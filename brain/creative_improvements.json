@@ -3305,5 +3305,35 @@
     "category": "entry sniper",
     "status": "catalogued — standing decision blocks",
     "risk": "high — violates standing CEO decision"
+  },
+  {
+    "date": "2026-10-07T04:38:27Z",
+    "idea": "Conservative SHORT RSI gate: use min(detect_rsi, entry_rsi_14, live_rsi) when any source available",
+    "rationale": "Post Oct6 SHORT trades show RSI source disagreement: APT entry_rsi_14=13.10 vs meta rsi_14=42.31 (29pt gap); LTC 28.49 vs 49.15. Filter uses one source; stored column uses another. Using the most-oversold reading blocks knife-catches even when one RSI source \"recovered\".",
+    "expected_impact": "Closes residual oversold-SHORT leak. 30d RSI<45 SHORT = -$5.52 — any path that lets a low reading through is leaving money on the table.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "decider_run.py SHORT floor checks: if any available RSI source < floor → SKIP (already partially true for live+detect; extend to entry_rsi_14 from sig/DB at exec)"
+  },
+  {
+    "date": "2026-10-07T04:38:27Z",
+    "idea": "Slot priority: when volume-breakout-long+ fires (golden goose, eRSI~59, 71%WR), deprioritize lower-edge LONG signals in same cycle",
+    "rationale": "volume-breakout-long+ is best signal (+$1.78/14d, 71.4%WR). Portfolio is slot-limited. When it fires, prefer it over bb-squeeze mid-RSI or mid-range LONGs that historically bleed.",
+    "expected_impact": "Shifts fill mix toward highest-EV signal. No new filter — ranking only.",
+    "category": "execution priority",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "decider/signal_runner confidence ordering already exists — document rule + verify volume-breakout ranks above bb-squeeze when both fire"
+  },
+  {
+    "date": "2026-10-07T04:38:27Z",
+    "idea": "REJECTED watchdog steer: bb-squeeze+ RSI ceiling to <=70",
+    "rationale": "Watchdog recommended capping bb-squeeze at RSI<=70 (avg entry 74.6, net -$0.05). DB REFUTES: 30d RSI>=80 = 24T 70.8%WR +$0.33 (BEST band). Cap at 70 would kill winners and keep the mediocre 65-70 band (-$0.16). Actual fix applied: RSI_MIN=60 to block low-RSI knife catches.",
+    "expected_impact": "N/A — rejected. Documented so future runs do not re-propose the ceiling.",
+    "category": "wrong-side prevention",
+    "status": "rejected",
+    "risk": "n/a",
+    "implementation": "n/a"
   }
 ]

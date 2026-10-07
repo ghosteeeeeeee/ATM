@@ -1,231 +1,190 @@
 {
-  "timestamp": "2026-10-06T23:38:12Z",
+  "timestamp": "2026-10-07T04:38:27Z",
   "session_brain_stats": {
-    "queries_run": 3,
-    "top_insights": [
-      "SHORT RSI floor runs at detection time not execution — USUAL dropped RSI 40→28 between detect and exec",
-      "pump-chain-short needs deeper filters — original trades had high WR, what made them winners",
-      "RSI sweet-spot: LONG 60-70 = 64.6%WR best bucket; SHORT 50-60 = 66.7%WR only winning short bucket"
-    ]
+    "queries_run": [
+      "SHORT RSI floor oversold",
+      "bb-squeeze RSI ceiling",
+      "trend-ride losing streak",
+      "new signal idea",
+      "hard_max_loss leverage"
+    ],
+    "note": "Session brain confirms recurring: oversold SHORT bleed, hard_max_loss leverage, RSI ceiling fights. No new unimplemented signal specs beyond ema_reclaim (still 0 trades EVER — delegated to signal_analyst)."
   },
   "trade_summary_24h": {
-    "closed": 12,
-    "pnl": -0.54,
-    "wr": 33.3,
-    "open": 1,
-    "open_trade": "LTC pump-chain- SHORT +0.46% entry=69.315 stop=69.227 (INVERTED — bug_hunter flag)",
-    "regime": "BTC SHORT_BIAS / STRONG_DOWN / NORMAL vol / ACCUMULATION",
-    "7d": {
-      "closed": 209,
-      "pnl": 0.44,
-      "wr": 54.1,
-      "long_pnl": 2.29,
-      "short_pnl": -1.85
+    "closed": 9,
+    "pnl_usdt": 1.06,
+    "win_rate": 66.7,
+    "by_signal": {
+      "pump-chain- SHORT": "5T +$0.85 60%WR",
+      "oversold-bounce+ LONG": "2T +$0.24 100%WR",
+      "mover+ LONG": "1T +$0.10 100%WR (signal now KILLED)",
+      "bb-squeeze+ LONG": "1T -$0.13 0%WR"
     },
-    "dominant_bleed": "hard_max_loss 22T -$3.28 0%WR since Oct 4 — entry timing failure (MFE<0.3%), not stop failure",
-    "best_signals_7d": [
-      "volume-breakout-long+ 5T 60%WR +$1.50 avg_rsi=53.8",
-      "pump-chain+ 10T 70%WR +$1.09 avg_rsi=69.0",
-      "bb-bounce-v2-long+ 10T 80%WR +$0.27 avg_rsi=58.8"
+    "losers_24h": [
+      "IO pump-chain- SHORT RSI_meta=41.03 hard_max_loss -$0.12",
+      "LTC pump-chain- SHORT RSI_meta=50.0 hard_max_loss -$0.25",
+      "POL bb-squeeze+ LONG RSI=64.14 HIGH hard_max_loss -$0.13"
     ],
-    "worst_signals_7d": [
-      "pump-chain- SHORT 23T 39.1%WR -$1.18 avg_rsi=30.4",
-      "mtf-regime-trend+ LONG 9T 44.4%WR -$0.46",
-      "accel-300- SHORT 8T 37.5%WR -$0.34"
-    ]
+    "regime": "BTC 4h SHORT_BIAS / 15m NEUTRAL / vol LOW — battle zone, flat is correct"
   },
-  "losing_trade_autopsy": [
-    {
-      "trade": "LTC pump-chain- SHORT pnl=-$0.25",
-      "signal": "pump-chain-",
-      "regime": "NORMAL",
-      "root_cause": "Shorted at RSI=9.9 (extreme oversold) — wrong side. Winning side = LONG bounce.",
-      "entry_check": "RSI 9.9 at entry, below hard floor 25. Opened 03:29 pre-dates CEO floor raise to 45.",
-      "recommended_change": "Already blocked by SHORT_RSI_FLOOR=45 + HARD_FLOOR=25 post-CEO. Monitor.",
-      "impact_on_winners": "N/A — filter already live",
-      "confidence": "HIGH"
+  "trade_summary_7d": {
+    "total": "209T -$0.31 54.1%WR (FLIPPED NEGATIVE per CEO 02:00)",
+    "long": "169T +$1.35 56.8%WR",
+    "short": "40T -$0.52 45.0%WR",
+    "by_regime": {
+      "EXTREME": "+$1.88",
+      "FLAT": "+$0.44",
+      "NORMAL": "-$0.36",
+      "HIGH": "-$1.21"
     },
-    {
-      "trade": "IO pump-chain- SHORT pnl=-$0.12",
-      "signal": "pump-chain-",
-      "regime": "EXTREME",
-      "root_cause": "Shorted at RSI=38 — below new floor 45. Opened 19:25, floor raised 22:30.",
-      "entry_check": "RSI 38 at entry. Pre-dates CEO change.",
-      "recommended_change": "Already blocked by floor=45 post-CEO. Monitor.",
-      "impact_on_winners": "N/A — filter already live",
-      "confidence": "HIGH"
-    },
-    {
-      "trade": "USELESS trend-ride+ LONG pnl=-$0.12",
-      "signal": "trend-ride+",
-      "regime": "EXTREME",
-      "root_cause": "LONG at RSI=16.8 (extreme oversold) — falling knife. trend-ride+ is momentum signal firing outside intended RSI 50-70 range.",
-      "entry_check": "RSI 16.8 at entry. Signal designed for RSI 50-70 momentum.",
-      "recommended_change": "trend-ride+ RSI_MIN=50 gate — but n=7 14d below 20T threshold. MONITOR.",
-      "impact_on_winners": "n=7 too small to verify. 3 winners avg_rsi=70.9 — RSI_MIN=50 would preserve them.",
-      "confidence": "LOW (sample size)"
-    },
-    {
-      "trade": "HBAR trend-ride+ LONG pnl=-$0.11",
-      "signal": "trend-ride+",
-      "regime": "NORMAL",
-      "root_cause": "LONG at RSI=41.5 — mid-range, not in winning 60-70 zone. Same pattern as USELESS/SUPER.",
-      "entry_check": "RSI 41.5 at entry. Losers avg_rsi=42.3, winners avg_rsi=70.9.",
-      "recommended_change": "Same as USELESS — trend-ride+ RSI_MIN=50. MONITOR (n=7).",
-      "impact_on_winners": "0 winners blocked (all winners RSI>60).",
-      "confidence": "LOW (sample size)"
-    },
-    {
-      "trade": "SUPER trend-ride+ LONG pnl=-$0.11",
-      "signal": "trend-ride+",
-      "regime": "HIGH",
-      "root_cause": "LONG at RSI=46 — mid-range. Third trend-ride+ loser at low RSI this 24h.",
-      "entry_check": "RSI 46 at entry. Cluster of 3 trend-ride+ losses all at RSI 40-47.",
-      "recommended_change": "Same trend-ride+ RSI_MIN gate. MONITOR.",
-      "impact_on_winners": "See above.",
-      "confidence": "LOW (sample size)"
-    },
-    {
-      "trade": "TURBO bb-squeeze+ LONG pnl=-$0.12",
-      "signal": "bb-squeeze+",
-      "regime": "NORMAL",
-      "root_cause": "Variance — bb-squeeze+ RSI>70 is its EDGE (39T 64.1%WR +$0.43 14d). TURBO also lost -$0.16 Oct 5 at same RSI=100. Not a filter issue.",
-      "entry_check": "Detection RSI=75, stored RSI=100. bb-squeeze+ in STANDALONE_BYPASS — RSI ceiling intentionally bypassed for this momentum signal.",
-      "recommended_change": "None — working as designed. hard_max_loss = entry timing.",
-      "impact_on_winners": "39T RSI>70 winners would be killed by ceiling. Do NOT add ceiling.",
-      "confidence": "HIGH"
-    },
-    {
-      "trade": "POL bb-squeeze+ LONG pnl=-$0.13",
-      "signal": "bb-squeeze+",
-      "regime": "HIGH",
-      "root_cause": "Variance — RSI 64 is in the good zone for bb-squeeze+. HIGH is its best habitat (research 74.1%WR).",
-      "entry_check": "RSI 64.14 at entry. Within intended range.",
-      "recommended_change": "None — variance.",
-      "impact_on_winners": "N/A",
-      "confidence": "HIGH"
-    }
-  ],
-  "signal_quality_findings": [
-    {
-      "finding": "hard_max_loss is THE root cause across all signals",
-      "evidence": "Since Oct 4 ATR_TP_MIN change: hard_max_loss 22T -$3.28 0%WR vs profit-monster-trail 32T +$1.92 93.8%. Watchdog: 'hard_max_loss trades 7d avg MFE<0.3% — entry timing failure, not stop failure.'",
-      "implication": "Stops work. Entries arrive after moves exhaust. Fix = entry timing quality, not SL/TP width.",
-      "status": "delegated to bug_hunter queue#2 (leverage-aware semantics) — do not re-propose"
-    },
-    {
-      "finding": "trend-ride+ is RSI-dependent — works at RSI>70, loses at RSI~42",
-      "evidence": "14d: hard_max_loss 4T avg_rsi=42.3 0%WR -$0.34 vs profit-monster-trail 3T avg_rsi=70.9 100%WR +$0.16. All 24h losers at RSI 40-47.",
-      "implication": "Signal fires outside its intended RSI 50-70 range. RSI_MIN=50 would block losers, preserve winners.",
-      "status": "MONITOR — n=7 14d below 20T threshold"
-    },
-    {
-      "finding": "pump-chain- RSI 20-30 is a WINNING band being blocked by floor=45",
-      "evidence": "14d: pump-chain- SHORT RSI 20-30 = 17T 64.7%WR +$0.78 (BEST SHORT CELL). RSI 30-45 = 31T 41.9%WR -$1.13 (BLEED). Floor=45 blocks BOTH bands.",
-      "implication": "CEO's floor=45 correctly cuts the 40-45 bleed band but also collateral-blocks the winning 20-30 band. Standing decision 'exec RSI>=40' prevents allowing 20-30.",
-      "status": "DATA FINDING — standing decision blocks action. Flag for CEO."
-    },
-    {
-      "finding": "LONG RSI 40-60 is a dead zone (73T ~46%WR -$0.80)",
-      "evidence": "14d: RSI 40-50 = 33T 45.5%WR -$0.52, RSI 50-60 = 40T 47.5%WR -$0.28. Combined 73T. vs RSI 60-70 = 48T 64.6%WR +$1.15 (best) and RSI 20-40 = 35T 54.3%WR +$0.12.",
-      "implication": "Mid-range LONGs bleed. Needs confidence dampen, not block (40-60 spans multiple signals).",
-      "status": "creative improvement — see below"
-    }
-  ],
+    "hard_max_loss": "58T -$8.11 0%WR pre-fix; 0 hard_max_loss exits since CEO leverage-aware fix 02:00 Oct7 (2 closes both wins +$1.14)"
+  },
   "drift_findings": [
     {
-      "item": "ATR_TP_MIN=0.013 (my Oct 4 change)",
-      "status": "LIVE — unjudgeable",
-      "impact": "Since change: hard_max_loss 22T -$3.28 0%WR. TP floor isn't the issue — entries arrive after moves exhaust (MFE<0.3%). Impact N/A.",
-      "action": "Keep. Root cause is entry timing, not TP width."
+      "id": "DRIFT-AUDIT-001",
+      "finding": "Watchdog rec SHORT_RSI_HARD_FLOOR 25→45 was correct and UNIMPLEMENTED at audit start",
+      "status": "FIXED this run",
+      "evidence": "30d SHORT RSI<45=114T -$5.52 vs >=45=246T +$3.53"
     },
     {
-      "item": "BTC override LONG RECOVERY/NEUTRAL + non-bear linreg (my Oct 6 change)",
-      "status": "LIVE — no clear signal",
-      "impact": "Current regime STRONG_DOWN/SHORT_BIAS. 7d LONG +$2.29/170T 57.1% — working fine. Cannot isolate override impact.",
-      "action": "Keep. Monitor 48h."
+      "id": "DRIFT-AUDIT-002",
+      "finding": "Watchdog rec bb-squeeze+ RSI ceiling <=70 is WRONG — >=80 is best band",
+      "status": "REJECTED — applied RSI_MIN=60 instead",
+      "evidence": "30d >=80: 24T 70.8%WR +$0.33; 65-70: 9T -$0.16; <60: 10T -$0.44"
     },
     {
-      "item": "CEO 22:30 SHORT broadening (floor 45, pump_chain min 45, continuum 40, HIGH opened)",
-      "status": "LIVE — 1h old, needs 48h",
-      "impact": "24h since change: 12T -$0.54 33.3%WR. But most 24h losers pre-date the change (opened before 22:30). Post-change sample too thin.",
-      "action": "DO NOT STACK. 48h monitor."
+      "id": "DRIFT-AUDIT-003",
+      "finding": "trend-ride+ already KILLED 2026-10-06 (TREND_RIDE_LONG_ENABLED=False) — watchdog still flags it",
+      "status": "STALE WATCHDOG STEER — no action needed",
+      "evidence": "hermes_constants.py:2254"
+    },
+    {
+      "id": "DRIFT-AUDIT-004",
+      "finding": "entry_rsi_14 vs _signal_metadata.rsi_14 disagree wildly on recent SHORTs (APT 13.10 vs 42.31)",
+      "status": "OPEN — data quality issue",
+      "evidence": "Post-Oct6 SHORT trades: metadata RSI often 20-30pts higher than trades.entry_rsi_14. Filters use metadata/live; analytics use entry_rsi_14. Cannot fully trust entry_rsi_14 for autopsy.",
+      "owner": "bug_hunter"
+    },
+    {
+      "id": "DRIFT-AUDIT-005",
+      "finding": "ATR_TP_MIN=0.013 fix working — RR<1 trades collapsed",
+      "status": "MONITOR",
+      "evidence": "Post Oct4 fix: RR<1=3T -$0.50 0%WR; RR>=1=60T +$0.03 60%WR. Still some RR<1 (SL/TP from other engines)."
     }
   ],
   "recurring_problems": [
-    {
-      "problem": "hard_max_loss entry timing failure",
-      "frequency": "Dominant bleed 7d+ — 62% of 24h closes, -$3.28 since Oct 4",
-      "root_cause": "Entries arrive after moves exhaust. MFE<0.3% on hard_max_loss trades.",
-      "owner": "bug_hunter queue#2 (leverage-aware semantics) — standing delegation"
-    },
-    {
-      "problem": "Oversold shorts = wrong side",
-      "frequency": "14d verified: SHORT RSI<20 = 7.1%WR, RSI 30-40 = 34.4%WR. Only RSI 50-60 wins (66.7%).",
-      "root_cause": "pump-chain- fires on falling momentum, enters short at bottom of move. Winning side = LONG bounce.",
-      "owner": "CEO floor=45 addresses this. Monitor 48h."
-    },
-    {
-      "problem": "Best signals under-allocated vs losers",
-      "frequency": "7d: pump-chain+ 70%WR +$1.09 vs pump-chain- 39%WR -$1.18. Volume allocated to loser.",
-      "root_cause": "pump-chain- fires more frequently than pump-chain+ in current regime.",
-      "owner": "Cannot directly control frequency. Regime gates + RSI floors are the lever."
-    }
+    "SHORT oversold bleed — recurring since Sep. Floors raised repeatedly (25→40→45 HARD, 40→45 FLOOR, pump-chain MIN 45). Winning side confirmed: SHORT only RSI>=50.",
+    "hard_max_loss leverage mismatch — #1 bleed 58T -$8.11/7d. CEO shipped leverage-aware fix 02:00 Oct7. 0 post-fix exits so far.",
+    "RSI source disagreement (entry_rsi_14 vs metadata) — recurring data quality issue undermines audits.",
+    "LOW vol split regime (HTF bear / LTF base) — flat correct; no forced entries."
   ],
   "missing_implementations": [
     {
-      "item": "trend-ride+ RSI_MIN=50 gate",
-      "reason": "n=7 14d below 20T threshold",
-      "action": "Monitor. Re-check at n>=20."
+      "item": "ema_reclaim_long — 0 trades EVER despite being ENABLED",
+      "status": "delegated signal_analyst (overdue since Oct 1)",
+      "note": "Still unbuilt/starved. Not a config change for brain_auditor."
+    }
+  ],
+  "losing_trade_autopsy_24h": [
+    {
+      "losing_trade": "LTC pump-chain- SHORT pnl=-$0.25",
+      "signal": "pump-chain-",
+      "regime": "NORMAL",
+      "root_cause": "Shorted into extreme oversold (stored entry_rsi_14=9.90, meta=50.0). RSI source disagreement. hard_max_loss exit.",
+      "entry_check": "Open Oct6 03:29 — pre/at floor-raise window. Oversold short = someone else's long.",
+      "recommended_change": "SHORT_RSI_HARD_FLOOR 25→45 (APPLIED) + conservative min-RSI gate (suggested)",
+      "impact_on_winners": "30d RSI>=45 SHORT = 246T +$3.53 preserved",
+      "confidence": "HIGH"
     },
     {
-      "item": "LONG mid-range confidence dampen (40-60 RSI)",
-      "reason": "Needs new code (confidence multiplier logic), not config constant",
-      "action": "See creative improvement below"
+      "losing_trade": "IO pump-chain- SHORT pnl=-$0.12",
+      "signal": "pump-chain-",
+      "regime": "EXTREME",
+      "root_cause": "Meta RSI 41.03 < 45. Small loss. Part of oversold-short pattern.",
+      "entry_check": "Open Oct6 19:25. hard_max_loss.",
+      "recommended_change": "HARD_FLOOR=45 (APPLIED)",
+      "impact_on_winners": "EXTREME pump-chain- RSI>=45 edge preserved",
+      "confidence": "HIGH"
+    },
+    {
+      "losing_trade": "POL bb-squeeze+ LONG pnl=-$0.13",
+      "signal": "bb-squeeze+",
+      "regime": "HIGH",
+      "root_cause": "Squeeze-break LONG at RSI 64.14 in HIGH regime. Not low-RSI (<60) — this one survives new filter. Exit hard_max_loss.",
+      "entry_check": "RSI 64 is in mediocre 60-70 band (-$0.16/30d). HIGH regime bb-squeeze not the best habitat.",
+      "recommended_change": "BB_SQUEEZE_LONG_RSI_MIN=60 (APPLIED — would NOT block this trade). HIGH-regime bb-squeeze remains watch item.",
+      "impact_on_winners": "Does not affect RSI>=60 winners",
+      "confidence": "MEDIUM"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-06T23:38:12Z",
-      "idea": "LONG RSI mid-range confidence dampen (40-60) — reduce confidence multiplier 0.3x for LONG entries in dead zone",
-      "rationale": "14d verified: LONG RSI 40-50 = 33T 45.5%WR -$0.52, RSI 50-60 = 40T 47.5%WR -$0.28. Combined 73T ~46%WR -$0.80. vs RSI 60-70 = 48T 64.6%WR +$1.15 (best bucket) and RSI 20-40 = 35T 54.3%WR +$0.12. Mid-range LONGs are structural losers — not because the setup is impossible, but because momentum signals fire when move is halfway done. Dampen (not block) preserves the 60-70 winners while reducing dead-zone exposure. 73T > 50T regime threshold.",
-      "expected_impact": "-$0.40 to -$0.60/14d bleed reduction from dead zone; 0 winners blocked (all winners RSI>=60 or <40)",
-      "category": "entry sniper",
+      "idea": "Conservative SHORT RSI gate using min of all available RSI sources",
       "status": "suggested",
-      "risk": "low-medium — confidence dampen not block; needs implementation in signal_compactor; CEO approval required"
+      "rationale": "APT entry_rsi=13.10 vs meta=42.31 — any low reading should block SHORT"
     },
     {
-      "date": "2026-10-06T23:38:12Z",
-      "idea": "pump-chain- RSI band filter concept: block 30-45 specifically instead of blanket floor",
-      "rationale": "14d: pump-chain- RSI 20-30 = 17T 64.7%WR +$0.78 (BEST SHORT CELL) but RSI 30-45 = 31T 41.9%WR -$1.13 (BLEED). Current floor=45 blocks BOTH bands. A band filter (block 30-45, allow 20-30 and 45+) would cut the bleed while preserving the winning oversold bounce. HOWEVER: standing decision 'exec RSI>=40 all paths' prevents allowing 20-30. This idea is CATALOGUED for if/when standing decision is revisited.",
-      "expected_impact": "If standing decision relaxed: +$0.78/14d from preserved 20-30 band. Current: N/A.",
-      "category": "entry sniper",
-      "status": "catalogued — standing decision blocks implementation",
-      "risk": "high — violates standing CEO decision. Do NOT implement without CEO sign-off."
+      "idea": "Slot priority for volume-breakout-long+ when it fires",
+      "status": "suggested",
+      "rationale": "Golden goose +$1.78/14d — prefer when slots open"
+    },
+    {
+      "idea": "REJECTED: bb-squeeze RSI ceiling <=70",
+      "status": "rejected",
+      "rationale": ">=80 is best band (+$0.33). Ceiling would kill winners."
     }
   ],
-  "config_changes_applied": [],
-  "changes_from_last_run": [
+  "config_changes_applied": [
     {
-      "change": "ATR_TP_MIN 0.008→0.013 (Oct 4 11:36)",
-      "status": "LIVE",
-      "worked": "unjudgeable — 2 post-change trades both hard_max_loss. Root cause is entry timing, not TP width.",
-      "action": "Keep. No revert."
+      "change": "SHORT_RSI_HARD_FLOOR 25→45",
+      "file": "scripts/hermes_constants.py",
+      "type": "config",
+      "restart_required": true
     },
     {
-      "change": "BTC override LONG RECOVERY/NEUTRAL + non-bear linreg (Oct 6 06:39)",
-      "status": "LIVE",
-      "worked": "no clear signal — regime shifted to SHORT_BIAS, 7d LONG +$2.29 working fine",
-      "action": "Keep. Monitor 48h."
+      "change": "BB_SQUEEZE_LONG_RSI_MIN=60 + bollinger_squeeze.py RSI filter",
+      "file": "scripts/hermes_constants.py + scripts/signals/bollinger_squeeze.py",
+      "type": "config",
+      "restart_required": true
+    },
+    {
+      "change": "MOVER_PLUS/MINUS killed (logged — was applied earlier today, uncommitted)",
+      "file": "scripts/hermes_constants.py",
+      "type": "kill",
+      "restart_required": true
+    }
+  ],
+  "changes_from_last_run": [
+    {
+      "change": "ATR_TP_MIN 0.008→0.013 (2026-10-04)",
+      "worked": "YES — RR<1 collapsed from structural bleed to 3T -$0.50 post-fix; RR>=1 60T 60%WR",
+      "verdict": "KEEP"
+    },
+    {
+      "change": "PUMP_CHAIN_LONG_RSI_MAX wiring (2026-10-04)",
+      "worked": "MONITOR — pump-chain+ 7d still mixed; no catastrophic RSI>70 longs in 24h",
+      "verdict": "KEEP"
+    },
+    {
+      "change": "EXTREME pump-chain- SHORT block revert 0.0→1.0 (2026-10-04)",
+      "worked": "YES — pump-chain- 24h 5T +$0.85 60%WR; EXTREME SHORT is habitat",
+      "verdict": "KEEP"
+    },
+    {
+      "change": "BTC override LONG non-bear linreg (2026-10-06)",
+      "worked": "MONITOR — no BTC LONG losers in 24h; regime still battle-zone",
+      "verdict": "KEEP"
     }
   ],
   "next_actions": [
-    "48h monitor: CEO 22:30 SHORT changes (floor 45, HIGH opened, continuum 40) — do not stack",
-    "bug_hunter #1: hard_max_loss leverage-aware semantics — STILL critical path for SHORT 7d >=$0",
-    "bug_hunter candidate: LTC stop_loss column inverted (69.227 < entry 69.315 for SHORT) — data display or logic bug",
-    "MONITOR: trend-ride+ RSI_MIN gate at n>=20 (currently n=7)",
-    "MONITOR: pump-chain- post-floor-change RSI distribution — is 45-55 EXTREME cell holding?",
-    "CEO flag: pump-chain- RSI 20-30 winning band blocked by floor=45 — standing decision prevents action, revisit if SHORT continues bleeding",
-    "signal_analyst: still 0 new signals this week — overdue for Oct 10 deadline"
+    "RESTART pipeline to load SHORT_RSI_HARD_FLOOR=45 + BB_SQUEEZE_LONG_RSI_MIN=60 + mover kill",
+    "MONITOR 48h: hard_max_loss post leverage-aware fix (CEO metric Oct 11)",
+    "MONITOR 48h: bb-squeeze+ RSI_MIN=60 — expect fewer <60 entries, WR lift",
+    "MONITOR 48h: SHORT count + SHORT 7d PnL post HARD_FLOOR=45",
+    "DELEGATE bug_hunter: entry_rsi_14 vs metadata rsi_14 disagreement root cause",
+    "DELEGATE signal_analyst: ema_reclaim_long coverage still 0 trades EVER",
+    "WATCH: trend-ride+ already killed — watchdog steer is stale",
+    "WATCH: volume-breakout-long+ — protect, prioritize when slots open",
+    "WATCH: HIGH regime bb-squeeze (POL-class losses survive RSI_MIN=60)"
   ]
 }

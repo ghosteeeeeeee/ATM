@@ -879,7 +879,7 @@ SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocke
 # STANDALONE_BYPASS skips signal_compactor (where OVERSOLD_SHORT_RSI_MAX lives), and both compactor
 # and decider bearish-structure overrides allowed RSI<25 SHORT through. 14d: RSI<25 SHORT = 12T 25%WR
 # -$0.89; 0 real winners (3 scratches +$0.01 each). BANANA lesson: oversold = bounce risk even in downtrend.
-SHORT_RSI_HARD_FLOOR = 25      # brain_auditor 2026-10-01 — hard block, NO bearish override. Applied in decider_run.py detection + execution gates.
+SHORT_RSI_HARD_FLOOR = 45      # brain_auditor 2026-10-07: raised 25→45, align SHORT_RSI_FLOOR. 30d SHORT RSI<45=114T 34.4%WR -$5.52 vs >=45=246T +$3.53. Defense-in-depth: catches STANDALONE_BYPASS paths that only check HARD_FLOOR. No bearish override.
 
 # ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
 # When SHORT_RSI_FLOOR is 40, RSI <40 is blocked. Extra guard for extreme oversold.
@@ -2629,6 +2629,7 @@ BOLLINGER_SQUEEZE_BREAK_PCT    = 0.15     # price must cross band by this % for 
 BOLLINGER_SQUEEZE_CANDLE_SEC   = 300      # candle period in seconds (300 = 5m)
 BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze formation
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
+BB_SQUEEZE_LONG_RSI_MIN = 60              # brain_auditor 2026-10-07 — block low-RSI squeeze LONG entries. 30d: RSI<60=10T 30%WR -$0.44 vs >=60=61T 63.9%WR +$0.18. Winners avg RSI 76. Squeeze-break in weakness = catching knife.
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = False    # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
@@ -3359,8 +3360,8 @@ MOMENTUM_LEADERBOARD_CONF_CAP = 90            # maximum confidence (matches syst
 # mover.py — catches coins ACCELERATING into moves, not just moving
 # Uses velocity acceleration as primary signal (fires at START of move)
 MOVER_ENABLED = True                    # master kill-switch
-MOVER_PLUS_ENABLED = True              # RE-ENABLED 2026-09-22 (CEO)
-MOVER_MINUS_ENABLED = True             # RE-ENABLED 2026-09-22 (CEO)
+MOVER_PLUS_ENABLED = False              # brain_auditor 2026-10-07 KILL — post Sep22 re-enable 8T LONG −$0.99 25%WR; 30d 23T −$0.89. Dominant exit atr_sl_hit (leverage-aware hard_max_loss fix will NOT help). BLUR SHORT RSI=100 chase. Revisit only with new backtest.
+MOVER_MINUS_ENABLED = False             # brain_auditor 2026-10-07 KILL — post Sep22 re-enable 3T SHORT −$0.72 0%WR; 30d 12T −$0.20 58%WR net-negative. Same atr_sl/hard_sl bleed.
 MOVER_TOP_N = 20                        # top N candidates to evaluate
 MOVER_VELOCITY_MIN = 0.3                # min velocity % (lowered — acceleration is primary)
 MOVER_VELOCITY_WINDOW = 12              # candles for velocity calc (=1h on 5m)

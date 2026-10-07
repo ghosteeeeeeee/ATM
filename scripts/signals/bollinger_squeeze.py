@@ -30,6 +30,7 @@ BREAK_PCT       = hc.BOLLINGER_SQUEEZE_BREAK_PCT
 CANDLE_SECONDS  = hc.BOLLINGER_SQUEEZE_CANDLE_SEC
 LOOKBACK_HOURS  = hc.BOLLINGER_SQUEEZE_LOOKBACK_H
 COOLDOWN_MIN    = hc.BOLLINGER_SQUEEZE_COOLDOWN_MIN
+LONG_RSI_MIN    = getattr(hc, 'BB_SQUEEZE_LONG_RSI_MIN', 0)
 SIGNAL_TYPE_L   = 'bollinger_squeeze_long'
 SIGNAL_TYPE_S   = 'bollinger_squeeze_short'
 SOURCE_TAG      = 'bb-squeeze'
@@ -181,12 +182,26 @@ def scan_bollinger_squeeze():
         if direction == 'SHORT' and not hc.BOLLINGER_SQUEEZE_MINUS_ENABLED:
             continue
 
+        # Entry-quality gate: squeeze-break LONG at low RSI = knife catch.
+        # 30d: RSI<60 = 10T 30%WR -$0.44; >=60 = 61T 63.9%WR +$0.18. Fail-open (allow) if RSI unavailable.
+        rsi_val = None
+        if direction == 'LONG' and LONG_RSI_MIN > 0:
+            try:
+                from rsi_utils import compute_rsi
+                rsi_val = compute_rsi(token, tf='5m', period=14)
+            except Exception:
+                rsi_val = None
+            if rsi_val is not None and rsi_val < LONG_RSI_MIN:
+                print(f'  [bb-squeeze] {token} LONG BLOCKED — RSI {rsi_val:.1f} < {LONG_RSI_MIN} (squeeze-break in weakness)')
+                continue
+
         if _in_cooldown(token, direction):
             continue
 
         price = candles[-1][4]
         signal_type = SIGNAL_TYPE_L if direction == 'LONG' else SIGNAL_TYPE_S
         source_tag = f'{SOURCE_TAG}+' if direction == 'LONG' else f'{SOURCE_TAG}-'
+        details_out = details if rsi_val is None else f'{details} rsi={rsi_val:.1f}'
 
         add_signal(
             token=token,
@@ -194,11 +209,11 @@ def scan_bollinger_squeeze():
             signal_type=signal_type,
             source=source_tag,
             confidence=confidence,
-            value=details,
+            value=details_out,
             price=price,
             timeframe='5m',
         )
-        signals_found.append(f'{token} {direction} conf={confidence} {details}')
+        signals_found.append(f'{token} {direction} conf={confidence} {details_out}')
 
     elapsed = time.time() - t0
     if signals_found:

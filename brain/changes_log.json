@@ -814,5 +814,38 @@
     "after": "(_p in ('RECOVERY','NEUTRAL') and _l not in ('LEAN_BEAR','BEAR')) or structural bull",
     "rationale": "SUPER RECOVERY+LEAN_BEAR+BELOW reopened after CONTINUUM-BLOCK; net +$0.57/7d SUPER-class, +$3.07 RECOVERY+non-bear preserved",
     "impact": "Block wrong-side LONGs into bear structure during RECOVERY/NEUTRAL phase"
+  },
+  {
+    "timestamp": "2026-10-07T03:00:00Z",
+    "agent": "brain_auditor",
+    "change": "Killed MOVER_PLUS_ENABLED and MOVER_MINUS_ENABLED (True/True → False/False)",
+    "type": "kill",
+    "file": "scripts/hermes_constants.py",
+    "before": "MOVER_PLUS_ENABLED=True, MOVER_MINUS_ENABLED=True",
+    "after": "MOVER_PLUS_ENABLED=False, MOVER_MINUS_ENABLED=False",
+    "rationale": "mover+ 8T post-re-enable -$0.99 25%WR 30d; mover- 3T -$0.72 0%WR. Dominant exit atr_sl_hit/hard_sl. 14d losers: mover+ -$1.25, mover- -$0.72.",
+    "impact": "Stops bleeding on both directions. Revisit only with new backtest."
+  },
+  {
+    "timestamp": "2026-10-07T04:38:27Z",
+    "agent": "brain_auditor",
+    "change": "Raise SHORT_RSI_HARD_FLOOR 25→45 (align SHORT_RSI_FLOOR)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "SHORT_RSI_HARD_FLOOR = 25",
+    "after": "SHORT_RSI_HARD_FLOOR = 45",
+    "rationale": "30d SHORT RSI<45 = 114T 34.4%WR -$5.52 vs RSI>=45 = 246T +$3.53. 14d: <45=87T -$2.89 vs >=45=17T +$0.62. Defense-in-depth for STANDALONE_BYPASS paths. Winning side is SHORT only when RSI>=50 (50-65 +$0.31, >=65 +$0.12/14d).",
+    "impact": "Blocks oversold SHORT bleed. Would have blocked 87/104 SHORT trades (14d) netting -$2.89; kept 17 winners netting +$0.62. pump-chain- EXTREME RSI>=45 edge preserved via PUMP_CHAIN_SHORT_RSI_MIN=45 + SHORT_RSI_FLOOR=45."
+  },
+  {
+    "timestamp": "2026-10-07T04:38:27Z",
+    "agent": "brain_auditor",
+    "change": "Add BB_SQUEEZE_LONG_RSI_MIN=60 + wire RSI filter in bollinger_squeeze.py",
+    "type": "config",
+    "file": "scripts/hermes_constants.py + scripts/signals/bollinger_squeeze.py",
+    "before": "No RSI filter on bb-squeeze LONG — squeeze-break any RSI",
+    "after": "BB_SQUEEZE_LONG_RSI_MIN=60; detection skips LONG when compute_rsi(token,tf=5m)<60 (fail-open if RSI unavailable)",
+    "rationale": "bb-squeeze+ 30d RSI<60=10T 30%WR -$0.44 vs >=60=61T 63.9%WR +$0.18. 14d winners avg entry RSI 76.2 vs losers 71.4. Watchdog rec to cap at RSI<=70 REJECTED — >=80 band is best (+$0.33, 70.8%WR). Problem is low-RSI entries, not overbought.",
+    "impact": "Blocks ~10T/14d toxic low-RSI squeeze LONGs (-$0.44), preserves 61T winners (+$0.18). Expected +$0.40-0.50/14d on this signal."
   }
 ]

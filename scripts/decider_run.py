@@ -1914,7 +1914,7 @@ def execute_trade(token, direction, price, confidence, source,
                 log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} at execution time (extreme oversold — no bearish override)')
                 return False, f'RSI hard floor: {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR}'
             # 2026-10-06 brain_auditor: removed c4097276 exec bear override on SHORT_RSI_FLOOR.
-            # Standing decision (CURRENT.md): exec RSI>=40 all paths; HARD_FLOOR=25 no override.
+            # Standing decision: exec RSI>=45 all paths; HARD_FLOOR=45 (aligned 2026-10-07) no override.
             # 7d SHORT meta RSI<40: 13T 31%WR -$0.77; pump-chain- RSI<40: 3T 0%WR -$0.38.
             # Live-signal winner impact: 0 — the 4 RSI<40 winners were accel-300-/mtf-regime-trend- (disabled/killed).
             if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
