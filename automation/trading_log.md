@@ -5104,3 +5104,37 @@ CONFLUENCE_REQUIRED=True · LIVE_TRADING_ENABLED=True · PM_TRAIL_ACTIVATE_PCT=0
 
 ## TEAM UPDATES
 - [2026-10-07 01:12] auto_1hr: NO CHANGE — 0T last hour; 1 open LTC pump-chain- SHORT (SL correctly above entry); atr_sl_hit 0%; hard_max_loss 5T -$0.73 sole 24h bleed (queue#2 open); NEG-STREAK not active; kill/overtrade paths not active; no constants edit
+
+## [2026-10-07 02:12 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (2 wins, 0 losses)
+**PnL:** +$1.14 (WR: 100.0%)
+
+**Last hour detail:**
+- APT pump-chain- SHORT trail_sl +$0.53 (+23.9%)
+- LTC pump-chain- SHORT atr_trail_hit +$0.61 (+13.6%) — LTC open since 20:07 (~6h), exited near TP with trail
+
+**24h:** 10 closed | 6W 4L | +$0.95 (WR 60%)
+**24h by signal:** pump-chain- 5T 3W +$0.85 | oversold-bounce+ 2T 2W +$0.24 | mover+ 1T 1W +$0.10 | bb-squeeze+ 1T 0W -$0.13 | trend-ride+ 1T 0W -$0.11
+**24h by close reason:** hard_max_loss 4T -$0.61 (40%) | profit-monster-trail 3T +$0.34 | atr_trail_hit 1T +$0.61 | trail_sl 1T +$0.53 | rr_engine 1T +$0.08
+**Hourly streak:** 21:00 -$0.12 then 02:00 +$1.14 — NEG-STREAK not active
+**atr_sl_hit:** 1/10 = 10% — tpsl_utils.py fix stable
+**Open:** 0
+
+**Changes:** none — analysis only
+
+**No Change Needed:**
+- Kill: none — last hour only pump-chain- (2W); 24h 0%-WR signals are bb-squeeze+ 1T / trend-ride+ 1T — not 3+T clustered
+- Overtrade: 2/hr — fine
+- atr_sl_hit: 10% — no SL-tightness action, no CEO alert
+- NEG-STREAK: not active
+- hard_max_loss: 4/10 = 40% of 24h closes, sole bleed -$0.61 (all other exits +$1.56) — queue#2 leverage-aware semantics still open, not a constants change this hour
+- signal_versions.json not modified → no audit entry needed
+
+**Open Questions:**
+- hard_max_loss ~40% of closes persists — if another 24h at this rate, demand queue#2 fix or SL structure review
+- bb-squeeze+ / trend-ride+ each 1T 0W in 24h — kill-eligible only if 0% WR + 3+T cluster in one last hour
+- Volume low (0-2T/hr for ~8h) — quiet market vs filter starvation; pump-chain- only signal firing and winning — leave min confidence alone
+
+## TEAM UPDATES
+- [2026-10-07 02:12] auto_1hr: NO CHANGE — 2T last hour, both wins (APT +$0.53, LTC +$0.61 pump-chain- SHORTs); atr_sl_hit 10%; hard_max_loss 4T -$0.61 sole 24h bleed (queue#2 open); NEG-STREAK inactive; kill/overtrade paths not active; no constants edit
