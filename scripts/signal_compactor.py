@@ -1461,6 +1461,13 @@ def _score_signal(token, direction, conf, source, signal_type,
             _bullish_structure = (_ctx.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
                                   _ctx.get('trend_quality') in ('UP', 'STRONG_UP') and
                                   _ctx.get('ema300_position') in ('AT', 'ABOVE'))
+            # Strong bearish: score < 30, bias < -0.3
+            # OR: bearish structure (LEAN_BEAR + DOWN trend + EMA300 BELOW) regardless of score
+            # ponytail: both structure flags computed before the if/elif — an assignment between
+            # if-block and elif is a SyntaxError (broke signal_compactor + position_manager 20:05 UTC)
+            _bearish_structure = (_ctx.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
+                                  _ctx.get('trend_quality') in ('DOWN', 'STRONG_DOWN') and
+                                  _ctx.get('ema300_position') == 'BELOW')
             if (_score > 70 and _bias > 0.3) or _bullish_structure:
                 # FIX 2026-10-02: Check coin's own momentum before penalizing SHORT
                 # Compute live from price_history (momentum_cache percentiles are dead)
@@ -1497,11 +1504,6 @@ def _score_signal(token, direction, conf, source, signal_type,
                 if not _coin_momentum_ok:
                     trend_alignment_mult = 1.4 if direction == 'LONG' else 0.6
                     log(f"  📊 [TREND-ALIGN] {token} {direction}: BTC bullish (score={_score:.0f}, bias={_bias:.2f}) → {trend_alignment_mult:.2f}x")
-            # Strong bearish: score < 30, bias < -0.3
-            # OR: bearish structure (LEAN_BEAR + DOWN trend + EMA300 BELOW) regardless of score
-            _bearish_structure = (_ctx.get('linreg_direction') in ('LEAN_BEAR', 'BEAR') and
-                                  _ctx.get('trend_quality') in ('DOWN', 'STRONG_DOWN') and
-                                  _ctx.get('ema300_position') == 'BELOW')
             elif (_score < 30 and _bias < -0.3) or _bearish_structure:
                 # FIX 2026-10-02: Check coin's own momentum before penalizing LONG
                 # Compute live from price_history (momentum_cache percentiles are dead)
