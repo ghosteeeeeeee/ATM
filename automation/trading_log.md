@@ -5604,3 +5604,35 @@ BY: auto_1hr
 - 24h PnL drifted slightly lower ($0.85→$0.71) because older wins aged out; still net positive
 
 BY: auto_1hr
+
+## [2026-10-07 18:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+**Open:** 1 — FOGO pump-chain+ LONG @18:09:33, PnL -$0.01
+
+**24h:** 12 closed | 3W 9L | +$0.51 (WR 25.0%)
+**24h by signal:** pump-chain- 10T 3W +$0.72 | pump-chain+ 2T 0W -$0.21
+**24h by close reason:** hard_max_loss 7T -$0.61 (58.3% of closes) | atr_trail_hit 2T +$0.61 | hard_sl 1T -$0.10 | rr_engine_resistance_break 1T +$0.08 | trail_sl 1T +$0.53
+**atr_sl_hit:** 0/12 = 0% — tpsl_utils.py fix stable
+**Hourly streak:** 12h $0.00 | 13h -$0.22 | 14h-18h 0T — NEG-STREAK inactive (0T gaps, not consecutive losses)
+**Pipeline:** live_trading True; 1 open
+
+**Changes:** none — no trigger fired
+
+**No Change Needed:**
+- Kill: none — last hour 0T; pump-chain+ 24h 0% WR on 2T + 1 open FOGO (kill needs 3+ closed at 0% WR — if FOGO loses, trigger fires next hour)
+- Overtrade: 0/hr — fine
+- atr_sl_hit: 0% — fix deployed and stable
+- NEG-STREAK: inactive — 14h-18h are 0T gaps, not consecutive loss hours
+- hard_max_loss: 7/12 = 58.3% of 24h closes (up from 46.2% — wins aged out, losses stayed). Fix IS deployed; queue#2 leverage-aware SL review remains open. No new change this hour (max 1/hr rule; none warranted)
+- signal_versions.json parses OK; no constants edit → no version audit entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- FOGO pump-chain+ LONG open at 18:09 — third pump-chain+ trade. If it closes red, signal hits kill threshold (0% WR, 3T) next cycle
+- Quiet volume: 0T/hr since 13:00 (5h). Market vs filter starvation — leave min confidence alone
+- hard_max_loss ratio worsened 46.2%→58.3% purely from wins aging out; absolute count still 7T. Queue#2 SL review remains the live watch item
+- pump-chain- still carrying the 24h PnL (+$0.72 on 10T)
+
+BY: auto_1hr

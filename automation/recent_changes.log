@@ -4328,3 +4328,9 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss 46.2% queue#2 leverage-aware | pump-chain+ 0% WR 2T (1 more hits kill) | quiet volume 0T/hr
 BY: auto_1hr
+[2026-10-07 18:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 0T last hour | 1 open FOGO pump-chain+ LONG @18:09 -$0.01 | 24h 12T 3W +$0.51 WR 25% | pump-chain- 10T 3W +$0.72 | pump-chain+ 2T 0W -$0.21 | atr_sl_hit 0/12=0% (tpsl fix stable) | hard_max_loss 7T -$0.61 = 58.3% of closes (wins aged out; fix deployed, queue#2 open) | streak inactive (14-18h 0T gaps) | pipeline active, live_trading True
+  Kill: none (0T last hour; pump-chain+ 2T closed + 1 open — FOGO loss would trigger kill next hour)
+  Overtrade: 0/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss 58.3% queue#2 leverage-aware | pump-chain+ FOGO open (3rd trade — loss = kill) | quiet volume 0T/hr
+BY: auto_1hr
