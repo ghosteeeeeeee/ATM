@@ -40,6 +40,27 @@ cat /var/www/hermes/data/regime_5m.json
 cat /var/www/hermes/data/signals.json
 ```
 
+Also check recent volatility for candidate coins (needed for RR engine pre-check):
+```python
+import sqlite3
+conn = sqlite3.connect('/root/.hermes/data/candles.db')
+cur = conn.cursor()
+cur.execute('''
+    SELECT token, 
+           AVG((high - low) / close * 100) as atr_pct
+    FROM candles_5m 
+    WHERE ts > strftime('%s', 'now') - 3600
+    GROUP BY token
+    HAVING atr_pct > 0.3
+    ORDER BY atr_pct DESC
+    LIMIT 20
+''')
+print("Top coins by ATR% (last 1h):")
+for row in cur.fetchall():
+    print(f"  {row[0]}: {row[1]:.2f}%")
+conn.close()
+```
+
 ## Step 3: Deep Analysis (YOUR VALUE-ADD)
 
 The automated checks catch the obvious stuff. YOUR job is the deeper analysis:
@@ -139,14 +160,66 @@ Every hour, if there are open slots (fewer positions than MAX_POSITIONS), you pi
 - If open_trades < MAX_POSITIONS (check hermes_constants.py for MAX_POSITIONS), you may fire
 - Only fire once per hour — check if ai_trader_state.json was written in the last 45 minutes
 
-**How to pick the coin:**
+### GATE AWARENESS — Pick coins that WILL pass
+
+The pipeline has multiple gates between your pick and an actual trade. Recent picks got blocked:
+- **WLFI LONG** → RR Engine blocked (R:R 0.65 < 0.7 minimum)
+- **AVAX LONG** → BTC chop gate (now bypassed for ai-trader)
+- **SAGA LONG** → coin reversed to SHORT_BIAS within 15 min, signal expired
+
+**Before picking, run this pre-check:**
+```python
+import sqlite3, json
+conn = sqlite3.connect('/root/.hermes/data/candles.db')
+cur = conn.cursor()
+# Get recent ATR for candidate coins
+cur.execute('''
+    SELECT token, 
+           AVG(high - low) as avg_range,
+           AVG((high - low) / close * 100) as atr_pct
+    FROM candles_5m 
+    WHERE token IN ('COIN1', 'COIN2', 'COIN3')
+      AND ts > strftime('%s', 'now') - 3600
+    GROUP BY token
+''')
+for row in cur.fetchall():
+    print(f'{row[0]}: ATR%={row[2]:.2f}%')
+conn.close()
+```
+
+**RR Engine gate (R:R ≥ 0.70):**
+- The RR engine uses ATR to place SL/TP. If ATR% is too low (< 0.4%), the SL will be too close to entry and R:R fails.
+- **Prefer coins with ATR% > 0.5%** — enough room for SL/TP to breathe.
+- **Avoid tight consolidations** — BB width < 0.3% means no room for a proper R:R setup.
+- Check the coin's recent volatility. If it's been flat for hours, the RR engine will block it.
+
+**RSI Gate:**
+- LONG: RSI must be 40-65 (above 70 = spike filter blocks, below 35 = oversold)
+- SHORT: RSI must be 40-60 (below 35 = hard block)
+- **Pick coins at RSI 45-60** — center of the allowed band, not edges.
+
+**Trend Filter:**
+- add_signal blocks counter-trend entries. If BTC is BELOW EMA300 with bearish linreg, LONG signals get blocked.
+- Check `continuum_data.json` for BTC's `ema300_position` and `linreg_direction` before picking LONG.
+
+**Momentum/Velocity:**
+- Tokens with negative 30m velocity get blocked by pump-chain velocity filter.
+- Check coin-tracker for 30m momentum before picking.
+
+**Staleness:**
+- If the coin is about to reverse (RSI extreme, momentum fading), the signal will expire before filling.
+- Pick coins with STABLE momentum, not knife-edge setups.
+
+### How to pick the coin:
+
 This is where your brain shines. Consider:
 1. **Regime alignment** — LONG in bull, SHORT in bear. Don't fight the trend.
 2. **Coin-tracker momentum** — coins trending up for LONG, fading for SHORT
-3. **RSI sweet spot** — LONG at RSI 40-65, SHORT at RSI 40-60 (NOT oversold, NOT overbought)
-4. **Volume** — prefer coins with above-average volume right now
-5. **Avoid the crap** — skip coins with recent losses on similar signals, skip extreme RSI zones, skip coins we're already in
-6. **What would you trade if you had one shot?** — the best setup you can find
+3. **RSI sweet spot** — LONG at RSI 45-60, SHORT at RSI 45-55 (center of the allowed band, not edges)
+4. **ATR room** — prefer coins with ATR% > 0.5% so SL/TP can be placed properly
+5. **Volume** — prefer coins with above-average volume right now
+6. **Avoid the crap** — skip coins with recent losses on similar signals, skip extreme RSI zones, skip coins we're already in
+7. **What would you trade if you had one shot?** — the best setup you can find
 
 **Write the signal file:**
 ```python
@@ -160,7 +233,7 @@ signal = {
     "confidence": 75,  # 60-90 range
     "price": 123.45,   # current price
     "conviction": 80,  # how sure are you
-    "reasoning": "Why this coin right now — regime alignment, momentum, RSI, etc."
+    "reasoning": "Why this coin right now — regime alignment, momentum, RSI, ATR room, etc."
 }
 
 with open("/root/.hermes/data/ai_trader_state.json", "w") as f:
