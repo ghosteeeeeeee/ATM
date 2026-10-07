@@ -3402,5 +3402,15 @@
     "status": "suggested",
     "risk": "low — data fix, not trading change. Backfill from signal metadata where available; ensure new trades write RSI at close.",
     "evidence": "PG query: pump-chain+ 30d 90/91 null signal_rsi_14. bb-squeeze 14d 68/71 null. Watchdog uses computed RSI (avg_rsi=72.7) not stored column."
+  },
+  {
+    "date": "2026-10-07T10:37:35Z",
+    "idea": "Move-freshness guard for pump-chain signals — block entries if price already moved >0.8% in trade direction in last 5 minutes",
+    "rationale": "All 5 post-fix hard_max_loss trades are pump-chain± with avg MFE only 0.2%. Entries arrive after the move exhausts. 24h winners (pump-chain- 3W +$1.22 avg 13.7%) had fresh momentum. A move-freshness check would block chasing entries while preserving fresh-momentum entries. Addresses root cause (entry timing), not symptom (stop losses).",
+    "expected_impact": "Reduce hard_max_loss frequency from 45% of closes to <30%. Preserve 24h winners.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — needs backtest on 7d data before implementation. Must verify it wouldn't block the 24h winners.",
+    "implementation_note": "Add PUMP_CHAIN_MAX_PREMOVE_PCT=0.8 to hermes_constants.py. In pump-chain detection, check |price_now - price_5min_ago| / price_5min_ago > 0.8% in trade direction → block. Backtest first: run against 7d pump-chain trades, count winners blocked."
   }
 ]

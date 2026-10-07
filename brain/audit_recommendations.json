@@ -1,143 +1,296 @@
 {
-  "timestamp": "2026-10-07T07:35:37Z",
+  "timestamp": "2026-10-07T10:37:35Z",
   "session_brain_stats": {
-    "queries_run": 3,
-    "top_insights": [
-      "pump-chain BTC-pumping winrate question unresolved in sessions",
-      "oversold short filter work is current (HARD_FLOOR=45 live)",
-      "mover kill discussed and executed 2026-10-07"
-    ]
+    "queries_run": 4,
+    "top_themes": [
+      "signal performance winrate regime",
+      "losing wrong side bleeding",
+      "new signal idea improvement",
+      "pump-chain-short RSI filter",
+      "bb-squeeze R:R hard_max_loss"
+    ],
+    "key_insight": "Session brain confirms: exit system is #1 profit leak (30d). pump-chain- wins ONLY at meta RSI 45-55. bb-squeeze+ R:R broken — winners small, losers big at lev 3-5. Entry timing (hard_max_loss) is residual after leverage-aware fix."
   },
   "trade_summary_24h": {
-    "trades": 10,
-    "pnl": 1.09,
-    "wr": 60.0,
-    "longs_short": "6 pump-chain- SHORT +0.82 (50%WR), 1 pump-chain+ LONG -0.07, 1 mover+ LONG +0.10 (pre-kill), 2 oversold-bounce+ +0.24",
-    "losers": [
-      "IMX pump-chain+ LONG RSI 65.5 EXTREME hard_max_loss -0.07",
-      "INJ pump-chain- SHORT RSI 57.1 EXTREME hard_max_loss -0.03",
-      "IO pump-chain- SHORT RSI 41.0 EXTREME hard_max_loss -0.12 (PRE floor-raise)",
-      "LTC pump-chain- SHORT RSI 50.0 NORMAL hard_max_loss -0.25 (PRE floor-raise)"
-    ],
-    "post_fix_0438Z": "2 trades, both small hard_max_loss (-0.10 total), no oversold shorts"
+    "trades": 11,
+    "wins": 6,
+    "wr": 54.5,
+    "pnl": 1.21,
+    "open": 0,
+    "by_signal": {
+      "pump-chain- SHORT": {
+        "n": 7,
+        "pnl": 0.94,
+        "wr": 42.9,
+        "note": "winners bigger than losers"
+      },
+      "oversold-bounce+ LONG": {
+        "n": 2,
+        "pnl": 0.24,
+        "wr": 100.0
+      },
+      "mover+ LONG": {
+        "n": 1,
+        "pnl": 0.1,
+        "wr": 100.0,
+        "note": "pre-kill aging trade"
+      },
+      "pump-chain+ LONG": {
+        "n": 1,
+        "pnl": -0.07,
+        "wr": 0.0,
+        "note": "IMX hard_max_loss EXTREME meta RSI 65.5"
+      }
+    },
+    "hard_max_loss": {
+      "n": 5,
+      "pnl": -0.35,
+      "pct_of_closes": 45,
+      "note": "all pump-chain±, post-fix avg -1.5% acct (was -4.4%)"
+    },
+    "regime": "SHORT_BIAS (100/3/21), BTC BELOW EMA300 35h, LOW vol, dead-cat bounce"
   },
   "trade_summary_7d": {
-    "trades": 210,
-    "pnl": 0.75,
-    "wr": 54.3,
-    "long": "+1.30 / 169T",
-    "short": "-0.55 / 41T",
-    "hard_max_loss_7d": "60T -8.21 (window includes pre-fix; post Oct6: 10T -1.06 avg -0.106)"
-  },
-  "last_run_changes_verification": [
-    {
-      "change": "SHORT_RSI_HARD_FLOOR 25→45",
-      "status": "WORKING",
-      "evidence": "0 SHORT entries with meta-RSI<45 since 04:38Z. 45-50 band is WINNING (14d 9T +0.75 66.7%WR; 30d 21T +0.11) — floor placement CORRECT at 45. Raising to 50 would have blocked 10 winners incl LTC +0.61, DYDX +0.45.",
-      "verdict": "KEEP. Do not raise."
+    "trades": 212,
+    "pnl": 0.62,
+    "wr": 53.8,
+    "long": {
+      "n": 169,
+      "pnl": 1.3,
+      "wr": 56.8
     },
-    {
-      "change": "BB_SQUEEZE_LONG_RSI_MIN=60",
-      "status": "WIRED, AWAITING SAMPLES",
-      "evidence": "bollinger_squeeze.py:194 enforces filter. Targets HIGH regime <60 bleed: 18T -0.28 50%WR 4 HML. 0 bb-squeeze+ trades post-change yet.",
-      "verdict": "MONITOR 48h. Expected to cut ~50% of HIGH bleed."
+    "short": {
+      "n": 43,
+      "pnl": -0.68,
+      "wr": 41.9,
+      "status": "AT RISK for Oct 9 goal"
     },
-    {
-      "change": "MOVER_PLUS/MINUS_ENABLED False",
-      "status": "WORKING",
-      "evidence": "0 mover trades since Oct 7 03:00. Watchdog still shows historical 3-loss streak — STALE, signal is dead.",
-      "verdict": "KEEP. Watchdog should stop flagging disabled signals."
+    "regime_split": {
+      "EXTREME": "+1.71 (63T 50.8%)",
+      "FLAT": "+0.44 (8T 75.0%)",
+      "NORMAL": "-0.34 (64T 57.8%)",
+      "HIGH": "-1.27 (71T 53.5%)"
     },
-    {
-      "change": "hard_max_loss leverage-aware fix (CEO aed0aa36)",
-      "status": "WORKING",
-      "evidence": "Post-fix losses -1.43%/-1.67% account (was -3 to -6%). Magnitude correct. Still entry-quality problem (2 trades, both valid-RSI entries that just lost).",
-      "verdict": "KEEP. Entry quality is separate issue."
+    "bleed_signals": {
+      "bb-squeeze+ LONG": {
+        "n": 69,
+        "pnl": -0.05,
+        "wr": 60.9,
+        "note": "broken R:R, RSI_MIN=60 added today"
+      },
+      "pump-chain- SHORT": {
+        "n": 27,
+        "pnl": -0.01,
+        "wr": 40.7,
+        "note": "24h +0.94, winners bigger"
+      },
+      "bb-bounce-v3-long+ LONG": {
+        "n": 19,
+        "pnl": -0.33,
+        "wr": 52.6,
+        "note": "NORMAL 15T -0.43 blocked, HIGH 4T +0.10 winning"
+      },
+      "disabled_aging": "mtf-regime-trend±, accel-300-, pump-chain-v5, trend-ride+ — all disabled, losses aging out"
     }
-  ],
+  },
+  "losing_trade_autopsy": {
+    "post_fix_hml_cohort": [
+      {
+        "token": "INJ",
+        "signal": "pump-chain-",
+        "dir": "SHORT",
+        "meta_rsi": 57.14,
+        "regime": "EXTREME",
+        "pnl_pct": -1.43,
+        "root_cause": "Entry after move exhausted — MFE ~0.2%. RSI 57 within band, regime EXTREME allowed. Entry timing failure."
+      },
+      {
+        "token": "IMX",
+        "signal": "pump-chain+",
+        "dir": "LONG",
+        "meta_rsi": 65.52,
+        "regime": "EXTREME",
+        "pnl_pct": -1.67,
+        "root_cause": "RSI 65.5 within sweet spot. Entry timing — move exhausted before entry."
+      },
+      {
+        "token": "ADA",
+        "signal": "pump-chain-",
+        "dir": "SHORT",
+        "meta_rsi": 56.25,
+        "regime": "HIGH",
+        "pnl_pct": -1.42,
+        "root_cause": "HIGH regime pump-chain- SHORT — PUMP_CHAIN_SHORT_HIGH_BLOCK would have blocked (added 09:39, trade opened 08:08). Pre-block."
+      },
+      {
+        "token": "LDO",
+        "signal": "pump-chain-",
+        "dir": "SHORT",
+        "meta_rsi": 47.17,
+        "regime": "EXTREME",
+        "pnl_pct": -1.61,
+        "root_cause": "RSI 47.2 above floor 45. EXTREME allowed. Entry timing. DRIFT-E confirmed: stored RSI 7.49 was artifact."
+      },
+      {
+        "token": "IO",
+        "signal": "pump-chain-",
+        "dir": "SHORT",
+        "meta_rsi": 41.03,
+        "regime": "EXTREME",
+        "pnl_pct": -3.15,
+        "root_cause": "Pre-fix trade (closed Oct 6 21:32). RSI 41 below current floor 45. Would be blocked now."
+      }
+    ],
+    "winning_side_check": "24h pump-chain- winners: 3W +$1.22 avg +13.7% acct. Winners had fresh momentum, losers had exhausted moves. Same signal, same regime, different entry timing."
+  },
+  "winner_impact_analysis": {
+    "SHORT_RSI_HARD_FLOOR=45": {
+      "verified": "0 oversold shorts post-fix. 14d pump-chain- 45-50 band = 9T 55.6% +$0.67 WINNING — floor at 45 correct, do not raise to 50."
+    },
+    "PUMP_CHAIN_SHORT_HIGH_BLOCK": {
+      "verified": "ADA pre-block. HIGH 14d 7T 14.3% -$0.66 vs NORMAL 7T 71.4% +$0.43. Block correct."
+    },
+    "BB_SQUEEZE_LONG_RSI_MIN=60": {
+      "verified": "wired, 0 post-fix trades yet. 14d <60 = 32T 46.9% -$0.64 bleed. 60-65 = 9T 100% +$0.86 BEST band."
+    },
+    "MOVER±_kill": {
+      "verified": "0 trades since kill. 24h mover+ trade pre-kill aging."
+    }
+  },
   "drift_findings": [
     {
       "id": "DRIFT-W1",
-      "severity": "LOW",
-      "finding": "Watchdog signal_performance/streak steers include DISABLED signals (trend-ride+, mover+, accel-300-). Creates false 'wrong-side' alarms.",
-      "impact": "Auditor/CEO time wasted re-investigating killed signals. 24h is actually +$1.09.",
-      "fix": "Automation: filter watchdog performance stats by *_ENABLED flags. Not a trading config change."
+      "severity": "MED",
+      "finding": "Watchdog flags losing signals that are ALREADY disabled (trend-ride+, mtf-regime-trend±, accel-300-, pump-chain-v5). Losses are aging prints. Watchdog should filter steers by *_ENABLED flags.",
+      "status": "open",
+      "action": "automated suggested — filter steers by ENABLED flags"
     },
     {
-      "id": "DRIFT-W2",
-      "severity": "INFO",
-      "finding": "accel-300- is DEAD (NEVER_REENABLE + SIGNAL_SOURCE_BLACKLIST). 0 trades after Oct 1. Watchdog deep_analysis still describes it as live.",
-      "impact": "None on trading. Stale analysis.",
-      "fix": "None needed. Module is blacklisted."
+      "id": "DRIFT-E",
+      "severity": "HIGH",
+      "finding": "entry_rsi_14 stored values unreliable (LDO=7.49 vs meta=47.17). All RSI-based audits must use meta.rsi_14 from _signal_metadata. Bug_hunter write-path fix still open.",
+      "status": "open",
+      "action": "DELEGATE bug_hunter (standing)"
+    },
+    {
+      "id": "DRIFT-ENTRY-TIMING",
+      "severity": "HIGH",
+      "finding": "hard_max_loss is entry failure not stop failure. 62 trades 7d, avg MFE 0.2%. Entries arrive after move exhausts. Post-fix magnitude working (-1.5% vs -4.4%) but frequency residual (45% of 24h closes).",
+      "status": "open",
+      "action": "creative idea: move-freshness guard. Needs backtest."
     }
   ],
   "recurring_problems": [
     {
-      "problem": "hard_max_loss still #1 exit bleed (7d 60T -8.21 window, post-fix 10T -1.06)",
-      "status": "MITIGATED by leverage-aware fix",
-      "note": "Per-trade loss now ~-1.5% account. Root remaining: wrong-side entries at valid RSI (INJ RSI 57, IMX RSI 65). Not a floor problem."
+      "topic": "hard_max_loss entry timing",
+      "frequency": "every run for 5+ days",
+      "status": "magnitude fixed (aed0aa36), frequency open",
+      "root_cause": "pump-chain signals fire on detected momentum but execution arrives after move exhausts"
     },
     {
-      "problem": "SHORT book negative 7d (-0.55/41T)",
-      "status": "IMPROVING",
-      "note": "Was -1.66 earlier. Floor + oversold guard holding. 45-50 band winning. Do not over-tighten."
+      "topic": "SHORT book bleed",
+      "frequency": "standing goal SHORT 7d ≥$0 by Oct 9",
+      "status": "AT RISK -0.68",
+      "root_cause": "aging prints from disabled signals (mtf-regime-trend-, accel-300-) + pump-chain- 40.7% WR 7d. Active SHORT signal pump-chain- is ~breakeven (24h +0.94)."
     },
     {
-      "problem": "bb-squeeze+ HIGH regime bleed at RSI<60",
-      "status": "JUST ADDRESSED",
-      "note": "BB_SQUEEZE_LONG_RSI_MIN=60 live. 0 samples yet. Monitor."
+      "topic": "DRIFT-E entry_rsi_14",
+      "frequency": "flagged 3+ times",
+      "status": "open bug_hunter",
+      "root_cause": "stored RSI written from momentum_cache (late, different TF) not signal-time RSI"
     }
   ],
   "missing_implementations": [
     {
-      "idea": "Watchdog exclude disabled signals from performance/streak steers",
-      "reason": "DRIFT-W1 — false alarms on trend-ride+/mover+/accel-300-",
-      "owner": "automation",
-      "priority": "low"
+      "idea": "Move-freshness guard for pump-chain signals",
+      "discussed": "watchdog deep analysis + session brain",
+      "status": "not built",
+      "action": "creative idea this run — needs backtest"
+    },
+    {
+      "idea": "Watchdog steer filtering by ENABLED flags",
+      "discussed": "brain_auditor prior runs",
+      "status": "not built",
+      "action": "automated — low priority"
+    },
+    {
+      "idea": "signal_versions.json missing active signals",
+      "discussed": "auto_1hr 2026-10-07",
+      "status": "open",
+      "action": "side-find, not trading config"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-07T07:35:37Z",
-      "idea": "Monitor BB_SQUEEZE_LONG_RSI_MIN=60 impact on HIGH regime <60 entries (expected: block ~18T/14d 50%WR 4 HML bleed without touching 60-70 sweet spot 20T 75%WR)",
-      "rationale": "bb-squeeze+ edge is RSI-defined: <60 bleeds, 60-70 wins 75%. Filter just landed. One variable — wait for samples before any further squeeze change.",
-      "expected_impact": "Cut ~50% of bb-squeeze+ HIGH bleed (-0.28/14d)",
+      "date": "2026-10-07T10:37:35Z",
+      "idea": "Move-freshness guard for pump-chain signals — block entries if price already moved >0.8% in trade direction in last 5 minutes",
+      "rationale": "All 5 post-fix hard_max_loss trades are pump-chain± with avg MFE only 0.2%. Entries arrive after the move exhausts. 24h winners (pump-chain- 3W +$1.22 avg 13.7%) had fresh momentum. A move-freshness check would block chasing entries while preserving fresh-momentum entries. Addresses root cause (entry timing), not symptom (stop losses).",
+      "expected_impact": "Reduce hard_max_loss frequency from 45% of closes to <30%. Preserve 24h winners.",
       "category": "entry sniper",
-      "status": "monitoring",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-07T07:35:37Z",
-      "idea": "REJECTED: SHORT_RSI_HARD_FLOOR 45→50",
-      "rationale": "14d 45-50 band is WINNING 9T +0.75 66.7%WR. Raising floor would block 10 winners (LTC +0.61, DYDX +0.45, etc). Constants comment claiming 45-50 bleed was stale/wrong — live DB disproves it.",
-      "expected_impact": "N/A — would HURT winners",
-      "category": "rejected",
-      "status": "rejected",
-      "risk": "n/a"
+      "status": "suggested",
+      "risk": "medium — needs backtest on 7d data before implementation. Must verify it wouldn't block the 24h winners.",
+      "implementation_note": "Add PUMP_CHAIN_MAX_PREMOVE_PCT=0.8 to hermes_constants.py. In pump-chain detection, check |price_now - price_5min_ago| / price_5min_ago > 0.8% in trade direction → block. Backtest first: run against 7d pump-chain trades, count winners blocked."
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    "SHORT_RSI_HARD_FLOOR=45: VERIFIED WORKING — 0 oversold shorts, band placement correct",
-    "BB_SQUEEZE_LONG_RSI_MIN=60: WIRED — awaiting samples, targets correct bleed",
-    "MOVER± kill: VERIFIED — 0 trades since",
-    "hard_max_loss leverage-aware: VERIFIED — losses now ~-1.5% not -4%"
+    {
+      "change": "MOVER±_kill (True/True → False/False)",
+      "timestamp": "2026-10-07T03:00Z",
+      "verified": "PASS — 0 trades since kill. 24h mover+ trade is pre-kill aging.",
+      "action": "none"
+    },
+    {
+      "change": "SHORT_RSI_HARD_FLOOR 25→45",
+      "timestamp": "2026-10-07T04:38Z",
+      "verified": "PASS — 0 oversold shorts post-fix. 14d 45-50 band = 9T 55.6% +$0.67 WINNING — floor correct, do not raise.",
+      "action": "none"
+    },
+    {
+      "change": "BB_SQUEEZE_LONG_RSI_MIN=60 + wire RSI filter",
+      "timestamp": "2026-10-07T04:38Z",
+      "verified": "WIRED — bollinger_squeeze.py:33 reads constant. 0 post-fix bb-squeeze trades yet (last close Oct 6 06:09, filter added Oct 7 04:38). 14d <60 = 32T 46.9% -$0.64 bleed target.",
+      "action": "MONITOR 48h"
+    },
+    {
+      "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED False→True",
+      "timestamp": "2026-10-07T09:39Z",
+      "verified": "RATIFIED by CEO 10:00. ADA HIGH trade opened 08:08 (pre-block). HIGH 14d 7T 14.3% -$0.66 vs NORMAL 7T 71.4% +$0.43.",
+      "action": "none — correct fix"
+    }
   ],
   "next_actions": [
-    "MONITOR BB_SQUEEZE_LONG_RSI_MIN 48h — check if HIGH <60 entries stop firing",
-    "MONITOR SHORT book 7d — target ≥$0 by Oct 9 (currently -0.55)",
-    "MONITOR wyckoff 48h shadow — 0 trades since wire-up",
-    "AUTOMATION: filter watchdog steers by ENABLED flags (DRIFT-W1)",
-    "NO config changes this run — last run's changes need sample time",
-    "Next audit: check squeeze RSI_MIN samples + SHORT 7d PnL + hard_max_loss cohort n≥10"
+    "MONITOR BB_SQUEEZE_LONG_RSI_MIN=60 — check if HIGH <60 entries stop firing (48h)",
+    "MONITOR SHORT 7d PnL — aging prints from disabled signals should age out, target ≥$0 by Oct 9",
+    "MONITOR hard_max_loss frequency — post-fix n≥10 needed by Oct 11. Magnitude working (-1.5%), frequency open (45% of closes).",
+    "BACKTEST move-freshness guard (PUMP_CHAIN_MAX_PREMOVE_PCT=0.8) on 7d pump-chain data before implementation",
+    "DELEGATE bug_hunter: entry_rsi_14 write-path fix (DRIFT-E standing), disk prune (85%)",
+    "DELEGATE signal_analyst: wyckoff 48h eval Oct 9, trend-ride+ n≥10 aging out",
+    "WATCHDOG FIX: filter steers by *_ENABLED flags — trend-ride+/mtf/accel flags are stale (DRIFT-W1)"
   ],
-  "system_health": {
-    "24h": "+$1.09 60%WR 10T — GOAL MET",
-    "7d": "+$0.75 54.3%WR 210T — GOAL MET (flipped positive)",
-    "30d": "still negative (window aging)",
-    "open_trades": 0,
-    "portfolio_health": "warning (watchdog) but DB shows healthy 24h/7d",
-    "pipeline": "active, signals_enabled=true",
-    "disk": "85% WARN"
+  "goals_status": {
+    "24h PnL >=$0": {
+      "current": "+$1.21",
+      "status": "MET"
+    },
+    "7d PnL >=$0": {
+      "current": "+$0.62",
+      "status": "MET (thin)"
+    },
+    "SHORT 7d >=$0": {
+      "current": "-$0.68",
+      "deadline": "Oct 9",
+      "status": "AT RISK — aging prints should recover"
+    },
+    "hard_max_loss magnitude >=50% cut": {
+      "current": "-1.5% acct (was -4.4%)",
+      "deadline": "Oct 11",
+      "status": "WORKING — monitor n>=10"
+    },
+    "hard_max_loss frequency <30% closes": {
+      "current": "45%",
+      "deadline": "Oct 11",
+      "status": "OPEN — entry quality, creative idea proposed"
+    }
   }
 }
