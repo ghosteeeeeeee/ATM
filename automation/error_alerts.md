@@ -1,5 +1,17 @@
 # Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
 
+## Error Alerts — 2026-10-07 13:50 UTC
+- **CRITICAL→FIXED** (765k+ restarts): `hermes-coding-mcp.service` crash-looping — `can't open file '/root/.hermes/scripts/run_mcp_server.py': No such file or directory`, status=2/INVALIDARGUMENT every 5s since ~44 days of restarts. MCP dir `mcp/hermes-coding-mcp/` gutted (only empty `dispatcher/`).
+  - **AUTO-FIX**: `systemctl disable --now hermes-coding-mcp.service`. Not on trading path (pipeline/price-collector/1m-candle unaffected). Re-enable only after restoring `run_mcp_server.py`.
+- **WARN→FIXED**: `hermes-better-coder.service` + timer failing every 30min — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'` (dispatcher package deleted). Same gutted MCP dir.
+  - **AUTO-FIX**: `systemctl disable --now hermes-better-coder.service hermes-better-coder.timer`.
+- **WARN** (recurring): Disk 85% used (95G/118G). No uncompressed *.log >7d. Active DBs: coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.5G, session_brain 1.0G. CEO retention decision still open.
+  - **AUTO-FIX**: None safe this run.
+- **WARN** (recurring): `hermes-git-release.service` fails hourly — update-git.py refuses dirty tree (`automation/error_alerts.md`, `brain/associative_memory.db`, etc. uncommitted). Needs a commit, not a service fix.
+  - **AUTO-FIX**: None (commit workflow is human/CEO-gated per SOP).
+- **INFO**: Pipeline healthy — 86 signals/hr, 2 open (APT/FIL SHORT both in profit), 8 closed today +$0.50 / 2 wins. All 3 critical timers active. Prices fresh (87 tokens ~8s). Regime SHORT_BIAS. 0 phantom trades. Position manager rc=0, trailing SLs active on both opens.
+- **INFO**: `hermes-atr-sl-updater.timer` not-found — DEFUNCT rename, expected. `hermes-regime-24h-check.timer` / `hermes-regime-transition-check.timer` inactive — intentional, not in run path.
+
 ## Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
 - **WARN** (recurring): Disk 85% used (95G/118G) — at threshold, goal <80% by Oct 14
   - **AUTO-FIX**: None safe — no *.log older than 7d to gzip; DB prune still delegated to bug_hunter (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.4G, session_brain 1.0G)
@@ -89,3 +101,6 @@
 - **INFO**: `data/speed_history.json` is dead — all 567 token series last ts ~2026-05-10 (~151 days stale). No script references found. Live speed data is `token_speeds` in signals_hermes_runtime.db (180 live rows, updated 12:47 UTC). Safe to ignore/delete; not wired into pipeline.
 - **INFO**: `decisions` table last write 2026-04-13 (4 rows). Expected — ai_decider defunct, signal_compactor does not write here. No action.
 - **OK**: Pipeline running, position manager rc=0, all 3 timers active (fired within last ~90s), prices fresh (18s), 94 signals last 1h, 0 open trades, 7 closed today (+0.50 USDT, 2 wins), regime SHORT_BIAS (18L/23S/83N), 70.6% tokens >= 50th speed percentile.
+
+## Error Alerts — 2026-10-07 12:59 UTC
+- **REPEATED** (11x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`

@@ -1,44 +1,34 @@
 
-# Hermes Health Report — 2026-10-07 05:50 UTC
+# Hermes Health Report — 2026-10-07 13:50 UTC
 
 ## Status: OK (WARN: disk 85%)
 
 PIPELINE:
-- Status: active (cycle #232066)
-- Signals (1h): 77 generated
-- Trades: 1 open (IMX LONG -0.15%), 3 closed today (+1.11 USDT, 2 wins)
+- Status: active (cycle #232539, position_manager rc=0)
+- Signals (1h): 86 generated
+- Trades: 2 open (APT SHORT +0.56%, FIL SHORT +0.82%), 8 closed today (+0.50 USDT, 2 wins)
 - Errors: 0 Tracebacks/CRASH in 30min window
-- position_manager: rc=0
 - Phantom trades (atr_sl_hit <0.01%): 0 today
-- Hotset: empty (COOL_OFF, 67% coins hot — expected under current regime)
+- Regime gate: SHORT_BIAS — macro gate LONG=REDUCE, SHORT=FULL
 
 MARKET:
-- Regime: LONG_BIAS 72 / SHORT 2 / NEUTRAL 49 (123 tokens, 5m)
-- coin_tracker: STORMY, COOL_OFF strength 54
-- Speeds: 178 fresh / 90 tokens >= 50th percentile
-- Predictive: MOMENTUM_SURGE wind gust 0.32 vs sustained 0.09
+- Regime: SHORT_BIAS 5 LONG / 69 SHORT / 50 NEUTRAL (124 tokens, 5m)
+- coin_tracker: STORMY, MOMENTUM_SURGE predictive alert (gust 0.34 vs sustained 0.05)
+- Speeds: 127/241 tokens >= 50th percentile (52.7%)
+- Prices: fresh (87 tokens, age ~8s)
 
 SYSTEM:
-- Timers: 3/3 active — price-collector (50s), pipeline (28s), 1m-candle (3m)
-- Services: pipeline + hl-sync-guardian active
-- Disk: 85% used (18G free of 118G) — WARN, recurring
-- Prices: fresh — collector ran 50s ago, 87 prices, candle_seed 10/10
-- DB locks: normal concurrent access (price-collector, 1m-candle, trades-api) — not stuck
-- OpenMemory MCP: functional (with Accept header)
+- Timers: pipeline / price-collector / 1m-candle all active (<90s last fire)
+- Services: pipeline, hl-sync-guardian active
+- Disk: 85% used (95G/118G) — WARN, no uncompressed logs >7d
+- Active DBs (do not delete): coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.5G
 
 AUTO-FIXES APPLIED:
-- None required — no crashes, no stuck locks, no missed critical timers
-- Log compression skipped (nothing >7d old)
-- Failed aux services (better-coder, bug-hunter, git-release) not restarted — root-cause fixes required, restart-only is a bandaids (per prior decision)
+- Disabled hermes-coding-mcp.service — crash-looping (765k+ restarts), ExecStart script missing (`scripts/run_mcp_server.py`), MCP dir gutted (dispatcher/ empty). Not part of trading path.
+- Disabled hermes-better-coder.service + timer — `ModuleNotFoundError: dispatcher.dispatcher`, module deleted. Non-critical maintenance.
 
 ALERTS:
-- WARN: Disk 85% (recurring since Oct 1). Largest: coin_tracker.db 3.3G, candles.db 2.6G, mtf_macd_tuner.db 1.4G, session_brain.db 1.0G, signals_hermes.db 949M. CEO DB-pruning decision still open.
-- WARN: 3 non-trading systemd services failed (better-coder exit 1, bug-hunter exit 1 by design, git-release exit 1). Auxiliary only.
-- INFO: safety filters working as designed — RSI hard-floor blocks, BTC-CRASH momentum blocks, loss cooldowns.
-
-SIDE FINDINGS:
-1. signals table 26,121 rows — unbounded growth despite signal-purge timer (recurring). signal_history still empty — purge may target wrong table.
-2. decisions table stale since 2026-04-13 — dead table, compactor logs to journal only.
-3. coin_tracker_data.json lives at /var/www/html/ (not data/) — path quirk, not missing.
-4. Empty legacy prices.db files at /root/.hermes/data/prices.db and scripts/data/prices.db — unused; real price_history is in signals_hermes.db static DB (13M rows).
-5. BTC-CRASH / RSI-hard-floor blocks firing correctly — not errors.
+- WARN: disk 85% — recurring; active DBs are the growth drivers, CEO retention decision still open
+- WARN: hermes-git-release fails hourly on uncommitted changes (update-git.py refuses dirty tree) — needs a commit when ready, not a service fix
+- WARN: hermes-bug-hunter / trading-checklist / upgrade-implementer still failing on code-quality audits (known, non-critical)
+- INFO: GRASS SHORT closed at exactly 0.00% PnL via atr_trail_hit — not a phantom (real exit, zero net), filter/entry quality issue not system health
