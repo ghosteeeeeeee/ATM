@@ -4304,3 +4304,15 @@ BY: auto_1hr
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: hard_max_loss 50% queue#2 leverage-aware | pump-chain+ 0% WR 2T (1 more hits kill) | quiet volume
 BY: auto_1hr
+[2026-10-07 13:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 1T last hour GRASS pump-chain- SHORT atr_trail_hit $0.00 flat | 0 open | 24h 12T 6W +$1.07 WR 50% | pump-chain- 8T 3W +$0.94 | pump-chain+ 2T 0W -$0.21 | atr_sl_hit 0/12=0% (tpsl fix stable) | hard_max_loss 6T -$0.49 = 50% of closes (fix deployed, queue#2 open) | streak inactive (0T gaps + flat) | pipeline active, live_trading True
+  Kill: none (1T flat last hour; 24h 0%-WR only pump-chain+ 2T)
+  Overtrade: 1/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss 50% queue#2 leverage-aware | pump-chain+ 0% WR 2T (1 more hits kill) | quiet volume 0-1T/hr
+BY: auto_1hr
+[2026-10-07 14:12 UTC] auto_1hr: NO CHANGE — analysis only
+  DB-verified: 2T last hour FIL pump-chain- SHORT hard_max_loss -$0.12 + APT pump-chain- SHORT hard_sl -$0.10 | 0 open | 24h 15T 6W +$0.85 WR 40% | pump-chain- 10T 3W +$0.72 | pump-chain+ 2T 0W -$0.21 | atr_sl_hit 0/15=0% (tpsl fix deployed, stable) | hard_max_loss 7T -$0.61 = 46.7% of closes (fix deployed, queue#2 open) | streak inactive (09-12h gaps) | pipeline active, live_trading True
+  Kill: none (last hour pump-chain- not 0% WR; pump-chain+ only 2T 24h)
+  Overtrade: 2/hr | atr_sl_hit 0%
+  WATCH: hard_max_loss 46.7% queue#2 leverage-aware | pump-chain+ 0% WR 2T (1 more hits kill) | OpenMemory skipped per task
+BY: auto_1hr
