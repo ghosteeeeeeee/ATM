@@ -96,7 +96,7 @@ def precheck(coin, direction):
             SELECT close FROM candles_5m 
             WHERE token = ? ORDER BY ts DESC LIMIT 15
         ''', (coin.upper(),))
-        closes = [r[0] for r in cur.fetchall()]
+        closes = [r[0] for r in cur.fetchall()][::-1]  # ASC: oldest->newest (query returns DESC)
         conn.close()
         if len(closes) >= 14:
             # Simple RSI calculation
