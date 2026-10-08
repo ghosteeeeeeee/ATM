@@ -20,7 +20,68 @@ from hermes_constants import (
     HL_COPY_CLUSTER_ENABLED,
     HL_COPY_CLUSTER_BONUS_PER_TRADER,
     HL_COPY_CLUSTER_MAX_BONUS,
+    COPY_TRADE_MIN_WIN_RATE,
+    COPY_TRADE_MIN_PNL,
+    COPY_TRADE_MIN_RECENT_WR,
+    COPY_TRADE_MIN_TRADES,
 )
+
+def is_qualified_trader(wallet: str) -> tuple:
+    """Check if trader meets quality criteria for copy trading.
+
+    CEO 2026-10-08: Only copy winning traders.
+    - Win rate >= 75%
+    - Lifetime PnL >= $10,000
+    - Recent 100-fill WR >= 60%
+    - Minimum 20 trades for statistical significance
+
+    Returns: (is_qualified: bool, reason: str)
+    """
+    conn = get_db()
+    try:
+        # Get trader stats from leaderboard
+        trader = conn.execute("""
+            SELECT win_rate, pnl_all_time, trade_count
+            FROM traders WHERE wallet = ?
+        """, (wallet,)).fetchone()
+
+        if not trader:
+            return False, "not_tracked"
+
+        # Check statistical significance
+        trade_count = trader['trade_count'] or 0
+        if trade_count < COPY_TRADE_MIN_TRADES:
+            return False, f"too_few_trades({trade_count})"
+
+        # Check lifetime win rate
+        win_rate = trader['win_rate'] or 0
+        if win_rate < COPY_TRADE_MIN_WIN_RATE:
+            return False, f"low_win_rate({win_rate:.0%})"
+
+        # Check lifetime PnL
+        pnl = trader['pnl_all_time'] or 0
+        if pnl < COPY_TRADE_MIN_PNL:
+            return False, f"low_pnl(${pnl:.0f})"
+
+        # Check recent performance (last 100 fills)
+        recent = conn.execute("""
+            SELECT closed_pnl FROM trader_fills
+            WHERE wallet = ? AND closed_pnl != 0
+            ORDER BY time DESC LIMIT 100
+        """, (wallet,)).fetchall()
+
+        if recent:
+            recent_wins = sum(1 for t in recent if t['closed_pnl'] > 0)
+            recent_total = len(recent)
+            recent_wr = recent_wins / recent_total if recent_total > 0 else 0
+
+            if recent_wr < COPY_TRADE_MIN_RECENT_WR:
+                return False, f"low_recent_wr({recent_wr:.0%})"
+
+        return True, "qualified"
+
+    finally:
+        conn.close()
 
 def get_trader_performance(wallet: str) -> dict:
     """Get trader's historical performance for confidence calculation."""
@@ -54,14 +115,15 @@ def calculate_confidence(trader_score: float, trader_win_rate: float,
                          cluster_size: int = 1) -> float:
     """Calculate signal confidence based on trader performance, copy weight, and cluster size.
 
+    CEO 2026-10-08: Removed confidence floor — bad traders now get low confidence.
     Cluster bonus: when multiple pro traders all buy the same coin, it's higher conviction.
-    E.g., 3 traders buy BTC → +6 confidence (2 extra traders × 3 each).
     """
     # Base confidence from trader score (0-100)
     base_confidence = min(trader_score, 100)
 
-    # Win rate adjustment
-    wr_adjustment = (trader_win_rate - 0.5) * 40  # ±20 points
+    # Win rate adjustment — scale more aggressively
+    # 75% WR = +10 points, 90% WR = +20 points, 100% WR = +25 points
+    wr_adjustment = (trader_win_rate - 0.5) * 50  # ±25 points
 
     # Combine and apply copy weight
     confidence = (base_confidence + wr_adjustment) * copy_weight
@@ -74,8 +136,8 @@ def calculate_confidence(trader_score: float, trader_win_rate: float,
         )
         confidence += cluster_bonus
 
-    # Clamp to configured range
-    confidence = max(HL_COPY_SIGNAL_MIN_CONFIDENCE, min(HL_COPY_SIGNAL_MAX_CONFIDENCE, confidence))
+    # Clamp to range — NO floor, so bad traders get low confidence
+    confidence = max(30, min(HL_COPY_SIGNAL_MAX_CONFIDENCE, confidence))
 
     return round(confidence, 1)
 
@@ -272,6 +334,14 @@ def run_hl_copy_signal():
         if cluster_size < HL_COPY_CLUSTER_MIN_SIZE:
             print(f"[hl_signal] SKIP {trade['coin']} {trade['side']} — cluster={cluster_size} < {HL_COPY_CLUSTER_MIN_SIZE}")
             continue
+
+        # Trader quality filter: only copy winning traders (75%+ WR, $10k+ PnL)
+        wallet = trade.get('wallet', '')
+        if wallet:
+            qualified, reason = is_qualified_trader(wallet)
+            if not qualified:
+                print(f"[hl_signal] SKIP {trade['coin']} {trade['side']} — trader {wallet[:10]}... not qualified: {reason}")
+                continue
 
         # Generate signal (pass cluster_size for confidence/size bonus)
         signal = generate_hl_signal(trade, trade['score'], cluster_size=cluster_size)

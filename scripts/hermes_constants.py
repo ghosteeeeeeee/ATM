@@ -1833,7 +1833,7 @@ NEVER_REENABLE_FLAGS = {
     'COIN_TRACKER_HOT_PLUS_ENABLED',    # SIGNAL REPORTER 2026-08-24 — 28.6% WR, -$0.49 (24h), 14T. NEVER_REENABLE.
     'COIN_TRACKER_HOT_MINUS_ENABLED',   # SIGNAL REPORTER 2026-08-24 — 0% WR (6T), -$0.34. NEVER_REENABLE.
     'HZSCORE_MINUS_ENABLED',  # SIGNAL REPORTER 2026-08-23 — 8T/24h 37.5% WR -$0.35, avg loser 2x avg winner. NEVER_REENABLE.
-    'HL_COPY_SIGNAL_PLUS_ENABLED',  # SIGNAL REPORTER 2026-08-25 — 30% WR, -$0.74 (24h), 10T. Copy delay. NEVER_REENABLE.
+    # HL_COPY_SIGNAL_PLUS_ENABLED — REMOVED from NEVER_REENABLE 2026-10-08 — CEO re-enabled with quality filter (75%+ WR, $10k+ PnL)
     # BB_BOUNCE KILLED 2026-08-27 (CEO) — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
     # BB_BOUNCE_PLUS_ENABLED — REMOVED from NEVER_REENABLE 2026-09-09 — re-enabled with EXTREME regime block
     'BB_BOUNCE_ENABLED',       # CEO 2026-08-27 — 48h 9T/11.1%WR/-$0.74. NEVER_REENABLE.
@@ -3345,6 +3345,14 @@ COPY_TRADE_WEIGHT_MAX = 2.0           # maximum copy weight (best performers)
 COPY_TRADE_WEIGHT_MIN_TRADES = 5      # minimum trades before weight adjusts
 COPY_BAD_HOURS_ENABLED = False          # disabled — we're 24/7 live, improve entries not block hours
 COPY_BAD_HOURS = [14, 18, 20]           # UTC hours with poor copy WR (25-40%) — inactive
+
+# ── Copy Trader Quality Filter ────────────────────────────────────────────────
+# CEO 2026-10-08: Only copy winning traders. Target: $10k+ PnL, 75%+ WR.
+# Blocks trades from traders with poor recent performance.
+COPY_TRADE_MIN_WIN_RATE = 0.75         # minimum trader win rate (75%)
+COPY_TRADE_MIN_PNL = 10000.0           # minimum trader lifetime PnL ($10k)
+COPY_TRADE_MIN_RECENT_WR = 0.60        # minimum recent 100-fill win rate (60%)
+COPY_TRADE_MIN_TRADES = 20             # minimum trades for statistical significance
 
 # ── Momentum Leaderboard Signal ─────────────────────────────────────────────
 # momentum_leaderboard.py — scans for biggest movers, rides continuation or fades overextension
