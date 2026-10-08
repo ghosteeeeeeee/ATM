@@ -65,6 +65,7 @@ REGIME_SIGNALS = {
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
+        'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'NORMAL': {
         'pump-catcher+', 'pump-catcher-',
@@ -106,6 +107,7 @@ REGIME_SIGNALS = {
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 NORMAL
         'continuum-ma+', 'continuum-ma-',  # continuum MA crossover — momentum confirmation
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
+        'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
@@ -145,6 +147,7 @@ REGIME_SIGNALS = {
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 HIGH
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
+        'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'EXTREME': {
         'continuation+,hzscore+', 'hzscore+,mover+',
@@ -173,6 +176,7 @@ REGIME_SIGNALS = {
         'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'accel-300-breakout',  # ATR breakout signal — works solo, added 2026-09-23 (bug hunt: was killing PONS SHORT)
+        'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
 }
 

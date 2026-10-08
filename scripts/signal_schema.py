@@ -635,11 +635,12 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             _hzscore_exempt = signal_type and signal_type.lower() == 'mtf_zscore'
             _reversion_exempt = signal_type and ('inverse_accel_300' in signal_type.lower() or 'oversold_bounce' in signal_type.lower())  # mean reversion fires INTO trend
             _pump_chain_exempt = signal_type and 'pump-chain' in signal_type.lower()  # momentum from pump flow engine
-            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt:
+            _ai_trader_exempt = signal_type and 'ai-trader' in signal_type.lower()  # AI trader considers trend when picking
+            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt and not _ai_trader_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
-            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt:
+            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt and not _ai_trader_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None

@@ -10,11 +10,24 @@ Someone else gained what we lost. The same way we lost money fast — there was 
 
 Blaming entries, signals, market conditions, chop, volatility — these are all excuses. The truth is simple: **we picked the wrong direction, and someone picked the right one.**
 
-### What this means:
-- When a trade loses, check what the WINNING side looked like
-- When a signal fires LONG and loses, ask: what would have been the winning SHORT entry?
-- When a signal loses in 5 minutes, the opportunity to gain was RIGHT THERE — we just weren't on it
-- Stop treating losses as "bad luck" — they were **real opportunities for someone else**
+## 📈 THE TRADING RULE: "The trend is your friend, till it ends."
+
+**This is the core of our edge.** We make money by following trends. We lose money by entering during chop.
+
+### What the data says:
+- **Trail family (trending trades)**: 89T, +$5.14, 86.5% WR — THIS IS HOW WE WIN
+- **hard_max_loss (chop trades)**: 56T, -$8.17, 0% WR — THIS IS HOW WE LOSE
+- 52/56 hard_max_loss trades never reached +0.40% for trail to arm — they're chop entries
+
+### The pattern:
+- **Trending entries** → trail activates → lock in profit → WIN
+- **Chop entries** → no momentum → hit max loss → LOSE
+
+### Your mission:
+1. **Keep us in trends** — when a trend is working, ride it
+2. **Keep us out of chop** — when there's no direction, stay flat
+3. **Don't fight the trend** — if BTC is trending down, don't fight it with LONGs
+4. **Exit early in chop** — if a trade goes nowhere, cut it fast
 
 ## YOUR MANDATE
 
