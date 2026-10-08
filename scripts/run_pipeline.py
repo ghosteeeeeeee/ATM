@@ -183,21 +183,20 @@ def main():
     every_10 = (minute % 10 == 0)
 
     # Prevent overlapping pipeline runs (systemd can fire twice)
+    # NOTE (BUG-026, 2026-10-08): the lock fd MUST stay open for the lifetime of
+    # this process. flock is released when the LAST fd to the file is closed —
+    # a previous "fix" closed lock_fd right after acquisition, making the lock
+    # a complete no-op (0 skips in 16,353 cycles; overlapping pipelines ran
+    # concurrently). Child processes do NOT inherit the fd: subprocess.Popen
+    # defaults to close_fds=True, and run_bg's start_new_session only detaches
+    # the process group, not the fd table. The kernel releases the flock on
+    # process exit — no explicit close needed.
     try:
         lock_fd = os.open(LOCK, os.O_CREAT | os.O_RDWR)
         fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except (IOError, OSError):
         log(f'=== Pipeline skipped (already running) ===')
         sys.exit(0)
-
-    # Explicitly close lock fd — otherwise the lock persists until this process
-    # exits. Since signals_runner is forked (run_bg with start_new_session=True),
-    # the fd is duplicated into the child. Closing it here releases the lock
-    # immediately so subsequent pipeline runs are not blocked.
-    try:
-        os.close(lock_fd)
-    except OSError:
-        pass
 
     log(f'=== Pipeline {mode} ({"1m+5m+10m" if every_5 else ("1m+10m" if every_10 else "1m")}) ===')
 

@@ -435,7 +435,7 @@
       "symptom": "64 RC=2 \"usage:\" trade failures in 4 days (2026-10-03..08); BLUR LONG retried & failed every minute 14:25-14:31 UTC on 2026-10-08. Log showed only the argparse usage block, never the error line.",
       "root_cause": "decider_run.py built brain.py argv as [\"--signal-macd-hist\", str(v)]. Python renders tiny negative floats in scientific notation (e.g. -4.29e-06). argparse's negative-number matcher (r'^-\\d+$|^\u2212?\\d*\\.\\d+$') does not match \"-4.29e-06\", so argparse treated it as an OPTION \u2192 \"error: argument --signal-macd-hist: expected one argument\" \u2192 RC=2 \u2192 trade never opened. Any token whose signal had a negative MACD hist/value in sci-notation (common for low-price coins) was un-tradeable.",
       "fix": "All brain.py argv options in decider_run.py now use the \"--opt=value\" equals form (helper _barg) which argparse accepts for any value incl. negative scientific notation.",
-      "verified_by": "Reproduced parse failure with extracted brain.py argparse block (space form rc=2, identical usage+error); equals form parses OK with -4.29e-06. py_compile OK. Live confirmation pending next qualifying signal.",
+      "verified_by": "Reproduced parse failure with extracted parser (space rc=2 / equals OK); LIVE CONFIRMED 2026-10-08 14:43:42 UTC \u2014 BLUR LONG trade #15989 opened after failing every minute 14:25-14:31 pre-fix.",
       "date_found": "2026-10-08",
       "date_fixed": "2026-10-08",
       "found_by": "bug-hunter session 2026-10-08",
@@ -481,6 +481,78 @@
       "related_bugs": [
         "BUG-023"
       ]
+    },
+    {
+      "id": "BUG-026",
+      "title": "brain.py INSERT retry calls time.sleep \u2014 module imports time as _time: NameError kills retry and rolls back HL position",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/brain.py"
+      ],
+      "symptom": "Transient Postgres INSERT errors (lock/serialization/timeout) never retried. Instead NameError propagates to the outer handler which rolls back the HL position \u2014 trade aborted although a retry would very likely have succeeded. Retry loop was dead since import refactor.",
+      "root_cause": "brain.py line 15: `import time as _time`; INSERT retry at line ~738 called bare `time.sleep(1)` \u2192 NameError inside the retry branch.",
+      "fix": "time.sleep(1) \u2192 _time.sleep(1)",
+      "verified_by": "grep confirmed no other bare `time.` usage; py_compile OK",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 1 (2026-10-08)",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-027",
+      "title": "Double-close race: close_trade ignores UPDATE rowcount \u2014 loss cooldown + Hebbian + correlation learn the same outcome twice",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/brain.py"
+      ],
+      "symptom": "profit-monster.service runs as its own systemd unit alongside position_manager (which calls cut_loser\u2192sniper_exit). Two exit engines closing the same trade both succeed: second UPDATE matches 0 rows (status already closed) but code fell through to record loss cooldown again and feed Hebbian/correlation a duplicate outcome, skewing learning stats. CLI also printed \"\u2713 Closed\" regardless.",
+      "root_cause": "_close_trade_impl UPDATE has WHERE status=open but never checked cur.rowcount before running close side-effects; CLI ignored close_trade() return value.",
+      "fix": "Check cur.rowcount==0 after UPDATE \u2192 return False before commit/cooldown/Hebbian/correlation. CLI now prints failure and exits 1 when close_trade returns False.",
+      "verified_by": "Tested live: bogus id 999999 \u2192 rc=1 clean; already-closed trade #15985 \u2192 refused, DB row byte-identical (status/exit_price/close_time/pnl/close_reason unchanged). py_compile OK.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 1 (2026-10-08)",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-028",
+      "title": "brain.py trade close --pnl (manual PnL override) is silently ignored",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "scripts/brain.py"
+      ],
+      "symptom": "CLI documents --pnl as \"Manual PnL override\" but _close_trade_impl never reads the pnl_usdt param \u2014 PnL always recomputed from HL fill or signal prices.",
+      "root_cause": "pnl_usdt parameter accepted by close_trade/_close_trade_impl but unused in the function body.",
+      "fix": "Honor pnl_usdt when provided (skip compute_close_pnl + HL realized lookup, or override after). No current callers pass --pnl, so dormant.",
+      "verified_by": "grep: zero callers pass --pnl today; behavior unchanged for all live paths",
+      "date_found": "2026-10-08",
+      "date_fixed": null,
+      "found_by": "bug-hunter session 1 (2026-10-08)",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-029",
+      "title": "brain.py: duplicate unreachable `except Exception: pass` after guardian marker write",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/brain.py"
+      ],
+      "symptom": "Dead code artifact of a botched edit \u2014 second except clause unreachable.",
+      "root_cause": "Two consecutive `except Exception:` clauses on the guardian_recently_opened.json marker try block.",
+      "fix": "Removed the dead duplicate clause.",
+      "verified_by": "py_compile OK",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 1 (2026-10-08)",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {

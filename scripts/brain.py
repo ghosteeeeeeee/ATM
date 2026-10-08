@@ -541,9 +541,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
             fcntl.flock(_marker_fd, fcntl.LOCK_UN)
             _marker_fd.close()
     except Exception:
-        pass
-    except Exception:
-        pass  # non-fatal
+        pass  # non-fatal (FIX 2026-10-08, BUG-029: removed duplicate unreachable `except Exception: pass` — artifact of a botched edit)
 
     # ── Step 3: mirror_open on HL ──────────────────────────────────────
     # Cluster size multiplier: multiple pro traders agreeing = bigger position
@@ -735,7 +733,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                 _is_transient = any(k in _err_msg for k in ['lock', 'deadlock', 'serialization', 'connection', 'timeout', 'could not'])
                 if _is_transient and _attempt < _max_retries - 1:
                     print(f"[brain.py] INSERT attempt {_attempt+1}/{_max_retries} failed (transient): {_insert_err}")
-                    time.sleep(1)
+                    _time.sleep(1)  # FIX (2026-10-08, BUG-026): was bare time.sleep — module imports `time as _time`, so NameError killed the retry and rolled back the HL position instead
                     conn.rollback()
                     continue
                 print(f"[brain.py] INSERT EXCEPTION (attempt {_attempt+1}/{_max_retries}): {type(_insert_err).__name__}: {_insert_err}")
@@ -952,6 +950,15 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             notes         = COALESCE(%s, '')
         WHERE id = %s AND status = 'open'
     """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, close_reason_val, close_reason_val, exit_conditions, notes, trade_id))
+
+    # FIX (2026-10-08, BUG-027): the UPDATE above has `WHERE status='open'` — if the
+    # trade was already closed by another exit engine (profit-monster runs as its own
+    # service alongside position_manager), rowcount is 0 and everything below must be
+    # skipped: otherwise the loss cooldown is recorded again and Hebbian/correlation
+    # learn the same outcome twice, skewing learning stats.
+    if cur.rowcount == 0:
+        print(f"[close_trade] trade #{trade_id} ({token}) was not open (already closed or missing) — skipping close side-effects")
+        return False
 
     conn.commit()
 
@@ -1357,9 +1364,15 @@ if __name__ == "__main__":
             print(f"  Exchange: {args.exchange} | Server: {args.server} | Paper: {not args.real} | Signal: {args.signal or 'N/A'} | Lev: {args.leverage}x")
         
         elif args.subcommand == "close":
-            close_trade(args.id, args.exit_price, args.pnl, args.notes, args.close_reason,
-                        skip_hl=args.skip_hl, exit_conditions=args.exit_conditions)
-            print(f"✓ Closed trade #{args.id} @ ${args.exit_price}")
+            # FIX (2026-10-08, BUG-027): honor close_trade's return value — previously
+            # printed "✓ Closed" even when the trade was already closed / not found.
+            _closed = close_trade(args.id, args.exit_price, args.pnl, args.notes, args.close_reason,
+                                  skip_hl=args.skip_hl, exit_conditions=args.exit_conditions)
+            if _closed:
+                print(f"✓ Closed trade #{args.id} @ ${args.exit_price}")
+            else:
+                print(f"✗ trade #{args.id} was not open or not found — nothing closed")
+                sys.exit(1)
         
         elif args.subcommand == "list":
             trades = list_trades(args.status, args.limit)
