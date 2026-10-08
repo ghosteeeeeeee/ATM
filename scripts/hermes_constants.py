@@ -175,7 +175,8 @@ LONG_BLACKLIST = {
     # TST, KAS removed 2026-08-07 — no specific block reason
     # ACE removed from LONG_BLACKLIST 2026-08-24 — re-enabled for longs
     # ACE re-blacklisted 2026-10-03 — 7d 3T 0W -$0.55 (bb-squeeze+ x2, pump-chain+), 14d 3W/8T 37.5% -$0.78 across 5 signals. Watchdog URGENT: coin-level bleed, not signal logic. Aug 24 removal was premature.
-    'ACE',
+    # REMOVED 2026-10-08 — T directive: ACE had +6.3% bounce while BTC flat, 0 signals fired because blacklisted. 90d ACE LONG = 23T 60.9%WR +$0.04 (breakeven).
+    # 'ACE',
     # TRUMP added 2026-08-08 — political meme coin, high volatility
     # PROVE re-blacklisted 2026-08-10 — 25% WR, -0.25% avg PnL, -$0.22 total
     'BOME', 'USTC', 'RSR',
