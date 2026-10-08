@@ -6600,3 +6600,25 @@ BY: daily_orchestrator
 **Open Questions:**
 - hard_max_loss creeping back above 40% (41.7%) — Oct 9/10 eval must address; 24h net still +$0.42
 - Carry-forward: v5 solo/conj 24h 0W −$0.37 for 7d eval
+
+## [2026-10-08 23:12] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 | 24h: 12T 5W +$0.42 (WR 41.7%)
+**24h exits:** hard_max_loss 5T −$0.74 | stale_exit 4T +$0.60 | atr_trail_hit 1T +$0.94 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+**Open:** 0
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal eligible
+- atr_sl_hit 0/12=0% — tpsl stable
+- hard_max_loss 5/12=41.7% — hold per brain_auditor Oct 9/10 eval
+- Overtrade: 0/hr
+- Streak: last hour flat (0 trades) after +$0.01 — not 3 consecutive negative
+- Timers fresh (all within 1min), live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Carry-forward: hard_max_loss 41.7% for Oct 9/10 eval; v5 solo/conj 24h 0W −$0.37 for 7d kill bar
