@@ -548,3 +548,17 @@
 **Endpoint:** POST http://localhost:8080/mcp (x-api-key: dev-key-123)
 **Accept header required:** application/json, text/event-stream
 **Config:** /root/.hermes/config/shared-mcp.json
+
+## 2026-10-08: REJECT velocity-based detection bypass in pump_chain_long
+
+**Decision:** REJECT — do not fire pump-chain+ from momentum_cache velocity > 0.10 + LONG_BIAS when pump_flow is in ACCUMULATION.
+**Why (verified live 2026-10-08 01:04 UTC):**
+- Premise stale: pump_flow already MARKUP conf=0.764 with 9 LONG recs; pump-chain+ fired today (CRV 00:24, LDO 00:26, CHIP 01:04). Only 7 coins pass vel>0.10+LONG_BIAS (not 12+); PURR/APT/ATOM fail the proposed gate.
+- Filter inverts the winner: winning CRV entered at signal_rsi_14=52.17; CRV now RSI 99.44. Downstream signal_compactor blocks pump-chain LONG at RSI>85 ("overbought chase, 23.5%WR").
+- Velocity variant already exists as pump-chain-v5 and loses: 14d 11T 4W 36.4% WR -$0.27. v4 before it: 15.4%WR NEVER_REENABLE.
+- Bypass strips chain evidence, BTC 1h filter, move-already-done filter, flow confidence — the protections that make the signal work.
+- pump-chain+ LONG base rate: 24h 4T 1W 25% WR -$0.20 | 14d 57.1% +$0.89 | 30d 43.6% +$1.84.
+**Approved instead:** root-cause pump_flow phase lag; mirror pump_flow_signal's low-phase-conf escape hatch in pump_chain_long; resolve v5 before any second velocity experiment; any new velocity signal needs its own flag + RSI≤85 + BTC filter + independent backtest.
+**Full writeup:** brain/decisions/2026-10-08_reject-pump-chain-velocity-bypass.md
+**Sideways:** pump_chain_long/v5 `_load_state()` missing staleness check (pump_flow_signal has 600s reject) — medium severity, fix pending.
+**Revisit:** 2026-10-10 | **Owner:** CEO
