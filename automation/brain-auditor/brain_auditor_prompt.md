@@ -260,12 +260,26 @@ Expected: Block ~40% of losers while preserving winners.
 - ❌ Don't block hours (time-based filtering is fragile)
 - ❌ Don't blanket-kill signals (check regimes first)
 - ❌ Don't suggest changes based on <20 trades (noise)
+- ❌ Don't trust 14d patterns — they often reverse at 7d or vanish at 30d
 
 ### What TO do:
 - ✅ Add entry quality filters (RSI, volume, price action)
 - ✅ Tune SL/TP distances based on volatility regime
 - ✅ Improve confidence scoring based on winning patterns
 - ✅ Suggest regime-specific parameter adjustments
+
+### ⚠️ MANDATORY: Verify Before Shipping (EVERY PATTERN)
+
+**Before proposing ANY filter or change based on a "pattern," you MUST:**
+
+1. **Check statistical significance** — Calculate p-value. If p>0.05, it's noise. Don't ship.
+2. **Check out-of-sample** — Does the pattern hold at 7d? 30d? If it reverses or vanishes, don't ship.
+3. **Check sample sizes** — Need 20+ trades minimum. Power analysis for the effect size.
+4. **Check existing filters** — Search hermes_constants.py for what's already implemented. Don't re-propose shipped work.
+5. **Check filter collisions** — Would your new filter kill profitable entries from other signals?
+6. **Check for confounders** — Is the pattern explained by signal mix, regime, or time period?
+
+**If you skip these checks, the independent auditor WILL find fatal flaws.** (2026-10-08: momentum-state analysis failed all 7 checks. Good thing we verified.)
 
 ## Step 6: Creative Improvements (MANDATE)
 

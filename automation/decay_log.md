@@ -1593,3 +1593,7 @@
 [2026-10-08 08:24 UTC] No signals with sufficient trades in 24h window
 [2026-10-08 14:24 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-10-08 14:24 UTC] No signals with sufficient trades in 24h window
+[2026-10-08 20:24 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 20:24 UTC]   🟢 OK: pump-chain+: 6 trades, 83.3% WR, PnL=12.37
+[2026-10-08 20:24 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-08 20:24 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

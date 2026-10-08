@@ -257,3 +257,11 @@
 - **AUTO-FIX**: None — active DBs, no safe auto-clean without retention review.
 - **WARN** (1x): hermes-bug-hunter.service exits status=1 (expected — reports known code-quality audit findings). Timer active, not a runtime fault.
 - **INFO**: hermes-atr-sl-updater.timer unit intentionally DEFUNCT/disabled. Stale list entry only.
+
+## Error Alerts — 2026-10-08 19:48 UTC
+- **WARN** (1x): Disk at 85% (94G/118G, 18G free). Unchanged since 18:48 check. Top consumers unchanged: coin_tracker.db (3.3G), candles.db (2.6G), session_brain.db (1.1G). Active DBs — no safe auto-clean without retention review.
+- **AUTO-FIX**: Compressed stale `/root/.hermes/logs/sniper_exit.log` (>7d) to .gz. No other safe cleanup targets (only 1 log >7d; journals already compact at 56M).
+- **INFO**: Pipeline healthy — 1 open / 9 closed today, +35.61% PnL. All core timers firing. Prices fresh (max candle 19:47 UTC). No phantom trades, no DB locks, no crashes.
+
+## Error Alerts — 2026-10-08 20:00 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
