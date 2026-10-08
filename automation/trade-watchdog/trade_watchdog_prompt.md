@@ -61,7 +61,7 @@ cat /var/www/hermes/data/regime_5m.json
 cat /var/www/hermes/data/signals.json
 ```
 
-Also check recent volatility for candidate coins (needed for RR engine pre-check):
+Also check recent volatility for candidate coins:
 ```python
 import sqlite3
 conn = sqlite3.connect('/root/.hermes/data/candles.db')
@@ -188,31 +188,28 @@ The pipeline has multiple gates between your pick and an actual trade. Recent pi
 - **AVAX LONG** → BTC chop gate (now bypassed for ai-trader)
 - **SAGA LONG** → coin reversed to SHORT_BIAS within 15 min, signal expired
 
-**Before picking, run this pre-check:**
-```python
-import sqlite3, json
-conn = sqlite3.connect('/root/.hermes/data/candles.db')
-cur = conn.cursor()
-# Get recent ATR for candidate coins
-cur.execute('''
-    SELECT token, 
-           AVG(high - low) as avg_range,
-           AVG((high - low) / close * 100) as atr_pct
-    FROM candles_5m 
-    WHERE token IN ('COIN1', 'COIN2', 'COIN3')
-      AND ts > strftime('%s', 'now') - 3600
-    GROUP BY token
-''')
-for row in cur.fetchall():
-    print(f'{row[0]}: ATR%={row[2]:.2f}%')
-conn.close()
+**Before picking, run the pre-check tool:**
+```bash
+cd /root/.hermes/scripts && python3 ai_trader_precheck.py COIN DIRECTION
 ```
 
+This tests the ACTUAL RR engine calculation (including S/R level adjustments) plus RSI, ATR, and price freshness. Only pick coins that pass ALL checks.
+
+**Example output:**
+```
+=== AI Trader Pre-check: AVAX LONG ===
+  ✅ ATR > 0.3%: ATR=1.2%
+  ✅ RR engine: multiplier=1.15
+  ✅ RSI 40-65: RSI=55.3
+  ✅ Price fresh (<5min): age=1min
+✅ PASS — safe to pick
+```
+
+**If the pre-check FAILS, pick a different coin.** Don't force a pick that the pipeline will block.
+
 **RR Engine gate (R:R ≥ 0.70):**
-- The RR engine uses ATR to place SL/TP. If ATR% is too low (< 0.4%), the SL will be too close to entry and R:R fails.
-- **Prefer coins with ATR% > 0.5%** — enough room for SL/TP to breathe.
-- **Avoid tight consolidations** — BB width < 0.3% means no room for a proper R:R setup.
-- Check the coin's recent volatility. If it's been flat for hours, the RR engine will block it.
+- The RR engine uses ATR + S/R levels to place SL/TP. If ATR is too tight OR a strong S/R level sits between entry and SL, the R:R fails.
+- **Always run the precheck** — ATR% alone doesn't tell the whole story.
 
 **RSI Gate:**
 - LONG: RSI must be 40-65 (above 70 = spike filter blocks, below 35 = oversold)

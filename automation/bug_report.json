@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-10-08 15:03:51",
+  "timestamp": "2026-10-08 18:34:27",
   "total_checks": 20,
-  "passed": 10,
+  "passed": 11,
   "critical_count": 9,
-  "warning_count": 1,
+  "warning_count": 0,
   "criticals": [
     {
       "name": "sqlite_leaks",
-      "msg": "49 files: ceo_dashboard_api.py, study_winning_combos.py, apply_fixes.py, pump_flow_engine.py, wave_backtest.py",
+      "msg": "50 files: ceo_dashboard_api.py, study_winning_combos.py, apply_fixes.py, pump_flow_engine.py, wave_backtest.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Move conn.close() to a finally block or use context manager"
     },
@@ -19,7 +19,7 @@
     },
     {
       "name": "cursor_leaks",
-      "msg": "51 files: ceo_dashboard_api.py, study_winning_combos.py, family_map_dashboard.py, apply_fixes.py, wave_backtest.py",
+      "msg": "52 files: ceo_dashboard_api.py, study_winning_combos.py, family_map_dashboard.py, apply_fixes.py, wave_backtest.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -37,7 +37,7 @@
     },
     {
       "name": "connection_leaks",
-      "msg": "53 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, session_brain.py, apply_fixes.py, pump_flow_engine.py",
+      "msg": "54 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, session_brain.py, apply_fixes.py, pump_flow_engine.py",
       "file": "",
       "fix": "Use 'with _db_cursor(path) as (conn, cur):' from signal_schema or add try/finally"
     },
@@ -60,12 +60,5 @@
       "fix": "Remove imports of ai_decider and signal_gen (defunct per AGENTS.md)"
     }
   ],
-  "warnings": [
-    {
-      "name": "trade_frequency",
-      "msg": "2 trades in 6h (0.3/hr)",
-      "file": "",
-      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
-    }
-  ]
+  "warnings": []
 }

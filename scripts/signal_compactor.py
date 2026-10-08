@@ -5086,6 +5086,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         # Purge executed signals older than 1 hour (keeps DB lean)
         if purge_executed:
             _purge_executed_signals(hours=1, dry=dry)
+            _purge_stale_unexecuted(hours=2, dry=dry)
 
         return {
             'hotset': hotset_output,
@@ -5208,6 +5209,43 @@ def _do_purge(conn, c, hours):
     conn.commit()
     log(f"Purged {deleted} executed signals older than {hours}h")
     return deleted
+
+
+def _purge_stale_unexecuted(hours=2, dry=False):
+    """Delete dead unexecuted signals (EXPIRED/SKIPPED) older than `hours`.
+
+    Keeps PENDING (live candidates) and EXECUTED (handled by _purge_executed_signals).
+    Extends signal-purge per health-monitor recommendation 2026-10-08 — 28k+ stale
+    unexecuted rows were accumulating because purge only covered executed signals.
+    """
+    conn = sqlite3.connect(RUNTIME_DB, timeout=30)
+    try:
+        c = conn.cursor()
+        c.execute("""
+            SELECT count(*) FROM signals
+            WHERE decision IN ('EXPIRED','SKIPPED')
+              AND executed = 0
+              AND updated_at < datetime('now', '-' || ? || ' hours')
+        """, (hours,))
+        n = c.fetchone()[0]
+        if dry:
+            log(f"[DRY] Would purge {n} stale unexecuted signals (EXPIRED/SKIPPED older than {hours}h)")
+            return n
+        if n == 0:
+            log(f"Purged 0 stale unexecuted signals (EXPIRED/SKIPPED older than {hours}h)")
+            return 0
+        c.execute("""
+            DELETE FROM signals
+            WHERE decision IN ('EXPIRED','SKIPPED')
+              AND executed = 0
+              AND updated_at < datetime('now', '-' || ? || ' hours')
+        """, (hours,))
+        deleted = c.rowcount
+        conn.commit()
+        log(f"Purged {deleted} stale unexecuted signals (EXPIRED/SKIPPED older than {hours}h)")
+        return deleted
+    finally:
+        conn.close()
 
 
 def _filter_safe_prev_hotset(prev_hotset):
@@ -5590,12 +5628,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Deterministic signal compactor')
     parser.add_argument('--dry', action='store_true', help='Dry run (log only, no write)')
     parser.add_argument('--verbose', action='store_true', help='Log per-signal scoring details')
-    parser.add_argument('--purge-executed', action='store_true', help='Purge executed signals older than 1 hour')
+    parser.add_argument('--purge-executed', action='store_true', help='Purge executed (>1h) and stale unexecuted EXPIRED/SKIPPED (>2h) signals')
     parser.add_argument('--purge-only', action='store_true', help='Only purge — skip compaction entirely')
     args = parser.parse_args()
 
     if args.purge_only:
         _purge_executed_signals(hours=1, dry=args.dry)
+        _purge_stale_unexecuted(hours=2, dry=args.dry)
         print("Purge complete.")
         sys.exit(0)
 
