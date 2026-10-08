@@ -1,36 +1,17 @@
-# CEO Report — RR Engine Bug Hunt #2 Decisions
+# CEO Report — 2026-10-08 01:47 UTC
 
-**Date:** 2026-10-07
-**Context (DB-verified):** 24h **12T 3W +$0.37 WR 16.7%** | 7d **212T +$0.62 53.8%** (LONG +$1.30, SHORT −$0.68) | hard_max_loss residual | system thin on volume. Logs: **6,688 SHADOW BLOCK** lines; multiplier already live (RR HARD BLOCK mult=0.0 firing). BUG-3 cache fix confirmed in code. BUG-4/10 open.
+### Diagnosis
+DB-verified: **24h 14T +$1.44 28.6%WR** (CRV pump-chain+ +42.34% acct +$0.94 carries it) | **7d 208T +$1.08 52.9%** | LONG +$1.77/168T 56.5% | SHORT **−$0.69/40T 37.5%** | Open 0 | HML 7d **66T −$8.72 #1** | post-CUT_LOSER_PNL=-1.50 24h 8T avg **−1.92%** (was −4.15%) | Regime LONG_BIAS, BTC NEUTRAL flat | Disk 86% | Protected flags intact.
 
----
+### Root Cause
+1. **HML frequency** — magnitude fix working but trail never gets room (87.5% had MFE>0). D3 trail-min-gap **not implemented** in position_manager.py.
+2. **wyckoff 0 fires** — `pattern_recognition.py` missing (silent ImportError); spring/upthrust detection returns None on all 12 dry-run tokens despite healthy candles + working climax/range stages.
+3. **SHORT bleed** — EXTREME/HIGH losing; NORMAL habitat only (11T 63.6% +$0.09). Floors (HARD_FLOOR=45, HIGH_BLOCK) already live.
 
-## Decisions
-
-### D1 — Shadow Mode Flip (BUG-2) → **B: KEEP SHADOW=True. Do not enforce yet.**
-**Rationale:** Multiplier already hard-blocks rr<0.70 + grade F; flipping regime mins (FLAT 2.5 / NORMAL 2.0) would starve an already-thin 12T/24h flow on thresholds that contradict the live curve, while BUG-4/10 still distort scores.
-**Risks:** Shadow-block volume may hide real edge (7d RR<1 = 23%WR vs RR≥1 = 61%). Monitor: shadow-block cohorts vs 7d outcomes.
-**Path (delegate self_learner + signal_analyst):** (1) make `rr_confidence_multiplier` consult `_get_rr_min(regime)`; (2) backtest FORCE on shadow logs; (3) re-eval flip at n≥100 shadow blocks. Constants stay T-approved — no flag flip without sign-off.
-
-### D2 — Score Floor Exemption (BUG-12) → **A: EXEMPT rr_mult from the 0.3 floor.**
-**Rationale:** Floor actively washes RR penalties in production (`[SCORE-FLOOR] product 0.1643 floored to 0.3` on live BTC SHORT); hard blocks already exempt — soft RR penalties must bite too.
-**Implementation:** Remove rr_mult from floored product; apply after: `final = score * rr_mult * max(other_product, 0.3)`.
-**Risks:** Deeper score cuts when RR+noise stack → fewer signals. Monitor: trade volume, SCORE-FLOOR events, winners blocked at rr_mult=0.70.
-
-### D3 — TRAIL_SL Minimum Gap (BUG-11) → **A: ADD ATR-based minimum gap.**
-**Rationale:** Rule 1 break path already has `RR_EXIT_MIN_BREAK_DIST=0.5%`; trail path lacks it — support 0.1% below price = market stop, killed by wiggle. Production-wired via `position_manager.py:2997`.
-**Implementation:** `min_gap = max(RR_EXIT_MIN_BREAK_DIST, atr_pct * RR_EXIT_TRAIL_MIN_ATR_MULT / 100)` in trail loops; new constant near `RR_EXIT_TRAIL_BUFFER`.
-**Risks:** Less responsive trail → profits give back more. Monitor: trail exit frequency, avg trail distance, trail-family WR (currently the only real edge: +$9.47/7d).
-
-### D4 — Open Skies Points (BUG-10) → **B: KEEP full 25 points.**
-**Rationale:** Open skies = room to run = structurally good for trend trades; BUG-3 price-bucketing already cut the main garbage-map risk. Reducing to 15 treats genuine breakouts like "far target" (15). Fix BUG-4 distance normalization if inflation proves real — don't double-penalize.
-**Risks:** Score inflation on incomplete S/R → A/B grades on garbage. Monitor: open-skies trades vs sweet-spot WR at n≥20; if gap >10% WR, revisit (conditional 25/15 by map depth).
-
----
+### Fix Applied
+**0 trading constant value changes.** All planned regime blocks already live; brain_auditor rejected remaining filter candidates on winner-impact. **RATIFIED pump-chain+ KEEP** (30d 95T +$2.78 44.2%; CRV winner today). Regime memory refreshed. **DELEGATE bug_hunter:** D3 trail-min-gap, pattern_recognition.py, DRIFT-E, disk retention. **DELEGATE signal_analyst:** wyckoff spring/upthrust audit. Thursday — MoE skipped.
 
 ### Verification
-- No trading-path constants changed this run. Protected flags intact. Session lock clear.
-- D2/D3 are code fixes — delegate bug_hunter after T acknowledges these decisions.
-- Goals: RR engine enforcement consistency by Oct 11 | trail premature-stop share <20% by Oct 14 | open-skies cohort n≥20 eval Oct 14.
+Next-run metrics: 24h ≥$0 (met thin), 7d ≥$0 by Oct 10, SHORT 7d ≥$0 by Oct 11, HML mag sustain ≤−2%, wyckoff ≥1 by Oct 9, disk <80% by Oct 14. n≥10 post-widen HML by Oct 11.
 
-Artifacts: brain/specs/rr_engine_bug_hunt_2.md, this report, automation/ceo/ceo_kanban.md. — CEO
+Artifacts: CURRENT.md, automation/ceo/ceo_kanban.md, data/signal_regime_memory.json. — CEO
