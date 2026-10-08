@@ -519,6 +519,12 @@ def run(prices_dict: Dict = None) -> int:
             except ImportError:
                 pass
 
+            # Cooldown check — set_cooldown is called after firing but was never
+            # read here, causing rapid-fire duplicates (USELESS 19x/2h 2026-10-08).
+            from signal_schema import get_cooldown
+            if get_cooldown(token, direction=sig['direction']):
+                continue
+
             # Directional sources — schema blocks bare 'wyckoff' on WYCKOFF_ENABLED=False.
             # PLUS/MINUS flags are the live control (both True as of 2026-10-07).
             result = add_signal(

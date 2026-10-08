@@ -1092,28 +1092,12 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
             continue
 
         # ── Cooldown enforcement (RS_COOLDOWN_HOURS) ─────────────────────────────
-        # Skip if a recent RS signal of the same direction already fired
+        # Standard signal_schema cooldown — old signal_history check never fired
+        # because blocked signals never reach signal_history (USUAL 14x/2h 2026-10-08).
         if RS_COOLDOWN_HOURS and RS_COOLDOWN_HOURS > 0:
-            import datetime
-            cooldown_cutoff = datetime.datetime.utcnow() - datetime.timedelta(hours=RS_COOLDOWN_HOURS)
-            cooldown_cutoff_str = cooldown_cutoff.strftime('%Y-%m-%d %H:%M:%S')
-            conn_cd = None
-            try:
-                conn_cd = _get_conn(_runtime())
-                cur_cd = conn_cd.cursor()
-                cur_cd.execute("""
-                    SELECT created_at FROM signal_history
-                    WHERE token=? AND direction=? AND created_at > ?
-                    ORDER BY created_at DESC LIMIT 1
-                """, (token_upper, sig['direction'].upper(), cooldown_cutoff_str))
-                row_cd = cur_cd.fetchone()
-                if row_cd is not None:
-                    continue  # within cooldown window
-            except Exception:
-                pass  # non-fatal: skip cooldown check if DB query fails
-            finally:
-                if conn_cd:
-                    conn_cd.close()
+            from signal_schema import get_cooldown
+            if get_cooldown(token, direction=sig['direction']):
+                continue
 
         # ── GATE: Candle pattern quality bonus (pin bar, engulfing at level) ──
         # Books: pin bar at S/R = highest probability (Woods, Porwal)
@@ -1138,6 +1122,8 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
         if sid:
             added += 1
             signaled_tokens.append(token.upper())
+            from signal_schema import set_cooldown
+            set_cooldown(token, sig['direction'], hours=RS_COOLDOWN_HOURS)
             level_pct = abs(price - sig['level']) / price * 100.0
             print(f'  {sig["direction"]:5s} {token:8s} conf={sig["confidence"]:3.0f}% '
                   f'level={sig["level"]:.6f} ({level_pct:.3f}% off) '
