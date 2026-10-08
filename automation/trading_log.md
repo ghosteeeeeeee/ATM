@@ -6037,3 +6037,66 @@ BY: auto_1hr
 - pump-chain- 24h 0W -$0.38 vs 7d +$0.17 — variance or degradation? Monitor, not kill-eligible
 
 BY: auto_1hr
+
+## LOSERS Update — 2026-10-08 06:05 UTC
+- REMOVE ALGO (insufficient data)
+- ADD CRV (WR=20.0%, PnL=$0.56, low_wr (20.0%))
+
+Final set: ['BTC', 'CHIP', 'CRV', 'INJ', 'JUP', 'TURBO']
+
+## [2026-10-08 06:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+**Open:** 0
+
+**24h:** 10 closed | 2W 8L | +$0.30 (WR 20.0%)
+**24h by close reason:** hard_max_loss 6T -$0.51 (60%) | atr_trail_hit 2T +$0.94 | hard_sl 1T -$0.10 | pump_exit_dead_money 1T +$0.07
+**24h by signal:** pump-chain- 5T 0W -$0.35 | pump-chain+ 4T 2W +$0.81 | pump-chain-v5 1T 0W -$0.06
+**7d by signal:** pump-chain+ 15T 9W +$1.83 | pump-chain- 21T 7W +$0.17 | pump-chain-v5 8T 2W -$0.34
+**atr_sl_hit:** 0/10 = 0% — tpsl_utils.py fix stable
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: 0T last hour — no evaluation possible.
+2. SL behavior: atr_sl_hit 0% — NOT dominant. hard_max_loss 6/10=60% remains the systemic watch (queue#2 leverage-aware SL review).
+3. Signal quality: No 0%-WR signal with 3+T in last hour (0T closed). pump-chain- 24h 0W but 7d positive — not kill-eligible. pump-chain+ 50% WR 24h — healthy.
+4. Trade frequency: 0/hr — fine.
+
+**No Change Needed:**
+- Kill: 0T last hour — no kill trigger
+- atr_sl_hit: 0% — tpsl fix stable
+- hard_max_loss: 60% queue#2 remains open — watch item
+- NEG-STREAK: inactive — last net hour was +$0.94
+- Overtrade: 0/hr
+- Open: 0 — nothing to manage
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 60% queue#2 leverage-aware SL review — still #1 systemic watch
+- Market quiet (multiple consecutive quiet hours) — under-trading vs over-filtering? Pipeline correctly gating signals under current regime
+
+## [2026-10-08 06:40 UTC] daily_orchestrator: D3 TRAIL-MIN-GAP SHIPPED + commits
+
+**PG-verified:** 24h 10T 2W 8L +$0.40 (20% WR) | 7d 201T +$1.10 (52.7%) | LONG 7d +$1.67 | SHORT 7d −$0.57 AT RISK | Open 0 | Kill LIVE=true
+**24h exits:** HML 6T −$0.51 (60%) | atr_trail 2T +$0.94 | hard_sl 1T −$0.10 | pump_exit 1T +0.07
+
+### Implemented
+1. **D3 trail-min-gap** — `HML_TRAIL_MIN_GAP_PCT=0.20`; HML price floor −(0.40 trail arm + 0.20 gap)=**−0.60%** before vol floor. Self-check PASS. Live immediately (PM per-cycle load). Evidence: LDO MFE+0.27% / FIL MFE+0.82% died HML with old −0.20% thresh.
+2. **Committed** `1c6c6927` — brain_auditor HML_VOL_ATR_MULT + pump-chain- NORMAL 1.2 + pattern_recognition.py + LOSERS/ACCEL cleanup + bollinger candidates. Compile-checked.
+3. **pattern_recognition.py verified** — wyckoff import path OK; upgrade-implementer asserts PASS.
+4. **Disk prune deferred** — mtf_macd_tuner 1.76GB / 15.9M backtest_results rows; tuner sweep ACTIVE. Prune >14d + VACUUM after idle.
+
+### Not changed (correct)
+- No signal kills (regime path live for pump-chain-)
+- No CEO-only decisions (ride_it exemption stays PROPOSED)
+- No constants without evidence
+
+### Watch
+- HML frequency post-D3 next 24h (goal <40% of closes)
+- SHORT 7d −$0.57 (deadline Oct 11)
+- Disk 86% until tuner prune + big-DB plan
+
+BY: daily_orchestrator
