@@ -1,0 +1,416 @@
+{
+ "matrix": {
+  "close|censor=True": {
+   "n_fires": 29,
+   "n_impossible_post_close": 0,
+   "net_delta": -2.6373,
+   "overlap_dm": 3,
+   "overlap_ids": [
+    15588,
+    15591,
+    15982
+   ],
+   "n_kills": 6,
+   "kills": [
+    [
+     15126,
+     "GRASS",
+     2.11
+    ],
+    [
+     15493,
+     "FOGO",
+     2.19
+    ],
+    [
+     15518,
+     "AVAX",
+     2.29
+    ],
+    [
+     15520,
+     "JUP",
+     2.27
+    ],
+    [
+     15565,
+     "ETC",
+     2.04
+    ],
+    [
+     15567,
+     "ADA",
+     2.02
+    ]
+   ]
+  },
+  "close|censor=False": {
+   "n_fires": 91,
+   "n_impossible_post_close": 62,
+   "net_delta": -7.9854,
+   "overlap_dm": 10,
+   "overlap_ids": [
+    15588,
+    15591,
+    15599,
+    15857,
+    15859,
+    15866,
+    15876,
+    15917,
+    15918,
+    15982
+   ],
+   "n_kills": 8,
+   "kills": [
+    [
+     15126,
+     "GRASS",
+     2.11
+    ],
+    [
+     15390,
+     "INJ",
+     5.79
+    ],
+    [
+     15493,
+     "FOGO",
+     2.19
+    ],
+    [
+     15518,
+     "AVAX",
+     2.29
+    ],
+    [
+     15520,
+     "JUP",
+     2.27
+    ],
+    [
+     15547,
+     "AVAX",
+     2.56
+    ],
+    [
+     15565,
+     "ETC",
+     2.04
+    ],
+    [
+     15567,
+     "ADA",
+     2.02
+    ]
+   ]
+  },
+  "open|censor=True": {
+   "n_fires": 30,
+   "n_impossible_post_close": 0,
+   "net_delta": -2.5563,
+   "overlap_dm": 3,
+   "overlap_ids": [
+    15588,
+    15591,
+    15982
+   ],
+   "n_kills": 6,
+   "kills": [
+    [
+     15126,
+     "GRASS",
+     2.02
+    ],
+    [
+     15493,
+     "FOGO",
+     2.11
+    ],
+    [
+     15518,
+     "AVAX",
+     2.21
+    ],
+    [
+     15520,
+     "JUP",
+     2.19
+    ],
+    [
+     15565,
+     "ETC",
+     2.12
+    ],
+    [
+     15567,
+     "ADA",
+     2.11
+    ]
+   ]
+  },
+  "open|censor=False": {
+   "n_fires": 89,
+   "n_impossible_post_close": 59,
+   "net_delta": -7.8216,
+   "overlap_dm": 10,
+   "overlap_ids": [
+    15588,
+    15591,
+    15599,
+    15857,
+    15859,
+    15866,
+    15876,
+    15917,
+    15918,
+    15982
+   ],
+   "n_kills": 8,
+   "kills": [
+    [
+     15126,
+     "GRASS",
+     2.02
+    ],
+    [
+     15390,
+     "INJ",
+     5.71
+    ],
+    [
+     15493,
+     "FOGO",
+     2.11
+    ],
+    [
+     15518,
+     "AVAX",
+     2.21
+    ],
+    [
+     15520,
+     "JUP",
+     2.19
+    ],
+    [
+     15547,
+     "AVAX",
+     2.47
+    ],
+    [
+     15565,
+     "ETC",
+     2.12
+    ],
+    [
+     15567,
+     "ADA",
+     2.11
+    ]
+   ]
+  }
+ },
+ "dead_money_forensics": [
+  {
+   "id": 15588,
+   "token": "GMX",
+   "closed": "2026-09-21 15:05:52.377906+00:00",
+   "hold_h": 3.639,
+   "align_close": {
+    "fire_at": "2026-09-21 13:30:00+00:00",
+    "hold": 2.041,
+    "post_close": false,
+    "lag_min": 95.9,
+    "censored_hit": true
+   },
+   "align_open": {
+    "fire_at": "2026-09-21 13:30:00+00:00",
+    "hold": 2.041,
+    "post_close": false,
+    "lag_min": 95.9,
+    "censored_hit": true
+   }
+  },
+  {
+   "id": 15591,
+   "token": "AZTEC",
+   "closed": "2026-09-21 16:05:34.150531+00:00",
+   "hold_h": 2.053,
+   "align_close": {
+    "fire_at": "2026-09-21 16:05:00+00:00",
+    "hold": 2.043,
+    "post_close": false,
+    "lag_min": 0.6,
+    "censored_hit": true
+   },
+   "align_open": {
+    "fire_at": "2026-09-21 16:05:00+00:00",
+    "hold": 2.043,
+    "post_close": false,
+    "lag_min": 0.6,
+    "censored_hit": true
+   }
+  },
+  {
+   "id": 15599,
+   "token": "ALT",
+   "closed": "2026-09-21 22:45:28.015301+00:00",
+   "hold_h": 2.127,
+   "align_close": {
+    "fire_at": "2026-09-21 23:10:00+00:00",
+    "hold": 2.536,
+    "post_close": true,
+    "lag_min": -24.5,
+    "censored_hit": false
+   },
+   "align_open": {
+    "fire_at": "2026-09-21 23:05:00+00:00",
+    "hold": 2.453,
+    "post_close": true,
+    "lag_min": -19.5,
+    "censored_hit": false
+   }
+  },
+  {
+   "id": 15857,
+   "token": "ENS",
+   "closed": "2026-10-03 01:34:57.702987+00:00",
+   "hold_h": 2.458,
+   "align_close": {
+    "fire_at": "2026-10-03 01:40:00+00:00",
+    "hold": 2.542,
+    "post_close": true,
+    "lag_min": -5.0,
+    "censored_hit": false
+   },
+   "align_open": {
+    "fire_at": "2026-10-03 01:35:00+00:00",
+    "hold": 2.458,
+    "post_close": true,
+    "lag_min": -0.0,
+    "censored_hit": false
+   }
+  },
+  {
+   "id": 15859,
+   "token": "LDO",
+   "closed": "2026-10-03 02:22:24.715943+00:00",
+   "hold_h": 2.03,
+   "align_close": {
+    "fire_at": "2026-10-03 02:25:00+00:00",
+    "hold": 2.073,
+    "post_close": true,
+    "lag_min": -2.6,
+    "censored_hit": false
+   },
+   "align_open": {
+    "fire_at": "2026-10-03 02:25:00+00:00",
+    "hold": 2.073,
+    "post_close": true,
+    "lag_min": -2.6,
+    "censored_hit": false
+   }
+  },
+  {
+   "id": 15866,
+   "token": "JUP",
+   "closed": "2026-10-03 07:42:43.003688+00:00",
+   "hold_h": 2.0,
+   "align_close": {
+    "fire_at": "2026-10-03 07:45:00+00:00",
+    "hold": 2.038,
+    "post_close": true,
+    "lag_min": -2.3,
+    "censored_hit": false
+   },
+   "align_open": {
+    "fire_at": "2026-10-03 07:55:00+00:00",
+    "hold": 2.205,
+    "post_close": true,
+    "lag_min": -12.3,
+    "censored_hit": false
+   }
+  },
+  {
+   "id": 15876,
+   "token": "GMT",
+   "closed": "2026-10-03 15:26:16.951103+00:00",
+   "hold_h": 2.01,
+   "align_close": {
+    "fire_at": "2026-10-03 15:30:00+00:00",
+    "hold": 2.072,
+    "post_close": true,
+    "lag_min": -3.7,
+    "censored_hit": false
+   },
+   "align_open": {
+    "fire_at": "2026-10-03 15:35:00+00:00",
+    "hold": 2.155,
+    "post_close": true,
+    "lag_min": -8.7,
+    "censored_hit": false
+   }
+  },
+  {
+   "id": 15917,
+   "token": "IMX",
+   "closed": "2026-10-04 19:58:32.032289+00:00",
+   "hold_h": 2.0,
+   "align_close": {
+    "fire_at": "2026-10-04 20:05:00+00:00",
+    "hold": 2.108,
+    "post_close": true,
+    "lag_min": -6.5,
+    "censored_hit": false
+   },
+   "align_open": {
+    "fire_at": "2026-10-04 20:00:00+00:00",
+    "hold": 2.025,
+    "post_close": true,
+    "lag_min": -1.5,
+    "censored_hit": false
+   }
+  },
+  {
+   "id": 15918,
+   "token": "GMT",
+   "closed": "2026-10-04 19:59:38.652675+00:00",
+   "hold_h": 2.002,
+   "align_close": {
+    "fire_at": "2026-10-04 20:00:00+00:00",
+    "hold": 2.008,
+    "post_close": true,
+    "lag_min": -0.4,
+    "censored_hit": false
+   },
+   "align_open": {
+    "fire_at": "2026-10-04 20:00:00+00:00",
+    "hold": 2.008,
+    "post_close": true,
+    "lag_min": -0.4,
+    "censored_hit": false
+   }
+  },
+  {
+   "id": 15982,
+   "token": "DOT",
+   "closed": "2026-10-07 21:36:31.714219+00:00",
+   "hold_h": 2.75,
+   "align_close": {
+    "fire_at": "2026-10-07 21:30:00+00:00",
+    "hold": 2.642,
+    "post_close": false,
+    "lag_min": 6.5,
+    "censored_hit": true
+   },
+   "align_open": {
+    "fire_at": "2026-10-07 21:25:00+00:00",
+    "hold": 2.558,
+    "post_close": false,
+    "lag_min": 11.5,
+    "censored_hit": true
+   }
+  }
+ ]
+}
