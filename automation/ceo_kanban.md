@@ -286,3 +286,6 @@
 
 ## TEAM UPDATES
 - [2026-10-08 06:50 UTC] health_monitor: Auto-fixes: journal vacuum freed 0B (disk still 86% — DB retention is the real fix, already on your board). No crash restarts needed — pipeline LIVE rc=0, timers 3/3 active, prices fresh (1m candles 20s), regime SHORT_BIAS 90S/3L/31N, 92 signals/hr in DB but 0 executed (known compactor/top-10 drought). Side findings: better-coder still crashing on empty dispatcher/; BANANA SHORT looping in DECIDER-LOOP with BTC-CRASH-OVERRIDE every 60s (conf=54, no fill).
+
+## TEAM UPDATES
+- [2026-10-08 14:12 UTC] auto_1hr: **NO CONFIG CHANGE — 1T last hour (quiet ~13h streak broken).** IMX pump-chain- SHORT hard_max_loss −$0.23. 1 open: GRASS LONG pump-chain+,v5 $11.10 (SL 0.5997 / TP 0.6228). PG-verified 24h: 5T 2W +$0.66 | pump-chain+ 3T 2W +$0.95 | pump-chain- 1T 0W −$0.23 | v5 1T 0W −$0.06. atr_sl_hit 0/5=0% (tpsl stable). hard_max_loss 3/5=60% — ticked up from 42.9%, still inside hold-until-Oct-9/10 window per brain_auditor. Kill rule: none eligible (1T last hour). Overtrade 1/hr. Streak inactive. Pipeline timers fresh, live_trading=true, kill JSON=true. 0 CHANGES APPLIED. Full log: automation/trading_log.md

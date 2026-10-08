@@ -6344,3 +6344,38 @@ BY: auto_1hr
 - GMT LONG PASS at 13:12 with no execution — check if a trade was opened and immediately closed, or if the execution path blocked it
 
 BY: auto_1hr
+
+## [2026-10-08 14:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss) | 1 open (GRASS LONG pump-chain+,v5)
+**PnL:** −$0.23 (WR 0%)
+**24h:** 5T 2W +$0.66
+**Exits 24h:** hard_max_loss 3T −$0.35 | atr_trail_hit 1T +$0.94 | pump_exit_dead_money 1T +$0.07 | atr_sl_hit 0T 0%
+**By signal 24h:** pump-chain+ 3T 2W +$0.95 | pump-chain- 1T 0W −$0.23 | pump-chain-v5 1T 0W −$0.06
+**Last trade:** IMX pump-chain- SHORT hard_max_loss −$0.23 (−5.19%)
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: 1T — IMX SHORT hit hard_max_loss, no MFE data in this query.
+2. SL behavior: atr_sl_hit 0/5=0% — tpsl_utils fix stable. hard_max_loss 3/5=60% — ticked back up from 42.9%, still inside hold-until-Oct-9/10 window.
+3. Signal quality: No 0%-WR signal with 3+T last hour → kill none.
+4. Trade frequency: 1/hr — quiet streak (~13h) broken. Not overtrading.
+
+**No Change Needed:**
+- Kill trigger: 1T last hour, none eligible
+- atr_sl_hit: 0% — tpsl fix stable
+- hard_max_loss: hold per brain_auditor until Oct 9/10 eval
+- NEG-STREAK: inactive — 24h net +$0.66
+- Overtrade: 1/hr
+- Open: 1 GRASS LONG pump-chain+,v5 — SL 0.59972, TP 0.62275, sized $11.10
+- Pipeline timers fresh, live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 60% (3/5) vs 42.9% earlier today — small sample noise, hold per plan
+- SHORT signal (pump-chain-) still bleeding slowly; 7d +$0.11 after IMX — watch if it flips negative again
+- GRASS open LONG — first trade in ~13h; regime was SHORT_BIAS, long took anyway via pump-chain combo
+
+BY: auto_1hr

@@ -75,3 +75,6 @@
 
 ## TEAM UPDATES
 - [2026-10-07 12:48] health_monitor: Auto-fixed disk WARN — vacuumed journald (freed ~453MB). Pipeline/timers/position manager all healthy. Disk still 85% due to active DBs; no unsafe deletions performed. speed_history.json confirmed dead (unused, 151d stale) — token_speeds DB is live source.
+
+## TEAM UPDATES
+- [2026-10-08 13:47] health_monitor: Stopped hermes-coding-mcp.service — crash-looping 770k+ times against missing run_mcp_server.py, burning CPU. Service was already disabled (no timer). Disk at 85% (WARN) — bulk is DBs, not logs.

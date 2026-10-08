@@ -1591,3 +1591,5 @@
 [2026-10-08 08:22 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-10-08 08:24 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-10-08 08:24 UTC] No signals with sufficient trades in 24h window
+[2026-10-08 14:24 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 14:24 UTC] No signals with sufficient trades in 24h window

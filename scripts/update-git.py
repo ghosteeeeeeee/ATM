@@ -70,14 +70,18 @@ def main():
     symlinks = sh("find", ".", "-type", "l", check=False)
     # Known exceptions: ai_decider.py (underscore import), wandb/ (debug logs),
     # data/trailing_stops.json (live runtime symlink to /var/www), graphify-out (KG symlink),
-    # .opencode/node_modules/.bin/, lsp/ (npm bin symlinks)
+    # .opencode/node_modules/.bin/, lsp/ (npm bin symlinks),
+    # skills/shared/ (MANDATED symlinks — AGENTS.md: "Never copy skills, always use symlinks"),
+    # hl_sync_guardian.py (underscore alias -> hl-sync-guardian.py, imported by pipeline code)
     symlinks_clean = "\n".join(l for l in symlinks.splitlines()
                                  if 'ai_decider.py' not in l
                                  and 'wandb/' not in l
                                  and 'data/trailing_stops.json' not in l
                                  and 'graphify-out' not in l
                                  and '.opencode/node_modules/.bin/' not in l
-                                 and 'lsp/' not in l)
+                                 and 'lsp/' not in l
+                                 and not l.startswith('./skills/shared/')  # MANDATED shared skill symlinks (AGENTS.md)
+                                 and l != './scripts/hl_sync_guardian.py')  # underscore alias -> hl-sync-guardian.py
     if symlinks_clean.strip():
         print(f"[!] SYMLINKS FOUND:{chr(10)}{symlinks_clean}")
         sys.exit(1)

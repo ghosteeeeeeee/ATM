@@ -30,7 +30,28 @@ The Python watchdog has ALREADY run and generated data. **DO NOT re-run it.** Ju
 cat /var/www/hermes/data/watchdog.json
 ```
 
-This contains: open trades, automated steers, regime summary, signal performance, pipeline status.
+This contains: open trades (with `meta_rsi`), automated steers, regime summary, signal performance, pipeline status, and `recent_closed` (last 20 closes with `meta_rsi`).
+
+### ⚠️ DRIFT-E — USE `meta_rsi`, NEVER `entry_rsi_14`
+
+The PostgreSQL column `trades.entry_rsi_14` is written LATE from a different timeframe (momentum_cache 5m) and is **unreliable** — median absolute error vs signal-time RSI is ~13 points, max 86. All prior "RSI 78 chase" / "oversold RSI 24" steers based on that column were DISPROVED.
+
+**Truth source:** `meta_rsi` in watchdog.json, or SQL:
+```sql
+(_signal_metadata::json->>'rsi_14')::float AS meta_rsi
+```
+
+When analyzing losses/open trades for RSI quality:
+```sql
+SELECT token, signal, direction, pnl_usdt, exit_reason,
+       (_signal_metadata::json->>'rsi_14')::float AS meta_rsi  -- NOT entry_rsi_14
+FROM trades
+WHERE status='closed' AND pnl_usdt < 0
+  AND close_time > NOW() - INTERVAL '24 hours'
+ORDER BY close_time DESC;
+```
+
+If `meta_rsi` disagrees with a stored column, **meta_rsi wins**. Do not generate "overbought chase" or "oversold short" steers from `entry_rsi_14`.
 
 ## Step 2: Read Additional Market Context
 

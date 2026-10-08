@@ -423,6 +423,64 @@
       "related_bugs": [
         "BUG-021"
       ]
+    },
+    {
+      "id": "BUG-023",
+      "title": "brain.py trade add dies (argparse RC=2) on negative scientific-notation signal values \u2014 trades silently fail",
+      "severity": "CRITICAL",
+      "status": "FIXED",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "64 RC=2 \"usage:\" trade failures in 4 days (2026-10-03..08); BLUR LONG retried & failed every minute 14:25-14:31 UTC on 2026-10-08. Log showed only the argparse usage block, never the error line.",
+      "root_cause": "decider_run.py built brain.py argv as [\"--signal-macd-hist\", str(v)]. Python renders tiny negative floats in scientific notation (e.g. -4.29e-06). argparse's negative-number matcher (r'^-\\d+$|^\u2212?\\d*\\.\\d+$') does not match \"-4.29e-06\", so argparse treated it as an OPTION \u2192 \"error: argument --signal-macd-hist: expected one argument\" \u2192 RC=2 \u2192 trade never opened. Any token whose signal had a negative MACD hist/value in sci-notation (common for low-price coins) was un-tradeable.",
+      "fix": "All brain.py argv options in decider_run.py now use the \"--opt=value\" equals form (helper _barg) which argparse accepts for any value incl. negative scientific notation.",
+      "verified_by": "Reproduced parse failure with extracted brain.py argparse block (space form rc=2, identical usage+error); equals form parses OK with -4.29e-06. py_compile OK. Live confirmation pending next qualifying signal.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-024",
+      "title": "Delayed-entry path passes side as buy/sell \u2014 brain.py requires long/short; feature 100% dead",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "Every DELAYED ENTRY trade would die in argparse with \"invalid choice: buy (choose from long, short)\". Silent feature death.",
+      "root_cause": "decider_run.py delayed-entry block set cmd_side = \"buy\"/\"sell\" (line ~728) but brain.py trade add declares side positional with choices=[\"long\",\"short\"].",
+      "fix": "cmd_side = 'long' if direction.upper() == 'LONG' else 'short'",
+      "verified_by": "Extracted-parser test: buy \u2192 rc=2 invalid choice; long \u2192 parse OK. py_compile OK.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-023"
+      ]
+    },
+    {
+      "id": "BUG-025",
+      "title": "brain.py failure logging truncates stderr from the front \u2014 real argparse error line never visible",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "Logs showed only \"usage: brain.py trade add [-h] ...\" with no error reason; BUG-023 stayed invisible for days.",
+      "root_cause": "decider_run.py logged result.stderr[:800] \u2014 argparse prints the ~900-char usage block first and the 'error:' line last, so head-truncation always cut the actual cause.",
+      "fix": "Log last 4 stderr lines (tail) + returncode instead of first 800 chars.",
+      "verified_by": "py_compile OK; log format change reviewed.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-023"
+      ]
     }
   ],
   "schema": {

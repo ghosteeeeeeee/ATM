@@ -722,7 +722,10 @@ def process_delayed_entries(paper=False):
         # Passing sl=0, tp=0 defers to position_manager._collect_atr_updates().
         sl = 0
         tp = 0
-        cmd_side = 'buy' if direction.upper() == 'LONG' else 'sell'
+        # FIX (2026-10-08, BUG-024): brain.py trade add's `side` positional has
+        # choices=["long","short"] — passing 'buy'/'sell' made EVERY delayed-entry
+        # trade die in argparse with RC=2 (feature was 100% dead).
+        cmd_side = 'long' if direction.upper() == 'LONG' else 'short'
 
         experiment = entry.get('experiment', 'control')
         variant_id = entry.get('variant_id', '')
@@ -2127,50 +2130,62 @@ def execute_trade(token, direction, price, confidence, source,
     # This fixes the bug where trades had wrong signal type (e.g., 'pump-chain+' instead of 'support_resistance')
     _signal_for_trade = signal_type or source
 
+    # FIX (2026-10-08, BUG-023): argparse rejects space-separated values that look
+    # like options. Python renders tiny negative floats in scientific notation
+    # (e.g. macd_hist=-4.29e-06), and argparse's negative-number matcher
+    # (r'^-\d+$|^-\d*\.\d+$') does NOT match '-4.29e-06' — so '--signal-macd-hist
+    # -4.29e-06' raised "expected one argument" (RC=2) and the trade silently
+    # failed. Verified: 64 RC=2 trade failures in 4 days, BLUR retrying every
+    # minute. Using the '--opt=value' (equals) form makes argparse accept any
+    # value, negative scientific notation included.
+    def _barg(opt, val):
+        return f'{opt}={val}'
+
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
            token, cmd_side, str(_trade_size), str(round(price, 6)),
-           '--exchange', 'Hyperliquid',
-           '--strategy', f'Hermes-{source}',
+           _barg('--exchange', 'Hyperliquid'),
+           _barg('--strategy', f'Hermes-{source}'),
            paper_flag,
-           '--sl', str(round(sl, 6)),
-           '--target', str(round(tp, 6)),
-           '--server', SERVER,
-           '--signal', _signal_for_trade,
-           '--confidence', str(round(confidence, 1)),
-           '--leverage', str(leverage),
-           '--sl-distance', str(sl_pct_val),
-           '--trailing-threshold', str(trailing_activation),
-           '--trailing-distance', str(trailing_distance)]
+           _barg('--sl', str(round(sl, 6))),
+           _barg('--target', str(round(tp, 6))),
+           _barg('--server', SERVER),
+           _barg('--signal', _signal_for_trade),
+           _barg('--confidence', str(round(confidence, 1))),
+           _barg('--leverage', str(leverage)),
+           _barg('--sl-distance', str(sl_pct_val)),
+           _barg('--trailing-threshold', str(trailing_activation)),
+           _barg('--trailing-distance', str(trailing_distance))]
     if trailing_phase2_dist is not None:
-        cmd += ['--trailing-phase2', str(trailing_phase2_dist)]
+        cmd += [_barg('--trailing-phase2', str(trailing_phase2_dist))]
     if exp_json:
-        cmd += ['--experiment', exp_json]
+        cmd += [_barg('--experiment', exp_json)]
     if flipped:
         cmd += ['--flipped']
     # ── Signal indicator fields (from hotset at entry) ──
+    # FIX (2026-10-08, BUG-023): all value args use '--opt=value' form — see _barg above.
     if signal_z_score is not None:
-        cmd += ['--signal-z-score', str(signal_z_score)]
+        cmd += [_barg('--signal-z-score', str(signal_z_score))]
     if signal_rsi_14 is not None:
-        cmd += ['--signal-rsi-14', str(signal_rsi_14)]
+        cmd += [_barg('--signal-rsi-14', str(signal_rsi_14))]
     if signal_macd_hist is not None:
-        cmd += ['--signal-macd-hist', str(signal_macd_hist)]
+        cmd += [_barg('--signal-macd-hist', str(signal_macd_hist))]
     if signal_momentum_state is not None:
-        cmd += ['--signal-momentum-state', str(signal_momentum_state)]
+        cmd += [_barg('--signal-momentum-state', str(signal_momentum_state))]
     if signal_z_score_tier is not None:
-        cmd += ['--signal-z-score-tier', str(signal_z_score_tier)]
+        cmd += [_barg('--signal-z-score-tier', str(signal_z_score_tier))]
     if signal_decision is not None:
-        cmd += ['--signal-decision', str(signal_decision)]
+        cmd += [_barg('--signal-decision', str(signal_decision))]
     if test_sl_variant is not None:
-        cmd += ['--test-sl-variant', str(test_sl_variant)]
+        cmd += [_barg('--test-sl-variant', str(test_sl_variant))]
     if test_timing_variant is not None:
-        cmd += ['--test-timing-variant', str(test_timing_variant)]
+        cmd += [_barg('--test-timing-variant', str(test_timing_variant))]
     if test_trailing_variant is not None:
-        cmd += ['--test-trailing-variant', str(test_trailing_variant)]
+        cmd += [_barg('--test-trailing-variant', str(test_trailing_variant))]
     if signal_metadata is not None:
         import json as _json
-        cmd += ['--signal-metadata-json', _json.dumps(signal_metadata)]
+        cmd += [_barg('--signal-metadata-json', _json.dumps(signal_metadata))]
     if regime is not None:
-        cmd += ['--regime', str(regime)]
+        cmd += [_barg('--regime', str(regime))]
 
     # ── Duplicate-entry guard ───────────────────────────────────────────────
     # FIX (2026-04-14): If there's already an open trade for this token+direction
@@ -2309,8 +2324,14 @@ def execute_trade(token, direction, price, confidence, source,
             log(f'  [brain.py] ⚠️ RC=0 but no trade ID in stdout — treating as failure. stdout={result.stdout[:100]}')
             return False, f'brain.py RC=0 but no trade ID in stdout'
         else:
-            log(f'  [brain.py] ❌ FAILED: stderr={result.stderr.strip()[:800] if result.stderr else "(empty)"}')
-            return False, result.stderr.strip()[:200]
+            # FIX (2026-10-08, BUG-025): log the TAIL of stderr, not the head. argparse
+            # prints the ~900-char usage block FIRST and the actual "error: ..." line
+            # LAST — truncating from the front ([:800]) always cut off the real error,
+            # which is why BUG-023 hid in the logs for days.
+            _err = (result.stderr or '').strip()
+            _err_tail = '\n'.join(_err.splitlines()[-4:]) if _err else '(empty)'
+            log(f'  [brain.py] ❌ FAILED rc={result.returncode}: stderr_tail={_err_tail[:600]}')
+            return False, _err[-200:] or f'brain.py rc={result.returncode}'
     except Exception as e:
         return False, str(e)[:80]
 

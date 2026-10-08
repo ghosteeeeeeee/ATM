@@ -211,6 +211,10 @@ def collect_open_trades():
                     trade['_signal_metadata'] = json.loads(trade['_signal_metadata'])
                 except:
                     pass
+            # DRIFT-E: entry_rsi_14 column is late/wrong-TF — meta.rsi_14 is signal-time truth
+            meta = trade.get('_signal_metadata')
+            if isinstance(meta, dict):
+                trade['meta_rsi'] = meta.get('rsi_14')
             # Normalize field names for consistency
             trade['coin'] = trade.get('token', '?')
             trade['entry_time'] = trade.get('open_time')
@@ -238,7 +242,7 @@ def collect_recent_closed(limit=20):
         cur = conn.cursor()
         cur.execute("""
             SELECT id, token, direction, entry_price, exit_price,
-                   open_time, close_time, pnl_usdt, signal,
+                   open_time, close_time, pnl_usdt, pnl_pct, signal,
                    _signal_metadata, regime,
                    amount_usdt, leverage
             FROM trades
@@ -258,6 +262,9 @@ def collect_recent_closed(limit=20):
                     trade['_signal_metadata'] = json.loads(trade['_signal_metadata'])
                 except:
                     pass
+            meta = trade.get('_signal_metadata')
+            if isinstance(meta, dict):
+                trade['meta_rsi'] = meta.get('rsi_14')
             # Normalize
             trade['coin'] = trade.get('token', '?')
             trade['entry_time'] = trade.get('open_time')
@@ -794,14 +801,20 @@ def analyze_recent_losses(recent_trades):
         })
 
     # Pattern: wrong direction
+    # brain_auditor 2026-10-08: was abs(pnl_usdt)/entry_price > 0.02 — unit bug.
+    # pnl_usdt is USDT, entry_price is coin price; ratio fires on EVERY loss
+    # regardless of magnitude (FIL -2.70% and APT -0.47% both triggered).
+    # Correct: loss > 2% of position = wrong-side. Uses pnl_pct.
     wrong_side = 0
     for t in losses:
-        sig = t.get("signal_name", "")
-        direction = (t.get("direction") or "").lower()
-        # If loss is > 2%, likely wrong direction
-        pnl = t.get("pnl_usdt", 0) or 0
-        entry = float(t.get("entry_price") or 0)
-        if entry > 0 and abs(float(pnl)) / entry > 0.02:
+        pnl_pct = t.get("pnl_pct")
+        if pnl_pct is None:
+            pnl = t.get("pnl_usdt", 0) or 0
+            amt = float(t.get("amount_usdt") or 0)
+            if amt <= 0:
+                continue
+            pnl_pct = (pnl / amt) * 100
+        if abs(float(pnl_pct)) > 2.0:
             wrong_side += 1
 
     if wrong_side >= 3:
@@ -809,13 +822,20 @@ def analyze_recent_losses(recent_trades):
             "severity": "warning",
             "category": "health",
             "title": f"{wrong_side} recent losses look like wrong-side trades",
-            "detail": "Multiple large losses suggest we're fading momentum. "
+            "detail": "Multiple losses >2% of position suggest we're fading momentum. "
                       "Check if signals are aligned with trend.",
             "auto_executable": False
         })
 
     # Pattern: specific signal losing
+    # brain_auditor 2026-10-08: only flag when the signal is NET NEGATIVE in the
+    # window. Was counting raw losses — pump-chain- "7-loss streak" was actually
+    # net +$0.34 over 7d (wins offset losses). Losses alone are normal variance.
+    sig_pnl = {}
     sig_losses = {}
+    for t in recent_trades:
+        sig = t.get("signal_name", "unknown")
+        sig_pnl[sig] = sig_pnl.get(sig, 0) + (t.get("pnl_usdt", 0) or 0)
     for t in losses:
         sig = t.get("signal_name", "unknown")
         if sig not in sig_losses:
@@ -826,12 +846,13 @@ def analyze_recent_losses(recent_trades):
     for sig, data in sig_losses.items():
         if _signal_is_disabled(sig):
             continue  # DRIFT-W1: historical losses from killed signals — not actionable
-        if data["count"] >= 3:
+        if data["count"] >= 3 and sig_pnl.get(sig, 0) < 0:
             steers.append({
                 "severity": "warning",
                 "category": "health",
                 "title": f"Signal '{sig}' losing streak: {data['count']} losses",
-                "detail": f"Total loss: {data['total_loss']:+.2f} USDT. "
+                "detail": f"Net {sig_pnl[sig]:+.2f} USDT over last {len(recent_trades)} trades "
+                          f"(losses: {data['total_loss']:+.2f}). "
                           f"Consider disabling or tuning this signal.",
                 "auto_executable": False
             })
@@ -1036,6 +1057,22 @@ def build_output(data, steers):
         },
         "signal_performance": data.get("signal_performance", {}),
         "pipeline_status": data.get("pipeline_status", {}),
+        # DRIFT-E-safe recent closes for the deep-analysis agent — use meta_rsi,
+        # NOT trades.entry_rsi_14 (late/wrong-TF, median |diff| ~13 pts).
+        "recent_closed": [
+            {
+                "id": t.get("id"),
+                "coin": t.get("coin"),
+                "direction": t.get("direction"),
+                "signal": t.get("signal_name"),
+                "pnl_usdt": t.get("pnl_usdt"),
+                "pnl_pct": t.get("pnl_pct"),
+                "meta_rsi": t.get("meta_rsi"),
+                "volatility_regime": t.get("volatility_regime"),
+                "leverage": t.get("leverage"),
+            }
+            for t in (data.get("recent_closed") or [])[:20]
+        ],
     }
 
     # Enrich open trades with computed fields
@@ -1079,6 +1116,7 @@ def build_output(data, steers):
             "stop_loss": trade.get("stop_loss"),
             "take_profit": trade.get("take_profit"),
             "leverage": trade.get("leverage"),
+            "meta_rsi": trade.get("meta_rsi"),
         })
 
     return output
