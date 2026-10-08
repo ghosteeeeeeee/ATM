@@ -3565,5 +3565,43 @@
         "risk": "low"
       }
     ]
+  },
+  {
+    "date": "2026-10-08T08:39:55Z",
+    "idea": "Meta-RSI band-weighted confidence for pump-chain- EXTREME: boost 50-55 ×1.1, dampen 55-60 ×0.8",
+    "rationale": "14d EXTREME meta-RSI bands: 50-55=14T 64.3%WR +$0.81 (BEST), 55-60=5T 20%WR +$0.07 (mixed, includes CRV +0.55 winner at RSI 58.44), 60+=14T 64.3%WR +$0.02. Instead of blanket regime dampen (reverted today), scale confidence by band quality. 55-60 n=5 below threshold — monitor to n>=10 before implementing dampen leg.",
+    "expected_impact": "+$0.30-0.50/14d from 50-55 boost; reduce 55-60 bleed without zeroing band",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-08T08:39:55Z",
+    "idea": "hard_max_loss MFE amnesty: if peak MFE >= PM_TRAIL_ACTIVATE_PCT (0.40%), widen HML threshold by trail distance (1.20%) once",
+    "rationale": "7d hard_max_loss 62T -$8.38 0%WR. Evidence: 56/66 HML trades had MFE>0 (were in profit, trail never got room). LDO MFE+0.27%, FIL MFE+0.82% both died to HML. D3 already gives room from start (-0.60% floor); amnesty gives EXTRA room to trades that proved themselves. Complements D3, does not replace it. Needs backtest: which HML trades with MFE>=0.40% would amnesty have saved vs let bleed further?",
+    "expected_impact": "Reduce HML frequency toward <40% goal; preserve trail captures on MFE-positive trades",
+    "category": "exit structure",
+    "status": "suggested_deferred",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-08T11:37:47Z",
+    "idea": "Trail-arming precheck for pump-chain- SHORT entries",
+    "rationale": "7d pump-chain- winners and losers have IDENTICAL avg entry RSI (29.9 vs 28.3) — entry RSI does not discriminate. Differentiator is exit path: winners got atr_trail_hit/trail_sl, losers got hard_max_loss. D3 widens HML threshold to -0.60% price so trail (arms at +0.40%) always has room. Second lever: if current ATR% is so small that trail cannot realistically arm before the HML/vol floor, skip or delay entry. This is entry QUALITY, not time-blocking.",
+    "expected_impact": "Convert a portion of HML losers to trail exits; complements D3 without stacking a conflicting filter",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — would only skip low-ATR entries that historically HML'd",
+    "sample_check": "7d n=18 pump-chain- (11L/7W) — below 20T for signal-level change. MONITOR, do not implement yet. Re-check when n>=20 post-D3."
+  },
+  {
+    "date": "2026-10-08T11:37:47Z",
+    "idea": "bb-squeeze+ NORMAL-regime confidence boost via vol gate",
+    "rationale": "bb-squeeze+ 7d net -$0.05 (69T) but regime split: NORMAL 18T +$0.25 66.7%WR (only profitable habitat), HIGH 39T -$0.15, EXTREME 12T -$0.15. Losers concentrated in hard_max_loss (HIGH 9T -$1.34, NORMAL 6T -$0.74). Boosting NORMAL confidence would route more volume to the winning habitat without blocking anything.",
+    "expected_impact": "+$0.10-0.20/7d if NORMAL share of bb-squeeze+ volume rises",
+    "category": "regime routing",
+    "status": "suggested",
+    "risk": "low — boost, not block; NORMAL already profitable",
+    "sample_check": "NORMAL n=18 over 7d — below 20T. MONITOR 48h. Re-check at n>=20 before changing vol-gate multiplier."
   }
 ]
