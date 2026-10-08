@@ -6577,3 +6577,26 @@ BY: daily_orchestrator
 
 **Open Questions:**
 - Carry-forward: hard_max_loss dominance (now 38.5%, improving); v5 solo/conj 24h 0W −$0.42 for Oct 9/10 eval
+
+## [2026-10-08 22:12] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss) — AIXBT pump_exit_dead_money +$0.01 (+1.05%); AVAX hard_max_loss −$0.11 (−4.86%)
+**PnL:** $-0.10 (WR 50.0%) | 24h: 12T 5W +$0.42 (WR 41.7%)
+**24h exits:** hard_max_loss 5T −$0.74 | stale_exit 4T +$0.60 | atr_trail_hit 1T +$0.94 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+**Open:** 0
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 2T last hour, pump-chain+ 1W1L (not 0% WR); v5-combo 2T 0W −$0.22 still under 7d kill bar
+- atr_sl_hit 0/12=0% — tpsl stable
+- hard_max_loss 5/12=41.7% — slightly above 40% but hold per brain_auditor Oct 9/10 eval
+- Overtrade: 2/hr (<20)
+- Streak: −$0.10 hour after +$0.11 — not 3 consecutive negative
+- Timers live, live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss creeping back above 40% (41.7%) — Oct 9/10 eval must address; 24h net still +$0.42
+- Carry-forward: v5 solo/conj 24h 0W −$0.37 for 7d eval
