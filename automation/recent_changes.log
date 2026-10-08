@@ -4388,3 +4388,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-08 12:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet ~11h) | 0 open | 24h 7T 2W +$0.67 WR 28.6% | pump-chain+ 3T 2W +$0.95 | pump-chain- 3T 0W −$0.22 (7d +$0.34 not kill-eligible) | v5 1T 0W | atr_sl_hit 0/7=0% (tpsl stable) | hard_max_loss 3T=42.9% (hold per brain_auditor until Oct 9/10) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline timers active, live_trading=true, regime=SHORT_BIAS
 BY: auto_1hr
+BY: auto_1hr
+[2026-10-08 13:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet ~12h) | 0 open | 24h 6T 2W +$0.67 WR 33.3% | pump-chain+ 3T 2W +$0.95 | pump-chain- 2T 0W −$0.22 (7d +$0.34 not kill-eligible) | v5 1T 0W | atr_sl_hit 0/6=0% (tpsl stable) | hard_max_loss 3T=50% (hold per brain_auditor until Oct 9/10) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline timers all fresh, live_trading=true, kill JSON=true | Note: signal-analyst PASSed GMT LONG bb-squeeze+ conf=60 at 13:12 but no trade executed — watching for pass-without-execute pattern

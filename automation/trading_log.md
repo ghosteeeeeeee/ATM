@@ -6306,3 +6306,41 @@ BY: auto_1hr
 - bb-squeeze+ 7d 69T net −$0.05 — high frequency, flat. Not a last-hour kill candidate; flag for later analysis if it stays net-negative
 
 BY: auto_1hr
+
+## [2026-10-08 13:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**24h:** 6T 2W +$0.67 (WR 33.3%)
+**Exits 24h:** hard_max_loss 3T −$0.24 | atr_trail_hit 1T +$0.94 | hard_sl 1T −$0.10 | pump_exit_dead_money 1T +$0.07 | atr_sl_hit 0T 0%
+**By signal 24h:** pump-chain+ 3T 2W +$0.95 | pump-chain- 2T 0W −$0.22 | pump-chain-v5 1T 0W −$0.06
+**By signal 7d:** bb-squeeze+ 69T 42W −$0.05 | pump-chain- 19T 7W +$0.34 | pump-chain+ 15T 9W +$1.83 | v5 3T 1W −$0.14
+**7d total:** 183T +$2.01 (approx, from signal breakdown)
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: 0T last hour — no evaluation. Quiet ~12h consecutive, longest stretch this week.
+2. SL behavior: atr_sl_hit 0/6=0% — NOT dominant. tpsl_utils.py fix stable (Oct 3). hard_max_loss 50% (3/6) — down from 60-67% pre-D3; hold until Oct 9/10 eval per brain_auditor.
+3. Signal quality: No 0%-WR signal with 3+T last hour → kill none. pump-chain- 24h 0W but 7d 19T 7W +$0.34 not kill-eligible. v5 1T 0W, 7d 3T 1W not kill-eligible.
+4. Trade frequency: 0/hr — quiet ~12h. Pipeline actively scanning (bb-squeeze+ GMT PASS score=60 at 13:12, decision logged). Not overtrading; regime gating (SHORT_BIAS) holding.
+
+**No Change Needed:**
+- Kill trigger: 0T last hour — none eligible
+- atr_sl_hit: 0% — tpsl fix stable
+- hard_max_loss 50%: D3 HML_TRAIL_MIN_GAP_PCT=0.20 deployed — hold per brain_auditor until Oct 9/10
+- NEG-STREAK: inactive — 24h net +$0.67, no closes in last 6h
+- Overtrade: 0/hr
+- Open: 0 — nothing to manage
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+- Pipeline timers all fresh, live_trading=true, kill switch JSON=true
+- Interesting: signal-analyst PASSed GMT LONG bb-squeeze+ conf=60 at 13:12 but no trade executed — likely execution gate (standalone bypass / regime / blacklist). Worth watching if signals pass-but-don't-execute becomes a pattern.
+
+**Open Questions:**
+- hard_max_loss post-D3: 50% (3/6) vs 60-67% pre-D3 — trend positive, not conclusive until Oct 9/10 eval
+- SHORT 7d −$0.57 deadline Oct 11 (brain_auditor note)
+- Market quiet ~12h — longest quiet stretch; pipeline correctly scanning but not executing (regime=SHORT_BIAS). Under-trading, not over-trading.
+- bb-squeeze+ 7d 69T net −$0.05 — high frequency, flat. Not a last-hour kill candidate; flag for later analysis if it stays net-negative
+- GMT LONG PASS at 13:12 with no execution — check if a trade was opened and immediately closed, or if the execution path blocked it
+
+BY: auto_1hr
