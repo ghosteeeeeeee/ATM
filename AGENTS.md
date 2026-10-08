@@ -73,6 +73,17 @@ Two separate stores for trade data — they are NOT the same:
 - **If you can't verify it, don't claim it.** Every number, every win rate, every backtest result must come from actually running code. Never report results from memory, from "what I think happened," or from extrapolation. If you didn't run the code, say so. Fabricated data destroys trust and wastes everyone's time.
 - **Run the code, don't describe it.** When asked for backtest results, performance metrics, or trade analysis, run the actual code and report the output. Don't estimate, don't round, don't "check your work" by re-reading the same code. Execute it.
 - **Independent verification before deployment.** Any signal, strategy, or filter must pass independent backtest (run by a separate agent or auditor) before going live. Your own backtest is not sufficient — confirmation bias is real.
+- **⚠️ THE PATTERN — DO NOT REPEAT THIS** (2026-10-08, 4 failed analyses): Every time I find a "pattern" in trading data, I don't verify it properly. The independent auditor catches fatal flaws every single time. **BEFORE claiming you found a pattern, you MUST:**
+  1. **Check reproducibility** — Can you re-run the exact query and get the same numbers? (Attempt 4 claimed n=46, actual n=10)
+  2. **Check statistical significance** — Calculate p-values. If p>0.05, the pattern could be noise. (All habitat filters were p=0.18-0.29)
+  3. **Check existing implementations** — Search the codebase for what's already live. Don't re-propose shipped work. (2 of 3 habitat filters already existed)
+  4. **Check filter collisions** — New filters may conflict with existing ones, creating traps. (Proposed BTC<40 block collided with SHORT_CONTINUUM BTC>60 block, trapping trades in worst band)
+  5. **Do out-of-sample validation** — Test on data not used to derive the pattern. Edges often reverse in recent weeks. (14d window showed blocking would LOSE money)
+  6. **Verify time windows** — Are you measuring the right period? Don't anchor at close_time when you mean open_time. (Attempt 3 measured during-trade, not pre-entry)
+  7. **Check for survivorship bias** — Compare winners vs losers, not just winners. (Attempt 1 only analyzed winners)
+  8. **Validate sample sizes** — n=5-8 is not enough to draw conclusions. Report confidence intervals.
+  
+  **If you skip these checks, the independent auditor WILL find fatal flaws.** This pattern caused 4 failed analyses on 2026-10-08 (survivorship bias, selection-on-outcome, time-anchor bug, unreproducible numbers). The lesson: I cannot be trusted for quantitative analysis without independent verification.
 - **Be honest about failures.** If a backtest shows poor results, say so. Don't spin negative results as "promising" or "needs tuning." The data is the data. Users make decisions based on your reports — inaccurate reports cause real financial loss.
 - **Document everything** in brain + trading.md. "Never lose track again."
 - **Don't use cron jobs** — use systemd timers instead.
