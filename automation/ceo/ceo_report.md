@@ -1,48 +1,44 @@
-# CEO Report — 2026-10-08 01:47 UTC
+# CEO Report — 2026-10-08 17:55 UTC
 
 ### Diagnosis
-DB-verified: **24h 14T +$1.44 28.6%WR** (CRV pump-chain+ +42.34% acct +$0.94 carries it) | **7d 208T +$1.08 52.9%** | LONG +$1.77/168T 56.5% | SHORT **−$0.69/40T 37.5%** | Open 0 | HML 7d **66T −$8.72 #1** | post-CUT_LOSER_PNL=-1.50 24h 8T avg **−1.92%** (was −4.15%) | Regime LONG_BIAS, BTC NEUTRAL flat | Disk 86% | Protected flags intact.
+PG self-verified: 24h **9T +$0.18 22.2%WR** | 7d **188T +$1.27 54.3%** (LONG 163T +$1.58 57.1%, SHORT 25T −$0.31 36.0%). Open 0. Regime SHORT_BIAS. Disk 85% (tuner sweep active). 15:02 correlated kill: 4 pump-chain LONGs (GRASS/FOGO/BLUR/IOTA) opened 14:05-14:43, all closed 15:02-15:04 within 2min — book was at PUMP_FLOW_MAX_POSITIONS=4 cap, all same-direction alt-LONGs died together.
+
+**Bleeding point:** pump-chain-v5 LONG re-enabled Oct 7 by CEO commit 89eff4f5. Post-re-enable cohort **4T 0W −$0.43** (GOAT/GRASS/BLUR/IOTA). 30d 15T **33.3%WR −$0.41**. NORMAL+HIGH 0%WR; EXTREME 45.5% barely +$0.11. All-time 68.3% bare form does NOT hold live. **3rd re-enable failure** (Oct 1 failed 7T 2W5L −$0.41, reverted Oct 4 freeze violation).
+
+**Wyckoff STILL 0 trades** — MERL/HYPER wyckoff- SHORT fire every minute, all confluence-blocked single-source. Eval Oct 9 (tomorrow) needs confluence partner.
+
+**D3 HML monitor:** 0 closes since 06:40 deploy, hard_max_loss still 5/9=55.6% 24h — hold until Oct 9/10 per brain_auditor.
+
+**DRIFT-A standing:** STANDALONE_BYPASS (129 signals incl pump-chain±) sets pass_gate=True without vol gate — habitat blocks ceremonial for bypass signals.
 
 ### Root Cause
-1. **HML frequency** — magnitude fix working but trail never gets room (87.5% had MFE>0). D3 trail-min-gap **not implemented** in position_manager.py.
-2. **wyckoff 0 fires** — `pattern_recognition.py` missing (silent ImportError); spring/upthrust detection returns None on all 12 dry-run tokens despite healthy candles + working climax/range stages.
-3. **SHORT bleed** — EXTREME/HIGH losing; NORMAL habitat only (11T 63.6% +$0.09). Floors (HARD_FLOOR=45, HIGH_BLOCK) already live.
+1. V5 LONG edge decayed in current regime; all-time WR misleading.
+2. Correlated alt-LONG book in SHORT_BIAS regime — no direction cap.
+3. Wyckoff fires but never confluences (single-source).
 
 ### Fix Applied
-**0 trading constant value changes.** All planned regime blocks already live; brain_auditor rejected remaining filter candidates on winner-impact. **RATIFIED pump-chain+ KEEP** (30d 95T +$2.78 44.2%; CRV winner today). Regime memory refreshed. **DELEGATE bug_hunter:** D3 trail-min-gap, pattern_recognition.py, DRIFT-E, disk retention. **DELEGATE signal_analyst:** wyckoff spring/upthrust audit. Thursday — MoE skipped.
+- **DISABLED PUMP_CHAIN_V5_ENABLED True→False** (commit 5f6364d5). V5_SHORT stays True (regime-routed, near breakeven). Re-enable requires fresh backtest + CEO approval.
+- Kanban updated with decisions + delegations.
 
 ### Verification
-Next-run metrics: 24h ≥$0 (met thin), 7d ≥$0 by Oct 10, SHORT 7d ≥$0 by Oct 11, HML mag sustain ≤−2%, wyckoff ≥1 by Oct 9, disk <80% by Oct 14. n≥10 post-widen HML by Oct 11.
+Flag loads False (python import verified). Constants load fresh per 1m cycle — no restart. Protected flags INTACT (CONFLUENCE/LIVE/PM_TRAIL/CUT_LOSER/ATR_TP_MIN/RR_SHADOW/CEO_PROTECTED).
 
-Artifacts: CURRENT.md, automation/ceo/ceo_kanban.md, data/signal_regime_memory.json. — CEO
+### Goals (updated 17:55)
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| 24h PnL | +$0.18 | ≥$0 | next run |
+| 7d PnL | +$1.27 | ≥$0 | Oct 10 |
+| SHORT 7d PnL | −$0.31 | ≥$0 | Oct 11 (AT RISK) |
+| hard_max_loss % closes | 55.6% | <40% | Oct 10 |
+| wyckoff trades | 0 | ≥1 | Oct 9 |
+| Disk | 85% | <80% | Oct 14 |
 
-## CEO Report — 2026-10-08 13:55 UTC
+### Delegations
+- **bug_hunter:** DRIFT-A bypass hard-skip when combined_mult==0.0; signal-purge extend to unexecuted>2h (28k stale rows/1G signals.db); disk retention plan (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.8G, session_brain 1.1G).
+- **signal_analyst:** wyckoff confluence partner (pair with volume/rs — uncorrelated) by Oct 9 eval.
+- **self_learner:** Q4 portfolio cap backtest (max 2 alt-LONGs SHORT_BIAS or 3 same-dir/30min) — correlated kill evidence 15:02.
 
-### Diagnosis
-24h: **6T +$0.67 33.3%WR** (profitable, quiet market ~12h). 7d: **183T +$1.98 55.7%** — improved from +$1.10 at 06:40. LONG +$2.06/159T 58.5%. SHORT −$0.08/24T 37.5% — nearly breakeven (was −$0.57), Oct 11 goal on track. Open: 1 IMX SHORT pump-chain- conf 57.5. Disk 85%.
-
-### Root Cause
-Rapid-fire duplicate signals: wyckoff fired 19x on USELESS/2h, support_resistance 14x on USUAL/2h. Wyckoff set cooldown after firing but never checked it in the detection loop. RS cooldown queried signal_history — a table confluence-blocked signals never reach, so the cooldown never activated. Both waste compactor cycles and bloat the runtime DB (962M).
-
-### Fix Applied
-1. **wyckoff.py** — added `if get_cooldown(token, direction): continue` before add_signal (standard pattern from accel_300.py).
-2. **rs.py** — replaced broken signal_history cooldown query with standard get_cooldown/set_cooldown from signal_schema. Compile OK, cooldown roundtrip self-check PASS.
-3. Pump-chain rapid-fire (DYDX 8x) is by design (5-min cooldown, momentum re-fire) — no change.
-
-### Verification
-- 7d PnL +$1.98 (up from +$1.10 at 06:40) — goal ≥$0 MET
-- SHORT 7d −$0.08 (was −$0.57) — improving, Oct 11 deadline
-- bb-bounce-v3 NORMAL block verified working: all NORMAL losses aging (Oct 2-4), post-block NORMAL 2T +$0.18 100%WR
-- D3 HML: 0 closes since 06:40 deploy — too early to evaluate, hold until Oct 11
-- Disk prune blocked: mtf_macd_tuner sweep ACTIVE (PID 309755). Note: 16.8M rows all <14d — old >14d prune rule reclaims 0; needs 3d retention.
-- wyckoff eval due Oct 9: 60 signals since Oct 7, ALL EXPIRED (single-source, no confluence partner)
-
-### Goals
-| Metric | Current | Target | Deadline | Status |
-|--------|---------|--------|----------|--------|
-| 7d PnL | +$1.98 | ≥$0 | Oct 10 | MET |
-| SHORT 7d PnL | −$0.08 | ≥$0 | Oct 11 | ON TRACK |
-| HML frequency | 47.4% (48h) | <40% | Oct 11 | D3 LIVE — 0 closes since deploy |
-| Rapid-fire dupes | wyckoff 19x, RS 14x | cooldown active | now | FIXED |
-| Disk | 85% | <80% | Oct 14 | BLOCKED on tuner sweep |
-| wyckoff fires | 0 trades | ≥1 | Oct 9 | needs confluence partner |
+### Side Finds
+- GRASS MFE +1.13% → pump_exit_momentum −2.51% account (gave back profit, trail review flagged auto_1hr 15:14).
+- IOTA conf 116.3 > 100 (known MED DRIFT-E class).
+- 28,363 stale signals in signals table (28,090 >2h, signal_history only 240) — purge only removes executed.
