@@ -6534,3 +6534,24 @@ BY: daily_orchestrator
 
 **Open Questions:**
 - Carry-forward: hard_max_loss dominance pending Oct 9/10 eval; v5 solo/conj 24h 0W −$0.43 watch for 7d eval
+
+## [2026-10-08 20:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 | 24h: 9T 3W +$0.72 (WR 33.3%)
+**Open:** 4 (GRASS +1.67%, BABY +0.43%, AIXBT +0.05%, BANANA -0.18% — all pump-chain+ LONG)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour; pump-chain-v5 24h 2T 0W −$0.21 under 7d bar
+- atr_sl_hit 0/9=0% — tpsl stable
+- hard_max_loss 4/9=44% — hold per brain_auditor Oct 9/10 eval
+- Overtrade: 0/hr | Streak inactive
+- Timers fresh, live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 4 concurrent open positions (unusually high vs 0-1 norm) — all pump-chain+ LONG, watch if regime flips
+- Carry-forward: hard_max_loss dominance; v5 solo/conj for Oct 9/10 eval
