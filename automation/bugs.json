@@ -716,6 +716,24 @@
       "found_by": "bug-hunter session 2026-10-08 round 2",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-030",
+      "title": "pump-exit momentum exit reads the WRONG end of the candle window \u2014 counts oldest candles, not newest",
+      "severity": "CRITICAL",
+      "status": "FIXED",
+      "files": [
+        "scripts/position_manager.py"
+      ],
+      "symptom": "Momentum exit (pump_exit_momentum) fires on stale momentum and misses current dumps. With newest-2 candles dumping hard the old code returned False (LONG held a falling knife); with newest-2 recovering it returned True (cut a winner). Affects every pump_chain+ trade \u2014 all 3 currently-open trades (GRASS/FOGO/BLUR) map to pump_exit and RR_EXIT_ENABLED=True.",
+      "root_cause": "_vel_closes fetched ORDER BY ts DESC (index 0=newest) but the loop ran range(1,len) \u2014 newest interval first, oldest last. The consecutive counter RESETS on a non-qualifying candle, so the final surviving run reflects the OLDEST intervals, not the newest. Direction semantics (LONG exits on vel < -0.5, SHORT on vel > +0.5) were correct; only the window end was inverted.",
+      "fix": "Iterate the range in reverse (oldest interval \u2192 newest) so the newest interval is evaluated last and the surviving counter run is the most recent candles. Both LONG and SHORT branches.",
+      "verified_by": "Reproduced the exact loop logic standalone: newest-2-dumping \u2192 old=False/fixed=True (want True); newest-2-recovering \u2192 old=True/fixed=False (want False); SHORT mirrors both pass. py_compile OK. Path confirmed live via SIGNAL_EXIT_CONFIG (pump_chain+ \u2192 pump_exit) + 3 open pump-chain trades.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 1 (2026-10-08)",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
