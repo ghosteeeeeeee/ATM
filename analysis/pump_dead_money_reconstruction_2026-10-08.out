@@ -1,0 +1,43 @@
+pump_exit-scope trades (pump-chain+ etc.): 147
+home runs in scope: 13 -> [(15126, 'GRASS', Decimal('30.8203')), (15390, 'INJ', Decimal('12.5302')), (15493, 'FOGO', Decimal('18.6747')), (15518, 'AVAX', Decimal('23.6246')), (15520, 'JUP', Decimal('21.1304')), (15547, 'AVAX', Decimal('45.7149')), (15565, 'ETC', Decimal('13.4945')), (15567, 'ADA', Decimal('23.0647')), (15570, 'JUP', Decimal('13.5677')), (15587, 'CASHCAT', Decimal('11.5958')), (15858, 'ME', Decimal('11.9684')), (15984, 'CRV', Decimal('42.3397')), (15990, 'IMX', Decimal('10.7695'))]
+
+REPLAY FIRES (dead-money, velocity clause modeled): 36
+  of which actual exit_reason = pump_exit_dead_money: 7 (validation)
+  actual dead_money exits overall: 10; replay predicts 7 of them; replay fires on 29 trades that exited another way
+
+HOME-RUN KILLS (actual pnl_pct>=10, rule fires first): 6
+  #15126 GRASS   Hermes-pump-chain+           fired at 2.02h (profit +0.65%, vel -0.11%) | actual +30.8% ($+1.57) | sim-at-fire $+0.11 | GAVE UP $+1.46
+  #15493 FOGO    Hermes-pump-chain+           fired at 2.11h (profit +0.53%, vel -0.01%) | actual +18.7% ($+0.69) | sim-at-fire $+0.06 | GAVE UP $+0.63
+  #15518 AVAX    Hermes-pump-chain+           fired at 2.21h (profit +1.21%, vel -0.56%) | actual +23.6% ($+0.53) | sim-at-fire $+0.13 | GAVE UP $+0.40
+  #15520 JUP     Hermes-pump-chain+           fired at 2.19h (profit +1.59%, vel -0.15%) | actual +21.1% ($+0.47) | sim-at-fire $+0.18 | GAVE UP $+0.29
+  #15565 ETC     Hermes-pump-chain+           fired at 2.12h (profit -0.43%, vel -0.22%) | actual +13.5% ($+0.30) | sim-at-fire $-0.05 | GAVE UP $+0.35
+  #15567 ADA     Hermes-pump-chain+           fired at 2.11h (profit -0.15%, vel -0.26%) | actual +23.1% ($+0.52) | sim-at-fire $-0.02 | GAVE UP $+0.54
+
+RULE ECONOMICS (all fires, sim-vs-actual, fee-neutral):
+  fires=36  net delta=$-2.60  (saved on eventual losers $+1.41, gave up on eventual winners $-4.01)
+  fired trades that ended positive (would-be small winners cut): 21/36
+  fired trades that were HRs: 6 (gave up $+3.67)
+  fires by ISO week: {37: 6, 38: 23, 39: 2, 40: 4, 41: 1}
+
+ACTUAL dead_money exits — post-fire 5m drift (did price recover after we exited?)
+  n=26  recovered(>+0.3%): 8  continued(<-0.3%): 9  flat: 9  median 1h drift +0.16%
+
+At exactly 2h: 88 in-scope trades below +2%; of those HRs: 6 -> [(15126, 'GRASS', 30.8), (15493, 'FOGO', 18.7), (15518, 'AVAX', 23.6), (15520, 'JUP', 21.1), (15565, 'ETC', 13.5), (15567, 'ADA', 23.1)]
+
+DONE.
+Traceback (most recent call last):
+  File "<stdin>", line 42, in <module>
+  File "<stdin>", line 16, in run
+ValueError: not enough values to unpack (expected 13, got 12)
+Traceback (most recent call last):
+  File "<stdin>", line 39, in <module>
+  File "<stdin>", line 19, in run
+NameError: name 'timezone' is not defined
+CURRENT: 2h, <2%, no exemption               fires= 36  net=$-2.60  HR kills=6 ['GRASS', 'FOGO', 'AVAX', 'JUP', 'ETC', 'ADA']
+A: 2h, <0% (must be red)                     fires= 20  net=$-1.79  HR kills=3 ['GRASS', 'ETC', 'ADA']
+B: 3h, <2%                                   fires= 21  net=$-1.88  HR kills=4 ['GRASS', 'FOGO', 'ETC', 'ADA']
+C: 2h, <2%, exempt if ever >=+2% (showed life) fires= 33  net=$-2.61  HR kills=6 ['GRASS', 'FOGO', 'AVAX', 'JUP', 'ETC', 'ADA']
+C2: 2h, <2%, exempt if ever >=+1%            fires= 24  net=$-1.89  HR kills=4 ['GRASS', 'FOGO', 'ETC', 'ADA']
+D: DISABLE time-exit (momentum+trail stay)   fires=  0  net=$+0.00  HR kills=0 []  (delta vs current = +$2.60 per main replay)
+
+context: 116 trades below +2% at 2h; 6 became HRs (5.2%) vs scope baseline 8.8%
