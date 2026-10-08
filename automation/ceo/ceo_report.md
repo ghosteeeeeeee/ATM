@@ -42,3 +42,20 @@ Flag loads False (python import verified). Constants load fresh per 1m cycle —
 - GRASS MFE +1.13% → pump_exit_momentum −2.51% account (gave back profit, trail review flagged auto_1hr 15:14).
 - IOTA conf 116.3 > 100 (known MED DRIFT-E class).
 - 28,363 stale signals in signals table (28,090 >2h, signal_history only 240) — purge only removes executed.
+
+## BTC Regime Alignment Decision Verification
+
+**Answer: NO** — I did not approve converting pump-chain LONG → SHORT when BTC is DECLINING or BELOW EMA300.
+
+**What was actually approved:**
+- Oct 7 (commit 89eff4f5): Re-enabled PUMP_CHAIN_V5 LONG with NO BTC regime condition — "philosophy is every pump is a LONG"
+- Oct 8 (commit 5f6364d5): DISABLED PUMP_CHAIN_V5 LONG entirely (3rd re-enable failed)
+
+**Existing BTC gates (blocking, not flipping):**
+- CONTINUUM-BLOCK (signal_compactor.py:2684): blocks LONG when ALL 3 bear conditions agree (phase+linreg+ema)
+- BTC_TIMING_GUARD: blocks pump-chain LONG when BTC 30m > 1.00%
+- Only contrarian flip in codebase = trend_momentum_near_sma, not pump-chain
+
+**15:02 root cause:** CONTINUUM-BLOCK didn't fire because BTC was in transitional states (CALM/DECLINING at EMA300, not full bear structure). Block requires all 3 conditions to agree.
+
+**Plan align-with-btc-regime.md:** Proposes BLOCKING LONG in bearish BTC (not converting to SHORT). Never implemented.
