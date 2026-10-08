@@ -4367,3 +4367,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-08 02:15 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour CRV pump-chain+ +$0.94 atr_trail_hit (MAE 0.01%/MFE 9.86%) | 0 open | 24h 12T 2W +$0.30 WR 16.7% | pump-chain- 6T 0W -$0.38 (24h) but 25T 9W +$0.05 7d not kill-eligible | pump-chain+ 5T 2W +$0.74 24h / 15T 9W +$1.83 7d | atr_sl_hit 0/12=0% (tpsl stable) | hard_max_loss 8T=66.7% queue#2 open | Kill: none (0T last hour) | Overtrade 1/hr | Streak inactive | Pipeline active
 BY: auto_1hr
+[2026-10-08 03:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 12T 2W +$0.30 WR 16.7% | pump-chain- 6T 0W -$0.38 (24h, 7d positive not kill-eligible) | pump-chain+ 5T 2W +$0.74 | v5 1T 0W | atr_sl_hit 0/12=0% (tpsl stable) | hard_max_loss 8T=66.7% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active
+BY: auto_1hr

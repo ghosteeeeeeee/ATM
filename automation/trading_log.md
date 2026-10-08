@@ -5926,3 +5926,40 @@ BY: auto_1hr
 - GRASS 2-second trade with MFE 7% — data quality anomaly worth a look outside this hour's mandate
 
 BY: auto_1hr
+
+## [2026-10-08 03:12] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+**Open:** 0
+
+**24h:** 12 closed | 2W 10L | +$0.30 (WR 16.7%)
+**24h by close reason:** hard_max_loss 8T -$0.61 (66.7%) | atr_trail_hit 2T +$0.94 | hard_sl 1T -$0.10 | pump_exit_dead_money 1T +$0.07
+**24h by signal:** pump-chain- 6T 0W -$0.38 | pump-chain-v5 1T 0W -$0.06 | pump-chain+ 5T 2W +$0.74
+**atr_sl_hit:** 0/12 = 0% — tpsl_utils.py fix stable
+**Hourly PnL 24h:** mixed (neg 05:00-18:00, +$0.01 21:00, +$0.94 01:00) — streak inactive
+**Pipeline:** active | no open positions
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: No trades this hour to evaluate.
+2. SL behavior: atr_sl_hit 0% — NOT dominant. hard_max_loss 8/12=66.7% still the live watch (queue#2 leverage-aware SL review).
+3. Signal quality: No 0%-WR with 3+T in last hour (0T closed). pump-chain- 24h 0W -$0.38 but 7d positive per prior logs — not kill-eligible. pump-chain+ 5T 2W +$0.74 24h — working.
+4. Trade frequency: 0/hr — fine, not overtrading.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal can hit 3T-0%WR
+- atr_sl_hit: 0% — fix deployed, stable
+- hard_max_loss: 66.7% queue#2 remains open; no forced change this hour
+- NEG-STREAK: inactive — last closes positive (+$0.01, +$0.94)
+- Overtrade: 0/hr — fine
+- Open: 0 positions — nothing to manage
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 66.7% queue#2 leverage-aware SL review — still the #1 systemic watch item
+- pump-chain- 24h 0W -$0.38 vs 7d positive — variance or degradation? Monitor
+
+BY: auto_1hr
