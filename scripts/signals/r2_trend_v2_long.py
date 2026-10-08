@@ -224,6 +224,11 @@ def _get_candles_1m(token, lookback=LOOKBACK_CANDLES):
             conn.close()
 
 
+# AUDIT 2026-10-08: tokens already warned about a candles_1m read failure (rate-limit
+# so a systemic DB failure doesn't emit 60-130k log lines/day).
+_CANDLES_1M_FAIL_WARNED = set()
+
+
 def _get_closes_from_candles_1m(token, lookback=50):
     """Get close prices from candles_1m (OHLC data) for accurate RSI/BB."""
     conn = None
@@ -242,11 +247,16 @@ def _get_closes_from_candles_1m(token, lookback=50):
     except Exception as e:
         # AUDIT 2026-10-08: this subquery was missing `ts` in the inner SELECT, so the
         # outer ORDER BY ts raised OperationalError on EVERY call. The bare except hid it,
-        # returning [] → line 305 fail-closed every token → signal was dead for 35 days
-        # (0 signals / 0 trades since 2026-09-03) while showing ENABLED=True in constants.
+        # returning [] → scanner fail-closed every token (now lines 312-313) → signal was
+        # dead for 35 days (0 signals / 0 trades since 2026-09-03) despite
+        # R2_TREND_V2_LONG_ENABLED=True in hermes_constants.py.
         # Same bug was fixed in signal_schema.py (commit ea01ec1c) but never propagated here.
-        print(f'[r2_trend_v2_long] ❌ _get_closes_from_candles_1m({token}) FAILED: '
-              f'{type(e).__name__}: {e} — token skipped', flush=True)
+        # Rate-limited: in a systemic failure (candles_1m dropped/locked) this would fire
+        # 40-90x/cycle ≈ 60-130k lines/day and rotate pipeline.log before anyone sees it.
+        if token not in _CANDLES_1M_FAIL_WARNED:
+            _CANDLES_1M_FAIL_WARNED.add(token)
+            print(f'[r2_trend_v2_long] ❌ _get_closes_from_candles_1m({token}) FAILED: '
+                  f'{type(e).__name__}: {e} — token skipped', flush=True)
         return []
     finally:
         if conn:
