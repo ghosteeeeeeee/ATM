@@ -1,0 +1,146 @@
+
+====================================================================================================
+STEP 1 — HOME-RUN INVENTORY (90d live, pnl_pct >= 10)
+====================================================================================================
+total 90d trades=3364  winners=1670  HOME RUNS (>=10%)=64 (1.9% of all, 3.8% of winners)  >=20% tier=22
+range 10.1% .. 47.5%  span 2026-08-21..2026-10-08
+home-run base rate 1.9%  Wilson95% CI [1.5%, 2.4%]
+
+====================================================================================================
+STEP 2 — EVERY HOME RUN, FULL PROFILE (n above)
+====================================================================================================
+    id tok      signal                   dir      pnl%   pnl$ lev  sz$ exit                 vol        rsi  min   mfe   mae  btc regime        wave           spd   gap   stl  hr
+ 14101 ETH      hl_copy_trader           LONG    47.53   0.49 5.0   11 atr_sl_hit           NORMAL    48.5  304  6.04  0.14 None None          falling         46  None  None  18
+ 15547 AVAX     pump-chain+              LONG    45.71   1.02 5.0   11 atr_sl_hit           EXTREME   94.4  124 10.50  0.29   32 BEAR_TREND    accelerating    52  0.82   4.8  22
+ 15984 CRV      pump-chain+              LONG    42.34   0.94 5.0   11 atr_trail_hit        EXTREME   82.4  184  9.86  0.01   47 RANGING_BEAR  accelerating    93  1.19   1.3  22
+ 14075 ZRO      ct-hot+                  LONG    42.16   0.43 5.0   17 atr_sl_hit           EXTREME   79.5   45  5.50  0.22 None None          accelerating    93  None  None  10
+ 15757 COMP     volume-breakout-long+    LONG    42.12   0.94 5.0   11 HARD_SL_FAILED       EXTREME   55.0  344  6.34  1.25   35 RANGING       accelerating     1  0.58   1.2  19
+ 15044 INJ      open-skies+              LONG    40.57   0.94 5.0   11 atr_sl_hit           EXTREME   None  162  9.56  0.01 None None          falling         83  None  None  17
+ 14112 POL      ct-hot+                  LONG    36.67   0.75 5.0   11 atr_sl_hit           HIGH      89.3   89  8.91  0.00 None None          bottoming       53  None  None   3
+ 14068 HYPE     hl_copy_trader           LONG    32.49   0.33 5.0   11 atr_sl_hit           NORMAL    56.9  125  4.40  0.11 None None          None          None  None  None   6
+ 15304 NEO      rr-struct+               LONG    30.98   0.69 5.0   11 atr_sl_hit           NORMAL    None  475  7.71  1.03   47 RANGING       accelerating    89  None  None  20
+ 15126 GRASS    pump-chain+              LONG    30.82   1.57 3.0   17 atr_sl_hit           EXTREME   None  442 11.57  0.37 None None          falling         77  None  None   0
+ 14080 HYPE     hl_copy_trader           LONG    29.81   0.31 5.0   11 atr_sl_hit           NORMAL    56.9   81  4.24  0.51 None None          falling         63  None  None  12
+ 14525 COMP     accel-300-v2-            SHORT   24.76   0.55 5.0   11 atr_sl_hit           NORMAL    None   52  5.73  0.41 None None          decelerating    69  None  None  15
+ 15972 APT      pump-chain-              SHORT   23.89   0.53 5.0   11 trail_sl             EXTREME   13.1   38  5.97  0.13    0 BEAR_TREND    accelerating    11 -0.77   4.2   1
+ 15518 AVAX     pump-chain+              LONG    23.62   0.53 5.0   11 atr_sl_hit           EXTREME   91.4  259  6.75  0.69   51 RANGING       falling         61  0.39   5.1   5
+ 15567 ADA      pump-chain+              LONG    23.06   0.52 5.0   11 atr_sl_hit           HIGH      62.2  486  5.99  0.50   50 TRANSITIONING accelerating    52 -0.27   5.4   9
+ 15583 FIL      volume-breakout-long+    LONG    22.11   0.74 5.0   17 atr_sl_hit           EXTREME   68.4  268  6.03  0.69   47 RANGING       accelerating    77  0.66   2.0   5
+ 14063 BTC      hl_copy_trader           LONG    21.98   0.46 5.0   11 atr_sl_hit           NORMAL    47.0  270  5.81  0.13 None None          None          None  None  None   4
+ 14103 SOL      hl_copy_trader           LONG    21.81   0.24 5.0   11 atr_sl_hit           NORMAL    57.5  151  3.49  0.05 None None          accelerating    31  None  None  21
+ 15058 WLD      open-skies+              LONG    21.64   0.48 5.0   11 atr_sl_hit           EXTREME   None  142  6.31  0.56 None None          falling         97  None  None  23
+ 15520 JUP      pump-chain+              LONG    21.13   0.47 5.0   11 atr_sl_hit           EXTREME   95.3  232  5.82  0.41   36 RANGING_BEAR  accelerating    91 -0.11   1.2   6
+ 14178 ENA      ct-hot+                  LONG    20.05   0.45 5.0   11 atr_sl_hit           EXTREME   None   35  5.24  0.38 None None          bottoming       62  None  None   9
+ 15865 DYDX     pump-chain-              SHORT   20.02   0.45 5.0   11 atr_trail_hit        EXTREME   39.1  333  5.16  0.11   24 RANGING       bottoming       96  1.69   5.3   4
+ 15493 FOGO     pump-chain+              LONG    18.67   0.69 3.0   11 atr_sl_hit           HIGH      63.0  339  7.60  0.23   86 BULL_TREND    accelerating    65  None  None  18
+ 15156 ONDO     ema300-dip-short         SHORT   18.66   0.42 5.0   11 atr_sl_hit           HIGH      None  249  4.87  0.21 None None          falling         47  None  None  18
+ 14079 CASHCAT  ct-hot+                  LONG    17.21   0.18 3.0   11 atr_tp_hit           EXTREME   59.8    1  1.72  0.00 None None          bottoming       83  None  None  11
+ 14102 HYPE     hl_copy_trader           LONG    16.89   0.18 5.0   11 atr_sl_hit           NORMAL    56.9  119  2.79  0.15 None None          falling         68  None  None  19
+ 14117 SOL      hl_copy_trader           LONG    16.77   0.36 5.0   11 guardian_hard_sl     NORMAL    57.5   28  5.86  0.09 None None          falling         56  None  None   4
+ 14529 ZRO      accel-300-v2-            SHORT   16.06   0.36 5.0   11 atr_sl_hit           EXTREME   None   21  3.91  0.00 None None          falling         39  None  None  16
+ 14629 SEI      ichimoku-,rs-r117        SHORT   15.79   0.35 5.0   11 atr_sl_hit           EXTREME   None  106  3.87  0.13 None None          decelerating    34  None  None  22
+ 15028 ETC      bb-bounce-v2-long+       LONG    15.70   0.35 5.0   11 profit-monster-trail HIGH      None  159  3.54  0.40 None None          falling         54  None  None  10
+ 14674 CRV      accel-300-v2-long,volume-breakout-long+ LONG    15.61   0.35 5.0   11 atr_sl_hit           EXTREME   None   59  4.10  0.65 None None          accelerating    77  None  None  19
+ 14107 SOL      hl_copy_trader           LONG    14.68   0.30 5.0   11 atr_sl_hit           NORMAL    57.5  203  4.28  0.09 None None          falling         63  None  None   0
+ 15159 ENA      pullback-entry-          SHORT   14.57   0.48 5.0   17 atr_sl_hit           EXTREME   None  204  4.18  0.17 None None          accelerating    66  None  None  19
+ 14157 SOL      hl_copy_trader           LONG    14.55   0.41 5.0   14 atr_sl_hit           NORMAL    None  202  4.36  0.41 None None          falling          7  None  None  21
+ 15695 POL      continuation+            LONG    14.29   0.32 5.0   11 profit-monster-trail HIGH      47.5 None  3.52  0.83   15 RANGING       falling         93  0.13   3.2  16
+ 15161 ADA      pullback-entry-          SHORT   14.12   0.32 5.0   11 atr_sl_hit           HIGH      None  178  3.94  0.12 None None          falling         46  None  None  19
+ 14958 SOL      bb-bounce-v2-long+       LONG    14.07   0.32 5.0   11 profit-monster-trail FLAT      None  443  3.42  0.34 None None          decelerating     3  None  None  20
+ 15971 LTC      pump-chain-              SHORT   13.64   0.61 5.0   22 atr_trail_hit        NORMAL    28.5  356  3.52  0.07   34 BEAR_TREND    bottoming       26 -0.58   2.1  20
+ 15570 JUP      pump-chain+              LONG    13.57   0.45 5.0   17 atr_sl_hit           EXTREME   48.3  127  3.88  0.01   92 BULL_TREND    falling         76  0.40   3.3  15
+ 15565 ETC      pump-chain+              LONG    13.49   0.30 5.0   11 atr_sl_hit           EXTREME   64.7  489  4.05  0.89   14 TRANSITIONING falling         80 -0.35   1.1   9
+ 14948 COMP     bb-bounce-v2-long+       LONG    13.44   0.30 5.0   11 profit-monster-trail NORMAL    None  283  3.28  0.35 None None          accelerating    79  None  None  14
+ 14350 DYDX     bb_bounce+               LONG    13.25   0.29 5.0   11 atr_sl_hit           HIGH      None  299  3.82 14.24 None None          decelerating    49  None  None   4
+ 14177 HBAR     ct-hot+                  LONG    12.78   0.29 5.0   11 atr_sl_hit           NORMAL    None  278  3.68  0.62 None None          accelerating    32  None  None   8
+ 15301 XPL      pullback-entry-          SHORT   12.54   0.28 5.0   11 atr_sl_hit           NORMAL    None  188  3.70  0.33   12 RANGING       decelerating    34  None  None  17
+ 15390 INJ      pump-chain+              LONG    12.53   0.28 5.0   11 atr_sl_hit           EXTREME   None  248  3.92  0.06   72 BULL_TREND    falling         12  None  None  15
+ 14476 INJ      accel-300-v2-            SHORT   12.49   0.29 5.0   11 atr_sl_hit           HIGH      None   64  3.05  0.11 None None          bottoming       32  None  None   1
+ 14072 ENS      ct-hot+                  LONG    12.22   0.50 5.0   11 atr_sl_hit           EXTREME   29.4   57  3.82  0.21 None None          falling         95  None  None   9
+ 14843 ENA      accel-300-v3-long+       LONG    12.18   0.27 5.0   11 profit-monster-trail EXTREME   None   15  3.56  0.35 None None          bottoming       80  None  None  15
+ 14189 LDO      hl_copy_trader           LONG    12.16   0.34 5.0   14 atr_sl_hit           EXTREME   None   72  3.74  0.06 None None          falling         84  None  None  14
+ 14110 HYPE     hl_copy_trader           LONG    12.12   0.25 5.0   11 atr_sl_hit           NORMAL    56.9   95  4.31  0.10 None None          bottoming       56  None  None   2
+ 14961 ZRO      coil-spring+             LONG    12.04   0.27 5.0   11 profit-monster-trail HIGH      None  117  2.95  0.76 None None          accelerating    65  None  None  23
+ 15858 ME       pump-chain+              LONG    11.97   0.88 3.0   22 atr_trail_hit        EXTREME   88.2  224  5.41  0.11   63 RANGING_BULL  falling         51  0.25   4.2  23
+ 15474 WLD      volume-breakout-long+    LONG    11.80   0.26 5.0   11 atr_sl_hit           EXTREME   59.5  103  3.86  1.10   90 BULL_TREND    bottoming       83  None  None   2
+ 15587 CASHCAT  pump-chain+              LONG    11.60   0.43 3.0   11 atr_sl_hit           EXTREME   70.5   54  5.71  0.10   95 TRANSITIONING decelerating    62 -0.46   4.3   8
+ 15369 XPL      breakout-long+           LONG    11.27   0.25 5.0   11 atr_sl_hit           HIGH      None  359  3.64  0.07   91 TRANSITIONING accelerating    91  None  None   6
+ 14419 APT      r2-trend-long3,r2-trend-long5,rs-s79 LONG    11.18   0.25 5.0   11 atr_sl_hit           EXTREME   None  132  2.72  0.21 None None          accelerating    59  None  None   6
+ 15990 IMX      pump-chain+              LONG    10.77   0.48 5.0   22 stale_exit           EXTREME   89.7   29  2.21  0.39   50 TRANSITIONING accelerating    49  1.45   3.2  18
+ 14095 BTC      hl_copy_trader           LONG    10.74   0.12 5.0   11 atr_sl_hit           NORMAL    47.0  513  2.34  0.36 None None          falling         57  None  None  16
+ 14804 DOT      bb-bounce-v2-long+       LONG    10.62   0.24 5.0   11 profit-monster-trail HIGH      None   30  2.38  0.00 None None          falling         28  None  None   1
+ 14184 IMX      ct-hot+                  LONG    10.35   0.23 5.0   11 atr_sl_hit           HIGH      None  136  3.22  0.66 None None          accelerating    66  None  None  12
+ 15333 BIGTIME  pullback-entry-          SHORT   10.31   0.57 3.0   17 atr_sl_hit           EXTREME   None  357  4.58  0.44   67 TRANSITIONING falling         55  None  None  17
+ 15368 SOL      rr-struct-v2+            LONG    10.30   0.23 5.0   11 atr_sl_hit           NORMAL    None  890  3.25  0.79   76 BULL_TREND    accelerating    20  None  None   6
+ 14539 WLD      accel-300-v2-            SHORT   10.12   0.22 5.0   11 atr_sl_hit           EXTREME   None  108  2.77  0.66 None None          accelerating    86  None  None  17
+ 15168 WLD      pullback-entry-          SHORT   10.07   0.22 5.0   11 atr_sl_hit           EXTREME   None   54  3.33  0.48 None None          accelerating    40  None  None  21
+
+====================================================================================================
+STEP 3 — CONCENTRATION: where do home runs come from vs the 90d base rates
+====================================================================================================
+
+By signal (HR count vs its own 90d trade count; Fisher vs rest):
+  pump-chain+                HR= 13 /  138 trades ( 9.4% HR rate)  fisher p=0.0000
+  hl_copy_trader             HR= 12 /   79 trades (15.2% HR rate)  fisher p=0.0000
+  ct-hot+                    HR=  7 /   99 trades ( 7.1% HR rate)  fisher p=0.0024
+  pullback-entry-            HR=  5 /  120 trades ( 4.2% HR rate)  fisher p=0.0762
+  accel-300-v2-              HR=  4 /   72 trades ( 5.6% HR rate)  fisher p=0.0468
+  bb-bounce-v2-long+         HR=  4 /  106 trades ( 3.8% HR rate)  fisher p=0.1412
+  volume-breakout-long+      HR=  3 /   24 trades (12.5% HR rate)  fisher p=0.0100
+  pump-chain-                HR=  3 /  138 trades ( 2.2% HR rate)  fisher p=0.7458
+  open-skies+                HR=  2 /   30 trades ( 6.7% HR rate)  fisher p=0.1104
+  rr-struct+                 HR=  1 /   15 trades ( 6.7% HR rate)  fisher p=0.2508
+
+By direction / vol regime / leverage:
+  dir:LONG       HR= 50 / 1942 ( 2.6% HR rate)  fisher p=0.0008
+  dir:SHORT      HR= 14 / 1422 ( 1.0% HR rate)  fisher p=0.0008
+  vol:EXTREME    HR= 32 /  991 ( 3.2% HR rate)  fisher p=0.0005
+  vol:NORMAL     HR= 18 /  861 ( 2.1% HR rate)  fisher p=0.6646
+  vol:HIGH       HR= 13 /  871 ( 1.5% HR rate)  fisher p=0.3870
+  vol:FLAT       HR=  1 /   13 ( 7.7% HR rate)  fisher p=0.2213
+  lev:5.0      HR= 58 / 1905 ( 3.0% HR rate)  fisher p=0.0000
+  lev:3.0      HR=  6 / 1458 ( 0.4% HR rate)  fisher p=0.0000
+
+Top repeat tokens among HRs: {'SOL': 6, 'HYPE': 4, 'WLD': 4, 'ZRO': 3, 'COMP': 3, 'INJ': 3, 'ENA': 3, 'AVAX': 2}
+Top HR exit reasons: {'atr_sl_hit': 48, 'profit-monster-trail': 7, 'atr_trail_hit': 4, 'HARD_SL_FAILED': 1, 'trail_sl': 1, 'atr_tp_hit': 1, 'guardian_hard_sl': 1, 'stale_exit': 1}
+
+====================================================================================================
+STEP 4 — CASE-CONTROL: HRs vs SAME-SIGNAL/SAME-DIRECTION/SAME-PERIOD non-HR trades
+====================================================================================================
+risk set: 871 non-HR trades on the same signals+directions in the HR date span (2026-08-21..2026-10-08); HRs n=64
+
+feature             HR_n    HR_mu  ctrl_n  ctrl_mu      MW_p
+entry_rsi_14          32    61.30     293    51.96    0.0142
+entry_bb_position     32     0.62     293     0.49    0.0305
+atr_norm%             32     0.53     293     0.42    0.0715
+leverage              64     4.81     871     4.18    0.0000
+size_usdt             64    12.20     871    12.81    0.0069
+meta rsi_14           58    52.14     800    51.77    0.8395
+meta bb_pos           62     0.56     868     0.51    0.2359
+meta z_score          62     0.24     868     0.04    0.2358
+meta btc_score        24    51.04     335    44.51    0.2576
+meta speed_pct        62    58.78     868    52.56    0.0861
+meta gap%             16     0.32     196    -0.08    0.0996
+meta staleness        16     3.24     200     2.44    0.0530
+meta momentum         62    24.52     868    21.93    0.0822
+hour_of_day           64    12.53     871    11.81    0.3547
+
+Categorical (Fisher/chi2):
+  vol_regime   chi2 p=0.0950 | EXTREME:32/344  NORMAL:18/244  HIGH:13/280  FLAT:1/3
+  btc_regime   chi2 p=0.6483 | None:40/536  RANGING:7/77  TRANSITIONING:6/63  BULL_TREND:5/73  BEAR_TREND:3/99  RANGING_BEAR:2/13
+  wave_phase   chi2 p=0.0453 | falling:24/359  accelerating:23/350  bottoming:9/77  decelerating:6/76  None:2/3  neutral:0/6
+
+Bonferroni over 14 continuous features -> threshold p < 0.00357
+  ** SURVIVES: leverage (p=0.00000) **
+
+====================================================================================================
+STEP 5 — POST-ENTRY MECHANICS of HRs (descriptive: how home runs are captured, not DNA)
+====================================================================================================
+exit reasons: {'atr_sl_hit': 48, 'profit-monster-trail': 7, 'atr_trail_hit': 4, 'HARD_SL_FAILED': 1, 'trail_sl': 1, 'atr_tp_hit': 1, 'guardian_hard_sl': 1, 'stale_exit': 1}
+hold minutes: median 159, mean 200, min 1, max 890
+in-trade MAE: median 0.26%, max 14.24%
+share with MAE < 1%: 94%  (how few HRs ever went underwater)
+open hour (UTC) histogram: {0: 2, 1: 3, 2: 2, 3: 1, 4: 4, 5: 2, 6: 5, 8: 2, 9: 4, 10: 2, 11: 1, 12: 2, 14: 2, 15: 4, 16: 3, 17: 4, 18: 4, 19: 5, 20: 3, 21: 3, 22: 3, 23: 3}
+by week (Mon-start): {datetime.date(2026, 8, 17): 19, datetime.date(2026, 8, 24): 7, datetime.date(2026, 8, 31): 6, datetime.date(2026, 9, 7): 11, datetime.date(2026, 9, 14): 11, datetime.date(2026, 9, 21): 3, datetime.date(2026, 9, 28): 3, datetime.date(2026, 10, 5): 4}
+
+DONE.
