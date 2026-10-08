@@ -6,20 +6,30 @@ forward returns are no worse than market baseline / vs trades that passed?
 
 Method:
   1. Parse ALL block lines from pipeline.log (2026-10-02 20:24 → 2026-10-08 23:01).
+     Shape-match emoji+[GATE]+TOKEN+DIR, then classify: gate name contains BLOCK
+     or line contains a block marker (blocked/denied/skip/HARD BLOCK). Excludes
+     soft multipliers (TIDE →0.7x, RR PENALTY, SLOPE-OVERRIDE, OPP-PENALTY),
+     shadow (WOULD BLOCK/SHADOW), ✅ pass lines, DEBUG.
   2. Coalesce repeated per-minute blocks into episodes (gap > 60min = new episode).
   3. Counterfactual per episode: direction-aware forward return from candles.db.
      Entry = OPEN of first 5m candle with ts >= block timestamp (no lookahead).
      Horizons: +30m (+6), +1h (+12), +4h (+48). MFE/MAE over 4h, direction-aware.
-  4. Market baseline per timestamp: cross-sectional mean forward return across
-     ALL tracked tokens at the same entry candle → excess = signed_ret - market.
+  4. Market baseline DIRECTION-SIGNED (v3 fix, 2026-10-08): excess =
+     sgn × (raw_fwd − market_mean), sgn=+1 LONG / −1 SHORT. The earlier unsigned
+     baseline gave every SHORT episode ~2×market-drift free excess (+0.30% in
+     this falling window) — it manufactured false "blocks-winners" verdicts
+     (OVERSOLD-SHORT +1.17→+0.04, CHOP −0.91→−0.19). Auditor confirmed v3
+     against an independent implementation (audit/gate_counterfactual_verify.md).
   5. Passed-side comparison: same forward metric applied to real live trades
      opened in the same window (brain.trades) — what the gates let through.
-  6. OOS split: Oct 2-5 12:00 vs Oct 5 12:00 - Oct 8. MWU + sign test,
-     Bonferroni across gates.
+  6. OOS split: Oct 2-5 12:00 vs Oct 5 12:00 - Oct 8. Wilcoxon per gate,
+     Bonferroni across gates, pooled blocked-vs-passed MWU.
 
-Excludes: WOULD-BLOCK shadow lines, ✅ skip lines, DEBUG/OFF lines.
-Footgun guards: candles_5m ts = candle OPEN time; entry at open of candle with
-ts >= block_ts; episodes without candle coverage dropped and counted.
+KNOWN GAPS (auditor-verified): single-char token "W" (~864 lines) and
+CONF-FILTER-PRESERVE/CONFLICT-RESCUE/LOSERS-BLOCK colon-glued formats still
+unparsed (~2% of block volume); direction-level blocks (VOL-FLOOR, WARNING
+BTC-momentum, DIRECTION-LOCK, VOL-GATE-v2) have no token+dir → unverifiable
+by this method. Verdicts unaffected (auditor cross-validated full table).
 """
 import re
 import sys
@@ -341,13 +351,52 @@ def main():
           f"{fwd4['wr']:6.1f} {s4['mean']:+9.3f} {s4['med']:+8.3f} {p_s:>6} │ "
           f"{s1['wr']:6.1f} {s1['mean']:+9.3f} │ {mfe:5.2f} {mae:6.2f} {mfe2:6.1f}")
     P()
-    P("ex4h/ex1h = market-adjusted excess (episode signed fwd - cross-sectional mean fwd).")
-    P("p = Wilcoxon signed-rank of excess vs 0 (edge test: p<0.05 → blocked set truly differs from market).")
+    P("ex4h/ex1h = DIRECTION-SIGNED market excess: sgn × (fwd − market_mean), sgn=+1 LONG/−1 SHORT.")
+    P("p = Wilcoxon signed-rank of excess vs 0 (edge test).")
     P("solo = episodes where NO other gate fired on same token+direction within ±10min (marginal value).")
     P("mfe>2% = share of blocked episodes that printed ≥+2% favorable excursion in 4h (killed winners).")
-    P("VERDICT KEY: ex-mean ≈ 0 & p>0.05 → NO EDGE (gate blocks market-average signals = pure noise filter).")
-    P("             ex-mean < 0 & significant → gate WORKS (blocked below-market signals).")
-    P("             ex-mean > 0 → gate BLOCKS WINNERS (harmful).")
+    P("VERDICT KEY (auditor-aligned): NO EDGE = |ex-mean| ≤ 0.2% AND p > Bonferroni threshold")
+    P("  (gate blocks market-average signals = noise filter; nominal p<0.05 alone is NOT a verdict).")
+    P("  WORKS = ex-mean < −0.2% AND p < threshold. BLOCKS WINNERS = ex-mean > +0.2% AND p < threshold.")
+    P()
+
+    # ── Pooled blocked-vs-passed (the headline stack-level test) ─────────────
+    from scipy import stats as sps
+    pooled_blocked = [r['excess_4h'] for recs in per_gate.values() for r in recs
+                      if r['excess_4h'] is not None]
+    pooled_passed = [v for v in passed['excess_4h'] if v is not None]
+    P("── POOLED BLOCKED vs PASSED (excess_4h; does the stack select?) " + "─" * 46)
+    if len(pooled_blocked) >= 10 and len(pooled_passed) >= 10:
+        import statistics as st
+        P(f"  blocked: n={len(pooled_blocked)} mean={st.mean(pooled_blocked):+.3f}% med={st.median(pooled_blocked):+.3f}%")
+        P(f"  passed:  n={len(pooled_passed)} mean={st.mean(pooled_passed):+.3f}% med={st.median(pooled_passed):+.3f}%")
+        u2, p2 = sps.mannwhitneyu(pooled_passed, pooled_blocked, alternative='two-sided')
+        u1, p1 = sps.mannwhitneyu(pooled_passed, pooled_blocked, alternative='greater')
+        P(f"  MWU two-sided p={p2:.4f}  one-sided (passed>blocked) p={p1:.4f}")
+        P("  INTERPRETATION CAVEAT: power statement — the test can only detect selection")
+        P("  ≳ mean-difference CI; gates also toggle minute-to-minute (passed set overlaps")
+        P("  blocked set on same token+dir), so p>0.05 ≠ gates proven useless.")
+    P()
+
+    # ── Bonferroni summary ───────────────────────────────────────────────────
+    n_gates = len(gate_stats)
+    bonf = 0.05 / n_gates if n_gates else 0.05
+    P(f"── BONFERRONI (gates tested: {n_gates} → threshold p < {bonf:.4f}) " + "─" * 39)
+    survivors = [(g, s) for g, s in gate_stats.items()
+                 if s['s4'] and s['s4']['p'] is not None and s['s4']['p'] < bonf]
+    nominal = [(g, s) for g, s in gate_stats.items()
+               if s['s4'] and s['s4']['p'] is not None and bonf <= s['s4']['p'] < 0.05]
+    if survivors:
+        P("  SURVIVES BONFERRONI:")
+        for g, s in sorted(survivors, key=lambda x: x[1]['s4']['p']):
+            verdict = 'WORKS' if s['s4']['mean'] < -0.2 else ('BLOCKS-WINNERS' if s['s4']['mean'] > 0.2 else 'DIFFERS-FROM-MARKET')
+            P(f"    {g:26} n={s['n']:4} ex4h={s['s4']['mean']:+.3f}% p={s['s4']['p']:.5f} → {verdict}")
+    else:
+        P("  (none)")
+    if nominal:
+        P("  NOMINAL ONLY (p<0.05, does NOT survive Bonferroni — not actionable):")
+        for g, s in sorted(nominal, key=lambda x: x[1]['s4']['p']):
+            P(f"    {g:26} n={s['n']:4} ex4h={s['s4']['mean']:+.3f}% p={s['s4']['p']:.4f}")
     P()
 
     # OOS halves

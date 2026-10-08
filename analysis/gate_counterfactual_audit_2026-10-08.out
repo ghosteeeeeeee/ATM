@@ -1,7 +1,7 @@
 ==============================================================================================================
 GATE COUNTERFACTUAL AUDIT — pipeline.log 2026-10-02 20:24 → 2026-10-08 23:01 UTC
 ==============================================================================================================
-raw block lines parsed: 74,806  |  episodes: 8,061  |  episodes w/ candle coverage: 7,818
+raw block lines parsed: 74,806  |  episodes: 8,061  |  episodes w/ candle coverage: 7,835
 
 ── PASSED SIDE (real live trades opened in window) ───────────────────────────────────────────────────────
 n trades in window: 135  (no candle coverage: 5)
@@ -12,32 +12,32 @@ n trades in window: 135  (no candle coverage: 5)
 ── PER-GATE COUNTERFACTUAL (episodes; fwd = direction-aware forward return) ─────────────────────────────────
 gate                           eps  solo  ovl │ 4h wr% ex4h mean ex4h med      p │ 1h wr% ex1h mean │   mfe    mae mfe>2%
 ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-SHORT-CONTINUUM               1054   693  0.5 │   49.8    -0.028   +0.122  0.016 │   52.3    +0.008 │  1.20  -1.35   15.9
-CONFLUENCE-GATE-BLOCK          856   549  0.5 │   46.4    -0.097   -0.139  0.011 │   48.4    -0.015 │  1.68  -1.58   27.7
+SHORT-CONTINUUM               1059   693  0.5 │   49.6    -0.027   +0.122  0.016 │   52.2    +0.007 │  1.19  -1.35   15.9
+CONFLUENCE-GATE-BLOCK          857   549  0.5 │   46.3    -0.097   -0.137  0.012 │   48.4    -0.014 │  1.67  -1.58   27.7
 LONG-RSI-BLOCK                 627   324  0.6 │   47.5    -0.028   -0.203  0.010 │   45.0    -0.032 │  1.60  -1.44   26.8
 LONG-NEUTRAL                   549   247  0.6 │   49.0    +0.038   -0.046  0.465 │   46.3    -0.030 │  1.26  -1.52   18.2
 CONTINUUM-BLOCK                513    67  1.1 │   43.7    +0.054   -0.062  0.241 │   46.6    +0.004 │  1.41  -2.08   21.6
 RR-ENGINE                      406   186  0.8 │   53.0    +0.155   -0.028  0.568 │   53.4    +0.085 │  2.01  -1.50   31.5
 PUMP-CHAIN-SHORT-RSI-MIN       401   242  0.5 │   47.6    -0.048   +0.073  0.673 │   52.4    +0.009 │  1.60  -1.75   24.4
-SHORT-NEUTRAL                  382   224  0.5 │   48.2    -0.166   +0.024  0.397 │   48.2    -0.092 │  1.43  -1.41   19.4
+SHORT-NEUTRAL                  384   224  0.5 │   47.9    -0.167   +0.024  0.387 │   48.2    -0.092 │  1.43  -1.41   19.3
 HALL-SHAME                     288   177  0.5 │   48.6    +0.026   -0.039  0.550 │   45.8    +0.027 │  1.88  -1.57   28.8
+CONTINUUM-BULL                 253    40  1.3 │   51.0    -0.089   +0.134  0.929 │   44.7    -0.074 │  1.52  -1.44   23.7
 LONG-RSI-CEILING               251    95  0.8 │   51.0    +0.175   -0.146  0.430 │   55.4    +0.084 │  1.80  -1.31   29.5
-CONTINUUM-BULL                 246    40  1.3 │   52.4    -0.097   +0.115  0.993 │   44.3    -0.072 │  1.55  -1.42   24.4
 BTC-CHOP-GATE                  238   106  0.7 │   37.4    -0.381   -0.182  0.000 │   41.6    -0.092 │  0.96  -1.63    7.6
 SHORT-RSI-FLOOR                211   143  0.4 │   54.0    +0.213   +0.203  0.041 │   53.1    +0.040 │  2.19  -1.33   38.4
 VOL-GATE-BYPASS                186   147  0.3 │   40.3    -0.054   -0.152  0.283 │   46.2    +0.012 │  1.59  -1.95   26.3
-PUMP-CHAIN-RSI-MAX             184   103  0.6 │   49.5    +0.172   -0.096  0.947 │   44.6    +0.022 │  1.90  -1.58   37.5
+PUMP-CHAIN-RSI-MAX             185   103  0.6 │   49.7    +0.169   -0.101  0.921 │   44.3    +0.016 │  1.89  -1.58   37.3
 OVERSOLD-SHORT                 178   102  0.6 │   63.5    +0.037   +0.067  0.509 │   49.4    +0.049 │  1.72  -0.99   32.6
 CTX-GATE                       163    51  1.1 │   39.3    -0.013   -0.079  0.598 │   50.9    -0.086 │  1.57  -1.55   27.6
-PENALTY-BLOCK                  154    39  1.3 │   49.4    +0.316   +0.028  0.336 │   47.4    -0.009 │  1.96  -2.09   31.2
-BTC-CRASH                      146    15  1.7 │   42.5    +0.335   -0.022  0.392 │   50.7    -0.004 │  1.56  -1.68   23.3
+PENALTY-BLOCK                  154    39  1.3 │   49.4    +0.316   +0.028  0.337 │   47.4    -0.009 │  1.96  -2.09   31.2
+BTC-CRASH                      147    15  1.7 │   42.2    +0.342   +0.000  0.340 │   51.0    +0.003 │  1.55  -1.67   23.1
 PUMP-CHAIN-SHORT-HIGH          124    97  0.2 │   47.6    -0.228   +0.091  0.763 │   48.4    -0.164 │  2.05  -1.57   36.3
-SPIKE-FILTER                   111    45  0.9 │   54.1    +0.265   +0.025  0.309 │   52.3    +0.048 │  1.75  -1.62   28.8
+SPIKE-FILTER                   111    45  0.9 │   54.1    +0.265   +0.025  0.310 │   52.3    +0.048 │  1.75  -1.62   28.8
 SLOPE-FILTER                   110    64  0.5 │   60.9    +0.544   +0.532  0.008 │   57.3    +0.196 │  3.44  -2.23   59.1
 PUMP-CHAIN-VEL-SHORT            59    15  1.1 │   67.8    +0.358   +0.103  0.070 │   47.5    +0.009 │  2.35  -1.34   33.9
 SHORT-BB-DEAD-ZONE2             48    18  1.0 │   52.1    -0.274   +0.009  0.988 │   43.8    -0.088 │  1.56  -1.91   25.0
 PUMP-CHAIN-RSI-MIN              39    28  0.4 │   48.7    -0.371   -0.357  0.062 │   48.7    -0.033 │  1.63  -1.40   30.8
-CHASE-BLOCK                     37    15  1.4 │   48.6    -0.511   -0.360  0.249 │   35.1    -0.468 │  1.58  -2.16   37.8
+CHASE-BLOCK                     37    15  1.4 │   48.6    -0.512   -0.360  0.249 │   35.1    -0.468 │  1.58  -2.16   37.8
 SHORT-REGIME-GATE               35    26  0.3 │   54.3    +0.110   -0.079  0.916 │   34.3    -0.048 │  1.98  -1.19   28.6
 CHOP                            30     9  0.9 │   26.7    -0.189   +0.030  0.524 │   23.3    -0.182 │  0.61  -1.51    6.7
 EXEC-RSI-HARD-FLOOR             24     1  1.5 │   54.2    +0.279   +0.362  0.208 │   54.2    +0.003 │  1.65  -1.14   20.8
@@ -62,42 +62,60 @@ V2-RECHECK                       1     1  0.0 │    0.0    -0.052   -0.052    n
 BB-SQUEEZE-EXTREME               1     0  5.0 │    0.0    -2.292   -2.292    n/a │    0.0    -0.004 │  0.00  -4.73    0.0
 DISABLED-COMPONENT               1     0  1.0 │  100.0    +9.587   +9.587    n/a │  100.0    +0.305 │ 10.75   0.00  100.0
 
-ex4h/ex1h = market-adjusted excess (episode signed fwd - cross-sectional mean fwd).
-p = Wilcoxon signed-rank of excess vs 0 (edge test: p<0.05 → blocked set truly differs from market).
+ex4h/ex1h = DIRECTION-SIGNED market excess: sgn × (fwd − market_mean), sgn=+1 LONG/−1 SHORT.
+p = Wilcoxon signed-rank of excess vs 0 (edge test).
 solo = episodes where NO other gate fired on same token+direction within ±10min (marginal value).
 mfe>2% = share of blocked episodes that printed ≥+2% favorable excursion in 4h (killed winners).
-VERDICT KEY: ex-mean ≈ 0 & p>0.05 → NO EDGE (gate blocks market-average signals = pure noise filter).
-             ex-mean < 0 & significant → gate WORKS (blocked below-market signals).
-             ex-mean > 0 → gate BLOCKS WINNERS (harmful).
+VERDICT KEY (auditor-aligned): NO EDGE = |ex-mean| ≤ 0.2% AND p > Bonferroni threshold
+  (gate blocks market-average signals = noise filter; nominal p<0.05 alone is NOT a verdict).
+  WORKS = ex-mean < −0.2% AND p < threshold. BLOCKS WINNERS = ex-mean > +0.2% AND p < threshold.
+
+── POOLED BLOCKED vs PASSED (excess_4h; does the stack select?) ──────────────────────────────────────────────
+  blocked: n=7835 mean=+0.012% med=-0.009%
+  passed:  n=130 mean=+0.188% med=+0.032%
+  MWU two-sided p=0.5215  one-sided (passed>blocked) p=0.2607
+  INTERPRETATION CAVEAT: power statement — the test can only detect selection
+  ≳ mean-difference CI; gates also toggle minute-to-minute (passed set overlaps
+  blocked set on same token+dir), so p>0.05 ≠ gates proven useless.
+
+── BONFERRONI (gates tested: 49 → threshold p < 0.0010) ───────────────────────────────────────
+  SURVIVES BONFERRONI:
+    BTC-CHOP-GATE              n= 238 ex4h=-0.381% p=0.00023 → WORKS
+  NOMINAL ONLY (p<0.05, does NOT survive Bonferroni — not actionable):
+    SLOPE-FILTER               n= 110 ex4h=+0.544% p=0.0076
+    LONG-RSI-BLOCK             n= 627 ex4h=-0.028% p=0.0104
+    CONFLUENCE-GATE-BLOCK      n= 857 ex4h=-0.097% p=0.0121
+    SHORT-CONTINUUM            n=1059 ex4h=-0.027% p=0.0156
+    SHORT-RSI-FLOOR            n= 211 ex4h=+0.213% p=0.0406
 
 ── OOS SPLIT (excess_4h mean; first half vs second half) ───────────────────────────────────────────────────
 gate                           n1    ex1h1   n2    ex1h2 same-sign
-SHORT-CONTINUUM               632   -0.086  422   +0.060       NO 
-CONFLUENCE-GATE-BLOCK         285   +0.100  571   -0.196       NO 
+SHORT-CONTINUUM               632   -0.086  427   +0.061       NO 
+CONFLUENCE-GATE-BLOCK         285   +0.100  572   -0.195       NO 
 LONG-RSI-BLOCK                397   +0.041  230   -0.146       NO 
 LONG-NEUTRAL                  242   +0.005  307   +0.064       YES
 CONTINUUM-BLOCK                53   +0.015  460   +0.058       YES
 RR-ENGINE                     179   +0.271  227   +0.063       YES
 PUMP-CHAIN-SHORT-RSI-MIN      151   -0.101  250   -0.017       YES
-SHORT-NEUTRAL                 188   -0.162  194   -0.170       YES
+SHORT-NEUTRAL                 188   -0.162  196   -0.171       YES
 HALL-SHAME                    129   +0.026  159   +0.025       YES
+CONTINUUM-BULL                  0     +nan  253   -0.089       —  
 LONG-RSI-CEILING              184   +0.053   67   +0.513       YES
-CONTINUUM-BULL                  0     +nan  246   -0.097       —  
 BTC-CHOP-GATE                 167   -0.613   71   +0.163       NO 
 SHORT-RSI-FLOOR                50   +0.009  161   +0.277       YES
 VOL-GATE-BYPASS                 0     +nan  186   -0.054       —  
-PUMP-CHAIN-RSI-MAX             75   +0.062  109   +0.248       YES
+PUMP-CHAIN-RSI-MAX             75   +0.062  110   +0.241       YES
 OVERSOLD-SHORT                 27   -0.130  151   +0.067       NO 
 CTX-GATE                       42   -0.546  121   +0.172       NO 
 PENALTY-BLOCK                   0     +nan  154   +0.316       —  
-BTC-CRASH                      22   -0.261  124   +0.441       NO 
+BTC-CRASH                      22   -0.261  125   +0.448       NO 
 PUMP-CHAIN-SHORT-HIGH           3   -0.031  121   -0.233       YES
 SPIKE-FILTER                   16   +0.631   95   +0.203       YES
 SLOPE-FILTER                   60   +0.443   50   +0.665       YES
 PUMP-CHAIN-VEL-SHORT            9   +0.317   50   +0.365       YES
 SHORT-BB-DEAD-ZONE2            12   -1.693   36   +0.199       NO 
 PUMP-CHAIN-RSI-MIN              5   -0.566   34   -0.342       YES
-CHASE-BLOCK                    30   -0.645    7   +0.063       NO 
+CHASE-BLOCK                    30   -0.645    7   +0.060       NO 
 SHORT-REGIME-GATE               3   -0.249   32   +0.143       NO 
 CHOP                           20   -0.361   10   +0.156       NO 
 EXEC-RSI-HARD-FLOOR             6   -0.122   18   +0.412       NO 
@@ -123,25 +141,25 @@ BB-SQUEEZE-EXTREME              0     +nan    1   -2.292       —
 DISABLED-COMPONENT              0     +nan    1   +9.587       —  
 
 ── BLOCK VOLUME ROLLUP ──────────────────────────────────────────────────────────────────────────────────────
-  SHORT-CONTINUUM               1054 episodes (13.5%)
-  CONFLUENCE-GATE-BLOCK          856 episodes (10.9%)
+  SHORT-CONTINUUM               1059 episodes (13.5%)
+  CONFLUENCE-GATE-BLOCK          857 episodes (10.9%)
   LONG-RSI-BLOCK                 627 episodes ( 8.0%)
   LONG-NEUTRAL                   549 episodes ( 7.0%)
-  CONTINUUM-BLOCK                513 episodes ( 6.6%)
+  CONTINUUM-BLOCK                513 episodes ( 6.5%)
   RR-ENGINE                      406 episodes ( 5.2%)
   PUMP-CHAIN-SHORT-RSI-MIN       401 episodes ( 5.1%)
-  SHORT-NEUTRAL                  382 episodes ( 4.9%)
+  SHORT-NEUTRAL                  384 episodes ( 4.9%)
   HALL-SHAME                     288 episodes ( 3.7%)
+  CONTINUUM-BULL                 253 episodes ( 3.2%)
   LONG-RSI-CEILING               251 episodes ( 3.2%)
-  CONTINUUM-BULL                 246 episodes ( 3.1%)
   BTC-CHOP-GATE                  238 episodes ( 3.0%)
   SHORT-RSI-FLOOR                211 episodes ( 2.7%)
   VOL-GATE-BYPASS                186 episodes ( 2.4%)
-  PUMP-CHAIN-RSI-MAX             184 episodes ( 2.4%)
+  PUMP-CHAIN-RSI-MAX             185 episodes ( 2.4%)
   OVERSOLD-SHORT                 178 episodes ( 2.3%)
   CTX-GATE                       163 episodes ( 2.1%)
   PENALTY-BLOCK                  154 episodes ( 2.0%)
-  BTC-CRASH                      146 episodes ( 1.9%)
+  BTC-CRASH                      147 episodes ( 1.9%)
   PUMP-CHAIN-SHORT-HIGH          124 episodes ( 1.6%)
   SPIKE-FILTER                   111 episodes ( 1.4%)
   SLOPE-FILTER                   110 episodes ( 1.4%)
@@ -172,4 +190,4 @@ DISABLED-COMPONENT              0     +nan    1   +9.587       —
   V2-RECHECK                       1 episodes ( 0.0%)
   BB-SQUEEZE-EXTREME               1 episodes ( 0.0%)
   DISABLED-COMPONENT               1 episodes ( 0.0%)
-  TOTAL                         7818
+  TOTAL                         7835
