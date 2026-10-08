@@ -251,3 +251,9 @@
 - **WARN**: `hermes-bug-hunter.service` exits 1 by design — 9 findings (dead signal_gen imports in zscore_momentum.py/trend_purity_signals.py/candle_predictor.py, bare excepts, sqlite leaks, hardcoded passwords). Known, not new.
 - **WARN**: `hermes-upgrade-implementer.service` failed — pipes prompt into opencode; no journal output captured. Non-critical agent.
 - **INFO**: `candles.db` held by 3 python procs (price-collector, 1m-candle, pipeline) — normal concurrent WAL access, no lock errors. `price_history.db` is 0 bytes/empty (unused legacy; live prices via `prices.json`).
+
+## Error Alerts — 2026-10-08 18:48 UTC
+- **WARN** (1x): Disk at 85% (94G/118G). Top consumers: coin_tracker.db (3.3G), candles.db (2.6G), session_brain.db (1.1G), signals_hermes.db (964M), mtf_macd_tuner.db (944M). 18G free.
+- **AUTO-FIX**: None — active DBs, no safe auto-clean without retention review.
+- **WARN** (1x): hermes-bug-hunter.service exits status=1 (expected — reports known code-quality audit findings). Timer active, not a runtime fault.
+- **INFO**: hermes-atr-sl-updater.timer unit intentionally DEFUNCT/disabled. Stale list entry only.

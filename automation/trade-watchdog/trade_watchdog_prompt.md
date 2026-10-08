@@ -135,7 +135,8 @@ data["deep_analysis"] = """Clean analysis of what's happening. Focus on:
 data["regime_context"] = """Current regime and what it means for our positions"""
 data["pattern_alerts"] = """VERIFIED patterns from PostgreSQL. Include: n trades, avg PnL, WR, specific coins/signals.
 For each pattern, answer: what was the WINNING side? Why weren't we on it?"""
-data["agent_timestamp"] = "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+from datetime import datetime, timezone
+data["agent_timestamp"] = datetime.now(timezone.utc).isoformat()
 
 with open(path, "w") as f:
     json.dump(data, f, indent=2)
@@ -211,10 +212,11 @@ This tests the ACTUAL RR engine calculation (including S/R level adjustments) pl
 - The RR engine uses ATR + S/R levels to place SL/TP. If ATR is too tight OR a strong S/R level sits between entry and SL, the R:R fails.
 - **Always run the precheck** — ATR% alone doesn't tell the whole story.
 
-**RSI Gate:**
-- LONG: RSI must be 40-65 (above 70 = spike filter blocks, below 35 = oversold)
-- SHORT: RSI must be 40-60 (below 35 = hard block)
+**RSI Gate (import from hermes_constants.py):**
+- LONG: `LONG_RSI_FLOOR` (20) to `SIGNAL_FILTER_RSI_MAX` (72) — but prefer 45-60
+- SHORT: `SHORT_RSI_HARD_FLOOR` (45) to `SHORT_RSI_CEILING` (65) — hard block below 45
 - **Pick coins at RSI 45-60** — center of the allowed band, not edges.
+- The precheck tool imports these constants automatically — trust its verdict.
 
 **Trend Filter:**
 - add_signal blocks counter-trend entries. If BTC is BELOW EMA300 with bearish linreg, LONG signals get blocked.

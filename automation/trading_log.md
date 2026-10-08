@@ -6513,3 +6513,24 @@ BY: auto_1hr
 - price_history 13.2M rows in signals_hermes.db — live tick data used by _aggregate_1m; needs retention plan before any prune (bug_hunter, not approved)
 
 BY: daily_orchestrator
+
+## [2026-10-08 19:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses) — IMX pump-chain+ LONG stale_exit +$0.48 (+10.77%)
+**PnL:** $+0.48 (WR 100%)
+**24h:** 9T 4W +$0.67 (WR ~44%) | exits: hard_max_loss 4T −$0.53 | stale_exit 2T +$0.33 | atr_trail_hit 1T +$0.94 | pump_exit_dead_money 1T +$0.07 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill trigger: 1T last hour (needs 3+ with 0% WR); v5 24h 2T 0W −$0.21 still under 7d kill-eligibility bar
+- atr_sl_hit 0% — tpsl stable
+- hard_max_loss 4/9=44%: hold per brain_auditor until Oct 9/10 eval
+- Neg-streak: last hour +$0.48 positive — streak broken
+- Overtrade: 1/hr; 0 open
+- Timers fresh, live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Carry-forward: hard_max_loss dominance pending Oct 9/10 eval; v5 solo/conj 24h 0W −$0.43 watch for 7d eval
