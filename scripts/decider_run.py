@@ -218,6 +218,23 @@ from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, FAVO
 
 from hermes_log import log
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
+
+
+def _barg(opt, val):
+    """Format a CLI option as '--opt=value' (equals form).
+
+    FIX (2026-10-08, BUG-023): argparse rejects space-separated values that look
+    like options. Python renders tiny negative floats in scientific notation
+    (e.g. macd_hist=-4.29e-06), and argparse's negative-number matcher
+    (r'^-\\d+$|^\\-?\\d*\\.\\d+$') does NOT match '-4.29e-06' — so '--signal-macd-hist
+    -4.29e-06' raised "expected one argument" (RC=2) and the trade silently
+    failed. 64 RC=2 trade failures in 4 days. The equals form makes argparse
+    accept any value, negative scientific notation included. Module-level so
+    every brain.py argv site (main execute_trade + delayed-entry) shares it.
+    """
+    return f'{opt}={val}'
+
+
 SERVER          = 'Hermes'
 MAX_POS         = MAX_OPEN_POSITIONS
 POSITION_SIZE_USD = DEFAULT_TRADE_SIZE_USDT   # fallback — overwritten by _get_dynamic_position_size()
@@ -734,7 +751,7 @@ def process_delayed_entries(paper=False):
         exp_arg = []
         if experiment and experiment != 'control':
             exp_json = json.dumps({'test': test_name, 'variant': variant_id, 'experiment': experiment})
-            exp_arg = ['--experiment', exp_json]
+            exp_arg = [_barg('--experiment', exp_json)]
 
         _base_size = _get_dynamic_position_size()
         _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
@@ -764,17 +781,21 @@ def process_delayed_entries(paper=False):
         except Exception:
             pass
 
+        # FIX (2026-10-08, BUG-023 follow-up): delayed-entry block migrated to
+        # module-level _barg() equals form — same argparse sci-notation hazard
+        # as the main execute_trade path once this revived path (BUG-024) starts
+        # carrying real signal values.
         cmd = ([sys.executable, BRAIN_CMD, 'trade', 'add',
                 token, cmd_side, str(_trade_size), str(round(cur_price, 6)),
-                '--exchange', 'Hyperliquid',
-                '--strategy', 'delayed-entry',
+                _barg('--exchange', 'Hyperliquid'),
+                _barg('--strategy', 'delayed-entry'),
                 '--paper' if paper else '--real',
-                '--sl', str(round(sl, 6)),
-                '--target', str(round(tp, 6)),
-                '--server', SERVER,
-                '--signal', 'delayed-entry',
-                '--confidence', str(round(conf, 1)),
-                '--leverage', '5']
+                _barg('--sl', str(round(sl, 6))),
+                _barg('--target', str(round(tp, 6))),
+                _barg('--server', SERVER),
+                _barg('--signal', 'delayed-entry'),
+                _barg('--confidence', str(round(conf, 1))),
+                _barg('--leverage', '5')]
                + exp_arg)
 
         try:
@@ -783,7 +804,11 @@ def process_delayed_entries(paper=False):
                 log(f'  ✅ DELAYED ENTERED: {token} {direction}')
                 executed += 1
             else:
-                log(f'  ❌ DELAYED FAILED: {result.stderr.strip()[:80]}')
+                # FIX (2026-10-08, BUG-025 follow-up): tail, not head — argparse's
+                # real error line is the LAST line, after the usage block.
+                _derr = (result.stderr or '').strip()
+                log(f'  ❌ DELAYED FAILED rc={result.returncode}: '
+                    f'{chr(10).join(_derr.splitlines()[-2:]) if _derr else "(empty)"}'[:300])
                 still_pending.append(entry)  # keep for retry
         except Exception as e:
             log(f'  ❌ DELAYED ERROR: {e}')
@@ -2130,17 +2155,9 @@ def execute_trade(token, direction, price, confidence, source,
     # This fixes the bug where trades had wrong signal type (e.g., 'pump-chain+' instead of 'support_resistance')
     _signal_for_trade = signal_type or source
 
-    # FIX (2026-10-08, BUG-023): argparse rejects space-separated values that look
-    # like options. Python renders tiny negative floats in scientific notation
-    # (e.g. macd_hist=-4.29e-06), and argparse's negative-number matcher
-    # (r'^-\d+$|^-\d*\.\d+$') does NOT match '-4.29e-06' — so '--signal-macd-hist
-    # -4.29e-06' raised "expected one argument" (RC=2) and the trade silently
-    # failed. Verified: 64 RC=2 trade failures in 4 days, BLUR retrying every
-    # minute. Using the '--opt=value' (equals) form makes argparse accept any
-    # value, negative scientific notation included.
-    def _barg(opt, val):
-        return f'{opt}={val}'
-
+    # FIX (2026-10-08, BUG-023): all brain.py value options use the '--opt=value'
+    # equals form via module-level _barg() — see its docstring for the argparse
+    # negative scientific-notation failure this prevents (64 lost trades in 4 days).
     cmd = [sys.executable, BRAIN_CMD, 'trade', 'add',
            token, cmd_side, str(_trade_size), str(round(price, 6)),
            _barg('--exchange', 'Hyperliquid'),
@@ -2330,7 +2347,7 @@ def execute_trade(token, direction, price, confidence, source,
             # which is why BUG-023 hid in the logs for days.
             _err = (result.stderr or '').strip()
             _err_tail = '\n'.join(_err.splitlines()[-4:]) if _err else '(empty)'
-            log(f'  [brain.py] ❌ FAILED rc={result.returncode}: stderr_tail={_err_tail[:600]}')
+            log(f'  [brain.py] ❌ FAILED rc={result.returncode}: stderr_tail={_err_tail[-600:]}')
             return False, _err[-200:] or f'brain.py rc={result.returncode}'
     except Exception as e:
         return False, str(e)[:80]

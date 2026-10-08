@@ -10,6 +10,7 @@ import psycopg2
 import psycopg2.extras
 import sys
 import os
+import time
 import json
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Tuple

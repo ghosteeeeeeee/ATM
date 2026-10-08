@@ -581,12 +581,18 @@ def compute_atr_sl_tp(
                     _eff_dist = min(ATR_SL_MIN, _trail_dist)  # use tighter of the two
                     new_sl = round(highest_price * (1 - _eff_dist), 8)
                 else:
-                    new_sl = min(trail_floor, min_from_entry)  # trail from peak, enforce floor
-                # FIX (2026-10-03): CRITICAL GUARD — SL must NEVER be above entry for LONG.
-                # When trail_floor >= entry (line 580), the calculation can produce SL above
-                # entry if highest_price is far above entry. This happened on ME and GMT.
-                # Enforce entry floor as absolute minimum.
-                new_sl = min(new_sl, min_from_entry)  # CRITICAL: SL must never be above entry for LONG
+                    # FIX (BUG-030, 2026-10-08): for LONG, a HIGHER SL is tighter. The old
+                    # min(trail_floor, min_from_entry) picked the LOOSER stop (the floor),
+                    # pinning every LONG SL at entry*(1-ATR_SL_MIN)=entry-1.3% and killing
+                    # trailing entirely (DB-verified: GRASS/IOTA/FOGO all entry*0.987).
+                    # max() takes the tighter of the peak-trail and the floor — trail from
+                    # peak while never dropping below the entry floor. (SHORT mirror at ~615
+                    # uses min() correctly because lower=tighter there.)
+                    new_sl = max(trail_floor, min_from_entry)  # trail from peak, enforce floor
+                # FIX (BUG-030): cap at ENTRY (breakeven), enforcing the 2026-10-03 "SL must
+                # never be above entry" policy. The old min(new_sl, min_from_entry) capped at
+                # entry-1.3% instead, which is what forced the floor onto every in-profit LONG.
+                new_sl = min(new_sl, entry_f)  # CRITICAL: SL must never be above entry for LONG
                 # NOTE: No one-way gate here — the trailing gate (lines 670-720) handles
                 # one-way logic AND wrong-side correction. Adding one-way here would block
                 # the trailing gate from correcting a wrong-sided current_sl.

@@ -723,6 +723,9 @@ def _save_closed_set():
 # may fire for the same trade. Once a trade_id is closed this cycle, skip re-closes.
 _CLOSED_THIS_CYCLE=_load_closed_set()  # loaded from disk for crash-restart dedup
 _CLOSED_HL_COINS=set()  # tokens where HL position was closed this cycle
+# Module-level so the except handler's `_failure_count += 1` can't NameError on the
+# first sync() failure (BUG-035: crashed main() → systemd Restart=always burned the cycle).
+_failure_count = 0
 
 # Ensure data dir exists
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -1486,8 +1489,14 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     log(f'  ⚠️ Orphan {coin} skipped — at max positions ({current_count}/{MAX_OPEN_POSITIONS})', 'WARN')
                     continue
 
+                # FIX (BUG-034, 2026-10-08): was `amount_usdt` — undefined NameError that
+                # crashed reconcile_hype_to_paper on EVERY real orphan (live evidence:
+                # COMP 9/30, POL 10/1, ME 10/2 in sync-guardian.log), so orphan HL positions
+                # were market-closed with no brain-DB trade created — real PnL untracked.
+                # The 2026-09-03 fix deleted the amount_usdt assignment but left this
+                # reference. position_usd = actual HL notional (abs(sz)*entry_px).
                 trade_id = add_orphan_trade(
-                    coin, direction, hl_entry, amount_usdt, int(lev), sl_price, tp_price
+                    coin, direction, hl_entry, position_usd, int(lev), sl_price, tp_price
                 )
                 if trade_id:
                     _mark_hl_reconciled(coin, trade_id, hl_entry, direction)

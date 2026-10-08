@@ -11,7 +11,7 @@ Rate limit strategy:
 from eth_account import Account
 from hyperliquid.exchange import Exchange
 import hyperliquid.utils.signing as signing
-import pathlib, time, json, os as _os, math, sys, urllib.request, urllib.error, subprocess
+import pathlib, time, json, os, os as _os, math, sys, urllib.request, urllib.error, subprocess
 from decimal import Decimal, ROUND_UP
 
 from paths import *
