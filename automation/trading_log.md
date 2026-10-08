@@ -6555,3 +6555,25 @@ BY: daily_orchestrator
 **Open Questions:**
 - 4 concurrent open positions (unusually high vs 0-1 norm) — all pump-chain+ LONG, watch if regime flips
 - Carry-forward: hard_max_loss dominance; v5 solo/conj for Oct 9/10 eval
+
+## [2026-10-08 21:11 UTC] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss) — BANANA hard_max_loss −$0.16; GRASS stale_exit +$0.17; BABY stale_exit +$0.10
+**PnL:** $+0.11 (WR 66.7%) | 24h: 13T 5W +$0.63 (WR 38.5%)
+**24h exits:** hard_max_loss 5T −$0.69 | stale_exit 4T +$0.60 | atr_trail_hit 1T +$0.94 | pump_exit_dead_money 1T +$0.07 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+**Open:** 2 (AIXBT +0.85%, AVAX −0.51% — pump-chain+ LONG)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: pump-chain+ last hour 3T 2W (not 0% WR); pump-chain-v5 24h 2T 0W −$0.21 still under 7d kill bar
+- atr_sl_hit 0/13=0% — tpsl stable
+- hard_max_loss 5/13=38.5% — below 40%, hold per brain_auditor Oct 9/10 eval
+- Overtrade: 3/hr (<20)
+- Streak: positive hour (+$0.11), inactive
+- Timers live, live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Carry-forward: hard_max_loss dominance (now 38.5%, improving); v5 solo/conj 24h 0W −$0.42 for Oct 9/10 eval
