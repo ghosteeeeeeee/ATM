@@ -1,28 +1,31 @@
 === Signal Performance Report ===
 Period: Last 6h | 24h
-Generated: 2026-10-08 15:10 UTC
+Generated: 2026-10-08 22:15 UTC
 
 KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | | | | | No candidates met kill criteria |
+| (none) | — | — | — | — | No kill candidates |
 
 BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | | | | | No candidates met boost criteria (WR 50% < 55% threshold, 4 trades < 5) |
+| pump-chain+ | LONG | 62.5% (24h) / 59.1% (7d) | +$1.32 (24h) / +$2.21 (7d) | 8 (24h) / 22 (7d) | combo_weights 1.0 → 1.1 |
 
 LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+,pump-chain-v5 | LONG | 0.0% | -$0.22 | 2 (6h) | WATCH — sample too small; 24h still +$0.84 @ 50% WR |
+| pump-chain- | SHORT | 0.0% | -$0.23 | 1 (24h) | Watch — 7d 35% WR -$0.14; already suppressed at 0.6 |
+| pump-chain+,pump-chain-v5 | LONG | 0.0% | -$0.22 | 2 (24h) | v5 already disabled; residual closes |
+| pump-chain-v5 | LONG | 0.0% | -$0.15 | 1 (24h) | Already disabled 2026-10-08 CEO |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 50.0% | +$0.84 | 4 (24h) | ACTIVE — profitable, below boost bar |
+| pump-chain+ | LONG | 62.5% (6h) | +$0.49 | 6 (6h) | Active; boosted to 1.1 |
 
 ISSUES:
-- Very low trade volume: only 9 closed trades in 24h (was higher in prior weeks). No inversions found (0 direction mismatches in 24h).
-- Regime check for pump-chain family (all history): EXTREME 48.6% WR (177t, +$2.38) | HIGH 39.7% WR (58t, -$0.67) | NORMAL 52.6% WR (19t, -$0.13). No blanket kill warranted — profitable overall, strongest in EXTREME. No action.
-- 6h window: only 1 signal-group with >=2 trades — insufficient data for any action this cycle.
+- Low overall trade volume: 12 closed trades in 24h, only one signal group clears sample thresholds.
+- No direction inversions detected (0 in 24h).
+- self_learner auto-tune threshold (COMBO_BOOST_WR=0.60) sits just above pump-chain+ 7d WR of 59.1% — manual boost applied; self_learner will preserve it (returns None → keeps old weight) until WR crosses 60%.
+- 14d window shows same n=22 as 7d (signal_outcomes retention/window), so "active > 24h" confirmed via brain DB (first trade 2026-09-09).
