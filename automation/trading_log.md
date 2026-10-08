@@ -6484,3 +6484,32 @@ BY: auto_1hr
 
 **Open Questions:**
 - Carry-forward: hard_max_loss dominance pending Oct 9/10 eval; GRASS MFE give-back + BLUR sizing asymmetry in brain_auditor queue
+
+## [2026-10-08 18:36 UTC] Daily Orchestrator Run
+
+**Pipeline (PG-verified):** 24h 8T 2W +$0.24 | 7d 187T 101W (54.0%) +$1.18 | SHORT 7d 25T 36% −$0.31 (AT RISK, unchanged) | Open 1 | Kill switch LIVE=true
+
+**Team activity (24h):**
+- health_monitor: auto-fixed mtf_macd_tuner IndexError (4h warmup guard <10 → <70), journal vacuum +89.6M. WARN: better-coder ModuleNotFoundError (recurring), 28k stale signals, checklist exits 1 by design. Timed out once at 17:56 (1/48h, not recurring).
+- auto_1hr: 3 cycles, no triggers met, no changes. Carry-forwards: hard_max_loss 55.6% hold, GRASS MFE give-back, BLUR sizing.
+- signal_reporter: 9T/24h too thin for kills/boosts. pump-chain+ LONG 50% WR +$0.84 kept. Regime check: EXTREME 48.6% WR profitable — no kill.
+
+**Implemented today (3 tasks, all approved standing items):**
+
+1. **signal-purge extended to unexecuted >2h** (signal_compactor.py) — new `_purge_stale_unexecuted()` purges EXPIRED/SKIPPED unexecuted signals older than 2h; PENDING and EXECUTED untouched. Wired into `--purge-only` (timer path) and `--purge-executed`. Result: purged 28,041 rows (28,614 → 586), VACUUM runtime DB 68M → 44M. Compile OK, dry-run verified first, pipeline rc=0 post-change. Health-monitor WARN now resolved.
+2. **mtf_macd_tuner backtest_results pruned to 3d retention** (CEO-approved, tuner idle — next run 23h out) — deleted 8,372,096 results + 5,908 runs >3d, VACUUM. DB 1.8G → 944M (−855M). token_best_config/monitored_tokens tables untouched (verified 125/340/340/207 rows). Disk 95G → 94G used.
+3. **hermes-better-coder.timer disabled** — failing every 30min since ~Sep 1 (`dispatcher.dispatcher` ModuleNotFoundError; module deleted in cleanup commit 4e21f7a0, mcp/ gitignored). Service was already disabled but timer kept firing. Timer now inactive, failed state reset. Restore path if wanted: `git show 17ebf022:mcp/hermes-coding-mcp/dispatcher/` (dispatcher.py, worker.py, __init__.py).
+
+**Validation:**
+- Pipeline ran clean during/after all changes (signals_runner rc=0, decider_run running, 1 open trade +24.94% PnL)
+- All core timers active (pipeline, price-collector, 1m-candle, signal-purge)
+- signal-purge next fire 19:00 UTC will exercise new code path automatically
+
+**Not done (CEO/agent-owned, pending):**
+- SHORT 7d −$0.31 AT RISK — monitoring only, no kill (pump-chain- EXTREME habitat KEEP)
+- wyckoff eval Oct 9 — signal_analyst confluence pairing
+- Ride_it HML exemption — CEO backtest decision
+- Q4 portfolio cap backtest — self_learner
+- price_history 13.2M rows in signals_hermes.db — live tick data used by _aggregate_1m; needs retention plan before any prune (bug_hunter, not approved)
+
+BY: daily_orchestrator
