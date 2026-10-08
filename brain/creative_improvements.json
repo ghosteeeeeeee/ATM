@@ -3502,5 +3502,25 @@
     "risk": "low — kills some winners (+$0.28) but less than losers (-$0.71)",
     "implementation": "New constant PUMP_CHAIN_SHORT_RSI_MAX + compactor filter beside PUMP_CHAIN_SHORT_RSI_MIN",
     "sample_size": "11T (need 20)"
+  },
+  {
+    "date": "2026-10-08T02:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "Regime-scaled hard_max_loss: EXTREME 2x, NORMAL 1x, HIGH 1.5x threshold",
+    "rationale": "hard_max_loss fires on ~1% price move inside EXTREME noise at lev 3-5. Trail family (120T 87.5% +$9.47) proves wider exits capture profit.",
+    "expected_impact": "Reduce hard_max_loss frequency ~30-40% in EXTREME",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-08T02:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "pump-chain- SHORT confidence boost in NORMAL (1.0 → 1.2)",
+    "rationale": "NORMAL is only profitable habitat: 5T +$0.37 60%WR. EXTREME dampened. Boost winning side.",
+    "expected_impact": "+$0.10-0.15 per NORMAL trade if edge holds",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

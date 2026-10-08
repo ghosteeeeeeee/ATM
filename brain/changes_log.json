@@ -891,5 +891,16 @@
     "after": "-1.50",
     "rationale": "7d hard_max_loss 64T 0%WR -$8.60 = #1 bleed (entire system bleed; trail_family +$9.47/120T). 87.5% of HML trades had MFE>0 — were in profit, trail never got room. Post-fix lev-aware HML (aed0aa36) cut magnitude but -1% acct still inside EXTREME-vol noise at lev5. Widen gives trail ~50% more room to engage. Cannot block winners (HML only fires on losers). position_manager is per-cycle subprocess — loads fresh.",
     "impact": "Expected: reduce HML frequency toward <30% of closes; convert some HML losers to trail exits. Monitor 48h: HML count, trail_family share, 7d PnL."
+  },
+  {
+    "timestamp": "2026-10-08T02:35:53Z",
+    "agent": "brain_auditor",
+    "change": "Dampened EXTREME pump_chain- SHORT in volatility_gate_v2.py (both underscore + hyphen variants) 1.0 → 0.5",
+    "type": "config",
+    "file": "scripts/volatility_gate_v2.py",
+    "before": "1.0 (CEO re-enabled 2026-10-07)",
+    "after": "0.5 (dampen, not block)",
+    "rationale": "Post CEO re-enable still bleeds: 7d EXTREME n=20 35%WR -$0.23; post re-enable 3T -$0.22 0%WR. NORMAL is the edge (5T +$0.37 60%). Dampen respects CEO philosophy while reducing exposure.",
+    "impact": "Reduced confidence for pump-chain- SHORT in EXTREME regime. NORMAL habitat untouched. CEO can revert to 1.0 if desired."
   }
 ]
