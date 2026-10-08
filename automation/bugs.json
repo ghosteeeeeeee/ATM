@@ -736,6 +736,117 @@
       "related_bugs": [
         "NOTE: ID collision \u2014 parallel bug-hunter round-2 held BUG-030 (tpsl_utils trailing inversion); this momentum bug renumbered to BUG-039"
       ]
+    },
+    {
+      "id": "BUG-040",
+      "title": "cut_loser inverted re-check closes DB row when HL close FAILED and position still open",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/cut_loser.py"
+      ],
+      "symptom": "DB status=\"closed\" with phantom pnl while real money stays open; guardian then creates duplicate guardian_orphan paper trade. Latent (0 HL close failures today) but hits on every HL API failure/429.",
+      "root_cause": "Guard `if hl_fill_price is None and not is_position_on_hl(token)` skipped the DB write exactly when the position was GONE (the case that SHOULD close the DB), and fell through to brain.py trade close --skip-hl when the close failed and the position was STILL on HL.",
+      "fix": "Inverted: now returns False (retry next cycle) when close failed AND position still on HL; closes DB row when position gone from HL.",
+      "verified_by": "py_compile OK; logic traced both branches.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 3",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-041",
+      "title": "replace_sl crashes with float(None) when no size passed and no existing SL order",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/hyperliquid_exchange.py",
+        "scripts/trade_watchdog.py"
+      ],
+      "symptom": "Watchdog autopilot 0/2 HL success rate (CRV 2026-10-08 00:49 & 01:19): \"float() argument must be a string or a real number, not NoneType\". DB was already written and never rolled back \u2192 DB/HL stop divergence.",
+      "root_cause": "replace_sl(coin,direction,new_price) default size=None; when _find_open_trigger_order found no SL (oid=None, existing_sz=None), place_sl received sz=None \u2192 float(None) TypeError.",
+      "fix": "replace_sl now fetches live position size (get_open_hype_positions) as ground truth when both size and existing_sz are None; returns clean {success:False,error:...} if truly flat.",
+      "verified_by": "Behavioral test with mocks: flat account \u2192 clean error dict (no crash); live position \u2192 sz=7.5 picked up, place_sl called with size.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 3",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-042",
+      "title": "watchdog autopilot wrote brain DB BEFORE HL attempt with no rollback \u2014 stop divergence",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/trade_watchdog.py"
+      ],
+      "symptom": "Every failed HL stop-move left brain DB stop_loss updated while exchange stop unchanged; position_manager then pushed its own view, silently overriding the watchdog.",
+      "root_cause": "execute_safe_actions called adjust_stop_loss(trade_id,...) before replace_sl; on HL failure the DB write was never reverted.",
+      "fix": "Reordered: HL replace_sl FIRST, DB adjust_stop_loss only on hl_result success.",
+      "verified_by": "py_compile OK; code path reviewed.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 3",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-043",
+      "title": "watchdog \u22655% profit-lock branch can propose LOOSENING the stop (no tighten-check)",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/trade_watchdog.py"
+      ],
+      "symptom": "Trail steer could widen an already-tighter stop (e.g. tpsl trailed tighter), giving back profit.",
+      "root_cause": "new_stop = current*(1\u00b13%) computed without comparing against current_sl.",
+      "fix": "Tighten-check added: skip steer when new_stop is not tighter than current_sl (LONG: must be above; SHORT: below).",
+      "verified_by": "py_compile OK.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 3",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-044",
+      "title": "sniper-exit.timer disabled \u2014 entire regime-shift exit layer never runs (T decision)",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "files": [
+        "sniper-exit.timer",
+        "scripts/sniper_exit.py"
+      ],
+      "symptom": "0 journal entries in 48h; profit_monster/cut_loser still consult sniper closing markers \u2014 dead coordination. BTC-shift mass-exit protection silently OFF.",
+      "root_cause": "Timer disabled at some point; no rationale found in trading_log.md, bugs.json, or git history.",
+      "fix": "NOT enabled \u2014 audit found sniper closes positions on DATA FAILURE (fail-close on missing token_speeds row, sniper_exit.py:862/866) and leaves phantom-open trades on brain.py failure. Enabling as-is is dangerous. T decision needed AFTER fail-open fix.",
+      "verified_by": "systemctl is-enabled \u2192 disabled; journalctl 48h \u2192 no entries.",
+      "date_found": "2026-10-08",
+      "date_fixed": null,
+      "found_by": "bug-hunter session 2026-10-08 round 3",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-045",
+      "title": "signal purge (--purge-executed) never wired into systemd ExecStart \u2014 but archive timer covers retention",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "signal_compactor.py",
+        "/etc/systemd/system/hermes-signal-compactor.service"
+      ],
+      "symptom": "Audit claimed 25,578 EXPIRED rows = leak. VERIFIED NOT A LEAK: hermes-archive-signals.timer runs daily 04:00 with --apply, 14-day retention by design; dry-run shows 828 rows queued exactly at the 14d boundary. EXECUTED rows total only 20. The --purge-executed flag (1h cleanup + PG cross-check phantom restore) is simply never invoked \u2014 dead feature, not a leak.",
+      "root_cause": "ExecStart=/usr/bin/python3 signal_compactor.py passes no --purge-executed; _purge_executed_signals unreachable in production.",
+      "fix": "Left as-is (archive timer handles cleanup; purge adds little with 20 executed rows). Flagged so the checklist warning \"[FAIL] signals_db: 28223 signals\" is understood as retention-by-design, not failure.",
+      "verified_by": "Dry-run archive-signals.py: 828 rows at 14d boundary. DB distribution: EXPIRED 25578 / SKIPPED 2652 / EXECUTED 20 / PENDING 9.",
+      "date_found": "2026-10-08",
+      "date_fixed": null,
+      "found_by": "bug-hunter session 2026-10-08 round 3",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {

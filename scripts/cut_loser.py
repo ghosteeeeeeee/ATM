@@ -209,10 +209,21 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
     except Exception as e:
         log(f"  [{tier}] HL close error for {token}: {e}", "WARN")
 
-    # Re-check HL before DB write — only if close wasn't confirmed
-    if hl_fill_price is None and not is_position_on_hl(token):
-        log(f"  [{tier}] {token} gone from HL during close (no fill price) — skipping DB write", "WARN")
+    # Re-check HL before DB write — only if close wasn't confirmed.
+    # FIX (BUG-040, 2026-10-08): this guard was INVERTED. The old condition
+    # (`not is_position_on_hl`) skipped the DB write precisely when the position was
+    # GONE from HL — the one case where the DB *should* be marked closed. Worse, when
+    # the HL close FAILED and the position is STILL OPEN on HL (no fill price AND
+    # is_position_on_hl True), the guard fell through to brain.py trade close --skip-hl:
+    # DB status='closed' with a phantom pnl while real money stayed open — guardian
+    # then sees an HL orphan and creates a duplicate paper trade (hl_sync_guardian).
+    # Correct logic: only mark the DB row closed when HL reports the position gone.
+    if hl_fill_price is None and is_position_on_hl(token):
+        log(f"  [{tier}] {token} HL close FAILED and position still OPEN on HL — will retry next cycle (DB untouched)", "WARN")
         return False
+
+    if hl_fill_price is None and not is_position_on_hl(token):
+        log(f"  [{tier}] {token} gone from HL during close (no fill price) — closing DB row at last known price", "WARN")
 
     # Update DB
     exit_price = f"{hl_fill_price:.8f}" if hl_fill_price else f"{current_price:.8f}"

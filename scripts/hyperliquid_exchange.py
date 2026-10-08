@@ -2041,6 +2041,23 @@ def replace_sl(coin: str, direction: str, new_price: float, size: float = None) 
     oid, cloid, existing_sz, _ = _find_open_trigger_order(coin, "sl")
     is_buy = direction.upper() == "SHORT"
     sz = float(size) if size is not None else existing_sz
+    # FIX (BUG-041, 2026-10-08): when no size was passed AND no existing SL order was
+    # found (oid=None, existing_sz=None), the old code called place_sl(..., None) →
+    # float(None) TypeError. Live evidence: watchdog autopilot 0/2 success rate —
+    # both CRV attempts failed with "float() argument must be a string or a real
+    # number, not 'NoneType'" while the DB had already been written (no rollback).
+    # Fetch the live position size as ground truth; fail cleanly if truly flat.
+    if sz is None:
+        try:
+            _pos = get_open_hype_positions().get(coin)
+            if _pos and _pos.get("size"):
+                sz = float(_pos["size"])
+                print(f"[INFO] replace_sl({coin}): no size passed and no existing SL — using live position size {sz}", file=sys.stderr)
+        except Exception as _sz_err:
+            print(f"[WARN] replace_sl({coin}): live position size fetch failed: {_sz_err}", file=sys.stderr)
+    if sz is None:
+        return {"success": False, "error": "no size available (no size param, no existing SL order, no open HL position)",
+                "coin": coin, "type": "SL"}
     price_decimals = _hl_price_decimals(coin)
     new_px = _hl_tick_round(new_price, price_decimals)
     order_type = signing.TriggerOrderType(trigger={

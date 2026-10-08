@@ -552,6 +552,15 @@ def analyze_profit_lock(open_trades):
             else:
                 new_stop = current * (1 + PROFIT_LOCK_TRAIL_DISTANCE / 100)
 
+            # FIX (BUG-043, 2026-10-08): tighten-check — never propose a stop LOOSER
+            # than the current one (e.g. tpsl already trailed tighter; executing this
+            # steer would widen the stop and give back profit). LONG: new must be
+            # ABOVE current_sl; SHORT: new must be BELOW current_sl.
+            if current_sl > 0:
+                if (direction == "long" and new_stop <= current_sl) or \
+                   (direction == "short" and new_stop >= current_sl):
+                    continue
+
             steers.append({
                 "severity": "info",
                 "category": "profit_lock",
@@ -1218,18 +1227,21 @@ def execute_safe_actions(steers, watchdog_mode):
         if action_type == "move_stop" and symbol and new_stop:
             log(f"AUTO-EXEC: Moving {symbol} stop to {new_stop} — {steer.get('detail', '')}")
             try:
-                # Update stop in brain DB
-                sys.path.insert(0, SCRIPTS_DIR)
-                from position_manager import adjust_stop_loss
-                if trade_id:
-                    adjust_stop_loss(trade_id, new_stop)
-
-                # Place actual SL on Hyperliquid
+                # FIX (BUG-042, 2026-10-08): HL FIRST, DB only on HL success. The old
+                # order wrote the brain DB unconditionally BEFORE the HL attempt and
+                # never rolled back — every failed HL move left DB and exchange stops
+                # diverging (live evidence: CRV 2026-10-08 00:49 & 01:19 both failed
+                # with float(None) while the DB had already been updated).
                 from hyperliquid_exchange import replace_sl
                 direction = action.get("direction", "long")
                 result = replace_sl(symbol, direction, float(new_stop))
 
                 if result.get("success"):
+                    # DB write AFTER confirmed HL success
+                    sys.path.insert(0, SCRIPTS_DIR)
+                    from position_manager import adjust_stop_loss
+                    if trade_id:
+                        adjust_stop_loss(trade_id, new_stop)
                     log(f"AUTO-EXEC: {symbol} stop moved to {new_stop} ✅")
                     executed.append({
                         "timestamp": datetime.now(timezone.utc).isoformat(),
