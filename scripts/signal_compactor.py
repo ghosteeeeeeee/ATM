@@ -2907,17 +2907,40 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     pass
             # ── pump-chain- SHORT RSI_MIN filter ────────────────────────
             # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
-            # KILLED 2026-10-07 brain_auditor: bear-structure override REMOVED — same standing
-            # decision as SHORT-RSI-FLOOR. 30d EXTREME pump-chain- meta-RSI 40-45 = 15T -$0.35
-            # (bleed band, PUMP_CHAIN_SHORT_RSI_MIN=45 ratified 2026-10-06). Override was
-            # re-admitting the bleed band whenever BTC bear structure score<30 (was TRUE at kill).
+            # Bearish override RESTORED 2026-10-08 by T directive: 118 SHORT signals expired during dump.
+            # When BTC is bearish (LEAN_BEAR + BELOW EMA), oversold = continuation, not bounce.
             if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'SHORT':
                 try:
                     from hermes_constants import PUMP_CHAIN_SHORT_RSI_MIN
                     _rsi_val_s = row[8] if len(row) > 8 else None
                     if _rsi_val_s is not None and _rsi_val_s < PUMP_CHAIN_SHORT_RSI_MIN:
-                        log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT — hard block, no bearish override)")
-                        continue
+                        # Bearish override: when BTC is bearish, allow SHORT even if RSI < min
+                        _pcs_bearish_override = False
+                        try:
+                            import os as _pcs_os
+                            import time as _pcs_time
+                            _pcs_cont = sqlite3.connect(_pcs_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            try:
+                                _pcs_row = _pcs_cont.execute(
+                                    "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
+                                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                ).fetchone()
+                            finally:
+                                _pcs_cont.close()
+                            if _pcs_row:
+                                _pcs_phase, _pcs_linreg, _pcs_ema, _pcs_ts = _pcs_row
+                                _pcs_age = _pcs_time.time() - (_pcs_ts or 0)
+                                if _pcs_age < 600:
+                                    _pcs_bearish = (_pcs_linreg in ('LEAN_BEAR', 'BEAR') and _pcs_ema == 'BELOW')
+                                    if _pcs_bearish:
+                                        _pcs_bearish_override = True
+                        except Exception:
+                            pass
+                        if _pcs_bearish_override:
+                            log(f"  ✅ [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT bypass — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} but BTC bearish (oversold = continuation)")
+                        else:
+                            log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT)")
+                            continue
                 except ImportError:
                     pass
             # ── pump-chain+ LONG RSI_MIN/MAX filter ─────────────────────────
@@ -3621,8 +3644,34 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _rsf_al > 0:
                             _rsf_rsi = 100 - (100 / (1 + _rsf_ag / _rsf_al))
                             if _rsf_rsi < SHORT_RSI_FLOOR:
-                                log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold — hard block, no bearish override)")
-                                continue
+                                # Bearish override: when BTC is bearish, oversold = continuation
+                                # T directive 2026-10-08: restore override — 118 SHORT signals expired during dump
+                                _rsf_bearish_override = False
+                                try:
+                                    import os as _rsf_os
+                                    import time as _rsf_time
+                                    _rsf_cont = sqlite3.connect(_rsf_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                                    try:
+                                        _rsf_row = _rsf_cont.execute(
+                                            "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
+                                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                        ).fetchone()
+                                    finally:
+                                        _rsf_cont.close()
+                                    if _rsf_row:
+                                        _rsf_phase, _rsf_linreg, _rsf_ema, _rsf_ts = _rsf_row
+                                        _rsf_age = _rsf_time.time() - (_rsf_ts or 0)
+                                        if _rsf_age < 600:
+                                            _rsf_bearish = (_rsf_linreg in ('LEAN_BEAR', 'BEAR') and _rsf_ema == 'BELOW')
+                                            if _rsf_bearish:
+                                                _rsf_bearish_override = True
+                                except Exception:
+                                    pass
+                                if _rsf_bearish_override:
+                                    log(f"  ✅ [SHORT-RSI-FLOOR] {tkn}: SHORT bypass — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} but BTC bearish (oversold = continuation)")
+                                else:
+                                    log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold)")
+                                    continue
                 except Exception:
                     pass  # non-fatal
                 finally:
