@@ -1,5 +1,11 @@
 # Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
 
+## Error Alerts — 2026-10-08 10:47 UTC (health_monitor)
+- **WARN** (recurring): Disk 85% used (/dev/vda2 95G/118G). Gzip of *.log >7d found nothing (rotations already .gz). DBs: coin_tracker ~3.3G, candles ~2.6G, mtf_macd_tuner ~1.6G, session_brain ~1.1G. No safe auto-fix — CEO/bug_hunter DB prune decision still open.
+- **WARN** (informational): 136 signals in last hour, but 0 compaction decisions / 0 executions / hotset empty ("no signals survived compaction"). Filters are rejecting candidates — verify compaction thresholds, not a pipeline crash. 1 closed today (+$0.94, 1 win), 0 open, 0 phantom trades.
+- **INFO**: Pipeline healthy — LIVE run 10:46:34 rc=0, position_manager rc=0, no Tracebacks. Timers 3/3 active (price-collector, 1m-candle, pipeline). Prices fresh (~1.5min, candles_1m). Regime 5m SHORT_BIAS (8L/30S/88N of 126). Speeds 128/241 ≥50th pct (avg 48.5). tokens.last_update in candles.db ~45d stale but candles_1m fresh — metadata table not updated by collector, not a price staleness issue.
+- **INFO**: Side findings unchanged — `signals_hermes_runtime.db` unbounded; `prices.db`/`signals.db` 0-byte stubs still present.
+
 ## Error Alerts — 2026-10-08 00:50 UTC (health_monitor)
 - **CRITICAL→FIXED** (recurring ~every 4min): `hermes-trade-watchdog.service` crash — `NameError: name 'watchdog_mode' is not defined` in `scripts/trade_watchdog.py` (`analyze_profit_lock`, `analyze_stale_trades`, `write_outputs`). Service failed; deep-analysis wrapper never ran.
   - **AUTO-FIX**: Root cause — those helpers referenced `watchdog_mode` without fetching it. Added `watchdog_mode = get_watchdog_mode()[0]` at top of `analyze_profit_lock` and `analyze_stale_trades`; `write_outputs` now sets `auto_executed` from the steer flag. Verified: compile OK, `--dry-run` completes (5 steers), service restarts into opencode analysis phase. Python analysis path no longer NameErrors.
@@ -191,3 +197,15 @@
 - **INFO**: BANANA SHORT stuck in DECIDER-LOOP — same conf=54.06 hotset=YES volume-breakout-short- re-evaluated every ~60s 06:26–06:46 with BTC-CRASH-OVERRIDE allowing despite crash filter. No fill, no dismissal progress. Worth signal-lab look (stale hotset entry?).
 - **OK**: Pipeline clean — 192 rc=0 cycles/30min, LIVE done 06:46:49 rc=0, 0 Tracebacks/CRASH, position_manager rc=0. Critical timers 3/3 active (price-collector 06:46:22, 1m-candle 06:46:32, pipeline 06:47:00). hl-sync-guardian active. Prices fresh: candles_1m age 20s, 89 tokens/10m, token_speeds updated 06:47:36. Speed 128/241 (53%) ≥50th pct. Regime SHORT_BIAS (3L/90S/31N, 124 tokens, 06:45). Trades: 0 open, 1 closed today in signal_outcomes; pipeline portfolio log 10 closed today +31.28%. 0 phantom trades. candles.db held by 3 python procs — normal concurrent access, no lock errors.
 - **INFO**: `hermes-atr-sl-updater.timer` not-found (defunct rename, expected). `hermes-health-monitor.timer` active (this monitor). Grep "error|fail" hits were false positives ("0 errors" coin_tracker lines).
+
+## Error Alerts — 2026-10-08 08:50 UTC (health_monitor)
+- **WARN** (recurring): Disk at 85% (95G/118G, 18G free). Auto-fix this run: pip cache purged (720 files), uv cache cleaned (1.5GiB, 51081 files), logs >7d gzipped. Disk 86%→85%. DB hogs unchanged: coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.7G, session_brain 1.1G, signals_hermes 960M. Log cleanup exhausted — needs DB retention plan (CEO).
+- **WARN** (recurring): Hotset empty / execution dry — 105 signals in `signals` last hour (conf up to 88: BANANA pump-chain SHORT, WLD ichimoku_short, ADA support_resistance LONG) but pipeline logs "No signals above 50% confidence — skipping execution." Known compactor/top-10 admission issue from prior audits; not auto-fixed.
+- **WARN** (new): Rapid-fire duplicate signals — CAKE hmacd_mtf 9x (07:55–08:43), USUAL support_resistance 7x (08:01–08:44), MNT hmacd_mtf 6x, CRV pump-chain 4x in last hour. Same signal_type re-firing on same token without dismissal/cooldown. Worth signal-lab look.
+- **WARN** (recurring): `hermes-better-coder.service` FAILED — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. `/root/.hermes/mcp/hermes-coding-mcp/dispatcher/` still empty. Not auto-fixed — module source unknown.
+- **WARN** (info): 8 non-critical agent services in failed state (better-coder, brain-auditor, bug-hunter, ceo, git-release, trading-checklist, upgrade-implementer, wasp). WASP exits 1 BY DESIGN when it finds warnings — not a crash; its output confirms hotset empty + runtime DB 66MB>50MB + rapid-fire duplicates. Core trading path unaffected.
+- **OK**: Pipeline clean — LIVE done 08:46:38 rc=0, 0 Tracebacks/CRASH, position_manager rc=0. Critical timers 3/3 active (price-collector, 1m-candle, pipeline). hl-sync-guardian active. Prices fresh: prices.json updated 08:47:05 (~seconds old), 88 tokens. Speed 90/178 (50.6%) ≥50th pct. Regime SHORT_BIAS (7L/57S/62N, 126 tokens, scanner 08:45). Trades: 0 open; signal_outcomes 1 closed today (+0.94 USDT LONG 100% WR); pipeline portfolio log 8 closed today +34.31%. 0 phantom trades. candles.db held by price_collector PID — normal, no lock errors.
+- **INFO**: `decisions` table unused by current signal_compactor.py (deterministic, LLM-free) — dead code path, not a runtime issue.
+
+## Error Alerts — 2026-10-08 09:00 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING — BTC_LEVEL`
