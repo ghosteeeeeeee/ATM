@@ -2130,6 +2130,12 @@ def execute_trade(token, direction, price, confidence, source,
             finally:
                 _conn_zone_sz.close()
             if len(_atr_rows_zone) >= 15:
+                # FIX (2026-10-08, BUG-046): query returns DESC (newest first), but the
+                # TR loop pairs rows[i] (candle H/L) with rows[i-1][3] (previous close).
+                # Without reversing, rows[i] is the OLDER candle and rows[i-1] the NEWER
+                # close — inverting the TR pairing. Reverse to ASC first, matching the
+                # identical (already-correct) calc in position_manager.py ~2714.
+                _atr_rows_zone.reverse()
                 _trs_zone = []
                 for i in range(1, len(_atr_rows_zone)):
                     _h, _l, _pc = _atr_rows_zone[i][1], _atr_rows_zone[i][2], _atr_rows_zone[i-1][3]
@@ -2270,7 +2276,14 @@ def execute_trade(token, direction, price, confidence, source,
     try:
         log(f'  [brain.py] EXEC: {" ".join(cmd[:8])}... [{paper_flag}]')
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
-        log(f'  [brain.py] RC={result.returncode} stdout={result.stdout[:200] if result.stdout else "(empty)"}')
+        # FIX (2026-10-08, BUG-047): log the TAIL of stdout, not the head. brain.py's
+        # INSERT-failure path prints its full traceback to STDOUT then sys.exit(1)
+        # (stderr only carries earlier [LOCK-WAIT] info). The old stdout[:200] cut off
+        # exactly those diagnostics — 2 real trade-add failures today (CC LONG) had
+        # zero visible reason. Mirror of the stderr-tail fix (BUG-025).
+        _out = (result.stdout or '').strip()
+        _out_tail = '\n'.join(_out.splitlines()[-6:]) if _out else '(empty)'
+        log(f'  [brain.py] RC={result.returncode} stdout_tail={_out_tail[-600:]}')
         if result.returncode == 0:
             import re
             # Bug-14 fix: use regex instead of fragile substring split.
