@@ -4373,3 +4373,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-08 05:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 12T 2W +$0.30 WR 16.7% | pump-chain- 6T 0W -$0.38 (7d 21T 7W +$0.17 not kill-eligible) | pump-chain+ 5T 2W +$0.74 (7d 15T 9W +$1.83) | v5 1T 0W (7d 8T 2W not kill-eligible) | atr_sl_hit 0/12=0% (tpsl stable) | hard_max_loss 8T=66.7% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active, live_trading=true, signals gated correctly
 BY: auto_1hr
+[2026-10-08 06:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 10T 2W +$0.30 WR 20.0% | pump-chain- 5T 0W -$0.35 (7d +$0.17 not kill-eligible) | pump-chain+ 4T 2W +$0.81 (7d 15T 9W +$1.83) | v5 1T 0W | atr_sl_hit 0/10=0% (tpsl stable) | hard_max_loss 6T=60% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active, live_trading=true
+BY: auto_1hr
+BY: auto_1hr
+[2026-10-08 07:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 10T 2W +$0.40 WR 20.0% | 7d 200T +$1.17 | pump-chain- 5T 0W -$0.35 (7d +$0.17 not kill-eligible) | pump-chain+ 4T 2W +$0.81 (7d 15T 9W +$1.83) | v5 1T 0W (7d not kill-eligible) | atr_sl_hit 0/10=0% (tpsl stable) | hard_max_loss 6T=60% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active, live_trading=true, D3 HML_TRAIL_MIN_GAP_PCT=0.20 deployed
