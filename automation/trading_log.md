@@ -6379,3 +6379,38 @@ BY: auto_1hr
 - GRASS open LONG — first trade in ~13h; regime was SHORT_BIAS, long took anyway via pump-chain combo
 
 BY: auto_1hr
+
+## [2026-10-08 15:14 UTC] Hourly Analysis
+
+**Trades:** 4 closed last hour (0 wins, 4 losses) | 0 open
+**PnL:** −$0.48 (WR 0%)
+**24h:** 9T 3W +$0.18
+**Exits 24h:** hard_max_loss 5T −$0.59 | atr_trail_hit 1T +$0.94 | pump_exit_dead_money 1T +$0.07 | pump_exit_momentum 1T −$0.09 | stale_exit 1T −$0.15 | atr_sl_hit 0T
+**By signal 24h:** pump-chain+ 4T 2W +$0.84 | combo +,v5 2T 0W −$0.22 | pump-chain-v5 2T 0W −$0.21 | pump-chain- 1T 0W −$0.23
+**Last hour:** IOTA +,v5 LONG hard_max_loss −$0.35%acct | FOGO pump-chain+ LONG hard_max_loss −$0.31%acct | BLUR v5 LONG stale_exit −$3.15%acct $22.10 | GRASS +,v5 LONG pump_exit_momentum −$0.09 (MFE was +1.13% — gave back profit)
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: Mixed. GRASS MFE 1.13% / FOGO MFE 0.74% — entries fine, exits gave back gains. IOTA MFE 0.08% / MAE 0.83% — pure bad entry. BLUR MFE 0.24% — dead money.
+2. SL behavior: atr_sl_hit 0/9=0% — tpsl fix stable. hard_max_loss 5/9=55.6% — inside hold-until-Oct-9/10 window per brain_auditor; HML_VOL_ATR_MULT + TRAIL_MIN_GAP deployed this morning, do not touch.
+3. Signal quality: No signal has 3+ solo trades at 0% WR last hour. pump-chain+ appeared in 3 losses via combos but 7d 16T 9W +$1.72 — strongest signal, not kill-eligible. v5 solo 1T. No kill.
+4. Trade frequency: 4/hr — healthy. Cluster of 4 LONGs 14:05–14:43 all lost (regime was SHORT_BIAS — note, not a change: philosophy says follow the tape not regime).
+
+**No Change Needed:**
+- Kill trigger: no eligible signal (pump-chain+ 7d +$1.72 protects it)
+- hard_max_loss 55.6%: hold per brain_auditor until Oct 9/10 eval
+- NEG-STREAK: 13h −$0.23, 15h −$0.48, 14h gap no closes — not 3 consecutive
+- Overtrade: 4/hr
+- Open: 0
+- Pipeline timers fresh, live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- All 4 last-hour trades were LONGs during SHORT_BIAS regime — pump-chain+ LONG filter timing worth a look AFTER Oct 9/10 eval (not now, max 1 change/hr and HML review pending)
+- GRASS +$1.13% MFE → −$0.09 close via pump_exit_momentum: exit gave back all profit; belongs in HML/trail review queue
+- BLUR sized $22.10 (double normal $11.10) on a stale_exit loser — position sizing asymmetry worth flagging to brain_auditor
+- 24h net dropped +$0.66 → +$0.18; still positive, watch tomorrow
+
+BY: auto_1hr

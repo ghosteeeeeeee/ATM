@@ -718,7 +718,7 @@
       "related_bugs": []
     },
     {
-      "id": "BUG-030",
+      "id": "BUG-039",
       "title": "pump-exit momentum exit reads the WRONG end of the candle window \u2014 counts oldest candles, not newest",
       "severity": "CRITICAL",
       "status": "FIXED",
@@ -733,7 +733,9 @@
       "date_fixed": "2026-10-08",
       "found_by": "bug-hunter session 1 (2026-10-08)",
       "git_commit": null,
-      "related_bugs": []
+      "related_bugs": [
+        "NOTE: ID collision \u2014 parallel bug-hunter round-2 held BUG-030 (tpsl_utils trailing inversion); this momentum bug renumbered to BUG-039"
+      ]
     }
   ],
   "schema": {
