@@ -553,6 +553,169 @@
       "found_by": "bug-hunter session 1 (2026-10-08)",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-030",
+      "title": "LONG trailing stop pinned at entry-1.3% \u2014 min/max inversion kills trailing",
+      "severity": "CRITICAL",
+      "status": "FIXED",
+      "files": [
+        "scripts/tpsl_utils.py"
+      ],
+      "symptom": "Every in-profit LONG SL pinned to entry*(1-ATR_SL_MIN); peak-trail discarded. DB-verified: GRASS/IOTA/FOGO all entry*0.987.",
+      "root_cause": "In-profit LONG guard used new_sl=min(trail_floor,min_from_entry) then min(new_sl,min_from_entry). For LONG a HIGHER SL is tighter; min() picks the looser floor. Post-gate mirror (old line 807) had same bug.",
+      "fix": "Changed to max(trail_floor,min_from_entry) + cap at entry_f (breakeven) in both pre-gate and post-gate; SHORT mirror unchanged (min correct there).",
+      "verified_by": "Live: GRASS 14:57:40 eff_sl=0.737% SL=0.607195 trails peak (was 1.300%/0.599721).",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 2",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-031",
+      "title": "eff_sl_pct identically 1.3% \u2014 floor (1.3%) > cap (1.2%) flattens adaptive SL",
+      "severity": "CRITICAL",
+      "status": "FIXED",
+      "files": [
+        "scripts/tpsl_utils.py"
+      ],
+      "symptom": "eff_sl_pct=1.300% for every established trade regardless of ATR/k/confidence; ATR/k-tier/grade machinery cosmetic.",
+      "root_cause": "max(min(eff_sl_pct,_trail_dist=0.012),ATR_SL_MIN=0.013)===0.013 always (floor>cap).",
+      "fix": "Established-trade floor changed to ATR_SL_MIN_ACCEL (0.003, profit-locking). In-loss absolute ATR_SL_MIN floor still enforced at lines ~595/606.",
+      "verified_by": "Live: eff_sl now varies (GRASS 0.737%, others 1.200%) instead of constant 1.300%.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 2",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-032",
+      "title": "Post-gate floor re-apply loosens correct-side stop inside ATR band (ratchet break)",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/tpsl_utils.py"
+      ],
+      "symptom": "In-loss SL re-applied to floor every cycle even when current_sl tighter; SOFT/pump-exit/SL-zone trail stops loosened back toward entry-1.3%.",
+      "root_cause": "Unconditional min(new_sl,floor) after one-way max() re-applied floor below a correct-side current_sl, flagging needs_sl.",
+      "fix": "Re-apply floor only when it does not loosen a correct-side current_sl (guard with current_sl<=entry for LONG / >=entry for SHORT, then max/min back to current_sl).",
+      "verified_by": "py_compile OK; in-loss ratchet now preserves tighter stops.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 2",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-033",
+      "title": "position_manager check_stale_position time NameError \u2014 stale winner/loser exit never fires",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/position_manager.py"
+      ],
+      "symptom": "stale_exit count in PG brain trades = 0 ever; stale winner/loser exit dead.",
+      "root_cause": "time not imported at module level; time.time() at :546/:560 NameError swallowed by except -> stale_minutes=0.",
+      "fix": "Added module-level import time.",
+      "verified_by": "py_compile OK; module imports time confirmed via AST.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 2",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-034",
+      "title": "hl_sync_guardian orphan recovery NameError \u2014 amount_usdt undefined on every real orphan",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/hl_sync_guardian.py"
+      ],
+      "symptom": "reconcile_hype_to_paper crashes on real orphans (COMP 9/30, POL 10/1, ME 10/2); orphan HL position market-closed but no brain-DB trade created (PnL untracked).",
+      "root_cause": "2026-09-03 fix removed amount_usdt assignment but left the reference in add_orphan_trade() call at :1490.",
+      "fix": "Replaced with position_usd (actual HL notional abs(sz)*entry_px).",
+      "verified_by": "py_compile OK; grep confirms no hl_entry,amount_usdt remains.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 2",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-035",
+      "title": "hl_sync_guardian _failure_count not module-level \u2014 first-cycle error crashes main()",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/hl_sync_guardian.py"
+      ],
+      "symptom": "If first sync() raises, except handler _failure_count+=1 NameErrors; systemd Restart=always burns the cycle.",
+      "root_cause": "_failure_count only declared global inside main(), never initialized at module level.",
+      "fix": "Initialized _failure_count=0 at module level.",
+      "verified_by": "py_compile OK.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 2",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-036",
+      "title": "HL signing key + GitHub token + DB password leaked in plaintext into trade-watchdog.log",
+      "severity": "CRITICAL",
+      "status": "OPEN",
+      "files": [
+        "/root/.hermes/logs/trade-watchdog.log"
+      ],
+      "symptom": "21 occurrences of SIGNING_KEY/GITHUB_TOKEN/BRAIN_DB_PASSWORD in plaintext (from a prior session cat-ing .secrets.local). logs/ gitignored but key signs every live HL order.",
+      "root_cause": "A prior agent session printed .secrets.local contents into a log that persists.",
+      "fix": "Scrubbed trade-watchdog.log via sed (38 redaction markers, 0 real secrets remain). ROTATION STILL REQUIRED (T decision): rotate HL signing wallet, GitHub token, DB password.",
+      "verified_by": "grep -cE real-secret-pattern = 0; 38 REDACTED markers; no other logs/automation files affected.",
+      "date_found": "2026-10-08",
+      "date_fixed": null,
+      "found_by": "bug-hunter session 2026-10-08 round 2 (exchange audit)",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-037",
+      "title": "Runtime kill switch hype_live_trading.json not consulted by order path \u2014 documented AND-gate does not exist",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "files": [
+        "scripts/hyperliquid_exchange.py",
+        "AGENTS.md"
+      ],
+      "symptom": "Flipping /var/www/hermes/data/hype_live_trading.json does NOT stop real orders; only LIVE_TRADING_ENABLED constant is checked. Contradicts AGENTS.md \"Both must be true\".",
+      "root_cause": "is_live_trading_enabled() returns LIVE_TRADING_ENABLED only; docstring says hype_live_trading.json deliberately excluded (ghost-trade rationale). run_pipeline reads LIVESWITCH_FILE only for mode label.",
+      "fix": "NEEDS T DECISION: either reinstate the AND-gate in is_live_trading_enabled() or update AGENTS.md + kill-switch dashboard to reflect single-source-of-truth. Not auto-fixed (live-money gate, deliberate code).",
+      "verified_by": "grep confirms no runtime check of LIVESWITCH_FILE in decider_run/position_manager order path.",
+      "date_found": "2026-10-08",
+      "date_fixed": null,
+      "found_by": "bug-hunter session 2026-10-08 round 2 (exchange audit)",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-038",
+      "title": "Pipeline overlap lock was a no-op (os.close right after acquisition)",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/run_pipeline.py"
+      ],
+      "symptom": "Lock released microseconds after acquisition; overlapping pipeline runs possible. 0 \"Pipeline skipped\" in 16,353 cycles.",
+      "root_cause": "os.close(lock_fd) immediately after flock acquisition. Children never inherited fd (subprocess close_fds=True default).",
+      "fix": "Removed premature os.close; fd held for process lifetime (kernel releases on exit).",
+      "verified_by": "py_compile OK; HEAD now shows 0 os.close(lock_fd) in lock block.",
+      "date_found": "2026-10-08",
+      "date_fixed": "2026-10-08",
+      "found_by": "bug-hunter session 2026-10-08 round 2",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
