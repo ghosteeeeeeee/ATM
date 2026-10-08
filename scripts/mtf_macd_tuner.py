@@ -951,7 +951,8 @@ def run_full_sweep(tokens=None, window_days=WINDOW_DAYS, parallel=True, workers=
                     _save_candles_to_file(path, formatted)
 
             warmup = 65 + 28 + 5  # slow + signal + buffer
-            if len(closes_15m) < warmup + 1 or len(closes_1h) < warmup + 1 or len(closes_4h) < 10:
+            # PrecomputedMACD(12,55,15) needs n > (slow-1)+sig = 69, i.e. >= 70 candles
+            if len(closes_15m) < warmup + 1 or len(closes_1h) < warmup + 1 or len(closes_4h) < 70:
                 print(f'  [WARN] {token}: not enough candles after warmup')
                 conn.commit()
                 continue

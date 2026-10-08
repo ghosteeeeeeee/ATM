@@ -225,3 +225,29 @@
 - **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: usage: brain.py trade add [-h] [--exchange EXCHANGE] [--strategy STRATEGY]`
 - **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-08 15:50 UTC (health_monitor)
+- **OK**: Core trading path healthy. Pipeline LIVE done 15:46:41 rc=0, 0 real Tracebacks (6 "CRASH" grep hits were BTC-CRASH momentum blocks, not crashes). Critical timers 3/3 active (price-collector, 1m-candle, pipeline). hl-sync-guardian active. Prices fresh: candles_1m age 0.3min, 128 tokens/10min. Speed 128/241 (53%) ≥50th pct. Regime SHORT_BIAS (1L/120S/5N, 126 tokens, 15:45). Trades: 0 open, 6 closed today in signal_outcomes (+0.23 USDT, 1 win); pipeline portfolio log 9 closed +23.21%. 137 signals/1h. candles.db held by 3 python procs — normal concurrent access, no lock errors.
+- **WARN** (recurring): Disk 85% (95G/118G). This run: journal vacuumed (freed 178MB), pip/uv caches empty. Still 85% — DB hogs unchanged (coin_tracker 3.4G, candles 2.6G, mtf_macd_tuner 1.8G, session_brain 1.1G, signals_hermes 1G). Log/cache cleanup exhausted — needs DB retention plan (CEO decision).
+- **WARN** (recurring): Hotset empty / execution dry — 137 signals/1h (conf up to 88: ME/TURBO/KAS SHORT, ME/KAS LONG) but pipeline logs "No signals above 50% confidence — skipping execution." Known compactor/top-10 admission issue; not auto-fixed.
+- **WARN** (recurring): `hermes-better-coder.service` FAILED — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. `/root/.hermes/mcp/hermes-coding-mcp/dispatcher/` still empty. Not auto-fixed — module source unknown.
+- **WARN**: `hermes-trading-checklist.service` exits 1 by design on WARNINGS — flagging 28,363 stale signals in `signals` table (28,090 older than 2h; signal_history only 240). signal-purge purges executed signals only; unexecuted stale rows accumulate. Suggest purge extend to unexecuted >2h.
+- **WARN**: `hermes-brain-auditor.service` / `hermes-upgrade-implementer.service` exit 124 (timeout). Non-critical agents. `hermes-bug-hunter.service` exits 1 by design (findings: dead signal_gen imports in zscore_momentum.py, trend_purity_signals.py, candle_predictor.py + inline DB passwords).
+- **INFO**: `hermes-mtf-macd-tuner.service` currently mid-sweep (activating) — earlier "failed" was prior run completing; not stuck. `hermes-atr-sl-updater.timer` not-found (defunct rename, expected).
+
+## Error Alerts — 2026-10-08 16:00 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: 1s, retrying`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-08 16:50 UTC
+- **WARN** (1x): Disk `/` at 85% (95G/118G, 18G free). Top consumers: `coin_tracker.db` 3.3G, `candles.db` 2.6G, `mtf_macd_tuner.db` 1.8G, `session_brain.db` 1.1G, logs 329M. Logs actively written by services — no safe compression possible. No auto-fix applied; needs retention/pruning strategy for DBs.
+
+## Error Alerts — 2026-10-08 17:55 UTC (health_monitor)
+- **OK**: Core path healthy. Pipeline last done 17:46:51 rc=0, 0 open / 9 closed today (+23.21% PnL). Timers 3/3 active (price-collector, 1m-candle, pipeline) all firing on schedule. No real Tracebacks — BTC-CRASH lines are intentional momentum blocks. Signals: 110/1h. Prices fresh: 87 tokens, 75s old. Speed 126/241 (52%) ≥50th pct. Regime SHORT_BIAS (5L/107S/12N, 124 tokens, 17:45).
+- **AUTO-FIX**: `mtf_macd_tuner.py` IndexError — 4h warmup guard was `< 10` but `PrecomputedMACD(12,55,15)` requires ≥70 candles (first_sig=69). Changed guard to `< 70`. Compile OK. Next daily sweep will skip short-4h tokens cleanly instead of crashing mid-sweep.
+- **AUTO-FIX**: Journal vacuumed, freed 89.6M. Disk still 85% (95G/118G) — DB hogs unchanged (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.8G, session_brain 1.1G, signals_hermes 963M). Recurring WARN — needs DB retention plan (CEO decision).
+- **WARN** (recurring): `hermes-better-coder.service` FAILED every 30min — `ModuleNotFoundError: dispatcher.dispatcher`. `/root/.hermes/mcp/hermes-coding-mcp/dispatcher/` is an empty dir (no `dispatcher.py`). Module source unknown — not auto-fixed.
+- **WARN**: `hermes-trading-checklist.service` exits 1 by design — flags 28,540 stale rows in `signals` (0 approved, 16 pending). signal-purge only purges executed signals; unexecuted accumulate. Suggest extend purge to unexecuted >2h.
+- **WARN**: `hermes-bug-hunter.service` exits 1 by design — 9 findings (dead signal_gen imports in zscore_momentum.py/trend_purity_signals.py/candle_predictor.py, bare excepts, sqlite leaks, hardcoded passwords). Known, not new.
+- **WARN**: `hermes-upgrade-implementer.service` failed — pipes prompt into opencode; no journal output captured. Non-critical agent.
+- **INFO**: `candles.db` held by 3 python procs (price-collector, 1m-candle, pipeline) — normal concurrent WAL access, no lock errors. `price_history.db` is 0 bytes/empty (unused legacy; live prices via `prices.json`).
