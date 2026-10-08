@@ -5886,3 +5886,43 @@ BY: auto_1hr
 - pump-chain-v5 7d negative per prior logs despite CEO re-enable — monitor only
 
 BY: auto_1hr
+
+## [2026-10-08 02:15] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.94 (WR: 100%)
+
+**Open:** 0
+
+**24h:** 12 closed | 2W 10L | +$0.30 (WR 16.7%)
+**24h by close reason:** hard_max_loss 8T -$0.61 (66.7%) | atr_trail_hit 2T +$0.94 | hard_sl 1T -$0.10 | pump_exit_dead_money 1T +$0.07
+**24h by signal:** pump-chain- 6T 0W -$0.38 | pump-chain-v5 1T 0W -$0.06 | pump-chain+ 5T 2W +$0.74
+**atr_sl_hit:** 0/12 = 0% — tpsl_utils.py fix stable
+**Hourly PnL 6h:** 21:00 +$0.01 (2T) | 01:00 +$0.94 (1T)
+**Pipeline:** active | position-manager oneshot (inactive between runs = normal)
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: CRV winner MAE 0.014% / MFE 9.86% — textbook. GRASS 2-second atr_trail_hit +$0.00 with MFE 7.03% is a bookkeeping anomaly (open→close in 2s), not a signal issue.
+2. SL behavior: atr_sl_hit 0% — NOT dominant. hard_max_loss 8/12=66.7% still the live watch (queue#2 leverage-aware SL review).
+3. Signal quality: No 0%-WR with 3+T in last hour (pump-chain- closed 0T this hour). pump-chain- 6T 0W -$0.38 last24h BUT 25T 9W +$0.05 over 7d — not kill-eligible, monitor. pump-chain+ 5T 2W +$0.74 last24h / 15T 9W +$1.83 7d — CEO re-enable working.
+4. Trade frequency: 1/hr last hour — fine.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal can hit 3T-0%WR
+- pump-chain-: 0%WR 24h but 7d positive — below kill bar, monitor
+- atr_sl_hit: 0% — fix deployed, stable
+- hard_max_loss: 66.7% queue#2 remains open; no forced change this hour
+- NEG-STREAK: inactive — +$0.01 then +$0.94
+- Overtrade: 1/hr — fine
+- Open: 0 positions — nothing to manage
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- pump-chain- 24h 0W -$0.38 vs 7d +$0.05 — is it degrading or variance? Monitor next few hours
+- hard_max_loss 66.7% queue#2 leverage-aware SL review — still the #1 systemic watch item
+- GRASS 2-second trade with MFE 7% — data quality anomaly worth a look outside this hour's mandate
+
+BY: auto_1hr
