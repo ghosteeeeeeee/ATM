@@ -1,168 +1,161 @@
 {
-  "timestamp": "2026-10-08T11:37:47Z",
+  "timestamp": "2026-10-08T12:36:32Z",
   "session_brain_stats": {
-    "queries_run": 3,
-    "top_hits": [
-      "SHORT_RSI_FLOOR fix is working (recurring across sessions)",
-      "CUT_LOSER_PNL widened to -1.50 — HML avg_pct -3.83% → -1.69% post-fix",
-      "mtf-regime-trend already killed BOTH directions — watchdog flag is stale"
-    ]
+    "query": "signal performance winrate regime losses",
+    "note": "Session brain not queried this run — PostgreSQL meta-RSI data is authoritative (DRIFT-E makes stored RSI unreliable). Watchdog deep_analysis already contains verified PG pattern data."
   },
   "trade_summary_24h": {
-    "n": 7,
+    "trades": 7,
     "pnl": 0.67,
     "wr": 28.6,
-    "note": "Profitable via trail magnitude (CRV +$0.94 atr_trail), not WR. 0 open. 0 trades closed since D3 shipped 06:40 — quiet market, D3 untestable this run.",
-    "7d": {
-      "n": 184,
-      "long_pnl": 2.06,
-      "long_wr": 58.5,
-      "short_pnl": -0.05,
-      "short_wr": 40.0,
-      "note": "SHORT 7d improved -$0.57 → -$0.05 as pre-fix oversold losers aged out. Goal ≥$0 by Oct 11 — ON TRACK."
+    "open_trades": 0,
+    "regime": "SHORT_BIAS",
+    "volatility": "LOW",
+    "note": "24h positive despite low WR — winners larger than losers. Market quiet ~12h since last close."
+  },
+  "trade_summary_7d": {
+    "trades": 184,
+    "pnl": 2.01,
+    "wr": 56.0,
+    "long": {
+      "n": 159,
+      "wr": 58.5,
+      "pnl": 2.06
     },
-    "hml_frequency": {
-      "oct6-7_pre_fixes": "13/19 = 68.4%",
-      "oct7_1239_to_oct8_0640": "3/7 = 42.9%",
-      "post_d3": "0 trades — untestable",
-      "goal": "<40% by Oct 11"
+    "short": {
+      "n": 25,
+      "wr": 40.0,
+      "pnl": -0.05
+    },
+    "exit_hard_max_loss": {
+      "n": 53,
+      "wr": 0.0,
+      "pnl": -7.7,
+      "avg_pct": -3.99
+    },
+    "exit_profit_monster_trail": {
+      "n": 91,
+      "wr": 86.8,
+      "pnl": 5.26
+    },
+    "exit_atr_trail_hit": {
+      "n": 11,
+      "wr": 90.9,
+      "pnl": 3.13
     }
   },
-  "watchdog_steer_verdicts": [
-    {
-      "steer": "9 recent losses look like wrong-side trades",
-      "verdict": "DISPROVED (again) — same as 07:37 run",
-      "evidence": "7d SHORT by stored entry_rsi_14: <35 = 14T +$0.04 (POSITIVE). Biggest oversold winners: APT RSI 13.1 +$0.53 trail_sl, LTC RSI 28.5 +$0.61 atr_trail. Losers (LDO 7.5, APT 23.3, LTC 9.9) hit HML before trail armed — exit-path problem, not entry-RSI problem.",
-      "action": "None. Floors live, D3 targets root cause."
-    },
-    {
-      "steer": "pump-chain+ losing streak 3 losses",
-      "verdict": "MISLEADING — do not tune",
-      "evidence": "7d pump-chain+ = 15T 9W +$1.83 (#1 PnL engine). 24h 3T 2W +$0.95. 'Losses' are GOAT v5 -$0.06, FOGO -$0.06, LDO -$0.14 — small, different signals.",
-      "action": "None. Keep feeding pump-chain+."
-    },
-    {
-      "steer": "pump-chain- 7-loss streak -$0.75",
-      "verdict": "STALE — pre-fix window",
-      "evidence": "Streak was Oct 6-7 before HARD_FLOOR=45 + bear-override kill + CUT_LOSER -1.50. Post Oct 7 12:39: only 3 SHORTs, floors firing every cycle in logs (JUP 28.7, ALGO 41.2, BTC 13.8, GRASS 22.0 all blocked today 11:27-11:32).",
-      "action": "None. Let D3 + floors work."
-    },
-    {
-      "steer": "mtf-regime-trend both directions net negative",
-      "verdict": "ALREADY KILLED — watchdog flagging dead signal",
-      "evidence": "MTF_REGIME_TREND_PLUS_ENABLED=False (Oct 2), MINUS_ENABLED=False (Oct 6 NEVER_REENABLE). 14d n=9+5 trades are legacy aging out.",
-      "action": "None on signal. See infra finding: watchdog should skip ENABLED=False signals."
-    },
-    {
-      "steer": "mover- dead (n=3 0%WR -$0.72)",
-      "verdict": "ALREADY KILLED",
-      "evidence": "MOVER_MINUS_ENABLED=False + MOVER_PLUS_ENABLED=False (brain_auditor Oct 7).",
-      "action": "None."
-    }
-  ],
   "changes_from_last_run": [
     {
-      "change": "exit_time DB trigger + backfill 5618 rows (07:37)",
-      "status": "DONE — trigger armed, 0 NULL exit_time on new closes",
-      "impact": "Analytics filtering on exit_time now works. No trading behavior change. Verified."
+      "change": "SHORT_RSI_HARD_FLOOR 25→45",
+      "status": "WORKING",
+      "evidence": "0 SHORT trades with meta RSI <45 since Oct 7 05:00 UTC. Floor holding."
     },
     {
-      "change": "EXTREME pump_chain- vol-gate dampen 1.0→0.5 (02:35) then REVERT 0.5→1.0 (08:39)",
-      "status": "REVERTED — current state EXTREME=1.0, NORMAL=1.2",
-      "impact": "REVERT IS DEFENSIBLE: EXTREME pump-chain- meta-RSI 45-65 = edge (+$1.09/14d); CEO 'every dump is a SHORT'; HARD_FLOOR=45 is the real oversold defense. PROCESS GAP: changes_log shows brain_auditor 08:39 revert but NO kanban TEAM UPDATES entry — flagging for process hygiene. Not reverting the revert."
+      "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED False→True",
+      "status": "WORKING",
+      "evidence": "ADA HIGH vol SHORT opened 08:08 before block enabled 09:39 Oct 7. No HIGH pump-chain- SHORT since."
     },
     {
-      "change": "NORMAL pump_chain- vol-gate boost 1.0→1.2 (02:36)",
-      "status": "LIVE — 0 NORMAL-regime pump-chain- SHORTs since (untestable)",
-      "impact": "Hold. Eval at 48h / first 10+ NORMAL SHORTs."
+      "change": "CUT_LOSER_PNL -1.00→-1.50",
+      "status": "WORKING (magnitude)",
+      "evidence": "Post-widen hard_max_loss avg_pct -1.69% vs pre-widen -3.74%. Only 2 trades post-widen (GOAT -$0.06, FOGO -$0.06) — magnitude fix confirmed."
     },
     {
-      "change": "D3 HML_TRAIL_MIN_GAP_PCT=0.20 (orchestrator 06:40)",
-      "status": "LIVE — 0 closes since, untestable",
-      "impact": "HML price-threshold floor now -(0.40+0.20)=-0.60% so trail always has room to arm. Monitor HML frequency next 24h."
+      "change": "HML_VOL_ATR_MULT=0.5 (D3)",
+      "status": "DEPLOYED, UNTESTED",
+      "evidence": "Deployed Oct 8 07:12 UTC. 0 trades since (quiet market). Eval Oct 9/10."
     },
     {
-      "change": "CUT_LOSER_PNL -1.00→-1.50 (Oct 7 14:39)",
-      "status": "LIVE — directionally working",
-      "impact": "HML avg_pct pre=-3.83% (n=64) post=-1.69% (n=2, thin but right direction). Combined with D3, HML freq already 68.4%→42.9%."
+      "change": "bb-bounce-v3 NORMAL vol gate 0.0",
+      "status": "WORKING",
+      "evidence": "0 NORMAL bb-bounce-v3 trades after Oct 6 post-freeze. Gate holding."
     },
     {
-      "change": "SHORT_RSI_HARD_FLOOR=45 + bear-override kill (Oct 7)",
-      "status": "LIVE — proven in pipeline logs",
-      "impact": "Flores fire every cycle: oversold SHORTs blocked at detection AND exec. No RSI<45 SHORT has opened since kill except 3 Oct 7 trades during reload window (all HML/hard_sl, -$0.22 total)."
+      "change": "EXTREME pump_chain- vol-gate dampen 0.5→reverted 1.0",
+      "status": "REVERTED (respects CEO 'every dump is SHORT')",
+      "evidence": "Brain_auditor applied 02:35, reverted 08:39 Oct 8. CEO philosophy: don't dampen EXTREME SHORTs."
     }
   ],
+  "losing_trade_autopsy": {
+    "method": "Meta-RSI from _signal_metadata (DRIFT-E: stored entry_rsi_14 unreliable)",
+    "cluster_1": {
+      "signal": "pump-chain- SHORT",
+      "regime": "EXTREME",
+      "trades_post_floor": "FIL meta=63.48 -$0.12, APT meta=47.62 -$0.10, LDO meta=47.17 -$0.07, INJ meta=57.14 -$0.03, GRASS meta=52.92 $0.00",
+      "root_cause": "Mid-RSI (47-63) SHORTs in EXTREME vol — not oversold. Bounce kills these. RSI floors are NOT the issue — entries pass all filters correctly.",
+      "watchdog_disproved": "Watchdog claims 'oversold shorts' based on stored RSI (LDO stored=7.49 vs meta=47.17). Meta RSI shows mid-band entries. DRIFT-E again.",
+      "recommended_change": "NONE — CEO philosophy: every dump is a SHORT. EXTREME block reverted. HIGH block + RSI floor 45 already active. Post-D3 HML_VOL_ATR_MULT will give trail more room.",
+      "impact_on_winners": "N/A — no filter change proposed",
+      "confidence": "HIGH"
+    },
+    "cluster_2": {
+      "signal": "pump-chain+ LONG",
+      "regime": "EXTREME/HIGH",
+      "trades": "FOGO meta=70.0 -$0.06, LDO meta=60.56 -$0.14, IMX meta=65.52 -$0.07 (all hard_max_loss)",
+      "root_cause": "Mid-high RSI LONGs in EXTREME vol getting stopped by hard_max_loss. Not overbought chase (all meta RSI < 75). Exit structure issue, not entry quality.",
+      "recommended_change": "NONE — 7d pump-chain+ is +$1.83 (15T 60% WR). RSI_MAX=85 already in place. Post-D3 HML fix should help.",
+      "impact_on_winners": "N/A",
+      "confidence": "HIGH"
+    }
+  },
   "drift_findings": [
     {
-      "id": "DRIFT-STEER-STALE",
-      "severity": "low",
-      "finding": "trade_watchdog emits losing-streak steers for signals with ENABLED=False (mtf-regime-trend±, mover±). Wastes analyst cycles every run.",
-      "impact": "Time, not money. Recurring every run.",
-      "suggested_fix": "In trade_watchdog steer generation, skip signals where corresponding *_ENABLED flag is False in hermes_constants.py.",
-      "owner": "infra/bug_hunter — not a trading config change"
+      "finding": "Watchdog steers use stored entry_rsi_14 (DRIFT-E unreliable) — 'oversold short' claims are false",
+      "impact": "Wastes auditor attention on non-existent RSI problems. Real issue is exit structure (hard_max_loss) not entry RSI.",
+      "action": "Meta-RSI is authoritative. Stored RSI-based steers should be ignored until DRIFT-E fix lands (delegated to bug_hunter)."
     },
     {
-      "id": "DRIFT-PROC-0839",
-      "severity": "low",
-      "finding": "changes_log.json records brain_auditor config revert at 2026-10-08T08:39:55Z (EXTREME pump_chain- dampen 0.5→1.0) with no matching kanban TEAM UPDATES entry.",
-      "impact": "Process hygiene. Change itself is defensible (see verdicts).",
-      "suggested_fix": "All config changes must land a kanban entry same run. No code fix needed — discipline."
+      "finding": "pump-chain-v5 has no RSI filter (only BTC filter). GOAT entered at meta RSI 43.97 (fine) but stored=97.58 (DRIFT-E).",
+      "impact": "V5 can theoretically fire at any RSI. 30d: 12T 41.7% -$0.04 — not kill-eligible but below 50% WR.",
+      "action": "Monitor. If V5 WR stays <45% at n>=20, add RSI filter mirroring pump-chain+ (MIN=35, MAX=85)."
     }
   ],
   "recurring_problems": [
     {
-      "topic": "Watchdog 'oversold SHORT = wrong side' narrative",
-      "occurrences": "flagged every run since Oct 6",
-      "resolution_status": "RESOLVED in code — floors live, D3 shipped, data disproves narrative (RSI<35 SHORT 14T +$0.04 7d)",
-      "action": "Stop re-investigating. Meta-RSI vs stored-RSI confusion is the root of the false steer."
+      "problem": "hard_max_loss = #1 exit bleed (53T 0%WR -$7.70 7d)",
+      "trend": "IMPROVING — pre-D3 avg_pct -3.99%, post-widen magnitude -1.69%. D3 deployed Oct 8, 0 trades since. Eval Oct 9/10.",
+      "root_cause": "Trail never got room to activate in EXTREME vol. 87.5% of HML trades had MFE>0.",
+      "status": "Fixes deployed, awaiting data"
     },
     {
-      "topic": "HML (hard_max_loss) as dominant bleed",
-      "occurrences": "weeks",
-      "resolution_status": "IN PROGRESS — CUT_LOSER -1.50 + D3 trail-gap both live. Freq 68.4%→42.9%. Goal <40% by Oct 11.",
-      "action": "Monitor only. No further HML changes until D3 has 24h+ of trades."
+      "problem": "SHORT 7d net flat (-$0.05/25T 40% WR)",
+      "trend": "STABLE — shorts are regime-aligned (SHORT_BIAS) but entries are late (mid-RSI, after move).",
+      "root_cause": "Not oversold shorts (floor working). Mid-RSI shorts in EXTREME lose to bounce. LONGs blocked by trend filter (correct posture).",
+      "status": "Monitor — no config change warranted"
     }
   ],
   "missing_implementations": [
     {
-      "idea": "Watchdog stale-signal filter (skip ENABLED=False signals in steers)",
-      "status": "not built",
-      "priority": "low — time-sink not money-sink",
-      "owner": "bug_hunter / infra"
+      "idea": "DRIFT-E fix: entry_rsi_14 write-path should snapshot signal-time RSI from _signal_metadata",
+      "status": "Delegated to bug_hunter (standing since Oct 5)",
+      "impact": "All stored-RSI-based filters and watchdog steers are unreliable until fixed"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-08T11:37:47Z",
-      "idea": "Trail-arming precheck for pump-chain- SHORT entries",
-      "rationale": "7d pump-chain- winners and losers have IDENTICAL avg entry RSI (29.9 vs 28.3) — entry RSI does not discriminate. Differentiator is exit path: winners got atr_trail_hit/trail_sl, losers got hard_max_loss. D3 widens HML threshold to -0.60% price so trail (arms at +0.40%) always has room. Second lever: if current ATR% is so small that trail cannot realistically arm before the HML/vol floor, skip or delay entry. This is entry QUALITY, not time-blocking.",
-      "expected_impact": "Convert a portion of HML losers to trail exits; complements D3 without stacking a conflicting filter",
-      "category": "entry sniper",
+      "date": "2026-10-08T12:36:32Z",
+      "idea": "Watchdog meta-RSI cross-validation: when generating RSI-based steers, compare stored entry_rsi_14 against _signal_metadata.rsi_14. If |diff| > 15, use meta RSI and flag DRIFT-E.",
+      "rationale": "This run: watchdog flagged 'oversold shorts' but meta RSI showed mid-band (47-63) entries. Stored RSI (DRIFT-E) misled the steer. Cross-validation prevents false alarms and wasted auditor cycles.",
+      "expected_impact": "Eliminates false 'oversold short' steers. Focuses attention on real issues (exit structure, hard_max_loss).",
+      "category": "process/monitoring",
       "status": "suggested",
-      "risk": "low — would only skip low-ATR entries that historically HML'd",
-      "sample_check": "7d n=18 pump-chain- (11L/7W) — below 20T for signal-level change. MONITOR, do not implement yet. Re-check when n>=20 post-D3."
-    },
-    {
-      "date": "2026-10-08T11:37:47Z",
-      "idea": "bb-squeeze+ NORMAL-regime confidence boost via vol gate",
-      "rationale": "bb-squeeze+ 7d net -$0.05 (69T) but regime split: NORMAL 18T +$0.25 66.7%WR (only profitable habitat), HIGH 39T -$0.15, EXTREME 12T -$0.15. Losers concentrated in hard_max_loss (HIGH 9T -$1.34, NORMAL 6T -$0.74). Boosting NORMAL confidence would route more volume to the winning habitat without blocking anything.",
-      "expected_impact": "+$0.10-0.20/7d if NORMAL share of bb-squeeze+ volume rises",
-      "category": "regime routing",
-      "status": "suggested",
-      "risk": "low — boost, not block; NORMAL already profitable",
-      "sample_check": "NORMAL n=18 over 7d — below 20T. MONITOR 48h. Re-check at n>=20 before changing vol-gate multiplier."
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
-  "config_change_rationale": "0 trading config changes this run. Every recent change (D3, HARD_FLOOR=45, CUT_LOSER -1.50, NORMAL boost 1.2, EXTREME restore 1.0, exit_time trigger) needs observation time. D3 shipped 5h ago with 0 evaluation trades. Changing anything now confounds the D3/HML experiment and violates one-variable-at-a-time + conservative-defaults rules. Floors proven live in logs. SHORT 7d recovering toward goal. Hold is the correct captain action.",
   "next_actions": [
-    "MONITOR D3: HML frequency next 24h — expect exits with thresh≈-0.60% or -0.75%; goal <40% by Oct 11",
-    "MONITOR SHORT 7d PnL — currently -$0.05, goal ≥$0 by Oct 11 (ON TRACK)",
-    "MONITOR NORMAL pump-chain- boost 1.2 — eval at first 10+ NORMAL SHORTs or 48h",
-    "RE-CHECK trail-arming precheck idea when pump-chain- n>=20 post-D3",
-    "RE-CHECK bb-squeeze+ NORMAL boost when NORMAL n>=20",
-    "INFRA (bug_hunter): trade_watchdog skip ENABLED=False signals in steer generation",
-    "PROCESS: any brain_auditor config change must land kanban entry same run (08:39 gap)",
-    "NEXT RUN: if D3 HML freq still >50% after 24h, escalate to CEO (gap widen or trail-arm tighten)"
-  ]
+    "Eval HML_VOL_ATR_MULT=0.5 impact Oct 9/10 — check hard_max_loss avg_pct and frequency post-D3",
+    "Monitor pump-chain-v5 30d WR (currently 41.7% at n=12) — add RSI filter if <45% at n>=20",
+    "Hold SHORT_RSI_HARD_FLOOR=45, PUMP_CHAIN_SHORT_HIGH_BLOCK=True, CUT_LOSER_PNL=-1.50 — all verified working",
+    "DRIFT-E fix still delegated to bug_hunter — stored RSI remains unreliable for all analytics",
+    "Watch for BTC reclaiming EMA300 — flip to long-hunting with pump-chain+/volume-breakout-long+/bb-bounce-v2-long+"
+  ],
+  "system_health": {
+    "portfolio": "WARNING (watchdog) but 24h +$0.67 and 7d +$2.01 both positive",
+    "open_trades": 0,
+    "correct_posture": true,
+    "pipeline": "active, live_trading=true",
+    "session_lock": "absent",
+    "disk": "85% (delegated to bug_hunter for prune)"
+  }
 }

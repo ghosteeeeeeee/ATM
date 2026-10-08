@@ -3603,5 +3603,15 @@
     "status": "suggested",
     "risk": "low — boost, not block; NORMAL already profitable",
     "sample_check": "NORMAL n=18 over 7d — below 20T. MONITOR 48h. Re-check at n>=20 before changing vol-gate multiplier."
+  },
+  {
+    "date": "2026-10-08T12:36:32Z",
+    "agent": "brain_auditor",
+    "idea": "Watchdog meta-RSI cross-validation for RSI-based steers",
+    "rationale": "DRIFT-E makes stored entry_rsi_14 unreliable. Watchdog flagged 'oversold shorts' but meta RSI showed mid-band entries (47-63). Cross-validation prevents false steers.",
+    "expected_impact": "Eliminates false oversold-short steers, focuses auditor on real issues (exit structure)",
+    "category": "process/monitoring",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
