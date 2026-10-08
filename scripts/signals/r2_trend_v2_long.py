@@ -233,13 +233,20 @@ def _get_closes_from_candles_1m(token, lookback=50):
         c = conn.cursor()
         c.execute("""
             SELECT close FROM (
-                SELECT close FROM candles_1m
+                SELECT ts, close FROM candles_1m
                 WHERE token = ? ORDER BY ts DESC LIMIT ?
             ) sub ORDER BY ts ASC
         """, (token.upper(), lookback))
         rows = c.fetchall()
         return [r[0] for r in rows] if rows else []
-    except Exception:
+    except Exception as e:
+        # AUDIT 2026-10-08: this subquery was missing `ts` in the inner SELECT, so the
+        # outer ORDER BY ts raised OperationalError on EVERY call. The bare except hid it,
+        # returning [] → line 305 fail-closed every token → signal was dead for 35 days
+        # (0 signals / 0 trades since 2026-09-03) while showing ENABLED=True in constants.
+        # Same bug was fixed in signal_schema.py (commit ea01ec1c) but never propagated here.
+        print(f'[r2_trend_v2_long] ❌ _get_closes_from_candles_1m({token}) FAILED: '
+              f'{type(e).__name__}: {e} — token skipped', flush=True)
         return []
     finally:
         if conn:

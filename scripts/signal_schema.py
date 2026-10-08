@@ -440,7 +440,13 @@ def _get_closes_from_candles_1m(token, lookback=50):
         """, (token.upper(), lookback))
         rows = c.fetchall()
         return [r[0] for r in rows] if rows else []
-    except Exception:
+    except Exception as e:
+        # AUDIT 2026-10-08: this bare except hid a 2-day rsi_14 blackout (2026-09-09
+        # → 2026-09-11) — a `_sqlite3` NameError returned [] silently, so _enrich_indicators
+        # skipped rsi_14 while all other fields populated. 3868/4925 trades lost rsi_14.
+        # Log loudly so the next failure is visible in pipeline.log instead of forensic git-bisect.
+        print(f'[signal_schema] ❌ _get_closes_from_candles_1m({token}) FAILED: '
+              f'{type(e).__name__}: {e} — rsi_14 will be omitted from signal_metadata', flush=True)
         return []
     finally:
         if conn:
