@@ -5999,3 +5999,41 @@ BY: auto_1hr
 - Market quiet (0T this hour) — under-trading vs over-filtering? Macro gate SHORT_BIAS may be suppressing LONGs correctly
 
 BY: auto_1hr
+
+## [2026-10-08 05:12] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a)
+**Open:** 0
+
+**24h:** 12 closed | 2W 10L | +$0.30 (WR 16.7%)
+**24h by close reason:** hard_max_loss 8T -$0.61 (66.7%) | atr_trail_hit 2T +$0.94 | hard_sl 1T -$0.10 | pump_exit_dead_money 1T +$0.07
+**24h by signal:** pump-chain- 6T 0W -$0.38 | pump-chain+ 5T 2W +$0.74 | pump-chain-v5 1T 0W -$0.06
+**7d by signal:** pump-chain+ 15T 9W +$1.83 | pump-chain- 21T 7W +$0.17 | pump-chain-v5 8T 2W -$0.34
+**atr_sl_hit:** 0/12 = 0% — tpsl_utils.py fix stable
+**Pipeline:** active | live_trading=true | recent pipeline log shows WLD SHORT confluence BLOCK (regime mismatch) — system correctly gating, no leak
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: 0T last hour — no evaluation possible.
+2. SL behavior: atr_sl_hit 0% — NOT dominant. hard_max_loss 8/12=66.7% remains the systemic watch (queue#2 leverage-aware SL review).
+3. Signal quality: No 0%-WR signal with 3+T in last hour (0T closed). pump-chain- 24h 0W -$0.38 but 21T 7W +$0.17 7d — not kill-eligible. pump-chain+ 15T 9W +$1.83 7d — healthy. v5 7d 8T 2W -$0.34 — not kill-eligible (wins exist).
+4. Trade frequency: 0/hr — fine.
+
+**No Change Needed:**
+- Kill: 0T last hour — no kill trigger (no 3T-0%WR)
+- atr_sl_hit: 0% — tpsl fix stable
+- hard_max_loss: 66.7% queue#2 remains open — watch item, not auto-fix
+- NEG-STREAK: inactive — last net hour was +$0.94 (02:00), then quiet
+- Overtrade: 0/hr
+- Open: 0 — nothing to manage
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 66.7% queue#2 leverage-aware SL review — still #1 systemic watch
+- Market quiet (0T this hour, several consecutive quiet hours) — under-trading vs over-filtering? Pipeline log shows signals firing but being gated (confluence BLOCK on WLD SHORT) — correct behavior under current regime
+- pump-chain- 24h 0W -$0.38 vs 7d +$0.17 — variance or degradation? Monitor, not kill-eligible
+
+BY: auto_1hr
