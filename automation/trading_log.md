@@ -6134,3 +6134,37 @@ BY: daily_orchestrator
 - Market quiet multi-hour — under-trading vs over-filtering? Pipeline gating correctly under current regime
 
 BY: auto_1hr
+
+## [2026-10-08 08:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**24h:** 10T 2W 8L +$0.40 (WR 20.0%)
+**Exits 24h:** hard_max_loss 6T −$0.51 (60%) | atr_trail_hit 2T +$0.94 | hard_sl 1T −$0.10 | pump_exit_dead_money 1T +$0.07
+**By signal 24h:** pump-chain- 5T 0W −$0.35 | pump-chain+ 4T 2W +$0.81 | pump-chain-v5 1T 0W −$0.06
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: 0T last hour — no evaluation possible. Prior winners low MAE (CRV MAE 0.01% / MFE 9.86%).
+2. SL behavior: atr_sl_hit 0/10=0% — NOT dominant. tpsl_utils fix stable. hard_max_loss 60% remains systemic watch (queue#2 leverage-aware SL).
+3. Signal quality: No 0%-WR signal with 3+T last hour. pump-chain- 24h 0W but 7d 21T 7W +$0.17 — not kill-eligible. pump-chain+ 50% WR healthy. v5 1T 0W 7d not kill-eligible.
+4. Trade frequency: 0/hr — quiet market, pipeline correctly gating.
+
+**No Change Needed:**
+- Kill trigger: 0T last hour — none eligible
+- atr_sl_hit: 0% — tpsl fix stable
+- hard_max_loss 60% queue#2 — open watch item
+- NEG-STREAK: inactive — last net hour +$0.94
+- Overtrade: 0/hr
+- Open: 0 — nothing to manage
+- D3 HML_TRAIL_MIN_GAP_PCT=0.20 deployed — HML frequency next 24h is the post-D3 check
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 60% queue#2 leverage-aware SL review — still #1 systemic watch
+- HML post-D3: goal <40% of closes vs 60% pre-D3
+- SHORT 7d −$0.57 (deadline Oct 11)
+- Market quiet multi-hour — under-trading vs over-filtering? Pipeline gating correctly under current regime
+
+BY: auto_1hr

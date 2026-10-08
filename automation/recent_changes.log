@@ -4378,3 +4378,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-08 07:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 10T 2W +$0.40 WR 20.0% | 7d 200T +$1.17 | pump-chain- 5T 0W -$0.35 (7d +$0.17 not kill-eligible) | pump-chain+ 4T 2W +$0.81 (7d 15T 9W +$1.83) | v5 1T 0W (7d not kill-eligible) | atr_sl_hit 0/10=0% (tpsl stable) | hard_max_loss 6T=60% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active, live_trading=true, D3 HML_TRAIL_MIN_GAP_PCT=0.20 deployed
 [2026-10-08 07:37 UTC] brain_auditor: 0 trading config + exit_time trigger/backfill 5618; watchdog RSI steers disproved (meta-RSI); HML fixes directionally working; hold until Oct 9/10 evals — brain_auditor
+[2026-10-08 08:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 0 open | 24h 10T 2W +$0.40 WR 20.0% | pump-chain- 5T 0W -$0.35 (7d +$0.17 not kill-eligible) | pump-chain+ 4T 2W +$0.81 | v5 1T 0W | atr_sl_hit 0/10=0% (tpsl stable) | hard_max_loss 6T=60% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active, live_trading=true, D3 HML_TRAIL_MIN_GAP_PCT=0.20 deployed
+BY: auto_1hr
