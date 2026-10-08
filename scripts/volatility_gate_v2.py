@@ -341,8 +341,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'volume_breakout_short'): 1.0,    # OK — volume-breakout-short can work in NORMAL
     ('NORMAL', 'pump_chain+'): 1.0,              # RE-ENABLED 2026-10-07 CEO — every pump is a LONG
     ('NORMAL', 'pump-chain+'): 1.0,              # RE-ENABLED 2026-10-07 CEO — hyphen variant
-    ('NORMAL', 'pump_chain-'): 1.0,              # OK — pump-chain- SHORT 75% WR in NORMAL (8T)
-    ('NORMAL', 'pump-chain-'): 1.0,              # OK — hyphen form (runtime signal_type is 'pump-chain')
+    ('NORMAL', 'pump_chain-'): 1.2,              # BOOST 1.0→1.2 2026-10-08 brain_auditor — NORMAL is the only profitable SHORT habitat (14d 7T 71.4%WR +$0.43). Boost winning side; EXTREME stays 0.5, HIGH blocked in compactor. Small-n boost, not a filter.
+    ('NORMAL', 'pump-chain-'): 1.2,              # hyphen form — same boost (runtime signal_type is 'pump-chain')
     ('NORMAL', 'pump_chain'): 0.5,               # PENALIZED 2026-09-22 — 66.7% WR but -$0.27 (6T)
     ('NORMAL', 'pump-chain'): 0.5,               # PENALIZED — bare form fallback
     ('NORMAL', 'bb-bounce-v3-long'): 0.0,        # BLOCKED 2026-10-04 signal_reporter — NORMAL 15T 46.7%WR -$0.43. Wins HIGH 5T 60%WR +$0.08. Overrides family Bollinger NORMAL=1.3 boost (wrong for v3).
@@ -380,7 +380,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'mover-'): 1.0,                     # OK 2026-09-22 — 66.7% WR, +$0.26 (3T)
     ('HIGH', 'pump_chain+'): 1.0,                # RE-ENABLED 2026-10-07 CEO — every pump is a LONG
     ('HIGH', 'pump-chain+'): 1.0,                # RE-ENABLED 2026-10-07 CEO — hyphen variant
-    ('HIGH', 'pump_chain-'): 1.0,                # ALLOWED 2026-10-06 CEO/T — was 0.0 block citing stale "48%WR HIGH". 30d meta-RSI HIGH: 50-55=20T +$0.59 55%WR (ONLY profitable HIGH band); 40-45=7T 14.3%WR cut by SHORT_RSI_FLOOR=45. PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED already False. Monitor48h.
+    ('HIGH', 'pump_chain-'): 1.0,                # Gate shows 1.0 but PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True (brain_auditor 2026-10-07) hard-blocks in signal_compactor.py:2901 + decider_run.py:1656. Gate value is fallback only. Comment was stale (said False). HIGH 30d 27T 44.4%WR -$0.42.
     ('HIGH', 'pump-chain-'): 1.0,                # hyphen variant — same as underscore
     ('HIGH', 'pump_chain'): 1.0,                 # OK 2026-09-22 — bare form 76.9% WR (13T) in HIGH
     ('HIGH', 'pump-chain'): 1.0,                 # OK — bare form fallback

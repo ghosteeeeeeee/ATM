@@ -308,13 +308,14 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
-    'ALGO',
     'BTC',
     'CHIP',
+    'CRV',
     'INJ',
     'JUP',
     'TURBO'
 }
+
 
 
 
@@ -705,6 +706,8 @@ TP_PCT_FALLBACK    = 0.060  # 6.0% fallback target (3:1 R:R with 2.0% SL) — br
 STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
 CUT_LOSER_PNL     = -1.50  # close trade at -1.50% ACCOUNT PnL — brain_auditor 2026-10-07: widened -1.00→-1.50. 7d hard_max_loss 64T 0%WR -$8.60 = #1 bleed; 87.5% had MFE>0 (were in profit, trail never got room). trail_family 120T 87.5% +$9.47 is the winning exit. Post-fix lev-aware HML (aed0aa36) cut magnitude ~-4.4%→~-1.5% but frequency stays high because -1% acct is inside EXTREME-vol noise at lev5 (-0.20% price). Widen gives trail ~50% more room. Cannot block winners (HML only fires on losers). position_manager is per-cycle subprocess — loads fresh, no restart. Prior: -1.00 (CEO Oct 1, widened from -0.50). NOTE: this constant only governs position_manager's HARD_MAX_LOSS exit + Priority-3 fallback (unreachable when sl_distance exists). Main cut-loser engine uses CL_TIER1_MIN_PCT.
+HML_VOL_ATR_MULT  = 0.5   # brain_auditor 2026-10-08 — HML price-threshold = -0.5×ATR when ATR provides more room than CUT_LOSER_PNL/lev. Trail arms at +0.40% (PM_TRAIL_ACTIVATE) but HML killed at -0.30% price @lev5 — trail never got room in EXTREME. 7d HML 66T -$8.72 #1 bleed, 56/66 had MFE>0, median hold 61min. Example: EXTREME ATR 1.5% → thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%. NORMAL/FLAT ATR low → account threshold unchanged. HML only fires on losers — cannot block winners.
+HML_TRAIL_MIN_GAP_PCT = 0.20  # D3 TRAIL-MIN-GAP — orchestrator 2026-10-08. HML price-threshold floor = -(PM_TRAIL_ACTIVATE_PCT*100 + this) = -(0.40+0.20)=-0.60% so PM trail always has room to arm before hard kill. Frequency goal: HML <40% of closes (was 60-67%). Applied before vol floor; EXTREME ATR can still widen further via HML_VOL_ATR_MULT. Evidence: 24h HML LDO pump-chain+ MFE=+0.27% FIL pump-chain- MFE=+0.82% both closed HML — trail never armed. HML only fires on losers.
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
@@ -1792,8 +1795,8 @@ NEVER_REENABLE_FLAGS = {
     'INVERSE_ACCEL_300_ENABLED',
     'INVERSE_ACCEL_300_PLUS_ENABLED',
     'INVERSE_ACCEL_300_MINUS_ENABLED',
-    'ACCEL_300_ENABLED',           # 0% WR over 48h, no edge — permanently dead
-    'ACCEL_300_PLUS_ENABLED',      # 0% WR over 48h — permanently dead
+    # ACCEL_300_ENABLED — REMOVED from NEVER_REENABLE 2026-10-08 — re-enabled 2026-09-11 with NORMAL/EXTREME regime (HIGH blocked 0.3x). Flag was live True while listed here (stale entry, signal_reporter 2026-10-07).
+    'ACCEL_300_PLUS_ENABLED',      # 0% WR over 48h — permanently dead (self_learner 2026-08-05)
     # ACCEL_300_MINUS_ENABLED — REMOVED from NEVER_REENABLE 2026-09-11 — re-enabled with NORMAL/EXTREME regime (65%/57% WR)
     'ACCEL_300_BREAKOUT_ENABLED',  # 0% WR (0/3) — permanently dead
     'ACCEL_300_VELOCITY_IGNITION_ENABLED',  # 0% WR (10 trades), -$4.97 — permanently dead

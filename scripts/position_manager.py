@@ -25,6 +25,7 @@ from hermes_constants import (
     ATR_K_LOW_VOL, ATR_K_NORMAL_VOL, ATR_K_HIGH_VOL,
     ATR_K_INITIAL,
     ATR_PCT_LOW_THRESH, ATR_PCT_HIGH_THRESH,
+    HML_VOL_ATR_MULT, HML_TRAIL_MIN_GAP_PCT, PM_TRAIL_ACTIVATE_PCT,
     PHASE_TIER_NEUTRAL, PHASE_TIER_BUILDING, PHASE_TIER_ACCELERATING,
     PHASE_TIER_EXHAUSTION, PHASE_TIER_EXTREME,
     K_PHASE_ACCEL_STALL, K_PHASE_ACCEL_FAST, K_PHASE_ACCEL_SLOW,
@@ -3411,18 +3412,38 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # LEVERAGE-AWARE (CEO 2026-10-07): live_pnl is unleveraged price-move %;
         # CUT_LOSER_PNL is ACCOUNT %. Account loss = price_move × leverage.
         # Was: -1% price at lev 4 = -4% account bleed (hard_max_loss 7d 0%WR).
-        # Now: fire when account loss exceeds CUT_LOSER_PNL (-1% account).
-        # ponytail: no price floor — hard_max_loss cohort is 0% WR, tighter cut = less bleed.
+        # Now: fire when account loss exceeds CUT_LOSER_PNL (-1.50% account).
+        # VOL-SCALED (brain_auditor 2026-10-08): trail arms at +0.40% price but
+        # HML killed at -0.30% price @lev5 — EXTREME noise never let trail work.
+        # 7d HML 66T -$8.72 #1 bleed, 56/66 MFE>0. Widen by ATR when ATR provides
+        # more room than the account threshold. HML only fires on losers.
         _hml_lev = max(float(pos.get('leverage') or 1), 1.0)
         HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES / _hml_lev
+        # D3 TRAIL-MIN-GAP (orchestrator 2026-10-08): never fire HML tighter than
+        # PM trail activation (+0.40%) + gap (0.20%) = -0.60% price. Trail arms at
+        # +0.40%; HML at -0.20..-0.30% killed trades with MFE>0 before trail could
+        # work (LDO MFE+0.27%, FIL MFE+0.82% both HML 24h). Frequency goal <40%.
+        _hml_trail_floor = -(float(PM_TRAIL_ACTIVATE_PCT) * 100.0 + float(HML_TRAIL_MIN_GAP_PCT))
+        if _hml_trail_floor < HARD_MAX_LOSS_PCT:
+            HARD_MAX_LOSS_PCT = _hml_trail_floor
+        try:
+            from volatility_gate_v2 import get_atr_pct as _hml_get_atr
+            _hml_atr = _hml_get_atr(token)
+        except Exception:
+            _hml_atr = None
+        if _hml_atr is not None and _hml_atr > 0:
+            _hml_vol_floor = -float(HML_VOL_ATR_MULT) * float(_hml_atr)  # ATR is pct pts (1.5=1.5%)
+            if _hml_vol_floor < HARD_MAX_LOSS_PCT:
+                HARD_MAX_LOSS_PCT = _hml_vol_floor
+        # ponytail: self-check — lev5 CUT_LOSER -0.30 → D3 floor -0.60; EXTREME ATR 1.5 → -0.75; NORMAL ATR 0.3 → -0.60
         if live_pnl <= HARD_MAX_LOSS_PCT:
             # P0: canonical label 'hard_max_loss' — pnl detail moved to exit_detail.
             # (Old f-string produced ~25 fragmented per-trade labels like
             # 'hard_max_loss_-1.04%', each with 1-4 rows, invisible in GROUP BY.)
             close_paper_position(trade_id, "hard_max_loss",
-                                 exit_detail=f"hard_max_loss_pct={live_pnl:+.2f}%,lev={_hml_lev:.1f},thresh={HARD_MAX_LOSS_PCT:+.2f}%")
+                                 exit_detail=f"hard_max_loss_pct={live_pnl:+.2f}%,lev={_hml_lev:.1f},thresh={HARD_MAX_LOSS_PCT:+.2f}%,atr={_hml_atr}")
             closed_count += 1
-            log(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}% @ lev {_hml_lev:.1f}]")
+            log(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}% @ lev {_hml_lev:.1f} atr={_hml_atr}]")
             continue
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
