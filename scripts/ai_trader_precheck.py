@@ -188,6 +188,25 @@ def precheck(coin, direction):
     except Exception as e:
         check('30d WR', True, f'error: {e} — skip check')
 
+    # 3c. LOSERS/PENALTY check
+    try:
+        from hermes_constants import LOSERS, LOSERS_LONG, LOSERS_SHORT, PENALTY_TOKENS
+        in_losers = token in LOSERS or token in LOSERS_LONG or token in LOSERS_SHORT
+        in_penalty = token in PENALTY_TOKENS
+        if in_losers or in_penalty:
+            reasons = []
+            if token in LOSERS: reasons.append('LOSERS')
+            if token in LOSERS_LONG and direction == 'LONG': reasons.append('LOSERS_LONG')
+            if token in LOSERS_SHORT and direction == 'SHORT': reasons.append('LOSERS_SHORT')
+            if in_penalty: reasons.append('PENALTY')
+            check('Not in losers/penalty', False, f'blocked by {", ".join(reasons)}')
+        else:
+            check('Not in losers/penalty', True, 'clean')
+    except ImportError:
+        check('Not in losers/penalty', True, 'constants not importable')
+    except Exception as e:
+        check('Not in losers/penalty', True, f'error: {e}')
+
     # 4. BTC trend check for LONG
     if direction == 'LONG':
         try:
