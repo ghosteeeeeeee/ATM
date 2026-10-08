@@ -2871,10 +2871,23 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 
                 if len(_vel_closes) >= momentum_candles + 1:
                     # Direction-aware: LONG exits on negative velocity, SHORT exits on positive velocity
+                    #
+                    # FIX (2026-10-08, BUG-030): _vel_closes is fetched ORDER BY ts DESC
+                    # (index 0 = NEWEST). The old loop ran range(1, len) — newest interval
+                    # first, oldest LAST — and because the counter RESETS on a
+                    # non-qualifying candle, the final counter value reflected the OLDEST
+                    # consecutive run in the window, not the newest. Result: the exit
+                    # fired on stale momentum and MISSED current dumps (and vice-versa
+                    # for SHORT). Verified: with newest-2 dumping the old code returned
+                    # False (held a falling knife); with newest-2 recovering it returned
+                    # True (cut a winner). Iterating the range in reverse evaluates the
+                    # newest interval LAST, so the surviving counter run is the most
+                    # recent candles — the direction semantics are unchanged.
+                    _vel_range = range(len(_vel_closes) - 1, 0, -1)  # oldest interval → newest
                     if direction == 'LONG':
                         # LONG: exit when price dropping (negative velocity)
                         neg_count = 0
-                        for i in range(1, len(_vel_closes)):
+                        for i in _vel_range:
                             period_vel = (_vel_closes[i-1] - _vel_closes[i]) / _vel_closes[i] * 100 if _vel_closes[i] > 0 else 0
                             if period_vel < PUMP_EXIT_MOMENTUM_VEL:
                                 neg_count += 1
@@ -2884,7 +2897,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     else:
                         # SHORT: exit when price rising (positive velocity)
                         pos_count = 0
-                        for i in range(1, len(_vel_closes)):
+                        for i in _vel_range:
                             period_vel = (_vel_closes[i-1] - _vel_closes[i]) / _vel_closes[i] * 100 if _vel_closes[i] > 0 else 0
                             if period_vel > abs(PUMP_EXIT_MOMENTUM_VEL):
                                 pos_count += 1

@@ -255,6 +255,14 @@ def scan_signals():
             _log(f"  [PUMP-CHAIN-V5-SHORT] {token} SHORT blocked — falling+flat+BB>{bb_position:.2f} (0% WR)")
             continue
         
+        # ── V5 FILTER 3: Rise 1M (late-entry / bounce filter) ──────────────
+        # Independent audit verified: kills 9 wins, catches 16 losses, net=+$2.09
+        # Blocks when 2+ consecutive rising 1m candles before entry (price already bouncing)
+        rise_1m = _check_rise_1m(token)
+        if rise_1m is not None and rise_1m >= PUMP_CHAIN_V5_SHORT_RISE_1M_THRESHOLD:
+            _log(f"  [PUMP-CHAIN-V5-SHORT] {token} SHORT blocked — rise_1m={rise_1m} >= {PUMP_CHAIN_V5_SHORT_RISE_1M_THRESHOLD} (late entry, price already bouncing)")
+            continue
+        
         # Cooldown
         if get_cooldown(token, direction='SHORT'):
             continue

@@ -220,3 +220,8 @@
 - **WARN**: Disk 85% used (18G free) — dominated by DBs (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.8G). No old logs to reclaim.
 - **WARN**: Multiple auxiliary services failed (bug-hunter, better-coder, brain-auditor, ceo, git-release) — bug-hunter exits 1 by design when findings exist (sqlite_leaks 49 files, cursor_leaks 51, bare_except 127). Not pipeline-blocking.
 - **CRITICAL → FIXED**: hermes-coding-mcp crash-looping (770k+ restarts) — ExecStart points to missing `/root/.hermes/scripts/run_mcp_server.py`. **AUTO-FIX**: stopped service; already disabled (no timer).
+
+## Error Alerts — 2026-10-08 15:00 UTC
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: usage: brain.py trade add [-h] [--exchange EXCHANGE] [--strategy STRATEGY]`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+AT, allowing despite TOK filter`

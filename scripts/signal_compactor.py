@@ -4012,6 +4012,36 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _conn_vel_30s.close()
                     except Exception:
                         pass
+                # ── Rise 1M filter: block SHORT when 2+ consecutive rising 1m candles ──
+                # Independent audit verified: kills 9 wins, catches 16 losses, net=+$2.09
+                # Catches late-entry pattern (price already bouncing before SHORT)
+                try:
+                    _conn_rise_1m = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_rise_1m = _conn_rise_1m.cursor()
+                    _cur_rise_1m.execute("""
+                        SELECT close FROM candles_1m
+                        WHERE token = ?
+                        ORDER BY ts DESC LIMIT 10
+                    """, (tkn.upper(),))
+                    _rise_1m_closes = [r[0] for r in _cur_rise_1m.fetchall()]
+                    _cur_rise_1m.close()
+                    if len(_rise_1m_closes) >= 2:
+                        _rise_count = 0
+                        for _ri in range(len(_rise_1m_closes) - 1):
+                            if _rise_1m_closes[_ri] > _rise_1m_closes[_ri + 1]:
+                                _rise_count += 1
+                            else:
+                                break
+                        if _rise_count >= 2:
+                            log(f"  🚫 [PUMP-CHAIN-RISE1M-SHORT] {tkn}: SHORT blocked — rise_1m={_rise_count} >= 2 (late entry, price already bouncing)")
+                            continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    try:
+                        _conn_rise_1m.close()
+                    except Exception:
+                        pass
             # ── Volatility floor filter: block low-vol entries (no energy = no trade) ──
             vol_ok = check_volatility_floor(tkn)
             if vol_ok == 0.0:
@@ -4382,6 +4412,30 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         continue
                             except Exception:
                                 pass  # non-fatal
+                            # ── Rise 1M filter for preserved SHORT entries ──
+                            if pe_direction == 'SHORT':
+                                try:
+                                    _pv_rise_conn = sqlite3.connect(CANDLES_DB, timeout=5)
+                                    _pv_rise_cur = _pv_rise_conn.cursor()
+                                    _pv_rise_cur.execute("""
+                                        SELECT close FROM candles_1m
+                                        WHERE token = ?
+                                        ORDER BY ts DESC LIMIT 10
+                                    """, (pe['token'].upper(),))
+                                    _pv_rise_closes = [r[0] for r in _pv_rise_cur.fetchall()]
+                                    _pv_rise_conn.close()
+                                    if len(_pv_rise_closes) >= 2:
+                                        _pv_rise_count = 0
+                                        for _pri in range(len(_pv_rise_closes) - 1):
+                                            if _pv_rise_closes[_pri] > _pv_rise_closes[_pri + 1]:
+                                                _pv_rise_count += 1
+                                            else:
+                                                break
+                                        if _pv_rise_count >= 2:
+                                            log(f"  🚫 [PRESERVE-PUMP-CHAIN-RISE1M] {pe['token']} SHORT preserved — rise_1m={_pv_rise_count} >= 2 (late entry)")
+                                            continue
+                                except Exception:
+                                    pass  # non-fatal
                         # Track whether preserved entry won the merge (for APPROVED upsert below)
                         _preserved_won = False
                         if existing is None:
@@ -4556,6 +4610,30 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 elif direc.upper() == 'SHORT' and _pv_vel_r > 0:
                                     _rescue_ok = False
                                     log(f"  🚫 [RESCUE-PUMP-CHAIN-VEL] {tok} SHORT rescue blocked — 30m vel={_pv_vel_r:+.3f}% (token rising)")
+                        except Exception:
+                            pass  # non-fatal
+                    # ── Rise 1M filter for rescued SHORT entries ──
+                    if _rescue_ok and direc.upper() == 'SHORT' and 'pump-chain' in (loser.get('source', '') or ''):
+                        try:
+                            _pv_rise_conn_r = sqlite3.connect(CANDLES_DB, timeout=5)
+                            _pv_rise_cur_r = _pv_rise_conn_r.cursor()
+                            _pv_rise_cur_r.execute("""
+                                SELECT close FROM candles_1m
+                                WHERE token = ?
+                                ORDER BY ts DESC LIMIT 10
+                            """, (tok.upper(),))
+                            _pv_rise_closes_r = [r[0] for r in _pv_rise_cur_r.fetchall()]
+                            _pv_rise_conn_r.close()
+                            if len(_pv_rise_closes_r) >= 2:
+                                _pv_rise_count_r = 0
+                                for _pri in range(len(_pv_rise_closes_r) - 1):
+                                    if _pv_rise_closes_r[_pri] > _pv_rise_closes_r[_pri + 1]:
+                                        _pv_rise_count_r += 1
+                                    else:
+                                        break
+                                if _pv_rise_count_r >= 2:
+                                    _rescue_ok = False
+                                    log(f"  🚫 [RESCUE-PUMP-CHAIN-RISE1M] {tok} SHORT rescue blocked — rise_1m={_pv_rise_count_r} >= 2 (late entry)")
                         except Exception:
                             pass  # non-fatal
                     if not _rescue_ok:
