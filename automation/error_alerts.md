@@ -265,3 +265,7 @@
 
 ## Error Alerts — 2026-10-08 20:00 UTC
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-08 20:48 UTC
+- **WARN** (1x): Disk usage at 85% (18G free). Large logs: pipeline.log (127M), trade-watchdog.log (54M).
+- **AUTO-FIX**: Compressed logs older than 3 days. No active errors, all timers running, pipeline healthy.

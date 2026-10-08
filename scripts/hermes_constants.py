@@ -3318,9 +3318,9 @@ HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
 
 # ── HL Copy Trading Signal ────────────────────────────────────────────────────
 # hl_copy_signal.py — Generates signals from pro trader activity
-HL_COPY_SIGNAL_ENABLED = False      # auto_1hr KILLED 2026-08-25 — 12T/25%WR/-$1.13/24h. PLUS/MINUS already CEO-killed. Base signal last hl_copy standing, hemorrhaging. NEVER_REENABLE.
-HL_COPY_SIGNAL_PLUS_ENABLED = False  # SIGNAL REPORTER 2026-08-25 — 30% WR, -$0.74 (24h), 10T. Copy delay = enters after move over. NEVER_REENABLE.
-HL_COPY_SIGNAL_MINUS_ENABLED = False   # CEO KILLED 2026-08-25 — 6T/7d 0% WR -$0.76, ALL ATR_SL exits. LONG side is backbone (+$2.07/7d 52.4% WR). SHORT has no edge in copy-trading.
+HL_COPY_SIGNAL_ENABLED = True       # CEO re-enabled 2026-10-08 — cluster filter (2+ traders) added, SHORT enabled, 30min lookback
+HL_COPY_SIGNAL_PLUS_ENABLED = True  # CEO re-enabled 2026-10-08 — LONG side was backbone (+$2.07/7d 52.4% WR)
+HL_COPY_SIGNAL_MINUS_ENABLED = True # CEO re-enabled 2026-10-08 — 24/7 live, cluster filter protects
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
