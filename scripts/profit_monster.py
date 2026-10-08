@@ -293,7 +293,10 @@ def close_position(trade_id, token, direction, pnl_pct, current_price, dry_run, 
                 log(f"  [{tier}] Signal outcome record error: {sig_err}", "WARN")
             return True
         else:
-            log(f"  [{tier}] Close failed id={trade_id} {token}: {result.stderr.strip()[:120]}", "ERROR")
+            # FIX (2026-10-08, BUG-027 follow-up): include stdout — brain.py's
+            # "✗ trade #N was not open or not found" diagnostic goes to stdout,
+            # so race events were logging with empty stderr detail.
+            log(f"  [{tier}] Close failed id={trade_id} {token}: rc={result.returncode} stderr={result.stderr.strip()[:100]} stdout={result.stdout.strip()[:120]}", "ERROR")
             return False
     except Exception as e:
         log(f"  [{tier}] Close error id={trade_id} {token}: {e}", "ERROR")

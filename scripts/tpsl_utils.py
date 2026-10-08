@@ -541,11 +541,15 @@ def compute_atr_sl_tp(
         eff_tp_pct = max(eff_tp_pct * 0.8, MIN_TP_PCT)
         log(f'  [LIFECYCLE] {token}: LAGGING — SL tightened to {eff_sl_pct*100:.2f}%, TP to {eff_tp_pct*100:.2f}%')
 
-    # For established trades: cap SL at trailing distance so trailing can lock profits
-    # Without this, the ATR-based floor (0.15-0.50%) overrides the trailing distance (0.20%)
-    # FIX: Ensure ATR_SL_MIN floor is never violated — floor must always win
+    # For established trades: cap SL at trailing distance so trailing can lock profits.
+    # FIX (BUG-031, 2026-10-08): the floor here must be ATR_SL_MIN_ACCEL (0.30%, the
+    # profit-locking floor), NOT ATR_SL_MIN (1.3%). With TRAILING_DISTANCE_PCT (1.20%)
+    # < ATR_SL_MIN (1.30%), the old max(min(x, 0.012), 0.013) was identically 0.013 —
+    # the trail cap was dead and every eff_sl_pct flattened to 1.30% (DB/log-verified:
+    # GRASS/IOTA/FOGO all pinned at entry-1.3%). The in-loss absolute ATR_SL_MIN floor
+    # is still enforced below (lines ~595/606), so nothing is weakened for losers.
     if not is_new_trade:
-        eff_sl_pct = max(min(eff_sl_pct, _trail_dist), ATR_SL_MIN)
+        eff_sl_pct = max(min(eff_sl_pct, _trail_dist), ATR_SL_MIN_ACCEL)
 
     # ── Compute raw SL/TP from anchor price ───────────────────────────────────────
     if direction == 'LONG':
@@ -804,7 +808,9 @@ def compute_atr_sl_tp(
                     _eff_dist = min(ATR_SL_MIN, _trail_dist)  # use tighter of the two
                     new_sl = round(highest_price * (1 - _eff_dist), 8)
                 else:
-                    new_sl = min(trail_floor, min_from_entry)  # trail from peak, enforce floor
+                    # FIX (BUG-030, 2026-10-08): LONG tighter = HIGHER. Old min() picked the
+                    # looser stop (the floor). max() = trail from peak, never below floor.
+                    new_sl = max(trail_floor, min_from_entry)  # trail from peak, enforce floor
                 if current_sl > 0:
                     # Only enforce one-way when current_sl is correct-side (below entry for LONG).
                     # If current_sl is wrong-sided (above entry), the trailing gate's correction
@@ -812,13 +818,26 @@ def compute_atr_sl_tp(
                     current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
                     if not current_above_entry:
                         new_sl = max(new_sl, current_sl)
+                # FIX (BUG-032, 2026-10-08): cap at entry (breakeven) — matches pre-gate guard.
+                # The old code had NO entry cap here in-profit, so a wrong-sided current_sl
+                # below entry could not be corrected upward toward entry.
+                new_sl = min(new_sl, entry_f)  # SL must never be above entry for LONG
             else:
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
                     current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
                     if not current_above_entry:
                         new_sl = max(new_sl, current_sl)
-                new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))  # re-enforce floor after one-way
+                # FIX (BUG-032, 2026-10-08): re-enforce floor only when it does NOT loosen a
+                # correct-side current_sl that is tighter than the floor (sits inside the
+                # ATR_SL_MIN band, e.g. written by SOFT trigger/pump-exit/SL-zone trail).
+                # Old unconditional min() re-applied the floor below current_sl every cycle,
+                # flagging needs_sl and loosening the stop back toward entry-1.3% (ratchet break).
+                if current_sl > 0 and current_sl <= entry_f:
+                    new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
+                    new_sl = max(new_sl, current_sl)  # never loosen a correct-side stop
+                else:
+                    new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
         elif direction == 'SHORT' and lowest_price > 0:
@@ -840,7 +859,15 @@ def compute_atr_sl_tp(
                     current_below_entry = (current_sl < entry_f) if entry_f > 0 else False
                     if not current_below_entry:
                         new_sl = min(new_sl, current_sl)
-                new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))  # re-enforce ceiling after one-way
+                # FIX (BUG-032, 2026-10-08): re-enforce ceiling only when it does NOT loosen a
+                # correct-side current_sl tighter than the ceiling (sits inside ATR_SL_MIN band).
+                # Old unconditional max() re-applied the ceiling above current_sl every cycle,
+                # loosening the stop back toward entry+1.3% (SHORT ratchet break, mirror of BUG-032).
+                if current_sl > 0 and current_sl >= entry_f:
+                    new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
+                    new_sl = min(new_sl, current_sl)  # never loosen a correct-side stop
+                else:
+                    new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
 

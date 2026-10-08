@@ -754,7 +754,9 @@ def sniper_close_position(pos, reason, dry_run=False):
             log.info(f"  Closed id={trade_id} {token} {direction} — {pnl_pct:+.2f}% — {reason}")
             return True
         else:
-            log.warning(f"  DB close failed for {token}: {result.stderr[:200]}")
+            # FIX (2026-10-08, BUG-027 follow-up): include stdout — brain.py's
+            # "✗ trade #N was not open or not found" diagnostic goes to stdout.
+            log.warning(f"  DB close failed for {token}: rc={result.returncode} stderr={result.stderr[:100]} stdout={result.stdout.strip()[:120]}")
             return False
     except Exception as e:
         log.error(f"  DB close error for {token}: {e}")

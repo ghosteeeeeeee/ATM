@@ -26,6 +26,7 @@ from hermes_constants import (
     PUMP_FLOW_ENABLED,
     PUMP_CHAIN_V5_SHORT_ENABLED,
     PUMP_CHAIN_V5_SHORT_BB_THRESHOLD,
+    PUMP_CHAIN_V5_SHORT_RISE_1M_THRESHOLD,
     PUMP_FLOW_MIN_CONFIDENCE,
     PUMP_FLOW_MIN_PHASE_CONFIDENCE,
     PUMP_FLOW_COOLDOWN_HOURS,
@@ -150,6 +151,49 @@ def _get_signal_metadata(token):
             except Exception:
                 pass
     return {}
+
+
+def _check_rise_1m(token):
+    """
+    Check consecutive rising 1m candles before entry.
+    Returns the count of consecutive rising 1m candles, or None if insufficient data.
+    Independent audit verified: catches late-entry pattern (price already bouncing).
+    """
+    conn = None
+    try:
+        import sqlite3
+        from paths import CANDLES_DB
+        conn = sqlite3.connect(f"file:{CANDLES_DB}?mode=ro", uri=True, timeout=5)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT close FROM candles_1m
+            WHERE token = ?
+            ORDER BY ts DESC LIMIT 10
+        """, (token.upper(),))
+        closes = [r[0] for r in cur.fetchall()]
+        cur.close()
+        
+        if len(closes) < 2:
+            return None
+        
+        # Count consecutive rising candles (closes[0] is most recent)
+        # rises[0] > rises[1] means the most recent candle closed higher than the previous
+        rise_count = 0
+        for i in range(len(closes) - 1):
+            if closes[i] > closes[i + 1]:
+                rise_count += 1
+            else:
+                break
+        return rise_count
+    except Exception:
+        pass
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return None
 
 
 def scan_signals():

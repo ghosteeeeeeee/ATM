@@ -851,13 +851,20 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     cur.execute("""SELECT entry_price, amount_usdt, direction, leverage,
                           token, open_time, hl_notional_usdt,
                           signal, signal_z_score_tier, signal_momentum_state,
-                          signal_decision
+                          signal_decision, status
                    FROM trades WHERE id = %s""", (trade_id,))
     row = cur.fetchone()
     if not row:
         return False
 
-    entry_price, amount_usdt, direction, stored_lev, token, open_time, hl_notional_usdt, signal, signal_z_score_tier, signal_momentum_state, signal_decision = row
+    entry_price, amount_usdt, direction, stored_lev, token, open_time, hl_notional_usdt, signal, signal_z_score_tier, signal_momentum_state, signal_decision, _trade_status = row
+    # FIX (2026-10-08, BUG-027 follow-up / review finding 11): early-out on
+    # already-closed/missing trades BEFORE the optional HL realized-PnL network
+    # call below — previously a close of a closed trade wasted one HL API call
+    # (rate-limit budget) just to discover at the UPDATE that nothing was open.
+    if _trade_status != 'open':
+        print(f"[close_trade] trade #{trade_id} ({token}) status={_trade_status} — not open, refusing close (no HL call made)")
+        return False
     lev = float(stored_lev or 1)
     # Bug-fix (2026-05-20): `or` treated 0.0 as falsy. Use explicit None check.
     amount_usdt = float(amount_usdt) if amount_usdt is not None else DEFAULT_TRADE_SIZE_USDT

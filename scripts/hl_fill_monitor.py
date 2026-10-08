@@ -507,14 +507,20 @@ def check_trader_exits(new_fills: list):
         # Close our trade
         try:
             from brain import close_trade
-            close_trade(
+            _closed_ok = close_trade(
                 trade_id=perf['trade_id'],
                 exit_price=current_price,
                 close_reason='trader_exit',
                 notes=f"Trader {wallet[:10]}... exited {coin}",
                 exit_conditions=f"trader-exit({wallet[:8]})"
             )
-            update_trader_performance(perf['trade_id'], current_price, 'trader_exit')
+            # FIX (2026-10-08, BUG-027 follow-up): close_trade now returns False
+            # when the trade was already closed by another exit engine — guard the
+            # trader-performance update so the same close isn't counted twice.
+            if _closed_ok:
+                update_trader_performance(perf['trade_id'], current_price, 'trader_exit')
+            else:
+                print(f"[copy_exit] trade #{perf['trade_id']} ({coin}) was already closed — skipping trader-perf update")
         except Exception as e:
             print(f"[copy_exit] Error closing trade #{perf['trade_id']}: {e}")
 

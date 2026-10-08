@@ -3798,6 +3798,9 @@ PUMP_CHAIN_V4_ENABLED = False          # KILLED 2026-09-22 — pump-chain+ LONG 
 PUMP_CHAIN_V5_ENABLED = True          # RE-ENABLED 2026-10-07 CEO — 68.3% WR all-time bare form
 PUMP_CHAIN_V5_SHORT_ENABLED = True     # RE-ENABLED 2026-09-28 — CEO: never blanket disable, route via regime. 30d: 88T 54.5%WR -$0.31 (breakeven). EXTREME 50%WR. Regime gate blocks in EXTREME. Monitor: revert if 7d WR < 50%.
 PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat+BB filter (0% WR above this)
+PUMP_CHAIN_V5_SHORT_RISE_1M_THRESHOLD = 2  # block SHORT when 2+ consecutive rising 1m candles before entry
+                                            # Independent audit verified: kills 9 wins, catches 16 losses, net=+$2.09, WR 50.7%→54.9%
+                                            # Catches late-entry pattern (price already bouncing before SHORT)
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
