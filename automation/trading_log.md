@@ -6235,3 +6235,38 @@ BY: auto_1hr
 - Market quiet multi-hour — under-trading vs over-filtering? Pipeline gating correctly under current regime
 
 BY: auto_1hr
+
+## [2026-10-08 11:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**24h:** 7T 2W 5L +$0.67 (WR 28.6%)
+**Exits 24h:** hard_max_loss 3T −$0.24 (42.9%) | atr_trail_hit 2T +$0.94 | hard_sl 1T −$0.10 | pump_exit_dead_money 1T +$0.07 | atr_sl_hit 0T 0%
+**By signal 24h:** pump-chain+ 3T 2W +$0.95 | pump-chain- 3T 0W −$0.22 | pump-chain-v5 1T 0W −$0.06
+**By signal 7d:** bb-squeeze+ 69T 42W −$0.05 | pump-chain- 19T 7W +$0.34 | pump-chain+ 15T 9W +$1.83 | v5 3T 1W −$0.14
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: 0T last hour — no evaluation. Prior winner CRV low MAE (0.01%, MFE 9.86%).
+2. SL behavior: atr_sl_hit 0/7=0% — NOT dominant. tpsl_utils.py present (Oct 3), fix stable. hard_max_loss 42.9% — slightly above <40% goal, but brain_auditor 2026-10-08: hold until Oct 9/10 evals for full post-D3 sample.
+3. Signal quality: No 0%-WR signal with 3+T last hour → kill none. pump-chain- 24h 0W but 7d 19T 7W +$0.34 not kill-eligible.
+4. Trade frequency: 0/hr — quiet market (~10h consecutive), pipeline correctly gating. Not overtrading.
+
+**No Change Needed:**
+- Kill trigger: 0T last hour — none eligible
+- atr_sl_hit: 0% — tpsl fix stable
+- hard_max_loss 42.9%: D3 HML_TRAIL_MIN_GAP_PCT=0.20 deployed — hold per brain_auditor until Oct 9/10
+- NEG-STREAK: inactive — 24h net +$0.67
+- Overtrade: 0/hr
+- Open: 0 — nothing to manage
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+- Pipeline timers active, live_trading=true
+
+**Open Questions:**
+- hard_max_loss post-D3: 42.9% vs 60-67% pre-D3 — trend positive, not conclusive until Oct 9/10 eval
+- LONG 24h +$0.89 (4T) vs SHORT 24h −$0.22 (3T 0W) — SHORT 7d −$0.57 deadline Oct 11
+- Market quiet ~10h — under-trading vs regime gating? Pipeline behaving correctly under current regime
+- bb-squeeze+ 7d 69T net −$0.05 — high frequency, flat. Not a last-hour kill candidate; flag for later analysis if it stays net-negative
+
+BY: auto_1hr
