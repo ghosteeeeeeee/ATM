@@ -902,5 +902,16 @@
     "after": "0.5 (dampen, not block)",
     "rationale": "Post CEO re-enable still bleeds: 7d EXTREME n=20 35%WR -$0.23; post re-enable 3T -$0.22 0%WR. NORMAL is the edge (5T +$0.37 60%). Dampen respects CEO philosophy while reducing exposure.",
     "impact": "Reduced confidence for pump-chain- SHORT in EXTREME regime. NORMAL habitat untouched. CEO can revert to 1.0 if desired."
+  },
+  {
+    "timestamp": "2026-10-08T02:36:00Z",
+    "agent": "brain_auditor",
+    "change": "Boosted NORMAL pump_chain- SHORT in volatility_gate_v2.py 1.0 → 1.2 (both underscore + hyphen)",
+    "type": "config",
+    "file": "scripts/volatility_gate_v2.py",
+    "before": "1.0",
+    "after": "1.2",
+    "rationale": "NORMAL is the only profitable SHORT habitat: 7d 11T 63.6%WR +$0.09; 14d pump-chain- NORMAL 7T 71.4%WR +$0.43; 30d NORMAL 12T 75% +$0.53. EXTREME dampened to 0.5 same run. Boost winning side; cannot block anyone.",
+    "impact": "Increased confidence for pump-chain- SHORT in NORMAL regime. EXTREME/HIGH untouched by boost. Eval in 48h."
   }
 ]

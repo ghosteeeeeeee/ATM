@@ -1523,3 +1523,46 @@
 [2026-10-07 23:08 UTC]   🟢 OK: pump-chain-: 8 trades, 25.0% WR, PnL=24.72
 [2026-10-07 23:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-07 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-08 05:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:10 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:12 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:16 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:18 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:22 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:24 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:28 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:30 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:34 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:36 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:40 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:42 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:46 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:48 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:52 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:54 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 05:58 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:00 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:04 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:06 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:10 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:12 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:16 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:18 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:22 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:24 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:28 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:30 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:34 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:36 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:40 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:42 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:46 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:48 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:52 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:54 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 06:58 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 07:00 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 07:04 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 07:06 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 07:10 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-08 07:12 UTC] === Signal Decay Detector (rapid-response) ===

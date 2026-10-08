@@ -3522,5 +3522,23 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-08T05:00:00Z",
+    "idea": "Evaluate narrowing LONG_RSI_SWEET_SPOT_MIN 40→50 after monitor windows close (Oct 10+)",
+    "rationale": "Verified meta-RSI 30d LONG 50-60 = 117T +$5.58 61.5% dominant band. Current boost 40-60 includes weaker 40-50 (64T +$1.42). Not implementing now: 40-50 still net positive; 2 monitor windows active; CEO said no RSI re-litigation this cycle.",
+    "expected_impact": "Concentrate +10pt confidence on actual edge band. Boost not a block — low risk.",
+    "category": "entry sniper",
+    "status": "suggested_deferred",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-08T05:00:00Z",
+    "idea": "Monitor LONG 60-70 meta-RSI band flip (30d -$2.12/141T vs 14d +$0.91/71T) — extend sweet spot MAX to 70 only if positive holds through Oct 15",
+    "rationale": "Band flipped positive after RSI filters + HARD_FLOOR landed. If structural, MAX=60 leaves new edge unboosted. If noise, extending boosts a losing band.",
+    "expected_impact": "Conditional on data.",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "medium"
   }
 ]
