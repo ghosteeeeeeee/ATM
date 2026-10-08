@@ -1,0 +1,247 @@
+
+====================================================================================================
+PART A — BIGGEST WINNING TRADES (DESCRIPTIVE ONLY — NOT FOR INFERENCE)
+====================================================================================================
+
+--- A1. ALL-TIME top 15 by pnl_pct (live closed)
+    id token    signal                     dir      pnl%    pnl$  lev  size$ exit                   vol        rsi   min    mfe    mae  opened
+ 14101 ETH      hl_copy_trader             LONG    47.53    0.49  5.0     11 atr_sl_hit             NORMAL    48.5   304   6.04   0.14  2026-08-21 18:47:18
+ 15547 AVAX     pump-chain+                LONG    45.71    1.02  5.0     11 atr_sl_hit             EXTREME   94.4   124  10.50   0.29  2026-09-19 22:41:40
+ 15984 CRV      pump-chain+                LONG    42.34    0.94  5.0     11 atr_trail_hit          EXTREME   82.4   184   9.86   0.01  2026-10-07 22:17:45
+ 14075 ZRO      ct-hot+                    LONG    42.16    0.43  5.0     17 atr_sl_hit             EXTREME   79.5    45   5.50   0.22  2026-08-21 10:28:15
+ 15757 COMP     volume-breakout-long+      LONG    42.12    0.94  5.0     11 HARD_SL_FAILED         EXTREME   55.0   344   6.34   1.25  2026-09-29 19:41:16
+ 15044 INJ      open-skies+                LONG    40.57    0.94  5.0     11 atr_sl_hit             EXTREME   None   162   9.56   0.01  2026-09-07 17:57:22
+ 14112 POL      ct-hot+                    LONG    36.67    0.75  5.0     11 atr_sl_hit             HIGH      89.3    89   8.91   0.00  2026-08-22 03:37:16
+ 14068 HYPE     hl_copy_trader             LONG    32.49    0.33  5.0     11 atr_sl_hit             NORMAL    56.9   125   4.40   0.11  2026-08-21 06:48:26
+ 15304 NEO      rr-struct+                 LONG    30.98    0.69  5.0     11 atr_sl_hit             NORMAL    None   475   7.71   1.03  2026-09-12 20:36:37
+ 15126 GRASS    pump-chain+                LONG    30.82    1.57  3.0     17 atr_sl_hit             EXTREME   None   442  11.57   0.37  2026-09-09 00:08:31
+ 14080 HYPE     hl_copy_trader             LONG    29.81    0.31  5.0     11 atr_sl_hit             NORMAL    56.9    81   4.24   0.51  2026-08-21 12:11:19
+ 14525 COMP     accel-300-v2-              SHORT   24.76    0.55  5.0     11 atr_sl_hit             NORMAL    None    52   5.73   0.41  2026-08-28 15:12:19
+ 15972 APT      pump-chain-                SHORT   23.89    0.53  5.0     11 trail_sl               EXTREME   13.1    38   5.97   0.13  2026-10-07 01:32:34
+ 15518 AVAX     pump-chain+                LONG    23.62    0.53  5.0     11 atr_sl_hit             EXTREME   91.4   259   6.75   0.69  2026-09-19 05:17:28
+ 15567 ADA      pump-chain+                LONG    23.06    0.52  5.0     11 atr_sl_hit             HIGH      62.2   486   5.99   0.50  2026-09-20 09:13:42
+
+--- A2. ALL-TIME top 15 by pnl_usdt (real dollars)
+    id token    signal                     dir      pnl%    pnl$  lev  size$ exit                   vol        rsi   min    mfe    mae  opened
+ 15126 GRASS    pump-chain+                LONG    30.82    1.57  3.0     17 atr_sl_hit             EXTREME   None   442  11.57   0.37  2026-09-09 00:08:31
+ 15547 AVAX     pump-chain+                LONG    45.71    1.02  5.0     11 atr_sl_hit             EXTREME   94.4   124  10.50   0.29  2026-09-19 22:41:40
+ 15044 INJ      open-skies+                LONG    40.57    0.94  5.0     11 atr_sl_hit             EXTREME   None   162   9.56   0.01  2026-09-07 17:57:22
+ 15984 CRV      pump-chain+                LONG    42.34    0.94  5.0     11 atr_trail_hit          EXTREME   82.4   184   9.86   0.01  2026-10-07 22:17:45
+ 15757 COMP     volume-breakout-long+      LONG    42.12    0.94  5.0     11 HARD_SL_FAILED         EXTREME   55.0   344   6.34   1.25  2026-09-29 19:41:16
+ 15858 ME       pump-chain+                LONG    11.97    0.88  3.0     22 atr_trail_hit          EXTREME   88.2   224   5.41   0.11  2026-10-02 23:10:30
+ 15804 IMX      volume-breakout-long+      LONG     3.70    0.82  5.0     22 hard_tp                EXTREME   63.6    94   1.61   0.04  2026-10-01 23:55:50
+ 14112 POL      ct-hot+                    LONG    36.67    0.75  5.0     11 atr_sl_hit             HIGH      89.3    89   8.91   0.00  2026-08-22 03:37:16
+ 15583 FIL      volume-breakout-long+      LONG    22.11    0.74  5.0     17 atr_sl_hit             EXTREME   68.4   268   6.03   0.69  2026-09-21 05:22:38
+ 15304 NEO      rr-struct+                 LONG    30.98    0.69  5.0     11 atr_sl_hit             NORMAL    None   475   7.71   1.03  2026-09-12 20:36:37
+ 15493 FOGO     pump-chain+                LONG    18.67    0.69  3.0     11 atr_sl_hit             HIGH      63.0   339   7.60   0.23  2026-09-18 18:13:32
+ 15971 LTC      pump-chain-                SHORT   13.64    0.61  5.0     22 atr_trail_hit          NORMAL    28.5   356   3.52   0.07  2026-10-06 20:07:50
+ 15178 KAS      pump-chain+                LONG     8.04    0.59  3.0     22 rr_engine_support_br   EXTREME   None    72   3.37   0.01  2026-09-10 04:54:30
+ 15333 BIGTIME  pullback-entry-            SHORT   10.31    0.57  3.0     17 atr_sl_hit             EXTREME   None   357   4.58   0.44  2026-09-13 17:34:39
+ 15751 CRV      pump-chain-                SHORT    4.90    0.55  5.0     11 hard_sl                EXTREME   32.0   146   6.05   0.45  2026-09-29 15:37:25
+
+--- A3. 30d top 15 by pnl_pct
+    id token    signal                     dir      pnl%    pnl$  lev  size$ exit                   vol        rsi   min    mfe    mae  opened
+ 15547 AVAX     pump-chain+                LONG    45.71    1.02  5.0     11 atr_sl_hit             EXTREME   94.4   124  10.50   0.29  2026-09-19 22:41:40
+ 15984 CRV      pump-chain+                LONG    42.34    0.94  5.0     11 atr_trail_hit          EXTREME   82.4   184   9.86   0.01  2026-10-07 22:17:45
+ 15757 COMP     volume-breakout-long+      LONG    42.12    0.94  5.0     11 HARD_SL_FAILED         EXTREME   55.0   344   6.34   1.25  2026-09-29 19:41:16
+ 15304 NEO      rr-struct+                 LONG    30.98    0.69  5.0     11 atr_sl_hit             NORMAL    None   475   7.71   1.03  2026-09-12 20:36:37
+ 15126 GRASS    pump-chain+                LONG    30.82    1.57  3.0     17 atr_sl_hit             EXTREME   None   442  11.57   0.37  2026-09-09 00:08:31
+ 15972 APT      pump-chain-                SHORT   23.89    0.53  5.0     11 trail_sl               EXTREME   13.1    38   5.97   0.13  2026-10-07 01:32:34
+ 15518 AVAX     pump-chain+                LONG    23.62    0.53  5.0     11 atr_sl_hit             EXTREME   91.4   259   6.75   0.69  2026-09-19 05:17:28
+ 15567 ADA      pump-chain+                LONG    23.06    0.52  5.0     11 atr_sl_hit             HIGH      62.2   486   5.99   0.50  2026-09-20 09:13:42
+ 15583 FIL      volume-breakout-long+      LONG    22.11    0.74  5.0     17 atr_sl_hit             EXTREME   68.4   268   6.03   0.69  2026-09-21 05:22:38
+ 15520 JUP      pump-chain+                LONG    21.13    0.47  5.0     11 atr_sl_hit             EXTREME   95.3   232   5.82   0.41  2026-09-19 06:43:41
+ 15865 DYDX     pump-chain-                SHORT   20.02    0.45  5.0     11 atr_trail_hit          EXTREME   39.1   333   5.16   0.11  2026-10-03 04:35:49
+ 15493 FOGO     pump-chain+                LONG    18.67    0.69  3.0     11 atr_sl_hit             HIGH      63.0   339   7.60   0.23  2026-09-18 18:13:32
+ 15156 ONDO     ema300-dip-short           SHORT   18.66    0.42  5.0     11 atr_sl_hit             HIGH      None   249   4.87   0.21  2026-09-09 18:02:28
+ 15159 ENA      pullback-entry-            SHORT   14.57    0.48  5.0     17 atr_sl_hit             EXTREME   None   204   4.18   0.17  2026-09-09 19:01:30
+ 15695 POL      continuation+              LONG    14.29    0.32  5.0     11 profit-monster-trail   HIGH      47.5  None   3.52   0.83  2026-09-27 16:41:27
+
+--- A4. 30d WORST 10 by pnl_pct (survivorship guard)
+    id token    signal                     dir      pnl%    pnl$  lev  size$ exit                   vol        rsi   min    mfe    mae  opened
+ 15618 LINK     pullback-entry-            SHORT  -14.49   -0.34  5.0     11 atr_sl_hit             HIGH      62.1   119   0.50   0.82  2026-09-22 11:03:36
+ 15416 IMX      breakout-long+             LONG   -11.07   -0.25  5.0     11 atr_sl_hit             HIGH      None   117   1.09   1.39  2026-09-15 16:40:30
+ 15499 FIL      pump-chain+                LONG    -9.83   -0.22  5.0     11 atr_sl_hit             EXTREME   93.9    19   0.00   1.80  2026-09-19 00:38:48
+ 15722 AVAX     mover-                     SHORT   -9.29   -0.21  5.0     11 hard_sl                EXTREME   17.8    77   0.05   1.81  2026-09-29 04:09:32
+ 15419 ZEN      breakout-long+             LONG    -8.84   -0.20  5.0     11 atr_sl_hit             HIGH      None    26   0.01   1.77  2026-09-15 17:51:57
+ 15247 AVAX     pump-chain-                SHORT   -8.14   -0.18  5.0     11 rr_engine_resistance   HIGH      None    20   0.55   1.81  2026-09-11 13:30:29
+ 15605 GOAT     pump-chain-                SHORT   -8.10   -0.30  3.0     11 atr_sl_hit             EXTREME   31.8   103   0.62   2.37  2026-09-22 02:22:33
+ 15197 ICP      pump-chain-,r2-trend-short4 SHORT   -7.94   -0.18  5.0     11 atr_sl_hit             EXTREME   None    49   0.06   1.56  2026-09-10 12:48:44
+ 15338 ENA      ADA(1.73x),ZRO(1.52x)),pump-chain+ LONG    -7.81   -0.22  5.0     17 atr_sl_hit             HIGH      None    96   0.48   1.40  2026-09-13 20:30:48
+ 15564 WLD      pullback-entry-            SHORT   -7.59   -0.17  5.0     11 atr_sl_hit             EXTREME   21.2    34   0.18   1.46  2026-09-20 08:48:58
+ 15516 ALGO     mover+                     LONG    -7.57   -0.05  5.0     11 atr_sl_hit             HIGH      61.5   124   0.27   1.41  2026-09-19 04:16:31
+ 15660 ARB      pump-chain-                SHORT   -7.55   -0.17  5.0     11 atr_sl_hit             EXTREME   34.8    53   0.34   1.55  2026-09-24 01:24:34
+ 15677 ALGO     pump-chain-                SHORT   -7.55   -0.17  5.0     11 atr_sl_hit             HIGH      34.6    21   0.00   1.44  2026-09-24 10:39:02
+ 15549 IMX      pump-chain+                LONG    -7.50   -0.33  5.0     22 atr_sl_hit             EXTREME   51.6   108   1.06   1.44  2026-09-19 23:27:39
+ 15484 ONDO     volume-breakout-long+      LONG    -7.45   -0.17  5.0     11 atr_sl_hit             EXTREME   86.4    21   0.05   1.54  2026-09-18 12:42:01
+
+--- A5. Exit-reason mix: all-time top-25 winners vs 30d population
+exit_reason               top25  top25%  pop30%
+atr_sl_hit                   20   80.0%   39.2%
+atr_trail_hit                 2    8.0%    1.3%
+HARD_SL_FAILED                1    4.0%    0.2%
+trail_sl                      1    4.0%    0.5%
+atr_tp_hit                    1    4.0%    0.1%
+
+====================================================================================================
+PART B — POPULATION DNA TEST (ALL winners vs ALL losers, 30d live, n≈819)
+====================================================================================================
+n=819  winners=432  losers=387  WR=52.7%
+
+variable                        n_win n_lose   win_mu  lose_mu  win_med lose_med       t_p      mw_p  sig(Bonf)
+entry_rsi_14 (DB col)             271    267    56.53    51.88    57.71    50.27    0.0107    0.0137
+entry_bb_position (DB)            271    267     0.59     0.51     0.65     0.53    0.0134    0.0172
+entry_atr_norm% (ATR/price)       271    267     0.34     0.34     0.29     0.32    0.9304    0.2609
+leverage                          432    387     4.09     4.05     5.00     5.00    0.5835    0.5833
+size_usdt                         432    387    13.35    13.71    11.10    11.10    0.2364    0.2817
+meta rsi_14 (signal-time)         376    348    52.40    52.09    53.85    52.38    0.8064    0.7023
+meta bb_position                  432    387     0.57     0.53     0.62     0.57    0.2863    0.3105
+meta z_score                      432    387     0.26     0.14     0.48     0.27    0.2863    0.3104
+meta btc_score                    345    326    51.47    46.76    50.30    43.70    0.0592    0.0588
+meta speed_percentile             432    387    49.25    51.29    48.40    53.40    0.2852    0.2789
+meta gap_at_entry%                241    236     0.18     0.10     0.20     0.16    0.4214    0.3571
+meta staleness_min                244    240     2.46     2.43     1.54     1.46    0.8332    0.8505
+meta momentum_score               432    387    20.44    21.37    20.10    22.20    0.2469    0.2588
+meta volume_spike                 154    136     0.72     0.56     0.36     0.39    0.3061    0.8502
+
+Bonferroni over 14 continuous tests -> threshold p < 0.00357
+  entry_rsi_14 (DB col)          t_p=0.0107 mw_p=0.0137 (raw-only)
+  entry_bb_position (DB)         t_p=0.0134 mw_p=0.0172 (raw-only)
+
+Categorical:
+  direction              chi2 p=0.9050  | LONG:254W/225L(53%)  SHORT:178W/162L(52%)
+  volatility_regime      chi2 p=0.2464  | EXTREME:169W/160L(51%)  FLAT:9W/2L(82%)  HIGH:159W/137L(54%)  NORMAL:95W/88L(52%)
+  btc_regime             chi2 p=0.1418  | BEAR_TREND:72W/89L(45%)  BULL_TREND:101W/73L(58%)  RANGING:77W/64L(55%)  RANGING_BEAR:7W/10L(41%)  RANGING_BULL:17W/13L(57%)  TRANSITIONING:71W/77L(48%)
+  wave_phase             chi2 p=0.0675  | accelerating:197W/176L(53%)  bottoming:47W/34L(58%)  decelerating:36W/19L(65%)  falling:151W/153L(50%)  neutral:1W/5L(17%)
+
+====================================================================================================
+PART B2 — FORWARD OOS SPLIT (first half = derive, second half = test)
+====================================================================================================
+Split at open_time 2026-09-20 17:26:50.491742
+half1 n=409 (WR 54.5%)  half2 n=410 (WR 51.0%)
+variable                         h1_diff      h1_p   h2_diff      h2_p  same_sign
+entry_rsi_14 (DB col)               5.46    0.0807      3.94    0.0988        YES
+entry_bb_position (DB)              0.09    0.0468      0.06    0.1575        YES
+entry_atr_norm% (ATR/price)         0.02    0.6752     -0.01    0.2617 NO (flip!)
+leverage                            0.05    0.6311      0.03    0.7849        YES
+size_usdt                          -0.07    0.9305     -0.64    0.1640        YES
+meta rsi_14 (signal-time)          -0.06    0.9078      0.62    0.4961 NO (flip!)
+meta bb_position                   -0.04    0.3145      0.10    0.0141 NO (flip!)
+meta z_score                       -0.15    0.3147      0.39    0.0141 NO (flip!)
+meta btc_score                      5.58    0.1636      4.07    0.2419        YES
+meta speed_percentile              -0.96    0.6613     -3.18    0.2579        YES
+meta gap_at_entry%                  0.01    0.7775      0.11    0.3389        YES
+meta staleness_min                  0.09    0.6662     -0.00    0.9224 NO (flip!)
+meta momentum_score                -0.55    0.6423     -1.34    0.2551        YES
+meta volume_spike                   0.01    0.6730      0.31    0.4383        YES
+
+====================================================================================================
+PART C — PER-SIGNAL EXPECTANCY (90d live, n>=20), Bonferroni-corrected
+====================================================================================================
+signal                         n    WR%    avg%    sem%      t_p  binom_p     sum$ avg_size days
+pump-chain+                  138   54.3   1.159   0.722   0.1107   0.3491     4.26       14 2026-09-06..2026-10-08
+volume-breakout-long+         24   66.7   3.284   2.140   0.1385   0.1516     3.04       14 2026-09-17..2026-10-05
+bb-bounce-v2-long+           106   68.9   0.765   0.404   0.0610   0.0001     1.76       13 2026-09-02..2026-10-05 *
+accel-300-v2-                 72   56.9   0.734   0.611   0.2336   0.2888     1.46       11 2026-08-27..2026-08-28
+open-skies+                   30   53.3   1.517   1.786   0.4026   0.8555     0.83       12 2026-09-05..2026-09-17
+hl_copy_trader                79   50.6   1.448   1.176   0.2219   1.0000     0.68       12 2026-08-21..2026-08-25
+bb_bounce+,range_finder+      53   58.5   0.137   0.077   0.0810   0.2717     0.64       11 2026-08-07..2026-08-10
+tl_break_long                 94   38.3   0.060   0.073   0.4132   0.0298     0.58       11 2026-07-27..2026-08-04
+bb_bounce                     27   55.6   0.139   0.118   0.2495   0.7011     0.33       11 2026-08-04..2026-08-06
+bb_bounce+                    65   58.5   0.044   0.423   0.9175   0.2145     0.32       11 2026-08-11..2026-08-27
+bb_bounce+,hzscore+           34   50.0   0.074   0.106   0.4900   1.0000     0.25       11 2026-08-08..2026-08-11
+pullback-entry-              120   54.2   0.060   0.495   0.9037   0.4114     0.21       13 2026-09-06..2026-09-22
+tl_break_short               114   46.5  -0.011   0.151   0.9421   0.5123     0.06       11 2026-07-28..2026-08-24
+accel-300+                    37   32.4   0.051   0.085   0.5523   0.0470    -0.03       11 2026-07-23..2026-08-04
+accel-300-vel+                22   27.3  -0.024   0.126   0.8508   0.0525    -0.04       11 2026-07-31..2026-07-31
+bb-squeeze+                   69   60.9   0.017   0.361   0.9626   0.0912    -0.05       14 2026-10-02..2026-10-06
+vel-hermes-                   50   36.0  -0.012   0.071   0.8665   0.0649    -0.10       11 2026-08-02..2026-08-04
+macd-div-                     32   62.5  -0.046   0.729   0.9501   0.2153    -0.12       11 2026-08-24..2026-08-31
+r2-trend-long4                22   59.1  -0.420   0.454   0.3654   0.5235    -0.12       11 2026-08-14..2026-09-02
+range_breakout-               20   45.0  -0.060   0.149   0.6917   0.8238    -0.14       11 2026-08-12..2026-08-12
+hzscore-                      45   53.3   0.058   0.295   0.8450   0.7660    -0.16       11 2026-08-11..2026-08-23
+bb-bounce-long+               25   60.0  -0.038   0.552   0.9457   0.4244    -0.18       11 2026-09-01..2026-09-02
+zscore-rising-                38   44.7  -0.058   0.072   0.4256   0.6271    -0.22       11 2026-08-03..2026-08-04
+range_breakout_short          28   46.4  -0.093   0.175   0.5995   0.8506    -0.28       11 2026-08-12..2026-08-17
+inv-accel-300-                98   32.7  -0.030   0.058   0.6062   0.0008    -0.30       11 2026-07-25..2026-08-02 *
+inv-accel-300+                77   27.3  -0.098   0.045   0.0325   0.0001    -0.31       11 2026-07-25..2026-08-01 *
+bb-bounce-v3-long+            20   55.0  -0.321   0.693   0.6485   0.8238    -0.35       14 2026-09-21..2026-10-04
+pump-chain-                  138   52.9  -0.197   0.409   0.6308   0.5514    -0.36       14 2026-09-08..2026-10-08
+r2-trend-long3                47   53.2  -0.277   0.383   0.4732   0.7709    -0.37       11 2026-08-13..2026-09-02
+pump-catcher+                 21   38.1  -1.520   0.891   0.1035   0.3833    -0.39       11 2026-08-26..2026-08-27
+bb-bounce-short               65   66.2  -0.163   0.372   0.6627   0.0125    -0.44       11 2026-08-25..2026-09-03
+accel-300-,rs-s-broken        42   28.6  -0.124   0.106   0.2488   0.0079    -0.60       11 2026-07-11..2026-07-21
+coil-spring+                  21   47.6  -0.636   1.101   0.5699   1.0000    -0.65       13 2026-09-05..2026-09-06
+ema300-dip                    55   63.6  -0.524   0.418   0.2154   0.0581    -0.72       15 2026-09-03..2026-09-04
+accel-300-                    89   43.8  -0.163   0.090   0.0735   0.2891    -0.73       11 2026-07-23..2026-10-01
+accel-300-v2-long             21   28.6  -1.457   0.896   0.1196   0.0784    -0.74       11 2026-08-31..2026-09-01
+mover+                        30   50.0  -0.282   0.762   0.7140   1.0000    -1.04       13 2026-08-14..2026-10-06
+ema300-dip-short              25   44.0  -1.655   1.175   0.1718   0.6900    -1.06       12 2026-09-04..2026-09-09
+accel-300-v3-long+            39   43.6  -0.820   0.763   0.2893   0.5224    -1.41       12 2026-09-01..2026-09-07
+ct-hot+                       99   38.4  -0.974   0.965   0.3153   0.0265    -4.07       11 2026-08-15..2026-08-24
+(*) = significant after Bonferroni over 40 signals (p < 0.00125)
+
+====================================================================================================
+PART D — PAYOFF-RATIO ROOT CAUSE (30d live)
+====================================================================================================
+Winners : n= 432  mean +3.74%  median +2.21%  mean $+0.13
+Losers  : n= 387  mean -3.81%  median -3.82%  mean $-0.14
+Payoff ratio (mean): 0.982   (median): 0.579
+Expectancy/trade: +0.173%  $+0.001
+
+Loss tail:  beyond -3%: 64.3% of losers | beyond -5%: 30.2% | beyond -10%: 0.5%
+Win  tail:  beyond +3%: 39.1% of winners | beyond +5%: 21.1% | beyond +10%: 6.7%
+
+exit_reason                  n    WR%   avgW%   avgL%     sum$  avg_mfe  avg_mae
+profit-monster-trail       227   79.7    2.35   -0.72    12.08     0.88     0.34
+atr_trail_hit               11   90.9    9.84   -0.00     3.13     3.53     0.11
+hard_tp                      5  100.0    2.77    0.00     1.95     1.48     0.21
+pump_exit_dead_money        26   73.1    2.60   -1.48     1.36     0.99     0.46
+rr_engine_support_tp         9   77.8    1.79   -0.69     0.28     0.58     0.28
+HL_CLOSED                    6   50.0    0.30   -0.35    -0.06     0.44     0.50
+rr_engine_support_br        13   30.8    4.84   -4.54    -0.33     0.97     0.79
+cut-loser-MAE-GUARD          5    0.0    0.00   -3.51    -0.50     0.70     0.86
+rr_engine_resistance        37   40.5    2.97   -4.11    -1.33     0.79     0.77
+atr_sl_hit                 321   49.8    5.21   -5.29    -2.54     1.74     0.94
+cut-loser-CL-T1             25    0.0    0.00   -3.83    -3.11     0.09     0.88
+hard_sl                     46   34.8    1.20   -1.83    -3.17     1.15     1.12
+hard_max_loss               70    0.0    0.00   -3.77    -9.31     0.21     0.75
+
+MFE capture (winners): avg MFE vs avg realized -> left on table
+  winners avg mfe=1.90%  realized=3.74%  captured 196% of MFE
+  losers avg mae=1.01%  realized=-3.81%  (realized worse than MAE => slippage/gap beyond stop)
+
+By leverage (30d):
+     3x: n= 379 WR= 51.7%  avg=+0.02%  sum=$-2.05
+     5x: n= 440 WR= 53.6%  avg=+0.31%  sum=$+2.69
+
+====================================================================================================
+PART E — RSI-BAND PROSPECTIVE TEST (the surviving lead; weekly stability + OOS)
+====================================================================================================
+
+LONG (entry_rsi_14 coverage: 364/479)
+  band                   n    WR%    avg%     sum$
+  <35 oversold          40   60.0   0.105    -0.28
+  35-50                 55   47.3   0.260    -0.60
+  50-65                 98   55.1   0.838     1.91
+  >=65 overbought      171   55.0   0.647     2.69
+
+SHORT (entry_rsi_14 coverage: 174/340)
+  band                   n    WR%    avg%     sum$
+  <35 oversold          80   33.8  -1.510    -4.49
+  35-50                 58   43.1  -0.368    -1.47
+  50-65                 26   61.5   0.459     0.80
+  >=65 overbought       10   50.0  -1.620    -0.60
+
+  weekly stability (LONG only, RSI>=50 vs <50):
+    wk 2026-09-14: RSI>=50 n= 74 WR= 58.1% sum$  3.39 | RSI<50 n= 18 WR= 61.1% sum$  0.35
+    wk 2026-09-21: RSI>=50 n= 42 WR= 38.1% sum$ -2.24 | RSI<50 n= 20 WR= 50.0% sum$ -0.02
+    wk 2026-09-28: RSI>=50 n=118 WR= 61.9% sum$  3.40 | RSI<50 n= 50 WR= 52.0% sum$ -0.91
+    wk 2026-10-05: RSI>=50 n= 35 WR= 45.7% sum$  0.05 | RSI<50 n=  7 WR= 42.9% sum$ -0.30
+
+Prospective test: LONG & entry_rsi>=50 KEEP vs BLOCK (30d, and per half)
+  30d: KEEP n=269 WR=55.0% avg=+0.717% sum=$+4.60 | BLOCK n=95 WR=52.6% avg=+0.194% sum=$-0.88
+  half1: KEEP n=132 WR=57.6% avg=+0.836% sum=$+4.24 | BLOCK n=27 WR=48.1% avg=-0.110% sum=$-0.08
+  half2: KEEP n=137 WR=52.6% avg=+0.602% sum=$+0.36 | BLOCK n=68 WR=54.4% avg=+0.316% sum=$-0.80
+
+DONE.
