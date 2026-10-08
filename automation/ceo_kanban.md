@@ -282,3 +282,6 @@
 
 ## TEAM UPDATES
 - [2026-10-08 06:40 UTC] daily_orchestrator: **D3 TRAIL-MIN-GAP SHIPPED.** PG: 24h 10T +$0.40 20%WR | 7d 201T +$1.10 52.7% | LONG +$1.67 | SHORT −$0.57 AT RISK Oct 11 | Open 0 | HML 6T −$0.51 (60% closes). (1) HML_TRAIL_MIN_GAP_PCT=0.20 → HML price floor −0.60% (trail arm +0.40% always has room); EXTREME ATR still −0.75% via HML_VOL_ATR_MULT. Self-check PASS. (2) Committed 1c6c6927: brain_auditor HML vol-floor + pump-chain- NORMAL 1.2 boost + pattern_recognition.py (wyckoff dep restored, import verified) + LOSERS/ACCEL cleanup. (3) Disk: mtf_macd_tuner 1.76GB/15.9M rows prune queued after sweep idle. (4) NO kills, NO ride_it exemption (CEO-only). Watch: HML freq <40% next 24h; SHORT 7d.
+
+## TEAM UPDATES
+- [2026-10-08 06:50 UTC] health_monitor: Auto-fixes: journal vacuum freed 0B (disk still 86% — DB retention is the real fix, already on your board). No crash restarts needed — pipeline LIVE rc=0, timers 3/3 active, prices fresh (1m candles 20s), regime SHORT_BIAS 90S/3L/31N, 92 signals/hr in DB but 0 executed (known compactor/top-10 drought). Side findings: better-coder still crashing on empty dispatcher/; BANANA SHORT looping in DECIDER-LOOP with BTC-CRASH-OVERRIDE every 60s (conf=54, no fill).

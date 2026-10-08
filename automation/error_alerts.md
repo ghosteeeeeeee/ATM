@@ -159,3 +159,35 @@
 - **OK**: Pipeline clean (192 rc=0 cycles/30min, 0 tracebacks). Timers 3/3 active, firing ≤75s. Positions: 1 open (CRV LONG +5.38%), 13 closed today. Regime LONG_BIAS (75L/1S/48N). Speed 128/241 (53%). Prices fresh (87 tokens, ~51s). 1m candles flowing (105/5min). No DB locks blocking. hl-sync-guardian clean.
 - **INFO**: `hermes-bug-hunter.service` FAILED — by design (exits 1 when bugs found). Real issues logged: defunct ai_decider imports, 127 bare excepts, 52 sqlite connection leaks.
 - **INFO**: `hermes-git-release.service` FAILED — by design (exits 1 on uncommitted changes).
+
+## Error Alerts — 2026-10-08 02:48 UTC
+- **WARN** (recurring): Disk at 86% (95G/118G, 17G free). No logs >7d to gzip. DB hogs: coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.6G, session_brain 1.1G. Needs DB retention plan — log cleanup won't help.
+- **WARN** (1x): `hermes-better-coder.service` FAILED — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. Dispatcher dir empty. Service crashes every 30min. Not auto-fixed — module source unknown.
+- **WARN** (1x): Phantom trade — 1 trade with |pnl_pct| < 0.01% in last 24h. Below threshold for action.
+- **INFO**: Hotset empty — 110 signals generated last hour, 0 survived compaction / none above 50% confidence. Compactor filtering aggressively. Pipeline log confirms: "No signals above 50% confidence — skipping execution."
+- **OK**: Pipeline clean — all cycles rc=0, no tracebacks in 30min. Timers 3/3 active (fired ≤46s). Positions: 0 open, 1 closed today (pump-chain LONG +0.94 USDT, 100% WR). Regime SHORT_BIAS (10L/47S/67N across 124 tokens). Prices fresh (60s, 185 tokens). 1m candles flowing. No DB lock contention (3 concurrent readers on candles.db is normal). hl-sync-guardian active. Grep "error" hits were false positives ("0 errors" in coin_tracker lines).
+
+## Error Alerts — 2026-10-08 03:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-08 04:49 UTC
+- **WARN** (recurring): Disk at 86% (95G/118G, 17G free). Journal vacuum freed 92.5M (156M→64M). DB hogs unchanged: coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.7G, signals_hermes 958M, session_brain 1.1G. Log cleanup won't help — needs DB retention plan (CEO).
+- **WARN** (recurring): Hotset empty — 145 signals in DB last hour (many conf≥50: pump-chain SHORTs 88, ichimoku_short 75–78) but pipeline logs "No signals above 50% confidence — skipping execution" and hotset.json `[]`. Compactor filters all. decisions table still dead (4 rows, last 2026-04-13). Not auto-fixed — needs signal-lab review of why high-conf signals don't reach execution.
+- **WARN** (recurring): `hermes-better-coder.service` FAILED — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. `/root/.hermes/mcp/hermes-coding-mcp/dispatcher/` is EMPTY (since Sep 1). Service crashes every 30min. Not auto-fixed — module source unknown.
+- **OK**: Pipeline clean — all cycles rc=0, no Traceback/CRASH/DB-lock in 30min. Timers critical set active: pipeline, price-collector, 1m-candle, 15m-regime, 4h-regime (timer named `4h-regime-scanner.timer` — naming quirk, fires every 4h, last 01:05 next 05:05). Positions: 0 open, 1 closed today in signal_outcomes (+0.94 USDT win); pipeline portfolio log 12 closed today +28.18%. Regime SHORT_BIAS (98S/1L/27N, 126 tokens, scanner 04:45). Prices fresh (1m candles 0.2min, signals 0min). 0 phantom trades. BTC-CRASH/BTC_LEVEL guard blocks expected under SHORT_BIAS. hl-sync-guardian active.
+- **INFO**: `decisions` table unused by current signal_compactor.py (deterministic, LLM-free) — dead code path, not a runtime issue.
+
+## Error Alerts — 2026-10-08 05:00 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3541s left, N failures)`
+
+## Error Alerts — 2026-10-08 06:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-08 06:50 UTC (health_monitor)
+- **WARN** (recurring): Disk at 86% (96G/118G, 17G free). Journal vacuum freed 0B (already clean). No uncompressed *.log >7d. DB hogs unchanged: coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.7G, session_brain 1.1G, signals_hermes 959M. Log cleanup will not help — needs DB retention plan (CEO).
+- **WARN** (recurring): `hermes-better-coder.service` FAILED — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. `/root/.hermes/mcp/hermes-coding-mcp/dispatcher/` still empty. Service+timer report disabled but unit ran 06:46:22 (timer still listed NEXT 07:16). Not auto-fixed — module source unknown.
+- **WARN** (recurring): Hotset empty / execution dry — 92 signals in `signals` last hour (conf up to 88: BTC continuum_trend_short, BIGTIME volume_breakout_long) but pipeline logs "No signals above 50% confidence — skipping execution." Known compactor/top-10 admission issue from prior audits; not auto-fixed.
+- **INFO**: BANANA SHORT stuck in DECIDER-LOOP — same conf=54.06 hotset=YES volume-breakout-short- re-evaluated every ~60s 06:26–06:46 with BTC-CRASH-OVERRIDE allowing despite crash filter. No fill, no dismissal progress. Worth signal-lab look (stale hotset entry?).
+- **OK**: Pipeline clean — 192 rc=0 cycles/30min, LIVE done 06:46:49 rc=0, 0 Tracebacks/CRASH, position_manager rc=0. Critical timers 3/3 active (price-collector 06:46:22, 1m-candle 06:46:32, pipeline 06:47:00). hl-sync-guardian active. Prices fresh: candles_1m age 20s, 89 tokens/10m, token_speeds updated 06:47:36. Speed 128/241 (53%) ≥50th pct. Regime SHORT_BIAS (3L/90S/31N, 124 tokens, 06:45). Trades: 0 open, 1 closed today in signal_outcomes; pipeline portfolio log 10 closed today +31.28%. 0 phantom trades. candles.db held by 3 python procs — normal concurrent access, no lock errors.
+- **INFO**: `hermes-atr-sl-updater.timer` not-found (defunct rename, expected). `hermes-health-monitor.timer` active (this monitor). Grep "error|fail" hits were false positives ("0 errors" coin_tracker lines).
