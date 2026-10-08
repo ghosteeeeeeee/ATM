@@ -1,5 +1,13 @@
 # Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
 
+## Error Alerts — 2026-10-08 00:50 UTC (health_monitor)
+- **CRITICAL→FIXED** (recurring ~every 4min): `hermes-trade-watchdog.service` crash — `NameError: name 'watchdog_mode' is not defined` in `scripts/trade_watchdog.py` (`analyze_profit_lock`, `analyze_stale_trades`, `write_outputs`). Service failed; deep-analysis wrapper never ran.
+  - **AUTO-FIX**: Root cause — those helpers referenced `watchdog_mode` without fetching it. Added `watchdog_mode = get_watchdog_mode()[0]` at top of `analyze_profit_lock` and `analyze_stale_trades`; `write_outputs` now sets `auto_executed` from the steer flag. Verified: compile OK, `--dry-run` completes (5 steers), service restarts into opencode analysis phase. Python analysis path no longer NameErrors.
+- **WARN** (recurring): Disk 85% used (95G/118G). Journal vacuum freed 181M (269M→~88M). No uncompressed *.log >7d. Active DBs still large: coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.6G, session_brain 1.1G.
+  - **AUTO-FIX**: `journalctl --vacuum-size=80M` (freed 181M). DB prune still CEO/bug_hunter decision.
+- **INFO**: Pipeline healthy — LIVE run 00:46:51 rc=0, 86 signals/hr, 1 open (CRV LONG +9% in profit), 0 closed today. Timers 3/3 active (price-collector, 1m-candle, pipeline). Prices fresh (~2min). Regime 5m LONG_BIAS (47L/15S/60N). 0 phantom trades. 0 pipeline Tracebacks. token_speeds 128/241 ≥50th pct (avg 48.6).
+- **INFO**: Side findings unchanged — `signals_hermes_runtime.db` unbounded; failed non-critical units (better-coder, bug-hunter, git-release, brain-auditor) still disabled/commit-blocked; `prices.db`/`signals.db` 0-byte stubs still present.
+
 ## Error Alerts — 2026-10-07 13:50 UTC
 - **CRITICAL→FIXED** (765k+ restarts): `hermes-coding-mcp.service` crash-looping — `can't open file '/root/.hermes/scripts/run_mcp_server.py': No such file or directory`, status=2/INVALIDARGUMENT every 5s since ~44 days of restarts. MCP dir `mcp/hermes-coding-mcp/` gutted (only empty `dispatcher/`).
   - **AUTO-FIX**: `systemctl disable --now hermes-coding-mcp.service`. Not on trading path (pipeline/price-collector/1m-candle unaffected). Re-enable only after restoring `run_mcp_server.py`.
@@ -104,3 +112,50 @@
 
 ## Error Alerts — 2026-10-07 12:59 UTC
 - **REPEATED** (11x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+
+## Error Alerts — 2026-10-07 14:59 UTC
+- **REPEATED** (12x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-07 15:50 UTC
+- **WARN** (recurring): Disk at 85% (95G/118G, 18G free). No auto-fix applied — no logs >7d to gzip; prior journald vacuum (12:48) already done. Remaining hogs are live DBs (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.5G, session_brain 1.0G, signals_hermes 953M). Do not delete active DBs without a retention plan. Suggest: retention job for mtf_macd_tuner/session_brain, or grow disk.
+- **INFO**: price-collector LOCK-WAIT on candles.db — 46 retries/30min, all waited ≤0.1s and succeeded. Prices fresh (52s), candles_1m fresh (21s). Not blocking; no service stop needed.
+- **OK**: Pipeline cycle #232659 all rc=0. Timers: 3/3 active (fired ≤90s). Signals 125/1h. Trades: 0 open, 10 closed today (~+0.28 USDT, 2 wins). Regime SHORT_BIAS (12L/22S/92N). Speed 128/241 (53%) ≥50th pct. Position manager clean. No crashes.
+
+## Error Alerts — 2026-10-07 15:59 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-07 16:48 UTC
+- **WARN** (recurring): Disk at 85% (95G/118G, 18G free). No auto-fix — no logs >7d to gzip; journald vacuum already done at 12:48. Hogs are live DBs (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.5G, session_brain 1.0G). Need retention plan or disk growth.
+- **OK**: Pipeline clean (rc=0 all steps). Timers 3/3 active (fired ≤30s). Signals 76/1h. Trades: 0 open, 10 closed today (+0.55 USDT, 2 wins). Regime LONG_BIAS (86L/0S/38N). Speed 128/241 (53%). No phantom trades. No DB lock issues. No crashes.
+
+## Error Alerts — 2026-10-07 16:59 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-07 17:48 UTC
+- **WARN** (recurring): Disk at 85% (95G/118G, 18G free). No auto-fix — no logs >7d to gzip; live DBs are the hogs (coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.5G, session_brain 1.0G). Need retention plan or disk growth.
+- **OK**: Pipeline cycle rc=0 all steps. Timers 3/3 active (fired ≤60s). Signals: 4 signal_history/1h, recent SHORT signals (BTC/FOGO/STX/BABY/CHIP). Trades: 0 open, 10 closed today (+0.28 USDT, 25% WR pump-chain- SHORT). Regime SHORT_BIAS (3L/77S/45N). Speed 128/241 (53%). Prices fresh (candles.db 17:46, collector 17:47). No phantom trades, no crashes, no DB locks. hotset empty — compaction filtered all signals (BTC-CRASH momentum block + conf <50%). pipeline.service inactive between fires is normal (oneshot + timer).
+
+## Error Alerts — 2026-10-07 20:48 UTC
+- **WARN** (recurring): Disk at 85% (95G/118G, 17G free). No logs >7d to gzip. DB hogs unchanged: coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.6G, session_brain 1.1G. Same as 17:48 alert — needs retention plan, not a log cleanup.
+- **OK**: Pipeline cycle #232952 rc=0. Timers 3/3 active (fired ≤60s). Services: pipeline, hl-sync-guardian, hl-copy, brain-api all active. Signals: 100/1h (LDO/GRASS/CHIP SHORT pump-chain, WLD SHORT, WCT LONG). Trades: 0 open in signal_outcomes, 11 closed today (+0.22 USDT, 2 wins). Decider sees 2/6 open server positions (not yet in signal_outcomes — normal). Regime LONG_BIAS 44L/12S/67N; coin_tracker STORMY/BEARISH tide; macro gate LONG=FULL, SHORT=REDUCE. Speed 128/241 (53.1%) >= p50. Prices fresh (51s, 87 tokens). No phantom trades, no crashes, no DB locks, no exceptions in 30min. Grep "error" hits were false positives ("0 errors" in coin_tracker lines).
+
+## Error Alerts — 2026-10-07 21:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.2s (rc=N)`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TOK position_manager: TOK (most recent call last):`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: position_manager`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-07 22:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-07 23:49 UTC
+- **WARN** (recurring): Disk at 86% (95G/118G, 17G free). No logs >7d to gzip. DB hogs: coin_tracker 3.3G, candles 2.6G, mtf_macd_tuner 1.6G, session_brain 1.1G. Needs DB retention plan — log cleanup won't help.
+- **WARN** (1x): `hermes-better-coder.service` — `ModuleNotFoundError: No module named 'dispatcher.dispatcher'`. Dispatcher dir at `/root/.hermes/mcp/hermes-coding-mcp/dispatcher/` is EMPTY. Service crashes every 30min run. Not auto-fixed — module source unknown.
+- **WARN** (1x): Phantom trade — GRASS SHORT closed at -0.0015% / -0.0005 USDT (atr_trail_hit, 12:47). Below 0.01% threshold.
+- **INFO**: Hotset empty — 52 signals generated last hour, 0 survived compaction. Compactor filtering aggressively (BTC-CRASH momentum block + conf <50% pattern from earlier alerts).
+- **OK**: Pipeline clean (192 rc=0 cycles/30min, 0 tracebacks). Timers 3/3 active, firing ≤75s. Positions: 1 open (CRV LONG +5.38%), 13 closed today. Regime LONG_BIAS (75L/1S/48N). Speed 128/241 (53%). Prices fresh (87 tokens, ~51s). 1m candles flowing (105/5min). No DB locks blocking. hl-sync-guardian clean.
+- **INFO**: `hermes-bug-hunter.service` FAILED — by design (exits 1 when bugs found). Real issues logged: defunct ai_decider imports, 127 bare excepts, 52 sqlite connection leaks.
+- **INFO**: `hermes-git-release.service` FAILED — by design (exits 1 on uncommitted changes).

@@ -328,6 +328,18 @@ def scan_signals():
                         if direction == 'SHORT' and token_30m_vel > PUMP_FLOW_SHORT_VEL_THRESHOLD:
                             _log(f"  [pump-flow] {token} 30m Δ={token_30m_vel:+.3f}% > {PUMP_FLOW_SHORT_VEL_THRESHOLD}% — skipping SHORT (token rising)")
                             continue
+                        # MOVE-ALREADY-DONE FILTER (2026-10-07)
+                        # Block SHORT if token already dropped >3% in 30min (move over, bounce likely)
+                        # Block LONG if token already risen >3% in 30min (move over, pullback likely)
+                        from hermes_constants import PUMP_FLOW_MOVE_DONE_THRESHOLD
+                        if direction == 'SHORT' and token_30m_vel < -PUMP_FLOW_MOVE_DONE_THRESHOLD:
+                            _log(f"  [pump-flow] {token} 30m Δ={token_30m_vel:+.3f}% < -{PUMP_FLOW_MOVE_DONE_THRESHOLD}% — skipping SHORT (move already done, bounce likely)")
+                            continue
+                        if direction == 'LONG' and token_30m_vel > PUMP_FLOW_MOVE_DONE_THRESHOLD:
+                            _log(f"  [pump-flow] {token} 30m Δ={token_30m_vel:+.3f}% > +{PUMP_FLOW_MOVE_DONE_THRESHOLD}% — skipping LONG (move already done, pullback likely)")
+                            continue
+                            _log(f"  [pump-flow] {token} 30m Δ={token_30m_vel:+.3f}% > {PUMP_FLOW_SHORT_VEL_THRESHOLD}% — skipping SHORT (token rising)")
+                            continue
                     # 5m velocity (300s) — LONG only
                     if direction == 'LONG':
                         _vel5_row = _conn_vel.execute("""

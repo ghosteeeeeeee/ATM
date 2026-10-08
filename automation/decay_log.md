@@ -1511,3 +1511,15 @@
 [2026-10-07 05:08 UTC]   🟢 OK: pump-chain-: 5 trades, 60.0% WR, PnL=25.18
 [2026-10-07 05:08 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-07 05:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-07 11:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-07 11:08 UTC]   🟢 OK: pump-chain-: 7 trades, 42.9% WR, PnL=25.4
+[2026-10-07 11:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-07 11:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-07 17:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-07 17:08 UTC]   🟢 OK: pump-chain-: 10 trades, 30.0% WR, PnL=24.39
+[2026-10-07 17:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-07 17:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-07 23:08 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-07 23:08 UTC]   🟢 OK: pump-chain-: 8 trades, 25.0% WR, PnL=24.72
+[2026-10-07 23:08 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-07 23:08 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

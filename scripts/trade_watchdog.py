@@ -48,6 +48,50 @@ MFE_GIVEBACK_WARNING_PCT = 3.0     # Gave back 3%+ of MFE = warning
 # Auto-switches after DEPLOY_TIME + AUTOPILOT_DELAY_HOURS
 AUTOPILOT_DELAY_HOURS = 48
 DEPLOY_TIME_FILE = os.path.join(HERMES_DATA, "watchdog_deploy_time.json")
+
+# ponytail: killed-signal steer filter (DRIFT-W1) — historical closes from
+# disabled signals still emit false "losing streak" steers. Map trade signal
+# names → live hermes_constants flags. Extend when new kills land.
+_SIGNAL_FLAG_MAP = (
+    ('trend-ride', 'TREND_RIDE_LONG_ENABLED'),
+    ('trend_ride', 'TREND_RIDE_LONG_ENABLED'),
+    ('mover+', 'MOVER_PLUS_ENABLED'),
+    ('mover-', 'MOVER_MINUS_ENABLED'),
+    ('mtf-regime-trend+', 'MTF_REGIME_TREND_PLUS_ENABLED'),
+    ('mtf-regime-trend-', 'MTF_REGIME_TREND_MINUS_ENABLED'),
+    ('mtf_regime_trend+', 'MTF_REGIME_TREND_PLUS_ENABLED'),
+    ('mtf_regime_trend-', 'MTF_REGIME_TREND_MINUS_ENABLED'),
+    ('accel-300+', 'ACCEL_300_PLUS_ENABLED'),
+    ('accel-300-', 'ACCEL_300_MINUS_ENABLED'),
+    ('accel_300+', 'ACCEL_300_PLUS_ENABLED'),
+    ('accel_300-', 'ACCEL_300_MINUS_ENABLED'),
+    ('wave-catcher', 'WAVE_CATCHER_ENABLED'),
+    ('wave_catcher', 'WAVE_CATCHER_ENABLED'),
+    ('coin-tracker-hot', 'COIN_TRACKER_HOT_ENABLED'),
+    ('coin_tracker_hot', 'COIN_TRACKER_HOT_ENABLED'),
+    ('vel-hermes', 'VEL_HERMES_ENABLED'),
+    ('vel_hermes', 'VEL_HERMES_ENABLED'),
+    ('pump-catcher', 'PUMP_CATCHER_ENABLED'),
+    ('pump_catcher', 'PUMP_CATCHER_ENABLED'),
+    ('pattern-wolf', 'PATTERN_WOLF_ENABLED'),
+    ('pattern_wolf', 'PATTERN_WOLF_ENABLED'),
+)
+
+
+def _signal_is_disabled(sig: str) -> bool:
+    """True when trade signal name maps to a False *_ENABLED flag in constants."""
+    if not sig:
+        return False
+    s = sig.lower()
+    try:
+        import hermes_constants as hc
+        for frag, flag in _SIGNAL_FLAG_MAP:
+            if frag in s:
+                if getattr(hc, flag, True) is False:
+                    return True
+        return False
+    except Exception:
+        return False
 AUTO_EXECUTABLE_CATEGORIES = {"profit_lock"}  # Only these actions auto-execute
 
 
@@ -470,6 +514,7 @@ def analyze_regime_alignment(open_trades, btc_regime):
 
 def analyze_profit_lock(open_trades):
     """Check if any trades qualify for profit lock (breakeven or trailing stop)."""
+    watchdog_mode = get_watchdog_mode()[0]
     steers = []
 
     for trade in open_trades:
@@ -576,6 +621,7 @@ def analyze_profit_lock(open_trades):
 
 def analyze_stale_trades(open_trades):
     """Flag trades that have been open too long."""
+    watchdog_mode = get_watchdog_mode()[0]
     steers = []
 
     for trade in open_trades:
@@ -778,6 +824,8 @@ def analyze_recent_losses(recent_trades):
         sig_losses[sig]["total_loss"] += t.get("pnl_usdt", 0) or 0
 
     for sig, data in sig_losses.items():
+        if _signal_is_disabled(sig):
+            continue  # DRIFT-W1: historical losses from killed signals — not actionable
         if data["count"] >= 3:
             steers.append({
                 "severity": "warning",
@@ -798,6 +846,8 @@ def analyze_signal_quality(signal_perf, btc_regime):
     btc_trend = btc_regime.get("continuum") or btc_regime.get("btc_4h", "unknown")
 
     for sig, perf in signal_perf.items():
+        if _signal_is_disabled(sig):
+            continue  # DRIFT-W1: skip steers for currently-disabled signals
         # Cold signal: lots of trades, negative PnL
         if perf["total"] >= 5 and perf["total_pnl"] < -2:
             steers.append({
@@ -1099,7 +1149,7 @@ def write_outputs(output, steers, dry_run=False):
             action = s.get("action", {})
             action["timestamp"] = now.isoformat()
             action["reason"] = s.get("detail", "")
-            action["auto_executed"] = watchdog_mode == "autopilot"
+            action["auto_executed"] = bool(s.get("auto_executable"))
             actions.append(action)
 
         atomic_write_json(ACTIONS_LOG, {"actions": actions})

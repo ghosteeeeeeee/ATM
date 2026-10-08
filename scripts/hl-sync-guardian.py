@@ -3431,35 +3431,49 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
 def _record_trade_outcome(token, direction, pnl_pct, pnl_usdt, trade_id):
     """
     Record trade outcome to signal_outcomes + self-correct on loss.
-    Called whenever any trade closes (guardian or position_manager).
+
+    P0 fix (2026-10-07): this path previously INSERTed without learning columns
+    (signal_type='unknown', no mfe/exit_reason). Prefer the P0 funnel in
+    _close_paper_trade_db / _close_orphan_paper_trade_by_id. If this stub is
+    wired, it looks up PG and routes through signal_schema so cells_st/TVS
+    get exit_reason + mfe.
     """
     is_win = float(pnl_pct or 0) > 0
 
-    # ── Record to signal_outcomes (SQLite) ─────────────────────────────────
+    # ── Record to signal_outcomes via signal_schema (learning columns) ──────
     try:
-        import sqlite3
-        conn_s = sqlite3.connect(RUNTIME_DB)
-        cur_s = conn_s.cursor()
-        # Bug-16 fix: include trade_id in dedup — same trade may be called twice
-        # with slightly different pnl_pct rounding. Without trade_id, both insert.
-        cur_s.execute("""
-            SELECT id FROM signal_outcomes
-            WHERE token=? AND direction=? AND ABS(pnl_pct - ?) < 0.0001
-            AND trade_id = ?
-            AND created_at > datetime('now', '-5 minutes')
-        """, (token.upper(), direction.upper(), pnl_pct, trade_id))
-        if cur_s.fetchone():
-            log(f'  Signal outcome dedup: {token} {direction} already recorded recently, skipping', 'WARN')
-            conn_s.close()
-            return
-        # BUG-24 fix: include trade_id column so outcomes can be joined back to brain.trades.
-        cur_s.execute("""
-            INSERT INTO signal_outcomes (token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, trade_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (token.upper(), direction.upper(), 'unknown',
-              1 if is_win else 0, pnl_pct, pnl_usdt, None, trade_id))
-        conn_s.commit()
-        conn_s.close()
+        from signal_schema import record_signal_outcome as _rso, rsi_band_label as _rsi_band
+        signal_type, confidence, exit_reason, mfe, mae, rsi = None, None, None, None, None, None
+        try:
+            import psycopg2 as _pg2
+            from _secrets import BRAIN_DB_DICT as _bdb
+            with _pg2.connect(**_bdb) as _conn:
+                _cur = _conn.cursor()
+                _cur.execute(
+                    """
+                    SELECT signal, confidence, exit_reason, mfe_pct, mae_pct, entry_rsi_14
+                    FROM trades WHERE id=%s
+                    """,
+                    (trade_id,),
+                )
+                _row = _cur.fetchone()
+                if _row:
+                    signal_type, confidence, exit_reason, mfe, mae, rsi = _row
+        except Exception:
+            pass  # fall through with Nones — signal_schema still records the row
+        _rso(
+            token=token,
+            direction=direction,
+            pnl_pct=float(pnl_pct or 0),
+            pnl_usdt=float(pnl_usdt or 0),
+            signal_type=signal_type or 'unknown',
+            confidence=float(confidence) if confidence is not None else None,
+            trade_id=trade_id,
+            exit_reason=exit_reason,
+            mfe_pct=mfe,
+            mae_pct=mae,
+            entry_rsi_band=_rsi_band(rsi),
+        )
         log(f'  Signal outcome: {token} {direction} -> {"WIN" if is_win else "LOSS"} '
             f'(pnl={pnl_pct:+.4f}%)', 'PASS')
     except Exception as sig_err:

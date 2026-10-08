@@ -619,3 +619,111 @@
 - **Severity:** LOW (latent)
 - **Finding:** `should_trade_v2` in volatility_gate_v2.py is dead code in production — only caller is the module's `__main__` self-test (line 819). Decider imports v1 `should_trade` (decider_run.py:1549). Compactor imports v2 for multipliers/classification but not REGIME_SIGNALS membership. Two large v1-only REGIRE_SIGNALS sets remain (52 signals in v1 NORMAL not in v2; 40 in v1 EXTREME not in v2) — many are deliberate v2 exclusions (comments show data-backed removals). Do NOT blind-sync those. Only the mtf-regime-trend± asymmetry was unsafe to leave (enabled SHORT signal, same kill class as the Oct 2 incident).
 - **Suggested fix:** None required now. If decider is ever repointed to v2, run a full REGIME_SIGNALS diff and reconcile deliberately — not mechanically.
+
+---
+
+## Session: 2026-10-07 18:08 UTC — Upgrade Implementer (post-freeze, Level 1 focus)
+
+### Plan: profitability-fix-plan-2026-10-07.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Entry timing is late; move-done filter, wider hard max loss, grind detection, continuum backfill.
+- **Difficulty:** Level 1-4 (mixed priorities)
+- **Value:** HIGH
+- **Status:** PARTIALLY IMPLEMENTED / PENDING CEO
+- **Reason:** P1 30m move-done live (PUMP_FLOW_MOVE_DONE_THRESHOLD=3.0). P2 partially done differently — CUT_LOSER widened -1.00→-1.50 (brain_auditor Oct 7) + leverage-aware HML fix (aed0aa36), not the proposed -2.50. P3 btc_grind_spike.py exists untested (Level 2). P4 continuum backfill not started. Move-freshness 5m filter BACKTEST DISPROVED Oct 7 (winners/losers identical pre-move) — do not add more move filters. Threshold value changes need CEO.
+
+### Plan: penalty-gated-execution-2026-10-06.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Penalty engine is advisory-only; gate final_confidence on penalty product; fix ema-AT bear hole; chop bullish phases.
+- **Difficulty:** Level 1-2
+- **Value:** HIGH
+- **Status:** ✅ FIXES 1-3 IMPLEMENTED
+- **Reason:** Fix 1 live — decider_run.py multiplies final_confidence by max(penalty_product, 0.3) before MIN_EXEC_CONFIDENCE (PENALTY-BLOCK logging live, 56 events Oct 6). Fix 2 live — _cont_bearish includes ema AT (signal_compactor.py:2658). Fix 3 live — chop_detector bullish set includes DECLINING (:530). Fix 4 (HL order sizing audit) PENDING investigation. Fix 5 (TRAILING_ACTIVATION_PCT widen) needs CEO — constant still 0.40.
+
+### Plan: ride-it-hard-max-loss-exemption.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Ride_it exits 0 all-time because HARD_MAX_LOSS fires before ride_it SL; Option B ride_it hard stop at -2.5%.
+- **Difficulty:** Level 1 (code) but process requires backtest + CEO
+- **Value:** HIGH (unblocks ride_it design)
+- **Status:** PENDING
+- **Reason:** _is_ride_it exists in position_manager.py:3307 but only exempts UNIVERSAL_MAX_HOLD, NOT hard_max_loss. HML now leverage-aware (CUT_LOSER/lev) at -1.50 account — still tighter than ride_it phase-1 SL cap. Plan process: backtest → own-conclusions → CEO → implement. No CEO approval yet. Constants change blocked without T.
+
+### Plan: wrong-side-chop-detector-2026-10-06.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Direction-aware chop detector; WR hard-block bear override; confluence relaxation.
+- **Difficulty:** Level 2
+- **Value:** MEDIUM (diagnosis correct, proposed fix wrong)
+- **Status:** SUPERSEDED / REJECTED
+- **Reason:** Later audit (penalty-gated plan + brain_auditor Oct 6): all 7 losing trades were STANDALONE_BYPASS — they skip chop detector entirely. "Direction-aware chop detector targets wrong gate." Root causes fixed elsewhere: penalty-gate (Fix 1), SHORT_CONTINUUM_SCORE_MAX=60, SHORT_RSI_HARD_FLOOR=45, bear override via LLM context + continuum. Do not implement direction-aware chop.
+
+### Plan: trade-learning-system-EXECUTION.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Close learning loops — P0 data layer, P1 cell store, P2 exit optimizer, P3 gate shadow, P4-T5 trainer.
+- **Difficulty:** Level 2-3 (phased)
+- **Value:** HIGH
+- **Status:** P0-P4 IMPLEMENTED; P5-P6 pending gates
+- **Reason:** wr_estimate reads trade_log (hebbian_engine.py:405). PG trades 30d: 896 closed, 895 exit_reason, 888 mfe, 887 mae (~99%). cell_stats.py + hermes-cell-stats.timer live (Oct 7 00:20: 662 cells, 55 admitted, 15 tradeable). t5_shadow.py live. signal_outcomes learning columns write-on-close since Oct 4 (3d: 66/66 complete). TVS constants + score boosts live in signal_compactor. Remaining: SQLite historical backfill for cells_st/TVS depth (this session), P5 live cells need shadow thresholds + CEO, P6 weekly trainer.
+
+### Plan: thesis-validation-system.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Track MFE thesis validation; score boosts on re-entries; cooldown override.
+- **Difficulty:** Level 3 (full spec) / Level 1 (data completeness)
+- **Value:** HIGH
+- **Status:** ✅ MOSTLY IMPLEMENTED
+- **Reason:** TVS_ENABLED=True; boosts/penalties in signal_compactor.py:1996+; thesis_validated/thesis_mfe columns written from mfe on close; TVS_COOLDOWN_OVERRIDE live. Gap: historical signal_outcomes lack thesis_mfe (coverage ~2% pre-Oct-4) — backfilled this session from PG.
+
+### Plan: 2026-09-07_partial-close-trailing-runner.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** 50% partial close at PM trail activation + adaptive runner trail.
+- **Difficulty:** Level 2-3
+- **Value:** HIGH (winner capture — ICP left 4% on table)
+- **Status:** NOT IMPLEMENTED
+- **Reason:** No PARTIAL_CLOSE_* constants; tpsil_utils close is full-size. Plan status "Plan". Needs tpsil partial-size support + profit_monster changes + CEO on runner trail tiers. Queue after Level 1 wins.
+
+### Plan: chop-v2-spec.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Per-coin trend routing in chop + chop_exit.py module.
+- **Difficulty:** Level 2-3
+- **Value:** HIGH (NEUTRAL chop is top bleed)
+- **Status:** PARTIAL / DEFERRED
+- **Reason:** chop_exit.py deferred (prior audits). Per-coin scoring not in chop_detector. Spec still valid but large; pending CEO prioritization vs entry-quality fixes currently dominating.
+
+### Plan: 2026-09-23_emergency-winrate-fix.md / 2026-09-23_regime-based-signal-fixes.md / 2026-09-11_volatility-*.md / 2026-09-09_regime-transition-smoothing.md / 2026-09-09_pump-chain-v2-spec.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Regime/vol gate fixes, pump-chain v2, winrate emergency.
+- **Difficulty:** Level 1-2
+- **Value:** HIGH
+- **Status:** ✅ IMPLEMENTED (prior sessions)
+- **Reason:** Confirmed in prior audit (2026-09-30) + live constants: SHORT_CONTINUUM_SCORE_MAX=60, regime signals tables synced, vol gate multipliers live, pump-chain active in regimes.
+
+### Plan: short-drought-dump-day-2026-10-05.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Shorts blocked during BTC dump — RSI floors, LLM gate, SHORT-CONTINUUM.
+- **Difficulty:** Level 1-2
+- **Value:** HIGH
+- **Status:** PARTIALLY SHIPPED
+- **Reason:** Fix 3 (LLM context + BTC continuum) shipped Oct 5, bug_hunter verified. Fix 1 bear override: intentionally NOT restored (bf96d7cd decision — oversold=bounce risk); later mitigated by SHORT_RSI_HARD_FLOOR=45 + SHORT_CONTINUUM_SCORE_MAX=60 + HIGH regime open. Fix 2 hysteresis not shipped. Post-fix SHORT 7d still negative but improving (−$1.66 → −$0.55). Monitor.
+
+### Plan: oscillator-matrix-lifecycle.md
+- **Date scanned:** 2026-10-07 18:08
+- **Core request:** Enable oscillator multiplier matrix.
+- **Difficulty:** Level 1
+- **Value:** MEDIUM
+- **Status:** ✅ IMPLEMENTED
+- **Reason:** OSCILLATOR_MULT_ENABLED=True since 2026-10-01 (shadow-validated: penalized zones -$8.61/33.3%WR vs boosted +$9.87/50.9%WR).
+
+---
+
+### Session implementations (2026-10-07)
+
+1. **signal_outcomes historical backfill** — filled exit_reason/mfe_pct/mae_pct/entry_rsi_band/regime/signal_type/thesis_* from PostgreSQL trades for rows with trade_id. Completes trade-learning P0 SQLite side for cells_st + TVS history depth.
+2. **hl-sync-guardian dead path fix** — `_record_trade_outcome` wrote signal_outcomes without learning columns (signal_type='unknown', no mfe/exit_reason). No current callers (P0 funnel already uses signal_schema), but path is a landmine. Rewired to look up PG trade + call signal_schema.record_signal_outcome.
+3. **trade_watchdog disabled-signal filter (DRIFT-W1)** — historical closes from killed signals (trend-ride+, mover±, mtf-regime-trend±, accel-300±, etc.) no longer emit false "losing streak" steers. Flag map reads live hermes_constants.
+
+### Sideways findings (this session)
+- **Severity:** LOW
+- **Finding:** `scripts/signal_version.py` missing (flagged in brain_auditor Oct 6) — signal_versions.json pump-chain+ corruption. Not fixed this session.
+- **Severity:** LOW
+- **Finding:** PG has no `signal_outcomes` table (SQLite-only). cell_stats correctly uses PG trades as primary; cells_st is supplementary. Do not try to join PG→SQLite without trade_id.
+- **Severity:** INFO
+- **Finding:** Ride_it hard-max-loss exemption still open — highest structural exit bug remaining after HML leverage-aware fix. Needs backtest + CEO.

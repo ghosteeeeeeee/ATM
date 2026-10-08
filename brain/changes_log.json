@@ -858,5 +858,38 @@
     "after": "PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True",
     "rationale": "HIGH is the bleed regime for pump-chain- SHORT. 14d HIGH 7T 14.3%WR -$0.66 vs NORMAL 7T 71.4% +$0.43. 30d HIGH 27T 44.4%WR -$0.42 vs NORMAL 12T 75% +$0.53. ADA 2026-10-07 HIGH RSI 56 SHORT lost (shorted bullish coin). Block wired in signal_compactor.py:2891 + decider_run.py:1656. EXTREME stays 1.0 (reopened Oct 4, 30d 51% breakeven). NORMAL preserved (the edge).",
     "impact": "Blocks HIGH-regime pump-chain- SHORT entries. 30d: kills 12 HIGH winners (~+$1.24) but eliminates 15 HIGH losers (~-$1.66) = net +$0.42 improvement. NORMAL winners (75%WR +$0.53/30d) unaffected. Constants load fresh per 1m cycle — no restart."
+  },
+  {
+    "timestamp": "2026-10-07T12:39:14Z",
+    "agent": "brain_auditor",
+    "change": "Killed bear-structure RSI-floor overrides in signal_compactor.py (SHORT-RSI-FLOOR-OVERRIDE + PUMP-CHAIN-SHORT-RSI-OVERRIDE). Floors=45 now hard blocks, no bear override. Aligned with standing decision 2026-10-06 (exec-side override already removed).",
+    "type": "config",
+    "file": "scripts/signal_compactor.py",
+    "before": "Bear-structure override admitted SHORT RSI<45 when BTC phase in (DECLINING,CALM,RECOVERY) AND linreg in (LEAN_BEAR,BEAR) AND ema=BELOW AND score<30",
+    "after": "Hard block at SHORT_RSI_FLOOR=45 / PUMP_CHAIN_SHORT_RSI_MIN=45 — no override path",
+    "rationale": "7d SHORT meta-RSI<45 = 28T 39.3%WR -$1.17 vs >=45 = 15T 46.7%WR +$0.49. 30d <45 = 136T -$4.64 (62W +$5.96, 70L -$10.60). Bear override was LIVE at kill (BTC RECOVERY+LEAN_BEAR+BELOW+score 8.13). Override manufactured the bleed. Watchdog steers + CEO deep analysis both recommended kill.",
+    "impact": "Blocks detection-time admission of oversold SHORTs. 7d net +$1.17 saved; 30d net +$4.64 saved. Exec-side HARD_FLOOR=45 remains backstop for bypass paths. Verified live: BTC SHORT RSI 44.0 blocked 12:38:01 with no-override log."
+  },
+  {
+    "timestamp": "2026-10-07T12:39:14Z",
+    "agent": "brain_auditor",
+    "change": "Re-enabled hermes-signal-compactor.timer (was disabled — latent failure mode)",
+    "type": "config",
+    "file": "systemd:hermes-signal-compactor.timer",
+    "before": "disabled",
+    "after": "enabled",
+    "rationale": "run_pipeline.py comment says compactor runs via standalone 1min timer, but timer was disabled. Manual restarts masked the issue. Timer must be enabled for override-kill fix to stay loaded.",
+    "impact": "Compactor fires reliably every 1min with fresh code"
+  },
+  {
+    "timestamp": "2026-10-07T14:39:47Z",
+    "agent": "brain_auditor",
+    "change": "CUT_LOSER_PNL -1.00 → -1.50 (hard_max_loss account threshold widened 50%)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "-1.00",
+    "after": "-1.50",
+    "rationale": "7d hard_max_loss 64T 0%WR -$8.60 = #1 bleed (entire system bleed; trail_family +$9.47/120T). 87.5% of HML trades had MFE>0 — were in profit, trail never got room. Post-fix lev-aware HML (aed0aa36) cut magnitude but -1% acct still inside EXTREME-vol noise at lev5. Widen gives trail ~50% more room to engage. Cannot block winners (HML only fires on losers). position_manager is per-cycle subprocess — loads fresh.",
+    "impact": "Expected: reduce HML frequency toward <30% of closes; convert some HML losers to trail exits. Monitor 48h: HML count, trail_family share, 7d PnL."
   }
 ]

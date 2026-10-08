@@ -1,0 +1,2312 @@
+[
+  {
+    "token": "ACE",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-11T14:42:39.218331",
+    "pnl": 0.13,
+    "trade_id": null,
+    "id": 15252,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "ACE",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-14T05:10:50.197604",
+    "pnl": 0.01,
+    "trade_id": null,
+    "id": 15365,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 62.469716464722225,
+    "prev_pnl": 0.13,
+    "prev_trade": {
+      "token": "ACE",
+      "open_time": "2026-09-11T14:42:39.218331",
+      "pnl": 0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ACE",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-14T19:05:40.806810",
+    "pnl": 0.22,
+    "trade_id": null,
+    "id": 15393,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 13.914058112777779,
+    "prev_pnl": 0.01,
+    "prev_trade": {
+      "token": "ACE",
+      "open_time": "2026-09-14T05:10:50.197604",
+      "pnl": 0.01,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ACE",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-24T03:24:50.468154",
+    "pnl": -0.33,
+    "trade_id": null,
+    "id": 15665,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 224.31935037333335,
+    "prev_pnl": 0.22,
+    "prev_trade": {
+      "token": "ACE",
+      "open_time": "2026-09-14T19:05:40.806810",
+      "pnl": 0.22,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ADA",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-09T09:16:43.185606",
+    "pnl": 0.05,
+    "trade_id": null,
+    "id": 15138,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "ADA",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-22T04:57:33.873381",
+    "pnl": 0.16,
+    "trade_id": null,
+    "id": 15611,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 307.68074660416664,
+    "prev_pnl": 0.05,
+    "prev_trade": {
+      "token": "ADA",
+      "open_time": "2026-09-09T09:16:43.185606",
+      "pnl": 0.05,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ADA",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-30T19:22:42.728595",
+    "pnl": -0.17,
+    "trade_id": null,
+    "id": 15771,
+    "exit_reason": "hard_sl",
+    "gap_hours": 206.41912644833332,
+    "prev_pnl": 0.16,
+    "prev_trade": {
+      "token": "ADA",
+      "open_time": "2026-09-22T04:57:33.873381",
+      "pnl": 0.16,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ADA",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-10-07T08:08:07.270476",
+    "pnl": -0.06,
+    "trade_id": null,
+    "id": 15975,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 156.75681718916667,
+    "prev_pnl": -0.17,
+    "prev_trade": {
+      "token": "ADA",
+      "open_time": "2026-09-30T19:22:42.728595",
+      "pnl": -0.17,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "AIXBT",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T18:10:05.115776",
+    "pnl": -0.18,
+    "trade_id": null,
+    "id": 15206,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-22T03:30:35.678342",
+    "pnl": 0.19,
+    "trade_id": null,
+    "id": 15608,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-24T10:39:01.718554",
+    "pnl": -0.17,
+    "trade_id": null,
+    "id": 15677,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 55.14056672555555,
+    "prev_pnl": 0.19,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-09-22T03:30:35.678342",
+      "pnl": 0.19,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-29T00:29:26.078549",
+    "pnl": 0.22,
+    "trade_id": null,
+    "id": 15719,
+    "exit_reason": "hard_sl",
+    "gap_hours": 109.84009999861111,
+    "prev_pnl": -0.17,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-09-24T10:39:01.718554",
+      "pnl": -0.17,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-29T10:33:38.665005",
+    "pnl": 0.04,
+    "trade_id": null,
+    "id": 15736,
+    "exit_reason": "hard_sl",
+    "gap_hours": 10.070162904444445,
+    "prev_pnl": 0.22,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-09-29T00:29:26.078549",
+      "pnl": 0.22,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 4,
+    "open_time": "2026-09-29T16:51:31.041052",
+    "pnl": 0.1,
+    "trade_id": null,
+    "id": 15752,
+    "exit_reason": "hard_sl",
+    "gap_hours": 6.297882235277778,
+    "prev_pnl": 0.04,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-09-29T10:33:38.665005",
+      "pnl": 0.04,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 5,
+    "open_time": "2026-09-29T22:53:27.553339",
+    "pnl": -0.19,
+    "trade_id": null,
+    "id": 15761,
+    "exit_reason": "hard_sl",
+    "gap_hours": 6.032364524166667,
+    "prev_pnl": 0.1,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-09-29T16:51:31.041052",
+      "pnl": 0.1,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 6,
+    "open_time": "2026-09-30T23:21:49.171869",
+    "pnl": -0.11,
+    "trade_id": null,
+    "id": 15774,
+    "exit_reason": "hard_sl",
+    "gap_hours": 24.47267181388889,
+    "prev_pnl": -0.19,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-09-29T22:53:27.553339",
+      "pnl": -0.19,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 7,
+    "open_time": "2026-10-01T08:09:56.478407",
+    "pnl": -0.06,
+    "trade_id": null,
+    "id": 15786,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 8.80202959388889,
+    "prev_pnl": -0.11,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-09-30T23:21:49.171869",
+      "pnl": -0.11,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 8,
+    "open_time": "2026-10-01T13:08:46.706951",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15798,
+    "exit_reason": "atr_trail_hit",
+    "gap_hours": 4.9806190400000006,
+    "prev_pnl": -0.06,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-10-01T08:09:56.478407",
+      "pnl": -0.06,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ALGO",
+    "dir": "SHORT",
+    "idx": 9,
+    "open_time": "2026-10-03T03:07:28.796996",
+    "pnl": 0.04,
+    "trade_id": null,
+    "id": 15862,
+    "exit_reason": "atr_trail_hit",
+    "gap_hours": 37.97835834583333,
+    "prev_pnl": 0.03,
+    "prev_trade": {
+      "token": "ALGO",
+      "open_time": "2026-10-01T13:08:46.706951",
+      "pnl": 0.03,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "APT",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T11:57:36.578273",
+    "pnl": 0.01,
+    "trade_id": null,
+    "id": 15193,
+    "exit_reason": "rr_engine_support_tp",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "APT",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-11T06:38:36.116062",
+    "pnl": -0.11,
+    "trade_id": null,
+    "id": 15229,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": 18.683204941388887,
+    "prev_pnl": 0.01,
+    "prev_trade": {
+      "token": "APT",
+      "open_time": "2026-09-10T11:57:36.578273",
+      "pnl": 0.01,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "APT",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-11T10:40:14.223517",
+    "pnl": 0.11,
+    "trade_id": null,
+    "id": 15238,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 4.027252070833333,
+    "prev_pnl": -0.11,
+    "prev_trade": {
+      "token": "APT",
+      "open_time": "2026-09-11T06:38:36.116062",
+      "pnl": -0.11,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "APT",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-14T14:56:29.888830",
+    "pnl": 0.0,
+    "trade_id": null,
+    "id": 15389,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 76.2710181425,
+    "prev_pnl": 0.11,
+    "prev_trade": {
+      "token": "APT",
+      "open_time": "2026-09-11T10:40:14.223517",
+      "pnl": 0.11,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "APT",
+    "dir": "SHORT",
+    "idx": 4,
+    "open_time": "2026-10-03T02:10:55.094555",
+    "pnl": -0.21,
+    "trade_id": null,
+    "id": 15861,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 443.2403349236111,
+    "prev_pnl": 0.0,
+    "prev_trade": {
+      "token": "APT",
+      "open_time": "2026-09-14T14:56:29.888830",
+      "pnl": 0.0,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "APT",
+    "dir": "SHORT",
+    "idx": 5,
+    "open_time": "2026-10-07T01:32:33.927261",
+    "pnl": 0.53,
+    "trade_id": null,
+    "id": 15972,
+    "exit_reason": "trail_sl",
+    "gap_hours": 95.36078686277779,
+    "prev_pnl": -0.21,
+    "prev_trade": {
+      "token": "APT",
+      "open_time": "2026-10-03T02:10:55.094555",
+      "pnl": -0.21,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "APT",
+    "dir": "SHORT",
+    "idx": 6,
+    "open_time": "2026-10-07T13:41:32.332835",
+    "pnl": -0.1,
+    "trade_id": null,
+    "id": 15980,
+    "exit_reason": "hard_sl",
+    "gap_hours": 12.149557103888888,
+    "prev_pnl": 0.53,
+    "prev_trade": {
+      "token": "APT",
+      "open_time": "2026-10-07T01:32:33.927261",
+      "pnl": 0.53,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ARB",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-11T21:03:31.704700",
+    "pnl": -0.13,
+    "trade_id": null,
+    "id": 15268,
+    "exit_reason": "cut-loser-CL-T1",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "ARB",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-24T01:24:33.865573",
+    "pnl": -0.17,
+    "trade_id": null,
+    "id": 15660,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 292.35060024250004,
+    "prev_pnl": -0.13,
+    "prev_trade": {
+      "token": "ARB",
+      "open_time": "2026-09-11T21:03:31.704700",
+      "pnl": -0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ARB",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-24T03:16:28.261300",
+    "pnl": -0.14,
+    "trade_id": null,
+    "id": 15664,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 1.8651099241666667,
+    "prev_pnl": -0.17,
+    "prev_trade": {
+      "token": "ARB",
+      "open_time": "2026-09-24T01:24:33.865573",
+      "pnl": -0.17,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ARB",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-10-03T03:09:31.176203",
+    "pnl": 0.01,
+    "trade_id": null,
+    "id": 15863,
+    "exit_reason": "atr_trail_hit",
+    "gap_hours": 215.8841430286111,
+    "prev_pnl": -0.14,
+    "prev_trade": {
+      "token": "ARB",
+      "open_time": "2026-09-24T03:16:28.261300",
+      "pnl": -0.14,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ATOM",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T15:26:28.942833",
+    "pnl": -0.14,
+    "trade_id": null,
+    "id": 15203,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "ATOM",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-11T03:16:32.183009",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15222,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": 11.834233382222221,
+    "prev_pnl": -0.14,
+    "prev_trade": {
+      "token": "ATOM",
+      "open_time": "2026-09-10T15:26:28.942833",
+      "pnl": -0.14,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ATOM",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-11T17:51:29.847017",
+    "pnl": 0.06,
+    "trade_id": null,
+    "id": 15259,
+    "exit_reason": "profit-monster-trail",
+    "gap_hours": 14.582684446666667,
+    "prev_pnl": 0.03,
+    "prev_trade": {
+      "token": "ATOM",
+      "open_time": "2026-09-11T03:16:32.183009",
+      "pnl": 0.03,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ATOM",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-11T21:35:29.562455",
+    "pnl": 0.04,
+    "trade_id": null,
+    "id": 15271,
+    "exit_reason": "profit-monster-trail",
+    "gap_hours": 3.7332542883333333,
+    "prev_pnl": 0.06,
+    "prev_trade": {
+      "token": "ATOM",
+      "open_time": "2026-09-11T17:51:29.847017",
+      "pnl": 0.06,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ATOM",
+    "dir": "SHORT",
+    "idx": 4,
+    "open_time": "2026-09-24T21:46:26.023723",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15688,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 312.1823503522222,
+    "prev_pnl": 0.04,
+    "prev_trade": {
+      "token": "ATOM",
+      "open_time": "2026-09-11T21:35:29.562455",
+      "pnl": 0.04,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "AVAX",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-11T13:30:28.515481",
+    "pnl": -0.18,
+    "trade_id": null,
+    "id": 15247,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "AVAX",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-23T18:15:30.528161",
+    "pnl": -0.06,
+    "trade_id": null,
+    "id": 15652,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 292.7505590777778,
+    "prev_pnl": -0.18,
+    "prev_trade": {
+      "token": "AVAX",
+      "open_time": "2026-09-11T13:30:28.515481",
+      "pnl": -0.18,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "AZTEC",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-24T01:56:31.274377",
+    "pnl": 0.0,
+    "trade_id": null,
+    "id": 15661,
+    "exit_reason": "pump_exit_momentum",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "AZTEC",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-24T08:45:49.333677",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15675,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 6.821683138888889,
+    "prev_pnl": 0.0,
+    "prev_trade": {
+      "token": "AZTEC",
+      "open_time": "2026-09-24T01:56:31.274377",
+      "pnl": 0.0,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BABY",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T06:21:25.994412",
+    "pnl": 0.28,
+    "trade_id": null,
+    "id": 15183,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "BABY",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-10T18:19:40.927024",
+    "pnl": 0.1,
+    "trade_id": null,
+    "id": 15210,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 11.970814614444443,
+    "prev_pnl": 0.28,
+    "prev_trade": {
+      "token": "BABY",
+      "open_time": "2026-09-10T06:21:25.994412",
+      "pnl": 0.28,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BABY",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-14T19:17:35.512669",
+    "pnl": 0.13,
+    "trade_id": null,
+    "id": 15394,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 96.96516267916667,
+    "prev_pnl": 0.1,
+    "prev_trade": {
+      "token": "BABY",
+      "open_time": "2026-09-10T18:19:40.927024",
+      "pnl": 0.1,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BABY",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-23T22:11:36.274557",
+    "pnl": 0.08,
+    "trade_id": null,
+    "id": 15657,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 218.90021163555554,
+    "prev_pnl": 0.13,
+    "prev_trade": {
+      "token": "BABY",
+      "open_time": "2026-09-14T19:17:35.512669",
+      "pnl": 0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BABY",
+    "dir": "SHORT",
+    "idx": 4,
+    "open_time": "2026-09-28T17:03:36.935707",
+    "pnl": 0.14,
+    "trade_id": null,
+    "id": 15710,
+    "exit_reason": "hard_sl",
+    "gap_hours": 114.86685031944444,
+    "prev_pnl": 0.08,
+    "prev_trade": {
+      "token": "BABY",
+      "open_time": "2026-09-23T22:11:36.274557",
+      "pnl": 0.08,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BABY",
+    "dir": "SHORT",
+    "idx": 5,
+    "open_time": "2026-09-29T05:46:24.472375",
+    "pnl": -0.09,
+    "trade_id": null,
+    "id": 15728,
+    "exit_reason": "hard_sl",
+    "gap_hours": 12.71320463,
+    "prev_pnl": 0.14,
+    "prev_trade": {
+      "token": "BABY",
+      "open_time": "2026-09-28T17:03:36.935707",
+      "pnl": 0.14,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BABY",
+    "dir": "SHORT",
+    "idx": 6,
+    "open_time": "2026-09-30T19:31:37.139607",
+    "pnl": -0.17,
+    "trade_id": null,
+    "id": 15772,
+    "exit_reason": "hard_sl",
+    "gap_hours": 37.753518675555554,
+    "prev_pnl": -0.09,
+    "prev_trade": {
+      "token": "BABY",
+      "open_time": "2026-09-29T05:46:24.472375",
+      "pnl": -0.09,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BANANA",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-14T10:30:34.371943",
+    "pnl": 0.06,
+    "trade_id": null,
+    "id": 15378,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "BCH",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T13:38:49.642240",
+    "pnl": 0.18,
+    "trade_id": null,
+    "id": 15199,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "BCH",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-10T18:27:28.544758",
+    "pnl": -0.12,
+    "trade_id": null,
+    "id": 15211,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": 4.810806255,
+    "prev_pnl": 0.18,
+    "prev_trade": {
+      "token": "BCH",
+      "open_time": "2026-09-10T13:38:49.642240",
+      "pnl": 0.18,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BIGTIME",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-09T05:36:28.410740",
+    "pnl": -0.13,
+    "trade_id": null,
+    "id": 15133,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "BIGTIME",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-23T16:56:46.986400",
+    "pnl": 0.0,
+    "trade_id": null,
+    "id": 15646,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 347.33849323888893,
+    "prev_pnl": -0.13,
+    "prev_trade": {
+      "token": "BIGTIME",
+      "open_time": "2026-09-09T05:36:28.410740",
+      "pnl": -0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BLUR",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T12:43:30.833998",
+    "pnl": 0.5,
+    "trade_id": null,
+    "id": 15195,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "BLUR",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-14T14:49:28.877220",
+    "pnl": -0.2,
+    "trade_id": null,
+    "id": 15388,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 98.09945645055556,
+    "prev_pnl": 0.5,
+    "prev_trade": {
+      "token": "BLUR",
+      "open_time": "2026-09-10T12:43:30.833998",
+      "pnl": 0.5,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BTC",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T18:10:21.147966",
+    "pnl": 0.05,
+    "trade_id": null,
+    "id": 15207,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "BTC",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-11T16:30:41.196903",
+    "pnl": 0.09,
+    "trade_id": null,
+    "id": 15256,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": 22.3389024825,
+    "prev_pnl": 0.05,
+    "prev_trade": {
+      "token": "BTC",
+      "open_time": "2026-09-10T18:10:21.147966",
+      "pnl": 0.05,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BTC",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-11T18:22:29.688648",
+    "pnl": 0.06,
+    "trade_id": null,
+    "id": 15262,
+    "exit_reason": "profit-monster-trail",
+    "gap_hours": 1.8634699291666668,
+    "prev_pnl": 0.09,
+    "prev_trade": {
+      "token": "BTC",
+      "open_time": "2026-09-11T16:30:41.196903",
+      "pnl": 0.09,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "BTC",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-24T16:16:25.072378",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15684,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 309.89871770277773,
+    "prev_pnl": 0.06,
+    "prev_trade": {
+      "token": "BTC",
+      "open_time": "2026-09-11T18:22:29.688648",
+      "pnl": 0.06,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CAKE",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-09T15:15:45.008652",
+    "pnl": 0.02,
+    "trade_id": null,
+    "id": 15147,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "CAKE",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-24T02:06:31.046884",
+    "pnl": -0.09,
+    "trade_id": null,
+    "id": 15662,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 346.8461217311111,
+    "prev_pnl": 0.02,
+    "prev_trade": {
+      "token": "CAKE",
+      "open_time": "2026-09-09T15:15:45.008652",
+      "pnl": 0.02,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CASHCAT",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-23T20:17:30.239379",
+    "pnl": 0.2,
+    "trade_id": null,
+    "id": 15655,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "CASHCAT",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-24T06:56:30.015457",
+    "pnl": 0.13,
+    "trade_id": null,
+    "id": 15671,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 10.649937799444444,
+    "prev_pnl": 0.2,
+    "prev_trade": {
+      "token": "CASHCAT",
+      "open_time": "2026-09-23T20:17:30.239379",
+      "pnl": 0.2,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CASHCAT",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-24T17:31:41.039809",
+    "pnl": 0.06,
+    "trade_id": null,
+    "id": 15686,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 10.586395653333334,
+    "prev_pnl": 0.13,
+    "prev_trade": {
+      "token": "CASHCAT",
+      "open_time": "2026-09-24T06:56:30.015457",
+      "pnl": 0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CASHCAT",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-29T00:16:23.849992",
+    "pnl": 0.19,
+    "trade_id": null,
+    "id": 15718,
+    "exit_reason": "hard_sl",
+    "gap_hours": 102.74522505083333,
+    "prev_pnl": 0.06,
+    "prev_trade": {
+      "token": "CASHCAT",
+      "open_time": "2026-09-24T17:31:41.039809",
+      "pnl": 0.06,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CASHCAT",
+    "dir": "SHORT",
+    "idx": 4,
+    "open_time": "2026-09-29T10:26:30.526424",
+    "pnl": -0.26,
+    "trade_id": null,
+    "id": 15735,
+    "exit_reason": "hard_sl",
+    "gap_hours": 10.16852123111111,
+    "prev_pnl": 0.19,
+    "prev_trade": {
+      "token": "CASHCAT",
+      "open_time": "2026-09-29T00:16:23.849992",
+      "pnl": 0.19,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CASHCAT",
+    "dir": "SHORT",
+    "idx": 5,
+    "open_time": "2026-09-29T12:37:39.926553",
+    "pnl": -0.42,
+    "trade_id": null,
+    "id": 15743,
+    "exit_reason": "hard_sl",
+    "gap_hours": 2.1859444802777777,
+    "prev_pnl": -0.26,
+    "prev_trade": {
+      "token": "CASHCAT",
+      "open_time": "2026-09-29T10:26:30.526424",
+      "pnl": -0.26,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CC",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T09:43:27.335337",
+    "pnl": 0.04,
+    "trade_id": null,
+    "id": 15190,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "CC",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-10T16:05:35.278737",
+    "pnl": 0.0,
+    "trade_id": null,
+    "id": 15204,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 6.368873166666667,
+    "prev_pnl": 0.04,
+    "prev_trade": {
+      "token": "CC",
+      "open_time": "2026-09-10T09:43:27.335337",
+      "pnl": 0.04,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CC",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-11T21:31:37.715548",
+    "pnl": 0.18,
+    "trade_id": null,
+    "id": 15270,
+    "exit_reason": "profit-monster-trail",
+    "gap_hours": 29.43401022527778,
+    "prev_pnl": 0.0,
+    "prev_trade": {
+      "token": "CC",
+      "open_time": "2026-09-10T16:05:35.278737",
+      "pnl": 0.0,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CHIP",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-23T20:03:24.012379",
+    "pnl": -0.17,
+    "trade_id": null,
+    "id": 15654,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "CHIP",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-24T11:22:28.988883",
+    "pnl": 0.04,
+    "trade_id": null,
+    "id": 15679,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 15.318049028888888,
+    "prev_pnl": -0.17,
+    "prev_trade": {
+      "token": "CHIP",
+      "open_time": "2026-09-23T20:03:24.012379",
+      "pnl": -0.17,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CHIP",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-29T10:39:29.060465",
+    "pnl": -0.21,
+    "trade_id": null,
+    "id": 15737,
+    "exit_reason": "hard_sl",
+    "gap_hours": 119.28335321722223,
+    "prev_pnl": 0.04,
+    "prev_trade": {
+      "token": "CHIP",
+      "open_time": "2026-09-24T11:22:28.988883",
+      "pnl": 0.04,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CHIP",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-10-01T08:35:41.809677",
+    "pnl": -0.11,
+    "trade_id": null,
+    "id": 15788,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 45.93687478111111,
+    "prev_pnl": -0.21,
+    "prev_trade": {
+      "token": "CHIP",
+      "open_time": "2026-09-29T10:39:29.060465",
+      "pnl": -0.21,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "COMP",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-23T16:56:32.998471",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15645,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "COMP",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-24T00:51:30.948222",
+    "pnl": -0.13,
+    "trade_id": null,
+    "id": 15659,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 7.9160971530555555,
+    "prev_pnl": 0.03,
+    "prev_trade": {
+      "token": "COMP",
+      "open_time": "2026-09-23T16:56:32.998471",
+      "pnl": 0.03,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "COMP",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-30T14:03:48.894579",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15763,
+    "exit_reason": "hard_sl",
+    "gap_hours": 157.20498509916666,
+    "prev_pnl": -0.13,
+    "prev_trade": {
+      "token": "COMP",
+      "open_time": "2026-09-24T00:51:30.948222",
+      "pnl": -0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "CRV",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-29T15:37:25.128638",
+    "pnl": 0.55,
+    "trade_id": null,
+    "id": 15751,
+    "exit_reason": "hard_sl",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "CRV",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-10-03T08:41:54.090032",
+    "pnl": -0.11,
+    "trade_id": null,
+    "id": 15868,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 89.07471149833333,
+    "prev_pnl": 0.55,
+    "prev_trade": {
+      "token": "CRV",
+      "open_time": "2026-09-29T15:37:25.128638",
+      "pnl": 0.55,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "DOGE",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-10-06T17:44:02.764617",
+    "pnl": 0.08,
+    "trade_id": null,
+    "id": 15969,
+    "exit_reason": "rr_engine_resistance_break",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "DYDX",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T18:19:26.935642",
+    "pnl": 0.02,
+    "trade_id": null,
+    "id": 15209,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "DYDX",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-29T19:56:30.542718",
+    "pnl": -0.18,
+    "trade_id": null,
+    "id": 15758,
+    "exit_reason": "hard_sl",
+    "gap_hours": 457.6176686322222,
+    "prev_pnl": 0.02,
+    "prev_trade": {
+      "token": "DYDX",
+      "open_time": "2026-09-10T18:19:26.935642",
+      "pnl": 0.02,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "DYDX",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-30T14:07:36.393100",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15764,
+    "exit_reason": "hard_sl",
+    "gap_hours": 18.184958439444443,
+    "prev_pnl": -0.18,
+    "prev_trade": {
+      "token": "DYDX",
+      "open_time": "2026-09-29T19:56:30.542718",
+      "pnl": -0.18,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "DYDX",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-10-03T04:35:49.337868",
+    "pnl": 0.45,
+    "trade_id": null,
+    "id": 15865,
+    "exit_reason": "atr_trail_hit",
+    "gap_hours": 62.470262435555554,
+    "prev_pnl": 0.03,
+    "prev_trade": {
+      "token": "DYDX",
+      "open_time": "2026-09-30T14:07:36.393100",
+      "pnl": 0.03,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ENA",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-11T18:49:46.796350",
+    "pnl": 0.13,
+    "trade_id": null,
+    "id": 15263,
+    "exit_reason": "profit-monster-trail",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "ENA",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-11T20:31:30.902504",
+    "pnl": -0.25,
+    "trade_id": null,
+    "id": 15266,
+    "exit_reason": "cut-loser-CL-T1",
+    "gap_hours": 1.6955850427777779,
+    "prev_pnl": 0.13,
+    "prev_trade": {
+      "token": "ENA",
+      "open_time": "2026-09-11T18:49:46.796350",
+      "pnl": 0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ENA",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-11T20:39:28.414996",
+    "pnl": 0.05,
+    "trade_id": null,
+    "id": 15267,
+    "exit_reason": "profit-monster-trail",
+    "gap_hours": 0.1326423588888889,
+    "prev_pnl": -0.25,
+    "prev_trade": {
+      "token": "ENA",
+      "open_time": "2026-09-11T20:31:30.902504",
+      "pnl": -0.25,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ENA",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-14T09:29:33.944102",
+    "pnl": -0.13,
+    "trade_id": null,
+    "id": 15373,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 60.834869196111114,
+    "prev_pnl": 0.05,
+    "prev_trade": {
+      "token": "ENA",
+      "open_time": "2026-09-11T20:39:28.414996",
+      "pnl": 0.05,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ENA",
+    "dir": "SHORT",
+    "idx": 4,
+    "open_time": "2026-09-14T12:05:45.384838",
+    "pnl": 0.13,
+    "trade_id": null,
+    "id": 15383,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 2.6031779822222223,
+    "prev_pnl": -0.13,
+    "prev_trade": {
+      "token": "ENA",
+      "open_time": "2026-09-14T09:29:33.944102",
+      "pnl": -0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ENA",
+    "dir": "SHORT",
+    "idx": 5,
+    "open_time": "2026-09-14T17:42:36.206677",
+    "pnl": -0.16,
+    "trade_id": null,
+    "id": 15392,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 5.6141171775,
+    "prev_pnl": 0.13,
+    "prev_trade": {
+      "token": "ENA",
+      "open_time": "2026-09-14T12:05:45.384838",
+      "pnl": 0.13,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ETC",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-11T08:07:25.280256",
+    "pnl": -0.11,
+    "trade_id": null,
+    "id": 15231,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "FIL",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-09T16:17:42.464465",
+    "pnl": 0.01,
+    "trade_id": null,
+    "id": 15152,
+    "exit_reason": "rr_engine_support_tp",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "FIL",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-10T06:27:29.932835",
+    "pnl": 0.03,
+    "trade_id": null,
+    "id": 15184,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 14.163185658333333,
+    "prev_pnl": 0.01,
+    "prev_trade": {
+      "token": "FIL",
+      "open_time": "2026-09-09T16:17:42.464465",
+      "pnl": 0.01,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "FIL",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-24T11:34:27.760901",
+    "pnl": -0.22,
+    "trade_id": null,
+    "id": 15680,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 341.1160633516667,
+    "prev_pnl": 0.03,
+    "prev_trade": {
+      "token": "FIL",
+      "open_time": "2026-09-10T06:27:29.932835",
+      "pnl": 0.03,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "FIL",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-10-07T13:31:50.845742",
+    "pnl": -0.12,
+    "trade_id": null,
+    "id": 15979,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 313.9564124558333,
+    "prev_pnl": -0.22,
+    "prev_trade": {
+      "token": "FIL",
+      "open_time": "2026-09-24T11:34:27.760901",
+      "pnl": -0.22,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "FOGO",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-23T19:31:28.644450",
+    "pnl": 0.2,
+    "trade_id": null,
+    "id": 15653,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "FOGO",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-24T08:13:49.984952",
+    "pnl": -0.01,
+    "trade_id": null,
+    "id": 15673,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 12.705927917222223,
+    "prev_pnl": 0.2,
+    "prev_trade": {
+      "token": "FOGO",
+      "open_time": "2026-09-23T19:31:28.644450",
+      "pnl": 0.2,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "GMT",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-13T17:56:31.117279",
+    "pnl": 0.22,
+    "trade_id": null,
+    "id": 15335,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "GMT",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-22T02:15:33.003793",
+    "pnl": -0.02,
+    "trade_id": null,
+    "id": 15603,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 200.31719069833335,
+    "prev_pnl": 0.22,
+    "prev_trade": {
+      "token": "GMT",
+      "open_time": "2026-09-13T17:56:31.117279",
+      "pnl": 0.22,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "GMX",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-23T17:37:28.805650",
+    "pnl": 0.11,
+    "trade_id": null,
+    "id": 15651,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "GMX",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-23T22:11:48.248078",
+    "pnl": -0.01,
+    "trade_id": null,
+    "id": 15658,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 4.572067341111111,
+    "prev_pnl": 0.11,
+    "prev_trade": {
+      "token": "GMX",
+      "open_time": "2026-09-23T17:37:28.805650",
+      "pnl": 0.11,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "GOAT",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-14T10:31:26.767383",
+    "pnl": 0.2,
+    "trade_id": null,
+    "id": 15379,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "GOAT",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-22T02:22:32.973649",
+    "pnl": -0.3,
+    "trade_id": null,
+    "id": 15605,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 183.85172396277778,
+    "prev_pnl": 0.2,
+    "prev_trade": {
+      "token": "GOAT",
+      "open_time": "2026-09-14T10:31:26.767383",
+      "pnl": 0.2,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "GOAT",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-22T05:16:34.327165",
+    "pnl": 0.09,
+    "trade_id": null,
+    "id": 15612,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 2.9003759766666666,
+    "prev_pnl": -0.3,
+    "prev_trade": {
+      "token": "GOAT",
+      "open_time": "2026-09-22T02:22:32.973649",
+      "pnl": -0.3,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "GOAT",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-23T16:57:30.110163",
+    "pnl": 0.02,
+    "trade_id": null,
+    "id": 15647,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 35.682161943888886,
+    "prev_pnl": 0.09,
+    "prev_trade": {
+      "token": "GOAT",
+      "open_time": "2026-09-22T05:16:34.327165",
+      "pnl": 0.09,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "GOAT",
+    "dir": "SHORT",
+    "idx": 4,
+    "open_time": "2026-09-24T11:56:29.967730",
+    "pnl": 0.0,
+    "trade_id": null,
+    "id": 15681,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 18.983293768611112,
+    "prev_pnl": 0.02,
+    "prev_trade": {
+      "token": "GOAT",
+      "open_time": "2026-09-23T16:57:30.110163",
+      "pnl": 0.02,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "GOAT",
+    "dir": "SHORT",
+    "idx": 5,
+    "open_time": "2026-09-29T05:00:25.424806",
+    "pnl": -0.08,
+    "trade_id": null,
+    "id": 15725,
+    "exit_reason": "hard_sl",
+    "gap_hours": 113.06540474333333,
+    "prev_pnl": 0.0,
+    "prev_trade": {
+      "token": "GOAT",
+      "open_time": "2026-09-24T11:56:29.967730",
+      "pnl": 0.0,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "GRASS",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-11T14:36:32.859103",
+    "pnl": 0.06,
+    "trade_id": null,
+    "id": 15251,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "GRASS",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-10-07T12:47:18.116585",
+    "pnl": 0.0,
+    "trade_id": null,
+    "id": 15978,
+    "exit_reason": "atr_trail_hit",
+    "gap_hours": 622.1792381894445,
+    "prev_pnl": 0.06,
+    "prev_trade": {
+      "token": "GRASS",
+      "open_time": "2026-09-11T14:36:32.859103",
+      "pnl": 0.06,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "HBAR",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-22T03:15:37.066477",
+    "pnl": -0.16,
+    "trade_id": null,
+    "id": 15607,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "HBAR",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-30T23:37:45.942717",
+    "pnl": 0.04,
+    "trade_id": null,
+    "id": 15775,
+    "exit_reason": "trail_sl",
+    "gap_hours": 212.3691322888889,
+    "prev_pnl": -0.16,
+    "prev_trade": {
+      "token": "HBAR",
+      "open_time": "2026-09-22T03:15:37.066477",
+      "pnl": -0.16,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "HBAR",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-10-05T03:22:28.071456",
+    "pnl": 0.06,
+    "trade_id": null,
+    "id": 15935,
+    "exit_reason": "UNIVERSAL_MAX_HOLD",
+    "gap_hours": 99.74503576083333,
+    "prev_pnl": 0.04,
+    "prev_trade": {
+      "token": "HBAR",
+      "open_time": "2026-09-30T23:37:45.942717",
+      "pnl": 0.04,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "HEMI",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-13T22:36:48.546129",
+    "pnl": -0.04,
+    "trade_id": null,
+    "id": 15339,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "HEMI",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-22T03:00:27.912383",
+    "pnl": -0.15,
+    "trade_id": null,
+    "id": 15606,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 196.39426840388887,
+    "prev_pnl": -0.04,
+    "prev_trade": {
+      "token": "HEMI",
+      "open_time": "2026-09-13T22:36:48.546129",
+      "pnl": -0.04,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "HYPER",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-14T08:46:32.381754",
+    "pnl": -0.16,
+    "trade_id": null,
+    "id": 15372,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "HYPER",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-14T11:25:33.953127",
+    "pnl": -0.14,
+    "trade_id": null,
+    "id": 15381,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 2.6504364925000004,
+    "prev_pnl": -0.16,
+    "prev_trade": {
+      "token": "HYPER",
+      "open_time": "2026-09-14T08:46:32.381754",
+      "pnl": -0.16,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "HYPER",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-10-02T07:35:28.222822",
+    "pnl": -0.13,
+    "trade_id": null,
+    "id": 15827,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 428.1650749152778,
+    "prev_pnl": -0.14,
+    "prev_trade": {
+      "token": "HYPER",
+      "open_time": "2026-09-14T11:25:33.953127",
+      "pnl": -0.14,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ICP",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-09T16:17:28.460172",
+    "pnl": -0.16,
+    "trade_id": null,
+    "id": 15151,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "ICP",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-10T12:48:43.681333",
+    "pnl": -0.18,
+    "trade_id": null,
+    "id": 15197,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 20.520894766944444,
+    "prev_pnl": -0.16,
+    "prev_trade": {
+      "token": "ICP",
+      "open_time": "2026-09-09T16:17:28.460172",
+      "pnl": -0.16,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "ICP",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-10T18:11:53.429685",
+    "pnl": -0.13,
+    "trade_id": null,
+    "id": 15208,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 5.386041208888889,
+    "prev_pnl": -0.18,
+    "prev_trade": {
+      "token": "ICP",
+      "open_time": "2026-09-10T12:48:43.681333",
+      "pnl": -0.18,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "INJ",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T13:38:35.668527",
+    "pnl": 0.29,
+    "trade_id": null,
+    "id": 15198,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "INJ",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-11T18:19:29.654280",
+    "pnl": -0.27,
+    "trade_id": null,
+    "id": 15261,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 28.681662709166666,
+    "prev_pnl": 0.29,
+    "prev_trade": {
+      "token": "INJ",
+      "open_time": "2026-09-10T13:38:35.668527",
+      "pnl": 0.29,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "INJ",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-10-07T05:22:37.271502",
+    "pnl": -0.03,
+    "trade_id": null,
+    "id": 15973,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 611.0521158949999,
+    "prev_pnl": -0.27,
+    "prev_trade": {
+      "token": "INJ",
+      "open_time": "2026-09-11T18:19:29.654280",
+      "pnl": -0.27,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "IO",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-10T12:13:31.861650",
+    "pnl": 0.07,
+    "trade_id": null,
+    "id": 15194,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "IO",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-28T21:00:30.124476",
+    "pnl": 0.05,
+    "trade_id": null,
+    "id": 15716,
+    "exit_reason": "hard_sl",
+    "gap_hours": 440.78285078500005,
+    "prev_pnl": 0.07,
+    "prev_trade": {
+      "token": "IO",
+      "open_time": "2026-09-10T12:13:31.861650",
+      "pnl": 0.07,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "IO",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-10-03T21:17:32.016568",
+    "pnl": -0.24,
+    "trade_id": null,
+    "id": 15890,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 120.28385891444444,
+    "prev_pnl": 0.05,
+    "prev_trade": {
+      "token": "IO",
+      "open_time": "2026-09-28T21:00:30.124476",
+      "pnl": 0.05,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "IO",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-10-06T19:25:10.745660",
+    "pnl": -0.12,
+    "trade_id": null,
+    "id": 15970,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 70.12742474777778,
+    "prev_pnl": -0.24,
+    "prev_trade": {
+      "token": "IO",
+      "open_time": "2026-10-03T21:17:32.016568",
+      "pnl": -0.24,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "IOTA",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-29T15:19:46.578704",
+    "pnl": 0.23,
+    "trade_id": null,
+    "id": 15748,
+    "exit_reason": "hard_sl",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "IOTA",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-30T18:59:36.305730",
+    "pnl": 0.0,
+    "trade_id": null,
+    "id": 15770,
+    "exit_reason": "hard_sl",
+    "gap_hours": 27.663813062777777,
+    "prev_pnl": 0.23,
+    "prev_trade": {
+      "token": "IOTA",
+      "open_time": "2026-09-29T15:19:46.578704",
+      "pnl": 0.23,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "JUP",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-14T05:04:52.114874",
+    "pnl": 0.0,
+    "trade_id": null,
+    "id": 15363,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "JUP",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-10-01T01:01:36.413230",
+    "pnl": -0.1,
+    "trade_id": null,
+    "id": 15776,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 403.94563843222227,
+    "prev_pnl": 0.0,
+    "prev_trade": {
+      "token": "JUP",
+      "open_time": "2026-09-14T05:04:52.114874",
+      "pnl": 0.0,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "KAS",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-09T15:17:31.227612",
+    "pnl": -0.42,
+    "trade_id": null,
+    "id": 15149,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "KAS",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-09-10T19:06:29.311810",
+    "pnl": 0.22,
+    "trade_id": null,
+    "id": 15212,
+    "exit_reason": "rr_engine_resistance",
+    "gap_hours": 27.816134499444445,
+    "prev_pnl": -0.42,
+    "prev_trade": {
+      "token": "KAS",
+      "open_time": "2026-09-09T15:17:31.227612",
+      "pnl": -0.42,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "KAS",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-09-24T06:06:35.126046",
+    "pnl": 0.06,
+    "trade_id": null,
+    "id": 15670,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 323.00161506555554,
+    "prev_pnl": 0.22,
+    "prev_trade": {
+      "token": "KAS",
+      "open_time": "2026-09-10T19:06:29.311810",
+      "pnl": 0.22,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "KAS",
+    "dir": "SHORT",
+    "idx": 3,
+    "open_time": "2026-09-24T10:36:26.295682",
+    "pnl": -0.32,
+    "trade_id": null,
+    "id": 15676,
+    "exit_reason": "atr_sl_hit",
+    "gap_hours": 4.497547121111111,
+    "prev_pnl": 0.06,
+    "prev_trade": {
+      "token": "KAS",
+      "open_time": "2026-09-24T06:06:35.126046",
+      "pnl": 0.06,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "KAS",
+    "dir": "SHORT",
+    "idx": 4,
+    "open_time": "2026-09-24T17:31:29.047563",
+    "pnl": -0.08,
+    "trade_id": null,
+    "id": 15685,
+    "exit_reason": "pump_exit_dead_money",
+    "gap_hours": 6.9174310780555555,
+    "prev_pnl": -0.32,
+    "prev_trade": {
+      "token": "KAS",
+      "open_time": "2026-09-24T10:36:26.295682",
+      "pnl": -0.32,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "LDO",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-28T16:46:33.904334",
+    "pnl": 0.21,
+    "trade_id": null,
+    "id": 15706,
+    "exit_reason": "hard_sl",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "LDO",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-10-01T02:45:39.687263",
+    "pnl": 0.05,
+    "trade_id": null,
+    "id": 15777,
+    "exit_reason": "trail_sl",
+    "gap_hours": 57.9849397025,
+    "prev_pnl": 0.21,
+    "prev_trade": {
+      "token": "LDO",
+      "open_time": "2026-09-28T16:46:33.904334",
+      "pnl": 0.21,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "LDO",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-10-07T08:19:37.975034",
+    "pnl": -0.07,
+    "trade_id": null,
+    "id": 15976,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 149.56619104749998,
+    "prev_pnl": 0.05,
+    "prev_trade": {
+      "token": "LDO",
+      "open_time": "2026-10-01T02:45:39.687263",
+      "pnl": 0.05,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "LTC",
+    "dir": "SHORT",
+    "idx": 0,
+    "open_time": "2026-09-28T17:01:37.419381",
+    "pnl": 0.24,
+    "trade_id": null,
+    "id": 15709,
+    "exit_reason": "hard_sl",
+    "gap_hours": null,
+    "prev_pnl": null,
+    "prev_trade": null
+  },
+  {
+    "token": "LTC",
+    "dir": "SHORT",
+    "idx": 1,
+    "open_time": "2026-10-06T03:29:41.410386",
+    "pnl": -0.25,
+    "trade_id": null,
+    "id": 15965,
+    "exit_reason": "hard_max_loss",
+    "gap_hours": 178.46777527916666,
+    "prev_pnl": 0.24,
+    "prev_trade": {
+      "token": "LTC",
+      "open_time": "2026-09-28T17:01:37.419381",
+      "pnl": 0.24,
+      "trade_id": null
+    }
+  },
+  {
+    "token": "LTC",
+    "dir": "SHORT",
+    "idx": 2,
+    "open_time": "2026-10-06T20:07:49.950455",
+    "pnl": 0.61,
+    "trade_id": null,
+    "id": 15971,
+    "exit_reason": "atr_trail_hit",
+    "gap_hours": 16.635705574722223,
+    "prev_pnl": -0.25,
+    "prev_trade": {
+      "token": "LTC",
+      "open_time": "2026-10-06T03:29:41.410386",
+      "pnl": -0.25,
+      "trade_id": null
+    }
+  }
+]
