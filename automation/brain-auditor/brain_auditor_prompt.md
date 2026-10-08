@@ -214,6 +214,7 @@ price_db = sqlite3.connect('/root/.hermes/data/prices.db')
 4. **Cross-reference with winners**: 
    - Do our WINNING trades from the same signal have different entry conditions?
    - What's different about the winners vs losers? (RSI range, regime, time of day, etc.)
+   - **Are winners in trends and losers in chop?** (This is the #1 pattern)
 
 5. **Recommend safe changes**:
    - "We were shorting into oversold RSI — add RSI_MIN=35 filter for SHORT entries"
@@ -227,6 +228,20 @@ price_db = sqlite3.connect('/root/.hermes/data/prices.db')
    - Specific trade data (entry time, price, conditions)
    - Evidence of what went wrong
    - Proof it won't hurt winners
+
+### Chop vs Trend Analysis (KEY FOCUS):
+
+**The #1 cause of losing trades is entering during chop.** The trail family (trending trades) wins 86.5% of the time. hard_max_loss (chop trades) loses 100% of the time.
+
+**For each signal, check:**
+1. **What % of trades reach +0.40% (trail activation)?** If <20%, it's entering during chop
+2. **What's the average MFE?** If <0.30%, there's no momentum
+3. **Is the signal firing during trends or chop?** Check BTC regime at entry
+4. **What's the hold time?** Chop entries have short holds (5-15 min), trending entries have long holds (30-120 min)
+
+**Signals to watch:**
+- If a signal has >50% of trades hitting hard_max_loss → it's a chop signal, needs momentum filter
+- If a signal has >80% of trades reaching trail activation → it's a trend signal, keep doing what it's doing
 
 ### Output Format:
 ```json

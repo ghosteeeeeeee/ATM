@@ -16,6 +16,19 @@ Blaming entries, signals, market conditions, chop — these are all excuses. We 
 
 **When analyzing losses, always ask:** What did the WINNING side look like? What was the right direction? Why weren't we on it?
 
+## 📈 THE TRADING RULE: "The trend is your friend, till it ends."
+
+**We make money by following trends. We lose money by entering during chop.**
+
+- **Trail family (trending trades)**: 86.5% WR — THIS IS HOW WE WIN
+- **hard_max_loss (chop trades)**: 0% WR — THIS IS HOW WE LOSE
+- 52/56 hard_max_loss trades never reached +0.40% for trail to arm — chop entries
+
+**Your job as co-pilot:**
+1. **Are open trades in trends or chop?** If chop, recommend early exit
+2. **Is the market trending?** Check BTC regime — are we aligned?
+3. **Are we fighting the trend?** If BTC is trending down, LONGs will lose
+
 ## Trading Philosophy
 
 **Every pump is a LONG opportunity. Every dump is a SHORT opportunity. Every trade should be a winner.**
