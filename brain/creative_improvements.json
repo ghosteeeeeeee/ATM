@@ -3540,5 +3540,30 @@
     "category": "entry sniper",
     "status": "monitor",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-08T07:37:22Z",
+    "agent": "brain_auditor",
+    "ideas": [
+      {
+        "date": "2026-10-08T07:37:22Z",
+        "idea": "HIGH-regime dampen for volume-breakout-long+ (0.3x) — MONITOR until n>=10",
+        "rationale": "14d volume-breakout-long+: EXTREME 3T 100%WR +$2.12, NORMAL 1T +$0.36, HIGH 2T 0%WR -$0.38. Signal wins everywhere except HIGH. n=2 HIGH is below sample floor.",
+        "expected_impact": "If pattern holds at n>=10 HIGH: cut ~$0.38/week bleed without touching EXTREME/NORMAL winners (5/6 winners non-HIGH).",
+        "category": "regime routing",
+        "status": "monitor",
+        "risk": "low",
+        "implementation_note": "volatility_gate_v2.py: ('HIGH','volume_breakout+') / ('HIGH','volume_breakout-long+') = 0.3 when sample justifies. Do NOT implement this run."
+      },
+      {
+        "date": "2026-10-08T07:37:22Z",
+        "idea": "WINNER-SHAPE confidence — volume-breakout-long+ stays the #1 non-pump LONG edge (14d 6T 66.7% +$1.58) but is under-traded (6T/14d vs pump-chain+ 15T). Current SOURCE_WEIGHTS already 1.25. Next lever is detection coverage, not another weight bump.",
+        "rationale": "WEIGHT increases have diminishing returns; the signal fires rarely. Check why detection yields few signals (thresholds, cooldowns) before touching weights.",
+        "expected_impact": "+2-4T/week if coverage gap is real → +$0.40-0.80/week at current avg.",
+        "category": "signal coverage",
+        "status": "suggested",
+        "risk": "low"
+      }
+    ]
   }
 ]

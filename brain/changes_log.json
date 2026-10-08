@@ -913,5 +913,16 @@
     "after": "1.2",
     "rationale": "NORMAL is the only profitable SHORT habitat: 7d 11T 63.6%WR +$0.09; 14d pump-chain- NORMAL 7T 71.4%WR +$0.43; 30d NORMAL 12T 75% +$0.53. EXTREME dampened to 0.5 same run. Boost winning side; cannot block anyone.",
     "impact": "Increased confidence for pump-chain- SHORT in NORMAL regime. EXTREME/HIGH untouched by boost. Eval in 48h."
+  },
+  {
+    "timestamp": "2026-10-08T07:37:22Z",
+    "agent": "brain_auditor",
+    "change": "Fixed exit_time NULL on all closed trades: DB trigger trg_trades_exit_time + backfill 5618 rows",
+    "type": "bugfix",
+    "file": "brain PostgreSQL trades table (trigger + data)",
+    "before": "exit_time NULL on 5618/5618 closed trades",
+    "after": "0 NULL; trigger armed for future close paths",
+    "rationale": "Data hygiene — all close paths set close_time but none set exit_time; watchdog sideways find. Trigger is root-cause (covers all write paths).",
+    "impact": "Analytics filtering on exit_time now works. No trading behavior change. 0 trading config changes this run."
   }
 ]
