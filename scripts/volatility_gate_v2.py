@@ -307,7 +307,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
     ('EXTREME', 'mover_long'): 0.5,              # PENALIZED 2026-09-22 — 50% WR but -$0.93 (8T)
     ('EXTREME', 'mover_short'): 0.5,             # PENALIZED 2026-09-22 — 55.6% WR but -$0.46 (9T)
-    ('EXTREME', 'pump_chain-'): 0.5,             # DAMPENED 2026-10-08 brain_auditor — post CEO re-enable still bleeds: 7d EXTREME n=20 35%WR -$0.23; post re-enable 3T -$0.22 0%WR. NORMAL is the edge (5T +$0.37 60%). Dampen not block (CEO philosophy: every dump is a SHORT).
+    ('EXTREME', 'pump_chain-'): 1.0,             # REVERTED 2026-10-08 brain_auditor — dampen 0.5 was over-correction. 14d EXTREME meta-RSI>=45: 41T +$1.09 (50-55 band 14T 64.3%WR +$0.81 BEST cell). The 7d EXTREME bleed (−$0.23/33.3%) was pre-floor RSI<45 trades — now blocked by SHORT_RSI_HARD_FLOOR=45 + PUMP_CHAIN_SHORT_RSI_MIN=45. HIGH stays blocked via PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED.
     ('EXTREME', 'pump_chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T, profitable)
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
@@ -322,7 +322,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
     ('EXTREME', 'pump_chain'): 1.0,              # OK 2026-09-22 — bare form 63.6% WR, +$1.35 (22T)
     ('EXTREME', 'pump-chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T)
-    ('EXTREME', 'pump-chain-'): 0.5,             # DAMPENED 2026-10-08 brain_auditor — hyphen variant, same bleed as underscore. 7d EXTREME n=20 35%WR -$0.23.
+    ('EXTREME', 'pump-chain-'): 1.0,             # REVERTED 2026-10-08 brain_auditor — hyphen variant, same as underscore. 14d EXTREME meta-RSI>=45: 41T +$1.09. Floors already block RSI<45 oversold.
     ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter
@@ -341,7 +341,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'volume_breakout_short'): 1.0,    # OK — volume-breakout-short can work in NORMAL
     ('NORMAL', 'pump_chain+'): 1.0,              # RE-ENABLED 2026-10-07 CEO — every pump is a LONG
     ('NORMAL', 'pump-chain+'): 1.0,              # RE-ENABLED 2026-10-07 CEO — hyphen variant
-    ('NORMAL', 'pump_chain-'): 1.2,              # BOOST 1.0→1.2 2026-10-08 brain_auditor — NORMAL is the only profitable SHORT habitat (14d 7T 71.4%WR +$0.43). Boost winning side; EXTREME stays 0.5, HIGH blocked in compactor. Small-n boost, not a filter.
+    ('NORMAL', 'pump_chain-'): 1.2,              # BOOST 1.0→1.2 2026-10-08 brain_auditor — NORMAL profitable SHORT habitat. Boost winning side; EXTREME reverted to 1.0 same day (RSI>=45 pays); HIGH blocked in compactor. Small-n boost, not a filter.
     ('NORMAL', 'pump-chain-'): 1.2,              # hyphen form — same boost (runtime signal_type is 'pump-chain')
     ('NORMAL', 'pump_chain'): 0.5,               # PENALIZED 2026-09-22 — 66.7% WR but -$0.27 (6T)
     ('NORMAL', 'pump-chain'): 0.5,               # PENALIZED — bare form fallback

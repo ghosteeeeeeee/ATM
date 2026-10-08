@@ -924,5 +924,16 @@
     "after": "0 NULL; trigger armed for future close paths",
     "rationale": "Data hygiene — all close paths set close_time but none set exit_time; watchdog sideways find. Trigger is root-cause (covers all write paths).",
     "impact": "Analytics filtering on exit_time now works. No trading behavior change. 0 trading config changes this run."
+  },
+  {
+    "timestamp": "2026-10-08T08:39:55Z",
+    "agent": "brain_auditor",
+    "change": "Revert EXTREME pump_chain- SHORT vol-gate dampen 0.5→1.0 (underscore + hyphen)",
+    "type": "config",
+    "file": "volatility_gate_v2.py",
+    "before": "('EXTREME','pump_chain-'): 0.5 and ('EXTREME','pump-chain-'): 0.5",
+    "after": "('EXTREME','pump_chain-'): 1.0 and ('EXTREME','pump-chain-'): 1.0",
+    "rationale": "Dampen deployed 02:35 today was over-correction. 14d EXTREME meta-RSI>=45: 41T +$1.09 (50-55 band 14T 64.3%WR +$0.81 BEST cell). The 7d EXTREME bleed (-$0.23/33.3%) that justified dampen was contaminated by pre-floor RSI<45 trades — now blocked by SHORT_RSI_HARD_FLOOR=45 + PUMP_CHAIN_SHORT_RSI_MIN=45 (both live). Dampen suppressed the paying EXTREME cell. NORMAL boost 1.2 retained. HIGH stays blocked via PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED.",
+    "impact": "Restores full confidence to EXTREME pump-chain- SHORT in RSI 45-65 band. Expected: capture EXTREME SHORT edge (+$1.09/14d on RSI>=45) without the oversold bleed (already floored). Winner impact of revert: 0 (no winners blocked)."
   }
 ]

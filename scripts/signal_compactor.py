@@ -2048,11 +2048,13 @@ def _score_signal(token, direction, conf, source, signal_type,
     # FIX 2026-10-04: penalty compounding floor — 26 multiplicative factors can compound
     # to near-zero (0.5 × 0.3 × 0.3 × 0.5 = 0.0225x). Floor prevents this while preserving
     # individual penalty signals.
+    # BUG-12 CEO 2026-10-07: rr_mult EXEMPT from score-floor. RR penalties must bite.
+    # final = score * rr_mult * max(other, 0.3). Hard blocks (any other mult = 0) still kill.
     _mult_product = (survival_bonus * staleness_mult * trend_alignment_mult * dir_outcome_mult *
                      source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult *
                      leaderboard_mult * combo_mult * penalty_mult * amplitude_mult *
                      time_block_mult * phase_mult * confluence_mult * inverse_mult *
-                     lifecycle_mult * rr_mult * vol_regime_mult * short_normal_mult *
+                     lifecycle_mult * vol_regime_mult * short_normal_mult *
                      oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult)
     _mult_floor = 0.3  # Score can't drop below 30% of base regardless of penalty stacking
     # CEO Fix 1: store raw product for decider penalty-gated execution
@@ -2070,7 +2072,7 @@ def _score_signal(token, direction, conf, source, signal_type,
         _mult_adjusted = max(_mult_product, _mult_floor)
         if _mult_product < _mult_floor:
             log(f"  ⚖️ [SCORE-FLOOR] {token} {direction}: multiplier product {_mult_product:.4f} floored to {_mult_floor}")
-        final_score = score * _mult_adjusted
+        final_score = score * _mult_adjusted * rr_mult
     return final_score
 
 
@@ -3857,6 +3859,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _skip_long = True
                                 break
                     if not _skip_long:
+                        # BUG-A CEO 2026-10-08: SPIKE-FILTER must not be stricter than
+                        # documented LONG RSI ceilings. LONG_RSI_CEILING=85 (raised 70→85
+                        # Oct 7 — RSI≥70 still prints). volume-breakout+ wins at RSI 70-95
+                        # (VOLUME_BREAKOUT_LONG_RSI_CEILING=95). Blanket 100-SPIKE_FILTER_RSI_THRESHOLD
+                        # (=70) was killing both before their own ceilings could allow them.
+                        try:
+                            from hermes_constants import LONG_RSI_CEILING, VOLUME_BREAKOUT_LONG_RSI_CEILING
+                            _spike_rsi_ceiling = LONG_RSI_CEILING
+                            if src and 'volume-breakout' in (src or '').lower():
+                                _spike_rsi_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING
+                        except Exception:
+                            _spike_rsi_ceiling = 100 - SPIKE_FILTER_RSI_THRESHOLD
                         _cur_sf2.execute("""
                             SELECT close FROM candles_5m
                             WHERE token = ? AND is_closed = 1
@@ -3872,12 +3886,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _al_l = sum(_losses_l) / 14
                             if _al_l == 0 and _ag_l > 0:
                                 # All gains, no losses → RSI = 100 (max overbought) → block LONG
-                                log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — RSI 100.0 > {100 - SPIKE_FILTER_RSI_THRESHOLD} (no losses in 14 periods)")
+                                log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — RSI 100.0 > {_spike_rsi_ceiling} (no losses in 14 periods)")
                                 _skip_long = True
                             elif _al_l > 0:
                                 _rsi_l = 100 - (100 / (1 + _ag_l / _al_l))
-                                if _rsi_l > (100 - SPIKE_FILTER_RSI_THRESHOLD):
-                                    log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — RSI {_rsi_l:.1f} > {100 - SPIKE_FILTER_RSI_THRESHOLD}")
+                                if _rsi_l > _spike_rsi_ceiling:
+                                    log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — RSI {_rsi_l:.1f} > {_spike_rsi_ceiling}")
                                     _skip_long = True
                     if _skip_long:
                         continue
