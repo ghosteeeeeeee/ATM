@@ -5845,3 +5845,44 @@ BY: auto_1hr
 - pump-chain-v5 7d negative per prior logs despite CEO re-enable — monitor only
 
 BY: auto_1hr
+
+## [2026-10-08 01:12] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: n/a)
+**Open:** 1 — CRV pump-chain+ LONG 22:17 UTC, entry 0.35971, SL 0.39017, TP 0.40092, +9.52% (TPSL-managed)
+
+**24h:** 13 closed | 3W 10L | +$0.50 (WR 23.1%)
+**24h by close reason:** hard_max_loss 8T -$0.61 (61.5%) | atr_trail_hit 2T +$0.61 | hard_sl 1T -$0.10 | pump_exit_dead_money 1T +$0.07 | trail_sl 1T +$0.53
+**24h by signal:** pump-chain- 8T 2W +$0.76 | pump-chain+ 4T 1W -$0.20 | pump-chain-v5 1T 0W -$0.06
+**atr_sl_hit:** 0/13 = 0% — tpsl_utils.py fix stable
+**Hourly PnL 6h:** 21:00 +$0.01 (gaps 22-01 = 0T)
+**Pipeline:** active, position_manager rc=0 @01:11 (Synced PnL from HL for 1 positions)
+
+**Changes:** NONE (no trigger met)
+
+**Diagnosis:**
+1. Entry quality: 0T closed last hour — nothing to judge. CRV open at +9.52% — winners trail-exit profitably (APT +23.89%, LTC +13.64%). Losers cluster at hard_max_loss -1.4%..-3.15%.
+2. SL behavior: atr_sl_hit 0% — NOT dominant. hard_max_loss 61.5% of 24h closes = queue#2 leverage-aware SL review still open (max 1 change/hr; no rule forced).
+3. Signal quality: No 0%-WR with 3+T last hour (0T closed). pump-chain+ 4T 1W 25%WR -$0.20 — below kill criteria and CEO RE-ENABLED today — do not re-kill. v5 1T 0W last24h but all-time 11T 4W — not kill-eligible.
+4. Trade frequency: 0/hr last hour, 1 open — fine.
+
+**Sideways:**
+- CRV pnl_usdt shows 0.00 despite +9.52% pnl_pct — HL sync lag or position bookkeeping; watch next cycle, no action if it syncs.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal can hit 3T-0%WR. pump-chain+ / v5 CEO RE-ENABLED today — do not re-kill.
+- atr_sl_hit: 0% — fix deployed, stable
+- hard_max_loss: 8/13 = 61.5% of 24h closes — queue#2 remains open; no stacked SL change
+- NEG-STREAK: inactive — 21:00 +$0.01 then gaps, no consecutive loss hours
+- Overtrade: 0/hr — fine
+- CRV open: +9.52%, TPSL-managed — no action on open
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 61.5% of 24h closes — queue#2 leverage-aware SL review remains the live watch item
+- pump-chain+ 4T 1W -$0.20 24h + CRV open +9.52% — if CRV TP-hits, signal turns profitable; CEO owns the keep
+- pump-chain-v5 7d negative per prior logs despite CEO re-enable — monitor only
+
+BY: auto_1hr
