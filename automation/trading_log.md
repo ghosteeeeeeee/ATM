@@ -6719,3 +6719,28 @@ BY: daily_orchestrator
 **Open Questions:**
 - hard_max_loss now 50% of 24h closes (6/12, avg −$0.143) — if Oct 9/10 brain_auditor eval clears it, next lever is SL width not signal kills
 - v5 family (solo+combo+v6 combo) 4T 0W −$0.49 combined over 24h — remains on 7d kill-bar watch, still under bar for instant kill
+
+## [2026-10-09 04:12] Hourly Analysis
+
+**Trades:** 0 closed (quiet streak 1h since 03:12 ALT close)
+**PnL:** $0.00 | 24h: 12T 4W −$0.34 (WR 33.3%)
+**24h exits:** hard_max_loss 6T −$0.86 | stale_exit 4T +$0.60 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+**24h signals:** pump-chain+ 7T 4W +$0.38 | pump-chain+v5 combo 2T 0W −$0.22 | pump-chain-v6 combo 1T 0W −$0.12 | pump-chain-v5 solo 1T 0W −$0.15 | pump-chain- 1T 0W −$0.23
+**Open:** 0
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal eligible (v5 family still 7d-bar watch only)
+- atr_sl_hit 0/12=0% — tpsl stable
+- hard_max_loss 6/12=50.0% — hold per brain_auditor Oct 9/10 eval window
+- Overtrade: 0/hr
+- Streak: flat hour, not 3 consecutive negatives
+- Timers fresh (pump-hunter/compactor 1min, 15m regime 12min), live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 50% share — awaiting brain_auditor Oct 9/10 verdict; next lever SL width not signal kills
+- v5 family 4T 0W −$0.49 over 24h — 7d kill-bar watch continues
+- Quiet stretch resumed (0T this hour); revisit over-filtering only if past ~8h
