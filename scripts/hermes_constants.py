@@ -1674,6 +1674,17 @@ SIGNAL_EXIT_CONFIG = {
     'pump_chain+': 'pump_exit',  # underscore variant
     'pump_chain-': 'rr_engine',  # underscore variant — SHORT needs tighter SL
     'pump_chain': 'pump_exit',    # bare variant
+    # Pump chain V5/V6 — EXPLICIT entries mandatory (rev1-audit fix #4): _match_exit_config
+    # (position_manager, fixed 2026-09-30) rejects raw-prefix matches, so versioned
+    # direction forms would silently fall to the default exit path without these keys.
+    # CEO 2026-10-09: v5 keys added — 'pump-chain-v5-' matched None (auditor routing bug);
+    # bare 'pump-chain-v5' stem-matches pump-chain+ → pump_exit (correct for LONG).
+    'pump-chain-v5+': 'pump_exit',   # LONG: momentum exit (same as pump-chain+)
+    'pump-chain-v5-': 'rr_engine',   # SHORT: tighter SL (CASHCAT -6.4% with pump_exit lesson)
+    'pump_chain_v5+': 'pump_exit',
+    'pump_chain_v5-': 'rr_engine',
+    'pump-chain-v6+': 'pump_exit',   # LONG: momentum exit (same as pump-chain+)
+    'pump-chain-v6-': 'rr_engine',   # SHORT: tighter SL (CASHCAT -6.4% with pump_exit lesson)
     # Mover: ride-it exit — volume spike override catches explosive moves
     # BUG FIX: mover+ REMOVED from ride_it (independent audit 2026-10-05: ride_it hurts mover+,
     # was already removed from PM bypass 2026-09-25 for PM trail to manage). Keep mover- on ride_it.
@@ -2792,6 +2803,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'grind-trend', 'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works solo (2026-09-19)
     'sma20-dip',  # SMA20 pullback LONG — mean reversion at SMA20, works solo
     'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum — standalone bypass (2026-09-13)
+    'pump-chain-v6', 'pump-chain-v6+', 'pump-chain-v6-',  # V6 both directions — chain correlation, works solo (spec rev1 §6.2)
     'rr-struct-v2', 'rr-struct-v2-',  # RR structural v2 — support/resistance structure, works solo (2026-09-14). v2+ KILLED CEO 2026-09-15
     'rr-struct-v',  # regex-stripped variant (trailing digits removed: v2 -> v)
     'warrior-sr-confirm', 'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R confirm — support/resistance breakout, works solo (2026-09-14)
@@ -3810,6 +3822,34 @@ PUMP_CHAIN_V5_SHORT_BB_THRESHOLD = 0.4  # BB position threshold for falling+flat
 PUMP_CHAIN_V5_SHORT_RISE_1M_THRESHOLD = 2  # block SHORT when 2+ consecutive rising 1m candles before entry
                                             # Independent audit verified: kills 9 wins, catches 16 losses, net=+$2.09, WR 50.7%→54.9%
                                             # Catches late-entry pattern (price already bouncing before SHORT)
+
+# ── Pump-Chain V6 (double-audited spec: brain/specs/pump_chain_v6_spec.md rev1) ──
+# pump_chain_v6.py — both directions, one file. Gates validated on 60d extended family
+# (n=304) with time-split robustness screen + permutation tests:
+#   LONG  block RSI<40 or flat momentum: 43.7%WR +$2.59 -> 59.7% +$7.26 (Fisher p<0.001,
+#         perm p=0.0001). VALIDATED edge.
+#   SHORT block RSI<45 or flat momentum: 53.5%WR +$1.40, blocked -$2.05 (perm p~0.05).
+#         MONITORING BET — stricter kill criteria (15 trades, not 20).
+# RSI/momentum computed by signal_schema._enrich_indicators (exact historical 1m formula).
+# Audits: brain/verdicts/2026-10-08-pump-chain-v6-verdict.md (FIX SPEC FIRST, 10 fixes
+# applied) + 2026-10-08-pump-chain-v6-rev1-verdict.md (PASS HIGH confidence).
+PUMP_CHAIN_V6_ENABLED = True          # master kill-switch
+PUMP_CHAIN_V6_PLUS_ENABLED = True     # LONG direction
+PUMP_CHAIN_V6_MINUS_ENABLED = True    # SHORT direction
+PUMP_CHAIN_V6_LONG_RSI_MIN = 40       # LONG RSI floor — RSI<40 = 15.4%WR -$1.01 (13T)
+PUMP_CHAIN_V6_SHORT_RSI_MIN = 45      # SHORT RSI floor — aligned w/ SHORT_RSI_HARD_FLOOR=45
+                                      # (rev0's 40 would keep trades the pipeline blocks anyway)
+PUMP_CHAIN_V6_BLOCK_FLAT_MOMENTUM = True  # block momentum_state='flat' both directions
+                                          # (LONG validated 26.1%WR -$1.75 all terciles; SHORT hygiene)
+PUMP_CHAIN_V6_MIN_AGE_MIN = 2         # LONG execution min-age — signals <2min old are SKIPped
+                                      # but left PENDING for re-check (decider_run V6-MIN-AGE guard).
+                                      # LONG opened <2min: 32.7%WR -$1.86 (55T, Fisher p=0.0099 vs >=2min).
+# V6 confidence-bonus tuning (ranking-only; mirrors pump_chain_long formula — bug_hunter M3)
+PUMP_CHAIN_V6_VEL_BONUS_CAP = 12      # cap on velocity bonus
+PUMP_CHAIN_V6_VEL_BONUS_DIVISOR = 2   # flow_score divisor for velocity bonus
+PUMP_CHAIN_V6_CHAIN_BONUS_CAP = 10    # cap on chain-count bonus
+PUMP_CHAIN_V6_PHASE_CONF_BONUS = 5    # bonus when phase confidence above threshold
+PUMP_CHAIN_V6_PHASE_CONF_THRESHOLD = 0.6  # phase confidence threshold for bonus
 PUMP_FLOW_MIN_CONFIDENCE = 65          # minimum confidence to emit signal (0-100)
 PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal

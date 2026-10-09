@@ -70,6 +70,7 @@ REGIME_SIGNALS = {
         'pump-catcher+', 'pump-catcher-',
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
+        'pump-chain-v6+', 'pump-chain-v6-',  # V6 — NORMAL is profitable SHORT habitat (spec rev1 §6.3)
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in NORMAL
         # Trend following + mean reversion in steady markets
@@ -140,6 +141,7 @@ REGIME_SIGNALS = {
         'pump-chain', 'pump-chain+',  # chain correlation LONG — HIGH edge for +
         # pump-chain- SHORT removed 2026-10-01 — HIGH 48%WR -$0.36 bleed. NORMAL 85.7%WR edge. signal_reporter
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works in high vol
+        'pump-chain-v6+',  # V6 LONG only — HIGH kept (gate-applied HIGH kept 14T 57.1% +$0.92); SHORT HIGH is the bleed regime (spec rev1 §6.3)
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — works in high vol
         'bb_bounce', 'bb_bounce+',  # standalone parts
         'bb-bounce-long+', 'bb-bounce-long-',  # LONG bounce signal
@@ -228,6 +230,7 @@ REGIME_SIGNALS = {
         'pump-chain', 'pump-chain+',  # chain correlation LONG — EXTREME edge (57% WR)
         # pump-chain- SHORT removed 2026-10-01 — EXTREME Pump_Flow=0.0 hard block; REGIME_SIGNALS was stale dead path
         'pump-chain-v5',  # V5 — LONG killed, SHORT regime-routed via VOL_PHASE_MULTS
+        'pump-chain-v6+', 'pump-chain-v6-',  # V6 — EXTREME carries the PnL (spec rev1 §6.3)
         'coil-spring', 'coil-spring+', 'coil-spring-',  # compression breakout — works in HIGH vol
         'slow-grind-',  # slow grinding downtrend detector
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion

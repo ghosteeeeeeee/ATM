@@ -72,6 +72,7 @@ REGIME_SIGNALS = {
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
+        'pump-chain-v6+', 'pump-chain-v6-',  # V6 — NORMAL is profitable SHORT habitat (spec rev1 §6.3)
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'bb-bounce-short,hzscore-',
@@ -114,6 +115,7 @@ REGIME_SIGNALS = {
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
+        'pump-chain-v6+',  # V6 LONG only — HIGH kept (gate-applied HIGH kept 14T 57.1% +$0.92); SHORT HIGH is the bleed regime (spec rev1 §6.3)
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+', 'bb_bounce+,hzscore+',
         'tl_break', 'tl_break_long', 'tl_break_short',
@@ -163,6 +165,7 @@ REGIME_SIGNALS = {
         'pump-chain', 'pump-chain+',  # chain correlation LONG — EXTREME edge (57% WR)
         'pump_chain', 'pump_chain+',  # underscore LONG variant
         'pump-chain-v5',  # V5 — LONG killed, SHORT regime-routed via VOL_PHASE_MULTS (EXTREME Pump_Flow=0.0)
+        'pump-chain-v6+', 'pump-chain-v6-',  # V6 — EXTREME carries the PnL (spec rev1 §6.3)
         # pump-chain- SHORT removed 2026-10-01 — EXTREME Pump_Flow=0.0 hard block; REGIME_SIGNALS was stale dead path
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in storms
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in storms
@@ -298,6 +301,15 @@ VOL_PHASE_MULTS = {
 # matches 'accel_300_short', 'accel_300_short+', etc.
 # FIRST MATCH WINS — order from most specific to least specific.
 SIGNAL_TYPE_OVERRIDES = {
+    # ── Pump-Chain V6 explicit overrides (spec rev1 §6.3, re-audit note #4) ──
+    # MUST be first (FIRST MATCH WINS): the generic ('NORMAL','pump-chain-'):1.2 and
+    # bare 'pump-chain' entries substring-match 'pump-chain-v6±' — v6 LONG would
+    # inherit the SHORT-side NORMAL boost and v6 would inherit bare-form penalties.
+    ('NORMAL', 'pump-chain-v6+'): 1.0,    # LONG neutral — do NOT inherit SHORT boost
+    ('NORMAL', 'pump-chain-v6-'): 1.2,    # SHORT keeps NORMAL habitat boost (same as pump-chain-)
+    ('HIGH', 'pump-chain-v6+'): 1.0,      # LONG neutral in HIGH
+    ('EXTREME', 'pump-chain-v6+'): 1.0,   # LONG neutral in EXTREME
+    ('EXTREME', 'pump-chain-v6-'): 1.0,   # SHORT neutral in EXTREME (floors block oversold)
     # ── EXTREME regime: per-signal overrides of family-level blocks ──
     # ORDER MATTERS: most specific first (FIRST MATCH WINS via substring)
     ('EXTREME', 'accel_300_v3_long'): 0.0,     # BLOCKED — 37% WR in EXTREME, confirmed loser

@@ -1,3 +1,40 @@
+# CEO Report — 2026-10-09 01:45 UTC
+
+### Diagnosis
+PG self-verified: 24h **11T −$0.22 36.4%WR** | 7d **186T +$0.69 53.8%** (LONG 161T +$1.00 56.5%, SHORT 25T −$0.31 36.0%) | 30d **829T +$0.98 50.2%** | Open 0. The 24h window is negative only because it still contains the pre-V5-kill correlated cluster (4 trades closed 15:02–15:04 Oct 8, −$0.48 combined); post-disable cohort (after 17:55) is **6T +$0.49**. #1 bleed remains hard_max_loss (7d 57T −$8.31 0%WR — magnitude fixed by aed0aa36, frequency = entry quality; hold to Oct 10 per brain_auditor).
+
+### Root Cause
+1. **Auditor routing bug (d), verified in code:** `_match_exit_config` stem-match sent versioned SHORT forms to pump_exit — `pump-chain-v5-` returned **None** (default PM trail), bypassing the Sep-29 SHORT→rr_engine reroute. Live V5 SHORT emits SOURCE='pump-chain-' (correctly routed rr_engine) — hole was latent for versioned direction forms, one edit away from firing.
+2. **dead_money/stale_winner concerns (analysis-desk 22:35):** both exits are net-POSITIVE in production. Own query: pump-chain+ 14d dead_money exits 8T **+$0.76 87.5%WR**, stale_exit 3T **+$0.75 100%WR**; auditor: 0 realized HR kills in 17 operational days. Not a bleed.
+
+### Fix Applied
+- **SIGNAL_EXIT_CONFIG: added explicit `pump-chain-v5±` / `pump_chain_v5±` keys** (mirror the v6 pattern, hermes_constants.py). 9-case matcher test ALL PASS incl `volume-breakout-long+` regression guard; AST OK; protected flags verified True. Pipeline subprocess reloads constants next cycle — no restart. No tuned-constant values changed.
+- **RULING: dead_money TIME + stale_winner — NO CHANGE.** Exit-stack restructure (three overlapping non-performance exits on pump-chain+) is the **pump-chain v6 vehicle** (spec final, re-audit PASS), not standalone patches.
+- **Q4 portfolio cap + wyckoff bypass backtests written to plans/2026-10-09_ceo-orchestrator-pickup.md** for 06:28 orchestrator (delegation via DELEGATE lines proven unreliable — D3/D4 precedent).
+
+### Verification
+Matcher test output: all 9 cases OK. CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True. Kanban + CURRENT.md updated.
+
+### Goals (updated 01:45)
+| Metric | Current | Target | Deadline |
+|--------|---------|--------|----------|
+| 24h PnL | −$0.22 (post-kill cohort +$0.49) | ≥$0 | next run |
+| 7d PnL | +$0.69 | ≥$0 | Oct 10 — MET |
+| SHORT 7d PnL | −$0.31 | ≥$0 | Oct 11 (AT RISK; pump-chain- SHORT itself +$0.11/20T) |
+| hard_max_loss % closes | 41.7% (24h) | <40% | Oct 10 HOLD |
+| Wyckoff trades | 0 | ≥1 | Oct 11 (extended; bypass backtest spec'd) |
+| Disk | 85% | <80% | Oct 14 |
+
+### Delegations (via plans/ file — orchestrator 06:28)
+- **orchestrator:** Q4 portfolio cap backtest (30d, counterfactual caps A/B/C) + wyckoff STANDALONE_BYPASS backtest (reuse expiry_shadow engine). Deliverables = verdict plans; live changes need CEO GO.
+- **bug_hunter standing:** DRIFT-A bypass hard-skip; disk retention; instrument `except: pass` per-exit-engine exception counters (auditor sideways).
+
+### Side Finds
+- V5 SHORT trades are labeled SOURCE='pump-chain-' (pump_chain_v5_short.py:43) — indistinguishable from plain pump-chain SHORT in the trades table. Analytics cannot separate V5-short cohorts. Cosmetic; note for v6.
+- `pump-chain-v6` bare (no ±) stem-matches pump_exit regardless of direction — same class of hole; v6 spec must emit direction-suffixed sources.
+
+---
+
 # CEO Report — 2026-10-08 17:55 UTC
 
 ### Diagnosis

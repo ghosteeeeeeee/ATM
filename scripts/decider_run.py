@@ -3558,6 +3558,9 @@ def run(dry_run=False):
             continue
 
         # V2 (2026-08-29): Signal staleness check — block if signal too old or price drifted
+        # (M1e fix: initialized BEFORE the try so an ImportError below can never leave it
+        # undefined (NameError) or stale from a previous loop iteration.)
+        _v6_min_age_pending = False
         try:
             from hermes_constants import SIGNAL_STALENESS_MAX_AGE_MIN, SIGNAL_STALENESS_PRICE_PCT
             signal_created_at = sig.get('created_at')
@@ -3580,18 +3583,81 @@ def run(dry_run=False):
                             log(f'  ⏰ [STALE-WARN] {token} {direction}: signal {age_min:.1f}min old (max {SIGNAL_STALENESS_MAX_AGE_MIN}min) — conditions will be verified')
                     except ValueError:
                         pass  # unparseable timestamp — skip staleness check
+            # ── PUMP-CHAIN V6 min-age pre-check (MUST run before the drift kill) ──
+            # bug_hunter M1 fix (2026-10-09): the drift check below measures vs the
+            # DETECTION price, so drift accumulated BY the mandated <2min wait would
+            # consume the signal before the min-age guard ever sees it (spec §6.5:
+            # "the skip path must not trip the drift block merely due to the wait").
+            # Flag under-age v6 LONG signals here; the guard below does the skip +
+            # re-anchors the drift baseline so the wait cannot compound on re-check.
+            # (Flag itself initialized above the try — M1e.)
+            try:
+                from hermes_constants import PUMP_CHAIN_V6_ENABLED as _V6_EN, PUMP_CHAIN_V6_MIN_AGE_MIN as _V6_AGE
+                # Match on source substring OR signal_type (merged-group hardening:
+                # get_approved_signals groups by token+direction and returns MAX(source)
+                # + an arbitrary row id, so a v6 row sharing a group with a
+                # later-sorting source would be missed by substring alone).
+                _v6_src_hit = 'pump-chain-v6+' in (source or '') or 'pump-chain-v6' in (sig.get('types') or '')
+                if (_V6_EN and direction == 'LONG' and _v6_src_hit
+                        and _staleness_min is not None and _staleness_min < _V6_AGE):
+                    _v6_min_age_pending = True
+            except ImportError:
+                pass  # constants not available — no exemption
             # Price drift check
             sig_price = sig.get('price')
             if sig_price and price and sig_price > 0:
                 drift_pct = abs(price - sig_price) / sig_price * 100
                 if drift_pct > SIGNAL_STALENESS_PRICE_PCT:
-                    log(f'  🚫 [DRIFT] {token} {direction}: price drifted {drift_pct:.2f}% (max {SIGNAL_STALENESS_PRICE_PCT}%)')
-                    if sig_id:
-                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
-                    skipped += 1
-                    continue
+                    if _v6_min_age_pending:
+                        log(f'  ⏳ [V6-MIN-AGE] {token} LONG drift {drift_pct:.2f}% deferred — signal still under min-age; baseline re-anchored at skip')
+                    else:
+                        log(f'  🚫 [DRIFT] {token} {direction}: price drifted {drift_pct:.2f}% (max {SIGNAL_STALENESS_PRICE_PCT}%)')
+                        if sig_id:
+                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        skipped += 1
+                        continue
         except ImportError:
             pass  # constants not available — skip staleness check
+
+        # ── PUMP-CHAIN V6 min-age guard (spec pump_chain_v6_spec.md rev1 §6.5) ──
+        # LONG entries executed <2 min after detection lose (32.7% WR, -$1.86, n=55;
+        # Fisher p=0.0099 vs >=2min). SKIP but leave the signal PENDING — do NOT mark
+        # executed — so a later cycle re-examines it once it is >=2 min old.
+        # (SIGNAL_STALENESS_MAX_AGE_MIN is warn-only since 2026-09-04, so there is no
+        # hard 5-min ceiling conflict. Bounds on the pending window: age is monotonic so
+        # the guard can only fire below 2 min; the generic 15-min staleness skip and the
+        # signal expire process (signal_schema) eventually reap anything left.)
+        # On skip, the signal's price is RE-ANCHORED to the current price so the drift
+        # baseline restarts — the mandated wait itself can then never trip the drift kill.
+        # SHORT: no min-age — 5m+ is the BEST SHORT band (58.1% WR) — age helps SHORTs.
+        if _v6_min_age_pending:
+            try:
+                from hermes_constants import PUMP_CHAIN_V6_MIN_AGE_MIN
+                log(f'  ⏳ [V6-MIN-AGE] {token} LONG: signal {_staleness_min:.1f}min old '
+                    f'(< {PUMP_CHAIN_V6_MIN_AGE_MIN}min) — leaving pending for re-check')
+                if sig_id:
+                    try:
+                        import sqlite3 as _sq
+                        from paths import RUNTIME_DB as _RTDB
+                        _rc = _sq.connect(_RTDB, timeout=5)
+                        try:
+                            # Scoped by token+direction+signal_type (not bare id): the
+                            # merged-group id may point at a different row's signal.
+                            _rc.execute(
+                                "UPDATE signals SET price = ? "
+                                "WHERE token = ? AND direction = ? "
+                                "AND signal_type = 'pump-chain-v6' AND executed = 0",
+                                (price, token, direction))
+                            _rc.commit()
+                        finally:
+                            _rc.close()
+                        log(f'  ⏳ [V6-MIN-AGE] #{sig_id} drift baseline re-anchored to {price}')
+                    except Exception as _re:
+                        log(f'  ⚠️ [V6-MIN-AGE] drift re-anchor failed for #{sig_id}: {type(_re).__name__}: {_re}')
+                skipped += 1
+                continue
+            except ImportError:
+                pass  # constants not available — guard disabled
 
         if not price:
             log(f'SKIP: {token} — no price available')

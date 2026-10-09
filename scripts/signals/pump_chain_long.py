@@ -164,7 +164,9 @@ def scan_signals():
         if added >= PUMP_FLOW_MAX_PER_CYCLE:
             break
         
-        token = rec.get('token', '').upper()
+        token = (rec.get('token') or '').upper()
+        if not token:
+            continue  # null/empty token — same fix as pump_chain_v6 (bug_hunter watch item)
         direction = rec.get('suggested_direction', '')
         
         if direction != 'LONG':

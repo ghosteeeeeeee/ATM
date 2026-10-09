@@ -626,6 +626,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 1.2,  # NEW 2026-09-13 — 7 new filters, regime-aware
     ('bollinger_squeeze_long', 'bb-squeeze+'): 1.0,  # REVERTED 2026-10-05 signal_reporter — was 1.2 (BOOSTED 10-03 on 24h 10T 70%WR +$0.33). Now 24h 16T 62.5%WR -$0.32 — WR holds but R:R negative (HIGH regime -$0.40 9T). EXTREME still blocked. 7d +$0.18 keep enabled.
     ('pump-chain', 'pump-chain+'): 1.2,  # BOOSTED 2026-10-03 23:13 — 24h 8T 62.5%WR +$0.95 (ME/LDO/ENS/DYDX/GMT). Re-enabled 10-02 post-kill. Static fallback; combo_weights.json is authoritative.
+    ('pump-chain-v6', 'pump-chain-v6+'): 1.0,  # V6 LONG — validated gate (spec rev1, double-audited). Self-learner tunes after 5+ trades.
+    ('pump-chain-v6', 'pump-chain-v6-'): 1.0,  # V6 SHORT — monitoring bet; same base weight
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
     ('bb_bounce',   'bb_bounce,hzscore+'):               1.5,  # 5T 100% WR +$0.12 (boosted)
     ('mtf_zscore',  'bb-bounce-short,hzscore-'):           1.5,  # 11T 64% WR +$0.18 (boosted)

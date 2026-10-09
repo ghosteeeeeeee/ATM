@@ -1984,6 +1984,23 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         return None
                 except ImportError:
                     pass
+            # pump-chain V6 (both directions, own kill-switches — spec rev1 §6.3)
+            if _comp == 'pump-chain-v6+':
+                try:
+                    from hermes_constants import PUMP_CHAIN_V6_PLUS_ENABLED, PUMP_CHAIN_V6_ENABLED
+                    if not PUMP_CHAIN_V6_PLUS_ENABLED or not PUMP_CHAIN_V6_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_CHAIN_V6_PLUS_ENABLED=False or PUMP_CHAIN_V6_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
+            if _comp == 'pump-chain-v6-':
+                try:
+                    from hermes_constants import PUMP_CHAIN_V6_MINUS_ENABLED, PUMP_CHAIN_V6_ENABLED
+                    if not PUMP_CHAIN_V6_MINUS_ENABLED or not PUMP_CHAIN_V6_ENABLED:
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PUMP_CHAIN_V6_MINUS_ENABLED=False or PUMP_CHAIN_V6_ENABLED=False', flush=True)
+                        return None
+                except ImportError:
+                    pass
             # btc-pump-rider (BTC breakout → alt lagging LONG)
             if _comp == 'btc-pump-rider+':
                 try:
@@ -2752,6 +2769,7 @@ def is_component_disabled(component: str) -> bool:
             RR_STRUCTURAL_ENABLED, RR_STRUCTURAL_PLUS_ENABLED, RR_STRUCTURAL_MINUS_ENABLED,
             RR_STRUCTURAL_V2_LONG_ENABLED,
             AI_TRADER_ENABLED,
+            PUMP_CHAIN_V6_ENABLED, PUMP_CHAIN_V6_PLUS_ENABLED, PUMP_CHAIN_V6_MINUS_ENABLED,
         )
     except ImportError:
         return False  # can't check — allow
@@ -3107,6 +3125,11 @@ def is_component_disabled(component: str) -> bool:
         except ImportError:
             pass
         return False  # V5 SHORT enabled or old flag enabled
+    # pump-chain V6 (both directions, own kill-switches — spec rev1 §6.3)
+    if c == 'pump-chain-v6+':
+        return not (PUMP_CHAIN_V6_ENABLED and PUMP_CHAIN_V6_PLUS_ENABLED)
+    if c == 'pump-chain-v6-':
+        return not (PUMP_CHAIN_V6_ENABLED and PUMP_CHAIN_V6_MINUS_ENABLED)
     # ai-trader (AI-driven signal from trade-watchdog)
     if c in ('ai-trader', 'ai-trader+', 'ai-trader-'):
         return not AI_TRADER_ENABLED
