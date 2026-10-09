@@ -120,6 +120,7 @@ REGIME_SIGNALS = {
         'resistance-break+',  # resistance break + pullback — works in trending markets
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in normal vol
         'bb-squeeze+', 'bb-squeeze-',  # bollinger squeeze breakout — SHORT added 2026-10-02: asymmetry fix
+        'hmacd_mtf-+', 'hmacd-mtf',  # multi-timeframe MACD — works in normal vol (2026-10-09)
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — SHORT added 2026-10-02: asymmetry fix
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in normal vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in normal vol
@@ -190,6 +191,7 @@ REGIME_SIGNALS = {
         'open-skies+',  # open skies breakout — structural, regime-agnostic
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in high vol
         'bb-squeeze+', 'bb-squeeze-',  # bollinger squeeze breakout — works in high vol (SHORT added 2026-10-02: asymmetry fix)
+        'hmacd_mtf-+', 'hmacd-mtf',  # multi-timeframe MACD — works in high vol (2026-10-09)
         'volume-breakout-long+', 'volume-breakout-short-',  # volume-confirmed breakout — LONG added 2026-10-02 (reverse asymmetry fix: SHORT was added but LONG was never in HIGH)
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — works in high vol (SHORT added 2026-10-02: asymmetry fix, LONG was whitelisted but SHORT was not)
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — works in high vol (2026-10-09)
@@ -246,6 +248,7 @@ REGIME_SIGNALS = {
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic (added 2026-10-02: was FLAT-only, killed conf=99 SHORT "not suited for NORMAL")
         'resistance-break+',  # resistance break + pullback — works in extreme vol
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
+        'hmacd_mtf-+', 'hmacd-mtf',  # multi-timeframe MACD — works in extreme vol (2026-10-09)
         # bb-squeeze+ LONG removed from EXTREME 2026-10-02 — 12T 50%WR -$0.15 (hard_sl/hard_max_loss). HIGH 63.6%WR +$0.14 edge kept. signal_reporter
         'bb-squeeze-',  # SHORT disabled (BOLLINGER_SQUEEZE_MINUS_ENABLED=False) — keep out of EXTREME too
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in extreme vol
