@@ -81,3 +81,6 @@
 
 ## TEAM UPDATES
 - [2026-10-09 05:50 UTC] health_monitor: Pipeline OK — LIVE every 1m, 0 Tracebacks/30m, PM clean (0 open / 2 closed today / -0.03 USDT), 157 signals/1h, regime LONG_BIAS (54L/8S/50N), speed 53% >=50pct, prices fresh (0.6min, 176 tokens), phantom 0. AUTO-FIX: journal vacuum +175M; restarted hermes-brain-auditor (exit 124 timeout). Disk 85% WARN (DBs, not logs — WALs normal now: candles 4.5M, session_brain 29M, signals 11M). bug-hunter/ceo "failed" states by design/schedule. Details: automation/error_alerts.md
+
+## TEAM UPDATES
+- [2026-10-09 11:50 UTC] health_monitor: Pipeline OK — LIVE every 1m, 0 Tracebacks/30m, PM clean (0 open / 4 closed today / -0.16 USDT / 1 win), 97 signals/1h, regime SHORT_BIAS (9L/20S/81N), speed 53% >=50pct, prices fresh (2.4min), phantom 0. AUTO-FIX: journal vacuum 84M + npm cache 2.4G. Disk 86%→84% (WARN cleared). Timers 3/3 active. Details: automation/error_alerts.md

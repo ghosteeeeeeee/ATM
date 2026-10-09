@@ -313,3 +313,31 @@
 
 ## Error Alerts — 2026-10-09 07:00 UTC
 - **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-09 09:00 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Balance too low ($N.N < $N.N)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+
+## Error Alerts — 2026-10-09 10:47 UTC
+- **WARN**: Disk usage at 86% on / (95G/118G, 17G free)
+- **AUTO-FIX**: Compressed logs older than 7d (none found); largest space consumers are DBs: coin_tracker.db (3.3G), candles.db (2.6G), session_brain.db (1.1G). No action taken on DBs — flagging for CEO review.
+
+## Error Alerts — 2026-10-09 11:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CC TOK — continuum says RECOVERY+NEUTRAL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-09 11:50 UTC
+- **WARN** (1x): Disk usage 86% on / (96G/118G)
+- **AUTO-FIX**: Vacuumed journald (freed 84M); npm cache clean (freed ~2.4G). Disk now 84%. No pipeline errors, no crashes, no phantom trades, timers all firing. DBs untouched (coin_tracker 3.3G, candles 2.6G — flagged previously for CEO review).
+
+## Error Alerts — 2026-10-09 14:00 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-09 15:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-09 15:48 UTC
+- **[WARN]** (1x): `hermes-brain-auditor.service` exited status=124 (timeout) at 15:40. Prior run at 15:37 succeeded (RC:0, pushed 471cae7d). Self-recovers at next timer (16:30). No action taken — will retry automatically.
+
+## Error Alerts — 2026-10-09 16:00 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`

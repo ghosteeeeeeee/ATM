@@ -3858,6 +3858,7 @@ PUMP_FLOW_MAX_PRICE_AGE = 5            # max minutes since last price update
 PUMP_CHAIN_VEL_30M_MIN = -0.3          # pump-chain LONG: block when 30m velocity < this (plan: vel>-0.3% → 90%WR)
 PUMP_FLOW_RESERVED_SLOTS = 1           # slots reserved exclusively for pump-chain
 PUMP_FLOW_MAX_POSITIONS = 4            # max concurrent pump-chain positions
+SAME_DIR_30MIN_MAX = 3                 # CEO 2026-10-09 Cap B — max same-direction opens per 30min rolling window (30d backtest: 43 blocked, net +$1.02; independent verify: 4th+ same-dir opens 30d = -$1.16). Does NOT catch the Oct-8 4-cluster (max-3 allows it) — aggregate edge only. Cluster protection would need max-2 or signal-family cap (re-test pending).
 PUMP_FLOW_VELOCITY_BONUS = 3           # confidence bonus per 0.1% velocity
 PUMP_FLOW_CHAIN_BONUS = 2              # confidence bonus per chain link
 PUMP_FLOW_PHASE_BONUS = 5              # confidence bonus for phase-aligned signal

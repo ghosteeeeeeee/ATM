@@ -442,6 +442,31 @@ print('Changes logged.')
 "
 ```
 
+## ⚠️ SQL SYNTAX RULES (PostgreSQL)
+
+**Common mistakes that cause errors:**
+
+1. **INTERVAL syntax**: Use full unit names
+   - ❌ `INTERVAL '12h'` ❌ `INTERVAL '7 days'`
+   - ✅ `INTERVAL '12 hours'` ✅ `INTERVAL '7 days'`
+
+2. **ROUND with decimals**: Cast to numeric first
+   - ❌ `ROUND(pnl_usdt, 2)` ❌ `ROUND(AVG(x), 2)`
+   - ✅ `ROUND(pnl_usdt::numeric, 2)` ✅ `ROUND(AVG(x)::numeric, 2)`
+
+3. **Timestamp comparisons**: Use AT TIME ZONE for UTC
+   - ❌ `EXTRACT(HOUR FROM close_time)` (assumes local time)
+   - ✅ `EXTRACT(HOUR FROM close_time AT TIME ZONE 'UTC')`
+
+4. **Column names**: Use exact names from trades table
+   - `pnl_usdt`, `pnl_pct`, `direction`, `signal`, `exit_reason`
+   - `open_time`, `close_time`, `status`, `confidence`
+   - `_signal_metadata` (JSON), `volatility_regime`
+
+5. **String literals**: Use single quotes
+   - ❌ `WHERE status = "closed"` (double quotes = column identifier)
+   - ✅ `WHERE status = 'closed'`
+
 ## RULES
 
 1. **Captain the ship** — you don't just report, you STEER. Make changes, drive improvement.

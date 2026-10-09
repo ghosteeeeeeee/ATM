@@ -3885,6 +3885,35 @@ def run(dry_run=False):
             log(f'SKIP: Max total positions reached ({open_count}/{MAX_POS})')
             continue
 
+        # Cap B (CEO 2026-10-09): max SAME_DIR_30MIN_MAX same-direction opens per 30min rolling window.
+        # 30d backtest net +$1.02; 4th+ same-dir opens in 30min = -$1.16/30d. Aggregate edge only —
+        # does NOT block the Oct-8 cluster pattern (max-3 allows it).
+        from hermes_constants import SAME_DIR_30MIN_MAX
+        try:
+            _cap_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            _cap_cur = _cap_conn.cursor()
+            _cap_cur.execute("""
+                SELECT COUNT(*) FROM trades
+                WHERE direction = %s AND status = 'open'
+                  AND open_time > NOW() - INTERVAL '30 minutes'
+            """, (direction,))
+            _same_dir_open = _cap_cur.fetchone()[0]
+            # also count same-dir trades opened (then closed) within the window — they consumed the slot
+            _cap_cur.execute("""
+                SELECT COUNT(*) FROM trades
+                WHERE direction = %s AND status = 'closed'
+                  AND open_time > NOW() - INTERVAL '30 minutes'
+            """, (direction,))
+            _same_dir_closed = _cap_cur.fetchone()[0]
+            _cap_conn.close()
+            _same_dir_total = _same_dir_open + _same_dir_closed
+            if _same_dir_total >= SAME_DIR_30MIN_MAX:
+                log(f'SKIP: Cap B — {_same_dir_total} {direction} opens in last 30min (max {SAME_DIR_30MIN_MAX})')
+                skipped += 1
+                continue
+        except Exception as _cap_err:
+            log(f'WARN: Cap B check failed ({_cap_err}) — proceeding without cap')
+
         if is_pump_chain:
             # Pump-chain: allow if pump_chain_count < PUMP_FLOW_MAX_POSITIONS
             # OR if pump-chain is in confluence with another signal (multiple source types)
