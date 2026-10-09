@@ -3249,6 +3249,15 @@ def run(dry_run=False):
     # Setting to 1 = signal must have survived at least 1 hot-set cycle (the "prove it" gate).
     # The original value of 2 was unachievable on first-pass signals.
     MIN_SURVIVAL_ROUNDS = 1
+    # 2026-10-09 D3 (CEO GO 00:45): per-signal conf-floor logging — the 50%
+    # floor previously rejected silently (only the aggregate "No signals above
+    # 50%" line existed; which signals died at the floor was unrecoverable).
+    # Log-only, filter behavior unchanged.
+    for _s in approved:
+        if _s.get('final_confidence', 0) < MIN_EXEC_CONFIDENCE:
+            log(f"  🚫 [CONF-FLOOR] {_s.get('token','?')} {_s.get('direction','?')} "
+                f"conf={_s.get('final_confidence',0):.0f}% < {MIN_EXEC_CONFIDENCE}% "
+                f"(src={_s.get('source','?')})")
     approved = [s for s in approved if s.get('final_confidence', 0) >= MIN_EXEC_CONFIDENCE]
     if not approved:
         log(f'No signals above {MIN_EXEC_CONFIDENCE}% confidence — skipping execution')
@@ -3351,7 +3360,7 @@ def run(dry_run=False):
                 log(f"  ⚖️ [PENALTY-GATE] {token} {direction}: conf {_raw_conf:.0f}×penalty_raw {_pp:.3f}×mult {_exec_mult:.3f}→exec {confidence:.1f}%")
         # CEO Fix 1: re-check AFTER penalty multiplication (initial filter at :3227 used raw conf)
         if confidence is not None and confidence < MIN_EXEC_CONFIDENCE:
-            log(f'  🚫 [PENALTY-BLOCK] {token} {direction} exec_conf {confidence:.1f}% < {MIN_EXEC_CONFIDENCE}% after penalty product')
+            log(f'  🚫 [PENALTY-BLOCK] {token} {direction} BLOCKED — exec_conf {confidence:.1f}% < {MIN_EXEC_CONFIDENCE}% after penalty product')
             if sig_id:
                 mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
             skipped += 1

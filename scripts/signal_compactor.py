@@ -2322,7 +2322,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         except Exception:
                             pass
                         if slope_pct >= slope_threshold:
-                            log(f"  🚫 [SLOPE-FILTER] {token} SHORT: slope={slope_pct:+.4f}% >= {slope_threshold:.4f}% — price trending up, skip")
+                            log(f"  🚫 [SLOPE-FILTER] {token} SHORT BLOCKED — slope={slope_pct:+.4f}% >= {slope_threshold:.4f}% — price trending up")
                             continue
                 except Exception:
                     pass  # non-fatal: skip slope check if DB query fails
@@ -2349,7 +2349,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _ema_vals.append(_ema_v)
                         _ema_slope = (_ema_vals[-1] - _ema_vals[-20]) / _ema_vals[-20] * 100 if len(_ema_vals) >= 20 else 0
                         if _ema_slope >= 0:
-                            log(f"  🚫 [EMA300-SLOPE-FILTER] {token} SHORT: EMA300 slope={_ema_slope:+.4f}% >= 0 — EMA rising, skip")
+                            log(f"  🚫 [EMA300-SLOPE-FILTER] {token} SHORT BLOCKED — EMA300 slope={_ema_slope:+.4f}% >= 0 — EMA rising")
                             continue
                 except Exception:
                     pass  # non-fatal: skip EMA300 slope check if DB query fails
@@ -2719,7 +2719,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  ✅ [CONTINUUM-BULL] {token} LONG — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), bypass allowed")
                         elif direction.upper() == 'SHORT' and _cont_bullish:
                             _btc_mom_ok_for_bypass = False
-                            log(f"  🚫 [CONTINUUM-BULL] {token} SHORT — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), SHORT bypass denied")
+                            log(f"  🚫 [CONTINUUM-BULL] {token} SHORT BLOCKED — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), SHORT bypass denied")
                         else:
                             # Fallback to velocity check
                             _btc_mom_ok_for_bypass = _vel_ok
@@ -2909,7 +2909,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
             # Bearish override RESTORED 2026-10-08 by T directive: 118 SHORT signals expired during dump.
             # When BTC is bearish (LEAN_BEAR + BELOW EMA), oversold = continuation, not bounce.
-            if ('pump-chain' in bare_source or 'pump_chain' in bare_source) and direction.upper() == 'SHORT':
+            if bare_source == 'pump-chain-' and direction.upper() == 'SHORT':
                 try:
                     from hermes_constants import PUMP_CHAIN_SHORT_RSI_MIN
                     _rsi_val_s = row[8] if len(row) > 8 else None
@@ -3046,7 +3046,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             log(f"  🔎 [CONFLUENCE-DEBUG] {token} {direction}: source='{source}' parts={source_parts} count={source_count} unique_types={unique_signal_types} -> {'PASS' if pass_gate else 'BLOCK'}")
 
             if not pass_gate:
-                log(f"  🔒 [CONFLUENCE-GATE-BLOCK] {token} {direction}: {gate_msg}")
+                # 2026-10-09 D4 (CEO GO): literal BLOCKED + token + dir on every
+                # block line — gate census must never depend on substring-grep
+                # archaeology again (v1 audit dropped 36% of block volume).
+                log(f"  🔒 [CONFLUENCE-GATE-BLOCK] {token} {direction} BLOCKED — {gate_msg}")
                 continue
 
             # ── DRIFT-A enforcement (2026-10-06): bypass must respect vol-gate 0.0 ──
@@ -3063,7 +3066,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     from volatility_gate_v2 import _get_signal_type_mult
                     _bypass_sig_mult = _get_signal_type_mult(source, _vol_regime, source=source or '')
                     if _bypass_sig_mult == 0.0:
-                        log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction}: bypass denied — vol gate override=0.0 for '{source}' in {_vol_regime}")
+                        log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction} BLOCKED — bypass denied, vol gate override=0.0 for '{source}' in {_vol_regime}")
                         continue
                 except Exception:
                     pass  # fail-open
