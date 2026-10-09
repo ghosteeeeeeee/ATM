@@ -828,7 +828,9 @@ def get_directional_outcome_long(direction: str) -> tuple:
 
 def _is_direction_locked(direction: str) -> bool:
     """Check if direction is locked due to recent catastrophic loss (4+/5 trades).
-    Returns True if lock is active (suppress all signals in this direction)."""
+    Returns True if lock is active (suppress all signals in this direction).
+    Only outcomes from the last 2h count — stale losses from broken system
+    periods should not lock fresh winning signals."""
     from hermes_constants import (
         DIRECTIONAL_OUTCOME_LOCK_ENABLED,
         DIRECTIONAL_OUTCOME_LOCK_MINUTES,
@@ -840,11 +842,12 @@ def _is_direction_locked(direction: str) -> bool:
     try:
         conn = sqlite3.connect(RUNTIME_DB, timeout=10)
         c = conn.cursor()
+        cutoff = (datetime.now() - timedelta(hours=2)).strftime('%Y-%m-%d %H:%M:%S')
         c.execute("""
             SELECT is_win, created_at FROM signal_outcomes
-            WHERE direction = ?
+            WHERE direction = ? AND created_at >= ?
             ORDER BY created_at DESC LIMIT 5
-        """, (direction.upper(),))
+        """, (direction.upper(), cutoff))
         rows = c.fetchall()
         if len(rows) < 5:
             return False
