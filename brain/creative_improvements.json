@@ -3656,9 +3656,11 @@
     "rationale": "BANANA pump-chain+ lost twice (15.8h apart, -$0.23 total). FOGO pump-chain+ lost twice (-$0.17). IO pump-chain- lost twice (-$0.36). TURBO bb-squeeze+ lost twice (-$0.28). The chop that caused the first loss is still there — re-entering compounds the bleed. 4 clusters = 8 trades = $1.04 of the 55T hard_max_loss stack.",
     "expected_impact": "Block ~8 trades of hard_max_loss re-entries per week = save ~$1.00/week. Conservative: only blocks for 12h, same exact combo.",
     "category": "exit discipline",
-    "status": "suggested",
+    "status": "rejected",
     "risk": "low — 12h cooldown on exact token+signal+direction only. Won't block different signals or opposite direction. May block 1-2 valid re-entries per week.",
-    "implementation": "Position manager: on hard_max_loss close, write (token, signal, direction, timestamp) to cooldown table. Decider checks cooldown before execution."
+    "implementation": "Position manager: on hard_max_loss close, write (token, signal, direction, timestamp) to cooldown table. Decider checks cooldown before execution.",
+    "rejected_at": "2026-10-09T21:39:56.268626+00:00",
+    "reject_reason": "too broad"
   },
   {
     "date": "2026-10-09T20:43:26.902396+00:00",

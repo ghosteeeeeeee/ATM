@@ -4445,3 +4445,4 @@ BY: auto_1hr
 [2026-10-09 19:12] auto_1hr: NO CONFIG CHANGE — 2T last hour CC pump-chain+ stale_exit +$0.17 + ETH continuation+ atr_sl_hit −$0.09 | 0 open | 24h 21T 8W ≈−$0.45 | hard_max_loss 33% (hold brain_auditor eval) | atr_sl_hit 23.8% (tpsl stable) | Kill: none | Overtrade 2/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-09 20:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 0 open | 24h 21T 8W ≈−$0.45 | hard_max_loss 33% (hold brain_auditor eval) | atr_sl_hit 23.8% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
+[2026-10-09 21:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 3h) | 0 open | 24h 18T 7W -$0.45 WR 39% | hard_max_loss 33% (hold brain_auditor) | atr_sl_hit 27.8% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true

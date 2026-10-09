@@ -2822,6 +2822,7 @@ STANDALONE_BYPASS_SIGNALS = (
     # rs/rs-r/rs-s REMOVED 2026-09-29 — poor performance, requires confluence (2+ signal types)
     'breakout-pullback', 'breakout-pullback+', 'breakout-pullback-',  # breakout + pullback confirmation — standalone bypass (2026-09-25)
     'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal from trade-watchdog — full market context, standalone bypass
+    'hl_copy_trader', 'hl-copy-trader',  # CEO 2026-10-09: pro trader copy signal — quality filter (75%+ WR, $10k+ PnL) already applied
 )
 
 # ── AI Trader Signal ──────────────────────────────────────────────────────────

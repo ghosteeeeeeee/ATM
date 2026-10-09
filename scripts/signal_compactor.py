@@ -4851,7 +4851,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if validate_source(src or '') == 'unknown':
                     c.execute("""
                         UPDATE signals
-                        SET decision='EXPIRED', expired_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP
+                        SET decision='EXPIRED', decision_reason='expired: unknown/invalid source',
+                            expired_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP
                         WHERE id=? AND decision IN ('PENDING','APPROVED') AND executed=0
                     """, (row_id,))
                     expired_ids.append(row_id)
@@ -4870,7 +4871,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if blocked:
                     c.execute("""
                         UPDATE signals
-                        SET decision='EXPIRED', expired_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP
+                        SET decision='EXPIRED', decision_reason='expired: token on LONG/SHORT blacklist',
+                            expired_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP
                         WHERE id=? AND decision IN ('PENDING','APPROVED') AND executed=0
                     """, (row_id,))
                     expired_token_ids.append(row_id)
@@ -4995,6 +4997,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         c.execute("""
                             UPDATE signals
                             SET decision = 'EXPIRED',
+                                decision_reason = 'expired: no refire for 5min (stale signal)',
                                 expired_at = CURRENT_TIMESTAMP,
                                 updated_at = CURRENT_TIMESTAMP
                             WHERE id = ?
@@ -5037,6 +5040,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 c.execute(f"""
                     UPDATE signals
                     SET decision = 'EXPIRED',
+                        decision_reason = 'expired: APPROVED combo fell out of hotset',
                         expired_at = CURRENT_TIMESTAMP,
                         updated_at = CURRENT_TIMESTAMP
                     WHERE decision = 'APPROVED'
@@ -5063,6 +5067,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 c.execute(f"""
                     UPDATE signals
                     SET decision = 'EXPIRED',
+                        decision_reason = 'expired: APPROVED combo fell out of hotset',
                         expired_at = CURRENT_TIMESTAMP,
                         updated_at = CURRENT_TIMESTAMP
                     WHERE decision = 'APPROVED'

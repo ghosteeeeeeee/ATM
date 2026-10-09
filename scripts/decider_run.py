@@ -3350,7 +3350,12 @@ def run(dry_run=False):
         confidence = sig.get('final_confidence')
         # CEO Fix 1: penalty-gated execution — multiply confidence by max(product, 0.3)
         # Floor preserves mixed-signal trades; heavy penalty stacks (conf 93 × 0.3 = 28) block.
+        # CEO 2026-10-09: hl_copy signals EXEMPT — quality filter (75%+ WR) already applied upstream.
+        # Old penalty history poisons new qualified signals.
+        source_for_penalty = sig.get('source', '')
         _pp = sig.get('penalty_product')
+        if 'hl_copy' in (source_for_penalty or ''):
+            _pp = None  # bypass penalty for quality-filtered copy signals
         if _pp is not None and confidence is not None:
             _raw_conf = confidence
             _exec_mult = max(_pp, 0.3)  # floor at 0.3, same as compactor SCORE-FLOOR

@@ -69,6 +69,9 @@ SIGNAL_OVERRIDES = {
     'open_skies_long': 'MOMENTUM',         # breakout signal — fails in chop (reclassified 2026-09-17)
 
     # Mean-reversion signals — always allowed
+    'hl_copy_plus': 'MEAN_REVERSION',       # CEO 2026-10-09: pro trader copy — quality-filtered (75%+ WR), not momentum
+    'hl_copy_minus': 'MEAN_REVERSION',      # CEO 2026-10-09: pro trader copy — quality-filtered (75%+ WR), not momentum
+    'hl_copy_trader': 'MEAN_REVERSION',     # CEO 2026-10-09: pro trader copy — quality-filtered (75%+ WR), not momentum
     'bb_bounce_v2_long': 'MEAN_REVERSION',
     'bb_bounce_long': 'MEAN_REVERSION',
     'bb_bounce_short': 'MEAN_REVERSION',

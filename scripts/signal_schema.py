@@ -3212,34 +3212,54 @@ def update_signal_decision(token, direction, decision, reason=None, signal_id=No
 
     When signal_id is None, falls back to legacy behavior:
     updates ALL matching token+direction signals (for backward compat).
+
+    FIX 2026-10-09: `reason` was accepted but silently DISCARDED — neither
+    UPDATE wrote decision_reason, so 100% of signals had a blank
+    decision_reason and every skip/block analysis had to grep pipeline.log.
+    Now persisted (truncated to 500 chars to bound column growth).
     """
+    # Persist the human-readable reason. Fall back to the last log() line when
+    # the caller didn't pass one — every block path logs the reason string
+    # immediately before calling mark_signal_executed(), so this captures it.
+    _reason = reason
+    if not _reason:
+        try:
+            from hermes_log import get_last_log_msg
+            _reason = get_last_log_msg() or None
+        except Exception:
+            _reason = None
+    if _reason:
+        _reason = str(_reason)[:500]
+
     conn = _get_conn(_runtime())
     c = conn.cursor()
     if signal_id is not None:
         # Atomic claim: only update the specific signal row
         c.execute('''
             UPDATE signals
-            SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
+            SET decision=?, decision_reason=?,
+                executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
                 compact_rounds = CASE WHEN ?='EXECUTED' THEN 0 ELSE compact_rounds END,
                 updated_at=CURRENT_TIMESTAMP
             WHERE id=? AND executed=0
-        ''', (decision, decision, decision, signal_id))
+        ''', (decision, _reason, decision, decision, signal_id))
     else:
         # Legacy: update all matching token+direction
         c.execute('''
             UPDATE signals
-            SET decision=?, executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
+            SET decision=?, decision_reason=?,
+                executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
                 compact_rounds = CASE WHEN ?='EXECUTED' THEN 0 ELSE compact_rounds END,
                 updated_at=CURRENT_TIMESTAMP
             WHERE token=? AND direction=? AND decision IN ('PENDING', 'APPROVED')
             AND executed=0
-        ''', (decision, decision, decision, token.upper(), direction.upper()))
+        ''', (decision, _reason, decision, decision, token.upper(), direction.upper()))
     conn.commit()
     count = c.rowcount
     conn.close()
     return count
 
-def mark_signal_executed(token, direction, decision='EXECUTED', signal_id=None):
+def mark_signal_executed(token, direction, decision='EXECUTED', signal_id=None, reason=None):
     """
     Mark a signal as processed (executed or skipped).
 
@@ -3249,8 +3269,13 @@ def mark_signal_executed(token, direction, decision='EXECUTED', signal_id=None):
 
     decision='EXECUTED': trade was actually placed (default)
     decision='SKIPPED':  signal was blocked/dropped, no trade placed
+
+    FIX 2026-10-09: added `reason`. When None, update_signal_decision falls back
+    to the last log() line — so the 48 existing call sites (which all do
+    log(reason) immediately before this call) persist their block reason with
+    zero changes. Pass reason explicitly to override.
     """
-    return update_signal_decision(token, direction, decision, signal_id=signal_id)
+    return update_signal_decision(token, direction, decision, reason=reason, signal_id=signal_id)
 
 
 def rollback_signal_executed(token, direction, signal_id=None) -> bool:
@@ -3519,11 +3544,13 @@ def cleanup_stale_approved(hours=1):
     try:
         c.execute('''
             UPDATE signals
-            SET decision='EXPIRED', executed=1, updated_at=CURRENT_TIMESTAMP
+            SET decision='EXPIRED',
+                decision_reason='expired: stale APPROVED >'||?||'h (cleanup_stale_approved)',
+                executed=1, updated_at=CURRENT_TIMESTAMP
             WHERE decision='APPROVED'
               AND executed=0
               AND created_at <= datetime('now', '-'||?||' hours')
-        ''', (hours,))
+        ''', (hours, hours))
         conn.commit()
         expired = c.rowcount
         return expired
