@@ -2689,11 +2689,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         elif direction.upper() == 'LONG' and _cont_bearish:
                             # FIX 2026-10-02: Check coin's own momentum before blocking LONG
                             # If coin is rising (velocity > threshold + above SMA), allow even if BTC bearish
-                            # 2026-10-09 watchdog: tightened threshold — 0.5% let 41 LONGs through
-                            # in a bearish market (BTC below EMA300 200+ bars). Now requires 1.5%
-                            # velocity to override bearish BTC structure.
+                            # 2026-10-09: tuned to 1.0% — 0.5% too loose (41 false LONGs in bearish),
+                            # 1.5% too tight (blocked valid entries in flat market like BLUR vel=+0.58%).
                             from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
-                            _long_override_threshold = max(TREND_ALIGN_VELOCITY_THRESHOLD * 3, 1.5)
+                            _long_override_threshold = max(TREND_ALIGN_VELOCITY_THRESHOLD * 2, 1.0)
                             _coin_rising = False
                             try:
                                 import sqlite3 as _mom_sqlite2
