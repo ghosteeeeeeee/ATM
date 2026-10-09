@@ -2727,7 +2727,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _coin_dumping = False
                             try:
                                 from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
-                                _mom_conn3 = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=3)
+                                _mom_conn3 = sqlite3.connect(CANDLES_DB, timeout=3)
                                 try:
                                     _candles3 = _mom_conn3.execute(
                                         "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
@@ -2915,7 +2915,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     _coin_dumping_sc = False
                                     try:
                                         from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
-                                        _sc_mom_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=3)
+                                        _sc_mom_conn = sqlite3.connect(CANDLES_DB, timeout=3)
                                         try:
                                             _sc_candles = _sc_mom_conn.execute(
                                                 "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
@@ -2930,8 +2930,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                             _sc_below_sma = _sc_closes[-1] < _sc_sma
                                             if _sc_vel < -TREND_ALIGN_VELOCITY_THRESHOLD and _sc_below_sma:
                                                 _coin_dumping_sc = True
-                                    except Exception:
-                                        pass
+                                    except Exception as _sc_mom_e:
+                                        log(f"  ⚠️ [SHORT-CONTINUUM] {token} momentum check failed: {_sc_mom_e}", 'WARN')
                                     if _coin_dumping_sc:
                                         log(f"  ✅ [SHORT-CONTINUUM-TOKEN-MOM] {token} SHORT allowed — BTC score={_sc_score:.1f} but token dumping (vel={_sc_vel:+.2f}%, below SMA)")
                                     else:
