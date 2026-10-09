@@ -6990,3 +6990,33 @@ Final set: ['IMX', 'INJ']
 - hard_max_loss ~47% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
 - v5/v6 combo signals still 0W over 24h (−$0.22, −$0.16) — below kill threshold, on watch
 - pump-chain+ alone remains only profitable signal (+$0.38/24h); BANANA open on it now
+
+## [2026-10-09 13:12] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** −$0.07 last hour | 24h: 16T 5W −$0.44 (WR 31.2%)
+**Last hour:** BANANA pump-chain+ LONG hard_max_loss −$0.07 (−1.96% acct; RSI 72.4 at entry — entered overbought)
+**24h exits:** hard_max_loss 8T −$1.01 | stale_exit 4T +$0.60 | atr_sl_hit 1T −$0.04 | profit-monster-trail 1T +$0.09 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09
+**Open:** 2 BTC — continuum-trend+ LONG (+open), continuum_engine LONG (⚠ amount_usdt=0.00, no SL/TP set)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 1T last hour (pump-chain+ 1T 0W) — under 3T threshold; pump-chain+ still net +$0.31/24h (4W)
+- atr_sl_hit 1/16=6.3% — tpsl stable, well under 40%
+- hard_max_loss 8/16=50% −$1.01 — dominant, within brain_auditor eval hold (Oct 9/10)
+- Overtrade: 1/hr (limit 20)
+- Streak: not 3 consecutive negative hours (10:00 and 11:00 had no closes)
+- Timers fresh (pipeline/pump-hunter/compactor 42s, watchdog 1m37s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Flagged (not changed):**
+- ⚠ Trade 16002 BTC continuum_engine open with amount_usdt=0.00 and NULL stop_loss/target — only such row in open set; 9 closed continuum_engine trades exist (1W, +$0.08). Looks like a sizing/SL-attach bug at execution. Not auto-fixed (no trigger in playbook, would exceed 1-change rule without diagnosis).
+- BANANA entry RSI=72.4 (overbought long) — matches earlier BANANA SHORT lesson pattern of trading at extremes; informational.
+
+**Open Questions:**
+- hard_max_loss still ~50% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+- v5/v6 combo signals 0W over 24h (−$0.22, −$0.16) — below kill threshold, on watch
+- pump-chain+ alone remains only profitable signal family (+$0.31/24h)
+- Who creates zero-size open trades (continuum_engine)? Needs root-cause next hour if it recurs.
