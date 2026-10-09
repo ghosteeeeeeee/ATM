@@ -408,7 +408,7 @@
       "id": "BUG-022",
       "title": "Missing ema300_dip_long in SIGNAL_OVERRIDES \u2014 defaults correctly by accident",
       "severity": "LOW",
-      "status": "OPEN",
+      "status": "FIXED",
       "files": [
         "scripts/chop_detector.py"
       ],
@@ -417,12 +417,13 @@
       "fix": "Add 'ema300_dip_long': 'MOMENTUM' to SIGNAL_OVERRIDES.",
       "verified_by": "Bug hunter: confirmed ema300_dip_long not in dict, defaults correctly only because of line 160 default.",
       "date_found": "2026-09-13",
-      "date_fixed": null,
+      "date_fixed": "2026-09-13",
       "found_by": "agent",
       "git_commit": null,
       "related_bugs": [
         "BUG-021"
-      ]
+      ],
+      "note": "Already fixed \u2014 ema300_dip_long present in SIGNAL_OVERRIDES (chop_detector.py:58). Closed 2026-10-09."
     },
     {
       "id": "BUG-023",
@@ -522,7 +523,7 @@
       "id": "BUG-028",
       "title": "brain.py trade close --pnl (manual PnL override) is silently ignored",
       "severity": "LOW",
-      "status": "OPEN",
+      "status": "FIXED",
       "files": [
         "scripts/brain.py"
       ],
@@ -531,10 +532,11 @@
       "fix": "Honor pnl_usdt when provided (skip compute_close_pnl + HL realized lookup, or override after). No current callers pass --pnl, so dormant.",
       "verified_by": "grep: zero callers pass --pnl today; behavior unchanged for all live paths",
       "date_found": "2026-10-08",
-      "date_fixed": null,
+      "date_fixed": "2026-10-09",
       "found_by": "bug-hunter session 1 (2026-10-08)",
-      "git_commit": null,
-      "related_bugs": []
+      "git_commit": "pending",
+      "related_bugs": [],
+      "note": "Fixed 2026-10-09: _close_trade_impl now honors manual pnl_usdt override \u2014 skips HL lookup + signal calc, writes explicit value."
     },
     {
       "id": "BUG-029",
@@ -833,7 +835,7 @@
       "id": "BUG-045",
       "title": "signal purge (--purge-executed) never wired into systemd ExecStart \u2014 but archive timer covers retention",
       "severity": "LOW",
-      "status": "OPEN",
+      "status": "CLOSED",
       "files": [
         "signal_compactor.py",
         "/etc/systemd/system/hermes-signal-compactor.service"
@@ -846,7 +848,8 @@
       "date_fixed": null,
       "found_by": "bug-hunter session 2026-10-08 round 3",
       "git_commit": null,
-      "related_bugs": []
+      "related_bugs": [],
+      "note": "Not-a-bug (verified 2026-10-08): archive timer covers retention. Closed 2026-10-09."
     },
     {
       "id": "BUG-046",

@@ -884,6 +884,10 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     hype_pnl_pct  = None
     hl_exit_price = None
 
+    # BUG-028 fix: explicit manual --pnl override wins — skip HL lookup + signal calc
+    if pnl_usdt is not None:
+        skip_hl = True
+
     if not skip_hl:
         try:
             import sys, os
@@ -919,7 +923,12 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             print(f"[close_trade] HL sync failed (non-fatal): {e}")
 
     # ── Fallback: signal-based PnL ─────────────────────────────────────────────
-    if hype_pnl_usdt is None:
+    if pnl_usdt is not None:
+        # Manual override (BUG-028): honor explicit --pnl, skip price/HL math
+        hype_pnl_usdt = float(pnl_usdt)
+        hype_pnl_pct = (hype_pnl_usdt / calc_notional * 100) if calc_notional else 0
+        print(f"[close_trade] manual PnL override — {token} pnl={hype_pnl_usdt:+.4f} ({hype_pnl_pct:+.2f}%)")
+    elif hype_pnl_usdt is None:
         # Use actual HL notional (calc_notional) when available for accurate sizing.
         # When hl_notional_usdt is set, it reflects what was actually sent to HL
         # (≈$7). When not set (legacy trades), falls back to amount_usdt (≈$50).

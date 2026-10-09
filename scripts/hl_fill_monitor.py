@@ -154,9 +154,8 @@ def update_positions(wallet: str):
 def get_active_traders() -> list:
     """Get top active tracked traders (limited by HL_COPY_MAX_MONITORED).
 
-    Only monitors the highest-scored traders to stay within HL API rate limits.
-    268 traders × 2 calls = 536 calls/cycle → 429 rate limits.
-    20 traders × 2 calls = 40 calls/cycle → safe.
+    CEO 2026-10-08: Sort by QUALITY (win_rate + PnL), not just score.
+    Qualified traders (75%+ WR, $10k+ PnL) get priority.
     """
     try:
         from hermes_constants import HL_COPY_MAX_MONITORED
@@ -165,10 +164,14 @@ def get_active_traders() -> list:
 
     conn = get_db()
     try:
-        traders = conn.execute(
-            "SELECT wallet, score FROM traders WHERE active = 1 ORDER BY score DESC LIMIT ?",
-            (HL_COPY_MAX_MONITORED,)
-        ).fetchall()
+        # Sort by quality: win_rate DESC, pnl DESC — qualified traders first
+        traders = conn.execute("""
+            SELECT wallet, score, win_rate, pnl_all_time
+            FROM traders
+            WHERE active = 1
+            ORDER BY win_rate DESC, pnl_all_time DESC
+            LIMIT ?
+        """, (HL_COPY_MAX_MONITORED,)).fetchall()
         return [{'wallet': t['wallet'], 'score': t['score']} for t in traders]
     finally:
         conn.close()

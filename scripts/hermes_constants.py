@@ -3322,7 +3322,7 @@ HL_COPY_MAX_DRAWDOWN = 0.15        # Stop copying at 15% drawdown
 HL_COPY_MIN_SCORE = 70             # Minimum trader score to copy
 HL_COPY_POLL_INTERVAL = 30         # Seconds between fill polls
 HL_COPY_MAX_DAILY_TRADES = 50      # Daily trade limit
-HL_COPY_MAX_MONITORED = 20         # Max traders to actively monitor (reduces API calls: 20 × 2 = 40 calls/cycle vs 268 × 2 = 536)
+HL_COPY_MAX_MONITORED = 50         # Max traders to actively monitor (CEO 2026-10-08: increased from 20 to capture more qualified traders)
 HL_COPY_REPORT_PATH = "/var/www/hermes/data/hl_copy_report.md"
 HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
 
