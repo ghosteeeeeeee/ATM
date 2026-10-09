@@ -3298,12 +3298,17 @@ def rollback_signal_executed(token, direction, signal_id=None) -> bool:
         cur = conn.cursor()
         if signal_id is not None:
             # Atomic: only update if this exact signal_id is marked executed
+            # FIX 2026-10-09: was %s placeholders against sqlite3 (needs ?) — every
+            # call raised sqlite3.OperationalError, swallowed by the bare except,
+            # and returned False. Rollback NEVER worked. decider_run's token+direction
+            # fallback therefore always logged "signal may be stuck".
             cur.execute("""
                 UPDATE signals
                 SET executed = 0,
                     decision = 'APPROVED',
+                    decision_reason = NULL,
                     updated_at = CURRENT_TIMESTAMP
-                WHERE id = %s AND executed = 1
+                WHERE id = ? AND executed = 1
                 RETURNING id
             """, (signal_id,))
         else:
@@ -3312,8 +3317,9 @@ def rollback_signal_executed(token, direction, signal_id=None) -> bool:
                 UPDATE signals
                 SET executed = 0,
                     decision = 'APPROVED',
+                    decision_reason = NULL,
                     updated_at = CURRENT_TIMESTAMP
-                WHERE token = %s AND direction = %s AND executed = 1
+                WHERE token = ? AND direction = ? AND executed = 1
                 RETURNING id
             """, (token.upper(), direction.upper()))
         row = cur.fetchone()
@@ -3321,6 +3327,11 @@ def rollback_signal_executed(token, direction, signal_id=None) -> bool:
         cur.close(); conn.close()
         return row is not None
     except Exception:
+        # FIX 2026-10-09: close conn here too — this except leaked it before.
+        try:
+            conn.close()
+        except Exception:
+            pass
         return False
 
 
