@@ -342,6 +342,10 @@ def should_trade(token, signal=None):
             if base in regime_sigs:
                 works_in_regime = True
                 break
+            # Check with + and - suffixes (regime sets store entries WITH suffixes)
+            if base + '+' in regime_sigs or base + '-' in regime_sigs:
+                works_in_regime = True
+                break
             # Strip trailing numbers (e.g., r2-trend-long0 → r2-trend-long)
             base_no_num = re.sub(r'\d+$', '', base)
             if base_no_num in regime_sigs:
