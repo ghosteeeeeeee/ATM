@@ -199,7 +199,8 @@ Every hour, if there are open slots (fewer positions than MAX_POSITIONS), you pi
 
 The pipeline has multiple gates between your pick and an actual trade. Recent picks got blocked:
 - **WLFI LONG** → RR Engine blocked (R:R 0.65 < 0.7 minimum)
-- **AVAX LONG** → BTC chop gate (now bypassed for ai-trader)
+- **GRASS LONG** → Trend filter + volatility gate (now exempt for ai-trader)
+- **FIL LONG** → HALL-SHAME blocked (30d LONG WR=50% < 55%)
 - **SAGA LONG** → coin reversed to SHORT_BIAS within 15 min, signal expired
 
 **Before picking, run the pre-check tool:**
@@ -207,19 +208,9 @@ The pipeline has multiple gates between your pick and an actual trade. Recent pi
 cd /root/.hermes/scripts && python3 ai_trader_precheck.py COIN DIRECTION
 ```
 
-This tests the ACTUAL RR engine calculation (including S/R level adjustments) plus RSI, ATR, and price freshness. Only pick coins that pass ALL checks.
+This tests ALL pipeline gates: blacklist, ATR, RR engine, RSI bands, 30d winrate, LOSERS/PENALTY lists, BTC trend, price freshness. Only pick coins that pass ALL checks.
 
-**Example output:**
-```
-=== AI Trader Pre-check: AVAX LONG ===
-  ✅ ATR > 0.3%: ATR=1.2%
-  ✅ RR engine: multiplier=1.15
-  ✅ RSI 40-65: RSI=55.3
-  ✅ Price fresh (<5min): age=1min
-✅ PASS — safe to pick
-```
-
-**If the pre-check FAILS, pick a different coin.** Don't force a pick that the pipeline will block.
+**If the pre-check FAILS, pick a different coin.** Don't force a pick that the pipeline will block. Test multiple candidates until one passes.
 
 **RR Engine gate (R:R ≥ 0.70):**
 - The RR engine uses ATR + S/R levels to place SL/TP. If ATR is too tight OR a strong S/R level sits between entry and SL, the R:R fails.
