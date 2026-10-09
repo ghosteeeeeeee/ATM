@@ -107,6 +107,8 @@ REGIME_SIGNALS = {
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 NORMAL
         'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-09: CAKE/ETH LONG blocked
+        'volume-breakout-long+',  # volume-confirmed breakout LONG — added 2026-10-09: sync with v1
+        'btc-pump-rider+',  # BTC breakout → alt lagging LONG — added 2026-10-09: sync with v1
         'r2v2-long', 'r2v2-long3',  # R² trend v2 — added 2026-10-09: IOTA LONG blocked
         'continuum-ma+', 'continuum-ma-',  # continuum MA crossover — momentum confirmation
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
@@ -130,6 +132,8 @@ REGIME_SIGNALS = {
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors — LONG only in HIGH (74.1% WR)
         'r2v2-long', 'r2v2-long3',  # R² trend v2 — added 2026-10-09: IOTA LONG blocked
         'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-09
+        'volume-breakout-long+',  # volume-confirmed breakout LONG — added 2026-10-09: sync with v1
+        'btc-pump-rider+',  # BTC breakout → alt lagging LONG — added 2026-10-09: sync with v1
         'slow-grind-',
         'mover', 'mover+', 'mover-',
         'ct-hot', 'ct-hot+', 'ct-hot-',
@@ -182,6 +186,7 @@ REGIME_SIGNALS = {
         'r2v2-long', 'r2v2-long3',  # R² trend v2 — added 2026-10-09: LDO LONG blocked in EXTREME
         'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-09
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
+        'volume-breakout-long+',  # volume-confirmed breakout LONG (hyphen variant) — added 2026-10-09: sync with v1
         'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'accel-300-breakout',  # ATR breakout signal — works solo, added 2026-09-23 (bug hunt: was killing PONS SHORT)
@@ -735,6 +740,11 @@ def should_trade_v2(token, signal=None):
                     break
                 base = part.rstrip('+-')
                 if base in regime_sigs:
+                    works_in_regime = True
+                    break
+                # Direction-preserving suffix match (sync with v1 fix 2026-10-09)
+                suffix = part[-1] if part[-1] in '+-' else ''
+                if suffix and (base + suffix) in regime_sigs:
                     works_in_regime = True
                     break
                 base_no_num = re.sub(r'\d+$', '', base)

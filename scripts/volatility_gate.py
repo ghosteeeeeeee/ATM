@@ -345,8 +345,10 @@ def should_trade(token, signal=None):
             if base in regime_sigs:
                 works_in_regime = True
                 break
-            # Check with + and - suffixes (regime sets store entries WITH suffixes)
-            if base + '+' in regime_sigs or base + '-' in regime_sigs:
+            # Direction-preserving suffix match: only check the SAME suffix direction
+            # (e.g., volume-breakout-long+ matches volume-breakout-long+ but NOT volume-breakout-long-)
+            suffix = part[-1] if part[-1] in '+-' else ''
+            if suffix and (base + suffix) in regime_sigs:
                 works_in_regime = True
                 break
             # Strip trailing numbers (e.g., r2-trend-long0 → r2-trend-long)
