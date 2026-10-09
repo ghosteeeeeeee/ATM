@@ -3334,14 +3334,14 @@ HL_COPY_SIGNAL_MINUS_ENABLED = True # CEO re-enabled 2026-10-08 — 24/7 live, c
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal
-HL_COPY_SIGNAL_LOOKBACK_MINUTES = 30 # How far back to look for trades (30min catches more clusters)
+HL_COPY_SIGNAL_LOOKBACK_MINUTES = 360 # How far back to look for trades (6h — qualified traders are position traders, need longer window)
 HL_COPY_SIGNAL_MAX_PER_CYCLE = 5   # Max signals per cycle (avoid noise)
 
 # ── Copy Trader Cluster Bonus ────────────────────────────────────────────────
 # When multiple pro traders all buy the same coin within the lookback window,
 # boost confidence AND position size — it's higher conviction (cluster confluence).
 HL_COPY_CLUSTER_ENABLED = True      # master switch for cluster bonus
-HL_COPY_CLUSTER_MIN_SIZE = 2        # minimum traders in cluster to fire signal (2+ = at least 2 traders agree)
+HL_COPY_CLUSTER_MIN_SIZE = 1        # CEO 2026-10-09: lowered from 2 to 1 — qualified traders (75%+ WR) rarely cluster, single quality signal is enough
 HL_COPY_CLUSTER_BONUS_PER_TRADER = 3  # +3 confidence per additional trader in cluster
 HL_COPY_CLUSTER_MAX_BONUS = 15       # cap cluster bonus at +15 (prevents overconfidence)
 HL_COPY_CLUSTER_SIZE_MULT = 0.25    # +25% position size per additional trader (e.g., 3 traders → 1.5x)

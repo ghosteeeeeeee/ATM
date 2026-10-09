@@ -214,9 +214,10 @@ def get_recent_pro_trades(minutes: int = None) -> list:
         # Filter to only tradable coins (exclude xyz: HIP-3 stocks)
         # AND deduplicate by coin+side — keep only the most recent fill per coin+direction
 
-        # FIRST: count unique traders per (coin, side) for cluster bonus
+        # FIRST: count unique QUALIFIED traders per (coin, side) for cluster bonus
+        # CEO 2026-10-08: Only count qualified traders (75%+ WR, $10k+ PnL) in clusters
         from collections import defaultdict
-        trader_counts = defaultdict(set)  # (coin, side) -> set of unique wallets
+        trader_counts = defaultdict(set)  # (coin, side) -> set of unique qualified wallets
         tradable_fills = []
         for t in trades:
             if t['coin'].startswith('xyz:'):
@@ -224,8 +225,12 @@ def get_recent_pro_trades(minutes: int = None) -> list:
             key = (t['coin'].upper(), t['side'].upper())
             wallet = t['wallet'] if 'wallet' in t.keys() else ''
             if wallet:
-                trader_counts[key].add(wallet)
-            tradable_fills.append({k: t[k] for k in t.keys()})
+                # Only count qualified traders
+                qualified, _ = is_qualified_trader(wallet)
+                if qualified:
+                    trader_counts[key].add(wallet)
+                    tradable_fills.append({k: t[k] for k in t.keys()})
+            # Don't add unqualified trader fills at all
 
         # THEN: dedup — keep only most recent fill per (coin, side)
         seen = set()
