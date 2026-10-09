@@ -56,30 +56,29 @@ LOG_END = datetime(2026, 10, 8, 23, 2, tzinfo=timezone.utc).timestamp()
 # Token charset excludes pure digits (prices) — matches gate_shadow convention.
 BLOCK_RE = re.compile(
     r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?'
-    r'(?:🚫|🔒|🚧|🌊|🎯|⏱️|🛡️|🚨|⚠️)\s+\[([A-Za-z0-9_-]+)\]\s+'
-    r'([A-Z0-9]{2,12})\s+(LONG|SHORT)\b',
+    r'(?:🚫|🔒|🚧|🌊|🎯|⏱️|🛡️|🚨|⚠️|🔄|🗑️)\s+\[([A-Za-z0-9_-]+)\]\s+'
+    r'([A-Z0-9]{1,12})\s+(LONG|SHORT)\b',   # {1,12}: token "W" (Wormhole) exists
 )
-# LONG-RSI-BLOCK variant: token carries its own colon: [GATE] CHIP: LONG blocked
+# colon-glued variant: [GATE] TOKEN:LONG / TOKEN: LONG (CONF-FILTER-PRESERVE,
+# CONFLICT-RESCUE-BLOCK, PRESERVE-LOCK/CHOP-BLOCK log TOK:DIR with no space)
 COLON_RE = re.compile(
     r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?'
-    r'(?:🚫|🔒|🚧|🌊|🎯|⏱️|🛡️|🚨|⚠️)\s+\[([A-Za-z0-9_-]+)\]\s+'
-    r'([A-Z0-9]{2,12}):\s+(LONG|SHORT)\b',
+    r'(?:🚫|🔒|🚧|🌊|🎯|⏱️|🛡️|🚨|⚠️|🔄|🗑️)\s+\[([A-Za-z0-9_-]+)\]\s+'
+    r'([A-Z0-9]{1,12}):\s*(LONG|SHORT)\b',
 )
 EXCLUDE_GATE = {'CONFLUENCE-DEBUG'}
-# Soft-multiplier / debug lines that match the shape but are NOT blocks:
-#   RR-ENGINE "RR PENALTY: ... mult=0.70" (soft conf penalty), TIDE "→ 0.7x",
-#   SLOPE-OVERRIDE "threshold relaxed", OPP-PENALTY "→ 70%", PHANTOM-DBG traces,
-#   ✅ "allowed"/"SKIPPED" pass lines.
-EXCLUDE_SUBSTR = ('WOULD BLOCK', 'SKIPPED', ' shadow', 'SHADOW',
-                  'RR PENALTY', '→ 0.', '→ 7', '→ 8', '→ 9', 'relaxed',
-                  'allowed', 'DEBUG', 'preserved entry blocked — RSI')  # last one: dup of PRESERVE-SPIKE shape? no — keep, it IS a block; removed below
+# Soft-multiplier / debug / pass lines that match the shape but are NOT blocks:
+#   RR-ENGINE "RR PENALTY: ... mult=0.70", TIDE "→ 0.7x", SLOPE-OVERRIDE
+#   "threshold relaxed", OPP-PENALTY, PHANTOM-DBG, ✅ "allowed"/"SKIPPED",
+#   PRESERVE-MERGE-BYPASS "allowed at merge" (an ALLOW line, 1,427 in window).
 EXCLUDE_SUBSTR = ('WOULD BLOCK', 'SKIPPED', ' shadow', 'SHADOW',
                   'RR PENALTY', 'relaxed', 'allowed', 'DEBUG')
-# A shape-matched line is a BLOCK iff:
-#   gate name contains 'BLOCK' (covers CONFLUENCE-GATE-BLOCK, CHASE-BLOCK,
-#   PUMP-CHAIN-GAP-BLOCK, PENALTY-BLOCK, HARD-BLOCK, EXEC-BLOCK, PRESERVE-*),
-#   OR line contains a block marker (covers CONTINUUM-BULL "denied",
-#   VOL-GATE-BYPASS "denied", SLOPE-FILTER "skip", SHORT-CONTINUUM "blocked"...)
+# NOT captured by design: plain CONFLICT-RESCUE "winner killed, promoting
+# conflict loser" (🔄, 102 lines) — it blocks the named direction but PROMOTES
+# the opposite-direction loser on the same token, so direction attribution is
+# unreliable; only CONFLICT-RESCUE-BLOCK (gate name has BLOCK) is counted.
+# Direction-level gates (VOL-FLOOR, WARNING BTC-momentum, DIRECTION-LOCK,
+# VOL-GATE-v2 SKIP) have no token+dir → unverifiable by this method.
 BLOCK_MARKERS = ('blocked', 'BLOCKED', 'HARD BLOCK', 'denied', 'skip')
 
 def parse_log():
@@ -404,8 +403,8 @@ def main():
     P(f"{'gate':28} {'n1':>4} {'ex1h1':>8} {'n2':>4} {'ex1h2':>8} {'same-sign':>9}")
     for gate in sorted(per_gate, key=lambda g: -len(per_gate[g])):
         recs = per_gate[gate]
-        a = [r['excess_4h'] for r in recs if r['ts'] < OOS_SPLIT]
-        b = [r['excess_4h'] for r in recs if r['ts'] >= OOS_SPLIT]
+        a = [r['excess_4h'] for r in recs if r['ts'] < OOS_SPLIT and r['excess_4h'] is not None]
+        b = [r['excess_4h'] for r in recs if r['ts'] >= OOS_SPLIT and r['excess_4h'] is not None]
         ma = sum(a) / len(a) if a else float('nan')
         mb = sum(b) / len(b) if b else float('nan')
         same = '  —  ' if not (a and b) else ('YES' if ma * mb > 0 else 'NO ')
