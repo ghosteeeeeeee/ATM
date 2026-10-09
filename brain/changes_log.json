@@ -946,5 +946,16 @@
     "after": "0.5 all four keys. EXTREME stays 1.0. Bare pump_chain / SHORT / v6 untouched.",
     "rationale": "EXTREME is the verified habitat: 30d 74T +$3.34 / 14d 25T +$2.09. NORMAL+HIGH bleed: 30d 37T 32.4%WR -$0.66 (binomial p=0.024 vs 50%). 14d NORMAL 1T -$0.07, HIGH 3T -$0.13. 7d recent kill-rate if blocked: 1/14 winners (7%) — well under 20% rule. Dampen not block: reversible, allows high-conf through, aligns with bare pump_chain NORMAL 0.5 precedent and mover+ HIGH 0.5.",
     "impact": "Expected: cut ~50% of NORMAL/HIGH pump-chain+ LONG frequency; recover ~+$0.15-0.33/30d net; reduce this signals HML tail (9T -$1.21 7d). EXTREME edge untouched. Monitor 7d: NORMAL/HIGH pump-chain+ trades should drop; EXTREME count unchanged."
+  },
+  {
+    "timestamp": "2026-10-09T22:44:26Z",
+    "agent": "brain_auditor",
+    "change": "SHORT-RSI-CEILING bear exemption OR→AND (full bear structure required) in signal_compactor.py + decider_run.py",
+    "type": "bugfix",
+    "file": "scripts/signal_compactor.py + scripts/decider_run.py",
+    "before": "if linreg BEAR/LEAN_BEAR OR phase DECLINING/STORMY OR ema BELOW → exemption fires",
+    "after": "if linreg BEAR/LEAN_BEAR AND phase DECLINING/STORMY AND ema BELOW → exemption fires",
+    "rationale": "Sibling SHORT-NEUTRAL-BYPASS already fixed to AND on 2026-09-24 for same false-bypass disease. LDO SHORT@RSI70.19 wrong-side 2026-10-09 slipped through on DECLINING+LEAN_BEAR while ema=AT (not BELOW). 14d SHORT meta-RSI 65-75 band = 9T 44.4%WR -$0.69 (4W+$0.31/5L-$1.00); all-time 60T 53.3%WR -$0.74. Tightening blocks shallow-bear false exemptions without touching full-bear legitimate shorts.",
+    "impact": "Blocks wrong-side SHORT entries when BTC has only partial bear structure. Full-bear (phase+linreg+ema-below) shorts still exempt. Expected: reduce SHORT bleed in 65-75 RSI band; monitor 7d."
   }
 ]

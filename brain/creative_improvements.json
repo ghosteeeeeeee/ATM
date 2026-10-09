@@ -3671,5 +3671,35 @@
     "status": "suggested",
     "risk": "medium — needs backtest on 7d winners during bear windows. Code change in signal_compactor.py:1510.",
     "implementation": "Replace hardcoded 0.6 with constant BEAR_LONG_TREND_MULT=0.4 in hermes_constants.py"
+  },
+  {
+    "date": "2026-10-09T22:44:26Z",
+    "idea": "Momentum-precondition gate for pump-chain+ and bb-squeeze+ — block entry if 5m ATR% < 0.3% OR coin 15m velocity ≈ 0 (SLOW)",
+    "rationale": "Watchdog deep_analysis: 'Volatility is LOW and velocity SLOW — the precise regime where the hard_max_loss cluster died.' Trail family needs momentum to arm. A pre-entry momentum check would skip chop without blocking trends. Data: 52/56 HML never armed trail; 3 winners in 24h all exited via profit-monster-trail.",
+    "expected_impact": "Block ~30-50% of HML cluster while preserving trail winners. Conservative: start as shadow-log would-fires for 48h.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — shadow first",
+    "verification_required": "Backtest against 7d HML cluster + 7d trail winners. Must block 0 trail winners."
+  },
+  {
+    "date": "2026-10-09T22:44:26Z",
+    "idea": "bb-squeeze+ RSI_MAX=80 (not 70) — block only exhausted zone",
+    "rationale": "bb-squeeze+ meta-RSI 70-80 band 12T 50%WR -$0.38 6HML (7d). 80+ band 1T 100%WR +$0.07. All-time >=70: 18T 61.1% -$0.14 6HML. 61% WR means winners exist; R:R is the problem. A ceiling at 80 blocks only the most exhausted entries. NOT 70 — that would block the 60-70 band's 80%WR winners.",
+    "expected_impact": "Block 1-3 HML/week in 70-80 band without killing 60-70 winners.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — single constant, reversible",
+    "verification_required": "Check 30d 70-80 band PnL. If still negative, ship. Sample currently 12T — borderline, prefer 48h more data."
+  },
+  {
+    "date": "2026-10-09T22:44:26Z",
+    "idea": "Leverage-aware position sizing for hard_max_loss-prone signals — cap leverage 3x on bb-squeeze+ and pump-chain+ in HIGH regime",
+    "rationale": "7d HML by leverage: lev3 28T -$3.46 avg -3.00% vs lev5 27T -$4.12 avg -4.50%. Lev5 amplifies chop losses 50% more. bb-squeeze+ HIGH 9T -$0.40. Capping leverage on chop-prone cells reduces bleed without blocking entries.",
+    "expected_impact": "Reduce HML magnitude ~33% on capped signals. Preserve all entries.",
+    "category": "risk",
+    "status": "suggested",
+    "risk": "low — reduces size not frequency",
+    "verification_required": "Needs position_manager leverage cap path. Delegate bug_hunter if approved."
   }
 ]

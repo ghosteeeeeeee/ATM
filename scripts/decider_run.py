@@ -1967,8 +1967,12 @@ def execute_trade(token, direction, price, confidence, source,
                         ).fetchone()
                     finally:
                         _ec_cont.close()
-                    if _ec_row and (_ec_row[1] in ('LEAN_BEAR', 'BEAR') or
-                                    _ec_row[0] in ('DECLINING', 'STORMY') or
+                    # FIX 2026-10-09 brain_auditor: OR→AND, mirrors signal_compactor.py fix.
+                    # Sibling SHORT-NEUTRAL-BYPASS already AND (2026-09-24). Require full
+                    # bear structure: phase AND linreg AND ema-below. LDO@70.19 wrong-side
+                    # was the OR-logic false bypass.
+                    if _ec_row and (_ec_row[1] in ('LEAN_BEAR', 'BEAR') and
+                                    _ec_row[0] in ('DECLINING', 'STORMY') and
                                     _ec_row[2] == 'BELOW'):
                         _exec_ceiling_bearish = True
                 except Exception:

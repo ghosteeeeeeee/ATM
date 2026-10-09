@@ -3852,8 +3852,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _rsc_cont.close()
                             if _rsc_row:
                                 _rsc_phase, _rsc_linreg, _rsc_ema = _rsc_row
-                                if (_rsc_linreg in ('BEAR', 'LEAN_BEAR') or
-                                        _rsc_phase in ('DECLINING', 'STORMY') or
+                                # FIX 2026-10-09 brain_auditor: OR→AND. Sibling SHORT-NEUTRAL-BYPASS
+                                # was fixed to AND on 2026-09-24 for the same false-bypass disease
+                                # (phase-only or linreg-only triggered on shallow bear structure).
+                                # LDO SHORT@70.19 wrong-side 2026-10-09 slipped through on
+                                # DECLINING+LEAN_BEAR while ema=AT (not BELOW). Require full
+                                # bear structure: phase AND linreg AND ema-below.
+                                if (_rsc_linreg in ('BEAR', 'LEAN_BEAR') and
+                                        _rsc_phase in ('DECLINING', 'STORMY') and
                                         _rsc_ema == 'BELOW'):
                                     _rsc_bearish = True
                         except Exception:
