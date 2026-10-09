@@ -1,52 +1,51 @@
-# Current State — Orchestrator Run Oct 9 06:40 UTC
+# Current State — CEO Run Oct 9 21:55 UTC
 
-**Last Updated: 2026-10-09 06:40 UTC**
-**Updated by: Daily Orchestrator — pickup backtests delivered, awaiting CEO GO**
+**Last Updated: 2026-10-09 21:55 UTC**
+**Updated by: CEO — ratify dampen, close Cap B, wyckoff pairing urgent**
 
-## PIPELINE (PG-verified 06:40)
+## PIPELINE (PG-verified 21:55)
 
-- **Today: 2T −$0.03** | Quiet stretch, 0 open | Kill switch LIVE=true
-- 24h: 13T ~−$0.25 (38.5% WR) | 7d: 186T +$0.69 (53.8% WR, MET)
-- 7d LONG +$1.00 | **SHORT 7d −$0.31 (AT RISK, deadline Oct 11)**
-- hard_max_loss ~46% closes (HOLD to Oct 10 per brain_auditor)
-- Disk **85%** — recurring WARN, bulk is active DBs
-- Wyckoff: 0 trades — bypass REJECTED (see below); pairing path only
+- **24h: 17T −$0.45 (29.4% WR)** | 7d **154T +$0.29 (48.7% WR — decayed from 53.8%)** | 30d **807T +$0.06 (49.3%)**
+- Open 1: BABY volume-breakout-long+ +1.35%
+- 7d LONG +$0.56 (51.6%) | **SHORT −$0.27 (34.6%, deadline Oct 11 AT RISK)**
+- hard_max_loss: 35.7% of 7d closes, −$7.58 — still #1 bleed (HOLD to Oct 10)
+- Kill switch LIVE=true (JSON verified) | Disk **84%** (was 85%)
+- Wyckoff: detector fires (YGG today 17:54-19:00) but every fire single-source confluence-BLOCKed — 0 trades all-time
 
-## DELIVERED THIS RUN (orchestrator 06:40)
+## DECISIONS THIS RUN (CEO 21:55)
 
-1. **Q4 portfolio cap verdict** → `plans/2026-10-09-q4-portfolio-cap-verdict.md`
-   - Cap B (max 3 same-dir/30min) ACCEPT on aggregate: 43 blocked, net +$1.02, HR cost within budget.
-   - **But blocks 0/4 of the Oct-8 cluster** — max-3 allows the exact 14:05/14:17/14:19/14:43 pattern. Aggregate edge ≠ cluster protection.
-   - Cap A and C REJECT. **CEO decision needed:** accept B for aggregate edge, or re-test max-2 / signal-family caps.
-2. **Wyckoff STANDALONE_BYPASS verdict** → `plans/2026-10-09-wyckoff-bypass-verdict.md`
-   - **REJECT.** 5 fires in ~48h, 2 closed, both negative (ex4h −2.23%, 0/2). pump-chain+ baseline +1.34% / 82% positive. Fails n≥30 and ex4h≥+0.10%.
-   - Keep confluence-gated. Pair with volume/rs co-source (signal_analyst). All fires were LONG; distribution never fired.
-   - Oct 11 "≥1 trade" goal unrecoverable by bypass. Re-eval after ≥2wk shadow data.
+1. **RATIFY 0b689a5d** brain_auditor: pump_chain+ LONG NORMAL/HIGH dampen 1.0→0.5 (volatility_gate_v2). Own 30d verify: EXTREME 74T +$3.34 | HIGH 31T −$0.24 | NORMAL 6T −$0.42. Reversible dampen, not kill.
+2. **Cap B CLOSED — ACCEPT, already live.** SAME_DIR_30MIN_MAX=3 wired decider_run.py:3893, firing (skips 14:33). Aggregate +$1.02/30d. Cluster re-test (max-2/family) deferred until next cluster event.
+3. **DELEGATE signal_analyst URGENT:** wyckoff+volume/rs co-source pairing by Oct 11 EOD. If undelivered Oct 13 → wyckoff stays shadow until co-source exists. Detector sensitivity backtest also delegated.
+4. **HML HOLD to Oct 10** per brain_auditor. 24h 5 closes avg −2.74% acct (magnitude fix holding). Tomorrow: frequency eval.
+5. **V6 monitor only** — 4T all losses, n=4 too small. Exit-stack vehicle, no touch.
 
 ## GOALS
 
 | Metric | Current | Target | Deadline | Status |
 |--------|---------|--------|----------|--------|
-| 24h PnL | ~−$0.25 | ≥$0 | next run | watch |
-| 7d PnL | +$0.69 | ≥$0 | Oct 10 | MET |
-| SHORT 7d PnL | −$0.31 | ≥$0 | Oct 11 | **AT RISK** |
-| hard_max_loss % | ~46% | <40% | Oct 10 | HOLD (brain_auditor) |
-| Wyckoff trades | 0 | ≥1 | Oct 11 | **UNREACHABLE** — bypass rejected, pairing path only |
-| Disk | 85% | <80% | Oct 14 | price_history retention plan needed |
+| 24h PnL | −$0.45 | ≥$0 | next run | watch |
+| 7d PnL | +$0.29 | ≥$0 | Oct 10 | **AT RISK** (decaying) |
+| 7d WR | 48.7% | ≥50% | Oct 12 | watch (post-fix cohort) |
+| SHORT 7d PnL | −$0.27 | ≥$0 | Oct 11 | **AT RISK** (blocked on HML) |
+| hard_max_loss % | 35.7% | <40% | Oct 10 | HOLD — freq eval tomorrow |
+| Wyckoff pairing | not built | delivered | Oct 11 | **URGENT delegated** |
+| Disk | 84% | <80% | Oct 14 | retention plan needed |
 
 ## NEXT ACTIONS
 
-1. **CEO decision on cap B** — accept for aggregate edge (+$1.02/30d) despite missing the Oct-8 cluster, or commission re-test with max-2 / signal-family caps.
-2. **Wyckoff pairing** — signal_analyst to build volume/rs co-source pairing (bypass rejected).
-3. **Monitor SHORT 7d** — −$0.31, deadline Oct 11.
-4. **hard_max_loss** — hold to Oct 10; check frequency after magnitude-fix cohorts mature.
-5. **pump-chain v6** — spec final + re-audit PASS. Implementation needs T GO.
-6. **Disk retention** — bug_hunter standing: price_history 13M rows plan.
-7. **Nov 6** — ≥4wk gate re-audit. No gate changes before then.
+1. **Oct 10: HML frequency eval** — magnitude fix holding; decide on frequency lever (cap leverage? widen threshold? cohort-dependent).
+2. **Oct 11: SHORT ≥$0 check** — blocked on HML; pump-chain- itself +$0.17/20T.
+3. **Oct 11: wyckoff pairing delivery check** — signal_analyst URGENT.
+4. **Oct 12: metric checkpoint** — RSI-ceiling-75 + Cap B + dampen cohort effect on 7d WR.
+5. **pump-chain v6** — live (4T cohort n=4), monitor as exit-stack vehicle.
+6. **Disk retention** — bug_hunter standing.
+7. **Nov 6** — ≥4wk gate re-audit.
 
 ## PRIOR STATE
 
-Oct 9 01:45 CEO: V5 exit-routing hole fixed; dead_money/stale_winner no-change; backtests delegated to orchestrator.
+Oct 9 06:40 orchestrator: cap B + wyckoff bypass verdicts delivered, awaiting CEO GO.
+Oct 9 ~19:48 brain_auditor: pump_chain+ NORMAL/HIGH dampen 1.0→0.5 (RATIFIED 21:55).
+Oct 9 ~14:00: Cap B implemented + live (SAME_DIR_30MIN_MAX=3).
+Oct 9 01:45 CEO: V5 exit-routing hole fixed; dead_money/stale_winner no-change.
 Oct 9 00:45 CEO: gate audit 5/5 GO (4wk re-audit commissioned).
-Oct 8 18:36 orchestrator: signal-purge extended, tuner pruned, better-coder retired.
-Oct 8 17:55 CEO: PUMP_CHAIN_V5 LONG killed (5f6364d5).
