@@ -3631,5 +3631,23 @@
     "category": "data integrity",
     "status": "standing_delegate",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-09T19:48:33Z",
+    "idea": "Momentum-floor pre-entry gate for HML-prone signals",
+    "rationale": "HML trades 7d avg MFE only +0.187% — never arm trail at +0.40%. 85% had MFE>0 but tiny. Pre-entry 5m displacement >0.15% OR ATR expansion filter could cut chop entries.",
+    "expected_impact": "Reduce HML frequency below 30% of closes; preserve trail family 91.4% WR.",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest on 55 HML vs 58 trail winners",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-09T19:48:33Z",
+    "idea": "Auto-habitat registry: wire cell_stats nightly output to vol-gate dampen proposals",
+    "rationale": "pump_chain+ EXTREME-only edge (+$3.34/30d) sat in data while gate had NORMAL/HIGH at 1.0. cell_stats already computes signal×regime cells nightly. Auto-propose dampen for n>=20 net-negative significant cells.",
+    "expected_impact": "Systematic weekly cleanup of regime-dilutive multipliers.",
+    "category": "systemic",
+    "status": "suggested — proposals only, CEO approves",
+    "risk": "low"
   }
 ]

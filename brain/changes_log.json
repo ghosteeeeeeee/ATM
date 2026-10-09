@@ -935,5 +935,16 @@
     "after": "('EXTREME','pump_chain-'): 1.0 and ('EXTREME','pump-chain-'): 1.0",
     "rationale": "Dampen deployed 02:35 today was over-correction. 14d EXTREME meta-RSI>=45: 41T +$1.09 (50-55 band 14T 64.3%WR +$0.81 BEST cell). The 7d EXTREME bleed (-$0.23/33.3%) that justified dampen was contaminated by pre-floor RSI<45 trades — now blocked by SHORT_RSI_HARD_FLOOR=45 + PUMP_CHAIN_SHORT_RSI_MIN=45 (both live). Dampen suppressed the paying EXTREME cell. NORMAL boost 1.2 retained. HIGH stays blocked via PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED.",
     "impact": "Restores full confidence to EXTREME pump-chain- SHORT in RSI 45-65 band. Expected: capture EXTREME SHORT edge (+$1.09/14d on RSI>=45) without the oversold bleed (already floored). Winner impact of revert: 0 (no winners blocked)."
+  },
+  {
+    "timestamp": "2026-10-09T19:47:12Z",
+    "agent": "brain_auditor",
+    "change": "Dampened pump_chain+ LONG in NORMAL and HIGH vol regimes: 1.0 → 0.5 (underscore + hyphen variants)",
+    "type": "config",
+    "file": "volatility_gate_v2.py",
+    "before": "('NORMAL','pump_chain+'): 1.0, ('HIGH','pump_chain+'): 1.0 (and hyphen variants)",
+    "after": "0.5 all four keys. EXTREME stays 1.0. Bare pump_chain / SHORT / v6 untouched.",
+    "rationale": "EXTREME is the verified habitat: 30d 74T +$3.34 / 14d 25T +$2.09. NORMAL+HIGH bleed: 30d 37T 32.4%WR -$0.66 (binomial p=0.024 vs 50%). 14d NORMAL 1T -$0.07, HIGH 3T -$0.13. 7d recent kill-rate if blocked: 1/14 winners (7%) — well under 20% rule. Dampen not block: reversible, allows high-conf through, aligns with bare pump_chain NORMAL 0.5 precedent and mover+ HIGH 0.5.",
+    "impact": "Expected: cut ~50% of NORMAL/HIGH pump-chain+ LONG frequency; recover ~+$0.15-0.33/30d net; reduce this signals HML tail (9T -$1.21 7d). EXTREME edge untouched. Monitor 7d: NORMAL/HIGH pump-chain+ trades should drop; EXTREME count unchanged."
   }
 ]

@@ -375,8 +375,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pullback_entry+'): 0.5,          # PENALIZED — pullback-entry+ LONG less reliable in NORMAL
     ('NORMAL', 'pullback-entry+'): 0.3,          # PENALIZED — 30d: 6T 17%WR -$0.57. Structurally weak LONG variant.
     ('NORMAL', 'volume_breakout_short'): 1.0,    # OK — volume-breakout-short can work in NORMAL
-    ('NORMAL', 'pump_chain+'): 1.0,              # RE-ENABLED 2026-10-07 CEO — every pump is a LONG
-    ('NORMAL', 'pump-chain+'): 1.0,              # RE-ENABLED 2026-10-07 CEO — hyphen variant
+    ('NORMAL', 'pump_chain+'): 0.5,              # DAMPENED 1.0→0.5 brain_auditor 2026-10-09 — EXTREME is the habitat (30d 74T +$3.34). NORMAL+HIGH bleed: 30d 37T 32.4%WR -$0.66 (binomial p=0.024). 14d NORMAL 1T -$0.07. Aligns with bare pump_chain NORMAL 0.5. EXTREME stays 1.0. Reversible dampen, not block.
+    ('NORMAL', 'pump-chain+'): 0.5,              # hyphen variant — same dampen
     ('NORMAL', 'pump_chain-'): 1.2,              # BOOST 1.0→1.2 2026-10-08 brain_auditor — NORMAL profitable SHORT habitat. Boost winning side; EXTREME reverted to 1.0 same day (RSI>=45 pays); HIGH blocked in compactor. Small-n boost, not a filter.
     ('NORMAL', 'pump-chain-'): 1.2,              # hyphen form — same boost (runtime signal_type is 'pump-chain')
     ('NORMAL', 'pump_chain'): 0.5,               # PENALIZED 2026-09-22 — 66.7% WR but -$0.27 (6T)
@@ -414,8 +414,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'accel_300_short'): 1.0,            # OK — accel_300_short SHORT works in HIGH
     ('HIGH', 'mover+'): 0.5,                     # PENALIZED 2026-09-22 — 54.5% WR but -$0.07 (11T)
     ('HIGH', 'mover-'): 1.0,                     # OK 2026-09-22 — 66.7% WR, +$0.26 (3T)
-    ('HIGH', 'pump_chain+'): 1.0,                # RE-ENABLED 2026-10-07 CEO — every pump is a LONG
-    ('HIGH', 'pump-chain+'): 1.0,                # RE-ENABLED 2026-10-07 CEO — hyphen variant
+    ('HIGH', 'pump_chain+'): 0.5,                # DAMPENED 1.0→0.5 brain_auditor 2026-10-09 — HIGH 30d 31T 35.5%WR -$0.24. EXTREME is habitat. 7d HIGH 3T -$0.13. Aligns with mover+ HIGH 0.5 precedent. Bare pump_chain HIGH stays 1.0 (76.9%WR).
+    ('HIGH', 'pump-chain+'): 0.5,                # hyphen variant — same dampen
     ('HIGH', 'pump_chain-'): 1.0,                # Gate shows 1.0 but PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True (brain_auditor 2026-10-07) hard-blocks in signal_compactor.py:2901 + decider_run.py:1656. Gate value is fallback only. Comment was stale (said False). HIGH 30d 27T 44.4%WR -$0.42.
     ('HIGH', 'pump-chain-'): 1.0,                # hyphen variant — same as underscore
     ('HIGH', 'pump_chain'): 1.0,                 # OK 2026-09-22 — bare form 76.9% WR (13T) in HIGH

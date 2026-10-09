@@ -1,152 +1,149 @@
 {
-  "timestamp": "2026-10-09T15:37:01Z",
-  "agent": "brain_auditor",
-  "trade_summary_24h": {
-    "trades": 18,
-    "pnl": 0.04,
-    "wr": 38.9,
-    "7d": {
-      "trades": 156,
-      "pnl": -0.39,
-      "wr": 48.7
-    },
-    "long_7d": {
-      "trades": 132,
-      "pnl": -0.21,
-      "wr": 50.8
-    },
-    "short_7d": {
-      "trades": 24,
-      "pnl": -0.18,
-      "wr": 37.5,
-      "deadline": "Oct 11 AT RISK"
-    },
-    "open": "2 longs (ETH continuation+, JUP pump-chain+)",
-    "portfolio_health": "critical (watchdog)"
+  "timestamp": "2026-10-09T19:47:12Z",
+  "session_brain_stats": {
+    "queries_run": 4,
+    "top_insight": "Session brain confirms recurring pattern: SHORT_BIAS market opens LONG flood (mtf-regime-trend, continuum) — same pattern as 2026-10-05. Trend filter gives multiplier but does not hard-block counter-trend LONGs."
   },
-  "watchdog_pattern_verdicts": [
+  "trade_summary_24h": {
+    "closed": 21,
+    "pnl": -0.45,
+    "wr": 33.3,
+    "long": "19T -$0.36 36.8%WR",
+    "short": "2T -$0.09 0%WR",
+    "open": 0,
+    "hml_24h": "~7T all LONG, meta_rsi 37-79",
+    "note": "BTC BELOW EMA300 ~6.6h, SHORT_BIAS 15m, STRONG_DOWN. Counter-trend LONGs dominated losses."
+  },
+  "trade_summary_7d": {
+    "closed": 155,
+    "pnl": 0.37,
+    "wr": 49.0,
+    "long": "129T +$0.64 51.9%",
+    "short": "26T -$0.27 34.6%",
+    "hml": "55T 0%WR -$7.58 #1 bleed (avg MFE only +0.187%, 85% had MFE>0, hold 97min vs trail 62min)",
+    "trail": "58T 91.4% +$3.71 — the edge",
+    "post_oct8_12": "27T -$0.68 29.6%WR; HML 10T 37% of closes avg -3.25% acct (magnitude fix working, frequency 37%<40% goal)"
+  },
+  "drift_findings": [
     {
-      "claim": "pump-chain+ LONG at meta_rsi>=60 -> 23% WR n=13; reject RSI>=60",
-      "verdict": "DISPROVED",
-      "evidence": "7d n=33: RSI>=60 = 43.5%WR +$0.21 (n=23) vs RSI<60 = 40.0%WR +$1.14 (n=10). Fisher p=1.000. 14d OOS: hot 44% +$0.17 vs cool 41% +$1.28. Watchdog used short n=13 window.",
-      "winner_impact": "RSI_MAX=60 would block 10/14 (71%) of 7d winners incl ME +$0.88, GRASS +$0.17",
-      "action": "REJECT RSI_MAX=60. Existing PUMP_CHAIN_LONG_RSI_MAX=75 (landed today) is the correct ceiling: 30d 75+ = 12T 33.3% -$0.55; 70-75 kept open (+$0.25, n=12 < 20 threshold)."
+      "finding": "PUMP_CHAIN_LONG_RSI_MAX / LONG_RSI_CEILING both already at 75 (committed today ff0ccd0f / c22f7407)",
+      "status": "RESOLVED — no action. BANANA@79 would now be blocked. BANANA@72.39 correctly passes (<75)."
     },
     {
-      "claim": "8 recent losses fading momentum / wrong-side",
-      "verdict": "PARTIALLY CONFIRMED — entry quality not direction",
-      "evidence": "24h 7/10 losers = hard_max_loss, all LONG. BTC regime LONG_BIAS both TFs — direction correct. Failures are chop entries: 49/57 7d hard_max_loss never armed +0.40% trail (median MFE 0.095%). These never trended.",
-      "action": "Chop early-exit delegated to bug_hunter (creative improvement below)"
+      "finding": "GRASS/HBAR SHORT signals.json EXECUTED but missing from PG — watchdog flagged gate leak",
+      "status": "FALSE ALARM — verified in pipeline.log: GRASS blocked 6x by CTX-GATE (RSI 27.8<45), HBAR blocked by EXEC-RSI-HARD-FLOOR (RSI dropped 56.76→34.9 at exec, DRIFT-E). Floor holding. signals.json = detection records not executions."
+    },
+    {
+      "finding": "HML frequency still 37% of closes post Oct-8 fixes",
+      "status": "ON TRACK — prior brain_auditor decision HOLD to Oct 10. Magnitude fixed (-3.25% vs pre-fix -4.4%). D3 floor + ATR mult live. Do not touch."
     }
   ],
-  "hard_max_loss_eval_2026_10_09": {
-    "status": "MAGNITUDE FIX WORKING — HOLD frequency watch to Oct 10",
-    "cut_loser_pnl_minus_1_50_impact": "pre: 64T avg -3.83% acct | post (Oct 7 15:00+): 12T avg -2.99% acct (-22% magnitude). Daily $ bleed: Oct1-6 avg -$1.35/day -> Oct7-9 avg -$0.64/day.",
-    "remaining": "57T 7d -$8.03 still #1 bleed exit. 0% WR. 49/57 never armed trail = chop entries, not trend reversals. Top: bb-squeeze+ 14T -$1.97, pump-chain- 10T -$1.44, pump-chain+ 9T -$1.21.",
-    "verdict": "KEEP CUT_LOSER_PNL=-1.50. Do not tighten further (one variable). Frequency fix = early-exit code, not threshold."
-  },
-  "losers_autopsy_24h": [
+  "losing_trade_autopsy": [
     {
-      "trade": "BANANA pump-chain+ LONG rsi=78.95",
-      "pnl": -0.16,
-      "root_cause": "Overbought chase — already blocked by PUMP_CHAIN_LONG_RSI_MAX=75 landed this morning",
-      "status": "FIXED"
+      "cluster": "pump-chain+ LONG hard_max_loss x5 (BANANA 78.95/72.39, ICP 66.67, ALT 60, AVAX 58.18)",
+      "root_cause": "Overbought chase longs into SHORT_BIAS/BELOW-EMA300 market. Meta-RSI >=70 band 30d 23T 34.8%WR -$0.23. BANANA@79 now blocked by RSI_MAX=75.",
+      "wrong_side": "SHORT those pumps or flat. EXTREME-vol LONG winners (GRASS 70.26, BABY 71.43) were same-signal different-regime — correctly kept.",
+      "change_applied": "NORMAL/HIGH pump_chain+ dampened 1.0→0.5 (habitat is EXTREME only)",
+      "confidence": "HIGH"
     },
     {
-      "trade": "AVAX pump-chain+ LONG rsi=58.18 EXTREME lev5",
-      "pnl": -0.11,
-      "root_cause": "Chop entry in EXTREME, never armed trail, lev5 amplified -4.86% acct",
-      "status": "no safe filter (58 in profitable 45-60 band 30d +$3.07)"
+      "cluster": "BTC continuum-trend+ LONG -$0.17 (RSI 57.62, FLAT vol)",
+      "root_cause": "LONGed BTC against its own STRONG_DOWN trend below EMA300. Self-trend misalignment.",
+      "wrong_side": "SHORT BTC or flat.",
+      "change_applied": "None — n=1, signal-specific. Monitor recurrence."
     },
     {
-      "trade": "ICP pump-chain-v6+ LONG rsi=66.67 HIGH lev5",
-      "pnl": -0.08,
-      "root_cause": "v6 new signal n=3 0W all hard_max_loss — insufficient data to tune",
-      "status": "MONITOR n>=10"
+      "cluster": "LDO/ALGO pump-chain- SHORT EXTREME (RSI 70.19 / 60)",
+      "root_cause": "Shorted overbought that kept pumping. 30d >=60 SHORT band actually +$0.91 56.9% (pays), 14d -$0.41 — band unstable across windows.",
+      "wrong_side": "Stay long/flat on strength.",
+      "change_applied": "None — 14d vs 30d reversal = noise. Do not add ceiling."
+    }
+  ],
+  "signal_quality_deep_dive": [
+    {
+      "signal": "pump-chain+ LONG",
+      "habitat_verdict": "EXTREME ONLY. 30d EXTREME 74T +$3.34 48.6% / NORMAL 6T -$0.42 16.7% / HIGH 31T -$0.24 35.5%.",
+      "change": "Dampened NORMAL+HIGH to 0.5. Binomial p=0.024. Recent kill-rate 7% (1/14 winners)."
     },
     {
-      "trade": "BTC continuum-trend+ LONG rsi=57.62 FLAT",
-      "pnl": -0.17,
-      "root_cause": "Single trade, FLAT vol regime, no follow-through",
-      "status": "noise n=1"
+      "signal": "bb-squeeze+",
+      "habitat_verdict": "HIGH 14d 40T -$0.26 60%WR — asymmetry not entry. Losers avg -$0.12 vs winners +$0.07. Exit-structure problem (HML tail), already addressed by D3 floor. HIGH block would kill 24/40 winners for +$0.26 net — REJECT.",
+      "change": "None."
+    },
+    {
+      "signal": "pump-chain- SHORT",
+      "habitat_verdict": "Meta-RSI bands unstable: 14d 50-55 best (+$0.48) but 30d 50-55 worst (-$0.63); 14d >=60 bleed but 30d >=60 best (+$0.91). Non-stationary.",
+      "change": "None — do not trust 14d band edges."
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-09T19:47:12Z",
+      "idea": "Momentum-floor pre-entry gate for HML-prone signals",
+      "rationale": "HML trades avg MFE only +0.187% (never arm trail at +0.40%). 85% had MFE>0 but tiny. A pre-entry check (5m price displacement >0.15% OR ATR expansion last 3 bars) could filter chop entries before they open.",
+      "expected_impact": "Reduce HML frequency below 30% of closes; preserve trail family (91.4% WR).",
+      "category": "entry sniper",
+      "status": "suggested — needs backtest on 55 HML trades vs 58 trail winners",
+      "risk": "medium — could delay valid entries; must verify 0 trail winners blocked"
+    },
+    {
+      "date": "2026-10-09T19:47:12Z",
+      "idea": "Auto-habitat registry: wire cell_stats nightly output to vol-gate proposals",
+      "rationale": "pump-chain+ EXTREME-only edge was sitting in the data but gate still had NORMAL/HIGH at 1.0. cell_stats already computes signal×regime cells nightly. Auto-dampen any signal whose regime cell is n>=20 AND net-negative AND statistically significant (binomial p<0.05).",
+      "expected_impact": "Systematic removal of regime-dilutive multipliers; catches pump-chain+ style drift weekly instead of on-demand.",
+      "category": "systemic",
+      "status": "suggested — requires CEO approval (touches trading path indirectly via proposal queue)",
+      "risk": "low — proposals only, CEO approves each"
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "file": "volatility_gate_v2.py",
+      "keys": "('NORMAL','pump_chain+'), ('NORMAL','pump-chain+'), ('HIGH','pump_chain+'), ('HIGH','pump-chain+')",
+      "before": "1.0",
+      "after": "0.5",
+      "evidence": "30d NORMAL+HIGH 37T 32.4%WR -$0.66 p=0.024; EXTREME 74T +$3.34 untouched; 7d kill-rate 7%",
+      "reversible": true
     }
   ],
   "changes_from_last_run": [
     {
-      "change": "PUMP_CHAIN_LONG_RSI_MAX 85->75 (prior run today, commit ff0ccd0f)",
-      "impact": "Landed. BANANA@78.95 would-be repeat blocked. 70-75 band preserved. WORKING as designed."
+      "change": "CUT_LOSER_PNL -1.00→-1.50 (Oct 7)",
+      "verified": "Magnitude working: HML avg -3.25% acct post-fix vs -4.4% pre. Frequency 37% (<40% goal). HOLD to Oct 10 per plan."
     },
     {
-      "change": "CUT_LOSER_PNL -1.00->-1.50 (Oct 7)",
-      "impact": "Magnitude -22% (avg -3.83%->-2.99% acct). Daily bleed halved. WORKING. HOLD."
+      "change": "EXTREME pump_chain- SHORT dampen revert (Oct 8)",
+      "verified": "Reverted to 1.0 correctly — 30d EXTREME >=60 SHORT pays (+$0.91). LDO@70 loss today was band variance, not regime failure."
     },
     {
-      "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK=True (Oct 7)",
-      "impact": "Post-block pump-chain- SHORT: 4T all EXTREME 0%WR -$0.45. HIGH losses stopped (ADA was pre-block). EXTREME keep-standing per CEO."
+      "change": "NORMAL pump_chain- SHORT boost 1.0→1.2 (Oct 8)",
+      "verified": "14d 50-55 band +$0.48 58.3% — boost aligned. But 30d 50-55 -$0.63 — unstable. Leave at 1.2 (small-n boost, not filter), monitor."
     },
     {
-      "change": "exit_time NULL trigger (Oct 8)",
-      "impact": "0 NULL on closed trades. WORKING."
-    }
-  ],
-  "config_changes_applied": [],
-  "config_change_rationale": "0 changes this run. Morning's RSI_MAX=75 is the correct pump-chain ceiling and already in tree. CUT_LOSER -1.50 needs 48h more cohort. Watchdog RSI_MAX=60 rejected (would kill 71% of winners, p=1.0). No other filter passes significance + winner-impact checks. Forcing a change would be destabilizing.",
-  "creative_improvements": [
-    {
-      "date": "2026-10-09T15:37:01Z",
-      "idea": "Chop early-exit: close open position if unrealized MFE never exceeded +0.15% after 90 minutes in LOW volume_regime",
-      "rationale": "49/57 (86%) hard_max_loss trades 7d NEVER armed +0.40% trail; median MFE 0.095%. These trades are dead on arrival — capital sits in chop until -1.5% account stop. Existing UNIVERSAL_MAX_HOLD and pump_exit_dead_money exits don't catch the non-arming middle. Every dollar not bled to chop is a dollar for the RSI 45-60 setups that actually run.",
-      "expected_impact": "Could cut ~40-60% of hard_max_loss closes early at ~-0.3% instead of -1.5% acct. Est. saves $3-5/7d at current frequency.",
-      "category": "exit management",
-      "status": "delegated_bug_hunter",
-      "risk": "medium — must not exit winners mid-consolidation before leg 2. Guard: only LOW volume_regime, only if MFE < 0.15%, skip if position < 90min old."
-    },
-    {
-      "date": "2026-10-09T15:37:01Z",
-      "idea": "Re-baseline all RSI band analytics on _signal_metadata.rsi_14 (meta RSI), purge entry_rsi_14 usage from dashboards/watchdog prompts",
-      "rationale": "DRIFT-E: entry_rsi_14 median abs diff vs meta = 12.6 pts. Watchdog's disproven RSI>=60 claim likely used unreliable stored RSI. Every past RSI audit based on entry_rsi_14 is suspect.",
-      "expected_impact": "Prevents future false patterns; watchdog accuracy",
-      "category": "data integrity",
-      "status": "standing_delegate",
-      "risk": "low"
-    }
-  ],
-  "drift_findings": [
-    {
-      "id": "WATCHDOG-REGIME-CONTRADICTION",
-      "severity": "MED",
-      "finding": "watchdog.json regime_summary.trend_quality=STRONG_DOWN but its own deep_analysis says trend_quality UP + linreg BULL all TFs alignment 1.0. One field stale or miscomputed.",
-      "action": "flag to bug_hunter — trade_watchdog may be mixing 1m micro-trend with macro trend_quality"
+      "change": "PUMP_CHAIN_LONG_RSI_MAX 85→75 (committed ff0ccd0f today)",
+      "verified": "BANANA@78.95 (Oct 8 pre-fix) would now be blocked. Post-fix BANANA@72.39 correctly passes. No over-block observed."
     }
   ],
   "next_actions": [
-    "bug_hunter: implement chop early-exit (MFE<0.15% after 90min in LOW vol) in position_manager — creative improvement #1",
-    "Monitor pump-chain v6+ LONG: 3T 0W all hard_max_loss — eval at n>=10, do not kill on 3T",
-    "Monitor SHORT 7d: -$0.18, deadline Oct 11 — improving from -$0.31 morning",
-    "hard_max_loss frequency: re-eval Oct 10 after CUT_LOSER -1.50 cohorts mature",
-    "Fix watchdog trend_quality contradiction (STRONG_DOWN vs UP)",
-    "Disk still 85% — standing bug_hunter retention plan overdue"
+    "Monitor pump-chain+ NORMAL/HIGH trade frequency post-dampen — expect drop within 24h",
+    "Monitor HML frequency to Oct 10 (goal <40% — currently 37%)",
+    "SHORT 7d PnL at risk (-$0.27) deadline Oct 11 — EXTREME pump-chain- is the lever",
+    "Creative idea 1 (momentum-floor) — needs backtest before any implementation",
+    "pump-chain-v6 LONG: 3 trades all losers n=3 — monitor, no action",
+    "hmacd_mtf just added to STANDALONE_BYPASS today, first trade lost — monitor 7d"
   ],
-  "goals": {
-    "24h_pnl": {
-      "current": 0.04,
-      "target": ">=0",
-      "status": "MET"
+  "watchdog_steer_response": [
+    {
+      "steer": "Losing streak 13/20 (30% WR)",
+      "response": "Verified 24h 21T -$0.45 33.3%. Root cause: counter-trend LONGs in SHORT_BIAS. Applied pump_chain+ NORMAL/HIGH dampen. RSI ceilings already at 75 (would have blocked BANANA@79). Gates verified holding (IMX, GRASS, HBAR all blocked)."
     },
-    "7d_pnl": {
-      "current": -0.39,
-      "target": ">=0",
-      "status": "AT RISK — flipped negative, window aging"
+    {
+      "steer": "5 wrong-side trades (fade momentum)",
+      "response": "Confirmed. Winners were EXTREME-vol LONGs (GRASS/BABY/CC) or trail exits. Losers were NORMAL/HIGH chase longs + overbought shorts. Dampen targets the exact bleed cell."
     },
-    "short_7d": {
-      "current": -0.18,
-      "target": ">=0 by Oct 11",
-      "status": "AT RISK improving"
-    },
-    "hard_max_loss_pct": {
-      "current": "41.2% 24h / 36.5% 7d closes",
-      "target": "<40%",
-      "status": "7d MET, 24h watch"
+    {
+      "steer": "pump-chain+ 4-loss streak",
+      "response": "Losses were NORMAL/HIGH regime RSI 58-79 chase entries. EXTREME trades still winning. Dampen reduces NORMAL/HIGH frequency 50% without touching EXTREME."
     }
-  }
+  ]
 }
