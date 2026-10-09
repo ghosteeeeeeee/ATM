@@ -812,21 +812,16 @@ def compute_atr_sl_tp(
                 # FIX (2026-10-09): Removed min(new_sl, entry_f) cap — it prevented trailing
                 # from locking profit above entry. SL above entry for LONG is correct trailing.
             else:
-                new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
-                if current_sl > 0:
-                    current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
-                    if not current_above_entry:
-                        new_sl = max(new_sl, current_sl)
-                # FIX (BUG-032, 2026-10-08): re-enforce floor only when it does NOT loosen a
-                # correct-side current_sl that is tighter than the floor (sits inside the
-                # ATR_SL_MIN band, e.g. written by SOFT trigger/pump-exit/SL-zone trail).
-                # Old unconditional min() re-applied the floor below current_sl every cycle,
-                # flagging needs_sl and loosening the stop back toward entry-1.3% (ratchet break).
-                if current_sl > 0 and current_sl <= entry_f:
-                    new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
-                    new_sl = max(new_sl, current_sl)  # never loosen a correct-side stop
+                # In loss branch — but check if current_sl is an above-entry profit lock
+                current_above_entry = (current_sl > entry_f) if current_sl > 0 and entry_f > 0 else False
+                if current_above_entry:
+                    # current_sl is an above-entry profit lock — preserve it, don't loosen
+                    new_sl = current_sl
+                    result['needs_sl'] = False
                 else:
                     new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
+                    if current_sl > 0:
+                        new_sl = max(new_sl, current_sl)  # never loosen a correct-side stop
             if new_sl != result.get('new_sl', new_sl):
                 result['needs_sl'] = True
         elif direction == 'SHORT' and lowest_price > 0:
