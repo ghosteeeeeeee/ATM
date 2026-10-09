@@ -1,30 +1,30 @@
 === Signal Performance Report ===
-Period: Last 6h | 24h (generated 2026-10-09 05:12 UTC)
+Period: 2026-10-09 | Last 6h: no closed trades | Last 24h: 15 closed trades, net -$0.37
 
 KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no kill criteria met |
+| (none) | | | | | No kill candidates — no signal met 5+ trades with WR<30% and PnL<-$0.10 |
 
 BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — pump-chain+ already boosted (1.2 weight, 2026-10-03) |
+| pump-chain+ | LONG | 57.1% | +$0.38 | 7 | Already boosted (1.2x since 2026-10-03) — no change needed, still performing |
 
 LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain- | SHORT | 35.0% (7d) | +$0.11 (7d) | 20 (7d) | watch — WR near floor, PnL still positive; no kill |
-| bb-bounce-v3-long+ | LONG | 56.3% (7d) | -$0.37 (7d) | 16 (7d) | watch — WR fine, R:R problem; no 24h trades |
-| pump-chain+,pump-chain-v5 | LONG | 0% (24h) | -$0.22 | 2 (24h) | below thresholds, noise |
+| pump-chain-,pump-chain-v5 | LONG | 0% | -$0.22 | 2 | Watch — combo signal, below trade threshold |
+| pump-chain-,pump-chain-v6+ | LONG | 0% | -$0.16 | 2 | Watch — combo signal, below trade threshold |
+| pump-chain- | SHORT | 0% | -$0.23 | 1 | Watch — single trade, not actionable |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 57.1% (24h) / 59.1% (7d) | +$0.38 (24h) / +$2.21 (7d) | 7 (24h) / 22 (7d) | top performer, already boosted; 7 trades across 7 tokens |
-| bb-squeeze+ | LONG | 65.5% (7d) | +$0.01 (7d) | 58 (7d) | volume leader, break-even; healthy |
+| pump-chain+ | LONG | 57.1% | +$0.38 | 7 | Active, boosted 1.2x — wins on IMX/GRASS/BABY/AIXBT, losses on BANANA/AVAX/FOGO |
+| ai-trader+ | LONG | 100% | +$0.09 | 1 | Active — single trade |
 
 ISSUES:
-- LOW TRADE VOLUME: only 13 closed trades in 24h (6h window: 0 qualifying groups). All timers active and pipeline running — volume drop is from signal scarcity / gates, not a stalled system. Worth a volume audit if it persists.
-- No inversions (long/short direction mismatches): NONE in 24h.
-- pump-chain+ trades exclusively in EXTREME regime (10/10 24h trades) — 4W/3L -$0.03 net in regime slice; overall positive due to trade mix. No regime block needed (no regime with 55%+ WR at n>=5, but blanket kill is inappropriate — signal is net positive).
+- None. Zero direction inversions in 24h.
+- Very low trade volume (15 trades/24h) — quiet period, no actionable kill candidates.
+- pump-chain+ regime history: EXTREME 49.2% WR (183T, +$2.91) | HIGH 37.7% WR (61T, -$0.95, blocked) | NORMAL 52.6% WR (19T, -$0.13). HIGH regime block already in place.
