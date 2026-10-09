@@ -281,3 +281,28 @@
 - **INFO**: Disk 85% used (18G free) — at WARN threshold. No logs >7d worth compressing. Journal 144M.
 - **INFO**: 0 trades open/closed today, 0 outcomes in last hour despite 116 signals generated. Position manager healthy (rc=0 every run). Live trading enabled.
 - **AUTO-FIX**: None required. All critical timers (price-collector, 1m-candle, pipeline) active and firing. Pipeline no errors in 30m. Prices fresh (87s). No DB locks.
+
+## Error Alerts — 2026-10-09 03:00 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS TOK signals_runner: timed out (killed after N.0s)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: signals_runner`
+
+## Error Alerts — 2026-10-09 03:48 UTC
+- **WARN** (1x): disk `/` at 85% used (118G total, 18G free). Largest logs: pipeline.log 132M, trade-watchdog.log 55M, signal-compactor.log 46M. No logs >7d to gzip.
+- **WARN** (3x): non-critical agent services failed last run — `hermes-brain-auditor` (exit 124 timeout), `hermes-ceo` (exit 124 timeout), `hermes-bug-hunter` (exit 1). Timers still scheduled; next runs will retry.
+- **AUTO-FIX**: None required. Pipeline completed clean at 03:46 (LIVE, rc=0). All critical timers active (price-collector, 1m-candle, pipeline). No tracebacks, no DB locks, prices fresh, 162 signals in last hour.
+
+## Error Alerts — 2026-10-09 04:00 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3533s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3482s left, N failures)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-09 05:00 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-09 05:50 UTC
+- **WARN** (1x): `disk 85.5% used (107.9G/126.2G, 18.3G free)` — recurring; bulk is active DBs (coin_tracker 3.3G, candles 2.6G, session_brain 1.1G), not logs. No unsafe deletions performed.
+- **WARN** (1x): `hermes-brain-auditor.service failed (exit 124 systemd timeout)` — **AUTO-FIX**: restarted, now activating.
+- **NOTE**: `hermes-bug-hunter.service exit 1` — by design (exits non-zero when code-quality findings exist: bare excepts, cursor leaks, etc.); not a runtime failure.
+- **NOTE**: `hermes-ceo.service inactive` — normal between 6h timer runs.
+- Core timers (price-collector, 1m-candle, pipeline) all **active**, last fire <2min. No tracebacks, no position-manager crashes, no phantom trades. Prices fresh (0.6min). 157 signals/1h.

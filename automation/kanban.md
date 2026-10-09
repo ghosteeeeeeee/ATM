@@ -78,3 +78,6 @@
 
 ## TEAM UPDATES
 - [2026-10-08 13:47] health_monitor: Stopped hermes-coding-mcp.service — crash-looping 770k+ times against missing run_mcp_server.py, burning CPU. Service was already disabled (no timer). Disk at 85% (WARN) — bulk is DBs, not logs.
+
+## TEAM UPDATES
+- [2026-10-09 05:50 UTC] health_monitor: Pipeline OK — LIVE every 1m, 0 Tracebacks/30m, PM clean (0 open / 2 closed today / -0.03 USDT), 157 signals/1h, regime LONG_BIAS (54L/8S/50N), speed 53% >=50pct, prices fresh (0.6min, 176 tokens), phantom 0. AUTO-FIX: journal vacuum +175M; restarted hermes-brain-auditor (exit 124 timeout). Disk 85% WARN (DBs, not logs — WALs normal now: candles 4.5M, session_brain 29M, signals 11M). bug-hunter/ceo "failed" states by design/schedule. Details: automation/error_alerts.md
