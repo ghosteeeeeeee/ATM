@@ -36,6 +36,18 @@ def precheck(coin, direction):
 
     token = coin.upper()
 
+    # 0. Blacklist check — first gate, cheapest to check
+    try:
+        from hermes_constants import LONG_BLACKLIST, SHORT_BLACKLIST
+        blacklist = LONG_BLACKLIST if direction == 'LONG' else SHORT_BLACKLIST
+        if token in blacklist:
+            check('Not blacklisted', False, f'{token} is in {direction} blacklist')
+            return results  # early exit — no point checking further
+        else:
+            check('Not blacklisted', True, 'clean')
+    except ImportError:
+        check('Not blacklisted', True, 'blacklist not importable')
+
     # 1. ATR check — use volatility_gate.get_atr_pct() (same source as RR engine)
     try:
         from volatility_gate import get_atr_pct
