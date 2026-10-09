@@ -4437,3 +4437,5 @@ BY: auto_1hr
 [2026-10-09 15:12] auto_1hr: NO CONFIG CHANGE — 3T last hour BABY continuation −0.01 + ETH bb-bounce-v2 +0.10 + BABY r2v2-long3 +0.03 | 2 open JUP/ETH sized OK | 24h 17T ~8W net ≈−0.08 | hard_max_loss 7/17=41.2% (hold brain_auditor eval) | atr_sl_hit 5.9% (tpsl stable) | Kill: none | Overtrade 3/hr | Streak inactive (+0.12)
 BY: auto_1hr
 [2026-10-09 16:12] auto_1hr: NO CONFIG CHANGE — 1T last hour JUP pump-chain+ atr_sl_hit −$0.04 | 1 open ETH continuation+ (SL/TP OK) | 24h 18T ~6W ≈−0.12 | hard_max_loss 7/18=38.9% (hold brain_auditor eval) | atr_sl_hit 11.1% (tpsl stable) | Kill: none | Overtrade 1/hr | Streak inactive | timers fresh, live_trading=true
+[2026-10-09 17:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 3 open CC pump-chain+/LDO pump-chain-/ETH continuation+ (all sized SL/TP OK) | 24h 18T 7W +$0.04 WR 38.9% | hard_max_loss 7/18=38.9% (hold brain_auditor eval) | atr_sl_hit 11.1% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive (14:00 +0.13 broke it) | timers fresh, live_trading=true, kill JSON=true
+BY: auto_1hr
