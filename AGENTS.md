@@ -20,7 +20,7 @@ This is non-negotiable. If we're losing, we're on the wrong side of the trade �
 
 | Date | Action | Details |
 |------|--------|---------|
-| **2027-03-12** | 🔴 **HL API KEY EXPIRES IN 3 DAYS** | New wallet: `0xc3e4CC06E086Bf73c38FaCdbbb1FD8E979e5415B`. Set 2026-09-16, valid 180 days. Renew in `.secrets.local` — update `SIGNING_KEY` and `SIGNING_WALLET_ADDRESS`. |
+| **2027-03-12** | 🔴 **HL API KEY EXPIRES 2027-03-12** (~5 months from 2026-10-09) | New wallet: `0xc3e4CC06E086Bf73c38FaCdbbb1FD8E979e5415B`. Set 2026-09-16, valid 180 days. Renew in `.secrets.local` — update `SIGNING_KEY` and `SIGNING_WALLET_ADDRESS`. |
 
 ## Two Data Directories
 

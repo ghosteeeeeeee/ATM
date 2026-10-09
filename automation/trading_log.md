@@ -6770,3 +6770,25 @@ BY: daily_orchestrator
 - hard_max_loss remains 6/13 of 24h closes — awaiting brain_auditor Oct 9/10 verdict; next lever is SL width not signal kills
 - v5 family (solo+combo+v6 combo) still 4T 0W −$0.49 over 24h — on 7d kill-bar watch, not instant-kill eligible
 - ai-trader+ just appeared with a win — track if it repeats
+
+## FAVORITES Update — 2026-10-09 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE HBAR (WR=50.0%, PnL=$0.07, 1 consecutive bad days, regime=LONG_BIAS)
+
+Final set: ['BLUR', 'LDO', 'SYRUP']
+
+## LOSERS Update — 2026-10-09 06:05 UTC
+- REMOVE TURBO (insufficient data)
+- REMOVE CRV (insufficient data)
+- REMOVE CHIP (insufficient data)
+- REMOVE BTC (insufficient data)
+- REMOVE JUP (insufficient data)
+- ADD IMX (WR=40.0%, PnL=$-0.03, wr_collapse (62.5% → 40.0%))
+
+Final set: ['IMX', 'INJ']
+
+## [2026-10-09 06:10 UTC] Upgrade Implementer — D4 remainder + L1 housekeeping
+
+**Changes:** Log-string only (CEO GO D4, commit da7d6522): CONTINUUM-BLOCK, CHASE-BLOCK, PUMP-CHAIN-GAP-BLOCK, LOSERS-BLOCK, CONFLICT-RESCUE-BLOCK, CONF-FILTER-PRESERVE now emit literal `BLOCKED`; RR reason strings `HARD BLOCK`→`HARD BLOCKED`. Zero logic/threshold changes. Live next signal-compactor/decider cycle (subprocess-per-minute).
+**Housekeeping:** AGENTS.md HL-key expiry reminder de-staled; repo-root SELECT-accident file + 0-byte DB stubs removed.
+**Trading impact:** None (observability only — feeds Nov 6 gate re-audit).

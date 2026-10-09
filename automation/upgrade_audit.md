@@ -727,3 +727,71 @@
 - **Finding:** PG has no `signal_outcomes` table (SQLite-only). cell_stats correctly uses PG trades as primary; cells_st is supplementary. Do not try to join PG→SQLite without trade_id.
 - **Severity:** INFO
 - **Finding:** Ride_it hard-max-loss exemption still open — highest structural exit bug remaining after HML leverage-aware fix. Needs backtest + CEO.
+
+---
+
+## Upgrade Implementer Session — 2026-10-09 06:08 UTC
+
+### Plan: 2026-10-09_D4-structured-block-logging.md
+- **Date scanned:** 2026-10-09 06:00
+- **Core request:** CEO GO D4 remainder — append literal `BLOCKED` + token + dir to every remaining gate block log line (log strings only, zero logic).
+- **Difficulty:** Level 1
+- **Value:** HIGH (observability for Nov 6 gate re-audit; auditor-set success metric ≥95% parseable block volume)
+- **Status:** ✅ IMPLEMENTED (commit da7d6522)
+- **Reason:** First tranche done in 7f51dc6c; remainder executed now. Edited: CONTINUUM-BLOCK, CONFLICT-RESCUE-BLOCK, CONF-FILTER-PRESERVE (signal_compactor.py); CHASE-BLOCK, PUMP-CHAIN-GAP-BLOCK, LOSERS-BLOCK (decider_run.py); RR HARD BLOCK→BLOCKED ×3 (risk_reward_engine.py). All 9 lines compile-checked; parser simulation green (audit parsers match `HARD BLOCK` prefix of `HARD BLOCKED`); no logic consumers of the strings. Verify-only items (SHORT/LONG-NEUTRAL, SHORT-CONTINUUM, HALL-SHAME, PUMP-CHAIN family, EXEC-RSI, BTC-CRASH, PRESERVE-*) already compliant. Direction-level gates (VOL-FLOOR, WARNING BTC-momentum, DIRECTION-LOCK, VOL-GATE-v2) left per plan — not trivial, weekly re-audit discussion.
+
+### Plan: 2026-10-09_ceo-orchestrator-pickup.md
+- **Date scanned:** 2026-10-09 06:00
+- **Core request:** Q4 portfolio-cap backtest + Wyckoff bypass backtest — both delegated backtest jobs.
+- **Difficulty:** Level 2-3 (analysis/backtest jobs, not code changes)
+- **Value:** HIGH
+- **Status:** PENDING
+- **Reason:** Out of Level-1 scope this session; both need fresh PostgreSQL/candle counterfactual runs with acceptance criteria. Next session candidate after 3× L1.
+
+### Plan: align-with-btc-regime.md
+- **Date scanned:** 2026-10-09 06:00
+- **Core request:** BTC_REGIME_ALIGN_ENABLED flag (default OFF) to allow pump-chain LONG in bullish regime.
+- **Difficulty:** Level 2
+- **Value:** HIGH
+- **Status:** PENDING
+- **Reason:** CEO-approved with modifications but sequencing constraint: "after queue#2 (exit engine fix) or hold sizing flat" + mandatory independent backtest before live. Not started.
+
+### Plan: ride-it-hard-max-loss-exemption.md
+- **Date scanned:** 2026-10-09 06:00
+- **Core request:** Ride_it-specific HARD_MAX_LOSS at -2.5% (Option B).
+- **Difficulty:** Level 1-2 (small code change) but gated
+- **Status:** SKIPPED (this session)
+- **Reason:** Plan explicitly requires backtest → own-conclusions verification → CEO approval before implementation. Holding.
+
+### Plan: wrong-side-chop-detector-2026-10-06.md
+- **Date scanned:** 2026-10-09 06:00
+- **Core request:** Direction-aware chop detector.
+- **Difficulty:** Level 2-3
+- **Status:** SKIPPED (this session)
+- **Reason:** Status "PROPOSED — awaiting independent verification". Don't implement unverified proposals.
+
+### Plan: profitability-fix-plan-2026-10-07.md
+- **Date scanned:** 2026-10-09 06:00
+- **Core request:** Entry-timing overhaul (grind-before-spike detection), velocity filter, hard_max_loss widen, continuum backfill.
+- **Difficulty:** Level 3-4
+- **Status:** PARTIALLY SHIPPED / PENDING CEO
+- **Reason:** SHORT_CONTINUUM_SCORE_MAX 40→60 already live; recommendations section still "pending CEO approval"; hard_max_loss frequency on standing hold until Oct 10.
+
+### Plan: 2026-10-08_winning-dna-population-report.md
+- **Date scanned:** 2026-10-09 06:00
+- **Core request:** Replicate biggest-winner DNA; implementable actions in §5/§7.
+- **Difficulty:** Level 2-3 (analysis complete; actions are protect-pump-chain+, re-test RSI tilt Oct 15/16)
+- **Status:** PENDING (re-test date-gated)
+- **Reason:** Entry-DNA closed (nothing survives Bonferroni); RSI tilt re-test due Oct 16; pump-chain+ protection = do-not-filter (already standing). No code action today.
+
+### Plan: 2026-10-09_gate-counterfactual-audit.md
+- **Date scanned:** 2026-10-09 06:00
+- **Core request:** Which gates have no edge? + 5 CEO decisions.
+- **Difficulty:** N/A (analysis; execution split)
+- **Status:** MOSTLY IMPLEMENTED (D3 expiry_shadow + D4 tranche 1 in 7f51dc6c; D4 remainder this session; D2 re-audit window open through ~Nov 6)
+- **Reason:** D1/D5 done or folded; standing hold: NO gate removal on this window.
+
+### Session housekeeping (Level 1, 2026-10-09)
+1. **AGENTS.md HL-key reminder fixed** — "EXPIRES IN 3 DAYS" beside 2027-03-12 was stale (key set 2026-09-16, 180d → ~2027-03-15). Now reads "EXPIRES 2027-03-12 (~5 months from 2026-10-09)". Flagged as sideways find in bug-hunt session 0.
+2. **Repo-root junk removed** — tracked redirect-accident file `SELECT token, ... FROM signals ...` deleted via git rm; 0-byte untracked `candles.db`/`hermes.db`/`signals.db`/`herbbian_memory.db` at repo root deleted (real DBs live in HERMES_DATA per paths.py; gitignored; no code connects to bare root paths).
+3. **TESTTOKEN housekeeping item from gate audit** — already clean: zero matches in scripts/. Mark done.
