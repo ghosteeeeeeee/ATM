@@ -3713,8 +3713,33 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             if _os_al > 0:
                                 _os_rsi = 100 - (100 / (1 + _os_ag / _os_al))
                                 if _os_rsi < OVERSOLD_SHORT_RSI_MAX:
-                                    log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention — no bearish override)")
-                                    continue
+                                    # Bearish override: when BTC is bearish, oversold = continuation
+                                    _os_bearish_override = False
+                                    try:
+                                        import os as _os_os
+                                        import time as _os_time
+                                        _os_cont = sqlite3.connect(_os_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                                        try:
+                                            _os_row = _os_cont.execute(
+                                                "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
+                                                "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                            ).fetchone()
+                                        finally:
+                                            _os_cont.close()
+                                        if _os_row:
+                                            _os_phase, _os_linreg, _os_ema, _os_ts = _os_row
+                                            _os_age = _os_time.time() - (_os_ts or 0)
+                                            if _os_age < 600:
+                                                _os_bearish = (_os_linreg in ('LEAN_BEAR', 'BEAR'))
+                                                if _os_bearish:
+                                                    _os_bearish_override = True
+                                    except Exception:
+                                        pass
+                                    if _os_bearish_override:
+                                        log(f"  ✅ [OVERSOLD-SHORT] {tkn}: SHORT bypass — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} but BTC bearish (oversold = continuation)")
+                                    else:
+                                        log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention)")
+                                        continue
                     finally:
                         if _conn_os:
                             try: _conn_os.close()
