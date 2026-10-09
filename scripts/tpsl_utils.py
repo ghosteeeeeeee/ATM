@@ -593,13 +593,10 @@ def compute_atr_sl_tp(
                     # peak while never dropping below the entry floor. (SHORT mirror at ~615
                     # uses min() correctly because lower=tighter there.)
                     new_sl = max(trail_floor, min_from_entry)  # trail from peak, enforce floor
-                # FIX (BUG-030): cap at ENTRY (breakeven), enforcing the 2026-10-03 "SL must
-                # never be above entry" policy. The old min(new_sl, min_from_entry) capped at
-                # entry-1.3% instead, which is what forced the floor onto every in-profit LONG.
-                new_sl = min(new_sl, entry_f)  # CRITICAL: SL must never be above entry for LONG
-                # NOTE: No one-way gate here — the trailing gate (lines 670-720) handles
-                # one-way logic AND wrong-side correction. Adding one-way here would block
-                # the trailing gate from correcting a wrong-sided current_sl.
+                # FIX (2026-10-09): Removed min(new_sl, entry_f) cap — it prevented trailing
+                # from locking profit above entry. SL above entry for LONG is the correct
+                # trailing exit (atr_trail_hit), not an error. The one-way gate still ensures
+                # SL only tightens (goes up for LONG).
             else:
                 # In loss: entry floor is absolute — SL must stay at least ATR_SL_MIN from entry
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
@@ -760,15 +757,9 @@ def compute_atr_sl_tp(
     # Exception: wrong-side correction (current_sl on wrong side of entry)
     if direction == 'LONG':
         if current_sl > 0:
-            current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
             if new_sl > current_sl:
                 # new_sl RAISES = tighten upward — correct, allow
                 result['needs_sl'] = True
-            elif current_above_entry:
-                # current_sl is above entry (wrong side for LONG).
-                # Force update to correct it — this is a correction, not loosening.
-                result['needs_sl'] = True
-                result['_force_write'] = True
             else:
                 # new_sl would loosen — block it
                 new_sl = current_sl
@@ -818,10 +809,8 @@ def compute_atr_sl_tp(
                     current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
                     if not current_above_entry:
                         new_sl = max(new_sl, current_sl)
-                # FIX (BUG-032, 2026-10-08): cap at entry (breakeven) — matches pre-gate guard.
-                # The old code had NO entry cap here in-profit, so a wrong-sided current_sl
-                # below entry could not be corrected upward toward entry.
-                new_sl = min(new_sl, entry_f)  # SL must never be above entry for LONG
+                # FIX (2026-10-09): Removed min(new_sl, entry_f) cap — it prevented trailing
+                # from locking profit above entry. SL above entry for LONG is correct trailing.
             else:
                 new_sl = min(new_sl, round(entry_f * (1 - ATR_SL_MIN), 8))
                 if current_sl > 0:
