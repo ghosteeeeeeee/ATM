@@ -4446,3 +4446,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-09 20:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 0 open | 24h 21T 8W ≈−$0.45 | hard_max_loss 33% (hold brain_auditor eval) | atr_sl_hit 23.8% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 [2026-10-09 21:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 3h) | 0 open | 24h 18T 7W -$0.45 WR 39% | hard_max_loss 33% (hold brain_auditor) | atr_sl_hit 27.8% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
+[2026-10-09 22:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet but 1 open BABY volume-breakout-long+ SL/TP OK) | 24h 16T 6W ≈−0.46 WR 38% | hard_max_loss 31.3% (hold brain_auditor) | atr_sl_hit 31.3% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
+BY: auto_1hr

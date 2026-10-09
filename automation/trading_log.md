@@ -7211,3 +7211,25 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - 3 quiet closes after 19:12 (~3h no trades) — verify trade flow not stalled (signals firing but blocked, or genuinely no setups)
 - hard_max_loss still 33% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+
+## [2026-10-09 22:12] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour, but flow not stalled)
+**PnL:** $0 last hour | 24h: 16T 6W ≈−$0.46 (WR ~38%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0 trades this hour — no signal eligible
+- atr_sl_hit 5/16=31.3% — under 40% threshold, tpsl stable
+- hard_max_loss 5/16=31.3% −$0.58 — dominant but within brain_auditor eval hold (Oct 9/10)
+- Overtrade: 0/hr (limit 20)
+- Streak: not 3 consecutive negative hours (last active hour 18:00 was +$0.08)
+- 1 open: BABY volume-breakout-long+ (opened 21:19, SL/TP sized OK ~±2.5%) — trade flow resumed after 3h quiet
+- Timers fresh (1m-candle 21s, pipeline 22s, pump-hunter/compactor 22s, watchdog ~2min), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still 31% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+- BABY volume-breakout trade open — first volume-breakout fill in a while, watch its outcome next hour
