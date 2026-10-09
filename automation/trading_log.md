@@ -7144,3 +7144,26 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss still 35% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
 - Both closes this hour were SHORT atr_sl_hit — pump-chain- SHORT entries catching bounces; watch but n=2
+
+## [2026-10-09 19:12] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.08 last hour | 24h: 21T 8W ≈−$0.45 (rolling window; WR ~38%)
+**Last hour:** CC pump-chain+ LONG stale_exit +$0.17 (+4.67%) | ETH continuation+ LONG atr_sl_hit −$0.09 (−1.93%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: no signal with 3+ trades 0% WR this hour (pump-chain+ 1W, continuation+ 1L)
+- atr_sl_hit 5/21=23.8% — under 40% threshold, tpsl stable
+- hard_max_loss 7/21=33% −$0.85 — dominant but within brain_auditor eval hold (Oct 9/10)
+- Overtrade: 2/hr (limit 20)
+- Streak: 17:−$0.09, 18:+$0.08 — not 3 consecutive negative hours
+- 0 open trades
+- Timers fresh (pump-hunter/compactor 22s, watchdog 18s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still ~33% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+- ETH continuation+ atr_sl_hit exit — single sample, watch continuation+ SL behavior
