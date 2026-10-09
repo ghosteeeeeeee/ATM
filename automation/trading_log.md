@@ -7020,3 +7020,31 @@ Final set: ['IMX', 'INJ']
 - v5/v6 combo signals 0W over 24h (−$0.22, −$0.16) — below kill threshold, on watch
 - pump-chain+ alone remains only profitable signal family (+$0.31/24h)
 - Who creates zero-size open trades (continuum_engine)? Needs root-cause next hour if it recurs.
+
+## [2026-10-09 14:12] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 2 losses, 1 orphan-paper)
+**PnL:** −$0.31 last hour | 24h: 17T 5W −$0.53 (WR 29.4%)
+**Last hour:** CAKE hmacd_mtf-+ LONG hard_max_loss −$0.14 (−1.83% acct) | BTC continuum-trend+ LONG hard_max_loss −$0.17 (−3.14% acct) | BTC continuum_engine ORPHAN_PAPER $0.00
+**24h exits:** hard_max_loss 9T −$1.09 | stale_exit 4T +$0.60 | atr_sl_hit 1T −$0.04 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | profit-monster-trail 1T +$0.09 | ORPHAN_PAPER 1T $0
+**Open:** 0
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: no signal with 3+ trades 0% WR this hour (2 real closes, different signals)
+- atr_sl_hit 1/17=5.9% — tpsl stable, well under 40%
+- hard_max_loss 9/17=52.9% −$1.09 — dominant, within brain_auditor eval hold (Oct 9/10)
+- Overtrade: 2/hr real (limit 20)
+- Streak: 13:00 −$0.31, 12:00 flat, 11:00 flat, 10:00 −$0.04 — not 3 consecutive negative
+- Timers fresh (pipeline/pump-hunter/compactor 55s, watchdog 1m42s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Resolved:**
+- Trade 16002 (BTC continuum_engine, size=0 NULL SL, flagged 13:12) closed as ORPHAN_PAPER $0.00 — self-resolved, no money lost. Zero-size open trades gone (0 open now). No further action.
+
+**Open Questions:**
+- hard_max_loss 52.9% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+- v5/v6 combo signals still 0W over 24h (−$0.22, −$0.16) — below kill threshold, on watch
+- pump-chain+ alone remains only profitable signal (+$0.31/24h)
