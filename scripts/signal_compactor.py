@@ -2689,7 +2689,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         elif direction.upper() == 'LONG' and _cont_bearish:
                             # FIX 2026-10-02: Check coin's own momentum before blocking LONG
                             # If coin is rising (velocity > threshold + above SMA), allow even if BTC bearish
+                            # 2026-10-09 watchdog: tightened threshold — 0.5% let 41 LONGs through
+                            # in a bearish market (BTC below EMA300 200+ bars). Now requires 1.5%
+                            # velocity to override bearish BTC structure.
                             from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
+                            _long_override_threshold = max(TREND_ALIGN_VELOCITY_THRESHOLD * 3, 1.5)
                             _coin_rising = False
                             try:
                                 import sqlite3 as _mom_sqlite2
@@ -2707,7 +2711,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     _vel2 = (_closes2[-1] - _closes2[-6]) / _closes2[-6] * 100 if _closes2[-6] > 0 else 0
                                     _sma2 = sum(_closes2[-20:]) / len(_closes2[-20:])
                                     _above_sma2 = _closes2[-1] > _sma2
-                                    if _vel2 > TREND_ALIGN_VELOCITY_THRESHOLD and _above_sma2:
+                                    if _vel2 > _long_override_threshold and _above_sma2:
                                         _coin_rising = True
                             except Exception as _mom_e2:
                                 log(f"  ⚠️ [CONTINUUM-BLOCK] {token} momentum check failed: {_mom_e2}", 'WARN')
