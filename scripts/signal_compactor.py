@@ -2615,7 +2615,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             _is_mover = bare_source in ('mover_long', 'mover+', 'mover-', 'mover_long+', 'mover_long-')
             _is_open_skies = bare_source in ('open-skies+', 'open-skies', 'open_skies')
             _is_accel_breakout = 'accel-300-breakout' in bare_source
-            _btc_exempt = _is_pump_chain or _is_mover or _is_open_skies or _is_accel_breakout
+            _is_grind_accum = 'grind-accum' in bare_source or 'grind_accum' in bare_source
+            _btc_exempt = _is_pump_chain or _is_mover or _is_open_skies or _is_accel_breakout or _is_grind_accum
             _continuum_phase = None  # will be set if we query continuum
             if BTC_CHOP_GATE_ENABLED and not _btc_exempt:
                 _bypass_conn = None
