@@ -961,11 +961,11 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
 
         # Hard block conditions
         if grade == 'F':
-            return 0.0, f"RR HARD BLOCK: grade=F (score={score})"
+            return 0.0, f"RR HARD BLOCKED: grade=F (score={score})"
         if rr < getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70):
-            return 0.0, f"RR HARD BLOCK: R:R={rr:.2f} < {getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70)} (risk > reward)"
+            return 0.0, f"RR HARD BLOCKED: R:R={rr:.2f} < {getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70)} (risk > reward)"
         if not result['pass'] and result.get('block_reason', ''):
-            return 0.0, f"RR HARD BLOCK: {result['block_reason']}"
+            return 0.0, f"RR HARD BLOCKED: {result['block_reason']}"
 
         # Graded multiplier (using hermes_constants for all thresholds)
         boost_rr = getattr(hc, 'RR_ENGINE_CONF_BOOST_THRESHOLD_RR', 4.0)

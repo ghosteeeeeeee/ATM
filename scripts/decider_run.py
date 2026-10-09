@@ -4377,7 +4377,7 @@ def run(dry_run=False):
             log(f'  🗑️ [LOSERS] {token} {direction}: confidence penalty {LOSERS_CONF_PENALTY} → {confidence:.0f}%')
             # Block losers with low confidence after penalty
             if confidence < 50:
-                log(f'  🗑️ [LOSERS-BLOCK] {token} {direction}: confidence {confidence:.0f}% < 50% — SKIP')
+                log(f'  🗑️ [LOSERS-BLOCK] {token} {direction} BLOCKED — confidence {confidence:.0f}% < 50% — SKIP')
                 skipped += 1
                 _record_hotset_failure(token, direction, failures)
                 continue
@@ -4676,7 +4676,7 @@ def run(dry_run=False):
                 _is_chase = True
                 _chase_reason = f'gap={_gap_at_entry:.2f}%>{CHASE_GAP_MAX_PCT}%'
             if _is_chase:
-                log(f'  🎯 [CHASE-BLOCK] {token} {direction}: {_chase_reason}')
+                log(f'  🎯 [CHASE-BLOCK] {token} {direction} BLOCKED — {_chase_reason}')
                 if sig_id:
                     mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                 skipped += 1
@@ -4692,7 +4692,7 @@ def run(dry_run=False):
             _pc_st = f"{sig.get('signal_type') or ''} {source or ''}"
             if ('pump-chain' in _pc_st or 'pump_chain' in _pc_st) and direction.upper() == 'LONG':
                 if _gap_at_entry is not None and _gap_at_entry > PUMP_CHAIN_LONG_MAX_ENTRY_GAP:
-                    log(f'  🎯 [PUMP-CHAIN-GAP-BLOCK] {token} LONG: gap={_gap_at_entry:.2f}%>{PUMP_CHAIN_LONG_MAX_ENTRY_GAP}%')
+                    log(f'  🎯 [PUMP-CHAIN-GAP-BLOCK] {token} LONG BLOCKED — gap={_gap_at_entry:.2f}%>{PUMP_CHAIN_LONG_MAX_ENTRY_GAP}%')
                     if sig_id:
                         mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                     skipped += 1

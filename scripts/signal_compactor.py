@@ -2715,7 +2715,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 log(f"  ✅ [CONTINUUM-OVERRIDE] {token} LONG — BTC bearish BUT coin rising (vel={_vel2:+.2f}%, above SMA), allowing")
                             else:
                                 _btc_mom_ok_for_bypass = False
-                                log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG — BTC bearish structure, blocking")
+                                log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG BLOCKED — BTC bearish structure")
                         elif direction.upper() == 'LONG' and _cont_bullish:
                             _btc_mom_ok_for_bypass = True
                             log(f"  ✅ [CONTINUUM-BULL] {token} LONG — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), bypass allowed")
@@ -4693,7 +4693,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         except Exception:
                             pass  # non-fatal
                     if not _rescue_ok:
-                        log(f"  🔄 [CONFLICT-RESCUE-BLOCK] {tok}:{direc} — safety check failed, not rescued")
+                        log(f"  🔄 [CONFLICT-RESCUE-BLOCK] {tok} {direc} BLOCKED — safety check failed, not rescued")
                         continue
                     row = loser['row']
                     l_token, l_direction, l_stype, l_conf, l_source = row[0], row[1], row[2], row[3], row[4]
@@ -5400,7 +5400,7 @@ def _filter_safe_prev_hotset(prev_hotset):
         from hermes_constants import CONF_FILTER_ENABLED as _CFE, CONF_FILTER_MAX as _CFX, CONF_FILTER_MIN as _CFN
         _entry_conf = entry.get('confidence', 0)
         if _CFE and (_entry_conf >= _CFX or _entry_conf < _CFN):
-            log(f"  🛡️  [CONF-FILTER-PRESERVE] {tok}:{direction} blocked — conf={_entry_conf:.0f} outside [{_CFN},{_CFX})")
+            log(f"  🛡️  [CONF-FILTER-PRESERVE] {tok} {direction} BLOCKED — conf={_entry_conf:.0f} outside [{_CFN},{_CFX})")
             continue
         src_str = src.strip() if src else ''
         # ── Source blacklist filter (mirrors signal_schema.validate_source) ─────────
