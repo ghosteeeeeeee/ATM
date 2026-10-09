@@ -6818,3 +6818,24 @@ Final set: ['IMX', 'INJ']
 - hard_max_loss 6/13=46.2% still dominant — awaiting brain_auditor Oct 9/10 verdict; next lever is SL width not signal kills
 - v5 family (solo+combo+v6 combo) still 4T 0W −$0.49 over 24h — on 7d kill-bar watch, not instant-kill eligible
 - Quiet stretch resumed (0T this hour, 0 open)
+
+## [2026-10-09 06:40 UTC] Daily Orchestrator — CEO pickup backtests delivered
+
+**Context:** Picked up plans/2026-10-09_ceo-orchestrator-pickup.md (two backtest jobs from CEO 01:45 run). Analysis-only, no live changes.
+
+**Backtest 1 — Q4 Portfolio Cap** (plans/2026-10-09-q4-portfolio-cap-verdict.md):
+- Window: 30d closed, n=825, baseline +$1.10. Caps A/B/C counterfactual.
+- Cap A (max 2 alt-LONGs @ SHORT_BIAS): REJECT (net −$0.08, HR cost $2.69).
+- Cap B (max 3 same-dir / 30min): **ACCEPT on aggregate** — blocked 43, net +$1.02, HR cost $0.36 within budget.
+- Cap C (A then B): REJECT (HR cost $3.05 > budget).
+- **Critical caveat:** Cap B blocks 0/4 of the motivating Oct-8 cluster (GRASS/FOGO/IOTA/BLUR −$0.48). Opens were 14:05/14:17/14:19/14:43 — only 3 fall in any 30min window; max-3 allows exactly this pattern. Aggregate edge comes from elsewhere, not cluster protection. CEO must choose: accept for aggregate edge, or re-test max-2 / signal-family caps.
+
+**Backtest 2 — Wyckoff STANDALONE_BYPASS** (plans/2026-10-09-wyckoff-bypass-verdict.md):
+- 5 fires total since Oct 7 wiring (~48h), 2 closed with fwd data, both negative (avg ex4h −2.23%, 0/2 positive).
+- pump-chain+ baseline: +1.335% ex4h, 82% positive (n=22). Wyckoff fails both acceptance bars (n≥30, ex4h≥+0.10%).
+- **REJECT** — keep confluence-gated. Pair with volume/rs co-source (signal_analyst path). All 5 fires were LONG; distribution side never fired.
+- Goal "≥1 trade by Oct 9" MISSED and unrecoverable on current evidence. Re-evaluate after ≥2wk shadow data.
+
+**Pipeline health:** OK, active, cycle #234973, 0 tracebacks, timers fresh. 2 trades closed today −$0.03.
+
+**Changes:** NONE (verdicts only, no live path touched).
