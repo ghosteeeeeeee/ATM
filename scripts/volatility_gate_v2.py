@@ -106,6 +106,8 @@ REGIME_SIGNALS = {
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 NORMAL
+        'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-09: CAKE/ETH LONG blocked
+        'r2v2-long', 'r2v2-long3',  # R² trend v2 — added 2026-10-09: IOTA LONG blocked
         'continuum-ma+', 'continuum-ma-',  # continuum MA crossover — momentum confirmation
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
@@ -126,6 +128,8 @@ REGIME_SIGNALS = {
         'range_breakout+', 'range_breakout_short',
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',
         'r2-trend-long', 'r2-trend-short',  # R² trend detectors — LONG only in HIGH (74.1% WR)
+        'r2v2-long', 'r2v2-long3',  # R² trend v2 — added 2026-10-09: IOTA LONG blocked
+        'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-09
         'slow-grind-',
         'mover', 'mover+', 'mover-',
         'ct-hot', 'ct-hot+', 'ct-hot-',
