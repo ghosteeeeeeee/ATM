@@ -2723,8 +2723,33 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _btc_mom_ok_for_bypass = True
                             log(f"  ✅ [CONTINUUM-BULL] {token} LONG — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), bypass allowed")
                         elif direction.upper() == 'SHORT' and _cont_bullish:
-                            _btc_mom_ok_for_bypass = False
-                            log(f"  🚫 [CONTINUUM-BULL] {token} SHORT BLOCKED — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), SHORT bypass denied")
+                            # Momentum override: allow SHORT when token is dumping despite BTC bullish
+                            _coin_dumping = False
+                            try:
+                                from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
+                                _mom_conn3 = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=3)
+                                try:
+                                    _candles3 = _mom_conn3.execute(
+                                        "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
+                                        (token.upper(),)
+                                    ).fetchall()
+                                finally:
+                                    _mom_conn3.close()
+                                if len(_candles3) >= 10:
+                                    _closes3 = [r[0] for r in reversed(_candles3)]
+                                    _vel3 = (_closes3[-1] - _closes3[-6]) / _closes3[-6] * 100 if _closes3[-6] > 0 else 0
+                                    _sma3 = sum(_closes3[-20:]) / len(_closes3[-20:])
+                                    _below_sma3 = _closes3[-1] < _sma3
+                                    if _vel3 < -TREND_ALIGN_VELOCITY_THRESHOLD and _below_sma3:
+                                        _coin_dumping = True
+                            except Exception as _mom_e3:
+                                log(f"  ⚠️ [CONTINUUM-BULL] {token} momentum check failed: {_mom_e3}", 'WARN')
+                            if _coin_dumping:
+                                _btc_mom_ok_for_bypass = True
+                                log(f"  ✅ [CONTINUUM-OVERRIDE] {token} SHORT — BTC bullish BUT coin dumping (vel={_vel3:+.2f}%, below SMA), allowing")
+                            else:
+                                _btc_mom_ok_for_bypass = False
+                                log(f"  🚫 [CONTINUUM-BULL] {token} SHORT BLOCKED — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), SHORT bypass denied")
                         else:
                             # Fallback to velocity check
                             _btc_mom_ok_for_bypass = _vel_ok
@@ -2886,8 +2911,32 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 if _token_z_ok:
                                     log(f"  ✅ [SHORT-CONTINUUM-TOKEN-Z] {token} SHORT allowed — BTC score={_sc_score:.1f} but token z-score < -0.5 (oversold)")
                                 else:
-                                    log(f"  🚫 [SHORT-CONTINUUM] {token} SHORT blocked — BTC score={_sc_score:.1f} z={_sc_z} (not STRONG_NEG, score>{SHORT_CONTINUUM_SCORE_MAX})")
-                                    continue
+                                    # Token-level momentum override: allow SHORT when token is dumping
+                                    _coin_dumping_sc = False
+                                    try:
+                                        from hermes_constants import TREND_ALIGN_VELOCITY_THRESHOLD
+                                        _sc_mom_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes.db'), timeout=3)
+                                        try:
+                                            _sc_candles = _sc_mom_conn.execute(
+                                                "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
+                                                (token.upper(),)
+                                            ).fetchall()
+                                        finally:
+                                            _sc_mom_conn.close()
+                                        if len(_sc_candles) >= 10:
+                                            _sc_closes = [r[0] for r in reversed(_sc_candles)]
+                                            _sc_vel = (_sc_closes[-1] - _sc_closes[-6]) / _sc_closes[-6] * 100 if _sc_closes[-6] > 0 else 0
+                                            _sc_sma = sum(_sc_closes[-20:]) / len(_sc_closes[-20:])
+                                            _sc_below_sma = _sc_closes[-1] < _sc_sma
+                                            if _sc_vel < -TREND_ALIGN_VELOCITY_THRESHOLD and _sc_below_sma:
+                                                _coin_dumping_sc = True
+                                    except Exception:
+                                        pass
+                                    if _coin_dumping_sc:
+                                        log(f"  ✅ [SHORT-CONTINUUM-TOKEN-MOM] {token} SHORT allowed — BTC score={_sc_score:.1f} but token dumping (vel={_sc_vel:+.2f}%, below SMA)")
+                                    else:
+                                        log(f"  🚫 [SHORT-CONTINUUM] {token} SHORT blocked — BTC score={_sc_score:.1f} z={_sc_z} (not STRONG_NEG, score>{SHORT_CONTINUUM_SCORE_MAX})")
+                                        continue
                 except Exception:
                     pass
             # ── pump-chain+ HIGH regime block ──────────────────────────────
