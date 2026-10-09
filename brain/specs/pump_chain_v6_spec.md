@@ -4,7 +4,11 @@
 **Status:** SPEC rev1 — audit fixes applied; awaiting approval before implementation
 **Author:** Hermes analysis (data-driven, 260–304 closed trades, time-split validated)
 **Skills followed:** `signal-lab` (thesis → entry → exit → backtest), `add-signal` (integration checklist), `own-conclusions` (independent audit)
-**Independent audit:** `brain/verdicts/2026-10-08-pump-chain-v6-verdict.md` — verdict: FIX SPEC FIRST (10 changes). All 10 are applied in this revision; each notes what changed.
+**Independent audit:** round 1 `brain/verdicts/2026-10-08-pump-chain-v6-verdict.md`
+(FIX SPEC FIRST, 10 changes — all applied in rev1); round 2 (re-audit of rev1)
+`brain/verdicts/2026-10-08-pump-chain-v6-rev1-verdict.md` — **PASS, HIGH confidence**:
+10/10 fixes CORRECT, all revised gate numbers reproduced exactly, zero disagreements.
+Four non-blocking notes from the re-audit are folded into this document.
 
 ---
 
@@ -96,9 +100,10 @@ flow and continues — but only while the move is mid-cycle:
   compactor block and `SHORT_RSI_HARD_FLOOR=45` exec floor — a v6 floor of 40 would have
   produced kept trades the pipeline blocks anyway.
 - **`momentum_state='flat'` blocks LONG** (26.1% WR −$1.75, negative in all three time
-  terciles). For SHORT it stays in the gate as low-cost hygiene (removes 53.3%-WR trades
-  at −$0.41 net) but is **not claimed as validated SHORT edge** (audit claim 4: SHORT flat
-  was +PnL in 2 of 3 splits).
+  terciles). For SHORT it stays in the gate as low-cost hygiene (under the shipped
+  floor-45: removes 26 trades at 46.2% WR, −$0.75 net — rev1-reaudit figure) but is
+  **not claimed as validated SHORT edge** (audit claim 4: SHORT flat was +PnL in 2 of 3
+  splits).
 
 ---
 
@@ -194,10 +199,19 @@ reused. `STANDALONE_BYPASS_SIGNALS` += v6 sources (exact/strip matching confirme
     the gate, not the regime table, justifies keeping HIGH)
   - SHORT → NORMAL, EXTREME (HIGH is the confirmed SHORT bleed regime)
 - **Inherited substring blocks (audit finding — accepted, documented):** ~15 live
-  compactor/decider locations match `'pump-chain' in source` and WILL apply to v6, notably
-  SHORT RSI_MIN=45 (consistent with G3), SHORT HIGH block (consistent), LONG 35/85 RSI
-  block (consistent). Before shipping, enumerate them (`grep -n "'pump-chain' in" *.py`)
-  and confirm none conflicts with the gates above.
+  compactor/decider locations match `'pump-chain' in source` and WILL apply to v6 —
+  notably the source-agnostic decider `SHORT_RSI_HARD_FLOOR=45` and the SHORT HIGH block
+  (both consistent with the gates above). NOTE (rev1-reaudit): the compactor
+  PUMP-CHAIN-SHORT-RSI-MIN block is exact-match on `'pump-chain-'` and will NOT inherit
+  to v6 — v6's SHORT floor is protected by its own G3 gate + the decider hard floor, not
+  inheritance; that compactor floor is also soft (BTC-bearish override). Before shipping,
+  enumerate inherited matches (`grep -n "'pump-chain' in" *.py`) and confirm none
+  conflicts with the gates above — MANDATORY because live code drifts (signal_compactor
+  was modified during the re-audit itself).
+- **Confidence multiplier quirk (rev1-reaudit):** `'pump-chain-v6+'` substring-matches
+  the `('NORMAL', 'pump-chain-') = 1.2` volatility-gate-v2 entry, so v6 LONG would get the
+  SHORT-side confidence boost in NORMAL regime (a boost, not a filter). Add explicit v6
+  override entries in both gates' multipliers at implementation time.
 - Not in `_DEAD_SIGNALS`; `validate_source()` check.
 
 ### 6.4 Known inherited blocks that intentionally apply to v6
@@ -293,5 +307,8 @@ kill trigger (§9).
   historical times (timing jitter between signal and enrichment) — hence the calibration
   threshold is 75%, not 100%; the gate trades the *stored-label* edge, and residual
   misclassification dilutes (never inflates) the measured effect.
+- Calibration anchor set: the 175 hyphen-sample trades with non-NULL staleness
+  (260 − 85); all 175 have 1m data available (re-audit verified). The 44 underscore trades
+  all have NULL staleness and cannot serve as anchors.
 - Window drift is real: several headline numbers moved 5–15% between the spec draft and
   the audit hours later. All rev1 numbers are as of 2026-10-08 and re-runnable.
