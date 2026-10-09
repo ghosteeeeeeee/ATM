@@ -7167,3 +7167,25 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss still ~33% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
 - ETH continuation+ atr_sl_hit exit — single sample, watch continuation+ SL behavior
+
+## [2026-10-09 20:12] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** /usr/bin/bash last hour | 24h: 21T 8W ≈−$0.45 (WR ~38%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0 trades this hour — no signal eligible
+- atr_sl_hit 5/21=23.8% — under 40% threshold, tpsl stable
+- hard_max_loss 7/21=33% −$0.85 — dominant but within brain_auditor eval hold (Oct 9/10)
+- Overtrade: 0/hr (limit 20)
+- Streak: 14:+, 15:−, 17:−, 18:+ — not 3 consecutive negative hours
+- 0 open trades
+- Timers fresh (1m-candle 5s, pump-hunter/compactor 35s, watchdog 1min53s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still 33% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+- 2 quiet closes after 19:12 — watch whether trade flow resumes next hour
