@@ -7243,3 +7243,26 @@ Final set: ['IMX', 'INJ']
 - **Verification:** ast.parse OK; import check (0 sockets, no side effects); /tmp dry-run suite 35/35 assertions (60 slots/run exact, 3-run full rotation, cursor wrap/park/resume, fresh-skip, vol=0 forced re-fetch + heal, no-downgrade guard, upsert semantics) — throwaway deleted. LIVE: Type=oneshot timer picked up code at 22:50 UTC with no restart — 5 cycles logged 'Refreshed 49/58/58/35/13 of 60', full 178-token rotation in 103s, 0 errors; live candles_1m now 158/178 fresh <5min (was ~30/178), median staleness 184s. Rate math: worst case 202 HTTP calls/cycle (~202 Binance weight/min vs 6000 cap).
 - **Tracker:** BUG-048 (kept OPEN — 48h soak of the dead 1m aggregator not yet complete; deletion of _aggregate_1m.py is a later step)
 - **Manual steps:** NONE — hermes-price-collector.service is Type=oneshot (fresh process per timer tick), new code already live. Do NOT delete _aggregate_1m.py / hermes-1m-candle.* until the 48h soak completes.
+
+## [2026-10-09 23:12] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.16 last hour (WR 50%) | 24h: 18T 7W ≈−$0.30 (WR 39%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 1T/signal max this hour (W hmacd_mtf- SHORT −$0.14 atr_sl_hit, BABY volume-breakout-long+ +$0.30 stale_exit) — no 0%-WR signal with 3+ trades
+- atr_sl_hit 6/18=33.3% — under 40% threshold, tpsl stable
+- hard_max_loss 5/18=27.8% −$0.58 — still dominant loser bucket (hold brain_auditor eval)
+- Overtrade: 2/hr (limit 20)
+- Streak: 17:−$0.09, 18:+$0.08, 22:+$0.30, 23:−$0.14 — no 3 consecutive negative hours
+- 4 open (ZEN/SEI/YGG volume-breakout-long+ combo, CAKE hmacd_mtf-+) — all sized $11.10, SL/TP ~±2-2.5% OK
+- volume-breakout-long+ now 3 open + BABY win last hour — signal reactivated after quiet patch, working
+- Timers fresh (watchdog 1m39s, pump-hunter/compactor 20s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still 27.8% of 24h closes −$0.58 — awaiting brain_auditor; next lever is SL width not signal kills
+- 3 volume-breakout longs open simultaneously (ZEN/SEI/YGG) — cluster exposure, watch correlation if market dumps
