@@ -1337,7 +1337,7 @@ TIME_BLOCK_PENALTY = 0.7                # Score multiplier during dead zone — 
 # Fix entry conditions, not the clock.
 PUMP_CHAIN_LONG_DEAD_HOURS = []         # DISABLED 2026-09-30 — use entry quality filters instead
 PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries.
-PUMP_CHAIN_LONG_RSI_MAX = 85          # CEO 2026-10-07: raised 70→85 — watchdog verified 14d: RSI 60-70 best (+$1.26, 64.4%WR), RSI ≥70 still prints (+$0.85). Old 70 threshold blocked profitable trades.
+PUMP_CHAIN_LONG_RSI_MAX = 75          # brain_auditor 2026-10-09: lowered 85→75 — CEO Oct-7 raise used entry_rsi_14 (DRIFT-E unreliable). meta_rsi truth: 30d 75+=11T 36.4%WR -$0.48 (4W+$0.42/6L-$0.90); 14d 75+=1T 0%WR -$0.16 (BANANA@79). 70-75 band 30d +$0.32 (keep open). Watchdog flagged LDO@84.44 as verified wrong-side cell — blocked now. Parent band 70+ n=22 meets threshold.
 PUMP_CHAIN_LONG_RSI_MIN = 35          # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers). Oversold LONG = catching falling knife.
 
 # pump-chain- SHORT entry quality (replaced dead hours)

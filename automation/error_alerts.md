@@ -306,3 +306,10 @@
 - **NOTE**: `hermes-bug-hunter.service exit 1` — by design (exits non-zero when code-quality findings exist: bare excepts, cursor leaks, etc.); not a runtime failure.
 - **NOTE**: `hermes-ceo.service inactive` — normal between 6h timer runs.
 - Core timers (price-collector, 1m-candle, pipeline) all **active**, last fire <2min. No tracebacks, no position-manager crashes, no phantom trades. Prices fresh (0.6min). 157 signals/1h.
+
+## Error Alerts — 2026-10-09 06:48 UTC
+- **WARN** (1x): Disk usage at 85% (/dev/vda2 95G/118G, 18G free)
+- **AUTO-FIX**: None applied — no logs older than 7 days to compress. Largest consumers: /var/lib 8.2G, /var/www 2.4G, /root/zscore 2.2G, /root/hermes-agent 2.0G. Manual review recommended before disk hits critical.
+
+## Error Alerts — 2026-10-09 07:00 UTC
+- **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
