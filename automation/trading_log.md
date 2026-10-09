@@ -6839,3 +6839,28 @@ Final set: ['IMX', 'INJ']
 **Pipeline health:** OK, active, cycle #234973, 0 tracebacks, timers fresh. 2 trades closed today −$0.03.
 
 **Changes:** NONE (verdicts only, no live path touched).
+
+## [2026-10-09 07:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** /usr/bin/bash.00 | 24h: 13T 5W −/usr/bin/bash.25 (WR 38.5%)
+**Last hour:** none
+**24h exits:** hard_max_loss 6T −$0.86 | stale_exit 4T +$0.60 | profit-monster-trail 1T +$0.09 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+**Open:** 0
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal with 3+ trades 0% WR this hour
+- atr_sl_hit 0/13=0% — tpsl stable
+- hard_max_loss 6/13=46.2% — within Oct 9/10 brain_auditor eval hold
+- Overtrade: 0/hr (limit 20)
+- Streak: flat not negative (last closes: +0.09 then quiet)
+- Timers fresh (pump-hunter/compactor/watchdog 1min), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 6/13=46.2% still dominant — awaiting brain_auditor Oct 9/10 verdict; next lever is SL width not signal kills
+- v5 family still 4T 0W −$0.49 over 24h — on 7d kill-bar watch
+- Quiet stretch continues (0T this hour, 0 open)
