@@ -6965,3 +6965,28 @@ Final set: ['IMX', 'INJ']
 - hard_max_loss ~47% of 24h closes — awaiting brain_auditor verdict; next lever is SL width not signal kills
 - v5/v6 combo signals still 0W over 24h (pump-chain+,pump-chain-v5 2T −$0.22, pump-chain+,pump-chain-v6+ 2T −$0.16) — below kill threshold, on watch
 - pump-chain+ alone remains only profitable signal (+$0.38/24h)
+
+## [2026-10-09 12:12] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 last hour | 24h: 15T 5W −$0.37 (WR 33.3%)
+**Last hour:** none
+**24h exits:** hard_max_loss 7T −$0.94 | stale_exit 4T +$0.60 | atr_sl_hit 1T −$0.04 | profit-monster-trail 1T +$0.09 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09
+**Open:** 2 — BTC continuum-trend+ LONG (+0.14%), BANANA pump-chain+ LONG (−0.25%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal with 3+ trades 0% WR this hour
+- atr_sl_hit 1/15=6.7% — tpsl stable, well under 40% threshold
+- hard_max_loss 7/15=46.7% −$0.94 — still dominant, within brain_auditor eval hold
+- Overtrade: 0/hr (limit 20)
+- Streak: hours 08 −$0.08, 09 −$0.04, 10 flat — not 3 consecutive negative
+- Timers fresh (watchdog 1m, pump-hunter/signal-compactor 8s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss ~47% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+- v5/v6 combo signals still 0W over 24h (−$0.22, −$0.16) — below kill threshold, on watch
+- pump-chain+ alone remains only profitable signal (+$0.38/24h); BANANA open on it now
