@@ -7048,3 +7048,27 @@ Final set: ['IMX', 'INJ']
 - hard_max_loss 52.9% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
 - v5/v6 combo signals still 0W over 24h (−$0.22, −$0.16) — below kill threshold, on watch
 - pump-chain+ alone remains only profitable signal (+$0.31/24h)
+
+## [2026-10-09 15:13] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.12 last hour | 24h: 17T ~8W −$0.08 net (per exit-reason sums: hard_max_loss −0.85, winners +0.97)
+**Last hour:** ETH bb-bounce-v2-long+ LONG profit-monster-trail +$0.10 (+2.30% acct) | BABY r2v2-long3 LONG profit-monster-trail +$0.03 | BABY continuation+ LONG profit-monster-trail −$0.01
+**24h exits:** hard_max_loss 7T −$0.85 | profit-monster-trail 4T +$0.21 | stale_exit 3T +$0.75 | atr_sl_hit 1T −$0.04 | pump_exit_dead_money 1T +$0.01 | ORPHAN_PAPER 1T $0
+**Open:** 2 (JUP pump-chain+ LONG, ETH continuation+ LONG — both sized, SL/TP attached)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: no signal with 3+ trades 0% WR this hour; pump-chain+ still best (7T 4W +$0.42/24h)
+- atr_sl_hit 1/17=5.9% — tpsl stable, well under 40%
+- hard_max_loss 7/17=41.2% −$0.85 — dominant but down from 52.9%; still within brain_auditor eval hold (Oct 9/10)
+- Overtrade: 3/hr (limit 20)
+- Streak: +$0.12 this hour — not negative, streak inactive
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still ~41% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+- v5/v6 combo (pump-chain+,pump-chain-v6+) still 0W −$0.16 over 24h (2T) — below kill threshold, on watch
+- All 3 closes this hour were profit-monster-trail — trail working well when entries are good
