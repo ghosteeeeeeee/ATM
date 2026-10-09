@@ -2167,13 +2167,24 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
                 continue
             # ── PHANTOM TRADE DEBUG — catch tight SL at write time ──────────
             _entry_chk = float(u.get('entry_price', 0) or 0)
+            _dir_chk = u.get('direction', '')
             if _entry_chk > 0 and new_sl > 0:
-                _dist = abs(new_sl - _entry_chk) / _entry_chk * 100
-                if _dist < 0.15:
-                    log(f"  ⚠️ [PHANTOM-WRITE] {u.get('token')} {u.get('direction')}: "
-                        f"BLOCKED tight SL={new_sl:.6f} entry={_entry_chk:.6f} dist={_dist:.3f}% "
-                        f"(old_sl={u.get('old_sl')}) trade_id={trade_id}")
-                    continue  # Skip this write — SL too tight, likely ATR bug
+                # FIX (2026-10-09): Only block LOSS-side tight SLs, not profit locks.
+                # An SL above entry for LONG (or below entry for SHORT) is a profit
+                # lock — allow it even if close to entry.
+                _is_profit_lock = False
+                if _dir_chk == 'LONG' and new_sl > _entry_chk:
+                    _is_profit_lock = True
+                elif _dir_chk == 'SHORT' and new_sl < _entry_chk:
+                    _is_profit_lock = True
+
+                if not _is_profit_lock:
+                    _dist = abs(new_sl - _entry_chk) / _entry_chk * 100
+                    if _dist < 0.15:
+                        log(f"  ⚠️ [PHANTOM-WRITE] {u.get('token')} {u.get('direction')}: "
+                            f"BLOCKED tight SL={new_sl:.6f} entry={_entry_chk:.6f} dist={_dist:.3f}% "
+                            f"(old_sl={u.get('old_sl')}) trade_id={trade_id}")
+                        continue  # Skip this write — SL too tight, likely ATR bug
             cur.execute(
                 "UPDATE trades SET stop_loss = %s, target = %s, atr_managed = TRUE WHERE id = %s AND status = 'open'",
                 (round(new_sl, 8), round(new_tp, 8), trade_id)
