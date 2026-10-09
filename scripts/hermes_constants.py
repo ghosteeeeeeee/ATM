@@ -890,7 +890,7 @@ OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold =
 # RSI 35-45 LONG = 18T 44.4%WR -$0.30 (dead zone).
 # Floor at 20 allows the 80% WR oversold bounce band while blocking extreme crash entries.
 LONG_RSI_FLOOR = 20            # LOWERED 30→20 (CEO 2026-09-29). 14d: RSI <25 LONG = 5T 80%WR +$0.15 (BEST). Allows oversold bounces.
-LONG_RSI_CEILING = 85            # CEO 2026-10-07: raised 70→85 — watchdog verified RSI≥70 still prints (+$0.85, pump-chain LONG). DOT entry RSI 75.3 was correct.
+LONG_RSI_CEILING = 75            # CEO 2026-10-09: lowered 85→75. Meta-RSI (DRIFT-E ground truth) 30d LONG: 70-75=38T 47.4%WR +$0.24 (keep), 75-80=36T 44.4% -$0.45 + 80-85=4T -$0.14 (block). Post-Oct-7 raise cohort (70-85 band, n=7) 28.6% -$0.26 — 85 didn't pay rent. Matches PUMP_CHAIN_LONG_RSI_MAX=75 + watchdog 2x rec. NOT 70: would block the positive 70-75 band. NOT 65: 65-70=+0.09/47T flat, no edge to cut. Grade A still gets 80 (dynamic tier signal_compactor:3881); BTC-bullish override still bypasses.
 VOLUME_BREAKOUT_LONG_RSI_CEILING = 95  # brain_auditor 2026-09-30 — volume-breakout-long+ is STANDALONE_BYPASS momentum signal. 14d RSI>70: 9T 77.8%WR +$1.23 (BEST band). Blanket LONG_RSI_CEILING=65 kills its edge. 95 blocks only exhausted zone (RSI>95: 2L -$0.32, 0W). Same pattern as existing vol-breakout RSI<20 exclusion in signal_compactor.
 
 # ── Contrarian zone: flip blocked signals at strong SL zones ──────────────

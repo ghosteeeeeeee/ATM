@@ -135,3 +135,17 @@ Not a single broken gate — the stack is underpowered to evaluate at 6d, and th
 5. Reconfirm BTC-CHOP-GATE and CONF-FILTER-PRESERVE as keep in signal_regime_memory.json (audit-verified works).
 
 Artifacts: plans/2026-10-09_gate-counterfactual-audit.md, audit/gate_counterfactual_verify.md, analysis/gate_counterfactual_audit_2026-10-08.py/.out (v3.2). Kanban: 2026-10-08 23:50, 10-09 00:05, 00:25, + this decision block.
+
+## CEO Report — 2026-10-09 (LONG_RSI_CEILING decision)
+
+### Diagnosis
+The Oct-7 raise 70→85 rested on (a) one DOT data point and (b) a 789-trade watchdog sample built on `entry_rsi_14` — the DRIFT-E-unreliable column (median 12.6pt divergence from signal-time meta RSI). My own reproduction of entry_rsi_14 30d LONG 70+ shows **+$1.70/139T**, contradicting the watchdog's −$4.30 claim. Meta-RSI ground truth (30d LONG): 70-75 = 38T 47.4%WR **+$0.24**, 75-80 = 36T 44.4% **−$0.45**, 80-85 = 4T −$0.14, 85+ = 7T +$0.33. Post-Oct-7 cohort in the 70-85 band: n=7, 28.6%WR, −$0.26 — the raise earned nothing.
+
+### Root Cause
+RSI ≥75 LONG entries are the chase zone on current meta data; 70-75 is not. The watchdog was directionally right (block 75+) but wrong about the cut point (recommended 70/75 based on the wrong column). Of the 3 named 48h losses: BANANA@78.95 now blocked by PUMP_CHAIN_LONG_RSI_MAX=75 (brain_auditor today); BANANA@72.39 blocked by ceiling 75; **ICP@66.67 blocked by nothing above 66** — that loss is hard_max_loss exit structure in HIGH regime, not entry RSI.
+
+### Fix Applied
+`LONG_RSI_CEILING` 85 → **75** (hermes_constants.py:893). NOT 70 (would block the +$0.24 70-75 band); NOT 65 (65-70 = +$0.09/47T, flat — no edge to cut, guts momentum entries); NOT dynamic (the BTC-bullish override at signal_compactor:3888-3919 already IS the dynamic behavior — base 75 + override = 85-equivalent when BTC bullish, 75 when not; BTC below EMA300 200+ bars so override rarely fires). Grade A (mult≥1.30) still gets ceiling 80 via existing dynamic tier. VOLUME_BREAKOUT_LONG_RSI_CEILING=95 untouched (its best band is RSI>70). Aligned with PUMP_CHAIN_LONG_RSI_MAX=75.
+
+### Verification
+py_compile OK; LONG_RSI_CEILING=75 loads; CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True intact. Compactor timer loads fresh constants next fire — no restart. Expected impact: blocks ~40 trades/30d in the 75+ band worth ≈−$0.59/30d, keeps 70-75 momentum entries. Metric checkpoint (Oct 12): LONG 75+ meta-RSI closed trades → target 0; 70-75 band WR ≥47% maintained.
