@@ -273,3 +273,11 @@
 ## Error Alerts — 2026-10-08 21:00 UTC
 - **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING — BTC_LEVEL`
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] BIGTIME TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-09 01:50 UTC
+- **WARN** (recurring hourly): `hermes-brain-auditor.service` failed at 01:40 — psycopg2 errors inside LLM session: `signal_metadata` column (hint: use `_signal_metadata`), `ROUND(double precision, integer)` needs `::numeric` cast, `hold_minutes` column doesn't exist (likely `hold_min`/`duration_min`). Service is LLM-driven; SQL errors are mid-session but process exited 1.
+- **INFO**: `hermes-bug-hunter.service` exit 1 at 01:47 — by design (findings: connection_leaks 53 files, non_atomic_json 75 files, hardcoded_passwords 4 files, dead_imports 3x signal_gen). Not a crash.
+- **INFO**: `hermes-atr-sl-updater.timer` unit not-found (stale reference in hermes.target listing). No-op.
+- **INFO**: Disk 85% used (18G free) — at WARN threshold. No logs >7d worth compressing. Journal 144M.
+- **INFO**: 0 trades open/closed today, 0 outcomes in last hour despite 116 signals generated. Position manager healthy (rc=0 every run). Live trading enabled.
+- **AUTO-FIX**: None required. All critical timers (price-collector, 1m-candle, pipeline) active and firing. Pipeline no errors in 30m. Prices fresh (87s). No DB locks.
