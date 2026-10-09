@@ -2931,7 +2931,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _pcs_phase, _pcs_linreg, _pcs_ema, _pcs_ts = _pcs_row
                                 _pcs_age = _pcs_time.time() - (_pcs_ts or 0)
                                 if _pcs_age < 600:
-                                    _pcs_bearish = (_pcs_linreg in ('LEAN_BEAR', 'BEAR') and _pcs_ema == 'BELOW')
+                                    # FIX 2026-10-09: relaxed — ema=AT is also bearish (at resistance)
+                                    _pcs_bearish = (_pcs_linreg in ('LEAN_BEAR', 'BEAR'))
                                     if _pcs_bearish:
                                         _pcs_bearish_override = True
                         except Exception:
@@ -3662,7 +3663,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         _rsf_phase, _rsf_linreg, _rsf_ema, _rsf_ts = _rsf_row
                                         _rsf_age = _rsf_time.time() - (_rsf_ts or 0)
                                         if _rsf_age < 600:
-                                            _rsf_bearish = (_rsf_linreg in ('LEAN_BEAR', 'BEAR') and _rsf_ema == 'BELOW')
+                                            # FIX 2026-10-09: relaxed — ema=AT is also bearish (at resistance)
+                                            _rsf_bearish = (_rsf_linreg in ('LEAN_BEAR', 'BEAR'))
                                             if _rsf_bearish:
                                                 _rsf_bearish_override = True
                                 except Exception:
