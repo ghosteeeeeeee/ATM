@@ -2693,8 +2693,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _coin_rising = False
                             try:
                                 import sqlite3 as _mom_sqlite2
-                                from paths import HERMES_DATA as _MOM_DATA2
-                                _mom_conn2 = _mom_sqlite2.connect(f'{_MOM_DATA2}/candles.db', timeout=3)
+                                _mom_conn2 = _mom_sqlite2.connect(CANDLES_DB, timeout=3)
                                 try:
                                     _candles2 = _mom_conn2.execute(
                                         "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
