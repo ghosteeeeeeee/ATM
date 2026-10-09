@@ -6667,3 +6667,29 @@ BY: daily_orchestrator
 **Open Questions:**
 - Quiet streak: 0 trades for 3+ hours — monitor for over-filtering if it extends much longer
 - Carry-forward: hard_max_loss 41.7% for Oct 9/10 eval; pump-chain-v5 1T 0W −$0.15 solo + combo 2T 0W −$0.22 for 7d kill bar
+
+## [2026-10-09 02:12] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 | 24h: 11T 4W −$0.22 (WR 36.4%)
+**24h exits:** hard_max_loss 5T −$0.74 | stale_exit 4T +$0.60 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+**24h signals:** pump-chain+ 7T 4W +$0.38 | pump-chain+v5 combo 2T 0W −$0.22 | pump-chain-v5 solo 1T 0W −$0.15 | pump-chain- 1T 0W −$0.23
+**Open:** 1 (ALT LONG pump-chain+,pump-chain-v6+ combo since 01:55)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal eligible (combo/v5 still on 7d bar watch only)
+- atr_sl_hit 0/11=0% — tpsl stable
+- hard_max_loss 5/11=45.5% — hold per brain_auditor Oct 9/10 eval (window is now; awaiting that review before touching)
+- Overtrade: 0/hr
+- Streak: not 3 consecutive negative hours (last negative hour 21:00; 22:00 +$0.01, then flat)
+- Quiet streak 4h+ (23:12→02:12 zero closes) — 1 open trade active, pipeline timers fresh
+- live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 45.5% share: brain_auditor Oct 9/10 eval is due now — follow that review's verdict next hour
+- Quiet stretch: 0 closes for 4h; if 0T extends past ~8h revisit over-filtering (not actionable yet)
+- pump-chain-v5 (solo+combo) 3T 0W −$0.37 over 24h — on 7d kill-bar watch per prior sessions
