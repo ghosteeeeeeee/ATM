@@ -6864,3 +6864,29 @@ Final set: ['IMX', 'INJ']
 - hard_max_loss 6/13=46.2% still dominant — awaiting brain_auditor Oct 9/10 verdict; next lever is SL width not signal kills
 - v5 family still 4T 0W −$0.49 over 24h — on 7d kill-bar watch
 - Quiet stretch continues (0T this hour, 0 open)
+
+## [2026-10-09 08:12 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $-0.25 (24h, WR 38.5% 5/13)
+**Last hour:** none
+**24h exits:** hard_max_loss 6T −$0.86 | stale_exit 4T +$0.60 | profit-monster-trail 1T +$0.09 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+**Open:** 2 — ICP pump-chain-v6+ LONG, IOTA pump-chain+,pump-chain-v6+ LONG
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal with 3+ trades 0% WR this hour
+- atr_sl_hit 0/13=0% — tpsl stable
+- hard_max_loss 6/13=46.2% — within Oct 9/10 brain_auditor eval hold
+- Overtrade: 0/hr (limit 20)
+- Streak: not negative (last close GRASS +$0.09, quiet since)
+- Timers fresh, live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+- Pipeline log tracebacks all from Oct 7 (stale), none recent
+
+**Open Questions:**
+- hard_max_loss 6/13=46.2% still dominant — awaiting brain_auditor verdict
+- v5 family still on 7d kill-bar watch
+- Quiet stretch continues (0T this hour), 2 open LONGs from 07:32/07:36
