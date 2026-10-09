@@ -1296,7 +1296,7 @@ VOL_FLOOR_THRESHOLD = 0.15             # CEO 2026-08-16 — STARVATION FIX: 0.30
 # time confidence reaches 90+, the easy move is done and you're buying the top.
 # Plan: conf-filter-plan.md (2026-08-19)
 CONF_FILTER_ENABLED = True
-CONF_FILTER_MAX = 92                    # block if confidence >= this value (raised from 89 — 90-95 tier mixed, 95+ was losing historically but winning recently)
+CONF_FILTER_MAX = 95                    # block if confidence >= this value (lowered 92→95 2026-10-09 — 92-94 bucket profitable: 32T 71.9%WR +$1.35. 95+ still losing: 515T 50.1%WR -$2.52. Allow profitable 92-94 band.)
 CONF_FILTER_MIN = 70                    # FIX 2026-09-30: lowered 90→70. CONF_FILTER_MIN=90 blocked ALL signals (67/hour, 0 passed). 89.8 bucket only had 11T — not enough data to justify blocking everything below 90. 70 is natural floor for our signals.
 
 # ── Continuum Oscillator Multipliers (SHADOW MODE) ──────────────────────────
