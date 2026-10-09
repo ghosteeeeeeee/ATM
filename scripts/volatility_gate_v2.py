@@ -179,6 +179,8 @@ REGIME_SIGNALS = {
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 EXTREME
+        'r2v2-long', 'r2v2-long3',  # R² trend v2 — added 2026-10-09: LDO LONG blocked in EXTREME
+        'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-09
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
         'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
