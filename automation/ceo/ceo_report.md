@@ -59,3 +59,42 @@ Flag loads False (python import verified). Constants load fresh per 1m cycle —
 **15:02 root cause:** CONTINUUM-BLOCK didn't fire because BTC was in transitional states (CALM/DECLINING at EMA300, not full bear structure). Block requires all 3 conditions to agree.
 
 **Plan align-with-btc-regime.md:** Proposes BLOCKING LONG in bearish BTC (not converting to SHORT). Never implemented.
+
+## CEO Report — 2026-10-09 00:45 UTC
+
+### Diagnosis
+Gate counterfactual audit complete (user-initiated, dual-verified): 6d window, 75,820 block lines, 55 gates, 8,226 episodes. Pooled passed vs blocked indistinguishable (ex4h +0.20% vs +0.02%, MWU p≈0.5) — power only detects selection ≳0.4%/trade. ~78% of blocked episodes show NO EDGE under every robustness test. Only 2 robust verdicts: BTC-CHOP-GATE WORKS (sole Bonferroni survivor, −0.405 p=0.00011); CONF-FILTER-PRESERVE WORKS (−0.670 p=0.006, n=52). SLOPE-FILTER strongest harm candidate (+0.542 p=0.007, both OOS halves positive, kills 59.8% runners) but fails Bonferroni. Biggest unmeasured filter: 25,204 signals EXPIRED waiting <5min for confluence partner (avg conf 80.5) — zero counterfactual instrumentation. 6,956 decider-floor rejections also unlogged per-signal. 10–14/22 gates flip OOS sign; 5 gate codes changed mid-window; one chop→dump regime only. PG-verified live: 24h 12T +$0.72 41.7%WR | 7d 191T +$1.48 53.9%WR.
+
+### Root Cause
+Not a single broken gate — the stack is underpowered to evaluate at 6d, and the largest filter (confluence-by-expiry) has no instrumentation at all. Acting on this window would be noise-chasing (the pattern this system keeps getting caught in per AGENTS.md THE PATTERN).
+
+### Decisions (all GO — 0 trading config changes, 0 protected flags touched)
+
+**D1 GO — Ratify the hold.** No gate removal/relax on this 6d window. Reasons: (a) 10–14/22 gates flip sign OOS; (b) 5 gate codes changed mid-window so halves aren't comparable; (c) one regime only (chop→dump); (d) power limit ±0.4%/trade means "no edge shown" ≠ "proven useless"; (e) AGENTS.md pattern discipline — every past unverified "pattern" has been killed by independent audit. Ratified.
+
+**D2 GO — Commission the ≥4-week, code-version-aware, both-regime re-audit** as the standing gate before ANY relax/remove. Priority queue: (1) CONF-FILTER-PRESERVE (works, all-5-baselines, don't touch until reconfirmed); (2) SLOPE-FILTER (harms-direction candidate — blocks SHORTs on +0.05% 5m uptrend slope, 59.8% runner-kill vs market 23.6% — most likely actionable if 4wk confirms); (3) BTC-CHOP-GATE (works, carry-forward). Resource: one analysis pass/week, starts collecting data now (window opens Oct 9). Deliverable: code-version-stratified per-gate table + regime split + Bonferroni. **Any SLOPE-FILTER change before this re-audit completes = reject without discussion.**
+
+**D3 GO — Instrument the confluence-expiry counterfactual.** Highest-information unmeasured thing in the system. Scope: log every signal that expires waiting for a confluence partner (token, direction, confidence, source, timestamp) + attach forward returns from candles.db (+30m/+1h/+4h, direction-aware). Also log the 50%-confidence decider-floor rejections per-signal (6,956 cycles currently invisible). Pure observability — does NOT touch CONFLUENCE_REQUIRED (protected) or any trading path. Decision on any architecture change gated on the measured data. Delegate: bug_hunter (log schema + forward-return join), self_learner (first analysis pass after 7d of data). Success metric: 7d of expired-signal counterfactuals with n≥1000, answerable question "do conf≥80 single-source signals have positive forward edge?"
+
+**D4 GO — Structured block logging at source.** Every gate block line must contain literal BLOCKED + token + direction (or a single JSON object). Current format chaos forced substring-grepping that dropped 36% of block volume in audit v1 and left ~3,800 direction-level block lines (VOL-FLOOR, WARNING BTC-momentum, DIRECTION-LOCK, VOL-GATE-v2) permanently unverifiable. This is pure observability — no gate logic changes, no constant value changes. Delegate: bug_hunter. Success metric: next audit parse covers ≥95% of block volume with zero custom regex archaeology.
+
+**D5 GO (modified) — Fold housekeeping into D4.** GRASS candle feed currently HEALTHY (288/24h candles, fresh to 00:25 UTC; was absent Oct 2–4, present since Oct 6 — token added mid-window, not broken). TESTTOKEN noise last appears Oct 4 in pipeline.log (historical, already rolled out of active window). Both are low-priority; fix as part of the D4 structured-logging pass rather than separate effort. No standalone action.
+
+### Guardrails reaffirmed
+- CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS: INTACT, will not be touched without T's explicit GO.
+- D3 instrumentation measures the confluence architecture — it does not change it. Any proposal to relax CONFLUENCE_REQUIRED requires: measured edge on conf≥80 singles + independent audit + CEO GO.
+- SLOPE-FILTER: monitor only until D2 re-audit. Do not disable, do not relax.
+
+### Verification
+- Dual-implementation agreement <0.10% on every gate (analysis + independent adversarial auditor). Counts reconcile exactly (75,820 vs 75,824 lines, 55 gates, 8,226 episodes).
+- PG live numbers self-queried: 24h 12T +$0.72 41.7% | 7d 191T +$1.48 53.9%.
+- GRASS/TESTTOKEN/D5 claims spot-checked against candles.db and pipeline.log.
+
+### Next actions
+1. D4 + D5 structured block logging — DELEGATE bug_hunter (this week).
+2. D3 confluence-expiry instrumentation — DELEGATE bug_hunter (this week), self_learner first analysis +7d.
+3. D2 4-week re-audit window opens Oct 9 — analysis-desk owns weekly pass; first full readout ~Nov 6.
+4. SLOPE-FILTER: no action until re-audit; note in regime memory as harm-candidate.
+5. Reconfirm BTC-CHOP-GATE and CONF-FILTER-PRESERVE as keep in signal_regime_memory.json (audit-verified works).
+
+Artifacts: plans/2026-10-09_gate-counterfactual-audit.md, audit/gate_counterfactual_verify.md, analysis/gate_counterfactual_audit_2026-10-08.py/.out (v3.2). Kanban: 2026-10-08 23:50, 10-09 00:05, 00:25, + this decision block.
