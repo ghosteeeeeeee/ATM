@@ -44,7 +44,14 @@ CANDLE_TOKENS_FILE = '/root/.hermes/data/candle_universe_tokens.json'
 # is irrelevant. Separate progress file so the slow multi-TF cursor in
 # CANDLE_TOKENS_FILE is never touched by the fast loop (and vice versa).
 CANDLE_FAST_1M_FILE = '/root/.hermes/data/candle_fast_1m_progress.json'
-FAST_1M_TOKENS_PER_RUN = 60   # CEO-set: 178 tokens / 60 per run = full rotation in 3 runs (~3-5 min)
+FAST_1M_TOKENS_PER_RUN = 60   # CEO-set: 178 tokens / 60 per run = one full pass in 3 runs
+                              # (~2-7 min at the observed 36-142s cadence). NOTE (review
+                              # MEDIUM-3, measured live 2026-10-09): because of the <300s
+                              # skip below, a token is usually skipped on its first revisit
+                              # and re-fetched on its second — effective per-token refresh
+                              # is ~6-13 min, NOT the 2-7 min pass time. Still ~3-4x better
+                              # than the old 18-42 min rotation. Lower FAST_1M_MAX_AGE_S or
+                              # raise this constant if <5 min per-token freshness is required.
 FAST_1M_MAX_AGE_S = 300       # re-fetch 1m when newest candle is older than this...
                               # ...OR has volume=0 (a vol=0 "fresh" candle is fake tick-agg data)
 FAST_1M_FETCH_LIMIT = 200     # Binance klines limit for 1m (matches the legacy slow-path fetch)
@@ -284,43 +291,55 @@ def _seed_fast_1m(universe: list):
         _save_fast_1m_progress(saved_tokens, cursor)
         print(f'[candle_seed_1m] Universe changed — reset fast cursor to 0 ({len(saved_tokens)} tokens)')
 
-    conn = sqlite3.connect(CANDLES_DB, timeout=10)
-    conn.execute("PRAGMA busy_timeout=30000")
+    conn = None
     checked = 0
     refreshed = 0
     deadline = time.time() + FAST_1M_TIME_BUDGET_S
     try:
+        conn = sqlite3.connect(CANDLES_DB, timeout=10)
+        conn.execute("PRAGMA busy_timeout=30000")
         for _ in range(FAST_1M_TOKENS_PER_RUN):
             idx = cursor % len(saved_tokens)
             token = saved_tokens[idx]
+            try:
+                # Skip-if-fresh: newest 1m candle < FAST_1M_MAX_AGE_S old AND volume > 0.
+                # A vol=0 "fresh" candle means fake tick-agg data — always re-fetch (BUG-048).
+                row = conn.execute(
+                    "SELECT ts, volume FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 1",
+                    (token,)
+                ).fetchone()
+                if row and row[0] is not None and (int(time.time()) - row[0]) < FAST_1M_MAX_AGE_S \
+                   and (row[1] or 0) > 0:
+                    cursor += 1
+                    checked += 1
+                    continue  # fresh REAL candle — skip
 
-            # Skip-if-fresh: newest 1m candle < FAST_1M_MAX_AGE_S old AND volume > 0.
-            # A vol=0 "fresh" candle means fake tick-agg data — always re-fetch (BUG-048).
-            row = conn.execute(
-                "SELECT ts, volume FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 1",
-                (token,)
-            ).fetchone()
-            if row and row[0] is not None and (int(time.time()) - row[0]) < FAST_1M_MAX_AGE_S \
-               and (row[1] or 0) > 0:
+                # Wall-clock guard: stop before fetching, do NOT advance the cursor
+                # past this token — the next cycle resumes exactly here.
+                if time.time() > deadline:
+                    print(f'  [candle_seed_1m] Time budget ({FAST_1M_TIME_BUDGET_S}s) hit after '
+                          f'{checked} tokens — resuming at cursor={cursor} next cycle')
+                    break
+
+                candles = _fetch_real_candles(token, '1m', FAST_1M_FETCH_LIMIT)
+                if candles:
+                    _store_candles(token, '1m', candles)  # guarded upsert — vol=0 can never downgrade real OHLC
+                    refreshed += 1
                 cursor += 1
                 checked += 1
-                continue  # fresh REAL candle — skip
-
-            # Wall-clock guard: stop before fetching, do NOT advance the cursor
-            # past this token — the next cycle resumes exactly here.
-            if time.time() > deadline:
-                print(f'  [candle_seed_1m] Time budget ({FAST_1M_TIME_BUDGET_S}s) hit after '
-                      f'{checked} tokens — resuming at cursor={cursor} next cycle')
-                break
-
-            candles = _fetch_real_candles(token, '1m', FAST_1M_FETCH_LIMIT)
-            if candles:
-                _store_candles(token, '1m', candles)  # guarded upsert — vol=0 can never downgrade real OHLC
-                refreshed += 1
-            cursor += 1
-            checked += 1
+            except Exception as e:
+                # Self-review fix (fc55eff0 review MEDIUM-1): ONE poisoned token must
+                # never wedge the whole rotation. _store_candles only catches
+                # sqlite3.OperationalError, so e.g. a NaN OHLC value -> IntegrityError
+                # would park the cursor on this token forever (the whole 1m seeder
+                # would silently stop behind a single 'non-fatal' log line).
+                # Log, advance past the bad token, keep the rotation alive.
+                print(f'  [candle_seed_1m] {token}: unexpected error — advancing past: {e}')
+                cursor += 1
+                checked += 1
     finally:
-        conn.close()
+        if conn is not None:
+            conn.close()
         _save_fast_1m_progress(saved_tokens, cursor)
 
     print(f'[candle_seed_1m] Refreshed {refreshed}/{checked} tokens this run '
