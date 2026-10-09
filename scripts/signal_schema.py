@@ -3231,33 +3231,33 @@ def update_signal_decision(token, direction, decision, reason=None, signal_id=No
     if _reason:
         _reason = str(_reason)[:500]
 
-    conn = _get_conn(_runtime())
-    c = conn.cursor()
-    if signal_id is not None:
-        # Atomic claim: only update the specific signal row
-        c.execute('''
-            UPDATE signals
-            SET decision=?, decision_reason=?,
-                executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
-                compact_rounds = CASE WHEN ?='EXECUTED' THEN 0 ELSE compact_rounds END,
-                updated_at=CURRENT_TIMESTAMP
-            WHERE id=? AND executed=0
-        ''', (decision, _reason, decision, decision, signal_id))
-    else:
-        # Legacy: update all matching token+direction
-        c.execute('''
-            UPDATE signals
-            SET decision=?, decision_reason=?,
-                executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
-                compact_rounds = CASE WHEN ?='EXECUTED' THEN 0 ELSE compact_rounds END,
-                updated_at=CURRENT_TIMESTAMP
-            WHERE token=? AND direction=? AND decision IN ('PENDING', 'APPROVED')
-            AND executed=0
-        ''', (decision, _reason, decision, decision, token.upper(), direction.upper()))
-    conn.commit()
-    count = c.rowcount
-    conn.close()
-    return count
+    # FIX 2026-10-09 (code review R2): connection leaked on exception — no
+    # try/finally meant a locked-DB error skipped conn.close(). Use the repo's
+    # _db_cursor context manager, which guarantees cleanup even on raise.
+    with _db_cursor(_runtime()) as (conn, c):
+        if signal_id is not None:
+            # Atomic claim: only update the specific signal row
+            c.execute('''
+                UPDATE signals
+                SET decision=?, decision_reason=?,
+                    executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
+                    compact_rounds = CASE WHEN ?='EXECUTED' THEN 0 ELSE compact_rounds END,
+                    updated_at=CURRENT_TIMESTAMP
+                WHERE id=? AND executed=0
+            ''', (decision, _reason, decision, decision, signal_id))
+        else:
+            # Legacy: update all matching token+direction
+            c.execute('''
+                UPDATE signals
+                SET decision=?, decision_reason=?,
+                    executed=CASE WHEN ?='EXECUTED' THEN 1 ELSE executed END,
+                    compact_rounds = CASE WHEN ?='EXECUTED' THEN 0 ELSE compact_rounds END,
+                    updated_at=CURRENT_TIMESTAMP
+                WHERE token=? AND direction=? AND decision IN ('PENDING', 'APPROVED')
+                AND executed=0
+            ''', (decision, _reason, decision, decision, token.upper(), direction.upper()))
+        conn.commit()
+        return c.rowcount
 
 def mark_signal_executed(token, direction, decision='EXECUTED', signal_id=None, reason=None):
     """
@@ -3271,9 +3271,11 @@ def mark_signal_executed(token, direction, decision='EXECUTED', signal_id=None, 
     decision='SKIPPED':  signal was blocked/dropped, no trade placed
 
     FIX 2026-10-09: added `reason`. When None, update_signal_decision falls back
-    to the last log() line — so the 48 existing call sites (which all do
-    log(reason) immediately before this call) persist their block reason with
-    zero changes. Pass reason explicitly to override.
+    to the last log() line — so the 44 existing call sites in decider_run.py
+    (which all do log(reason) immediately before this call) persist their block
+    reason with zero changes. Pass reason explicitly to override. The 3 call
+    sites in hl-sync-guardian.py (a long-running daemon, where the fallback
+    would be stale) pass reason explicitly.
     """
     return update_signal_decision(token, direction, decision, reason=reason, signal_id=signal_id)
 

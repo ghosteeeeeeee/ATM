@@ -3,9 +3,11 @@ import time
 FP = '/root/.hermes/logs/pipeline.log'
 
 # AUDIT 2026-10-09: last non-empty message logged by this process. Lets
-# mark_signal_executed() persist WHY a signal was skipped without editing all
-# 48 call sites — every block path does log(reason) immediately before the
-# mark_signal_executed() call, so this captures the exact reason string.
+# mark_signal_executed() persist WHY a signal was skipped without editing the
+# 44 decider_run.py call sites — every block path there does log(reason)
+# immediately before the mark_signal_executed() call, so this captures the
+# exact reason string. Long-running daemons (hl-sync-guardian.py) must pass
+# reason= explicitly, since a stale fallback would write a wrong message.
 _LAST_LOG_MSG = ''
 
 def log(msg, level=None):

@@ -2792,7 +2792,11 @@ def close_orphan_paper_trades(hl_pos, prices):
                         # Mark signal as executed
                         try:
                             from signal_schema import mark_signal_executed
-                            mark_signal_executed(r['token'].upper(), r.get('side', '').upper())
+                            # Explicit reason: this is a long-running daemon, so the
+                            # get_last_log_msg() fallback would capture a stale message
+                            # from potentially minutes (and another token) ago.
+                            mark_signal_executed(r['token'].upper(), r.get('side', '').upper(),
+                                                 reason='hl-sync-guardian: batch-mirrored live copy trade')
                         except Exception:
                             pass
                 log(f'  BATCH mirrored: {placed_tokens}', 'PASS')
@@ -2834,7 +2838,10 @@ def close_orphan_paper_trades(hl_pos, prices):
                                     conn4.close()
                             try:
                                 from signal_schema import mark_signal_executed
-                                mark_signal_executed(ht.upper(), direction.upper())
+                                # Explicit reason: long-running daemon — the
+                                # get_last_log_msg() fallback would be stale here.
+                                mark_signal_executed(ht.upper(), direction.upper(),
+                                                     reason='hl-sync-guardian: mirrored live copy trade')
                             except Exception:
                                 pass
                             hype_count += 1
@@ -2933,7 +2940,10 @@ def close_orphan_paper_trades(hl_pos, prices):
                     log(f'  [LIVE-MISS] Mirrored {token} {direction} @ {curr_price} → {result}', 'PASS')
                     try:
                         from signal_schema import mark_signal_executed
-                        mark_signal_executed(ht.upper(), direction.upper())
+                        # Explicit reason: long-running daemon — the
+                        # get_last_log_msg() fallback would be stale here.
+                        mark_signal_executed(ht.upper(), direction.upper(),
+                                             reason='hl-sync-guardian: LIVE-MISS mirrored open trade')
                         log(f'  [LIVE-MISS] Marked {ht} {direction} signal as executed in DB', 'PASS')
                     except Exception as sig_err:
                         log(f'  [LIVE-MISS] Failed to mark signal executed: {sig_err}', 'WARN')
