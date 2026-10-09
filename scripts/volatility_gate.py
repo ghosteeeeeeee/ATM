@@ -192,6 +192,7 @@ REGIME_SIGNALS = {
         'bb-squeeze+', 'bb-squeeze-',  # bollinger squeeze breakout — works in high vol (SHORT added 2026-10-02: asymmetry fix)
         'volume-breakout-long+', 'volume-breakout-short-',  # volume-confirmed breakout — LONG added 2026-10-02 (reverse asymmetry fix: SHORT was added but LONG was never in HIGH)
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — works in high vol (SHORT added 2026-10-02: asymmetry fix, LONG was whitelisted but SHORT was not)
+        'btc-pump-rider+',  # BTC breakout → alt lagging LONG — works in high vol (2026-10-09)
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in high vol
         'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-13)
