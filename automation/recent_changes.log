@@ -4439,3 +4439,5 @@ BY: auto_1hr
 [2026-10-09 16:12] auto_1hr: NO CONFIG CHANGE — 1T last hour JUP pump-chain+ atr_sl_hit −$0.04 | 1 open ETH continuation+ (SL/TP OK) | 24h 18T ~6W ≈−0.12 | hard_max_loss 7/18=38.9% (hold brain_auditor eval) | atr_sl_hit 11.1% (tpsl stable) | Kill: none | Overtrade 1/hr | Streak inactive | timers fresh, live_trading=true
 [2026-10-09 17:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 3 open CC pump-chain+/LDO pump-chain-/ETH continuation+ (all sized SL/TP OK) | 24h 18T 7W +$0.04 WR 38.9% | hard_max_loss 7/18=38.9% (hold brain_auditor eval) | atr_sl_hit 11.1% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive (14:00 +0.13 broke it) | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
+BY: auto_1hr
+[2026-10-09 18:12] auto_1hr: NO CONFIG CHANGE — 2T last hour ALGO pump-chain-v6- combo SHORT atr_sl_hit −$0.02 + LDO pump-chain- SHORT atr_sl_hit −$0.07 | 2 open ETH continuation+/CC pump-chain+ (SL/TP OK) | 24h 20T 8W −$0.05 WR 40% | hard_max_loss 7/20=35% (hold brain_auditor eval) | atr_sl_hit 20% (tpsl stable) | Kill: none | Overtrade 2/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true

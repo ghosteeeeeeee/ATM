@@ -7119,3 +7119,28 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss still ~39% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
 - 3 open: CC pump-chain+ LONG, LDO pump-chain- SHORT, ETH continuation+ LONG — all sized with SL/TP
+
+## [2026-10-09 18:12] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** −$0.09 last hour | 24h: 20T 8W −$0.05 (WR 40%)
+**Last hour:** ALGO pump-chain-,pump-chain-v6- SHORT atr_sl_hit −$0.02 (−0.92%) | LDO pump-chain- SHORT atr_sl_hit −$0.07 (−1.59%)
+**24h exits:** hard_max_loss 7T −$0.85 | stale_exit 3T +$0.75 | profit-monster-trail 4T +$0.21 | atr_sl_hit 4T −$0.17 | pump_exit_dead_money 1T +$0.01 | ORPHAN_PAPER 1T $0
+**Open:** 2 (ETH continuation+ LONG $22.10 SL 2480.39/TP 2520.24 | CC pump-chain+ LONG $11.10 SL 0.121667/TP 0.125106)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: no signal with 3+ trades 0% WR this hour (pump-chain- 1T, combo 1T)
+- atr_sl_hit 4/20=20% — under 40% threshold, tpsl stable
+- hard_max_loss 7/20=35% −$0.85 — dominant but within brain_auditor eval hold (Oct 9/10)
+- Overtrade: 2/hr (limit 20)
+- Streak: 14:00 +$0.13 broke the run; 15:−, 16:0, 17:− not 3 consecutive negative
+- pump-chain+ alone still best (8T 4W +$0.38/24h); v5/v6 combo 2T 0W −$0.16 below kill threshold
+- Timers fresh (pump-hunter/compactor 40s, watchdog 47s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still 35% of 24h closes — awaiting brain_auditor; next lever is SL width not signal kills
+- Both closes this hour were SHORT atr_sl_hit — pump-chain- SHORT entries catching bounces; watch but n=2
