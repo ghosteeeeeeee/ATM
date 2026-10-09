@@ -1,127 +1,152 @@
 {
-    "timestamp": "2026-10-08T20:40:00Z",
-    "agent": "brain_auditor",
-    "run_type": "full audit — 0 config changes",
-    "session_brain_stats": {
-        "queries": ["pump-chain short regime gate losing", "short filter long bias tape", "wrong side trade pattern"],
-        "top_insight": "Recurring 'wrong-side trade' topic across sessions; SHORT_CONTINUUM filter (SCORE_MAX=60) is the existing implementation of the watchdog's recommended long-bias gate — actively blocking (score 64-83) as of 20:21-20:31 UTC"
+  "timestamp": "2026-10-09T15:37:01Z",
+  "agent": "brain_auditor",
+  "trade_summary_24h": {
+    "trades": 18,
+    "pnl": 0.04,
+    "wr": 38.9,
+    "7d": {
+      "trades": 156,
+      "pnl": -0.39,
+      "wr": 48.7
     },
-    "trade_summary_24h": {
-        "trades": 11, "wins": 5, "wr_pct": 45.5, "pnl_usdt": 0.99,
-        "note": "WATCHDOG '14/20 losing streak' is a rolling last-20 window artifact spanning Oct 7-8 losing cluster. Actual 24h PG: +$0.99. 7d: 189T +$1.90 54.5%. LONG 164T +$2.21 57.3%, SHORT 25T -$0.31 36.0% (AT RISK Oct 11 goal)."
+    "long_7d": {
+      "trades": 132,
+      "pnl": -0.21,
+      "wr": 50.8
     },
-    "drift_findings": [
-        {
-            "id": "DRIFT-W1",
-            "severity": "info",
-            "finding": "Watchdog recommends 'gate pump-chain- shorts when 5m LONG_BIAS >70%' — ALREADY IMPLEMENTED as SHORT_CONTINUUM filter (score>60 blocks shorts unless z=STRONG_NEG). Verified firing live: POL/DOGE/BTC/HYPER/TURBO/CC/PUMP/GMT SHORTs blocked 20:21-20:31 UTC (score 64-83). The 7 wrong-side shorts (Oct 7-8) fired during a window when score was <60. No new gate needed.",
-            "action": "None — defense exists and is active. Suggest watchdog prompt gains awareness of existing gates to avoid redundant recommendations."
-        },
-        {
-            "id": "DRIFT-C-standing",
-            "severity": "MED",
-            "finding": "PUMP_CHAIN_LONG_RSI_MAX=85 enforced at signal_compactor.py:2933 but fire path for FOGO/IOTA (RSI 72-73, both HML losses) unverifiable — signal_metadata lacks standalone_bypass/confluence keys. Standing bug_hunter backlog item.",
-            "action": "No value change. 30d RSI>70 band = 34T -$0.29 net negative BUT contains AVAX +$1.02 (biggest single winner) — blocking RSI>70 would LOSE ~$0.44 net. CEO raise 70→85 ratified by data."
-        }
-    ],
-    "recurring_problems": [
-        {
-            "problem": "hard_max_loss (#1 bleed): 7d 56T -$8.17 avg lev 4.1",
-            "status": "MITIGATION LIVE, evaluating",
-            "detail": "CUT_LOSER_PNL -1.00→-1.50 (Oct 7 14:39) + HML_VOL_ATR_MULT=0.5. Post-change: 5T -$0.59 over ~30h = ~4/day (was ~8/day pre-change). Frequency halved. n=5 insufficient for verdict — 48h eval due Oct 9 14:39.",
-            "evidence": "Post-change HML share 41.7% of closes (5/12); since Oct 8 00:00: 3T -$0.47 of 9 closes (33%). IMX SHORT -5.19% acct = ATR mult gave EXTREME room as designed (trail chance) — trade just lost."
-        },
-        {
-            "problem": "pump-chain- SHORT 7d -$0.31 (goal ≥$0 by Oct 11)",
-            "status": "DEFENSES STACKED, self-healing",
-            "detail": "7-loss cluster (net -$0.61) was Oct 7 05:24→Oct 8 13:53, mostly EXTREME regime lev 5. Defenses now live: SHORT_RSI_HARD_FLOOR=45, PUMP_CHAIN_SHORT_HIGH_BLOCK=True, NORMAL boost 1.2, EXTREME at 1.0 (revert ratified by 14d RSI>=45 data: 41T +$1.09), SHORT_CONTINUUM actively blocking. Since Oct 8 14:00: 0 shorts executed (continuum score >64). 30d habitat: NORMAL 12T 75% +$0.53 ONLY profitable; EXTREME 102T 49% -$0.63 bleed; HIGH blocked.",
-            "evidence": "Post-boost: 0 NORMAL pump-chain- trades yet (boost too fresh). 1 EXTREME trade since revert (IMX -$0.23, RSI 45.0 floor boundary, n=1)."
-        }
-    ],
-    "missing_implementations": [],
-    "losing_trade_autopsy": [
-        {
-            "losing_trade": "IMX SHORT pnl=-$0.23 (-5.19% acct, lev 5)",
-            "signal": "pump-chain-", "regime": "EXTREME", "meta_rsi": 45.0,
-            "root_cause": "Shorted IMX at RSI=45.0 (exact floor boundary) in EXTREME vol during a LONG_BIAS tape. Price pumped against us ~1.3% in 7min → HML. Wrong side: LONG was the winning side (IMX LONG +$0.48 5h later at RSI 48.9).",
-            "entry_check": "RSI 45.0 squeaked past SHORT_RSI_HARD_FLOOR=45. Entry 13:46, continuum score must have been <60 then (filter passes).",
-            "recommended_change": "None new — floors/HIGH-block/continuum all live. Raise floor 45→46 to catch boundary? REJECTED: 14d EXTREME RSI>=45 pays +$1.09; n=1 loss ≠ pattern.",
-            "impact_on_winners": "N/A (no change)",
-            "confidence": "HIGH that no change needed — defenses address class, not this trade"
-        },
-        {
-            "losing_trade": "FOGO LONG pnl=-$0.11 (-3.07% acct, HML)",
-            "signal": "pump-chain+", "regime": "EXTREME", "meta_rsi": 73.3,
-            "root_cause": "Overbought chase in EXTREME (2nd FOGO HML in 24h — first was Oct 7 RSI 70.0 -$0.06). Passed PUMP_CHAIN_LONG_RSI_MAX=85. Wrong side: the dump was running; shorts at that moment won.",
-            "entry_check": "RSI 73.3, below 85 ceiling. Repeat entry on same coin after prior HML loss — no per-coin HML cooldown exists.",
-            "recommended_change": "Per-coin HML cooldown (block pump-chain+ re-entry on coin that HML'd in last 24h) — MONITOR only: FOGO is the only 30d repeat (n=1). Below filter threshold.",
-            "impact_on_winners": "Would block FOGO 2nd entry only. Too small n to deploy.",
-            "confidence": "MEDIUM on pattern, HIGH on not deploying yet"
-        },
-        {
-            "losing_trade": "IOTA LONG pnl=-$0.13 + BLUR LONG pnl=-$0.15 (combo pump-chain+,pump-chain-v5 / v5)",
-            "signal": "pump-chain-v5 combos", "regime": "EXTREME/HIGH", "meta_rsi": 72.7/43.8,
-            "root_cause": "V5 LONG — CEO killed 17:55 (5f6364d5, 3rd re-enable FAILED). These closed 15:02-15:04 pre-kill. Post-kill: 0 V5 trades. V5_SHORT stays True (regime-routed, firing 0-1/cycle).",
-            "recommended_change": "None — kill verified clean.",
-            "confidence": "HIGH"
-        }
-    ],
-    "changes_from_last_run": [
-        {
-            "change": "CUT_LOSER_PNL -1.00→-1.50 (Oct 7 14:39)",
-            "verdict": "WORKING (preliminary) — HML ~8/day→~4/day, magnitude -$0.16→-$0.12 avg. n=5. 48h eval Oct 9 14:39.",
-            "action": "KEEP, monitor"
-        },
-        {
-            "change": "NORMAL pump_chain- SHORT boost 1.0→1.2 (Oct 8 02:36)",
-            "verdict": "UNEVALUABLE — 0 NORMAL pump-chain- trades since boost. Habitat is correct (30d 75% WR +$0.53).",
-            "action": "KEEP, 48h eval Oct 10 02:36"
-        },
-        {
-            "change": "EXTREME pump_chain- SHORT dampen revert 0.5→1.0 (Oct 8 08:39)",
-            "verdict": "1 trade since (IMX -$0.23, RSI 45.0 boundary). 14d RSI>=45 EXTREME data (+$1.09/41T) still justifies 1.0. n=1.",
-            "action": "KEEP at 1.0. If next 3 EXTREME shorts all lose → re-dampen to 0.7."
-        },
-        {
-            "change": "exit_time trigger + backfill 5618 rows (Oct 8 07:37)",
-            "verdict": "WORKING — analytics filterable on exit_time. No trading impact.",
-            "action": "KEEP"
-        },
-        {
-            "change": "PUMP_CHAIN_V5 LONG kill (CEO 5f6364d5, 17:55)",
-            "verdict": "VERIFIED CLEAN — 0 V5 trades post-kill. pump_chain_v5_short still runs (regime-routed, 0-1/cycle).",
-            "action": "KEEP"
-        }
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-10-08T20:40:00Z",
-            "idea": "FOGO-class repeat-HML coin cooldown — block pump-chain+ re-entry on any coin that hit hard_max_loss within prior 24h",
-            "rationale": "FOGO HML'd twice in 24h (Oct 7 RSI 70 -$0.06, Oct 8 RSI 73.3 -$0.11) — same coin, same overbought-chase pattern, same wrong side. Second entry was preventable memory-free re-entry.",
-            "expected_impact": "30d: only 1 preventable repeat (FOGO). Small but free. Would NOT have blocked any winners (winners don't HML then re-fire within 24h — verify before deploy).",
-            "category": "entry sniper / memory",
-            "status": "suggested-monitor",
-            "risk": "low",
-            "note": "n=1 repeat in 30d — BELOW deploy threshold. Requires per-coin exit_reason memory in signal path. Deploy when repeats reach n>=3."
-        },
-        {
-            "date": "2026-10-08T20:40:00Z",
-            "idea": "Watchdog gate-awareness: suppress 'gate shorts in long-bias' steers when SHORT_CONTINUUM is actively blocking (score>60)",
-            "rationale": "Watchdog deep-analysis recommends a gate that already exists and is firing. Redundant recommendations erode trust in steers and could trigger unnecessary config churn.",
-            "expected_impact": "Steer quality: eliminate false-urgent 'missing gate' alarms. Zero trading impact.",
-            "category": "meta / watchdog",
-            "status": "suggested",
-            "risk": "none"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "48h eval Oct 9 14:39 — CUT_LOSER -1.50 + HML_VOL_ATR_MULT: HML share of closes, trail_family share, magnitude. If HML >40% of closes still → next lever is trail activation distance, not threshold.",
-        "48h eval Oct 10 02:36 — NORMAL pump_chain- boost 1.2: any NORMAL trades? WR? If 0 trades by Oct 10, boost is moot (signal doesn't fire in NORMAL) — consider detection-side fix, not confidence.",
-        "SHORT 7d goal Oct 11 — currently -$0.31. Continuum blocking (score 64-83) = no new SHORT bleed. Old losses age out. On track if no new shorts lose.",
-        "Monitor: next 3 EXTREME pump-chain- shorts — if all lose, re-dampen EXTREME to 0.7.",
-        "Monitor: FOGO-class repeats — track per-coin HML re-entries, deploy cooldown at n>=3.",
-        "bug_hunter standing: DRIFT-A bypass hard-skip combined_mult==0.0; DRIFT-E entry_rsi_14 write-path; disk retention (85%).",
-        "Sideways find (LOW): pipeline log footer shows '+43.31% PnL' — likely raw pnl_pct sum display bug (leveraged % summed). Cosmetic; log to bug_hunter backlog."
-    ]
+    "short_7d": {
+      "trades": 24,
+      "pnl": -0.18,
+      "wr": 37.5,
+      "deadline": "Oct 11 AT RISK"
+    },
+    "open": "2 longs (ETH continuation+, JUP pump-chain+)",
+    "portfolio_health": "critical (watchdog)"
+  },
+  "watchdog_pattern_verdicts": [
+    {
+      "claim": "pump-chain+ LONG at meta_rsi>=60 -> 23% WR n=13; reject RSI>=60",
+      "verdict": "DISPROVED",
+      "evidence": "7d n=33: RSI>=60 = 43.5%WR +$0.21 (n=23) vs RSI<60 = 40.0%WR +$1.14 (n=10). Fisher p=1.000. 14d OOS: hot 44% +$0.17 vs cool 41% +$1.28. Watchdog used short n=13 window.",
+      "winner_impact": "RSI_MAX=60 would block 10/14 (71%) of 7d winners incl ME +$0.88, GRASS +$0.17",
+      "action": "REJECT RSI_MAX=60. Existing PUMP_CHAIN_LONG_RSI_MAX=75 (landed today) is the correct ceiling: 30d 75+ = 12T 33.3% -$0.55; 70-75 kept open (+$0.25, n=12 < 20 threshold)."
+    },
+    {
+      "claim": "8 recent losses fading momentum / wrong-side",
+      "verdict": "PARTIALLY CONFIRMED — entry quality not direction",
+      "evidence": "24h 7/10 losers = hard_max_loss, all LONG. BTC regime LONG_BIAS both TFs — direction correct. Failures are chop entries: 49/57 7d hard_max_loss never armed +0.40% trail (median MFE 0.095%). These never trended.",
+      "action": "Chop early-exit delegated to bug_hunter (creative improvement below)"
+    }
+  ],
+  "hard_max_loss_eval_2026_10_09": {
+    "status": "MAGNITUDE FIX WORKING — HOLD frequency watch to Oct 10",
+    "cut_loser_pnl_minus_1_50_impact": "pre: 64T avg -3.83% acct | post (Oct 7 15:00+): 12T avg -2.99% acct (-22% magnitude). Daily $ bleed: Oct1-6 avg -$1.35/day -> Oct7-9 avg -$0.64/day.",
+    "remaining": "57T 7d -$8.03 still #1 bleed exit. 0% WR. 49/57 never armed trail = chop entries, not trend reversals. Top: bb-squeeze+ 14T -$1.97, pump-chain- 10T -$1.44, pump-chain+ 9T -$1.21.",
+    "verdict": "KEEP CUT_LOSER_PNL=-1.50. Do not tighten further (one variable). Frequency fix = early-exit code, not threshold."
+  },
+  "losers_autopsy_24h": [
+    {
+      "trade": "BANANA pump-chain+ LONG rsi=78.95",
+      "pnl": -0.16,
+      "root_cause": "Overbought chase — already blocked by PUMP_CHAIN_LONG_RSI_MAX=75 landed this morning",
+      "status": "FIXED"
+    },
+    {
+      "trade": "AVAX pump-chain+ LONG rsi=58.18 EXTREME lev5",
+      "pnl": -0.11,
+      "root_cause": "Chop entry in EXTREME, never armed trail, lev5 amplified -4.86% acct",
+      "status": "no safe filter (58 in profitable 45-60 band 30d +$3.07)"
+    },
+    {
+      "trade": "ICP pump-chain-v6+ LONG rsi=66.67 HIGH lev5",
+      "pnl": -0.08,
+      "root_cause": "v6 new signal n=3 0W all hard_max_loss — insufficient data to tune",
+      "status": "MONITOR n>=10"
+    },
+    {
+      "trade": "BTC continuum-trend+ LONG rsi=57.62 FLAT",
+      "pnl": -0.17,
+      "root_cause": "Single trade, FLAT vol regime, no follow-through",
+      "status": "noise n=1"
+    }
+  ],
+  "changes_from_last_run": [
+    {
+      "change": "PUMP_CHAIN_LONG_RSI_MAX 85->75 (prior run today, commit ff0ccd0f)",
+      "impact": "Landed. BANANA@78.95 would-be repeat blocked. 70-75 band preserved. WORKING as designed."
+    },
+    {
+      "change": "CUT_LOSER_PNL -1.00->-1.50 (Oct 7)",
+      "impact": "Magnitude -22% (avg -3.83%->-2.99% acct). Daily bleed halved. WORKING. HOLD."
+    },
+    {
+      "change": "PUMP_CHAIN_SHORT_HIGH_BLOCK=True (Oct 7)",
+      "impact": "Post-block pump-chain- SHORT: 4T all EXTREME 0%WR -$0.45. HIGH losses stopped (ADA was pre-block). EXTREME keep-standing per CEO."
+    },
+    {
+      "change": "exit_time NULL trigger (Oct 8)",
+      "impact": "0 NULL on closed trades. WORKING."
+    }
+  ],
+  "config_changes_applied": [],
+  "config_change_rationale": "0 changes this run. Morning's RSI_MAX=75 is the correct pump-chain ceiling and already in tree. CUT_LOSER -1.50 needs 48h more cohort. Watchdog RSI_MAX=60 rejected (would kill 71% of winners, p=1.0). No other filter passes significance + winner-impact checks. Forcing a change would be destabilizing.",
+  "creative_improvements": [
+    {
+      "date": "2026-10-09T15:37:01Z",
+      "idea": "Chop early-exit: close open position if unrealized MFE never exceeded +0.15% after 90 minutes in LOW volume_regime",
+      "rationale": "49/57 (86%) hard_max_loss trades 7d NEVER armed +0.40% trail; median MFE 0.095%. These trades are dead on arrival — capital sits in chop until -1.5% account stop. Existing UNIVERSAL_MAX_HOLD and pump_exit_dead_money exits don't catch the non-arming middle. Every dollar not bled to chop is a dollar for the RSI 45-60 setups that actually run.",
+      "expected_impact": "Could cut ~40-60% of hard_max_loss closes early at ~-0.3% instead of -1.5% acct. Est. saves $3-5/7d at current frequency.",
+      "category": "exit management",
+      "status": "delegated_bug_hunter",
+      "risk": "medium — must not exit winners mid-consolidation before leg 2. Guard: only LOW volume_regime, only if MFE < 0.15%, skip if position < 90min old."
+    },
+    {
+      "date": "2026-10-09T15:37:01Z",
+      "idea": "Re-baseline all RSI band analytics on _signal_metadata.rsi_14 (meta RSI), purge entry_rsi_14 usage from dashboards/watchdog prompts",
+      "rationale": "DRIFT-E: entry_rsi_14 median abs diff vs meta = 12.6 pts. Watchdog's disproven RSI>=60 claim likely used unreliable stored RSI. Every past RSI audit based on entry_rsi_14 is suspect.",
+      "expected_impact": "Prevents future false patterns; watchdog accuracy",
+      "category": "data integrity",
+      "status": "standing_delegate",
+      "risk": "low"
+    }
+  ],
+  "drift_findings": [
+    {
+      "id": "WATCHDOG-REGIME-CONTRADICTION",
+      "severity": "MED",
+      "finding": "watchdog.json regime_summary.trend_quality=STRONG_DOWN but its own deep_analysis says trend_quality UP + linreg BULL all TFs alignment 1.0. One field stale or miscomputed.",
+      "action": "flag to bug_hunter — trade_watchdog may be mixing 1m micro-trend with macro trend_quality"
+    }
+  ],
+  "next_actions": [
+    "bug_hunter: implement chop early-exit (MFE<0.15% after 90min in LOW vol) in position_manager — creative improvement #1",
+    "Monitor pump-chain v6+ LONG: 3T 0W all hard_max_loss — eval at n>=10, do not kill on 3T",
+    "Monitor SHORT 7d: -$0.18, deadline Oct 11 — improving from -$0.31 morning",
+    "hard_max_loss frequency: re-eval Oct 10 after CUT_LOSER -1.50 cohorts mature",
+    "Fix watchdog trend_quality contradiction (STRONG_DOWN vs UP)",
+    "Disk still 85% — standing bug_hunter retention plan overdue"
+  ],
+  "goals": {
+    "24h_pnl": {
+      "current": 0.04,
+      "target": ">=0",
+      "status": "MET"
+    },
+    "7d_pnl": {
+      "current": -0.39,
+      "target": ">=0",
+      "status": "AT RISK — flipped negative, window aging"
+    },
+    "short_7d": {
+      "current": -0.18,
+      "target": ">=0 by Oct 11",
+      "status": "AT RISK improving"
+    },
+    "hard_max_loss_pct": {
+      "current": "41.2% 24h / 36.5% 7d closes",
+      "target": "<40%",
+      "status": "7d MET, 24h watch"
+    }
+  }
 }

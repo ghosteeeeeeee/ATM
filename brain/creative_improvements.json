@@ -3613,5 +3613,23 @@
     "category": "process/monitoring",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-09T15:37:01Z",
+    "idea": "Chop early-exit: close open position if unrealized MFE never exceeded +0.15% after 90 minutes in LOW volume_regime",
+    "rationale": "49/57 (86%) hard_max_loss trades 7d NEVER armed +0.40% trail; median MFE 0.095%. These trades are dead on arrival — capital sits in chop until -1.5% account stop. Existing UNIVERSAL_MAX_HOLD and pump_exit_dead_money exits don't catch the non-arming middle. Every dollar not bled to chop is a dollar for the RSI 45-60 setups that actually run.",
+    "expected_impact": "Could cut ~40-60% of hard_max_loss closes early at ~-0.3% instead of -1.5% acct. Est. saves $3-5/7d at current frequency.",
+    "category": "exit management",
+    "status": "delegated_bug_hunter",
+    "risk": "medium — must not exit winners mid-consolidation before leg 2. Guard: only LOW volume_regime, only if MFE < 0.15%, skip if position < 90min old."
+  },
+  {
+    "date": "2026-10-09T15:37:01Z",
+    "idea": "Re-baseline all RSI band analytics on _signal_metadata.rsi_14 (meta RSI), purge entry_rsi_14 usage from dashboards/watchdog prompts",
+    "rationale": "DRIFT-E: entry_rsi_14 median abs diff vs meta = 12.6 pts. Watchdog's disproven RSI>=60 claim likely used unreliable stored RSI. Every past RSI audit based on entry_rsi_14 is suspect.",
+    "expected_impact": "Prevents future false patterns; watchdog accuracy",
+    "category": "data integrity",
+    "status": "standing_delegate",
+    "risk": "low"
   }
 ]
