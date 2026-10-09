@@ -6890,3 +6890,27 @@ Final set: ['IMX', 'INJ']
 - hard_max_loss 6/13=46.2% still dominant — awaiting brain_auditor verdict
 - v5 family still on 7d kill-bar watch
 - Quiet stretch continues (0T this hour), 2 open LONGs from 07:32/07:36
+
+## [2026-10-09 09:12 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** −$0.08 last hour | 24h: 14T 5W −$0.33 (WR 35.7%)
+**Last hour:** ICP pump-chain-v6+ LONG hard_max_loss −$0.08 (−3.56%)
+**24h exits:** hard_max_loss 7T −$0.94 | stale_exit 4T +$0.60 | profit-monster-trail 1T +$0.09 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
+**Open:** 1 — IOTA pump-chain+,pump-chain-v6+ LONG (open since 07:36, entry 0.050761, SL 0.050682)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 1T last hour — no signal with 3+ trades 0% WR this hour
+- atr_sl_hit 0/14=0% — tpsl stable
+- hard_max_loss 7/14=50% −$0.94 — still dominant, within Oct 9/10 brain_auditor eval hold; next lever is SL width not signal kills
+- Overtrade: 1/hr (limit 20)
+- Streak: not 3+ consecutive negative hours (hour 05 +$0.09, hour 08 −$0.08)
+- Timers fresh, live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss 50% of closes — awaiting brain_auditor verdict; IOTA SL is only 0.155% below entry (very tight, watch this trade)
+- v5 family still on 7d kill-bar watch (pump-chain+,pump-chain-v5 2T 0W −$0.22 over 24h)
