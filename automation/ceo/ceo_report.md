@@ -165,3 +165,35 @@ py_compile OK; LONG_RSI_CEILING=75 loads; CONFLUENCE_REQUIRED=True, LIVE_TRADING
 Protected flags INTACT (CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True, kill JSON=true). Cap B skips confirmed in pipeline.log. Wyckoff confluence-blocks confirmed in CONFLUENCE-DEBUG lines. Disk 84%.
 
 **Metric checkpoint Oct 12:** 7d PnL ≥$0 AND WR ≥50% (RSI-75 + Cap B + dampen cohort effect). Oct 10: HML frequency eval. Oct 11: SHORT ≥$0 + wyckoff pairing delivery.
+
+## CEO Report — 2026-10-09 22:30 UTC (BUG-048 decision: 1m candle pipeline)
+
+### Decision
+**Option A — split the seeder. Fix upstream, kill the aggregator dependency. Do NOT revive `_aggregate_1m.py`.** Sequence BEFORE `plans/align-with-btc-regime.md`. No `hermes_constants.py` changes.
+
+### Diagnosis (own SQL, 22:2x UTC — not bug_hunter's numbers)
+- `candles_1m`: 179 tokens, **on-time(<2min)=10**, median stale **775s**, p90 **1495s**. Journal: `filled=0 dev=0` every run. Aggregator confirmed 100% dead.
+- `price_history` last 24h: **126,544 windows, 100% have exactly 1 tick** — `bar_count>=3` can never pass. Structural, by design (`signal_schema.py:4507`).
+- Landmines confirmed: **230,827 stuck `is_closed=0` rows** (all >1h, 97 tokens); **91/91 tokens with both dev+closed have the ancient-boundary shape** (`oldest_dev < last_closed`) — a MIN_BARS revert re-arms the ~5.5M fill-storm + DB-lock race that Oct-5 killed.
+- Still live: `_aggregate_tf` INSERT-OR-REPLACE vol=0 — **4h 27.8% vol0, 1h 11.4%** last 24h (15m already fixed at 4.2%).
+
+### Root Cause
+Staleness = seeder rotation, not the dead aggregator: `TOKENS_PER_RUN=10` over 178 tokens, timer collapses to run duration → 18-42min full pass, skip-if-fresh never fires (`Seeded 10/10` every run). The aggregator was never the freshness source — it was only ever a gap-filler, and it was deliberately retired on Oct-5 to protect real OHLC from flat O=H=L=C vol=0 overwrites.
+
+### Fix Applied
+None — decision-only run. Option B rejected: (1) revives a component a prior verdict knowingly retired; (2) requires 3 coordinated fixes (revert + boundary max(walkback,lc) + UPDATE dev-close path) — subtle, high-risk diff; (3) still accepts flat vol=0 candles at the live edge; (4) leaves `_aggregate_tf` unfixed. Option A fixes the actual root cause (rotation too slow), delivers REAL OHLC+volume for all 178 tokens <2min, makes the aggregator irrelevant, and is the natural place to fix the vol=0 overwrite class in the same file.
+
+### Sequencing vs align-with-btc-regime.md
+**Candles FIRST.** BTC-regime alignment is a signal_compactor entry gate whose 7d shadow review (`would-block/would-allow`) is only meaningful on correct RSI — shadow data on 13min-median-stale 1m closes is garbage-in-garbage-out. Candle fix is infrastructure (price_collector.py only), does not confound the exit-engine experiment the plan sequences after, and the plan is default-OFF with no hard deadline. Bug_hunter owns the candle work; signal_analyst's Oct-11 wyckoff pairing is unblocked and unaffected.
+
+### Parameters (all in `price_collector.py`, NOT hermes_constants.py)
+- Fast 1m loop: **60 tokens/run** (60 API calls/run, well under rate limits) → full 178-token rotation in 3 runs ≈ 3-5min at current cadence. Skip-if-fresh threshold stays 300s.
+- Slow multi-TF backfill: unchanged 10 tokens × 4 TFs (5m/15m/1h/4h).
+- `_aggregate_tf`: switch closed-path writes to INSERT OR IGNORE (stop vol=0 overwrites); 1m excluded from aggregate_tf entirely (seeder owns 1m).
+- Aggregator: leave in place until 48h post-split verification, then DELETE `_aggregate_1m.py` + service/timer + prune 230,827 stuck rows.
+
+### Verification (post-implementation, not this run)
+After split lands + 1 full rotation: on-time(<2min) candles_1m ≥150/178; vol0% on 1h <2%; zero `filled=0` service errors; `Seeded N/60` logs; restart pipeline per AGENTS.md rule. Metric checkpoint Oct 12 (with existing cohort checkpoint): alt-token RSI staleness p90 <180s.
+
+### Protected flags
+CONFLUENCE_REQUIRED / LIVE_TRADING_ENABLED / hermes_constants.py — **untouched, verified**.

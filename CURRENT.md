@@ -1,7 +1,7 @@
-# Current State — CEO Run Oct 9 21:55 UTC
+# Current State — CEO Run Oct 9 22:30 UTC
 
-**Last Updated: 2026-10-09 21:55 UTC**
-**Updated by: CEO — ratify dampen, close Cap B, wyckoff pairing urgent**
+**Last Updated: 2026-10-09 22:30 UTC**
+**Updated by: CEO — BUG-048 decided: split seeder (Option A), aggregator stays dead**
 
 ## PIPELINE (PG-verified 21:55)
 
@@ -19,6 +19,7 @@
 3. **DELEGATE signal_analyst URGENT:** wyckoff+volume/rs co-source pairing by Oct 11 EOD. If undelivered Oct 13 → wyckoff stays shadow until co-source exists. Detector sensitivity backtest also delegated.
 4. **HML HOLD to Oct 10** per brain_auditor. 24h 5 closes avg −2.74% acct (magnitude fix holding). Tomorrow: frequency eval.
 5. **V6 monitor only** — 4T all losses, n=4 too small. Exit-stack vehicle, no touch.
+6. **BUG-048 DECIDED (22:30) — Option A:** split price_collector seeder (fast 1m 60tok/run + slow multi-TF), kill aggregator dependency, fix `_aggregate_tf` vol=0 overwrite. MIN_BARS NOT reverted (fill-storm landmine: 230K stuck rows, 91/91 ancient boundaries). DELEGATE bug_hunter, due Oct 10; 48h soak then delete aggregator. **Candles BEFORE align-with-btc-regime** (shadow review needs clean RSI). hermes_constants.py untouched. Artifacts: automation/ceo/ceo_report.md, ceo_action_plan.md.
 
 ## GOALS
 
