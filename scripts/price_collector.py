@@ -38,6 +38,24 @@ BATCH_SIZE = 500  # Hyperliquid universe ~500 tokens
 CANDLE_PROGRESS_FILE = '/root/.hermes/data/candle_seed_progress.json'
 CANDLE_TOKENS_FILE = '/root/.hermes/data/candle_universe_tokens.json'
 
+# ── BUG-048 (Option A, CEO-ratified 2026-10-09): fast 1m seeder ──
+# 1m candles are refreshed with REAL Binance/HL OHLC at high frequency so the
+# dead 1m tick aggregator (_aggregate_1m.py — kept alive for its 48h soak)
+# is irrelevant. Separate progress file so the slow multi-TF cursor in
+# CANDLE_TOKENS_FILE is never touched by the fast loop (and vice versa).
+CANDLE_FAST_1M_FILE = '/root/.hermes/data/candle_fast_1m_progress.json'
+FAST_1M_TOKENS_PER_RUN = 60   # CEO-set: 178 tokens / 60 per run = full rotation in 3 runs (~3-5 min)
+FAST_1M_MAX_AGE_S = 300       # re-fetch 1m when newest candle is older than this...
+                              # ...OR has volume=0 (a vol=0 "fresh" candle is fake tick-agg data)
+FAST_1M_FETCH_LIMIT = 200     # Binance klines limit for 1m (matches the legacy slow-path fetch)
+FAST_1M_TIME_BUDGET_S = 25    # hard wall-clock cap per run — guarantees the loop finishes well
+                              # inside the ~36-142s effective timer cadence (no cadence blowup)
+# Slow multi-TF backfill (BUG-048 split): owns 5m/15m/1h/4h ONLY — 1m was
+# removed from its fetch list because the fast loop above owns 1m now.
+# Keeping 1m in both loops would double API load for zero benefit.
+SLOW_SEED_TOKENS_PER_RUN = 10  # (was local TOKENS_PER_RUN in _seed_universe_candles)
+SLOW_SEED_TFS = [('5m', 100), ('15m', 100), ('1h', 100), ('4h', 100)]  # NO '1m' — fast loop owns it
+
 
 def _init_candles_db():
     """Ensure candles.db has all required tables."""
@@ -134,7 +152,17 @@ def _fetch_hl_candles(token: str, interval: str, limit: int = 200) -> list:
 
 
 def _store_candles(token: str, interval: str, candles: list):
-    """Store candles to candles.db."""
+    """Store candles to candles.db.
+
+    FIX 2026-10-09 (BUG-048): guarded upsert instead of INSERT OR REPLACE —
+    never let a flat volume=0 candle overwrite a real (volume>0) OHLC candle.
+    Existing volume=0 rows ARE always overwritten (that is how fake tick-agg
+    candles get healed); real candles only refresh against other real candles.
+    Plain INSERT OR IGNORE was NOT used here on purpose: it would freeze the
+    currently-open candle at its first partial snapshot forever (the seeder
+    sees mid-minute OHLC), re-introducing the stale-candle class of BUG-048.
+    is_closed=1 preserves the old "column DEFAULT 1" semantics of the REPLACE.
+    """
     if not candles:
         return
     table = {'1m': 'candles_1m', '15m': 'candles_15m', '1h': 'candles_1h', '4h': 'candles_4h', '5m': 'candles_5m'}[interval]
@@ -146,7 +174,14 @@ def _store_candles(token: str, interval: str, candles: list):
             conn.execute("PRAGMA busy_timeout=30000")
             conn.execute("PRAGMA journal_mode=WAL")
             c = conn.cursor()
-            c.executemany(f"INSERT OR REPLACE INTO {table} (token, ts, open, high, low, close, volume) VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
+            c.executemany(f"""
+                INSERT INTO {table} (token, ts, open, high, low, close, volume, is_closed)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+                ON CONFLICT(token, ts) DO UPDATE SET
+                    open=excluded.open, high=excluded.high, low=excluded.low,
+                    close=excluded.close, volume=excluded.volume, is_closed=1
+                WHERE {table}.volume = 0 OR excluded.volume > 0
+            """, rows)
             conn.commit()
             return
         except sqlite3.OperationalError as e:
@@ -177,20 +212,131 @@ def _save_candle_progress(tokens: list, cursor: int):
         json.dump({'tokens': tokens, 'cursor': cursor, 'last_run': int(time.time())}, f)
 
 
-def _seed_universe_candles(universe: list):
-    """
-    Seed multi-TF candles for the full universe — 1 token per run, all 3 TFs.
-    Tracks progress in a JSON file so each run picks up where we left off.
-    """
-    _init_candles_db()
+def _get_fast_1m_progress():
+    """Load or init the fast-1m loop's OWN token list + cursor.
 
-    all_tokens = sorted(set(
+    BUG-048: kept in a separate file from CANDLE_TOKENS_FILE so the fast and
+    slow loops can never corrupt each other's cursor (the slow path's
+    _save_candle_progress rewrites its whole file and would wipe a sibling key).
+    """
+    if os.path.exists(CANDLE_FAST_1M_FILE):
+        try:
+            with open(CANDLE_FAST_1M_FILE) as f:
+                data = json.load(f)
+            return data.get('tokens', []), data.get('cursor', 0)
+        except Exception:
+            pass
+    return [], 0
+
+
+def _save_fast_1m_progress(tokens: list, cursor: int):
+    """Persist the fast-1m loop's universe token list + cursor."""
+    with open(CANDLE_FAST_1M_FILE, 'w') as f:
+        json.dump({'tokens': tokens, 'cursor': cursor, 'last_run': int(time.time())}, f)
+
+
+def _universe_token_list(universe: list) -> list:
+    """Sorted, deduped, tradeable coin list from the HL universe (shared by both seeders)."""
+    return sorted(set(
         u['name'] for u in universe
         if u.get('name')
         and not u['name'].startswith('@')
         and len(u['name']) <= 10
         and not u.get('isDelisted', False)  # FIX: don't seed candles for delisted HL tokens
     ))
+
+
+def _fetch_real_candles(token: str, tf: str, limit: int) -> list:
+    """Fetch real API candles for one TF — Binance first, HL fallback (DRIFT-007).
+    Binance fails for HL-only alts; HL candleSnapshot has volume for all HL tokens.
+    Returns [] only when both sources return nothing."""
+    candles = _fetch_binance_candles(token, tf, limit)
+    if not candles or all(cd.get('volume', 0) == 0 for cd in candles):
+        _hl = _fetch_hl_candles(token, tf, limit)
+        if _hl:
+            candles = _hl
+    return candles
+
+
+def _seed_fast_1m(universe: list):
+    """
+    BUG-048 fast 1m seeder (CEO Option A) — refreshes 1m candles for a large
+    slice of the universe EVERY cycle with REAL Binance/HL OHLC, making the
+    dead 1m tick aggregator irrelevant.
+
+    Runs INSIDE main()'s candles lock — must NEVER re-acquire it (deadlock).
+    Own cursor in CANDLE_FAST_1M_FILE; the slow multi-TF rotation is untouched.
+    Skip-if-fresh: only re-fetch a token when its newest 1m candle is older
+    than FAST_1M_MAX_AGE_S OR has volume=0 (a vol=0 "fresh" candle is fake).
+    """
+    all_tokens = _universe_token_list(universe)
+    if not all_tokens:
+        return
+
+    _init_candles_db()  # self-sufficient — runs before the slow path that usually inits
+
+    saved_tokens, cursor = _get_fast_1m_progress()
+
+    # If universe changed significantly, reset (same policy as the slow path)
+    if set(saved_tokens) != set(all_tokens):
+        saved_tokens = all_tokens
+        cursor = 0
+        _save_fast_1m_progress(saved_tokens, cursor)
+        print(f'[candle_seed_1m] Universe changed — reset fast cursor to 0 ({len(saved_tokens)} tokens)')
+
+    conn = sqlite3.connect(CANDLES_DB, timeout=10)
+    conn.execute("PRAGMA busy_timeout=30000")
+    checked = 0
+    refreshed = 0
+    deadline = time.time() + FAST_1M_TIME_BUDGET_S
+    try:
+        for _ in range(FAST_1M_TOKENS_PER_RUN):
+            idx = cursor % len(saved_tokens)
+            token = saved_tokens[idx]
+
+            # Skip-if-fresh: newest 1m candle < FAST_1M_MAX_AGE_S old AND volume > 0.
+            # A vol=0 "fresh" candle means fake tick-agg data — always re-fetch (BUG-048).
+            row = conn.execute(
+                "SELECT ts, volume FROM candles_1m WHERE token=? ORDER BY ts DESC LIMIT 1",
+                (token,)
+            ).fetchone()
+            if row and row[0] is not None and (int(time.time()) - row[0]) < FAST_1M_MAX_AGE_S \
+               and (row[1] or 0) > 0:
+                cursor += 1
+                checked += 1
+                continue  # fresh REAL candle — skip
+
+            # Wall-clock guard: stop before fetching, do NOT advance the cursor
+            # past this token — the next cycle resumes exactly here.
+            if time.time() > deadline:
+                print(f'  [candle_seed_1m] Time budget ({FAST_1M_TIME_BUDGET_S}s) hit after '
+                      f'{checked} tokens — resuming at cursor={cursor} next cycle')
+                break
+
+            candles = _fetch_real_candles(token, '1m', FAST_1M_FETCH_LIMIT)
+            if candles:
+                _store_candles(token, '1m', candles)  # guarded upsert — vol=0 can never downgrade real OHLC
+                refreshed += 1
+            cursor += 1
+            checked += 1
+    finally:
+        conn.close()
+        _save_fast_1m_progress(saved_tokens, cursor)
+
+    print(f'[candle_seed_1m] Refreshed {refreshed}/{checked} tokens this run '
+          f'(cursor={cursor % len(saved_tokens)}/{len(saved_tokens)})')
+
+
+def _seed_universe_candles(universe: list):
+    """
+    Seed multi-TF candles for the full universe — SLOW path (BUG-048 split):
+    owns 5m/15m/1h/4h backfill ONLY. 1m was removed from the fetch list —
+    _seed_fast_1m() owns 1m now (60 tokens/run with real OHLC).
+    Tracks progress in a JSON file so each run picks up where we left off.
+    """
+    _init_candles_db()
+
+    all_tokens = _universe_token_list(universe)
 
     saved_tokens, cursor, last_run = _get_candle_progress()
 
@@ -209,7 +355,9 @@ def _seed_universe_candles(universe: list):
     # FIX 2026-10-05: raised 2->10 — 76/82 tokens had flat 1m candles (O=H=L=C) from
     # aggregator overwrite bug. Need faster cycling to re-fetch real OHLC. ~40 API
     # calls per run (10 tokens x 4 TFs) is well within Binance/HL rate limits.
-    TOKENS_PER_RUN = 10
+    # FIX 2026-10-09 (BUG-048): 10 tokens x 4 TFs — '1m' dropped from the TF list;
+    # the fast loop (_seed_fast_1m) owns 1m now. Do NOT add 1m back here.
+    TOKENS_PER_RUN = SLOW_SEED_TOKENS_PER_RUN
 
     seeded = 0
     for _ in range(TOKENS_PER_RUN):
@@ -240,16 +388,13 @@ def _seed_universe_candles(universe: list):
             cursor += 1
             continue  # Already fresh with volume, skip
 
-        # Fetch 1m, 5m, 15m, 1h, 4h candles — Binance first, HL fallback.
+        # Fetch 5m, 15m, 1h, 4h candles — Binance first, HL fallback.
         # DRIFT-007: Binance fails for HL-only alts; HL candleSnapshot has volume for all.
         # FIX 2026-10-05 (bug_hunter HIGH): added 15m — was never fetched, so candles_15m
         # was 100% zero-volume from _aggregate_tf, breaking 15m volume signals.
-        for tf, limit in [('1m', 200), ('5m', 100), ('15m', 100), ('1h', 100), ('4h', 100)]:
-            candles = _fetch_binance_candles(token, tf, limit)
-            if not candles or (candles and all(cd.get('volume', 0) == 0 for cd in candles)):
-                _hl = _fetch_hl_candles(token, tf, limit)
-                if _hl:
-                    candles = _hl
+        # FIX 2026-10-09 (BUG-048): 1m removed — owned by _seed_fast_1m() now.
+        for tf, limit in SLOW_SEED_TFS:
+            candles = _fetch_real_candles(token, tf, limit)
             if candles:
                 _store_candles(token, tf, candles)
 
@@ -261,7 +406,8 @@ def _seed_universe_candles(universe: list):
         print(f'[candle_seed] Seeded {seeded}/{TOKENS_PER_RUN} tokens this run '
               f'(cursor={cursor}/{len(saved_tokens)})')
 
-    # Always fetch BTC 1m candles (needed for continuum engine)
+    # Always fetch BTC 1m candles (needed for continuum engine — fresh EVERY cycle;
+    # the fast loop only reaches BTC once per full rotation, so keep this)
     btc_1m = _fetch_binance_candles('BTC', '1m', 200)
     if not btc_1m:
         btc_1m = _fetch_hl_candles('BTC', '1m', 200)
@@ -481,7 +627,8 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
     # We track last_computed_dict (the raw MAX is_closed=1 per token) and
     # last_closed_dict (last_computed - tf_seconds, safe from developing candle corruption).
     # The fill queries all windows from last_closed_boundary + tf onward,
-    # then INSERT OR REPLACE marks them is_closed=1.
+    # then the guarded upsert (FIX 2026-10-09 BUG-048) marks them is_closed=1
+    # WITHOUT ever overwriting real API candles (volume>0).
     # Tokens with no prior candles have last_closed_boundary = -tf_seconds (start from epoch).
     # Skip blacklisted tokens — reduces ~79 tokens × 5 queries × 4 TFs per run
     # EXCEPT broad market tokens — they must always have fresh candle data
@@ -529,10 +676,27 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
                 (token, last_ts)
             ).fetchone()
             if open_row and close_row:
+                # FIX 2026-10-09 (BUG-048): guarded upsert instead of INSERT OR REPLACE —
+                # the aggregator was overwriting API-fetched OHLC candles (from
+                # price_collector's seeder) with flat tick-aggregated data (O=H=L=C,
+                # volume=0). Same bug class fixed for 1m on 2026-10-05. Measured live
+                # damage: 27.8% volume=0 on 4h, 11.4% on 1h over 24h. price_history
+                # ticks are ~155s apart, so few ticks per window = no range. Only fill
+                # GAPS and tick-agg (volume=0) rows — NEVER overwrite real API candles
+                # (volume>0). The WHERE clause (instead of plain INSERT OR IGNORE) is
+                # deliberate: plain OR IGNORE can never upgrade an existing is_closed=0
+                # developing row (BUG-048 root cause (b): 230,827 stuck rows in
+                # candles_1m, is_closed=1 count=0 all-time). The volume=0 guard lets
+                # the aggregator close its own developing windows while still leaving
+                # real API candles untouched.
                 candle_cur.execute(f"""
-                    INSERT OR REPLACE INTO {table}
+                    INSERT INTO {table}
                         (token, ts, open, high, low, close, volume, is_closed)
                     VALUES (?, ?, ?, ?, ?, ?, 0, 1)
+                    ON CONFLICT(token, ts) DO UPDATE SET
+                        open=excluded.open, high=excluded.high, low=excluded.low,
+                        close=excluded.close, is_closed=1
+                    WHERE {table}.volume = 0
                 """, (token, window_ts, open_row[0], high, low, close_row[0]))
                 filled += 1
 
@@ -668,8 +832,14 @@ def main():
         # candles now updated — timestamp already reflects post-aggregation freshness
         # save_prices() removed — was redundant second write, doubled DB time
         # ponytail: seeder is best-effort — never fail the cycle after prices are saved
+        # BUG-048 (Option A): fast 1m seeder FIRST (1m is the latency-critical path).
+        # Runs inside the candles lock already held here — do NOT re-acquire it.
         try:
-            _seed_universe_candles(universe)  # Re-enabled: only fetches 5m (2 calls/run, ~0.5s)
+            _seed_fast_1m(universe)
+        except Exception as e:
+            print(f'  [candle_seed_1m] skipped (non-fatal): {e}')
+        try:
+            _seed_universe_candles(universe)  # slow multi-TF backfill (5m/15m/1h/4h only — 1m removed, BUG-048)
         except Exception as e:
             print(f'  [candle_seed] skipped (non-fatal): {e}')
     finally:
