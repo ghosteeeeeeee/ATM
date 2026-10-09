@@ -444,19 +444,18 @@ print('Changes logged.')
 
 ## ⚠️ SQL SYNTAX RULES (PostgreSQL)
 
-**Common mistakes that cause errors:**
+**These rules are verified against the live brain Postgres:**
 
-1. **INTERVAL syntax**: Use full unit names
-   - ❌ `INTERVAL '12h'` ❌ `INTERVAL '7 days'`
-   - ✅ `INTERVAL '12 hours'` ✅ `INTERVAL '7 days'`
+1. **INTERVAL syntax**: Both forms work — use whichever reads better
+   - ✅ `INTERVAL '12 hours'` ✅ `INTERVAL '7 days'` ✅ `INTERVAL '12h'`
 
-2. **ROUND with decimals**: Cast to numeric first
-   - ❌ `ROUND(pnl_usdt, 2)` ❌ `ROUND(AVG(x), 2)`
-   - ✅ `ROUND(pnl_usdt::numeric, 2)` ✅ `ROUND(AVG(x)::numeric, 2)`
+2. **ROUND with decimals**: Works on numeric columns directly
+   - ✅ `ROUND(pnl_usdt, 2)` ✅ `ROUND(AVG(x), 2)` — pnl_usdt is numeric
+   - Only need `::numeric` cast for float columns
 
-3. **Timestamp comparisons**: Use AT TIME ZONE for UTC
-   - ❌ `EXTRACT(HOUR FROM close_time)` (assumes local time)
-   - ✅ `EXTRACT(HOUR FROM close_time AT TIME ZONE 'UTC')`
+3. **Timestamps**: `close_time` is `timestamp without time zone` (UTC stored)
+   - ✅ `EXTRACT(HOUR FROM close_time)` — extracts stored UTC hour directly
+   - ✅ `EXTRACT(HOUR FROM close_time AT TIME ZONE 'UTC')` — also works
 
 4. **Column names**: Use exact names from trades table
    - `pnl_usdt`, `pnl_pct`, `direction`, `signal`, `exit_reason`

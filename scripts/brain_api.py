@@ -76,15 +76,18 @@ def get_stats() -> dict:
     
     # Get vec count from sqlite-vec
     vec_count = 0
+    vec_conn = None
     try:
         import sqlite_vec
         vec_conn = sqlite3.connect(str(BRAIN_DB))
         vec_conn.enable_load_extension(True)
         sqlite_vec.load(vec_conn)
         vec_count = vec_conn.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
-        vec_conn.close()
     except Exception:
         pass
+    finally:
+        if vec_conn:
+            vec_conn.close()
     
     db_size = BRAIN_DB.stat().st_size if BRAIN_DB.exists() else 0
     

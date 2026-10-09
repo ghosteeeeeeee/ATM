@@ -756,9 +756,11 @@ class SessionBrain:
         results = self.vector_store.search(query_vec, top_k=top_k * 2)
         
         # Enrich with metadata
+        # BUG 3 fix: vec0 returns L2 distance (lower = better)
+        # min_score is a MAX distance threshold, not min similarity
         enriched = []
-        for chunk_id, score in results:
-            if score < min_score:
+        for chunk_id, distance in results:
+            if min_score > 0 and distance > min_score:
                 continue
             row = self.db.execute(
                 "SELECT c.session_id, c.text, c.chunk_type, c.chunk_index, "
@@ -773,7 +775,7 @@ class SessionBrain:
                     "type": row[2],
                     "chunk_index": row[3],
                     "title": row[4],
-                    "score": score
+                    "score": distance
                 })
             if len(enriched) >= top_k:
                 break
@@ -922,7 +924,7 @@ def main():
         print(f"  Sessions: {s['sessions_indexed']}/{s['sessions_total']} indexed")
         print(f"  Chunks: {s['chunks_total']}")
         print(f"  Chunk types: {s['chunk_types']}")
-        print(f"  FAISS index: {s['faiss_index_size_mb']} MB")
+        print(f"  Vectors: {s['vectors_total']:,}")
         print(f"  SQLite DB: {s['db_size_mb']} MB")
         if s['last_ingest']:
             li = s['last_ingest']
