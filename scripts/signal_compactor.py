@@ -827,7 +827,7 @@ def get_directional_outcome_long(direction: str) -> tuple:
 
 
 def _is_direction_locked(direction: str) -> bool:
-    """Check if direction is locked due to recent catastrophic loss (4+/5 trades).
+    """Check if direction is locked due to recent catastrophic loss (3+/5 trades, velocity>=0.5).
     Returns True if lock is active (suppress all signals in this direction).
     Only outcomes from the last 2h count — stale losses from broken system
     periods should not lock fresh winning signals."""

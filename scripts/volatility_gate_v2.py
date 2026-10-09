@@ -112,6 +112,7 @@ REGIME_SIGNALS = {
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — added 2026-10-09: sync with v1
         'r2v2-long', 'r2v2-long3',  # R² trend v2 — added 2026-10-09: IOTA LONG blocked
         'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-09: APT LONG blocked
+        'doji-bottom-long', 'doji-top', 'doji-top-short',  # doji patterns — added 2026-10-09: LTC LONG blocked
         'continuum-ma+', 'continuum-ma-',  # continuum MA crossover — momentum confirmation
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
@@ -137,6 +138,7 @@ REGIME_SIGNALS = {
         'volume-breakout-long+',  # volume-confirmed breakout LONG — added 2026-10-09: sync with v1
         'volume-breakout-short-', 'volume_breakout_short',  # volume-confirmed breakout SHORT — added 2026-10-09
         'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-09
+        'doji-bottom-long', 'doji-top', 'doji-top-short',  # doji patterns — added 2026-10-09
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — added 2026-10-09: sync with v1
         'slow-grind-',
         'mover', 'mover+', 'mover-',
@@ -193,6 +195,7 @@ REGIME_SIGNALS = {
         'volume-breakout-long+',  # volume-confirmed breakout LONG (hyphen variant) — added 2026-10-09: sync with v1
         'volume-breakout-short-', 'volume_breakout_short',  # volume-confirmed breakout SHORT — added 2026-10-09: BANANA SHORT blocked
         'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-09: APT LONG blocked in EXTREME
+        'doji-bottom-long', 'doji-top', 'doji-top-short',  # doji patterns — added 2026-10-09
         'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'accel-300-breakout',  # ATR breakout signal — works solo, added 2026-09-23 (bug hunt: was killing PONS SHORT)
