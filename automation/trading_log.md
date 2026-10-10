@@ -7337,3 +7337,25 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss still −$0.58 cumulative — awaiting brain_auditor; next lever is SL width not signal kills
 - BABY volume-breakout double-size ($22.10 vs usual $11.10) — flag if this is intentional sizing or a bug next hour
+
+## [2026-10-10 03:12] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** −$0.22 last hour (WR 33%) | 24h: 27T ~13W +$0.32 (WR ~48%) — still positive
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: no 0%-WR signal with 3+ trades last hour — BABY volume-breakout 1T −$0.17 (hard_max_loss), RUNE bb-bounce 1T −$0.06 (hard_max_loss), NXPC bb-bounce 1T +$0.01 (profit-monster-trail). bb-bounce 24h still net +$0.05 (2/3W), volume-breakout +$0.43 (3/4W) — both hold
+- atr_sl_hit 6/27=22% — under 40% threshold, tpsl_utils deployed, stable
+- hard_max_loss 6/27=22% −$0.69 — still dominant loser bucket (was −$0.58 at 02:12; BABY−0.17+RUNE−0.06 added). Hold brain_auditor eval; lever is SL width not signal kills
+- Overtrade: 3/hr (limit 20)
+- Streak: 22:+0.30, 23:−0.14, 00:+0.30, 01:+0.42, 02:−0.05, 03:−0.17 — 2 consecutive negative hours (02,03), not yet 3 — watch next hour; if negative again, check regime / consider size reduction
+- Open trades: 0 (all 3 prior opens closed this hour)
+- 24h profit engines: stale_exit 4T +$0.71, rr_engine_resistance_break +$0.37, volume-breakout-long+ 4T 3W +$0.43, profit-monster-trail 7T +$0.27
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$0.69 cumulative and growing — awaiting brain_auditor; next lever is SL width not signal kills
+- 2 consecutive negative hours (02, 03) after strong 00-01 — if hour 03 pattern repeats, evaluate regime/size lever
