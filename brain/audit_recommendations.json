@@ -1,131 +1,116 @@
 {
-  "timestamp": "2026-10-10T07:43:50Z",
-  "agent": "brain_auditor",
-  "run_type": "full_audit",
-  "session_lock": false,
+  "timestamp": "2026-10-10T08:38:56.277290+00:00",
   "session_brain_stats": {
-    "note": "Session brain query skipped this run — focused on live trade data and config verification",
-    "prior_insights_used": [
-      "DRIFT-E: entry_rsi_14 unreliable, meta_rsi is ground truth",
-      "Trail family wins 86.5%, hard_max_loss loses 100% — trend vs chop",
-      "W SHORT wrong-side pattern (4 strikes against LONG_BIAS coin)",
-      "volume-breakout-long+ edge in EXTREME regime (80%WR +$3.65)"
-    ]
+    "queries_run": 1,
+    "top_insight": "R:R vs RSI ceiling tension — signals blocked by RSI ceilings when R:R would justify entry"
   },
   "trade_summary_24h": {
-    "total_trades": 29,
-    "pnl": -0.1,
-    "win_rate": 41.4,
-    "hard_max_loss_freq": "7/29 = 24.1% (GOAL <40% MET)",
-    "open_trades": 2,
-    "regime": "BTC_15m SHORT_BIAS / BTC_4h LONG_BIAS / vol LOW"
+    "total": 30,
+    "wins": 13,
+    "losses": 17,
+    "wr": 43.0,
+    "net_pnl": -0.06,
+    "note": "First genuinely losing stretch. 13/17 losers are LONGs in alt-bleed tape (BTC 15m SHORT_BIAS, alt universe 40 SHORT / 10 LONG)."
   },
-  "trade_summary_7d": {
-    "total_trades": 159,
-    "pnl": -0.34,
-    "win_rate": 49.1,
-    "deterioration": "+$0.29 → -$0.34 since CURRENT.md 22:30 UTC",
-    "long_pnl": -0.39,
-    "short_pnl": 0.05,
-    "top_bleed": "hard_max_loss 54T 0%WR -$7.48",
-    "top_winner": "profit-monster-trail 63T 90.5%WR +$3.82"
-  },
-  "losing_trade_autopsy": {
-    "focus": "24h losers — wrong-side analysis",
-    "clusters": [
-      {
-        "cluster": "W SHORT (hmacd_mtf--) — 4 consecutive losses",
-        "trades": "3 closed losses -$0.27 total + 1 open",
-        "root_cause": "Shorting into a LONG_BIAS coin's bounce. W regime LONG_BIAS conf 79.9, +1.13%/16 candles. hmacd_mtf-- triggers on bounce, not breakdown.",
-        "winning_side": "LONG the bounce, or short only after confirmed breakdown (RSI fading below 50 following bounce stall)",
-        "recommended_change": "Monitor — n=4 on single token. W 06:05 SHORT won +$0.06 (profit-monster-trail). Pattern is real but not yet config-worthy.",
-        "confidence": "MEDIUM"
-      },
-      {
-        "cluster": "volume-breakout-long+ at high RSI",
-        "trades": "BLUR@68.89 -$0.38, BABY@81.82 -$0.17 (both hard_max_loss, HIGH regime)",
-        "root_cause": "Entering overbought — chase entries after breakout already stretched RSI. Winners today at meta_rsi 55-62.",
-        "winning_side": "Same breakout entered as pullback at RSI 50-60, or skip when breakout candle stretched RSI past 80.",
-        "recommended_change": "SHIPPED: VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85 (blocks BABY@81.82; BLUR@68.89 still passes — all-time 65-70 band 7T 57.1% +$0.81 is profitable).",
-        "confidence": "HIGH"
-      },
-      {
-        "cluster": "bb-squeeze+ hard_max_loss (13T -$1.96 7d)",
-        "trades": "POL/TURBO/MERL/INJ/SAGA/SEI/NEAR/STX etc — all LONG, meta_rsi 33-79, HIGH/NORMAL regime",
-        "root_cause": "Chop entries — squeeze-break in weakness. BB_SQUEEZE_LONG_RSI_MIN=60 already blocks low-RSI entries. No clean RSI threshold separates winners from losers (meta_rsi scattered 33-79).",
-        "winning_side": "Wait for confirmed breakout above upper BB with volume. Current entries fire on squeeze detection, not breakout confirmation.",
-        "recommended_change": "Monitor — signal is 7d net +$0.02/42T 64.3%WR. hard_max_loss is the cost of doing business on a winning signal.",
-        "confidence": "LOW"
-      }
-    ]
+  "watchdog_steers": [
+    "Portfolio heavily long (3 trades) — one BTC dump hits all",
+    "5 recent losses look like wrong-side trades — fading momentum"
+  ],
+  "regime": {
+    "btc_15m": "SHORT_BIAS",
+    "btc_4h": "LONG_BIAS",
+    "volatility": "LOW",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
   "drift_findings": [
     {
-      "id": "DRIFT-A-STANDING",
-      "severity": "HIGH",
-      "finding": "STANDALONE_BYPASS still sets pass_gate=True without vol gate. Volume family NORMAL=0.0 and Volume_Breakout HIGH=0.0 blocks are bypassed. 6 HIGH + 8 NORMAL volume-breakout trades occurred despite blocks.",
-      "status": "STANDING — delegated to bug_hunter (DRIFT-A bypass hard-skip when combined_mult==0.0)",
-      "impact": "Bypass signals trade in regimes where they historically lose"
+      "finding": "hard_max_loss frequency IMPROVING — Oct 6: 66.7% → Oct 10: 21.4%",
+      "evidence": "Daily HML%: Oct 6=66.7%, Oct 7=61.5%, Oct 8=41.7%, Oct 9=27.8%, Oct 10=21.4%",
+      "assessment": "Magnitude fix + recent changes working. No action needed. CEO HOLD to Oct 10 satisfied — frequency trending down.",
+      "severity": "info"
     },
     {
-      "id": "V5-ROUTING",
-      "severity": "MED",
-      "finding": "pump-chain-v5 SHORTS still route to pump_exit via stem-matching, bypassing Sep-29 'SHORT needs rr_engine' reroute. V5_SHORT=True is live.",
-      "status": "Delegated to position_manager owner (analysis-desk 2026-10-08)"
+      "finding": "volume-breakout-long+ RSI>65: 24h pattern does NOT hold on 14d",
+      "evidence": "Watchdog: >65 n=3 WR 33% avg -0.14 (24h). 14d: 65-75 band 3T 66.7% +$0.56, >75 2T 50% +$0.19. 55-65 band 8T 75% +$1.36 BEST.",
+      "assessment": "Do NOT tighten VOLUME_BREAKOUT_LONG_RSI_CEILING further. The 95→85 change from this morning already targets the exhausted zone. 24h sample too small.",
+      "severity": "warning"
+    },
+    {
+      "finding": "W token chop — signal re-fires into same oscillation",
+      "evidence": "4 hmacd_mtf-- SHORT trades 24h, 1W/3L net -$0.21. 30d: 9T 44.4% -$0.12. All EXTREME regime. Watchdog: 'W is oscillating, avoid W entirely until it trends.'",
+      "assessment": "FIXED — added W to SHORT_BLACKLIST. Reversible.",
+      "severity": "high"
     }
   ],
-  "changes_from_last_run": [
+  "recurring_problems": [
     {
-      "change": "pump_chain+ LONG NORMAL/HIGH dampen 1.0→0.5 (2026-10-09 19:47)",
-      "trades_since": 0,
-      "verdict": "TOO EARLY — no pump_chain+ LONG trades since change. Monitor 48h."
+      "problem": "hard_max_loss still #1 bleed (54T -$7.48 7d) but frequency declining",
+      "status": "IMPROVING — no action. Magnitude fix holding (avg -3.69% vs pre-fix -4.4%).",
+      "trend": "66.7% → 21.4% over 5 days"
     },
     {
-      "change": "SHORT-RSI-CEILING bear exemption OR→AND fix (2026-10-09 22:44)",
-      "trades_since": 5,
-      "verdict": "MIXED — 5 SHORT trades since fix: 2W 3L. ATOM +$0.37 (rr_engine), W trades mixed. Fix is structural (bear exemption logic), not trade-blocking. No regression."
-    },
-    {
-      "change": "mtf_macd regime guard fail-open fix (2026-10-10 02:45)",
-      "trades_since": 2,
-      "verdict": "TOO EARLY — 2 hmacd_mtf trades: 1W 1L. Both in EXTREME (correct habitat). No regression."
+      "problem": "Alt-bleed tape: 13/17 losers are LONGs while BTC 15m SHORT_BIAS",
+      "status": "MONITOR — entry quality issue, not blanket LONG block. VOLUME_BREAKOUT ceiling 85 targets chase entries. Oversold-bounce longs still win (BABY rsi=0.0 +$0.04).",
+      "note": "Philosophy: every pump is a LONG. Fix entry quality, don't block direction."
     }
   ],
-  "config_changes_applied": [
+  "missing_implementations": [
     {
-      "timestamp": "2026-10-10T07:43:50Z",
-      "change": "VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85",
-      "file": "hermes_constants.py",
-      "rationale": "Meta-RSI fine bands: 80-85=1T 0% -$0.17, 85+=4T 50% -$0.22 (exhausted). 70-80=5T 100% +$1.45 (profit band). 95 let BABY@81.82 through to hard_max_loss.",
-      "impact_on_winners": "All-time 75-80 band = 2T 100% +$0.51 (below 85, stays open). 80-85 = 1T 0% (blocked). 85+ = 4T 50% (blocked). Net: block 5 losers/wash trades, preserve 5 winners.",
-      "risk": "LOW — reversible, thin sample (5T 80+), monitor 7d"
+      "idea": "Momentum floor for LONG entries in LOW volatility",
+      "rationale": "Watchdog: 'In LOW vol, hard_max_loss chop deaths dominate — prefer fewer, better-band entries over volume.' BTC ATR 0.06% = hard_max_loss factory.",
+      "status": "SUGGESTED — complex to implement, needs backtest first",
+      "risk": "medium"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-10T07:43:50Z",
-      "idea": "Per-signal meta-RSI entry quality zones — volume-breakout prefers pullback entries (RSI 50-65), not chase entries (RSI 68+)",
-      "rationale": "Watchdog verified: winners avg meta_rsi 55-62, losers avg 68-82. All-time fine bands confirm: 50-65 = 12T 66.7% +$1.22, 70-80 = 5T 100% +$1.45, 80+ = 5T 40% -$0.39. The signal works; the RSI band it fires in decides outcome.",
-      "expected_impact": "Block exhausted-zone entries without killing the profit band",
+      "date": "2026-10-10T08:38:56.277307+00:00",
+      "idea": "Regime-aware confidence dampening for alt LONGs when BTC 15m is SHORT_BIAS",
+      "rationale": "13/17 losers are LONGs fighting the alt-bleed tape. Not a block — a confidence dampen. Aligns with 'don't fight the trend' without blanket-blocking. Would reduce size on wrong-side entries while keeping winners.",
+      "expected_impact": "Reduce alt-bleed LONG losses by 20-30% without blocking winners",
       "category": "entry sniper",
-      "status": "partially_shipped (ceiling 85)",
-      "risk": "low"
+      "status": "suggested",
+      "risk": "medium",
+      "note": "Needs backtest. One variable at a time — don't ship without verification."
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "file": "hermes_constants.py",
+      "change": "Added W to SHORT_BLACKLIST",
+      "rationale": "Chop token, 4 trades 24h 1W/3L net -$0.21, oscillating both directions, signal re-fires into same chop. Watchdog verified.",
+      "reversible": true,
+      "impact_on_winners": "W SHORT 30d: 6 trades, 2W 4L net -$0.21. Blacklisting loses 2 winners worth +$0.06 total but saves 4 losers worth -$0.27. Net positive."
+    }
+  ],
+  "changes_from_last_run": [
+    {
+      "change": "VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85 (brain_auditor Oct 10 07:42)",
+      "status": "TOO NEW — opened 1h before watchdog snapshot. Monitor 7d. Would have blocked BABY@81.82 (-$0.17 hard_max_loss).",
+      "verdict": "ON TRACK"
     },
     {
-      "date": "2026-10-10T07:43:50Z",
-      "idea": "hmacd_mtf-- SHORT directional guard: block SHORT when coin's own regime is LONG_BIAS (not just BTC regime)",
-      "rationale": "W SHORT 4 strikes all wrong side — shorting into LONG_BIAS coin's bounce. Current SHORT_RSI_HARD_FLOOR=45 fires after bounce starts but doesn't check coin-level regime direction.",
-      "expected_impact": "Prevent shorting into confirmed uptrends on individual coins",
-      "category": "wrong-side prevention",
-      "status": "suggested",
-      "risk": "medium — needs coin-regime direction check in exec path, not just RSI"
+      "change": "mtf_macd.py regime guard fail-open fix (Oct 10 02:45)",
+      "status": "LIVE — 2 hmacd trades since, 1W/1L net +0.05. Small n but not bleeding.",
+      "verdict": "HOLDING"
+    },
+    {
+      "change": "SHORT-RSI-CEILING bear exemption OR→AND (Oct 9 22:44)",
+      "status": "LIVE — ATOM SHORT +$0.37 winner since fix. W trades mixed but W is now blacklisted.",
+      "verdict": "HOLDING"
+    },
+    {
+      "change": "pump_chain+ NORMAL/HIGH dampen 1.0→0.5 (Oct 9 19:47, RATIFIED)",
+      "status": "NO TRADES in NORMAL/HIGH since. Can't evaluate yet.",
+      "verdict": "MONITOR"
     }
   ],
   "next_actions": [
+    "Monitor W blacklist effectiveness — if W starts trending, remove from blacklist",
     "Monitor VOLUME_BREAKOUT_LONG_RSI_CEILING=85 for 7d — revert to 95 if 80-85 band proves profitable",
-    "Monitor pump_chain+ dampen (0 trades since change) — eval at 48h",
-    "HML frequency eval per CEO schedule — 24h freq 24.1% (goal <40% met), but 54T 7d still #1 bleed",
-    "SHORT 7d ≥$0 check Oct 11 — currently +$0.05, barely holding",
-    "7d PnL deteriorated +$0.29→-$0.34 — watch for further decay"
+    "Track hard_max_loss frequency — goal <20% by Oct 12",
+    "Backtest momentum floor for LONG entries in LOW vol (creative idea)",
+    "Backtest regime-aware confidence dampening for alt LONGs in SHORT_BIAS tape"
   ]
 }

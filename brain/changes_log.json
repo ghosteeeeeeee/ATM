@@ -979,5 +979,16 @@
     "after": "85",
     "rationale": "Meta-RSI fine bands all-time: 70-75=3T 100%WR +$0.94, 75-80=2T 100%WR +$0.51 (BEST), 80-85=1T 0% -$0.17, 85+=4T 50% -$0.22 (exhausted). 95 let BABY@81.82 through to hard_max_loss. 85 blocks exhausted zone only; 70-80 profit band stays open.",
     "impact": "Block volume-breakout-long+ entries at meta_rsi>85. Expected: eliminate 80+ exhausted-zone losers while preserving 70-80 winners. Monitor 7d, revert to 95 if 80-85 proves profitable."
+  },
+  {
+    "timestamp": "2026-10-10T08:38:15Z",
+    "agent": "brain_auditor",
+    "change": "Added W to SHORT_BLACKLIST — chop token, 4 hmacd_mtf-- SHORT trades 24h 1W/3L net -$0.21, oscillating both directions, signal re-fires into same chop",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "W not in SHORT_BLACKLIST",
+    "after": "W in SHORT_BLACKLIST (line ~171)",
+    "rationale": "Watchdog verified chop pattern. 30d: 9T 44.4% -$0.12. Mechanism clear: oscillating token, no trend to follow. Remove when W trends.",
+    "impact": "Blocks hmacd_mtf-- and other SHORT signals on W. Reversible — remove from blacklist when W shows sustained trend."
   }
 ]

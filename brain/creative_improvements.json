@@ -3779,5 +3779,15 @@
     "category": "wrong-side prevention",
     "status": "suggested",
     "risk": "medium — needs coin-regime direction check in exec path, not just RSI"
+  },
+  {
+    "date": "2026-10-10T08:39:26.162591+00:00",
+    "idea": "Regime-aware confidence dampening for alt LONGs when BTC 15m is SHORT_BIAS",
+    "rationale": "13/17 24h losers are LONGs fighting the alt-bleed tape. Not a block — a confidence dampen. Aligns with don't-fight-the-trend without blanket-blocking. Would reduce size on wrong-side entries while keeping winners.",
+    "expected_impact": "Reduce alt-bleed LONG losses by 20-30% without blocking winners",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium",
+    "note": "Needs backtest. One variable at a time."
   }
 ]

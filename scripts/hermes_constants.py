@@ -168,6 +168,7 @@ SHORT_BLACKLIST = {
     # 'BCH',
     # REMOVED 2026-10-06 — ATOM SHORT now profitable (6T 83%WR +$0.15)
     # 'ATOM',
+    'W',  # brain_auditor 2026-10-10 — chop token: 4 hmacd_mtf-- SHORT trades 24h, 1W/3L net -$0.21. Oscillating both directions, signal re-fires into same chop. 30d: 9T 44.4% -$0.12. Watchdog verified. Remove when W trends.
 }
 LONG_BLACKLIST = {
     # 2026-04-22: BIO — block both directions
