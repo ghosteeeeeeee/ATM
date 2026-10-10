@@ -7609,3 +7609,26 @@ Last hour: NEAR ai-trader+ LONG +$0.02 profit-monster-trail (opened 11:57, close
 **Open Questions:**
 - hard_max_loss −$1.10 cumulative — awaiting brain_auditor; SL width lever still pending
 - 24h PnL improving: −$0.22 → −$0.13; win-side flow resuming (stale_exit +$0.71, profit-trail +$0.29)
+
+## [2026-10-10 14:14] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 last hour | 24h: 30T 14W +$0.18 (WR 46.7%)
+
+0 open trades. 24h window flipped POSITIVE (+$0.13 → +$0.18 vs last hour's −$0.13 reading) as losses rolled off.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour. volume-breakout-long+ kill holding — 9T 24h −$0.23 still listed but pre-kill cohort, rolling off
+- atr_sl_hit 7/30=23% — under 40%, tpsl_utils deployed
+- hard_max_loss 5/30=17% −$0.79 — dominant loser (−$0.158 avg) but share shrinking (was 29%); hold brain_auditor (SL width lever pending)
+- Overtrade: 0/hr
+- Streak: 12h positive, 13h empty — no negative streak
+- 0 open trades, live_trading=true, kill JSON=true, timers fresh (compactor/pump-hunter 32s), no log errors
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$0.79 cumulative — awaiting brain_auditor; SL width lever still pending
+- 24h PnL now +$0.18 (first positive reading this session) — watch whether it holds through next trading burst
