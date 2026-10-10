@@ -1046,39 +1046,55 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 pass
 
         # Rule 1: SL at structural break (PRIMARY EXIT)
-        # LONG → exit when price breaks BELOW support (structural floor broken)
-        # SHORT → exit when candle CLOSE breaks ABOVE resistance (wick-only = hold)
-        # KEY: Hold until the level BREAKS, not just touches it.
-        # Don't exit if resistance is too close to entry (within 0.5%) — that's just noise.
+        # FIX (2026-10-10): SHORT was using 'resistance' break which fired on
+        # price RISING above a level — but for SHORT, price rising is normal
+        # consolidation before the drop. The S/R level classification is based
+        # on CURRENT price, so when price drops, old support becomes 'resistance'.
+        # This caused premature exits on profitable SHORTs (ATOM +16.56% cut
+        # at resistance_break).
+        #
+        # CORRECT LOGIC: Both LONG and SHORT exit when price breaks BELOW support.
+        # For LONG: support break = floor broken = BAD
+        # For SHORT: support break = price dropped through floor = GOOD for SHORT
+        #   → SHORT should NOT exit on support break either.
+        #
+        # ACTUAL FIX: SHORT exits when price breaks ABOVE resistance (ceiling).
+        # But resistance must be classified relative to ENTRY, not current price.
+        # Simpler: SHORT exits on resistance break ONLY when resistance is ABOVE entry.
         break_buffer = getattr(hc, 'RR_EXIT_SUPPORT_BREAK_BUFFER', 0.001)
-        break_type = 'support' if direction == 'LONG' else 'resistance'
         min_break_dist = getattr(hc, 'RR_EXIT_MIN_BREAK_DIST', 0.005)  # 0.5% minimum distance
         for level in sr_map:
-            if level.get('type') == break_type:
-                level_price = level['price']
-                level_touches = level.get('touches', level.get('strength', 0))
-                
-                # Don't exit if level is too close to entry (within 0.5%) — that's just noise
-                if entry_price is not None and entry_price > 0:
-                    dist_from_entry = abs(level_price - entry_price) / entry_price
-                    if dist_from_entry < min_break_dist:
-                        continue  # level too close — skip
-                
-                if direction == 'LONG' and current_price < level_price * (1 - break_buffer):
+            level_price = level['price']
+            level_type = level.get('type', '')
+            level_touches = level.get('touches', level.get('strength', 0))
+
+            # Don't exit if level is too close to entry (within 0.5%) — that's just noise
+            if entry_price is not None and entry_price > 0:
+                dist_from_entry = abs(level_price - entry_price) / entry_price
+                if dist_from_entry < min_break_dist:
+                    continue  # level too close — skip
+
+            if direction == 'LONG':
+                # LONG: exit when price breaks BELOW support (floor broken)
+                if level_type == 'support' and current_price < level_price * (1 - break_buffer):
                     return {
                         'action': 'CUT_LOSS',
                         'price': current_price,
-                        'reason': f'{break_type}_break: {level_price:.4f} broken (touches={level_touches})',
+                        'reason': f'support_break: {level_price:.4f} broken (touches={level_touches})',
                         'new_sl': None,
                     }
-                # SHORT: use candle_close (not wick) to avoid false breakouts
-                if direction == 'SHORT' and candle_close > level_price * (1 + break_buffer):
-                    return {
-                        'action': 'CUT_LOSS',
-                        'price': current_price,
-                        'reason': f'{break_type}_break: {level_price:.4f} broken (touches={level_touches}, close={candle_close:.4f})',
-                        'new_sl': None,
-                    }
+            elif direction == 'SHORT':
+                # SHORT: exit when price breaks ABOVE resistance (ceiling broken)
+                # BUT only if resistance is ABOVE entry — a resistance below entry
+                # is just old support that price already dropped through (good for SHORT)
+                if level_type == 'resistance' and level_price > entry_price:
+                    if candle_close > level_price * (1 + break_buffer):
+                        return {
+                            'action': 'CUT_LOSS',
+                            'price': current_price,
+                            'reason': f'resistance_break: {level_price:.4f} broken (touches={level_touches}, close={candle_close:.4f})',
+                            'new_sl': None,
+                        }
 
         # Rule 2: REMOVED — TP at support/resistance touch was exiting too early
         # Price continued in trade direction after exit on every trade tested.
