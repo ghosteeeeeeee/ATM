@@ -7493,3 +7493,28 @@ Quiet hour — no closes. 4 open: PURR vol-breakout LONG (SL −0.23%/TP +2.86%)
 **Open Questions:**
 - hard_max_loss −$1.07 cumulative (7/29=24%) — awaiting brain_auditor; SL width lever still pending
 - BABY oversold-bounce+ $22.10 (2× size) — confirm intentional; if sizing bug, fix next hour
+
+## [2026-10-10 09:15] Hourly Analysis
+
+**Trades:** 5 closed (1 win, 3 losses, 1 flat)
+**PnL:** −$0.21 last hour (WR 20%) | 24h: 26T 9W −$0.46 (WR ~35%)
+
+Last hour: AIXBT vol-breakout hard_max_loss −$0.12 (−2.17%, SL −2.5%, entered RSI 75.86 post-ceiling-fix, 2× size $22.10), WCT vol-breakout hard_max_loss −$0.06 (−1.62%, RSI 72.88 post-fix), PURR vol-breakout atr_sl_hit −$0.07 (opened 05:21 pre-fix), SOPH bb-bounce trail $0.00 flat, BABY oversold-bounce trail +$0.04 (2× size win — resolves last hour's BABY sizing flag: legitimate favorite/amplitude multiplier path, not a bug).
+
+**Changes:**
+1. **KILLED volume-breakout-long+** (`VOLUME_BREAKOUT_PLUS_ENABLED = False`, hermes_constants.py:3262) — kill rule met: 3T 0W last hour, 24h 8T 3W −$0.20 = worst signal. WCT/AIXBT entered AFTER brain_auditor's RSI ceiling 95→85 fix (RSI 72.9/75.9, inside the "profit band" — ceiling doesn't address them). SHORT side untouched.
+2. **BUGFIX: wired PLUS/MINUS flags into volume_breakout.py run()** — the flags existed in constants but the module NEVER read them (unlike every sibling signal: volume_hl, accel_300, grind_trend...). Without this, the kill would have been a no-op. One logical change, two files.
+
+**No Change Needed:**
+- Kill: only trigger met was volume-breakout (killed above). continuation+ 2T 0W −$0.10 still under 3T threshold
+- atr_sl_hit 7/26=27% — under 40%, tpsl_utils deployed, stable
+- hard_max_loss 8/26=31% −$1.17 — dominant loser bucket, hold brain_auditor (levers in flight: HML magnitude fix trending down 66.7%→21%)
+- Overtrade: 5/hr (limit 20)
+- Streak: hour 09 negative (−$0.21) but hour 08 empty — not 3 consecutive. Regime SHORT_BIAS (alt tape) — not NEUTRAL, size lever N/A
+- 1 open: PUMP vol-breakout LONG $11.10 — pre-kill position, TPSL manages; no new LONG entries after this change (pipeline picks up constants next 1m cycle, no restart needed)
+- No OpenMemory calls (task instruction)
+
+**Open Questions:**
+- brain_auditor 08:45 "REJECTED further vol-breakout RSI tightening" — this kill is a different lever (master LONG flag), not RSI tightening; reversible when post-fix cohort proves out. CEO may re-enable.
+- SIDeways finding: volume_breakout.py hardcodes VOL_SPIKE_MULT=2.0 locally (line 43) — does NOT read VOLUME_BREAKOUT_SPIKE_MULT from constants. self_learner tuning of that constant is a silent no-op. Separate fix, not applied (1 change/hr).
+- 24h PnL −$0.46 deteriorating from −$0.10 at 08:13 — vol-breakout bleed was the driver.

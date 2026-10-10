@@ -220,6 +220,11 @@ def run(prices_dict=None) -> int:
             continue
 
         direction = sig['direction']
+        from hermes_constants import VOLUME_BREAKOUT_PLUS_ENABLED, VOLUME_BREAKOUT_MINUS_ENABLED
+        if direction == 'LONG' and not VOLUME_BREAKOUT_PLUS_ENABLED:
+            continue
+        if direction == 'SHORT' and not VOLUME_BREAKOUT_MINUS_ENABLED:
+            continue
         if direction == 'LONG' and token.upper() in LONG_BLACKLIST:
             continue
         if direction == 'SHORT' and token.upper() in SHORT_BLACKLIST:
