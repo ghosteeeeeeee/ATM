@@ -7784,3 +7784,27 @@ Last hour: ZRO r2v2-long4 LONG hard_max_loss −$0.03 (−4.89%). 5 open: POL/ME
 - 2× sizing recurrence: ETH and YGG both $22.10 vs standard $11.10 (also BABY earlier) — sizing path still unknown; dedicated sizing audit when brain_auditor SL work lands
 - hard_max_loss −$1.04 cumulative — awaiting brain_auditor; SL width lever still pending
 - 4 consecutive negative hours totaling −$0.28 — noise-level, watching whether hour 19 tips 24h further negative
+
+## [2026-10-10 20:14] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** −$0.13 last hour | 24h: 32T 15W −$0.23 (WR 46.9%)
+
+Last hour: YGG volume-breakout-long+ atr_sl_hit −$0.14 (−1.89%); ME/POL bb-bounce-v2-long+ profit-monster-trail +$0.00/+0.01. 2 open: GOAT doji-bottom-long, ETH hmacd_mtf-+ 2× size $22.10 (recurring sizing flag).
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: no signal 3+T last hour at 0% WR — volume-breakout-long+ only 1T (YGG); 24h 10T 3W −$0.37 still worst but CEO re-enabled 12:25, kill rule not met
+- atr_sl_hit 4/32 = 12.5% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/32=25% −$1.04 dominant loser (−$0.13 avg) — hold brain_auditor (SL width lever pending)
+- Overtrade: 3/hr (limit 20)
+- Streak: 5 consecutive negative hours (15–19, −$0.41 total) BUT regime aggregate LONG_BIAS (19L/12S/72N) not NEUTRAL — size lever N/A per rule
+- bb-bounce-v2-long+ 5T 2W −$0.04 24h — not a kill candidate
+- Timers fresh, live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 5 neg hours −$0.41 cumulative — 24h still only −$0.23; watch hour 20
+- 2× sizing ETH $22.10 recurrence (also BABY/YGG earlier) — sizing audit still pending brain_auditor
