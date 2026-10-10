@@ -2534,32 +2534,37 @@ def record_entry_features(trade_id: int, token: str):
     intel = get_token_intel(token)
 
     # DRIFT-E FIX: prefer signal-time RSI from _signal_metadata over computed value
+    # Uses a SEPARATE connection for the metadata read — the UPDATE below needs a fresh one.
     _meta_rsi = None
-    conn = get_db_connection()
-    if conn is not None:
+    _meta_conn = get_db_connection()
+    if _meta_conn is not None:
         try:
-            cur = conn.cursor()
+            cur = _meta_conn.cursor()
             cur.execute("SELECT _signal_metadata FROM trades WHERE id = %s", (trade_id,))
             _meta_row = cur.fetchone()
             cur.close()
             if _meta_row and _meta_row[0]:
                 _meta = _json.loads(_meta_row[0]) if isinstance(_meta_row[0], str) else _meta_row[0]
                 _meta_rsi = _meta.get('rsi_14')
-        except Exception:
-            pass
+        except Exception as _meta_e:
+            log(f'  Feature entry: {token} trade #{trade_id} metadata read failed: {_meta_e} — falling back to computed RSI', 'WARN')
+        finally:
+            try:
+                _meta_conn.close()
+            except:
+                pass
 
     if _meta_rsi is not None:
-        intel['rsi_14'] = float(_meta_rsi)
-        log(f'  Feature entry: {token} trade #{trade_id} — using signal-time rsi={_meta_rsi} (DRIFT-E fix)')
+        try:
+            intel['rsi_14'] = float(_meta_rsi)
+            log(f'  Feature entry: {token} trade #{trade_id} — using signal-time rsi={_meta_rsi} (DRIFT-E fix)')
+        except (TypeError, ValueError):
+            log(f'  Feature entry: {token} trade #{trade_id} metadata rsi_14={_meta_rsi!r} not numeric — using computed RSI', 'WARN')
 
     if not intel or not any(intel.values()):
-        if conn:
-            try: conn.close()
-            except: pass
         return False
 
-    if conn is None:
-        conn = get_db_connection()
+    conn = get_db_connection()
     if conn is None:
         return False
 
