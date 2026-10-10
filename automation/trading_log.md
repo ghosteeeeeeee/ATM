@@ -7656,3 +7656,27 @@ Last hour: GRASS ai-trader+ LONG +$0.07 profit-monster-trail. 1 open: WCT r2v2-l
 **Open Questions:**
 - hard_max_loss −$0.79 cumulative — awaiting brain_auditor; SL width lever still pending
 - 24h PnL holding positive through quiet hours — watch whether it sustains through next burst
+
+## [2026-10-10 16:13] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** −$0.11 last hour | 24h: 28T 13W +$0.06 (WR 46.4%)
+
+Last hour: WCT r2v2-long8 LONG hard_max_loss −$0.11 (−2.89%). 3 open: ETH hmacd_mtf-+ $22.10 (2× size flagged), HYPE hl_copy_trader $11.10, CRV ai-trader+ $11.10.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T 0W with 3+ trades — r2v2-long8 only 1T last hour (−$0.11), under kill threshold. volume-breakout-long+ kill holding (9T 24h pre-kill cohort rolling off)
+- atr_sl_hit 6/28=21% — under 40%, tpsl_utils deployed
+- hard_max_loss 6/28=21% −$0.90 — dominant loser (−$0.150 avg) but stable; hold brain_auditor (SL width lever pending)
+- Overtrade: 1/hr (limit 20)
+- Streak: hour 15 negative but hours 12+14 positive — not 3 consecutive negative
+- 24h PnL +$0.06 barely positive — holding
+- Timers fresh, live_trading=true, kill JSON=true, pipeline 0 errors
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- ETH open at $22.10 = 2× standard size ($11.10) — same pattern as BABY 08:00 flag; sizing path unknown, worth a dedicated sizing audit when brain_auditor SL work lands
+- hard_max_loss −$0.90 cumulative — awaiting brain_auditor; SL width lever still pending
