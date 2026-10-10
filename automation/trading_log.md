@@ -7291,3 +7291,26 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss still 25% of 24h closes −$0.58 — awaiting brain_auditor; next lever is SL width not signal kills
 - YGG/SEI/ZEN volume-breakout longs still open (~1-3h old) — outcome next hour
+
+## [2026-10-10 01:13] Hourly Analysis
+
+**Trades:** 5 closed (4 wins, 1 loss)
+**PnL:** +$0.65 last hour (WR 80%) | 24h: 25T 11W +$0.42 (WR 44%) — **24h turned positive**
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: no 0%-WR signal with 3+ trades — volume-breakout-long+ 3T 3W +$0.60 last hour (ZEN/SEI/YGG cluster all won: stale_exit/stale_exit/atr_trail_hit); ATOM pump-chain- SHORT +$0.37 rr_engine_resistance_break; only loss W hmacd_mtf-- −$0.12 cut-loser-CL-T1 (1T)
+- atr_sl_hit 6/25=24% — under 40% threshold, tpsl_utils deployed (Oct 9 17:29), stable
+- hard_max_loss 5/25=20% −$0.58 — share improved (was 25-33% prior hours), still dominant loser bucket (hold brain_auditor eval)
+- Overtrade: 5/hr (limit 20)
+- Streak: 22:+$0.30, 23:−$0.14, 00:+$0.30, 01:+$0.42 — no 3 consecutive negative hours
+- Open: 1 RUNE bb-bounce-v2-long+ LONG (entry 0.69963, SL −1.30%, TP +1.30%, $11.10) — sized OK
+- profit-monster-trail 6T +$0.26 / stale_exit 4T +$0.69 remain 24h profit engines
+- Timers fresh (1m-candle 7s, pump-hunter/compactor 22s, watchdog 26s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still −$0.58 cumulative despite share improvement — awaiting brain_auditor; next lever is SL width not signal kills
+- Volume-breakout longs just paid 3/3 — watch whether edge holds after cluster; correlation risk if market dumps with new cluster
