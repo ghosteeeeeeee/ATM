@@ -3701,5 +3701,25 @@
     "status": "suggested",
     "risk": "low — reduces size not frequency",
     "verification_required": "Needs position_manager leverage cap path. Delegate bug_hunter if approved."
+  },
+  {
+    "date": "2026-10-10T00:41:08Z",
+    "idea": "Trail-activation telemetry: watchdog computes per-signal % of closes that reached +0.40% (PM_TRAIL_ACTIVATE) over last 20 closes; flags <20% as chop-entry candidate for dampen review",
+    "rationale": "Operationalizes the fundamental truth: trending entries arm trail and win (trail 60T +$3.76), chop entries never arm and die (HML 55T -$7.58). Outcome-based labels lag; arm-rate is a leading indicator of entry quality.",
+    "expected_impact": "Early identification of chop signals before they bleed a full week; quantifies 'wrong side' directly",
+    "category": "entry sniper / telemetry",
+    "status": "suggested",
+    "risk": "low (monitoring only, no trading path change)",
+    "delegate": "bug_hunter (watchdog.py additive metric)"
+  },
+  {
+    "date": "2026-10-10T00:41:08Z",
+    "idea": "Extend dead_money early-exit beyond pump signals: trades <+0.10% MFE after 90min = chop, exit at market",
+    "rationale": "pump_exit_dead_money is 9T +$0.92/7d (profitable exit type). bb-squeeze HIGH losers held 75min vs winners 42min — chop lingers. BTC continuum HML held 98min before dying.",
+    "expected_impact": "Cut chop holds ~30min earlier; reduce HML count by converting to smaller dead_money losses",
+    "category": "exit early in chop",
+    "status": "suggested",
+    "risk": "medium (touches position_manager all-signal path — requires 7d backtest of MFE@90min vs final outcome before ship)",
+    "delegate": "self_learner backtest then bug_hunter implement"
   }
 ]
