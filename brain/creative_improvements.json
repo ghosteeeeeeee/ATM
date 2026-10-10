@@ -3742,5 +3742,24 @@
     "category": "entry sniper",
     "status": "suggested — needs backtest",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-10T03:40:36Z",
+    "idea": "Dead-tape execution filter: at execution time, compare current price to price at signal creation. If signal age > 5min AND |price change| < 0.05%, skip entry (dead tape = no momentum = HML candidate).",
+    "rationale": "64% of 7d losers never reached +0.40% MFE — they entered dead tape. Winners (trail family) typically show pre-execution movement. This filters chop entries at the moment of commitment without touching entries that are already moving.",
+    "expected_impact": "Block ~30-40% of HML candidates while preserving trail-eligible entries (which have pre-exec momentum)",
+    "category": "entry sniper",
+    "status": "needs backtest",
+    "risk": "low",
+    "verification_required": "Reconstruct price-at-signal vs price-at-exec for last 7d trades. Must block <20% of winners. Sample: 55 HML + 61 trail exits."
+  },
+  {
+    "date": "2026-10-10T04:40:15Z",
+    "idea": "bb-squeeze+ trail-arming telemetry: log MFE@60min per trade; if <0.30% MFE at 60min the entry was chop. Use as confidence input after n>=20 samples.",
+    "rationale": "Losers hold 115min never arming trail vs winners 50min. The gap IS the edge measurement — trades that can't reach +0.40% in 60min are chop entries. Better entry filter than any RSI/vol gate.",
+    "expected_impact": "if dampen fires on non-arming entries at 40% rate: cut ~6 HML/week (bb-squeeze+ is #1 HML source)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — shadow telemetry first, no live change"
   }
 ]
