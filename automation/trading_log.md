@@ -7468,3 +7468,28 @@ Last hour: W hmacd_mtf-- SHORT profit-monster-trail +$0.06 (+2.65% pnl_pct). Ope
 **Open Questions:**
 - hard_max_loss −$1.07 cumulative (7/29=24%) — awaiting brain_auditor; SL width lever still pending
 - 24h PnL −$0.10 (near flat) — 2 negative closes in hour 06 (BLUR −$0.38 earlier + another −$0.32?) — wait, hour 06 bucket shows 2T −$0.32 but BLUR closed 06:01 −$0.38 and W closed 06:42 +$0.06 = −$0.32 ✓. Consistent. No anomaly
+
+## [2026-10-10 08:13] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 last hour (no closes) | 24h: 29T 12W −$0.10 (WR 41%)
+
+Quiet hour — no closes. 4 open: PURR vol-breakout LONG (SL −0.23%/TP +2.86%), SOPH bb-bounce LONG (SL −0.82%/TP +1.29%), PUMP vol-breakout LONG (SL −2.5%/TP +2.68%), BABY oversold-bounce LONG (SL −0.58%/TP +1.95%, sized $22.10 — 2× normal $11.10, flag: double size may be intentional confidence sizing, verify oversold-bounce sizing rule).
+
+24h by close reason: profit-monster-trail 8T +$0.23, hard_max_loss 7T −$1.07 (dominant loser), atr_sl_hit 6T −$0.40, stale_exit 4T +$0.71 (top earner).
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0T last hour — no 0%-WR signal with 3+ trades. Worst 24h signals (continuation+ 2T 0W −$0.10, hmacd_mtf-+ 2T 1W −$0.11) under 3T threshold
+- atr_sl_hit 6/29=21% — under 40%, tpsl_utils deployed, stable
+- hard_max_loss 7/29=24% −$1.07 — dominant loser bucket, hold brain_auditor (lever is SL width, not signal kills)
+- Overtrade: 0/hr (limit 20)
+- Streak: hours 02/03/04 were 3 neg hours but 05 empty broke it; 06 neg (−$0.32), 07 empty — not 3 consecutive. Regime previously LONG_BIAS — size lever N/A
+- Timers fresh (pipeline/pump-hunter/compactor 44s, watchdog 33s), live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$1.07 cumulative (7/29=24%) — awaiting brain_auditor; SL width lever still pending
+- BABY oversold-bounce+ $22.10 (2× size) — confirm intentional; if sizing bug, fix next hour
