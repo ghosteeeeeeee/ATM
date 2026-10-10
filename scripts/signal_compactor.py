@@ -547,7 +547,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('mover_long',  'mover+'):  1.0,  # new signal — start neutral, tune after 20+ trades
     ('mover_short', 'mover-'):  1.0,
     # ai-trader — AI-driven signal from trade-watchdog (full market context)
-    ('ai-trader', 'ai-trader+'): 1.0,  # start neutral, tune after live performance data
+    ('ai-trader', 'ai-trader+'): 1.2,  # BOOSTED 1.0→1.2 2026-10-10 — 14d 5T 100%WR +$0.25 +1.56%avg. Trade Watchdog hourly pick.
     ('ai-trader', 'ai-trader-'): 1.0,
     # hzscore+mover+ combo — star performer (80% WR, +$0.17)
     ('mtf_zscore',  'hzscore+,mover+'): 1.3,  # boosted 2026-08-14
@@ -611,7 +611,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # doji_top — doji exhaustion at top (mean-reversion)
     ('doji_top_short', 'doji-top-short'):  1.0,  # exit LONG / enter SHORT, standard weight
     # doji_bottom — doji exhaustion at bottom (mean-reversion)
-    ('doji_bottom_long', 'doji-bottom-long'):  1.0,  # enter LONG, standard weight
+    ('doji_bottom_long', 'doji-bottom-long'):  1.2,  # BOOSTED 1.0→1.2 2026-10-10 — 14d 10T 70%WR +$0.26 +1.32%avg
     # ema_reclaim — EMA20 reclaim after decline (mean-reversion, NEUTRAL diversity)
     ('ema_reclaim_long', 'ema-reclaim-long'):  1.0,  # CEO 2026-10-02 — shadow, no solo trade
     # ema300_dip_long — buy dips to EMA300 during strong uptrends
@@ -623,9 +623,9 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('ema300_breakthrough_short', 'ema300-breakthrough-'):  1.2,  # NEW — 80% WR backtest, trend continuation SHORT
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
     ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.4,  # RE-APPLIED 2026-10-06 00:38Z brain_auditor post-freeze (queue #6). Was 1.3 (reverted freeze b960ffe8). Fresh evidence: 7d 18T 77.8%WR +$0.77 (NORMAL 9T 66.7% +$0.50, HIGH 5T 80% +$0.10, FLAT 4T 100% +$0.17). Boosts winner, blocks nothing.
-    ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 1.2,  # NEW 2026-09-13 — 7 new filters, regime-aware
-    ('bollinger_squeeze_long', 'bb-squeeze+'): 1.0,  # REVERTED 2026-10-05 signal_reporter — was 1.2 (BOOSTED 10-03 on 24h 10T 70%WR +$0.33). Now 24h 16T 62.5%WR -$0.32 — WR holds but R:R negative (HIGH regime -$0.40 9T). EXTREME still blocked. 7d +$0.18 keep enabled.
-    ('pump-chain', 'pump-chain+'): 1.2,  # BOOSTED 2026-10-03 23:13 — 24h 8T 62.5%WR +$0.95 (ME/LDO/ENS/DYDX/GMT). Re-enabled 10-02 post-kill. Static fallback; combo_weights.json is authoritative.
+    ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 0.5,  # DISABLED 2026-10-10 signal_reporter — 14d 19T -$0.33 52.6%WR. Weight lowered pending re-enable.
+    ('bollinger_squeeze_long', 'bb-squeeze+'): 0.8,  # DEPRIORITIZED 2026-10-10 — 14d 69T -$0.05 60.9%WR +0.02%avg. Massive trade count, zero edge. Lowered 1.0→0.8 to reduce capital allocation. 17 hard_max_loss at avg RSI 74.1 (overbought chase).
+    ('pump-chain', 'pump-chain+'): 1.4,  # BOOSTED 1.2→1.4 2026-10-10 — 14d 25T 56%WR +$2.27 +2.91%avg. BEST signal by total PnL. Was 1.2 (boosted 10-03).
     ('pump-chain-v6', 'pump-chain-v6+'): 1.0,  # V6 LONG — validated gate (spec rev1, double-audited). Self-learner tunes after 5+ trades.
     ('pump-chain-v6', 'pump-chain-v6-'): 1.0,  # V6 SHORT — monitoring bet; same base weight
     # ── Combo boosts (14d data: 2026-08-09) ──────────────────────────────────
@@ -717,7 +717,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # trend_ignition — early-stage breakout at trend START (100% WR backtest)
     ('trend_ignition_long', 'trend-ignition+'):  1.3,  # NEW — 100% WR 7-day backtest, volume+compression breakout
     # volume_breakout — 68.8%WR +$1.41/7d, wins across 10+ tokens. signal_reporter 2026-09-22
-    ('volume_breakout_long', 'volume-breakout-long+'): 1.25,  # BOOSTED 1.15→1.25 2026-10-03 — window over; DB 7d 4T 4W +$1.96
+    ('volume_breakout_long', 'volume-breakout-long+'): 1.4,  # BOOSTED 1.25→1.4 2026-10-10 — 14d 15T 46.7%WR +$1.35 +3.01%avg. High-volatility winner. CEO re-enabled 10-10.
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
