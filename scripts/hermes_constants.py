@@ -3259,7 +3259,7 @@ ENGULFING_CONF_CAP = 88               # max confidence
 # Family: Volume (pairs with ANY other family for 2-type confluence)
 # NEW 2026-08-30 — backbone signal to address signal starvation
 VOLUME_BREAKOUT_ENABLED = True         # master toggle
-VOLUME_BREAKOUT_PLUS_ENABLED = False   # LONG — KILLED auto_1hr 2026-10-10 09:15: 3T 0W −$0.25 last hour (AIXBT/WCT hard_max_loss post RSI-ceiling-85, PURR atr_sl_hit), 24h 8T 3W −$0.20 worst signal. Flag was never wired in volume_breakout.py — wiring added same commit. Re-enable when post-fix cohort (RSI<85, post-07:44) proves profitable.
+VOLUME_BREAKOUT_PLUS_ENABLED = True    # LONG — RE-ENABLED CEO 2026-10-10: was great signal, chop losses were regime issue not signal issue. RSI ceiling 85 in place. Kill was auto_1hr not CEO.
 VOLUME_BREAKOUT_MINUS_ENABLED = True   # SHORT (bearish volume spike)
 VOLUME_BREAKOUT_SPIKE_MULT = 2.0       # volume must be >= 2x average
 VOLUME_BREAKOUT_AVG_PERIOD = 20        # bars for average volume
