@@ -235,11 +235,19 @@ def report():
             wr = (wins / traded_n * 100) if traded_n else None
             wr_s = f'{wr:5.1f}%' if wr is not None else '  n/a '
             flag = ''
-            if traded_n >= 15 and wr is not None and wr >= 55:
-                flag = ' ← PROPOSE RELAX (shadow WR>=55, n>=15)'
-                proposals.append((gate, wr, traded_n, 'relax'))
-            elif traded_n >= 15 and wr <= 35:
-                flag = ' ← gate working (shadow WR<=35)'
+            if traded_n >= 15:
+                # FIX 2026-10-10 (T): relax proposals require BOTH high WR AND
+                # positive PnL — WR alone qualified LONG-NEUTRAL (56.5% WR but
+                # blocked trades net -$0.48: relaxing would let losing trades in).
+                # A relax case means the gate is COSTING money, i.e. blocked
+                # trades would have net-made money.
+                if wr is not None and wr >= 55 and pnl > 0:
+                    flag = ' ← PROPOSE RELAX (WR>=55, n>=15, blocked net POSITIVE)'
+                    proposals.append((gate, wr, traded_n, 'relax'))
+                elif pnl < 0:
+                    flag = ' ← gate working (blocked trades net negative)'
+                elif wr is not None and wr <= 35:
+                    flag = ' ← gate working (shadow WR<=35)'
             log(f'{gate:28} {blocks:6} {closed_n:6} {traded_n:6} {wins:5} {wr_s} {pnl:+8.2f}{flag}')
         if proposals:
             log('KANBAN PROPOSALS: ' + '; '.join(f'{g} relax (wr={w:.0f}%,n={n})' for g, w, n, _ in proposals))
