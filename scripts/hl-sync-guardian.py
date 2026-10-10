@@ -850,22 +850,33 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
             vol_regime = _get_volatility_regime(token)
         except Exception:
             vol_regime = 'UNKNOWN'
-        
+
+        # DRIFT-E FIX 2026-10-10: write minimal _signal_metadata so record_entry_features
+        # can find it. Orphan trades have no signal-time RSI (signal data is gone),
+        # so rsi_14 is intentionally absent — record_entry_features will correctly
+        # fall back to the price_history computation for these.
+        import json as _json
+        _orphan_meta = _json.dumps({
+            'source': 'orphan_recovery',
+            'z_score': float(signal_z_score) if signal_z_score is not None else None,
+            'vol_regime': vol_regime,
+        })
+
         cur.execute("""
             INSERT INTO trades (token, direction, amount_usdt, entry_price, hl_entry_price,
                 exchange, paper, stop_loss, target, server, status, open_time,
                 pnl_usdt, pnl_pct, leverage, sl_distance, trailing_activation, trailing_distance,
                 guardian_closed, is_guardian_close,
-                signal_z_score, volatility_regime)
+                signal_z_score, volatility_regime, _signal_metadata)
             SELECT %s, %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
                    0, 0, %s, 0.03, 0.01, 0.01, TRUE, TRUE,
-                   %s, %s
+                   %s, %s, %s::jsonb
             WHERE NOT EXISTS (
                 SELECT 1 FROM trades WHERE token=%s AND server='Hermes' AND status='open'
             )
             RETURNING id
         """, (token, direction, amount_usdt, entry_price, entry_price,
-              stop_loss, target, leverage, signal_z_score, vol_regime, token))
+              stop_loss, target, leverage, signal_z_score, vol_regime, _orphan_meta, token))
         row = cur.fetchone()
         if row is None:
             # No row returned = INSERT was skipped (open trade already exists)
