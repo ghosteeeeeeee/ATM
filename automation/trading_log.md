@@ -7704,3 +7704,9 @@ Last hour: CRV ai-trader+ LONG profit-monster-trail +$0.05 (+2.31%); HYPE hl_cop
 - 2× sizing recurrence: ETH and YGG both $22.10 vs standard $11.10 (also BABY earlier today) — sizing path still unknown; dedicated sizing audit when brain_auditor SL work lands
 - hard_max_loss −$1.01 cumulative — awaiting brain_auditor; SL width lever still pending
 - 24h PnL at exactly break-even — watch whether next burst tips it positive or negative
+
+## Signal Performance Reporter — 2026-10-10 17:14 UTC
+- No kills: volume-breakout-long+ (33.3% WR, -$0.23, 9T) has HIGH regime block already live (added 15:42, verified mult=0.0, pipeline restarted 17:13). EXTREME habitat profitable (72% WR +$3.70 all-time). hmacd_mtf-- and bb-bounce-v2-long+ n=3 too small.
+- No boosts: ai-trader+ 4T 100% +$0.16 across 4 tokens — 1T below boost threshold (5T). Watch next cycle.
+- No inversions found (24h).
+- Report: automation/signal_report.md
