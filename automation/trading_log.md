@@ -7404,3 +7404,41 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss −$0.69 cumulative — awaiting brain_auditor; SL width lever still pending
 - 3 negative hours but regime LONG_BIAS — if streak extends to 4h with a meaningful loss day (>−$0.50), escalate size/regime review even outside NEUTRAL
+
+## FAVORITES Update — 2026-10-10 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE LDO (WR=57.1%, PnL=$0.16, 1 consecutive bad days, regime=LONG_BIAS)
+- PROMOTE BABY (WR=66.7%, AvgPnL=1.26%, Trades=6)
+
+Final set: ['BABY', 'BLUR', 'SYRUP']
+
+## LOSERS Update — 2026-10-10 06:05 UTC
+- REMOVE INJ (insufficient data)
+
+Final set: ['IMX']
+
+## [2026-10-10 06:13] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** −$0.38 last hour (WR 0%) | 24h: 28T 11W −$0.16 (WR 39%) — flipped slightly negative as older winning hours aged out of the 24h window
+
+Last hour: BLUR volume-breakout-long+ LONG hard_max_loss −$0.38 (−5.11% pnl_pct). Entry 05:17, close 06:01 (~44min hold). Single trade — no signal pattern.
+
+24h by close reason: hard_max_loss 7T −$1.07 (dominant loser), profit-monster-trail 7T +$0.17, atr_sl_hit 6T −$0.40, stale_exit 4T +$0.71 (top earner).
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 1T last hour — no 0%-WR signal with 3+ trades. volume-breakout-long+ 24h 5T 3W +$0.05 (profitable, no kill). hmacd_mtf-- 2T 0W −$0.13 — under 3T threshold
+- atr_sl_hit 6/27=22% — under 40%, tpsl_utils deployed, stable
+- hard_max_loss 7/27=26% −$1.07 — still dominant loser bucket, hold brain_auditor (lever is SL width, not signal kills)
+- Overtrade: 1/hr (limit 20)
+- Streak: 02/03/04 were 3 neg hours but hour 05 had 0 closes (streak broken); 06 is first neg hour after gap. Regime previously LONG_BIAS (not NEUTRAL) — size lever N/A
+- 3 open all sized $11.10, SL/TP sane: PURR vol-breakout LONG (SL −2.5%/TP +1.9%), SOPH bb-bounce LONG (SL −1.0%/TP +1.3%), W hmacd SHORT (SL +1.1%/TP −1.5%)
+- Timers fresh (pipeline/pump-hunter/compactor 41s, watchdog 52s, 1m-candle 10s, price-collector 14s), live_trading=true, kill JSON=true, pipeline LIVE +4.89% today
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$1.07 cumulative (7/27=26%) — awaiting brain_auditor; SL width lever still pending
+- BLUR −5.11% single hard_max_loss — one data point, not actionable alone; watch if vol-breakout LONG hard_max_loss clusters next hour
