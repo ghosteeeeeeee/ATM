@@ -1068,24 +1068,31 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
             level_type = level.get('type', '')
             level_touches = level.get('touches', level.get('strength', 0))
 
+            # Guard: skip if entry_price is invalid (0, None) — prevents TypeError
+            # and prevents the below-entry resistance bug from regressing
+            if not entry_price or entry_price <= 0:
+                continue
+
             # Don't exit if level is too close to entry (within 0.5%) — that's just noise
-            if entry_price is not None and entry_price > 0:
-                dist_from_entry = abs(level_price - entry_price) / entry_price
-                if dist_from_entry < min_break_dist:
-                    continue  # level too close — skip
+            dist_from_entry = abs(level_price - entry_price) / entry_price
+            if dist_from_entry < min_break_dist:
+                continue  # level too close — skip
 
             if direction == 'LONG':
                 # LONG: exit when price breaks BELOW support (floor broken)
-                if level_type == 'support' and current_price < level_price * (1 - break_buffer):
-                    return {
-                        'action': 'CUT_LOSS',
-                        'price': current_price,
-                        'reason': f'support_break: {level_price:.4f} broken (touches={level_touches})',
-                        'new_sl': None,
-                    }
+                # FIX: support must be BELOW entry — a support above entry is
+                # just old resistance (price already rose through it = good for LONG)
+                if level_type == 'support' and level_price < entry_price:
+                    if current_price < level_price * (1 - break_buffer):
+                        return {
+                            'action': 'CUT_LOSS',
+                            'price': current_price,
+                            'reason': f'support_break: {level_price:.4f} broken (touches={level_touches})',
+                            'new_sl': None,
+                        }
             elif direction == 'SHORT':
                 # SHORT: exit when price breaks ABOVE resistance (ceiling broken)
-                # BUT only if resistance is ABOVE entry — a resistance below entry
+                # FIX: resistance must be ABOVE entry — a resistance below entry
                 # is just old support that price already dropped through (good for SHORT)
                 if level_type == 'resistance' and level_price > entry_price:
                     if candle_close > level_price * (1 + break_buffer):
