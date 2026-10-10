@@ -3457,7 +3457,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         except Exception:
             _hml_atr = None
         if _hml_atr is not None and _hml_atr > 0:
-            _hml_vol_floor = -float(HML_VOL_ATR_MULT) * float(_hml_atr)  # ATR is pct pts (1.5=1.5%)
+            # Vol floor in price move %: -HML_VOL_ATR_MULT × ATR
+            _hml_vol_floor = -float(HML_VOL_ATR_MULT) * float(_hml_atr)
+            # FIX (2026-10-10): vol floor must NOT be wider than account limit.
+            # Vol floor is price %; account limit is CUT_LOSER_PNL/lev (also price %).
+            # If vol floor is wider, it allows account loss beyond CUT_LOSER_PNL.
+            # Example: ATR 1.57, lev 5 → vol floor -0.785% price = -3.93% account
+            # but CUT_LOSER_PNL = -2.00% account. Cap vol floor at account limit.
+            _hml_account_cap = CUT_LOSER_PNL_HERMES / _hml_lev  # account limit in price %
+            if _hml_vol_floor < _hml_account_cap:
+                _hml_vol_floor = _hml_account_cap  # don't exceed account limit
             if _hml_vol_floor < HARD_MAX_LOSS_PCT:
                 HARD_MAX_LOSS_PCT = _hml_vol_floor
         # ponytail: self-check — lev5 CUT_LOSER -0.30 → D3 floor -0.60; EXTREME ATR 1.5 → -0.75; NORMAL ATR 0.3 → -0.60
