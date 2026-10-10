@@ -7381,3 +7381,26 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss −$0.69 cumulative — awaiting brain_auditor; lever is SL width not signal kills
 - 2 negative hours (02, 03) — if hour 04 closes negative too, evaluate regime/size lever next hour
+
+## [2026-10-10 05:16] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss — breakeven)
+**PnL:** −$0.01 last hour (WR 0%, −0.58% pnl_pct) | 24h: 27T ~13W +$0.32 (WR ~48%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 1T last hour — W hmacd_mtf-- SHORT profit-monster-trail −$0.01. No 0%-WR signal with 3+ trades last hour. hmacd_mtf-- 24h 2T 0W −$0.13 — under 3T kill threshold, hold
+- atr_sl_hit 6/27=22% — under 40%, tpsl_utils deployed, stable
+- hard_max_loss 6/27=22% −$0.69 — still dominant loser bucket, hold brain_auditor eval (lever is SL width, not signal kills)
+- Overtrade: 1/hr (limit 20)
+- **Streak: 02:−0.05, 03:−0.17, 04:−0.01 = 3 consecutive negative hours — rule says check regime.** Regime 4h: LONG_BIAS (34L/11S/37N), 15m: LONG_BIAS (25L/9S/62N) — NOT NEUTRAL, size-reduction lever does not fire. Also: 3h losses total −$0.23 vs 00-01 gains +$0.72; 24h still +$0.32. Noise, not regime bleed. Sizing is dynamic (7% withdrawable, min $11) — already at floor-ish $11.10 trades; further cut would breach HL min notional anyway
+- Open trades: 0
+- 24h profit engines: stale_exit 4T +$0.71, volume-breakout-long+ 4T 3W +$0.43, rr_engine_resistance_break +$0.37, pump-chain- 2T +$0.30
+- Timers fresh (watchdog 5s, pump-hunter/compactor ~45s, 15m-regime in 14m), live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$0.69 cumulative — awaiting brain_auditor; SL width lever still pending
+- 3 negative hours but regime LONG_BIAS — if streak extends to 4h with a meaningful loss day (>−$0.50), escalate size/regime review even outside NEUTRAL
