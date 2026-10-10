@@ -7268,3 +7268,26 @@ Final set: ['IMX', 'INJ']
 - 3 volume-breakout longs open simultaneously (ZEN/SEI/YGG) — cluster exposure, watch correlation if market dumps
 
 **Self-review addendum (BUG-048, same night):** Independent subagent audit of commit fc55eff0 returned SAFE TO SHIP (no CRITICAL/HIGH introduced; lock/cursor/upsert/rate-limit checks all clean). Three findings fixed in follow-up commit: (1) MEDIUM-1 — per-token try/except in `_seed_fast_1m` so one poisoned token (e.g. NaN OHLC -> sqlite IntegrityError) can never wedge the whole 1m rotation (poison-token test passed: cursor kept advancing, 177/178 stored); (2) LOW-1 — read conn + pragma moved inside try/finally; (3) MEDIUM-3 — comment corrected: effective per-token 1m refresh is ~6-13min (skip-on-first-revisit), not 2-7min. Reported for later: no freshness watchdog on candles_1m (recommend before 48h soak ends); _aggregate_1m.py never acquires the candles lock (pre-existing HIGH, dormant — resolve at revival/deletion step); backfill_candles_5m.py has unguarded INSERT OR REPLACE (dormant manual script).
+
+## [2026-10-10 00:13] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.05 last hour (WR 100%) | 24h: 20T 7W −$0.25 (WR 35%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 2 trades total, both wins (CAKE hmacd_mtf-+ LONG +$0.03, SYRUP ai-trader+ LONG +$0.02 — both profit-monster-trail) — no 0%-WR signal with 3+ trades
+- atr_sl_hit 6/20=30% — under 40% threshold, tpsl stable
+- hard_max_loss 5/20=25% −$0.58 — still dominant loser bucket (hold brain_auditor eval, Oct 9/10)
+- Overtrade: 2/hr (limit 20)
+- Streak: last hour positive — no 3 consecutive negative hours
+- 3 open: ZEN/SEI/YGG volume-breakout-long+ cluster (all $11.10, SL/TP ~±2-2.5% OK) — same cluster flagged last hour, watch correlation
+- 24h profit engine: profit-monster-trail 6T +$0.26, stale_exit 2T +$0.47; worst single signals all 1-2T (below kill threshold)
+- Timers fresh (pipeline/pump-hunter/compactor 39s, watchdog ~2min), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still 25% of 24h closes −$0.58 — awaiting brain_auditor; next lever is SL width not signal kills
+- YGG/SEI/ZEN volume-breakout longs still open (~1-3h old) — outcome next hour
