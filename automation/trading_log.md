@@ -7808,3 +7808,26 @@ Last hour: YGG volume-breakout-long+ atr_sl_hit −$0.14 (−1.89%); ME/POL bb-b
 **Open Questions:**
 - 5 neg hours −$0.41 cumulative — 24h still only −$0.23; watch hour 20
 - 2× sizing ETH $22.10 recurrence (also BABY/YGG earlier) — sizing audit still pending brain_auditor
+
+## [2026-10-10 21:14] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 last hour | 24h: 32T 15W −$0.23 (WR 46.9%)
+
+No closes last hour. 24h breakdown unchanged from 20:14 run: hard_max_loss 8T −$1.04 dominant loser (−$0.13 avg), volume-breakout-long+ 10T 3W −$0.37 worst signal (CEO re-enabled 12:25, not a leak). ai-trader+ 4T 4W +$0.16 best.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal qualifies (need 3+T at 0% WR)
+- atr_sl_hit 4/32=12.5% — under 40%, tpsl_utils deployed
+- hard_max_loss 25% −$1.04 — stable, hold for brain_auditor SL width lever
+- Overtrade: 0/hr (limit 20)
+- Streak: hour 20 empty → 5-neg-hour streak (15–19, −$0.41) broken; no size lever needed
+- Timers fresh (pipeline fired 35s ago), live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 2× sizing recurrence (ETH/YGG $22.10) — sizing audit still pending brain_auditor
+- hard_max_loss cumulative −$1.04 — awaiting SL width work
