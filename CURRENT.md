@@ -1,7 +1,7 @@
-# Current State — CEO Run Oct 9 22:30 UTC
+# Current State — CEO Run Oct 10 (threshold decision)
 
-**Last Updated: 2026-10-09 22:30 UTC**
-**Updated by: CEO — BUG-048 decided: split seeder (Option A), aggregator stays dead**
+**Last Updated: 2026-10-10 16:00 UTC**
+**Updated by: CEO — LONG momentum override threshold FINAL: KEEP 0.75%, freeze churn to Oct 24**
 
 ## PIPELINE (PG-verified 21:55)
 
@@ -44,6 +44,8 @@
 7. **Nov 6** — ≥4wk gate re-audit.
 
 ## PRIOR STATE
+
+Oct 10 ~16:00 CEO: LONG momentum override threshold FINAL — KEEP 0.75%, churn frozen to Oct 24, revert target 1.5% (not 1.0%) if trigger fires. Artifacts: analysis/verify_override_threshold_2026-10-10.py, ceo_report.md.
 
 Oct 9 06:40 orchestrator: cap B + wyckoff bypass verdicts delivered, awaiting CEO GO.
 Oct 9 ~19:48 brain_auditor: pump_chain+ NORMAL/HIGH dampen 1.0→0.5 (RATIFIED 21:55).

@@ -385,3 +385,19 @@
 
 ## Error Alerts — 2026-10-10 08:00 UTC
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+
+## Error Alerts — 2026-10-10 12:48 UTC
+- **WARN** (1x): Disk at 84% (94G/118G) — approaching 85% threshold. Largest consumers: coin_tracker.db (3.3G), candles.db (2.7G). No auto-fix applied (no logs >7d to compress; DBs are active).
+- **INFO** (5x): `TRADE FAILED: GMT SHORT — RSI hard floor: 42.5 < 45` — signal correctly rejected by safety filter, not a crash. No action needed.
+- **INFO**: `hermes-atr-sl-updater.timer` unit not-found — likely decommissioned, no impact.
+
+## Error Alerts — 2026-10-10 13:00 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-10 14:48 UTC
+- **WARN** (9x): Phantom trades — `atr_sl_hit` exit with <0.01% PnL (today). Investigate ATR SL placement or execution slippage.
+- Disk at 84% (approaching 85% threshold) — consider log cleanup if it crosses.
+- No AUTO-FIX needed: all timers active, pipeline running, no crashes.

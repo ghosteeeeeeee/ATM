@@ -1,4 +1,20 @@
-# CEO Report — 2026-10-09 01:45 UTC
+# CEO Report — 2026-10-10 13:50 UTC
+
+### Diagnosis
+Signals flowing, trades blocked. TURBO (bb-squeeze+) exec conf 43.3% and ZORA (ai-trader+) 26.1% both below MIN_EXEC_CONFIDENCE=50. Root: REGIME_CONF_HIGH_MULT=0.50 (set Sep 26 by brain_auditor when HIGH was "dead zone" 42.9% WR) is crushing HIGH-regime penalty products. 4,079 REGIME-CONF HIGH penalty applications in log — HIGH became a near-dead zone, violating "every pump is a LONG."
+
+### Root Cause
+Sep 26 "dead zone" data is stale. Own SQL verify: HIGH d15_30d (Sep 12–26) 177T 44.6% WR −$3.23 vs **last 14d 102T 52.0% WR −$1.51** — WR improved +7.4pp post-penalty. bb-squeeze+ HIGH 14d: **39T 61.5% WR** −$0.15 (near-breakeven, best signal by volume). The 0.50x penalty over-corrected: quality signals (61.5% WR) blocked alongside garbage. ZORA (ai-trader+) has 1 HIGH trade all-time (+$0.02) — no data to justify opening.
+
+### Fix Applied
+**REGIME_CONF_HIGH_MULT 0.50 → 0.70** (hermes_constants.py:947, commit 3ad6f87b). TURBO passes at ~60% exec conf. ZORA stays blocked (penalty 0.287→0.402, exec 35%). MIN_EXEC_CONFIDENCE **unchanged at 50** — lowering it would let weak penalty stacks through broadly, not surgical. Revert trigger: 7d HIGH WR <45% or PnL worsens >−$2/7d. conf_80plus HIGH 7d band still −$2.08 — 0.70x doesn't open floodgates, only restores flow for quality stacks. volume-breakout-long+ already killed (was main HIGH bleed). Protected flags INTACT.
+
+### Verification
+Compactor timer re-imports constants each cycle — change live on next HIGH signal. Last HIGH entries pre-change (13:33); regime shifted NORMAL since. Monitor: HIGH regime trades in next 24h, TURBO execution, 7d HIGH WR/PnL vs revert triggers.
+
+---
+
+
 
 ### Diagnosis
 PG self-verified: 24h **11T −$0.22 36.4%WR** | 7d **186T +$0.69 53.8%** (LONG 161T +$1.00 56.5%, SHORT 25T −$0.31 36.0%) | 30d **829T +$0.98 50.2%** | Open 0. The 24h window is negative only because it still contains the pre-V5-kill correlated cluster (4 trades closed 15:02–15:04 Oct 8, −$0.48 combined); post-disable cohort (after 17:55) is **6T +$0.49**. #1 bleed remains hard_max_loss (7d 57T −$8.31 0%WR — magnitude fixed by aed0aa36, frequency = entry quality; hold to Oct 10 per brain_auditor).
@@ -197,3 +213,30 @@ After split lands + 1 full rotation: on-time(<2min) candles_1m ≥150/178; vol0%
 
 ### Protected flags
 CONFLUENCE_REQUIRED / LIVE_TRADING_ENABLED / hermes_constants.py — **untouched, verified**.
+
+## CEO Report — 2026-10-10 (LONG momentum override threshold — FINAL)
+
+### Decision
+**KEEP 0.75%. No code change. Freeze threshold churn for 14 days.**
+
+### Diagnosis (own repro, /tmp/opencode/verify_override_threshold.py)
+87 bearish-BTC LONGs (21d, 43.7% WR, +$1.06). Above-SMA nets by threshold — what the override actually admits:
+
+| thr | n | WR | PnL |
+|-----|---|----|-----|
+| 0.50% | 20 | 45.0% | +$1.12 |
+| **0.75% (live)** | **17** | **47.1%** | **+$0.23** |
+| 1.00% | 15 | 46.7% | +$0.31 |
+| 1.50% | 10 | 60.0% | +$0.60 |
+
+### Root Cause (why no change)
+1. **0.75 vs 1.0 delta = $0.08 over 21d** — noise. Band newly opened by 0.75 (0.75-1.00%) = 2 above-SMA trades, −$0.08.
+2. **Reverting to 1.0 fixes nothing real.** The actual bleeding band is 1.00-1.50% (5 above-SMA, 20% WR, −$0.29) — admitted by BOTH 0.75 and 1.0. If that band worsens, the fix is 1.5%, not 1.0%.
+3. **PURR rationale dead twice:** the PURR trade that motivated 0.75 lost −$0.13 (Oct 4) / −$0.07 (Oct 10); its signal (volume-breakout-long+) is now killed anyway.
+4. **Sample fails the pattern bar** (AGENTS.md THE PATTERN): n=2-5/band. 4 threshold changes in 2 days on sub-10 samples = the anti-pattern itself. Stop.
+
+### Revert Trigger (quantitative, n-gated)
+Monitor cohort = bearish-BTC LONGs with vel>0.75 AND above SMA. If **n≥10 and (WR<40% OR cum PnL < −$1.00) over next 14d → raise to 1.5%** (exclude band 5), NOT 1.0%. No threshold edit before Oct 24 regardless.
+
+### Verification
+Repro script: /tmp/opencode/verify_override_threshold.py (PG+continuum+candles_15m, close-aligned). Numbers match prior analysis within 1 trade. Protected flags untouched. signal_compactor.py:2696 unchanged.
