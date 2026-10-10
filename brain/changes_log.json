@@ -957,5 +957,16 @@
     "after": "if linreg BEAR/LEAN_BEAR AND phase DECLINING/STORMY AND ema BELOW → exemption fires",
     "rationale": "Sibling SHORT-NEUTRAL-BYPASS already fixed to AND on 2026-09-24 for same false-bypass disease. LDO SHORT@RSI70.19 wrong-side 2026-10-09 slipped through on DECLINING+LEAN_BEAR while ema=AT (not BELOW). 14d SHORT meta-RSI 65-75 band = 9T 44.4%WR -$0.69 (4W+$0.31/5L-$1.00); all-time 60T 53.3%WR -$0.74. Tightening blocks shallow-bear false exemptions without touching full-bear legitimate shorts.",
     "impact": "Blocks wrong-side SHORT entries when BTC has only partial bear structure. Full-bear (phase+linreg+ema-below) shorts still exempt. Expected: reduce SHORT bleed in 65-75 RSI band; monitor 7d."
+  },
+  {
+    "timestamp": "2026-10-10T02:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Fixed mtf_macd.py regime guard fail-open for alts: continuum.db is BTC-only (136K rows, 100% BTC) so _get_trend_quality returned None for 69/70 traded tokens and the STRONG_UP/STRONG_DOWN guard never fired. Added _get_regime_5m() fallback reading regime_5m.json — blocks SHORT when 5m=LONG_BIAS conf>=70, blocks LONG when 5m=SHORT_BIAS conf>=70. New constant ALT_REGIME_CONF_MIN=70.",
+    "type": "bugfix",
+    "file": "scripts/signals/mtf_macd.py",
+    "before": "Guard fail-opened for all alts (no continuum row). Directly caused W SHORT x2 losses -$0.26 shorting LONG_BIAS conf 90.1.",
+    "after": "Alt path uses regime_5m.json with conf>=70 threshold. BTC path unchanged (continuum trend_quality still primary).",
+    "rationale": "Watchdog flagged hmacd_mtf-- no regime-alignment guard. Root cause: guard existed but was dead code for alts. Bug fix, not new filter — docstring already claimed this behavior. Winner impact: 0 of 4 all-time hmacd trades.",
+    "impact": "Blocks counter-structure SHORT/LONG on alts with strong 5m bias. W-pattern prevented. Sibling signals (squeeze_breakout, pump_chain_v4) have same fail-open disease — delegated for sweep."
   }
 ]

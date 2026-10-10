@@ -1,123 +1,138 @@
 {
-  "timestamp": "2026-10-10T00:41:08Z",
-  "run_type": "report-only (0 config changes — last-run changes need 48h cohort, HML HOLD per eval)",
-  "session_brain_stats": {
-    "queries": [
-      "pump chain long regime dampen performance",
-      "SHORT RSI ceiling exemption",
-      "hard_max_loss frequency leverage"
+    "timestamp": "2026-10-10T02:45:00Z",
+    "agent": "brain_auditor",
+    "session_lock": "absent — config changes allowed",
+    "trade_summary_24h": {
+        "closed": 26,
+        "pnl": 0.43,
+        "wr": 46.2,
+        "winners": 12,
+        "losers": 14,
+        "note": "RECOVERED positive overnight. Volume-breakout cluster (ZEN/SEI/YGG/BABY) all won +0.72 combined. ATOM pump-chain- SHORT +0.37 best single trade."
+    },
+    "trade_summary_7d": {
+        "closed": 160,
+        "pnl": 0.45,
+        "wr": 50.0,
+        "long_pnl": 0.61,
+        "long_wr": 53.4,
+        "short_pnl": -0.16,
+        "short_wr": 34.5,
+        "hard_max_loss": "54T -$7.57 0%WR avg_lev 4.0 — still #1 bleed",
+        "goal_status": "7d PnL +$0.45 HOLDING ≥$0; SHORT 7d -$0.16 AT RISK vs Oct 11 deadline"
+    },
+    "changes_from_last_run": [
+        {
+            "change": "pump_chain+ LONG NORMAL/HIGH dampen 1.0→0.5 (volatility_gate_v2, RATIFIED by CEO 21:55)",
+            "applied": "2026-10-09T19:47Z",
+            "status": "n=0 post-change trades in affected regimes — TOO EARLY to judge",
+            "pre_change_7d_context": "NORMAL 1T -$0.07 | HIGH 3T -$0.13 | EXTREME 23T +$1.51 (habitat confirmed, dampen direction correct)",
+            "action": "MONITOR 48h"
+        },
+        {
+            "change": "SHORT-RSI-CEILING bear exemption OR→AND (signal_compactor + decider_run)",
+            "applied": "2026-10-09T22:44Z",
+            "status": "n=0 post-fix SHORTs hit RSI ceiling (3 SHORTs since: RSI 47.6, 53.2, 45.8 — all below ceiling). No regressions. TOO EARLY for impact.",
+            "action": "MONITOR 48h"
+        }
     ],
-    "top_insight": "HML root-cause confirmed again: CUT_LOSER fires before trail arms (+0.40%) — chop entries, not exit bugs. Session consensus: leverage-aware HML + ATR mult working."
-  },
-  "trade_summary_24h": {
-    "closed": 20,
-    "pnl": -0.25,
-    "wr": 35.0,
-    "7d": {
-      "trades": 158,
-      "pnl": 0.5,
-      "wr": 49.4
+    "losing_trade_autopsy_24h": {
+        "losers": 14,
+        "clusters": [
+            {
+                "cluster": "hard_max_loss chop entries (6T, -$0.55)",
+                "trades": "BTC continuum-trend+ -$0.17 | CAKE hmacd_mtf-+ -$0.14 | ALT pump-chain+ -$0.12 | ICP pump-chain-v6+ -$0.08 | RUNE bb-bounce-v2 -$0.07 | BANANA pump-chain+ -$0.07",
+                "root_cause": "Chop entries — none reached +0.40% trail arm (max MFE 0.31%). Market ranging, no follow-through. Consistent with standing 52/56 finding.",
+                "winning_side": "Not in them. Flat was the winning side.",
+                "recommended_change": "No safe lever within sample constraints. hard_max_loss freq eval (CEO Oct 10 task): 55T/7d, 87% never armed trail. Frequency fix needs momentum pre-filter — not shippable today.",
+                "confidence": "HIGH (pattern), change DEFERRED (no safe lever)"
+            },
+            {
+                "cluster": "W SHORT x2 counter-structure (2T, -$0.26)",
+                "trades": "W ai-trader-,hmacd_mtf-- SHORT -$0.14 @ 22:55 | W hmacd_mtf-- SHORT -$0.12 @ 00:16",
+                "root_cause": "BUG: mtf_macd.py trend_quality guard fail-opens for alts — continuum.db is BTC-only (136K rows, 100% BTC). W had NO continuum row → guard bypassed → SHORT fired while W was LONG_BIAS conf 90.1 ripping +1.98%.",
+                "winning_side": "LONG W — structure had flipped up, momentum oscillator lagged. Watchdog pattern confirmed.",
+                "recommended_change": "FIXED THIS RUN: regime_5m.json fallback in mtf_macd.py — block SHORT when 5m=LONG_BIAS conf≥70, block LONG when 5m=SHORT_BIAS conf≥70.",
+                "impact_on_winners": "All-time hmacd trades: 4 (2 W SHORT losses, 2 CAKE LONG 50%WR). CAKE LONG not blocked (aligned/low-conf). Expected winner blocks: 0.",
+                "confidence": "HIGH — bug fix, not pattern filter"
+            },
+            {
+                "cluster": "BANANA pump-chain+ LONG chase (meta_rsi 72.4, -$0.07)",
+                "root_cause": "Entered at chase-zone RSI. Pump_chain+ dampen (last run) targets NORMAL/HIGH regimes — BANANA was NORMAL. Dampen may catch future instances.",
+                "action": "Covered by standing dampen — monitor"
+            }
+        ]
     },
-    "7d_long": "+0.91/131T 52.7%",
-    "7d_short": "-0.41/27T 33.3%",
-    "hml_7d": "55T -$7.58 (34.8% of closes — goal <40% MET)",
-    "hml_daily_share": "Oct6 67% -> Oct7 62% -> Oct8 42% -> Oct9 28% (improving)",
-    "hml_since_widen_oct7": "12T -$1.44 avg -$0.12/trade (was -$4.4% acct pre-fix)",
-    "open": "ZEN +0.92 / SEI +1.26 / YGG +3.60 / ATOM SHORT +0.71"
-  },
-  "changes_from_last_run": [
-    {
-      "change": "pump_chain+ NORMAL/HIGH dampen 1.0->0.5 (Oct 9 19:47)",
-      "verdict": "WORKING (early)",
-      "evidence": "0 pump-chain+ LONG opens since dampen vs 9 in prior 24h. Other signals still firing (volume-breakout 3x, hmacd, pump-chain- 2x) — not a market drought. EXTREME habitat untouched by design."
-    },
-    {
-      "change": "SHORT-RSI-CEILING bear exemption OR->AND (Oct 9 22:44)",
-      "verdict": "HOLDING (n=3, too early)",
-      "evidence": "3 SHORT opens since: W@47.6, W@53.2, ATOM@45.8 — all mid-band, none needed exemption, none wrongly blocked. LDO-class RSI 70 shorts should now require full bear (phase+linreg+ema-below). Code verified signal_compactor.py:3855."
-    },
-    {
-      "change": "CUT_LOSER_PNL -1.50->-2.00 (CEO Oct 9) + HML_VOL_ATR_MULT=0.5",
-      "verdict": "HML FREQUENCY EVAL (CEO mandate due today): HOLD both levers",
-      "evidence": "HML share 67%->28% over 4 days, magnitude avg -$0.12 post-fix, goal <40% MET. Further widening risks -2.5% account floor with no evidence trail needs it. Cohort leverage-cap (3x on >40% HML-rate signals) needs backtest first — DELEGATE self_learner."
-    }
-  ],
-  "drift_findings": [
-    {
-      "finding": "DRIFT-A general bypass hole: signal_compactor.py:3113-3130 enforces 0.0 only for explicit SIGNAL_TYPE_OVERRIDES, not family-level 0.0s (deliberate, documented).",
-      "severity": "INFO",
-      "action": "No change — design choice on file. bb-bounce-v3 NORMAL leak fixed by bypass-list removal (verified: 0 NORMAL opens since Oct 4 18:05)."
-    },
-    {
-      "finding": "LONG meta-RSI>=75 trades (9T 7d, -$0.54, 5 HML) passed via Grade-A/BTC-bull exemptions of LONG_RSI_CEILING=75",
-      "severity": "LOW",
-      "action": "No change — blocking exemptions would kill 3/9 winners (33% > 20% rule). INJ/CHIP/XPL winners were exempt. Monitor 14d."
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "HML chop entries — #1 bleed for 3+ weeks",
-      "status": "IMPROVING: share 28% Oct9 (goal met), magnitude controlled. Trail family (profit-monster-trail 60T +$3.76/7d) remains the winning side."
-    },
-    {
-      "problem": "SHORT book negative 7d (-$0.41) — Oct 11 deadline",
-      "status": "STRUCTURALLY CLEAN: dead signals purged (mtf-regime-trend- NEVER_REENABLE, 0 post-kill closes verified). pump-chain- +$0.17/20T is the only live SHORT edge. Residual = combo noise (ai-trader-,hmacd_mtf--). Ceiling-AND fix needs 48h."
-    }
-  ],
-  "losing_trade_autopsy_24h": {
-    "losers": 12,
-    "pnl": -0.83,
-    "clusters": [
-      {
-        "signal": "pump-chain+ / v6+ LONG overbought chase",
-        "trades": "BANANA RSI 72.4 HML -$0.07, ICP RSI 66.7 HML -$0.08, ALT RSI 60.0 HML -$0.12",
-        "root_cause": "entered during consolidation, never reached trail arm",
-        "verdict": "watchdog overbought pattern holds at n=3 but 30d 70-75 band +$0.24 — no filter ship. NORMAL/HIGH dampen (live) targets habitat not RSI."
-      },
-      {
-        "signal": "SHORTs in long tape",
-        "trades": "W -$0.14 (RSI 47.6), LDO -$0.07 (RSI 70.2), ALGO -$0.02 (RSI 60)",
-        "root_cause": "60:2 breadth, shorts fight tape. LDO was OR-exemption leak — FIXED 22:44.",
-        "verdict": "ceiling-AND fix live; W@47.6 is mid-band chop not ceiling — short cooldown/re-fire hygiene noted (W re-fired 21min after loss)."
-      },
-      {
-        "signal": "chop HML family",
-        "trades": "CAKE hmacd RSI 45, BTC continuum RSI 57.6 FLAT",
-        "root_cause": "no momentum, held 21-98min, bled to max loss",
-        "verdict": "HML levers working; further change needs backtest"
-      }
+    "drift_findings": [
+        {
+            "id": "DRIFT-ALT-CONTINUUM",
+            "severity": "HIGH",
+            "finding": "mtf_macd.py regime + EMA300 guards are dead code for 69/70 traded tokens. continuum.db has 136,320 rows, 100% BTC. _get_trend_quality(alt) always returns None → guard fail-opens. Docstring claims 'regime awareness' and 'EMA300 filter' — both no-ops for alts.",
+            "impact": "Directly caused W SHORT x2 losses -$0.26. Any signal reading continuum.db for alts has the same fail-open disease.",
+            "action_taken": "FIXED in mtf_macd.py this run (regime_5m.json fallback). EMA300 guard still fail-open for alts (no alt EMA300 source — partially covered by regime fallback).",
+            "siblings_affected": "squeeze_breakout.py (2 refs), pump_chain_v4.py (4 refs) — same disease, NOT fixed this run. DELEGATE systematic sweep."
+        }
     ],
-    "winners_profile": "All 7 wins LONG, meta-RSI 27-69 (concentration 50-62), trail/stale exits, volume-breakout-long+ and ai-trader+ led. SEI/YGG open trades match this exact pattern."
-  },
-  "creative_improvements": [
-    {
-      "date": "2026-10-10T00:41:08Z",
-      "idea": "Trail-activation telemetry: watchdog computes per-signal % of closes that reached +0.40% (PM_TRAIL_ACTIVATE) over last 20 closes; flags <20% as chop-entry candidate for dampen review",
-      "rationale": "Operationalizes the fundamental truth: trending entries arm trail and win (trail 60T +$3.76), chop entries never arm and die (HML 55T -$7.58). Outcome-based labels lag; arm-rate is a leading indicator of entry quality.",
-      "expected_impact": "Early identification of chop signals before they bleed a full week; quantifies 'wrong side' directly",
-      "category": "entry sniper / telemetry",
-      "status": "suggested",
-      "risk": "low (monitoring only, no trading path change)",
-      "delegate": "bug_hunter (watchdog.py additive metric)"
+    "hard_max_loss_freq_eval": {
+        "mandate": "CEO Oct 10 task — frequency lever decision",
+        "data_7d": {
+            "n": 55,
+            "pnl": -7.57,
+            "wr": 0.0,
+            "reached_trail_arm": "7/55 (12.7%)",
+            "avg_mfe": 0.182,
+            "avg_leverage": 4.0,
+            "avg_pnl_pct": -3.72,
+            "by_lev": "lev3 27T -$3.45 avg -2.98% | lev5 28T -$4.18 avg -4.43%",
+            "by_regime": "EXTREME 20T -$2.71 | HIGH 18T -$2.41 | NORMAL 16T -$2.34 | FLAT 1T -$0.17",
+            "top_signals": "bb-squeeze+ 13T -$1.96 | pump-chain- 10T -$1.44 | pump-chain+ 9T -$1.21"
+        },
+        "verdict": "87% of HML trades are chop entries (never armed trail). Magnitude fix (leverage-aware) already holding — avg -3.72% vs pre-fix -4.5%+. Frequency lever options: (a) leverage cap on HML-prone signals, (b) momentum pre-filter at entry, (c) widen threshold (REJECT — lets losses grow). No safe lever shippable today: leverage cap needs per-signal backtest, momentum filter is new infrastructure. RECOMMEND: bug_hunter builds HML entry-MFE backtest (what % of HML entries had 5m slope < 0.1% at open?) — then decide cap vs filter with data.",
+        "action": "DEFER lever decision to Oct 11 with backtest data"
     },
-    {
-      "date": "2026-10-10T00:41:08Z",
-      "idea": "Extend dead_money early-exit beyond pump signals: trades <+0.10% MFE after 90min = chop, exit at market",
-      "rationale": "pump_exit_dead_money is 9T +$0.92/7d (profitable exit type). bb-squeeze HIGH losers held 75min vs winners 42min — chop lingers. BTC continuum HML held 98min before dying.",
-      "expected_impact": "Cut chop holds ~30min earlier; reduce HML count by converting to smaller dead_money losses",
-      "category": "exit early in chop",
-      "status": "suggested",
-      "risk": "medium (touches position_manager all-signal path — requires 7d backtest of MFE@90min vs final outcome before ship)",
-      "delegate": "self_learner backtest then bug_hunter implement"
-    }
-  ],
-  "config_changes_applied": [],
-  "next_actions": [
-    "48h cohort check Oct 11: pump_chain+ NORMAL/HIGH dampen (0 opens / 24h target) + SHORT-RSI-CEILING AND (0 wrong-side RSI 65-75 shorts)",
-    "Oct 11: SHORT 7d >=$0 check — -0.41, dead signals purged, pump-chain- positive, ceiling fix accruing",
-    "self_learner: HML cohort leverage-cap backtest (3x on signals with >40% HML rate 20-close window)",
-    "signal_analyst: bb-squeeze+ silent since Oct 6 (0 opens, flags True, signal runs but returns []) — verify market-condition vs detection regression by Oct 12",
-    "Monitor: W hmacd_mtf-- re-fired SHORT 21min after prior loss — cooldown hygiene, watch for repeat",
-    "Watchdog steer noted: YGG breakeven stop at 0.027224 (+3.6%) — position management, trader/executor lane"
-  ]
+    "recurring_problems": [
+        "hard_max_loss #1 bleed — standing since Oct 3. Magnitude fixed, frequency open.",
+        "Counter-structure SHORTs — W x2 today, LDO RSI70.19 Oct 9. OR→AND fix + hmacd regime fallback should arrest this class.",
+        "Chop entries in low-vol — no momentum filter exists. 87% of HML never armed trail."
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-10-10T02:45:00Z",
+            "idea": "Systematic continuum-fail-open sweep: audit ALL signal files reading continuum.db for alt-token guards (squeeze_breakout, pump_chain_v4 + any others). Apply the same regime_5m.json fallback pattern.",
+            "rationale": "continuum.db is BTC-only by design. Any alt guard reading it is dead code. This class of silent fail-open will produce more wrong-side trades until swept.",
+            "expected_impact": "Prevents repeat of W-pattern across sibling signals",
+            "category": "bug sweep",
+            "status": "suggested",
+            "risk": "low — additive fallback, no existing behavior removed"
+        },
+        {
+            "date": "2026-10-10T02:45:00Z",
+            "idea": "HML entry-MFE backtest: for all 55 hard_max_loss trades/7d, reconstruct 5m slope and volume_ratio at entry time. If >80% had slope < 0.1% AND volume_ratio < 0.5, ship a shared 'dead-tape' entry filter (block new entries when coin 5m |slope| < 0.1% AND vol_ratio < 0.5).",
+            "rationale": "87% of HML never armed trail — they enter when nothing is moving. A dead-tape filter attacks frequency at the root without time-blocks or blanket kills.",
+            "expected_impact": "Block 30-40% of HML entries; verify 0 winners blocked",
+            "category": "entry sniper",
+            "status": "suggested — needs backtest",
+            "risk": "medium — must verify against winners"
+        }
+    ],
+    "config_changes_applied": [
+        {
+            "file": "scripts/signals/mtf_macd.py",
+            "type": "bugfix",
+            "change": "Regime guard fallback: when continuum.db has no row (all alts), read regime_5m.json and block counter-bias entries at conf≥70. New constant ALT_REGIME_CONF_MIN=70. New helper _get_regime_5m().",
+            "before": "trend_quality guard fail-opened for 69/70 traded tokens (continuum BTC-only)",
+            "after": "SHORT blocked vs LONG_BIAS conf≥70; LONG blocked vs SHORT_BIAS conf≥70 (alt path only)",
+            "winner_impact": "0 of 4 all-time hmacd trades blocked as winners",
+            "restart_required": "No — signals_runner subprocess reloads each minute"
+        }
+    ],
+    "next_actions": [
+        "MONITOR 48h: pump_chain+ NORMAL/HIGH dampen (n=0 post-change)",
+        "MONITOR 48h: SHORT-RSI-CEILING OR→AND fix (n=0 ceiling hits)",
+        "MONITOR 24h: hmacd regime fallback — expect SKIP logs for counter-bias fires",
+        "DELEGATE bug_hunter: HML entry-MFE backtest (55 trades, reconstruct slope+vol at entry)",
+        "DELEGATE bug_hunter: continuum-fail-open sweep — squeeze_breakout.py, pump_chain_v4.py",
+        "Oct 11: SHORT 7d ≥$0 check — currently -$0.16, blocked on HML bleed",
+        "Oct 11: wyckoff pairing delivery check (signal_analyst URGENT)"
+    ]
 }

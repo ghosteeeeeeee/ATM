@@ -44,6 +44,7 @@ MIN_TRADE_INTERVAL    = 10     # minutes between trades per token
 LOG_FILE              = '/root/.hermes/logs/signals.log'
 RSI_SHORT_MIN         = 35     # Don't SHORT when RSI < 35 (oversold)
 RSI_LONG_MAX          = 70     # Don't LONG when RSI > 70 (overbought)
+ALT_REGIME_CONF_MIN   = 70     # brain_auditor 2026-10-10: min 5m-regime confidence to block counter-bias entries (alt fallback for BTC-only continuum.db)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -193,6 +194,19 @@ def _get_trend_quality(token: str) -> Optional[str]:
     except Exception:
         pass
     return None
+
+
+def _get_regime_5m(token: str) -> Tuple[Optional[str], float]:
+    """Get (regime, confidence) from regime_5m.json. Fallback for alts — continuum.db is BTC-only."""
+    try:
+        with open('/var/www/hermes/data/regime_5m.json') as f:
+            data = json.load(f)
+        r = data.get('regimes', {}).get(token.upper())
+        if r:
+            return r.get('regime'), float(r.get('confidence') or 0)
+    except Exception:
+        pass
+    return None, 0.0
 
 
 def _macd_crossover(token: str, minutes: int):
@@ -364,6 +378,18 @@ def run():
             if mtf_direction == 'SHORT' and trend_quality == 'STRONG_UP':
                 _log(f'  SKIP {token} SHORT: trend_quality=STRONG_UP')
                 continue
+        else:
+            # Fallback: continuum.db is BTC-only — alts always miss. Use 5m regime.
+            # brain_auditor 2026-10-10: W SHORT x2 lost -$0.26 shorting LONG_BIAS conf 90.1
+            # because this guard fail-opened (no continuum row for W).
+            alt_regime, alt_conf = _get_regime_5m(token)
+            if alt_regime and alt_conf >= ALT_REGIME_CONF_MIN:
+                if mtf_direction == 'SHORT' and alt_regime == 'LONG_BIAS':
+                    _log(f'  SKIP {token} SHORT: 5m regime LONG_BIAS conf={alt_conf:.1f}')
+                    continue
+                if mtf_direction == 'LONG' and alt_regime == 'SHORT_BIAS':
+                    _log(f'  SKIP {token} LONG: 5m regime SHORT_BIAS conf={alt_conf:.1f}')
+                    continue
 
         # ── EMA300 position filter ────────────────────────────────────
         ema_pos = _get_ema300_position(token)

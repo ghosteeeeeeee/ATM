@@ -3708,9 +3708,10 @@
     "rationale": "Operationalizes the fundamental truth: trending entries arm trail and win (trail 60T +$3.76), chop entries never arm and die (HML 55T -$7.58). Outcome-based labels lag; arm-rate is a leading indicator of entry quality.",
     "expected_impact": "Early identification of chop signals before they bleed a full week; quantifies 'wrong side' directly",
     "category": "entry sniper / telemetry",
-    "status": "suggested",
+    "status": "boosted",
     "risk": "low (monitoring only, no trading path change)",
-    "delegate": "bug_hunter (watchdog.py additive metric)"
+    "delegate": "bug_hunter (watchdog.py additive metric)",
+    "boosted_at": "2026-10-10T01:23:20.021049+00:00"
   },
   {
     "date": "2026-10-10T00:41:08Z",
@@ -3721,5 +3722,25 @@
     "status": "suggested",
     "risk": "medium (touches position_manager all-signal path — requires 7d backtest of MFE@90min vs final outcome before ship)",
     "delegate": "self_learner backtest then bug_hunter implement"
+  },
+  {
+    "date": "2026-10-10T02:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "Systematic continuum-fail-open sweep: audit ALL signal files reading continuum.db for alt-token guards and apply regime_5m.json fallback pattern (same as mtf_macd fix).",
+    "rationale": "continuum.db is BTC-only. Any alt guard reading it is dead code. squeeze_breakout.py and pump_chain_v4.py confirmed reading it. Silent fail-open class.",
+    "expected_impact": "Prevents W-pattern repeats across sibling signals",
+    "category": "bug sweep",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-10T02:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "HML entry-MFE backtest then dead-tape entry filter: reconstruct 5m slope + volume_ratio at entry for all 55 hard_max_loss trades/7d. If >80% had slope<0.1% AND vol_ratio<0.5, ship shared entry filter blocking new entries in dead tape.",
+    "rationale": "87% of HML never armed trail — entries happen when nothing moves. Attacks frequency at root without time-blocks.",
+    "expected_impact": "Block 30-40% of HML entries; verify 0 winners blocked",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest",
+    "risk": "medium"
   }
 ]
