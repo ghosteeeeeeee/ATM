@@ -161,7 +161,11 @@ def compute_outcome_cells(rows):
                     'n': n, 'wins': agg['wins'], 'wr_raw': round(wr, 4),
                     'wr_blended': round(wr_b, 4), 'avg_pnl_pct': round(avg_b, 4),
                     'total_pnl_pct': round(agg['pnl'], 2), 'admission': admission,
-                    'tradeable': bool(n >= MIN_N and wr_b >= 0.60)})
+                    # FIX 2026-10-10 (T, same class as gate proposal rule): WR-only
+                    # flagged high-WR-but-net-losing cells as tradeable (3 of the top
+                    # tradeable cells had negative PnL). Tradeable requires positive
+                    # expectancy, not just win rate.
+                    'tradeable': bool(n >= MIN_N and wr_b >= 0.60 and avg_b > 0)})
     return out
 
 
@@ -279,7 +283,10 @@ def compute_cells(rows):
             'wr_blended': round(wr_b, 4), 'avg_pnl_raw': c['avg_pnl'],
             'avg_pnl_blended': round(avg_b, 4), 'total_pnl': c['total_pnl'],
             'admission': admission,
-            'tradeable': bool(n >= MIN_N and wr_b >= 0.60),
+            # FIX 2026-10-10 (T): same as cells_st — WR-only tradeable flagged
+            # high-WR-net-losing cells (bb-squeeze+ HIGH -0.15, ema300_dip HIGH
+            # -0.17, ema300_dip NORMAL -0.55 all qualified on WR alone).
+            'tradeable': bool(n >= MIN_N and wr_b >= 0.60 and avg_b > 0),
             'mfe_p25': c['mfe_p25'], 'mfe_p50': c['mfe_p50'], 'mfe_p75': c['mfe_p75'],
             'mae_p25': c['mae_p25'], 'mae_p50': c['mae_p50'],
             'signal_n': sig['n'] if sig else 0,
