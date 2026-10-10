@@ -549,7 +549,7 @@ VEL_STALE_THRESHOLD_PCT = 0.05  # % per candle — below this = "flat" for stale
                                         # but smooths micro-noise from single ref candles
 OVEREXTENDED_THRESHOLD  = 3.0  # % — vel must exceed this to be "overextended" (per-candle windowed)
 MOMENTUM_EXHAUSTION_THRESHOLD = 0.5  # % — if price moved this much in 30m, don't enter (catches tops)
-STALE_WINNER_TIMEOUT_MINUTES = 60  # close winners flat for 60+ min (was 45)
+STALE_WINNER_TIMEOUT_MINUTES = 120  # close winners flat for 120+ min (was 60 — BABY flat 60min then broke out to +12% account; stale_exit stole it from trailing stop)
 STALE_LOSER_TIMEOUT_MINUTES = 8   # cut losers flat for 8+ min (was 10)
 STALE_WINNER_MIN_PROFIT = 0.6    # % profit required to be a "winner" (was 0.8%)
 STALE_LOSER_MAX_LOSS   = -1.0   # % loss required to be a "loser" (was -0.6, widened 2026-10-01 to match CL_TIER1_MIN_PCT=-1.00. -0.6 was cutting stalled trades before they could reach trail activation +0.40% and recover.)
