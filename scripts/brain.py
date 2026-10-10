@@ -622,8 +622,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
 
     conn = get_db_connection()
     cur = conn.cursor()
-    # Build _exp_metadata_str BEFORE _params so it can be used as a placeholder
+    # Build _exp_metadata_str BEFORE _params so it can be used in a placeholder
     _exp_metadata_str = json.dumps(exp_metadata, default=str) if exp_metadata else '{}'
+    _db_committed = False  # once True, outer except must NOT close the HL position (trade is live + recorded)
     try:
         # DEBUG: Log the tuple construction so we can see exactly what brain.py sends
         # ── DEBUG: log the column-to-position mapping before INSERT ─────────────
@@ -727,6 +728,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                 """, tuple(_params))
                 _trade_id = cur.fetchone()[0]
                 conn.commit()
+                _db_committed = True  # DB row is durable — never HL-rollback after this point
                 break  # success
             except Exception as _insert_err:
                 _err_msg = str(_insert_err).lower()
@@ -757,56 +759,63 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         except Exception as _feat_err:
             print(f"[brain.py] ⚠️ Feature record failed: {_feat_err}")
     except Exception as e:
-        # CRITICAL: mirror_open already succeeded — HL has this position live.
-        # If DB write fails we MUST roll back the HL position to avoid a phantom live trade.
-        # Capture full exception details for debugging
         import traceback
-        error_details = traceback.format_exc()
-        print(f"[brain.py] ❌ DB INSERT FAILED for {hype_token}: {e}")
-        print(f"[brain.py]    Exception type: {type(e).__name__}")
-        print(f"[brain.py]    Full traceback:\n{error_details}")
-        print(f"[brain.py]    INSERT params: token={token}, direction={direction}, entry={hl_entry}, exchange={exchange}")
-        print(f"[brain.py]    hl_notional={hl_notional}, total_sz={total_sz}, fill_px={fill_px}")
-        print(f"[brain.py]    Rolling back HL position to prevent phantom live trade...")
-        try:
-            conn.rollback()
-        except Exception as rb_exc:
-            print(f"[brain.py]    ⚠️ conn.rollback() failed: {rb_exc}")
-        try:
-            # Bug-Fix (2026-05-20): mirror_close raises RuntimeError if
-            # LIVE_TRADING_ENABLED=False (kill switch), but we need to close
-            # the position even when the kill switch is off — the position was
-            # already opened under live trading. Use close_position (lower-level,
-            # no is_live_trading_enabled() gate) so rollback always works.
-            from hyperliquid_exchange import close_position
-            result = close_position(hype_token)
-            if result and result.get('success'):
-                print(f"[brain.py]    ✅ HL rollback succeeded for {hype_token}")
-            else:
-                print(f"[brain.py]    ⚠️ HL rollback returned: {result}")
-        except Exception as mc_err:
-            print(f"[brain.py]    ⚠️ HL rollback failed: {mc_err} — {hype_token} may be orphaned on HL!")
-            # ── AUDIT: Log failure with orphan flag ─────────────────────────
+        if _db_committed:
+            # DB row committed + trade_id assigned — the trade is live AND recorded.
+            # Any exception here is post-commit (success prints, etc). Closing the HL
+            # position now would orphan the DB row. Log and fall through to return.
+            print(f"[brain.py] ⚠️ Post-commit error for {hype_token} trade #{trade_id} (DB kept, HL left open): {e}")
+            print(traceback.format_exc())
+        else:
+            # CRITICAL: mirror_open already succeeded — HL has this position live.
+            # If DB write fails we MUST roll back the HL position to avoid a phantom live trade.
+            # Capture full exception details for debugging
+            error_details = traceback.format_exc()
+            print(f"[brain.py] ❌ DB INSERT FAILED for {hype_token}: {e}")
+            print(f"[brain.py]    Exception type: {type(e).__name__}")
+            print(f"[brain.py]    Full traceback:\n{error_details}")
+            print(f"[brain.py]    INSERT params: token={token}, direction={direction}, entry={hl_entry}, exchange={exchange}")
+            print(f"[brain.py]    hl_notional={hl_notional}, total_sz={total_sz}, fill_px={fill_px}")
+            print(f"[brain.py]    Rolling back HL position to prevent phantom live trade...")
             try:
-                from audit_logger import trade_open_failed
-                trade_open_failed(token=token.upper(), direction=direction,
-                                  reason=f'DB INSERT failed then HL rollback failed: {mc_err}',
-                                  hl_position_left_open=True, source='add_trade')
-            except Exception:
-                pass
-            # [AUDIT] Log the full state at failure point for post-mortem
-            print(f"[brain.py]    === AUDIT: DB INSERT FAILURE STATE ===")
-            print(f"[brain.py]       coin={hype_token} direction={direction} leverage={leverage}")
-            print(f"[brain.py]       hl_entry={hl_entry} sz={sz} hl_notional={hl_notional}")
-            print(f"[brain.py]       total_sz={total_sz} fill_px={fill_px}")
-            print(f"[brain.py]       signal={signal} confidence={confidence}")
-            print(f"[brain.py]       exception={type(mc_err).__name__}: {mc_err}")
-            print(f"[brain.py]       HL position may be orphaned — guardian must detect on next sync")
-        # ALWAYS exit with failure when INSERT failed — HL was rolled back
-        # (or rollback failed). Without this, code falls through to line 748
-        # where trade_id is undefined (NameError). (USUAL 08-26, INJ 08-24)
-        # sys.exit OUTSIDE try/except so all error prints flush before exit.
-        sys.exit(1)
+                conn.rollback()
+            except Exception as rb_exc:
+                print(f"[brain.py]    ⚠️ conn.rollback() failed: {rb_exc}")
+            try:
+                # Bug-Fix (2026-05-20): mirror_close raises RuntimeError if
+                # LIVE_TRADING_ENABLED=False (kill switch), but we need to close
+                # the position even when the kill switch is off — the position was
+                # already opened under live trading. Use close_position (lower-level,
+                # no is_live_trading_enabled() gate) so rollback always works.
+                from hyperliquid_exchange import close_position
+                result = close_position(hype_token)
+                if result and result.get('success'):
+                    print(f"[brain.py]    ✅ HL rollback succeeded for {hype_token}")
+                else:
+                    print(f"[brain.py]    ⚠️ HL rollback returned: {result}")
+            except Exception as mc_err:
+                print(f"[brain.py]    ⚠️ HL rollback failed: {mc_err} — {hype_token} may be orphaned on HL!")
+                # ── AUDIT: Log failure with orphan flag ─────────────────────────
+                try:
+                    from audit_logger import trade_open_failed
+                    trade_open_failed(token=token.upper(), direction=direction,
+                                      reason=f'DB INSERT failed then HL rollback failed: {mc_err}',
+                                      hl_position_left_open=True, source='add_trade')
+                except Exception:
+                    pass
+                # [AUDIT] Log the full state at failure point for post-mortem
+                print(f"[brain.py]    === AUDIT: DB INSERT FAILURE STATE ===")
+                print(f"[brain.py]       coin={hype_token} direction={direction} leverage={leverage}")
+                print(f"[brain.py]       hl_entry={hl_entry} sz={sz} hl_notional={hl_notional}")
+                print(f"[brain.py]       total_sz={total_sz} fill_px={fill_px}")
+                print(f"[brain.py]       signal={signal} confidence={confidence}")
+                print(f"[brain.py]       exception={type(mc_err).__name__}: {mc_err}")
+                print(f"[brain.py]       HL position may be orphaned — guardian must detect on next sync")
+            # ALWAYS exit with failure when INSERT failed — HL was rolled back
+            # (or rollback failed). Without this, code falls through to line 748
+            # where trade_id is undefined (NameError). (USUAL 08-26, INJ 08-24)
+            # sys.exit OUTSIDE try/except so all error prints flush before exit.
+            sys.exit(1)
     finally:
         cur.close(); conn.close()
 

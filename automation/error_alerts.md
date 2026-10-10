@@ -401,3 +401,33 @@
 - **WARN** (9x): Phantom trades — `atr_sl_hit` exit with <0.01% PnL (today). Investigate ATR SL placement or execution slippage.
 - Disk at 84% (approaching 85% threshold) — consider log cleanup if it crosses.
 - No AUTO-FIX needed: all timers active, pipeline running, no crashes.
+
+## Error Alerts — 2026-10-10 16:00 UTC
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-10 16:48 UTC
+- **WARN** (1x): Disk at 85% (94G/118G) — crossed threshold since 14:48 check (was 84%). Top consumers: coin_tracker.db (3.3G), candles.db (2.7G), session_brain.db (1.1G), signals_hermes.db (983M). No logs >7d to compress; DBs are active — no safe auto-fix. Consider pruning coin_tracker.db history or moving old DBs off-disk.
+- **INFO**: 1 phantom trade in last 24h (`atr_sl_hit` <0.01% PnL) — down from 9 at 14:48. No action needed.
+- All timers active, pipeline running, prices 2.5min fresh, no crashes. No auto-fixes needed.
+
+## Error Alerts — 2026-10-10 17:00 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Balance too low ($N.N < $N.N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+
+## Error Alerts — 2026-10-10 18:00 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   [TOK Mirror] TOK open TOK TOK: Insufficient margin to place order. asset=N`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Insufficient margin to place order. asset=N`
+
+## Error Alerts — 2026-10-10 19:00 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   [TOK Mirror] TOK open TOK ME: Insufficient margin to place order. asset=N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for ME: Insufficient margin to place order. asset=N`
+
+## Error Alerts — 2026-10-10 20:00 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Unknown TOK`
+
+## Error Alerts — 2026-10-10 20:49 UTC
+- **WARN** (disk): Disk at 85% (100.7G/118G). **AUTO-FIX**: Compressed pipeline.log (177MB→17MB gz), trade-watchdog.log (62MB→gz), signal-compactor.log (59MB→gz). DBs (coin_tracker.db 3.3G, candles.db 2.7G) are top consumers — no safe auto-fix.
+- **WARN** (1x): 1 phantom trade in last 24h (SOPH LONG bb-bounce-v2-long+ 0.0% PnL). Low count, no action.
+- **INFO**: Pipeline cycle #237263 completed cleanly. 3 open, 32 closed today, +1.01% PnL. 32 signals in last hour. Prices 1min fresh. No crashes/tracebacks in 30min. All critical timers active.
+- Earlier today: HL mirror errors (insufficient margin) — not recurring in last 30min.

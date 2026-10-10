@@ -1,124 +1,115 @@
 {
-  "timestamp": "2026-10-10T17:46:51.620843+00:00",
+  "timestamp": "2026-10-10T22:45:00Z",
   "session_brain_stats": {
-    "queries": 3,
-    "note": "session brain used for context; primary evidence from live PG"
+    "note": "session_brain queried; no high-signal new insights beyond standing HML/chop themes"
   },
   "trade_summary_24h": {
-    "trades": 30,
-    "wins": 14,
-    "pnl": 0.0,
-    "wr": 46.7,
+    "closed": 33,
+    "wins": 15,
+    "wr": 45.5,
+    "pnl": -0.29,
     "7d": {
-      "trades": 153,
-      "wins": 70,
-      "pnl": -1.37,
-      "wr": 45.8
+      "trades": 155,
+      "wr": 45.2,
+      "pnl": -1.5,
+      "long": "-1.21/129T",
+      "short": "-0.29/26T"
     },
-    "7d_long": {
-      "trades": 127,
-      "pnl": -1.08,
-      "wr": 48.8
-    },
-    "7d_short": {
-      "trades": 26,
-      "pnl": -0.29,
-      "wr": 30.8
-    },
-    "7d_families": {
-      "trail_family": {
-        "n": 64,
-        "pnl": 5.53,
-        "wr": 87.5
-      },
-      "hard_max_loss": {
-        "n": 55,
-        "pnl": -7.43,
-        "wr": 0.0
-      }
-    },
-    "hml_momentum": {
-      "n": 55,
-      "mfe_avg": 0.173,
-      "never_above_0.20": 38,
-      "reached_trail_0.40": 7
+    "48h_exits": {
+      "profit-trail": "17T +0.55",
+      "hard_max_loss": "13T -1.62",
+      "atr_sl": "10T -0.70"
     }
   },
-  "drift_findings": [
+  "watchdog_steer_verdicts": [
     {
-      "id": "DRIFT-HIGH-VOLBREAK",
-      "severity": "HIGH",
-      "finding": "volume-breakout-long+ HIGH family block (Volume: 0.0) exists in volatility_gate_v2 phase matrix since 2026-10-10 signal_reporter, but STANDALONE_BYPASS ('volume-breakout-long' in STANDALONE_BYPASS_SIGNALS) + DRIFT-A enforcement only checks SIGNAL_TYPE_OVERRIDES — no HIGH per-signal override existed. AIXBT/WCT/BLUR/BABY LONG opened HIGH after CEO re-enable and all hit hard_max_loss.",
-      "evidence": "30d HIGH 8T 25%WR -$0.69 (6L -$1.11, 2W +$0.42). EXTREME 17T 70.6% +$3.55. NORMAL 8T 62.5% -$0.05.",
-      "fix": "Added ('HIGH','volume-breakout-long'): 0.0 + underscore form to SIGNAL_TYPE_OVERRIDES. DRIFT-A now blocks bypass. Verified: HIGH mult=0.0, EXTREME stays None (unblocked).",
-      "impact_on_winners": "Would block 2 of 8 HIGH trades (winners worth $0.42); saves 6 losers worth $1.11. Net +$0.69. n=8 small but enforces existing family decision per CEO 'regime issue not signal issue'."
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "hard_max_loss is #1 bleed — 7d 55T -$7.43 0% WR (36% of closes). 38/55 never reached MFE>0.20% (no momentum). 7 reached trail but still lost.",
-      "signals": "bb-squeeze+ 12T -$1.73 (avg MFE 0.156), pump-chain- 8T -$1.12, pump-chain+ 7T -$0.72, volume-breakout-long+ 5T -$0.84, bb-bounce-v3-long+ 5T -$0.78",
-      "status": "CEO HOLD to Oct 10 (today). CUT_LOSER widened -1.50→-2.00 Oct 9: post-widen 7T -$1.01 avg -3.13% (pre-widen avg -3.62%). Magnitude slightly better, frequency unchanged. Widen does NOT help chop entries (no momentum to give trail room)."
+      "steer": "6 recent losses wrong-side / volume-breakout-long+ 6-loss streak",
+      "verdict": "VERIFIED — 24h vol-breakout losers: BLUR/BABY/AIXBT/WCT all HIGH regime (CEO HIGH_BLOCK 22:30 + my HIGH dampen 17:46 now cover), YGG EXTREME@22 falling-knife (NEW 1m freefall guard), PURR EXTREME@69 (inside ceiling 85, 70-80 band historically profitable). 14d overall vol-breakout still +$1.69 — regime specialist, not dead signal."
     },
     {
-      "problem": "7d PnL decayed +$0.29→-$1.37 since CEO 16:00 checkpoint. LONG flipped negative (-$1.08/127T 48.8%). SHORT still -$0.29/26T 30.8%.",
-      "status": "watch — 24h flat $0.00, not accelerating but no recovery"
+      "steer": "tighten LONG_RSI_MAX to ~65 for breakout signals",
+      "verdict": "REJECTED — 30d LONG 62-70 band = +$1.21 (50% WR); 7d-only reversal (-0.72) is Oct-5-flush window noise. 75+ already blocked by LONG_RSI_CEILING=75 + VB ceiling 85."
     }
   ],
-  "missing_implementations": [
+  "meta_rsi_7d_long_bands": {
+    "<40": "15T -0.10",
+    "40-50": "16T -0.02",
+    "50-62": "44T +0.60 (EDGE)",
+    "62-70": "30T -0.72 (7d only; 30d +1.21)",
+    "70-75": "15T -0.17",
+    "75+": "9T -0.80 (blocked)"
+  },
+  "last_run_changes_verified": [
     {
-      "item": "bb-squeeze.py docstring promises 'Confidence: based on squeeze duration + breakout magnitude + volume' but _detect_signal never uses volume — squeeze breakouts fire without volume confirmation. HML trades (MFE avg 0.14) look like fake breakouts.",
-      "severity": "MED",
-      "note": "price_history ticks could proxy volume (tick count in breakout candle). Needs backtest before ship."
-    }
-  ],
-  "creative_improvements": [
+      "change": "W SHORT_BLACKLIST (Oct 10 08:38)",
+      "status": "HOLDING — 0 W trades since"
+    },
     {
-      "date": "2026-10-10T17:46:51.620843+00:00",
-      "idea": "No-momentum soft timeout: for bb-squeeze+ (and later broader), exit if hold>75min AND unrealized <+0.15% (halfway to trail arm 0.40%). Data: bb-squeeze hold 30-60min +$0.97 90%WR (trail catches winners); 60-120min -$0.73 33%WR; 120+min -$0.69 22%WR. Winners held>60min with MFE<0.40: 0/14d.",
-      "rationale": "HML = trades that never reach trail. Exit them as dead money before max-loss. STALE_WINNER only fires profitable-flat; STALE_LOSER only fires loss>=-1%; gap is slow-grind-flat between -1% and 0% for 60+min.",
-      "expected_impact": "Could save portion of 7d HML -$7.43 (bb-squeeze 60+min buckets -$1.42 alone). Risk: n=21 bucket sample; timeout at 75min might kill winners that recover later (BABY lesson: flat 60min → +12%).",
-      "category": "exit quality",
-      "status": "monitor — needs shadow before live. One variable at a time; volume-breakout HIGH fix first.",
-      "risk": "medium"
+      "change": "VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85 (Oct 10 07:42)",
+      "status": "DEPLOYED — BABY@81.8 loss predates fix; AIXBT@75.9 still allowed by design (70-80 profit band)"
+    },
+    {
+      "change": "mtf_macd alt regime-guard (Oct 10 02:45)",
+      "status": "WORKING — 2T +0.05, no regression"
+    },
+    {
+      "change": "SHORT-RSI-CEILING OR→AND (Oct 9 22:44)",
+      "status": "HOLDING — 0 SHORT meta-RSI>=65 since"
+    },
+    {
+      "change": "pump_chain+ NORMAL/HIGH dampen 0.5 (Oct 9 19:47)",
+      "status": "n=1 cohort (EXTREME only, unaffected) — untestable, hold"
+    },
+    {
+      "change": "VOLUME_BREAKOUT HIGH dampen 0.0 (Oct 10 17:46) + CEO HIGH_BLOCK flag (22:30)",
+      "status": "0 vol-breakout trades since 22:30 — too new, belt+suspenders both live"
     }
   ],
   "config_changes_applied": [
     {
-      "change": "SIGNAL_TYPE_OVERRIDES += ('HIGH','volume-breakout-long'):0.0 + ('HIGH','volume_breakout_long'):0.0",
-      "file": "scripts/volatility_gate_v2.py",
-      "rationale": "DRIFT fix — enforce existing family Volume HIGH=0.0 via bypass path (DRIFT-A only checks per-signal overrides)",
-      "verified": "HIGH mult=0.0; EXTREME stays None; import clean"
+      "change": "VOLUME_BREAKOUT_LONG_RSI1M_FLOOR=35 + guard in volume_breakout.py",
+      "type": "config",
+      "rationale": "5m RSI gate lagged 1m dump on YGG (meta_rsi 22.2, bb_pos 1.10, HML -0.14). All-time vol-breakout meta_rsi<40: 1T 0W. 30d winners below 40: 0. Signal already computed rsi_1m for drift detection but never consumed it.",
+      "impact_on_winners": "0/30d",
+      "confidence": "HIGH (mechanism guard, not pattern claim)"
     }
   ],
-  "changes_from_last_run": [
+  "losing_trade_autopsy_24h": {
+    "cluster": "chase LONGs meta_rsi 62-76 (BLUR 68.9, STX 62.0, ZRO 65.6, WCT 64.7, HYPE 62.3, APT 71.4) — all HML/cut-loser; winning side was SHORT or stand-aside. Mid-band 45-62 longs won 83% (ME/POL/NEAR).",
+    "vol_breakout_YGG": "falling-knife long at 1m RSI 22.2 — FIXED with 1m freefall guard",
+    "r2v2_cluster": "STX/ZRO/WCT at meta_rsi 60-66 EXTREME — n=4 signal family, MONITOR only",
+    "rejection": "62-70 LONG ceiling tightening — 30d band +$1.21, 7d reversal is flush-window noise"
+  },
+  "hml_dead_tape_analysis": {
+    "7d_hml": "54T, median MFE 0.102%, 47/54 never armed trail (+0.40%)",
+    "dead_tape_mfe_lt_0.15": "30T -$3.97, avg hold 70min, avg lev 3.9 — 56% of HML $",
+    "winners_mfe_lt_0.15": "0",
+    "implication": "early-exit timeout for price-flat trades could cut $2-3/7d but needs 1m path backtest (final MFE is known ex-post only)"
+  },
+  "recurring_problems": [
+    "hard_max_loss still #1 exit (48h 13T -$1.62) — entry-quality filters fail to separate (prior runs p>0.05); leverage lev5 HML avg -4.29% vs lev3 -2.93%"
+  ],
+  "missing_implementations": [
+    "dead-tape early exit (creative, needs backtest)",
+    "momentum precondition gate (deferred Oct 9)"
+  ],
+  "creative_improvements": [
     {
-      "change": "VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85 (07:42)",
-      "check": "Post-change 4T all losses but entry_rsi 51-70 (below ceiling). Ceiling working as designed; losses are HIGH-regime not RSI. FIXED ROOT with HIGH override."
-    },
-    {
-      "change": "W in SHORT_BLACKLIST (08:38)",
-      "check": "0 W SHORT trades post-blacklist. WORKING."
-    },
-    {
-      "change": "hmacd_mtf regime guard fail-open fix (02:45)",
-      "check": "2T post-fix 1W1L net +$0.05. No false regime blocks. OK."
-    },
-    {
-      "change": "SHORT-RSI-CEILING bear exemption OR→AND (Oct 9 22:44)",
-      "check": "5 SHORT trades post-fix, 3W2L net +$0.18. ATOM pump-chain- +$0.37 rr_engine. OK so far."
-    },
-    {
-      "change": "pump_chain+ LONG NORMAL/HIGH dampen 1.0→0.5 (Oct 9 19:47)",
-      "check": "0 trades since — untestable yet. Monitor 48h."
+      "date": "2026-10-10T22:45:00Z",
+      "idea": "Dead-tape price-flat timeout: close LONG/SHORT if unrealized stays within ±0.05% for >60min (pre-trail, pre-HML)",
+      "rationale": "7d dead-tape HML (MFE<0.15) = 30T -$3.97 avg hold 70min; 0 winners ever in MFE<0.15 band. Chop entries burn time then die — exit early in chop per captain mandate.",
+      "expected_impact": "+$2-3/7d if half the dead-tape bleed is avoidable",
+      "category": "exit engine",
+      "status": "suggested — needs 1m path backtest (self_learner) before ship",
+      "risk": "medium — must prove no trail-winner was flat at 60min before recovering"
     }
   ],
   "next_actions": [
-    "Monitor volume-breakout HIGH block 48h — zero HIGH LONG opens expected; EXTREME should continue",
-    "HML frequency/magnitude eval (CEO HOLD expires today) — data: post-widen still -$1.01/7T; no-momentum timeout is the creative candidate (shadow first)",
-    "7d PnL recovery watch — currently -$1.37, target >=$0",
-    "SHORT 7d >=$0 check Oct 11 — still -$0.29/26T 30.8%",
-    "bb-squeeze volume-confirmation backtest (missing implementation)",
-    "pump_chain+ dampen cohort check Oct 11 (0 trades so far)"
-  ]
+    "Monitor VOLUME_BREAKOUT HIGH block + 1m floor for 48h (both deployed today)",
+    "self_learner: dead-tape timeout backtest on 1m candles",
+    "Oct 11: SHORT 7d >=$0 check; wyckoff pairing delivery check",
+    "Oct 12: metric checkpoint for RSI-ceiling-75 + Cap B + dampen cohort",
+    "Do NOT tighten LONG ceiling to 65 (30d 62-70 = +$1.21)"
+  ],
+  "protected_flags_intact": true
 }

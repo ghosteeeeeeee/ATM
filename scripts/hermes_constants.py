@@ -3267,6 +3267,7 @@ VOLUME_BREAKOUT_MOMENTUM_BARS = 3      # bars for price momentum
 VOLUME_BREAKOUT_RSI_PERIOD = 14        # RSI period
 VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 VOLUME_BREAKOUT_LONG_HIGH_BLOCK_ENABLED = True  # HIGH regime block CEO 2026-10-10 — 30d HIGH 10T 30%WR -$0.79 | EXTREME 19T 68.4% +$3.56 | NORMAL 9T 66.7% +$0.31. Regime specialist: keep EXTREME+NORMAL, block HIGH.
+VOLUME_BREAKOUT_LONG_RSI1M_FLOOR = 35  # brain_auditor 2026-10-10 — 1m freefall guard. 5m RSI gate (rsi_val>50) can lag a 1m dump: YGG 2026-10-10 LONG at 5m RSI>50 while 1m RSI 22.2, bb_pos 1.10, HML -$0.14. All-time vol-breakout meta_rsi<40 = 1T 0W; 30d winners below 40 = 0. Blocks knife catches only; mid-band/oversold winners (rsi_1m>=35) untouched.
 
 # ── Range Reversion Signal ─────────────────────────────────────────────────────
 # range_reversion.py — Mean-reversion for flat/ranging markets (NEUTRAL regime)

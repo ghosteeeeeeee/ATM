@@ -166,6 +166,14 @@ def detect_volume_breakout(token: str, candles: list) -> Optional[dict]:
     if direction is None:
         return None
 
+    # 1m freefall guard: 5m RSI gate can lag a 1m dump — YGG 2026-10-10 entered
+    # LONG with 5m RSI>50 while 1m RSI was 22.2 (bb_pos 1.10, HML -$0.14).
+    # Only all-time vol-breakout trade with meta_rsi<40; 0 winners below 40 in 30d.
+    if direction == 'LONG' and rsi_1m is not None:
+        from hermes_constants import VOLUME_BREAKOUT_LONG_RSI1M_FLOOR
+        if rsi_1m < VOLUME_BREAKOUT_LONG_RSI1M_FLOOR:
+            return None
+
     # Confidence: base on volume spike strength + RSI extremity + momentum
     vol_bonus = min(25, (vol_ratio - VOL_SPIKE_MULT) * 12)
     # Extra bonus for very strong volume spikes (>4x)

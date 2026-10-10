@@ -3819,5 +3819,25 @@
     "category": "exit quality",
     "status": "monitor — needs shadow before live. One variable at a time; volume-breakout HIGH fix first.",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-10T21:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "Momentum confirmation pre-filter for STANDALONE_BYPASS signals — require price ≥+0.1% in signal direction over last 3 bars (15m) before single-source bypass entries",
+    "rationale": "87% of hard_max_loss trades (47/54) never reached +0.40% trail activation. HML avg MFE 0.37% vs winners 1.20%. These were chop entries with zero momentum from the start. A momentum gate filters them without touching multi-source confluence or proven trend entries.",
+    "expected_impact": "Block ~50-70% of future HML entries. Conservative estimate: save $2-3/7d without touching winners (trail winners had momentum from entry).",
+    "category": "entry sniper",
+    "status": "suggested — needs 30d backtest before ship",
+    "risk": "medium — mitigate with 3-bar window not 1-bar",
+    "verification": "Backtest: for each 30d HML trade, check 1m price 15min pre-entry. Would +0.1% gate block it? For each trail winner, would it pass? Ship only if winner block rate <10%."
+  },
+  {
+    "date": "2026-10-10T22:45:00Z",
+    "idea": "Dead-tape price-flat timeout: close LONG/SHORT if unrealized stays within ±0.05% for >60min (pre-trail, pre-HML)",
+    "rationale": "7d dead-tape HML (MFE<0.15) = 30T -$3.97 avg hold 70min; 0 winners ever in MFE<0.15 band. Chop entries burn time then die — exit early in chop per captain mandate.",
+    "expected_impact": "+$2-3/7d if half the dead-tape bleed is avoidable",
+    "category": "exit engine",
+    "status": "suggested — needs 1m path backtest (self_learner) before ship",
+    "risk": "medium — must prove no trail-winner was flat at 60min before recovering"
   }
 ]

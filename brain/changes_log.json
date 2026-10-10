@@ -1001,5 +1001,16 @@
     "after": "('HIGH','volume-breakout-long'):0.0, ('HIGH','volume_breakout_long'):0.0",
     "rationale": "30d HIGH 8T 25%WR -$0.69; family block existed but bypass hole (DRIFT-A only checks SIGNAL_TYPE_OVERRIDES). Saves $1.11 losers / costs $0.42 winners. CEO diagnosis: regime issue.",
     "impact": "Blocks volume-breakout LONG in HIGH; EXTREME habitat preserved (17T 70.6% +$3.55)"
+  },
+  {
+    "timestamp": "2026-10-10T22:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Added VOLUME_BREAKOUT_LONG_RSI1M_FLOOR=35 — block volume-breakout LONG when 1m RSI in freefall despite 5m RSI>50 gate",
+    "type": "config",
+    "file": "hermes_constants.py + signals/volume_breakout.py",
+    "before": "No 1m RSI check — 5m gate could lag 1m dump (YGG 2026-10-10 entered LONG at 1m RSI 22.2, bb_pos 1.10, HML -$0.14)",
+    "after": "LONG skipped when rsi_1m < 35 (rsi_1m None = no block). SHORT untouched.",
+    "rationale": "Only all-time vol-breakout trade with meta_rsi<40 is the YGG loser; 30d winners below 40 = 0. Mechanism guard (signal already computed rsi_1m for drift detection but never consumed it).",
+    "impact": "Blocks falling-knife longs only; 0 winners affected in 30d data. Reversible."
   }
 ]

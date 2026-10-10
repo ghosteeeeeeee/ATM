@@ -1623,3 +1623,8 @@
 [2026-10-10 14:24 UTC]   🟢 OK: volume-breakout-long+: 9 trades, 33.3% WR, PnL=-0.7
 [2026-10-10 14:24 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-10 14:24 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-10 20:24 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-10 20:24 UTC]   🟢 OK: volume-breakout-long+: 10 trades, 30.0% WR, PnL=-1.44
+[2026-10-10 20:24 UTC]   🟢 OK: bb-bounce-v2-long+: 5 trades, 60.0% WR, PnL=0.3
+[2026-10-10 20:24 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-10 20:24 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
