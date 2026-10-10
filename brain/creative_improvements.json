@@ -3801,5 +3801,14 @@
     "status": "suggested",
     "risk": "medium — needs candle backtest first (dead_money replay lessons: close-aligned, no lookahead)",
     "backtest_delegated": true
+  },
+  {
+    "date": "2026-10-10T16:42:33Z",
+    "idea": "Leverage cap 3x for HML-prone signals (bb-squeeze+, pump-chain-, bb-bounce-v3-long+)",
+    "rationale": "30d HML: lev5 24T -$3.41 avg -4.35% vs lev3 31T -$4.02 avg -2.94%. Lev5 HML loses $0.14 more per trade. These 3 signals produce 37 of 84 30d HML trades. Cap lev=3 for these signals only.",
+    "expected_impact": "~$1.4 saved/7d on HML (reduce lev5 HML bleed from -$3.41 to ~-$2.0). Trade-off: reduces lev5 winners ~proportionally (trail family avg lev 3.9).",
+    "category": "risk sizing",
+    "status": "suggested — needs CEO approval + per-signal leverage config check",
+    "risk": "medium — affects all trades from these signals, not just HML"
   }
 ]
