@@ -7314,3 +7314,26 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss still −$0.58 cumulative despite share improvement — awaiting brain_auditor; next lever is SL width not signal kills
 - Volume-breakout longs just paid 3/3 — watch whether edge holds after cluster; correlation risk if market dumps with new cluster
+
+## [2026-10-10 02:12] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0 last hour | 24h: 25T 11W +$0.42 (WR 44%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0 trades — no 0%-WR signal with 3+ trades
+- atr_sl_hit 6/25=24% — under 40% threshold, tpsl_utils deployed, stable
+- hard_max_loss 5/25=20% −$0.58 — dominant loser bucket (hold brain_auditor eval)
+- Overtrade: 0/hr (limit 20)
+- Streak: 22:+0.30, 23:−0.14, 00:+0.30, 01:+0.42, 02:quiet — no 3 consecutive negative hours
+- 3 open: RUNE bb-bounce (−0.17%), NXPC bb-bounce (+0.31%), BABY vol-breakout (−0.11%) — all sized $11-22, SL/TP ±1.3-2.5% OK
+- 24h profit engines: stale_exit 4T +$0.71, rr_engine_resistance_break +$0.37, volume-breakout-long+ 3T 3W +$0.60
+- Timers fresh (1m-candle 43s, pump-hunter/compactor 20s, watchdog 1m17s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss still −$0.58 cumulative — awaiting brain_auditor; next lever is SL width not signal kills
+- BABY volume-breakout double-size ($22.10 vs usual $11.10) — flag if this is intentional sizing or a bug next hour
