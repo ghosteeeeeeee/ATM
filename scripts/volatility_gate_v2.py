@@ -65,6 +65,7 @@ REGIME_SIGNALS = {
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
         'continuum-trend+', 'continuum-trend-',  # continuum trendline alignment — regime-agnostic
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
+        'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-10: ETH LONG blocked in FLAT
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'NORMAL': {
@@ -97,6 +98,7 @@ REGIME_SIGNALS = {
         'confluence+', 'confluence-',
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
+        'bb-squeeze+', 'bb_squeeze+', 'bb-squeeze', 'bb_squeeze',  # BB squeeze breakout — added 2026-10-10: ZORA LONG blocked in NORMAL
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
