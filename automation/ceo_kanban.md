@@ -334,3 +334,6 @@
 
 ## TEAM UPDATES
 - [2026-10-10 14:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 0 open | 24h 30T 14W +$0.18 WR 47% (flipped positive) | hard_max_loss 17% −$0.79 (hold brain_auditor) | atr_sl_hit 23% (tpsl stable) | kill holding | overtrade 0/hr | streak inactive | timers fresh, live_trading=true
+
+## TEAM UPDATES
+- [2026-10-10 17:14] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L net −$0.06 (CRV ai-trader+ trail +$0.05 / HYPE hl_copy_trader hard_max_loss −$0.11 −4.95%) | 3 open: ETH hmacd_mtf-+ $22.10 2× size, YGG volume-breakout-long+ $22.10 2× size, PUMP oversold-bounce+ $11.10 | 24h 30T 14W $0.00 WR 47% exactly break-even | hard_max_loss 7/30=23% −$1.01 (hold brain_auditor SL-width lever) | atr_sl_hit 6/30=20% (tpsl stable) | kill: none qualifying (0 signals 3+T last hour); YGG vol-breakout entry is CEO re-enable at 12:25 (commit 764a5ad9), NOT a kill leak — earlier "kill holding" notes stale | overtrade 2/hr | streak 2 neg hrs (15,16), not 3 — size lever not triggered | timers fresh, live_trading=true. SIDES: 2× sizing recurrence (ETH+YGG $22.10) — sizing-path audit still pending. Full log: automation/trading_log.md

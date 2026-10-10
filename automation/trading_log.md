@@ -7680,3 +7680,27 @@ Last hour: WCT r2v2-long8 LONG hard_max_loss −$0.11 (−2.89%). 3 open: ETH hm
 **Open Questions:**
 - ETH open at $22.10 = 2× standard size ($11.10) — same pattern as BABY 08:00 flag; sizing path unknown, worth a dedicated sizing audit when brain_auditor SL work lands
 - hard_max_loss −$0.90 cumulative — awaiting brain_auditor; SL width lever still pending
+
+## [2026-10-10 17:14] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** −$0.06 last hour | 24h: 30T 14W $0.00 (WR 46.7%, exactly break-even)
+
+Last hour: CRV ai-trader+ LONG profit-monster-trail +$0.05 (+2.31%); HYPE hl_copy_trader LONG hard_max_loss −$0.11 (−4.95%). 3 open: ETH hmacd_mtf-+ $22.10 (2× size), PUMP oversold-bounce+ $11.10, YGG volume-breakout-long+ $22.10 (2× size).
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0 signals with 3+ trades last hour — none qualify. YGG volume-breakout-long+ entry is NOT a kill leak: CEO re-enabled VOLUME_BREAKOUT_PLUS_ENABLED at 12:25 UTC (commit 764a5ad9, RSI ceiling 85). Earlier "kill holding" notes were stale.
+- atr_sl_hit 6/30=20% — under 40%, tpsl_utils deployed
+- hard_max_loss 7/30=23% −$1.01 — dominant loser (−$0.144 avg); stable; hold brain_auditor (SL width lever pending)
+- Overtrade: 2/hr (limit 20)
+- Streak: hour 15 −$0.11 + hour 16 −$0.06 = 2 consecutive negative hours, not 3 — size lever not triggered
+- 24h PnL exactly $0.00 — recovered from −$0.22 midday via stale_exit +$0.71 and trail wins
+- Timers/live_trading/kill JSON healthy; no constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 2× sizing recurrence: ETH and YGG both $22.10 vs standard $11.10 (also BABY earlier today) — sizing path still unknown; dedicated sizing audit when brain_auditor SL work lands
+- hard_max_loss −$1.01 cumulative — awaiting brain_auditor; SL width lever still pending
+- 24h PnL at exactly break-even — watch whether next burst tips it positive or negative
