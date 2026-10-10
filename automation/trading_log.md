@@ -7563,3 +7563,26 @@ Last hour: PUMP volume-breakout-long+ atr_sl_hit −$0.03 (−1.52%) — pre-kil
 **Open Questions:**
 - hard_max_loss −$1.17 cumulative — awaiting brain_auditor; SL width lever still pending
 - 24h PnL −$0.22 slightly worse than −$0.19 at 10:15 but driven by the pre-kill PUMP close; post-kill flow is clean (0 new vol-breakout LONG entries)
+
+## [2026-10-10 12:13] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 last hour | 24h: 33T 13W 20L −$0.22 (WR 39.4%)
+
+1 open: NEAR ai-trader+ LONG $11.10 (opened 11:57, TPSL manages)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour. volume-breakout-long+ kill holding — 0 new LONG closes since 09:15; 24h 9T 3W −$0.23 still worst-signal but pre-kill cohort, will roll off window
+- atr_sl_hit 7/32=22% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/32=29% −$1.17 — dominant loser, hold brain_auditor (SL width lever pending)
+- Overtrade: 0/hr
+- Streak: hours 08/09/10 negative (−$0.24 total) but hour 11 empty → streak broken; regime was SHORT_BIAS not NEUTRAL → size lever N/A
+- Live_trading=true, kill JSON=true, timers fresh (pipeline/compactor/pump-hunter 38s), no log errors
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$1.17 cumulative — awaiting brain_auditor; SL width lever still pending
+- 24h PnL flat −$0.22 — quiet hours slowing bleed; NEAR open trade is first post-kill flow to watch
