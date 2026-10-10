@@ -4486,3 +4486,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-10 21:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 32T 15W −$0.23 WR 47% | hard_max_loss 25% −$1.04 (hold brain_auditor) | atr_sl_hit 12.5% (tpsl stable) | kill: none (0T) | overtrade 0/hr | streak broken (hour 20 empty) | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
+BY: auto_1hr
+[2026-10-10 22:13] auto_1hr: NO CONFIG CHANGE — 1T last hour L APT pump-chain+ atr_sl −$0.06 | 2 open | 24h 33T 15W −$0.29 WR 46% | hard_max_loss 24% −$1.04 (hold brain_auditor) | atr_sl_hit 15% (tpsl stable) | kill: none qualifying | overtrade 1/hr | streak broken (hour -2 empty); regime SHORT_BIAS | timers fresh, live_trading=true

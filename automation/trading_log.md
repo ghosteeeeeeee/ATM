@@ -7831,3 +7831,26 @@ No closes last hour. 24h breakdown unchanged from 20:14 run: hard_max_loss 8T �
 **Open Questions:**
 - 2× sizing recurrence (ETH/YGG $22.10) — sizing audit still pending brain_auditor
 - hard_max_loss cumulative −$1.04 — awaiting SL width work
+
+## [2026-10-10 22:13] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** −$0.06 last hour | 24h: 33T 15W −$0.29 (WR 45.5%)
+
+Last hour: APT pump-chain+ atr_sl_hit −$0.06 (−1.33%). 2 open trades.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: pump-chain+ only 1T last hour at 0% WR — need 3+T to kill; volume-breakout-long+ still 0 new LONG closes since 09:15 kill (only combo-tagged trades remain)
+- atr_sl_hit 5/33 = 15.2% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/33 = 24% −$1.04 dominant loser (−$0.13 avg) — hold brain_auditor (SL width lever pending)
+- Overtrade: 1/hr (limit 20)
+- Streak: hours −6..−3 negative (−$0.30) but hour −2 empty broke streak; regime SHORT_BIAS (11L/29S/59N) not NEUTRAL — size lever N/A
+- live_trading=true, continuum_enabled=true, guardian kill switch empty (OK), timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h still −$0.29 at 45.5% WR — worst signal volume-breakout-long+ (10T 3W −$0.37) unchanged; CEO re-enabled 12:25, not a leak
+- 2× sizing recurrence (ETH/YGG $22.10) — sizing audit still pending brain_auditor
