@@ -944,7 +944,7 @@ SHORT_NORMAL_PENALTY = 0.85  # brain_auditor Sep 21 — ALL SHORT signals in NOR
 REGIME_CONF_MULTIPLIER_ENABLED = True
 REGIME_CONF_EXTREME_MULT = 1.15   # +15% confidence boost in EXTREME vol
 REGIME_CONF_NORMAL_MULT  = 0.85   # -15% confidence penalty in NORMAL vol
-REGIME_CONF_HIGH_MULT    = 0.50   # -50% confidence penalty in HIGH vol — brain_auditor Sep 26: HIGH 14d 147T 42.9%WR -$3.33, 39% of all trades, dead zone. 0.85x insufficient.
+REGIME_CONF_HIGH_MULT    = 0.70   # -30% confidence penalty in HIGH vol — CEO Oct 10: Sep 26 "dead zone" (42.9%WR) stale; last 14d HIGH 102T 52.0%WR -$1.51. bb-squeeze+ HIGH 39T 61.5%WR passes at 0.70x (~60% exec). ZORA/ai-trader stays blocked (35%). Revert to 0.50 if 7d HIGH WR <45% or PnL worsens >-$2/7d.
 REGIME_CONF_FLAT_MULT    = 1.0    # no adjustment for FLAT (too few trades)
 
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────
