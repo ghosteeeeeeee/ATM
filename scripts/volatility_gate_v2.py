@@ -302,7 +302,7 @@ VOL_PHASE_MULTS = {
         'R2_Structural': 0.0,    # BLOCKED — rr-struct- 4T 25%WR -$0.41 in HIGH, wins in NORMAL. Key fixed 2026-09-13 (was R2_Structural, already matched but value stands)
         'Bollinger': 0.0,        # BLOCKED — bb_bounce 50% WR in HIGH, wins in EXTREME/NORMAL
         # Accelerate REMOVED 2026-09-12 — SHORT needs HIGH regime access, EXTREME already blocked
-        'Volume_Breakout': 0.0,  # BLOCKED — volume_breakout 33% WR in HIGH, wins in EXTREME
+        'Volume': 0.0,  # BLOCKED 2026-10-10 signal_reporter — volume-breakout-long+ HIGH 30% WR -$0.79 (30d 10T); EXTREME 72% WR +$3.80, NORMAL 67% +$0.31. Key was 'Volume_Breakout' (dead — signal_family returns 'Volume')
         'Breakout': 0.0,         # BLOCKED — breakout_long 33% WR in HIGH, wins in EXTREME
         'Pump_Flow': 0.5,        # PENALIZED 2026-09-22 — HIGH pump-chain+ 37% WR, pump-chain- 48% WR. Bare pump_chain 76.9% WR though.
         'Trend_Purity': 0.0,    # BLOCKED — trend_purity+ 33.3% WR in HIGH (3T, -$0.50), wins in EXTREME (57.1%)
