@@ -1,5 +1,10 @@
 # Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
 
+## Error Alerts — 2026-10-10 04:47 UTC (health_monitor)
+- **WARN** (recurring): Disk 85% used (/dev/vda2 94G/118G). No uncompressed *.log >7d to gzip. Top DBs: coin_tracker 3.3G, candles 2.7G, session_brain 1.1G, signals_hermes 979M, mtf_macd_tuner 948M. No safe auto-fix — DB prune still a CEO/bug_hunter decision.
+- **INFO**: Pipeline healthy — cycle #236303 running, no Tracebacks in 30min. Timers 3/3 active (price-collector, 1m-candle, pipeline). Prices fresh (~1min, 347 tokens in candles_1m last 5min). Regime 5m SHORT_BIAS (10L/16S/71N of 97). Speeds 128/241 ≥50th pct. 332 active signals, 1 generated last hour. 11 closed today (8W/3L, +$0.53), 0 open. 4 phantom trades (<0.01% pnl) in last 7d.
+- **INFO**: Side findings unchanged — `signals_hermes_runtime.db` unbounded; `prices.db`/`signals.db` 0-byte stubs still present; `brain.db` 0-byte stub.
+
 ## Error Alerts — 2026-10-08 10:47 UTC (health_monitor)
 - **WARN** (recurring): Disk 85% used (/dev/vda2 95G/118G). Gzip of *.log >7d found nothing (rotations already .gz). DBs: coin_tracker ~3.3G, candles ~2.6G, mtf_macd_tuner ~1.6G, session_brain ~1.1G. No safe auto-fix — CEO/bug_hunter DB prune decision still open.
 - **WARN** (informational): 136 signals in last hour, but 0 compaction decisions / 0 executions / hotset empty ("no signals survived compaction"). Filters are rejecting candidates — verify compaction thresholds, not a pipeline crash. 1 closed today (+$0.94, 1 win), 0 open, 0 phantom trades.
@@ -360,3 +365,13 @@
 
 ## Error Alerts — 2026-10-09 23:00 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] W TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-10 02:48 UTC
+- **WARN** (4x): Non-critical automation services in failed state: bug-hunter (code-quality FAILs, by design), ceo (exit 124 timeout), summarizer (timeout), upgrade-implementer (exit 124)
+- **AUTO-FIX**: `systemctl reset-failed` on all 4 — they re-trigger on next timer fire. Pipeline/timers/price-collector unaffected.
+- **WATCH**: Disk at 85% (/dev/vda2, 18G free). No logs >7d to compress; journal rotation covers system logs. Monitor.
+
+## Error Alerts — 2026-10-10 07:00 UTC
+- **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: W TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
