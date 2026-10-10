@@ -3228,7 +3228,10 @@ def run(dry_run=False):
     # Lowered from 65% on 2026-04-11 — signals were being generated at 59-65% conf
     # but 100% blocked at execution gate, causing empty hotset and pipeline stall.
     # 50% is still a meaningful quality floor for pre-qualified hot-set tokens.
-    MIN_EXEC_CONFIDENCE = 50
+    # CEO 2026-10-10: lowered 50→40. Penalty gate counterfactual showed blocked
+    # signals avg move +0.03% (noise). Penalty product still scales confidence —
+    # unanimously-penalized trades (product <0.3) land at ~30% and stay blocked.
+    MIN_EXEC_CONFIDENCE = 40
 
     # ── HOTSET_ENABLED bypass ──────────────────────────────────────────────
     # When HOTSET_ENABLED=False, skip the hot-set gate entirely.
