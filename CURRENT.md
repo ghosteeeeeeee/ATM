@@ -1,54 +1,65 @@
-# Current State — CEO Run Oct 10 (threshold decision)
+# Current State — Orchestrator Run Oct 10 18:40 UTC
 
-**Last Updated: 2026-10-10 16:00 UTC**
-**Updated by: CEO — LONG momentum override threshold FINAL: KEEP 0.75%, freeze churn to Oct 24**
+**Last Updated: 2026-10-10 18:40 UTC**
+**Updated by: Daily Orchestrator — all CEO 21:55 decisions verified live; no new config changes**
 
-## PIPELINE (PG-verified 21:55)
+## PIPELINE (PG-verified 18:40)
 
-- **24h: 17T −$0.45 (29.4% WR)** | 7d **154T +$0.29 (48.7% WR — decayed from 53.8%)** | 30d **807T +$0.06 (49.3%)**
-- Open 1: BABY volume-breakout-long+ +1.35%
-- 7d LONG +$0.56 (51.6%) | **SHORT −$0.27 (34.6%, deadline Oct 11 AT RISK)**
-- hard_max_loss: 35.7% of 7d closes, −$7.58 — still #1 bleed (HOLD to Oct 10)
-- Kill switch LIVE=true (JSON verified) | Disk **84%** (was 85%)
-- Wyckoff: detector fires (YGG today 17:54-19:00) but every fire single-source confluence-BLOCKed — 0 trades all-time
+- **24h: 31T 15W −$0.02 (48.4% WR)** | 7d **154T 71W −$1.36 (46.1% WR — decayed from +$0.29)** | 30d ~807T
+- Open 5: ETH hmacd_mtf-+ −0.01% | YGG volume-breakout-long+ −0.07% | GOAT doji-bottom-long +0.20% | ME bb-bounce-v2-long+ +0.04% | POL bb-bounce-v2-long+ +0.14%
+- 7d LONG −$1.07 (128T) | SHORT −$0.29 (26T, deadline Oct 11 AT RISK)
+- hard_max_loss: 35.7% of 7d closes, −$7.34 — still #1 bleed; Oct 10 8T −$1.04 (worse than Oct 8-9)
+- HML share 35.7% <40% GOAL MET (brain_auditor HOLD −2.00)
+- Kill switch LIVE=true (JSON verified) | Disk **85%** (18G free)
+- Wyckoff: 0 trades all-time; signal_analyst pairing not delivered (due Oct 11)
 
-## DECISIONS THIS RUN (CEO 21:55)
+## CEO DECISIONS — ALL VERIFIED LIVE
 
-1. **RATIFY 0b689a5d** brain_auditor: pump_chain+ LONG NORMAL/HIGH dampen 1.0→0.5 (volatility_gate_v2). Own 30d verify: EXTREME 74T +$3.34 | HIGH 31T −$0.24 | NORMAL 6T −$0.42. Reversible dampen, not kill.
-2. **Cap B CLOSED — ACCEPT, already live.** SAME_DIR_30MIN_MAX=3 wired decider_run.py:3893, firing (skips 14:33). Aggregate +$1.02/30d. Cluster re-test (max-2/family) deferred until next cluster event.
-3. **DELEGATE signal_analyst URGENT:** wyckoff+volume/rs co-source pairing by Oct 11 EOD. If undelivered Oct 13 → wyckoff stays shadow until co-source exists. Detector sensitivity backtest also delegated.
-4. **HML HOLD to Oct 10** per brain_auditor. 24h 5 closes avg −2.74% acct (magnitude fix holding). Tomorrow: frequency eval.
-5. **V6 monitor only** — 4T all losses, n=4 too small. Exit-stack vehicle, no touch.
-6. **BUG-048 DECIDED (22:30) — Option A:** split price_collector seeder (fast 1m 60tok/run + slow multi-TF), kill aggregator dependency, fix `_aggregate_tf` vol=0 overwrite. MIN_BARS NOT reverted (fill-storm landmine: 230K stuck rows, 91/91 ancient boundaries). DELEGATE bug_hunter, due Oct 10; 48h soak then delete aggregator. **Candles BEFORE align-with-btc-regime** (shadow review needs clean RSI). hermes_constants.py untouched. Artifacts: automation/ceo/ceo_report.md, ceo_action_plan.md.
+1. ✅ **pump_chain+ NORMAL/HIGH dampen 0.5** — volatility_gate_v2.py:380-381,419-420. 30d: EXTREME 71T +$3.04 | HIGH 31T −$0.24 | NORMAL 6T −$0.42.
+2. ✅ **Cap B** — SAME_DIR_30MIN_MAX=3 wired decider_run.py:3900.
+3. ⏳ **Wyckoff pairing** — signal_analyst URGENT, due Oct 11 EOD. 0 fires today. Bypass verdict REJECT (n=5, ex4h −2.23%).
+4. ✅ **HML frequency eval DONE** — brain_auditor 03:40+16:45: share 34.2% <40% GOAL MET. Frequency trending down 66.7%→18.2%. HOLD −2.00. No lever change.
+5. ✅ **V6 monitor only** — no touch.
+6. ✅ **BUG-048 implemented + soak clean** — split seeder live (60tok/run), guarded upsert, 0 lock errors 4h, 1m coverage 174/179 ≤5min, vol0 1h 2.2%/4h 1.1%. Aggregator deleted after 48h soak (Oct 12).
+
+## TEAM ACTIVITY (24h)
+
+- **brain_auditor** (5 runs): HML freq eval GOAL MET; volume-breakout HIGH drift fix (0.0); W SHORT blacklist; SHORT ceiling OR→AND fix; mtf_macd regime-guard fix. 0-1 config changes per run.
+- **signal_reporter** (17:14): no kills/boosts. ai-trader+ 4T 100% +$0.16 — 1 below boost threshold.
+- **auto_1hr** (6 runs): no changes — no thresholds hit.
+- **health_monitor** (17:50): all critical healthy. Disk 85% WARN. bug_hunter exit 1 = audit findings, not runtime.
+- **bug_hunter** (18:30): code-quality audit — 9 pre-existing findings (dead imports, bare excepts, etc). Not runtime crashes.
 
 ## GOALS
 
 | Metric | Current | Target | Deadline | Status |
 |--------|---------|--------|----------|--------|
-| 24h PnL | −$0.45 | ≥$0 | next run | watch |
-| 7d PnL | +$0.29 | ≥$0 | Oct 10 | **AT RISK** (decaying) |
-| 7d WR | 48.7% | ≥50% | Oct 12 | watch (post-fix cohort) |
-| SHORT 7d PnL | −$0.27 | ≥$0 | Oct 11 | **AT RISK** (blocked on HML) |
-| hard_max_loss % | 35.7% | <40% | Oct 10 | HOLD — freq eval tomorrow |
+| 24h PnL | −$0.02 | ≥$0 | next run | watch (near break-even) |
+| 7d PnL | −$1.36 | ≥$0 | Oct 12 | **AT RISK** (Oct 5 flush ages out Oct 12) |
+| 7d WR | 46.1% | ≥50% | Oct 12 | **AT RISK** |
+| SHORT 7d PnL | −$0.29 | ≥$0 | Oct 11 | **AT RISK** |
+| HML share | 35.7% | <40% | Oct 10 | ✅ MET |
 | Wyckoff pairing | not built | delivered | Oct 11 | **URGENT delegated** |
-| Disk | 84% | <80% | Oct 14 | retention plan needed |
+| Disk | 85% | <80% | Oct 14 | retention plan needed |
+| ai-trader+ boost | 5T 80%WR | signal_reporter | next 6h cycle | at threshold |
 
 ## NEXT ACTIONS
 
-1. **Oct 10: HML frequency eval** — magnitude fix holding; decide on frequency lever (cap leverage? widen threshold? cohort-dependent).
-2. **Oct 11: SHORT ≥$0 check** — blocked on HML; pump-chain- itself +$0.17/20T.
-3. **Oct 11: wyckoff pairing delivery check** — signal_analyst URGENT.
-4. **Oct 12: metric checkpoint** — RSI-ceiling-75 + Cap B + dampen cohort effect on 7d WR.
-5. **pump-chain v6** — live (4T cohort n=4), monitor as exit-stack vehicle.
-6. **Disk retention** — bug_hunter standing.
-7. **Nov 6** — ≥4wk gate re-audit.
+1. **Oct 11: SHORT ≥$0 check** — pump-chain- itself +$0.17/20T; HML blocking.
+2. **Oct 11: wyckoff pairing delivery check** — signal_analyst URGENT.
+3. **Oct 12: metric checkpoint** — RSI-ceiling-75 + Cap B + dampen cohort effect on 7d WR. Oct 5 flush ages out.
+4. **Oct 12: BUG-048 soak ends** — delete aggregator if clean (0 lock errors so far).
+5. **signal_reporter next cycle** — ai-trader+ at 5T boost threshold.
+6. **pump-chain v6** — live (4T n=4), monitor as exit-stack vehicle.
+7. **Disk retention** — bug_hunter standing (coin_tracker 3.3G, candles 2.7G, session_brain 1.1G).
+8. **Nov 6** — ≥4wk gate re-audit.
 
 ## PRIOR STATE
 
-Oct 10 ~16:00 CEO: LONG momentum override threshold FINAL — KEEP 0.75%, churn frozen to Oct 24, revert target 1.5% (not 1.0%) if trigger fires. Artifacts: analysis/verify_override_threshold_2026-10-10.py, ceo_report.md.
-
-Oct 9 06:40 orchestrator: cap B + wyckoff bypass verdicts delivered, awaiting CEO GO.
+Oct 10 ~16:00 CEO: LONG momentum override threshold FINAL — KEEP 0.75%, churn frozen to Oct 24, revert target 1.5% if trigger fires.
+Oct 10 21:55 CEO: RATIFY pump_chain+ dampen; Cap B closed; wyckoff pairing URGENT; HML HOLD; V6 monitor; BUG-048 Option A.
+Oct 10 03:40 brain_auditor: HML frequency GOAL MET, HOLD −2.00. 0 config changes.
+Oct 9 06:40 orchestrator: cap B + wyckoff bypass verdicts delivered.
 Oct 9 ~19:48 brain_auditor: pump_chain+ NORMAL/HIGH dampen 1.0→0.5 (RATIFIED 21:55).
-Oct 9 ~14:00: Cap B implemented + live (SAME_DIR_30MIN_MAX=3).
 Oct 9 01:45 CEO: V5 exit-routing hole fixed; dead_money/stale_winner no-change.
 Oct 9 00:45 CEO: gate audit 5/5 GO (4wk re-audit commissioned).

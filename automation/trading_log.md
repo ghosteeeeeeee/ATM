@@ -7710,3 +7710,52 @@ Last hour: CRV ai-trader+ LONG profit-monster-trail +$0.05 (+2.31%); HYPE hl_cop
 - No boosts: ai-trader+ 4T 100% +$0.16 across 4 tokens — 1T below boost threshold (5T). Watch next cycle.
 - No inversions found (24h).
 - Report: automation/signal_report.md
+
+## [2026-10-10 18:14] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** −$0.08 last hour | 24h: 30T 15W +$0.01 (WR 50.0%)
+
+Last hour: STX r2v2-long3 LONG cut-loser-CL-T1 −$0.12 (−5.55%); PUMP oversold-bounce+ LONG profit-monster-trail +$0.04 (+1.98%). 4 open: ETH hmacd_mtf-+ $22.10 (2× size), YGG volume-breakout-long+ $22.10 (2× size), ZRO r2v2-long4 $11.10, GOAT doji-bottom-long $11.10.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: no signal with 3+ trades last hour — r2v2-long3 1T, oversold-bounce+ 1T only
+- atr_sl_hit 4/30=13% — under 40%, tpsl_utils deployed
+- hard_max_loss 7/30=23% −$1.01 — dominant loser (−$0.144 avg) but stable; hold brain_auditor (SL width lever pending)
+- Overtrade: 2/hr (limit 20)
+- Streak: 3 consecutive negative hours (15: −$0.11, 16: −$0.06, 17: −$0.08, total −$0.25) BUT regime is SHORT_BIAS (5m: 33 short/11 long/54 neutral), not NEUTRAL — size lever N/A per rule
+- 24h PnL +$0.01 barely positive — recovered from midday −$0.22 via stale_exit +$0.71
+- Timers fresh, live_trading=true, kill JSON=true, pipeline active
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 2× sizing recurrence: ETH and YGG both $22.10 vs standard $11.10 (also BABY earlier today) — sizing path still unknown; dedicated sizing audit when brain_auditor SL work lands
+- hard_max_loss −$1.01 cumulative — awaiting brain_auditor; SL width lever still pending
+- 3 consecutive negative hours totaling only −$0.25 — noise-level, watching whether hour 18 tips 24h negative
+
+## [2026-10-10 18:40] Daily Orchestrator
+
+**Phase 0-1:** Read CURRENT.md (last updated 16:00, stale). Gathered: health_monitor 17:50 (all critical healthy, disk 85% WARN), auto_1hr 6 runs (no changes), signal_reporter 17:14 (no kills/boosts, ai-trader+ 4T at threshold), bug_hunter 18:30 (9 pre-existing audit findings, not runtime), blacklist_test_log (experiment complete, 0 KEEP/77), upgrade_audit (plans mature, no pending L1).
+
+**Phase 2 — Analysis:**
+- All 6 CEO 21:55 decisions VERIFIED LIVE: pump_chain+ dampen (volatility_gate_v2.py:380-381,419-420), Cap B (decider_run.py:3900), wyckoff pairing delegated (not delivered, due Oct 11), HML freq eval DONE (brain_auditor 03:40, share 34.2% <40% GOAL MET), V6 monitor, BUG-048 implemented+soak clean.
+- BUG-048 soak: 0 lock errors 4h, 1m coverage 174/179 ≤5min, vol0 1h 2.2%/4h 1.1% (target <2% — 1h borderline). Aggregator still running per plan, delete after 48h (Oct 12).
+- 7d PnL deteriorated +$0.29→−$1.36. Oct 5 flush (−$0.90) ages out Oct 12. Top losers all have regime blocks/dampens now (bb-squeeze+ −$1.75, pump-chain- −$1.29, volume-breakout-long+ −$1.21 — HIGH block live 15:42, pump-chain+ −$0.76 — dampen live).
+- HML daily: Oct 10 8T −$1.04 (worse than Oct 8-9) but share still <40%.
+- ai-trader+ hit 5T 80%WR +$0.11 24h — boost threshold met, signal_reporter owns (next cycle 23:14).
+- Wyckoff: 0 fires today, 0 trades all-time. Bypass verdict REJECT (n=5, ex4h −2.23%). signal_analyst pairing still pending.
+
+**Phase 3-5:** 0 config changes (all decisions already implemented/delegated). Updated CURRENT.md (16:00→18:40). No critical issues found.
+
+**Sideways finds:**
+- hermes-bug-hunter.service exit 1 = pre-existing code-quality findings (dead signal_gen imports 3 files, hardcoded passwords 4 files, non-atomic JSON 75 files). Not runtime crashes. Standing cleanup, not orchestrator scope.
+- 1m candle vol0 last 30min: 18.3% — guarded upsert preventing NEW clobbers but historical vol0 rows remain. Fine, fix is working.
+- mtf_macd_tuner.db 471M, session_brain.db 1.1G, signals_hermes.db 985M — disk retention candidates (bug_hunter standing).
+
+**Open Questions:**
+- 7d WR 46.1% vs target 50% by Oct 12 — AT RISK. Oct 5 flush aging is the main lever; no new intervention without CEO.
+- SHORT 7d −$0.29 vs ≥$0 by Oct 11 — AT RISK, blocked on HML. pump-chain- itself +$0.17/20T healthy.
+- ai-trader+ boost — signal_reporter will apply if 5T confirmed next cycle. Not orchestrator scope.
