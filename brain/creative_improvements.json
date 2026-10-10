@@ -3810,5 +3810,14 @@
     "category": "risk sizing",
     "status": "suggested — needs CEO approval + per-signal leverage config check",
     "risk": "medium — affects all trades from these signals, not just HML"
+  },
+  {
+    "date": "2026-10-10T17:46:51.620843+00:00",
+    "idea": "No-momentum soft timeout: for bb-squeeze+ (and later broader), exit if hold>75min AND unrealized <+0.15% (halfway to trail arm 0.40%). Data: bb-squeeze hold 30-60min +$0.97 90%WR (trail catches winners); 60-120min -$0.73 33%WR; 120+min -$0.69 22%WR. Winners held>60min with MFE<0.40: 0/14d.",
+    "rationale": "HML = trades that never reach trail. Exit them as dead money before max-loss. STALE_WINNER only fires profitable-flat; STALE_LOSER only fires loss>=-1%; gap is slow-grind-flat between -1% and 0% for 60+min.",
+    "expected_impact": "Could save portion of 7d HML -$7.43 (bb-squeeze 60+min buckets -$1.42 alone). Risk: n=21 bucket sample; timeout at 75min might kill winners that recover later (BABY lesson: flat 60min → +12%).",
+    "category": "exit quality",
+    "status": "monitor — needs shadow before live. One variable at a time; volume-breakout HIGH fix first.",
+    "risk": "medium"
   }
 ]

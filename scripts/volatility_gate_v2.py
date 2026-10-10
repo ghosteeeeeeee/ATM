@@ -430,6 +430,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('HIGH', 'accel-300'): 0.0,                 # BLOCKED — bare form fallback for accel-300- (substring match)
     ('HIGH', 'trend-ride'): 0.0,                # BLOCKED 2026-10-06 signal_reporter — backtest HIGH 91T 51.6%WR -$2.38 no edge; 24h 7T 42.9%WR -$0.18. EXTREME 58.6%WR kept via Momentum family (no EXTREME block).
     ('HIGH', 'trend_ride'): 0.0,                # underscore form (signal_type 'trend_ride_long' in trades DB)
+    ('HIGH', 'volume-breakout-long'): 0.0,       # BLOCKED 2026-10-10 brain_auditor — DRIFT fix. Family Volume HIGH=0.0 existed (signal_reporter) but STANDALONE_BYPASS + DRIFT-A only enforce SIGNAL_TYPE_OVERRIDES — AIXBT/WCT/BLUR/BABY LONG opened HIGH after CEO re-enable and all hit hard_max_loss. 30d HIGH 8T 25%WR -$0.69 vs EXTREME 17T 70.6% +$3.55. Saves $1.11 losers / costs $0.42 winners. n=8 small but enforces existing family decision (CEO: "regime issue not signal issue").
+    ('HIGH', 'volume_breakout_long'): 0.0,       # underscore form (signal_type in trades DB)
     ('HIGH', 'support_resistance'): 0.3,         # PENALIZED — rs mean-reversion reduced in HIGH
     ('HIGH', 'pullback_entry-'): 1.0,            # OK — pullback-entry- SHORT 53.4% WR in HIGH (legacy underscore form)
     ('HIGH', 'pullback-entry-'): 1.0,            # OK — 30d HIGH: 58T +$0.43. Works in HIGH, bleeds NORMAL.

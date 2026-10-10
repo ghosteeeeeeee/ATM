@@ -1,80 +1,124 @@
 {
-  "timestamp": "2026-10-10T16:42:33Z",
+  "timestamp": "2026-10-10T17:46:51.620843+00:00",
   "session_brain_stats": {
-    "note": "session_brain queried for HML frequency, bb-squeeze timeout, chop patterns",
-    "key_insight": "HML is exit-structure + entry-quality problem, not regime-specific"
+    "queries": 3,
+    "note": "session brain used for context; primary evidence from live PG"
   },
   "trade_summary_24h": {
-    "total": "29T -$0.05 44.8%WR",
-    "7d": "155T -$1.29 46.5%WR",
-    "30d_hml": "84T -$11.17 avg -3.65%",
-    "7d_exit_family": {
-      "TRAIL_FAMILY": "74T +$6.92 87.8%WR — HOW WE WIN",
-      "HML": "55T -$7.43 0%WR — HOW WE LOSE",
-      "OTHER": "26T -$0.78 26.9%WR"
+    "trades": 30,
+    "wins": 14,
+    "pnl": 0.0,
+    "wr": 46.7,
+    "7d": {
+      "trades": 153,
+      "wins": 70,
+      "pnl": -1.37,
+      "wr": 45.8
+    },
+    "7d_long": {
+      "trades": 127,
+      "pnl": -1.08,
+      "wr": 48.8
+    },
+    "7d_short": {
+      "trades": 26,
+      "pnl": -0.29,
+      "wr": 30.8
+    },
+    "7d_families": {
+      "trail_family": {
+        "n": 64,
+        "pnl": 5.53,
+        "wr": 87.5
+      },
+      "hard_max_loss": {
+        "n": 55,
+        "pnl": -7.43,
+        "wr": 0.0
+      }
+    },
+    "hml_momentum": {
+      "n": 55,
+      "mfe_avg": 0.173,
+      "never_above_0.20": 38,
+      "reached_trail_0.40": 7
     }
   },
-  "drift_findings": [],
+  "drift_findings": [
+    {
+      "id": "DRIFT-HIGH-VOLBREAK",
+      "severity": "HIGH",
+      "finding": "volume-breakout-long+ HIGH family block (Volume: 0.0) exists in volatility_gate_v2 phase matrix since 2026-10-10 signal_reporter, but STANDALONE_BYPASS ('volume-breakout-long' in STANDALONE_BYPASS_SIGNALS) + DRIFT-A enforcement only checks SIGNAL_TYPE_OVERRIDES — no HIGH per-signal override existed. AIXBT/WCT/BLUR/BABY LONG opened HIGH after CEO re-enable and all hit hard_max_loss.",
+      "evidence": "30d HIGH 8T 25%WR -$0.69 (6L -$1.11, 2W +$0.42). EXTREME 17T 70.6% +$3.55. NORMAL 8T 62.5% -$0.05.",
+      "fix": "Added ('HIGH','volume-breakout-long'): 0.0 + underscore form to SIGNAL_TYPE_OVERRIDES. DRIFT-A now blocks bypass. Verified: HIGH mult=0.0, EXTREME stays None (unblocked).",
+      "impact_on_winners": "Would block 2 of 8 HIGH trades (winners worth $0.42); saves 6 losers worth $1.11. Net +$0.69. n=8 small but enforces existing family decision per CEO 'regime issue not signal issue'."
+    }
+  ],
   "recurring_problems": [
     {
-      "problem": "hard_max_loss #1 bleed for 30+ days",
-      "data": "30d 84T -$11.17 avg -3.65%. Leverage fix (aed0aa36) reduced avg from -4.4% to -3.65% but frequency unchanged. 85% of HML trades never reach trail arm (+0.40%) — avg MFE only 0.17-0.19%.",
-      "root_cause": "Chop entries. Signals fire during no-momentum periods. Trail never activates. Hard stop kills.",
-      "verdict": "NOT fixable via entry-quality filters tested. momentum_score, speed_percentile, bb_position, meta-RSI bands all show NO significant difference between HML losers and trail winners. HML is evenly distributed across all entry conditions.",
-      "action": "CEO HML frequency eval is the right lever. Leverage correlation: lev5 HML -$0.14/trade worse than lev3 (24T -$3.41). Cap leverage at 3 for HML-prone signals is candidate."
+      "problem": "hard_max_loss is #1 bleed — 7d 55T -$7.43 0% WR (36% of closes). 38/55 never reached MFE>0.20% (no momentum). 7 reached trail but still lost.",
+      "signals": "bb-squeeze+ 12T -$1.73 (avg MFE 0.156), pump-chain- 8T -$1.12, pump-chain+ 7T -$0.72, volume-breakout-long+ 5T -$0.84, bb-bounce-v3-long+ 5T -$0.78",
+      "status": "CEO HOLD to Oct 10 (today). CUT_LOSER widened -1.50→-2.00 Oct 9: post-widen 7T -$1.01 avg -3.13% (pre-widen avg -3.62%). Magnitude slightly better, frequency unchanged. Widen does NOT help chop entries (no momentum to give trail room)."
+    },
+    {
+      "problem": "7d PnL decayed +$0.29→-$1.37 since CEO 16:00 checkpoint. LONG flipped negative (-$1.08/127T 48.8%). SHORT still -$0.29/26T 30.8%.",
+      "status": "watch — 24h flat $0.00, not accelerating but no recovery"
     }
   ],
-  "missing_implementations": [],
+  "missing_implementations": [
+    {
+      "item": "bb-squeeze.py docstring promises 'Confidence: based on squeeze duration + breakout magnitude + volume' but _detect_signal never uses volume — squeeze breakouts fire without volume confirmation. HML trades (MFE avg 0.14) look like fake breakouts.",
+      "severity": "MED",
+      "note": "price_history ticks could proxy volume (tick count in breakout candle). Needs backtest before ship."
+    }
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-10T16:42:33Z",
-      "idea": "Leverage cap 3x for HML-prone signals (bb-squeeze+, pump-chain-, bb-bounce-v3-long+)",
-      "rationale": "30d HML: lev5 24T -$3.41 avg -4.35% vs lev3 31T -$4.02 avg -2.94%. Lev5 HML loses $0.14 more per trade. These 3 signals produce 37 of 84 30d HML trades. Cap lev=3 for these signals only.",
-      "expected_impact": "~$1.4 saved/7d on HML (reduce lev5 HML bleed from -$3.41 to ~-$2.0). Trade-off: reduces lev5 winners ~proportionally (trail family avg lev 3.9).",
-      "category": "risk sizing",
-      "status": "suggested — needs CEO approval + per-signal leverage config check",
-      "risk": "medium — affects all trades from these signals, not just HML"
+      "date": "2026-10-10T17:46:51.620843+00:00",
+      "idea": "No-momentum soft timeout: for bb-squeeze+ (and later broader), exit if hold>75min AND unrealized <+0.15% (halfway to trail arm 0.40%). Data: bb-squeeze hold 30-60min +$0.97 90%WR (trail catches winners); 60-120min -$0.73 33%WR; 120+min -$0.69 22%WR. Winners held>60min with MFE<0.40: 0/14d.",
+      "rationale": "HML = trades that never reach trail. Exit them as dead money before max-loss. STALE_WINNER only fires profitable-flat; STALE_LOSER only fires loss>=-1%; gap is slow-grind-flat between -1% and 0% for 60+min.",
+      "expected_impact": "Could save portion of 7d HML -$7.43 (bb-squeeze 60+min buckets -$1.42 alone). Risk: n=21 bucket sample; timeout at 75min might kill winners that recover later (BABY lesson: flat 60min → +12%).",
+      "category": "exit quality",
+      "status": "monitor — needs shadow before live. One variable at a time; volume-breakout HIGH fix first.",
+      "risk": "medium"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "change": "SIGNAL_TYPE_OVERRIDES += ('HIGH','volume-breakout-long'):0.0 + ('HIGH','volume_breakout_long'):0.0",
+      "file": "scripts/volatility_gate_v2.py",
+      "rationale": "DRIFT fix — enforce existing family Volume HIGH=0.0 via bypass path (DRIFT-A only checks per-signal overrides)",
+      "verified": "HIGH mult=0.0; EXTREME stays None; import clean"
+    }
+  ],
   "changes_from_last_run": [
     {
-      "change": "VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85 (Oct 10 07:42)",
-      "status": "moot — signal killed 09:15 same day. Kill holding: 0 new entries."
+      "change": "VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85 (07:42)",
+      "check": "Post-change 4T all losses but entry_rsi 51-70 (below ceiling). Ceiling working as designed; losses are HIGH-regime not RSI. FIXED ROOT with HIGH override."
     },
     {
-      "change": "W added to SHORT_BLACKLIST (Oct 10 08:38)",
-      "status": "HOLDING — 0 W SHORT trades since."
+      "change": "W in SHORT_BLACKLIST (08:38)",
+      "check": "0 W SHORT trades post-blacklist. WORKING."
     },
     {
-      "change": "pump_chain+ NORMAL/HIGH dampen 1.0→0.5 (Oct 9 19:47)",
-      "status": "n=0 post-change trades — cannot evaluate yet."
+      "change": "hmacd_mtf regime guard fail-open fix (02:45)",
+      "check": "2T post-fix 1W1L net +$0.05. No false regime blocks. OK."
     },
     {
       "change": "SHORT-RSI-CEILING bear exemption OR→AND (Oct 9 22:44)",
-      "status": "IMPROVING — 5T +$0.16 40%WR since fix (was -$0.29/7d baseline). SHORT 7d goal ≥$0 by Oct 11 within reach."
+      "check": "5 SHORT trades post-fix, 3W2L net +$0.18. ATOM pump-chain- +$0.37 rr_engine. OK so far."
     },
     {
-      "change": "mtf_macd regime guard fix (Oct 10 02:45)",
-      "status": "WORKING — 2T +$0.05 post-fix."
+      "change": "pump_chain+ LONG NORMAL/HIGH dampen 1.0→0.5 (Oct 9 19:47)",
+      "check": "0 trades since — untestable yet. Monitor 48h."
     }
   ],
   "next_actions": [
-    "CEO HML frequency eval — leverage cap candidate for bb-squeeze+/pump-chain-/bb-bounce-v3-long+",
-    "SHORT 7d ≥$0 check Oct 11 — post-fix 5T +$0.16 40%WR, improving",
-    "OBSERVE pump_chain+ dampen cohort (n=0 so far, need n>=10)",
-    "OBSERVE SHORT post ceiling-AND fix (5T +$0.16 so far)",
-    "HOLD: volume-breakout kill, W blacklist — both clean",
-    "DISK 84% — bug_hunter standing retention item"
-  ],
-  "rejected_ideas": [
-    {
-      "idea": "bb-squeeze+ HIGH dampen 1.0→0.5",
-      "reason": "30d HIGH: 40T -$0.26, t=-0.174 p=0.863. NOT statistically significant. Net-negative is noise. Would save ~$0.13/30d — not worth complexity."
-    },
-    {
-      "idea": "bb_position entry filter (0.75-0.90 sweet spot)",
-      "reason": "WR diff 54.4% vs 51.1% p=0.603. NOT significant. HML evenly distributed across all bb_position bands."
-    }
+    "Monitor volume-breakout HIGH block 48h — zero HIGH LONG opens expected; EXTREME should continue",
+    "HML frequency/magnitude eval (CEO HOLD expires today) — data: post-widen still -$1.01/7T; no-momentum timeout is the creative candidate (shadow first)",
+    "7d PnL recovery watch — currently -$1.37, target >=$0",
+    "SHORT 7d >=$0 check Oct 11 — still -$0.29/26T 30.8%",
+    "bb-squeeze volume-confirmation backtest (missing implementation)",
+    "pump_chain+ dampen cohort check Oct 11 (0 trades so far)"
   ]
 }

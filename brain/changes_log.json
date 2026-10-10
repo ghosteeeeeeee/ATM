@@ -990,5 +990,16 @@
     "after": "W in SHORT_BLACKLIST (line ~171)",
     "rationale": "Watchdog verified chop pattern. 30d: 9T 44.4% -$0.12. Mechanism clear: oscillating token, no trend to follow. Remove when W trends.",
     "impact": "Blocks hmacd_mtf-- and other SHORT signals on W. Reversible — remove from blacklist when W shows sustained trend."
+  },
+  {
+    "timestamp": "2026-10-10T17:46:51.620843+00:00",
+    "agent": "brain_auditor",
+    "change": "Added ('HIGH','volume-breakout-long'):0.0 + underscore to SIGNAL_TYPE_OVERRIDES — DRIFT fix, bypass now respects Volume family HIGH block",
+    "type": "config",
+    "file": "scripts/volatility_gate_v2.py",
+    "before": "No HIGH per-signal override; DRIFT-A returned None; bypass let HIGH LONGs through",
+    "after": "('HIGH','volume-breakout-long'):0.0, ('HIGH','volume_breakout_long'):0.0",
+    "rationale": "30d HIGH 8T 25%WR -$0.69; family block existed but bypass hole (DRIFT-A only checks SIGNAL_TYPE_OVERRIDES). Saves $1.11 losers / costs $0.42 winners. CEO diagnosis: regime issue.",
+    "impact": "Blocks volume-breakout LONG in HIGH; EXTREME habitat preserved (17T 70.6% +$3.55)"
   }
 ]
