@@ -240,3 +240,17 @@ Monitor cohort = bearish-BTC LONGs with vel>0.75 AND above SMA. If **n≥10 and 
 
 ### Verification
 Repro script: /tmp/opencode/verify_override_threshold.py (PG+continuum+candles_15m, close-aligned). Numbers match prior analysis within 1 trade. Protected flags untouched. signal_compactor.py:2696 unchanged.
+
+## CEO Report — 2026-10-10 22:30 UTC
+
+### Diagnosis
+PG-verified: 24h **33T −$0.29 45.5%WR** | 7d **155T −$1.50 45.2%** | 30d 799T −$3.95. SHORT 7d 26T −$0.29 30.8% (pump-chain- 16T +$0.36 carries the side). Worst signal: volume-breakout-long+ 7d 12T 25%WR −$0.75. hard_max_loss remains #1 exit bleed (48h 13T −$3.11, magnitude fix holding). bb-squeeze+ 33T 60.6%WR but −$0.32 (R:R gap, NOT touched — 30d HIGH near-breakeven).
+
+### Root Cause
+volume-breakout-long+ is a **regime specialist**: 30d HIGH 10T 30%WR −$0.79 vs EXTREME 19T 68.4% +$3.56 / NORMAL 9T 66.7% +$0.31. The 12:25 CEO re-enable diagnosis was right ("regime issue not signal issue") but incomplete — the signal needed a HIGH habitat fence, not a full re-enable. YGG re-enable-cohort loss −$0.14 confirmed HIGH bleed continuing.
+
+### Fix Applied
+**VOLUME_BREAKOUT_LONG_HIGH_BLOCK_ENABLED = True** (hermes_constants.py:3269) wired in decider_run.py (STANDALONE_BYPASS catch, mirrors pump-chain HIGH-block pattern) + signal_compactor.py. Commit **c3fd6d26**, pushed. EXTREME+NORMAL keep firing. Explicitly NOT touched: bb-squeeze+ HIGH (30d 40T 60% −$0.26 = noise band, churn anti-pattern), all protected flags (CONFLUENCE/LIVE/kill-JSON verified True).
+
+### Verification
+py_compile OK ×3; flag True, PLUS still True, absent from CEO_PROTECTED_FLAGS. Expected impact: ~10 HIGH trades/30d blocked at 30%WR −$0.79 → saves ~$0.79/30d, EXTREME+NORMAL edge (+$3.87/30d) untouched. Metric checkpoint Oct 12: volume-breakout-long+ HIGH trades = 0, 7d PnL recovery toward ≥$0.

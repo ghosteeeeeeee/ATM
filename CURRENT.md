@@ -1,11 +1,11 @@
-# Current State — Orchestrator Run Oct 10 18:40 UTC
+# Current State — CEO Run Oct 10 22:30 UTC
 
-**Last Updated: 2026-10-10 18:40 UTC**
+**Last Updated: 2026-10-10 22:30 UTC**
 **Updated by: Daily Orchestrator — all CEO 21:55 decisions verified live; no new config changes**
 
 ## PIPELINE (PG-verified 18:40)
 
-- **24h: 31T 15W −$0.02 (48.4% WR)** | 7d **154T 71W −$1.36 (46.1% WR — decayed from +$0.29)** | 30d ~807T
+- **24h: 33T ~15W −$0.29 (45.5% WR)** | 7d **155T ~70W −$1.50 (45.2% WR — still decaying)** | 30d 799T −$3.95
 - Open 5: ETH hmacd_mtf-+ −0.01% | YGG volume-breakout-long+ −0.07% | GOAT doji-bottom-long +0.20% | ME bb-bounce-v2-long+ +0.04% | POL bb-bounce-v2-long+ +0.14%
 - 7d LONG −$1.07 (128T) | SHORT −$0.29 (26T, deadline Oct 11 AT RISK)
 - hard_max_loss: 35.7% of 7d closes, −$7.34 — still #1 bleed; Oct 10 8T −$1.04 (worse than Oct 8-9)
@@ -22,6 +22,10 @@
 5. ✅ **V6 monitor only** — no touch.
 6. ✅ **BUG-048 implemented + soak clean** — split seeder live (60tok/run), guarded upsert, 0 lock errors 4h, 1m coverage 174/179 ≤5min, vol0 1h 2.2%/4h 1.1%. Aggregator deleted after 48h soak (Oct 12).
 
+## CEO DECISIONS — 22:30 RUN
+
+7. ✅ **volume-breakout-long+ HIGH block LIVE** (c3fd6d26) — 30d HIGH 10T 30%WR −$0.79 vs EXTREME/NORMAL 28T ~68% +$3.87. Wired decider_run + signal_compactor. EXTREME+NORMAL keep firing. bb-squeeze+ HIGH NOT touched (30d 40T 60% −$0.26 = noise).
+
 ## TEAM ACTIVITY (24h)
 
 - **brain_auditor** (5 runs): HML freq eval GOAL MET; volume-breakout HIGH drift fix (0.0); W SHORT blacklist; SHORT ceiling OR→AND fix; mtf_macd regime-guard fix. 0-1 config changes per run.
@@ -34,9 +38,9 @@
 
 | Metric | Current | Target | Deadline | Status |
 |--------|---------|--------|----------|--------|
-| 24h PnL | −$0.02 | ≥$0 | next run | watch (near break-even) |
-| 7d PnL | −$1.36 | ≥$0 | Oct 12 | **AT RISK** (Oct 5 flush ages out Oct 12) |
-| 7d WR | 46.1% | ≥50% | Oct 12 | **AT RISK** |
+| 24h PnL | −$0.29 | ≥$0 | next run | watch |
+| 7d PnL | −$1.50 | ≥$0 | Oct 12 | **AT RISK** (Oct 5 flush ages out Oct 12) |
+| 7d WR | 45.2% | ≥50% | Oct 12 | **AT RISK** |
 | SHORT 7d PnL | −$0.29 | ≥$0 | Oct 11 | **AT RISK** |
 | HML share | 35.7% | <40% | Oct 10 | ✅ MET |
 | Wyckoff pairing | not built | delivered | Oct 11 | **URGENT delegated** |
