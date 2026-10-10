@@ -7359,3 +7359,25 @@ Final set: ['IMX', 'INJ']
 **Open Questions:**
 - hard_max_loss −$0.69 cumulative and growing — awaiting brain_auditor; next lever is SL width not signal kills
 - 2 consecutive negative hours (02, 03) after strong 00-01 — if hour 03 pattern repeats, evaluate regime/size lever
+
+## [2026-10-10 04:12] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0 last hour | 24h: 27T ~13W +$0.32 (WR ~48%)
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 0 trades last hour — no 0%-WR signal with 3+ trades
+- atr_sl_hit 6/26=23% — under 40% threshold, tpsl_utils deployed, stable
+- hard_max_loss 6/26=23% −$0.69 — dominant loser bucket (hold brain_auditor eval)
+- Overtrade: 0/hr (limit 20)
+- Streak: 01:+0.42, 02:−0.05, 03:−0.17 — only 2 consecutive negative hours, not 3
+- 1 open: W hmacd_mtf-- SHORT $11.10, SL 0.01732/TP 0.01679 OK
+- Timers fresh (1m-candle 45s, pump-hunter/compactor 15s, watchdog 51s), live_trading=true + kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$0.69 cumulative — awaiting brain_auditor; lever is SL width not signal kills
+- 2 negative hours (02, 03) — if hour 04 closes negative too, evaluate regime/size lever next hour
