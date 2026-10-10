@@ -40,7 +40,8 @@ _SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
 os.makedirs(os.path.dirname(_SIGNAL_LOG), exist_ok=True)
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-VOL_SPIKE_MULT = 2.0        # volume must be >= 2x average
+from hermes_constants import VOLUME_BREAKOUT_SPIKE_MULT
+VOL_SPIKE_MULT = VOLUME_BREAKOUT_SPIKE_MULT   # volume must be >= Nx average (tunable in hermes_constants)
 VOL_AVG_PERIOD = 20         # bars for average volume
 VOL_MOMENTUM_BARS = 3       # bars for price momentum check
 VOL_RSI_PERIOD = 14         # RSI period

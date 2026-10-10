@@ -375,3 +375,13 @@
 - **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: W TOK — signal TOK rolled back (prevents retry loop)`
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+
+## Error Alerts — 2026-10-10 07:49 UTC
+- **WARN** (777982x): `hermes-coding-mcp.service` crash-looping — `/root/.hermes/scripts/run_mcp_server.py` does not exist
+- **AUTO-FIX**: Disabled `hermes-coding-mcp.service` (no script found anywhere on disk; re-enable only after restoring the script or updating ExecStart)
+- **WARN** (1x): `hermes-ceo.service` exited status=124 (timeout) at 05:57 UTC
+- **AUTO-FIX**: `reset-failed` applied; next timer fire 09:47 UTC will start clean
+- **INFO**: Disk at 84% (94G/118G) — approaching 85% warn threshold; compress logs soon if it ticks up
+
+## Error Alerts — 2026-10-10 08:00 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`

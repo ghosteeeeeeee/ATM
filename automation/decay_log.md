@@ -1615,3 +1615,7 @@
 [2026-10-09 20:24 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
 [2026-10-10 02:24 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-10-10 02:24 UTC] No signals with sufficient trades in 24h window
+[2026-10-10 08:24 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-10 08:24 UTC]   🟢 OK: volume-breakout-long+: 5 trades, 60.0% WR, PnL=1.51
+[2026-10-10 08:24 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-10 08:24 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

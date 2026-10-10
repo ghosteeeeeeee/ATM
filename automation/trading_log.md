@@ -7518,3 +7518,25 @@ Last hour: AIXBT vol-breakout hard_max_loss −$0.12 (−2.17%, SL −2.5%, ente
 - brain_auditor 08:45 "REJECTED further vol-breakout RSI tightening" — this kill is a different lever (master LONG flag), not RSI tightening; reversible when post-fix cohort proves out. CEO may re-enable.
 - SIDeways finding: volume_breakout.py hardcodes VOL_SPIKE_MULT=2.0 locally (line 43) — does NOT read VOLUME_BREAKOUT_SPIKE_MULT from constants. self_learner tuning of that constant is a silent no-op. Separate fix, not applied (1 change/hr).
 - 24h PnL −$0.46 deteriorating from −$0.10 at 08:13 — vol-breakout bleed was the driver.
+
+## [2026-10-10 10:15] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 last hour | 24h: 32T −$0.19 (WR ~34%)
+
+**Changes:**
+1. **BUGFIX: wired VOLUME_BREAKOUT_SPIKE_MULT into volume_breakout.py** (line 43) — VOL_SPIKE_MULT was hardcoded 2.0 locally, so self_learner tuning of the constants value was a silent no-op (flagged at 09:15 as SIDeways finding). Both values were 2.0 → zero behavior change, pure wiring fix. Verified module loads and VOL_SPIKE_MULT==2.0.
+
+**No Change Needed:**
+- Kill: 0T last hour — no 0%-WR signal with 3+ trades. volume-breakout-long+ kill holding (no new LONG closes; pre-kill PUMP still open, TPSL manages)
+- atr_sl_hit 6/32=19% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/32=25% −$1.17 — dominant loser, hold brain_auditor (SL width lever pending)
+- Overtrade: 0/hr
+- Streak: hours 08 (−$0.03) and 09 (−$0.18) negative but 07 and 10 empty — not 3 consecutive. Regime SHORT_BIAS (19S/13L/63N), not NEUTRAL — size lever N/A
+- Timers fresh (pipeline/compactor/pump-hunter 28-31s, watchdog 55s), live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$1.17 cumulative — awaiting brain_auditor; SL width lever still pending
+- 24h PnL improving: −$0.46 (09:15) → −$0.19 — vol-breakout kill may already be helping
