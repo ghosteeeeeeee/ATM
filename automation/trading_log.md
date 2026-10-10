@@ -7540,3 +7540,26 @@ Last hour: AIXBT vol-breakout hard_max_loss −$0.12 (−2.17%, SL −2.5%, ente
 **Open Questions:**
 - hard_max_loss −$1.17 cumulative — awaiting brain_auditor; SL width lever still pending
 - 24h PnL improving: −$0.46 (09:15) → −$0.19 — vol-breakout kill may already be helping
+
+## [2026-10-10 11:15] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** −$0.03 last hour | 24h: 33T 13W −$0.22 (WR ~39%)
+
+Last hour: PUMP volume-breakout-long+ atr_sl_hit −$0.03 (−1.52%) — pre-kill position opened 07:41, closed via ATR SL. No NEW volume-breakout-long+ entries since the 09:15 kill — kill is holding.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 1T last hour (pre-kill PUMP). No signal with 0% WR and 3+ trades. volume-breakout-long+ kill holding, no new LONG closes.
+- atr_sl_hit 7/28=25% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/28=29% −$1.17 — dominant loser bucket, hold brain_auditor (SL width lever pending)
+- Overtrade: 1/hr (limit 20)
+- Streak: hours 08 (−$0.03), 09 (−$0.18), 10 (−$0.03) = 3 consecutive negative hours, BUT regime=SHORT_BIAS (6L/41S/54N) not NEUTRAL → size lever N/A; magnitudes noise-level (−$0.24 total)
+- 0 open trades, live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$1.17 cumulative — awaiting brain_auditor; SL width lever still pending
+- 24h PnL −$0.22 slightly worse than −$0.19 at 10:15 but driven by the pre-kill PUMP close; post-kill flow is clean (0 new vol-breakout LONG entries)
