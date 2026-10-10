@@ -7759,3 +7759,28 @@ Last hour: STX r2v2-long3 LONG cut-loser-CL-T1 −$0.12 (−5.55%); PUMP oversol
 - 7d WR 46.1% vs target 50% by Oct 12 — AT RISK. Oct 5 flush aging is the main lever; no new intervention without CEO.
 - SHORT 7d −$0.29 vs ≥$0 by Oct 11 — AT RISK, blocked on HML. pump-chain- itself +$0.17/20T healthy.
 - ai-trader+ boost — signal_reporter will apply if 5T confirmed next cycle. Not orchestrator scope.
+
+## [2026-10-10 19:13] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** −$0.03 last hour | 24h: 29T 14W −$0.10 (WR 48.3%)
+
+Last hour: ZRO r2v2-long4 LONG hard_max_loss −$0.03 (−4.89%). 5 open: POL/ME bb-bounce-v2-long+, GOAT doji-bottom-long, YGG volume-breakout-long+ 2× size $22.10, ETH hmacd_mtf-+ 2× size $22.10.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: no signal with 3+ trades last hour — only 1T total (r2v2-long4)
+- atr_sl_hit 3/29=10% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/29=28% −$1.04 — dominant loser (−$0.13 avg) but stable; hold brain_auditor (SL width lever pending)
+- Overtrade: 1/hr (limit 20)
+- Streak: 4 consecutive negative hours (15: −$0.11, 16: −$0.06, 17: −$0.08, 18: −$0.03, total −$0.28) BUT regime is LONG_BIAS (24L/16S/57N), not NEUTRAL — size lever N/A per rule
+- volume-breakout-long+ worst 24h (9T 3W −$0.23) — CEO re-enabled 12:25, YGG open, kill holding (0 new closes last hour)
+- Timers fresh, live_trading=true, kill JSON=true, pipeline active
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 2× sizing recurrence: ETH and YGG both $22.10 vs standard $11.10 (also BABY earlier) — sizing path still unknown; dedicated sizing audit when brain_auditor SL work lands
+- hard_max_loss −$1.04 cumulative — awaiting brain_auditor; SL width lever still pending
+- 4 consecutive negative hours totaling −$0.28 — noise-level, watching whether hour 19 tips 24h further negative
