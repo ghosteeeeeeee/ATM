@@ -2962,6 +2962,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                 except ImportError:
                     pass
+            # ── volume-breakout-long+ HIGH regime block (CEO 2026-10-10) ──
+            # 30d HIGH 10T 30%WR -$0.79. EXTREME 19T 68.4% +$3.56, NORMAL 9T 66.7% +$0.31 kept.
+            if 'volume-breakout' in bare_source and direction.upper() == 'LONG':
+                try:
+                    from hermes_constants import VOLUME_BREAKOUT_LONG_HIGH_BLOCK_ENABLED
+                    if VOLUME_BREAKOUT_LONG_HIGH_BLOCK_ENABLED and _vol_regime == 'HIGH':
+                        log(f"  🚫 [VOLBREAK-HIGH] {token} LONG blocked — HIGH vol, volume-breakout-long+ bleeds (30%WR)")
+                        continue
+                except ImportError:
+                    pass
             # ── pump-chain- SHORT RSI_MIN filter ────────────────────────
             # 14d: RSI<25 = 9T 22.2%WR -$0.66 (CATASTROPHIC). RSI 45-55 = 7T 85.7%WR +$0.86 (BEST).
             # Bearish override RESTORED 2026-10-08 by T directive: 118 SHORT signals expired during dump.

@@ -1709,6 +1709,17 @@ def context_gate(token, direction, source, sig):
                     return ('SKIP', 'bb-squeeze+ LONG EXTREME regime block', 0)
             except ImportError:
                 pass
+        # ── volume-breakout-long+ HIGH regime block (CEO 2026-10-10) ──
+        # 30d HIGH 10T 30%WR -$0.79. EXTREME 19T 68.4% +$3.56, NORMAL 9T 66.7% +$0.31 kept.
+        # STANDALONE_BYPASS skips signal_compactor — catch here like pump-chain.
+        if vol_regime == 'HIGH' and direction.upper() == 'LONG' and source and 'volume-breakout' in source:
+            try:
+                from hermes_constants import VOLUME_BREAKOUT_LONG_HIGH_BLOCK_ENABLED
+                if VOLUME_BREAKOUT_LONG_HIGH_BLOCK_ENABLED:
+                    log(f'  🚫 [VOLBREAK-HIGH] {token} LONG blocked — HIGH vol, volume-breakout-long+ bleeds (decider_run)')
+                    return ('SKIP', 'volume-breakout-long+ HIGH regime block', 0)
+            except ImportError:
+                pass
     except Exception as e:
         # CEO 2026-10-06 post-freeze: fail-open REMOVED — vol gate is loss-prevention.
         # Unknown regime must not let trades through (DRIFT-A/D class).
