@@ -7442,3 +7442,29 @@ Last hour: BLUR volume-breakout-long+ LONG hard_max_loss −$0.38 (−5.11% pnl_
 **Open Questions:**
 - hard_max_loss −$1.07 cumulative (7/27=26%) — awaiting brain_auditor; SL width lever still pending
 - BLUR −5.11% single hard_max_loss — one data point, not actionable alone; watch if vol-breakout LONG hard_max_loss clusters next hour
+
+## [2026-10-10 07:13] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.06 last hour (WR 100%) | 24h: 29T 12W −$0.10 (WR 41%)
+
+Last hour: W hmacd_mtf-- SHORT profit-monster-trail +$0.06 (+2.65% pnl_pct). Open 06:05, close 06:42 (~37min hold). Single trade — no signal pattern.
+
+24h by close reason: profit-monster-trail 8T +$0.23, hard_max_loss 7T −$1.07 (dominant loser), atr_sl_hit 6T −$0.40, stale_exit 4T +$0.71 (top earner).
+
+**Changes:** NONE (no trigger met)
+
+**No Change Needed:**
+- Kill: 1T last hour (a win) — no 0%-WR signal with 3+ trades. continuation+ 2T 0W −$0.10 — under 3T threshold
+- atr_sl_hit 6/29=21% — under 40%, tpsl_utils deployed, stable
+- hard_max_loss 7/29=24% −$1.07 — still dominant loser bucket, hold brain_auditor (lever is SL width, not signal kills)
+- Overtrade: 1/hr (limit 20)
+- Streak: hours 02/03/04 negative, 05 empty, 06 negative (−$0.32), but this hour 07 is POSITIVE (+$0.06) — streak broken, not 3 consecutive. Regime previously LONG_BIAS (not NEUTRAL) — size lever N/A
+- 2 open trades sized OK: SOPH bb-bounce LONG (SL −1.0%/TP +1.3%), PURR vol-breakout LONG (SL −2.5%/TP +1.9%)
+- Timers fresh (pipeline/pump-hunter/compactor 58s, watchdog 57s, 1m-candle 26s), live_trading=true, kill JSON=true
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- hard_max_loss −$1.07 cumulative (7/29=24%) — awaiting brain_auditor; SL width lever still pending
+- 24h PnL −$0.10 (near flat) — 2 negative closes in hour 06 (BLUR −$0.38 earlier + another −$0.32?) — wait, hour 06 bucket shows 2T −$0.32 but BLUR closed 06:01 −$0.38 and W closed 06:42 +$0.06 = −$0.32 ✓. Consistent. No anomaly
