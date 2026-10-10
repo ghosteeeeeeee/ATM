@@ -2523,12 +2523,43 @@ def record_entry_features(trade_id: int, token: str):
     """
     Record technical indicators at trade entry.
     Updates brain.trades with entry_rsi_14, entry_macd_hist, etc.
+
+    DRIFT-E FIX 2026-10-10: entry_rsi_14 now prefers _signal_metadata.rsi_14
+    (signal-time ground truth) over the price_history computation. The old path
+    computed RSI from price_history snapshots at trade-open time, which drifted
+    from signal-time RSI by 10-50 points (PURR stored 100.00 vs actual 68.71).
     """
+    import json as _json
+
     intel = get_token_intel(token)
+
+    # DRIFT-E FIX: prefer signal-time RSI from _signal_metadata over computed value
+    _meta_rsi = None
+    conn = get_db_connection()
+    if conn is not None:
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT _signal_metadata FROM trades WHERE id = %s", (trade_id,))
+            _meta_row = cur.fetchone()
+            cur.close()
+            if _meta_row and _meta_row[0]:
+                _meta = _json.loads(_meta_row[0]) if isinstance(_meta_row[0], str) else _meta_row[0]
+                _meta_rsi = _meta.get('rsi_14')
+        except Exception:
+            pass
+
+    if _meta_rsi is not None:
+        intel['rsi_14'] = float(_meta_rsi)
+        log(f'  Feature entry: {token} trade #{trade_id} — using signal-time rsi={_meta_rsi} (DRIFT-E fix)')
+
     if not intel or not any(intel.values()):
+        if conn:
+            try: conn.close()
+            except: pass
         return False
 
-    conn = get_db_connection()
+    if conn is None:
+        conn = get_db_connection()
     if conn is None:
         return False
 
@@ -2554,7 +2585,7 @@ def record_entry_features(trade_id: int, token: str):
             intel.get('slope_4h'),
             intel.get('regime_4h'),
             intel.get('trend'),
-            0.0,  # predicted_return: was writing regime string; numeric value TBD
+            0.0,
             trade_id
         ))
         conn.commit()
