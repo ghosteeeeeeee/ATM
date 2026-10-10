@@ -3761,5 +3761,23 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "low — shadow telemetry first, no live change"
+  },
+  {
+    "date": "2026-10-10T07:43:50Z",
+    "idea": "Per-signal meta-RSI entry quality zones — volume-breakout prefers pullback entries (RSI 50-65), not chase entries (RSI 68+)",
+    "rationale": "Watchdog verified: winners avg meta_rsi 55-62, losers avg 68-82. All-time fine bands confirm: 50-65 = 12T 66.7% +$1.22, 70-80 = 5T 100% +$1.45, 80+ = 5T 40% -$0.39. The signal works; the RSI band it fires in decides outcome.",
+    "expected_impact": "Block exhausted-zone entries without killing the profit band",
+    "category": "entry sniper",
+    "status": "partially_shipped (ceiling 85)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-10T07:43:50Z",
+    "idea": "hmacd_mtf-- SHORT directional guard: block SHORT when coin's own regime is LONG_BIAS (not just BTC regime)",
+    "rationale": "W SHORT 4 strikes all wrong side — shorting into LONG_BIAS coin's bounce. Current SHORT_RSI_HARD_FLOOR=45 fires after bounce starts but doesn't check coin-level regime direction.",
+    "expected_impact": "Prevent shorting into confirmed uptrends on individual coins",
+    "category": "wrong-side prevention",
+    "status": "suggested",
+    "risk": "medium — needs coin-regime direction check in exec path, not just RSI"
   }
 ]

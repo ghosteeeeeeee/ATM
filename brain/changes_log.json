@@ -968,5 +968,16 @@
     "after": "Alt path uses regime_5m.json with conf>=70 threshold. BTC path unchanged (continuum trend_quality still primary).",
     "rationale": "Watchdog flagged hmacd_mtf-- no regime-alignment guard. Root cause: guard existed but was dead code for alts. Bug fix, not new filter — docstring already claimed this behavior. Winner impact: 0 of 4 all-time hmacd trades.",
     "impact": "Blocks counter-structure SHORT/LONG on alts with strong 5m bias. W-pattern prevented. Sibling signals (squeeze_breakout, pump_chain_v4) have same fail-open disease — delegated for sweep."
+  },
+  {
+    "timestamp": "2026-10-10T07:42:34Z",
+    "agent": "brain_auditor",
+    "change": "Lowered VOLUME_BREAKOUT_LONG_RSI_CEILING from 95 to 85",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "95",
+    "after": "85",
+    "rationale": "Meta-RSI fine bands all-time: 70-75=3T 100%WR +$0.94, 75-80=2T 100%WR +$0.51 (BEST), 80-85=1T 0% -$0.17, 85+=4T 50% -$0.22 (exhausted). 95 let BABY@81.82 through to hard_max_loss. 85 blocks exhausted zone only; 70-80 profit band stays open.",
+    "impact": "Block volume-breakout-long+ entries at meta_rsi>85. Expected: eliminate 80+ exhausted-zone losers while preserving 70-80 winners. Monitor 7d, revert to 95 if 80-85 proves profitable."
   }
 ]
