@@ -1279,11 +1279,43 @@ def _score_signal(token, direction, conf, source, signal_type,
                         from chop_detector import _classify_signal
                         _sig_family = _classify_signal(signal_type)
                         if _sig_family == 'MOMENTUM':
-                            if CHOP_GATE_LOG_ONLY:
+                            # FIX 2026-10-11: per-coin momentum check — GRASS +3.43% was
+                            # blocked because BTC 30m=+0.012% (flat). Token has own momentum.
+                            _bgc_mom = False
+                            try:
+                                from chop_detector import get_coin_trend_score as _bgc_gcts
+                                _bgc_score = _bgc_gcts(token)
+                                if _bgc_score >= 61:
+                                    _bgc_mom = True
+                            except Exception:
+                                pass
+                            if not _bgc_mom:
+                                try:
+                                    import sqlite3 as _bgc_sq
+                                    from paths import HERMES_DATA as _bgc_hd
+                                    _bgc_conn = _bgc_sq.connect(f'{_bgc_hd}/candles.db', timeout=3)
+                                    try:
+                                        _bgc_candles = _bgc_conn.execute(
+                                            "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
+                                            (token.upper(),)
+                                        ).fetchall()
+                                    finally:
+                                        _bgc_conn.close()
+                                    if len(_bgc_candles) >= 10:
+                                        _bgc_closes = [r[0] for r in reversed(_bgc_candles)]
+                                        _bgc_vel = (_bgc_closes[-1] - _bgc_closes[-6]) / _bgc_closes[-6] * 100 if _bgc_closes[-6] > 0 else 0
+                                        _bgc_sma = sum(_bgc_closes[-20:]) / len(_bgc_closes[-20:])
+                                        if abs(_bgc_vel) > 0.3 and _bgc_closes[-1] > _bgc_sma:
+                                            _bgc_mom = True
+                                except Exception:
+                                    pass
+                            if _bgc_mom:
+                                log(f"  ✅ [BTC-CHOP-BYPASS] {token} {direction} {signal_type} — BTC flat but coin has own momentum, allowed")
+                            elif CHOP_GATE_LOG_ONLY:
                                 log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: WOULD BLOCK — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
                             else:
                                 log(f"  🚧 [BTC-CHOP-GATE] {token} {direction} {signal_type}: BLOCKED — BTC 30m={_btc_30m:+.3f}% (flat), signal={_sig_family}")
-                            return 0.0
+                                return 0.0
         except Exception as e:
             log(f"  [WARN] BTC chop gate check failed: {e}", 'WARN')
         finally:
@@ -3709,7 +3741,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
             # EXEMPTION: Skip in downtrends (linreg BEAR) — green candles are normal pullbacks (2026-09-23)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING, LONG_RSI_SWEET_SPOT_MIN, LONG_RSI_SWEET_SPOT_MAX, LONG_RSI_SWEET_SPOT_BOOST, LONG_MIDBAND_RSI_MIN, LONG_MIDBAND_RSI_MAX, LONG_MIDBAND_NON_EXTREME_BLOCK, LONG_HIGH_OVERBOUGHT_RSI_MIN, LONG_HIGH_OVERBOUGHT_BLOCK
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_HARD_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING, LONG_RSI_SWEET_SPOT_MIN, LONG_RSI_SWEET_SPOT_MAX, LONG_RSI_SWEET_SPOT_BOOST, LONG_MIDBAND_RSI_MIN, LONG_MIDBAND_RSI_MAX, LONG_MIDBAND_NON_EXTREME_BLOCK, LONG_HIGH_OVERBOUGHT_RSI_MIN, LONG_HIGH_OVERBOUGHT_BLOCK
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 # Skip spike filter in downtrends — green candles are pullbacks, not reversals
                 _skip_spike = False
@@ -3799,6 +3831,46 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # 70L -$10.60 — losers 1.5x bigger). Bear override was LIVE at kill time
             # (BTC RECOVERY+LEAN_BEAR+BELOW+score 8.13<30) — actively manufacturing the bleed.
             # RSI<45 SHORT = shorting oversold = wrong side (fundamental truth).
+            # FIX (BUG-052, 2026-10-11 CEO): mirror exec-time HARD FLOOR at approval.
+            # decider_run.py:1952 + brain.py both hard-block SHORT when exec RSI < 45
+            # with NO bearish override — any signal approved below that is a
+            # guaranteed-reject (claimed EXECUTED, brain rejects, no trade). The 20
+            # false CFX/NEO EXECUTED rows (2026-10-11 21:59-22:42) were exactly this
+            # loop: compactor bearish-override approved RSI 34-41 SHORTs, exec floor
+            # killed every one. Zero trading-behavior change (exec already rejected
+            # 100% of these) — only stops the approval→claim→reject waste.
+            # T directive 2026-10-08 (restore bear override on SHORT_RSI_FLOOR) stays
+            # intact below for the FLOOR tier; HARD tier is alignment, not policy change.
+            if direction == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
+                _conn_rsh = None
+                try:
+                    _conn_rsh = sqlite3.connect(CANDLES_DB, timeout=5)
+                    _cur_rsh = _conn_rsh.cursor()
+                    _cur_rsh.execute("""
+                        SELECT close FROM candles_5m
+                        WHERE token = ? AND is_closed = 1
+                        ORDER BY ts DESC LIMIT 15
+                    """, (tkn.upper(),))
+                    _rsh_closes = [r[0] for r in _cur_rsh.fetchall()]
+                    if len(_rsh_closes) >= 15:
+                        _rsh_deltas = [_rsh_closes[i] - _rsh_closes[i+1] for i in range(len(_rsh_closes)-1)]
+                        _rsh_gains = [d if d > 0 else 0 for d in _rsh_deltas[-14:]]
+                        _rsh_losses = [-d if d < 0 else 0 for d in _rsh_deltas[-14:]]
+                        _rsh_ag = sum(_rsh_gains) / 14
+                        _rsh_al = sum(_rsh_losses) / 14
+                        if _rsh_al > 0:
+                            _rsh_rsi = 100 - (100 / (1 + _rsh_ag / _rsh_al))
+                            if _rsh_rsi < SHORT_RSI_HARD_FLOOR:
+                                log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} (exec-time floor would reject anyway)")
+                                continue
+                except Exception:
+                    pass  # non-fatal
+                finally:
+                    if _conn_rsh:
+                        try:
+                            _conn_rsh.close()
+                        except Exception:
+                            pass
             if direction == 'SHORT' and SHORT_RSI_FLOOR > 0:
                 _conn_rsf = None
                 try:
