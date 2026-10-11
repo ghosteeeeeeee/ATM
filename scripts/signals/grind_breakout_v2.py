@@ -57,7 +57,10 @@ from hermes_constants import (
     GRIND_BREAKOUT_V2_CONF_FLOOR,
     GRIND_BREAKOUT_V2_CONF_CAP,
     GRIND_BREAKOUT_V2_CONF_VOL_BONUS,
+    GRIND_BREAKOUT_V2_CONF_VOL_BONUS_MULT,
+    GRIND_BREAKOUT_V2_CONF_VOL_HALF_MULT,
     GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS,
+    GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS_MIN,
     GRIND_BREAKOUT_V2_CONF_MACD_BONUS,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
@@ -141,12 +144,20 @@ def _get_macd_hist(candles):
     if len(macd_line) < 10:
         return None, None
 
-    # Signal line (EMA9 of MACD)
-    signal_line = _ema(macd_line, 9)
+    # Signal line as a SERIES (EMA9 of MACD) — needed for correct hist_prev
+    signal_series = []
+    k = 2 / (9 + 1)
+    sig = sum(macd_line[:9]) / 9
+    signal_series.append(sig)
+    for m in macd_line[9:]:
+        sig = m * k + sig * (1 - k)
+        signal_series.append(sig)
 
-    # Histogram = MACD - Signal
-    hist_now = macd_line[-1] - signal_line
-    hist_prev = macd_line[-2] - signal_line if len(macd_line) >= 2 else None
+    # Histogram = MACD - Signal at each bar
+    if len(signal_series) < 2:
+        return None, None
+    hist_now = macd_line[-1] - signal_series[-1]
+    hist_prev = macd_line[-2] - signal_series[-2]
 
     return hist_now, hist_prev
 
@@ -282,13 +293,13 @@ def detect(token):
     confidence = GRIND_BREAKOUT_V2_CONF_BASE
 
     # Volume bonus
-    if current_vol_ratio >= 3.0:
+    if current_vol_ratio >= GRIND_BREAKOUT_V2_CONF_VOL_BONUS_MULT:
         confidence += GRIND_BREAKOUT_V2_CONF_VOL_BONUS
-    elif current_vol_ratio >= 2.5:
+    elif current_vol_ratio >= GRIND_BREAKOUT_V2_CONF_VOL_HALF_MULT:
         confidence += GRIND_BREAKOUT_V2_CONF_VOL_BONUS // 2
 
     # Acceleration bonus
-    if abs(accel) > 0.01:
+    if abs(accel) > GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS_MIN:
         confidence += GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS
 
     # MACD bonus

@@ -2349,8 +2349,11 @@ GRIND_BREAKOUT_V2_BREAKOUT_BODY_MIN = 0.5  # min body/range ratio for breakout b
 GRIND_BREAKOUT_V2_CONF_BASE = 75           # base confidence
 GRIND_BREAKOUT_V2_CONF_FLOOR = 50          # min confidence
 GRIND_BREAKOUT_V2_CONF_CAP = 88            # max confidence (system ceiling)
-GRIND_BREAKOUT_V2_CONF_VOL_BONUS = 5       # +5 if volume > 3x average
-GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS = 3     # +3 if acceleration > 0.01
+GRIND_BREAKOUT_V2_CONF_VOL_BONUS = 5       # +5 if volume >= VOL_BONUS_MULT × avg
+GRIND_BREAKOUT_V2_CONF_VOL_BONUS_MULT = 3.0  # volume ratio for full bonus
+GRIND_BREAKOUT_V2_CONF_VOL_HALF_MULT = 2.5   # volume ratio for half bonus
+GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS = 3     # +3 if |acceleration| > ACCEL_BONUS_MIN
+GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS_MIN = 0.01  # acceleration magnitude for bonus
 GRIND_BREAKOUT_V2_CONF_MACD_BONUS = 2      # +2 if MACD histogram rising
 
 # ── grind_trend (accumulation grind — steady drift, no breakout needed) ───────
