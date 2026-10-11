@@ -1,7 +1,7 @@
 # Current State — Daily Orchestrator Oct 11 21:55 UTC
 
-**Last Updated: 2026-10-11 21:55 UTC**
-**Updated by: CEO — Sunday verification run, 0 config changes**
+**Last Updated: 2026-10-11 23:55 UTC**
+**Updated by: CEO — combo-first reputation spec review (APPROVED + M1-M3), 0 config changes**
 
 ## PIPELINE (PG-verified 21:55)
 
@@ -51,6 +51,7 @@
 
 1. Oct 12: 7d PnL + SHORT clean-number checkpoint; HML trail-timeout backtest due (self_learner)
 2. Wyckoff partner — if undelivered, Oct 13 shadow rule per Sep 9 ruling
-3. Monitor [LONG-HIGH-70] blocks + volume-breakout EXTREME (2T losses, variance watch)
-4. Oct 15: 7d WR recovery checkpoint
-5. Disk cleanup pass if >84%
+3. **NEW: Combo-first reputation Phase 1 (bug_hunter)** — scripts/reputation.py shadow-only, M1 (brain/ path) M2 (TEST% filter) M3 (shadow 48h); checkpoint Oct 13
+4. Monitor [LONG-HIGH-70] blocks + volume-breakout EXTREME (2T losses, variance watch)
+5. Oct 15: 7d WR recovery checkpoint
+6. Disk cleanup pass if >84%
