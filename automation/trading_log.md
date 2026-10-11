@@ -8149,3 +8149,9 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - 24h now +$0.21 — trail wins (profit-monster-trail 9T +$0.56) covering SL losses. Volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
+
+## [2026-10-11 06:40 UTC] signal_reporter — 6h signal performance run
+- 21 closed trades/24h, 2/6h. No kills, no boosts executed (no signal met criteria).
+- Watch: volume-breakout-long+ (7d 25% WR, -$0.73, no winning regime), r2v2 EXTREME (0% WR), hmacd_mtf EXTREME (25% WR), bb-squeeze+ R:R problem (59% WR but -$0.55).
+- Near-boost: doji-bottom-long, ai-trader+ (75% WR, 4 trades — need 5).
+- No inversions. Report: automation/signal_report.md
