@@ -8298,3 +8298,42 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - volume-breakout-long+ still 24h 2T 0W, awaiting brain_auditor/CEO. ORPHAN_PAPER BTC close from hour 16 still unexplained (paper leak into closed table?)
+
+## [2026-10-11 18:12] Hourly Analysis
+
+**Trades:** 7 closed last hour (2 real + 5 continuum NOT_HOTSET $0 scratch)
+**PnL:** last hour ~$0.01 | 24h: 24T 8W +$1.05 (WR 33%) | 1 open (ME ai-trader+ LONG)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: continuum_engine 5T 0W last hour but all NOT_HOTSET closes totaling −$0.01 — hotset filter artifact, not a signal losing money. Not a kill candidate. volume-breakout-long+ 24h 2T 0W −$0.23 still CEO-owned
+- atr_sl_hit 4/24 ≈ 17% — under 40%, tpsl_utils deployed
+- hard_max_loss 3/24 ≈ 13% −$0.19 — hold brain_auditor (SL width lever)
+- profit-monster-trail 7/24 = 29% of closes, +$1.03 — trailing exits still the profit engine
+- Overtrade: 7/hr raw (5 were $0 NOT_HOTSET) — under 20, no action
+- Streak: hour 17 +$0.01, hour 18 −$0.01 — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers fresh (~1min)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- continuum_engine generating NOT_HOTSET scratch closes every hour — paper trades leaking into closed table? Worth a pipeline check (same class as earlier ORPHAN_PAPER question)
+- 24h WR 33% but net +$1.05 — winners larger than losers, R:R carrying the system
+
+## [2026-10-11 18:40] Daily Orchestrator
+
+**Task:** Investigate ORPHAN_PAPER/NOT_HOTSET paper trade leak flagged in hourly analyses.
+
+**Finding:** 6/26 closed trades (23%) in 24h were guardian artifacts: NOT_HOTSET=5, ORPHAN_PAPER=1. PnL impact -$0.01 but pollutes trade count and WR stats. Root cause: hl-sync-guardian closes BTC continuum paper trades as NOT_HOTSET (BTC not in hotset).
+
+**Fix:** CONTINUUM EXEMPTION was added to `close_position_hl()` and `_close_paper_trade_db()` but missed in `_close_orphan_paper_trade_by_id()`. Added check at line 3315. All 3 close paths now skip BTC.
+
+**Verification:** 
+- Bug hunter audit: all 3 close paths covered, no bypasses, syntax OK
+- Service restarted at 18:38, CONTINUUM skip messages confirming fix working
+- 0 NOT_HOTSET/ORPHAN closes since fix deployed
+
+**Files:** scripts/hl-sync-guardian.py (+8 lines: CONTINUUM exemption in _close_orphan_paper_trade_by_id)
+
+**Bug:** BUG-XXX (tracked in bugs.json)

@@ -910,6 +910,24 @@
       "found_by": "bug_hunter (independent investigation 2026-10-09)",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-049",
+      "title": "Guardian NOT_HOTSET/ORPHAN closes polluting trade stats (BTC continuum)",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/hl-sync-guardian.py"
+      ],
+      "symptom": "5 NOT_HOTSET + 1 ORPHAN_PAPER closes in 24h, polluting trade count and WR stats (23% of closed trades). PnL impact negligible (-$0.01) but stats pollution real.",
+      "root_cause": "hl-sync-guardian closes BTC continuum paper trades as NOT_HOTSET because BTC is not in hotset. CONTINUUM exemption was added to close_position_hl and _close_paper_trade_db but missed in _close_orphan_paper_trade_by_id.",
+      "fix": "Added CONTINUUM EXEMPTION check to _close_orphan_paper_trade_by_id() at line 3315. All 3 close paths now skip BTC.",
+      "verified_by": "bug_hunter audit: all 3 close paths covered, no bypasses, syntax OK",
+      "date_found": "2026-10-11",
+      "date_fixed": "2026-10-11",
+      "found_by": "daily_orchestrator",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
