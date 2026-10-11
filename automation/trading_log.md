@@ -8337,3 +8337,25 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 **Files:** scripts/hl-sync-guardian.py (+8 lines: CONTINUUM exemption in _close_orphan_paper_trade_by_id)
 
 **Bug:** BUG-XXX (tracked in bugs.json)
+
+## [2026-10-11 19:13] Hourly Analysis
+
+**Trades:** 3 closed last hour (1 real loss + 2 guardian_orphan BTC $0 — pre-fix artifacts from 18:13, before the 18:38 CONTINUUM exemption)
+**PnL:** last hour −$0.08 | 24h: 26T 8W +$1.00 (WR 31%) | 3 open (BTC continuum_engine LONG x3, .51 each)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Guardian fix VERIFIED: 0 NOT_HOTSET/ORPHAN_PAPER/guardian_orphan closes after 18:38 deploy. 3 continuum BTC trades now sitting open normally instead of being force-closed — fix working as intended. Open question from prior hours RESOLVED.
+- Kill: no signal with 0% WR + 3+ real trades last hour. continuum_engine 7T/24h 0W but total −$0.01 — all guardian artifacts, not real losses. volume-breakout-long+ still CEO-owned.
+- atr_sl_hit 4/26 ≈ 15% — under 40%, tpsl_utils deployed
+- hard_max_loss 3/26 ≈ 12% −$0.24 (ME −$0.08 this hour) — hold brain_auditor (SL width lever)
+- profit-monster-trail 7/26 = 27% of closes, +$1.03 — trailing exits still the profit engine
+- Overtrade: 3/hr — well under 20
+- Streak: hour 17 +$0.01, hour 18 −$0.09 — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers fresh (~1min)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 31% but net +$1.00 — R:R still carrying; watch if hard_max_loss share grows

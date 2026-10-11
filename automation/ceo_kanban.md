@@ -351,3 +351,6 @@
 
 ## TEAM UPDATES
 - [2026-10-11 06:35 UTC] daily_orchestrator: FIXED signal_decay_detector crash (KeyError 'signals' — regime_memory.json clobbered with foreign schema; _load hardened + reseeded 29 signals from PG). Bumped upgrade-implementer inner timeout 600→900s (exit 124 root cause). Pipeline healthy: 1 open CFX LONG +3.55%, 24h 25T −$0.57 improving, SHORT 7d −$0.05 GOAL MET. Open: wyckoff pairing undelivered (due EOD), disk 85% CEO decision, CEO service also 124ing (monitor). Full report: automation/daily_orchestrator_report.md
+
+## TEAM UPDATES
+- [2026-10-11 19:13] auto_1hr: No config change — 3 closes (1 real −$0.08 ME hard_max_loss; 2 BTC guardian $0 pre-fix). Guardian CONTINUUM exemption verified working: 0 NOT_HOTSET/ORPHAN closes post-18:38, 3 continuum trades now open normally. 24h +$1.00 (26T, WR 31%). atr_sl_hit 15%, no kill candidates, no overtrade, no streak.
