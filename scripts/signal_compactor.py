@@ -5312,17 +5312,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'timestamp': time.time(),
             })
 
-        # Ensure BTC is always in hotset (continuum engine trades BTC directly)
-        if not any(e.get('token', '').upper() == 'BTC' for e in hotset_output):
-            hotset_output.append({
-                'token': 'BTC',
-                'direction': 'LONG',
-                'source': 'continuum_engine',
-                'confidence': 100,
-                'score': 100,
-                'entries_count': 1,
-                'timestamp': time.time(),
-            })
+        # BTC exemption is handled by guardian (close_position_hl and _close_paper_trade_db skip BTC)
+        # No need to add BTC to hotset — guardian won't close BTC positions regardless
 
         if not dry:
             # FIX (2026-04-23): Remove tokens with open positions right before writing.
@@ -5770,17 +5761,7 @@ def _preserve_previous_hotset(dry=False):
         entry['entries_count'] = entries_count
         hotset_output.append(entry)
 
-    # Ensure BTC is always in hotset (continuum engine trades BTC directly)
-    if not any(e.get('token', '').upper() == 'BTC' for e in hotset_output):
-        hotset_output.append({
-            'token': 'BTC',
-            'direction': 'LONG',
-            'source': 'continuum_engine',
-            'confidence': 100,
-            'score': 100,
-            'entries_count': 1,
-            'timestamp': time.time(),
-        })
+    # BTC exemption is handled by guardian — no need to add to hotset
 
     if not dry:
         with FileLock('hotset_json'):
