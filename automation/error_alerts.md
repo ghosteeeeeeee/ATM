@@ -503,3 +503,12 @@
 - **WARN** (1x): hermes-ceo.service failed 17:57 UTC (exit 124 = timeout). Timer active, next run 21:47 UTC — self-recovers.
 - **AUTO-FIX**: bug_hunter.py false positives — dead_imports/defunct_imports were substring-matching comments and bug_hunter's own grep pattern. Now regex-match real import lines only, and skip bug_hunter.py itself. Verified: both checks PASS, 9→7 criticals.
 - **INFO**: No pipeline errors in 30min. Timers all firing. Prices fresh (1m: 67s). 59 signals/1h. 0 open / 19 closed today, +$1.12 PnL, 36.8% WR.
+
+## Error Alerts — 2026-10-11 20:50 UTC
+- **[WARN]** (1x): Disk usage hit 85% (`/dev/vda2 95G/118G`)
+- **AUTO-FIX**: Cleaned 6.7GB of stale JIT `.so` artifacts (1286 files >3 days old) + old ATM backup zips from `/tmp`. Disk now 82% (21G free). No pipeline services affected.
+
+## Error Alerts — 2026-10-11 21:00 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`

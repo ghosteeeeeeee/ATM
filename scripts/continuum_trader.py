@@ -108,6 +108,26 @@ def get_our_positions() -> list:
     positions = load_positions()
     return [p for p in positions if p.get('tag') == POSITION_TAG]
 
+def _pg_open_continuum_trades() -> list:
+    """Open continuum_engine rows in PG. Used to prevent re-entry after positions.json loss."""
+    try:
+        from _secrets import BRAIN_DB_DICT
+        import psycopg2
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, direction, entry_price, open_time
+            FROM trades WHERE signal = 'continuum_engine' AND status = 'open'
+            ORDER BY open_time DESC LIMIT 5
+        """)
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return rows
+    except Exception as e:
+        print(f"[TRADER] WARNING: PG continuum query failed: {e}")
+        return []
+
 # ── Kill Switch ────────────────────────────────────────────────────────────────
 
 def is_live_trading_enabled() -> bool:
@@ -278,15 +298,39 @@ class ContinuumTrader:
         self._restore_state_from_file()
     
     def _restore_state_from_file(self):
-        """Restore engine position state from continuum_positions.json.
-        Prevents restart from force-closing live positions."""
+        """Restore engine state from continuum_positions.json, reconciling from PG if lost.
+        Prevents restart from force-closing live positions AND from stacking re-entries."""
         positions = get_our_positions()
+        if not positions:
+            # positions.json lost (restart/crash) — reconcile from PG so exits still manage the book
+            pg_rows = _pg_open_continuum_trades()
+            if pg_rows:
+                tid, side, entry_px, open_time = pg_rows[0]
+                try:
+                    ot = int(open_time.timestamp()) if hasattr(open_time, 'timestamp') else 0
+                except Exception:
+                    ot = 0
+                positions = [{
+                    'side': side,
+                    'entry_price': float(entry_px),
+                    'size_usd': 0.0,
+                    'entry_time': ot,
+                    'entry_time_str': str(open_time),
+                    'order_id': f'PG-{tid}',
+                    'tag': POSITION_TAG,
+                    'restored': True,
+                }]
+                save_positions(positions)
+                print(f"[TRADER] positions.json empty — restored from PG #{tid}: {side} @ {entry_px}")
         if positions:
             # Use the most recent position
             pos = positions[-1]
             self.engine.position_side = pos['side']
             self.engine.entry_phase = 6
             self.last_position_side = pos['side']
+            # Restore entry cooldown so restart does not bypass MIN_TIME_BETWEEN_ENTRIES
+            if pos.get('entry_time'):
+                self.last_entry_time = float(pos['entry_time'])
             print(f"[TRADER] Restored state: {pos['side']} @ ${pos['entry_price']:.1f} (Phase 6)")
         
     def _can_trade(self) -> tuple:
@@ -319,10 +363,12 @@ class ContinuumTrader:
         """Check if we can open a new position."""
         now = time.time()
         
-        # Check position limit
+        # Check position limit (json AND PG — json alone desyncs after restart)
         positions = get_our_positions()
-        if len(positions) >= MAX_CONTINUUM_POSITIONS:
-            return False, f"Position limit ({len(positions)}/{MAX_CONTINUUM_POSITIONS})"
+        pg_open = _pg_open_continuum_trades()
+        tracked = max(len(positions), len(pg_open))
+        if tracked >= MAX_CONTINUUM_POSITIONS:
+            return False, f"Position limit (json={len(positions)} pg={len(pg_open)}/{MAX_CONTINUUM_POSITIONS})"
         
         # Check min time between entries
         if now - self.last_entry_time < MIN_TIME_BETWEEN_ENTRIES:
