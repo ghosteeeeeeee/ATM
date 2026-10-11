@@ -1260,7 +1260,8 @@ def _score_signal(token, direction, conf, source, signal_type,
                                     # bare phase clause; structural bull still allows any phase.
                                     (_p2 in ('RECOVERY', 'NEUTRAL') and _l2 not in ('LEAN_BEAR', 'BEAR')) or
                                     (_p2 == 'CALM' and _l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT')) or
-                                    (_l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT'))  # structural bull regardless of phase; AT = transitional (bug_hunter F1 2026-10-05)
+                                    (_l2 in ('LEAN_BULL', 'BULL') and _e2 in ('ABOVE', 'AT') and
+                                     not (_p2 == 'DECLINING' and _e2 == 'AT'))  # structural bull; AT transitional EXCEPT DECLINING (brain_auditor 2026-10-11: DECLINING+LEAN_BULL+AT is chop flicker at EMA300 line — linreg flaps LEAN_BULL↔LEAN_BEAR minute-to-minute, 0W/3L matched trades; DECLINING+ABOVE real reclaim stays bullish)
                                 ):
                                     _override = True
                                     log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} LONG — continuum says {_p2}+{_l2}+{_e2}, allowing despite chop gate")
@@ -2679,8 +2680,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # FIX 2026-10-05: ema AT counts as bullish — BTC can be LEAN_BULL + ema=AT
                         # (recovered to EMA, not yet crossed above). Requiring ABOVE only missed this
                         # transitional state, blocking LONGs during live pumps (score 77, 22min AT).
+                        # FIX brain_auditor 2026-10-11: DECLINING+LEAN_BULL+AT is NOT structure.
+                        # At EMA300 line linreg flaps LEAN_BULL↔LEAN_BEAR minute-to-minute; every
+                        # LEAN_BULL flicker during DECLINING (RSI<45) allowed bypass LONGs
+                        # (USELESS/INJ 0W/3L via CONTINUUM-BULL today). DECLINING+ABOVE (real
+                        # reclaim above EMA300) stays bullish; RECOVERY/CALM+AT unchanged.
                         _cont_bullish = (_cont_row_data.get('linreg_direction') in ('LEAN_BULL', 'BULL') and
-                                         _cont_row_data.get('ema300_position') in ('ABOVE', 'AT'))
+                                         _cont_row_data.get('ema300_position') in ('ABOVE', 'AT') and
+                                         not (_continuum_phase == 'DECLINING' and
+                                              _cont_row_data.get('ema300_position') == 'AT'))
 
                         if direction.upper() == 'SHORT' and _cont_bearish:
                             _btc_mom_ok_for_bypass = True
@@ -2826,14 +2834,49 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 except Exception:
                     pass
                 _btc_in_trend = (_btc_ema_pos == 'ABOVE')  # AT/BELOW/None = chop
+                # Per-coin momentum check (computed once, used in both branches).
+                # FIX 2026-10-11: GRASS +2% / CFX +3.35% blocked because BTC AT EMA300
+                # despite clear individual pumps. Same _coin_momentum_ok pattern as TREND-ALIGN.
+                _ln_coin_mom = False
+                if not _btc_in_trend:
+                    try:
+                        from chop_detector import get_coin_trend_score as _ln_gcts
+                        _ln_score = _ln_gcts(token)
+                        if _ln_score >= 61:
+                            _ln_coin_mom = True
+                    except Exception:
+                        pass
+                    if not _ln_coin_mom:
+                        try:
+                            import sqlite3 as _ln_sq
+                            from paths import HERMES_DATA as _ln_hd
+                            _ln_conn = _ln_sq.connect(f'{_ln_hd}/candles.db', timeout=3)
+                            try:
+                                _ln_candles = _ln_conn.execute(
+                                    "SELECT close FROM candles_15m WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 20",
+                                    (token.upper(),)
+                                ).fetchall()
+                            finally:
+                                _ln_conn.close()
+                            if len(_ln_candles) >= 10:
+                                _ln_closes = [r[0] for r in reversed(_ln_candles)]
+                                _ln_vel = (_ln_closes[-1] - _ln_closes[-6]) / _ln_closes[-6] * 100 if _ln_closes[-6] > 0 else 0
+                                _ln_sma = sum(_ln_closes[-20:]) / len(_ln_closes[-20:])
+                                if _ln_vel > 0.3 and _ln_closes[-1] > _ln_sma:
+                                    _ln_coin_mom = True
+                        except Exception:
+                            pass
                 if _regime == 'LONG_BIAS' and _btc_in_trend:
                     log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but 1m LONG_BIAS + BTC ABOVE EMA300, allowed")
                 elif _regime == 'LONG_BIAS' and not _btc_in_trend:
-                    log(f"  🚫 [LONG-NEUTRAL-CHOP] {token} LONG blocked — 4h NEUTRAL, 1m LONG_BIAS but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend)")
-                    continue
+                    if _ln_coin_mom:
+                        log(f"  ✅ [LONG-NEUTRAL-CHOP-BYPASS] {token} LONG — BTC AT EMA300 but coin has own momentum, allowed")
+                    else:
+                        log(f"  🚫 [LONG-NEUTRAL-CHOP] {token} LONG blocked — 4h NEUTRAL, 1m LONG_BIAS but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend)")
+                        continue
                 elif unique_signal_types >= 2 or ((bare_source in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS) and _btc_mom_ok_for_bypass):
-                    if _btc_in_trend:
-                        log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types) + BTC ABOVE EMA300, allowed")
+                    if _btc_in_trend or _ln_coin_mom:
+                        log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types) + {'BTC ABOVE EMA300' if _btc_in_trend else 'coin momentum'}, allowed")
                     else:
                         log(f"  🚫 [LONG-NEUTRAL-CHOP] {token} LONG blocked — confluence but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend)")
                         continue
