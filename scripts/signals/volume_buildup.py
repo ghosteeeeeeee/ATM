@@ -115,17 +115,22 @@ def detect(token):
     if vol_avg <= 0:
         return None
 
-    # ── Condition 1: Sustained volume — ALL last N bars above threshold ──────
+    # ── Condition 1: Sustained volume — AVERAGE of last N bars above threshold ──
+    # Not every bar must be above (too strict for real accumulation), but the
+    # average must be elevated AND at least half the bars above threshold.
     n = VOLUME_BUILDUP_BARS
     recent_vols = vols[-n:]
     vol_ratios = [v / vol_avg for v in recent_vols]
+    avg_vol_ratio = sum(vol_ratios) / n
 
-    # Every bar must be above the multiplier
-    if not all(r >= VOLUME_BUILDUP_VOL_MULT for r in vol_ratios):
+    # Average must be above the multiplier
+    if avg_vol_ratio < VOLUME_BUILDUP_VOL_MULT:
         return None
 
-    # Average volume ratio across the N bars (for confidence)
-    avg_vol_ratio = sum(vol_ratios) / n
+    # At least half the bars must individually be above threshold
+    bars_above = sum(1 for r in vol_ratios if r >= VOLUME_BUILDUP_VOL_MULT)
+    if bars_above < (n + 1) // 2:
+        return None
 
     # ── Condition 2: Price direction ────────────────────────────────────────
     price_change = (closes[-1] - closes[-1 - n]) / closes[-1 - n] * 100

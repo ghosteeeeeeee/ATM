@@ -2386,12 +2386,12 @@ VOLUME_BUILDUP_PLUS_ENABLED = True        # LONG direction
 VOLUME_BUILDUP_MINUS_ENABLED = True       # SHORT direction
 VOLUME_BUILDUP_COOLDOWN_HOURS = 2         # per token+direction cooldown
 VOLUME_BUILDUP_BARS = 4                   # number of consecutive bars that must be above avg volume
-VOLUME_BUILDUP_VOL_MULT = 1.5             # each bar must be >= this × average volume
+VOLUME_BUILDUP_VOL_MULT = 1.2             # avg volume must be >= this × average (lowered from 1.5 — gradual buildup has 1.2-1.3x avg with spikes)
 VOLUME_BUILDUP_VOL_AVG_PERIOD = 20        # bars for average volume
 VOLUME_BUILDUP_RSI_MAX = 75               # LONG: RSI must be below this (not overbought)
 VOLUME_BUILDUP_RSI_MIN = 30               # SHORT: RSI must be above this (not oversold)
 VOLUME_BUILDUP_RSI_PERIOD = 14            # RSI period
-VOLUME_BUILDUP_MIN_PRICE_CHANGE_PCT = 1.5 # min % price move over the N bars to confirm direction
+VOLUME_BUILDUP_MIN_PRICE_CHANGE_PCT = 0.3 # min % price move over the N bars to confirm direction (lowered from 1.5 — accumulation phase has small moves)
 VOLUME_BUILDUP_CONF_BASE = 75             # base confidence
 VOLUME_BUILDUP_CONF_FLOOR = 50            # min confidence
 VOLUME_BUILDUP_CONF_CAP = 88              # max confidence (system ceiling)
