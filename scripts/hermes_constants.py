@@ -3731,6 +3731,9 @@ RR_ENGINE_TP_MAX_PCT_FLAT    = 0.030   # 3.0% max for FLAT regime (low vol = wid
 RR_ENGINE_TP_MAX_PCT_HIGH    = 0.020   # 2.0% max for HIGH regime
 RR_ENGINE_TP_MAX_PCT_EXTREME = 0.020   # 2.0% max for EXTREME regime
 RR_ENGINE_TP_ATR_MULT        = 2.0     # fallback TP = 2.0 × ATR (when no S/R target)
+RR_ENGINE_TP_ATR_SCALING     = 1.5     # TP cap scales with ATR: max(regime_cap, ATR × 1.5)
+                                       # Prevents R:R < 1 by construction when ATR > 2%
+                                       # (SL = ATR × 1.0 scales up, but fixed TP cap doesn't)
 
 # S/R detection (candle swings)
 RR_ENGINE_SR_CLUSTER_ATR     = 1.0     # merge levels within 1.0 × ATR of each other

@@ -455,16 +455,28 @@ def compute_liquidity_proximity(token, price, direction, liq_data=None):
 
 # ── Structural R:R Calculation ─────────────────────────────────────────────
 
-def _get_tp_max_pct(regime):
-    """Get regime-adjusted TP max distance."""
+def _get_tp_max_pct(regime, atr_pct=None):
+    """Get regime-adjusted TP max distance, scaled to never produce R:R < 1.
+
+    Bug fix: SL = ATR × 1.0 (scales with volatility) but TP cap was fixed per
+    regime. When ATR > 2%, SL > TP cap → R:R < 1 by construction. Now the TP
+    cap scales with ATR: TP_cap = max(regime_cap, ATR × TP_ATR_SCALING).
+    """
     if regime == 'FLAT':
-        return getattr(hc, 'RR_ENGINE_TP_MAX_PCT_FLAT', 0.030)
+        base = getattr(hc, 'RR_ENGINE_TP_MAX_PCT_FLAT', 0.030)
     elif regime == 'HIGH':
-        return getattr(hc, 'RR_ENGINE_TP_MAX_PCT_HIGH', 0.020)
+        base = getattr(hc, 'RR_ENGINE_TP_MAX_PCT_HIGH', 0.020)
     elif regime == 'EXTREME':
-        return getattr(hc, 'RR_ENGINE_TP_MAX_PCT_EXTREME', 0.020)
+        base = getattr(hc, 'RR_ENGINE_TP_MAX_PCT_EXTREME', 0.020)
     else:  # NORMAL
-        return getattr(hc, 'RR_ENGINE_TP_MAX_PCT_NORMAL', 0.025)
+        base = getattr(hc, 'RR_ENGINE_TP_MAX_PCT_NORMAL', 0.025)
+
+    # Scale with ATR so R:R can never be < 1 by construction
+    if atr_pct and atr_pct > 0:
+        scaling = getattr(hc, 'RR_ENGINE_TP_ATR_SCALING', 1.5)
+        atr_scaled = (atr_pct * scaling) / 100.0  # convert ATR% to decimal
+        return max(base, atr_scaled)
+    return base
 
 
 def _get_rr_min(regime):
@@ -526,7 +538,7 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
                 sl_distance_pct = (sl_price - price) / price
 
     # TP: find nearest S/R in trade direction
-    tp_max = _get_tp_max_pct(regime)
+    tp_max = _get_tp_max_pct(regime, atr_pct)
     tp_distance_pct = atr_pct * getattr(hc, 'RR_ENGINE_TP_ATR_MULT', 2.0) / 100.0
     tp_distance_pct = max(tp_distance_pct, getattr(hc, 'RR_ENGINE_TP_MIN_PCT', 0.005))
     tp_distance_pct = min(tp_distance_pct, tp_max)
