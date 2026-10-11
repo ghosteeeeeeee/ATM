@@ -31,6 +31,7 @@ CANDLE_SECONDS  = hc.BOLLINGER_SQUEEZE_CANDLE_SEC
 LOOKBACK_HOURS  = hc.BOLLINGER_SQUEEZE_LOOKBACK_H
 COOLDOWN_MIN    = hc.BOLLINGER_SQUEEZE_COOLDOWN_MIN
 LONG_RSI_MIN    = getattr(hc, 'BB_SQUEEZE_LONG_RSI_MIN', 0)
+LONG_RSI_MAX    = getattr(hc, 'BB_SQUEEZE_LONG_RSI_MAX', 999)
 SIGNAL_TYPE_L   = 'bollinger_squeeze_long'
 SIGNAL_TYPE_S   = 'bollinger_squeeze_short'
 SOURCE_TAG      = 'bb-squeeze'
@@ -184,8 +185,9 @@ def scan_bollinger_squeeze():
 
         # Entry-quality gate: squeeze-break LONG at low RSI = knife catch.
         # 30d: RSI<60 = 10T 30%WR -$0.44; >=60 = 61T 63.9%WR +$0.18. Fail-open (allow) if RSI unavailable.
+        # RSI_MAX=65: 60-65 band is 100%WR +$0.86; 65+ bleeds (30d -$0.56, 10 HML; 7d -$0.87 8 HML).
         rsi_val = None
-        if direction == 'LONG' and LONG_RSI_MIN > 0:
+        if direction == 'LONG' and (LONG_RSI_MIN > 0 or LONG_RSI_MAX < 999):
             try:
                 from rsi_utils import compute_rsi
                 rsi_val = compute_rsi(token, tf='5m', period=14)
@@ -193,6 +195,9 @@ def scan_bollinger_squeeze():
                 rsi_val = None
             if rsi_val is not None and rsi_val < LONG_RSI_MIN:
                 print(f'  [bb-squeeze] {token} LONG BLOCKED — RSI {rsi_val:.1f} < {LONG_RSI_MIN} (squeeze-break in weakness)')
+                continue
+            if rsi_val is not None and rsi_val > LONG_RSI_MAX:
+                print(f'  [bb-squeeze] {token} LONG BLOCKED — RSI {rsi_val:.1f} > {LONG_RSI_MAX} (squeeze already ran, exhaustion zone)')
                 continue
 
         if _in_cooldown(token, direction):

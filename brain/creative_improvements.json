@@ -3839,5 +3839,24 @@
     "category": "exit engine",
     "status": "suggested — needs 1m path backtest (self_learner) before ship",
     "risk": "medium — must prove no trail-winner was flat at 60min before recovering"
+  },
+  {
+    "date": "2026-10-11T02:42:55.937897+00:00",
+    "idea": "Hard-Max-Loss cluster breaker: auto-pause a signal family for 4h after 3 hard_max_loss exits within any 2h rolling window",
+    "rationale": "24h autopsy: volume-breakout-long+ went 7T 0W -$0.97 with HML clustered (BLUR/BABY/AIXBT/WCT all HIGH regime, sequential). 14d exit family is stark: TRAIL 171T +$11.82 80.1% WR vs HML 85T -$11.20 0% WR. A cluster detector would have paused vol-breakout after the 3rd HML (~06:00), skipping 4 more losers. Auto_1hr only kills on 3+T/hour signal frequency — this targets the LOSS cluster, not frequency.",
+    "expected_impact": "Save ~30-50% of clustered HML bleed without blanket signal kills. Volume-breakout 24h: would save ~$0.50-0.70 of the -$0.97.",
+    "category": "loss circuit-breaker",
+    "status": "suggested",
+    "risk": "medium — needs shadow run first to measure false-pause rate on winning streaks",
+    "implementation": "trade_watchdog or signal_compactor: rolling 2h count of hard_max_loss by signal_family; on >=3, write pause_until to runtime cooldown_tracker. Shadow-only for 7d before live."
+  },
+  {
+    "date": "2026-10-11T02:42:55.937897+00:00",
+    "idea": "Squeeze habitat lock: require volume_spike>=1.0 at bb-squeeze LONG entry (fresh expansion, not stale squeeze)",
+    "rationale": "bb-squeeze+ 14d volume_spike bands: 1-2=18T 72.2%WR +$0.54 2HML | <0.5=40T 55% -$0.40 11HML. The 60-65 RSI band we just capped to is the RSI half of the habitat; volume confirmation is the other half. Combined habitat (RSI 60-65 AND volume_spike>=1) is likely near-pure trail-arm trades.",
+    "expected_impact": "Further cut residual HML inside the 60-65 RSI window. Need n for intersection before shipping.",
+    "category": "entry sniper",
+    "status": "monitor — needs intersection sample",
+    "risk": "low if intersection n>=15 shows same edge"
   }
 ]

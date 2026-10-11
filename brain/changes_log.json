@@ -1012,5 +1012,16 @@
     "after": "LONG skipped when rsi_1m < 35 (rsi_1m None = no block). SHORT untouched.",
     "rationale": "Only all-time vol-breakout trade with meta_rsi<40 is the YGG loser; 30d winners below 40 = 0. Mechanism guard (signal already computed rsi_1m for drift detection but never consumed it).",
     "impact": "Blocks falling-knife longs only; 0 winners affected in 30d data. Reversible."
+  },
+  {
+    "timestamp": "2026-10-11T02:42:55.937897+00:00",
+    "agent": "brain_auditor",
+    "change": "Added BB_SQUEEZE_LONG_RSI_MAX=65 and wired into bollinger_squeeze.py LONG gate (paired with existing MIN=60 → live window 60-65 only)",
+    "type": "config",
+    "file": "hermes_constants.py + signals/bollinger_squeeze.py",
+    "before": "No RSI ceiling — squeeze LONGs fired at any RSI above 60",
+    "after": "BB_SQUEEZE_LONG_RSI_MAX=65; signal module blocks LONG when 5m RSI>65",
+    "rationale": "30d rsi_14 bands: 60-65=9T 100%WR +$0.86 0HML (KEEP) | 65-70=11T 54.5% -$0.42 | 70+=18T 61.1% -$0.14. Block 65+: saves $1.47 losers vs $0.91 tiny winners (avg win $0.054 vs avg loss $0.123 = bad-RR tail). 7d: 65+=15T 46.7% -$0.87 8HML vs 55-65 9T 88.9% +$0.58.",
+    "impact": "Expected: eliminate ~10 HML/30d on bb-squeeze+, preserve 100%WR 60-65 habitat. Zero trades since Oct 6 — gate ready for next fire. Revert to 999 if 60-65 band sample thins without replacement."
   }
 ]

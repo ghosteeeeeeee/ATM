@@ -2707,6 +2707,7 @@ BOLLINGER_SQUEEZE_CANDLE_SEC   = 300      # candle period in seconds (300 = 5m)
 BOLLINGER_SQUEEZE_LOOKBACK_H   = 6        # hours to look back for squeeze formation
 BOLLINGER_SQUEEZE_COOLDOWN_MIN = 30       # min minutes between signals per token+direction
 BB_SQUEEZE_LONG_RSI_MIN = 60              # brain_auditor 2026-10-07 — block low-RSI squeeze LONG entries. 30d: RSI<60=10T 30%WR -$0.44 vs >=60=61T 63.9%WR +$0.18. Winners avg RSI 76. Squeeze-break in weakness = catching knife.
+BB_SQUEEZE_LONG_RSI_MAX = 65              # brain_auditor 2026-10-11 — block overbought squeeze LONG entries (chop band). 30d LONG rsi_14: 60-65=9T 100%WR +$0.86 0HML (KEEP) | 65-70=11T 54.5% -$0.42 4HML | 70+=18T 61.1% -$0.14 6HML. Block 65+: saves $1.47 losers, costs $0.91 tiny winners (avg win $0.054 vs avg loss $0.123 — bad-RR tail). 7d: 65+=15T 46.7% -$0.87 8HML vs 55-65=9T 88.9% +$0.58. Squeeze already ran above 65 — we're buying someone else's exhaustion. Paired with MIN=60 → live window 60-65 only.
 
 # bb_bounce.py — mean reversion for ranging markets
 BB_BOUNCE_ENABLED = False    # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
