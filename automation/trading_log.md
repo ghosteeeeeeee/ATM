@@ -8128,3 +8128,24 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - 24h flipped positive on signal breakdown (sums +$0.26) while trades-table SUM shows −$0.26 earlier — rounding/open-trade window; still essentially flat. Volume-breakout-long+ remains 0W, awaiting brain_auditor/CEO
+
+## [2026-10-11 10:12] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet), 0 open
+**PnL:** last hour $0 | 24h: 22T 9W +$0.21 (WR 41%) — flipped POSITIVE (was −$0.26 last check)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal qualifies (needs 3+T at 0% WR last hour). volume-breakout-long+ 24h 3T 0W −$0.26 still worst but CEO-owned re-enable
+- continuum_engine 7d 3T 0W but $0.00 flat — not losing, skip kill
+- atr_sl_hit 5/22 ≈ 23% — under 40%, tpsl_utils deployed
+- hard_max_loss 5/22 ≈ 23% −$0.41 — still top loser with atr_sl, hold brain_auditor (SL width lever)
+- Overtrade: 0/hr (limit 20)
+- Streak: hours 05 (+$0.23) / 06 (+$0.63) positive then empty — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h now +$0.21 — trail wins (profit-monster-trail 9T +$0.56) covering SL losses. Volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
