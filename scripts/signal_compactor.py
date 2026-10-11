@@ -2805,10 +2805,38 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
                     continue
             if LONG_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'LONG' and _regime_4h == 'NEUTRAL':
-                if _regime == 'LONG_BIAS':
-                    log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but 1m LONG_BIAS, allowed")
+                # ── BTC POSITION CHECK (2026-10-11): chop = no trend = no LONG edge ──
+                # When BTC is AT/BELOW EMA300, LONG_BIAS from 1m is noise, not trend.
+                # 2026-10-11 losses: AIXBT/INJ/USELESS all LONG in chop (BTC AT EMA300),
+                # all hard_max_loss/atr_sl_hit. The 1m LONG_BIAS override was letting
+                # breakout signals through in conditions where breakouts reverse.
+                _btc_ema_pos = None
+                try:
+                    import os as _ln_os
+                    _ln_cont = sqlite3.connect(_ln_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    try:
+                        _ln_row = _ln_cont.execute(
+                            "SELECT ema300_position FROM continuum_states "
+                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _ln_cont.close()
+                    if _ln_row:
+                        _btc_ema_pos = _ln_row[0]
+                except Exception:
+                    pass
+                _btc_in_trend = (_btc_ema_pos == 'ABOVE')  # AT/BELOW/None = chop
+                if _regime == 'LONG_BIAS' and _btc_in_trend:
+                    log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but 1m LONG_BIAS + BTC ABOVE EMA300, allowed")
+                elif _regime == 'LONG_BIAS' and not _btc_in_trend:
+                    log(f"  🚫 [LONG-NEUTRAL-CHOP] {token} LONG blocked — 4h NEUTRAL, 1m LONG_BIAS but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend)")
+                    continue
                 elif unique_signal_types >= 2 or ((bare_source in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS) and _btc_mom_ok_for_bypass):
-                    log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types), allowed")
+                    if _btc_in_trend:
+                        log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types) + BTC ABOVE EMA300, allowed")
+                    else:
+                        log(f"  🚫 [LONG-NEUTRAL-CHOP] {token} LONG blocked — confluence but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend)")
+                        continue
                 else:
                     # Continuum score exception (2026-10-01): 60≤score<80 + mean-reversion only
                     # Audit: n=102, 61.8% WR, +$3.96 (best bucket in dataset)
@@ -2959,6 +2987,17 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     from hermes_constants import PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED
                     if PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED and _vol_regime == 'HIGH':
                         log(f"  🚫 [PUMP-CHAIN-SHORT-HIGH] {token} SHORT blocked — HIGH vol, no pump-chain- SHORT edge (20%WR)")
+                        continue
+                except ImportError:
+                    pass
+            # ── bb-bounce-short FLAT regime block (2026-10-13) ──────────
+            # Regime data: HIGH 64.3% WR (28T), EXTREME 100% WR (6T), NORMAL 65.5% WR (58T).
+            # FLAT = 40% WR (5T) — only bad regime. Re-enabled from auto-kill.
+            if 'bb-bounce-short' in bare_source.lower().replace('_', '-'):
+                try:
+                    from hermes_constants import BB_BOUNCE_SHORT_FLAT_BLOCK
+                    if BB_BOUNCE_SHORT_FLAT_BLOCK and _vol_regime == 'FLAT':
+                        log(f"  🚫 [BB-BOUNCE-SHORT-FLAT] {token} SHORT blocked — FLAT vol regime, no edge (40% WR)")
                         continue
                 except ImportError:
                     pass
