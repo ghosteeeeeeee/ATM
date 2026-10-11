@@ -8155,3 +8155,43 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 - Watch: volume-breakout-long+ (7d 25% WR, -$0.73, no winning regime), r2v2 EXTREME (0% WR), hmacd_mtf EXTREME (25% WR), bb-squeeze+ R:R problem (59% WR but -$0.55).
 - Near-boost: doji-bottom-long, ai-trader+ (75% WR, 4 trades — need 5).
 - No inversions. Report: automation/signal_report.md
+
+## [2026-10-11 11:14] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet), 0 open
+**PnL:** last hour $0 | 24h: 21T 8W +$0.21 (WR 38%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal qualifies (needs 3+T at 0% WR last hour). volume-breakout-long+ 24h 2T 0W −$0.23 still worst but CEO-owned re-enable
+- atr_sl_hit 4/21 ≈ 19% — under 40%, tpsl_utils deployed
+- hard_max_loss 5/21 ≈ 24% −$0.41 — hold brain_auditor (SL width lever)
+- Overtrade: 0/hr (limit 20)
+- Streak: hours 05 (+$0.23) / 06 (+$0.63) positive then empty — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers fresh (~1min ago)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Market very quiet since 06:00 (0 trades in 5 hours). Volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
+
+## [2026-10-11 12:13] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet), 0 open
+**PnL:** last hour $0 | 24h: 21T 8W +$0.21 (WR 38%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal qualifies (needs 3+T at 0% WR last hour). volume-breakout-long+ 24h 2T 0W −$0.23 still worst but CEO-owned re-enable
+- atr_sl_hit 4/21 ≈ 19% — under 40%, tpsl_utils deployed
+- hard_max_loss 5/21 ≈ 24% −$0.41 — hold brain_auditor (SL width lever)
+- Overtrade: 0/hr (limit 20)
+- Streak: hours 05/06 positive then empty 07–12 — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers fresh (~1min ago)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Market quiet 6 hours straight (0 trades since 07:00). 24h still +$0.21. volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
