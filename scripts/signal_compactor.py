@@ -3708,7 +3708,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
             # EXEMPTION: Skip in downtrends (linreg BEAR) — green candles are normal pullbacks (2026-09-23)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING, LONG_RSI_SWEET_SPOT_MIN, LONG_RSI_SWEET_SPOT_MAX, LONG_RSI_SWEET_SPOT_BOOST, LONG_MIDBAND_RSI_MIN, LONG_MIDBAND_RSI_MAX, LONG_MIDBAND_NON_EXTREME_BLOCK
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING, LONG_RSI_SWEET_SPOT_MIN, LONG_RSI_SWEET_SPOT_MAX, LONG_RSI_SWEET_SPOT_BOOST, LONG_MIDBAND_RSI_MIN, LONG_MIDBAND_RSI_MAX, LONG_MIDBAND_NON_EXTREME_BLOCK, LONG_HIGH_OVERBOUGHT_RSI_MIN, LONG_HIGH_OVERBOUGHT_BLOCK
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 # Skip spike filter in downtrends — green candles are pullbacks, not reversals
                 _skip_spike = False
@@ -3948,6 +3948,19 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _lmb_vreg = _classify_volatility(_lmb_atr) if _lmb_atr is not None else 'NORMAL'
                         if _lmb_vreg != 'EXTREME':
                             log(f"  🚫 [LONG-MIDBAND] {tkn}: LONG blocked — RSI {_lmb_rsi:.1f} in {LONG_MIDBAND_RSI_MIN}-{LONG_MIDBAND_RSI_MAX} + {_lmb_vreg} vol (chop death zone; EXTREME only)")
+                            continue
+                except Exception:
+                    pass  # non-fatal
+            # ── HIGH-regime overbought LONG block: RSI >70 in HIGH = exhaustion chase ──
+            # Complements midband (covers <=70). HIGH 70+ = bad-RR tail. NORMAL 70-75 stays open.
+            if direction == 'LONG' and LONG_HIGH_OVERBOUGHT_BLOCK:
+                try:
+                    _lhb_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lhb_rsi is not None and _lhb_rsi > LONG_HIGH_OVERBOUGHT_RSI_MIN:
+                        _lhb_atr = _get_atr_pct(tkn)
+                        _lhb_vreg = _classify_volatility(_lhb_atr) if _lhb_atr is not None else 'NORMAL'
+                        if _lhb_vreg == 'HIGH':
+                            log(f"  🚫 [LONG-HIGH-70] {tkn}: LONG blocked — RSI {_lhb_rsi:.1f} > {LONG_HIGH_OVERBOUGHT_RSI_MIN} + HIGH vol (exhaustion chase; midband covers <=70)")
                             continue
                 except Exception:
                     pass  # non-fatal

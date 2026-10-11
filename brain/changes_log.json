@@ -1045,5 +1045,16 @@
     "after": "LONG_MIDBAND_RSI_MIN=60, LONG_MIDBAND_RSI_MAX=70, LONG_MIDBAND_NON_EXTREME_BLOCK=True; wired Step 11 in signal_compactor after sweet-spot with EXTREME exemption",
     "rationale": "30d non-EXTREME 60-70 = 96T 39.6%WR -$4.56 (consistent 7d/14d). EXTREME 60-70 = 53T 56.6% +$2.31 kept open. Breakout signals fire into this band; trail never arms. Blocks 15.3% of 30d LONG winners, net save $4.56/30d.",
     "impact": "Expected: eliminate mid-band chop LONGs while preserving EXTREME trend habitat. Monitor for false-positive blocks in pipeline.log."
+  },
+  {
+    "timestamp": "2026-10-11T17:38:40Z",
+    "agent": "brain_auditor",
+    "change": "Added LONG_HIGH_OVERBOUGHT_BLOCK — skip LONG when meta RSI >70 and vol_regime=HIGH (exhaustion chase; complements midband ≤70)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py + scripts/signal_compactor.py",
+    "before": "HIGH 70+ LONG band open (only LONG_RSI_CEILING=75 Grade-B blocked >75)",
+    "after": "LONG_HIGH_OVERBOUGHT_RSI_MIN=70, LONG_HIGH_OVERBOUGHT_BLOCK=True; [LONG-HIGH-70] gate after midband in scoring loop",
+    "rationale": "30d HIGH RSI70+: 40T 45%WR -$1.44 | 14d 20T -$0.48 | 7d 10T -$0.54. Avg win $0.09 vs avg loss $0.16 bad-RR tail. Blocks 18W +$1.68 / saves 20L -$3.12 → net +$1.44/30d. NORMAL 70-75 stays open (+$0.16/30d). Midband soak 2h: 30 blocks, 0 FP.",
+    "impact": "Expected +$1.44/30d saved; blocks overbought HIGH-regime chase entries"
   }
 ]

@@ -926,6 +926,14 @@ LONG_MIDBAND_RSI_MIN = 60
 LONG_MIDBAND_RSI_MAX = 70
 LONG_MIDBAND_NON_EXTREME_BLOCK = True  # brain_auditor 2026-10-11 — EXTREME exempt
 
+# ── HIGH-regime overbought LONG block: RSI >70 in HIGH vol = exhaustion chase ──
+# Complements midband (60-70 non-EXTREME). HIGH 70+ = bad-RR tail (avg win $0.09 vs avg loss $0.16).
+# 30d: 40T 45%WR -$1.44 | 14d: 20T 50% -$0.48 | 7d: 10T 40% -$0.54 — consistent bleed.
+# Blocks 18 winners (+$1.68) / saves 20 losers (-$3.12) → net +$1.44/30d.
+# Midband already covers RSI<=70; this catches 70+ that midband misses. NORMAL 70-75 stays open (+$0.16/30d).
+LONG_HIGH_OVERBOUGHT_RSI_MIN = 70
+LONG_HIGH_OVERBOUGHT_BLOCK = True  # brain_auditor 2026-10-11
+
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
 # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
 # 7d: 17T 41.2%WR -$1.05. All other zones: 162T 57.8%WR +$3.77.

@@ -3943,5 +3943,23 @@
     "category": "entry sniper",
     "status": "monitor — revisit when volume_spike write-path coverage >90%",
     "risk": "medium (thin data, unreliable field)"
+  },
+  {
+    "date": "2026-10-11T17:38:40Z",
+    "idea": "Trail-arm velocity precheck (MONITOR — needs backtest)",
+    "rationale": "7d trail family 58T +$6.28 88%WR is how we win; hard_max_loss 46T -$5.76 0%WR is how we lose. MFE>=0.40 rate only 58.1% (79/136) — 42% of entries never arm trail. Hypothesis: requiring positive 5m velocity or price>EMA5 at exec would shift entry mix toward trail-arming trades. MUST backtest winners-vs-HML velocity distribution before any filter.",
+    "expected_impact": "Unknown until backtest — could cut HML share materially if velocity separates cohorts",
+    "category": "entry sniper",
+    "status": "monitor — request signal_analyst/bug_hunter backtest of 5m vel at entry for trail winners vs hard_max_loss losers",
+    "risk": "medium (could block trend entries that start slow)"
+  },
+  {
+    "date": "2026-10-11T17:38:40Z",
+    "idea": "NORMAL 70-75 gap-band tracker (ME live case)",
+    "rationale": "ME ai-trader+ opened at RSI 72.5 NORMAL after midband (≤70) missed the climb from 66.1→72.5. 30d NORMAL+HIGH 70-75 = 26T 53.8% +$0.16 (keep). Not shippable as block. Track every LONG entry with RSI 70-75 NORMAL to brain for n>=20 review.",
+    "expected_impact": "Visibility only — confirm keep-band holds or revise",
+    "category": "monitor",
+    "status": "monitor — zero-code tracking",
+    "risk": "low"
   }
 ]
