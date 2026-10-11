@@ -537,6 +537,15 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
                 sl_price = level_price + (price * structural_buffer)
                 sl_distance_pct = (sl_price - price) / price
 
+    # Clamp SL to minimum floor — structural loop can shrink SL below ATR_SL_MIN
+    sl_floor = getattr(hc, 'ATR_SL_MIN', 0.015)
+    if sl_distance_pct < sl_floor:
+        sl_distance_pct = sl_floor
+        if direction == 'LONG':
+            sl_price = price - (price * sl_distance_pct)
+        else:
+            sl_price = price + (price * sl_distance_pct)
+
     # TP: find nearest S/R in trade direction
     tp_max = _get_tp_max_pct(regime, atr_pct)
     tp_distance_pct = atr_pct * getattr(hc, 'RR_ENGINE_TP_ATR_MULT', 2.0) / 100.0
