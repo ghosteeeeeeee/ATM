@@ -8087,3 +8087,23 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - 24h still slightly negative at −$0.57 — trail wins offsetting SL losses; volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
+
+## [2026-10-11 08:12] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet) | 0 open
+**PnL:** last hour $0 | 24h: 27T 10W −$0.57 (WR 37.0%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal qualifies (needs 3+T at 0% WR). volume-breakout-long+ 24h 6T 0W −$0.51 still worst but CEO-owned re-enable
+- atr_sl_hit 6/27 ≈ 22% — under 40%, tpsl_utils deployed
+- hard_max_loss 7/27 ≈ 26% −$0.59 dominant loser — hold brain_auditor (SL width lever)
+- Overtrade: 0/hr (limit 20)
+- Streak: hour 06 pos, hours 07/08 empty — no 3-neg-hr run; no size lever
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 37% at −$0.57 flat vs last hour — trail wins still offsetting SL losses; volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
