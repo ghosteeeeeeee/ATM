@@ -7854,3 +7854,49 @@ Last hour: APT pump-chain+ atr_sl_hit −$0.06 (−1.33%). 2 open trades.
 **Open Questions:**
 - 24h still −$0.29 at 45.5% WR — worst signal volume-breakout-long+ (10T 3W −$0.37) unchanged; CEO re-enabled 12:25, not a leak
 - 2× sizing recurrence (ETH/YGG $22.10) — sizing audit still pending brain_auditor
+
+## [2026-10-10 23:14] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** −$0.02 last hour | 24h: 32T 14W −$0.47 (WR 43.8%)
+
+Last hour: GOAT doji-bottom-long atr_sl_hit −$0.02 (−1.14%). 1 open: ETH hmacd_mtf-+ LONG $22.10 (2× size flag, open since 15:42).
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: doji only 1T last hour at 0% WR — need 3+T; volume-breakout-long+ still worst 24h (9T 2W −$0.67) but 0 new closes last hour, CEO re-enabled 12:25
+- atr_sl_hit 5/32 = 15.6% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/32 = 25% −$1.04 dominant loser — hold brain_auditor SL width lever
+- Overtrade: 1/hr (limit 20)
+- Streak: hours 21–22 neg (−$0.08) = 2 consecutive, not 3; regime SHORT_BIAS (7L/42S/51N) → size lever N/A
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h drifted −$0.29 → −$0.47 (ai-trader+ winner aged out of window + GOAT loss) — WR 43.8%, watch hour 0
+- ETH $22.10 2× size still open ~7.5h — sizing audit still pending brain_auditor
+
+## [2026-10-11 00:12] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.06 last hour | 24h: 32T 13W −$0.46 (WR 40.6%)
+
+Last hour: AIXBT doji-bottom-long profit-monster-trail +$0.08 (+1.11%) / ETH hmacd_mtf-+ UNIVERSAL_MAX_HOLD −$0.02 (−0.40%). 0 open trades (ETH closed, 2× size flag resolved).
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: no signal 3+T last hour at 0% WR (doji 1T won, hmacd 1T lost); volume-breakout-long+ still worst 24h (9T 2W −$0.67) but 0 new closes last hour, CEO re-enabled 12:25
+- atr_sl_hit 5/32 = 15.6% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/32 = 25% −$1.04 dominant loser (−$0.13 avg) — hold brain_auditor (SL width lever pending)
+- Overtrade: 2/hr (limit 20)
+- Streak: hours 21−22 neg (−$0.08) but hour 23 positive (+$0.06) — broken
+- live_trading=true, timers fresh, 0 open positions
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h drifted to −$0.46 at 40.6% WR — hmacd_mtf-- (3T 1W −$0.07) now also negative; volume-breakout-long+ still the main drag
+- ETH 2× sizing flag resolved by exit; sizing audit still pending brain_auditor

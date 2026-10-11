@@ -4488,3 +4488,7 @@ BY: auto_1hr
 BY: auto_1hr
 BY: auto_1hr
 [2026-10-10 22:13] auto_1hr: NO CONFIG CHANGE — 1T last hour L APT pump-chain+ atr_sl −$0.06 | 2 open | 24h 33T 15W −$0.29 WR 46% | hard_max_loss 24% −$1.04 (hold brain_auditor) | atr_sl_hit 15% (tpsl stable) | kill: none qualifying | overtrade 1/hr | streak broken (hour -2 empty); regime SHORT_BIAS | timers fresh, live_trading=true
+[2026-10-10 23:14] auto_1hr: NO CONFIG CHANGE — 1T last hour L GOAT doji atr_sl −$0.02 | 1 open ETH hmacd 2× size $22.10 | 24h 32T 14W −$0.47 WR 44% | hard_max_loss 25% −$1.04 (hold brain_auditor) | atr_sl_hit 15.6% (tpsl stable) | kill: none qualifying (vol-breakout 0T last hour, CEO re-enabled 12:25) | overtrade 1/hr | streak 2 neg hrs not 3; regime SHORT_BIAS | timers fresh, live_trading=true
+BY: auto_1hr
+BY: auto_1hr
+[2026-10-11 00:12] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L net +$0.06 (AIXBT doji trail +$0.08 / ETH hmacd MAX_HOLD −$0.02) | 0 open | 24h 32T 13W −$0.46 WR 41% | hard_max_loss 25% −$1.04 (hold brain_auditor) | atr_sl_hit 15.6% (tpsl stable) | kill: none qualifying (vol-breakout 0T last hour, CEO re-enabled) | overtrade 2/hr | streak broken (hour 23 pos) | timers fresh, live_trading=true
