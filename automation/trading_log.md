@@ -8422,3 +8422,24 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - 4th BTC continuum position opened 22:08 while 3 from 18:2x still open — watch if continuum cluster risks same-coin concentration
+
+## [2026-10-11 23:13] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** last hour $0.00 | 24h real ~14T net +$1.24 (doji-bottom-long 3T/3W +$0.37, r2v2-long3 +$0.59, pump-chain combos +$0.47 lead) | 4 open (BTC continuum_engine LONG x4: 3 from 18:2x, 1 from 22:08)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: no signal with 0% WR + 3+ trades last hour (0 closed). volume-breakout-long+ 1T/24h 0W −$0.09 CEO-owned, n too small.
+- atr_sl_hit 1/24h ≈ 4% — under 40%, tpsl_utils deployed
+- hard_max_loss 3/24h −$0.24 — hold brain_auditor (SL width lever)
+- profit-monster-trail still the profit engine (+$1.04/24h)
+- Overtrade: 0/hr — well under 20
+- Streak: +0.01 (17h), −0.08 (18h), +0.02 (20h), then empty — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers fresh (~1min)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 4th BTC continuum position opened 22:08 while 3 from 18:2x still open (~5h) — same-coin cluster persists; watch if positions never close or accumulate further
