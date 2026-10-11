@@ -447,3 +447,45 @@
 - **WARN** (1x): `[DISK]` Root filesystem at 85% used (95G/118G). No logs >7d to compress; journals already minimal. candles.db is 2.8GB.
 - **WARN** (1x): `[bug-hunter exit 1]` Failed at 06:46 — by design when findings exist: dead signal_gen imports (zscore_momentum, trend_purity_signals, candle_predictor), 4 hardcoded password files, 75 non-atomic JSON writers. **AUTO-FIX**: `systemctl reset-failed` — will re-fire on next 8h timer.
 - **WARN** (1x): `[ceo exit 124]` Timed out at 05:57 after ~1min CPU. **AUTO-FIX**: `systemctl reset-failed` — will re-fire on next timer.
+
+## Error Alerts — 2026-10-11 08:00 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ [TOK-TOK] TOK failed for TOK: Command '['/root/.opencode/bin/opencode', 'run', 'You are a crypto trading gate. Evaluate this signal and reply TOK of: GO, TOK, TO`
+
+## Error Alerts — 2026-10-11 08:50 UTC
+- **[WARN]** (1x): Disk usage at 85% on / (95G/118G). No old logs to compress — bloat is DBs: coin_tracker.db 3.3G, candles.db 2.7G, session_brain.db 1.1G, signals_hermes.db 990M.
+- **AUTO-FIX**: Checked for log cleanup (>7d, >30d gz) — none found; rotation working. DB vacuum/retention left for manual review (not auto-applied, risky on live DBs).
+- **[INFO]**: hl-copy.err.log shows recurring [LOCK-WAIT] info_rate 0.1s retries — recovering on its own, not stuck.
+
+## Error Alerts — 2026-10-11 10:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-11 10:49 UTC
+- **[WARN]** (1x): Disk usage at 85% (`/dev/vda2` 95G/118G, 18G free). No >7d logs found to compress. Monitor; if it crosses 90%, archive `data/coin_tracker.db` (3.4G) or old pipeline logs.
+- **[WARN]** (1x): `hermes-ceo.service` failed at 09:57 with exit 124 (timeout). Auto-fix: `systemctl reset-failed`. Next timer run: 14:41 UTC.
+- **[INFO]** (4x): RESOLV SHORT execution failures — `RSI hard floor: 17.7 < 45`. Filter working as intended (blocked shorts below RSI 45). No action needed; signal marked executed, no rollback.
+- **AUTO-FIXES**: reset-failed hermes-ceo.service. All 3 critical timers verified active.
+
+## Error Alerts — 2026-10-11 11:00 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-11 14:48 UTC
+- **WARN** (1x): Disk at 85% used (/dev/vda2, 95G/118G). No logs >7d to reclaim; growth is data (candles_1m ~18M rows). Consider archiving candles_1m >60d (18.1M rows flagged by CEO script).
+- **WARN** (1x): `hermes-ceo.service` failed — exit 124 (timeout) at 13:57 UTC. Non-critical oversight job; timer will retry. Not a trading-path failure.
+- **WARN** (1x): `hermes-upgrade-implementer.service` failed — exit 124 (timeout) at 06:12 UTC. Non-critical; timer will retry.
+- **INFO**: `hermes-atr-sl-updater.timer` shows as not-found (stale unit reference). ATR SL is applied inline by position_manager — no functional impact.
+- **AUTO-FIX**: None required. Pipeline, price-collector, 1m-candle, signal-compactor, hl-sync-guardian all healthy. Prices fresh (80s). 0 phantom trades. No DB locks.
+
+## Error Alerts — 2026-10-11 16:50 UTC
+- **WARN** (1x): Disk at 86% used (/dev/vda2, 95G/118G). No uncompressed logs >7d to reclaim. candles_1m (18.2M rows) is the growth driver — consider archiving >60d candles.
+- **WARN** (3x): Non-critical services failed: `hermes-bug-hunter` (exit 1), `hermes-ceo` (exit 124 timeout), `hermes-upgrade-implementer` (exit 124 timeout). Timers will retry. Not trading-path.
+- **INFO**: bug-hunter "dead_imports" finding is a **false positive** — grep confirms no actual `import signal_gen`/`import ai_decider` statements in zscore_momentum.py, trend_purity_signals.py, candle_predictor.py; only comments mention signal_gen.
+- **AUTO-FIX**: None required. Pipeline healthy (cycle #238463, 128 signals/h). All critical timers active (price-collector, 1m-candle, pipeline, hl-sync-guardian). Prices fresh (1.6 min). 0 phantom trades. 9 trades closed today. Regime: LONG_BIAS (80L/3S/26N).
+
+## Error Alerts — 2026-10-11 17:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] USELESS: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+- **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-11 17:50 UTC
+- **[WARN]** (1x): Disk usage 86% (>85% threshold) on /dev/vda2
+- **AUTO-FIX**: Cleaned 52 ATM backup zips in /tmp older than 24h (~1G freed). Disk now 85%. No other safe auto-fix — remaining usage is active DBs (coin_tracker.db 3.3G, candles.db 2.7G) and /usr+/snap system files. Recommend manual review if disk approaches 90%.

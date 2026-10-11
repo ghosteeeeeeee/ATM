@@ -5312,6 +5312,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 'timestamp': time.time(),
             })
 
+        # Ensure BTC is always in hotset (continuum engine trades BTC directly)
+        if not any(e.get('token', '').upper() == 'BTC' for e in hotset_output):
+            hotset_output.append({
+                'token': 'BTC',
+                'direction': 'LONG',
+                'source': 'continuum_engine',
+                'confidence': 100,
+                'score': 100,
+                'entries_count': 1,
+                'timestamp': time.time(),
+            })
+
         if not dry:
             # FIX (2026-04-23): Remove tokens with open positions right before writing.
             # This closes the ~1-minute gap where guardian fires a trade but compactor
@@ -5757,6 +5769,18 @@ def _preserve_previous_hotset(dry=False):
         # (len(source_parts) < 2) because their stale entries_count claimed 2 sources.
         entry['entries_count'] = entries_count
         hotset_output.append(entry)
+
+    # Ensure BTC is always in hotset (continuum engine trades BTC directly)
+    if not any(e.get('token', '').upper() == 'BTC' for e in hotset_output):
+        hotset_output.append({
+            'token': 'BTC',
+            'direction': 'LONG',
+            'source': 'continuum_engine',
+            'confidence': 100,
+            'score': 100,
+            'entries_count': 1,
+            'timestamp': time.time(),
+        })
 
     if not dry:
         with FileLock('hotset_json'):
