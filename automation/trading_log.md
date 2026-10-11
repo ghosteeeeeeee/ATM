@@ -7969,3 +7969,26 @@ Last hour: both hard_max_loss exits — USELESS volume-breakout-long+ −$0.09 (
 **Open Questions:**
 - 24h WR 33% at −$1.01 — hard_max_loss 30% of closes still dominant (brain_auditor-owned)
 - AIXBT $22.10 = 2× size flag recurring (3rd+ occurrence) — sizing audit still pending brain_auditor
+
+## [2026-10-11 04:14] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 last hour | 24h: 28T 9W −$1.19 (WR 32.1%)
+
+Last hour: no closes, no open positions. Prior hour (03) was −$0.34 0W/3T (hard_max_loss x2, atr_sl) but hour 02 empty breaks any streak.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal qualifies (needs 3+T at 0% WR). volume-breakout-long+ 24h 7T 0W −$0.89 remains worst but CEO-owned re-enable + brain_auditor RSI floor wired 02:43; 0 entries since HIGH block
+- atr_sl_hit 6/28 ≈ 21% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/28 ≈ 29% −$0.97 dominant loser — hold brain_auditor (SL width lever)
+- Overtrade: 0/hr (limit 20)
+- Streak: hour 03 −$0.34 but hour 02 empty, hour 01 +$0.06 — no 3-neg-hr run; no size lever
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 32% at −$1.19 (was −$1.01 at 03:14) — hard_max_loss 29% of closes still dominant (brain_auditor-owned)
+- No open positions right now — system idle, waiting for signals
