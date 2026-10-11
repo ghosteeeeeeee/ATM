@@ -8015,3 +8015,37 @@ Last hour: no closes. 1 open: SYRUP doji-bottom-long LONG $22.10 (2× size flag 
 **Open Questions:**
 - 24h WR 32% at −$1.19 — hard_max_loss 29% of closes still dominant (brain_auditor-owned)
 - $22.10 (2× size) flag recurring across AIXBT/ETH/SYRUP — sizing audit still pending brain_auditor
+
+## FAVORITES Update — 2026-10-11 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE BLUR (WR=50.0%, PnL=$-0.29, 1 consecutive bad days, regime=LONG_BIAS)
+- PROMOTE GRASS (WR=60.0%, AvgPnL=1.26%, Trades=5)
+
+Final set: ['BABY', 'GRASS', 'SYRUP']
+
+## LOSERS Update — 2026-10-11 06:05 UTC
+- ADD AIXBT (WR=40.0%, PnL=$-0.32, wr_collapse (61.5% → 40.0%))
+
+Final set: ['AIXBT', 'IMX']
+
+## [2026-10-11 06:14] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.23 last hour | 24h: 27T 10W −$0.57 (WR 37.0%)
+
+Last hour: SYRUP doji-bottom-long LONG exit profit-monster-trail +$0.23 (+3.07%). 0 open positions. 24h PnL improved from −$1.19 to −$0.57 (win + older trades rolling out).
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal qualifies (needs 3+T at 0% WR last hour). volume-breakout-long+ 24h 6T 0W −$0.51 still worst but CEO-owned re-enable
+- atr_sl_hit 6/27 ≈ 22% — under 40%, tpsl_utils deployed
+- hard_max_loss 7/27 ≈ 26% −$0.59 dominant loser — hold brain_auditor (SL width lever)
+- Overtrade: 1/hr (limit 20)
+- Streak: hour 05 positive, hours 02/04 empty — no 3-neg-hr run; no size lever
+- live_trading=true, kill JSON=true, timers active
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 37% at −$0.57 improving but still negative — hard_max_loss 26% of closes still dominant (brain_auditor-owned)
