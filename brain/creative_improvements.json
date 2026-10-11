@@ -3886,5 +3886,23 @@
     "status": "suggested",
     "risk": "low — dampen not block; recovers automatically when signal finds momentum again",
     "implementation": "extend scripts/signal_decay_detector.py; read last 10 closed trades per signal from brain PG, compute median mfe_pct, write dampener to signal_regime_memory.json"
+  },
+  {
+    "date": "2026-10-11T13:39:36.587302+00:00",
+    "idea": "MFE-stagnation early cut: exit LONG/SHORT if hold>=20min AND MFE<0.15% AND unrealized PnL<0 — BEFORE hard_max_loss fires at -2..-5% account",
+    "rationale": "7d HML autopsy: 26/30 never armed trail (+0.40%); median MFE 0.11%. Winners avg MFE 1.27%. Chop entries bleed to HML with zero momentum. Cutting at ~-0.15% price after 20 dead minutes saves ~2-4% account per trade on ~26 trades/7d.",
+    "expected_impact": "If live on non-pump-chain signals only: save ~$3-5/7d on HML cohort without touching trail winners. MUST exclude pump-chain+ (grind-is-normal: 116/147 below +2% at 2h — dead_money audit lesson).",
+    "category": "exit sniper",
+    "status": "suggested — BACKTEST FIRST by self_learner; shadow-log would-fires 48h before any live change",
+    "risk": "medium — similar mechanics killed home runs when applied universally (dead_money). Signal-scoped + MFE-threshold sensitivity sweep required. Do NOT implement without independent audit."
+  },
+  {
+    "date": "2026-10-11T13:39:36.587304+00:00",
+    "idea": "volume-breakout-long+ EXTREME dampen 0.5x when meta_rsi>68 (not hard block) — keeps rare 30d winners possible but shrinks chop-chase allocation",
+    "rationale": "7d/14d 68+ is 0/6 pure bleed; 30d has aged winners. Dampen instead of block avoids the out-of-sample kill while reducing capital on the dead band during chop regimes.",
+    "expected_impact": "Reduce EXTREME high-RSI vol-breakout size by 50%; preserves any breakout continuation. Complements existing HIGH 0.0 block.",
+    "category": "entry sniper",
+    "status": "suggested — needs gate_shadow counterfactual + winner-impact check at ship time",
+    "risk": "low-medium — one variable; reversible; does not hard-block"
   }
 ]
