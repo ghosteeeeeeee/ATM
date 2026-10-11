@@ -45,6 +45,7 @@ from hermes_constants import (
     CONTINUUM_SCORE_ENABLED, CONTINUUM_SCORE_LONG_ENABLED, CONTINUUM_SCORE_SHORT_ENABLED,
     SMA20_DIP_ENABLED, SMA20_DIP_PLUS_ENABLED, SMA20_DIP_MINUS_ENABLED,
     GRIND_BREAKOUT_ENABLED, GRIND_BREAKOUT_PLUS_ENABLED, GRIND_BREAKOUT_MINUS_ENABLED,
+    GRIND_BREAKOUT_V2_ENABLED, GRIND_BREAKOUT_V2_PLUS_ENABLED, GRIND_BREAKOUT_V2_MINUS_ENABLED,
     GRIND_TREND_ENABLED, GRIND_TREND_PLUS_ENABLED, GRIND_TREND_MINUS_ENABLED,
     BTC_GRIND_SPIKE_ENABLED,
     GRIND_ACCUM_ENABLED, GRIND_ACCUM_PLUS_ENABLED, GRIND_ACCUM_MINUS_ENABLED,
@@ -369,6 +370,11 @@ except Exception:
     _grind_breakout_run = None
 
 try:
+    from signals.grind_breakout_v2 import run as _grind_breakout_v2_run
+except Exception:
+    _grind_breakout_v2_run = None
+
+try:
     from signals.grind_trend import run as _grind_trend_run
 except Exception:
     _grind_trend_run = None
@@ -537,6 +543,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'pullback_entry',            'enabled': 'PULLBACK_ENTRY_ENABLED',        'run': _pullback_entry_run},
     {'name': 'oversold_bounce',           'enabled': 'OVERSOLD_BOUNCE_ENABLED',       'run': _oversold_bounce_run},
     {'name': 'grind_breakout',            'enabled': 'GRIND_BREAKOUT_ENABLED',        'run': _grind_breakout_run},
+    {'name': 'grind_breakout_v2',         'enabled': 'GRIND_BREAKOUT_V2_ENABLED',     'run': _grind_breakout_v2_run},
     {'name': 'grind_trend',              'enabled': 'GRIND_TREND_ENABLED',            'run': _grind_trend_run},
     {'name': 'btc_grind_spike',           'enabled': 'BTC_GRIND_SPIKE_ENABLED',       'run': _btc_grind_spike_run},
     {'name': 'grind_accumulator',         'enabled': 'GRIND_ACCUM_ENABLED',           'run': _grind_accum_run},

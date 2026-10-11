@@ -2324,6 +2324,35 @@ GRIND_BREAKOUT_CONF_BREAKOUT_BONUS = 2      # extra for clean breakout
 GRIND_BREAKOUT_CONF_PURITY_BONUS = 2        # extra for high purity
 GRIND_BREAKOUT_BREAKOUT_BONUS_BUFFER = 0.005  # 0.5% above range for breakout bonus
 
+# ── grind_breakout_v2 (compression → volume breakout) ─────────────────────────
+# grind_breakout_v2.py — catches CHIP/CFX-style moves: tight range → volume surge breakout
+# Lessons from coiled_spring (killed Oct 1, 40.9%WR): fewer conditions, no trend requirement, no RSI filter
+GRIND_BREAKOUT_V2_ENABLED = True           # master kill-switch
+GRIND_BREAKOUT_V2_PLUS_ENABLED = True      # LONG direction
+GRIND_BREAKOUT_V2_MINUS_ENABLED = True     # SHORT direction
+GRIND_BREAKOUT_V2_COOLDOWN_HOURS = 2       # per token+direction cooldown
+# Compression precondition (the coiled spring)
+GRIND_BREAKOUT_V2_BB_COMPRESS_MAX = 3.0    # BB(20,2.0) width must be below this % before breakout
+GRIND_BREAKOUT_V2_COMPRESS_LOOKBACK = 10   # bars to check for compression (10 bars = 50min on 5m)
+GRIND_BREAKOUT_V2_COMPRESS_VOL_MAX = 0.6   # volume must be below this × avg during compression
+GRIND_BREAKOUT_V2_BB_PERIOD = 20           # BB period
+GRIND_BREAKOUT_V2_BB_STDDEV = 2.0          # BB standard deviations
+# Breakout conditions
+GRIND_BREAKOUT_V2_RESISTANCE_BARS = 20     # lookback for resistance/support
+GRIND_BREAKOUT_V2_VOL_SURGE_MULT = 2.0     # volume must be >= Nx average
+GRIND_BREAKOUT_V2_VOL_AVG_PERIOD = 20      # bars for average volume
+GRIND_BREAKOUT_V2_ACCEL_MIN = 0.0          # min acceleration (0.0 = must be positive)
+GRIND_BREAKOUT_V2_MACD_RISE_ENABLED = True # MACD histogram rising (bonus, not hard filter)
+GRIND_BREAKOUT_V2_MAX_MOVE_FROM_RANGE = 3.0  # max % move from breakout level (don't chase)
+GRIND_BREAKOUT_V2_BREAKOUT_BODY_MIN = 0.5  # min body/range ratio for breakout bar
+# Confidence
+GRIND_BREAKOUT_V2_CONF_BASE = 75           # base confidence
+GRIND_BREAKOUT_V2_CONF_FLOOR = 50          # min confidence
+GRIND_BREAKOUT_V2_CONF_CAP = 88            # max confidence (system ceiling)
+GRIND_BREAKOUT_V2_CONF_VOL_BONUS = 5       # +5 if volume > 3x average
+GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS = 3     # +3 if acceleration > 0.01
+GRIND_BREAKOUT_V2_CONF_MACD_BONUS = 2      # +2 if MACD histogram rising
+
 # ── grind_trend (accumulation grind — steady drift, no breakout needed) ───────
 # grind_trend.py — low-volatility accumulation grind signal
 GRIND_TREND_ENABLED = True                # master kill-switch
@@ -2651,7 +2680,8 @@ BB_SQUEEZE_LONG_RSI_MIN = 60              # brain_auditor 2026-10-07 — block l
 BB_BOUNCE_ENABLED = False    # CEO KILLED 2026-08-27 — 48h 9T/11.1%WR/-$0.74. Degraded after re-enable. NEVER_REENABLE.
 BB_BOUNCE_PLUS_ENABLED = True   # RE-ENABLED 2026-09-09 — NORMAL 77% WR, EXTREME 62% WR. HIGH blocked via volatility_gate_v2.
 BB_BOUNCE_MINUS_ENABLED = True    # RE-ENABLED 2026-09-09 — EXTREME 81% WR, NORMAL 57% WR. HIGH blocked via volatility_gate_v2.
-BB_BOUNCE_SHORT_ENABLED = False    # auto_1hr KILLED 2026-09-03 — 3T/33.3%WR/-$0.35 today. 2 consecutive losses (ME cut-loser, ALT atr_sl_hit). Below 60% KILL_WR threshold.
+BB_BOUNCE_SHORT_ENABLED = True    # RE-ENABLED 2026-10-13 — regime data: HIGH 64.3% WR (28T), EXTREME 100% WR (6T), NORMAL 65.5% WR (58T). FLAT is only bad regime (40% 5T) → BB_BOUNCE_SHORT_FLAT_BLOCK. Auto-killed 09-03 on bad day, not regime problem.
+BB_BOUNCE_SHORT_FLAT_BLOCK = True  # Block bb-bounce-short in FLAT vol regime (40% WR, 5T — only bad regime)
 BB_BOUNCE_SHORT_MOM_MAX = 999.0   # V2 2026-08-29 — REVERTED 2026-08-30 by CEO. Filter too aggressive: 61.7% WR (below 65% kill trigger). Live 47T showed momentum filter killing good entries.
 BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → auto-disable. Changed from 65% per T 2026-08-30.
 
