@@ -238,10 +238,10 @@ else:
 # 13. ai_decider.py imports (defunct module)
 defunct_imports = []
 for pyfile in os.listdir(SCRIPTS):
-    if not pyfile.endswith('.py') or pyfile == 'ai_decider.py':
+    if not pyfile.endswith('.py') or pyfile in ('ai_decider.py', 'bug_hunter.py'):
         continue
     fp = os.path.join(SCRIPTS, pyfile)
-    matches = grep_file(r'import ai_decider|from ai_decider', fp)
+    matches = grep_file(r'^\s*(?:from|import)\s+ai_decider\b', fp)
     if matches:
         defunct_imports.append((pyfile, matches[0][0]))
 if defunct_imports:
@@ -374,7 +374,8 @@ for script in SCRIPTS_DIR.glob('*.py'):
         continue
     content = script.read_text()
     for module in dead_modules:
-        if f'import {module}' in content or f'from {module}' in content:
+        # Match real import lines only (not comments/docstrings mentioning the module)
+        if re.search(rf'^\s*(?:from|import)\s+{module}\b', content, re.MULTILINE):
             dead_imports.append((script.name, module))
 if dead_imports:
     check("dead_imports", False, f"{len(dead_imports)} imports of defunct modules: {', '.join(f'{n}→{m}' for n,m in dead_imports[:3])}",

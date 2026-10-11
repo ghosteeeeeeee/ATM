@@ -3961,5 +3961,24 @@
     "category": "monitor",
     "status": "monitor — zero-code tracking",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-11T18:49:35Z",
+    "idea": "HML slippage cycle-time tightening — PM checks near-threshold positions more frequently",
+    "rationale": "HML thresholds are now correct (-0.60 to -0.84% price, verified in exit_conditions) but actual exits slip 5-75% beyond threshold (HYPE thresh -0.60→actual -1.05; BLUR -0.67→-1.12; ME -0.67→-0.70). In EXTREME vol where HML clusters, one PM cycle of delay = 0.2-0.4% slippage. If live_pnl < thresh×0.7, tighten check interval (e.g. 15s vs default). Estimated save: 46 HML/7d × ~$0.13 avg excess loss ≈ $6/7d.",
+    "expected_impact": "Reduce HML avg loss from -3.0% to ~-2.2% account; ~+$0.85/7d",
+    "category": "exit execution",
+    "status": "delegated-bug_hunter",
+    "risk": "low — does not change threshold, only check frequency near threshold",
+    "prerequisite": "backtest PM cycle-time impact on trail interactions before live"
+  },
+  {
+    "date": "2026-10-11T18:49:35Z",
+    "idea": "Midband climb-through tracker — monitor tokens blocked at 60-70 that later enter at 70-75",
+    "rationale": "ME was blocked 3x at RSI 66.1 (midband) then entered at 72.5 (gap band 70-75 NORMAL) and hit HML -2.10%. If climb-through entries (blocked→delayed→entered higher) underperform direct 70-75 entries, midband is shifting risk upward not eliminating it. Zero-code: grep MIDBAND blocks from pipeline.log, join with subsequent trades by token. Trigger: if climb-through WR <40% at n≥15, add post-block cooldown or extend midband to 75.",
+    "expected_impact": "Prevents midband becoming a deferral-into-worse-band mechanism",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "none — observation only until n≥15"
   }
 ]

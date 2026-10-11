@@ -489,3 +489,17 @@
 ## Error Alerts — 2026-10-11 17:50 UTC
 - **[WARN]** (1x): Disk usage 86% (>85% threshold) on /dev/vda2
 - **AUTO-FIX**: Cleaned 52 ATM backup zips in /tmp older than 24h (~1G freed). Disk now 85%. No other safe auto-fix — remaining usage is active DBs (coin_tracker.db 3.3G, candles.db 2.7G) and /usr+/snap system files. Recommend manual review if disk approaches 90%.
+
+## Error Alerts — 2026-10-11 18:00 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3542s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.8s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run`
+
+## Error Alerts — 2026-10-11 19:54 UTC
+- **WARN** (1x): Disk at 85% (/dev/vda2, 18G free). Logs only 191M — bloat is /root/.local (11G), /root/.cache (3.5G), /root/snap (1.7G), /root/.ollama (1.2G). Not auto-cleaned (outside hermes logs scope).
+- **WARN** (1x): hermes-bug-hunter.service failed (exit 1 by design — 7 CRITICAL code-hygiene findings: sqlite/cursor leaks, bare excepts, f-string SQL, non-atomic JSON). Chronic, not new.
+- **WARN** (1x): hermes-ceo.service failed 17:57 UTC (exit 124 = timeout). Timer active, next run 21:47 UTC — self-recovers.
+- **AUTO-FIX**: bug_hunter.py false positives — dead_imports/defunct_imports were substring-matching comments and bug_hunter's own grep pattern. Now regex-match real import lines only, and skip bug_hunter.py itself. Verified: both checks PASS, 9→7 criticals.
+- **INFO**: No pipeline errors in 30min. Timers all firing. Prices fresh (1m: 67s). 59 signals/1h. 0 open / 19 closed today, +$1.12 PnL, 36.8% WR.

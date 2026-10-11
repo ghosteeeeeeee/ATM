@@ -1056,5 +1056,16 @@
     "after": "LONG_HIGH_OVERBOUGHT_RSI_MIN=70, LONG_HIGH_OVERBOUGHT_BLOCK=True; [LONG-HIGH-70] gate after midband in scoring loop",
     "rationale": "30d HIGH RSI70+: 40T 45%WR -$1.44 | 14d 20T -$0.48 | 7d 10T -$0.54. Avg win $0.09 vs avg loss $0.16 bad-RR tail. Blocks 18W +$1.68 / saves 20L -$3.12 → net +$1.44/30d. NORMAL 70-75 stays open (+$0.16/30d). Midband soak 2h: 30 blocks, 0 FP.",
     "impact": "Expected +$1.44/30d saved; blocks overbought HIGH-regime chase entries"
+  },
+  {
+    "timestamp": "2026-10-11T18:49:35Z",
+    "agent": "brain_auditor",
+    "change": "Cap B counts paper=false only — exclude paper continuum_engine BTC churn from SAME_DIR_30MIN_MAX",
+    "type": "bugfix",
+    "file": "decider_run.py",
+    "before": "Cap B counted ALL trades (paper+live) in 30min window",
+    "after": "Cap B counts only paper=false (capital-at-risk) trades",
+    "rationale": "24h: 8/10 over-cap LONG opens were paper continuum BTC (no SL/TP, NOT_HOTSET churn). Live-only count drops over-cap alt opens 10→1. Cap protects live capital; paper dust must not squat alt slots. Verified: alt trades 139/140 paper=False, continuum 13/14 paper=True. 0 live-only LONG in 30min window now (was 6 incl paper) — alt slots immediately unblocked.",
+    "impact": "Alt LONG signals no longer Cap-B-blocked by continuum paper churn. Immediate: window went 6→0 live-only. Prevents recurrence of 17:42-18:32 squat (8 continuum opens/50min)."
   }
 ]

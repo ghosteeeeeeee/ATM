@@ -3915,10 +3915,16 @@ def run(dry_run=False):
         try:
             _cap_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
             _cap_cur = _cap_conn.cursor()
+            # paper=false: Cap B protects live capital, so only count trades with capital
+            # at risk. Paper continuum_engine BTC churn (8 opens in 50min on 2026-10-11,
+            # no SL/TP, NOT_HOTSET quick-closes) was polluting the cap and squatting
+            # alt-LONG slots. 24h counterfactual: 8/10 over-cap LONG opens were paper
+            # continuum; live-only count drops over-cap alt opens 10→1.
             _cap_cur.execute("""
                 SELECT COUNT(*) FROM trades
                 WHERE direction = %s AND status = 'open'
                   AND open_time > NOW() - INTERVAL '30 minutes'
+                  AND paper = false
             """, (direction,))
             _same_dir_open = _cap_cur.fetchone()[0]
             # also count same-dir trades opened (then closed) within the window — they consumed the slot
@@ -3926,6 +3932,7 @@ def run(dry_run=False):
                 SELECT COUNT(*) FROM trades
                 WHERE direction = %s AND status = 'closed'
                   AND open_time > NOW() - INTERVAL '30 minutes'
+                  AND paper = false
             """, (direction,))
             _same_dir_closed = _cap_cur.fetchone()[0]
             _cap_conn.close()
