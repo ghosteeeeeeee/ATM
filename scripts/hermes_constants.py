@@ -2807,6 +2807,7 @@ STANDALONE_BYPASS_SIGNALS = (
     # ponytail: ema300-dip-short removed — killed Sep 8
     'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works solo
     'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works solo
+    'grind-breakout-v2+', 'grind-breakout-v2-', 'grind_breakout_v2',  # compression → volume breakout — works solo (2026-10-10)
     'tl_break_long', 'tl_break_short',
     'atr-spike',
     'ct-hot',
