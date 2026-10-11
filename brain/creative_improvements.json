@@ -3924,5 +3924,24 @@
     "category": "signal quality",
     "status": "suggested — signal_analyst owns volume-breakout tuning",
     "risk": "low — additive precondition"
+  },
+  {
+    "date": "2026-10-11T16:43:51Z",
+    "idea": "HIGH 70+ LONG block (next-run ship candidate)",
+    "rationale": "LONG meta-RSI 70+ in HIGH regime bleeds consistently: 30d 40T 45%WR -$1.44 | 14d 20T 50% -$0.48 | 7d 10T 40% -$0.54. Losers bigger than winners (7d: avg win +$0.08 vs avg loss -$0.15). Complements LONG_MIDBAND (60-70 non-EXTREME) — no overlap, different band+regime scope. Would block HIGH-regime overbought chase entries where momentum is exhausted.",
+    "expected_impact": "+$0.50-1.40/30d saved; blocks ~18 winners/30d (acceptable — losers dominate)",
+    "category": "entry sniper",
+    "status": "STAGED — ship next run after LONG_MIDBAND soaks 24h (one-variable discipline)",
+    "risk": "low",
+    "data": "7d: 10T 4W6L +$0.33/-$0.87 | 14d: 20T 10W10L +$0.87/-$1.35 | 30d: 40T 18W22L"
+  },
+  {
+    "date": "2026-10-11T16:43:51Z",
+    "idea": "Midband volume_spike exemption (MONITOR — not shippable)",
+    "rationale": "non-EXTREME 60-70 with volume_spike 1.0-2.0 = 16T 68.8%WR +$0.49 (would rescue from midband block). BUT: (1) coverage only 56% (54/96 trades have volume_spike in metadata) — filter would be blind on 44%; (2) 2.0+ band negative (1T -$0.18); (3) volume_spike field reliability unverified (DRIFT-E class risk). Also DISPROVED watchdog 'CFX won on volume' narrative — CFX volume_spike was 0.1 (low).",
+    "expected_impact": "+$0.49/30d IF coverage fixed — not worth complexity now",
+    "category": "entry sniper",
+    "status": "monitor — revisit when volume_spike write-path coverage >90%",
+    "risk": "medium (thin data, unreliable field)"
   }
 ]
