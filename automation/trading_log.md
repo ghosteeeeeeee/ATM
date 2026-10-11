@@ -8235,3 +8235,66 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - Market quiet 8 hours straight (0 trades since 07:00 win). 24h still +$0.22. volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
+
+## [2026-10-11 15:13] Hourly Analysis
+
+**Trades:** 2 closed last hour (2W 0L) — streak broke after 8h quiet
+**PnL:** last hour +$0.65 | 24h: 22T 9W +$0.87 (WR ~41%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Both winners: SYRUP r2v2-long3 +$0.59 (7.99%), ARB bb-bounce-v2-long+ +$0.06 (2.76%) — both profit-monster-trail exits
+- Kill: no signal with 0% WR + 3+ trades last hour. volume-breakout-long+ still 24h 2T 0W −$0.23, CEO-owned
+- atr_sl_hit 4/21 ≈ 19% — under 40%, tpsl_utils deployed
+- hard_max_loss 5/21 ≈ 24% −$0.41 — hold brain_auditor (SL width lever)
+- Overtrade: 2/hr (limit 20)
+- Streak: no 3-neg-hr run (hour 14 net positive)
+- live_trading=true, kill JSON=true, timers fresh (~1min ago)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Market activity resumed after 8h quiet. 24h +$0.87. Trailing exits doing the work (9/21 closes). volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
+
+## [2026-10-11 16:13] Hourly Analysis
+
+**Trades:** 1 closed last hour (BTC continuum_engine ORPHAN_PAPER $0.00 — effectively 0 real trades)
+**PnL:** last hour $0.00 | 24h: 21T 9W +$0.87 (WR ~43%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0 real trades last hour — no signal qualifies. volume-breakout-long+ 24h 2T 0W −$0.23, CEO-owned re-enable
+- atr_sl_hit 4/21 ≈ 19% — under 40%, tpsl_utils deployed
+- hard_max_loss 4/21 ≈ 19% −$0.30 — hold brain_auditor (SL width lever)
+- profit-monster-trail 9/21 = 43% of closes, +$1.12 — trailing exits driving profits
+- Overtrade: 1/hr (limit 20)
+- Streak: no 3-neg-hr run (hour 15 was +$0.65)
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- ORPHAN_PAPER close on BTC continuum_engine — paper trade leaking into closed trades table? Worth checking origin. 24h still +$0.87.
+
+## [2026-10-11 17:13] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** last hour $0.00 | 24h: 19T 8W +$0.97 (WR ~42%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0 trades last hour — no signal qualifies. volume-breakout-long+ 24h 2T 0W −$0.23, CEO-owned re-enable
+- atr_sl_hit 4/19 ≈ 21% — under 40%, tpsl_utils deployed
+- hard_max_loss 3/19 ≈ 16% −$0.19 — hold brain_auditor (SL width lever)
+- profit-monster-trail 8/19 = 42% of closes, +$1.07 — trailing exits still driving profits
+- Overtrade: 0/hr (limit 20)
+- Streak: no 3-neg-hr run (last active hours 14 +$0.65, 16 $0.00)
+- live_trading=true, kill JSON=true, timers fresh (~1min ago)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- volume-breakout-long+ still 24h 2T 0W, awaiting brain_auditor/CEO. ORPHAN_PAPER BTC close from hour 16 still unexplained (paper leak into closed table?)
