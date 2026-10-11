@@ -3104,8 +3104,29 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🚫 [PUMP-CHAIN-RSI-MIN] {token} LONG blocked — RSI={_rsi_val:.1f} < {PUMP_CHAIN_LONG_RSI_MIN} (oversold, 0% WR in 14d)")
                         continue
                     if _rsi_val is not None and _rsi_val > PUMP_CHAIN_LONG_RSI_MAX:
-                        log(f"  🚫 [PUMP-CHAIN-RSI-MAX] {token} LONG blocked — RSI={_rsi_val:.1f} > {PUMP_CHAIN_LONG_RSI_MAX} (overbought chase, 23.5%WR at RSI>=70/14d)")
-                        continue
+                        # FIX 2026-10-11: bull structure override — during confirmed bull
+                        # (score>80 + STRONG_POS), allow RSI up to 85. Pump-chain fires
+                        # AFTER the pump, so RSI is naturally high. Blocking RSI>75 in a
+                        # bull means the system never enters during pumps.
+                        _pc_bull_override = False
+                        try:
+                            _pc_bc = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                            try:
+                                _pc_br = _pc_bc.execute(
+                                    "SELECT state_score, zscore_tier, ts FROM continuum_states "
+                                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                ).fetchone()
+                            finally:
+                                _pc_bc.close()
+                            if _pc_br and _pc_br[2] and (time.time() - _pc_br[2]) < 600:
+                                _pc_bull_override = (_pc_br[0] is not None and _pc_br[0] > 80 and _pc_br[1] == 'STRONG_POS')
+                        except Exception:
+                            pass
+                        if _pc_bull_override and _rsi_val <= 85:
+                            log(f"  ✅ [PUMP-CHAIN-RSI-OVERRIDE] {token} LONG — RSI={_rsi_val:.1f} > {PUMP_CHAIN_LONG_RSI_MAX} but BTC bull (score>80 STRONG_POS), allowed up to 85")
+                        else:
+                            log(f"  🚫 [PUMP-CHAIN-RSI-MAX] {token} LONG blocked — RSI={_rsi_val:.1f} > {PUMP_CHAIN_LONG_RSI_MAX} (overbought chase, 23.5%WR at RSI>=70/14d)")
+                            continue
                 except ImportError:
                     pass
             # ── Coiled Spring regime filter ──────────────────────────────────

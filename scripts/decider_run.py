@@ -4721,12 +4721,28 @@ def run(dry_run=False):
                 _sig_z = _ctx_gate_get_zscore(token)
             _is_chase = False
             _chase_reason = ''
+            # FIX 2026-10-11: bull structure override — gap relaxed to 3.0% in bull.
+            _chase_gap_limit = CHASE_GAP_MAX_PCT
+            try:
+                _chg_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                try:
+                    _chg_row = _chg_conn.execute(
+                        "SELECT state_score, zscore_tier, ts FROM continuum_states "
+                        "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                    ).fetchone()
+                finally:
+                    _chg_conn.close()
+                if _chg_row and _chg_row[2] and (time.time() - _chg_row[2]) < 600:
+                    if _chg_row[0] is not None and _chg_row[0] > 80 and _chg_row[1] == 'STRONG_POS':
+                        _chase_gap_limit = 3.0
+            except Exception:
+                pass
             if _sig_z is not None and float(_sig_z) > CHASE_ZSCORE_MAX:
                 _is_chase = True
                 _chase_reason = f'z={_sig_z}>{CHASE_ZSCORE_MAX}'
-            elif _gap_at_entry is not None and _gap_at_entry > CHASE_GAP_MAX_PCT:
+            elif _gap_at_entry is not None and _gap_at_entry > _chase_gap_limit:
                 _is_chase = True
-                _chase_reason = f'gap={_gap_at_entry:.2f}%>{CHASE_GAP_MAX_PCT}%'
+                _chase_reason = f'gap={_gap_at_entry:.2f}%>{_chase_gap_limit}%'
             if _is_chase:
                 log(f'  🎯 [CHASE-BLOCK] {token} {direction} BLOCKED — {_chase_reason}')
                 if sig_id:
@@ -4736,15 +4752,31 @@ def run(dry_run=False):
 
         # ── pump-chain+ MAX_ENTRY_GAP filter: block chasing entries ──────────
         # 14d: gap>1.5% pump-chain+ LONG = 6T 33.3%WR -$0.43. Blocks 4 losers,2 marginal winners.
+        # FIX 2026-10-11: bull structure override — gap relaxed to 3.0% when BTC score>80+STRONG_POS.
+        # Pump-chain fires AFTER the pump, so gap is naturally >1.5%. In a bull, entering
+        # with wider gap is profitable; the 1.5% cap made pump-chain+ unexecutable during pumps.
         try:
             from hermes_constants import PUMP_CHAIN_LONG_MAX_ENTRY_GAP
-            # ponytail: live sig payload stores name in `source`, not signal_type —
-            # filter was dead (INJ gap=1.98% filled 2026-10-03 despite 1.5% cap).
-            # Mirror the working PUMP-CHAIN-STALE check above which reads `source`.
             _pc_st = f"{sig.get('signal_type') or ''} {source or ''}"
             if ('pump-chain' in _pc_st or 'pump_chain' in _pc_st) and direction.upper() == 'LONG':
-                if _gap_at_entry is not None and _gap_at_entry > PUMP_CHAIN_LONG_MAX_ENTRY_GAP:
-                    log(f'  🎯 [PUMP-CHAIN-GAP-BLOCK] {token} LONG BLOCKED — gap={_gap_at_entry:.2f}%>{PUMP_CHAIN_LONG_MAX_ENTRY_GAP}%')
+                _pc_gap_limit = PUMP_CHAIN_LONG_MAX_ENTRY_GAP
+                # Bull structure override
+                try:
+                    _pcg_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                    try:
+                        _pcg_row = _pcg_conn.execute(
+                            "SELECT state_score, zscore_tier, ts FROM continuum_states "
+                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _pcg_conn.close()
+                    if _pcg_row and _pcg_row[2] and (time.time() - _pcg_row[2]) < 600:
+                        if _pcg_row[0] is not None and _pcg_row[0] > 80 and _pcg_row[1] == 'STRONG_POS':
+                            _pc_gap_limit = 3.0
+                except Exception:
+                    pass
+                if _gap_at_entry is not None and _gap_at_entry > _pc_gap_limit:
+                    log(f'  🎯 [PUMP-CHAIN-GAP-BLOCK] {token} LONG BLOCKED — gap={_gap_at_entry:.2f}%>{_pc_gap_limit}%')
                     if sig_id:
                         mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                     skipped += 1
