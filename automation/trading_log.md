@@ -7946,3 +7946,26 @@ Last hour: NXPC doji-bottom-long profit-monster-trail +$0.06 (+1.47%). 1 open: A
 **Open Questions:**
 - 24h WR ~39% at ~−$1.07 — volume-breakout-long+ remains sole biggest drag (CEO-owned)
 - AIXBT $22.10 open = 2× size flag recurring — sizing audit still pending brain_auditor
+
+## [2026-10-11 03:14] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** −$0.16 last hour | 24h: 27T 9W −$1.01 (WR 33.3%)
+
+Last hour: both hard_max_loss exits — USELESS volume-breakout-long+ −$0.09 (−2.47%), INJ ai-trader+ −$0.07 (−3.09%). 1 open: AIXBT pump-chain LONG $22.10 (2× size flag recurring).
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: volume-breakout-long+ had 1T last hour (not 3+) — 24h 7T 0W −$0.89 remains worst but CEO-owned re-enable + brain_auditor RSI ceiling/floor wired 02:43
+- atr_sl_hit 5/27 = 18.5% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/27 = 30% −$0.97 dominant loser — hold brain_auditor SL width lever
+- Overtrade: 2/hr (limit 20)
+- Streak: hour 03 −$0.16 but hour 02 empty, hour 01 +$0.06 — no 3-neg-hr run; no size lever
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 33% at −$1.01 — hard_max_loss 30% of closes still dominant (brain_auditor-owned)
+- AIXBT $22.10 = 2× size flag recurring (3rd+ occurrence) — sizing audit still pending brain_auditor
