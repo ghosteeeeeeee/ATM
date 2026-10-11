@@ -60,6 +60,7 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
+        'grind-breakout-v2+', 'grind-breakout-v2-', 'grind_breakout_v2',  # compression → volume breakout — added 2026-10-10
         'continuum+', 'continuum-',  # continuum score extreme signals — contrarian, works in range-bound
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
@@ -100,6 +101,7 @@ REGIME_SIGNALS = {
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'bb-squeeze+', 'bb_squeeze+', 'bb-squeeze', 'bb_squeeze',  # BB squeeze breakout — added 2026-10-10: ZORA LONG blocked in NORMAL
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
+        'grind-breakout-v2+', 'grind-breakout-v2-', 'grind_breakout_v2',  # compression → volume breakout — added 2026-10-10
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
         'trend_purity+', 'trend_purity-',  # trend following — fires in NORMAL (primary regime)
@@ -155,6 +157,7 @@ REGIME_SIGNALS = {
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
+        'grind-breakout-v2+', 'grind-breakout-v2-', 'grind_breakout_v2',  # compression → volume breakout — added 2026-10-10
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong moves confirm through EMA
         # trend_purity+ REMOVED from HIGH — 33.3% WR, -$0.50 (3 trades). Wins in EXTREME (57.1%).
@@ -185,6 +188,7 @@ REGIME_SIGNALS = {
         # pump-chain- SHORT removed 2026-10-01 — EXTREME Pump_Flow=0.0 hard block; REGIME_SIGNALS was stale dead path
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works in storms
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in storms
+        'grind-breakout-v2+', 'grind-breakout-v2-', 'grind_breakout_v2',  # compression → volume breakout — added 2026-10-10
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — strong momentum confirms through EMA
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
