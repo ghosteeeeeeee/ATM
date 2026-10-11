@@ -7900,3 +7900,49 @@ Last hour: AIXBT doji-bottom-long profit-monster-trail +$0.08 (+1.11%) / ETH hma
 **Open Questions:**
 - 24h drifted to −$0.46 at 40.6% WR — hmacd_mtf-- (3T 1W −$0.07) now also negative; volume-breakout-long+ still the main drag
 - ETH 2× sizing flag resolved by exit; sizing audit still pending brain_auditor
+
+## [2026-10-11 01:14] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 last hour | 24h: 27T 10W −$1.13 (WR 37.0%)
+
+Last hour: 0 closes. 1 open: NXPC doji-bottom-long LONG $11.10 (sized OK, opened 00:50).
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal 3+T at 0% WR. volume-breakout-long+ 24h 7T 0W −$0.97 (worst, all LONG) but 0 closes last hour; CEO re-enabled 12:25, RSI ceiling 95→85 by brain_auditor today
+- atr_sl_hit 5/27 = 18.5% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/27 = 30% −$1.04 dominant loser — hold brain_auditor SL width lever
+- Overtrade: 0/hr (limit 20)
+- Streak: hour 00 empty, prior hour 23 positive — no 3-neg-hr run; no size lever
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR drifted 41%→37% at −$1.13 (winners aging out of window; volume-breakout-long+ now 0W/7T −$0.97 sole biggest drag — CEO-owned re-enable)
+- NXPC open $11.10 sized OK
+
+## [2026-10-11 02:14] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.06 last hour | 24h: 28T 11W ~−$1.07 (WR ~39%)
+
+Last hour: NXPC doji-bottom-long profit-monster-trail +$0.06 (+1.47%). 1 open: AIXBT pump-chain+ LONG $22.10 (opened 01:35 — $22.10 = 2× size flag again).
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 1T last hour (won) — no signal 3+T at 0% WR. volume-breakout-long+ 24h 7T 0W −$0.97 still worst but 0 closes last hour; CEO-owned re-enable + brain_auditor RSI ceiling 85
+- atr_sl_hit 5/28 ≈ 18% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/28 ≈ 29% −$1.04 dominant loser — hold brain_auditor (SL width lever)
+- Overtrade: 1/hr (limit 20)
+- Streak: hour 01 positive (+$0.06) — no 3-neg-hr run; no size lever
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR ~39% at ~−$1.07 — volume-breakout-long+ remains sole biggest drag (CEO-owned)
+- AIXBT $22.10 open = 2× size flag recurring — sizing audit still pending brain_auditor
