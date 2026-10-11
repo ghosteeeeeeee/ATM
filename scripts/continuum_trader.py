@@ -529,13 +529,14 @@ class ContinuumTrader:
             cur = conn.cursor()
 
             # Insert into trades table (used by guardian for orphan detection)
+            # NOTE: exchange MUST be 'Hyperliquid' (capitalized) — guardian filters on this exact string
             cur.execute("""
                 INSERT INTO trades (token, direction, strategy, amount_usdt, entry_price,
                                    status, exchange, signal, paper, server, confidence, leverage,
                                    open_time, created_at, _signal_metadata)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s)
             """, ('BTC', side, 'continuum', size_btc, entry_price,
-                  'open', 'hyperliquid', 'continuum_engine', True, 'main', conf, 10,
+                  'open', 'Hyperliquid', 'continuum_engine', True, 'main', conf, 10,
                   json.dumps(meta)))
 
             conn.commit()
