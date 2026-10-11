@@ -1888,6 +1888,10 @@ def sync_pnl_from_hype(prices):
                 # UnboundLocalError when used at line 904 before local def at line 931.
                 if pnl_pct <= CUT_LOSER_THRESHOLD:
                         log(f'  [CUT-LOSER] {token} PnL={pnl_pct:.2f}% <= {CUT_LOSER_THRESHOLD}% — closing', 'FAIL')
+                        # CONTINUUM EXEMPTION: Never close BTC (continuum manages it)
+                        if token.upper() == 'BTC':
+                            log(f'  ⛔ CONTINUUM: skipping CUT-LOSER close for {token}', 'WARN')
+                            continue
                         from hyperliquid_exchange import close_position
 
                         # Retry close up to 2 times on failure
@@ -2376,6 +2380,11 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
         except:
             pass
     _update_rate()
+
+    # CONTINUUM EXEMPTION: Never close BTC (continuum manages it)
+    if token.upper() == 'BTC':
+        log(f'  ⛔ CONTINUUM: skipping STALE-ROTATION close for {token}', 'WARN')
+        return
 
     from hyperliquid_exchange import close_position
 
@@ -3092,13 +3101,14 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         CASCADE_FLIP   = cascade flip
         MANUAL_CLOSE   = T manually closed via kill switch
     """
+    # BUG-FIX B7: Kill switch check — skip if T manually closed this token
+    # (checked BEFORE continuum exemption so T can manually close BTC)
+    if _is_token_killed(token):
+        log(f'  Kill switch: skipping close for {token} ({reason})', 'INFO')
+        return
     # CONTINUUM EXEMPTION: Never close BTC trades managed by the continuum engine
     if token.upper() == 'BTC':
         log(f'  ⛔ CONTINUUM: skipping paper close for {token} ({reason}) — continuum manages BTC', 'WARN')
-        return
-    # BUG-FIX B7: Kill switch check — skip if T manually closed this token
-    if _is_token_killed(token):
-        log(f'  Kill switch: skipping close for {token} ({reason})', 'INFO')
         return
     if DRY:
         log(f'  [DRY] Would close paper trade #{trade_id} ({reason})', 'WARN')

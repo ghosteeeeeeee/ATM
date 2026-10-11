@@ -985,7 +985,8 @@ class ContinuumEngine:
         else:
             side = self._last_side or 'LONG'  # AT zone: hold previous or default LONG
         
-        self._last_side = side  # Track for AT zone fallback and flip detection
+        prev_side = self._last_side  # Snapshot BEFORE updating (for flip detection)
+        self._last_side = side  # Track for AT zone fallback
         
         # Debug: log entry to update method
         print(f"[CONTINUUM] _update: phase={self.entry_phase}, side={side}, dur={state.ema300_duration}, z={state.zscore_tier}")
@@ -1053,10 +1054,10 @@ class ContinuumEngine:
                 # Z-score reversed against trade direction — step back
                 self.entry_phase = 2
                 print(f"[CONTINUUM] Phase 3→2: z-score reversed ({state.zscore_tier} vs {side})")
-            elif (self._last_side == 'LONG' and side == 'SHORT') or (self._last_side == 'SHORT' and side == 'LONG'):
+            elif (prev_side == 'LONG' and side == 'SHORT') or (prev_side == 'SHORT' and side == 'LONG'):
                 # EMA300 position flipped — reset phase
                 self.entry_phase = 0
-                print(f"[CONTINUUM] Phase reset: EMA300 flipped from {self._last_side} to {side}")
+                print(f"[CONTINUUM] Phase reset: EMA300 flipped from {prev_side} to {side}")
         
         # Phase 4 → 5: Sustained score confirmation (filters false alarms)
         if self.entry_phase == 4:

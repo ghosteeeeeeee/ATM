@@ -55,10 +55,10 @@ def save_positions(positions: list):
     with open(POSITION_FILE_PATH, 'w') as f:
         json.dump(positions, f, indent=2)
 
-def track_entry(side: str, entry_price: float, size_usd: float, order_id: str = None):
+def track_entry(side: str, entry_price: float, size_usd: float, order_id: str = None, manual: bool = False):
     """Record a new position."""
     positions = load_positions()
-    positions.append({
+    entry = {
         'side': side,
         'entry_price': entry_price,
         'size_usd': size_usd,
@@ -66,9 +66,12 @@ def track_entry(side: str, entry_price: float, size_usd: float, order_id: str = 
         'entry_time_str': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
         'order_id': order_id,
         'tag': POSITION_TAG,
-    })
+    }
+    if manual:
+        entry['manual'] = True
+    positions.append(entry)
     save_positions(positions)
-    print(f"[TRADER] Tracked entry: {side} ${size_usd:.0f} @ {entry_price:.1f}")
+    print(f"[TRADER] Tracked entry: {side} ${size_usd:.0f} @ {entry_price:.1f}{' (manual)' if manual else ''}")
 
 def track_exit(entry_price: float, exit_price: float, pnl: float):
     """Record a position exit."""
@@ -270,6 +273,21 @@ class ContinuumTrader:
         self.trades_today = 0
         self.last_loss_time = 0
         self.last_trade_date = None
+        
+        # Restore engine state from position file (prevents restart from closing positions)
+        self._restore_state_from_file()
+    
+    def _restore_state_from_file(self):
+        """Restore engine position state from continuum_positions.json.
+        Prevents restart from force-closing live positions."""
+        positions = get_our_positions()
+        if positions:
+            # Use the most recent position
+            pos = positions[-1]
+            self.engine.position_side = pos['side']
+            self.engine.entry_phase = 6
+            self.last_position_side = pos['side']
+            print(f"[TRADER] Restored state: {pos['side']} @ ${pos['entry_price']:.1f} (Phase 6)")
         
     def _can_trade(self) -> tuple:
         """Check if we're allowed to trade. Returns (can_trade, reason)."""
