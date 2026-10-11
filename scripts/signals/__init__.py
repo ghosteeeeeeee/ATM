@@ -30,6 +30,7 @@ from hermes_constants import (
     ACCEL_300_MINUS_ENABLED,
     ICHIMOKU_ENABLED,
     VOLUME_BREAKOUT_ENABLED,
+    VOLUME_BUILDUP_ENABLED, VOLUME_BUILDUP_PLUS_ENABLED, VOLUME_BUILDUP_MINUS_ENABLED,
     RANGE_REVERSION_ENABLED,
     RANGE_REVERSION_PLUS_ENABLED, RANGE_REVERSION_MINUS_ENABLED,
     COILED_SPRING_ENABLED, COILED_SPRING_PLUS_ENABLED, COILED_SPRING_MINUS_ENABLED,
@@ -238,6 +239,11 @@ try:
     from signals.volume_breakout import run as _volume_breakout_run
 except Exception:
     _volume_breakout_run = None
+
+try:
+    from signals.volume_buildup import run as _volume_buildup_run
+except Exception:
+    _volume_buildup_run = None
 
 try:
     from signals.range_reversion_long import scan_range_reversion_long_signals as _range_reversion_long_run
@@ -525,6 +531,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'inverse_accel_300_v2',     'enabled': INVERSE_ACCEL_300_V2_ENABLED,   'run': _inverse_accel_300_v2_run},
     {'name': 'ichimoku_cloud',           'enabled': ICHIMOKU_ENABLED,              'run': _ichimoku_run},
     {'name': 'volume_breakout',           'enabled': 'VOLUME_BREAKOUT_ENABLED',     'run': _volume_breakout_run},
+    {'name': 'volume_buildup',            'enabled': 'VOLUME_BUILDUP_ENABLED',      'run': _volume_buildup_run},
     {'name': 'range_reversion_long',       'enabled': 'RANGE_REVERSION_PLUS_ENABLED',  'run': _range_reversion_long_run},
     {'name': 'range_reversion_short',      'enabled': 'RANGE_REVERSION_MINUS_ENABLED', 'run': _range_reversion_short_run},
     {'name': 'coiled_spring',             'enabled': 'COILED_SPRING_ENABLED',         'run': _coiled_spring_run},

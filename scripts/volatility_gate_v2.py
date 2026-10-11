@@ -61,6 +61,7 @@ REGIME_SIGNALS = {
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'grind-breakout-v2+', 'grind-breakout-v2-', 'grind_breakout_v2',  # compression → volume breakout — added 2026-10-10
+        'volume-buildup+', 'volume-buildup-', 'volume_buildup',  # sustained volume buildup — added 2026-10-11
         'continuum+', 'continuum-',  # continuum score extreme signals — contrarian, works in range-bound
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
@@ -102,6 +103,7 @@ REGIME_SIGNALS = {
         'bb-squeeze+', 'bb_squeeze+', 'bb-squeeze', 'bb_squeeze',  # BB squeeze breakout — added 2026-10-10: ZORA LONG blocked in NORMAL
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         'grind-breakout-v2+', 'grind-breakout-v2-', 'grind_breakout_v2',  # compression → volume breakout — added 2026-10-10
+        'volume-buildup+', 'volume-buildup-', 'volume_buildup',  # sustained volume buildup — added 2026-10-11
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
         'trend_purity+', 'trend_purity-',  # trend following — fires in NORMAL (primary regime)

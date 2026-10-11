@@ -1720,6 +1720,10 @@ SIGNAL_EXIT_CONFIG = {
     'grind-breakout-v2+': 'rr_engine',
     'grind-breakout-v2-': 'rr_engine',
     'grind_breakout_v2': 'rr_engine',   # underscore variant
+    # Volume buildup: ride-it exit — sustained volume means let the trend run
+    'volume-buildup+': 'ride_it',
+    'volume-buildup-': 'ride_it',
+    'volume_buildup': 'ride_it',   # underscore variant
     # Default: PM trail (current behavior for all signals not listed)
 }
 
@@ -2334,7 +2338,7 @@ GRIND_BREAKOUT_BREAKOUT_BONUS_BUFFER = 0.005  # 0.5% above range for breakout bo
 GRIND_BREAKOUT_V2_ENABLED = True           # master kill-switch
 GRIND_BREAKOUT_V2_PLUS_ENABLED = True      # LONG direction
 GRIND_BREAKOUT_V2_MINUS_ENABLED = True     # SHORT direction
-GRIND_BREAKOUT_V2_COOLDOWN_HOURS = 2       # per token+direction cooldown
+GRIND_BREAKOUT_V2_COOLDOWN_HOURS = 0.25    # 15 min per token+direction cooldown
 # Compression precondition (the coiled spring)
 GRIND_BREAKOUT_V2_BB_COMPRESS_MAX = 3.0    # BB(20,2.0) width must be below this % before breakout
 GRIND_BREAKOUT_V2_COMPRESS_LOOKBACK = 10   # bars to check for compression (10 bars = 50min on 5m)
@@ -2359,6 +2363,26 @@ GRIND_BREAKOUT_V2_CONF_VOL_HALF_MULT = 2.5   # volume ratio for half bonus
 GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS = 3     # +3 if |acceleration| > ACCEL_BONUS_MIN
 GRIND_BREAKOUT_V2_CONF_ACCEL_BONUS_MIN = 0.01  # acceleration magnitude for bonus
 GRIND_BREAKOUT_V2_CONF_MACD_BONUS = 2      # +2 if MACD histogram rising
+
+# ── volume_buildup (sustained volume accumulation → sustained breakout) ────────
+# volume_buildup.py — like volume-breakout but requires SUSTAINED volume over N bars
+# Catches CHIP (+29%)/CFX (+20%) style: institutional accumulation, not single-bar spike
+VOLUME_BUILDUP_ENABLED = True             # master kill-switch
+VOLUME_BUILDUP_PLUS_ENABLED = True        # LONG direction
+VOLUME_BUILDUP_MINUS_ENABLED = True       # SHORT direction
+VOLUME_BUILDUP_COOLDOWN_HOURS = 2         # per token+direction cooldown
+VOLUME_BUILDUP_BARS = 4                   # number of consecutive bars that must be above avg volume
+VOLUME_BUILDUP_VOL_MULT = 1.5             # each bar must be >= this × average volume
+VOLUME_BUILDUP_VOL_AVG_PERIOD = 20        # bars for average volume
+VOLUME_BUILDUP_RSI_MAX = 75               # LONG: RSI must be below this (not overbought)
+VOLUME_BUILDUP_RSI_MIN = 30               # SHORT: RSI must be above this (not oversold)
+VOLUME_BUILDUP_RSI_PERIOD = 14            # RSI period
+VOLUME_BUILDUP_MIN_PRICE_CHANGE_PCT = 1.5 # min % price move over the N bars to confirm direction
+VOLUME_BUILDUP_CONF_BASE = 75             # base confidence
+VOLUME_BUILDUP_CONF_FLOOR = 50            # min confidence
+VOLUME_BUILDUP_CONF_CAP = 88              # max confidence (system ceiling)
+VOLUME_BUILDUP_CONF_VOL_BONUS = 5         # +5 if avg volume ratio >= 3.0x
+VOLUME_BUILDUP_CONF_MOMENTUM_BONUS = 3    # +3 if |price change| >= 3.0%
 
 # ── grind_trend (accumulation grind — steady drift, no breakout needed) ───────
 # grind_trend.py — low-volatility accumulation grind signal
@@ -2815,6 +2839,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works solo
     'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works solo
     'grind-breakout-v2+', 'grind-breakout-v2-', 'grind_breakout_v2',  # compression → volume breakout — works solo (2026-10-10)
+    'volume-buildup+', 'volume-buildup-', 'volume_buildup',  # sustained volume buildup — works solo (2026-10-11)
     'tl_break_long', 'tl_break_short',
     'atr-spike',
     'ct-hot',
