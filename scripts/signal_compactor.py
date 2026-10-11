@@ -5206,21 +5206,21 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # just entered the merge window and should stay PENDING.
                     created_ts = time.mktime(time.strptime(sig_created_at, '%Y-%m-%d %H:%M:%S'))
                     age_m = (time.time() - created_ts) / 60.0
-                    # Staleness = 5 min. Signals must find confluence (enter top-10) within
-                    # 5 min or they expire. Same timer as hot-set expiry — stale signals
-                    # no longer useful.
-                    if age_m < 5.0:
+                    # Staleness = SIGNAL_EXPIRY_MINUTES (default 15min). Signals must
+                    # find confluence (enter top-10) within this window or they expire.
+                    from hermes_constants import SIGNAL_EXPIRY_MINUTES
+                    if age_m < SIGNAL_EXPIRY_MINUTES:
                         still_pending_ids.append(sid)
                     else:
-                        # age_m >= 5: no new firing for 5 min → EXPIRED
+                        # age_m >= threshold: no new firing → EXPIRED
                         c.execute("""
                             UPDATE signals
                             SET decision = 'EXPIRED',
-                                decision_reason = 'expired: no refire for 5min (stale signal)',
+                                decision_reason = %s,
                                 expired_at = CURRENT_TIMESTAMP,
                                 updated_at = CURRENT_TIMESTAMP
                             WHERE id = ?
-                        """, (sid,))
+                        """, (f'expired: no refire for {SIGNAL_EXPIRY_MINUTES}min (stale signal)',))
                         expired_ids.append(sid)
 
             if approved_ids:

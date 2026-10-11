@@ -3183,6 +3183,13 @@ FAST_MOMENTUM_MINUS_ENABLED = True  # Re-enabled 2026-08-10 — backtested: 0.08
 HOTSET_ENABLED = True
 # HH_HL_ENABLED — see Signal Family Killswitches section (line ~398)
 
+# ── Signal Expiry ─────────────────────────────────────────────────────────────
+# How long a PENDING signal can go without being refired before it expires.
+# 5min was too aggressive for signals that fire on 5m candles (volume-buildup
+# needed the full 20min window to accumulate). 15min gives compactor time to
+# process signals that fire on slower timeframes.
+SIGNAL_EXPIRY_MINUTES = 15              # minutes without refire before EXPIRED
+
 # ── Confluence Gate ───────────────────────────────────────────────────────────
 # When True (default): single-source signals are blocked from hot-set (require 2+ sources).
 # When False: single-source signals are allowed to pass through.
