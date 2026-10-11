@@ -64,12 +64,19 @@ class RegimeMemory:
         self._data = self._load()
     
     def _load(self):
-        """Load memory from disk."""
+        """Load memory from disk. Validate schema — foreign writers have clobbered this file before (2026-10-11: snapshot dump overwrote it, crashed signal_decay_detector with KeyError 'signals')."""
         try:
             with open(self.memory_file) as f:
-                return json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            return {'signals': {}, 'updated_at': None}
+                data = json.load(f)
+            if isinstance(data, dict) and isinstance(data.get('signals'), dict):
+                return data
+            keys = list(data)[:8] if isinstance(data, dict) else type(data).__name__
+            print(f"[regime-memory] corrupt schema, resetting. keys={keys}")
+        except FileNotFoundError:
+            pass
+        except (json.JSONDecodeError, OSError, TypeError, ValueError) as e:
+            print(f"[regime-memory] load failed, resetting: {e}")
+        return {'signals': {}, 'updated_at': None}
     
     def _save(self):
         """Save memory to disk."""

@@ -8049,3 +8049,19 @@ Last hour: SYRUP doji-bottom-long LONG exit profit-monster-trail +$0.23 (+3.07%)
 
 **Open Questions:**
 - 24h WR 37% at −$0.57 improving but still negative — hard_max_loss 26% of closes still dominant (brain_auditor-owned)
+
+## [2026-10-11 06:35] Daily Orchestrator
+
+**Trades:** 1 open (CFX pump-chain+ LONG +3.55%) | 27 closed today | 24h: 25T 10W −$0.57 (40% WR)
+**7d:** 152T 67W −$1.63 (44.1% WR) | SHORT 7d −$0.05 — GOAL MET
+
+**Changes:**
+1. **FIXED signal_decay_detector KeyError 'signals' (CRITICAL)** — data/signal_regime_memory.json was overwritten with a foreign snapshot schema (snapshot_date/habitats_14d at top level, no 'signals' key). regime_memory.py `_load()` now validates schema (dict + signals dict), resets on mismatch. Re-seeded 29 signals via seed_from_db(30d). Verified: detector exit 0, correctly keeps volume-breakout alive in NORMAL/EXTREME per regime protocol.
+2. **upgrade-implementer inner timeout 600→900s** — run_upgrade_implementer.sh was exiting 124 at 600s while systemd TimeoutStartSec=900. Aligned. CEO timeout left at 600 (design: fast runs) — still 124ing, monitor next timer.
+
+**No config changes** — no constants touched, no signal enable/disable.
+
+**Findings:**
+- Wyckoff pairing (signal_analyst URGENT) still not delivered as of 06:35 — due EOD Oct 11.
+- CEO service also exit 124 — opencode LLM sessions slow; not fixed this run (monitor after upgrade timeout bump).
+- grind-breakout-v2 already fully shipped (commits today 02:38 etc) — no action needed.

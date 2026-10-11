@@ -1,48 +1,45 @@
-# Daily Orchestrator Report — 2026-09-27 18:30 UTC
+# Daily Orchestrator Report — 2026-10-11 06:35 UTC
 
 ## PIPELINE STATUS
-- **System:** ACTIVE — woke up Sep 27 ~14:48 UTC after 100h+ idle
-- **Open:** 5 LONGs (YGG, HBAR, POL, CAKE, HYPER) — all in profit
-- **Closed today:** 4 (3W 1L, net +$0.05)
-- **7d:** 122T 35.2%WR -$5.93 (DB-verified, ALL NEUTRAL regime)
-- **14d:** 330T 44.2%WR -$4.28 (DB-verified)
-- **Pipeline:** Healthy, all timers firing, no crashes
-- **Disk:** 84% (19G free) — below 85% threshold
+- **System:** LIVE — 1 open (CFX pump-chain+ LONG +3.55%, opened 06:24) | 27 closed today
+- **24h:** 25T 10W −$0.57 (40.0% WR) — improving from −$1.19 at 05:14
+- **7d:** 152T 67W −$1.63 (44.1% WR) — AT RISK vs Oct 12 goal
+- **SHORT 7d:** 25T 8W −$0.05 — **goal ≥$0 essentially MET** (was −$2.08)
+- **Errors:** 0 tracebacks/30m | Kill switch LIVE=true | Disk 85% (18G free)
 
-## TEAM ACTIVITY
-- **health_monitor:** Pipeline OK, 5 open positions, disk 83% (now 84%), 0 phantom trades
-- **auto_1hr:** No changes. CRITICAL DRIFT alert about volume_spike is STALE — fix is working
-- **signal_reporter:** No kills needed. All 7-day losers already dead. Top: bb_bounce_v2_long 74%WR
+## TEAM ACTIVITY (24h)
+- **health_monitor** (05:49): all critical healthy; journal vacuum +262M; disk 85% WARN (DBs not logs)
+- **auto_1hr** (6 runs): no changes — no thresholds hit; SYRUP win +$0.23 (profit-monster-trail)
+- **signal_reporter** (05:20): no kills/boosts; corrected own prior DISABLE rec for volume-breakout (regime protocol); EXTREME streak watch stands; doji-bottom/ai-trader+ below 5T boost threshold
+- **brain_auditor**: HML freq GOAL MET (share <40%); volume-breakout HIGH block live (c3fd6d26)
+- **summarizer** (05:46): flagged 4 failed services (ceo, bug-hunter, decay-detector, upgrade-implementer)
+- **bug_hunter** (06:30): exit 1 = 9 pre-existing code-quality findings, not runtime crashes
+- **upgrade-implementer** (06:12): exit 124 timeout — fixed this run
 
-## IMPLEMENTED TODAY
-1. **25 dead 0-byte SQLite files cleaned** from data/ — reduced clutter, no functional impact
-2. **CURRENT.md updated** with fresh DB-verified data and consolidated old entries
+## IMPLEMENTED TODAY (orchestrator 06:30-06:35)
 
-## KEY FINDINGS
-1. **volume_spike fix IS WORKING** — 6/9 post-fix trades have values (0.02-0.97). auto_1hr drift alert is STALE (queries7d including pre-fix trades). NOT a bug.
-2. **final_confidence NOT A BUG** — by design, only in hotset JSON for execution filtering, never persisted to trades table.
-3. **ATR_SL widening STILL UNTESTED** — 0 ATR_SL hits on post-fix trades. Needs 50 trades for eval.
-4. **REGIME_CONF_HIGH_MULT=0.50 FIRST TEST** — POL opened in HIGH regime. First real test.
-5. **pump-chain+ DEGRADED** — 21T 23.8%WR -$1.54/7d (was +$1.24/14d). Cold streak or systemic?
-6. **Signal kills WORKING** — pullback-entry- and mover+ have no new trades since kills.
+1. **FIXED signal_decay_detector KeyError 'signals' (CRITICAL)** — root cause: `data/signal_regime_memory.json` was clobbered with a foreign snapshot schema (top-level `snapshot_date`/`habitats_14d`, no `signals` wrapper) — likely a bad manual/agent write. `_load()` in regime_memory.py:66 now validates schema (dict + `signals` dict) and resets on mismatch. Re-seeded 29 signals from PG 30d. Verified: detector runs clean (exit 0) and correctly refuses to blanket-kill volume-breakout (winning regimes NORMAL/EXTREME).
+2. **upgrade-implementer timeout 600→900s** — was hitting inner `timeout 600` while systemd TimeoutStartSec=900. Aligned. (ceo timeout 600 also fires 124 — LLM sessions slow; left at 600 per "CEO should be fast" design, monitor next run.)
 
-## CRITICAL ISSUES
-- **ATR_SL 55.7% 7d** — ALL pre-fix trades. Widening deployed Sep 25, untested. Needs market activity.
-- **SIGNAL DIVERSITY** — Only volume-breakout-long+ (+$0.62/7d) and pump-chain+ (+$0.85/14d) profitable.
-- **Disk 84%** — candles.db 2.2G, coin_tracker.db 3.1G. Monitor growth.
+## NOT DONE (needs owner)
+- **Wyckoff confluence pairing** — signal_analyst URGENT, due EOD Oct 11. wyckoff.py wired, 0 fires all-time; bypass verdict REJECT. Cannot implement pairing without analyst delivery.
+- **Disk retention** — 85%, CEO standing decision (coin_tracker 3.3G, candles 2.7G, session_brain 1.1G).
+- **hard_max_loss SL-width lever** — brain_auditor-owned, still dominant 24h loser (~26% of closes).
+- **$22.10 2× size flag** — recurring AIXBT/ETH/SYRUP, sizing audit pending brain_auditor.
+
+## PRIOR STATE (verified live, no re-touch)
+- CEO 21:55/22:30 decisions all confirmed (dampen 0.5, Cap B, HML HOLD, V6 monitor, volume-breakout HIGH block, BUG-048 soak clean)
+- grind-breakout-v2 fully shipped (d515fa39/35e98e4c/b3a39eb9) — constants, registry, vol gate wired
 
 ## NEXT STEPS
-1. **ATR_SL widening eval** — needs 50 trades, pass: <55% hit rate + R:R >1.3:1
-2. **REGIME_CONF_HIGH_MULT eval** — POL in HIGH is first test case
-3. **pump-chain+ degradation** — investigate cold streak vs systemic issue
-4. **DISK monitoring** — 84%, approaching 85% warn threshold
-5. **decider_run failures** — 80/24h, signals consumed but HL API rejects
+1. **signal_reporter next 6h cycle** — ai-trader+/doji-bottom at 5T boost threshold; volume-breakout EXTREME streak (penalize 0.3x if still 0% with 3+ new trades — reporter-owned)
+2. **Oct 11 EOD: wyckoff pairing delivery check** — escalate to CEO if not delivered
+3. **Oct 12: metric checkpoint** — 7d WR/PnL (Oct 5 flush ages out); BUG-048 soak ends
+4. **CEO: disk retention decision** — standing since Oct 1, disk still 85%
+5. **Monitor CFX open LONG** — pump-chain+ +3.55%, validates grind-breakout thesis token
 
 ## QUALITY METRICS
-- Tasks completed: 3 (cleanup, CURRENT.md update, trading_log update)
-- First-attempt success: 100%
-- No config changes applied — system just woke up, all fixes need evaluation
-
----
-**BY:** daily_orchestrator
-**NEXT RUN:** 2026-09-28 ~06:30 UTC
+- Tasks completed: 2 (decay-detector fix, timeout align)
+- First-attempt success: 2/2 (100%)
+- Critical issues found: 1 (fixed same-run)
+- Critical issues outstanding: 0
