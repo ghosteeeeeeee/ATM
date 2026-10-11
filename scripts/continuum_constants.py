@@ -94,7 +94,7 @@ SCORE_WEIGHTS = {
 # ── Exit Thresholds ───────────────────────────────────────────────────────────
 EXIT_TIER1_SCORE_DROP = 10    # score drops this much = tighten stop
 EXIT_TIER2_STATES_DEGRADED = 2  # 2+ states degrade = close 50%
-EXIT_TIER3_EMA_BREAK = 3     # candles below EMA300 = close all
+EXIT_TIER3_EMA_BREAK = 10    # candles below EMA300 = close all (was 3, too sensitive to wicks)
 
 # ── Position Sizing ───────────────────────────────────────────────────────────
 MAX_POSITION_USD = 15          # Above HL $10 minimum (15 × 75% = $11.25)
