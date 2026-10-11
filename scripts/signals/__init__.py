@@ -584,6 +584,32 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'wyckoff',                   'enabled': True,                        'run': _wyckoff_run},
 ]
 
+# ── Registry sanity check (BUG-048, 2026-10-11) ──────────────────────────────
+# Every import above is wrapped in `try/except Exception: _x = None`, so a broken
+# module (defunct signal_gen dependency, bad import) silently becomes run=None and
+# the signal just never fires — no error anywhere. This made 5 modules dead without
+# detection (momentum, mtf_momentum, pct_hermes, vel_hermes, ma300_candle_confirm,
+# all importing the removed signal_gen / ma300_candle_confirm_signals).
+# Warn LOUDLY when an ENABLED flag has no runnable function.
+def _warn_broken_registry_entries():
+    import sys as _sys
+    for _e in SIGNAL_REGISTRY:
+        _flag = _e.get('enabled')
+        _on = _flag is True
+        if isinstance(_flag, str):
+            try:
+                _on = bool(getattr(_hc_module, _flag, False))
+            except Exception:
+                _on = False
+        if _on and _e.get('run') is None:
+            print(f"[signals/__init__] WARNING: '{_e['name']}' is ENABLED ({_flag}) "
+                  f"but its module failed to import — it will NEVER fire. "
+                  f"Check for defunct imports (signal_gen / removed modules).",
+                  file=_sys.stderr, flush=True)
+
+import hermes_constants as _hc_module  # noqa: E402
+_warn_broken_registry_entries()
+
 
 # ── Registry Accessors ─────────────────────────────────────────────────────────
 

@@ -52,17 +52,44 @@ _exchange = None
 # ─── Cached HL meta (coin info, expires every 6h) ───────────────────────────
 _META_CACHE        = {"data": None, "ts": 0}
 _META_CACHE_TTL    = 21600  # 6 hours
+# FIX (BUG-046, 2026-10-11): disk-persisted meta cache. The in-memory cache above is
+# useless for short-lived per-minute processes (signal_compactor imports is_delisted
+# → _get_meta → HL /info through the 2s-gated info_rate FileLock EVERY cycle).
+# Evidence: signal-compactor.err.log grew to 5.8MB with 55,312 [LOCK-WAIT] info_rate
+# lines (55% of file). With a disk cache, fresh processes skip the network entirely.
+_HL_META_FILE      = '/root/.hermes/data/hl_meta_cache.json'
 
 def _get_meta() -> dict:
-    """Fetch full HL coin meta, cached for 6h to avoid hammering /info."""
+    """Fetch full HL coin meta, cached in-memory (6h) and on disk (shared TTL).
+
+    Disk cache is the cross-process layer: any consumer refreshes it at most once
+    per _META_CACHE_TTL; everyone else (compactor, watchdog, guardian, decider)
+    reads the file and never touches /info.
+    """
     now = time.time()
     if _META_CACHE["data"] is not None and now - _META_CACHE["ts"] < _META_CACHE_TTL:
         return _META_CACHE["data"]
+    # Disk layer: fresh file written by any process (including this one earlier)
+    try:
+        with open(_HL_META_FILE) as f:
+            disk = json.load(f)
+        if disk.get("meta") and now - disk.get("ts", 0) < _META_CACHE_TTL:
+            _META_CACHE["data"] = disk["meta"]
+            _META_CACHE["ts"]   = disk.get("ts", 0)
+            return disk["meta"]
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        pass
     try:
         result = _hl_info({"type": "meta"})
         if result:
             _META_CACHE["data"] = result
             _META_CACHE["ts"]   = now
+            try:
+                _os.makedirs(_os.path.dirname(_HL_META_FILE), exist_ok=True)
+                with open(_HL_META_FILE, "w") as f:
+                    json.dump({"ts": now, "meta": result}, f)
+            except OSError as e:
+                print(f"[_get_meta] disk cache write failed: {e}")
             return result
     except Exception as e:
         print(f"[_get_meta] fetch failed: {e}")
@@ -70,6 +97,17 @@ def _get_meta() -> dict:
     if _META_CACHE["data"] is not None:
         print(f"[_get_meta] using stale cache (age: {now - _META_CACHE['ts']:.0f}s)")
         return _META_CACHE["data"]
+    # Last resort: stale DISK cache (a sibling process may have fetched it)
+    try:
+        with open(_HL_META_FILE) as f:
+            disk = json.load(f)
+        if disk.get("meta"):
+            print(f"[_get_meta] using stale DISK cache (age: {now - disk.get('ts', 0):.0f}s)")
+            _META_CACHE["data"] = disk["meta"]
+            _META_CACHE["ts"]   = disk.get("ts", 0)
+            return disk["meta"]
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        pass
     raise RuntimeError(f"[_get_meta] Cannot fetch HL meta and no cache available")
 
 def _sz_decimals(token: str) -> int:

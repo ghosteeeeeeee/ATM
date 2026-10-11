@@ -928,6 +928,136 @@
       "found_by": "daily_orchestrator",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-050",
+      "title": "decider_run guardian recently-opened marker written without flock",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "Concurrent decider cycles + guardian could interleave; guardian mid-read sees partial JSON and treats it as \"no marker\" -> creates an orphan on a token being opened.",
+      "root_cause": "Line ~2255 did unlocked json.loads(open().read()) + truncate-write while sibling sites (~776, ~2325) correctly used fcntl.flock. Bare except:pass also hid write failures.",
+      "fix": "Use the same flock read-modify-write pattern as the sibling sites (LOCK_EX, seek/truncate/fsync, LOCK_UN) and log failures instead of swallowing.",
+      "verified_by": "py_compile + AST parse OK; pattern matches sibling marker writers.",
+      "date_found": "2026-10-11",
+      "date_fixed": "2026-10-11",
+      "found_by": "bug-hunter session 2026-10-11",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-051",
+      "title": "decider_run claim-before-validate leaks signals stuck EXECUTED with no trade",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "Signals claimed at line ~4549 then dropped by the EXPIRED / >15min-stale / missing-from-DB checks stayed decision=EXECUTED with executed=1 and no HL trade. Not retryable and pollutes executed-vs-traded winrate analytics.",
+      "root_cause": "Three `continue` paths after the atomic claim never released it; mark_signal_executed(...,\"SKIPPED\") is the release primitive (used 4x elsewhere at 3404-3440) but was not called here.",
+      "fix": "Call mark_signal_executed(token,direction,\"SKIPPED\", signal_id=sig_id, reason=...) on all three paths before continue.",
+      "verified_by": "py_compile + AST OK; all three calls inside the `if sig_id:` scope so signal_id is non-None.",
+      "date_found": "2026-10-11",
+      "date_fixed": "2026-10-11",
+      "found_by": "bug-hunter session 2026-10-11",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-052",
+      "title": "hyperliquid meta cache was memory-only -> info_rate LOCK-WAIT storm in every 1-min process",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/hyperliquid_exchange.py"
+      ],
+      "symptom": "signal-compactor.err.log grew to 5.8MB with 67,187 [LOCK-WAIT] info_rate lines; every fresh process (signal_compactor, watchdog, guardian, decider) paid a network /info call behind the 2s-gated info_rate FileLock on every cycle.",
+      "root_cause": "_get_meta() cached only in a module-level dict; per-minute subprocesses start with an empty cache so each hit /info independently.",
+      "fix": "Layer a disk cache (/root/.hermes/data/hl_meta_cache.json, TTL=_META_CACHE_TTL=6h) under the in-memory cache, with stale-disk fallback. Verified real cache holds 234 coins incl. BTC.",
+      "verified_by": "Live: err.log byte count and LOCK-WAIT line count both delta 0 across a full compactor cycle after the fix (log idle 31min).",
+      "date_found": "2026-10-11",
+      "date_fixed": "2026-10-11",
+      "found_by": "bug-hunter session 2026-10-11",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-053",
+      "title": "hermes_file_lock unlink-on-exit TOCTOU can let two processes hold the same lock",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/hermes_file_lock.py"
+      ],
+      "symptom": "A waiter holding a fd to the old inode plus a new arrival that O_CREATs a fresh lockfile can both believe they hold the lock simultaneously.",
+      "root_cause": "__exit__ did os.unlink(self.lockfile) after releasing, so the next contender recreated the file and locked a different inode.",
+      "fix": "Drop the unlink; keep the lockfile stable (it holds only a PID).",
+      "verified_by": "py_compile OK; flock is inode-based so a stable path is the correct model.",
+      "date_found": "2026-10-11",
+      "date_fixed": "2026-10-11",
+      "found_by": "bug-hunter session 2026-10-11",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-054",
+      "title": "Signal registry silently swallows import failures",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/__init__.py"
+      ],
+      "symptom": "A module whose import fails becomes run=None with no log line anywhere, so the signal just never fires and nobody notices.",
+      "root_cause": "Every one of ~84 import blocks is `try/except Exception: _x = None`.",
+      "fix": "Add _warn_broken_registry_entries(): iterate SIGNAL_REGISTRY and print a WARNING to stderr for any ENABLED flag whose run is None.",
+      "verified_by": "py_compile OK; import signals runs clean, registry reports 84 entries / 0 broken.",
+      "date_found": "2026-10-11",
+      "date_fixed": "2026-10-11",
+      "found_by": "bug-hunter session 2026-10-11",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-055",
+      "title": "Five signal modules import the removed signal_gen module (dead, now deleted)",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/momentum.py",
+        "scripts/signals/mtf_momentum.py",
+        "scripts/signals/pct_hermes.py",
+        "scripts/signals/vel_hermes.py",
+        "scripts/signals/ma300_candle_confirm.py"
+      ],
+      "symptom": "All five import signal_gen (removed) or ma300_candle_confirm_signals (removed) and could never import successfully. None were registered in SIGNAL_REGISTRY, so no live signal loss.",
+      "root_cause": "signal_gen was removed from the codebase; these were never migrated or deregistered.",
+      "fix": "Deleted all five files (git rm). No code imports them; only docstring mentions referenced them.",
+      "verified_by": "grep -r for imports found no consumers; signals_runner loads only via SIGNAL_REGISTRY.",
+      "date_found": "2026-10-11",
+      "date_fixed": "2026-10-11",
+      "found_by": "bug-hunter session 2026-10-11",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-056",
+      "title": "hermes_constants orphan flags: MA300_CANDLE_MINUS_ENABLED=True with no consumer",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "scripts/hermes_constants.py"
+      ],
+      "symptom": "MA300_CANDLE_MINUS_ENABLED (line ~2112) is True but no registry entry or runner references it, so the flag appears live while doing nothing. Other *_ENABLED flags may share this.",
+      "root_cause": "Module deleted/deregistered without clearing its flag.",
+      "fix": "NOT auto-fixed - constants file is protected (line 2: DO NOT UPDATE ANY VALUES BEFORE ASKING T). Recommend T review and clear orphan flags.",
+      "verified_by": "grep -rn \"MA300_CANDLE\" signals/__init__.py + signals_runner.py -> no hits.",
+      "date_found": "2026-10-11",
+      "date_fixed": null,
+      "found_by": "bug-hunter session 2026-10-11",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {

@@ -90,10 +90,10 @@ class FileLock:
         except Exception:
             pass
         self.fd = None
-        try:
-            os.unlink(self.lockfile)
-        except Exception:
-            pass
+        # FIX (BUG-047, 2026-10-11): do NOT unlink the lockfile. Unlinking creates a
+        # TOCTOU race: a waiter holding a fd to the OLD inode and a new arrival that
+        # O_CREATs a FRESH file can both believe they hold "the" lock simultaneously.
+        # Lockfiles are tiny (PID only) — keeping them stable is free safety.
 
     def _read_holder(self) -> str:
         try:

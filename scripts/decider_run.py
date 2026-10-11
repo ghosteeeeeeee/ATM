@@ -2254,16 +2254,32 @@ def execute_trade(token, direction, price, confidence, source,
     # sees it immediately and skips orphan creation for this token.
     try:
         _marker_path = os.path.join(HERMES_DATA, 'guardian_recently_opened.json')
-        _marker = {}
-        if os.path.exists(_marker_path):
-            _marker = json.loads(open(_marker_path).read())
-        _marker[token.upper()] = time.time()
-        # Prune entries older than 60s
-        _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
-        with open(_marker_path, 'w') as _f:
-            json.dump(_marker, _f)
-    except Exception:
-        pass  # non-fatal
+        # FIX (BUG-050, 2026-10-11): use flock like the sibling write sites (line ~2325,
+        # ~776). The old code did unlocked json.loads(open().read()) + truncate-write;
+        # concurrent writers (multiple decider cycles, guardian) could interleave and a
+        # guardian mid-read could see partial JSON → treat as "no marker" → create an
+        # orphan on a token being opened. Also swallowed errors with bare except:pass.
+        import fcntl as _fcntl
+        with open(_marker_path, 'r+' if os.path.exists(_marker_path) else 'w+') as _marker_fd:
+            _fcntl.flock(_marker_fd, _fcntl.LOCK_EX)
+            try:
+                _marker_fd.seek(0)
+                try:
+                    _marker = json.loads(_marker_fd.read() or '{}')
+                except (json.JSONDecodeError, ValueError):
+                    _marker = {}
+                _marker[token.upper()] = time.time()
+                # Prune entries older than 60s
+                _marker = {k: v for k, v in _marker.items() if time.time() - v < 60}
+                _marker_fd.seek(0)
+                _marker_fd.truncate()
+                json.dump(_marker, _marker_fd)
+                _marker_fd.flush()
+                os.fsync(_marker_fd.fileno())
+            finally:
+                _fcntl.flock(_marker_fd, _fcntl.LOCK_UN)
+    except Exception as _mk_e:
+        log(f'  ⚠️ guardian recently-opened marker write failed for {token}: {_mk_e}', 'WARN')
 
     # ── V2 EXECUTION-TIME RE-VALIDATION ──────────────────────────────────
     # Re-check velocity and momentum before placing trade.
@@ -4569,6 +4585,14 @@ def run(dry_run=False):
                     if _sig_decision == 'EXPIRED':
                         log(f'SKIP: {token} {direction} — signal {sig_id} is EXPIRED (created={_sig_created}), not executing stale trade')
                         skipped += 1
+                        # FIX (BUG-051, 2026-10-11): release the claim taken at line 4549.
+                        # Without this the row stays decision='EXECUTED'/executed=1 with no
+                        # trade — it can never be retried AND it pollutes executed-vs-traded
+                        # winrate analytics. SKIPPED is the correct terminal state for a
+                        # considered-but-not-traded signal.
+                        mark_signal_executed(token, direction, 'SKIPPED',
+                                             signal_id=sig_id,
+                                             reason='claim-before-validate: signal EXPIRED at execution time')
                         continue
                     # Check age: if signal is older than 15 minutes, skip
                     if _sig_created:
@@ -4577,6 +4601,10 @@ def run(dry_run=False):
                             if _sig_age_min > 15:
                                 log(f'SKIP: {token} {direction} — signal {sig_id} is {_sig_age_min:.0f}min old (>15min), too stale to execute')
                                 skipped += 1
+                                # FIX (BUG-051): release claim — was leaking EXECUTED rows.
+                                mark_signal_executed(token, direction, 'SKIPPED',
+                                                     signal_id=sig_id,
+                                                     reason=f'claim-before-validate: stale signal {_sig_age_min:.0f}min old at execution')
                                 continue
                         except Exception:
                             pass
@@ -4584,6 +4612,10 @@ def run(dry_run=False):
                     # Signal doesn't exist — block trade
                     log(f'SKIP: {token} {direction} — signal {sig_id} does not exist in DB, blocking stale trade')
                     skipped += 1
+                    # FIX (BUG-051): release claim — was leaking EXECUTED rows.
+                    mark_signal_executed(token, direction, 'SKIPPED',
+                                         signal_id=sig_id,
+                                         reason='claim-before-validate: signal missing from DB at execution')
                     continue
             except Exception as _e:
                 log(f'  WARN: staleness check failed for {token}: {_e}')
@@ -4875,6 +4907,19 @@ def run(dry_run=False):
             # pipeline cycle will re-approve if conditions still warrant.
             if sig_id:
                 log(f'  ⚠️ TRADE FAILED: {token} {direction} — signal NOT rolled back (prevents retry loop)')
+                # FIX (BUG-049, 2026-10-11): record the execution failure so the
+                # 2-fails→1h cooldown (_check_hotset_cooldown) can engage. Previously
+                # _record_hotset_failure was ONLY called at approval-filter time, never
+                # in the trade-failed branch — so a token that failed brain.py execution
+                # 10x in a row was retried every cycle with no cooldown. This is the
+                # mechanism that turns "signal NOT rolled back" into an actual backstop
+                # instead of an unbounded retry (see BLUR 2026-10-08, 64 failures/4d).
+                try:
+                    _record_hotset_failure(token, direction, failures)
+                    log(f'  📉 hotset failure recorded: {token} {direction} '
+                        f'(count={failures.get(token, {}).get(direction, {}).get("count", "?")})')
+                except Exception as _hf_e:
+                    log(f'  ⚠️ failed to record hotset failure for {token} {direction}: {_hf_e}', 'WARN')
             else:
                 # [FIX-BUG1] sig_id=None (legacy hot-set without signal_id):
                 # Try token+direction fallback rollback so signal isn't stuck permanently.
