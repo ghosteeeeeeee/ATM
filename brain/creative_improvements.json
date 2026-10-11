@@ -3980,5 +3980,14 @@
     "category": "entry sniper",
     "status": "monitor",
     "risk": "none — observation only until n≥15"
+  },
+  {
+    "date": "2026-10-11T22:39:55Z",
+    "idea": "MFE round-trip breakeven handoff — when MFE >= trail-arm (+0.40%) then price crosses back below entry, exit at entry instead of riding to atr_sl/hard_max_loss",
+    "rationale": "7d atr_sl_hit with MFE>=0.7%: 7T all losses (volume-breakout 3T MFE 0.79, pump-chain 4T MFE 0.88). Trail arms, momentum dies, full round-trip to SL. Breakeven handoff saves the MFE. NOT implementable standalone — exit-engine vehicle (v6/RR). Logged for v6 spec input.",
+    "expected_impact": "Save ~$0.5-0.8/7d on round-trip cohort; preserve all trail winners (they never cross back below entry before trailing up)",
+    "category": "exit quality",
+    "status": "suggested-for-v6-spec",
+    "risk": "low (only fires after trail-arm, only on re-cross of entry)"
   }
 ]

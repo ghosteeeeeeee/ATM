@@ -1,138 +1,90 @@
 {
-  "timestamp": "2026-10-11T17:39:51Z",
+  "timestamp": "2026-10-11T22:39:55Z",
   "session_brain_stats": {
-    "queries": [
-      "high regime overbought long block",
-      "wyckoff partner overdue",
-      "hard_max_loss leverage stop",
-      "STANDALONE_BYPASS midband"
-    ],
-    "key_insights": [
-      "hard_max_loss root cause confirmed again in sessions: CUT_LOSER_PNL=-1.00 fires ~1% price move → 3-5% account loss at lev 3-5 — still open with bug_hunter",
-      "Wyckoff confluence partner still undelivered — 0 fires all-time, recurring since Oct 7",
-      "No new unimplemented ideas found beyond trail-arm velocity precheck (needs backtest)"
-    ]
+    "queries": 3,
+    "top_hits": "HML chop entries, continuum BTC, wrong-side momentum — all consistent with standing knowledge"
   },
   "trade_summary_24h": {
-    "trades": 19,
-    "wins": 8,
-    "pnl": 0.97,
-    "wr": 42.1,
-    "open": "3 LONG (CFX pump-chain+ +0.57%, ME ai-trader+ -0.27%, YGG oversold-bounce+ +0.05%)",
-    "regime": "btc_15m LONG_BIAS / btc_4h LONG_BIAS, vol LOW, zscore NEUTRAL, trend STRONG_UP",
-    "7d": "144T 65W +$0.66 45.1%WR (AT RISK vs 50% target Oct 12)",
-    "30d": "764T -$1.53 48.4%WR",
-    "losers_autopsied": 9,
-    "hml_24h": "USELESS vol-breakout EXTREME RSI74 HML, INJ ai-trader EXTREME RSI41 HML, ZRO r2v2 EXTREME RSI66 HML — EXTREME chop entries"
+    "trades": 23,
+    "pnl": 1.21,
+    "wr": 34.8
   },
-  "changes_from_last_run": [
-    {
-      "change": "LONG_MIDBAND_NON_EXTREME_BLOCK (2026-10-11 15:44)",
-      "status": "WORKING",
-      "evidence": "30 blocks by 16:59 (FOGO 69.6 HIGH, ICP 60.9 HIGH, HYPER 64.4 HIGH, ME 66.1 NORMAL). 0 false positives: CFX win was EXTREME exempt (RSI 67.3 correct); ME opened after RSI climbed to 72.5 (gap band); YGG RSI 39 not in band. No blocked winner.",
-      "verdict": "KEEP"
+  "trade_summary_7d": {
+    "trades": 144,
+    "pnl": 0.35,
+    "wr": 41.0
+  },
+  "hml_7d": {
+    "n": 46,
+    "pnl": -5.6,
+    "avg_mfe": 0.179,
+    "avg_lev": 4.0,
+    "reached_trail_arm": 5
+  },
+  "changes_from_last_run": {
+    "W_short_blacklist": {
+      "post_trades": 0,
+      "status": "WORKING (blocked)"
     },
-    {
-      "change": "BB_SQUEEZE_LONG_RSI_MAX=65 (2026-10-11 02:43)",
-      "status": "UNTESTABLE — 0 bb-squeeze trades since deploy AND 0 in prior 24h",
-      "evidence": "Filter correctly targeted at historical HML band; awaiting first trade. KEEP.",
-      "verdict": "KEEP"
+    "vol_breakout_HIGH_block": {
+      "post_HIGH_trades": 0,
+      "status": "WORKING"
     },
-    {
-      "change": "DECLINING+LEAN_BULL continuum fix (2026-10-11 08:47)",
-      "status": "WORKING",
-      "evidence": "BTC continuum paper trade opened; no false blocks observed.",
-      "verdict": "KEEP"
+    "bb_squeeze_RSI_MAX_65": {
+      "post_trades": 0,
+      "status": "UNTESTABLE — KEEP"
     },
-    {
-      "change": "VOLUME_BREAKOUT HIGH block + RSI1M floor (Oct 10)",
-      "status": "HOLDING",
-      "evidence": "All 7d HIGH-regime vol-breakout losses (BLUR/BABY/AIXBT/WCT) opened BEFORE the Oct 10 17:46 block. 0 HIGH trades post-block.",
-      "verdict": "KEEP"
+    "LONG_MIDBAND_block": {
+      "post_trades": 12,
+      "post_pnl": -0.06,
+      "status": "NEUTRAL/HOLD"
+    },
+    "LONG_HIGH_OVERBOUGHT_block": {
+      "post_trades": 8,
+      "post_pnl": 0.01,
+      "status": "NEUTRAL/HOLD"
+    },
+    "CapB_paper_fix": {
+      "real_capital_clusters": 0,
+      "status": "WORKING"
     }
-  ],
-  "drift_findings": [
-    {
-      "id": "DRIFT-I",
-      "severity": "INFO (not a leak)",
-      "finding": "ME midband 'leak' investigated and DISPROVED as code-path bypass. ME blocked 16:57-16:59 at RSI 66.1; re-scored 17:00 after RSI climbed past 70 (opened 72.5). HOTSET-FINAL-BYPASS is confluence-standalone path, not midband bypass — midband runs in scoring loop each cycle with fresh RSI. NORMAL 70-75 is a keep band (+$0.16/30d).",
-      "action": "No code fix. Gap-band tracker logged as creative monitor."
-    }
-  ],
+  },
+  "drift_findings": [],
   "recurring_problems": [
     {
-      "problem": "hard_max_loss #1 bleed — 7d 46T 0%WR -$5.76",
-      "detail": "Trail family 7d 58T +$6.28 88%WR vs hard_max_loss 46T -$5.76 0%WR. Leverage semantics still open with bug_hunter (stop ~1% price = 3-5% account at lev 3-5). Top signals: bb-squeeze+ 8T HML (6/8 RSI_MAX=65 would block — awaiting trades), pump-chain- 7T, volume-breakout 5T (pre-block), pump-chain+ 7T.",
-      "action": "monitor post-bb-squeeze-fix cohort; escalate leverage-aware stop to bug_hunter if still open"
+      "problem": "hard_max_loss 46T 0%WR -$5.60/7d — regime-blind, RSI-blind, signal-spread (18 signals). Only 5/46 reached trail arm +0.40%. Root = entry momentum, not direction/RSI/regime.",
+      "vehicle": "self_learner trail-arm-timeout backtest DUE Oct 12",
+      "status": "waiting"
     },
     {
-      "problem": "Wyckoff 0 trades all-time — confluence partner OVERDUE",
-      "detail": "Due Oct 9, extended Oct 11 EOD, still not delivered. Detection live, 0 fires.",
-      "action": "ESCALATE to CEO — signal_analyst deliverable"
-    },
-    {
-      "problem": "7d WR 45.1% at risk vs 50% target (deadline Oct 12)",
-      "detail": "24h +$0.97 42.1%WR improving from overnight bleed. 7d +$0.66. HIGH 70+ block aims to cut bad-RR HIGH entries.",
-      "action": "Oct 12 checkpoint"
+      "problem": "atr_sl_hit round-trips: 7T with MFE>=0.7% still closed via atr_sl (avg MFE 0.8%+). Captured momentum then gave it all back.",
+      "vehicle": "pump-chain v6 exit-stack / RR engine",
+      "status": "logged for v6 spec"
     }
   ],
-  "missing_implementations": [
-    {
-      "item": "Wyckoff confluence partner",
-      "owner": "signal_analyst",
-      "due": "2026-10-11 EOD — OVERDUE",
-      "impact": "Wyckoff dead capital"
-    },
-    {
-      "item": "hard_max_loss leverage-aware CUT_LOSER semantics",
-      "owner": "bug_hunter",
-      "due": "open since Oct 4",
-      "impact": "HML exits at -1% price become -3-5% account losses"
-    }
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-10-11T17:39:51Z",
-      "idea": "HIGH 70+ LONG BLOCK — SHIPPED THIS RUN",
-      "rationale": "30d HIGH RSI70+: 40T 45%WR -$1.44 | 14d 20T -$0.48 | 7d 10T -$0.54. Avg win $0.09 vs avg loss $0.16. Complements midband (≤70). NORMAL 70-75 stays open.",
-      "expected_impact": "+$1.44/30d net save (18W +$1.68 blocked / 20L -$3.12 saved)",
-      "category": "entry sniper",
-      "status": "SHIPPED",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-11T17:39:51Z",
-      "idea": "Trail-arm velocity precheck (MONITOR)",
-      "rationale": "MFE>=0.40 rate only 58.1% 7d — 42% never arm trail. Backtest 5m vel at entry: trail winners vs HML losers before any filter.",
-      "category": "entry sniper",
-      "status": "monitor — needs backtest",
-      "risk": "medium"
-    },
-    {
-      "date": "2026-10-11T17:39:51Z",
-      "idea": "NORMAL 70-75 gap-band tracker (ME live case)",
-      "rationale": "ME opened RSI 72.5 NORMAL. 30d band +$0.16 keep. Track entries for n>=20 review.",
-      "category": "monitor",
-      "status": "monitor",
-      "risk": "low"
+      "date": "2026-10-11T22:39:55Z",
+      "idea": "MFE round-trip breakeven handoff — when MFE >= trail-arm (+0.40%) then price crosses back below entry, exit at entry instead of riding to atr_sl/hard_max_loss",
+      "rationale": "7d atr_sl_hit with MFE>=0.7%: 7T all losses (volume-breakout 3T MFE 0.79, pump-chain 4T MFE 0.88). Trail arms, momentum dies, full round-trip to SL. Breakeven handoff saves the MFE. NOT implementable standalone — exit-engine vehicle (v6/RR). Logged for v6 spec input.",
+      "expected_impact": "Save ~$0.5-0.8/7d on round-trip cohort; preserve all trail winners (they never cross back below entry before trailing up)",
+      "category": "exit quality",
+      "status": "suggested-for-v6-spec",
+      "risk": "low (only fires after trail-arm, only on re-cross of entry)"
     }
   ],
-  "config_changes_applied": [
-    {
-      "change": "LONG_HIGH_OVERBOUGHT_BLOCK=True + LONG_HIGH_OVERBOUGHT_RSI_MIN=70",
-      "file": "scripts/hermes_constants.py + scripts/signal_compactor.py",
-      "gate": "[LONG-HIGH-70] after midband in scoring loop",
-      "rationale": "Staged last run; midband soak 2h 30 blocks 0 FP; HIGH 70+ consistent bleed 7/14/30d",
-      "impact": "+$1.44/30d expected"
-    }
-  ],
-  "config_decision": "1 config change this run (HIGH 70+ LONG block — staged last run, soak verified). Midband kept. No reverts. Max-2 discipline respected. Protected flags untouched.",
+  "config_changes_applied": [],
+  "config_decision": "0 changes — all 8 recent brain_auditor changes within 48h monitoring windows and holding; no new pattern passes n>=20 + significance bar; HML root-cause vehicle (self_learner backtest) due tomorrow",
+  "watchdog_steer_verification": {
+    "steer": "4 recent losses look like wrong-side trades",
+    "verdict": "PARTIALLY CONFIRMED — 24h losers (ME/INJ/USELESS/AIXBT) all LONG chop entries (HML/atr_sl), NOT direction-fade vs BTC (BTC NEUTRAL slope~0, market LONG_BIAS 38/0/71). Pattern = chop entries with no momentum, consistent with standing HML diagnosis. No direction-lock change warranted."
+  },
   "next_actions": [
-    "Monitor [LONG-HIGH-70] blocks in pipeline.log — verify profile matches HIGH RSI>70",
-    "ESCALATE wyckoff confluence partner to CEO — overdue",
-    "Escalate hard_max_loss leverage-aware stop to bug_hunter if still open next run",
-    "Oct 12: 7d WR/PnL checkpoint (45.1% → target 50%)",
-    "Monitor NORMAL 70-75 gap-band (ME live trade) and bb-squeeze RSI_MAX first trade",
-    "Disk 85% standing — cleanup pass due"
+    "Oct 12: self_learner HML trail-arm-timeout backtest — THE vehicle for 46T 0%WR bleed",
+    "Oct 12: 7d PnL checkpoint (Oct 5 -$0.90 ages out; projected >+$0.80 if overnight flat)",
+    "Monitor LONG_MIDBAND + LONG_HIGH_OVERBOUGHT through Oct 13 (n=12/8 so far neutral)",
+    "BB_SQUEEZE_LONG_RSI_MAX=65 keep — 0 trades, untestable, window 60-65 live",
+    "v6 spec: fold MFE round-trip breakeven handoff into exit-stack restructure"
   ]
 }
