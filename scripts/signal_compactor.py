@@ -3687,7 +3687,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── Global spike filter: block SHORT after recent bullish 5m candle ──
             # Prevents entering SHORT at spike highs (TIA/CFX/IO pattern)
             # EXEMPTION: Skip in downtrends (linreg BEAR) — green candles are normal pullbacks (2026-09-23)
-            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING, LONG_RSI_SWEET_SPOT_MIN, LONG_RSI_SWEET_SPOT_MAX, LONG_RSI_SWEET_SPOT_BOOST
+            from hermes_constants import SPIKE_FILTER_ENABLED, SPIKE_FILTER_5M_THRESHOLD, SPIKE_FILTER_RSI_THRESHOLD, SHORT_VEL_FILTER_ENABLED, SHORT_VEL_FILTER_VEL_THRESHOLD, SHORT_VEL_FILTER_GREEN_THRESHOLD, SHORT_RSI_FLOOR, SHORT_RSI_CEILING, SHORT_BB_DEAD_ZONE_MIN, SHORT_BB_DEAD_ZONE_MAX, SHORT_BB_DEAD_ZONE2_MIN, SHORT_BB_DEAD_ZONE2_MAX, LONG_RSI_FLOOR, LONG_RSI_CEILING, LONG_RSI_SWEET_SPOT_MIN, LONG_RSI_SWEET_SPOT_MAX, LONG_RSI_SWEET_SPOT_BOOST, LONG_MIDBAND_RSI_MIN, LONG_MIDBAND_RSI_MAX, LONG_MIDBAND_NON_EXTREME_BLOCK
             if direction == 'SHORT' and SPIKE_FILTER_ENABLED:
                 # Skip spike filter in downtrends — green candles are pullbacks, not reversals
                 _skip_spike = False
@@ -3914,6 +3914,20 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if _lss_rsi is not None and LONG_RSI_SWEET_SPOT_MIN <= _lss_rsi <= LONG_RSI_SWEET_SPOT_MAX:
                         entry['confidence'] = min(entry.get('confidence', 50) + LONG_RSI_SWEET_SPOT_BOOST, 100)
                         log(f"  🎯 [LONG-RSI-SWEET-SPOT] {tkn}: LONG RSI {_lss_rsi:.1f} in {LONG_RSI_SWEET_SPOT_MIN}-{LONG_RSI_SWEET_SPOT_MAX} — +{LONG_RSI_SWEET_SPOT_BOOST} confidence")
+                except Exception:
+                    pass  # non-fatal
+            # ── LONG mid-band chop block: RSI 60-70 outside EXTREME = death zone ─────
+            # 30d non-EXTREME 60-70 = 96T 39.6%WR -$4.56; EXTREME 60-70 = +$2.31 (keep).
+            # Breakout signals fire into this band by construction — trail never arms.
+            if direction == 'LONG' and LONG_MIDBAND_NON_EXTREME_BLOCK:
+                try:
+                    _lmb_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lmb_rsi is not None and LONG_MIDBAND_RSI_MIN <= _lmb_rsi <= LONG_MIDBAND_RSI_MAX:
+                        _lmb_atr = _get_atr_pct(tkn)
+                        _lmb_vreg = _classify_volatility(_lmb_atr) if _lmb_atr is not None else 'NORMAL'
+                        if _lmb_vreg != 'EXTREME':
+                            log(f"  🚫 [LONG-MIDBAND] {tkn}: LONG blocked — RSI {_lmb_rsi:.1f} in {LONG_MIDBAND_RSI_MIN}-{LONG_MIDBAND_RSI_MAX} + {_lmb_vreg} vol (chop death zone; EXTREME only)")
+                            continue
                 except Exception:
                     pass  # non-fatal
             # ── SHORT RSI ceiling: block SHORT at overbought RSI (momentum favors LONG) ──

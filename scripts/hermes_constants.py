@@ -915,6 +915,17 @@ LONG_RSI_SWEET_SPOT_MIN = 40
 LONG_RSI_SWEET_SPOT_MAX = 60  # Extended 50→60: RSI 50-60 LONG = 43T 60.5%WR +$1.53/14d (same as 40-50)
 LONG_RSI_SWEET_SPOT_BOOST = 10  # confidence points added when RSI in sweet spot
 
+# ── LONG mid-band chop block: skip LONG when RSI 60-70 outside EXTREME ──────
+# Death zone (meta-RSI): breakout signals (volume-breakout, pump-chain, r2v2)
+# fire into 60-70 by construction — by fill time mean-reversion eats the entry
+# and trail never arms. 30d non-EXTREME (NORMAL/HIGH/FLAT): 96T 39.6%WR -$4.56.
+# EXTREME 60-70 is the WINNING habitat: 53T 56.6%WR +$2.31 — kept open.
+# 30d impact: blocks 38/248 winners (15.3%), saves $7.06 losers, net +$4.56.
+# 7d: 30T 50%WR -$1.05 | 14d: 55T 47.3% -$1.70 — consistent across windows.
+LONG_MIDBAND_RSI_MIN = 60
+LONG_MIDBAND_RSI_MAX = 70
+LONG_MIDBAND_NON_EXTREME_BLOCK = True  # brain_auditor 2026-10-11 — EXTREME exempt
+
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
 # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
 # 7d: 17T 41.2%WR -$1.05. All other zones: 162T 57.8%WR +$3.77.
@@ -3923,7 +3934,7 @@ PUMP_FLOW_MIN_PHASE_CONFIDENCE = 0.40  # minimum phase detection confidence
 PUMP_FLOW_MIN_VELOCITY = 0.15          # minimum 15m velocity (%) for flow signal
 PUMP_FLOW_MIN_CHAIN_LIFT = 1.3         # minimum chain lift for recommendation
 PUMP_FLOW_MIN_CHAIN_CO_FIRES = 5       # minimum historical co-fires for chain
-PUMP_FLOW_COOLDOWN_HOURS = 0.083       # per-token cooldown after pump flow signal (5 min)
+PUMP_FLOW_COOLDOWN_HOURS = 0.25        # per-token cooldown after pump flow signal (15 min)
 PUMP_FLOW_MAX_PER_CYCLE = 3            # max pump flow signals per pipeline run
 PUMP_FLOW_MAX_PRICE_AGE = 5            # max minutes since last price update
 PUMP_CHAIN_VEL_30M_MIN = -0.3          # pump-chain LONG: block when 30m velocity < this (plan: vel>-0.3% → 90%WR)

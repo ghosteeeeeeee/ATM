@@ -3893,8 +3893,10 @@
     "rationale": "7d HML autopsy: 26/30 never armed trail (+0.40%); median MFE 0.11%. Winners avg MFE 1.27%. Chop entries bleed to HML with zero momentum. Cutting at ~-0.15% price after 20 dead minutes saves ~2-4% account per trade on ~26 trades/7d.",
     "expected_impact": "If live on non-pump-chain signals only: save ~$3-5/7d on HML cohort without touching trail winners. MUST exclude pump-chain+ (grind-is-normal: 116/147 below +2% at 2h — dead_money audit lesson).",
     "category": "exit sniper",
-    "status": "suggested — BACKTEST FIRST by self_learner; shadow-log would-fires 48h before any live change",
-    "risk": "medium — similar mechanics killed home runs when applied universally (dead_money). Signal-scoped + MFE-threshold sensitivity sweep required. Do NOT implement without independent audit."
+    "status": "rejected",
+    "risk": "medium — similar mechanics killed home runs when applied universally (dead_money). Signal-scoped + MFE-threshold sensitivity sweep required. Do NOT implement without independent audit.",
+    "rejected_at": "2026-10-11T15:36:23.274989+00:00",
+    "reject_reason": "not a fan of this because we might be in the grind before a breakout, good concept but look for another way to cut losers earlier"
   },
   {
     "date": "2026-10-11T13:39:36.587304+00:00",
@@ -3904,5 +3906,23 @@
     "category": "entry sniper",
     "status": "suggested — needs gate_shadow counterfactual + winner-impact check at ship time",
     "risk": "low-medium — one variable; reversible; does not hard-block"
+  },
+  {
+    "date": "2026-10-11T15:44:20Z",
+    "idea": "Momentum precondition for trail-arming: skip LONG unless impulse evidence (last 3×5m net move >= 0.15% or BB width expanding vs 20 ago). Session brain: 'squeeze-breakout with compression precondition'.",
+    "rationale": "48/48 HML 7d never reached +0.40% trail arm — pure chop entries. ATR gate accepts room-to-move but not direction. Impulse check = direction evidence.",
+    "expected_impact": "Cut HML frequency further (share already <40% goal). Target: block 30-50% of future HML with <10% winner kill.",
+    "category": "entry sniper / chop filter",
+    "status": "suggested — needs backtest on 7d/30d before ship",
+    "risk": "medium — may delay valid late-trend entries"
+  },
+  {
+    "date": "2026-10-11T15:44:20Z",
+    "idea": "volume-breakout compression precondition (session brain CHIP/CFX pattern): only fire if BB width was in bottom 30th percentile within last N candles before expansion.",
+    "rationale": "Clean breakouts from compression win; chasing already-extended candles lose. Separates CFX (+$0.63 trail) from USELESS (HML).",
+    "expected_impact": "Improve volume-breakout WR from 25% (7d) back toward 54% (30d baseline)",
+    "category": "signal quality",
+    "status": "suggested — signal_analyst owns volume-breakout tuning",
+    "risk": "low — additive precondition"
   }
 ]
