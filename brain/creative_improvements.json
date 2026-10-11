@@ -3858,5 +3858,14 @@
     "category": "entry sniper",
     "status": "monitor — needs intersection sample",
     "risk": "low if intersection n>=15 shows same edge"
+  },
+  {
+    "date": "2026-10-11T05:40:53Z",
+    "idea": "Gate pump-chain-v6 LONG entries to metaRSI <60 (the structural winning band) while leaving pump-chain+ bare form untouched",
+    "rationale": "v6 combos 7d: 6T 0W −$0.50, every entry metaRSI 60-71 (AIXBT 64.3, APT 71.4, IOTA 62.5, ALT 60.0, ICP 66.7). All bailed atr_sl/HML before trail arm. Bare pump-chain+ same window: 36T +$1.49. v6 is firing its own entries in the exact band where chase-longs die, dragging the best signal.",
+    "expected_impact": "Eliminate v6 combo bleed (−$0.50/7d observed) without touching pump-chain+ edge (+$1.49/7d)",
+    "category": "entry sniper",
+    "status": "escalated_to_ceo",
+    "risk": "low — one signal-variant, reversible, does not touch CEO v6 exit-stack vehicle design"
   }
 ]

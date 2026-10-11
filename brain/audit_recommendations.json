@@ -1,100 +1,205 @@
 {
-  "timestamp": "2026-10-11T02:42:55.937897+00:00",
-  "session_brain_stats": {
-    "queries": 3,
-    "topics": [
-      "volume breakout RSI",
-      "hard_max_loss chop",
-      "r2v2 late entry"
+  "timestamp": "2026-10-11T05:40:53Z",
+  "agent": "brain_auditor",
+  "run_type": "captain_audit",
+  "session_lock": false,
+  "config_changes_applied": [],
+  "trade_summary_24h": {
+    "trades": 27,
+    "wins": 9,
+    "losses": 16,
+    "flat": 2,
+    "pnl_usdt": -1.18,
+    "wr_pct": 33.3,
+    "open": [
+      {
+        "coin": "SYRUP",
+        "signal": "doji-bottom-long",
+        "pnl_pct": 1.19,
+        "trail": "armed, BE stop locked"
+      }
     ]
   },
-  "trade_summary_24h": {
-    "closed": 28,
-    "wins": 11,
-    "pnl": -1.07,
-    "wr": 39.3,
-    "exit_family": {
-      "hard_max_loss": "8T -$1.04 0%WR #1 bleed",
-      "profit-monster-trail": "12T +$0.42 75%WR",
-      "atr_sl_hit": "5T -$0.32"
+  "trade_summary_7d": {
+    "trades": 153,
+    "pnl_usdt": -1.81,
+    "wr_pct": 43.8,
+    "long": {
+      "n": 128,
+      "pnl": -1.76,
+      "wr": 46.1
     },
-    "worst_signal": "volume-breakout-long+ 7T 0W -$0.97 (pre-HIGH-block trades; 0 new entries since block 17:46)",
-    "open": "AIXBT pump-chain+ LONG +0.04% 0.7h RSI 64.3 mid-band"
+    "short": {
+      "n": 25,
+      "pnl": -0.05,
+      "wr": 32.0
+    },
+    "hard_max_loss": {
+      "n": 54,
+      "pnl": -7.01,
+      "wr": 0.0,
+      "avg_lev": 3.9,
+      "share_pct": 35.3
+    },
+    "profit_monster_trail": {
+      "n": 55,
+      "pnl": 2.91,
+      "wr": 89.1
+    },
+    "oct5_flush_still_in_window": {
+      "n": 32,
+      "pnl": -0.9,
+      "ages_out": "2026-10-12"
+    }
   },
-  "regime": "chop-with-long-lean | BTC AT EMA300 | vol LOW | scanners 62:1 LONG | trail exits carry PnL",
-  "losing_trade_autopsy": [
+  "watchdog_steers_verified": [
     {
-      "cluster": "volume-breakout-long+ 7T 0W -$0.97",
-      "root_cause": "Meta-RSI>68 exhaustion entries (BABY 81.8, AIXBT 75.9, WCT 72.9, BLUR 68.9) + HIGH regime + 1m freefall (YGG). Bought the exhausted end of someone else's pump.",
-      "fixes_already_live": "HIGH block 17:46, RSI ceiling 85, RSI1M floor 35 (wired in volume_breakout.py detection). 0 new entries since 17:46 — fixes holding, sample pending.",
-      "confidence": "HIGH"
+      "id": "steer-001",
+      "claim": "12/20 recent losses, 35% WR",
+      "verdict": "CONFIRMED",
+      "detail": "24h 27T 9W 16L −$1.18 33.3%WR. CRITICAL health driven by streak, open book healthy."
     },
     {
-      "cluster": "bb-squeeze+ 30d 65+ RSI band 29T -$0.56 10HML",
-      "root_cause": "Squeeze-break LONG when RSI already >65 = late entry into someone else's expansion. 60-65 band is 100%WR +$0.86; 65+ is bad-RR tail (avg win $0.054 vs avg loss $0.123).",
-      "fix_applied": "BB_SQUEEZE_LONG_RSI_MAX=65 this run. Live window now 60-65 only.",
-      "impact_on_winners": "Blocks 17 winners/30d totaling only +$0.91 while saving 12 losers totaling -$1.47 = net +$0.56. Band is net-negative; blocked winners are noise-sized.",
-      "confidence": "HIGH"
+      "id": "steer-002",
+      "claim": "7 recent losses wrong-side / fading momentum",
+      "verdict": "CONFIRMED with meta-RSI evidence",
+      "detail": "24h LONG metaRSI: <60=10T 60%WR +$0.05 | 60-70=11T 18.2% −$0.96 | 70+=4T 0% −$0.33. Chase-longs into distribution. Last 3 closes before SYRUP (AIXBT 64.3, USELESS 74.3, APT 71.4) all chase profiles."
     },
     {
-      "cluster": "r2v2 LONGs 4T 0W (STX/WCT/ZRO/BABY)",
-      "root_cause": "Entries at RSI 62-66 late to the move; sole win BABY at 58.3.",
-      "recommended": "Monitor only — n=4 < 20 threshold. Do not ship filter.",
-      "confidence": "LOW (insufficient n)"
+      "id": "steer-003",
+      "claim": "volume-breakout-long+ 3-loss streak",
+      "verdict": "CONFIRMED, filters landed, cohort immature",
+      "detail": "7d 12T 25%WR −$0.73. HIGH block (17:46 Oct10), ceiling 85, 1m floor 35 all live. Post-block: 2 closes (USELESS EXTREME RSI74 HML; YGG pre-floor). 0 HIGH violations since block. Need 48h cohort."
     }
   ],
+  "losing_trade_autopsy": {
+    "focus": "24h RSI>60 LONG chase cluster + v6 combo drag",
+    "pattern": "metaRSI 60-75 LONG = 35L/26W 7d −$2.01 net (60-70 −$1.58 + 70-75 −$0.31). Winners exit profit-monster-trail; every hard_max_loss/atr_sl_hit is a chop entry that never trended.",
+    "winning_side": "Same tokens, wait for pullback into 50-60 metaRSI (30d 120T 61.7% +$4.01 THE structural edge), or stay flat. LOW volume = re-accumulation grind, no expansion for chase entries.",
+    "v6_drag": "pump-chain family 7d: alone 36T +$1.49 38.9%WR vs with_v6 6T 0W −$0.50. All v6 combos atr_sl_hit/HML — bailed before trail (+0.40%) could arm. ESCALATED to CEO (v6 = monitor-only vehicle, not brain_auditor-owned).",
+    "ceiling_70_rejected": "Blocking 70-75 would net WORSE: 7d band −$0.31 but contains +$0.51 winners (block impact −$0.20); 30d band +$0.15 (block impact −$0.15). CEO Oct 9 keep-70-75 ruling STANDS."
+  },
   "drift_findings": [
     {
-      "id": "DRIFT-RSI1M-CHECKED",
-      "severity": "info",
-      "finding": "VOLUME_BREAKOUT_LONG_RSI1M_FLOOR=35 (last run 22:45) IS wired — signals/volume_breakout.py:172-174 at detection time. Not a dead constant. 0 new vol-breakout LONG entries since floor + HIGH block.",
-      "action": "none — working as designed"
-    }
-  ],
-  "recurring_problems": [
-    "hard_max_loss = chop entries that never reach +0.40% trail arm. 14d: HML 85T -$11.20 0%WR vs TRAIL 171T +$11.82 80.1%WR. Root cause is entry habitat, not exit management.",
-    "Every 24h HML loser this run was a LONG in one-sided chop. Zero SHORT HML. WINNING side = trail-armed entries or flat.",
-    "volume-breakout-long+ was the #1 24h bleed; regime/RSI fixes now live, awaiting first post-fix trades."
-  ],
-  "missing_implementations": [],
-  "creative_improvements": [
-    "HML cluster breaker (3 HML/2h → 4h family pause) — suggested, shadow-first",
-    "Squeeze volume_spike>=1.0 habitat lock — monitor for intersection n"
-  ],
-  "config_changes_applied": [
-    {
-      "file": "hermes_constants.py",
-      "change": "BB_SQUEEZE_LONG_RSI_MAX = 65 (new)",
-      "rationale": "60-65=100%WR +$0.86; 65+ bleeds -$0.56/30d with 10 HML"
+      "severity": "watch",
+      "item": "LONG metaRSI 65-70 band flipped",
+      "detail": "CEO Oct 9 baseline: 65-70=+0.09/47T flat. Now 30d: 65-70=−$0.39/52T 44.2%. 7d 60-70=−$1.58/45T. NOT actionable yet (ceiling-70 math negative) but MUST re-check at Oct 12 metric checkpoint.",
+      "owner": "brain_auditor + CEO Oct 12"
     },
     {
-      "file": "signals/bollinger_squeeze.py",
-      "change": "Wired LONG_RSI_MAX gate after existing RSI_MIN check",
-      "rationale": "Detection-time filter — signals above 65 never enter pool"
+      "severity": "info",
+      "item": "confidence does not separate win/lose in 60-75 band",
+      "detail": "7d final_confidence avg: losers 97.7 vs winners 96.4. Confidence floor sweep (50-80) blocks only losers-with-similar-conf — no clean cut. REJECTED confidence-floor idea."
+    },
+    {
+      "severity": "info",
+      "item": "momentum_state not a clean LONG gate",
+      "detail": "7d LONG: rising 78T −$1.23 46% | falling 15T −$0.78 33% | flat 30T +$0.31 60%. Falling bleeds but rising bleeds more in $ — state alone insufficient. REJECTED."
+    },
+    {
+      "severity": "info",
+      "item": "r2v2 family Oct 10 cluster",
+      "detail": "3 losses in 4h (ZRO/STX/WCT), all EXTREME, metaRSI 62-65, all HML/CL-T1. Family 30d n=4 total. INSUFFICIENT DATA — monitor, do not filter."
     }
   ],
   "changes_from_last_run": [
     {
-      "change": "VOLUME_BREAKOUT_LONG_RSI1M_FLOOR=35",
-      "status": "VERIFIED WIRED in volume_breakout.py:172",
-      "impact": "0 new entries post-fix (also HIGH block active); cannot yet measure PnL impact, n=0"
+      "change": "BB_SQUEEZE_LONG_RSI_MAX=65 + bollinger_squeeze.py wire",
+      "when": "2026-10-11T02:42Z",
+      "status": "MONITOR — 0 bb-squeeze closes since deploy (quiet). Window now 60-65 only (MIN=60). Log shows vol-gate EXTREME blocks firing on bb-squeeze (separate Oct 2 rule, intact)."
     },
     {
-      "change": "VOLUME_BREAKOUT LONG HIGH block (SIGNAL_TYPE_OVERRIDES 0.0)",
-      "status": "VERIFIED WIRED in decider_run + signal_compactor",
-      "impact": "0 new HIGH-regime vol-breakout LONG entries since 17:46"
+      "change": "VOLUME_BREAKOUT_LONG_RSI1M_FLOOR=35",
+      "when": "2026-10-10T22:45Z",
+      "status": "MONITOR — 1 post-close (USELESS) was high-RSI not knife; YGG knife closed pre-deploy. Floor untested live yet."
+    },
+    {
+      "change": "('HIGH','volume-breakout-long'):0.0 vol gate",
+      "when": "2026-10-10T17:46Z",
+      "status": "WORKING — 0 volume-breakout HIGH entries since. Prior HIGH cohort was 25%WR bleed."
     },
     {
       "change": "VOLUME_BREAKOUT_LONG_RSI_CEILING 95→85",
-      "status": "LIVE",
-      "impact": "Pre-fix 24h losers BABY@81.8 would still pass 85; ceiling alone insufficient — needed HIGH block + RSI1M floor"
+      "when": "2026-10-10T07:42Z",
+      "status": "WORKING — no 85+ entries since; BABY@81.8 class blocked."
+    },
+    {
+      "change": "W added SHORT_BLACKLIST",
+      "when": "2026-10-10T08:38Z",
+      "status": "MONITOR — 0 W SHORT trades since."
+    },
+    {
+      "change": "mtf_macd regime-guard fail-open fix",
+      "when": "2026-10-10T02:45Z",
+      "status": "MONITOR — no new mtf counter-structure losses."
+    }
+  ],
+  "config_changes_rationale": {
+    "count": 0,
+    "why": "Highest-impact levers are (a) FRESH — bb-squeeze RSI_MAX and vol-breakout floors need 48h cohorts, (b) CEO-OWNED — pump-chain-v6 monitor-only per Oct 10 22:30 ruling, (c) WINNER-DESTROYING — ceiling 75→70 nets −$0.20/7d −$0.15/30d if applied. Forced change = destabilize for zero expected value. Filters from prior runs are demonstrably firing (log evidence)."
+  },
+  "creative_improvements": [
+    {
+      "date": "2026-10-11T05:40:53Z",
+      "idea": "Gate pump-chain-v6 LONG entries to metaRSI <60 (the structural winning band) while leaving pump-chain+ bare form untouched",
+      "rationale": "v6 combos 7d: 6T 0W −$0.50, every entry metaRSI 60-71 (AIXBT 64.3, APT 71.4, IOTA 62.5, ALT 60.0, ICP 66.7). All bailed atr_sl/HML before trail arm. Bare pump-chain+ same window: 36T +$1.49. v6 is firing its own entries in the exact band where chase-longs die, dragging the best signal.",
+      "expected_impact": "Eliminate v6 combo bleed (−$0.50/7d observed) without touching pump-chain+ edge (+$1.49/7d)",
+      "category": "entry sniper",
+      "status": "escalated_to_ceo",
+      "risk": "low — one signal-variant, reversible, does not touch CEO v6 exit-stack vehicle design"
+    }
+  ],
+  "goals_check": [
+    {
+      "goal": "24h PnL ≥$0",
+      "current": "−$1.18",
+      "status": "MISS watch",
+      "note": "SYRUP open +$0.29 trail-armed; streak needs 2-3 clean winners"
+    },
+    {
+      "goal": "7d PnL ≥$0 by Oct 12",
+      "current": "−$1.81",
+      "status": "AT RISK",
+      "note": "Oct 5 flush (−$0.90/32T) ages out end of Oct 11 → effective 7d ≈ −$0.91 after flush out; need +$0.91 from Oct 12 window to flip"
+    },
+    {
+      "goal": "7d WR ≥50% by Oct 12",
+      "current": "43.8%",
+      "status": "AT RISK",
+      "note": "Chase-long block + fresh filters should lift; verify Oct 12"
+    },
+    {
+      "goal": "SHORT 7d ≥$0 Oct 11",
+      "current": "−$0.05/25T 32%",
+      "status": "NEARLY MET — hours from green",
+      "note": "pump-chain- alone +$0.60/15T; remaining drag mtf-regime-trend- −$0.42 is pre-kill historical (last close Oct 5, flag False since Oct 6) — ages out Oct 12"
+    },
+    {
+      "goal": "HML share <40%",
+      "current": "35.3% (54/153)",
+      "status": "MET — HOLD −2.00 confirmed",
+      "note": "magnitude avg −3.49% price @lev3.9; frequency goal met, do not widen CUT_LOSER further"
+    },
+    {
+      "goal": "wyckoff pairing Oct 11",
+      "current": "0 trades all-time",
+      "status": "URGENT — signal_analyst deadline TODAY EOD",
+      "note": "If undelivered, wyckoff stays shadow per CEO"
     }
   ],
   "next_actions": [
-    "Monitor bb-squeeze+ first fire with RSI_MAX=65 — expect only 60-65 entries",
-    "Monitor volume-breakout-long+ post-fix trades (HIGH block + RSI1M floor + ceiling 85) — need 10+ to judge",
-    "SHORT 7d PnL deadline TODAY: currently -$0.05. pump-chain- SHORT +$0.60/15T carries; mtf-regime-trend- -$0.42/5T is the bleed (n=5, monitor only)",
-    "7d PnL -$1.12 / WR 45.2% AT RISK through Oct 12 — Oct 5 flush ages out",
-    "Shadow-test HML cluster breaker before any live wiring"
-  ]
+    "Oct 11 EOD: wyckoff pairing delivery check (signal_analizen — CEO URGENT)",
+    "Oct 11: SHORT 7d confirm ≥$0 (−$0.05, should flip with flush aging)",
+    "Oct 12: metric checkpoint — 7d WR/PnL post-flush-aging; re-check 65-70 band drift; bb-squeeze RSI_MAX=65 first cohort; vol-breakout HIGH block cohort n",
+    "CEO: v6 RSI<60 entry gate decision (creative improvement above) — v6 6T 0W all RSI 60-71",
+    "CEO: disk 85% → retention still standing (coin_tracker 3.3G, candles 2.7G)",
+    "Monitor: r2v2 family (n=4 all-time, Oct 10 EXTREME cluster) — no filter until n≥20"
+  ],
+  "protected_flags_verified": {
+    "LIVE_TRADING_ENABLED": true,
+    "kill_switch_json": true,
+    "PM_TRAIL_ENABLED": true,
+    "CUT_LOSER_PNL": -2.0,
+    "session_lock": false
+  }
 }

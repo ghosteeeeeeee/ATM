@@ -431,3 +431,19 @@
 - **WARN** (1x): 1 phantom trade in last 24h (SOPH LONG bb-bounce-v2-long+ 0.0% PnL). Low count, no action.
 - **INFO**: Pipeline cycle #237263 completed cleanly. 3 open, 32 closed today, +1.01% PnL. 32 signals in last hour. Prices 1min fresh. No crashes/tracebacks in 30min. All critical timers active.
 - Earlier today: HL mirror errors (insufficient margin) — not recurring in last 30min.
+
+## Error Alerts — 2026-10-11 02:00 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-11 04:00 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-11 05:48 UTC
+- **[WARN]** (1x): Disk usage at 85% (95G/118G). Big consumers: coin_tracker.db (3.3G), candles.db (2.7G), session_brain.db (1.1G), signals_hermes.db (989M).
+- **AUTO-FIX**: Vacuumed 262M of archived systemd journals. Data DBs left untouched (essential). Recommend periodic candle/token pruning if disk climbs past 90%.
+
+## Error Alerts — 2026-10-11 06:49 UTC
+- **WARN** (1x): `[DISK]` Root filesystem at 85% used (95G/118G). No logs >7d to compress; journals already minimal. candles.db is 2.8GB.
+- **WARN** (1x): `[bug-hunter exit 1]` Failed at 06:46 — by design when findings exist: dead signal_gen imports (zscore_momentum, trend_purity_signals, candle_predictor), 4 hardcoded password files, 75 non-atomic JSON writers. **AUTO-FIX**: `systemctl reset-failed` — will re-fire on next 8h timer.
+- **WARN** (1x): `[ceo exit 124]` Timed out at 05:57 after ~1min CPU. **AUTO-FIX**: `systemctl reset-failed` — will re-fire on next timer.

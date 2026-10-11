@@ -279,7 +279,7 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
     'BABY',
-    'BLUR',
+    'GRASS',
     'SYRUP'
 }
 FAVORITES_SHORT = {
@@ -309,8 +309,10 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
+    'AIXBT',
     'IMX'
 }
+
 
 
 
