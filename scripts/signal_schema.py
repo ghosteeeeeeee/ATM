@@ -3335,6 +3335,60 @@ def rollback_signal_executed(token, direction, signal_id=None) -> bool:
         return False
 
 
+def mark_signal_failed(signal_id, reason=None):
+    """
+    Terminal state for a CLAIMED signal whose trade never opened (executed=1,
+    decision='FAILED').
+
+    CEO ruling 2026-10-11: executed=1 means "never re-claimed" (satisfies the
+    2026-09-08 no-rollback/retry-loop concern); decision='FAILED' means analytics
+    know no trade opened (fixes the false-EXECUTED pollution from the 20
+    CFX/NEO rows).
+
+    IMPORTANT: must NOT reuse mark_signal_executed('FAILED') — that UPDATE is
+    guarded by WHERE executed=0, and the BUG-26 atomic claim already set
+    executed=1, so the update silently no-ops (BUG-051 shipped 2026-10-11 hit
+    exactly this trap on its SKIPPED release path).
+    """
+    _reason = (str(reason)[:500] if reason else 'trade failed at execution (no position opened)')
+    with _db_cursor(_runtime()) as (conn, c):
+        c.execute('''
+            UPDATE signals
+            SET decision='FAILED', decision_reason=?,
+                updated_at=CURRENT_TIMESTAMP
+            WHERE id=? AND executed=1 AND decision='EXECUTED'
+            RETURNING id
+        ''', (_reason, signal_id))
+        row = c.fetchone()
+        conn.commit()
+        return row is not None
+
+
+def release_signal_claim(signal_id, decision='SKIPPED', reason=None):
+    """
+    Release an atomic claim taken BEFORE a validation check failed (BUG-051
+    claim-before-validate paths: EXPIRED / stale / missing signal).
+
+    Sets executed=0 + decision so the row leaves the EXECUTED pool and is
+    purged by the stale-unexecuted sweeper (decision IN EXPIRED/SKIPPED,
+    executed=0). Fixes BUG-051's silent no-op: it called
+    mark_signal_executed(..., 'SKIPPED') whose WHERE executed=0 guard never
+    matched a row already claimed to executed=1.
+    """
+    _reason = (str(reason)[:500] if reason else None)
+    with _db_cursor(_runtime()) as (conn, c):
+        c.execute('''
+            UPDATE signals
+            SET decision=?, decision_reason=?, executed=0,
+                updated_at=CURRENT_TIMESTAMP
+            WHERE id=? AND executed=1
+            RETURNING id
+        ''', (decision, _reason, signal_id))
+        row = c.fetchone()
+        conn.commit()
+        return row is not None
+
+
 def approve_signal(token, direction, leverage=None):
     conn = _get_conn(_runtime())
     c = conn.cursor()

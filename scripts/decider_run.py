@@ -11,7 +11,8 @@ sys.path.insert(0, '/root/.hermes/scripts')
 from signal_schema import (init_db, get_approved_signals, get_pending_signals,
                            mark_signal_executed, cleanup_stale_approved,
                            update_signal_decision, validate_source,
-                           is_component_disabled)
+                           is_component_disabled,
+                           mark_signal_failed, release_signal_claim)
 from paths import *
 # NOTE: legacy LLM-based compaction removed. Current pipeline uses:
 #   signal_compactor.py (runs every 1 min via hermes-signal-compactor.timer) → writes hotset.json
@@ -4590,8 +4591,10 @@ def run(dry_run=False):
                         # trade — it can never be retried AND it pollutes executed-vs-traded
                         # winrate analytics. SKIPPED is the correct terminal state for a
                         # considered-but-not-traded signal.
-                        mark_signal_executed(token, direction, 'SKIPPED',
-                                             signal_id=sig_id,
+                        # FIX (BUG-051b, 2026-10-11 CEO): was mark_signal_executed('SKIPPED')
+                        # — silent no-op, that UPDATE is guarded WHERE executed=0 and the
+                        # claim already set executed=1. release_signal_claim clears the claim.
+                        release_signal_claim(sig_id, 'SKIPPED',
                                              reason='claim-before-validate: signal EXPIRED at execution time')
                         continue
                     # Check age: if signal is older than 15 minutes, skip
@@ -4601,9 +4604,8 @@ def run(dry_run=False):
                             if _sig_age_min > 15:
                                 log(f'SKIP: {token} {direction} — signal {sig_id} is {_sig_age_min:.0f}min old (>15min), too stale to execute')
                                 skipped += 1
-                                # FIX (BUG-051): release claim — was leaking EXECUTED rows.
-                                mark_signal_executed(token, direction, 'SKIPPED',
-                                                     signal_id=sig_id,
+                                # FIX (BUG-051b): release claim — was leaking EXECUTED rows.
+                                release_signal_claim(sig_id, 'SKIPPED',
                                                      reason=f'claim-before-validate: stale signal {_sig_age_min:.0f}min old at execution')
                                 continue
                         except Exception:
@@ -4612,9 +4614,8 @@ def run(dry_run=False):
                     # Signal doesn't exist — block trade
                     log(f'SKIP: {token} {direction} — signal {sig_id} does not exist in DB, blocking stale trade')
                     skipped += 1
-                    # FIX (BUG-051): release claim — was leaking EXECUTED rows.
-                    mark_signal_executed(token, direction, 'SKIPPED',
-                                         signal_id=sig_id,
+                    # FIX (BUG-051b): release claim — was leaking EXECUTED rows.
+                    release_signal_claim(sig_id, 'SKIPPED',
                                          reason='claim-before-validate: signal missing from DB at execution')
                     continue
             except Exception as _e:
@@ -4907,6 +4908,19 @@ def run(dry_run=False):
             # pipeline cycle will re-approve if conditions still warrant.
             if sig_id:
                 log(f'  ⚠️ TRADE FAILED: {token} {direction} — signal NOT rolled back (prevents retry loop)')
+                # FIX (BUG-052, 2026-10-11 CEO): transition claim → FAILED terminal state.
+                # executed=1 stays set (never re-claimed — preserves the 2026-09-08
+                # no-retry-loop ruling) but decision='FAILED' tells analytics no trade
+                # opened. Before this, failed executions left decision='EXECUTED',
+                # polluting executed-vs-traded winrate stats (20 false CFX/NEO rows
+                # on 2026-10-11, all SHORT RSI-hard-floor rejections).
+                try:
+                    if mark_signal_failed(sig_id, reason=f'trade failed at execution: {msg}'):
+                        log(f'  🏷️ signal {sig_id} marked FAILED (executed=1, no trade opened) — analytics-safe terminal state')
+                    else:
+                        log(f'  ⚠️ mark_signal_failed no-op for signal {sig_id} (not in EXECUTED state?)', 'WARN')
+                except Exception as _mf_e:
+                    log(f'  ⚠️ mark_signal_failed error for signal {sig_id}: {_mf_e}', 'WARN')
                 # FIX (BUG-049, 2026-10-11): record the execution failure so the
                 # 2-fails→1h cooldown (_check_hotset_cooldown) can engage. Previously
                 # _record_hotset_failure was ONLY called at approval-filter time, never

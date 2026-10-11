@@ -512,3 +512,8 @@
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-11 23:00 UTC
+- **REPEATED** (17x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (17x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+- **REPEATED** (12x): `Oct N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Balance too low ($N.N < $N.N)`

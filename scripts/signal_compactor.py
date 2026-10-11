@@ -5562,10 +5562,12 @@ def _purge_executed_signals(hours=1, dry=False):
 
 
 def _do_purge(conn, c, hours):
-    """Execute the actual DELETE for _purge_executed_signals. Returns rowcount."""
+    """Execute the actual DELETE for _purge_executed_signals. Returns rowcount.
+    FIX (BUG-052): includes FAILED (claimed-but-no-trade) — same lifecycle as
+    EXECUTED; FAILED means known-no-trade so no PG phantom-restore check needed."""
     c.execute("""
         DELETE FROM signals
-        WHERE decision = 'EXECUTED'
+        WHERE decision IN ('EXECUTED', 'FAILED')
           AND updated_at < datetime('now', '-' || ? || ' hours')
     """, (hours,))
     deleted = c.rowcount
