@@ -1216,7 +1216,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                     _src_lower = (source or '').lower().replace('_', '-')
                     _sig_lower = (signal_type or '').lower().replace('_', '-')
                     _is_btc_exempt = any(x in _src_lower or x in _sig_lower for x in
-                                         ('pump-chain', 'mover', 'open-skies', 'accel-300'))
+                                         ('pump-chain', 'mover', 'open-skies', 'accel-300', 'volume-buildup'))
                     if _is_btc_exempt:
                         _override = True
                         log(f"  ✅ [BTC-CHOP-OVERRIDE] {token} {direction} {signal_type} — BTC-exempt signal type, bypassing chop gate")
@@ -2617,7 +2617,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             _is_open_skies = bare_source in ('open-skies+', 'open-skies', 'open_skies')
             _is_accel_breakout = 'accel-300-breakout' in bare_source
             _is_grind_accum = 'grind-accum' in bare_source or 'grind_accum' in bare_source
-            _btc_exempt = _is_pump_chain or _is_mover or _is_open_skies or _is_accel_breakout or _is_grind_accum
+            _is_volume_buildup = 'volume-buildup' in bare_source or 'volume_buildup' in bare_source
+            _btc_exempt = _is_pump_chain or _is_mover or _is_open_skies or _is_accel_breakout or _is_grind_accum or _is_volume_buildup
             _continuum_phase = None  # will be set if we query continuum
             if BTC_CHOP_GATE_ENABLED and not _btc_exempt:
                 _bypass_conn = None
