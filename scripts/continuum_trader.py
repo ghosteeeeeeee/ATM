@@ -323,6 +323,14 @@ class ContinuumTrader:
             return False, f"Exit cooldown ({remaining}m remaining)"
         
         return True, "OK"
+    
+    def set_position_state(self, side: str, entry_price: float):
+        """Set engine position state after manual trade placement.
+        Prevents reconcile logic from closing the position."""
+        self.engine.position_side = side
+        self.engine.entry_phase = 6
+        self.last_position_side = side
+        print(f"[TRADER] Engine state set: {side} @ ${entry_price:.1f} (Phase 6)")
         
     def run_tick(self):
         """Run one tick of the continuum trader."""
@@ -346,7 +354,8 @@ class ContinuumTrader:
                 self._handle_exit(state)
             
             # Reconcile: check for orphaned positions (file has position but engine doesn't)
-            tracked = get_our_positions()
+            # Skip manual positions (placed outside engine state machine)
+            tracked = [p for p in get_our_positions() if not p.get('manual')]
             if tracked and state.position_side == 'NONE':
                 print(f"[TRADER] RECONCILE: {len(tracked)} orphaned position(s) found, attempting close...")
                 for pos in tracked:

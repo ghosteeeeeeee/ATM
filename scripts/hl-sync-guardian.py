@@ -929,6 +929,10 @@ def close_position_hl(coin: str, reason: str) -> bool:
     """Close a position on HL. Returns True on success.
     SDK market_close returns None when coin not in positions (already flat) —
     that is SUCCESS, not rate-limit. Retry once on real failures."""
+    # CONTINUUM EXEMPTION: Never close BTC positions managed by the continuum engine
+    if coin.upper() == 'BTC':
+        log(f'  ⛔ CONTINUUM: skipping HL close for {coin} ({reason}) — continuum manages BTC', 'WARN')
+        return False
     log(f'  → close_position_hl({coin}, reason={reason}) — initiating HL market close')
     if DRY:
         log(f'  [DRY] Would close {coin} ({reason})')
@@ -3088,6 +3092,10 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         CASCADE_FLIP   = cascade flip
         MANUAL_CLOSE   = T manually closed via kill switch
     """
+    # CONTINUUM EXEMPTION: Never close BTC trades managed by the continuum engine
+    if token.upper() == 'BTC':
+        log(f'  ⛔ CONTINUUM: skipping paper close for {token} ({reason}) — continuum manages BTC', 'WARN')
+        return
     # BUG-FIX B7: Kill switch check — skip if T manually closed this token
     if _is_token_killed(token):
         log(f'  Kill switch: skipping close for {token} ({reason})', 'INFO')
@@ -3304,6 +3312,10 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
     DB lookup. Allows guardian to pass actual HL notional (sz × entry_px)
     computed at orphan-close time before DB INSERT creates the record.
     """
+    # CONTINUUM EXEMPTION: Never close BTC trades managed by the continuum engine
+    if token.upper() == 'BTC':
+        log(f'  ⛔ CONTINUUM: skipping orphan close for {token} ({reason}) — continuum manages BTC', 'WARN')
+        return False
     if DRY:
         log(f'  [DRY] Would _close_orphan_paper_trade_by_id #{trade_id} ({reason})', 'WARN')
         return True  # DRY mode: treat as success (no marker to leak)
