@@ -2862,7 +2862,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout — works solo
     'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works solo
     'grind-breakout-v2+', 'grind-breakout-v2-', 'grind-breakout-v2', 'grind_breakout_v2',  # compression → volume breakout — works solo (2026-10-10). Bare form needed: _src_stripped strips +/- but keeps digits.
-    'volume-buildup+', 'volume-buildup-', 'volume_buildup',  # sustained volume buildup — works solo (2026-10-11)
+    'volume-buildup+', 'volume-buildup-', 'volume-buildup', 'volume_buildup',  # sustained volume buildup — works solo (2026-10-11). Bare form needed: compactor strips +/- for matching.
     'tl_break_long', 'tl_break_short',
     'atr-spike',
     'ct-hot',
