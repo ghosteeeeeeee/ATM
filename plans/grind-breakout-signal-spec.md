@@ -23,12 +23,27 @@ ENTRY: Price closes above N-bar high (resistance breakout)
 
 | # | Condition | Parameter | Default | Rationale |
 |---|-----------|-----------|---------|-----------|
-| 1 | Price breaks above resistance | `RESISTANCE_BARS` | 20 | 20-bar high on 5m = ~100min consolidation range |
-| 2 | Breakout bar closes in top 50% of range | `BREAKOUT_BODY_MIN` | 0.5 | Confirms buying pressure, not just a wick |
-| 3 | Volume surge | `VOL_SURGE_MULT` | 2.0 | 2x average = institutional participation |
-| 4 | Acceleration positive | `ACCEL_MIN` | 0.0 | Velocity increasing = move gaining steam |
-| 5 | MACD histogram rising (optional) | `MACD_RISE_ENABLED` | True | Secondary momentum confirmation |
-| 6 | Not overextended | `MAX_MOVE_FROM_RANGE` | 3.0% | Don't chase if price already moved >3% from breakout level |
+| 1 | **BB compression before breakout** | `BB_COMPRESS_MAX` | 3.0% | BB width must be below this within last 10 bars. Tight coil = coiled spring. CHIP was 0.62%, CFX was 5.5%. |
+| 2 | Price breaks above resistance | `RESISTANCE_BARS` | 20 | 20-bar high on 5m = ~100min consolidation range |
+| 3 | Breakout bar closes in top 50% of range | `BREAKOUT_BODY_MIN` | 0.5 | Confirms buying pressure, not just a wick |
+| 4 | Volume surge | `VOL_SURGE_MULT` | 2.0 | 2x average = institutional participation |
+| 5 | Volume during compression was low | `COMPRESS_VOL_MAX` | 0.6 | Volume must have been below 60% of average during compression. Dead volume = accumulation. |
+| 6 | Acceleration positive | `ACCEL_MIN` | 0.0 | Velocity increasing = move gaining steam |
+| 7 | MACD histogram rising (optional) | `MACD_RISE_ENABLED` | True | Secondary momentum confirmation |
+| 8 | Not overextended | `MAX_MOVE_FROM_RANGE` | 3.0% | Don't chase if price already moved >3% from breakout level |
+
+### Compression Precondition (Condition 1+5)
+
+The compression filter is what separates V2 from pump-chain (which fires on any pump). Evidence from the target moves:
+
+| Token | BB Width Before Breakout | Volume Before Breakout | Move |
+|-------|-------------------------|----------------------|------|
+| CHIP | **0.62%–1.34%** | 0.0x–0.6x | +29.4% |
+| CFX | **5.5%** (compressing from 18.6%) | 0.1x–0.3x | +20.7% |
+
+**Compression check:** At breakout, BB(20, 2.0) width must have been below `BB_COMPRESS_MAX` within the last `COMPRESS_LOOKBACK` bars (10 bars = 50 minutes on 5m). AND volume during those compression bars must have been below `COMPRESS_VOL_MAX` × average.
+
+This filters out tokens that are already volatile (no coil = no spring). It also catches the accumulation phase — smart money buying quietly in a tight range before the markup.
 
 ### SHORT Entry (Mirror)
 
@@ -76,6 +91,22 @@ SOURCE_SHORT      = 'grind-breakout-v2-'
 
 V2 is **simpler** (fewer conditions = less overfitting) but adds the **volume surge** filter that V1 is missing. Volume is the single most important confirmation for breakout validity — price without volume is noise.
 
+## Lessons from Coiled-Spring (coiled_spring.py) — KILLED 2026-10-01
+
+Coiled-spring attempted a similar compression-breakout pattern but failed: **22 trades, 40.9% WR, −$0.79**. Loses in ALL regimes.
+
+| What went wrong | How V2 avoids it |
+|----------------|-----------------|
+| **40+ constants** — massive overfitting surface | V2 uses ~15 constants |
+| **5-of-6 conditions required** — too restrictive, signals rarely fire | V2 uses 4 core conditions (compression, breakout, volume, acceleration) |
+| **Required specific multi-phase pattern** (impulse → pause → second push → coiled → trigger) — too complex, rarely aligns | V2 just checks: was it compressed? Did it break out with volume? Is it accelerating? |
+| **Required bullish trend first** (HH/HL structure, EMA alignment) — blocks counter-trend breakouts | V2 has no trend requirement — works in any regime |
+| **RSI 30-50 filter** — too restrictive, blocks strong momentum | V2 has no RSI filter |
+| **LONG only** — can't catch breakdowns | V2 works both directions |
+| **Normal-only regime** — vol gate blocked HIGH/EXTREME | V2 should be regime-agnostic (backtest will confirm) |
+
+**The core mistake:** Coiled-spring tried to define the EXACT pattern (multi-phase, specific indicators). V2 uses a simpler question: **"Was this token quiet, and is it now moving with volume?"** — that's what CHIP and CFX did.
+
 ## Constants (hermes_constants.py)
 
 ```python
@@ -94,6 +125,13 @@ GRIND_BREAKOUT_V2_ACCEL_MIN = 0.0         # min acceleration (0.0 = must be posi
 GRIND_BREAKOUT_V2_MACD_RISE_ENABLED = True # require MACD histogram rising
 GRIND_BREAKOUT_V2_MAX_MOVE_FROM_RANGE = 3.0  # max % move from breakout level (don't chase)
 GRIND_BREAKOUT_V2_BREAKOUT_BODY_MIN = 0.5 # min body/range ratio for breakout bar
+
+# Compression precondition (the coiled spring)
+GRIND_BREAKOUT_V2_BB_COMPRESS_MAX = 3.0   # BB(20,2.0) width must be below this % before breakout
+GRIND_BREAKOUT_V2_COMPRESS_LOOKBACK = 10  # bars to check for compression (10 bars = 50min on 5m)
+GRIND_BREAKOUT_V2_COMPRESS_VOL_MAX = 0.6  # volume must be below this × avg during compression
+GRIND_BREAKOUT_V2_BB_PERIOD = 20          # BB period
+GRIND_BREAKOUT_V2_BB_STDDEV = 2.0         # BB standard deviations
 
 # Exit rules
 GRIND_BREAKOUT_V2_TP_TRAIL_PCT = 1.5      # trail from highest high
