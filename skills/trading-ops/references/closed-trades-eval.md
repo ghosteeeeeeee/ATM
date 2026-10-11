@@ -7,7 +7,7 @@ description: Audit closed trades for bogus zero-PnL entries, delete them, then r
 
 ## Prerequisites
 - SQLite signals DB: `/root/.hermes/data/signals_hermes_runtime.db`
-- PostgreSQL brain DB: `host=/var/run/postgresql, dbname=brain, user=postgres, password=Brain123` (for blocklist lookups only)
+- PostgreSQL brain DB: `host=/var/run/postgresql, dbname=brain, user=postgres, password=[BRAIN_DB_PASSWORD]` (for blocklist lookups only)
 - Constants file: `/root/.hermes/scripts/hermes_constants.py`
 - The canonical `signal_outcomes` table is in SQLite — NOT in PostgreSQL brain DB
 - The `signal_outcomes` table does NOT have a `close_reason` column — do not look for one

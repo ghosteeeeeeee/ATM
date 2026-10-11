@@ -38,7 +38,7 @@ grep "PERSIST" /root/.hermes/logs/pipeline.log | tail -10
 # Check PostgreSQL directly
 python3 -c "
 import psycopg2
-conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
 cur.execute(\"SELECT token, direction, entry_price, stop_loss, target, atr_managed FROM trades WHERE status='open' AND direction='SHORT'\")
 for row in cur.fetchall():

@@ -44,7 +44,7 @@ The guardian had been returning `HL returned empty` since June 13 — it couldn'
 
 **1. `.secrets.local`** — Already had correct values (correct wallet was there, just being ignored by hyperliquid_exchange.py):
 ```
-SIGNING_KEY="0xa3efd0f6339a7dd8130b2b9ccee331d62585d5de685ddc56eb04d03d55b47140"
+SIGNING_KEY="[SIGNING_KEY]"
 SIGNING_WALLET_ADDRESS="0x8507BEE48e89BB6C53096AF9461Be3FE2B78D3AC"
 MAIN_ACCOUNT_ADDRESS="0x324a9713603863FE3A678E83d7a81E20186126E7"
 ```

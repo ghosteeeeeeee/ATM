@@ -40,7 +40,7 @@ This rules out a genuine SL hit. The stored SL was $1.9133 — price at close wa
 ## Diagnostic Query
 
 ```bash
-PGPASSWORD='Brain123' psql -h /var/run/postgresql -U postgres -d brain \
+PGPASSWORD='[BRAIN_DB_PASSWORD]' psql -h /var/run/postgresql -U postgres -d brain \
   -c "SELECT id, token, direction, entry_price, exit_price, stop_loss, target, current_price, pnl_pct, pnl_usdt, close_reason, open_time, close_time FROM trades WHERE token='MORPHO' ORDER BY open_time DESC LIMIT 3;"
 ```
 

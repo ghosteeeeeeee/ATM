@@ -15,7 +15,7 @@ Run when asked to analyze a token for blacklist eligibility, or when a token has
 **PostgreSQL brain DB:**
 ```python
 import psycopg2
-conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
 cur.execute("""
     SELECT token, direction, pnl_pct, pnl_usdt, status, close_reason, open_time, close_time

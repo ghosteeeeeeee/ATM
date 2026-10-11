@@ -31,7 +31,7 @@ FROM trades WHERE status='closed'
 ## Verification
 ```bash
 # Check server values in brain DB
-psql "host=/var/run/postgresql dbname=brain user=postgres password=Brain123" \
+psql "host=/var/run/postgresql dbname=brain user=postgres password=[BRAIN_DB_PASSWORD]" \
   -c "SELECT DISTINCT server, status, COUNT(*) FROM trades GROUP BY server, status"
 
 # Run the writer

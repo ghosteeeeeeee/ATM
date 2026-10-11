@@ -15,7 +15,7 @@ cat automation/recent_changes.log | tail -20  # Recent changes (don't revert)
 
 ```python
 import psycopg2
-conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
 
 # Trades closed in last hour

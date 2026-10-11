@@ -98,7 +98,7 @@ The display layer (`trades.json` written by `_update_trades_json_atr()` in guard
 
 ```python
 import psycopg2
-conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
 cur.execute("""
     SELECT token, direction, entry_price, stop_loss, target, 

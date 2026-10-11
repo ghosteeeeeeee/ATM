@@ -54,7 +54,7 @@ The fallback values (1.5% / 8%) are applied directly to entry without going thro
 3. **Verify the ATR engine ran for this trade:**
    ```python
    import psycopg2
-   conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+   conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
    cur = conn.cursor()
    cur.execute("SELECT token, direction, entry_price, stop_loss, target, atr_managed FROM trades WHERE token='SNX' AND status='open'")
    print(cur.fetchone())
@@ -85,7 +85,7 @@ grep '\[TPSL\].*SNX' /root/.hermes/logs/pipeline.log | grep -oE 'SL=[0-9.]+ TP=[
 # Check what PostgreSQL has (should match TPSL log if atr_managed=TRUE)
 python3 -c "
 import psycopg2, json
-conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
 cur.execute(\"SELECT token, direction, entry_price, stop_loss, target, atr_managed FROM trades WHERE token='SNX' AND status='open'\")
 row = cur.fetchone()

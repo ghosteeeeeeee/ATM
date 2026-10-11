@@ -79,7 +79,7 @@ What was the last PnL? WR? Any critical issues flagged?
 ### B. Query 24h trade data (PostgreSQL)
 ```python
 import psycopg2
-conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
 cur.execute("""
     SELECT signal, direction, COUNT(*) as trades, 

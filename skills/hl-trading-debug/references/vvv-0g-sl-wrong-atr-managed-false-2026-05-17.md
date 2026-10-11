@@ -38,7 +38,7 @@ If `atr_managed = FALSE`, either:
 
 ```python
 import psycopg2
-conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
 cur.execute("SELECT token, direction, entry_price, stop_loss, target, highest_price, lowest_price, atr_managed FROM trades WHERE status='open' AND token IN ('VVV','0G')")
 for row in cur.fetchall():

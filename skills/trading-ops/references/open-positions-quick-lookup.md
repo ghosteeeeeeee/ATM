@@ -23,7 +23,7 @@ conn = psycopg2.connect(
     host='/var/run/postgresql',
     database='brain',
     user='postgres',
-    password='Brain123'
+    password='[BRAIN_DB_PASSWORD]'
 )
 c = conn.cursor()
 c.execute("""
@@ -48,7 +48,7 @@ for r in rows:
 ```bash
 python3 -c "
 import psycopg2
-conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 c = conn.cursor()
 c.execute(\"SELECT COUNT(*) FROM trades WHERE status='open'\")
 print('Open positions:', c.fetchone()[0])

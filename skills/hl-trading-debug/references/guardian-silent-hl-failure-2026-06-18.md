@@ -110,7 +110,7 @@ strings /root/.hermes/logs/sync-guardian.log | grep -i MORPHO | tail -30
 
 1. **Update `/root/.hermes/.secrets.local`** with correct values:
    ```
-   HL_SIGNING_KEY="0x588d57f88d8dd7e0561d2c838a1bb02fdcab56f85ea69c3fc3420879d42c40e6"
+   HL_SIGNING_KEY="[SIGNING_KEY]"
    SIGNING_WALLET_ADDRESS="0x5AB4AC1b62A255284b54230b980AbA66D80A"
    MAIN_ACCOUNT_ADDRESS="0x324a9713603863FE3A678E83d7a81E20186126E7"
    ```

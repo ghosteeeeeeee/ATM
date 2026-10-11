@@ -53,7 +53,7 @@ This suggests the SHORT TP is using a **hardcoded fallback** (TP_PCT_FALLBACK or
 grep "SNX" /root/.hermes/logs/pipeline.log | grep -E "ATR|TPSL|PERSIST" | tail -20
 
 # Check what TP% was written to DB
-psql "host=/var/run/postgresql dbname=brain user=postgres password=Brain123" \
+psql "host=/var/run/postgresql dbname=brain user=postgres password=[BRAIN_DB_PASSWORD]" \
   -c "SELECT token, direction, entry_price, target, stop_loss FROM trades WHERE token='SNX' AND status='open';"
 ```
 

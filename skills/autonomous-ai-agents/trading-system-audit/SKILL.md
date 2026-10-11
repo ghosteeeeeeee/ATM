@@ -549,7 +549,7 @@ try:
     import psycopg2
     mids = get_allMids()
     hl = get_open_hype_positions_curl()
-    conn = psycopg2.connect(host='/var/run/postgresql',dbname='brain',user='postgres',password='Brain123')
+    conn = psycopg2.connect(host='/var/run/postgresql',dbname='brain',user='postgres',password='[BRAIN_DB_PASSWORD]')
     cur = conn.cursor()
     cur.execute("SELECT token,status FROM trades WHERE status='open'")
     db_tokens = set(r[0] for r in cur.fetchall())

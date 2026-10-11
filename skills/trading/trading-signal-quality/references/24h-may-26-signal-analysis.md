@@ -4,7 +4,7 @@
 
 - PostgreSQL `brain`: `psql -h /var/run/postgresql -U postgres -d brain`
 - SQLite runtime: `/root/.hermes/data/signals_hermes_runtime.db`
-- Connection: `psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')`
+- Connection: `psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')`
 
 ## Query Templates
 

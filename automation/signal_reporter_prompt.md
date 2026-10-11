@@ -13,7 +13,7 @@ You are analyzing signal performance for the Hermes trading system. Run every 6 
 ```python
 import psycopg2
 from datetime import datetime, timedelta, timezone
-conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='Brain123')
+conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
 now = datetime.now(timezone.utc)
 h6 = now - timedelta(hours=6)
