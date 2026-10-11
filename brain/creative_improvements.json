@@ -3867,5 +3867,24 @@
     "category": "entry sniper",
     "status": "escalated_to_ceo",
     "risk": "low — one signal-variant, reversible, does not touch CEO v6 exit-stack vehicle design"
+  },
+  {
+    "date": "2026-10-11T08:47:02Z",
+    "idea": "Continuum flap detector: if BTC linreg_direction flipped >=N times in rolling 10min, treat structure as UNRESOLVED — no bullish/bearish override, velocity fallback only",
+    "rationale": "DECLINING+LEAN_BULL+AT fix (shipped) covers the #1 flicker case, but RECOVERY/CALM flapping has the same disease. Flap count is measurable from continuum_states history. Chop = disagreement between successive structural reads.",
+    "expected_impact": "Eliminates remaining phase-lag overrides during true chop; zero impact during resolved trends (linreg stable)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — flap detector only tightens when structure is self-contradictory"
+  },
+  {
+    "date": "2026-10-11T12:46:38.673972+00:00",
+    "idea": "MFE-based chop confidence dampener in signal_decay_detector",
+    "rationale": "51% of HML trades (33/65 30d) never reached +0.10% MFE — they enter, go nowhere, die. RSI filters catch the chase band but miss chop entries across all RSI levels. Rolling median MFE < 0.15% over last 10 closes = signal is entering chop; dampen confidence 0.5× until median recovers above 0.20%. Uses mfe_pct already stored on every closed trade — zero new data plumbing.",
+    "expected_impact": "Reduce HML count by 30-50% (the never-moved cohort) without blocking trail trades (median MFE 0.584)",
+    "category": "entry sniper / chop filter",
+    "status": "suggested",
+    "risk": "low — dampen not block; recovers automatically when signal finds momentum again",
+    "implementation": "extend scripts/signal_decay_detector.py; read last 10 closed trades per signal from brain PG, compute median mfe_pct, write dampener to signal_regime_memory.json"
   }
 ]
