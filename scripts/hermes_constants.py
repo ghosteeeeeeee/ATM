@@ -2342,17 +2342,18 @@ GRIND_BREAKOUT_V2_COOLDOWN_HOURS = 0.25    # 15 min per token+direction cooldown
 # Compression precondition (the coiled spring)
 GRIND_BREAKOUT_V2_BB_COMPRESS_MAX = 3.0    # BB(20,2.0) width must be below this % before breakout
 GRIND_BREAKOUT_V2_COMPRESS_LOOKBACK = 10   # bars to check for compression (10 bars = 50min on 5m)
-GRIND_BREAKOUT_V2_COMPRESS_VOL_MAX = 0.6   # volume must be below this × avg during compression
+GRIND_BREAKOUT_V2_COMPRESS_VOL_MAX = 0.5   # volume must be below this × rolling avg during compression (kept for reference, unused in BB-only mode)
+GRIND_BREAKOUT_V2_BB_EXPAND_MULT = 2.0     # BB must expand to > Nx min BB in compression window (sweep: 2.0 → 3.4/day, +219% total)
 GRIND_BREAKOUT_V2_BB_PERIOD = 20           # BB period
 GRIND_BREAKOUT_V2_BB_STDDEV = 2.0          # BB standard deviations
 # Breakout conditions
 GRIND_BREAKOUT_V2_RESISTANCE_BARS = 20     # lookback for resistance/support
-GRIND_BREAKOUT_V2_VOL_SURGE_MULT = 2.0     # volume must be >= Nx average
+GRIND_BREAKOUT_V2_VOL_SURGE_MULT = 2.5     # volume must be >= Nx average (sweep: 2.5)
 GRIND_BREAKOUT_V2_VOL_AVG_PERIOD = 20      # bars for average volume
 GRIND_BREAKOUT_V2_ACCEL_MIN = 0.0          # min acceleration (0.0 = must be positive)
 GRIND_BREAKOUT_V2_MACD_RISE_ENABLED = True # MACD histogram rising (bonus, not hard filter)
 GRIND_BREAKOUT_V2_MAX_MOVE_FROM_RANGE = 3.0  # max % move from breakout level (don't chase)
-GRIND_BREAKOUT_V2_BREAKOUT_BODY_MIN = 0.5  # min body/range ratio for breakout bar
+GRIND_BREAKOUT_V2_BREAKOUT_BODY_MIN = 0.6  # min body/range ratio for breakout bar (sweep: 0.6)
 # Confidence
 GRIND_BREAKOUT_V2_CONF_BASE = 75           # base confidence
 GRIND_BREAKOUT_V2_CONF_FLOOR = 50          # min confidence

@@ -49,6 +49,7 @@ from hermes_constants import (
     GRIND_BREAKOUT_V2_MAX_MOVE_FROM_RANGE,
     GRIND_BREAKOUT_V2_BREAKOUT_BODY_MIN,
     GRIND_BREAKOUT_V2_BB_COMPRESS_MAX,
+    GRIND_BREAKOUT_V2_BB_EXPAND_MULT,
     GRIND_BREAKOUT_V2_COMPRESS_LOOKBACK,
     GRIND_BREAKOUT_V2_COMPRESS_VOL_MAX,
     GRIND_BREAKOUT_V2_BB_PERIOD,
@@ -203,19 +204,31 @@ def detect(token):
         return None
     current_vol_ratio = vols[-1] / vol_avg
 
-    # ── Condition 1+5: Compression before breakout ─────────────────────────
-    # BB width must have been below BB_COMPRESS_MAX within last COMPRESS_LOOKBACK bars
-    # AND volume during those bars must have been below COMPRESS_VOL_MAX × avg
+    # ── Condition 1+5: Compression before breakout + BB expansion ──────────
+    # BB width must have been below BB_COMPRESS_MAX within last COMPRESS_LOOKBACK bars,
+    # AND BB must now be > BB_EXPAND_MULT × min BB in compression window.
+    # The expansion requirement confirms a real volatility expansion (coil → spring),
+    # not just a token that's always been quiet.
     compressed = False
-    compress_start = max(0, len(candles) - 1 - GRIND_BREAKOUT_V2_COMPRESS_LOOKBACK)
+    min_bb_in_window = 999.0
+    compress_start = max(GRIND_BREAKOUT_V2_BB_PERIOD, len(candles) - 1 - GRIND_BREAKOUT_V2_COMPRESS_LOOKBACK)
     for i in range(compress_start, len(candles) - 1):  # exclude current bar
         bb_w = _bb_width(closes[:i+1], GRIND_BREAKOUT_V2_BB_PERIOD, GRIND_BREAKOUT_V2_BB_STDDEV)
-        vol_r = vols[i] / vol_avg if vol_avg > 0 else 999
-        if bb_w is not None and bb_w < GRIND_BREAKOUT_V2_BB_COMPRESS_MAX and vol_r < GRIND_BREAKOUT_V2_COMPRESS_VOL_MAX:
+        if bb_w is None:
+            continue
+        if bb_w < min_bb_in_window:
+            min_bb_in_window = bb_w
+        if bb_w < GRIND_BREAKOUT_V2_BB_COMPRESS_MAX:
             compressed = True
-            break
 
     if not compressed:
+        return None
+
+    # BB expansion: current BB must be significantly wider than compression level
+    current_bb = _bb_width(closes, GRIND_BREAKOUT_V2_BB_PERIOD, GRIND_BREAKOUT_V2_BB_STDDEV)
+    if current_bb is None or min_bb_in_window >= 999.0:
+        return None
+    if current_bb < min_bb_in_window * GRIND_BREAKOUT_V2_BB_EXPAND_MULT:
         return None
 
     # ── Condition 2: Resistance breakout (LONG) or support breakdown (SHORT) ─
