@@ -59,7 +59,12 @@ def rsi(closes, period=14):
         return None
     gains, losses = [], []
     for i in range(1, len(closes)):
-        diff = closes[i - 1] - closes[i]
+        # FIX (BUG-059, 2026-10-11): caller passes OLDEST-FIRST arrays (reversed
+        # from the ORDER BY ts DESC rows at coin_tracker.py:287). Old diff
+        # = closes[i-1] - closes[i] negated every delta, so production uptrend
+        # candles yielded RSI=0.0 and downtrends RSI=100.0 (reproduced live).
+        # Correct delta for oldest-first = current - previous.
+        diff = closes[i] - closes[i - 1]
         gains.append(max(diff, 0))
         losses.append(max(-diff, 0))
     if len(gains) < period:
@@ -154,10 +159,11 @@ def score_momentum(closes, ema_9=None, ema_20=None, ema_50=None):
     if not closes or len(closes) < 5:
         return 50.0
     # Price change over last 20 candles (or fewer if not available)
+    # FIX (BUG-059): oldest-first — current is closes[-1], lookback is closes[-1-lookback].
     lookback = min(19, len(closes) - 1)
-    if closes[lookback] == 0:
+    if closes[-1 - lookback] == 0:
         return 50.0
-    price_change = (closes[0] - closes[lookback]) / closes[lookback] * 100
+    price_change = (closes[-1] - closes[-1 - lookback]) / closes[-1 - lookback] * 100
     # Map price change to score: -10% → 10, 0% → 50, +10% → 90
     score = 50.0 + max(-40, min(40, price_change * 4))
     # EMA alignment: strong bonus/penalty

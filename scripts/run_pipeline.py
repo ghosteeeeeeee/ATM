@@ -122,9 +122,15 @@ def run(name, args=None):
                     log(f'  {l}')
 
         if proc.returncode != 0 and err:
-            for line in err.strip().split('\n')[:2]:
-                if line.strip():
-                    log(f'  ERR {name}: {line.strip()}')
+            # FIX (BUG-057, 2026-10-11): log the TAIL of stderr, not the head. A
+            # Python traceback's real exception line is the LAST line; the old [:2]
+            # captured only "Traceback..." + one "File ..." frame and hid the
+            # actual error (live case: decider_run crash 2026-10-11 17:59 showed
+            # nothing beyond "File decider_run.py line 4904"). Same class as the
+            # brain.py stderr-tail fixes (BUG-025/047).
+            _err_lines = [l for l in err.strip().split('\n') if l.strip()]
+            for line in _err_lines[-8:]:
+                log(f'  ERR {name}: {line.strip()}')
         return proc.returncode == 0
     except Exception as e:
         log(f'ERROR {name}: {e} (after {time.time()-_start:.1f}s)')

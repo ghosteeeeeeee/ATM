@@ -807,9 +807,15 @@ def process_delayed_entries(paper=False):
             else:
                 # FIX (2026-10-08, BUG-025 follow-up): tail, not head — argparse's
                 # real error line is the LAST line, after the usage block.
+                # FIX (BUG-058, 2026-10-11): also log the STDOUT tail. brain.py prints
+                # INSERT-failure tracebacks to STDOUT, so stderr alone still showed
+                # "(empty)" and hid the real cause on the delayed-entry path — the
+                # exact gap the main site's stdout_tail fix (BUG-047) already closed.
                 _derr = (result.stderr or '').strip()
+                _dout = (result.stdout or '').strip()
                 log(f'  ❌ DELAYED FAILED rc={result.returncode}: '
-                    f'{chr(10).join(_derr.splitlines()[-2:]) if _derr else "(empty)"}'[:300])
+                    f'stdout_tail={chr(10).join(_dout.splitlines()[-3:]) if _dout else "(empty)"} '
+                    f'| stderr_tail={chr(10).join(_derr.splitlines()[-2:]) if _derr else "(empty)"}'[:500])
                 still_pending.append(entry)  # keep for retry
         except Exception as e:
             log(f'  ❌ DELAYED ERROR: {e}')
@@ -4657,7 +4663,7 @@ def run(dry_run=False):
                     if _drift > 15:
                         log(f'  🚫 [RSI-DRIFT] {token} {direction}: stored RSI={_stored_rsi:.1f} vs live={_live_rsi:.1f} (drift={_drift:.1f} > 15) — extreme reversed, blocking')
                         if sig_id:
-                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                            release_signal_claim(sig_id, 'SKIPPED', reason='post-claim block: RSI-DRIFT extreme reversed at execution')
                         skipped += 1
                         continue
         except Exception as _e:
@@ -4680,7 +4686,7 @@ def run(dry_run=False):
                         _pcb_age_min = (time.time() - _pcb_ts) / 60
                         if _pcb_age_min > PUMP_CHAIN_STALE_BLOCK_AGE_MIN:
                             log(f'  🚫 [PUMP-CHAIN-STALE] {token} {direction}: signal {sig_id} is {_pcb_age_min:.0f}min old (> {PUMP_CHAIN_STALE_BLOCK_AGE_MIN}min) — 0% WR when stale, blocking')
-                            mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                            release_signal_claim(sig_id, 'SKIPPED', reason='post-claim block: PUMP-CHAIN-STALE signal too old at execution')
                             skipped += 1
                             continue
                     except Exception:
@@ -4786,7 +4792,7 @@ def run(dry_run=False):
             if _is_chase:
                 log(f'  🎯 [CHASE-BLOCK] {token} {direction} BLOCKED — {_chase_reason}')
                 if sig_id:
-                    mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                    release_signal_claim(sig_id, 'SKIPPED', reason='post-claim block: CHASE-BLOCK entry chasing at execution')
                 skipped += 1
                 continue
 
@@ -4818,7 +4824,7 @@ def run(dry_run=False):
                 if _gap_at_entry is not None and _gap_at_entry > _pc_gap_limit:
                     log(f'  🎯 [PUMP-CHAIN-GAP-BLOCK] {token} LONG BLOCKED — gap={_gap_at_entry:.2f}%>{_pc_gap_limit}%')
                     if sig_id:
-                        mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+                        release_signal_claim(sig_id, 'SKIPPED', reason='post-claim block: PUMP-CHAIN-GAP-BLOCK price gap too wide at execution')
                     skipped += 1
                     continue
         except ImportError:
