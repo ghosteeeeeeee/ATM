@@ -1716,6 +1716,10 @@ SIGNAL_EXIT_CONFIG = {
     # RR structural: RR engine + ATR SL
     'rr-struct+': 'rr_engine',
     'rr-struct-': 'rr_engine',
+    # Grind breakout V2: RR engine — structural exit manages SL/TP based on S/R levels
+    'grind-breakout-v2+': 'rr_engine',
+    'grind-breakout-v2-': 'rr_engine',
+    'grind_breakout_v2': 'rr_engine',   # underscore variant
     # Default: PM trail (current behavior for all signals not listed)
 }
 
