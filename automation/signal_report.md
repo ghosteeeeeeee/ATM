@@ -1,37 +1,57 @@
 # Signal Performance Report
+**Generated:** 2026-10-11 16:15 UTC | **Period:** Last 6h | 24h
 
-Generated: 2026-10-11 06:40 UTC
-Period: Last 6h | 24h (21 closed trades in 24h, 2 in 6h — low activity)
+## Overall Stats
+- **24h closed trades:** 19 | **PnL:** +$0.97
+- **6h closed trades:** 3 | **PnL:** +$0.65
 
-KILLED (executed):
+---
+
+## KILLED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no signal met kill criteria in 24h |
+| — | — | — | — | — | None killed |
 
-BOOSTED (executed):
+No signal met kill criteria (WR < 30% AND 5+ trades AND net PnL < -$0.10 over 24h). Closest: `volume-breakout-long+` at 0% WR / -$0.23, but only 2 trades — insufficient sample.
+
+---
+
+## BOOSTED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — top winners (ai-trader+, doji-bottom-long) had only 4 trades each, below 5-trade boost threshold |
+| — | — | — | — | — | None boosted |
 
-LOSERS (watch list):
+No signal met boost criteria (WR > 55% AND 5+ trades AND PnL > $0.05). Closest: `doji-bottom-long` at 75% WR / +$0.35 across 4 tokens, but only 4 trades (needs 5+).
+
+---
+
+## LOSERS (watch list)
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 0% | -$0.23 | 2 (24h) | WATCH: 7d = 12 trades, 25% WR, -$0.73. No winning regime (EXTREME 20%/-0.15, HIGH 37.5%/-0.46). 24h count too low to kill by rule — next run, kill if 5+ trades accumulate or add regime gate |
-| r2v2-long3/4/8 | LONG | 0% | -$0.26 | 3 (24h) | WATCH: r2v2 EXTREME regime 7d = 0% WR n=3. Noise-level volume |
-| hmacd_mtf-+ | LONG | 0% | -$0.02 | 1 (24h) | WATCH: 7d EXTREME 25% WR n=4, -$0.21 |
-| bb-squeeze+ | LONG | — | — | 0 (24h) | WATCH: 7d = 22 trades, 59.1% WR but -$0.55 PnL (R:R problem). HIGH regime -0.53. No 24h activity |
-| bb-bounce-v3-long+ | LONG | — | — | 0 (24h) | WATCH: 7d NORMAL 42.9% WR, -$0.42 |
-| mtf-regime-trend- | SHORT | — | — | 0 (24h) | WATCH: 7d 40% WR, -$0.42 |
+| volume-breakout-long+ | LONG | 0.0% | -$0.23 | 2 | ⚠️ Watch — active since 2026-09-17; kill if 24h sample reaches 5+ trades at this WR |
+| ai-trader+ | LONG | 0.0% | -$0.07 | 1 | Watch — new signal (first trade 2026-10-09) |
+| r2v2-long4 | LONG | 0.0% | -$0.03 | 1 | Watch — new signal (first trade 2026-10-10) |
+| hmacd_mtf-+ | LONG | 0.0% | -$0.02 | 1 | Watch — new signal (first trade 2026-10-09) |
 
-WINNERS:
+---
+
+## WINNERS
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| doji-bottom-long | LONG | 75% | +$0.35 | 4 (24h) | Healthy — one more trade qualifies for boost next run |
-| ai-trader+ | LONG | 75% | +$0.07 | 4 (24h) | Healthy — one more trade qualifies for boost next run |
-| pump-chain+,pump-chain-v6+ | LONG | 33.3% | +$0.39 | 3 (24h) | Profitable but WR low; pump-chain+ 7d = 52.9% WR +$1.32 |
+| r2v2-long3 | LONG | 50.0% | +$0.47 | 2 | Positive, low sample |
+| pump-chain+,pump-chain-v6+ | LONG | 33.3% | +$0.39 | 3 | Net positive despite low WR (CFX +$0.63 win covers 2 losses) |
+| doji-bottom-long | LONG | 75.0% | +$0.35 | 4 | ⭐ Boost candidate — consistent across 3/4 tokens (NXPC, AIXBT, SYRUP green); 1 more win qualifies for boost |
+| bb-bounce-v2-long+ | LONG | 66.7% | +$0.07 | 3 | Green, low sample |
+| oversold-bounce+ | LONG | 100.0% | +$0.04 | 1 | Green, single trade |
 
-ISSUES:
-- Direction inversions (24h): 0 — clean
-- Open trades: 0
-- Low trade volume (21 closes/24h) — insufficient data for most kill/boost rules; decisions deferred to next 6h run
-- bb-squeeze+ is a structural R:R problem on 7d (high WR, negative PnL) — candidate for TP/SL review, not a kill
+---
+
+## ISSUES
+
+- **No signal inversions found** in the last 24h. All `*long*` signals traded LONG.
+- **Low trade volume:** only 19 closed trades in 24h, 3 in last 6h. Few signals reach statistical thresholds for kill/boost decisions this cycle.
+- **volume-breakout-long+** is the top watch-list item: 35 lifetime trades, -$0.23 in last 24h at 0% WR (2 trades). If it continues losing, check regime performance before any kill (winning regimes → volatility_gate_v2 multiplier, not blanket disable).
