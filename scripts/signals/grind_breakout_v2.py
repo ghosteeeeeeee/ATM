@@ -269,12 +269,9 @@ def detect(token):
     if current_vol_ratio < GRIND_BREAKOUT_V2_VOL_SURGE_MULT:
         return None
 
-    # ── Condition 6: Acceleration (BONUS, not hard filter) ──────────────────
-    # FIX 2026-10-11: acceleration moved from hard filter to confidence bonus.
-    # BTC at 15:40 had accel=-0.0006 (slightly decelerating) but all other conditions
-    # passed (BB 2.6x expansion, 3.3x volume, resistance breakout). The hard filter
-    # blocked a valid breakout. BB expansion + volume surge + resistance are already
-    # strong signals — acceleration is confirmation, not requirement.
+    # ── Condition 6: Acceleration (lenient hard filter) ─────────────────────
+    # Sweep found: ACCEL_MIN=-0.02 catches CHIP+CFX at 106/day, +234% total.
+    # At 0.0 (must be positive), misses both targets — BTC's breakout had accel=-0.0006.
     accel = _get_acceleration(token)
     if accel is None:
         # Fallback: compute from candle closes
@@ -284,6 +281,11 @@ def detect(token):
             accel = vel_now - vel_prev
         else:
             accel = 0.0
+
+    if direction == 'LONG' and accel < GRIND_BREAKOUT_V2_ACCEL_MIN:
+        return None
+    if direction == 'SHORT' and accel > -GRIND_BREAKOUT_V2_ACCEL_MIN:
+        return None
 
     # ── Condition 7: Not overextended ───────────────────────────────────────
     if breakout_level and breakout_level > 0:

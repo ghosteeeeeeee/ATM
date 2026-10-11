@@ -2371,7 +2371,7 @@ GRIND_BREAKOUT_V2_BB_STDDEV = 2.0          # BB standard deviations
 GRIND_BREAKOUT_V2_RESISTANCE_BARS = 20     # lookback for resistance/support
 GRIND_BREAKOUT_V2_VOL_SURGE_MULT = 2.5     # volume must be >= Nx average (sweep: 2.5)
 GRIND_BREAKOUT_V2_VOL_AVG_PERIOD = 20      # bars for average volume
-GRIND_BREAKOUT_V2_ACCEL_MIN = 0.0          # min acceleration (0.0 = must be positive)
+GRIND_BREAKOUT_V2_ACCEL_MIN = -0.02        # min acceleration (sweep: -0.02 catches CHIP+CFX, 106/day, +234% total)
 GRIND_BREAKOUT_V2_MACD_RISE_ENABLED = True # MACD histogram rising (bonus, not hard filter)
 GRIND_BREAKOUT_V2_MAX_MOVE_FROM_RANGE = 3.0  # max % move from breakout level (don't chase)
 GRIND_BREAKOUT_V2_BREAKOUT_BODY_MIN = 0.6  # min body/range ratio for breakout bar (sweep: 0.6)
