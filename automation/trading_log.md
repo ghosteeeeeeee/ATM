@@ -8359,3 +8359,24 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - 24h WR 31% but net +$1.00 — R:R still carrying; watch if hard_max_loss share grows
+
+## [2026-10-11 20:13] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** last hour $0.00 | 24h: 23T 7W +$1.13 (WR 30%) | 4 open (BTC continuum_engine LONG x3, CAKE ai-trader+ LONG +$0.02)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: no signal with 0% WR + 3+ trades last hour (0 trades last hour). volume-breakout-long+ 1T/24h 0W -$0.09 still CEO-owned.
+- atr_sl_hit 3/23 ≈ 13% — under 40%, tpsl_utils deployed
+- hard_max_loss 3/23 ≈ 13% -$0.24 — hold brain_auditor (SL width lever)
+- profit-monster-trail 5/23 ≈ 22% of closes, +$1.02 — trailing exits still the profit engine
+- Overtrade: 0/hr — well under 20
+- Streak: hour 17 +$0.01, hour 18 −$0.09 — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers fresh (~1min)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 30% but net +$1.13 — R:R carrying; doji-bottom-long 4T 3W +$0.35, r2v2-long3 1T +$0.59, pump-chain combos +$0.39 are the winners
