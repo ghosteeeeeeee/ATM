@@ -1,5 +1,62 @@
 # Upgrade Audit Trail
 
+## Session: 2026-10-11 ~18:20 UTC — Upgrade Implementer (post-D4, L1 focus)
+
+**Scope:** scanned ~20 most recent plans/ (Oct 1 → Oct 11). No constants values touched. One doc-only change.
+
+### Plan evaluations (recent-20)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| grind-breakout-signal-spec (Oct 11) | L2–3 | MED | ✅ ALREADY IMPLEMENTED | grind_breakout_v2.py + GRIND_BREAKOUT_V2_* constants live; prior audit 2026-10-04 confirmed (AVNT blacklisted on backtest) |
+| 2026-10-09-wyckoff-bypass-verdict | N/A | — | ✅ VERDICT: REJECT | 5 fires, ex4h −2.23%, n≥30 FAIL. No STANDALONE_BYPASS add. Correctly closed |
+| 2026-10-09-q4-portfolio-cap-verdict | N/A | HIGH | ⏳ PENDING CEO | Cap B ACCEPT on aggregate ($+1.02/30d) but does NOT catch the Oct-8 cluster. No live change without CEO GO either way |
+| 2026-10-09_D4-structured-block-logging | L1 | HIGH | ✅ COMPLETE (verified) | Plan header says complete; re-ran verification harness — 1007/7740 "misses" are ALL soft multipliers (RR BOOST, RSI sweet-spot +10), not blocks. Zero real block lines lack BLOCKED |
+| 2026-10-09_ceo-orchestrator-pickup | L2 | HIGH | ✅ DONE | Both backtests delivered (wyckoff + q4 verdict files exist) |
+| 2026-10-09_gate-counterfactual-audit | L1–2 | HIGH | ✅ D3/D4 EXECUTED | expiry_shadow.py + BLOCKED tranche-1 live; remainder complete (above). Housekeeping (TESTTOKEN historical Oct 4, GRASS feed healthy) per CEO D5 low-priority |
+| 2026-10-08_winning-dna-population-report | L1–3 | HIGH | ✅ ACTIONS 1–3 SHIPPED / ACTION 5 CLOSED THIS SESSION / ACTION 2 waits Oct 15 | Entry-DNA closed (rule); cell_stats live; exit stack monitor-only. Action 5 footguns now documented (see below). Action 5b verified: entry_rsi_14 coverage 753/771=97.7% 30d (DRIFT-E fix works). Action 2 re-run due Oct 15 |
+| align-with-btc-regime | L2 | MED-HIGH | ⏳ PENDING (CEO-approved, default OFF) | BTC_REGIME_ALIGN_ENABLED absent from constants — not built. Gated: independent backtest + bug_hunter + shadow-first per CEO mods; also sequence after exit-engine changes to avoid confounds. Level 2 candidate for a dedicated session |
+| bug-hunt-gameplan / master-plan | ongoing | HIGH | 🔄 MULTI-SESSION | Tier 0 mostly fixed (BUG-023..047). Remaining open need T: BUG-036 secret rotation, BUG-037 kill-switch AND-gate |
+| profitability-fix-plan-2026-10-07 | L1–4 | HIGH | PARTIAL | P1 move-done live; P2 done differently (CUT_LOSER −1.50 + leverage-aware HML); P3 btc_grind_spike.py untested (L2); P4 continuum backfill not started. Threshold changes = CEO |
+| penalty-gated-execution-2026-10-06 | L1–2 | HIGH | FIXES 1–3 LIVE | Fix 4 (HL order sizing) = investigation pending; Fix 5 (TRAILING_ACTIVATION) = CEO |
+| ride-it-hard-max-loss-exemption | L1 code / process L2+ | HIGH | ⏳ PENDING | Needs backtest → own-conclusions → CEO. Constants change blocked without T |
+| wrong-side-chop-detector-2026-10-06 | L2 | MED | ⏭️ REJECTED/SUPERSEDED | Targeted wrong gate (losers were STANDALONE_BYPASS). Root causes fixed elsewhere |
+| short-drought-dump-day-2026-10-05 | L1–2 | HIGH | PARTIAL | Fix 3 (LLM) live; Fix 1 bear-override deliberately REJECTED (bf96d7cd, data-backed); Fix 2 hysteresis: constant exists but NEVER WIRED (see sideways); Fix 4 pre-arm not built |
+| trade-learning-system-EXECUTION | L2–3 | HIGH | P0–P4 LIVE | P5–P6 gated on shadow thresholds + CEO. Do not re-implement |
+| short-signal-drought-2026-10-02 | L1 | HIGH | FIXES 1–3 DONE | Fixes 4–6 = CEO |
+| mtf-regime-trend + multi-timeframe (dup pair) | L3 | MED | ✅ BUILT / PLUS auto-killed | MINUS still enabled; no action |
+| thesis-validation / chop-v2 / continuum-integration / partial-close | L2–3 | varies | per prior audits | statuses unchanged (TVS live; chop_exit deferred; partial-close skipped on thin MFE coverage) |
+
+### Implemented this session (1 Level 1)
+
+#### 1. Trade column-semantics footguns documented (winning-dna action 5a+5c+5d)
+- **Plan/source:** `plans/2026-10-08_winning-dna-population-report.md` §5 action 5
+- **Difficulty:** Level 1 (doc block in one file)
+- **Value:** HIGH — closes the recurring analyst trap class (mfe/pnl leverage mismatch 4–5×, era break in pnl_pct, seconds-vs-minutes duration, gross-vs-net PnL)
+- **Status:** ✅ IMPLEMENTED
+- **Fix:** `scripts/pnl_utils.py` module header gains a "Column-semantics footguns" block: pnl_pct leverage-multiplied post-2026-08-21 (era break); mfe/mae ALWAYS unleveraged; pnl_usdt gross from compute_close_pnl vs position_manager net_pnl preference vs hype_* ground truth; trade_duration SECONDS.
+- **Verified:** py_compile OK; self-check `compute_close_pnl(100→105, LONG, 1000, 5x)` → pnl_pct=25.0, pnl_usdt=50.0, net=49.1 (fee math intact). No behavior change — docs only.
+- **Action 5b:** verified already fixed (DRIFT-E 2026-10-10; entry_rsi_14 30d coverage 97.7%). No code needed.
+
+### Verifications performed (no changes)
+- **D4 harness:** zero real block lines missing BLOCKED; residual misses are soft multipliers (RR BOOST, sweet-spot boost) which the plan explicitly excludes.
+- **Fees (action 5d):** position_manager.py:895 prefers net_pnl (after 0.09% RT fee) as record_pnl; compute_close_pnl returns gross pnl_usdt + separate net_pnl; HL ground truth in hype_pnl_usdt. Documented, not rewired.
+- **SHORT_CONTINUUM_HYSTERESIS_MIN=30** defined in hermes_constants.py:1381 but referenced NOWHERE in code — Fix 2 from short-drought shipped the constant without the wiring.
+
+### Sideways findings
+1. **LOW:** `SHORT_CONTINUUM_HYSTERESIS_MIN` orphan constant (above). Wiring needs score-history tracking in signal_compactor (L2). Either wire it or remove the constant to avoid false confidence that hysteresis is live.
+2. **INFO:** trade_duration coverage 530/771 (69%) 30d closed — lower than mfe/rsi (~98%). velocity_backfill.py exists; coverage gap predates recent fixes. No action.
+
+### Success rate this session: 1/1 implemented (100%)
+### Next candidates (priority order)
+1. **align-with-btc-regime** — L2 — MED-HIGH — CEO-approved w/ mods; needs independent backtest + shadow-first build
+2. **winning-dna action 2** — L1 — HIGH — re-run analysis/winning_dna_pop_2026-10-08.py on **Oct 15**
+3. **ride-it Option B** — L1 — HIGH — blocked on backtest + CEO (process, not code)
+4. **q4 portfolio cap B** — L1 — HIGH — blocked on CEO GO (verdict recommends re-test max-2/30min or family-cap first)
+5. **short-drought Fix 2 hysteresis wiring** — L2 — MED — constant exists, needs score-history (or delete constant)
+
+---
+
 ## Session: 2026-10-04 ~18:15 UTC — Upgrade Implementer (freeze-safe only)
 
 **Freeze context:** b960ffe8 active until 2026-10-06 00:38 UTC. Trading-behavior / constants VALUES blocked. Data + prompt hygiene only. Trade-learning P0–P4 already shipped by prior agent (cell_stats, gate_shadow, t5_shadow, trade_watchdog timers live).

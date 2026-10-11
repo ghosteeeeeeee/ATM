@@ -14,6 +14,17 @@ Key definitions:
   calc_notional = hl_notional_usdt (if set) else amount_usdt * leverage
   hype_pnl_usdt = actual realized PnL from HL fills (ground truth on close)
 
+Column-semantics footguns (brain.trades / signal_outcomes — winning-dna action 5):
+  - pnl_pct is LEVERAGE-MULTIPLIED account return (post 2026-08-21). Rows before
+    2026-08-21 store unleveraged price move — era break, do not mix eras.
+  - mfe_pct / mae_pct are ALWAYS UNLEVERAGED price-move % (both tables). A 5x trade
+    with pnl_pct=+10 has mfe_pct ~ +2 on the same move. Never compute mfe/pnl ratios
+    without dividing pnl_pct by leverage first (4-5x analyst trap, caught 2026-10-08).
+  - trades.pnl_usdt from compute_close_pnl is GROSS (no fees). position_manager
+    prefers net_pnl (gross − 0.09% round-trip HL fee) as record_pnl when available;
+    HL exchange-net ground truth lands in hype_realized_pnl_usdt / hype_pnl_usdt.
+  - trades.trade_duration is SECONDS (EXTRACT(EPOCH FROM close_time - open_time)).
+
 Usage:
   from pnl_utils import (
       compute_live_pnl,      # live pnl_pct from prices
