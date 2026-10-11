@@ -8065,3 +8065,25 @@ Last hour: SYRUP doji-bottom-long LONG exit profit-monster-trail +$0.23 (+3.07%)
 - Wyckoff pairing (signal_analyst URGENT) still not delivered as of 06:35 — due EOD Oct 11.
 - CEO service also exit 124 — opencode LLM sessions slow; not fixed this run (monitor after upgrade timeout bump).
 - grind-breakout-v2 already fully shipped (commits today 02:38 etc) — no action needed.
+
+## [%Y-%m-%d %H:%M] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.63 last hour | 24h: 27T 10W −$0.57 (WR 37.0%)
+
+Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02%, $11.10 size). 0 open. 24h PnL steady at −$0.57.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0T last hour — no signal qualifies (needs 3+T at 0% WR). volume-breakout-long+ still 24h 6T 0W −$0.51 but CEO-owned re-enable
+- atr_sl_hit 6/27 ≈ 22% — under 40%, tpsl_utils deployed
+- hard_max_loss 7/27 ≈ 26% −$0.59 dominant loser — hold brain_auditor
+- Overtrade: 1/hr (limit 20)
+- Streak: hours 05/06 positive — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h still slightly negative at −$0.57 — trail wins offsetting SL losses; volume-breakout-long+ still 0W, awaiting brain_auditor/CEO
