@@ -442,3 +442,30 @@ CREATE INDEX idx_continuum_tf_ts ON continuum_states(timeframe, ts);
 8. [ ] Paper trade test
 9. [ ] Integrate with decider_run.py
 10. [ ] Update surfing.md with continuum philosophy
+
+---
+
+## Fast Pump Mode (Future Development)
+
+**Date:** 2026-10-12
+**Status:** Not implemented — current engine tuned for big waves
+
+**Use case:** Catch smaller pumps (like the Oct 12 02:18 breakout) that the current engine misses because it waits for 60min confirm + 15min sustained score.
+
+**Pattern:** Compression → Expansion → Breakout → Volume
+- Compression: low volatility, consolidation (detect via ATR squeeze, Bollinger squeeze)
+- Expansion: volatility increases
+- Breakout: price breaks above resistance/EMA300
+- Volume: volume confirms the breakout
+
+**Entry logic:**
+1. Detect compression phase (ATR squeeze, low volume)
+2. Wait for breakout (price breaks above resistance)
+3. Wait for volume confirmation (volume spike)
+4. **Immediate entry** — no 60min wait, no 15min sustained
+5. Smaller position size (25-30% of max)
+6. Tighter stops (1% vs normal)
+
+**Tradeoff:** Faster entries = more false alarms. Need strong compression detection to filter noise.
+
+**Current engine is fine for bigger waves (Sep 3 style — 6+ hour moves). Fast pump mode is a separate mode for smaller, quicker moves.**
