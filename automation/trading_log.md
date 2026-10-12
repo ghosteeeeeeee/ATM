@@ -8917,3 +8917,25 @@ Final set: []
 **Open Questions:**
 - 24h net fell +$0.17 → +$0.03 as pump-chain+ trio ate $0.14; if pump-chain+ keeps bleeding (n=6, 1W), revisit kill criteria with CEO — current rule requires 0% WR last hour, and HYPER's flat +$0.02 win blocks it
 - 24h WR 42.1% — still below ≥50% Oct 15 goal
+
+## [2026-10-12 22:13] Hourly Analysis
+
+**Trades:** 2 closed last hour — both oversold-bounce+ LONG (APT −$0.15 hard_max_loss −6.82%, NEAR −$0.08 hard_max_loss −3.38%)
+**PnL:** −$0.23 last hour | 24h: 21T 8W −$0.20 (38.1%) | 0 open
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: oversold-bounce+ last hour 2T 0W — kill rule needs 3+ trades at 0% WR last hour, NOT met (2<3). Escalating: 24h 3T 0W −$0.29, last 4 closes 0W (XPL/YGG/APT/NEAR all red since Oct 11), watchdog 21:50 already flagged 0/4. One more 0% close qualifies it for kill next hour
+- Lifetime oversold-bounce+ 8T 4W +$0.02 — edge was real Oct 6-10 (4W +$0.32 all profit-monster-trail), died with the Oct 11-12 bear flip (0W −$0.30). Regime mismatch, not necessarily broken logic
+- atr_sl_hit 1/21 ≈ 4.8% — under 40%, tpsl_utils deployed (verified present, 12 defs)
+- hard_max_loss 10/21 ≈ 47.6% −$0.84 — new high; hold brain_auditor (SL width lever), not auto_1hr's to touch
+- Overtrade: 2/hr — well under 20
+- Streak: 20h −$0.12, 21h −$0.23 = 2 consecutive negative hours; 19h zero-trade — not 3 consecutive
+- live_trading=true (constants line 33 + kill JSON), verified this run
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h net flipped +$0.03 → −$0.20 — first negative 24h net today, entirely oversold-bounce+ ($0.23) + residual pump-chain+
+- Watchdog 21:50 says "bear flip" — oversold-bounce+ is a LONG-only mean-reversion signal buying RSI 15-20; in a falling regime that's the BANANA lesson in reverse. If next close is red, kill and let CEO decide whether to re-enable with a bear-regime block instead
