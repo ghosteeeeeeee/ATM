@@ -4026,5 +4026,14 @@
     "category": "regime watch",
     "status": "monitoring",
     "risk": "none — no change"
+  },
+  {
+    "date": "2026-10-12T04:44:30Z",
+    "idea": "3-minute confirmation-timeout SHADOW: log would-exit when position age ≤3min AND pnl ≤ −0.15%",
+    "rationale": "24h instant-death hml trades: MON held 2min (−2.2%), CFX held 5min (−2.3%). These were wrong at fill. A 3-min −0.15% timeout would cut them to ~−0.3% before full hml. Need winner false-positive rate before shipping — shadow first.",
+    "expected_impact": "Cut instant-death hml magnitude ~80% on 2–5min cohort without touching winners (shadow measures FP rate)",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low (shadow-only)"
   }
 ]
