@@ -330,18 +330,35 @@ def _get_favorite_size_mult(token, direction=None):
         dir_stats = lb_data.get('direction_stats', {})
 
         # Direction-specific Hall of Fame check
+        # FIX 2026-10-12: Hall of Shame returned 0.5 UNCONDITIONALLY, unlike the
+        # LOSERS branches above which guard with max(LOSERS_SIZE_MULT, max_reduction).
+        # At low balance _get_trade_size_usdt() already floors to the $11 HL minimum,
+        # so a 0.5x multiplier produced $5.50 < MIN_TRADE_USDT and mirror_open failed
+        # with "Balance too low" — 50 failed trades in one day (APT/CFX/ADA). A size
+        # PENALTY became a total execution KILL.
+        #
+        # The floor must use the ACTUAL base size, not DEFAULT_TRADE_SIZE_USDT: the
+        # LOSERS guard divides by the constant (11/11=1.0), which permanently disables
+        # that penalty at every balance. Dividing by the live base size keeps the
+        # penalty inert only while it would otherwise kill the trade, and lets it
+        # bite again once 7% of balance exceeds the $11 minimum.
+        try:
+            from hyperliquid_exchange import _get_trade_size_usdt as _hos_base_size
+            _hos_reduction = HL_MIN_NOTIONAL_USDT / max(_hos_base_size(), HL_MIN_NOTIONAL_USDT)
+        except Exception:
+            _hos_reduction = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
         if direction and direction.upper() in dir_stats:
             dir_wr = dir_stats[direction.upper()].get('winrate', 50)
             dir_trades = dir_stats[direction.upper()].get('trades', 0)
             if dir_wr >= 60 and dir_trades >= 5:
                 return 2.0  # Hall of Fame — extra boost
             elif dir_wr < 45 and dir_trades >= 5:
-                return 0.5  # Hall of Shame — penalty
+                return max(0.5, _hos_reduction)  # Hall of Shame — penalty, floored at HL min notional
         # Combined Hall of Fame check
         elif lb_data.get('wr', 50) >= 60 and lb_data.get('trades', 0) >= 15:
             return 2.0  # Hall of Fame — extra boost
         elif lb_data.get('wr', 50) < 45 and lb_data.get('trades', 0) >= 15:
-            return 0.5  # Hall of Shame — penalty
+            return max(0.5, _hos_reduction)  # Hall of Shame — penalty, floored at HL min notional
     except Exception:
         pass
 
