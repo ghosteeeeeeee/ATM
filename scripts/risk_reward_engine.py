@@ -520,6 +520,11 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
     atr_mult = getattr(hc, 'RR_ENGINE_SL_ATR_MULT', 1.0)
     sl_distance_pct = atr_pct * atr_mult / 100.0  # convert ATR% to decimal
 
+    # Hard cap: never risk more than ATR_SL_MAX (3%) on a single trade
+    # Extreme-ATR tokens (RSR 8%, W 8.7%) would otherwise have insane SL
+    sl_cap = getattr(hc, 'ATR_SL_MAX', 0.030)
+    sl_distance_pct = min(sl_distance_pct, sl_cap)
+
     # Ensure minimum SL — but don't let the floor be wider than 2× ATR
     # (low-ATR tokens get trapped when fixed floor >> actual volatility)
     sl_floor = getattr(hc, 'ATR_SL_MIN', 0.015)
@@ -573,6 +578,9 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
     tp_distance_pct = atr_pct * getattr(hc, 'RR_ENGINE_TP_ATR_MULT', 2.0) / 100.0
     tp_distance_pct = max(tp_distance_pct, getattr(hc, 'RR_ENGINE_TP_MIN_PCT', 0.005))
     tp_distance_pct = min(tp_distance_pct, tp_max)
+    # Cap TP at 3× the (capped) SL — prevents unrealistically high R:R
+    # when SL was capped but TP wasn't (extreme ATR tokens)
+    tp_distance_pct = min(tp_distance_pct, sl_distance_pct * 3.0)
 
     tp_price = price + (price * tp_distance_pct) if direction == 'LONG' else price - (price * tp_distance_pct)
     tp_source = 'ATR'
