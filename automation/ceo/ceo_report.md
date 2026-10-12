@@ -101,3 +101,9 @@ Position_manager D3 trail-floor removal + stray HML_TRAIL_MIN_GAP_PCT comment-on
 ### Numbers: 24h 19T +$1.58 57.9% | 7d 134T +$0.54 41.8%
 ### Findings: 7d PnL flipped back POSITIVE (+$0.41→+$0.54); 24h WR strong (57.9%). NEW error: `NameError: PM_TRAIL_ACTIVATE_PCT is not defined` in position_manager (1x) — undefined constant reference, could break a trail path. Repeated: mirror_open "Balance too low" (8x), mark_signal_executed returned=0 (13x). Coin_tracker scores FRESH (agg_scores max ts=2026-10-12 05:49 UTC, 112 coins) — proactive Q12 (rotating: 12 mod 15=12) ANSWERED: updating on schedule.
 ### Recommendation: Investigate `PM_TRAIL_ACTIVATE_PCT` NameError (likely missing import/constant in position_manager) before weekly deep run.
+
+## CEO Status — 20261012T094722Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 22T +$0.75 50.0% | 7d 132T +$1.01 41.7%
+### Findings: New alert — `NameError: PM_TRAIL_ACTIVATE_PCT is not defined` in position_manager (1x, not yet repeated); earlier 05:00 batch of 8x `mirror_open Balance too low` + signal rollbacks + hotset failures (trading with thin balance?); continuum OVERRIDE allowing trades despite BTC filter 4x. Proactive (12%15=12): accumulation-phase coins — 90/112 tracked, top predictive_score: ALGO 55.4, SYRUP 54.8, BTC 54.8, MNT 54.6, GMX 54.5 (all setup=NEUTRAL except ZRO LONG 53.8) — phase data fresh (same ts batch); no accumulation→markup transition signal build yet.
+### Recommendation: bug_hunter — triage `PM_TRAIL_ACTIVATE_PCT` NameError (undefined constant = trail logic may be dead if raised live); confirm why mirror_open is balance-starved.
