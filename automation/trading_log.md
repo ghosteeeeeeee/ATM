@@ -8875,3 +8875,24 @@ Final set: []
 **Open Questions:**
 - 24h WR 47.1% with +$0.17 net — improved from +$0.09 earlier today; sixth consecutive thin-positive hour, still below ≥50% Oct 15 goal
 - Quiet stretch: 0 trades in 9 of last 10 hours, 0 open positions — market lull or over-filtering; no action while 24h net positive
+
+## [2026-10-12 20:14] Hourly Analysis
+
+**Trades:** 0 closed last hour | 2 open (HYPER +$0.00, KAS −$0.02 — both pump-chain+ LONG, opened 19:48/19:55)
+**PnL:** $0.00 last hour | 24h: 17T 8W +$0.17 (47.1%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- atr_sl_hit 1/17 ≈ 5.9% of 24h closes — under 40%, tpsl_utils deployed
+- Kill: 0 candidates — 0 closed last hour; 24h losers pump-chain+ 3T 0W −$0.33, hmacd_mtf-- 1T −$0.12 (kill rule needs 3+ trades LAST HOUR, not met). pump-chain+ is however the only signal with open positions — watch if both close red
+- hard_max_loss 7/17 ≈ 41% −$0.49 (avg −$0.070) — hold brain_auditor (SL width lever), not touched
+- Overtrade: 0/hr closed — well under 20
+- Streak: last negative hours 08h (−$0.04) / 09h (−$0.12), then zero-trade hours — not 3 consecutive negative PnL hours
+- live_trading=true (constants line 33 + kill JSON), verified this run
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 47.1% with +$0.17 net — seventh consecutive thin-positive hour, still below ≥50% Oct 15 goal
+- Quiet stretch continues (0 closed 9 of last 10 hours) but 2 fresh pump-chain+ longs just opened — first activity since 14h
