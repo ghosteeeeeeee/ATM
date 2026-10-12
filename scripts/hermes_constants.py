@@ -707,7 +707,7 @@ STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — bra
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
 CUT_LOSER_PNL     = -2.00  # close trade at -2.00% ACCOUNT PnL — CEO Oct 9: widened -1.50→-2.00. Gives trail more room to work before hard kill.
 HML_VOL_ATR_MULT  = 0.5   # brain_auditor 2026-10-08 — HML price-threshold = -0.5×ATR when ATR provides more room than CUT_LOSER_PNL/lev. Trail arms at +0.40% (PM_TRAIL_ACTIVATE) but HML killed at -0.30% price @lev5 — trail never got room in EXTREME. 7d HML 66T -$8.72 #1 bleed, 56/66 had MFE>0, median hold 61min. Example: EXTREME ATR 1.5% → thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%. NORMAL/FLAT ATR low → account threshold unchanged. HML only fires on losers — cannot block winners.
-HML_TRAIL_MIN_GAP_PCT = 0.20  # D3 TRAIL-MIN-GAP — orchestrator 2026-10-08. HML price-threshold floor = -(PM_TRAIL_ACTIVATE_PCT*100 + this) = -(0.40+0.20)=-0.60% so PM trail always has room to arm before hard kill. Frequency goal: HML <40% of closes (was 60-67%). Applied before vol floor; EXTREME ATR can still widen further via HML_VOL_ATR_MULT. Evidence: 24h HML LDO pump-chain+ MFE=+0.27% FIL pump-chain- MFE=+0.82% both closed HML — trail never armed. HML only fires on losers.
+HML_TRAIL_MIN_GAP_PCT = 0.20  # UNUSED as of CEO 2026-10-12 — D3 trail-floor block REMOVED from position_manager (only fired at lev>=4 and widened HML past CUT_LOSER account limit; same bug class as vol floor capped Oct 10). Value kept for history. DO NOT re-add a trail floor that exceeds CUT_LOSER_PNL/lev.
 
 # ── Trailing Activation — brain.py / decider_run.py
 # CEO 2026-08-05: widened from 0.10% — trades killed on first pullback noise
@@ -748,6 +748,19 @@ RR_THRESHOLD_B     = 2.0   # R:R above this = Grade B
 RR_THRESHOLD_C     = 1.5   # R:R above this = Grade C (below = Grade D)
 ATR_PCT_LOW_THRESH = 0.01  # 1%
 ATR_PCT_HIGH_THRESH= 0.015  # 1.5% — matches EXTREME regime threshold
+
+# ── MAXXED volatility tier (2026-10-12, T directive) ──────────────────────────
+# ATR% >= MAXXED_ATR_PCT_THRESH = "maxxed out" — the explosive top tier above EXTREME.
+# COMPLEMENTARY, NOT A RELABEL: classify_volatility() still returns 'EXTREME' for these
+# so all existing EXTREME restrictions keep firing (structurally cannot unblock anything
+# — CEO 2026-10-12 hard constraint: a naive 'MAXXED' relabel would silently unblock the
+# 36 existing == 'EXTREME' string comparisons). MAXXED only ever ADDS blocks on top.
+# Evidence (brain/regime-recalibration-backtest-2026-10-12.md, CEO-independent-repro CONFIRMED):
+#   >=4.0% ATR bad BOTH directions — LONG 44.4% WR -$1.48 (n=54), SHORT 24.0% WR -$1.16 (n=25).
+# Worst case of blocking = a missed trade, never a loss. Instant revert: MAXXED_BLOCK_ENABLED=False.
+MAXXED_ATR_PCT_THRESH = 4.0  # ATR% at/above which a token is "maxxed out"
+MAXXED_BLOCK_ENABLED  = True  # kill-switch for the MAXXED approval+exec block
+MAXXED_REGIME_LOG     = True  # shadow-log every MAXXED sighting (measure counterfactual)
 
 # ── ATR Fallback ───────────────────────────────────────────────────────────────
 # Used when real ATR cannot be fetched (e.g., unprotectable coins first-seen).

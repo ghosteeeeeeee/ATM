@@ -1928,6 +1928,27 @@ def execute_trade(token, direction, price, confidence, source,
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
     cmd_side = direction.lower()  # long or short
 
+    # ── MAXXED volatility backstop at execution time (2026-10-12, T directive) ──
+    # Last line of defense: a signal that slipped past approval-time MAXXED block
+    # (signal_compactor) is stopped here before brain.py. ATR% >= MAXXED_ATR_PCT_THRESH
+    # (4.0) = "maxxed out" — verified bad BOTH directions (regime-recalibration backtest
+    # 2026-10-12, CEO-independent-repro confirmed: LONG 44.4% WR, SHORT 24.0% WR).
+    # COMPLEMENTARY tier — classify_volatility() still returns EXTREME, so all existing
+    # EXTREME restrictions keep firing; this only ADDS a stricter block. Revert: flag off.
+    try:
+        from hermes_constants import MAXXED_BLOCK_ENABLED, MAXXED_REGIME_LOG, MAXXED_ATR_PCT_THRESH
+        if MAXXED_BLOCK_ENABLED or MAXXED_REGIME_LOG:
+            from volatility_gate_v2 import get_atr_pct as _mx_get_atr, is_maxxed as _mx_is_maxxed
+            _mx_atr = _mx_get_atr(token)
+            if _mx_is_maxxed(_mx_atr):
+                if MAXXED_REGIME_LOG:
+                    log(f'  🔥 [EXEC-MAXXED] {token} {direction}: ATR%={_mx_atr:.2f} >= maxxed tier')
+                if MAXXED_BLOCK_ENABLED:
+                    log(f'  🚫 [EXEC-MAXXED-BLOCK] {token} {direction} BLOCKED — ATR% {_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (maxxed-out vol, bad both directions)')
+                    return False, f'MAXXED vol: ATR% {_mx_atr:.2f} >= maxxed threshold (exec backstop)'
+    except Exception:
+        pass  # non-fatal — fail-open on MAXXED check
+
     # ── RSI Floor/Ceiling at Execution Time ────────────────────────────────────
     # FIX: RSI floor only checked at compaction time (hours earlier). By execution
     # time, RSI may have dropped into danger zone. Check NOW at execution time.

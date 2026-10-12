@@ -526,6 +526,24 @@ def classify_volatility(atr_pct):
         return 'EXTREME'
 
 
+def is_maxxed(atr_pct):
+    """True when ATR% is at/above the MAXXED ('maxxed out') tier.
+
+    COMPLEMENTARY label, NOT a regime string — classify_volatility() still returns
+    'EXTREME' for these tokens so every existing EXTREME restriction keeps firing.
+    This helper only enables EXTRA blocks layered on top (see MAXXED_* constants in
+    hermes_constants.py). Fails safe: missing/None ATR -> not maxxed (never blocks
+    on absent data).
+    """
+    if atr_pct is None:
+        return False
+    try:
+        from hermes_constants import MAXXED_ATR_PCT_THRESH
+        return atr_pct >= MAXXED_ATR_PCT_THRESH
+    except Exception:
+        return False
+
+
 def get_atr_ratio(token='BTC'):
     """Compute current ATR(14) / average ATR ratio for BTC.
     
