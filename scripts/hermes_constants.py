@@ -1773,6 +1773,10 @@ SIGNAL_EXIT_CONFIG = {
     'grind-breakout+': 'rr_engine',
     'grind-breakout-': 'rr_engine',
     'grind_breakout': 'rr_engine',   # underscore variant
+    # HL copy trader: RR engine exits
+    'hl_copy_trader+': 'rr_engine',
+    'hl_copy_trader-': 'rr_engine',
+    'hl_copy_trader': 'rr_engine',
     # Volume buildup: ride-it exit — sustained volume means let the trend run
     'volume-buildup+': 'ride_it',
     'volume-buildup-': 'ride_it',
