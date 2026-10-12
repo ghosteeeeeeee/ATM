@@ -530,3 +530,7 @@
 ## Error Alerts — 2026-10-12 02:00 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK position_manager: NameError: name 'PM_TRAIL_ACTIVATE_PCT' is not defined`
+
+## Error Alerts — 2026-10-12 04:00 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
