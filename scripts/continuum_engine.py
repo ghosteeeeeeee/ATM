@@ -1157,11 +1157,19 @@ class ContinuumEngine:
                     self.entry_phase = 0
                     return
         
-        # Score-based exit
+        # Score-based exit (sustained, not wicks)
         if state.state_score < SCORE_EXIT_THRESHOLD:
-            print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Score below {SCORE_EXIT_THRESHOLD}: {state.state_score:.1f}")
-            self.position_side = 'NONE'
-            self.position_size_pct = 0
+            if not hasattr(self, '_low_score_count'):
+                self._low_score_count = 0
+            self._low_score_count += 1
+            if self._low_score_count >= 10:  # 10 candles sustained below threshold
+                print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Score below {SCORE_EXIT_THRESHOLD} for {self._low_score_count} candles: {state.state_score:.1f}")
+                self.position_side = 'NONE'
+                self.position_size_pct = 0
+                self._low_score_count = 0
+                return
+        else:
+            self._low_score_count = 0
             self.entry_phase = 0
     
     def save_state(self, state: ContinuumState):
