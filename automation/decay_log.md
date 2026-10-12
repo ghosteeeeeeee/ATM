@@ -1777,3 +1777,7 @@
 [2026-10-12 06:34 UTC]   🔴 RAPID DISABLE: continuum_engine: 7 trades, 14.3% WR, PnL=-0.57
 [2026-10-12 06:34 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-12 06:34 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-12 12:34 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-12 12:34 UTC]   🔴 RAPID DISABLE: continuum_engine: 7 trades, 14.3% WR, PnL=-0.57
+[2026-10-12 12:34 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-12 12:34 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

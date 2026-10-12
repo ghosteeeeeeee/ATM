@@ -84,3 +84,4 @@
 
 ## TEAM UPDATES
 - [2026-10-09 11:50 UTC] health_monitor: Pipeline OK — LIVE every 1m, 0 Tracebacks/30m, PM clean (0 open / 4 closed today / -0.16 USDT / 1 win), 97 signals/1h, regime SHORT_BIAS (9L/20S/81N), speed 53% >=50pct, prices fresh (2.4min), phantom 0. AUTO-FIX: journal vacuum 84M + npm cache 2.4G. Disk 86%→84% (WARN cleared). Timers 3/3 active. Details: automation/error_alerts.md
+- [2026-10-12 12:51] health_monitor: Auto-fixed hermes-coding-mcp crash loop (7987 restarts, missing run_mcp_server.py) — disabled service pending CEO decision. Bug-hunter audit FAILs logged to error_alerts.md. Timers/pipeline/prices all healthy.

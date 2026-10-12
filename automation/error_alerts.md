@@ -545,3 +545,22 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3549s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3302s left, N failures)`
 - **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-12 09:00 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-12 10:00 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-12 12:51 UTC
+- **CRITICAL** (7987x): `hermes-coding-mcp.service` crash-looping — ExecStart script `/root/.hermes/scripts/run_mcp_server.py` missing (file does not exist anywhere in repo).
+- **AUTO-FIX**: `systemctl disable --now hermes-coding-mcp.service` — loop stopped. Needs CEO decision: restore the script or remove the unit.
+- **WARN**: `hermes-bug-hunter.service` exits 1 — audit FAILs: 35 files f-string SQL, 50 files cursor leaks, 132 bare excepts, 52 connection leaks, 75 non-atomic JSON writes, 4 hardcoded passwords (worst: session_brain.py:498, ceo_dashboard_api.py, hl_sync_guardian.py). By-design exit code, but findings are real debt.
+- **WARN**: `hermes-upgrade-implementer.service` timed out 06:17 UTC (2.1G memory peak, killed after timeout). Runs again in 12h cycle.
+- **INFO**: `hermes-atr-sl-updater.timer` unit not-found (stale reference in list-units).
+- **NOTE**: Disk at 83% (92G/118G); `candles.db` is 2.9 GB. Watch, not yet >85%.

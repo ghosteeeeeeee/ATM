@@ -203,13 +203,30 @@ The pipeline has multiple gates between your pick and an actual trade. Recent pi
 - **GRASS LONG** → Trend filter + volatility gate (now exempt for ai-trader)
 - **FIL LONG** → HALL-SHAME blocked (30d LONG WR=50% < 55%)
 - **SAGA LONG** → coin reversed to SHORT_BIAS within 15 min, signal expired
+- **AERO SHORT** → no price data (price collector doesn't track it)
 
 **Before picking, run the pre-check tool:**
 ```bash
 cd /root/.hermes/scripts && python3 ai_trader_precheck.py COIN DIRECTION
 ```
 
-This tests ALL pipeline gates: blacklist, ATR, RR engine, RSI bands, 30d winrate, LOSERS/PENALTY lists, BTC trend, price freshness. Only pick coins that pass ALL checks.
+This tests ALL pipeline gates: price data freshness, blacklist, ATR, RR engine, RSI bands, 30d winrate, LOSERS/PENALTY lists, BTC trend. Only pick coins that pass ALL checks.
+
+**Important:** Only pick coins with fresh price data. Check the coins list first:
+```bash
+python3 -c "
+import sys; sys.path.insert(0, '/root/.hermes/scripts')
+from signal_schema import price_age_minutes
+import sqlite3
+conn = sqlite3.connect('/root/.hermes/data/candles.db')
+cur = conn.cursor()
+cur.execute('SELECT DISTINCT token FROM candles_5m')
+tokens = [r[0] for r in cur.fetchall()]
+conn.close()
+fresh = [t for t in tokens if (price_age_minutes(t) or 999) < 10]
+print(f'Fresh tokens ({len(fresh)}):', sorted(fresh))
+"
+```
 
 **If the pre-check FAILS, pick a different coin.** Don't force a pick that the pipeline will block. Test multiple candidates until one passes.
 

@@ -36,6 +36,23 @@ def precheck(coin, direction):
 
     token = coin.upper()
 
+    # 0b. Price data freshness — cheapest check, early exit if stale
+    try:
+        from signal_schema import price_age_minutes
+        age = price_age_minutes(token)
+        if age is not None and age >= 999:
+            check('Price data', False, f'no price data for {token}')
+            return results  # early exit
+        elif age is not None and age > AI_TRADER_PRICE_MAX_AGE_MINUTES:
+            check('Price data', False, f'price {age:.0f} min old')
+            return results  # early exit
+        else:
+            check('Price data', True, f'age={age:.0f}min' if age else 'fresh')
+    except ImportError:
+        pass
+    except Exception:
+        pass
+
     # 0. Blacklist check — first gate, cheapest to check
     try:
         from hermes_constants import LONG_BLACKLIST, SHORT_BLACKLIST
