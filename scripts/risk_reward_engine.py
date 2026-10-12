@@ -750,10 +750,11 @@ def evaluate_rr(token, direction, price, candles_5m=None, signal_type=None):
         regime = vol_width.get('atr_regime', 'NORMAL')
         atr_pct = vol_width.get('atr_pct', 1.0)
 
-        # Quick check: if ATR is the fallback (0.75%) AND no S/R levels exist,
-        # the token has no real market data. Return fail-open (don't block,
-        # don't boost — neutral).
-        if abs(atr_pct - 0.75) < 0.01:
+        # Detect dead tokens: no real ATR data + no S/R levels = no market data
+        # Check get_atr_pct() directly (not the fallback value) to avoid
+        # fragility if ATR_PCT_FALLBACK changes
+        _raw_atr = get_atr_pct(token_upper)
+        if _raw_atr is None:
             sr_check = build_sr_map(token_upper, price, candles_5m, atr_pct)
             if len(sr_check) == 0:
                 return _result(True, 999, 0, 0, 0, 'A', None,
