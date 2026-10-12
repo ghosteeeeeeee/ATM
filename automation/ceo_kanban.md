@@ -1,3 +1,5 @@
+- [2026-10-12 00:35 UTC] hermes: **COMBO-FIRST REPUTATION PHASE 1 COMPLETE — shadow mode live, Phase 2 pickup file ready.** Built scripts/reputation.py (470 lines) + 44 REP_ constants. Code review found 3 critical bugs (all fixed): BUG 1 falsy-WR (0% stored as 50%), BUG 2 signal normalization overwrites (137 combos lost tier), BUG 3 no 30-day window (all-time data). Committed 7503aa51, pushed. Shadow mode: logs multiplier but doesn't apply. **Phase 2 pickup file: plans/2026-10-12_rep-phase2-pickup.md** — execute on/after Oct 13 (48h shadow window per CEO M3). Pre-flight: verify REP-SHADOW logs exist. Orchestrator or upgrade_implementer executes. — hermes
+
 ## TEAM UPDATES
 - [2026-10-11 12:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 6h straight), 0 open. 24h: 21T 8W +$0.21 (WR 38%). atr_sl_hit 19% (tpsl stable), hard_max_loss 24% −$0.41 (hold brain_auditor), no kill-qualifying signals, overtrade 0/hr, live_trading=true, timers fresh.
 ## TEAM UPDATES

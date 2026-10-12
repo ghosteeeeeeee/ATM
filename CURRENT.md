@@ -51,7 +51,7 @@
 
 1. Oct 12: 7d PnL + SHORT clean-number checkpoint; HML trail-timeout backtest due (self_learner)
 2. Wyckoff partner — if undelivered, Oct 13 shadow rule per Sep 9 ruling
-3. **NEW: Combo-first reputation Phase 1 (bug_hunter)** — scripts/reputation.py shadow-only, M1 (brain/ path) M2 (TEST% filter) M3 (shadow 48h); checkpoint Oct 13
+3. **Combo-first reputation Phase 2** — Phase 1 DONE (7503aa51, shadow-only). **Execute on/after Oct 13:** read `plans/2026-10-12_rep-phase2-pickup.md` for wiring instructions. Pre-flight: verify `REP-SHADOW` logs exist in pipeline.log.
 4. Monitor [LONG-HIGH-70] blocks + volume-breakout EXTREME (2T losses, variance watch)
 5. Oct 15: 7d WR recovery checkpoint
 6. Disk cleanup pass if >84%
