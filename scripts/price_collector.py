@@ -40,7 +40,8 @@ CANDLE_TOKENS_FILE = '/root/.hermes/data/candle_universe_tokens.json'
 
 # ── BUG-048 (Option A, CEO-ratified 2026-10-09): fast 1m seeder ──
 # 1m candles are refreshed with REAL Binance/HL OHLC at high frequency so the
-# dead 1m tick aggregator (_aggregate_1m.py — kept alive for its 48h soak)
+# dead 1m tick aggregator (_aggregate_1m.py — 48h soak expired Oct 7; timer
+# disabled 2026-10-12 after confirming filled=0/dev=0 every run for ~7 days)
 # is irrelevant. Separate progress file so the slow multi-TF cursor in
 # CANDLE_TOKENS_FILE is never touched by the fast loop (and vice versa).
 CANDLE_FAST_1M_FILE = '/root/.hermes/data/candle_fast_1m_progress.json'

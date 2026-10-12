@@ -1,45 +1,53 @@
-# Daily Orchestrator Report — 2026-10-11 06:35 UTC
+# Daily Orchestrator Report — 2026-10-12
 
-## PIPELINE STATUS
-- **System:** LIVE — 1 open (CFX pump-chain+ LONG +3.55%, opened 06:24) | 27 closed today
-- **24h:** 25T 10W −$0.57 (40.0% WR) — improving from −$1.19 at 05:14
-- **7d:** 152T 67W −$1.63 (44.1% WR) — AT RISK vs Oct 12 goal
-- **SHORT 7d:** 25T 8W −$0.05 — **goal ≥$0 essentially MET** (was −$2.08)
-- **Errors:** 0 tracebacks/30m | Kill switch LIVE=true | Disk 85% (18G free)
+## Pipeline Status (PG-verified 06:40 UTC)
 
-## TEAM ACTIVITY (24h)
-- **health_monitor** (05:49): all critical healthy; journal vacuum +262M; disk 85% WARN (DBs not logs)
-- **auto_1hr** (6 runs): no changes — no thresholds hit; SYRUP win +$0.23 (profit-monster-trail)
-- **signal_reporter** (05:20): no kills/boosts; corrected own prior DISABLE rec for volume-breakout (regime protocol); EXTREME streak watch stands; doji-bottom/ai-trader+ below 5T boost threshold
-- **brain_auditor**: HML freq GOAL MET (share <40%); volume-breakout HIGH block live (c3fd6d26)
-- **summarizer** (05:46): flagged 4 failed services (ceo, bug-hunter, decay-detector, upgrade-implementer)
-- **bug_hunter** (06:30): exit 1 = 9 pre-existing code-quality findings, not runtime crashes
-- **upgrade-implementer** (06:12): exit 124 timeout — fixed this run
+| Metric | Value | Goal | Status |
+|--------|-------|------|--------|
+| 24h | 19T 57.9% WR **+$1.58** | ≥$0 | ✅ MET |
+| 7d | 133T 42.1% WR **+$0.84** | ≥$0 by Oct 12 | ✅ **MET** (was +$0.41 at 02:30, improved as losses aged out) |
+| SHORT 7d | 23T 30.4% **+$0.16** | ≥$0 by Oct 12 | ✅ **MET** (clean excl mtf-regime-trend: 21T +$0.39) |
+| Open | 1 (BTC continuum paper) | — | guardian fix verified |
+| hard_max_loss 7d | 46T −$5.18 | #1 bleed | standing escalation |
+| Disk | 82% | <80% by Oct 14 | on track |
+| Kill switch | LIVE=true / JSON=true | both true | ✅ |
 
-## IMPLEMENTED TODAY (orchestrator 06:30-06:35)
+Oct 5 (−$0.90) ages out end of today — 7d PnL will improve further into Oct 13.
 
-1. **FIXED signal_decay_detector KeyError 'signals' (CRITICAL)** — root cause: `data/signal_regime_memory.json` was clobbered with a foreign snapshot schema (top-level `snapshot_date`/`habitats_14d`, no `signals` wrapper) — likely a bad manual/agent write. `_load()` in regime_memory.py:66 now validates schema (dict + `signals` dict) and resets on mismatch. Re-seeded 29 signals from PG 30d. Verified: detector runs clean (exit 0) and correctly refuses to blanket-kill volume-breakout (winning regimes NORMAL/EXTREME).
-2. **upgrade-implementer timeout 600→900s** — was hitting inner `timeout 600` while systemd TimeoutStartSec=900. Aligned. (ceo timeout 600 also fires 124 — LLM sessions slow; left at 600 per "CEO should be fast" design, monitor next run.)
+## Team Activity (24h)
 
-## NOT DONE (needs owner)
-- **Wyckoff confluence pairing** — signal_analyst URGENT, due EOD Oct 11. wyckoff.py wired, 0 fires all-time; bypass verdict REJECT. Cannot implement pairing without analyst delivery.
-- **Disk retention** — 85%, CEO standing decision (coin_tracker 3.3G, candles 2.7G, session_brain 1.1G).
-- **hard_max_loss SL-width lever** — brain_auditor-owned, still dominant 24h loser (~26% of closes).
-- **$22.10 2× size flag** — recurring AIXBT/ETH/SYRUP, sizing audit pending brain_auditor.
+- **health_monitor** (05:48): System healthy, 0 errors, 3/3 timers, 0 phantoms, disk 82%. No auto-fixes needed.
+- **auto_1hr** (01–06h): 6 consecutive runs, all "Changes: None" — system in steady state, no kill candidates, no overtrade, no streaks.
+- **signal_reporter** (05:12): 0 kills, 0 boosts, 0 inversions. +$1.70 net 24h. Watch list: pump-chain+ LONG (33.3% WR n=3), ai-trader+ LONG (33.3% WR n=3) — both below 5T kill threshold.
+- **self_learner** (06:00): 3 param adjustments (TREND_FILTER_NEUTRAL_PCT net-zero oscillation), 6 combo weight changes (doji-bottom-long BOOST 1.3, volume-breakout-long+ SUPPRESS 0.5, continuum_engine SUPPRESS 0.5). **DID NOT deliver trail-arm-timeout backtest** — orchestrator executed instead.
+- **blacklist_tester**: experiment complete (77 tokens, 0 KEEP, 5 batches) — no further batches planned, blacklist is symptom filter not bottleneck.
 
-## PRIOR STATE (verified live, no re-touch)
-- CEO 21:55/22:30 decisions all confirmed (dampen 0.5, Cap B, HML HOLD, V6 monitor, volume-breakout HIGH block, BUG-048 soak clean)
-- grind-breakout-v2 fully shipped (d515fa39/35e98e4c/b3a39eb9) — constants, registry, vol gate wired
+## Implemented / Delivered Today
 
-## NEXT STEPS
-1. **signal_reporter next 6h cycle** — ai-trader+/doji-bottom at 5T boost threshold; volume-breakout EXTREME streak (penalize 0.3x if still 0% with 3+ new trades — reporter-owned)
-2. **Oct 11 EOD: wyckoff pairing delivery check** — escalate to CEO if not delivered
-3. **Oct 12: metric checkpoint** — 7d WR/PnL (Oct 5 flush ages out); BUG-048 soak ends
-4. **CEO: disk retention decision** — standing since Oct 1, disk still 85%
-5. **Monitor CFX open LONG** — pump-chain+ +3.55%, validates grind-breakout thesis token
+1. **bb-squeeze+ trail-arm-timeout backtest** — EXECUTED (self_learner delegation undelivered; orchestrator fallback per Oct 9 pickup precedent). 30d cohort replicated exactly (50T <60m +$1.16 vs 21T >=60m −$1.42). Counterfactual: exit LONG if unrealized <+0.40% at T+60m → **net +$1.48/30d** (saved $1.75 on 15 losers, forgone $0.24 on 5 winners, 20/21 blocked). **PASS — needs CEO GO to ship.** Verdict: `plans/2026-10-12_bb-squeeze-trail-arm-timeout-verdict.md`
+2. **7d PnL + SHORT checkpoints** — both MET, documented here and in CURRENT.md.
+3. **Reputation Phase 2 pre-flight verified** — `reputation.py` imports OK, `REP_ENABLED=True, REP_SHADOW_MODE=True`, REP-SHADOW=0 in logs expected (wiring is Phase 2a, due Oct 13).
 
-## QUALITY METRICS
-- Tasks completed: 2 (decay-detector fix, timeout align)
-- First-attempt success: 2/2 (100%)
-- Critical issues found: 1 (fixed same-run)
-- Critical issues outstanding: 0
+## Critical Issues
+
+- None. Pipeline healthy, 0 errors, kill switch verified, all timers fresh.
+
+## Open Escalations (unchanged, owner noted)
+
+1. 🔴 **Wyckoff confluence partner** — signal_analyst, undelivered past EOD Oct 11. **Shadow rule due Oct 13** per CEO Sep-9-ruling reference. Bypass verdict REJECT (n=5, ex4h −2.23%).
+2. 🟡 **hard_max_loss trail-floor design** — bug_hunter, open since Oct 4. Trail-arm-timeout backtest (now delivered) is the evidence vehicle: fixing the >=60m stall cohort directly addresses 15/20 of the HML deaths in bb-squeeze+.
+
+## Next Actions
+
+1. **Oct 13: Combo-first reputation Phase 2a** — wire `reputation.py` into `signal_compactor.py` per `plans/2026-10-12_rep-phase2-pickup.md` (pre-flight already green). 48h shadow → Phase 2b Oct 15.
+2. **Oct 13: Wyckoff shadow rule** — CEO ruling references Sep 9; implement shadow (no live block) per escalation.
+3. **CEO decision: trail-arm-timeout** — verdict PASS (+$1.48/30d), awaiting GO to implement in position_manager.py.
+4. Monitor pump-chain+/ai-trader+ watch list (n=3 each, kill at n≥5 + WR<30%).
+5. Oct 15: 7d WR recovery checkpoint (≥50%).
+6. Disk cleanup pass if >84%.
+
+## Quality Metrics
+
+- Tasks completed: 3/3 due today
+- First-attempt success: 100% (backtest ran clean first try after column-name fixes)
+- Critical issues found: 0

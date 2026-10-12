@@ -2978,6 +2978,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         SHORT_CONTINUUM_FILTER_ENABLED,
                         SHORT_CONTINUUM_SCORE_MAX,
                         SHORT_CONTINUUM_ALLOW_Z,
+                        SHORT_CONTINUUM_HYSTERESIS_MIN,
                     )
                     if SHORT_CONTINUUM_FILTER_ENABLED:
                         _sc_conn = None
@@ -3043,8 +3044,35 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     if _coin_dumping_sc:
                                         log(f"  ✅ [SHORT-CONTINUUM-TOKEN-MOM] {token} SHORT allowed — BTC score={_sc_score:.1f} but token dumping (vel={_sc_vel:+.2f}%, below SMA)")
                                     else:
-                                        log(f"  🚫 [SHORT-CONTINUUM] {token} SHORT blocked — BTC score={_sc_score:.1f} z={_sc_z} (not STRONG_NEG, score>{SHORT_CONTINUUM_SCORE_MAX})")
-                                        continue
+                                        # Fix 2 (plans/short-drought-dump-day-2026-10-05.md): hysteresis —
+                                        # block only when score has been > MAX for a sustained window.
+                                        # Instant threshold flaps on brief bounces (score 0→45 in 2h seen live).
+                                        # Constant was committed 2026-10-06 but never wired (BUG noted 2026-10-11).
+                                        _hyst_sustained = False
+                                        try:
+                                            from hermes_constants import SHORT_CONTINUUM_HYSTERESIS_MIN
+                                            _hyst_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                                            try:
+                                                # +90s slack covers one missed 30s write slot
+                                                _hyst_rows = _hyst_conn.execute(
+                                                    "SELECT ts, state_score FROM continuum_states "
+                                                    "WHERE token='BTC' AND ts >= ? ORDER BY ts",
+                                                    (time.time() - SHORT_CONTINUUM_HYSTERESIS_MIN * 60 - 90,)
+                                                ).fetchall()
+                                            finally:
+                                                _hyst_conn.close()
+                                            if _hyst_rows and all(
+                                                r[1] is not None and r[1] > SHORT_CONTINUUM_SCORE_MAX
+                                                for r in _hyst_rows
+                                            ):
+                                                _hyst_sustained = True
+                                        except Exception:
+                                            _hyst_sustained = False  # fail-open: no sustained evidence = no block
+                                        if _hyst_sustained:
+                                            log(f"  🚫 [SHORT-CONTINUUM] {token} SHORT blocked — BTC score={_sc_score:.1f} z={_sc_z} sustained >{SHORT_CONTINUUM_SCORE_MAX} ≥{SHORT_CONTINUUM_HYSTERESIS_MIN}min (hysteresis)")
+                                            continue
+                                        else:
+                                            log(f"  ✅ [SHORT-CONTINUUM-HYSTERESIS] {token} SHORT allowed — BTC score={_sc_score:.1f} >{SHORT_CONTINUUM_SCORE_MAX} but not sustained ≥{SHORT_CONTINUUM_HYSTERESIS_MIN}min (flapping bounce)")
                 except Exception:
                     pass
             # ── pump-chain+ HIGH regime block ──────────────────────────────

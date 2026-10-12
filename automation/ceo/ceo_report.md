@@ -95,3 +95,9 @@ Higher tier later (e.g. APOCALYPSE) = same additive pattern: one `is_*` helper +
 
 ### No action
 Position_manager D3 trail-floor removal + stray HML_TRAIL_MIN_GAP_PCT comment-only edit (value unchanged 0.20) — housekeeping acknowledged, no further action. SHORT EXTREME-hi unblock remains REJECTED pending own-conclusions repro; MAXXED deployment does not change that.
+
+## CEO Status — 20261012T054722Z
+### Health: pipeline=active (timer tick, between-cycle inactive is normal) guardian=active open_pos=1
+### Numbers: 24h 19T +$1.58 57.9% | 7d 134T +$0.54 41.8%
+### Findings: 7d PnL flipped back POSITIVE (+$0.41→+$0.54); 24h WR strong (57.9%). NEW error: `NameError: PM_TRAIL_ACTIVATE_PCT is not defined` in position_manager (1x) — undefined constant reference, could break a trail path. Repeated: mirror_open "Balance too low" (8x), mark_signal_executed returned=0 (13x). Coin_tracker scores FRESH (agg_scores max ts=2026-10-12 05:49 UTC, 112 coins) — proactive Q12 (rotating: 12 mod 15=12) ANSWERED: updating on schedule.
+### Recommendation: Investigate `PM_TRAIL_ACTIVATE_PCT` NameError (likely missing import/constant in position_manager) before weekly deep run.
