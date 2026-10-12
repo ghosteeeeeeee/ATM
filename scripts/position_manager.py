@@ -70,6 +70,7 @@ from hermes_constants import (
     STALE_WINNER_MIN_PROFIT, STALE_LOSER_MAX_LOSS, VEL_STALE_THRESHOLD_PCT,
     CUT_LOSER_PNL as CUT_LOSER_PNL_HERMES,
     BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED, BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN,
+    PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED, PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN,
     PM_TRAIL_ACTIVATE_PCT,
 )
 
@@ -2960,8 +2961,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                     closed_count += 1
                                     log(f"  [PUMP-EXIT] {token} {direction}: pump_exit_dead_money {_detail}")
                                     continue
-                    except Exception:
-                        pass
+                    except Exception as _dm_e:
+                        # Instrumented 2026-10-12 (winning-dna §9 ask d): this swallow hid a
+                        # datetime TypeError that kept the dead-money TIME exit dead for 8 days.
+                        log(f"  [PUMP-EXIT] {token} dead_money time-exit check failed: {_dm_e}", "WARN")
             except Exception as e:
                 log(f"  [PUMP-EXIT] Error: {e}", "WARN")
         
@@ -3481,32 +3484,40 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             log(f"  HARD MAX-LOSS EXIT {token} {direction} {live_pnl:+.2f}% [>{HARD_MAX_LOSS_PCT}% @ lev {_hml_lev:.1f} atr={_hml_atr}]")
             continue
 
-        # ── 7b. TRAIL-ARM TIMEOUT (bb-squeeze LONG stall pre-emption) ──────────
+        # ── 7b. TRAIL-ARM TIMEOUT (LONG stall pre-emption) ─────────────────────
         # Verdict PASS 2026-10-12 (plans/2026-10-12_bb-squeeze-trail-arm-timeout-verdict.md):
         # bb-squeeze LONG holds >=60m that never reach PM_TRAIL_ACTIVATE die to hard_max_loss.
         # 30d counterfactual +$1.48 (20/21 blocked; $1.75 saved losers / $0.24 forgone winners).
-        # Flag defaults False — CEO GO + independent audit required before enable.
+        # Extended to pump-chain+ LONG 2026-10-12 15:40Z (brain_auditor): >=45m never-armed
+        # = 13T 0%WR -$1.75; >=45m winners all MFE 2-10% (immune to live_pnl < arm guard).
         # live_pnl is unleveraged price % (compute_live_pnl); PM_TRAIL_ACTIVATE_PCT is fraction.
-        if BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED and direction == 'LONG' and 'bb-squeeze' in (_pos_signal or ''):
-            try:
-                _tat_ot = pos.get('open_time') or open_time
-                if _tat_ot:
-                    if isinstance(_tat_ot, str):
-                        _tat_dt = datetime.fromisoformat(_tat_ot.replace('Z', '+00:00'))
-                    else:
-                        _tat_dt = _tat_ot
-                    if _tat_dt.tzinfo is None:
-                        _tat_dt = _tat_dt.replace(tzinfo=timezone.utc)
-                    _tat_age_m = (datetime.now(timezone.utc) - _tat_dt).total_seconds() / 60
-                    _tat_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100  # 0.004 → 0.40% (live_pnl units)
-                    if _tat_age_m >= BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN and live_pnl < _tat_arm_pct:
-                        close_paper_position(trade_id, "trail_arm_timeout",
-                                             exit_detail=f"trail_arm_timeout hold={_tat_age_m:.0f}m pnl={live_pnl:+.2f}% arm<{_tat_arm_pct:.2f}%")
-                        closed_count += 1
-                        log(f"  TRAIL-ARM TIMEOUT {token} {direction} {live_pnl:+.2f}% [{_tat_age_m:.0f}m < arm {_tat_arm_pct:.2f}%]")
-                        continue
-            except Exception as e:
-                log(f"  TRAIL-ARM TIMEOUT error for {token}: {e}")
+        if direction == 'LONG':
+            _tat_sig_l = (_pos_signal or '').lower()
+            _tat_min = None
+            if BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED and 'bb-squeeze' in _tat_sig_l:
+                _tat_min = BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN
+            elif PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED and 'pump-chain' in _tat_sig_l:
+                _tat_min = PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN
+            if _tat_min is not None:
+                try:
+                    _tat_ot = pos.get('open_time') or open_time
+                    if _tat_ot:
+                        if isinstance(_tat_ot, str):
+                            _tat_dt = datetime.fromisoformat(_tat_ot.replace('Z', '+00:00'))
+                        else:
+                            _tat_dt = _tat_ot
+                        if _tat_dt.tzinfo is None:
+                            _tat_dt = _tat_dt.replace(tzinfo=timezone.utc)
+                        _tat_age_m = (datetime.now(timezone.utc) - _tat_dt).total_seconds() / 60
+                        _tat_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100  # 0.004 → 0.40% (live_pnl units)
+                        if _tat_age_m >= _tat_min and live_pnl < _tat_arm_pct:
+                            close_paper_position(trade_id, "trail_arm_timeout",
+                                                 exit_detail=f"trail_arm_timeout hold={_tat_age_m:.0f}m pnl={live_pnl:+.2f}% arm<{_tat_arm_pct:.2f}%")
+                            closed_count += 1
+                            log(f"  TRAIL-ARM TIMEOUT {token} {direction} {live_pnl:+.2f}% [{_tat_age_m:.0f}m < arm {_tat_arm_pct:.2f}%]")
+                            continue
+                except Exception as e:
+                    log(f"  TRAIL-ARM TIMEOUT error for {token}: {e}")
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
         # Catches two patterns:

@@ -2846,7 +2846,28 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     else:
                         log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
                     continue
-            if LONG_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'LONG' and _regime_4h == 'NEUTRAL':
+            # ── BTC Regime Alignment (CEO-approved 2026-10-08, plans/align-with-btc-regime.md) ──
+            # Bullish continuum (BULL_TREND/RANGING_BULL, score>=60) bypasses the LONG-NEUTRAL
+            # block. Default OFF: shadow-log the would-allow counterfactual only (non-bullish =
+            # status quo, already logged by the gate). Bearish/NULL never bypass (mod #4).
+            _btc_align_allow = False
+            if direction.upper() == 'LONG' and _regime_4h == 'NEUTRAL':
+                try:
+                    from hermes_constants import BTC_REGIME_ALIGN_ENABLED, BTC_REGIME_ALIGN_MIN_SCORE
+                    from continuum_context import get_btc_trend_context as _brc_get
+                    _brc_ctx = _brc_get()
+                    _brc_bull = bool(_brc_ctx and _brc_ctx.get('available')
+                                     and _brc_ctx.get('regime') in ('BULL_TREND', 'RANGING_BULL')
+                                     and (_brc_ctx.get('score') or 0.0) >= BTC_REGIME_ALIGN_MIN_SCORE)
+                    if _brc_bull:
+                        if BTC_REGIME_ALIGN_ENABLED:
+                            _btc_align_allow = True
+                            log(f"  ✅ [BTC-REGIME-ALIGN] {token} LONG — bullish BTC ({_brc_ctx['regime']}, score={_brc_ctx['score']:.0f}), LONG-NEUTRAL bypassed")
+                        else:
+                            log(f"  📊 [BTC-REGIME-ALIGN-SHADOW] {token} LONG — would-allow ({_brc_ctx['regime']}, score={_brc_ctx['score']:.0f}); flag OFF, existing gate applies")
+                except Exception:
+                    pass
+            if LONG_NEUTRAL_BLOCK_ENABLED and direction.upper() == 'LONG' and _regime_4h == 'NEUTRAL' and not _btc_align_allow:
                 # ── BTC POSITION CHECK (2026-10-11): chop = no trend = no LONG edge ──
                 # When BTC is AT/BELOW EMA300, LONG_BIAS from 1m is noise, not trend.
                 # 2026-10-11 losses: AIXBT/INJ/USELESS all LONG in chop (BTC AT EMA300),

@@ -1,5 +1,68 @@
 # Upgrade Audit Trail
 
+## Session: 2026-10-12 ~18:00 UTC — Upgrade Implementer (L1 fix + L2: BTC regime align shadow build)
+
+**Scope:** re-scanned most recent plans/ (Oct 5 → Oct 12). Picked up the #1 next-candidate from the 2026-10-11 session (align-with-btc-regime). 1 Level 1 + 1 Level 2 implemented.
+
+### Plan evaluations (recent-20, deltas vs Oct-11 session)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| 2026-10-12_bb-squeeze-trail-arm-timeout-verdict | L2 | HIGH | ✅ ALREADY IMPLEMENTED | Verdict said "not shipped, needs CEO GO" but constants BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=True + position_manager:3495 wiring are LIVE. Presumably CEO-approved separately; flag for own-conclusions re-check per verdict caveat |
+| grind-breakout-v2-coin-tracker-integration | L3 | LOW | ⏸️ DEFERRED (by plan) | Plan itself defers; revisit only if window-based firing misses >50% breakouts |
+| regime-recalibration-2026-10-12 | L2 | MED-HIGH | ⏳ PENDING CEO | PROPOSED — do not touch live code until approved (plan header) |
+| 2026-10-12_rep-phase2-pickup | L2 | HIGH | ⏳ SCHEDULED Oct 13 | Execute on/after 2026-10-13 00:00 UTC (48h shadow window). Not yet time at scan (Oct 12 18:00). Pre-flight: reputation.py imports OK |
+| combo-first-reputation-system | L2–3 | HIGH | Phase 1 LIVE / Phase 2 = rep-phase2-pickup | Phase 1 commit 7503aa51 landed; Phase 2 gated on Oct 13 date |
+| bug-hunt-master-plan | ongoing | HIGH | 🔄 Tier 1–4 pending | Tier 0 done; 5 open bugs all T-decision or covered elsewhere |
+| profitability-fix-plan | L1–4 | HIGH | PARTIAL (per Oct 11) | SHORT_CONTINUUM_SCORE_MAX=60 confirmed live; no new action |
+| penalty-gated-execution | L1–2 | HIGH | ✅ FIXES 1–3 CONFIRMED LIVE | PENALTY-BLOCK gate in decider_run:3476; _cont_bearish AT (POL hole) at compactor:2711; chop bullish DECLINING at chop_detector:533 |
+| align-with-btc-regime | L2 | MED-HIGH | ✅ SHIPPED THIS SESSION (shadow, flag OFF) | See implementation below |
+| winning-dna-population-report | L1–3 | HIGH | ASSESSED | §9 routing bug (v5-SHORT→pump_exit) already FIXED (constants 1742–1747, CEO 2026-10-09); ask (d) except-swallow instrumented this session; stale_winner/dead_money behavior asks remain CEO-gated |
+| ride-it-hard-max-loss-exemption | L1 | HIGH | ⏳ PENDING CEO | Still needs backtest → own-conclusions → CEO. Untouched |
+| q4-portfolio-cap-verdict | — | HIGH | ⏳ PENDING CEO | Cap B accepted on aggregate, CEO must choose re-test vs accept |
+| wyckoff-bypass-verdict | — | — | ✅ CLOSED REJECT | No action |
+| gate-counterfactual-audit | — | HIGH | ✅ D3/D4 DONE | No new action; token-W allowlist housekeeping skipped (LOW, unlocatable in reasonable time) |
+| trade-learning-system-EXECUTION | L2–3 | HIGH | P0–P4 LIVE | MFE/MAE write path verified present (position_manager:619–1194). P5–P6 CEO-gated |
+| short-drought-dump-day | L1–2 | HIGH | PARTIAL | Hysteresis constant still orphaned (known sideways from Oct 11) |
+| bug-hunt-gameplan | ongoing | HIGH | 🔄 | BUG-036/037/044 remain T-decision; BUG-064 (continuum BTC no SL) HIGH — not touched (live-money path, needs care + likely CEO) |
+| wrong-side-chop-detector / profitability others | — | — | unchanged | per prior audits |
+
+### Implemented this session (1 Level 1 + 1 Level 2)
+
+#### 1. (L1) Dead-money time-exit exception swallow instrumented
+- **Plan/source:** `plans/2026-10-08_winning-dna-population-report.md` §9 ask (d)
+- **Difficulty:** Level 1 (2-line change)
+- **Value:** HIGH — this exact `except: pass` hid a datetime TypeError that kept the dead-money TIME exit dead for 8 days; recurrence would again be invisible
+- **Status:** ✅ IMPLEMENTED
+- **Fix:** `scripts/position_manager.py:2964` — bare swallow replaced with WARN log (`[PUMP-EXIT] {token} dead_money time-exit check failed: {err}`)
+- **Verified:** py_compile OK; no behavior change (exception path identical, now logged)
+
+#### 2. (L2) BTC Regime Alignment — shadow build (CEO-approved 2026-10-08, default OFF)
+- **Plan:** `plans/align-with-btc-regime.md` (APPROVED WITH MODIFICATIONS)
+- **Difficulty:** Level 2
+- **Value:** MED-HIGH — BULL_TREND LONG cohort: 139T 56.8% +$0.48/30d (CEO-verified); unlocks pump-chain LONGs wrongly gated by LONG-NEUTRAL when BTC continuum is bullish; ships default-OFF so zero live-behavior change
+- **Status:** ✅ IMPLEMENTED (shadow wiring only)
+- **Changes:**
+  - `hermes_constants.py`: `BTC_REGIME_ALIGN_ENABLED = False` + `BTC_REGIME_ALIGN_MIN_SCORE = 60` (new flags, no existing values touched)
+  - `signal_compactor.py` (before LONG-NEUTRAL gate): bullish continuum check via existing `get_btc_trend_context()`; if flag ON and BULL_TREND/RANGING_BULL with score≥60 → bypass LONG-NEUTRAL; if flag OFF → `[BTC-REGIME-ALIGN-SHADOW]` would-allow log (counterfactual data for the 7d review). Bearish/NULL: no change (mod #4). SHORT side untouched (mod #1). RSI ceiling/RR/confluence/blacklists untouched.
+- **Verified:** py_compile OK on all 3 files; constants import OK; live ctx call OK (regime=BEAR_TREND score=4.2 → bullish_check=False, correct no-op in current regime); signal_compactor runs via hermes-signal-compactor.timer (subprocess/minute — live next cycle, no restart)
+- **Next (per plan governance):** accrue shadow logs → independent backtest + bug_hunter verification → CEO GO to flip flag; 7d test window after enable. NOT enabled by this session.
+
+### Sideways findings
+1. **MED:** bb-squeeze trail-arm timeout shipped ENABLED=True although the verdict file's implementation sketch said default-off/needs-CEO-GO. Behavior matches the PASS verdict's intent, but the approval trail for flipping it live isn't in the plan file — recommend own-conclusions spot-check.
+2. **LOW:** token-W allowlist housekeeping (gate audit ask) skipped — couldn't locate the failing site cheaply; value LOW.
+3. **INFO:** current BTC continuum = BEAR_TREND (score 4.2) — BTC-REGIME-ALIGN-SHADOW logs will stay silent until a bullish regime returns; expected, not a bug.
+
+### Success rate this session: 2/2 implemented (100%)
+### Next candidates (priority order)
+1. **rep-phase2-pickup** — L2 — HIGH — execute on/after 2026-10-13 00:00 UTC (pre-flight verified this session)
+2. **regime-recalibration-2026-10-12** — L2 — MED-HIGH — blocked on CEO approval (additive MAXXED tier + EXTREME-hi SHORT override)
+3. **q4 portfolio cap B** — L1 — HIGH — blocked on CEO GO (re-test max-2/30min vs accept)
+4. **BUG-064 continuum BTC no-SL** — L2 — HIGH — live-money path; needs careful fix + verification
+5. **winning-dna action 2 re-run** — L1 — HIGH — due Oct 15
+
+---
+
 ## Session: 2026-10-11 ~18:20 UTC — Upgrade Implementer (post-D4, L1 focus)
 
 **Scope:** scanned ~20 most recent plans/ (Oct 1 → Oct 11). No constants values touched. One doc-only change.

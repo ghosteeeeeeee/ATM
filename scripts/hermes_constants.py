@@ -1106,6 +1106,13 @@ BTC_CHOP_GATE_3H_PCT = 0.50              # % — |BTC 3h momentum| from _get_btc
                                          # OR check with velocity: either moving = not chop. BTC_CHOP_GATE_THRESHOLD value unchanged.
 CHOP_GATE_LOG_ONLY = False                # Activated 2026-09-21 — was log-only since 2026-09-11, 10 days clean logs
 
+# ── BTC Regime Alignment — LONG-side only (CEO-approved 2026-10-08, plans/align-with-btc-regime.md) ──
+# Bullish BTC continuum (BULL_TREND/RANGING_BULL, score>=60) bypasses the LONG-NEUTRAL block.
+# Bearish/NULL regimes: no change. Does NOT loosen SHORT filters, RSI ceiling, RR engine,
+# confluence gate, or blacklists. Default OFF — shadow-log counterfactual, 7d review before enable.
+BTC_REGIME_ALIGN_ENABLED = False
+BTC_REGIME_ALIGN_MIN_SCORE = 60           # btc continuum score floor (CEO-mod: score >= 60)
+
 # ── BTC Timing Guard — Per-Signal-Type Momentum Filter (2026-09-11) ────────
 # Blocks signals when BTC has already moved significantly in the trade direction.
 # Prevents chasing: pump-chain+ loses 70% when BTC > +0.3%, pump-chain- loses 60% when BTC < -0.3%.
@@ -1602,6 +1609,14 @@ PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20% — tight trail, exits before ATR SL (whi
 # Revert: set False (one line).
 BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED = True
 BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN = 60  # minutes hold before stall check; fires when live_pnl < PM_TRAIL_ACTIVATE_PCT
+# Trail-arm timeout vehicle extended to pump-chain+ LONG (brain_auditor 2026-10-12 15:40Z).
+# Same mechanic as bb-squeeze: LONG hold >=MIN that never arms PM_TRAIL is a stall, not a grind.
+# PG 30d counterfactual (verified twice, morning + captain): pump-chain+ LONG >=45m never-armed
+# = 13T 0%WR -$1.75. Every >=45m WINNER had MFE 2-10% (armed long before check) — structurally
+# immune to live_pnl < 0.40% guard. 24h bleed shape: 9/10 losers never armed (MFE < 0.40%).
+# Revert: set False (one line). Monitor: trail_arm_timeout exits on pump-chain cohort.
+PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED = True
+PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45  # pump-chain grinds shorter than bb-squeeze before spike
 # Tiered trail: loosens as profit grows (2026-09-07 partial-close plan — Option 3)
 # Format: list of (min_profit_pct, trail_distance_pct) — first match wins, never tightens
 PM_TRAIL_TIERS = [
