@@ -1632,6 +1632,8 @@ PROFIT_MONSTER_BYPASS_SIGNALS = (
     'ema300-dip-short',    # EMA300 rally seller — structural exit
     # 'pullback-entry+' REMOVED 2026-09-25 — 16.7% WR, -$0.57 in NEUTRAL, pm_trail should manage
     'pullback-entry-',     # pullback entry SHORT — structural exit
+    'grind-breakout+',     # grind breakout LONG — RR engine + ATR SL
+    'grind-breakout-',     # grind breakout SHORT — RR engine + ATR SL
     # 'trend_purity+' REMOVED 2026-09-25 — 36.4% WR, -$0.90 in NEUTRAL, pm_trail should manage
     'trend_purity-',       # trend purity SHORT — RR engine + ATR SL
     # 'rr-struct+' REMOVED 2026-09-25 — 73.3% WR LONG in NEUTRAL, pm_trail should book profits (was: RR engine + ATR SL)
@@ -1768,6 +1770,9 @@ SIGNAL_EXIT_CONFIG = {
     'grind-breakout-v2+': 'rr_engine',
     'grind-breakout-v2-': 'rr_engine',
     'grind_breakout_v2': 'rr_engine',   # underscore variant
+    'grind-breakout+': 'rr_engine',
+    'grind-breakout-': 'rr_engine',
+    'grind_breakout': 'rr_engine',   # underscore variant
     # Volume buildup: ride-it exit — sustained volume means let the trend run
     'volume-buildup+': 'ride_it',
     'volume-buildup-': 'ride_it',
