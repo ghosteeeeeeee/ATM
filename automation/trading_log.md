@@ -8507,3 +8507,25 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - Quiet window (0 closes/hr) — 2 positions still open ~1-2h; no action
+
+## [2026-10-12 05:14] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** −$0.18 (WR 0%) | 24h: 18T 10W +$1.70 | 3 open (BTC continuum LONG 02:13 flat $0, ETH hl_copy LONG 02:47 +$0.15 unreal, SUPER r2v2-long6 LONG 04:39 +$0.06 unreal)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0 candidates — only 1 trade last hour (GRASS pump-chain+ atr_sl_hit −$0.18); no signal with 3+ trades/0% WR last hour. pump-chain+ 3T/24h −$0.26 (1W) — watchlist, n too small to kill
+- atr_sl_hit 1/18 ≈ 5.6% of 24h closes — under 40%, tpsl_utils deployed
+- hard_max_loss 5/24h ≈ 28% −$0.36 — still brain_auditor watchlist (SL width lever), not touched
+- profit-monster-trail 6/24h +$1.01, atr_trail_hit 2 +$0.62, hard_tp 2 +$0.59 — trailing remains profit engine
+- Overtrade: 1/hr — well under 20
+- Streak: 00h −$0.17, 01h +$0.51, 02h −$0.01, 03h +$0.09, 05h −$0.18 — no 3-neg-hr run (04h zero-trade gap)
+- live_trading=true, kill JSON=true, pipeline timer fresh (next in 16s)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- BTC continuum LONG open ~3h at $0.00 flat — third consecutive hour flagged; monitor whether it closes scratch or moves
+- 24h PnL drifted +$1.88 → +$1.70 (GRASS loss + 24h window roll) — still net positive
