@@ -65,6 +65,15 @@ cat "$BASE" >> "$PROMPT_FILE"
 printf '\n\n--- TASK ---\n\n' >> "$PROMPT_FILE"
 cat "$TASK" >> "$PROMPT_FILE"
 
+# Abort if the persona failed to load — a panel run with no protected-flags
+# context and no rules is worse than no run at all. (Same guard as deep; see
+# ceo_lib.sh ceo_assert_prompt. Live test 2026-10-12.)
+if ! ceo_assert_prompt "$PROMPT_FILE" "$CEO_PERSONA_MARKER" "moe"; then
+    echo "[CEO-MOE] prompt integrity check FAILED — not launching." >&2
+    rm -f "$PROMPT_FILE" "$TASK"
+    exit 5
+fi
+
 jsonl="$CEO_LOG_DIR/moe-${TS}.jsonl"
 exitf="$CEO_LOG_DIR/moe-${TS}.exit"
 

@@ -577,3 +577,9 @@
 - **INFO**: Pipeline health check — all clear. 3 core timers firing, services active, no errors in 30min, 38 signals/hr, 18 trades closed today, regime LONG_BIAS, candles fresh (~2.4min).
 - **NOTE**: Disk at 84% (94G/118G, 19G free). Watch — will WARN at >85%. No logs >7d to compress. candles.db = 2.8G.
 - **NOTE**: 8 historical atr_sl_hit phantom trades (|pnl|<0.01%) all from Jul-Sep, none recent.
+
+## Error Alerts — 2026-10-12 21:52 UTC
+- **WARN**: `hermes-1m-candle.timer` STILL ACTIVE but documented dead — price_collector.py:43-44 says "timer disabled 2026-10-12 after confirming filled=0/dev=0 every run for ~7 days". Evidence: 1209/1209 runs over 7d = filled=0/dev=0, ~37s CPU each (~12 CPU-hours wasted). Fast 1m seeder in price_collector.py (BUG-048, CEO-ratified) owns 1m candles now — candles_1m fresh at 1.1min/176 tokens. Aggregator is pure waste + contends for candles.db write locks.
+- **NO AUTO-FIX APPLIED**: service-safety rule forbids stopping a timer. **CEO action:** `systemctl disable --now hermes-1m-candle.timer` (then delete `_aggregate_1m.py` or leave as gap-filler reference).
+- **INFO**: Disk 84% (94G/118G) — under 85% WARN. No logs >7d to gzip. candles.db 2.9G, session_brain.db 1.2G, signals_hermes.db 1.0G. DB-prune goal (<80% by Oct 14) still open.
+- **INFO**: Pipeline healthy — 3 core timers firing, hl-sync-guardian active, 0 Tracebacks/30min, 68 signals/hr, 20 closed today, 0 open, 0 phantoms, prices fresh (46s), regime SHORT_BIAS (6L/77S/34N), token_speeds 241 tokens @ 52.7% >=p50.

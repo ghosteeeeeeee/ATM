@@ -8896,3 +8896,24 @@ Final set: []
 **Open Questions:**
 - 24h WR 47.1% with +$0.17 net — seventh consecutive thin-positive hour, still below ≥50% Oct 15 goal
 - Quiet stretch continues (0 closed 9 of last 10 hours) but 2 fresh pump-chain+ longs just opened — first activity since 14h
+
+## [2026-10-12 21:14] Hourly Analysis
+
+**Trades:** 3 closed last hour, all pump-chain+ LONG (KAS −$0.02 trail_arm_timeout, HYPER +$0.02 trail_arm_timeout, FIL −$0.12 hard_max_loss)
+**PnL:** −$0.12 last hour | 24h: 19T 8W +$0.03 (42.1%) | 0 open
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: pump-chain+ last hour 3T 1W 33% WR (not 0%) — kill rule not met; 24h 6T 1W −$0.45 remains worst signal, stays on watchlist
+- atr_sl_hit 1/19 ≈ 5.3% — under 40%, tpsl_utils deployed
+- hard_max_loss 8/19 ≈ 42% −$0.61 — hold brain_auditor (SL width lever), not auto_1hr's to touch
+- Overtrade: 3/hr — well under 20
+- Streak: only 20:00 negative (−$0.12); prior hours zero-trade /usr/bin/bash.00 — not 3 consecutive negative hours
+- live_trading=true (constants line 33 + kill JSON), verified this run
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h net fell +$0.17 → +$0.03 as pump-chain+ trio ate $0.14; if pump-chain+ keeps bleeding (n=6, 1W), revisit kill criteria with CEO — current rule requires 0% WR last hour, and HYPER's flat +$0.02 win blocks it
+- 24h WR 42.1% — still below ≥50% Oct 15 goal

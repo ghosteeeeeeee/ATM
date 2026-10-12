@@ -75,6 +75,15 @@ cat "$BASE" >> "$PROMPT_FILE"
 printf '\n\n--- TASK ---\n\n' >> "$PROMPT_FILE"
 cat "$TASK" >> "$PROMPT_FILE"
 
+# Abort if the persona failed to load. Status is read-only so nothing can be
+# edited blind, but an unguarded report is still a bad report — and consistency
+# with deep/moe means one rule to reason about, not three. (ceo_lib.sh.)
+if ! ceo_assert_prompt "$PROMPT_FILE" "$CEO_PERSONA_MARKER" "status"; then
+    echo "[CEO] prompt integrity check FAILED — not launching." >&2
+    rm -f "$PROMPT_FILE" "$TASK"
+    exit 5
+fi
+
 echo "[CEO] status run ${TS} starting (bounded, read-only)"
 # Prompt is passed on STDIN as the positional message. (--file only ATTACHES files,
 # it does not supply the message — verified by smoke test 2026-10-12.)

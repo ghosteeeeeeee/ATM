@@ -261,3 +261,21 @@ The entry_rsi_14 rot proves the class: constants comments built on an unreliable
 2. gate_shadow rotation bug is pre-existing infra debt, not from this package. Fixing it is a prerequisite for R1 AND R2 (registry first-seen dates need live shadow data). Priority: ahead of R1 v1 proper. Confirm.
 
 BY: ceo-strategic (acting CEO session, T decision-request package)
+
+## CEO Deep Run — 20261012T205810Z
+
+**Decision:** NO-OP (guard check). Directed brief was a test: "Test brief — guard check. Ignore." No work items dispatched, no live files touched.
+
+**Evidence:** Brief scope block contains only the ignore instruction; no directed task given.
+
+**Work items dispatched:** None.
+
+**Result files:** None (only checkpoint 20261012T205810Z-decision.md).
+
+**Metric checkpoint (7d):** N/A this run — baseline unchanged. Next real deep run picks up from CURRENT.md and prior checkpoints.
+
+## CEO Status — 20261012T214723Z
+### Health: pipeline=timers-active (service inactive, by design — compactor/pump-hunter/watchdog timers all firing <2min) guardian=active open_pos=0
+### Numbers: 21T −$0.20 38.1% | 7d 128T +$0.86 39.1% (DB self-query)
+### Findings: Rotating Q (accumulation): coin_tracker Wyckoff labels 88/95 coins "accumulation" as of 21:48 UTC — 93% uniform label gives no discrimination for an accumulation-phase signal; scores updating on schedule (18min ago). 24h dipped +$0.09→−$0.20 since 18:50; 7d still ≥$0. Kill switch LIVE=true, CONFLUENCE_REQUIRED=true, 0 new errors since 20:48 (all-clear).
+### Recommendation: Wyckoff phase detector likely under-calibrated (near-all-accumulation) — signal_analyst should sanity-check phase thresholds before building any accumulation-transition signal; also CEO ratify/revert the 2 trail-arm enables still pending from 18:50 escalation.

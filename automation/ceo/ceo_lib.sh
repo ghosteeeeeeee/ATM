@@ -26,6 +26,36 @@ CEO_LOCK_OWNER=""   # tag written into the lock; release only removes OUR lock
 
 mkdir -p "$CEO_LOG_DIR" "$CHECKPOINT_DIR"
 
+# ── Prompt-integrity guard ───────────────────────────────────────────────────
+# A run whose persona/rules file failed to load is the worst possible outcome:
+# opencode will happily execute a task with NO persona, NO protected-flags
+# context, and NO rules — silently. Live test 2026-10-12: an agent piped a task
+# via the pre-rework `cat ceo_prompt.md - <<TASK |` pattern after that file had
+# been renamed; `cat` failed to stderr but the heredoc still reached opencode,
+# so the CEO ran as a nameless "acting session" and only the stderr line gave it
+# away. Fail LOUD and abort instead.
+#
+# Usage: ceo_assert_prompt <prompt-file> <required-marker> <label>
+ceo_assert_prompt() {
+    local prompt="$1" marker="$2" label="$3"
+    if [ ! -s "$prompt" ]; then
+        echo "[CEO][FATAL] $label prompt is missing or empty: $prompt" >&2
+        echo "[CEO][FATAL] refusing to launch a run with no persona/rules — aborting." >&2
+        return 1
+    fi
+    if ! grep -qF -- "$marker" "$prompt"; then
+        echo "[CEO][FATAL] $label prompt has no persona marker ($marker): $prompt" >&2
+        echo "[CEO][FATAL] the shared base prompt failed to load — a run launched now" >&2
+        echo "[CEO][FATAL] would have NO protected-flags context. Aborting instead." >&2
+        return 1
+    fi
+    return 0
+}
+
+# Marker present in ceo_prompt_base.md. If the base prompt is ever renamed or
+# replaced, update this too — a wrong marker fails closed (abort), never open.
+CEO_PERSONA_MARKER='CEO_PROTECTED_FLAGS'
+
 # ── Port ────────────────────────────────────────────────────────────────────
 # opencode run already defaults to a RANDOM free port when --port is omitted,
 # so concurrent detached runs never collide. We pass --port only for runs that

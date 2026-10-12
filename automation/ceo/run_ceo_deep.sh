@@ -16,6 +16,20 @@
 # Design basis: CEO decision 2026-10-12 (automation/ceo/ceo_report.md).
 
 set -uo pipefail
+
+# Resolve an optional brief argument to an ABSOLUTE path BEFORE cd'ing. A
+# relative path would otherwise be re-interpreted against /root/.hermes and
+# spuriously fail the existence test below — every relative-path invocation
+# aborted with "brief not found" even when the file existed. (Found 2026-10-12
+# while testing the persona guard.)
+INJECTED_BRIEF="${1:-}"
+if [ -n "$INJECTED_BRIEF" ]; then
+    case "$INJECTED_BRIEF" in
+        /*) : ;;                                   # already absolute
+        *) INJECTED_BRIEF="$(pwd)/$INJECTED_BRIEF" ;;  # caller-relative -> absolute
+    esac
+fi
+
 cd /root/.hermes || exit 1
 source /root/.hermes/automation/ceo/ceo_lib.sh
 
@@ -47,7 +61,8 @@ fi
 # "at most TWO work items" default — the agent works YOUR question instead of
 # picking its own. Put the brief INSIDE the repo (e.g. under automation/), NOT in
 # /tmp: opencode auto-rejects /tmp/* reads and the session dies mid-run.
-INJECTED_BRIEF="${1:-}"
+# (INJECTED_BRIEF was resolved to an absolute path at the top of this script,
+# before the cd — do not reassign it from $1 here or relative paths break again.)
 INJECT_BLOCK=""
 if [ -n "$INJECTED_BRIEF" ]; then
     if [ ! -f "$INJECTED_BRIEF" ]; then
@@ -116,6 +131,16 @@ printf '\n\n--- BASE PERSONA ---\n\n' >> "$PROMPT_FILE"
 cat "$BASE" >> "$PROMPT_FILE"
 printf '\n\n--- TASK ---\n\n' >> "$PROMPT_FILE"
 cat "$TASK" >> "$PROMPT_FILE"
+
+# Abort BEFORE taking the lock if the persona failed to load. A deep run with no
+# protected-flags context could edit live-trading files blind — the one failure
+# mode that must never launch. (Live test 2026-10-12 hit exactly this via an
+# ad-hoc pipeline; the runners had the same latent weakness, now closed.)
+if ! ceo_assert_prompt "$PROMPT_FILE" "$CEO_PERSONA_MARKER" "deep"; then
+    echo "[CEO-DEEP] prompt integrity check FAILED — not launching, not locking." >&2
+    rm -f "$PROMPT_FILE" "$TASK"
+    exit 5
+fi
 
 echo "[CEO-DEEP] run ${TS} starting (detached)"
 jsonl="$CEO_LOG_DIR/deep-${TS}.jsonl"
