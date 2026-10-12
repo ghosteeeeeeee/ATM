@@ -8854,3 +8854,24 @@ Final set: []
 **Watch:** 7d WR ~42% vs ≥50% Oct 15 goal; pump-chain+/ai-trader+/hmacd_mtf-- kill watchlist (n<5); disk 83%; live timeout checks every cycle after 60m vs backtest one-shot — continuous-semantics CF unvalidated
 
 **Next run (Oct 13 06:40):** Reputation Phase 2a wiring (date-gated) + Wyckoff shadow rule (orchestrator implements shadow-only if still undelivered)
+
+## [2026-10-12 19:13] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 | 24h: 17T 8W +$0.17 (47.1%) | 0 open | 7d: 123T +$1.21 (39.8%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- atr_sl_hit 1/17 ≈ 5.9% of 24h closes — under 40%, tpsl_utils deployed
+- Kill: 0 candidates — 0T last hour; 24h losers pump-chain+ 3T 0W −$0.33, hmacd_mtf-- 1T −$0.12 (kill rule needs 3+ trades last hour, not met)
+- hard_max_loss 7/17 ≈ 41% −$0.49 (avg −$0.070) — hold brain_auditor (SL width lever), not touched
+- Overtrade: 0/hr — well under 20
+- Streak: only 1 trade in last 6h ($0.00 at 14h); last negative hours 08h/09h — not 3 consecutive negative PnL hours
+- live_trading=true (constants line 33 + kill JSON), verified this run
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 47.1% with +$0.17 net — improved from +$0.09 earlier today; sixth consecutive thin-positive hour, still below ≥50% Oct 15 goal
+- Quiet stretch: 0 trades in 9 of last 10 hours, 0 open positions — market lull or over-filtering; no action while 24h net positive
