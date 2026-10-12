@@ -1035,7 +1035,12 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
             size_usdt *= size_mult
             print(f"[mirror_open] {token}: applied size_mult={size_mult:.2f} → ${size_usdt:.2f}")
 
-    if size_usdt < MIN_TRADE_USDT:
+    # FIX 2026-10-12: epsilon the gate. Size multipliers floored at HL_MIN/base
+    # (see decider_run._get_min_notional_floor) compute mathematically-exact $11.00
+    # but IEEE float can yield 10.999999999999998 — tripping this strict `<` and
+    # reproducing the very "Balance too low" rejection the floor exists to prevent.
+    # MIN_ORDER_BUFFER below is added AFTER this check, so it never protected here.
+    if size_usdt < MIN_TRADE_USDT - 1e-6:
         return {"success": False, "message": f"Balance too low (${size_usdt:.2f} < ${MIN_TRADE_USDT})"}
 
     # Apply buffer to guarantee we clear HL's $10 min even with rounding edge cases

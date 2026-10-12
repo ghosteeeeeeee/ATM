@@ -298,6 +298,41 @@ def _get_amplitude_size_mult(token):
     return AMPLITUDE_SIZE_MULT.get(amp_class, 1.0)
 
 
+# ── Min-notional size floor ──────────────────────────────────────────────────
+# Cache per-process: decider_run/brain.py are short-lived one-shot processes, so
+# one live account fetch per process instead of one per call (R2: this sits on the
+# trade hot path and get_account_value_curl has no caching + a global /info rate
+# limit that sleeps >=2s). Stale-within-process is harmless — a single run lasts
+# seconds and sizing does not change intra-run.
+_min_notional_floor_cache = {'val': None}
+
+def _get_min_notional_floor():
+    """Largest size MULTIPLIER reduction that still clears the HL $11 minimum.
+
+    Size penalties (LOSERS/Hall of Shame = 0.5x) are applied to the base size, but
+    when the account is near the $11 minimum the base is already floored at $11, so
+    0.5x → $5.50 → mirror_open rejects with "Balance too low". A PENALTY becomes a
+    total execution KILL (50 failed trades on 2026-10-12: APT/CFX/ADA).
+
+    Returns HL_MIN_NOTIONAL_USDT / live base size, so the penalty is inert exactly
+    while it would otherwise kill the trade, and re-activates once 7% of balance
+    exceeds the minimum. Uses the LIVE base, not the DEFAULT constant — dividing by
+    the constant gives 11/11=1.0 at every balance, permanently disabling the
+    penalty entirely (that flaw is why the LOSERS guard was dead code).
+    """
+    if _min_notional_floor_cache['val'] is None:
+        try:
+            from hyperliquid_exchange import _get_trade_size_usdt as _base_fn
+            _base = _base_fn()
+            _min_notional_floor_cache['val'] = HL_MIN_NOTIONAL_USDT / max(_base, HL_MIN_NOTIONAL_USDT)
+        except Exception as _floor_e:
+            # Safe direction: 1.0 = penalty inert, trade proceeds at full size.
+            log(f'  ⚠️ [_min_notional_floor] live base size unavailable ({_floor_e}) — '
+                f'falling back to constant ratio, size penalties inert this run', 'WARN')
+            _min_notional_floor_cache['val'] = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
+    return _min_notional_floor_cache['val']
+
+
 def _get_favorite_size_mult(token, direction=None):
     """Get position size multiplier based on direction-specific favorites/losers status + Hall of Fame.
     - Direction-specific losers: 0.5x (penalized)
@@ -311,15 +346,16 @@ def _get_favorite_size_mult(token, direction=None):
     token_upper = token.upper()
 
     # Direction-specific losers get penalized first
+    # FIX 2026-10-12: was max(LOSERS_SIZE_MULT, HL_MIN/DEFAULT) = max(0.5, 11/11) = 1.0
+    # at EVERY balance — the constant ratio permanently disabled the LOSERS penalty
+    # (dead code). Now uses the live base size via _get_min_notional_floor().
     if direction:
         if (direction == 'LONG' and token_upper in LOSERS_LONG) or \
            (direction == 'SHORT' and token_upper in LOSERS_SHORT):
-            max_reduction = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
-            return max(LOSERS_SIZE_MULT, max_reduction)
+            return max(LOSERS_SIZE_MULT, _get_min_notional_floor())
     # Legacy combined check
     if LOSERS and token_upper in LOSERS:
-        max_reduction = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
-        return max(LOSERS_SIZE_MULT, max_reduction)
+        return max(LOSERS_SIZE_MULT, _get_min_notional_floor())
 
     # Check Hall of Fame status first (highest priority boost)
     try:
@@ -331,34 +367,23 @@ def _get_favorite_size_mult(token, direction=None):
 
         # Direction-specific Hall of Fame check
         # FIX 2026-10-12: Hall of Shame returned 0.5 UNCONDITIONALLY, unlike the
-        # LOSERS branches above which guard with max(LOSERS_SIZE_MULT, max_reduction).
-        # At low balance _get_trade_size_usdt() already floors to the $11 HL minimum,
-        # so a 0.5x multiplier produced $5.50 < MIN_TRADE_USDT and mirror_open failed
+        # LOSERS branches above which guard with a min-notional floor. At low
+        # balance _get_trade_size_usdt() already floors to the $11 HL minimum, so a
+        # 0.5x multiplier produced $5.50 < MIN_TRADE_USDT and mirror_open failed
         # with "Balance too low" — 50 failed trades in one day (APT/CFX/ADA). A size
-        # PENALTY became a total execution KILL.
-        #
-        # The floor must use the ACTUAL base size, not DEFAULT_TRADE_SIZE_USDT: the
-        # LOSERS guard divides by the constant (11/11=1.0), which permanently disables
-        # that penalty at every balance. Dividing by the live base size keeps the
-        # penalty inert only while it would otherwise kill the trade, and lets it
-        # bite again once 7% of balance exceeds the $11 minimum.
-        try:
-            from hyperliquid_exchange import _get_trade_size_usdt as _hos_base_size
-            _hos_reduction = HL_MIN_NOTIONAL_USDT / max(_hos_base_size(), HL_MIN_NOTIONAL_USDT)
-        except Exception:
-            _hos_reduction = HL_MIN_NOTIONAL_USDT / DEFAULT_TRADE_SIZE_USDT
+        # PENALTY became a total execution KILL. Floored via the shared lazy helper.
         if direction and direction.upper() in dir_stats:
             dir_wr = dir_stats[direction.upper()].get('winrate', 50)
             dir_trades = dir_stats[direction.upper()].get('trades', 0)
             if dir_wr >= 60 and dir_trades >= 5:
                 return 2.0  # Hall of Fame — extra boost
             elif dir_wr < 45 and dir_trades >= 5:
-                return max(0.5, _hos_reduction)  # Hall of Shame — penalty, floored at HL min notional
+                return max(0.5, _get_min_notional_floor())  # Hall of Shame — floored at HL min notional
         # Combined Hall of Fame check
         elif lb_data.get('wr', 50) >= 60 and lb_data.get('trades', 0) >= 15:
             return 2.0  # Hall of Fame — extra boost
         elif lb_data.get('wr', 50) < 45 and lb_data.get('trades', 0) >= 15:
-            return max(0.5, _hos_reduction)  # Hall of Shame — penalty, floored at HL min notional
+            return max(0.5, _get_min_notional_floor())  # Hall of Shame — floored at HL min notional
     except Exception:
         pass
 
@@ -773,6 +798,12 @@ def process_delayed_entries(paper=False):
 
         _base_size = _get_dynamic_position_size()
         _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
+        # FIX 2026-10-12 (code review R775): this delayed-entry path was MISSING the
+        # HL_MIN cap that the main execution path has (see ~line 2196). AMPLITUDE_SIZE_MULT
+        # includes 0.5 (CHAOTIC), so $11 x 1.0 x 0.5 = $5.50 — brain.py's add_trade gate
+        # then hard-rejects with "amount_usdt < HL_MIN". Same "penalty becomes kill" class
+        # as the Hall of Shame bug. Cap after multipliers, matching the main path.
+        _trade_size = max(_trade_size, HL_MIN_NOTIONAL_USDT)
 
         # ── RACE CONDITION FIX: Write marker BEFORE brain.py subprocess ────
         # Uses file lock to prevent TOCTOU race where concurrent writes overwrite each other.
@@ -2207,6 +2238,11 @@ def execute_trade(token, direction, price, confidence, source,
         if _zone_adjusted < _trade_size:
             log(f"  [SL-ZONE-SIZE] {token} {direction}: size reduced from {_trade_size:.2f} to {_zone_adjusted:.2f} (death zone ahead)")
             _trade_size = _zone_adjusted
+            # FIX 2026-10-12 (code review): zone reduction runs AFTER the HL_MIN cap
+            # above, so it could push size back below $11 and brain.py's add_trade gate
+            # would hard-reject the trade. Re-cap — the zone should shrink a position,
+            # never delete it.
+            _trade_size = max(_trade_size, HL_MIN_NOTIONAL_USDT)
     except ImportError:
         pass  # sl_zones not available
     except Exception as e:
