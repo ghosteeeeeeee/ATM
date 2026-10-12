@@ -3999,5 +3999,14 @@
     "status": "suggested-for-backtest",
     "risk": "medium — needs self_learner backtest with execution costs; 15min/0.10%/0.30% are candidate params, not verified",
     "owner": "self_learner"
+  },
+  {
+    "date": "2026-10-12T02:45:00Z",
+    "idea": "Confidence-calibration shadow: log counterfactual skip when final_confidence>=80 AND vol_regime=HIGH (shadow only, 48h). conf>=80 inversely predictive (30d 557T -$7.67 vs 60-80 172T +$5.79; t=-2.70, bootstrap CI [-0.08,-0.01]). Bulk already covered by MIDBAND+HIGH-70 blocks; residual HIGH x RSI<60 x conf80 = -$0.30/14d (weak). Shadow decides dampener vs no-action.",
+    "rationale": "Statistically significant cross-window inversion; momentum signals peak confidence at late-pump tops. Existing blocks harvest the strong cells; shadow avoids over-shipping.",
+    "expected_impact": "Decision-grade data 48h; optional 0.85x dampener on HIGH conf80 cohort without touching EXTREME habitat",
+    "category": "calibration",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
