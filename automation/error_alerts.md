@@ -572,3 +572,8 @@
 ## Error Alerts — 2026-10-12 15:00 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-10-12 20:48 UTC
+- **INFO**: Pipeline health check — all clear. 3 core timers firing, services active, no errors in 30min, 38 signals/hr, 18 trades closed today, regime LONG_BIAS, candles fresh (~2.4min).
+- **NOTE**: Disk at 84% (94G/118G, 19G free). Watch — will WARN at >85%. No logs >7d to compress. candles.db = 2.8G.
+- **NOTE**: 8 historical atr_sl_hit phantom trades (|pnl|<0.01%) all from Jul-Sep, none recent.
