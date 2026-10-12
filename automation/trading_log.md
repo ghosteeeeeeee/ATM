@@ -8486,3 +8486,24 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - None new; hard_max_loss share (29%) still on brain_auditor watchlist
+
+## [2026-10-12 04:13] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 (WR n/a) | 24h: 17T 10W +$1.88 | 2 open (BTC continuum LONG 02:13, ETH hl_copy LONG 02:47)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: 0 candidates (no signal with 3+ trades last hour)
+- atr_sl_hit 0/24h — under 40%, tpsl_utils deployed
+- hard_max_loss 5/24h ≈ 29% −$0.36 — hold brain_auditor (SL width lever)
+- profit-monster-trail 6/24h +$1.01 + atr_trail_hit 2 +$0.62 — trailing still the profit engine
+- Overtrade: 0/hr — well under 20
+- Streak: 00h −$0.17, 01h +$0.51, 02h −$0.01, 03h +$0.09 — no 3-neg-hr run
+- live_trading=true, kill JSON=true, timers active
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Quiet window (0 closes/hr) — 2 positions still open ~1-2h; no action
