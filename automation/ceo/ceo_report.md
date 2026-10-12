@@ -187,3 +187,77 @@ Requires threading signal-quality context (confluence + trend alignment status) 
 - More SHORT signals survive scoring during dumps
 - Marginal setups rank lower (0.70x) but aren't eliminated
 - Net effect: +5–15 SHORT trades/week in the 0.55–0.69 R:R band
+
+---
+
+## CEO Decisions — Gate Conundrum Package (D1–D6) — 2026-10-12 ~20:40 UTC
+
+Package: T decision request. Plan `plans/2026-10-12_gate-conundrum-deadlock-plan.md`; adversarial verdict `brain/verdicts/2026-10-12_deadlock-gate-verify.md` (commit 49cc558c; auditor's own code + raw tables in /tmp/audit/ — files no longer present, log data frozen 2026-10-12 19:28 UTC). Context: extends Oct-8/9 gate counterfactual audit (55 gates, 78% no-edge, BTC-CHOP-GATE sole Bonferroni survivor) + D3/D4 instrumentation already live. 0 config changes made by the package; 0 trading config changes made by these decisions (D4 approves a future constant change — the constant itself is NOT touched here).
+
+PG context at decision time: 24h 18T +$0.05 | 7d 122T +$1.48 | 1 open.
+
+### Decisions (lead)
+
+| Item | Verdict | Class |
+|------|---------|-------|
+| D1 — R1 blocked-signal shadow trader | **GO** | instrumentation |
+| D2 — R2 gate registry + shadow-first policy | **GO** | process |
+| D3 — R3 claim-hygiene standard | **GO** | process |
+| D4 — R4 PUMP-CHAIN-VEL deadband | **GO** | bug-fix (1 constant + 3 comparison sites) |
+| D5 — R5 evidence-column audit | **GO** | read-only audit |
+| D6 — Guardrails | **CONFIRM** | standing rules |
+
+### D1 — R1 shadow trader: GO
+
+Ratify. Instrumentation-only; fits the established D3 (expiry_shadow) / D4 (BLOCKED log format) pattern. Existing infra: `gate_shadow.py` (12,483 events recorded since 10-04, hourly timer live) + `expiry_shadow.py` (30min timer live) — both standalone log/DB parsers, zero code in the trading path.
+
+**First target confirmed: LONG-NEUTRAL-CHOP.** First seen 2026-10-11 04:15 (2 days old). It blocks chop-LONGs — the system's single best cohort (C3: +$3.28/2wk, WR 53.7%). It shipped hours after AIXBT/INJ/USELESS losses, unmeasured. Its gate has bypasses (BTC above EMA300, coin-own-momentum vel>0.3+SMA, strong-confluence+trend), so the shadow must capture the actual blocked set from log lines, not simulate from scratch. If the blocked cohort's counterfactual PnL is positive over 14d → remove the gate on data at the Nov 6 re-audit. If negative → keep. Either way, we get the answer instead of arguing.
+
+**Implementation direction:** extend `gate_shadow.py`'s closer to simulate the real exit stack (SL/TP/trailing from hermes_constants) on blocked signals, producing per-gate counterfactual PnL in $ over 14d. The current closer uses signal_outcomes forward-returns join — adequate for ranking but not for a dollar-denominated gate-removal decision (C6 noted the markout-vs-realized-PnL divergence). Don't fork a new system; extend the existing one.
+
+**⚠️ SIDeways FIND (blocking for R1, pre-existing bug):** gate_shadow recorder has been SILENTLY DEAD since the 2026-10-10 20:48 log rotation. Offset file = 176,599,955; current pipeline.log size = 43,429,899. Seek past EOF records nothing. ~2 days of blocks missed — including the entire lifetime of LONG-NEUTRAL-CHOP (first seen 10-11). The recorder's last event is 2026-10-10 19:59. Fix: reset offset on rotation detection (or size-check before seek). Must be fixed as R1 v1 prerequisite. Severity: HIGH (the shadow data R1/R2 depend on has a 2-day hole).
+
+### D2 — R2 gate registry + shadow-first: GO
+
+Ratify. Registry = single source of truth per gate: first-seen date, evidence grade (trade-level / counterfactual / shadow), n, effect, last-verified. Live gates populated from the verified C1 census (the verdict file has correct first-seen dates for every gate). New hard-veto gates ship shadow-first 14d before enforcement.
+
+The LONG-NEUTRAL-CHOP casualty is the proof case: a 2-day-old gate shipped on intuition, attacking the best cohort, with zero measurement. A first-seen date field + shadow-first rule would have caught both the gate's youth and its counterproductive aim before it went live. Retroactive registry entries for the three young live gates: SHORT-RSI-HARD-FLOOR (first seen 2026-10-12 00:33), LONG-NEUTRAL-CHOP (2026-10-11 04:15), CONTINUUM-BULL (2026-10-05 21:23). All three hit the 2-week minimum by Nov 6.
+
+### D3 — R3 claim-hygiene standard: GO
+
+Ratify. Standard for any future gate proposal: (1) episode-level counts, not raw lines (re-logging inflates ~9×); (2) first-seen dates with explicit window; (3) null-model check for any "always/never" statistic (the 99.7% both-direction-blocked stat was 1 hour BELOW the coin-flip null); (4) direction-signed counterfactual. Lives in brain/SOPs.md.
+
+The deadlock episode is the textbook case: three separate claim-hygiene failures (irreproducible census windowing a <24h gate as a 2-week blocker; vacuous pincer stat; imputed null cohort manufacturing "+$3.53 for RSI≥45") nearly drove a gate-removal program. One of the three was a fabricated number. Standard costs nothing to follow and kills bad proposals at the first step.
+
+### D4 — R4 PUMP-CHAIN-VEL deadband: GO (bug-fix class)
+
+Approve. vel<0 → vel<−0.3% (LONG); vel>0 → vel>+0.3% (SHORT). This is a measurement-floor fix with direct in-system precedent: `SHORT_VEL_FILTER_VEL_THRESHOLD = 0.3` since Aug 16, explicitly justified as "was blocking SHORTs on noise" (hermes_constants.py:1004). The PUMP-CHAIN-VEL founding claim ("ALL 10 losses neg vel, ALL 26 winners pos") is falsified — AIXBT was a +4.59% winner entered at vel −0.21%, blocked by the zero deadband.
+
+**Implementation note (scope correction to plan):** not purely one-constant. The current code hardcodes `0` at three sites: signal_compactor.py:4454 (LONG main), :4480 (SHORT main), :5102/5105 (RESCUE path). Add `PUMP_CHAIN_VEL_DEADBAND_PCT = 0.3` to hermes_constants.py (this GO satisfies line 2); change three comparisons to use it. This also harmonizes with `PUMP_CHAIN_VEL_30M_MIN = -0.3` already used by pump_chain_long.py:203 — the signal module and the compactor currently disagree on the LONG threshold (−0.3 vs 0), which is itself a latent inconsistency. Still bug-fix class, still a small diff, still reversible.
+
+### D5 — R5 evidence-column audit: GO (read-only)
+
+Commission. Independently recompute every evidence column cited in hermes_constants.py comments with cohort statistics. Priority order: (1) columns behind comment-justified threshold constants — entry_rsi_14 is known-bad (r=0.33, mean|Δ|=12.9 pts, 4-day hole whose profitable cohort was imputed into the "+$3.53" claim); (2) exec-time gate inputs; (3) exit-engine features. DO-NOT-MODIFY respected — findings flagged for T/CEO, no edits.
+
+The entry_rsi_14 rot proves the class: constants comments built on an unreliable column manufacture false precision. Find the next one before another threshold gets justified on a broken column. Read-only = zero risk; the audit's output feeds the Nov 6 re-audit alongside R1 shadow data and R2 registry grades.
+
+### D6 — Guardrails: CONFIRM
+
+1. **SHORT-RSI-HARD-FLOOR stays for chop.** Chop<45 shorts: WR 36%, −$4.56/30d, consistent across both RSI derivations (stored + independent candle-recompute). This is the one short-gate with real trade-level backing. Trend-side stays open (no bleed, wide CIs, n=22 — needs more data). No removal. If ever changed, make it chop-conditional (mirror SHORT-RSI-FLOOR's bear-structure override, 1,470 uses in window).
+2. **No gate removals on intuition or <2-week windows.** Nov 6 re-audit (standing from D2 of the gate audit) remains the decision gate. Shadow counterfactuals (R1) + registry grades (R2) feed the readout. The deadlock episode is the cautionary tale: a vacuous stat + a <24h-old gate nearly drove a removal program.
+3. **DO-NOT-MODIFY / protected flags intact.** 0 trading config changed by this package. D4 approves a future constant addition (PUMP_CHAIN_VEL_DEADBAND_PCT) — the constant itself is NOT added by this decision; implementation is a separate delegated task. hermes_constants.py line 2 honored.
+
+### Delegation (on T's ratification of this package)
+
+1. **bug_hunter: R1 v1** — (a) fix gate_shadow rotation bug (offset reset on rotation/size-check), (b) extend closer to exit-stack simulation, (c) first target LONG-NEUTRAL-CHOP counterfactual. Instrumentation-only; no trading-path edits.
+2. **bug_hunter: R4** — add PUMP_CHAIN_VEL_DEADBAND_PCT=0.3 + change 3 comparison sites (compactor main LONG/SHORT + rescue path). py_compile + dry-run. One-constant + three-line diff.
+3. **signal_analyst: R2** — build gate registry (brain/gate_registry.db or JSON), populate from C1 census + retroactive entries for 3 young gates, wire into weekly report.
+4. **brain_auditor: R5** — evidence-column audit, read-only, prioritized list from hermes_constants.py comment citations. Findings to brain/verdicts/.
+5. **R3 standard** — write to brain/SOPs.md (parent or signal_analyst, whichever touches SOPs next).
+
+### Questions for T
+
+1. R1 implementation: extend gate_shadow closer (recommended — same recording infra, richer closer, no fork) vs. build a separate blocked-signal paper trader? Confirm extend.
+2. gate_shadow rotation bug is pre-existing infra debt, not from this package. Fixing it is a prerequisite for R1 AND R2 (registry first-seen dates need live shadow data). Priority: ahead of R1 v1 proper. Confirm.
+
+BY: ceo-strategic (acting CEO session, T decision-request package)
