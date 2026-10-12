@@ -1,90 +1,129 @@
 {
-  "timestamp": "2026-10-11T22:39:55Z",
+  "timestamp": "2026-10-12T00:42:19Z",
   "session_brain_stats": {
-    "queries": 3,
-    "top_hits": "HML chop entries, continuum BTC, wrong-side momentum — all consistent with standing knowledge"
+    "queries": [
+      "signal performance winrate volume-breakout bb-squeeze",
+      "hard_max_loss chop entries momentum",
+      "new signal idea improvement strategy"
+    ],
+    "key_insights": "Squeeze detection historically loose (29-45% WR backtests on 1m); trend-following signal requests recurring; momentum gate rejected again on re-verification"
   },
   "trade_summary_24h": {
-    "trades": 23,
-    "pnl": 1.21,
-    "wr": 34.8
+    "trades": 20,
+    "pnl": "+$1.21",
+    "wr": "~42%",
+    "real_losers": [
+      "ME ai-trader+ -0.08 HML (RSI 72.5 NORMAL)",
+      "AIXBT pump-chain+v6 -0.18 atr_sl",
+      "USELESS volume-breakout -0.09 HML (RSI 74.25 EXTREME)"
+    ],
+    "note": "Overnight quiet; regime LONG_BIAS STRONG_UP; trail family how we win"
   },
   "trade_summary_7d": {
-    "trades": 144,
-    "pnl": 0.35,
-    "wr": 41.0
+    "pnl": "+$0.41",
+    "wr": "41.4%",
+    "exit_bleed": "hard_max_loss 46T -$5.60 0%WR #1; atr_sl_hit 12T -$0.90",
+    "by_signal_losers": "volume-breakout-long+ 12T 25% -$0.73 (HIGH block landed, aging out); bb-squeeze+ 15T -$0.48 (pre-fix, 0 trades since Oct 6)",
+    "regime": "HIGH -$0.83 / NORMAL +$0.02 / EXTREME +$1.10"
   },
-  "hml_7d": {
-    "n": 46,
-    "pnl": -5.6,
-    "avg_mfe": 0.179,
-    "avg_lev": 4.0,
-    "reached_trail_arm": 5
-  },
-  "changes_from_last_run": {
-    "W_short_blacklist": {
-      "post_trades": 0,
-      "status": "WORKING (blocked)"
-    },
-    "vol_breakout_HIGH_block": {
-      "post_HIGH_trades": 0,
-      "status": "WORKING"
-    },
-    "bb_squeeze_RSI_MAX_65": {
-      "post_trades": 0,
-      "status": "UNTESTABLE — KEEP"
-    },
-    "LONG_MIDBAND_block": {
-      "post_trades": 12,
-      "post_pnl": -0.06,
-      "status": "NEUTRAL/HOLD"
-    },
-    "LONG_HIGH_OVERBOUGHT_block": {
-      "post_trades": 8,
-      "post_pnl": 0.01,
-      "status": "NEUTRAL/HOLD"
-    },
-    "CapB_paper_fix": {
-      "real_capital_clusters": 0,
-      "status": "WORKING"
-    }
-  },
-  "drift_findings": [],
-  "recurring_problems": [
+  "changes_from_last_run": [
     {
-      "problem": "hard_max_loss 46T 0%WR -$5.60/7d — regime-blind, RSI-blind, signal-spread (18 signals). Only 5/46 reached trail arm +0.40%. Root = entry momentum, not direction/RSI/regime.",
-      "vehicle": "self_learner trail-arm-timeout backtest DUE Oct 12",
-      "status": "waiting"
+      "change": "BB_SQUEEZE_LONG_RSI_MAX=65 (Oct 11 02:42)",
+      "status": "KEEP — 0 trades since (pre-silent since Oct 6); window 60-65 now fully restored via midband exemption"
     },
     {
-      "problem": "atr_sl_hit round-trips: 7T with MFE>=0.7% still closed via atr_sl (avg MFE 0.8%+). Captured momentum then gave it all back.",
-      "vehicle": "pump-chain v6 exit-stack / RR engine",
-      "status": "logged for v6 spec"
+      "change": "DECLINING continuum fix (Oct 11 08:47)",
+      "status": "monitor — no contrarian LONG losses post-fix in sample"
+    },
+    {
+      "change": "LONG_MIDBAND_NON_EXTREME_BLOCK (Oct 11 15:44)",
+      "status": "WORKING — CAKE RSI 41.67 trail winner passed; ME RSI 72.5 predates HIGH_OVERBOUGHT ship by 38min"
+    },
+    {
+      "change": "LONG_HIGH_OVERBOUGHT_BLOCK (Oct 11 17:38)",
+      "status": "WORKING for HIGH; ME/USELESS losses predate ship or in positive NORMAL/EXTREME 70+ bands — no extension"
+    },
+    {
+      "change": "Cap B paper=false (Oct 11 18:49)",
+      "status": "WORKING — alt LONGs no longer Cap-B-blocked by continuum paper"
     }
   ],
-  "missing_implementations": [],
+  "drift_findings": [
+    {
+      "id": "FILTER-COLLISION-BB-SQUEEZE-MIDBAND",
+      "severity": "HIGH",
+      "finding": "LONG_MIDBAND_NON_EXTREME_BLOCK (60-70 non-EXTREME) killed bb-squeeze+ entire LONG habitat. Module window is 60-65; EXTREME blocked by vol gate 0.0 + decider_run. Zero regimes survivable.",
+      "evidence": "bb-squeeze LONG RSI 60-65 non-EXTREME 14d = 8T 100%WR +$0.74 0 HML. Signal silent since Oct 6; midband would have kept it dead.",
+      "action": "FIXED this run — midband skips bb-squeeze source. Module MAX=65 still caps."
+    },
+    {
+      "id": "WATCHDOG-OVERBOUGHT-CHASE-PARTIAL-DISPROOF",
+      "severity": "INFO",
+      "finding": "Watchdog flagged ME/USELESS overbought LONG losers. NORMAL RSI>70 30d = 20T +$0.72 50%; EXTREME RSI>70 30d = 30T +$1.85 50% — both net POSITIVE. Only HIGH 70+ bleeds (-$1.07/38T) and is already blocked.",
+      "action": "NO extension of overbought block. Accept ME/USELESS as variance in positive bands."
+    },
+    {
+      "id": "MOMENTUM-FILTER-REVERIFY-FAIL",
+      "severity": "INFO",
+      "finding": "Re-ran entry-time feature separation HML vs trail winners 14d (n=87/162): speed_percentile p=0.46, momentum_score p=0.43, volume_spike p=0.20. Threshold sweep: every spd cutoff blocks more winners than HML. Confirms Oct 8 verdict — entry-time momentum filters are dead.",
+      "action": "No momentum filter. Edge must be exit-side (trail-arm timeout / micro-loss timeout)."
+    }
+  ],
+  "recurring_problems": [
+    "hard_max_loss 46T 7d 0%WR -$5.60 — #1 bleed, entry-side 85% never arm trail (MFE median 0.106%). self_learner trail-arm-timeout backtest due Oct 12.",
+    "STANDALONE_BYPASS skips vol gate (DRIFT-A standing) — per-signal decider_run catches exist for bb-squeeze EXTREME + volume-breakout HIGH but pattern must be repeated per signal.",
+    "bb-squeeze+ 0 trades since Oct 6 — pre-dates midband; module MIN/MAX + market conditions. Now that habitat restored, monitor 7d for re-fire."
+  ],
+  "missing_implementations": [
+    "Micro-loss timeout (creative this run) — needs backtest by self_learner",
+    "Wyckoff confluence partner — signal_analyst DUE EOD Oct 11 (still 0 all-time fires)"
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-11T22:39:55Z",
-      "idea": "MFE round-trip breakeven handoff — when MFE >= trail-arm (+0.40%) then price crosses back below entry, exit at entry instead of riding to atr_sl/hard_max_loss",
-      "rationale": "7d atr_sl_hit with MFE>=0.7%: 7T all losses (volume-breakout 3T MFE 0.79, pump-chain 4T MFE 0.88). Trail arms, momentum dies, full round-trip to SL. Breakeven handoff saves the MFE. NOT implementable standalone — exit-engine vehicle (v6/RR). Logged for v6 spec input.",
-      "expected_impact": "Save ~$0.5-0.8/7d on round-trip cohort; preserve all trail winners (they never cross back below entry before trailing up)",
-      "category": "exit quality",
-      "status": "suggested-for-v6-spec",
-      "risk": "low (only fires after trail-arm, only on re-cross of entry)"
+      "date": "2026-10-12T00:42:19Z",
+      "idea": "Micro-loss timeout: MFE<0.10% after 15min → exit -0.30% price instead of hard_max_loss",
+      "rationale": "Entry features don't separate (re-verified p>0.2); MFE does (median 0.106% vs 0.704%). 85% HML never show life.",
+      "expected_impact": "Cut HML account damage ~50-70% on zero-momentum entries; $2-3/7d potential",
+      "category": "exit sniper",
+      "status": "suggested-for-backtest",
+      "risk": "medium"
     }
   ],
-  "config_changes_applied": [],
-  "config_decision": "0 changes — all 8 recent brain_auditor changes within 48h monitoring windows and holding; no new pattern passes n>=20 + significance bar; HML root-cause vehicle (self_learner backtest) due tomorrow",
-  "watchdog_steer_verification": {
-    "steer": "4 recent losses look like wrong-side trades",
-    "verdict": "PARTIALLY CONFIRMED — 24h losers (ME/INJ/USELESS/AIXBT) all LONG chop entries (HML/atr_sl), NOT direction-fade vs BTC (BTC NEUTRAL slope~0, market LONG_BIAS 38/0/71). Pattern = chop entries with no momentum, consistent with standing HML diagnosis. No direction-lock change warranted."
-  },
+  "config_changes_applied": [
+    {
+      "change": "signal_compactor.py LONG_MIDBAND: skip when \"bb-squeeze\" in src",
+      "file": "scripts/signal_compactor.py + hermes_constants.py comment",
+      "rationale": "Filter collision — midband dead-killed verified 100%WR 60-65 squeeze band",
+      "verified": "AST OK; protected flags untouched; EXTREME + RSI>65 still blocked by other layers"
+    }
+  ],
+  "watchdog_steer_verification": [
+    {
+      "steer": "overbought-LONG losers ME/USELESS",
+      "verdict": "PARTIAL DISPROOF — NORMAL/EXTREME 70+ bands net positive; HIGH already blocked"
+    },
+    {
+      "steer": "trail family works / hard_max_loss chop",
+      "verdict": "CONFIRMED — re-verified MFE split; momentum entry filter rejected again"
+    },
+    {
+      "steer": "volume-breakout-long+ 12T 25% 7d",
+      "verdict": "AGING OUT — HIGH block landed Oct 10; post-fix only 1 trade (USELESS EXTREME, in +$1.81 band)"
+    },
+    {
+      "steer": "bb-squeeze+ 15T -$0.48 7d",
+      "verdict": "PRE-FIX — 0 trades since Oct 6; midband collision found+fixed this run; monitor re-fire"
+    },
+    {
+      "steer": "continuum_engine churn",
+      "verdict": "PAPER ~$0 — not money bleed; guardian fix verified; leave to CEO"
+    }
+  ],
   "next_actions": [
-    "Oct 12: self_learner HML trail-arm-timeout backtest — THE vehicle for 46T 0%WR bleed",
-    "Oct 12: 7d PnL checkpoint (Oct 5 -$0.90 ages out; projected >+$0.80 if overnight flat)",
-    "Monitor LONG_MIDBAND + LONG_HIGH_OVERBOUGHT through Oct 13 (n=12/8 so far neutral)",
-    "BB_SQUEEZE_LONG_RSI_MAX=65 keep — 0 trades, untestable, window 60-65 live",
-    "v6 spec: fold MFE round-trip breakeven handoff into exit-stack restructure"
+    "Monitor bb-squeeze+ LONG re-fire after midband exemption (7d target: any 60-65 trade should execute)",
+    "self_learner: micro-loss timeout backtest (15min/0.10%/0.30% candidates) — complements trail-arm-timeout due today",
+    "Oct 12: 7d PnL + SHORT clean-number checkpoint (Oct 5 -$0.93 ages out)",
+    "Wyckoff partner still undelivered → Oct 13 shadow rule if not shipped",
+    "Re-verify LONG_MIDBAND/HIGH_OVERBOUGHT cohorts through Oct 13"
   ]
 }

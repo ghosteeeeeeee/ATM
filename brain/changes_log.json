@@ -1067,5 +1067,16 @@
     "after": "Cap B counts only paper=false (capital-at-risk) trades",
     "rationale": "24h: 8/10 over-cap LONG opens were paper continuum BTC (no SL/TP, NOT_HOTSET churn). Live-only count drops over-cap alt opens 10→1. Cap protects live capital; paper dust must not squat alt slots. Verified: alt trades 139/140 paper=False, continuum 13/14 paper=True. 0 live-only LONG in 30min window now (was 6 incl paper) — alt slots immediately unblocked.",
     "impact": "Alt LONG signals no longer Cap-B-blocked by continuum paper churn. Immediate: window went 6→0 live-only. Prevents recurrence of 17:42-18:32 squat (8 continuum opens/50min)."
+  },
+  {
+    "timestamp": "2026-10-12T00:42:19Z",
+    "agent": "brain_auditor",
+    "change": "LONG_MIDBAND_NON_EXTREME_BLOCK exemption for bb-squeeze source — filter collision fix",
+    "type": "bugfix",
+    "file": "scripts/signal_compactor.py",
+    "before": "midband blocked RSI 60-70 non-EXTREME for ALL LONG sources incl bb-squeeze",
+    "after": "midband skips when 'bb-squeeze' in src — module RSI_MAX=65 already caps the band",
+    "rationale": "Filter collision: bb-squeeze LONG window is 60-65 (MIN/MAX constants); midband 60-70 non-EXTREME killed the entire habitat. 14d RSI 60-65 non-EXTREME = 8T 100%WR +$0.74 0 HML. Without exemption BB_SQUEEZE_LONG_RSI_MIN/MAX are dead code.",
+    "impact": "Restores bb-squeeze+ LONG 60-65 band (verified 100% WR). EXTREME still blocked by vol gate 0.0 + decider_run. RSI 65-70 still blocked by module MAX=65."
   }
 ]

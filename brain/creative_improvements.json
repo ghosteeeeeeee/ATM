@@ -3989,5 +3989,15 @@
     "category": "exit quality",
     "status": "suggested-for-v6-spec",
     "risk": "low (only fires after trail-arm, only on re-cross of entry)"
+  },
+  {
+    "date": "2026-10-12T00:42:19Z",
+    "idea": "Micro-loss timeout: if position MFE < 0.10% after 15min open, exit at -0.30% price instead of riding hard_max_loss (-1% price = -3 to -5% account at lev 3-5)",
+    "rationale": "Re-verified 14d: entry-time speed_percentile/momentum_score/volume_spike do NOT separate HML from winners (Welch p=0.20-0.46, n=87/162). But MFE does: HML median MFE 0.106% (15% arm) vs winners 0.704% (94% arm). 85% of HML never show life — cutting them at -0.30% price saves ~50-70% of the -3 to -5% account bleed while trail family untouched.",
+    "expected_impact": "Reduce hard_max_loss account damage from avg -3.06% to ~-1.0-1.5% on zero-momentum entries. 7d HML = 46T -$5.60; potential save $2-3/7d.",
+    "category": "exit sniper",
+    "status": "suggested-for-backtest",
+    "risk": "medium — needs self_learner backtest with execution costs; 15min/0.10%/0.30% are candidate params, not verified",
+    "owner": "self_learner"
   }
 ]

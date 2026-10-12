@@ -924,7 +924,7 @@ LONG_RSI_SWEET_SPOT_BOOST = 10  # confidence points added when RSI in sweet spot
 # 7d: 30T 50%WR -$1.05 | 14d: 55T 47.3% -$1.70 — consistent across windows.
 LONG_MIDBAND_RSI_MIN = 60
 LONG_MIDBAND_RSI_MAX = 70
-LONG_MIDBAND_NON_EXTREME_BLOCK = True  # brain_auditor 2026-10-11 — EXTREME exempt
+LONG_MIDBAND_NON_EXTREME_BLOCK = True  # brain_auditor 2026-10-11 — EXTREME exempt. bb-squeeze exempt 2026-10-12 (module RSI 60-65 window = 14d 8T 100%WR +$0.74; midband was dead-habitat collision)
 
 # ── HIGH-regime overbought LONG block: RSI >70 in HIGH vol = exhaustion chase ──
 # Complements midband (60-70 non-EXTREME). HIGH 70+ = bad-RR tail (avg win $0.09 vs avg loss $0.16).

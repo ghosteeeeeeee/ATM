@@ -4013,7 +4013,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # ── LONG mid-band chop block: RSI 60-70 outside EXTREME = death zone ─────
             # 30d non-EXTREME 60-70 = 96T 39.6%WR -$4.56; EXTREME 60-70 = +$2.31 (keep).
             # Breakout signals fire into this band by construction — trail never arms.
-            if direction == 'LONG' and LONG_MIDBAND_NON_EXTREME_BLOCK:
+            # EXEMPT bb-squeeze: module enforces RSI window 60-65 (BB_SQUEEZE_LONG_RSI_MIN/MAX);
+            # that band is 14d 8T 100%WR +$0.74 non-EXTREME 0 HML. Midband would kill the entire
+            # squeeze LONG habitat (filter collision — brain_auditor 2026-10-12).
+            if direction == 'LONG' and LONG_MIDBAND_NON_EXTREME_BLOCK and 'bb-squeeze' not in (src or ''):
                 try:
                     _lmb_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
                     if _lmb_rsi is not None and LONG_MIDBAND_RSI_MIN <= _lmb_rsi <= LONG_MIDBAND_RSI_MAX:

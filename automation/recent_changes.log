@@ -4530,3 +4530,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-11 23:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet), 4 open BTC continuum x4 (3 from 18:2x ~5h old) | 24h ~14T real net +$1.24 | hard_max_loss 12.5% (hold brain_auditor) | atr_sl_hit 4% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak no 3-neg (17 +0.01, 18 −0.08, 20 +0.02) | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-12 00:42] brain_auditor: FILTER-COLLISION FIX — LONG_MIDBAND exempts bb-squeeze source. RSI 60-65 band was 8T 100%WR +$0.74; midband dead-killed entire squeeze LONG habitat. Module MAX=65 still caps. Protected flags intact. 1 config change.
+BY: brain_auditor
