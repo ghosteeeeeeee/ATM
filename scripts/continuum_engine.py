@@ -1103,22 +1103,59 @@ class ContinuumEngine:
         Tier 2: Compound degradation → close 50%
         Tier 3: Entry state machine breaks → close all
         """
-        # Tier 3: Entry state machine breaks
-        if self.position_side == 'LONG' and state.ema300_position == 'BELOW':
-            if state.ema300_duration >= EXIT_TIER3_EMA_BREAK:  # Below for N candles
-                print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Tier 3: EMA300 break (below for {state.ema300_duration} candles)")
-                self.position_side = 'NONE'
-                self.position_size_pct = 0
-                self.entry_phase = 0
-                return
-        
-        if self.position_side == 'SHORT' and state.ema300_position == 'ABOVE':
-            if state.ema300_duration >= EXIT_TIER3_EMA_BREAK:
-                print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Tier 3: EMA300 break (above for {state.ema300_duration} candles)")
-                self.position_side = 'NONE'
-                self.position_size_pct = 0
-                self.entry_phase = 0
-                return
+        # Compute 5m EMA300 for exit decisions (smoother, less wick-sensitive)
+        candles_5m = self._read_candles('5m', limit=400)
+        if candles_5m and len(candles_5m) >= 300:
+            closes_5m = [c['close'] for c in candles_5m]
+            ema300_5m = ema(closes_5m, 300)
+            if ema300_5m:
+                price = closes_5m[-1]
+                above_5m = price > ema300_5m * (1 + EMA300_ABOVE_BUFFER)
+                below_5m = price < ema300_5m * (1 - EMA300_BELOW_BUFFER)
+                
+                # Tier 3: 5m EMA300 break (sustained, not wicks)
+                if self.position_side == 'LONG' and below_5m:
+                    if not hasattr(self, '_below_5m_count'):
+                        self._below_5m_count = 0
+                    self._below_5m_count += 1
+                    if self._below_5m_count >= EXIT_TIER3_EMA_BREAK:
+                        print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Tier 3: 5m EMA300 break (below for {self._below_5m_count} candles)")
+                        self.position_side = 'NONE'
+                        self.position_size_pct = 0
+                        self.entry_phase = 0
+                        self._below_5m_count = 0
+                        return
+                elif self.position_side == 'SHORT' and above_5m:
+                    if not hasattr(self, '_above_5m_count'):
+                        self._above_5m_count = 0
+                    self._above_5m_count += 1
+                    if self._above_5m_count >= EXIT_TIER3_EMA_BREAK:
+                        print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Tier 3: 5m EMA300 break (above for {self._above_5m_count} candles)")
+                        self.position_side = 'NONE'
+                        self.position_size_pct = 0
+                        self.entry_phase = 0
+                        self._above_5m_count = 0
+                        return
+                else:
+                    # Reset counters when price is on the right side
+                    self._below_5m_count = 0
+                    self._above_5m_count = 0
+        else:
+            # Fallback to 1m EMA300 if 5m data unavailable
+            if self.position_side == 'LONG' and state.ema300_position == 'BELOW':
+                if state.ema300_duration >= EXIT_TIER3_EMA_BREAK:
+                    print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Tier 3: EMA300 break (below for {state.ema300_duration} candles)")
+                    self.position_side = 'NONE'
+                    self.position_size_pct = 0
+                    self.entry_phase = 0
+                    return
+            if self.position_side == 'SHORT' and state.ema300_position == 'ABOVE':
+                if state.ema300_duration >= EXIT_TIER3_EMA_BREAK:
+                    print(f"[CONTINUUM] *** EXIT SIGNAL *** {self.position_side} → Tier 3: EMA300 break (above for {state.ema300_duration} candles)")
+                    self.position_side = 'NONE'
+                    self.position_size_pct = 0
+                    self.entry_phase = 0
+                    return
         
         # Score-based exit
         if state.state_score < SCORE_EXIT_THRESHOLD:
