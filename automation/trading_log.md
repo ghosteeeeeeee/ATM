@@ -8939,3 +8939,10 @@ Final set: []
 **Open Questions:**
 - 24h net flipped +$0.03 → −$0.20 — first negative 24h net today, entirely oversold-bounce+ ($0.23) + residual pump-chain+
 - Watchdog 21:50 says "bear flip" — oversold-bounce+ is a LONG-only mean-reversion signal buying RSI 15-20; in a falling regime that's the BANANA lesson in reverse. If next close is red, kill and let CEO decide whether to re-enable with a bear-regime block instead
+
+## 2026-10-12 21:45 UTC — signal_reporter (6h cycle)
+- Verified live: 24h 22T -$0.23 36.4% WR; 6h 6T -$0.38 16.7% WR.
+- Kills: none. pump-chain+ LONG meets paper kill criteria (16.7% WR, -$0.45, 6T 24h) but regime check blocks it — EXTREME all-time 83T +$3.48, 7d +$1.14; 24h loss was n=6 bad day in EXTREME. Prior DISABLE recommendation formally declined.
+- oversold-bounce+ LONG watch-listed (3x consecutive hard_max_loss, n=8 all-time break-even; below 5T 24h threshold).
+- Boosts: none (no 5T+ winners). Inversions: none.
+- Report: automation/signal_report.md
