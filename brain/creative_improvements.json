@@ -4035,5 +4035,41 @@
     "category": "exit sniper",
     "status": "suggested",
     "risk": "low (shadow-only)"
+  },
+  {
+    "date": "2026-10-12T07:49:23Z",
+    "idea": "Universal trail-arm timeout — extend stall pre-emption to pump-chain+ (7d 8HML) after bb-squeeze proves live",
+    "rationale": "Same never-armed pattern across signals; bb-squeeze vehicle is the test case. pump-chain+ HML trades die faster (5-6m) so 60m timeout may not fit — needs own backtest with shorter window or entry-side fix.",
+    "expected_impact": "TBD after bb-squeeze live data; do NOT copy constants blindly",
+    "category": "exit structure",
+    "status": "suggested",
+    "risk": "medium — different hold-time distribution per signal"
+  },
+  {
+    "date": "2026-10-12T07:49:23Z",
+    "idea": "volume-breakout-long+ 7d patch is regime noise, not signal decay — 30d +$2.94 55% WR; winners include RSI 86-91 breakout momentum entries. DO NOT add RSI ceiling below 85.",
+    "rationale": "Verified winners at extreme RSI; a naive RSI filter would kill the profit engine. Monitor until 7d sample >=20.",
+    "expected_impact": "avoids -EV filter on a net-positive signal",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-12T10:45:00Z",
+    "idea": "Generalize trail-arm timeout to pump-chain+ LONG and volume-breakout-long+ after 72h bb-squeeze soak",
+    "rationale": "Same never-arming stall pattern: pump-chain+ LONG 7d HML 9T −$0.87 avg hold 34m; volume-breakout-long+ 6T −$0.87 avg 27m. bb-squeeze vehicle ships first (soak isolates variable); if trail_arm_timeout exits show ~0 realized losses and no >$0.15 forgone winners over 72h, extend with per-signal TIMEOUT_MIN (pump-chain likely 45m given faster grind).",
+    "expected_impact": "+$1-2/30d per signal family (conservative vs bb-squeeze +$1.48)",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-12T10:45:00Z",
+    "idea": "REJECTED: watchdog steer gate pump-chain+ LONG on BTC SHORT_BIAS/BELOW EMA300",
+    "rationale": "Data inverted vs steer: 7d ALL-LONG BEAR-bias 31T 58.1% +$1.07 (winners) vs BULL-bias 49T 38.8% −$1.62 (bleed). pump-chain+ 30d flat across biases (BULL +0.75 / BEAR +0.65). Gating would block winners and keep chasers. Same class as Oct-8 failed momentum-state analysis. Logged so it is not re-proposed from watchdog pressure.",
+    "expected_impact": "N/A — rejected, would lose +$1.07/7d of BEAR-bias winners",
+    "category": "entry gate",
+    "status": "rejected",
+    "risk": "high-if-shipped"
   }
 ]

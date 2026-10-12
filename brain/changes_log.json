@@ -1089,5 +1089,27 @@
     "after": "rsi_utils.compute_rsi_1m(token) — Wilder RSI on 1m closed candles, cached, same as pipeline execution band gates",
     "rationale": "Watchdog steer: ONDO pick SKIPPED with precheck RSI 46.8 vs execution RSI 71.8 — 25pt drift made band gate unreliable for watchdog picks. Root cause: precheck re-implemented RSI instead of sharing rsi_utils. Fixed once at source.",
     "impact": "Precheck verdicts now match pipeline band gates by construction. Verified live: ONDO RSI=60.8, ETH RSI=48.1 via rsi_utils. py_compile OK."
+  },
+  {
+    "timestamp": "2026-10-12T07:49:23Z",
+    "agent": "brain_auditor",
+    "change": "Trail-arm timeout vehicle: BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=False + TIMEOUT_MIN=60 + position_manager section 7b exit (bb-squeeze LONG, live_pnl < PM_TRAIL_ACTIVATE at T+60m)",
+    "type": "config",
+    "file": "hermes_constants.py + scripts/position_manager.py",
+    "before": "No trail-arm timeout — bb-squeeze >=60m stalls rode to hard_max_loss (14/21 never-armed, -$1.85/30d)",
+    "after": "Vehicle live, flag False. Flip True after CEO GO + independent audit. Exit label trail_arm_timeout.",
+    "rationale": "Verdict PASS plans/2026-10-12: 30d counterfactual +$1.48. Self-check passed: disabled never fires; enabled fires stalls only, spares armed winners, respects 60m floor and signal/direction scope.",
+    "impact": "Awaiting enable — expected +$1.48/30d on bb-squeeze LONG >=60m cohort"
+  },
+  {
+    "timestamp": "2026-10-12T10:45:00Z",
+    "agent": "brain_auditor",
+    "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED False→True — enable 60m stall pre-emption for bb-squeeze+ LONG (fires when unrealized < +0.40% at T+60m)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "False",
+    "after": "True",
+    "rationale": "Independent audit PASSED: PG cohort exact-match (>=60m 21T 28.6% -USD1.42 vs <60m 51T 72.5% +USD1.17) + 7/7 candle spot-checks at T+60m incl SEI 15870 u60=+0.99% pass-through winner. 15/20 blocked are hard_max_loss — pre-empts #1 bleed family on this signal. Verdict plans/2026-10-12_bb-squeeze-trail-arm-timeout-verdict.md. CEO visibility: captain-enabled under steer mandate; revert is one-line flip.",
+    "impact": "Expected +$1.48/30d (counterfactual); forgone winners capped at ~$0.24/30d. Monitor trail_arm_timeout exit_reason cohort 72h."
   }
 ]

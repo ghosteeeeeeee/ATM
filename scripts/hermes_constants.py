@@ -1593,6 +1593,15 @@ PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%. DO NOT WI
 # Widening trail = ATR SL wins the race = trail never fires = system broken.
 PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — activate sooner so trail catches profit before ATR SL
 PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20% — tight trail, exits before ATR SL (which trails at ~0.15%)
+# Trail-arm timeout (bb-squeeze LONG stall pre-emption) — brain_auditor 2026-10-12.
+# Verdict PASS: plans/2026-10-12_bb-squeeze-trail-arm-timeout-verdict.md — 30d counterfactual +$1.48
+# (20/21 >=60m never-armed stalls pre-empted; $1.75 saved on losers / $0.24 forgone winners).
+# ENABLED 2026-10-12 brain_auditor: independent audit PASSED (captain-run).
+# PG cohort exact-match (<60m 51T 72.5% +$1.17 / >=60m 21T 28.6% −$1.42) + 7/7 candle
+# spot-check at T+60m (incl SEI 15870 u60=+0.99% PASS-through winner; 6/7 stalls <0.40%).
+# Revert: set False (one line).
+BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED = True
+BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN = 60  # minutes hold before stall check; fires when live_pnl < PM_TRAIL_ACTIVATE_PCT
 # Tiered trail: loosens as profit grows (2026-09-07 partial-close plan — Option 3)
 # Format: list of (min_profit_pct, trail_distance_pct) — first match wins, never tightens
 PM_TRAIL_TIERS = [
