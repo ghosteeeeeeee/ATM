@@ -417,6 +417,58 @@ class ContinuumTrader:
                 print(f"[TRADER] EXIT SIGNAL DETECTED: Position side changed to NONE")
                 self._handle_exit(state)
             
+            # Exit check for manual positions (uses 5m EMA300 + score)
+            tracked = get_our_positions()
+            if tracked and state.position_side == 'NONE':
+                # Check 5m EMA300 for sustained break
+                candles_5m = self.engine._read_candles('5m', limit=400)
+                if candles_5m and len(candles_5m) >= 300:
+                    closes_5m = [c['close'] for c in candles_5m]
+                    from continuum_engine import ema, EMA300_BELOW_BUFFER
+                    ema300_5m = ema(closes_5m, 300)
+                    if ema300_5m:
+                        price = closes_5m[-1]
+                        below_5m = price < ema300_5m * (1 - EMA300_BELOW_BUFFER)
+                        
+                        if below_5m:
+                            if not hasattr(self, '_manual_below_5m_count'):
+                                self._manual_below_5m_count = 0
+                            self._manual_below_5m_count += 1
+                            if self._manual_below_5m_count >= 10:  # 10 candles = 50 min on 5m
+                                print(f"[TRADER] EXIT: 5m EMA300 break (below for {self._manual_below_5m_count} candles)")
+                                for pos in tracked:
+                                    pnl = (state.price - pos['entry_price']) * (1 if pos['side'] == 'LONG' else -1)
+                                    print(f"[TRADER] Closing {pos['side']} @ entry ${pos['entry_price']:.1f} | PnL: {pnl:+.2f}%")
+                                    if not PAPER_MODE:
+                                        result = close_hl_position()
+                                        if result.get('success') or 'No open position' in str(result.get('message', '')):
+                                            track_exit(pos['entry_price'], state.price, pnl)
+                                    else:
+                                        track_exit(pos['entry_price'], state.price, pnl)
+                                self._manual_below_5m_count = 0
+                        else:
+                            self._manual_below_5m_count = 0
+                
+                # Check score for sustained drop
+                if state.state_score < SCORE_EXIT_THRESHOLD:
+                    if not hasattr(self, '_manual_low_score_count'):
+                        self._manual_low_score_count = 0
+                    self._manual_low_score_count += 1
+                    if self._manual_low_score_count >= 10:  # 10 candles sustained
+                        print(f"[TRADER] EXIT: Score below {SCORE_EXIT_THRESHOLD} for {self._manual_low_score_count} candles: {state.state_score:.1f}")
+                        for pos in tracked:
+                            pnl = (state.price - pos['entry_price']) * (1 if pos['side'] == 'LONG' else -1)
+                            print(f"[TRADER] Closing {pos['side']} @ entry ${pos['entry_price']:.1f} | PnL: {pnl:+.2f}%")
+                            if not PAPER_MODE:
+                                result = close_hl_position()
+                                if result.get('success') or 'No open position' in str(result.get('message', '')):
+                                    track_exit(pos['entry_price'], state.price, pnl)
+                            else:
+                                track_exit(pos['entry_price'], state.price, pnl)
+                        self._manual_low_score_count = 0
+                else:
+                    self._manual_low_score_count = 0
+            
             # Reconcile: check for orphaned positions (file has position but engine doesn't)
             # Skip manual positions (placed outside engine state machine)
             tracked = [p for p in get_our_positions() if not p.get('manual')]

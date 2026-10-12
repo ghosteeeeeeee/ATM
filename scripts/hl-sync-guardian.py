@@ -3107,7 +3107,8 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
         log(f'  Kill switch: skipping close for {token} ({reason})', 'INFO')
         return
     # CONTINUUM EXEMPTION: Never close BTC trades managed by the continuum engine
-    if token.upper() == 'BTC':
+    # BUT allow paper close when HL position is already gone (keeps DB in sync)
+    if token.upper() == 'BTC' and reason not in ('HL_CLOSED', 'guardian_missing'):
         log(f'  ⛔ CONTINUUM: skipping paper close for {token} ({reason}) — continuum manages BTC', 'WARN')
         return
     if DRY:
