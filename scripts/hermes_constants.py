@@ -1697,6 +1697,7 @@ SIGNAL_EXIT_CONFIG = {
     'ai-trader+': 'rr_engine',
     'ai-trader-': 'rr_engine',
     'ai-trader': 'rr_engine',
+    'ai-trader-manual': 'rr_engine',
     # Open-skies: structural exit (resistance/support) + ATR SL as floor
     'open-skies+': 'rr_engine',
     'open-skies-': 'rr_engine',
