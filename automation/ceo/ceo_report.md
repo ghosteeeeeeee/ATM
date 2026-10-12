@@ -20,3 +20,34 @@ Two-part:
 
 ### Next
 DELEGATE signal_analyst: MAXXED shadow label (observability only, EXTREME-equivalent mapping) + reproduction script. DELEGATE own-conclusions: fresh-eyes repro of the 2.5–3.0 SHORT cell. 7d PnL now −$0.10 — protecting ≥$0 checkpoint.
+
+---
+
+## CEO Acknowledgment — 2026-10-12 02:22 UTC — MAXXED tier DEPLOYED (T-directed)
+
+### Acknowledged
+T-directed MAXXED tier is live. Accept the design and the two-pass verification. Commits 2b6c85ca + 1bf84683 pushed.
+
+### Constraint satisfied (structurally)
+My hard constraint — naive `regime='MAXXED'` relabel would silently unblock all `== 'EXTREME'` restrictions — is avoided by design, not by audit. `classify_volatility()` unchanged (still returns EXTREME at ATR%>=4.0); MAXXED is an additive block via `is_maxxed()` on `MAXXED_ATR_PCT_THRESH=4.0`. Zero `== 'MAXXED'` comparisons anywhere. MAXXED can only block more, never less. No relabel risk exists.
+
+### Shipped
+- `hermes_constants.py`: MAXXED_ATR_PCT_THRESH=4.0, MAXXED_BLOCK_ENABLED=True, MAXXED_REGIME_LOG=True. New constants only; line-2 protection honored.
+- `volatility_gate_v2.py`: `is_maxxed()`.
+- `signal_compactor.py`: approval-time block, both directions, logs [MAXXED-BLOCK].
+- `decider_run.py`: exec-time backstop in `execute_trade()` — BUG-052-safe (return-before-claim).
+
+### Verified
+- Static pass: 88 insertions 0 deletions; classify_volatility invariant holds v1+v2; imports complete; conn closed in finally; ATR div-zero guarded.
+- Live pass: pipeline restarted 02:09:16 UTC, cycles rc=0, zero tracebacks, 3 tokens MAXXED (S 6.78%, W 5.51%, STRK 5.43%), dry-run of exec backstop fired correctly, GRASS SHORT (ATR 3.82) correctly not blocked. Kill-switch sanity clean.
+- Zero [MAXXED-BLOCK] firings since restart is expected — those tokens produced no hotset signals in window. Block is armed and provably functional.
+
+### Decisions on informational findings
+1. Fail-open on <15 closed 1h candles (fresh explosive listings): **accept as-is.** Fail-safe by design; no [MAXXED-UNKNOWN] shadow log for now — add if fresh-listing leakage becomes visible.
+2. Inlined ATR-14 copy in compactor (drift risk vs `get_atr_pct()`): **defer.** Matches today; cleanup when next touching compactor. Not worth a standalone diff.
+
+### Extensibility
+Higher tier later (e.g. APOCALYPSE) = same additive pattern: one `is_*` helper + one additive block; inherits all MAXXED/EXTREME blocks automatically. Threshold is a named constant. T's requirement met.
+
+### No action
+Position_manager D3 trail-floor removal + stray HML_TRAIL_MIN_GAP_PCT comment-only edit (value unchanged 0.20) — housekeeping acknowledged, no further action. SHORT EXTREME-hi unblock remains REJECTED pending own-conclusions repro; MAXXED deployment does not change that.
