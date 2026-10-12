@@ -69,6 +69,30 @@ ceo_release_lock() {
     fi
 }
 
+# ── Success detection ───────────────────────────────────────────────────────
+# opencode exits 0 even when the AGENT stopped without finishing (e.g. a tool
+# call is auto-rejected for permission, or the model ends its turn early). A bare
+# exit-0 therefore does NOT mean the run produced a decision. Classify the run by
+# scanning the streamed jsonl for terminal evidence and write the CLASS (not the
+# raw exit code) to the .exit file, so a poller that only reads .exit cannot
+# mistake a dead run for a clean success:
+#   ok      — completion marker, or real output (so a no-op status run still passes)
+#   failed  — a permission rejection / tool error is present
+#   silent  — jsonl has no usable content (crash before any output)
+ceo_classify_run() {
+    local jsonl="$1"
+    [ -s "$jsonl" ] || { echo "silent"; return; }
+    if grep -qiE 'auto-rejecting|permission rejected|tool.*"status": *"error"' "$jsonl"; then
+        echo "failed"; return
+    fi
+    if grep -qE '"finish": *"(stop|end_turn|success)"|"type": *"(result|final|message_complete)"' "$jsonl"; then
+        echo "ok"; return
+    fi
+    # No explicit marker, but the run produced non-trivial output — treat as ok.
+    [ "$(wc -c < "$jsonl")" -gt 200 ] && { echo "ok"; return; }
+    echo "silent"
+}
+
 # NOTE: there is deliberately no generic "launch a detached run" helper here. Each
 # runner (run_ceo_deep.sh, run_ceo_moe.sh) inlines its own nohup+timeout+stdin
 # launch so the exact invocation is visible and tested in one place. If you need a

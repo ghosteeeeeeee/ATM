@@ -40,7 +40,49 @@ if [ -f "$LOCK_FILE" ]; then
     rm -f "$LOCK_FILE"
 fi
 
+# ── Optional directed brief (task injection) ────────────────────────────────
+# A caller with a specific question can pass a brief WITHOUT patching this script:
+#   run_ceo_deep.sh /path/to/brief.md
+# The brief is appended to the prompt AFTER the generic scope, and it REPLACES the
+# "at most TWO work items" default — the agent works YOUR question instead of
+# picking its own. Put the brief INSIDE the repo (e.g. under automation/), NOT in
+# /tmp: opencode auto-rejects /tmp/* reads and the session dies mid-run.
+INJECTED_BRIEF="${1:-}"
+INJECT_BLOCK=""
+if [ -n "$INJECTED_BRIEF" ]; then
+    if [ ! -f "$INJECTED_BRIEF" ]; then
+        echo "[CEO-DEEP] brief not found: $INJECTED_BRIEF — stopping (caller error)." >&2
+        exit 4
+    fi
+    case "$INJECTED_BRIEF" in
+        /tmp/*|/var/tmp/*)
+            _bdir=$(dirname "$INJECTED_BRIEF")
+            echo "[CEO-DEEP] brief is in $_bdir — opencode auto-rejects that path and the session will die mid-run. Move the brief into the repo (e.g. automation/)." >&2
+            exit 4 ;;
+    esac
+    INJECT_BLOCK=$(cat "$INJECTED_BRIEF")
+    echo "[CEO-DEEP] directed brief attached: $INJECTED_BRIEF"
+fi
+
 # ── Build the bounded deep task ─────────────────────────────────────────────
+# Branch in SHELL (before the heredoc) and emit only the chosen scope text. A
+# shell if/else written inside the heredoc would be emitted as literal prose for
+# the agent to read — that bug shipped once and leaked the default scope even
+# when a directed brief was passed.
+if [ -n "$INJECTED_BRIEF" ]; then
+    SCOPE_BLOCK="Work the DIRECTED BRIEF below — it REPLACES the default \"pick your own items\" scope. Answer the brief's question with verified numbers, checkpoint the decision, then dispatch edits as needed.
+--- DIRECTED BRIEF ---
+$INJECT_BLOCK
+--- END BRIEF ---"
+else
+    SCOPE_BLOCK="Default scope (no brief was passed):
+1. Verify the headline numbers yourself (base prompt SQL). Find the single biggest bleeding point.
+2. Regime-aware analysis: before disabling anything, find the signal's WINNING regime. Do not blanket-kill.
+3. Pick at most TWO items: (a) ONE signal tune / param fix; (b) ONE new-signal or coin_tracker task.
+   Checkpoint each, then dispatch each to its OWN fresh single-goal subagent session.
+4. Assemble results from the subagent result files into the report under flock."
+fi
+
 cat > "$TASK" <<TASK
 # DEEP RUN ${TS} (UTC)
 
@@ -52,17 +94,12 @@ Before ANY analysis that leads to an edit, and BEFORE dispatching any subagent, 
 containing Decision, Evidence, Plan, Files-to-touch, Rollback. This is the surviving artifact if you are killed.
 
 ## CONCURRENCY
-- Any subagent that will edit hermes_constants.py or a signal file must ACQUIRE
-  /tmp/hermes-session-active.lock before its first edit (this runner already holds it).
+- The session lock (/tmp/hermes-session-active.lock) is ALREADY held by the runner that launched you. Do NOT read, write, or reference it yourself — opencode auto-rejects /tmp/* access and a single /tmp read will kill this session mid-run. Just proceed; the lock is handled for you.
 - ceo_report.md and ceo_kanban.md are written by ONE aggregator under flock — NOT by subagents.
 - Each subagent writes ONLY its own file: automation/ceo/checkpoints/${TS}-result-<n>.md
 
-## SCOPE (at most TWO work items)
-1. Verify the headline numbers yourself (base prompt SQL). Find the single biggest bleeding point.
-2. Regime-aware analysis: before disabling anything, find the signal's WINNING regime. Do not blanket-kill.
-3. Pick at most TWO items: (a) ONE signal tune / param fix; (b) ONE new-signal or coin_tracker task.
-   Checkpoint each, then dispatch each to its OWN fresh single-goal subagent session.
-4. Assemble results from the subagent result files into the report under flock.
+## SCOPE
+$SCOPE_BLOCK
 
 ## OUTPUT
 Append "## CEO Deep Run — ${TS}" to automation/ceo/ceo_report.md (single writer, under flock):
@@ -95,9 +132,13 @@ nohup bash -c '
     trap "ceo_release_lock" EXIT
     ceo_acquire_lock "ceo-deep-$(date -u +%Y%m%dT%H%M%SZ)-$$" || { echo "[CEO-DEEP] child could not acquire lock; aborting." >&2; echo 3 > "$3"; exit 3; }
     timeout 1800 "$OPENCODE" run --format json < "$1" >> "$2" 2>&1
-    echo $? > "$3"
+    rc=$?
+    # opencode exits 0 even when the agent died mid-run (e.g. a permission
+    # auto-reject), so classify by jsonl evidence, not the bare exit code.
+    echo "$(ceo_classify_run "$2")" > "$3"
 ' _ "$PROMPT_FILE" "$jsonl" "$exitf" >/dev/null 2>&1 &
 pid=$!
 echo "[CEO-DEEP] detached pid=$pid — poll $exitf (budget 1800s). Lock held until the run exits."
+echo "[CEO-DEEP] NOTE: $exitf will contain a CLASS (ok|failed|silent), not a raw exit code — opencode exits 0 even when the agent dies mid-run. Do not treat exit-0 as success; read the class."
 rm -f "$TASK"
 exit 0

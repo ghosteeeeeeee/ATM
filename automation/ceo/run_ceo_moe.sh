@@ -74,7 +74,10 @@ echo "[CEO-MOE] panel ${TS} starting (detached, budget 3600s)"
 # session lock — it only writes reports/ + checkpoints/ + OpenMemory.
 nohup bash -c '
     timeout 3600 "$0" run --format json < "$1" >> "$2" 2>&1
-    echo $? > "$3"
+    rc=$?
+    # opencode exits 0 even when the agent died mid-run (e.g. a permission
+    # auto-reject), so classify by jsonl evidence, not the bare exit code.
+    echo "$(ceo_classify_run "$2")" > "$3"
 ' "$OPENCODE" "$PROMPT_FILE" "$jsonl" "$exitf" >/dev/null 2>&1 &
 pid=$!
 echo "[CEO-MOE] detached pid=$pid — poll $exitf for completion"
