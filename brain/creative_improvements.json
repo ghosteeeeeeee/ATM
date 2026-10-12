@@ -4100,5 +4100,15 @@
     "category": "debug/audit",
     "status": "suggested",
     "risk": "none — log-only"
+  },
+  {
+    "date": "2026-10-12T19:45:00Z",
+    "idea": "Impulse-freshness execution gate for momentum-entry signals (pump-chain+, volume-breakout-long+): at exec time, if live price already retraced >0.35% from the 5m-local trigger high, skip entry — impulse spent",
+    "rationale": "5/8 24h losers died <10min (instant-fail class); RSI cannot separate instant-fail winners (48-68) from losers (41-75); the fade was the winning side on CFX/GRASS/ICP — entry-side fix, not another exit",
+    "expected_impact": "conservative +$0.30-0.50/7d if gate blocks 50% of instant-fail losses with 0 winner loss",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low-medium — self_learner 1m-replay backtest of winner retrace-at-entry REQUIRED before shipping",
+    "agent": "brain_auditor"
   }
 ]

@@ -1,113 +1,144 @@
 {
-  "timestamp": "2026-10-12T17:45:00Z",
+  "timestamp": "2026-10-12T19:45:00Z",
+  "agent": "brain_auditor",
+  "session_lock": "ACTIVE (19:25 UTC) — report-only, 0 config changes",
   "session_brain_stats": {
-    "note": "session brain query skipped this run — PG + watchdog steers were sufficient; no drift topic required session cross-ref"
+    "queries_run": 3,
+    "top_hits": "pump-chain RSI ceiling enforcement history; volume-breakout filter deployments; trail-arm wide-exit audits"
   },
   "trade_summary_24h": {
-    "closed": 21,
-    "net_usdt": 1.1,
-    "long": "19T +$0.20 42.1%WR",
-    "short": "2T -$0.10 50%WR",
-    "losers": "10 (9 LONG / 1 SHORT)",
-    "dominant_failure": "overbought chop-entry LONGs exiting hard_max_loss before trail arm (HYPE 76.6, CFX 74.5, ME 72.5, GRASS 71.2 — pattern verified)",
-    "exit_families_7d": "trail_family 42T +$5.22 85.7%WR | hard_max_loss 46T -$4.91 0%WR (still #1 bleed)"
+    "closes": 17,
+    "net_pnl": 0.09,
+    "win_rate": 47.1,
+    "open_trades": 0,
+    "regime": "SHORT_BIAS both TFs, BTC below EMA300 ~9h, zscore -1.25 improving, ACCUMULATION — idle posture correct",
+    "exits": "hard_max_loss 7T -$0.49 0%W | profit-monster-trail 5T +$0.16 100%W | hard_tp 2T +$0.59",
+    "losers_8": "all hard_max_loss/atr_sl; 5/8 died <10min (instant-fail class); 3/8 were pump-chain+ (CFX 74.5, GRASS 71.2, ICP 41.4)"
   },
-  "watchdog_steer_adjudication": [
-    {
-      "steer": "steer-001 wrong-side trades / BLOCK LONGs when BTC ema300_position=BELOW",
-      "verdict": "REJECTED — fails winner-impact and would not have caught the pattern",
-      "counterfactual_7d": "blanket BELOW LONG block: kills 4 winners +$1.57 (ZRO +0.23, CRV +0.94, CC +0.17, SYRUP +0.23), saves 4 losers -$0.41 → net -$1.98",
-      "pattern_miss": "all 4 overbought cluster losers (HYPE/CFX/ME/GRASS) OPENED while BTC was ABOVE or AT EMA300, not BELOW — the gate misses the actual cluster",
-      "signal_quality": "BTC ema300_position flickers ABOVE↔AT↔BELOW every 1-3 min since Oct 10 (100+ transitions/3d) — instantaneous state is noise, not a trend signal",
-      "7d_long_by_btc_state": "ABOVE 38T -$0.90 34.2%WR | AT 56T +$0.74 46.4%WR | BELOW 8T +$1.16 50%WR — BELOW is the BEST cohort, opposite of the steer"
-    },
-    {
-      "steer": "steer-002 pump-chain+ losing streak — disable or tune",
-      "verdict": "NO CHANGE — still net positive",
-      "evidence": "14d 36T +$1.97 44.4%WR; EXTREME habitat 31T +$2.35 48.4%. Streak losses (ICP/CFX/GRASS) all EXTREME chop-day entries. NORMAL/HIGH dampen 0.5x already live (Oct 9). Kill threshold n>=5 + net negative not met (n=3, last-20 net +$0.92 per prior audit)."
-    }
-  ],
   "drift_findings": [
     {
-      "finding": "Overbought LONG band (metaRSI>70) has NO clean filter — every candidate fails winner-impact",
-      "data_14d": "RSI>70 LONG: 45T +$0.34 44.4% (19 HML -$2.09 vs 14 trail +$1.37). NORMAL 11T +$0.51 | HIGH 21T -$0.46 (blocked live) | EXTREME 11T +$0.19",
-      "rejected_gates": [
-        "ceiling 75→70: kills 7d winners CFX +0.63, SYRUP +0.59, ZEN +0.12, BABY +0.10, INJ +0.10, SUPER +0.02 = +$1.56 to save ~$0.32 losers → -$1.24 net",
-        "NORMAL RSI>70 block: kills SYRUP +0.59 + ME combo +0.36, saves $0.35 → net negative"
-      ],
-      "conclusion": "the band is a genuine coin-flip that HML exit structure turns negative — fix is entry-momentum (trail-arm timeout family), not RSI gates"
+      "id": "D1",
+      "severity": "MED",
+      "finding": "PUMP_CHAIN_TRAIL_ARM_TIMEOUT 45m has small addressable surface: 30d pump-chain+ HML 13T, 9T (-$1.16) die <45m before timeout can fire; only 4T (-$0.45) are stall-class the timeout can preempt. Instant-fail is an entry-side disease the exit-side timeout cannot treat.",
+      "action": "Keep enable (soak, 0 fires since 18:16) but temper expectation to ~+$0.45/30d ceiling for pump-chain vs bb-squeeze's much larger stall surface. Do NOT revert — direction correct, magnitude smaller."
     },
     {
-      "finding": "Midband + HIGH-overbought blocks VERIFIED FIRING",
-      "evidence": "115 LONG-MIDBAND + 39 LONG-HIGH-70 block lines in signal-compactor.log; CRV blocked 11x today (RSI 60.9 HIGH), HYPER blocked (RSI 77-85 HIGH)",
-      "leaks": "3 non-exempt midband-band trades opened post-block (AIXBT, WCT, ETH) — WCT/ETH won; hl_copy_trader doesn't route compactor (structural); likely compute_rsi fail-open at those minutes. Not config-fixable; monitor leak rate."
+      "id": "D2",
+      "severity": "MED",
+      "finding": "LONG_HIGH_OVERBOUGHT_BLOCK leak check: SUPER r2v2-long6 opened 05:15 at meta RSI 73.7 + vol HIGH (won +$0.02) — block deployed Oct 11 17:38 should have caught RSI>70+HIGH. HYPE volume-buildup+ opened at 76.6 NORMAL (lost) — above LONG_RSI_CEILING=75, possibly dynamic-tier (Grade A→80) or signal-time-vs-meta RSI gap.",
+      "action": "Next run (unlocked): code-path audit of signal_compactor.py:4142 — verify r2v2 family in scope; verify HYPE exec log for ceiling/dynamic-tier path. Report-only this run."
     },
     {
-      "finding": "HYPE volume-buildup+ metaRSI 76.62 fired despite VOLUME_BUILDUP_RSI_MAX=75 and LONG_RSI_CEILING=75",
-      "likely_causes": "module filtered on its own 5m Wilder RSI at detect ≤75, meta recorded 76.62 later (detection-vs-execution gap, known gotcha) OR Grade A RR dynamic ceiling=80 (conf 85.6, by design Oct 9). Not a bug to fix; note for ceiling-telemetry idea."
+      "id": "D3",
+      "severity": "LOW",
+      "finding": "volume-breakout-long+ still bleeding post-Oct-10 triple filter (ceiling 85, HIGH block, rsi1m floor 35): 6T since ceiling all losses -$0.51-ish 7d 25%WR. But losses are micro-spike instant-fail class (MON died in 2min at RSI 52.3), not overbought chase — the filters target the right disease, the signal's EXTREME instant-fail cohort is a different one. 30d EXTREME remains its BEST regime (68.4% +$3.56 per constants comment).",
+      "action": "No further changes (3 shipped Oct 10). Watch 7d; kill threshold n>=5 NOT met on any single failure mode."
     }
   ],
   "recurring_problems": [
-    "hard_max_loss still sole losing exit family 7d: 46T -$4.91 0%WR vs trail +$5.22 85.7% — entry-side chop problem, exit tuning rejected repeatedly",
-    "Overbought-pump-chase LONG cluster recurs whenever BTC bear-structure + alt bounce (3rd occurrence since Oct 8) — existing bands catch HIGH vol only; NORMAL/EXTREME overbought remains a mixed band"
+    {
+      "topic": "hard_max_loss chop-tax bleed",
+      "status": "7d 46T -$4.91 0%W still #1 bleed. Trail-arm timeout family is the proven vehicle: bb-squeeze live (soak 0 fires/9h quiet market), pump-chain 45m live (tempered, see D1). Next sweep candidates by 30d HML: pump-chain- SHORT 14T -$1.84 (13T stall-class >=45m — GOOD timeout surface), volume-breakout 7T -$0.98 (5/7 die <45m — poor surface), bb-bounce-v3 6T -$0.89.",
+      "recommendation": "If Oct 15 bb-squeeze soak clean: sweep pump-chain- SHORT 60m variant first (13/14 stall-class), NOT volume-breakout (instant-fail, wrong vehicle)."
+    },
+    {
+      "topic": "post-impulse instant-fail entries",
+      "status": "7d hold<10m cohort: 17T 3W/12L. 24h: 5/8 losers died <10min in EXTREME regime. Signals fire when the impulse is spent; execution catches the exhaustion tail. No clean RSI separator (instant-fail winners RSI 48-68, losers 41-75).",
+      "recommendation": "Entry-side momentum-freshness gate (see creative_improvements). Not an RSI problem, not a time problem."
+    }
   ],
-  "missing_implementations": [
-    "pump-chain+ trail-arm 45m variant — queued behind bb-squeeze 60m soak (0 fires yet, review Oct 15)",
-    "confidence>100 telemetry (conf 222 GRASS, 112 CFX — bonus stacking beyond cap; MED side-find Oct 6 still open)"
+  "losing_trade_autopsy_24h": [
+    {
+      "losing_trade": "CFX pump-chain+ LONG -$0.10 (-2.26%)",
+      "regime": "EXTREME",
+      "hold": "5min",
+      "root_cause": "Post-impulse chase at meta RSI 74.5 — entered after the pump ran; immediate reversal to hard_max_loss. Winning side was the fade (short the exhaustion tail).",
+      "entry_check": "RSI 74.5 (under ceiling 75, passes), died 5min — impulse already spent at entry",
+      "recommended_change": "None safe — ceiling 70 would have blocked this but also blocks 14d winners +$0.90 (CFX +0.63, BABY +0.10, GRASS +0.17) vs losers -$0.61. DO NOT lower.",
+      "confidence": "HIGH on diagnosis, NO safe param fix"
+    },
+    {
+      "losing_trade": "GRASS pump-chain+ LONG -$0.18 (-3.99%)",
+      "regime": "EXTREME",
+      "hold": "6min atr_sl",
+      "root_cause": "Same instant-fail class, RSI 71.2. Same verdict as CFX.",
+      "recommended_change": "None — same band analysis"
+    },
+    {
+      "losing_trade": "ICP pump-chain+ LONG -$0.05 (-2.34%)",
+      "regime": "EXTREME",
+      "hold": "8min",
+      "root_cause": "Midband entry RSI 41.4 — NOT a chase. Coin was bleeding, signal fired on residual momentum, died in 8min. This is the irreducible noise floor for pump-chain OR an impulse-freshness problem (price already retraced before exec).",
+      "recommended_change": "Impulse-freshness backtest would cover this (creative idea). No RSI filter helps.",
+      "confidence": "MED"
+    },
+    {
+      "losing_trade": "HYPE volume-buildup+ LONG -$0.04 (-1.88%)",
+      "regime": "NORMAL",
+      "hold": "86min",
+      "root_cause": "Overbought at 76.6 — ABOVE LONG_RSI_CEILING=75 yet opened. Either dynamic tier (Grade A→80) or RSI drift between detection and record. Potential ceiling leak (D2).",
+      "recommended_change": "Code-path audit next run. If leak: fix enforcement, not the value.",
+      "confidence": "MED"
+    },
+    {
+      "losing_trade": "CHIP hmacd_mtf-- SHORT -$0.12 (-3.18%)",
+      "regime": "EXTREME",
+      "hold": "5min",
+      "root_cause": "SHORT at meta RSI 63 mid-band, reversed instantly. hmacd_mtf-- on watchlist (25% WR trending) but 24h n too small for kill. W was already blacklisted Oct 10 for this signal.",
+      "recommended_change": "Watch — kill needs n>=5 cluster",
+      "confidence": "LOW (small n)"
+    },
+    {
+      "losing_trade": "MON volume-breakout-long+ LONG -$0.05 (-2.20%)",
+      "regime": "EXTREME",
+      "hold": "2min",
+      "root_cause": "Micro-spike reversal (watchdog pattern 4). Entered a 1m candle that immediately reversed. RSI 52.3 mid-band — no filter catches this cleanly. Irreducible noise floor unless volume-breakout adds a sustain check.",
+      "recommended_change": "None now — signal still historically best in EXTREME; monitor post-Oct-10-filter cohort",
+      "confidence": "MED"
+    }
+  ],
+  "chop_vs_trend": {
+    "verified": "24h pattern reconfirms trail-vs-chop: 8 trail/profit winners (+$0.84) vs 7 hard_max_loss losers (-$0.49). Trail family = how we win. HML = how we lose. Trail-arm vehicles for bb-squeeze + pump-chain live and soaking.",
+    "rsi_ceiling_verdict": "pump-chain+ 70-75 band 14d = 3W/7L but winners +$0.90 vs losers -$0.61, net +$0.29 — KEEP ceiling at 75. CEO Oct-9 ruling (NOT 70) reconfirmed on fresh 14d data.",
+    "high_regime": "7d HIGH 32T 40.6% -$0.66 only losing regime — below n>=50 threshold, monitor only"
+  },
+  "changes_from_last_run": [
+    {
+      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED True (10:45 UTC)",
+      "status": "SOAKING — 0 bb-squeeze closes since enable (quiet market, 9 of 10h 0 trades). No regression. Review Oct 15 as planned.",
+      "verdict": "on track"
+    },
+    {
+      "change": "Midband leak watch (threshold >5/wk)",
+      "status": "n=3 in ~28h (DOT bb-squeeze-exempt, ETH hl_copy, WCT volume-buildup) — all 3 WON (+$0.19). Under threshold.",
+      "verdict": "holding, no action"
+    },
+    {
+      "change": "Oct 10-11 filter batch (vol-breakout ceiling/HIGH-block/rsi1m-floor, midband block, HIGH-overboought block)",
+      "status": "Midband block holding (3 leaks all winners). HIGH-overboought block has 1 leak to audit (SUPER, D2). Vol-breakout still bleeding but different failure mode than filters target — no further changes.",
+      "verdict": "mixed, audit D2 next run"
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-12T17:45:00Z",
-      "idea": "Generalized trail-arm timeout sweep: per-signal backtest of 'exit if unrealized < +0.40% at T+X' for the top HML-bleed signals beyond bb-squeeze",
-      "rationale": "7d HML 46T -$4.91 all never armed; RSI>70 HML avg hold 78min — a 60m no-arm exit preempts the majority. bb-squeeze vehicle already live; extend the PROVEN pattern, not a new invention.",
-      "expected_impact": "up to +$3-4/7d if ~60-70% of HML cohort pre-empted (bounded by forgone recoveries — bb-squeeze counterfactual only gave up $0.24/30d)",
-      "category": "exit structure",
-      "status": "suggested — delegate self_learner per-signal backtest (pump-chain+ 45m first)",
-      "risk": "low — same mechanism as audited bb-squeeze timeout; per-signal scope"
-    },
-    {
-      "date": "2026-10-12T17:45:00Z",
-      "idea": "Dynamic-ceiling telemetry: log when LONG_RSI_CEILING upgrades to 80 (Grade A) so 'ceiling leak' investigations stop re-litigating by-design passes",
-      "rationale": "HYPE 76.62 'breach' this run most likely Grade-A ceiling=80 by design; without a log line, every auditor re-flags it as a bug (3rd time).",
-      "expected_impact": "0 PnL; saves audit time, prevents false-positive config churn",
-      "category": "debug/audit",
+      "date": "2026-10-12T19:45:00Z",
+      "idea": "Impulse-freshness execution gate for momentum-entry signals (pump-chain+, volume-breakout-long+): at exec time, compare live price to the 5m-local high that triggered the signal. If price already retraced >0.35% from trigger high, the impulse is spent — skip entry. Entry-side fix for the instant-fail cohort, not another exit.",
+      "rationale": "5/8 24h losers died <10min post-entry (CFX 5m, GRASS 6m, ICP 8m, MON 2m, CHIP 5m). Watchdog pattern 2: signals fire post-impulse, execution catches exhaustion tail. RSI cannot separate (instant-fail winners 48-68 vs losers 41-75 overlap completely). The fade was the winning side on CFX/GRASS/ICP — if we can't be on the fade, don't be late to the already-spent pump.",
+      "expected_impact": "bounded by instant-fail cohort: 7d ~12 instant-fail losses; if gate blocks 50% with 0 winner loss, ~+$0.30-0.50/7d. Conservative.",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "none — log-only"
+      "risk": "low-medium — MUST backtest winner impact first (self_learner, 1m replay). Cannot verify winner retrace-at-entry without replay. Do NOT ship blind.",
+      "prerequisite": "self_learner backtest: for last 30d pump-chain+/vol-breakout winners, what % had already retraced >0.35% from trigger high at exec? If <10%, gate is safe."
     }
   ],
   "config_changes_applied": [],
-  "changes_from_last_run": [
-    {
-      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=True (Oct 12 10:45)",
-      "verified": "0 fires — no bb-squeeze position hit 60m stall since enable. Code wired, imports clean.",
-      "verdict": "KEEP — soak continues, 72h review Oct 15"
-    },
-    {
-      "change": "bb-squeeze midband exemption (Oct 12 00:42)",
-      "verified": "DOT bb-squeeze metaRSI 62.5 NORMAL entered and WON +$0.01 via profit-monster-trail today — exemption restoring the 60-65 habitat, exactly as designed",
-      "verdict": "KEEP"
-    },
-    {
-      "change": "ai_trader_precheck rsi_utils unification (Oct 12 03:45)",
-      "verified": "no recurrence of precheck/execution RSI drift in 24h watchdog picks",
-      "verdict": "KEEP"
-    },
-    {
-      "change": "LONG_MIDBAND + LONG_HIGH_OVERBOUGHT blocks (Oct 11)",
-      "verified": "115 + 39 block fires in compactor log; CRV/HYPER correctly blocked today",
-      "verdict": "KEEP"
-    },
-    {
-      "change": "Cap B paper=false (Oct 11)",
-      "verified": "alt LONGs opening while BTC paper continuum sits — no Cap-B squat reports since",
-      "verdict": "KEEP"
-    }
-  ],
   "next_actions": [
-    "Oct 15: bb-squeeze trail-arm 72h review — if clean, delegate pump-chain+ 45m variant backtest (self_learner)",
-    "Monitor midband leak rate (AIXBT/WCT/ETH class) — if >5/wk, audit compute_rsi fail-open path in Step 11",
-    "conf>100 telemetry — low-priority code task (bonus stacking past cap), fold into next bug_hunter batch",
-    "Watchdog owners: do NOT re-propose BTC-below LONG block — counterfactual documented, net -$1.98/7d",
-    "Oct 13: Reputation Phase 2a + Wyckoff shadow rule (orchestrator-owned, not auditor)"
+    "Next unlocked run: audit D2 leaks — LONG_HIGH_OVERBOUGHT_BLOCK scope (r2v2) + LONG_RSI_CEILING path for HYPE@76.6 (dynamic tier vs enforcement gap)",
+    "Oct 15: bb-squeeze trail-arm 72h soak review + pump-chain 45m soak review (tempered expectation ~+$0.45/30d ceiling, D1)",
+    "If soak clean: sweep pump-chain- SHORT 60m trail-arm variant (13/14 stall-class, best remaining timeout surface) — self_learner backtest first",
+    "CEO: ratify/revert 2 unratified trail-arm enables (orchestrator audit: keep, corrected +$0.97/30d bb-squeeze; pump-chain expectation tempered D1)",
+    "Monitor: hmacd_mtf-- (kill n>=5), volume-breakout post-filter cohort, HIGH regime 7d (-$0.66, n=32 <50), midband leak (3/wk, all winners)",
+    "DO NOT re-propose: pump-chain RSI ceiling 75→70 (14d reconfirmed net +$0.29 band), BTC-below LONG block, time-based filters",
+    "Impulse-freshness gate: queue self_learner backtest (creative idea above) — do not ship without winner-impact replay"
   ]
 }
