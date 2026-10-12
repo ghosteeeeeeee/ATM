@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-10-12T22:20:34.048459+00:00",
+  "steers": [
+    {
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.20 USDT. Something is wrong.",
+      "auto_executable": false,
+      "id": "steer-001"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "10 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "auto_executable": false,
+      "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'oversold-bounce+' losing streak: 3 losses",
+      "detail": "Net -0.29 USDT over last 20 trades (losses: -0.29). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'pump-chain+' losing streak: 5 losses",
+      "detail": "Net -0.45 USDT over last 20 trades (losses: -0.47). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-004"
+    }
+  ],
+  "portfolio_health": "critical",
+  "regime": {
+    "btc_15m": "SHORT_BIAS",
+    "btc_4h": "SHORT_BIAS",
+    "continuum": "BELOW",
+    "volatility": "LOW",
+    "zscore_tier": "NEG",
+    "velocity_state": "SLOW",
+    "acceleration_state": "NEGATIVE",
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "MARKDOWN",
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
+  },
+  "open_count": 0,
+  "deep_analysis": "Flat book (0 open) is the correct hold: BTC 82568 below EMA300 (82760), trend_quality STRONG_DOWN, 15m+4h SHORT_BIAS, 5m scanner 102 SHORT vs 2 LONG. 24h book 8W/12L (-0.20 USDT) was a structural long-bias error \u2014 17 of 18 meta_rsi trades were LONG into a short market; 10 hard_max_loss chop exits. That error has self-corrected to flat.\n\nNEW MIRROR TRAP forming: 7 pump-chain- SHORT pendings sit in the queue, 5 of them generated at oversold RSI (INJ 25.8, ICP 27.3, CFX 33.0, APT 36.8, CHIP 41.9 \u2014 all below the SHORT RSI hard floor of 45). A bounce ripped through the complex within minutes: NEAR 37\u219270, ICP 27\u219274, APT 37\u219267. Shorting those pendings is the exact same knife-edge mistake as the oversold-bounce+ LONGs, mirrored \u2014 we would have been shorting into the bounce, the wrong side again. Brain history confirms shorts at RSI 25-38 historically short into bounces and lose. The RSI floor should block them; do not manually approve any sub-45 SHORT.\n\nAI trader: no pick fired. Every SHORT_BIAS candidate fails precheck right now (STX RSI 37.9, JUP RSI 42.9 + R:R 0.59, HYPE RSI 40.7 + R:R 1.51) \u2014 the bounce pushed the aligned shorts out of the 45-65 band on the way down, and LONGs are trend-blocked. Forcing a fill is how the last 10 stops happened.",
+  "agent_timestamp": "2026-10-12T22:23:48.805917+00:00",
+  "regime_context": "BEAR / STRONG_DOWN. BTC 82568 below EMA300 82760 (BELOW, LEAN_BEAR linreg), 15m+4h SHORT_BIAS, continuum BELOW, 5m aggregate SHORT_BIAS 102:2:18, wyckoff MARKDOWN, volatility LOW, velocity SLOW/NEGATIVE. A short-term oversold bounce is lifting alt RSI readings fast (many coins now 62-75 after being 25-40 ten minutes ago) \u2014 this is a bounce inside markdown, not a reversal, until BTC reclaims EMA300 with positive velocity. Implication: aligned expression is SHORT on mid-band bounces only (RSI 48-62 with fresh RR pass); sub-45 shorts are knife-catches; longs stay blocked by the trend filter.",
+  "pattern_alerts": "VERIFIED (PostgreSQL meta_rsi, last 24h, n=20):\n\n1) WRONG-SIDE BY REGIME: 17/18 meta_rsi trades LONG while 15m+4h both SHORT_BIAS. 10 hard_max_loss exits, 12/20 losses, -0.20 USDT. WINNING SIDE: SHORT or flat. WHY WE WEREN'T: structural long bias in signals + oversold-bounce+ firing on oversold alone (0/4, all hard_max_loss, meta_rsi 37-42). Flat now \u2014 the only correct position.\n\n2) MIRROR TRAP (active, not yet executed): 5 of 7 pending pump-chain- SHORTs are at RSI <45 (INJ 25.8 \u2192 now 68, ICP 27.3 \u2192 now 74, APT 36.8 \u2192 now 67). The bounce in progress proves the wrong side in real time. WINNING SIDE: do not short sub-45 RSI even in STRONG_DOWN; oversold in a downtrend is continuation-for-the-longs' stop, not a fresh short entry. Brain corroborates: historical shorts at RSI 25-38 short into bounces. Gate: SHORT_RSI_HARD_FLOOR=45 should block; do not manually approve.\n\n3) RSI BANDS (meta_rsi-verified, 24h LONGs): 59-68 = 5/5 wins; <45 = 0/4; >68 = 1/6 (chases lost: GRASS 71.2 -3.99%, CFX 74.5 -2.26%, FIL 68.7 -2.81%, KAS 71.6 flat). The 59-68 bull band is DERIVED \u2014 invalid until EMA300 reclaim."
+}
