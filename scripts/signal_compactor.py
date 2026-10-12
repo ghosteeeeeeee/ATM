@@ -4712,7 +4712,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # This is NOT a live gap, but the exec backstop is a DIFFERENT gate than the
                         # one missing here: decider_run.py does NOT call VOL-GATE-BYPASS /
                         # _get_signal_type_mult at execution. Instead preserved dead-habitat entries
-                        # are caught by should_trade_v2 (decider_run.py:1654), which (a) skips any
+                        # are caught by should_trade_v2 (decider_run.py:1655), which (a) skips any
                         # non-structural signal in EXTREME ("storm: ATR>1.5%") and (b) hard-SKIPs
                         # when get_combined_multiplier==0.0 ("regime_block: banned"). That gate is
                         # strictly stronger than the DRIFT-A override, so no position opens and no
