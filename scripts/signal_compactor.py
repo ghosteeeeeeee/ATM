@@ -4701,6 +4701,26 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # check. But when they merge with DB entries (existing), the merged entry
                         # could theoretically become single-source if the DB entry has a conflicting
                         # single source. This guard ensures the merged entry still has 2+ sources.
+                        #
+                        # SCOPE NOTE (bug_hunter 2026-10-12): preserved prev_hotset entries merged
+                        # here sit OUTSIDE the compactor pre-filter loop, so they do NOT run the
+                        # approval-time vol-gate override check added for BUG-052 (the
+                        # [VOL-GATE-BYPASS] 0.0 check near line 3267). A preserved bb-squeeze+ LONG
+                        # in EXTREME could therefore re-enter the hotset here each cycle without
+                        # being dropped at approval.
+                        #
+                        # This is NOT a live gap, but the exec backstop is a DIFFERENT gate than the
+                        # one missing here: decider_run.py does NOT call VOL-GATE-BYPASS /
+                        # _get_signal_type_mult at execution. Instead preserved dead-habitat entries
+                        # are caught by should_trade_v2 (decider_run.py:1654), which (a) skips any
+                        # non-structural signal in EXTREME ("storm: ATR>1.5%") and (b) hard-SKIPs
+                        # when get_combined_multiplier==0.0 ("regime_block: banned"). That gate is
+                        # strictly stronger than the DRIFT-A override, so no position opens and no
+                        # false-EXECUTED row is created — correctness does not depend on the approval
+                        # block being comprehensive.
+                        #
+                        # The only real residual is per-cycle CHURN (re-score + re-log each pass),
+                        # not a money leak. Mirror the vol-gate override here only to cut that churn.
                         pe_src = pe.get('source', '')
                         pe_parts = [p.strip() for p in (pe_src or '').split(',') if p.strip()]
                         if CONFLUENCE_REQUIRED and len(pe_parts) < 2:

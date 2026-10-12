@@ -26,7 +26,7 @@ from hermes_constants import (
     ATR_K_LOW_VOL, ATR_K_NORMAL_VOL, ATR_K_HIGH_VOL,
     ATR_K_INITIAL,
     ATR_PCT_LOW_THRESH, ATR_PCT_HIGH_THRESH,
-    HML_VOL_ATR_MULT, HML_TRAIL_MIN_GAP_PCT, PM_TRAIL_ACTIVATE_PCT,
+    HML_VOL_ATR_MULT,
     PHASE_TIER_NEUTRAL, PHASE_TIER_BUILDING, PHASE_TIER_ACCELERATING,
     PHASE_TIER_EXHAUSTION, PHASE_TIER_EXTREME,
     K_PHASE_ACCEL_STALL, K_PHASE_ACCEL_FAST, K_PHASE_ACCEL_SLOW,
@@ -3444,13 +3444,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # more room than the account threshold. HML only fires on losers.
         _hml_lev = max(float(pos.get('leverage') or 1), 1.0)
         HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES / _hml_lev
-        # D3 TRAIL-MIN-GAP (orchestrator 2026-10-08): never fire HML tighter than
-        # PM trail activation (+0.40%) + gap (0.20%) = -0.60% price. Trail arms at
-        # +0.40%; HML at -0.20..-0.30% killed trades with MFE>0 before trail could
-        # work (LDO MFE+0.27%, FIL MFE+0.82% both HML 24h). Frequency goal <40%.
-        _hml_trail_floor = -(float(PM_TRAIL_ACTIVATE_PCT) * 100.0 + float(HML_TRAIL_MIN_GAP_PCT))
-        if _hml_trail_floor < HARD_MAX_LOSS_PCT:
-            HARD_MAX_LOSS_PCT = _hml_trail_floor
+        # D3 TRAIL-MIN-GAP REMOVED (CEO 2026-10-12): the -0.60% trail floor only
+        # ever fired at lev>=4, and only to WIDEN HML past CUT_LOSER account limit
+        # (lev5: -0.60% price = -3.0% acct vs limit -2.0% acct) — same bug class as
+        # the vol floor (capped Oct 10). 7d hard_max_loss 49T avg -3.35% acct,
+        # 80% never armed trail (MFE<0.40%). Account limit now governs everywhere.
+        # HML_TRAIL_MIN_GAP_PCT left in constants (unused) — do not re-add floor.
         try:
             from volatility_gate_v2 import get_atr_pct as _hml_get_atr
             _hml_atr = _hml_get_atr(token)
