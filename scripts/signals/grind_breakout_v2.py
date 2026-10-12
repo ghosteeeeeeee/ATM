@@ -365,9 +365,24 @@ def run(prices_dict=None) -> int:
             conn.close()
 
     for token in tokens:
-        # Skip if price is stale
-        if price_age_minutes(token) > 10:
-            continue
+        # Skip if candle data is stale
+        # CEO 2026-10-12: switched from price_age_minutes (latest_prices) to candle-age
+        # check on candles_5m — the table detect() actually consumes. latest_prices only
+        # tracks ~87 tokens while candles_5m has 182. Fixed 42-token blind spot.
+        try:
+            _freshness_conn = sqlite3.connect(_CANDLES_DB, timeout=5)
+            _fc = _freshness_conn.cursor()
+            _fc.execute("SELECT MAX(ts) FROM candles_5m WHERE token=? AND is_closed=1", (token.upper(),))
+            _last_ts = _fc.fetchone()
+            _freshness_conn.close()
+            if _last_ts and _last_ts[0]:
+                import time as _time
+                if (_time.time() - _last_ts[0]) / 60 > 10:
+                    continue
+            else:
+                continue  # no candle data
+        except Exception:
+            continue  # can't verify freshness — skip
 
         sig = detect(token)
         if not sig:
