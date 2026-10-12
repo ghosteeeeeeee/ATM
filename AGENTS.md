@@ -171,24 +171,28 @@ openmemory_openmemory_store(content="...", tags=["topic", "context"])
 Endpoint: `POST http://localhost:8080/mcp`
 Auth: `x-api-key: dev-key-123`
 Protocol: JSON-RPC 2.0
+**Required header:** `-H "Accept: application/json, text/event-stream"` — without it the server returns `406 Not Acceptable: Client must accept both application/json and text/event-stream`.
 
 ```bash
 # Query
 curl -s -X POST http://localhost:8080/mcp \
   -H "x-api-key: dev-key-123" \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"openmemory_query","arguments":{"query":"your query here"}}}'
 
 # Store
 curl -s -X POST http://localhost:8080/mcp \
   -H "x-api-key: dev-key-123" \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"openmemory_store","arguments":{"content":"What was done: ...","tags":["topic","date"],"type":"contextual"}}}'
 
 # List all memories
 curl -s -X POST http://localhost:8080/mcp \
   -H "x-api-key: dev-key-123" \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"openmemory_list","arguments":{}}}'
 ```
 
