@@ -164,37 +164,12 @@ def precheck(coin, direction):
         rsi_short_min = getattr(hc, 'SHORT_RSI_HARD_FLOOR', 45)
         rsi_short_max = getattr(hc, 'SHORT_RSI_CEILING', 65)
 
-        conn = None
-        try:
-            conn = _get_candles_db()
-            cur = conn.cursor()
-            # Use CLOSED candles only (match rsi_utils behavior)
-            cur.execute('''
-                SELECT close FROM candles_5m 
-                WHERE token = ? AND is_closed = 1
-                ORDER BY ts DESC LIMIT 16
-            ''', (token,))
-            closes = [r[0] for r in cur.fetchall()][::-1]  # ASC: oldest->newest
-        finally:
-            if conn:
-                conn.close()
-
-        if len(closes) >= 15:
-            # Simple RSI calculation on closed candles
-            gains, losses = [], []
-            for i in range(1, len(closes)):
-                diff = closes[i] - closes[i-1]
-                gains.append(max(0, diff))
-                losses.append(max(0, -diff))
-            # Use last 14 diffs (need 15 closes for 14 diffs)
-            avg_gain = sum(gains[-14:]) / 14
-            avg_loss = sum(losses[-14:]) / 14
-            rs = avg_gain / avg_loss if avg_loss > 0 else 100
-            rsi = 100 - (100 / (1 + rs))
-            rsi_valid = True
-        else:
-            rsi = None
-            rsi_valid = False
+        # brain_auditor 2026-10-12: use rsi_utils (Wilder 1m) — same source as
+        # decider_run/signal_compactor band gates. Old inline simple-SMA on 5m
+        # drifted ~25 pts from pipeline (ONDO precheck 46.8 vs exec 71.8).
+        from rsi_utils import compute_rsi_1m
+        rsi = compute_rsi_1m(token)
+        rsi_valid = rsi is not None
     except Exception as e:
         rsi = None
         rsi_valid = False

@@ -4008,5 +4008,23 @@
     "category": "calibration",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-12T03:42:19Z",
+    "idea": "Micro-stall exit SHADOW: if LONG open >=25min AND MFE < 0.08% AND |vel5m| < 0.03%, log would-exit at market (shadow only, no live close). Measure counterfactual for 7d before considering live.",
+    "rationale": "35/38 7d LONG hml never armed trail (avg MFE 0.164%). A 25min micro-stall cut would convert most hml to ~−0.3% losses instead of −3.2% avg. Dead-money audit taught us TIME exits kill grinds — so shadow first, never ship blind. Differentiator from dead_money: MFE-based (showed-no-life) not pure time.",
+    "expected_impact": "If counterfactual positive after 7d shadow: reduce hml magnitude ~60-80% on LONG side without touching winners (trail winners avg MFE 0.81% at close — need time-resolved MFE in shadow to verify).",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "medium — grind-phase false kills possible; shadow-only until proven"
+  },
+  {
+    "date": "2026-10-12T03:42:19Z",
+    "idea": "HIGH-regime per-signal dampen watchlist (NOT blanket block): volume-breakout-long+ HIGH cohort 14d and bb-squeeze+ HIGH — collect n>=20 per signal before any change. Existing HIGH blocks already active.",
+    "rationale": "HIGH is worst 14d regime (105T −$1.69, 29.5% hml rate) but blanket HIGH throttle was deferred correctly (signal mix confound, EXTREME home runs adjacent). One-variable discipline: no new HIGH changes until midband/overbought soak completes.",
+    "expected_impact": "Monitor only",
+    "category": "regime watch",
+    "status": "monitoring",
+    "risk": "none — no change"
   }
 ]

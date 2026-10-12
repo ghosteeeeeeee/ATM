@@ -1078,5 +1078,16 @@
     "after": "midband skips when 'bb-squeeze' in src — module RSI_MAX=65 already caps the band",
     "rationale": "Filter collision: bb-squeeze LONG window is 60-65 (MIN/MAX constants); midband 60-70 non-EXTREME killed the entire habitat. 14d RSI 60-65 non-EXTREME = 8T 100%WR +$0.74 0 HML. Without exemption BB_SQUEEZE_LONG_RSI_MIN/MAX are dead code.",
     "impact": "Restores bb-squeeze+ LONG 60-65 band (verified 100% WR). EXTREME still blocked by vol gate 0.0 + decider_run. RSI 65-70 still blocked by module MAX=65."
+  },
+  {
+    "timestamp": "2026-10-12T03:45:00Z",
+    "agent": "brain_auditor",
+    "change": "ai_trader_precheck.py: replaced private simple-SMA 5m RSI with rsi_utils.compute_rsi_1m (Wilder 1m) — same source as decider_run/signal_compactor band gates",
+    "type": "bugfix",
+    "file": "scripts/ai_trader_precheck.py",
+    "before": "Inline simple average RSI on last 16 closed 5m candles (SMA of gains/losses, no Wilder smoothing)",
+    "after": "rsi_utils.compute_rsi_1m(token) — Wilder RSI on 1m closed candles, cached, same as pipeline execution band gates",
+    "rationale": "Watchdog steer: ONDO pick SKIPPED with precheck RSI 46.8 vs execution RSI 71.8 — 25pt drift made band gate unreliable for watchdog picks. Root cause: precheck re-implemented RSI instead of sharing rsi_utils. Fixed once at source.",
+    "impact": "Precheck verdicts now match pipeline band gates by construction. Verified live: ONDO RSI=60.8, ETH RSI=48.1 via rsi_utils. py_compile OK."
   }
 ]

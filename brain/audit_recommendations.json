@@ -1,98 +1,120 @@
 {
-    "timestamp": "2026-10-12T02:45:00Z",
-    "agent": "brain_auditor",
-    "session_lock": "none — config changes permitted",
-    "watchdog_first": {
-        "steer_001_wrong_side": "VERIFIED via autopsy — 9 losers 24h, 6 hard_max_loss LONGs at RSI extremes. Confirmed: RSI does not separate winners from losers (CFX same-signal proof: RSI 73.2 -> +28% trail, RSI 74.5 -> HML). Continuation separates. Existing blocks (MIDBAND/HIGH-70/CHASE) already target the shippable cells.",
-        "steer_002_ai_trader_streak": "NO CHANGE — ai-trader+ 7d 12T 66.7% WR +$0.50. 3-loss streak (AVAX/ME/INJ) is n=3 within a winning signal. Pick bar already raised (ONDO pick: RR B, mid-band RSI 46.8, +0.44% 30m mom). Keep enabled."
+  "timestamp": "2026-10-12T03:42:19Z",
+  "agent": "brain_auditor",
+  "session_lock": false,
+  "watchdog_first": {
+    "steers_resolved": [
+      {
+        "steer": "8 recent losses wrong-side",
+        "verdict": "PARTIALLY CONFIRMED — direction is regime-aligned LONG (15m/4h LONG_BIAS); losses are chop deaths not wrong-side. 24h 6 exits hard_max_loss, all LONG, trail never armed. Watchdog deep analysis agrees: vol is the enemy, not direction.",
+        "action": "No direction change. Entry-quality/exits continue."
+      },
+      {
+        "steer": "ai-trader+ losing streak 3L",
+        "verdict": "NOISE — 7d 12T +$0.50 66.7% WR. 3-loss streak (ME/AVAX/INJ mixed RSI) is pick-quality variance not signal decay. Counter-evidence GRASS manual LONG +$0.57 hard_tp same day.",
+        "action": "KEEP signal. No disable."
+      }
+    ]
+  },
+  "trade_summary_24h": {
+    "closed": "17T, WR 58.8%, net +$1.88",
+    "open": "2 (ETH hl_copy -0.30%, BTC continuum ~flat)",
+    "losers": "5 LONG hard_max_loss + 1 tiny atr_trail (CFX/ME/AVAX/XPL/MON/YGG)",
+    "regime": "15m+4h LONG_BIAS, vol LOW, velocity SLOW, wyckoff DISTRIBUTION — long-biased but low-vol chop tape"
+  },
+  "changes_from_last_run": [
+    {
+      "change": "LONG_MIDBAND_NON_EXTREME_BLOCK (Oct 11 15:44)",
+      "impact": "WORKING — 7d counterfactual cohort (LONG meta-RSI 60-70 non-EXTREME non-squeeze) = 18T −$1.02 33.3%WR. Post-deploy 12 LONG closes, 0 false-positive blocks observed. CFX RSI 67.3 EXTREME winner passed correctly (EXTREME exempt)."
     },
-    "trade_summary_24h": {
-        "closed": "19T +$1.45 47.4% WR",
-        "open": "1 BTC continuum LONG (+0.33%, regime-aligned)",
-        "hml_share": "7/19 = 37% (down from 55% earlier — D3 floor working)",
-        "regime": "BTC 4h LONG_BIAS / 15m SHORT_BIAS, alts 59 SHORT_BIAS, vol NORMAL"
+    {
+      "change": "LONG_HIGH_OVERBOUGHT_BLOCK (Oct 11 17:40)",
+      "impact": "WORKING — post-deploy only 1 LONG hml RSI>70: CFX 74.53 EXTREME (exempt by design for continuation home runs, −$0.10 cost acceptable). BABY RSI 82 hml was pre-deploy (Oct 10)."
     },
-    "changes_from_last_run": [
-        {
-            "change": "LONG_MIDBAND_NON_EXTREME_BLOCK bb-squeeze exemption (00:42)",
-            "status": "UNTESTABLE — 0 bb-squeeze trades since. KEEP (100%WR band preserved).",
-            "action": "monitor"
-        },
-        {
-            "change": "CHASE quality-tiered exemption (00:50)",
-            "status": "WORKING — GRASS still correctly blocked at gap 4.66-6.77% (>3.0% bull override); CHASE-BLOCK 63 fires in log. Exemption not yet exercised (no conf>=150 setupWR>=60 candidate hit).",
-            "action": "keep"
-        },
-        {
-            "change": "LONG_MIDBAND_NON_EXTREME_BLOCK (Oct 11 15:44)",
-            "status": "WORKING — 46 fires (SUPER RSI 61 HIGH, DYDX RSI 64.6 NORMAL, USUAL RSI 69.3 NORMAL). Covers the worst conf>=80 x HIGH x RSI 60-70 cell discovered this run (19T -$1.32/14d).",
-            "action": "keep"
-        },
-        {
-            "change": "LONG_HIGH_OVERBOUGHT_BLOCK (Oct 11 17:45)",
-            "status": "VALIDATED — 14d LONG HIGH RSI>70 = 20T -$0.48 net, max win +$0.20. 10 fires (ICP RSI 82, SEI RSI 76.4). EXTREME/NORMAL RSI>70 are NET POSITIVE (+$0.37/+$0.55 14d) — correctly scoped to HIGH only. Do NOT extend.",
-            "action": "keep"
-        },
-        {
-            "change": "VOLUME_BREAKOUT_LONG_RSI1M_FLOOR=35 (Oct 10)",
-            "status": "MON still lost (conf 32.2, meta final 47.2 passed floor — stored conf != gate conf). 7d vol-breakout 14T -$0.66 28.6%. Recent bleed dominated by pre-HIGH-block trades. Monitor.",
-            "action": "monitor"
-        }
-    ],
-    "new_finding_confidence_inversion": {
-        "claim": "Stored confidence is inversely predictive above 80",
-        "data": {
-            "30d": "conf>=80: 557T -$7.67 47.0%WR | conf 60-80: 172T +$5.79 50.0%WR",
-            "14d": "conf>=80: 260T -$2.23 | conf 60-80: 78T +$3.24",
-            "7d": "conf>=80: 81T -$1.81 37.0%WR | conf 60-80: 31T +$1.36 41.9%WR",
-            "ttest_30d": "t=-2.70 (df~242), bootstrap 95% CI of per-trade delta [-0.083,-0.014] — SIGNIFICANT",
-            "mechanism": "momentum/breakout signals stack confidence at late-pump tops; avg gap_at_entry 0.188% vs 0.137% (conf 60-80). Bleeds BOTH directions (LONG -$3.63, SHORT -$4.04) and concentrates in HIGH regime (-$5.92/192T).",
-            "winner_check": "Blocking conf>=80 blanket would kill best-10 cohort +$6.26. NOT shippable as block."
-        },
-        "actionable_cells_already_covered": "HIGH x RSI>=60 x conf>=80 (the -$1.32+/14d bulk) is now blocked by LONG_MIDBAND + LONG_HIGH_OVERBOUGHT (both live Oct 11). Remaining incremental cell HIGH x RSI<60 x conf>=80: 38T -$0.30 14d / 67T -$0.63 30d at 55-57% WR — weak, R:R drag not WR. DO NOT SHIP (mandate: conservative when uncertain).",
-        "verdict": "REAL pattern, already mostly harvested by Oct 11 blocks. Shadow-log dampener counterfactual before any new change."
+    {
+      "change": "BB_SQUEEZE_LONG_RSI_MAX=65 (Oct 11 02:42)",
+      "impact": "WORKING — 14d RSI>=65 squeeze LONG cohort = 29T −$0.56 net (17W +$0.91 / 12L −$1.47). Block EV positive as designed. Window 60-65 preserved (14d 8T 100%WR +$0.74)."
     },
-    "drift_findings": [],
-    "recurring_problems": [
-        "hard_max_loss remains #1 bleed: 7d 50T -$5.88 avg lev 4.0. Frequency improving (24h share 37% vs 55%). D3 trail floor magnitude fix working. No new lever — chop-entry problem, entry-quality filters shipping steadily."
-    ],
-    "losing_trade_autopsy_24h": [
-        {"trade": "MON volume-breakout-long+ LONG -$0.05", "regime": "EXTREME", "rsi": 52.3, "held": "93s", "root_cause": "fill-then-dump; conf 32.2 raw / 47.2 final — low-conviction setup in EXTREME. Trail never armed.", "change": "none — below sample bar"},
-        {"trade": "XPL oversold-bounce+ LONG -$0.06", "regime": "HIGH", "rsi": 38.3, "root_cause": "oversold bounce in SHORT_BIAS alt tape = falling knife. Signal module RSI (15-20 zone) vs meta 5m RSI 38 — different measurers, not a bug.", "change": "none — oversold <40 14d net +$0.12, habitat intact"},
-        {"trade": "CFX pump-chain+ LONG -$0.10", "regime": "EXTREME", "rsi": 74.5, "root_cause": "exhaustion LONG; same-coin same-signal RSI 73.2 won +28% earlier. Continuation, not RSI, separates.", "change": "none — RSI cap would kill winners (EXTREME RSI>70 14d +$0.37)"},
-        {"trade": "AVAX/ME/INJ ai-trader+ LONGs -$0.22 total", "mixed": "RSI 45/72.5/41", "root_cause": "pick quality not band. 7d signal still 66.7% WR.", "change": "keep signal; pick bar already raised"}
-    ],
-    "creative_improvements": [
-        {
-            "date": "2026-10-12T02:45:00Z",
-            "idea": "Confidence-calibration shadow: in signal_compactor, log counterfactual skip when final_confidence>=80 AND vol_regime=HIGH (do not block). After 48h, count would-have-blocked trades, their PnL, and winners lost. If net-positive with <=20% winner loss, propose dampener (0.85x) not block.",
-            "rationale": "conf>=80 is significantly inversely predictive (t=-2.70, CI excludes 0, consistent 7/14/30d). Bulk of bleed already covered by MIDBAND+HIGH-70. Shadow quantifies the residual before risking flow.",
-            "expected_impact": "Decision-grade data in 48h; if shipped later, targets ~6T/day HIGH conf80 cohort without touching EXTREME trend habitat",
-            "category": "calibration",
-            "status": "suggested",
-            "risk": "low (shadow only, zero live-path change)"
-        },
-        {
-            "date": "2026-10-12T02:45:00Z",
-            "idea": "EXTREME conf>=80 underperformance watch (n=197T -$1.98/30d vs conf60-80 +$5.89): DO NOT touch — CFX-type home runs live here. Log only. If 30d gap widens beyond -$4 with n>=250, revisit as leverage-cap (not entry-block) candidate.",
-            "rationale": "EXTREME is the trail-family habitat; entry blocks there trade dollars for noise.",
-            "category": "monitor",
-            "status": "monitoring",
-            "risk": "none"
-        }
-    ],
-    "config_changes_applied": [],
-    "next_actions": [
-        "Shadow confidence-dampener counterfactual (creative idea 1) — implement if next run has bandwidth",
-        "Monitor bb-squeeze midband exemption until n>=8 (untestable at 0 trades)",
-        "Monitor vol-breakout-long+ 7d (28.6% WR) — HIGH-block + RSI1M floor cohorts need 48h",
-        "hard_max_loss frequency: continue entry-quality filters; magnitude already fixed (D3 floor)"
-    ],
-    "protected_flags_verified": {
-        "CONFLUENCE_REQUIRED": true,
-        "LIVE_TRADING_ENABLED": true,
-        "PM_TRAIL_ENABLED": true,
-        "CUT_LOSER_ENABLED": true,
-        "ATR_TP_MIN": 0.013
+    {
+      "change": "bb-squeeze midband exemption (Oct 12 00:42)",
+      "impact": "MONITOR — 0 bb-squeeze LONG closes since exemption. Untestable until n>=8. No collision regressions."
+    },
+    {
+      "change": "VOLUME_BREAKOUT_LONG_RSI1M_FLOOR=35 (Oct 10)",
+      "impact": "MONITOR — 0 vol-breakout LONG closes since floor. 14d signal still 38.9%WR +$1.07; HIGH-block + floor cohorts need 48h soak."
     }
+  ],
+  "losing_trade_autopsy_24h": {
+    "cluster": "5/6 losers LONG hard_max_loss, avg −2.4% unleveraged (−3 to −5% account at lev 3-5)",
+    "pattern": "Chop entries: CFX RSI 74.5 EXTREME (exempt continuation band, no continuation followed), ME 72.5 NORMAL (70-75 band open below ceiling 75), AVAX 45 HIGH, XPL 38.3 HIGH (oversold-bounce catching knife), MON 52 EXTREME. All trail-never-armed.",
+    "winning_side": "Standing aside OR the SHORT that paid while we waited for a bounce. CFX same-day earlier trade at RSI 67.3 EXTREME WON (+$0.02 trail) — continuation-confirmed vs not is the separator, not RSI level.",
+    "checked_filters": "None of these are filter leaks: CFX 74.53 < LONG_RSI_CEILING 75 + EXTREME exempt; ME 72.5 in open 70-75 Grade-A band; XPL oversold-bounce module band; MON vol-breakout fired before 1m-floor deploy cycle. Entry quality, not gate holes."
+  },
+  "hml_deep_dive": {
+    "7d": "49T −$5.76 0%WR still #1 leak. LONG 38T −$4.19, SHORT 10T −$1.41",
+    "mfe": "7d LONG hml avg MFE 0.164%, only 3/38 reached +0.40% trail-arm. Winners avg MFE 0.81% (30/32 armed). Clean separation AFTER entry.",
+    "entry_features_fail": "momentum_state/speed_percentile/momentum_score do NOT separate hml from trail winners (rising: 22 hml AND 15 winners; all speed quartiles have both cohorts). Third consecutive audit confirming entry-state filters cannot predict chop deaths. STOP proposing them.",
+    "regime": "14d hml rate: HIGH 29.5% worst, NORMAL 26.9%, EXTREME 23.3% best (but EXTREME net +$3.53 — home runs live there). HIGH is worst regime 14d −$1.69. Existing HIGH-specific blocks (overbought, vol-breakout 0.0) active; blanket HIGH throttle remains deferred (n too thin per-signal)."
+  },
+  "drift_findings": [
+    {
+      "id": "DRIFT-PRECHECK-RSI",
+      "severity": "HIGH — FIXED THIS RUN",
+      "detail": "ai_trader_precheck.py computed its own simple-SMA RSI on 5m candles while pipeline band gates use rsi_utils Wilder RSI on 1m. Watchdog observed ONDO precheck 46.8 vs execution 71.8 (25pt drift). Precheck feeds live pick decisions via trade_watchdog_prompt.md — false greenlights and false skips.",
+      "fix": "Replaced inline RSI block with rsi_utils.compute_rsi_1m. Verified live: ONDO 60.8, ETH 48.1 via shared source. py_compile OK. Root-cause fix (shared function), not per-caller patch."
+    }
+  ],
+  "recurring_problems": [
+    {
+      "topic": "hard_max_loss as sole bleed",
+      "status": "OPEN — magnitude fixed (D3, CUT_LOSER −2.00 + HML_VOL_ATR_MULT), frequency improved 68%→~32% but still #1 at 49T/−$5.76 7d. Entry-state filters disproven 3x. Exit-side micro-stall shadow = creative idea 1."
+    },
+    {
+      "topic": "entry_rsi_14 vs meta rsi drift (DRIFT-E)",
+      "status": "PARTIAL — meta is ground truth for audits; precheck now aligned. Stored entry_rsi_14 write-path fix still delegated to bug_hunter (standing)."
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-12T03:42:19Z",
+      "idea": "Micro-stall exit SHADOW: if LONG open >=25min AND MFE < 0.08% AND |vel5m| < 0.03%, log would-exit at market (shadow only, no live close). Measure counterfactual for 7d before considering live.",
+      "rationale": "35/38 7d LONG hml never armed trail (avg MFE 0.164%). A 25min micro-stall cut would convert most hml to ~−0.3% losses instead of −3.2% avg. Dead-money audit taught us TIME exits kill grinds — so shadow first, never ship blind. Differentiator from dead_money: MFE-based (showed-no-life) not pure time.",
+      "expected_impact": "If counterfactual positive after 7d shadow: reduce hml magnitude ~60-80% on LONG side without touching winners (trail winners avg MFE 0.81% at close — need time-resolved MFE in shadow to verify).",
+      "category": "exit sniper",
+      "status": "suggested",
+      "risk": "medium — grind-phase false kills possible; shadow-only until proven"
+    },
+    {
+      "date": "2026-10-12T03:42:19Z",
+      "idea": "HIGH-regime per-signal dampen watchlist (NOT blanket block): volume-breakout-long+ HIGH cohort 14d and bb-squeeze+ HIGH — collect n>=20 per signal before any change. Existing HIGH blocks already active.",
+      "rationale": "HIGH is worst 14d regime (105T −$1.69, 29.5% hml rate) but blanket HIGH throttle was deferred correctly (signal mix confound, EXTREME home runs adjacent). One-variable discipline: no new HIGH changes until midband/overbought soak completes.",
+      "expected_impact": "Monitor only",
+      "category": "regime watch",
+      "status": "monitoring",
+      "risk": "none — no change"
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "file": "scripts/ai_trader_precheck.py",
+      "change": "RSI source: private simple-SMA 5m → rsi_utils.compute_rsi_1m (Wilder)",
+      "type": "bugfix",
+      "rationale": "Precheck/pipeline RSI disagreement made watchdog band gate unreliable (ONDO 25pt drift). Shared-function fix kills the drift class.",
+      "not_a_trading_config_change": true
+    }
+  ],
+  "next_actions": [
+    "Monitor bb-squeeze midband exemption until n>=8 (0 trades so far)",
+    "Monitor vol-breakout-long+ 14d 38.9%WR — HIGH-block + 1m-floor cohorts need 48h",
+    "Implement micro-stall exit SHADOW (creative idea 1) if bandwidth — position_manager shadow logger, no live closes",
+    "Standing bug_hunter: entry_rsi_14 write-path (DRIFT-E) still open",
+    "ai-trader precheck RSI fix: verify next watchdog ONDO-class pick matches execution RSI"
+  ],
+  "protected_flags_verified": {
+    "LIVE_TRADING_ENABLED": true,
+    "CONFLUENCE_REQUIRED": true,
+    "PM_TRAIL_ENABLED": true,
+    "CUT_LOSER_PNL": -2.0,
+    "kill_switch_json": true
+  }
 }
