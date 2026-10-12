@@ -82,7 +82,8 @@ def _read_cache():
     try:
         with open(HL_CACHE_FILE) as f:
             return json.load(f)
-    except Exception:
+    except Exception as e:
+        print(f'[coin_tracker] hl_cache read error: {e}', flush=True)
         return {}
 
 def _read_candles_batch(tokens, tf='5m', limit=200, conn=None):
@@ -137,8 +138,8 @@ def _read_regime():
         ).fetchone()
         if row:
             return row[0], row[1]
-    except Exception:
-        pass
+    except Exception as e:
+        print(f'[coin_tracker] regime read error: {e}', flush=True)
     finally:
         if conn:
             try:
@@ -235,8 +236,8 @@ def collect():
                 'warm_pct': (prev_dist_row[1] or 0) / prev_dist_row[3] * 100,
                 'cold_pct': (prev_dist_row[2] or 0) / prev_dist_row[3] * 100,
             }
-    except Exception:
-        pass
+    except Exception as e:
+        print(f'[coin_tracker] prev health dist read error: {e}', flush=True)
 
     processed = 0
     skipped = 0
@@ -303,16 +304,22 @@ def collect():
                 atr_14 = _atr(highs_5m, lows_5m, closes_5m, 14) if len(closes_5m) >= 15 else None
 
                 # ── Volume analysis ──
-                vol_1h = volumes_1h[0] if volumes_1h else None
-                vol_24h = sum(volumes_1h[:24]) if len(volumes_1h) >= 24 else sum(volumes_1h) if volumes_1h else None
-                vol_avg = sum(volumes_5m[:50]) / min(50, len(volumes_5m)) if volumes_5m else None
-                vol_recent = volumes_5m[0] if volumes_5m else 0
-                vol_trend = _volume_trend(volumes_5m[:60])
+                # FIX (BUG-059, 2026-10-11): arrays are OLDEST-FIRST (reversed at
+                # line ~287). The old [0]/[:24]/[:50] reads pulled the OLDEST
+                # candles: vol_1h was ~8 days stale, vol_recent ~16h stale, and
+                # spread_bps came from the oldest 5m candle. Use the END of the
+                # arrays for anything labeled "recent"/"current".
+                vol_1h = volumes_1h[-1] if volumes_1h else None
+                vol_24h = sum(volumes_1h[-24:]) if len(volumes_1h) >= 24 else sum(volumes_1h) if volumes_1h else None
+                vol_avg = sum(volumes_5m[-50:]) / min(50, len(volumes_5m)) if volumes_5m else None
+                vol_recent = volumes_5m[-1] if volumes_5m else 0
+                # Most recent 60 candles ([:60] selected the OLDEST 60 of 200)
+                vol_trend = _volume_trend(volumes_5m[-60:])
 
                 # ── Spread (approximate from candle range) ──
                 spread_bps = None
                 if highs_5m and lows_5m and price > 0:
-                    recent_range = highs_5m[0] - lows_5m[0]
+                    recent_range = highs_5m[-1] - lows_5m[-1]
                     if recent_range:
                         spread_bps = (recent_range / price) * 10000
 
@@ -440,18 +447,25 @@ def collect():
                 # Weather station scores (NEW)
                 # Get price acceleration from token_speeds table
                 price_accel = None
+                # FIX (BUG-005 residual, 2026-10-11): speed_conn leaked on any
+                # exception (close was success-only) and the failure was silent.
+                speed_conn = None
                 try:
-                    # Open fresh connection for token_speeds query
                     speed_conn = sqlite3.connect(RUNTIME_DB, timeout=10)
                     speed_row = speed_conn.execute(
                         'SELECT price_acceleration FROM token_speeds WHERE token = ?',
                         (symbol.upper(),)
                     ).fetchone()
-                    speed_conn.close()
                     if speed_row:
                         price_accel = speed_row[0]
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f'[coin_tracker] token_speeds read error: {e}', flush=True)
+                finally:
+                    if speed_conn:
+                        try:
+                            speed_conn.close()
+                        except Exception:
+                            pass
                 
                 token_data = {
                     'setup_type': setup.get('setup_type'),

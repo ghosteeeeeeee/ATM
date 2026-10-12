@@ -803,12 +803,16 @@ def compute_atr_sl_tp(
                     # looser stop (the floor). max() = trail from peak, never below floor.
                     new_sl = max(trail_floor, min_from_entry)  # trail from peak, enforce floor
                 if current_sl > 0:
-                    # Only enforce one-way when current_sl is correct-side (below entry for LONG).
-                    # If current_sl is wrong-sided (above entry), the trailing gate's correction
-                    # must not be overwritten by this one-way gate.
-                    current_above_entry = (current_sl > entry_f) if entry_f > 0 else False
-                    if not current_above_entry:
-                        new_sl = max(new_sl, current_sl)
+                    # FIX (BUG-063, 2026-10-11): apply the one-way ratchet UNCONDITIONALLY.
+                    # The old code skipped the clamp when current_sl was "wrong-sided"
+                    # (above entry for LONG), but since BUG-030/2026-10-09 removed the
+                    # entry cap, an above-entry stop is a LEGITIMATE profit lock. Skipping
+                    # let the post-gate recompute from the 1.2% trail and push a TIGHTER
+                    # above-entry stop back DOWN (loosening it) every cycle — undoing what
+                    # the trailing gate correctly blocked. Synthetic proof (V1): LONG
+                    # entry=99 cur=99.6 high=100 cur_sl=99.4 -> new_sl=98.8 needs_sl=True.
+                    # For LONG a higher stop is always tighter, so never lower it.
+                    new_sl = max(new_sl, current_sl)
                 # FIX (2026-10-09): Removed min(new_sl, entry_f) cap — it prevented trailing
                 # from locking profit above entry. SL above entry for LONG is correct trailing.
             else:
@@ -832,11 +836,11 @@ def compute_atr_sl_tp(
                 # Always use min() — trail_ceil below entry = locks in profit (good!)
                 new_sl = min(trail_ceil, ceil_from_entry)
                 if current_sl > 0:
-                    # Only enforce one-way when current_sl is correct-side (above entry for SHORT).
-                    # If current_sl is wrong-sided (below entry), trailing gate's correction must stick.
-                    current_below_entry = (current_sl < entry_f) if entry_f > 0 else False
-                    if not current_below_entry:
-                        new_sl = min(new_sl, current_sl)
+                    # FIX (BUG-063, 2026-10-11): unconditional one-way ratchet, mirror of
+                    # the LONG fix. For SHORT a lower stop is always tighter — never raise
+                    # it here, regardless of whether current_sl is "wrong-sided" (below
+                    # entry = a legitimate profit lock since the entry cap was removed).
+                    new_sl = min(new_sl, current_sl)
             else:
                 new_sl = max(new_sl, round(entry_f * (1 + ATR_SL_MIN), 8))
                 if current_sl > 0:

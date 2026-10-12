@@ -97,6 +97,11 @@ def export_all():
         for coin in coins:
             sym = coin['symbol']
             table = _table_name(sym)
+            # FIX (BUG-010, 2026-10-11): hoist path/tmp above try so the handler can
+            # clean up an orphaned .tmp if json.dump or os.replace fails, and log the
+            # failure instead of swallowing it (was bare except:pass).
+            path = os.path.join(WWW_COINS, f'{sym}.json')
+            tmp = path + '.tmp'
             try:
                 events = conn.execute(
                     f"SELECT ts, price, vol_1h, health, health_score, signal_type, signal_confidence, "
@@ -119,14 +124,17 @@ def export_all():
                         'vol_profile': coin.get('vol_profile'),
                         'events': [dict(e) for e in events],
                     }
-                    path = os.path.join(WWW_COINS, f'{sym}.json')
-                    tmp = path + '.tmp'
                     with open(tmp, 'w') as f:
                         json.dump(coin_out, f)
                     os.replace(tmp, path)
                     exported += 1
-            except Exception:
-                pass
+            except Exception as e:
+                print(f'[coin_tracker_api] {sym} export failed: {e}', flush=True)
+                try:
+                    if os.path.exists(tmp):
+                        os.remove(tmp)
+                except OSError:
+                    pass
 
         print(f'[coin_tracker_api] Exported {exported} per-coin histories')
     finally:

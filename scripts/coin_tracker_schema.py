@@ -129,6 +129,57 @@ def init_db():
 
 _TABLE_EXISTS_CACHE = set()
 
+# FIX (BUG-012, 2026-10-11): single source of truth for the per-coin table DDL.
+# The two 40-line CREATE TABLE blocks in ensure_coin_table (conn-provided and
+# standalone paths) were byte-identical duplicates — a schema change applied to
+# only one would silently diverge the two paths.
+_COIN_TABLE_DDL = """CREATE TABLE IF NOT EXISTS {table} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts INTEGER NOT NULL,
+                event_type TEXT NOT NULL,
+                price REAL,
+                bid REAL,
+                ask REAL,
+                spread_bps REAL,
+                vol_1m REAL,
+                vol_5m REAL,
+                vol_1h REAL,
+                vol_24h REAL,
+                rsi_14 REAL,
+                macd_hist REAL,
+                ema_9 REAL,
+                ema_20 REAL,
+                ema_50 REAL,
+                atr_14 REAL,
+                health TEXT,
+                health_score REAL,
+                signal_type TEXT,
+                signal_confidence REAL,
+                regime TEXT,
+                notes TEXT,
+                wyckoff_phase TEXT,
+                ewave_count INTEGER,
+                ewave_degree TEXT,
+                ewave_direction TEXT,
+                trend_quality REAL,
+                trend_direction TEXT,
+                sr_levels TEXT,
+                vol_profile TEXT,
+                setup_score REAL,
+                setup_type TEXT,
+                setup_details TEXT,
+                clustering_bullish REAL,
+                clustering_bearish REAL,
+                recency REAL
+            )"""
+
+def _create_coin_table(db, table):
+    """Create the per-coin table + indexes on an existing connection."""
+    db.execute(_COIN_TABLE_DDL.format(table=table))
+    db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")
+    db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_health ON {table}(health)")
+    db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_event ON {table}(event_type)")
+
 def ensure_coin_table(symbol, conn=None):
     """Create per-coin table if it doesn't exist. Returns table name.
     If conn is provided, use it (caller manages lifecycle). Otherwise use _db()."""
@@ -143,50 +194,7 @@ def ensure_coin_table(symbol, conn=None):
         if exists:
             _TABLE_EXISTS_CACHE.add(table)
             return table
-        conn.execute(f"""
-            CREATE TABLE IF NOT EXISTS {table} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ts INTEGER NOT NULL,
-                event_type TEXT NOT NULL,
-                price REAL,
-                bid REAL,
-                ask REAL,
-                spread_bps REAL,
-                vol_1m REAL,
-                vol_5m REAL,
-                vol_1h REAL,
-                vol_24h REAL,
-                rsi_14 REAL,
-                macd_hist REAL,
-                ema_9 REAL,
-                ema_20 REAL,
-                ema_50 REAL,
-                atr_14 REAL,
-                health TEXT,
-                health_score REAL,
-                signal_type TEXT,
-                signal_confidence REAL,
-                regime TEXT,
-                notes TEXT,
-                wyckoff_phase TEXT,
-                ewave_count INTEGER,
-                ewave_degree TEXT,
-                ewave_direction TEXT,
-                trend_quality REAL,
-                trend_direction TEXT,
-                sr_levels TEXT,
-                vol_profile TEXT,
-                setup_score REAL,
-                setup_type TEXT,
-                setup_details TEXT,
-                clustering_bullish REAL,
-                clustering_bearish REAL,
-                recency REAL
-            )
-        """)
-        conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")
-        conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_health ON {table}(health)")
-        conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_event ON {table}(event_type)")
+        _create_coin_table(conn, table)
         _TABLE_EXISTS_CACHE.add(table)
         return table
     # Standalone mode — use context manager
@@ -197,50 +205,7 @@ def ensure_coin_table(symbol, conn=None):
         if exists:
             _TABLE_EXISTS_CACHE.add(table)
             return table
-        db.execute(f"""
-            CREATE TABLE IF NOT EXISTS {table} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ts INTEGER NOT NULL,
-                event_type TEXT NOT NULL,
-                price REAL,
-                bid REAL,
-                ask REAL,
-                spread_bps REAL,
-                vol_1m REAL,
-                vol_5m REAL,
-                vol_1h REAL,
-                vol_24h REAL,
-                rsi_14 REAL,
-                macd_hist REAL,
-                ema_9 REAL,
-                ema_20 REAL,
-                ema_50 REAL,
-                atr_14 REAL,
-                health TEXT,
-                health_score REAL,
-                signal_type TEXT,
-                signal_confidence REAL,
-                regime TEXT,
-                notes TEXT,
-                wyckoff_phase TEXT,
-                ewave_count INTEGER,
-                ewave_degree TEXT,
-                ewave_direction TEXT,
-                trend_quality REAL,
-                trend_direction TEXT,
-                sr_levels TEXT,
-                vol_profile TEXT,
-                setup_score REAL,
-                setup_type TEXT,
-                setup_details TEXT,
-                clustering_bullish REAL,
-                clustering_bearish REAL,
-                recency REAL
-            )
-        """)
-        db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_ts ON {table}(ts)")
-        db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_health ON {table}(health)")
-        db.execute(f"CREATE INDEX IF NOT EXISTS idx_{table}_event ON {table}(event_type)")
+        _create_coin_table(db, table)
         db.commit()
         _TABLE_EXISTS_CACHE.add(table)
     return table

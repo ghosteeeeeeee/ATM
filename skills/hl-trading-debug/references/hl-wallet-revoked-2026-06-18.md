@@ -23,9 +23,9 @@ GITHUB_TOKEN=*** HL_SIGNING_KEY is MISSING
 `~/.secrets/hyperliquid-main.json` (the actual funded wallet on HL):
 ```json
 {
-  "hyperliquid_private_key": "0x588d57f88d8dd7e0561d2c838a1bb02fdcab56f85ea69c3fc3420879d42c40e6",
+  "hyperliquid_private_key": "0x[REDACTED-PRIVATE-KEY-BUG-036]",
   "hyperliquid_address": "0x5AB4AC1b62A255284b54230b980AbA66D80A",
-  "hyperliquid_api_key": "0x588d57f88d8dd7e0561d2c838a1bb02fdcab56f85ea69c3fc3420879d42c40e6",
+  "hyperliquid_api_key": "0x[REDACTED-PRIVATE-KEY-BUG-036]",
   "main_account_address": "0x324a9713603863FE3A678E83d7a81E20186126E7"
 }
 ```

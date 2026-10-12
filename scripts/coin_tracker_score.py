@@ -1421,7 +1421,10 @@ def compute_coin_regime(closes, ema_9=None, ema_20=None, ema_50=None, rsi_14=Non
     if not closes or len(closes) < 20:
         return 'NEUTRAL'
     
-    price = closes[0]
+    # FIX (BUG-059, 2026-10-11): closes is OLDEST-FIRST — current price is closes[-1],
+    # not closes[0]. Old code read the OLDEST candle as "price" and computed momentum
+    # backwards, so regime votes were inverted in production (uptrend→BEAR).
+    price = closes[-1]
     above_20 = price > ema_20 if ema_20 else None
     above_50 = price > ema_50 if ema_50 else None
     ema20_above_50 = ema_20 > ema_50 if ema_20 and ema_50 else None
@@ -1443,21 +1446,22 @@ def compute_coin_regime(closes, ema_9=None, ema_20=None, ema_50=None, rsi_14=Non
         if rsi_14 > 55: bull += 1
         elif rsi_14 < 45: bear += 1
     
-    # Price momentum (last 10 candles)
+    # Price momentum (last 10 candles — oldest-first: closes[-1] vs closes[-10])
     if len(closes) >= 10:
-        momentum = (closes[0] - closes[9]) / closes[9] * 100
+        momentum = (closes[-1] - closes[-10]) / closes[-10] * 100
         if momentum > 0.5: bull += 1
         elif momentum < -0.5: bear += 1
     
     # Price momentum (last 20 candles)
     if len(closes) >= 20:
-        momentum20 = (closes[0] - closes[19]) / closes[19] * 100
+        momentum20 = (closes[-1] - closes[-20]) / closes[-20] * 100
         if momentum20 > 1.0: bull += 1
         elif momentum20 < -1.0: bear += 1
     
     # EMA 9 slope (short-term momentum)
     if len(closes) >= 12 and ema_9:
-        ema_9_prev = ema(closes[1:11], 9) if len(closes) >= 11 else None
+        # Oldest-first: the 10 candles BEFORE the current one are closes[-11:-1]
+        ema_9_prev = ema(closes[-11:-1], 9) if len(closes) >= 11 else None
         if ema_9_prev and ema_9 > ema_9_prev * 1.001: bull += 1
         elif ema_9_prev and ema_9 < ema_9_prev * 0.999: bear += 1
     

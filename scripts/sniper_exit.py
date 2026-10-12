@@ -757,7 +757,21 @@ def sniper_close_position(pos, reason, dry_run=False):
             # FIX (2026-10-08, BUG-027 follow-up): include stdout — brain.py's
             # "✗ trade #N was not open or not found" diagnostic goes to stdout.
             log.warning(f"  DB close failed for {token}: rc={result.returncode} stderr={result.stderr[:100]} stdout={result.stdout.strip()[:120]}")
-            return False
+            # FIX (BUG-062, 2026-10-11): the HL position is ALREADY CLOSED at this
+            # point — a failed brain.py close leaves a PHANTOM-OPEN DB trade, and
+            # hl_sync_guardian.close_orphan_paper_trades() will RE-MIRROR it onto
+            # HL (undoing this close + double fees). Retry once, then scream.
+            log.error(f"  DB close failed for {token} — HL ALREADY CLOSED; retrying brain.py in 5s")
+            time.sleep(5)
+            try:
+                r2 = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+                if r2.returncode == 0:
+                    log.info(f"  DB close retry succeeded for {token} id={trade_id}")
+                    return True
+            except Exception as _r2e:
+                log.error(f"  DB close retry errored for {token}: {_r2e}")
+            log.critical(f"  PHANTOM-OPEN: HL closed {token}, DB trade #{trade_id} still open — guardian may re-mirror this position!")
+            return True
     except Exception as e:
         log.error(f"  DB close error for {token}: {e}")
         return False
@@ -861,11 +875,20 @@ def sniper_check(dry_run=False):
                 else:
                     staying.append(p)
             else:
-                staying.append(p)  # No data — close (safe default)
+                # FIX (BUG-062, 2026-10-11): FAIL-OPEN — never CLOSE on missing data.
+                # The old "No data — close (safe default)" treated absence of evidence
+                # as proof of divergence: a missing token_speeds row (or a stale cache)
+                # would market-close a healthy position. Closing realizes PnL and must
+                # require positive evidence.
+                diverging.append(p)
+                log.info(f"  [DIVERGENCE] {token} {direction} — NO speed data — keeping (fail-open, never close on missing data)")
         _conn.close()
     except Exception as e:
         log.warning(f"Divergence check error: {e}")
-        staying = wrong_side  # On error, close all (safe default)
+        # FIX (BUG-062): FAIL-OPEN — a DB/SQLite error (lock, schema drift) used to
+        # set staying = wrong_side = MASS-CLOSE of every wrong-side position. Close
+        # nothing on infrastructure failure; self-heals next cycle.
+        staying = []
 
     if not staying:
         log.info(f"  All wrong-side positions diverging from BTC — no closes")
