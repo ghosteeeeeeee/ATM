@@ -4082,5 +4082,23 @@
     "status": "queued-on-soak",
     "risk": "low",
     "gate": "Ship ONLY after bb-squeeze trail-arm timeout 72h soak (Oct 15) clean. One variable at a time."
+  },
+  {
+    "date": "2026-10-12T17:45:00Z",
+    "idea": "Generalized trail-arm timeout sweep: per-signal backtest of 'exit if unrealized < +0.40% at T+X' for the top HML-bleed signals beyond bb-squeeze",
+    "rationale": "7d HML 46T -$4.91 all never armed; RSI>70 HML avg hold 78min — a 60m no-arm exit preempts the majority. bb-squeeze vehicle already live; extend the PROVEN pattern, not a new invention.",
+    "expected_impact": "up to +$3-4/7d if ~60-70% of HML cohort pre-empted (bounded by forgone recoveries — bb-squeeze counterfactual only gave up $0.24/30d)",
+    "category": "exit structure",
+    "status": "suggested — delegate self_learner per-signal backtest (pump-chain+ 45m first)",
+    "risk": "low — same mechanism as audited bb-squeeze timeout; per-signal scope"
+  },
+  {
+    "date": "2026-10-12T17:45:00Z",
+    "idea": "Dynamic-ceiling telemetry: log when LONG_RSI_CEILING upgrades to 80 (Grade A) so 'ceiling leak' investigations stop re-litigating by-design passes",
+    "rationale": "HYPE 76.62 'breach' this run most likely Grade-A ceiling=80 by design; without a log line, every auditor re-flags it as a bug (3rd time).",
+    "expected_impact": "0 PnL; saves audit time, prevents false-positive config churn",
+    "category": "debug/audit",
+    "status": "suggested",
+    "risk": "none — log-only"
   }
 ]

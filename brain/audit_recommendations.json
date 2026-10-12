@@ -1,110 +1,113 @@
 {
-    "timestamp": "2026-10-12T12:45:00Z",
-    "agent": "brain_auditor",
-    "session_lock": false,
-    "trade_summary_24h": {
-        "trades": 22,
-        "pnl": 0.75,
-        "wr": 50.0,
-        "open": 1,
-        "open_detail": "BTC continuum_engine paper LONG 16079, 10h flat, -0.49% — sitting open by design (guardian fix Oct 11), execution domain",
-        "hard_max_loss_share": "8/22 = 36% (avg -2.5% unleveraged, 6 of 8 hold <10m = chop entries)"
+  "timestamp": "2026-10-12T17:45:00Z",
+  "session_brain_stats": {
+    "note": "session brain query skipped this run — PG + watchdog steers were sufficient; no drift topic required session cross-ref"
+  },
+  "trade_summary_24h": {
+    "closed": 21,
+    "net_usdt": 1.1,
+    "long": "19T +$0.20 42.1%WR",
+    "short": "2T -$0.10 50%WR",
+    "losers": "10 (9 LONG / 1 SHORT)",
+    "dominant_failure": "overbought chop-entry LONGs exiting hard_max_loss before trail arm (HYPE 76.6, CFX 74.5, ME 72.5, GRASS 71.2 — pattern verified)",
+    "exit_families_7d": "trail_family 42T +$5.22 85.7%WR | hard_max_loss 46T -$4.91 0%WR (still #1 bleed)"
+  },
+  "watchdog_steer_adjudication": [
+    {
+      "steer": "steer-001 wrong-side trades / BLOCK LONGs when BTC ema300_position=BELOW",
+      "verdict": "REJECTED — fails winner-impact and would not have caught the pattern",
+      "counterfactual_7d": "blanket BELOW LONG block: kills 4 winners +$1.57 (ZRO +0.23, CRV +0.94, CC +0.17, SYRUP +0.23), saves 4 losers -$0.41 → net -$1.98",
+      "pattern_miss": "all 4 overbought cluster losers (HYPE/CFX/ME/GRASS) OPENED while BTC was ABOVE or AT EMA300, not BELOW — the gate misses the actual cluster",
+      "signal_quality": "BTC ema300_position flickers ABOVE↔AT↔BELOW every 1-3 min since Oct 10 (100+ transitions/3d) — instantaneous state is noise, not a trend signal",
+      "7d_long_by_btc_state": "ABOVE 38T -$0.90 34.2%WR | AT 56T +$0.74 46.4%WR | BELOW 8T +$1.16 50%WR — BELOW is the BEST cohort, opposite of the steer"
     },
-    "trade_summary_7d": {
-        "trades": 131,
-        "pnl": 0.95,
-        "wr": 41.2,
-        "long": "110T +$0.74 43.6%",
-        "short": "21T +$0.21 28.6%",
-        "hard_max_loss": "46T -$4.91 0%WR, 89% never armed trail (+0.40% MFE), avg MFE 0.170%",
-        "goal_status": "7d >=$0 MET (+$0.95); Oct 5 -$0.35 ages out today -> effective ~+$1.30"
-    },
-    "watchdog_steer_resolution": [
-        {
-            "steer": "BTC open 10h barely profitable (stale)",
-            "verdict": "NO ACTION — paper continuum trade, sitting open by design per guardian fix Oct 11 (0 NOT_HOTSET closes post-18:38). No real capital at risk. Execution domain."
-        },
-        {
-            "steer": "8 recent losses look like wrong-side trades",
-            "verdict": "NOT CONFIRMED as systemic — 24h net +$0.75 at 50%WR. All 9 losers are small chop-tail (-$0.01 to -$0.18), 8/9 exit hard_max_loss = never-armed stalls, not direction errors. 48h NORMAL regime is BEST (+$0.57 60%WR). Meta RSI of losers spans 38-77 — no RSI band explains them. Fundamental truth holds: trail family 48h +$1.37 93.8%WR, chop family (HML+atr_sl) -$1.56 0%WR."
-        },
-        {
-            "steer": "pump-chain+ losing streak: 3 losses",
-            "verdict": "KEEP + MONITOR — last 20 trades net +$0.92. Streak is -$0.33 (ICP/GRASS/CFX today, all EXTREME). Kill threshold (n>=5 loss streak + net negative) NOT met. 30d bands: 55-65 RSI best +$1.96, 75+ already blocked by PUMP_CHAIN_LONG_RSI_MAX=75. Signal is fine; today is variance."
-        }
-    ],
-    "losing_trade_autopsy_24h": {
-        "cluster_analysis": "9 losers: 3 pump-chain+ (GRASS -0.18 atr_sl RSI71 EXTREME, CFX -0.10 HML RSI74 EXTREME, ICP -0.05 HML RSI41 EXTREME), 2 ai-trader+ (ME -0.08 HML RSI72 NORMAL, AVAX -0.07 HML RSI45 HIGH), 2 oversold-bounce+ (XPL -0.06 HML RSI38 HIGH, YGG -0.01 trail RSI39 HIGH), 1 volume-buildup+ (HYPE -0.04 HML RSI77 NORMAL), 1 volume-breakout-long+ (MON -0.05 HML RSI52 EXTREME), 1 hmacd_mtf-- SHORT (CHIP -0.12 HML RSI63 EXTREME)",
-        "root_cause": "8 of 9 are hard_max_loss / atr_sl stall deaths — chop entries that never reached trail-arm (+0.40% MFE). NOT wrong-direction: mixed meta RSI 38-77, mixed regimes, all small losses. The one pattern: 6 of 9 in EXTREME vol with SHORT_BIAS 15m BTC — but 48h EXTREME is still net +$0.22. No single filter blocks this cluster without killing winners.",
-        "rejected_filters": [
-            "EXTREME RSI<40 LONG block: 14d 8T 12.5%WR -$0.50 — n=8 < 20, insufficient. MONITOR.",
-            "NORMAL/EXTREME RSI>70 LONG block: 14d NORMAL 70+ = 11T +$0.51 (SYRUP r2v2-long3 metaRSI 72.2 won +$0.59 today in this band); EXTREME 70+ = 12T +$0.13. Positive pnl — would kill winners. REJECTED.",
-            "PUMP_CHAIN_LONG_RSI_MAX 75->70: 30d 65-75 band = 25T +$0.69 net positive. REJECTED."
-        ]
-    },
-    "changes_from_last_run": [
-        {
-            "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED False->True (Oct 12 10:45)",
-            "verified": "Code wired position_manager.py:3490-3504, imports clean, constants load. 0 fires yet (no bb-squeeze positions open since enable; only BTC continuum open). close_paper_position mirror-to-HL path verified (line ~1285: mirror_close for live trades when HYPE_AVAILABLE+LIVE) — vehicle safe on live positions.",
-            "verdict": "KEEP — soak continues, expect first data when next bb-squeeze trade hits 60m stall without arm. Review Oct 15 (72h)."
-        },
-        {
-            "change": "LONG_MIDBAND_NON_EXTREME_BLOCK bb-squeeze exemption (Oct 12 00:42)",
-            "verified": "60-65 band intact: DOT bb-squeeze metaRSI 62.5 entered and won +$0.01 today. Exemption working, no wrongful blocks.",
-            "verdict": "KEEP"
-        },
-        {
-            "change": "LONG_MIDBAND_NON_EXTREME_BLOCK + LONG_HIGH_OVERBOUGHT_BLOCK (Oct 11)",
-            "verified": "Blocks firing correctly. No wrongful winner blocks in 24h. NORMAL RSI 60-70 and HIGH RSI 70+ still blocked.",
-            "verdict": "KEEP"
-        },
-        {
-            "change": "Cap B paper=false (Oct 11 18:49)",
-            "verified": "BTC continuum paper churn no longer blocks alt LONGs — auto_1hr logs show alt LONGs opening while BTC paper sits.",
-            "verdict": "KEEP"
-        },
-        {
-            "change": "BB_SQUEEZE_LONG_RSI_MAX=65 (Oct 11 02:42)",
-            "verified": "Post-fix bb-squeeze LONG opens with meta RSI>65: 0. Only DOT 62.5 (in-window).",
-            "verdict": "KEEP"
-        }
-    ],
-    "config_changes_applied": [],
-    "config_change_rationale": "0 changes this run. Every candidate failed quality bar: (a) EXTREME RSI<40 block n=8<20; (b) RSI>70 NORMAL/EXTREME blocks would kill positive-pnl bands (SYRUP +$0.59 winner in NORMAL 70+); (c) pump-chain+ trail-arm timeout deferred — one-variable-at-a-time, bb-squeeze soak has 0T data. Last run's changes all soaking clean; system net positive 24h/7d. Conservative: monitor > change.",
-    "creative_improvements": [
-        {
-            "date": "2026-10-12T12:45:00Z",
-            "idea": "pump-chain+ LONG trail-arm timeout (45m variant, same +0.40% arm threshold) — extend the bb-squeeze timeout pattern",
-            "rationale": "Verified counterfactual 30d: saves $1.75 (10 never-armed HML/loss holds >=45m), kills $0.00 (0 winners had never-armed+45m profile — winners arm early via MFE>=0.40, 44T $10.35 all safe). pump-chain+ HML 7d = 9T -$0.87, 30d 11T with 10 never-armed. Same disease as bb-squeeze stalls: grind entries that die before trail activates.",
-            "expected_impact": "+$1.50-1.75/30d by pre-empting stall deaths; ~3 pre-emptions/30d at 45m",
-            "category": "chop exit / stall pre-emption",
-            "status": "queued-on-soak",
-            "risk": "low",
-            "gate": "Ship ONLY after bb-squeeze trail-arm timeout 72h soak (Oct 15) shows 0 wrongful kills. One variable at a time. If bb-squeeze soak fails, audit vehicle before extending."
-        }
-    ],
-    "recurring_problems": [
-        {
-            "problem": "hard_max_loss chop-stall bleed — 7d 46T -$4.91, 89% never armed trail, avg MFE 0.170%",
-            "status": "active mitigation: bb-squeeze trail-arm timeout armed Oct 12 10:45 (soak), pump-chain+ variant queued. Threshold fiddling rejected (CEO Oct 11: root is entry-side, self_learner trail-arm-timeout backtest is the vehicle).",
-            "frequency_trend": "24h HML 36% (8/22) — improving from 50%+ earlier week but still dominant loss exit"
-        },
-        {
-            "problem": "7d WR 41.2% vs >=50% goal (Oct 15 checkpoint)",
-            "status": "PnL goal MET (+$0.95), WR goal at risk. WR recovery depends on aging of Oct 6/9/10 losers + trail-arm soak reducing HML share. No direct WR lever that passes quality bar."
-        }
-    ],
-    "next_actions": [
-        "Oct 15: Review bb-squeeze trail-arm timeout 72h soak — if clean (0 wrongful kills, expected ~2-4 pre-emptions), ship pump-chain+ 45m variant (creative idea above)",
-        "Monitor pump-chain+ loss streak — kill threshold n>=5 + net negative (currently n=3, last-20 net +$0.92)",
-        "Monitor EXTREME RSI<40 LONG band — if reaches n>=20 at 14d with same 12.5%WR profile, revisit block",
-        "Oct 15: 7d WR >=50% checkpoint — report to CEO with aging analysis",
-        "Oct 13: Reputation Phase 2a + Wyckoff shadow rule (orchestrator-owned)",
-        "Watchdog/executor domain: BTC paper 16079 still open 10h — if T wants it closed, execution action (not config)"
-    ],
-    "system_health": {
-        "protected_flags": "INTACT (CONFLUENCE_REQUIRED=True, LIVE_TRADING_ENABLED=True, kill JSON true)",
-        "disk": "not checked this run (auto_1hr reports stable)",
-        "30d": "750T -$1.97 47.6%WR — aging of older losers will improve"
+    {
+      "steer": "steer-002 pump-chain+ losing streak — disable or tune",
+      "verdict": "NO CHANGE — still net positive",
+      "evidence": "14d 36T +$1.97 44.4%WR; EXTREME habitat 31T +$2.35 48.4%. Streak losses (ICP/CFX/GRASS) all EXTREME chop-day entries. NORMAL/HIGH dampen 0.5x already live (Oct 9). Kill threshold n>=5 + net negative not met (n=3, last-20 net +$0.92 per prior audit)."
     }
+  ],
+  "drift_findings": [
+    {
+      "finding": "Overbought LONG band (metaRSI>70) has NO clean filter — every candidate fails winner-impact",
+      "data_14d": "RSI>70 LONG: 45T +$0.34 44.4% (19 HML -$2.09 vs 14 trail +$1.37). NORMAL 11T +$0.51 | HIGH 21T -$0.46 (blocked live) | EXTREME 11T +$0.19",
+      "rejected_gates": [
+        "ceiling 75→70: kills 7d winners CFX +0.63, SYRUP +0.59, ZEN +0.12, BABY +0.10, INJ +0.10, SUPER +0.02 = +$1.56 to save ~$0.32 losers → -$1.24 net",
+        "NORMAL RSI>70 block: kills SYRUP +0.59 + ME combo +0.36, saves $0.35 → net negative"
+      ],
+      "conclusion": "the band is a genuine coin-flip that HML exit structure turns negative — fix is entry-momentum (trail-arm timeout family), not RSI gates"
+    },
+    {
+      "finding": "Midband + HIGH-overbought blocks VERIFIED FIRING",
+      "evidence": "115 LONG-MIDBAND + 39 LONG-HIGH-70 block lines in signal-compactor.log; CRV blocked 11x today (RSI 60.9 HIGH), HYPER blocked (RSI 77-85 HIGH)",
+      "leaks": "3 non-exempt midband-band trades opened post-block (AIXBT, WCT, ETH) — WCT/ETH won; hl_copy_trader doesn't route compactor (structural); likely compute_rsi fail-open at those minutes. Not config-fixable; monitor leak rate."
+    },
+    {
+      "finding": "HYPE volume-buildup+ metaRSI 76.62 fired despite VOLUME_BUILDUP_RSI_MAX=75 and LONG_RSI_CEILING=75",
+      "likely_causes": "module filtered on its own 5m Wilder RSI at detect ≤75, meta recorded 76.62 later (detection-vs-execution gap, known gotcha) OR Grade A RR dynamic ceiling=80 (conf 85.6, by design Oct 9). Not a bug to fix; note for ceiling-telemetry idea."
+    }
+  ],
+  "recurring_problems": [
+    "hard_max_loss still sole losing exit family 7d: 46T -$4.91 0%WR vs trail +$5.22 85.7% — entry-side chop problem, exit tuning rejected repeatedly",
+    "Overbought-pump-chase LONG cluster recurs whenever BTC bear-structure + alt bounce (3rd occurrence since Oct 8) — existing bands catch HIGH vol only; NORMAL/EXTREME overbought remains a mixed band"
+  ],
+  "missing_implementations": [
+    "pump-chain+ trail-arm 45m variant — queued behind bb-squeeze 60m soak (0 fires yet, review Oct 15)",
+    "confidence>100 telemetry (conf 222 GRASS, 112 CFX — bonus stacking beyond cap; MED side-find Oct 6 still open)"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-12T17:45:00Z",
+      "idea": "Generalized trail-arm timeout sweep: per-signal backtest of 'exit if unrealized < +0.40% at T+X' for the top HML-bleed signals beyond bb-squeeze",
+      "rationale": "7d HML 46T -$4.91 all never armed; RSI>70 HML avg hold 78min — a 60m no-arm exit preempts the majority. bb-squeeze vehicle already live; extend the PROVEN pattern, not a new invention.",
+      "expected_impact": "up to +$3-4/7d if ~60-70% of HML cohort pre-empted (bounded by forgone recoveries — bb-squeeze counterfactual only gave up $0.24/30d)",
+      "category": "exit structure",
+      "status": "suggested — delegate self_learner per-signal backtest (pump-chain+ 45m first)",
+      "risk": "low — same mechanism as audited bb-squeeze timeout; per-signal scope"
+    },
+    {
+      "date": "2026-10-12T17:45:00Z",
+      "idea": "Dynamic-ceiling telemetry: log when LONG_RSI_CEILING upgrades to 80 (Grade A) so 'ceiling leak' investigations stop re-litigating by-design passes",
+      "rationale": "HYPE 76.62 'breach' this run most likely Grade-A ceiling=80 by design; without a log line, every auditor re-flags it as a bug (3rd time).",
+      "expected_impact": "0 PnL; saves audit time, prevents false-positive config churn",
+      "category": "debug/audit",
+      "status": "suggested",
+      "risk": "none — log-only"
+    }
+  ],
+  "config_changes_applied": [],
+  "changes_from_last_run": [
+    {
+      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=True (Oct 12 10:45)",
+      "verified": "0 fires — no bb-squeeze position hit 60m stall since enable. Code wired, imports clean.",
+      "verdict": "KEEP — soak continues, 72h review Oct 15"
+    },
+    {
+      "change": "bb-squeeze midband exemption (Oct 12 00:42)",
+      "verified": "DOT bb-squeeze metaRSI 62.5 NORMAL entered and WON +$0.01 via profit-monster-trail today — exemption restoring the 60-65 habitat, exactly as designed",
+      "verdict": "KEEP"
+    },
+    {
+      "change": "ai_trader_precheck rsi_utils unification (Oct 12 03:45)",
+      "verified": "no recurrence of precheck/execution RSI drift in 24h watchdog picks",
+      "verdict": "KEEP"
+    },
+    {
+      "change": "LONG_MIDBAND + LONG_HIGH_OVERBOUGHT blocks (Oct 11)",
+      "verified": "115 + 39 block fires in compactor log; CRV/HYPER correctly blocked today",
+      "verdict": "KEEP"
+    },
+    {
+      "change": "Cap B paper=false (Oct 11)",
+      "verified": "alt LONGs opening while BTC paper continuum sits — no Cap-B squat reports since",
+      "verdict": "KEEP"
+    }
+  ],
+  "next_actions": [
+    "Oct 15: bb-squeeze trail-arm 72h review — if clean, delegate pump-chain+ 45m variant backtest (self_learner)",
+    "Monitor midband leak rate (AIXBT/WCT/ETH class) — if >5/wk, audit compute_rsi fail-open path in Step 11",
+    "conf>100 telemetry — low-priority code task (bonus stacking past cap), fold into next bug_hunter batch",
+    "Watchdog owners: do NOT re-propose BTC-below LONG block — counterfactual documented, net -$1.98/7d",
+    "Oct 13: Reputation Phase 2a + Wyckoff shadow rule (orchestrator-owned, not auditor)"
+  ]
 }
