@@ -8684,3 +8684,24 @@ Final set: []
 
 **Open Questions:**
 - BTC continuum LONG open ~9h flat $0.00 — 9th consecutive hour flagged; continuum is low-frequency by design, monitor but no action
+
+## [2026-10-12 12:14] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 | 24h: 22T 12W +$0.75 (54.5%) | 1 open (BTC continuum LONG since 02:13, ~10h flat $0.00)
+
+**Changes:** None.
+
+**No Change Needed:**
+- atr_sl_hit 1/22 ≈ 4.5% of 24h closes — under 40%, tpsl_utils deployed
+- Kill: 0 candidates — 0T last hour; 24h losers pump-chain+ 4T 1W −$0.31, ai-trader+ 3T 1W −$0.13 — both have wins, n too small, same watchlist 7+ hours; oversold-bounce+ 2T 0W −$0.07 under 3T threshold
+- hard_max_loss 8/22 ≈ 36% −$0.57 (avg −$0.071) — hold brain_auditor (SL width lever), not touched
+- profit-monster-trail 7/24h +$0.81, hard_tp 2 +$0.59 — trailing remains profit engine
+- Overtrade: 0/hr — well under 20
+- Streak: 08h −$0.09, 09h −$0.12, 10h/11h $0.00 (zero-trade) — not 3 consecutive negative PnL hours; no action
+- live_trading=true (constants + kill JSON), timers fresh (≤1min ago)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- BTC continuum LONG open ~10h flat $0.00 — 10th consecutive hour flagged; continuum is low-frequency by design, monitor but no action
