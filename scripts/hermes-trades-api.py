@@ -222,7 +222,7 @@ def get_trades(status='open', limit=20, offset=0):
                    signal, confidence, leverage, amount_usdt,
                    trailing_activation, trailing_distance, exit_price, atr_managed
             FROM trades
-            WHERE (server = 'Hermes' OR server IS NULL) AND status = %s
+            WHERE status = %s
             ORDER BY
                 CASE WHEN %s = 'open' THEN id END DESC,
                 CASE WHEN %s = 'closed' THEN close_time END DESC

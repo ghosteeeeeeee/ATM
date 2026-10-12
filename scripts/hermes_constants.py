@@ -1680,6 +1680,10 @@ STALE_ROTATION_ENABLED = False  # PAUSED 2026-08-04 — closing trades too aggre
 # Combos: 'atr+pm_tiers', 'rr_engine+pm_tiers', etc.
 # Default: 'pm_trail' (current behavior for all signals not listed)
 SIGNAL_EXIT_CONFIG = {
+    # AI trader: RR engine exit — structural S/R based SL/TP
+    'ai-trader+': 'rr_engine',
+    'ai-trader-': 'rr_engine',
+    'ai-trader': 'rr_engine',
     # Open-skies: structural exit (resistance/support) + ATR SL as floor
     'open-skies+': 'rr_engine',
     'open-skies-': 'rr_engine',

@@ -1,7 +1,12 @@
-# Current State — Daily Orchestrator Oct 12 00:50 UTC
+# Current State — Daily Orchestrator Oct 12 02:30 UTC
 
-**Last Updated: 2026-10-12 00:50 UTC**
-**Updated by: CEO — chase quality exemption shipped (1 config change)**
+**Last Updated: 2026-10-12 02:30 UTC**
+**Updated by: CEO — regime-recalibration decision (0 trading config changes)**
+
+## REGIME RECALIBRATION (Oct 12 02:30)
+- Independent repro FAILED to confirm SHORT 2.5-4.0 hump (t=0.95 vs claimed 1.92; LOO t=0.49; band-membership mismatch n=244>209). EXTREME-hi SHORT-allow REJECTED.
+- MAXXED(≥4.0) tier: shadow-approved only; must map EXTREME-equivalent (naive relabel unblocks EXTREME restrictions).
+- Awaiting: own-conclusions fresh repro + signal_analyst MAXXED shadow script. 7d PnL flipped −$0.10.
 
 ## PIPELINE (PG-verified 21:55)
 
