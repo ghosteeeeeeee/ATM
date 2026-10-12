@@ -76,13 +76,14 @@ ceo_release_lock() {
 # scanning the streamed jsonl for terminal evidence and write the CLASS (not the
 # raw exit code) to the .exit file, so a poller that only reads .exit cannot
 # mistake a dead run for a clean success:
-#   ok         — a real completion marker, OR evidence of actual work (tool calls /
-#                assistant text) with no failure signal. A genuinely finished run
-#                always emits one of these.
-#   incomplete — the run streamed events but never reached a completion marker and
-#                shows no failure (e.g. the model ended its turn early, or the
-#                stream was cut). MUST NOT read as ok — this is the size-only
-#                fallback trap: a 250-byte markerless jsonl is not a finished run.
+#   ok         — the LAST streamed event is opencode's terminal step_finish with
+#                reason=stop, i.e. the agent ran to a clean completion. Anything
+#                less (work done but no terminal event) is 'incomplete', never 'ok'.
+#   incomplete — the run streamed events (tool calls / text) but the final event is
+#                not a completion — the model ended its turn early, hit its budget,
+#                or the stream was cut. MUST NOT read as ok: mere evidence of work
+#                is not evidence of completion, and treating it as such recreates
+#                the false-success bug this classifier exists to kill.
 #   failed     — a permission rejection / tool error is present
 #   silent     — jsonl has no usable content (crash before any output)
 ceo_classify_run() {
@@ -94,14 +95,24 @@ ceo_classify_run() {
     if grep -qiE 'auto-rejecting|rejected permission|permission rejected|"status": *"error"' "$jsonl"; then
         echo "failed"; return
     fi
-    if grep -qE '"finish": *"(stop|end_turn|success)"|"type": *"(result|final|message_complete)"' "$jsonl"; then
+    # Completion is detected on the LAST LINE ONLY. opencode's terminal event is
+    #   {"type":"step_finish","part":{"type":"step-finish","reason":"stop",...}}
+    # There is no "finish" key and no result/final/message_complete type — an
+    # earlier pattern looked for those and matched NOTHING across every real
+    # jsonl in logs/ceo, so 'ok' was unreachable and a clean run read as
+    # 'incomplete'. Whole-file matching is also wrong: a run killed mid-stream
+    # contains step_finish events from earlier turns (the killed run
+    # deep-20261012T172817Z.jsonl has 2), so only the final event is trustworthy.
+    if tail -n1 "$jsonl" | grep -qE '"type": *"step_finish".*"reason": *"stop"'; then
         echo "ok"; return
     fi
-    # No completion marker. Only claim 'ok' if the run demonstrably did WORK
-    # (issued tool calls or produced assistant text) — mere byte size is not
-    # evidence of completion, and treating it as such recreates the false-success
-    # bug this classifier exists to kill.
-    if grep -qE '"type": *"tool(_use)?"|"role": *"assistant"|"type": *"text"' "$jsonl"; then
+    # Not a clean stop. Work was demonstrably done if we see tool activity, an
+    # assistant turn, or a step_finish with any non-stop reason (e.g. the
+    # budget-exhausted 'tool-calls' reason the runners emit on a timeout). Mere
+    # byte size is NOT evidence of completion — treating it as such recreates the
+    # false-success bug this classifier exists to kill — but evidence of WORK is
+    # enough to distinguish "started and got cut off" from "produced nothing".
+    if grep -qE '"type": *"tool(_use)?"|"role": *"assistant"|"type": *"text"|"type": *"step_finish"' "$jsonl"; then
         echo "incomplete"; return
     fi
     echo "silent"

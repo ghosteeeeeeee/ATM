@@ -138,7 +138,7 @@ nohup bash -c '
     # Keep rc alongside the class so a timeout (124) stays visible — a
     # budget-exhausted run must not read as a clean "ok".
     echo "$(ceo_classify_run "$2") rc=$rc" > "$3"
-' _ "$PROMPT_FILE" "$jsonl" "$exitf" "$CEO_LOG_DIR/deep-${TS}.err" >/dev/null 2>&1 &
+' _ "$PROMPT_FILE" "$jsonl" "$exitf" "$CEO_LOG_DIR/deep-${TS}.err" 2>> "$CEO_LOG_DIR/deep-${TS}.err" &
 pid=$!
 echo "[CEO-DEEP] detached pid=$pid — poll $exitf (budget 1800s). Lock held until the run exits."
 echo "[CEO-DEEP] NOTE: $exitf contains a CLASS plus rc (e.g. 'ok rc=0', 'failed rc=0', 'silent rc=124'), not a bare exit code — opencode exits 0 even when the agent dies mid-run. Do not treat exit-0 as success; read the class. Child stderr: $CEO_LOG_DIR/deep-${TS}.err"

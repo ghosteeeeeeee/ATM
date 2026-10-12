@@ -84,7 +84,7 @@ nohup bash -c '
     # Keep rc alongside the class so a timeout (124) stays visible — a
     # budget-exhausted run must not read as a clean "ok".
     echo "$(ceo_classify_run "$2") rc=$rc" > "$3"
-' "$OPENCODE" "$PROMPT_FILE" "$jsonl" "$exitf" "$CEO_LOG_DIR/moe-${TS}.err" >/dev/null 2>&1 &
+' "$OPENCODE" "$PROMPT_FILE" "$jsonl" "$exitf" "$CEO_LOG_DIR/moe-${TS}.err" 2>> "$CEO_LOG_DIR/moe-${TS}.err" &
 pid=$!
 echo "[CEO-MOE] detached pid=$pid — poll $exitf for completion"
 rm -f "$TASK"
