@@ -564,3 +564,11 @@
 - **WARN**: `hermes-upgrade-implementer.service` timed out 06:17 UTC (2.1G memory peak, killed after timeout). Runs again in 12h cycle.
 - **INFO**: `hermes-atr-sl-updater.timer` unit not-found (stale reference in list-units).
 - **NOTE**: Disk at 83% (92G/118G); `candles.db` is 2.9 GB. Watch, not yet >85%.
+
+## Error Alerts — 2026-10-12 14:00 UTC
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+TOK+TOK, allowing despite TOK filter`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-12 15:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`

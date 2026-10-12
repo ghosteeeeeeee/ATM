@@ -59,10 +59,10 @@
 
 ## NEXT ACTIONS
 
-1. **Oct 13 06:40 run: Reputation Phase 2a wiring** (plan ready, pre-flight green, date-gated)
+1. ~~Reputation Phase 2a wiring~~ **DONE 2026-10-12** — wired live (REP_SHADOW_MODE=False), pickup file deleted, HALL-SHAME hard block replaced with 0.3x multiplier + combo override. Monitor for regressions.
 2. **Oct 13 06:40 run: Wyckoff shadow rule** (CEO escalation; if signal_analyst still undelivered, orchestrator implements shadow-only)
 3. **CEO: ratify/revert the 2 trail-arm enables** (audit: keep, +$0.97/30d corrected)
 4. Monitor pump-chain+/ai-trader+/hmacd_mtf-- watchlist (kill threshold n≥5)
 5. If CEO ratifies: delegate continuous-check-semantics counterfactual re-run
-6. Oct 15: 7d WR ≥50% checkpoint; bb-squeeze soak review; pump-chain 45m soak review; Rep 2b if 48h shadow clean
+6. Oct 15: 7d WR ≥50% checkpoint; bb-squeeze soak review; pump-chain 45m soak review
 7. Disk cleanup if >84%

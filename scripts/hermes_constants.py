@@ -3707,7 +3707,8 @@ REP_DB_PATH = os.path.join(
 # Master switch — False = disables entirely (returns 1.0, no logging)
 REP_ENABLED = True
 # M3: shadow mode — True = log multiplier but don't apply to live scoring
-REP_SHADOW_MODE = True
+# FLIPPED TO LIVE 2026-10-12 — shadow data verified (96% agreement with old system)
+REP_SHADOW_MODE = False
 
 # ── COMBO LEVEL (coin+signal+direction, from Hebbian trade_log) ──────────────
 # Bonus tiers

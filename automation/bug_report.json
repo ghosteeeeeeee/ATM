@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-10-12 13:25:33",
+  "timestamp": "2026-10-12 19:26:35",
   "total_checks": 20,
-  "passed": 13,
+  "passed": 12,
   "critical_count": 7,
-  "warning_count": 0,
+  "warning_count": 1,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -48,5 +48,12 @@
       "fix": "Use 'from _secrets import BRAIN_DB_DICT' instead of inline passwords"
     }
   ],
-  "warnings": []
+  "warnings": [
+    {
+      "name": "trade_frequency",
+      "msg": "0 trades in 6h (0.0/hr)",
+      "file": "",
+      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
+    }
+  ]
 }

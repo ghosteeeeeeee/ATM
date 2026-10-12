@@ -51,6 +51,7 @@ from paths import HERMES_DATA
 # ── Cache ─────────────────────────────────────────────────────────────────────
 _combo_cache = {}    # (token, signal, direction) -> {'wr': float, 'trades': int, 'pnl': float}
 _coin_cache = {}     # (token, direction) -> {'wr': float, 'trades': int, 'pnl': float}
+_coin_combined_cache = {}  # (token) -> {'wr': float, 'trades': int} — combined across directions
 _signal_cache = {}   # (signal, direction) -> {'wr': float, 'trades': int, 'pnl': float}
 _cache_ts = 0
 _load_failed_ts = 0  # M2: backoff after failed load
@@ -68,7 +69,7 @@ def _load_combo_data():
     M3 fix: build fresh dicts, swap atomically.
     M2-fix: backoff after failure.
     """
-    global _combo_cache, _coin_cache, _signal_cache, _cache_ts, _load_failed_ts
+    global _combo_cache, _coin_cache, _coin_combined_cache, _signal_cache, _cache_ts, _load_failed_ts
     now = time.time()
     # TTL check — also back off after a failure
     if _combo_cache and (now - _cache_ts) < REP_CACHE_TTL:
@@ -131,6 +132,24 @@ def _load_combo_data():
                 'pnl': float(pnl) if pnl is not None else 0.0,
             }
 
+        # ── Coin COMBINED level: token only (for entry threshold, matches old system) ──
+        cur.execute(f"""
+            SELECT token,
+                   COUNT(*) as trades,
+                   ROUND(100.0 * SUM(CASE WHEN won IN ('1', 1, 'True', 'true') THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
+            FROM trade_log
+            WHERE token NOT LIKE 'TEST%'
+              AND close_time IS NOT NULL
+              {_REP_WINDOW_SQL}
+            GROUP BY token
+        """)
+        new_coin_combined = {}
+        for token, trades, wr in cur.fetchall():
+            new_coin_combined[token.upper()] = {
+                'wr': float(wr) if wr is not None else 50.0,
+                'trades': int(trades),
+            }
+
         # ── Signal level: normalized_signal + direction ──
         cur.execute(f"""
             SELECT {_norm_sig} as nsig, direction,
@@ -157,7 +176,110 @@ def _load_combo_data():
         # M3 fix: atomic swap — fresh dicts replace stale caches
         _combo_cache = new_combo
         _coin_cache = new_coin
+        _coin_combined_cache = new_coin_combined
         _signal_cache = new_signal
+
+        # ── PostgreSQL fallback (plan: Hebbian primary, PG fallback) ──
+        # Hebbian trade_log only records trades closed via position_manager.py.
+        # PG has full coverage (~761 trades 30d vs ~735 Hebbian). Fill gaps.
+        try:
+            import psycopg2
+            pg_conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
+                                       user='postgres', connect_timeout=5)
+            pg_cur = pg_conn.cursor()
+
+            # PG coin-level: token + direction, only fill gaps (not already in Hebbian)
+            pg_cur.execute("""
+                SELECT token, direction,
+                       COUNT(*) as trades,
+                       ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr,
+                       ROUND(SUM(pnl_usdt), 2) as total_pnl
+                FROM trades
+                WHERE status = 'closed' AND server = 'Hermes'
+                  AND pnl_pct IS NOT NULL AND direction IS NOT NULL
+                  AND close_time > NOW() - INTERVAL '30 days'
+                GROUP BY token, direction
+                HAVING COUNT(*) >= 5
+            """)
+            for token, direction, trades, wr, pnl in pg_cur.fetchall():
+                key = (token.upper(), direction.upper())
+                if key not in _coin_cache or _coin_cache[key]['trades'] < trades:
+                    _coin_cache[key] = {
+                        'wr': float(wr) if wr is not None else 50.0,
+                        'trades': int(trades),
+                        'pnl': float(pnl) if pnl is not None else 0.0,
+                    }
+
+            # PG coin COMBINED: token only, fill gaps
+            pg_cur.execute("""
+                SELECT token,
+                       COUNT(*) as trades,
+                       ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr
+                FROM trades
+                WHERE status = 'closed' AND server = 'Hermes'
+                  AND pnl_pct IS NOT NULL
+                  AND close_time > NOW() - INTERVAL '30 days'
+                GROUP BY token
+                HAVING COUNT(*) >= 10
+            """)
+            for token, trades, wr in pg_cur.fetchall():
+                key = token.upper()
+                if key not in _coin_combined_cache or _coin_combined_cache[key]['trades'] < trades:
+                    _coin_combined_cache[key] = {
+                        'wr': float(wr) if wr is not None else 50.0,
+                        'trades': int(trades),
+                    }
+
+            # PG combo-level: token + signal + direction, only fill gaps
+            pg_cur.execute("""
+                SELECT token, signal, direction,
+                       COUNT(*) as trades,
+                       ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr,
+                       ROUND(SUM(pnl_usdt), 2) as total_pnl
+                FROM trades
+                WHERE status = 'closed' AND server = 'Hermes'
+                  AND pnl_pct IS NOT NULL AND signal IS NOT NULL AND direction IS NOT NULL
+                  AND close_time > NOW() - INTERVAL '30 days'
+                GROUP BY token, signal, direction
+                HAVING COUNT(*) >= 3
+            """)
+            for token, signal, direction, trades, wr, pnl in pg_cur.fetchall():
+                primary_sig = signal.split(',')[0].strip() if signal else signal
+                key = (token.upper(), primary_sig.upper(), direction.upper())
+                if key not in _combo_cache or _combo_cache[key]['trades'] < trades:
+                    _combo_cache[key] = {
+                        'wr': float(wr) if wr is not None else 50.0,
+                        'trades': int(trades),
+                        'pnl': float(pnl) if pnl is not None else 0.0,
+                    }
+
+            # PG signal-level: signal + direction, only fill gaps
+            pg_cur.execute("""
+                SELECT signal, direction,
+                       COUNT(*) as trades,
+                       ROUND(100.0 * SUM(CASE WHEN pnl_pct > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) as wr,
+                       ROUND(SUM(pnl_usdt), 2) as total_pnl
+                FROM trades
+                WHERE status = 'closed' AND server = 'Hermes'
+                  AND pnl_pct IS NOT NULL AND signal IS NOT NULL AND direction IS NOT NULL
+                  AND close_time > NOW() - INTERVAL '30 days'
+                GROUP BY signal, direction
+                HAVING COUNT(*) >= 5
+            """)
+            for signal, direction, trades, wr, pnl in pg_cur.fetchall():
+                primary_sig = signal.split(',')[0].strip() if signal else signal
+                key = (primary_sig.upper(), direction.upper())
+                if key not in _signal_cache or _signal_cache[key]['trades'] < trades:
+                    _signal_cache[key] = {
+                        'wr': float(wr) if wr is not None else 50.0,
+                        'trades': int(trades),
+                        'pnl': float(pnl) if pnl is not None else 0.0,
+                    }
+
+            pg_conn.close()
+        except Exception:
+            pass  # PG fallback is best-effort; Hebbian data is primary
+
         _cache_ts = now
         _load_failed_ts = 0
 
@@ -225,7 +347,10 @@ def get_combo_reputation(coin, signal, direction):
 
 def get_coin_reputation(coin, direction):
     """Get coin-level reputation (coin+direction).
-    
+
+    Entry threshold uses COMBINED trades (all directions, matches old system).
+    Tier uses direction-specific WR when available, else combined WR.
+
     Returns dict: {'tier': str, 'mult': float, 'wr': float, 'trades': int, 'pnl': float}
     or None if no data.
     """
@@ -233,14 +358,23 @@ def get_coin_reputation(coin, direction):
     if not coin or not direction:
         return None
 
-    key = (coin.upper(), direction.upper())
-    data = _coin_cache.get(key)
-
-    if not data or data['trades'] < REP_COIN_MIN_TRADES:
+    # Entry threshold: combined trades across all directions (matches old system)
+    combined = _coin_combined_cache.get(coin.upper())
+    if not combined or combined['trades'] < REP_COIN_MIN_TRADES:
         return None
 
-    wr = data['wr']
-    trades = data['trades']
+    # Tier: prefer direction-specific WR
+    dir_key = (coin.upper(), direction.upper())
+    dir_data = _coin_cache.get(dir_key)
+
+    if dir_data and dir_data['trades'] >= 5:
+        wr = dir_data['wr']
+        trades = dir_data['trades']
+        pnl = dir_data['pnl']
+    else:
+        wr = combined['wr']
+        trades = combined['trades']
+        pnl = 0.0
 
     # Bonus tiers
     if wr >= REP_COIN_FAME_WR and trades >= REP_COIN_FAME_MIN:
@@ -260,7 +394,7 @@ def get_coin_reputation(coin, direction):
         'mult': mult,
         'wr': wr,
         'trades': trades,
-        'pnl': data['pnl'],
+        'pnl': pnl,
     }
 
 

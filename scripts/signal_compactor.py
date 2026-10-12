@@ -1680,32 +1680,43 @@ def _score_signal(token, direction, conf, source, signal_type,
     else:
         favorites_mult = 1.0
 
-    # 30d leaderboard bonus/penalty — long-term performers get extra boost
-    leaderboard_mult = _get_leaderboard_mult(token, direction)
-
-    # Token+Signal+Direction combo bonus — winning combos get huge boost
-    # FIX 2026-10-04: also try signal_type — cache keyed by trades.signal (signal_type), not source
-    combo_mult = _get_combo_mult(token, source, direction)
-    if combo_mult == 1.0 and signal_type:
-        combo_mult = _get_combo_mult(token, signal_type, direction)
-    if combo_mult >= 2.0:
-        log(f"  🏆 [COMBO] {token}+{source}+{direction}: {combo_mult:.1f}x bonus (proven winner)")
-
-    # Hall of Shame BLOCK — direction-specific check
-    # Block if direction WR < 55%, allow if >= 55%
-    lb = _load_leaderboard()
-    lb_data = lb.get(token.upper())
-    if lb_data and lb_data['trades'] >= 15:
-        dir_stats = lb_data.get('direction_stats', {})
-        if direction and direction.upper() in dir_stats:
-            dir_wr = dir_stats[direction.upper()].get('winrate', 50)
-            if dir_wr < 55:
-                log(f"  🚫 [HALL-SHAME] {token} {direction} BLOCKED — 30d {direction} WR={dir_wr:.1f}% < 55%")
+    # ── Combo-First Reputation System (replaces leaderboard_mult + combo_mult + HALL-SHAME) ──
+    # Phase 2: shadow mode logs multiplier but doesn't apply. Flip REP_SHADOW_MODE=False to go live.
+    from reputation import get_combined_multiplier as _rep_get_mult, should_block as _rep_should_block, REP_SHADOW_MODE as _REP_SHADOW
+    _rep_result = _rep_get_mult(token, source, direction)
+    _rep_hos = _rep_should_block(token, source, direction)
+    if _REP_SHADOW:
+        # Shadow: log what WOULD happen, use old logic for actual scoring
+        leaderboard_mult = _get_leaderboard_mult(token, direction)
+        combo_mult = _get_combo_mult(token, source, direction)
+        if combo_mult == 1.0 and signal_type:
+            combo_mult = _get_combo_mult(token, signal_type, direction)
+        # Old HALL-SHAME block (still active in shadow)
+        lb = _load_leaderboard()
+        lb_data = lb.get(token.upper())
+        if lb_data and lb_data['trades'] >= 15:
+            dir_stats = lb_data.get('direction_stats', {})
+            if direction and direction.upper() in dir_stats:
+                dir_wr = dir_stats[direction.upper()].get('winrate', 50)
+                if dir_wr < 55:
+                    log(f"  🚫 [HALL-SHAME] {token} {direction} BLOCKED — 30d {direction} WR={dir_wr:.1f}% < 55%")
+                    return 0.0
+            elif lb_data.get('wr', 50) < 55:
+                log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR={lb_data['wr']:.1f}% < 55%")
                 return 0.0
-        # Fallback to combined WR if no direction data
-        elif lb_data.get('wr', 50) < 55:
-            log(f"  🚫 [HALL-SHAME] {token} BLOCKED — 30d WR={lb_data['wr']:.1f}% < 55%")
-            return 0.0
+        # Log shadow comparison
+        _old_mult = leaderboard_mult * combo_mult
+        log(f"  📊 [REP-SHADOW] {token}+{source}+{direction}: old={_old_mult:.3f}x new={_rep_result['mult']:.3f}x HOS={_rep_hos['mult']}x({_rep_hos['reason']})")
+    else:
+        # LIVE: use reputation system
+        leaderboard_mult = _rep_result['mult']  # reputation handles all three levels
+        combo_mult = 1.0                         # folded into leaderboard_mult
+        # HOS multiplier is inside _rep_result already (replaces coin multiplier when triggered)
+        # Log notable reputation decisions
+        if _rep_result['mult'] < 0.5:
+            log(f"  🚫 [REP] {token}+{source}+{direction}: low reputation {_rep_result['mult']:.3f}x ({_rep_hos['reason']})")
+        elif _rep_result['mult'] >= 1.5:
+            log(f"  🏆 [REP] {token}+{source}+{direction}: high reputation {_rep_result['mult']:.3f}x")
 
     # Penalty list — direction-specific losers get stronger penalty
     is_long_loser = token in LOSERS_LONG
