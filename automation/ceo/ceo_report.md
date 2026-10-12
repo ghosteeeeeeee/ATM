@@ -114,3 +114,39 @@ Position_manager D3 trail-floor removal + stray HML_TRAIL_MIN_GAP_PCT comment-on
 ### Findings: clean — 7d PnL holding ≥$0 (+$1.33); 24h WR 50%; open 1 paper position. Error alerts show only repeated expected blocks + resolved crash-loop (hermes-coding-mcp auto-disabled, script missing).
 ### Proactive Q12 — accumulation coins (coin_tracker agg_scores, fresh ts): 15+ coins in Wyckoff accumulation. Highest-signal: ADA (composite 59, volume_z 98.6), COMP (60.5, vol 59.7), BABY (59.0), BIGTIME (58.2), CHIP (58.0). Momentum universally low (3–23) — textbook pre-spring base.
 ### Recommendation: trail-arm timeout verdict still awaiting CEO GO (audit first per plan); hermes-coding-mcp unit should be removed or script restored — one-line decision for weekly deep run.
+
+## grind-breakout-v2 Freshness Gate — 2026-10-12
+
+### Decision: APPROVE the fix. Leave MEGA blacklisted. Medium priority — do it now, it's a small verified diff.
+
+### Verified numbers (DB, run today)
+
+| Bucket | Tokens | Status after fix |
+|--------|--------|------------------|
+| fresh latest_prices + fresh candles | 87 | already scanned today |
+| **stale latest_prices + fresh candles** | **42** | **unlocked by fix — true blind spot** |
+| stale latest_prices + stale candles | 47 | correctly skipped either way |
+| no latest_prices + stale candles | 6 | correctly skipped either way |
+
+Correction to task context: blind spot is **42 tokens, not 95**. The 95 figure counts all tokens the gate skips; 53 of those have stale candles too and should be skipped regardless. Fix expands the scanned universe 87 → 129 tokens (+48%).
+
+MEGA verified: latest_prices frozen 2026-08-11, but candles_5m is **fresh** (last candle 14:50 today). Bug-hunter's diagnosis confirmed — candle collector still tracks it, only the gate blocks it.
+
+### 1. Freshness gate fix — APPROVED
+Change `run()` in grind_breakout_v2.py:369 from `price_age_minutes(token) > 10` (reads latest_prices) to candle-age check on `candles_5m` — the table detect() actually consumes. Precedent exists: btc_grind_spike, bb_bounce_v3_long, neutral_sniper, range_reversion, volume_breakout, trend_ride_long already do candle-age checks. Not a novel pattern. Low risk: detect() was already verified correct; this only widens the input set. Blacklists, cooldowns, direction gates all still apply after the check.
+
+### 2. MEGA — LEAVE BLACKLISTED
+Blacklisted both directions 2026-08-11 with specific reason (5T, 0% WR, −$0.23, all ATR SL hits, "low-price noise coin"). The freshness fix does NOT bypass blacklists — MEGA still can't trade after the fix. The gate fix and the blacklist are orthogonal. No reason to revisit: nothing has changed about MEGA's trade quality.
+
+### 3. Other signals — systemic, but fix pattern first
+~50 signals call price_age_minutes. The bug only bites where the token universe is sourced from candles but gated on latest_prices — 17 signals do `SELECT DISTINCT token FROM candles`. Don't blanket-change price_age_minutes (50+ callers, execution pricing may depend on it). Fix grind_breakout_v2 now, verify for a week, then batch-audit the other 16 as a follow-up if the pattern proves out.
+
+### 4. Priority vs other work
+Do it now — it's a ~5-line change to a live, verified-correct signal, and deferring it means continued blind scanning. Not urgent enough to interrupt higher-priority items (PM_TRAIL_ACTIVATE_PCT NameError still open; trail-arm timeout verdict pending). Order: NameError triage > this fix > 16-signal audit.
+
+### Measurable goal
+- Universe scanned: 87 → 129 tokens (+48%)
+- grind-breakout+ trades/7d: 0-1 → baseline + whatever the 42 new tokens produce
+- Zero new losses attributable to the fix in first 7d (blacklists still hold)
+
+BY: ceo-strategic
