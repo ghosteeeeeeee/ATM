@@ -69,9 +69,9 @@ REGIME_SIGNALS = {
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-10: ETH LONG blocked in FLAT
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
-        'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-12 CEO sync from v1: 20 "not suited for FLAT" blocks; 90d FLAT 5T 100%WR +$0.49. HIGH/EXTREME stay out (90d EXTREME -$0.14).
-        'doji-bottom-long', 'doji-top-short',  # doji mean-reversion — added 2026-10-12 CEO sync from v1: v1 FLAT mean-reversion set; 560 "not suited for FLAT" blocks; 0 trades 90d (never admitted).
-        'tl-bounce+',  # TL bounce — added 2026-10-12 CEO sync from v1: v1 curated FLAT/NORMAL; 89 log hits, 0 trades 90d (never admitted).
+        'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-12 CEO sync from v1: FLAT only; 90d FLAT 5T 100%WR +$0.49. NOTE: HIGH/EXTREME were already admitted 2026-10-09 (commit 6c042a7f), NOT by this change — and 90d EXTREME is -$0.14/16T (watch).
+        'doji-bottom-long', 'doji-top-short',  # doji mean-reversion — added 2026-10-12 CEO sync from v1: FLAT mean-reversion habitat; 0 trades 90d (never admitted, no negative evidence). NOTE: the 100 real doji vol-gate blocks were NORMAL/HIGH, not FLAT.
+        'tl-bounce+',  # TL bounce — added 2026-10-12 CEO sync from v1: FLAT only (v1 also curates NORMAL, but NOT added here — NORMAL tl-bounce+ blocks remain); 0 trades 90d (never admitted).
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d FLAT 0T (never admitted).
     },
     'NORMAL': {
