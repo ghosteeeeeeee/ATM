@@ -69,6 +69,10 @@ REGIME_SIGNALS = {
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-10: ETH LONG blocked in FLAT
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
+        'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-12 CEO sync from v1: 20 "not suited for FLAT" blocks; 90d FLAT 5T 100%WR +$0.49. HIGH/EXTREME stay out (90d EXTREME -$0.14).
+        'doji-bottom-long', 'doji-top-short',  # doji mean-reversion — added 2026-10-12 CEO sync from v1: v1 FLAT mean-reversion set; 560 "not suited for FLAT" blocks; 0 trades 90d (never admitted).
+        'tl-bounce+',  # TL bounce — added 2026-10-12 CEO sync from v1: v1 curated FLAT/NORMAL; 89 log hits, 0 trades 90d (never admitted).
+        'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d FLAT 0T (never admitted).
     },
     'NORMAL': {
         'pump-catcher+', 'pump-catcher-',
@@ -122,6 +126,7 @@ REGIME_SIGNALS = {
         'continuum-ma+', 'continuum-ma-',  # continuum MA crossover — momentum confirmation
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
+        'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"). v2 omission was an oversight: ATOM SHORT reached exec 10x on 2026-10-12 and vol gate was sole blocker. 90d NORMAL 1T +$0.01.
     },
     'HIGH': {
         'pump-catcher+', 'pump-catcher-',
@@ -171,6 +176,7 @@ REGIME_SIGNALS = {
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 HIGH
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
+        'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d HIGH 0T (never admitted).
     },
     'EXTREME': {
         'continuation+,hzscore+', 'hzscore+,mover+',
@@ -208,6 +214,7 @@ REGIME_SIGNALS = {
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'accel-300-breakout',  # ATR breakout signal — works solo, added 2026-09-23 (bug hunt: was killing PONS SHORT)
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
+        'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d EXTREME 2T 100%WR +$0.13. This is T's reported ATOM SHORT case (blocked 10x by "storm: ATR>1.5%").
     },
 }
 
