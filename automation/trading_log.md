@@ -8529,3 +8529,38 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 **Open Questions:**
 - BTC continuum LONG open ~3h at $0.00 flat — third consecutive hour flagged; monitor whether it closes scratch or moves
 - 24h PnL drifted +$1.88 → +$1.70 (GRASS loss + 24h window roll) — still net positive
+
+## FAVORITES Update — 2026-10-12 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE GRASS (WR=50.0%, PnL=$0.06, 1 consecutive bad days, regime=LONG_BIAS)
+- PROMOTE ETH (WR=60.0%, AvgPnL=0.50%, Trades=5)
+
+Final set: ['BABY', 'ETH', 'SYRUP']
+
+## LOSERS Update — 2026-10-12 06:05 UTC
+- REMOVE AIXBT (insufficient data)
+- REMOVE IMX (insufficient data)
+
+Final set: []
+
+## [2026-10-12 06:14] Hourly Analysis
+
+**Trades:** 2 closed last hour (2 wins, 0 losses)
+**PnL:** +$0.11 (WR 100%) | 24h: 18T 12W +$1.81 | 1 open (BTC continuum LONG 02:13 flat $0.00, ~4h)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Entry quality: ETH hl_copy_trader winner MAE 0.355% (<0.5% = clean entry); SUPER r2v2-long6 +$0.02 trail (mae/mfe null — trail-closed, not a concern)
+- atr_sl_hit 1/18 ≈ 5.3% of 24h closes — under 40%, tpsl_utils deployed
+- Kill: 0 candidates — last hour both winners; 24h losers pump-chain+ 3T −$0.26 (1W), ai-trader+ 3T −$0.13 (1W) — n=3 too small, watchlist only
+- hard_max_loss 5/24h ≈ 28% −$0.36 — hold brain_auditor (SL width lever), not touched
+- profit-monster-trail 6/24h +$0.80, atr_trail_hit 3 +$0.71, hard_tp 2 +$0.59 — trailing remains profit engine
+- Overtrade: 2/hr — well under 20
+- Streak: 00h −$0.17, 01h +$0.51, 02h −$0.01, 03h +$0.09, 05h −$0.07 — no 3-neg-hr run (04h zero-trade gap)
+- live_trading=true, kill JSON=true, timers fresh
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- BTC continuum LONG open ~4h flat $0.00 — 4th consecutive hour flagged; continuum is low-frequency by design, monitor but no action
