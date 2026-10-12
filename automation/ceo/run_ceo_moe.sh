@@ -59,6 +59,10 @@ Consensus, Confidence (0.0-1.0), Dissent notes, Top 3 actionable fixes (ranked b
 TASK
 
 PROMPT_FILE="$CEO_LOG_DIR/moe-${TS}.prompt"
+# Verify each source before assembly — a missing template would silently yield a
+# base+task prompt (see ceo_lib.sh ceo_assert_template). Fail closed.
+ceo_assert_template "$MOE" "moe" || { rm -f "$TASK"; exit 5; }
+ceo_assert_template "$BASE" "base" || { rm -f "$TASK"; exit 5; }
 cat "$MOE" > "$PROMPT_FILE"
 printf '\n\n--- BASE PERSONA ---\n\n' >> "$PROMPT_FILE"
 cat "$BASE" >> "$PROMPT_FILE"

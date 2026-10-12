@@ -69,6 +69,11 @@ TASK
 # ── Run: status runs IN-PROCESS (short, bounded). Hard timeout is intentional:
 #    a timeout here means a regression, because status must finish <3 min.
 PROMPT_FILE="$CEO_LOG_DIR/status-${TS}.prompt"
+# Verify each source before assembly — a missing template would silently yield a
+# base+task prompt (see ceo_lib.sh ceo_assert_template). Fail closed, same rule
+# as deep/moe so there is one rule to reason about, not three.
+ceo_assert_template "$STATUS" "status" || { rm -f "$TASK"; exit 5; }
+ceo_assert_template "$BASE" "base" || { rm -f "$TASK"; exit 5; }
 cat "$STATUS" > "$PROMPT_FILE"
 printf '\n\n--- BASE PERSONA ---\n\n' >> "$PROMPT_FILE"
 cat "$BASE" >> "$PROMPT_FILE"

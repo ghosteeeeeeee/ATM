@@ -22,12 +22,26 @@ set -uo pipefail
 # spuriously fail the existence test below — every relative-path invocation
 # aborted with "brief not found" even when the file existed. (Found 2026-10-12
 # while testing the persona guard.)
+#
+# Then CANONICALIZE it (strip `.`/`..`/symlinks). Without this the /tmp ban
+# below is a string-prefix match on a non-canonical path and is both bypassable
+# (`/root/../tmp/brief.md` slips past it and the session dies mid-run on the
+# auto-reject the ban exists to prevent) and falsely-triggerable
+# (`/tmp/../root/.../brief.md` wrongly rejects a legitimate in-repo brief).
 INJECTED_BRIEF="${1:-}"
 if [ -n "$INJECTED_BRIEF" ]; then
     case "$INJECTED_BRIEF" in
         /*) : ;;                                   # already absolute
         *) INJECTED_BRIEF="$(pwd)/$INJECTED_BRIEF" ;;  # caller-relative -> absolute
     esac
+    if _canon=$(realpath -m -- "$INJECTED_BRIEF" 2>/dev/null) && [ -n "$_canon" ]; then
+        INJECTED_BRIEF="$_canon"
+    elif _canon=$(readlink -f -- "$INJECTED_BRIEF" 2>/dev/null) && [ -n "$_canon" ]; then
+        INJECTED_BRIEF="$_canon"                   # fallback if realpath is absent
+    fi
+    # If neither exists we keep the absolute-but-uncanonicalized path: the
+    # existence test below still applies, and a miss fails closed.
+    unset _canon
 fi
 
 cd /root/.hermes || exit 1
@@ -126,6 +140,13 @@ Do NOT do all of Step 0-5 in your own context. Analyze + decide + checkpoint + D
 TASK
 
 PROMPT_FILE="$CEO_LOG_DIR/deep-${TS}.prompt"
+# Check EACH source before assembling. `cat` on a missing file fails to stderr
+# but `>` has already truncated the target, so assembly would quietly produce a
+# base+task prompt that still carries the persona marker — launching a deep run
+# with no checkpoint-before-edit / single-writer / fresh-subagent discipline.
+# Fail closed here instead. (ceo_lib.sh; found 2026-10-12 by bug_hunter.)
+ceo_assert_template "$DEEP" "deep" || { rm -f "$TASK"; exit 5; }
+ceo_assert_template "$BASE" "base" || { rm -f "$TASK"; exit 5; }
 cat "$DEEP" > "$PROMPT_FILE"
 printf '\n\n--- BASE PERSONA ---\n\n' >> "$PROMPT_FILE"
 cat "$BASE" >> "$PROMPT_FILE"

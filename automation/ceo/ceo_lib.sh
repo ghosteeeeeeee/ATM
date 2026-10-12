@@ -52,6 +52,23 @@ ceo_assert_prompt() {
     return 0
 }
 
+# The marker check above only proves the BASE prompt loaded. The per-run template
+# (deep/moe/status) is assembled with a plain `cat` under `set -uo pipefail` —
+# no `-e` — so a missing template silently yields base+task only, and the marker
+# still matches: the run launches WITHOUT its run-specific discipline (checkpoint-
+# before-edit, single-writer, fresh-subagent dispatch). Same silent-degradation
+# family, weaker form. Verify each source file before assembly.
+#
+# Usage: ceo_assert_template <file> <label>
+ceo_assert_template() {
+    if [ ! -s "$1" ]; then
+        echo "[CEO][FATAL] $2 prompt template is missing or empty: $1" >&2
+        echo "[CEO][FATAL] a run launched now would have no run-specific rules. Aborting." >&2
+        return 1
+    fi
+    return 0
+}
+
 # Marker present in ceo_prompt_base.md. If the base prompt is ever renamed or
 # replaced, update this too — a wrong marker fails closed (abort), never open.
 CEO_PERSONA_MARKER='CEO_PROTECTED_FLAGS'
