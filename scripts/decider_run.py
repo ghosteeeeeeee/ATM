@@ -1095,10 +1095,17 @@ def rule_based_context_gate(token, direction, source, sig):
 
         # RSI filter: penalize overbought/oversold entries
         # FIX 2026-09-22: signals store RSI as 'rsi', not 'rsi_14' — field name mismatch
+        # FIX brain_auditor 2026-10-12: LONG overbought AMBIGUOUS→SKIP (hard block).
+        # AMBIGUOUS verdict fell through as PASS at caller (decider_run.py:4490 else-branch)
+        # and was further converted to GO by fail-open paths — gate was completely toothless.
+        # CFX@74.5 / HYPE@76.6 entered despite SIGNAL_FILTER_RSI_MAX and both hard_max_loss'd
+        # (watchdog steer-deep-005). Threshold 72→75 aligns with CEO-verified LONG_RSI_CEILING;
+        # 7d at >75: saves 5 losers -$0.60, blocks 1 winner +$0.10 (INJ@75.2) = net +$0.50.
+        # SHORT oversold stays AMBIGUOUS — SHORT_RSI_HARD_FLOOR=45 already hard-SKIPs at :2027.
         rsi = sig.get('rsi') or sig.get('rsi_14') if isinstance(sig, dict) else None
         if rsi is not None:
             if direction == 'LONG' and rsi > SIGNAL_FILTER_RSI_MAX:
-                return ('AMBIGUOUS', f'RSI {rsi:.1f} > {SIGNAL_FILTER_RSI_MAX} (overbought)', 10)
+                return ('SKIP', f'RSI {rsi:.1f} > {SIGNAL_FILTER_RSI_MAX} (overbought — hard block)', 0)
             if direction == 'SHORT' and rsi < SIGNAL_FILTER_RSI_MIN:
                 return ('AMBIGUOUS', f'RSI {rsi:.1f} < {SIGNAL_FILTER_RSI_MIN} (oversold)', 10)
 

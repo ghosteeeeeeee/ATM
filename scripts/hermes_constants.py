@@ -863,7 +863,7 @@ SIGNAL_FILTER_SPEED_MIN = 40  # CEO 2026-08-16: RAISED from 30. ATR_SL 37T/48h 2
 SIGNAL_FILTER_NEUTRAL_SPEED_MIN = 15  # CEO 2026-08-15 — STARVATION FIX: relaxed speed filter in NEUTRAL regime (102/104 tokens flat). 30 still blocks most NEUTRAL signals. 15 lets low-momentum signals through when regime is flat.
 SIGNAL_FILTER_MOMENTUM_MIN = 25      # block signals when momentum < this (winners avg 29)
 SIGNAL_FILTER_RSI_MIN = 42           # block SHORT when RSI < this (oversold = bounce risk) — raised from 30: RSI<40 SHORT = 0%WR, -$1.67 (2026-09-22 audit)
-SIGNAL_FILTER_RSI_MAX = 72           # block LONG when RSI > this (overbought) — lowered from 80: pump-chain+ LONG RSI>70 = 26.7%WR (2026-09-22 audit)
+SIGNAL_FILTER_RSI_MAX = 75           # block LONG when RSI > this (overbought) — brain_auditor 2026-10-12: 72→75 align with CEO-verified LONG_RSI_CEILING (70-75 band 30d +$0.24 keep-open). Exec-time check hardened AMBIGUOUS→SKIP in decider_run.py:1101 — STANDALONE_BYPASS signals (pump-chain+, volume-buildup+) skipped compactor ceiling, gate was toothless (AMBIGUOUS treated as pass by caller).
 SIGNAL_FILTER_Z_MIN = -1.5           # block LONG when z < this AND speed < 50% (chasing)
 SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50% (chasing)
 

@@ -1111,5 +1111,16 @@
     "after": "True",
     "rationale": "Independent audit PASSED: PG cohort exact-match (>=60m 21T 28.6% -USD1.42 vs <60m 51T 72.5% +USD1.17) + 7/7 candle spot-checks at T+60m incl SEI 15870 u60=+0.99% pass-through winner. 15/20 blocked are hard_max_loss — pre-empts #1 bleed family on this signal. Verdict plans/2026-10-12_bb-squeeze-trail-arm-timeout-verdict.md. CEO visibility: captain-enabled under steer mandate; revert is one-line flip.",
     "impact": "Expected +$1.48/30d (counterfactual); forgone winners capped at ~$0.24/30d. Monitor trail_arm_timeout exit_reason cohort 72h."
+  },
+  {
+    "timestamp": "2026-10-12T21:43:10Z",
+    "agent": "brain_auditor",
+    "change": "Fixed toothless RSI overbought gate: SIGNAL_FILTER_RSI_MAX 72→75 + AMBIGUOUS→SKIP hard block in decider_run.py:1107. Closes STANDALONE_BYPASS hole (watchdog steer-deep-005: CFX@74.5/HYPE@76.6 entered despite MAX=72, both hard_max_loss).",
+    "type": "bugfix",
+    "file": "hermes_constants.py + decider_run.py",
+    "before": "SIGNAL_FILTER_RSI_MAX=72; rule gate returned AMBIGUOUS which caller treated as pass (else-branch) and fail-open paths converted to GO",
+    "after": "SIGNAL_FILTER_RSI_MAX=75 (aligns CEO-verified LONG_RSI_CEILING keep-open 70-75 band); LONG overbought returns SKIP hard block",
+    "rationale": "7d verification: >75 band saves 5 losers -$0.60, blocks 1 winner +$0.10 (INJ@75.2) = net +$0.50. Blocks 1/8 (12.5%) of >=68 winners < 20% threshold. SHORT oversold stays AMBIGUOUS (SHORT_RSI_HARD_FLOOR=45 already SKIPs).",
+    "impact": "Expected: bypass signals (pump-chain+, volume-buildup+) now respect 75 ceiling at exec time. Monitor: no trades meta_rsi>75 should open in next 48h."
   }
 ]
