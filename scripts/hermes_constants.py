@@ -3646,7 +3646,7 @@ REP_DB_PATH = os.path.join(
     'brain', 'associative_memory.db'
 )  # M1: real Hebbian DB, NOT data/associative_memory.db (0-byte stub)
 
-# Master switch — False = shadow mode (log only, don't apply)
+# Master switch — False = disables entirely (returns 1.0, no logging)
 REP_ENABLED = True
 # M3: shadow mode — True = log multiplier but don't apply to live scoring
 REP_SHADOW_MODE = True

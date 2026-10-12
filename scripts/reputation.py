@@ -13,8 +13,6 @@ M2: TEST% tokens filtered from trade_log queries
 M3: Shadow mode — log multiplier but don't apply until Phase 2
 """
 
-import json
-import os
 import sqlite3
 import time
 
@@ -55,13 +53,27 @@ _combo_cache = {}    # (token, signal, direction) -> {'wr': float, 'trades': int
 _coin_cache = {}     # (token, direction) -> {'wr': float, 'trades': int, 'pnl': float}
 _signal_cache = {}   # (signal, direction) -> {'wr': float, 'trades': int, 'pnl': float}
 _cache_ts = 0
+_load_failed_ts = 0  # M2: backoff after failed load
+
+# 30-day window for all queries (BUG 3 fix)
+_REP_WINDOW_SQL = "AND close_time >= datetime('now', '-30 days')"
 
 
 def _load_combo_data():
-    """Load combo-level data from Hebbian trade_log. M1: pin to brain/associative_memory.db. M2: filter TEST%."""
-    global _combo_cache, _coin_cache, _signal_cache, _cache_ts
+    """Load combo/coin/signal data from Hebbian trade_log (last 30 days).
+    M1: pin to brain/associative_memory.db. M2: filter TEST%.
+    BUG 1 fix: wr is not None (0.0% WR is valid).
+    BUG 2 fix: normalize signal in SQL via CASE/substr/instr, GROUP BY normalized.
+    BUG 3 fix: 30-day window.
+    M3 fix: build fresh dicts, swap atomically.
+    M2-fix: backoff after failure.
+    """
+    global _combo_cache, _coin_cache, _signal_cache, _cache_ts, _load_failed_ts
     now = time.time()
+    # TTL check — also back off after a failure
     if _combo_cache and (now - _cache_ts) < REP_CACHE_TTL:
+        return
+    if _load_failed_ts and (now - _load_failed_ts) < REP_CACHE_TTL:
         return
 
     conn = None
@@ -70,10 +82,13 @@ def _load_combo_data():
         conn = sqlite3.connect(REP_DB_PATH, timeout=10)
         cur = conn.cursor()
 
-        # ── Combo level: token + signal + direction ──
-        # M2: Filter TEST% tokens
-        cur.execute("""
-            SELECT token, signal, direction,
+        # Normalize signal to primary (before first comma) in SQL
+        # BUG 2 fix: GROUP BY the normalized form so variants merge correctly
+        _norm_sig = "CASE WHEN instr(signal, ',') > 0 THEN substr(signal, 1, instr(signal, ',') - 1) ELSE signal END"
+
+        # ── Combo level: token + normalized_signal + direction ──
+        cur.execute(f"""
+            SELECT token, {_norm_sig} as nsig, direction,
                    COUNT(*) as trades,
                    ROUND(100.0 * SUM(CASE WHEN won IN ('1', 1, 'True', 'true') THEN 1 ELSE 0 END) / COUNT(*), 1) as wr,
                    ROUND(SUM(pnl_pct), 4) as total_pnl
@@ -82,20 +97,20 @@ def _load_combo_data():
               AND signal IS NOT NULL
               AND direction IS NOT NULL
               AND close_time IS NOT NULL
-            GROUP BY token, signal, direction
+              {_REP_WINDOW_SQL}
+            GROUP BY token, nsig, direction
         """)
-        for token, signal, direction, trades, wr, pnl in cur.fetchall():
-            # Normalize signal — extract primary signal before comma
-            primary_sig = signal.split(',')[0].strip() if signal else signal
-            key = (token.upper(), primary_sig.upper(), direction.upper())
-            _combo_cache[key] = {
-                'wr': float(wr) if wr else 50.0,
+        new_combo = {}
+        for token, nsig, direction, trades, wr, pnl in cur.fetchall():
+            key = (token.upper(), nsig.strip().upper(), direction.upper())
+            new_combo[key] = {
+                'wr': float(wr) if wr is not None else 50.0,  # BUG 1 fix
                 'trades': int(trades),
-                'pnl': float(pnl) if pnl else 0.0,
+                'pnl': float(pnl) if pnl is not None else 0.0,
             }
 
         # ── Coin level: token + direction ──
-        cur.execute("""
+        cur.execute(f"""
             SELECT token, direction,
                    COUNT(*) as trades,
                    ROUND(100.0 * SUM(CASE WHEN won IN ('1', 1, 'True', 'true') THEN 1 ELSE 0 END) / COUNT(*), 1) as wr,
@@ -104,19 +119,21 @@ def _load_combo_data():
             WHERE token NOT LIKE 'TEST%'
               AND direction IS NOT NULL
               AND close_time IS NOT NULL
+              {_REP_WINDOW_SQL}
             GROUP BY token, direction
         """)
+        new_coin = {}
         for token, direction, trades, wr, pnl in cur.fetchall():
             key = (token.upper(), direction.upper())
-            _coin_cache[key] = {
-                'wr': float(wr) if wr else 50.0,
+            new_coin[key] = {
+                'wr': float(wr) if wr is not None else 50.0,
                 'trades': int(trades),
-                'pnl': float(pnl) if pnl else 0.0,
+                'pnl': float(pnl) if pnl is not None else 0.0,
             }
 
-        # ── Signal level: signal + direction ──
-        cur.execute("""
-            SELECT signal, direction,
+        # ── Signal level: normalized_signal + direction ──
+        cur.execute(f"""
+            SELECT {_norm_sig} as nsig, direction,
                    COUNT(*) as trades,
                    ROUND(100.0 * SUM(CASE WHEN won IN ('1', 1, 'True', 'true') THEN 1 ELSE 0 END) / COUNT(*), 1) as wr,
                    ROUND(SUM(pnl_pct), 4) as total_pnl
@@ -125,22 +142,32 @@ def _load_combo_data():
               AND signal IS NOT NULL
               AND direction IS NOT NULL
               AND close_time IS NOT NULL
-            GROUP BY signal, direction
+              {_REP_WINDOW_SQL}
+            GROUP BY nsig, direction
         """)
-        for signal, direction, trades, wr, pnl in cur.fetchall():
-            primary_sig = signal.split(',')[0].strip() if signal else signal
-            key = (primary_sig.upper(), direction.upper())
-            _signal_cache[key] = {
-                'wr': float(wr) if wr else 50.0,
+        new_signal = {}
+        for nsig, direction, trades, wr, pnl in cur.fetchall():
+            key = (nsig.strip().upper(), direction.upper())
+            new_signal[key] = {
+                'wr': float(wr) if wr is not None else 50.0,
                 'trades': int(trades),
-                'pnl': float(pnl) if pnl else 0.0,
+                'pnl': float(pnl) if pnl is not None else 0.0,
             }
 
+        # M3 fix: atomic swap — fresh dicts replace stale caches
+        _combo_cache = new_combo
+        _coin_cache = new_coin
+        _signal_cache = new_signal
         _cache_ts = now
+        _load_failed_ts = 0
 
     except Exception as e:
-        # Fail-open: return whatever we have in cache
-        pass
+        # M1 fix: log the failure (don't silently swallow)
+        _load_failed_ts = now
+        try:
+            print(f"  ⚠️ [REP] load failed: {e} (backing off {REP_CACHE_TTL}s)")
+        except Exception:
+            pass
     finally:
         if conn:
             try:
@@ -284,7 +311,7 @@ def get_combined_multiplier(coin, signal, direction):
     """
     if not REP_ENABLED:
         return {'mult': 1.0, 'combo': None, 'coin': None, 'signal': None,
-                'shadow': False, 'hos': None}
+                'shadow': False, 'hos': None, 'hos_applied': False}
 
     combo = get_combo_reputation(coin, signal, direction)
     coin_rep = get_coin_reputation(coin, direction)
@@ -362,7 +389,9 @@ def should_block(coin, signal, direction):
 def log_reputation(coin, signal, direction, current_mult=None):
     """Shadow-mode logging: log what the multiplier WOULD be vs current.
 
-    Returns the multiplier that would be applied (for Phase 2 integration).
+    L1 fix: returns 1.0 while REP_SHADOW_MODE is True (M3 hazard — a Phase-2
+    dev wiring the return value would apply it without checking result['shadow']).
+    Phase 2 will disable shadow mode and this will return the real multiplier.
     """
     if not REP_ENABLED:
         return 1.0
@@ -371,7 +400,7 @@ def log_reputation(coin, signal, direction, current_mult=None):
     combined = result['mult']
 
     if REP_SHADOW_MODE:
-        # Shadow: log but don't apply
+        # Shadow: log but don't apply — return 1.0 so nothing can accidentally apply
         combo_str = ''
         if result['combo']:
             combo_str = f" combo={result['combo']['tier']}({result['combo']['wr']:.1f}%/{result['combo']['trades']}T/{result['combo']['mult']}x)"
@@ -389,14 +418,13 @@ def log_reputation(coin, signal, direction, current_mult=None):
                 hos_str = f" HOS={result['hos']['mult']}x(not-applied:{result['hos']['reason']})"
 
         print(f"  📊 [REP-SHADOW] {coin}+{signal}+{direction}: mult={combined:.3f}{combo_str}{coin_str}{signal_str}{hos_str}")
+        return 1.0  # L1 fix: shadow mode returns 1.0, not the live multiplier
 
     return combined
 
 
 # ── CLI test ──────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
-    import sys
-
     print("=== Combo-First Reputation System — CLI Test ===")
     print(f"DB: {REP_DB_PATH}")
     print(f"Enabled: {REP_ENABLED}, Shadow: {REP_SHADOW_MODE}")
