@@ -526,3 +526,7 @@
 ## Error Alerts — 2026-10-12 01:00 UTC
 - **REPEATED** (49x): `Oct N N:N:N python3[TOK]: [coin_tracker_api] TOK/TOK export failed: [Errno N] No such file or directory: '/var/www/html/coin_tracker_coins/TOK/TOK.json.tmp'`
 - **REPEATED** (13x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-12 02:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK position_manager: NameError: name 'PM_TRAIL_ACTIVATE_PCT' is not defined`
