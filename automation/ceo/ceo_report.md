@@ -156,3 +156,34 @@ BY: ceo-strategic
 ### Numbers: 24h 21T +$0.10 42.9% | 7d 123T +$1.21 39.8%
 ### Findings: Clean — both services active, 0 open, 7d PnL improved (+$0.84→+$1.21 vs CURRENT.md). Rotating Q (accumulation coins): coin_tracker fresh (29s), 83/88 coins in accumulation, 4 markup. Highest-predictive accumulation: BTC pred 58.1, ZRO 55.9, HYPER 53.8, FOGO 54.9, LTC 54.3 — 10 coins also flag LONG setup (PONS, GMT, ALT, RESOLV, STX, WLFI, ZORA, SAND, kBONK, kFLOKI). 7d WR 39.8% still well under 50% Oct 15 goal. No new error alerts since 15:00 UTC; disk 83%.
 ### Recommendation: none — wait on trail-arm GO + Oct 13 deliverables (Reputation 2a, Wyckoff shadow).
+
+## 2026-10-12 — RR Engine Hard Block: Lowered 0.70 → 0.55
+
+**Decision: Option A (softened) — lowered `RR_ENGINE_CONF_HARD_BLOCK_RR` from 0.70 to 0.55.**
+
+### Data Verified (ran myself, not trusted from report)
+- 24h: 17T, +$0.17, 47.1% WR
+- 7d SHORT: 21T, +$0.21, 28.6% WR (barely profitable)
+- 7d LONG: 102T, +$1.00, 42.2% WR
+- Log analysis: 1871 total RR hard blocks. SHORT blocks: 386 at R:R 0.00–0.49, **308 at R:R 0.50–0.69** (the marginal zone killing dump SHORTs)
+
+### Why Not Full Removal (Option A pure)
+Removing entirely would let R:R 0.35 trades through with 0.70x — the log shows 386 SHORT blocks in that range. Those are genuinely bad (risking 2–3x for 1x reward). 0.55 keeps them blocked.
+
+### Why Not Conditional (Option B)
+Requires threading signal-quality context (confluence + trend alignment status) into `rr_confidence_multiplier()` — non-trivial code change across two files. Ponytail says: try the one-constant change first.
+
+### Implementation
+- `hermes_constants.py:3902` — `RR_ENGINE_CONF_HARD_BLOCK_RR = 0.55`
+- Marginal setups (R:R 0.55–0.69) now get 0.70x penalty (deprioritized in hotset) instead of 0.0x kill
+- Other filters unchanged: confluence gate, chop gate, RSI floors, trend alignment
+
+### Risks to Monitor (48h)
+- SHORT WR could drop below 28.6% if marginal R:R trades lose money
+- If SHORT PnL turns negative, revert to 0.70
+- If SHORTs still not firing, lower further to 0.45 or remove entirely
+
+### Expected Impact
+- More SHORT signals survive scoring during dumps
+- Marginal setups rank lower (0.70x) but aren't eliminated
+- Net effect: +5–15 SHORT trades/week in the 0.55–0.69 R:R band

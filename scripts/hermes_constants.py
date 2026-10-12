@@ -3899,7 +3899,7 @@ RR_ENGINE_CACHE_TTL          = 300     # 5 min cache for S/R map and vol width p
 # Integrated into _score_signal() final_score formula as rr_mult.
 RR_ENGINE_CONF_ENABLED       = True    # master switch for RR confidence adjustment
 RR_ENGINE_CONF_SHADOW        = False   # False = actually block bad R:R setups (was shadow mode)
-RR_ENGINE_CONF_HARD_BLOCK_RR = 0.70    # R:R below this = hard block (0.0x multiplier) — lowered from 0.95 (2026-09-23). In downtrends, SHORT at resistance has low R:R but high probability. 0.70 allows these trades while still blocking garbage (R:R < 0.70).
+RR_ENGINE_CONF_HARD_BLOCK_RR = 0.55    # R:R below this = hard block (0.0x multiplier) — lowered from 0.70 (2026-10-12 CEO). During dumps, SHORT R:R is bad by construction (price near support, SL far at resistance). 0.55 lets through marginal 0.55-0.69 setups with 0.70x penalty while still blocking garbage (R:R < 0.55). Prior: 0.95→0.70 (2026-09-23).
 RR_ENGINE_CONF_HARD_BLOCK_SCORE = 35   # Score below this = hard block (grade F)
 RR_ENGINE_CONF_BOOST_THRESHOLD_RR = 4.0  # R:R above this + Grade A = boost
 RR_ENGINE_CONF_BOOST_MULT    = 1.30    # multiplier for exceptional setups (R:R≥4 + Grade A)
