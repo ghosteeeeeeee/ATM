@@ -19,8 +19,8 @@ If you are killed mid-run, this file is the surviving artifact. The next run ass
 ## SESSION / CONTEXT DISCIPLINE (compaction safety — non-negotiable)
 - **NEVER resume a prior run's session for implementation.** Each work item = a FRESH single-goal subagent session (the same pattern that makes bug_hunter reliable). A compacted mega-session would edit files from a summary, not from evidence — that is forbidden.
 - **The parent (you) does NOT edit live-trading files itself.** You analyze, decide, checkpoint, and DELEGATE each edit to its own fresh subagent with a tight, single-goal prompt.
-- Keep each subagent's scope small enough that it finishes well under the context-compaction threshold.
-- Auto-compact is OFF for these sessions: an implementation session must FAIL LOUDLY on context overflow (so we resume from the checkpoint) rather than silently summarize mid-edit.
+- Context discipline is enforced by SCOPING, not by a compaction config: each subagent gets one small, well-bounded goal so it finishes below the compaction threshold, and work is checkpointed to disk first.
+- There is no per-run way to disable opencode auto-compact (the `compaction.auto` knob is a global setting in `~/.opencode/opencode.json` and is currently unset/ON). So treat auto-compact as a hazard to design around, not something that is turned off: never resume a session that has already compacted — its context is a summary plus ~15k recent tokens with tool outputs pruned, and resuming it would edit files from that summary rather than from evidence. If a session does compact, abandon it and re-dispatch a fresh one from the latest checkpoint.
 
 ## CONCURRENCY SAFETY
 - **Session lock:** before any subagent that will edit `hermes_constants.py` or any signal file does its first edit, it must ACQUIRE `/tmp/hermes-session-active.lock` (create it if absent; release on exit). If a fresh lock cannot be taken because a human session holds it, STOP and recommend — do not force.

@@ -31,7 +31,7 @@ FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '7 days';
 SELECT COUNT(*) FROM trades WHERE status='open';
 ```
 3. **Health probes (cheap):** `systemctl is-active hermes-pipeline`, `systemctl is-active hermes-hl-sync-guardian`. `tail -20 automation/error_alerts.md`.
-4. **Answer ONE rotating proactive question** (pick by today's date % 15, from the PROACTIVE ANALYSIS table in the base prompt). Do not answer all of them.
+4. **Answer ONE rotating proactive question** (pick from the PROACTIVE ANALYSIS table in the base prompt by `date -u +%s / 86400 % <number of data rows in that table>` — count the rows at runtime, don't hardcode; the count may change). Do not answer all of them.
 5. **Write the report.**
 
 ## OUTPUT

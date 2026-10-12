@@ -313,7 +313,7 @@ ATM runs a **CEO + automation team** that continuously improves the system.
 
 | Role | Script | Job |
 |------|--------|-----|
-| **CEO** | `automation/ceo/ceo_prompt.md` | Strategic decisions, param changes |
+| **CEO** | `automation/ceo/run_ceo.sh` (status; `run_ceo_deep.sh`/`run_ceo_moe.sh` for deep/MoE) | Strategic decisions, param changes |
 | **Orchestrator** | `automation/orchestrator_prompt.md` | Daily implementation pipeline (12h) |
 | **Health Monitor** | `automation/health_monitor_prompt.md` | Pipeline health + anomalies (hourly) |
 | **Signal Reporter** | `automation/signal_reporter_prompt.md` | Signal performance analysis (6h) |

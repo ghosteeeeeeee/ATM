@@ -5,8 +5,9 @@
 # prompt so it NEVER runs inline in a status or deep run. Dispatches 6 parallel
 # fresh subagent sessions + a synthesis pass, all checkpointed.
 #
-# Triggered: systemd deep/MoE unit weekly, or manually. Monday-gated by default;
-# pass --force to run on any day (e.g. to re-run a missed Monday).
+# Triggered manually (or via a timer that does not exist yet — wire a
+# hermes-ceo-moe.timer before relying on automatic firing). Monday-gated by
+# default; pass --force to run on any day (e.g. to re-run a missed Monday).
 #
 # Design basis: CEO decision 2026-10-12 (automation/ceo/ceo_report.md).
 

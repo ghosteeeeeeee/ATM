@@ -8,8 +8,10 @@
 #   - ACQUIRES the session lock before dispatching any editor
 #   - single-writer (flock) for ceo_report.md / ceo_kanban.md
 #
-# Triggered: manually, by a DEEP_RUN_REQUESTED flag in ceo_report.md, or by the
-# weekly schedule (this script does NOT self-schedule; the systemd deep unit does).
+# Triggered: manually, or by a DEEP_RUN_REQUESTED / NEEDS_DEEP_RUN flag in
+# ceo_report.md. This script does NOT self-schedule — no systemd timer exists for
+# it yet (only run_ceo.sh is on a timer). Wire a hermes-ceo-deep.timer before
+# relying on it firing automatically.
 #
 # Design basis: CEO decision 2026-10-12 (automation/ceo/ceo_report.md).
 
@@ -91,7 +93,7 @@ nohup bash -c '
     # Always release the lock on ANY exit path (normal, timeout, or signal) — an
     # explicit call after `timeout` would be skipped if timeout is killed.
     trap "ceo_release_lock" EXIT
-    ceo_acquire_lock "ceo-deep" || { echo "[CEO-DEEP] child could not acquire lock; aborting." >&2; echo 3 > "$3"; exit 3; }
+    ceo_acquire_lock "ceo-deep-$(date -u +%Y%m%dT%H%M%SZ)-$$" || { echo "[CEO-DEEP] child could not acquire lock; aborting." >&2; echo 3 > "$3"; exit 3; }
     timeout 1800 "$OPENCODE" run --format json < "$1" >> "$2" 2>&1
     echo $? > "$3"
 ' _ "$PROMPT_FILE" "$jsonl" "$exitf" >/dev/null 2>&1 &

@@ -126,3 +126,24 @@ After making changes, report:
 
 **Rule: If you can't measure it, don't change it.**
 
+## PROACTIVE ANALYSIS
+
+Every run answers ONE rotating question from this table (picked by date), not all of them. The STATUS run rotates through it; the DEEP run may answer more when investigating a flagged problem.
+
+| Question | Data Source | Action |
+|----------|-------------|--------|
+| What's the PnL? | DB query | If negative, find why |
+| Which signal is worst? | DB query | **Check regime — keep alive in winning regimes** |
+| Which signal is best? | DB query | Tune for even better WR |
+| Are SHORTs bleeding? | DB query | Add regime filter |
+| Is the pipeline healthy? | systemctl | Fix crashes |
+| Are there new errors? | error_alerts.md | Investigate |
+| What signals are blocked by confluence? | pipeline logs | Add to standalone bypass or build new signal |
+| What regime are we in? | regime scanner | If NEUTRAL, prioritize volume-generating signals |
+| **Which signals are regime-specialists?** | DB query (per-regime WR) | **Keep alive in winning regime, snapshot params** |
+| **Has regime memory been updated?** | signal_regime_memory.json | If stale >7d, update from DB |
+| How many new signals developed this week? | kanban | If < 1, delegate to signal_analyst |
+| Which coins are in accumulation phase? | coin_tracker.db | Build signal for phase transition |
+| Are coin_tracker scores updating? | coin_tracker.db | If stale, check coin_tracker.py timer |
+| Coin tracker signals this week? | trades table | If < 5, delegate coin_tracker signal build |
+

@@ -8,8 +8,11 @@
 #  - Ephemeral port: each run gets its own port so concurrent runs don't collide.
 #  - Session lock: implementation runs ACQUIRE /tmp/hermes-session-active.lock
 #    before dispatching any editor (was a read-only check before -> collision risk).
-#  - compaction.auto=false: impl/deep/moe sessions FAIL LOUDLY on context
-#    overflow instead of silently summarizing mid-edit.
+#  - Context safety: auto-compact remains ON (no global override in
+#    ~/.opencode/opencode.json). Bounds come from each runner's timeout, NOT from
+#    compaction. Context safety is achieved by scoping + fresh-subagent dispatch +
+#    checkpoint-before-edit (see ceo_prompt_deep.md) — never by assuming compact
+#    is off.
 #  - Checkpoints: the FIRST action of any deep/moe run is a checkpoint file, so a
 #    hard kill leaves the decision + plan on disk.
 
@@ -66,47 +69,10 @@ ceo_release_lock() {
     fi
 }
 
-# ── Detached + streamed opencode run ────────────────────────────────────────
-# ceo_run_detached <label> <template-file> [task-file]
-#  - builds prompt = template + "\n\n---\n\n" + task  (on disk, avoids ARG_MAX)
-#  - passes the prompt via --file (no process substitution, no shell quoting traps)
-#  - relies on opencode's default RANDOM port (no collision between runs)
-#  - streams --format json to logs/ceo/<label>-<ts>.jsonl  (partial signal survives a kill)
-#  - writes the exit code to logs/ceo/<label>-<ts>.exit
-#  - returns immediately (detached). Caller polls the .exit file.
-#
-# Compaction: NOT disabled here. opencode has no per-run --config flag; the knob
-# is compaction.auto in ~/.opencode/opencode.json (shared). The status run is
-# short + read-only, so auto-compact is harmless there. The DEEP and MOE runs
-# enforce context discipline by DISPATCHING FRESH SINGLE-GOAL SUBAGENT SESSIONS
-# (never resuming a compacted mega-session) — the compaction-safety mechanism
-# the CEO approved. See ceo_prompt_deep.md / ceo_prompt_moe.md.
-ceo_run_detached() {
-    local label="$1" template="$2" task="$3"
-    local ts jsonl exitf prompt_file
-    ts=$(date -u +%Y%m%dT%H%M%SZ)
-    jsonl="$CEO_LOG_DIR/${label}-${ts}.jsonl"
-    exitf="$CEO_LOG_DIR/${label}-${ts}.exit"
-    prompt_file="$CEO_LOG_DIR/${label}-${ts}.prompt"
-
-    # Assemble prompt on disk.
-    cat "$template" > "$prompt_file"
-    if [ -n "$task" ] && [ -f "$task" ]; then
-        printf '\n\n---\n\n' >> "$prompt_file"
-        cat "$task" >> "$prompt_file"
-    fi
-
-    echo "[CEO] label=$label jsonl=$jsonl exit=$exitf"
-    # Prompt is fed on STDIN as the positional message (--file only ATTACHES files;
-    # it does not supply the message — verified by smoke test 2026-10-12).
-    # The watcher runs in the SAME subshell as the call, so `wait` is valid and the
-    # real exit code is captured.
-    nohup bash -c '
-        "$0" run --format json < "$1" >> "$2" 2>&1
-        echo $? > "$3"
-    ' "$OPENCODE" "$prompt_file" "$jsonl" "$exitf" >/dev/null 2>&1 &
-    local pid=$!
-    echo "$pid" > "$CEO_LOG_DIR/${label}-${ts}.pid"
-
-    echo "[CEO] detached pid=$pid — poll $exitf for completion"
-}
+# NOTE: there is deliberately no generic "launch a detached run" helper here. Each
+# runner (run_ceo_deep.sh, run_ceo_moe.sh) inlines its own nohup+timeout+stdin
+# launch so the exact invocation is visible and tested in one place. If you need a
+# shared launcher, add it AND update all callers + re-run the smoke test — do not
+# let two launch paths drift apart (a `--file` vs stdin divergence here shipped a
+# real bug on 2026-10-12 where the prompt was attached as a file and the run failed
+# with "You must provide a message or a command").
