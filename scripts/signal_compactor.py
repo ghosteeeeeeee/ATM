@@ -1681,10 +1681,17 @@ def _score_signal(token, direction, conf, source, signal_type,
         favorites_mult = 1.0
 
     # ── Combo-First Reputation System (replaces leaderboard_mult + combo_mult + HALL-SHAME) ──
-    # Phase 2: shadow mode logs multiplier but doesn't apply. Flip REP_SHADOW_MODE=False to go live.
-    from reputation import get_combined_multiplier as _rep_get_mult, should_block as _rep_should_block, REP_SHADOW_MODE as _REP_SHADOW
-    _rep_result = _rep_get_mult(token, source, direction)
-    _rep_hos = _rep_should_block(token, source, direction)
+    # MEDIUM fix: guarded import — a half-written reputation.py must not kill the compactor
+    try:
+        from reputation import get_combined_multiplier as _rep_get_mult, should_block as _rep_should_block, REP_SHADOW_MODE as _REP_SHADOW
+        _rep_result = _rep_get_mult(token, source, direction)
+        _rep_hos = _rep_should_block(token, source, direction)
+    except Exception as _rep_e:
+        log(f"  ⚠️ [REP] import/call failed ({_rep_e}) — fail-open to 1.0x")
+        _rep_result = {'mult': 1.0, 'combo': None, 'coin': None, 'signal': None,
+                       'hos': {'mult': 1.0, 'reason': 'rep_error'}, 'hos_applied': False, 'shadow': False}
+        _rep_hos = {'mult': 1.0, 'reason': 'rep_error'}
+        _REP_SHADOW = False
     if _REP_SHADOW:
         # Shadow: log what WOULD happen, use old logic for actual scoring
         leaderboard_mult = _get_leaderboard_mult(token, direction)

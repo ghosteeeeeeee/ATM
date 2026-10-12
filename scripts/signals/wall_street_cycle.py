@@ -315,7 +315,7 @@ def _detect_euphoria(candles_5m, candles_1h, candles_4h, token=None):
     }
 
 
-def _detect_capitulation(candles_5m, candles_1h, candles_4h):
+def _detect_capitulation(candles_5m, candles_1h, candles_4h, token=None):
     """Detect Capitulation phase (LONG signal).
 
     Capitulation = crash + extreme oversold + panic volume + buyer rejection wicks.
@@ -404,8 +404,13 @@ def _detect_capitulation(candles_5m, candles_1h, candles_4h):
     conf = max(conf, WALL_ST_CYCLE_CONF_FLOOR)
 
     # Compute 1m RSI for metadata
-    from signals.rsi_1m import compute_rsi_1m
-    rsi_1m = compute_rsi_1m(token)
+    rsi_1m = None
+    if token:
+        try:
+            from signals.rsi_1m import compute_rsi_1m
+            rsi_1m = compute_rsi_1m(token)
+        except Exception:
+            pass
 
     return {
         'direction': 'LONG',
@@ -499,7 +504,7 @@ def scan_wall_street_cycle_signals():
         # Try both detection modes
         sig = _detect_euphoria(candles_5m, candles_1h, candles_4h, token=token)
         if not sig:
-            sig = _detect_capitulation(candles_5m, candles_1h, candles_4h)
+            sig = _detect_capitulation(candles_5m, candles_1h, candles_4h, token=token)
         if not sig:
             continue
 

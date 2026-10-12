@@ -182,6 +182,7 @@ def _load_combo_data():
         # ── PostgreSQL fallback (plan: Hebbian primary, PG fallback) ──
         # Hebbian trade_log only records trades closed via position_manager.py.
         # PG has full coverage (~761 trades 30d vs ~735 Hebbian). Fill gaps.
+        pg_conn = None
         try:
             import psycopg2
             pg_conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
@@ -277,8 +278,19 @@ def _load_combo_data():
                     }
 
             pg_conn.close()
-        except Exception:
-            pass  # PG fallback is best-effort; Hebbian data is primary
+            pg_conn = None
+        except Exception as e:
+            # MEDIUM fix: log PG failures instead of silent swallow
+            try:
+                print(f"  ⚠️ [REP] PG fallback failed: {e} (Hebbian data is primary)")
+            except Exception:
+                pass
+        finally:
+            if pg_conn:
+                try:
+                    pg_conn.close()
+                except Exception:
+                    pass
 
         _cache_ts = now
         _load_failed_ts = 0
