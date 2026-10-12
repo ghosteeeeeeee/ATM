@@ -4572,3 +4572,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-12 22:13] auto_1hr: NO CONFIG CHANGE — 2T last hour both oversold-bounce+ hard_max_loss (−/usr/bin/bash.23) | 0 open | 24h 21T 8W −$0.20 (38.1%) — first negative day-net | kill: oversold-bounce+ 2T 0W last hour (rule needs 3+, not met; 0/4 since Oct 11 — ESCALATE, one more red = kill) | hard_max_loss 47.6% (hold brain_auditor) | atr_sl_hit 4.8% (tpsl stable) | overtrade 2/hr | streak 2-neg (20h/21h), not 3 | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-12 23:13] auto_1hr: NO CONFIG CHANGE — 1T last hour BTC hl_copy_trader atr_sl_hit (−$0.03) | 0 open | 24h 22T 8W −$0.23 (36.4%) | kill: none qualifying (oversold-bounce+ 0T last hour, rule needs 3+) | hard_max_loss 45.5% (hold brain_auditor) | atr_sl_hit 9.1% (tpsl stable) | overtrade 1/hr | streak 3-neg but tiny (−$0.38) + regime SHORT_BIAS not NEUTRAL, no size cut | live_trading=true, kill JSON=true
+BY: auto_1hr

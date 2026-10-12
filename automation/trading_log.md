@@ -8946,3 +8946,24 @@ Final set: []
 - oversold-bounce+ LONG watch-listed (3x consecutive hard_max_loss, n=8 all-time break-even; below 5T 24h threshold).
 - Boosts: none (no 5T+ winners). Inversions: none.
 - Report: automation/signal_report.md
+
+## [2026-10-12 23:13] Hourly Analysis
+
+**Trades:** 1 closed last hour — BTC hl_copy_trader LONG atr_sl_hit −$0.03 (−1.15%)
+**PnL:** −$0.03 last hour | 24h: 22T 8W −$0.23 (36.4%) | 0 open
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: oversold-bounce+ 0T last hour — kill rule (3+ trades at 0% WR last hour) not met; prior escalation ("next red = kill") didn't fire because no new close. Still 0/3 24h −$0.29, remains top watchlist item
+- atr_sl_hit 2/22 ≈ 9.1% — under 40%, tpsl_utils deployed
+- hard_max_loss 10/22 ≈ 45.5% −$0.84 — hold brain_auditor (SL width lever), not auto_1hr's to touch
+- Overtrade: 1/hr — well under 20
+- Streak: 20h −$0.12, 21h −$0.23, 22h −$0.03 = 3 consecutive negative hours, BUT all tiny (−$0.38 total) and regime is SHORT_BIAS (5m aggregate: 2 long / 61 short / 56 neutral), not NEUTRAL — size-reduction condition not met
+- live_trading=true (constants line 33 + kill JSON), verified this run
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h net drifted −$0.20 → −$0.23; 36.4% WR well below ≥50% Oct 15 goal, but trade volume is very thin (22 in 24h, most hours zero)
+- pump-chain+ (6T 1W −$0.45) and oversold-bounce+ (3T 0W −$0.29) = 78% of 24h losses from 9 of 22 trades — both on watchlist, neither meets kill rule this hour
