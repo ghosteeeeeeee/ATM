@@ -4071,5 +4071,16 @@
     "category": "entry gate",
     "status": "rejected",
     "risk": "high-if-shipped"
+  },
+  {
+    "date": "2026-10-12T12:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "pump-chain+ LONG trail-arm timeout (45m variant, same +0.40% arm threshold) — extend bb-squeeze timeout pattern",
+    "rationale": "Verified counterfactual 30d: saves $1.75 (10 never-armed stall deaths held>=45m), kills $0.00 (0 winners had never-armed+45m profile; 44 armed winners $10.35 all safe). pump-chain+ HML 7d 9T -$0.87, 30d 11T 10 never-armed. Same grind-stall disease as bb-squeeze.",
+    "expected_impact": "+$1.50-1.75/30d, ~3 pre-emptions/30d",
+    "category": "chop exit / stall pre-emption",
+    "status": "queued-on-soak",
+    "risk": "low",
+    "gate": "Ship ONLY after bb-squeeze trail-arm timeout 72h soak (Oct 15) clean. One variable at a time."
   }
 ]
