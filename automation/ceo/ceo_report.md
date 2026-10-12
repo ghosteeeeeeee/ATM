@@ -1,3 +1,47 @@
+## CEO Decision — 2026-10-12 — ceo-comm rework (design-only, no implementation)
+
+### Decisions (lead)
+1. **Root cause CONFIRMED** = unbounded scope + all-or-nothing kill. Not a model/provider speed problem. Evidence: `run_ceo.sh:37` is a single `timeout 600 bash -c "cat ceo_prompt.md | opencode run"` — SIGTERM kills the process, zero partial output captured. `ceo_prompt.md` (394 lines) mandates Steps 0–5 as "ACTIVE — every run" (live SQL verification, tune a signal, develop a signal, develop coin_tracker) plus a Monday 6-subagent MoE panel. That cannot fit in 600s. Secondary finding: the script's own comment says "Timeout: 5 minutes (300s)" but the actual timeout is 600 — stale comment, fix on implement.
+2. **Compaction-safe design APPROVED with 3 amendments** (full detail below). Your instinct that `-c` resume of a compacted giant session is BAD is correct — auto-compact keeps only ~15k recent tokens and prunes tool outputs; resumed impl sessions would edit files on a summary, not on evidence. Do not use `-c`/`-s` across runs for implementation at all.
+3. **Step 0–5 on every run: NO — trim and split.** Concrete split below. The "develop new signal / coin_tracker every run" language is the primary budget blowout and moves to weekly.
+
+### The design I approve
+| Piece | Verdict | Amendment |
+|-------|---------|-----------|
+| (a) Status-report = one read-only bounded session | ✅ | One SQL batch (24h + 7d + per-signal), not Step 2's full interrogation. Budget ~3 min. |
+| (b) Decision/impl = fresh single-goal subagent sessions | ✅ | Same pattern that made bug_hunter succeed. One goal per session, parent never edits files itself. |
+| (c) Checkpoint-to-disk BEFORE any edits | ✅ | Parent writes `automation/ceo/checkpoints/<ts>-decision.md` (decision + evidence + plan + files-to-touch) BEFORE dispatching. Each subagent appends `<ts>-result-<n>.md`. Even a hard kill leaves the decision and partial results on disk; next run assembles the report from checkpoints. |
+| (d) auto-compact OFF on impl sessions | ✅ | Silent mid-edit summarization is strictly worse than a loud overflow failure. Config per-session or via agent config. |
+| (e) Detach + JSON stream | ✅ | `nohup`/`systemd-run` + `--format json >> logs/ceo/<ts>.jsonl` + capture exit code to a `.exit` file. Timeout becomes a signal to inspect, not a data-loss event. |
+
+**Amendments / risks you missed:**
+1. **Lock is read-only today.** `run_ceo.sh` checks `/tmp/hermes-session-active.lock` but never CREATES it. A detached impl session that edits `hermes_constants.py` while a human session is live would collide. Fix: the detached impl run must acquire the lock before its first edit and release on exit (flock or timestamp file). Status sessions don't need it.
+2. **Concurrent-writer hazard.** Multiple detached sessions (status + N subagents) all potentially touching `ceo_kanban.md` / `ceo_report.md`. Rule: subagents write ONLY their own checkpoint files; a single aggregator (parent or next run) is the sole writer of kanban/report. Use `flock` on that writer.
+3. **Port collision.** Current script pins `--port 4099`. Two detached sessions = conflict. Use a random/ephemeral port for detached runs, or one port per session type.
+4. **MoE panel must leave the normal run entirely.** Separate script (`run_ceo_moe.sh`), own budget (detached, ~30 min), Monday only. Never in the same process as a normal run.
+5. **`-c`/`-s` usage policy:** status session may use `-s` within its own short life if it needs a second turn; NEVER resume a prior run's session for implementation. Fresh session every time.
+
+### Concrete run-split (recommendation for Step 0–5)
+| Run type | Frequency | Scope | Budget |
+|----------|-----------|-------|--------|
+| **Status run** | every scheduled tick | CURRENT.md + team updates + ONE SQL batch (24h totals, 7d totals, per-signal 7d) + ONE rotating proactive question + write report. Read-only. | ~3 min, in-process OK |
+| **Deep run** | weekly (or when status run flags a problem) | Regime-aware analysis (Step 2b), ONE signal tune, ONE signal-development task — each dispatched as a fresh subagent session with a checkpoint file. | detached, per-task budget |
+| **MoE panel** | Monday only, separate script | 6 parallel expert subagents, synthesis to `reports/`. | detached, ~30 min |
+
+Rationale: the current prompt conflates "CEO checks the system" (cheap, frequent) with "CEO improves the system" (expensive, rare). Splitting them keeps the frequent path bounded and makes the expensive path survivable. "Develop new signals / coin_tracker every run" becomes "every weekly deep run" — that alone recovers most of the budget.
+
+### What I am NOT approving
+- Resuming one giant `-c` session across runs (your analysis is right; rejected).
+- Raising the timeout instead of bounding the work (treats the symptom).
+- Removing the checkpoint-before-edit rule for any session that touches files.
+
+### Verification plan (when implemented)
+1. Run status session 3× back-to-back — must complete <3 min each, produce a report every time.
+2. Kill an impl session mid-flight with SIGTERM — checkpoint file + partial subagent results must exist on disk and be assemblable.
+3. Confirm auto-compact-off session fails loudly (non-zero exit, error in .jsonl) on a deliberately oversized prompt instead of summarizing.
+
+---
+
 ## CEO Report — 2026-10-12
 
 ### Diagnosis
