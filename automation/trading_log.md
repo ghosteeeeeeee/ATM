@@ -8578,3 +8578,25 @@ Final set: []
 **No live changes this run.** 0 TRADING CONFIG CHANGES.
 
 **Next:** Oct 13 — Phase 2a wiring + Wyckoff shadow rule. CEO — trail-arm GO + hard_max_loss trail-floor design. Oct 15 — WR checkpoint.
+
+## [2026-10-12 07:14] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 (0%) | 24h: 18T 10W +$0.95 | 3 open (BTC continuum LONG 5h flat, HYPE volume-buildup+ 0.4h flat, DOT bb-squeeze+ just opened)
+
+**Changes:** None.
+
+**No Change Needed:**
+- atr_sl_hit 1/18 ≈ 5.6% of 24h closes — under 40%, tpsl_utils deployed
+- Kill: 0 candidates — 0T last hour; 24h losers pump-chain+ 3T −$0.26 (1W), ai-trader+ 3T −$0.13 (1W) — n=3 too small, same watchlist as prior hour
+- hard_max_loss 5/18 ≈ 28% −$0.36 — hold brain_auditor (SL width lever), not touched
+- profit-monster-trail 6/24h +$0.80, hard_tp 2 +$0.59 — trailing remains profit engine
+- Overtrade: 0/hr — well under 20
+- Streak: 00h −$0.17, 01h +$0.51, 02h −$0.01, 03h +$0.09, 05h −$0.07 — no 3-neg-hr run (04h/06h zero-trade gaps)
+- 24h PnL drifted +$1.81 → +$0.95 (window roll, GRASS loss leaving window)
+- live_trading=true, kill JSON=true, timers fresh (all fired within last few min)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- BTC continuum LONG open ~5h flat $0.00 — 5th consecutive hour flagged; continuum is low-frequency by design, monitor but no action
