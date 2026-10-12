@@ -8443,3 +8443,25 @@ Last hour: CFX pump-chain+/pump-chain-v6+ LONG exit atr_trail_hit +$0.63 (+28.02
 
 **Open Questions:**
 - 4th BTC continuum position opened 22:08 while 3 from 18:2x still open (~5h) — same-coin cluster persists; watch if positions never close or accumulate further
+
+## [2026-10-12 02:13] Hourly Analysis
+
+**Trades:** 4 closed last hour (3 wins, 1 loss)
+**PnL:** +$0.55 (WR 75%) | 24h real: 17T 9W +$1.50 | 0 open
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: no signal 0% WR with 3+ trades last hour (ai-trader-manual 2T/2W +$0.59, grind-breakout+ 1W, oversold-bounce+ 1L −$0.06)
+- atr_sl_hit 1/24h ≈ 4% — under 40%, tpsl_utils deployed
+- hard_max_loss 6/24h ≈ 33% −$0.47 — hold brain_auditor (SL width lever; its 00:42 LONG_MIDBAND bb-squeeze exemption already deployed)
+- profit-monster-trail 5/24h +$0.92 + atr_trail_hit 2 +$0.62 — trailing still the profit engine
+- Overtrade: 4/hr — well under 20
+- Streak: 00h −$0.17, 01h +$0.51, 02h +$0.04 — no 3-neg-hr run
+- BTC continuum cluster resolved (0 open positions now)
+- live_trading=true, kill JSON=true, timers fresh (~1min)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 4 BTC continuum positions from yesterday all closed without appearing in last-hour closes as real PnL — confirm they closed earlier as scratch/artifacts vs still tracked elsewhere

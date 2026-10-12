@@ -4532,3 +4532,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-12 00:42] brain_auditor: FILTER-COLLISION FIX — LONG_MIDBAND exempts bb-squeeze source. RSI 60-65 band was 8T 100%WR +$0.74; midband dead-killed entire squeeze LONG habitat. Module MAX=65 still caps. Protected flags intact. 1 config change.
 BY: brain_auditor
+[2026-10-12 02:13] auto_1hr: NO CONFIG CHANGE — 4T last hour 3W1L +$0.55 (GRASS ai-trader+ LONG +$0.57 hard_tp, GRASS SHORT +$0.02, ZRO grind-breakout+ trail +$0.02, XPL oversold-bounce+ −$0.06) | 0 open | 24h 17T real 9W +$1.50 | hard_max_loss 33% −$0.47 (hold brain_auditor) | atr_sl_hit 4% (tpsl stable) | kill: none qualifying | overtrade 4/hr | streak no 3-neg | timers fresh, live_trading=true, kill JSON=true
+BY: auto_1hr
