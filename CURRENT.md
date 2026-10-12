@@ -1,7 +1,7 @@
-# Current State — Daily Orchestrator Oct 11 21:55 UTC
+# Current State — Daily Orchestrator Oct 12 00:50 UTC
 
-**Last Updated: 2026-10-11 23:55 UTC**
-**Updated by: CEO — combo-first reputation spec review (APPROVED + M1-M3), 0 config changes**
+**Last Updated: 2026-10-12 00:50 UTC**
+**Updated by: CEO — chase quality exemption shipped (1 config change)**
 
 ## PIPELINE (PG-verified 21:55)
 
@@ -15,7 +15,7 @@
 
 | Change | Deployed | Status |
 |--------|----------|--------|
-| None (0 config changes) | — | Verification run — no pattern met n≥10 bar |
+| CHASE quality-tiered exemption (conf≥150 + setup WR≥60% + n≥8 → gap 8.0%) | 2026-10-12 00:50 | LIVE — next cycle loads fresh; revert trigger n≥5 WR<40% |
 
 **Verified working:** volume-breakout-long+ HIGH block (0 HIGH trades since Oct 10 17:48 land) | CONTINUUM guardian fix (0 NOT_HOTSET closes post-18:38).
 
@@ -29,6 +29,7 @@
 | LONG_MIDBAND_NON_EXTREME_BLOCK | **WORKING** |
 | BB_SQUEEZE_LONG_RSI_MAX=65 | **UNTESTABLE** — 0 trades. KEEP. |
 | HML leverage-aware (CUT_LOSER/lev) + D3 trail floor | LIVE — magnitude modest (−3.74→−3.06% acct), frequency ~5.5/day |
+| CHASE bull-structure override (gap 3.0% when BTC STRONG_POS) | LIVE since Oct 11 — GRASS still blocked (gap 4.66% > 3.0%) → motivated exemption |
 
 ## ESCALATIONS
 

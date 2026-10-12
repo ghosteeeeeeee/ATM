@@ -1,42 +1,36 @@
-# CEO Report — 2026-10-11 (Spec Review: Combo-First Reputation System)
+## CEO Report — 2026-10-12
 
-## VERDICT: APPROVE with 3 mandatory modifications
+### Chase Block vs Late Entry Decision
 
----
+**DECISION: Option B (refined) — quality-tiered chase exemption. NOT a flat threshold raise, NOT removal.**
 
-## Decisions
+**Root-cause correction:** The task's framing is wrong on two counts:
+1. **gap_at_entry is NOT latency.** It's price-vs-EMA300 extension (decider_run.py:4724). Staleness data proves the filter stack is fast: AIXBT/INJ/USELESS executed 1-2min after signal. The "filter stack latency" diagnosis is incorrect.
+2. **The AIXBT/INJ/USELESS losers were NOT chase-blocked.** Their gaps were 0.01%, 0.28%, 1.22% — all below the 2.0% threshold. They entered early in BTC chop with no momentum. Different failure mode entirely. USELESS was correctly blocked LATER (16:00, gap 4.74%) when it was extended.
 
-### 1. Combo penalty aggressiveness: **AGGRESSIVE (0.5x/0.3x) — APPROVED as specced**
-Rationale: PG 30d shows real bleeding combos at n≥5 (pump-chain-v5 LONG 33.3% −$0.42, trend_purity+ LONG 36.4% −$0.90, open-skies+ LONG 33.3% −$0.40). n≥5 threshold is the sample guard — conservative 0.7x/0.5x would be noise-level and not fix the "bonus-only" problem. Note: Hebbian trade_log is sparse (3,393 unique combos / 5,555 rows ≈ 1.6 trades/combo), so most combos will sit at NEW 1.0x; penalties only fire on the few with real history. That is correct behavior.
+**Verified evidence (PG self-query):**
+- Historical gap>2% executed LONGs (14d, pre-tightening): 8T, 25% WR, -$1.10. **All conf 71-102.**
+- GRASS Oct 12 00:36-00:43: conf=193, setup WR=75% n=8, passed CTX-GATE/VOL-GATE/sentiment/hotset. Blocked at gap 4.66→6.77% (bull override active at 3.0%). Token continued up.
+- Recent chase-blocks: CFX conf 129, USELESS conf 88, ICP conf 48-121 — **none** would pass a conf≥150 gate.
 
-### 2. New combos: **NEUTRAL 1.0x — APPROVED as specced**
-Rationale: 0.9x penalizes before evidence exists — violates "if you can't measure it, don't change it." With Hebbian sparsity (~1.6 trades/combo), most combos ARE new; a blanket 0.9x would tax the entire unproven universe and slow signal development. Neutral 1.0x + shadow-mode evaluation (per Step 4 workflow) is the right path.
+**Why not the other options:**
+- **A (raise to 5-8%):** Would also admit all 8 historical losers (conf 71-102, 25%WR). Blunt instrument.
+- **C (speed up stack):** Staleness already 1-2min. Wrong diagnosis.
+- **D (momentum confirmation):** Another filter, more latency. The conf+setup gate IS quality confirmation.
+- **E (scale position):** Execution doesn't support it; exemption achieves the goal simpler.
 
-### 3. HALL-SHAME block: **CONVERT to 0.3x multiplier, keep combo-override — APPROVED**
-Rationale: hard block (score→0.0) at coin WR<55%/15+ trades is the JUP bug — kills valid combos. New logic: block becomes 0.3x multiplier (equivalent to "Bad coin" tier); proven combo (WR≥60%, 3+ trades) overrides to full strength. This preserves suppression of shame coins without categorical kills. Coin-level remains the weaker fallback per the tier design.
+**Fix applied:** `CHASE_EXEMPT_MIN_CONF=150`, `CHASE_EXEMPT_MIN_SETUP_N=8`, `CHASE_EXEMPT_MIN_SETUP_WR=60`, `CHASE_EXEMPT_GAP_MAX=8.0` (hermes_constants.py:865-871). Exemption in decider_run.py:4786-4802 — only widens the GAP branch; z-score block intact. Historical losers all rejected by conf<150 gate. Only GRASS-class signals (conf≥150 + proven setup) qualify.
 
-### 4. Overall spec: **APPROVE** with modifications below.
+**Honest limitation:** n=1 GRASS winner. The conf separation (losers 71-102 vs GRASS 193) is theoretically clean and the gate is narrow, but this is not statistically significant alone. **Revert trigger: exempt cohort n≥5 with WR<40% or PnL<-$1 over 14d.** Self-check 9/9 PASS.
 
----
+### Diagnosis
+7d PnL +$0.41, WR 41.4%. hard_max_loss 46T 0%WR -$5.60 remains #1 bleed (entry-side, separate issue). Chase filter was blocking the highest-quality signal of the day (GRASS conf 193) while admitting low-quality near-EMA entries that lost in chop.
 
-## Mandatory Modifications (before implementation)
+### Root Cause
+Flat chase threshold treats conf-48 and conf-193 identically. High-confidence momentum continuation (the biggest pumps, by definition the most extended) gets the same block as low-confidence late chases.
 
-| # | Modification | Why |
-|---|-------------|-----|
-| M1 | **Pin Hebbian DB path to `brain/associative_memory.db`, NOT `data/associative_memory.db`** — the data/ copy is a **0-byte stub** | Verified: `data/associative_memory.db` = 0 bytes; real DB (4.7MB, 5,555 trade_log rows) is in brain/. Spec's Phase 1 must use the brain/ path or primary data source is empty. |
-| M2 | **Filter test tokens out of trade_log queries** — `TEST_TTOK_B/TEST_TSIG_B` rows exist (9 rows, 0% WR) | Verified in trade_log. Without exclusion, TEST rows pollute combo WR stats and could theoretically fire penalties on test data. Add `token NOT LIKE 'TEST%'` guard in reputation.py queries. |
-| M3 | **Phase 1 must land with `reputation.py` in shadow-only mode (log multiplier, don't apply) for 48h** before Phase 2 replaces live `_get_leaderboard_mult`/`_get_combo_mult`/HALL-SHAME | Combo penalties are NEW behavior (currently bonus-only). A bug in tier logic would suppress live trades across the book. Shadow 48h = measure before applying. Standard repo pattern. |
+### Fix Applied
+Quality-tiered exemption: conf≥150 + setup WR≥60% + n≥8 → gap limit 8.0%. Base threshold 2.0% unchanged for everyone else. Z-score block unchanged.
 
-## Sideways findings (fold into implementation, already in spec)
-- `hall_of_fame` dead data — use it or stop computing (spec line 136)
-- Hebbian circuit breaker blind: 0/200 outcomes filled (spec line 137)
-- `entry_gates.hebbian_gate()` dead code (spec line 138)
-- `tp_bonus_mult` 1.50 vs 1.75 inconsistency (spec line 139)
-- HoS threshold mismatch: block at WR<55%, list classifies at WR<45% (spec line 20) — reconcile in constants move
-
-## Protected flags
-No trading config changed this run. CONFLUENCE_REQUIRED, LIVE_TRADING_ENABLED, ROTATOR_PROTECTED_FLAGS, CEO_PROTECTED_FLAGS all INTACT (spec review only — no code touched).
-
-## Next
-- Delegate Phase 1 (`scripts/reputation.py` + constants) to bug_hunter with M1/M2/M3 embedded
-- Shadow-mode 48h review checkpoint: **2026-10-13**
+### Verification
+py_compile OK both files. Self-check 9/9 PASS (scripts/test_chase_exempt.py). Historical losers all rejected by new gate (conf 71-102 < 150). Protected flags INTACT. Next pipeline cycle loads fresh — no restart.

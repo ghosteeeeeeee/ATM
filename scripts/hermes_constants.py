@@ -862,6 +862,15 @@ SIGNAL_FILTER_Z_MAX = 1.5            # block SHORT when z > this AND speed < 50%
 CHASE_FILTER_ENABLED = True
 CHASE_GAP_MAX_PCT = 2.0              # brain_auditor 2026-09-25: tightened 3.0→2.0. Gap>2.0% = 8T/14d 25%WR -$1.10. Only 2 winners ($0.23). Blocks BABY(1.687), ACE(2.56), ADA(1.95) chases.
 CHASE_ZSCORE_MAX = 2.5               # max z-score for LONG (blocks chasing extended moves)
+# Quality-tiered chase exemption (CEO 2026-10-12): high-confidence proven setups get
+# a wider gap limit. Evidence: historical gap>2% losers were ALL conf 71-102 (25%WR -$1.10);
+# GRASS ai-trader+ conf=193 setup WR=75% n=8 was blocked at gap 4.66% and token ran +29%.
+# Exemption only widens the GAP branch — z-score block stays intact. Revert trigger:
+# exempt cohort (conf>=150 + gap>2%) n>=5 with WR<40% or PnL<-$1 over 14d.
+CHASE_EXEMPT_MIN_CONF = 150          # final_confidence threshold for exemption
+CHASE_EXEMPT_MIN_SETUP_N = 8         # min similar-setup sample size
+CHASE_EXEMPT_MIN_SETUP_WR = 60       # min similar-setup WR %
+CHASE_EXEMPT_GAP_MAX = 8.0           # gap limit when exemption applies (was 2.0/3.0)
 
 # ── Global Spike Filter ────────────────────────────────────────────────────
 # Block SHORT entries after recent bullish 5m candle (spike → consolidation → bad SHORT)

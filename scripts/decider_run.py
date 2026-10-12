@@ -4783,6 +4783,23 @@ def run(dry_run=False):
                         _chase_gap_limit = 3.0
             except Exception:
                 pass
+            # FIX 2026-10-12 CEO: quality-tiered exemption — high-conf proven setups
+            # get wider gap limit. Historical gap>2% losers conf 71-102; GRASS conf 193
+            # setup WR 75% blocked at 4.66% and ran +29%. Only widens GAP branch.
+            try:
+                from hermes_constants import (CHASE_EXEMPT_MIN_CONF, CHASE_EXEMPT_MIN_SETUP_N,
+                                               CHASE_EXEMPT_MIN_SETUP_WR, CHASE_EXEMPT_GAP_MAX)
+                _exc_conf = sig.get('final_confidence') or 0
+                if _exc_conf >= CHASE_EXEMPT_MIN_CONF and _gap_at_entry is not None:
+                    _exc_setup = similar_setup_lookup(token, source, direction)
+                    if (_exc_setup and _exc_setup.n >= CHASE_EXEMPT_MIN_SETUP_N
+                            and _exc_setup.win_rate * 100 >= CHASE_EXEMPT_MIN_SETUP_WR):
+                        _chase_gap_limit = CHASE_EXEMPT_GAP_MAX
+                        log(f'  [CHASE-EXEMPT] {token} {direction}: conf={_exc_conf:.0f} '
+                            f'setup n={_exc_setup.n} WR={_exc_setup.win_rate*100:.0f}% '
+                            f'→ gap limit relaxed to {_chase_gap_limit}%')
+            except Exception:
+                pass
             if _sig_z is not None and float(_sig_z) > CHASE_ZSCORE_MAX:
                 _is_chase = True
                 _chase_reason = f'z={_sig_z}>{CHASE_ZSCORE_MAX}'
