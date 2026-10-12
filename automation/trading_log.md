@@ -8814,3 +8814,24 @@ Final set: []
 **Open Questions:**
 - 24h WR at 42.9% with only +$0.10 net for third consecutive hour — thin but positive; escalate if next hour closes negative
 - Quiet stretch: 0 trades in 7 of last 8 hours, 0 open positions — market lull or over-filtering; no action while 24h net positive
+
+## [2026-10-12 18:14] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 | 24h: 19T 8W +$0.09 (42.1%) | 0 open
+
+**Changes:** None.
+
+**No Change Needed:**
+- atr_sl_hit 1/19 ≈ 5.3% of 24h closes — under 40%, tpsl_utils deployed
+- Kill: 0 candidates — 0T last hour; 24h losers pump-chain+ 3T 0W −$0.33, ai-trader+ 3T 1W −$0.13 (kill rule needs 3+ trades last hour, not met)
+- hard_max_loss 8/19 ≈ 42% −$0.57 — hold brain_auditor (SL width lever), not touched
+- Overtrade: 0/hr — well under 20
+- Streak: last negative hours 08h (−$0.09) / 09h (−$0.12), then zero-trade — not 3 consecutive negative PnL hours
+- live_trading=true (constants line 33 + kill JSON), verified this run
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR at 42.1% with +$0.09 net — thin; fourth consecutive hour watching, escalate if next hour closes negative
+- Quiet stretch: 0 trades in 8 of last 9 hours, 0 open positions — market lull or over-filtering; no action while 24h net positive
