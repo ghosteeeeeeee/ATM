@@ -8749,3 +8749,25 @@ Final set: []
 **Open Questions:**
 - BTC continuum LONG open ~12h flat $0.00 — 12th consecutive hour flagged; continuum is low-frequency by design, monitor but no action
 - Quiet stretch: 0 trades in 5 of last 6 hours — market lull or over-filtering; no action while 24h still net positive
+
+## [2026-10-12 15:13] Hourly Analysis
+
+**Trades:** 1 closed last hour (BTC continuum LONG, flat)
+**PnL:** $0.00 (pnl_pct -1.28, fees) | 24h: 21T 9W +$0.10 (42.9%) | 0 open
+
+**Changes:** None.
+
+**No Change Needed:**
+- BTC continuum finally closed ~12.5h flat after being flagged 12 consecutive hours — no longer open, stale-position watch cleared
+- atr_sl_hit 1/21 ≈ 4.8% of 24h closes — under 40%, tpsl_utils deployed
+- Kill: 0 candidates — 1T last hour flat; 24h losers pump-chain+ 4T 1W −$0.31, ai-trader+ 3T 1W −$0.13 (both have wins, n small), oversold-bounce+ 2T 0W −$0.07 under 3T threshold — same watchlist 9+ hours
+- hard_max_loss 8/21 ≈ 38% −$0.57 (avg −$0.071) — hold brain_auditor (SL width lever), not touched
+- Overtrade: 1/hr — well under 20
+- Streak: 08h −$0.09, 09h −$0.12, then zero-trade hours, 14h $0.00 — not 3 consecutive negative PnL hours
+- live_trading=true prior check; no constants edit
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR drifted to 42.9% with only +$0.10 net — still positive but thin; watch if next hour goes negative before escalating
+- Quiet stretch: 0 or 1 trade in each of last 6 hours — market lull or over-filtering; no action while 24h net positive
