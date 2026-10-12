@@ -225,13 +225,14 @@ If you skip this, the next session starts blind.
 ### Available Shared Skills (38+)
 - **Verification:** `post-change`, `bug-hunter`, `own-conclusions` (independent audit — no priming, fresh eyes)
 - **Trading:** `signal-lab`, `signal-backtest`, `signal-quality-tuner`, `signal-combo-analyzer`, `trade-analysis`, `trade-stats`, `winrate-calculator`, `hotset-debug`, `phantom-trades`
-- **System:** `decisions` (lists uncertain choices made during work), `handoff`, `ceo-comm`, `pipeline-visualizer`
+- **System:** `decisions` (lists uncertain choices made during work), `handoff`, `ceo-comm`, `pipeline-visualizer`, `automatic-implementation` (staggered shadow→enforce rollout for gates/filters/signals)
 - **Content:** `graphify`, `transcript-miner`, `youtube-watch`, `download-pdfs`
 - **Books:** 16 trading books (Wyckoff, Price Action, etc.)
 
 ### Skill Usage Notes
 - **`decisions`** — Run after any significant work to surface uncertain choices. Trigger: `/decisions`
 - **`own-conclusions`** — Independent verification agent. Give it data, it reads from scratch and makes its own conclusions. Trigger: "own conclusions", "verify independently", "fresh eyes". Saves verdicts to `brain/verdicts/`.
+- **`automatic-implementation`** — Staggered shadow→enforce rollout pattern for any gate/filter/signal touching live trading. Ships code OFF, collects counterfactual data, then flips ON with CEO approval. Trigger: "shadow mode", "staggered rollout", "phased implementation".
 
 ### Shared MCP Servers
 | Server | Purpose |
