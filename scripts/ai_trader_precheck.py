@@ -78,6 +78,41 @@ def precheck(coin, direction):
     except Exception as e:
         check('ATR', False, f'error: {e}')
 
+    # 1b. VOL-FLOOR check — coefficient of variation (std/mean %) over last 20 closed candles
+    try:
+        import hermes_constants as hc
+        vol_floor_enabled = getattr(hc, 'VOL_FLOOR_ENABLED', True)
+        vol_floor_threshold = getattr(hc, 'VOL_FLOOR_THRESHOLD', 0.30)
+        if vol_floor_enabled:
+            conn = None
+            try:
+                conn = _get_candles_db()
+                cur = conn.cursor()
+                cur.execute('''
+                    SELECT close FROM candles_5m
+                    WHERE token = ? AND is_closed = 1
+                    ORDER BY ts DESC LIMIT 20
+                ''', (token,))
+                closes = [r[0] for r in cur.fetchall()]
+                if len(closes) >= 10:
+                    mean_c = sum(closes) / len(closes)
+                    if mean_c > 0:
+                        variance = sum((c - mean_c) ** 2 for c in closes) / len(closes)
+                        volatility = (variance ** 0.5) / mean_c * 100
+                        check(f'Vol floor > {vol_floor_threshold}%', volatility >= vol_floor_threshold, 
+                              f'volatility={volatility:.2f}% (std/mean)')
+                    else:
+                        check('Vol floor', True, 'mean price <= 0 — skip')
+                else:
+                    check('Vol floor', True, f'insufficient candles ({len(closes)}) — skip')
+            finally:
+                if conn:
+                    conn.close()
+    except ImportError:
+        check('Vol floor', True, 'constants not importable')
+    except Exception as e:
+        check('Vol floor', True, f'error: {e} — skip')
+
     # 2. RR engine test — call it directly
     try:
         # Get current price from CLOSED candles (match compactor behavior)
