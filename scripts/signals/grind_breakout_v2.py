@@ -351,39 +351,30 @@ def run(prices_dict=None) -> int:
 
     added = 0
 
-    # Get all tokens from candles_5m
+    # Get all tokens from candles_5m with freshness in ONE query (bug-hunter fix:
+    # was 182 separate connections per run. Also raised threshold to 15 min —
+    # _aggregate_tf closes each 5m window one run late, so newest closed candle
+    # is always ~5-11 min old. 10 min caused coverage collapse: 5-27 of 182 tokens.)
     conn = None
+    fresh_tokens = []
     try:
+        import time
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         c = conn.cursor()
-        c.execute("SELECT DISTINCT token FROM candles_5m")
-        tokens = [r[0] for r in c.fetchall()]
+        c.execute("""
+            SELECT token, MAX(ts) as max_ts FROM candles_5m
+            WHERE is_closed = 1
+            GROUP BY token
+            HAVING (? - MAX(ts)) / 60.0 <= 15
+        """, (time.time(),))
+        fresh_tokens = [r[0] for r in c.fetchall()]
     except Exception:
         return 0
     finally:
         if conn:
             conn.close()
 
-    for token in tokens:
-        # Skip if candle data is stale
-        # CEO 2026-10-12: switched from price_age_minutes (latest_prices) to candle-age
-        # check on candles_5m — the table detect() actually consumes. latest_prices only
-        # tracks ~87 tokens while candles_5m has 182. Fixed 42-token blind spot.
-        try:
-            _freshness_conn = sqlite3.connect(_CANDLES_DB, timeout=5)
-            _fc = _freshness_conn.cursor()
-            _fc.execute("SELECT MAX(ts) FROM candles_5m WHERE token=? AND is_closed=1", (token.upper(),))
-            _last_ts = _fc.fetchone()
-            _freshness_conn.close()
-            if _last_ts and _last_ts[0]:
-                import time as _time
-                if (_time.time() - _last_ts[0]) / 60 > 10:
-                    continue
-            else:
-                continue  # no candle data
-        except Exception:
-            continue  # can't verify freshness — skip
-
+    for token in fresh_tokens:
         sig = detect(token)
         if not sig:
             continue
