@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-10-11 23:57:07",
+  "timestamp": "2026-10-12 00:15:12",
   "total_checks": 20,
-  "passed": 13,
+  "passed": 12,
   "critical_count": 7,
-  "warning_count": 0,
+  "warning_count": 1,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -25,7 +25,7 @@
     },
     {
       "name": "bare_except",
-      "msg": "131 bare except clauses in 38 files (worst: hl_sync_guardian.py(19), hl-sync-guardian.py(19), signal_compactor.py(12))",
+      "msg": "132 bare except clauses in 39 files (worst: hl_sync_guardian.py(19), hl-sync-guardian.py(19), signal_compactor.py(12))",
       "file": "",
       "fix": "Replace bare 'except:' with 'except Exception as e: log(f\"error: {e}\")'"
     },
@@ -48,5 +48,12 @@
       "fix": "Use 'from _secrets import BRAIN_DB_DICT' instead of inline passwords"
     }
   ],
-  "warnings": []
+  "warnings": [
+    {
+      "name": "trade_frequency",
+      "msg": "2 trades in 6h (0.3/hr)",
+      "file": "",
+      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
+    }
+  ]
 }

@@ -3636,6 +3636,75 @@ HEBBIAN_CIRCUIT_BREAKER_WR = 0.45            # if auto-decision WR drops below, 
 HEBBIAN_CIRCUIT_BREAKER_N = 50               # minimum auto-decisions before circuit breaker
 HEBBIAN_CIRCUIT_BREAKER_COOLDOWN_SEC = 14400 # 4 hours cooldown when tripped
 
+# ── Combo-First Reputation System (Hall of Fame/Shame v2) ────────────────────
+# APPROVED by CEO 2026-10-11. Plan: plans/combo-first-reputation-system.md
+# M1: Pin Hebbian DB path — data/ copy is a 0-byte stub
+# M2: Filter TEST% tokens from trade_log queries
+# M3: Shadow-only for 48h before Phase 2 replaces live logic. Checkpoint 2026-10-13.
+REP_DB_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    'brain', 'associative_memory.db'
+)  # M1: real Hebbian DB, NOT data/associative_memory.db (0-byte stub)
+
+# Master switch — False = shadow mode (log only, don't apply)
+REP_ENABLED = True
+# M3: shadow mode — True = log multiplier but don't apply to live scoring
+REP_SHADOW_MODE = True
+
+# ── COMBO LEVEL (coin+signal+direction, from Hebbian trade_log) ──────────────
+# Bonus tiers
+REP_COMBO_MIN_TRADES = 3           # minimum trades to consider a combo
+REP_COMBO_LEGENDARY_WR = 75.0      # WR >= this + trades >= LEGENDARY_MIN → 2.5x
+REP_COMBO_LEGENDARY_MIN = 5
+REP_COMBO_LEGENDARY_MULT = 2.5
+REP_COMBO_ELITE_WR = 70.0          # WR >= this + trades >= ELITE_MIN → 2.0x
+REP_COMBO_ELITE_MIN = 4
+REP_COMBO_ELITE_MULT = 2.0
+REP_COMBO_STRONG_WR = 65.0         # WR >= this + trades >= STRONG_MIN → 1.5x
+REP_COMBO_STRONG_MIN = 4
+REP_COMBO_STRONG_MULT = 1.5
+REP_COMBO_GOOD_WR = 60.0           # WR >= this + trades >= GOOD_MIN → 1.25x
+REP_COMBO_GOOD_MIN = 3
+REP_COMBO_GOOD_MULT = 1.25
+# Penalty tiers (CEO: aggressive 0.5x/0.3x — n>=5 is sample guard)
+REP_COMBO_WEAK_WR = 55.0           # WR < this + trades >= WEAK_MIN → 0.5x
+REP_COMBO_WEAK_MIN = 5
+REP_COMBO_WEAK_MULT = 0.5
+REP_COMBO_BAD_WR = 50.0            # WR < this + trades >= BAD_MIN → 0.3x
+REP_COMBO_BAD_MIN = 5
+REP_COMBO_BAD_MULT = 0.3
+
+# ── COIN LEVEL (coin+direction, fallback to favorites_leaderboard.json) ──────
+REP_COIN_MIN_TRADES = 10           # minimum 30d trades for coin-level reputation
+REP_COIN_FAME_WR = 60.0            # WR >= this + trades >= FAME_MIN → 1.15x
+REP_COIN_FAME_MIN = 10
+REP_COIN_FAME_MULT = 1.15
+REP_COIN_STRONG_WR = 55.0          # WR >= this → 1.05x
+REP_COIN_STRONG_MULT = 1.05
+REP_COIN_SHAME_WR = 50.0           # WR < this + trades >= SHAME_MIN → 0.85x
+REP_COIN_SHAME_MIN = 10
+REP_COIN_SHAME_MULT = 0.85
+REP_COIN_WEAK_WR = 55.0            # WR < this → 0.9x
+REP_COIN_WEAK_MULT = 0.9
+
+# ── SIGNAL LEVEL (signal+direction, from Hebbian trade_log) ──────────────────
+REP_SIGNAL_MIN_TRADES = 10         # minimum trades for signal-level reputation
+REP_SIGNAL_PROVEN_WR = 60.0        # WR >= this → 1.05x
+REP_SIGNAL_PROVEN_MULT = 1.05
+REP_SIGNAL_WEAK_WR = 50.0          # WR < this → 0.95x
+REP_SIGNAL_WEAK_MULT = 0.95
+
+# ── HALL-SHAME block → combo-aware block ─────────────────────────────────────
+# CEO: convert hard block to 0.3x multiplier with proven-combo override
+REP_HOS_BLOCK_MIN_TRADES = 15      # minimum coin 30d trades to trigger HoS
+REP_HOS_BLOCK_WR = 55.0            # coin WR < this → potential block
+REP_HOS_OVERRIDE_COMBO_WR = 60.0   # combo WR >= this overrides coin shame
+REP_HOS_OVERRIDE_COMBO_MIN = 3     # combo trades >= this for override
+REP_HOS_BLOCK_MULT = 0.3           # multiplier when blocked (not hard 0.0)
+
+# ── Cache settings ───────────────────────────────────────────────────────────
+REP_CACHE_TTL = 300                # 5 min cache for reputation lookups
+
 # ── Wave Catcher — catch violent spikes in both directions ──────────────────
 WAVE_CATCHER_ENABLED            = False   # CEO KILLED 2026-08-17 — both variants dead (+37.5% WR -$0.42, -25% WR -$0.09). Master switch.
 WAVE_CATCHER_PLUS_ENABLED       = False   # CEO KILLED 2026-08-14 — 8T -$0.42 37.5% WR LONG. SHORT profitable (+$0.15).

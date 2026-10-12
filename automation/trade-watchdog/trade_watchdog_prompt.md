@@ -194,6 +194,7 @@ Every hour, if there are open slots (fewer positions than MAX_POSITIONS), you pi
 - Check the open trades count from watchdog.json
 - If open_trades < MAX_POSITIONS (check hermes_constants.py for MAX_POSITIONS), you may fire
 - Only fire once per hour — check if ai_trader_state.json was written in the last 45 minutes
+- **Check ai_trader_state.json for `rejected_at` field** — if the last pick was rejected (cooldown, blacklist, etc.), pick a DIFFERENT coin. Don't pick the same coin that just got rejected.
 
 ### GATE AWARENESS — Pick coins that WILL pass
 

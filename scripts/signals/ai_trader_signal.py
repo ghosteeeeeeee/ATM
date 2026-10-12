@@ -75,6 +75,10 @@ def _load_state():
     if not ts:
         return None
 
+    # Skip rejected picks — watchdog should pick a different coin
+    if state.get('rejected_at'):
+        return None
+
     try:
         ts_dt = datetime.fromisoformat(ts.replace('Z', '+00:00'))
         if ts_dt.tzinfo is None:
@@ -86,6 +90,19 @@ def _load_state():
         return None
 
     return state
+
+
+def _mark_rejected(state, reason):
+    """Mark state as rejected so watchdog picks a different coin next cycle."""
+    state['rejected_at'] = datetime.now(timezone.utc).isoformat()
+    state['reject_reason'] = reason
+    try:
+        tmp_path = STATE_FILE + '.tmp'
+        with open(tmp_path, 'w') as f:
+            json.dump(state, f, indent=2)
+        os.replace(tmp_path, STATE_FILE)
+    except Exception:
+        pass
 
 
 def run():
@@ -140,6 +157,7 @@ def run():
     # Cooldown check
     if get_cooldown(token, direction):
         _log(f"  [AI-TRADER] {token} {direction} rejected: cooldown active")
+        _mark_rejected(state, f'cooldown active for {token} {direction}')
         return None
 
     # Price freshness (BUG 7: use constant, handle 999 = no data)
@@ -147,9 +165,11 @@ def run():
         age = price_age_minutes(token)
         if age is not None and age >= 999:
             _log(f"  [AI-TRADER] {token} {direction} rejected: no price data")
+            _mark_rejected(state, f'no price data for {token}')
             return None
         if age is not None and age > AI_TRADER_PRICE_MAX_AGE_MINUTES:
             _log(f"  [AI-TRADER] {token} {direction} rejected: price {age:.0f} min old")
+            _mark_rejected(state, f'price {age:.0f} min old for {token}')
             return None
 
     # Determine source
