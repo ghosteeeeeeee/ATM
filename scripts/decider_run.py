@@ -799,7 +799,7 @@ def process_delayed_entries(paper=False):
         _base_size = _get_dynamic_position_size()
         _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
         # FIX 2026-10-12 (code review R775): this delayed-entry path was MISSING the
-        # HL_MIN cap that the main execution path has (see ~line 2196). AMPLITUDE_SIZE_MULT
+        # HL_MIN cap that the main execution path has (see ~line 2202). AMPLITUDE_SIZE_MULT
         # includes 0.5 (CHAOTIC), so $11 x 1.0 x 0.5 = $5.50 — brain.py's add_trade gate
         # then hard-rejects with "amount_usdt < HL_MIN". Same "penalty becomes kill" class
         # as the Hall of Shame bug. Cap after multipliers, matching the main path.

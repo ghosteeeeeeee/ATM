@@ -568,6 +568,12 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     from hyperliquid_exchange import _get_trade_size_usdt as _get_hl_base_size
     _base_size = _get_hl_base_size()
     _precomputed_size = _base_size * _size_mult
+    # FIX 2026-10-12 (code review RISK 1): this chain bypasses every cap in
+    # decider_run (they cap _trade_size, not this override) and relies solely on
+    # mirror_open's epsilon gate. Any future multiplier added to _size_mult would
+    # compound into an uncapped product. Cap here for defense-in-depth — mirror_open
+    # skips its own sizing entirely when size_usdt_override is passed.
+    _precomputed_size = max(_precomputed_size, HL_MIN_NOTIONAL_USDT)
     print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage}, size_mult={_size_mult}, size_usdt=${_precomputed_size:.2f})")
     result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult, size_usdt_override=_precomputed_size)
     print(f"[brain.py] ← mirror_open returned: success={result.get('success')}, "
