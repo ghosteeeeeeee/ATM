@@ -216,7 +216,17 @@ def _build_liq_sr(token):
 
 
 def _merge_sr_maps(candle_levels, liq_levels, price, atr_pct):
-    """Merge candle and liquidation S/R into unified map, sorted by proximity."""
+    """Merge candle and liquidation S/R into unified map, sorted by proximity.
+
+    Filters out levels too close to current price (< 0.1% or < 0.2× ATR) —
+    these are order book walls at the bid/ask, not structural resistance.
+    During a pump, price blows through them instantly.
+    """
+    # Minimum distance: levels closer than this are order book noise
+    min_dist_pct = 0.1  # 0.1% absolute floor
+    if atr_pct and atr_pct > 0:
+        min_dist_pct = max(0.1, (atr_pct * 0.2))  # or 0.2× ATR, whichever is larger
+
     all_levels = []
 
     for level in candle_levels:
@@ -224,6 +234,9 @@ def _merge_sr_maps(candle_levels, liq_levels, price, atr_pct):
         level['distance_pct'] = abs(level['price'] - price) / price * 100 if price > 0 else 999
         # Recompute type vs eval price (not candle close)
         level['type'] = 'resistance' if level['price'] > price else 'support'
+        # Filter out levels too close (order book noise at current price)
+        if level['distance_pct'] < min_dist_pct:
+            continue
         all_levels.append(level)
 
     for level in liq_levels:
@@ -231,6 +244,9 @@ def _merge_sr_maps(candle_levels, liq_levels, price, atr_pct):
         level['type'] = 'resistance' if level['price'] > price else 'support'
         # Normalize distance_pct to absolute vs eval price
         level['distance_pct'] = abs(level['price'] - price) / price * 100 if price > 0 else 999
+        # Filter out levels too close (order book noise at current price)
+        if level['distance_pct'] < min_dist_pct:
+            continue
         all_levels.append(level)
 
     # Sort by proximity to current price
@@ -682,13 +698,14 @@ def _compute_score(rr_ratio, vol_width, liquidity, sr_map, direction='LONG'):
         score += 0      # no S/R data at all (can't assess)
 
     # Grade
+    block_score = getattr(hc, 'RR_ENGINE_BLOCK_SCORE', 28)
     if score >= 80:
         grade = 'A'
     elif score >= 65:
         grade = 'B'
     elif score >= 50:
         grade = 'C'
-    elif score >= 35:
+    elif score >= block_score:
         grade = 'D'
     else:
         grade = 'F'

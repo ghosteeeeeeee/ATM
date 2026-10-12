@@ -3884,7 +3884,7 @@ RR_ENGINE_LIQ_FIGHT_PENALTY  = -10     # score penalty for fighting cluster flow
 
 # Scoring
 RR_ENGINE_MIN_SCORE          = 50      # minimum composite score to pass (C grade)
-RR_ENGINE_BLOCK_SCORE        = 35      # hard block below this (D/F grade)
+RR_ENGINE_BLOCK_SCORE        = 28      # hard block below this (grade F) — lowered from 35 (2026-10-12). BTC LONG during pump got score 30.4 → Grade F → killed. 0.98% TP + 1.30% SL floor = R:R 0.75 is legitimate for BTC at $83K.
 
 # Bollinger Band width (for volatility assessment)
 RR_ENGINE_BB_PERIOD          = 20
