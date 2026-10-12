@@ -102,6 +102,8 @@ def export_all():
             # failure instead of swallowing it (was bare except:pass).
             path = os.path.join(WWW_COINS, f'{sym}.json')
             tmp = path + '.tmp'
+            # Symbols like PURR/USDC contain '/' — create parent dir (frontend fetches the same nested path)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
             try:
                 events = conn.execute(
                     f"SELECT ts, price, vol_1h, health, health_score, signal_type, signal_confidence, "

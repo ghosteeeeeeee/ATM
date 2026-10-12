@@ -517,3 +517,8 @@
 - **REPEATED** (17x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
 - **REPEATED** (17x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
 - **REPEATED** (12x): `Oct N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Balance too low ($N.N < $N.N)`
+
+## Error Alerts — 2026-10-12 00:50 UTC
+- **AUTO-FIX**: `coin_tracker_api.py` PURR/USDC export failing every minute — symbol contains `/`, path joined to `coin_tracker_coins/PURR/USDC.json.tmp` but parent dir didn't exist. Fixed: `os.makedirs(os.path.dirname(path), exist_ok=True)` before write. Verified: 95/95 exports succeed (was 94), PURR/USDC.json 379KB, 1440 events.
+- **WARN** (15x): Phantom trades — `is_win=0 AND |pnl_pct|<0.01` in signal_outcomes. Mostly BTC continuum_engine (0.0/0.0) and dust losses <$0.001. Historical, not modified.
+- **INFO**: Pipeline healthy — cycle #238943, no Tracebacks in 30min. Timers 3/3 active. Disk 82%. Prices fresh (2.2m, 105 tokens in last 5m). Regime 5m SHORT_BIAS (15L/22S/60N of 97). 231 active signals, 1 generated last hour. 0 open / 1 closed today (-$0.10).
