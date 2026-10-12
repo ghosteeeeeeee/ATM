@@ -520,8 +520,11 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
     atr_mult = getattr(hc, 'RR_ENGINE_SL_ATR_MULT', 1.0)
     sl_distance_pct = atr_pct * atr_mult / 100.0  # convert ATR% to decimal
 
-    # Ensure minimum SL
-    sl_distance_pct = max(sl_distance_pct, getattr(hc, 'ATR_SL_MIN', 0.015))
+    # Ensure minimum SL — but don't let the floor be wider than 2× ATR
+    # (low-ATR tokens get trapped when fixed floor >> actual volatility)
+    sl_floor = getattr(hc, 'ATR_SL_MIN', 0.015)
+    atr_based_sl = atr_pct * 1.5 / 100.0  # 1.5× ATR as the effective floor
+    sl_distance_pct = max(sl_distance_pct, min(sl_floor, atr_based_sl))
 
     # Check if there's a strong structural level between entry and SL
     # If so, extend SL beyond it (avoid getting stopped at a level that should hold)
@@ -553,10 +556,13 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
                 sl_price = level_price + (price * structural_buffer)
                 sl_distance_pct = (sl_price - price) / price
 
-    # Clamp SL to minimum floor — structural loop can shrink SL below ATR_SL_MIN
+    # Clamp SL to minimum floor — structural loop can shrink SL below floor
+    # Use ATR-aware floor: don't force wider than 2× ATR for low-ATR tokens
     sl_floor = getattr(hc, 'ATR_SL_MIN', 0.015)
-    if sl_distance_pct < sl_floor:
-        sl_distance_pct = sl_floor
+    atr_based_floor = atr_pct * 2.0 / 100.0  # 2× ATR as the cap on the floor
+    effective_floor = min(sl_floor, atr_based_floor)
+    if sl_distance_pct < effective_floor:
+        sl_distance_pct = effective_floor
         if direction == 'LONG':
             sl_price = price - (price * sl_distance_pct)
         else:
@@ -738,10 +744,20 @@ def evaluate_rr(token, direction, price, candles_5m=None, signal_type=None):
         token_upper = token.upper()
         direction = direction.upper()
 
-        # Get volatility width
+        # Skip tokens with no candle data — dead/delisted tokens waste cycles
+        # ATR fallback 0.75% + 0 S/R levels = no market data = don't evaluate
         vol_width = compute_vol_width(token_upper, candles_5m)
         regime = vol_width.get('atr_regime', 'NORMAL')
         atr_pct = vol_width.get('atr_pct', 1.0)
+
+        # Quick check: if ATR is the fallback (0.75%) AND no S/R levels exist,
+        # the token has no real market data. Return fail-open (don't block,
+        # don't boost — neutral).
+        if abs(atr_pct - 0.75) < 0.01:
+            sr_check = build_sr_map(token_upper, price, candles_5m, atr_pct)
+            if len(sr_check) == 0:
+                return _result(True, 999, 0, 0, 0, 'A', None,
+                             f'no market data for {token_upper} (fail-open)')
 
         # Build S/R map
         sr_map = build_sr_map(token_upper, price, candles_5m, atr_pct)
