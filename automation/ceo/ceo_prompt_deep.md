@@ -23,7 +23,7 @@ If you are killed mid-run, this file is the surviving artifact. The next run ass
 - There is no per-run way to disable opencode auto-compact (the `compaction.auto` knob is a global setting in `~/.opencode/opencode.json` and is currently unset/ON). So treat auto-compact as a hazard to design around, not something that is turned off: never resume a session that has already compacted — its context is a summary plus ~15k recent tokens with tool outputs pruned, and resuming it would edit files from that summary rather than from evidence. If a session does compact, abandon it and re-dispatch a fresh one from the latest checkpoint.
 
 ## CONCURRENCY SAFETY
-- **Session lock:** before any subagent that will edit `hermes_constants.py` or any signal file does its first edit, it must ACQUIRE `/tmp/hermes-session-active.lock` (create it if absent; release on exit). If a fresh lock cannot be taken because a human session holds it, STOP and recommend — do not force.
+- **Session lock:** the runner that launched you ALREADY holds `/tmp/hermes-session-active.lock` for the whole run. Do NOT read, write, or reference that path yourself — opencode auto-rejects `/tmp/*` access, and a single `/tmp` read will kill this session mid-run with no checkpoint. Just proceed; locking is handled for you. If you believe a lock conflict exists, note it in your report instead of touching the file.
 - **Single writer:** `automation/ceo/ceo_kanban.md` and `automation/ceo/ceo_report.md` are written by ONE aggregator under `flock` — never by parallel subagents. Subagents write ONLY their own result file: `automation/ceo/checkpoints/<ts>-result-<n>.md`.
 
 ## YOUR JOB this run (at most ONE tune + ONE new-signal task)

@@ -130,15 +130,17 @@ nohup bash -c '
     # Always release the lock on ANY exit path (normal, timeout, or signal) — an
     # explicit call after `timeout` would be skipped if timeout is killed.
     trap "ceo_release_lock" EXIT
-    ceo_acquire_lock "ceo-deep-$(date -u +%Y%m%dT%H%M%SZ)-$$" || { echo "[CEO-DEEP] child could not acquire lock; aborting." >&2; echo 3 > "$3"; exit 3; }
-    timeout 1800 "$OPENCODE" run --format json < "$1" >> "$2" 2>&1
+    ceo_acquire_lock "ceo-deep-$(date -u +%Y%m%dT%H%M%SZ)-$$" || { echo "[CEO-DEEP] child could not acquire lock; aborting." >&2; echo "failed rc=3" > "$3"; exit 3; }
+    timeout 1800 "$OPENCODE" run --format json < "$1" >> "$2" 2> "$4"
     rc=$?
     # opencode exits 0 even when the agent died mid-run (e.g. a permission
     # auto-reject), so classify by jsonl evidence, not the bare exit code.
-    echo "$(ceo_classify_run "$2")" > "$3"
-' _ "$PROMPT_FILE" "$jsonl" "$exitf" >/dev/null 2>&1 &
+    # Keep rc alongside the class so a timeout (124) stays visible — a
+    # budget-exhausted run must not read as a clean "ok".
+    echo "$(ceo_classify_run "$2") rc=$rc" > "$3"
+' _ "$PROMPT_FILE" "$jsonl" "$exitf" "$CEO_LOG_DIR/deep-${TS}.err" >/dev/null 2>&1 &
 pid=$!
 echo "[CEO-DEEP] detached pid=$pid — poll $exitf (budget 1800s). Lock held until the run exits."
-echo "[CEO-DEEP] NOTE: $exitf will contain a CLASS (ok|failed|silent), not a raw exit code — opencode exits 0 even when the agent dies mid-run. Do not treat exit-0 as success; read the class."
+echo "[CEO-DEEP] NOTE: $exitf contains a CLASS plus rc (e.g. 'ok rc=0', 'failed rc=0', 'silent rc=124'), not a bare exit code — opencode exits 0 even when the agent dies mid-run. Do not treat exit-0 as success; read the class. Child stderr: $CEO_LOG_DIR/deep-${TS}.err"
 rm -f "$TASK"
 exit 0

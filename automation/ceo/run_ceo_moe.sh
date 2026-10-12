@@ -73,12 +73,18 @@ echo "[CEO-MOE] panel ${TS} starting (detached, budget 3600s)"
 # not edit live-trading files (analysis + report only), so it does NOT take the
 # session lock — it only writes reports/ + checkpoints/ + OpenMemory.
 nohup bash -c '
-    timeout 3600 "$0" run --format json < "$1" >> "$2" 2>&1
+    # Source the lib IN THE CHILD: ceo_classify_run lives there, and the child
+    # outlives this parent, so it must define the function itself. Without this
+    # the classifier call silently expands to empty and .exit is a blank line.
+    source /root/.hermes/automation/ceo/ceo_lib.sh
+    timeout 3600 "$0" run --format json < "$1" >> "$2" 2> "$4"
     rc=$?
     # opencode exits 0 even when the agent died mid-run (e.g. a permission
     # auto-reject), so classify by jsonl evidence, not the bare exit code.
-    echo "$(ceo_classify_run "$2")" > "$3"
-' "$OPENCODE" "$PROMPT_FILE" "$jsonl" "$exitf" >/dev/null 2>&1 &
+    # Keep rc alongside the class so a timeout (124) stays visible — a
+    # budget-exhausted run must not read as a clean "ok".
+    echo "$(ceo_classify_run "$2") rc=$rc" > "$3"
+' "$OPENCODE" "$PROMPT_FILE" "$jsonl" "$exitf" "$CEO_LOG_DIR/moe-${TS}.err" >/dev/null 2>&1 &
 pid=$!
 echo "[CEO-MOE] detached pid=$pid — poll $exitf for completion"
 rm -f "$TASK"

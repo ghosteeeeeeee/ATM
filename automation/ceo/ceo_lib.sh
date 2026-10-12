@@ -76,20 +76,34 @@ ceo_release_lock() {
 # scanning the streamed jsonl for terminal evidence and write the CLASS (not the
 # raw exit code) to the .exit file, so a poller that only reads .exit cannot
 # mistake a dead run for a clean success:
-#   ok      — completion marker, or real output (so a no-op status run still passes)
-#   failed  — a permission rejection / tool error is present
-#   silent  — jsonl has no usable content (crash before any output)
+#   ok         — a real completion marker, OR evidence of actual work (tool calls /
+#                assistant text) with no failure signal. A genuinely finished run
+#                always emits one of these.
+#   incomplete — the run streamed events but never reached a completion marker and
+#                shows no failure (e.g. the model ended its turn early, or the
+#                stream was cut). MUST NOT read as ok — this is the size-only
+#                fallback trap: a 250-byte markerless jsonl is not a finished run.
+#   failed     — a permission rejection / tool error is present
+#   silent     — jsonl has no usable content (crash before any output)
 ceo_classify_run() {
     local jsonl="$1"
     [ -s "$jsonl" ] || { echo "silent"; return; }
-    if grep -qiE 'auto-rejecting|permission rejected|tool.*"status": *"error"' "$jsonl"; then
+    # Match opencode's real phrasing — it emits "The user rejected permission to
+    # use this specific tool call", NOT "permission rejected". Do not drop the
+    # 'rejected permission' variant or this stops matching the live failure mode.
+    if grep -qiE 'auto-rejecting|rejected permission|permission rejected|"status": *"error"' "$jsonl"; then
         echo "failed"; return
     fi
     if grep -qE '"finish": *"(stop|end_turn|success)"|"type": *"(result|final|message_complete)"' "$jsonl"; then
         echo "ok"; return
     fi
-    # No explicit marker, but the run produced non-trivial output — treat as ok.
-    [ "$(wc -c < "$jsonl")" -gt 200 ] && { echo "ok"; return; }
+    # No completion marker. Only claim 'ok' if the run demonstrably did WORK
+    # (issued tool calls or produced assistant text) — mere byte size is not
+    # evidence of completion, and treating it as such recreates the false-success
+    # bug this classifier exists to kill.
+    if grep -qE '"type": *"tool(_use)?"|"role": *"assistant"|"type": *"text"' "$jsonl"; then
+        echo "incomplete"; return
+    fi
     echo "silent"
 }
 
