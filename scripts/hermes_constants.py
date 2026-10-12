@@ -3908,6 +3908,15 @@ RR_ENGINE_CONF_NEUTRAL_MULT  = 1.00    # standard (R:R≥2)
 RR_ENGINE_CONF_MEDIOCRE_MULT = 0.85    # mediocre (R:R 1.5-2.0)
 RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 
+# ── Risk-Reward Engine: Momentum S/R Filter ─────────────────────────────────
+# When price is actively moving in the trade direction (confirmed velocity),
+# skip nearby S/R levels for TP — they're being blown through, not holding.
+# Loop falls through to ATR-based TP or the next further structural level.
+RR_ENGINE_MOMENTUM_SR_FILTER     = False   # master switch (OFF by default — shadow first)
+RR_ENGINE_MOMENTUM_FILTER_BARS   = 5       # candles for velocity calculation
+RR_ENGINE_MOMENTUM_MIN_ATR_VEL   = 0.5     # min velocity as fraction of ATR/candle to activate (ATR-relative, not absolute %)
+RR_ENGINE_MOMENTUM_SKIP_ATR_MULT = 1.5     # skip S/R levels closer than this × ATR (they're being blown through)
+
 # ── RR Structural Signal ────────────────────────────────────────────────────
 # rr_structural.py — fire on structurally excellent R:R setups
 # Uses risk_reward_engine to evaluate structural quality for every token.

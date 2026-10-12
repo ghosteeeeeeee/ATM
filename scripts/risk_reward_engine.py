@@ -507,7 +507,37 @@ def _get_rr_min(regime):
         return getattr(hc, 'RR_ENGINE_MIN_RATIO_NORMAL', 2.0)
 
 
-def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
+def _compute_velocity_aligned(candles_5m, direction, atr_pct):
+    """Check if recent close-to-close velocity is aligned with trade direction.
+
+    Returns (aligned: bool, avg_velocity_pct: float or None).
+    Fail-open: any exception or insufficient data → (False, None).
+    """
+    try:
+        n_bars = getattr(hc, 'RR_ENGINE_MOMENTUM_FILTER_BARS', 5)
+        min_vel_pct = atr_pct * getattr(hc, 'RR_ENGINE_MOMENTUM_MIN_ATR_VEL', 0.5)  # %/candle
+        if not candles_5m or len(candles_5m) < 3:
+            return False, None
+        recent = candles_5m[-n_bars:]
+        if len(recent) < 3:
+            return False, None
+        vels = []
+        for i in range(1, len(recent)):
+            prev_close = recent[i - 1]['close']
+            if prev_close <= 0:
+                return False, None
+            vels.append((recent[i]['close'] - prev_close) / prev_close)
+        avg_vel_pct = (sum(vels) / len(vels)) * 100.0
+        if direction == 'LONG':
+            aligned = avg_vel_pct > 0 and avg_vel_pct >= min_vel_pct
+        else:
+            aligned = avg_vel_pct < 0 and abs(avg_vel_pct) >= min_vel_pct
+        return aligned, avg_vel_pct
+    except Exception:
+        return False, None
+
+
+def compute_structural_rr(price, direction, sr_map, vol_width, liquidity, candles_5m=None):
     """Compute R:R based on structural levels.
 
     SL: ATR-based, extended beyond nearby structural level if needed.
@@ -586,10 +616,24 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
     tp_source = 'ATR'
     target_level = None
 
+    # Momentum S/R filter: price moving with trade → skip nearby levels (blown through)
+    mom_filter_active = False
+    mom_velocity = None
+    n_skipped = 0
+    skip_dist = 0.0
+    if getattr(hc, 'RR_ENGINE_MOMENTUM_SR_FILTER', False) and candles_5m:
+        mom_filter_active, mom_velocity = _compute_velocity_aligned(candles_5m, direction, atr_pct)
+        if mom_filter_active:
+            skip_dist = atr_pct * getattr(hc, 'RR_ENGINE_MOMENTUM_SKIP_ATR_MULT', 1.5) / 100.0
+
     # Find nearest S/R in trade direction
     for level in sr_map:
         level_price = level['price']
         dist_pct = abs(level_price - price) / price
+
+        if mom_filter_active and dist_pct < skip_dist:
+            n_skipped += 1
+            continue
 
         if direction == 'LONG' and level_price > price:
             # Reward side: find closest resistance above
@@ -633,6 +677,10 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity):
         'sl_source': 'ATR',
         'tp_source': tp_source,
         'target_level': target_level,
+        'momentum_sr_filter': mom_filter_active,
+        'momentum_velocity': round(mom_velocity, 4) if mom_velocity is not None else None,
+        'momentum_skipped': n_skipped,
+        'momentum_skip_dist_pct': round(skip_dist * 100, 4),
     }
 
 
@@ -775,7 +823,7 @@ def evaluate_rr(token, direction, price, candles_5m=None, signal_type=None):
         liquidity = compute_liquidity_proximity(token_upper, price, direction)
 
         # Compute structural R:R
-        rr = compute_structural_rr(price, direction, sr_map, vol_width, liquidity)
+        rr = compute_structural_rr(price, direction, sr_map, vol_width, liquidity, candles_5m)
         rr_ratio = rr['rr_ratio']
 
         # Get regime-adjusted minimum
@@ -813,7 +861,18 @@ def evaluate_rr(token, direction, price, candles_5m=None, signal_type=None):
         notes_parts.append(f"TP via {rr['tp_source']}")
         notes_parts.append(f"Regime={regime} ATR={atr_pct:.2f}% BB={vol_width.get('bb_width', 'N/A')}")
         notes_parts.append(f"S/R levels: {len(sr_map)} | Liq: {liquidity['clusters_ahead']} ahead, {liquidity['clusters_behind']} behind")
+        mom_active = rr.get('momentum_sr_filter', False)
+        notes_parts.append(f"MomFilter={'ON' if mom_active else 'OFF'}")
         notes = ' | '.join(notes_parts)
+
+        # Shadow log when momentum filter activates and skips levels
+        if mom_active and rr.get('momentum_skipped', 0) > 0:
+            log_key = f"{token_upper}:{direction}:mom_sr_filter"
+            now_ts = time.time()
+            if log_key not in _log_dedup or now_ts - _log_dedup[log_key] > _LOG_DEDUP_TTL:
+                _log(f"MOMENTUM SR-FILTER {token_upper} {direction}: skipped {rr['momentum_skipped']} nearby levels "
+                     f"(vel={rr.get('momentum_velocity') or 0:.4f}%/candle, skip_dist={rr.get('momentum_skip_dist_pct', 0):.2f}%)")
+                _log_dedup[log_key] = now_ts
 
         # Log in shadow mode (with dedup to prevent spam)
         if not passed and shadow and not force:
@@ -847,6 +906,8 @@ def evaluate_rr(token, direction, price, candles_5m=None, signal_type=None):
             'legacy_rr': legacy,
             'tp_source': rr['tp_source'],
             'target_level': rr.get('target_level'),
+            'momentum_sr_filter': rr.get('momentum_sr_filter', False),
+            'momentum_velocity': rr.get('momentum_velocity'),
         }
 
     except Exception as e:
@@ -876,6 +937,8 @@ def _result(passed, rr, sl, tp, score, grade, reason, notes):
         'legacy_rr': {},
         'tp_source': 'UNKNOWN',
         'target_level': None,
+        'momentum_sr_filter': False,
+        'momentum_velocity': None,
     }
 
 
