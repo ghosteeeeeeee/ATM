@@ -583,3 +583,6 @@
 - **NO AUTO-FIX APPLIED**: service-safety rule forbids stopping a timer. **CEO action:** `systemctl disable --now hermes-1m-candle.timer` (then delete `_aggregate_1m.py` or leave as gap-filler reference).
 - **INFO**: Disk 84% (94G/118G) — under 85% WARN. No logs >7d to gzip. candles.db 2.9G, session_brain.db 1.2G, signals_hermes.db 1.0G. DB-prune goal (<80% by Oct 14) still open.
 - **INFO**: Pipeline healthy — 3 core timers firing, hl-sync-guardian active, 0 Tracebacks/30min, 68 signals/hr, 20 closed today, 0 open, 0 phantoms, prices fresh (46s), regime SHORT_BIAS (6L/77S/34N), token_speeds 241 tokens @ 52.7% >=p50.
+
+## Error Alerts — 2026-10-12 22:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

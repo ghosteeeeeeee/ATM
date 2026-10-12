@@ -279,3 +279,58 @@ BY: ceo-strategic (acting CEO session, T decision-request package)
 ### Numbers: 21T −$0.20 38.1% | 7d 128T +$0.86 39.1% (DB self-query)
 ### Findings: Rotating Q (accumulation): coin_tracker Wyckoff labels 88/95 coins "accumulation" as of 21:48 UTC — 93% uniform label gives no discrimination for an accumulation-phase signal; scores updating on schedule (18min ago). 24h dipped +$0.09→−$0.20 since 18:50; 7d still ≥$0. Kill switch LIVE=true, CONFLUENCE_REQUIRED=true, 0 new errors since 20:48 (all-clear).
 ### Recommendation: Wyckoff phase detector likely under-calibrated (near-all-accumulation) — signal_analyst should sanity-check phase thresholds before building any accumulation-transition signal; also CEO ratify/revert the 2 trail-arm enables still pending from 18:50 escalation.
+
+## CEO Deep Run — 20261012T230504Z
+
+**Decision:** NO-OP. Directed brief was an empty placeholder ("x") — no question, no work item. Same guard-check class as run 20261012T205810Z.
+
+**Evidence:** SCOPE block reads verbatim "--- DIRECTED BRIEF ---\nx\n--- END BRIEF ---". No directed task to answer; inventing scope would violate the directed-brief rule.
+
+**Work items dispatched:** None.
+
+**Result files:** None (only checkpoint 20261012T230504Z-decision.md).
+
+**Metric checkpoint (7d):** N/A this run — no changes. Baseline unchanged from 21:47 UTC status: 24h 21T −$0.20 (38.1%), 7d 128T +$0.86 (39.1%). Open escalations (trail-arm ratify, Wyckoff shadow rule Oct 13) remain for the next STATUS run or a directed deep run with a real brief.
+
+## CEO Deep Run — 20261012T231259Z
+
+- **Decision:** NO-OP. Directed brief was the empty placeholder "x" — no question or work item. Inventing scope would violate the directed-brief rule (it REPLACES default pick-your-own scope). Fourth identical guard today; prior runs 205810Z, 230504Z, 230650Z all NO-OP'd the same empty brief.
+- **Evidence (self-verified ~23:13 UTC):** 24h 22 closed, −$0.23, 36.4% WR. 7d worst: volume-breakout-long+ −$0.51 (25% WR), trend-ride+ −$0.33 (20% WR). 7d best: pump-chain+ +$0.75, pump-chain- +$0.54. CURRENT.md escalations (trail-arm ratify/revert, Wyckoff shadow rule due Oct 13) remain open but out of scope for an empty directed brief.
+- **Work items dispatched:** none.
+- **Result files:** none (no subagents).
+- **Metric checkpoint (7d):** no change made — track 7d WR ≥50% goal and trail-arm ratify/revert escalation on next directed run with real scope.
+
+## CEO Deep Run — 20261012T232327Z
+
+### Decision
+**Assessed RR Engine Smart Upgrades plan (`plans/2026-10-13_rr-engine-smart-upgrades.md`) with modifications.** Plan diagnosis is correct (engine measures R:R at worst moment during momentum), but Upgrade 1 as written (velocity-based TP projection) is TOO RISKY. Dispatched a REFRAMED Upgrade 1: momentum S/R filtering — during confirmed velocity, skip nearby S/R levels for TP selection (they are being blown through), fall through to ATR-based TP or next further structural level. Same effect, no forward projection, no overshoot risk. Flag `RR_ENGINE_MOMENTUM_SR_FILTER` defaults OFF (shadow first, zero live impact).
+
+### Evidence (verified via DB self-query + log analysis, ~23:23 UTC)
+- 7d: 124 closed, +$0.92, 37.9% WR. 24h: 22 closed, −$0.23, 36.4% WR (first negative day-net since Oct 6).
+- RR engine: 1,978 HARD BLOCKED events (mult=0.00, avg R:R=0.46, n=1341), 4,181 PENALTY events, 392 BOOST. Hard blocks are LIVE via `RR_ENGINE_CONF_SHADOW=False`.
+- BTC dump verified: 83,136→81,800 (−1.6%). Plan's claimed velocity of −0.3%/candle was inflated — actual 5m velocity was 0.022%/candle, below the plan's own MIN_VELOCITY=0.1 threshold.
+- Critical flaw found: Plan's Upgrade 1 contradicts BANANA SHORT lesson in AGENTS.md — shorting at RSI 16.1 (extreme oversold) is exactly the pattern that lesson warns against. The 20 "crushed" SHORTs may have been correctly blocked.
+- No counterfactual data exists — we do not know if blocked signals would have won.
+
+### Answers to brief questions
+1. **Right approach?** Diagnosis yes, prescription no. Safer fix: momentum S/R filtering (skip nearby levels) instead of TP projection (extrapolate forward).
+2. **Implementation order?** Momentum-aware is right priority, wrong form. Ship reframed version in shadow first. Upgrades 2–4 deferred until shadow data validates.
+3. **Risks?** Overshoot (plan example projected 81,080, BTC only reached 81,800), contradicts BANANA SHORT lesson, velocity noise on 5m, no counterfactual data, chop trap.
+4. **Constants?** MIN_VELOCITY=0.1 too absolute — reframed version uses ATR-relative (0.5×ATR). TP_MAX_EXTENSION=2% aggressive for BTC. TF profile min_rr values unvalidated.
+5. **Add/remove?** ADD: momentum S/R filtering. REMOVE/DEFER: Upgrade 3 (double-counts with confluence boost). KEEP: Upgrades 2 and 4 for future runs.
+
+### Work items dispatched
+- **Result 1** (`20261012T232327Z-result-1.md`): Momentum S/R filter in `compute_structural_rr()`. Files: `scripts/risk_reward_engine.py` (+67 lines), `scripts/hermes_constants.py` (+9 lines, 4 new constants). Flag OFF by default. Verified: import OK, engine works with flag off/on, no regression on LONG/SHORT. Synthetic test: filter skipped 16 nearby levels, fell through to ATR TP. Committed as `ab1c3083`.
+- Code review (subagent): no critical issues. Warnings: ATR timeframe mismatch (1h ATR vs 5m velocity — filter stricter than intended, tune on enable), some call paths do not pass candles_5m (filter inactive there, acceptable for shadow).
+
+### Metric checkpoint (measure in 7d)
+- **Hard-block rate**: count of `RR HARD BLOCKED` events per day (currently ~100–190/day). Expect: no change until flag enabled.
+- **Shadow log**: when flag is temporarily enabled, count `MOMENTUM SR-FILTER` activations and analyze what would have been allowed vs blocked. Promote to live only if shadow data shows net-positive counterfactual.
+- **Win rate**: 7d WR baseline is 37.9%. Target after promotion: 40%+ (measure at 7d post-enable).
+- **SHORT PnL**: 7d SHORT PnL baseline. Target: non-negative if filter correctly unblocks momentum SHORTs.
+- **BANANA guard**: track whether any promoted trade enters at RSI < 20 (SHORT) or RSI > 80 (LONG) — these should remain blocked regardless of R:R.
+
+### Deferred (future runs)
+- Upgrade 2: Timeframe-aware SL/TP (signal files already emit `timeframe` metadata, threading is straightforward but touches many files)
+- Upgrade 3: Signal quality context (double-counting risk with existing confluence_mult — redesign before implementing)
+- Upgrade 4: Fibonacci retracement levels in S/R map (lowest risk, reuse `hh_hl_signals.py:342-361`)

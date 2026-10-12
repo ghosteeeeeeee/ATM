@@ -4110,5 +4110,25 @@
     "status": "suggested",
     "risk": "low-medium — self_learner 1m-replay backtest of winner retrace-at-entry REQUIRED before shipping",
     "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-12T23:30:00Z",
+    "idea": "Regime brake on LONG-family signals in STRONG_DOWN markdown",
+    "rationale": "11/13 losers last 24h are LONGs in SHORT_BIAS. oversold-bounce+ and pump-chain+ have no regime brake — they fire LONGs regardless of BTC direction. The trail family wins 86% because trending entries activate the trail; chop entries hit hard_max_loss. A regime brake keeps us out of chop without blocking times.",
+    "expected_impact": "Block 8/13 of today's losers (APT, NEAR, XPL, KAS, FIL, GRASS, ICP, CFX). Preserve HYPER (RSI 62.5) via RSI<65 exemption. +5-10% WR in SHORT_BIAS regimes.",
+    "category": "entry sniper / regime brake",
+    "status": "suggested",
+    "risk": "medium — must verify winners not blocked. Existing 0.5x dampen pattern (pump_chain+ NORMAL/HIGH) is the template; extend to STRONG_DOWN for oversold-bounce+ and pump-chain+ LONG.",
+    "sample_size_caveat": "Today n=13 thin. 7d oversold-bounce n=8. Ship as confidence dampen (0.5x) not kill. Backtest before CEO approval."
+  },
+  {
+    "date": "2026-10-12T23:30:00Z",
+    "idea": "oversold-bounce+ regime gate specifically",
+    "rationale": "Signal buys oversold. In markdown, oversold = short continuation, not a buy. 3/3 losses today. No short counterpart exists. 7d breakeven (8T +$0.02). Lowest-risk surgical fix: suppress when BTC 15m SHORT_BIAS.",
+    "expected_impact": "Blocks 3 losers/day in bear. Neutral in bull (signal only fires long).",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low — signal is breakeven overall; gate only fires in defined bear regime",
+    "sample_size_caveat": "n=8 7d is thin. Monitor 48h or backtest. Not a kill."
   }
 ]

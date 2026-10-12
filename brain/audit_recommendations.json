@@ -1,130 +1,152 @@
 {
-  "timestamp": "2026-10-12T21:45:03.270264+00:00",
-  "agent": "brain_auditor",
+  "timestamp": "2026-10-12T23:30:00Z",
+  "session_lock": "ACTIVE — report-only, 0 config changes",
+  "regime": {
+    "btc_15m": "SHORT_BIAS",
+    "btc_4h": "SHORT_BIAS",
+    "wyckoff": "MARKDOWN",
+    "trend_quality": "STRONG_DOWN",
+    "volatility": "LOW",
+    "btc_price": 82045,
+    "below_ema300_min": 191,
+    "zscore": -1.5
+  },
   "trade_summary_24h": {
-    "trades": 19,
+    "total": 22,
     "wins": 8,
-    "pnl": 0.03,
-    "wr": 42.1,
-    "open": 0,
-    "top_losers": "GRASS pump-chain+ -0.18 (RSI 71.2 EXTREME), CHIP hmacd_mtf-- -0.12 (SHORT mid-band), FIL pump-chain+ -0.12 (RSI 68.7 EXTREME), CFX pump-chain+ -0.10 (RSI 74.5), HYPE volume-buildup+ -0.04 (RSI 76.6)"
+    "pnl": -0.23,
+    "wr": 36.4,
+    "avg_lev": 4.3,
+    "losers": 13,
+    "winners": 8,
+    "losers_long": 11,
+    "losers_short": 1,
+    "hard_max_loss_exits": 10,
+    "key_finding": "11/13 losers are LONGs in SHORT_BIAS markdown — wrong-side trades. hard_max_loss = 10/13 exits (chop entries, no momentum)."
   },
   "trade_summary_7d": {
-    "trades": 126,
-    "pnl": 1.09,
-    "wr": 39.7,
-    "exit_bleed": "hard_max_loss 47T 0%WR -5.03 (avg lev 4.1) - still #1 bleed; trail-family 42T 85.7%WR +5.22",
-    "regime": "HIGH 32T -0.66 | NORMAL 30T +0.62 | EXTREME 59T +1.32"
+    "long": {
+      "n": 103,
+      "pnl": 0.71,
+      "wr": 39.8
+    },
+    "short": {
+      "n": 21,
+      "pnl": 0.21,
+      "wr": 28.6
+    },
+    "exit_bleed": {
+      "hard_max_loss": {
+        "n": 47,
+        "pnl": -5.01,
+        "wr": 0.0
+      },
+      "atr_sl_hit": {
+        "n": 14,
+        "pnl": -1.11,
+        "wr": 0.0
+      },
+      "profit-monster-trail": {
+        "n": 30,
+        "pnl": 2.07,
+        "wr": 86.7
+      },
+      "atr_trail_hit": {
+        "n": 7,
+        "pnl": 2.44,
+        "wr": 71.4
+      },
+      "stale_exit": {
+        "n": 8,
+        "pnl": 1.31,
+        "wr": 87.5
+      }
+    },
+    "note": "Trail family (profit-monster-trail + atr_trail_hit) = +$4.51 combined 86%/71% WR. hard_max_loss = -$5.01 0% WR. Trend entries win, chop entries lose."
   },
-  "config_changes_applied": [
+  "losing_trade_autopsy": [
     {
-      "change": "SIGNAL_FILTER_RSI_MAX 72 to 75 + AMBIGUOUS to SKIP (decider_run.py:1107)",
-      "reason": "Watchdog steer-deep-005: CFX@74.5/HYPE@76.6 entered LONG despite MAX=72 gate, both hard_max_loss. Root cause: AMBIGUOUS verdict treated as PASS by caller else-branch + fail-open paths converted to GO. Gate was completely toothless for STANDALONE_BYPASS signals.",
-      "verification": "7d: >75 band saves 5L -0.60, blocks 1W +0.10 = net +0.50. Blocks 12.5% of >=68 winners (<20% threshold). 30d CEO-verified 75-80=-0.45, 80-85=-0.14.",
-      "files": "hermes_constants.py:866, decider_run.py:1107"
+      "cluster": "oversold-bounce+ LONG (3 losses)",
+      "trades": "APT -6.8% RSI 41.7, NEAR -3.4% RSI 37.3, XPL -2.7% RSI 38.3",
+      "root_cause": "LONG-bias signal buying oversold in SHORT_BIAS markdown = catching falling knives. Oversold = continuation for shorts, not a buy, in MARKDOWN. No short counterpart, no regime brake.",
+      "entry_check": "All 3 RSI 37-42 at entry. Price already dumped. Signal fires on oversold → we buy → market keeps dumping → hard_max_loss.",
+      "regime_check": "EXTREME/EXTREME/HIGH vol. BTC STRONG_DOWN, wyckoff MARKDOWN.",
+      "recommended_change": "Add regime brake: suppress oversold-bounce+ LONG when BTC 15m is STRONG_DOWN or trend_quality STRONG_DOWN. Monitor recommendation (n=8 7d thin) — CEO decision when lock lifts.",
+      "impact_on_winners": "7d oversold-bounce: 8T 4W +$0.02 breakeven. Today's 3 losses all in bear. A regime brake would have blocked the 3 losers; check winners' regime before shipping.",
+      "confidence": "MEDIUM-HIGH (pattern clear, sample thin)"
+    },
+    {
+      "cluster": "pump-chain+ LONG at RSI>68 (4 losses)",
+      "trades": "GRASS -4.0% RSI 71.2, FIL -2.8% RSI 68.7, CFX -2.3% RSI 74.5, KAS -0.6% RSI 71.6",
+      "root_cause": "Buying local tops in markdown. Pump already happened → mean reversion → hard_max_loss. 30d meta-RSI: 75+ = 11T -0.48 36.4% WR (worst band); 55-64 = 31T +1.55 48.4% (best).",
+      "entry_check": "All 4 RSI 68-75. HYPER winner was RSI 62.5 — the profitable band.",
+      "regime_check": "All EXTREME vol. BTC STRONG_DOWN.",
+      "recommended_change": "SIGNAL_FILTER_RSI_MAX=75 already blocks 75+. Today's losses are 68-74 (within positive 30d band). Real lever is regime brake on pump-chain+ LONG in STRONG_DOWN, not RSI ceiling. Existing 0.5x dampen in NORMAL/HIGH (ratified 0b689a5d) doesn't cover EXTREME markdown.",
+      "impact_on_winners": "HYPER +0.67% was RSI 62.5 — a regime brake with RSI<65 exemption would preserve it. Verify before shipping.",
+      "confidence": "MEDIUM (30d 65-74 band still +$0.99 — regime is the confounder)"
+    }
+  ],
+  "execution_trap": {
+    "finding": "Last 50 signals ALL EXPIRED. LONGs blocked by BTC-CRASH momentum filter. SHORTs blocked by SHORT_RSI_HARD_FLOOR=45 when coins dump below 45 in markdown.",
+    "impact": "System is flat by double-block, not by design. The winning side (SHORTs on dumping coins) can't fill because our own filter rejects RSI<45.",
+    "note": "This is a known standing issue (watchdog steer-001, prior brain_auditor runs). SHORT_RSI_HARD_FLOOR=45 was designed to prevent shorting bottoms; in a trending markdown it prevents shorting everything. Regime-conditional floor (35 in STRONG_DOWN) is the fix — CEO scope, not unilateral.",
+    "confidence": "HIGH (pipeline.log shows ALT 33.3, AIXBT 34.7, ARB 29.5, YGG 24.4 all rejected)"
+  },
+  "trail_arm_soak": {
+    "bb_squeeze": {
+      "fires": 0,
+      "status": "0 fires / ~13h soak",
+      "unratified": true
+    },
+    "pump_chain": {
+      "fires": 2,
+      "net": 0.0,
+      "status": "KAS -0.02, HYPER +0.02 — net neutral",
+      "unratified": true
+    },
+    "note": "Both enabled live without CEO ratify. Orchestrator escalated. Corrected expectation +$0.97/30d (bb-squeeze). Monitor; CEO decision pending."
+  },
+  "creative_improvements": [
+    {
+      "date": "2026-10-12T23:30:00Z",
+      "idea": "Regime brake on LONG-family signals in STRONG_DOWN markdown",
+      "rationale": "11/13 losers last 24h are LONGs in SHORT_BIAS. oversold-bounce+ and pump-chain+ have no regime brake — they fire LONGs regardless of BTC direction. The trail family wins 86% because trending entries activate the trail; chop entries hit hard_max_loss. A regime brake keeps us out of chop without blocking times.",
+      "expected_impact": "Block 8/13 of today's losers (APT, NEAR, XPL, KAS, FIL, GRASS, ICP, CFX). Preserve HYPER (RSI 62.5) via RSI<65 exemption. +5-10% WR in SHORT_BIAS regimes.",
+      "category": "entry sniper / regime brake",
+      "status": "suggested",
+      "risk": "medium — must verify winners not blocked. Existing 0.5x dampen pattern (pump_chain+ NORMAL/HIGH) is the template; extend to STRONG_DOWN for oversold-bounce+ and pump-chain+ LONG.",
+      "sample_size_caveat": "Today n=13 thin. 7d oversold-bounce n=8. Ship as confidence dampen (0.5x) not kill. Backtest before CEO approval."
+    },
+    {
+      "date": "2026-10-12T23:30:00Z",
+      "idea": "oversold-bounce+ regime gate specifically",
+      "rationale": "Signal buys oversold. In markdown, oversold = short continuation, not a buy. 3/3 losses today. No short counterpart exists. 7d breakeven (8T +$0.02). Lowest-risk surgical fix: suppress when BTC 15m SHORT_BIAS.",
+      "expected_impact": "Blocks 3 losers/day in bear. Neutral in bull (signal only fires long).",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low — signal is breakeven overall; gate only fires in defined bear regime",
+      "sample_size_caveat": "n=8 7d is thin. Monitor 48h or backtest. Not a kill."
     }
   ],
   "changes_from_last_run": [
     {
-      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED True (Oct 12 10:48)",
-      "status": "LIVE - awaiting CEO ratify/revert",
-      "impact": "0 bb-squeeze fires in ~12h soak. No regression."
+      "change": "SIGNAL_FILTER_RSI_MAX 72→75 (brain_auditor 2026-10-12)",
+      "status": "live, no regression observed — 75+ band still blocked",
+      "impact": "Neutral. 30d 75+ band was -$0.48; filter working as designed."
     },
     {
-      "change": "PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED True 45m (Oct 12 18:16)",
-      "status": "LIVE - first 2 fires verified working",
-      "impact": "HYPER +0.02 (capped stall), KAS -0.02 (preempted potential hard_max_loss ~-0.15). Vehicle doing its job."
-    },
-    {
-      "change": "LONG_MIDBAND_NON_EXTREME_BLOCK (Oct 11) + bb-squeeze exemption (Oct 12)",
-      "status": "LIVE - working",
-      "impact": "Post-land: 6 LONG RSI 60-70 opened (EXTREME or bb-squeeze exempt), 5W 1L. Collision avoided."
-    },
-    {
-      "change": "LONG_HIGH_OVERBOUGHT_BLOCK RSI>70 HIGH (Oct 11 17:38)",
-      "status": "LIVE - working",
-      "impact": "Since land: 1 LONG >70 HIGH opened (SUPER 73.7 winner). EXTREME >70 stays open (7d net +0.21)."
-    },
-    {
-      "change": "ai_trader_precheck Wilder RSI fix (Oct 12 03:45)",
-      "status": "LIVE - needs soak",
-      "impact": "ME@72.5 loss predates fix. Monitor 48h."
+      "change": "Trail-arm timeout enables (bb-squeeze 60m, pump-chain 45m)",
+      "status": "soaking, 2 pump-chain fires net $0.00, 0 bb-squeeze fires",
+      "impact": "Too early to judge. Unratified — CEO decision pending."
     }
   ],
-  "drift_findings": [
-    {
-      "id": "steer-deep-005-RESOLVED",
-      "finding": "RSI gate gap: SIGNAL_FILTER_RSI_MAX returned AMBIGUOUS treated as pass",
-      "root_cause": "Two-layer bug: rule gate returned AMBIGUOUS; wrapper fail-open paths (thin hebbian to GO, profit-dominant to GO, LLM GO) overrode it; caller else-branch logged AMBIGUOUS as passed.",
-      "resolution": "Changed to SKIP hard block. Threshold 72 to 75 aligns with LONG_RSI_CEILING."
-    },
-    {
-      "id": "DRIFT-E-partially-healed",
-      "finding": "entry_rsi_14 now matches meta_rsi for recent trades",
-      "status": "Write path fixed for recent cohort. Continue using meta_rsi as ground truth."
-    }
-  ],
-  "losing_trade_autopsy_24h": {
-    "cluster_1_overbought_chase": {
-      "trades": "CFX@74.5, HYPE@76.6, GRASS@71.2, KAS@71.6, FIL@68.7 - pump-chain+/volume-buildup+ LONG EXTREME/NORMAL",
-      "root_cause": "Entered after pump spent. RSI>75 (HYPE) now hard-blocked. 70-75 stays open per CEO 30d (+0.24). EXTREME>70 net positive 7d (+0.21).",
-      "fix": "Exec-time SKIP at >75 closes bypass hole."
-    },
-    "cluster_2_short_midband": {
-      "trades": "CHIP hmacd_mtf-- SHORT RSI 63 EXTREME -3.18%",
-      "root_cause": "Shorted mid-band while BTC holding EMA300 LEAN_BULL. n=1 not a law.",
-      "fix": "No change. Monitor hmacd_mtf-- (25% WR trending, kill n>=5)."
-    },
-    "cluster_3_oversold_fail": {
-      "trades": "ICP@41.4, AVAX@45.0, XPL@38.3 - LOW RSI LONGs",
-      "root_cause": "Oversold-bounce failed. Bypass signals enter below LONG_RSI_FLOOR. n=3 mixed.",
-      "fix": "No change. Monitor."
-    }
-  },
-  "signal_quality_flags": [
-    {
-      "signal": "pump-chain+ LONG",
-      "7d": "22T 40.9%WR +0.75",
-      "note": "Profitable overall. Bands: 50-59 best (+1.00), 72-75 bleed (-0.28), 75+ bleed (-0.16). New gate blocks 75+. Watch 68-72 (6T -0.11) - insufficient n."
-    },
-    {
-      "signal": "volume-breakout-long+",
-      "7d": "12T 25%WR -0.51",
-      "note": "Includes pre-fix HIGH losses (opened before Oct 10 17:48 HIGH block). 30d EXTREME +3.27/20T 60%. Aging artifact. No action."
-    },
-    {
-      "signal": "hmacd_mtf--",
-      "7d": "4T 25%WR -0.19 + CHIP",
-      "note": "n=5 total, trending toward kill threshold. Monitor."
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-10-12T21:45:03.270283+00:00",
-      "idea": "RSI-band confidence scaling instead of binary blocks",
-      "rationale": "7d LONG bands: 50-59=55%WR +1.16, 60-67=37.5% -0.63, 68-72=27.3% -0.71, >75 bad. Scale confidence +10/0/-15/-25 instead of hard blocks. Preserves every-pump-is-a-LONG. Weak entries fall below MIN_EXEC_CONFIDENCE naturally.",
-      "expected_impact": "Fewer hard blocks killing winners (SYRUP@72.2 +0.59 stays), midband entries filtered by confidence",
-      "category": "entry sniper",
-      "status": "suggested - needs backtest",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-12T21:45:03.270285+00:00",
-      "idea": "Generalize trail-arm timeout into universal stall detector",
-      "rationale": "Trail-arm proving stall=wrong-side thesis: HYPER +0.02/KAS -0.02 vs potential hard_max_loss -0.15. 7d HML 47T 0%WR all stalls. Universal rule: no +0.20% within N min AND 1m velocity flat = exit.",
-      "expected_impact": "Intercept 30-50% of hard_max_loss before full slam (69% MFE<0.2%)",
-      "category": "exit engine",
-      "status": "suggested - pump-chain 45m needs Oct 15 soak first",
-      "risk": "medium - dead_money lesson: could cut slow starters. Backtest required."
-    }
-  ],
+  "config_changes_applied": [],
   "next_actions": [
-    "CEO: ratify/revert 2 trail-arm enables (audit recommends keep, +0.97/30d corrected)",
-    "Monitor: no trades meta_rsi>75 should open in 48h (new SKIP gate)",
-    "Monitor: pump-chain+ 68-72 RSI band (6T -0.11) - if bleeds to n>=15, consider tightening",
-    "Monitor: hmacd_mtf-- approaching kill threshold (n=5, 25% WR)",
-    "Oct 13: Wyckoff shadow rule, Reputation Phase 2a",
-    "Oct 15: 7d WR >=50% checkpoint, bb-squeeze soak, pump-chain 45m soak",
-    "Backtest RSI-band confidence scaling (self_learner)"
+    "CEO: RATIFY or REVERT 2 trail-arm enables (audit says keep, +$0.97/30d corrected)",
+    "CEO: evaluate SHORT_RSI_HARD_FLOOR regime-conditional (35 in STRONG_DOWN) — execution trap blocking winning side",
+    "Post-lock: backtest regime brake on oversold-bounce+ and pump-chain+ LONG in STRONG_DOWN",
+    "Monitor oversold-bounce+ (0/4 since Oct 11, kill threshold n>=5)",
+    "Monitor pump-chain+ (4-loss streak, kill threshold n>=5)",
+    "hmacd_mtf-- SHORT 25% WR 7d — watch, not yet kill threshold"
   ]
 }
