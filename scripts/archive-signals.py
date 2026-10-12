@@ -20,7 +20,11 @@ os.makedirs(ARCHIVE_DIR, exist_ok=True)
 
 # WAIT is included because stale WAIT signals block hot-set auto-approvals
 # (WASP flagged: "5 WAIT signals never re-reviewed" — same root cause)
-ARCHIVABLE_DECISIONS = {'SKIPPED', 'EXPIRED', 'EXECUTED', 'COMPACTED', 'WAIT'}
+# FAILED (BUG-052): claimed-but-no-trade rows (executed=1, decision='FAILED').
+# Added so archive treats them like EXECUTED for consistency — _do_purge deletes
+# them at 1h so they don't accumulate today, but this keeps archive correct if
+# purge hours ever change.
+ARCHIVABLE_DECISIONS = {'SKIPPED', 'EXPIRED', 'EXECUTED', 'COMPACTED', 'WAIT', 'FAILED'}
 CUTOFF_HOURS_APPROVED = 720   # archive APPROVED signals older than 30 days (was 6h — too aggressive for analysis)
 # EXPIRED/SKIPPED are the bulk of runtime DB growth (~24k EXPIRED in 14d).
 # 30d retention kept DB at ~92MB / 26k rows (disk 85%). 14d still covers weekly analysis.

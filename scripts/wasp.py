@@ -161,7 +161,9 @@ def check_signals():
         bug("WARNING", "signals", f"{len(stuck_approved)} APPROVED signals stuck >1h",
             ", ".join(f"{r['token']} {r['direction']}({r['age_h']:.0f}h)" for r in stuck_approved))
 
-    # decision=EXECUTED but executed=0 (inconsistent — the old bug)
+    # decision=PENDING but executed=1 (inconsistent — the old bug).
+    # NOTE: label/message are the source of truth; an earlier comment here said
+    # "decision=EXECUTED but executed=0", which did not match the query.
     inconsistent = sqlite(RUNTIME_DB,
         "SELECT COUNT(*) as cnt FROM signals WHERE decision='PENDING' AND executed=1")
     if inconsistent and inconsistent[0]["cnt"] > 0:
