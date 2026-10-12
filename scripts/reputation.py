@@ -493,13 +493,22 @@ def should_block(coin, signal, direction):
     _load_combo_data()
 
     # Check if coin is in HALL-SHAME territory
-    coin_key = (coin.upper(), direction.upper())
-    coin_data = _coin_cache.get(coin_key)
-
-    if not coin_data or coin_data['trades'] < REP_HOS_BLOCK_MIN_TRADES:
+    # Entry threshold: combined trades (all directions, matches old system)
+    combined_data = _coin_combined_cache.get(coin.upper())
+    if not combined_data or combined_data['trades'] < REP_HOS_BLOCK_MIN_TRADES:
         return {'blocked': False, 'mult': 1.0, 'reason': 'not_in_hos'}
 
-    if coin_data['wr'] >= REP_HOS_BLOCK_WR:
+    # WR check: prefer direction-specific, fallback to combined
+    coin_key = (coin.upper(), direction.upper())
+    dir_data = _coin_cache.get(coin_key)
+    if dir_data and dir_data['trades'] >= 5:
+        wr = dir_data['wr']
+        trades = dir_data['trades']
+    else:
+        wr = combined_data['wr']
+        trades = combined_data['trades']
+
+    if wr >= REP_HOS_BLOCK_WR:
         return {'blocked': False, 'mult': 1.0, 'reason': 'coin_wr_ok'}
 
     # Coin is in HALL-SHAME — check for proven combo override
@@ -516,7 +525,7 @@ def should_block(coin, signal, direction):
     return {
         'blocked': False,  # Not a hard block anymore — multiplier applies
         'mult': REP_HOS_BLOCK_MULT,
-        'reason': f'coin_shame ({coin_data["wr"]:.1f}% WR, {coin_data["trades"]}T)',
+        'reason': f'coin_shame ({wr:.1f}% WR, {trades}T)',
     }
 
 
