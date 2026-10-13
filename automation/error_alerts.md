@@ -627,3 +627,43 @@
 ## Error Alerts — 2026-10-13 06:49 UTC
 - **WARN** (1): Disk at 85% used (18G free) — no action yet, compress if >85%
 - **WARN** (8): 8 phantom trades (`atr_sl_hit` with <0.01% pnl) in signal_outcomes — historical, not new
+
+## Error Alerts — 2026-10-13 07:49 UTC
+- **WARN** (1): Disk at 85% used (18G free) — at threshold, no uncompressed old logs to gzip; monitor
+- **WARN** (1): `hermes-coding-mcp.service` crash-looped 9275x — `/root/.hermes/scripts/run_mcp_server.py` missing (exit 2). **AUTO-FIX**: stopped service (disabled, not in trading path; script needs restore or unit removal)
+- **WARN** (1): `hermes-daily-orchestrator.service` timed out & killed (TERM) at 06:58 — will retry on next timer
+- **INFO** (1): `hermes-bug-hunter.service` exit 1 — code-quality findings (f-string SQL, cursor leaks, bare excepts), not runtime failures
+- Pipeline OK: 4 open / 21 closed today, -33.93% portfolio PnL, 0 crashes. Timers 3/3 active. Prices fresh (<1min). No phantoms.
+
+## Error Alerts — 2026-10-13 08:56 UTC
+- **WARN** (1): Disk at 85% used (18G free) — at threshold; no uncompressed logs >7d to gzip; largest consumers are DBs (candles.db 2.9G, coin_tracker.db 3.4G). No auto-fix possible; consider retention policy.
+- **WARN** (1): `hermes-daily-orchestrator.service` timed out & killed (TERM) at 06:58 — non-critical, will retry on next 24h timer.
+- **WARN** (1): `hermes-upgrade-implementer.service` timed out & killed (TERM) at 06:17 — non-critical, will retry on next 12h timer.
+- **INFO** (1): `hermes-bug-hunter.service` exit 1 — 7 pre-existing code-quality findings (sqlite/cursor leaks, f-string SQL, bare excepts, non-atomic JSON, hardcoded passwords), not runtime failures.
+- **INFO** (1): ATOM SHORT execution failed at 08:45 (RSI hard floor 36.6 < 40) — handled correctly: marked FAILED, no rollback loop, hotset failure recorded. Working as designed.
+- Pipeline OK: 4 open / 23 closed today, -37.89% portfolio PnL, 0 crashes, 0 errors in 30min. Timers 3/3 active (price-collector, 1m-candle, pipeline). Prices fresh (<4min). Regime: SHORT_BIAS (10L/25S/84N). Signals 1h: 44 detected / 4 outcomes. No phantoms (24h).
+
+## Error Alerts — 2026-10-13 09:00 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-13 09:50 UTC
+- **WARN** (1x): Disk usage at 85% (/dev/vda2, 95G/118G). No logs >7d to compress; largest files: candles.db (2.9G), coin_tracker.db (3.5G). Consider pruning candle/token DB retention.
+- **WARN** (8x): Phantom trades — atr_sl_hit with |pnl_pct| < 0.01%. Review entry conditions for these fills.
+- **INFO**: hermes-daily-orchestrator failed (timeout kill at 06:58 UTC after ModuleNotFoundError: paths + FileNotFoundError wyckoff_shadow.jsonl). Non-critical improvement agent.
+- **INFO**: hermes-bug-hunter exit 1 by design (static analysis FAILs: bare_except 132, connection_leaks 52, non_atomic_json 76, hardcoded_passwords 4). Not a crash.
+- **AUTO-FIX**: None required — pipeline, timers, price freshness all healthy. Disk/phantom flagged for CEO attention.
+
+## Error Alerts — 2026-10-13 10:00 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Insufficient margin to place order. asset=N`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+
+## Error Alerts — 2026-10-13 10:48 UTC
+- **WARN** (2x): `[brain.py] ❌ REJECTED: {DYDX,GMX} SHORT — SHORT RSI < HARD_FLOOR 35 (extreme oversold)` — signals entered shorts at RSI 25-29, killed at execution. Upstream v2 filters let oversold shorts through to brain.py (BANANA SHORT pattern). No retry loop (marked FAILED correctly). Suggest: RSI floor check in signal/decider stage before EXEC.
+- **WARN**: Disk 85% used (94G/118G). Auto-fixed: vacuumed journald (-342MB). Watch for growth.
+- **AUTO-FIX**: `journalctl --vacuum-size=300M` — freed 342MB. Timers verified active. No pipeline crashes, no DB locks, no phantom trades.
+
+## Error Alerts — 2026-10-13 11:00 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`

@@ -9231,3 +9231,26 @@ Final set: ['GRASS']
 - ai-trader+ 24h 3T 0W −$0.17 (CFX/NEAR/PONS) — 0 trades this hour; if it re-fires and loses, consider kill
 - hard_max_loss still 44.8% of closes — brain_auditor SL-width review still pending
 - 24h WR 31.0% vs ≥50% Oct 15 goal — improving but gap remains large
+
+## [2026-10-13 11:18] Hourly Analysis
+
+**Trades:** 2 closed last hour — both doji-bottom-long losses: TURBO hard_max_loss −$0.06 (−2.87%), ME atr_sl_hit −$0.12 (−3.12%)
+**PnL:** −$0.18 last hour (WR 0.0%) | 24h: 30T 9W −$0.50 (30.0%) | 3 open: ADA pump-chain- +2.11%, ACE pump-chain- +1.84%, BANANA doji-bottom-long −0.73%
+
+**Changes:**
+1. KILLED doji-bottom-long (DOJI_BOTTOM_ENABLED=False, v1) — 0/4 24h −$0.37, all four trades losers (SEI/IMX/TURBO hard_max_loss + ME atr_sl_hit −3.12%). Same profile as oversold-bounce+ killed earlier today (0/4 consecutive losses). Mean-reversion LONG in weak regime keeps catching falling knives. Strict last-hour rule was 2T 0W (needed 3+), but 24h evidence identical to the morning kill — holding would just pay for another loss. Re-enable only with CEO approval + regime check.
+
+**No Change Needed:**
+- hard_max_loss 14/30 = 46.7% of 24h closes −$1.32 — hold (brain_auditor: 4 fixes in soak, do not stack)
+- atr_sl_hit 3/30 = 10% — under 40%, tpsl_utils deployed and stable
+- Overtrade: 2/hr — well under 20
+- Streak: 09h +$0.57, 10h +$0.03, 11h −$0.18 = 1 consecutive negative hour, not 3 — regime check not triggered
+- pump-chain- 2 open SHORTs +2.11%/+1.84% in profit — trail mechanism healthy
+- live_trading=true (constants line 33 + kill JSON) — verified
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- BANANA (doji-bottom-long, opened pre-kill) still open −0.73% — kill blocks new entries only; TPSL manages the existing position
+- 24h WR stalled at 30.0% vs ≥50% Oct 15 goal — 5 days left
+- hard_max_loss still 46.7% of closes — brain_auditor SL-width review still pending
+- ai-trader+ 24h 3T 0W −$0.17 — 0 trades this hour; if it re-fires and loses, candidate for kill

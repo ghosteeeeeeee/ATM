@@ -121,3 +121,9 @@ WR fell 53.9%→36.7% *after* the Oct 6-7 tightening, but PnL rose. This is cons
 ### Numbers: 24h 18T -1.09 22.2% | 7d 126T 0.87 38.9%
 ### Findings: 24h flipped negative since 18:50 (+$0.09→−$1.09, WR 42→22%); error log shows 4x mark_signal_executed failures + disk hit 85% warn threshold. Proactive Q: new errors — no CRITICAL, all warn-class.
 ### Recommendation: Investigate the 4x mark_signal_executed failure returns (possible unclaimed/lost signals) and run DB prune (disk 85%, goal <80% Oct 14).
+
+## CEO Status — 20261013T094726Z
+### Health: pipeline=active guardian=active open_pos=4
+### Numbers: 24h 26T -$0.47 26.9% | 7d 136T +$1.67 39.0%
+### Findings: 24h WR 26.9% (brain_auditor flagged CRITICAL; 7d PnL still +$1.67). Disk 85% (DBs 6.3G, no gzip left). 2 unratified trail-arm enables still awaiting CEO decision. Rotating Q (coin_tracker scores): agg_scores fresh (09:48 UTC) but ~20 coin tables empty and 6 stale >14d (AZTEC/BCH Sep 27, ENA Sep 14, HEMI/NOT/CASHCAT/ICP partial) — registry drift, not a timer failure.
+### Recommendation: CEO ratify or revert the 2 trail-arm enables before Oct 15 soak review; investigate coin_tracker empty-table registry for dropped tokens.
