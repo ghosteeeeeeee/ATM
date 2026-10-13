@@ -4631,3 +4631,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 19:13] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 58T 14W −$1.88 (24.1%) | kill: none (0 trades) | atr_sl_hit 22.4% (tpsl stable) | hard_max_loss 41.4% (hold soak) | overtrade 0/hr | streak 2-neg under 3, regime=LONG_BIAS ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-13 20:15] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 57T 14W −$1.76 (24.6%) | kill: none (0 trades) | hard_max_loss 40.4% (hold soak) | atr_sl_hit 22.8% (tpsl stable) | overtrade 0/hr | streak 2-neg under 3, regime=LONG_BIAS ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
+BY: auto_1hr

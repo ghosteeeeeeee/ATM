@@ -9480,3 +9480,19 @@ Final set: ['GRASS']
 - Overtrade: 0/hr (limit 20)
 - live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-13 20:15] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 (no closes)
+
+**Changes:** None.
+
+**No Change Needed:**
+- 0T last hour → no kill-rule candidates (rule requires 3+T/0W in hour)
+- 24h: 57T 14W −$1.76 (24.6%) — bleeds continue; hard_max_loss 23T −$1.95 (40.4% of closes, over 40% threshold but held: brain_auditor soak, 4 fixes in progress, do not stack)
+- atr_sl_hit 13/57 = 22.8% — under 40%, tpsl_utils deployed/stable
+- Streak: hour 17 −$0.18 + hour 18 −$0.14 = 2 consecutive neg, under 3; hour 19 0 closes. Regime=LONG_BIAS (22L/7S/95N) ≠ NEUTRAL → size lever N/A
+- Overtrade: 0/hr (limit 20)
+- 4 open positions; live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
