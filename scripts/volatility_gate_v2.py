@@ -209,7 +209,7 @@ REGIME_SIGNALS = {
         'volume-breakout-long+',  # volume-confirmed breakout LONG (hyphen variant) — added 2026-10-09: sync with v1
         'volume-breakout-short-', 'volume_breakout_short',  # volume-confirmed breakout SHORT — added 2026-10-09: BANANA SHORT blocked
         'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-09: APT LONG blocked in EXTREME
-        'doji-bottom-long', 'doji-top', 'doji-top-short',  # doji patterns — added 2026-10-09
+        'doji-top', 'doji-top-short',  # doji patterns — added 2026-10-09; doji-bottom-long REMOVED from EXTREME 2026-10-13 signal_reporter — EXTREME 3T 0%WR -$0.25 (mean-reversion LONG in storm = falling knife; TURBO/IMX hard_max_loss). HIGH 12T 83.3% +$0.89 and NORMAL 8T 50% +$0.12 kept.
         'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'accel-300-breakout',  # ATR breakout signal — works solo, added 2026-09-23 (bug hunt: was killing PONS SHORT)
