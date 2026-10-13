@@ -9432,3 +9432,34 @@ Final set: ['GRASS']
 - 3 of 5 losses last hour were atr_sl_hit pump-chain- SHORTs in a SHORT_BIAS regime — shorts died on bounce/retrace against the short-bias trend; same chase-into-move pattern flagged at 16:15 for ICP, now 4 occurrences (ICP/CRV/LDO/ALGO). Needs data, not a 1-trade change
 - 24h WR 24.1%, PnL −$1.88 — still bleeding; 1 day to Oct 15 ≥50% goal, gap very large
 - hard_max_loss 41.4% of closes — brain_auditor SL-width/entry-filter review still pending
+
+## [2026-10-13 18:40] Daily Orchestrator Run
+
+**Context:** 06:40 orchestrator run implemented Wyckoff shadow rule then crashed at 06:58 (verification snippet ModuleNotFoundError) before documentation; code swept into daily-commit 2409c5f3 07:15. This run completes documentation + disk cleanup.
+
+**Pipeline:** 2 open | 58 closed today | −$1.88 (24.1% WR — bad day, 7d still +$0.93-1.70 per brain_auditor 10:45) | Health OK | Kill switch LIVE=true | Regime SHORT_BIAS | Disk 85%→83% after cleanup.
+
+### IMPLEMENTED (verified this run)
+
+1. **Wyckoff shadow rule — VERIFIED LIVE (implemented 06:40 run, commit 2409c5f3).**
+   - `WYCKOFF_SHADOW_MODE=True` (hermes_constants.py:3083) + shadow branch in wyckoff.py:528-556 (logs to `data/wyckoff_shadow.jsonl`, skips `add_signal`, sets cooldown).
+   - Rationale: co-source pairing undelivered past Oct 11 EOD → shadow-only per CEO escalation chain (Oct 11 21:55, Oct 13 02:47 brain_auditor). Bypass REJECT stands (n=5 ex4h −2.23%).
+   - **Verification:** 6 shadow fires logged (10:10-15:12): LTC+PONS SHORT distribution ×3 (SHORT side NEVER fired live before), PONS LONG accumulation ×3. Live signals table: last wyckoff entry 05:31 (pre-shadow), **0 entries since 07:15** while 635 other signals entered — exclusion signal-specific, pipeline healthy.
+   - Flip OFF only with CEO GO + validated volume/rs pairing backtest.
+
+2. **Disk cleanup — 85% → 83% (~2.4G freed).** Removed /tmp/audit 607M + /tmp/all_logs.txt 295M + 48 stale hourly ATM zips 624M; journal vacuum 349M; compressed /var/log/syslog.1 742M→~90M. Trading DBs untouched (candles/coin_tracker NEVER vacuum mid-trading). **<80% Oct 14 goal will MISS** — remaining gap needs trading-DB retention plan (bug_hunter delegated Oct 7, undelivered). Optional CEO: /root/.cache camoufox 1.4G + puppeteer 651M re-downloadable if fetcher/browser tools unused.
+
+### STATUS CARRIED (no action, CEO-owned)
+
+- Trail-arm 2 unratified enables — brain_auditor re-recommends RATIFY (corrected +$0.97/30d); still no CEO GO. **Do not let soak pass Oct 15 undecided.**
+- doji-bottom-long regime question — signal_reporter escalated to CEO today (HIGH 14T 71.4% +$0.68 → regime-block candidate, not blanket kill).
+- hard_max_loss #1 bleed (41-46% of closes) — brain_auditor: chase-entry filter needs backtest, 4 fixes in soak, do not stack.
+- Rep Phase 2a/2 — DONE Oct 12 19:30 (wired LIVE per user directive; REP_SHADOW_MODE=False verified). Rep 2b candidate due Oct 15.
+
+### SIDEWAYS FINDS
+
+- **wyckoff.py COOLDOWN_BARS mismatch:** constant=30 with comment "(2.5h)" but formula `hours=COOLDOWN_BARS/60.0` yields 0.5h (confirmed by PONS fires ~30min apart). Pre-existing since Oct 8 cooldown fix — not introduced by shadow change. De-facto 30min behavior may be intentional; flagging for CEO rather than changing mid-soak (one-variable discipline).
+- self_learner delegation misses continuing (trail-arm Oct 12, now pattern).
+- signal_analyst: wyckoff pairing undelivered — 3rd missed delegation class (wyckoff Oct 9/11/13).
+
+**Next:** Oct 15 — WR ≥50% checkpoint, bb-squeeze soak review, pump-chain 45m soak review, Rep 2b candidate, wyckoff shadow n-review (~2wk data window opens). CEO: trail-arm ratify, doji regime, disk deep-prune plan.

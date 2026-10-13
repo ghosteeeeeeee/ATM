@@ -1,68 +1,49 @@
-# Current State — Daily Orchestrator Oct 12 18:50 UTC
+# Current State — Daily Orchestrator Oct 13 18:45 UTC
 
-**Last Updated: 2026-10-12 18:50 UTC**
-**Updated by: daily_orchestrator — trail-arm independent audit delivered; 2 unratified live enables escalated to CEO**
+**Last Updated: 2026-10-13 18:45 UTC**
+**Updated by: daily_orchestrator — Wyckoff shadow rule verified live; disk 85%→83%; trail-arm ratify still pending CEO**
 
-## PIPELINE STATUS (18:50 UTC)
+## PIPELINE STATUS (18:40 UTC)
 
-- **24h: 19T 8W +$0.09** (42.1% WR) — thin, 4th consecutive hour watching; 0 open | 15 closed today
-- Quiet stretch: 0 closes in 8 of last 9 hours — market lull, no action while 24h net positive
-- Health: OK | Disk 83% | Kill switch LIVE=true | Regime SHORT_BIAS (1L/81S/36N)
-- Watch: pump-chain+ 3T 0W −$0.33, ai-trader+ 3T 1W −$0.13 (kill needs n≥5), hmacd_mtf-- 25% WR trending
+- **Today: 58 closed, 24.1% WR, −$1.88** — bad day (chase-into-move losses, hard_max_loss 41% of closes) | 2 open | 7d still +$0.93-1.70 (brain_auditor 10:45)
+- Health: OK | Disk **83%** (cleaned ~2.4G; <80% Oct 14 goal will MISS) | Kill switch LIVE=true | Regime SHORT_BIAS
+- 0 errors last 30min; timers 3/3 active
 
-## TRAIL-ARM TIMEOUT — INDEPENDENT AUDIT DELIVERED (18:40)
+## DONE TODAY (Oct 13)
 
-- Audit: `plans/2026-10-12_bb-squeeze-trail-arm-timeout-AUDIT.md` — **PASS direction, magnitude REFUTED**
-- Original +$1.48/30d inflated by leverage unit-bug (pnl_pct is leverage-scaled; CF losses shrank 3-5×). **Corrected: +$0.97/30d** (scaled) / +$0.89 (direct). n=21 replicated exactly. Not outlier-driven (drop top trade: +$0.74).
-- Additional audit findings: live code checks every cycle after 60m (strict superset of backtest's one-shot-at-60m check — unvalidated); cohort is HIGH 12 / NORMAL 9 / EXTREME 0, single 5-day cluster Oct 2-6.
-- 0 live fires in first 8h soak.
+- **Wyckoff shadow rule — LIVE + VERIFIED.** 06:40 run implemented (crashed pre-doc, code swept 2409c5f3); evening run verified: 6 shadow fires logged (incl first-ever SHORT distribution fires), 0 live-table entries since 07:15, 635 other signals flowing. `WYCKOFF_SHADOW_MODE=True`. Flip OFF only with CEO GO + pairing backtest.
+- **Disk cleanup ~2.4G** — /tmp scratch, stale zips, journal vacuum, syslog compress. Trading DBs untouched.
+- **Rep Phase 2** — wired LIVE Oct 12 19:30 (REP_SHADOW_MODE=False, user-directed early). Monitoring.
+- signal_reporter killed hmacd_mtf-+ LONG (all-regimes-losing, blanket kill correct).
 
-## ⚠️ CEO ESCALATION — 2 UNRATIFIED LIVE ENABLES
+## ⚠️ CEO ESCALATIONS (open)
 
-1. **`BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=True`** — brain_auditor flipped 10:48 UTC (9f3c3e2a) citing "independent audit PASSED" but its audit was a spot-check of the orchestrator's backtest (+$1.48, since corrected to +$0.97); verdict doc said "needs CEO approval"; no CEO GO found in kanban. Soak: 0 fires / 8h.
-2. **`PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED=True` 45m** — shipped 18:16 UTC (c3f73fd0) though brain_auditor's own 12:45 queue said "QUEUED on bb-squeeze soak Oct 15". 0 combo overlap with bb-squeeze in 30d; elif precedence correct.
-- **Ask: RATIFY (keep, corrected expectation +$0.97/30d bb-squeeze) or REVERT (one-line each).** Audit recommends keep-enabled. Do NOT let both soak past Oct 15 without a decision.
+1. 🔴 **Trail-arm 2 unratified enables** — brain_auditor keeps recommending RATIFY (corrected +$0.97/30d bb-squeeze; pump-chain 2 fires net $0 correct direction). Decide BEFORE Oct 15 soak review. One-line revert each if REVERT.
+2. 🔴 **doji-bottom-long** — auto_1hr killed it but HIGH regime 14T 71.4% +$0.68 WINS. Regime-block (EXTREME-only 0.0x) vs keep-kill: CEO call (signal_reporter 17:10).
+3. 🟡 **Disk <80% unreachable without deep prune** — needs candle/coin_tracker/session_brain retention plan; bug_hunter delegation undelivered since Oct 7. Optional: delete camoufox 1.4G + puppeteer 651M caches if browser tools unused.
+4. 🟡 **hard_max_loss #1 bleed** (41-46% of closes) — brain_auditor: chase-entry filter is the lever, needs self_learner backtest; 4 fixes in soak, do NOT stack entry filters.
+5. 🟡 **wyckoff COOLDOWN_BARS mismatch** — constant 30, comment says 2.5h, formula yields 0.5h (confirmed live). Pre-existing. CEO: fix formula to 2.5h or fix comment to 30min?
 
-## CHANGES THIS RUN
+## WATCHLIST
 
-| Change | Deployed | Status |
-|--------|----------|--------|
-| Independent audit of trail-arm verdict | plans/…-AUDIT.md | PASS dir / +$0.97 corrected |
-| Verdict doc corrected (+$1.48→+$0.97, live-status header) | plans/…-verdict.md | done |
-| (no trading-config changes) | — | orchestrator scope; CEO owns the 2 enables |
+- pump-chain- SHORT: 13T 30.8% −$0.16 all EXTREME (kill threshold n≥5 not met; EXTREME block stays reverted per CEO)
+- 7d WR ~39-42% vs ≥50% Oct 15 goal — gap large, today's −$1.88 hurts
+- Wyckoff shadow data accumulating (~6 fires/5h → n≥30 in ~2wk; eval window opens ~Oct 27)
+- self_learner + signal_analyst delegation misses (wyckoff pairing 3rd miss class)
 
-## REPUTATION PHASE 2a — DUE OCT 13 (next run ~06:40)
+## KEY DATES
 
-- Pre-flight GREEN (re-verified 18:35: imports OK, REP_ENABLED=True, REP_SHADOW_MODE=True)
-- Execute per `plans/2026-10-12_rep-phase2-pickup.md` after 00:00 UTC Oct 13 (date-gated; NOT early)
+| Date | Item |
+|------|------|
+| Oct 14 | Disk <80% goal (WILL MISS — see escalation 3) |
+| Oct 15 | 7d WR ≥50% checkpoint; bb-squeeze trail-arm soak review; pump-chain 45m soak review; Rep 2b candidate; CEO trail-arm ratify deadline |
+| ~Oct 27 | Wyckoff shadow n≥30 re-eval (pairing or bypass decision) |
+| Nov 6 | Gate re-audit window opens (D2) |
 
-## ESCALATIONS
+## NEXT ACTIONS (next run ~Oct 14 06:40)
 
-1. 🔴 **Wyckoff confluence shadow rule** — due Oct 13 (tomorrow), signal_analyst undelivered since EOD Oct 11. Bypass REJECT (n=5 ex4h −2.23%), 0 trades all-time.
-2. 🔴 **Trail-arm 2 unratified enables** — CEO ratify/revert (above).
-3. 🟡 **hard_max_loss trail-floor** — bug_hunter since Oct 4; trail-arm family now partially addresses the stall cohort (15/20 bb-squeeze stall deaths preempted live).
-4. 🟡 **Continuous-check semantics unvalidated** — live timeout checks every cycle after 60m; backtest validated one-shot at 60m only. Re-run counterfactual with continuous semantics before trusting (delegate next run if CEO ratifies).
-5. 🟡 **self_learner delegation misses** — trail-arm backtest missed Oct 10; watch recurrence (2nd miss class).
-
-## GOALS
-
-| Metric | Current | Target | Deadline | Status |
-|--------|---------|--------|----------|--------|
-| 7d PnL | +$0.84 (06:40) | ≥$0 | Oct 12 | ✅ MET |
-| SHORT 7d | +$0.16 (06:40) | ≥$0 | Oct 12 | ✅ MET |
-| 7d WR | ~42% | ≥50% | Oct 15 | watch — thin +$0.09 24h |
-| Trail-arm ratify | live unratified | CEO RATIFY/REVERT | — | ⏳ escalation |
-| Wyckoff pairing | 0 trades | shadow rule | Oct 13 | due tomorrow |
-| Reputation 2a | pre-flight green | wire shadow | Oct 13 | due tomorrow (06:40 run) |
-| Disk | 83% | <80% | Oct 14 | watch |
-| bb-squeeze soak | 0 fires / 8h | review Oct 15 | Oct 15 | on track |
-
-## NEXT ACTIONS
-
-1. ~~Reputation Phase 2a wiring~~ **DONE 2026-10-12** — wired live (REP_SHADOW_MODE=False), pickup file deleted, HALL-SHAME hard block replaced with 0.3x multiplier + combo override. Monitor for regressions.
-2. **Oct 13 06:40 run: Wyckoff shadow rule** (CEO escalation; if signal_analyst still undelivered, orchestrator implements shadow-only)
-3. **CEO: ratify/revert the 2 trail-arm enables** (audit: keep, +$0.97/30d corrected)
-4. Monitor pump-chain+/ai-trader+/hmacd_mtf-- watchlist (kill threshold n≥5)
-5. If CEO ratifies: delegate continuous-check-semantics counterfactual re-run
-6. Oct 15: 7d WR ≥50% checkpoint; bb-squeeze soak review; pump-chain 45m soak review
-7. Disk cleanup if >84%
+1. Check trail-arm ratify status — if still undecided by Oct 15, escalate HARD (soak review cannot proceed clean)
+2. Oct 15: WR checkpoint + bb-squeeze soak review + pump-chain 45m soak review + Rep 2b candidate
+3. Monitor wyckoff shadow log growth (expect ~30/day in active markets)
+4. Disk: propose retention plan to CEO if bug_hunter still undelivered
+5. Watch chase-into-move pattern (ICP/CRV/LDO/ALGO shorts + today's LONG cluster) — needs data not quick fix

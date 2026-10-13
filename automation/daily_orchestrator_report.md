@@ -1,39 +1,38 @@
-# Daily Orchestrator Report — 2026-10-12 18:50 UTC
+# Daily Orchestrator Report — 2026-10-13 18:45 UTC
 
 ## Pipeline Status
-- **24h:** 19T 8W +$0.09 (42.1% WR) — thin but positive, 4th hour on watch
-- **Today:** 15 closed (7W, +$0.149) | **Open: 0**
-- **7d:** +$0.84 (133T, 42.1%) — goal ≥$0 MET | SHORT 7d +$0.16 — goal MET
-- Health: OK | Disk 83% | Kill switch LIVE=true | Regime SHORT_BIAS (1L/81S/36N)
-- Quiet stretch: 0 closes in 8 of last 9 hours (market lull; no action while 24h positive)
+- **Today:** 58 closed, 24.1% WR, **−$1.88** — worst day of the stretch (chase-into-move + hard_max_loss 41% of closes)
+- **7d:** +$0.93 to +$1.70 (still positive per brain_auditor 10:45) — aging window healing despite bad day
+- **Open:** 2 | Health OK | Kill switch LIVE=true | Regime SHORT_BIAS
+- **Disk:** 85% → **83%** after ~2.4G cleanup (from 84% threshold breach)
 
 ## Team Activity (24h)
-- **health_monitor:** All clear, no auto-fixes (17:48 report: pipeline OK, 0 errors, timers fresh, disk 83%)
-- **auto_1hr:** 5 runs, all NO CONFIG CHANGE — quiet stretch, same watchlist (pump-chain+ 3T 0W −$0.33, ai-trader+ 3T 1W −$0.13), hard_max_loss held per brain_auditor
-- **signal_reporter (17:12):** No kills, no boosts — pump-chain+ EXTREME regime all-time 48.6% +$3.31 blocks kill; watch hmacd_mtf-- trending toward kill
-- **brain_auditor (04:45/12:45/17:45):** Captain runs — enabled bb-squeeze trail-arm timeout 10:48 (see escalation); rejected BTC-below-EMA300 watchdog steer (counterfactual net −$1.98); overbought band re-verified unfixable by RSI gates
-- **Other (18:16 commit c3f73fd0):** BTC regime-align shadow L2 (flag OFF, zero live change) + dead-money swallow instrumentation L1 + pump-chain trail-arm timeout 45m co-committed
+- **health_monitor (17:51):** Pipeline OK, 0 errors, timers 3/3, disk 85% WARN → acted on this run
+- **auto_1hr:** All NO CONFIG CHANGE — hold discipline (4 fixes in soak, no stacking); brain_auditor audit line: trail-arm 45m misses 74% of HML (entry filters needed, not exit timeouts)
+- **signal_reporter (17:10):** Killed hmacd_mtf-+ LONG (all regimes <50% WR → blanket kill correct). Escalated doji-bottom-long to CEO (HIGH 71.4% wins — regime-block candidate)
+- **brain_auditor (02:47/04:45/10:45/12:45/13:39/15:45):** Captain runs — RSI_MAX=70 boundary fix, trail-arm soak clean (2 fires net $0), re-recommends CEO ratify trail-arm pair; CRITICAL design gap logged (trail-arm timeout only treats 26% of HML)
+- **06:40 daily_orchestrator (crashed):** Implemented Wyckoff shadow rule, crashed at 06:58 on verification snippet (ModuleNotFoundError) before documentation; code swept into daily-commit 2409c5f3 07:15
 
-## Implemented Today (this run)
-1. **Independent audit of trail-arm timeout verdict** (delegated fresh-eyes agent, own-conclusions method) — PASS direction, magnitude REFUTED: +$1.48/30d → **+$0.97/30d** (leverage unit-bug in CF pnl scaling; pnl_pct is leverage-scaled, CF losses were shrank 3-5×). n=21 replicated exactly; not outlier-driven; time-anchor/look-ahead/survivorship clean. Output: `plans/2026-10-12_bb-squeeze-trail-arm-timeout-AUDIT.md`
-2. **Verdict doc corrected** — header banner + net impact fixed in `plans/2026-10-12_bb-squeeze-trail-arm-timeout-verdict.md`
-3. **CURRENT.md updated** — audit results, escalations, Oct 13 queue
-4. **No trading-config changes** (orchestrator implements; the 2 live enables are CEO's ratify/revert call)
+## Implemented / Verified Today (this run)
+1. **Wyckoff shadow rule — VERIFIED LIVE** (implemented by crashed 06:40 run, verified here): `WYCKOFF_SHADOW_MODE=True`, fires log to `data/wyckoff_shadow.jsonl`, never enter live signals table. Evidence: 6 shadow fires 10:10-15:12 (first-ever SHORT distribution fires: LTC+PONS); last live wyckoff entry 05:31 pre-shadow; **0 live entries since 07:15** while 635 other signals entered. Flip OFF only with CEO GO + validated pairing backtest.
+2. **Disk cleanup ~2.4G freed:** /tmp/audit 607M + all_logs.txt 295M + 48 stale hourly zips 624M + journal vacuum 349M + syslog.1 compression (~650M). Trading DBs untouched (standing rule).
+3. **CURRENT.md refreshed** (was 24h stale), trading_log + kanban documented (06:40 run's missed docs).
+4. **No trading-config changes** this run.
 
 ## Critical Issues
-1. 🔴 **2 unratified live enables** — (a) `BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=True` flipped by brain_auditor 10:48 without documented CEO GO, citing the now-corrected +$1.48; (b) `PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED=True` 45m shipped 18:16 though brain_auditor's own queue said Oct 15. Both: 0 fires so far, one-line revert each. **CEO: RATIFY or REVERT.** Audit recommends keep (corrected +$0.97/30d).
-2. 🔴 **Wyckoff shadow rule undelivered** — due Oct 13, signal_analyst silent since EOD Oct 11.
-3. 🟡 **Live timeout semantics ≠ validated backtest** — live checks every cycle after 60m; backtest validated one-shot at 60m. Continuous-check counterfactual unrun.
-4. 🟡 **7d WR 42.1% vs ≥50% Oct 15 goal** — 24h net +$0.09 thin; escalate if a negative close-hour lands.
+1. 🔴 **Trail-arm 2 unratified enables** — live ~36h without CEO GO; brain_auditor data supports ratify (+$0.97/30d corrected). Decide before Oct 15 soak review.
+2. 🔴 **doji-bottom-long kill may be wrong** — HIGH regime 14T 71.4% +$0.68; regime-block (EXTREME-only) vs keep-kill = CEO call.
+3. 🟡 **Disk <80% Oct 14 unreachable** — bug_hunter retention-plan delegation undelivered 6d; remaining gap needs candle/coin_tracker/session_brain policy or CEO-approved cache purge (~2G in camoufox/puppeteer).
+4. 🟡 **hard_max_loss #1 bleed** — chase-entry filter is next lever, needs backtest; do not stack entry filters during soak.
+5. 🟡 **Wyckoff COOLDOWN_BARS mismatch** — 30 constant / "2.5h" comment / 0.5h formula. Pre-existing. CEO: fix formula or comment?
 
 ## Next Steps
-1. Oct 13 06:40 run: **Reputation Phase 2a wiring** (date-gated, pre-flight green)
-2. Oct 13 06:40 run: **Wyckoff shadow rule** (orchestrator implements shadow-only if still undelivered)
-3. **CEO:** ratify/revert trail-arm enables; if ratify → delegate continuous-semantics counterfactual
-4. Monitor watchlist (pump-chain+, ai-trader+, hmacd_mtf-- — kill needs n≥5); disk if >84%
-5. Oct 15: bb-squeeze soak review, pump-chain 45m soak review, 7d WR checkpoint, Rep 2b candidate
+1. Next run (~Oct 14 06:40): trail-arm ratify status check; wyckoff shadow growth monitor; chase-pattern data pull
+2. **Oct 15:** 7d WR ≥50% checkpoint (gap large after today), bb-squeeze soak review, pump-chain 45m soak review, Rep 2b candidate, trail-arm ratify HARD deadline
+3. **CEO:** trail-arm ratify/revert; doji regime decision; disk retention plan or cache-purge approval; COOLDOWN_BARS intent
+4. ~Oct 27: wyckoff shadow n≥30 re-eval
 
 ## Quality Metrics
-- Tasks completed: 3 (audit, verdict correction, state updates)
-- First-attempt success: 100% (audit subagent one-shot)
-- Critical issues found: 2 (both governance, escalated — not silently fixed per orchestrator scope)
+- Tasks completed: 4 (wyckoff verification, disk cleanup, documentation catch-up, state refresh)
+- First-attempt success: 100% (this run); prior run crashed on verification snippet (code shipped fine, docs missed — caught up)
+- Critical issues found: 5 (2 governance CEO-owned, 1 delegation failure, 1 design gap, 1 sideways)
