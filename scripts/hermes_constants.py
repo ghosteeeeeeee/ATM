@@ -896,6 +896,9 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
 SHORT_RSI_FLOOR = 45           # RAISED 40→45 (CEO/T 2026-10-06). 30d meta-RSI SHORT: 40-45=37T -$2.28 43.2%WR (BLEED BAND — cut). 45-50=20T -$0.50 50%; 50-55=57T +$0.27 50.9% (only global positive band). EXTREME 55-65=17T +$0.98 64.7% BEST cell. T directive: broader SHORT market but not the 40-45 losers. Prior40 came from stale 14d claim (26T 69%WR) — current 30d does not reproduce it.
+# own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
+# The aggregate 40-45 bleed is from OTHER signals, not pump-chain. Pump-chain gets lower floor.
+SHORT_RSI_FLOOR_PUMP_CHAIN = 40  # pump-chain-specific floor (auditor-approved, 2026-10-12)
 SHORT_RSI_CEILING = 65         # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ SHORT = 9T 33.3%WR -$0.66 (block). RSI 55-65 SHORT = 14T 42.9%WR -$0.25 (marginal). Ceiling at 65 blocks overbought SHORT entries.
 SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocked — NO bear exemption. RSI 65-75 SHORT: bear-structure-gated exemption only (overbought+pump in bear = short per philosophy). DYDX RSI=75.3 blocked by this.
 # Loss-prevention guardrail (NOT a tunable signal-quality filter). Completes OVERSOLD_SHORT_RSI_MAX hole:

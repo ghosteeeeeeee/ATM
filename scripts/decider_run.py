@@ -1180,10 +1180,13 @@ def rule_based_context_gate(token, direction, source, sig):
         except Exception:
             pass
         
-        if _live_rsi_floor is not None and _live_rsi_floor < SHORT_RSI_FLOOR:
-            return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (extremely oversold — bounce risk)', 0)
-        if _detect_rsi_floor is not None and _detect_rsi_floor < SHORT_RSI_FLOOR:
-            return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_FLOOR} (detected in oversold — bounce risk)', 0)
+        # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12.
+        from hermes_constants import SHORT_RSI_FLOOR_PUMP_CHAIN
+        _soft_floor = SHORT_RSI_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_FLOOR
+        if _live_rsi_floor is not None and _live_rsi_floor < _soft_floor:
+            return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {_soft_floor} (extremely oversold — bounce risk)', 0)
+        if _detect_rsi_floor is not None and _detect_rsi_floor < _soft_floor:
+            return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {_soft_floor} (detected in oversold — bounce risk)', 0)
         # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened (pullback-entry only)
         # Catches trades where detect() 5m z passed but execution-time 1m z is positive
         _is_pullback = source and 'pullback-entry' in source
@@ -2045,9 +2048,12 @@ def execute_trade(token, direction, price, confidence, source,
             # Standing decision: exec RSI>=45 all paths; HARD_FLOOR=45 (aligned 2026-10-07) no override.
             # 7d SHORT meta RSI<40: 13T 31%WR -$0.77; pump-chain- RSI<40: 3T 0%WR -$0.38.
             # Live-signal winner impact: 0 — the 4 RSI<40 winners were accel-300-/mtf-regime-trend- (disabled/killed).
-            if direction.upper() == 'SHORT' and SHORT_RSI_FLOOR > 0 and _exec_rsi < SHORT_RSI_FLOOR:
-                log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_FLOOR} at execution time (oversold — standing decision: no bearish override)')
-                return False, f'RSI floor: {_exec_rsi:.1f} < {SHORT_RSI_FLOOR}'
+            # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12.
+            from hermes_constants import SHORT_RSI_FLOOR_PUMP_CHAIN
+            _exec_soft_floor = SHORT_RSI_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_FLOOR
+            if direction.upper() == 'SHORT' and _exec_soft_floor > 0 and _exec_rsi < _exec_soft_floor:
+                log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {_exec_soft_floor} at execution time (oversold — standing decision: no bearish override)')
+                return False, f'RSI floor: {_exec_rsi:.1f} < {_exec_soft_floor}'
             if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
                 log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
                 return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
