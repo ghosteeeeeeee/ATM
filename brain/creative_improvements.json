@@ -4256,5 +4256,15 @@
     "category": "kill candidate",
     "status": "monitor — n=10 < 20 threshold",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-13T14:46:51Z",
+    "idea": "5m momentum gate (<0.15% block) — REFUTED; BTC-regime alignment filter — REFUTED",
+    "rationale": "Both entry-quality ideas tested against 14d n=282 exit-family cohort. Momentum gate net +$0.46/14d kills 41% of trail winners. Regime filter: HML occurs in all regimes at similar rates to trail.",
+    "expected_impact": "N/A — both rejected",
+    "category": "entry sniper",
+    "status": "refuted",
+    "risk": "n/a",
+    "verification": "Full counterfactual in brain/audit_recommendations.json timestamp 2026-10-13T14:46:51Z"
   }
 ]

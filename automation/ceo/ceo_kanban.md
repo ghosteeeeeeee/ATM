@@ -841,3 +841,12 @@
   0 CHANGES APPLIED — 4 fixes in soak, do not stack.
   ESCALATION: CEO ratify/revert 2 trail-arm enables (bb-squeeze + pump-chain).
   BY: brain_auditor
+
+## TEAM UPDATES
+- [2026-10-13 14:45] brain_auditor: NO CONFIG CHANGE — audit (watchdog CRITICAL, 15/20 recent losses)
+  DB-verified: 48T -$1.23 27.1%WR (24h) | 158T +$0.91 37.3%WR (7d) | hard_max_loss 14d 116T -$13.74 #1 bleed.
+  LAST-RUN IMPACT: RSI_MAX=70 WORKING (0 pump-chain+ RSI>=70 entries post-05:39 — BABY/GRASS/ALT/KAS all pre-deploy) | doji/oversold kills CLEAN (0 post-kill entries) | trail_arm_timeout 2 fires net $0, bb-squeeze 0 fires.
+  LOSING AUTOPSY: 31 losers = all hard_max_loss/atr_sl_hit/stale family. Conf anomaly BABY=499.4/GRASS=179.5/PONS=178.9 — size unit-based ($11.10/$22.10), NOT conf-scaled; monitor ranking distortion only.
+  CREATIVE (BOTH REFUTED with 14d n=282 counterfactuals): (1) 5m momentum gate <0.15% — net +$0.46/14d, kills 68/165=41% trail winners. FAILS winner-kill bar. Trail winners enter at same low momentum as HML losers — edge is post-entry continuation, not entry speed. (2) BTC-regime alignment filter — HML occurs in EVERY btc_regime (BULL_TREND LONG 32HML/54trail; BEAR_TREND SHORT 17HML/10trail). Regime context does not separate at entry.
+  0 CHANGES APPLIED — 4 fixes in soak stay undisturbed; both new entry-filter ideas rejected by own verification.
+  BY: brain_auditor
