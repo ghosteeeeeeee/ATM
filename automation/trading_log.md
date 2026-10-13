@@ -9077,3 +9077,26 @@ Final set: []
 - 24h WR 22.2% (4/18) vs ≥50% Oct 15 goal — window still shedding older wins
 - hard_max_loss >40% of closes for 5th straight hour — brain_auditor SL-width review still pending
 - 3 open pump-chain+/continuum positions in profit — watch whether they confirm or give back
+
+## [2026-10-13 05:13] Hourly Analysis
+
+**Trades:** 1 closed last hour — ALT pump-chain+ LONG trail_sl $0.01 (+0.11%)
+**PnL:** +$0.01 last hour | 24h: 19T 6W −$1.19 (31.6%) | 4 open: LDO pump-chain+ +$0.56, GRASS pump-chain+ −$0.10, ETH hl_copy_trader +$0.07, BTC continuum-trend+ +$0.03
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — only 1T last hour, and it was a win
+- pump-chain+ 6T 2W −$0.40 24h worst by volume — 1W last hour, kill rule not met
+- hard_max_loss 9/19 ≈ 47% of 24h closes −$1.02 — hold brain_auditor (SL width lever, unchanged)
+- atr_sl_hit 1/19 ≈ 5.3% — under 40%, tpsl_utils deployed
+- Overtrade: 1/hr — well under 20
+- Streak: 04h bucket +$0.01 (positive) — not 3 consecutive negative; regime check not triggered
+- live_trading=true (constants + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 31.6% (6/19) vs ≥50% Oct 15 goal
+- hard_max_loss >40% of closes for 6th straight hour — brain_auditor SL-width review still pending
+- 4 open positions, 3 in profit — watch whether they hold
