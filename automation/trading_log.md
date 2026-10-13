@@ -9159,3 +9159,26 @@ Final set: ['GRASS']
 - 24h WR 20.0% (4/20) vs ≥50% Oct 15 goal — deteriorating (22.2% → 20.0%)
 - hard_max_loss >40% of closes for 8th straight hour — brain_auditor SL-width review still pending
 - 4 open positions all in profit — watch whether they hold into closes
+
+## [2026-10-13 08:15] Hourly Analysis
+
+**Trades:** 3 closed last hour — BTC continuum-trend+ LONG profit-monster-trail +$0.04 (+1.50%), ENS hmacd_mtf-+ LONG profit-monster-trail +$0.02 (+1.11%), CRV volume-breakout-long+ LONG hard_max_loss −$0.08 (−3.66%)
+**PnL:** −$0.02 last hour (WR 66.7%) | 24h: 21T 5W −$1.12 (23.8%) | 5 open: LDO pump-chain+ +3.55%, ETH hl_copy_trader +0.85%, MON bb-bounce-v2-long+ −0.17%, ENS hmacd_mtf-+ −0.21%, SAND volume-breakout-long+ −0.22%
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — volume-breakout-long+ 1T 0W only; no signal hit 3+
+- atr_sl_hit 3/21 ≈ 14.3% — under 40%, tpsl_utils deployed
+- hard_max_loss 10/21 = 47.6% of 24h closes −$1.05 — hold (brain_auditor 07:38: 4 fixes in soak, do not stack)
+- Overtrade: 3/hr — well under 20
+- Streak: 07h −$0.07 but 06h $0.00 breaks it — not 3 consecutive negative; regime check not triggered
+- 2 trail wins this hour — trail-arm pump-chain fix showing early positive signal, let it soak
+- live_trading=true (constants + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 23.8% (5/21) vs ≥50% Oct 15 goal
+- hard_max_loss >40% of closes for 9th straight hour — brain_auditor SL-width review still pending
+- 3 of 5 open positions red (MON/ENS/SAND) — watch whether they recover or add to hard_max_loss count

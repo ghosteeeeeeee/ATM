@@ -4599,3 +4599,4 @@ BY: auto_1hr
   CREATIVE: (1) correlated alt-LONG cap BTC 4h SHORT_BIAS (Q4 backtest still pending) (2) pump-chain 45-60 conf boost at n>=20 (3) volume-breakout 70+ band monitor.
   0 CHANGES APPLIED — 4 fixes in soak, do not stack.
   BY: brain_auditor
+[2026-10-13 08:15] auto_1hr: NO CONFIG CHANGE — 3T last hour (BTC continuum-trend+ trail +$0.04, ENS hmacd_mtf-+ trail +$0.02, CRV volume-breakout-long+ hard_max_loss −$0.08) | 5 open (2 profit, 3 red) | 24h 21T 5W −$1.12 (23.8%) | kill: none qualifying (max 1T 0W per signal last hour, needs 3+) | hard_max_loss 47.6% (hold, 4 fixes in soak per brain_auditor) | atr_sl_hit 14.3% (tpsl stable) | overtrade 3/hr | streak not 3-neg (06h $0.00 breaks) | live_trading=true, kill JSON=true
