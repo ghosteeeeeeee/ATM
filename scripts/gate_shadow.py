@@ -103,6 +103,12 @@ def record(since_hours):
         cutoff = datetime.now(timezone.utc) - timedelta(hours=since_hours)
         n_new = 0
         with open(PIPELINE_LOG, 'r', errors='replace') as f:
+            # LOG ROTATION CHECK: if offset > file size, file was rotated
+            f.seek(0, 2)
+            file_size = f.tell()
+            if offset > file_size:
+                log(f'log rotation detected (offset={offset} > size={file_size}) — resetting')
+                offset = 0
             if offset:
                 f.seek(offset)
             else:
