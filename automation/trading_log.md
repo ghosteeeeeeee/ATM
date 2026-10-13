@@ -8900,7 +8900,7 @@ Final set: []
 ## [2026-10-12 21:14] Hourly Analysis
 
 **Trades:** 3 closed last hour, all pump-chain+ LONG (KAS −$0.02 trail_arm_timeout, HYPER +$0.02 trail_arm_timeout, FIL −$0.12 hard_max_loss)
-**PnL:** −$0.12 last hour | 24h: 19T 8W +$0.03 (42.1%) | 0 open
+**PnL:** −$0.12 last hour | 24h: 22T 8W −$0.83 (36.4%) | 1 open: BABY pump-chain+ LONG
 
 **Changes:** None.
 
@@ -9010,3 +9010,25 @@ Final set: []
 **Open Questions:**
 - 24h WR 36.4% vs ≥50% Oct 15 goal; only 22 trades in 24h, most hours zero
 - Remaining 24h loss sources: pump-chain+ (−$0.35), hmacd_mtf-- (−$0.12), volume-breakout-long+ (−$0.05) — none meet kill criteria this hour
+
+## [2026-10-13 02:15] Hourly Analysis
+
+**Trades:** 1 closed last hour — CFX ai-trader+ LONG hard_max_loss −$0.12 (−2.79%)
+**PnL:** −$0.12 last hour | 24h: 22T 8W −$0.83 (36.4%) | 1 open: BABY pump-chain+ LONG
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — ai-trader+ only 1 trade last hour (0/1 24h −$0.12)
+- pump-chain+ 5T 1W −$0.35 24h — still on watchlist; signal_reporter declined kill (EXTREME regime all-time +$3.48); BABY long currently open
+- hard_max_loss 9/22 ≈ 40.9% −$0.83 — hold for brain_auditor (SL width lever, unchanged)
+- atr_sl_hit 2/22 ≈ 9.1% — under 40%, tpsl_utils deployed
+- Overtrade: 1/hr — well under 20
+- Streak: 0-trade hour (23h region per bucket gaps) reset prior streak; current −$0.12 single hour, not 3 consecutive; regime SHORT_BIAS not NEUTRAL → no size cut
+- live_trading=true (constants line 33 + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h net worsened −$0.23 → −$0.83 (CFX loss); WR 36.4% vs ≥50% Oct 15 goal
+- hard_max_loss now >40% of closes for 3rd straight hour — brain_auditor SL-width review still pending
