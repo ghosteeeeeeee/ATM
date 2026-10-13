@@ -1166,5 +1166,16 @@
     "after": "shadow mode: log CHASE-RATIO-SHADOW, no live block",
     "rationale": "14d backtest: blocks 19/118 hard_max_loss (-$2.01) 0/28 trail winners; both 7d and d8-14 halves 0 winners blocked (p~0.0006 under null). Orthogonal to CHASE gap/z (existing) and SPIKE single-candle filter. Shadow until soak review Oct 15.",
     "impact": "Zero live impact (shadow). If enforced after clean 48h: expected +$2/14d from blocked instant-death entries."
+  },
+  {
+    "timestamp": "2026-10-13T21:50:00Z",
+    "agent": "brain_auditor",
+    "change": "CHASE-RATIO k-token bug fix — exact-case candle lookup first, .upper() fallback (reviewer finding)",
+    "type": "bugfix",
+    "file": "scripts/decider_run.py",
+    "before": "token.upper() only — kSHIB/kPEPE etc. read 8-day-stale K* rows",
+    "after": "exact token first; upper() only if <6 fresh rows",
+    "rationale": "Subagent review: collector stores 6 k-tokens lowercase; .upper() silently computed moves from stale closes. Shadow soak would be polluted; enforce mode would decide on wrong prices.",
+    "impact": "Shadow logs now correct for all tokens. SIDEWIDE FINDING (not fixed, soak conflict): same .upper() bug pre-exists at decider_run.py:4759 exec-time RSI query."
   }
 ]

@@ -4938,9 +4938,15 @@ def run(dry_run=False):
             _cr_now = time.time()
             _cr_conn = sqlite3.connect(CANDLES_DB, timeout=5)
             try:
+                # k-tokens stored lowercase (kSHIB etc.) — exact match first,
+                # .upper() fallback only if fresh rows missing (reviewer bug fix)
                 _cr_rows = _cr_conn.execute(
                     "SELECT ts, close FROM candles_1m WHERE token=? AND is_closed=1 AND ts>? ORDER BY ts",
-                    (token.upper(), int(_cr_now) - 900)).fetchall()
+                    (token, int(_cr_now) - 900)).fetchall()
+                if len(_cr_rows) < 6:
+                    _cr_rows = _cr_conn.execute(
+                        "SELECT ts, close FROM candles_1m WHERE token=? AND is_closed=1 AND ts>? ORDER BY ts",
+                        (token.upper(), int(_cr_now) - 900)).fetchall()
             finally:
                 _cr_conn.close()
             if len(_cr_rows) >= 6:
