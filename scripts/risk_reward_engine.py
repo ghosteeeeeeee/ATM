@@ -1339,14 +1339,22 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                         new_sl = level['price'] - (current_price * trail_buffer)
                         if best_trail is None or new_sl > best_trail:
                             best_trail = new_sl
-                
+
                 # ATR fallback trail
                 atr_pct = vol_width.get('atr_pct', 1.0)
                 atr_trail_pct = atr_pct / 100.0 * 0.5
                 atr_new_sl = current_price - (current_price * atr_trail_pct)
                 if atr_new_sl < current_price and (best_trail is None or atr_new_sl > best_trail):
                     best_trail = atr_new_sl
-                
+
+                # FIX (2026-10-13): enforce ATR_SL_MIN floor — trail SL must stay
+                # at least ATR_SL_MIN below entry. Without this, trail could move
+                # SL too close to entry and hard_sl fires instantly.
+                if best_trail and entry_price is not None and entry_price > 0:
+                    _max_sl = entry_price * (1 - hc.ATR_SL_MIN)
+                    if best_trail > _max_sl:
+                        best_trail = _max_sl  # don't trail above ATR_SL_MIN floor
+
                 if best_trail and best_trail > current_sl:
                     return {
                         'action': 'TRAIL_SL',
@@ -1358,7 +1366,7 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
             # For SHORT: trail DOWN — pick tightest SL from structural + ATR
             elif direction == 'SHORT':
                 best_trail = None
-                
+
                 # Structural trails (resistance above for SHORT)
                 for level in sr_map:
                     level_price = level['price']
@@ -1366,7 +1374,7 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                         new_sl = level_price + (current_price * trail_buffer)
                         if best_trail is None or new_sl < best_trail:
                             best_trail = new_sl
-                
+
                 # ATR trail
                 atr_pct = vol_width.get('atr_pct', 1.0)
                 atr_trail_pct = atr_pct / 100.0 * 0.5
@@ -1374,7 +1382,15 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 # For SHORT: SL must stay ABOVE current price
                 if atr_new_sl > current_price and (best_trail is None or atr_new_sl < best_trail):
                     best_trail = atr_new_sl
-                
+
+                # FIX (2026-10-13): enforce ATR_SL_MIN floor — trail SL must stay
+                # at least ATR_SL_MIN above entry. Without this, trail moved SL
+                # to 0.14% from entry (GMX #16138) and hard_sl fired instantly.
+                if best_trail and entry_price is not None and entry_price > 0:
+                    _min_sl = entry_price * (1 + hc.ATR_SL_MIN)
+                    if best_trail < _min_sl:
+                        best_trail = _min_sl  # don't trail below ATR_SL_MIN floor
+
                 # Apply tightest trail
                 if best_trail and best_trail < current_sl:
                     return {
