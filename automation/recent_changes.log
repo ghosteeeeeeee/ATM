@@ -4621,3 +4621,5 @@ BY: auto_1hr
   BY: brain_auditor
 [2026-10-13 14:14] auto_1hr: NO CONFIG CHANGE — 3T last hour 0W −$0.21 | 24h 47T 13W −$1.11 (27.7%) | kill: none qualifying (max 2T 0W, needs 3+) | pump-chain- 24h flipped −$0.08 — watch, not kill-qualifying | hard_max_loss 44.7% (hold soak) | atr_sl_hit 19.1% (tpsl stable) | overtrade 3/hr | streak 3-neg calendar hours, regime=LONG_BIAS ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-13 15:15] auto_1hr: NO CONFIG CHANGE — 3T last hour 0W −$0.26 (all hard_max_loss: ENS hmacd_mtf-+, XPL volume-breakout-long+, CHIP pump-chain+ — 1T 0W each, no kill qualifying) | 3 open | 24h 49T 13W −$1.37 (26.5%) | kill: none qualifying (max 1T 0W per signal, needs 3+) | volume-breakout-long+ 24h 3T 0W −$0.21 watch (1T last hour, CEO re-enabled 10-10) | hard_max_loss 49.0% (hold soak) | atr_sl_hit 18.4% (tpsl stable) | overtrade 3/hr | streak 4-neg calendar, regime=LONG_BIAS ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
+BY: auto_1hr

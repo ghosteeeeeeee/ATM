@@ -9330,3 +9330,29 @@ Final set: ['GRASS']
 - pump-chain- 24h flipped negative — primary watch signal this hour
 - BIGTIME hmacd_mtf-+ open — hmacd_mtf-+ 24h 3T 1W −$0.15, weak signal, position tiny (+$0.01)
 - hard_max_loss still 44.7% of closes — brain_auditor SL-width review still pending
+
+## [2026-10-13 15:15] Hourly Analysis
+
+**Trades:** 3 closed last hour — 0 wins, 3 losses, ALL hard_max_loss (ENS hmacd_mtf-+ LONG −$0.07/−3.00%, XPL volume-breakout-long+ LONG −$0.07/−3.13%, CHIP pump-chain+ LONG −$0.12/−3.21%)
+**PnL:** −$0.26 last hour (WR 0%) | 24h: 49T 13W −$1.37 (26.5%) | 3 open: BTC continuum-osc- SHORT, GMX pump-chain- SHORT, BIGTIME hmacd_mtf-+ LONG
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no signal with 3+T 0%WR last hour — each of the 3 losers was a different signal (1T 0W each). doji/oversold kills still holding (0 new entries)
+- volume-breakout-long+ 24h 3T 0W −$0.21 all hard_max_loss (XPL/SAND/CRV) — under kill threshold (1T last hour), CEO re-enabled 2026-10-10 with RSI ceiling 85; watch, kill if 3T 0W hour fires
+- ai-trader+ 24h 3T 0W −$0.17 but 0 trades last hour — no re-fire
+- hmacd_mtf-+ 4T 1W −$0.22 24h — 1 win, not 0%
+- hard_max_loss 24/49 = 49.0% of 24h closes −$2.07 — hold (brain_auditor: 4 fixes in soak, do not stack; trail_arm_timeout analysis showed entry filters needed not exit tweaks)
+- atr_sl_hit 9/49 = 18.4% — under 40%, tpsl_utils deployed and stable
+- Overtrade: 3/hr — well under 20
+- Streak: 12h −$0.44, 13h −$0.19, 14h −$0.19, 15h −$0.07 = 4 consecutive negative calendar hours → rule FIRED, regime check: regime_5m overall=LONG_BIAS (47L/5S/69N) ≠ NEUTRAL → size lever N/A per rule wording and Oct 6 precedent
+- live_trading=true (constants line 33 + kill JSON verified: live_trading=True)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 26.5% (13/49), PnL −$1.37 — gap to ≥50% Oct 15 goal essentially closed, 2 days left
+- All 3 closes last hour were LONG-side hard_max_loss during LONG_BIAS regime — LONG entries failing in a long-bias chop, consistent with brain_auditor's chop-entry 5m momentum gate idea (needs backtest)
+- hard_max_loss now 49% of closes — SL-width review still pending, soak holds
+- BIGTIME hmacd_mtf-+ open −0.74% — hmacd_mtf-+ weak (4T 1W −$0.22), tiny position
