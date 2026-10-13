@@ -623,3 +623,7 @@
 ## Error Alerts — 2026-10-13 05:00 UTC
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-13 06:49 UTC
+- **WARN** (1): Disk at 85% used (18G free) — no action yet, compress if >85%
+- **WARN** (8): 8 phantom trades (`atr_sl_hit` with <0.01% pnl) in signal_outcomes — historical, not new

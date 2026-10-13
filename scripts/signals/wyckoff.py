@@ -525,6 +525,36 @@ def run(prices_dict: Dict = None) -> int:
             if get_cooldown(token, direction=sig['direction']):
                 continue
 
+            # ── Shadow mode (CEO Sep 9 ruling, formalized 2026-10-13) ─────────
+            # Co-source pairing undelivered past Oct 11 EOD → wyckoff is
+            # shadow-only until a validated volume/rs co-source exists.
+            # Bypass REJECT stands (n=5 ex4h −2.23%). Log fires for counterfactual
+            # tracking; never write to the live signals table.
+            try:
+                from hermes_constants import WYCKOFF_SHADOW_MODE
+            except ImportError:
+                WYCKOFF_SHADOW_MODE = False
+            if WYCKOFF_SHADOW_MODE:
+                import json
+                from paths import HERMES_DATA
+                shadow_log = os.path.join(HERMES_DATA, 'wyckoff_shadow.jsonl')
+                entry = {
+                    'ts': time.time(),
+                    'token': token,
+                    'direction': sig['direction'],
+                    'signal_type': sig['signal_type'],
+                    'source': 'wyckoff+' if sig['direction'] == 'LONG' else 'wyckoff-',
+                    'confidence': sig['confidence'],
+                    'price': price,
+                    'metadata': sig.get('metadata'),
+                }
+                with open(shadow_log, 'a') as f:
+                    f.write(json.dumps(entry) + '\n')
+                added += 1
+                from signal_schema import set_cooldown
+                set_cooldown(token, sig['direction'], hours=COOLDOWN_BARS / 60.0)
+                continue
+
             # Directional sources — schema blocks bare 'wyckoff' on WYCKOFF_ENABLED=False.
             # PLUS/MINUS flags are the live control (both True as of 2026-10-07).
             result = add_signal(

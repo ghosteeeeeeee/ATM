@@ -115,3 +115,9 @@ WR fell 53.9%→36.7% *after* the Oct 6-7 tightening, but PnL rose. This is cons
 
 - **rsi_utils.py:62 cache key omitted `limit`** — latent footgun: any future caller passing a non-default limit would silently share/poison cache entries with default-limit callers (wrong-window RSI). Added `limit` to the cache key. Zero behavior change today (all live callers use the default 20). Also fixed stale docstring (said "defaults to 1m, 15 candles" — default is 20).
 - **signal_schema.py divergence comment updated** to record this ruling so the "must go through SHADOW ROLLOUT" mandate from the 2026-10-13 audit is not re-activated by a future agent.
+
+## CEO Status — 20261013T054724Z
+### Health: pipeline=inactive(timer-ok) guardian=active open_pos=3
+### Numbers: 24h 18T -1.09 22.2% | 7d 126T 0.87 38.9%
+### Findings: 24h flipped negative since 18:50 (+$0.09→−$1.09, WR 42→22%); error log shows 4x mark_signal_executed failures + disk hit 85% warn threshold. Proactive Q: new errors — no CRITICAL, all warn-class.
+### Recommendation: Investigate the 4x mark_signal_executed failure returns (possible unclaimed/lost signals) and run DB prune (disk 85%, goal <80% Oct 14).

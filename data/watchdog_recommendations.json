@@ -1,29 +1,45 @@
 {
-  "timestamp": "2026-10-13T05:20:36.935251+00:00",
+  "timestamp": "2026-10-13T06:50:37.652029+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -1.11 USDT. Something is wrong.",
+      "detail": "Win rate 30% over last 20 trades. Total PnL: -1.16 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: BTC + ETH",
-      "detail": "Both opened within 15 minutes. Correlation risk.",
+      "title": "Trade cluster: CRV + PONS",
+      "detail": "Both opened within 0 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
     },
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
+      "title": "Trade cluster: CRV + STX",
+      "detail": "Both opened within 8 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: PONS + STX",
+      "detail": "Both opened within 8 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-004"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Portfolio heavily long (6 trades)",
+      "detail": "6 long positions. One BTC dump hits all of them.",
+      "auto_executable": false,
+      "id": "steer-005"
     },
     {
       "severity": "warning",
@@ -31,7 +47,7 @@
       "title": "10 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-006"
     },
     {
       "severity": "warning",
@@ -39,7 +55,7 @@
       "title": "Signal 'pump-chain+' losing streak: 6 losses",
       "detail": "Net -0.68 USDT over last 20 trades (losses: -0.71). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-005"
+      "id": "steer-007"
     },
     {
       "severity": "warning",
@@ -47,7 +63,7 @@
       "title": "Signal 'oversold-bounce+' losing streak: 3 losses",
       "detail": "Net -0.33 USDT over last 20 trades (losses: -0.33). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-006"
+      "id": "steer-008"
     }
   ],
   "portfolio_health": "critical",
@@ -56,18 +72,18 @@
     "btc_4h": "SHORT_BIAS",
     "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "DISTRIBUTION",
+    "linreg_alignment": 0.25,
+    "wyckoff_phase": "UNKNOWN",
     "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 3,
-  "deep_analysis": "Both STX and AIXBT pass. STX has higher ATR (4.46% vs 1.62%) \u2014 more trail room. Now writing the analysis and AI trader pick.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 3 (3 long, 0 short)\nUnrealized PnL: ~+2.4% combined (LDO +1.9%, ALT +0.53%, BTC -0.03%)\nRegime: bull grind | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent]  13/20 recent trades lost (30% WR). 48h: 14 hard_max_loss exits\n            (avg -$0.099, 0% WR) vs 9 trail exits (avg +$0.116, 100% WR).\n            Chop entries are killing us \u2014 trail family is how we win.\n\n\ud83d\udd34 [urgent]  oversold-bounce+ is 0-for-5 in 48h. All losers RSI<45,\n            all hard_max_loss. This signal buys weakness in a grind-up\n            regime. The bounce doesn't come.\n\n\ud83d\udfe1 [warning] ALT RSI 73.68 \u2014 near the >75 overbought cliff where 48h\n            data shows 0% WR. Stop is locked at 0.008005 (above entry).\n            Let it ride but watch for exhaustion.\n\n\ud83d\udfe1 [warning] All 3 trades long. BTC ABOVE EMA300 (317 min) supports this,\n            but 4h regime says SHORT_BIAS. Tripwire: BTC below 82635\n            (EMA300) = all longs vulnerable.\n\n\ud83d\udfe2 [info]    LDO stop already at 0.4104 (above entry at 0.40645).\n            Profit locked. Trail will handle the rest.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe 48h RSI band data is unambiguous: LONG at RSI 55-75 is the ONLY\nwinning zone (15 trades, 73% WR, +$1.00). Everything outside it bleeds.\nRSI <45 longs lost 75% of the time. RSI >75 longs lost 100%.\n\nThe exit data tells the same story: every trail exit won, every\nhard_max_loss exit lost. 52/56 hard_max_loss trades never reached\n+0.40% for trail to arm \u2014 they entered during chop and had no chance.\n\nCurrent open trades are well-positioned: LDO RSI 56.86 (sweet spot),\nBTC RSI 66.15 (sweet spot), ALT RSI 73.68 (near ceiling \u2014 watch it).\nAll stops are placed. No action needed on existing positions.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. AI Trader pick: STX LONG conf=72 (precheck PASS, ATR 4.46%,\n   regime conf 95, +7.14% over 16 candles). Written to state file.\n2. Let LDO and ALT ride \u2014 stops are locked, trail will manage.\n3. Watch BTC 82635 (EMA300) as the long-alignment tripwire.\n4. oversold-bounce+ needs attention from the brain auditor \u2014\n   0-for-5 in this regime is not noise, it's a broken signal.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
-  "agent_timestamp": "2026-10-13T04:26:29.037576+00:00",
-  "regime_context": "BTC: ABOVE EMA300 (317 min), LEAN_BULL, trend UP, zscore POS, acceleration POSITIVE. 15m regime: LONG_BIAS. 4h regime: SHORT_BIAS \u2014 divergence, but shorter timeframes are in control during this grind. Continuum: ABOVE. Market phase: CALM. Volatility: LOW.\n\nIMPLICATION: We are in a low-volatility grind-up. This is the regime where trail-family trades win (86.5% WR historically). The 4h SHORT_BIAS is a warning flag but has not materialized into downside \u2014 BTC has held above EMA300 for 5+ hours. If BTC drops below 82635 (EMA300), the 4h bear thesis activates and all longs become vulnerable. Current stop on the BTC trade (82341) sits below EMA300 \u2014 well-placed.\n\nPOSITIONING: 3/6 slots used, all long. In a grind-up regime this is correct alignment. The risk is not direction \u2014 it is that the 4h SHORT_BIAS could reassert. Watch BTC 82635 as the tripwire.",
-  "pattern_alerts": "VERIFIED PATTERNS (PostgreSQL, 48h, n=35):\n\n1. TRAIL FAMILY WORKS, CHOP DIES. hard_max_loss exits: 14 trades, avg -$0.099, 0% WR. profit-monster-trail exits: 9 trades, avg +$0.116, 100% WR. The market is telling us: entries that never reach +0.40% are chop entries. WINNING SIDE: wait for momentum confirmation before entering. Why we miss it: signals fire on detection, not on confirmation \u2014 the trail arm threshold (+0.40%) is the filter that separates trend from chop, but by then it is too late for the losers.\n\n2. OVERSOLD LONGS LOSE IN THIS REGIME. RSI<45 LONG: 8 trades, 25% WR, -$0.20. All 6 losers (PUMP, APT, NEAR, ICP, XPL, YGG) exited hard_max_loss. WINNING SIDE: the dump continued \u2014 we bought weakness during a grind-up. Why we miss it: oversold-bounce+ fires on RSI dip, but in a trending market RSI dips are pullbacks in an uptrend, not reversals. The bounce does not come.\n\n3. OVERBOUGHT LONGS ALSO LOSE AT THE EDGE. RSI>70 LONG: 12 trades, 58.3% WR, +$0.95 \u2014 profitable overall but the RSI>75 subset is 0% WR (-$0.28). BABY (RSI 75), HYPE (RSI 76.6), GRASS (RSI 71.2), CFX (RSI 74.5), ME (RSI 72.5) all lost. WINNING SIDE: the pump was exhausted. Why we miss it: pump-chain+ fires on momentum but does not distinguish fresh momentum from late-stage chase.\n\n4. THE SWEET SPOT IS RSI 55-75. 15 trades, 73% WR, +$1.00 combined. This is where trail arms and rides. Current open trades: LDO RSI 56.86 (in band), BTC RSI 66.15 (in band), ALT RSI 73.68 (near ceiling \u2014 watch for exhaustion)."
+  "open_count": 6,
+  "deep_analysis": "3 open trades, all long, all flat-to-positive (+$0.70 unrealized). Portfolio health CRITICAL is driven by the trailing 24h closed set, not by the open book.\n\nOPEN TRADES \u2014 would I open these fresh today?\n1. BTC LONG (continuum-trend+, opened 05:45, +0.00%): thesis partially valid \u2014 BTC has been above EMA300 for ~9h (557+ min), LEAN_BULL on 1m, 15m regime LONG_BIAS. BUT meta_rsi at entry was 11.08 (extreme oversold) and 4h regime is SHORT_BIAS with trend_quality STRONG_DOWN \u2014 this is a counter-trend scalper inside a 4h downtrend. Fresh today: marginal yes on 15m/continuum alignment, no on 4h. Hold with tight management; SL at 82654 (-1.08%) is reasonable for current low volatility.\n2. ETH LONG (hl_copy_trader, 2h, +0.66%): entry at meta_rsi 56.4 \u2014 center band, clean. Stop already at 2518.2, ABOVE entry 2510.6 \u2014 breakeven locked (+0.3%). Regime LONG_BIAS conf 56.9. Keep. Would open fresh.\n3. LDO LONG (pump-chain+, 3h, +2.57%): entry meta_rsi 56.9, up 2.57%. Stop already at 0.41447 vs entry 0.40645 \u2014 locks +1.97% profit. Trail engine in control. Keep. Would open fresh. Only concern: LDO 5m regime is NEUTRAL ranging (slope ~0), so momentum has stalled \u2014 trail will either ride the next leg or exit at locked profit. No action needed.\n\nPATTERN (verified from PostgreSQL, last 24h, n=18 closed, W4/L12, net -$1.09):\nThe book is losing from BOTH RSI extremes, not from the middle:\n- LONG meta_rsi <45: n=4, 0% WR, -$0.38. All oversold-bounce+ (PUMP 44.2, APT 41.7, NEAR 37.2) plus ICP pump-chain 41.4. All exit=hard_max_loss. These were falling-knife longs \u2014 the WINNING side was the SHORT (or simply standing aside). We bought into dumps.\n- LONG meta_rsi 70+: n=5, 20% WR, -$0.39. GRASS 72.8, BABY 75.0, KAS 71.6, HYPE 76.6 all lost; only ALT 73.7 won. pump-chain+ chasing after the pump. The WINNING side was already held by early longs \u2014 we arrived late and bought their exit liquidity.\n- LONG meta_rsi 45-70: n=7, mostly small. The only structurally winning band 60-70 went 3/4 but PnL still ~flat because winners were tiny.\n- 9 of 12 losses exit=hard_max_loss: chop/wrong-side entries that never reached +0.40% for trail to arm. Classic hard_max_loss 0%-WR chop family.\n\nBottom line: we are entering at the extremes (too late on pumps, too early on dumps) instead of at the mid-band where both the oscillator and the trail system work. Every one of those losers had a winning counterpart on the other side.\n\nSIGNAL HEALTH: pump-chain+ 7 trades 24h, 2W/5L (-$0.33) \u2014 its edge has collapsed at RSI>70 (chase zone). oversold-bounce+ 3/3 losses 24h, -$0.33 \u2014 every entry was RSI 37-44 knife-catch. Both are bleeding money on their current entry-RSI profiles. This is signal-tuning territory (brain auditor), not watchdog territory \u2014 flagging only.\n\nCorrelation: 3 longs are BTC/ETH/beta-LDO \u2014 one BTC dump hits all three. Acceptable at LOW volatility with 2 stops already profit-locked, but do NOT add a 4th correlated long unless BTC breaks 4h SHORT_BIAS.",
+  "agent_timestamp": "2026-10-13T06:25:53.878170+00:00",
+  "regime_context": "BTC is in a split regime: 15m LONG_BIAS and continuum ABOVE EMA300 for ~9h (LEAN_BULL, recovery phase), but 4h remains SHORT_BIAS with trend_quality STRONG_DOWN and volatility LOW (velocity SLOW, acceleration mostly NEGATIVE, volume LOW). Wyckoff: ACCUMULATION on 1m. regime_5m scan: BTC NEUTRAL ranging; aggregate market LONG_BIAS 42 vs 5 short.\n\nWhat this means for positions: our 3 longs align with the 15m/continuum recovery and are correctly placed for a bounce. They are counter-trend to the 4h down \u2014 fine for scalps with hard stops, wrong for swing holds. Do not add size against the 4h. If BTC loses the EMA300 (~83000) the whole long book stops out together; that is the cluster risk. Conversely the 4h SHORT_BIAS in an accumulation phase with alts grinding up (PURR +4%, PONS +2.4%, ALT +3.2%) looks like a stale short signal \u2014 the winning side right now is LONG alts on the 15m, which is what we hold.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, last 24h, meta_rsi from _signal_metadata, n=18 closed):\n\nPATTERN 1 \u2014 Oversold LONG knife-catch: n=4, 0% WR, -$0.38 (PUMP/Aptos/NEAR oversold-bounce+, ICP pump-chain+ at RSI 41). Exit: all hard_max_loss. WINNING SIDE: short continuation of the dump, or no trade. Why we weren't on it: oversold-bounce+ bought RSI 37-44 believing in a bounce that never armed the trail (+0.40%). Knife-catch = wrong side.\n\nPATTERN 2 \u2014 Overbought pump-chain chase: n=5 at meta_rsi 70+, 20% WR, -$0.39 (GRASS 72.8, BABY 75.0, KAS 71.6, HYPE 76.6 lost; ALT 73.7 only win). Exit: hard_max_loss / trail_arm_timeout / atr_sl. WINNING SIDE: longs entered at RSI 55-70 earlier in the pump \u2014 they trailed out on us. Why we weren't on it: signal fired after the move; we bought the top of someone else's pump.\n\nPATTERN 3 \u2014 hard_max_loss is doing all the bleeding: 9/12 losses (75%) exit=hard_max_loss, total -$1.09 in 24h. This is the known chop-entry family: 52/56 hard_max_loss trades never reach +0.40% for trail to arm. If a trade cannot clear +0.40% in this LOW-vol regime, the trail family (86.5% WR when armed) never gets to work. Entry quality, not exit management, is the loss driver.\n\nPATTERN 4 (info, not action) \u2014 mid-band entries still work: meta_rsi 60-70 LONGs went 3/4 (75% WR). Open trades ETH (56.4) and LDO (56.9) are in/near this band and both are green with profit-locked stops. The 30-45 and 70+ bands are where the account is dying."
 }

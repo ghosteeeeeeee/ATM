@@ -278,8 +278,6 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
-    'BABY',
-    'ETH',
     'SYRUP'
 }
 FAVORITES_SHORT = {
@@ -308,7 +306,10 @@ LOSERS_SHORT = {
     'DOT', 'ZRO'
 }
 # Legacy combined set
-LOSERS = set()
+LOSERS = {
+    'GRASS'
+}
+
 
 
 
@@ -3074,6 +3075,12 @@ COUNTER_FLIP_ENABLED     = False   # controlled by counter_flip_signal.py indepe
 WYCKOFF_ENABLED = False   # CEO 2026-08-05 — 0% WR (48h). DISABLED.
 WYCKOFF_PLUS_ENABLED = True     # wyckoff+ LONG (accumulation spring)
 WYCKOFF_MINUS_ENABLED = True    # wyckoff- SHORT (distribution upthrust)
+# CEO Sep 9 ruling, formalized 2026-10-13 (daily_orchestrator): co-source pairing
+# undelivered past Oct 11 EOD → wyckoff shadow-only until a validated volume/rs
+# co-source exists. Fires log to data/wyckoff_shadow.jsonl, never enter the live
+# signals table. Bypass REJECT stands (plans/2026-10-09-wyckoff-bypass-verdict.md:
+# n=5 ex4h −2.23%). Flip False only with CEO GO + pairing backtest.
+WYCKOFF_SHADOW_MODE = True
 
 # ── EMA300 Angle Signal ────────────────────────────────────────────────────────
 # ema_angle.py — detects when EMA300 starts lifting from flat (LONG setup)
@@ -3940,6 +3947,18 @@ RR_ENGINE_MOMENTUM_SR_FILTER     = True    # master switch (ON for shadow data c
 RR_ENGINE_MOMENTUM_FILTER_BARS   = 5       # candles for velocity calculation
 RR_ENGINE_MOMENTUM_MIN_ATR_VEL   = 0.5     # min velocity as fraction of ATR/candle to activate (ATR-relative, not absolute %)
 RR_ENGINE_MOMENTUM_SKIP_ATR_MULT = 1.5     # skip S/R levels closer than this × ATR (they're being blown through)
+
+# ── Risk-Reward Engine: Momentum-Aware TP Projection ────────────────────────
+# Upgrade 1 of plans/2026-10-13_rr-engine-smart-upgrades.md. When price is
+# actively moving in the trade direction, project TP forward from recent
+# velocity instead of anchoring only at the nearest S/R (which sits artificially
+# close during dumps/pumps). Extends TP only — never shrinks it; regime tp_max
+# cap still applies. Complements (does not replace) MOMENTUM_SR_FILTER.
+RR_ENGINE_MOMENTUM_PROJECTION        = True    # master switch
+RR_ENGINE_MOMENTUM_PROJ_BARS         = 5       # candles for velocity calculation
+RR_ENGINE_MOMENTUM_PROJ_MIN_VEL      = 0.1     # %/candle — minimum aligned velocity to activate
+RR_ENGINE_MOMENTUM_PROJ_TP_MAX_EXT   = 0.02    # cap projected TP distance at 2%
+RR_ENGINE_MOMENTUM_PROJ_FORWARD_BARS = 3       # project avg velocity forward N candles
 
 # ── RR Structural Signal ────────────────────────────────────────────────────
 # rr_structural.py — fire on structurally excellent R:R setups

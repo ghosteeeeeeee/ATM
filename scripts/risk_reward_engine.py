@@ -537,6 +537,50 @@ def _compute_velocity_aligned(candles_5m, direction, atr_pct):
         return False, None
 
 
+def _momentum_projected_tp(price, direction, candles_5m, tp_max, current_tp_distance_pct):
+    """Momentum-aware TP projection (plans/2026-10-13_rr-engine-smart-upgrades.md Upgrade 1).
+
+    During a dump/pump the nearest S/R TP sits artificially close (price already
+    at support/resistance) while the move continues. Project TP forward from
+    recent per-candle velocity instead. EXTENDS the target only — never shrinks
+    it, never exceeds the regime tp_max cap. Fail-open: any error → None.
+    """
+    try:
+        n_bars = getattr(hc, 'RR_ENGINE_MOMENTUM_PROJ_BARS', 5)
+        min_vel = getattr(hc, 'RR_ENGINE_MOMENTUM_PROJ_MIN_VEL', 0.1)  # %/candle
+        fwd_bars = getattr(hc, 'RR_ENGINE_MOMENTUM_PROJ_FORWARD_BARS', 3)
+        max_ext = getattr(hc, 'RR_ENGINE_MOMENTUM_PROJ_TP_MAX_EXT', 0.02)
+        if not candles_5m or len(candles_5m) < 3 or price <= 0:
+            return None
+        recent = candles_5m[-n_bars:]
+        vels = []
+        for i in range(1, len(recent)):
+            prev_close = recent[i - 1]['close']
+            if prev_close <= 0:
+                return None
+            vels.append((recent[i]['close'] - prev_close) / prev_close * 100.0)
+        if not vels:
+            return None
+        avg_vel = sum(vels) / len(vels)  # % per candle
+        if direction == 'LONG':
+            if avg_vel < min_vel:
+                return None
+            proj_pct = (avg_vel * fwd_bars) / 100.0
+        else:
+            if avg_vel > -min_vel:
+                return None
+            proj_pct = (abs(avg_vel) * fwd_bars) / 100.0
+        proj_pct = min(proj_pct, max_ext)                      # hard extension cap
+        proj_pct = max(proj_pct, current_tp_distance_pct)      # extend only, never shrink
+        proj_pct = min(proj_pct, tp_max)                       # respect regime tp_max
+        if proj_pct <= current_tp_distance_pct:
+            return None  # nothing gained
+        tp_price = price * (1 + proj_pct) if direction == 'LONG' else price * (1 - proj_pct)
+        return proj_pct, tp_price, avg_vel
+    except Exception:
+        return None
+
+
 def compute_structural_rr(price, direction, sr_map, vol_width, liquidity, candles_5m=None):
     """Compute R:R based on structural levels.
 
@@ -662,6 +706,18 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity, candle
             tp_price = price + (price * tp_distance_pct) if direction == 'LONG' else price - (price * tp_distance_pct)
             tp_source = 'LIQUIDATION'
 
+    # Momentum-aware TP projection (Upgrade 1, 2026-10-13 plan): extend target
+    # when velocity is aligned and stronger than the nearest structural TP.
+    mom_proj_active = False
+    mom_proj_vel = None
+    if getattr(hc, 'RR_ENGINE_MOMENTUM_PROJECTION', False) and candles_5m:
+        proj = _momentum_projected_tp(price, direction, candles_5m, tp_max, tp_distance_pct)
+        if proj is not None:
+            tp_distance_pct, tp_price, mom_proj_vel = proj
+            tp_source = 'MOMENTUM_PROJECTION'
+            target_level = None
+            mom_proj_active = True
+
     # R:R ratio
     if sl_distance_pct <= 0:
         rr_ratio = 999  # fail-open
@@ -681,6 +737,8 @@ def compute_structural_rr(price, direction, sr_map, vol_width, liquidity, candle
         'momentum_velocity': round(mom_velocity, 4) if mom_velocity is not None else None,
         'momentum_skipped': n_skipped,
         'momentum_skip_dist_pct': round(skip_dist * 100, 4),
+        'momentum_tp_projection': mom_proj_active,
+        'momentum_proj_velocity': round(mom_proj_vel, 4) if mom_proj_vel is not None else None,
     }
 
 
@@ -863,6 +921,8 @@ def evaluate_rr(token, direction, price, candles_5m=None, signal_type=None):
         notes_parts.append(f"S/R levels: {len(sr_map)} | Liq: {liquidity['clusters_ahead']} ahead, {liquidity['clusters_behind']} behind")
         mom_active = rr.get('momentum_sr_filter', False)
         notes_parts.append(f"MomFilter={'ON' if mom_active else 'OFF'}")
+        if rr.get('momentum_tp_projection'):
+            notes_parts.append(f"MomTPProj=ON (vel={rr.get('momentum_proj_velocity') or 0:.3f}%/candle)")
         notes = ' | '.join(notes_parts)
 
         # Shadow log when momentum filter activates and skips levels
