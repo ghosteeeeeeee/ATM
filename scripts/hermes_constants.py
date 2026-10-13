@@ -3912,7 +3912,7 @@ RR_ENGINE_CONF_POOR_MULT     = 0.70    # poor (R:R 1.0-1.5)
 # When price is actively moving in the trade direction (confirmed velocity),
 # skip nearby S/R levels for TP — they're being blown through, not holding.
 # Loop falls through to ATR-based TP or the next further structural level.
-RR_ENGINE_MOMENTUM_SR_FILTER     = False   # master switch (OFF by default — shadow first)
+RR_ENGINE_MOMENTUM_SR_FILTER     = True    # master switch (ON for shadow data collection — filter improves R:R, reduces false kills)
 RR_ENGINE_MOMENTUM_FILTER_BARS   = 5       # candles for velocity calculation
 RR_ENGINE_MOMENTUM_MIN_ATR_VEL   = 0.5     # min velocity as fraction of ATR/candle to activate (ATR-relative, not absolute %)
 RR_ENGINE_MOMENTUM_SKIP_ATR_MULT = 1.5     # skip S/R levels closer than this × ATR (they're being blown through)
