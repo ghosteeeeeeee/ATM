@@ -586,3 +586,31 @@
 
 ## Error Alerts — 2026-10-12 22:00 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-13 00:00 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+
+## Error Alerts — 2026-10-13 00:50 UTC
+- **WARN**: 0 signals / 0 decisions in last hour — all candidates below 40% confidence threshold. Market SHORT_BIAS (1L/106S/11N). No fix; confidence gate working as designed.
+- **INFO**: Disk 84% (94G/118G) — still under 85% WARN. DB-prune goal (<80% by Oct 14) remains open. Largest logs: pipeline.log 47M, 15m_regime.log 38M.
+- **INFO**: hermes-bug-hunter.service failed at 00:47 (exit 1) — code-quality findings (f-string SQL 35 files, bare excepts 132, cursor leaks 50). Not a runtime failure; report only.
+- **INFO**: hermes-upgrade-implementer.service failed yesterday 18:17 (timeout after completing work + push). Recurring every 12h; consider raising TimeoutStartSec.
+- **INFO**: hermes-1m-candle.timer STILL active despite documented dead aggregator (previous CEO action pending). Not touched — service-safety rule.
+- **INFO**: 1 open trade (PUMP LONG, trade_id 16095), 18 closed today, portfolio -27.25% PnL today. 0 phantoms in 24h. Prices fresh (~2min), all 3 core timers firing.
+- **AUTO-FIXES**: none required.
+
+## Health Check — 2026-10-13 02:51 UTC
+- **INFO**: All systems green. Pipeline running, 3/3 timers active, 58 signals/hr, 0 open trades, prices fresh (185 tokens, 02:51 UTC). Regime: LONG_BIAS (82L/3S/36N). No errors or crashes.
+- **WARN** (1x): Disk at 84% (threshold 85%). Suggest compressing logs older than 7 days if usage continues climbing.
+- **AUTO-FIX**: none needed.
+
+## Health Check — 2026-10-13 03:52 UTC
+- **INFO**: All systems green. Pipeline LIVE cycle at 03:49 rc=0 (open 2/6: ALT +0.46%, LDO +1.61%). 3/3 core timers active & firing (pipeline 46s, price-collector 34s, 1m-candle 8s ago). No errors/tracebacks in last hour. 0 phantom trades (24h). Prices fresh (<1min).
+- **WARN**: Disk 84% (94G/118G) — under 85% threshold but DB-prune goal (<80% by Oct 14) still open. No files >7d old to gzip.
+- **INFO**: 1 signal in last hour (ai-trader+ LONG). 0 closed today. 128/241 tokens ≥50th pct speed. Regime LONG_BIAS (81L/3S/36N, 120 tokens, 03:45).
+- **INFO**: `hermes-1m-candle.timer` still dead-but-active (filled=0/dev=0 confirmed again this run). Briefly enabled during check by mistake, reverted to disabled within seconds — timer stayed active throughout, no interruption. CEO action still pending: `systemctl disable --now hermes-1m-candle.timer`.
+- **AUTO-FIX**: none (1m-candle toggle fully reverted).
