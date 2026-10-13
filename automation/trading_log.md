@@ -9383,3 +9383,28 @@ Final set: ['GRASS']
 - ICP pump-chain- SHORT died in 8m atr_sl_hit during SHORT_BIAS with ICP already −1.33% over 16 candles — looks like chase-into-move; worth checking if chase filter should be tighter for shorts in strong short-bias (needs data, not a 1-trade change)
 - 24h WR 25.0%, PnL −$1.56 — 2 days to Oct 15 ≥50% goal, gap very large
 - hard_max_loss 46.2% of closes — brain_auditor SL-width/entry-filter review still pending
+
+## [2026-10-13 17:15] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet hour — 4 open: BTC continuum-osc- SHORT +0.47%, ALT pump-chain+ LONG −0.01%, COMP pump-chain+ LONG −0.41%, ALGO pump-chain- SHORT −0.31%)
+**PnL:** $0.00 last hour | 24h: 52T 13W −$1.56 (25.0%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: 0 trades last hour — no signal can qualify for 3+T 0%WR
+- volume-breakout-long+ 24h 3T 0W −$0.21 — 0 fires last hour, watch only
+- ai-trader+ 24h 3T 0W −$0.17 — 0 fires last hour
+- doji/oversold kills holding (pre-kill cohorts aging out)
+- hard_max_loss 24/52 = 46.2% of 24h closes −$2.07 — hold (brain_auditor: 4 fixes in soak, do not stack)
+- atr_sl_hit 10/52 = 19.2% — under 40%, tpsl_utils stable
+- Overtrade: 0/hr — well under 20
+- Calendar-hour streak: 11h−$0.04 … 15h−$0.26 = 5 consecutive negative hours; hour 16 had 0 closes (streak ends); regime flipped SHORT_BIAS → LONG_BIAS (86L/1S/31N) ≠ NEUTRAL → size lever N/A per rule wording
+- live_trading=true (constants line 33 + kill JSON verified)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 25.0%, PnL −$1.56 unchanged from 16:15 (no closes) — 2 days to Oct 15 ≥50% goal, gap very large
+- Regime flipped back SHORT_BIAS → LONG_BIAS within an hour — whipsaw market; 4 open positions include 2 pump-chain+ LONGs entered during/near the short-bias window
+- hard_max_loss 46.2% of closes — brain_auditor SL-width/entry-filter review still pending

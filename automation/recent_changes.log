@@ -4625,3 +4625,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 16:15] auto_1hr: NO CONFIG CHANGE — 3T last hour 0W −$0.19 (GMX pump-chain- hard_sl, ICP pump-chain- atr_sl_hit, BIGTIME hmacd_mtf-+ hard_sl — pre-kill open closed) | 1 open | 24h 52T 13W −$1.56 (25.0%) | kill: none qualifying (pump-chain- 2T 0W needs 3+) | volume-breakout-long+/ai-trader+ 24h 3T 0W 0-fire watch | hard_max_loss 46.2% (hold soak) | atr_sl_hit 19.2% (tpsl stable) | overtrade 3/hr | streak 5-neg calendar, regime flipped to SHORT_BIAS (94S/23N) ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-13 17:15] auto_1hr: NO CONFIG CHANGE — 0T last hour | 4 open (BTC +0.47%, ALGO −0.31%, COMP −0.41%, ALT −0.01%) | 24h 52T 13W −$1.56 (25.0%) | kill: none (0 trades last hour) | volume-breakout-long+/ai-trader+ 24h 3T 0W 0-fire watch | hard_max_loss 46.2% (hold soak) | atr_sl_hit 19.2% (tpsl stable) | overtrade 0/hr | streak ends (hour 16 0 closes); regime flipped back to LONG_BIAS (86L/1S/31N) ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
+BY: auto_1hr
