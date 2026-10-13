@@ -4140,5 +4140,25 @@
     "status": "suggested — CEO approval required (STANDALONE_BYPASS is CEO-protected)",
     "risk": "medium — could suppress winning counter-trend bounces; must backtest before enable",
     "verification_plan": "Backtest last 30d: count bypass LONG trades in SHORT_BIAS tape, split by outcome. Must show: blocks net losers, preserves net winners. Sample threshold n>=20."
+  },
+  {
+    "date": "2026-10-13T02:46:44Z",
+    "idea": "Investigate RSI=75.0 saturation spike — meta rsi_14 clusters at exactly 75.0 (16 in 30d vs neighbors 4-7). Cross-signal artifact (pump-chain/bb-squeeze/mover/volume-breakout all show it). Possible clamp/default in a shared RSI writer or signal source. If a writer defaults to 75 when RSI unavailable, trades are entering on fake RSI.",
+    "rationale": "8 of 16 exactly-75.0 trades are pump-chain+ LONG, 0 winners. If the spike is a default-not-real value, the RSI gate is filtering garbage. Root-cause fix could be better than the >= boundary patch.",
+    "expected_impact": "Data-quality fix; may reveal additional blocked/leaked entries if other RSI defaults exist (e.g. 50.0 mid spike?).",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low",
+    "owner": "bug_hunter or signal_analyst"
+  },
+  {
+    "date": "2026-10-13T02:46:44Z",
+    "idea": "Extend trail-arm timeout vehicle to volume-breakout-long+ (7d hard_max_loss #3: 6T −$0.87). Same pattern as bb-squeeze (60m) and pump-chain (45m) — backtest stall cohort first, then ship shadow.",
+    "rationale": "volume-breakout-long+ has 7 hard_max_loss in 14d (hml=7/18T). Trail-arm already proven on bb-squeeze (+$0.97/30d corrected) and pump-chain (2 fires net $0 vs −2-4% counterfactual). Next-largest uncovered stall bleed.",
+    "expected_impact": "Preempt ~30-50% of volume-breakout hard_max_loss stalls at near-zero instead of −2-3% account.",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "low",
+    "owner": "self_learner backtest → CEO approve → brain_auditor ship"
   }
 ]

@@ -3204,11 +3204,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if _rsi_val is not None and _rsi_val < PUMP_CHAIN_LONG_RSI_MIN:
                         log(f"  🚫 [PUMP-CHAIN-RSI-MIN] {token} LONG blocked — RSI={_rsi_val:.1f} < {PUMP_CHAIN_LONG_RSI_MIN} (oversold, 0% WR in 14d)")
                         continue
-                    if _rsi_val is not None and _rsi_val > PUMP_CHAIN_LONG_RSI_MAX:
+                    if _rsi_val is not None and _rsi_val >= PUMP_CHAIN_LONG_RSI_MAX:
                         # FIX 2026-10-11: bull structure override — during confirmed bull
                         # (score>80 + STRONG_POS), allow RSI up to 85. Pump-chain fires
-                        # AFTER the pump, so RSI is naturally high. Blocking RSI>75 in a
+                        # AFTER the pump, so RSI is naturally high. Blocking RSI>=75 in a
                         # bull means the system never enters during pumps.
+                        # FIX brain_auditor 2026-10-13: >→>= boundary. CEO band analysis
+                        # puts 75 in the BLOCK band (75-80 = −$0.45/36T); > let RSI=75.0
+                        # through. Exactly-75.0 pump-chain+ LONG 30d: 4T 0W −$0.49
+                        # (BABY/HEMI/IMX/HYPER all hard_max_loss/flat, 0 winners blocked).
                         _pc_bull_override = False
                         try:
                             _pc_bc = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
@@ -3224,9 +3228,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         except Exception:
                             pass
                         if _pc_bull_override and _rsi_val <= 85:
-                            log(f"  ✅ [PUMP-CHAIN-RSI-OVERRIDE] {token} LONG — RSI={_rsi_val:.1f} > {PUMP_CHAIN_LONG_RSI_MAX} but BTC bull (score>80 STRONG_POS), allowed up to 85")
+                            log(f"  ✅ [PUMP-CHAIN-RSI-OVERRIDE] {token} LONG — RSI={_rsi_val:.1f} >= {PUMP_CHAIN_LONG_RSI_MAX} but BTC bull (score>80 STRONG_POS), allowed up to 85")
                         else:
-                            log(f"  🚫 [PUMP-CHAIN-RSI-MAX] {token} LONG blocked — RSI={_rsi_val:.1f} > {PUMP_CHAIN_LONG_RSI_MAX} (overbought chase, 23.5%WR at RSI>=70/14d)")
+                            log(f"  🚫 [PUMP-CHAIN-RSI-MAX] {token} LONG blocked — RSI={_rsi_val:.1f} >= {PUMP_CHAIN_LONG_RSI_MAX} (overbought chase, 23.5%WR at RSI>=70/14d)")
                             continue
                 except ImportError:
                     pass

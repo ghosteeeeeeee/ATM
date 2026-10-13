@@ -1122,5 +1122,16 @@
     "after": "SIGNAL_FILTER_RSI_MAX=75 (aligns CEO-verified LONG_RSI_CEILING keep-open 70-75 band); LONG overbought returns SKIP hard block",
     "rationale": "7d verification: >75 band saves 5 losers -$0.60, blocks 1 winner +$0.10 (INJ@75.2) = net +$0.50. Blocks 1/8 (12.5%) of >=68 winners < 20% threshold. SHORT oversold stays AMBIGUOUS (SHORT_RSI_HARD_FLOOR=45 already SKIPs).",
     "impact": "Expected: bypass signals (pump-chain+, volume-buildup+) now respect 75 ceiling at exec time. Monitor: no trades meta_rsi>75 should open in next 48h."
+  },
+  {
+    "timestamp": "2026-10-13T02:46:44Z",
+    "agent": "brain_auditor",
+    "change": "PUMP_CHAIN_LONG_RSI_MAX boundary >→>= in signal_compactor.py:3207 — closes exactly-75.0 leak (BABY@75.0 hard_max_loss −$0.24 same run)",
+    "type": "config",
+    "file": "scripts/signal_compactor.py",
+    "before": "_rsi_val > PUMP_CHAIN_LONG_RSI_MAX (lets RSI=75.0 through)",
+    "after": "_rsi_val >= PUMP_CHAIN_LONG_RSI_MAX (blocks at-ceiling; bull override to 85 intact)",
+    "rationale": "CEO band analysis puts 75 in BLOCK band (75-80=−$0.45/36T). Exactly-75.0 pump-chain+ LONG 30d: 4T 0W −$0.49 (BABY/HEMI/IMX/HYPER all losers/flat). 0 winners blocked. RSI=75.0 is a saturation spike (16 vs neighbors 4-7) — boundary bug not tuning.",
+    "impact": "Blocks pump-chain+ LONG at exactly RSI 75.0 unless BTC bull override (score>80 STRONG_POS). Bull override still allows 75-85 in bull tape."
   }
 ]
