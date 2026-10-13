@@ -8967,3 +8967,46 @@ Final set: []
 **Open Questions:**
 - 24h net drifted −$0.20 → −$0.23; 36.4% WR well below ≥50% Oct 15 goal, but trade volume is very thin (22 in 24h, most hours zero)
 - pump-chain+ (6T 1W −$0.45) and oversold-bounce+ (3T 0W −$0.29) = 78% of 24h losses from 9 of 22 trades — both on watchlist, neither meets kill rule this hour
+
+## [2026-10-13 00:13] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h: 22T 8W −$0.23 (36.4%) | 0 open
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill: oversold-bounce+ 0T last hour — kill rule (3+ trades at 0% WR last hour) not met; remains 0/3 24h −$0.29 on watchlist
+- pump-chain+ 6T 1W −$0.45 24h — signal_reporter already declined kill (EXTREME regime all-time +$3.48); no change
+- atr_sl_hit 2/22 ≈ 9.1% — under 40%, tpsl_utils deployed
+- hard_max_loss 10/22 ≈ 45.5% −$0.84 — hold brain_auditor
+- Overtrade: 0/hr
+- Streak: 20h/21h/22h were 3-neg but 23h had 0 trades (streak reset); regime SHORT_BIAS not NEUTRAL anyway
+- live_trading=true (constants line 33 + kill JSON), verified this run
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 36.4% vs ≥50% Oct 15 goal; volume very thin (0 closes in last hour, 0 open). Quiet regime — nothing to tune until trades resume
+
+## [2026-10-13 01:15] Hourly Analysis
+
+**Trades:** 1 closed last hour — PUMP oversold-bounce+ LONG hard_max_loss −$0.10 (−4.72%)
+**PnL:** −$0.10 last hour | 24h: 22T 8W −$0.23 (36.4%) | 0 open
+
+**Changes:**
+1. **KILL oversold-bounce+** (`OVERSOLD_BOUNCE_ENABLED = False`) — standing escalation from 2026-10-12 22:13 ("one more red = kill") met: 4th consecutive hard_max_loss (XPL −$0.06, NEAR −$0.08, APT −$0.15, PUMP −$0.10), 0/4 24h −$0.39, 0% WR. LONG-only mean-reversion buying RSI 15-20 in bear-flip regime = BANANA lesson in reverse (watchdog 21:50). Re-enable only with bear-regime block + CEO approval. signal_versions.json: oversold-bounce v1. Pipeline restarted to load new constant.
+
+**No Change Needed:**
+- Kill rule auto (3+ trades 0% WR last hour): not met (1 trade), but standing escalation fired on next-red condition
+- pump-chain+ 5T 1W −$0.35 24h — signal_reporter declined kill (EXTREME all-time +$3.48); no change
+- atr_sl_hit 2/22 ≈ 9.1% — under 40%, tpsl_utils deployed
+- hard_max_loss 9/21 ≈ 42.9% −$0.77 — hold brain_auditor (SL width lever)
+- Overtrade: 1/hr — well under 20
+- Streak: 1h −$0.10, 2h −$0.10, 3h −$0.13 — negative but tiny (−$0.33) and prior streak reset at 00:13; regime SHORT_BIAS not NEUTRAL, size-reduction condition not met
+- live_trading=true (constants + kill JSON) — verified
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 36.4% vs ≥50% Oct 15 goal; only 22 trades in 24h, most hours zero
+- Remaining 24h loss sources: pump-chain+ (−$0.35), hmacd_mtf-- (−$0.12), volume-breakout-long+ (−$0.05) — none meet kill criteria this hour

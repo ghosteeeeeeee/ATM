@@ -4272,7 +4272,7 @@ PULLBACK_CONF_BONUS_SQUEEZE      = 5       # confidence bonus for tight BB
 # Backtest: RSI 15-25 + z < -1.5 + BB < 0 = 85.7% WR, +$0.74 (7 trades)
 # Tight golden zone: RSI 15-20 + z < -1.5 + BB < 0 = 100% WR, +$0.35 (3 trades)
 # Thesis: Oversold cascades are overreactions, price reverts to mean
-OVERSOLD_BOUNCE_ENABLED             = True    # master kill-switch (LONG only)
+OVERSOLD_BOUNCE_ENABLED             = False   # master kill-switch (LONG only) — KILLED 2026-10-13 auto_1hr: 4 consecutive hard_max_loss (XPL/APT/NEAR/PUMP), 0/4 24h −$0.39; bear-flip regime, LONG-only mean-reversion = BANANA reverse. Re-enable only with bear-regime block + CEO approval
 OVERSOLD_BOUNCE_RSI_MIN             = 15      # RSI must be above this (not cliff-edge)
 OVERSOLD_BOUNCE_RSI_MAX             = 20      # RSI must be below this (golden zone: not too extreme, not too mild)
 OVERSOLD_BOUNCE_Z_MAX               = -2.0    # z-score must be below this (deeply extended — golden zone)

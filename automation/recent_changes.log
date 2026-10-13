@@ -4574,3 +4574,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-12 23:13] auto_1hr: NO CONFIG CHANGE — 1T last hour BTC hl_copy_trader atr_sl_hit (−$0.03) | 0 open | 24h 22T 8W −$0.23 (36.4%) | kill: none qualifying (oversold-bounce+ 0T last hour, rule needs 3+) | hard_max_loss 45.5% (hold brain_auditor) | atr_sl_hit 9.1% (tpsl stable) | overtrade 1/hr | streak 3-neg but tiny (−$0.38) + regime SHORT_BIAS not NEUTRAL, no size cut | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-13 00:13] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 22T 8W −$0.23 (36.4%) | kill: none qualifying (oversold-bounce+ 0T last hour) | hard_max_loss 45.5% (hold brain_auditor) | atr_sl_hit 9.1% (tpsl stable) | overtrade 0/hr | streak reset (0-trade hour) | live_trading=true, kill JSON=true
+BY: auto_1hr
+[2026-10-13 01:15] auto_1hr: KILL oversold-bounce+ (OVERSOLD_BOUNCE_ENABLED=False) — 4 consecutive hard_max_loss (XPL/NEAR/APT/PUMP), 0/4 24h −$0.39, standing escalation "next red = kill" met; bear-flip regime, LONG mean-reversion = BANANA reverse; v1 logged; pipeline restart to load
+BY: auto_1hr
