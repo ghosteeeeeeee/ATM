@@ -133,3 +133,52 @@ WR fell 53.9%→36.7% *after* the Oct 6-7 tightening, but PnL rose. This is cons
 ### Numbers: 24h 47T -$1.11 27.7% | 7d 157T +$1.03 37.6%
 ### Findings: 24h WR collapsed to 27.7% (brain_auditor flagged 15% at 07:38, now 27.7%); disk 85% (coin_tracker.db 3.3G, candles.db 2.8G); 2 unratified trail-arm enables (bb-squeeze + pump-chain 45m) still awaiting CEO decision — soak deadline Oct 15; coin_tracker timer healthy (last 13:30, next 14:00, scores updating).
 ### Recommendation: CEO must RATIFY or REVERT the 2 trail-arm enables before Oct 15 soak deadline (one-line each in hermes_constants.py); also set DB retention policy for coin_tracker.db/candles.db before disk hits 90%.
+
+
+---
+
+## CEO Deep Run — 20261013T155406Z
+
+**Mode:** directed brief (8-item UX feedback from external live-tester) — **decide + checkpoint only, no implementation** (per brief: author implements after confirming with user).
+
+**Checkpoint:** `automation/ceo/checkpoints/20261013T155406Z-decision.md` (FINAL — rulings, evidence, plan, files, rollback).
+**Work items dispatched:** NONE (decide-only brief — zero subagent edits by design).
+**Result files:** NONE.
+
+### Decision — rulings on all 8
+
+| # | Item | Ruling | Core rationale |
+|---|------|--------|----------------|
+| 1 | ceo-comm missing from skill catalog | **REJECT-as-diagnosed / MODIFY** | Forensics on the tester session (`/root/.dsh/sessions/.../session-e0ca88f3…`): DSH `skill()` failed **12/12** calls — ceo-comm, trade-analysis, post-change, signal-lab, bug-hunter, own-conclusions, add-signal, volatility-breakdown, trading-decisions all returned "unknown or no longer available". This is a **DSH harness-wide skill-loader failure**, not a ceo-comm registration gap. opencode resolves ceo-comm live (present in this session's catalog). Renaming the skill or adding a skills.json index would fix nothing. **Ship:** docs fallback in SKILL.md ("if skill() returns unknown, `cat` the SKILL.md at `skills/shared/ceo-comm/`") + the 4-runner decision table the tester requested. **Log separately:** DSH skill-loader investigation (which dir it scans; whether pointing it at the user skills dir fixes all 12). |
+| 2 | Dead-pattern stub | **CLOSED** | Stub exists (`ceo_prompt.md` fail-loud banner, verified), tester endorses it unreservedly. No change. |
+| 3 | Exit-0 trap | **MODIFY (small)** | `.exit` class mechanism is real and working (`ceo_classify_run`, history: ok/failed/incomplete samples). `--wait` already prints the class. Gap is doc + consult stdout — closed by items 7+1 (class line printed with final text; SKILL.md documents `.exit` as THE success signal). |
+| 4 | `/tmp` ban at wrong layer (REGRESSION) | **APPROVE — option (b) + text fix; REJECT (a) and (c)** | See full ruling below. Move lock to `/root/.hermes/.run/session-active.lock`; keep the opencode `/tmp`+`/var/tmp` allow; fix stale kill-claims in 3 places. |
+| 5 | Budget tight for decision briefs | **APPROVE raise — 1800→2400s; REJECT decide/dispatch split (for now)** | Exactly ONE real budget exhaustion on record (deep-20261012T192508Z, 1617s investigating, `incomplete rc=124`); all other "deaths" were permission-reject kills, now fixed by the config allow. n=1 does not justify a second runner + state handoff. 2400s caps the known worst case (investigation ~1600s + dispatch ~600s) with margin. Revisit split only if exhaustion recurs post-raise. |
+| 6 | `--wait` cuts budget | **APPROVE simplify — delete the 600s special case; one 2400s knob everywhere** | Both sides heard: 600s was shipped to bound the caller's blocked turn; but the flag itself signals "I choose to block and watch", and a 600s cap that kills a run which needed ~1700s is strictly worse than waiting. Detached+tail remains available for those who do not want to block. One budget number = one knob to reason about. `run_ceo_deep.sh:71-72` becomes `BUDGET=2400` unconditionally. |
+| 7 | Raw `--format json` floods stdout | **APPROVE — but consult-ONLY; brief was wrong about status** | `run_ceo.sh:95` already redirects jsonl to the log file (`>> jsonl 2>&1`) — no stdout flood there, nothing to fix. Only `run_ceo_consult.sh:103` tees raw json to the caller. Fix: jsonl → log only; new `ceo_final_text()` in ceo_lib.sh extracts the last assistant text parts; consult prints final text + `[CEO-CONSULT] class: <result>` line. Fail-soft: empty extract → print pointer to jsonl. |
+| 8 | Consult opinions not persisted | **APPROVE — optional `--save`, default OFF** | Verified consult writes nothing durable today (only logs/ceo jsonl/err/exit + temp task file, removed). `--save` appends `automation/ceo/consults/<ts>.md` (brief + ruling); default off preserves the read-only invariant; keep-all retention (KB-sized files; rotate only if it ever hurts). |
+
+### Item 4 full ruling (the regression)
+
+**Chosen end-state: (b) + text fix.** Exact changes:
+1. `ceo_lib.sh:23` → `LOCK_FILE="/root/.hermes/.run/session-active.lock"`; mkdir `.run/`, gitignore it.
+2. `automation/brain-auditor/run_brain_auditor.sh:5` → same path (only other live reader).
+3. `run_ceo_deep.sh:155` CONCURRENCY block: drop the false "opencode auto-rejects /tmp/* … killed instantly" claim (made false by the config allow); keep the do-not-touch instruction as session discipline, referencing the new workspace path.
+4. `ceo_prompt_base.md:155`: survival warning stays TRUE for non-temp external paths (brief author's 55s `/root/.opencode` death stands); temp dirs are an explicit carve-out — "allowed but discouraged: style rule, not survival".
+5. `brain_auditor_prompt.md:474`: path reference update.
+6. **Do NOT touch `hermes_constants.py`** — SESSION_LOCK_FILE (line 2776) is dead code (zero script consumers); the file carries a hard no-write rule; updating a dead constant has zero functional gain.
+7. **Keep the opencode config allow as-is.** Rejected (a) revert: restores the kill-on-mention grenade that murdered 172817Z (15s) and 000026Z (557s) — availability loss >> the integrity gain once the lock is out of temp. Rejected (c) narrow+deny: `external_directory` deny for a single FILE inside an allowed dir is unverified to work, and `ask` is useless headless; adds config complexity for no asset (the lock has left the zone).
+8. **Do NOT broaden the config** to other paths (`/var/www`, `/etc`, …) — persona workarounds (psql, paths.py imports, systemctl without absolute paths) already cover functional needs.
+
+**Anomaly logged (not acted on):** this session ran `grep`/`ls` against `/root/.opencode/*` paths WITHOUT dying — inconsistent with both the 2026-10-12 kill evidence and the author's recent 55s death. Do not use this anomaly to justify any permission change until independently reproduced.
+
+### Metric checkpoint (measure in 7d)
+- Deep-run budget exhaustions (`incomplete rc=124`): baseline 1/12 runs → target 0 after 2400s raise. Recurrence ⇒ triggers the decide/dispatch split reconsideration.
+- Consult usage after `--save` ships: ≥1 saved consult/week means the flag earns its keep; 0 after 2 weeks ⇒ delete it.
+- `.exit` class misreads (false-success reports): target 0 — class now printed on stdout for consult and `--wait`, documented in SKILL.md.
+- DSH skill-loader: follow-up task filed; target = all 12 failing skills resolve or root-caused within 7d.
+
+### Tester keep-list — all honored
+Decision table ships in SKILL.md (item 1). ⛔ banner stays (item 2). Checkpoint-first + `.exit` class stay (items 3-4). Consult re-derivation of caller numbers is mandated in the consult task template already — no change.
+
+**Shipped order (severity, not the tester's):** 4 → 5+6 → 7 → 8 → 1-docs → (2,3 closed).
