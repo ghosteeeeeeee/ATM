@@ -49,16 +49,18 @@ Query the `signals` DB for recent fires matching token+direction:
 SELECT COUNT(*) FROM signals
 WHERE token = ? AND direction = ?
   AND created_at > datetime('now', ?)
-  AND executed = 0
+  AND decision IN ('PENDING', 'EXPIRED')
 ```
 
 The `?` for time is a SQLite modifier string like `'-30 minutes'`.
 
+**⚠️ CRITICAL: Do NOT use `executed = 0` in this query.** When signals expire, they get `executed = 1`. Using `executed = 0` returns 0 for most tokens (verified: GRASS SHORT has 20 fires but all have `executed = 1`). The `decision IN ('PENDING','EXPIRED')` filter correctly counts all fires that were detected but not traded.
+
 **What counts as a fire:**
 - Any signal row for the same token+direction within the window
 - Regardless of source (pump-chain-, volume-breakout-short-, etc. all count)
-- `executed = 0` excludes already-traded signals (prevents double-counting)
 - PENDING and EXPIRED both count (expired signals still represent real detections)
+- EXECUTED signals are excluded (already traded — no need for confluence bypass)
 
 **What doesn't count:**
 - Opposite direction (LONG fires don't count toward SHORT threshold)
@@ -104,7 +106,12 @@ Helper function:
 
 ```python
 def _temporal_confluence_count(token: str, direction: str) -> int:
-    """Count recent signal fires for token+direction within the temporal window."""
+    """Count recent signal fires for token+direction within the temporal window.
+    
+    NOTE: Uses decision IN ('PENDING','EXPIRED') — NOT executed = 0.
+    Expired signals have executed = 1 but represent real detections.
+    Using executed = 0 would return 0 for most tokens (verified with GRASS/CHIP).
+    """
     try:
         from hermes_constants import TEMPORAL_CONFLUENCE_WINDOW_MIN
         _conn = sqlite3.connect(RUNTIME_DB, timeout=3)
@@ -113,7 +120,7 @@ def _temporal_confluence_count(token: str, direction: str) -> int:
             _cur.execute("""
                 SELECT COUNT(*) FROM signals
                 WHERE token = ? AND direction = ?
-                  AND executed = 0
+                  AND decision IN ('PENDING', 'EXPIRED')
                   AND created_at > datetime('now', ?)
             """, (token.upper(), direction.upper(),
                   f'-{TEMPORAL_CONFLUENCE_WINDOW_MIN} minutes'))
