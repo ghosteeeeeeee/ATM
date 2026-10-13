@@ -1,18 +1,18 @@
 {
-  "timestamp": "2026-10-12T23:50:34.428515+00:00",
+  "timestamp": "2026-10-13T03:20:36.182263+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.13 USDT. Something is wrong.",
+      "title": "Losing streak: 13/20 recent trades lost",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: -1.03 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "9 recent losses look like wrong-side trades",
+      "title": "10 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-002"
@@ -20,38 +20,34 @@
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'oversold-bounce+' losing streak: 3 losses",
-      "detail": "Net -0.29 USDT over last 20 trades (losses: -0.29). Consider disabling or tuning this signal.",
+      "title": "Signal 'pump-chain+' losing streak: 5 losses",
+      "detail": "Net -0.59 USDT over last 20 trades (losses: -0.61). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-003"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 4 losses",
-      "detail": "Net -0.35 USDT over last 20 trades (losses: -0.37). Consider disabling or tuning this signal.",
+      "title": "Signal 'oversold-bounce+' losing streak: 3 losses",
+      "detail": "Net -0.33 USDT over last 20 trades (losses: -0.33). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-004"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
-    "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "continuum": "ABOVE",
+    "volatility": "NORMAL",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
-    "volume_regime": "LOW",
-    "linreg_alignment": 1.0,
+    "acceleration_state": "NEGATIVE",
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 0.75,
     "wyckoff_phase": "UNKNOWN",
     "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "trend_quality": "UP"
   },
-  "open_count": 0,
-  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 (0 long, 0 short) \u2014 100% cash\nUnrealized PnL: 0.00 USDT\nRegime: BEAR (SHORT_BIAS 15m+4h) | Volatility: LOW | Wyckoff: MARKDOWN\nBTC: 82,045 \u2014 below EMA300 for 191 min, zscore -1.50, STRONG_DOWN\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent] Losing streak: 12/20 recent trades lost (40% WR, net -0.13 USDT)\n\ud83d\udd34 [urgent] EXECUTION TRAP \u2014 zero fills, last 50 signals ALL EXPIRED. LONGs blocked by BTC-CRASH momentum filter; SHORTs blocked by SHORT-RSI-HARD-FLOOR (ALT 33.3, AIXBT 34.7, ARB 29.5, YGG 24.4 all rejected <45). BTC SHORT blocked at conf=74 (need 75). System is flat by double-block, not by design.\n\ud83d\udfe1 [warning] oversold-bounce+ 3-loss streak (APT -6.8%, NEAR -3.4%, XPL -2.7%) \u2014 all wrong-side LONGs in bear. Winning side was SHORT each.\n\ud83d\udfe1 [warning] pump-chain+ 4-loss streak (GRASS -4.0%, FIL -2.8%, KAS -0.6%) \u2014 buying pumps at RSI 68-72 in markdown = buying local tops. Winning side was SHORT each.\n\ud83d\udfe1 [warning] SHORT signals that do fill barely breakeven (pump-chain- 40.4% WR net -0.02; mtf-regime-trend- 40% WR net -0.42) \u2014 entering after dump completes, not at fade start.\n\ud83d\udfe2 [info] ADA SHORT (ai-trader, 22:54) was regime-correct (RSI 48.7, right side) but EXPIRED. Cooldown active \u2014 no re-fire until 23:39.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe market is unambiguously bearish: BTC grinding markdown below EMA300 across all timeframes, 69/121 alts SHORT_BIAS vs 2 LONG_BIAS, CALM low-volume selloff. We are 100% cash \u2014 which is the correct side given nothing fills \u2014 but not by choice.\n\nThe real problem is an execution trap. LONGs are correctly blocked (BTC 30m momentum -0.43% triggers BTC-CRASH gate). SHORTs are incorrectly blocked: the coins that ARE the winning side (ALT, AIXBT, ARB, YGG \u2014 all dumping hard) hit SHORT-RSI-HARD-FLOOR <45 before our signals can fill. The floor was designed to prevent shorting bottoms; in a trending markdown it prevents shorting everything. The 45-65 SHORT band is a no-man's-land that fast dumps blow through in minutes and slow grinds sit below for hours.\n\nCompounding this: every one of the last 50 pipeline signals expired without filling \u2014 including the ADA SHORT that was correctly picked at RSI 48.7 in the valid band. Something in RR engine / staleness / price data is expiring signals before execution even gets to the RSI gate. Until fill rate recovers, regime-correct picks are academic.\n\nThe 40% WR is structural, not random: 18 of 20 recent trades were LONG in a SHORT_BIAS market. oversold-bounce+ and pump-chain+ are both LONG-family signals with no regime brake \u2014 they caught falling knives (RSI 37-42) and bought local tops (RSI 68-72) while the market dumped. Every one of those losses had a mirror-image winning SHORT we weren't in because our own filters blocked it.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. URGENT \u2014 Investigate why last 50 signals all EXPIRED: check RR engine, staleness window, and price-data freshness in the execution chain. A 0% fill rate means the system cannot take the winning side regardless of signal quality. This is the single highest-leverage fix.\n2. Escalate SHORT-RSI-HARD-FLOOR for review (brain auditor scope): in STRONG_DOWN/markdown regimes the floor of 45 blocks the entire shortable universe. Consider a regime-conditional floor (e.g., 35 in STRONG_DOWN) \u2014 but do NOT change it unilaterally here.\n3. Ask T whether SHORT-REGIME-GATE confidence threshold (75) should flex: BTC SHORT at conf=74 was blocked one point below while the regime screams SHORT_BIAS. A 1-point miss costing the correct side of the market is worth a look.\n4. Keep oversold-bounce+ and pump-chain+ on watch \u2014 both on multi-loss streaks firing counter-trend. If streaks continue, recommend regime-gating them (LONG-only signals require BTC not STRONG_DOWN) to the brain auditor.\n5. Next hourly cycle: re-evaluate AI trader pick after ADA cooldown (23:39). Prefer a SHORT on a coin still above RSI 45 with fresh price data \u2014 precheck before firing.\n\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged to `watchdog_recommendations.json`. No AI trader pick this cycle (ADA cooldown active, 26 min elapsed < 45 min). Zero open trades means no per-position steers apply \u2014 the entire urgent action is restoring fill rate so regime-correct SHORTs can execute.\n",
-  "agent_timestamp": "2026-10-12T23:27:19.564479+00:00",
-  "regime_context": "BTC: 82,045 (below EMA300=82,591 for 191 consecutive minutes). Zscore -1.50 STRONG_NEG. Linreg bearish on ALL timeframes (1m/5m/15m/1h). Wyckoff MARKDOWN, trend_quality STRONG_DOWN, market_phase CALM. Volume regime LOW \u2014 this is a grinding markdown, not a capitulation. 69/121 tokens SHORT_BIAS, only 2 LONG_BIAS. Continuum BELOW. Both BTC 15m and 4h scanners SHORT_BIAS.\n\nImplication: Any LONG entry is counter-trend and will likely fail unless it's a scalp of a brief relief bounce. SHORT entries are regime-aligned but must be at the RIGHT RSI \u2014 not oversold (SHORT_RSI_HARD_FLOOR=45 blocks this correctly), not overbought-chase either. Sweet spot: RSI 45-55 on a coin that's fading after a failed bounce.\n\nWe are currently 100% cash. In a markdown regime, cash is a position \u2014 but only if we're waiting for SHORT setups. Right now we're flat because nothing fills, not by design.",
-  "pattern_alerts": "VERIFIED PATTERNS (from last 20 closed trades + pipeline.log + signal_performance):\n\nPATTERN 1 \u2014 SHORT-RSI-HARD-FLOOR no-man's-land (URGENT): In markdown regime, coins dump below RSI 45 before SHORT signals can fire. Pipeline.log 23:24 shows ALT (33.3), AIXBT (34.7), ARB (29.5), YGG (24.4) all SHORT-blocked at floor. These are the coins that ARE the winning side \u2014 we're correctly identifying them as shorts, then rejecting them for being too oversold. The floor was designed to prevent shorting bottoms, but in a trending markdown it prevents shorting everything. Winning side: SHORT ALT/AIXBT/ARB/YGG at first signal, before RSI drops below 45. Why we can't: our own filter.\n\nPATTERN 2 \u2014 Oversold LONGs in bear regime are wrong-side trades (n=3, 0% WR, avg -4.3%): APT (meta_rsi 41.7, -6.8%), NEAR (meta_rsi 37.3, -3.4%), XPL (meta_rsi 38.3, -2.7%). All oversold-bounce+ LONGs. Winning side: SHORT each. Why we weren't: oversold-bounce+ only generates LONGs \u2014 no short counterpart. In markdown, oversold = continuation for shorts, not a buy.\n\nPATTERN 3 \u2014 Pump-chain LONGs at RSI>68 are local-top buys (n=3, 0% WR, avg -2.5%): GRASS (meta_rsi 71.2, -4.0%), FIL (meta_rsi 68.7, -2.8%), KAS (meta_rsi 71.6, -0.6%). All pump-chain+ LONGs. Winning side: SHORT each \u2014 mean-reverted within hours. SIGNAL_FILTER_RSI_MAX=72 lets 68-71 through in a bear regime.\n\nPATTERN 4 \u2014 Zero signal fills, last 50 signals all EXPIRED (n=50, 0% fill): ADA SHORT (regime-aligned, RSI 48.7, correct band) also expired. Beyond the RSI floor blocks, something in RR engine / staleness / price data is expiring every signal before fill. This is the #1 operational issue.\n\nPATTERN 5 \u2014 SHORT signals underperform when they do fill: pump-chain- (47 trades, 40.4% WR, net -0.02), hmacd_mtf- (4 trades, 25% WR, net -0.19), mtf-regime-trend- (5 trades, 40% WR, net -0.42). Even regime-aligned shorts barely breakeven \u2014 likely entering after the dump completes, not at the start of the fade. Need RSI 45-55 entries, not 35 (too late) or 65 (too early)."
+  "open_count": 1
 }
