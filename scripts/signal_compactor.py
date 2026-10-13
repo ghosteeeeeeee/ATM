@@ -3328,6 +3328,28 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if _part_bypass:
                         pass_gate = True
                         gate_msg = f'backtested standalone part ({source})'
+                    else:
+                        # ── Temporal Confluence Bypass ──────────────────────────
+                        # Repetition = evidence. If this token+direction fired
+                        # N+ times in the window, the setup is persistent enough
+                        # to treat as confluence. Shadow mode: log only.
+                        # Spec: plans/temporal-confluence-spec.md
+                        try:
+                            from hermes_constants import (
+                                TEMPORAL_CONFLUENCE_ENABLED, TEMPORAL_CONFLUENCE_SHADOW,
+                                TEMPORAL_CONFLUENCE_WINDOW_MIN, TEMPORAL_CONFLUENCE_MIN_FIRES)
+                            if TEMPORAL_CONFLUENCE_ENABLED:
+                                _tc_count = _temporal_confluence_count(token, direction)
+                                if _tc_count >= TEMPORAL_CONFLUENCE_MIN_FIRES:
+                                    if TEMPORAL_CONFLUENCE_SHADOW:
+                                        log(f"  📊 [TEMPORAL-CONFLUENCE-SHADOW] {token} {direction} — would bypass ({_tc_count} fires in {TEMPORAL_CONFLUENCE_WINDOW_MIN}min), shadow mode")
+                                    else:
+                                        pass_gate = True
+                                        gate_msg = f'temporal confluence ({_tc_count} fires in {TEMPORAL_CONFLUENCE_WINDOW_MIN}min)'
+                        except ImportError:
+                            pass
+                        if not pass_gate and not gate_msg:
+                            gate_msg = f'single-type not in standalone bypass (regime={_regime})'
                 # ── Confluence Signal Bypass ──────────────────────────────────────
                 # Confluence signals (source=conf-2s, conf-3s, etc.) are already merged
                 # from 2+ agreeing indicators. They represent real confluence even though
@@ -3343,27 +3365,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pass_gate = True
                         gate_msg = f'backtested standalone ({source})'
                     else:
-                        # ── Temporal Confluence Bypass ──────────────────────────
-                        # Repetition = evidence. If this token+direction fired
-                        # N+ times in the window, the setup is persistent enough
-                        # to treat as confluence. Shadow mode: log only.
-                        # Spec: plans/temporal-confluence-spec.md
-                        try:
-                            from hermes_constants import (
-                                TEMPORAL_CONFLUENCE_ENABLED, TEMPORAL_CONFLUENCE_SHADOW,
-                                TEMPORAL_CONFLUENCE_MIN_FIRES)
-                            if TEMPORAL_CONFLUENCE_ENABLED and unique_signal_types == 1:
-                                _tc_count = _temporal_confluence_count(token, direction)
-                                if _tc_count >= TEMPORAL_CONFLUENCE_MIN_FIRES:
-                                    if TEMPORAL_CONFLUENCE_SHADOW:
-                                        log(f"  📊 [TEMPORAL-CONFLUENCE-SHADOW] {token} {direction} — would bypass ({_tc_count} fires in {TEMPORAL_CONFLUENCE_WINDOW_MIN}min), flag ON, shadow mode")
-                                    else:
-                                        pass_gate = True
-                                        gate_msg = f'temporal confluence ({_tc_count} fires in {TEMPORAL_CONFLUENCE_WINDOW_MIN}min)'
-                        except ImportError:
-                            pass
-                        if not pass_gate and gate_msg == '':
-                            gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
+                        gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
 
             # CRITICAL DEBUG: log EVERY combo before gate decision — no exceptions
             log(f"  🔎 [CONFLUENCE-DEBUG] {token} {direction}: source='{source}' parts={source_parts} count={source_count} unique_types={unique_signal_types} -> {'PASS' if pass_gate else 'BLOCK'}")
