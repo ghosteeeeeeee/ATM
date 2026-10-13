@@ -826,3 +826,18 @@
 - [2026-10-13 05:45] brain_auditor: pump-chain+ LONG RSI 70-75 dead zone confirmed (14d 30%WR, 30d 31.3%WR, confounder-clean) — PUMP_CHAIN_LONG_RSI_MAX 75→70 applied, bull override to 85 preserved — net +$0.48/7d expected. Trail-arm timeouts soaking (2 fires: 1W+$0.67/1L-$0.02). oversold-bounce+ kill by auto_1hr ratified (0-for-4 hard_max_loss). Creative: momentum-freshness pre-entry gate suggested (14 EXTREME chop exits -$1.81 vs 18 trail-reached +$3.48). 24h: 17T 31.6%WR -$1.19. Protected flags INTACT.
 
 - [2026-10-13 10:45 UTC] brain_auditor: HOLD COURSE — 0 config changes. 4 fixes in soak all clean (RSI_MAX=70 holding n=0, trail-arm pump-chain 2 fires net $0, bb-squeeze 0 fires, oversold-bounce kill 0 trades). DB-verified: 24h 29T 9W -$0.44 (31%WR, improving from -$1.12) | 7d 139T 55W +$1.70 (LONG +$1.02, SHORT +$0.68). hard_max_loss 7d 50T -$5.08 #1 — only 10% reached trail-arm, avg MFE 0.162% = chop entries confirmed. LOSING AUTOPSY: all 16 losers 24h LONG; 13 HML all EXTREME vol. EXTREME high-RSI LONG 7d -$0.93 BUT 30d +$2.22 — REVERSES, hard block REJECTED. volume-breakout 14T 3W -$0.65 losers avg RSI 72 (overbought chase) — trail-arm timeout backtest suggested (delegate self_learner). ESCALATION: bb-squeeze trail-arm still unratified (0 fires, Oct 12 deploy); disk 85% due <80% Oct 14. Full: brain/audit_recommendations.json — brain_auditor
+
+## TEAM UPDATES
+- [2026-10-13 12:45] brain_auditor: NO CONFIG CHANGE — audit (watchdog: BTC LONG wrong-side, 4 correlated shorts, doji kill clean)
+  DB-verified: 37T 11W -$0.64 29.7%WR (24h) | 5 open (4 short + 1 long) | Regime SHORT_BIAS/STRONG_DOWN, BTC below EMA300 6.7h
+  LOSING AUTOPSY: hard_max_loss 7d 56T 0%WR -$5.44 #1 — 94.6% never reached +0.40% trail arm (enter dead). Median RSI 61.4 vs trail 52.5 (overbought chase). Daily trend: bleeding every day, Oct 13 worst 16T -$1.27.
+  TRAIL FAMILY: 50T 86%WR +$6.42 — HOW WE WIN. MFE 0.508% vs HML 0.093% (5.5x momentum).
+  OPEN BTC LONG (continuum-osc+): wrong-side of STRONG_DOWN, RSI 66.77. n=7 all-time 57.1%WR -$0.11. Flagged for monitor — not enough for config change. Watchdog recommends close/stop 83200.
+  4 CORRELATED SHORTS (CHIP/CFX/ADA/DOT): correctly sided but basket risk. Watch BTC 83534 EMA300.
+  LAST-RUN IMPACT: RSI_MAX=70 3T +$0.54 (hold) | trail-arm 2 fires net $0 (hold) | bb-squeeze trail-arm 0 fires (CEO ratify pending) | oversold/doji kills clean (0 new trades).
+  MIDBAND RATIONALE VERIFIED: 30d EXTREME RSI 60-70 = 55T 50.9% +$1.53 (only profitable band). 7d bleed driven by minor signals, not pump-chain+/volume-breakout+ (both 50% WR positive).
+  REJECTED: midband flip to EXTREME — 30d rationale still holds, 7d noise from small-n minor signals.
+  CREATIVE: momentum pre-entry gate (velocity > 0.1%) — backtest needed to verify doesn't block trail winners.
+  0 CHANGES APPLIED — 4 fixes in soak, do not stack.
+  ESCALATION: CEO ratify/revert 2 trail-arm enables (bb-squeeze + pump-chain).
+  BY: brain_auditor

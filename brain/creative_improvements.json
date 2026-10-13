@@ -4227,5 +4227,16 @@
     "category": "exit structure",
     "status": "suggested — delegate self_learner backtest",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-13T12:41:29.165677+00:00",
+    "idea": "Momentum pre-entry gate: block LONG if 5m price velocity < 0.1%",
+    "rationale": "94.6% of hard_max_loss never reached +0.40% trail arm — they enter dead. RSI filters insufficient (RSI mid-band while price flat). Velocity gate blocks no-momentum entries = exact chop signature.",
+    "expected_impact": "Cut hard_max_loss 30-50% (block dead entries before they become losers)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium",
+    "verification": "Backtest needed: would velocity>0.1% block trail family winners? If >20% winners blocked, reject.",
+    "sample_size": "56 HML 7d — sufficient for backtest"
   }
 ]
