@@ -1141,10 +1141,13 @@ def rule_based_context_gate(token, direction, source, sig):
             _detect_rsi_floor = sig.get('rsi_14') or sig.get('rsi')
         # HARD FLOOR first — no bearish override. RSI<25 SHORT = falling knife even in downtrend.
         # 14d: 12T 25%WR -$0.89; 0 real winners. Catches STANDALONE_BYPASS + bearish-override hole.
-        if _live_rsi_floor is not None and _live_rsi_floor < SHORT_RSI_HARD_FLOOR:
-            return ('SKIP', f'{source or "SHORT"}: LIVE RSI {_live_rsi_floor:.1f} < {SHORT_RSI_HARD_FLOOR} (extreme oversold — hard block, no bearish override)', 0)
-        if _detect_rsi_floor is not None and _detect_rsi_floor < SHORT_RSI_HARD_FLOOR:
-            return ('SKIP', f'{source or "SHORT"}: DETECT RSI {_detect_rsi_floor:.1f} < {SHORT_RSI_HARD_FLOOR} (extreme oversold — hard block, no bearish override)', 0)
+        # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12: 40-45 band = 19T 63.2%WR +$0.48.
+        from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
+        _hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_HARD_FLOOR
+        if _live_rsi_floor is not None and _live_rsi_floor < _hard_floor:
+            return ('SKIP', f'{source or "SHORT"}: LIVE RSI {_live_rsi_floor:.1f} < {_hard_floor} (extreme oversold — hard block, no bearish override)', 0)
+        if _detect_rsi_floor is not None and _detect_rsi_floor < _hard_floor:
+            return ('SKIP', f'{source or "SHORT"}: DETECT RSI {_detect_rsi_floor:.1f} < {_hard_floor} (extreme oversold — hard block, no bearish override)', 0)
         # FIX 2026-10-05 CEO: b960ffe8 fail-closed gap — both RSI sources None = allow.
         # IMX mtf-regime-trend- SHORT entry_rsi=14.47 + HBAR pump-chain- SHORT entry_rsi=24.30 leaked 2026-10-05.
         if _live_rsi_floor is None and _detect_rsi_floor is None:
@@ -2032,9 +2035,12 @@ def execute_trade(token, direction, price, confidence, source,
             # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
             _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
             # HARD FLOOR first — no bearish override. Catches STANDALONE_BYPASS + override hole at exec time.
-            if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0 and _exec_rsi < SHORT_RSI_HARD_FLOOR:
-                log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} at execution time (extreme oversold — no bearish override)')
-                return False, f'RSI hard floor: {_exec_rsi:.1f} < {SHORT_RSI_HARD_FLOOR}'
+            # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12.
+            from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
+            _exec_hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_HARD_FLOOR
+            if direction.upper() == 'SHORT' and _exec_hard_floor > 0 and _exec_rsi < _exec_hard_floor:
+                log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {_exec_hard_floor} at execution time (extreme oversold — no bearish override)')
+                return False, f'RSI hard floor: {_exec_rsi:.1f} < {_exec_hard_floor}'
             # 2026-10-06 brain_auditor: removed c4097276 exec bear override on SHORT_RSI_FLOOR.
             # Standing decision: exec RSI>=45 all paths; HARD_FLOOR=45 (aligned 2026-10-07) no override.
             # 7d SHORT meta RSI<40: 13T 31%WR -$0.77; pump-chain- RSI<40: 3T 0%WR -$0.38.

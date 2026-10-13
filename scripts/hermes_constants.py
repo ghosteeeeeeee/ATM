@@ -903,6 +903,9 @@ SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocke
 # and decider bearish-structure overrides allowed RSI<25 SHORT through. 14d: RSI<25 SHORT = 12T 25%WR
 # -$0.89; 0 real winners (3 scratches +$0.01 each). BANANA lesson: oversold = bounce risk even in downtrend.
 SHORT_RSI_HARD_FLOOR = 45      # brain_auditor 2026-10-07: raised 25→45, align SHORT_RSI_FLOOR. 30d SHORT RSI<45=114T 34.4%WR -$5.52 vs >=45=246T +$3.53. Defense-in-depth: catches STANDALONE_BYPASS paths that only check HARD_FLOOR. No bearish override.
+# own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
+# Blanket 45 floor cuts off this band. Pump-chain gets a lower floor. Revert if 7d n>=5 WR<45% or PnL<-$0.50.
+SHORT_RSI_HARD_FLOOR_PUMP_CHAIN = 40  # pump-chain-specific floor (auditor-approved, 2026-10-12)
 
 # ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
 # When SHORT_RSI_FLOOR is 40, RSI <40 is blocked. Extra guard for extreme oversold.
