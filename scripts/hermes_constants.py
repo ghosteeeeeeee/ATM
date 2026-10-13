@@ -703,7 +703,7 @@ SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) �
 TP_PCT_FALLBACK    = 0.060  # 6.0% fallback target (3:1 R:R with 2.0% SL) — brain_auditor Sep 28: widened with ATR_SL_MAX
 STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
 SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
-CUT_LOSER_PNL     = -2.50  # close trade at -2.50% ACCOUNT PnL — CEO Oct 12: widened -2.00→-2.50. Gives trail more room to work before hard kill.
+CUT_LOSER_PNL     = -2.80  # close trade at -2.80% ACCOUNT PnL — CEO Oct 12: widened -2.50→-2.80. Gives trail more room to work before hard kill.
 HML_VOL_ATR_MULT  = 0.5   # brain_auditor 2026-10-08 — HML price-threshold = -0.5×ATR when ATR provides more room than CUT_LOSER_PNL/lev. Trail arms at +0.40% (PM_TRAIL_ACTIVATE) but HML killed at -0.30% price @lev5 — trail never got room in EXTREME. 7d HML 66T -$8.72 #1 bleed, 56/66 had MFE>0, median hold 61min. Example: EXTREME ATR 1.5% → thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%. NORMAL/FLAT ATR low → account threshold unchanged. HML only fires on losers — cannot block winners.
 HML_TRAIL_MIN_GAP_PCT = 0.20  # UNUSED as of CEO 2026-10-12 — D3 trail-floor block REMOVED from position_manager (only fired at lev>=4 and widened HML past CUT_LOSER account limit; same bug class as vol floor capped Oct 10). Value kept for history. DO NOT re-add a trail floor that exceeds CUT_LOSER_PNL/lev.
 
@@ -3836,6 +3836,19 @@ SIGNAL_CONFLUENCE_SURVIVED_BONUS       = 10     # points if earliest signal surv
 SIGNAL_CONFLUENCE_RECENCY_BONUS        = 5      # points if most recent signal < 10 min old
 SIGNAL_CONFLUENCE_COOLDOWN_HOURS       = 1      # per-token+direction cooldown after fire
 SIGNAL_CONFLUENCE_MAX_PRICE_AGE        = 10     # skip tokens with price data older than N minutes
+
+# ── Temporal Confluence ─────────────────────────────────────────────────────
+# Repetition of the same token+direction signal within a window = confluence.
+# Bypasses single-source confluence gate ONLY — all downstream filters still apply
+# (RR engine, penalty gate, HALL-SHAME, RSI floors/ceilings, CONTINUUM-BLOCK, etc.).
+# Complementary to signal_confluence (which requires 3+ UNIQUE source types).
+# Spec: plans/temporal-confluence-spec.md
+# Pattern: automatic-implementation (shadow→enforce rollout)
+# CEO approved 2026-10-13: shadow mode first, 48h counterfactual, then enforce.
+TEMPORAL_CONFLUENCE_ENABLED  = True   # module active
+TEMPORAL_CONFLUENCE_SHADOW   = True   # shadow mode: log but don't bypass (flip False to enforce)
+TEMPORAL_CONFLUENCE_WINDOW_MIN = 30   # minutes to count fires
+TEMPORAL_CONFLUENCE_MIN_FIRES = 3     # fires needed to qualify for bypass
 
 # ── Risk-Reward Engine ─────────────────────────────────────────────────────
 # risk_reward_engine.py — structural R:R evaluation gate (replaces basic rr_gate)
