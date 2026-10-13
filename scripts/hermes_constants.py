@@ -4357,7 +4357,7 @@ EMA_RECLAIM_COOLDOWN_HOURS       = 0.5     # 30 min cooldown per token
 # continuum_score.py — contrarian + momentum signals from continuum engine
 CONTINUUM_SCORE_ENABLED              = True    # master kill-switch
 CONTINUUM_SCORE_LONG_ENABLED         = True    # LONG direction
-CONTINUUM_SCORE_SHORT_ENABLED        = True    # SHORT direction
+CONTINUUM_SCORE_SHORT_ENABLED        = False   # T directive 2026-10-13 — 0 trades all-time, conf=83% signals expiring as noise
 CONTINUUM_SCORE_LONG_THRESHOLD       = 85      # score >= this → SHORT (contrarian sell greed)  [was 95, widened 2026-09-12]
 CONTINUUM_SCORE_SHORT_THRESHOLD      = 15      # score <= this → LONG (contrarian buy fear)    [was 5, widened 2026-09-12]
 CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per direction
