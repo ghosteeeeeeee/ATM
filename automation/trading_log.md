@@ -9182,3 +9182,27 @@ Final set: ['GRASS']
 - 24h WR 23.8% (5/21) vs ≥50% Oct 15 goal
 - hard_max_loss >40% of closes for 9th straight hour — brain_auditor SL-width review still pending
 - 3 of 5 open positions red (MON/ENS/SAND) — watch whether they recover or add to hard_max_loss count
+
+## [2026-10-13 09:13] Hourly Analysis
+
+**Trades:** 5 closed last hour — LDO pump-chain+ LONG atr_trail_hit +$0.68 (+15.29%), ETH hl_copy_trader LONG atr_trail_hit +$0.10 (+2.73%), MON bb-bounce-v2-long+ LONG hard_max_loss −$0.06 (−3.53%), ENS hmacd_mtf-+ LONG hard_max_loss −$0.06 (−2.83%), SAND volume-breakout-long+ LONG hard_max_loss −$0.06 (−2.88%)
+**PnL:** +$0.60 last hour (WR 40.0%) | 24h: 25T 7W −$0.48 (28.0%) | 4 open: ADA pump-chain- +0.40%, CHIP pump-chain- +0.30%, ATOM pump-chain- +0.11%, BANANA hmacd_mtf-+ −0.68%
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — each hard_max_loss signal had 1T last hour only
+- pump-chain+ 24h flipped positive: 7T 3W +$0.23 (was −$0.50 at 07:15) — RSI_MAX=70 + trail-arm soak showing real improvement, let it run
+- 2 atr_trail_hit wins this hour (+$0.78 combined) — trail mechanism working
+- hard_max_loss 12/25 = 48% of 24h closes −$1.19 — hold (brain_auditor: 4 fixes in soak, do not stack)
+- atr_sl_hit 3/25 = 12% — under 40%, tpsl stable
+- Overtrade: 5/hr — well under 20
+- Streak: 07h −$0.07, 08h −$0.08 = 2 consecutive negative hours, not 3 — regime check not triggered
+- live_trading=true (constants line 33 + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR improved 23.8% → 28.0% and PnL −$1.12 → −$0.48 — fixes soaking appear to be working; need more hours to confirm
+- hard_max_loss still 48% of closes — brain_auditor SL-width review still pending
+- 3 of 4 open are pump-chain- SHORTs — correlated SHORT cluster; watch if BTC pumps against them
