@@ -172,6 +172,32 @@ if not TEMPORAL_CONFLUENCE_ENABLED:
 
 This collects counterfactual data without changing behavior.
 
+## Relationship to Existing `signal_confluence`
+
+There is already a `signal_confluence` meta-signal (`scripts/signals/signal_confluence.py`) that does something similar. The two are **complementary, not overlapping**:
+
+| Aspect | `signal_confluence` (existing) | Temporal Confluence (proposed) |
+|--------|-------------------------------|-------------------------------|
+| Window | 30 min | 30 min |
+| What it counts | **Unique source types** (different signals) | **Total fires** (same source OK) |
+| Threshold | `MIN_COMPOUND = 3` unique sources | `MIN_FIRES = 3` total fires |
+| Price confirmation | Required — price must move in favor | Not required |
+| Persistence | Required — price must not reverse | Not required |
+| Action | Fires a **new signal** (confluence+/−) | **Bypasses the gate** for the existing signal |
+| Cooldown | Per token+direction | None |
+
+**The gap `signal_confluence` doesn't cover:** If `return_exhaustion-short` fires 5 times for GRASS but no other signal type fires, `compound_count = 1` (below `MIN_COMPOUND = 3`). The confluence signal never fires. The 5 individual signals each expire as single-source PENDING.
+
+This is exactly the 2026-10-12/13 scenario: `return_exhaustion-short` fired repeatedly for 8 tokens, `pump-chain-` fired repeatedly for 12 tokens. Same source, multiple fires, no other signal types agreeing. `signal_confluence` saw `compound_count = 1` and stayed silent.
+
+**The two approaches catch different things:**
+- `signal_confluence`: "Three different signals agree AND price confirms" → high-conviction second chance
+- Temporal confluence: "One signal won't shut up about this coin" → persistent setup
+
+**They coexist without conflict.** `signal_confluence` runs as a slow signal (every 5 min, `_SLOW_SIGNALS`). Temporal confluence runs in the compactor (every cycle). A token could trigger both — the confluence signal adds a new signal, temporal confluence lets the original signal through.
+
+**Potential interaction:** If temporal confluence bypasses the gate for a single-source signal, and `signal_confluence` later fires a confluence+ signal for the same token, both would be in the hotset. The deduplication by token+direction (Step 8) would keep the higher-scored one. This is acceptable — it means the market had both temporal and spatial confluence, which is stronger evidence.
+
 ## Risk Analysis
 
 **Risk 1: Same bad signal fires repeatedly → repeated losses**
