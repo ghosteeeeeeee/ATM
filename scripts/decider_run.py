@@ -3397,6 +3397,29 @@ def run(dry_run=False):
         log(f'No signals above {MIN_EXEC_CONFIDENCE}% confidence — skipping execution')
         return 0, 0
 
+    # ── Contrarian shadow logging (2026-10-13) ──────────────────────────────
+    # When a signal classified as LOSER (30d WR<45% + unprofitable) reaches
+    # execution, log what the contrarian trade WOULD have done. No execution.
+    # Data collected by contrarian_shadow.py — evaluated after 48h.
+    try:
+        from contrarian_shadow import classify_signal as _cs_classify, log_contrarian_shadow as _cs_log
+        for _s in approved:
+            _cs_sig = _s.get('source', '') or ''
+            _cs_cls = _cs_classify(_cs_sig)
+            if _cs_cls == 'LOSER':
+                _cs_log(
+                    token=_s.get('token', '?'),
+                    signal_name=_cs_sig,
+                    original_direction=_s.get('direction', '?'),
+                    entry_price=_s.get('price', 0),
+                    confidence=_s.get('final_confidence', 0),
+                    reason=f'would-contrarian (30d classification: LOSER)'
+                )
+                log(f"  📊 [CONTRARIAN-SHADOW] {_s.get('token','?')} {_s.get('direction','?')} "
+                    f"src={_cs_sig} — classified LOSER, contrarian logged (SHADOW)")
+    except Exception as _cs_e:
+        log(f"  [WARN] Contrarian shadow failed: {_cs_e}", 'WARN')
+
     # ── Multi-factor execution ranking ─────────────────────────────────────────
     # PRIMARY: survival rounds — signals that survived more hot-set compaction cycles
     # have proven themselves against market volatility. Execute veterans first.
