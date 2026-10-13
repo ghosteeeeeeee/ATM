@@ -4286,5 +4286,25 @@
     "status": "suggested",
     "risk": "medium — needs backtest",
     "backtest_required": true
+  },
+  {
+    "date": "2026-10-13T19:30:00Z",
+    "idea": "5m momentum gate for chop-entry signals — block trades with |price_change_5m| < 0.15% at entry",
+    "rationale": "91.8% of hard_max_loss trades never reached trail arm (MFE<0.40%). Avg MFE 0.148% = no momentum. A 5m momentum gate would block chop entries before they die.",
+    "expected_impact": "Block ~50% of hard_max_loss trades. Save ~$3/7d if half of blocked trades would have lost.",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest",
+    "risk": "medium",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-13T19:30:00Z",
+    "idea": "pump-chain- SHORT_BIAS confirmation — require r2>0.6 before firing",
+    "rationale": "14d: pump-chain- loses in ALL regimes. Root cause = shorting NEUTRAL chop coins, not confirmed downtrends. EXTREME block alone = +$0.90/14d.",
+    "expected_impact": "Block chop-shorts, keep trend-shorts.",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest",
+    "risk": "medium",
+    "agent": "brain_auditor"
   }
 ]

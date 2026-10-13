@@ -1,253 +1,204 @@
 {
-  "timestamp": "2026-10-13T15:47:52.805555Z",
-  "agent": "brain_auditor",
-  "run_type": "captain_audit",
+  "timestamp": "2026-10-13T19:38:38.230502Z",
+  "session_brain_stats": {
+    "queries_run": 3,
+    "top_insights": [
+      "Recurring: pump-chain tuning, winrate by regime, momentum filter failures",
+      "Missing: trend-following signal, grind-to-spike signal discussed but not built",
+      "Signal decay / guitar tuning concept: preserve high-WR signals as regime changes"
+    ]
+  },
   "trade_summary_24h": {
-    "trades": 52,
-    "pnl": -1.56,
-    "wr": 25.0,
-    "hard_max_loss": {
-      "count": 24,
-      "pnl": -2.07,
-      "wr": 0.0,
-      "avg_lev": 4.7
-    },
-    "trail_family": {
-      "count": 13,
-      "pnl": 1.5,
-      "wr": 100.0
-    },
-    "note": "37/52 trades (71%) never reach trail activation — chop entries"
+    "total": 58,
+    "win_rate": 24.1,
+    "pnl": -1.88,
+    "status": "CRITICAL",
+    "top_losers": [
+      {
+        "signal": "doji-bottom-long",
+        "pnl": -0.46,
+        "wr": 0.0,
+        "n": 5,
+        "status": "KILLED by auto_1hr"
+      },
+      {
+        "signal": "hmacd_mtf-+ LONG",
+        "pnl": -0.33,
+        "wr": 20.0,
+        "n": 5,
+        "status": "KILLED by signal_reporter"
+      },
+      {
+        "signal": "oversold-bounce+",
+        "pnl": -0.33,
+        "wr": 0.0,
+        "n": 3,
+        "status": "KILLED earlier"
+      },
+      {
+        "signal": "pump-chain- SHORT",
+        "pnl": -0.32,
+        "wr": 31.3,
+        "n": 16,
+        "status": "WATCH — EXTREME vol bleed"
+      },
+      {
+        "signal": "volume-breakout-long+",
+        "pnl": -0.21,
+        "wr": 0.0,
+        "n": 3,
+        "status": "WATCH"
+      }
+    ]
   },
   "trade_summary_7d": {
-    "trades": 161,
-    "pnl": 0.47,
-    "wr": 35.4,
-    "long": {
-      "trades": 127,
-      "pnl": 0.24,
-      "wr": 37.0
-    },
-    "short": {
-      "trades": 34,
-      "pnl": 0.23,
-      "wr": 29.4
-    }
+    "total": 165,
+    "win_rate": 33.9,
+    "pnl": -0.16,
+    "status": "SLIGHTLY NEGATIVE — at risk"
   },
-  "trade_summary_30d": {
-    "trail_family": {
-      "trades": 248,
-      "wr": 77.4,
-      "pnl": 17.3
-    },
-    "hard_max_loss": {
-      "trades": 119,
-      "wr": 0.0,
-      "pnl": -14.0
-    },
-    "other": {
-      "trades": 405,
-      "wr": 39.3,
-      "pnl": -7.12
-    },
-    "note": "Trail family = how we win. hard_max_loss = how we lose. Same as always."
-  },
-  "regime_analysis": {
-    "24h": {
-      "EXTREME": {
-        "n": 43,
-        "wr": 23.3,
-        "pnl": -1.29
-      },
-      "HIGH": {
-        "n": 5,
-        "wr": 20.0,
-        "pnl": -0.29
-      },
-      "NORMAL": {
-        "n": 4,
-        "wr": 50.0,
-        "pnl": 0.02
-      }
-    },
-    "7d": {
-      "EXTREME": {
-        "n": 97,
-        "wr": 29.9,
-        "pnl": 0.26
-      },
-      "HIGH": {
-        "n": 30,
-        "wr": 40.0,
-        "pnl": -0.66
-      },
-      "NORMAL": {
-        "n": 29,
-        "wr": 55.2,
-        "pnl": 1.06
-      }
-    },
-    "30d": {
-      "EXTREME": {
-        "n": 326,
-        "wr": 43.9,
-        "pnl": 2.13
-      },
-      "HIGH": {
-        "n": 246,
-        "wr": 45.9,
-        "pnl": -4.46
-      },
-      "NORMAL": {
-        "n": 177,
-        "wr": 48.6,
-        "pnl": -1.95
-      }
-    },
-    "insight": "EXTREME 24h bleeding (-$1.29) but 30d positive (+$2.13). Recent EXTREME is choppy, not trending. HIGH is persistent bleed (-$4.46/30d)."
-  },
-  "losing_trade_autopsy": {
-    "instant_death_trades": 9,
-    "chase_entries": 5,
-    "chase_pct": "5/8 (62.5%)",
-    "pattern": "Entered within 0.2% of 5m extreme AFTER move already happened. By entry, momentum played out and price reversed.",
-    "examples": [
-      {
-        "token": "CHIP",
-        "signal": "pump-chain+",
-        "dir": "LONG",
-        "rsi": 68.32,
-        "15m_chg": "+1.54%",
-        "context": "CHASE — entered near high after pump"
-      },
-      {
-        "token": "LDO",
-        "signal": "pump-chain-",
-        "dir": "SHORT",
-        "rsi": 40.0,
-        "5m_chg": "+1.30%",
-        "context": "SHORTING_PUMP — shorted into upward move"
-      },
-      {
-        "token": "DOT",
-        "signal": "pump-chain-",
-        "dir": "SHORT",
-        "rsi": 42.11,
-        "context": "CHASE — entered at 5m low"
-      },
-      {
-        "token": "IMX",
-        "signal": "doji-bottom",
-        "dir": "LONG",
-        "rsi": 64.0,
-        "context": "CHASE — entered at high, vol 5.9x"
-      },
-      {
-        "token": "NEAR",
-        "signal": "oversold-bounce+",
-        "dir": "LONG",
-        "rsi": 37.25,
-        "context": "CHASE — entered at high"
-      }
-    ],
-    "root_cause": "Signals confirm AFTER the move, not before. Trail family catches trends early and rides them. hard_max_loss family enters late during chop."
-  },
-  "soak_status": {
-    "rsi_max_70_pump_chain": {
-      "status": "WORKING",
-      "evidence": "0 entries >70 since 05:39 deploy. 3 entries 62-68 all hard_max_loss — 60-70 band still bleeding, but filter doing its job."
-    },
-    "trail_arm_timeout": {
-      "status": "NEUTRAL",
-      "evidence": "2 fires/48h (KAS -$0.02, HYPER +$0.02). Net $0."
-    },
-    "doji_kill": {
-      "status": "CLEAN",
-      "evidence": "0 new entries post-kill."
-    },
-    "oversold_bounce_kill": {
-      "status": "CLEAN",
-      "evidence": "0 new entries post-kill."
-    }
-  },
-  "monitor_items": [
+  "drift_findings": [
     {
-      "item": "pump-chain- RSI<45 bleed",
-      "detail": "30d: 44T 34.1% -$0.94 (worst band). 7d reverses: 16T 31.3% +$0.10. Pattern reverses at 7d — DONT SHIP floor raise. Monitor 48h.",
-      "action": "monitor"
+      "finding": "SHORT_RSI_HARD_FLOOR 45→35 may be misaligned with data",
+      "severity": "HIGH",
+      "evidence": "pump-chain- 14d meta-RSI bands: RSI 35-45 = 32T 31.3%WR -$0.94 (WORST), RSI 45-55 = 19T 47.4%WR +$0.75 (BEST). Lowering floor to 35 OPENS the worst band.",
+      "ceo_rationale": "Allow BTC SHORT at RSI 16.1, INJ at 22.4 during confirmed bear dumps",
+      "conflict": "CEO wants to catch deep-oversold dump shorts, but data shows RSI 35-45 chop shorts bleed. These are different contexts — deep-oversold (<35) confirmed dumps vs mid-range chop.",
+      "recommendation": "Monitor 48h. If 7d RSI 35-45 SHORTs lose >$1, revert to 45. Revert trigger already set by CEO.",
+      "confidence": "MEDIUM"
     },
     {
-      "item": "volume-breakout-long+ EXTREME",
-      "detail": "7d 16T 4W 12L -$0.78. 30d all RSI bands positive (RSI<60 +$0.89, 60-70 +$0.72, 70-80 +$1.00). 7d is noise (n<20).",
-      "action": "monitor"
+      "finding": "RSI_MAX=70 for pump-chain+ WORKING — 0 overbought entries since 05:39",
+      "severity": "INFO",
+      "evidence": "6 trades since 05:39, avg meta RSI 64.4, 0 trades with RSI>=70. Net +$0.34.",
+      "recommendation": "Keep. Soak through Oct 15.",
+      "confidence": "HIGH"
     },
     {
-      "item": "hmacd_mtf-+ LONG",
-      "detail": "24h 5T 20%WR -$0.33. n=5 below kill threshold. Watch.",
-      "action": "watchlist"
-    },
-    {
-      "item": "correlated SHORT book",
-      "detail": "3 open trades all SHORT (ICP/BTC/GMX). One BTC pump hits all. Cluster risk.",
-      "action": "flag"
+      "finding": "trail_arm_timeout working as intended — net -$0.08 on 4 fires",
+      "severity": "INFO",
+      "evidence": "4 fires 7d: COMP -$0.07, ALT -$0.01, KAS -$0.02, HYPER +$0.02. Net -$0.08. Saving stalls without excessive cost.",
+      "recommendation": "Keep. No change.",
+      "confidence": "HIGH"
     }
   ],
+  "losing_trade_autopsy": {
+    "chop_vs_trend_confirmed": {
+      "finding": "Winners ride trends, losers die in chop — CONFIRMED with MFE data",
+      "winners": {
+        "n": 51,
+        "avg_mfe": "1.725%",
+        "trail_arm_rate": "96.1%"
+      },
+      "losers": {
+        "n": 106,
+        "avg_mfe": "0.347%",
+        "trail_arm_rate": "24.5%"
+      },
+      "implication": "91.8% of hard_max_loss trades never reached trail arm (MFE<0.40%). These are chop entries, not trend entries."
+    },
+    "pump_chain_minus": {
+      "pattern": "Shorting chop in EXTREME vol — 16 losses 24h, avg RSI 41.8, all EXTREME regime",
+      "rsi_bands_14d": {
+        "<35": "1T 0% -$0.17",
+        "35-45": "32T 31.3% -$0.94 (BLEED)",
+        "45-55": "19T 47.4% +$0.75 (BEST)",
+        "55+": "16T 25% -$0.83 (BLEED)"
+      },
+      "extreme_vs_other_14d": {
+        "EXTREME": "57T 35.1% -$0.90",
+        "OTHER": "11T 27.3% -$0.29"
+      },
+      "block_extreme_impact": "Would block 57T: 20 winners +$2.82, 37 losers -$3.72 = net +$0.90",
+      "root_cause": "pump-chain- fires on NEUTRAL chop coins in EXTREME vol. No confirmation of independent downtrend. Bounce eats the short.",
+      "recommended_change": "Require SHORT_BIAS confirmation (r2>0.6) before pump-chain- fires. OR block EXTREME vol (14d net +$0.90).",
+      "impact_on_winners": "Blocking EXTREME would give up 20 winners (+$2.82) to save 37 losers (-$3.72). Net +$0.90. 65% of EXTREME trades are losers.",
+      "confidence": "MEDIUM — n=57 sufficient, but non-EXTREME also negative (-$0.29). Signal may need broader fix."
+    },
+    "pump_chain_plus": {
+      "pattern": "Overbought chase — RSI_MAX=70 landed 05:39, 0 trades with RSI>=70 since. 6 trades at avg RSI 64.4, net +$0.34.",
+      "rsi_bands_14d": {
+        "<55": "6T 50% +$1.12 (BEST)",
+        "55-65": "17T 41.2% +$1.11",
+        "65-70": "10T 50% -$0.05 (flat)",
+        "70-75": "13T 30.8% +$0.08 (dead zone per prior audit)",
+        "75+": "2T 0% -$0.40 (blocked by RSI_MAX=70)"
+      },
+      "root_cause": "RSI_MAX=70 is working. 65-70 band is flat (-$0.05, n=10). Could tighten to 65 but n<20 threshold not met.",
+      "recommended_change": "Monitor 65-70 band. If 14d n>=20 and still negative, consider RSI_MAX=65.",
+      "confidence": "LOW — insufficient sample for change"
+    }
+  },
+  "signal_quality_deep_dive": {
+    "hard_max_loss": {
+      "status": "#1 bleed — 61T 7d, -$5.89, 0% WR",
+      "root_cause": "91.8% never reached trail arm (MFE<0.40%). Avg hold 32m. Chop entries dying before momentum builds.",
+      "trail_arm_timeout_status": "Working — 4 fires net -$0.08. But 45m too slow for instant-death cohort (median 12-26m).",
+      "entry_filter_needed": "Chop-entry filter: block trades with |price_change_5m| < 0.15% at entry. Needs backtest.",
+      "do_not_stack": "4 fixes in soak. Do NOT add more entry filters until RSI_MAX=70 + trail-arm soak complete (Oct 15)."
+    },
+    "doji_bottom_long": {
+      "status": "KILLED by auto_1hr — 24h 5T 0% -$0.46",
+      "signal_reporter_reversal": "CEO decision open — HIGH regime 14T 71.4% +$0.68 WINS. Recommend re-enable with EXTREME-only 0.0x block.",
+      "recommendation": "CEO call. Data supports regime-block, not blanket kill."
+    },
+    "hmacd_mtf_plus": {
+      "status": "KILLED by signal_reporter — 24h 5T 20% -$0.33, all regimes <50% WR",
+      "recommendation": "Keep killed. Blanket kill correct."
+    }
+  },
   "creative_improvements": [
     {
-      "date": "2026-10-13T15:47:52.805594Z",
-      "idea": "Chase-entry filter — block entries within 0.15% of 5m extreme",
-      "rationale": "62.5% of instant-death hard_max_loss trades entered within 0.2% of 5m extreme AFTER the move already happened. Trail family wins because they catch trends early. hard_max_loss family loses because they enter late during chop. A chase filter would block the late entries.",
-      "expected_impact": "Block 5/8 instant-death trades identified. Conservative estimate: reduce hard_max_loss frequency by 15-20% without killing trail-family winners (trend entries often enter near extremes but CONTINUE).",
+      "date": "2026-10-13T19:30:00Z",
+      "idea": "5m momentum gate for chop-entry signals — block trades with |price_change_5m| < 0.15% at entry",
+      "rationale": "91.8% of hard_max_loss trades never reached trail arm. Avg MFE 0.148% = no momentum. A 5m momentum gate would block chop entries before they die.",
+      "expected_impact": "Block ~50% of hard_max_loss trades (those with no 5m momentum). Save ~$3/7d if half of blocked trades would have lost.",
       "category": "entry sniper",
-      "status": "suggested",
-      "risk": "medium — trend entries also enter near extremes. Needs backtest to verify winner impact <20%.",
-      "backtest_required": true,
-      "shadow_candidate": true
+      "status": "suggested — needs backtest",
+      "risk": "medium — might block slow-starting winners. Backtest required before shipping.",
+      "verification_required": "Run backtest on last 30d. Check: (1) How many winners would be blocked? (2) Statistical significance. (3) Out-of-sample at 7d/14d."
     },
     {
-      "date": "2026-10-13T15:47:52.805605Z",
-      "idea": "Volume confirmation filter for chase entries — if entry is near 5m extreme, require vol_ratio > 2.0x",
-      "rationale": "Refinement of chase filter. CHIP had vol_ratio 4.1x and still lost (single spike, not sustained). TURBO had vol_ratio 0.3x (no momentum). Volume alone doesn't separate, but vol_ratio < 1.0x + chase entry = instant death. Could block TURBO-type entries without blocking sustained trends.",
-      "expected_impact": "Block low-volume chase entries (vol_ratio < 1.0x). Would have blocked TURBO (vol 0.3x) without blocking CHIP (vol 4.1x) — but CHIP still lost, so this is incomplete.",
+      "date": "2026-10-13T19:30:00Z",
+      "idea": "pump-chain- SHORT_BIAS confirmation — require r2>0.6 before firing",
+      "rationale": "14d: pump-chain- loses in ALL regimes. Root cause = shorting NEUTRAL chop coins, not confirmed downtrends. Winners short coins with independent downtrends.",
+      "expected_impact": "Block chop-shorts, keep trend-shorts. 14d EXTREME block alone = +$0.90. SHORT_BIAS confirmation could be cleaner.",
       "category": "entry sniper",
-      "status": "suggested",
-      "risk": "medium — needs backtest.",
-      "backtest_required": true
+      "status": "suggested — needs backtest",
+      "risk": "medium — might reduce frequency. Signal already low-frequency in non-EXTREME.",
+      "verification_required": "Backtest r2>0.6 filter on last 30d pump-chain- trades."
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "RSI_MAX=70 pump-chain+",
-      "shipped": "2026-10-13 05:39",
+      "change": "PUMP_CHAIN_LONG_RSI_MAX 75→70 (2026-10-13 05:39)",
       "status": "WORKING",
-      "impact": "0 overbought entries since deploy. 3 entries 62-68 all hard_max_loss — 60-70 band still bleeding but filter doing its job."
+      "impact": "0 trades with RSI>=70 since land. 6 trades at avg RSI 64.4, net +$0.34. Soak to Oct 15."
     },
     {
-      "change": "trail_arm_timeout bb-squeeze + pump-chain 45m",
-      "shipped": "2026-10-12",
-      "status": "NEUTRAL",
-      "impact": "2 fires/48h, net $0. CEO ratify/revert still pending."
+      "change": "SIGNAL_FILTER_RSI_MAX 72→75 + AMBIGUOUS→SKIP (2026-10-12 21:43)",
+      "status": "WORKING",
+      "impact": "Exec-time gate hardened. STANDALONE_BYPASS signals no longer skip ceiling."
     },
     {
-      "change": "doji-bottom kill",
-      "shipped": "2026-10-13 11:18",
-      "status": "CLEAN",
-      "impact": "0 new entries."
+      "change": "trail_arm_timeout vehicle enabled (2026-10-12 10:45)",
+      "status": "WORKING",
+      "impact": "4 fires 7d, net -$0.08. Saving stalls without excessive cost."
     },
     {
-      "change": "oversold-bounce kill",
-      "shipped": "2026-10-13 morning",
-      "status": "CLEAN",
-      "impact": "0 new entries."
+      "change": "SHORT_RSI_HARD_FLOOR 45→35 (2026-10-13, CEO)",
+      "status": "MONITORING — potential misalignment",
+      "impact": "RSI 35-45 band is WORST (32T 31.3% -$0.94/14d). Lowering floor OPENS this band. Revert trigger set: 10+ RSI 35-45 SHORTs lose >$1 in 7d."
     }
   ],
   "next_actions": [
-    "CEO: ratify/revert 2 trail-arm enables (audit says keep, +$0.97/30d corrected)",
-    "Backtest chase-entry filter (shadow candidate) — delegate self_learner",
-    "Monitor pump-chain- RSI<45 for 48h — if 7d stays positive, pattern is fixed; if reverts, raise floor to 45",
-    "Monitor volume-breakout-long+ — 30d all bands positive, 7d is noise",
-    "Wyckoff shadow rule due Oct 13 — signal_analyst undelivered",
-    "Disk cleanup if >84%"
+    "CEO: Decide SHORT_RSI_HARD_FLOOR — data shows RSI 35-45 is worst band. Consider reverting to 45.",
+    "CEO: Decide doji-bottom-long — signal_reporter recommends re-enable with EXTREME-only block (HIGH regime wins).",
+    "CEO: Ratify/revert trail-arm enables (soak review Oct 15).",
+    "Backtest 5m momentum gate for chop-entry signals — delegate self_learner.",
+    "Backtest pump-chain- SHORT_BIAS confirmation — delegate self_learner.",
+    "Monitor pump-chain- 48h — if 7d RSI<45 SHORTs lose >$1, revert floor to 45.",
+    "Do NOT stack more entry filters until Oct 15 soak review."
   ]
 }
