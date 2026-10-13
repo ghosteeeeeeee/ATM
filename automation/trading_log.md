@@ -9100,3 +9100,38 @@ Final set: []
 - 24h WR 31.6% (6/19) vs ≥50% Oct 15 goal
 - hard_max_loss >40% of closes for 6th straight hour — brain_auditor SL-width review still pending
 - 4 open positions, 3 in profit — watch whether they hold
+
+## FAVORITES Update — 2026-10-13 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE BABY (WR=57.1%, PnL=$0.05, 1 consecutive bad days, regime=LONG_BIAS)
+- DEMOTE ETH (WR=50.0%, PnL=$0.08, 1 consecutive bad days, regime=LONG_BIAS)
+
+Final set: ['SYRUP']
+
+## LOSERS Update — 2026-10-13 06:05 UTC
+- ADD GRASS (WR=42.9%, PnL=$-0.04, low_wr (42.9%))
+
+Final set: ['GRASS']
+
+## [2026-10-13 06:15] Hourly Analysis
+
+**Trades:** 2 closed last hour — BTC continuum-trend+ LONG profit-monster-trail +$0.04 (+1.57%), GRASS pump-chain+ LONG atr_sl_hit −$0.10 (−2.70%)
+**PnL:** −$0.06 last hour | 24h: 18T 4W −$1.09 (22.2%) | 3 open: LDO pump-chain+, ETH hl_copy_trader, BTC continuum-trend+ (all ~$0.00)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — GRASS 1T 0W only
+- pump-chain+ 7T 2W −$0.50 24h worst by volume — 1T 0W last hour, kill rule needs 3+
+- hard_max_loss 9/18 = 50% of 24h closes −$1.02 — hold brain_auditor (SL width lever, unchanged)
+- atr_sl_hit 2/18 ≈ 11.1% — under 40%, tpsl_utils deployed
+- Overtrade: 2/hr — well under 20
+- Streak: 05h −$0.06 but 04h +$0.01, 03h $0.00 — not 3 consecutive negative; regime check not triggered
+- live_trading=true (constants + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 22.2% (4/18) vs ≥50% Oct 15 goal
+- hard_max_loss >40% of closes for 7th straight hour — brain_auditor SL-width review still pending
+- oversold-bounce+ still shows 3T 0W −$0.33 in 24h window despite kill at 01:15 — trades closed after kill; confirm no new opens
