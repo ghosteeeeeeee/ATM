@@ -4266,5 +4266,25 @@
     "status": "refuted",
     "risk": "n/a",
     "verification": "Full counterfactual in brain/audit_recommendations.json timestamp 2026-10-13T14:46:51Z"
+  },
+  {
+    "date": "2026-10-13T15:48:11.369833Z",
+    "idea": "Chase-entry filter — block entries within 0.15% of 5m extreme",
+    "rationale": "62.5% of instant-death hard_max_loss trades entered within 0.2% of 5m extreme AFTER the move already happened. Trail family wins early, hard_max_loss enters late in chop.",
+    "expected_impact": "Block 5/8 instant-death trades. Reduce hard_max_loss frequency 15-20% without killing trail winners.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — needs backtest, trend entries also near extremes",
+    "backtest_required": true
+  },
+  {
+    "date": "2026-10-13T15:48:11.369848Z",
+    "idea": "Volume confirmation for chase entries — vol_ratio < 1.0x + near extreme = block",
+    "rationale": "Refinement. TURBO vol_ratio 0.3x (no momentum) + chase = instant death. CHIP vol 4.1x still lost (single spike). Low-volume chase is cleaner block than all chase.",
+    "expected_impact": "Block low-volume chase entries without blocking sustained high-volume trends.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — needs backtest",
+    "backtest_required": true
   }
 ]

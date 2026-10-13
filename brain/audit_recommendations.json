@@ -1,71 +1,253 @@
 {
-  "timestamp": "2026-10-13T14:46:51Z",
+  "timestamp": "2026-10-13T15:47:52.805555Z",
   "agent": "brain_auditor",
-  "portfolio_health": "CRITICAL (watchdog) — 24h -$1.23 / 27.1% WR; 7d still +$0.91 / 37.3% WR",
+  "run_type": "captain_audit",
   "trade_summary_24h": {
-    "trades": 48,
-    "pnl_usdt": -1.23,
-    "wr_pct": 27.1,
-    "by_exit": {
-      "hard_max_loss": "22T -$1.93 0%WR",
-      "atr_sl_hit": "9T -$0.69 0%WR",
-      "trail_family": "13T +$1.50 ~92%WR"
+    "trades": 52,
+    "pnl": -1.56,
+    "wr": 25.0,
+    "hard_max_loss": {
+      "count": 24,
+      "pnl": -2.07,
+      "wr": 0.0,
+      "avg_lev": 4.7
     },
-    "top_bleeders_killed": "doji-bottom-long 5T -$0.46 (killed 11:18, 0 post-kill entries); oversold-bounce+ 3T -$0.33 (killed earlier, 0 post-kill entries)",
-    "remaining_bleed": "structural hard_max_loss chop entries — spread across pump-chain±, ai-trader+, volume-breakout+, hmacd_mtf-+"
+    "trail_family": {
+      "count": 13,
+      "pnl": 1.5,
+      "wr": 100.0
+    },
+    "note": "37/52 trades (71%) never reach trail activation — chop entries"
   },
   "trade_summary_7d": {
-    "trades": 158,
-    "pnl_usdt": 0.91,
-    "wr_pct": 37.3,
-    "long": "+$0.60/126T",
-    "short": "+$0.31/32T"
+    "trades": 161,
+    "pnl": 0.47,
+    "wr": 35.4,
+    "long": {
+      "trades": 127,
+      "pnl": 0.24,
+      "wr": 37.0
+    },
+    "short": {
+      "trades": 34,
+      "pnl": 0.23,
+      "wr": 29.4
+    }
   },
-  "last_run_impact": {
-    "PUMP_CHAIN_LONG_RSI_MAX=70 (05:39)": "WORKING — 0 pump-chain+ LONG entries with meta-RSI>=70 since deploy. BABY@75.0/GRASS@72.8/ALT@73.7/KAS@71.6 all pre-deploy.",
-    "doji-bottom-long kill (11:18)": "CLEAN — 0 entries post-kill",
-    "oversold-bounce+ kill (early)": "CLEAN — 0 entries post-06:00",
-    "trail_arm_timeout pump-chain 45m": "2 fires net $0 (KAS -0.56%, HYPER +0.67%) — soak",
-    "trail_arm_timeout bb-squeeze 60m": "0 fires — soak, CEO ratify still pending",
-    "SIGNAL_FILTER_RSI_MAX=75 exec hard-block (Oct 12)": "in place; CRV volume-breakout RSI 72.34 entered+lost (<75, passes by design)"
+  "trade_summary_30d": {
+    "trail_family": {
+      "trades": 248,
+      "wr": 77.4,
+      "pnl": 17.3
+    },
+    "hard_max_loss": {
+      "trades": 119,
+      "wr": 0.0,
+      "pnl": -14.0
+    },
+    "other": {
+      "trades": 405,
+      "wr": 39.3,
+      "pnl": -7.12
+    },
+    "note": "Trail family = how we win. hard_max_loss = how we lose. Same as always."
+  },
+  "regime_analysis": {
+    "24h": {
+      "EXTREME": {
+        "n": 43,
+        "wr": 23.3,
+        "pnl": -1.29
+      },
+      "HIGH": {
+        "n": 5,
+        "wr": 20.0,
+        "pnl": -0.29
+      },
+      "NORMAL": {
+        "n": 4,
+        "wr": 50.0,
+        "pnl": 0.02
+      }
+    },
+    "7d": {
+      "EXTREME": {
+        "n": 97,
+        "wr": 29.9,
+        "pnl": 0.26
+      },
+      "HIGH": {
+        "n": 30,
+        "wr": 40.0,
+        "pnl": -0.66
+      },
+      "NORMAL": {
+        "n": 29,
+        "wr": 55.2,
+        "pnl": 1.06
+      }
+    },
+    "30d": {
+      "EXTREME": {
+        "n": 326,
+        "wr": 43.9,
+        "pnl": 2.13
+      },
+      "HIGH": {
+        "n": 246,
+        "wr": 45.9,
+        "pnl": -4.46
+      },
+      "NORMAL": {
+        "n": 177,
+        "wr": 48.6,
+        "pnl": -1.95
+      }
+    },
+    "insight": "EXTREME 24h bleeding (-$1.29) but 30d positive (+$2.13). Recent EXTREME is choppy, not trending. HIGH is persistent bleed (-$4.46/30d)."
   },
   "losing_trade_autopsy": {
-    "cohort": "31 losers 24h, all hard_max_loss/atr_sl_hit/stale family",
-    "rsi_meta": "doji knives RSI 4-13 (killed); pump-chain- oversold shorts RSI 38-43 entered via BTC-bearish override (PUMP_CHAIN_SHORT_RSI_MIN=45 has override for LEAN_BEAR) — mixed outcomes (5 losses, 3 wins incl ACE +5.53%); pump-chain+ mid-RSI 62-68 chop entries (post-fix cohort) all hard_max_loss",
-    "confidence_anomaly": "BABY conf=499.4, GRASS 179.5, PONS 178.9, CFX 154.6 — conf explosion documented. Size is UNIT-BASED ($11.10/$22.10), NOT conf-scaled. Cosmetic for sizing; may distort ranking/MIN_EXEC_CONFIDENCE. Monitor only.",
-    "wrong_side_truth": "Every HML trade = someone else on the right side. Winners trail-arm; HML losers never reach +0.40% arm (chop entries)."
+    "instant_death_trades": 9,
+    "chase_entries": 5,
+    "chase_pct": "5/8 (62.5%)",
+    "pattern": "Entered within 0.2% of 5m extreme AFTER move already happened. By entry, momentum played out and price reversed.",
+    "examples": [
+      {
+        "token": "CHIP",
+        "signal": "pump-chain+",
+        "dir": "LONG",
+        "rsi": 68.32,
+        "15m_chg": "+1.54%",
+        "context": "CHASE — entered near high after pump"
+      },
+      {
+        "token": "LDO",
+        "signal": "pump-chain-",
+        "dir": "SHORT",
+        "rsi": 40.0,
+        "5m_chg": "+1.30%",
+        "context": "SHORTING_PUMP — shorted into upward move"
+      },
+      {
+        "token": "DOT",
+        "signal": "pump-chain-",
+        "dir": "SHORT",
+        "rsi": 42.11,
+        "context": "CHASE — entered at 5m low"
+      },
+      {
+        "token": "IMX",
+        "signal": "doji-bottom",
+        "dir": "LONG",
+        "rsi": 64.0,
+        "context": "CHASE — entered at high, vol 5.9x"
+      },
+      {
+        "token": "NEAR",
+        "signal": "oversold-bounce+",
+        "dir": "LONG",
+        "rsi": 37.25,
+        "context": "CHASE — entered at high"
+      }
+    ],
+    "root_cause": "Signals confirm AFTER the move, not before. Trail family catches trends early and rides them. hard_max_loss family enters late during chop."
   },
-  "creative_improvements": [
+  "soak_status": {
+    "rsi_max_70_pump_chain": {
+      "status": "WORKING",
+      "evidence": "0 entries >70 since 05:39 deploy. 3 entries 62-68 all hard_max_loss — 60-70 band still bleeding, but filter doing its job."
+    },
+    "trail_arm_timeout": {
+      "status": "NEUTRAL",
+      "evidence": "2 fires/48h (KAS -$0.02, HYPER +$0.02). Net $0."
+    },
+    "doji_kill": {
+      "status": "CLEAN",
+      "evidence": "0 new entries post-kill."
+    },
+    "oversold_bounce_kill": {
+      "status": "CLEAN",
+      "evidence": "0 new entries post-kill."
+    }
+  },
+  "monitor_items": [
     {
-      "idea": "5m momentum gate: block entries with |price_change_5m| < 0.15%",
-      "status": "REFUTED with data this run",
-      "verification": "14d cohort n=282 (116 HML / 165 trail + misc). Trail winners enter at SAME low momentum as HML losers: trail <0.10% = 43T +$4.59, <0.15% = 68T +$6.69. Gate <0.15% saves $7.15 HML but kills $6.69 trail = NET +$0.46/14d (noise) AND kills 41% of all trail winners (>>20% bar). FAILS.",
-      "conclusion": "Entry momentum does NOT separate winners from losers. The edge is post-entry continuation (does the move reach trail arm), not entry speed."
+      "item": "pump-chain- RSI<45 bleed",
+      "detail": "30d: 44T 34.1% -$0.94 (worst band). 7d reverses: 16T 31.3% +$0.10. Pattern reverses at 7d — DONT SHIP floor raise. Monitor 48h.",
+      "action": "monitor"
     },
     {
-      "idea": "BTC-regime alignment filter (block counter-trend entries)",
-      "status": "REFUTED with data this run",
-      "verification": "14d by meta btc_regime: HML occurs in EVERY regime. BULL_TREND LONG = 32 HML -$3.53 + 54 trail +$3.67; BEAR_TREND SHORT = 17 HML -$2.04 + 10 trail +$1.58; RANGING LONG = 18 HML + 34 trail. Even ALIGNED trades split 117 HML -$13.81 / 165 trail +$13.76. Regime context does not separate chop from trend at entry.",
-      "conclusion": "Regime gates already live (SHORT-CONTINUUM, vol gate, HIGH blocks) capture the available regime edge. Further alignment filters would cut winners at the same rate as losers."
+      "item": "volume-breakout-long+ EXTREME",
+      "detail": "7d 16T 4W 12L -$0.78. 30d all RSI bands positive (RSI<60 +$0.89, 60-70 +$0.72, 70-80 +$1.00). 7d is noise (n<20).",
+      "action": "monitor"
+    },
+    {
+      "item": "hmacd_mtf-+ LONG",
+      "detail": "24h 5T 20%WR -$0.33. n=5 below kill threshold. Watch.",
+      "action": "watchlist"
+    },
+    {
+      "item": "correlated SHORT book",
+      "detail": "3 open trades all SHORT (ICP/BTC/GMX). One BTC pump hits all. Cluster risk.",
+      "action": "flag"
     }
   ],
-  "drift_findings": [
-    "STANDALONE_BYPASS still skips vol gate (DRIFT-A standing since Oct 5) — bypass signals pass_gate=True without vol-mult consult. Known, queued, not re-fixed this run.",
-    "entry_rsi_14 vs meta rsi_14 (DRIFT-E standing) — audits must use meta RSI. This run used meta rsi_14 exclusively.",
-    "SHORT_RSI_HARD_FLOOR lowered 45->35 by CEO recalibration TODAY (line 910) — do not collide with re-blocking oversold shorts this run."
-  ],
-  "recurring_problems": [
-    "hard_max_loss = #1 bleed 14d: 116T -$13.74 0%WR — unchanged. Instant-death cohort (<45m, never arm trail) needs exit-side/sizing solution, not entry filters (both entry-filter ideas refuted this run).",
-    "2 trail-arm enables UNRATIFIED by CEO (bb-squeeze 60m + pump-chain 45m) — soak only, do not stack more.",
-    "Confidence explosion (conf up to 499) — new finding, monitor for ranking distortion."
+  "creative_improvements": [
+    {
+      "date": "2026-10-13T15:47:52.805594Z",
+      "idea": "Chase-entry filter — block entries within 0.15% of 5m extreme",
+      "rationale": "62.5% of instant-death hard_max_loss trades entered within 0.2% of 5m extreme AFTER the move already happened. Trail family wins because they catch trends early. hard_max_loss family loses because they enter late during chop. A chase filter would block the late entries.",
+      "expected_impact": "Block 5/8 instant-death trades identified. Conservative estimate: reduce hard_max_loss frequency by 15-20% without killing trail-family winners (trend entries often enter near extremes but CONTINUE).",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "medium — trend entries also enter near extremes. Needs backtest to verify winner impact <20%.",
+      "backtest_required": true,
+      "shadow_candidate": true
+    },
+    {
+      "date": "2026-10-13T15:47:52.805605Z",
+      "idea": "Volume confirmation filter for chase entries — if entry is near 5m extreme, require vol_ratio > 2.0x",
+      "rationale": "Refinement of chase filter. CHIP had vol_ratio 4.1x and still lost (single spike, not sustained). TURBO had vol_ratio 0.3x (no momentum). Volume alone doesn't separate, but vol_ratio < 1.0x + chase entry = instant death. Could block TURBO-type entries without blocking sustained trends.",
+      "expected_impact": "Block low-volume chase entries (vol_ratio < 1.0x). Would have blocked TURBO (vol 0.3x) without blocking CHIP (vol 4.1x) — but CHIP still lost, so this is incomplete.",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "medium — needs backtest.",
+      "backtest_required": true
+    }
   ],
   "config_changes_applied": [],
+  "changes_from_last_run": [
+    {
+      "change": "RSI_MAX=70 pump-chain+",
+      "shipped": "2026-10-13 05:39",
+      "status": "WORKING",
+      "impact": "0 overbought entries since deploy. 3 entries 62-68 all hard_max_loss — 60-70 band still bleeding but filter doing its job."
+    },
+    {
+      "change": "trail_arm_timeout bb-squeeze + pump-chain 45m",
+      "shipped": "2026-10-12",
+      "status": "NEUTRAL",
+      "impact": "2 fires/48h, net $0. CEO ratify/revert still pending."
+    },
+    {
+      "change": "doji-bottom kill",
+      "shipped": "2026-10-13 11:18",
+      "status": "CLEAN",
+      "impact": "0 new entries."
+    },
+    {
+      "change": "oversold-bounce kill",
+      "shipped": "2026-10-13 morning",
+      "status": "CLEAN",
+      "impact": "0 new entries."
+    }
+  ],
   "next_actions": [
-    "Continue 4-fix soak — do not stack entry filters (momentum gate and regime-alignment both refuted)",
-    "CEO: ratify/revert 2 trail-arm enables (audit recommends keep; corrected expectation +$0.97/30d bb-squeeze)",
-    "Next creative backtest: instant-death cohort SIZING dampen in shadow (reduce size, don't block) — needs MFE-at-entry from candles.db, queue for next run",
-    "Monitor confidence>150 anomalies — log-only, check if conf drives any gate besides MIN_EXEC_CONFIDENCE",
-    "Monitor open book: CHIP pump-chain+ LONG RSI 68.3 (passes new ceiling), BIGTIME hmacd_mtf-+ — regime conflict 15m LONG_BIAS vs 4h SHORT_BIAS",
-    "hmacd_mtf-+ 14d n=6 -$0.28 — still below n=20 kill threshold, keep on watchlist"
+    "CEO: ratify/revert 2 trail-arm enables (audit says keep, +$0.97/30d corrected)",
+    "Backtest chase-entry filter (shadow candidate) — delegate self_learner",
+    "Monitor pump-chain- RSI<45 for 48h — if 7d stays positive, pattern is fixed; if reverts, raise floor to 45",
+    "Monitor volume-breakout-long+ — 30d all bands positive, 7d is noise",
+    "Wyckoff shadow rule due Oct 13 — signal_analyst undelivered",
+    "Disk cleanup if >84%"
   ]
 }
