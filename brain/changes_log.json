@@ -1144,5 +1144,27 @@
     "after": "70",
     "rationale": "70-75 band is dead zone: 14d 10T 30%WR -$0.36, 30d 16T 31.3%WR -$0.01 (WR ~31% both windows). 65-70 stays open (71.4%/61.5% WR). Confounder clean: EXTREME-only RSI<70=59.1% +$2.20 vs RSI 70+=30% -$0.53. Code comment already flagged dead zone. Bull override to 85 preserved.",
     "impact": "Blocks 12T/7d -$0.76 losers, 3 winners +$0.28 (17.6% < 20% threshold). Net +$0.48/7d expected."
+  },
+  {
+    "timestamp": "2026-10-13T21:41:50Z",
+    "agent": "brain_auditor",
+    "change": "VOLUME_BREAKOUT_PLUS_ENABLED True->False — post-Oct10 re-enable 12T 0%WR -$1.32, EXTREME home habitat post-HIGH-block 8T 0% -$0.59",
+    "type": "kill",
+    "file": "scripts/hermes_constants.py",
+    "before": "True",
+    "after": "False",
+    "rationale": "CEO Oct10 re-enable thesis (regime issue not signal issue) falsified: HIGH block shipped Oct10 17:48, post-fix EXTREME-only cohort still 0/8 -$0.59. 14d signal total -$1.10 20%WR. Kill pending fresh backtest + CEO re-enable.",
+    "impact": "Stops ~1.5 trades/day avg -$0.11/trade bleed. 7d expected +$1.32 saved. SHORT (minus) unaffected."
+  },
+  {
+    "timestamp": "2026-10-13T21:41:50Z",
+    "agent": "brain_auditor",
+    "change": "CHASE_RATIO shadow gate shipped (CHASE_RATIO_SHADOW=True) — block when |m5|/|m15|>0.7 and |m15|>=0.3%",
+    "type": "shadow",
+    "file": "scripts/hermes_constants.py + scripts/decider_run.py",
+    "before": "n/a (new gate)",
+    "after": "shadow mode: log CHASE-RATIO-SHADOW, no live block",
+    "rationale": "14d backtest: blocks 19/118 hard_max_loss (-$2.01) 0/28 trail winners; both 7d and d8-14 halves 0 winners blocked (p~0.0006 under null). Orthogonal to CHASE gap/z (existing) and SPIKE single-candle filter. Shadow until soak review Oct 15.",
+    "impact": "Zero live impact (shadow). If enforced after clean 48h: expected +$2/14d from blocked instant-death entries."
   }
 ]

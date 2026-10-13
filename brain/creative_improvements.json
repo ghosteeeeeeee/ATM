@@ -4306,5 +4306,22 @@
     "status": "suggested — needs backtest",
     "risk": "medium",
     "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-13T21:42:17Z",
+    "idea": "Chase-ratio entry gate (share-of-move timing) — SHIPPED SHADOW",
+    "rationale": "Winners enter during quiet pause of established move; losers chase the last 5m candle. Ratio metric separates them where raw momentum does not.",
+    "expected_impact": "+$2/14d if enforced",
+    "category": "entry sniper",
+    "status": "shadow",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-13T21:42:17Z",
+    "idea": "REJECTED: raw 5m momentum floor gate",
+    "rationale": "Backtest disproved: winners have LESS 5m momentum than losers; would kill best trades (0-0.1% band = 6T +$1.74).",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
   }
 ]

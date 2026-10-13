@@ -4930,6 +4930,37 @@ def run(dry_run=False):
                 skipped += 1
                 continue
 
+        # ── CHASE-RATIO shadow gate (brain_auditor 2026-10-13) ────────────
+        # Block when most of the 15m direction-signed move happened in the last
+        # 5m (chasing the candle). Shadow logs only until soak review Oct 15.
+        try:
+            from hermes_constants import CHASE_RATIO_SHADOW, CHASE_RATIO_MIN_MOVE15, CHASE_RATIO_MAX
+            _cr_now = time.time()
+            _cr_conn = sqlite3.connect(CANDLES_DB, timeout=5)
+            try:
+                _cr_rows = _cr_conn.execute(
+                    "SELECT ts, close FROM candles_1m WHERE token=? AND is_closed=1 AND ts>? ORDER BY ts",
+                    (token.upper(), int(_cr_now) - 900)).fetchall()
+            finally:
+                _cr_conn.close()
+            if len(_cr_rows) >= 6:
+                _cr_sgn = 1 if direction.upper() == 'LONG' else -1
+                _cr_m5 = _cr_sgn * (_cr_rows[-1][1] - _cr_rows[-6][1]) / _cr_rows[-6][1] * 100
+                _cr_m15 = _cr_sgn * (_cr_rows[-1][1] - _cr_rows[0][1]) / _cr_rows[0][1] * 100
+                if abs(_cr_m15) >= CHASE_RATIO_MIN_MOVE15:
+                    _cr_ratio = abs(_cr_m5) / abs(_cr_m15)
+                    if _cr_ratio > CHASE_RATIO_MAX:
+                        _cr_tag = 'BLOCK' if not CHASE_RATIO_SHADOW else 'SHADOW'
+                        log(f'  [CHASE-RATIO-{_cr_tag}] {token} {direction} '
+                            f'm5={_cr_m5:.3f}% m15={_cr_m15:.3f}% ratio={_cr_ratio:.2f}')
+                        if not CHASE_RATIO_SHADOW:
+                            if sig_id:
+                                release_signal_claim(sig_id, 'SKIPPED', reason='post-claim block: CHASE-RATIO chase candle')
+                            skipped += 1
+                            continue
+        except Exception as _cr_e:
+            log(f'  [CHASE-RATIO] err {token}: {_cr_e}')
+
         # ── pump-chain+ MAX_ENTRY_GAP filter: block chasing entries ──────────
         # 14d: gap>1.5% pump-chain+ LONG = 6T 33.3%WR -$0.43. Blocks 4 losers,2 marginal winners.
         # FIX 2026-10-11: bull structure override — gap relaxed to 3.0% when BTC score>80+STRONG_POS.

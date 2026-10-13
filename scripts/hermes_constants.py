@@ -885,6 +885,17 @@ CHASE_EXEMPT_MIN_SETUP_N = 8         # min similar-setup sample size
 CHASE_EXEMPT_MIN_SETUP_WR = 60       # min similar-setup WR %
 CHASE_EXEMPT_GAP_MAX = 8.0           # gap limit when exemption applies (was 2.0/3.0)
 
+# ── Chase-Ratio Shadow Gate (brain_auditor 2026-10-13) ─────────────────────
+# Orthogonal to CHASE gap/z and SPIKE single-candle: blocks when ≥70% of the
+# direction-signed 15m move happened in the last 5m (chasing the candle, not
+# riding an established move). 14d backtest vs trail winners: |m15|>=0.3% AND
+# ratio>0.7 blocks 19/118 hard_max_loss (−$2.01) and 0/28 trail winners.
+# Both 7d and d8-14 halves: 0 winners blocked. SHADOW=True logs only — flip
+# False after 48h soak (review Oct 15). Revert: 3+ winners in shadow logs.
+CHASE_RATIO_SHADOW = True
+CHASE_RATIO_MIN_MOVE15 = 0.30        # % direction-signed 15m move must reach this
+CHASE_RATIO_MAX = 0.70               # block if |move5m| / |move15m| > this
+
 # ── Global Spike Filter ────────────────────────────────────────────────────
 # Block SHORT entries after recent bullish 5m candle (spike → consolidation → bad SHORT)
 # Backtested: spike>0.3% + RSI<30 blocks 2x more losers than winners (0.5x ratio)
@@ -3427,7 +3438,7 @@ ENGULFING_CONF_CAP = 88               # max confidence
 # Family: Volume (pairs with ANY other family for 2-type confluence)
 # NEW 2026-08-30 — backbone signal to address signal starvation
 VOLUME_BREAKOUT_ENABLED = True         # master toggle
-VOLUME_BREAKOUT_PLUS_ENABLED = True    # LONG — RE-ENABLED CEO 2026-10-10: was great signal, chop losses were regime issue not signal issue. RSI ceiling 85 in place. Kill was auto_1hr not CEO.
+VOLUME_BREAKOUT_PLUS_ENABLED = False   # LONG — KILLED brain_auditor 2026-10-13: post-Oct10-re-enable cohort 12T 0%WR -$1.32 (EXTREME home habitat post-HIGH-block-fix 8T 0% -$0.59). CEO's "regime issue not signal issue" thesis falsified by post-fix data. Re-enable only with fresh backtest + CEO approval.
 VOLUME_BREAKOUT_MINUS_ENABLED = True   # SHORT (bearish volume spike)
 VOLUME_BREAKOUT_SPIKE_MULT = 2.0       # volume must be >= 2x average
 VOLUME_BREAKOUT_AVG_PERIOD = 20        # bars for average volume
