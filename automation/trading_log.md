@@ -9135,3 +9135,27 @@ Final set: ['GRASS']
 - 24h WR 22.2% (4/18) vs ≥50% Oct 15 goal
 - hard_max_loss >40% of closes for 7th straight hour — brain_auditor SL-width review still pending
 - oversold-bounce+ still shows 3T 0W −$0.33 in 24h window despite kill at 01:15 — trades closed after kill; confirm no new opens
+
+## [2026-10-13 07:15] Hourly Analysis
+
+**Trades:** 2 closed last hour — PONS ai-trader+ LONG atr_sl_hit −$0.05 (−2.88%), STX r2v2-long3 LONG hard_max_loss $0.00 (−2.49% raw, breakeven PnL)
+**PnL:** −$0.05 last hour | 24h: 20T 4W −$1.14 (20.0%) | 4 open: LDO pump-chain+ +3.32%, ETH hl_copy_trader +0.75%, BTC continuum-trend+ +0.15%, CRV volume-breakout-long+ +0.24%
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — only 2T last hour, neither signal hit 3+
+- ai-trader+ 3T 0W −$0.17 24h — kill rule is last-hour scoped; 1T 0W last hour, watch only
+- pump-chain+ 7T 2W −$0.50 24h worst by volume — 0T last hour, kill rule not met
+- hard_max_loss 10/20 = 50% of 24h closes −$1.02 — hold brain_auditor (SL width lever, unchanged)
+- atr_sl_hit 3/20 = 15% — under 40%, tpsl_utils deployed
+- Overtrade: 2/hr — well under 20
+- Streak: 07h −$0.05 but 06h $0.00, 04h +$0.01 — not 3 consecutive negative; regime check not triggered
+- live_trading=true (constants line 33 + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 20.0% (4/20) vs ≥50% Oct 15 goal — deteriorating (22.2% → 20.0%)
+- hard_max_loss >40% of closes for 8th straight hour — brain_auditor SL-width review still pending
+- 4 open positions all in profit — watch whether they hold into closes
