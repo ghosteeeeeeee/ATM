@@ -28,7 +28,28 @@ set -uo pipefail
 # (`/root/../tmp/brief.md` slips past it and the session dies mid-run on the
 # auto-reject the ban exists to prevent) and falsely-triggerable
 # (`/tmp/../root/.../brief.md` wrongly rejects a legitimate in-repo brief).
-INJECTED_BRIEF="${1:-}"
+#
+# Flags (order-independent with the brief arg):
+#   --wait   Foreground wait for interactive use. Budget drops to 600s; on
+#            non-ok the parent prints the class + checkpoint path. Detached
+#            1800s remains the default (automation path).
+WAIT=0
+INJECTED_BRIEF=""
+for _arg in "$@"; do
+    case "$_arg" in
+        --wait) WAIT=1 ;;
+        *)
+            if [ -z "$INJECTED_BRIEF" ]; then
+                INJECTED_BRIEF="$_arg"
+            else
+                echo "[CEO-DEEP] unexpected extra arg: $_arg (only one brief allowed)" >&2
+                exit 4
+            fi
+            ;;
+    esac
+done
+unset _arg
+
 if [ -n "$INJECTED_BRIEF" ]; then
     case "$INJECTED_BRIEF" in
         /*) : ;;                                   # already absolute
@@ -44,6 +65,12 @@ if [ -n "$INJECTED_BRIEF" ]; then
     unset _canon
 fi
 
+# Interactive wait uses a shorter budget: a foreground 1800s call blocks the
+# caller's turn for 30min. 600s is enough for a bounded investigate+dispatch
+# on a real brief; if it doesn't finish, the checkpoint + jsonl are on disk.
+BUDGET=1800
+[ "$WAIT" -eq 1 ] && BUDGET=600
+
 cd /root/.hermes || exit 1
 source /root/.hermes/automation/ceo/ceo_lib.sh
 
@@ -58,13 +85,15 @@ TASK="$CEO_DIR/ceo_task_deep_${TS}.md"
 # child sets its EXIT trap BEFORE calling ceo_acquire_lock; acquire sees an
 # existing trap and does not set its own, so the child's single trap fires the
 # release on any exit path (normal, timeout, or signal).
+# Pre-check uses the owner-aware stale test (dead ceo-* pid → stale regardless
+# of mtime — the friction case that bit the live tester on 2026-10-12).
 if [ -f "$LOCK_FILE" ]; then
-    _age=$(( $(date +%s) - $(stat -c %Y "$LOCK_FILE" 2>/dev/null || echo 0) ))
-    if [ "$_age" -lt "$LOCK_TTL" ]; then
+    if ! ceo_lock_is_stale "$LOCK_FILE"; then
+        _age=$(( $(date +%s) - $(stat -c %Y "$LOCK_FILE" 2>/dev/null || echo 0) ))
         echo "[CEO-DEEP] human/other session active (${_age}s < ${LOCK_TTL}s) — refusing to edit. Set a recommendation only. Stopping."
         exit 2
     fi
-    echo "[CEO-DEEP] stale lock (${_age}s) — removing"
+    echo "[CEO-DEEP] stale lock — removing"
     rm -f "$LOCK_FILE"
 fi
 
@@ -163,30 +192,55 @@ if ! ceo_assert_prompt "$PROMPT_FILE" "$CEO_PERSONA_MARKER" "deep"; then
     exit 5
 fi
 
-echo "[CEO-DEEP] run ${TS} starting (detached)"
+echo "[CEO-DEEP] run ${TS} starting (detached, budget ${BUDGET}s)"
 jsonl="$CEO_LOG_DIR/deep-${TS}.jsonl"
 exitf="$CEO_LOG_DIR/deep-${TS}.exit"
+errf="$CEO_LOG_DIR/deep-${TS}.err"
 
 # Run FOREGROUND inside a detached process tree so the EXIT trap (lock release)
-# fires only AFTER the opencode call actually finishes. `timeout 1800` bounds it;
-# a timeout is inspectable via the .exit file, and the lock still releases cleanly
-# because this subshell exits when the bounded run returns.
+# fires only AFTER the opencode call actually finishes. `timeout $BUDGET` bounds
+# it; a timeout is inspectable via the .exit file, and the lock still releases
+# cleanly because this subshell exits when the bounded run returns.
 nohup bash -c '
     source /root/.hermes/automation/ceo/ceo_lib.sh
     # Always release the lock on ANY exit path (normal, timeout, or signal) — an
     # explicit call after `timeout` would be skipped if timeout is killed.
     trap "ceo_release_lock" EXIT
     ceo_acquire_lock "ceo-deep-$(date -u +%Y%m%dT%H%M%SZ)-$$" || { echo "[CEO-DEEP] child could not acquire lock; aborting." >&2; echo "failed rc=3" > "$3"; exit 3; }
-    timeout 1800 "$OPENCODE" run --format json < "$1" >> "$2" 2> "$4"
+    timeout "$5" "$OPENCODE" run --format json < "$1" >> "$2" 2> "$4"
     rc=$?
     # opencode exits 0 even when the agent died mid-run (e.g. a permission
     # auto-reject), so classify by jsonl evidence, not the bare exit code.
     # Keep rc alongside the class so a timeout (124) stays visible — a
     # budget-exhausted run must not read as a clean "ok".
     echo "$(ceo_classify_run "$2") rc=$rc" > "$3"
-' _ "$PROMPT_FILE" "$jsonl" "$exitf" "$CEO_LOG_DIR/deep-${TS}.err" 2>> "$CEO_LOG_DIR/deep-${TS}.err" &
+' _ "$PROMPT_FILE" "$jsonl" "$exitf" "$errf" "$BUDGET" 2>> "$errf" &
 pid=$!
-echo "[CEO-DEEP] detached pid=$pid — poll $exitf (budget 1800s). Lock held until the run exits."
-echo "[CEO-DEEP] NOTE: $exitf contains a CLASS plus rc (e.g. 'ok rc=0', 'failed rc=0', 'silent rc=124'), not a bare exit code — opencode exits 0 even when the agent dies mid-run. Do not treat exit-0 as success; read the class. Child stderr: $CEO_LOG_DIR/deep-${TS}.err"
+
+if [ "$WAIT" -eq 1 ]; then
+    echo "[CEO-DEEP] --wait: foreground, budget ${BUDGET}s. Lock held until the run exits."
+    wait "$pid"
+    result=$(cat "$exitf" 2>/dev/null || echo "missing")
+    echo "[CEO-DEEP] finished: $result"
+    case "$result" in
+        ok*)
+            echo "[CEO-DEEP] report appended to $CEO_DIR/ceo_report.md"
+            ;;
+        incomplete*|silent*)
+            echo "[CEO-DEEP] did not finish cleanly within ${BUDGET}s."
+            echo "[CEO-DEEP] Checkpoint (if written): automation/ceo/checkpoints/${TS}-decision.md"
+            echo "[CEO-DEEP] Inspect: $jsonl"
+            ;;
+        failed*)
+            echo "[CEO-DEEP] failed. Inspect: $jsonl and $errf"
+            ;;
+        *)
+            echo "[CEO-DEEP] unexpected .exit content. Inspect: $jsonl and $errf"
+            ;;
+    esac
+else
+    echo "[CEO-DEEP] detached pid=$pid — poll $exitf (budget ${BUDGET}s). Lock held until the run exits."
+    echo "[CEO-DEEP] NOTE: $exitf contains a CLASS plus rc (e.g. 'ok rc=0', 'failed rc=0', 'silent rc=124'), not a bare exit code — opencode exits 0 even when the agent dies mid-run. Do not treat exit-0 as success; read the class. Child stderr: $errf"
+fi
 rm -f "$TASK"
 exit 0

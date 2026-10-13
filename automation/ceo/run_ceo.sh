@@ -95,7 +95,10 @@ echo "[CEO] status run ${TS} starting (bounded, read-only)"
 timeout 300 "$OPENCODE" run --format json < "$PROMPT_FILE" \
     >> "$CEO_LOG_DIR/status-${TS}.jsonl" 2>&1
 rc=$?
-echo "$rc" > "$CEO_LOG_DIR/status-${TS}.exit"
+# Standardize .exit to the same `class rc=N` contract as deep/moe (2026-10-13).
+# ceo_classify_run scans the jsonl because opencode exits 0 even when the agent
+# dies mid-run. The process exit code below is unchanged for systemd oneshot.
+echo "$(ceo_classify_run "$CEO_LOG_DIR/status-${TS}.jsonl") rc=$rc" > "$CEO_LOG_DIR/status-${TS}.exit"
 
 if [ "$rc" -eq 124 ]; then
     echo "[CEO] ⚠️ status run TIMED OUT (300s) — REGRESSION (status must be <3min)."

@@ -334,3 +334,35 @@ BY: ceo-strategic (acting CEO session, T decision-request package)
 - Upgrade 2: Timeframe-aware SL/TP (signal files already emit `timeframe` metadata, threading is straightforward but touches many files)
 - Upgrade 3: Signal quality context (double-counting risk with existing confluence_mult — redesign before implementing)
 - Upgrade 4: Fibonacci retracement levels in S/R map (lowest risk, reuse `hh_hl_signals.py:342-361`)
+
+## CEO Deep Run — 20261013T000026Z (ceo-comm interactive-workflow friction)
+
+**Brief:** 4 friction points from an external agent's conversational live-test of the ceo-comm skill. Decide + implement.
+
+### Decisions
+1. **`--wait` on deep — APPROVE (modified).** Foreground for interactive use, budget **600s** (not 1800s). On non-clean finish it prints the class + checkpoint path + jsonl path. Detached 1800s stays the automation default. Rationale: blocking a caller's turn ≤10min beats unbounded polling; an interactive budget that is 3× shorter than automation keeps the foreground path honest about what it can finish.
+2. **`.exit` standardization — APPROVE.** Status now writes `class rc=N` via `ceo_classify_run`, same contract as deep/moe. Verified no script or systemd unit parses the status `.exit` as a bare integer (only SKILL.md described the dual format — and flagged it as a trap). The process exit code systemd sees is unchanged.
+3. **`--force` / `--ignore-lock` — REJECT the bypass; MODIFY staleness instead.** The lock exists to stop a CEO run editing `hermes_constants.py` while a human session is live; a convenience flag weakens exactly that. Root cause of the friction was diagnosed as mtime-only staleness: a dead CEO owner behind a <1h-old lock reads as "fresh". New `ceo_lock_is_stale()` is owner-aware — a `ceo-*` lock whose embedded PID is dead is stale regardless of age; human/unknown owners keep the age check. No bypass shipped.
+4. **"consult" mode — APPROVE as a thin 4th runner**, `run_ceo_consult.sh`, not a `--consult` flag on deep. Deep's lock+detach+classify flow is battle-tested and complex; bolting "skip all that" onto it is more code and risk than a standalone read-only script reusing `ceo_lib` + the base prompt. Consult: in-process, 300s, brief arg required, **no lock, no report write, stdout only**.
+
+### Evidence
+- Read all 3 runners + `ceo_lib.sh` + SKILL.md + the last 4 checkpoints before deciding.
+- systemd: `hermes-ceo.service` is `Type=oneshot`, `TimeoutStartSec=3600`; the `.exit` FILE format is independent of the process exit code it sees.
+- Lock owner tag format is `ceo-<label>-<ts>-<pid>`; stale auto-remove already existed for `age >= 3600s`, which is why a dead owner with a fresh mtime was invisible.
+
+### Verification (run after the implementing session was killed)
+The deep session was killed after editing all four scripts but before touching SKILL.md or appending this report. Post-hoc verification by the orchestrator:
+- `bash -n` passes on `ceo_lib.sh`, `run_ceo.sh`, `run_ceo_deep.sh`, `run_ceo_consult.sh`.
+- consult: refuses with no brief (rc=4), rejects `/tmp` and missing briefs (rc=4), live smoke returned `CONSULT_OK`, left no lock and no report write, did not leave its brief behind.
+- `--wait`: parses order-independently with the brief arg, drops budget to 600s, takes the foreground path.
+- owner-aware lock: synthetic dead-CEO-PID lock → stale (auto-cleared); alive-PID lock → not stale.
+- status `.exit` now writes `class rc=N`.
+- SKILL.md updated (consult documented, `--wait` documented, `.exit` contract unified, no-bypass lock policy and owner-aware staleness documented, brief-arg interface promoted to the primary deep command).
+
+### Known open (deliberately NOT fixed here)
+**Deep-run budget problem.** A prior deep run spent its full 1800s on investigation and died before dispatching subagents. That is an agent-behavior failure, not a runner-UX one, and its fix surface is `ceo_prompt_deep.md` (investigation-time hint) rather than the shell. Mixing it into this change risked breaking the tested deep flow. Tracked as a separate item.
+
+### Metric checkpoint (measure in 7d)
+- Count of interactive deep runs that complete within the 600s `--wait` budget (expect: brief-scoped ones finish; open-ended investigation will not — that is the signal to split investigate from dispatch).
+- Count of consult invocations vs deep invocations (expect consult to absorb the "give me your opinion" load that was overloading deep).
+- Count of manual lock removals (expect: near zero, now that dead CEO owners self-clear).

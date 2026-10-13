@@ -80,20 +80,48 @@ CEO_PERSONA_MARKER='CEO_PROTECTED_FLAGS'
 ceo_ephemeral_port() { :; }
 
 # ── Session lock (acquire / release) ────────────────────────────────────────
+# Staleness test. Returns 0 (true) if the lock should be treated as stale.
+# Owner-aware: a CEO-owned lock whose embedded PID is dead is stale REGARDLESS
+# of mtime — this is the friction case that bit the live tester (a dead deep-run
+# left a <1h-old lock; mtime-only check refused and the human had to rm it).
+# Human/unknown owners keep the age-based check only (we cannot safely
+# auto-classify them).
+ceo_lock_is_stale() {
+    local lock="${1:-$LOCK_FILE}"
+    [ -f "$lock" ] || return 0   # absent → nothing to hold
+    local age owner pid
+    age=$(( $(date +%s) - $(stat -c %Y "$lock" 2>/dev/null || echo 0) ))
+    owner=$(head -n1 "$lock" 2>/dev/null)
+    case "$owner" in
+        ceo-*)
+            # Owner tag format: ceo-<label>-<ts>-<pid>  (see ceo_acquire_lock)
+            pid="${owner##*-}"
+            if [ -n "$pid" ] && [ "$pid" -gt 0 ] 2>/dev/null; then
+                if ! kill -0 "$pid" 2>/dev/null; then
+                    echo "[LOCK] CEO-owned lock with dead pid=$pid — treating as stale"
+                    return 0
+                fi
+                return 1   # live CEO owner
+            fi
+            # ceo-* but no parseable PID → fall through to age check
+            ;;
+    esac
+    [ "$age" -ge "$LOCK_TTL" ]
+}
+
 # Create-if-absent with a timestamp. Refuses if a FRESH lock exists (human session).
 # On success we OWN the lock (ceo_release_lock removes it on exit).
 ceo_acquire_lock() {
-    local now owner
-    now=$(date +%s)
-    owner="$1"   # e.g. "ceo-deep-20261012T034500Z"
+    local owner
+    owner="$1"   # e.g. "ceo-deep-20261012T034500Z-12345" (pid at end)
     if [ -f "$LOCK_FILE" ]; then
-        local age
-        age=$(( now - $(stat -c %Y "$LOCK_FILE" 2>/dev/null || echo 0) ))
-        if [ "$age" -lt "$LOCK_TTL" ]; then
+        if ! ceo_lock_is_stale "$LOCK_FILE"; then
+            local age
+            age=$(( $(date +%s) - $(stat -c %Y "$LOCK_FILE" 2>/dev/null || echo 0) ))
             echo "[LOCK] human/other session active (${age}s old < ${LOCK_TTL}s) — refusing. Recommendation only; do not force."
             return 1
         fi
-        echo "[LOCK] stale lock (${age}s) — removing and acquiring"
+        echo "[LOCK] stale lock — removing and acquiring"
         rm -f "$LOCK_FILE"
     fi
     printf '%s\n' "$owner" > "$LOCK_FILE"
