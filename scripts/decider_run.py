@@ -2044,6 +2044,30 @@ def execute_trade(token, direction, price, confidence, source,
             if direction.upper() == 'SHORT' and _exec_hard_floor > 0 and _exec_rsi < _exec_hard_floor:
                 log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {_exec_hard_floor} at execution time (extreme oversold — no bearish override)')
                 return False, f'RSI hard floor: {_exec_rsi:.1f} < {_exec_hard_floor}'
+            # BUGFIX brain_auditor 2026-10-13: detect-RSI hard-floor for STANDALONE_BYPASS path.
+            # Context gate (non-bypass) blocks when EITHER live OR detect RSI < floor. Bypass
+            # signals skip the context gate, so a signal fired in oversold (meta RSI < floor)
+            # that bounced above floor by exec entered short-into-bounce. ICP@35.3, ADA@38.9,
+            # BLUR@39.3 meta — live RSI recovered >=40 at exec, all losers/flat 2026-10-13.
+            # 14d hole cohort: 8T 2W +$0.08 winners vs 6L -$0.54 losers = net -$0.46.
+            _detect_floor_rsi = signal_rsi_14
+            if _detect_floor_rsi is None:
+                try:
+                    _sm_floor = signal_metadata
+                    if isinstance(_sm_floor, str):
+                        _sm_floor = json.loads(_sm_floor)
+                    if isinstance(_sm_floor, dict):
+                        _detect_floor_rsi = _sm_floor.get('rsi_14') or _sm_floor.get('rsi')
+                except Exception:
+                    _detect_floor_rsi = None
+            try:
+                _detect_floor_rsi = float(_detect_floor_rsi) if _detect_floor_rsi is not None else None
+            except (TypeError, ValueError):
+                _detect_floor_rsi = None
+            if (direction.upper() == 'SHORT' and _exec_hard_floor > 0
+                    and _detect_floor_rsi is not None and _detect_floor_rsi < _exec_hard_floor):
+                log(f'  🚫 [EXEC-RSI-DETECT-FLOOR] {token} SHORT BLOCKED — detect RSI {_detect_floor_rsi:.1f} < {_exec_hard_floor} (signal fired in oversold; live recovered to {_exec_rsi:.1f})')
+                return False, f'RSI hard floor (detect): {_detect_floor_rsi:.1f} < {_exec_hard_floor}'
             # 2026-10-06 brain_auditor: removed c4097276 exec bear override on SHORT_RSI_FLOOR.
             # Standing decision: exec RSI>=45 all paths; HARD_FLOOR=45 (aligned 2026-10-07) no override.
             # 7d SHORT meta RSI<40: 13T 31%WR -$0.77; pump-chain- RSI<40: 3T 0%WR -$0.38.

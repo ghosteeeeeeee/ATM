@@ -1,76 +1,123 @@
 {
-  "timestamp": "2026-10-13T21:42:17Z",
-  "session_brain_stats": {
-    "note": "skipped this run — trade-data-driven audit"
-  },
+  "timestamp": "2026-10-13T22:45:42Z",
+  "agent": "brain_auditor",
   "trade_summary_24h": {
-    "closed": 56,
-    "pnl": -1.76,
-    "wr": 23.2,
+    "closed": 55,
+    "wins": 13,
+    "wr_pct": 23.6,
+    "pnl_usdt": -1.57,
+    "exit_breakdown": {
+      "hard_max_loss": {
+        "n": 21,
+        "pnl": -1.72,
+        "wr": 0.0
+      },
+      "atr_sl_hit": {
+        "n": 15,
+        "pnl": -1.09,
+        "wr": 0.0
+      },
+      "trail_family": {
+        "n": 14,
+        "pnl": 1.57,
+        "wr": 85.7
+      }
+    },
+    "top_losing_signal": "pump-chain- SHORT 17T -0.32 29.4%WR",
     "7d": {
-      "closed": 166,
-      "pnl": -0.16,
+      "n": 166,
+      "pnl": -0.08,
       "wr": 33.7
+    },
+    "30d": {
+      "n": 766,
+      "pnl": -3.5,
+      "wr": 45.2
     }
   },
   "losing_trade_autopsy": {
-    "dominant_exit": "hard_max_loss 21/38 losses -$1.95 (24h); 61T/7d -$5.89; 119T/30d -$14.00",
-    "momentum_gate_test": "REJECTED — trail winners have LOWER |5m move| (median 0.162%) than hml losers (0.205%). Blocking |mom5|<0.15% kills 7/17 winners (+$1.74) to save ~$1.91 losers.",
-    "chase_15m_gate_test": "REJECTED standalone — winners have HIGHER 15m pre-move (median 0.433 vs 0.243); any 15m-move threshold kills more winner PnL than it saves.",
-    "chase_ratio_gate": "ACCEPTED shadow — |m5|/|m15|>0.7 AND |m15|>=0.3%: 19/118 hml blocked (-$2.01), 0/28 winners. Stable both 7d and d8-14 halves."
+    "cluster": "pump-chain- SHORT fired in oversold, entered short-into-bounce",
+    "trades": [
+      "ICP meta_rsi=35.29 -0.05",
+      "ADA meta_rsi=38.89 -0.11",
+      "BLUR meta_rsi=39.29 0.00",
+      "ADA meta_rsi=36.4 +0.01",
+      "CC meta_rsi=35.29 +0.07"
+    ],
+    "root_cause": "STANDALONE_BYPASS signals skip the context gate which checks BOTH live AND detect-time RSI vs hard floor. Only exec-time (live RSI) ran. Signal fired while oversold (meta <40), bounced above 40 by exec, entered. Log proof: ICP SAFETY-FILTER-BYPASS, zero RSI-floor lines; CC 'OVERSOLD-SHORT bypass 1m RSI 34.0 < 35 but BTC bearish'.",
+    "winning_side": "Shorts that fired AFTER the bounce stalled (meta >=40 clean entries) OR with real continuation (ACE meta 42.3 +0.24 trail). The hole cohort net -$0.46/14d vs clean-band trades.",
+    "fix_applied": "EXEC-RSI-DETECT-FLOOR: exec-time hard floor now also checks detect-time RSI (signal_rsi_14 param / metadata fallback). Blocks short-into-bounce on bypass path. bug_hunter PASS 10/10.",
+    "impact_14d": "Blocks 8T: 2W +$0.08, 6L -$0.54 = net +$0.46 expected. CC dust-winner (+0.07) accepted cost."
   },
-  "drift_findings": [],
-  "recurring_problems": [
-    "hard_max_loss still #1 bleed (61T/7d, 0%WR) — instant-death cohort (median hold 32m) not addressable by trail_arm_timeout (45m); entry-side only",
-    "volume-breakout-long+ post-re-enable 0/12 — CEO regime thesis falsified by post-HIGH-block data"
-  ],
-  "missing_implementations": [],
-  "creative_improvements": [
+  "changes_from_last_run": [
     {
-      "date": "2026-10-13T21:42:17Z",
-      "idea": "Chase-ratio entry gate (share-of-move timing) — SHIPPED SHADOW",
-      "rationale": "Winners enter during quiet pause of established move; losers chase the last 5m candle. Ratio metric separates them where raw momentum does not.",
-      "expected_impact": "+$2/14d if enforced",
-      "category": "entry sniper",
-      "status": "shadow",
-      "risk": "low"
+      "change": "PUMP_CHAIN_LONG_RSI_MAX 75->70 (05:39)",
+      "verdict": "WORKING",
+      "evidence": "pump-chain+ LONG since 05:39: 6T +$0.34 (was bleeding; no meta>70 entries)"
     },
     {
-      "date": "2026-10-13T21:42:17Z",
-      "idea": "REJECTED: raw 5m momentum floor gate",
-      "rationale": "Backtest disproved: winners have LESS 5m momentum than losers; would kill best trades (0-0.1% band = 6T +$1.74).",
-      "category": "entry sniper",
-      "status": "rejected",
-      "risk": "n/a"
+      "change": "VOLUME_BREAKOUT_PLUS kill (21:41)",
+      "verdict": "CLEAN",
+      "evidence": "flag False verified; 24h pre-kill cohort 4T 0%WR -$0.25; 0 opens since"
+    },
+    {
+      "change": "CHASE_RATIO shadow gate (21:41)",
+      "verdict": "MONITOR",
+      "evidence": "0 fires yet — slots 6/6 full since ~21:15, no new entries to evaluate"
+    },
+    {
+      "change": "doji-bottom kill + hmacd_mtf-+ kill",
+      "verdict": "CLEAN",
+      "evidence": "flags False; today's losses were pre-kill opens closing after"
+    },
+    {
+      "change": "bb-squeeze trail_arm_timeout (Oct 12)",
+      "verdict": "WORKING",
+      "evidence": "7d trail_arm_timeout exits 4T -$0.08 — pre-empting stalls cheaply"
+    }
+  ],
+  "drift_findings": [
+    {
+      "severity": "MED",
+      "finding": "process_delayed_entries (decider_run.py:684, active 3337) calls brain.py directly, bypassing execute_trade — delayed entries get NO exec RSI floors incl. new detect floor",
+      "owner": "bug_hunter queue",
+      "note": "pre-existing, bug_hunter follow-up tonight"
+    },
+    {
+      "severity": "LOW",
+      "finding": "PUMP-CHAIN-VEL-SHORT blocked CC SHORT 17:30 ('30m vel=+0.554% token rising') then CC entered 17:31 — one-minute flappability or vel flip; CC won +0.07",
+      "note": "monitor, no action"
+    },
+    {
+      "severity": "LOW",
+      "finding": "falsy 0.0 RSI key falls through .get() chains; NaN float passes floor check (theoretical)",
+      "note": "pre-existing convention, not touched"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-13T22:45:42Z",
+      "idea": "Signal-time vs exec-time COHERENCE shadow for STANDALONE_BYPASS signals",
+      "rationale": "Tonight's root cause: bypass path checks less state than context gate. Tonight's fix closed the RSI dimension. Other dimensions (regime flip, momentum_state flip, BTC bias flip between detect and exec) are unlogged on bypass. Shadow-log divergence stats for 7d, then decide if a coherence block earns its keep — same automatic-implementation pattern as CHASE_RATIO.",
+      "expected_impact": "Data to decide next bypass-consistency fix; zero live impact (shadow)",
+      "category": "entry sniper / bypass consistency",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [
-    "VOLUME_BREAKOUT_PLUS_ENABLED True->False (kill, evidence-backed)",
-    "CHASE_RATIO_SHADOW=True + constants + decider_run shadow block (no live impact)"
-  ],
-  "changes_from_last_run": [
     {
-      "change": "PUMP_CHAIN_LONG_RSI_MAX 75->70 (Oct 13 05:39)",
-      "verdict": "WORKING as designed — 0 overbought entries since; remaining pump-chain+ losses are RSI 62-68 mid-band chop (different problem). No revert."
-    },
-    {
-      "change": "doji/oversold kills (auto_1hr)",
-      "verdict": "CLEAN — 0 new entries; last oversold close 00:50."
-    },
-    {
-      "change": "trail_arm_timeout soak (bb-squeeze 60m / pump-chain 45m)",
-      "verdict": "NET $0 so far; 2 pump-chain fires both small losses. Hold to Oct 15 review."
-    },
-    {
-      "change": "5m momentum gate creative idea (proposed last run)",
-      "verdict": "REJECTED with data this run — would have killed winners."
+      "timestamp": "2026-10-13T22:45:42Z",
+      "change": "EXEC-RSI-DETECT-FLOOR bugfix — exec-time hard floor also checks detect-time RSI (closes STANDALONE_BYPASS short-into-bounce hole)",
+      "file": "scripts/decider_run.py",
+      "type": "bugfix"
     }
   ],
   "next_actions": [
-    "Oct 15: soak review — CHASE_RATIO shadow logs (flip to enforce if 0 winner-blocks in logs)",
-    "Oct 15: trail_arm_timeout soak review (standing)",
-    "Monitor: pump-chain- keep (7d +$0.39 trail family — watchdog kill rec REJECTED)",
-    "Monitor: pump-chain+ RSI 65-70 band (7d -0.30 vs 30d +0.27 — weekly variance, no change)",
-    "CEO: VB LONG kill needs ratification (overrode Oct10 re-enable on post-fix falsification data)"
+    "Monitor EXEC-RSI-DETECT-FLOOR blocks in log next 48h — expect 3-6 blocks/24h in current SHORT_BIAS chop",
+    "pump-chain- 40-45 clean-band WR 12.5% (8T) post-hole-fix — re-evaluate floor 40->45 at Oct 15 soak IF clean cohort still <45% WR (winner-impact 25% by count currently blocks revert)",
+    "delayed-entries RSI-floor bypass — delegate bug_hunter (bug_hunter MED finding tonight)",
+    "CHASE_RATIO shadow soak review Oct 15 with other fixes",
+    "CEO: trail-arm ratify still open — soak review Oct 15 cannot proceed clean without decision"
   ]
 }

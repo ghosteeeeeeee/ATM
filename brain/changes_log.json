@@ -1177,5 +1177,16 @@
     "after": "exact token first; upper() only if <6 fresh rows",
     "rationale": "Subagent review: collector stores 6 k-tokens lowercase; .upper() silently computed moves from stale closes. Shadow soak would be polluted; enforce mode would decide on wrong prices.",
     "impact": "Shadow logs now correct for all tokens. SIDEWIDE FINDING (not fixed, soak conflict): same .upper() bug pre-exists at decider_run.py:4759 exec-time RSI query."
+  },
+  {
+    "timestamp": "2026-10-13T22:45:42Z",
+    "agent": "brain_auditor",
+    "change": "EXEC-RSI-DETECT-FLOOR bugfix: exec-time SHORT hard floor now also checks detect-time RSI (signal_rsi_14/metadata) — closes STANDALONE_BYPASS short-into-bounce hole (ICP@35.3/ADA@38.9/BLUR@39.3 entered below pump-chain floor 40; context gate would have blocked, bypass skipped it)",
+    "type": "bugfix",
+    "file": "scripts/decider_run.py",
+    "before": "exec-time floor checked live RSI only; bypass signals skip context gate detect-RSI check entirely",
+    "after": "after live-RSI hard-floor check, detect RSI < _exec_hard_floor (40 pump-chain / 35 global) → SKIP with EXEC-RSI-DETECT-FLOOR log",
+    "rationale": "14d hole cohort 8T 2W +$0.08 vs 6L -$0.54 = net -$0.46. bug_hunter PASS 10/10. Root-cause fix (bypass path alignment), not a new filter — context gate already had this check for non-bypass signals. 8 guard cases pass, py_compile OK.",
+    "impact": "Expected +$0.46/14d from blocked short-into-bounce entries. Blocks CC-type dust winners (+0.07) as accepted cost. Loads next decider subprocess cycle (fresh process per minute)."
   }
 ]

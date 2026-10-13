@@ -4323,5 +4323,14 @@
     "category": "entry sniper",
     "status": "rejected",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-13T22:45:42Z",
+    "idea": "Signal-time vs exec-time COHERENCE shadow for STANDALONE_BYPASS signals",
+    "rationale": "Tonight's root cause: bypass path checks less state than context gate. Tonight's fix closed the RSI dimension. Other dimensions (regime flip, momentum_state flip, BTC bias flip between detect and exec) are unlogged on bypass. Shadow-log divergence stats for 7d, then decide if a coherence block earns its keep — same automatic-implementation pattern as CHASE_RATIO.",
+    "expected_impact": "Data to decide next bypass-consistency fix; zero live impact (shadow)",
+    "category": "entry sniper / bypass consistency",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
