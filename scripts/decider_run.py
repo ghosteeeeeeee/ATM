@@ -3492,7 +3492,8 @@ def run(dry_run=False):
             _pp = None  # bypass penalty for quality-filtered copy signals
         if _pp is not None and confidence is not None:
             _raw_conf = confidence
-            _exec_mult = max(_pp, 0.3)  # floor at 0.3, same as compactor SCORE-FLOOR
+            from hermes_constants import PENALTY_MULT_FLOOR as _pen_floor  # CEO 2026-10-13: 0.3→0.5
+            _exec_mult = max(_pp, _pen_floor)  # CEO 2026-10-13: was hardcoded 0.3, now PENALTY_MULT_FLOOR
             confidence = confidence * _exec_mult
             sig['final_confidence'] = confidence
             if _pp < 1.0:

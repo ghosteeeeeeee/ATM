@@ -1115,10 +1115,14 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
         except Exception:
             pass
         if rr < _rr_effective_block:
-            _rr_tag = ' [RR-REGIME-EXEMPT]' if _rr_regime_exempt and rr >= getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70) else ''
-            return 0.0, f"RR HARD BLOCKED: R:R={rr:.2f} < {_rr_effective_block} (risk > reward){_rr_tag}"
+            return 0.0, f"RR HARD BLOCKED: R:R={rr:.2f} < {_rr_effective_block} (risk > reward)"
         if not result['pass'] and result.get('block_reason', ''):
             return 0.0, f"RR HARD BLOCKED: {result['block_reason']}"
+        # CEO 2026-10-13: log regime-exempted ALLOWED trades for revert-trigger measurement
+        if _rr_regime_exempt and rr < getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.55):
+            _rr_exempt_note = f' [RR-REGIME-EXEMPT: rr={rr:.2f} in 0.35-0.55 band, confirmed structure]' 
+        else:
+            _rr_exempt_note = ''
 
         # Graded multiplier (using hermes_constants for all thresholds)
         boost_rr = getattr(hc, 'RR_ENGINE_CONF_BOOST_THRESHOLD_RR', 4.0)
@@ -1144,7 +1148,7 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
             mult = poor_mult
             reason = f"RR PENALTY: R:R={rr:.2f} grade={grade} (poor)"
 
-        return mult, reason
+        return mult, reason + _rr_exempt_note
 
     except Exception as e:
         # Fail-open: don't block trades if engine fails
