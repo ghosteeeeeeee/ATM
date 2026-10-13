@@ -9206,3 +9206,28 @@ Final set: ['GRASS']
 - 24h WR improved 23.8% → 28.0% and PnL −$1.12 → −$0.48 — fixes soaking appear to be working; need more hours to confirm
 - hard_max_loss still 48% of closes — brain_auditor SL-width review still pending
 - 3 of 4 open are pump-chain- SHORTs — correlated SHORT cluster; watch if BTC pumps against them
+
+## [2026-10-13 10:13] Hourly Analysis
+
+**Trades:** 5 closed last hour — ATOM pump-chain- SHORT atr_trail_hit +$0.07 (+3.02%), CHIP pump-chain- SHORT atr_trail_hit +$0.15 (+4.05%), IMX doji-bottom-long LONG hard_max_loss −$0.17 (−3.77%), SEI doji-bottom-long LONG hard_max_loss $0.00 (−2.70%), BANANA hmacd_mtf-+ LONG stale_exit −$0.11 (−3.03%)
+**PnL:** −$0.06 last hour (WR 40.0%) | 24h: 29T 9W −$0.42 (31.0%) | 3 open: ADA pump-chain- +0.99%, ACE pump-chain- +0.47%, ME doji-bottom-long 0.00%
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — doji-bottom-long 2T 0W last hour (needs 3+), ai-trader+ 0T last hour (24h 3T 0W −$0.17 but kill rule is last-hour window)
+- hard_max_loss 13/29 = 44.8% of 24h closes −$1.24 — hold (brain_auditor: 4 fixes in soak, do not stack)
+- atr_sl_hit 3/29 = 10.3% — under 40%, tpsl_utils deployed and stable
+- Overtrade: 5/hr — well under 20
+- Streak: 07h −$0.07, 08h −$0.08, then 09h +$0.57, 10h +$0.05 — broken, no 3-consecutive-negative
+- pump-chain- 2T 2W +$0.22 this hour — SHORT trail mechanism healthy
+- 24h improving: WR 28.0% → 31.0%, PnL −$0.48 → −$0.42
+- live_trading=true (constants line 33 + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- doji-bottom-long 2T 0W last hour (both hard_max_loss, −3.77%/−2.70%) + 1 open ME at breakeven — if next hour adds a 3rd 0% trade, kill rule fires; watch closely
+- ai-trader+ 24h 3T 0W −$0.17 (CFX/NEAR/PONS) — 0 trades this hour; if it re-fires and loses, consider kill
+- hard_max_loss still 44.8% of closes — brain_auditor SL-width review still pending
+- 24h WR 31.0% vs ≥50% Oct 15 goal — improving but gap remains large

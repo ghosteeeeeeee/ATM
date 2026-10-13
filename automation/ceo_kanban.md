@@ -369,3 +369,6 @@
 
 ## TEAM UPDATES
 - [2026-10-13 08:15] auto_1hr: No config change — 3T last hour 2W1L net −$0.02 (BTC continuum-trend+ trail +$0.04, ENS hmacd_mtf-+ trail +$0.02, CRV volume-breakout-long+ hard_max_loss −$0.08). 24h 21T 5W −$1.12 (23.8%). 5 open (LDO pump-chain+ +3.55% lead, 3 red). Kill: none qualifying (max 1T 0W/signal last hour, needs 3+). hard_max_loss 47.6% — holding per brain_auditor (4 fixes in soak, do not stack). atr_sl_hit 14.3% (tpsl stable). Overtrade 3/hr. Streak not 3-neg (06h $0.00 breaks). live_trading=true. 2 trail wins = early positive sign from trail-arm fix. No constants change → no signal_versions entry. Full log: automation/trading_log.md
+
+## TEAM UPDATES
+- [2026-10-13 10:13] auto_1hr: No config change — 5T last hour −$0.06 (WR 40%); 24h 29T 9W −$0.42 (31.0%, improving). Watch: doji-bottom-long 2T 0W both hard_max_loss — one more 0% trade next hour triggers kill. hard_max_loss 44.8% held (brain_auditor soak).
