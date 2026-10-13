@@ -377,3 +377,4 @@
 
 ## TEAM UPDATES
 - [2026-10-13 10:13] auto_1hr: No config change — 5T last hour −$0.06 (WR 40%); 24h 29T 9W −$0.42 (31.0%, improving). Watch: doji-bottom-long 2T 0W both hard_max_loss — one more 0% trade next hour triggers kill. hard_max_loss 44.8% held (brain_auditor soak).
+- [2026-10-13 21:15] auto_1hr: No config change — 0T last hour (3rd empty hour). 24h 55T 13W −$1.76 (23.6%). Kill: none (0 trades). hard_max_loss 41.8% held (brain_auditor soak, do not stack). atr_sl_hit 23.6% (tpsl stable). Overtrade 0/hr. Streak 2-neg under 3. Regime=LONG_BIAS ≠ NEUTRAL → size lever N/A. 6 open. live_trading=true, kill JSON=true. Full log: automation/trading_log.md
