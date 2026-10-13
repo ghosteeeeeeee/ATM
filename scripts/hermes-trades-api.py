@@ -984,7 +984,31 @@ def main():
     write_trades()
     write_signals()
     write_signal_config()
-    print(f"trades.json: written | signals.json: written | signal_config.json: written")
+    # Generate blocked_signals.json from pipeline.log
+    try:
+        from blocked_signals_api import parse_blocked_signals
+        import time as _time
+        blocked = parse_blocked_signals(limit_minutes=120)
+        # Group by gate for summary
+        gate_summary = {}
+        for b in blocked:
+            gate = b['gate']
+            if gate not in gate_summary:
+                gate_summary[gate] = {'count': 0, 'tokens': set()}
+            gate_summary[gate]['count'] += 1
+            if b['token']:
+                gate_summary[gate]['tokens'].add(b['token'])
+        summary = {gate: {'count': d['count'], 'tokens': sorted(list(d['tokens']))[:10]} for gate, d in gate_summary.items()}
+        blocked_result = {
+            'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+            'blocked_count': len(blocked),
+            'gate_summary': summary,
+            'recent_blocks': blocked[:50],
+        }
+        _atomic_write(blocked_result, '/var/www/hermes/data/blocked_signals.json')
+    except Exception as e:
+        _log.warning(f"[write_blocked_signals] failed: {e}")
+    print(f"trades.json: written | signals.json: written | signal_config.json: written | blocked_signals.json: written")
 
 
 if __name__ == '__main__':

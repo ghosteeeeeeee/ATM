@@ -99,6 +99,17 @@
     .signal-badge .wr { color: #666; font-size: 0.85em; margin-left: 3px; }
     .signal-badge .wr.good { color: #00ff88; }
     .signal-badge .wr.bad { color: #ff4444; }
+
+    /* Blocked signals */
+    .gate-badge { background: #ff444415; border: 1px solid #ff444444; color: #ff4444; padding: 3px 8px; border-radius: 3px; font-size: 0.75em; cursor: default; }
+    .gate-badge .gate-count { background: #ff4444; color: #fff; padding: 1px 5px; border-radius: 3px; font-size: 0.9em; margin-left: 4px; }
+    .block-row { display: flex; gap: 12px; padding: 4px 8px; border-bottom: 1px solid #1a1a2e; font-size: 0.8em; align-items: center; }
+    .block-row:hover { background: #1a1a2e; }
+    .block-token { font-weight: bold; min-width: 60px; }
+    .block-dir { min-width: 50px; }
+    .block-gate { color: #ff4444; min-width: 140px; }
+    .block-reason { color: #888; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .block-time { color: #555; font-size: 0.9em; }
   </style>
 </head>
 <body>
@@ -167,6 +178,20 @@
         </thead>
         <tbody id="hotBody"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Blocked Signals Section -->
+  <div class="hot-section" id="blockedSection" style="display:none">
+    <div class="hot-header" style="cursor:pointer;user-select:none;color:#ff4444" onclick="toggleBlocked()">
+      <span>🚫</span>
+      Blocked Signals — last 2h
+      <span id="blockedCount" style="font-size:0.8em;color:#888;margin-left:8px"></span>
+      <span id="blockedToggle" style="font-size:0.7em;color:#666;margin-left:8px">▼</span>
+    </div>
+    <div id="blockedContainer">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="blockedGates"></div>
+      <div style="max-height:300px;overflow-y:auto" id="blockedList"></div>
     </div>
   </div>
 
@@ -257,11 +282,50 @@
         renderHotSet();
         updateTabCounts();
         filterTab(activeTab);
+        loadBlocked();
 
       } catch(e) {
         document.getElementById('status').textContent = 'Error loading: ' + e.message;
         document.getElementById('tbody').innerHTML = '<tr><td colspan="11" class="empty">Error: ' + e.message + '</td></tr>';
       }
+    }
+
+    let blockedHidden = false;
+    function toggleBlocked() {
+      blockedHidden = !blockedHidden;
+      document.getElementById('blockedContainer').style.display = blockedHidden ? 'none' : '';
+      document.getElementById('blockedToggle').textContent = blockedHidden ? '▶' : '▼';
+    }
+
+    async function loadBlocked() {
+      try {
+        const r = await fetch('/data/blocked_signals.json?t=' + Date.now());
+        if (!r.ok) return;
+        const d = await r.json();
+        if (!d.blocked_count) return;
+
+        document.getElementById('blockedSection').style.display = '';
+        document.getElementById('blockedCount').textContent = `${d.blocked_count} blocks in last 2h`;
+
+        // Render gate summary badges
+        const gates = Object.entries(d.gate_summary || {})
+          .sort((a, b) => b[1].count - a[1].count);
+        document.getElementById('blockedGates').innerHTML = gates.map(([gate, data]) =>
+          `<span class="gate-badge" title="Tokens: ${data.tokens.join(', ')}">${gate}<span class="gate-count">${data.count}</span></span>`
+        ).join('');
+
+        // Render recent blocks list
+        const recent = (d.recent_blocks || []).slice(0, 30);
+        document.getElementById('blockedList').innerHTML = recent.map(b =>
+          `<div class="block-row">
+            <span class="block-token">${b.token || '--'}</span>
+            <span class="block-dir ${b.direction === 'LONG' ? 'dir-long' : 'dir-short'}">${b.direction || ''}</span>
+            <span class="block-gate">${b.gate}</span>
+            <span class="block-reason" title="${(b.reason || '').replace(/"/g, '&quot;')}">${b.reason || ''}</span>
+            <span class="block-time">${(b.time || '').slice(11, 19)}</span>
+          </div>`
+        ).join('');
+      } catch {}
     }
 
     function renderHotSet() {
