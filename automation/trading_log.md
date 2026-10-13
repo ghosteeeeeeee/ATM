@@ -9408,3 +9408,27 @@ Final set: ['GRASS']
 - 24h WR 25.0%, PnL −$1.56 unchanged from 16:15 (no closes) — 2 days to Oct 15 ≥50% goal, gap very large
 - Regime flipped back SHORT_BIAS → LONG_BIAS within an hour — whipsaw market; 4 open positions include 2 pump-chain+ LONGs entered during/near the short-bias window
 - hard_max_loss 46.2% of closes — brain_auditor SL-width/entry-filter review still pending
+
+## [2026-10-13 18:14] Hourly Analysis
+
+**Trades:** 6 closed last hour — 1 win, 5 losses (CC pump-chain- atr_trail_hit +$0.07; CRV pump-chain-v6- atr_sl_hit −$0.08, LDO pump-chain- atr_sl_hit −$0.13, ALGO pump-chain- atr_sl_hit −$0.10, COMP pump-chain+ trail_arm_timeout −$0.07, ALT pump-chain+ trail_arm_timeout −$0.01)
+**PnL:** −$0.32 last hour (WR 16.7%) | 24h: 58T 14W −$1.88 (24.1%) | 2 open: BTC continuum-osc- SHORT +0.42%, MNT bb-bounce-v2-long+ LONG +0.16%
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: pump-chain- 3T 1W (not 0%), pump-chain+ 2T 0W (needs 3+), pump-chain-v6- 1T 0W — none qualify
+- volume-breakout-long+/ai-trader+ 24h 3T 0W 0-fire watch — unchanged, no re-fire
+- doji/oversold kills holding (cohorts aging out, 0 new entries)
+- hard_max_loss 24/58 = 41.4% of 24h closes −$2.07 — hold (brain_auditor: 4 fixes in soak, do not stack; entry-filter fix needs backtest)
+- atr_sl_hit 13/58 = 22.4% — under 40%, tpsl_utils deployed and stable
+- Overtrade: 6/hr — well under 20
+- Streak: hour 17 −$0.18 + hour 18 −$0.14 (so far) = 2 consecutive negative calendar hours — under 3, rule not fired; regime=SHORT_BIAS (56S/10L/54N) ≠ NEUTRAL anyway → size lever N/A
+- live_trading=true (constants line 33 + kill JSON verified)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 3 of 5 losses last hour were atr_sl_hit pump-chain- SHORTs in a SHORT_BIAS regime — shorts died on bounce/retrace against the short-bias trend; same chase-into-move pattern flagged at 16:15 for ICP, now 4 occurrences (ICP/CRV/LDO/ALGO). Needs data, not a 1-trade change
+- 24h WR 24.1%, PnL −$1.88 — still bleeding; 1 day to Oct 15 ≥50% goal, gap very large
+- hard_max_loss 41.4% of closes — brain_auditor SL-width/entry-filter review still pending
