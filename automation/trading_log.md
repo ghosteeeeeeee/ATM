@@ -9032,3 +9032,25 @@ Final set: []
 **Open Questions:**
 - 24h net worsened −$0.23 → −$0.83 (CFX loss); WR 36.4% vs ≥50% Oct 15 goal
 - hard_max_loss now >40% of closes for 3rd straight hour — brain_auditor SL-width review still pending
+
+## [2026-10-13 03:13] Hourly Analysis
+
+**Trades:** 1 closed last hour — BABY pump-chain+ LONG hard_max_loss −$0.24 (−3.30%)
+**PnL:** −$0.24 last hour | 24h: 17T 4W −$1.11 (23.5%) | 0 open
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — pump-chain+ only 1T last hour (0/1; 24h 6T 1W −$0.59 worst signal, still watchlist, prior signal_reporter declined kill on EXTREME all-time +$3.48)
+- hard_max_loss 9/17 ≈ 53% of 24h closes −$1.02 — hold brain_auditor (SL width lever, unchanged)
+- atr_sl_hit 2/17 ≈ 11.8% — under 40%, tpsl_utils deployed
+- Overtrade: 1/hr — well under 20
+- Streak: hour-02 bucket −$0.36 (CFX+BABY), but prior hours empty (01, 23) — not 3 consecutive negative; regime check not triggered for size cut
+- live_trading=true (constants line 33 + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h rolling window shed older wins: 22T 8W −$0.83 → 17T 4W −$1.11 (WR 36.4%→23.5%) — deterioration mostly window rollover + BABY loss, not new signal bugs
+- 24h loss sources: pump-chain+ (−$0.59), oversold-bounce+ (−$0.33, now killed), ai-trader+ (−$0.12), hmacd_mtf-- (−$0.12) — none meet kill criteria this hour
+- hard_max_loss >40% of closes for 4th straight hour — brain_auditor SL-width review still pending
