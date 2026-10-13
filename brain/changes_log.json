@@ -1133,5 +1133,16 @@
     "after": "_rsi_val >= PUMP_CHAIN_LONG_RSI_MAX (blocks at-ceiling; bull override to 85 intact)",
     "rationale": "CEO band analysis puts 75 in BLOCK band (75-80=−$0.45/36T). Exactly-75.0 pump-chain+ LONG 30d: 4T 0W −$0.49 (BABY/HEMI/IMX/HYPER all losers/flat). 0 winners blocked. RSI=75.0 is a saturation spike (16 vs neighbors 4-7) — boundary bug not tuning.",
     "impact": "Blocks pump-chain+ LONG at exactly RSI 75.0 unless BTC bull override (score>80 STRONG_POS). Bull override still allows 75-85 in bull tape."
+  },
+  {
+    "timestamp": "2026-10-13T05:39:29Z",
+    "agent": "brain_auditor",
+    "change": "PUMP_CHAIN_LONG_RSI_MAX 75→70 — block overbought pump-chain+ LONG chase entries",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "75",
+    "after": "70",
+    "rationale": "70-75 band is dead zone: 14d 10T 30%WR -$0.36, 30d 16T 31.3%WR -$0.01 (WR ~31% both windows). 65-70 stays open (71.4%/61.5% WR). Confounder clean: EXTREME-only RSI<70=59.1% +$2.20 vs RSI 70+=30% -$0.53. Code comment already flagged dead zone. Bull override to 85 preserved.",
+    "impact": "Blocks 12T/7d -$0.76 losers, 3 winners +$0.28 (17.6% < 20% threshold). Net +$0.48/7d expected."
   }
 ]

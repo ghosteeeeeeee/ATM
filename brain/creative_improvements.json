@@ -4147,9 +4147,11 @@
     "rationale": "8 of 16 exactly-75.0 trades are pump-chain+ LONG, 0 winners. If the spike is a default-not-real value, the RSI gate is filtering garbage. Root-cause fix could be better than the >= boundary patch.",
     "expected_impact": "Data-quality fix; may reveal additional blocked/leaked entries if other RSI defaults exist (e.g. 50.0 mid spike?).",
     "category": "data quality",
-    "status": "suggested",
+    "status": "rejected",
     "risk": "low",
-    "owner": "bug_hunter or signal_analyst"
+    "owner": "bug_hunter or signal_analyst",
+    "rejected_at": "2026-10-13T04:49:25.452170+00:00",
+    "reject_reason": "Net result: the RSI=75 spike is documented and closed as a non-bug — genuine tick-quantized gain:loss ratios, not clamps or fake RSI. No functional change to trading. The only code that actually changed is the cache-key footgun fix, which is a strict improvement. The CEO also flagged (not fixed) ~14 duplicate local compute_rsi helpers scattered across scripts/signals/*.py as a future cleanup."
   },
   {
     "date": "2026-10-13T02:46:44Z",
@@ -4178,5 +4180,15 @@
     "category": "instrumentation",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-13T05:39:38Z",
+    "idea": "Momentum-freshness pre-entry gate: skip pump-chain+ LONG if coin moved <0.15% in last 5 candles (no fresh momentum = chop entry)",
+    "rationale": "14d EXTREME pump-chain+: 14 CHOP_EXIT trades (never reached +0.40% trail arm) lost -$1.81 at 0% WR vs 18 REACHED_TRAIL won +$3.48 at 88.9% WR. The chop entries have no momentum at entry — price is flat. A 5-candle momentum check would filter them before capital is at risk. Trail-arm timeout (60m) catches them late but after capital is locked.",
+    "expected_impact": "Block ~40% of hard_max_loss pump-chain+ entries while preserving trail-reached winners (which by definition have momentum)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "verification_needed": "Backtest: would the filter have blocked the 14 EXTREME chop exits without blocking the 18 trail-reached trades? Need candle data pre-entry."
   }
 ]

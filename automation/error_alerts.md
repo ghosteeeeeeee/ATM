@@ -614,3 +614,12 @@
 - **INFO**: 1 signal in last hour (ai-trader+ LONG). 0 closed today. 128/241 tokens ≥50th pct speed. Regime LONG_BIAS (81L/3S/36N, 120 tokens, 03:45).
 - **INFO**: `hermes-1m-candle.timer` still dead-but-active (filled=0/dev=0 confirmed again this run). Briefly enabled during check by mistake, reverted to disabled within seconds — timer stayed active throughout, no interruption. CEO action still pending: `systemctl disable --now hermes-1m-candle.timer`.
 - **AUTO-FIX**: none (1m-candle toggle fully reverted).
+
+## Error Alerts — 2026-10-13 04:48 UTC
+- **[WARN]** (1x): Disk usage at 85% (/dev/vda2, 18G free). Largest consumers: candle DBs (candles.db 2.9G, coin_tracker.db 3.4G), logs 252M. No uncompressed logs >7d to compress. No auto-fix applied — monitor; consider candles.db/coin_tracker.db retention policy.
+- **[WARN]** (8x, historical): Phantom trades — atr_sl_hit exits with |pnl_pct| < 0.01%. Most recent 2026-09-14 (JUP). No new occurrences in 30 days. No auto-fix applied.
+- No CRITICAL issues. Pipeline, timers, price freshness all OK. "CRASH" log hits were BTC-CRASH guard messages (correct behavior), not actual crashes.
+
+## Error Alerts — 2026-10-13 05:00 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`

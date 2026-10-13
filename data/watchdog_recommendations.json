@@ -1,29 +1,21 @@
 {
-  "timestamp": "2026-10-13T04:20:36.617629+00:00",
+  "timestamp": "2026-10-13T05:20:36.935251+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -1.05 USDT. Something is wrong.",
+      "detail": "Win rate 30% over last 20 trades. Total PnL: -1.11 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: LDO + ALT",
-      "detail": "Both opened within 23 minutes. Correlation risk.",
+      "title": "Trade cluster: BTC + ETH",
+      "detail": "Both opened within 15 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ALT + BTC",
-      "detail": "Both opened within 25 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -31,7 +23,7 @@
       "title": "Portfolio heavily long (3 trades)",
       "detail": "3 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -39,15 +31,15 @@
       "title": "10 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-005"
+      "id": "steer-004"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 5 losses",
-      "detail": "Net -0.59 USDT over last 20 trades (losses: -0.61). Consider disabling or tuning this signal.",
+      "title": "Signal 'pump-chain+' losing streak: 6 losses",
+      "detail": "Net -0.68 USDT over last 20 trades (losses: -0.71). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-006"
+      "id": "steer-005"
     },
     {
       "severity": "warning",
@@ -55,7 +47,7 @@
       "title": "Signal 'oversold-bounce+' losing streak: 3 losses",
       "detail": "Net -0.33 USDT over last 20 trades (losses: -0.33). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-007"
+      "id": "steer-006"
     }
   ],
   "portfolio_health": "critical",
@@ -64,14 +56,14 @@
     "btc_4h": "SHORT_BIAS",
     "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "POS",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.75,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "wyckoff_phase": "DISTRIBUTION",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 3,
   "deep_analysis": "Both STX and AIXBT pass. STX has higher ATR (4.46% vs 1.62%) \u2014 more trail room. Now writing the analysis and AI trader pick.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 3 (3 long, 0 short)\nUnrealized PnL: ~+2.4% combined (LDO +1.9%, ALT +0.53%, BTC -0.03%)\nRegime: bull grind | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent]  13/20 recent trades lost (30% WR). 48h: 14 hard_max_loss exits\n            (avg -$0.099, 0% WR) vs 9 trail exits (avg +$0.116, 100% WR).\n            Chop entries are killing us \u2014 trail family is how we win.\n\n\ud83d\udd34 [urgent]  oversold-bounce+ is 0-for-5 in 48h. All losers RSI<45,\n            all hard_max_loss. This signal buys weakness in a grind-up\n            regime. The bounce doesn't come.\n\n\ud83d\udfe1 [warning] ALT RSI 73.68 \u2014 near the >75 overbought cliff where 48h\n            data shows 0% WR. Stop is locked at 0.008005 (above entry).\n            Let it ride but watch for exhaustion.\n\n\ud83d\udfe1 [warning] All 3 trades long. BTC ABOVE EMA300 (317 min) supports this,\n            but 4h regime says SHORT_BIAS. Tripwire: BTC below 82635\n            (EMA300) = all longs vulnerable.\n\n\ud83d\udfe2 [info]    LDO stop already at 0.4104 (above entry at 0.40645).\n            Profit locked. Trail will handle the rest.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe 48h RSI band data is unambiguous: LONG at RSI 55-75 is the ONLY\nwinning zone (15 trades, 73% WR, +$1.00). Everything outside it bleeds.\nRSI <45 longs lost 75% of the time. RSI >75 longs lost 100%.\n\nThe exit data tells the same story: every trail exit won, every\nhard_max_loss exit lost. 52/56 hard_max_loss trades never reached\n+0.40% for trail to arm \u2014 they entered during chop and had no chance.\n\nCurrent open trades are well-positioned: LDO RSI 56.86 (sweet spot),\nBTC RSI 66.15 (sweet spot), ALT RSI 73.68 (near ceiling \u2014 watch it).\nAll stops are placed. No action needed on existing positions.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. AI Trader pick: STX LONG conf=72 (precheck PASS, ATR 4.46%,\n   regime conf 95, +7.14% over 16 candles). Written to state file.\n2. Let LDO and ALT ride \u2014 stops are locked, trail will manage.\n3. Watch BTC 82635 (EMA300) as the long-alignment tripwire.\n4. oversold-bounce+ needs attention from the brain auditor \u2014\n   0-for-5 in this regime is not noise, it's a broken signal.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
