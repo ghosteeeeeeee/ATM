@@ -4217,5 +4217,15 @@
     "category": "entry quality",
     "status": "monitor_14d_vs_30d_conflict",
     "risk": "high if shipped"
+  },
+  {
+    "date": "2026-10-13T10:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "Trail-arm timeout backtest for volume-breakout-long+ (90m window)",
+    "rationale": "8T -$1.01 hard_max_loss 7d; 5/8 never armed trail (MFE<0.1%). Same stall-death pattern trail-arm pre-empts in pump-chain/bb-squeeze. CRV giveback-after-arm is separate trail-mechanics issue.",
+    "expected_impact": "Pre-empt ~5/8 volume-breakout HML per 7d ≈ +$0.60/7d if backtest confirms",
+    "category": "exit structure",
+    "status": "suggested — delegate self_learner backtest",
+    "risk": "low"
   }
 ]
