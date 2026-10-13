@@ -4611,3 +4611,11 @@ BY: auto_1hr
 
 [2026-10-13 13:14] auto_1hr: NO CONFIG CHANGE — 7T last hour 2W −$0.26 (ICP r2v2-long9 trail +$0.12, YGG bb-bounce trail +$0.02; BLUR/DOT pump-chain- hard_max_loss, CHIP/ADA pump-chain- atr_sl_hit, CFX ai-trader- hard_max_loss) | 3 open (BTC LONG, FIL/CHIP pump-chain- SHORTs) | 24h 44T 12W −$0.80 (27.3%) | kill: pump-chain- met 3+T 0W rule (4T 0W) but held — 24h 9T 4W +$0.10, single-direction regime loss, trail-arm soak would be invalidated | hard_max_loss 45.5% (hold soak) | atr_sl_hit 15.9% (tpsl stable) | overtrade 7/hr | streak 2-neg calendar then 13h +$0.02 | live_trading=true, kill JSON=true
 BY: auto_1hr
+
+- [2026-10-13 13:39 UTC] brain_auditor: NO CONFIG CHANGE — audit (watchdog portfolio_health=CRITICAL, losing streak 13/20)
+  DB-verified: 46T -$1.08 28.3%WR (24h) | 156T +$1.06 37.8%WR (7d) | hard_max_loss 116T -$13.74 30d #1 bleed.
+  LAST-RUN IMPACT: RSI_MAX=70 WORKING (0 pump-chain+ overbought entries since 05:39) | doji/oversold kills CLEAN | trail_arm_timeout 2 fires net $0.
+  CRITICAL DESIGN GAP: trail_arm_timeout 45m misses 74% of hard_max_loss (20/27 die <45m, median 12-26m). Lowering to 30m = NET NEGATIVE (kills 7 winners +$1.12 to save 5 losers -$0.69). The instant-death cohort needs ENTRY filters, not exit timeouts.
+  CREATIVE: (1) 5m momentum gate for chop-entry signals — block trades with |price_change_5m| < 0.15% at entry (needs backtest) (2) hmacd_mtf-+ 14d watch (10T -$0.47, n<20 threshold).
+  0 CHANGES APPLIED — 4 fixes in soak, do not stack.
+  BY: brain_auditor

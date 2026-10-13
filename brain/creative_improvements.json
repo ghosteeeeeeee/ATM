@@ -4238,5 +4238,23 @@
     "risk": "medium",
     "verification": "Backtest needed: would velocity>0.1% block trail family winners? If >20% winners blocked, reject.",
     "sample_size": "56 HML 7d — sufficient for backtest"
+  },
+  {
+    "date": "2026-10-13T13:39:41.897108+00:00",
+    "idea": "ENTRY-SIDE MOMENTUM GATE for chop-entry signals",
+    "rationale": "trail_arm_timeout addresses EXIT side but 74% of hard_max_loss die before timeout fires (median 12-26m). These are chop entries with zero momentum from the start. A 5m price-change gate (e.g., require |price_change_5m| > 0.15% at entry) would block instant-death trades without affecting trend entries. Trending coins move; chop coins sit still.",
+    "expected_impact": "Block ~40% of hard_max_loss (the <15m instant-death cohort) while preserving trail winners (which show momentum from entry)",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest with MFE at entry",
+    "risk": "medium — must verify trail winners all have >0.15% 5m move at entry"
+  },
+  {
+    "date": "2026-10-13T13:39:41.897111+00:00",
+    "idea": "hmacd_mtf-+ 14d watch — 10T -$0.47 both directions negative",
+    "rationale": "LONG 6T 33.3% -$0.28, SHORT 4T 25% -$0.19. Below 20T threshold — insufficient data for kill. But consistent bleed across both directions suggests signal quality issue, not regime.",
+    "expected_impact": "If 14d reaches 15T with WR <40%, candidate for kill",
+    "category": "kill candidate",
+    "status": "monitor — n=10 < 20 threshold",
+    "risk": "low"
   }
 ]

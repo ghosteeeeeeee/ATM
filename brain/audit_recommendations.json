@@ -1,95 +1,122 @@
 {
-  "timestamp": "2026-10-13T12:41:14.365123+00:00",
+  "timestamp": "2026-10-13T13:39:41.897088+00:00",
   "session_brain_stats": {
     "queries_run": 1,
-    "top_insights": [
-      "pump-chain-short: add filters to improve winrate, backtest original trades",
-      "spike_exhaustion_short: re-enable and monitor 48h",
-      "bb_bounce short: re-enable and monitor 48h",
-      "winrate fluctuates up to 65% — keep it high, don't let it drop to 50%"
-    ]
+    "top_insight": "hard_max_loss = chop entries. 52/56 never reached trail arm. Trail family 86.5% WR is the edge."
   },
   "trade_summary_24h": {
-    "total_trades": 37,
-    "wins": 11,
-    "win_rate": 29.7,
-    "pnl": -0.64,
-    "open_trades": 5,
-    "regime": "SHORT_BIAS / STRONG_DOWN",
-    "volatility": "LOW",
-    "btc_below_ema300_hours": 6.7
+    "total_trades": 46,
+    "pnl": -1.08,
+    "win_rate": 28.3,
+    "health": "CRITICAL",
+    "worst_exit": "hard_max_loss 21T 0%WR -$1.81",
+    "best_exit": "atr_trail_hit 5T 100%WR +$1.24",
+    "long_pnl": "see DB",
+    "short_pnl": "see DB"
   },
-  "drift_findings": [],
-  "recurring_problems": [
+  "drift_findings": [
     {
-      "problem": "hard_max_loss is #1 bleed — 56T 0%WR -$5.44 in 7d",
-      "detail": "94.6% of hard_max_loss trades never reached +0.40% trail arm threshold. They enter dead during chop. Median RSI 61.4 vs trail family 52.5 — overbought chase pattern.",
-      "daily_trend": "Oct 1-13: bleeding every day. Oct 13 worst at 16T -$1.27. NOT improving.",
-      "root_cause": "Entry quality — signals fire on local bounce structure while higher-timeframe trend is down. No momentum from start.",
-      "status": "MONITOR — 4 fixes in soak (RSI_MAX=70, trail-arm timeout, midband, oversold kill)"
+      "finding": "RSI_MAX=70 soak CONFIRMED WORKING",
+      "detail": "0 pump-chain+ LONG trades since 05:39 deploy. No overbought chase entries. Filter doing its job.",
+      "severity": "info",
+      "action": "keep, continue soak"
     },
     {
-      "problem": "Open BTC LONG (continuum-osc+) is wrong-side of STRONG_DOWN",
-      "detail": "Entry 83477, RSI 66.77, NORMAL regime. BTC below EMA300 for 6.7h, trend STRONG_DOWN, 15m+4h both SHORT_BIAS. Same signature as 25/25 hard_max_loss LONGs in 48h.",
-      "signal_stats": "continuum-osc+ all-time: 7T 57.1% WR -$0.11 (tiny sample)",
-      "recommendation": "Monitor — n=1 open, n=7 all-time. Not enough for config change. Watchdog says close or tighten stop to 83200.",
-      "status": "FLAGGED — CEO/watchdog decision"
+      "finding": "trail_arm_timeout 45m misses 74% of hard_max_loss",
+      "detail": "20/27 pump-chain hard_max_loss trades (7d) die <45m. Median hold: pump-chain+ 26m, pump-chain- 12m. Timeout fires AFTER hard_max_loss already killed the trade. Only 7/27 (26%) held >=45m where timeout could fire.",
+      "severity": "HIGH — design gap, not fixable by lowering timeout",
+      "action": "documented. Lowering to 30m would be NET NEGATIVE: kills 7 winners (+$1.12) to save 5 losers (-$0.69). The 20 trades dying <30m need ENTRY filters, not exit timeouts."
     },
     {
-      "problem": "4 correlated alt shorts (CHIP/CFX/ADA/DOT) = one basket",
-      "detail": "Opened within 40 min. Correctly sided (SHORT in SHORT_BIAS) but correlated. One BTC bounce hits all four stops.",
-      "recommendation": "Watch BTC 83534 (EMA300). If reclaimed, trim weakest first (CFX).",
-      "status": "MONITOR — position management, not config"
+      "finding": "SHORT_RSI_HARD_FLOOR lowered 45→35 today (CEO recalibration 84a38707)",
+      "detail": "pump-chain- specific floor=40 (SHORT_RSI_HARD_FLOOR_PUMP_CHAIN). ADA at 38.89 fired before the change landed. Post-change: monitor RSI 35-45 SHORT cohort.",
+      "severity": "info",
+      "action": "monitor 7d. Revert trigger: 10+ RSI 35-45 SHORTs lose >$1."
+    },
+    {
+      "finding": "doji-bottom-long and oversold-bounce+ killed today (auto_1hr)",
+      "detail": "Both 0%WR knife-catching LONGs in bear regime. Kills clean — 0 new entries post-kill.",
+      "severity": "info",
+      "action": "confirmed correct"
     }
   ],
-  "missing_implementations": [],
+  "recurring_problems": [
+    {
+      "problem": "hard_max_loss is #1 bleed — 116T 30d -$13.74 0%WR",
+      "detail": "Chop entries that never reach trail arm. Median hold 23m. Dominates ALL signals: pump-chain+ 13T, volume-breakout 8T, pump-chain- 10T. Root cause: signals fire on isolated indicators without trend confirmation.",
+      "status": "ONGOING — trail_arm_timeout addresses only 26% of cohort"
+    },
+    {
+      "problem": "volume-breakout-long+ post HIGH-block: 4T 0%WR -$0.28 EXTREME",
+      "detail": "HIGH block landed Oct 10. Since then only EXTREME fires, all hard_max_loss. 30d EXTREME was 68.4% +$3.56. Small n=4 — may be variance. Watch.",
+      "status": "MONITOR — n=4 insufficient for action"
+    }
+  ],
+  "missing_implementations": [
+    {
+      "idea": "Q4 correlated alt-LONG cap in SHORT_BIAS regime",
+      "detail": "Backtest still pending since Oct 6. Would have prevented BTC LONG fighting 4h SHORT_BIAS today.",
+      "priority": "MED"
+    }
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-13T12:41:14.365142+00:00",
-      "idea": "Momentum pre-entry gate: block LONG if 5m price velocity < 0.1% (no upward momentum)",
-      "rationale": "94.6% of hard_max_loss trades never reached +0.40% trail arm. They enter dead. RSI filters haven't fixed this because RSI can be mid-band while price is flat/declining. A velocity gate would block entries with no momentum — the exact signature of chop trades.",
-      "expected_impact": "Cut hard_max_loss by 30-50% (block dead entries before they become losers)",
+      "date": "2026-10-13T13:39:41.897108+00:00",
+      "idea": "ENTRY-SIDE MOMENTUM GATE for chop-entry signals",
+      "rationale": "trail_arm_timeout addresses EXIT side but 74% of hard_max_loss die before timeout fires (median 12-26m). These are chop entries with zero momentum from the start. A 5m price-change gate (e.g., require |price_change_5m| > 0.15% at entry) would block instant-death trades without affecting trend entries. Trending coins move; chop coins sit still.",
+      "expected_impact": "Block ~40% of hard_max_loss (the <15m instant-death cohort) while preserving trail winners (which show momentum from entry)",
       "category": "entry sniper",
-      "status": "suggested",
-      "risk": "medium",
-      "verification_needed": "Backtest: would velocity>0.1% have blocked trail family winners? If >20% of winners blocked, reject.",
-      "sample_size": "56 hard_max_loss trades 7d — sufficient for backtest"
+      "status": "suggested — needs backtest with MFE at entry",
+      "risk": "medium — must verify trail winners all have >0.15% 5m move at entry"
+    },
+    {
+      "date": "2026-10-13T13:39:41.897111+00:00",
+      "idea": "hmacd_mtf-+ 14d watch — 10T -$0.47 both directions negative",
+      "rationale": "LONG 6T 33.3% -$0.28, SHORT 4T 25% -$0.19. Below 20T threshold — insufficient data for kill. But consistent bleed across both directions suggests signal quality issue, not regime.",
+      "expected_impact": "If 14d reaches 15T with WR <40%, candidate for kill",
+      "category": "kill candidate",
+      "status": "monitor — n=10 < 20 threshold",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "PUMP_CHAIN_LONG_RSI_MAX 75→70 (deployed 05:39)",
-      "impact": "3T since deploy, 33.3% WR +$0.54. Small sample, positive PnL. Unvalidated but not hurting.",
-      "verdict": "HOLD — needs n>=10 to judge"
+      "change": "RSI_MAX=70 on pump-chain+ (deployed 05:39 today)",
+      "expected": "Block overbought chase entries",
+      "actual": "0 pump-chain+ LONG trades since deploy. Working as intended. No overbought entries fired.",
+      "verdict": "WORKING — continue soak"
     },
     {
-      "change": "PUMP_CHAIN_TRAIL_ARM_TIMEOUT 45m (deployed Oct 12)",
-      "impact": "2 fires, net $0.00 (+$0.098 and -$0.023). Working as designed — cutting stalled trades.",
-      "verdict": "HOLD — needs soak to Oct 15"
+      "change": "doji-bottom-long kill (auto_1hr 11:18)",
+      "expected": "Stop 0%WR knife-catching",
+      "actual": "0 new entries post-kill. BANANA pre-kill position continued to close normally.",
+      "verdict": "CLEAN"
     },
     {
-      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT 60m (deployed Oct 12)",
-      "impact": "0 fires so far. CEO ratification still pending.",
-      "verdict": "ESCALATE — CEO must ratify/revert"
+      "change": "oversold-bounce+ kill (auto_1hr earlier today)",
+      "expected": "Stop knife-catching LONG",
+      "actual": "0 new entries. 3 pre-kill losses were all hard_max_loss.",
+      "verdict": "CLEAN"
     },
     {
-      "change": "oversold-bounce+ KILLED (auto_1hr 01:15)",
-      "impact": "0 new trades since kill. Clean.",
-      "verdict": "WORKING"
+      "change": "SHORT_RSI_HARD_FLOOR 45→35 (CEO recalibration 04:19)",
+      "expected": "Allow SHORTs in confirmed bear dumps at lower RSI",
+      "actual": "Too early to evaluate. pump-chain- floor=40 still active.",
+      "verdict": "SOAKING"
     },
     {
-      "change": "doji-bottom-long KILLED (auto_1hr 11:18)",
-      "impact": "0 new trades since kill. Clean.",
-      "verdict": "WORKING"
+      "change": "trail_arm_timeout pump-chain 45m / bb-squeeze 60m",
+      "expected": "Preempt hard_max_loss on stalled trades",
+      "actual": "2 fires (HYPER +$0.02, KAS -$0.02) net $0. Design gap: 74% of hard_max_loss die <45m, timeout never fires on them.",
+      "verdict": "PARTIAL — addresses 26% of cohort only. Not reversible to improvement; the 45m+ cohort it does catch is net positive."
     }
   ],
   "next_actions": [
-    "CEO: ratify/revert 2 trail-arm enables (bb-squeeze + pump-chain)",
-    "Monitor open BTC LONG — if hits stop 82552, that's -$0.05. Watchdog recommends stop 83200.",
-    "Monitor BTC 83534 (EMA300) — if reclaimed, short thesis weakens",
-    "Backtest momentum pre-entry gate (velocity > 0.1%) on 7d hard_max_loss vs trail family",
-    "Continue soak on 4 fixes — do not stack new changes until n>=10 each",
-    "Oct 15: 7d WR >=50% checkpoint; bb-squeeze soak review; pump-chain 45m soak review"
+    "Continue trail_arm_timeout soak — do NOT lower timeout (data shows 30m would be net negative)",
+    "Monitor volume-breakout-long+ EXTREME: if n reaches 8+ with 0%WR, investigate entry quality",
+    "Monitor hmacd_mtf-+ toward 15T threshold for kill decision",
+    "Q4 correlated alt-LONG cap backtest still pending — escalate to self_learner",
+    "Creative: 5m momentum gate backtest for chop-entry signals (needs MFE-at-entry data)"
   ]
 }
