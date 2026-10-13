@@ -706,3 +706,52 @@
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-13 16:52 UTC
+- **WARN** (1): Disk usage at 85% (/dev/vda2 95G/118G, 18G free). No uncompressed logs >7d to gzip; bulk is candles.db (2.9G) + coin_tracker.db (3.5G). Manual pruning/VACUUM needed if it crosses 90%.
+- **WARN** (4): Failed services — hermes-signal-reporter (timeout 11:29, retries 17:09), hermes-bug-hunter, hermes-daily-orchestrator, hermes-upgrade-implementer. Auxiliary only; core pipeline/timers unaffected.
+- Core pipeline, price-collector, 1m-candle timers: all active, last runs clean (rc=0). No auto-fixes required.
+
+## Error Alerts — 2026-10-13 17:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-13 17:51 UTC
+- **WARN** (1x): Disk usage at 85% (17G free of 118G). Largest consumers: coin_tracker.db (3.3G), candles.db (2.8G), session_brain.db (1.3G). No safe auto-cleanup available (no stale logs >7d uncompressed).
+- **INFO**: Win rate today 26.5% (49 closed, -0.37 USDT net) — performance note, not a system fault.
+
+## Error Alerts — 2026-10-13 18:01 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+2026-10-13 18:54
+
+## Error Alerts — 2026-10-13 18:52 UTC
+- **WARN** (1x): `hermes-bug-hunter.service` exited status=1 — by design after finding 7 critical code-quality issues (sqlite leaks 48 files, sql injection patterns 35 files, bare excepts 132, connection leaks 52, non-atomic JSON 78, hardcoded passwords 4). Scanner working as intended; timer retries ~2026-10-15 02:50 UTC. Not trading-path.
+- **WARN** (1x): `hermes-upgrade-implementer.service` timed out (killed at systemd TimeoutStartSec ~2min while scanning file list). Non-critical; timer retries 2026-10-14 06:02 UTC. Suggested fix: raise TimeoutStartSec in unit file.
+- **WARN** (1x): Disk at 83% (118G total, 20G free) — approaching 85% threshold. pipeline.log 66M, 15m_regime.log 41M. No auto-fix applied (logs actively written; logrotate owns rotation).
+- No CRITICAL issues. Trading pipeline, position manager, price collector, 1m candles, HL sync guardian all healthy. Timers all firing.
+
+## Error Alerts — 2026-10-13 19:50 UTC
+- **[WARN]** (3x): `APT SHORT rejected by brain.py HARD_FLOOR (RSI 23.02 < 35)` — retry loop 19:45–19:47, signal IDs 1674797/1674801/1674804
+- **AUTO-FIX**: none needed — hotset cooldown (BUG-049, 2-fails→1h) engaged at count=3, no further retries after 19:47. Self-resolved.
+- **[INFO]**: hotset.json empty since 19:48 — no signals surviving compaction safety filters. No new entries until multi-source signals appear. 3/6 slots open.
+
+## Error Alerts — 2026-10-13 20:01 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+
+## Error Alerts — 2026-10-13 20:49 UTC
+- **WARN** (8x): `atr_sl_hit` with <0.01% PnL — phantom trades detected in signal_outcomes
+- **WARN**: Disk at 83% (threshold 85%) — monitor
+- No auto-fixes needed. All timers and services active. Pipeline completed successfully.
+
+## Error Alerts — 2026-10-13 21:56 UTC
+- **WARN** (5x): `CAKE SHORT` brain.py rejection loop — SHORT RSI 22.22 < HARD_FLOOR 35, retried 5x in 4min (21:36-21:39). Hotset failures recorded (count=5) but `_check_hotset_cooldown` never called in main exec loop — only in read-only `_run_hot_set()`. Same gap pattern as BTC-CRASH (BANANA 09-08).
+- **ROOT CAUSE**: RSI mismatch — brain.py uses `signal_rsi_14` from detection-time metadata (22.22), signal_compactor/decider_run compute live RSI (46-50) which passes HARD_FLOOR 35. Compactor keeps re-approving; brain.py keeps rejecting.
+- **AUTO-FIX**: Added hotset failure cooldown check to main exec loop (decider_run.py:4012-4021). 2+ same-direction failures in 1hr → block for 1hr with SKIPPED mark. Matches BUG-049 intent.
+- **INFO**: Disk 83% (threshold 85%). Prices fresh (1m candles <1min, 100 tokens). All 3 timers active. Macro gate REDUCE (wr=15%).

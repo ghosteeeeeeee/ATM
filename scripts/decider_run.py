@@ -4009,6 +4009,19 @@ def run(dry_run=False):
             skipped += 1
             continue
 
+        # Back-to-back execution-failure cooldown (FIX, 2026-10-13).
+        # _run_hot_set() is READ-ONLY and its cooldown check is cosmetic —
+        # same gap as BTC-CRASH (BANANA 09-08). BUG-049 records failures in
+        # the trade-failed branch so this check can engage; without it here,
+        # brain.py RSI rejections retry every cycle (CAKE SHORT: 5 fails/4min).
+        _hf_blocked, _hf_reason = _check_hotset_cooldown(token, direction, failures)
+        if _hf_blocked:
+            log(f'SKIP: {token} {direction} in hotset failure cooldown — {_hf_reason}')
+            if sig_id:
+                mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
+            skipped += 1
+            continue
+
         # ── Wrong-Side Learning ───────────────────────────────────
         # Softened 2026-08-03: penalty -15→-10, skip threshold 55→50.
         # Was blocking too many hot-set candidates. MIN_EXEC_CONFIDENCE=50
