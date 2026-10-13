@@ -9054,3 +9054,26 @@ Final set: []
 - 24h rolling window shed older wins: 22T 8W −$0.83 → 17T 4W −$1.11 (WR 36.4%→23.5%) — deterioration mostly window rollover + BABY loss, not new signal bugs
 - 24h loss sources: pump-chain+ (−$0.59), oversold-bounce+ (−$0.33, now killed), ai-trader+ (−$0.12), hmacd_mtf-- (−$0.12) — none meet kill criteria this hour
 - hard_max_loss >40% of closes for 4th straight hour — brain_auditor SL-width review still pending
+
+## [2026-10-13 04:13] Hourly Analysis
+
+**Trades:** 1 closed last hour — NEAR ai-trader+ LONG profit-monster-trail $0.00 (+0.22% breakeven)
+**PnL:** $0.00 last hour | 24h: 18T 4W −$1.11 (22.2%) | 3 open: LDO pump-chain+ +$0.42, ALT pump-chain+ +$0.11, BTC continuum-trend+ $0.00 (combined unrealized +$0.53)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto (0% WR 3+ trades last hour): not met — only 1T last hour, and it was a breakeven win (+0.22%)
+- pump-chain+ 6T 1W −$0.59 24h worst signal — 0 closes last hour, 2 currently open and in profit; kill rule not met
+- hard_max_loss 9/18 ≈ 50% of 24h closes −$1.02 — hold brain_auditor (SL width lever, unchanged)
+- atr_sl_hit 2/18 ≈ 11.1% — under 40%, tpsl_utils deployed
+- Overtrade: 1/hr — well under 20
+- Streak: 03h bucket $0.00 (breakeven, breaks negative chain from 02h −$0.36); not 3 consecutive negative; regime check not triggered
+- live_trading=true (constants + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 22.2% (4/18) vs ≥50% Oct 15 goal — window still shedding older wins
+- hard_max_loss >40% of closes for 5th straight hour — brain_auditor SL-width review still pending
+- 3 open pump-chain+/continuum positions in profit — watch whether they confirm or give back
