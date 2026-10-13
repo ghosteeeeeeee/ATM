@@ -4588,3 +4588,14 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 07:15] auto_1hr: NO CONFIG CHANGE — 2T last hour (PONS ai-trader+ atr_sl_hit −$0.05, STX r2v2-long3 hard_max_loss $0.00) | 4 open all in profit | 24h 20T 4W −$1.14 (20.0%) | kill: none qualifying (2T last hour, needs 3+ 0% WR) | hard_max_loss 50% (hold brain_auditor) | atr_sl_hit 15% (tpsl stable) | overtrade 2/hr | streak not 3-neg (06h $0.00 breaks) | live_trading=true, kill JSON=true
 BY: auto_1hr
+
+[2026-10-13 07:38 UTC] brain_auditor: NO CONFIG CHANGE — audit (watchdog portfolio_health=CRITICAL)
+  DB-verified: 20T -$1.23 15.0%WR (24h) | 39T -$0.27 35.9%WR (48h) | 128T +$0.87 38.3%WR (7d)
+  LONG 7d +$0.66/107T 40.2%, SHORT 7d +$0.21/21T 28.6%. Open 4 all LONG +$1.05 unrealized.
+  LOSING AUTOPSY: (1) pump-chain+ overbought chase (GRASS/BABY/KAS RSI 71-75) — RSI_MAX=70 deployed 05:39, 0 trades since, unvalidated. (2) oversold-bounce+ knife (APT/NEAR/PUMP RSI 37-44) — KILLED by auto_1hr today, correct. (3) hard_max_loss 7d 46T -$4.96 still #1 — trail-arm 45m fired 2x (net $0), needs soak.
+  24h LONG bands: <45 knife 0%WR | 55-70 mid 40%WR (least bad) | 70+ chase 16.7%WR. Same extremes pattern.
+  LAST-RUN IMPACT: RSI_MAX=70 n=0 unvalidated | trail-arm pump-chain 2 fires net $0 | bb-squeeze trail-arm 0 fires, CEO ratify pending | oversold-bounce kill clean.
+  REJECTED (out-of-sample): volume-breakout RSI_CEILING tighten — 14d 70+ = -$0.52 but 30d 70+ = +$0.71, pattern reverses.
+  CREATIVE: (1) correlated alt-LONG cap BTC 4h SHORT_BIAS (Q4 backtest still pending) (2) pump-chain 45-60 conf boost at n>=20 (3) volume-breakout 70+ band monitor.
+  0 CHANGES APPLIED — 4 fixes in soak, do not stack.
+  BY: brain_auditor

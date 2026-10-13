@@ -4190,5 +4190,32 @@
     "status": "suggested",
     "risk": "low",
     "verification_needed": "Backtest: would the filter have blocked the 14 EXTREME chop exits without blocking the 18 trail-reached trades? Need candle data pre-entry."
+  },
+  {
+    "date": "2026-10-13T07:38:02Z",
+    "idea": "Correlated alt-LONG cap when BTC 4h SHORT_BIAS (max 2 alt-LONGs)",
+    "rationale": "Watchdog steer-003: 4/4 open trades LONG, one BTC dump hits all. Q4 portfolio-cap backtest pending since Oct 6. Cluster mechanism recurred (Oct 8: 4 pump-chain LONGs closed together -$0.48).",
+    "expected_impact": "Reduce correlated drawdown events; protect 7d PnL floor",
+    "category": "risk / portfolio",
+    "status": "suggested_backtest_first",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-13T07:38:02Z",
+    "idea": "pump-chain+ meta_rsi 45-60 confidence boost (+10pt) once n>=20",
+    "rationale": "14d fine bands: 45-60 = 6T 66.7% +$1.64 BEST. Mid-band entries are the edge (LDO open +3.7% at RSI 56.9).",
+    "expected_impact": "+$0.30-0.60/14d if holds at n>=20",
+    "category": "entry sniper",
+    "status": "monitor_until_n20",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-13T07:38:02Z",
+    "idea": "volume-breakout-long+ meta_rsi 70+ band monitor — do NOT tighten yet",
+    "rationale": "14d 70+ = 5T -$0.52 but 30d 70+ = 14T +$0.71. Fails out-of-sample. RSI_CEILING=85 stays.",
+    "expected_impact": "n/a monitoring only",
+    "category": "entry quality",
+    "status": "monitor_14d_vs_30d_conflict",
+    "risk": "high if shipped"
   }
 ]

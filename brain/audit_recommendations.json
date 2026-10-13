@@ -1,107 +1,138 @@
 {
-  "timestamp": "2026-10-13T05:40:18Z",
+  "timestamp": "2026-10-13T07:38:02Z",
+  "agent": "brain_auditor",
+  "run_type": "audit_no_config_change",
   "session_brain_stats": {
-    "queries_run": 1,
-    "top_insight": "Session brain confirms known RSI-ceiling bypass bug (entries at RSI 97-98 despite ceiling). Partially addressed by >= boundary fix 2026-10-13 02:46."
+    "queries_run": 3,
+    "top_insights": [
+      "Wrong-side trades in flat BTC discussed repeatedly (RR+k, chop v2, trend following sessions)",
+      "Pump-chain short WR filters and RSI floors are recurring design topics",
+      "Redundant filter/gate collisions (GRASS confluence+chop override+RR boost) flagged in sessions"
+    ]
   },
   "trade_summary_24h": {
-    "trades": 17,
-    "pnl": -1.19,
-    "win_rate": 31.6,
-    "open": 3,
-    "open_direction": "all LONG (ETH, BTC, LDO)",
-    "regime_15m": "LONG_BIAS",
-    "regime_4h": "SHORT_BIAS",
-    "volatility": "LOW",
-    "watchdog_health": "critical",
-    "losing_streak": "13/20 recent trades lost (30% WR)"
+    "trades": 20,
+    "pnl": -1.23,
+    "wr": 15.0,
+    "trades_48h": 39,
+    "pnl_48h": -0.27,
+    "wr_48h": 35.9,
+    "trades_7d": 128,
+    "pnl_7d": 0.87,
+    "wr_7d": 38.3,
+    "long_7d": "107T +$0.66 40.2%WR",
+    "short_7d": "21T +$0.21 28.6%WR",
+    "open": "4 all LONG, +$1.05 unrealized (LDO +3.7%, ETH +0.83%, BTC +0.25%, CRV -0.11%)",
+    "regime": "btc_15m LONG_BIAS, btc_4h SHORT_BIAS, volatility NORMAL, wyckoff MARKUP, trend_quality STRONG_UP"
   },
-  "losing_trade_autopsy": [
-    {
-      "cluster": "pump-chain+ LONG 70+ RSI entries",
-      "trades": "BABY@75.0 -$0.24, CFX@74.5 -$0.10, GRASS@72.8 -$0.10, GRASS@71.2 -$0.18, KAS@71.6 -$0.02, FIL@68.7 -$0.12, FOGO@73.3 -$0.11, FOGO@70.0 -$0.06",
-      "root_cause": "Late-stage pump chase — RSI 70-75 = exhausted momentum. Code comment already flagged 'RSI>=70 = 17T 23.5%WR dead zone'.",
-      "entry_check": "All EXTREME regime (correct habitat), meta RSI 68-75. Entered after pump already ran — no fresh momentum for trail to arm.",
-      "recommended_change": "PUMP_CHAIN_LONG_RSI_MAX 75→70 (APPLIED)",
-      "impact_on_winners": "14d: blocks 3/17 winners (17.6%, +$0.28). 7d: blocks 12T losers (-$0.76). Net +$0.48/7d.",
+  "losing_trade_autopsy": {
+    "cluster_1_overbought_pump_chain_chase": {
+      "trades": "GRASS RSI72.8 atr_sl -$0.10, BABY RSI75.0 hard_max_loss -$0.24, KAS RSI71.6 trail_arm_timeout -$0.02 (all pump-chain+ LONG)",
+      "root_cause": "Entered after the pump already happened — bought someone else's exit liquidity. meta_rsi 71-75 = dead zone.",
+      "fix_status": "PUMP_CHAIN_LONG_RSI_MAX lowered 75->70 by brain_auditor 2026-10-13 05:39 UTC. 0 trades since deploy — unvalidated, needs 48h soak.",
+      "impact_on_winners": "14d: blocks 10T 70-75 (-$0.36) + 2T 75+ (-$0.40); keeps 65-70 (7T 71.4% +$0.15) and 45-60 (6T 66.7% +$1.64). Net positive.",
       "confidence": "HIGH"
     },
-    {
-      "cluster": "oversold-bounce+ LONG (already killed)",
-      "trades": "PUMP -$0.10, APT -$0.15, NEAR -$0.08 (all hard_max_loss, RSI<45)",
-      "root_cause": "Buying weakness in grind-up/distribution regime. Watchdog: '0-for-5 in this regime is not noise, it's a broken signal.'",
-      "status": "KILLED by auto_1hr 2026-10-13 01:15 (OVERSOLD_BOUNCE_ENABLED=False)",
+    "cluster_2_oversold_knife_catch": {
+      "trades": "APT RSI41.7, NEAR RSI37.3, PUMP RSI44.2 (oversold-bounce+ LONG) — all hard_max_loss, all EXTREME",
+      "root_cause": "Bought falling knives believing in a bounce that never armed the trail (+0.40%). Same BANANA reverse lesson: extremes = wrong side.",
+      "fix_status": "OVERSOLD_BOUNCE_ENABLED=False killed by auto_1hr 2026-10-13. Last trade opened 00:42 before kill. 0 post-kill trades.",
+      "impact_on_winners": "14d signal total was 9T -$0.82 — kill removes the bleed entirely. Winners were small scratches (+$0.01-0.04).",
       "confidence": "HIGH"
+    },
+    "cluster_3_chop_entries_hard_max_loss": {
+      "trades": "7d hard_max_loss 46T -$4.96 0%WR avg lev 4.2 — #1 bleed. 14d 102T -$12.70.",
+      "root_cause": "Chop entries never reach +0.40% trail activation. 52/56 historically never armed. Entry quality, not exit management.",
+      "fix_status": "PUMP_CHAIN_TRAIL_ARM_TIMEOUT 45m live since Oct 12 18:16 — 2 fires (HYPER +$0.02, KAS -$0.02). BB_SQUEEZE 60m live, 0 fires. Both awaiting soak + CEO ratification of the bb-squeeze enable.",
+      "impact_on_winners": "Trail-arm pre-empts stalls before hard_max_loss. 2/2 fires net $0. Needs n>=10 to validate.",
+      "confidence": "MEDIUM"
+    },
+    "band_check_24h_long": {
+      "rsi_under_45": "4T 0%WR -$0.38 (knife)",
+      "rsi_45_55": "3T 0%WR -$0.15",
+      "rsi_55_70_mid": "5T 40%WR -$0.11 (least bad)",
+      "rsi_70_plus": "6T 16.7%WR -$0.47 (chase)"
     }
-  ],
-  "drift_findings": [
-    {
-      "finding": "PUMP_CHAIN_LONG_RSI_MAX was 75 but code comment said 70 is dead zone",
-      "status": "FIXED this run — lowered to 70",
-      "evidence": "14d 70-75=10T 30%WR -$0.36, 30d 70-75=16T 31.3%WR -$0.01. Bull override to 85 preserved."
-    }
-  ],
+  },
+  "drift_findings": [],
   "recurring_problems": [
-    {
-      "problem": "hard_max_loss = chop entries (0% WR, -$5.01/7d)",
-      "pattern": "Trail exits win 84-100%, hard_max_loss always loses. 52/56 never reached +0.40% trail arm.",
-      "status": "Structural — signals fire on detection, not confirmation. RSI ceiling narrows the band; trail-arm timeout catches stalls. Root fix requires momentum-confirmation entry (see creative improvement)."
-    },
-    {
-      "problem": "pump-chain+ family dominates hard_max_loss bleed",
-      "data": "7d: pump-chain+ 11T -$1.23, pump-chain- 7T -$0.88, v5/v6 3T -$0.31",
-      "status": "RSI ceiling now 70. NORMAL/HIGH already dampened 0.5. EXTREME is habitat. Monitor."
-    }
+    "hard_max_loss chop-entry bleed — persistent #1, trail-arm is the vehicle, needs more soak data",
+    "Overbought LONG chase (meta_rsi 70+) — now gated at pump-chain 70, global ceiling 75, volume-breakout 85 (see rejected below)",
+    "Oversold LONG knife-catch — oversold-bounce killed; pump-chain RSI_MIN=35 already live"
   ],
   "missing_implementations": [],
   "creative_improvements": [
     {
-      "idea": "Momentum-freshness pre-entry gate for pump-chain+ LONG",
-      "detail": "Skip if coin moved <0.15% in last 5 candles. 14d EXTREME: 14 chop exits -$1.81 vs 18 trail-reached +$3.48. Chop entries have no momentum at entry.",
-      "category": "entry sniper",
-      "status": "suggested"
-    }
-  ],
-  "config_changes_applied": [
+      "date": "2026-10-13T07:38:02Z",
+      "idea": "Correlated alt-LONG cap when BTC 4h SHORT_BIAS (max 2 alt-LONGs)",
+      "rationale": "Watchdog steer-003: 4/4 open trades are LONG. One BTC dump hits all. Q4 portfolio-cap backtest pending since Oct 6 (self_learner). Recurring cluster mechanism (Oct 8 15:02: 4 pump-chain LONGs closed together -$0.48).",
+      "expected_impact": "Reduce correlated drawdown events; protect 7d PnL floor during BTC 4h SHORT_BIAS",
+      "category": "risk / portfolio",
+      "status": "suggested_backtest_first",
+      "risk": "medium — needs backtest, prior ruling said no blind cap",
+      "sample_note": "Not a signal-level pattern; systems-level cluster risk. Backtest required per Oct 6 CEO ruling."
+    },
     {
-      "file": "hermes_constants.py",
-      "change": "PUMP_CHAIN_LONG_RSI_MAX 75→70",
-      "rationale": "70-75 band consistently ~31% WR at 14d and 30d. Confounder clean (same regime, different RSI = different outcome). Net +$0.48/7d.",
-      "protected_flags_verified": true
+      "date": "2026-10-13T07:38:02Z",
+      "idea": "pump-chain+ meta_rsi 45-60 confidence boost (+10pt) once n>=20",
+      "rationale": "14d fine bands: 45-60 = 6T 66.7% +$1.64 BEST. Same band won LDO (+3.7% open, RSI 56.9). Mid-band entries are the edge.",
+      "expected_impact": "+$0.30-0.60/14d if it holds at n>=20",
+      "category": "entry sniper",
+      "status": "monitor_until_n20",
+      "risk": "low — currently n=6, below 20-trade bar"
+    },
+    {
+      "date": "2026-10-13T07:38:02Z",
+      "idea": "volume-breakout-long+ meta_rsi 70+ band monitor (do NOT tighten yet)",
+      "rationale": "14d 70+ = 5T -$0.52 0-40%WR (bleeding) but 30d 70+ = 14T +$0.71 (still positive). Fails out-of-sample check — pattern reverses at 30d window. RSI_CEILING=85 stays.",
+      "expected_impact": "n/a — monitoring only",
+      "category": "entry quality",
+      "status": "monitor_14d_vs_30d_conflict",
+      "risk": "high if shipped — would block 30d-profitable band"
     }
   ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "PUMP_CHAIN_LONG_RSI_MAX boundary >→>= (2026-10-13 02:46)",
-      "status": "Working — BABY@75.0 would now be blocked at boundary",
-      "impact": "1 trade blocked at boundary (BABY -$0.24 saved)"
+      "change": "PUMP_CHAIN_LONG_RSI_MAX 75->70 (2026-10-13 05:39)",
+      "status": "0 trades since deploy — UNVALIDATED, soak 48h",
+      "verdict": "direction correct (14d 70-75 30%WR -$0.36), no data yet"
     },
     {
-      "change": "LONG_MIDBAND_NON_EXTREME_BLOCK (2026-10-11)",
-      "status": "Active — RSI 60-70 non-EXTREME LONGs blocked",
-      "impact": "No non-EXTREME pump-chain+ LONGs in 24h data — filter holding"
+      "change": "PUMP_CHAIN_TRAIL_ARM_TIMEOUT 45m (2026-10-12 18:16)",
+      "status": "2 fires: HYPER +$0.02, KAS -$0.02 — net $0",
+      "verdict": "working as designed, needs n>=10"
     },
     {
-      "change": "LONG_HIGH_OVERBOUGHT_BLOCK (2026-10-11)",
-      "status": "Active — RSI>70 + HIGH regime blocked",
-      "impact": "BANANA@79 HIGH would be blocked. No post-fix HIGH pump-chain+ LONGs observed."
+      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT 60m (2026-10-12 10:48)",
+      "status": "0 fires / ~21h — awaiting cohort",
+      "verdict": "CEO ratification still pending (orchestrator escalation)"
     },
     {
-      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=True (2026-10-12 10:45)",
-      "status": "Soaking — 0 fires in ~20h",
-      "impact": "Too early. Review Oct 15."
+      "change": "oversold-bounce+ KILLED by auto_1hr (2026-10-13)",
+      "status": "0 post-kill trades; last open 00:42 pre-kill",
+      "verdict": "correct kill — 4 consecutive hard_max_loss, bear-flip LONG-only mean-reversion = BANANA reverse"
     },
     {
-      "change": "PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED=True (2026-10-12 18:16)",
-      "status": "Soaking — 2 fires: HYPER +$0.67 (win), KAS -$0.02 (small loss)",
-      "impact": "Working as designed — catching stalls before hard_max_loss. Review Oct 15."
+      "change": "SIGNAL_FILTER_RSI_MAX 72->75 + AMBIGUOUS->SKIP (2026-10-12 21:43)",
+      "status": "landed, no direct trade audit this run",
+      "verdict": "monitor"
     }
   ],
   "next_actions": [
-    "Monitor PUMP_CHAIN_LONG_RSI_MAX=70 effect over 48h — expect ~$0.50/7d savings",
-    "bb-squeeze trail-arm soak review Oct 15",
-    "pump-chain trail-arm soak review Oct 15",
-    "Creative: momentum-freshness gate backtest (needs candle data)",
-    "7d WR checkpoint Oct 15 — currently 38.4%, target 50%"
-  ]
+    "Soak pump-chain RSI_MAX=70 through 2026-10-15 — do not touch until n>=10 post-deploy trades",
+    "CEO: ratify/revert bb-squeeze trail-arm enable (orchestrator escalation; audit says keep, +$0.97/30d corrected)",
+    "Monitor trail-arm fires: target n>=10 before extending to other signals",
+    "self_learner: Q4 portfolio-cap backtest still pending since Oct 6 — correlated LONG cluster recurred today (steer-003)",
+    "Watch volume-breakout EXTREME cohort: 6 post-HIGH-block trades all EXTREME, mixed — if 14d EXTREME flips negative, revisit EXTREME habitat",
+    "Do NOT stack more entry filters until RSI_MAX=70 and trail-arm soak complete",
+    "Oct 15: 7d WR >=50% checkpoint; bb-squeeze soak review"
+  ],
+  "sanity_check": {
+    "7d_pnl_positive": true,
+    "protected_flags_untouched": true,
+    "config_changes_this_run": 0,
+    "max_changes_per_run": 2,
+    "session_lock_active": false
+  }
 }
