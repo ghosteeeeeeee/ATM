@@ -4608,3 +4608,6 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 12:20] auto_1hr: NO CONFIG CHANGE — 7T last hour 2W −$0.14 (ACE pump-chain- trail +$0.24, ADA pump-chain- trail +$0.01; AVAX/ADA pump-chain+ hard_max_loss, LDO hard_max_loss, BANANA/ME doji pre-kill closes) | 4 open | 24h 37T 11W −$0.64 (29.7%) | kill: none qualifying (max 2T 0W last hour, needs 3+; doji kill clean 0 new entries) | hard_max_loss 45.9% (hold soak) | atr_sl_hit 13.5% (tpsl stable) | overtrade 7/hr | streak 2-neg not 3 (13h neg would trigger) | live_trading=true, kill JSON=true
 BY: auto_1hr
+
+[2026-10-13 13:14] auto_1hr: NO CONFIG CHANGE — 7T last hour 2W −$0.26 (ICP r2v2-long9 trail +$0.12, YGG bb-bounce trail +$0.02; BLUR/DOT pump-chain- hard_max_loss, CHIP/ADA pump-chain- atr_sl_hit, CFX ai-trader- hard_max_loss) | 3 open (BTC LONG, FIL/CHIP pump-chain- SHORTs) | 24h 44T 12W −$0.80 (27.3%) | kill: pump-chain- met 3+T 0W rule (4T 0W) but held — 24h 9T 4W +$0.10, single-direction regime loss, trail-arm soak would be invalidated | hard_max_loss 45.5% (hold soak) | atr_sl_hit 15.9% (tpsl stable) | overtrade 7/hr | streak 2-neg calendar then 13h +$0.02 | live_trading=true, kill JSON=true
+BY: auto_1hr

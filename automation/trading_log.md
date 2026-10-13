@@ -9279,3 +9279,28 @@ Final set: ['GRASS']
 - hard_max_loss still 45.9% of closes — brain_auditor SL-width review still pending
 - CFX ai-trader- SHORT open −0.40% — ai-trader+ 24h 3T 0W −$0.17; if this closes red and signal re-fires, kill candidate
 - BTC continuum-osc+ LONG open −0.24% — first continuum-osc+ trade today, watch
+
+## [2026-10-13 13:14] Hourly Analysis
+
+**Trades:** 7 closed last hour — 2 wins (ICP r2v2-long9 trail +$0.12/+5.17%, YGG bb-bounce-v2-long+ trail +$0.02), 5 losses (BLUR/DOT pump-chain- hard_max_loss −$0.12/−$0.05, CHIP/ADA pump-chain- atr_sl_hit −$0.05/−$0.11, CFX ai-trader- hard_max_loss −$0.07)
+**PnL:** −$0.26 last hour (WR 28.6%) | 24h: 44T 12W −$0.80 (27.3%) | 3 open: BTC continuum-osc+ LONG, FIL/CHIP pump-chain- SHORTs
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule fired on pump-chain- (4T 0W last hour, threshold 3+) but NOT killed: 24h still 9T 4W +$0.10 (2nd-best signal), all 4 losses same-direction during one up-move = regime adversity not signal decay, AND pump-chain trail-arm is one of brain_auditor's 4 soak fixes — killing half the family invalidates the soak. Will re-evaluate if 24h turns negative.
+- hard_max_loss 20/44 = 45.5% of 24h closes −$1.74 — hold (brain_auditor: 4 fixes in soak, do not stack)
+- atr_sl_hit 7/44 = 15.9% — under 40%, tpsl_utils deployed and stable
+- Overtrade: 7/hr — well under 20
+- Streak (calendar): 11h −$0.04, 12h −$0.44, 13h +$0.02 = 2 consecutive negative then green — regime check not triggered. (Rolling 1h windows: −$0.18/−$0.14/−$0.26 = 3 neg — noted, but calendar convention used all day.)
+- ai-trader- 1T 0W last hour (CFX) — n=1, no kill; ai-trader+ 24h 3T 0W −$0.17 but 0 trades last hour, still under kill threshold
+- volume-breakout-long+ 2T 0W −$0.14 24h — n<3, watch
+- live_trading=true (constants line 33 + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 12h bucket −$0.44 (8T 1W) drove most of the day's damage; 13h early +$0.02 — too small to call
+- 24h WR 27.3% slipped below 30% — gap to ≥50% Oct 15 goal widening, 2 days left
+- FIL/CHIP pump-chain- SHORTs open — if market keeps pumping these add to the red; family stays under review
+- hard_max_loss still 45.5% of closes — brain_auditor SL-width review still pending
