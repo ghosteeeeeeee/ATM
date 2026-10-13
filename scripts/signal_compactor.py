@@ -749,6 +749,34 @@ def _get_source_weight(signal_type, source):
     return DEFAULT_SOURCE_WEIGHT
 
 
+# ── Temporal Confluence: signal repetition counter ───────────────────────────
+# Spec: plans/temporal-confluence-spec.md
+# Counts how many times the same token+direction fired in the temporal window.
+# Uses decision IN ('PENDING','EXPIRED') — NOT executed=0 (expired signals have
+# executed=1 but represent real detections).
+def _temporal_confluence_count(token: str, direction: str) -> int:
+    """Count recent signal fires for token+direction within the temporal window."""
+    try:
+        from hermes_constants import TEMPORAL_CONFLUENCE_WINDOW_MIN
+        _tc_conn = sqlite3.connect(RUNTIME_DB, timeout=3)
+        try:
+            _tc_cur = _tc_conn.cursor()
+            _tc_cur.execute("""
+                SELECT COUNT(*) FROM signals
+                WHERE token = ? AND direction = ?
+                  AND decision IN ('PENDING', 'EXPIRED')
+                  AND created_at > datetime('now', ?)
+            """, (token.upper(), direction.upper(),
+                  f'-{TEMPORAL_CONFLUENCE_WINDOW_MIN} minutes'))
+            _tc_row = _tc_cur.fetchone()
+            return _tc_row[0] if _tc_row else 0
+        finally:
+            _tc_cur.close()
+            _tc_conn.close()
+    except Exception:
+        return 0  # fail-open: no temporal bypass on error
+
+
 # ── Weather Vane: Directional Outcome Tracker ────────────────────────────────
 def get_directional_outcome(direction: str) -> tuple:
     """
@@ -3315,7 +3343,27 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pass_gate = True
                         gate_msg = f'backtested standalone ({source})'
                     else:
-                        gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
+                        # ── Temporal Confluence Bypass ──────────────────────────
+                        # Repetition = evidence. If this token+direction fired
+                        # N+ times in the window, the setup is persistent enough
+                        # to treat as confluence. Shadow mode: log only.
+                        # Spec: plans/temporal-confluence-spec.md
+                        try:
+                            from hermes_constants import (
+                                TEMPORAL_CONFLUENCE_ENABLED, TEMPORAL_CONFLUENCE_SHADOW,
+                                TEMPORAL_CONFLUENCE_MIN_FIRES)
+                            if TEMPORAL_CONFLUENCE_ENABLED and unique_signal_types == 1:
+                                _tc_count = _temporal_confluence_count(token, direction)
+                                if _tc_count >= TEMPORAL_CONFLUENCE_MIN_FIRES:
+                                    if TEMPORAL_CONFLUENCE_SHADOW:
+                                        log(f"  📊 [TEMPORAL-CONFLUENCE-SHADOW] {token} {direction} — would bypass ({_tc_count} fires in {TEMPORAL_CONFLUENCE_WINDOW_MIN}min), flag ON, shadow mode")
+                                    else:
+                                        pass_gate = True
+                                        gate_msg = f'temporal confluence ({_tc_count} fires in {TEMPORAL_CONFLUENCE_WINDOW_MIN}min)'
+                        except ImportError:
+                            pass
+                        if not pass_gate and gate_msg == '':
+                            gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
 
             # CRITICAL DEBUG: log EVERY combo before gate decision — no exceptions
             log(f"  🔎 [CONFLUENCE-DEBUG] {token} {direction}: source='{source}' parts={source_parts} count={source_count} unique_types={unique_signal_types} -> {'PASS' if pass_gate else 'BLOCK'}")
