@@ -29,7 +29,7 @@ from hermes_constants import (
     VOLUME_BUILDUP_ENABLED,
     VOLUME_BUILDUP_PLUS_ENABLED,
     VOLUME_BUILDUP_MINUS_ENABLED,
-    VOLUME_BUILDUP_COOLDOWN_HOURS,
+    VOLUME_BUILDUP_COOLDOWN_MINUTES,
     VOLUME_BUILDUP_BARS,
     VOLUME_BUILDUP_VOL_MULT,
     VOLUME_BUILDUP_VOL_AVG_PERIOD,
@@ -234,7 +234,7 @@ def run(prices_dict=None) -> int:
         if sid:
             added += 1
             _log(f'{token} {direction} conf={sig["confidence"]:.0f} vol={sig["value"]}x price={sig["price"]}')
-            set_cooldown(token, direction, hours=VOLUME_BUILDUP_COOLDOWN_HOURS)
+            set_cooldown(token, direction, hours=VOLUME_BUILDUP_COOLDOWN_MINUTES / 60.0)
 
     if added:
         _log(f'Added {added} signals')

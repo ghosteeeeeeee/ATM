@@ -2460,7 +2460,7 @@ GRIND_BREAKOUT_V2_CONF_MACD_BONUS = 2      # +2 if MACD histogram rising
 VOLUME_BUILDUP_ENABLED = True             # master kill-switch
 VOLUME_BUILDUP_PLUS_ENABLED = True        # LONG direction
 VOLUME_BUILDUP_MINUS_ENABLED = True       # SHORT direction
-VOLUME_BUILDUP_COOLDOWN_HOURS = 2         # per token+direction cooldown
+VOLUME_BUILDUP_COOLDOWN_MINUTES = 15      # per token+direction cooldown (was 2h — too long for 5m timeframe signal)
 VOLUME_BUILDUP_BARS = 4                   # number of consecutive bars that must be above avg volume
 VOLUME_BUILDUP_VOL_MULT = 1.2             # avg volume must be >= this × average (lowered from 1.5 — gradual buildup has 1.2-1.3x avg with spikes)
 VOLUME_BUILDUP_VOL_AVG_PERIOD = 20        # bars for average volume
