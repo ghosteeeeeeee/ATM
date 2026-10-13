@@ -8995,7 +8995,7 @@ Final set: []
 **PnL:** −$0.10 last hour | 24h: 22T 8W −$0.23 (36.4%) | 0 open
 
 **Changes:**
-1. **KILL oversold-bounce+** (`OVERSOLD_BOUNCE_ENABLED = False`) — standing escalation from 2026-10-12 22:13 ("one more red = kill") met: 4th consecutive hard_max_loss (XPL −$0.06, NEAR −$0.08, APT −$0.15, PUMP −$0.10), 0/4 24h −$0.39, 0% WR. LONG-only mean-reversion buying RSI 15-20 in bear-flip regime = BANANA lesson in reverse (watchdog 21:50). Re-enable only with bear-regime block + CEO approval. signal_versions.json: oversold-bounce v1. Pipeline restarted to load new constant.
+1. **KILL oversold-bounce+** (`OVERSOLD_BOUNCE_ENABLED = False`) — standing escalation from 2026-10-12 22:13 ("one more red = kill") met: 4th consecutive hard_max_loss (XPL −$0.06, NEAR −$0.08, APT −$0.15, PUMP −$0.10), 0/4 24h −$0.39, 0% WR. LONG-only mean-reversion buying RSI 15-20 in bear-flip regime = BANANA lesson in reverse (watchdog 21:50). Re-enable only with bear-regime block + CEO approval. signal_versions.json: oversold-bounce v1. Pipeline is per-minute one-shot cron — next tick loads new constant (no restart needed).
 
 **No Change Needed:**
 - Kill rule auto (3+ trades 0% WR last hour): not met (1 trade), but standing escalation fired on next-red condition
