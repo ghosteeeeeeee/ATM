@@ -1,152 +1,119 @@
 {
-  "timestamp": "2026-10-12T23:30:00Z",
-  "session_lock": "ACTIVE — report-only, 0 config changes",
-  "regime": {
-    "btc_15m": "SHORT_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "wyckoff": "MARKDOWN",
-    "trend_quality": "STRONG_DOWN",
-    "volatility": "LOW",
-    "btc_price": 82045,
-    "below_ema300_min": 191,
-    "zscore": -1.5
+  "timestamp": "2026-10-13T01:45:52Z",
+  "session_brain_stats": {
+    "queries": [
+      "oversold bounce signal losing regime",
+      "pump chain signal RSI filter",
+      "momentum filter entry quality chop"
+    ],
+    "key_insight": "Session history confirms: STANDALONE_BYPASS signals skip trend_alignment_mult — structural counter-trend defense gap, root cause of oversold-bounce+ knife-catch cluster"
   },
   "trade_summary_24h": {
-    "total": 22,
-    "wins": 8,
-    "pnl": -0.23,
-    "wr": 36.4,
-    "avg_lev": 4.3,
-    "losers": 13,
-    "winners": 8,
-    "losers_long": 11,
-    "losers_short": 1,
-    "hard_max_loss_exits": 10,
-    "key_finding": "11/13 losers are LONGs in SHORT_BIAS markdown — wrong-side trades. hard_max_loss = 10/13 exits (chop entries, no momentum)."
+    "total": "21T 8W -0.16 USDT (38.1% WR)",
+    "by_signal": {
+      "oversold-bounce+ LONG": "4T 0W -0.39 (KILLED by auto_1hr 01:15 — verified OVERSOLD_BOUNCE_ENABLED=False)",
+      "pump-chain+ LONG": "5T 1W -0.35 (watchdog flagged; 14d still +1.84 50% WR — n=5 cluster, NO kill)",
+      "winners": "ai-trader-manual LONG +0.57, hl_copy +0.06, bb-squeeze +0.01, misc +0.09"
+    },
+    "direction_mix": "19 LONG / 2 SHORT while market 98-106/118 SHORT_BIAS — watchdog pattern 3 (directional monoculture) confirmed",
+    "open_trades": 0,
+    "posture": "FLAT — correct in capitulation (median alt RSI ~15, BTC below EMA300 6h+)"
   },
-  "trade_summary_7d": {
-    "long": {
-      "n": 103,
-      "pnl": 0.71,
-      "wr": 39.8
-    },
-    "short": {
-      "n": 21,
-      "pnl": 0.21,
-      "wr": 28.6
-    },
-    "exit_bleed": {
-      "hard_max_loss": {
-        "n": 47,
-        "pnl": -5.01,
-        "wr": 0.0
-      },
-      "atr_sl_hit": {
-        "n": 14,
-        "pnl": -1.11,
-        "wr": 0.0
-      },
-      "profit-monster-trail": {
-        "n": 30,
-        "pnl": 2.07,
-        "wr": 86.7
-      },
-      "atr_trail_hit": {
-        "n": 7,
-        "pnl": 2.44,
-        "wr": 71.4
-      },
-      "stale_exit": {
-        "n": 8,
-        "pnl": 1.31,
-        "wr": 87.5
-      }
-    },
-    "note": "Trail family (profit-monster-trail + atr_trail_hit) = +$4.51 combined 86%/71% WR. hard_max_loss = -$5.01 0% WR. Trend entries win, chop entries lose."
-  },
-  "losing_trade_autopsy": [
+  "drift_findings": [
     {
-      "cluster": "oversold-bounce+ LONG (3 losses)",
-      "trades": "APT -6.8% RSI 41.7, NEAR -3.4% RSI 37.3, XPL -2.7% RSI 38.3",
-      "root_cause": "LONG-bias signal buying oversold in SHORT_BIAS markdown = catching falling knives. Oversold = continuation for shorts, not a buy, in MARKDOWN. No short counterpart, no regime brake.",
-      "entry_check": "All 3 RSI 37-42 at entry. Price already dumped. Signal fires on oversold → we buy → market keeps dumping → hard_max_loss.",
-      "regime_check": "EXTREME/EXTREME/HIGH vol. BTC STRONG_DOWN, wyckoff MARKDOWN.",
-      "recommended_change": "Add regime brake: suppress oversold-bounce+ LONG when BTC 15m is STRONG_DOWN or trend_quality STRONG_DOWN. Monitor recommendation (n=8 7d thin) — CEO decision when lock lifts.",
-      "impact_on_winners": "7d oversold-bounce: 8T 4W +$0.02 breakeven. Today's 3 losses all in bear. A regime brake would have blocked the 3 losers; check winners' regime before shipping.",
-      "confidence": "MEDIUM-HIGH (pattern clear, sample thin)"
+      "finding": "DIRECTIONAL_BIAS_ENABLED + COUNTER_TREND_PENALTY + PRO_TREND_BOOST and ALT_BTC_DIVERGENCE_* constants are ORPHANED — zero script references outside hermes_constants.py",
+      "root_cause": "Consolidated into trend_alignment_mult by commit f79429b9 (2026-10-01, CEO-approved Item 1) — constants never cleaned up",
+      "severity": "low (dead config, not a live bug — trend_alignment_mult IS wired at signal_compactor.py:1485-1591)",
+      "action": "Cleanup candidate — remove orphaned constants to prevent future audit confusion. NOT done this run (max-2-changes budget reserved; zero-trading-impact)"
     },
     {
-      "cluster": "pump-chain+ LONG at RSI>68 (4 losses)",
-      "trades": "GRASS -4.0% RSI 71.2, FIL -2.8% RSI 68.7, CFX -2.3% RSI 74.5, KAS -0.6% RSI 71.6",
-      "root_cause": "Buying local tops in markdown. Pump already happened → mean reversion → hard_max_loss. 30d meta-RSI: 75+ = 11T -0.48 36.4% WR (worst band); 55-64 = 31T +1.55 48.4% (best).",
-      "entry_check": "All 4 RSI 68-75. HYPER winner was RSI 62.5 — the profitable band.",
-      "regime_check": "All EXTREME vol. BTC STRONG_DOWN.",
-      "recommended_change": "SIGNAL_FILTER_RSI_MAX=75 already blocks 75+. Today's losses are 68-74 (within positive 30d band). Real lever is regime brake on pump-chain+ LONG in STRONG_DOWN, not RSI ceiling. Existing 0.5x dampen in NORMAL/HIGH (ratified 0b689a5d) doesn't cover EXTREME markdown.",
-      "impact_on_winners": "HYPER +0.67% was RSI 62.5 — a regime brake with RSI<65 exemption would preserve it. Verify before shipping.",
-      "confidence": "MEDIUM (30d 65-74 band still +$0.99 — regime is the confounder)"
+      "finding": "STANDALONE_BYPASS signals skip trend_alignment_mult entirely — oversold-bounce+ knife-catches (RSI 37-44 LONGs in markdown) had NO counter-trend confidence penalty",
+      "root_cause": "Architectural: bypass path skips signal_compactor where trend_alignment_mult lives. Exec-time path got RSI hard-block 2026-10-12 but no trend alignment.",
+      "severity": "structural — mitigated by oversold-bounce+ kill, but hole remains for other bypass LONG signals",
+      "action": "Logged as creative improvement — CEO decision required (bypass architecture is CEO-protected territory)"
     }
   ],
-  "execution_trap": {
-    "finding": "Last 50 signals ALL EXPIRED. LONGs blocked by BTC-CRASH momentum filter. SHORTs blocked by SHORT_RSI_HARD_FLOOR=45 when coins dump below 45 in markdown.",
-    "impact": "System is flat by double-block, not by design. The winning side (SHORTs on dumping coins) can't fill because our own filter rejects RSI<45.",
-    "note": "This is a known standing issue (watchdog steer-001, prior brain_auditor runs). SHORT_RSI_HARD_FLOOR=45 was designed to prevent shorting bottoms; in a trending markdown it prevents shorting everything. Regime-conditional floor (35 in STRONG_DOWN) is the fix — CEO scope, not unilateral.",
-    "confidence": "HIGH (pipeline.log shows ALT 33.3, AIXBT 34.7, ARB 29.5, YGG 24.4 all rejected)"
-  },
-  "trail_arm_soak": {
-    "bb_squeeze": {
-      "fires": 0,
-      "status": "0 fires / ~13h soak",
-      "unratified": true
+  "recurring_problems": [
+    {
+      "problem": "hard_max_loss chop deaths — 45T -$4.88/7d, 0% WR. Top bleed: pump-chain+ LONG 10T -$0.99, pump-chain- SHORT 7T -$0.88, volume-breakout-long+ 6T -$0.87",
+      "status": "Entry-side filters shipped incrementally (oversold-bounce kill, RSI bands, HIGH blocks, trail-arm timeouts). 7d WR still 38.5% but PnL positive (+$1.05). Trail family intact: profit-monster-trail 30T 86.7% +$2.07, atr_trail_hit 7T 71.4% +$2.44.",
+      "verdict": "Trail family = how we win (confirmed). Chop entries = how we lose (confirmed). Fixes landing but slow."
     },
-    "pump_chain": {
-      "fires": 2,
-      "net": 0.0,
-      "status": "KAS -0.02, HYPER +0.02 — net neutral",
-      "unratified": true
-    },
-    "note": "Both enabled live without CEO ratify. Orchestrator escalated. Corrected expectation +$0.97/30d (bb-squeeze). Monitor; CEO decision pending."
-  },
+    {
+      "problem": "Directional monoculture in markdown — 20/22 trades LONG while both BTC TFs SHORT_BIAS",
+      "status": "Structural: signal generators are long-heavy; short generators die at RSI_HARD_FLOOR=45 in capitulation. DIRECTIONAL_CAP 80% only blocks extreme concentration of OPEN positions, not sequential closed trades.",
+      "verdict": "Known structural gap. Flat IS the trade — system correctly has 0 open now. No time-based or blanket direction blocks (banned)."
+    }
+  ],
+  "missing_implementations": [
+    {
+      "idea": "Trend-alignment mirror for STANDALONE_BYPASS exec path",
+      "detail": "decider_run.py has exec-time RSI hard block (shipped 2026-10-12) but no counter-trend check. A 0.6x trend penalty mirroring trend_alignment_mult for bypass LONG signals in SHORT_BIAS tape would have slashed oversold-bounce+ confidence below threshold — 4 knife-catches likely blocked.",
+      "status": "creative improvement logged — needs CEO (bypass architecture)"
+    }
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-12T23:30:00Z",
-      "idea": "Regime brake on LONG-family signals in STRONG_DOWN markdown",
-      "rationale": "11/13 losers last 24h are LONGs in SHORT_BIAS. oversold-bounce+ and pump-chain+ have no regime brake — they fire LONGs regardless of BTC direction. The trail family wins 86% because trending entries activate the trail; chop entries hit hard_max_loss. A regime brake keeps us out of chop without blocking times.",
-      "expected_impact": "Block 8/13 of today's losers (APT, NEAR, XPL, KAS, FIL, GRASS, ICP, CFX). Preserve HYPER (RSI 62.5) via RSI<65 exemption. +5-10% WR in SHORT_BIAS regimes.",
-      "category": "entry sniper / regime brake",
-      "status": "suggested",
-      "risk": "medium — must verify winners not blocked. Existing 0.5x dampen pattern (pump_chain+ NORMAL/HIGH) is the template; extend to STRONG_DOWN for oversold-bounce+ and pump-chain+ LONG.",
-      "sample_size_caveat": "Today n=13 thin. 7d oversold-bounce n=8. Ship as confidence dampen (0.5x) not kill. Backtest before CEO approval."
-    },
-    {
-      "date": "2026-10-12T23:30:00Z",
-      "idea": "oversold-bounce+ regime gate specifically",
-      "rationale": "Signal buys oversold. In markdown, oversold = short continuation, not a buy. 3/3 losses today. No short counterpart exists. 7d breakeven (8T +$0.02). Lowest-risk surgical fix: suppress when BTC 15m SHORT_BIAS.",
-      "expected_impact": "Blocks 3 losers/day in bear. Neutral in bull (signal only fires long).",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low — signal is breakeven overall; gate only fires in defined bear regime",
-      "sample_size_caveat": "n=8 7d is thin. Monitor 48h or backtest. Not a kill."
-    }
-  ],
-  "changes_from_last_run": [
-    {
-      "change": "SIGNAL_FILTER_RSI_MAX 72→75 (brain_auditor 2026-10-12)",
-      "status": "live, no regression observed — 75+ band still blocked",
-      "impact": "Neutral. 30d 75+ band was -$0.48; filter working as designed."
-    },
-    {
-      "change": "Trail-arm timeout enables (bb-squeeze 60m, pump-chain 45m)",
-      "status": "soaking, 2 pump-chain fires net $0.00, 0 bb-squeeze fires",
-      "impact": "Too early to judge. Unratified — CEO decision pending."
+      "date": "2026-10-13T01:45:52Z",
+      "idea": "STANDALONE_BYPASS trend-alignment guard: apply trend_alignment_mult-equivalent counter-trend check at decider_run exec-time for bypass signals",
+      "rationale": "Verified root cause of oversold-bounce+ 0/4 -$0.39 knife-catch cluster: bypass path has zero counter-trend defense (trend_alignment_mult only lives in compactor). Watchdog pattern: '9 wrong-side trades, fading momentum'. 7d: 45 hard_max_loss deaths, majority LONG in SHORT_BIAS tape.",
+      "expected_impact": "Blocks counter-trend bypass LONGs during aligned bear tape; pro-trend SHORTs unaffected. Conservative: 0.6x multiplier (same as trend_alignment_mult), NOT a hard block — signal can still pass if base confidence high.",
+      "category": "entry sniper / structural defense",
+      "status": "suggested — CEO approval required (STANDALONE_BYPASS is CEO-protected)",
+      "risk": "medium — could suppress winning counter-trend bounces; must backtest before enable",
+      "verification_plan": "Backtest last 30d: count bypass LONG trades in SHORT_BIAS tape, split by outcome. Must show: blocks net losers, preserves net winners. Sample threshold n>=20."
     }
   ],
   "config_changes_applied": [],
+  "changes_from_last_run": [
+    {
+      "change": "SIGNAL_FILTER_RSI_MAX 72→75 + AMBIGUOUS→SKIP exec hard-block (2026-10-12 21:43)",
+      "verdict": "UNTESTABLE — 0 pump-chain+ trades since ship. CFX@74.53 entered BEFORE fix. Monitor 48h.",
+      "action": "continue monitoring"
+    },
+    {
+      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=True (2026-10-12 10:45)",
+      "verdict": "0 fires / ~15h soak. On track for Oct 15 review. CEO ratification STILL PENDING (escalation from orchestrator — not mine to resolve).",
+      "action": "CEO: ratify or revert (audit says keep, corrected +$0.97/30d)"
+    },
+    {
+      "change": "bb-squeeze midband exemption (2026-10-12 00:42)",
+      "verdict": "WORKING — DOT bb-squeeze+ profit-monster-trail win +0.16% 24h. No false blocks observed.",
+      "action": "none"
+    },
+    {
+      "change": "ai_trader_precheck.py RSI fix (2026-10-12 03:45)",
+      "verdict": "WORKING — ai-trader-manual 24h 2T 2W +$0.59 (GRASS LONG hard_tp +2.87%, GRASS SHORT hard_tp +0.15%).",
+      "action": "none"
+    },
+    {
+      "change": "oversold-bounce+ KILL (auto_1hr 2026-10-13 01:15 — not brain_auditor, verified)",
+      "verdict": "CORRECT KILL — verified OVERSOLD_BOUNCE_ENABLED=False in constants. Justification solid: 4 consecutive hard_max_loss, RSI 37-44 entries in markdown, 0/4 -$0.39. Re-enable only with bear-regime block + CEO approval.",
+      "action": "none — kill stands"
+    }
+  ],
+  "signals_analyzed_this_run": {
+    "pump-chain+_LONG": {
+      "14d": "32T +1.84 50% WR hml=12 (37.5%)",
+      "verdict": "DO NOT KILL — 24h 5T cluster (-0.35) is noise vs 14d edge. Best habitat rsi 55-60 (30d 72.7% +2.12), gap 0.7-1.2 (62.5% +1.88). 70+ rsi band bleeds (7d 22% WR) but CEO owns ceiling; exec hard-block at 75 live.",
+      "config_change": "none"
+    },
+    "volume-breakout-long+_LONG": {
+      "14d": "18T +1.07 38.9% WR hml=7 (38.9%)",
+      "tested": "RSI_MAX=68 — 14d pattern (0 winners >68) FAILS 30d out-of-sample (75+ = 9T +0.19 55.6% WR). n=18 < 20 threshold. DO NOT SHIP.",
+      "config_change": "none — monitor"
+    },
+    "pump-chain-_SHORT": {
+      "14d": "46T -0.21 39.1% WR",
+      "tested": "No clean rsi band edge (30d: only 45-50 pays; 50-55 loses; 7d <50 wins +1.07 with n=8). EXTREME bleed -0.74 but CEO reverted EXTREME block 2026-10-07 ('every dump is a SHORT').",
+      "config_change": "none — messy data, CEO decision stands"
+    }
+  },
   "next_actions": [
-    "CEO: RATIFY or REVERT 2 trail-arm enables (audit says keep, +$0.97/30d corrected)",
-    "CEO: evaluate SHORT_RSI_HARD_FLOOR regime-conditional (35 in STRONG_DOWN) — execution trap blocking winning side",
-    "Post-lock: backtest regime brake on oversold-bounce+ and pump-chain+ LONG in STRONG_DOWN",
-    "Monitor oversold-bounce+ (0/4 since Oct 11, kill threshold n>=5)",
-    "Monitor pump-chain+ (4-loss streak, kill threshold n>=5)",
-    "hmacd_mtf-- SHORT 25% WR 7d — watch, not yet kill threshold"
+    "Monitor SIGNAL_FILTER_RSI_MAX hard-block effectiveness (48h — first pump-chain+ trades after ship will test it)",
+    "CEO: ratify/revert 2 trail-arm enables (bb-squeeze + pump-chain 45m) — do not let soak past Oct 15 undecided",
+    "Cleanup (low prio, next run): remove orphaned DIRECTIONAL_BIAS_* and ALT_BTC_DIVERGENCE_* constants",
+    "Oct 15: 7d WR ≥50% checkpoint; bb-squeeze soak review; pump-chain 45m soak review",
+    "If capitulation ends (BTC reclaims EMA300 / alts RSI 45-58): reassess SHORT-the-bounce candidates — ai-trader precheck path ready"
   ]
 }
