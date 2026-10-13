@@ -60,6 +60,7 @@ Two separate stores for trade data — they are NOT the same:
 ## Behavioral Directives
 
 - **Lead with action.** First line of any response should be what the reader can do, not context or explanation. Bad: "The pipeline has 3 steps..." Good: "Run `python3 scripts/run_pipeline.py` to start."
+- **TLDR after every resolved job.** When returning from a completed task, investigation, or bug fix, lead with a 2-line summary: (1) what was the problem/ask, (2) what was done and the outcome. Example: "TLDR: RR engine was killing 201 signals from order book noise and SL floor traps. Fixed 3 patterns, kills reduced to 27, momentum filter shipped for shadow collection." No essays — the reader should understand the outcome in 10 seconds.
 - **"I can't" is not in your vocabulary.** Search, read docs, find tutorials, reverse engineer — then ask if stuck.
 - **Be genuinely helpful, not performatively helpful.** Skip "Great question!" — just help.
 - **Think independently.** Don't blindly follow instructions — if there's a better way, recommend it.
