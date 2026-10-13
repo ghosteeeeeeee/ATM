@@ -1347,13 +1347,14 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 if atr_new_sl < current_price and (best_trail is None or atr_new_sl > best_trail):
                     best_trail = atr_new_sl
 
-                # FIX (2026-10-13): enforce ATR_SL_MIN floor — trail SL must stay
-                # at least ATR_SL_MIN below entry. Without this, trail could move
-                # SL too close to entry and hard_sl fires instantly.
+                # FIX (2026-10-13): enforce ATR_SL_MIN_ACCEL floor — trail SL must
+                # stay at least 0.3% below entry. ATR_SL_MIN_ACCEL is the trailing
+                # floor (allows profit locking); ATR_SL_MIN (1.3%) is for initial
+                # SL only. Using ATR_SL_MIN here killed all profit locks.
                 if best_trail and entry_price is not None and entry_price > 0:
-                    _max_sl = entry_price * (1 - hc.ATR_SL_MIN)
+                    _max_sl = entry_price * (1 - hc.ATR_SL_MIN_ACCEL)
                     if best_trail > _max_sl:
-                        best_trail = _max_sl  # don't trail above ATR_SL_MIN floor
+                        best_trail = _max_sl  # don't trail above accel floor
 
                 if best_trail and best_trail > current_sl:
                     return {
@@ -1383,13 +1384,14 @@ def manage_exit(token, direction, current_price, entry_price=None, current_sl=No
                 if atr_new_sl > current_price and (best_trail is None or atr_new_sl < best_trail):
                     best_trail = atr_new_sl
 
-                # FIX (2026-10-13): enforce ATR_SL_MIN floor — trail SL must stay
-                # at least ATR_SL_MIN above entry. Without this, trail moved SL
-                # to 0.14% from entry (GMX #16138) and hard_sl fired instantly.
+                # FIX (2026-10-13): enforce ATR_SL_MIN_ACCEL floor — trail SL must
+                # stay at least 0.3% above entry. ATR_SL_MIN_ACCEL is the trailing
+                # floor (allows profit locking); ATR_SL_MIN (1.3%) is for initial
+                # SL only. Using ATR_SL_MIN here killed all profit locks.
                 if best_trail and entry_price is not None and entry_price > 0:
-                    _min_sl = entry_price * (1 + hc.ATR_SL_MIN)
+                    _min_sl = entry_price * (1 + hc.ATR_SL_MIN_ACCEL)
                     if best_trail < _min_sl:
-                        best_trail = _min_sl  # don't trail below ATR_SL_MIN floor
+                        best_trail = _min_sl  # don't trail below accel floor
 
                 # Apply tightest trail
                 if best_trail and best_trail < current_sl:
