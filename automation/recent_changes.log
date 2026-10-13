@@ -4606,3 +4606,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 11:18] auto_1hr: KILLED doji-bottom-long (DOJI_BOTTOM_ENABLED=False, signal_versions v1) — 0/4 24h −$0.37 all losers (SEI/IMX/TURBO hard_max_loss, ME atr_sl_hit −3.12%), same profile as oversold-bounce+ kill this morning | 2T last hour both doji losses −$0.18 | 24h 30T 9W −$0.50 (30.0%) | 3 open (2 pump-chain- SHORTs +2%, BANANA doji −0.73% pre-kill position continues) | hard_max_loss 46.7% (hold soak) | atr_sl_hit 10% (tpsl stable) | overtrade 2/hr | streak 1-neg | live_trading=true
 BY: auto_1hr
+[2026-10-13 12:20] auto_1hr: NO CONFIG CHANGE — 7T last hour 2W −$0.14 (ACE pump-chain- trail +$0.24, ADA pump-chain- trail +$0.01; AVAX/ADA pump-chain+ hard_max_loss, LDO hard_max_loss, BANANA/ME doji pre-kill closes) | 4 open | 24h 37T 11W −$0.64 (29.7%) | kill: none qualifying (max 2T 0W last hour, needs 3+; doji kill clean 0 new entries) | hard_max_loss 45.9% (hold soak) | atr_sl_hit 13.5% (tpsl stable) | overtrade 7/hr | streak 2-neg not 3 (13h neg would trigger) | live_trading=true, kill JSON=true
+BY: auto_1hr

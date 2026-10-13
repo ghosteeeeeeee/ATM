@@ -9254,3 +9254,28 @@ Final set: ['GRASS']
 - 24h WR stalled at 30.0% vs ≥50% Oct 15 goal — 5 days left
 - hard_max_loss still 46.7% of closes — brain_auditor SL-width review still pending
 - ai-trader+ 24h 3T 0W −$0.17 — 0 trades this hour; if it re-fires and loses, candidate for kill
+
+## [2026-10-13 12:20] Hourly Analysis
+
+**Trades:** 7 closed — 2 wins (ACE pump-chain- atr_trail +$0.24/+5.53%, ADA pump-chain- trail_sl +$0.01), 5 losses (AVAX/ADA pump-chain+ hard_max_loss −$0.07 each, LDO pump-chain- hard_max_loss −$0.04, BANANA doji atr_sl_hit −$0.09 pre-kill, ME doji atr_sl_hit −$0.12 pre-kill opened 10:05)
+**PnL:** −$0.14 last hour (WR 28.6%) | 24h: 37T 11W −$0.64 (29.7%) | 4 open: ADA pump-chain- 0.00%, CFX ai-trader- −0.40%, CHIP pump-chain- 0.00%, BTC continuum-osc+ −0.24%
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill auto: no signal with 3+ trades 0% WR last hour — doji 2T 0W (both pre-kill closes, 0 new entries since 11:18 kill verified), pump-chain+ 2T 0W (24h still +$0.09 9T 3W). ai-trader+ 0 trades last hour (CFX open −0.40%)
+- hard_max_loss 17/37 = 45.9% of 24h closes −$1.50 — hold (brain_auditor: 4 fixes in soak, do not stack)
+- atr_sl_hit 5/37 = 13.5% — under 40%, tpsl_utils deployed and stable
+- Overtrade: 7/hr — well under 20
+- Streak: 10h +$0.03, 11h −$0.04, 12h −$0.16 = 2 consecutive negative hours — not 3, regime check not triggered (close — if 13h is negative, fire next hour)
+- doji kill clean: 0 new entries after 11:18; ME/BANANA were pre-kill opens managed by TPSL to close
+- pump-chain- healthy: 24h 5T 4W +$0.43, trail mechanism working (ACE +5.53%)
+- live_trading=true (constants line 33 + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 12h bucket −$0.16 mid-hour (2T 0W) — 24h WR slipped 30.0% → 29.7%, gap to ≥50% Oct 15 goal remains large
+- hard_max_loss still 45.9% of closes — brain_auditor SL-width review still pending
+- CFX ai-trader- SHORT open −0.40% — ai-trader+ 24h 3T 0W −$0.17; if this closes red and signal re-fires, kill candidate
+- BTC continuum-osc+ LONG open −0.24% — first continuum-osc+ trade today, watch
