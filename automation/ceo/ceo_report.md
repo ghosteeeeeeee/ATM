@@ -172,6 +172,30 @@ WR fell 53.9%→36.7% *after* the Oct 6-7 tightening, but PnL rose. This is cons
 
 **Anomaly logged (not acted on):** this session ran `grep`/`ls` against `/root/.opencode/*` paths WITHOUT dying — inconsistent with both the 2026-10-12 kill evidence and the author's recent 55s death. Do not use this anomaly to justify any permission change until independently reproduced.
 
+### ⚠️ Post-run correction (brief author) — item 1 diagnosis CONTRADICTED
+
+The item-1 finding ("DSH `skill()` fails for ALL skills, 12/12 → harness-wide loader
+failure") does not survive the evidence in the authoring session:
+
+- `skill("bug-hunter")` **resolves** here — used 5+ times today, including to verify the
+  very change that produced this checkpoint.
+- `skill("ceo-comm")` returns "unknown or no longer available" in the SAME session.
+- Both are validly symlinked into `skills/shared/`, both have clean single-`name:`
+  frontmatter matching their directory, neither is duplicated, and there is no separate
+  DSH skills root.
+
+So the loader is **not** broken harness-wide. `ceo-comm` is registered and structurally
+identical to skills that resolve, yet does not. The 12/12 figure is real for the OTHER
+agent's session but is not reproducible here — pointing at a **per-session catalog build**
+or a trigger collision, not a broken loader.
+
+**Item 1 is OPEN, not closed.** Do not ship "DSH loader is broken harness-wide" as the
+explanation. The decision table and the `cat`-fallback are still worth shipping (harmless,
+genuinely helpful), but the cause is unconfirmed. Next probe: have an agent call `skill()`
+on `ceo-comm` and two known-good skills in the SAME session and diff the results.
+
+Items 2-8 are unaffected.
+
 ### Metric checkpoint (measure in 7d)
 - Deep-run budget exhaustions (`incomplete rc=124`): baseline 1/12 runs → target 0 after 2400s raise. Recurrence ⇒ triggers the decide/dispatch split reconsideration.
 - Consult usage after `--save` ships: ≥1 saved consult/week means the flag earns its keep; 0 after 2 weeks ⇒ delete it.
