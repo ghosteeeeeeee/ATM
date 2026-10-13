@@ -9512,3 +9512,23 @@ Final set: ['GRASS']
 - Overtrade: 0/hr (limit 20)
 - 6 open positions; live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-13 22:15] Hourly Analysis
+
+**Trades:** 2 closed last hour (0 wins, 2 losses)
+**PnL:** −$0.04 (WR: 0.0%)
+
+**Details:**
+- RESOLV volume-breakout-long+ LONG atr_sl_hit −$0.04 (−1.15%)
+- BLUR pump-chain- SHORT atr_sl_hit $0.00 (−3.77%)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: max 1T 0W per signal last hour (needs 3+) — no candidates
+- volume-breakout-long+ 24h 4T 0W −$0.25 and ai-trader+ 24h 3T 0W −$0.17 remain on watch (0 fires beyond RESOLV this hour, cannot re-trigger)
+- 24h: 55T 13W −$1.57 (23.6%); hard_max_loss 21T −$1.72 = 38.2% of closes — dropped UNDER 40% threshold; atr_sl_hit 15/55 = 27.3% under 40%, tpsl_utils stable
+- Streak: hour 21 $0.00 (BLUR flat) breaks chain; hour 22 −$0.04 = 1 neg hr, under 3 → size lever N/A
+- Overtrade: 2/hr (limit 20)
+- 5 open positions; live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
