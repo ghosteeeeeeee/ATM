@@ -197,22 +197,38 @@ jsonl="$CEO_LOG_DIR/deep-${TS}.jsonl"
 exitf="$CEO_LOG_DIR/deep-${TS}.exit"
 errf="$CEO_LOG_DIR/deep-${TS}.err"
 
+# Sentinel .exit written BEFORE launch: if the detached child is SIGTERMed, bash dies
+# before the classify line at the bottom of the child runs, and the run would leave NO
+# .exit at all — indistinguishable from a run that never started. bug_hunter found 4 real
+# instances of exactly that (deep-230504Z, deep-230650Z, deep-000026Z, deep-001525Z),
+# one of which was a genuine permission kill with no class file. A 'running' sentinel
+# guarantees every launched run has a class file from the moment it exists.
+echo "running" > "$exitf"
+
 # Run FOREGROUND inside a detached process tree so the EXIT trap (lock release)
 # fires only AFTER the opencode call actually finishes. `timeout $BUDGET` bounds
 # it; a timeout is inspectable via the .exit file, and the lock still releases
 # cleanly because this subshell exits when the bounded run returns.
 nohup bash -c '
     source /root/.hermes/automation/ceo/ceo_lib.sh
-    # Always release the lock on ANY exit path (normal, timeout, or signal) — an
-    # explicit call after `timeout` would be skipped if timeout is killed.
-    trap "ceo_release_lock" EXIT
+    # Always release the lock AND finalize the class on ANY exit path (normal,
+    # timeout, or signal). An explicit classify after `timeout` is skipped when the
+    # child itself is killed, so the trap does it — it runs on signal too. The
+    # "running" sentinel written by the parent means a still-running child is
+    # distinguishable from one that died before classifying.
+    # Single-quoted on purpose: every $3/$2 must expand in the CHILD when the trap
+    # FIRES, not in this parent when the trap is set. The guard means the trap only
+    # finalizes the class if the normal path below has not already done so (i.e. the
+    # sentinel is still there), so a clean run is not overwritten.
+    trap '"'"'ceo_release_lock; if [ "$(cat "$3" 2>/dev/null)" = running ]; then _c="$(ceo_classify_run "$2")"; [ -n "$_c" ] && _c="incomplete"; echo "${_c} rc=143" > "$3"; fi'"'"' EXIT
     ceo_acquire_lock "ceo-deep-$(date -u +%Y%m%dT%H%M%SZ)-$$" || { echo "[CEO-DEEP] child could not acquire lock; aborting." >&2; echo "failed rc=3" > "$3"; exit 3; }
     timeout "$5" "$OPENCODE" run --format json < "$1" >> "$2" 2> "$4"
     rc=$?
     # opencode exits 0 even when the agent died mid-run (e.g. a permission
     # auto-reject), so classify by jsonl evidence, not the bare exit code.
     # Keep rc alongside the class so a timeout (124) stays visible — a
-    # budget-exhausted run must not read as a clean "ok".
+    # budget-exhausted run must not read as a clean "ok". This overwrites the
+    # "running" sentinel, which disarms the trap (its guard sees a non-sentinel).
     echo "$(ceo_classify_run "$2") rc=$rc" > "$3"
 ' _ "$PROMPT_FILE" "$jsonl" "$exitf" "$errf" "$BUDGET" 2>> "$errf" &
 pid=$!

@@ -124,7 +124,25 @@ ceo_acquire_lock() {
         echo "[LOCK] stale lock — removing and acquiring"
         rm -f "$LOCK_FILE"
     fi
-    printf '%s\n' "$owner" > "$LOCK_FILE"
+    # Create the parent dir BEFORE the first write attempt. Redirecting a write into
+    # a nonexistent dir makes bash emit its own "No such file or directory" that the
+    # redirect's own 2>/dev/null cannot suppress, so pre-creating is cleaner than
+    # catching the failure. Then verify the write landed: `>` on a missing dir (or a
+    # permissions failure) does not abort this function — the old code printed
+    # "[LOCK] acquired" and returned 0 while holding NOTHING, and the run would then
+    # edit files believing it had the lock. Harmless while the lock lives in /tmp,
+    # which always exists; becomes live the moment the lock moves elsewhere.
+    mkdir -p "$(dirname "$LOCK_FILE")" 2>/dev/null
+    if ! printf '%s\n' "$owner" > "$LOCK_FILE" 2>/dev/null; then
+        echo "[LOCK] FATAL: cannot write lock at $LOCK_FILE — refusing to run unlocked." >&2
+        return 1
+    fi
+    # Confirm what landed matches what we intended to own; a partial write or a
+    # concurrent writer would show a different owner tag.
+    if [ "$(head -n1 "$LOCK_FILE" 2>/dev/null)" != "$owner" ]; then
+        echo "[LOCK] FATAL: lock at $LOCK_FILE does not hold our owner tag — refusing to run unlocked." >&2
+        return 1
+    fi
     CEO_LOCK_OWNER="$owner"
     # Only set an EXIT trap if the caller has none, so a caller that needs extra
     # cleanup keeps its own trap (bash traps are not stacked — a second `trap`
@@ -159,26 +177,55 @@ ceo_release_lock() {
 #                or the stream was cut. MUST NOT read as ok: mere evidence of work
 #                is not evidence of completion, and treating it as such recreates
 #                the false-success bug this classifier exists to kill.
-#   failed     — a permission rejection / tool error is present
+#   ok_after_reject — a permission denial DID happen, but the run recovered and
+#                     still reached a clean terminal event. Surfaced separately
+#                     from plain 'ok' because the recovery is real and worth a
+#                     glance, but it is NOT a failure.
+#   failed     — a permission denial happened AND the run did not end clean
 #   silent     — jsonl has no usable content (crash before any output)
 ceo_classify_run() {
     local jsonl="$1"
     [ -s "$jsonl" ] || { echo "silent"; return; }
-    # Match opencode's real phrasing — it emits "The user rejected permission to
-    # use this specific tool call", NOT "permission rejected". Do not drop the
-    # 'rejected permission' variant or this stops matching the live failure mode.
-    if grep -qiE 'auto-rejecting|rejected permission|permission rejected|"status": *"error"' "$jsonl"; then
+
+    # Completion is detected on the LAST NON-EMPTY LINE ONLY. opencode's terminal
+    # event is {"type":"step_finish","part":{"type":"step-finish","reason":"stop"}}.
+    # There is no "finish" key and no result/final/message_complete type — an
+    # earlier pattern looked for those and matched NOTHING across every real jsonl,
+    # so 'ok' was unreachable. Whole-file matching is also wrong: a run killed
+    # mid-stream contains step_finish events from earlier turns (deep-20261012T172817Z
+    # has 2), so only the final event is trustworthy.
+    local terminal_ok=0
+    if tail -n1 "$jsonl" | grep -qE '"type": *"step_finish".*"reason": *"stop"'; then
+        terminal_ok=1
+    fi
+
+    # Hard-fail evidence: a PERMISSION DENIAL, matched on STRUCTURED FIELDS ONLY.
+    # BUG-FIX (2026-10-13): the old whole-file grep matched plain output TEXT, so
+    # any run that read ceo_lib.sh (whose own grep pattern contains these phrases)
+    # or grepped logs about past rejections was guaranteed to self-report 'failed'
+    # even when it finished clean — deep-20261013T155406Z and deep-20261012T230504Z
+    # were both mislabeled this way. In JSON output the phrase is escaped, so
+    # anchoring on the unescaped field boundary cannot match echoed text. The raw
+    # stderr banner is anchored off line-start + non-'{' prefix because it is NOT
+    # JSON — it lands in the stream interleaved between events.
+    #
+    # NOTE: a generic tool error ("state":{"status":"error") is deliberately NOT
+    # hard-fail. A run that hits one and recovers proves it by ending in a clean
+    # stop (deep-20261012T230504Z hit a benign "File not found" read error and then
+    # completed); treating any error as fatal hid that as 'failed'.
+    local hard_fail=0
+    if grep -qE '"error":"The user rejected permission' "$jsonl" \
+       || grep -qE '^[^{]*permission requested: .*; *auto-rejecting' "$jsonl"; then
+        hard_fail=1
+    fi
+
+    if [ "$hard_fail" -eq 1 ] && [ "$terminal_ok" -eq 0 ]; then
         echo "failed"; return
     fi
-    # Completion is detected on the LAST LINE ONLY. opencode's terminal event is
-    #   {"type":"step_finish","part":{"type":"step-finish","reason":"stop",...}}
-    # There is no "finish" key and no result/final/message_complete type — an
-    # earlier pattern looked for those and matched NOTHING across every real
-    # jsonl in logs/ceo, so 'ok' was unreachable and a clean run read as
-    # 'incomplete'. Whole-file matching is also wrong: a run killed mid-stream
-    # contains step_finish events from earlier turns (the killed run
-    # deep-20261012T172817Z.jsonl has 2), so only the final event is trustworthy.
-    if tail -n1 "$jsonl" | grep -qE '"type": *"step_finish".*"reason": *"stop"'; then
+    if [ "$hard_fail" -eq 1 ]; then
+        echo "ok_after_reject"; return
+    fi
+    if [ "$terminal_ok" -eq 1 ]; then
         echo "ok"; return
     fi
     # Not a clean stop. Work was demonstrably done if we see tool activity, an
