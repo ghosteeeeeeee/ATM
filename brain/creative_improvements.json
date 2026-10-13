@@ -4160,5 +4160,23 @@
     "status": "suggested",
     "risk": "low",
     "owner": "self_learner backtest → CEO approve → brain_auditor ship"
+  },
+  {
+    "date": "2026-10-13T04:45:00Z",
+    "idea": "Loser-side T+10m micro-checkpoint backtest (pump-chain+ LONG): exit early if live_pnl <= -0.35% unlevered at T+10m",
+    "rationale": "16/45 HML die <20m totaling -$0.96 — never-armed entries. Distinct from WITHDRAWN fast-de-risk (winner-side, selection-biased): this exits LOSERS only. Avg pump-chain LONG HML = -2.66% pnl_pct.",
+    "expected_impact": "Cut ~30-50% of <20m HML magnitude; guard: 0 trail-armed winners killed (verify MFE-at-10m)",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "medium",
+    "validation_required": "Pre-registered backtest + independent audit (withdrawn-idea bar). DO NOT SHIP blind."
+  },
+  {
+    "date": "2026-10-13T04:45:00Z",
+    "idea": "Bug_hunter: verify pump-chain- SHORT trail-arm timeout coverage (7d HML 7T avg_hold 76m > 45m timeout — gap exists)",
+    "rationale": "Either timeout is LONG-gated or SHORT rr_engine routing bypasses it. SHORT +$0.52/7d — verify coverage, do not extend while printing.",
+    "category": "instrumentation",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
