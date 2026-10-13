@@ -9532,3 +9532,24 @@ Final set: ['GRASS']
 - Overtrade: 2/hr (limit 20)
 - 5 open positions; live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-13 23:15] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 flat)
+**PnL:** +$0.01 (WR: 50.0%)
+
+**Details:**
+- BTC continuum-osc- SHORT UNIVERSAL_MAX_HOLD +$0.01 (+0.39%)
+- CHIP pump-chain- SHORT atr_trail_hit $0.00 (+2.14% account pct, tiny position rounds to 0 USDT)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: max 1T/signal last hour (needs 3+) — no candidates
+- 24h watch: doji-bottom-long 5T 0W −$0.46, volume-breakout-long+ 4T 0W −$0.25, ai-trader+ 3T 0W −$0.17 — 0 fires this hour, cannot re-trigger kill rule
+- 24h: 56T 14W −$1.53 (25.0%); hard_max_loss 21T = 37.5% of closes — under 40% threshold; atr_sl_hit 14/56 = 25.0% under 40%, tpsl_utils stable
+- Streak: hour 21 $0.00 (flat) breaks chain; hour 22 −$0.03 = 1 neg hr, under 3 → size lever N/A
+- Regime: SHORT_BIAS (31S/7L/86N) ≠ NEUTRAL → size lever N/A
+- Overtrade: 2/hr (limit 20)
+- 5 open positions; live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction

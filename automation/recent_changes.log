@@ -4637,3 +4637,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 22:15] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W −$0.04 (RESOLV volume-breakout-long+ atr_sl_hit, BLUR pump-chain- atr_sl_hit flat) | 24h 55T 13W −$1.57 (23.6%) | kill: none qualifying (max 1T 0W/signal, needs 3+) | volume-breakout-long+/ai-trader+ 24h 0%WR watch | hard_max_loss 38.2% — now UNDER 40% threshold | atr_sl_hit 27.3% (tpsl stable) | overtrade 2/hr | streak 1-neg under 3 | 5 open | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-13 23:15] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W +$0.01 (BTC continuum-osc- UNIVERSAL_MAX_HOLD, CHIP pump-chain- atr_trail_hit flat +2.14% pct) | 24h 56T 14W −$1.53 (25.0%) | kill: none qualifying (max 1T/signal, needs 3+) | doji-bottom-long 5T 0W, volume-breakout-long+ 4T 0W, ai-trader+ 3T 0W 0-fire watch | hard_max_loss 37.5% — under 40% threshold | atr_sl_hit 25.0% (tpsl stable) | overtrade 2/hr | streak 1-neg under 3 | regime=SHORT_BIAS ≠ NEUTRAL → size lever N/A | 5 open | live_trading=true, kill JSON=true
+BY: auto_1hr
