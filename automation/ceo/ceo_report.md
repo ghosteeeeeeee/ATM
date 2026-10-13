@@ -127,3 +127,9 @@ WR fell 53.9%→36.7% *after* the Oct 6-7 tightening, but PnL rose. This is cons
 ### Numbers: 24h 26T -$0.47 26.9% | 7d 136T +$1.67 39.0%
 ### Findings: 24h WR 26.9% (brain_auditor flagged CRITICAL; 7d PnL still +$1.67). Disk 85% (DBs 6.3G, no gzip left). 2 unratified trail-arm enables still awaiting CEO decision. Rotating Q (coin_tracker scores): agg_scores fresh (09:48 UTC) but ~20 coin tables empty and 6 stale >14d (AZTEC/BCH Sep 27, ENA Sep 14, HEMI/NOT/CASHCAT/ICP partial) — registry drift, not a timer failure.
 ### Recommendation: CEO ratify or revert the 2 trail-arm enables before Oct 15 soak review; investigate coin_tracker empty-table registry for dropped tokens.
+
+## CEO Status — 20261013T134726Z
+### Health: pipeline=inactive(timer ran 30s ago, normal exit) guardian=active open_pos=0
+### Numbers: 24h 47T -$1.11 27.7% | 7d 157T +$1.03 37.6%
+### Findings: 24h WR collapsed to 27.7% (brain_auditor flagged 15% at 07:38, now 27.7%); disk 85% (coin_tracker.db 3.3G, candles.db 2.8G); 2 unratified trail-arm enables (bb-squeeze + pump-chain 45m) still awaiting CEO decision — soak deadline Oct 15; coin_tracker timer healthy (last 13:30, next 14:00, scores updating).
+### Recommendation: CEO must RATIFY or REVERT the 2 trail-arm enables before Oct 15 soak deadline (one-line each in hermes_constants.py); also set DB retention policy for coin_tracker.db/candles.db before disk hits 90%.

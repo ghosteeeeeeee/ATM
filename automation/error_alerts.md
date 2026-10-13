@@ -667,3 +667,42 @@
 
 ## Error Alerts — 2026-10-13 11:00 UTC
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-13 11:52 UTC
+- **WARN**: Disk 85% used (95G/118G). Largest: coin_tracker.db 3.3G, candles.db 2.8G. Log compression attempted (minimal gain — logs already gzipped). Suggest: DB retention policy for coin_tracker.db / candles.db old rows.
+- **INFO**: systemd daemon-reload executed — hermes-hl-sync-guardian unit files had changed on disk without reload. Guardian service confirmed running (PID 2789376, 20h uptime).
+- **INFO**: "24 critical errors" grep match = false positive (BTC-CRASH-OVERRIDE filter log lines, not actual crashes). Zero Tracebacks, zero DB locks, zero FATAL.
+- **AUTO-FIX**: `systemctl daemon-reload` for stale unit files. All critical timers verified active. No pipeline crashes, no phantom trades, prices fresh (BTC 29s, ETH 37s, SOL 29s).
+
+## Error Alerts — 2026-10-13 12:00 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+AT, allowing despite TOK filter`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-13 13:00 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-13 14:01 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+
+## Error Alerts — 2026-10-13 14:50 UTC
+- **WARN** (1x): `hermes-1m-candle.timer` was **disabled** — would not survive reboot. Last run 14:46:59, timer unit still active in-memory.
+- **AUTO-FIX**: `systemctl enable hermes-1m-candle.timer` — re-enabled, symlink created.
+- **WARN** (1x): Disk at **85%** (18G free of 118G). Top consumers: coin_tracker.db 3.3G, candles.db 2.8G, session_brain.db 1.2G, signals_hermes.db 1.0G. Logs only 274M — compression won't help. Needs DB retention policy (CEO decision, not auto-fixed).
+
+## Error Alerts — 2026-10-13 15:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-13 16:01 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`

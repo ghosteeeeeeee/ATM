@@ -1,24 +1,40 @@
 {
-  "timestamp": "2026-10-13T10:50:39.166234+00:00",
+  "timestamp": "2026-10-13T15:50:41.340208+00:00",
   "steers": [
     {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ADA + ACE",
-      "detail": "Both opened within 24 minutes. Correlation risk.",
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 17/20 recent trades lost",
+      "detail": "Win rate 15% over last 20 trades. Total PnL: -0.91 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "9 recent losses look like wrong-side trades",
+      "title": "13 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'pump-chain-' losing streak: 8 losses",
+      "detail": "Net -0.35 USDT over last 20 trades (losses: -0.59). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'pump-chain+' losing streak: 3 losses",
+      "detail": "Net -0.26 USDT over last 20 trades (losses: -0.26). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-004"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "critical",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
@@ -26,16 +42,12 @@
     "volatility": "LOW",
     "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 4,
-  "deep_analysis": "2 slots open (4/6). USUAL SHORT was rejected on cooldown. Let me precheck short candidates.\nMost shorts fail on RSI < 35 (already dumped). Let me find coins with RSI in the sweet band 45-60.\nSEI SHORT passes. Let me check a few more for the best pick.\nTwo PASS: SEI SHORT and PUMP SHORT. Let me get current prices and check which is stronger.\nPUMP SHORT is the better pick \u2014 RSI 41.1 (closer to 45-55 sweet spot), stronger momentum (-1.44%), higher ATR (2.08%), clean downtrend (r2=0.85). Let me write the signal and merge my analysis.\nNow the deep analysis and merge:\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 4 (2 long, 2 short)\nUnrealized PnL: +0.07 USDT\nRegime: BEAR (STRONG_DOWN) | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent] BANANA LONG (RSI 13.3) + ME LONG (RSI 4.0) \u2014 both fighting\n   the entire market. doji-bottom-long oversold bounces in STRONG_DOWN.\n   BANANA is 84.9% SHORT_BIAS. The winning side is SHORT on both.\n   Exit before they become hard_max_loss trades.\n\n\ud83d\udfe1 [warning] ADA SHORT +1.88% \u2014 stop 0.2341 locked above entry 0.2371.\n   TP 0.2310 in range. Hold.\n\n\ud83d\udfe2 [info] ACE SHORT +1.42% \u2014 stop 0.1888 locked. Correctly aligned. Hold.\n\n\ud83d\udfe2 [info] AI Trader pick: PUMP SHORT conf=76. RSI 41.1, 89.8% SHORT_BIAS,\n   ATR 2.08%, precheck PASS all gates. (USUAL was rejected on cooldown.)\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nBTC below EMA300 (83,600) for 219 consecutive minutes. 85/123 tokens\nSHORT_BIAS. Both shorts are surfing the wave. Both longs are fighting it.\n\nVerified pattern: 7/8 LONGs at meta_rsi>=60 lost last 20 closes (avg\n-3.2%). SHORTs at mid-band RSI 40-50 are winning (ATOM +3%, CHIP +4.1%).\nThe signal pipeline has a problem: doji-bottom-long fires LONG with no\nregime awareness \u2014 pending on CRV, IOTA, KAS, CAKE all at RSI 18-41 in\na bear market. Simultaneously pump-chain- fires SHORT on the same coins.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Exit BANANA + ME LONGs \u2014 wrong side of every timeframe\n2. Hold ADA + ACE SHORTs \u2014 stop locked, TP in range\n3. PUMP SHORT fired (conf 76) \u2014 redeploying to the winning side\n4. Brain auditor: doji-bottom-long needs a BTC-below-EMA300 regime gate\n5. Watch BTC 83,600 (EMA300) \u2014 if reclaimed 30+ min, exit shorts\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
-  "agent_timestamp": "2026-10-13T10:57:47.612678+00:00",
-  "regime_context": "BTC @ 83,271. BELOW EMA300 (83,600) for 219 consecutive 1m candles (~3.6 hours). Continuum BELOW. Both 15m and 4h: SHORT_BIAS. Trend quality: STRONG_DOWN. Velocity SLOW, acceleration POSITIVE (slowing the decline), volume LOW. Linreg alignment 0.75 LEAN_BEAR. Z-score -2.02 STRONG_NEG. Market phase: RECOVERY (weak bounce attempt in a downtrend). Wyckoff: UNKNOWN.\n\n5m regime: 85/123 SHORT_BIAS, 35 neutral, 3 LONG_BIAS (MERL, TON, BTC neutral). This is NOT a mixed market \u2014 it's a one-way street. Alts are declining with beta to BTC.\n\nWhat this means: SHORTs are aligned with every timeframe. LONGs are counter-trend on every timeframe. The only way a LONG wins here is a sharp V-reversal \u2014 which hasn't happened and shows no signs of happening (acceleration POSITIVE but velocity still SLOW, volume LOW).\n\nLINE IN THE SAND: BTC 83,600 (EMA300). If BTC reclaims and holds above for 30+ minutes, short thesis weakens. Until then, SHORTS ONLY.",
-  "pattern_alerts": "VERIFIED PATTERN 1 (CRITICAL): High-RSI LONGs are money losers in STRONG_DOWN. Last 20 closes: 8 LONGs at meta_rsi >= 60, 7 lost. Avg loss -3.2%. Coins: BABY@75 (-3.3%), GRASS@72.8 (-2.7%), CRV@72.3 (-3.7%), SAND@66 (-2.9%), PONS@65.1 (-2.9%), IMX@64 (-4.2%), ENS@63.6 (-2.8%), BANANA@60.9 (-3.0%). WINNING SIDE: SHORT these coins, or wait for RSI reset to 35-50 before any long consideration. We bought the top of bounces inside a downtrend \u2014 wrong SIDE, not wrong timing.\n\nVERIFIED PATTERN 2 (PROFITABLE): SHORTs at mid-band RSI 40-50 win. ATOM@46.7 (+3.0%), CHIP@41.2 (+4.1%). Both pump-chain-. The 45-55 band is the SHORT profit zone \u2014 enough downside remaining, bounce hasn't started. Below 35 RSI, shorts get squeezed. Above 60, the move is partially done.\n\nVERIFIED PATTERN 3 (WARNING): pump-chain- is net negative overall (44 trades, 40.9% WR, -0.28 PnL) but works as a regime amplifier. ADA (+1.88%) and ACE (+1.42%) are winning BECAUSE 85/123 tokens agree on direction. When the tide is one-way, pump-chain- rides it. When mixed, it fails. Brain auditor should evaluate a regime-strength gate (only fire when >70% tokens SHORT_BIAS for SHORT signals, >70% LONG_BIAS for LONG signals).\n\nVERIFIED PATTERN 4 (URGENT): doji-bottom-long has no regime awareness. It fired on ME (RSI 4.0), BANANA (RSI 13.3), SEI (RSI 41.4), and is pending on CRV, IOTA, KAS, CAKE \u2014 all in a STRONG_DOWN bear. Overall WR is 64.3% but in this regime it's 0/2 closed (ME and SEI both negative or breakeven). The signal needs a BTC-below-EMA300 block for LONGs, or at minimum a regime-strength gate."
+  "open_count": 1
 }

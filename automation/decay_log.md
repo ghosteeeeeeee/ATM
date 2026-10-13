@@ -1791,3 +1791,10 @@
 [2026-10-13 06:34 UTC]   🟢 OK: pump-chain+: 7 trades, 28.6% WR, PnL=-2.88
 [2026-10-13 06:34 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-13 06:34 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-13 12:34 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-13 12:34 UTC]   🟡 RAPID DISABLE BLOCKED: doji-bottom-long: 0.0% WR but has winning regimes: ['HIGH', 'NORMAL']
+[2026-10-13 12:34 UTC]     → Keeping alive in habitat: HIGH, NORMAL
+[2026-10-13 12:34 UTC]   🟢 OK: pump-chain+: 9 trades, 33.3% WR, PnL=-0.57
+[2026-10-13 12:34 UTC]   🟢 OK: pump-chain-: 8 trades, 50.0% WR, PnL=2.35
+[2026-10-13 12:34 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-13 12:34 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
