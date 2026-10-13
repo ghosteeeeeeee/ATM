@@ -9304,3 +9304,29 @@ Final set: ['GRASS']
 - 24h WR 27.3% slipped below 30% — gap to ≥50% Oct 15 goal widening, 2 days left
 - FIL/CHIP pump-chain- SHORTs open — if market keeps pumping these add to the red; family stays under review
 - hard_max_loss still 45.5% of closes — brain_auditor SL-width review still pending
+
+## [2026-10-13 14:14] Hourly Analysis
+
+**Trades:** 3 closed last hour — 0 wins, 3 losses (BTC continuum-osc+ atr_sl_hit −$0.03, FIL pump-chain- hard_max_loss −$0.07, CHIP pump-chain- atr_sl_hit −$0.11)
+**PnL:** −$0.21 last hour (WR 0%) | 24h: 47T 13W −$1.11 (27.7%) | 1 open: BIGTIME hmacd_mtf-+ LONG +$0.01
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no signal with 3+ trades 0% WR last hour — pump-chain- 2T 0W (needs 3+), continuum-osc+ 1T 0W, others 0T. doji/oversold kills still holding (0 new entries; 24h doji −$0.46 is pre-kill cohort aging out)
+- pump-chain- flipped 24h slightly negative (−$0.08, was +$0.10) — still not kill-qualifying (2T last hour < 3+), 4-fix soak in progress, hold; will kill if 3+T 0W hour fires or 24h bleeds past −$0.30
+- ai-trader+ 24h 3T 0W −$0.17 but 0 trades last hour — no re-fire, no kill
+- hard_max_loss 21/47 = 44.7% of 24h closes −$1.81 — hold (brain_auditor: 4 fixes in soak, do not stack)
+- atr_sl_hit 9/47 = 19.1% — under 40%, tpsl_utils deployed and stable
+- Overtrade: 3/hr — well under 20
+- Streak: 11h −$0.04, 12h −$0.44, 13h −$0.19 = 3 consecutive negative calendar hours → rule FIRED, regime check: regime_5m overall=LONG_BIAS (57L/1S/60N) ≠ NEUTRAL → size lever N/A per rule wording and Oct 6 precedent
+- live_trading=true (constants line 33 + kill JSON) — verified
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 24h WR 27.7%, PnL −$1.11 — gap to ≥50% Oct 15 goal very large, 2 days left
+- 3 consecutive negative hours with LONG_BIAS regime — odd combination (LONG_BIAS but LONG-side and SHORT-side both bleeding); suggests chop not trend, worth a regime-quality look if it persists
+- pump-chain- 24h flipped negative — primary watch signal this hour
+- BIGTIME hmacd_mtf-+ open — hmacd_mtf-+ 24h 3T 1W −$0.15, weak signal, position tiny (+$0.01)
+- hard_max_loss still 44.7% of closes — brain_auditor SL-width review still pending

@@ -4619,3 +4619,5 @@ BY: auto_1hr
   CREATIVE: (1) 5m momentum gate for chop-entry signals — block trades with |price_change_5m| < 0.15% at entry (needs backtest) (2) hmacd_mtf-+ 14d watch (10T -$0.47, n<20 threshold).
   0 CHANGES APPLIED — 4 fixes in soak, do not stack.
   BY: brain_auditor
+[2026-10-13 14:14] auto_1hr: NO CONFIG CHANGE — 3T last hour 0W −$0.21 | 24h 47T 13W −$1.11 (27.7%) | kill: none qualifying (max 2T 0W, needs 3+) | pump-chain- 24h flipped −$0.08 — watch, not kill-qualifying | hard_max_loss 44.7% (hold soak) | atr_sl_hit 19.1% (tpsl stable) | overtrade 3/hr | streak 3-neg calendar hours, regime=LONG_BIAS ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
+BY: auto_1hr
