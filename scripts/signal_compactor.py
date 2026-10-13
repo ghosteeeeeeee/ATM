@@ -2140,7 +2140,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                      time_block_mult * phase_mult * confluence_mult * inverse_mult *
                      lifecycle_mult * vol_regime_mult * short_normal_mult *
                      oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult)
-    _mult_floor = 0.3  # Score can't drop below 30% of base regardless of penalty stacking
+    from hermes_constants import PENALTY_MULT_FLOOR as _mult_floor  # CEO 2026-10-13: 0.3→0.5
     # CEO Fix 1: store raw product for decider penalty-gated execution
     try:
         _penalty_product_tracker[(token.upper(), direction.upper())] = _mult_product

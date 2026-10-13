@@ -1088,8 +1088,35 @@ def rr_confidence_multiplier(token, direction, price, signal_type=None, candles_
         # Hard block conditions
         if grade == 'F':
             return 0.0, f"RR HARD BLOCKED: grade=F (score={score})"
-        if rr < getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70):
-            return 0.0, f"RR HARD BLOCKED: R:R={rr:.2f} < {getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70)} (risk > reward)"
+        # CEO 2026-10-13 RECALIBRATION: regime exemption — confirmed structure lowers threshold
+        _rr_effective_block = getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70)
+        _rr_regime_exempt = False
+        try:
+            import sqlite3 as _rr_sqlite3, os as _rr_os, time as _rr_time
+            _rr_cont = _rr_sqlite3.connect(_rr_os.path.join(
+                getattr(hc, 'HERMES_DATA', '/root/.hermes/data'), 'continuum.db'), timeout=3)
+            try:
+                _rr_row = _rr_cont.execute(
+                    "SELECT linreg_direction, ema300_position, ts FROM continuum_states "
+                    "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                ).fetchone()
+            finally:
+                _rr_cont.close()
+            if _rr_row:
+                _rr_linreg, _rr_ema, _rr_ts = _rr_row
+                _rr_age = _rr_time.time() - (_rr_ts or 0)
+                if _rr_age < 600:  # fresh data (<10min)
+                    if direction.upper() == 'LONG' and _rr_linreg in ('LEAN_BULL', 'BULL') and _rr_ema == 'ABOVE':
+                        _rr_regime_exempt = True
+                    elif direction.upper() == 'SHORT' and _rr_linreg in ('LEAN_BEAR', 'BEAR') and _rr_ema == 'BELOW':
+                        _rr_regime_exempt = True
+            if _rr_regime_exempt:
+                _rr_effective_block = getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR_CONFIRMED', 0.35)
+        except Exception:
+            pass
+        if rr < _rr_effective_block:
+            _rr_tag = ' [RR-REGIME-EXEMPT]' if _rr_regime_exempt and rr >= getattr(hc, 'RR_ENGINE_CONF_HARD_BLOCK_RR', 0.70) else ''
+            return 0.0, f"RR HARD BLOCKED: R:R={rr:.2f} < {_rr_effective_block} (risk > reward){_rr_tag}"
         if not result['pass'] and result.get('block_reason', ''):
             return 0.0, f"RR HARD BLOCKED: {result['block_reason']}"
 

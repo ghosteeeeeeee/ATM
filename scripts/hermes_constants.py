@@ -756,7 +756,8 @@ ATR_PCT_HIGH_THRESH= 0.015  # 1.5% — matches EXTREME regime threshold
 # Evidence (brain/regime-recalibration-backtest-2026-10-12.md, CEO-independent-repro CONFIRMED):
 #   >=4.0% ATR bad BOTH directions — LONG 44.4% WR -$1.48 (n=54), SHORT 24.0% WR -$1.16 (n=25).
 # Worst case of blocking = a missed trade, never a loss. Instant revert: MAXXED_BLOCK_ENABLED=False.
-MAXXED_ATR_PCT_THRESH = 4.0  # ATR% at/above which a token is "maxxed out"
+MAXXED_ATR_PCT_THRESH = 6.0  # ATR% at/above which a token is "maxxed out" — CEO 2026-10-13 RECALIBRATION: 4.0→6.0. At 4.0, BLUR blocked every cycle (ATR 5.99-6.04%). Market routinely 5-6% ATR now.
+PENALTY_MULT_FLOOR = 0.5     # CEO 2026-10-13 RECALIBRATION: 0.3→0.5. Multiplier products were 0.03-0.24, floored to 0.3, still below hotset threshold. 0.5 lets signals score high enough to compete.
 MAXXED_BLOCK_ENABLED  = True  # kill-switch for the MAXXED approval+exec block
 MAXXED_REGIME_LOG     = True  # shadow-log every MAXXED sighting (measure counterfactual)
 
@@ -895,7 +896,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 45           # RAISED 40→45 (CEO/T 2026-10-06). 30d meta-RSI SHORT: 40-45=37T -$2.28 43.2%WR (BLEED BAND — cut). 45-50=20T -$0.50 50%; 50-55=57T +$0.27 50.9% (only global positive band). EXTREME 55-65=17T +$0.98 64.7% BEST cell. T directive: broader SHORT market but not the 40-45 losers. Prior40 came from stale 14d claim (26T 69%WR) — current 30d does not reproduce it.
+SHORT_RSI_FLOOR = 35           # CEO 2026-10-13 RECALIBRATION: 45→35. BTC SHORT at RSI 16.1 was blocked during confirmed bear dump. RSI<35 still blocked (BANANA lesson). Revert: 10+ RSI 35-45 SHORTs lose >$1 in 7d.
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
 # The aggregate 40-45 bleed is from OTHER signals, not pump-chain. Pump-chain gets lower floor.
 SHORT_RSI_FLOOR_PUMP_CHAIN = 40  # pump-chain-specific floor (auditor-approved, 2026-10-12)
@@ -905,7 +906,7 @@ SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocke
 # STANDALONE_BYPASS skips signal_compactor (where OVERSOLD_SHORT_RSI_MAX lives), and both compactor
 # and decider bearish-structure overrides allowed RSI<25 SHORT through. 14d: RSI<25 SHORT = 12T 25%WR
 # -$0.89; 0 real winners (3 scratches +$0.01 each). BANANA lesson: oversold = bounce risk even in downtrend.
-SHORT_RSI_HARD_FLOOR = 45      # brain_auditor 2026-10-07: raised 25→45, align SHORT_RSI_FLOOR. 30d SHORT RSI<45=114T 34.4%WR -$5.52 vs >=45=246T +$3.53. Defense-in-depth: catches STANDALONE_BYPASS paths that only check HARD_FLOOR. No bearish override.
+SHORT_RSI_HARD_FLOOR = 35      # CEO 2026-10-13 RECALIBRATION: 45→35. Aligns with SHORT_RSI_FLOOR. BTC SHORT at RSI 16.1, INJ at 22.4, FIL at 43.7 all blocked during confirmed bear dumps. RSI<35 still blocked. Revert: 10+ RSI 35-45 SHORTs lose >$1 in 7d.
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
 # Blanket 45 floor cuts off this band. Pump-chain gets a lower floor. Revert if 7d n>=5 WR<45% or PnL<-$0.50.
 SHORT_RSI_HARD_FLOOR_PUMP_CHAIN = 40  # pump-chain-specific floor (auditor-approved, 2026-10-12)
@@ -3398,7 +3399,7 @@ VORTEX_BREAK_MIN_CONFIDENCE = 80    # CEO 2026-08-05 — lowered from 95 for pap
 RETURN_EXHAUSTION_ENABLED = False    # auto_1hr 2026-08-18 — 3T/0%WR -$0.21, auto-kill threshold crossed
 RETURN_EXHAUSTION_PLUS_ENABLED = True    # return_exhaustion+ LONG (extreme negative)
 RETURN_EXHAUSTION_MINUS_ENABLED = False  # CEO 2026-08-08 — 14 trades, -$0.64 across combos. hemorrhaging like hzscore-.
-RETURN_EXHAUSTION_SHORT_ENABLED = True   # return_exhaustion_short — SHORT-specific with regime filter, tighter percentile/RSI, volume
+RETURN_EXHAUSTION_SHORT_ENABLED = False  # CEO 2026-10-13 RECALIBRATION — 1 closed trade ever (0W −$0.11). Fires → PENDING → expires uselessly. Disable to stop wasted compaction cycles.
 RETURN_EXHAUSTION_MIN_CONFIDENCE = 90  # raised 2026-08-07 (was 70) — 48h data: <90 conf = 37.5% WR, 90+ = 72% WR
 
 # ── Engulfing Candle Signal ──────────────────────────────────────────────
@@ -3922,6 +3923,7 @@ RR_ENGINE_CACHE_TTL          = 300     # 5 min cache for S/R map and vol width p
 RR_ENGINE_CONF_ENABLED       = True    # master switch for RR confidence adjustment
 RR_ENGINE_CONF_SHADOW        = False   # False = actually block bad R:R setups (was shadow mode)
 RR_ENGINE_CONF_HARD_BLOCK_RR = 0.55    # R:R below this = hard block (0.0x multiplier) — lowered from 0.70 (2026-10-12 CEO). During dumps, SHORT R:R is bad by construction (price near support, SL far at resistance). 0.55 lets through marginal 0.55-0.69 setups with 0.70x penalty while still blocking garbage (R:R < 0.55). Prior: 0.95→0.70 (2026-09-23).
+RR_ENGINE_CONF_HARD_BLOCK_RR_CONFIRMED = 0.35  # CEO 2026-10-13 RECALIBRATION: effective threshold in confirmed structure (LEAN_BULL+ABOVE-EMA300 for LONGs / LEAN_BEAR+BELOW-EMA300 for SHORTs). Regime confirms direction; R:R double-gates. 133 hard blocks in 24h. Revert: 10+ regime-exempted trades lose >$1 in 7d. Log tag: [RR-REGIME-EXEMPT]
 RR_ENGINE_CONF_HARD_BLOCK_SCORE = 35   # Score below this = hard block (grade F)
 RR_ENGINE_CONF_BOOST_THRESHOLD_RR = 4.0  # R:R above this + Grade A = boost
 RR_ENGINE_CONF_BOOST_MULT    = 1.30    # multiplier for exceptional setups (R:R≥4 + Grade A)
