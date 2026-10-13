@@ -9356,3 +9356,30 @@ Final set: ['GRASS']
 - All 3 closes last hour were LONG-side hard_max_loss during LONG_BIAS regime — LONG entries failing in a long-bias chop, consistent with brain_auditor's chop-entry 5m momentum gate idea (needs backtest)
 - hard_max_loss now 49% of closes — SL-width review still pending, soak holds
 - BIGTIME hmacd_mtf-+ open −0.74% — hmacd_mtf-+ weak (4T 1W −$0.22), tiny position
+
+## [2026-10-13 16:15] Hourly Analysis
+
+**Trades:** 3 closed last hour — 0 wins, 3 losses (GMX pump-chain- SHORT hard_sl −$0.03/45m, ICP pump-chain- SHORT atr_sl_hit −$0.05/8m, BIGTIME hmacd_mtf-+ LONG hard_sl −$0.11/69m — the open position from 15:15 closed)
+**PnL:** −$0.19 last hour (WR 0%) | 24h: 52T 13W −$1.56 (25.0%) | 1 open: BTC continuum-osc- SHORT flat
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: pump-chain- 2T 0W last hour (needs 3+), hmacd_mtf-+ 1T 0W — neither qualifies
+- volume-breakout-long+ 24h 3T 0W −$0.21 — 0 trades last hour, no re-fire, watch
+- ai-trader+ 24h 3T 0W −$0.17 — 0 trades last hour
+- doji/oversold kills still holding (24h −$0.46/−$0.33 are pre-kill cohorts aging out; 0 new entries)
+- hmacd_mtf-+ 24h 5T 1W −$0.33 — has 1 win, not 0%, not kill-qualifying
+- hard_max_loss 24/52 = 46.2% of 24h closes −$2.07 — hold (brain_auditor: 4 fixes in soak, do not stack)
+- atr_sl_hit 10/52 = 19.2% — under 40%, tpsl_utils deployed and stable
+- Overtrade: 3/hr — well under 20
+- Streak: 11h −$0.04 through 15h −$0.26 = 5 consecutive negative calendar hours → rule FIRED, regime check: regime_5m overall=SHORT_BIAS (94S/2L/23N) ≠ NEUTRAL → size lever N/A per rule wording and Oct 6 precedent
+- live_trading=true (constants line 33 + kill JSON verified)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Regime flipped LONG_BIAS → SHORT_BIAS (94/2/23) since 15:00 — broad market dump; prior hours' LONG-side bleed may reverse or accelerate
+- ICP pump-chain- SHORT died in 8m atr_sl_hit during SHORT_BIAS with ICP already −1.33% over 16 candles — looks like chase-into-move; worth checking if chase filter should be tighter for shorts in strong short-bias (needs data, not a 1-trade change)
+- 24h WR 25.0%, PnL −$1.56 — 2 days to Oct 15 ≥50% goal, gap very large
+- hard_max_loss 46.2% of closes — brain_auditor SL-width/entry-filter review still pending
