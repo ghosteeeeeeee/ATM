@@ -9,7 +9,7 @@ plus accel_300_v3 exec-RSI still use their own inline implementations.
 
 Usage:
     from rsi_utils import compute_rsi
-    rsi = compute_rsi(token)           # defaults to 1m, 15 candles
+    rsi = compute_rsi(token)           # defaults to 1m, 20 candles
     rsi = compute_rsi(token, tf='5m')  # 5m candles
     rsi = compute_rsi(token, period=14, limit=20)  # custom params
     rsi = compute_rsi(token, tf='5m', max_age_s=900)  # fail-closed if candles stale
@@ -59,7 +59,8 @@ def compute_rsi(token: str, tf: str = '1m', period: int = 14, limit: int = 20,
     import time
 
     # Check cache first (but never serve a cached value that fails the staleness check)
-    cache_key = (token.upper(), tf, period)
+    # limit is in the key: a limit=15 caller must not share entries with limit=20 callers
+    cache_key = (token.upper(), tf, period, limit)
     if cache_key in _rsi_cache:
         cached_rsi, cached_ts, cached_candle_ts = _rsi_cache[cache_key]
         if time.time() - cached_ts < _CACHE_TTL:

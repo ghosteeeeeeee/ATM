@@ -87,3 +87,31 @@ Any change causing **−$2.00 aggregate over 24h from newly-unblocked trade clas
 ## Note on the WR drop
 
 WR fell 53.9%→36.7% *after* the Oct 6-7 tightening, but PnL rose. This is consistent with the filters cutting mid-tier winners and losers alike, leaving fewer but (per unit) better trades — until volume dropped to near-zero. The recalibrations above restore frequency without returning to the pre-Oct-6 regime: every loosening has a measured revert trigger and a log tag for counterfactual audit.
+
+---
+
+# RSI Consistency Normalization (Cutler→Wilder) — 2026-10-13
+
+**Decision: LEAVE AS-IS (Option 2). No shadow rollout. Reject limit=20.**
+
+## Rationale
+
+1. **The limit=15 "normalization" is a mathematical no-op — the shadow rollout would have nothing to measure.** Wilder with exactly 14 deltas (15 closes) skips the smoothing loop entirely (`range(period, len(gains))` = `range(14,14)` = empty, rsi_utils.py:105) and reduces to `sum(gains)/14` — the identical formula to the Cutler block at signal_schema.py:510-512. The audit's 2000/2000 match is code equivalence, not an empirical coincidence. Collecting 7 days of counterfactual for a no-op is pure overhead.
+
+2. **The only real delta a swap would introduce is the `is_closed=1` filter, not Wilder.** `_get_closes_from_candles_1m` (signal_schema.py:428) includes the in-progress candle; rsi_utils excludes it. That is a candle-set change on a fallback analytics field — near-zero value, and not what anyone asked to normalize.
+
+3. **limit=20 is a tuning change, not a consistency fix.** It shifts 619/622 live values (151 by >10 pts) and touches decider_run exec-time RSI ceilings/floors + drift checks. Zero evidence the extra smoothing benefits anyone. If proposed again, it must arrive as a tuning proposal with a backtest showing enrichment-RSI consumers improve — via the automatic-implementation shadow pattern. Not as a consistency ticket.
+
+4. **Blast radius of the status quo is already contained.** Money-gating RSI comes from rsi_utils (`_ctx_gate_get_rsi` → decider_run.py:950-951; exec-time at 2023-2029); SHORT path fails closed on None. The enrichment RSI (signal_schema.py:512) is a shared fallback + `_signal_metadata` analytics only. Divergence is loudly documented in-code at signal_schema.py:478-504.
+
+5. **Opportunity cost.** 7 days of collection + flip risk + review cycles for cosmetics on a fallback field, while engineering attention is needed on the recalibration plan above.
+
+## Accepted residual (known, documented, no money impact)
+
+- Enrichment `rsi_14` (feeds `entry_rsi_14` / `_signal_metadata`) remains equal-weight Cutler over a live-candle-inclusive 15-close window. Exec-time RSI remains Wilder over closed candles. Consumers reading metadata RSI get a slightly different number than the exec gate saw — by design, until a real tuning case exists.
+- Round RSI values (0/20/…/75/100) remain in metadata. They are genuine 3:1 gain:loss ratios from tick quantization — not clamps, not thin data.
+
+## Shipped with this ruling
+
+- **rsi_utils.py:62 cache key omitted `limit`** — latent footgun: any future caller passing a non-default limit would silently share/poison cache entries with default-limit callers (wrong-window RSI). Added `limit` to the cache key. Zero behavior change today (all live callers use the default 20). Also fixed stale docstring (said "defaults to 1m, 15 candles" — default is 20).
+- **signal_schema.py divergence comment updated** to record this ruling so the "must go through SHADOW ROLLOUT" mandate from the 2026-10-13 audit is not re-activated by a future agent.

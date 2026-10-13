@@ -476,6 +476,36 @@ def _enrich_indicators(token):
                                       'extreme_low' if z < -2 else 'low' if z < -1 else 'neutral')
             result['bb_position'] = round((last - (mean - 2 * std)) / (4 * std), 4)
         # RSI(14) — use candles_1m for accuracy (matches signal filters)
+        #
+        # ── DIVERGENCE NOTE (audit 2026-10-13) — DO NOT "FIX" THE ROUND VALUES ──
+        # This is an EQUAL-WEIGHT Cutler RSI over the last 14 changes (a 15-close
+        # window), NOT Wilder smoothing. Every other consumer in the codebase uses
+        # Wilder via rsi_utils.compute_rsi(). Two things to know before touching this:
+        #
+        # 1. ROUND SPIKE (0/20/25/33.3/40/50/60/66.7/75/80/100) IS NOT A CLAMP.
+        #    An auditor flagged "meta rsi_14 clusters at exactly 75.0". There is NO
+        #    `=75` default anywhere — every `75` in the codebase is a comparison
+        #    filter. The round values come from TICK-QUANTIZATION on low-priced
+        #    tokens: IMX (~$0.13) sums gains/losses to exact rational ratios like
+        #    3.0000 -> exactly 75.00, or 0.6667 -> exactly 40.0, on DENSE windows
+        #    (14/14 nonzero moves). It is a genuine gain:loss ratio, not fabricated.
+        #    It spans 15+ distinct signal_types because this is the SHARED fallback
+        #    (see ~2248: `if rsi_14 is None: rsi_14 = enriched.get('rsi_14')`).
+        #    A "min nonzero changes" guard does NOT help — round values appear on
+        #    dense windows too (only ~6/110 would be caught).
+        #
+        # 2. Cutler == Wilder ON THIS 15-CLOSE WINDOW (verified 2000/2000 series).
+        #    The divergence ONLY appears if Wilder is fed MORE candles (rsi_utils
+        #    default limit=20), where 619/622 live values shift (151 by >10 pts).
+        #    So do NOT blindly swap in rsi_utils.compute_rsi() here — it changes
+        #    every RSI downstream (exec-time ceilings/floors + drift checks).
+        #    CEO RULING 2026-10-13: divergence ACCEPTED as-is, no rollout.
+        #    - limit=15 swap is a mathematical no-op (Wilder with exactly 14 deltas
+        #      reduces to the same sum(gains)/14 formula) — the only real delta is
+        #      rsi_utils' is_closed=1 filter, a candle-set change nobody asked for.
+        #    - limit=20 is a TUNING change, not a consistency fix — rejected.
+        #      Re-open only as a tuning proposal with a backtest, via the
+        #      automatic-implementation shadow pattern. See ceo_report.md 2026-10-13.
         closes_1m = _get_closes_from_candles_1m(token, lookback=50)
         if len(closes_1m) >= 15:
             changes = [closes_1m[i] - closes_1m[i-1] for i in range(1, len(closes_1m))]
