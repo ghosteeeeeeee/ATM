@@ -4629,3 +4629,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 18:14] auto_1hr: NO CONFIG CHANGE — 6T last hour 1W −$0.32 (CC pump-chain- atr_trail_hit +$0.07; CRV/LDO/ALGO pump-chain-+v6- atr_sl_hit, COMP/ALT pump-chain+ trail_arm_timeout) | 2 open (BTC +0.42%, MNT +0.16%) | 24h 58T 14W −$1.88 (24.1%) | kill: none qualifying (pump-chain- 3T 1W not 0%, pump-chain+ 2T 0W needs 3+) | volume-breakout-long+/ai-trader+ 24h 3T 0W 0-fire watch | hard_max_loss 41.4% (hold soak) | atr_sl_hit 22.4% (tpsl stable) | overtrade 6/hr | streak 2-neg calendar (under 3), regime=SHORT_BIAS (56S/54N) ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-13 19:13] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 58T 14W −$1.88 (24.1%) | kill: none (0 trades) | atr_sl_hit 22.4% (tpsl stable) | hard_max_loss 41.4% (hold soak) | overtrade 0/hr | streak 2-neg under 3, regime=LONG_BIAS ≠ NEUTRAL → size lever N/A | live_trading=true, kill JSON=true
+BY: auto_1hr

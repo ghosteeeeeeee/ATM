@@ -9463,3 +9463,20 @@ Final set: ['GRASS']
 - signal_analyst: wyckoff pairing undelivered — 3rd missed delegation class (wyckoff Oct 9/11/13).
 
 **Next:** Oct 15 — WR ≥50% checkpoint, bb-squeeze soak review, pump-chain 45m soak review, Rep 2b candidate, wyckoff shadow n-review (~2wk data window opens). CEO: trail-arm ratify, doji regime, disk deep-prune plan.
+
+## [2026-10-13 19:13] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 (no closes)
+
+**Changes:** None.
+
+**No Change Needed:**
+- 0T last hour → no kill-rule candidates (rule requires 3+T/0W in hour)
+- 24h: 58T 14W −$1.88 (24.1%) — bleeds unchanged, largest bucket hard_max_loss 24T −$2.07 (41.4%, under-40% threshold crossed but held: brain_auditor soak, 4 fixes in progress, do not stack)
+- atr_sl_hit 13/58 = 22.4% — under 40%, tpsl_utils deployed/stable
+- 0%-WR 24h signals (doji 5T, oversold-bounce+ 3T, volume-breakout-long+ 3T, ai-trader+ 3T) — doji/oversold already killed, others 0-fire this hour (0 last-hour trades so cannot re-trigger kill rule)
+- Streak: hour 17 −$0.18 + hour 18 −$0.14 = 2 consecutive neg calendar hrs, under 3; hour 19 empty. Regime=LONG_BIAS (36L/6S/78N 5m aggregate) ≠ NEUTRAL → size lever N/A
+- Overtrade: 0/hr (limit 20)
+- live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
