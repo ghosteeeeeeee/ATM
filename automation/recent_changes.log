@@ -4663,3 +4663,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-14 11:15] auto_1hr: NO CONFIG CHANGE — 0T last hour, 0 open | 24h 57T 13W −$1.66 (22.8%) | kill: none (0 trades) | hard_max_loss 33.3% (under 40) | atr_sl_hit 29.8% (tpsl stable) | overtrade 0/hr | pump-chain+/pump-chain- 24h worst but 0-fire this hour | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-14 12:15] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W +$0.14 (ENS bb-squeeze+/CASHCAT bb-bounce-v2-long+ profit-monster-trail) | 24h 52T 13W −$1.38 (25.0%) | kill: none (max 1T 1W/signal, needs 3+) | pump-chain- 16T 2W −$0.48, pump-chain+ 6T 1W −$0.20 24h worst but 0-fire this hour | volume-buildup+ remains killed | hard_max_loss 30.8% (under 40) | atr_sl_hit 28.8% (tpsl stable) | winners MAE avg 0.156% (entries fine) | overtrade 2/hr | streak positive (no 3-neg) | 1 open | live_trading=true, kill JSON=true
+BY: auto_1hr
+[2026-10-14 13:14] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W −$0.12 (LTC volume-buildup- SHORT trail +$0.11, SEI r2-trend-long4 atr_sl_hit −$0.23) | 24h 47T 12W −$1.24 (25.5%) | kill: none (max 1T 0W/signal, needs 3+) | volume-buildup+ remains killed (3T 0W 24h pre-kill) | hard_max_loss 27.7% (under 40) | atr_sl_hit 29.8% (tpsl stable) | winners MAE avg 0.139% (entries fine) | overtrade 2/hr | streak positive (no 3-neg) | live_trading=true, kill JSON=true
+BY: auto_1hr

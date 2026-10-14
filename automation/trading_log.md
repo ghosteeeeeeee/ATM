@@ -9829,3 +9829,52 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 - Overtrade: 0/hr (limit 20)
 - hard_max_loss/atr_sl_hit both under thresholds
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 12:15] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.14 (WR: 100.0%)
+
+**Details:**
+- ENS bb-squeeze+ LONG profit-monster-trail +$0.06 (+2.79%)
+- CASHCAT bb-bounce-v2-long+ LONG profit-monster-trail +$0.08 (+2.24%)
+- 24h: 52T 13W −$1.38 (25.0% WR)
+- Open: 1
+- Kill switch: live_trading=true verified
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: max 1T 1W per signal this hour (needs 3+T 0W) — no candidates
+- 24h watch: pump-chain- 16T 2W −$0.48, pump-chain+ 6T 1W −$0.20 — 0 fires this hour, neither re-triggers kill rule
+- volume-buildup+ remains killed (09:15); 3T 0W −$0.26 in 24h are pre-kill trades only
+- hard_max_loss 16/52 = 30.8% under 40% threshold; atr_sl_hit 15/52 = 28.8% under 40%, tpsl_utils stable
+- Entry quality: winners 24h MAE avg 0.156% (max 0.288%) — under 0.5%, entries fine
+- Streak: hour 08 −$0.20, hour 09 +$0.16, hour 12 +$0.14 — no 3-neg streak
+- Overtrade: 2/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+## [2026-10-14 13:14] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** −$0.12 (WR: 50.0%)
+
+**Details:**
+- LTC volume-buildup- SHORT profit-monster-trail +$0.11 (+4.90%)
+- SEI r2-trend-long4 LONG atr_sl_hit −$0.23 (−5.19%)
+- 24h: 47T 12W −$1.24 (25.5% WR)
+- 24h by reason: atr_sl_hit 14/47=29.8% (under 40), hard_max_loss 13/47=27.7% (under 40)
+- 24h worst: volume-buildup+ 3T 0W −$0.26 (already killed 09:15), pump-chain+ 6T 1W −$0.20, hmacd_mtf-+ 2T 0W −$0.18
+- Kill switch: live_trading=true verified
+
+**Changes:** None — max 1T 0W per signal this hour (needs 3+T 0W) to kill.
+
+**No Change Needed:**
+- Kill rule: no candidates (r2-trend-long4 1T 0W, volume-buildup- 1T 1W)
+- hard_max_loss/atr_sl_hit both under 40% thresholds
+- Entry quality: winners 24h MAE avg 0.139% — under 0.5%, entries fine
+- Streak: hour 12 +$0.02 positive, no 3-neg streak
+- Overtrade: 2/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
