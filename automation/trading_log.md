@@ -9570,3 +9570,26 @@ Final set: ['GRASS']
 - Overtrade: 0/hr (limit 20)
 - 6 open positions ($0.00 unrealized); live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 01:15] Hourly Analysis
+
+**Trades:** 6 closed (2 wins, 4 losses)
+**PnL:** +$0.13 (WR: 33.3%)
+
+**Details:**
+- ACE pump-chain- SHORT atr_trail_hit +$0.30 (+7.16%) — covered the hour
+- MNT bb-bounce-v2-long+ profit-monster-trail +$0.08 (+3.57%)
+- STX ai-trader+ hard_max_loss −$0.07, PUMP volume-breakout-short- hard_max_loss −$0.09, GMX bb-bounce-v2-long+ atr_sl_hit −$0.09, SAGA r2-trend-long5 atr_sl_hit $0.00 flat
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: max 2T 1W (bb-bounce-v2-long+) per signal last hour (needs 3T 0W) — no candidates
+- 24h watch: doji-bottom-long 5T 0W −$0.46, volume-breakout-long+ 4T 0W −$0.25, ai-trader+ 4T 0W −$0.24 — ai-trader+ fired 1T this hour (STX loss) but not 3+; none re-trigger kill rule
+- 24h: 61T 16W −$1.30 (26.2%) — improved from −$1.53
+- hard_max_loss 22/61 = 36.1% under 40%; atr_sl_hit 16/61 = 26.2% under 40%, tpsl_utils stable
+- Streak: hour 00 +$0.20, hour 01 −$0.07 = 1 neg hr, under 3 → size lever N/A
+- Regime: 23S/38L = LONG_BIAS ≠ NEUTRAL → size lever N/A
+- Overtrade: 6/hr (limit 20)
+- 1 open (+0.62%); live_trading=true (kill JSON verified); no constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
