@@ -10036,3 +10036,29 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 
 **Open Questions:**
 - Guardrail ESCALATE still active (48h WR 28.9%) — watching, no action this hour
+
+## [2026-10-14 20:13] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+
+**Details:**
+- Quiet hour — 0 closes, 0 open positions (2nd consecutive 0T hour)
+- 24h: 39T 14W −$0.02 net (35.9% WR, near breakeven)
+- 24h by reason: atr_sl_hit 11/39=28.2% (under 40), hard_max_loss 9/39=23.1%, profit trails 15/39 (+$1.42) — tpsl stable
+- 24h worst: volume-buildup+ 3T 0W −$0.26 (already killed 09:15, pre-kill only); rest ≤2T each, no kill candidates
+- volume-buildup- SHORT: 4T 4W +$0.41 — still best signal 24h
+- live_trading=true, kill JSON=true
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no candidates (0 trades this hour; no signal with 3+T 0W)
+- atr_sl_hit 28.2% under 40% threshold — tpsl stable
+- Streak: 14h +$0.14, 16h −$0.16, 17h +$0.28, then quiet — no 3-neg
+- Overtrade: 0/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Guardrail ESCALATE still active (48h WR 28.9%) — watching, no action
