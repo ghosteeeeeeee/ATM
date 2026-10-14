@@ -160,3 +160,7 @@ ISSUES:
 - Constants: `scripts/hermes_constants.py`
 - Signal outcomes: `data/signals_hermes_runtime.db`
 - Trading log: `automation/trading_log.md`
+
+## Column Name Gotchas (brain DB `trades` table)
+- Signal metadata JSON column is **`_signal_metadata`** (leading underscore) — NOT `signal_metadata`. Using the wrong name causes `column "signal_metadata" does not exist` errors. Example: `_signal_metadata->>'source'`, `(_signal_metadata->>'rsi_14')::numeric`.
+- Token column is **`chain`**, not `coin` or `token`.

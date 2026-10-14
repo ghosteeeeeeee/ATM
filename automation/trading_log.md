@@ -9990,3 +9990,23 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 - Overtrade: 1/hr (limit 20)
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 18:45] Daily Orchestrator
+
+**Pipeline:** 24h 39T 14W −$0.02 (35.9% WR, nearly breakeven) | 7d 192T −$0.55 (35.4%) | 0 open | Disk 84% | Kill LIVE=true | Regime LONG_BIAS
+
+**Implemented:**
+1. Disk cleanup — removed 17 stale ATM hourly zips from /tmp (~224M). 19G free.
+2. signal_reporter_prompt.md — documented `_signal_metadata` (leading underscore) + `chain` column gotchas to prevent recurring PG column-name errors in reporter SQL.
+
+**Milestones:**
+- Wyckoff shadow n≥30 REACHED (34 fires, 28 in 24h: 19 SHORT / 9 LONG). Ahead of schedule. Pairing backtest now possible — flip only with CEO GO.
+- pump-chain+ LONG recovered −$0.08 → +$0.28 (ARB trail). No longer kill candidate.
+- doji-bottom-long resolved by brain_auditor (796c745): EXTREME-gated re-enable, correct per SIGNAL KILL POLICY.
+
+**Flagged:**
+- brain_auditor mid-work uncommitted signal_compactor.py meta-source RSI fixes — not touched.
+- Guardrail ESCALATE active (48h WR 28.9% < 40%, PnL −$1.90 under −$3.00 pause threshold).
+- Trail-arm ratify still pending CEO — Oct 15 soak review tomorrow.
+
+**Changes:** 0 config/constants changes (orchestrator role — no strategic decisions).

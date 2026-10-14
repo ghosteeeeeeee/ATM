@@ -1,49 +1,51 @@
-# Current State — Daily Orchestrator Oct 13 18:45 UTC
+# Current State — Daily Orchestrator Oct 14 18:45 UTC
 
-**Last Updated: 2026-10-13 18:45 UTC**
-**Updated by: daily_orchestrator — Wyckoff shadow rule verified live; disk 85%→83%; trail-arm ratify still pending CEO**
+**Last Updated: 2026-10-14 18:45 UTC**
+**Updated by: daily_orchestrator — wyckoff n≥30 reached; pump-chain+ recovered; disk cleanup ~224M; trail-arm ratify still pending CEO (Oct 15 tomorrow)**
 
 ## PIPELINE STATUS (18:40 UTC)
 
-- **Today: 58 closed, 24.1% WR, −$1.88** — bad day (chase-into-move losses, hard_max_loss 41% of closes) | 2 open | 7d still +$0.93-1.70 (brain_auditor 10:45)
-- Health: OK | Disk **83%** (cleaned ~2.4G; <80% Oct 14 goal will MISS) | Kill switch LIVE=true | Regime SHORT_BIAS
-- 0 errors last 30min; timers 3/3 active
+- **24h: 39 closed, 35.9% WR, −$0.02** — nearly breakeven, best since Oct 12 flush | 0 open | 7d 192T −$0.55 (35.4%)
+- Health: OK | Disk **84%** (ATM zips cleaned ~224M; <80% goal will MISS) | Kill switch LIVE=true | Regime LONG_BIAS
+- Guardrail: ESCALATE (48h WR 28.9% < 40%, PnL −$1.90 under −$3.00 pause) | Timers 4/4 active | 0 real errors
 
-## DONE TODAY (Oct 13)
+## DONE TODAY (Oct 14)
 
-- **Wyckoff shadow rule — LIVE + VERIFIED.** 06:40 run implemented (crashed pre-doc, code swept 2409c5f3); evening run verified: 6 shadow fires logged (incl first-ever SHORT distribution fires), 0 live-table entries since 07:15, 635 other signals flowing. `WYCKOFF_SHADOW_MODE=True`. Flip OFF only with CEO GO + pairing backtest.
-- **Disk cleanup ~2.4G** — /tmp scratch, stale zips, journal vacuum, syslog compress. Trading DBs untouched.
-- **Rep Phase 2** — wired LIVE Oct 12 19:30 (REP_SHADOW_MODE=False, user-directed early). Monitoring.
-- signal_reporter killed hmacd_mtf-+ LONG (all-regimes-losing, blanket kill correct).
+- **Wyckoff shadow n≥30 REACHED** — 34 fires total (28 in 24h: 19 SHORT / 9 LONG). Ahead of schedule (~Oct 27 expected). Rate ~30/day. Pairing backtest NOW possible — flip SHADOW_MODE off only with CEO GO + backtest. Top tokens: ICP(5), ACE(4), LDO(4), CHIP(4).
+- **pump-chain+ LONG recovered** — was $0.02 from kill at 17:10, now +$0.28 (ARB trail +$0.28/+12.43%). No longer kill candidate.
+- **doji-bottom-long RESOLVED** — brain_auditor re-enabled EXTREME-gated (796c745). EXTREME blocked via allow-list removal (vol_gate:212), HIGH/NORMAL kept. Correct per SIGNAL KILL POLICY. 0 trades since re-enable.
+- **Disk cleanup ~224M** — 17 stale ATM hourly zips removed from /tmp. 19G free.
+- **signal_reporter_prompt fix** — documented `_signal_metadata` + `chain` column gotchas to stop recurring PG column-name errors.
+- brain_auditor mid-work: uncommitted signal_compactor.py meta-source RSI fixes (sweet-spot + high-overought). Service was still running at 18:45 — DO NOT touch until it finishes.
 
 ## ⚠️ CEO ESCALATIONS (open)
 
-1. 🔴 **Trail-arm 2 unratified enables** — brain_auditor keeps recommending RATIFY (corrected +$0.97/30d bb-squeeze; pump-chain 2 fires net $0 correct direction). Decide BEFORE Oct 15 soak review. One-line revert each if REVERT.
-2. 🔴 **doji-bottom-long** — auto_1hr killed it but HIGH regime 14T 71.4% +$0.68 WINS. Regime-block (EXTREME-only 0.0x) vs keep-kill: CEO call (signal_reporter 17:10).
-3. 🟡 **Disk <80% unreachable without deep prune** — needs candle/coin_tracker/session_brain retention plan; bug_hunter delegation undelivered since Oct 7. Optional: delete camoufox 1.4G + puppeteer 651M caches if browser tools unused.
-4. 🟡 **hard_max_loss #1 bleed** (41-46% of closes) — brain_auditor: chase-entry filter is the lever, needs self_learner backtest; 4 fixes in soak, do NOT stack entry filters.
-5. 🟡 **wyckoff COOLDOWN_BARS mismatch** — constant 30, comment says 2.5h, formula yields 0.5h (confirmed live). Pre-existing. CEO: fix formula to 2.5h or fix comment to 30min?
+1. 🔴 **Trail-arm 2 unratified enables** — BB_SQUEEZE + PUMP_CHAIN still True, no ratify. **Oct 15 soak review is TOMORROW — decide tonight.** One-line revert each if REVERT.
+2. 🟡 **Disk <80% unreachable** — 84% after cleanup. Needs candle/coin_tracker/session_brain retention plan; bug_hunter delegation undelivered since Oct 7. Optional: delete camoufox 1.4G + puppeteer 651M caches if browser tools unused.
+3. 🟡 **hard_max_loss #1 bleed** — 9/39 = 23.1% today (under 40). brain_auditor soak holds; chase-entry filter needs self_learner backtest. Do NOT stack entry filters.
+4. 🟡 **wyckoff COOLDOWN_BARS mismatch** — constant 30, comment says 2.5h, formula `COOLDOWN_BARS / 60.0` yields 0.5h. CEO: fix formula to 2.5h or fix comment to 30min?
 
 ## WATCHLIST
 
-- pump-chain- SHORT: 13T 30.8% −$0.16 all EXTREME (kill threshold n≥5 not met; EXTREME block stays reverted per CEO)
-- 7d WR ~39-42% vs ≥50% Oct 15 goal — gap large, today's −$1.88 hurts
-- Wyckoff shadow data accumulating (~6 fires/5h → n≥30 in ~2wk; eval window opens ~Oct 27)
-- self_learner + signal_analyst delegation misses (wyckoff pairing 3rd miss class)
+- volume-buildup- SHORT: 4/4W +$0.41 — 1 win from boost (needs 5T)
+- volume-buildup+ LONG: killed 09:15, verified 0 trades post-kill
+- pump-chain- SHORT: 27.3% WR but +$0.10 profitable — not a kill
+- doji-bottom-long: monitor non-EXTREME cohort (re-kill if flips negative n≥10)
+- Wyckoff shadow: ~30/day fires accumulating; ready for pairing backtest + CEO GO
+- self_learner + signal_analyst delegation misses (wyckoff pairing class)
 
 ## KEY DATES
 
 | Date | Item |
 |------|------|
-| Oct 14 | Disk <80% goal (WILL MISS — see escalation 3) |
-| Oct 15 | 7d WR ≥50% checkpoint; bb-squeeze trail-arm soak review; pump-chain 45m soak review; Rep 2b candidate; CEO trail-arm ratify deadline |
-| ~Oct 27 | Wyckoff shadow n≥30 re-eval (pairing or bypass decision) |
+| **Oct 15** | **7d WR ≥50% checkpoint (WILL MISS — 35.4%); bb-squeeze trail-arm soak review; pump-chain 45m soak review; Rep 2b candidate; CEO trail-arm ratify HARD deadline** |
+| ~Oct 15+ | Wyckoff pairing backtest — n≥30 ready, CEO GO to flip SHADOW_MODE |
 | Nov 6 | Gate re-audit window opens (D2) |
 
-## NEXT ACTIONS (next run ~Oct 14 06:40)
+## NEXT ACTIONS (next run ~Oct 15 06:40)
 
-1. Check trail-arm ratify status — if still undecided by Oct 15, escalate HARD (soak review cannot proceed clean)
-2. Oct 15: WR checkpoint + bb-squeeze soak review + pump-chain 45m soak review + Rep 2b candidate
-3. Monitor wyckoff shadow log growth (expect ~30/day in active markets)
-4. Disk: propose retention plan to CEO if bug_hunter still undelivered
-5. Watch chase-into-move pattern (ICP/CRV/LDO/ALGO shorts + today's LONG cluster) — needs data not quick fix
+1. Oct 15: WR checkpoint + bb-squeeze soak + pump-chain 45m soak + Rep 2b + **trail-arm ratify HARD escalate**
+2. Check brain_auditor uncommitted signal_compactor.py — commit if complete + validated
+3. volume-buildup- boost check after next win
+4. Prepare wyckoff pairing backtest for CEO GO (n≥30 ready)
+5. Disk retention plan proposal if bug_hunter still undelivered
