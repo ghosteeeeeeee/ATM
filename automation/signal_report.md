@@ -1,47 +1,30 @@
 # Signal Performance Report
-**Generated:** 2026-10-14 06:00 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats
-- **Total trades (all time):** 3,087+ | **WR:** 51.3%
-- **Date range:** 2026-07-29 → 2026-10-14
+Period: Last 6h | 24h — Generated 2026-10-14
 
----
+## KILLED (executed):
+None this cycle.
 
-## KILLED (executed — verified today)
+## BOOSTED (executed):
+None this cycle.
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| doji-bottom-long | LONG | 0.0% | -$0.46 | 5 (24h) | `DOJI_BOTTOM_ENABLED=False` — verified line 4359. Kills from SEI/IMX/TURBO/ME hard_max_loss + atr_sl_hit. HIGH regime 83% WR kept via regime gate; EXTREME already blocked. |
-| hmacd_mtf-+ | LONG | 20.0% | -$0.33 | 5 (24h) | `HMACD_MTF_PLUS_ENABLED=False` — verified line 2730. ALL regimes <50% WR (EXTREME 33%, HIGH 0%, FLAT 0%, NORMAL 50% but -$0.11). |
-
----
-
-## BOOSTED (executed)
-
-None — no signal met WR > 55% with 5+ trades and PnL > $0.05 in 24h.
-
----
-
-## LOSERS (watch list)
+## LOSERS (watch list):
 
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 0.0% | -$0.25 | 4 (24h) | HIGH regime blocked (0.0 override). EXTREME 52% WR +$3.17 kept. 24h losers are HIGH trades — already gated. |
-| ai-trader+ | LONG | 0.0% | -$0.15 | 3 (24h) | Under 5T threshold. All regimes near break-even. Watch. |
-| bb-bounce-v2-long+ | LONG | 40.0% | -$0.11 | 5 (24h) | Tuning candidate (30-40% WR, 5+ trades). Small loss. FLAT habitat protected. |
-| pump-chain- | SHORT | 30.0% | -$0.02 | 20 (24h) | Tuning candidate. Basically flat. RSI floors + HIGH block already in place. |
-| hmacd_mtf-- | SHORT | 25.0% | -$0.19 | 4 (lifetime) | Under 5T threshold. Same losing profile as killed sibling. Watch — next kill candidate if it fires more. |
+| pump-chain+ | LONG | 12.5% | -$0.34 | 8 | EXTREME bleed (4T 0%WR -$0.27). All-time EXTREME +$3.27 / 45.9% WR — bad window, not structural. HIGH/NORMAL already dampened 0.5x. Monitor; kill only if EXTREME all-time turns negative. |
+| pump-chain- | SHORT | 21.1% | -$0.27 | 19 | EXTREME bleed (18T 22.2%WR -$0.24). NORMAL all-time 69.2%WR +$0.50 — keep. HIGH already blocked. Losses are small ATR_SL hits (-$0.01 to -$0.13), not catastrophic. CEO re-enabled EXTREME 2026-10-08. Monitor 7d. |
+| bb-bounce-v2-long+ | LONG | 40.0% | -$0.09 | 5 | Hyphen form weak. Underscore form (bb_bounce_v2_long) all-time HIGH 77.1%WR +$0.89, NORMAL 76.0%WR +$0.87. Same signal, different DB naming. Not a kill. |
+| volume-buildup+ | LONG | 0.0% | -$0.26 | 3 | ALREADY KILLED — VOLUME_BUILDUP_PLUS_ENABLED=False (auto_1hr 2026-10-14 09:15). 24h losses are pre-kill. Done. |
 
----
+## WINNERS:
 
-## WINNERS
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| volume-buildup- | SHORT | 100% | +$0.16 | 2 (6h) | Below boost threshold (need 5+). VOLUME_BUILDUP_MINUS_ENABLED=True. Monitor for boost next cycle. |
+| r2v2-long3 | LONG | 66.7% | +$0.01 | 3 | PnL too small ($0.01 < $0.05 boost threshold). All-time only 5T. Watch. |
 
-None with sufficient sample in 24h window.
-
----
-
-## ISSUES
-
-- **Inversions:** 0 found (checked signal LIKE '%long%' AND direction='SHORT' and vice versa).
-- **hmacd_mtf source naming:** `hmacd_mtf-+` uses `-` base with `+` direction suffix — confusing but correct per mtf_macd.py:465 (`source = f'hmacd_mtf-{hmacd_char}'`). Not a bug.
-- **Both kills already executed earlier today** — DOJI_BOTTOM_ENABLED and HMACD_MTF_PLUS_ENABLED verified False in hermes_constants.py. No duplicate action needed.
+## ISSUES:
+- No signal inversions found (24h).
+- pump-chain+ and pump-chain- both bleeding in EXTREME this 24h window. All-time EXTREME data still supports pump-chain+ LONG (+$3.27). pump-chain- SHORT NORMAL habitat intact (69.2% WR). No structural failures detected.
+- No regime qualifies for new blocking: pump-chain+ EXTREME all-time 45.9% WR (profitable), pump-chain- NORMAL 69.2% WR (above 55% threshold).
