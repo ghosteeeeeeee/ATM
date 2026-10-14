@@ -2134,12 +2134,50 @@ def _score_signal(token, direction, conf, source, signal_type,
     # individual penalty signals.
     # BUG-12 CEO 2026-10-07: rr_mult EXEMPT from score-floor. RR penalties must bite.
     # final = score * rr_mult * max(other, 0.3). Hard blocks (any other mult = 0) still kill.
+    # ── Cell Stats multiplier (CEO 2026-10-14: wiring gap fix) ──────────────
+    # cell_stats.db computes per-(signal, direction, regime) WR/PnL nightly.
+    # 54 admitted cells (n>=15), tradeable = admitted AND wr>=60%.
+    # This wiring feeds that data into the entry scoring — previously cell_stats
+    # was computed but never consumed by any live decision path.
+    _cell_mult = 1.0
+    try:
+        _cs_conn = sqlite3.connect(os.path.join(
+            os.path.dirname(HERMES_DATA), 'brain', 'cell_stats.db'), timeout=3)
+        try:
+            _cs_norm_sig = (signal_type or '').replace('-', '_').replace('+', '').replace(' ', '_').lower()
+            _cs_row = _cs_conn.execute(
+                "SELECT wr_raw, total_pnl, n, tradeable FROM cells "
+                "WHERE signal=? AND direction=? AND regime=? LIMIT 1",
+                (_cs_norm_sig, (direction or '').upper(), _vol_regime or 'UNKNOWN')
+            ).fetchone()
+            if _cs_row is None:
+                # Try source-form key
+                _cs_src_norm = (source or '').replace('-', '_').replace('+', '').replace(' ', '_').lower().rstrip('_')
+                _cs_row = _cs_conn.execute(
+                    "SELECT wr_raw, total_pnl, n, tradeable FROM cells "
+                    "WHERE signal=? AND direction=? AND regime=? LIMIT 1",
+                    (_cs_src_norm, (direction or '').upper(), _vol_regime or 'UNKNOWN')
+                ).fetchone()
+            if _cs_row:
+                _cs_wr, _cs_pnl, _cs_n, _cs_tradeable = _cs_row
+                if _cs_tradeable:
+                    _cell_mult = 1.2
+                    log(f"  📊 [CELL-STATS] {token} {direction}: tradeable cell (wr={_cs_wr*100:.0f}%, n={_cs_n}) → 1.2x")
+                elif _cs_n >= 15 and _cs_wr < 0.40:
+                    _cell_mult = 0.5
+                    log(f"  📊 [CELL-STATS] {token} {direction}: losing cell (wr={_cs_wr*100:.0f}%, n={_cs_n}) → 0.5x")
+        finally:
+            _cs_conn.close()
+    except Exception:
+        pass
+
     _mult_product = (survival_bonus * staleness_mult * trend_alignment_mult * dir_outcome_mult *
                      source_mult * speed_mult * tide_mult * zscore_accel_mult * favorites_mult *
                      leaderboard_mult * combo_mult * penalty_mult * amplitude_mult *
                      time_block_mult * phase_mult * confluence_mult * inverse_mult *
                      lifecycle_mult * vol_regime_mult * short_normal_mult *
-                     oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult)
+                     oscillator_mult * regime_conf_mult * thesis_validation_mult * chop_score_mult *
+                     _cell_mult)
     from hermes_constants import PENALTY_MULT_FLOOR as _mult_floor  # CEO 2026-10-13: 0.3→0.5
     # CEO Fix 1: store raw product for decider penalty-gated execution
     try:
