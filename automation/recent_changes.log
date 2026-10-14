@@ -4671,3 +4671,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-14 15:15] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W +$0.14 (ETC volume-buildup- SHORT profit-monster-trail) | 24h ~43T 12W | kill: none (1T this hour, needs 3+T 0W) | volume-buildup+ remains killed (pre-kill trades only) | hard_max_loss 20.9% (under 40) | atr_sl_hit 27.9% (tpsl stable) | winners MAE avg 0.139% (entries fine) | overtrade 1/hr | streak positive (no 3-neg) | 2 open | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-14 16:15] auto_1hr: NO CONFIG CHANGE — 0T last hour, 4 open | 24h 40T 13W −$0.46 (32.5%) | kill: none (0 trades) | volume-buildup+ remains killed (pre-kill trades only) | hard_max_loss 22.5% (under 40) | atr_sl_hit 27.5% (tpsl stable) | winners MAE avg 0.139% (entries fine) | overtrade 0/hr | streak no 3-neg | live_trading=true, kill JSON=true
+BY: auto_1hr
