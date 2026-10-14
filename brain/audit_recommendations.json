@@ -1,223 +1,139 @@
 {
-  "timestamp": "2026-10-14T02:35:00Z",
-  "run_mode": "REPORT-ONLY (session lock /tmp/hermes-session-active.lock <1h old)",
+  "timestamp": "2026-10-14T06:45:00Z",
   "session_brain_stats": {
-    "queries_run": 3,
-    "top_insights": [
-      "Session brain confirms recurring 'wrong side / other side won' discussions — same question as today's watchdog steer",
-      "Trail-arm / PM_TRAIL constants discussion still the standing trend-following lever",
-      "Chop filter historically applied only to certain signal types — not global"
-    ]
+    "queries": 2,
+    "note": "chase/RSI band insights cross-checked vs live PG; stale session claim SHORT 45-55 sweet spot DISPROVED by 30d data"
   },
   "trade_summary_24h": {
-    "trades": 62,
-    "pnl": -1.14,
-    "wr": 27.4,
-    "oct14_so_far": {
-      "trades": 8,
-      "pnl": 0.17,
-      "wr": 37.5,
-      "note": "positive day start"
+    "closed": 64,
+    "wins": 15,
+    "wr": 23.4,
+    "pnl": -1.24,
+    "open": 2,
+    "open_pnl": -0.02,
+    "regime": "BTC 15m SHORT_BIAS / 4h LONG_BIAS / continuum AT / CALM / DISTRIBUTION",
+    "exits_of_losers": {
+      "hard_max_loss": "22T -$1.76 lev4.55",
+      "atr_sl_hit": "14T -$1.08 lev3.86"
     },
-    "last_6h": {
-      "trades": 12,
-      "pnl": 0.14,
-      "wr": 33.3,
-      "note": "overnight slightly green post-kills"
+    "7d": {
+      "trades": 179,
+      "pnl": -1.33,
+      "wr": 32.4,
+      "long": "139T -0.46 34.5%",
+      "short": "40T -0.87 25.0%"
     }
   },
-  "trade_summary_7d": {
-    "trades": 174,
-    "pnl": -1.04,
-    "wr": 33.3,
-    "swing_note": "FLIPPED NEGATIVE vs 01:49 audit (+$0.06). Mechanism = window aging: Oct 7 02-03h (+$1.14 on 2T) rolled out of 7d window. Not fresh bleeding — overnight is slightly positive.",
-    "long": {
-      "n": 134,
-      "pnl": -0.15,
-      "wr": 35.8
-    },
-    "short": {
-      "n": 40,
-      "pnl": -0.89,
-      "wr": 25.0
-    },
-    "daily_pnl": {
-      "Oct7": -0.64,
-      "Oct8": 0.72,
-      "Oct9": -0.3,
-      "Oct10": -0.41,
-      "Oct11": 1.18,
-      "Oct12": -0.23,
-      "Oct13": -1.53,
-      "Oct14_partial": 0.14
-    },
-    "regime_split": {
-      "NORMAL": {
-        "n": 29,
-        "wr": 55.2,
-        "pnl": 0.46,
-        "verdict": "ONLY positive regime"
-      },
-      "EXTREME": {
-        "n": 107,
-        "wr": 27.1,
-        "pnl": -0.62
-      },
-      "HIGH": {
-        "n": 33,
-        "wr": 39.4,
-        "pnl": -0.69
-      },
-      "FILTER_COLLISION_WARNING": "pump-chain+ LONG in EXTREME is 27T 37% +$0.99 — the FLAGSHIP profit engine lives in EXTREME. Blanket EXTREME dampen would kill it. Any EXTREME fix MUST be per-signal or per-trade (momentum), never blanket."
-    },
-    "exit_equation": {
-      "chop_exits": "hard_max_loss 62T -$5.93 0%WR + atr_sl_hit 31T -$2.26 0%WR = -$8.19",
-      "trend_exits": "profit-monster-trail 35T +$2.09 85.7% + atr_trail_hit 14T +$3.44 78.6% + stale_exit 9T +$1.20 = +$6.73",
-      "net": "~-$1.04. Trail system works. Entry quality is the only lever."
-    }
+  "watchdog_steers_disposition": {
+    "steer-001 losing_streak_12_of_20": "VERIFIED — 24h 15W/64T 23.4%WR -$1.24; 7d 32.4% -$1.33. Root = chop entries (HML+atr_sl family), not single signal.",
+    "steer-002 cluster GMX+ALGO": "Both closed; GMX long pump-chain+ -0.04, ALGO short pump-chain- flat. Cap B SAME_DIR_30MIN_MAX=3 already live.",
+    "steer-003 wrong-side_8_losses": "CONFIRMED as chase/chop pattern. BABY/USUAL (meta_rsi 68.8/69.2) already HML-closed -0.12 each — the exact LONG 60-70 chase cell. Winning side was pullback-longs 50-60 (only green LONG cell 7d: +1.65 combined 50-55+55-60).",
+    "steer-004 bb-bounce-v2-long+_streak": "NOISE — 14d 25T +$0.76 64%WR; all meta-RSI bands green or flat; 3-loss streak n too small. Do NOT disable."
   },
-  "last_run_changes_impact": [
+  "losing_trade_autopsy": {
+    "clusters": [
+      {
+        "cluster": "LONG meta_rsi 65-70 chase (7d n=24, -$1.02, 29.2%WR)",
+        "root_cause": "Buying strength mid-chop; HML exit at lev 4.3 before trail arm",
+        "winner_side": "Pullback longs 50-60 (7d +$1.65) or SHORT the overbought tape",
+        "signal_mix": "CONFOUNDED — bb-squeeze+ 60-70 is +$0.45 76.2%WR (its BEST band, MIN=60 design), vol-breakout+ 60-70 was +$0.72 (now killed). Bleed is diffuse tail (r2v2/hmacd/doji/ai-trader/grind). Blanket ceiling 65 REJECTED: kills bb-squeeze best band + 28.6% of 30d LONG winners (69/241)."
+      },
+      {
+        "cluster": "HML chop family 24h (22T -$1.76, all LONG)",
+        "root_cause": "MFE data: 87% HML never reach +0.40% trail-arm — entered with no momentum",
+        "winner_side": "Trail family 7d LONG 29.5% arm rate +$; trail exits 24h +$1.97 vs death exits -$2.80",
+        "verdict": "Chase-ratio shadow + RSI_MAX=70 already target this; soak, don't stack"
+      }
+    ]
+  },
+  "drift_findings": [
     {
-      "change": "VOLUME_BREAKOUT_PLUS_ENABLED True->False",
-      "date": "2026-10-13 21:41",
-      "verdict": "CLEAN — 0 opens post-kill (verified open_time > 21:45). 7d had been 16T -$0.76 18.8%WR.",
-      "action": "HOLD"
+      "id": "D-watchdog-chase-band",
+      "severity": "info",
+      "finding": "Watchdog deep_analysis 'LONG 60-70 = worst cell, ceiling it' is signal-mix confounded. Per-signal 30d: bb-squeeze+ 60-70 +$0.45 76%WR, vol-breakout+ +$0.72, pump-chain+ -$0.02 flat, bb-bounce-v2 -$0.09 flat. No per-signal n>=20 bleed cell. Blanket fix would destroy the best bb-squeeze habitat.",
+      "action": "Do NOT ship global ceiling 65. Per-family RSI map = creative idea (backtest first)."
     },
     {
-      "change": "HMACD_MTF_PLUS kill (signal_reporter)",
-      "date": "2026-10-13 ~17:10",
-      "verdict": "CLEAN — 0 opens post-kill.",
-      "action": "HOLD. HMACD_MTF_MINUS still True, 7d 4T -$0.19 — watchlist n<20."
-    },
-    {
-      "change": "DOJI_BOTTOM_ENABLED False (auto_1hr)",
-      "date": "2026-10-13",
-      "verdict": "HOLD KILLED — signal_reporter's 'HIGH 14T 71.4% +$0.68' claim NOT reproduced: own 14d query HIGH 7T 57.1% +$0.01, 7d HIGH 3T 33.3% +$0.02. HIGH edge is noise-level, not a missed winner.",
-      "action": "Keep killed. Flag discrepancy to CEO — signal_reporter number unreliable."
-    },
-    {
-      "change": "PUMP_CHAIN_LONG_RSI_MAX 75->70",
-      "date": "2026-10-13 05:39",
-      "verdict": "BLOCKING (0 entries >=70 since) but 5 post-change RSI 62-69 entries all lost (-$0.34). RSI ceiling fixes chase, not chop. n=5.",
-      "action": "MONITOR, do not stack."
-    },
-    {
-      "change": "CHASE_RATIO_SHADOW=True",
-      "date": "2026-10-13 21:41",
-      "verdict": "COLLECTING. Shadow fires logged, zero live impact by design.",
-      "action": "48h enforce decision (n>=10, precision >=80%)."
-    },
-    {
-      "change": "EXEC-RSI-DETECT-FLOOR bugfix",
-      "date": "2026-10-13 22:45",
-      "verdict": "2 SHORT opens post-fix (PUMP hard_max_loss -$0.09, CFX flat) — both detect-RSI >40, correctly let through. Fix behaving as designed.",
-      "action": "MONITOR 48h."
-    },
-    {
-      "change": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED True",
-      "date": "2026-10-12 10:45",
-      "verdict": "0 bb-squeeze timeout fires. WIDER FINDING: bb-squeeze+ has 0 OPENS since Oct 12 07:12 (44h silence) — signal went quiet BEFORE timeout enable. Timeout is exit-side, cannot cause silence. Likely CALM/LOW-vol regime = no squeeze setups, but detection path should be spot-checked before Oct 15 soak review (else soak has no cohort).",
-      "action": "Oct 15 soak review: verify detector still firing; if 0 signals continue, review is moot."
+      "id": "D-short-bands-30d",
+      "severity": "med",
+      "finding": "30d SHORT: ALL meta-RSI bands negative (25-35 -$1.31, 35-45 -$1.22, 45-55 -$0.84...). 7d '35-45 green +$0.10' does NOT survive OOS. EXEC-RSI-DETECT-FLOOR (shipped 22:45) correctly targets short-into-oversold; 4 fires in 5h (INJ/LDO/ATOM/ALT), SHORT cohort since +$0.21.",
+      "action": "Soak detect-floor; no additional SHORT band filter."
     }
   ],
-  "losing_trade_autopsy": {
-    "watchdog_steer": "'8 recent losses look like wrong-side trades' — CONFIRMED. 24h losers are 100% chop exits (hard_max_loss/atr_sl_hit/hard_sl), avg hold 22m in EXTREME, 0% trail-arm.",
-    "cluster_examples": [
-      "ADA+AVAX pump-chain+ LONG opened 11:32/11:33 same minute, both hard_max_loss EXTREME lev5 — correlated same-setup double-down",
-      "IMX doji-bottom LONG 10:08->10:12 (4 min) hard_max_loss -4.19% — instant death, never any momentum",
-      "CHIP both directions: SHORT 13:11 atr_sl_hit, LONG 14:17 hard_max_loss — whipsawed both ways in EXTREME"
-    ],
-    "hard_max_loss_hold_7d": {
-      "<15m": "19T -$1.80",
-      "15-30m": "19T -$1.51",
-      "30-60m": "15T -$1.82",
-      "60m+": "9T -$0.80",
-      "verdict": "38/62 die <30m. 0% ever reach trail (+0.40%). Entry-side chop, not exit-side."
-    },
-    "winning_side": "Trend entries -> trail arms -> profit-monster/atr_trail 78-87% WR. Same signal family wins when momentum exists at entry."
-  },
-  "signal_quality_findings": [
-    {
-      "signal": "pump-chain- SHORT",
-      "status": "LIVE BLEED — CORRECTION TO 01:49 AUDIT",
-      "data": "7d 29T -$0.33 24.1% (exact name match). 14d EXTREME 50T 32% -$0.56, NORMAL 5T 60% +$0.37.",
-      "correction": "01:49 audit claimed 7d +$0.81 'net positive' — WRONG. Own exact-name query: -$0.33. auto_1hr 22:15 already flagged 24h flip -$0.08.",
-      "recommendation": "STILL #1 live bleed signal. Kill threshold: has 24% WR (wins exist) so 0%-WR auto-kill won't fire. EXTREME block was CEO-reverted. Data unchanged — CEO decision item, n=29>>5. Momentum gate would cut the chop entries without killing EXTREME trend shorts."
-    },
-    {
-      "signal": "ai-trader+",
-      "status": "CONCERNING",
-      "data": "14d exits: hard_max_loss 5T -$0.41 0%WR vs profit-monster 7T +$0.27 85.7%. EXTREME 7d 8T 25% -$0.24.",
-      "recommendation": "MONITOR n=13<20. Same chop-vs-trend split as pump-chain. Momentum gate helps."
-    },
-    {
-      "signal": "pump-chain+ LONG",
-      "status": "PROFIT ENGINE — DO NOT DAMPEN",
-      "data": "7d 31T +$0.76 35.5%WR. EXTREME alone 27T +$0.99. Lottery structure: low WR, trail winners pay for chop losers.",
-      "recommendation": "KEEP. Any regime-level change would collision-kill this. Entry quality (momentum floor) only."
-    },
-    {
-      "signal": "bb-squeeze+",
-      "status": "SILENT 44h",
-      "data": "0 opens since Oct 12 07:12. Was 39T 61.5% 14d top-volume signal. Market CALM/LOW vol.",
-      "recommendation": "Spot-check detector path before Oct 15 soak review. If regime-driven, fine; if bug, fix before review."
-    }
+  "recurring_problems": [
+    "hard_max_loss chop entries — HML+atr_sl = bulk of losers every audit; entry-side, 87% never trail-arm. Levers shipped: RSI_MAX=70, chase-ratio shadow, detect-floor, doji/hmacd/vb kills. Do not stack more entry filters while soaking.",
+    "Trail-arm ratify pending CEO since Oct 12 — STILL blocks clean Oct 15 soak review (3rd consecutive audit escalating)."
+  ],
+  "missing_implementations": [
+    "self_learner momentum-at-entry backtest — requested 3x, still undelivered",
+    "per-family LONG RSI ceiling map (see creative) — never built",
+    "disk retention plan (bug_hunter, Oct 7 standing) — <80% Oct 14 goal will miss"
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-14T02:35:00Z",
-      "idea": "SIGNAL-HABITAT MATRIX DAMPEN (surgical, per signal×regime cell) — NOT blanket regime blocks",
-      "rationale": "Own data kills the blanket-EXTREME idea: pump-chain+ EXTREME 27T +$0.99 is the profit engine, while ai-trader+ EXTREME 8T 25% -$0.24 and doji EXTREME bleed. Regime is not monolithic. The right shape is a matrix: dampen confidence only on bleeding cells (signal, regime) with n>=20, keep green cells full. Precedent: SIGNAL_TYPE_OVERRIDES already does per-signal; this extends per-cell.",
-      "expected_impact": "Cuts EXTREME chop bleed (~$0.62/7d net across non-pump-chain signals) without touching pump-chain+ +$0.99.",
-      "category": "entry sniper / regime surgical",
-      "status": "suggested — FIRST CELL CANDIDATE ai-trader+ EXTREME needs n>=20 (currently 8). Monitor 5d then backtest.",
-      "risk": "low if n-guard enforced; medium if cells approved on n<20 (the Oct-8 pattern trap)"
-    },
-    {
-      "date": "2026-10-14T02:35:00Z",
-      "idea": "RECONFIRM (prior run): MOMENTUM-AT-ENTRY GATE |m5|<0.15% block",
-      "rationale": "Strengthened by this run's collision check: per-trade momentum floor is the ONLY fix shape that cuts chop everywhere (hard_max_loss 38/62 die <30m with zero MFE) while preserving pump-chain+ EXTREME trend winners. CHASE_RATIO shadow blocks the late side; this blocks the dead side. Bracket = ideal entry window.",
-      "expected_impact": "Block ~40-60% of 62T/7d hard_max_loss (-$5.93) pending backtest.",
+      "date": "2026-10-14T06:45:00Z",
+      "idea": "Per-family LONG RSI ceiling map (replace scalar LONG_RSI_CEILING for signal-level decisions)",
+      "rationale": "30d data proves 60-70 band is habitat-profitable for bb-squeeze+ (21T 76.2% +$0.45) and dead for diffuse tail (r2v2 7T -$0.34, grind-trend 7T 28.6%). A single scalar forces choosing between killing the best squeeze entries and letting the tail bleed. SIGNAL_EXIT_CONFIG pattern already exists for exits — mirror for entry ceilings.",
+      "expected_impact": "Capture ~$2/30d tail bleed without touching bb-squeeze +$0.45 band",
       "category": "entry sniper",
-      "status": "suggested — self_learner backtest STILL the top queued action. DO NOT ship before CHASE_RATIO 48h soak ends (no entry-filter stacking).",
-      "risk": "medium without backtest; low with 0-winner-block verification"
-    }
-  ],
-  "drift_findings": [
-    {
-      "severity": "HIGH",
-      "finding": "01:49 audit pump-chain- SHORT '+$0.81 net positive' was WRONG — exact query 29T -$0.33. Corrected here. Prior audits may have mixed signal variants or direction.",
-      "action": "CORRECTED in this file. pump-chain- SHORT is a live bleed, not a winner. CEO decision item unchanged (EXTREME block was reverted; n=29, 24% WR)."
+      "status": "suggested_backtest_first",
+      "risk": "low (per-signal, reversible, one family at a time)",
+      "owner": "self_learner backtest → CEO"
     },
     {
-      "severity": "MED",
-      "finding": "signal_reporter doji 'HIGH 14T 71.4% +$0.68' not reproducible (own 14d: HIGH 7T 57.1% +$0.01).",
-      "action": "Keep doji killed. Flag unreliable stat to CEO — do not re-enable on that number."
-    },
-    {
-      "severity": "MED",
-      "finding": "7d WR 33.3% vs Oct 15 goal >=50% — MATHEMATICALLY UNREACHABLE (needs ~13 straight wins on remaining volume). Retarget to PnL>=$0 trajectory + WR trend, same as Oct 12 precedent.",
-      "action": "CEO goal reset at Oct 15 checkpoint."
-    },
-    {
-      "severity": "LOW",
-      "finding": "DRIFT-E still looks fixed on recent trades (prior audit), keep 50-trade verification open.",
-      "action": "Continue monitoring."
+      "date": "2026-10-14T06:45:00Z",
+      "idea": "REJECTED (verify-first worked): global LONG RSI ceiling 65",
+      "rationale": "7d 65-70 looks like -$1.02 bleed but 30d shows band net -$0.65 with +$3.43 winners; ceiling kills bb-squeeze+'s best band and 28.6% of all 30d LONG winners. Fails winner-impact bar. Logged so it is not re-proposed.",
+      "expected_impact": "negative — do not re-propose",
+      "category": "risk",
+      "status": "rejected",
+      "risk": "n/a"
     }
   ],
   "config_changes_applied": [],
-  "changes_from_last_run": "0 changes this run (session lock). 6 prior changes tracked: 2 kills CLEAN (0 post-kill opens), 3 collecting (CHASE_RATIO, EXEC-RSI, RSI_MAX), 1 needs soak-review fix (bb-squeeze silence — signal-side, not timeout-side). No reverts warranted.",
+  "changes_from_last_run": [
+    {
+      "change": "PUMP_CHAIN_LONG_RSI_MAX 75->70 (Oct 13 05:39)",
+      "status": "WORKING",
+      "evidence": "Live blocks INJ@70.5 every cycle 06:31-06:38; 7T post-fix +$0.33; 0 entries >=70"
+    },
+    {
+      "change": "VOLUME_BREAKOUT_PLUS kill (Oct 13 21:41)",
+      "status": "CLEAN",
+      "evidence": "0 new entries; 1 close post-kill was pre-open trade"
+    },
+    {
+      "change": "CHASE_RATIO shadow (Oct 13 21:41)",
+      "status": "ACCUMULATING",
+      "evidence": "1 fire (STX ratio=1.15 -> HML, correct); enforce decision needs n>=10"
+    },
+    {
+      "change": "EXEC-RSI-DETECT-FLOOR (Oct 13 22:45)",
+      "status": "WORKING",
+      "evidence": "4 blocks in 5h (INJ detect 21.9, LDO 4.7, ATOM 31.8, ALT 21.4) — all short-into-bounce; SHORT cohort since +$0.21 40%WR"
+    },
+    {
+      "change": "doji/hmacd_mtf-+ kills (Oct 13)",
+      "status": "CLEAN",
+      "evidence": "0 post-kill entries"
+    },
+    {
+      "change": "bb-squeeze trail-arm-timeout (Oct 12 10:45)",
+      "status": "LOW ACTIVITY",
+      "evidence": "4 trail_arm_timeout exits since, net -$0.08; bb-squeeze still blocked in HIGH by vol gate; 02:35 audit flagged 44h open-silence, FIL executed 04:38 so detector alive"
+    }
+  ],
   "next_actions": [
-    "OCT 15: 7d WR checkpoint — WILL MISS >=50% at 33.3%. CEO goal reset needed. Track WR trend + PnL>=$0 instead.",
-    "OCT 15: bb-squeeze soak review — FIRST verify signal still detects (44h 0 opens; if silent, review has no cohort)",
-    "OCT 15: pump-chain 45m soak review (4 trail_arm_timeout fires since enable, net ~-$0.08, all pump-chain+ — timeout may be mislabeled as bb-squeeze-scoped)",
-    "OCT 15: CEO trail-arm ratify deadline (2 unratified enables — CURRENT.md escalation 1)",
-    "CEO: doji keep-kill confirmed by data (HIGH edge noise, reporter stat unreliable)",
-    "CEO: pump-chain- SHORT 29T 24%WR -$0.33/7d — #1 live bleed, EXTREME block reverted, awaiting directive (momentum gate is the compatible fix)",
-    "48h: CHASE_RATIO shadow enforce decision (n>=10, precision >=80%)",
-    "48h: EXEC-RSI-DETECT-FLOOR verification",
-    "BACKTEST (self_learner, STILL UNDELIVERED): momentum-at-entry gate |m5|<0.15% — top impact item, queued since Oct 13",
-    "BUG (bug_hunter): confidence stack cap 200 — BABY fired conf=499.4",
-    "WATCH: correlated same-minute opens (ADA/AVAX Oct 13 11:32) — Q4 portfolio cap backtest undelivered since Oct 6, escalate"
-  ]
+    "CEO: RATIFY or REVERT trail-arm enables BEFORE Oct 15 soak review — 3rd escalation, now blocking",
+    "self_learner: deliver momentum-at-entry backtest (3rd request) + pump-chain- SHORT 50+ dampen shadow backtest",
+    "Monitor CHASE_RATIO shadow to n>=10; promote only if >=70% would-block-was-loss",
+    "Oct 15: 7d WR checkpoint (32.4% — goal unreachable, CEO retarget) + soak reviews",
+    "bug_hunter: disk retention plan still undelivered; <80% Oct 14 goal will miss (~83%)"
+  ],
+  "goals_check": {
+    "24h_pnl": "-$1.24 FAIL",
+    "7d_pnl": "-$1.33 FAIL (was +$0.93 Oct 13 morning — bad-day aging)",
+    "7d_wr": "32.4% FAIL (>=50% Oct 15 mathematically unreachable)",
+    "hard_max_loss_share": "24h 22/39 losers via HML ~56% of loss exits; share of closes improved (33-38% recent hourly logs)"
+  }
 }

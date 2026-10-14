@@ -4386,5 +4386,46 @@
     "category": "entry sniper",
     "status": "suggested — self_learner backtest top priority",
     "risk": "medium pre-backtest"
+  },
+  {
+    "date": "2026-10-14T04:38:27Z",
+    "agent": "brain_auditor",
+    "idea": "pump-chain- SHORT meta_rsi 50+ confidence dampen 0.5x (shadow) — 45-50 green cell only; block variant rejected (43% winners)",
+    "rationale": "14d 50+ = 11T -0.72; 30d 50+ = 56T -0.86; 45-50 = +1.00/+0.72. Dampen preserves winners.",
+    "expected_impact": "~-50% bleed on 50+ band, ~+$0.40/30d",
+    "category": "entry sniper / sizing",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-14T04:38:27Z",
+    "agent": "brain_auditor",
+    "idea": "REJECTED: global lev-3 entry cap — honest counterfactual 30d -4.17→-5.07 (selection-on-outcome trap)",
+    "rationale": "Winners avg lev 4.10 ≈ losers 4.06; capping hurts rides as much as deaths.",
+    "expected_impact": "negative — do not re-propose",
+    "category": "risk",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-14T06:45:00Z",
+    "idea": "Per-family LONG RSI ceiling map (replace scalar LONG_RSI_CEILING for signal-level decisions)",
+    "rationale": "30d data proves 60-70 band is habitat-profitable for bb-squeeze+ (21T 76.2% +$0.45) and dead for diffuse tail (r2v2 7T -$0.34, grind-trend 7T 28.6%). A single scalar forces choosing between killing the best squeeze entries and letting the tail bleed. SIGNAL_EXIT_CONFIG pattern already exists for exits — mirror for entry ceilings.",
+    "expected_impact": "Capture ~$2/30d tail bleed without touching bb-squeeze +$0.45 band",
+    "category": "entry sniper",
+    "status": "suggested_backtest_first",
+    "risk": "low (per-signal, reversible, one family at a time)",
+    "owner": "self_learner backtest → CEO",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-14T06:45:00Z",
+    "idea": "REJECTED (verify-first worked): global LONG RSI ceiling 65",
+    "rationale": "7d 65-70 looks like -$1.02 bleed but 30d shows band net -$0.65 with +$3.43 winners; ceiling kills bb-squeeze+'s best band and 28.6% of all 30d LONG winners. Fails winner-impact bar. Logged so it is not re-proposed.",
+    "expected_impact": "negative — do not re-propose",
+    "category": "risk",
+    "status": "rejected",
+    "risk": "n/a",
+    "agent": "brain_auditor"
   }
 ]
