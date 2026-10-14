@@ -1,114 +1,104 @@
 {
-  "timestamp": "2026-10-14T12:48:03Z",
+  "timestamp": "2026-10-14T14:45:06Z",
   "session_brain_stats": {
-    "queries": 3,
-    "note": "volume-buildup origin, r2-trend RSI, pump-chain short — no new unimplemented ideas surfaced"
+    "note": "queried; embeddings loaded; chop/wrong-side/r2v2 topics reviewed"
   },
   "trade_summary_24h": {
-    "closed": 50,
-    "wins": 14,
-    "pnl": -1.22,
-    "wr": 28.0,
-    "exit_anatomy": "hard_max_loss 14T 0%W -$1.21 | atr_sl_hit 14T 0%W -$0.92 | trail family: profit-monster-trail 9/9 +$0.65, atr_trail_hit 3/5 +$0.39 — 100% of wins from trail family",
-    "worst_signals": "pump-chain- SHORT 13T 15.4% -$0.27 | volume-buildup+ LONG 3T 0% -$0.26 (killed 09:15) | pump-chain+ LONG 6T 16.7% -$0.20",
-    "meta_rsi_bands": "LONG 60-72: 12T 25% -$0.47 worst | LONG >72: 5T 20% -$0.25 | SHORT 45-55: 4T 0% -$0.31"
+    "closed": 44,
+    "wins": 12,
+    "pnl_usdt": -0.93,
+    "wr_pct": 27.3,
+    "7d": {
+      "closed": 187,
+      "wins": 65,
+      "pnl_usdt": -0.87,
+      "wr_pct": 34.8
+    },
+    "48h_direction": {
+      "LONG": "62T 24.2% -$2.12",
+      "SHORT": "30T 33.3% -$0.04"
+    },
+    "48h_exits": {
+      "hard_max_loss": "33T 0% -$2.83",
+      "profit_monster_trail": "14T 92.9% +$0.86",
+      "atr_trail_hit": "10T 80% +$1.63"
+    },
+    "open": "ETC SHORT volume-buildup- +1.49% (hold)"
   },
   "drift_findings": [
     {
-      "id": "DRIFT-I",
       "severity": "HIGH",
-      "finding": "LONG-RSI-CEILING in signal_compactor used live-5m compute_rsi only (DRIFT-E class). SEI@meta84.21 entered with live-5m=53.9 → hard_max_loss -$0.23. Same hole I fixed for MIDBAND at 07:45 today.",
-      "status": "FIXED this run — meta rsi_14 preferred, live-5m fallback (signal_compactor.py:4322)"
+      "finding": "pump-chain- EXTREME habitat now 35%WR -$0.24/14d (was KEEP at 51.6%). CEO standing KEEP may be stale.",
+      "action": "CEO decision — do not unilateral revert"
     },
     {
-      "id": "DRIFT-J",
-      "severity": "HIGH",
-      "finding": "EXEC-time LONG ceiling checked live RSI only. Bypass signals (r2-trend-long4 'backtested standalone') skip context-gate detect-ceiling at decider_run.py:1248. SEI passed both holes.",
-      "status": "FIXED this run — EXEC-RSI-DETECT-CEILING added (mirror of SHORT detect-floor 2067-2070)"
+      "severity": "INFO",
+      "finding": "doji-bottom blanket kill Oct 13 was over-broad — non-EXTREME 60%WR positive",
+      "action": "FIXED: re-enabled with EXTREME already gated"
+    },
+    {
+      "severity": "INFO",
+      "finding": "LONG_MIDBAND meta-source + ceiling fixes landed today; post-12:48 n=1, cohort too small to verify",
+      "action": "monitor 48h"
     }
   ],
   "recurring_problems": [
-    "DRIFT-E (live vs meta RSI divergence) — 3rd site fixed (midband 07:45, ceiling compactor, ceiling exec). Standing: entry_rsi_14 column still unreliable for analytics.",
-    "hard_max_loss still #1 bleed: 14T/24h all chop entries, trail never armed. CHASE_RATIO shadow (3 fires) is the designed fix — soak before enforce.",
-    "pump-chain- SHORT: 24h 13T 15.4% -$0.27, 7d 30T 23.3% -$0.31, 30d 120T 41.7% -$0.58. Kill threshold not met (has wins). EXTREME block reverted per CEO. Monitor."
+    "Counter-trend LONG in SHORT_BIAS/BELOW-EMA300 market — 48h #1 bleed source",
+    "hard_max_loss = chop entries (0% WR) vs trail = trend entries (86% WR) — entry quality, not exit logic"
   ],
   "missing_implementations": [
-    "SHORT 45-54 mid-band dead-zone (30d 77T 40.3% -$1.05) — no existing filter covers it; SHORT_BB_DEAD_ZONE2 is bb_position not RSI. Do NOT stack while CHASE_RATIO soaks.",
-    "HOTSET-FINAL-BYPASS 'backtested standalone' status lets single-source signals skip safety filters — r2-trend-long4 rode this through. Audit which signals carry the status."
+    "Velocity-SLOW entry gate (watchdog steer) — deferred; CHASE_RATIO shadow partially covers chase pattern",
+    "Token-level SHORT_BIAS scan (>60% tokens) dampen — BTC continuum proxy shipped instead (simpler, same thesis)"
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-14T12:48:03Z",
-      "idea": "When CHASE_RATIO shadow reaches n>=10 fires with 0 trail-winner false-blocks, flip CHASE_RATIO_SHADOW=False (enforce). Pre-registered bar from Oct 13 backtest: blocked 19/118 hard_max_loss (-$2.01), 0/28 trail winners, both 7d halves clean.",
-      "rationale": "Trail family is 100% of wins. CHASE_RATIO is the only filter designed against the chase-into-move pattern that produces hard_max_loss. Entry filters shipped this week (midband, ceilings, RSI_MAX) treat symptoms; chase-ratio treats the cause.",
-      "expected_impact": "-$2/14d hard_max_loss reduction per backtest",
-      "category": "chop-entry root cause",
-      "status": "monitor",
-      "risk": "low"
+      "idea": "LONG-SHORT-BIAS shadow dampen (BTC BELOW+BEAR)",
+      "status": "shipped_shadow"
     },
     {
-      "date": "2026-10-14T12:48:03Z",
-      "idea": "Audit HOTSET-FINAL-BYPASS / 'backtested standalone' signal list — which signals carry it, what WR do they have, do they still deserve gate-skipping? r2-trend-long4 used it to enter SEI@84.",
-      "rationale": "STANDALONE_BYPASS DRIFT-A class: ceremonial gates. My detect-ceiling fix is defense-in-depth but the bypass itself is the hole.",
-      "expected_impact": "identify gate-skipping signals for individual re-audit",
-      "category": "gate integrity",
-      "status": "suggested",
-      "risk": "low"
+      "idea": "pump-chain- EXTREME habitat drift monitor",
+      "status": "monitor_for_ceo"
     }
   ],
   "config_changes_applied": [
     {
-      "change": "LONG-RSI-CEILING meta-source: prefer signal_metadata.rsi_14 over live-5m compute_rsi",
-      "file": "scripts/signal_compactor.py",
-      "type": "bugfix",
-      "before": "compute_rsi(tkn, tf='5m') only — SEI@meta84 passed at live=53.9",
-      "after": "meta rsi_14 preferred, live-5m fallback (same pattern as MIDBAND fix)",
-      "winner_impact": "7d meta>75: 8T 0W -$0.83 — 0 winners blocked. 30d: 41T 39% net -$0.90 — block is net-positive. 70-75 band (22T 8W +$0.35) stays open."
+      "file": "hermes_constants.py",
+      "change": "DOJI_BOTTOM_ENABLED False→True",
+      "type": "config"
     },
     {
-      "change": "EXEC-RSI-DETECT-CEILING: exec-time LONG ceiling also checks detect-time meta RSI",
-      "file": "scripts/decider_run.py",
-      "type": "bugfix",
-      "before": "exec ceiling checked live _exec_rsi only; bypass signals skipped context-gate detect check",
-      "after": "detect RSI (signal_rsi_14/metadata) also blocked at exec when > ceiling — mirror of SHORT detect-floor",
-      "winner_impact": "same band: 0 winners 7d"
+      "file": "hermes_constants.py + signal_compactor.py",
+      "change": "LONG_SHORT_BIAS_DAMPEN_SHADOW shadow gate",
+      "type": "shadow"
     }
   ],
   "changes_from_last_run": [
     {
-      "change": "LONG-MIDBAND meta-source fix (07:45)",
-      "verified": "WORKING — 490 blocks in log, DYDX@69.5 blocked every cycle since"
+      "change": "LONG-MIDBAND meta-source (07:45)",
+      "status": "live",
+      "note": "post-fix LONG cohort 7T 3W -0.26 42.9% — better than 24h base 27%, n=7"
     },
     {
-      "change": "LONG-RSI-CEILING bullish-override bound (09:50)",
-      "verified": "WORKING — ZORA/AVAX/WLD blocked at Grade C/D ceiling; MON/RUNE/ACE pre-fix losses were the justification"
+      "change": "LONG-RSI-CEILING meta-source + EXEC ceiling (12:48)",
+      "status": "live",
+      "note": "n=1 post-land — need 48h"
     },
     {
-      "change": "PUMP_CHAIN_LONG_RSI_MAX 75->70 (Oct 13)",
-      "verified": "WORKING — CHIP@87.6, ACE@88.9 blocked every compactor cycle"
-    },
-    {
-      "change": "VOLUME_BREAKOUT_PLUS kill (Oct 13)",
-      "verified": "WORKING — 0 trades since kill"
-    },
-    {
-      "change": "volume-buildup+ kill (auto_1hr 09:15)",
-      "verified": "WORKING — 3 hard_max_loss losses triggered kill, 0 trades since; volume-buildup- SHORTs still 2/2 winning"
+      "change": "EXEC-RSI-DETECT-FLOOR (Oct 13)",
+      "status": "live",
+      "note": "cohort aging in"
     },
     {
       "change": "CHASE_RATIO shadow (Oct 13)",
-      "verified": "FIRING — 3 shadow logs (STX/POL/BLUR). Soak continues, do not enforce yet."
-    },
-    {
-      "change": "EXEC-RSI-DETECT-FLOOR SHORT (Oct 13)",
-      "verified": "LIVE — no short-into-bounce entries since"
+      "status": "shadow_active",
+      "note": "3 shadow fires logged, 0 enforce (correct)"
     }
   ],
   "next_actions": [
-    "Watch CHASE_RATIO shadow fire count — enforce at n>=10 with 0 trail-winner false-blocks",
-    "SEI@84 lesson: both new ceiling fixes live next subprocess cycle — verify EXEC-RSI-DETECT-CEILING blocks on next overbought detect",
-    "Oct 15: WR checkpoint + bb-squeeze soak + pump-chain 45m soak + trail-arm ratify deadline",
-    "HOTSET-FINAL-BYPASS signal list audit (delegated idea)",
-    "pump-chain- SHORT 7d bleed -$0.31 — monitor, no touch (kill threshold not met)"
+    "48h: review LONG-SHORT-BIAS shadow fire count + counterfactual PnL; CEO decide enforce",
+    "Monitor doji-bottom non-EXTREME cohort (revert if n>=10 flips negative)",
+    "CEO: pump-chain- EXTREME drift decision (35% WR 14d vs KEEP order)",
+    "Oct 15: 7d WR checkpoint (currently 34.8% vs ≥50% goal — gap large)",
+    "ETC SHORT: hold — trail thesis intact"
   ]
 }

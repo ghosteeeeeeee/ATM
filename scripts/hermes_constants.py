@@ -978,6 +978,15 @@ LONG_MIDBAND_NON_EXTREME_BLOCK = True  # brain_auditor 2026-10-11 — EXTREME ex
 LONG_HIGH_OVERBOUGHT_RSI_MIN = 70
 LONG_HIGH_OVERBOUGHT_BLOCK = True  # brain_auditor 2026-10-11
 
+# ── Shadow: LONG counter-trend dampen when BTC below EMA300 + bear linreg ──
+# Watchdog steer 2026-10-14: 48h 62 LONGs 24.2%WR −$2.12 vs 30 SHORTs 33.3% −$0.04.
+# BTC continuum: ema300_position=BELOW, linreg=BEAR → every LONG is counter-trend.
+# SHADOW first (auto-implementation): log would-dampen, zero live impact.
+# Flip LONG_SHORT_BIAS_DAMPEN_SHADOW→False to enforce after 48h clean shadow data.
+LONG_SHORT_BIAS_DAMPEN_SHADOW = True   # True=shadow log only; False=enforce mult
+LONG_SHORT_BIAS_DAMPEN_MULT   = 0.70   # confidence multiplier when enforced
+LONG_SHORT_BIAS_MIN_MOVE15    = 0.15   # min |BTC 15m slope| % to treat as directional (skip flat noise)
+
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
 # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
 # 7d: 17T 41.2%WR -$1.05. All other zones: 162T 57.8%WR +$3.77.
@@ -4361,7 +4370,7 @@ OVERSOLD_BOUNCE_CONF_BONUS_BB       = 3       # confidence bonus for deep lower 
 DOJI_TOP_ENABLED              = True    # master kill-switch
 DOJI_TOP_PLUS_ENABLED         = True    # LONG direction (not used — doji_top is SHORT-only)
 DOJI_TOP_MINUS_ENABLED        = True    # SHORT direction (exit LONG, enter SHORT)
-DOJI_BOTTOM_ENABLED           = False   # master kill-switch for doji_bottom LONG — KILLED 2026-10-13 auto_1hr: 0/4 24h −$0.37 (SEI/IMX/TURBO hard_max_loss + ME atr_sl_hit −3.12%), same profile as oversold-bounce+ kill; mean-reversion LONG in weak regime. Re-enable only with CEO approval + regime check
+DOJI_BOTTOM_ENABLED           = True    # RE-ENABLED 2026-10-14 brain_auditor — blanket Oct-13 kill was over-broad. EXTREME already 0.0 (removed from EXTREME list 2026-10-13: 3T 0%WR −$0.25 falling-knife). non-EXTREME 14d: HIGH 7T 57.1% +$0.01, NORMAL 3T 66.7% +$0.12 = 10T 60% +$0.13. Re-kill via DOJI_BOTTOM_ENABLED=False if non-EXTREME cohort flips negative (n≥10).
 DOJI_BODY_MAX_PCT             = 15      # max body % for doji classification (relaxed from 10%)
 DOJI_ADVANCE_MIN_PCT          = 0.5     # min % advance before doji (prior move must be meaningful)
 DOJI_DECLINE_MIN_PCT          = 0.5     # min % decline for bottom signal (doji_bottom)

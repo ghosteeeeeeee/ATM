@@ -4474,5 +4474,23 @@
     "category": "gate integrity",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-14T14:44:26Z",
+    "idea": "LONG counter-trend shadow dampen when BTC BELOW EMA300 + bear linreg",
+    "rationale": "Watchdog: 62 LONGs 24% WR -$2.12 in SHORT_BIAS market. Trail family wins when trend-aligned; chop/counter-trend entries hit hard_max_loss. BTC continuum BELOW+BEAR is the structural filter.",
+    "expected_impact": "After enforce: cut ~50% of counter-trend LONG losers without blocking EXTREME-vol LONG winners",
+    "category": "entry sniper",
+    "status": "shipped_shadow",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-14T14:44:26Z",
+    "idea": "Monitor pump-chain- EXTREME habitat drift (CEO KEEP may be stale)",
+    "rationale": "14d EXTREME: 60T 35%WR -$0.24 — was KEEP at 51.6% earlier. Signal bleeding even in home habitat. Flag for CEO; do NOT unilateral revert (standing order).",
+    "expected_impact": "Decision point: re-block EXTREME if 21d EXTREME WR <40% with n>=40",
+    "category": "regime",
+    "status": "monitor",
+    "risk": "n/a"
   }
 ]

@@ -1243,5 +1243,27 @@
     "after": "detect RSI (signal_rsi_14/metadata) also blocked at exec when > ceiling — mirror of SHORT detect-floor",
     "rationale": "DRIFT-E: live-5m RSI diverges from signal-time meta rsi_14. SEI@84.21 entered LONG via live=53.9, hard_max_loss. Winner impact: 0/8 7d.",
     "impact": "Closes overbought-LONG hole for bypass signals; ceiling constants now enforce as designed."
+  },
+  {
+    "timestamp": "2026-10-14T14:44:26Z",
+    "agent": "brain_auditor",
+    "change": "Re-enable doji-bottom-long (EXTREME already 0.0-gated)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "DOJI_BOTTOM_ENABLED=False (blanket Oct-13 kill)",
+    "after": "DOJI_BOTTOM_ENABLED=True (EXTREME blocked via vol-gate; HIGH/NORMAL open)",
+    "rationale": "14d non-EXTREME 10T 60%WR +$0.13 (HIGH 7T 57.1% +0.01, NORMAL 3T 66.7% +0.12). EXTREME 3T 0% -0.25 already gated. Blanket kill was over-broad.",
+    "impact": "Opens ~0.7 trades/day of 60% WR habitat. Revert: DOJI_BOTTOM_ENABLED=False if non-EXTREME n>=10 flips negative."
+  },
+  {
+    "timestamp": "2026-10-14T14:44:26Z",
+    "agent": "brain_auditor",
+    "change": "Ship LONG-SHORT-BIAS shadow dampen (BTC BELOW EMA300 + BEAR linreg)",
+    "type": "shadow",
+    "file": "hermes_constants.py + signal_compactor.py",
+    "before": "n/a (new shadow gate)",
+    "after": "SHADOW: log would-dampen ×0.70 conf on counter-trend LONGs; enforce when LONG_SHORT_BIAS_DAMPEN_SHADOW=False",
+    "rationale": "48h 62 LONGs 24.2%WR -$2.12 vs 30 SHORTs. BTC BELOW+BEAR = every LONG counter-trend. Zero live impact until CEO ratifies after 48h shadow data.",
+    "impact": "Shadow only. Expected after enforce: suppress worst counter-trend LONG cohort (~50% of LONG losers per 48h autopsy)."
   }
 ]

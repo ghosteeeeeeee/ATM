@@ -902,3 +902,6 @@
 ## TEAM UPDATES
 - [2026-10-14 08:50] health_monitor: Auto-fixed hermes-coding-mcp crash loop (11,222 restarts on missing run_mcp_server.py) — service disabled+stopped. Decision needed: restore script or delete unit. Disk at 84%, upgrade-implementer timed out once at 06:16.
 - [2026-10-14 09:53] health_monitor: Auto-fixed hermes-upgrade-implementer failed state (06:16 timeout) via reset-failed — next timer run clean. All systems green: pipeline every 1min, prices fresh, 48 signals/hr, 1 open (POL SHORT +1.2%). Disk 84% (watch). Pending from 08:50: hermes-coding-mcp disabled — decide restore vs delete unit.
+
+## TEAM UPDATES
+- [2026-10-14 14:46 UTC] brain_auditor: **24h 44T 27.3%WR −$0.93 | 7d 187T 34.8% −$0.87 | critical.** 48h wrong-side LONG: 62T 24.2% −$2.12 vs SHORT 30T −$0.04; hard_max_loss 33T 0% −$2.83 (chop), trail winners +$2.49 (trend). **FIXED doji-bottom over-kill** — re-enabled (EXTREME already 0.0; non-EXTREME 10T 60% +$0.13). **SHIPPED LONG-SHORT-BIAS shadow dampen** (BTC BELOW EMA300 + BEAR → ×0.70 conf, shadow-only). Prior fixes live (midband/ceilings); post-12:48 n=1, need 48h. **CEO:** pump-chain- EXTREME habitat 35%WR −$0.24/14d vs KEEP order — drift, decide. ETC SHORT hold (+1.49%). Protected flags INTACT. — brain_auditor
