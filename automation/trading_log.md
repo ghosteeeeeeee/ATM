@@ -9660,3 +9660,26 @@ Final set: ['GRASS']
 - Overtrade: 1/hr (limit 20)
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 05:15] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00
+
+**Details:**
+- 0 trades closed this hour (4th empty hour recently)
+- 24h: 61T 16W −$1.00 (26.2% WR)
+- 24h by signal (3+T): doji-bottom-long 5T 0W −$0.46, hmacd_mtf-+ 5T 1W −$0.33, volume-breakout-long+ 4T 0W −$0.25, ai-trader+ 3T 0W −$0.15 — all 0-fire this hour, none re-trigger kill rule (needs 3+T 0W IN LAST HOUR)
+- Open: 3 (ALT SHORT pump-chain-v6− +0.33%, BABY LONG r2v2-long3 −0.66%, USUAL LONG r2v2-long4 −0.62%)
+- Kill switch: live_trading=true verified
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: 0T this hour — no candidates
+- hard_max_loss 21/61 = 34.4% under 40% threshold; atr_sl_hit 18/61 = 29.5% under 40%, tpsl_utils stable
+- Streak: hour 03 −$0.03, hour 04 −$0.06 = 2 neg hrs; hour 05 0T ($0.00) breaks streak → 0 consecutive, under 3 → size lever N/A
+- Regime 24h opens: EXTREME 46 / HIGH 8 / NORMAL 6 — not NEUTRAL → size lever N/A
+- Overtrade: 0/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
