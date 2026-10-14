@@ -9683,3 +9683,36 @@ Final set: ['GRASS']
 - Overtrade: 0/hr (limit 20)
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## LOSERS Update — 2026-10-14 06:05 UTC
+- ADD CHIP (WR=33.3%, PnL=$-0.25, low_wr (33.3%))
+- ADD BTC (WR=42.9%, PnL=$-0.14, low_wr (42.9%))
+- ADD LDO (WR=16.7%, PnL=$0.23, wr_collapse (62.5% → 16.7%))
+- ADD CFX (WR=33.3%, PnL=$0.36, low_wr (33.3%))
+
+Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
+
+## [2026-10-14 06:15] Hourly Analysis
+
+**Trades:** 4 closed (0 wins, 4 losses)
+**PnL:** −$0.29 (WR: 0.0%)
+
+**Details:**
+- WLFI bb-bounce-v2-long+ hard_max_loss −$0.04 (−3.31%)
+- USUAL r2v2-long4 hard_max_loss −$0.12 (−3.20%)
+- BABY r2v2-long3 hard_max_loss −$0.12 (−3.32%)
+- ALT pump-chain-v6− hard_sl −$0.01 (−0.08%)
+- 24h: 63T 15W −$1.23 (23.8% WR)
+- Open: 0
+- Kill switch: live_trading=true verified
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: max 1T 0W per signal this hour (needs 3+T 0W) — no candidates
+- 24h watch: doji-bottom-long 5T 0W −$0.46, volume-breakout-long+ 4T 0W −$0.25, ai-trader+ 3T 0W −$0.15 — 0 fires this hour, none re-trigger kill rule
+- hard_max_loss 24/63 = 38.1% under 40% (rising; was 34.4% last hour — watch); atr_sl_hit 17/63 = 27.0% under 40%, tpsl_utils stable
+- Streak: hours 04 −$0.06, 05 −$0.25, 06 −$0.04 = 3 neg hrs — rule says check regime; 24h opens EXTREME 46 / HIGH 8 / NORMAL 6, not NEUTRAL → size lever N/A
+- Overtrade: 4/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction

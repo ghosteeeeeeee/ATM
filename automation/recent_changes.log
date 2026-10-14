@@ -4651,3 +4651,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-14 05:15] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 61T 16W −$1.00 (26.2%) | kill: none (0 trades) | doji-bottom-long 5T 0W, volume-breakout-long+ 4T 0W, ai-trader+ 3T 0W 0-fire watch | hard_max_loss 34.4% (under 40) | atr_sl_hit 29.5% (tpsl stable) | overtrade 0/hr | streak broken (0T hour 05) | regime EXTREME≠NEUTRAL → size lever N/A | 3 open | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-14 06:15] auto_1hr: NO CONFIG CHANGE — 4T last hour 0W −$0.29 (WLFI bb-bounce-v2-long+/USUAL r2v2-long4/BABY r2v2-long3 hard_max_loss ~−3.3% each, ALT pump-chain- hard_sl flat) | 24h 63T 15W −$1.23 (23.8%) | kill: none qualifying (max 1T 0W/signal, needs 3+) | doji-bottom-long 5T 0W, volume-breakout-long+ 4T 0W, ai-trader+ 3T 0W 0-fire watch | hard_max_loss 38.1% (under 40, rising — watch) | atr_sl_hit 27.0% (tpsl stable) | overtrade 4/hr | streak 3-neg but regime EXTREME≠NEUTRAL → size lever N/A | 0 open | live_trading=true, kill JSON=true
+BY: auto_1hr
