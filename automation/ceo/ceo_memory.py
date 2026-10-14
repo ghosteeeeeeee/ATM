@@ -2,12 +2,13 @@
 """
 ceo_memory.py — read-side access to OpenMemory for the CEO runners.
 
-Why this exists: the CEO WRITES to OpenMemory on every run (3 stores per deep run on
-record) but nothing in its runners or prompts ever READS it back. It therefore
-rediscovers context from scratch each run — re-grepping recent_changes.log, re-reading
-CURRENT.md, re-running the same SQL. That re-discovery is what the 33-tool-call,
-17-minute investigations are made of. This is the read half of an existing store, not
-a new subsystem.
+Why this exists: the CEO occasionally WRITES to OpenMemory (3 store calls across all
+deep runs on record — 3 of 12 runs stored anything) but nothing in its runners or
+prompts ever READS it back: zero `openmemory_openmemory_query` calls across all 240
+logged tool calls. It therefore rediscovers context from scratch each run — re-grepping
+recent_changes.log, re-reading CURRENT.md, re-running the same SQL. That re-discovery
+is what a 33-tool-call, 27-minute investigation was made of. This is the read half of
+an existing store, not a new subsystem.
 
 Deliberately small and dependency-free (stdlib only): no vector store, no embeddings.
 OpenMemory already does the retrieval; we only call it and bound the output so a big
@@ -18,7 +19,7 @@ Usage:
     ceo_memory.py "volatility gate" --max-chars 1200
     ceo_memory.py --check          # probe only: is OpenMemory reachable?
 
-Exit codes: 0 ok, 3 OpenMemory unreachable, 4 bad args.
+Exit codes: 0 ok, 3 OpenMemory unreachable, 4 bad args, 2 argparse usage error.
 """
 import argparse
 import json
@@ -55,7 +56,23 @@ def query_openmemory(tool, arguments, timeout=DEFAULT_TIMEOUT):
         },
     )
     with urllib.request.urlopen(req, timeout=timeout) as resp:
-        body = json.loads(resp.read())
+        raw = resp.read()
+    # We advertise Accept: application/json, text/event-stream, so the server is
+    # entitled to answer either. It answers JSON today; if it ever switches to SSE
+    # framing ("data: {...}" lines), a bare json.loads would fail and every call
+    # would report rc 3 "unavailable" — the same silent-failure family as the
+    # missing-Accept 406 that bit us twice. Handle both.
+    text = raw.decode("utf-8", errors="replace")
+    stripped = text.lstrip()
+    # SSE events may open with an "event:" line before their "data:" line, so match
+    # on the presence of a data: line rather than the first non-space character.
+    if "\ndata:" in "\n" + stripped or stripped.startswith("data:"):
+        # SSE: take the last data line, which carries the final event.
+        for line in reversed(text.strip().splitlines()):
+            if line.startswith("data:"):
+                text = line[len("data:"):].strip()
+                break
+    body = json.loads(text)
     if "error" in body:
         raise RuntimeError(f"MCP error: {body['error']}")
     content = body.get("result", {}).get("content", [])
@@ -73,6 +90,13 @@ def main():
     ap.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT)
     ap.add_argument("--check", action="store_true", help="probe reachability only")
     args = ap.parse_args()
+
+    # Cap the cap. `--max-chars 0` would print only the truncation marker, and a
+    # negative value would slice from the wrong end — both defeat the whole point,
+    # which is bounding what reaches the CEO's context window.
+    if args.max_chars <= 0:
+        print(f"[CEO-MEMORY] --max-chars must be > 0 (got {args.max_chars})", file=sys.stderr)
+        return 4
 
     if args.check:
         try:

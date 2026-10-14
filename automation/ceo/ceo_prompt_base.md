@@ -85,7 +85,7 @@ If old report says -6.64% but DB shows +$0.38, **use the DB number.**
 
 ### 0. Prior context (MANDATORY — before any analysis)
 You have done this work before. Rediscovering it from scratch is the single most
-expensive thing you do: on record, one deep run spent 33 tool calls and 17 minutes
+expensive thing you do: on record, one deep run spent 33 tool calls and 27 minutes
 re-deriving context that was already stored. Two cheap reads replace most of that.
 
 ```bash

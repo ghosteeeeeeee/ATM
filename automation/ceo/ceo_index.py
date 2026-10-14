@@ -21,13 +21,14 @@ Usage:
     ceo_index.py --since 20261013
     ceo_index.py --max-chars 2500
 
-Exit codes: 0 ok, 5 missing inputs.
+Exit codes: 0 ok, 4 bad args, 5 missing inputs, 2 argparse usage error.
 """
 import argparse
 import glob
 import os
 import re
 import sys
+from datetime import datetime
 
 CEO_DIR = "/root/.hermes/automation/ceo"
 REPORT = os.path.join(CEO_DIR, "ceo_report.md")
@@ -41,24 +42,72 @@ CKPT_RE = re.compile(r"^(\d{8}T\d{6}Z)-(decision|result(?:-\d+)?)\.md$")
 DEFAULT_MAX_CHARS = 3000
 
 
+def _stamp_key(stamp):
+    """Normalize both header stamp formats to a sortable, comparable value.
+
+    Sections use Zulu stamps (20261014T094729Z); older hand-written ones used ISO
+    dates (2026-10-13). Comparing those as raw strings silently DROPS ISO sections from
+    --since, because '-' (0x2D) sorts below '1' (0x31) — "2026-10-13" < "20261013".
+    Normalize to a datetime for both compare and sort, and treat an unparseable stamp
+    as oldest rather than dropping it.
+    """
+    s = stamp.rstrip("Z")
+    try:
+        return datetime.strptime(s, "%Y%m%dT%H%M%S")
+    except ValueError:
+        pass
+    try:
+        return datetime.strptime(s, "%Y%m%dT%H%M")
+    except ValueError:
+        pass
+    try:
+        return datetime.strptime(s[:10], "%Y-%m-%d")
+    except ValueError:
+        pass
+    # Bare YYYYMMDD is a valid --since cutoff and may appear as a section stamp.
+    try:
+        return datetime.strptime(s[:8], "%Y%m%d")
+    except ValueError:
+        return datetime.min
+
+
 def index_report(path=REPORT):
-    """Yield (line_no, level, title, stamp, first_line_of_body)."""
+    """Yield (line_no, level, title, stamp, digest).
+
+    The digest matters: a returning CEO needs "what did I decide/recommend last time"
+    far more than the title. The status template writes its body as ### Health/Numbers/
+    Findings/Recommendation sub-headers, so a naive "first non-# line" yields nothing —
+    that bug shipped and made every digest empty. Prefer Recommendation, else Findings,
+    else any non-header line.
+    """
     if not os.path.exists(path):
         return []
     out, cur = [], None
+
+    def flush():
+        if cur:
+            # cur[4] collects (rank, text); keep the best-ranked candidate's TEXT.
+            best = min(cur[4], key=lambda c: c[0])[1] if cur[4] else ""
+            out.append([cur[0], cur[1], cur[2], cur[3], best[:200]])
+
     with open(path, errors="replace") as f:
         for i, line in enumerate(f, 1):
             m = SECTION_RE.match(line)
             if m:
-                if cur:
-                    out.append(cur)
-                cur = [i, len(m.group(1)), m.group(2).strip(), m.group(3), ""]
-            elif cur and not cur[4] and line.strip() and not line.startswith("#"):
-                # First substantive line under the header — enough to identify the
-                # section without the CEO having to open the file.
-                cur[4] = line.strip()[:160]
-    if cur:
-        out.append(cur)
+                flush()
+                cur = [i, len(m.group(1)), m.group(2).strip(), m.group(3), []]
+            elif cur:
+                s = line.strip()
+                if not s:
+                    continue
+                # Rank: a Recommendation is the single most reusable line in a section.
+                if s.startswith("### Recommendation"):
+                    cur[4].append((0, s))
+                elif s.startswith("### Findings"):
+                    cur[4].append((1, s))
+                elif not s.startswith("#"):
+                    cur[4].append((2, s))
+    flush()
     return out
 
 
@@ -99,12 +148,15 @@ def index_briefs(directory=CEO_DIR):
 def main():
     ap = argparse.ArgumentParser(description="Index the CEO's prior rulings.")
     ap.add_argument("--topic", help="case-insensitive substring filter on section text")
-    ap.add_argument("--since", help="only sections/checkpoints at or after this stamp (YYYYMMDD...)")
+    ap.add_argument("--since", help="only sections/checkpoints at or after this stamp (YYYYMMDD... or YYYY-MM-DD)")
     ap.add_argument("--max-chars", type=int, default=DEFAULT_MAX_CHARS)
     ap.add_argument("--no-checkpoints", action="store_true")
     ap.add_argument("--no-briefs", action="store_true",
                     help="skip briefs (per-task scratch, low reuse)")
     args = ap.parse_args()
+    if args.max_chars <= 0:
+        print(f"[CEO-INDEX] --max-chars must be > 0 (got {args.max_chars})", file=sys.stderr)
+        return 4
 
     sections = index_report()
     ckpts = [] if args.no_checkpoints else index_checkpoints()
@@ -113,8 +165,9 @@ def main():
         return 5
 
     if args.since:
-        sections = [s for s in sections if s[3] >= args.since]
-        ckpts = [c for c in ckpts if c[1] >= args.since]
+        cutoff = _stamp_key(args.since)
+        sections = [s for s in sections if _stamp_key(s[3]) >= cutoff]
+        ckpts = [c for c in ckpts if _stamp_key(c[1]) >= cutoff]
     if args.topic:
         t = args.topic.lower()
         sections = [s for s in sections
@@ -122,14 +175,32 @@ def main():
         # Checkpoints have no body index; filter on filename topic token.
         ckpts = [c for c in ckpts if t in c[0].lower()]
 
+    # Briefs: scratch inputs, listed last and only if asked. They are per-task and
+    # rarely reused, but knowing one exists beats re-writing it (several briefs were
+    # re-created by later runs because nobody could find the original).
+    briefs = [] if args.no_briefs else index_briefs()
+    if briefs:
+        # Same filters as the rest: without this, `--topic ux8` reported zero
+        # sections and checkpoints, then dumped every irrelevant brief.
+        if args.topic:
+            t = args.topic.lower()
+            briefs = [b for b in briefs if t in b[0].lower()]
+        if args.since:
+            cutoff = _stamp_key(args.since)
+            briefs = [b for b in briefs if _stamp_key(b[1]) >= cutoff]
+
     lines = ["# CEO prior-work index", ""]
-    lines.append(f"Report sections: {len(sections)}   Checkpoints: {len(ckpts)}")
+    lines.append(f"Report sections: {len(sections)}   Checkpoints: {len(ckpts)}"
+                 + (f"   Briefs: {len(briefs)}" if briefs else ""))
     lines.append("Read a single checkpoint file for full rationale — do not read them all.")
     lines.append("")
 
     if sections:
         lines.append("## Report sections (newest first)")
-        for ln, lvl, title, stamp, body in reversed(sections):
+        # Sort explicitly rather than relying on the report being appended in order:
+        # a mixed Zulu/ISO report (or an agent that prepends) would otherwise put an
+        # ISO-dated section at the "newest" end.
+        for ln, lvl, title, stamp, body in sorted(sections, key=lambda s: _stamp_key(s[3]), reverse=True):
             pad = "  " * max(0, lvl - 2)
             lines.append(f"{pad}- {stamp}  {title}  (line {ln})")
             if body:
@@ -145,13 +216,11 @@ def main():
     # Briefs: scratch inputs, listed last and only if asked. They are per-task and
     # rarely reused, but knowing one exists beats re-writing it (several briefs were
     # re-created by later runs because nobody could find the original).
-    if not args.no_briefs:
-        briefs = index_briefs()
-        if briefs:
-            lines.append("## Briefs (per-task scratch — read only if directly relevant)")
-            for fn, stamp, size in briefs:
-                lines.append(f"  - {stamp}  {size:>6}B  {fn}")
-            lines.append("")
+    if briefs:
+        lines.append("## Briefs (per-task scratch — read only if directly relevant)")
+        for fn, stamp, size in briefs:
+            lines.append(f"  - {stamp}  {size:>6}B  {fn}")
+        lines.append("")
 
     # Topic rollup: which topics recur, so the CEO can see its own repeated concerns.
     if not args.topic:
