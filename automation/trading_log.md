@@ -9946,3 +9946,25 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 - Overtrade: 0/hr (limit 20)
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 17:15] Hourly Analysis
+
+**Trades:** 4 closed (1 win, 3 losses)
+**PnL:** −$0.16 (WR: 25.0%)
+
+**Details:**
+- FIL pump-chain- atr_trail_hit +$0.06 | ETH hl_copy_trader atr_sl_hit −$0.05 | CAKE pump-chain- atr_sl_hit −$0.05 | USELESS volume-breakout-short- atr_sl_hit −$0.12
+- 24h: 44T 16W −$0.62 net (by reason sums)
+- 24h by reason: atr_sl_hit 14/44=31.8% (under 40), hard_max_loss 9/44=20.5% — tpsl stable
+- 24h worst 0-WR (3+T): volume-buildup+ 3T 0W −$0.26 (already killed 09:15, pre-kill trades only)
+- Open: 1 | live_trading=true verified
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no candidates (max 1T 0W/signal this hour, needs 3+T 0W)
+- atr_sl_hit 31.8% under 40% threshold
+- Streak: hour 14 +$0.14, hour 15 0T, hour 16 −$0.16 — no 3-neg streak
+- Overtrade: 4/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction

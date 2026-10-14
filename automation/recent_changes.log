@@ -4673,3 +4673,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-14 16:15] auto_1hr: NO CONFIG CHANGE — 0T last hour, 4 open | 24h 40T 13W −$0.46 (32.5%) | kill: none (0 trades) | volume-buildup+ remains killed (pre-kill trades only) | hard_max_loss 22.5% (under 40) | atr_sl_hit 27.5% (tpsl stable) | winners MAE avg 0.139% (entries fine) | overtrade 0/hr | streak no 3-neg | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-14 17:15] auto_1hr: NO CONFIG CHANGE — 4T last hour 1W −$0.16 (FIL pump-chain- trail +$0.06; ETH hl_copy/CAKE pump-chain-/USELESS volume-breakout-short- atr_sl_hit) | 24h 44T 16W −$0.62 | kill: none (max 1T 0W/signal, needs 3+T) | volume-buildup+ remains killed (pre-kill trades only) | hard_max_loss 20.5% (under 40) | atr_sl_hit 31.8% (tpsl stable) | overtrade 4/hr | streak no 3-neg | 1 open | live_trading=true, kill JSON=true
+BY: auto_1hr
