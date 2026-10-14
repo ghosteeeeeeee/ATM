@@ -4319,12 +4319,31 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 except Exception:
                     pass
                 try:
-                    _lrc_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
-                    if _lrc_rsi is not None and _lrc_rsi > _dynamic_ceiling:
-                        if _lrc_bullish_override:
-                            log(f"  ✅ [LONG-RSI-CEILING] {tkn}: LONG bypass — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} but BTC bullish (overbought = momentum)")
+                    # FIX brain_auditor 2026-10-14: prefer meta rsi_14 (DRIFT-E-safe) —
+                    # live-5m let SEI@meta84.21 through (live-5m=53.9), hard_max_loss −0.23.
+                    # Same pattern as LONG-MIDBAND fix. Fallback live-5m when meta absent.
+                    _lrc_rsi = None
+                    _lrc_meta = entry.get('signal_metadata')
+                    if _lrc_meta:
+                        try:
+                            import json as _json_lrc
+                            _lrc_md = _json_lrc.loads(_lrc_meta) if isinstance(_lrc_meta, str) else (_lrc_meta if isinstance(_lrc_meta, dict) else {})
+                            _lrc_rsi = _lrc_md.get('rsi_14')
+                        except Exception:
+                            _lrc_rsi = None
+                    if _lrc_rsi is None:
+                        _lrc_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lrc_rsi is not None and float(_lrc_rsi) > _dynamic_ceiling:
+                        # FIX brain_auditor 2026-10-14: bullish override is BOUNDED by LONG_RSI_CEILING.
+                        # Previously unbounded — LEAN_BULL+ABOVE flicker during failed EMA300 reclaim
+                        # (08:15-08:30 today) let MON@78.1 / RUNE@79 / ACE@75.5 LONGs through →
+                        # MON hard_max_loss −4.70%. 7d verify: 0 winners with meta RSI >75, 7 losers −$0.60.
+                        # Override still serves its purpose in the Grade C/D tightening band (60-75).
+                        # Grade A ceiling 80 untouched (CEO 2026-10-09).
+                        if _lrc_bullish_override and float(_lrc_rsi) <= LONG_RSI_CEILING:
+                            log(f"  ✅ [LONG-RSI-CEILING] {tkn}: LONG bypass — RSI {float(_lrc_rsi):.1f} > {_dynamic_ceiling} but BTC bullish (overbought = momentum)")
                         else:
-                            log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {_lrc_rsi:.1f} > {_dynamic_ceiling} (overbought — pullback risk, rr_mult={_rr_m:.2f})")
+                            log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {float(_lrc_rsi):.1f} > {_dynamic_ceiling} (overbought — pullback risk, rr_mult={_rr_m:.2f}, meta-source)")
                             continue
                 except Exception:
                     pass  # non-fatal

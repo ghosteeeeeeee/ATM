@@ -4447,5 +4447,32 @@
     "status": "suggested — needs self_learner backtest, position_manager change",
     "risk": "medium — must not cut slow-starting winners (pump-chain+ grind phase is ~2h; 20min MFE<0.15% could kill future HRs)",
     "verification_required": "Backtest: how many of the 60 trail-family winners had MFE<0.15% at minute 20? If >10%, don't ship."
+  },
+  {
+    "date": "2026-10-14T09:50:00Z",
+    "idea": "Wrong-side flip shadow collector: when a LONG dies at hard_max_loss while BTC bear structure is active, log a counterfactual SHORT paper-entry for the same token (entry=exit price of the long, standard SL/TP)",
+    "rationale": "Watchdog verified pattern: 16/16 LONG hard_max_loss losers in bear tape — the coins kept dumping (IMX, CHIP, BABY all flipped SHORT_BIAS after our long died). We lose fast on the wrong side; the same velocity was the winning SHORT side. Zero live impact — pure counterfactual data to answer: would systematically flipping HML-long losers into shorts be net positive?",
+    "expected_impact": "Data collection only. If flip cohort shows >55% WR over n>=30, propose a real flip signal; if <45%, kills the thesis with evidence.",
+    "category": "wrong-side recovery",
+    "status": "suggested",
+    "risk": "none (shadow log only)"
+  },
+  {
+    "date": "2026-10-14T12:48:03Z",
+    "idea": "When CHASE_RATIO shadow reaches n>=10 fires with 0 trail-winner false-blocks, flip CHASE_RATIO_SHADOW=False (enforce). Pre-registered bar from Oct 13 backtest: blocked 19/118 hard_max_loss (-$2.01), 0/28 trail winners, both 7d halves clean.",
+    "rationale": "Trail family is 100% of wins. CHASE_RATIO is the only filter designed against the chase-into-move pattern that produces hard_max_loss. Entry filters shipped this week (midband, ceilings, RSI_MAX) treat symptoms; chase-ratio treats the cause.",
+    "expected_impact": "-$2/14d hard_max_loss reduction per backtest",
+    "category": "chop-entry root cause",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-14T12:48:03Z",
+    "idea": "Audit HOTSET-FINAL-BYPASS / 'backtested standalone' signal list — which signals carry it, what WR do they have, do they still deserve gate-skipping? r2-trend-long4 used it to enter SEI@84.",
+    "rationale": "STANDALONE_BYPASS DRIFT-A class: ceremonial gates. My detect-ceiling fix is defense-in-depth but the bypass itself is the hole.",
+    "expected_impact": "identify gate-skipping signals for individual re-audit",
+    "category": "gate integrity",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

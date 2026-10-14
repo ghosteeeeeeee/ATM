@@ -1210,5 +1210,38 @@
     "after": "n/a",
     "rationale": "5 fixes landed in prior 18h, all verified working. Stacking more violates soak discipline and CEO escalation (4 fixes in soak).",
     "impact": "No new change. Prior fixes expected to recover WR as Oct 13 ages out of window."
+  },
+  {
+    "timestamp": "2026-10-14T09:50:00Z",
+    "agent": "brain_auditor",
+    "change": "LONG-RSI-CEILING bullish override bounded by LONG_RSI_CEILING (75) — was unbounded, let MON@78.1/RUNE@79/ACE@75.5 LONGs through during failed EMA300 reclaim flicker",
+    "type": "bugfix",
+    "file": "signal_compactor.py",
+    "before": "bullish_override allowed ANY RSI > dynamic_ceiling when continuum LEAN_BULL+ABOVE/AT",
+    "after": "bullish_override only bypasses when rsi <= LONG_RSI_CEILING (75); above 75 hard block regardless of continuum. Grade A ceiling 80 untouched.",
+    "rationale": "539 ceiling bypasses today during 08:15-08:30 failed reclaim; MON entered RSI 78.1 → hard_max_loss -4.70%. 7d verify: 0 LONG winners with meta RSI>75, 7 losers -$0.60. Same disease as Oct 11 CONTINUUM-BULL flicker fix, unfixed on this path.",
+    "impact": "Blocks overbought LONG chase entries in failed-reclaim bounces; preserves override in 60-75 Grade C/D band. Expected save ~$0.60/7d + prevents MON-class events."
+  },
+  {
+    "timestamp": "2026-10-14T12:48:03Z",
+    "agent": "brain_auditor",
+    "change": "LONG-RSI-CEILING meta-source: prefer signal_metadata.rsi_14 over live-5m compute_rsi",
+    "type": "bugfix",
+    "file": "scripts/signal_compactor.py",
+    "before": "compute_rsi(tkn, tf='5m') only — SEI@meta84 passed at live=53.9",
+    "after": "meta rsi_14 preferred, live-5m fallback (same pattern as MIDBAND fix)",
+    "rationale": "DRIFT-E: live-5m RSI diverges from signal-time meta rsi_14. SEI@84.21 entered LONG via live=53.9, hard_max_loss. Winner impact: 0/8 7d.",
+    "impact": "Closes overbought-LONG hole for bypass signals; ceiling constants now enforce as designed."
+  },
+  {
+    "timestamp": "2026-10-14T12:48:03Z",
+    "agent": "brain_auditor",
+    "change": "EXEC-RSI-DETECT-CEILING: exec-time LONG ceiling also checks detect-time meta RSI",
+    "type": "bugfix",
+    "file": "scripts/decider_run.py",
+    "before": "exec ceiling checked live _exec_rsi only; bypass signals skipped context-gate detect check",
+    "after": "detect RSI (signal_rsi_14/metadata) also blocked at exec when > ceiling — mirror of SHORT detect-floor",
+    "rationale": "DRIFT-E: live-5m RSI diverges from signal-time meta rsi_14. SEI@84.21 entered LONG via live=53.9, hard_max_loss. Winner impact: 0/8 7d.",
+    "impact": "Closes overbought-LONG hole for bypass signals; ceiling constants now enforce as designed."
   }
 ]

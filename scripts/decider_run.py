@@ -2114,6 +2114,28 @@ def execute_trade(token, direction, price, confidence, source,
             if direction.upper() == 'LONG' and _exec_rsi > _long_ceiling:
                 log(f'  🚫 [EXEC-RSI-CEILING] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} > {_long_ceiling} at execution time (overbought — chasing)')
                 return False, f'RSI ceiling: {_exec_rsi:.1f} > {_long_ceiling}'
+            # BUGFIX brain_auditor 2026-10-14: detect-RSI ceiling for LONG — mirror of SHORT
+            # detect-floor (2067-2070). Bypass signals (r2-trend-long4 etc.) skip the context
+            # gate where detect-ceiling lives (1248-1250). SEI meta=84.21 entered with live=53.9
+            # (DRIFT-E), hard_max_loss −0.23. Live-recovered-into-overbought = chasing.
+            _detect_ceiling_rsi = signal_rsi_14
+            if _detect_ceiling_rsi is None:
+                try:
+                    _sm_ceil = signal_metadata
+                    if isinstance(_sm_ceil, str):
+                        _sm_ceil = json.loads(_sm_ceil)
+                    if isinstance(_sm_ceil, dict):
+                        _detect_ceiling_rsi = _sm_ceil.get('rsi_14') or _sm_ceil.get('rsi')
+                except Exception:
+                    _detect_ceiling_rsi = None
+            try:
+                _detect_ceiling_rsi = float(_detect_ceiling_rsi) if _detect_ceiling_rsi is not None else None
+            except (TypeError, ValueError):
+                _detect_ceiling_rsi = None
+            if (direction.upper() == 'LONG' and _long_ceiling > 0
+                    and _detect_ceiling_rsi is not None and _detect_ceiling_rsi > _long_ceiling):
+                log(f'  🚫 [EXEC-RSI-DETECT-CEILING] {token} LONG BLOCKED — detect RSI {_detect_ceiling_rsi:.1f} > {_long_ceiling} (signal fired overbought; live={_exec_rsi:.1f})')
+                return False, f'RSI ceiling (detect): {_detect_ceiling_rsi:.1f} > {_long_ceiling}'
         else:
             # rsi_utils returned None — stale/insufficient data
             if direction.upper() == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
