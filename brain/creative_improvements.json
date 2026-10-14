@@ -4537,5 +4537,15 @@
     "category": "exit structure",
     "status": "ceo_package_ready",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-14T23:44:45Z",
+    "idea": "Extend trail-arm timeout to volume-breakout-long+ and ai-trader+ (HML top-3 signals without the vehicle)",
+    "rationale": "7d HML by signal: pump-chain+ 12T (has timeout), volume-breakout-long+ 9T (killed signal — skip), ai-trader+ 5T (NO timeout, −$0.41), pump-chain- 5T (has it). trail-arm timeout proven on pump-chain: exits stalls at −0.23% vs HML −3%. ai-trader+ 5 HML trades never armed trail = chop entries.",
+    "expected_impact": "ai-trader+ HML −$0.41/7d → ~−$0.05 (timeout exit), net save ~$0.35/7d",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "low",
+    "prereq": "ai-trader+ n≥10 HML backtest (self_learner) — 5T is thin; monitor 48h then decide. NOT shipped this run (one-variable + soak discipline)."
   }
 ]

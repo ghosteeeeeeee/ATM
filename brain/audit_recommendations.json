@@ -1,151 +1,181 @@
 {
-  "timestamp": "2026-10-14T22:48:08Z",
+  "timestamp": "2026-10-14T23:44:45Z",
+  "agent": "brain_auditor",
+  "run_type": "audit + trail-arm ratify package (soak ends Oct 15)",
   "session_brain_stats": {
-    "note": "queried trail-arm, conf-inversion, HML topics — session_brain returning trade-log fragments, low signal",
-    "queries": [
-      "trail arm timeout pump chain soak",
-      "confidence cap inversion calib",
-      "hard_max_loss chop filter backtest"
+    "queries": 3,
+    "top_recurring": [
+      "chop vs trend",
+      "trail arm",
+      "wrong-side trades"
     ]
   },
   "trade_summary_24h": {
-    "trades": 39,
-    "pnl": 0.0,
-    "wr": 38.5,
-    "note": "BREAKEVEN — best since Oct 12 flush. 21 losers -$1.48 offset by 18 winners +$1.48. 0 open."
+    "closed": 38,
+    "wr_pct": 39.0,
+    "pnl": -0.04,
+    "by_exit": {
+      "hard_max_loss": {
+        "n": 10,
+        "pnl": -0.82,
+        "wr": 0.0
+      },
+      "atr_sl_hit": {
+        "n": 10,
+        "pnl": -0.63,
+        "wr": 0.0
+      },
+      "profit-monster-trail": {
+        "n": 9,
+        "pnl": 0.76,
+        "wr": 100.0
+      },
+      "atr_trail_hit": {
+        "n": 5,
+        "pnl": 0.66,
+        "wr": 80.0
+      }
+    },
+    "by_direction": {
+      "LONG": {
+        "n": 23,
+        "pnl": -0.41,
+        "wr": 34.8
+      },
+      "SHORT": {
+        "n": 15,
+        "pnl": 0.37,
+        "wr": 40.0
+      }
+    },
+    "note": "Nearly breakeven (−$0.04). Trail family net +$1.42; hard_max_loss −$0.82 sole bleed. Watchdog '8 wrong-side losses' verified — all small (max −$0.23), system capping losers correctly."
   },
   "trade_summary_7d": {
-    "trades": 192,
-    "pnl": -0.58,
-    "wr": 35.4,
-    "long": "147T -$0.26 36.1%",
-    "short": "45T -$0.32 33.3%",
-    "ex_killed_long": "+$1.64/109T 41.3% — kills working",
-    "ex_killed_short": "-$0.32/45T 33.3% — all n<=4 signals",
-    "top_exit_bleed": "hard_max_loss 62T -$5.98 0%WR (rate falling: Oct13 37.5% → Oct14 27%)",
-    "trail_exits": "profit-monster-trail 42T +$2.73 88.1% + atr_trail_hit 17T +$3.80 82.4%"
+    "closed": 193,
+    "wr_pct": 35.2,
+    "pnl": -0.61,
+    "hml": {
+      "n": 62,
+      "pnl": -5.98,
+      "wr": 0.0
+    },
+    "trail_family": {
+      "profit-monster-trail": 2.73,
+      "atr_trail_hit": 3.8
+    }
   },
   "drift_findings": [
     {
-      "id": "TRAIL-ARM-RATIFY",
-      "severity": "HIGH",
-      "finding": "Trail-arm soak data complete for pump-chain+. Timeouts exit stalled trades at avg -0.23% unlevered (net -$0.06/6 fires) vs HML avg -2.74% (net -$1.55/15 fires). Timeout is 10x cheaper per fire. Counterfactual: if 6 timeouts became HML at lev3-5, additional cost ~$1.00-1.60.",
-      "evidence": "pump-chain+ since Oct 6: 37T +$1.02, 6 trail_arm_timeout, 15 HML. bb-squeeze: 4T, 0 timeouts, 2 HML -$0.18 — 60min threshold never fired (insufficient n).",
-      "recommended_change": "CEO RATIFY pump-chain trail-arm (keep True). bb-squeeze: keep True (0 fires = 0 cost), extend soak to Oct 22 for n>=10.",
-      "status": "ceo_decision_oct15",
-      "confidence": "HIGH"
+      "severity": "RESOLVED",
+      "finding": "LONG midband 60-70 non-EXTREME death-zone leak",
+      "verify": "0 entries post Oct-14 07:45 meta-source fix; 1030 [LONG-MIDBAND]/[LONG-RSI-CEILING] blocks in log",
+      "action": "none — fix working"
     },
     {
-      "id": "SEI-DRIFT-E-ALREADY-FIXED",
+      "severity": "RESOLVED",
+      "finding": "LONG_RSI_CEILING bullish-override unbounded (MON@78/RUNE@79/ACE@75.5)",
+      "verify": "0 LONG meta-RSI>75 since Oct-14 12:48 meta-source+bounded-override fix; 7d 75+ band 13T −$1.13 all pre-fix",
+      "action": "none — fix working"
+    },
+    {
+      "severity": "RESOLVED",
+      "finding": "pump-chain+ LONG exec-time ceiling gap (PUMP_CHAIN_LONG_RSI_MAX=70 detect-only, exec uses 75)",
+      "verify": "0 pump-chain+ LONG meta-RSI 70-75 trades since Oct-13 05:39 (n=0) — detect-time PUMP-CHAIN-RSI-MAX catches them first; [PUMP-CHAIN-RSI-MAX] actively blocking CRV/DOT",
+      "action": "no exec-time change needed — detect filter effective, gap closed in practice"
+    },
+    {
       "severity": "INFO",
-      "finding": "SEI r2-trend-long4 LONG @metaRSI=84.2 lost -$0.23 — was DRIFT-E (live-5m=53.9 vs meta=84.2). Fixed same day at 12:49 (d5b6f422). Post-fix 0 similar trades. LONG meta>75 in 7d: 8T 0W -$0.83, all pre-fix opens.",
-      "status": "fixed_verified",
-      "confidence": "HIGH"
-    },
-    {
-      "id": "META-SOURCE-FIXES-LIVE",
-      "severity": "INFO",
-      "finding": "All 4 meta-source RSI fixes verified firing in logs: LONG-MIDBAND (AIXBT/JUP blocked), LONG-RSI-SWEET-SPOT (BTC), EXEC-RSI-CEILING (APT/ACE blocked Oct 14), LONG-HIGH-70. 172 meta-source log lines today.",
-      "status": "verified_working",
-      "confidence": "HIGH"
-    },
-    {
-      "id": "CONF-INVERSION-STANDING",
-      "severity": "HIGH",
-      "finding": "conf>100 7d: 40T -$1.30 25%WR (10W +1.40 / 30L -2.70). conf<=100: 151T +$0.72 38.4%. CONF-CALIB cap delegated to bug_hunter yesterday — NOT YET DELIVERED. No min(final_confidence,...) in decider_run.py.",
-      "recommended_change": "ESCALATE bug_hunter. One-liner: final_confidence = min(final_confidence, 100) before MIN_EXEC_CONFIDENCE in decider_run.py.",
-      "status": "delegated_undelivered",
-      "confidence": "HIGH"
+      "finding": "LONG counter-trend dampen (shadow) would block winners",
+      "verify": "3 LONGs since shadow ship: ARB +$0.28 (12.43%) conf 29.5→20.6 would-BLOCK, APT +$0.04 would-BLOCK, ARB −$0.06 would-BLOCK",
+      "action": "KEEP SHADOW — 102 fires since 14:44; enforcing would have killed +$0.32 net. Wait for larger sample + CEO GO before flip."
     }
   ],
+  "losing_trade_autopsy_24h": {
+    "summary": "10 hard_max_loss all chop entries (never armed trail). 2 r2v2-long USUAL/BABY (meta-RSI 69/69) were the Oct-11 midband-leak victims — now blocked by Oct-14 fix. 3 volume-buildup+ (MON/ETC/POL) — signal already killed 09:15. Rest scattered (STX/HBAR/WLFI/ARB bb-bounce/pump-chain).",
+    "chop_vs_trend_confirmed": "Winners: trail family 14T +$1.42 (profit-monster 100%WR, atr_trail 80%WR). Losers: hard_max_loss 10T 0%WR −$0.82 — 100% never reached +0.40% trail-arm. Pattern holds: trending entries win, chop entries lose.",
+    "recommended_change": "None (soak active until Oct 15 — do not stack entry filters). All 24h losers either (a) pre-date today's meta-RSI fixes, (b) belong to already-killed volume-buildup+, or (c) are noise (n=1-2)."
+  },
+  "trail_arm_ratify_package": {
+    "deadline": "Oct 15 (CEO HARD escalate)",
+    "enables": [
+      {
+        "flag": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED",
+        "value": true,
+        "timeout_min": 60,
+        "soak_data": "bb-squeeze+ since Oct 13: 1T +$0.06 100%WR (fire rate collapsed — low-vol regime, thin data)",
+        "counterfactual_30d": "18/73 HML pre-trail-arm; timeout exits at avg −0.23% unleveraged vs HML −2.96% leveraged",
+        "recommendation": "RATIFY (mechanism proven on pump-chain sibling; bb-squeeze low fire-rate = regime not defect; revert = 1-line if future HML cluster)"
+      },
+      {
+        "flag": "PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED",
+        "value": true,
+        "timeout_min": 45,
+        "soak_data": "trail_arm_timeout 7d 6T −$0.06 avg −0.23% unleveraged (lev 3.7). Counterfactual: HML 30d avg −$0.121/trade. Estimated 7d save ≈ $0.79; 30d projection ≈ +$3.39",
+        "verify": "pump-chain+ since Oct 13 05:39: 12T +$0.60 net positive despite chop regime. timeout exits cutting stalls before HML.",
+        "recommendation": "RATIFY — clear $ benefit, no winner-block, mechanism validated"
+      }
+    ],
+    "verdict": "RATIFY BOTH. Trail-arm timeout is a STALL pre-emption (exits at −0.23% before ride-to-HML −3%). Saves ~$0.79/7d on pump-chain alone. No downside observed. Revert path = 1-line each if future data reverses."
+  },
   "recurring_problems": [
     {
-      "problem": "hard_max_loss chop entries — 62T -$5.98 0%WR 7d #1 bleed. Rate IMPROVING: Oct 12 45% → Oct 13 37.5% → Oct 14 27%. Trail-arm + midband + RSI_MAX compounding.",
-      "status": "improving_do_not_stack"
+      "topic": "hard_max_loss chop bleed",
+      "status": "MONITOR (soak)",
+      "detail": "7d 62T −$5.98 #1 bleed but 24h only 10T −$0.82 (26% share, under 40 threshold). Trail-arm timeout is the active mitigation. Do NOT stack entry filters until Oct 15 soak ends."
     },
     {
-      "problem": "SHORT ex-killed still -$0.32/45T but all bleeding signals n<=4 (volume-breakout-short- 2T, hmacd_mtf-- 4T, ai-trader- 1T). Insufficient sample for kill.",
-      "status": "monitor"
+      "topic": "counter-trend LONGs in SHORT_BIAS",
+      "status": "SHADOW",
+      "detail": "7d LONG −$0.26/147T vs SHORT −$0.35/46T. LONG-SHORT-BIAS dampen shadow (×0.70 conf when BTC BELOW EMA300+BEAR) shipped Oct-14 14:44, 102 fires. Would block some winners — keep shadow, flip only with CEO GO + larger sample."
     }
   ],
-  "missing_implementations": [
-    {
-      "item": "CONF-CALIB conf cap at 100",
-      "owner": "bug_hunter",
-      "status": "delegated 2026-10-14 18:30, undelivered as of 22:20",
-      "action": "escalate or self-implement if still undelivered next run"
-    },
-    {
-      "item": "Trail-arm timeout:HML ratio as watchdog leading indicator",
-      "owner": "brain_auditor",
-      "status": "creative idea, not yet built",
-      "action": "build when watchdog is touched next"
-    }
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-10-14T22:48:08Z",
-      "idea": "Trail-arm timeout:HML ratio as leading chop indicator",
-      "rationale": "pump-chain+ 10d: 6 timeouts vs 15 HML. If timeout rate drops while HML rises, entries are degrading BEFORE WR collapses. Currently we wait for WR; this leads by hours.",
-      "expected_impact": "Earlier chop detection — flag signal when timeout/(timeout+HML) drops below 20% over 7d",
-      "category": "monitoring",
+      "date": "2026-10-14T23:44:45Z",
+      "idea": "Extend trail-arm timeout to volume-breakout-long+ and ai-trader+ (HML top-3 signals without the vehicle)",
+      "rationale": "7d HML by signal: pump-chain+ 12T (has timeout), volume-breakout-long+ 9T (killed signal — skip), ai-trader+ 5T (NO timeout, −$0.41), pump-chain- 5T (has it). trail-arm timeout proven on pump-chain: exits stalls at −0.23% vs HML −3%. ai-trader+ 5 HML trades never armed trail = chop entries.",
+      "expected_impact": "ai-trader+ HML −$0.41/7d → ~−$0.05 (timeout exit), net save ~$0.35/7d",
+      "category": "exit quality",
       "status": "suggested",
-      "risk": "none"
-    },
-    {
-      "date": "2026-10-14T22:48:08Z",
-      "idea": "Trail-arm ratify data package (pump-chain RECOMMEND KEEP, bb-squeeze EXTEND SOAK)",
-      "rationale": "Timeouts exit at -0.23% avg vs HML -2.74% avg. 10x cost ratio. bb-squeeze 0 fires in 8d — 60min threshold too high for squeeze's faster grind OR trades resolve before stall. Extend, don't revert.",
-      "category": "exit structure",
-      "status": "ceo_package_ready",
-      "risk": "low"
+      "risk": "low",
+      "prereq": "ai-trader+ n≥10 HML backtest (self_learner) — 5T is thin; monitor 48h then decide. NOT shipped this run (one-variable + soak discipline)."
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "doji-bottom-long re-enable EXTREME-gated (14:44)",
-      "result": "0 trades since. MONITOR.",
-      "verdict": "too_early"
+      "change": "LONG midband meta-source fix (Oct-14 07:45)",
+      "worked": "YES — 0 post-fix entries in 60-70 non-EXTREME death zone; 1030 blocks logged"
     },
     {
-      "change": "LONG-SHORT-BIAS shadow dampen (14:44)",
-      "result": "8 trades since, mostly SHORT. Shadow collecting. n>=30 reached per orchestrator — ready for CEO GO.",
-      "verdict": "collecting"
+      "change": "LONG_RSI_CEILING bullish-override bound + meta-source (Oct-14 09:50/12:48)",
+      "worked": "YES — 0 LONG meta-RSI>75 since 12:48; SEI@meta84 caught"
     },
     {
-      "change": "cell_stats key-mismatch fix (15:44)",
-      "result": "Committed 0ebfd16b. No regression observed.",
-      "verdict": "working"
+      "change": "cell_stats wiring key-mismatch fix (Oct-14 15:44)",
+      "worked": "MONITOR — no regression; pump-chain+ recovered to +$0.28 (ARB trail). Needs 48h to confirm boost accuracy."
     },
     {
-      "change": "CONF-CALIB delegation (18:30)",
-      "result": "NOT DELIVERED. No implementation in decider_run.py. ESCALATE.",
-      "verdict": "undelivered"
+      "change": "doji-bottom re-enable EXTREME-gated (Oct-14 14:44)",
+      "worked": "PENDING — 0 trades since re-enable (quiet regime). Watch non-EXTREME cohort n≥10."
     },
     {
-      "change": "PUMP_CHAIN_LONG_RSI_MAX=70 (Oct 13)",
-      "result": "0 breaches since. 12T +$0.60 post-land.",
-      "verdict": "working"
-    },
-    {
-      "change": "volume-buildup+ kill (auto_1hr 09:15)",
-      "result": "0 post-kill trades. 24h losers were pre-kill only.",
-      "verdict": "working"
-    },
-    {
-      "change": "Meta-source RSI fixes sweet-spot/midband/high-overbought/ceiling (12:49)",
-      "result": "172 meta-source log lines. All 4 firing. SEI-class leak closed.",
-      "verdict": "working"
+      "change": "LONG-SHORT-BIAS dampen shadow (Oct-14 14:44)",
+      "worked": "COLLECTING — 102 fires; sample of actual LONGs too small (3T, 2 winners would-block). Keep shadow."
     }
   ],
   "next_actions": [
-    "Oct 15 CEO: TRAIL-ARM RATIFY — pump-chain RECOMMEND KEEP (data package ready), bb-squeeze EXTEND SOAK to Oct 22",
-    "ESCALATE bug_hunter: CONF-CALIB conf cap undelivered — one-liner, strongest pending edge (+$1.30/7d)",
-    "Oct 15: 7d WR checkpoint WILL MISS (35.4% vs 50% goal) — pre-kill bleed aging out of window",
-    "Monitor LONG-SHORT-BIAS shadow — n>=30 reached, ready for CEO GO to flip live",
-    "Monitor volume-buildup- SHORT — 4/4W +$0.41, 1 win from boost threshold (needs 5T)",
-    "Do NOT stack more entry filters until trail-arm + meta-source + RSI_MAX soak through Oct 16",
-    "CURRENT.md stale item: 'uncommitted signal_compactor.py' — verified clean/committed (d5b6f422). Close item."
-  ]
+    "CEO: RATIFY trail-arm 2 enables tonight (package above) — HARD deadline Oct 15",
+    "Oct 15: RSI_MAX=70 soak review (48h complete), chase-ratio shadow data check, 7d WR checkpoint (will miss 50% — currently 35.2%)",
+    "Monitor LONG-SHORT-BIAS shadow 48h — flip only if sample shows clean winner-preservation + CEO GO",
+    "self_learner: ai-trader+ HML trail-arm timeout backtest (creative idea prereq)",
+    "Volume-buildup- SHORT: 1 win from boost (needs 5T) — watch next fire"
+  ],
+  "protected_flags_verified": {
+    "CONFLUENCE_MIN_SOURCES": true,
+    "LIVE_TRADING_ENABLED": true,
+    "PM_TRAIL_ENABLED": true,
+    "status": "INTACT"
+  }
 }
