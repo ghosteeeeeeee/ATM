@@ -1265,5 +1265,16 @@
     "after": "SHADOW: log would-dampen ×0.70 conf on counter-trend LONGs; enforce when LONG_SHORT_BIAS_DAMPEN_SHADOW=False",
     "rationale": "48h 62 LONGs 24.2%WR -$2.12 vs 30 SHORTs. BTC BELOW+BEAR = every LONG counter-trend. Zero live impact until CEO ratifies after 48h shadow data.",
     "impact": "Shadow only. Expected after enforce: suppress worst counter-trend LONG cohort (~50% of LONG losers per 48h autopsy)."
+  },
+  {
+    "timestamp": "2026-10-14T15:44:38Z",
+    "agent": "brain_auditor",
+    "change": "Fix cell_stats wiring key-mismatch (fatal silent-noop / wrong-cell boost)",
+    "type": "bugfix",
+    "file": "scripts/signal_compactor.py",
+    "before": "normalized signal_type→underscore hit wrong cell_stats row (pump_chain 63.6% tradeable vs pump-chain+ 45.9% losing)",
+    "after": "exact-key match first (signal_type then source), underscore only as fallback; verified pump-chain+ HIGH→0.5x, bb-squeeze+ NORMAL→1.2x",
+    "rationale": "Landed 15:34 same day; 0 CELL-STATS logs fired = silent noop. On match it would BOOST losing pump_chain cell while real signal is pump-chain+.",
+    "impact": "Corrects boost/dampen targets so the 697-cell infra actually reaches the live entry path; prevents boosting a losing cell."
   }
 ]

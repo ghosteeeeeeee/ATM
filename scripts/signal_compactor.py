@@ -2144,28 +2144,46 @@ def _score_signal(token, direction, conf, source, signal_type,
         _cs_conn = sqlite3.connect(os.path.join(
             os.path.dirname(HERMES_DATA), 'brain', 'cell_stats.db'), timeout=3)
         try:
-            _cs_norm_sig = (signal_type or '').replace('-', '_').replace('+', '').replace(' ', '_').lower()
-            _cs_row = _cs_conn.execute(
-                "SELECT wr_raw, total_pnl, n, tradeable FROM cells "
-                "WHERE signal=? AND direction=? AND regime=? LIMIT 1",
-                (_cs_norm_sig, (direction or '').upper(), _vol_regime or 'UNKNOWN')
-            ).fetchone()
-            if _cs_row is None:
-                # Try source-form key
-                _cs_src_norm = (source or '').replace('-', '_').replace('+', '').replace(' ', '_').lower().rstrip('_')
+            # FIX brain_auditor 2026-10-14: cell_stats.db has BOTH dash-form (pump-chain+,
+            # from trades.signal) and underscore-form (pump_chain, from source) keys with
+            # DIFFERENT stats. Normalizing signal_type→underscore hit the WRONG row and
+            # would have BOOSTED a losing cell (pump-chain+ LONG EXTREME = 45.9%WR 85T
+            # losing, vs pump_chain = 63.6%WR 22T tradeable). Match EXACT live key first
+            # (signal_type, then source), fall back to normalized only if no exact hit.
+            _cs_dir = (direction or '').upper()
+            _cs_reg = _vol_regime or 'UNKNOWN'
+            _cs_row = None
+            _cs_used = None
+            for _cs_key in (signal_type, source):
+                if not _cs_key:
+                    continue
                 _cs_row = _cs_conn.execute(
                     "SELECT wr_raw, total_pnl, n, tradeable FROM cells "
                     "WHERE signal=? AND direction=? AND regime=? LIMIT 1",
-                    (_cs_src_norm, (direction or '').upper(), _vol_regime or 'UNKNOWN')
-                ).fetchone()
+                    (_cs_key, _cs_dir, _cs_reg)).fetchone()
+                if _cs_row:
+                    _cs_used = _cs_key
+                    break
+            if _cs_row is None:
+                for _cs_key in (signal_type, source):
+                    if not _cs_key:
+                        continue
+                    _cs_norm = _cs_key.replace('-', '_').replace('+', '').replace(' ', '_').lower().rstrip('_')
+                    _cs_row = _cs_conn.execute(
+                        "SELECT wr_raw, total_pnl, n, tradeable FROM cells "
+                        "WHERE signal=? AND direction=? AND regime=? LIMIT 1",
+                        (_cs_norm, _cs_dir, _cs_reg)).fetchone()
+                    if _cs_row:
+                        _cs_used = _cs_norm
+                        break
             if _cs_row:
                 _cs_wr, _cs_pnl, _cs_n, _cs_tradeable = _cs_row
                 if _cs_tradeable:
                     _cell_mult = 1.2
-                    log(f"  📊 [CELL-STATS] {token} {direction}: tradeable cell (wr={_cs_wr*100:.0f}%, n={_cs_n}) → 1.2x")
+                    log(f"  📊 [CELL-STATS] {token} {direction}: tradeable cell [{_cs_used}] (wr={_cs_wr*100:.0f}%, n={_cs_n}) → 1.2x")
                 elif _cs_n >= 15 and _cs_wr < 0.40:
                     _cell_mult = 0.5
-                    log(f"  📊 [CELL-STATS] {token} {direction}: losing cell (wr={_cs_wr*100:.0f}%, n={_cs_n}) → 0.5x")
+                    log(f"  📊 [CELL-STATS] {token} {direction}: losing cell [{_cs_used}] (wr={_cs_wr*100:.0f}%, n={_cs_n}) → 0.5x")
         finally:
             _cs_conn.close()
     except Exception:
