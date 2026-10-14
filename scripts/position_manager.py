@@ -2855,6 +2855,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         peak_price = max(cur, highest_price)
                         trailing_sl = peak_price - trail_distance
                         new_sl = max(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
+                        # FIX (2026-10-13): enforce ATR_SL_MIN_ACCEL floor — trail SL
+                        # must stay at least 0.3% below entry. Without this, trail
+                        # could move SL too close to entry and hard_sl fires instantly.
+                        _accel_floor = entry_price * (1 - ATR_SL_MIN_ACCEL) if entry_price > 0 else 0
+                        if _accel_floor > 0 and new_sl > _accel_floor:
+                            new_sl = _accel_floor
                         if new_sl > current_sl:
                             pos['stop_loss'] = new_sl
                             _persist_sl(trade_id, new_sl, token, direction, entry_price)
@@ -2864,6 +2870,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         trough_price = min(cur, lowest_price)
                         trailing_sl = trough_price + trail_distance
                         new_sl = min(current_sl, trailing_sl) if current_sl > 0 else trailing_sl
+                        # FIX (2026-10-13): enforce ATR_SL_MIN_ACCEL floor — trail SL
+                        # must stay at least 0.3% above entry. Without this, trail
+                        # could move SL too close to entry and hard_sl fires instantly.
+                        _accel_ceiling = entry_price * (1 + ATR_SL_MIN_ACCEL) if entry_price > 0 else 0
+                        if _accel_ceiling > 0 and new_sl < _accel_ceiling:
+                            new_sl = _accel_ceiling
                         if new_sl < current_sl:
                             pos['stop_loss'] = new_sl
                             _persist_sl(trade_id, new_sl, token, direction, entry_price)
