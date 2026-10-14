@@ -1,0 +1,372 @@
+[
+  {
+    "source": "kanban",
+    "text": "- [2026-10-12 ~20:40 UTC] CEO: **GATE CONUNDRUM PACKAGE (D1-D6) \u2014 ALL GO/CONFIRM. 0 trading config changes.** T decision-request on verified deadlock-gate package (plan plans/2026-10-12_gate-conundrum-deadlock-plan.md; verdict brain/verdicts/2026-10-12_deadlock-gate-verify.md commit 49cc558c). Verified kills: blocker census irreproducible (<24h gate as 2-week top blocker), pincer stat vacuous (nulls expect 100%, obs 99.7%), chop-LONG is best cohort (+$3.28 WR 53.7%) not a bleed, entry_rsi_14 r=0",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-08 22:35 UTC] analysis-desk: **LIVE CONCERN \u2014 TWO time/stall exits are cutting pump-chain+ during its grind phase, before the spike. (1) dead_money reconstruction complete, audit IN FLIGHT; (2) stale_winner exit ALIVE since today's label fix and has already capped a home run. No constants changed by me.** (1) **DEAD-MONEY RULE RECONSTRUCTED** (position_manager.py ~2917-2949; velocity clause modeled from candles_5m; replay validates 7/10 actual fires): over the full pump-chain+ history",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-05 21:50 UTC] CEO: Monday run. **MoE already ran 09:56 \u2014 not re-run.** Freeze b960ffe8 until Oct 6 00:38. **0 trading config changes.** PG verified: 24h **31T \u2212$0.64 58.1%WR** | 7d LONG **+$1.75/184T 56.0%**, SHORT **\u2212$1.82/56T 46.4%** | 30d **954T \u2212$2.07 51.6%**. Open 4 LONG (BLUR trend-ride+ 0%, MERL/TURBO bb-squeeze+, CRV mover+ \u22121.00%). **30d exit bleed (verified):** cut-loser-CL-T1 **73T \u2212$10.21 0%WR lev 4.23 #1** | hard_max_loss **49T \u2212$7.02 0%WR #2** | atr_sl_hit 351T \u2212$3.68 46",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-04 17:55 UTC] CEO SIDEWAYS FINDS: (1) **HIGH \u2014 regime_15m.json STALE since 2026-05-05** (~152 days, /var/www/hermes/data/regime_15m.json). regime_5m fresh (0.14h), regime_4h fresh (0.80h). 15m regime scanner dead or writing elsewhere \u2014 any gate/label reading 15m regime is on May data. **DELEGATE bug_hunter: 15m regime scanner write-path audit.** (2) **MED \u2014 concurrent git add -A theft:** cf866402 swept CEO uncommitted constants reverts (values correct in HEAD, message misleading). Age",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-04 16:30 UTC] training-system FULL VERIFICATION (bug-hunter, 6 commits + cut_loser fix): VERDICT on reviewed stack: **SOUND** \u2014 P0 data fixes live (wr_estimate 0/304 None, hard_max_loss single 40T label, MFE 96.9%/MAE 99.2%, outcomes rows with exit_reason now appearing on new closes), P1-P4 infra clean (cell store spot-check exact vs SQL, exit optimizer provably shadow-only, timers active, %s-fix holds), cut_loser HARD-STOP fix correct at ALL 5 call sites + fresh-oneshot semantics con",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-04 14:50 UTC] CEO: PLAN REVIEW trade-learning-system-2026-10-04 \u2014 **APPROVE P0 w/ corrections, MODIFY decisions 2-5, REJECT plan numbers.** VERIFIED: wr_estimate None = wrong data source (synapse recall vs trade_log \u2014 144/304 n>=3 pairs return None; decayed_wr_estimate works) = one-line fix NOT schema. Cell census plan 81 n>=10 **DISPROVED** \u2014 live 90d signal x regime x direction = **72** (15 WR>=60%, 28 profitable). Exit-path table CONFIRMED (pm-trail 81%/+$17.69, atr_sl 46%/-$3.90, ",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-04 13:50 UTC] CEO: 0 TRADING CONFIG CHANGES \u2014 b960ffe8 48h freeze standing until Oct 6 00:38. DB-verified: 24h **34T -$0.65 55.9%WR** (FLIPPED NEGATIVE from 09:50 +$0.49 \u2014 morning bb-squeeze+ winners aged out; 10/14 24h losers = hard_max_loss ~1.0% price / pnl_pct ~-3.2% lev) | 7d **217T +$1.57 52.1%** (LONG 163T +$2.95 54.0%, SHORT 54T -$1.38 46.3%) | 30d **946T -$0.80 51.6%** (improved from -$1.19, window recovery). **WORST: bb-bounce-v3-long+ 24h 7T -$0.48 28.6%WR + 3 correlated op",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-04 11:35 UTC] brain_auditor: 1 CONFIG CHANGE. DB-verified: 24h 34T 58.8%WR -$0.08 | 7d 214T 52.8%WR +$2.18. **ROOT CAUSE: ATR_TP_MIN=0.80% < ATR_SL_MIN=1.30%** \u2014 low-vol trades got RR 0.62 structurally. 30d: RR<1 = 161T 14.9%WR **-$18.47** vs RR>=1 = 785T 59.4%WR **+$16.91**. 7d: RR<1 16T -$1.09 vs RR>=1 195T +$2.95. Open SUSHI/CFX bb-bounce-v3 RR=0.67 (TP 0.87% vs SL 1.30%). **FIX APPLIED: ATR_TP_MIN 0.008\u21920.013** (hermes_constants.py:681) \u2014 TP floor now matches SL floor, min RR 1.0.",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-04 00:30 UTC] CEO: MoE PANEL DECISIONS \u2014 0 trading config changes this run (decision + delegation only). DB-verified: 30d **966T -$2.22 51.4%WR** | 7d 200T +$1.95 52.0% | 24h 34T +$1.15 58.8% | LONG 30d **+$1.90** | SHORT 30d **-$4.12**. SHORT RSI<40 **86T -$5.04 32.6%WR** (exact MoE match). Only positive SHORT cell: **EXTREME RSI>=40 40T +$0.98 62.5%WR**. profit-monster* +$18.83/307T 82.1% only big winner. MoE \"wave bottoms 94%WR\" **REJECTED** \u2014 DB shows RSI<40 = 32.6%WR. **DECISIONS",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-01 03:45 UTC] brain_auditor: 0 CONFIG CHANGES. DB-verified: 16T 50.0%WR +$0.03 (24h) | 115T 46.1%WR -$1.63 (7d) | 14d LONG +$2.06 vs SHORT -$4.42 (R:R 0.71). **PUMP_CHAIN_SHORT_RSI_MIN=40 VERIFIED WORKING** \u2014 post-raise: LDO RSI=43.38 +$0.05, HBAR RSI=50.0 +$0.04. Zero new RSI<40 entries. ALGO/BABY losers were PRE-RAISE legacy (opened Sep 30 before fix). **DRIFT-004: 'NEUTRAL signal unbuilt' is STALE** \u2014 neutral_sniper.py EXISTS at scripts/signals/, disabled Sep 12 per T. 1 trade ever",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-01 06:40 UTC] daily_orchestrator: **1 CRITICAL CODE FIX \u2014 PIPELINE RESTORED.** FAVORITES dict|set crash took pipeline down 06:00\u201306:32 (favorites_updater emptied FAVORITES_LONG \u2192 `{}` dict, `dict|set` TypeError at hermes_constants.py:278). Position management offline ~32 min. **FIXED:** (1) constants line 278 \u2192 `set(FAVORITES_LONG) | set(FAVORITES_SHORT)` (2) favorites_updater.py emits `set()` when empty + robust regex (mirrors losers_tracker). **VERIFIED:** import OK, pipeline full c",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-01 12:36 UTC] brain_auditor: NO CONFIG CHANGE. DB-verified: 36T 36.1%WR -$0.86 (24h) | 17T post-restore 17.6%WR -$0.91 | 7d EXTREME 64T 51.6%WR -$0.52. **HARD_FLOOR=25 VERIFIED** \u2014 would block 5 accel-300- losers (RSI 2.9-24.3, -$0.37), kill 3 scratches (+$0.03), net +$0.34. **NEW DRIFT: SIGNAL_FILTER_RSI_MIN=42 unenforced on bypass path** \u2014 5 SHORTs fired RSI<25 today despite filter. Hard floor partial patch (25-30 band still 9T 0%WR -$1.17). DELEGATE bug_hunter. **signal_rsi_14 100%",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-02 16:34 UTC] brain_auditor: NO CONFIG CHANGE. DB-verified live: 52T 65.4%WR +$1.65 (24h) | 162T 51.2%WR +$1.44 (7d) | LONG +$2.76/114T, SHORT -$1.32/48T. All 7d regimes positive (EXTREME +$0.78, HIGH +$0.20, NORMAL +$0.19, FLAT +$0.27). **SYSTEM POSITIVE.** **LOSING AUTOPSY mtf-regime-trend+ cluster -$0.46/24h (5L):** det-RSI chase pattern \u2014 winners det 26-38 (pullback), losers det 55-66 (TURBO 65.5, DOT 65.8, JUP 60.0) + HBAR oversold exception 22.8. PLUS killed 15:11 correct. Base ",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-02 19:36 UTC] brain_auditor: NO CONFIG CHANGE. DB-verified live PG: 53T 60.4%WR +$0.81 (24h) | 165T 50.3%WR +$0.72 (7d) | LONG 7d +$2.04/117T 52.1%, SHORT 7d -$1.32/48T 45.8%. Regimes 7d: EXTREME +$0.78 (74T), FLAT +$0.27, HIGH -$0.07 (41T), NORMAL -$0.26 (42T). **PnL FADE WATCH:** +$2.22 (14:00) -> +$0.99 (18:45) -> +$0.72 (19:35) \u2014 still positive, escalate if crosses $0. **mtf-regime-trend+ PLUS kill VERIFIED:** 0 trades opened after 15:11; all 7d losers pre-kill (DRIFT-002 signatur",
+    "type": "directive"
+  },
+  {
+    "source": "kanban",
+    "text": "- [2026-10-07 02:00 UTC] CEO: **1 TRADING-PATH FIX \u2014 hard_max_loss leverage-aware (THE bleed).** PG-verified: 24h **8T \u2212$0.19 50.0%WR** | 7d **207T \u2212$0.31 54.1%WR** (LONG +$1.35/169T 56.8%, SHORT \u2212$1.66/38T 42.1%) \u2014 **7d PnL flipped NEGATIVE** (was +$0.44 @22:00; Sep30 +$0.21 rolled out). **hard_max_loss 7d 58T \u2212$8.11 0%WR avg_lev 4.07 avg_account_pct \u22124.02** \u2014 root cause VERIFIED: `compute_live_pnl` unleveraged price-move % vs `CUT_LOSER_PNL=-1.00` ACCOUNT %; at lev 4.07 \u2192 \u22124.02% account per ex",
+    "type": "directive"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "# DECISIONS.md \u2014 Hermes Project Decision Log\n\n> Every significant architectural or operational decision goes here.\n> Format: Date | What | Why | Alternatives considered | Revisit date | Owner\n> Search with: `grep -n \"2026\\|decision\\|revisit\" /root/.hermes/brain/DECISIONS.md`\n\n---",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-14 | HL Fill Cache \u2014 Consolidate API Calls + Rate-Limit Guard\n\n**Decision:** Added `_get_fills_cached()` to consolidate all `get_trade_history` calls in `hl-sync-guardian.py`.\n\n**Why:**\n- Each close was making 2 separate `get_trade_history` API calls: `_get_hl_exit_price()` + `_close_paper_trade_db()`\n- HL fills take 5+ minutes to appear in `user_fills_by_time` \u2014 guardian was polling 3\u00d72s = 6s total, not enough\n- 67 trades have `exit_price = current_price` (market fallback), 5 PHANTOM",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-14 | RSI Signal Disable \u2014 Remove RSI from Signal Generation\n\n**Decision:** Commented out RSI individual signal and RSI confluence SHORT path in `signal_gen.py`. RSI LONG confluence remains active (has z-score filter).\n\n**Why disabled:**\n- RSI individual fires LONG when RSI < 42, SHORT when RSI > 60 \u2014 completely independent of z-score (price position)\n- RSI confluence SHORT: \"No z-score filter for SHORTs \u2014 elevated prices are valid short targets\" \u2014 fires SHORT when RSI > 60 regardless ",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "1. `_run_rsi_signals_for_confluence()` SHORT path (signal_gen.py ~lines 1334-1348)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "2. RSI individual signal block (signal_gen.py ~lines 1642-1673)\n\n**What remains active:**\n- RSI LONG confluence (lines 1320-1333) \u2014 has z-score filter `z > LONG_1H_Z_MAX`, suppressed prices only\n\n**What NOT to re-enable without:**\n- Z-score filter on RSI SHORT path (must confirm price is actually elevated with z_score > 0)\n- Minimum z-score threshold for RSI individual (don't fire RSI signals when z is near 0)\n\n**Backtest data:** `scripts/rsi_backtest.py` \u2014 run with `python3 scripts/rsi_backtest",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-10 | Cascade Flip Kill Switch \u2014 Disabled\n\n**Decision:** Added `CASCADE_FLIP_ENABLED = False` kill switch to `position_manager.py`. All 4 cascade flip call sites now guarded by this flag.\n\n**Why disabled:** Cascade flip not working as intended \u2014 T flagged for revisit.\n\n**What was disabled (all cascade flip paths in `check_and_manage_positions()`):**",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "1. MTF MACD all-TFs-flipped cascade flip (`if CASCADE_FLIP_ENABLED and mtf_all_flipped`)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "2. Cascade direction active flip (`CASCADE_FLIP_ENABLED and cascade['cascade_active']`)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "3. MACD rules engine flip signal (`CASCADE_FLIP_ENABLED and macd_result['should_flip']`)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "4. Speed-armed cascade flip (`CASCADE_FLIP_ENABLED and ... CASCADE_FLIP_ARM_LOSS`)\n\n**Kill switch location:** `position_manager.py` line ~74 (`CASCADE_FLIP_ENABLED = False`)\n\n**To re-enable:** Set `CASCADE_FLIP_ENABLED = True` in `position_manager.py`.\n\n**Owner:** T\n\n---",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | MiniMax API over ollama for ai_decider scoring\n\n**Decision:** Use MiniMax-M2 API (via `/v1/chat/completions`) as primary LLM for ai_decider signal scoring and compaction.\n**Rationale:** Token budget limits (8K/run, 500K/day) make local ollama inference cost-prohibitive at scale. MiniMax provides sufficient quality at lower token cost. Ollama kept as fallback only.\n**Previous:** ollama was primary (from earlier OpenClaw setup)\n**Alternatives considered:** ollama local (too slow fo",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | Crash recovery: checkpoint_utils.py (not session snapshots)\n\n**Decision:** Build `checkpoint_utils.py` for pipeline script crash recovery only \u2014 NOT full LLM agent session snapshot/restore.\n**Rationale:** Trading pipeline (decider-run.py, hl-sync-guardian.py) is where crashes cause real damage \u2014 mid-trade state loss. The LLM agent (hermes-agent) session persistence is a separate, more complex problem (~4-6 hrs to build) and less critical since the agent recovers quickly anyway.\n*",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | Structured event log: event_log.py (not event sourcing)\n\n**Decision:** Build `event_log.py` as append-only JSONL audit trail \u2014 not a full event-sourcing architecture.\n**Rationale:** Trading pipeline needs a way to reconstruct what happened after failures, without the complexity of an event store. JSONL file with auto-rotation is simple, debuggable, and sufficient.\n**Events captured:** TRADE_ENTERED, TRADE_FAILED, POSITION_OPEN/CLOSED, HOTSET_UPDATED, BUDGET_EXCEEDED, API_CALL, CH",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | Token budget: 8K/run hard cap, 500K/day soft cap\n\n**Decision:** Set `_MAX_TOKENS_PER_RUN = 8000` hard cap per ai_decider invocation, `_DAILY_TOKEN_BUDGET = 500000` daily cap.\n**Rationale:** MiniMax API costs accumulate fast at 4000+ tokens/call \u00d7 6 runs/hour. Budget enforcement ensures we don't blow the daily allocation before market close. Hard cap per call prevents single runaway invocation.\n**How it works:** Before MiniMax API call, estimate tokens (~4000). If over run cap or ",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | PostgreSQL workflow_state column in brain DB (not SQLite)\n\n**Decision:** Add `workflow_state VARCHAR(32) DEFAULT 'IDLE'` and `workflow_updated_at TIMESTAMP` columns to PostgreSQL `brain.trades` table via `signal_schema.py` functions.\n**Rationale:** Trading pipeline needs a single source of truth for trade lifecycle state. PostgreSQL (brain DB on Tokyo) is the authoritative store for trade metadata \u2014 SQLite is runtime-only. `workflow_state` enables guardian to know whether a trade",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | Regime filter applies to APPROVED signals path (not just PENDING)\n\n**Decision:** `check_cascade_flip()` in `position_manager.py` already queries `decision IN ('PENDING', 'APPROVED')` \u2014 the APPROVED path was already correct. However, the **decider-run.py approved-signals loop** was missing the regime check (only HOT-SET signals had it). Fixed to apply regime check to all approved signals.\n**Rationale:** AAVE contrarian trades were entering against regime because the APPROVED signa",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | OpenClaw removal from production system\n\n**Decision:** Remove OpenClaw entirely from the production system \u2014 binary, npm package, systemd services.\n**Rationale:** OpenClaw was the predecessor LLM agent framework. Hermes-agent is now primary. OpenClaw's gateway, skills, and cron jobs were creating confusion about which system was authoritative. Clean break.\n**What was removed:**\n- `/usr/bin/openclaw` and `/usr/local/bin/openclaw-cleanup.sh`\n- `openclaw@2026.4.1` npm package\n- 54 s",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | Hermes gateway on port 18790 (not replacing 18789)\n\n**Decision:** Run `hermes-gateway` on `127.0.0.1:18790` \u2014 not as a drop-in replacement for the removed `openclaw-gateway` on 18789.\n**Rationale:** OpenClaw gateway is gone. Hermes gateway is running as a standalone service (not systemd yet). Bound to loopback because platform tokens (TELEGRAM_BOT_TOKEN, etc.) aren't configured yet. API server platform is enabled and working.\n**Current state:** `{\"status\": \"ok\", \"platform\": \"herm",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | QMD memory backend not needed\n\n**Decision:** Do not implement QMD (Quantum Model D) memory backend for Hermes. Current file-backed memory (`MEMORY.md`, `USER.md`) is sufficient.\n**Rationale:** OpenClaw had `memory: { backend: qmd }` in config, but Hermes doesn't use it. File-backed memory is simpler, more reliable, and doesn't require external services. `brain-context-engine` plugin is disabled in OpenClaw anyway.\n**Alternatives considered:** Build QMD support (would require sign",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | Hot-set stale \u2014 root cause: ai_decider not running\n\n**Symptom:** hotset.json age >11 min, decider-run blocking approvals, Telegram shows empty hot-set.\n**Root cause:** `ai_decider` runs via `run_pipeline.py` STEPS_EVERY_10M (every 10 min at :00/:10/...). But before this fix, `ai-decider.timer` (systemd) was supposed to supplement this \u2014 however the timer was dead (inactive since Mar 29) AND the .service file was missing.\n**Fix:** \n- Re-created `/etc/systemd/system/ai-decider.serv",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | OPTION 1 DEPLOYED: Flip signal direction live\n\n**Decision:** Deploy Option 1 live \u2014 reverse signal direction before executing every trade.\n**Rationale:** WR is 13.8% (761 trades, Mar 10-25). 79% of SHORT signals had price move UP after entry. ACE (45% of all trades) had 98% of shorts go up. Signal direction is systematically inverted. Flip to test theory cheaply before extensive signal gen rebuild.\n**What changed:**\n- `_FLIP_SIGNALS = True` added to `/root/.hermes/scripts/decider",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | WR flip test FAILED \u2014 signal direction not systematically inverted\n\n**Decision:** Close the Win Rate investigation. Signal flip did NOT work \u2014 tested on 2 trades and failed (wrong direction). Historical 79% SHORT-wrong finding from Mar 10-25 data did NOT replicate in live trading. System continues without signal flip.\n\n**Outcome:**\n- Flip deployed 2026-04-05, ran 2 trades, both failed\n- Insufficient sample (2 trades) but direction was wrong\n- Historical data was noise or wrong se",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | Tokyo PG decommissioned \u2014 SQLite-only mode\n\n**Decision:** Accept SQLite-only mode permanently. Tokyo PG server (10.60.72.219) has been unreachable/asleep for days. PostgreSQL workflow_state feature is decommissioned.\n\n**Why:** Tokyo being unreachable makes PostgreSQL unusable. SQLite is sufficient for the current architecture. `signal_schema.py` functions fall back gracefully to SQLite.\n\n**What was removed:** PostgreSQL workflow_state column requirement\n**What stays:** SQLite sig",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | Volume-confirmation trailing SL (Phase 2)\n\n**Decision:** Add volume-based buffer selection to Phase 2 trailing SL \u2014 use tighter 0.25% buffer when volume does NOT confirm direction, looser 0.35% when volume confirms.\n\n**Why:** Phase 2 tokens in low-momentum moves were getting stopped out prematurely. High-momentum moves should get more room.\n\n**Changes:**\n- `position_manager.py`: `get_volume_confirmation(token, direction)` \u2014 current candle vol > 23-candle MA = confirmed\n- Phase 2 ",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | Cascade flip thresholds lowered + SKIPPED signals added\n\n**Decision:** Tighten cascade flip thresholds for faster response on wrong-direction positions.\n\n**Changes:**\n| Parameter | Old | New |\n|-----------|-----|-----|\n| ARM_LOSS | -0.50% | -0.25% |\n| TRIGGER_LOSS | -1.00% | -0.50% |\n| HF_TRIGGER_LOSS | -0.75% | -0.35% |\n| MIN_CONF | 70% | 60% |\n| MAX_AGE | 15 min | 30 min |\n| Cascade confluence | PENDING/WAIT/APPROVED | +SKIPPED |\n\n**Why:**\n- Positions like ZK SHORT, SKY LONG ne",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | trailing_stops.json cleanup \u2014 821 orphaned entries removed\n\n**Decision:** Clean orphaned entries from `trailing_stops.json` \u2014 keeps only active DB trades.\n\n**What:** 821 stale/orphaned entries removed, 8 active positions remain. Backup at `trailing_stops.json.bak`.\n\n**Why:** Entries from old closed positions were accumulating and causing confusion. 2 open positions (IDs 4138, 4141) were missing from file \u2014 they'll activate normally when pnl reaches 1%.\n\n**Revisit condition:** Aft",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | ai_decider last_seen field added to hotset.json\n\n**Decision:** `ai_decider.py` hotset query now includes `MAX(updated_at) as last_seen` so signals.html displays timestamps.\n\n**Why:** `signals.html` showed stale-looking `lastSeen=1775441492.49656` (Unix timestamp) for all hot-set tokens \u2014 blank display. Now writes human-readable timestamp to `last_seen` field.\n\n**Changes:**\n- Query: added `MAX(updated_at) as last_seen` (r[9])\n- hotset.json entry: added `'last_seen': r[9] or ''`\n- ",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | Cut-loser tightened to -2.0% | ALGO + VVV manual close\n\n**Decision:** Cut-loser threshold tightened from -3.0% to -2.0%. ALGO LONG (-3.67%) and VVV LONG (-3.67%) manually closed by T \u2014 entries showed proper entry prices on HL but had deep losses. 8 positions remain.\n\n**Why -2.0%:** Balanced \u2014 catches bad entries before deep loss without being too tight (avoids whipsaws on legitimate -1.5% dips). At -3.0%, ALGO and VVV had already blown through -3% before any cut.\n\n**Changes:**\n- ",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | Volume cache warmup fix (position_manager blocking I/O removed)\n\n**Decision:** Move volume cache warmup from synchronous blocking to non-blocking daemon threads inside `check_and_manage_positions()`.\n\n**Why:** `_warmup_volume_cache()` in decider-run.py was synchronous \u2014 blocking the pipeline on HL API calls (~100-200ms per token). Position_manager hangs for 15+ minutes because of it.\n\n**Changes:**\n- `_warmup_volume_cache_pm()` in position_manager.py fires daemon threads per stale",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | Signal compaction: 903 stale WAIT signals expired, hot-set rebuilt\n\n**Decision:** Run signal compaction to expire stale WAIT/PENDING/APPROVED signals (>3h old) and rebuild hotset.json.\n**Root cause:** 903 WAIT signals from 07:48 were sitting stale for 12+ hours. The `_load_hot_rounds()` query only considers signals created within the last 3 hours. Old signals blocked the pipeline \u2192 hot-set stayed at 4 tokens (all stale, rc=0) \u2192 decider-run found 0 APPROVED signals \u2192 2 position sl",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | Hot-set filters: confidence \u2265 70% and momentum > 0%\n\n**Decision:** Add hard filters to hot-set entry \u2014 reject any token with confidence < 70% OR momentum (speed) = 0%.\n**Reasoning:** Tokens like NOT (conf=50%, speed=\u23f80%), MEW (conf=81%, speed=\u23f80%), SUPER/BCH/BTC (conf=50%) have no business in the hot-set. The 903-signal backlog showed low-confidence signals dominating. Raising the bar to 70% should improve signal quality.\n**Changes:**\n- `ai_decider.py` line ~1165: `HAVING MAX(con",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-05 | hermes-git-release.timer restored\n\n**Decision:** Restart `hermes-git-release.timer` (was inactive since 2026-04-02). Also create missing `hermes-git-release.service` unit file.\n**Rationale:** The timer provides hourly backups + seed zip. It was manually stopped on Apr 2 and never restarted. Now active and waiting.\n**Alternatives considered:** Use separate cron job (timer is already set up, just dead), disable entirely (not ideal \u2014 backups are important)\n**Revisit condition:** If ",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | ATM folder created \u2014 trading system configs consolidated\n\n**Decision:** Create `/root/.hermes/ATM/` as the canonical home for all trading system files included in the standalone Docker. All primary trading scripts, configs, and architecture docs live here.\n\n**Why:** Docker target requires a clear, self-contained bundle. `ATM/` becomes the namespace for everything that goes into the final container \u2014 trading engine, configs, schemas. `/root/.hermes/scripts/` remains the runtime lo",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | Cut-loser DISABLED \u2014 guardian is the only emergency exit\n\n**Decision:** Cut_loser in position_manager.py is fully commented out (lines 1583-87). The guardian (`hl-sync-guardian.py`) is the designated emergency handler for live HL positions.\n\n**Why:** Cut_loser was causing race conditions \u2014 position_manager uses fresh prices and cuts at sl_distance from A/B test (as tight as 0.5%), before guardian's flip could fire. Removing cut_loser from position_manager eliminates duplicate clo",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "2. Trailing SL (once active \u2014 ONLY exit, cut_loser disabled)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "4. Stale Winner/Loser (speed-stall, alongside trailing)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "5. Guardian: handles live HL emergency exits, orphan recovery\n\n**Known bug:** `STALE_LOSER_TIMEOUT_MINUTES` comment says 15 min (line 32) but code uses 30 min (line 337) \u2014 needs cleanup.\n\n**Revisit condition:** If emergency exits are missed without cut_loser in position_manager\n**Owner:** Agent\n\n---\n\n---",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-06 | ai_decide_batch regime hard block + guardian orphan fix\n\n**Decisions:**",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "1. `ai_decide_batch()` now applies regime hard block inline after parsing Minimax decisions. Previously only `ai_decide()` had it \u2014 batch mode bypassed it entirely.",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "2. `hl-sync-guardian.py` Step8 now skips paper trades (`paper=True`) in orphan detection. Paper trades being absent from HL is expected behavior \u2014 they are never on HL.",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "3. NEUTRAL regime with conf > 60% should be treated as a WAIT, not auto-execute.\n\n**Evidence:** SKY was SHORT @ LONG_BIAS@95% regime \u2192 executed anyway (batch bypassed regime block). VVV SHORT was wrong direction \u2014 VVV not in regime_4h.json or momentum_cache. Guardian was closing paper trades as \"stale orphans.\"\n\n**Full post-mortems:** `tradingnotes.md`\n\n**Owner:** Agent\n\n---",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-04-10 | Cascade-flip kill switch confirmed + context-compactor migrated to systemd\n\n**Decisions:**",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "1. CASCADE_FLIP_ENABLED=False in position_manager.py (line 78) \u2014 kill switch already active. Cascade-flip DISABLED pending revisit.",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "2. context-compactor migrated: cron \u2192 hermes-context-compactor.timer (systemd). Removed from jobs.json.",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "3. CONTEXT.md hash enforcement wired: context-compactor.py now writes post-write MD5 \u2192 /root/.hermes/data/CONTEXT_MD_HASH.txt. Memory stores current hash. Agent checks at SESSION START \u2014 mismatch triggers full re-read.\n\n**Context:** T noted agent was looping on old tasks (cascade-flip already fixed). CONTEXT.md was stale (Apr 8). Root cause: session-start anchor in SOUL.md was not enforced.\n\n**Owner:** Agent\n\n---",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-08-29 | bb_bounce V2 Velocity Filter \u2014 Implement as Test\n\n**Decision:** APPROVE implementing bb_bounce V2 velocity filter as a test.\n\n**Why:**\n- MoE panel (4 experts, confidence 0.85/1.00) recommends velocity filter\n- Independent audit: 84.6% WR with velocity filter vs 58.9% baseline\n- Statistically significant (p=0.004, survives Bonferroni)\n- Risk-positive: max loss $2.42/period if wrong\n- bb-bounce-short already performing well (75%WR) \u2014 V2 may improve further\n\n**What to implement:**",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "1. Tighten `MEAN_REVERSION_VEL_THRESHOLD` from 0.15% to 0.015%",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "2. Move velocity check INTO `detect_bb_bounce()` (remove duplicate from scan)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "3. Add execution-time staleness check (5 min max age, 0.25% price drift)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "4. Fix bugs: hardcoded paths in bb_bounce_short.py, None guard on speed_tracker\n\n**Test approach:**\n- Implement as V2, keep V1 (current) active initially\n- Monitor WR for 7 days\n- If V2 WR > 70% over 50+ trades, replace V1\n- If V2 WR < 60%, revert to V1\n\n**Monitoring:**\n- Track V1 vs V2 WR separately\n- Log all velocity-blocked entries for audit\n- Kill trigger: if V2 WR drops below 65% over 30+ trades\n\n**Revisit:** 2026-09-05 (7 days after deployment)\n\n**Owner:** CEO\n\n---\n\n*Format: `## YYYY-MM-DD",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-08-26 | bb_bounce Execution-Time Staleness Gate\n\n**Decision:** APPROVE execution-time velocity check + price drift check. DEFER momentum filter.\n\n**Why:**\n- 5 losing bb_bounce+ trades (CRV, IO, SYRUP, CFX + ARAR not in DB) all share \"falling knife\" pattern\n- Root cause: velocity gate fires at detection time, not execution time. Signals sit 17+ minutes in hotset while market deteriorates.\n- Velocity data source fix already completed (candles_1m instead of stale price_history)\n- Momentum >",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "1. Execution-time velocity check in `decider_run.py` \u2014 re-check 15m velocity before placing trade, skip if vel_15m < -0.3%",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "2. Price drift check in `decider_run.py` \u2014 skip if price moved >0.25% since signal (uses existing SIGNAL_STALENESS_PRICE_PCT)",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "3. Monitor first week closely after deployment\n\n**What to defer:**\n- Momentum > -0.005 filter \u2014 kills 16 winners, needs analysis on which winners are acceptable to lose\n- Signal staleness limit \u2014 lower priority, can add later if needed\n\n**Backtest:**\n- Execution-time velocity check: catches CRV (-0.658%), IO (-0.573%), SYRUP (-0.238%), CFX (-0.392%)\n- Price drift check: catches CFX (0.71% > 0.25%)\n- Net impact: ~4 losers killed, minimal winner damage\n\n**Risk:** MEDIUM \u2014 new filters at execution ",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-08-26: Split Architecture for 30s Price Collector\n\n**Decision:** Option A \u2014 Split architecture (CEO approved)\n**What:** price_history quantized to minute boundaries, latest_prices at 30s\n**File:** scripts/signal_schema.py\n**Bugs fixed:** row counter (c.rowcount), backfill range (minute_ts), connection lifecycle (try/finally)\n**Pre-existing:** casing mismatch k* tokens, prev_price dead code, no try/finally\n**Impact:** Exit management gets 30s freshness, signals stay at 60s bars, zero sign",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-08-26: OpenMemory HTTP API documented in AGENTS.md\n\n**What:** Added direct curl examples for OpenMemory query/store/list when MCP functions aren't available.\n**Endpoint:** POST http://localhost:8080/mcp (x-api-key: dev-key-123)\n**Accept header required:** application/json, text/event-stream\n**Config:** /root/.hermes/config/shared-mcp.json",
+    "type": "decision"
+  },
+  {
+    "source": "DECISIONS.md",
+    "text": "## 2026-10-08: REJECT velocity-based detection bypass in pump_chain_long\n\n**Decision:** REJECT \u2014 do not fire pump-chain+ from momentum_cache velocity > 0.10 + LONG_BIAS when pump_flow is in ACCUMULATION.\n**Why (verified live 2026-10-08 01:04 UTC):**\n- Premise stale: pump_flow already MARKUP conf=0.764 with 9 LONG recs; pump-chain+ fired today (CRV 00:24, LDO 00:26, CHIP 01:04). Only 7 coins pass vel>0.10+LONG_BIAS (not 12+); PURR/APT/ATOM fail the proposed gate.\n- Filter inverts the winner: winn",
+    "type": "decision"
+  },
+  {
+    "source": "2026-10-08_reject-pump-chain-velocity-bypass.md",
+    "text": "# 2026-10-08 | CEO Decision: REJECT velocity-based detection bypass in pump_chain_long\n\n**Decision: REJECT (option 3)** \u2014 do NOT add momentum_cache velocity-based detection to `pump_chain_long.py`.\n\n**Decision maker:** CEO (delegated session)\n**Date:** 2026-10-08 ~01:10 UTC\n**Proposal under review:** Fire pump-chain+ LONG when momentum_cache shows velocity > 0.10 and phase LONG_BIAS, even when pump_flow engine is in ACCUMULATION \u2014 so we get \"more trades like CRV\".\n\n---\n\n## Why rejected \u2014 verifie",
+    "type": "file"
+  },
+  {
+    "source": "2026-09-22_rsi-timeframe-mismatch.md",
+    "text": "# CEO Decision: RSI Timeframe Mismatch Between Signals and Filters\n\n**Date:** 2026-09-22\n**Issue:** Timeframe mismatch between signal generators and execution filters causing bad entries\n**Priority:** \ud83d\udd34 CRITICAL \u2014 directly caused bad COMP SHORT entry\n**Decision by:** CEO (Hermes Trading System)\n\n---\n\n## The Problem\n\nThree independent RSI computation points in the pipeline can disagree on the same token:\n\n| Component | Data Source | Timeframe | Example (COMP SHORT) |\n|-----------|------------|---",
+    "type": "file"
+  }
+]

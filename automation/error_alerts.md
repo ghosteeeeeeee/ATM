@@ -860,3 +860,31 @@
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+TOK+TOK, allowing despite TOK filter`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3547s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3546s left, N failures)`
+
+## Error Alerts — 2026-10-14 15:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.8s (rc=N)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TOK position_manager: IndentationError: expected an indented block after 'if' statement on line N`
+
+## Error Alerts — 2026-10-14 15:50 UTC
+- **[WARN]** (1x): Disk usage at 85% on /dev/vda2 (118G total, 18G free)
+- **AUTO-FIX**: Vacuumed journald archives (freed 261.7M, 380M→~120M). Disk now 84%. No .log files older than 7d found to gzip. Top consumers: pipeline.log (87M), 15m_regime.log (44M), signal-compactor.log (36M) — all actively written, left alone. Recommend adding logrotate policy for hermes logs if disk trends toward 90%.
+
+## Error Alerts — 2026-10-14 16:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3536s left, N failures)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1509s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1509s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1428s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1428s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1388s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1325s left, N failures)`
+
+## Error Alerts — 2026-10-14 17:01 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: IO TOK (count=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (3534s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (3476s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (3416s left, N failures)`
