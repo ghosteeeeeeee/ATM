@@ -61,13 +61,37 @@ def check_guardrails():
 
 
 def pause_trading(reason):
-    """Disable live trading via kill switch."""
+    """Disable live trading: close positions + stop pipeline timers.
+
+    BUG-HUNTER BLOCKER FIX (2026-10-14): the JSON write alone was a no-op —
+    is_live_trading_enabled() reads only the static constant (commit 28215e7e
+    removed JSON consultation due to ghost trades). This fix uses
+    disable_live_trading() (closes HL positions + saves flags) AND stops
+    the pipeline/decider systemd timers so no new trades can open.
+    """
+    import subprocess
     try:
-        config = {'live_trading': False, 'reason': reason,
-                  'ts': int(datetime.now(timezone.utc).timestamp())}
-        with open(KILL_SWITCH_PATH, 'w') as f:
-            json.dump(config, f, indent=2)
-        log(f"🛑 [VACATION-GUARDRAIL] TRADING PAUSED: {reason}")
+        # 1. Close all open HL positions + save flags
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from hyperliquid_exchange import disable_live_trading
+        result = disable_live_trading()
+        closed = result.get('closed_positions', [])
+        log(f"🛑 [VACATION-GUARDRAIL] Closed {len(closed)} HL positions: {closed}")
+
+        # 2. Stop pipeline + decider timers (prevent new trades)
+        for timer in ['hermes-pipeline.timer', 'hermes-decider.timer']:
+            r = subprocess.run(['systemctl', 'stop', timer],
+                             capture_output=True, text=True, timeout=10)
+            if r.returncode == 0:
+                log(f"🛑 [VACATION-GUARDRAIL] Stopped {timer}")
+            else:
+                log(f"⚠️ [VACATION-GUARDRAIL] Could not stop {timer}: {r.stderr.strip()}", 'WARN')
+
+        # 3. Also stop the guardrail timer itself (avoid re-trigger)
+        subprocess.run(['systemctl', 'stop', 'hermes-vacation-guardrail.timer'],
+                      capture_output=True, timeout=10)
+
+        log(f"🛑 [VACATION-GUARDRAIL] TRADING PAUSED (positions closed + timers stopped): {reason}")
         return True
     except Exception as e:
         log(f"❌ [VACATION-GUARDRAIL] Failed to pause: {e}", 'ERROR')
