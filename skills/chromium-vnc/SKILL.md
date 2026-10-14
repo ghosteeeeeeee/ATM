@@ -36,6 +36,16 @@ test -f /root/snap/chromium/common/chromium/Default/Bookmarks && echo "snap: HAS
 test -f /root/.config/chromium/Default/Bookmarks && echo "config: HAS bookmarks" || echo "config: no bookmarks (stale)"
 ```
 
+## Service layout (since 2026-10-14)
+Xvfb and x11vnc are **separate systemd units** (`xvfb.service`, `x11vnc.service`) — do NOT recombine them into one ExecStart. The old single-unit `x11vnc.service` caused a recurring failure: unattended-upgrade installs new libs → needrestart's apt-pinvoke ran `systemctl restart x11vnc.service` → bundled Xvfb died → display :1 destroyed → Chromium killed ("X connection to :1 broken"). Happened on every upgrade touching libx11/libssl/etc (roughly every 1–3 days, always ~06:30 UTC).
+
+Fixes in place:
+- `/etc/systemd/system/xvfb.service` — owns Xvfb :1, `Restart=always`
+- `/etc/systemd/system/x11vnc.service` — `Requires=xvfb.service`, only shares the display
+- `/etc/needrestart/conf.d/99-blacklist-vnc.conf` — blacklists Xvfb/x11vnc from needrestart restarts (Xvfb keeps old libs in memory until reboot; harmless for a display server)
+
+If the display dies anyway: `systemctl status xvfb.service x11vnc.service`.
+
 ## Notes
 - `--no-sandbox` required when running as root.
 - `--disable-gpu` avoids GPU hardware acceleration issues in a headless VNC environment.
