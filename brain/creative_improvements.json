@@ -4502,5 +4502,23 @@
     "status": "suggested",
     "risk": "medium — needs shadow data before enforce; must not block LONG in EXTREME capitulation bounces",
     "verification": "backtest required: 7d/14d both-bear-state LONG cohort WR vs neutral; check filter collision with existing SHORT gates"
+  },
+  {
+    "date": "2026-10-14T18:46:27Z",
+    "idea": "CONF-CALIB: Cap final confidence at 100 before admission+ranking",
+    "rationale": "Confidence inversion: 40T conf>100 = -$1.30 net 7d. Runaway confidence = chasing. Cap normalizes ranking without blocking.",
+    "expected_impact": "Save ~$0.50-1.00/7d. Risk: dampens some big winners but net cohort is -$1.30.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-14T18:46:27Z",
+    "idea": "Trail-arm rate as leading signal-health indicator",
+    "rationale": "Signals with trail%<30% + avgMFE<0.30% are chop signals (all 3 killed this week). Trail% drops before WR collapses.",
+    "expected_impact": "Earlier chop-signal detection.",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "none"
   }
 ]

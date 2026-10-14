@@ -1,153 +1,168 @@
 {
-  "timestamp": "2026-10-14T15:46:51Z",
-  "agent": "brain_auditor",
-  "session_lock": "FREE",
-  "portfolio_health": "critical (watchdog)",
-  "regime": {
-    "btc_15m": "SHORT_BIAS",
-    "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
-    "volatility": "LOW",
-    "market_phase": "DECLINING",
-    "trend_quality": "UP"
+  "timestamp": "2026-10-14T18:46:04Z",
+  "session_brain_stats": {
+    "queries_run": 4,
+    "topics": [
+      "hard_max_loss chop entry filter",
+      "volume-breakout-long losing",
+      "confidence scoring bug",
+      "ai-trader performance"
+    ]
   },
-  "trade_summary": {
-    "24h": {
-      "trades": 40,
-      "pnl": -0.46,
-      "wr": 32.5,
-      "long": "23T -$0.79 26.1%",
-      "short": "17T +$0.33 41.2%"
+  "trade_summary_24h": {
+    "trades": 39,
+    "wins": 14,
+    "pnl": -0.02,
+    "wr": 35.9,
+    "open": 0,
+    "regime": "SHORT_BIAS / STRONG_DOWN / LOW vol",
+    "hard_max_loss_pct": 23.1,
+    "atr_sl_hit_pct": 28.2,
+    "note": "Near breakeven. Kills holding. 7d ex-killed-signals = +$1.20."
+  },
+  "trade_summary_7d": {
+    "trades": 192,
+    "wins": 68,
+    "pnl": -0.55,
+    "wr": 35.4,
+    "ex_killed_signals": {
+      "trades": 156,
+      "pnl": 1.2
     },
-    "7d": {
-      "trades": 188,
-      "pnl": -0.73,
-      "wr": 35.1,
-      "note": "flipped negative"
+    "killed_signal_bleed": {
+      "trades": 36,
+      "pnl": -1.75,
+      "signals": [
+        "volume-breakout-long+ 16T -$0.76",
+        "hmacd_mtf-+ 8T -$0.46",
+        "oversold-bounce+ 7T -$0.32",
+        "volume-buildup+ 5T -$0.21"
+      ]
     },
-    "open": 2,
-    "by_exit_24h": {
-      "hard_max_loss": "9T -$0.76 0%WR",
-      "atr_sl_hit": "11T -$0.73 0%WR",
-      "profit-monster-trail": "9T +$0.76 100%WR",
-      "atr_trail_hit": "5T +$0.39 60%WR"
+    "trail_family": {
+      "trades": 79,
+      "pnl": 8.71,
+      "wr": 84.8
+    },
+    "chop_family": {
+      "trades": 110,
+      "pnl": -9.26,
+      "wr": 0.9
     }
   },
-  "chop_vs_trend_7d": {
-    "TRAIL_FAMILY": {
-      "n": 62,
-      "pnl": 6.82,
-      "wr": 87.1
-    },
-    "CHOP_HML": {
-      "n": 63,
-      "pnl": -6.04,
-      "wr": 0.0
-    },
-    "OTHER": {
-      "n": 63,
-      "pnl": -1.51,
-      "wr": 19.0
-    },
-    "MFE_winners": {
-      "n": 57,
-      "avg_mfe": 1.55,
-      "trail_armed_pct": 77.2
-    },
-    "MFE_losers": {
-      "n": 120,
-      "avg_mfe": 0.444,
-      "trail_armed_pct": 10.0
-    }
-  },
-  "changes_from_last_run_verified": [
+  "drift_findings": [
     {
-      "item": "LONG_MIDBAND meta-source fix (signal_compactor:4190)",
-      "status": "WORKING",
-      "evidence": "495 LONG-MIDBAND blocks; 0 midband LONGs opened after 07:50 fix. USUAL/BABY were pre-fix."
+      "id": "CONF-INVERSION",
+      "severity": "HIGH",
+      "finding": "Confidence>100 trades are net LOSERS. 40T conf>100 over 7d = -$1.30. avgConf losers 168-334, winners 42-79. BABY pump-chain+ conf=499.4 lost. IMX conf=233 won +$0.48 (outlier).",
+      "evidence": "ai-trader+ conf>100: 5T -$0.31 avgConf=168. pump-chain+ conf>100: 12T -$0.19 avgConf=188. continuum-trend+ conf=334 lost -$0.17.",
+      "root_cause": "Confidence multipliers stack too aggressively. High conf = move already happened = chasing. Score measures 'how much moved' not 'how likely to continue'.",
+      "impact": "40/192 7d trades (21%), net -$1.30. If blocked: 7d would be +$0.75 instead of -$0.55.",
+      "recommended_change": "CONF-CALIB dampen: cap final confidence at 100 before MIN_EXEC_CONFIDENCE + ranking. Code change in decider_run.py. Does NOT block (conf=80 still passes MIN_EXEC=50), only normalizes ranking.",
+      "status": "delegated_bug_hunter",
+      "confidence": "HIGH"
     },
     {
-      "item": "LONG_RSI_CEILING meta-source fix (12:48 commit d5b6f422)",
-      "status": "WORKING",
-      "evidence": "444 ceiling blocks; FOGO/BLUR blocked with meta-source tag. SEI@84 was pre-fix."
+      "id": "RSI-CEILING-VERIFY",
+      "severity": "INFO",
+      "finding": "PUMP_CHAIN_LONG_RSI_MAX=70 (landed Oct 13 05:39) is working correctly. 0 trades with metaRSI>70 since change.",
+      "evidence": "9T since change, avgMetaRSI=63.8. Before: 26T avgMetaRSI=63.9. Filter blocking correctly, market regime shift explains WR drop (42.3%→22.2%), not the filter.",
+      "status": "verified_working",
+      "confidence": "HIGH"
     },
     {
-      "item": "volume-buildup+ LONG kill (09:15)",
-      "status": "WORKING",
-      "evidence": "steer-003 addressed; VOLUME_BUILDUP_PLUS_ENABLED=False; 0 trades since."
-    },
-    {
-      "item": "trail_arm_timeout (45m)",
-      "status": "WORKING",
-      "evidence": "5 fires 7d net -$0.10; correct chop-early-exit."
-    },
-    {
-      "item": "SHORT_RSI_HARD_FLOOR=35 monitor",
-      "status": "HOLD",
-      "evidence": "n=20 +$0.12 35%WR; revert trigger (10+ losers >$1) NOT met."
-    },
-    {
-      "item": "doji-bottom re-enable (14:44)",
-      "status": "MONITOR",
-      "evidence": "0 trades yet; EXTREME gated."
-    },
-    {
-      "item": "LONG_SHORT_BIAS_DAMPEN shadow (14:44)",
-      "status": "SHADOW",
-      "evidence": "condition ACTIVE now (BTC LEAN_BEAR + BELOW); no enforce yet, 0 shadow fires logged."
+      "id": "DOJI-REENABLE",
+      "severity": "INFO",
+      "finding": "doji-bottom-long re-enabled Oct 14 (my last run). 0 trades since. EXTREME block working (3T 0% pre-block). Non-EXTREME 14d: 10T 60% +$0.13.",
+      "status": "monitoring",
+      "confidence": "MEDIUM"
     }
   ],
-  "config_change_this_run": {
-    "change": "cell_stats wiring key-mismatch fix (commit 0ebfd16b)",
-    "problem": "Landed 15:34 by another agent; 0 CELL-STATS logs in 20min = silent noop. Normalized key hit WRONG cell_stats row: pump_chain (63.6%WR tradeable, n=22) vs real live signal pump-chain+ (45.9%WR losing, n=85). On a match it would BOOST a losing cell.",
-    "fix": "exact-key match first (signal_type then source), underscore-normalized only as fallback",
-    "verified": "pump-chain+ HIGH → 0.5x dampen (36.7%WR n=30); bb-squeeze+ NORMAL → 1.2x boost (68.4%WR n=19 tradeable); r2-trend-long4 → source-key r2_trend_long 1.2x"
-  },
-  "losing_trade_autopsy_24h": {
-    "cluster_1": {
-      "signal": "volume-buildup+ LONG",
-      "trades": "ETC/MON/POL",
-      "pnl": "-$0.26",
-      "root_cause": "NORMAL-regime chop entries, conf 45-46, trail never armed (13-22min holds), all hard_max_loss",
-      "fix": "KILLED 09:15 — already addressed"
+  "recurring_problems": [
+    {
+      "problem": "hard_max_loss chop entries — 62T -$5.98 0% WR 7d. #1 bleed. Trail family 84.8% WR vs chop family 0.9% WR.",
+      "status": "partially_addressed",
+      "note": "4 chop signals killed (volume-breakout-long+, hmacd_mtf-+, oversold-bounce+, volume-buildup+). Kills holding: 0 post-kill trades. Remaining bleed is in still-enabled signals with small samples."
     },
-    "cluster_2": {
-      "signal": "r2v2-long3/long4 LONG",
-      "trades": "USUAL/BABY",
-      "pnl": "-$0.24",
-      "root_cause": "meta-RSI 68-69 midband death zone (60-70 non-EXTREME); live-5m RSI passed them (DRIFT-E)",
-      "fix": "midband meta-source fix — already addressed"
-    },
-    "cluster_3": {
-      "signal": "r2-trend-long4 LONG",
-      "trades": "SEI",
-      "pnl": "-$0.23",
-      "root_cause": "meta-RSI 84.21 overbought chase; ceiling used live-5m=53.9 (DRIFT-E)",
-      "fix": "ceiling meta-source fix — already addressed"
-    },
-    "cluster_4": {
-      "signal": "pump-chain- SHORT",
-      "trades": "LDO/ALGO/CRV",
-      "pnl": "-$0.31",
-      "root_cause": "EXTREME regime whipsaw; 45-55 meta-RSI band",
-      "status": "MONITOR — CEO KEEP on EXTREME, n small"
+    {
+      "problem": "Counter-trend LONGs in SHORT_BIAS regime. LONG-SHORT-BIAS shadow collecting data (43 fires, mostly BLUR/TRX/ALGO).",
+      "status": "shadow_collecting",
+      "note": "Shadow fires ×0.70 dampen would-dampen on counter-trend LONGs. 43 fires since Oct 14. Flip with CEO approval after n>=30."
     }
-  },
-  "directional_diagnosis": "LONGS are the bleed (-$0.79 24h, 26.1% WR) while SHORTS print (+$0.33, 41.2%). BTC 15m SHORT_BIAS + continuum BELOW. We are on the wrong side of LONG entries during a bear structure. The three biggest LONG losers (volume-buildup+, r2v2 midband, SEI overbought) are ALL fixed today — cohort needs to age in.",
-  "rejected_ideas": [
+  ],
+  "missing_implementations": [
     {
-      "idea": "Revert SHORT_RSI_HARD_FLOOR 35→45",
-      "reason": "monitor n=20 +$0.12, trigger not met"
+      "item": "CONF-CALIB confidence cap at 100",
+      "status": "delegated",
+      "note": "40T -$1.30 7d. Simple code change in decider_run.py. Not config — code."
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-14T18:46:04Z",
+      "idea": "CONF-CALIB: Cap final confidence at 100 before admission+ranking",
+      "rationale": "Confidence inversion proven: 40T conf>100 = -$1.30 net. Runaway confidence = chasing (move already happened). Capping at 100 normalizes ranking without blocking (conf=80 still passes MIN_EXEC=50). Simplest fix that doesn't require recalibrating the entire scoring stack.",
+      "expected_impact": "Reduce conf>100 allocation by ~50%, save ~$0.50-1.00/7d. Risk: dampens some big winners (IMX conf=233 +$0.48), but net cohort is -$1.30.",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low",
+      "implementation": "One line: final_confidence = min(final_confidence, 100) before MIN_EXEC_CONFIDENCE check in decider_run.py"
     },
     {
-      "idea": "Stack new LONG entry filters",
-      "reason": "7 fixes in soak today; stacking invalidates measurements"
+      "date": "2026-10-14T18:46:04Z",
+      "idea": "Trail-arm rate as signal health metric",
+      "rationale": "7d data: 49.7% of trades reach +0.40% trail activation. Signals with trail%<30% + avgMFE<0.30% are chop signals (hmacd_mtf-+ 25%/0.29, oversold-bounce+ 28.6%/0.26, volume-buildup+ 20%/0.26). All three killed. Add trail% to watchdog as leading indicator — a signal whose trail% drops below 30% over 7d gets flagged before WR collapses.",
+      "expected_impact": "Earlier detection of chop-signal degradation. Currently we wait for WR to collapse; trail% drops first.",
+      "category": "monitoring",
+      "status": "suggested",
+      "risk": "none"
+    }
+  ],
+  "config_changes_applied": [],
+  "changes_from_last_run": [
+    {
+      "change": "doji-bottom-long re-enable (EXTREME 0.0-gated)",
+      "timestamp": "2026-10-14T14:44",
+      "result": "0 trades since. EXTREME block holding. Non-EXTREME 14d +$0.13. MONITOR.",
+      "verdict": "too_early"
+    },
+    {
+      "change": "PUMP_CHAIN_LONG_RSI_MAX 75→70",
+      "timestamp": "2026-10-13T05:39",
+      "result": "0 breaches since. Filter working. WR drop is regime shift, not filter.",
+      "verdict": "working"
+    },
+    {
+      "change": "VOLUME_BREAKOUT_PLUS kill",
+      "timestamp": "2026-10-13T21:41",
+      "result": "0 post-kill trades. Kill holding.",
+      "verdict": "working"
+    },
+    {
+      "change": "CHASE_RATIO shadow gate",
+      "timestamp": "2026-10-13T21:41",
+      "result": "10 log lines. Low fire rate. Mostly SHORTs ratio~1.0. Insufficient data.",
+      "verdict": "collecting"
+    },
+    {
+      "change": "LONG-SHORT-BIAS shadow dampen",
+      "timestamp": "2026-10-14T14:44",
+      "result": "43 fires. BLUR 19, TRX 10, ALGO 6. Counter-trend LONGs detected. Data accumulating.",
+      "verdict": "collecting"
+    },
+    {
+      "change": "EXEC-RSI-DETECT-FLOOR + CEILING bugfixes",
+      "timestamp": "2026-10-13/14",
+      "result": "Meta-RSI preferred over live-5m. RSI source drift (DRIFT-E) addressed at exec time.",
+      "verdict": "working"
     }
   ],
   "next_actions": [
-    "Oct 15 soak review: PUMP_CHAIN_LONG_RSI_MAX=70, volume-breakout kill, chase-ratio shadow, ceiling+midband meta fixes, volume-buildup+ kill",
-    "Watch LONG_SHORT_BIAS_DAMPEN shadow fires (condition active now) — enforce only after 48h data + CEO",
-    "Trail-arm ratify still pending CEO (overdue — decide before Oct 15)",
-    "Monitor cell_stats CELL-STATS logs now that key fix shipped"
+    "bug_hunter: investigate CONF-INVERSION — 40T conf>100 = -$1.30. Implement conf cap at 100 in decider_run.py. Verify no regression on conf>100 winners.",
+    "Monitor LONG-SHORT-BIAS shadow — flip live at n>=30 with CEO approval",
+    "Monitor doji-bottom-long — re-kill if non-EXTREME cohort flips negative (n>=10)",
+    "Monitor pump-chain+ LONG post-kill + regime shift — 9T 22.2% since Oct 13 (was 42.3%). Regime-driven, not filter-driven.",
+    "Oct 15: 7d WR checkpoint (goal >=50%, currently 35.4% — WILL MISS due to pre-kill bleed in window)",
+    "Trail-arm rate metric — add to watchdog as leading indicator (creative idea #2)"
   ]
 }
