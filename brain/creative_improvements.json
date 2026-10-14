@@ -4520,5 +4520,22 @@
     "category": "monitoring",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-14T22:48:08Z",
+    "idea": "Trail-arm timeout:HML ratio as leading chop indicator",
+    "rationale": "pump-chain+ 10d: 6 timeouts vs 15 HML. If timeout rate drops while HML rises, entries are degrading BEFORE WR collapses. Currently we wait for WR; this leads by hours.",
+    "expected_impact": "Earlier chop detection — flag signal when timeout/(timeout+HML) drops below 20% over 7d",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-14T22:48:08Z",
+    "idea": "Trail-arm ratify data package (pump-chain RECOMMEND KEEP, bb-squeeze EXTEND SOAK)",
+    "rationale": "Timeouts exit at -0.23% avg vs HML -2.74% avg. 10x cost ratio. bb-squeeze 0 fires in 8d — 60min threshold too high for squeeze's faster grind OR trades resolve before stall. Extend, don't revert.",
+    "category": "exit structure",
+    "status": "ceo_package_ready",
+    "risk": "low"
   }
 ]
