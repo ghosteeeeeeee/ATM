@@ -9740,3 +9740,28 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 - Overtrade: 2/hr (limit 20)
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 08:15] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** +$0.44 (WR: 33.3%)
+
+**Details:**
+- WLD r2v2-long3 profit-monster-trail +$0.44 (+0.80%)
+- FOGO pump-chain+ atr_trail_hit +$0.03 (+1.15%)
+- ALGO pump-chain- atr_sl_hit −$0.03 (−1.27%)
+- 24h: 63T 15W −$1.10 (23.8% WR)
+- Open: 0
+- Kill switch: live_trading=true verified
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: max 1T 1W per signal this hour (needs 3+T 0W) — no candidates
+- 24h watch: doji-bottom-long 5T 0W −$0.46, hmacd_mtf-+ 4T 0W −$0.35, volume-breakout-long+ 3T 0W −$0.17 — 0 fires this hour, none re-trigger kill rule
+- hard_max_loss 22/63 = 34.9% under 40% (fell from 36.5%); atr_sl_hit 17/63 = 27.0% under 40%, tpsl_utils stable
+- Entry quality: winners 24h MAE avg 0.139% (max 0.316%) — under 0.5%, entries fine
+- Streak: broken — hour 07 +$0.01, hour 08 +$0.06 (2 positive hours)
+- Overtrade: 3/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction

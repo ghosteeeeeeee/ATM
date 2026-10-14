@@ -4655,3 +4655,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-14 07:15] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W −$0.03 (GMX pump-chain+ trail_arm_timeout, IMX pump-chain+ atr_trail_hit) | 24h 63T 17W −$1.21 (27.0%) | kill: none (pump-chain+ 2T 0W needs 3+; 24h pump-chain+ +$0.31) | doji-bottom-long 5T 0W, volume-breakout-long+ 4T 0W, hmacd_mtf 5T 1W 0-fire watch | hard_max_loss 36.5% (under 40) | atr_sl_hit 25.4% (tpsl stable) | winners MAE avg 0.119% (entries fine) | overtrade 2/hr | streak 4-neg but regime EXTREME≠NEUTRAL → size lever N/A | 2 open | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-14 08:15] auto_1hr: NO CONFIG CHANGE — 3T last hour 1W +$0.44 (WLD r2v2-long3 profit-monster-trail +$0.44, FOGO pump-chain+ atr_trail_hit +$0.03; ALGO pump-chain- atr_sl_hit −$0.03) | 24h 63T 15W −$1.10 (23.8%) | kill: none (max 1T 1W/signal, needs 3+T 0W) | doji-bottom-long 5T 0W, hmacd_mtf-+ 4T 0W, volume-breakout-long+ 3T 0W 0-fire watch | hard_max_loss 34.9% (under 40, falling) | atr_sl_hit 27.0% (tpsl stable) | winners MAE avg 0.139% (entries fine) | overtrade 3/hr | streak broken (2 pos hrs) | live_trading=true, kill JSON=true
+BY: auto_1hr
