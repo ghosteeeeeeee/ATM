@@ -840,3 +840,18 @@
 ## Error Alerts — 2026-10-14 09:01 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3549s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3542s left, N failures)`
+
+## Error Alerts — 2026-10-14 09:53 UTC
+- **WARN** (1x): `hermes-upgrade-implementer.service` in failed state (timed out 06:16 UTC, killed by systemd start timeout).
+- **AUTO-FIX**: `systemctl reset-failed hermes-upgrade-implementer.service` — cleared failed state so next timer run (12h cadence) can start cleanly.
+- **NOTE**: Disk 84% (19G free of 118G) — under 85% threshold, previously flagged trending up. Largest DBs: coin_tracker 3.3G, candles.db 2.98G, session_brain 1.3G, signals_hermes 1.0G.
+- **NOTE**: Pipeline log reports "60 closed today | -72.06% PnL" but PG shows 23 closed today (-$0.36) — likely a metric/label discrepancy in the portfolio summary line, not a data issue. Worth a look by whoever owns the summary code.
+- All critical timers (pipeline, 1m-candle, price-collector) active and firing. Prices fresh (candles_1m age 0.1 min). 0 phantom trades. No pipeline errors in last 30min.
+
+## Error Alerts — 2026-10-14 10:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (961s left, N failures)`
+
+## Error Alerts — 2026-10-14 11:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3554s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2414s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2414s left, N failures)`

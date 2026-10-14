@@ -83,6 +83,27 @@ If old report says -6.64% but DB shows +$0.38, **use the DB number.**
 
 ## ⚠️ BEFORE MAKING ANY CHANGES — READ THIS
 
+### 0. Prior context (MANDATORY — before any analysis)
+You have done this work before. Rediscovering it from scratch is the single most
+expensive thing you do: on record, one deep run spent 33 tool calls and 17 minutes
+re-deriving context that was already stored. Two cheap reads replace most of that.
+
+```bash
+# What have I already decided about this topic? (OpenMemory, capped output)
+python3 automation/ceo/ceo_memory.py "<topic of your brief>"
+
+# What prior rulings/checkpoints/briefs exist? (deterministic index, not embeddings)
+python3 automation/ceo/ceo_index.py
+python3 automation/ceo/ceo_index.py --topic <keyword>   # narrower
+```
+
+Then read **one** checkpoint file in full if the index points at a relevant one — do
+not read them all. Both commands fail soft: if they error, proceed without them.
+
+Prefer these over `tail`-ing `ceo_report.md` or `ls`-ing the checkpoints dir. Note the
+report is occasionally rewritten by other agents, so it is NOT a reliable history on
+its own — OpenMemory and the checkpoint files are.
+
 ### 1. Recent Changes Log
 ```bash
 cat automation/recent_changes.log
