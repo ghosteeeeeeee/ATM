@@ -9784,3 +9784,28 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 - hard_max_loss 22/63 = 34.9% under 40% threshold; atr_sl_hit 17/63 = 27.0% under 40%, tpsl_utils stable
 - Overtrade: 3/hr (limit 20)
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 10:15] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.16 (WR: 100.0%)
+
+**Details:**
+- POL volume-buildup- SHORT profit-monster-trail +$0.11 (+4.77%)
+- AIXBT volume-buildup- SHORT profit-monster-trail +$0.05 (+1.30%)
+- 24h: 58T 13W −$1.72 (22.4% WR)
+- Open: 0
+- Kill switch: live_trading=true verified
+- volume-buildup+ killed last hour; volume-buildup- SHORT correctly left ON and paid (2W this hour)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: max 2T 2W per signal this hour (needs 3+T 0W) — no candidates
+- 24h watch: pump-chain+ 8T 1W −$0.34, doji-bottom-long 3T 0W −$0.27 — 0 fires this hour, neither re-triggers kill rule
+- hard_max_loss 20/58 = 34.5% under 40% threshold; atr_sl_hit 17/58 = 29.3% under 40%, tpsl_utils stable
+- Entry quality: winners 24h MAE avg 0.168% (max 0.316%) — under 0.5%, entries fine
+- Streak: hour 08 −$0.20, hour 09 +$0.16 (positive) — no 3-neg streak
+- Overtrade: 2/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction

@@ -4657,3 +4657,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-14 08:15] auto_1hr: NO CONFIG CHANGE — 3T last hour 1W +$0.44 (WLD r2v2-long3 profit-monster-trail +$0.44, FOGO pump-chain+ atr_trail_hit +$0.03; ALGO pump-chain- atr_sl_hit −$0.03) | 24h 63T 15W −$1.10 (23.8%) | kill: none (max 1T 1W/signal, needs 3+T 0W) | doji-bottom-long 5T 0W, hmacd_mtf-+ 4T 0W, volume-breakout-long+ 3T 0W 0-fire watch | hard_max_loss 34.9% (under 40, falling) | atr_sl_hit 27.0% (tpsl stable) | winners MAE avg 0.139% (entries fine) | overtrade 3/hr | streak broken (2 pos hrs) | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-14 09:15] auto_1hr: KILLED volume-buildup+ (VOLUME_BUILDUP_PLUS_ENABLED=False) — 3T 0W last hour all hard_max_loss (ETC −3.86%, MON −4.70%, POL −3.25%) | 24h 63T 17W −$0.85 (27.0%) | hard_max_loss 34.9% (under 40) | atr_sl_hit 27.0% (tpsl stable) | overtrade 3/hr | volume-buildup- SHORT left ON (2 open) | live_trading=true, kill JSON=true
+BY: auto_1hr
+[2026-10-14 10:15] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W +$0.16 (POL/AIXBT volume-buildup- SHORT profit-monster-trail) | 24h 58T 13W −$1.72 (22.4%) | kill: none (max 2T 2W/signal, needs 3+T 0W) | volume-buildup+ killed last hr, volume-buildup- paid 2W | hard_max_loss 34.5% (under 40) | atr_sl_hit 29.3% (tpsl stable) | winners MAE avg 0.168% (entries fine) | overtrade 2/hr | streak positive hr 09 | 0 open | live_trading=true, kill JSON=true
+BY: auto_1hr
