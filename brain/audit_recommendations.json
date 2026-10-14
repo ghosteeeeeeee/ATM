@@ -1,139 +1,101 @@
 {
-  "timestamp": "2026-10-14T06:45:00Z",
+  "timestamp": "2026-10-14T08:39:07.402446+00:00",
   "session_brain_stats": {
-    "queries": 2,
-    "note": "chase/RSI band insights cross-checked vs live PG; stale session claim SHORT 45-55 sweet spot DISPROVED by 30d data"
+    "queries": 3,
+    "top_insights": "chop-entry MFE pattern confirmed; open-skies filter 87% WR idea; ema300_dip MIN_GAP filter"
   },
   "trade_summary_24h": {
-    "closed": 64,
-    "wins": 15,
-    "wr": 23.4,
-    "pnl": -1.24,
-    "open": 2,
-    "open_pnl": -0.02,
-    "regime": "BTC 15m SHORT_BIAS / 4h LONG_BIAS / continuum AT / CALM / DISTRIBUTION",
-    "exits_of_losers": {
-      "hard_max_loss": "22T -$1.76 lev4.55",
-      "atr_sl_hit": "14T -$1.08 lev3.86"
-    },
-    "7d": {
-      "trades": 179,
-      "pnl": -1.33,
-      "wr": 32.4,
-      "long": "139T -0.46 34.5%",
-      "short": "40T -0.87 25.0%"
-    }
+    "total": "60T 25.0%WR -$0.92",
+    "total_7d": "182T 33.0%WR -$1.20 (SLID from +$0.93 — Oct 13 was worst day: 56T 25% -$1.53)",
+    "open": "2 LONG volume-buildup+ (ETC, MON) both NORMAL regime",
+    "hml_7d": "63T -$6.11 #1 bleed, only 4/63 reached trail arm (+0.40%), avg MFE 0.146% vs winners 1.550%",
+    "regime": "LONG_BIAS both TFs, STRONG_UP trend, CALM phase, LOW vol — bull market but 25% WR"
   },
-  "watchdog_steers_disposition": {
-    "steer-001 losing_streak_12_of_20": "VERIFIED — 24h 15W/64T 23.4%WR -$1.24; 7d 32.4% -$1.33. Root = chop entries (HML+atr_sl family), not single signal.",
-    "steer-002 cluster GMX+ALGO": "Both closed; GMX long pump-chain+ -0.04, ALGO short pump-chain- flat. Cap B SAME_DIR_30MIN_MAX=3 already live.",
-    "steer-003 wrong-side_8_losses": "CONFIRMED as chase/chop pattern. BABY/USUAL (meta_rsi 68.8/69.2) already HML-closed -0.12 each — the exact LONG 60-70 chase cell. Winning side was pullback-longs 50-60 (only green LONG cell 7d: +1.65 combined 50-55+55-60).",
-    "steer-004 bb-bounce-v2-long+_streak": "NOISE — 14d 25T +$0.76 64%WR; all meta-RSI bands green or flat; 3-loss streak n too small. Do NOT disable."
-  },
-  "losing_trade_autopsy": {
-    "clusters": [
-      {
-        "cluster": "LONG meta_rsi 65-70 chase (7d n=24, -$1.02, 29.2%WR)",
-        "root_cause": "Buying strength mid-chop; HML exit at lev 4.3 before trail arm",
-        "winner_side": "Pullback longs 50-60 (7d +$1.65) or SHORT the overbought tape",
-        "signal_mix": "CONFOUNDED — bb-squeeze+ 60-70 is +$0.45 76.2%WR (its BEST band, MIN=60 design), vol-breakout+ 60-70 was +$0.72 (now killed). Bleed is diffuse tail (r2v2/hmacd/doji/ai-trader/grind). Blanket ceiling 65 REJECTED: kills bb-squeeze best band + 28.6% of 30d LONG winners (69/241)."
-      },
-      {
-        "cluster": "HML chop family 24h (22T -$1.76, all LONG)",
-        "root_cause": "MFE data: 87% HML never reach +0.40% trail-arm — entered with no momentum",
-        "winner_side": "Trail family 7d LONG 29.5% arm rate +$; trail exits 24h +$1.97 vs death exits -$2.80",
-        "verdict": "Chase-ratio shadow + RSI_MAX=70 already target this; soak, don't stack"
-      }
-    ]
-  },
-  "drift_findings": [
-    {
-      "id": "D-watchdog-chase-band",
-      "severity": "info",
-      "finding": "Watchdog deep_analysis 'LONG 60-70 = worst cell, ceiling it' is signal-mix confounded. Per-signal 30d: bb-squeeze+ 60-70 +$0.45 76%WR, vol-breakout+ +$0.72, pump-chain+ -$0.02 flat, bb-bounce-v2 -$0.09 flat. No per-signal n>=20 bleed cell. Blanket fix would destroy the best bb-squeeze habitat.",
-      "action": "Do NOT ship global ceiling 65. Per-family RSI map = creative idea (backtest first)."
-    },
-    {
-      "id": "D-short-bands-30d",
-      "severity": "med",
-      "finding": "30d SHORT: ALL meta-RSI bands negative (25-35 -$1.31, 35-45 -$1.22, 45-55 -$0.84...). 7d '35-45 green +$0.10' does NOT survive OOS. EXEC-RSI-DETECT-FLOOR (shipped 22:45) correctly targets short-into-oversold; 4 fires in 5h (INJ/LDO/ATOM/ALT), SHORT cohort since +$0.21.",
-      "action": "Soak detect-floor; no additional SHORT band filter."
-    }
-  ],
-  "recurring_problems": [
-    "hard_max_loss chop entries — HML+atr_sl = bulk of losers every audit; entry-side, 87% never trail-arm. Levers shipped: RSI_MAX=70, chase-ratio shadow, detect-floor, doji/hmacd/vb kills. Do not stack more entry filters while soaking.",
-    "Trail-arm ratify pending CEO since Oct 12 — STILL blocks clean Oct 15 soak review (3rd consecutive audit escalating)."
-  ],
-  "missing_implementations": [
-    "self_learner momentum-at-entry backtest — requested 3x, still undelivered",
-    "per-family LONG RSI ceiling map (see creative) — never built",
-    "disk retention plan (bug_hunter, Oct 7 standing) — <80% Oct 14 goal will miss"
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-10-14T06:45:00Z",
-      "idea": "Per-family LONG RSI ceiling map (replace scalar LONG_RSI_CEILING for signal-level decisions)",
-      "rationale": "30d data proves 60-70 band is habitat-profitable for bb-squeeze+ (21T 76.2% +$0.45) and dead for diffuse tail (r2v2 7T -$0.34, grind-trend 7T 28.6%). A single scalar forces choosing between killing the best squeeze entries and letting the tail bleed. SIGNAL_EXIT_CONFIG pattern already exists for exits — mirror for entry ceilings.",
-      "expected_impact": "Capture ~$2/30d tail bleed without touching bb-squeeze +$0.45 band",
-      "category": "entry sniper",
-      "status": "suggested_backtest_first",
-      "risk": "low (per-signal, reversible, one family at a time)",
-      "owner": "self_learner backtest → CEO"
-    },
-    {
-      "date": "2026-10-14T06:45:00Z",
-      "idea": "REJECTED (verify-first worked): global LONG RSI ceiling 65",
-      "rationale": "7d 65-70 looks like -$1.02 bleed but 30d shows band net -$0.65 with +$3.43 winners; ceiling kills bb-squeeze+'s best band and 28.6% of all 30d LONG winners. Fails winner-impact bar. Logged so it is not re-proposed.",
-      "expected_impact": "negative — do not re-propose",
-      "category": "risk",
-      "status": "rejected",
-      "risk": "n/a"
-    }
-  ],
-  "config_changes_applied": [],
   "changes_from_last_run": [
     {
       "change": "PUMP_CHAIN_LONG_RSI_MAX 75->70 (Oct 13 05:39)",
-      "status": "WORKING",
-      "evidence": "Live blocks INJ@70.5 every cycle 06:31-06:38; 7T post-fix +$0.33; 0 entries >=70"
+      "verdict": "WORKING",
+      "evidence": "14d meta-RSI bands: 70+=15T 26.7% -$0.32 correctly blocked; <55=6T 50% +$1.12 and 55-65=20T 40% +$1.11 are profit engines preserved; 65-70=10T 50% -$0.05 kept open per plan"
     },
     {
       "change": "VOLUME_BREAKOUT_PLUS kill (Oct 13 21:41)",
-      "status": "CLEAN",
-      "evidence": "0 new entries; 1 close post-kill was pre-open trade"
+      "verdict": "WORKING",
+      "evidence": "0 trades opened since kill. 7d bleed frozen at -$0.76."
     },
     {
       "change": "CHASE_RATIO shadow (Oct 13 21:41)",
-      "status": "ACCUMULATING",
-      "evidence": "1 fire (STX ratio=1.15 -> HML, correct); enforce decision needs n>=10"
+      "verdict": "COLLECTING",
+      "evidence": "3 fires logged. STX LONG ratio=1.15 would-block — STX was an ai-trader+ hard_max_loss loser. Shadow validating."
     },
     {
       "change": "EXEC-RSI-DETECT-FLOOR (Oct 13 22:45)",
-      "status": "WORKING",
-      "evidence": "4 blocks in 5h (INJ detect 21.9, LDO 4.7, ATOM 31.8, ALT 21.4) — all short-into-bounce; SHORT cohort since +$0.21 40%WR"
+      "verdict": "WORKING",
+      "evidence": "POL SHORT blocked (detect RSI 33.8<35). AIXBT SHORT blocked (RSI 35.9<40 hard floor). BLUR SHORT blocked (RSI 37.1<40)."
     },
     {
-      "change": "doji/hmacd_mtf-+ kills (Oct 13)",
-      "status": "CLEAN",
-      "evidence": "0 post-kill entries"
-    },
-    {
-      "change": "bb-squeeze trail-arm-timeout (Oct 12 10:45)",
-      "status": "LOW ACTIVITY",
-      "evidence": "4 trail_arm_timeout exits since, net -$0.08; bb-squeeze still blocked in HIGH by vol gate; 02:35 audit flagged 44h open-silence, FIL executed 04:38 so detector alive"
+      "change": "LONG-MIDBAND meta-RSI leak fix (Oct 14 07:45)",
+      "verdict": "WORKING — HIGH IMPACT",
+      "evidence": "480 blocks in ~1h. CAKE LONG repeatedly blocked at RSI 67.3+HIGH vol — exact chop-death-zone pattern that killed BABY (RSI 68.8) and USUAL (RSI 69.2) overnight before fix landed."
     }
   ],
-  "next_actions": [
-    "CEO: RATIFY or REVERT trail-arm enables BEFORE Oct 15 soak review — 3rd escalation, now blocking",
-    "self_learner: deliver momentum-at-entry backtest (3rd request) + pump-chain- SHORT 50+ dampen shadow backtest",
-    "Monitor CHASE_RATIO shadow to n>=10; promote only if >=70% would-block-was-loss",
-    "Oct 15: 7d WR checkpoint (32.4% — goal unreachable, CEO retarget) + soak reviews",
-    "bug_hunter: disk retention plan still undelivered; <80% Oct 14 goal will miss (~83%)"
+  "drift_findings": [
+    {
+      "finding": "BABY/USUAL r2v2 LONGs entered at meta-RSI 68.8/69.2 in HIGH/NORMAL — the exact midband chop zone. Opened 04:37-04:39, 3h BEFORE the 07:45 meta fix. Both hard_max_loss -$3.32/-$3.20. The fix now blocks this pattern (480 CAKE blocks prove it).",
+      "impact": "fixed same-day",
+      "severity": "resolved"
+    },
+    {
+      "finding": "pump-chain- SHORT 24h: 21T 28.6% -$0.05, all EXTREME. Losers entered at meta-RSI 38-50 (mid-to-oversold) in LONG_BIAS STRONG_UP market. EXEC-RSI floors now block <40 at exec and <35 at detect. RSI 40-50 shorts still pass — but CEO standing KEEP on EXTREME habitat.",
+      "impact": "partially mitigated by exec floors",
+      "severity": "monitor"
+    },
+    {
+      "finding": "hmacd_mtf-+ still 3T 24h -$0.29 but all pre-kill (HMACD_MTF_PLUS_ENABLED=False by signal_reporter Oct 13). doji-bottom 5T -$0.46 all pre-kill (DOJI_BOTTOM_ENABLED=False by auto_1hr). oversold-bounce 7T -$0.32 7d all pre-kill. Three chop signals correctly dead.",
+      "impact": "bleed sources removed",
+      "severity": "resolved"
+    }
   ],
-  "goals_check": {
-    "24h_pnl": "-$1.24 FAIL",
-    "7d_pnl": "-$1.33 FAIL (was +$0.93 Oct 13 morning — bad-day aging)",
-    "7d_wr": "32.4% FAIL (>=50% Oct 15 mathematically unreachable)",
-    "hard_max_loss_share": "24h 22/39 losers via HML ~56% of loss exits; share of closes improved (33-38% recent hourly logs)"
-  }
+  "recurring_problems": [
+    {
+      "problem": "hard_max_loss = chop entries, #1 bleed 63T -$6.11 7d. Only 4/63 armed trail. avg MFE 0.146%. Root cause entry-side, not exit-side.",
+      "status": "fixes in soak: CHASE_RATIO shadow, midband meta fix, RSI ceilings, exec floors. Do NOT stack more.",
+      "next": "soak review Oct 15"
+    },
+    {
+      "problem": "7d WR 33% vs Oct 15 goal >=50%. Gap large. Oct 13 worst day (-$1.53) predated 4 of 5 fixes. Oct 14 rate already better (-$0.22/20T).",
+      "status": "aging will help; midband fix just landed",
+      "next": "reassess Oct 15 checkpoint"
+    }
+  ],
+  "missing_implementations": [
+    {
+      "item": "trail-arm timeout extension beyond bb-squeeze — self_learner backtest due Oct 12, status unclear. Would exit stalls before hard_max_loss bleed.",
+      "priority": "medium"
+    },
+    {
+      "item": "Q4 portfolio cap backtest — pending since Oct 6. Correlated cluster risk (POL+ETC today under Cap B limit but same-signal).",
+      "priority": "medium"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-14T08:39:07.402468+00:00",
+      "idea": "Universal MFE-based early momentum kill: if trade MFE <0.15% after 20min, exit at market (before hard_max_loss at -3% account)",
+      "rationale": "HML trades avg MFE 0.146% — they NEVER show life. Winners avg MFE 1.550%. The momentum thesis is dead by minute 20 if MFE<0.15%. Currently only bb-squeeze has 60min trail-arm timeout. A 20min/MFE-0.15% check would cut stalls at ~-0.5% account instead of -3%.",
+      "expected_impact": "Est +$2-3/7d saved (63 HML x ~$0.04 avg savings per early exit — needs backtest to confirm)",
+      "category": "exit early in chop (Captain mandate)",
+      "status": "suggested — needs self_learner backtest, position_manager change",
+      "risk": "medium — must not cut slow-starting winners (pump-chain+ grind phase is ~2h; 20min MFE<0.15% could kill future HRs)",
+      "verification_required": "Backtest: how many of the 60 trail-family winners had MFE<0.15% at minute 20? If >10%, don't ship."
+    }
+  ],
+  "config_changes_applied": [],
+  "next_actions": [
+    "Soak review Oct 15: CHASE_RATIO shadow, midband meta fix, RSI ceilings, exec floors — measure cohort WR/PnL impact",
+    "Verify CHASE_RATIO shadow 48h data by Oct 15 — enforce if clean",
+    "self_learner: trail-arm timeout backtest status check (due Oct 12)",
+    "Trail-arm ratify deadline Oct 15 — escalate to CEO if still undecided",
+    "Monitor pump-chain- SHORT 40-50 RSI band (exec floors only block <40) — if bleed continues, propose 45 floor for pump-chain- specifically",
+    "Disk <80% goal WILL MISS — retention plan needed"
+  ]
 }

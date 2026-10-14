@@ -4427,5 +4427,25 @@
     "status": "rejected",
     "risk": "n/a",
     "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-14T07:50:00Z",
+    "idea": "Impulse gate: block entries when |5m price change| < 0.15% at detection (consolidation = no trail fuel). Complements CHASE_RATIO shadow (|m5|/|m15|>0.7 chase block) — together they bracket the enterable window: started-but-not-finished moves only.",
+    "rationale": "Trail family 7d: 55T +$5.84 81.8% WR (impulse present, trail arms). Chop family 7d: 102T -$8.95 0% WR (flat consolidations, never reach +0.40%). hard_max_loss #1 bleed 64T -$6.17 = the flat-entry cohort. Fundamental truth: chop entries are wrong-side trades.",
+    "expected_impact": "~+$1.8/7d if blocks 30% of HML without touching trail winners (pending backtest)",
+    "category": "entry sniper",
+    "status": "delegated_backtest",
+    "delegate": "self_learner",
+    "risk": "medium — threshold unvalidated; must verify winner-block <20% on 30d before any ship"
+  },
+  {
+    "date": "2026-10-14T08:39:07.402468+00:00",
+    "idea": "Universal MFE-based early momentum kill: if trade MFE <0.15% after 20min, exit at market (before hard_max_loss at -3% account)",
+    "rationale": "HML trades avg MFE 0.146% — they NEVER show life. Winners avg MFE 1.550%. The momentum thesis is dead by minute 20 if MFE<0.15%. Currently only bb-squeeze has 60min trail-arm timeout. A 20min/MFE-0.15% check would cut stalls at ~-0.5% account instead of -3%.",
+    "expected_impact": "Est +$2-3/7d saved (63 HML x ~$0.04 avg savings per early exit — needs backtest to confirm)",
+    "category": "exit early in chop (Captain mandate)",
+    "status": "suggested — needs self_learner backtest, position_manager change",
+    "risk": "medium — must not cut slow-starting winners (pump-chain+ grind phase is ~2h; 20min MFE<0.15% could kill future HRs)",
+    "verification_required": "Backtest: how many of the 60 trail-family winners had MFE<0.15% at minute 20? If >10%, don't ship."
   }
 ]

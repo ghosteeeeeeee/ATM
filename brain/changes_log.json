@@ -1188,5 +1188,27 @@
     "after": "after live-RSI hard-floor check, detect RSI < _exec_hard_floor (40 pump-chain / 35 global) → SKIP with EXEC-RSI-DETECT-FLOOR log",
     "rationale": "14d hole cohort 8T 2W +$0.08 vs 6L -$0.54 = net -$0.46. bug_hunter PASS 10/10. Root-cause fix (bypass path alignment), not a new filter — context gate already had this check for non-bypass signals. 8 guard cases pass, py_compile OK.",
     "impact": "Expected +$0.46/14d from blocked short-into-bounce entries. Blocks CC-type dust winners (+0.07) as accepted cost. Loads next decider subprocess cycle (fresh process per minute)."
+  },
+  {
+    "timestamp": "2026-10-14T07:45:00Z",
+    "agent": "brain_auditor",
+    "change": "LONG-MIDBAND meta-RSI leak fix: prefer signal_metadata.rsi_14 over live-5m compute_rsi (live-5m let USUAL meta=69.2/live=58.1 and BABY meta=68.8 through; both hard_max_loss)",
+    "type": "bugfix",
+    "file": "scripts/signal_compactor.py",
+    "before": "midband used compute_rsi(tkn, tf=5m) only — diverges from meta-rsi_14 basis of the Oct-11 backtest",
+    "after": "meta rsi_14 preferred, live-5m fallback when metadata absent; log tagged meta-source",
+    "rationale": "Completes Oct-11 ratified midband filter (LONG_MIDBAND_NON_EXTREME_BLOCK). Impact verified: 7d net +$0.71, 14d +$2.06, 30d +$4.65; winner-block 9/49=18.4% < 20% threshold; USUAL/BABY smoke-gun. Not a new filter — existing filter was under-enforcing due to RSI source mismatch (DRIFT-E class).",
+    "impact": "Blocks LONG meta-RSI 60-70 non-EXTREME (chop death zone). Expected ~+$0.71/7d saved. EXTREME exempt, bb-squeeze exempt (unchanged)."
+  },
+  {
+    "timestamp": "2026-10-14T08:39:13Z",
+    "agent": "brain_auditor",
+    "change": "Report-only run — 0 config changes. Verified 5 prior fixes all live and firing (midband meta fix 480 blocks/hr, exec-RSI floors 3 blocks, CHASE_RATIO shadow 3 fires, volume-breakout kill 0 trades, pump-chain RSI_MAX cutting correct band). Oct 13 bleed (-$1.53 worst day) predated fixes. Soak discipline: do not stack.",
+    "type": "report",
+    "file": "none",
+    "before": "n/a",
+    "after": "n/a",
+    "rationale": "5 fixes landed in prior 18h, all verified working. Stacking more violates soak discipline and CEO escalation (4 fixes in soak).",
+    "impact": "No new change. Prior fixes expected to recover WR as Oct 13 ages out of window."
   }
 ]

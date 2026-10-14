@@ -4189,12 +4189,25 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # squeeze LONG habitat (filter collision — brain_auditor 2026-10-12).
             if direction == 'LONG' and LONG_MIDBAND_NON_EXTREME_BLOCK and 'bb-squeeze' not in (src or ''):
                 try:
-                    _lmb_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
-                    if _lmb_rsi is not None and LONG_MIDBAND_RSI_MIN <= _lmb_rsi <= LONG_MIDBAND_RSI_MAX:
+                    # FIX brain_auditor 2026-10-14: prefer meta rsi_14 (the basis of the
+                    # midband backtest) — live-5m compute_rsi diverges (USUAL meta=69.2 vs
+                    # live-5m=58.1 at entry; BABY meta=68.8 walked through). Fallback live.
+                    _lmb_rsi = None
+                    _lmb_meta = entry.get('signal_metadata')
+                    if _lmb_meta:
+                        try:
+                            import json as _json_lmb
+                            _lmb_md = _json_lmb.loads(_lmb_meta) if isinstance(_lmb_meta, str) else (_lmb_meta if isinstance(_lmb_meta, dict) else {})
+                            _lmb_rsi = _lmb_md.get('rsi_14')
+                        except Exception:
+                            _lmb_rsi = None
+                    if _lmb_rsi is None:
+                        _lmb_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lmb_rsi is not None and LONG_MIDBAND_RSI_MIN <= float(_lmb_rsi) <= LONG_MIDBAND_RSI_MAX:
                         _lmb_atr = _get_atr_pct(tkn)
                         _lmb_vreg = _classify_volatility(_lmb_atr) if _lmb_atr is not None else 'NORMAL'
                         if _lmb_vreg != 'EXTREME':
-                            log(f"  🚫 [LONG-MIDBAND] {tkn}: LONG blocked — RSI {_lmb_rsi:.1f} in {LONG_MIDBAND_RSI_MIN}-{LONG_MIDBAND_RSI_MAX} + {_lmb_vreg} vol (chop death zone; EXTREME only)")
+                            log(f"  🚫 [LONG-MIDBAND] {tkn}: LONG blocked — RSI {float(_lmb_rsi):.1f} in {LONG_MIDBAND_RSI_MIN}-{LONG_MIDBAND_RSI_MAX} + {_lmb_vreg} vol (chop death zone; EXTREME only; meta-source)")
                             continue
                 except Exception:
                     pass  # non-fatal
