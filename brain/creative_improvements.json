@@ -4332,5 +4332,59 @@
     "category": "entry sniper / bypass consistency",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-13T23:49:35.223048+00:00",
+    "idea": "atr_sl_hit bleed migration watch — as hard_max_loss rate fell 49%→37.5%, atr_sl_hit rose to 25% of exits (14T 0W −$1.06). The soak may be REDISTRIBUTING chop deaths from hard_max_loss to atr_sl rather than eliminating them. Track combined (hard_max_loss + atr_sl_hit) rate as the true chop metric at Oct 15 review.",
+    "rationale": "Exit-reason substitution is a known failure mode of timeout fixes. Combined metric catches it; per-reason metrics hide it.",
+    "expected_impact": "Diagnostic — prevents false 'hard_max_loss fixed' conclusion if atr_sl absorbs the bleed.",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "zero (no code change, just tracking lens)"
+  },
+  {
+    "date": "2026-10-13T23:49:35.223048+00:00",
+    "idea": "Regime-weighted sizing (NEUTRAL-only full size): NORMAL regime is the ONLY 7d profitable regime (29T 55.2% +$0.99) vs EXTREME 28.2% −$0.14 and HIGH 38.7% −$0.73. Instead of blocking EXTREME/HIGH entries (kills winners), size them down — e.g. 0.5x in EXTREME, 0.75x in HIGH, 1.0x in NORMAL. Position-manager lever, not a signal filter.",
+    "rationale": "Every trade should still be a winner-capable setup; chop-regime trades get smaller capital at risk. Preserves all entries, reduces bleed magnitude.",
+    "expected_impact": "If sustained: ~50% reduction on EXTREME/HIGH losing dollars (~−$0.43/7d saved) with full participation in NORMAL profits.",
+    "category": "risk scaling",
+    "status": "suggested",
+    "risk": "low — needs CEO/position_manager implementation, one lever at a time"
+  },
+  {
+    "date": "2026-10-14T01:30:00Z",
+    "idea": "MOMENTUM-AT-ENTRY GATE: block trades with |price_change_5m| < 0.15% at entry",
+    "rationale": "MFE analysis proves 87% of hard_max_loss trades have avg MFE 0.08-0.26% (never reach +0.40% trail activation). Winners avg MFE 0.55-3.04%. A 5m momentum floor would block chop entries while preserving trend entries. Complements CHASE_RATIO shadow (blocks chasing) — this blocks no-momentum entries.",
+    "expected_impact": "Block ~40-60% of hard_max_loss trades (62T/7d -$5.93). Preserve trail winners.",
+    "category": "entry sniper",
+    "status": "suggested — NEEDS BACKTEST (self_learner)",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-14T01:30:00Z",
+    "idea": "CONFIDENCE STACK BUG: cap confidence at 200 — BABY pump-chain+ fired at conf=499.4",
+    "rationale": "Multiplied confidence stack produces absurd values (499.4, 334.0, 261.7). High-conf trades don't win more. Multiplier stack is broken — double-counting or missing cap.",
+    "expected_impact": "No direct PnL impact. Fixes data quality, prevents false high-conviction signals.",
+    "category": "bug fix",
+    "status": "suggested — needs bug_hunter audit",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-14T02:35:00Z",
+    "idea": "SIGNAL-HABITAT MATRIX DAMPEN (per signal×regime cell, n>=20 guard)",
+    "rationale": "pump-chain+ EXTREME +$0.99 profit engine vs ai-trader+ EXTREME -$0.24 — regime not monolithic, blanket blocks collision-kill winners",
+    "expected_impact": "Cut non-pump-chain EXTREME bleed ~$0.6/7d without touching flagship",
+    "category": "regime surgical",
+    "status": "suggested",
+    "risk": "low with n-guard"
+  },
+  {
+    "date": "2026-10-14T02:35:00Z",
+    "idea": "RECONFIRM momentum-at-entry gate |m5|<0.15% — brackets entry window with CHASE_RATIO shadow",
+    "rationale": "38/62 hard_max_loss die <30m zero-MFE; per-trade momentum is only fix shape safe for pump-chain+ EXTREME",
+    "expected_impact": "Block 40-60% of hard_max_loss 62T/7d -$5.93 pending backtest",
+    "category": "entry sniper",
+    "status": "suggested — self_learner backtest top priority",
+    "risk": "medium pre-backtest"
   }
 ]
