@@ -4492,5 +4492,15 @@
     "category": "regime",
     "status": "monitor",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-14T15:46:51Z",
+    "idea": "Asymmetric regime dampen: dampen LONG mult when BTC 15m SHORT_BIAS AND continuum BELOW (both bear), boost SHORT mult in same state — follow the trend instead of fighting it",
+    "rationale": "24h LONG -$0.79 26.1%WR vs SHORT +$0.33 41.2%. 7d TRAIL (trend-following) +$6.82 87%WR vs CHOP_HML -$6.04 0%. The system's edge IS trend-following; the LONG bleed is counter-trend entries during bear structure. Not a time block — a structural direction gate tied to the prevailing trend. Complements the LONG_SHORT_BIAS_DAMPEN shadow already shipped (which only dampens LONG).",
+    "expected_impact": "suppress ~50% of LONG counter-trend losers; preserve SHORT winners",
+    "category": "trend-follow / direction alignment",
+    "status": "suggested",
+    "risk": "medium — needs shadow data before enforce; must not block LONG in EXTREME capitulation bounces",
+    "verification": "backtest required: 7d/14d both-bear-state LONG cohort WR vs neutral; check filter collision with existing SHORT gates"
   }
 ]

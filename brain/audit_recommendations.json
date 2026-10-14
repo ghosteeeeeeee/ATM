@@ -1,104 +1,153 @@
 {
-  "timestamp": "2026-10-14T14:45:06Z",
-  "session_brain_stats": {
-    "note": "queried; embeddings loaded; chop/wrong-side/r2v2 topics reviewed"
+  "timestamp": "2026-10-14T15:46:51Z",
+  "agent": "brain_auditor",
+  "session_lock": "FREE",
+  "portfolio_health": "critical (watchdog)",
+  "regime": {
+    "btc_15m": "SHORT_BIAS",
+    "btc_4h": "LONG_BIAS",
+    "continuum": "BELOW",
+    "volatility": "LOW",
+    "market_phase": "DECLINING",
+    "trend_quality": "UP"
   },
-  "trade_summary_24h": {
-    "closed": 44,
-    "wins": 12,
-    "pnl_usdt": -0.93,
-    "wr_pct": 27.3,
+  "trade_summary": {
+    "24h": {
+      "trades": 40,
+      "pnl": -0.46,
+      "wr": 32.5,
+      "long": "23T -$0.79 26.1%",
+      "short": "17T +$0.33 41.2%"
+    },
     "7d": {
-      "closed": 187,
-      "wins": 65,
-      "pnl_usdt": -0.87,
-      "wr_pct": 34.8
+      "trades": 188,
+      "pnl": -0.73,
+      "wr": 35.1,
+      "note": "flipped negative"
     },
-    "48h_direction": {
-      "LONG": "62T 24.2% -$2.12",
-      "SHORT": "30T 33.3% -$0.04"
-    },
-    "48h_exits": {
-      "hard_max_loss": "33T 0% -$2.83",
-      "profit_monster_trail": "14T 92.9% +$0.86",
-      "atr_trail_hit": "10T 80% +$1.63"
-    },
-    "open": "ETC SHORT volume-buildup- +1.49% (hold)"
+    "open": 2,
+    "by_exit_24h": {
+      "hard_max_loss": "9T -$0.76 0%WR",
+      "atr_sl_hit": "11T -$0.73 0%WR",
+      "profit-monster-trail": "9T +$0.76 100%WR",
+      "atr_trail_hit": "5T +$0.39 60%WR"
+    }
   },
-  "drift_findings": [
+  "chop_vs_trend_7d": {
+    "TRAIL_FAMILY": {
+      "n": 62,
+      "pnl": 6.82,
+      "wr": 87.1
+    },
+    "CHOP_HML": {
+      "n": 63,
+      "pnl": -6.04,
+      "wr": 0.0
+    },
+    "OTHER": {
+      "n": 63,
+      "pnl": -1.51,
+      "wr": 19.0
+    },
+    "MFE_winners": {
+      "n": 57,
+      "avg_mfe": 1.55,
+      "trail_armed_pct": 77.2
+    },
+    "MFE_losers": {
+      "n": 120,
+      "avg_mfe": 0.444,
+      "trail_armed_pct": 10.0
+    }
+  },
+  "changes_from_last_run_verified": [
     {
-      "severity": "HIGH",
-      "finding": "pump-chain- EXTREME habitat now 35%WR -$0.24/14d (was KEEP at 51.6%). CEO standing KEEP may be stale.",
-      "action": "CEO decision — do not unilateral revert"
+      "item": "LONG_MIDBAND meta-source fix (signal_compactor:4190)",
+      "status": "WORKING",
+      "evidence": "495 LONG-MIDBAND blocks; 0 midband LONGs opened after 07:50 fix. USUAL/BABY were pre-fix."
     },
     {
-      "severity": "INFO",
-      "finding": "doji-bottom blanket kill Oct 13 was over-broad — non-EXTREME 60%WR positive",
-      "action": "FIXED: re-enabled with EXTREME already gated"
+      "item": "LONG_RSI_CEILING meta-source fix (12:48 commit d5b6f422)",
+      "status": "WORKING",
+      "evidence": "444 ceiling blocks; FOGO/BLUR blocked with meta-source tag. SEI@84 was pre-fix."
     },
     {
-      "severity": "INFO",
-      "finding": "LONG_MIDBAND meta-source + ceiling fixes landed today; post-12:48 n=1, cohort too small to verify",
-      "action": "monitor 48h"
+      "item": "volume-buildup+ LONG kill (09:15)",
+      "status": "WORKING",
+      "evidence": "steer-003 addressed; VOLUME_BUILDUP_PLUS_ENABLED=False; 0 trades since."
+    },
+    {
+      "item": "trail_arm_timeout (45m)",
+      "status": "WORKING",
+      "evidence": "5 fires 7d net -$0.10; correct chop-early-exit."
+    },
+    {
+      "item": "SHORT_RSI_HARD_FLOOR=35 monitor",
+      "status": "HOLD",
+      "evidence": "n=20 +$0.12 35%WR; revert trigger (10+ losers >$1) NOT met."
+    },
+    {
+      "item": "doji-bottom re-enable (14:44)",
+      "status": "MONITOR",
+      "evidence": "0 trades yet; EXTREME gated."
+    },
+    {
+      "item": "LONG_SHORT_BIAS_DAMPEN shadow (14:44)",
+      "status": "SHADOW",
+      "evidence": "condition ACTIVE now (BTC LEAN_BEAR + BELOW); no enforce yet, 0 shadow fires logged."
     }
   ],
-  "recurring_problems": [
-    "Counter-trend LONG in SHORT_BIAS/BELOW-EMA300 market — 48h #1 bleed source",
-    "hard_max_loss = chop entries (0% WR) vs trail = trend entries (86% WR) — entry quality, not exit logic"
-  ],
-  "missing_implementations": [
-    "Velocity-SLOW entry gate (watchdog steer) — deferred; CHASE_RATIO shadow partially covers chase pattern",
-    "Token-level SHORT_BIAS scan (>60% tokens) dampen — BTC continuum proxy shipped instead (simpler, same thesis)"
-  ],
-  "creative_improvements": [
-    {
-      "idea": "LONG-SHORT-BIAS shadow dampen (BTC BELOW+BEAR)",
-      "status": "shipped_shadow"
+  "config_change_this_run": {
+    "change": "cell_stats wiring key-mismatch fix (commit 0ebfd16b)",
+    "problem": "Landed 15:34 by another agent; 0 CELL-STATS logs in 20min = silent noop. Normalized key hit WRONG cell_stats row: pump_chain (63.6%WR tradeable, n=22) vs real live signal pump-chain+ (45.9%WR losing, n=85). On a match it would BOOST a losing cell.",
+    "fix": "exact-key match first (signal_type then source), underscore-normalized only as fallback",
+    "verified": "pump-chain+ HIGH → 0.5x dampen (36.7%WR n=30); bb-squeeze+ NORMAL → 1.2x boost (68.4%WR n=19 tradeable); r2-trend-long4 → source-key r2_trend_long 1.2x"
+  },
+  "losing_trade_autopsy_24h": {
+    "cluster_1": {
+      "signal": "volume-buildup+ LONG",
+      "trades": "ETC/MON/POL",
+      "pnl": "-$0.26",
+      "root_cause": "NORMAL-regime chop entries, conf 45-46, trail never armed (13-22min holds), all hard_max_loss",
+      "fix": "KILLED 09:15 — already addressed"
     },
-    {
-      "idea": "pump-chain- EXTREME habitat drift monitor",
-      "status": "monitor_for_ceo"
+    "cluster_2": {
+      "signal": "r2v2-long3/long4 LONG",
+      "trades": "USUAL/BABY",
+      "pnl": "-$0.24",
+      "root_cause": "meta-RSI 68-69 midband death zone (60-70 non-EXTREME); live-5m RSI passed them (DRIFT-E)",
+      "fix": "midband meta-source fix — already addressed"
+    },
+    "cluster_3": {
+      "signal": "r2-trend-long4 LONG",
+      "trades": "SEI",
+      "pnl": "-$0.23",
+      "root_cause": "meta-RSI 84.21 overbought chase; ceiling used live-5m=53.9 (DRIFT-E)",
+      "fix": "ceiling meta-source fix — already addressed"
+    },
+    "cluster_4": {
+      "signal": "pump-chain- SHORT",
+      "trades": "LDO/ALGO/CRV",
+      "pnl": "-$0.31",
+      "root_cause": "EXTREME regime whipsaw; 45-55 meta-RSI band",
+      "status": "MONITOR — CEO KEEP on EXTREME, n small"
     }
-  ],
-  "config_changes_applied": [
+  },
+  "directional_diagnosis": "LONGS are the bleed (-$0.79 24h, 26.1% WR) while SHORTS print (+$0.33, 41.2%). BTC 15m SHORT_BIAS + continuum BELOW. We are on the wrong side of LONG entries during a bear structure. The three biggest LONG losers (volume-buildup+, r2v2 midband, SEI overbought) are ALL fixed today — cohort needs to age in.",
+  "rejected_ideas": [
     {
-      "file": "hermes_constants.py",
-      "change": "DOJI_BOTTOM_ENABLED False→True",
-      "type": "config"
+      "idea": "Revert SHORT_RSI_HARD_FLOOR 35→45",
+      "reason": "monitor n=20 +$0.12, trigger not met"
     },
     {
-      "file": "hermes_constants.py + signal_compactor.py",
-      "change": "LONG_SHORT_BIAS_DAMPEN_SHADOW shadow gate",
-      "type": "shadow"
-    }
-  ],
-  "changes_from_last_run": [
-    {
-      "change": "LONG-MIDBAND meta-source (07:45)",
-      "status": "live",
-      "note": "post-fix LONG cohort 7T 3W -0.26 42.9% — better than 24h base 27%, n=7"
-    },
-    {
-      "change": "LONG-RSI-CEILING meta-source + EXEC ceiling (12:48)",
-      "status": "live",
-      "note": "n=1 post-land — need 48h"
-    },
-    {
-      "change": "EXEC-RSI-DETECT-FLOOR (Oct 13)",
-      "status": "live",
-      "note": "cohort aging in"
-    },
-    {
-      "change": "CHASE_RATIO shadow (Oct 13)",
-      "status": "shadow_active",
-      "note": "3 shadow fires logged, 0 enforce (correct)"
+      "idea": "Stack new LONG entry filters",
+      "reason": "7 fixes in soak today; stacking invalidates measurements"
     }
   ],
   "next_actions": [
-    "48h: review LONG-SHORT-BIAS shadow fire count + counterfactual PnL; CEO decide enforce",
-    "Monitor doji-bottom non-EXTREME cohort (revert if n>=10 flips negative)",
-    "CEO: pump-chain- EXTREME drift decision (35% WR 14d vs KEEP order)",
-    "Oct 15: 7d WR checkpoint (currently 34.8% vs ≥50% goal — gap large)",
-    "ETC SHORT: hold — trail thesis intact"
+    "Oct 15 soak review: PUMP_CHAIN_LONG_RSI_MAX=70, volume-breakout kill, chase-ratio shadow, ceiling+midband meta fixes, volume-buildup+ kill",
+    "Watch LONG_SHORT_BIAS_DAMPEN shadow fires (condition active now) — enforce only after 48h data + CEO",
+    "Trail-arm ratify still pending CEO (overdue — decide before Oct 15)",
+    "Monitor cell_stats CELL-STATS logs now that key fix shipped"
   ]
 }
