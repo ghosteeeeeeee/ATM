@@ -1,53 +1,73 @@
 {
-  "timestamp": "2026-10-13T15:50:41.340208+00:00",
+  "timestamp": "2026-10-14T06:50:47.408604+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 17/20 recent trades lost",
-      "detail": "Win rate 15% over last 20 trades. Total PnL: -0.91 USDT. Something is wrong.",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 20% over last 20 trades. Total PnL: -0.33 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "health",
-      "title": "13 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "category": "cluster",
+      "title": "Trade cluster: GMX + ALGO",
+      "detail": "Both opened within 0 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
     },
     {
       "severity": "warning",
-      "category": "health",
-      "title": "Signal 'pump-chain-' losing streak: 8 losses",
-      "detail": "Net -0.35 USDT over last 20 trades (losses: -0.59). Consider disabling or tuning this signal.",
+      "category": "cluster",
+      "title": "Trade cluster: GMX + FOGO",
+      "detail": "Both opened within 2 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-003"
     },
     {
       "severity": "warning",
-      "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 3 losses",
-      "detail": "Net -0.26 USDT over last 20 trades (losses: -0.26). Consider disabling or tuning this signal.",
+      "category": "cluster",
+      "title": "Trade cluster: ALGO + FOGO",
+      "detail": "Both opened within 2 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-004"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "8 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "auto_executable": false,
+      "id": "steer-005"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'bb-bounce-v2-long+' losing streak: 3 losses",
+      "detail": "Net -0.11 USDT over last 20 trades (losses: -0.19). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-006"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
     "btc_15m": "SHORT_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "btc_4h": "LONG_BIAS",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "linreg_alignment": 0.0,
     "wyckoff_phase": "UNKNOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 1
+  "open_count": 3,
+  "deep_analysis": "CRV SHORT wins the pick \u2014 only precheck PASS, RSI 36.5 in the profitable 35-45 short band, regime SHORT_BIAS (76.6 conf). Writing signal and merging analysis.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 3 (2 long, 1 short) \u2014 slots used 3/6\nUnrealized PnL: +0.03 USDT\nRegime: SHORT_BIAS (15m STRONG_DOWN) | Volatility: LOW\nConflict: BTC 15m SHORT_BIAS vs 4h LONG_BIAS \u2014 alt aggregate 38 SHORT / 5 LONG\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent] 12/20 recent trades lost (20% WR). LONG RSI 65-75 chase is the killer: n=12, -$0.72, 8% WR (USUAL 69.2, BABY 68.8, RESOLV 80.0 all hard_max_loss). Every one of those had the same winning side: SHORT the rejection or no-trade.\n\ud83d\udd34 [urgent] FOGO LONG (RSI 62.5) + GMX LONG (RSI 57.1) are fighting the 15m STRONG_DOWN tape. If either stalls flat past 1-2h, exit early \u2014 don't wait for hard_max_loss (chop exits never reach trail, 0% WR family).\n\ud83d\udfe2 [info] ALGO SHORT is the only position on the right side: regime-aligned, RSI 44 in the sole profitable short band (35-45: n=18 +$0.10 33% WR), +0.42%. Holding.\n\ud83d\udfe2 [info] AI Trader fired: CRV SHORT conf=72 @ 0.33446. RSI 36.5 good band, SHORT_BIAS 76.6, ATR 1.19%, only precheck ALL-PASS. Rejected BAD candidates: BLUR (30d SHORT WR 16.7%), ALT (PENALTY), INJ (RSI 54.7 bad band).\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nWe keep entering chop and calling it setups. 5 of the last 20 closes hit hard_max_loss \u2014 trades that never reached +0.40% for trail to arm. That's the 0% WR family: entries during consolidation, not after impulse. The 24h RSI map (meta_rsi, verified): LONG 65-75 = -$0.72 bleed; SHORT 45-55 = -$0.31 bleed; only SHORT 35-45 and LONG 55-65 pay anything. doji-bottom-long is 0/5 catching knives at avg RSI 32.5 \u2014 every dump is a SHORT, not a knife-catch.\n\nRight now: 2 of 3 open positions are LONG into STRONG_DOWN. Not fatal on the 4h, but the immediate tape says those two need to prove thesis fast. ALGO SHORT is doing exactly what right-side trading looks like.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Let CRV SHORT fill \u2014 first regime-aligned, good-RSI-band setup this cycle.\n2. Early-exit FOGO/GMX if flat past ~1-2h. Don't donate to hard_max_loss.\n3. Kill the LONG 65-75 chase at the source (r2v2-long*, volume-breakout-long+ firing at overbought). That's brain-auditor territory but it's the #1 bleed.\n4. Prefer SHORT 35-45 band entries while 15m stays SHORT_BIAS.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
+  "regime_context": "BTC: AT EMA300 (price 83405 vs ema 83527), 15m SHORT_BIAS, 4h LONG_BIAS \u2014 conflicting timeframes. Trend quality STRONG_DOWN on the live 1m feed. Velocity SLOW, acceleration NEGATIVE, zscore NEUTRAL (-1.08), volume LOW. Continuum: AT, wyckoff UNKNOWN, market phase RECOVERY, ewave W4.\n\nAlt universe (regime_5m, 123 scanned): 38 SHORT_BIAS / 5 LONG_BIAS / 80 NEUTRAL \u2192 overall SHORT_BIAS. Strong short-bias names: BLUR (95), ALT (79), CRV (76.6), AVAX/ALGO (~55).\n\nIMPLICATION: The immediate tape favors SHORTS. Our 2 open LONGs are counter-trend on the 15m. The 4h LONG_BIAS is why longs aren't instant death, but with STRONG_DOWN trend quality and negative acceleration, longs need to prove thesis fast or get out. Prefer SHORT setups in the 35-45 RSI band until 15m flips.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, last 24h, meta_rsi from _signal_metadata):\n\n1. LONG RSI 65-75 CHASE \u2014 n=12, total -$0.72, 8% WR (1/12). THE killer. Coins: USUAL (-0.12 @69.2), BABY (-0.12 @68.8), RESOLV (-0.04 @80.0), SAGA (0.00 @77.8). Winning side = SHORT or no-trade. We were on the wrong side longing into overbought in a STRONG_DOWN regime. Why: signals (r2v2-long*, volume-breakout-long+) fire on overbought momentum that has already run.\n\n2. SHORT RSI 45-55 BLEED \u2014 n=6, total -$0.31, 17% WR. Coins: ALT (-0.01 @53.3), CRV prior (-0.08 @50.0), PUMP (-0.09 @50.0). Winning side = wait for RSI to degrade into 35-45, or no-trade. Mid-band shorts are entering too early against residual bid.\n\n3. SHORT RSI 35-45 PROFIT \u2014 n=18, total +$0.10, 33% WR. ACE +0.30 @40.5 and +0.24 @42.3. This is the only short band paying. Aligned with 'every dump is a SHORT' when RSI confirms oversold-after-bounce.\n\n4. doji-bottom-long KNIFE-CATCH \u2014 n=5, 0% WR, avg RSI 32.5, -$0.46. Catching falling knives in a down regime. Winning side = SHORT the breakdown, not LONG the 'bottom'.\n\n5. hard_max_loss EXIT DOMINANCE \u2014 WLFI, USUAL, BABY, STX, PUMP all exited hard_max_loss. 52/56 hard_max_loss trades never reached +0.40% for trail. These are chop entries, not trend entries. Root cause: entering during consolidation instead of after impulse.\n\n6. bb-bounce-v2-long+ mixed \u2014 23 trades 60.9% WR but net only +$0.24; recent 6 = 33% WR -$0.15. Signal is fine in the 55-65 band (+$0.23 overall) but bleeding when it fires at 65+ or in chop.\n\nWHAT EACH LOSER'S WINNING SIDE LOOKED LIKE:\n- USUAL/BABY LONG @69: SHORT at rejection, or skip. RSI 69 in STRONG_DOWN = distribution, not accumulation.\n- ALT SHORT @53: wait for RSI <45 or skip. Bid still had fuel.\n- CRV SHORT @50: wait for 35-45. Same.\n- STX LONG @42 (ai-trader+): direction may have been right long-term but chop killed it before trail. Winning side was patience \u2014 no entry until impulse confirmed.\n- doji-bottom longs @32: SHORT breakdown. Every dump is a SHORT.",
+  "agent_timestamp": "2026-10-14T06:56:13.572796+00:00"
 }

@@ -158,22 +158,30 @@ If any WARN or CRITICAL issue found, append to `automation/error_alerts.md`:
 
 | Table | Purpose | Key Columns |
 |-------|---------|-------------|
-| `signal_outcomes` | ALL trade outcomes (open + closed) | token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, created_at, trade_id |
+| `signal_outcomes` | CLOSED trade outcomes only (rows inserted at close) | token, direction, signal_type, is_win, pnl_pct, pnl_usdt, confidence, created_at, closed_at, trade_id, exit_reason, regime, mfe_pct, mae_pct, entry_rsi_band |
 | `signals` | Current active signals | token, direction, signal_type, confidence, created_at |
 | `signal_history` | Historical signals | same as signals |
 | `token_speeds` | Token momentum speeds | token, speed_percentile |
 | `decisions` | Signal compactor decisions | token, direction, decision, created_at |
 
-**DO NOT query a table called `trades` — it does not exist.** Use `signal_outcomes` for trade data.
+**DO NOT query a table called `trades` — it does not exist here.** Use `signal_outcomes` for trade data.
+
+**Column name facts (verify against PRAGMA before inventing columns):**
+- Exit reason column is `exit_reason` — NOT `close_reason`, NOT `stop_reason`.
+- There is NO `is_open` column. `signal_outcomes` only contains closed trades.
+- Open positions live in PostgreSQL `trades` table (status='open'), not in this SQLite DB.
+- Timestamps: `created_at` = signal time, `closed_at` = trade close time. Use `closed_at` for "trades closed in period".
 
 ### Example queries:
 ```sql
--- Trades today
-SELECT signal_type, direction, COUNT(*), SUM(pnl_usdt), SUM(CASE WHEN is_win=1 THEN 1 ELSE 0 END)*100.0/COUNT(*)
-FROM signal_outcomes WHERE created_at > date('now') GROUP BY signal_type, direction;
+-- Trades closed today (use closed_at, not created_at)
+SELECT signal_type, direction, COUNT(*), ROUND(SUM(pnl_usdt),2), ROUND(SUM(CASE WHEN is_win=1 THEN 1 ELSE 0 END)*100.0/COUNT(*),1)
+FROM signal_outcomes WHERE pnl_usdt IS NOT NULL AND date(closed_at)=date('now') GROUP BY signal_type, direction;
 
--- Open trades (trade_id NOT in closed set)
-SELECT COUNT(*) FROM signal_outcomes WHERE trade_id NOT IN (SELECT trade_id FROM signal_outcomes WHERE pnl_usdt IS NOT NULL AND trade_id IS NOT NULL);
+-- Exit reason breakdown (last 24h)
+SELECT exit_reason, COUNT(*), ROUND(SUM(pnl_usdt),2)
+FROM signal_outcomes WHERE pnl_usdt IS NOT NULL AND closed_at > datetime('now','-24 hours')
+GROUP BY exit_reason ORDER BY 2 DESC;
 
 -- Recent signals
 SELECT token, direction, signal_type, confidence, created_at FROM signals ORDER BY created_at DESC LIMIT 10;

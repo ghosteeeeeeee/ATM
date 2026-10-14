@@ -4486,10 +4486,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _conn_vel.close()
                             except Exception:
                                 pass
-            # ── Pump-chain LONG velocity filter: block LONG when token 30m velocity negative ──
-            # Backtest: ALL 10 losses had negative 30m velocity at entry, ALL 26 winners had positive
-            # Catches reversals between signal creation and execution (e.g., GRASS +0.88% at signal → -1.60% at close)
+            # ── Pump-chain LONG velocity filter: block LONG when token 30m velocity declining ──
+            # D4 R4 deadband (CEO GO 2026-10-12): vel < PUMP_CHAIN_VEL_30M_MIN (-0.3%), not vel<0.
+            # Founding claim "ALL 10 losses neg vel / ALL 26 winners pos" FALSIFIED (AIXBT +4.59%
+            # entered at vel -0.21%). Mirror of SHORT_VEL_FILTER_VEL_THRESHOLD=0.3 precedent (Aug 16).
             if direction == 'LONG' and 'pump-chain' in (src or ''):
+                from hermes_constants import PUMP_CHAIN_VEL_30M_MIN
                 log(f"  🔍 [PUMP-CHAIN-VEL-CHECK] {tkn}: checking LONG velocity filter")
                 _conn_vel_30 = None
                 try:
@@ -4505,8 +4507,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if len(_vel_30_closes) >= 6 and _vel_30_closes[-1] > 0:
                         _vel_30m = (_vel_30_closes[0] - _vel_30_closes[-1]) / _vel_30_closes[-1] * 100
                         log(f"  🔍 [PUMP-CHAIN-VEL-CHECK] {tkn}: vel_30m={_vel_30m:+.3f}%")
-                        if _vel_30m < 0:
-                            log(f"  🚫 [PUMP-CHAIN-VEL] {tkn}: LONG blocked — 30m vel={_vel_30m:+.3f}% (token declining)")
+                        if _vel_30m < PUMP_CHAIN_VEL_30M_MIN:
+                            log(f"  🚫 [PUMP-CHAIN-VEL] {tkn}: LONG blocked — 30m vel={_vel_30m:+.3f}% < {PUMP_CHAIN_VEL_30M_MIN}% (token declining)")
                             continue
                 except Exception:
                     pass  # non-fatal
@@ -4516,9 +4518,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_vel_30.close()
                         except Exception:
                             pass
-            # ── Pump-chain SHORT velocity filter: block SHORT when token 30m velocity positive ──
-            # Mirror of LONG filter — SHORT needs price declining, block if rising
+            # ── Pump-chain SHORT velocity filter: block SHORT when token 30m velocity rising ──
+            # Mirror of LONG filter with same deadband (D4 R4): block if vel > +0.3%, not vel>0.
             if direction == 'SHORT' and 'pump-chain' in (src or ''):
+                from hermes_constants import PUMP_CHAIN_VEL_30M_MIN
                 try:
                     _conn_vel_30s = sqlite3.connect(CANDLES_DB, timeout=5)
                     _cur_vel_30s = _conn_vel_30s.cursor()
@@ -4531,8 +4534,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _cur_vel_30s.close()
                     if len(_vel_30_closes_s) >= 6 and _vel_30_closes_s[0] > 0 and _vel_30_closes_s[-1] > 0:
                         _vel_30m_s = (_vel_30_closes_s[0] - _vel_30_closes_s[-1]) / _vel_30_closes_s[-1] * 100
-                        if _vel_30m_s > 0:
-                            log(f"  🚫 [PUMP-CHAIN-VEL-SHORT] {tkn}: SHORT blocked — 30m vel={_vel_30m_s:+.3f}% (token rising)")
+                        if _vel_30m_s > -PUMP_CHAIN_VEL_30M_MIN:
+                            log(f"  🚫 [PUMP-CHAIN-VEL-SHORT] {tkn}: SHORT blocked — 30m vel={_vel_30m_s:+.3f}% > {-PUMP_CHAIN_VEL_30M_MIN:+.3f}% (token rising)")
                             continue
                 except Exception:
                     pass  # non-fatal
@@ -4941,6 +4944,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         # FIX (2026-09-11): Added 15m velocity check — catches bounce-in-progress.
                         pe_direction = pe.get('direction', '').upper()
                         if 'pump-chain' in pe_src:
+                            from hermes_constants import PUMP_CHAIN_VEL_30M_MIN
                             try:
                                 _pv_conn = sqlite3.connect(CANDLES_DB, timeout=5)
                                 _pv_cur = _pv_conn.cursor()
@@ -4953,10 +4957,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _pv_conn.close()
                                 if len(_pv_closes) >= 6 and _pv_closes[0] > 0 and _pv_closes[-1] > 0:
                                     _pv_vel_30m = (_pv_closes[0] - _pv_closes[-1]) / _pv_closes[-1] * 100
-                                    if pe_direction == 'LONG' and _pv_vel_30m < 0:
+                                    if pe_direction == 'LONG' and _pv_vel_30m < PUMP_CHAIN_VEL_30M_MIN:
                                         log(f"  🚫 [PRESERVE-PUMP-CHAIN-BLOCK] {pe['token']} LONG preserved — 30m vel={_pv_vel_30m:+.3f}% (token declining)")
                                         continue
-                                    if pe_direction == 'SHORT' and _pv_vel_30m > 0:
+                                    if pe_direction == 'SHORT' and _pv_vel_30m > -PUMP_CHAIN_VEL_30M_MIN:
                                         log(f"  🚫 [PRESERVE-PUMP-CHAIN-BLOCK] {pe['token']} SHORT preserved — 30m vel={_pv_vel_30m:+.3f}% (token rising)")
                                         continue
                             except Exception:
@@ -5140,6 +5144,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # allowing wrong-direction entries (same class as PRESERVE bug).
                     # FIX (2026-09-11): Added 15m velocity check — catches bounce-in-progress.
                     if _rescue_ok and 'pump-chain' in (loser.get('source', '') or ''):
+                        from hermes_constants import PUMP_CHAIN_VEL_30M_MIN
                         try:
                             _pv_conn_r = sqlite3.connect(CANDLES_DB, timeout=5)
                             _pv_cur_r = _pv_conn_r.cursor()
@@ -5153,10 +5158,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             # 30m velocity check (6 x 5m candles) — sustained rise filter
                             if _rescue_ok and len(_pv_closes_r) >= 6 and _pv_closes_r[0] > 0 and _pv_closes_r[-1] > 0:
                                 _pv_vel_r = (_pv_closes_r[0] - _pv_closes_r[-1]) / _pv_closes_r[-1] * 100
-                                if direc.upper() == 'LONG' and _pv_vel_r < 0:
+                                if direc.upper() == 'LONG' and _pv_vel_r < PUMP_CHAIN_VEL_30M_MIN:
                                     _rescue_ok = False
                                     log(f"  🚫 [RESCUE-PUMP-CHAIN-VEL] {tok} LONG rescue blocked — 30m vel={_pv_vel_r:+.3f}% (token declining)")
-                                elif direc.upper() == 'SHORT' and _pv_vel_r > 0:
+                                elif direc.upper() == 'SHORT' and _pv_vel_r > -PUMP_CHAIN_VEL_30M_MIN:
                                     _rescue_ok = False
                                     log(f"  🚫 [RESCUE-PUMP-CHAIN-VEL] {tok} SHORT rescue blocked — 30m vel={_pv_vel_r:+.3f}% (token rising)")
                         except Exception:

@@ -9716,3 +9716,27 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 - Overtrade: 4/hr (limit 20)
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 07:15] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** −$0.03 (WR: 0.0%)
+
+**Details:**
+- GMX pump-chain+ LONG trail_arm_timeout −$0.02 (−0.25%)
+- IMX pump-chain+ LONG atr_trail_hit −$0.01 (−0.40%)
+- 24h: 63T 17W −$1.21 (27.0% WR)
+- Open: 2
+- Kill switch: live_trading=true verified
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: pump-chain+ 2T 0W this hour (needs 3+T 0W); 24h pump-chain+ actually +$0.31 profitable — no kill
+- 24h watch: doji-bottom-long 5T 0W −$0.46, volume-breakout-long+ 4T 0W −$0.25, hmacd_mtf 5T 1W −$0.33 — all 0-fire this hour
+- hard_max_loss 23/63 = 36.5% under 40% threshold; atr_sl_hit 16/63 = 25.4% under 40%, tpsl_utils stable
+- Entry quality: winners 24h MAE avg 0.119% (max 0.316%) — well under 0.5%, entries fine
+- Streak: hours 04 −$0.06, 05 −$0.25, 06 −$0.05, 07 −$0.02 = 4 neg hrs; regime EXTREME 43/HIGH 9/NORMAL 9, not NEUTRAL → size lever N/A
+- Overtrade: 2/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction

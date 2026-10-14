@@ -755,3 +755,72 @@
 - **ROOT CAUSE**: RSI mismatch — brain.py uses `signal_rsi_14` from detection-time metadata (22.22), signal_compactor/decider_run compute live RSI (46-50) which passes HARD_FLOOR 35. Compactor keeps re-approving; brain.py keeps rejecting.
 - **AUTO-FIX**: Added hotset failure cooldown check to main exec loop (decider_run.py:4012-4021). 2+ same-direction failures in 1hr → block for 1hr with SKIPPED mark. Matches BUG-049 intent.
 - **INFO**: Disk 83% (threshold 85%). Prices fresh (1m candles <1min, 100 tokens). All 3 timers active. Macro gate REDUCE (wr=15%).
+
+## Error Alerts — 2026-10-13 22:01 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+
+## Error Alerts — 2026-10-13 23:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (530s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (491s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (432s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (376s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (296s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (245s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (177s left, N failures)`
+
+## Error Alerts — 2026-10-14 00:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+TOK, allowing despite TOK filter`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor (detect): N.N < N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: CC TOK (count=N)`
+
+## Error Alerts — 2026-10-14 01:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3539s left, N failures)`
+
+## Error Alerts — 2026-10-14 02:01 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-14 02:48 UTC
+- **[WARN]** (1x): `disk 84% used` — 19G free on 118G disk. Approaching 85% WARN threshold.
+- **AUTO-FIX**: None needed yet. Will compress logs >7d when disk crosses 85%.
+- **[WARN]** (1x): `hermes-bug-hunter.service failed` — code quality scanner exits 1, reports pre-existing issues (bare excepts, cursor leaks, hardcoded passwords). Non-critical.
+- **AUTO-FIX**: None. Timer still active, will retry in 8h.
+- **[INFO]**: `hermes-upgrade-implementer.service timeout` (Oct 13 18:17) — timed out during file scan. Timer still scheduled.
+- **AUTO-FIX**: None. Timer will retry in next 12h window.
+
+## Error Alerts — 2026-10-14 03:01 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3544s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3544s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3487s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3487s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3427s left, N failures)`
+
+## Error Alerts — 2026-10-14 04:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+TOK+TOK, allowing despite TOK filter`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-14 04:53 UTC
+- **[WARN]** (1x): `disk 84% used` — 19G free on 118G disk. Approaching 85% WARN threshold.
+- **AUTO-FIX**: Cleaned 5 old ATM zip backups + stale trend_ride_backtest.json from /tmp (~84M freed). Compress logs >7d when disk crosses 85%.
+- **[WARN]** (1x): `hermes-bug-hunter.service failed` — code quality scanner exits 1 by design when it finds issues (sqlite leaks, bare excepts, etc.). Pre-existing debt, not a new crash.
+- **AUTO-FIX**: `systemctl reset-failed hermes-bug-hunter.service` — clears failed state, timer still active, will retry in 8h.
+- **[WARN]**: `hotset empty — 0 tokens survived compaction` — signals generating (75 in last hour) but none passing compaction threshold right now. Monitor; may be normal low-activity period.
+- **AUTO-FIX**: None needed. Not a service failure.
+
+## Error Alerts — 2026-10-14 05:01 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] ME TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-14 07:01 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3547s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3490s left, N failures)`
