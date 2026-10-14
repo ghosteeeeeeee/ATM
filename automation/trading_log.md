@@ -10088,3 +10088,31 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 
 **Open Questions:**
 - Guardrail ESCALATE still active (48h WR ~29%) — watching, no action
+
+## [2026-10-14 22:15] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+
+**Details:**
+- Quiet hour — 0 closes, 0 open positions (3rd quiet in last 4 hours)
+- 24h: 39T 15W $0.00 net (38.5% WR, exactly breakeven)
+- 24h by reason: hard_max_loss 10/39=25.6% (−$0.82), atr_sl_hit 9/39=23.1% (under 40), profit trails 15/39=38.5% (+$1.42) — tpsl stable
+- 24h worst: volume-buildup+ 3T 0W −$0.26 (already killed 09:15, pre-kill only); volume-breakout-short- 2T 0W −$0.21 (needs 3+T to kill)
+- volume-buildup- SHORT: 4T 4W +$0.41 — still best signal 24h
+- Winners MAE avg 0.210% (entries fine, <0.5%)
+- live_trading=true, kill JSON=true
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no candidates (0 trades this hour)
+- atr_sl_hit 23.1% under 40% threshold — tpsl stable
+- Streak: +0.28, quiet, −0.02, quiet — no 3-neg
+- Overtrade: 0/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Guardrail ESCALATE still active (48h WR ~29-38%) — watching, no action
+- Trade frequency low (0-2/hr all day) — not overtrading, but system is quiet; regime may be range-bound
