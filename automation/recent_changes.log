@@ -4669,3 +4669,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-14 14:15] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W −$0.02 (HBAR pump-chain- hard_sl) | 24h 45T 12W −$1.05 (26.7%) | kill: none (max 1T 0W/signal, needs 3+) | volume-buildup+ remains killed (3T 0W 24h pre-kill) | hard_max_loss 26.7% (under 40) | atr_sl_hit 26.7% (tpsl stable) | overtrade 1/hr | streak no 3-neg | 1 open | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-14 15:15] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W +$0.14 (ETC volume-buildup- SHORT profit-monster-trail) | 24h ~43T 12W | kill: none (1T this hour, needs 3+T 0W) | volume-buildup+ remains killed (pre-kill trades only) | hard_max_loss 20.9% (under 40) | atr_sl_hit 27.9% (tpsl stable) | winners MAE avg 0.139% (entries fine) | overtrade 1/hr | streak positive (no 3-neg) | 2 open | live_trading=true, kill JSON=true
+BY: auto_1hr

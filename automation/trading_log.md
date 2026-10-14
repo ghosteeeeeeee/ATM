@@ -9901,3 +9901,26 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 - Overtrade: 1/hr (limit 20)
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 15:15] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.14 (WR: 100.0%)
+
+**Details:**
+- ETC volume-buildup- SHORT profit-monster-trail +$0.14 (+6.12%)
+- 24h: 43T 12W (by reason sums) −$0.52 net approx
+- 24h by reason: atr_sl_hit 12/43=27.9% (under 40), hard_max_loss 9/43=20.9% — both fine, tpsl stable
+- 24h worst (3+T 0W): volume-buildup+ 3T 0W −$0.26 (already killed 09:15, pre-kill trades only)
+- Winners MAE avg 24h: 0.139% — under 0.5%, entries fine
+- Open: 2 | live_trading=true verified
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no candidates (1T total this hour, needs 3+T 0W per signal)
+- atr_sl_hit 27.9% under 40% threshold
+- Streak: hour 13 −$0.02, hour 14 +$0.14 — positive, no 3-neg streak
+- Overtrade: 1/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
