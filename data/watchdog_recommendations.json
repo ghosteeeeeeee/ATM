@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-10-14T08:20:48.045014+00:00",
+  "timestamp": "2026-10-14T08:50:48.248442+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -0.14 USDT. Something is wrong.",
+      "title": "Losing streak: 14/20 recent trades lost",
+      "detail": "Win rate 20% over last 20 trades. Total PnL: -0.62 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: POL + ETC",
-      "detail": "Both opened within 5 minutes. Correlation risk.",
+      "category": "health",
+      "title": "9 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-002"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "7 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "title": "Signal 'volume-buildup+' losing streak: 3 losses",
+      "detail": "Net -0.26 USDT over last 20 trades (losses: -0.26). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-003"
     },
@@ -38,16 +38,16 @@
   "regime": {
     "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "ABOVE",
+    "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "MARKUP",
-    "market_phase": "CALM",
-    "trend_quality": "STRONG_UP"
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 2
+  "open_count": 0
 }

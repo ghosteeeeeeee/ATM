@@ -836,3 +836,7 @@
 - **AUTO-FIX**: `systemctl disable --now hermes-coding-mcp.service` — stopped the restart loop. Nothing listens on port 8765 (service never successfully started). Needs either restore of `run_mcp_server.py` or removal of the unit file.
 - **WARN** (1x): `hermes-upgrade-implementer.service` timed out at 06:16 UTC (killed by systemd after start timeout). One-off; next timer run in ~12h.
 - **NOTE**: Disk at 84% (19G free of 118G). Under 85% warn threshold but trending up — largest consumers: coin_tracker.db 3.3G, candles.db 2.8G, session_brain.db 1.3G, signals_hermes.db 1020M.
+
+## Error Alerts — 2026-10-14 09:01 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3549s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3542s left, N failures)`

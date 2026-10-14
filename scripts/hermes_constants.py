@@ -2475,7 +2475,7 @@ GRIND_BREAKOUT_V2_CONF_MACD_BONUS = 2      # +2 if MACD histogram rising
 # volume_buildup.py — like volume-breakout but requires SUSTAINED volume over N bars
 # Catches CHIP (+29%)/CFX (+20%) style: institutional accumulation, not single-bar spike
 VOLUME_BUILDUP_ENABLED = True             # master kill-switch
-VOLUME_BUILDUP_PLUS_ENABLED = True        # LONG direction
+VOLUME_BUILDUP_PLUS_ENABLED = False       # LONG direction — KILLED 2026-10-14 09:15 auto_1hr: 3T 0W last hour all hard_max_loss (ETC −3.86%, MON −4.70%, POL −3.25%), −$0.26 24h. Re-enable after fix.
 VOLUME_BUILDUP_MINUS_ENABLED = True       # SHORT direction
 VOLUME_BUILDUP_COOLDOWN_MINUTES = 15      # per token+direction cooldown (was 2h — too long for 5m timeframe signal)
 VOLUME_BUILDUP_BARS = 4                   # number of consecutive bars that must be above avg volume

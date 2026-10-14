@@ -9765,3 +9765,22 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 - Overtrade: 3/hr (limit 20)
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
+
+## [2026-10-14 09:15] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** −$0.26 (WR: 0.0%)
+
+**Details:**
+- ALL 3 were volume-buildup+ LONG → hard_max_loss: ETC −3.86%, MON −4.70%, POL −3.25%
+- 24h: 63T 17W −$0.85 (27.0% WR)
+- Open: 2 (volume-buildup- SHORT ×2)
+- Kill switch: live_trading=true verified
+
+**Changes:**
+1. `VOLUME_BUILDUP_PLUS_ENABLED = False` — kill rule: 3T 0W last hour, all hard_max_loss, −$0.26 24h. volume-buildup- (SHORT) left on.
+
+**No Change Needed:**
+- hard_max_loss 22/63 = 34.9% under 40% threshold; atr_sl_hit 17/63 = 27.0% under 40%, tpsl_utils stable
+- Overtrade: 3/hr (limit 20)
+- OpenMemory skipped per task instruction
