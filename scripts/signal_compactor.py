@@ -4227,14 +4227,27 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 except Exception:
                     pass  # non-fatal
             # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
-            # 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band).
-            # Does NOT block — only boosts. Trades already pass MIN_EXEC_CONFIDENCE.
+            # Meta band evidence: 30d LONG meta-RSI 55-60 = 64T 59.4%WR +$3.75 (best band);
+            # 40-60 window broadly positive. Does NOT block — only boosts.
             if direction == 'LONG' and LONG_RSI_SWEET_SPOT_BOOST > 0:
                 try:
-                    _lss_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
-                    if _lss_rsi is not None and LONG_RSI_SWEET_SPOT_MIN <= _lss_rsi <= LONG_RSI_SWEET_SPOT_MAX:
+                    # FIX brain_auditor 2026-10-14: prefer meta rsi_14 (DRIFT-E-safe) —
+                    # live-5m compute_rsi diverges from signal-time RSI (median 12.6 pts).
+                    # Same pattern as midband/ceiling meta-source fixes.
+                    _lss_rsi = None
+                    _lss_meta = entry.get('signal_metadata')
+                    if _lss_meta:
+                        try:
+                            import json as _json_lss
+                            _lss_md = _json_lss.loads(_lss_meta) if isinstance(_lss_meta, str) else (_lss_meta if isinstance(_lss_meta, dict) else {})
+                            _lss_rsi = _lss_md.get('rsi_14')
+                        except Exception:
+                            _lss_rsi = None
+                    if _lss_rsi is None:
+                        _lss_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lss_rsi is not None and LONG_RSI_SWEET_SPOT_MIN <= float(_lss_rsi) <= LONG_RSI_SWEET_SPOT_MAX:
                         entry['confidence'] = min(entry.get('confidence', 50) + LONG_RSI_SWEET_SPOT_BOOST, 100)
-                        log(f"  🎯 [LONG-RSI-SWEET-SPOT] {tkn}: LONG RSI {_lss_rsi:.1f} in {LONG_RSI_SWEET_SPOT_MIN}-{LONG_RSI_SWEET_SPOT_MAX} — +{LONG_RSI_SWEET_SPOT_BOOST} confidence")
+                        log(f"  🎯 [LONG-RSI-SWEET-SPOT] {tkn}: LONG RSI {float(_lss_rsi):.1f} in {LONG_RSI_SWEET_SPOT_MIN}-{LONG_RSI_SWEET_SPOT_MAX} — +{LONG_RSI_SWEET_SPOT_BOOST} confidence (meta-source)")
                 except Exception:
                     pass  # non-fatal
             # ── LONG mid-band chop block: RSI 60-70 outside EXTREME = death zone ─────
@@ -4271,12 +4284,24 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Complements midband (covers <=70). HIGH 70+ = bad-RR tail. NORMAL 70-75 stays open.
             if direction == 'LONG' and LONG_HIGH_OVERBOUGHT_BLOCK:
                 try:
-                    _lhb_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
-                    if _lhb_rsi is not None and _lhb_rsi > LONG_HIGH_OVERBOUGHT_RSI_MIN:
+                    # FIX brain_auditor 2026-10-14: prefer meta rsi_14 (DRIFT-E-safe) —
+                    # same pattern as midband/ceiling/sweet-spot meta-source fixes.
+                    _lhb_rsi = None
+                    _lhb_meta = entry.get('signal_metadata')
+                    if _lhb_meta:
+                        try:
+                            import json as _json_lhb
+                            _lhb_md = _json_lhb.loads(_lhb_meta) if isinstance(_lhb_meta, str) else (_lhb_meta if isinstance(_lhb_meta, dict) else {})
+                            _lhb_rsi = _lhb_md.get('rsi_14')
+                        except Exception:
+                            _lhb_rsi = None
+                    if _lhb_rsi is None:
+                        _lhb_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
+                    if _lhb_rsi is not None and float(_lhb_rsi) > LONG_HIGH_OVERBOUGHT_RSI_MIN:
                         _lhb_atr = _get_atr_pct(tkn)
                         _lhb_vreg = _classify_volatility(_lhb_atr) if _lhb_atr is not None else 'NORMAL'
                         if _lhb_vreg == 'HIGH':
-                            log(f"  🚫 [LONG-HIGH-70] {tkn}: LONG blocked — RSI {_lhb_rsi:.1f} > {LONG_HIGH_OVERBOUGHT_RSI_MIN} + HIGH vol (exhaustion chase; midband covers <=70)")
+                            log(f"  🚫 [LONG-HIGH-70] {tkn}: LONG blocked — RSI {float(_lhb_rsi):.1f} > {LONG_HIGH_OVERBOUGHT_RSI_MIN} + HIGH vol (exhaustion chase; meta-source)")
                             continue
                 except Exception:
                     pass  # non-fatal
