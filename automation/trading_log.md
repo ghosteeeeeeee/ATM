@@ -10386,3 +10386,22 @@ BY: daily_orchestrator
 **Open Questions:**
 - 24h WR 27.3% still below 50% checkpoint retarget (CEO-owned)
 - hard_max_loss 3 exits −$0.27 — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-15 18:09] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L) — JUP pump-chain+ LONG hard_max_loss −$0.08 (−3.49%)
+**PnL:** −$0.08 last hour | 24h 11T 3W −$0.48 (27.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: volume-breakout-short− 1T 0W 24h (needs 3+T) — no kill
+- atr_sl_hit 4/11 = 36.4% (under 40 threshold; tpsl_utils fix deployed)
+- No 3-consecutive-neg-hour streak (16:00 was +$0.28, 17:00 quiet)
+- Overtrade 1/hr; live_trading=true, kill JSON=true
+- hard_max_loss 4 exits −$0.35 24h — standing CEO hold, momentum-gate backtest due Oct 17
+- Open: IOTA +3.49%, BANANA +3.79% (pump-chain+ LONGs in profit), BTC manual −0.19%, HYPE hl_copy flat
+
+**Open Questions:**
+- 24h WR 27.3% still below 50% checkpoint retarget (CEO-owned)
+- pump-chain+ 4T 2W +$0.18 — only net-positive signal; others 0W each
