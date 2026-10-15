@@ -10281,3 +10281,27 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 **Open Questions:**
 - 11h with zero new opens — confluence gate blocking 83 candidates. Market is 94/117 NEUTRAL so likely genuine lack of 2+ source confluence, but worth CEO review of whether STANDALONE_BYPASS_SIGNALS list should grow
 - BTC manual SHORT still open 11.6h — position_manager watching SL 82475.67 / TP 79241.33
+
+## [2026-10-15 15:10] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** −$0.34 (WR: 0%) | 24h: 14T 3W −$0.56 (21.4%)
+
+**Details:**
+- IO volume-breakout-short− atr_sl_hit −$0.16 (−4.43%); BTC manual SHORT HL_CLOSED −$0.18 (not auto_1hr scope)
+- 24h by reason: atr_sl_hit 7/14=50% (>40%) — tpsl_utils fix confirmed deployed (position_manager.py:49 imports compute_atr_sl_tp); tiny 14T sample, no action
+- volume-breakout-short− 2T 0W −$0.28 (needs 3+T to kill — watching, third hour at 2T)
+- pump-chain+ only ≥3T signal: 3T 2W +$0.26 (best)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no signal with 3+T 0W
+- atr_sl_hit 50%: fix deployed, sample artifact
+- Streak: 2-neg (14:00 −$0.16, 15:00 −$0.18), needs 3
+- Overtrade: 2/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+
+**Open Questions:**
+- 24h WR down to 21.4% — guardrail ESCALATE territory; watching
+- volume-breakout-short− will hit kill threshold at 1 more loss
