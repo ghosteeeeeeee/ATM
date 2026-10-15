@@ -3576,6 +3576,29 @@ def run(dry_run=False):
             sig['final_confidence'] = confidence
             if _pp < 1.0:
                 log(f"  ⚖️ [PENALTY-GATE] {token} {direction}: conf {_raw_conf:.0f}×penalty_raw {_pp:.3f}×mult {_exec_mult:.3f}→exec {confidence:.1f}%")
+            # FLOOR-ADMIT SHADOW 2026-10-15 brain_auditor — log-only. When PENALTY_MULT_FLOOR
+            # (0.5 since Oct 13) raised the multiplier above the raw product, the trade only
+            # reaches exec because of the floor. Counterfactual exec at 0.3 recorded so the
+            # 0.5-vs-0.3 cohort can be aged with real PnL before any floor decision.
+            # Zero trading impact — never raises/lowers confidence, never blocks.
+            if _pp < _exec_mult:
+                try:
+                    # counterfactual at the pre-Oct-13 floor (0.3): raw product still wins if > 0.3
+                    _exec_at_floor_03 = _raw_conf * max(_pp, 0.3)
+                    with open(os.path.join(HERMES_DATA, 'floor_admit_shadow.jsonl'), 'a') as _f:
+                        _f.write(json.dumps({
+                            'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+                            'token': token, 'direction': direction,
+                            'source': source_for_penalty,
+                            'raw_conf': round(_raw_conf, 1),
+                            'penalty_raw': round(_pp, 3),
+                            'exec_mult': round(_exec_mult, 3),
+                            'exec_conf': round(confidence, 1),
+                            'exec_conf_at_floor_03': round(_exec_at_floor_03, 1),
+                            'floor_admitted': bool(_exec_at_floor_03 < MIN_EXEC_CONFIDENCE <= confidence),
+                        }) + '\n')
+                except Exception as _e:
+                    log(f"  ⚠️ [FLOOR-SHADOW-WRITE-FAIL] {token} {direction}: {_e}")  # shadow must never break execution
         # CEO Fix 1: re-check AFTER penalty multiplication (initial filter at :3227 used raw conf)
         if confidence is not None and confidence < MIN_EXEC_CONFIDENCE:
             log(f'  🚫 [PENALTY-BLOCK] {token} {direction} BLOCKED — exec_conf {confidence:.1f}% < {MIN_EXEC_CONFIDENCE}% after penalty product')
