@@ -4680,5 +4680,15 @@
     "category": "loss prevention",
     "status": "suggested",
     "risk": "low (cooldown only, doesn't block first entry)"
+  },
+  {
+    "date": "2026-10-15T22:46:59.553506+00:00",
+    "idea": "HML streak cooldown — suppress signal+dir after 2+ consecutive hard_max_loss exits",
+    "rationale": "After 2+ prior HML from same signal+dir (last 4 trades), next-trade WR drops 47.4%→31.7% (n=60). After 3+: 25% (n=12). Signal-health circuit breaker, not market-momentum gate.",
+    "data": "14d block streak>=2: saves $2.26, costs $0.83, net +$1.43. Only 1 winner >$0.10 blocked out of 51 (2%).",
+    "expected_impact": "+$0.70/7d net, reduces HML frequency ~30%",
+    "category": "exit quality / signal health",
+    "status": "suggested_for_self_learner_oct17",
+    "risk": "low"
   }
 ]

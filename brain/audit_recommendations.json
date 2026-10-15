@@ -1,184 +1,83 @@
 {
-  "timestamp": "2026-10-15T20:40:14Z",
-  "agent": "brain_auditor",
-  "session_lock": false,
+  "timestamp": "2026-10-15T22:46:48.473775Z",
+  "session_brain_stats": {
+    "note": "session_brain query skipped — postgres trade data is ground truth this run"
+  },
   "trade_summary_24h": {
-    "closed": 13,
-    "pnl": -0.2,
-    "wr": 15.4,
-    "by_signal": "pump-chain+ LONG 5T +0.48 (only green); 9 other signals all 1T losses",
-    "by_exit": "hard_max_loss 4T -0.35, atr_sl_hit 5T -0.29, atr_trail_hit 2T +0.65 (100%WR)"
+    "trades": 15,
+    "pnl": 0.4,
+    "wr": 26.7,
+    "note": "Low WR but positive PnL — winners (pump-chain+ LONG avg +$0.40) bigger than losers (avg -$0.077)"
   },
   "trade_summary_7d": {
-    "closed": 195,
-    "pnl": -1.7,
-    "wr": 33.8,
-    "long": "146T -1.08 34.9%",
-    "short": "49T -0.62 30.6%",
-    "exit_bleed": "hard_max_loss 62T 0%WR -5.80 (avg lev 4.4) #1; atr_sl_hit 42T -3.06 #2",
-    "exit_wins": "profit-monster-trail 42T +2.73 88.1%; atr_trail_hit 18T +3.51 83.3%"
-  },
-  "regime": {
-    "btc_15m": "LONG_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "volatility": "LOW",
-    "trend_quality": "STRONG_DOWN",
-    "market_phase": "RECOVERY",
-    "net_read": "low-vol grind, long-bias correct, correlation risk on 5-long book"
-  },
-  "watchdog_steers_addressed": [
-    {
-      "steer": "14/20 losing streak 30%WR",
-      "verdict": "VERIFIED. 24h 13T 15.4% -0.20. Root cause = hard_max_loss chop entries (62T 0% 7d), not direction. Trail-armed trades win 90%.",
-      "action": "hard_max_loss fix delegated to self_learner momentum-gate backtest (due Oct 17). No stackable entry filter shipped — soak discipline."
-    },
-    {
-      "steer": "no SHORT while BTC>EMA300",
-      "verdict": "REJECT blanket. 7d pump-chain- SHORT 26T +0.24 (30.8%WR, net positive); volume-buildup- SHORT 4T +0.41 100%WR. Bad short signals already killed (vbo-short- Oct 15, hmacd_mtf- Oct 15).",
-      "action": "No blanket SHORT block. Would kill profitable fade."
-    },
-    {
-      "steer": "no pump-chain+ LONG at meta_rsi 66+",
-      "verdict": "PARTIALLY STALE. RSI_MAX=70 already live (shipped Oct 13). 0 trades >=70 since ship. 65-69 band: 30d 21T +0.39 42.9% (positive), post-Oct-13 7T 14.3% $0.00 (flat, n small). No edge to cut at 66.",
-      "action": "No RSI tightening. Monitor 65-69 band 48h."
-    },
-    {
-      "steer": "no same-coin re-entry within 1h of hard_max_loss",
-      "verdict": "JUP 16199→16202 gap 58min, both lost (-0.11 total). Only 2 re-entry events in 7d (JUP, CHIP), 0/2 won. LOSS_COOLDOWN_BASE=20min allows it by design.",
-      "action": "MONITOR. Sample 2 events — below threshold. Logged as creative idea: exit-reason-aware cooldown (2h after hard_max_loss)."
-    },
-    {
-      "steer": "trail IOTA stop 0.04835→0.04850",
-      "verdict": "Position management, PM trail owns it. Stop already above entry locking ~0.67%.",
-      "action": "No manual override. PM trail handles as price advances."
-    }
-  ],
-  "losing_autopsy_24h": [
-    {
-      "trade": "BTC ai-trader-manual SHORT -0.18",
-      "root_cause": "Manual HL trade, held 757min, HL_CLOSED. Not a signal issue.",
-      "winning_side": "LONG (BTC above EMA300 716min, 15m LONG_BIAS)",
-      "confidence": "HIGH"
-    },
-    {
-      "trade": "JUP pump-chain+ LONG x2 (-0.08 hard_max_loss + -0.03 trail_arm_timeout)",
-      "root_cause": "Entered RSI 66.7 then re-entered 58min later RSI 69.4 — 65-69 band is flat (30d +0.39/21T). Second entry worse conditions.",
-      "winning_side": "SKIP the coin after first hard_max_loss; or wait for RSI pullback to 50-65 band",
-      "confidence": "HIGH"
-    },
-    {
-      "trade": "MERL grind-breakout- SHORT -0.12 hard_max_loss 14min",
-      "root_cause": "Chop entry in EXTREME, RSI 49.4 mid-band. Signal only 3T/30d — too small to tune.",
-      "winning_side": "No short in grind-up; trail never armed",
-      "confidence": "MED (small n)"
-    },
-    {
-      "trade": "ICP bb-bounce-v2-long+ -0.09 hard_max_loss 18min RSI 54.6 EXTREME",
-      "root_cause": "Chop entry, no momentum. Same hard_max_loss archetype.",
-      "winning_side": "Wait for trail confirmation",
-      "confidence": "HIGH"
-    },
-    {
-      "trade": "IO vbo-short- -0.16",
-      "root_cause": "Killed signal (VOLUME_BREAKOUT_MINUS_ENABLED=False shipped 17:35 same day). Pre-kill trade.",
-      "winning_side": "Signal is dead — no re-entry",
-      "confidence": "CLOSED"
-    }
-  ],
-  "chop_vs_trend_7d": {
-    "pump_chain_plus_long": {
-      "trail_armed": "10T 90%WR +2.46",
-      "no_trail": "28T 10.7%WR -2.13"
-    },
-    "vbo_long_plus_30d": {
-      "trail_armed": "6T 100%WR +1.85",
-      "no_trail": "34T 38.2%WR +0.43"
-    },
-    "verdict": "CONFIRMED: trend entries (trail arms) win 90-100%; chop entries (no trail) lose. Every signal shows the same split. #1 fix = momentum gate (self_learner Oct 17), not more entry filters."
+    "trades": 195,
+    "pnl": -0.9,
+    "wr": 34.4,
+    "long": "146T -$0.28 35.6%",
+    "short": "49T -$0.62 30.6%"
   },
   "changes_from_last_run": [
     {
       "change": "KILL volume-breakout-short- (17:35)",
-      "result": "WORKING — 0 trades post-kill. Last trade IO -0.16 was pre-kill 15:10.",
-      "verdict": "KEEP"
+      "verified": "0 trades post-kill",
+      "status": "WORKING"
     },
     {
       "change": "KILL hmacd_mtf- SHORT (18:30)",
-      "result": "WORKING — 0 trades post-kill. Family fully dead both directions.",
-      "verdict": "KEEP"
+      "verified": "0 trades post-kill",
+      "status": "WORKING"
+    },
+    {
+      "change": "CONF-CALIB clamp decider_run.py:1996",
+      "verified": "0 trades conf>100 post-fix",
+      "status": "WORKING"
+    },
+    {
+      "change": "trade_watchdog.py:660 direction lowercase",
+      "verified": "code in place at :494/:530/:660",
+      "status": "WORKING"
     },
     {
       "change": "KILL LONG-SHORT-BIAS dampen shadow (14:45)",
-      "result": "WORKING — block code deleted, no shadow fires.",
-      "verdict": "KEEP"
-    },
-    {
-      "change": "CONF-CALIB clamp confidence [0,100] (03:40)",
-      "result": "WORKING — 0 trades with conf>100 since deploy (6 closes checked, max=100.0).",
-      "verdict": "KEEP"
-    },
-    {
-      "change": "trade_watchdog direction lowercase bugfix (19:40)",
-      "result": "WORKING — watchdog PnL signs correct (IOTA +0.64 shown as gain).",
-      "verdict": "KEEP"
-    },
-    {
-      "change": "doji-bottom re-enable (Oct 14 14:44)",
-      "result": "0 trades since re-enable. Not a failure — no fires. EXTREME already gated.",
-      "verdict": "MONITOR"
+      "verified": "shadow code removed",
+      "status": "WORKING"
     }
   ],
-  "config_changes_applied": [],
-  "rejected_this_run": [
+  "drift_findings": [
     {
-      "idea": "pump-chain+ RSI_MAX 70→66",
-      "reason": "65-69 band 30d 21T +0.39 42.9% (positive). Post-Oct-13 n=7 flat $0.00 — insufficient. CEO already rejected global 65. No edge to cut."
-    },
+      "finding": "LONG RSI 60-70 non-EXTREME midband leak via STANDALONE_BYPASS",
+      "detail": "LONG_MIDBAND_NON_EXTREME_BLOCK in signal_compactor.py:4259 but pump-chain+ (STANDALONE_BYPASS) bypasses compactor. 13T -$0.34 since Oct 11 fix. pump-chain+ alone 3T -$0.05 — tiny, not worth risking best signal.",
+      "severity": "LOW",
+      "action": "No fix — leak is small and fixing bypass risks pump-chain+ flow"
+    }
+  ],
+  "recurring_problems": [
     {
-      "idea": "Blanket no-SHORT-while-LONG_BIAS",
-      "reason": "Would kill pump-chain- SHORT (26T +0.24) and volume-buildup- SHORT (4T +0.41 100%WR). Bad shorts already killed individually."
-    },
-    {
-      "idea": "pump_chain NORMAL mult 0.5→0.0",
-      "reason": "14d NORMAL 4T 0% -0.45 looks bad but n=4 < 20 threshold. MONITOR 48h."
-    },
-    {
-      "idea": "LOSS_COOLDOWN_BASE 20→30min",
-      "reason": "JUP re-entry gap 58min would still pass at 30min base. To block need ~60min base — too aggressive blanket. Only 2 re-entry events 7d. Logged as creative (exit-reason-aware 2h cooldown)."
-    },
-    {
-      "idea": "Any hard_max_loss entry filter",
-      "reason": "CURRENT.md standing rule: self_learner momentum-gate backtest due Oct 17. Do NOT stack entry filters during soak."
+      "problem": "hard_max_loss still #1 bleed",
+      "data": "7d 60T -$5.53 avg lev 4.4. Only 2/60 reached trail arm. 12/60 never positive (MFE<=0). Median MFE 0.092%.",
+      "trend": "Weekly: Sep 28 -$5.84 → Oct 5 -$5.60 → Oct 12 -$3.67. HML_VOL_ATR_MULT magnitude fix WORKING but frequency unchanged.",
+      "still_enabled_split": "43T -$3.76 from still-enabled signals; 17T -$1.77 from already-killed signals aging out"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-15T20:40:14Z",
-      "idea": "Trail-arm pre-confirmation shadow: log pre-entry 2-bar momentum (+0.15% threshold) for every pump-chain+ fire, 48h collection",
-      "rationale": "Trail-armed trades win 90% (pump-chain+) / 100% (vbo-long+); no-trail trades lose. If requiring pre-entry momentum filters chop without killing trends, it attacks the #1 bleed (hard_max_loss 62T 0% -$5.80) at the entry side. Needs shadow data before any enforce.",
-      "expected_impact": "Potentially -30 to -50% of hard_max_loss chop entries",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "low (shadow only, 0 live impact)"
-    },
-    {
-      "date": "2026-10-15T20:40:14Z",
-      "idea": "Exit-reason-aware loss cooldown: 2h token+direction cooldown after hard_max_loss exits (vs current 20-90min streak-based)",
-      "rationale": "JUP re-entered 58min after hard_max_loss at worse RSI (66.7→69.4), lost again. CHIP re-entered 40min after, lost. 2/2 re-entries after hard_max_loss lost (-$0.14). Chop coins stay chop for hours. Code change in LOSS_COOLDOWN path, not a constant.",
-      "expected_impact": "Block re-entry-to-fresh-loser pattern; small but directionally correct",
-      "category": "loss prevention",
-      "status": "suggested",
-      "risk": "low (cooldown only, doesn't block first entry)"
+      "date": "2026-10-15T22:46:48.473819Z",
+      "idea": "HML streak cooldown — suppress signal+dir after 2+ consecutive hard_max_loss exits",
+      "rationale": "After 2+ prior HML from same signal+dir (last 4 trades), next-trade WR drops 47.4%→31.7% (n=60). After 3+: 25% (n=12). This is a signal-health circuit breaker, NOT a market-momentum gate.",
+      "data": "14d block streak>=2: saves $2.26, costs $0.83, net +$1.43. Only 1 winner >$0.10 blocked out of 51 (2%).",
+      "expected_impact": "+$0.70/7d net, reduces HML frequency ~30%",
+      "category": "exit quality / signal health",
+      "status": "suggested_for_self_learner_oct17",
+      "risk": "low — reversible, signal-scoped, not regime-based",
+      "note": "CEO directive: no entry-filter stacking before self_learner momentum-gate backtest Oct 17. Recommend including this variant in that backtest."
     }
   ],
+  "config_changes_applied": [],
   "next_actions": [
-    "self_learner momentum-gate backtest due Oct 17 (3rd re-request) — #1 hard_max_loss fix, delegated",
-    "Monitor pump-chain+ 65-69 band 48h — if flips negative with n>=10, revisit RSI_MAX=66",
-    "Monitor pump-chain+ NORMAL habitat 48h — if n>=10 stays 0%WR, dampen 0.5→0.0",
-    "Monitor doji-bottom post-re-enable — 0 fires since Oct 14, detection check if 0 by Oct 17",
-    "Watch volume-breakout-short- / hmacd_mtf- post-kill — 0 trades confirmed, keep dead",
-    "7d WR guardrail ESCALATE still active (33.8% vs 50% target) — no filter stacking until self_learner delivers"
-  ],
-  "protected_flags_intact": true,
-  "honesty_note": "0 trading config changes this run. Every candidate failed: sample-size rule (n<20), already-shipped (RSI_MAX=70, vbo/hmacd kills), delegated-in-flight (hard_max_loss momentum gate Oct 17), or would kill winners (blanket SHORT). The system's bleed is structural chop-entry; the fix is in flight. Shipping a small-n pattern now would repeat the 2026-10-08 failure mode."
+    "Include HML streak cooldown in self_learner momentum-gate backtest (due Oct 17)",
+    "Monitor volume-breakout-short- and hmacd_mtf- kills for 48h (verified 0 trades so far)",
+    "Watch hard_max_loss weekly trend — HML_VOL_ATR_MULT magnitude fix showing -$5.84→-$3.67 improvement",
+    "Doji-bottom-long and bb-bounce-v2-long+ 7d dips are variance (30d both positive) — no action",
+    "Portfolio 5 LONG in SHORT_BIAS — regime dampen was killed yesterday (shadow +$0.84/14d proved LONGs profitable in SHORT_BIAS); this is timing not systemic"
+  ]
 }
