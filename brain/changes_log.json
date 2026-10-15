@@ -1364,5 +1364,16 @@
     "after": "HMACD_MTF_MINUS_ENABLED = False",
     "rationale": "Family 30d 12T 25%WR −/usr/bin/bash.65 both directions. PLUS killed Oct 13 (8T 25%WR −/usr/bin/bash.46). MINUS all-time 4T 25%WR −/usr/bin/bash.19. Same chop-entry failure pattern. Last leg of dead family — remove to stop incremental bleed.",
     "impact": "Stops ~4T/30d of 25%WR losses. Low risk: rarely fires, family never worked."
+  },
+  {
+    "timestamp": "2026-10-15T19:40:10Z",
+    "agent": "brain_auditor",
+    "change": "trade_watchdog.py:660 analyze_stale_trades: direction not lowercased — PG stores LONG/SHORT, so every stale-steer on a LONG computed short-math PnL (sign inverted). IOTA +6.0% reported as \"losing -5.2%\" (steer-002).",
+    "type": "bugfix",
+    "file": "scripts/trade_watchdog.py",
+    "before": "direction = trade.get(\"direction\", \"?\")",
+    "after": "direction = (trade.get(\"direction\") or \"?\").lower()",
+    "rationale": "Monitoring-layer sign bug misleads captain/CEO steers (winning longs flagged \"losing, consider cutting\"). No auto-exec risk (AUTO_EXECUTABLE_CATEGORIES=profit_lock only, and profit_lock path already lowercased at :530). Every other direction read in the file already lowercases — this was the single miss.",
+    "impact": "Stale-trade steers now show true PnL sign. Zero trading-config impact."
   }
 ]

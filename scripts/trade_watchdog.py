@@ -657,7 +657,7 @@ def analyze_stale_trades(open_trades):
 
         hours_open = (now - entry_time).total_seconds() / 3600
         coin = trade.get("coin", "?")
-        direction = trade.get("direction", "?")
+        direction = (trade.get("direction") or "?").lower()  # PG stores LONG/SHORT; must lower or PnL sign inverts for LONGs
 
         # Get current PnL
         entry = float(trade.get("entry_price") or 0)

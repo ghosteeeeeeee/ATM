@@ -1,142 +1,153 @@
 {
-  "timestamp": "2026-10-15T18:30:00Z",
-  "session_brain_stats": {
-    "queries_run": 3,
-    "top_insights": [
-      "chop vs trend reconfirmed: trail family 86%+ WR, hard_max_loss/atr_sl = all losses",
-      "pump-chain+ EXTREME habitat net positive 14d: 20W +$5.18 vs 22L −$2.31 (magnitude edge holds)",
-      "hmacd_mtf family fully dead both directions — PLUS killed Oct 13, MINUS was last leg"
-    ]
-  },
+  "timestamp": "2026-10-15T19:41:23Z",
+  "agent": "brain_auditor_captain",
+  "session_lock": "free (no /tmp/hermes-session-active.lock)",
   "trade_summary_24h": {
-    "closed": 12,
-    "pnl": -0.11,
-    "wr": 25.0,
-    "winners": "3T all pump-chain+ trail family: BANANA +$0.37 (+10.1%), ICP +$0.28 (+15.2%), APT +$0.04",
-    "losers": "9T: 5 SHORT counter-trend (−$0.53), 4 LONG chop HML/atr_sl (−$0.31)",
-    "open": "3 LONG: IOTA pump-chain+ +3.72% (trail locked), BTC manual −0.26%, HYPE copy −0.07%"
+    "closed": 13,
+    "wr_pct": 23.1,
+    "pnl": -0.13,
+    "open": 5,
+    "open_book": "IOTA pump-chain+ LONG +6.0% (trail-riding, meta_rsi 66.67), WLFI doji-bottom+ +0.08%, HYPE hl_copy +0.21%, BTC manual -0.14%, JUP pump-chain+ -0.63% (meta_rsi 69.44 chase band)"
   },
   "trade_summary_7d": {
     "closed": 196,
-    "pnl": -0.9,
-    "wr": 35.2,
-    "long": "147T −$0.28 36.7%",
-    "short": "49T −$0.62 30.6%",
-    "trail_family": "profit-monster 42T +$2.73 88.1% + atr_trail 18T +$3.51 83.3% + stale 8T +$1.35 87.5% = 68T +$7.59",
-    "no_trail": "hard_max_loss 62T −$5.80 0% + atr_sl 41T −$3.04 0% = 103T −$8.84",
-    "by_regime": "HIGH 35T −$0.72 42.9% | EXTREME 109T −$0.09 30.3% | NORMAL 47T +$0.10 44.7%"
+    "wr_pct": 34.7,
+    "pnl": -1.4
   },
-  "trade_summary_30d": {
-    "closed": 748,
-    "pnl": -3.11,
-    "wr": 44.4
+  "regime": {
+    "btc_15m": "LONG_BIAS",
+    "btc_4h": "SHORT_BIAS",
+    "volatility": "LOW",
+    "market_phase": "DECLINING",
+    "note": "mixed chop — no clean trend; HML share improving (Oct 12 45.5% -> Oct 14 26.3%, Oct 15 30%)"
   },
-  "last_run_changes_verification": [
+  "watchdog_steers_addressed": [
     {
-      "change": "KILL volume-breakout-short- (Oct 15 17:35)",
-      "verified": "WORKING — 0 trades since kill. Last trade was IO loss 14:35 pre-kill.",
-      "status": "confirmed"
+      "steer": "steer-001 urgent: 13/20 recent losses",
+      "verdict": "CONFIRMED. 24h 10 losers: 3 hard_max_loss chase-band pump-chain+ (JUP/ARB @66.67, MFE<0.17% never armed), 4 mid-RSI SHORTs (IO/MERL/HYPE @49-59), 3 misc. Watchdog pattern 1+2 verified against PG meta_rsi. Fixes from earlier runs today already killed the worst SHORT offenders (vbo-short- 17:35, hmacd_mtf- 18:30); 0 post-kill trades verified."
     },
     {
-      "change": "CONF-CALIB clamp [0,100] (Oct 15 03:40)",
-      "verified": "WORKING — 4 trades post-fix, max conf=100, 0 trades >100.",
-      "status": "confirmed"
+      "steer": "steer-002 IOTA open 5h losing -5.2%",
+      "verdict": "FALSE ALARM — WATCHDOG BUG. IOTA is +6.0%, trail-riding, the best trade on the book. Root cause: trade_watchdog.py:660 direction not lowercased -> LONG computed with short-math -> sign inverted. FIXED this run (one-liner). Deep-analysis text in same file correctly called IOTA a free ride — steer generator disagreed with itself."
     },
     {
-      "change": "Kill LONG-SHORT-BIAS dampen shadow (Oct 15 14:45)",
-      "verified": "CORRECT KILL — shadow cohort was +$0.84/14d; premise falsified.",
-      "status": "confirmed"
+      "steer": "steer-003/004/005 clusters + all-long book",
+      "verdict": "NOTED, no action. 4h SHORT_BIAS vs all-LONG book is real correlation risk, but IOTA trail-locked and remaining positions have SLs. Blanket LONG block rejected (would kill pump-chain+ EXTREME habitat = only profitable cohort)."
     },
     {
-      "change": "doji-bottom EXTREME gate + re-enable (Oct 14)",
-      "verified": "WORKING — 0 trades since re-enable. EXTREME habitat 30d 3T 0% −$0.25 gated; HIGH 13T 69.2% +$0.37 kept.",
-      "status": "confirmed"
-    },
-    {
-      "change": "Vacation pause guardrail fix (Oct 15 02:40)",
-      "verified": "WORKING — no re-pause. WR_7D_PNL_CONFIRM preventing freeze on window artifacts.",
-      "status": "confirmed"
-    },
-    {
-      "change": "volume-buildup+ kill (Oct 14 auto_1hr)",
-      "verified": "WORKING — last trade Oct 14 08:43, kill at 09:15. 0 trades since.",
-      "status": "confirmed"
+      "steer": "steer-006 8 wrong-side losses",
+      "verdict": "Same as steer-001 — mid-RSI SHORTs + chase-band LONGs. Covered by today's kills + existing RSI bands. No new filter (sample + soak discipline)."
     }
   ],
-  "drift_findings": [],
-  "recurring_problems": [
+  "losing_autopsy_24h": [
     {
-      "problem": "hard_max_loss #1 bleed — 62T −$5.80/7d 0%WR",
-      "detail": "Chop entries never reach trail arm (+0.40%). 12/34 pump-chain+ HML all EXTREME — but EXTREME habitat net +$2.87/14d (winners avg +7.76% vs losers −2.72%). Magnitude edge intact. Lever-aware fix reduced avg magnitude −4.51%→−3.09% acct.",
-      "status": "DESIGNATED VEHICLE: self_learner momentum-gate + progressive-exit-ladder backtests due Oct 17. CEO: do NOT stack entry filters.",
-      "trend": "stable — magnitude improved, frequency still high"
+      "cluster": "pump-chain+ LONG chase band",
+      "trades": "JUP -0.08 HML @rsi 66.67 MFE 0.15%, ARB -0.06 HML @rsi 66.67 MFE 0.17%",
+      "root_cause": "Entered after pump exhausted; trail never armed (+0.40% needed); classic chop entry at chase RSI",
+      "considered_fix": "PUMP_CHAIN_LONG_RSI_MAX 70->66",
+      "verdict": "REJECTED — insufficient + counterexample",
+      "evidence": "Post-Oct-13-fix cohort 66-70: 5T 0W -$0.34 (suggestive) BUT 30d 66-70: 14T 42.9% -$0.26 (thin) AND 6 winners 30d would be blocked (+$0.50) AND open IOTA @66.67 is +6.0% (the fix would have killed the best trade of the day). n=5 post-fix fails the n>=20 bar. Monitor: re-test at n>=15 post-fix (~1 week)."
     },
     {
-      "problem": "SHORT book 30.6% WR 7d −$0.62",
-      "detail": "pump-chain- 26T +$0.24 works (30.8% WR, magnitude edge). volume-buildup- 4T 100% +$0.41 best SHORT. Bleed from weak tails: hmacd_mtf-- (killed this run), vbo-short- (killed Oct 15), pump-chain-v6- 2T −$0.09 (CEO: V6 = exit-stack vehicle, no touch).",
-      "status": "improving — weak tails being removed one by one"
+      "cluster": "mid-RSI SHORTs",
+      "trades": "IO vbo-short- @50.0 -$0.16, MERL grind-breakout- @49.43 -$0.12 HML, HYPE hl_copy/ichimoku- @59.32 -$0.04",
+      "root_cause": "Shorting neutral RSI = coin flip (watchdog pattern 1). vbo-short- and hmacd_mtf- KILLED earlier today; remaining offenders are tiny-n (grind-breakout- lifetime 5T, hl_copy external).",
+      "verdict": "No blanket SHORT RSI floor — pump-chain- habitat IS 40-55 (14d best band 45-55 +$0.75). Per-signal kills already shipped. Monitor grind-breakout- (n=5)."
     },
     {
-      "problem": "atr_sl_hit 41T −$0.04/7d 0%WR",
-      "detail": "SL hits dominate no-trail exits. tpsl_utils fix deployed. auto_1hr ratio 27-50% (tiny-sample).",
-      "status": "monitor — tpsl fix needs more cohort data"
+      "cluster": "misc",
+      "trades": "ICP bb-bounce-v2 @54.55 HML, MNT ai-trader+ @48.35 atr_sl, NEAR hl_copy @53.61 atr_sl",
+      "root_cause": "No-momentum entries in LOW-vol chop; trail cannot arm. Same disease as HML #1 bleed.",
+      "verdict": "Momentum-gate backtest (self_learner, due Oct 17, 4th escalation this run) is the correct vehicle. Do NOT stack entry filters."
     }
   ],
-  "missing_implementations": [
+  "chop_vs_trend_7d": {
+    "hard_max_loss": "62T -$5.80 0%WR #1 bleed (avg -3.16% per trade)",
+    "atr_sl_hit": "42T -$3.06 0%WR",
+    "trail_exits": "atr_trail_hit 18T +$3.51 83.3% + profit-monster-trail 42T +$2.73 88.1%",
+    "hml_share_trend": "Oct 12 45.5% -> Oct 13 37.5% -> Oct 14 26.3% -> Oct 15 30% (improving from today's kills)",
+    "conclusion": "Exit engine fine; entry-side momentum gap remains. Momentum-gate backtest is the pending root-cause fix."
+  },
+  "changes_from_last_run": [
     {
-      "item": "momentum-gate for chop entries",
-      "owner": "self_learner",
-      "due": "2026-10-17",
-      "status": "backtest delegated, 3rd re-request standing"
+      "change": "PUMP_CHAIN RSI_MAX=70 (Oct 13)",
+      "status": "HOLDING",
+      "detail": "0 entries >=70 since; residual 66-70 band bleeding but IOTA counterexample blocks further tighten"
     },
     {
-      "item": "progressive-exit-ladder",
-      "owner": "self_learner",
-      "due": "2026-10-17",
-      "status": "backtest delegated"
+      "change": "vbo-short- kill 17:35 today",
+      "status": "VERIFIED",
+      "detail": "0 trades post-kill (IO loss 14:24 predates)"
     },
     {
-      "item": "wyckoff COOLDOWN_BARS formula/comment mismatch",
-      "owner": "CEO",
-      "status": "pending decision (fix formula to 2.5h or comment to 30min)"
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-10-15T18:30:00Z",
-      "idea": "volume-buildup- SHORT NORMAL boost candidate — 4/4 100%WR +$0.41/7d, all profit-monster-trail exits",
-      "rationale": "ETC +6.1%, LTC +4.9%, POL +4.8%, AIXBT +1.3% — dump detection with volume confirmation in NORMAL vol. Mirror of pump-chain+ LONG EXTREME habitat. CURRENT.md watchlist: boost needs 5T. Has 4T.",
-      "expected_impact": "+$0.10-0.20/week if sample confirms",
-      "category": "signal boost",
-      "status": "monitor — needs 5T threshold per standing rule",
-      "risk": "low",
-      "blocker": "n=4, need 5T minimum. Next win qualifies it."
+      "change": "hmacd_mtf- kill 18:30 today",
+      "status": "VERIFIED",
+      "detail": "0 trades post-kill; family fully dead"
     },
     {
-      "date": "2026-10-15T18:30:00Z",
-      "idea": "pump-chain+ EXTREME entry-quality probe: HML trades all EXTREME but habitat net +$2.87/14d — entry timing within EXTREME, not regime block",
-      "rationale": "20W avg +7.76% vs 22L avg −2.72% in EXTREME. Winners ride trails, losers chop out. The edge is magnitude not WR. Any EXTREME block would kill +$5.18/14d of winners. Root fix = momentum gate (Oct 17 vehicle), not regime gate.",
-      "expected_impact": "n/a — do-not-block, informational",
-      "category": "analysis",
-      "status": "logged — prevents future misguided EXTREME block proposals",
-      "risk": "none"
+      "change": "LONG-SHORT-BIAS shadow kill 14:45",
+      "status": "VERIFIED",
+      "detail": "cohort was +$0.84/14d, premise falsified"
+    },
+    {
+      "change": "CONF-CALIB clamp 03:40",
+      "status": "NO REGRESSION",
+      "detail": "confidence values in open trades within [0,100]"
+    },
+    {
+      "change": "trail-arm ratify (bb-squeeze 60m + pump-chain 45m)",
+      "status": "RATIFIED by earlier captain run today",
+      "detail": "trail_arm_timeout 6T 7d net -$0.06, functioning as designed"
+    },
+    {
+      "change": "doji-bottom re-enable",
+      "status": "LIVE, first trade",
+      "detail": "WLFI opened 19:xx @rsi 40 NORMAL, +0.08% — monitor"
     }
   ],
   "config_changes_applied": [
     {
-      "timestamp": "2026-10-15T18:30:00Z",
-      "change": "KILL HMACD_MTF_MINUS_ENABLED True→False",
-      "file": "hermes_constants.py",
-      "rationale": "Family fully dead: PLUS killed Oct 13 (8T 25%WR −$0.46), MINUS all-time 4T 25%WR −$0.19, family 30d 12T −$0.65. Same chop-entry pattern both directions. Last leg of dead family.",
-      "impact": "Stops ~4T/30d of 25%WR losses. Low risk, rarely fires."
+      "file": "scripts/trade_watchdog.py",
+      "change": "analyze_stale_trades direction .lower() fix",
+      "type": "bugfix",
+      "trading_config": false
     }
   ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-15T19:41:23Z",
+      "idea": "Post-fix band re-test calendar: pump-chain+ LONG meta_rsi 66-70 decision gate at n>=15 (currently 5 post-Oct-13-fix trades, 0W-5L -$0.34)",
+      "rationale": "Chase-band tighten 70->66 is the obvious next lever but fails n>=20 today and has a live counterexample (IOTA +6.0% @66.67). Rather than a redundant shadow collector (trades table already records meta_rsi — ponytail: data exists), set a data-triggered re-test: when post-fix 66-70 cohort hits n>=15, run the band query; if still 0-2 winners and net negative, ship RSI_MAX=66 with CEO approval.",
+      "expected_impact": "If shipped later: blocks ~$0.34/62h of HML bleed in chop regimes while data decides (not gut). If IOTA-like winners keep coming from 66-70, the band stays open — data wins either way.",
+      "category": "entry sniper / evidence discipline",
+      "status": "suggested",
+      "risk": "low (no code, no config — calendar + query)"
+    },
+    {
+      "date": "2026-10-15T19:41:23Z",
+      "idea": "4th escalation: self_learner momentum-gate backtest (|5m move|<0.15% block) — deadline Oct 17, undelivered since Oct 13",
+      "rationale": "HML 62T -$5.80 7d is still #1 bleed; 52+/62 never armed trail (MFE<0.40%). The gate brackets the enterable window from the dead side, complementing CHASE_RATIO shadow (chase end). Every other RSI/band fix is soaked; this is the last structural entry-side hole and it has a delivery date.",
+      "expected_impact": "If historical 69%-never-armed rate holds: potentially blocks ~40 of 62 HML/7d candidates; even 50% effectiveness = ~+$2.9/7d avoided bleed (unleveraged estimate, needs real backtest).",
+      "category": "chop filter",
+      "status": "escalated",
+      "risk": "medium (needs OOS validation before live; shadow-first per automatic-implementation)"
+    }
+  ],
+  "rejected_this_run": [
+    "PUMP_CHAIN_LONG_RSI_MAX 70->66 — n=5 post-fix, 30d net -$0.26, would-block IOTA +6.0% winner. Re-test at n>=15.",
+    "Blanket SHORT mid-RSI floor — collides with pump-chain- 40-55 habitat; offenders already per-signal killed.",
+    "grind-breakout- kill — lifetime n=5, below bar. Monitor.",
+    "Any time-of-day filter — banned by mandate.",
+    "Stacking more entry filters during soak — escalation discipline."
+  ],
   "next_actions": [
-    "Monitor volume-buildup- for 5th trade → boost candidate",
-    "Follow up self_learner momentum-gate + progressive-exit-ladder backtests (due Oct 17)",
-    "Wyckoff CEO GO response — implement per decision",
-    "RSI tilt re-test window opens Oct 16 (date-gated, CEO commission)",
-    "Monitor 7d WR trajectory vs ESCALATE guardrail (currently 35.2%, target ≥50%)",
-    "Verify hmacd_mtf- kill holding (0 trades expected)"
-  ]
+    "Re-test pump-chain+ 66-70 band when post-fix n>=15 (~1 week) — data gate, not calendar",
+    "self_learner momentum-gate backtest due Oct 17 (4th request — if undelivered, re-delegate to signal_analyst)",
+    "doji-bottom WLFI trade outcome — first live trade since re-enable",
+    "JUP 16202 @69.44 chase-band open — position manager owns exits; do not open fresh in this band",
+    "volume-buildup- SHORT boost check (needs 5T, thin market stalled)",
+    "RSI tilt re-test window opens Oct 16 (date-gated DNA plan)"
+  ],
+  "protected_flags_intact": true,
+  "honesty_note": "0 trading config changes this run. The tempting chase-band tighten fails my own verification bar — today's only profitable habitat (pump-chain+ EXTREME LONG trail rides) includes a 66.67-RSI winner. Saying 'monitor' is the correct call, not passivity."
 }

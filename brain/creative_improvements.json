@@ -4644,5 +4644,23 @@
     "category": "analysis",
     "status": "logged — prevents future misguided EXTREME block proposals",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-15T19:41:23Z",
+    "idea": "Post-fix band re-test calendar: pump-chain+ LONG meta_rsi 66-70 decision gate at n>=15 (currently 5 post-Oct-13-fix trades, 0W-5L -$0.34)",
+    "rationale": "Chase-band tighten 70->66 is the obvious next lever but fails n>=20 today and has a live counterexample (IOTA +6.0% @66.67). Rather than a redundant shadow collector (trades table already records meta_rsi — ponytail: data exists), set a data-triggered re-test: when post-fix 66-70 cohort hits n>=15, run the band query; if still 0-2 winners and net negative, ship RSI_MAX=66 with CEO approval.",
+    "expected_impact": "If shipped later: blocks ~$0.34/62h of HML bleed in chop regimes while data decides (not gut). If IOTA-like winners keep coming from 66-70, the band stays open — data wins either way.",
+    "category": "entry sniper / evidence discipline",
+    "status": "suggested",
+    "risk": "low (no code, no config — calendar + query)"
+  },
+  {
+    "date": "2026-10-15T19:41:23Z",
+    "idea": "4th escalation: self_learner momentum-gate backtest (|5m move|<0.15% block) — deadline Oct 17, undelivered since Oct 13",
+    "rationale": "HML 62T -$5.80 7d is still #1 bleed; 52+/62 never armed trail (MFE<0.40%). The gate brackets the enterable window from the dead side, complementing CHASE_RATIO shadow (chase end). Every other RSI/band fix is soaked; this is the last structural entry-side hole and it has a delivery date.",
+    "expected_impact": "If historical 69%-never-armed rate holds: potentially blocks ~40 of 62 HML/7d candidates; even 50% effectiveness = ~+$2.9/7d avoided bleed (unleveraged estimate, needs real backtest).",
+    "category": "chop filter",
+    "status": "escalated",
+    "risk": "medium (needs OOS validation before live; shadow-first per automatic-implementation)"
   }
 ]
