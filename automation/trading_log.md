@@ -10349,3 +10349,21 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 **Next run (~Oct 16 06:40):** volume-breakout-short− kill check; wyckoff CEO GO response; 7d WR retarget; momentum-gate backtest follow-up (self_learner Oct 17); RSI tilt re-test window opens Oct 16.
 
 BY: daily_orchestrator
+
+## [2026-10-15 16:08] Hourly Analysis
+
+**Trades:** 0 closed last hour, 3 open
+**PnL:** $0.00 last hour | 24h 14T 3W −$0.56 (21.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: volume-breakout-short− still 2T 0W (needs 3+T) — no kill
+- atr_sl_hit 7/14=50% >40 but tpsl_utils fix deployed; tiny-sample artifact (prior runs same)
+- No consecutive-neg-hour streak (quiet hour)
+- Overtrade 0/hr; live_trading=true, kill JSON=true
+- hard_max_loss 3 exits −$0.27 — standing CEO hold, momentum-gate backtest due Oct 17, not stacking
+
+**Open Questions:**
+- 24h WR 21.4% still in guardrail ESCALATE territory
+- vbo-short− one loss away from kill threshold
