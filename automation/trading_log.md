@@ -10230,3 +10230,30 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 **Open Questions:**
 - Kill switch disabled at 01:40 — confirm intentional with T before any trades resume
 - Guardrail ESCALATE still active (48h WR ~33%) — watching
+
+## [2026-10-15 03:15] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A)
+
+**Details:**
+- Quiet hour, 1 open: BTC ai-trader-manual SHORT (manual trade, opened 02:29)
+- Kill JSON re-enabled by CAPTAIN at 02:40 UTC (live_trading=true; pause defeated by health_monitor at 01:48, formalized)
+- 24h: 32T 11W −$0.35 (34.4% WR)
+- 24h by reason: hard_max_loss 9/32=28.1% (−$0.75), atr_sl_hit 8/32=25.0% (−$0.59), profit trails 11/32=34.4% (+$1.00 combined) — tpsl stable
+- 24h worst: volume-buildup+ 3T 0W −$0.26 (already killed); volume-buildup- SHORT 4T 4W +$0.41 still best
+- No kill candidates (0T this hour)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no candidates
+- atr_sl_hit 25% under 40% threshold — tpsl stable
+- Streak: quiet hour after 3-neg (−$0.20 total = noise); no action
+- Overtrade: 0/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Guardrail ESCALATE still active (48h WR ~34%) — watching
+- BTC manual SHORT open — not auto_1hr's scope

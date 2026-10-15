@@ -1987,6 +1987,15 @@ def execute_trade(token, direction, price, confidence, source,
                   test_trailing_variant=None,
                   signal_metadata=None):  # JSON dict of all signal values for future-proof capture
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
+    # CONF-CALIB 2026-10-15 brain_auditor: confidence stacks past 100 via
+    # hebbian+sentiment+hot+rr boosts (7d: 42/195 trades, pump-chain avg 188,
+    # MNT 162.9). Sizing doesn't scale, but conf>100 breaks calibration
+    # analytics and MIN_EXEC_CONFIDENCE comparisons are meaningless above 100.
+    # Single choke point — all execute_trade callers route here.
+    try:
+        confidence = max(min(float(confidence or 0), 100.0), 0.0)
+    except (TypeError, ValueError):
+        confidence = 0.0
     cmd_side = direction.lower()  # long or short
 
     # ── MAXXED volatility backstop at execution time (2026-10-12, T directive) ──

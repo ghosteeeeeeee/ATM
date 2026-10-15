@@ -1,80 +1,102 @@
 {
-  "timestamp": "2026-10-15T02:45:00Z",
+  "timestamp": "2026-10-15T03:40:55Z",
   "run_type": "captain_audit",
-  "critical_incident": {
-    "title": "Vacation guardrail pause defeated by health_monitor — LIVE trade opened during 'paused' state",
-    "timeline": [
-      "01:30 brain_auditor run starts (run_brain_auditor.sh)",
-      "01:40:14 vacation_guardrail pauses: 7d WR 34.4% < 35.0% (195T). Stops pipeline+watchdog+guardrail timers, sets kill JSON false, writes vacation_pause.json",
-      "01:48:25 health_monitor LLM agent sees pipeline timer dead, classifies as crash, AUTO-FIXES: systemctl start hermes-pipeline.timer",
-      "01:49:20 pipeline resumes. decider runs LIVE (is_live_trading_enabled only reads constant=True; JSON/marker ignored)",
-      "02:29:58 LIVE BTC SHORT ai-trader-manual opens ($11.10, lev5, paper=False, conf 70)"
-    ],
-    "root_cause_chain": [
-      "1. is_live_trading_enabled() ignored pause marker — JSON deliberately removed (ghost-trades history) but marker never added",
-      "2. health_monitor prompt mandated 'restart any inactive timer' with no vacation-pause exception",
-      "3. Guardrail stopped its own timer on pause — no auto-resume path (design gap)",
-      "4. WR_7D_PAUSE criterion fires on WR alone — false-positive machine during fix-aging window"
-    ],
-    "fixes_landed": [
-      "hyperliquid_exchange.is_live_trading_enabled: marker check → pause forces paper",
-      "vacation_guardrail: WR pause requires pnl_7d < -2.00; auto-resume WR>=37% or pnl_7d>=0; timer stays armed",
-      "health_monitor_prompt: pause marker overrides restart mandate for pipeline/watchdog"
-    ],
-    "formal_resume": "02:40 UTC captain decision — marker cleared, kill JSON true, timers restarted. Rationale: pause already defeated de-facto; ex-killed 7d +$0.18 37.6%WR; fixes need live aging; trail-arm ratify due today. CEO may reverse by re-creating vacation_pause.json."
-  },
   "trade_summary_24h": {
-    "trades": 33,
-    "wr": 33.3,
-    "pnl": -0.38,
-    "open": 1,
-    "open_detail": "BTC SHORT ai-trader-manual $11.10 lev5 conf70 (opened 02:29 during defeated pause — kept, aligned SHORT_BIAS)"
+    "trades": 32,
+    "wr": 34.4,
+    "pnl": -0.35,
+    "long": "19T -0.47 31.6%",
+    "short": "13T +0.12 38.5%",
+    "note": "SHORT profitable, LONG bleeding — regime SHORT_BIAS both TFs"
   },
   "trade_summary_7d": {
     "trades": 195,
     "wr": 34.4,
     "pnl": -1.72,
-    "long": "148T -1.33 35.1%",
-    "short": "47T -0.39 31.9%",
-    "ex_killed": "157T +0.18 37.6% (kills working)",
-    "daily": "Oct13 worst -1.53/25%; Oct14 -0.04/36.8% healing"
+    "trail_vs_hml": "TRAIL 61T +$5.63 86.9%WR | HML 63T -$6.07 0%WR | OTHER 71T -$1.28",
+    "hml_top": "pump-chain+ 12T -1.28, volume-breakout-long+ 9T -1.08 (killed), pump-chain- 5T -0.51"
   },
-  "watchdog_steer": {
-    "steer-001": "VERIFIED — 9/24h hard_max_loss LONG chop entries, 0% trail-armed. Momentum-gate backtest (self_learner Oct 17) is the root fix. ICP HML tonight same class.",
-    "steer-002": "RESOLVED — volume-buildup+ killed 09:15, all 3 losses pre-kill."
+  "last_run_verification": {
+    "vacation_pause_infra": "PASS — no pause marker, kill JSON true, all timers firing; 0 live trades during any pause since 02:40 resume",
+    "ceiling_meta_fix_1248": "PASS — 0 LONGs with meta RSI>75 opened since; SEI-class leak closed (SEI meta84.21 live-5m53.9 was the smoking gun)",
+    "midband_meta_fix": "PASS — USUAL/BABY (meta 69.2/68.8) were pre-fix entries 04:37; post-fix cohort 12T +$0.04",
+    "trail_arm_timeout": "PASS — BB_SQUEEZE 60m + PUMP_CHAIN 45m both True; trail family 86.9% WR 7d",
+    "doji_reenable": "0 trades since re-enable — monitor",
+    "long_short_bias_shadow": "COLLECTING — 171 log lines, fires every cycle on ACE/GRASS/CHIP; flip to enforce needs CEO + more data",
+    "chase_ratio_shadow": "COLLECTING — 87 log lines",
+    "overall": "All 11 prior fixes PASSING. Post-12:48 cohort positive (+$0.04/12T)."
   },
-  "trail_arm_ratify": {
-    "deadline": "2026-10-15 CEO HARD",
-    "recommendation": "RATIFY BOTH KEEP",
-    "bb_squeeze_timeout_60m": "7d 2T +$0.07 100%WR; soak 1T since Oct13 21:00 +$0.06. 0 timeouts in prior 8d (low fire-rate = regime not defect). Cost ~$0.",
-    "pump_chain_timeout_45m": "14d 6T trail_arm_timeout 33.3%WR -$0.06 vs HML counterfactual avg -$0.27/trade. Timeout is 10x cheaper per fire. Since Oct13 21: 6T +$0.26 50%WR. Est save $0.79/7d, 30d proj +$3.39.",
-    "revert": "1-line each if CEO reverts."
+  "watchdog_steers": [
+    {
+      "id": "steer-001 wrong-side trades",
+      "verdict": "VERIFIED — 7d HML 63T 0%WR -$6.07, 91.8% never trail-armed = chop entries. Root fix = momentum-gate backtest (self_learner Oct 17). Do not stack entry filters."
+    },
+    {
+      "id": "5 signals bleeding",
+      "verdict": "MOSTLY STALE — mtf-regime-trend±, accel-300- killed Oct 6 (0 trades 3d); volume-breakout-long+ killed Oct 13 (last trade Oct 13 19:40). Only ai-trader+ live: 6T 3d -$0.31, n too small to act."
+    },
+    {
+      "id": "SHORT_RSI_CEILING bear exemption",
+      "verdict": "RESOLVED — exemption FIRING. ETC@RSI73.3 +$0.14, LTC@65.2 +$0.11 both entered via bear-structure override and won. Full bear structure required (phase AND linreg AND ema-below), current regime qualifies."
+    },
+    {
+      "id": "AI trader skip cycle",
+      "verdict": "CORRECT — no coin in RSI 60-70 short band. State file: SEI SHORT rejected on cooldown. Wait for bounce."
+    }
+  ],
+  "losing_autopsy_24h": {
+    "losers": "21 closed losers, all but 3 were pre-fix entries (opened before Oct 14 12:48 ceiling fix / 07:45 midband fix)",
+    "clusters": [
+      {
+        "signal": "volume-buildup+ LONG",
+        "trades": 3,
+        "pnl": -0.26,
+        "status": "KILLED 09:15 — losses pre-kill, resolved"
+      },
+      {
+        "signal": "r2v2-long3/4 LONG",
+        "trades": 3,
+        "pnl": -0.35,
+        "root": "USUAL/BABY midband leak (FIXED), SEI RSI84 chase (FIXED 12:48)"
+      },
+      {
+        "signal": "bb-bounce-v2-long+ LONG",
+        "trades": 4,
+        "pnl": -0.11,
+        "root": "ICP HML EXTREME 01:10 tonight = chop entry post-fix; 7d bb-bounce HML 5T -0.31, soak — no touch"
+      },
+      {
+        "signal": "pump-chain- SHORT",
+        "trades": 5,
+        "pnl": -0.08,
+        "root": "mid-band RSI 45-55 shorts (chop profile). HARD_FLOOR=35 revert trigger armed (Oct 13). n small."
+      }
+    ],
+    "winning_side": "Trail-family entries in trend. 7d TRAIL +$5.63 86.9% vs HML -$6.07 0%. Winners: ARB pump-chain+ trail +0.28, volume-buildup- SHORT 4/4W +0.41 (profit-monster-trail)."
   },
-  "soak_status": "All 10 prior fixes PASSING (midband/ceilings/exec-fires/cell_stats/doji/RSI_MAX70/vol-breakout-kill/volume-buildup-kill/chase-ratio-shadow/long-short-bias-shadow COLLECTING). Do not stack entry filters.",
   "changes_this_run": [
-    "is_live_trading_enabled marker check (pause infrastructure bugfix)",
-    "vacation_guardrail WR_PNL_CONFIRM + auto-resume + timer stays armed",
-    "health_monitor_prompt pause exception",
-    "formal resume after defeated pause"
+    "CONF-CALIB: execute_trade clamps confidence to [0,100] — single choke point. bug_hunter undelivered since Oct 14 18:30; 7d 42/195 trades conf>100 (pump-chain avg 188, MNT 162.9). Data hygiene, no sizing impact."
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-15T02:45:00Z",
-      "idea": "Soft-pause paper mode: when 48h WR < 35% (escalate band) but not full pause, auto-switch decider to paper for 4h to collect counterfactuals without bleeding",
-      "rationale": "Fix-aging windows need live cohort data but WR is too low to trust real fills. Paper-mode shadow collects the same signals/exits without PnL risk. The pause-marker→paper path we just built makes this a 5-line extension (soft marker, TTL 4h).",
-      "expected_impact": "Zero PnL risk during recovery windows; full counterfactual data for Oct 13-14 fix validation",
-      "category": "risk management",
+      "date": "2026-10-15T03:40:55Z",
+      "idea": "Trail-arm probability confidence multiplier — at compaction, look up historical trail-arm rate for (signal_type, direction, vol_regime, meta-RSI band) from last 30d closed trades; multiply confidence by arm_rate (e.g. 0.8x-1.2x). Entries where trail historically arms = trend habitat; entries where it never arms = chop habitat.",
+      "rationale": "Directly operationalizes trend-vs-chop philosophy: 91.8% of hard_max_loss never armed trail. Instead of blocking chop entries (hard, collides with other filters), softly down-weight them via confidence so they lose ranking to trend-habitat signals. Multiplier (not block) = reversible, surgical, no trap risk.",
+      "expected_impact": "Shift execution mix toward trail-habitat entries; projected +$2-4/7d based on HML-vs-TRAIL spread ($11.70/7d gap), captures even 20% of it",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "low",
-      "prereq": "backtest: would soft-pause windows historically have collected enough signals to validate fixes?"
+      "risk": "medium — needs backtest; arm-rate may be regime-dependent (out-of-sample check mandatory)",
+      "prereq": "self_learner backtest: compute arm-rate per cell, join to outcomes, verify conf-multiplier counterfactual net positive OOS with p<0.05"
     }
   ],
+  "soak_status": "11 fixes PASSING. Do NOT stack entry filters. Momentum-gate backtest due Oct 17 (self_learner). LONG-SHORT-BIAS shadow collecting — evaluate flip Oct 16 with n>=50 would-dampens.",
   "next_actions": [
-    "CEO: RATIFY trail-arm both (deadline today) — package above",
-    "CEO: review WR_7D_PNL_CONFIRM threshold change (veto window)",
-    "self_learner: momentum-gate backtest still due Oct 17",
-    "bug_hunter: CONF-CALIB (conf>100 clamp) still undelivered since Oct 14 18:30",
-    "Monitor: no re-pause expected (pnl_7d -1.72 > -2.00 confirm); if pnl drops below -2.00 with WR<35, guardrail freezes properly this time",
-    "Watch BTC SHORT open trade — trail/exit engine owns it"
+    "CEO: RATIFY trail-arm both KEEP (deadline was today — soak data supports; 1-line revert each if REVERT)",
+    "CEO: soft-pause idea from 02:45 run still open for review",
+    "self_learner: momentum-gate backtest due Oct 17; new trail-arm-probability multiplier backtest (above)",
+    "bug_hunter: CONF-CALIB self-fixed this run (clamp landed) — stand down; CONF-CALIB task closed",
+    "Monitor: post-12:48 cohort (12T +$0.04) — want n>=30 by Oct 16 before claiming ceiling fix impact",
+    "Monitor: doji-bottom non-EXTREME cohort (0 trades since re-enable)",
+    "Watch: BTC SHORT open — regime-aligned, hold; watchdog owns exits"
   ]
 }

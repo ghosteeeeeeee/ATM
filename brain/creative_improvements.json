@@ -4577,5 +4577,15 @@
     "status": "suggested",
     "risk": "low",
     "prereq": "backtest: would soft-pause windows historically have collected enough signals to validate fixes?"
+  },
+  {
+    "date": "2026-10-15T03:40:55Z",
+    "idea": "Trail-arm probability confidence multiplier — at compaction, look up historical trail-arm rate for (signal_type, direction, vol_regime, meta-RSI band) from last 30d closed trades; multiply confidence by arm_rate (e.g. 0.8x-1.2x). Entries where trail historically arms = trend habitat; entries where it never arms = chop habitat.",
+    "rationale": "Directly operationalizes trend-vs-chop philosophy: 91.8% of hard_max_loss never armed trail. Instead of blocking chop entries (hard, collides with other filters), softly down-weight them via confidence so they lose ranking to trend-habitat signals. Multiplier (not block) = reversible, surgical, no trap risk.",
+    "expected_impact": "Shift execution mix toward trail-habitat entries; projected +$2-4/7d based on HML-vs-TRAIL spread ($11.70/7d gap), captures even 20% of it",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — needs backtest; arm-rate may be regime-dependent (out-of-sample check mandatory)",
+    "prereq": "self_learner backtest: compute arm-rate per cell, join to outcomes, verify conf-multiplier counterfactual net positive OOS with p<0.05"
   }
 ]

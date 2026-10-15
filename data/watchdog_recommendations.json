@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-14T18:50:52.576453+00:00",
+  "timestamp": "2026-10-15T03:20:56.310277+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -8,25 +8,9 @@
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'pump-chain-' losing streak: 3 losses",
-      "detail": "Net -0.04 USDT over last 20 trades (losses: -0.10). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'volume-buildup+' losing streak: 3 losses",
-      "detail": "Net -0.26 USDT over last 20 trades (losses: -0.26). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-003"
     }
   ],
-  "portfolio_health": "warning",
+  "portfolio_health": "good",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
@@ -37,13 +21,43 @@
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "DECLINING",
-    "trend_quality": "UP"
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 0,
-  "deep_analysis": "Portfolio is FLAT (0 open trades) \u2014 no positions to steer, so this cycle is about pattern correction and one high-quality re-entry. Market regime is firmly BEAR: BTC at 81,686 sits BELOW EMA300 (81,991) for 761 consecutive minutes (~12.7h), continuum BELOW, both 15m and 4h scanners print SHORT_BIAS, and 87 of 123 scanned tokens are SHORT_BIAS vs 4 LONG_BIAS. Volume regime is LOW, velocity SLOW \u2014 this is a declining grind, not a panic dump, which favors fade-and-short setups over bottom-fishing LONGs.\n\nThe last 20 closes were a coin flip on count (10W/10L) but the losses reveal three verified failure patterns. First and worst: LONG at overbought RSI 80+. SEI LONG entered at meta_rsi 84.2 lost -5.2% (biggest single loss of the day), POL LONG at 85.0 lost -3.2%, RESOLV LONG at 80.0 lost -1.2%. All three died via hard_max_loss or atr_sl \u2014 the trail never armed because there was no trend to trail, only a pump that was already over. The WINNING side was SHORT or flat: ETC SHORT at RSI 73.3 won +6.1%, LTC SHORT at 65.2 won +4.9%. We keep longing tops in a bear tape.\n\nSecond: volume-buildup+ LONG is 0% WR (0/3, net -0.26 USDT) while its mirror volume-buildup- SHORT is 100% WR (4/4, net +0.41). Same mechanical signal, opposite side. The volume is building for a dump, not a pump \u2014 we're reading the setup backwards. The winning side is the short, and the signal family already proves it.\n\nThird: direction-level bleed. LONGs over 24h: 22 trades, 32% WR, net -0.43. SHORTs: 17 trades, 41% WR, net +0.41. In a bear regime below EMA300, every long is a counter-trend trade against someone who is short and winning. No open positions means no profit-lock or staleness steers this cycle \u2014 the actionable work is to keep firing SHORTs aligned with the bear continuum and refuse LONG entries until BTC reclaims EMA300 with bullish linreg.",
-  "regime_context": "BTC 81,686 below EMA300 (81,991) for 761 min / ~12.7h. Continuum BELOW. 15m + 4h scanners both SHORT_BIAS. Aggregate token scan: 87 SHORT_BIAS / 4 LONG_BIAS / 32 neutral \u2014 a broad, synchronized bear tape. Zscore NEUTRAL, velocity SLOW, acceleration slightly POSITIVE (a weak bounce inside the downtrend), volume LOW, linreg_direction LEAN_BEAR (15m and 1h slopes negative), market_phase DECLINING. Implication: SHORTs are regime-aligned and LONGs fight the tape. The acceleration-positive blip explains why several shorts at RSI ~50 got stopped (small bounces), but the higher-timeframe structure remains down \u2014 shorts entered at RSI 45-62 with ATR room keep working (volume-buildup- 4/4, pump-chain- net +0.26). Do not flip long until BTC reclaims EMA300 AND linreg turns bullish; the 1.3% ATR stop handles a reclaim cheaply if it happens.",
-  "pattern_alerts": "VERIFIED (PostgreSQL, last 24h, meta_rsi not entry_rsi_14):\n\nPATTERN 1 \u2014 Overbought LONG chase: n=3 (SEI rsi=84.2 -5.2%, POL rsi=85.0 -3.2%, RESOLV rsi=80.0 -1.2%), avg pnl -3.2%, 0% WR, total -0.43 USDT. All exits hard_max_loss/atr_sl. WINNING SIDE: SHORT the pump or stay flat \u2014 ETC SHORT at 73.3 won +6.1%, LTC SHORT at 65.2 won +4.9%. Why we weren't on it: r2-trend-long4 and volume-buildup+ fired long on RSI>80 momentum instead of treating exhaustion as a short setup. In a bear below EMA300, overbought = gift, not entry.\n\nPATTERN 2 \u2014 volume-buildup+ LONG: n=3, 0% WR, net -0.26 (ETC -3.9% rsi=54.5, MON -4.7% rsi=25.2, POL -3.2% rsi=85.0). Mirror volume-buildup- SHORT: n=4, 100% WR, net +0.41 (ETC +6.1%, LTC +4.9%, POL +4.8%, AIXBT +1.3%). WINNING SIDE: the short. Volume builds before dumps in this regime; the long side of this signal is structurally wrong while BTC sits below EMA300.\n\nPATTERN 3 \u2014 Direction bleed: LONG n=22 32% WR net -0.43 vs SHORT n=17 41% WR net +0.41. Also note MON LONG at meta_rsi 25.2 lost -4.7% \u2014 oversold is NOT a long in a grinding bear, price kept dumping (BANANA lesson repeated). pump-chain- SHORT shows 25% WR but net +0.26 (small losses, occasional big winners \u2014 correct risk shape for a fade signal).",
-  "agent_timestamp": "2026-10-14T18:57:17.363983+00:00"
+  "open_count": 1,
+  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (0 long, 1 short)\nUnrealized PnL: -0.46 USDT (BTC SHORT)\nRegime: bear (SHORT_BIAS both TFs) | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe2 [info] BTC SHORT: hold, thesis intact\n   Regime-aligned, R:R 2.34, stop 82100 above EMA300\n   (81540). Bounce is noise in STRONG_DOWN. No action.\n\n\ud83d\udfe1 [warning] 5 signals bleeding capital \u2014 brain auditor\n   volume-breakout-long+ (-0.20, 25% WR), mtf-regime-trend+\n   (-0.46), mtf-regime-trend- (-0.42), ai-trader+ (-0.26),\n   accel-300- (-0.34). All net losers. Need regime filters.\n\n\ud83d\udfe1 [warning] SHORT_RSI_CEILING=65 blocking best shorts\n   ETC SHORT @ RSI 73.3 won +6.12%, LTC @ 65.2 won +4.90%.\n   Verify bear-structure exemption (65-75 band) is firing\n   in the current confirmed bear regime.\n\n\ud83d\udfe2 [info] AI trader: skip this cycle\n   No coin in the 60-70 RSI short band. All high-ATR\n   candidates already dumped to oversold (OP 32.7, AXS 35.5,\n   USELESS 43.2). Forcing a mid-band short = hard_max_loss.\n   Last pick (SEI) also within 45-min cooldown window.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nBTC SHORT at 80809, now 81184.5, 0.8h open. Correct\ndirection \u2014 BTC below EMA300 for 200+ min, STRONG_DOWN,\n51/123 tokens SHORT_BIAS. Short-term bounce (acceleration\nPOSITIVE, Wyckoff ACCUMULATION on 1m) is noise; the 15m/4h\nstructure is intact. Stop at 82100 is correctly placed above\nthe thesis-invalidating EMA300 level. Hold.\n\nRecent 20 closed: 10W/10L, +0.15 net. Verified pattern:\nshorts at RSI \u226555 win (ETC 73.3 +6.1%, LTC 65.2 +4.9%),\nshorts at RSI 45-55 are chop (never reach trail arm). Longs\nat RSI 80+ are death (SEI 84.2 -5.19% \u2014 winning side was\nSHORT). The market is telling us: short the pops, skip the\nmid-range chop, don't long into SHORT_BIAS.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. HOLD BTC SHORT \u2014 regime-aligned, clean risk. Watch\n   81540 (EMA300) as invalidation line.\n2. Flag 5 losing signals for brain auditor \u2014 all need\n   regime gates (disable longs in SHORT_BIAS).\n3. Verify SHORT_RSI_HARD_CEILING bear-structure exemption\n   is firing \u2014 it should allow RSI 65-75 shorts now.\n4. Next AI trader pick: wait for a bounce to RSI 60+,\n   then SHORT. Nothing qualifies right now.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
+  "agent_timestamp": "2026-10-15T03:27:35.509009+00:00",
+  "regime_context": "BTC @ 81245, BELOW EMA300 (81540) for 200+ consecutive 1m ticks, zscore NEUTRAL, velocity SLOW, acceleration POSITIVE (bouncing), linreg LEAN_BEAR (alignment 0.5), wyckoff ACCUMULATION (1m), trend_quality STRONG_DOWN, market_phase CALM. 15m regime: SHORT_BIAS. 4h regime: SHORT_BIAS. Continuum: BELOW. Volatility: LOW.\n\n5m scanner: 51 SHORT_BIAS / 3 LONG_BIAS / 69 NEUTRAL (n=123). Heavy short bias across alts \u2014 OP/AXS/TURBO/USUAL/FOGO/ACE/KFLOKI all conf 80+ SHORT_BIAS with 3-9% drops over 16 candles.\n\nWhat this means: SHORTS are correct. LONGs fight the regime. The only longs that won in the last 20 were at RSI 50-62 (APT 58.8, ARB 61.5) \u2014 mid-band momentum, not bounces. Longs at RSI 80+ (SEI 84.2) lost -5.19%. In SHORT_BIAS chop, short the pops (RSI 65-73) and skip the mid-range chop. BTC 81540 (EMA300) is the line: above it, short thesis invalid; below it, shorts stay favored.",
+  "pattern_alerts": "PATTERN 1 (VERIFIED, n=20): Overbought-long chase = wrong side. SEI LONG at meta_rsi 84.21 lost -5.19% (r2-trend-long4). WINNING side was SHORT \u2014 SEI is now -2.72% over 16 candles, SHORT_BIAS regime. The pump was over; we longed the top. Rule: never LONG above RSI 75 (SIGNAL_FILTER_RSI_MAX=75 already blocks, but r2-trend-long4 may have bypassed). Check if r2-trend signals respect the RSI ceiling.\n\nPATTERN 2 (VERIFIED, n=10 shorts): SHORT wins require elevated RSI. Short winners: ETC meta_rsi 73.3 (+6.12%), LTC 65.2 (+4.90%), POL 55.8 (+4.77%). Short losers: ETH 51.5 (-2.12%), CAKE 48.2 (-2.57%), HYPE 59.3 (-1.79%), IO 50.0 (-0.87%), HBAR 50.8 (-0.16%). Shorts at RSI 45-55 are chop trades (never reach trail arm). WINNING side = short only when RSI \u2265 55, ideally 65-73 (overbought pop in a downtrend). SHORT_RSI_CEILING=65 blocks some of the best entries (ETC 73.3 won!) \u2014 the ceiling may be too tight in confirmed SHORT_BIAS regimes. Flag for brain auditor: consider regime-gated exemption (bear-structure short at RSI 65-75, same pattern as the existing SHORT_RSI_HARD_CEILING exemption logic).\n\nPATTERN 3 (VERIFIED, signal-level): volume-breakout-long+ is 25% WR (5W/20L), -0.20 USDT. mtf-regime-trend+ is 44.4% WR, -0.46. mtf-regime-trend- is 40% WR, -0.42. ai-trader+ is 40% WR, -0.26. accel-300- is 37.5% WR, -0.34. All five signals are net losers over their lifetime. The winning side = staying out or their opposite direction. Flag for brain auditor review \u2014 these are bleeding capital in the current regime.\n\nPATTERN 4 (INFO): USELESS SHORT at meta_rsi 42.53 lost -3.15% (volume-breakout-short-). RSI 42.53 is below SHORT_RSI_FLOOR band center \u2014 the move already happened. WINNING side was LONG (bounce from oversold). Confirms: don't short into oversold.",
+  "additional_steers": [
+    {
+      "severity": "info",
+      "category": "regime",
+      "title": "BTC SHORT: hold, thesis intact",
+      "detail": "Regime-aligned short, R:R 2.34, stop above EMA300. Short-term bounce (accel POSITIVE, Wyckoff ACCUMULATION on 1m) is noise in STRONG_DOWN. Invalidates if BTC 1m closes above 81540.",
+      "action": "Hold. No stop adjustment needed \u2014 82100 is correctly placed above the thesis-invalidating EMA300 level."
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "5 signals bleeding capital \u2014 flag for brain auditor",
+      "detail": "volume-breakout-long+ (25% WR, -0.20), mtf-regime-trend+ (-0.46), mtf-regime-trend- (-0.42), ai-trader+ (40% WR, -0.26), accel-300- (-0.34). All net losers. Not disabling (watchdog can't) but these need regime filters or parameter review.",
+      "action": "Flag for brain auditor. Suggest: regime-gate these signals (disable longs in SHORT_BIAS, disable shorts in LONG_BIAS)."
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "SHORT_RSI_CEILING=65 may be blocking best short entries",
+      "detail": "ETC SHORT at RSI 73.3 won +6.12%, LTC at 65.2 won +4.90%. Both near/above the 65 ceiling. The existing bear-structure exemption (SHORT_RSI_HARD_CEILING) covers 65-75 but only in confirmed bear structure. Current regime IS confirmed bear (SHORT_BIAS both TFs, STRONG_DOWN) \u2014 the exemption should be active. Verify it's firing.",
+      "action": "Verify bear-structure exemption path in signal_compactor. If it's not firing, the best short setups are being blocked."
+    },
+    {
+      "severity": "info",
+      "category": "opportunity",
+      "title": "AI trader next pick: SHORT at RSI 60-70, skip mid-band",
+      "detail": "Last pick (SEI SHORT) rejected for cooldown. When next pick fires, target SHORT on a coin with meta_rsi 60-70 in a SHORT_BIAS regime \u2014 that's the winning profile (ETC 73.3, LTC 65.2). Avoid RSI 45-55 shorts (chop, 0% trail-arm rate). Candidates with fresh data: OP RSI 32.7 (too low), AXS 35.5 (too low), USELESS 43.2 (too low), ZRO 45.0 (borderline). None in the 60-70 band right now \u2014 all the high-ATR coins have already dumped to oversold. Wait for a bounce to RSI 60+ before shorting.",
+      "action": "Skip AI trader this cycle. No coin is in the 60-70 RSI short band. Forcing a mid-band short = hard_max_loss setup."
+    }
+  ]
 }

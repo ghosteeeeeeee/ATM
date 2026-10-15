@@ -4695,3 +4695,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-15 02:15] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W −$0.13 (ICP bb-bounce-v2+ hard_max_loss, MNT ai-trader+ atr_sl_hit) | 24h 33T 11W −$0.38 (33%) | kill: none (ai-trader+ 2T 0W, needs 3+T) | volume-buildup+ remains killed | atr_sl_hit 27.3% (tpsl stable) | overtrade 2/hr | streak 3-neg but −$0.20 total (noise) | 0 open | ⚠️ kill JSON=false since 01:40 (live trading OFF, not by auto_1hr) | live_trading constant=true
 BY: auto_1hr
+[2026-10-15 03:15] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet), 1 open BTC ai-trader-manual SHORT | 24h 32T 11W −$0.35 (34.4%) | kill: none (0T) | volume-buildup+ remains killed | atr_sl_hit 25.0% (tpsl stable) | hard_max_loss 28.1% (hold) | overtrade 0/hr | streak reset by quiet hr | live_trading=true (CAPTAIN resumed 02:40), kill JSON=true
+BY: auto_1hr

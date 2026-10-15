@@ -1320,5 +1320,16 @@
     "after": "formally live: marker cleared, kill JSON true, all timers active, is_live_trading_enabled()=True",
     "rationale": "Pause was already defeated de-facto (live BTC SHORT open since 02:29). Ex-killed 7d = +$0.18 37.6%WR (kills working). Fixes Oct 13-14 need live cohort aging. Trail-arm ratify due today needs live data. Shadow gates need collection. One-way freeze without resume = death spiral (WR can only recover via aging, blocked from validating fixes).",
     "impact": "System live with fixed guardrail. WR_7D_PNL_CONFIRM prevents immediate re-pause on current metrics (pnl_7d -1.72 > -2.00). Open BTC SHORT (ai-trader-manual, $11.10 lev5) untouched."
+  },
+  {
+    "timestamp": "2026-10-15T03:40:55Z",
+    "agent": "brain_auditor",
+    "change": "CONF-CALIB: clamp execute_trade confidence to [0,100] — single choke point; bug_hunter undelivered, self-fixed",
+    "type": "bugfix",
+    "file": "scripts/decider_run.py",
+    "before": "confidence passed unclamped (7d 42/195 trades >100, max ~188)",
+    "after": "confidence = max(min(float(confidence or 0), 100.0), 0.0) at execute_trade entry",
+    "rationale": "conf>100 breaks calibration analytics; MIN_EXEC comparisons meaningless above 100; no sizing impact so zero trade risk",
+    "impact": "All future trades store conf<=100; historical data untouched"
   }
 ]
