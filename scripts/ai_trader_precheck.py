@@ -202,30 +202,19 @@ def precheck(coin, direction):
     elif rsi is None and 'RSI' not in [c['name'] for c in results['checks']]:
         check('RSI', False, 'insufficient closed candle data')
 
-    # 3b. HALL-SHAME check — 30d direction winrate must be >= 55%
+    # 3b. HALL-SHAME check — combo-aware via reputation.py (Rep Phase 3, 2026-10-15)
+    # Old duplicate leaderboard logic removed; single source = reputation.should_block.
+    # Not a hard block anymore (CEO Oct 11): 0.3x mult with proven-combo override.
     try:
-        lb_file = os.path.join(HERMES_DATA, 'favorites_leaderboard.json')
-        with open(lb_file) as f:
-            lb_data = json.load(f)
-        # Find coin in leaderboard
-        coin_lb = None
-        for t in lb_data.get('leaderboard', []):
-            if t.get('token', '').upper() == token:
-                coin_lb = t
-                break
-        if coin_lb and coin_lb.get('trades', 0) >= 15:
-            dir_stats = coin_lb.get('direction_stats', {})
-            if direction in dir_stats:
-                dir_wr = dir_stats[direction].get('winrate', 50)
-            else:
-                dir_wr = coin_lb.get('wr', 50)
-            check(f'30d WR >= 55%', dir_wr >= 55, f'30d {direction} WR={dir_wr:.1f}% ({coin_lb.get("trades",0)} trades)')
-        else:
-            check('30d WR', True, f'insufficient trades ({coin_lb.get("trades",0) if coin_lb else 0}) — skip check')
-    except FileNotFoundError:
-        check('30d WR', True, 'leaderboard not found — skip check')
+        from reputation import should_block as rep_should_block
+        hos = rep_should_block(token, 'ai-trader', direction)
+        mult = float(hos.get('mult', 1.0))
+        reason = hos.get('reason', '')
+        passed = mult >= 1.0
+        detail = reason if mult >= 1.0 else f'{reason} mult={mult:.2f}'
+        check('30d WR >= 55%', passed, detail)
     except Exception as e:
-        check('30d WR', True, f'error: {e} — skip check')
+        check('30d WR', True, f'rep error: {e} — skip check')
 
     # 3c. LOSERS/PENALTY check
     try:
