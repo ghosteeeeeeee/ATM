@@ -10,14 +10,26 @@ Launch Chromium browser on a VNC display (default: `:1`).
 ## Trigger
 Run chromium on a VNC display, e.g. "open chromium on VNC", "run chromium on display :1".
 
-## Usage
+## Usage (preferred): the systemd service
+Since 2026-10-15 Chromium runs as `chromium-vnc.service` — auto-starts on boot, auto-restarts on crash, and respects a clean close (no relaunch loop):
+
+```bash
+systemctl start chromium-vnc.service     # launch (no-op if already running)
+systemctl stop chromium-vnc.service      # close Chromium cleanly
+systemctl restart chromium-vnc.service   # restart browser
+systemctl status chromium-vnc.service
+journalctl -u chromium-vnc.service -n 20
+```
+
+It runs `launch_chromium.sh` (same dir as this SKILL.md), which waits for the X display, resolves the current snap revision, and launches with the real profile.
+
+## Usage (manual): one-off launch
 **Always launch with the existing snap user profile** to keep saved passwords, bookmarks, and history. A fresh `/tmp` profile is empty and loses everything on close.
 
 ```bash
-# Find current snap revision
+/root/.hermes/skills/chromium-vnc/launch_chromium.sh
+# or fully manual:
 REV=$(ls /snap/chromium/ | grep -E '^[0-9]+$' | sort -n | tail -1)
-
-# Launch with the real profile
 DISPLAY=:1 /snap/chromium/$REV/usr/lib/chromium-browser/chrome \
   --no-sandbox --disable-gpu --disable-software-rasterizer \
   --no-first-run \
@@ -42,6 +54,7 @@ Xvfb and x11vnc are **separate systemd units** (`xvfb.service`, `x11vnc.service`
 Fixes in place:
 - `/etc/systemd/system/xvfb.service` — owns Xvfb :1, `Restart=always`
 - `/etc/systemd/system/x11vnc.service` — `Requires=xvfb.service`, only shares the display
+- `/etc/systemd/system/chromium-vnc.service` — Chromium auto-start + crash recovery (`Restart=on-failure`, clean exit respected)
 - `/etc/needrestart/conf.d/99-blacklist-vnc.conf` — blacklists Xvfb/x11vnc from needrestart restarts (Xvfb keeps old libs in memory until reboot; harmless for a display server)
 
 If the display dies anyway: `systemctl status xvfb.service x11vnc.service`.
