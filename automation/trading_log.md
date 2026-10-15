@@ -10116,3 +10116,60 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 **Open Questions:**
 - Guardrail ESCALATE still active (48h WR ~29-38%) — watching, no action
 - Trade frequency low (0-2/hr all day) — not overtrading, but system is quiet; regime may be range-bound
+
+## [2026-10-14 23:15] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** $-0.03 (WR: 0.0%)
+
+**Details:**
+- IO pump-chain- SHORT atr_sl_hit −$0.03 (−0.87% acct, 27min hold) — normal SL loss
+- 24h: 38T ~15W −$0.04 net (39% WR, breakeven)
+- 24h by reason: atr_sl_hit 10/38=26.3% (−$0.63), hard_max_loss 10/38=26.3% (−$0.82), profit trails 16/38=42% (+$1.44 combined) — tpsl stable
+- 24h worst: volume-buildup+ 3T 0W −$0.26 (already killed 09:15, pre-kill only); volume-breakout-short- 2T 0W −$0.21 (needs 3+T to kill)
+- volume-buildup- SHORT: 4T 4W +$0.41 — still best signal 24h
+- 1 open position
+- live_trading=true, kill JSON=true
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no candidates (1T this hour, needs 3+T 0W in last hour)
+- atr_sl_hit 26.3% under 40% threshold — tpsl stable
+- Streak: −0.16, +0.28, quiet, −0.02, quiet, −0.03 — no 3 consecutive negative hours
+- Overtrade: 1/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Guardrail ESCALATE still active (48h WR ~29-39%) — watching, no action
+- Another quiet hour; regime still range-bound
+
+## [2026-10-15 00:15] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** $-0.04 (WR: 0.0%)
+
+**Details:**
+- HYPE hl_copy_trader,ichimoku- SHORT atr_sl_hit −$0.04 (−1.79% acct, ~59min hold) — normal SL loss
+- 24h: 39T 14W −$0.08 net (35.9% WR, breakeven)
+- 24h by reason: atr_sl_hit 11/39=28.2% (−$0.67, under 40), hard_max_loss 10/39=25.6% (−$0.82), profit trails 14/39=35.9% (+$1.44 combined) — tpsl stable
+- 24h worst: volume-buildup+ 3T 0W −$0.26 (already killed); volume-breakout-short- 2T 0W −$0.21 and ai-trader+ 2T 0W −$0.10 (both need 3+T to kill)
+- volume-buildup- SHORT: 4T 4W +$0.41 — still best signal 24h
+- Winners MAE avg 0.226% (entries fine, <0.5%)
+- 0 open positions
+- live_trading=true, kill JSON=true
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no candidates (1T this hour; vbo-short- and ai-trader+ still at 2T 0W, need 3+)
+- atr_sl_hit 28.2% under 40% threshold — tpsl stable
+- Streak: −0.02 (20:00), −0.03 (23:00), −0.04 (00:00) — 3 neg but total −$0.09, trivial; no size action
+- Overtrade: 1/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Guardrail ESCALATE still active (48h WR ~30-39%) — watching, no action
+- Quiet market continues (0-2/hr); losses are noise-sized (cents)
