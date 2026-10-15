@@ -4703,3 +4703,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-15 16:08] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet), 3 open | 24h 14T 3W -$0.56 (21.4%) | kill: none (vbo-short- 2T 0W, needs 3+T) | atr_sl_hit 50% tiny-sample, tpsl fix deployed | overtrade 0/hr | live_trading=true, kill JSON=true
 BY: auto_1hr
+[2026-10-15 17:09] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W +$0.28 (ICP pump-chain+ atr_trail_hit) | 24h 11T 3W −$0.12 (27.3%) | kill: none (vbo-short- 1T 0W) | atr_sl_hit 36.4% (under 40) | overtrade 1/hr | streak none (positive hour) | live_trading=true, kill JSON=true
+BY: auto_1hr

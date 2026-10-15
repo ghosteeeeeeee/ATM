@@ -10367,3 +10367,22 @@ BY: daily_orchestrator
 **Open Questions:**
 - 24h WR 21.4% still in guardrail ESCALATE territory
 - vbo-short− one loss away from kill threshold
+
+## [2026-10-15 17:09] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L) — ICP pump-chain+ LONG atr_trail_hit +$0.28 (+15.16%)
+**PnL:** +$0.28 last hour | 24h 11T 3W −$0.12 (27.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: volume-breakout-short− 1T 0W 24h (rolled down from 2T; needs 3+T) — no kill
+- atr_sl_hit 4/11 = 36.4% (under 40 threshold; tpsl_utils fix deployed)
+- No consecutive-neg-hour streak (last hour positive)
+- Overtrade 1/hr; live_trading=true, kill JSON=true
+- Open: IOTA +$0.35, BANANA +$0.40 (both pump-chain+ LONG, in profit)
+- pump-chain+ 4T 3W +$0.54 — only profitable signal in 24h window
+
+**Open Questions:**
+- 24h WR 27.3% still below 50% checkpoint retarget (CEO-owned)
+- hard_max_loss 3 exits −$0.27 — standing CEO hold, momentum-gate backtest due Oct 17
