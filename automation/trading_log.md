@@ -10462,3 +10462,22 @@ BY: daily_orchestrator
 **Open Questions:**
 - 24h WR 21.4% still below 50% checkpoint (CEO-owned)
 - hard_max_loss 3 exits −$0.29 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-15 23:09] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L) — BABY bb-bounce-v2-long+ LONG atr_sl_hit −$0.15 (−4.02%), ETH liq-hunt+ LONG profit-monster-trail +$0.05 (+1.20%)
+**PnL:** −$0.10 last hour | 24h 14T 4W +$0.28 (~28.6% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal has 3+ trades in last hour (bb-bounce-v2-long+ 2T 0W 24h, needs 3+T) — no kill
+- atr_sl_hit 5/14 = 35.7% (under 40 threshold; tpsl_utils fix deployed)
+- No 3-consecutive-neg-hour streak (20:00 +$0.49, 22:00 +$0.05, 23:00 −$0.15)
+- Overtrade 2/hr; live_trading=true, kill JSON=true
+- pump-chain+ 6T 3W +$1.03 — only net-positive signal; liq-hunt+ 1T 1W +$0.05
+- Open: BTC manual, HYPE hl_copy, WLFI doji-bottom (all flat)
+
+**Open Questions:**
+- 24h WR 28.6% still below 50% checkpoint (CEO-owned)
+- hard_max_loss 3 exits −$0.29 24h — standing CEO hold, momentum-gate backtest due Oct 17
