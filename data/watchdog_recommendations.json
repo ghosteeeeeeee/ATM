@@ -1,46 +1,30 @@
 {
-  "timestamp": "2026-10-15T14:38:05.427422+00:00",
+  "timestamp": "2026-10-15T18:38:07.629122+00:00",
   "steers": [
     {
       "severity": "urgent",
-      "category": "stale",
-      "title": "BTC open 12h, losing -0.4%",
-      "detail": "Trade open 12 hours and underwater. Thesis may be invalid. Consider cutting.",
-      "trade_id": 16192,
+      "category": "health",
+      "title": "Losing streak: 13/20 recent trades lost",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: +0.24 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
-      "severity": "urgent",
-      "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.13 USDT. Something is wrong.",
+      "severity": "warning",
+      "category": "stale",
+      "title": "IOTA open 4h, losing",
+      "detail": "Trade open 4 hours, down -3.7%. Monitor closely.",
+      "trade_id": 16195,
       "auto_executable": false,
       "id": "steer-002"
     },
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: IOTA + ICP",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
+      "title": "Trade cluster: HYPE + BTC",
+      "detail": "Both opened within 17 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-003"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: IOTA + BANANA",
-      "detail": "Both opened within 9 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-004"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ICP + BANANA",
-      "detail": "Both opened within 9 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-005"
     },
     {
       "severity": "warning",
@@ -48,7 +32,7 @@
       "title": "Portfolio heavily long (3 trades)",
       "detail": "3 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
-      "id": "steer-006"
+      "id": "steer-004"
     },
     {
       "severity": "warning",
@@ -56,7 +40,7 @@
       "title": "8 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-007"
+      "id": "steer-005"
     }
   ],
   "portfolio_health": "critical",
@@ -65,18 +49,92 @@
     "btc_4h": "SHORT_BIAS",
     "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "FLAT",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "STRONG_UP"
+    "linreg_alignment": 0.0,
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "DECLINING",
+    "trend_quality": "UP"
   },
-  "open_count": 4,
-  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 4 (3 long, 1 short)\nUnrealized PnL: ~flat (BTC short -0.38%, 3 longs ~-0.3%)\nRegime: bull reclaim (STRONG_UP, above EMA300 55 bars) | Vol: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent/stale] BTC SHORT (16192) open 12h \u2014 thesis DEAD. BTC reclaimed EMA300 (80932) and sits at 81113 with STRONG_UP trend. This short is fighting the tape; stop at 82100 = -1.6% give. Cut now.\n\ud83d\udd34 [urgent/health] 12/20 recent trades lost \u2014 8 of them mid-band shorts (RSI 42-59) entered into a rising market. pump-chain- at 32.6% WR / 46 trades. Wrong direction, not bad timing.\n\ud83d\udfe1 [warning/cluster] BANANA+ICP+IOTA opened within 9 min \u2014 correlated longs. Tripwire: BTC below 80930 invalidates all three at once.\n\ud83d\udfe1 [warning/regime] BTC 4h still SHORT_BIAS (lagging) vs 15m LONG_BIAS \u2014 reclaim is fresh on low volume; if BTC loses EMA300 again, flip longs to caution.\n\ud83d\udfe2 [info/opportunity] Top momentum now: XPL +8.5% (16 candles), PONS +6.1%, UNI +4.9% \u2014 all LONG_BIAS, we're not in them.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe losing pattern is direction, not timing. Mid-band shorts (RSI ~50) fired all morning into a BTC reclaim and went 7/8. The only shorts that paid were overbought with volume (ETC RSI 73 \u2192 +6.1%, LTC RSI 65 \u2192 +4.9%) via volume-buildup- (100% WR, 4/4). The only losing long was the overbought chase (SEI RSI 84 \u2192 -5.2%). Winners entered RSI 55-62 WITH the trend. Our 3 fresh longs match that template \u2014 hold them. The BTC short matches none of the winning templates \u2014 it's the odd position out.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Close the BTC SHORT (16192) or accept the -1.6% stop. Winning side = LONG while EMA300 holds.\n2. Hold BANANA/ICP/IOTA longs; treat BTC 80930 (EMA300) as the collective stop tripwire.\n3. AI Trader pick fired: **XPL LONG** @ 0.08463, conf 78 \u2014 all gates PASS, RSI 55.6, ATR 2.39%, top momentum, regime-aligned.\n4. Short-term: mid-band shorts (RSI 45-60) have no edge here \u2014 flag for brain auditor, not a param change from me.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
-  "regime_context": "Continuum: ABOVE | BTC 4h: SHORT_BIAS (lagging) | BTC 15m: LONG_BIAS | Trend: STRONG_UP, LEAN_BULL, 55 bars above EMA300.\n\nThis is a fresh reclaim, not a mature trend \u2014 volume is LOW and market phase is CALM, so moves are grindy not explosive. Aligned: LONG. Counter-trend: SHORT. pump-chain- shorts fired all morning into this reclaim and 8/12 recent shorts lost (33% WR). The only shorts that won recently (ETC +6.1% RSI 73.3, LTC +4.9% RSI 65.2) were overbought entries with volume confirmation \u2014 NOT mid-band chop shorts. Until BTC loses EMA300 (80930), every SHORT is fighting the tape.",
-  "pattern_alerts": "VERIFIED from last 20 closed (PostgreSQL meta_rsi, NOT entry_rsi_14):\n\nPATTERN 1 \u2014 Mid-band shorts are chop, not edge. n=8 shorts entered RSI 42-59 (IO -4.4%, MERL -3.3%, HYPE -1.8%, IO -0.9%, ETH -2.1%, CAKE -2.6%, USELESS -3.1%, HBAR -0.2%). 7/8 lost, avg -2.19%. The winning side: LONG \u2014 BTC was reclaiming, 50 tokens LONG_BIAS, shorts were fading a rising tape. Why weren't we on it? pump-chain- fires on any dump regardless of higher timeframe direction. Signal-level: pump-chain- now at 32.6% WR over 46 trades (total PnL +0.35, i.e. noise).\n\nPATTERN 2 \u2014 Shorts only pay at overbought extremes with volume. Winners: ETC +6.1% (RSI 73.3), LTC +4.9% (RSI 65.2), POL +4.8% (RSI 55.8 but volume-buildup-). All four recent short wins came from volume-buildup- (100% WR, 4/4) \u2014 not pump-chain-. The winning side for a short is RSI 65+ after a pump with a volume spike; mid-RSI 50 shorts have no edge because there's no inventory to squeeze.\n\nPATTERN 3 \u2014 Overbought longs lose. SEI entered RSI 84.2 \u2192 -5.2% (r2-trend-long4). ARB entered 66.7 \u2192 -2.6%. Winning longs (ARB +12.4% RSI 61.5, APT +2.0% RSI 58.8) entered the RSI 55-62 sweet spot with trend. The winning side after an overbought chase is the SHORT that fades the exhaustion \u2014 exactly the inverse of what SEI-long holders provided.\n\nCONCLUSION: 12/20 recent losses = 8 wrong-side mid-band shorts + 1 overbought long + 3 others. We are not losing on timing; we are losing on DIRECTION selection. Every pump-chain- short fired this morning into a rising BTC was the wrong side. Cut the BTC short, stop mid-band shorts while EMA300 holds.",
-  "agent_timestamp": "2026-10-15T14:42:15.376679+00:00"
+  "open_count": 3,
+  "deep_analysis": "48h performance is critical: 33% WR across 51 trades (30 losses, 17 wins), net -0.13 USDT. The vacation guardrail escalation is correct. Three verified patterns explain the bleed:\n\nPATTERN 1 \u2014 SHORTS AT MID-RSI ARE COIN FLIPS THAT LOSE. 8 of 12 short losses entered at meta_rsi 48-53 (IO x2 @ 50, MERL @ 49.4, CAKE @ 48.1, ETH @ 51.5, HBAR @ 50.8, PUMP @ 50, ALT @ 53.3). These coins were neutral \u2014 not overbought, not dumping. The winning side was either LONG (if the coin held) or waiting for RSI >65 where real shorts live (ETC won at 73.3, LTC at 65.2). We shorted air. The right move was to not short at all, or wait for actual overbought conditions.\n\nPATTERN 2 \u2014 LONGS CHASE AT RSI >66 AND DIE. JUP (66.7), ARB (66.7), POL (85.0), SEI (84.2), RESOLV (80.0), USUAL (69.2), BABY (68.8) all lost. These are FOMO entries after the pump is done. Winning longs entered at meta_rsi 56-65 (BANANA 65.2, ICP 63.2, ARB 61.5, FOGO 62.5). The winning side was already long from the 56-65 band and exited into our late entries. We were the exit liquidity.\n\nPATTERN 3 \u2014 hard_max_loss = 13/30 losses (43%). These never reached +0.40% for trail to arm. In LOW volatility, trail cannot arm, so every chop entry bleeds to hard_max_loss. The winning side had volatility; we entered when there was none.\n\nCurrent open trades: BTC LONG SL (81900) sits 0.05% above EMA300 (81861) with NEGATIVE acceleration \u2014 any EMA300 touch stops us out, and the 4h regime is SHORT_BIAS. HYPE LONG at meta_rsi 51.3 is the no-man's land profile (worst historical WR band) with SL only 0.16% below current. IOTA is the only sound trade: trail locked above entry at +3.66%, free ride. I would not open BTC or HYPE fresh today.",
+  "agent_timestamp": "2026-10-15T18:45:55.213868+00:00",
+  "regime_context": "BTC sits 0.45% above EMA300 (82226 vs 81861) after reclaiming it ~9h ago. 15m regime says LONG_BIAS, but 4h says SHORT_BIAS, acceleration is NEGATIVE, velocity SLOW, volume LOW, market phase DECLINING/CALM. This is a mixed chop environment \u2014 no clean trend to follow. The 48h data confirms: both LONG (34% WR) and SHORT (32% WR) are losing because neither side has momentum. LOW volatility means trail cannot arm (hard_max_loss pattern). Wyckoff shows ACCUMULATION/UNKNOWN \u2014 market is deciding. The 3 LONG positions are directionally aligned with the 15m and continuum (ABOVE EMA300) but exposed to a 4h-trend dump. One BTC break below EMA300 hits all 3 correlated positions simultaneously. Net: we are positioned for a bounce that the higher timeframe doesn't confirm. Not fatal yet, but the correlation risk is real.",
+  "pattern_alerts": "VERIFIED from PostgreSQL (48h window, n=47 closed trades, meta_rsi from _signal_metadata):\n\n1. SHORT at meta_rsi 48-53: n=8 losses, avg pnl=-0.07, 0% WR. Coins: IO, MERL, CAKE, ETH, HBAR, PUMP, ALT, HBAR. WINNING SIDE: wait for RSI >65 (real overbought dumps) or RSI <45 (already dumping continuation). At RSI 50 the coin is neutral \u2014 shorting neutral = coin flip. We weren't on the winning side because there wasn't one; we manufactured a trade out of nothing.\n\n2. LONG at meta_rsi >66: n=7 losses, avg pnl=-0.09, 0% WR. Coins: JUP, ARB, POL, SEI, RESOLV, USUAL, BABY. WINNING SIDE: LONGs that entered at 56-65 (the win cluster) and exited into our late entries. We were exit liquidity for the early longs. The right entry was 45-60 minutes earlier at RSI 56-65.\n\n3. LONG at meta_rsi 48-58 (mid-range): n=6 losses, avg pnl=-0.05, 0% WR. Coins: ICP, MNT, ETC, HBAR, GMX, USELESS, WLFI. WINNING SIDE: no winning side \u2014 these are chop entries with no momentum. Trail never arms (hard_max_loss). The correct action was to not enter.\n\n4. Volume-buildup+ LONG went from 100% WR to 3 losses in 48h (ETC @ 54.5, MON @ 25.2, POL @ 85.0). The signal is entering at RSI extremes (25 and 85) outside its historical sweet spot. MON at 25.2 was a falling knife; POL at 85 was a chase. The winning entries historically sit at 55-65.\n\n5. Pump-chain- SHORT: 3 losses in 48h, all at meta_rsi 44-50. Signal fires on any dump detection but the RSI floor (35) allows entries in neutral territory. The winning short entries from volume-buildup- were at RSI 65-73 (overbought dumps).",
+  "agent_steers": [
+    {
+      "severity": "urgent",
+      "category": "regime",
+      "title": "BTC long SL sits 0.05% above EMA300 \u2014 one touch stops us out",
+      "detail": "BTC LONG (id 16200) SL at 81900, EMA300 at 81861. With NEGATIVE acceleration and 4h SHORT_BIAS, an EMA300 touch is likely. If BTC drops to 82000, consider manual close before SL. The 4h trend doesn't confirm this long.",
+      "auto_executable": false
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Do NOT fire AI trader this cycle \u2014 system in chop, 33% WR",
+      "detail": "Last 4 AI trader outcomes: BTC short -0.18, MNT long -0.04, USELESS long -0.03, CRV skipped. LOW volatility + mixed regime = hard_max_loss pattern. Forcing a pick into chop adds fuel to the losing streak. Wait for volatility expansion or a clean trend signal.",
+      "auto_executable": false
+    },
+    {
+      "severity": "warning",
+      "category": "stale",
+      "title": "HYPE LONG at meta_rsi 51.3 \u2014 worst historical WR band",
+      "detail": "HYPE (id 16198) entered at RSI 51.3, the 48-53 no-man's land where 48h data shows 0% WR across 8 trades. SL only 0.16% below current. If HYPE doesn't reclaim 81.70 within 2h, consider manual close. Would not open fresh.",
+      "auto_executable": false
+    },
+    {
+      "severity": "info",
+      "category": "profit_lock",
+      "title": "IOTA trail locked \u2014 free ride, let it work",
+      "detail": "IOTA (id 16195) at +3.66% with trailing stop at 0.04736 (above entry 0.046044). Profit is locked. TP at 0.04889 is 2.44% above current. Let the trail manage it. If momentum stalls (RSI 66.67 is warm), trail will exit with profit.",
+      "auto_executable": false
+    },
+    {
+      "severity": "urgent",
+      "category": "cluster",
+      "title": "3 correlated LONGs \u2014 one BTC dump hits all three",
+      "detail": "BTC, HYPE, IOTA are all LONG and correlated to BTC direction. If BTC breaks below EMA300 (81861), all three take a hit simultaneously. Consider reducing to 1-2 positions until BTC confirms a direction. 3 slots open but filling them with more correlated LONGs increases tail risk.",
+      "auto_executable": false
+    }
+  ],
+  "additional_steers": [
+    {
+      "severity": "urgent",
+      "category": "regime",
+      "title": "BTC long SL sits 0.05% above EMA300 \u2014 one touch stops us out",
+      "detail": "BTC LONG (id 16200) SL at 81900, EMA300 at 81861. With NEGATIVE acceleration and 4h SHORT_BIAS, an EMA300 touch is likely. If BTC drops to 82000, consider manual close before SL. The 4h trend doesn't confirm this long.",
+      "action": "Watch BTC 82000. Manual close if approached."
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "AI trader NOT fired this cycle \u2014 system in chop, 33% WR",
+      "detail": "Last 4 AI trader outcomes: BTC short -0.18, MNT long -0.04, USELESS long -0.03, CRV skipped. LOW volatility + mixed regime = hard_max_loss pattern. Forcing a pick into chop adds fuel to the losing streak. Wait for volatility expansion or clean trend.",
+      "action": "Skip this hourly cycle. Re-evaluate next run."
+    },
+    {
+      "severity": "warning",
+      "category": "stale",
+      "title": "HYPE LONG at meta_rsi 51.3 \u2014 worst historical WR band",
+      "detail": "HYPE (id 16198) entered at RSI 51.3, the 48-53 no-man's land where 48h data shows 0% WR across 8 trades. SL only 0.16% below current. If HYPE doesn't reclaim 81.70 within 2h, consider manual close. Would not open fresh.",
+      "action": "Manual close if no reclaim by ~20:30 UTC."
+    },
+    {
+      "severity": "info",
+      "category": "profit_lock",
+      "title": "IOTA trail locked \u2014 free ride, let it work",
+      "detail": "IOTA (id 16195) at +3.66% with trailing stop at 0.04736 (above entry 0.046044). Profit is locked. TP at 0.04889 is 2.44% above current. RSI 66.67 is warm \u2014 trail will exit with profit if momentum stalls.",
+      "action": "No action. Let trail manage."
+    },
+    {
+      "severity": "urgent",
+      "category": "cluster",
+      "title": "3 correlated LONGs \u2014 one BTC dump hits all three",
+      "detail": "BTC, HYPE, IOTA all LONG, correlated to BTC. If BTC breaks below EMA300 (81861), all three take a hit. 3 slots open but filling with more correlated LONGs increases tail risk in a mixed regime.",
+      "action": "Do not add correlated LONGs until BTC confirms direction."
+    }
+  ]
 }

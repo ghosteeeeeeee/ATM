@@ -1,103 +1,142 @@
 {
-  "timestamp": "2026-10-15T17:35:00Z",
+  "timestamp": "2026-10-15T18:30:00Z",
   "session_brain_stats": {
-    "queries_run": 2,
+    "queries_run": 3,
     "top_insights": [
-      "chop v2: trades barely go into profit before reversing — MFE 0.01-0.31%, trail never arms",
-      "signal failure: winners HIGH volatility (avg_abs 3-6%), losers LOW — chop vs trend confirmed"
+      "chop vs trend reconfirmed: trail family 86%+ WR, hard_max_loss/atr_sl = all losses",
+      "pump-chain+ EXTREME habitat net positive 14d: 20W +$5.18 vs 22L −$2.31 (magnitude edge holds)",
+      "hmacd_mtf family fully dead both directions — PLUS killed Oct 13, MINUS was last leg"
     ]
   },
   "trade_summary_24h": {
-    "closed": 11,
-    "pnl": -0.12,
-    "wr": 27.3,
-    "long": "6T +$0.41 50%WR",
-    "short": "5T −$0.53 0%WR",
-    "open": "2 LONG pump-chain+ (BANANA +3.67%, IOTA +3.09%, stops locked +3.4%/+2.9% above entry)"
+    "closed": 12,
+    "pnl": -0.11,
+    "wr": 25.0,
+    "winners": "3T all pump-chain+ trail family: BANANA +$0.37 (+10.1%), ICP +$0.28 (+15.2%), APT +$0.04",
+    "losers": "9T: 5 SHORT counter-trend (−$0.53), 4 LONG chop HML/atr_sl (−$0.31)",
+    "open": "3 LONG: IOTA pump-chain+ +3.72% (trail locked), BTC manual −0.26%, HYPE copy −0.07%"
   },
   "trade_summary_7d": {
-    "closed": 194,
-    "pnl": -1.19,
-    "wr": 35.1,
-    "trail_family": "70T +$7.26 87.1%WR",
-    "no_trail": "124T −$8.45 5.6%WR",
-    "hard_max_loss": "61T −$5.72 0%WR avg lev 4.4",
-    "atr_sl_hit": "41T −$3.04 0%WR"
+    "closed": 196,
+    "pnl": -0.9,
+    "wr": 35.2,
+    "long": "147T −$0.28 36.7%",
+    "short": "49T −$0.62 30.6%",
+    "trail_family": "profit-monster 42T +$2.73 88.1% + atr_trail 18T +$3.51 83.3% + stale 8T +$1.35 87.5% = 68T +$7.59",
+    "no_trail": "hard_max_loss 62T −$5.80 0% + atr_sl 41T −$3.04 0% = 103T −$8.84",
+    "by_regime": "HIGH 35T −$0.72 42.9% | EXTREME 109T −$0.09 30.3% | NORMAL 47T +$0.10 44.7%"
+  },
+  "trade_summary_30d": {
+    "closed": 748,
+    "pnl": -3.11,
+    "wr": 44.4
   },
   "last_run_changes_verification": [
     {
-      "change": "CONF-CALIB confidence clamp [0,100] (Oct 15 03:40)",
-      "verified": "WORKING — 4 trades post-fix, max conf=100, 0 trades >100 (was 42/195 >100 pre-fix)",
+      "change": "KILL volume-breakout-short- (Oct 15 17:35)",
+      "verified": "WORKING — 0 trades since kill. Last trade was IO loss 14:35 pre-kill.",
       "status": "confirmed"
     },
     {
-      "change": "doji-bottom-long re-enable with EXTREME 0.0-gate (Oct 14 14:44)",
-      "verified": "WORKING — 0 trades fired since re-enable. EXTREME gate holding. All-time habitat: HIGH 14T 71.4% +$0.68, NORMAL 8T 50% +$0.12, EXTREME 3T 0% −$0.25 (gated).",
+      "change": "CONF-CALIB clamp [0,100] (Oct 15 03:40)",
+      "verified": "WORKING — 4 trades post-fix, max conf=100, 0 trades >100.",
       "status": "confirmed"
     },
     {
       "change": "Kill LONG-SHORT-BIAS dampen shadow (Oct 15 14:45)",
-      "verified": "CORRECT KILL — shadow cohort was +$0.84/14d n=48; dampening would remove profit. Premise falsified.",
+      "verified": "CORRECT KILL — shadow cohort was +$0.84/14d; premise falsified.",
+      "status": "confirmed"
+    },
+    {
+      "change": "doji-bottom EXTREME gate + re-enable (Oct 14)",
+      "verified": "WORKING — 0 trades since re-enable. EXTREME habitat 30d 3T 0% −$0.25 gated; HIGH 13T 69.2% +$0.37 kept.",
       "status": "confirmed"
     },
     {
       "change": "Vacation pause guardrail fix (Oct 15 02:40)",
-      "verified": "WORKING — no re-pause since formal resume. WR_7D_PNL_CONFIRM preventing freeze on window artifacts.",
+      "verified": "WORKING — no re-pause. WR_7D_PNL_CONFIRM preventing freeze on window artifacts.",
+      "status": "confirmed"
+    },
+    {
+      "change": "volume-buildup+ kill (Oct 14 auto_1hr)",
+      "verified": "WORKING — last trade Oct 14 08:43, kill at 09:15. 0 trades since.",
       "status": "confirmed"
     }
   ],
   "drift_findings": [],
   "recurring_problems": [
     {
-      "problem": "hard_max_loss #1 bleed — 61T −$5.72/7d 0%WR",
-      "detail": "Chop entries never reach trail arm (+0.40%). 52/56+ pattern persists. Top contributors: pump-chain+ 11T −$1.17, volume-breakout-long+ 9T −$1.08 (killed Oct 13, aging), ai-trader+ 5T −$0.41.",
-      "status": "DESIGNATED VEHICLE: self_learner momentum-gate backtest due Oct 17. CEO: do NOT stack entry filters.",
-      "trend": "stable — lever-aware fix reduced avg magnitude from −4.51% to −3.09% acct; frequency still high"
+      "problem": "hard_max_loss #1 bleed — 62T −$5.80/7d 0%WR",
+      "detail": "Chop entries never reach trail arm (+0.40%). 12/34 pump-chain+ HML all EXTREME — but EXTREME habitat net +$2.87/14d (winners avg +7.76% vs losers −2.72%). Magnitude edge intact. Lever-aware fix reduced avg magnitude −4.51%→−3.09% acct.",
+      "status": "DESIGNATED VEHICLE: self_learner momentum-gate + progressive-exit-ladder backtests due Oct 17. CEO: do NOT stack entry filters.",
+      "trend": "stable — magnitude improved, frequency still high"
     },
     {
-      "problem": "SHORT 0%WR 24h (5T −$0.53)",
-      "detail": "5 SHORT losses: vbo-short- IO, grind-breakout- MERL, hl_copy HYPE, pump-chain- IO, ai-trader-manual BTC. All chop shorts. BTC just flipped SHORT_BIAS — shorts may improve.",
-      "status": "monitor — regime just flipped, wait for aligned SHORT data"
+      "problem": "SHORT book 30.6% WR 7d −$0.62",
+      "detail": "pump-chain- 26T +$0.24 works (30.8% WR, magnitude edge). volume-buildup- 4T 100% +$0.41 best SHORT. Bleed from weak tails: hmacd_mtf-- (killed this run), vbo-short- (killed Oct 15), pump-chain-v6- 2T −$0.09 (CEO: V6 = exit-stack vehicle, no touch).",
+      "status": "improving — weak tails being removed one by one"
     },
     {
-      "problem": "atr_sl_hit 41T −$3.04/7d 0%WR",
-      "detail": "SL hits dominate no-trail exits. tpsl_utils fix deployed. auto_1hr shows ratio fluctuating 27-50% (tiny-sample).",
+      "problem": "atr_sl_hit 41T −$0.04/7d 0%WR",
+      "detail": "SL hits dominate no-trail exits. tpsl_utils fix deployed. auto_1hr ratio 27-50% (tiny-sample).",
       "status": "monitor — tpsl fix needs more cohort data"
     }
   ],
-  "missing_implementations": [],
+  "missing_implementations": [
+    {
+      "item": "momentum-gate for chop entries",
+      "owner": "self_learner",
+      "due": "2026-10-17",
+      "status": "backtest delegated, 3rd re-request standing"
+    },
+    {
+      "item": "progressive-exit-ladder",
+      "owner": "self_learner",
+      "due": "2026-10-17",
+      "status": "backtest delegated"
+    },
+    {
+      "item": "wyckoff COOLDOWN_BARS formula/comment mismatch",
+      "owner": "CEO",
+      "status": "pending decision (fix formula to 2.5h or comment to 30min)"
+    }
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-15T17:35:00Z",
-      "idea": "Pump-chain+ bull override RSI band: 75+ toxic regardless of confidence",
-      "rationale": "All-time meta RSI>=75: 12T 4W 7L 1flat −$0.72. Post-Oct-13 override cohort 3T −$0.33. FIL@75.32 winners only counter-example. Tighten to 75: net +$0.70/30d.",
-      "category": "entry sniper",
-      "status": "monitor",
+      "date": "2026-10-15T18:30:00Z",
+      "idea": "volume-buildup- SHORT NORMAL boost candidate — 4/4 100%WR +$0.41/7d, all profit-monster-trail exits",
+      "rationale": "ETC +6.1%, LTC +4.9%, POL +4.8%, AIXBT +1.3% — dump detection with volume confirmation in NORMAL vol. Mirror of pump-chain+ LONG EXTREME habitat. CURRENT.md watchlist: boost needs 5T. Has 4T.",
+      "expected_impact": "+$0.10-0.20/week if sample confirms",
+      "category": "signal boost",
+      "status": "monitor — needs 5T threshold per standing rule",
       "risk": "low",
-      "blocker": "n=12 all-time, n=3 post-fix — below 20-trade threshold"
+      "blocker": "n=4, need 5T minimum. Next win qualifies it."
+    },
+    {
+      "date": "2026-10-15T18:30:00Z",
+      "idea": "pump-chain+ EXTREME entry-quality probe: HML trades all EXTREME but habitat net +$2.87/14d — entry timing within EXTREME, not regime block",
+      "rationale": "20W avg +7.76% vs 22L avg −2.72% in EXTREME. Winners ride trails, losers chop out. The edge is magnitude not WR. Any EXTREME block would kill +$5.18/14d of winners. Root fix = momentum gate (Oct 17 vehicle), not regime gate.",
+      "expected_impact": "n/a — do-not-block, informational",
+      "category": "analysis",
+      "status": "logged — prevents future misguided EXTREME block proposals",
+      "risk": "none"
     }
   ],
   "config_changes_applied": [
     {
-      "timestamp": "2026-10-15T17:35:00Z",
-      "change": "KILL volume-breakout-short- (VOLUME_BREAKOUT_MINUS_ENABLED True→False)",
-      "rationale": "0/3 all-time 0%WR −$0.37. In STANDALONE_BYPASS. LONG side already killed Oct 13.",
+      "timestamp": "2026-10-15T18:30:00Z",
+      "change": "KILL HMACD_MTF_MINUS_ENABLED True→False",
       "file": "hermes_constants.py",
-      "revert": "Set VOLUME_BREAKOUT_MINUS_ENABLED=True with fresh backtest + CEO approval"
+      "rationale": "Family fully dead: PLUS killed Oct 13 (8T 25%WR −$0.46), MINUS all-time 4T 25%WR −$0.19, family 30d 12T −$0.65. Same chop-entry pattern both directions. Last leg of dead family.",
+      "impact": "Stops ~4T/30d of 25%WR losses. Low risk, rarely fires."
     }
   ],
-  "changes_from_last_run": [
-    "CONF-CALIB clamp: VERIFIED WORKING (0 conf>100 post-fix)",
-    "doji re-enable: VERIFIED WORKING (0 trades, EXTREME gated)",
-    "LONG-SHORT-BIAS shadow kill: CORRECT (cohort was +$0.84)",
-    "vacation guardrail: VERIFIED WORKING (no re-pause)"
-  ],
   "next_actions": [
-    "Monitor volume-breakout-short- kill: confirm 0 new trades post-kill",
-    "self_learner momentum-gate backtest due Oct 17 — primary hard_max_loss vehicle",
-    "Monitor pump-chain+ bull override 75+ cohort (creative idea, n=3 post-Oct-13)",
-    "volume-buildup- SHORT 4T 100% +$0.41 — boost candidate when n>=5",
-    "Watch SHORT performance now that BTC flipped SHORT_BIAS both timeframes",
-    "7d WR trajectory vs ESCALATE guardrail (currently 35.1%, was 34.7% at 15:50)"
+    "Monitor volume-buildup- for 5th trade → boost candidate",
+    "Follow up self_learner momentum-gate + progressive-exit-ladder backtests (due Oct 17)",
+    "Wyckoff CEO GO response — implement per decision",
+    "RSI tilt re-test window opens Oct 16 (date-gated, CEO commission)",
+    "Monitor 7d WR trajectory vs ESCALATE guardrail (currently 35.2%, target ≥50%)",
+    "Verify hmacd_mtf- kill holding (0 trades expected)"
   ]
 }

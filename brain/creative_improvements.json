@@ -4625,5 +4625,24 @@
     "risk": "low",
     "blocker": "n=12 all-time, n=3 post-Oct-13 — below 20-trade threshold. Monitor 7d; if 75+ cohort grows to n>=8 with WR<30%, tighten bull override ceiling to 75.",
     "note": "NOT implementing now — small sample. Logging for tracking. Aligns with \"every pump is a LONG\" — only blocks exhausted zone, not the 55-70 profit band."
+  },
+  {
+    "date": "2026-10-15T18:30:00Z",
+    "idea": "volume-buildup- SHORT NORMAL boost candidate — 4/4 100%WR +$0.41/7d, all profit-monster-trail exits",
+    "rationale": "ETC +6.1%, LTC +4.9%, POL +4.8%, AIXBT +1.3% — dump detection with volume confirmation in NORMAL vol. Mirror of pump-chain+ LONG EXTREME habitat. CURRENT.md watchlist: boost needs 5T. Has 4T.",
+    "expected_impact": "+$0.10-0.20/week if sample confirms",
+    "category": "signal boost",
+    "status": "monitor — needs 5T threshold per standing rule",
+    "risk": "low",
+    "blocker": "n=4, need 5T minimum. Next win qualifies it."
+  },
+  {
+    "date": "2026-10-15T18:30:00Z",
+    "idea": "pump-chain+ EXTREME entry-quality probe: HML trades all EXTREME but habitat net +$2.87/14d — entry timing within EXTREME, not regime block",
+    "rationale": "20W avg +7.76% vs 22L avg −2.72% in EXTREME. Winners ride trails, losers chop out. The edge is magnitude not WR. Any EXTREME block would kill +$5.18/14d of winners. Root fix = momentum gate (Oct 17 vehicle), not regime gate.",
+    "expected_impact": "n/a — do-not-block, informational",
+    "category": "analysis",
+    "status": "logged — prevents future misguided EXTREME block proposals",
+    "risk": "none"
   }
 ]

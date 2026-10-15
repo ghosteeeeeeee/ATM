@@ -1353,5 +1353,16 @@
     "after": "VOLUME_BREAKOUT_MINUS_ENABLED = False",
     "rationale": "0/3 all-time 0%WR −$0.37 (IO/USELESS/PUMP all losses in 48h). In STANDALONE_BYPASS fires freely. LONG side already killed Oct 13. CURRENT.md flagged for Oct 16 kill check — executed early with all-time 0/3 justification.",
     "impact": "Stops future 0%WR chop SHORT entries. Blocks 0 winners (none exist). Re-enable: fresh backtest + CEO approval."
+  },
+  {
+    "timestamp": "2026-10-15T18:30:00Z",
+    "agent": "brain_auditor",
+    "change": "KILL hmacd_mtf- SHORT (HMACD_MTF_MINUS_ENABLED True→False) — family fully dead",
+    "type": "kill",
+    "file": "hermes_constants.py",
+    "before": "HMACD_MTF_MINUS_ENABLED = True",
+    "after": "HMACD_MTF_MINUS_ENABLED = False",
+    "rationale": "Family 30d 12T 25%WR −/usr/bin/bash.65 both directions. PLUS killed Oct 13 (8T 25%WR −/usr/bin/bash.46). MINUS all-time 4T 25%WR −/usr/bin/bash.19. Same chop-entry failure pattern. Last leg of dead family — remove to stop incremental bleed.",
+    "impact": "Stops ~4T/30d of 25%WR losses. Low risk: rarely fires, family never worked."
   }
 ]

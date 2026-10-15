@@ -52,3 +52,9 @@
 ### Numbers: 24h 13T −$0.08 30.8% | 7d 195T −$1.61 34.4%
 ### Findings: Rotating Q (regime): 5m scanner now SHORT_BIAS (21 short / 94 neutral / 2 long of 117) — flipped from this morning's LONG_BIAS; regime mostly NEUTRAL at token level, consistent with low trade count (13T/24h). Error alerts = anonymized hotset-cooldown noise only, no new real errors. Pipeline + guardian both active.
 ### Recommendation: Ratify trail-arm enables (BB_SQUEEZE 60m + PUMP_CHAIN 45m) TODAY — hard deadline was Oct 15, soak supports KEEP, one-line revert each if REVERT.
+
+## CEO Status — 20261015T180805Z
+### Health: pipeline=inactive guardian=active open_pos=4
+### Numbers: 24h 11T -$0.48 18.2% | 7d 195T -$1.27 34.9%
+### Findings: 7d worst = volume-breakout-long+ 16T -$0.76 18.8% (already killed Oct 13 — losses aged in window); next live risk: volume-breakout-short- 3T 0% -$0.37 (1 loss from auto-kill threshold). pipeline service inactive between timer runs (oneshot — verify timers still firing). Errors = hotset cooldowns + BTC_LEVEL blocks only.
+### Recommendation: Confirm hermes-pipeline timer is firing (service inactive may be normal oneshot); volume-breakout-short- watch stands per kanban.
