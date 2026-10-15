@@ -4662,5 +4662,23 @@
     "category": "chop filter",
     "status": "escalated",
     "risk": "medium (needs OOS validation before live; shadow-first per automatic-implementation)"
+  },
+  {
+    "date": "2026-10-15T20:40:14Z",
+    "idea": "Trail-arm pre-confirmation shadow: log pre-entry 2-bar momentum (+0.15% threshold) for every pump-chain+ fire, 48h collection",
+    "rationale": "Trail-armed trades win 90% (pump-chain+) / 100% (vbo-long+); no-trail trades lose. If requiring pre-entry momentum filters chop without killing trends, it attacks the #1 bleed (hard_max_loss 62T 0% -$5.80) at the entry side. Needs shadow data before any enforce.",
+    "expected_impact": "Potentially -30 to -50% of hard_max_loss chop entries",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low (shadow only, 0 live impact)"
+  },
+  {
+    "date": "2026-10-15T20:40:14Z",
+    "idea": "Exit-reason-aware loss cooldown: 2h token+direction cooldown after hard_max_loss exits (vs current 20-90min streak-based)",
+    "rationale": "JUP re-entered 58min after hard_max_loss at worse RSI (66.7→69.4), lost again. CHIP re-entered 40min after, lost. 2/2 re-entries after hard_max_loss lost (-$0.14). Chop coins stay chop for hours. Code change in LOSS_COOLDOWN path, not a constant.",
+    "expected_impact": "Block re-entry-to-fresh-loser pattern; small but directionally correct",
+    "category": "loss prevention",
+    "status": "suggested",
+    "risk": "low (cooldown only, doesn't block first entry)"
   }
 ]
