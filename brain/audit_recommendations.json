@@ -1,102 +1,60 @@
 {
-  "timestamp": "2026-10-15T03:40:55Z",
+  "timestamp": "2026-10-15T14:45:04Z",
   "run_type": "captain_audit",
   "trade_summary_24h": {
-    "trades": 32,
-    "wr": 34.4,
-    "pnl": -0.35,
-    "long": "19T -0.47 31.6%",
-    "short": "13T +0.12 38.5%",
-    "note": "SHORT profitable, LONG bleeding — regime SHORT_BIAS both TFs"
+    "closed": 13,
+    "wins": 4,
+    "pnl": -0.08,
+    "wr": 30.8
   },
   "trade_summary_7d": {
-    "trades": 195,
+    "closed": 195,
+    "pnl": -1.61,
     "wr": 34.4,
-    "pnl": -1.72,
-    "trail_vs_hml": "TRAIL 61T +$5.63 86.9%WR | HML 63T -$6.07 0%WR | OTHER 71T -$1.28",
-    "hml_top": "pump-chain+ 12T -1.28, volume-breakout-long+ 9T -1.08 (killed), pump-chain- 5T -0.51"
+    "long": "148T -$1.33 35.1%",
+    "short": "47T -$0.28 31.9%"
   },
-  "last_run_verification": {
-    "vacation_pause_infra": "PASS — no pause marker, kill JSON true, all timers firing; 0 live trades during any pause since 02:40 resume",
-    "ceiling_meta_fix_1248": "PASS — 0 LONGs with meta RSI>75 opened since; SEI-class leak closed (SEI meta84.21 live-5m53.9 was the smoking gun)",
-    "midband_meta_fix": "PASS — USUAL/BABY (meta 69.2/68.8) were pre-fix entries 04:37; post-fix cohort 12T +$0.04",
-    "trail_arm_timeout": "PASS — BB_SQUEEZE 60m + PUMP_CHAIN 45m both True; trail family 86.9% WR 7d",
-    "doji_reenable": "0 trades since re-enable — monitor",
-    "long_short_bias_shadow": "COLLECTING — 171 log lines, fires every cycle on ACE/GRASS/CHIP; flip to enforce needs CEO + more data",
-    "chase_ratio_shadow": "COLLECTING — 87 log lines",
-    "overall": "All 11 prior fixes PASSING. Post-12:48 cohort positive (+$0.04/12T)."
+  "trail_arm_ratify": {
+    "decision": "RATIFY BOTH KEEP",
+    "bb_squeeze": "0 qualifying trades post-enable (no bb-squeeze LONG held >=60m since Oct 12). Dormant insurance, zero cost. KEEP.",
+    "pump_chain": "6 fires 45-54m, net -$0.06 (2W 4L tiny). Catches stalls in the -0.60%..+0.40% price band before HML. Without timeout these bleed to -3% account. KEEP.",
+    "config_change": "none — flags already True; ratify = decision logged",
+    "revert_trigger": "pump-chain trail_arm_timeout net < -$1.00 over next 14d OR any winner cut that would have reached trail arm"
   },
-  "watchdog_steers": [
+  "config_changes_applied": [
     {
-      "id": "steer-001 wrong-side trades",
-      "verdict": "VERIFIED — 7d HML 63T 0%WR -$6.07, 91.8% never trail-armed = chop entries. Root fix = momentum-gate backtest (self_learner Oct 17). Do not stack entry filters."
-    },
-    {
-      "id": "5 signals bleeding",
-      "verdict": "MOSTLY STALE — mtf-regime-trend±, accel-300- killed Oct 6 (0 trades 3d); volume-breakout-long+ killed Oct 13 (last trade Oct 13 19:40). Only ai-trader+ live: 6T 3d -$0.31, n too small to act."
-    },
-    {
-      "id": "SHORT_RSI_CEILING bear exemption",
-      "verdict": "RESOLVED — exemption FIRING. ETC@RSI73.3 +$0.14, LTC@65.2 +$0.11 both entered via bear-structure override and won. Full bear structure required (phase AND linreg AND ema-below), current regime qualifies."
-    },
-    {
-      "id": "AI trader skip cycle",
-      "verdict": "CORRECT — no coin in RSI 60-70 short band. State file: SEI SHORT rejected on cooldown. Wait for bounce."
+      "change": "KILL LONG-SHORT-BIAS dampen shadow",
+      "file": "hermes_constants.py + signal_compactor.py",
+      "evidence": "14d actual-continuum backtest: shadow cohort (BELOW+BEAR at open) n=48 +$0.84 45.8%WR vs non-shadow n=258 -$0.27. Dampening removes profit. Original 48h -$2.12 was flush-window selection bias.",
+      "revert": "git revert — block + 4 constants fully removed"
     }
   ],
+  "changes_from_last_run": {
+    "ceiling_meta_fix": "PASS — 0 LONGs meta RSI>75 opened since",
+    "midband_meta_fix": "PASS — post-fix cohort 12T +$0.04",
+    "conf_calib_clamp": "PASS — 0 trades conf>100 since 03:40 fix (pre-fix Oct 14 had 3T max 177.8)",
+    "doji_reenable": "0 trades since — monitor",
+    "vacation_pause_infra": "PASS — no marker, kill JSON true",
+    "trail_arm_timeout": "PASS — 6 pump-chain fires working as designed"
+  },
   "losing_autopsy_24h": {
-    "losers": "21 closed losers, all but 3 were pre-fix entries (opened before Oct 14 12:48 ceiling fix / 07:45 midband fix)",
-    "clusters": [
-      {
-        "signal": "volume-buildup+ LONG",
-        "trades": 3,
-        "pnl": -0.26,
-        "status": "KILLED 09:15 — losses pre-kill, resolved"
-      },
-      {
-        "signal": "r2v2-long3/4 LONG",
-        "trades": 3,
-        "pnl": -0.35,
-        "root": "USUAL/BABY midband leak (FIXED), SEI RSI84 chase (FIXED 12:48)"
-      },
-      {
-        "signal": "bb-bounce-v2-long+ LONG",
-        "trades": 4,
-        "pnl": -0.11,
-        "root": "ICP HML EXTREME 01:10 tonight = chop entry post-fix; 7d bb-bounce HML 5T -0.31, soak — no touch"
-      },
-      {
-        "signal": "pump-chain- SHORT",
-        "trades": 5,
-        "pnl": -0.08,
-        "root": "mid-band RSI 45-55 shorts (chop profile). HARD_FLOOR=35 revert trigger armed (Oct 13). n small."
-      }
-    ],
-    "winning_side": "Trail-family entries in trend. 7d TRAIL +$5.63 86.9% vs HML -$6.07 0%. Winners: ARB pump-chain+ trail +0.28, volume-buildup- SHORT 4/4W +0.41 (profit-monster-trail)."
+    "losers": "9T -$0.55 — 5 SHORT (wrong-side pumps: MERL/HYPE/ETH/CAKE/USELESS all stopped when price rose) + 4 LONG (ICP/MNT/ARB chop-deaths)",
+    "pattern": "SHORT losers all EXTREME/HIGH vol — shorted into alt pumps. LONG losers hard_max_loss = chop entries never armed. Same fundamental: wrong side, someone else gained.",
+    "action": "No new filter — momentum-gate backtest (self_learner Oct 17) is the root fix. Do NOT stack entry filters."
   },
-  "changes_this_run": [
-    "CONF-CALIB: execute_trade clamps confidence to [0,100] — single choke point. bug_hunter undelivered since Oct 14 18:30; 7d 42/195 trades conf>100 (pump-chain avg 188, MNT 162.9). Data hygiene, no sizing impact."
-  ],
+  "watchdog_steers": {
+    "steer-001_btc_stale_12h": "HOLD — regime SHORT_BIAS, BTC short aligned. prior verdict stands. watchdog owns exits.",
+    "steer-002_wrong_side_7losses": "VERIFIED as HML chop cohort — 63T/7d -$5.96. Root fix delegated (momentum-gate Oct 17)."
+  },
   "creative_improvements": [
-    {
-      "date": "2026-10-15T03:40:55Z",
-      "idea": "Trail-arm probability confidence multiplier — at compaction, look up historical trail-arm rate for (signal_type, direction, vol_regime, meta-RSI band) from last 30d closed trades; multiply confidence by arm_rate (e.g. 0.8x-1.2x). Entries where trail historically arms = trend habitat; entries where it never arms = chop habitat.",
-      "rationale": "Directly operationalizes trend-vs-chop philosophy: 91.8% of hard_max_loss never armed trail. Instead of blocking chop entries (hard, collides with other filters), softly down-weight them via confidence so they lose ranking to trend-habitat signals. Multiplier (not block) = reversible, surgical, no trap risk.",
-      "expected_impact": "Shift execution mix toward trail-habitat entries; projected +$2-4/7d based on HML-vs-TRAIL spread ($11.70/7d gap), captures even 20% of it",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "medium — needs backtest; arm-rate may be regime-dependent (out-of-sample check mandatory)",
-      "prereq": "self_learner backtest: compute arm-rate per cell, join to outcomes, verify conf-multiplier counterfactual net positive OOS with p<0.05"
-    }
+    "Progressive exit ladder: 10m age + pnl < HML_floor*0.5 + speed<33 → close. Targets 38% of HML that die <20m. Backtest required (self_learner, pair Oct 17)."
   ],
-  "soak_status": "11 fixes PASSING. Do NOT stack entry filters. Momentum-gate backtest due Oct 17 (self_learner). LONG-SHORT-BIAS shadow collecting — evaluate flip Oct 16 with n>=50 would-dampens.",
+  "soak_status": "11 fixes PASSING. trail-arm RATIFIED KEEP. LONG-SHORT-BIAS shadow KILLED (premise falsified). Do NOT stack entry filters. Momentum-gate backtest due Oct 17.",
   "next_actions": [
-    "CEO: RATIFY trail-arm both KEEP (deadline was today — soak data supports; 1-line revert each if REVERT)",
-    "CEO: soft-pause idea from 02:45 run still open for review",
-    "self_learner: momentum-gate backtest due Oct 17; new trail-arm-probability multiplier backtest (above)",
-    "bug_hunter: CONF-CALIB self-fixed this run (clamp landed) — stand down; CONF-CALIB task closed",
-    "Monitor: post-12:48 cohort (12T +$0.04) — want n>=30 by Oct 16 before claiming ceiling fix impact",
-    "Monitor: doji-bottom non-EXTREME cohort (0 trades since re-enable)",
-    "Watch: BTC SHORT open — regime-aligned, hold; watchdog owns exits"
+    "self_learner: momentum-gate backtest Oct 17 + progressive-exit-ladder counterfactual (same candle replay pipeline)",
+    "Monitor: post-12:48 meta-source cohort (12T +$0.04), doji non-EXTREME (0 trades), volume-buildup- SHORT boost at 5T",
+    "Watch: 3 new opens (ICP/IOTA pump-chain+ LONG, IO vbo-short-) all EXTREME slightly red — trail-arm will catch stalls at 45m",
+    "Oct 16: chase-ratio shadow eval (87 log lines)",
+    "Oct 17: momentum-gate backtest decision"
   ]
 }

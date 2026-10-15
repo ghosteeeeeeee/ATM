@@ -1331,5 +1331,16 @@
     "after": "confidence = max(min(float(confidence or 0), 100.0), 0.0) at execute_trade entry",
     "rationale": "conf>100 breaks calibration analytics; MIN_EXEC comparisons meaningless above 100; no sizing impact so zero trade risk",
     "impact": "All future trades store conf<=100; historical data untouched"
+  },
+  {
+    "timestamp": "2026-10-15T14:45:04Z",
+    "agent": "brain_auditor",
+    "change": "KILL LONG-SHORT-BIAS dampen shadow — premise falsified (shadow cohort +$0.84/14d n=48; dampening removes profit; original 48h window was flush artifact)",
+    "type": "kill",
+    "file": "scripts/hermes_constants.py + scripts/signal_compactor.py",
+    "before": "LONG_SHORT_BIAS_DAMPEN_SHADOW=True shadow logging would-dampen ×0.70 on BTC BELOW+BEAR LONGs (block at compactor:4308-4332 + 4 constants)",
+    "after": "Block deleted, constants removed. No dampen, no shadow log.",
+    "rationale": "Actual-continuum test (14d LONGs, trade open within 10min of BELOW+BEAR sample): shadow cohort n=48 +$0.84 45.8%WR vs non-shadow n=258 -$0.27. Enforcing would remove +$0.84 profit/14d. Original 48h evidence (62T 24.2% -$2.12) was selection-bias flush window. Same inversion class as Oct 12 SHORT_BIAS pump-chain reject.",
+    "impact": "Stops shadow log spam; prevents future enforcement flip that would dampen profitable bear-regime LONG cohort. 0 live behavior change (shadow was log-only)."
   }
 ]

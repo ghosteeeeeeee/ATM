@@ -4587,5 +4587,14 @@
     "status": "suggested",
     "risk": "medium — needs backtest; arm-rate may be regime-dependent (out-of-sample check mandatory)",
     "prereq": "self_learner backtest: compute arm-rate per cell, join to outcomes, verify conf-multiplier counterfactual net positive OOS with p<0.05"
+  },
+  {
+    "date": "2026-10-15T14:45:04Z",
+    "idea": "Progressive exit ladder for fast-HML cohort: close LONG if age>10m AND live_pnl < (HARD_MAX_LOSS_PCT*0.5) AND speed_percentile < 33 — targets the 24/63 (38%) HML trades that die <20m (avg 11min hold) which trail_arm_timeout at 45m cannot catch",
+    "rationale": "HML hold distribution 7d: <20m=24T -$2.09, 20-45m=22T -$2.26 — 73% die before any timeout fires. These are fast wrong-side dumps, not stalls. Current defenses (trail_arm_timeout 45m, HML -3% account) only catch late-stage. A 10m early-exit at half the HML floor cuts the bleed before full loss. Counterfactual needs replay against candles (delegate self_learner with momentum-gate backtest — same data pipeline).",
+    "expected_impact": "If it blocks 50% of <20m HML without killing recoveries: save ~$1.0/7d. Must verify winners (trail family avg hold) are never caught — trail winners should have positive pnl at 10m.",
+    "category": "exit sniper",
+    "status": "suggested — backtest required before ship (self_learner, pair with Oct 17 momentum-gate)",
+    "risk": "medium — could cut trades that recover; MUST verify 0 trail-family winners hit the 10m exit condition in backtest"
   }
 ]

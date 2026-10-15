@@ -978,15 +978,6 @@ LONG_MIDBAND_NON_EXTREME_BLOCK = True  # brain_auditor 2026-10-11 — EXTREME ex
 LONG_HIGH_OVERBOUGHT_RSI_MIN = 70
 LONG_HIGH_OVERBOUGHT_BLOCK = True  # brain_auditor 2026-10-11
 
-# ── Shadow: LONG counter-trend dampen when BTC below EMA300 + bear linreg ──
-# Watchdog steer 2026-10-14: 48h 62 LONGs 24.2%WR −$2.12 vs 30 SHORTs 33.3% −$0.04.
-# BTC continuum: ema300_position=BELOW, linreg=BEAR → every LONG is counter-trend.
-# SHADOW first (auto-implementation): log would-dampen, zero live impact.
-# Flip LONG_SHORT_BIAS_DAMPEN_SHADOW→False to enforce after 48h clean shadow data.
-LONG_SHORT_BIAS_DAMPEN_SHADOW = True   # True=shadow log only; False=enforce mult
-LONG_SHORT_BIAS_DAMPEN_MULT   = 0.70   # confidence multiplier when enforced
-LONG_SHORT_BIAS_MIN_MOVE15    = 0.15   # min |BTC 15m slope| % to treat as directional (skip flat noise)
-
 # ── SHORT BB dead zone: block SHORT at mid-upper band (noise zone) ──────
 # 0.70-0.85 BB = not extreme enough for mean-reversion, not low enough for trend.
 # 7d: 17T 41.2%WR -$1.05. All other zones: 162T 57.8%WR +$3.77.

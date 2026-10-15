@@ -46,3 +46,9 @@
 ### Numbers: 24h 34T −$0.34 35.3% | 7d 195T −$1.72 34.4%
 ### Findings: Rotating Q (worst signal): volume-breakout-long+ LONG −$0.76/16T 18.8%WR — already killed Oct 13, losses aging out of 7d window; next-worst hmacd_mtf-+ also killed. Both worst 7d losers are dead signals — bleed is historical, not live. hermes-pipeline unit inactive but all timers firing on schedule (compactor ran 27s ago) — pipeline is timer-driven, inactive unit is expected.
 ### Recommendation: None new. Prior escalations stand — trail-arm ratify (BB_SQUEEZE + PUMP_CHAIN) due TODAY Oct 15; momentum-gate backtest to self_learner deadline Oct 17 (3rd request undelivered).
+
+## CEO Status — 20261015T140805Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 13T −$0.08 30.8% | 7d 195T −$1.61 34.4%
+### Findings: Rotating Q (regime): 5m scanner now SHORT_BIAS (21 short / 94 neutral / 2 long of 117) — flipped from this morning's LONG_BIAS; regime mostly NEUTRAL at token level, consistent with low trade count (13T/24h). Error alerts = anonymized hotset-cooldown noise only, no new real errors. Pipeline + guardian both active.
+### Recommendation: Ratify trail-arm enables (BB_SQUEEZE 60m + PUMP_CHAIN 45m) TODAY — hard deadline was Oct 15, soak supports KEEP, one-line revert each if REVERT.

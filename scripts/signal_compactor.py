@@ -4305,31 +4305,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             continue
                 except Exception:
                     pass  # non-fatal
-            # ── Shadow: LONG counter-trend dampen (BTC BELOW EMA300 + BEAR linreg) ──
-            # brain_auditor 2026-10-14. 48h: 62 LONGs 24.2%WR −$2.12 (wrong side).
-            # SHADOW default — logs would-dampen only. Flip constant to enforce.
-            if direction == 'LONG':
-                try:
-                    from hermes_constants import LONG_SHORT_BIAS_DAMPEN_SHADOW, LONG_SHORT_BIAS_DAMPEN_MULT
-                    import os as _lsb_os, time as _lsb_time, sqlite3 as _lsb_sqlite
-                    _lsb_cont = _lsb_sqlite.connect(_lsb_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
-                    try:
-                        _lsb_row = _lsb_cont.execute(
-                            "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
-                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                        ).fetchone()
-                    finally:
-                        _lsb_cont.close()
-                    if _lsb_row and (_lsb_time.time() - (_lsb_row[3] or 0)) < 600:
-                        _lsb_ema, _lsb_linreg = _lsb_row[2], _lsb_row[1]
-                        if _lsb_ema == 'BELOW' and _lsb_linreg in ('BEAR', 'LEAN_BEAR'):
-                            if LONG_SHORT_BIAS_DAMPEN_SHADOW:
-                                log(f"  📊 [LONG-SHORT-BIAS-SHADOW] {tkn}: LONG would-dampen ×{LONG_SHORT_BIAS_DAMPEN_MULT} — BTC BELOW EMA300 + {_lsb_linreg} (counter-trend; shadow)")
-                            else:
-                                entry['confidence'] = float(entry.get('confidence') or 0) * LONG_SHORT_BIAS_DAMPEN_MULT
-                                log(f"  🚫 [LONG-SHORT-BIAS] {tkn}: LONG conf dampened ×{LONG_SHORT_BIAS_DAMPEN_MULT} — BTC BELOW EMA300 + {_lsb_linreg}")
-                except Exception:
-                    pass  # non-fatal
             # ── SHORT RSI ceiling: block SHORT at overbought RSI (momentum favors LONG) ──
             # Opposite of RSI floor — prevents SHORTing into strength where bounce risk is low
             # but momentum continuation risk is high. 7d: 20T RSI>=65 50%WR -$1.02.
