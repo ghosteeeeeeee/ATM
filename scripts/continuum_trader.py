@@ -406,6 +406,20 @@ class ContinuumTrader:
             
             # Save state to DB
             self.engine.save_state(state)
+
+            # Reconcile: clear stale position_side when no tracked positions exist
+            # Prevents _check_exits from resetting entry_phase every tick
+            if self.engine.position_side != 'NONE':
+                tracked_now = get_our_positions()
+                pg_now = _pg_open_continuum_trades()
+                if not tracked_now and not pg_now:
+                    print(f"[TRADER] RECONCILE: clearing stale position_side={self.engine.position_side} (no tracked positions)")
+                    self.engine.position_side = 'NONE'
+                    self.engine.position_size_pct = 0
+                    self.engine.entry_phase = 0
+                    self.last_position_side = 'NONE'
+                    state.position_side = 'NONE'
+                    state.entry_phase = 0
             
             # Check for entry signal (Phase 6 = all confirmations met)
             if state.entry_phase == 6 and self.last_entry_phase < 6:

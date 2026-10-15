@@ -1170,7 +1170,9 @@ class ContinuumEngine:
                 return
         else:
             self._low_score_count = 0
-            self.entry_phase = 0
+            # NOTE: do NOT reset entry_phase here — it breaks Phase 2→3 progression
+            # when position_side is stale (no actual position). entry_phase resets
+            # only on actual exits (Tier 3 EMA break or sustained score < 20).
     
     def save_state(self, state: ContinuumState):
         """Save state to SQLite."""
