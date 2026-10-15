@@ -10305,3 +10305,47 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 **Open Questions:**
 - 24h WR down to 21.4% — guardrail ESCALATE territory; watching
 - volume-breakout-short− will hit kill threshold at 1 more loss
+
+## [2026-10-15 15:50] Daily Orchestrator Run
+
+**Trades:** 3 open (BANANA/ICP/IOTA pump-chain+ LONG, all green +2.7-3.2%) | 14 closed today | 24h 14T 3W −$0.56 (21.4% WR) | 7d 193T 67W −$1.47 (34.7% WR)
+**PnL:** −$0.56/24h | −$1.47/7d | Health OK | Kill switch LIVE=true | Disk **79% (<80% GOAL MET)** | Regime LONG_BIAS
+
+### IMPLEMENTED
+
+1. **Rep 2b Phase 3 — ai_trader_precheck HALL-SHAME wired to reputation.py (commit bde1070d).**
+   - Plan: plans/combo-first-reputation-system.md (CEO-approved Oct 11). Phase 2a/2 shipped Oct 12; Phase 3 was the last unwired surface.
+   - Change: precheck section 3b duplicate leaderboard logic (favorites_leaderboard.json, coin-level 55% WR hard check) replaced with `reputation.should_block(token, 'ai-trader', direction)` — combo-aware, 0.3x mult with proven-combo override per CEO decision.
+   - Verification: py_compile OK; live smoke BTC SHORT → `coin_shame (54.5% WR, 22T) mult=0.30` correctly flagged; fail-open on error preserved.
+
+### OCT 15 CHECKPOINT ITEMS — CLOSED
+
+1. **7d WR ≥50% checkpoint: MISSED** — 7d 193T 34.7% WR −$1.47. No orchestrator action (guardrail ESCALATE active, brain_auditor soak discipline holds, do not stack filters). Retarget left to CEO.
+2. **bb-squeeze + pump-chain trail-arm soak review + ratify HARD deadline: CLOSED by captain** — brain_auditor CAPTAIN RUN 14:45 (0bc76eb4) RATIFIED BOTH KEEP: pump-chain 45m 6 fires net −$0.06 (catches stalls −0.60..+0.40% before HML), bb-squeeze 60m 0 qualifying trades (dormant insurance, 0 cost). Revert = 1-line each (constants True stays). CEO veto still possible.
+3. **Disk <80% Oct 14 goal: MET** — 79% used (24G free) per df + health monitor. ATM zips cleanup Oct 14 (~224M) + natural churn closed the gap. Deep-prune retention plan (candle/coin_tracker/session_brain) no longer urgent; keep as backlog.
+4. **Rep 2b: SHIPPED** (see IMPLEMENTED above).
+
+### ANALYSIS — WYCKOFF PAIRING (data for CEO GO, no config change)
+
+- 71 shadow fires in 7d (46 LONG / 25 SHORT). Top: PONS 7, ICP 5, ACE/LDO/CHIP/AVAX 4 each.
+- **±30min same-token co-signal pairing: ANY 37% | volume-family 4% (same-dir 1) | rs-family 0% | NONE 63%.**
+- The originally mandated volume/rs co-source **does not co-occur** with wyckoff fires — pairing premise fails structurally. Wyckoff should NOT flip out of shadow on a volume/rs pairing backtest (nothing to pair).
+- Alternative for CEO: pump-chain co-source co-occurs most often in examples, but frequently OPPOSITE direction (ACE wyckoff-LONG vs pump-chain-SHORT) — pairing on it would need a direction-agreement rule, not just co-presence.
+- **Recommendation: keep WYCKOFF_SHADOW_MODE=True. Commission a different co-source design or accept single-source with regime gating — CEO call.**
+
+### STATUS CARRIED (CEO-owned)
+
+- hard_max_loss #1 bleed (3/14 exits today −$0.27) — standing hold; momentum-gate backtest self_learner due Oct 17. Do not stack.
+- wyckoff COOLDOWN_BARS mismatch (comment 2.5h vs formula 0.5h) — CEO: fix formula or fix comment?
+- volume-breakout-short− 2T 0W −$0.28 — one more loss hits auto_1hr kill threshold (3T 0W).
+- 7d WR retarget after today's missed ≥50% checkpoint.
+
+### SIDEWAYS FINDS
+
+- signal_reporter TREND-ALIGN "BTC bullish 77" vs SPIKE-FILTER "BTC=DECLINING+LEAN_BEAR" same cycle — possible timeframe mismatch, worth a look (no action this run).
+- 60x [LOCK-WAIT] 0.1s info_rate in price-collector — contention, runs complete, no action.
+- Uncommitted bollinger_squeeze candidate diffs = backtest stat regen only (Generated 14:48), left for owning agent.
+
+**Next run (~Oct 16 06:40):** volume-breakout-short− kill check; wyckoff CEO GO response; 7d WR retarget; momentum-gate backtest follow-up (self_learner Oct 17); RSI tilt re-test window opens Oct 16.
+
+BY: daily_orchestrator
