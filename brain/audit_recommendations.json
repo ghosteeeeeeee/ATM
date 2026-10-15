@@ -1,60 +1,118 @@
 {
-  "timestamp": "2026-10-15T14:45:04Z",
-  "run_type": "captain_audit",
+  "timestamp": "2026-10-15T15:40:29.188701+00:00",
+  "session_brain_stats": {
+    "queries_run": 1,
+    "top_relevance": 0.82
+  },
   "trade_summary_24h": {
-    "closed": 13,
-    "wins": 4,
-    "pnl": -0.08,
-    "wr": 30.8
+    "trades": 14,
+    "pnl": -0.56,
+    "wr": 21.4,
+    "open": 3,
+    "open_pnl": "all green ~+2.7-3.2%",
+    "regime": "btc_15m LONG_BIAS, btc_4h SHORT_BIAS (lagging), EXTREME vol"
   },
   "trade_summary_7d": {
-    "closed": 195,
-    "pnl": -1.61,
-    "wr": 34.4,
-    "long": "148T -$1.33 35.1%",
-    "short": "47T -$0.28 31.9%"
+    "trades": 193,
+    "pnl": -1.47,
+    "wr": 34.7
   },
-  "trail_arm_ratify": {
-    "decision": "RATIFY BOTH KEEP",
-    "bb_squeeze": "0 qualifying trades post-enable (no bb-squeeze LONG held >=60m since Oct 12). Dormant insurance, zero cost. KEEP.",
-    "pump_chain": "6 fires 45-54m, net -$0.06 (2W 4L tiny). Catches stalls in the -0.60%..+0.40% price band before HML. Without timeout these bleed to -3% account. KEEP.",
-    "config_change": "none — flags already True; ratify = decision logged",
-    "revert_trigger": "pump-chain trail_arm_timeout net < -$1.00 over next 14d OR any winner cut that would have reached trail arm"
+  "trade_summary_30d": {
+    "trades": 748,
+    "pnl": -3.88,
+    "wr": 44.1
   },
-  "config_changes_applied": [
+  "drift_findings": [],
+  "recurring_problems": [
     {
-      "change": "KILL LONG-SHORT-BIAS dampen shadow",
-      "file": "hermes_constants.py + signal_compactor.py",
-      "evidence": "14d actual-continuum backtest: shadow cohort (BELOW+BEAR at open) n=48 +$0.84 45.8%WR vs non-shadow n=258 -$0.27. Dampening removes profit. Original 48h -$2.12 was flush-window selection bias.",
-      "revert": "git revert — block + 4 constants fully removed"
+      "problem": "hard_max_loss #1 bleed — 61T -$5.72 7d, 0% WR",
+      "detail": "HML trades die in 8-35 min (avg 25 min for pump-chain+ EXTREME). Trail-arm timeout fires at 45 min — too late. Root cause is ENTRY quality (chop entries), not exit timing. Momentum gate (|m5|<0.15% block) is the right fix — delegated 3x since Oct 13, UNDELIVERED.",
+      "status": "OPEN — escalate to CEO, re-delegate self_learner (4th request)"
+    },
+    {
+      "problem": "SHORT RSI 45-55 band bleeds — 25T 16% WR -$0.47 14d",
+      "detail": "But pump-chain- specifically is PROFITABLE in this band (+$0.54/13T). Bleed is from other signals with tiny samples (vbo-short- 2T, hmacd_mtf-- 2T, etc). Generic SHORT midband block would net +$0.47 but block +$1.50 in pump-chain- winners. NOT shipping — violates 'every dump is a SHORT', evidence weak.",
+      "status": "MONITOR — n=25, mostly small samples"
+    },
+    {
+      "problem": "SHORT_RSI_HARD_FLOOR=35 revert trigger check",
+      "detail": "Trigger: 10+ RSI 35-45 SHORTs lose >$1 in 7d. Actual: 22T +$0.06 36.4% WR. Floor STAYS at 35.",
+      "status": "HEALTHY — no action"
     }
   ],
-  "changes_from_last_run": {
-    "ceiling_meta_fix": "PASS — 0 LONGs meta RSI>75 opened since",
-    "midband_meta_fix": "PASS — post-fix cohort 12T +$0.04",
-    "conf_calib_clamp": "PASS — 0 trades conf>100 since 03:40 fix (pre-fix Oct 14 had 3T max 177.8)",
-    "doji_reenable": "0 trades since — monitor",
-    "vacation_pause_infra": "PASS — no marker, kill JSON true",
-    "trail_arm_timeout": "PASS — 6 pump-chain fires working as designed"
+  "missing_implementations": [
+    {
+      "item": "Momentum gate (|m5|<0.15% block) backtest",
+      "requested": "Oct 13, Oct 14, Oct 15 (3rd request)",
+      "owner": "self_learner",
+      "status": "UNDELIVERED — escalate to CEO as blocking issue",
+      "rationale": "HML #1 bleed root cause is chop entries. Trail-arm at 45 min misses HML trades that die in 25 min. Momentum gate blocks at ENTRY before capital is at risk. This is the highest-impact pending item."
+    }
+  ],
+  "changes_from_last_run": [
+    {
+      "change": "KILL LONG-SHORT-BIAS dampen shadow (Oct 15 14:45)",
+      "verdict": "CORRECT — shadow cohort was +$0.84/14d n=48, dampening would have hurt. Kill was right call.",
+      "impact": "N/A (shadow never enforced)"
+    },
+    {
+      "change": "Captain formal resume + vacation pause fixes (Oct 15 02:40)",
+      "verdict": "WORKING — system live, kill JSON true, 3 open trades all green. WR_7D_PAUSE now requires pnl_7d < -2.00 confirmation (was WR-only). Auto-resume hysteresis at WR>=37% or pnl_7d>=0.",
+      "impact": "System resumed cleanly, no re-pause"
+    },
+    {
+      "change": "CONF-CALIB confidence clamp [0,100] (Oct 15 03:40)",
+      "verdict": "LIVE — single choke point in execute_trade. Historical data untouched.",
+      "impact": "All future trades store conf<=100"
+    }
+  ],
+  "soak_status": {
+    "PUMP_CHAIN_LONG_RSI_MAX=70": "HOLDING — 0 trades at RSI>=70 since Oct 13",
+    "VOLUME_BREAKOUT_PLUS kill": "HOLDING — 0 trades post-kill",
+    "MIDBAND meta-source fix": "HOLDING — 0 non-EXT 60-70 LONG entries",
+    "LONG_RSI_CEILING bounded override": "HOLDING — 0 LONG >75 since Oct 14 12:48",
+    "SHORT_RSI_HARD_FLOOR=35": "HEALTHY — 35-45 band +$0.06, revert trigger NOT hit",
+    "DOJI re-enable": "0 trades since re-enable — habitat HIGH 71.4%",
+    "CHASE_RATIO shadow": "0 fires (calm regime) — accruing",
+    "trail_arm_timeout (BB_SQUEEZE 60m + PUMP_CHAIN 45m)": "WORKING — 14d 6 fires net -$0.06, mechanism proven (cuts stalled trades before HML). RECOMMEND RATIFY."
   },
-  "losing_autopsy_24h": {
-    "losers": "9T -$0.55 — 5 SHORT (wrong-side pumps: MERL/HYPE/ETH/CAKE/USELESS all stopped when price rose) + 4 LONG (ICP/MNT/ARB chop-deaths)",
-    "pattern": "SHORT losers all EXTREME/HIGH vol — shorted into alt pumps. LONG losers hard_max_loss = chop entries never armed. Same fundamental: wrong side, someone else gained.",
-    "action": "No new filter — momentum-gate backtest (self_learner Oct 17) is the root fix. Do NOT stack entry filters."
-  },
-  "watchdog_steers": {
-    "steer-001_btc_stale_12h": "HOLD — regime SHORT_BIAS, BTC short aligned. prior verdict stands. watchdog owns exits.",
-    "steer-002_wrong_side_7losses": "VERIFIED as HML chop cohort — 63T/7d -$5.96. Root fix delegated (momentum-gate Oct 17)."
+  "trail_arm_ratify_recommendation": {
+    "verdict": "RATIFY BOTH",
+    "evidence": "14d: 6 fires, net -$0.06, 33% WR. All pump-chain+ LONG. 2 winners saved (+$0.06), 4 losers cut (-$0.12). Without trail-arm, these would have continued to HML (pump-chain+ EXTREME HML avg -3.06% unleveraged). Mechanism works: exits at near-breakeven instead of letting bleed to stop.",
+    "revert": "BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=False + PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED=False (1 line each)"
   },
   "creative_improvements": [
-    "Progressive exit ladder: 10m age + pnl < HML_floor*0.5 + speed<33 → close. Targets 38% of HML that die <20m. Backtest required (self_learner, pair Oct 17)."
+    {
+      "date": "2026-10-15T15:40:29.188718+00:00",
+      "idea": "BTC 15m trend-alignment dampen for SHORT entries",
+      "rationale": "Watchdog pattern: 8 wrong-side shorts fired into BTC reclaim (15m LONG_BIAS, 4h SHORT_BIAS lagging). Shorts followed the lagging 4h instead of the leading 15m. Dampen SHORT confidence ×0.70 when BTC 15m is LONG_BIAS AND BTC > EMA300. Targets exact pattern without blocking overbought shorts (RSI 65+ with volume — those win 75%).",
+      "expected_impact": "Suppress worst counter-trend SHORT cohort (~50% of SHORT losers per watchdog pattern)",
+      "category": "direction filter",
+      "status": "suggested — needs backtest",
+      "risk": "medium — regime-based, may decay as market structure changes"
+    },
+    {
+      "date": "2026-10-15T15:40:29.188721+00:00",
+      "idea": "Momentum gate delegation ESCALATION (4th request)",
+      "rationale": "HML #1 bleed (61T -$5.72/7d) root cause is chop entries. Trail-arm at 45 min misses HML trades dying at 25 min. Momentum gate (|m5|<0.15% block) is the only filter that blocks at ENTRY before capital is at risk. Delegated Oct 13, Oct 14, Oct 15 — UNDELIVERED. This is the single highest-impact pending item.",
+      "expected_impact": "Block ~50% of HML trades (the zero-momentum ones) before they hit the stop",
+      "category": "entry sniper",
+      "status": "ESCALATE TO CEO — blocking issue",
+      "risk": "low — shadow mode first, 48h data before enforce"
+    }
   ],
-  "soak_status": "11 fixes PASSING. trail-arm RATIFIED KEEP. LONG-SHORT-BIAS shadow KILLED (premise falsified). Do NOT stack entry filters. Momentum-gate backtest due Oct 17.",
+  "config_changes_applied": [],
   "next_actions": [
-    "self_learner: momentum-gate backtest Oct 17 + progressive-exit-ladder counterfactual (same candle replay pipeline)",
-    "Monitor: post-12:48 meta-source cohort (12T +$0.04), doji non-EXTREME (0 trades), volume-buildup- SHORT boost at 5T",
-    "Watch: 3 new opens (ICP/IOTA pump-chain+ LONG, IO vbo-short-) all EXTREME slightly red — trail-arm will catch stalls at 45m",
-    "Oct 16: chase-ratio shadow eval (87 log lines)",
-    "Oct 17: momentum-gate backtest decision"
-  ]
+    "CEO: RATIFY trail-arm 2 enables (BB_SQUEEZE 60m + PUMP_CHAIN 45m) — data-backed, mechanism proven",
+    "ESCALATE momentum gate to CEO — 4th delegation request, undelivered since Oct 13, blocks HML fix",
+    "Monitor: SHORT RSI 45-55 band (n=25, mostly small samples — not shipping)",
+    "Monitor: doji-bottom-long non-EXTREME cohort (re-kill if flips negative n>=10)",
+    "Watch: volume-buildup- SHORT 4/4 100% WR — 1 win from boost (needs 5T)"
+  ],
+  "watchdog_pattern_verification": {
+    "mid_band_shorts": "VERIFIED — 14d SHORT RSI 45-55: 25T 16%WR -$0.47. But pump-chain- profitable (+$0.54). Bleed from other signals, small samples.",
+    "shorts_pay_at_overbought": "VERIFIED — 14d SHORT RSI 65-80: 4T 75%WR +$0.24 (BEST band).",
+    "overbought_longs_lose": "VERIFIED — LONG_RSI_CEILING=75 holding, 0 LONG >75 since Oct 14 fix.",
+    "wrong_side_trades": "PARTIALLY — 24h 11 losers: 6 SHORT (mixed signals), 5 LONG (1 pump-chain+ HML). BTC manual short was dead thesis. Direction issue confirmed for mid-band shorts."
+  }
 }

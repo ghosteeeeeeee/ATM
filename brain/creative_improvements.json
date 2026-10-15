@@ -4596,5 +4596,23 @@
     "category": "exit sniper",
     "status": "suggested — backtest required before ship (self_learner, pair with Oct 17 momentum-gate)",
     "risk": "medium — could cut trades that recover; MUST verify 0 trail-family winners hit the 10m exit condition in backtest"
+  },
+  {
+    "date": "2026-10-15T15:40:50.225678+00:00",
+    "idea": "BTC 15m trend-alignment dampen for SHORT entries",
+    "rationale": "8 wrong-side shorts fired into BTC reclaim (15m LONG_BIAS). Dampen SHORT confidence x0.70 when BTC 15m LONG_BIAS AND BTC > EMA300. Targets counter-trend shorts without blocking overbought winners.",
+    "expected_impact": "Suppress worst counter-trend SHORT cohort",
+    "category": "direction filter",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-15T15:40:50.225696+00:00",
+    "idea": "Momentum gate delegation ESCALATION (4th request)",
+    "rationale": "HML #1 bleed 61T -$5.72/7d root cause = chop entries. Trail-arm 45min misses HML dying at 25min. Momentum gate blocks at ENTRY. Undelivered since Oct 13.",
+    "expected_impact": "Block ~50% of HML trades before stop hit",
+    "category": "entry sniper",
+    "status": "ESCALATE TO CEO",
+    "risk": "low"
   }
 ]
