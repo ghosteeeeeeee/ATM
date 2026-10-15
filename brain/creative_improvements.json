@@ -4557,5 +4557,15 @@
     "status": "delegated_hard_deadline",
     "risk": "low",
     "deadline": "2026-10-17"
+  },
+  {
+    "date": "2026-10-15T01:45:00Z",
+    "idea": "Velocity-conditional pump-chain trail-arm timeout (backtest cell, not a config change)",
+    "rationale": "pump-chain+ 30d cohort grind-then-spike: <45m 27.7% WR (47T) vs >=45m 56.4% WR (55T) — INVERTED vs bb-squeeze (<60m 76% / >=60m 29%). Blunt 'un-armed at 45m -> exit' was designed on bb-squeeze shape. Variant to backtest: exit at 45m only if un-armed AND |5m velocity| < 0.05% (stalled AND flat) — catches true stalls, lets healthy grinds live. Forgoone-runner criterion trips first (>=3 tokens +1% within 60m post-exit in 7d) before any config review.",
+    "expected_impact": "Preserve stall-protection (~$1.75-class loser saves) while eliminating clip risk on the 56.4% ge45 winner cohort. Exact $ needs backtest.",
+    "category": "exit sniper",
+    "status": "needs_backtest",
+    "risk": "low",
+    "owner": "self_learner — fold as extra cell into momentum-gate matrix (deadline Oct 17)"
   }
 ]
