@@ -36,6 +36,11 @@ SIGNAL_MAX_AGE_SEC = 180     # 3 min — signal production halted
 TRADE_MAX_AGE_SEC = 3600     # 1 hour — execution stalled
 SIGNAL_COUNT_MIN = 20        # minimum signals per 5 min (normal ~6/min = 30/5min)
 
+# BUG-HUNTER 2026-10-15: vacation guardrail pause marker. When present the
+# pipeline was INTENTIONALLY stopped (PnL/WR kill criterion) — never
+# auto-restart the timer, or the pause silently unwinds in ~6 minutes.
+PAUSE_MARKER = os.path.join(HERMES_DATA, 'vacation_pause.json')
+
 
 def log(msg):
     ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
@@ -48,6 +53,9 @@ def check_pipeline_lock():
     Uses heartbeat file as primary indicator (more reliable than lock mtime).
     Falls back to lock file if heartbeat doesn't exist.
     """
+    # BUG-HUNTER 2026-10-15: paused by vacation guardrail = intentional, not stuck
+    if os.path.exists(PAUSE_MARKER):
+        return {'status': 'ok', 'message': 'pipeline paused by vacation guardrail (intentional)'}
     # Primary: check heartbeat file
     if os.path.exists(HEARTBEAT_FILE):
         try:
@@ -181,6 +189,10 @@ def add_alert(severity, message):
 
 def restart_pipeline():
     """Restart pipeline timer."""
+    # BUG-HUNTER 2026-10-15: never restart a guardrail-paused pipeline
+    if os.path.exists(PAUSE_MARKER):
+        log('Pipeline is paused by vacation guardrail — NOT restarting (remove vacation_pause.json to resume)')
+        return
     try:
         subprocess.run(['systemctl', 'restart', 'hermes-pipeline.timer'],
                        timeout=10, capture_output=True)

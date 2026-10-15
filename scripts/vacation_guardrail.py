@@ -25,6 +25,10 @@ WR_7D_PAUSE = 35.0         # Auto-pause if 7d WR < this (plan kill criterion —
 WR_7D_MIN_TRADES = 50      # Need 50+ trades before 7d WR is meaningful
 KILL_SWITCH_PATH = os.path.join(WWW_DATA := '/var/www/hermes/data', 'hype_live_trading.json')
 ALERT_PATH = os.path.join(HERMES_DATA, '..', 'automation', 'ceo', 'vacation_alerts.json')
+# BUG-HUNTER 2026-10-15: marker that pipeline_watchdog checks before auto-restarting
+# the pipeline timer. Without it the watchdog re-armed the timer ~6min after pause
+# (heartbeat goes stale >300s → CRITICAL → restart) and LIVE trading resumed.
+PAUSE_MARKER = os.path.join(HERMES_DATA, 'vacation_pause.json')
 
 
 def check_guardrails():
@@ -80,26 +84,53 @@ def pause_trading(reason):
     removed JSON consultation due to ghost trades). This fix uses
     disable_live_trading() (closes HL positions + saves flags) AND stops
     the pipeline/decider systemd timers so no new trades can open.
+
+    BUG-HUNTER BLOCKER FIX v2 (2026-10-15): pipeline_watchdog.py (2-min timer)
+    treats the stale heartbeat as CRITICAL and restarts hermes-pipeline.timer
+    ~6 min after we stop it — silently resuming LIVE trading (decider reads
+    the LIVE_TRADING_ENABLED constant, which stays True). Now we:
+      a) write PAUSE_MARKER (watchdog checks it before any restart), and
+      b) stop hermes-watchdog.timer itself, and
+      c) stop the running hermes-pipeline.service (stopping the timer alone
+         does NOT stop an in-flight or already-scheduled service run).
+    Note: 'hermes-decider.timer' does not exist (decider_run is a pipeline
+    step) — kept out of the list; stopping the pipeline covers it.
     """
     import subprocess
     try:
-        # 1. Close all open HL positions + save flags
+        # 0. Write pause marker FIRST so the watchdog never restarts the pipeline
+        try:
+            with open(PAUSE_MARKER, 'w') as f:
+                json.dump({'paused_at': datetime.now(timezone.utc).isoformat(),
+                           'reason': reason}, f, indent=2)
+        except Exception as e:
+            log(f"⚠️ [VACATION-GUARDRAIL] Could not write pause marker: {e}", 'WARN')
+
+        # 1. Stop the watchdog BEFORE the pipeline (it would re-arm the timer)
+        r = subprocess.run(['systemctl', 'stop', 'hermes-watchdog.timer'],
+                         capture_output=True, text=True, timeout=10)
+        if r.returncode == 0:
+            log("🛑 [VACATION-GUARDRAIL] Stopped hermes-watchdog.timer")
+        else:
+            log(f"⚠️ [VACATION-GUARDRAIL] Could not stop hermes-watchdog.timer: {r.stderr.strip()}", 'WARN')
+
+        # 2. Stop the pipeline service (kill any in-flight run) then its timer
+        for unit in ['hermes-pipeline.service', 'hermes-pipeline.timer']:
+            r = subprocess.run(['systemctl', 'stop', unit],
+                             capture_output=True, text=True, timeout=15)
+            if r.returncode == 0:
+                log(f"🛑 [VACATION-GUARDRAIL] Stopped {unit}")
+            else:
+                log(f"⚠️ [VACATION-GUARDRAIL] Could not stop {unit}: {r.stderr.strip()}", 'WARN')
+
+        # 3. Close all open HL positions + save flags
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from hyperliquid_exchange import disable_live_trading
         result = disable_live_trading()
         closed = result.get('closed_positions', [])
         log(f"🛑 [VACATION-GUARDRAIL] Closed {len(closed)} HL positions: {closed}")
 
-        # 2. Stop pipeline + decider timers (prevent new trades)
-        for timer in ['hermes-pipeline.timer', 'hermes-decider.timer']:
-            r = subprocess.run(['systemctl', 'stop', timer],
-                             capture_output=True, text=True, timeout=10)
-            if r.returncode == 0:
-                log(f"🛑 [VACATION-GUARDRAIL] Stopped {timer}")
-            else:
-                log(f"⚠️ [VACATION-GUARDRAIL] Could not stop {timer}: {r.stderr.strip()}", 'WARN')
-
-        # 3. Also stop the guardrail timer itself (avoid re-trigger)
+        # 4. Also stop the guardrail timer itself (avoid re-trigger)
         subprocess.run(['systemctl', 'stop', 'hermes-vacation-guardrail.timer'],
                       capture_output=True, timeout=10)
 
