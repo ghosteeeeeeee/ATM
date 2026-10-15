@@ -10173,3 +10173,60 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 **Open Questions:**
 - Guardrail ESCALATE still active (48h WR ~30-39%) — watching, no action
 - Quiet market continues (0-2/hr); losses are noise-sized (cents)
+
+## [2026-10-15 01:14] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (no trades)
+
+**Details:**
+- Quiet hour (0 closed, 2 open: MNT ai-trader+ LONG, ICP bb-bounce-v2-long+ LONG — both small unrealized losses)
+- 24h: 33T 13W −$0.21 net (~39% WR)
+- 24h by reason: atr_sl_hit 9/33=27.3% (under 40), hard_max_loss 8/33=24.2% (−$0.66), profit trails 12/33=36.4% (+$1.04 combined) — tpsl stable
+- 24h worst: volume-buildup+ 3T 0W −$0.26 (already killed 09:15); volume-breakout-short- still 2T 0W (needs 3+ to kill)
+- volume-buildup- SHORT: 4T 4W +$0.41 — still best signal
+- live_trading=true, kill JSON=true
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no candidates (0T this hour)
+- atr_sl_hit 27.3% under 40% threshold — tpsl stable
+- Streak: −0.03 (23:00), −0.04 (00:00), quiet (01:00) — quiet hour resets 3-neg streak; losses are cents
+- Overtrade: 0/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Guardrail ESCALATE still active (48h WR ~39%) — watching, no action
+- Very quiet overnight session (0-1/hr); waiting for volume
+
+## [2026-10-15 02:15] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.13 (WR: 0%)
+
+**Details:**
+- ICP bb-bounce-v2-long+ LONG hard_max_loss −$0.09 (−3.83% acct, 18min hold, MAE 0.60%) — normal hard_max_loss
+- MNT ai-trader+ LONG atr_sl_hit −$0.04 (−1.71% acct, 53min hold) — normal SL loss
+- 24h: 33T 11W −$0.38 net (33% WR)
+- 24h by reason: atr_sl_hit 9/33=27.3% (under 40, tpsl stable), hard_max_loss 9/33=27.3% (−$0.75), profit trails 11/33=33.3% (+$1.00 combined)
+- Kill candidates: ai-trader+ LONG 2T 0W (needs 3+T); volume-buildup+ 3T 0W remains killed (pre-kill trades only)
+- volume-buildup- SHORT: 4T 4W +$0.41 — still best signal 24h
+- Winners MAE avg 0.502% (entries acceptable)
+- 0 open positions
+- ⚠️ Kill JSON flipped to live_trading=false at 01:40 UTC (reason: "disabled") — live trading OFF via runtime switch (LIVE_TRADING_ENABLED constant still True). Not changed by auto_1hr; only T should re-enable.
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: no new candidates (ai-trader+ 2T 0W, needs 3+T)
+- atr_sl_hit 27.3% under 40% threshold — tpsl stable
+- Streak: 3 consecutive neg hours (23h −$0.03, 00h −$0.04, 01h −$0.13) but total −$0.20 = noise-sized; kill switch already off so no size action needed
+- Overtrade: 2/hr (limit 20)
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- Kill switch disabled at 01:40 — confirm intentional with T before any trades resume
+- Guardrail ESCALATE still active (48h WR ~33%) — watching
