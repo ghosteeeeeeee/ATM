@@ -4547,5 +4547,15 @@
     "status": "suggested",
     "risk": "low",
     "prereq": "ai-trader+ n≥10 HML backtest (self_learner) — 5T is thin; monitor 48h then decide. NOT shipped this run (one-variable + soak discipline)."
+  },
+  {
+    "date": "2026-10-15T00:42:31Z",
+    "idea": "Momentum-gate HARD re-delegation: block entries when |5m price change| < 0.15% (dead-bar chop)",
+    "rationale": "7d HML 59/62 never-armed at MFE 0.10%. Zero momentum after entry = chop. Pairs with chase-ratio shadow (high-velocity instant-death) to bracket enterable window. 3rd request — self_learner undelivered since Oct 13.",
+    "expected_impact": "Block ~30-40% of HML dead entries, preserve trending entries (MFE 1.7%+). Est +$2/14d.",
+    "category": "entry sniper",
+    "status": "delegated_hard_deadline",
+    "risk": "low",
+    "deadline": "2026-10-17"
   }
 ]
