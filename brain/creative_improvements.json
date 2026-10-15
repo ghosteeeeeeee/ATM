@@ -4614,5 +4614,16 @@
     "category": "entry sniper",
     "status": "ESCALATE TO CEO",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-15T17:35:00Z",
+    "idea": "Pump-chain+ bull override RSI band: 75+ is toxic regardless of confidence",
+    "rationale": "Bull override (score>80) lifts PUMP_CHAIN_LONG_RSI_MAX from 70 to 85. All-time meta RSI>=75: 12T 4W 7L 1flat −$0.72 (BABY×2, BANANA, HEMI, CHIP, HYPER all losses). Post-Oct-13 override cohort: 3T −$0.33 (GRASS@72.8 −0.10, ALT@73.7 +0.01, BABY@75.0 −0.24). FIL@75.32 winners (+0.30 net) are the only counter-example. If tightened to 75: blocks −$1.12 losers, loses +$0.42 winners = net +$0.70/30d.",
+    "expected_impact": "+$0.70/30d if enforced; blocks only the exhausted 75+ band",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low",
+    "blocker": "n=12 all-time, n=3 post-Oct-13 — below 20-trade threshold. Monitor 7d; if 75+ cohort grows to n>=8 with WR<30%, tighten bull override ceiling to 75.",
+    "note": "NOT implementing now — small sample. Logging for tracking. Aligns with \"every pump is a LONG\" — only blocks exhausted zone, not the 55-70 profit band."
   }
 ]

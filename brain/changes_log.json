@@ -1342,5 +1342,16 @@
     "after": "Block deleted, constants removed. No dampen, no shadow log.",
     "rationale": "Actual-continuum test (14d LONGs, trade open within 10min of BELOW+BEAR sample): shadow cohort n=48 +$0.84 45.8%WR vs non-shadow n=258 -$0.27. Enforcing would remove +$0.84 profit/14d. Original 48h evidence (62T 24.2% -$2.12) was selection-bias flush window. Same inversion class as Oct 12 SHORT_BIAS pump-chain reject.",
     "impact": "Stops shadow log spam; prevents future enforcement flip that would dampen profitable bear-regime LONG cohort. 0 live behavior change (shadow was log-only)."
+  },
+  {
+    "timestamp": "2026-10-15T17:35:00Z",
+    "agent": "brain_auditor",
+    "change": "KILL volume-breakout-short- (VOLUME_BREAKOUT_MINUS_ENABLED True→False)",
+    "type": "kill",
+    "file": "hermes_constants.py",
+    "before": "VOLUME_BREAKOUT_MINUS_ENABLED = True",
+    "after": "VOLUME_BREAKOUT_MINUS_ENABLED = False",
+    "rationale": "0/3 all-time 0%WR −$0.37 (IO/USELESS/PUMP all losses in 48h). In STANDALONE_BYPASS fires freely. LONG side already killed Oct 13. CURRENT.md flagged for Oct 16 kill check — executed early with all-time 0/3 justification.",
+    "impact": "Stops future 0%WR chop SHORT entries. Blocks 0 winners (none exist). Re-enable: fresh backtest + CEO approval."
   }
 ]

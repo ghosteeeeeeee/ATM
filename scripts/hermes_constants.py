@@ -3444,7 +3444,7 @@ ENGULFING_CONF_CAP = 88               # max confidence
 # NEW 2026-08-30 — backbone signal to address signal starvation
 VOLUME_BREAKOUT_ENABLED = True         # master toggle
 VOLUME_BREAKOUT_PLUS_ENABLED = False   # LONG — KILLED brain_auditor 2026-10-13: post-Oct10-re-enable cohort 12T 0%WR -$1.32 (EXTREME home habitat post-HIGH-block-fix 8T 0% -$0.59). CEO's "regime issue not signal issue" thesis falsified by post-fix data. Re-enable only with fresh backtest + CEO approval.
-VOLUME_BREAKOUT_MINUS_ENABLED = True   # SHORT (bearish volume spike)
+VOLUME_BREAKOUT_MINUS_ENABLED = False  # SHORT — KILLED brain_auditor 2026-10-15: 0/3 all-time 0%WR −$0.37 (IO/USELESS/PUMP all losses in 48h). In STANDALONE_BYPASS, fires freely. LONG side already killed Oct 13 (12T 0%WR). Re-enable only with fresh backtest + CEO approval.
 VOLUME_BREAKOUT_SPIKE_MULT = 2.0       # volume must be >= 2x average
 VOLUME_BREAKOUT_AVG_PERIOD = 20        # bars for average volume
 VOLUME_BREAKOUT_MOMENTUM_BARS = 3      # bars for price momentum
