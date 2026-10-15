@@ -1375,5 +1375,16 @@
     "after": "direction = (trade.get(\"direction\") or \"?\").lower()",
     "rationale": "Monitoring-layer sign bug misleads captain/CEO steers (winning longs flagged \"losing, consider cutting\"). No auto-exec risk (AUTO_EXECUTABLE_CATEGORIES=profit_lock only, and profit_lock path already lowercased at :530). Every other direction read in the file already lowercases — this was the single miss.",
     "impact": "Stale-trade steers now show true PnL sign. Zero trading-config impact."
+  },
+  {
+    "timestamp": "2026-10-15T23:44:30Z",
+    "agent": "brain_auditor",
+    "change": "FLOOR-ADMIT SHADOW: log-only JSONL cohort of penalty-floor-admitted trades (counterfactual exec at floor 0.3 + floor_admitted flag) for PENALTY_MULT_FLOOR 0.5-vs-0.3 decision",
+    "type": "shadow",
+    "file": "scripts/decider_run.py",
+    "before": "PENALTY-GATE log line only, no structured cohort data",
+    "after": "appends data/floor_admit_shadow.jsonl when PENALTY_MULT_FLOOR raises multiplier above raw product; try/except-wrapped, write failures logged",
+    "rationale": "Today 3/11 losers were floor-admitted pump-chain+ (exec conf 46-62.7, all chop exits) vs conf-100 winners 3/3 +$1.20. Floor-locked cohort since Oct 13: n=29 −$0.23 24.1%WR — monitor-grade, not revert-grade. Shadow ages clean cohort before CEO floor decision. Zero trading impact.",
+    "impact": "0 behavior change. Decision-ready data by Oct 19. Commit e5ea5e2d, bug_hunter PASS."
   }
 ]

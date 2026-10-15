@@ -4690,5 +4690,23 @@
     "category": "exit quality / signal health",
     "status": "suggested_for_self_learner_oct17",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-15T23:44:30Z",
+    "idea": "FLOOR-ADMIT SHADOW (SHIPPED) — log-only JSONL cohort of trades that execute only because PENALTY_MULT_FLOOR=0.5 raised the multiplier above the raw penalty product, with counterfactual exec conf at floor 0.3 and floor_admitted flag",
+    "rationale": "Oct-13 floor change is the only recent CEO tuning with an unmeasured losing tail: today 3/11 losers were penalty-reduced pump-chain+ entries (exec 46-62.7) vs conf-100 winners 3/3 +$1.20. Need aged cohort before any 0.5-vs-0.3 call. Log-only = zero trading risk.",
+    "expected_impact": "Decision-ready floor cohort by Oct 19 (n>=40). Prevents both premature revert and indefinite unmeasured bleed.",
+    "category": "measurement infrastructure",
+    "status": "SHIPPED (commit e5ea5e2d, bug_hunter PASS)",
+    "risk": "none (log-only)"
+  },
+  {
+    "date": "2026-10-15T23:44:30Z",
+    "idea": "Chase-signature tag on pump-chain entries (speed_percentile>70 OR bb_position>1.0 at entry) — log-only, feeds Oct 17 momentum-gate decision",
+    "rationale": "Today's pump-chain losers: speed_pct 73.7/93.7, one bb_pos 1.29 (z=3.17 extreme_high, decelerating). Winners: speed_pct 5.7-41.1, bb_pos 0.74-0.84. n=3v3 — too small to ship a filter, but tagging accrues the exact cohort the pending backtest needs.",
+    "expected_impact": "Zero risk now; sharpens Oct 17 momentum-gate decision",
+    "category": "entry sniper / measurement",
+    "status": "suggested — DEFERRED to self_learner momentum-gate backtest (don't duplicate in-flight work)",
+    "risk": "none (would be log-only)"
   }
 ]
