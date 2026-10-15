@@ -4567,5 +4567,15 @@
     "status": "needs_backtest",
     "risk": "low",
     "owner": "self_learner — fold as extra cell into momentum-gate matrix (deadline Oct 17)"
+  },
+  {
+    "date": "2026-10-15T02:45:00Z",
+    "idea": "Soft-pause paper mode: when 48h WR < 35% (escalate band) but not full pause, auto-switch decider to paper for 4h to collect counterfactuals without bleeding",
+    "rationale": "Fix-aging windows need live cohort data but WR is too low to trust real fills. Paper-mode shadow collects the same signals/exits without PnL risk. The pause-marker→paper path we just built makes this a 5-line extension (soft marker, TTL 4h).",
+    "expected_impact": "Zero PnL risk during recovery windows; full counterfactual data for Oct 13-14 fix validation",
+    "category": "risk management",
+    "status": "suggested",
+    "risk": "low",
+    "prereq": "backtest: would soft-pause windows historically have collected enough signals to validate fixes?"
   }
 ]

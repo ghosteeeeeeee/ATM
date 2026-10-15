@@ -23,6 +23,14 @@ PNL_24H_PAUSE = -3.00      # Auto-pause if 24h PnL < this
 WR_48H_ESCALATE = 40.0     # Escalate if 48h WR < this (after 48h soak)
 WR_7D_PAUSE = 35.0         # Auto-pause if 7d WR < this (plan kill criterion — was NOT coded)
 WR_7D_MIN_TRADES = 50      # Need 50+ trades before 7d WR is meaningful
+# 2026-10-15 captain fix: WR-alone is a false-positive machine during fix-aging
+# windows (Oct 12-13 bad day sits in the 7d window while Oct 13-14 fixes need
+# live cohort data). Pair WR pause with a PnL confirmation so we only freeze
+# on sustained bleed, not a window artifact.
+WR_7D_PNL_CONFIRM = -2.00  # 7d WR pause ALSO requires pnl_7d < this
+# Auto-resume hysteresis: only clear pause when metrics recover past the
+# pause threshold, so we don't thrash pause/resume on a single borderline check.
+WR_7D_RESUME = 37.0
 KILL_SWITCH_PATH = os.path.join(WWW_DATA := '/var/www/hermes/data', 'hype_live_trading.json')
 ALERT_PATH = os.path.join(HERMES_DATA, '..', 'automation', 'ceo', 'vacation_alerts.json')
 # BUG-HUNTER 2026-10-15: marker that pipeline_watchdog checks before auto-restarting
@@ -68,10 +76,16 @@ def check_guardrails():
         }
 
         should_pause = (data['pnl_24h'] < PNL_24H_PAUSE or
-                       (data['wr_7d'] < WR_7D_PAUSE and data['n_7d'] >= WR_7D_MIN_TRADES))
+                       (data['wr_7d'] < WR_7D_PAUSE and data['pnl_7d'] < WR_7D_PNL_CONFIRM
+                        and data['n_7d'] >= WR_7D_MIN_TRADES))
         should_escalate = data['wr_48h'] < WR_48H_ESCALATE and data['n_48h'] >= 30
+        # Auto-resume: pause marker present + metrics recovered → clear and restart.
+        # Hysteresis (WR_7D_RESUME > WR_7D_PAUSE) prevents thrash on borderline checks.
+        should_resume = (os.path.exists(PAUSE_MARKER) and
+                         data['pnl_24h'] >= PNL_24H_PAUSE and
+                         (data['wr_7d'] >= WR_7D_RESUME or data['pnl_7d'] >= 0))
 
-        return should_pause, should_escalate, data
+        return should_pause, should_escalate, should_resume, data
     finally:
         conn.close()
 
@@ -130,14 +144,47 @@ def pause_trading(reason):
         closed = result.get('closed_positions', [])
         log(f"🛑 [VACATION-GUARDRAIL] Closed {len(closed)} HL positions: {closed}")
 
-        # 4. Also stop the guardrail timer itself (avoid re-trigger)
-        subprocess.run(['systemctl', 'stop', 'hermes-vacation-guardrail.timer'],
-                      capture_output=True, timeout=10)
-
+        # 4. Keep the guardrail timer RUNNING so auto-resume can fire when
+        #    metrics recover. (Pre-fix: stopped itself → permanent freeze
+        #    with no resume path except manual intervention.)
         log(f"🛑 [VACATION-GUARDRAIL] TRADING PAUSED (positions closed + timers stopped): {reason}")
+        log("🛑 [VACATION-GUARDRAIL] Guardrail timer stays armed for auto-resume (WR>=37% or pnl_7d>=0)")
         return True
     except Exception as e:
         log(f"❌ [VACATION-GUARDRAIL] Failed to pause: {e}", 'ERROR')
+        return False
+
+
+def resume_trading(reason):
+    """Clear pause marker + restart pipeline/watchdog timers + re-enable kill JSON.
+
+    Does NOT touch LIVE_TRADING_ENABLED (CEO-protected constant). Resume only
+    clears the runtime pause; the constant stays authoritative.
+    """
+    import subprocess
+    try:
+        if os.path.exists(PAUSE_MARKER):
+            os.remove(PAUSE_MARKER)
+            log(f"▶️ [VACATION-GUARDRAIL] Removed pause marker: {reason}")
+        # Restore kill JSON to true (cosmetic for is_live_trading_enabled, but
+        # dashboards/watchdogs read it — keep state coherent).
+        try:
+            with open(KILL_SWITCH_PATH, 'w') as f:
+                json.dump({'live_trading': True, 'reason': f'RESUME: {reason}',
+                           'ts': datetime.now(timezone.utc).timestamp()}, f, indent=2)
+        except Exception as e:
+            log(f"⚠️ [VACATION-GUARDRAIL] Could not write kill JSON: {e}", 'WARN')
+        for unit in ['hermes-pipeline.timer', 'hermes-watchdog.timer']:
+            r = subprocess.run(['systemctl', 'start', unit],
+                             capture_output=True, text=True, timeout=15)
+            if r.returncode == 0:
+                log(f"▶️ [VACATION-GUARDRAIL] Started {unit}")
+            else:
+                log(f"⚠️ [VACATION-GUARDRAIL] Could not start {unit}: {r.stderr.strip()}", 'WARN')
+        log(f"▶️ [VACATION-GUARDRAIL] TRADING RESUMED: {reason}")
+        return True
+    except Exception as e:
+        log(f"❌ [VACATION-GUARDRAIL] Failed to resume: {e}", 'ERROR')
         return False
 
 
@@ -162,18 +209,23 @@ def write_alert(level, message, data):
 
 
 def main():
-    should_pause, should_escalate, data = check_guardrails()
+    should_pause, should_escalate, should_resume, data = check_guardrails()
 
     log(f"📊 [VACATION-GUARDRAIL] 24h: {data['n_24h']}T {data['wr_24h']}% ${data['pnl_24h']:+.2f} | "
         f"48h: {data['n_48h']}T {data['wr_48h']}% ${data['pnl_48h']:+.2f} | "
         f"7d: {data['n_7d']}T {data['wr_7d']}% ${data['pnl_7d']:+.2f}")
 
-    if should_pause:
+    if should_resume:
+        reason = (f"auto-resume: 7d WR {data['wr_7d']}% / pnl_7d ${data['pnl_7d']:+.2f} recovered "
+                  f"(hysteresis WR>={WR_7D_RESUME}% or pnl>=0)")
+        resume_trading(reason)
+        write_alert('INFO', f'TRADING RESUMED: {reason}', data)
+    elif should_pause:
         reasons = []
         if data['pnl_24h'] < PNL_24H_PAUSE:
             reasons.append(f"24h PnL ${data['pnl_24h']:.2f} < ${PNL_24H_PAUSE:.2f}")
-        if data['wr_7d'] < WR_7D_PAUSE and data['n_7d'] >= WR_7D_MIN_TRADES:
-            reasons.append(f"7d WR {data['wr_7d']}% < {WR_7D_PAUSE}% ({data['n_7d']}T)")
+        if data['wr_7d'] < WR_7D_PAUSE and data['pnl_7d'] < WR_7D_PNL_CONFIRM and data['n_7d'] >= WR_7D_MIN_TRADES:
+            reasons.append(f"7d WR {data['wr_7d']}% < {WR_7D_PAUSE}% AND pnl_7d ${data['pnl_7d']:.2f} < ${WR_7D_PNL_CONFIRM:.2f} ({data['n_7d']}T)")
         reason = "; ".join(reasons)
         pause_trading(reason)
         write_alert('CRITICAL', f'TRADING PAUSED: {reason}', data)

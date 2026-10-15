@@ -274,12 +274,20 @@ def is_live_trading_enabled() -> bool:
     """
     Final kill-switch for live trading on Hyperliquid.
 
-    Controlled by hermes_constants.LIVE_TRADING_ENABLED only.
-    hype_live_trading.json is NOT consulted — it was a redundant intermediate
-    control that caused ghost trades (brain.py rejected while decider_run thought
-    it succeeded). The single source of truth is the constant in hermes_constants.py.
+    Controlled by hermes_constants.LIVE_TRADING_ENABLED. Additionally, when the
+    vacation-guardrail pause marker exists, live mode is forced OFF (paper)
+    regardless of the constant — so a pause survives any timer restart
+    (health_monitor, smoke_test, manual). hype_live_trading.json is NOT
+    consulted (ghost-trades history); the pause marker is the runtime gate.
+    Clear vacation_pause.json to resume live trading.
     """
-    return LIVE_TRADING_ENABLED
+    if not LIVE_TRADING_ENABLED:
+        return False
+    # vacation pause marker → force paper until human clears the marker
+    _pause_marker = os.path.join(HERMES_DATA, 'vacation_pause.json')
+    if os.path.exists(_pause_marker):
+        return False
+    return True
 
 
 def enable_live_trading() -> dict:
