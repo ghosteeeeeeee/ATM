@@ -10257,3 +10257,27 @@ Final set: ['BTC', 'CFX', 'CHIP', 'GRASS', 'LDO']
 **Open Questions:**
 - Guardrail ESCALATE still active (48h WR ~34%) — watching
 - BTC manual SHORT open — not auto_1hr's scope
+
+## [2026-10-15 14:10] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses) — last close 03:42, last OPEN 03:00 (11h drought)
+**PnL:** $0.00 (WR: N/A) | 24h: 13T 4W −$0.08 (30.8%)
+
+**Details:**
+- 1 open: BTC ai-trader-manual SHORT (opened 02:29, ~11.6h hold, not auto_1hr scope)
+- 24h by reason: atr_sl_hit 6/13=46.2% (>40% rule) — but tpsl_utils.py fix IS deployed (position_manager imports compute_atr_sl_tp; recent fixes d5fab3cf/ff36afd7). Sample shrank from 33T→13T so ratio inflated; SL dists 0.30–0.89% price (expected at 3-5x lev). No action.
+- Trade drought: 13T/24h vs 33-39T earlier. blocked_signals.json: 85 blocks, 83 = CONFLUENCE-GATE "single-type not in standalone bypass". Regime: SHORT_BIAS overall, 94/117 NEUTRAL — thin confluence environment, not a code fault.
+- Regime 5m: overall SHORT_BIAS (21 short / 2 long / 94 neutral)
+
+**Changes:** None.
+
+**No Change Needed:**
+- Kill rule: 0 trades this hour, no 3+T 0W candidates
+- atr_sl_hit 46.2%: tpsl fix deployed (checked), ratio artifact of tiny 13T sample
+- Overtrade: 0/hr (limit 20) — opposite problem (under-trade), but relaxing confluence gate is a CEO-level change, not auto_1hr
+- No constants edit → no signal_versions.json entry
+- OpenMemory skipped per task instruction
+
+**Open Questions:**
+- 11h with zero new opens — confluence gate blocking 83 candidates. Market is 94/117 NEUTRAL so likely genuine lack of 2+ source confluence, but worth CEO review of whether STANDALONE_BYPASS_SIGNALS list should grow
+- BTC manual SHORT still open 11.6h — position_manager watching SL 82475.67 / TP 79241.33

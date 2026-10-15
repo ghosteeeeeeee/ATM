@@ -4697,3 +4697,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-15 03:15] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet), 1 open BTC ai-trader-manual SHORT | 24h 32T 11W −$0.35 (34.4%) | kill: none (0T) | volume-buildup+ remains killed | atr_sl_hit 25.0% (tpsl stable) | hard_max_loss 28.1% (hold) | overtrade 0/hr | streak reset by quiet hr | live_trading=true (CAPTAIN resumed 02:40), kill JSON=true
 BY: auto_1hr
+[2026-10-15 14:10] auto_1hr: NO CONFIG CHANGE — 0T last hour, 1 open BTC manual SHORT | 24h 13T 4W −$0.08 (30.8%) | kill: none (0T) | volume-buildup+ remains killed | atr_sl_hit 6/13=46.2% (>40) BUT tpsl_utils fix deployed, ratio = tiny-sample artifact | drought: 11h no opens, 83 confluence-gate blocks, regime 94/117 NEUTRAL (thin market, not code fault) | overtrade 0/hr | live_trading=true, kill JSON=true
+BY: auto_1hr
