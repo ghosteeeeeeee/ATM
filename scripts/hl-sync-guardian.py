@@ -2920,11 +2920,13 @@ def close_orphan_paper_trades(hl_pos, prices):
         # FIX (2026-10-16): Add 5-minute grace period for newly created trades.
         # Manual trades via brain.py trade add are paper=false but HL position
         # may not appear immediately — LIVE-MISS was creating duplicates.
+        # COALESCE: open_time has NO DEFAULT; NULL rows (cascade flips) would
+        # be permanently exempt. Fall back to created_at which defaults to NOW().
         cur3.execute("""
             SELECT id, token, direction, entry_price, leverage, amount_usdt, stop_loss, target
             FROM trades
             WHERE status = 'open' AND paper = false AND exchange = 'Hyperliquid'
-              AND open_time < NOW() - INTERVAL '5 minutes'
+              AND COALESCE(open_time, created_at) < NOW() - INTERVAL '5 minutes'
         """)
         live_missing = cur3.fetchall()
         conn3.close()
@@ -4809,6 +4811,32 @@ def sync():
                     # paper=False trades are LIVE trades. If HL returns 429, we should NOT close
                     # them as HL_CLOSED based on a single invisible cycle. Only close after 2+
                     # consecutive missing cycles (to survive 1-cycle 429 without losing the trade).
+                    #
+                    # FIX (2026-10-16): Add 5-minute grace period for newly created trades.
+                    # Manual trades via brain.py trade add may not appear on HL immediately.
+                    # Step 8 was closing them 2 minutes after open (see BTC #16239 incident).
+                    # Use COALESCE(open_time, created_at) because open_time has no DEFAULT.
+                    try:
+                        conn_age = get_db_connection()
+                        cur_age = conn_age.cursor()
+                        cur_age.execute(
+                            "SELECT COALESCE(open_time, created_at) FROM trades WHERE id=%s",
+                            (trade_id,))
+                        age_row = cur_age.fetchone()
+                        cur_age.close()
+                        conn_age.close()
+                        if age_row and age_row[0]:
+                            trade_age = age_row[0]
+                            if hasattr(trade_age, 'tzinfo') and trade_age.tzinfo is None:
+                                from datetime import timezone as _tz
+                                trade_age = trade_age.replace(tzinfo=_tz.utc)
+                            age_minutes = (datetime.now(timezone.utc) - trade_age).total_seconds() / 60
+                            if age_minutes < 5:
+                                log(f'  Step8 SKIP {tok} #{trade_id}: trade only {age_minutes:.1f} min old — grace period', 'WARN')
+                                continue
+                    except Exception:
+                        pass  # fail open — proceed with existing checks
+
                     missing_cycles = missing_state.get(tok, {}).get('cycles', 0)
                     if missing_cycles < 2:
                         log(f'  Step8 SKIP {tok} #{trade_id}: missing only {missing_cycles} cycle(s) — waiting for 2nd miss before closing (possible 429)', 'WARN')
