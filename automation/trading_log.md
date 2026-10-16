@@ -10658,3 +10658,62 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - pump-chain- 24h 3T 0W −$0.20 — 0% WR, kill only triggers on 3+T in a single hour
 - 3-neg-hour streak (04-06) small-loss grind — watch if it extends at 08:00+
 - hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 09:09] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L) — CRV pump-chain- SHORT atr_sl_hit −$0.05 (−2.14%), SUPER ai-trader+ LONG atr_trail_hit +$0.05 (+1.35%)
+**PnL:** $0.00 last hour | 24h 24T 10W +$0.43 (41.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal 3+T this hour (pump-chain- 1T 0W this hour, 24h 4T 0W −$0.25 watch item)
+- atr_sl_hit 9/24 = 37.5% (under 40 threshold; tpsl_utils fix deployed)
+- 3-neg-hour streak 04-06 broken — 07:00 was −$0.08, 08:00 $0.00; no 3-consecutive-neg now
+- Overtrade 2/hr; live_trading=true, kill JSON=true
+- Open: 5 trades
+- Entry quality: CRV loser exited −2.14% account (atr_sl_hit, normal ATR SL at 3-5x leverage); SUPER winner trailed to +1.35%
+
+**Open Questions:**
+- pump-chain- 24h 4T 0W −$0.25 — kill only triggers on 3+T in a single hour; still 1T/hr max observed
+- atr_trail_hit 6/24 = 25% second-most common exit, avg +$0.23 — healthy (winners trailing)
+- hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 10:09] Hourly Analysis
+
+**Trades:** 4 closed last hour (0W 4L) — ARB ai-trader+ LONG hard_sl −$0.09 (MFE 0.12/MAE 0.57), INJ pump-chain- SHORT hard_max_loss −$0.08 (MFE 0.06/MAE 0.65), GRASS pump-chain- SHORT atr_sl_hit −$0.03 (MFE 1.01/MAE 0.36), MET doji-bottom-long LONG atr_sl_hit −$0.10 (MFE 0.37/MAE 0.83)
+**PnL:** −$0.30 last hour (0% WR) | 24h 28T 10W +$0.13 (35.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: pump-chain- 2T 0W this hour (needs 3+T per rule); 24h 6T 0W −$0.36 remains the standing watch item
+- atr_sl_hit 11/28 = 39.3% (just under 40 threshold; tpsl_utils fix deployed; flagging as near-threshold)
+- 2-consecutive-neg-hours (09:00 −$0.21, 10:00 −$0.09) — not 3+; regime EXTREME (21/28 24h) NOT NEUTRAL → no size cut per rule
+- Overtrade 4/hr (under 20); live_trading=true, kill JSON=true
+- Open: 3 trades
+- Entry quality: all 4 losers had MAE > MFE at exit — GRASS actually had MFE 1.01% before reversing to SL; INJ/ARB/MET never got meaningful adverse-favorable run
+
+**Open Questions:**
+- pump-chain- 24h 6T 0W −$0.36 (0% WR) — kill rule only fires on 3+T in a single hour; max observed is 2T/hr. Suggest CEO consider 24h-based kill threshold (0% WR with 6+ trades) as a standing rule change
+- atr_sl_hit 39.3% is one trade away from the 40% kill-check threshold — if next hour has 1+ atr_sl_hit close, ratio crosses; tpsl fix already deployed so this may be EXTREME-regime SL churn
+- 24h WR slipped to 35.7% from 41.7% at 09:00 — all-losers hour; watch 11:00 for stabilization
+- hard_max_loss 1 exit −$0.08 24h (INJ this hour) — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 11:09] Hourly Analysis
+
+**Trades:** 2 closed last hour (2W 0L) — BIGTIME bb-bounce-v2-long+ LONG profit-monster-trail +$0.06 (+1.61%), ENS volume-buildup- SHORT profit-monster-trail +$0.06 (+2.67%)
+**PnL:** +$0.12 last hour (100% WR) | 24h 30T 13W +$0.25 (43.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: pump-chain- 0T this hour (24h 6T 0W −$0.36 remains standing watch item; kill rule fires only on 3+T in a single hour, max observed 2T/hr)
+- atr_sl_hit 11/30 = 36.7% (under 40 threshold; tpsl_utils fix deployed)
+- 2-consecutive-neg-hours streak 09-10 broken — 10:00 hour +$0.03, this hour +$0.12; no 3-neg streak → no regime/size check needed
+- Overtrade 2/hr (under 20); live_trading=true, kill JSON=true
+- Entry quality: both winners trailed to exit via profit-monster-trail; 24h atr_trail_hit avg +$0.23 and profit-monster-trail avg +$0.05 — winners being trailed correctly
+
+**Open Questions:**
+- pump-chain- 24h 6T 0W −$0.36 (0% WR) — hourly kill rule can't catch it at observed 1-2T/hr rate; standing CEO suggestion for 24h-based kill threshold (0% WR with 6+ trades)
+- hard_max_loss 2 exits −$0.16 24h — standing CEO hold, momentum-gate backtest due Oct 17
