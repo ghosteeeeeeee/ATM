@@ -1,29 +1,21 @@
 {
-  "timestamp": "2026-10-16T14:38:18.128467+00:00",
+  "timestamp": "2026-10-16T17:38:19.419582+00:00",
   "steers": [
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: SOPH + BTC",
-      "detail": "Both opened within 18 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-001"
-    },
     {
       "severity": "warning",
       "category": "health",
       "title": "7 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'pump-chain-' losing streak: 4 losses",
-      "detail": "Net -0.24 USDT over last 20 trades (losses: -0.24). Consider disabling or tuning this signal.",
+      "title": "Signal 'doji-bottom-long' losing streak: 3 losses",
+      "detail": "Net -0.22 USDT over last 20 trades (losses: -0.40). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-002"
     },
     {
       "severity": "warning",
@@ -31,27 +23,27 @@
       "title": "Signal 'bb-bounce-v2-long+' losing streak: 3 losses",
       "detail": "Net -0.18 USDT over last 20 trades (losses: -0.24). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-003"
     }
   ],
   "portfolio_health": "warning",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "ABOVE",
+    "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
-    "velocity_state": "SLOW",
+    "zscore_tier": "NEUTRAL",
+    "velocity_state": "RISING",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 1.0,
-    "wyckoff_phase": "ACCUMULATION",
+    "wyckoff_phase": "MARKDOWN",
     "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "trend_quality": "UP"
   },
-  "open_count": 2,
-  "deep_analysis": "PORTFOLIO: 2 open trades, both LONG, +0.03 USDT unrealized. BTC LONG (ai-trader-manual, just opened) and SOPH LONG (bb-bounce-v2-long+, +0.54%). Both regime-aligned with the micro-uptrend. No action needed on either \u2014 SOPH is halfway to TP at 0.00245, BTC is flat at entry.\n\nMARKET: BTC at 82380, above EMA300 for 40+ consecutive 1m candles, linreg BULL on all timeframes, zscore STRONG_POS. 4h regime LONG_BIAS. BUT volume is LOW and velocity is SLOW \u2014 this is a grind, not a rip. The 5m regime scanner shows mixed signals: 19 LONG_BIAS vs 23 SHORT_BIAS across 125 tokens, overall SHORT_BIAS on the short timeframe. The market is chopping with a slight upward drift on BTC. Low-vol grind favors mean-reversion entries (bb-bounce) over trend-following breakouts.\n\nCRITICAL PATTERN \u2014 SHORT SIDE IS BROKEN: Last 24h: LONGs 55% WR (+0.84 USDT) vs SHORTs 23% WR (-0.71 USDT). The system is net shorting into oversold zones and getting bounces. 9 pump-chain- SHORT losses in 24h, ALL entered at meta_rsi 42-56 \u2014 the neutral/oversold band where bounces are most likely. The WINNING side on those trades was LONG: every coin that stopped us out went UP. We were on the wrong side. The trend is up (BTC above EMA300, 4h LONG_BIAS). Shorting alts during a BTC uptrend = fighting the tape.\n\nbb-bounce-v2-long is also underperforming: 51.9% WR, -0.22 net over 27 trades. The losses (APT, ALT, ETC, BABY) all entered at meta_rsi 50-56 \u2014 mid-range, not extreme oversold. A bounce signal works at RSI extremes, not mid-range chop. The winners were at lower RSI levels.\n\nAI TRADER PICK: SOL LONG. RSI 51.3 (center of band), LONG_BIAS regime conf 55.4, +0.92% over 16 5m-candles, ATR 0.83%. Precheck PASS all gates. RR 1.28 grade C is mediocre but passes. BTC above EMA300 supports longs. No SOL trades in 7 days \u2014 clean slate.",
-  "regime_context": "BTC micro-uptrend: above EMA300 for 40+ min, linreg BULL across 1m/5m/15m, zscore STRONG_POS. But volume LOW and velocity SLOW \u2014 this is a low-participation grind, not a confirmed trend. 4h regime LONG_BIAS (conf ~55), 15m SHORT_BIAS (conf ~79) \u2014 timeframes disagree. The 5m scanner shows overall SHORT_BIAS across alts (23 SHORT vs 19 LONG), but BTC itself is LONG_BIAS. Mixed regime = chop. The correct posture: favor LONGs on BTC-correlated majors (SOL, AVAX, SUI), avoid counter-trend SHORTs on alts that are already oversold. Wyckoff ACCUMULATION phase on BTC supports a slow grind higher. Watch for volume expansion \u2014 if volume picks up with price up, the trend confirms. If volume stays flat, this is range-bound chop and mean-reversion is the only edge.",
-  "pattern_alerts": "VERIFIED PATTERN 1 \u2014 pump-chain- SHORTs lose to bounces (n=9 losses in 24h, all meta_rsi 42-56):\nFIL (-2.3%, rsi 42.2), DOT (-3.7%, rsi 43.5), BIGTIME (-0.1%, rsi 44.4), INJ (-3.2%, rsi 52.9), GRASS (-0.7%, rsi 43.6), CRV (-2.1%, rsi 48.2), IO (-2.4%, rsi 48.5), DOT again (-2.0%, rsi 55.6), APT (-2.9%, rsi 47.3).\nWINNING SIDE: LONG. Every one of these coins bounced after our short entry. The meta_rsi at entry (42-56) is the neutral-oversold zone \u2014 shorting here = catching a falling knife in reverse. The pump-chain- signal fires when zscore is deeply negative (oversold), but oversold in an uptrend = bounce setup, not breakdown setup. WHY WE WEREN'T ON THE RIGHT SIDE: The signal's zscore trigger fires on any dump, regardless of higher-timeframe trend. BTC is above EMA300 (uptrend), so alt dumps are pullbacks, not trend reversals. Shorts should only fire when BTC is BELOW EMA300 (confirmed downtrend). FIX: pump-chain- should check BTC ema300_position before firing SHORT. This is a signal-level fix for the brain auditor, not a watchdog action.\n\nVERIFIED PATTERN 2 \u2014 bb-bounce-v2-long losses at mid-range RSI (n=4 losses in 24h, all meta_rsi 50-56):\nAPT (-4.1%, rsi 53.7), ALT (-2.9%, rsi 55.6), ETC (-1.7%, rsi 50.0), BABY (-4.0%, rsi 55.6).\nWINNING SIDE: These coins kept drifting DOWN after our long entry. At RSI 50-56, there's no oversold pressure to bounce from \u2014 the signal is firing on a mid-range pullback that continues. A bounce LONG needs RSI < 45 to have room to revert to the mean. WHY WE WEREN'T ON THE RIGHT SIDE: The bb-bounce-v2 trigger fires on price touching the lower Bollinger Band, but in a low-vol grind the lower band is close to price \u2014 touching it doesn't mean oversold. The signal needs an RSI floor (ideally < 45) to avoid firing in no-man's-land. Note: BB bounces at RSI < 45 did win (DOGE rsi 43.8 +2.5%, XPL rsi 49.2 +3.9%). FIX: add RSI < 50 filter to bb-bounce-v2-long \u2014 brain auditor scope.\n\nVERIFIED PATTERN 3 \u2014 SHORT side is net negative, LONG side is net positive (24h):\nLONG: 33 trades, 18 wins (55% WR), +0.84 USDT. SHORT: 13 trades, 3 wins (23% WR), -0.71 USDT.\nThe SHORT trades that won (POL volume-buildup- +0.8%, ENS volume-buildup- +2.7%) had meta_rsi 38-60 \u2014 the ENS short at rsi 60 worked because it was shorting overbought. The SHORT losses were all at rsi 42-56 \u2014 shorting neutral/oversold. The pattern: SHORT only works when shorting overbought (rsi > 55), never when shorting oversold (rsi < 50). pump-chain- fires on oversold zscore, which is exactly when SHORT fails.",
-  "agent_timestamp": "2026-10-16T14:45:00.907221+00:00"
+  "open_count": 1,
+  "deep_analysis": "1 open trade: BTC SHORT (ai-trader-manual) entry 81502, current 81221, +0.43%, 0.5h old. Thesis fully intact \u2014 continuum BELOW EMA300 (81863) for 271 consecutive 1m bars, trend_quality STRONG_DOWN, zscore -1.92, 15m scanner SHORT_BIAS. SL 81900 sits just under EMA300 (good structural stop), TP 81100 was 0.15% away at watchdog time but BTC is bouncing on 1m (velocity flipping positive) \u2014 if TP misses and price reclaims 81500, tighten to breakeven rather than give back the full +0.43%.\n\nThe 20-close tape splits cleanly: SHORT continuation paid (volume-buildup- 2/2 on ETH+POL, +0.04), LONG flush-reversals paid when taken at RSI 43-56 (doji-bottom XPL +0.09, DOGE +0.06, GMT +0.02, ONDO +0.01), and everything else lost \u2014 bb-bounce fresh LONGs fired mid-dump during BEAR continuum (APT/ALT/ETC, -0.24 combined), pump-chain- SHORTs fired AFTER the flush completed at RSI 42-43 (FIL/DOT, -0.13 combined), and WCT doji-bottom at RSI 27.78 was the classic falling-knife mirror (-0.13). YGG doji-bottom at RSI 48.78 was the one genuine wrong-side loss (-0.24, -3.2%) \u2014 center-band RSI but the flush-reversal never came, so the LONG thesis died with the trend. NET lesson: entries were late, not wrong-direction. The signal families are right; the losers arrive after the move has already paid. Nothing to disable \u2014 this is timing, not broken signals.\n\nAI Trader fires PUMP SHORT: mid-air between weak supports, BEAR+ichimoku_short conf 75 on tracker, RSI 40.1 clear of the 35 hard floor, best R:R geometry of the three precheck-passing candidates. LINK/SEI both failed the 'would I open this fresh today' test \u2014 both sitting ON str-3 support with tight SL geometry (bounce traps). DOT blocked LOSERS_SHORT. Squeeze risk exists (26:4 short-biased alt tape) but trend hasn't flipped; SHORT remains the correct side until continuum reclaims EMA300.",
+  "agent_timestamp": "2026-10-16T17:15:49.116051+00:00",
+  "regime_context": "BTC: BELOW EMA300 (81863) for 271 1m bars, gap -0.78%, zscore -1.92 STRONG_NEG, linreg LEAN_BEAR on 1m/5m/15m/1h (alignment 0.75), velocity SLOW, acceleration slightly positive on last tick (bounce attempt), volume NORMAL 0.72x, wyckoff DISTRIBUTION->ACCUMULATION mixed, trend_quality STRONG_DOWN, market_phase RECOVERY. 15m scanner SHORT_BIAS, 4h scanner LONG_BIAS, continuum BELOW. Alt 5m aggregate: 26 SHORT_BIAS / 4 LONG / 90 neutral.\n\nImplication: we are on the correct side with the BTC SHORT. Do not fade the continuum \u2014 LONGs require flush-reversal confirmation at RSI 45-60, not fresh knife-catches. SHORTs require entry BEFORE the flush (RSI 45-55 center band), not after FIL/DOT-style post-dump chase. The one-sided 26:4 short tape means squeeze risk is elevated \u2014 new shorts need tighter invalidation, and any BTC reclaim of EMA300 (81863) flips the whole book.",
+  "pattern_alerts": "VERIFIED (PostgreSQL + watchdog recent_closed, meta_rsi from _signal_metadata, last 20 closes):\n\n1) PUMP-CHAIN- SHORTS ENTERED POST-FLUSH (RSI 42-43) \u2014 n=2, 0 wins, net -0.13: FIL -0.05 (RSI 42.15), DOT -0.08 (RSI 43.48). Winning side: the LONG bounce that followed \u2014 doji-bottom caught DOGE/XPL/GMT/ONDO in the same window. Why we weren't on it: pump-chain- fired the short after the dump was complete, i.e., the signal arrived when the winning move was already 80% done. PUMP_CHAIN_SHORT_RSI_MIN=45 exists to block exactly this band; these got through on fire-time drift. Same bug class as the v2 filter drift. Steer: pre-fire guard requiring RSI>=45 at EXECUTION time for pump-chain- (audit-only 24h before enforce) \u2014 already flagged last cycle, no enforcement yet.\n\n2) BB-BOUNCE/FRESH LONGS DURING BEAR CONTINUUM \u2014 n=4 (APT -0.09 RSI 53.7, ALT -0.11 RSI 55.6, ETC -0.04 RSI 50.0, WCT doji RSI 27.78 -0.13), 1 win, net -0.37. Winning side: SHORT continuation the continuum was already signaling (volume-buildup- ETH/POL won same window). WCT at RSI 27.78 is the BANANA mirror \u2014 longing extreme oversold = catching the falling knife. Do NOT disable bb-bounce (brain auditor tunes params); the fix is holding fresh LONGs until continuum flips ABOVE EMA300. Shadow-audit candidate: block doji-bottom LONG below RSI 35 (n=1, too early to enforce).\n\n3) YGG DOJI-BOTTOM AT RSI 48.78 \u2014 n=1, -0.24 (-3.2%), the single biggest wrong-side loss this session. Center-band RSI looked fine; the flush-reversal simply never came because the 15m trend was already SHORT_BIAS. Winning side: staying flat or SHORT. This is the only true 'wrong direction' loss in the 20; the rest were late entries on the correct family.\n\nWINNERS to lean into: volume-buildup- SHORT continuation (2/2 this session, 87.5% WR n=8 historically); doji-bottom LONG flush-reversals ONLY at RSI 45-60 with continuum confirmation; ai-trader manual (60% WR) \u2014 the BTC short currently open is this family."
 }

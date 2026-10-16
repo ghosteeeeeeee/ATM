@@ -1131,3 +1131,18 @@
 
 ## Error Alerts — 2026-10-16 14:08 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-16 15:08 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-16 16:08 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3488s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3428s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2569s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2569s left, N failures)`
+
+## Error Alerts — 2026-10-16 17:25 UTC
+- **WARN** (1x): `hermes-signal-reporter.service failed: start operation timed out (14:33 UTC)` — reporting only, no trading impact
+- **WARN** (1x): `hermes-upgrade-implementer.service failed: git push remote disconnect + start timeout (15:17 UTC)` — transient network, no trading impact
+- **INFO** (3x): `hermes-bug-hunter.service exit 1` — audit findings (sql_injection, cursor_leaks, bare_except, connection_leaks, non_atomic_json, hardcoded_passwords) — code quality, not runtime crashes
+- **AUTO-FIX**: None required — pipeline healthy (60 runs/h), timers active, prices fresh. Non-critical failed services left for their next scheduled run.

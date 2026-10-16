@@ -4876,5 +4876,14 @@
     "status": "suggested",
     "risk": "low",
     "prerequisite": "CEO GO for shadow (D2 shadow-first-14d)"
+  },
+  {
+    "date": "2026-10-16T17:47:10Z",
+    "idea": "Extend trail_arm_timeout (existing ratified mechanism) to doji-bottom-long + bb-bounce-v2-long+ at T=45m with HR-kill guard",
+    "rationale": "Momentum-gate verdict: chop bleed is exit-magnitude. Timeout mechanism already proven on pump-chain (8T 30d, avg -0.50% vs HML -3.3%). Scoped data: doji 8/13 chop trades held >45m (-0.42) with only 2 never-armed winners at risk; bb-bounce-v2 9/15 chop >45m (-0.64) with 1 at-risk winner. Both are top LONG chop bleeders (watchdog steers 002/003).",
+    "expected_impact": "convert ~50-60% of doji/bb-bounce chop exits from -3% acct to ~-0.5%: est +$0.60-0.90/30d without touching trail winners (they arm before T)",
+    "category": "exit engineering",
+    "status": "suggested",
+    "risk": "medium — needs candle-level pnl-at-T backtest (aggregate columns insufficient); dead_money lesson: guard slow-grind winners"
   }
 ]

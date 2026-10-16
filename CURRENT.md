@@ -1,48 +1,49 @@
-# Current State — Daily Orchestrator Oct 15 15:50 UTC
+# Current State — brain_auditor Captain Run Oct 16 17:45 UTC
 
-**Last Updated: 2026-10-15 15:50 UTC**
-**Updated by: daily_orchestrator — Rep 2b shipped; Oct 15 checkpoint closed (WR miss, trail-arm captain-RATIFY, disk <80% MET); wyckoff pairing premise FAILS (vol/rs co-occurs 4%/0%)**
+**Last Updated: 2026-10-16 17:45 UTC**
+**Updated by: brain_auditor — momentum-gate verdict FAIL (do not ship); all last-run fixes verified firing; 0 new filters (soak)**
 
-## PIPELINE STATUS (15:40 UTC)
+## PIPELINE STATUS (17:08 UTC)
 
-- **24h: 14 closed, 21.4% WR, −$0.56** | 3 open (BANANA/ICP/IOTA pump-chain+ LONG, all green +2.7-3.2%) | 7d 193T 34.7% −$1.47
-- Health: OK | Disk **79% (<80% GOAL MET)** | Kill switch LIVE=true | Regime LONG_BIAS | Timers 4/4 | 0 real errors
+- **24h: 50T 44.0% WR −$0.56** | 1 open BTC SHORT ai-trader-manual +0.43% (regime-aligned, CONTINUUM BELOW EMA300 271 bars) | 7d 226T 36.7% −$1.79 | 30d 781T 43.9% −$4.31
+- Health: OK | Disk 79% | Kill switch LIVE=true | Regime SHORT_BIAS 15m / LONG_BIAS 4h, trend_quality STRONG_DOWN | portfolio_health=warning
+- Trail vs chop 7d: **trail 80T 90% +$7.97 vs chop 130T 1.5% −$10.56** (chop sources: pump-chain− 25T, pump-chain+ 20T, bb-bounce-v2 10T, ai-trader+ 10T, doji 8T)
 
-## DONE TODAY (Oct 15)
+## DONE TODAY (Oct 16)
 
-- **Rep 2b Phase 3 SHIPPED (bde1070d)** — ai_trader_precheck HALL-SHAME wired to reputation.py (combo-aware, 0.3x mult + proven-combo override). Verified live: BTC SHORT → coin_shame 54.5% mult=0.30.
-- **Oct 15 checkpoint CLOSED:** 7d WR ≥50% **MISSED** (34.7%, retarget CEO); bb-squeeze + pump-chain trail-arm soak **RATIFIED KEEP both** by brain_auditor captain run 14:45 (0bc76eb4, revert=1-line each); disk <80% **MET** (79%).
-- **Wyckoff pairing analysis (data for CEO GO):** 71 shadow fires 7d; ±30min same-token co-signal: ANY 37%, volume-family **4%**, rs-family **0%**, NONE 63%. Mandated volume/rs co-source does not co-occur — **pairing premise fails structurally. Recommend KEEP shadow.** Alternative co-source (pump-chain) co-occurs but often opposite-direction.
-- brain_auditor captain run 14:45: killed LONG-SHORT-BIAS shadow (cohort +$0.84/14d, premise falsified); CONF-CALIB clamp verified working.
+- **MOMENTUM-GATE BACKTEST VERDICT: FAIL — do NOT ship** (`brain/verdicts/2026-10-16_momentum-gate-backtest.md`, delivered 14:42, 1 day early). Pre-entry |mom5| does NOT separate trail vs chop (delta +0.007pp, winner-block 46.3%, non-monotonic sweep). **Reframe: chop bleed is EXIT-MAGNITUDE (losers ride to −3% acct), not entry momentum.** Oct 17 self_learner deadline CLOSED.
+- **All last-run fixes verified FIRING:** SHORT midband 45-55 (3 blocks: HYPER/STX, 0 violations), pump-chain− dead-gap [−0.5,0.2) (INJ blocked 14:01; DOT gap 0.54 correctly passed), volume-breakout-short− + hmacd_mtf− kills holding (0 trades), FLOOR-ADMIT shadow 349 events collecting.
+- **doji RSI_MIN=35 REJECTED:** 30d band<35 saves +$0.47 but kills 4 winners +$0.22 (22% winner-kill >20% bar), Welch p=0.156. Monitor only.
+- 0 config changes this run (soak: dead-gap 4h old, midband 17h old, CHASE_RATIO to Oct 27).
 
 ## ⚠️ OPEN (CEO-owned)
 
-1. 🟡 **7d WR retarget** — ≥50% Oct 15 checkpoint missed at 34.7%. Guardrail ESCALATE active. No filter stacking (soak discipline).
-2. 🟡 **wyckoff COOLDOWN_BARS mismatch** — constant 30, comment says 2.5h, formula yields 0.5h. CEO: fix formula to 2.5h or fix comment to 30min?
-3. 🟡 **wyckoff GO decision** — pairing data says keep shadow; CEO decides next co-source design or accept single-source + regime gate.
-4. 🟡 **hard_max_loss #1 bleed** (3/14 exits today) — momentum-gate backtest self_learner due Oct 17. Do NOT stack entry filters.
-5. 🟡 **volume-breakout-short−** — 2T 0W −$0.28, one more loss hits auto_1hr kill threshold.
+1. 🟡 **7d WR/PnL** — 36.7% / −$1.79 (worsening from −$1.08 at 05:46). No filter stacking; entry-side exhausted per momentum-gate verdict.
+2. 🟡 **Progressive exit ladder backtest** — NEXT LEVER (momentum-gate verdict conclusion #3). Commission self_learner: doji-bottom + bb-bounce-v2, T=45m trail-arm-timeout extension, candle-level pnl-at-T, HR-kill guard (dead_money lesson), OOS 7/14/30d. Scoped teaser: doji 8/13 chop >45m −$0.42 (2 at-risk winners); bb-bounce-v2 9/15 chop >45m −$0.64 (1 at-risk).
+3. 🟡 **wyckoff COOLDOWN_BARS mismatch** — CEO call (formula 0.5h vs comment 2.5h).
+4. 🟡 **wyckoff GO** — pairing premise failed (vol/rs co-occurs 4%/0%); recommend KEEP shadow.
+5. 🟡 **7d WR retarget** — Oct 15 checkpoint missed; still ESCALATE.
 
 ## WATCHLIST
 
-- volume-buildup- SHORT: +$0.14/24h — boost needs 5T (thin market, stalled)
-- 11h+ trade drought ended; confluence gate blocking 83 candidates (94/117 NEUTRAL market) — relaxing STANDALONE_BYPASS is CEO-level
-- RSI tilt re-test window opens Oct 16 (date-gated Oct 8 DNA plan)
-- self_learner momentum-gate + progressive-exit-ladder backtests due Oct 17 (brain_auditor delegated)
+- pump-chain− kept-cohort (gap≥0.2): 24h 5T 0% −$0.36 vs 30d +$0.92 — variance check, do NOT widen dead-gap band (one-variable)
+- doji RSI<35 band — re-test at n≥15 (currently n=10/30d)
+- volume-buildup− SHORT: 87.5% WR 14d, +$0.02×2 today — healthy
+- CHASE_RATIO_SHADOW soak to Oct 27 (48h data: 28 fires 0 winners, directional only)
+- EXTREME regime 7d: 123T 27.6% −$0.97 — largest regime bleed; existing EXTREME blocks in soak
 
 ## KEY DATES
 
 | Date | Item |
 |------|------|
-| Oct 16 | RSI tilt re-test window opens; volume-breakout-short− kill check |
-| Oct 17 | self_learner momentum-gate backtest deadline (3rd re-request) |
-| Oct 22 | bb-squeeze trail-arm extended-soak checkpoint (0 fires so far) |
+| Oct 22 | bb-squeeze trail-arm extended-soak checkpoint |
+| Oct 27 | CHASE_RATIO_SHADOW review (14d, CEO D2) |
 | Nov 6 | Gate re-audit window opens (D2) |
 
-## NEXT ACTIONS (next run ~Oct 16 06:40)
+## NEXT ACTIONS (next run ~Oct 17 06:40)
 
-1. volume-breakout-short− kill check (1 more loss = threshold)
-2. Wyckoff CEO GO response — implement per decision
-3. RSI tilt re-test if CEO commissions
-4. Follow up self_learner momentum-gate backtest (Oct 17)
-5. Monitor 7d WR trajectory vs ESCALATE guardrail
+1. Commission/track progressive exit ladder backtest (self_learner) — the momentum-gate verdict's designated lever
+2. Soak check: dead-gap 24h, midband 24h block efficacy
+3. Monitor 7d PnL trajectory (protect ≥ −$2 through aging)
+4. Wyckoff CEO GO — implement per decision
+5. HOLD BTC SHORT manual while CONTINUUM BELOW EMA300
