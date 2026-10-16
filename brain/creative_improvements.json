@@ -4726,5 +4726,33 @@
     "category": "exit engine",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-16T05:46:22Z",
+    "idea": "Investigate btc_bear LONG outperformance (14d: btc_score<40 LONG 66T 59.1%WR +$0.81 vs btc_score>60 LONG 141T 42.6% -$1.22) — confound audit (regime×vol×signal mix) before any DIRECTIONAL_BIAS action. Counter-trend longs winning contradicts boost-pro-trend design.",
+    "rationale": "Stored btc_score metadata split shows pro-trend longs bleed while counter-trend longs print. If real: bias multipliers mis-calibrated. If confound (EXTREME-vol windows or lagging score): file and close.",
+    "expected_impact": "If real+clean: re-derive DIRECTIONAL_BIAS multipliers on 141T cohort. Investigation only, no config change.",
+    "category": "regime/entry quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-16T05:46:22Z",
+    "idea": "Momentum-gate candle backtest 4th re-request (due Oct 17): |price_change_5m|<0.15% at entry vs trailing_activated label, staleness-guarded candle join (exclude >180s stale). Metadata proxies (momentum_score/state/accel) ALL failed to separate this run — only candles can test it.",
+    "rationale": "Chop family 120T -$9.46/7d 1.7%WR is #1 bleed; trailing_activated=False cohort -$7.88. This is the standing lever since Oct 13.",
+    "expected_impact": "If separation holds: block 20-30% of chop entries ≈ +$2-3/7d. If not: close hypothesis permanently.",
+    "category": "chop filter",
+    "status": "delegated",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-16T06:45:19Z",
+    "idea": "Trail-arm threshold scaling by volatility regime: require +0.60% arm in EXTREME (vs +0.40% base) — 4/12 24h losers armed at 0.40-0.98% MFE then whipsawed through trail to -1 to -3% account losses in EXTREME vol",
+    "rationale": "Armed-but-reversed trades are the second-largest 24h loss cluster after never-armed chop entries. In EXTREME, ATR stops are wide and whipsaws are fast — arming the trail at 0.40% puts the trail in a zone where noise triggers it before trend commits.",
+    "expected_impact": "Reduce armed-but-reversed losses ~50% (est +$0.15-0.25/24h in EXTREME) without touching never-armed entries or trail winners",
+    "category": "exit tuning",
+    "status": "suggested",
+    "risk": "medium — needs backtest before ship. Defer to self_learner exit-ladder work (due Oct 17). One variable at a time.",
+    "verification": "n=4 armed losers/24h is below 20-trade threshold. MUST backtest on 14d+ data before any config change. Log only."
   }
 ]

@@ -1,131 +1,97 @@
 {
-  "timestamp": "2026-10-16T03:39:28Z",
+  "timestamp": "2026-10-16T06:45:19Z",
   "session_brain_stats": {
-    "queries": [
-      "short signal losing wrong side regime",
-      "momentum gate chop hard_max_loss",
-      "pump-chain short rsi filter"
-    ],
-    "top_insights": [
-      "Recurring: BTC chop gate historically blocked MOMENTUM-family LONGs when BTC 30m flat — same wrong-side pattern as current regime inversion steer",
-      "pump-chain SHORT entry filters (RSI_MIN) were designed to block oversold; current gap is the MID band 50-55, not the floor",
-      "No new unimplemented ideas found that aren't already in flight (momentum-gate backtest due Oct 17)"
-    ]
+    "note": "skipped this run — PG trade data + watchdog sufficient; session brain adds latency without new signal"
   },
   "trade_summary_24h": {
-    "closed": 17,
-    "wr": 41.2,
-    "pnl": 0.52,
-    "7d": {
-      "closed": 200,
-      "wr": 35.0,
-      "pnl": -0.86
-    },
-    "48h": {
-      "closed": 49,
-      "wr": 36.7,
-      "pnl": 0.17
-    },
-    "open": [
-      {
-        "id": 16210,
-        "coin": "ICP",
-        "dir": "SHORT",
-        "signal": "pump-chain-v6-",
-        "pnl_pct": -0.01,
-        "hours": 0.0
-      },
-      {
-        "id": 16200,
-        "coin": "BTC",
-        "dir": "LONG",
-        "signal": "ai-trader-manual",
-        "pnl_pct": -0.47,
-        "hours": 9.4,
-        "note": "STALE manual — watchdog steer-001, SL 81900 only 0.29% below price"
-      }
-    ],
-    "exits_24h": {
-      "atr_trail_hit": {
-        "n": 4,
-        "pnl": 1.33,
-        "wr": 100.0
-      },
-      "atr_sl_hit": {
-        "n": 5,
-        "pnl": -0.44,
-        "wr": 0.0
-      },
-      "hard_max_loss": {
-        "n": 2,
-        "pnl": -0.2,
-        "wr": 0.0
-      }
-    },
-    "winners": "IOTA +14.7 / BANANA +10.1 / ICP +15.2 pump-chain+ atr_trail_hit (momentum). All 24h losers = chop exits."
+    "trades": 22,
+    "wr": 45.5,
+    "pnl": 0.43,
+    "losers_autopsied": 12,
+    "never_armed_chop_entries": 8,
+    "armed_but_reversed_whipsaw": 4,
+    "regime": "CALM chop, BTC AT EMA300, LOW vol, STRONG_DOWN trend quality"
   },
+  "trade_summary_7d": {
+    "trades": 205,
+    "wr": 35.1,
+    "pnl": -1.16,
+    "trail_family": "76T +$6.84 (85%+ WR on trail exits)",
+    "hard_max_loss": "59T -$5.41 (0% WR)",
+    "atr_sl_hit": "48T -$3.61 (0% WR)",
+    "chop_exits_total": "107T -$9.02 vs trail +$6.84 = net -$2.18 gap"
+  },
+  "changes_from_last_run": [
+    {
+      "change": "SHORT mid-band block (RSI 45-55 non-pump-chain, 2026-10-16 00:43)",
+      "status": "SOAKING — 0 fires in 6.5h. All 5 SHORTs since ship were pump-chain (exempt by design). No verdict yet. Review after 3+ fires."
+    },
+    {
+      "change": "FLOOR-ADMIT shadow JSONL (2026-10-15 23:44)",
+      "status": "COLLECTING — 146 events. WCT volume-buildup- SHORT floor-admitted repeatedly at exec_conf 45 (raw 90, penalty 0.108, mult 0.5). volume-buildup- is 4T 7d 100%WR +$0.41 — floor correctly admitting a winner. Decision-ready Oct 19."
+    },
+    {
+      "change": "volume-breakout-short- kill (2026-10-15 17:35)",
+      "status": "WORKING — 0 trades post-kill. Last close 14:35 pre-kill."
+    },
+    {
+      "change": "hmacd_mtf- kill (2026-10-15 18:30)",
+      "status": "WORKING — 0 trades post-kill."
+    },
+    {
+      "change": "CONF-CALIB clamp (2026-10-15 03:40)",
+      "status": "WORKING — no conf>100 in recent closed trades."
+    },
+    {
+      "change": "CHASE_RATIO_SHADOW comment fix (2026-10-16 05:46)",
+      "status": "NO BEHAVIOR CHANGE — review date Oct 27 per CEO D2 standard."
+    }
+  ],
   "drift_findings": [],
   "recurring_problems": [
-    {
-      "problem": "hard_max_loss chop entries — #1 bleed 14d: 117T -$13.84 (EXTREME -$6.07, NORMAL -$3.87, HIGH -$3.73)",
-      "mfe_autopsy_14d": {
-        "mfe_lt_0.20": "86T (73.5%) -$10.30 — pure chop, never showed life → momentum-gate target (self_learner due Oct 17)",
-        "mfe_0.20_0.40": "21T -$2.03 near-arm",
-        "mfe_gte_0.40": "10T -$1.51 — TRAIL-ARM FAILURES: MFE>=0.40 (trail should arm) yet still hard_max_loss. Different bug class from chop. Signals: volume-breakout-long+ (3), pump-chain- SHORT (4), pump-chain+ (1), trend-ride+ (1), pump-chain-v5 (1). Mostly EXTREME."
-      },
-      "status": "self_learner momentum-gate backtest due Oct 17 — do NOT stack entry filters before then"
-    },
-    {
-      "problem": "SHORT bleed continues (7d 51T 29.4% -$0.73) but 24h SHORT losses are ALL pump-chain (exempt from SHORT-MIDBAND by design). DOT RSI 55.56 / APT 47.25 opened after midband block landed.",
-      "candidate_rejected": "PUMP_CHAIN_SHORT_RSI_MIN 45→50 (block 50-55 death band): 14d 7T 0%WR -$0.50, 30d 27T -$0.45 — BUT WR binomial p=0.221 (fails significance bar), 30d RSI>=50 winners +$2.81, net 50+ band only -$1.03/30d. FAILS shipping bar. Monitor 14d."
-    }
+    "hard_max_loss + atr_sl_hit = 107T/205T (52% of trades) -$9.02/7d. Trail family only 76T (37%). Chop entries dominate flow in CALM regime. Fix vehicle = self_learner momentum-gate backtest due Oct 17. DO NOT stack entry filters before that lands.",
+    "pump-chain- SHORT structurally breakeven: trail winners (13T +$2.01 84.6%WR) exactly pay for chop losses (32T -$2.88). Watchdog 'losing streak 3 losses' is n=3 noise — 7d is +$0.04. Do not disable.",
+    "4/12 24h losers were ARMED (MFE 0.5-0.98%) but closed negative via atr_sl_hit — trail gave back all profit in EXTREME whipsaw. Pattern flagged for self_learner exit-ladder backtest. Not actionable without backtest."
   ],
   "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-10-16T03:39:28Z",
-      "idea": "Split hard_max_loss fix into TWO buckets for self_learner Oct 17 backtest: (A) momentum gate for MFE<0.20 chop entries (86T/14d -$10.30, 73.5% of HML); (B) trail-arm-failure audit for MFE>=0.40 cohort (10T/14d -$1.51) — these reached trail activation price level yet died at hard_max_loss, suggesting exit-engine routing/timing bug (MFE is unleveraged price%, trail arm 0.40% price, yet hard_max_loss fired). Bucket B is NOT an entry problem — it's why trail didn't protect.",
-      "rationale": "One backtest treating all HML as chop will under-fit: 26.5% of HML trades showed real life (MFE>=0.20) and 8.5% crossed the arm threshold. Momentum gate alone cannot save bucket B.",
-      "expected_impact": "Bucket A: target -$10.30/14d bleed. Bucket B: recoverable subset of -$1.51 if exit routing fixed.",
-      "category": "exit engine",
+      "date": "2026-10-16T06:45:19Z",
+      "idea": "Trail-arm threshold scaling by volatility regime: require +0.60% arm in EXTREME (vs +0.40% base) — 4/12 24h losers armed at 0.40-0.98% MFE then whipsawed through trail to -1 to -3% account losses in EXTREME vol",
+      "rationale": "Armed-but-reversed trades are the second-largest 24h loss cluster after never-armed chop entries. In EXTREME, ATR stops are wide and whipsaws are fast — arming the trail at 0.40% puts the trail in a zone where noise triggers it before trend commits.",
+      "expected_impact": "Reduce armed-but-reversed losses ~50% (est +$0.15-0.25/24h in EXTREME) without touching never-armed entries or trail winners",
+      "category": "exit tuning",
       "status": "suggested",
-      "risk": "low"
+      "risk": "medium — needs backtest before ship. Defer to self_learner exit-ladder work (due Oct 17). One variable at a time.",
+      "verification": "n=4 armed losers/24h is below 20-trade threshold. MUST backtest on 14d+ data before any config change. Log only."
     }
   ],
   "config_changes_applied": [],
-  "changes_from_last_run": [
-    {
-      "change": "SHORT-MIDBAND block (Oct 16 00:43)",
-      "status": "WORKING+VALIDATED",
-      "evidence": "0 non-pump SHORTs in band since land. Retro 7d counterfactual: 8 non-pump SHORTs 45-55 all losses, would-block -$0.76. Pump-chain exempt by design (own PUMP_CHAIN_SHORT_RSI_MIN governs)."
-    },
-    {
-      "change": "KILL volume-breakout-short- (Oct 15 17:35)",
-      "status": "WORKING",
-      "evidence": "flag False; last vbo-short trade opened 14:24 Oct 15 (pre-kill); 0 post-kill fires"
-    },
-    {
-      "change": "KILL hmacd_mtf- (Oct 15 18:30)",
-      "status": "WORKING",
-      "evidence": "flag False; 0 fires since"
-    },
-    {
-      "change": "FLOOR-ADMIT shadow (Oct 15 23:44)",
-      "status": "COLLECTING",
-      "evidence": "decision data due Oct 19"
-    },
-    {
-      "change": "CONF-CALIB clamp (Oct 15 03:40)",
-      "status": "WORKING",
-      "evidence": "no conf>100 trades since land"
-    }
-  ],
   "next_actions": [
-    "CEO: open BTC LONG 16200 ai-trader-manual 9.4h stale -$0.47, SL 0.29% below price — watchdog recommends cut; manual trade, CEO call",
-    "Monitor pump-chain SHORT 50-55 rsi band 14d — if 0%WR persists n>=20 more, revisit floor=50 with fresh significance test",
-    "self_learner Oct 17: include trail-arm-failure bucket (MFE>=0.40 HML) in backtest scope per creative improvement",
-    "SHORT-MIDBAND: count live blocks in logs over 48h (0 so far — no non-pump candidates)",
-    "7d PnL still -$0.86 — aging path to >=$0: Oct 9-10 negative days exit window over next 48h",
-    "Do NOT stack entry filters until momentum-gate backtest lands (soak discipline)"
+    "self_learner momentum-gate backtest due Oct 17 — 3rd re-request, ESCALATE if missed",
+    "Midband SHORT block: wait for 3+ fires before verdict (current 0 in 6.5h, all SHORTs are pump-chain exempt)",
+    "FLOOR-ADMIT shadow: decision-ready Oct 19 (146 events and growing)",
+    "ai-trader+ watchlist: 16T 7d -$0.34 37.5%WR — below kill threshold n=20, monitor 48h more",
+    "bb-bounce-v2-long+ watchlist: 16T 7d -$0.19 43.8%WR — trail rate 56% keeps it alive, monitor",
+    "pump-chain- SHORT: KEEP (7d +$0.04, trail winners pay for chop losses). Watchdog disable recommendation rejected on n=3.",
+    "RAISE if armed-but-reversed pattern recurs >4/24h: commission trail-arm EXTREME scaling backtest separately"
+  ],
+  "rejected_this_run": [
+    {
+      "proposal": "pump-chain- SHORT RSI ceiling 55+",
+      "reason": "Fisher p=1.0 on 30d (29T 37.9% WR -$0.58 vs rest). 14d 9T 11.1% looked bad but reverses at 30d. Pattern noise."
+    },
+    {
+      "proposal": "Kill pump-chain- SHORT (watchdog steer)",
+      "reason": "7d +$0.04, 14d +$0.02 — breakeven not negative. Trail winners +$2.01/14d pay for chop. n=3 streak is noise."
+    },
+    {
+      "proposal": "Kill ai-trader+",
+      "reason": "16T 7d -$0.34 — below n=20 kill threshold. Monitor 48h more."
+    },
+    {
+      "proposal": "Trail-arm EXTREME scaling config change",
+      "reason": "n=4 armed losers/24h below threshold. Logged as creative improvement for self_learner backtest. One variable at a time — momentum-gate lands first."
+    }
   ]
 }
