@@ -176,7 +176,7 @@ def get_30d_leaderboard():
             WHERE status = 'closed'
               AND server = 'Hermes'
               AND pnl_pct IS NOT NULL
-              AND signal NOT LIKE %s
+              AND (signal IS NULL OR signal NOT LIKE %s)
               AND close_time > NOW() - INTERVAL '""" + str(LOOKBACK_DAYS_30D) + """ days'
             GROUP BY token
             HAVING COUNT(*) >= %s
@@ -199,7 +199,7 @@ def get_30d_leaderboard():
             WHERE status = 'closed'
               AND server = 'Hermes'
               AND pnl_pct IS NOT NULL
-              AND signal NOT LIKE %s
+              AND (signal IS NULL OR signal NOT LIKE %s)
               AND close_time > NOW() - INTERVAL '""" + str(LOOKBACK_DAYS_30D) + """ days'
             GROUP BY token, direction
             HAVING COUNT(*) >= 5
