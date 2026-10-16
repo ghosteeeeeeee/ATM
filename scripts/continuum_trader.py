@@ -676,7 +676,7 @@ class ContinuumTrader:
                                    open_time, created_at, _signal_metadata)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s)
             """, ('BTC', side, 'continuum', size_btc, entry_price,
-                  'open', 'Hyperliquid', 'continuum_engine', True, 'main', conf, 10,
+                  'open', 'Hyperliquid', 'continuum_engine', True, 'Hermes', conf, 10,
                   json.dumps(meta)))
 
             conn.commit()
