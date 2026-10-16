@@ -4717,5 +4717,14 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-16T03:39:28Z",
+    "idea": "Split hard_max_loss fix into TWO buckets for self_learner Oct 17 backtest: (A) momentum gate for MFE<0.20 chop entries (86T/14d -$10.30, 73.5% of HML); (B) trail-arm-failure audit for MFE>=0.40 cohort (10T/14d -$1.51) — these reached trail activation price level yet died at hard_max_loss, suggesting exit-engine routing/timing bug (MFE is unleveraged price%, trail arm 0.40% price, yet hard_max_loss fired). Bucket B is NOT an entry problem — it's why trail didn't protect.",
+    "rationale": "One backtest treating all HML as chop will under-fit: 26.5% of HML trades showed real life (MFE>=0.20) and 8.5% crossed the arm threshold. Momentum gate alone cannot save bucket B.",
+    "expected_impact": "Bucket A: target -$10.30/14d bleed. Bucket B: recoverable subset of -$1.51 if exit routing fixed.",
+    "category": "exit engine",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
