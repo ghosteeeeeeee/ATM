@@ -1,5 +1,10 @@
 # Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
 
+## Error Alerts — 2026-10-15 22:24 UTC (health_monitor)
+- **WARN** (1x): `hermes-brain-auditor.service` failed with timeout at 21:50 (killed by systemd after exceeding start timeout). Non-critical hourly analysis agent; timer still active, will self-retry next hour. No action needed.
+- **INFO**: Pipeline healthy — LIVE run 22:23:23 rc=0, position_manager rc=0, 0 Tracebacks in 30min. Timers 3/3 active (price-collector, 1m-candle, pipeline). 26 signals generated last hour. Portfolio: 3 open | 14 closed today | +18.64% PnL. Exit reasons 24h: atr_sl_hit 5 (-$0.36), hard_max_loss 3 (-$0.29), atr_trail_hit 3 (+$1.19), trail_arm_timeout 2 (-$0.08), profit-monster-trail 1 (+$0.04), HL_CLOSED 1 (-$0.18). 0 phantom trades. Regime 5m LONG_BIAS (42L/12S/72N of 126). Speeds top: INIT 100, BLZ 100, CASHCAT 99.4. Disk improved to 80% (was 85%). Prices fresh (~2min). Vacation pause: not active.
+- **INFO**: Side finding — `hermes-atr-sl-updater.timer` appears in list-timers as a ghost entry (unit file missing at /etc/systemd/system/). Harmless, no service attached. `signals_hermes_runtime.db` still unbounded; `prices.db`/`signals.db` 0-byte stubs still present.
+
 ## Error Alerts — 2026-10-10 04:47 UTC (health_monitor)
 - **WARN** (recurring): Disk 85% used (/dev/vda2 94G/118G). No uncompressed *.log >7d to gzip. Top DBs: coin_tracker 3.3G, candles 2.7G, session_brain 1.1G, signals_hermes 979M, mtf_macd_tuner 948M. No safe auto-fix — DB prune still a CEO/bug_hunter decision.
 - **INFO**: Pipeline healthy — cycle #236303 running, no Tracebacks in 30min. Timers 3/3 active (price-collector, 1m-candle, pipeline). Prices fresh (~1min, 347 tokens in candles_1m last 5min). Regime 5m SHORT_BIAS (10L/16S/71N of 97). Speeds 128/241 ≥50th pct. 332 active signals, 1 generated last hour. 11 closed today (8W/3L, +$0.53), 0 open. 4 phantom trades (<0.01% pnl) in last 7d.
@@ -1014,3 +1019,24 @@
 ## Error Alerts — 2026-10-15 19:08 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3479s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3419s left, N failures)`
+
+## Error Alerts — 2026-10-15 21:08 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor (detect): N.N < N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3489s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3489s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,TOK,BTC_LEVEL | vol=N.1x eth_div=+N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2694s left, N failures)`
+
+## Error Alerts — 2026-10-15 22:08 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3538s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3480s left, N failures)`
+
+## Error Alerts — 2026-10-15 23:08 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3411s left, N failures)`
+
+## Error Alerts — 2026-10-16 00:08 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2939s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2939s left, N failures)`

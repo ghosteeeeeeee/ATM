@@ -58,3 +58,9 @@
 ### Numbers: 24h 11T -$0.48 18.2% | 7d 195T -$1.27 34.9%
 ### Findings: 7d worst = volume-breakout-long+ 16T -$0.76 18.8% (already killed Oct 13 — losses aged in window); next live risk: volume-breakout-short- 3T 0% -$0.37 (1 loss from auto-kill threshold). pipeline service inactive between timer runs (oneshot — verify timers still firing). Errors = hotset cooldowns + BTC_LEVEL blocks only.
 ### Recommendation: Confirm hermes-pipeline timer is firing (service inactive may be normal oneshot); volume-breakout-short- watch stands per kanban.
+
+## CEO Status — 20261015T220805Z
+### Health: pipeline=active guardian=active open_pos=5
+### Numbers: 24h 14T +$0.35 21.4% | 7d 194T −$0.95 34.0%
+### Findings: Regime=LONG_BIAS (per CURRENT.md, verified). Error alerts show hotset failure-cooldowns + 1 BTC_LEVEL block (last 1h) — contained, no pipeline impact. 7d WR still below 50% target (34.0%).
+### Recommendation: CEO decide wyckoff GO now — pairing data (volume 4%/rs 0% co-occurrence) says premise fails; keep shadow or commission new co-source design.
