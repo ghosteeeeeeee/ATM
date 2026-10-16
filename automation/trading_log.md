@@ -10811,3 +10811,23 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - pump-chain- 24h 8T 0W −$0.49 — standing CEO decision (kill threshold MET, dual-emitter blocks unilateral kill)
 - bb-bounce-v2-long+ 24h 6T 2W −$0.27 — watch, not yet at kill threshold
 - hard_max_loss 6 exits −$0.80 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 19:10] Hourly Analysis
+
+**Trades:** 2 closed last hour (0W 2L) — ZEN doji-bottom-long LONG atr_sl_hit −$0.11 (−5.08%), CRV doji-bottom-long LONG hard_max_loss −$0.10 (−4.39%)
+**PnL:** −$0.21 last hour (0% WR) | 24h 52T 21W −$1.11 (40.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: doji-bottom-long 2T 0W this hour (needs 3+T — under threshold; 24h 11T 5W −$0.51 has positive WR, not a kill); pump-chain- 0T this hour (24h 8T 0W −$0.49 standing CEO escalation, dual-emitter)
+- atr_sl_hit 15/52 = 28.8% (under 40 threshold; tpsl_utils fix deployed)
+- 7-neg-hour streak 12:00–18:00 (−$1.15) but regime SHORT_BIAS (78 short / 44 neutral / 2 long), not NEUTRAL → no size cut per rule
+- Overtrade 2/hr (under 20); live_trading=true, kill JSON=true
+- ZEN −5.08% account ≈ 1% price move at leverage — expected, not a bug
+
+**Open Questions:**
+- doji-bottom-long 2T 0W this hour + 24h −$0.51 — watch; if 3+T/0%WR in an hour, kill rule fires
+- pump-chain- 24h 8T 0W −$0.49 — standing CEO decision (kill threshold MET, dual-emitter blocks unilateral kill)
+- 7-hour negative streak — regime is SHORT_BIAS so rule-compliant no-cut, but worth CEO awareness; 24h PnL −$1.11
+- hard_max_loss 7 exits −$0.87 24h — standing CEO hold, momentum-gate backtest due Oct 17
