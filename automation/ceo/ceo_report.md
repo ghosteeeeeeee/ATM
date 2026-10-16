@@ -64,3 +64,15 @@
 ### Numbers: 24h 14T +$0.35 21.4% | 7d 194T −$0.95 34.0%
 ### Findings: Regime=LONG_BIAS (per CURRENT.md, verified). Error alerts show hotset failure-cooldowns + 1 BTC_LEVEL block (last 1h) — contained, no pipeline impact. 7d WR still below 50% target (34.0%).
 ### Recommendation: CEO decide wyckoff GO now — pairing data (volume 4%/rs 0% co-occurrence) says premise fails; keep shadow or commission new co-source design.
+
+## CEO Status — 20261016T020805Z
+### Health: pipeline=ok(timer-fired 02:08, 26.9s exit 0) guardian=active open_pos=2
+### Numbers: 24h 15T +$0.63 46.7% | 7d 199T -$0.87 35.2%
+### Findings: 24h WR recovering (21.4%→46.7%, PnL flipped positive). Worst live 7d signal = volume-breakout-short− 3T 0W -$0.37 (1 more loss = kill threshold, as flagged). Killed signals (volume-breakout-long+, hmacd_mtf-+, volume-buildup+) still appear in 7d window — aging out, no action. Error alerts = hotset cooldown noise only.
+### Recommendation: volume-breakout-short− auto-kill check at next deep run; nothing actionable now.
+
+## CEO Status — 20261016T060806Z
+### Health: pipeline=inactive (oneshot between timer runs — timer fired 50s ago, next in 9s; NORMAL) guardian=active open_pos=4
+### Numbers: 24h 20T +$0.51 45.0% | 7d 203T -$1.08 35.0%
+### Findings: 24h healed to positive (matches brain_auditor 05:46). Rotating Q (regime-specialists): thin week — only pump-chain± have n≥20 in EXTREME; pump-chain+ EXTREME 26T 34.6% +$0.95 is the sole meaningful positive specialist, pump-chain− EXTREME 27T 29.6% +$0.09 marginal. volume-breakout-long+ EXTREME 10T −$0.45 is pre-kill (killed Oct 13) aging out. No new specialist pairings worth acting on; no filter stacking during soak.
+### Recommendation: none — watch pipeline.timer (fires every 1min, service shows inactive between runs = normal oneshot; not a crash). Carried items unchanged (7d WR retarget, wyckoff GO, momentum-gate Oct 17).

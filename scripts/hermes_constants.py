@@ -307,12 +307,13 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
+    'BABY',
     'BTC',
     'CFX',
     'CHIP',
-    'GRASS',
-    'LDO'
+    'ICP'
 }
+
 
 
 
@@ -895,8 +896,15 @@ CHASE_EXEMPT_GAP_MAX = 8.0           # gap limit when exemption applies (was 2.0
 # direction-signed 15m move happened in the last 5m (chasing the candle, not
 # riding an established move). 14d backtest vs trail winners: |m15|>=0.3% AND
 # ratio>0.7 blocks 19/118 hard_max_loss (−$2.01) and 0/28 trail winners.
-# Both 7d and d8-14 halves: 0 winners blocked. SHADOW=True logs only — flip
-# False after 48h soak (review Oct 15). Revert: 3+ winners in shadow logs.
+# Both 7d and d8-14 halves: 0 winners blocked. SHADOW=True logs only.
+# REVIEW DATE CORRECTED brain_auditor 2026-10-16: original comment said "flip
+# after 48h soak (review Oct 15)" — violates CEO D2 (2026-10-12) gate-registry
+# ruling: shadow-first 14d for NEW gates. Ship was Oct 13 → earliest flip
+# review Oct 27 (CEO may override earlier). 48h soak data as of Oct 16: 28
+# shadow fires, executed subset all losers (IO/MERL), 0 winners in logs —
+# direction agrees with backtest but window too short vs standard.
+# Flip criteria: ≥14d shadow + 0 trail-winner blocks + net counterfactual
+# positive. Revert if any trail winner appears in shadow logs.
 CHASE_RATIO_SHADOW = True
 CHASE_RATIO_MIN_MOVE15 = 0.30        # % direction-signed 15m move must reach this
 CHASE_RATIO_MAX = 0.70               # block if |move5m| / |move15m| > this

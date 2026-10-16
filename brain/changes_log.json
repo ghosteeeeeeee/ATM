@@ -1397,5 +1397,16 @@
     "after": "SHORT_MIDBAND_BLOCK_ENABLED=True, MIN=45, MAX=55; pump-chain exempt; exec-time choke point covers bypass signals",
     "rationale": "14d non-pc 9T 0W -$0.89, 7d 8T 0W -$0.76, 48h 0W (watchdog pattern alert). Zero winners killed. pump-chain profitable in band (+$0.42/14d) hence exempt.",
     "impact": "Blocks ~0.5-1 trade/day of 0%-WR death-band SHORTs; expected +$0.50-0.90/14d net"
+  },
+  {
+    "timestamp": "2026-10-16T05:46:22Z",
+    "agent": "brain_auditor",
+    "change": "CHASE_RATIO_SHADOW review-date comment corrected: 48h/Oct 15 -> 14d/Oct 27 per CEO D2 gate-registry standard (shadow-first 14d for new gates). CHASE_RATIO_SHADOW stays True, thresholds unchanged.",
+    "type": "tweak",
+    "file": "hermes_constants.py",
+    "before": "flip False after 48h soak (review Oct 15)",
+    "after": "review Oct 27 (14d from Oct 13 ship); flip criteria: >=14d + 0 trail-winner blocks + net counterfactual positive",
+    "rationale": "Comment would have authorized a blind flip violating CEO D2 2026-10-12 shadow-first-14d ruling. 48h soak data (28 fires, 0 winners, executed subset all losers) agrees directionally but window too short vs standard.",
+    "impact": "ZERO trading behavior change (comment only). Prevents future policy-violating flip. Verified py_compile OK + protected flags 13/13 intact + CHASE_RATIO_SHADOW still True."
   }
 ]
