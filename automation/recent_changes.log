@@ -4722,3 +4722,5 @@ BY: auto_1hr
 [2026-10-16 02:09] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W +$0.16 (HYPE hl_copy MAX_HOLD, INJ ai-trader+ atr_trail) | 24h 15T 7W +$0.63 (46.7%) | kill: none (no signal 3+T this hour) | atr_sl_hit 20% (under 40) | overtrade 2/hr | streak no 3-neg | live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-16 03:09] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W −$0.11 (DOT+APT pump-chain- SHORT atr_sl_hit) | 24h 15T 7W +$0.63 (46.7%) | kill: none (pump-chain- 2T 0W, needs 3+T) | atr_sl_hit 33.3% (under 40, tpsl fix deployed) | overtrade 2/hr | streak no 3-neg | live_trading=true, kill JSON=true
+BY: auto_1hr
+[2026-10-16 04:09] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W +$0.04 (ICP pump-chain-v6- trail, BTC manual HL_CLOSED) | 24h 18T 9W +$0.68 (50%) | kill: none (no signal 3+T this hour) | atr_sl_hit 27.8% (under 40, tpsl fix deployed) | overtrade 2/hr | streak no 3-neg | live_trading=true, kill JSON=true
