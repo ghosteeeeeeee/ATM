@@ -959,12 +959,14 @@ CONTRARIAN_ZONE_MAX_DISTANCE_PCT = 0.5     # max distance from zone center to tr
 CONTRARIAN_ZONE_POSITION_SIZE_MULT = 0.5   # position size multiplier (marginal edge — half size)
 
 # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
-# 14d: LONG RSI 35-50 = 43T 58.1%WR +$1.39 (best defined band).
-# pump-chain+ RSI 55-60 = 8T 75%WR +$1.68 (best). RSI 40-50 = 36T 58.3%WR +$1.64 (solid).
-# Narrowed 35→40: RSI 35-40 = 7T 57.1%WR -$0.25 (dead zone, net negative).
+# brain_auditor 2026-10-16: MIN 40→55 — 40-55 window is wash/bleed, not sweet.
+# 30d meta-RSI fine bands (verified PG): 55-60 = 72T 59.7%WR +$3.82 t=2.20 (SIG, OOS both 14d +$1.31 / 30d +$3.82);
+# 50-55 = 71T −$0.72 t=-0.48 (was inside old window — dead weight); 45-50 = 29T +$0.22 wash; 40-55 = 147T +$0.14 t=0.07.
+# 60-65 NOT included: 30d 95T +$0.02 t=0.01 wash (14d +$0.82 positive but fails longer-window OOS).
 # Blocks nothing — only boosts confidence for entries already in the sweet spot.
-LONG_RSI_SWEET_SPOT_MIN = 40
-LONG_RSI_SWEET_SPOT_MAX = 60  # Extended 50→60: RSI 50-60 LONG = 43T 60.5%WR +$1.53/14d (same as 40-50)
+# Revert trigger: 14d 55-60 PnL < $0 or WR < 48% → restore MIN=40.
+LONG_RSI_SWEET_SPOT_MIN = 55  # was 40 — 40-55 is wash/bleed, only 55-60 is significant profit band
+LONG_RSI_SWEET_SPOT_MAX = 60  # 55-60 only: 30d t=2.20; do NOT extend to 65 (60-65 30d wash t=0.01)
 LONG_RSI_SWEET_SPOT_BOOST = 10  # confidence points added when RSI in sweet spot
 
 # ── LONG mid-band chop block: skip LONG when RSI 60-70 outside EXTREME ──────

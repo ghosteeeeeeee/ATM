@@ -4903,5 +4903,23 @@
     "category": "exit engine",
     "status": "COMMISSION self_learner - overdue",
     "risk": "high if no HR-kill guard (dead_money lesson: 6/13 HRs killed by naive time exits)"
+  },
+  {
+    "date": "2026-10-16T21:40:52Z",
+    "idea": "bb-bounce-v2-long+ trail_arm_timeout SHADOW collector (T=55m, live_pnl < PM_TRAIL_ACTIVATE_PCT → log would-exit)",
+    "rationale": "7d bb-bounce-v2: 6 HML avg 47min hold −$0.40 + 3 atr_sl 126min −$0.28 vs 17 trail winners 106min +$0.74. Signal has NO trail_arm_timeout (only bb-squeeze 60m + pump-chain 45m have it). Winners may arm late (106min hold) — timeout could kill them; shadow measures would-fire rate and winner-overlap before live. Same pattern as bb-squeeze/pump-chain timeouts which netted +$0.97/30d ratify evidence.",
+    "expected_impact": "If shadow shows <10% winner overlap and catches HML cohort → live timeout saves ~$0.40-0.80/7d. If winner overlap high → abandon.",
+    "category": "exit magnitude (chop early-exit)",
+    "status": "suggested",
+    "risk": "low (shadow only, zero live impact)"
+  },
+  {
+    "date": "2026-10-16T21:40:52Z",
+    "idea": "Commission progressive exit ladder backtest (self_learner) — STILL OVERDUE since Oct 14",
+    "rationale": "Exit signature unchanged: 24h chop 25T −$2.56 0%WR vs trail 19T +$0.75 89.5%. 7d HML 62T −$5.82 + atr_sl 53T −$4.29 = $10.11 bleed; trail family +$7.34. Entry filters exhausted (6+ in soak). Momentum-gate verdict designated exit-ladder as THE untried lever. Scope: doji+bb-bounce family, T=45m, HR-kill guard mandatory (dead_money lesson).",
+    "expected_impact": "Convert HML −3% acct exits to −0.5% stall exits. Historical analog trail_arm_timeout already proven (bb-squeeze/pump-chain).",
+    "category": "exit magnitude",
+    "status": "escalated",
+    "risk": "medium (needs OOS + HR-kill guard before live)"
   }
 ]

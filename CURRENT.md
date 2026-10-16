@@ -1,39 +1,37 @@
-# Current State — brain_auditor Captain Run Oct 16 20:30 UTC
+# Current State — brain_auditor Captain Run Oct 16 21:45 UTC
 
-**Last Updated: 2026-10-16 20:30 UTC**
-**Updated by: brain_auditor — doji-bottom KILLED (pre-committed trigger); progressive exit ladder backtest still uncommissioned**
+**Last Updated: 2026-10-16 21:45 UTC**
+**Updated by: brain_auditor — sweet-spot drift fixed (40→55); exit ladder still uncommissioned**
 
-## PIPELINE STATUS (20:08 UTC)
+## PIPELINE STATUS (21:45 UTC)
 
-- **24h: 51T 41.2% WR −$1.11** | 1 open BTC LONG #16251 ai-trader-manual 10x +0.19% (watchdog: breakeven stop rec — CEO/T action) | 7d 227T 36.1% −$2.09 (worsening from −$1.79 at 17:45) | 30d 785T 43.6% −$4.84
-- Health: **CRITICAL** | Disk 79% | Kill switch LIVE=true | Regime BTC 15m LONG_BIAS / 4h SHORT_BIAS, continuum AT (reclaiming EMA300), volatility LOW, market_phase DECLINING, volume_regime LOW (ratio 0.19)
-- **Vacation guardrail ESCALATE active:** 48h WR 36.9% < 40.0% with 65 trades
-- Exit signature 24h: **chop-kill 22T −$2.17 (0%WR) vs trail 19T +$1.31 (95%WR)** — same disease as 7d (114 chop −$9.92 vs 75 trail +$7.34). Entry-side exhausted; bleed is EXIT-MAGNITUDE.
+- **24h: 50T 40.0% WR −$1.79** | 1 open BTC LONG #16251 ai-trader-manual 10x | 7d 228T 36.0% −$2.28 | 30d 782T 43.7% −$4.25 | 48h guardrail 64T 35.9% ESCALATE active
+- Health: **CRITICAL** | Kill switch LIVE=true | Regime BTC 15m LONG_BIAS / 4h SHORT_BIAS (conflict), Wyckoff DISTRIBUTION, vol NORMAL
+- Exit signature unchanged: **24h chop 25T −$2.56 0%WR vs trail 19T +$0.75 89.5%WR** — bleed remains EXIT-MAGNITUDE
 
-## DONE THIS RUN (Oct 16 20:30)
+## DONE THIS RUN (Oct 16 21:45)
 
-- **KILL: DOJI_BOTTOM_ENABLED True→False** (hermes_constants.py:4385) — pre-committed Oct-14 re-enable trigger FIRED: non-EXTREME cohort since re-enable = **11T 45.5%WR −$0.51** (n≥10, negative). HIGH flipped from 71.4% historical WR to 33.3% (9T −$0.59). NORMAL only 2T +$0.08, too thin. 5-loss streak today (ZEN RSI 29.5 / WCT 27.8 oversold traps). Watchdog steer-003. Reversible via fresh backtest + CEO.
-- **Verified:** signal_reporter's pump-chain- EXTREME 0.0 vol_gate block landed 14:44 (both hyphen+underscore keys) — 0 fires since, soaking correctly. Midband (non-pump-chain by design) and dead-gap firing per last run.
-- **Creative logged:** market-phase mean-reversion dampen (LOW vol + DECLINING → 0.5x doji/bb-bounce/oversold family) — needs backtest post-soak.
+- **FIX: LONG_RSI_SWEET_SPOT_MIN 40→55** (hermes_constants.py:966, MAX stays 60) — window was boosting the wrong band. 30d meta-RSI: 55-60 = 72T 59.7%WR +$3.82 t=2.20 SIG (OOS 14d +$1.31); 50-55 = 71T −$0.72 t=-0.48 was inside old window; 40-55 wash t=0.07; 60-65 excluded (30d t=0.01 wash, fails OOS). Confidence-only boost, not a block. Revert: 14d 55-60 PnL<$0 or WR<48% → MIN=40. py_compile+assert OK.
+- **LAST-RUN VERIFY:** doji kill HOLDING (0 opens/closes since 20:30) | pump-chain- EXTREME 0.0 vol_gate HOLDING (0 SHORT opens after 14:44)
+- **Creative logged:** bb-bounce-v2 trail_arm_timeout SHADOW T=55m (no timeout on signal; 6 HML/7d; winners hold 106min — shadow before live)
 
 ## ⚠️ OPEN (CEO-owned)
 
-1. 🔴 **Progressive exit ladder backtest — STILL NOT COMMISSIONED.** Momentum-gate verdict (14:42 today) designated this as THE lever (exit-magnitude, hard_max_loss 62T −$5.82/7d riding to −3% acct). Scoped: doji+bb-bounce-v2, T=45m, HR-kill guard mandatory (dead_money lesson). **Commission self_learner — overdue.**
-2. 🔴 **7d WR/PnL** — 36.1% / −$2.09, worsening. Vacation guardrail ESCALATE. Entry-side exhausted; exit-ladder is the only untried lever.
-3. 🟡 **BTC manual #16251** — 7th 10x scalp in bleeding series. Watchdog: breakeven stop at 81507. CEO/T decision.
-4. 🟡 **wyckoff COOLDOWN_BARS mismatch** — CEO call (formula 0.5h vs comment 2.5h).
-5. 🟡 **wyckoff GO** — pairing premise failed; recommend KEEP shadow.
+1. 🔴 **Progressive exit ladder backtest — STILL NOT COMMISSIONED.** Overdue since Oct 14. Scope: doji+bb-bounce family, T=45m, HR-kill guard mandatory. **Commission self_learner.**
+2. 🔴 **7d WR/PnL** — 36.0% / −$2.28, vacation guardrail ESCALATE. Entry filters exhausted; exit-ladder is the untried lever.
+3. 🟡 **BTC manual #16251** — watchdog HOLD with 1h leash under 81700.
+4. 🟡 **pump-chain- dual-emitter** — EXTREME block holding but pump_flow still emits pump-chain-; CEO kill decision pending.
+5. 🟡 **wyckoff COOLDOWN_BARS** mismatch + GO (KEEP shadow rec).
 
 ## WATCHLIST (soak — do NOT stack new entry filters)
 
-- pump-chain- EXTREME 0.0 block (signal_reporter 14:44) — verify fires on next signal
-- pump-chain- dead-gap [−0.5,0.2) — 24h checkpoint next run
-- SHORT midband 45-55 — 24h checkpoint next run
+- pump-chain- EXTREME 0.0 block — HOLDING since 14:44
+- pump-chain- dead-gap [−0.5,0.2) — 24h checkpoint Oct 17
+- SHORT midband 45-55 non-pump-chain — soak
 - CHASE_RATIO_SHADOW — soak to Oct 27
-- bb-bounce-v2-long+ — 7d 20T 40% −$0.41, no clean regime split, monitor (doji kill may reduce correlated bottom-fishing)
-- volume-buildup− SHORT: 7d 7T +$0.51 — healthy, lean into
-- pump-chain+ : 7d 10T 100% WR +$2.28 — #1 money maker, leave alone
-- FLOOR-ADMIT shadow collecting (349 events)
+- LONG_RSI_SWEET_SPOT 55-60 — new this run, monitor 14d
+- volume-buildup− SHORT: healthy, lean into
+- pump-chain+ : 14d #1 money maker, leave alone
 
 ## KEY DATES
 
@@ -44,10 +42,9 @@
 | Oct 27 | CHASE_RATIO_SHADOW review (14d, CEO D2) |
 | Nov 6 | Gate re-audit window opens (D2) |
 
-## NEXT ACTIONS (next run ~Oct 17 06:40)
+## NEXT ACTIONS (next run)
 
-1. **Commission progressive exit ladder backtest (self_learner)** — highest-priority overdue item
-2. Verify pump-chain- EXTREME block fires (0 signals since 14:44 landing)
-3. Verify doji kill holds (0 fires expected)
-4. Soak checks: dead-gap 24h, midband 24h
-5. Monitor 7d PnL trajectory through aging
+1. **Commission progressive exit ladder backtest (self_learner)** — still #1 overdue
+2. Verify sweet-spot fires show 55-60 only (grep LONG-RSI-SWEET-SPOT)
+3. Oct 17: dead-gap soak checkpoint
+4. Monitor 7d PnL trajectory through aging

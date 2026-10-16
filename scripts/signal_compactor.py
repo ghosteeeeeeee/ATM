@@ -4227,8 +4227,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 except Exception:
                     pass  # non-fatal
             # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
-            # Meta band evidence: 30d LONG meta-RSI 55-60 = 64T 59.4%WR +$3.75 (best band);
-            # 40-60 window broadly positive. Does NOT block — only boosts.
+            # Meta band evidence (brain_auditor 2026-10-16): 30d 55-60 = 72T 59.7%WR +$3.82 t=2.20;
+            # window set to 55-60 only (40-55 wash, 60-65 30d wash). Does NOT block — only boosts.
             if direction == 'LONG' and LONG_RSI_SWEET_SPOT_BOOST > 0:
                 try:
                     # FIX brain_auditor 2026-10-14: prefer meta rsi_14 (DRIFT-E-safe) —
