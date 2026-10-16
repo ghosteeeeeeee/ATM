@@ -10790,3 +10790,24 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 **Open Questions:**
 - ⚠️ ESCALATION: pump-chain- 24h 8T 0W −$0.49 (was 6T −$0.36 at 14:09 — bleeding continues). 24h kill threshold (0%WR 6+T, standing CEO suggestion) is MET but CANNOT be a single flag flip: BOTH pump_flow_signal (PUMP_FLOW_ENABLED) and pump_chain_v5_short (PUMP_CHAIN_V5_SHORT_ENABLED) emit source 'pump-chain-'. Killing PUMP_FLOW_ENABLED would also kill pump-chain+ LONG which is 7T 3W +$0.95 24h (profitable). CEO decision needed: (a) ratify 24h kill + which emitter to disable, or (b) leave both ON (regime gates already block most fires: HIGH-vol block, reputation, vol-gate all active in log)
 - doji-bottom-long 2T 0W this hour — watch if it hits 3+T/0%WR
+
+
+## [2026-10-16 17:10] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L) — YGG doji-bottom-long LONG atr_sl_hit −$0.24 (−3.22%), GMT doji-bottom-long LONG profit-monster-trail +$0.02 (+0.54%)
+**PnL:** −$0.22 last hour (50% WR) | 24h 50T 22W −$0.56 (44% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: doji-bottom-long 2T 1W this hour (needs 3+T AND 0% WR — WR is 50%); pump-chain- 0T this hour (24h 8T 0W −$0.49 remains standing CEO escalation, dual-emitter problem)
+- atr_sl_hit 14/50 = 28% (under 40 threshold; tpsl_utils fix deployed)
+- 5-neg-hour streak 12:00–16:00 (−$0.89) but aggregate regime = SHORT_BIAS (26 short / 4 long / 90 neutral), not NEUTRAL → no size cut per rule
+- Overtrade 2/hr (under 20); live_trading=true, kill JSON=true
+- YGG −3.22% account ≈ 1% price move at leverage — expected, not a bug
+
+**Open Questions:**
+- 24h PnL drifted from −$0.02 (14:09) to −$0.56 — 15:00 and 16:00 were worst hours (−$0.24, −$0.35); still within regime-driven variance, no signal meets kill criteria
+- pump-chain- 24h 8T 0W −$0.49 — standing CEO decision (kill threshold MET, dual-emitter blocks unilateral kill)
+- bb-bounce-v2-long+ 24h 6T 2W −$0.27 — watch, not yet at kill threshold
+- hard_max_loss 6 exits −$0.80 24h — standing CEO hold, momentum-gate backtest due Oct 17
