@@ -1086,3 +1086,45 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3435s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3374s left, N failures)`
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-16 09:08 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK mid-band death band: N.N in N-N`
+
+## Error Alerts — 2026-10-16 10:08 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-16 10:25 UTC
+- **[WARN]** (2nd time today): `hermes-brain-auditor.service start operation timed out` — killed at 09:50 (run started ~09:30, consumed 2m43 CPU while inspecting hermes_constants.py). Timer still active (next :30). `reset-failed` applied. Recurring: script hangs past systemd start limit — needs a hard timeout inside `run_brain_auditor.sh` or longer `TimeoutStartUSec`.
+- **[CRITICAL → FIXED]**: `hermes-coding-mcp.service` crash-looping every 5s (restart counter 3293+) — `ExecStart` points to `/root/.hermes/scripts/run_mcp_server.py` which does not exist; `/root/.hermes/mcp/hermes-coding-mcp/` is empty. **AUTO-FIX**: `systemctl disable --now hermes-coding-mcp.service`. If MCP host is still needed, restore the script then `systemctl enable --now`.
+- **[INFO]**: `hermes-atr-sl-updater.timer` not-found — stale unit reference, no unit file on disk, not scheduled. Harmless; clean up from any lingering references.
+- **[INFO]**: price_collector `[LOCK-WAIT]` retries — normal WAL contention with 1m-candle (both hold candles.db briefly); candles fresh (1.7 min old). No action.
+- Pipeline healthy: 48 signals/h, 3 open / 17 closed today (+19.42% portfolio PnL), regime SHORT_BIAS, disk 81%, all core timers active. Vacation pause: not set.
+
+## Error Alerts — 2026-10-16 11:08 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3552s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3552s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3490s left, N failures)`
+
+## Error Alerts — 2026-10-16 11:25 UTC
+- Pipeline healthy: 52 signals/h, 5 open / 18 closed today (44.4% WR, -$0.32 realized), regime LONG_BIAS, disk 81%, all core timers active, candles fresh (1.2 min). Vacation pause: not set.
+- **[INFO]**: `[PHANTOM-WRITE] BTC LONG BLOCKED tight SL` recurring every ~2min in position_manager (trade_id=16211) — defensive guard working as intended, blocking SL too close to entry (dist=0.025%). No action needed.
+- **[INFO]**: `[BTC-CRASH-OVERRIDE] CRV SHORT` firing every cycle — continuum filter allowing despite crash detection. Intentional override path, not an error.
+- **[INFO]**: price_collector `[LOCK-WAIT]` retries — normal WAL contention with 1m-candle. No action.
+- No auto-fixes required this cycle.
+
+## Error Alerts — 2026-10-16 12:08 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1639s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1639s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1580s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1580s left, N failures)`
+
+## Error Alerts — 2026-10-16 13:08 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor (detect): N.N < N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(BIGTIME): HL TOK failed — Unknown TOK`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1556s left, N failures)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
