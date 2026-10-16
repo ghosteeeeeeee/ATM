@@ -10831,3 +10831,23 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - pump-chain- 24h 8T 0W −$0.49 — standing CEO decision (kill threshold MET, dual-emitter blocks unilateral kill)
 - 7-hour negative streak — regime is SHORT_BIAS so rule-compliant no-cut, but worth CEO awareness; 24h PnL −$1.11
 - hard_max_loss 7 exits −$0.87 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+
+## [2026-10-16 20:09] Hourly Analysis
+
+**Trades:** 1 closed last hour (0W 1L) — BTC ai-trader-manual SHORT atr_sl_hit −$0.05 (−4.83%)
+**PnL:** −$0.05 last hour (0% WR) | 24h 51T 21W −$1.11 (41.2% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: only 1T this hour (ai-trader-manual, 0% WR but n=1, not a signal emitter); doji-bottom-long 0T this hour (24h 11T 5W −$0.51, positive WR); pump-chain- 0T this hour (24h 8T 0W −$0.49 standing CEO escalation, dual-emitter)
+- atr_sl_hit 15/51 = 29.4% (under 40 threshold; tpsl_utils fix deployed)
+- 8-neg-hour streak 12:00–19:00 (−$1.20) but regime SHORT_BIAS/BEAR_TREND (recent metadata btc_regime=BEAR_TREND), not NEUTRAL → no size cut per rule
+- Overtrade 1/hr (under 20); live_trading=true, kill JSON=true
+- BTC −4.83% account ≈ 1% price move at leverage — expected, not a bug
+
+**Open Questions:**
+- pump-chain- 24h 8T 0W −$0.49 — standing CEO decision (kill threshold MET, dual-emitter blocks unilateral kill); 0T this hour, bleed paused
+- 8-hour negative streak (−$1.20) driven by regime, not a single bad signal; 24h PnL −$1.11 — CEO awareness item
+- hard_max_loss 7 exits −$0.87 24h — standing CEO hold, momentum-gate backtest due Oct 17

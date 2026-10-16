@@ -1146,3 +1146,7 @@
 - **WARN** (1x): `hermes-upgrade-implementer.service failed: git push remote disconnect + start timeout (15:17 UTC)` — transient network, no trading impact
 - **INFO** (3x): `hermes-bug-hunter.service exit 1` — audit findings (sql_injection, cursor_leaks, bare_except, connection_leaks, non_atomic_json, hardcoded_passwords) — code quality, not runtime crashes
 - **AUTO-FIX**: None required — pipeline healthy (60 runs/h), timers active, prices fresh. Non-critical failed services left for their next scheduled run.
+
+## Error Alerts — 2026-10-16 18:08 UTC
+- **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3418s left, N failures)`
