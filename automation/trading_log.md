@@ -10576,3 +10576,22 @@ BY: daily_orchestrator
 **Open Questions:**
 - 24h WR reached 50% (18T 9W +$0.68) — CEO-owned checkpoint, first time above since 2026-10-15
 - hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 05:09] Hourly Analysis
+
+**Trades:** 2 closed last hour (0W 2L) — IO pump-chain- SHORT atr_sl_hit −$0.09 (−2.43%), FIL pump-chain+ LONG atr_sl_hit −$0.08 (−1.74%)
+**PnL:** −$0.17 last hour | 24h 20T 9W +$0.51 (45% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: pump-chain- 1T 0W this hour (24h 3T 0W −$0.20 — watch item, but kill threshold is 3+T *this hour*); no signal 3+T this hour
+- atr_sl_hit 7/20 = 35% (under 40 threshold; tpsl_utils fix deployed)
+- No 3-consecutive-neg-hour streak (03:00 +$0.04, 04:00 −$0.08, 05:00 −$0.09 = 2 neg max)
+- Overtrade 2/hr; live_trading=true, kill JSON=true
+- Open: 2 trades
+
+**Open Questions:**
+- pump-chain- 24h 3T 0W −$0.20 — 0% WR over 3 trades; if it hits 3+T in any single hour, kill immediately
+- 24h WR slipped 50%→45% (still above recent lows)
+- hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
