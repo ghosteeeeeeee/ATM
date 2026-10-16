@@ -4754,5 +4754,42 @@
     "status": "suggested",
     "risk": "medium — needs backtest before ship. Defer to self_learner exit-ladder work (due Oct 17). One variable at a time.",
     "verification": "n=4 armed losers/24h is below 20-trade threshold. MUST backtest on 14d+ data before any config change. Log only."
+  },
+  {
+    "date": "2026-10-16T08:42:48.212565+00:00",
+    "idea": "Trail-arm rate as leading signal health metric",
+    "rationale": "WR/PnL are lagging indicators. Trail-arm rate (% of trades reaching +0.40% PM_TRAIL_ACTIVATE) is a LEADING indicator of entry quality. Signals with <20% trail-arm rate are chop signals. Would catch drift before PnL shows it.",
+    "expected_impact": "Earlier chop-signal detection; proactive tuning vs reactive kills",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-16T08:42:48.212580+00:00",
+    "idea": "EXTREME-regime leverage dampen (3x cap) for hard_max_loss-prone signals",
+    "rationale": "63.8% of hard_max_loss trades are EXTREME. lev5 EXTREME losses avg -3.28% account vs lev3 -2.83%. 3x cap in EXTREME would reduce per-trade bleed without blocking entries. Needs backtest.",
+    "expected_impact": "~15% reduction in hard_max_loss account impact",
+    "category": "risk scaling",
+    "status": "suggested — needs backtest",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-16T11:43:18Z",
+    "idea": "Trail-arm-rate confidence multiplier (soft, per-cell)",
+    "rationale": "7d TRAIL 74T +$7.81 89.2% vs CHOP 125T -$9.94 1.6%. Entry quality = probability of reaching trail. For (signal, vol_regime, meta-RSI band) cells with n>=15/30d: trail-arm rate <25% → conf x0.7; >60% → conf x1.1. Soft demotion, not hard block — preserves 'every pump is a LONG / every dump is a SHORT'.",
+    "expected_impact": "Dampen chop-habitat entries ~10-15% of book without killing trail winners; targets hard_max_loss #1 bleed at root (zero-momentum entries)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium",
+    "requires": "self_learner backtest: OOS 7d/30d, p<0.05, winner-kill <20%. Do NOT ship before Oct 17 momentum-gate lands (one variable at a time)."
+  },
+  {
+    "date": "2026-10-16T11:43:18Z",
+    "idea": "pump-chain- SHORT 'active dump' shadow collector",
+    "rationale": "GRASS-class near-miss: bullish-tide shorts survive to conf 49.5, stopped only by CTX-GATE. Winners are real dumps (APT +23.9%, DYDX +20%); losers are mid-band pops. Log coin 5m pct change at pump-chain- SHORT entry to JSONL (dump<0 vs pop>0) — accrues counterfactual for a future hard gate without touching live path.",
+    "expected_impact": "Data for tide/dump gate decision in ~7d; zero live impact",
+    "category": "shadow collector",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

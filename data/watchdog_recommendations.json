@@ -1,41 +1,110 @@
 {
-  "timestamp": "2026-10-16T07:08:12.944999+00:00",
+  "timestamp": "2026-10-16T11:08:16.970332+00:00",
   "steers": [
     {
       "severity": "warning",
-      "category": "health",
-      "title": "4 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "category": "cluster",
+      "title": "Trade cluster: HBAR + ETC",
+      "detail": "Both opened within 14 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "health",
-      "title": "Signal 'pump-chain-' losing streak: 3 losses",
-      "detail": "Net -0.20 USDT over last 20 trades (losses: -0.20). Consider disabling or tuning this signal.",
+      "category": "cluster",
+      "title": "Trade cluster: HBAR + KAS",
+      "detail": "Both opened within 25 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: ETC + KAS",
+      "detail": "Both opened within 11 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Portfolio heavily long (3 trades)",
+      "detail": "3 long positions. One BTC dump hits all of them.",
+      "auto_executable": false,
+      "id": "steer-004"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "6 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "auto_executable": false,
+      "id": "steer-005"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'pump-chain-' losing streak: 6 losses",
+      "detail": "Net -0.36 USDT over last 20 trades (losses: -0.36). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-006"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "warning",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "NEUTRAL",
     "btc_4h": "LONG_BIAS",
     "continuum": "AT",
-    "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "volatility": "NORMAL",
+    "zscore_tier": "POS",
     "velocity_state": "SLOW",
     "acceleration_state": "FLAT",
-    "volume_regime": "LOW",
+    "volume_regime": "NORMAL",
     "linreg_alignment": 0.5,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 2,
-  "deep_analysis": "2 open trades, both marginal: CRV SHORT -0.27% (0.8h) and BTC LONG +0.14% (2.8h). Neither is broken; neither is thriving. Portfolio is balanced 1L/1S in a market that has no committed direction \u2014 BTC sits AT EMA300 with acceleration NEGATIVE, 15m SHORT_BIAS vs 4h LONG_BIAS, Wyckoff DISTRIBUTION, velocity SLOW. This is chop, and chop is where hard_max_loss trades go to die (52/56 never reach +0.40% trail arm).\n\nThe 24h book is unambiguous about which side pays: longs +$0.96 net (16T, 9W) vs shorts -$0.53 (6T, 1W). The three biggest wins were pump-chain+ LONGs entered at RSI 63-67 during volume expansion \u2014 IOTA +14.7%, BANANA +10.1%, ICP +15.2%. The four pump-chain- SHORT losses (IO -2.43%, DOT -1.97%, APT -2.93%) all died on ATR SL hits at meta_rsi 47-56 \u2014 mid-band, not oversold, not overbought. They were chop shorts: entered after the dump had already happened, against a tape that bounced. The WINNING side of those trades was the LONG of the same bounce. pump-chain+ LONG captured it; pump-chain- SHORT got run over. 7d pump-chain- SHORT: 34T, 26.5% WR, net -$0.09 \u2014 structural bleed, not bad luck.\n\nOpen CRV SHORT is this exact pattern live. CRV 5m regime SHORT_BIAS conf 79.4 supports the direction, but entry RSI 48.21 is mid-band \u2014 the same zone where 14 shorts in the bleed cluster entered. Stop 0.35161 is only ~0.27% above current price; one BTC bounce off EMA300 and it's an ATR SL hit like IO/DOT/APT. Would not open this fresh. Thesis still marginally valid only while CRV holds below 0.352; if BTC reclaims EMA300 with volume, exit immediately.\n\nBTC LONG is the better of the two: entered AT the EMA300 pivot (82006 vs ema300 ~82165), 4h LONG_BIAS, trend_quality STRONG_UP. If EMA300 holds, this is where trends start. If it breaks with volume, exit \u2014 no heroics in DISTRIBUTION phase.\n\nAI Trader pick: GRASS LONG (conf 72). Precheck passed all gates. LONG_BIAS 77.5 slow grind +0.4%, RSI 65 in today's winning band, vol 0.79% \u2014 best regime-aligned gate-clearing setup available. INJ had better R:R geometry (2.05, multiplier 1.00) but NEUTRAL regime = chop entry; skipped it on purpose.",
-  "agent_timestamp": "2026-10-16T06:45:26.799960+00:00",
-  "regime_context": "BTC AT EMA300 (~82165), price 82084, 113 consecutive minutes below, zscore -0.57 NEUTRAL. Velocity SLOW, acceleration NEGATIVE, linreg 15m slope negative, 1h slope slightly positive \u2014 mixed micro, no commit. Wyckoff DISTRIBUTION, market phase CALM, volume NORMAL but effectively quiet. 15m scanner: SHORT_BIAS. 4h scanner: LONG_BIAS, trend_quality STRONG_UP. Continuum: AT.\n\n5m aggregate: 14 LONG_BIAS / 41 SHORT_BIAS / 71 neutral = SHORT_BIAS overall. Strong long movers already ran: TIA +3.66% (95 conf), ZRO +3.52% (95 conf) \u2014 chasing after a 3.5% move is the WLD/JUP failure pattern. Strong short candidates: ANIME -1.58% (92 conf), NXPC -3.36% (87 conf) \u2014 mostly no price data or RSI hard-floored for entry.\n\nThis is a mixed tape with a bullish higher-timeframe and a bearish immediate tape. The correct stance: lean long on regime-aligned grinds with volume (GRASS profile), avoid mid-band shorts (CRV profile), and do not chase extended movers. Chop regime historically degrades trail-family edge until BTC commits direction \u2014 position sizing should reflect that, but directional bias stays LONG per the 4h structure and the 24h PnL split.",
-  "pattern_alerts": "VERIFIED from PostgreSQL (meta_rsi, last 24h + 7d/14d windows):\n\n1) pump-chain- SHORT IS A STRUCTURAL BLEEDER. 7d: 34 SHORT trades, 26.5% WR, net -$0.09. Last 20 closes: 3 of 3 pump-chain- entries lost (IO -2.43% RSI 48.5, DOT -1.97% RSI 55.6, APT -2.93% RSI 47.3) \u2014 all ATR SL hits, all mid-band RSI 47-56. WINNING side of those exact moves: LONG the bounce \u2014 same window pump-chain+ printed IOTA +14.7%, BANANA +10.1%, ICP +15.2%. We weren't on the wrong signal family; we were on the wrong SIDE. Open CRV SHORT (entry RSI 48.2) is this pattern repeating. Brain auditor should evaluate a mid-band (RSI 45-55) throttle on pump-chain- \u2014 not disable, throttle.\n\n2) 24h DIRECTIONAL SPLIT IS THE STORY. LONGS: 16T 9W net +$0.96. SHORTS: 6T 1W net -$0.53. Every short except ICP pump-chain-v6- (+0.01) lost. Shorts aren't paying in this AT-EMA300 chop because the 4h structure is still up and every dump gets bought. Until BTC breaks EMA300 with volume and 4h flips SHORT_BIAS, the book says: stop opening mid-band shorts.\n\n3) HIGH-RSI CHASE FAILS ONLY WITHOUT VOLUME. Long losers at meta_rsi>=60: JUP 69.4 (-1.2%), JUP 66.7 (-3.5%), HYPER 60.0 (-1.5%), FIL 62.6 (-1.7%). Long winners at same RSI: IOTA 66.7 (+14.7%), BANANA 65.2 (+10.1%), ICP 63.2 (+15.2%). The differentiator is volume expansion at entry, not RSI itself. RSI 60-67 is NOT auto-bad \u2014 it's bad when volume_regime is LOW. WINNING side: enter the pop as volume expands, not after it stalls.\n\n4) SIGNAL RED FLAGS (watchdog signal_performance, for brain auditor not watchdog action): volume-breakout-long+ 18T 16.7% WR -$1.14 (worst total); mtf-regime-trend+ 9T 44.4% -$0.46; hmacd_mtf-+ 8T 25% -$0.46; pump-chain-v5 4T 25% -$0.29; pump-chain- 49T 30.6% barely +$0.15 over full book. Best earners: pump-chain+ +$3.06 (54T), r2v2-long3 +$0.55 (8T 62.5%), ai-trader-manual +$0.44 (4T 75%), volume-buildup- +$0.41 (4T 100%).\n\n5) hard_max_loss FAMILY UNCHANGED: entries that never reach +0.40% trail arm are chop entries. Current LOW-velocity AT-EMA300 tape will produce more of them. The edge lives in trend capture with volume, not entry signal alone. Patience over activity."
+  "open_count": 4,
+  "deep_analysis": "4 open (3L/1S), net flat on open book. BTC reclaimed EMA300: price 82,308 vs EMA300 82,160, zscore POS 1.72, 1m/5m/15m linreg all positive (LEAN_BULL), 5m aggregate recovered from last cycle's 61-short-bias spike to NEUTRAL (17L/15S/91N). The bearish scare resolved bullish \u2014 4h LONG_BIAS + trend_quality STRONG_UP intact. Long-side positioning is now regime-aligned; the 3-long cluster is acceptable while BTC holds above EMA300.\n\nOpen trade verdicts:\n- KAS LONG (ai-trader+, RSI 57.69, -0.44%): pick filled within 25 min of signal \u2014 execution working. Momentum flat (+0.05% 1h) but thesis intact (per-coin LONG_BIAS 78.3 at entry). SL 0.037724 = -0.75% tight trail-ready. HOLD while above SL.\n- ETC LONG (bb-bounce-v2-long+, RSI 50.0 exact, -0.22%): weakest book position. Entered the death band \u2014 24h LONG RSI 45-55 = n=6 WR 33% net -$0.24. bb-bounce-v2-long+ all-time 24T 58.3% WR net +$0.02 (breakeven machine). ETC 1h mom -0.13% fading. Would NOT open this fresh. Exit on 5m close < 8.05; SL 7.998 backstop.\n- HBAR SHORT (volume-buildup-, RSI 63.64, -0.09%): best signal in book (5/5 all-time, ENS +2.67% 24h) in the only viable short band (RSI 55-65: 50% WR). But HBAR 1h mom +0.33% grinding against us. Hold while below 0.0870; exit on 5m close > 0.0870 (halfway to SL 0.0877).\n- BTC LONG (manual, +0.31%, 7.3h): macro-anchored, SL 81750 correctly sits below the EMA300 shelf. Approaching 8h stale flag \u2014 hold while 1m closes above EMA300 (82,160), trail stop to 82,100 at 8h.\n\nAI Trader: KAS pick from 10:46 filled as trade 16226 \u2014 cycle complete. Within 45-min cooldown, no new pick this run. 2 slots free (4/6).",
+  "agent_timestamp": "2026-10-16T11:13:47.650409+00:00",
+  "regime_context": "BTC 82,308 \u2014 ABOVE EMA300 (82,160) after 113+ candles sitting ON it. zscore POS (+1.72), velocity SLOW, acceleration FLAT (recovered from NEGATIVE), volume NORMAL 1.07. linreg: 1m +0.008, 5m +0.034, 15m +0.020 all positive \u2014 LEAN_BULL; only 1h still negative (-0.011, lagging). Wyckoff UNKNOWN/ACCUMULATION, ewave W3, market_phase DECLINING, trend_quality STRONG_UP.\n\n5m per-coin aggregate: NEUTRAL overall \u2014 17 long-bias / 15 short-bias / 91 neutral (123 scanned). This is a full recovery from the prior cycle's 9L/61S flip. The short-bias surge was a temporary BTC-at-EMA300 scare, not a regime change.\n\nPractical read: dip resolved bullish. Bias = long-side until BTC loses 81,750 (SL cluster / EMA300 shelf). Shorts only on per-coin SHORT_BIAS >= 90 with active dumps \u2014 24h short book is 20% WR net -$0.63, still the loss engine. Edge remains: per-coin confirmed momentum longs, ideally RSI 55-67 (the band that paid IOTA +14.7%, ICP +15.2%, BANANA +10.1%) or oversold bounces <45 (3/3 24h).",
+  "pattern_alerts": "VERIFIED PostgreSQL 24h: n=30 closed, meta_rsi from _signal_metadata, WR 43.3% net +$0.25.\n\n1) SHORTS STILL THE LOSS ENGINE \u2014 SHORT n=10 WR 20% net -$0.63. Band detail: RSI 45-55 shorts n=6 WR 17% net -$0.44 (suicide band); only RSI 55-65 shorts go 50% WR net +$0.02. Losers: IO -4.43% (RSI 50.0), INJ -3.19% (52.9), APT -2.93% (47.2), IO -2.43% (48.5), CRV -2.14% (48.2), DOT -1.97% (55.6). WINNING SIDE on every one: the coin kept going UP / held support. We shorted mid-band pops inside recovery chop. Only winning shorts: ENS volume-buildup- +2.67% (RSI 60.0, actively fading coin), ICP v6- +0.41%. Why we weren't on the winning side: we fade pops instead of confirmed dumps.\n\n2) LONG RSI BANDS \u2014 the money map: RSI <45 n=3 WR 100% net +$0.12 (oversold bounces pay); RSI 45-55 n=6 WR 33% net -$0.24 (DEATH BAND \u2014 mid-band longs lose); RSI 55-65 n=5 WR 40% net +$0.12 (mixed); RSI 65+ n=5 WR 60% net +$0.85 (momentum continuation = the real edge). Top winners all 61-67: IOTA +14.69%, BANANA +10.09%, ICP +15.16%, INJ +5.85%. We keep entering longs at RSI 50 exact (ETC now, BIGTIME's win was the exception at 1/2 for the band) when the winners are momentum longs with RSI 61-67.\n\n3) SIGNAL SCOREBOARD \u2014 pump-chain- : n=6 WR 0% net -$0.36 in 24h (all-time 51T 29.4% net +$0.12, marginally positive only via a few big wins; 6 straight losses now). bb-bounce-v2-long+: 24T 58.3% WR net +$0.02 breakeven machine, BABY -4.02% worst. pump-chain+ : n=7 WR 43% net +$0.95 \u2014 best net because winners trail big (IOTA/ICP/BANANA). volume-buildup- : 5/5 all-time 100% WR. Flag pump-chain- and bb-bounce-v2-long+ for brain auditor \u2014 watchdog cannot disable signals.\n\n4) WINNING SIDE ANSWER \u2014 for every short loss: the winning side was LONG or flat (coin continued up). For every mid-band long loss (MET -2.58% RSI 47.6, GMX -1.63% RSI 53.3): the winning side was either waiting for oversold (<45) or chasing confirmed momentum (61-67); mid-band is where money isn't. For BABY -4.02% bb-bounce RSI 55.6: winning side was NOT in the bounce \u2014 the coin kept dumping; bb-bounce bought a falling knife.\n\n5) EXIT REASON CHECK \u2014 24h hard_max_loss/atr_sl_hit concentration on shorts (6 of 10 shorts exited SL) confirms wrong-side entries, not bad stop placement. Stops worked; entries were wrong.",
+  "deep_steers": [
+    {
+      "severity": "warning",
+      "category": "stale",
+      "title": "BTC LONG approaching 8h flag (7.3h open)",
+      "detail": "Trail stop to 82,100 at 8h. Hold while 1m closes above EMA300 (82,160). Macro aligned (LEAN_BULL, zscore POS).",
+      "auto_executable": true
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "ETC LONG is the book's weakest link \u2014 mid-band RSI 50.0 entry",
+      "detail": "24h LONG RSI 45-55 = 33% WR net -$0.24 (death band). bb-bounce-v2-long+ net +0.02 all-time. ETC 1h mom -0.13% fading. Exit on 5m close < 8.05; SL 7.998 backstop. Would not open fresh.",
+      "auto_executable": false
+    },
+    {
+      "severity": "info",
+      "category": "profit_lock",
+      "title": "BTC LONG +0.31% \u2014 pre-position trail",
+      "detail": "Not yet at +2% BE threshold, but 7.3h open + approaching stale flag. Manual trail to 82,100 locks ~50% of current gain if BTC retests EMA300.",
+      "auto_executable": true
+    },
+    {
+      "severity": "info",
+      "category": "health",
+      "title": "HBAR SHORT correct signal/band but price grinding against (+0.33% 1h)",
+      "detail": "volume-buildup- 5/5 all-time, RSI 63.64 in viable 55-65 band. Hold while below 0.0870; exit on 5m close > 0.0870. If HBAR keeps pumping we're on the wrong side \u2014 winning side is the continued pump.",
+      "auto_executable": false
+    },
+    {
+      "severity": "info",
+      "category": "opportunity",
+      "title": "AI Trader KAS pick filled (trade 16226) \u2014 cycle complete",
+      "detail": "Signal fired 10:46, filled 10:52, now open. Within 45-min cooldown \u2014 no new pick this run. 2/6 slots free. Next cycle: hunt momentum longs RSI 55-67 with per-coin LONG_BIAS conf >= 75.",
+      "auto_executable": false
+    }
+  ]
 }

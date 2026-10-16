@@ -1,97 +1,133 @@
 {
-  "timestamp": "2026-10-16T06:45:19Z",
+  "timestamp": "2026-10-16T11:43:18Z",
   "session_brain_stats": {
-    "note": "skipped this run — PG trade data + watchdog sufficient; session brain adds latency without new signal"
+    "queries_run": 3,
+    "note": "session_brain loaded; pump-chain short / momentum gate / wrong-side topics surfaced prior decisions, no new missing implementations beyond standing backlog"
   },
   "trade_summary_24h": {
-    "trades": 22,
-    "wr": 45.5,
-    "pnl": 0.43,
-    "losers_autopsied": 12,
-    "never_armed_chop_entries": 8,
-    "armed_but_reversed_whipsaw": 4,
-    "regime": "CALM chop, BTC AT EMA300, LOW vol, STRONG_DOWN trend quality"
+    "closed": 31,
+    "wr": 43.3,
+    "net_pnl": 0.12,
+    "long": "20T +$0.88 55.0%WR",
+    "short": "11T -$0.76 18.2%WR",
+    "top_losers_signal": "pump-chain- SHORT 6T 0%WR -$0.36 (watchdog flagged)",
+    "top_winner_signal": "pump-chain+ LONG 7T 42.9%WR +$0.95 (trail family carrying)",
+    "exit_mix": "atr_sl_hit 11T -$0.91 | hard_max_loss 3T -$0.29 | trail families +$1.62"
   },
-  "trade_summary_7d": {
-    "trades": 205,
-    "wr": 35.1,
-    "pnl": -1.16,
-    "trail_family": "76T +$6.84 (85%+ WR on trail exits)",
-    "hard_max_loss": "59T -$5.41 (0% WR)",
-    "atr_sl_hit": "48T -$3.61 (0% WR)",
-    "chop_exits_total": "107T -$9.02 vs trail +$6.84 = net -$2.18 gap"
+  "seven_day": {
+    "all": "212T -$1.35 35.4%WR",
+    "trail_family": "74T +$7.81 89.2%WR",
+    "chop_family": "125T -$9.94 1.6%WR",
+    "short": "58T -$1.04 29.3%WR",
+    "long": "154T -$0.31 37.7%WR"
   },
-  "changes_from_last_run": [
+  "last_run_changes_verified": [
     {
-      "change": "SHORT mid-band block (RSI 45-55 non-pump-chain, 2026-10-16 00:43)",
-      "status": "SOAKING — 0 fires in 6.5h. All 5 SHORTs since ship were pump-chain (exempt by design). No verdict yet. Review after 3+ fires."
+      "change": "SHORT_MIDBAND_BLOCK_ENABLED=True (00:43)",
+      "status": "WORKING",
+      "evidence": "HYPER SHORT RSI 48.1 blocked 4x at 08:22-08:23; 0 midband non-pump-chain shorts opened since ship (only ENS@60 / HBAR@63.6 outside band)"
     },
     {
-      "change": "FLOOR-ADMIT shadow JSONL (2026-10-15 23:44)",
-      "status": "COLLECTING — 146 events. WCT volume-buildup- SHORT floor-admitted repeatedly at exec_conf 45 (raw 90, penalty 0.108, mult 0.5). volume-buildup- is 4T 7d 100%WR +$0.41 — floor correctly admitting a winner. Decision-ready Oct 19."
+      "change": "volume-breakout-short- kill (Oct 15 17:35)",
+      "status": "HOLDING",
+      "evidence": "0 post-kill trades; IO loss was pre-kill"
     },
     {
-      "change": "volume-breakout-short- kill (2026-10-15 17:35)",
-      "status": "WORKING — 0 trades post-kill. Last close 14:35 pre-kill."
+      "change": "hmacd_mtf- kill (Oct 15 18:30)",
+      "status": "HOLDING",
+      "evidence": "0 post-kill trades"
     },
     {
-      "change": "hmacd_mtf- kill (2026-10-15 18:30)",
-      "status": "WORKING — 0 trades post-kill."
+      "change": "CHASE_RATIO_SHADOW review-date comment fix (05:46)",
+      "status": "NO-BEHAVIOR",
+      "evidence": "comment only; shadow still True, review Oct 27"
     },
     {
-      "change": "CONF-CALIB clamp (2026-10-15 03:40)",
-      "status": "WORKING — no conf>100 in recent closed trades."
-    },
-    {
-      "change": "CHASE_RATIO_SHADOW comment fix (2026-10-16 05:46)",
-      "status": "NO BEHAVIOR CHANGE — review date Oct 27 per CEO D2 standard."
+      "change": "CONF-CALIB clamp (Oct 15)",
+      "status": "WORKING",
+      "evidence": "no conf>100 in 24h exec logs"
     }
   ],
-  "drift_findings": [],
-  "recurring_problems": [
-    "hard_max_loss + atr_sl_hit = 107T/205T (52% of trades) -$9.02/7d. Trail family only 76T (37%). Chop entries dominate flow in CALM regime. Fix vehicle = self_learner momentum-gate backtest due Oct 17. DO NOT stack entry filters before that lands.",
-    "pump-chain- SHORT structurally breakeven: trail winners (13T +$2.01 84.6%WR) exactly pay for chop losses (32T -$2.88). Watchdog 'losing streak 3 losses' is n=3 noise — 7d is +$0.04. Do not disable.",
-    "4/12 24h losers were ARMED (MFE 0.5-0.98%) but closed negative via atr_sl_hit — trail gave back all profit in EXTREME whipsaw. Pattern flagged for self_learner exit-ladder backtest. Not actionable without backtest."
+  "watchdog_steers_adressed": [
+    {
+      "steer": "pump-chain- 6-loss streak",
+      "verdict": "VERIFIED bleed but filters REJECTED on winner-kill",
+      "detail": "3d 25T 12%WR -$0.85 acute; post-Oct-6 cohort 44T +$0.12 25%WR breakeven-ish; RSI-55 ceiling kills 23.4% winners (prior run); below-EMA block collides with volume-buildup- edge (prior run). No new filter — soak + Oct 17 momentum-gate."
+    },
+    {
+      "steer": "6 recent losses wrong-side",
+      "verdict": "VERIFIED — chop-family entries never armed trail; same root as standing momentum-gate work"
+    },
+    {
+      "steer": "trade cluster HBAR/ETC/KAS + heavily long",
+      "verdict": "NOTED — 4 longs aligned LONG_BIAS/STRONG_UP; portfolio watch, not config"
+    }
   ],
-  "missing_implementations": [],
+  "drift_findings": [
+    {
+      "severity": "info",
+      "finding": "Watchdog 'long RSI 45-55 death band' DISPROVED on 30d",
+      "evidence": "30d 93T +$0.31 50.5%WR, Welch t=-0.111 p=0.91 vs other bands. 7d window (-$0.78/25T) is noise. DO NOT ship LONG 45-55 block."
+    },
+    {
+      "severity": "info",
+      "finding": "pump-chain- SHORT meta<45 'floor leak' is actually PROFITABLE",
+      "evidence": "post-Oct-6: 23T +$0.58 34.8%WR — bearish-oversold bypass working as designed (APT +$0.53, ACE +$0.30). GRASS@43.6 was one loss in a positive cohort. Do NOT tighten floor."
+    },
+    {
+      "severity": "low",
+      "finding": "WRONG_SIDE_SKIP_THRESHOLD=50 comment says '= MIN_EXEC_CONFIDENCE' but MIN_EXEC=40 (CEO Oct 10)",
+      "evidence": "decider_run.py:3426 local MIN_EXEC_CONFIDENCE=40; hermes_constants.py:1468 comment stale"
+    },
+    {
+      "severity": "medium",
+      "finding": "GRASS near-miss 11:30-11:33: conf 49.5 (product 0.17 washed to floor 0.5) passed MIN_EXEC=40; only CTX-GATE oversold (detect RSI 37.9<40) stopped it",
+      "evidence": "pipeline.log 11:30-11:33 — BTC-CRASH-OVERRIDE + NEUTRAL-BYPASS + CONTINUUM-HYSTERESIS + STANDALONE-BYPASS all allowed; tide 0.7x trend-align 0.6x insufficient. If detect RSI >=40, this short OPENS during bullish tide."
+    },
+    {
+      "severity": "info",
+      "finding": "hmacd_mtf-+ signal name has malformed direction suffix in trades table",
+      "evidence": "7d shows 'hmacd_mtf-+' as signal string; both direction flags already False — historical only"
+    }
+  ],
+  "recurring_problems": [
+    "hard_max_loss #1 exit bleed 7d 60T -$5.54 — momentum-gate backtest self_learner DUE Oct 17 (4th re-request). Do NOT stack entry filters.",
+    "SHORT book bleed 7d 58T -$1.04 — pump-chain- acute 3d streak; defenses layered but dampen-only; hard-gate needs backtest",
+    "7d WR 35.4% below 50% checkpoint — ESCALATE guardrail active, no filter stacking"
+  ],
+  "missing_implementations": [
+    "self_learner momentum-gate candle backtest (|m5|<0.15% vs trailing_activated) — due Oct 17, undelivered since Oct 13 (5th re-request)",
+    "wyckoff COOLDOWN_BARS formula-vs-comment fix — CEO-owned",
+    "Q4 portfolio cap backtest — pending since Oct 6"
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-16T06:45:19Z",
-      "idea": "Trail-arm threshold scaling by volatility regime: require +0.60% arm in EXTREME (vs +0.40% base) — 4/12 24h losers armed at 0.40-0.98% MFE then whipsawed through trail to -1 to -3% account losses in EXTREME vol",
-      "rationale": "Armed-but-reversed trades are the second-largest 24h loss cluster after never-armed chop entries. In EXTREME, ATR stops are wide and whipsaws are fast — arming the trail at 0.40% puts the trail in a zone where noise triggers it before trend commits.",
-      "expected_impact": "Reduce armed-but-reversed losses ~50% (est +$0.15-0.25/24h in EXTREME) without touching never-armed entries or trail winners",
-      "category": "exit tuning",
+      "date": "2026-10-16T11:43:18Z",
+      "idea": "Trail-arm-rate confidence multiplier (soft, per-cell)",
+      "rationale": "7d TRAIL 74T +$7.81 89.2% vs CHOP 125T -$9.94 1.6%. Entry quality = probability of reaching trail. For (signal, vol_regime, meta-RSI band) cells with n>=15/30d: trail-arm rate <25% → conf x0.7; >60% → conf x1.1. Soft demotion, not hard block — preserves 'every pump is a LONG / every dump is a SHORT'.",
+      "expected_impact": "Dampen chop-habitat entries ~10-15% of book without killing trail winners; targets hard_max_loss #1 bleed at root (zero-momentum entries)",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "medium — needs backtest before ship. Defer to self_learner exit-ladder work (due Oct 17). One variable at a time.",
-      "verification": "n=4 armed losers/24h is below 20-trade threshold. MUST backtest on 14d+ data before any config change. Log only."
+      "risk": "medium",
+      "requires": "self_learner backtest: OOS 7d/30d, p<0.05, winner-kill <20%. Do NOT ship before Oct 17 momentum-gate lands (one variable at a time)."
+    },
+    {
+      "date": "2026-10-16T11:43:18Z",
+      "idea": "pump-chain- SHORT 'active dump' shadow collector",
+      "rationale": "GRASS-class near-miss: bullish-tide shorts survive to conf 49.5, stopped only by CTX-GATE. Winners are real dumps (APT +23.9%, DYDX +20%); losers are mid-band pops. Log coin 5m pct change at pump-chain- SHORT entry to JSONL (dump<0 vs pop>0) — accrues counterfactual for a future hard gate without touching live path.",
+      "expected_impact": "Data for tide/dump gate decision in ~7d; zero live impact",
+      "category": "shadow collector",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
+  "changes_from_last_run": "All 5 verified: SHORT-MIDBAND FIRING (HYPER blocked), vbo-short- kill HOLDING, hmacd-mtf kill HOLDING, chase-ratio comment NO-BEHAVIOR, CONF-CALIB WORKING. 0 regressions.",
   "next_actions": [
-    "self_learner momentum-gate backtest due Oct 17 — 3rd re-request, ESCALATE if missed",
-    "Midband SHORT block: wait for 3+ fires before verdict (current 0 in 6.5h, all SHORTs are pump-chain exempt)",
-    "FLOOR-ADMIT shadow: decision-ready Oct 19 (146 events and growing)",
-    "ai-trader+ watchlist: 16T 7d -$0.34 37.5%WR — below kill threshold n=20, monitor 48h more",
-    "bb-bounce-v2-long+ watchlist: 16T 7d -$0.19 43.8%WR — trail rate 56% keeps it alive, monitor",
-    "pump-chain- SHORT: KEEP (7d +$0.04, trail winners pay for chop losses). Watchdog disable recommendation rejected on n=3.",
-    "RAISE if armed-but-reversed pattern recurs >4/24h: commission trail-arm EXTREME scaling backtest separately"
-  ],
-  "rejected_this_run": [
-    {
-      "proposal": "pump-chain- SHORT RSI ceiling 55+",
-      "reason": "Fisher p=1.0 on 30d (29T 37.9% WR -$0.58 vs rest). 14d 9T 11.1% looked bad but reverses at 30d. Pattern noise."
-    },
-    {
-      "proposal": "Kill pump-chain- SHORT (watchdog steer)",
-      "reason": "7d +$0.04, 14d +$0.02 — breakeven not negative. Trail winners +$2.01/14d pay for chop. n=3 streak is noise."
-    },
-    {
-      "proposal": "Kill ai-trader+",
-      "reason": "16T 7d -$0.34 — below n=20 kill threshold. Monitor 48h more."
-    },
-    {
-      "proposal": "Trail-arm EXTREME scaling config change",
-      "reason": "n=4 armed losers/24h below threshold. Logged as creative improvement for self_learner backtest. One variable at a time — momentum-gate lands first."
-    }
+    "self_learner momentum-gate backtest DUE Oct 17 EOD — 5th re-request; undelivered → brain_auditor runs scoped version Oct 18",
+    "Monitor pump-chain- SHORT: auto_1hr kill threshold (3+T/hr 0W or 7d net <-$1) — do not pre-kill, data says breakeven-ish post-Oct-6",
+    "GRASS-class near-miss: if any pump-chain- SHORT opens during bullish tide with detect RSI>=40 in next 48h, escalate tide hard-skip backtest",
+    "Watchdog 'long 45-55 death band' — CLOSED as noise (p=0.91); do not reopen on 7d windows",
+    "7d WR trajectory vs ESCALATE guardrail — no stacking until momentum-gate lands"
   ]
 }
