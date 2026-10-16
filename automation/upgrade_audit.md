@@ -915,3 +915,49 @@
 1. **AGENTS.md HL-key reminder fixed** — "EXPIRES IN 3 DAYS" beside 2027-03-12 was stale (key set 2026-09-16, 180d → ~2027-03-15). Now reads "EXPIRES 2027-03-12 (~5 months from 2026-10-09)". Flagged as sideways find in bug-hunt session 0.
 2. **Repo-root junk removed** — tracked redirect-accident file `SELECT token, ... FROM signals ...` deleted via git rm; 0-byte untracked `candles.db`/`hermes.db`/`signals.db`/`herbbian_memory.db` at repo root deleted (real DBs live in HERMES_DATA per paths.py; gitignored; no code connects to bare root paths).
 3. **TESTTOKEN housekeeping item from gate audit** — already clean: zero matches in scripts/. Mark done.
+
+---
+
+## Upgrade Implementer Session — 2026-10-16 15:30 UTC
+
+**Scope:** re-scanned recent plans/ (Oct 9 → Oct 14, 20 most recent). No live-code changes this session — all high-value remaining plans are CEO-gated SPECs. Executed the two date-gated analysis actions from the winning-dna report (Oct 15 re-measure, Oct 16 RSI re-test).
+
+### Plan evaluations (recent-20, deltas vs Oct 12 session)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| t-vacation-mode-2026-10-14 | L4 | HIGH | ✅ CLOSED (FINAL, bug_hunter-verified) | DO-NOT-FLIP inversion section corrected; no code action |
+| limit-order-capability | L2 | MED | ⏳ PENDING | Plan priority "Medium — not blocking"; guardian integration adds scope. Next L2 candidate |
+| strategic-six-options-2026-10-14 | L3–4 | HIGH | ✅ DECIDED (Option 6) | Work routed to other plans (vacation-mode, gate report card in CEO runs) |
+| contrarian-engine-2026-10-13 | L3 | MED | ⏳ PENDING CEO | SPEC awaiting approval; fee-blind inversion trap already corrected in vacation-mode — any revival must use fee-adj model |
+| contrarian-zone-backtest | — | LOW | ⏸️ SKIPPED | Marginal edge (+$0.0023/trade), paper-trade gate unmet |
+| vol-regime-relative-thresholds-2026-10-13 | L3 | MED-HIGH | ⏳ PENDING CEO | PROPOSED — no code until approved |
+| temporal-confluence-spec | L2–3 | MED | ⏳ PENDING CEO | SPEC awaiting approval |
+| signal-starvation-fix-2026-10-12 | L1–2 | HIGH | PARTIAL | RR momentum U1 live (shadow); remaining items (RSI floor bear-exemption, score-crush) CEO-gated + hermes_constants DO-NOT-MODIFY |
+| short-rsi-habitat-spec | L2 | MED | ⏳ PENDING CEO | Per-signal RSI bands replace blanket floor — constants + live-trading change |
+| 2026-10-13_rr-engine-smart-upgrades | L2–3 | HIGH | PARTIAL | U1 (momentum-aware) live in code w/ RR_ENGINE_SHADOW=True; U2–4 (TF-aware, quality-context, fib) pending — ship via automatic-implementation shadow when approved |
+| 2026-10-12_gate-conundrum-deadlock-plan | — | HIGH | ✅ CLOSED (VERIFIED) | Config changes: NONE by design; findings absorbed |
+| bb-squeeze-trail-arm-timeout verdict+audit | L2 | HIGH | ✅ LIVE — CEO RATIFY PENDING | Flags live without documented GO; brain_auditor Oct 15 recommended RATIFY (deadline passed); soak clean (1T/0 fires). CEO one-liner outstanding — flagged on kanban, not reverted |
+| grind-breakout-v2-coin-tracker-integration | L3 | LOW | ⏸️ DEFERRED (by plan) | Unchanged |
+| regime-recalibration-2026-10-12 | L2 | MED-HIGH | ⏳ PENDING CEO | Unchanged |
+| 2026-10-09_D4-structured-block-logging | L1 | HIGH | ✅ IMPLEMENTED (da7d6522) | Closed |
+| 2026-10-09_ceo-orchestrator-pickup | L2–3 | HIGH | ✅ CLOSED (verdicts filed) | Q4-cap: Cap B accepted-on-aggregate, CEO decision open; Wyckoff: REJECT closed |
+| 2026-10-09_gate-counterfactual-audit | — | HIGH | ✅ D3/D4 DONE | Standing hold: no gate removal on that window |
+| 2026-10-09-wyckoff-bypass-verdict / q4-portfolio-cap-verdict | — | — | ✅ CLOSED | Verdicts filed Oct 9 |
+| 2026-10-08_winning-dna-population-report | L1–3 | HIGH | ✅ ACTIONS #2 #4 #5 CLOSED THIS SESSION | See implementations below |
+
+### Implemented this session (2 × Level 1, analysis-only — no live changes)
+
+1. **Winning-dna Oct 15 re-measure (action #2)** — re-ran `analysis/winning_dna_pop_2026-10-08.py`. hard_max_loss WR still 0% (n 70→136, sum −$9.31→−$15.60/30d, severity flat −3.51%, frequency doubled). Escalation criterion MET → **SL-width study escalated to CEO kanban** with two-lever framing (SL-width vs entry-gate; HML avg MFE 0.17% = entries never worked). Verdict: `plans/2026-10-16_winning-dna-remeasure-verdict.md`.
+2. **RSI tilt re-test (action #4)** — coverage now 98.5% (DRIFT-E fix held). Column accuracy: r=0.52 vs 1m Wilder recompute (mean|Δ|=10pts, side-of-50 73%) — it's a *noisy 1m RSI*, not 1h (partially explains gate-conundrum's r=0.33). Tilt re-test: 30d KEEP +$3.85 vs BLOCK −$0.71 but OOS halves sign-inconsistent (half2 KEEP −$1.09) → **stays provisional, shadow-weight-only, no hard-block.** No code change.
+
+### Sideways findings (this session)
+- **Severity: INFO** — `entry_rsi_14` is a noisy 1m RSI (r=0.52, mean|Δ|=10pts vs clean recompute). Fine for population band stats; NEVER for per-trade threshold blocks. Documented in verdict file.
+- **Severity: LOW** — `signal_version.py` still missing (flagged Oct 4/6); only referenced via paths.py SIGNAL_VERSIONS_FILE, no code imports the module. Cosmetic.
+- **Severity: MED (standing)** — bb-squeeze + pump-chain trail-arm flags live without documented CEO GO; brain_auditor recommended RATIFY Oct 15. Awaiting CEO one-liner (kanban).
+
+### Next candidates (post this session)
+1. **SL-width + entry-gate study** — Level 2 (analysis) — HIGH — escalated, awaiting CEO GO
+2. **limit-order-capability** — Level 2 — MED — plan ready, standalone script first (skip brain.py --limit until standalone proven)
+3. **RR engine U2–U4** — Level 2–3 — HIGH — shadow-mode only, automatic-implementation pattern, needs CEO sequencing
+4. **temporal-confluence / short-rsi-habitat / vol-regime-relative** — Level 2–3 — MED-HIGH — all CEO-gated SPECs
