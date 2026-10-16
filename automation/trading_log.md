@@ -10735,3 +10735,21 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 **Open Questions:**
 - pump-chain- 24h 6T 0W −$0.36 (0% WR) — standing CEO suggestion for 24h-based kill threshold (0% WR with 6+ trades)
 - hard_max_loss 4 exits −$0.48 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 13:10] Hourly Analysis
+
+**Trades:** 4 closed last hour (2W 2L) — ETC bb-bounce-v2-long+ LONG atr_sl_hit −$0.04 (−1.69%), XPL doji-bottom-long LONG profit-monster-trail +$0.09 (+3.89%), BIGTIME btc-pump-rider+,pump-chain-v6+ LONG trail_arm_timeout −$0.01 (−0.08%), POL volume-buildup- SHORT profit-monster-trail +$0.02 (+0.77%)
+**PnL:** +$0.06 last hour (50% WR) | 24h 39T 18W +$0.17 (46.2% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal 3+T this hour; pump-chain- 0T this hour (24h 6T 0W −$0.36 remains standing watch item; hourly kill rule can't catch at observed 1-2T/hr rate)
+- atr_sl_hit 12/39 = 30.8% (well under 40 threshold; tpsl_utils fix deployed; ratio improved from 31.4%)
+- No 3-neg-hour streak (alternating: 12:00 −$0.14, 13:00 +$0.06)
+- Overtrade 4/hr (under 20); live_trading=true, kill JSON=true
+- Entry quality: both winners trailed via profit-monster-trail; BIGTIME loser only −0.08% (trail_arm_timeout, negligible); ETC atr_sl −1.69% normal SL churn
+
+**Open Questions:**
+- pump-chain- 24h 6T 0W −$0.36 (0% WR) — standing CEO suggestion for 24h-based kill threshold (0% WR with 6+ trades)
+- hard_max_loss 4 exits −$0.48 24h — standing CEO hold, momentum-gate backtest due Oct 17
