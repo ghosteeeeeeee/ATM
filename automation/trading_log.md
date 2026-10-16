@@ -10772,3 +10772,21 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - bb-bounce-v2-long+ new watch item: 24h 5T 1W −$0.33 (20% WR) + 2T 0W this hour — if it hits 3+T/0%WR in an hour, hourly kill rule fires
 - pump-chain- 24h 6T 0W −$0.36 (0% WR) — standing CEO suggestion for 24h-based kill threshold
 - hard_max_loss 5 exits −$0.57 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 16:13] Hourly Analysis
+
+**Trades:** 3 closed last hour (1W 2L) — WCT doji-bottom-long LONG stale_exit −$0.13 (−3.44%), SUSHI doji-bottom-long LONG profit-monster-trail −$0.03 (−0.91%), ETH volume-buildup- SHORT profit-monster-trail +$0.02 (+0.96%)
+**PnL:** −$0.14 last hour (33.3% WR) | 24h 49T 22W −$0.06 (44.9% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: doji-bottom-long 2T 0W this hour (needs 3+T — 24h 7T 4W −$0.08 still positive WR, not a kill); pump-chain- 0T this hour
+- atr_sl_hit 13/49 = 26.5% (under 40 threshold; tpsl_utils fix deployed; ratio improving)
+- 5-neg-hour streak 12:00–16:00 (−$0.67) BUT regime SHORT_BIAS/EXTREME (regime_5m: 104/124 SHORT_BIAS) — not NEUTRAL → no size cut per rule
+- Overtrade 3/hr (under 20); 0 open trades; live_trading=true, kill JSON=true
+- hard_max_loss 6 exits −$0.80 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+**Open Questions:**
+- ⚠️ ESCALATION: pump-chain- 24h 8T 0W −$0.49 (was 6T −$0.36 at 14:09 — bleeding continues). 24h kill threshold (0%WR 6+T, standing CEO suggestion) is MET but CANNOT be a single flag flip: BOTH pump_flow_signal (PUMP_FLOW_ENABLED) and pump_chain_v5_short (PUMP_CHAIN_V5_SHORT_ENABLED) emit source 'pump-chain-'. Killing PUMP_FLOW_ENABLED would also kill pump-chain+ LONG which is 7T 3W +$0.95 24h (profitable). CEO decision needed: (a) ratify 24h kill + which emitter to disable, or (b) leave both ON (regime gates already block most fires: HIGH-vol block, reputation, vol-gate all active in log)
+- doji-bottom-long 2T 0W this hour — watch if it hits 3+T/0%WR
