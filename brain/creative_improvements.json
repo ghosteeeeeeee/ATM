@@ -4885,5 +4885,23 @@
     "category": "exit engineering",
     "status": "suggested",
     "risk": "medium — needs candle-level pnl-at-T backtest (aggregate columns insufficient); dead_money lesson: guard slow-grind winners"
+  },
+  {
+    "date": "2026-10-16T20:30:00Z",
+    "idea": "Market-phase mean-reversion dampen: volume_regime=LOW AND market_phase=DECLINING -> dampen mean-reversion LONG family (doji/bb-bounce/oversold-bounce) to 0.5x confidence",
+    "rationale": "Bleed is bottom-fishing in no-volume DECLINING market. doji HIGH flipped 71.4pct->33.3pct exactly when market_phase went DECLINING. Cross-signal regime dampen does not exist (vol_gate is per-signal).",
+    "expected_impact": "Would have reduced doji HIGH 9T -$0.59 by ~half (dampen not kill). bb-bounce-v2 EXTREME similar.",
+    "category": "entry sniper / regime",
+    "status": "suggested - needs backtest post-soak, shadow-first per CEO D2",
+    "risk": "medium - cross-signal architecture"
+  },
+  {
+    "date": "2026-10-16T20:30:00Z",
+    "idea": "Progressive exit ladder for doji+bb-bounce-v2 (momentum-gate verdict designated lever) - STILL NOT COMMISSIONED",
+    "rationale": "Momentum-gate verdict 14:42 today: exit-magnitude is THE bleed (hard_max_loss 62T -$5.82/7d riding to -3pct acct). Lever = early no-progress cut T=45m with HR-kill guard. Scoped: doji 8/13 chop >45m -$0.42, bb-bounce-v2 9/15 chop >45m -$0.64.",
+    "expected_impact": "Target 30-50pct hard_max_loss magnitude reduction on covered signals",
+    "category": "exit engine",
+    "status": "COMMISSION self_learner - overdue",
+    "risk": "high if no HR-kill guard (dead_money lesson: 6/13 HRs killed by naive time exits)"
   }
 ]

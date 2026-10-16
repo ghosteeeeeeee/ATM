@@ -1419,5 +1419,16 @@
     "after": "PUMP_CHAIN_SHORT_DEAD_GAP_BLOCK_ENABLED=True, MIN=-0.5, MAX=0.2. Blocks 6W +$0.58, 21L -$2.08, net +$1.50/30d. Kept: gap>=0.2 (45.2%WR +$0.92) and gap<-0.5 (43.6%WR).",
     "rationale": "Watchdog flagged pump-chain- 4-loss streak (INJ/GRASS/CRV/IO) — all mid-band shorts squeezed by bounces. Watchdog suggested RSI_MIN 45→50 but band data REJECTS that (45-50 is best PnL cell +$0.71/14d; 50-55 is 0%WR). The actual death band is gap -0.5..0.2: pump already faded, price near/below EMA = shorting aftermath = bounce magnet. Verified 14d+30d, exit reasons confirm chop profile, kills 0% of kept-cohort winners above threshold.",
     "impact": "Expected: stop pump-chain- bleed in faded-pump entries; ~+$1.50/30d net. Mirror of existing PUMP_CHAIN_LONG_MAX_ENTRY_GAP chase-up block."
+  },
+  {
+    "timestamp": "2026-10-16T20:30:00Z",
+    "agent": "brain_auditor",
+    "change": "RE-KILL doji-bottom-long (DOJI_BOTTOM_ENABLED True->False) - pre-committed Oct-14 re-enable trigger fired: non-EXTREME 11T 45.5pctWR -$0.51 (n>=10), HIGH regime degraded 71.4pct->33.3pct, 5-loss streak, watchdog steer-003",
+    "type": "kill",
+    "file": "hermes_constants.py",
+    "before": "True (re-enabled 2026-10-14)",
+    "after": "False",
+    "rationale": "Re-kill trigger committed at re-enable: re-kill via DOJI_BOTTOM_ENABLED=False if non-EXTREME cohort flips negative n>=10. Cohort 11T -$0.51 since Oct 14. HIGH 9T -$0.59 (was 71.4pct WR historically, regime flipped). NORMAL only 2T +$0.08, too thin. Not a new filter, executing pre-committed revert. Not CEO_PROTECTED.",
+    "impact": "Blocks ~2-3 doji trades/day currently bleeding ~$0.21/day avg. Avoids further HIGH-regime chop losses. 5 winners +$0.20 since Oct 14 also blocked, acceptable at 45.5pct WR net-negative."
   }
 ]

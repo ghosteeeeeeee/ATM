@@ -1,89 +1,108 @@
 {
-  "timestamp": "2026-10-16T17:47:10Z",
-  "session_brain_stats": {
-    "queries": 4,
-    "note": "no new insights overriding live state; prior decisions still in force"
-  },
+  "timestamp": "2026-10-16T20:30:00Z",
+  "agent": "brain_auditor",
+  "run_type": "captain_audit",
+  "session_lock": false,
   "trade_summary_24h": {
-    "trades": 50,
-    "wr": 44.0,
-    "pnl": -0.56,
-    "top_losers": "pump-chain- SHORT 8T 0% -0.49; doji-bottom 9T 55.6% -0.30; bb-bounce-v2 6T 33.3% -0.27",
-    "7d": "226T 36.7% -1.79",
-    "30d": "781T 43.9% -4.31",
-    "trail_vs_chop_7d": "trail 80T 90% +7.97 vs chop 130T 1.5% -10.56"
+    "trades": 51,
+    "wr": 41.2,
+    "pnl": -1.11,
+    "open": 1,
+    "portfolio_health": "critical"
   },
-  "momentum_gate_verdict": {
-    "status": "FAIL — do NOT ship",
-    "file": "brain/verdicts/2026-10-16_momentum-gate-backtest.md",
-    "why": "pre-entry |mom5| does not separate trail vs chop (delta +0.007pp); winner-block 46.3%; non-monotonic sweep",
-    "reframe": "chop bleed is EXIT-MAGNITUDE (losers ride to -3% acct), not entry momentum",
-    "closed_item": "Oct 17 self_learner momentum-gate deadline CLOSED early (delivered Oct 16 14:42)"
+  "trade_summary_7d": {
+    "trades": 227,
+    "wr": 36.1,
+    "pnl": -2.09
   },
-  "last_run_changes_verified": [
+  "trade_summary_30d": {
+    "trades": 785,
+    "wr": 43.6,
+    "pnl": -4.84
+  },
+  "exit_signature_24h": {
+    "chop_kills": "atr_sl_hit 15T −$1.30 (0%WR) + hard_max_loss 7T −$0.87 (0%WR) = 22T −$2.17",
+    "trail_exits": "profit-monster-trail 14T +$0.54 (92.9%) + atr_trail_hit 5T +$0.77 (100%) = 19T +$1.31",
+    "verdict": "chop-to-trend ratio 22:19, same disease as 7d (114 chop vs 75 trail). Entry-side filters exhausted per momentum-gate verdict. Bleed is EXIT-MAGNITUDE."
+  },
+  "losing_trade_autopsy": [
     {
-      "change": "SHORT midband 45-55 block (00:43)",
-      "status": "FIRING — 3 blocks (HYPER x2, STX); 0 in-band violations post-land"
+      "cluster": "doji-bottom-long 5-loss streak (watchdog steer-003)",
+      "trades": "ZEN −5.08% RSI 29.5, CRV −4.39% RSI 39.8, YGG −3.22% RSI 48.8, WCT −3.44% RSI 27.8, MET −2.58% RSI 47.6 — ALL HIGH regime, atr_sl_hit/hard_max_loss/stale_exit",
+      "root_cause": "HIGH regime flipped from 71.4% WR (historical re-enable basis) to 33.3% (9T since Oct 14). Market phase DECLINING + volume LOW = doji bottoms don't reverse. Oversold traps (ZEN/WCT RSI<35) bounced nowhere.",
+      "action": "KILLED DOJI_BOTTOM_ENABLED per pre-committed re-kill trigger (non-EXTREME 11T −$0.51 n≥10). Not a new filter — executing committed revert.",
+      "impact_on_winners": "5 winners +$0.20 since Oct 14 also blocked. Acceptable: net-negative cohort (45.5% WR, −$0.51)."
     },
     {
-      "change": "pump-chain- dead-gap band [-0.5,0.2) (13:30)",
-      "status": "FIRING — INJ blocked 14:01 (gap -0.48); DOT 14:04 gap 0.54 correctly passed"
+      "cluster": "pump-chain- SHORT EXTREME 8L/9T −$0.47 (24h)",
+      "trades": "FIL/DOT/INJ/GRASS/CRV/IO/APT/DOT all EXTREME, RSI 42-56, atr_sl_hit/hard_max_loss. Shorting into bounce fuel.",
+      "root_cause": "EXTREME regime SHORT_BIAS chop — SHORTs fire on pumps that revert. Floors (RSI≥45) pass but entries still bleed.",
+      "action": "signal_reporter landed EXTREME 0.0 vol_gate block at 14:44 UTC today (both hyphen+underscore keys). Post-dates all 24h losses. SOAKING — 0 pump-chain- trades since. Verify firing next run.",
+      "impact_on_winners": "7d EXTREME pump-chain- 35T −$0.24 25.7%WR. NORMAL 2T −$0.05. HIGH blocked since Oct 7. Kill loses few winners."
     },
     {
-      "change": "volume-breakout-short- kill (Oct 15 17:35)",
-      "status": "HOLDING — 0 trades post-kill"
-    },
-    {
-      "change": "hmacd_mtf-+ kill (Oct 15 18:30)",
-      "status": "HOLDING — 0 trades post-kill"
-    },
-    {
-      "change": "FLOOR-ADMIT shadow (Oct 15 23:44)",
-      "status": "COLLECTING — 349 events, latest today 17:35"
-    },
-    {
-      "change": "trade_watchdog direction-lowercase bugfix (Oct 15)",
-      "status": "WORKING — steers rendering"
+      "cluster": "BTC manual 10x scalps (ai-trader-manual)",
+      "trades": "5 closes today −$0.38 net, 1 open #16251 LONG 10x +0.19%. Last 2 10x losses −4.33%/−4.83%.",
+      "root_cause": "BTC ranging 80900-81700, stop-hunting both directions. 10x leverage in LOW-vol chop = each round-trip costs 3-4% margin.",
+      "action": "Cannot config-block manual. Watchdog recommends breakeven stop on #16251 — CEO/T action. Flagged.",
+      "impact_on_winners": "N/A manual"
     }
   ],
-  "doji_rsi_floor_analysis": {
-    "candidate": "doji-bottom-long RSI_MIN=35",
-    "verdict": "REJECT",
-    "why": "30d band<35: 10T 40% -0.47 would save +0.47 but kills 4 winners +0.22 (22% winner-kill > 20% bar); Welch t=-1.47 p=0.156 fails significance",
-    "action": "monitor only"
+  "drift_findings": [
+    {
+      "item": "doji-bottom re-enable trigger (Oct 14) — EXECUTED",
+      "detail": "Committed trigger: re-kill if non-EXTREME n≥10 negative. Cohort 11T −$0.51. KILLED this run."
+    },
+    {
+      "item": "pump-chain- EXTREME vol_gate block (signal_reporter 14:44) — SOAKING",
+      "detail": "Both ('EXTREME','pump_chain-') and ('EXTREME','pump-chain-') set 0.0. 0 fires since landing. Verify at next pump-chain- signal."
+    },
+    {
+      "item": "SHORT midband 45-55 (landed 00:43) — NOT blocking pump-chain- (by design)",
+      "detail": "Midband is non-pump-chain only. pump-chain- has own RSI floor 45. CRV@48.2/IO@48.5 fired pre-EXTREME-block. Soak continues."
+    },
+    {
+      "item": "pump-chain- dead-gap [−0.5,0.2) (landed 13:30) — partial coverage",
+      "detail": "INJ blocked 14:01 per last run. FIL/DOT fired 14:19-14:28 (gap≥0.2 passed correctly). EXTREME 0.0 block is the backstop."
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "change": "DOJI_BOTTOM_ENABLED True→False",
+      "file": "hermes_constants.py:4385",
+      "type": "kill (pre-committed trigger)",
+      "rationale": "non-EXTREME 11T −$0.51 since Oct-14 re-enable, n≥10 trigger met. HIGH degraded 71.4%→33.3%."
+    }
+  ],
+  "changes_from_last_run": {
+    "run_17_45": "0 config changes, momentum-gate verdict FAIL, all fixes firing",
+    "verified_now": "SHORT midband firing (3 blocks last run), dead-gap firing (INJ), FLOOR-ADMIT shadow collecting (349), doji RSI_MIN=35 reject held up (14d <35 band still 4T −$0.45, 22% winner-kill)"
   },
-  "drift_findings": [],
-  "recurring_problems": [
-    {
-      "problem": "chop-family exits 130T -10.56/7d (hard_max_loss 60T -5.67, atr_sl_hit 53T -4.12)",
-      "status": "root clarified: exit-magnitude; entry-side filters exhausted; next lever = progressive exit ladder"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "item": "progressive exit ladder / early no-progress cut with HR-kill guard",
-      "source": "momentum-gate verdict conclusion #3",
-      "status": "next backtest to commission — self_learner, candle-level pnl-at-T, OOS, winner-block<20%"
-    }
-  ],
   "creative_improvements": [
     {
-      "date": "2026-10-16T17:47:10Z",
-      "idea": "Extend trail_arm_timeout (existing ratified mechanism) to doji-bottom-long + bb-bounce-v2-long+ at T=45m with HR-kill guard",
-      "rationale": "Momentum-gate verdict: chop bleed is exit-magnitude. Timeout mechanism already proven on pump-chain (8T 30d, avg -0.50% vs HML -3.3%). Scoped data: doji 8/13 chop trades held >45m (-0.42) with only 2 never-armed winners at risk; bb-bounce-v2 9/15 chop >45m (-0.64) with 1 at-risk winner. Both are top LONG chop bleeders (watchdog steers 002/003).",
-      "expected_impact": "convert ~50-60% of doji/bb-bounce chop exits from -3% acct to ~-0.5%: est +$0.60-0.90/30d without touching trail winners (they arm before T)",
-      "category": "exit engineering",
-      "status": "suggested",
-      "risk": "medium — needs candle-level pnl-at-T backtest (aggregate columns insufficient); dead_money lesson: guard slow-grind winners"
+      "date": "2026-10-16T20:30:00Z",
+      "idea": "Market-phase mean-reversion dampen: when volume_regime=LOW AND market_phase=DECLINING, dampen mean-reversion LONG family (doji/bb-bounce/oversold-bounce) to 0.5x confidence",
+      "rationale": "Today's bleed is bottom-fishing in a no-volume DECLINING market. doji HIGH flipped 71.4%→33.3% exactly when market_phase went DECLINING. bb-bounce-v2 EXTREME 10T −$0.37 same pattern. Cross-signal regime dampen doesn't exist — vol_gate is per-signal.",
+      "expected_impact": "Would have reduced doji HIGH 9T −$0.59 by ~half (dampen, not kill). bb-bounce-v2 EXTREME similar.",
+      "category": "entry sniper / regime",
+      "status": "suggested — needs backtest (post-soak, not now)",
+      "risk": "medium — cross-signal architecture, needs shadow-first per CEO D2"
+    },
+    {
+      "date": "2026-10-16T20:30:00Z",
+      "idea": "Progressive exit ladder for doji+bb-bounce-v2 (momentum-gate verdict designated lever) — STILL NOT COMMISSIONED",
+      "rationale": "Momentum-gate verdict (14:42 today) concluded #3: exit-magnitude is THE bleed (hard_max_loss 62T −$5.82/7d riding to −3% acct). Lever = early no-progress cut at T=45m with HR-kill guard. Scoped teaser: doji 8/13 chop >45m −$0.42, bb-bounce-v2 9/15 chop >45m −$0.64.",
+      "expected_impact": "Target ~30-50% of hard_max_loss magnitude reduction on covered signals",
+      "category": "exit engine",
+      "status": "COMMISSION self_learner — overdue (verdict delivered 14:42, not yet commissioned)",
+      "risk": "high if no HR-kill guard (dead_money lesson: 6/13 home runs killed by naive time exits)"
     }
   ],
-  "config_changes_applied": [],
-  "changes_from_last_run": "all 6 verified — 2 new filters firing, 2 kills holding, shadow collecting, watchdog fixed",
   "next_actions": [
-    "Commission progressive exit ladder backtest (self_learner): doji + bb-bounce-v2, T=45m, candle-level, HR-kill guard, OOS 7/14/30d",
-    "Keep all entry filters in soak (CHASE_RATIO to Oct 27, dead-gap 24h+, midband 24h+, FLOOR-ADMIT shadow)",
-    "Monitor: 7d PnL trajectory (-1.79), pump-chain- kept-cohort gap>=0.2 (24h 5T 0% -0.36 vs 30d +0.92 — variance check)",
-    "Monitor: doji RSI<35 band (re-test at n>=15)",
-    "HOLD open BTC SHORT manual — regime-aligned (BEAR continuum below EMA300)"
+    "Verify pump-chain- EXTREME 0.0 block fires on next signal (landed 14:44, 0 fires since)",
+    "Commission progressive exit ladder backtest (self_learner) — designated lever from momentum-gate verdict, STILL NOT COMMISSIONED as of this run",
+    "Soak check next run: dead-gap 24h, midband 24h, EXTREME pump-chain- block, doji kill (0 fires expected)",
+    "CEO: BTC manual #16251 breakeven stop recommendation (watchdog)",
+    "Monitor 7d PnL trajectory — −$2.09 and worsening; vacation guardrail ESCALATE active (48h WR 36.9%)"
   ]
 }

@@ -1,49 +1,53 @@
-# Current State — brain_auditor Captain Run Oct 16 17:45 UTC
+# Current State — brain_auditor Captain Run Oct 16 20:30 UTC
 
-**Last Updated: 2026-10-16 17:45 UTC**
-**Updated by: brain_auditor — momentum-gate verdict FAIL (do not ship); all last-run fixes verified firing; 0 new filters (soak)**
+**Last Updated: 2026-10-16 20:30 UTC**
+**Updated by: brain_auditor — doji-bottom KILLED (pre-committed trigger); progressive exit ladder backtest still uncommissioned**
 
-## PIPELINE STATUS (17:08 UTC)
+## PIPELINE STATUS (20:08 UTC)
 
-- **24h: 50T 44.0% WR −$0.56** | 1 open BTC SHORT ai-trader-manual +0.43% (regime-aligned, CONTINUUM BELOW EMA300 271 bars) | 7d 226T 36.7% −$1.79 | 30d 781T 43.9% −$4.31
-- Health: OK | Disk 79% | Kill switch LIVE=true | Regime SHORT_BIAS 15m / LONG_BIAS 4h, trend_quality STRONG_DOWN | portfolio_health=warning
-- Trail vs chop 7d: **trail 80T 90% +$7.97 vs chop 130T 1.5% −$10.56** (chop sources: pump-chain− 25T, pump-chain+ 20T, bb-bounce-v2 10T, ai-trader+ 10T, doji 8T)
+- **24h: 51T 41.2% WR −$1.11** | 1 open BTC LONG #16251 ai-trader-manual 10x +0.19% (watchdog: breakeven stop rec — CEO/T action) | 7d 227T 36.1% −$2.09 (worsening from −$1.79 at 17:45) | 30d 785T 43.6% −$4.84
+- Health: **CRITICAL** | Disk 79% | Kill switch LIVE=true | Regime BTC 15m LONG_BIAS / 4h SHORT_BIAS, continuum AT (reclaiming EMA300), volatility LOW, market_phase DECLINING, volume_regime LOW (ratio 0.19)
+- **Vacation guardrail ESCALATE active:** 48h WR 36.9% < 40.0% with 65 trades
+- Exit signature 24h: **chop-kill 22T −$2.17 (0%WR) vs trail 19T +$1.31 (95%WR)** — same disease as 7d (114 chop −$9.92 vs 75 trail +$7.34). Entry-side exhausted; bleed is EXIT-MAGNITUDE.
 
-## DONE TODAY (Oct 16)
+## DONE THIS RUN (Oct 16 20:30)
 
-- **MOMENTUM-GATE BACKTEST VERDICT: FAIL — do NOT ship** (`brain/verdicts/2026-10-16_momentum-gate-backtest.md`, delivered 14:42, 1 day early). Pre-entry |mom5| does NOT separate trail vs chop (delta +0.007pp, winner-block 46.3%, non-monotonic sweep). **Reframe: chop bleed is EXIT-MAGNITUDE (losers ride to −3% acct), not entry momentum.** Oct 17 self_learner deadline CLOSED.
-- **All last-run fixes verified FIRING:** SHORT midband 45-55 (3 blocks: HYPER/STX, 0 violations), pump-chain− dead-gap [−0.5,0.2) (INJ blocked 14:01; DOT gap 0.54 correctly passed), volume-breakout-short− + hmacd_mtf− kills holding (0 trades), FLOOR-ADMIT shadow 349 events collecting.
-- **doji RSI_MIN=35 REJECTED:** 30d band<35 saves +$0.47 but kills 4 winners +$0.22 (22% winner-kill >20% bar), Welch p=0.156. Monitor only.
-- 0 config changes this run (soak: dead-gap 4h old, midband 17h old, CHASE_RATIO to Oct 27).
+- **KILL: DOJI_BOTTOM_ENABLED True→False** (hermes_constants.py:4385) — pre-committed Oct-14 re-enable trigger FIRED: non-EXTREME cohort since re-enable = **11T 45.5%WR −$0.51** (n≥10, negative). HIGH flipped from 71.4% historical WR to 33.3% (9T −$0.59). NORMAL only 2T +$0.08, too thin. 5-loss streak today (ZEN RSI 29.5 / WCT 27.8 oversold traps). Watchdog steer-003. Reversible via fresh backtest + CEO.
+- **Verified:** signal_reporter's pump-chain- EXTREME 0.0 vol_gate block landed 14:44 (both hyphen+underscore keys) — 0 fires since, soaking correctly. Midband (non-pump-chain by design) and dead-gap firing per last run.
+- **Creative logged:** market-phase mean-reversion dampen (LOW vol + DECLINING → 0.5x doji/bb-bounce/oversold family) — needs backtest post-soak.
 
 ## ⚠️ OPEN (CEO-owned)
 
-1. 🟡 **7d WR/PnL** — 36.7% / −$1.79 (worsening from −$1.08 at 05:46). No filter stacking; entry-side exhausted per momentum-gate verdict.
-2. 🟡 **Progressive exit ladder backtest** — NEXT LEVER (momentum-gate verdict conclusion #3). Commission self_learner: doji-bottom + bb-bounce-v2, T=45m trail-arm-timeout extension, candle-level pnl-at-T, HR-kill guard (dead_money lesson), OOS 7/14/30d. Scoped teaser: doji 8/13 chop >45m −$0.42 (2 at-risk winners); bb-bounce-v2 9/15 chop >45m −$0.64 (1 at-risk).
-3. 🟡 **wyckoff COOLDOWN_BARS mismatch** — CEO call (formula 0.5h vs comment 2.5h).
-4. 🟡 **wyckoff GO** — pairing premise failed (vol/rs co-occurs 4%/0%); recommend KEEP shadow.
-5. 🟡 **7d WR retarget** — Oct 15 checkpoint missed; still ESCALATE.
+1. 🔴 **Progressive exit ladder backtest — STILL NOT COMMISSIONED.** Momentum-gate verdict (14:42 today) designated this as THE lever (exit-magnitude, hard_max_loss 62T −$5.82/7d riding to −3% acct). Scoped: doji+bb-bounce-v2, T=45m, HR-kill guard mandatory (dead_money lesson). **Commission self_learner — overdue.**
+2. 🔴 **7d WR/PnL** — 36.1% / −$2.09, worsening. Vacation guardrail ESCALATE. Entry-side exhausted; exit-ladder is the only untried lever.
+3. 🟡 **BTC manual #16251** — 7th 10x scalp in bleeding series. Watchdog: breakeven stop at 81507. CEO/T decision.
+4. 🟡 **wyckoff COOLDOWN_BARS mismatch** — CEO call (formula 0.5h vs comment 2.5h).
+5. 🟡 **wyckoff GO** — pairing premise failed; recommend KEEP shadow.
 
-## WATCHLIST
+## WATCHLIST (soak — do NOT stack new entry filters)
 
-- pump-chain− kept-cohort (gap≥0.2): 24h 5T 0% −$0.36 vs 30d +$0.92 — variance check, do NOT widen dead-gap band (one-variable)
-- doji RSI<35 band — re-test at n≥15 (currently n=10/30d)
-- volume-buildup− SHORT: 87.5% WR 14d, +$0.02×2 today — healthy
-- CHASE_RATIO_SHADOW soak to Oct 27 (48h data: 28 fires 0 winners, directional only)
-- EXTREME regime 7d: 123T 27.6% −$0.97 — largest regime bleed; existing EXTREME blocks in soak
+- pump-chain- EXTREME 0.0 block (signal_reporter 14:44) — verify fires on next signal
+- pump-chain- dead-gap [−0.5,0.2) — 24h checkpoint next run
+- SHORT midband 45-55 — 24h checkpoint next run
+- CHASE_RATIO_SHADOW — soak to Oct 27
+- bb-bounce-v2-long+ — 7d 20T 40% −$0.41, no clean regime split, monitor (doji kill may reduce correlated bottom-fishing)
+- volume-buildup− SHORT: 7d 7T +$0.51 — healthy, lean into
+- pump-chain+ : 7d 10T 100% WR +$2.28 — #1 money maker, leave alone
+- FLOOR-ADMIT shadow collecting (349 events)
 
 ## KEY DATES
 
 | Date | Item |
 |------|------|
+| Oct 17 | dead-gap 24h soak check |
 | Oct 22 | bb-squeeze trail-arm extended-soak checkpoint |
 | Oct 27 | CHASE_RATIO_SHADOW review (14d, CEO D2) |
 | Nov 6 | Gate re-audit window opens (D2) |
 
 ## NEXT ACTIONS (next run ~Oct 17 06:40)
 
-1. Commission/track progressive exit ladder backtest (self_learner) — the momentum-gate verdict's designated lever
-2. Soak check: dead-gap 24h, midband 24h block efficacy
-3. Monitor 7d PnL trajectory (protect ≥ −$2 through aging)
-4. Wyckoff CEO GO — implement per decision
-5. HOLD BTC SHORT manual while CONTINUUM BELOW EMA300
+1. **Commission progressive exit ladder backtest (self_learner)** — highest-priority overdue item
+2. Verify pump-chain- EXTREME block fires (0 signals since 14:44 landing)
+3. Verify doji kill holds (0 fires expected)
+4. Soak checks: dead-gap 24h, midband 24h
+5. Monitor 7d PnL trajectory through aging

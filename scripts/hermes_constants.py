@@ -4382,7 +4382,7 @@ OVERSOLD_BOUNCE_CONF_BONUS_BB       = 3       # confidence bonus for deep lower 
 DOJI_TOP_ENABLED              = True    # master kill-switch
 DOJI_TOP_PLUS_ENABLED         = True    # LONG direction (not used — doji_top is SHORT-only)
 DOJI_TOP_MINUS_ENABLED        = True    # SHORT direction (exit LONG, enter SHORT)
-DOJI_BOTTOM_ENABLED           = True    # RE-ENABLED 2026-10-14 brain_auditor — blanket Oct-13 kill was over-broad. EXTREME already 0.0 (removed from EXTREME list 2026-10-13: 3T 0%WR −$0.25 falling-knife). non-EXTREME 14d: HIGH 7T 57.1% +$0.01, NORMAL 3T 66.7% +$0.12 = 10T 60% +$0.13. Re-kill via DOJI_BOTTOM_ENABLED=False if non-EXTREME cohort flips negative (n≥10).
+DOJI_BOTTOM_ENABLED           = False   # RE-KILLED 2026-10-16 brain_auditor — pre-committed trigger fired: non-EXTREME cohort since Oct-14 re-enable = 11T 45.5%WR −$0.51 (n≥10, negative). HIGH 9T 33.3% −$0.59 (historical 71.4% win regime degraded), NORMAL 2T +$0.08 too thin to carry. 24h 11T 4W −$0.51 incl 5-loss streak (ZEN RSI 29.5 / WCT 27.8 oversold traps). Watchdog steer-003. Re-enable only with fresh backtest + CEO approval (HIGH-block variant if NORMAL shows durable edge).
 DOJI_BODY_MAX_PCT             = 15      # max body % for doji classification (relaxed from 10%)
 DOJI_ADVANCE_MIN_PCT          = 0.5     # min % advance before doji (prior move must be meaningful)
 DOJI_DECLINE_MIN_PCT          = 0.5     # min % decline for bottom signal (doji_bottom)

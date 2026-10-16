@@ -1,21 +1,29 @@
 {
-  "timestamp": "2026-10-16T17:38:19.419582+00:00",
+  "timestamp": "2026-10-16T20:38:20.858827+00:00",
   "steers": [
     {
-      "severity": "warning",
+      "severity": "urgent",
       "category": "health",
-      "title": "7 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "title": "Losing streak: 13/20 recent trades lost",
+      "detail": "Win rate 25% over last 20 trades. Total PnL: -1.14 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'doji-bottom-long' losing streak: 3 losses",
-      "detail": "Net -0.22 USDT over last 20 trades (losses: -0.40). Consider disabling or tuning this signal.",
+      "title": "11 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'doji-bottom-long' losing streak: 5 losses",
+      "detail": "Net -0.52 USDT over last 20 trades (losses: -0.61). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -23,27 +31,27 @@
       "title": "Signal 'bb-bounce-v2-long+' losing streak: 3 losses",
       "detail": "Net -0.18 USDT over last 20 trades (losses: -0.24). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-004"
     }
   ],
-  "portfolio_health": "warning",
+  "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
-    "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
+    "btc_15m": "LONG_BIAS",
+    "btc_4h": "SHORT_BIAS",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
-    "velocity_state": "RISING",
-    "acceleration_state": "POSITIVE",
+    "zscore_tier": "POS",
+    "velocity_state": "SLOW",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 1.0,
-    "wyckoff_phase": "MARKDOWN",
+    "linreg_alignment": 0.75,
+    "wyckoff_phase": "UNKNOWN",
     "market_phase": "DECLINING",
-    "trend_quality": "UP"
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 1,
-  "deep_analysis": "1 open trade: BTC SHORT (ai-trader-manual) entry 81502, current 81221, +0.43%, 0.5h old. Thesis fully intact \u2014 continuum BELOW EMA300 (81863) for 271 consecutive 1m bars, trend_quality STRONG_DOWN, zscore -1.92, 15m scanner SHORT_BIAS. SL 81900 sits just under EMA300 (good structural stop), TP 81100 was 0.15% away at watchdog time but BTC is bouncing on 1m (velocity flipping positive) \u2014 if TP misses and price reclaims 81500, tighten to breakeven rather than give back the full +0.43%.\n\nThe 20-close tape splits cleanly: SHORT continuation paid (volume-buildup- 2/2 on ETH+POL, +0.04), LONG flush-reversals paid when taken at RSI 43-56 (doji-bottom XPL +0.09, DOGE +0.06, GMT +0.02, ONDO +0.01), and everything else lost \u2014 bb-bounce fresh LONGs fired mid-dump during BEAR continuum (APT/ALT/ETC, -0.24 combined), pump-chain- SHORTs fired AFTER the flush completed at RSI 42-43 (FIL/DOT, -0.13 combined), and WCT doji-bottom at RSI 27.78 was the classic falling-knife mirror (-0.13). YGG doji-bottom at RSI 48.78 was the one genuine wrong-side loss (-0.24, -3.2%) \u2014 center-band RSI but the flush-reversal never came, so the LONG thesis died with the trend. NET lesson: entries were late, not wrong-direction. The signal families are right; the losers arrive after the move has already paid. Nothing to disable \u2014 this is timing, not broken signals.\n\nAI Trader fires PUMP SHORT: mid-air between weak supports, BEAR+ichimoku_short conf 75 on tracker, RSI 40.1 clear of the 35 hard floor, best R:R geometry of the three precheck-passing candidates. LINK/SEI both failed the 'would I open this fresh today' test \u2014 both sitting ON str-3 support with tight SL geometry (bounce traps). DOT blocked LOSERS_SHORT. Squeeze risk exists (26:4 short-biased alt tape) but trend hasn't flipped; SHORT remains the correct side until continuum reclaims EMA300.",
-  "agent_timestamp": "2026-10-16T17:15:49.116051+00:00",
-  "regime_context": "BTC: BELOW EMA300 (81863) for 271 1m bars, gap -0.78%, zscore -1.92 STRONG_NEG, linreg LEAN_BEAR on 1m/5m/15m/1h (alignment 0.75), velocity SLOW, acceleration slightly positive on last tick (bounce attempt), volume NORMAL 0.72x, wyckoff DISTRIBUTION->ACCUMULATION mixed, trend_quality STRONG_DOWN, market_phase RECOVERY. 15m scanner SHORT_BIAS, 4h scanner LONG_BIAS, continuum BELOW. Alt 5m aggregate: 26 SHORT_BIAS / 4 LONG / 90 neutral.\n\nImplication: we are on the correct side with the BTC SHORT. Do not fade the continuum \u2014 LONGs require flush-reversal confirmation at RSI 45-60, not fresh knife-catches. SHORTs require entry BEFORE the flush (RSI 45-55 center band), not after FIL/DOT-style post-dump chase. The one-sided 26:4 short tape means squeeze risk is elevated \u2014 new shorts need tighter invalidation, and any BTC reclaim of EMA300 (81863) flips the whole book.",
-  "pattern_alerts": "VERIFIED (PostgreSQL + watchdog recent_closed, meta_rsi from _signal_metadata, last 20 closes):\n\n1) PUMP-CHAIN- SHORTS ENTERED POST-FLUSH (RSI 42-43) \u2014 n=2, 0 wins, net -0.13: FIL -0.05 (RSI 42.15), DOT -0.08 (RSI 43.48). Winning side: the LONG bounce that followed \u2014 doji-bottom caught DOGE/XPL/GMT/ONDO in the same window. Why we weren't on it: pump-chain- fired the short after the dump was complete, i.e., the signal arrived when the winning move was already 80% done. PUMP_CHAIN_SHORT_RSI_MIN=45 exists to block exactly this band; these got through on fire-time drift. Same bug class as the v2 filter drift. Steer: pre-fire guard requiring RSI>=45 at EXECUTION time for pump-chain- (audit-only 24h before enforce) \u2014 already flagged last cycle, no enforcement yet.\n\n2) BB-BOUNCE/FRESH LONGS DURING BEAR CONTINUUM \u2014 n=4 (APT -0.09 RSI 53.7, ALT -0.11 RSI 55.6, ETC -0.04 RSI 50.0, WCT doji RSI 27.78 -0.13), 1 win, net -0.37. Winning side: SHORT continuation the continuum was already signaling (volume-buildup- ETH/POL won same window). WCT at RSI 27.78 is the BANANA mirror \u2014 longing extreme oversold = catching the falling knife. Do NOT disable bb-bounce (brain auditor tunes params); the fix is holding fresh LONGs until continuum flips ABOVE EMA300. Shadow-audit candidate: block doji-bottom LONG below RSI 35 (n=1, too early to enforce).\n\n3) YGG DOJI-BOTTOM AT RSI 48.78 \u2014 n=1, -0.24 (-3.2%), the single biggest wrong-side loss this session. Center-band RSI looked fine; the flush-reversal simply never came because the 15m trend was already SHORT_BIAS. Winning side: staying flat or SHORT. This is the only true 'wrong direction' loss in the 20; the rest were late entries on the correct family.\n\nWINNERS to lean into: volume-buildup- SHORT continuation (2/2 this session, 87.5% WR n=8 historically); doji-bottom LONG flush-reversals ONLY at RSI 45-60 with continuum confirmation; ai-trader manual (60% WR) \u2014 the BTC short currently open is this family."
+  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (1 long, 0 short)\nUnrealized PnL: +0.00 USDT\nRegime: chop reclaiming | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent] Losing streak: 13/20 recent trades lost (25% WR, -$1.14)\n\ud83d\udfe1 [warning] 11 recent losses look like wrong-side trades\n\ud83d\udfe1 [warning] Signal 'doji-bottom-long' losing streak: 5 losses\n\ud83d\udfe1 [warning] Signal 'bb-bounce-v2-long+' losing streak: 3 losses\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nBTC reclaimed EMA300 (81524) ~35min ago after 68 bars below \u2014 the open BTC LONG #16251 is now regime-ALIGNED. But volume ratio 0.19 (LOW) means the reclaim lacks conviction. BTC ranging 80900-81700, price at range TOP (81632). This is the 7th BTC manual scalp in 48h; last 2 at 10x lost -4.33% and -4.83%. SL 81262 is 0.30% below entry \u2014 at 10x, each stop-hit costs ~3% on margin.\n\nThe bleed signature is clear: 31 chop-kill exits (atr_sl_hit + hard_max_loss, -$2.81) vs 21 trail exits (+$1.96). 52/56 hard_max_loss trades never reached +0.40% for trail to arm. We keep entering chop, not trends.\n\nOversold doji trap confirmed: RSI<35 = 0 wins / 4 trades / -$0.45. ZEN (RSI 29.5) and WCT (RSI 27.8) both bounced nowhere \u2014 MFE never exceeded +0.14% before full stop. The winning side was SHORT or no trade. pump-chain- SHORTs: 0% WR / 8 trades / -$0.49 \u2014 every single one lost. Shorting into oversold = bounce fuel.\n\nAI Trader: NO PICK. Portfolio health critical, 25% WR. Damage limitation, not new exposure.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Move BTC LONG #16251 stop to breakeven (81507) \u2014 eliminate downside on 7th scalp in a bleeding series; if range-top rejection comes, exit flat instead of -3% margin\n2. After this trade closes, pause BTC 10x scalps until volume ratio > 0.5 and BTC breaks above 81700 with confirmation\n3. doji-bottom-long at meta_rsi < 35 is a proven money-loser (0% WR) \u2014 flag for brain auditor to add RSI floor at 35\n4. pump-chain- SHORT signal: 0% WR over 8 trades \u2014 every SHORT lost. Flag for brain auditor review\n5. Lean into what wins: pump-chain+ (+$0.93/48h) and volume-buildup- (75% WR) \u2014 these are the money-makers\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
+  "agent_timestamp": "2026-10-16T20:14:28.272254+00:00",
+  "regime_context": "BTC regime: fresh reclaim of EMA300 (81524) at 20:08 UTC after 68 consecutive 1m bars below. Price 81632 > EMA300, zscore 1.68 STRONG_POS, acceleration POSITIVE (0.178), linreg LEAN_BULL across all TFs. 15m scanner: LONG_BIAS. 4h scanner: SHORT_BIAS. Continuum: AT EMA300 (reclaiming). BUT volume_regime LOW (ratio 0.19) and market_phase DECLINING \u2014 the reclaim lacks volume confirmation. Wyckoff UNKNOWN, velocity SLOW, trend_quality STRONG_UP. Mixed signal: structure turning bullish, volume not confirming yet. 27 of 124 tokens LONG_BIAS vs 6 SHORT_BIAS (regime_5m aggregate LONG_BIAS). Volatility LOW overall. BTC range 80900-81700, price at top of range \u2014 resistance ahead. Implication for open BTC LONG: regime-aligned now, but LOW volume + range-top = elevated rejection risk. Hold only with breakeven stop. New LONGs: wait for volume expansion above 81700 for confirmation. SHORTs: only on clear rejection with RSI 45-55 center-band, not into oversold.",
+  "pattern_alerts": "VERIFIED PATTERNS (PostgreSQL, meta_rsi truth source):\n\n1. doji-bottom-long OVERSOLD TRAP (meta_rsi < 35): 4 trades / 7d, 0 wins, -$0.45, avg -$0.113. ZEN (RSI 29.5, MFE only +0.14% before -5.08% stop), WCT (RSI 27.8, MFE +0.09%, -3.44%). The bounce NEVER came \u2014 price kept dumping. WINNING SIDE: SHORT or no trade. We were longing falling knives in a SHORT_BIAS chop. Only profitable doji bucket: RSI 35-45 (7T, 57% WR, +$0.23). Mid-band works, oversold extremes are money-losers.\n\n2. BTC 10x manual scalps: 6 trades / 48h, net -$0.25, WR 17%. Last 2 at 10x lost -4.33% and -4.83% (hard_max_loss/atr_sl_hit, <1.2h holds). The 2 'wins' were scratches (+0.07%, +0.09%). BTC is ranging 80900-81700 and stop-hunting both directions. WINNING SIDE: neither direction \u2014 correct trade is NO BTC SCALP at 10x in LOW-vol chop. Each round-trip costs ~3-4% on margin. The open BTC LONG (#16251) is the 7th in this series.\n\n3. pump-chain- (SHORT) total collapse: 8 trades / 48h, 0% WR, -$0.49. Every single SHORT lost. FIL (RSI 42.2, -2.29%), DOT (RSI 43.5, -3.72%) \u2014 shorting into oversold = bounce fuel. WINNING SIDE: LONG the bounce or no SHORT below RSI 45. SHORT_BIAS regime does NOT mean short everything \u2014 short the RIPS, not the dumps.\n\n4. Exit reason signature: 20 atr_sl_hit (-$1.59) + 11 hard_max_loss (-$1.22) = 31 chop-kill exits. Only 14 profit-monster-trail (+$0.54) + 7 atr_trail_hit (+$1.42) = 21 trail exits. The ratio is 31:21 chop-to-trend. 52/56 hard_max_loss trades never reached +0.40% for trail to arm. We are entering chop, not trends. This is THE bleed.\n\n5. Signal kill-list (48h, n>=2, negative PnL): pump-chain- (8T 0%WR -$0.49), doji-bottom-long (11T 45%WR -$0.51), bb-bounce-v2-long+ (7T 29%WR -$0.36), ai-trader-manual (6T 17%WR -$0.25). Winning signals to lean into: pump-chain+ (9T 44%WR +$0.93 best absolute), volume-buildup- (4T 75%WR). The system makes money on pump-chain+ momentum LONGs and volume-buildup SHORTs \u2014 not on bottom-fishing."
 }
