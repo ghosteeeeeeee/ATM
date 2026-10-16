@@ -10620,3 +10620,23 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 **Open Questions:**
 - pump-chain- 24h 3T 0W −$0.20 — 0% WR, kill only triggers on 3+T in a single hour
 - hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 07:09] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L) — GMX ai-trader+ LONG atr_sl_hit −$0.12 (MFE 0.02/MAE 0.36), WLD r2v2-long3 LONG profit-monster-trail +$0.04
+**PnL:** −$0.08 last hour | 24h 22T 10W +$0.43 (45.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal 3+T this hour (pump-chain- remains 24h 3T 0W −$0.20 watch item, 0T this hour)
+- atr_sl_hit 8/22 = 36.4% (under 40 threshold; tpsl_utils fix deployed)
+- 3-consecutive-neg-hour streak (04:00 −$0.08, 05:00 −$0.09, 06:00 −$0.08 = −$0.25) — regime is LONG_BIAS (57L/67N/2S), NOT NEUTRAL → no size reduction per rule; losses small
+- Overtrade 2/hr; live_trading=true, kill JSON=true
+- Open: 2 trades
+- Entry quality: GMX loser had MFE 0.02% vs MAE 0.36% — entered, immediately adverse, SL hit; not a timing/staleness issue
+
+**Open Questions:**
+- pump-chain- 24h 3T 0W −$0.20 — kill only triggers on 3+T in a single hour; still 0T this hour
+- 3-neg-hour streak is small-loss grind (−$0.25 total), not a blowup — watch if it extends to 4+
+- hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17

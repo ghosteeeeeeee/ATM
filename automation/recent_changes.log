@@ -4728,3 +4728,5 @@ BY: auto_1hr
 [2026-10-16 05:09] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W −$0.17 (IO pump-chain- + FIL pump-chain+ both atr_sl_hit) | 24h 20T 9W +$0.51 (45%) | kill: none (pump-chain- 1T 0W this hour, 24h 3T 0W −$0.20 watch) | atr_sl_hit 35% (under 40) | overtrade 2/hr | streak no 3-neg | live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-16 06:09] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet), 4 open | 24h 20T 9W +$0.51 (45%) | kill: none (0T) | atr_sl_hit 35% (under 40, tpsl fix deployed) | overtrade 0/hr | streak no 3-neg | live_trading=true, kill JSON=true
+BY: auto_1hr
+[2026-10-16 07:09] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W −$0.08 (GMX ai-trader+ atr_sl_hit, WLD r2v2-long3 profit-monster-trail) | 24h 22T 10W +$0.43 (45.5%) | kill: none (no signal 3+T this hour; pump-chain- 24h 3T 0W watch) | atr_sl_hit 36.4% (under 40, tpsl fix deployed) | 3-neg-hour streak 04-06 (−$0.25) but regime LONG_BIAS not NEUTRAL → no size cut | overtrade 2/hr | live_trading=true, kill JSON=true
