@@ -4921,5 +4921,14 @@
     "category": "exit magnitude",
     "status": "escalated",
     "risk": "medium (needs OOS + HR-kill guard before live)"
+  },
+  {
+    "date": "2026-10-16T22:30:00Z",
+    "idea": "bb-bounce-v2 LONG trail-arm-timeout SHADOW collector (T=55m)",
+    "rationale": "Exit-ladder lever for bb-bounce family. 7d chop 10T -$0.79 (RUNE 80m HML, BABY/ETC/GMX 102-145m atr_sl) vs trail 10T +$0.38. T=55m catches atr_sl cluster without touching HML cluster (already dead) or winners (MNT/BIGTIME/POL all trail, likely armed). Existing ratified mechanism (bb-squeeze 60m, pump-chain 45m) extended to third family in shadow mode.",
+    "expected_impact": "If shadow confirms >=4 would-fires/14d with 0 winner-kills, flip live with CEO GO. Est. save $0.50-0.80/14d on bb-bounce chop family.",
+    "category": "exit ladder",
+    "status": "shadow",
+    "risk": "low"
   }
 ]

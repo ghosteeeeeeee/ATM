@@ -1441,5 +1441,16 @@
     "after": "LONG_RSI_SWEET_SPOT_MIN = 55, MAX = 60",
     "rationale": "30d meta-RSI: 55-60 = 72T 59.7%WR +$3.82 t=2.20 (SIG, OOS 14d +$1.31). 50-55 = 71T −$0.72 t=-0.48 was inside old window (dead weight). 40-55 aggregate wash t=0.07. 60-65 excluded (30d wash t=0.01 fails OOS). Boost is confidence-only, not a block.",
     "impact": "Stops +10 conf boost on wash/bleed 40-55 LONG entries; 55-60 already-boosted trades unchanged. Revert: 14d 55-60 PnL<$0 or WR<48% → MIN=40."
+  },
+  {
+    "timestamp": "2026-10-16T22:30:00Z",
+    "agent": "brain_auditor",
+    "change": "bb-bounce-v2 LONG trail-arm-timeout SHADOW collector (T=55m, zero behavior)",
+    "type": "creative",
+    "file": "hermes_constants.py + position_manager.py",
+    "before": "No bb-bounce trail-arm-timeout (only bb-squeeze 60m + pump-chain 45m live)",
+    "after": "BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW=True, MIN=55; logs [SHADOW] BB-BOUNCE TRAIL-ARM would-fire once per trade",
+    "rationale": "Exit-magnitude is THE lever (momentum-gate verdict). 7d bb-bounce chop 10T -$0.79 vs trail 10T +$0.38. T=55m sits between HML cluster (18-54m, already dead) and atr_sl cluster (102-145m, catchable). Shadow-first per CEO D2. Flip live only with CEO GO + 14d data + OOS backtest.",
+    "impact": "Zero live behavior change. Gathers would-fire data for exit-ladder decision. Revert: set BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW=False."
   }
 ]

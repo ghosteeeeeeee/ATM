@@ -71,6 +71,7 @@ from hermes_constants import (
     CUT_LOSER_PNL as CUT_LOSER_PNL_HERMES,
     BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED, BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN,
     PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED, PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN,
+    BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW, BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN,
     PM_TRAIL_ACTIVATE_PCT,
 )
 
@@ -93,6 +94,9 @@ SERVER_NAME = "Hermes"
 # Pipeline heartbeat file
 _PM_HEARTBEAT_FILE = PIPELINE_HB_FILE
 MAX_POSITIONS = MAX_OPEN_POSITIONS
+
+# Shadow collectors — once-per-trade log dedup (module-level, resets on PM restart)
+_bb_bounce_shadow_logged = set()
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
 CUT_LOSER_PNL = CUT_LOSER_PNL_HERMES  # from hermes_constants.py (was hardcoded -2.0)
@@ -3547,6 +3551,29 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                             continue
                 except Exception as e:
                     log(f"  TRAIL-ARM TIMEOUT error for {token}: {e}")
+
+        # ── 7b-shadow. BB-BOUNCE TRAIL-ARM TIMEOUT SHADOW (zero behavior) ──────
+        # brain_auditor 2026-10-16 22:30Z. Logs would-fires only; never closes.
+        # Flip live only with CEO GO + 14d shadow data + OOS backtest (HR-kill guard mandatory).
+        if direction == 'LONG' and BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW:
+            _bbs_sig_l = (_pos_signal or '').lower()
+            if 'bb-bounce' in _bbs_sig_l and trade_id not in _bb_bounce_shadow_logged:
+                try:
+                    _bbs_ot = pos.get('open_time') or open_time
+                    if _bbs_ot:
+                        if isinstance(_bbs_ot, str):
+                            _bbs_dt = datetime.fromisoformat(_bbs_ot.replace('Z', '+00:00'))
+                        else:
+                            _bbs_dt = _bbs_ot
+                        if _bbs_dt.tzinfo is None:
+                            _bbs_dt = _bbs_dt.replace(tzinfo=timezone.utc)
+                        _bbs_age_m = (datetime.now(timezone.utc) - _bbs_dt).total_seconds() / 60
+                        _bbs_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100
+                        if _bbs_age_m >= BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN and live_pnl < _bbs_arm_pct:
+                            _bb_bounce_shadow_logged.add(trade_id)
+                            log(f"  [SHADOW] BB-BOUNCE TRAIL-ARM would-fire {token} {direction} {live_pnl:+.2f}% [{_bbs_age_m:.0f}m < arm {_bbs_arm_pct:.2f}%] trade={trade_id}")
+                except Exception as e:
+                    log(f"  [SHADOW] BB-BOUNCE TRAIL-ARM error for {token}: {e}")
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
         # Catches two patterns:
