@@ -10640,3 +10640,21 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - pump-chain- 24h 3T 0W −$0.20 — kill only triggers on 3+T in a single hour; still 0T this hour
 - 3-neg-hour streak is small-loss grind (−$0.25 total), not a blowup — watch if it extends to 4+
 - hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 08:09] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet; 3 open)
+**PnL:** $0.00 last hour | 24h 22T 9W +$0.43 (40.9% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T this hour — no signal meets 3+T kill threshold (pump-chain- remains 24h 3T 0W −$0.20 watch item)
+- atr_sl_hit 8/22 = 36.4% (under 40 threshold; tpsl_utils fix deployed)
+- 3-neg-hour streak 04-06 (−$0.25) still standing — regime LONG_BIAS not NEUTRAL → no size cut per rule; no new data point this hour
+- Overtrade 0/hr; live_trading=true, kill JSON=true
+
+**Open Questions:**
+- pump-chain- 24h 3T 0W −$0.20 — 0% WR, kill only triggers on 3+T in a single hour
+- 3-neg-hour streak (04-06) small-loss grind — watch if it extends at 08:00+
+- hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
