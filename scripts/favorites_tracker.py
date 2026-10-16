@@ -161,7 +161,7 @@ def get_30d_leaderboard():
 
         # All tokens with enough 30d trades (combined)
         # Exclude ai-trader-manual: CEO overrides shouldn't penalize signal stats
-        cur.execute(f"""
+        cur.execute("""
             SELECT
                 token,
                 COUNT(*) as trades,
@@ -176,19 +176,19 @@ def get_30d_leaderboard():
             WHERE status = 'closed'
               AND server = 'Hermes'
               AND pnl_pct IS NOT NULL
-              AND signal NOT LIKE '%ai-trader-manual%'
-              AND close_time > NOW() - INTERVAL '{LOOKBACK_DAYS_30D} days'
+              AND signal NOT LIKE %s
+              AND close_time > NOW() - INTERVAL '""" + str(LOOKBACK_DAYS_30D) + """ days'
             GROUP BY token
             HAVING COUNT(*) >= %s
             ORDER BY total_pnl_usdt DESC
-        """, (list(FAVORITES), MIN_TRADES_30D))
+        """, (list(FAVORITES), '%ai-trader-manual%', MIN_TRADES_30D))
 
         columns = [desc[0] for desc in cur.description]
         all_tokens = [dict(zip(columns, [float(v) if hasattr(v, '__float__') else v for v in row])) for row in cur.fetchall()]
 
         # Direction-specific stats for each token
         # Exclude ai-trader-manual: CEO overrides shouldn't penalize signal stats
-        cur.execute(f"""
+        cur.execute("""
             SELECT
                 token,
                 direction,
@@ -199,12 +199,12 @@ def get_30d_leaderboard():
             WHERE status = 'closed'
               AND server = 'Hermes'
               AND pnl_pct IS NOT NULL
-              AND signal NOT LIKE '%ai-trader-manual%'
-              AND close_time > NOW() - INTERVAL '{LOOKBACK_DAYS_30D} days'
+              AND signal NOT LIKE %s
+              AND close_time > NOW() - INTERVAL '""" + str(LOOKBACK_DAYS_30D) + """ days'
             GROUP BY token, direction
             HAVING COUNT(*) >= 5
             ORDER BY token, direction
-        """)
+        """, ('%ai-trader-manual%',))
 
         direction_stats = {}
         for row in cur.fetchall():
