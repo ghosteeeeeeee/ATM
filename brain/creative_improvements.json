@@ -4930,5 +4930,14 @@
     "category": "exit ladder",
     "status": "shadow",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-16T23:47:28Z",
+    "idea": "Progressive exit ladder: tighten trail-arm timeout as trade ages (T=30m at -0.1%, T=45m at -0.2%, T=55m at -0.3%)",
+    "rationale": "hard_max_loss trades die avg 21-47m. Progressive ladder cuts chop entries faster without single hard cutoff that kills slow winners. 7d SL family -$9.95 vs trail +$7.34.",
+    "expected_impact": "Reduce SL-family bleed by 30-50% ($3-5/7d saved)",
+    "category": "exit engineering",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

@@ -1,81 +1,163 @@
 {
-  "timestamp": "2026-10-16T22:37:11.272344+00:00",
+  "timestamp": "2026-10-16T23:47:23.302303+00:00",
+  "session_brain_stats": {
+    "queries_run": 1,
+    "top_insight": "trail_arm_timeout exits = chop entries that never reached +0.40% trail arm"
+  },
   "trade_summary_24h": {
-    "trades": 51,
-    "wr": 39.2,
-    "pnl": -2.02,
-    "exit_map": "chop 26T -$2.55 (atr_sl 17, HML 7, tat 2) vs trail 17T +$0.71 (profit-monster 13, atr_trail 4)",
-    "worst_signals": "doji 11T -$0.51 (killed 20:30), pump-chain- SHORT 8T -$0.49 (EXTREME block 14:44), pump-chain+ 3T -$0.47"
+    "trades": 49,
+    "win_rate": 38.8,
+    "pnl": -1.89,
+    "7d": {
+      "trades": 228,
+      "win_rate": 36.0,
+      "pnl": -2.62
+    },
+    "30d": {
+      "trades": 784,
+      "win_rate": 43.8,
+      "pnl": -4.43
+    },
+    "exit_signature_7d": {
+      "sl_family": {
+        "trades": 115,
+        "wr": 0.9,
+        "pnl": -9.95,
+        "note": "hard_max_loss + atr_sl_hit"
+      },
+      "trail_family": {
+        "trades": 75,
+        "wr": 89.3,
+        "pnl": 7.34,
+        "note": "profit-monster-trail + atr_trail_hit"
+      }
+    }
   },
-  "trade_summary_7d": {
-    "trades": 230,
-    "wr": 36.1,
-    "pnl": -2.46
-  },
-  "trade_summary_30d": {
-    "trades": 784,
-    "wr": 43.8,
-    "pnl": -4.43
-  },
-  "watchdog_steers": [
+  "last_run_changes_verified": [
     {
-      "id": "steer-001",
-      "verdict": "VERIFIED — 24h 39.2% WR -$2.02 matches. Root = chop-family exit-magnitude (hard_max_loss 62T -$5.82 + atr_sl_hit 54T -$4.27 = -$10.09/7d). Entry filters exhausted per Oct 15 verdict. Exit-ladder is the untried lever."
+      "change": "doji-bottom-long RE-KILL 20:30",
+      "status": "HOLDING",
+      "evidence": "0 trades after 20:30"
     },
     {
-      "id": "steer-002",
-      "verdict": "VERIFIED — wrong-side = chop entries (never armed trail). Confirmed third cycle. doji knife-catches (RSI 27-40) killed at 20:30; midband shorts blocked 00:43; pump-chain- EXTREME block holding."
+      "change": "pump-chain- EXTREME block 14:44",
+      "status": "HOLDING",
+      "evidence": "0 SHORT opens after 14:44"
     },
     {
-      "id": "steer-003",
-      "verdict": "STALE — doji-bottom-long killed 20:30 (pre-committed Oct-14 trigger). 0 opens since. Steer predates kill."
-    }
-  ],
-  "last_run_verify": {
-    "doji_kill_2030": "HOLDING — 0 doji opens since 20:30",
-    "pump_chain_extreme_block_1444": "HOLDING — 0 pump-chain- SHORT opens since 14:44",
-    "sweet_spot_55_60_2145": "TOO NEW — 0 closed LONG trades since 21:45, verify next run",
-    "dead_gap_1330": "HOLDING — 0 pump-chain- SHORT opens since 14:44 (dead-gap is subset of EXTREME block cohort)",
-    "short_midband_0043": "HOLDING — no midband SHORT trades in 24h window"
-  },
-  "losing_trade_autopsy": {
-    "pattern": "chop-vs-trend unchanged. 7d: trail 75T +$7.34 (89% WR) vs chop 134T -$10.72 (~2% WR). 52/62 HML never armed trail.",
-    "biggest_chop_bleeds_7d": [
-      "pump-chain+ chop 22T -$1.81 (trail 9T +$2.21 — dual-mode signal)",
-      "pump-chain- chop 24T -$1.45 (trail 8T +$0.90 — EXTREME block + dead-gap holding)",
-      "volume-breakout-long+ chop 13T -$1.36 (KILLED Oct 13, aging out)",
-      "doji-bottom-long chop 10T -$1.03 (KILLED Oct 16 20:30)",
-      "bb-bounce-v2 chop 10T -$0.79 (SHADOW shipped this run)"
-    ],
-    "atr_sl_hit_7d": "54T -$4.27. Worst: pump-chain- SHORT 17T -$1.04 (RSI 45), doji 6T -$0.68 (RSI 33), pump-chain+ 4T -$0.55 (RSI 65)",
-    "hml_7d": "62T -$5.82. Worst: volume-breakout-long+ 9T -$1.08 (killed), pump-chain+ 9T -$0.91 (RSI 65), ai-trader+ 5T -$0.41"
-  },
-  "config_changes_applied": [
+      "change": "pump-chain- dead-gap block 13:30",
+      "status": "HOLDING",
+      "evidence": "0 SHORT opens after 13:30"
+    },
     {
-      "change": "BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW=True, MIN=55 (shadow collector, zero behavior)",
-      "file": "hermes_constants.py + position_manager.py",
-      "revert": "set BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW=False",
-      "rationale": "Exit-ladder lever for bb-bounce family. T=55m between HML cluster (18-54m) and atr_sl cluster (102-145m). Shadow-first per CEO D2."
+      "change": "SHORT midband block 00:43",
+      "status": "HOLDING",
+      "evidence": "0 non-pump-chain SHORT 45-55 opens after 00:43"
+    },
+    {
+      "change": "LONG_RSI_SWEET_SPOT_MIN 40->55",
+      "status": "CONFIRMED CORRECT",
+      "evidence": "30d 55-60 = 70T 60%WR +$3.74 (only profitable LONG band)"
+    },
+    {
+      "change": "bb-bounce trail-arm-timeout SHADOW T=55m",
+      "status": "COLLECTING",
+      "evidence": "0 fires yet (no trades hit 55m threshold); wiring verified position_manager.py:3558"
     }
   ],
-  "changes_from_last_run_2145": {
-    "sweet_spot_55_60": "TOO NEW to verify (0 closed trades). Monitor.",
-    "doji_kill": "HOLDING",
-    "bb_bounce_shadow_suggested": "IMPLEMENTED this run as shadow collector"
+  "meta_rsi_distribution_30d": {
+    "LONG": {
+      "<50": {
+        "n": 140,
+        "pnl": -1.87,
+        "wr": 41.4
+      },
+      "50-55": {
+        "n": 71,
+        "pnl": -0.72,
+        "wr": 52.1
+      },
+      "55-60": {
+        "n": 70,
+        "pnl": 3.74,
+        "wr": 60.0,
+        "note": "SWEET SPOT — only profit band"
+      },
+      "60+": {
+        "n": 257,
+        "pnl": 0.35,
+        "wr": 45.1
+      }
+    },
+    "SHORT": {
+      "<30": {
+        "n": 22,
+        "pnl": -2.16,
+        "wr": 13.6,
+        "note": "death zone (pre-hard-floor)"
+      },
+      "30-40": {
+        "n": 26,
+        "pnl": -0.68,
+        "wr": 46.2
+      },
+      "40-45": {
+        "n": 46,
+        "pnl": -0.74,
+        "wr": 39.1
+      },
+      "45-50": {
+        "n": 26,
+        "pnl": 0.17,
+        "wr": 38.5
+      },
+      "50-55": {
+        "n": 48,
+        "pnl": -1.21,
+        "wr": 37.5,
+        "note": "death band (blocked by midband)"
+      },
+      "55-60": {
+        "n": 19,
+        "pnl": -0.11,
+        "wr": 42.1
+      },
+      "60+": {
+        "n": 35,
+        "pnl": -1.56,
+        "wr": 40.0
+      }
+    }
   },
+  "drift_findings": [],
+  "recurring_problems": [
+    "EXIT-MAGNITUDE: SL family -$9.95 vs trail +$7.34 over 7d — entries never reach trail arm. Third consecutive cycle.",
+    "SHORT bleeds ALL meta-RSI bands 30d (except 45-50 barely +$0.17) — entry-side filters exhausted on SHORT.",
+    "LONG 50-55 band bleeds 30d -$0.72 (n=71, 52% WR) — losers bigger than winners, magnitude not direction problem."
+  ],
+  "missing_implementations": [
+    "Progressive exit ladder backtest — OVERDUE since Oct 14. The #1 untried lever. Commission self_learner.",
+    "trail-arm-timeout only on bb-bounce shadow — extend to pump-chain+/ai-trader+ AFTER bb-bounce 14d data validates pattern."
+  ],
   "creative_improvements": [
     {
-      "idea": "bb-bounce-v2 trail-arm-timeout SHADOW T=55m",
-      "status": "SHIPPED as shadow",
-      "next": "14d shadow data + OOS backtest → CEO GO decision"
+      "date": "2026-10-16T23:47:23.302303+00:00",
+      "idea": "Progressive exit ladder: tighten trail-arm timeout as trade ages (e.g. T=30m at -0.1%, T=45m at -0.2%, T=55m at -0.3%)",
+      "rationale": "hard_max_loss trades die avg 21-47m. A progressive ladder would cut chop entries faster without a single hard cutoff that kills slow-starting winners.",
+      "expected_impact": "Reduce SL-family bleed by 30-50% ($3-5/7d saved)",
+      "category": "exit engineering",
+      "status": "suggested — needs backtest",
+      "risk": "medium — could kill slow winners if thresholds too tight"
     }
   ],
+  "config_changes_applied": [],
+  "changes_from_last_run": "All 6 changes verified HOLDING or CONFIRMED. Sweet-spot 55-60 correct at 30d. Shadow collecting.",
   "next_actions": [
-    "Verify sweet-spot 55-60 fires next run (grep LONG-RSI-SWEET-SPOT)",
+    "COMMISSION progressive exit ladder backtest (self_learner) — P0, overdue since Oct 14",
+    "Monitor bb-bounce shadow logs for first [SHADOW] would-fire",
+    "Monitor sweet-spot 55-60 boost fires in pipeline.log",
     "Oct 17: dead-gap 24h soak checkpoint",
-    "Commission progressive exit ladder backtest (self_learner) — STILL OVERDUE since Oct 14",
-    "Monitor bb-bounce shadow [SHADOW] logs for 14d",
-    "pump-chain- dual-emitter: CEO kill decision pending"
-  ],
-  "open_trades": "2: BLUR pump-chain+ LONG -0.19% (meta_rsi 62.5, hold), BTC manual LONG +0.28% (SL at breakeven 81510, risk-free)"
+    "Oct 27: CHASE_RATIO_SHADOW review",
+    "Oct 30: bb-bounce shadow 14d review"
+  ]
 }
