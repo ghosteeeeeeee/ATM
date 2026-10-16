@@ -160,6 +160,7 @@ def get_30d_leaderboard():
         cur = conn.cursor()
 
         # All tokens with enough 30d trades (combined)
+        # Exclude ai-trader-manual: CEO overrides shouldn't penalize signal stats
         cur.execute(f"""
             SELECT
                 token,
@@ -175,6 +176,7 @@ def get_30d_leaderboard():
             WHERE status = 'closed'
               AND server = 'Hermes'
               AND pnl_pct IS NOT NULL
+              AND signal NOT LIKE '%ai-trader-manual%'
               AND close_time > NOW() - INTERVAL '{LOOKBACK_DAYS_30D} days'
             GROUP BY token
             HAVING COUNT(*) >= %s
@@ -185,6 +187,7 @@ def get_30d_leaderboard():
         all_tokens = [dict(zip(columns, [float(v) if hasattr(v, '__float__') else v for v in row])) for row in cur.fetchall()]
 
         # Direction-specific stats for each token
+        # Exclude ai-trader-manual: CEO overrides shouldn't penalize signal stats
         cur.execute(f"""
             SELECT
                 token,
@@ -196,6 +199,7 @@ def get_30d_leaderboard():
             WHERE status = 'closed'
               AND server = 'Hermes'
               AND pnl_pct IS NOT NULL
+              AND signal NOT LIKE '%ai-trader-manual%'
               AND close_time > NOW() - INTERVAL '{LOOKBACK_DAYS_30D} days'
             GROUP BY token, direction
             HAVING COUNT(*) >= 5
