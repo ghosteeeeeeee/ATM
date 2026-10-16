@@ -3043,8 +3043,20 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     # Update SL in memory AND persist to DB
                     new_sl = rr_result.get('new_sl')
                     if new_sl and new_sl > 0:
+                        # BUG-2 FIX (2026-10-16): Skip trailing if entry_price is invalid
+                        # Without this, entry_price=0 disables the breakeven guard
+                        # and the trail overwrites manual SL (bug_hunter BUG-2)
+                        if entry_price <= 0:
+                            log(f"  [RR-ENGINE] {token} {direction}: skip trail — entry_price={entry_price} invalid", "WARN")
+                            continue
+
+                        old_sl_in_memory = float(pos.get("stop_loss") or 0)
                         pos['stop_loss'] = new_sl
                         # Persist to DB so ATR SL check uses the tighter value
+                        # BUG-1 FIX (2026-10-16): CAS write — only update if SL hasn't
+                        # changed since we read it. Prevents clobbering manual edits.
+                        # BUG-4 FIX (2026-10-16): Add AND status='open' — don't update
+                        # closed trades (bug_hunter BUG-4)
                         db_conn = None
                         db_cur = None
                         try:
@@ -3054,8 +3066,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                                     user='postgres', password=BRAIN_PASSWORD,
                                                     connect_timeout=5)
                             db_cur = db_conn.cursor()
-                            db_cur.execute("UPDATE trades SET stop_loss = %s WHERE id = %s",
-                                        (float(new_sl), trade_id))
+                            db_cur.execute(
+                                "UPDATE trades SET stop_loss = %s WHERE id = %s AND status = 'open' AND stop_loss = %s",
+                                (float(new_sl), trade_id, old_sl_in_memory))
+                            if db_cur.rowcount == 0:
+                                log(f"  [RR-ENGINE] {token}: CAS skip — SL changed since read (manual edit?)", "WARN")
                             db_conn.commit()
                         except Exception as e:
                             log(f"  [RR-ENGINE] DB persist failed: {e}", "WARN")

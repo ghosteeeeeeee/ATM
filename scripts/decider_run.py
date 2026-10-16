@@ -5174,14 +5174,17 @@ def run(dry_run=False):
                     _actual = float(_hl_entry or _entry)
                     _sl_val = float(_sl or 0)
                     if _actual > 0 and _sl_val > 0:
-                        if _dir == 'LONG' and _sl_val >= _actual:
+                        if _dir == 'LONG' and _sl_val > _actual:
                             # SL above entry for LONG — wrong side, fix it
+                            # FIX (2026-10-16): changed >= to > — breakeven (SL==entry) is LEGAL
+                            # and should not be reset (bug_hunter BUG-3)
                             _new_sl = round(_actual * (1 - ATR_SL_MIN_INIT), 8)
                             _cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s", (_new_sl, _tid))
                             _pg.commit()
                             log(f'  [SL-FIX] {token} LONG: SL was {_sl_val:.6f} (above entry {_actual:.6f}), fixed to {_new_sl:.6f}')
-                        elif _dir == 'SHORT' and _sl_val <= _actual:
+                        elif _dir == 'SHORT' and _sl_val < _actual:
                             # SL below entry for SHORT — wrong side, fix it
+                            # FIX (2026-10-16): changed <= to < — breakeven (SL==entry) is LEGAL
                             _new_sl = round(_actual * (1 + ATR_SL_MIN_INIT), 8)
                             _cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s", (_new_sl, _tid))
                             _pg.commit()
