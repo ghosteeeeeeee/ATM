@@ -1,152 +1,74 @@
 {
-  "timestamp": "2026-10-15T23:44:30Z",
+  "timestamp": "2026-10-16T00:43:33Z",
   "session_brain_stats": {
-    "queries_run": 3,
-    "note": "Session brain confirmed prior patterns (bb_bounce EXTREME weakness, penalty-floor conf band); no new unimplemented ideas surfaced beyond in-flight self_learner work"
+    "queries": 3,
+    "note": "session_brain loaded; recurring themes: pump-chain short WR, momentum filter reverts, chop vs trend"
   },
   "trade_summary_24h": {
-    "trades": 15,
-    "pnl": 0.28,
-    "wr": 26.7,
-    "winners": "4T +$1.25 — pump-chain+ LONG 3/3 (+$1.20, all conf-100 trail exits) + ETH liq-hunt+",
-    "losers": "11T −$0.97 — pump-chain+ 0/3 −$0.17 (floor-admitted), bb-bounce-v2+ 0/2 −$0.24 (EXTREME), vbo-short- 0/1 (now killed), grind-breakout- 0/1, ai-trader 0/2, hl_copy 0/2",
-    "note": "Low WR but PnL positive — trail winners outweigh chop losses. Classic trail-vs-chop split."
+    "closed": 15,
+    "pnl": 0.34,
+    "wr": 33.3,
+    "winners": "pump-chain+ 6T 50% +$1.03 (IOTA/BANANA/ICP trail winners +10-15%)",
+    "losers": "bb-bounce-v2-long+ 2T 0W -$0.24; mid-band SHORTs (IO RSI 50, MERL RSI 49.4); chop LONGs (BABY/ICP RSI 54-55)"
   },
   "trade_summary_7d": {
-    "trades": 196,
-    "pnl": -1.05,
-    "wr": 34.2,
-    "long": "147T −$0.43 35.4%",
-    "short": "49T −$0.62 30.6%",
-    "exit_reasons": {
-      "hard_max_loss": "60T −$5.53 0%WR #1 bleed",
-      "atr_sl_hit": "43T −$3.21 0%WR",
-      "profit-monster-trail": "43T +$2.78 88.4%",
-      "atr_trail_hit": "19T +$4.06 84.2%"
-    },
-    "chop_vs_trend": "Trail family +$6.84 (86T ~86%WR) vs SL/chop family −$8.91 (107T 0%WR) — unchanged thesis: entries fire before momentum confirms, hard stops harvest us. 14d hard_max_loss cohort: avg MFE 0.14% vs trail-arm threshold 0.40% — they never worked."
+    "exit_bleed": "hard_max_loss 60T 0%W -$5.53; atr_sl_hit 43T 0%W -$3.21; trail family +$6.86 (profit-monster 88.6%, atr_trail 84.2%)",
+    "regime": "EXTREME 109T 27.5% -$0.45 worst; NORMAL 49T 46.9% +$0.17 best"
   },
-  "changes_from_last_run": [
-    {
-      "change": "KILL volume-breakout-short- (17:35)",
-      "verified": "0 trades post-kill; last trade 14:24 pre-kill",
-      "status": "WORKING"
-    },
-    {
-      "change": "KILL hmacd_mtf- SHORT (18:30)",
-      "verified": "0 trades post-kill",
-      "status": "WORKING"
-    },
-    {
-      "change": "CONF-CALIB clamp (03:40)",
-      "verified": "winners IOTA/ICP/BANANA stored conf=100.00 (clamped from meta 155-166); no conf>100 in 24h",
-      "status": "WORKING"
-    },
-    {
-      "change": "trade_watchdog direction lowercase (19:40)",
-      "verified": "code in place; stale steers now sign-correct",
-      "status": "WORKING"
-    },
-    {
-      "change": "KILL LONG-SHORT-BIAS dampen shadow (14:45)",
-      "verified": "shadow code removed; 0 behavior change expected",
-      "status": "WORKING (no-op by design)"
-    },
-    {
-      "change": "doji-bottom re-enable w/ EXTREME 0.0 (Oct 14)",
-      "verified": "EXTREME block holding — only post-re-enable doji trade is WLFI NORMAL (+$0.02). non-EXTREME cohort monitor: 2T −$0.21 HIGH — n too small",
-      "status": "MONITOR"
-    }
-  ],
-  "losing_trade_autopsy_24h": [
-    {
-      "cluster": "pump-chain+ LONG 0/3 −$0.17 (JUP ×2, HYPER)",
-      "root_cause": "All 3 executed with penalty-reduced exec conf 46.0/49.5/62.7 (raw conf 92-99 × penalty_raw 0.39-0.63). Today's winners (IOTA/ICP/BANANA) executed at unpenalized conf~99→clamped 100. Losers also showed chase signatures: JUP bb_position 1.29 (above upper band, z=3.17 extreme_high, decelerating), HYPER speed_percentile 93.7 + price_acceleration −0.021 (falling). Winners: speed_percentile 5.7-41.1, bb_position 0.74-0.84.",
-      "entry_check": "Chop entries — JUP #16199 HML avg-MFE never armed; JUP #16202 + HYPER trail_arm_timeout (never reached +0.40%)",
-      "recommended_change": "NO config change. PENALTY_MULT_FLOOR cohort now shadow-logged (floor_admit_shadow.jsonl) — re-evaluate 0.5-vs-0.3 Oct 19 with n>=40. Chase signature (speed_pct>70, bb_pos>1.0) feeds self_learner momentum-gate backtest due Oct 17.",
-      "impact_on_winners": "N/A — no filter shipped",
-      "confidence": "HIGH on diagnosis, no change shipped (CEO floor change Oct 13, cohort n=29 −$0.23 = monitor-grade)"
-    },
-    {
-      "cluster": "bb-bounce-v2-long+ 0/2 −$0.24 (BABY −4.02% acct, ICP −3.83% acct)",
-      "root_cause": "Both EXTREME regime bounce entries — bounce never became a trend (avg MFE 0.14% for bb-bounce HML 14d, 0% trail-arm). Mean-reversion LONG in storm.",
-      "entry_check": "BABY opened 21:21 EXTREME, ICP 01:10 EXTREME, both hard exits",
-      "recommended_change": "Monitor only — 14d bb-bounce EXTREME n=7 (<20 threshold). EXTREME dampen/veto would need CEO + n>=20. Watchlist item.",
-      "impact_on_winners": "N/A",
-      "confidence": "MED (right pattern, small n)"
-    },
-    {
-      "cluster": "Counter-trend SHORTs (MERL grind-breakout-, IO vbo-short-, BTC ai-trader-manual)",
-      "root_cause": "SHORT entries into LONG_BIAS accumulation regime. IO now killed (vbo-short-). MERL/BTC manual were one-offs.",
-      "recommended_change": "None — vbo-short- kill already shipped 17:35; BTC manual is CEO-owned.",
-      "impact_on_winners": "N/A",
-      "confidence": "HIGH"
-    }
-  ],
-  "drift_findings": [
-    {
-      "finding": "Stored trades.confidence is NOT exec confidence — it is exec conf minus hot_bonus (min(20, hot_rounds*5)) for LONGs. JUP exec 46.0 stored as 26.0; HYPER 62.7 stored 42.7. Winners clamp at 100 masking the strip.",
-      "impact": "Any analytics comparing stored confidence to MIN_EXEC_CONFIDENCE=40 falsely suggests sub-40 trades executed. Cosmetic, not a trading bug — but it will fool the next auditor. Meta final_confidence is the true exec conf.",
-      "severity": "MED (analytics trap, DRIFT-E class)",
-      "action": "Flagged. Fix belongs in brain.py write path — deferred, not shipped (single-variable discipline; not a bleed)."
-    },
-    {
-      "finding": "LONG RSI 60-70 non-EXTREME midband leak via STANDALONE_BYPASS (prior run finding, still open)",
-      "severity": "LOW",
-      "action": "No fix — leak small, fixing bypass risks pump-chain+ flow"
-    }
-  ],
+  "drift_findings": [],
   "recurring_problems": [
-    "hard_max_loss #1 bleed 60T −$5.53/7d — 0% trail-arm in HML cohort (avg MFE 0.14% vs 0.40% threshold). self_learner momentum-gate backtest due Oct 17 (3rd re-request). NO new entry filters stacked today.",
-    "Penalty-floor tail: floor-locked (meta_fc==49.5) cohort since Oct 13 n=29 −$0.23 24.1%WR, pump-chain-only 25T −$0.14. Not revert-grade; shadow now ages it properly."
+    "SHORT meta-RSI 45-55 death band: 7d 16T 12.5% -$0.64 | 14d 25T 16% -$0.47 | 30d 73T 38.4% -$1.21. Non-pump-chain subset: 0W in all windows. FIXED this run.",
+    "hard_max_loss / stop-exit family 0% WR across 7d (all signals) — chop entries never reach trail arm. Momentum-gate backtest self_learner due Oct 17."
   ],
-  "missing_implementations": [
-    "self_learner momentum-gate backtest (|5m move|<0.15% block) — due Oct 17, still pending. Chase signature in today's losers (speed_pct 73-94) is exactly what it would catch.",
-    "PENALTY_MULT_FLOOR decision data — WAS missing; NOW collecting via floor_admit_shadow.jsonl (shipped this run)."
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-10-15T23:44:30Z",
-      "idea": "FLOOR-ADMIT SHADOW (SHIPPED) — log-only JSONL cohort of trades that execute only because PENALTY_MULT_FLOOR=0.5 raised the multiplier above the raw penalty product, with counterfactual exec conf at floor 0.3 and floor_admitted flag",
-      "rationale": "Oct-13 floor change is the only recent CEO tuning with an unmeasured losing tail: today 3/11 losers were penalty-reduced pump-chain+ entries (exec 46-62.7) vs conf-100 winners 3/3 +$1.20. Need aged cohort before any 0.5-vs-0.3 call. Log-only = zero trading risk.",
-      "expected_impact": "Decision-ready floor cohort by Oct 19 (n>=40). Prevents both premature revert and indefinite unmeasured bleed.",
-      "category": "measurement infrastructure",
-      "status": "SHIPPED (commit e5ea5e2d, bug_hunter PASS)",
-      "risk": "none (log-only)"
-    },
-    {
-      "date": "2026-10-15T23:44:30Z",
-      "idea": "Chase-signature tag on pump-chain entries (speed_percentile>70 OR bb_position>1.0 at entry) — log-only, feeds Oct 17 momentum-gate decision",
-      "rationale": "Today's pump-chain losers: speed_pct 73.7/93.7, one bb_pos 1.29 (z=3.17 extreme_high, decelerating). Winners: speed_pct 5.7-41.1, bb_pos 0.74-0.84. n=3v3 — too small to ship a filter, but tagging accrues the exact cohort the pending backtest needs.",
-      "expected_impact": "Zero risk now; sharpens Oct 17 momentum-gate decision",
-      "category": "entry sniper / measurement",
-      "status": "suggested — DEFERRED to self_learner momentum-gate backtest (don't duplicate in-flight work)",
-      "risk": "none (would be log-only)"
+      "date": "2026-10-16T00:43:33Z",
+      "idea": "SHADOW-LOG ceiling-blocked SHORT RSI 65-80 entries (meta) — band shows 14d 4T 75% +$0.24, 30d 17T 58.8% +$0.05 on meta RSI but SHORT_RSI_CEILING=65 (set Sep 29 on entry_rsi data) blocks it. Log would-be entries for 14d; if n>=15 and still positive, reconsider ceiling with bear-structure exemption (mirror 65-75 LONG pattern).",
+      "rationale": "The ceiling was calibrated on the wrong RSI column (DRIFT-E). Meta RSI shows the overbought-dump short (65-80) is the ONLY consistently profitable SHORT band.",
+      "expected_impact": "Unlock best SHORT band if verified; risk=low (shadow-only)",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [
     {
-      "change": "FLOOR-ADMIT SHADOW — decider_run.py:3579-3601 (log-only instrumentation)",
-      "type": "shadow/instrumentation (not a trading config change)",
-      "file": "scripts/decider_run.py",
-      "before": "PENALTY-GATE log line only",
-      "after": "+ JSONL append to data/floor_admit_shadow.jsonl when floor raises multiplier; try/except-wrapped; write failures logged, never break execution",
-      "rationale": "Age the PENALTY_MULT_FLOOR cohort with real PnL before the 0.5-vs-0.3 decision. Today's losing cluster was floor-admitted.",
-      "impact": "0 trading behavior change. Data collection starts next pipeline cycle. Commit e5ea5e2d. Bug_hunter audit PASS."
+      "change": "SHORT mid-band death band block (45-55, non-pump-chain)",
+      "file": "hermes_constants.py + decider_run.py",
+      "constants": "SHORT_MIDBAND_BLOCK_ENABLED=True, SHORT_MIDBAND_RSI_MIN=45, SHORT_MIDBAND_RSI_MAX=55",
+      "placement": "exec-time choke point in execute_trade() — covers STANDALONE_BYPASS signals",
+      "evidence": "14d non-pc 9T 0W -$0.89; 7d 8T 0W -$0.76; 48h 0W (watchdog); pump-chain exempt 14d 16T 4W +$0.42; zero winners killed",
+      "bug_hunter": "PASS (8/8 checks)"
     }
   ],
-  "watchdog_steers_addressed": [
-    "steer-001 (13/20 losing streak): verified via PG — 24h 26.7%WR but +$0.28 PnL; trail/chop split intact. No panic action; discipline holds.",
-    "steer-d1 (HYPE stop 0.15% under entry): OPEN — position management, not config. Flagged for CEO/CAPTAIN; position manager owns live stops.",
-    "steer-d2 (BTC EMA300 risk line): OPEN — BTC long still open −0.36%, stop 81900. CEO-owned manual trade.",
-    "steer-d3 (WLFI RSI 40): RESOLVED — WLFI doji closed +$0.02."
+  "changes_from_last_run": [
+    {
+      "change": "KILL volume-breakout-short- (Oct 15 17:35)",
+      "status": "WORKING",
+      "evidence": "flag False; 1 IO loss in 24h window predates kill; no post-kill fires"
+    },
+    {
+      "change": "KILL hmacd_mtf- (Oct 15 18:30)",
+      "status": "WORKING",
+      "evidence": "flag False; 0 fires since"
+    },
+    {
+      "change": "FLOOR-ADMIT shadow (Oct 15 23:44)",
+      "status": "COLLECTING",
+      "evidence": "log-only; decision data due Oct 19"
+    },
+    {
+      "change": "CONF-CALIB clamp (Oct 15 03:40)",
+      "status": "WORKING",
+      "evidence": "no conf>100 trades since"
+    }
   ],
   "next_actions": [
-    "Oct 17: self_learner momentum-gate backtest (3rd re-request) — chase signature (speed_pct>70) data now accruing via today's autopsy + floor shadow",
-    "Oct 19: re-evaluate PENALTY_MULT_FLOOR 0.5-vs-0.3 on floor_admit_shadow cohort (target n>=40, floor_admitted subset)",
-    "Monitor bb-bounce-v2-long+ EXTREME (watchlist, n=7<20) — no dampen until n>=20 + CEO",
-    "HYPE stop geometry (steer-d1) — CEO/CAPTAIN action, not config",
-    "7d PnL ≥$0 goal: currently −$0.105 avg/day burn; trail family carrying. No filter stacking until Oct 17 backtest lands",
-    "Do NOT stack new entry filters — 5 changes already today, soak discipline holds"
+    "Monitor SHORT-MIDBAND blocks in logs for 48h — count would-have-fired blocks vs trades",
+    "self_learner momentum-gate backtest due Oct 17 (3rd re-request) — hard_max_loss chop entries",
+    "volume-breakout-short- kill check: already killed Oct 15, closed item",
+    "RSI tilt re-test window opened Oct 16 — CEO to commission if desired",
+    "Creative: ceiling-blocked 65-80 SHORT shadow-log (see creative_improvements)"
   ]
 }

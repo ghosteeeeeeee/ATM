@@ -2090,6 +2090,16 @@ def execute_trade(token, direction, price, confidence, source,
             if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
                 log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
                 return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
+            # brain_auditor 2026-10-16: SHORT mid-band death band 45-55 — mirror of LONG_MIDBAND.
+            # Non-pump-chain 14d 9T 0W -$0.89; 7d 8T 0W -$0.76; 48h 0W (watchdog pattern alert).
+            # pump-chain exempt: 14d 16T 4W +$0.42 (only profitable pocket in band).
+            # Meta-first (backtest basis, DRIFT-E-safe), live fallback — same as LONG midband fix.
+            from hermes_constants import SHORT_MIDBAND_BLOCK_ENABLED, SHORT_MIDBAND_RSI_MIN, SHORT_MIDBAND_RSI_MAX
+            if SHORT_MIDBAND_BLOCK_ENABLED and direction.upper() == 'SHORT' and 'pump-chain' not in (source or ''):
+                _smb_rsi = _detect_floor_rsi if _detect_floor_rsi is not None else _exec_rsi
+                if _smb_rsi is not None and SHORT_MIDBAND_RSI_MIN <= float(_smb_rsi) <= SHORT_MIDBAND_RSI_MAX:
+                    log(f'  🚫 [SHORT-MIDBAND] {token} SHORT BLOCKED — RSI {float(_smb_rsi):.1f} in {SHORT_MIDBAND_RSI_MIN}-{SHORT_MIDBAND_RSI_MAX} death band (non-pump-chain; 14d 9T 0W -$0.89)')
+                    return False, f'SHORT mid-band death band: {float(_smb_rsi):.1f} in {SHORT_MIDBAND_RSI_MIN}-{SHORT_MIDBAND_RSI_MAX}'
             # CEO Fix5 2026-10-02: RSI 65-75 bear-structure-gated exemption; RSI>75 always blocked.
             if direction.upper() == 'SHORT' and SHORT_RSI_CEILING > 0 and _exec_rsi > SHORT_RSI_CEILING:
                 if SHORT_RSI_HARD_CEILING > 0 and _exec_rsi > SHORT_RSI_HARD_CEILING:

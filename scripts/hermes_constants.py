@@ -970,6 +970,16 @@ LONG_MIDBAND_RSI_MIN = 60
 LONG_MIDBAND_RSI_MAX = 70
 LONG_MIDBAND_NON_EXTREME_BLOCK = True  # brain_auditor 2026-10-11 — EXTREME exempt. bb-squeeze exempt 2026-10-12 (module RSI 60-65 window = 14d 8T 100%WR +$0.74; midband was dead-habitat collision)
 
+# ── SHORT mid-band death band: block SHORT when meta RSI 45-55 (non-pump-chain) ──
+# Meta-RSI sourced (DRIFT-E-safe), live fallback — mirrors LONG_MIDBAND pattern.
+# Non-pump-chain 45-55: 14d 9T 0W -$0.89 | 7d 8T 0W -$0.76 | 48h 0W (watchdog pattern alert).
+# pump-chain exempt: 14d 16T 4W +$0.42 (only profitable pocket in band; own PUMP_CHAIN_SHORT_RSI_MIN governs).
+# Zero winners killed in blocked cohort across all three windows. Deployed at exec-time choke
+# point (decider_run.py) so STANDALONE_BYPASS signals (grind-breakout- etc.) are covered too.
+SHORT_MIDBAND_RSI_MIN = 45
+SHORT_MIDBAND_RSI_MAX = 55
+SHORT_MIDBAND_BLOCK_ENABLED = True  # brain_auditor 2026-10-16. Revert: set False.
+
 # ── HIGH-regime overbought LONG block: RSI >70 in HIGH vol = exhaustion chase ──
 # Complements midband (60-70 non-EXTREME). HIGH 70+ = bad-RR tail (avg win $0.09 vs avg loss $0.16).
 # 30d: 40T 45%WR -$1.44 | 14d: 20T 50% -$0.48 | 7d: 10T 40% -$0.54 — consistent bleed.

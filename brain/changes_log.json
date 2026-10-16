@@ -1386,5 +1386,16 @@
     "after": "appends data/floor_admit_shadow.jsonl when PENALTY_MULT_FLOOR raises multiplier above raw product; try/except-wrapped, write failures logged",
     "rationale": "Today 3/11 losers were floor-admitted pump-chain+ (exec conf 46-62.7, all chop exits) vs conf-100 winners 3/3 +$1.20. Floor-locked cohort since Oct 13: n=29 −$0.23 24.1%WR — monitor-grade, not revert-grade. Shadow ages clean cohort before CEO floor decision. Zero trading impact.",
     "impact": "0 behavior change. Decision-ready data by Oct 19. Commit e5ea5e2d, bug_hunter PASS."
+  },
+  {
+    "timestamp": "2026-10-16T00:43:33Z",
+    "agent": "brain_auditor",
+    "change": "SHORT mid-band death band block: RSI 45-55 non-pump-chain SHORTs blocked at exec time (meta-first, live fallback)",
+    "type": "config",
+    "file": "hermes_constants.py + decider_run.py",
+    "before": "No mid-band SHORT block — 45-55 SHORTs fired freely (0% WR bleed)",
+    "after": "SHORT_MIDBAND_BLOCK_ENABLED=True, MIN=45, MAX=55; pump-chain exempt; exec-time choke point covers bypass signals",
+    "rationale": "14d non-pc 9T 0W -$0.89, 7d 8T 0W -$0.76, 48h 0W (watchdog pattern alert). Zero winners killed. pump-chain profitable in band (+$0.42/14d) hence exempt.",
+    "impact": "Blocks ~0.5-1 trade/day of 0%-WR death-band SHORTs; expected +$0.50-0.90/14d net"
   }
 ]

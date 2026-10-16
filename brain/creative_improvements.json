@@ -4708,5 +4708,14 @@
     "category": "entry sniper / measurement",
     "status": "suggested — DEFERRED to self_learner momentum-gate backtest (don't duplicate in-flight work)",
     "risk": "none (would be log-only)"
+  },
+  {
+    "date": "2026-10-16T00:43:33Z",
+    "idea": "SHADOW-LOG ceiling-blocked SHORT RSI 65-80 entries (meta) — band shows 14d 4T 75% +$0.24, 30d 17T 58.8% +$0.05 on meta RSI but SHORT_RSI_CEILING=65 (set Sep 29 on entry_rsi data) blocks it. Log would-be entries for 14d; if n>=15 and still positive, reconsider ceiling with bear-structure exemption (mirror 65-75 LONG pattern).",
+    "rationale": "The ceiling was calibrated on the wrong RSI column (DRIFT-E). Meta RSI shows the overbought-dump short (65-80) is the ONLY consistently profitable SHORT band.",
+    "expected_impact": "Unlock best SHORT band if verified; risk=low (shadow-only)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
