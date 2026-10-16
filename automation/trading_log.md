@@ -10753,3 +10753,22 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 **Open Questions:**
 - pump-chain- 24h 6T 0W −$0.36 (0% WR) — standing CEO suggestion for 24h-based kill threshold (0% WR with 6+ trades)
 - hard_max_loss 4 exits −$0.48 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 14:09] Hourly Analysis
+
+**Trades:** 3 closed last hour (1W 2L) — APT bb-bounce-v2-long+ LONG hard_max_loss −$0.09 (−4.11%), ONDO doji-bottom-long LONG profit-monster-trail +$0.01 (+0.48%), ALT bb-bounce-v2-long+ LONG cut-loser-CL-T1 −$0.11 (−2.95%)
+**PnL:** −$0.19 last hour (33.3% WR) | 24h 42T 19W −$0.02 (flat, 45.2% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: bb-bounce-v2-long+ 2T 0W this hour (needs 3+T — close but under threshold); pump-chain- 0T this hour (24h 6T 0W −$0.36 remains standing watch)
+- atr_sl_hit 12/42 = 28.6% (under 40 threshold; tpsl_utils fix deployed)
+- No 3-neg-hour streak (13:00 +$0.06, 14:00 −$0.19)
+- Overtrade 3/hr (under 20); live_trading=true, kill JSON=true
+- hard_max_loss APT −4.11% account = ~1% price move at leverage — expected per leverage conversion, not a bug
+
+**Open Questions:**
+- bb-bounce-v2-long+ new watch item: 24h 5T 1W −$0.33 (20% WR) + 2T 0W this hour — if it hits 3+T/0%WR in an hour, hourly kill rule fires
+- pump-chain- 24h 6T 0W −$0.36 (0% WR) — standing CEO suggestion for 24h-based kill threshold
+- hard_max_loss 5 exits −$0.57 24h — standing CEO hold, momentum-gate backtest due Oct 17
