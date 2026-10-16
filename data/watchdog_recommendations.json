@@ -1,97 +1,53 @@
 {
-  "timestamp": "2026-10-16T13:38:17.912760+00:00",
+  "timestamp": "2026-10-16T14:38:18.128467+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: FIL + APT",
-      "detail": "Both opened within 6 minutes. Correlation risk.",
+      "title": "Trade cluster: SOPH + BTC",
+      "detail": "Both opened within 18 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: FIL + ONDO",
-      "detail": "Both opened within 9 minutes. Correlation risk.",
+      "category": "health",
+      "title": "7 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-002"
     },
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: FIL + DOGE",
-      "detail": "Both opened within 9 minutes. Correlation risk.",
+      "category": "health",
+      "title": "Signal 'pump-chain-' losing streak: 4 losses",
+      "detail": "Net -0.24 USDT over last 20 trades (losses: -0.24). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-003"
     },
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: APT + ONDO",
-      "detail": "Both opened within 3 minutes. Correlation risk.",
+      "category": "health",
+      "title": "Signal 'bb-bounce-v2-long+' losing streak: 3 losses",
+      "detail": "Net -0.18 USDT over last 20 trades (losses: -0.24). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-004"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: APT + DOGE",
-      "detail": "Both opened within 3 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-005"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ONDO + DOGE",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-006"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
-      "auto_executable": false,
-      "id": "steer-007"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "6 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
-      "auto_executable": false,
-      "id": "steer-008"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'pump-chain-' losing streak: 3 losses",
-      "detail": "Net -0.16 USDT over last 20 trades (losses: -0.16). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-009"
     }
   ],
   "portfolio_health": "warning",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
-    "volatility": "NORMAL",
-    "zscore_tier": "STRONG_NEG",
+    "continuum": "ABOVE",
+    "volatility": "LOW",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "volume_regime": "LOW",
+    "linreg_alignment": 1.0,
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 4,
-  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (1 long, 0 short)\nUnrealized PnL: ~0.00 USDT (ALT at -0.6%)\nRegime: BEAR/DUMP | Volatility: NORMAL | Trend: STRONG_DOWN\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent/regime] The ONLY open trade is a LONG in a dump market. BTC SHORT_BIAS conf 91, below EMA300 for 100+ min, 50/120 tokens SHORT_BIAS vs 6 LONG. ALT is NEUTRAL with fading volume \u2014 thesis is weak. Not broken yet (fresh, -0.6%), but if BTC rejects EMA300 again, close it. The winning side is SHORT.\n\n\ud83d\udfe1 [warning/health] volume-breakout-long+ is the worst signal in the book: 18T, 16.7% WR, -1.14 USDT net. Longs are bleeding in a short-bias regime. Brain auditor: regime-gate this signal.\n\n\ud83d\udfe1 [warning/health] pump-chain- 4-loss streak (INJ/GRASS/CRV/IO). All entered SHORT at RSI 43-53 mid-band and got squeezed by bounces. 29.4% WR over 51T. Winning side on those losses: LONG (the bounce). Signal needs RSI 50+ entries \u2014 brain auditor item.\n\n\ud83d\udfe2 [info/opportunity] volume-buildup- (SHORT) is the best signal in the book: 85.7% WR, +0.36 net over 7T. Short signals work in this regime. AI trader picked STX SHORT to align.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe market is dumping and we are long. One open trade (ALT) is a counter-trend LONG with a mid-RSI entry and no independent momentum. Fresh enough to hold, but the entire tape is against it.\n\nRecent 20 closes: 9W/11L, net ~-0.31. Losses split into two failure modes: (1) mid-RSI shorts squeezed by bounces (HBAR -5.72%, IO -2.43%, CRV -2.14%) \u2014 we shorted weakness not strength; (2) neutral-RSI chop longs (ENS -4.40%, MET -2.58%) that never reach trail arm \u2014 hard_max_loss profile, entry was wrong not exit.\n\nThe signal mix is long-heavy while the market rewards shorts. volume-buildup- (short) 85.7% WR vs volume-breakout-long+ 16.7% WR. The data is unambiguous: follow the trend.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Watch ALT closely \u2014 if it drops below 0.00810 with BTC still below EMA300, exit early. The correct side is SHORT.\n2. AI Trader pick: STX SHORT @ 0.41015 conf 76 \u2014 regime-aligned (SHORT_BIAS 75.8, slope -0.092), RSI 55.8 center of short band, ATR 1.99%, precheck PASS all gates.\n3. Brain auditor items (not my job to change): raise PUMP_CHAIN_SHORT_RSI_MIN 45\u219250; regime-gate volume-breakout-long+ to LONG_BIAS markets only; add trend/volume confirmation to bb-squeeze+ and doji-bottom-long.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nNote: commit `5318ae4f` succeeded locally; push failed (auth error on GitHub). Not blocking \u2014 daily timer will retry.\n",
-  "agent_timestamp": "2026-10-16T13:15:01.904466+00:00",
-  "regime_context": "BTC: SHORT_BIAS (5m conf 91), BELOW EMA300 for 100+ min, STRONG_DOWN trend quality, zscore STRONG_NEG (-1.76), velocity SLOW, acceleration NEGATIVE\u2192POSITIVE oscillating, market_phase RECOVERY. 4h remains LONG_BIAS \u2014 higher timeframe is up but the 15m/1m tape is firmly bear. Continuum position: BELOW. Aggregate 5m scanner: 50 SHORT_BIAS / 6 LONG_BIAS / 64 neutral \u2014 overwhelming short tilt.\n\nImplication: LONG entries face headwind from the entire market. SHORT entries are with the tide but must avoid oversold zones (RSI <35) where the bounce eats the stop. The sweet spot for shorts right now is RSI 45-58 \u2014 high enough that the dump has room, low enough that we are not shorting into a top. For longs, only take them if the coin shows independent LONG_BIAS momentum (e.g. DOT conf 82, GMX conf 87, PONS conf 53) \u2014 otherwise we are fade-catching a falling market.",
-  "pattern_alerts": "PATTERN 1 \u2014 pump-chain- mid-RSI shorts getting squeezed (VERIFIED from PostgreSQL + watchdog signal_performance):\nn=51 total, WR 29.4%, net +0.12 USDT (barely positive \u2014 winners are big, losers are frequent). Recent 4-trade losing streak: INJ -3.19% (meta_rsi 52.94), GRASS -0.74% (43.64), CRV -2.14% (48.21), IO -2.43% (48.48). All entered SHORT at RSI 43-53.\nWINNING SIDE on these 4: LONG (the bounce). We shorted mid-band, the coin bounced, stop hit. The signal only pays when the short is entered after a pump into RSI 55+ where there is room to fall. At 43-53 we are shorting into support.\nAction: brain auditor should evaluate raising PUMP_CHAIN_SHORT_RSI_MIN from 45 to 50. Not my job to change parameters \u2014 flagging for weekly tune.\n\nPATTERN 2 \u2014 volume-breakout-long+ is a money furnace (VERIFIED from watchdog signal_performance):\nn=18, WR 16.7%, net -1.14 USDT. Worst signal in the entire book. Longs break out, fail, and we eat the stop. In a SHORT_BIAS market (50/120 tokens), breakout longs have the entire market against them.\nWINNING SIDE: SHORT the failed breakout. The correct play in this regime is fade the breakout, not chase it.\nAction: recommend brain auditor disable or regime-gate volume-breakout-long+ to LONG_BIAS markets only.\n\nPATTERN 3 \u2014 longs at neutral RSI in chop (VERIFIED from recent_closed):\nENS bb-squeeze+ long RSI 50.0 lost -4.40%; MET doji-bottom long RSI 47.62 lost -2.58%; BIGTIME btc-pump-rider+ long RSI 44.44 lost -0.08%. These are chop entries \u2014 no trend, no momentum, mid-RSI. They never reach +0.40% trail arm and hit hard_max_loss.\nWINNING SIDE: no one \u2014 chop has no winning side. The correct action was NOT to enter. This is the hard_max_loss profile: 0% WR because the entry is wrong, not the exit.\nAction: these signals (bb-squeeze+, doji-bottom-long) need a trend/volume confirmation filter. Brain auditor item.\n\nPATTERN 4 \u2014 short-biased signals work, long-biased signals bleed:\nvolume-buildup- (SHORT): 85.7% WR, +0.36 net \u2014 BEST signal in the book. ai-trader-manual: 75% WR, +0.44. r2v2-long3: 62.5% WR, +0.55.\nvolume-breakout-long+: 16.7% WR, -1.14. hmacd_mtf-+: 25% WR, -0.46. mtf-regime-trend+: 44.4% WR, -0.46.\nThe market is rewarding shorts and punishing longs. Our signal mix is long-heavy. Portfolio-level fix: increase SHORT signal weight in this regime."
+  "open_count": 2
 }

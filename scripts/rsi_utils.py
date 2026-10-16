@@ -137,6 +137,11 @@ def compute_rsi_5m(token: str, period: int = 14, max_age_s: Optional[float] = No
     return compute_rsi(token, tf='5m', period=period, max_age_s=max_age_s)
 
 
+def get_rsi(token: str, tf: str = '1m', period: int = 14) -> Optional[float]:
+    """Alias for compute_rsi — backward-compatible with callers that use get_rsi."""
+    return compute_rsi(token, tf=tf, period=period)
+
+
 def is_oversold(rsi: Optional[float], threshold: float = 30.0) -> bool:
     """Check if RSI indicates oversold conditions."""
     return rsi is not None and rsi < threshold

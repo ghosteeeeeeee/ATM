@@ -358,7 +358,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coiled_spring'): 0.0,           # BLOCKED — 40% WR, only trade NORMAL
     ('EXTREME', 'mover_long'): 0.5,              # PENALIZED 2026-09-22 — 50% WR but -$0.93 (8T)
     ('EXTREME', 'mover_short'): 0.5,             # PENALIZED 2026-09-22 — 55.6% WR but -$0.46 (9T)
-    ('EXTREME', 'pump_chain-'): 1.0,             # REVERTED 2026-10-08 brain_auditor — dampen 0.5 was over-correction. 14d EXTREME meta-RSI>=45: 41T +$1.09 (50-55 band 14T 64.3%WR +$0.81 BEST cell). The 7d EXTREME bleed (−$0.23/33.3%) was pre-floor RSI<45 trades — now blocked by SHORT_RSI_HARD_FLOOR=45 + PUMP_CHAIN_SHORT_RSI_MIN=45. HIGH stays blocked via PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED.
+    ('EXTREME', 'pump_chain-'): 0.0,             # BLOCKED 2026-10-16 signal_reporter — 24h 6T 0%WR -$0.36 ALL EXTREME (RSI 43-56, floors passed, still lost). 14d EXTREME 44T 27.3%WR -$0.27. The 2026-10-08 brain_auditor 1.0 revert (meta-RSI>=45 +$1.09) has decayed — floors pass the entries now and they still bleed. NORMAL 14d +$0.45 (6T) keeps the signal alive; HIGH stays blocked via PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED.
     ('EXTREME', 'pump_chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T, profitable)
     ('EXTREME', 'support_resistance'): 0.5,      # PENALIZED — rs mean-reversion reduced in EXTREME
     # ── EXTREME: bare-form fallbacks (after specific forms, FIRST MATCH WINS) ──
@@ -373,10 +373,12 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'coin_tracker_hot'): 1.0,         # OK — bare coin_tracker_hot fallback
     ('EXTREME', 'pump_chain'): 1.0,              # OK 2026-09-22 — bare form 63.6% WR, +$1.35 (22T)
     ('EXTREME', 'pump-chain+'): 1.0,             # OK 2026-09-22 — 45.8% WR, +$1.19 (48T)
-    ('EXTREME', 'pump-chain-'): 1.0,             # REVERTED 2026-10-08 brain_auditor — hyphen variant, same as underscore. 14d EXTREME meta-RSI>=45: 41T +$1.09. Floors already block RSI<45 oversold.
+    ('EXTREME', 'pump-chain-'): 0.0,             # BLOCKED 2026-10-16 signal_reporter — hyphen variant, same as underscore. 24h 6T 0%WR -$0.36 ALL EXTREME.
     ('EXTREME', 'pump-chain'): 1.0,              # OK — bare form fallback (63.6% WR, +$1.35 in EXTREME)
     ('EXTREME', 'pump-catcher'): 0.5,            # PENALIZED — pump-catcher family in EXTREME
     ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter
+    ('EXTREME', 'bb-bounce-v2-long+'): 0.0,      # BLOCKED 2026-10-16 signal_reporter — 24h 3 EXTREME trades all losers (-$0.35). 14d EXTREME 9T 33.3%WR -$0.43. All-time EXTREME 12T -$0.63. FLAT 100%WR + NORMAL 50%WR +$0.33 kept — regime issue, not signal issue.
+    ('EXTREME', 'bb_bounce_v2_long'): 0.0,       # underscore form
     ('EXTREME', 'mtf-regime-trend-'): 0.0,       # BLOCKED CEO 2026-10-06 — EXTREME 30d 2T 0%WR -$0.23. SHORT model A: EXTREME habitat only profitable with RSI>=40; this signal's oversold leaks make EXTREME a bleed zone.
     ('EXTREME', 'mtf_regime_trend_short'): 0.0,  # underscore form
     ('EXTREME', 'mtf-regime-trend+'): 0.0,       # BLOCKED — signal already disabled (MTF_REGIME_TREND_PLUS_ENABLED=False); gate defense-in-depth

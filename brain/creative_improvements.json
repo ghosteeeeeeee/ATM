@@ -4818,5 +4818,23 @@
     "category": "system",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-16T14:43:42Z",
+    "idea": "MFE-at-10min no-progress early cut for NON-grind signals (bb-squeeze, doji, bb-bounce) — cut at -0.6% unleveraged if 10-min MFE <0.15%",
+    "rationale": "Momentum-gate FAIL proves chop signature is post-entry (MFE), not pre-entry. HML losers ride to -3% account; a 10-min no-progress cut costs -0.6% instead. Scoped AWAY from pump-chain (dead_money lesson: grind IS the setup, 116/147 below +2% at 2h). Non-grind signals have lower HR rate — verify before shipping.",
+    "expected_impact": "~-$0.60 to -$1.20/7d saved on chop family IF HR-kill rate stays <10% in non-grind signals",
+    "category": "exit sniper",
+    "status": "suggested — needs self_learner backtest with HR-kill guard",
+    "risk": "medium (dead_money precedent)"
+  },
+  {
+    "date": "2026-10-16T14:43:42Z",
+    "idea": "5m pre-entry momentum gate (|mom5|<0.15% block)",
+    "rationale": "Commissioned Oct 13-15 as hard_max_loss root fix. Backtested n=768: FAIL — TRAIL vs CHOP avgM delta +0.007pp, winner-block 46%, non-monotonic. Closed.",
+    "expected_impact": "n/a — not shipped",
+    "category": "entry sniper",
+    "status": "REJECTED (backtest fail, 2026-10-16)",
+    "risk": "high (would have killed 46% of winners)"
   }
 ]

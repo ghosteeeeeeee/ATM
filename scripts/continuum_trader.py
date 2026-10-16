@@ -96,7 +96,8 @@ def _remove_from_paper_db(order_id):
         
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
-        cur.execute("UPDATE trades SET status = 'closed', close_time = NOW() WHERE signal = 'continuum_engine' AND status = 'open' ORDER BY id DESC LIMIT 1")
+        # Use subquery — PostgreSQL doesn't support ORDER BY/LIMIT in UPDATE
+        cur.execute("UPDATE trades SET status = 'closed', close_time = NOW() WHERE id = (SELECT id FROM trades WHERE signal = 'continuum_engine' AND status = 'open' ORDER BY id DESC LIMIT 1)")
         conn.commit()
         cur.close()
         conn.close()
