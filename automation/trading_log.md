@@ -10519,3 +10519,22 @@ BY: daily_orchestrator
 **Open Questions:**
 - 24h WR 33.3% still below 50% checkpoint (CEO-owned)
 - hard_max_loss 3 exits −$0.29 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 02:10] Hourly Analysis
+
+**Trades:** 2 closed last hour (2W 0L) — HYPE hl_copy UNIVERSAL_MAX_HOLD +$0.03 (+0.90%), INJ ai-trader+ atr_trail_hit +$0.13 (+5.85%)
+**PnL:** +$0.16 last hour | 24h 15T 7W +$0.63 (~46.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal has 3+ trades this hour — no kill
+- atr_sl_hit 3/15 = 20% (under 40 threshold; tpsl_utils fix deployed)
+- No 3-consecutive-neg-hour streak (23:00 −$0.13, 00:00 quiet, 01:00 +$0.16)
+- Overtrade 2/hr; live_trading=true, kill JSON=true
+- pump-chain+ 6T 3W +$1.03 still only net-positive signal ≥2T; WR improved to 46.7% 24h
+- Open: BTC manual −0.51%, APT pump-chain- SHORT +0.48%
+
+**Open Questions:**
+- 24h WR 46.7% approaching 50% checkpoint (CEO-owned)
+- hard_max_loss 2 exits −$0.20 24h — standing CEO hold, momentum-gate backtest due Oct 17
