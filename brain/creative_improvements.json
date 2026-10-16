@@ -4800,5 +4800,23 @@
     "category": "instrumentation",
     "status": "suggested",
     "risk": "none (log-only)"
+  },
+  {
+    "date": "2026-10-16T13:30:00Z",
+    "idea": "pump-chain- SHORT z-score sweet-band gate (z in [-2.5,-1.5])",
+    "rationale": "14d: z -1.5..-2.5 = 24T +.10 best; z -0.5..-1.5 = 19T -/usr/bin/bash.88 worst (pump not faded, fighting).",
+    "expected_impact": "Avoid ~/usr/bin/bash.88/14d bleed in worst band",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — soak dead-gap block first (one variable at a time)"
+  },
+  {
+    "date": "2026-10-16T13:30:00Z",
+    "idea": "Watchdog signal_performance should window to 24h/7d not all-time",
+    "rationale": "Cumulative stats produced 2 misleading steers this run (killed signal still flagged; RSI heuristic contradicted by bands).",
+    "expected_impact": "Fewer false steers",
+    "category": "system",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

@@ -5102,6 +5102,31 @@ def run(dry_run=False):
         except ImportError:
             pass
 
+        # ── pump-chain- SHORT dead-gap band: block gap in [-0.5, 0.2) ────────
+        # brain_auditor 2026-10-16. 30d: band 27T 22.2%WR -$1.50 (chop aftermath —
+        # pump already faded, price near/below EMA, shorting into bounce magnet).
+        # Kept: gap>=0.2 31T 45.2% +$0.92; gap<-0.5 55T 43.6% -$0.39.
+        # Blocks 6 winners (+$0.58), 21 losers (-$2.08), net +$1.50/30d.
+        # Mirror of PUMP_CHAIN_LONG_MAX_ENTRY_GAP (chase-up block) — this is chase-down.
+        try:
+            from hermes_constants import (
+                PUMP_CHAIN_SHORT_DEAD_GAP_BLOCK_ENABLED,
+                PUMP_CHAIN_SHORT_DEAD_GAP_MIN,
+                PUMP_CHAIN_SHORT_DEAD_GAP_MAX,
+            )
+            _pcsg_st = f"{sig.get('signal_type') or ''} {source or ''}"
+            if (PUMP_CHAIN_SHORT_DEAD_GAP_BLOCK_ENABLED
+                    and 'pump-chain' in _pcsg_st and direction.upper() == 'SHORT'
+                    and _gap_at_entry is not None
+                    and PUMP_CHAIN_SHORT_DEAD_GAP_MIN <= _gap_at_entry < PUMP_CHAIN_SHORT_DEAD_GAP_MAX):
+                log(f'  🎯 [PUMP-CHAIN-SHORT-DEAD-GAP] {token} SHORT BLOCKED — gap={_gap_at_entry:.2f}% in [{PUMP_CHAIN_SHORT_DEAD_GAP_MIN},{PUMP_CHAIN_SHORT_DEAD_GAP_MAX}) death band (30d 27T 22.2%WR -$1.50)')
+                if sig_id:
+                    release_signal_claim(sig_id, 'SKIPPED', reason='post-claim block: PUMP-CHAIN-SHORT-DEAD-GAP pump faded, bounce magnet')
+                skipped += 1
+                continue
+        except ImportError:
+            pass
+
         success, msg = execute_trade(
             token, direction, price, confidence, source,
             signal_type=sig.get('signal_type', ''),

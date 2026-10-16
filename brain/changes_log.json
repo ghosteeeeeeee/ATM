@@ -1408,5 +1408,16 @@
     "after": "review Oct 27 (14d from Oct 13 ship); flip criteria: >=14d + 0 trail-winner blocks + net counterfactual positive",
     "rationale": "Comment would have authorized a blind flip violating CEO D2 2026-10-12 shadow-first-14d ruling. 48h soak data (28 fires, 0 winners, executed subset all losers) agrees directionally but window too short vs standard.",
     "impact": "ZERO trading behavior change (comment only). Prevents future policy-violating flip. Verified py_compile OK + protected flags 13/13 intact + CHASE_RATIO_SHADOW still True."
+  },
+  {
+    "timestamp": "2026-10-16T13:30:00Z",
+    "agent": "brain_auditor",
+    "change": "pump-chain- SHORT dead-gap band block: gap_at_entry in [-0.5, 0.2) blocked at exec time",
+    "type": "config",
+    "file": "hermes_constants.py + decider_run.py",
+    "before": "pump-chain- SHORTs fired at any gap — gap -0.5..0.2 band bled (30d 27T 22.2%WR -$1.50, hard_max_loss 6 / hard_sl 4 / atr_sl 11)",
+    "after": "PUMP_CHAIN_SHORT_DEAD_GAP_BLOCK_ENABLED=True, MIN=-0.5, MAX=0.2. Blocks 6W +$0.58, 21L -$2.08, net +$1.50/30d. Kept: gap>=0.2 (45.2%WR +$0.92) and gap<-0.5 (43.6%WR).",
+    "rationale": "Watchdog flagged pump-chain- 4-loss streak (INJ/GRASS/CRV/IO) — all mid-band shorts squeezed by bounces. Watchdog suggested RSI_MIN 45→50 but band data REJECTS that (45-50 is best PnL cell +$0.71/14d; 50-55 is 0%WR). The actual death band is gap -0.5..0.2: pump already faded, price near/below EMA = shorting aftermath = bounce magnet. Verified 14d+30d, exit reasons confirm chop profile, kills 0% of kept-cohort winners above threshold.",
+    "impact": "Expected: stop pump-chain- bleed in faded-pump entries; ~+$1.50/30d net. Mirror of existing PUMP_CHAIN_LONG_MAX_ENTRY_GAP chase-up block."
   }
 ]

@@ -1433,7 +1433,10 @@ PUMP_CHAIN_LONG_RSI_MIN = 35          # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers
 
 # pump-chain- SHORT entry quality (replaced dead hours)
 PUMP_CHAIN_SHORT_DEAD_HOURS = []      # DISABLED 2026-09-30 — use entry quality filters instead
-PUMP_CHAIN_SHORT_RSI_MIN = 45        # CEO/T 2026-10-06: raised 40→45, align SHORT_RSI_FLOOR. 30d EXTREME pump-chain- meta-RSI: 40-45=15T -$0.35 53.3%WR (neg PnL); 45-50=7T +$0.13 57.1%; 55-65=7T +$0.76 71.4% (best). Old "40-45=75%WR" was stale 14d. Blocks confirmed 40-45 bleed, keeps 45+ edge.
+PUMP_CHAIN_SHORT_RSI_MIN = 45        # CEO/T 2026-10-06: raised 40→45, align SHORT_RSI_FLOOR. 30d EXTREME pump-chain- meta-RSI: 40-45=15T -$0.35 53.3%WR (neg PnL); 45-50=7T +$0.13 57.1%; 55-65=7T +$0.76 71.4% (best). Old "40-45=75%WR" was stale 14d. Blocks confirmed 40-45 bleed, keeps 45+ edge. NOTE 2026-10-16: watchdog suggested 45→50 — REJECTED. 14d 45-50 band = +$0.71 best PnL cell; 50-55 = 0%WR -$0.46. Raising min would kill the profit band.
+PUMP_CHAIN_SHORT_DEAD_GAP_MIN = -0.5 # brain_auditor 2026-10-16: death-gap band. gap_at_entry (price vs EMA) -0.5..0.2 = pump already faded, shorting aftermath = bounce magnet. 30d: band 27T 22.2%WR -$1.50 (atr_sl 11, hard_max_loss 6, hard_sl 4). Kept cohorts: gap>=0.2 31T 45.2% +$0.92; gap<-0.5 55T 43.6% -$0.39. Would block 6 winners (+$0.58), 21 losers (-$2.08), net +$1.50/30d. 14d: band 5T 0%WR -$0.50 (same direction).
+PUMP_CHAIN_SHORT_DEAD_GAP_MAX = 0.2
+PUMP_CHAIN_SHORT_DEAD_GAP_BLOCK_ENABLED = True  # Revert: set False. Exec-time in decider_run.py (mirror of PUMP_CHAIN_LONG_MAX_ENTRY_GAP).
 
 # ── SHORT Continuum Phase Filter ─────────────────────────────────────────────
 # plans/continuum-filter-analysis.md 2026-10-01 — 338T/14d
