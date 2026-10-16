@@ -10871,3 +10871,23 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - pump-chain- 24h 8T 0W −$0.49 — standing CEO decision (dual-emitter blocks unilateral kill)
 - 9-hour negative streak −$1.40 driven by regime; 24h PnL −$1.30 — CEO awareness item
 - hard_max_loss 7 exits −$0.87 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 22:10] Hourly Analysis
+
+**Trades:** 1 closed last hour (1W 0L) — WLD ai-trader+ LONG atr_sl_hit +$0.02 (+1.04%)
+**PnL:** +$0.02 last hour (100% WR) | 24h 51T 21W −$1.77 (41.2% WR by close-reason sum)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: only 1T this hour (ai-trader+ 1W, no signal 3+T); pump-chain- 0T this hour (24h 8T 0W −$0.49 standing CEO escalation, dual-emitter); pump-chain+ 24h 2T 0W −$0.27 still under 3T kill threshold
+- atr_sl_hit 17/51 = 33.3% (under 40 threshold; tpsl_utils fix deployed)
+- 7-neg-hour streak 15:00–21:00 (−$1.30) BROKEN by 22:00 +$0.02; regime RANGING_BULL (btc_score 58.5) not NEUTRAL → no size cut per rule anyway
+- Overtrade 1/hr (under 20); live_trading=true, kill JSON=true
+- WLD atr_sl_hit closed green (+1.04% account) — trailing moved SL into profit before hit; expected behavior
+
+**Open Questions:**
+- pump-chain- 24h 8T 0W −$0.49 — standing CEO decision (dual-emitter blocks unilateral kill); 0T this hour, bleed paused
+- doji-bottom-long 24h 11T 5W −$0.51 — positive WR, no kill rule; largest 24h loser by signal, watch
+- 24h PnL −$1.77 (sliding window dropped earlier wins) — regime RANGING_BULL now; CEO awareness
+- hard_max_loss 7 exits −$0.87 24h — standing CEO hold, momentum-gate backtest due Oct 17
