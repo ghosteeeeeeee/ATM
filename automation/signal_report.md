@@ -1,48 +1,32 @@
-# Signal Performance Report
-**Generated:** 2026-10-16 01:35 UTC | **Period:** Last 6h + 24h (+7d watch list)
+=== Signal Performance Report ===
+Period: Last 6h | 24h
+Generated: 2026-10-16 ~06:00 UTC
 
-## Trade Volume
-- **6h closed:** 7 trades | **24h closed:** 15 trades
-- Low-volume window — no signal met kill or boost thresholds in 24h.
+Totals: 6h = 8 trades, -$0.32 | 24h = 22 trades, +$0.43
 
----
-
-## KILLED (executed)
-
+KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None — no signal met kill criteria (WR<30%, n>=5, PnL<-$0.10, 24h) |
+| (none) | | | | | No signal met kill criteria (needs WR<30%, 5+ trades, PnL<-$0.10) |
 
-## BOOSTED (executed)
-
+BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None — pump-chain+ LONG best at 50% WR (needs >55%) |
+| (none) | | | | | No signal met boost criteria (needs WR>55%, 5+ trades) |
 
-## LOSERS (watch list)
-
+LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-breakout-long+ | LONG | 18.8% | -0.76 | 16 (7d) | WATCH — EXTREME 10% WR (n=10), HIGH 42.9% (n=7); no regime >=55%, kill candidate if 24h volume returns |
-| hmacd_mtf-+ | LONG | 25.0% | -0.46 | 8 (7d) | WATCH — EXTREME 33.3% (n=3) |
-| oversold-bounce+ | LONG | 28.6% | -0.32 | 7 (7d) | WATCH — EXTREME 0% WR (n=3), HIGH 50% (n=4) |
-| volume-buildup+ | LONG | 20.0% | -0.21 | 5 (7d) | WATCH — NORMAL regime 20% WR (n=5) |
-| bb-bounce-v2-long+ | LONG | 0.0% | -0.15 | 1 (24h) | Single trade, insufficient data |
-| grind-breakout- | SHORT | 0.0% | -0.12 | 1 (24h) | Single trade, insufficient data |
-| ai-trader-manual | SHORT | 0.0% | -0.18 | 1 (24h) | Manual trade, not signal-tunable |
+| pump-chain- | SHORT | 0.0% | -$0.20 | 3 (24h) | WATCH — below 5-trade kill threshold; 7d: 27.6% WR, +$0.04 (n=29). All-time regime: NORMAL 64.3% WR (+$0.48), EXTREME 44.8% (-$0.25), HIGH 46.2% (-$0.42). Not a blanket kill; NORMAL regime edge intact. |
 
-## WINNERS
-
+WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 50.0% | +1.03 | 6 (24h) | 35.5% WR / +0.93 over 7d (n=31) — marginally profitable, keep |
-| ai-trader+ | LONG | 100% | +0.13 | 1 (24h) | Single win, insufficient data |
-| liq-hunt+ | LONG | 100% | +0.05 | 1 (24h) | Single win, insufficient data |
-| doji-bottom-long | LONG | 100% | +0.02 | 1 (24h) | Single win, insufficient data |
+| pump-chain+ | LONG | 42.9% | +$0.95 | 7 (24h) | Positive PnL, largest 24h contributor; WR below 55% boost bar. 7d: 34.4% WR, +$0.85 (n=32). |
+| ai-trader+ | LONG | 50.0% | +$0.01 | 2 (24h) | Small sample, breakeven |
+| hl_copy_trader | LONG | 50.0% | +$0.01 | 2 (24h) | Small sample, breakeven |
 
-## ISSUES
-
-- No direction inversions found (24h).
-- Low trade throughput: only 15 closed trades in 24h — signal stats are noise-dominated; no aggressive actions taken.
-- 7d losers (volume-breakout-long+, hmacd_mtf-+, oversold-bounce+, volume-buildup+) all lose in EXTREME regime; no regime has >=55% WR, so they qualify for blanket kill IF 24h criteria are met on a future run with adequate sample.
-- ai-trader-manual SHORT (-0.18) is a manual trade — flagging to CEO but not signal-tunable.
+ISSUES:
+- No direction inversions detected in 24h (0 mismatches).
+- Signal volume is low (22 closed trades in 24h) — insufficient data for most kill/boost decisions this cycle.
+- pump-chain- SHORT 3 straight SL hits in 6h (atr_sl_hit) but 7d PnL still slightly positive; recheck next cycle if 5+ 24h trades accumulate.
