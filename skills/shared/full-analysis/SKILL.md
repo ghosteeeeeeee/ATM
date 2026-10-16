@@ -96,6 +96,39 @@ Volume confirmation across timeframes tells you if a move is real:
 - **Volume on crossover:** MACD crossover WITH volume = real. Without = fake.
 - **Volume divergence:** Price higher but volume declining = weak rally, reversal coming.
 
+### MTF MACD Analysis
+
+MACD alignment across timeframes shows trend strength:
+
+**Per-TF MACD status:**
+- **Bullish** = MACD line above signal line
+- **Bearish** = MACD line below signal line
+- **Crossover** = momentum shift (BULL XO or BEAR XO)
+- **Histogram** = distance between MACD and signal (rising = momentum building, falling = fading)
+
+**MTF MACD patterns:**
+
+| Pattern | 1m | 5m | 15m | 1h | Meaning |
+|---------|----|----|-----|----|---------|
+| **Full bull** | 🟢 | 🟢 | 🟢 | 🟢 | Strong uptrend, ride it |
+| **Full bear** | 🔴 | 🔴 | 🔴 | 🔴 | Strong downtrend, ride it |
+| **Bull forming** | 🟢 | 🟢 | 🔴 | 🔴 | Bottom-up, early long |
+| **Bear forming** | 🔴 | 🔴 | 🟢 | 🟢 | Top-down, early short |
+| **Mixed** | Mixed | Mixed | Mixed | Mixed | Chop, no edge |
+
+**Key rules:**
+- **1m/5m lead, 15m/1h confirm.** If lower TFs cross bullish but higher TFs bearish, it's a bounce not a trend.
+- **Histogram divergence:** Price makes higher high but histogram makes lower high = bearish divergence (and vice versa).
+- **Crossover timing:** Enter on 5m crossover, not 1m (1m is noise).
+- **Cascading crossovers:** 1m → 5m → 15m → 1h = strongest signal (momentum building through TFs).
+- **Histogram slope:** Rising histogram = momentum building. Falling = fading. Flat = consolidation.
+
+**MACD + Volume confirmation:**
+- MACD crossover + volume surge = **real move**
+- MACD crossover + low volume = **fake move, likely fails**
+- MACD bearish + volume surge = **real selloff**
+- MACD bullish + volume surge = **real rally**
+
 ## Analysis Script
 
 Run this to get the complete picture:
