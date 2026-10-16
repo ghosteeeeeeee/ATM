@@ -131,11 +131,11 @@ def _get_signal_metadata(token):
         cur = conn.cursor()
         cur.execute("""
             SELECT _signal_metadata FROM trades
-            WHERE token = %s AND signal LIKE '%pump-chain%'
+            WHERE token = %s AND signal LIKE %s
             AND _signal_metadata IS NOT NULL
             AND direction = 'SHORT'
             ORDER BY close_time DESC LIMIT 1
-        """, (token,))
+        """, (token, '%pump-chain%'))
         row = cur.fetchone()
         cur.close()
         
