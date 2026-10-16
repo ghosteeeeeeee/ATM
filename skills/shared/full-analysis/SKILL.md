@@ -129,6 +129,64 @@ MACD alignment across timeframes shows trend strength:
 - MACD bearish + volume surge = **real selloff**
 - MACD bullish + volume surge = **real rally**
 
+### Trendlines
+
+Trendlines connect swing points to show trend direction and dynamic support/resistance:
+
+**How to draw:**
+- **Uptrend line:** Connect 2+ rising swing lows (support)
+- **Downtrend line:** Connect 2+ falling swing highs (resistance)
+- **More touches = stronger trendline** (3+ touches = significant)
+- **Steeper trendline = more fragile** (breaks easily on pullback)
+- **Shallower trendline = more robust** (survives volatility)
+
+**Breakout/breakdown signals:**
+- Price breaks ABOVE downtrend line = **bullish signal**
+- Price breaks BELOW uptrend line = **bearish signal**
+- Wait for candle CLOSE beyond trendline (not just wick)
+- **Volume confirmation** — breakout with volume = real, without = fake
+
+**Trendline + EMA confluence:**
+- Trendline and EMA200 at same level = **strong support/resistance**
+- Bounce off both = high-probability entry
+- Break through both = strong reversal signal
+
+### Chart Patterns
+
+**Continuation Patterns:**
+
+| Pattern | Structure | Entry | Target |
+|---------|-----------|-------|--------|
+| **Bull Flag** | Sharp rally (pole) + tight consolidation (flag) | Break above flag high | Pole height projected up |
+| **Bear Flag** | Sharp decline (pole) + tight consolidation (flag) | Break below flag low | Pole height projected down |
+| **Bull Pennant** | Rally + converging triangle consolidation | Break above pennant | Pole height projected up |
+| **Ascending Triangle** | Flat resistance + rising lows | Break above resistance | Triangle height projected up |
+| **Descending Triangle** | Flat support + falling highs | Break below support | Triangle height projected down |
+
+**Reversal Patterns:**
+
+| Pattern | Structure | Signal |
+|---------|-----------|--------|
+| **Double Bottom** | Two troughs at similar price | Bullish — enter long on break above neckline |
+| **Double Top** | Two peaks at similar price | Bearish — enter short on break below neckline |
+| **Head & Shoulders** | Peak with two lower shoulders | Bearish — enter short on break below neckline |
+| **Inverse H&S** | Trough with two higher shoulders | Bullish — enter long on break above neckline |
+| **Rounding Bottom** | Gradual shift from down to up | Bullish — enter on breakout |
+
+**Fakeout Patterns:**
+
+| Pattern | Structure | Signal |
+|---------|-----------|--------|
+| **Bull Trap** | Breaks above resistance then dumps | Bearish — exit longs, consider short |
+| **Bear Trap** | Breaks below support then pumps | Bullish — exit shorts, consider long |
+| **Stop Hunt** | Quick spike through S/R to trigger stops | Reversal likely — wait for direction |
+
+**Pattern Detection Rules:**
+- **Flag ratio:** Flag consolidation should be <50% of pole height
+- **Volume:** Patterns need declining volume during consolidation, increasing on breakout
+- **Timeframe:** 5m+ patterns are more reliable than 1m
+- **Confluence:** Pattern + EMA + S/R = strongest signals
+
 ## Analysis Script
 
 Run this to get the complete picture:
