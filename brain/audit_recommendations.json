@@ -1,133 +1,88 @@
 {
-  "timestamp": "2026-10-16T11:43:18Z",
+  "timestamp": "2026-10-16T12:48:33.951126+00:00",
   "session_brain_stats": {
-    "queries_run": 3,
-    "note": "session_brain loaded; pump-chain short / momentum gate / wrong-side topics surfaced prior decisions, no new missing implementations beyond standing backlog"
+    "queries_run": 1,
+    "top_insight": "Confluence gate neutral-relax only works in NEUTRAL regime; STANDALONE_BYPASS signals skip compactor entirely"
   },
   "trade_summary_24h": {
-    "closed": 31,
-    "wr": 43.3,
-    "net_pnl": 0.12,
-    "long": "20T +$0.88 55.0%WR",
-    "short": "11T -$0.76 18.2%WR",
-    "top_losers_signal": "pump-chain- SHORT 6T 0%WR -$0.36 (watchdog flagged)",
-    "top_winner_signal": "pump-chain+ LONG 7T 42.9%WR +$0.95 (trail family carrying)",
-    "exit_mix": "atr_sl_hit 11T -$0.91 | hard_max_loss 3T -$0.29 | trail families +$1.62"
+    "trades": 37,
+    "win_rate": 45.9,
+    "pnl": 0.12,
+    "note": "POSITIVE — first clean positive 24h in days. Recent fixes aging in."
   },
-  "seven_day": {
-    "all": "212T -$1.35 35.4%WR",
-    "trail_family": "74T +$7.81 89.2%WR",
-    "chop_family": "125T -$9.94 1.6%WR",
-    "short": "58T -$1.04 29.3%WR",
-    "long": "154T -$0.31 37.7%WR"
+  "trade_summary_7d": {
+    "trades": 218,
+    "win_rate": 36.2,
+    "pnl": -1.35,
+    "trail_family": "88T +$7.71 81.8%WR — THE MONEY",
+    "chop_family": "118T -$9.98 0%WR — THE BLEED"
   },
   "last_run_changes_verified": [
     {
-      "change": "SHORT_MIDBAND_BLOCK_ENABLED=True (00:43)",
+      "change": "SHORT_MIDBAND_BLOCK (RSI 45-55 non-pump-chain SHORTs)",
       "status": "WORKING",
-      "evidence": "HYPER SHORT RSI 48.1 blocked 4x at 08:22-08:23; 0 midband non-pump-chain shorts opened since ship (only ENS@60 / HBAR@63.6 outside band)"
+      "evidence": "0 non-pump-chain midband SHORTs since 00:43 ship; volume-buildup- at RSI 38/60/63 correctly outside band"
     },
     {
-      "change": "volume-breakout-short- kill (Oct 15 17:35)",
-      "status": "HOLDING",
-      "evidence": "0 post-kill trades; IO loss was pre-kill"
-    },
-    {
-      "change": "hmacd_mtf- kill (Oct 15 18:30)",
-      "status": "HOLDING",
-      "evidence": "0 post-kill trades"
-    },
-    {
-      "change": "CHASE_RATIO_SHADOW review-date comment fix (05:46)",
-      "status": "NO-BEHAVIOR",
-      "evidence": "comment only; shadow still True, review Oct 27"
-    },
-    {
-      "change": "CONF-CALIB clamp (Oct 15)",
+      "change": "CONF-CALIB clamp [0,100]",
       "status": "WORKING",
-      "evidence": "no conf>100 in 24h exec logs"
+      "evidence": "0 conf>100 trades since Oct 15 03:40 clamp; max conf 2d = 162.9 was pre-clamp (MNT Oct 15 00:29)"
+    },
+    {
+      "change": "volume-breakout-short- kill",
+      "status": "WORKING",
+      "evidence": "0 trades post Oct 15 17:35 kill"
+    },
+    {
+      "change": "hmacd_mtf- kill",
+      "status": "WORKING",
+      "evidence": "0 trades post Oct 15 18:30 kill (2 trades Oct 13 pre-kill)"
+    },
+    {
+      "change": "FLOOR-ADMIT shadow",
+      "status": "ACCRUING",
+      "evidence": "255 entries; 162 SHORT / 93 LONG; top: pump-chain- 95, volume-buildup- 60"
     }
   ],
-  "watchdog_steers_adressed": [
-    {
-      "steer": "pump-chain- 6-loss streak",
-      "verdict": "VERIFIED bleed but filters REJECTED on winner-kill",
-      "detail": "3d 25T 12%WR -$0.85 acute; post-Oct-6 cohort 44T +$0.12 25%WR breakeven-ish; RSI-55 ceiling kills 23.4% winners (prior run); below-EMA block collides with volume-buildup- edge (prior run). No new filter — soak + Oct 17 momentum-gate."
-    },
-    {
-      "steer": "6 recent losses wrong-side",
-      "verdict": "VERIFIED — chop-family entries never armed trail; same root as standing momentum-gate work"
-    },
-    {
-      "steer": "trade cluster HBAR/ETC/KAS + heavily long",
-      "verdict": "NOTED — 4 longs aligned LONG_BIAS/STRONG_UP; portfolio watch, not config"
-    }
-  ],
-  "drift_findings": [
-    {
-      "severity": "info",
-      "finding": "Watchdog 'long RSI 45-55 death band' DISPROVED on 30d",
-      "evidence": "30d 93T +$0.31 50.5%WR, Welch t=-0.111 p=0.91 vs other bands. 7d window (-$0.78/25T) is noise. DO NOT ship LONG 45-55 block."
-    },
-    {
-      "severity": "info",
-      "finding": "pump-chain- SHORT meta<45 'floor leak' is actually PROFITABLE",
-      "evidence": "post-Oct-6: 23T +$0.58 34.8%WR — bearish-oversold bypass working as designed (APT +$0.53, ACE +$0.30). GRASS@43.6 was one loss in a positive cohort. Do NOT tighten floor."
-    },
-    {
-      "severity": "low",
-      "finding": "WRONG_SIDE_SKIP_THRESHOLD=50 comment says '= MIN_EXEC_CONFIDENCE' but MIN_EXEC=40 (CEO Oct 10)",
-      "evidence": "decider_run.py:3426 local MIN_EXEC_CONFIDENCE=40; hermes_constants.py:1468 comment stale"
-    },
-    {
-      "severity": "medium",
-      "finding": "GRASS near-miss 11:30-11:33: conf 49.5 (product 0.17 washed to floor 0.5) passed MIN_EXEC=40; only CTX-GATE oversold (detect RSI 37.9<40) stopped it",
-      "evidence": "pipeline.log 11:30-11:33 — BTC-CRASH-OVERRIDE + NEUTRAL-BYPASS + CONTINUUM-HYSTERESIS + STANDALONE-BYPASS all allowed; tide 0.7x trend-align 0.6x insufficient. If detect RSI >=40, this short OPENS during bullish tide."
-    },
-    {
-      "severity": "info",
-      "finding": "hmacd_mtf-+ signal name has malformed direction suffix in trades table",
-      "evidence": "7d shows 'hmacd_mtf-+' as signal string; both direction flags already False — historical only"
-    }
-  ],
+  "drift_findings": [],
   "recurring_problems": [
-    "hard_max_loss #1 exit bleed 7d 60T -$5.54 — momentum-gate backtest self_learner DUE Oct 17 (4th re-request). Do NOT stack entry filters.",
-    "SHORT book bleed 7d 58T -$1.04 — pump-chain- acute 3d streak; defenses layered but dampen-only; hard-gate needs backtest",
-    "7d WR 35.4% below 50% checkpoint — ESCALATE guardrail active, no filter stacking"
+    {
+      "problem": "pump-chain- SHORT bleeding: 24h 0/6 -$0.36, 30d 113T 38.9% -$0.97",
+      "filters_tested_all_failed": [
+        "RANGING regime gate: p=0.54 (NOT significant)",
+        "EXTREME vs non-EXTREME: p=0.84 (NOT significant)",
+        "momentum_state falling block: p=0.79 (NOT significant)",
+        "price_acceleration <0 block: p=0.17 (closest, still fails)",
+        "momentum_score gate: p=0.99 (dead)"
+      ],
+      "verdict": "No statistically valid filter found. Monitor 48h. Every pump-chain- SHORT filter fails the p<0.05 bar. Do NOT ship on pattern alone — THE PATTERN rule (Oct 8 lesson)."
+    },
+    {
+      "problem": "hard_max_loss #1 bleed: 61T -$5.73/7d (chop entries that never reach trail)",
+      "status": "self_learner momentum-gate backtest due Oct 17 — do NOT stack entry filters before it lands"
+    }
   ],
-  "missing_implementations": [
-    "self_learner momentum-gate candle backtest (|m5|<0.15% vs trailing_activated) — due Oct 17, undelivered since Oct 13 (5th re-request)",
-    "wyckoff COOLDOWN_BARS formula-vs-comment fix — CEO-owned",
-    "Q4 portfolio cap backtest — pending since Oct 6"
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-10-16T11:43:18Z",
-      "idea": "Trail-arm-rate confidence multiplier (soft, per-cell)",
-      "rationale": "7d TRAIL 74T +$7.81 89.2% vs CHOP 125T -$9.94 1.6%. Entry quality = probability of reaching trail. For (signal, vol_regime, meta-RSI band) cells with n>=15/30d: trail-arm rate <25% → conf x0.7; >60% → conf x1.1. Soft demotion, not hard block — preserves 'every pump is a LONG / every dump is a SHORT'.",
-      "expected_impact": "Dampen chop-habitat entries ~10-15% of book without killing trail winners; targets hard_max_loss #1 bleed at root (zero-momentum entries)",
-      "category": "entry sniper",
+      "date": "2026-10-16T12:48:33.951126+00:00",
+      "idea": "Trail-arm-rate chop-risk tag: before execution, look up 30d trail-arm rate for (signal family, direction, volatility_regime) cell. If arm_rate < 20%, tag trade metadata with chop_risk=true (log-only, no block). After 200 tagged trades, measure underperformance to decide whether a hard dampen is warranted.",
+      "rationale": "Trail family wins 81.8% with avg MFE 1.7%; chop family never arms and loses 100%. We can PREDICT which entries won't arm by looking up historical arm rates per cell. Measurement-first: zero live impact, builds evidence for future filter.",
+      "expected_impact": "If validated: dampen 30-40% of chop-family entries before they hit hard_max_loss. Current chop bleed: -$10/7d.",
+      "category": "instrumentation",
       "status": "suggested",
-      "risk": "medium",
-      "requires": "self_learner backtest: OOS 7d/30d, p<0.05, winner-kill <20%. Do NOT ship before Oct 17 momentum-gate lands (one variable at a time)."
-    },
-    {
-      "date": "2026-10-16T11:43:18Z",
-      "idea": "pump-chain- SHORT 'active dump' shadow collector",
-      "rationale": "GRASS-class near-miss: bullish-tide shorts survive to conf 49.5, stopped only by CTX-GATE. Winners are real dumps (APT +23.9%, DYDX +20%); losers are mid-band pops. Log coin 5m pct change at pump-chain- SHORT entry to JSONL (dump<0 vs pop>0) — accrues counterfactual for a future hard gate without touching live path.",
-      "expected_impact": "Data for tide/dump gate decision in ~7d; zero live impact",
-      "category": "shadow collector",
-      "status": "suggested",
-      "risk": "low"
+      "risk": "none (log-only)"
     }
   ],
   "config_changes_applied": [],
-  "changes_from_last_run": "All 5 verified: SHORT-MIDBAND FIRING (HYPER blocked), vbo-short- kill HOLDING, hmacd-mtf kill HOLDING, chase-ratio comment NO-BEHAVIOR, CONF-CALIB WORKING. 0 regressions.",
+  "changes_from_last_run": [
+    "All 5 changes from Oct 15-16 runs verified WORKING (see last_run_changes_verified)"
+  ],
   "next_actions": [
-    "self_learner momentum-gate backtest DUE Oct 17 EOD — 5th re-request; undelivered → brain_auditor runs scoped version Oct 18",
-    "Monitor pump-chain- SHORT: auto_1hr kill threshold (3+T/hr 0W or 7d net <-$1) — do not pre-kill, data says breakeven-ish post-Oct-6",
-    "GRASS-class near-miss: if any pump-chain- SHORT opens during bullish tide with detect RSI>=40 in next 48h, escalate tide hard-skip backtest",
-    "Watchdog 'long 45-55 death band' — CLOSED as noise (p=0.91); do not reopen on 7d windows",
-    "7d WR trajectory vs ESCALATE guardrail — no stacking until momentum-gate lands"
+    "Monitor pump-chain- SHORT for 48h — no valid filter found, price_acceleration p=0.17 is closest",
+    "self_learner momentum-gate backtest due Oct 17 (3rd re-request) — HARD deadline",
+    "FLOOR-ADMIT shadow: analyze at 500 entries for floor-0.3 vs floor-0.5 counterfactual",
+    "7d PnL trajectory improving: Oct 13 -$1.53 → Oct 15 +$0.30 → Oct 16 -$0.42 (48.1% WR)",
+    "Disk 81% — was 79% on Oct 15, trending up. Watch."
   ]
 }

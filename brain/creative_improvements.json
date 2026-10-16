@@ -4791,5 +4791,14 @@
     "category": "shadow collector",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-16T12:48:33.951126+00:00",
+    "idea": "Trail-arm-rate chop-risk tag: before execution, look up 30d trail-arm rate for (signal family, direction, volatility_regime) cell. If arm_rate < 20%, tag trade metadata with chop_risk=true (log-only, no block). After 200 tagged trades, measure underperformance to decide whether a hard dampen is warranted.",
+    "rationale": "Trail family wins 81.8% with avg MFE 1.7%; chop family never arms and loses 100%. We can PREDICT which entries won't arm by looking up historical arm rates per cell. Measurement-first: zero live impact, builds evidence for future filter.",
+    "expected_impact": "If validated: dampen 30-40% of chop-family entries before they hit hard_max_loss. Current chop bleed: -$10/7d.",
+    "category": "instrumentation",
+    "status": "suggested",
+    "risk": "none (log-only)"
   }
 ]
