@@ -1,6 +1,6 @@
 ---
 name: full-analysis
-description: Use when you need a complete trading analysis combining MTF, technical, contrarian, continuum, and S/R. The master analysis skill. Triggers on "full analysis", "complete analysis", "what's the call", "analyze everything", "run all analysis".
+description: Use when you need a complete trading analysis combining MTF, technical, contrarian, continuum, S/R, Bollinger Bands, and EMA200. The master analysis skill. Triggers on "full analysis", "complete analysis", "what's the call", "analyze everything", "run all analysis".
 ---
 
 # Full Analysis Skill
@@ -15,6 +15,33 @@ This skill combines:
 - **contrarian-analysis** — "What if I'm wrong?" checklist
 - **Continuum oscillator** — Macro regime
 - **Support/Resistance** — Key levels
+- **Bollinger Bands** — BB position (0=lower band, 1=upper band)
+- **EMA200** — Long-term dynamic support/resistance
+- **Volume ratio** — Per-timeframe volume confirmation
+
+## Key Indicators
+
+### Bollinger Band Position
+```
+BB Position = (Price - Lower Band) / (Upper Band - Lower Band)
+```
+- **0.0-0.2** = Near lower band (oversold, bounce zone)
+- **0.2-0.4** = Lower half (pullback zone)
+- **0.4-0.6** = Middle (neutral)
+- **0.6-0.8** = Upper half (rally zone)
+- **0.8-1.0** = Near upper band (overbought, rejection zone)
+- **>1.0** = Above upper band (extreme, imminent pullback)
+
+### EMA200
+- Price ABOVE EMA200 = long-term bullish
+- Price BELOW EMA200 = long-term bearish
+- EMA200 acts as dynamic support/resistance
+- Bounce off EMA200 = key entry signal
+
+### Volume Ratio
+- **>1.5x** = Surge (real move, confirmed)
+- **0.8-1.5x** = Normal (uncertain)
+- **<0.8x** = Low (weak move, likely fakeout)
 
 ## Analysis Script
 
