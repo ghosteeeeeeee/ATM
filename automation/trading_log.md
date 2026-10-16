@@ -10717,3 +10717,21 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 **Open Questions:**
 - pump-chain- 24h 6T 0W −$0.36 (0% WR) — hourly kill rule can't catch it at observed 1-2T/hr rate; standing CEO suggestion for 24h-based kill threshold (0% WR with 6+ trades)
 - hard_max_loss 2 exits −$0.16 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-16 12:09] Hourly Analysis
+
+**Trades:** 5 closed last hour (2W 3L) — KAS ai-trader+ LONG atr_trail_hit +$0.03 (+0.73%), ENS bb-squeeze+ LONG hard_max_loss −$0.19 (−4.40%), BTC manual LONG UNIVERSAL_MAX_HOLD +$0.09 (+3.79%), CAKE bb-squeeze+ LONG profit-monster-trail +$0.06 (+1.65%), HBAR volume-buildup- SHORT hard_max_loss −$0.13 (−5.72%)
+**PnL:** −$0.14 last hour (40% WR) | 24h 35T 14W +$0.11 (40% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: bb-squeeze+ 2T 1W1L this hour (not 0% WR); volume-buildup- 1T 0W; pump-chain- 0T this hour (24h 6T 0W −$0.36 remains standing watch item; hourly kill rule can't catch at 1-2T/hr observed rate)
+- atr_sl_hit 11/35 = 31.4% (under 40 threshold; tpsl_utils fix deployed)
+- No 3-neg-hour streak (10:00 +$0.03, 11:00 +$0.02, 12:00 −$0.16)
+- Overtrade 5/hr (under 20); live_trading=true, kill JSON=true
+- hard_max_loss exits ENS −4.40% / HBAR −5.72% account = ~1% price move at leverage — expected per leverage conversion, not a bug
+
+**Open Questions:**
+- pump-chain- 24h 6T 0W −$0.36 (0% WR) — standing CEO suggestion for 24h-based kill threshold (0% WR with 6+ trades)
+- hard_max_loss 4 exits −$0.48 24h — standing CEO hold, momentum-gate backtest due Oct 17
