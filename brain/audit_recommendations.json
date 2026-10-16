@@ -1,123 +1,141 @@
 {
-  "timestamp": "2026-10-16T14:43:42Z",
-  "agent": "brain_auditor",
-  "run_type": "captain audit (0 config changes — 4 filters in soak)",
-  "session_brain_stats": {
-    "queries_run": 3,
-    "top_hits": [
-      "rsi gate — pump-chain SHORT floor 45→40 already approved+shipped (own-conclusions)",
-      "bb-bounce-v2-long EXTREME regime — already blocked today by signal_reporter (volatility_gate_v2:380)",
-      "RR+k / wrong-side trades — recurring theme, root = chop entries, not timing"
-    ]
-  },
-  "trade_summary": {
-    "24h": {
-      "trades": 45,
-      "pnl": -0.09,
-      "wr": 44.4,
-      "long": "33T +$0.97 54.5%",
-      "short": "13T -$0.71 23.1%"
+    "timestamp": "2026-10-16T16:45:00Z",
+    "agent": "brain_auditor",
+    "session_lock": false,
+    "session_brain_stats": {
+        "queries_run": 1,
+        "top_insight": "BTC chop gate blocking momentum signals in downtrend — recurring topic across 8 sessions"
     },
-    "7d": {
-      "trades": 222,
-      "pnl": -1.18,
-      "wr": 36.9,
-      "trail_family": "85T +$8.20 88.2%",
-      "chop_family": "120T -$9.97 0%"
+    "trade_summary_24h": {
+        "closed": 50,
+        "pnl": -0.04,
+        "win_rate": 46.0,
+        "trail_family": "21T +$1.96 95.2%WR",
+        "chop_family": "22T -$1.82 0%WR",
+        "open_trades": 0,
+        "regime": "SHORT_BIAS STRONG_DOWN, BTC BELOW EMA300"
     },
-    "30d": {
-      "trades": 775,
-      "pnl": -3.72,
-      "wr": 44.0
+    "trade_summary_7d": {
+        "closed": 225,
+        "pnl": -1.55,
+        "win_rate": 36.9,
+        "trail_family": "75T +$7.34 89.3%WR",
+        "chop_family": "121T -$9.71 1.7%WR"
     },
-    "open": "BTC long ai-trader-manual (flat), SOPH long bb-bounce-v2-long+ +0.54% — both fresh, no action"
-  },
-  "watchdog_steers": [
-    {
-      "id": "steer-001",
-      "title": "cluster SOPH+BTC",
-      "verdict": "noted — 2 fresh opens, manual BTC is CEO/AI-trader territory, no captain action"
+    "trade_summary_30d": {
+        "trail_family": "270T +$19.17 78.5%WR",
+        "chop_family": "353T -$23.81 19.0%WR"
     },
-    {
-      "id": "steer-002",
-      "title": "7 recent losses wrong-side",
-      "verdict": "VERIFIED — chop family 7d 120T -$9.97 0%WR vs trail 85T +$8.20 88.2%. Root = entry quality in chop; 4 entry fixes in soak (midband, dead-gap, bb-bounce EXTREME, RSI bands). Momentum-gate backtest run early — FAIL, see verdict."
+    "changes_from_last_run": [
+        {
+            "change": "CONF-CALIB clamp execute_trade confidence [0,100]",
+            "landed": "2026-10-15T03:40Z",
+            "verified": "PASS — 0 trades conf>100 since clamp",
+            "action": "none"
+        },
+        {
+            "change": "SHORT_MIDBAND_BLOCK RSI 45-55 non-pump-chain SHORTs",
+            "landed": "2026-10-16T00:43Z",
+            "verified": "WORKING — blocked HYPER@48.1 (08:22), STX@53.2 (13:22). 4 non-pc SHORTs post-ship -$0.03. Soak continues.",
+            "action": "none"
+        },
+        {
+            "change": "PUMP_CHAIN_SHORT_DEAD_GAP_BLOCK gap [-0.5,0.2)",
+            "landed": "2026-10-16T13:30Z",
+            "verified": "WORKING — blocked INJ@-0.48 (14:01). DOT@14:04 gap+0.54 correctly outside band (kept cohort). 30d validation: dead_band 31T 25.8%WR -$1.51 vs kept_gap>=0.2 34T 41.2% +$0.80.",
+            "action": "none — soak to Oct 18"
+        },
+        {
+            "change": "KILL volume-breakout-short- (VOLUME_BREAKOUT_MINUS_ENABLED=False)",
+            "landed": "2026-10-15T17:35Z",
+            "verified": "PASS — 0 post-kill trades. 7d 1HML -$0.09 is pre-kill aging out.",
+            "action": "none"
+        },
+        {
+            "change": "KILL hmacd_mtf- SHORT (HMACD_MTF_MINUS_ENABLED=False)",
+            "landed": "2026-10-15T18:30Z",
+            "verified": "PASS — 0 post-kill trades.",
+            "action": "none"
+        },
+        {
+            "change": "KILL LONG-SHORT-BIAS dampen shadow",
+            "landed": "2026-10-15T14:45Z",
+            "verified": "PASS — shadow stopped, no live impact.",
+            "action": "none"
+        },
+        {
+            "change": "FLOOR-ADMIT shadow collector",
+            "landed": "2026-10-15T23:44Z",
+            "verified": "ACCRUING — decision-ready by Oct 19.",
+            "action": "none"
+        }
+    ],
+    "watchdog_steer_verification": [
+        {
+            "steer": "steer-001: 7 recent losses look like wrong-side trades",
+            "verdict": "VERIFIED — LONG losers 24h spread across BTC manual/ENS bb-squeeze/BABY+APT bb-bounce/WCT+MET doji/GMX+ARB ai-trader/JUP+FIL pump-chain+. All knife-catches in SHORT_BIAS/STRONG_DOWN. BUT: LONG-SHORT-BIAS dampen shadow was KILLED Oct 15 (cohort n=48 +$0.84 45.8%WR — premise falsified). Losses = variance within net-positive LONG cohort. Root cause = regime variance, not signal defect.",
+            "action": "no regime block — shadow data falsified the fix"
+        },
+        {
+            "steer": "steer-002: bb-bounce-v2-long+ losing streak 3 losses",
+            "verdict": "PARTIALLY STALE — 24h now 6T 1W 33%WR -$0.27 (includes 2 trail winners SOPH+BIGTIME). 7d 20T 40% -$0.41. 30d 54T 55.6% +$0.32 (still positive). Bleed source = EXTREME regime 11T 45.5% -$0.33; non-EXTREME 43T 58.1% +$0.65. n=11 < 20-trade bar.",
+            "action": "monitor — EXTREME dampen below sample bar; re-check at n>=20"
+        }
+    ],
+    "losing_trade_autopsy_24h": {
+        "pattern": "LONG knife-catches into STRONG_DOWN dominate losers. #1 single loss BTC manual LONG -$0.23 HML -4.99% (manual trade, ai-trader-manual). #2 ENS bb-squeeze+ -$0.19 HML. bb-bounce APT/ALT/BABY EXTREME -$0.35 combined. pump-chain- SHORT 8T 0W -$0.49 (dead-gap block landed 13:30, already blocked INJ).",
+        "chop_vs_trend": "TRAIL 21T +$1.96 95.2% vs CHOP 22T -$1.82 0%. Winners trail; losers never arm. HML avg hold 30min = dead chop entries. #1 HML bleed signal volume-breakout-long+ 9T -$1.08 is PRE-KILL (killed Oct 13), aging out.",
+        "recommended_changes": "NONE this run — DEAD_GAP + MIDBAND blocks both <13h old, verified firing, need soak. Momentum-gate backtest (self_learner, due Oct 17) is the root-fix vehicle for HML bleed. Do NOT stack entry filters."
     },
-    {
-      "id": "steer-003",
-      "title": "bb-bounce-v2-long+ 3-loss streak",
-      "verdict": "COVERED — EXTREME regime block (0.0x) shipped today by signal_reporter (volatility_gate_v2:380). 14d EXTREME 9T 33.3% -$0.43, 30d 10T 40% -$0.39, OOS-consistent. Soak; SOPH open is non-EXTREME, allowed."
-    },
-    {
-      "id": "steer-004",
-      "title": "pump-chain- 4-loss streak",
-      "verdict": "PARTLY COVERED — dead-gap band block landed 13:30 (gap [-0.5,0.2)). Only 1 trade since (DOT gap +0.544, outside band, lost). 14d band data confirms 45→50 RSI-min raise stays REJECTED (45-50 = +$0.71 best cell; 50-55 = -$0.57 worst). Soak."
-    }
-  ],
-  "momentum_gate_backtest": {
-    "status": "COMPLETE (1 day before Oct 17 deadline)",
-    "verdict": "FAIL — do not ship",
-    "n": 768,
-    "key_finding": "avg |mom5| TRAIL 0.270% vs CHOP 0.259% (delta +0.007pp). Winner-block @0.15% threshold = 46.3% (bar is 20%). Sweep non-monotonic = noise.",
-    "detail": "brain/verdicts/2026-10-16_momentum-gate-backtest.md"
-  },
-  "last_run_changes_verify": [
-    {
-      "change": "watchdog direction lowercase fix (Oct 15 19:40)",
-      "status": "PASS — trade_watchdog.py:660 verified"
-    },
-    {
-      "change": "FLOOR-ADMIT shadow (Oct 15 23:44)",
-      "status": "PASS — data/floor_admit_shadow.jsonl accruing (DOT 14:03, SOPH 14:18). Decision data due Oct 19."
-    },
-    {
-      "change": "SHORT midband 45-55 death band (Oct 16 00:43)",
-      "status": "FIRING — 4 live blocks logged (HYPER RSI 48.1 ×3, STX RSI 53.2). Post-land non-pump SHORT cohort 3T -$0.05 66.7%WR."
-    },
-    {
-      "change": "pump-chain- dead-gap band (Oct 16 13:30)",
-      "status": "SOAKING — 0 in-band fires yet (DOT gap +0.544 outside band). Eval after 3-5 more trades."
-    },
-    {
-      "change": "bb-bounce-v2-long+ EXTREME 0.0x (signal_reporter Oct 16)",
-      "status": "VERIFIED SHIPPED — volatility_gate_v2:380. Not re-proposed."
-    }
-  ],
-  "config_changes_applied": [],
-  "rejections": [
-    {
-      "proposal": "PUMP_CHAIN_SHORT_RSI_MIN 45→50 (watchdog deep-analysis)",
-      "reason": "14d meta-RSI bands: 45-50 = 12T +$0.71 BEST PnL cell; 50-55 = 9T 11.1% -$0.57 worst. Raising min kills the profit band and keeps the death band. REJECTED (reconfirmed with fresh data)."
-    },
-    {
-      "proposal": "momentum gate |mom5|<0.15% block",
-      "reason": "Backtested today, FAIL: no separation (delta 0.007pp), winner-block 46%, non-monotonic sweep. See verdict file."
-    },
-    {
-      "proposal": "pump-chain- 50-55 RSI band block",
-      "reason": "14d n=9 <20 bar; 30d 29T 41.4% -$0.52 weak. Stacking ban + soak. MONITOR — revisit if band stays negative after dead-gap soak."
-    },
-    {
-      "proposal": "volume-breakout-long+ regime gate (watchdog rec #2)",
-      "reason": "Already shipped Oct 13 (VOLUME_BREAKOUT_PLUS_ENABLED=False). Watchdog deep-analysis stale on this point."
-    }
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-10-16T14:43:42Z",
-      "idea": "MFE-at-10min no-progress early cut for NON-grind signals (bb-squeeze, doji, bb-bounce) — cut at -0.6% unleveraged if 10-min MFE <0.15%",
-      "rationale": "Momentum-gate FAIL proves chop signature is post-entry (MFE), not pre-entry. HML losers ride to -3% account; a 10-min no-progress cut costs -0.6% instead. Scoped AWAY from pump-chain (dead_money lesson: grind IS the setup, 116/147 below +2% at 2h). Non-grind signals have lower HR rate — verify before shipping.",
-      "expected_impact": "~-$0.60 to -$1.20/7d saved on chop family IF HR-kill rate stays <10% in non-grind signals",
-      "category": "exit sniper",
-      "status": "suggested — needs self_learner backtest with HR-kill guard",
-      "risk": "medium (dead_money precedent)"
-    }
-  ],
-  "next_actions": [
-    "Soak watch: midband (4 blocks, eval Oct 18), dead-gap (eval after 3-5 in-band trades), bb-bounce EXTREME block (eval Oct 18), FLOOR-ADMIT shadow (decision Oct 19)",
-    "Momentum-gate: report FAIL to CEO — Oct 17 deliverable closed early; no self_learner dependency",
-    "pump-chain- 50-55 band: monitor, not ship (n<20)",
-    "Progressive-exit-ladder backtest (non-grind scope) — delegate self_learner with HR-kill guard spec from this run",
-    "7d PnL ≥$0 guardrail: currently −$1.18 — trail family +$8.20 must outrun chop −$9.97; entry fixes in soak are the lever"
-  ]
+    "drift_findings": [],
+    "recurring_problems": [
+        {
+            "problem": "hard_max_loss #1 bleed — 60T/7d -$5.67, avg hold 30min, 0%WR",
+            "status": "ROOT FIX PENDING — self_learner momentum-gate backtest due Oct 17 (4th re-request). Trail family 78-95% WR proves exit engine fine; entry quality is the leak. No filter stacking until backtest lands.",
+            "severity": "HIGH"
+        },
+        {
+            "problem": "pump-chain- SHORT dual-emitter (pump_flow_signal + pump_chain_v5_short both emit 'pump-chain-')",
+            "status": "CEO DECISION — auto_1hr kill threshold MET (8T 0W -$0.49/24h) but pump_flow also emits profitable pump-chain+ +$0.95. Can't kill wholesale. Dead-gap block is the surgical fix (blocks death-band entries from BOTH emitters). Soak to Oct 18.",
+            "severity": "MEDIUM"
+        },
+        {
+            "problem": "7d WR 36.9% below 50% target",
+            "status": "ESCALATED — Oct 15 checkpoint missed (34.7%). 7d PnL -$1.55. Guardrail ESCALATE active. No filter stacking. Momentum-gate backtest is the vehicle.",
+            "severity": "HIGH"
+        }
+    ],
+    "missing_implementations": [
+        {
+            "item": "self_learner momentum-gate backtest (|price_change_5m|<0.15% block vs trail-activation rate)",
+            "deadline": "2026-10-17",
+            "status": "DELEGATED 4th re-request, UNDELIVERED since Oct 13. Blocks HML root fix.",
+            "owner": "self_learner"
+        }
+    ],
+    "creative_improvements": [
+        {
+            "date": "2026-10-16T16:45:00Z",
+            "idea": "doji-bottom-long meta-RSI floor shadow (exec-time, mirror SHORT_MIDBAND pattern)",
+            "rationale": "doji-bottom-long fires on local RSI<35 (DOJI_RSI_OVERSOLD) but meta-RSI at trade time splits: meta 40-60 = winning band 30d 20T 65%WR +$0.61; meta <40 = losing band 30d 11T 45.5% -$0.24. DRIFT-E class — local and meta RSI diverge (WCT meta27.8 lost, DOGE meta43.8 won, XPL meta49.2 won). Signal is in STANDALONE_BYPASS so compactor meta-first checks don't reach it. A shadow collector logging 'would-block if meta_rsi<38' at exec time costs zero behavior and gives decision-ready data by Oct 30. n=11 below 20-bar for hard filter — shadow first per CEO D2 gate-registry ruling.",
+            "expected_impact": "If confirmed: block 11T/30d bleed cohort (-$0.24) without touching 20T/30d winning cohort (+$0.61). Net +$0.85/30d if full block.",
+            "category": "entry sniper",
+            "status": "suggested",
+            "risk": "low",
+            "prerequisite": "CEO GO for shadow (D2 shadow-first-14d)"
+        }
+    ],
+    "config_changes_applied": [],
+    "next_actions": [
+        "Soak DEAD_GAP block to Oct 18 — verify INJ block was not a false positive, check DOT-type gap+0.2 entries (kept cohort) performance",
+        "Soak MIDBAND block to Oct 18 — 4T post-ship, need n>=10 for verdict",
+        "self_learner momentum-gate backtest DUE Oct 17 — escalate if undelivered by EOD",
+        "pump-chain- dual-emitter CEO kill decision — present dead-gap block data as alternative to wholesale kill",
+        "bb-bounce EXTREME re-check at n>=20 (currently 11T 45.5% -$0.33)",
+        "doji meta-RSI floor shadow — awaiting CEO GO (creative idea this run)",
+        "Monitor 7d WR trajectory vs ESCALATE guardrail (36.9% now, target 50%)"
+    ],
+    "protected_flags_intact": true,
+    "kill_switch": "LIVE=true, kill JSON=true",
+    "disk": "81%"
 }

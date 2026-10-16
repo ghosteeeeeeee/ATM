@@ -4836,5 +4836,45 @@
     "category": "entry sniper",
     "status": "REJECTED (backtest fail, 2026-10-16)",
     "risk": "high (would have killed 46% of winners)"
+  },
+  {
+    "date": "2026-10-16T15:47:58Z",
+    "idea": "REJECTED: 5m momentum gate (|price_change_5m| < 0.15% block entries)",
+    "rationale": "Ran the full backtest on live candles.db. 7d chop-family 112T: low-mom n=51 -$4.52 vs high-mom n=61 -$5.03 — NO DIFFERENTIATION, high-momentum chop loses MORE. Impact on winners: would block 37/82 winners (45% kill >> 20% threshold), sacrificing $4.37 to save $4.52 = net +$0.15/7d. 14d HML-only: low-mom n=56 -$6.70 vs high-mom n=61 -$7.00 — same null. Premise falsified: chop losses happen at ALL entry momentum levels. What's missing is post-entry follow-through, which is unknowable ex-ante.",
+    "expected_impact": "None — DO NOT SHIP. Kills 45% of winners for ~zero net.",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "high if shipped",
+    "delegation": "CANCEL self_learner Oct 17 deadline for this item."
+  },
+  {
+    "date": "2026-10-16T15:47:58Z",
+    "idea": "pump-chain+ LONG deep-gap block (gap_at_entry < -1.0%)",
+    "rationale": "30d: n=7 14%WR -$0.55, consistent all 4 weeks (no positive week). 14d n=9 33% -$0.28. 7d n=7 29% -$0.26. Mirror of the pump-chain- dead-gap band shipped Oct 16. Deep-below-EMA LONGs = catching knives during fades.",
+    "expected_impact": "+$0.55/30d if pattern holds. Below sample bar (n=7 < 20).",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low",
+    "ship_condition": "n>=15 with WR<30% maintained, then ship as PUMP_CHAIN_LONG_DEEP_GAP_BLOCK"
+  },
+  {
+    "date": "2026-10-16T15:47:58Z",
+    "idea": "trail_arm_timeout expansion — 60 HML trades never armed trail but only 7 timeout fires/7d",
+    "rationale": "If timeout fired earlier (e.g. 20min no-arm AND <0.10% progress), it could cut chop before full -0.60% trail floor. 7d gap: 60 HML vs 7 timeout fires = 53 uncaptured.",
+    "expected_impact": "Unknown — needs backtest: what % of HML had <0.10% at 20min?",
+    "category": "exit engine",
+    "status": "suggested",
+    "risk": "medium — may cut slow-starting winners. Backtest mandatory before ship. Exit-stack vehicle = pump-chain v6, coordinate.",
+    "delegation": "Propose to self_learner as replacement for cancelled momentum-gate item."
+  },
+  {
+    "date": "2026-10-16T16:45:00Z",
+    "idea": "doji-bottom-long meta-RSI floor shadow (exec-time, mirror SHORT_MIDBAND pattern)",
+    "rationale": "doji fires on local RSI<35 but meta-RSI splits: meta 40-60 = 30d 20T 65%WR +$0.61 (winning); meta<40 = 30d 11T 45.5% -$0.24 (bleeding). DRIFT-E class. Signal in STANDALONE_BYPASS so compactor meta-first checks don't reach it. Shadow 'would-block if meta_rsi<38' at exec time = zero behavior change, decision-ready Oct 30.",
+    "expected_impact": "If confirmed: block 11T/30d bleed (-$0.24) without touching 20T/30d winners (+$0.61). Net +$0.85/30d.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "prerequisite": "CEO GO for shadow (D2 shadow-first-14d)"
   }
 ]
