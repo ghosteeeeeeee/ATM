@@ -43,6 +43,21 @@ BB Position = (Price - Lower Band) / (Upper Band - Lower Band)
 - **0.8-1.5x** = Normal (uncertain)
 - **<0.8x** = Low (weak move, likely fakeout)
 
+### Z-Score (20-bar)
+```
+Z = (Price - 20-bar Mean) / 20-bar StdDev
+```
+- **>2.0** = EXTREME_HIGH (overbought, reversal imminent)
+- **1.0-2.0** = HIGH (overbought, approaching reversal)
+- **-1.0 to 1.0** = NEUTRAL (normal range)
+- **-2.0 to -1.0** = LOW (oversold, bounce zone)
+- **<-2.0** = EXTREME_LOW (oversold, reversal imminent)
+
+**MTF Z-Score alignment:**
+- All TFs same sign = strong trend
+- Lower TFs HIGH, higher TFs LOW = bounce in downtrend
+- Lower TFs LOW, higher TFs HIGH = dip in uptrend
+
 ## Analysis Script
 
 Run this to get the complete picture:
