@@ -43,15 +43,29 @@ BB Position = (Price - Lower Band) / (Upper Band - Lower Band)
 - **0.8-1.5x** = Normal (uncertain)
 - **<0.8x** = Low (weak move, likely fakeout)
 
-### Z-Score (20-bar)
+### Z-Score (Multi-Window)
 ```
-Z = (Price - 20-bar Mean) / 20-bar StdDev
+Z = (Price - N-bar Mean) / N-bar StdDev
 ```
+
+**Standard windows:**
+- **20-bar** — Short-term (quick signals, noisy)
+- **50-bar** — Medium-term (balanced)
+- **100-bar** — Longer-term (trend confirmation)
+- **200-bar** — Long-term (macro view)
+
+**Z-Score tiers:**
 - **>2.0** = EXTREME_HIGH (overbought, reversal imminent)
 - **1.0-2.0** = HIGH (overbought, approaching reversal)
 - **-1.0 to 1.0** = NEUTRAL (normal range)
 - **-2.0 to -1.0** = LOW (oversold, bounce zone)
 - **<-2.0** = EXTREME_LOW (oversold, reversal imminent)
+
+**Multi-window interpretation:**
+- 20-bar NEUTRAL + 50-200 bar HIGH = short-term dip in extended uptrend
+- 20-bar NEUTRAL + 50-200 bar LOW = short-term bounce in extended downtrend
+- All windows same sign = strong trend
+- Divergence between windows = trend exhaustion
 
 **MTF Z-Score alignment:**
 - All TFs same sign = strong trend
