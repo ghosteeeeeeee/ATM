@@ -10595,3 +10595,28 @@ BY: daily_orchestrator
 - pump-chain- 24h 3T 0W −$0.20 — 0% WR over 3 trades; if it hits 3+T in any single hour, kill immediately
 - 24h WR slipped 50%→45% (still above recent lows)
 - hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## LOSERS Update — 2026-10-16 06:05 UTC
+- REMOVE LDO (insufficient data)
+- REMOVE GRASS (insufficient data)
+- ADD BABY (WR=37.5%, PnL=$-0.32, low_wr (37.5%))
+- ADD ICP (WR=42.9%, PnL=$0.14, low_wr (42.9%))
+
+Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
+
+## [2026-10-16 06:09] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet; 4 open)
+**PnL:** $0.00 last hour | 24h 20T 9W +$0.51 (45% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T this hour — no signal meets 3+T kill threshold (pump-chain- remains 24h 3T 0W −$0.20 watch item)
+- atr_sl_hit 7/20 = 35% (under 40 threshold; tpsl_utils fix deployed)
+- No 3-consecutive-neg-hour streak (04:00 −$0.08, 05:00 −$0.09 = 2 neg max)
+- Overtrade 0/hr; live_trading=true, kill JSON=true
+
+**Open Questions:**
+- pump-chain- 24h 3T 0W −$0.20 — 0% WR, kill only triggers on 3+T in a single hour
+- hard_max_loss 1 exit −$0.08 24h — standing CEO hold, momentum-gate backtest due Oct 17
