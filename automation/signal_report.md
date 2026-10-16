@@ -1,79 +1,49 @@
 # Signal Performance Report
-**Generated:** 2026-10-16 14:13 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats
-- **Total trades (all time):** 3,161 | **WR:** 51.1% | **PnL:** -99.36%
-- **Date range:** 2026-07-29 → 2026-10-16
+Period: Last 6h | 24h
+Generated: 2026-10-16 20:15 UTC
 
----
+## KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | | | | | No new kills |
 
-## WINNERS (WR > 55%, PnL > 0)
+All kill candidates from this window were already regime-blocked by earlier
+signal_reporter runs today (committed 14:44 UTC, pipeline restarted 20:15 UTC,
+blocks verified live via gate unit check):
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| ai-trader+ | LONG | 3 | 66.7% | -0.10 | 5 | 60.0% | +0.82 | ❓ |
+- **pump-chain- SHORT** — EXTREME 0.0 block live (8T 0% WR, -$0.49/24h, all EXTREME).
+  NORMAL 1.2 boost kept (14d 64% WR +$0.48 habitat). HIGH hard-blocked via
+  PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED. Signal alive, correctly routed.
+- **bb-bounce-v2-long+ LONG** — EXTREME 0.0 block live (24h EXTREME 3T all losers).
+  NORMAL +$0.55 / FLAT 100% WR kept.
+- **doji-bottom-long LONG** — removed from EXTREME REGIME_SIGNALS (3T 0% WR falling knife).
+  HIGH 57% / NORMAL 60% kept.
 
----
+## BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | | | | | No boost candidates |
 
-## LOSERS (WR < 30%, PnL < -2%)
+Closest: ai-trader+ LONG 60% WR but $0.00 PnL (5T). volume-buildup- SHORT 75% WR
+but -$0.03 (4T, one big loser). Neither meets WR>55% + 5T + PnL>$0.05.
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| pump-chain- | SHORT | 3 | 0.0% | -1.31 | 6 | 0.0% | -3.10 | ❓ | **DISABLE** |
-| bb-bounce-v2-long+ | LONG | 4 | 25.0% | -1.67 | 5 | 20.0% | -3.01 | ❓ | **DISABLE** |
+## LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| doji-bottom-long | LONG | 45.5% | -$0.51 | 11 | Regime-correct post-block. Loss = exit quality: atr_sl_hit 3T -$0.45 + hard_max_loss -$0.10 vs profit-trail 6T +$0.17. SL too wide for entry, not a regime problem. |
+| bb-bounce-v2-long+ | LONG | 33.3% | -$0.27 | 6 | EXTREME blocked. 30d NORMAL 52.2% +$0.55, HIGH 56.3% -$0.07. 24h loss predates block. |
+| volume-buildup- | SHORT | 75.0% | -$0.03 | 4 | One loser wipes 3 winners. 30d NORMAL-only 87.5% +$0.38. Small-n, watch. |
+| pump-chain- | SHORT | 0.0% | -$0.49 | 8 | All EXTREME, blocked. Trades closed 01:58–14:28, before 14:44 commit. Post-block verdict in next report. |
 
----
+## WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| ai-trader+ | LONG | 60.0% | $0.00 | 5 | Breakeven. Active. |
+| pump-chain+ | LONG | 33.3% | +$0.41 | 3 | Positive PnL, low WR (2/3 losers, 1 big winner). EXTREME habitat. |
+| volume-buildup- | SHORT | 75.0% | -$0.03 | 4 | See watch list — high WR, negative PnL. |
 
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| bb-squeeze+ | LONG | 2 | 50.0% | -0.31 | ENABLED | Needs more data |
-| hl_copy_trader | LONG | 2 | 50.0% | -0.01 | ❓ | Needs more data |
-| pump-chain+ | LONG | 7 | 42.9% | +9.51 | ❓ | Borderline |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## RECOMMENDATIONS
-
-1. **[DISABLE] pump-chain- SHORT** — WR=0.0%, PnL=-3.10% over 6 trades (24h).
-2. **[DISABLE] bb-bounce-v2-long+ LONG** — WR=20.0%, PnL=-3.01% over 5 trades (24h).
-3. **[WATCH] bb-squeeze+ LONG** — WR=50.0%, PnL=-0.31% over 2 trades. Monitor next cycle.
-4. **[WATCH] hl_copy_trader LONG** — WR=50.0%, PnL=-0.01% over 2 trades. Monitor next cycle.
-5. **[WATCH] pump-chain+ LONG** — WR=42.9%, PnL=+9.51% over 7 trades. Monitor next cycle.
-6. **[KEEP] 1 winning combos** — ai-trader+. LONG side dominant.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-10-16 | b16d030 | signals: brain_auditor captain run — pump-chain- SHORT dead-... |
-| 2026-10-16 | 9bdda8d | Daily trading system update (2026-10-16) |
-| 2026-10-16 | 86dce93 | signals: SHORT mid-band death band block (45-55, non-pump-ch... |
-| 2026-10-15 | 6d2bfc9 | brain_auditor: Captain run 2026-10-15 18:30 — kill hmacd_mtf... |
-| 2026-10-15 | 262603a | config: hard_max_loss -3.00% → -4.00% account PnL |
-| 2026-10-15 | 6c9f043 | brain_auditor: KILL volume-breakout-short- (0/3 all-time 0%W... |
-| 2026-10-15 | 0bc76eb | brain_auditor: captain audit 2026-10-15 14:50 — kill LONG-SH... |
-| 2026-10-14 | 796c745 | brain_auditor: re-enable doji-bottom (EXTREME gated) + LONG-... |
-| 2026-10-14 | b51cae0 | signals: kill volume-buildup+ LONG — 3T 0W last hour all har... |
-| 2026-10-14 | 20fcff5 | Daily trading system update (2026-10-14) |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+## ISSUES:
+- **None.** Zero direction inversions in 24h. No new bugs found.
+- ai-trader-manual (3T 33.3% LONG, 2T 0% SHORT, -$0.10 combined) — manual overrides, not signal-gated. Not actionable by signal_reporter.
+- Gate verification: pump-chain- EXTREME=0.0, NORMAL=1.2, bb-bounce-v2-long+ EXTREME=0.0, doji-bottom-long EXTREME=removed. All confirmed via `_get_signal_type_mult` live check.
