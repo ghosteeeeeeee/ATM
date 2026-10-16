@@ -72,6 +72,30 @@ Z = (Price - N-bar Mean) / N-bar StdDev
 - Lower TFs HIGH, higher TFs LOW = bounce in downtrend
 - Lower TFs LOW, higher TFs HIGH = dip in uptrend
 
+### MTF Volume Analysis
+
+Volume confirmation across timeframes tells you if a move is real:
+
+**Per-TF volume ratio** (current vs 20-bar average):
+- **>1.5x** = 🔥 Surge (strong conviction)
+- **0.8-1.5x** = 🟢 Normal (healthy)
+- **<0.8x** = 🔴 Low (weak, likely fakeout)
+
+**MTF volume patterns:**
+
+| Pattern | 1m | 5m | 15m | Meaning |
+|---------|----|----|-----|---------|
+| **Real breakout** | 🔥 | 🔥 | 🟢 | Strong move, institutional buying |
+| **Fakeout** | 🔥 | 🔴 | 🔴 | Only 1m spike = noise, not conviction |
+| **Exhaustion** | 🔴 | 🟢 | 🟢 | Move happened, now fading |
+| **Accumulation** | 🟢 | 🟢 | 🔴 | Quiet building before move |
+
+**Key rules:**
+- **1m volume alone = noise.** Need 5m+ confirmation.
+- **5m surge + 15m surge = real move.** Institutional interest.
+- **Volume on crossover:** MACD crossover WITH volume = real. Without = fake.
+- **Volume divergence:** Price higher but volume declining = weak rally, reversal coming.
+
 ## Analysis Script
 
 Run this to get the complete picture:

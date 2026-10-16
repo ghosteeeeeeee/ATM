@@ -94,6 +94,37 @@ Manual trades use the same exit management as AI trader signals:
 
 The `ai-trader` prefix in the signal tag (`ai-trader-manual`) matches the exit config automatically.
 
+## Setting Manual SL (Breakeven Protection)
+
+After opening a trade, you can move SL to breakeven to make it risk-free:
+
+```bash
+python3 -c "
+import sys; sys.path.insert(0, '/root/.hermes/scripts')
+import psycopg2
+from _secrets import BRAIN_DB_DICT
+conn = psycopg2.connect(**BRAIN_DB_DICT)
+cur = conn.cursor()
+cur.execute('UPDATE trades SET stop_loss = %s WHERE id = %s AND status = %s', (NEW_SL, TRADE_ID, 'open'))
+conn.commit()
+conn.close()
+print('SL moved to', NEW_SL)
+"
+```
+
+**Manual SL is protected** — the RR engine will NOT overwrite it because:
+1. **CAS write** — TRAIL_SL only updates if SL hasn't changed since read
+2. **Breakeven guard** — engine won't trail past breakeven (SL >= entry for LONG)
+3. **entry_price=0 check** — skips trail if entry price is invalid
+4. **Status check** — won't update closed trades
+
+**When to set manual SL:**
+- Trade is in profit and you want to make it risk-free
+- You have a specific level in mind (support/resistance)
+- You want to override the engine's SL for any reason
+
+**The engine respects your SL** but will still trail it UPWARD (tighter) as price moves in your favor.
+
 ## Verification
 
 After opening, verify the trade:
