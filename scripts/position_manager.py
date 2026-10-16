@@ -3024,7 +3024,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 from risk_reward_engine import manage_exit
                 current_sl = float(pos.get("stop_loss") or 0)
                 entry_price = float(pos.get("entry_price") or 0)
-                rr_result = manage_exit(token, direction, cur, entry_price, current_sl if current_sl > 0 else None)
+                # FIX (2026-10-16): was passing cursor `cur` instead of current price
+                current_price = float(pos.get("current_price") or entry_price or 0)
+                rr_result = manage_exit(token, direction, current_price, entry_price, current_sl if current_sl > 0 else None)
                 rr_action = rr_result.get('action', 'HOLD')
                 if rr_action in ('TAKE_PROFIT', 'CUT_LOSS', 'EXIT'):
                     # P0: canonical family label — engine reasons embed per-trade
