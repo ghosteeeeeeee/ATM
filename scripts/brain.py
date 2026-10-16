@@ -1281,7 +1281,12 @@ if __name__ == "__main__":
         add_parser.add_argument("--real", action="store_true", help="Real trade (not paper)")
         add_parser.add_argument("--sl", type=float, help="Stop loss price")
         add_parser.add_argument("--target", type=float, help="Target price")
-        add_parser.add_argument("--server", default="Tokyo", help="Server (Tokyo/Dallas)")
+        # FIX (2026-10-16, bug_hunter): default was "Tokyo" — trades added without
+        # --server landed on server='Tokyo', which NO exit manager sees:
+        # position_manager.get_open_positions(), profit_monster.py:93 and
+        # cut_loser.py:72 all filter server='Hermes'. Trade #16246 (BTC SHORT)
+        # sat through its entire TP window unmanaged because of this default.
+        add_parser.add_argument("--server", default="Hermes", help="Server (Hermes=managed by position_manager)")
         add_parser.add_argument("--signal", help="Signal source (alert/script/webhook)")
         add_parser.add_argument("--address", help="Token contract address")
         add_parser.add_argument("--confidence", type=float, help="Confidence factor (0-100)")
