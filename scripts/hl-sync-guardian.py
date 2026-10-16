@@ -2917,10 +2917,14 @@ def close_orphan_paper_trades(hl_pos, prices):
         # Mirror them now. Skip if already in copied (guardian crashed after placing).
         conn3 = get_db_connection()
         cur3 = conn3.cursor()
+        # FIX (2026-10-16): Add 5-minute grace period for newly created trades.
+        # Manual trades via brain.py trade add are paper=false but HL position
+        # may not appear immediately — LIVE-MISS was creating duplicates.
         cur3.execute("""
             SELECT id, token, direction, entry_price, leverage, amount_usdt, stop_loss, target
             FROM trades
             WHERE status = 'open' AND paper = false AND exchange = 'Hyperliquid'
+              AND open_time < NOW() - INTERVAL '5 minutes'
         """)
         live_missing = cur3.fetchall()
         conn3.close()
