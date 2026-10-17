@@ -11074,3 +11074,23 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - pump-chain+ / pump-chain- standing CEO escalations (still 0W)
 - doji-bottom-long 24h 10T 4W −$0.53 — largest 24h signal loser, positive WR, watch
 - hard_max_loss 8 exits −$0.96 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-17 07:10] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 43T 15W −$2.02 (34.9% WR) | 7d 219T 75W −$3.08 (34.2% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Trading PAUSED by vacation guardrail since 04:08 UTC — 0T expected; live_trading=false
+- Resume check: 7d WR 34.2% < 37% AND 7d PnL −$3.08 < 0 → both fail, stay paused (correct)
+- 1 open position: BTC ai-trader-manual SHORT entry 81522 SL 81766 TP 80299 size $11.10 (kept per pause protocol)
+- Kill check: 0T this hour; pump-chain+ / pump-chain- standing CEO escalations unchanged
+- atr_sl_hit 12/43 = 27.9% (under 40 threshold; tpsl_utils fix deployed)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
+- pump-chain+ / pump-chain- standing CEO escalations (still 0W)
+- hard_max_loss 8 exits −$0.96 24h — standing CEO hold, momentum-gate backtest due Oct 17
