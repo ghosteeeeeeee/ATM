@@ -11216,3 +11216,43 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
 - pump-chain+ / pump-chain- standing CEO escalations (still 0W 24h)
 - guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit
+
+## [2026-10-17 14:10] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 23T 6W −$1.57 (26.1% WR) | 7d 212T 73W −$2.86 (34.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Trading PAUSED by vacation guardrail since 04:08 UTC — 0T expected; live_trading=false (kill JSON reason=disabled)
+- Resume check: 7d WR 34.4% < 37% AND 7d PnL −$2.86 < 0 → both fail, stay paused (correct)
+- 1 open position: BTC ai-trader-manual SHORT entry 81522 SL 81766.57 TP 80299.17 size $11.10 (opened 03:25, kept per pause protocol)
+- Kill check: 0T this hour; no new 0% WR signals (need 3+T threshold); pump-chain+ 2T 0W −$0.39 / pump-chain- 2T 0W −$0.13 standing CEO escalations
+- atr_sl_hit 8/23 = 34.8% (under 40 threshold; tpsl_utils fix deployed)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
+- pump-chain+ / pump-chain- standing CEO escalations (still 0W 24h)
+- guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit
+
+## [2026-10-17 15:10] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 17T 4W −$1.33 (23.5% WR) | 7d 211T 72W −$2.93 (34.1% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Trading PAUSED by vacation guardrail since 04:08 UTC — 0T expected; live_trading=false (kill JSON reason=disabled)
+- Resume check: 7d WR 34.1% < 37% AND 7d PnL −$2.93 < 0 → both fail, stay paused (correct)
+- 1 open position: BTC ai-trader-manual SHORT entry 81522 SL 81766.57 TP 80299.17 size $11.10 (opened 03:25, kept per pause protocol)
+- Kill check: 0T this hour; no new 0% WR signals (need 3+T threshold); pump-chain+ / pump-chain- standing CEO escalations
+- atr_sl_hit 6/17 = 35.3% (under 40 threshold; tpsl_utils fix deployed)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
+- pump-chain+ / pump-chain- standing CEO escalations (still 0W 24h)
+- guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit
