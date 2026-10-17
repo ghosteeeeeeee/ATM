@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-10-17T11:38:26.696348+00:00",
+  "timestamp": "2026-10-17T12:38:27.053273+00:00",
   "steers": [
-    {
-      "severity": "urgent",
-      "category": "stale",
-      "title": "BTC open 8h, losing -0.0%",
-      "detail": "Trade open 8 hours and underwater. Thesis may be invalid. Consider cutting.",
-      "trade_id": 16258,
-      "auto_executable": false,
-      "id": "steer-001"
-    },
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 13/20 recent trades lost",
       "detail": "Win rate 25% over last 20 trades. Total PnL: -1.50 USDT. Something is wrong.",
       "auto_executable": false,
+      "id": "steer-001"
+    },
+    {
+      "severity": "warning",
+      "category": "stale",
+      "title": "BTC open 9h, barely profitable",
+      "detail": "Trade open 9 hours. Only +0.0%. Opportunity cost \u2014 consider freeing capital.",
+      "trade_id": 16258,
+      "auto_executable": true,
       "id": "steer-002"
     },
     {
@@ -45,13 +45,13 @@
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "AT",
     "volatility": "LOW",
     "zscore_tier": "NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "FLAT",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",

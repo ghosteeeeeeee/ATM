@@ -5054,5 +5054,14 @@
     "category": "exit engine",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-17T12:43:05Z",
+    "idea": "Breakeven-stop-after-trail-arm counterfactual (v6/self_learner backtest input, NOT a live change): in EXTREME, 24T/7d armed-then-reversed losers (MFE>=0.40, pnl<0) avg MFE 0.82% gave back to avg -1.77% account — ~+$1.18/7d raw recovery if half exit at breakeven on retrace-to-entry after arm",
+    "rationale": "The armed-then-reverse cohort is distinct from never-armed chop (hard_max_loss) and give-backs (only 4T -0.18). Trail arms, price reverses through entry, exit engine rides to hard loss. Breakeven stop after arm is the classic fix; needs candle-level sim (fees, whipsaw re-arm) before any code.",
+    "expected_impact": "+$0.4-0.6/7d if half the cohort stops at breakeven; risk = whipsaw-exiting trades that would have recovered (must measure in sim)",
+    "category": "exit structure",
+    "status": "suggested",
+    "risk": "low (backtest first, v6 vehicle, no live change)"
   }
 ]

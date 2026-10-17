@@ -1194,3 +1194,6 @@
 ## Error Alerts — 2026-10-17 11:27 UTC
 - **[INFO]** (1x): `hermes-trading-checklist.service` — CRIT `pipeline_service: hermes-pipeline.timer is inactive` at 11:08. **False positive**: caused by intentional vacation pause (paused_at 11:08:26, 7d WR 34.7% < 35.0% AND pnl_7d $-2.84 < $-2.00). No action taken — pause is by design. **Suggestion**: checklist should check `vacation_pause.json` before flagging inactive pipeline timer.
 - **[INFO]**: Health check at 11:27 — vacation pause active, pipeline/watchdog left stopped per guardrail rule. All data timers healthy (price-collector collected 87 prices at 11:23, 1m-candle firing, 30+ timers on schedule). 1 open trade (BTC ai-trader, opened 03:25). 4 closed today (-$0.29). Disk 82%. Phantom trades: 0. No auto-fixes needed.
+
+## Error Alerts — 2026-10-17 12:30 UTC
+- **[INFO]**: Health check at 12:30 UTC — vacation pause active (paused_at 12:08:26, 7d WR 34.7% < 35.0% AND pnl_7d $-2.84 < $-2.00). Pipeline.timer + trade-watchdog.timer left inactive per guardrail rule. Price-collector (last 12:29:54) and 1m-candle (last 12:30:22) timers firing normally. Prices fresh (99s). 1 open trade (BTC SHORT from 03:25). 4 closed today (-$0.29). Regime: SHORT_BIAS (4L/83S/39N of 126). Disk 82%. Phantom trades: 0. LOCK-WAIT noise in price-collector continues (known, non-blocking). No auto-fixes needed.
