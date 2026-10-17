@@ -717,8 +717,10 @@ def sniper_close_position(pos, reason, dry_run=False):
     # Close on HL
     hl_fill_price = None
     try:
-        from hyperliquid_exchange import is_live_trading_enabled, close_position as hl_close
-        if is_live_trading_enabled():
+        # FIX (2026-10-17): close gated by constant only, not pause marker —
+        # protective exits must always mirror to HL or DB/HL diverge
+        from hyperliquid_exchange import LIVE_TRADING_ENABLED, close_position as hl_close
+        if LIVE_TRADING_ENABLED:
             result = hl_close(token.upper())
             if result.get("success"):
                 log.info(f"  HL close OK: {token}")

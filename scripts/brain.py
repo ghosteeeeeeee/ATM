@@ -354,11 +354,14 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                # Stores arbitrary signal values: {accel_300: {conf: 85}, rs: {bounce: true}}
                # Eliminates need for per-signal columns — new signals just write to this dict.
                signal_metadata: dict = None,
-               exp_metadata: dict = None):
+               exp_metadata: dict = None,
+               is_manual: bool = False):
     """
     Add a new trade. HL-first: open on Hyperliquid FIRST, write to local DB only
     if HL confirms. Eliminates phantom trades (DB writes deleted when HL fails,
     leaving consumed signals with no corresponding position).
+
+    is_manual=True: direct CEO command — bypasses vacation pause marker.
     """
     import sys, os, random
 
@@ -438,8 +441,8 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         pass  # Never let audit crash the trade path
 
     # manual CEO trades bypass the vacation pause marker — only the constant gates them
-    print(f"[brain.py] DEBUG is_live_trading_enabled(is_manual=True) = {is_live_trading_enabled(is_manual=True)}")
-    if not is_live_trading_enabled(is_manual=True):
+    print(f"[brain.py] DEBUG is_live_trading_enabled(is_manual={is_manual}) = {is_live_trading_enabled(is_manual=is_manual)}")
+    if not is_live_trading_enabled(is_manual=is_manual):
         print(f"[brain.py] ❌ REJECTED: {token} {direction} — live_trading is DISABLED")
         print(f"[brain.py] DEBUG token={token}, direction={direction}, entry_price={entry_price}, paper={paper}")
         return None
@@ -575,8 +578,8 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # compound into an uncapped product. Cap here for defense-in-depth — mirror_open
     # skips its own sizing entirely when size_usdt_override is passed.
     _precomputed_size = max(_precomputed_size, HL_MIN_NOTIONAL_USDT)
-    print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage}, size_mult={_size_mult}, size_usdt=${_precomputed_size:.2f})")
-    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult, size_usdt_override=_precomputed_size)
+    print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage}, size_mult={_size_mult}, size_usdt=${_precomputed_size:.2f}, is_manual={is_manual})")
+    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult, size_usdt_override=_precomputed_size, is_manual=is_manual)
     print(f"[brain.py] ← mirror_open returned: success={result.get('success')}, "
           f"size={result.get('size')}, total_sz={result.get('total_sz')}, "
           f"notional_usdt={result.get('notional_usdt')}, entry_price={result.get('entry_price')}")
@@ -1298,6 +1301,8 @@ if __name__ == "__main__":
         add_parser.add_argument("--trailing-phase2", type=float, dest="trailing_phase2", help="Phase 2 trailing distance (tighter, activates after phase 1)")
         add_parser.add_argument("--leverage", type=int, default=1, help="Leverage (1-10)")
         add_parser.add_argument("--experiment", help="A/B test experiment info (JSON)")
+        add_parser.add_argument("--manual", action="store_true", default=False,
+                                help="Manual CEO trade — bypasses vacation pause marker")
         add_parser.add_argument("--flipped", action="store_true", default=False,
                                 help="Mark this trade as flipped from original signal direction")
         add_parser.add_argument("--signal-z-score", type=float, dest="signal_z_score",
@@ -1378,6 +1383,7 @@ if __name__ == "__main__":
                 leverage=args.leverage,
                 experiment=args.experiment,
                 flipped_from_trade=args.flipped,
+                is_manual=args.manual,
                 regime=args.regime,
                 signal_z_score=args.signal_z_score,
                 signal_rsi_14=args.signal_rsi_14,

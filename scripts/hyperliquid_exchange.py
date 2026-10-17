@@ -1018,7 +1018,8 @@ def mirror_get_exit_fill(token: str, start_time_ms: int, window_ms: int = 300000
 # They check the kill switch before doing anything.
 
 def mirror_open(token: str, direction: str, entry_price: float, leverage: int = None,
-                size_mult: float = 1.0, size_usdt_override: float = None) -> dict:
+                size_mult: float = 1.0, size_usdt_override: float = None,
+                is_manual: bool = False) -> dict:
     """
     Open a real Hyperliquid position mirroring a paper trade.
     BLOCKED if live trading is disabled (kill switch).
@@ -1030,11 +1031,12 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
         leverage:    HL leverage to use (default: coin max up to 10x)
         size_mult:   Position size multiplier (e.g. 1.5 for cluster confluence)
         size_usdt_override: Optional pre-computed size (skips _get_trade_size_usdt())
+        is_manual:   True for direct CEO commands — bypasses vacation pause marker
 
     Returns:
         dict with 'success', 'message', 'size', 'entry_price'
     """
-    if not is_live_trading_enabled():
+    if not is_live_trading_enabled(is_manual=is_manual):
         return {"success": False, "message": "Live trading disabled (kill switch)"}
 
     if is_delisted(token):
@@ -1298,11 +1300,17 @@ def mirror_open_batch(token_infos: list, prices: dict = None) -> dict:
 def mirror_close(token: str, direction: str, exit_price: float = None) -> dict:
     """
     Close a real Hyperliquid position mirroring a paper close.
-    BLOCKED if live trading is disabled (kill switch).
+    BLOCKED if live trading constant is disabled.
     RAISES RuntimeError on failure (fails loudly, never silently).
+
+    FIX (2026-10-17, bug_hunter HIGH): pause marker no longer gates closes.
+    During a vacation pause with real HL positions open, gating closes caused
+    DB/HL divergence (DB close commits, HL position stays open, guardian can't
+    reconcile because its closes are also gated). A pause should gate opens
+    only; protective exits must always mirror to HL.
     """
-    if not is_live_trading_enabled():
-        raise RuntimeError(f"mirror_close({token}): live trading disabled (kill switch)")
+    if not LIVE_TRADING_ENABLED:
+        raise RuntimeError(f"mirror_close({token}): live trading constant disabled")
 
     result = close_position(token)
 

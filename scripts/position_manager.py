@@ -43,12 +43,60 @@ from hermes_constants import (
     DIRECTIONAL_OUTCOME_ENABLED, DIRECTIONAL_OUTCOME_LOSS_THRESHOLD,
     DIRECTIONAL_OUTCOME_WR_THRESHOLD, DIRECTIONAL_OUTCOME_MIN_TRADES,
     AMPLITUDE_SL_MULT, AMPLITUDE_MAX_PORTFOLIO_LOSS, TOKEN_AMP_CLASS,
+    LIVE_TRADING_ENABLED,
 )
 from paths import *
 from _secrets import BRAIN_DB_DICT
 from tpsl_utils import compute_atr_sl_tp
 from signal_schema import record_signal_outcome
 from pnl_utils import compute_live_pnl, compute_hl_pnl_pct, compute_pnl_usdt, compute_close_pnl, Direction
+
+
+def _match_exit_config(part):
+    """Match signal part to exit config using exact or prefix match.
+
+    FIX (2026-09-30, rev 2 — verified 385bc167): Direction-suffixed keys
+    ('pump-chain+', 'pump-chain-') failed to match versioned signal names
+    ('pump-chain-v5') because the matcher appended another '-' to keys
+    already ending in '+/-' — 'pump-chain--' matched nothing.
+
+    Rev 1 of this fix used a raw `part.startswith(key)` branch, which
+    regressed 'volume-breakout-long+' (top signal, 70% WR) onto
+    'volume-breakout-' → ride_it, because the remainder 'long+' is a
+    direction word, not a version tag. Rev 2 restricts the new branches
+    to genuine version suffixes only (-vN): the remainder after the
+    matched key must be exactly '-vN', and the version-stripped base must
+    equal the key's stem. Everything else falls through to the original
+    behavior (default exit path), which is what those signals traded on.
+
+    Hoisted to module level (2026-10-17): was a closure inside
+    check_and_manage_positions; a divergent inline copy in
+    check_atr_tp_sl_hits misclassified pump-chain v5/v6 LONG signals
+    (bug_hunter 1b fix). Reuse this single matcher everywhere.
+    """
+    from hermes_constants import SIGNAL_EXIT_CONFIG
+    if part in SIGNAL_EXIT_CONFIG:
+        return SIGNAL_EXIT_CONFIG[part]
+    import re as _re
+    # Strip version suffix: 'pump-chain-v5' → 'pump-chain'
+    _base = _re.sub(r'-v\d+$', '', part)
+    if _base != part and _base in SIGNAL_EXIT_CONFIG:
+        return SIGNAL_EXIT_CONFIG[_base]
+    for key, val in SIGNAL_EXIT_CONFIG.items():
+        if part.startswith(key + '-') or part.startswith(key + '_'):
+            return val
+        # Version-only raw-prefix match: key 'pump-chain-' + remainder '-v5'.
+        # The remainder MUST be exactly a -vN tag — '-long+' etc. must not match.
+        if key.endswith(('+', '-')) and part.startswith(key):
+            _rem = part[len(key):]
+            if _re.fullmatch(r'-v\d+', _rem):
+                return val
+        # Version-stripped base equals the key's stem:
+        # 'pump-chain' (from 'pump-chain-v5') == stem of 'pump-chain+'.
+        _key_stem = key.rstrip('+-')
+        if _key_stem and _base == _key_stem:
+            return val
+    return None
 
 
 import hype_cache as hc
@@ -503,14 +551,9 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
                     _sig = str(pos.get('signal', '') or '')
                     _is_rr = False
                     try:
-                        from hermes_constants import SIGNAL_EXIT_CONFIG
                         for _part in [s.strip() for s in _sig.split(',')]:
-                            for _key, _val in SIGNAL_EXIT_CONFIG.items():
-                                if _part == _key or (_key not in ('+', '-') and _part.startswith(_key)):
-                                    if _val == 'rr_engine':
-                                        _is_rr = True
-                                        break
-                            if _is_rr:
+                            if _match_exit_config(_part) == 'rr_engine':
+                                _is_rr = True
                                 break
                     except Exception:
                         pass
@@ -1285,7 +1328,11 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
         # If DB commit fails → rollback (safe), HL is still open for retry.
         # Capture HL exit info for backfill — but don't let errors prevent DB commit
         hl_exit_info = None
-        if HYPE_AVAILABLE and is_live_trading_enabled():
+        # FIX (2026-10-17, bug_hunter HIGH): close mirror no longer gated by
+        # vacation pause marker — only by the LIVE_TRADING_ENABLED constant.
+        # A pause gates opens only; protective exits must always mirror to HL
+        # or DB/HL diverge (DB close commits, HL position stays open).
+        if HYPE_AVAILABLE and LIVE_TRADING_ENABLED:
             hype_token = hype_coin(token)
             # DB already committed above — row lock released
 
@@ -2781,46 +2828,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         signal = str(pos.get("signal", "") or "")
         from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
         signal_parts = [s.strip() for s in signal.split(',')]
-
-        def _match_exit_config(part):
-            """Match signal part to exit config using exact or prefix match.
-
-            FIX (2026-09-30, rev 2 — verified 385bc167): Direction-suffixed keys
-            ('pump-chain+', 'pump-chain-') failed to match versioned signal names
-            ('pump-chain-v5') because the matcher appended another '-' to keys
-            already ending in '+/-' — 'pump-chain--' matched nothing.
-
-            Rev 1 of this fix used a raw `part.startswith(key)` branch, which
-            regressed 'volume-breakout-long+' (top signal, 70% WR) onto
-            'volume-breakout-' → ride_it, because the remainder 'long+' is a
-            direction word, not a version tag. Rev 2 restricts the new branches
-            to genuine version suffixes only (-vN): the remainder after the
-            matched key must be exactly '-vN', and the version-stripped base must
-            equal the key's stem. Everything else falls through to the original
-            behavior (default exit path), which is what those signals traded on.
-            """
-            if part in SIGNAL_EXIT_CONFIG:
-                return SIGNAL_EXIT_CONFIG[part]
-            import re as _re
-            # Strip version suffix: 'pump-chain-v5' → 'pump-chain'
-            _base = _re.sub(r'-v\d+$', '', part)
-            if _base != part and _base in SIGNAL_EXIT_CONFIG:
-                return SIGNAL_EXIT_CONFIG[_base]
-            for key, val in SIGNAL_EXIT_CONFIG.items():
-                if part.startswith(key + '-') or part.startswith(key + '_'):
-                    return val
-                # Version-only raw-prefix match: key 'pump-chain-' + remainder '-v5'.
-                # The remainder MUST be exactly a -vN tag — '-long+' etc. must not match.
-                if key.endswith(('+', '-')) and part.startswith(key):
-                    _rem = part[len(key):]
-                    if _re.fullmatch(r'-v\d+', _rem):
-                        return val
-                # Version-stripped base equals the key's stem:
-                # 'pump-chain' (from 'pump-chain-v5') == stem of 'pump-chain+'.
-                _key_stem = key.rstrip('+-')
-                if _key_stem and _base == _key_stem:
-                    return val
-            return None
+        # _match_exit_config is now module-level — reuse the single matcher
 
         # ── 0a. Pump-Exit (ATR trailing + momentum + time) ──────────────────
         # Check if this trade's signal uses pump-exit
@@ -3062,14 +3070,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 elif rr_action == 'TRAIL_SL':
                     # Update SL in memory AND persist to DB
                     new_sl = rr_result.get('new_sl')
-                    if new_sl and new_sl > 0:
-                        # BUG-2 FIX (2026-10-16): Skip trailing if entry_price is invalid
-                        # Without this, entry_price=0 disables the breakeven guard
-                        # and the trail overwrites manual SL (bug_hunter BUG-2)
-                        if entry_price <= 0:
-                            log(f"  [RR-ENGINE] {token} {direction}: skip trail — entry_price={entry_price} invalid", "WARN")
-                            continue
-
+                    if new_sl and new_sl > 0 and entry_price > 0:
                         old_sl_in_memory = float(pos.get("stop_loss") or 0)
                         pos['stop_loss'] = new_sl
                         # Persist to DB so ATR SL check uses the tighter value
@@ -3121,6 +3122,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                 closed_count += 1
                                 log(f"  [RR-ENGINE] {token} {direction}: TRAIL SL IMMEDIATELY BREACHED — closing at rr_engine_trail_hit")
                                 continue
+                    elif new_sl and new_sl > 0:
+                        # BUG-2 FIX (2026-10-16): entry_price invalid — skip the
+                        # trail (breakeven guard would be disabled), but FALL
+                        # THROUGH to ATR/other exit checks. The old `continue`
+                        # here skipped ALL exit checks for this position, so an
+                        # entry_price=0 trade never got ATR-checked (bug_hunter
+                        # MED finding 2026-10-17).
+                        log(f"  [RR-ENGINE] {token} {direction}: skip trail — entry_price={entry_price} invalid", "WARN")
             except Exception as e:
                 log(f"  [RR-ENGINE] {token} {direction}: error — {e}", "WARN")
 
