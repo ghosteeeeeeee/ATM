@@ -10,6 +10,7 @@ The master analysis framework combining all sub-skills into one comprehensive ou
 ## Components
 
 This skill combines:
+- **Position check** — Current open/closed positions, exit reasons, PnL
 - **mtf-analysis** — Multi-timeframe analysis (1m/5m/15m/1h/4h)
 - **technical-analysis** — RSI, MACD, EMAs, volume, patterns
 - **contrarian-analysis** — "What if I'm wrong?" checklist
@@ -18,6 +19,53 @@ This skill combines:
 - **Bollinger Bands** — BB position (0=lower band, 1=upper band)
 - **EMA200** — Long-term dynamic support/resistance
 - **Volume ratio** — Per-timeframe volume confirmation
+
+## Step 0: Current Position Check (MANDATORY)
+
+**Always check current positions before any analysis.** This tells you:
+- What's open right now (direction, entry, SL, TP, unrealized PnL)
+- What just closed and why (exit reason reveals system behavior)
+- Whether you're already exposed to this coin/direction
+- Whether exit management is working correctly
+
+```bash
+python3 -c "
+import sys; sys.path.insert(0, '/root/.hermes/scripts')
+import psycopg2
+from _secrets import BRAIN_PASSWORD, BRAIN_HOST
+conn = psycopg2.connect(host=BRAIN_HOST, dbname='brain', user='postgres', password=BRAIN_PASSWORD, connect_timeout=5)
+cur = conn.cursor()
+# Open positions
+cur.execute('''SELECT id, token, direction, entry_price, current_price, stop_loss, target, pnl_pct, signal, leverage, amount_usdt 
+FROM trades WHERE status='open' ORDER BY open_time DESC''')
+open_trades = cur.fetchall()
+print('=== OPEN POSITIONS ===')
+for t in open_trades:
+    print(f'#{t[0]} {t[1]} {t[2]} entry={t[3]} px={t[4]} SL={t[5]} TP={t[6]} pnl={t[7]}% sig={t[8]} lev={t[9]}x size={t[10]}')
+# Recent closed (last 10)
+cur.execute('''SELECT id, token, direction, entry_price, exit_price, pnl_pct, exit_reason, signal, close_time 
+FROM trades WHERE status='closed' ORDER BY close_time DESC LIMIT 10''')
+closed = cur.fetchall()
+print('\\n=== RECENT CLOSED ===')
+for t in closed:
+    print(f'#{t[0]} {t[1]} {t[2]} entry={t[3]} exit={t[4]} pnl={t[5]}% reason={t[6]} sig={t[7]} closed={t[8]}')
+cur.close(); conn.close()
+"
+```
+
+**Key questions to answer:**
+1. Is there an open position on this coin? If yes, are you adding to it or flipping?
+2. What exit reason killed the last trade on this coin? (`atr_trail_hit` = trailing worked; `hard_max_loss` = stop hit; `atr_sl_hit` = ATR stop hit)
+3. Is the exit management (RR engine, trailing) actually firing for this signal type?
+4. Are you already on the right side or the wrong side?
+
+**Exit reason interpretation:**
+- `atr_trail_hit` — Trailing stop took profit (winner trailed out)
+- `atr_sl_hit` — ATR stop loss hit (loser)
+- `hard_max_loss` — Hard max loss cap hit (loser)
+- `rr_engine_*` — RR engine managed exit (structural support/resistance)
+- `HL_CLOSED` — Closed on Hyperliquid directly
+- `trail_sl` — Trailing stop loss hit
 
 ## Key Indicators
 
@@ -342,6 +390,12 @@ python3 /root/.hermes/scripts/ai_trader_precheck.py COIN DIRECTION
        FULL ANALYSIS — [COIN]
 ═══════════════════════════════════════════
 
+📋 0. CURRENT POSITIONS
+  Open: [list open positions on this coin + status]
+  Recent closed: [last trade exit reason + PnL]
+  [If open: "Currently LONG/SHORT at X, SL at Y, unrealized Z%"]
+  [If just closed: "Last trade closed by [reason] at [PnL]%"]
+
 📊 1. MULTI-TIMEFRAME
   [TF results]
 
@@ -355,7 +409,7 @@ python3 /root/.hermes/scripts/ai_trader_precheck.py COIN DIRECTION
   [contrarian analysis]
 
 🎯 5. VERDICT
-  [LONG/SHORT/NO TRADE + reasoning]
+  [LONG/SHORT/NO TRADE + reasoning + probability score]
 
 ═══════════════════════════════════════════
 ```

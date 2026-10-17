@@ -1153,3 +1153,21 @@
 
 ## Error Alerts — 2026-10-16 21:08 UTC
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-17 00:24 UTC
+- **[WARN]** (1x): `hermes-bug-hunter.service` failed (exit 1) — code quality audit found sql_injection (35 files), bare_except (132), connection_leaks (52), non_atomic_json (81), hardcoded_passwords (4). By-design non-zero exit on findings; not a runtime trading failure. No auto-fix (long-term code hygiene).
+- **[WARN]** (Nx): `[hotset] fallback DB query returned 0 tokens` — hotset.json is empty `[]`. Compactor cycle 13001 has no hot tokens. Investigate hotset generator if signals thin out.
+- **[WARN]**: Daily PnL -55.47% across 47 closed trades — not a system health issue but flagged for CEO visibility.
+
+## Error Alerts — 2026-10-17 01:08 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.2s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK decider_run: IndentationError: unexpected indent`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK position_manager: IndentationError: unexpected indent`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   hermes-trades-api: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK hermes-trades-api: IndentationError: unexpected indent`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run, position_manager, hermes-trades-api`
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: TOK (most recent call last):`
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: IndentationError: unexpected indent`
+- **REPEATED** (10x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Main process exited, code=exited, status=N/FAILURE`
+- **REPEATED** (10x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Failed with result 'exit-code'.`

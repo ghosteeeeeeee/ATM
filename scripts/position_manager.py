@@ -498,7 +498,23 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
                 _ep = 0.0
             if _ep > 0:
                 if (direction == 'LONG' and sl > _ep) or (direction == 'SHORT' and sl < _ep):
-                    hit = 'atr_trail_hit'
+                    # If this trade uses RR engine exits, label as rr_engine_trail_hit
+                    # so analytics show the RR engine managed the trail, not generic ATR.
+                    _sig = str(pos.get('signal', '') or '')
+                    _is_rr = False
+                    try:
+                        from hermes_constants import SIGNAL_EXIT_CONFIG
+                        for _part in [s.strip() for s in _sig.split(',')]:
+                            for _key, _val in SIGNAL_EXIT_CONFIG.items():
+                                if _part == _key or (_key not in ('+', '-') and _part.startswith(_key)):
+                                    if _val == 'rr_engine':
+                                        _is_rr = True
+                                        break
+                            if _is_rr:
+                                break
+                    except Exception:
+                        pass
+                    hit = 'rr_engine_trail_hit' if _is_rr else 'atr_trail_hit'
 
         if hit:
             hits.append({
@@ -3089,6 +3105,22 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                 pass
                         adjusted_count += 1
                         log(f"  [RR-ENGINE] {token} {direction}: TRAIL_SL → ${new_sl:.4f}")
+                        # IMMEDIATE BREACH CHECK: if price already breaches the
+                        # new trailed SL, close with rr_engine_trail_hit and
+                        # skip the ATR check — otherwise the ATR check steals
+                        # the label (atr_trail_hit instead of rr_engine_*).
+                        _cur_px = float(pos.get("current_price") or 0)
+                        if _cur_px > 0:
+                            _breached = (
+                                (direction == 'LONG' and _cur_px <= new_sl) or
+                                (direction == 'SHORT' and _cur_px >= new_sl)
+                            )
+                            if _breached:
+                                close_paper_position(trade_id, 'rr_engine_trail_hit',
+                                                     exit_detail=f"rr_engine trail SL breached: px={_cur_px:.4f} sl={new_sl:.4f}")
+                                closed_count += 1
+                                log(f"  [RR-ENGINE] {token} {direction}: TRAIL SL IMMEDIATELY BREACHED — closing at rr_engine_trail_hit")
+                                continue
             except Exception as e:
                 log(f"  [RR-ENGINE] {token} {direction}: error — {e}", "WARN")
 
