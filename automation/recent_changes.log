@@ -4799,3 +4799,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-17 22:14] auto_1hr: NO CONFIG CHANGE — 1T 0W −$0.15 last hour (WLD LONG ai-trader+ hard_sl) | 24h 7T 2W −$0.59 (28.6%) | 7d 203T 70W −$2.56 (34.5%) — size-reduce 30% stays | kill: none (pump-chain+ 1T 0W under 3T; ai-trader+ 24h 3T 0W −$0.44 new standing watch, kill rule not met) | atr_sl_hit 14.3% (healthy, tpsl deployed) | 0 open | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-17 23:14] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 6T 2W −$0.39 (33.3%) | 7d 202T 70W −$2.54 (34.7%) — size-reduce 30% stays | kill: none (ai-trader+ standing CEO watch 24h 3T 0W −$0.44; pump-chain+ 0 trades left in 24h, 7d has wins) | atr_sl_hit 16.7% (healthy, tpsl deployed) | 1 open: ALT SHORT pump-chain combo (entry 0.009246, $11.10) | regime now LONG_BIAS | No constants change → no signal_versions entry
+BY: auto_1hr

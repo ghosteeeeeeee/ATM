@@ -11380,3 +11380,25 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - ai-trader+ 24h 0W/3T −$0.44 — watch next hour; if 0W continues, CEO decision on disable (7d 26.3% WR, small bleeding)
 - pump-chain+ standing CEO escalation (now 1T 0W in 24h)
 - 7d WR 34.5% still < 35% — size-reduce stays at 30%
+
+## [2026-10-17 23:14] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 6T 2W −$0.39 (33.3% WR) | 7d 202T 70W −$2.54 (34.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0T last hour — quiet, not a failure; 2 SHORT candidates (SYRUP, PUMP) correctly gated single-type by confluence gate
+- 1 open: ALT SHORT pump-chain-,pump-chain-v6- (entry 0.009246, SL 0.008843, TP 0.008563, $11.10 size-reduced, opened 22:36 UTC) — watch outcome next hour
+- atr_sl_hit 1/6 = 16.7% (healthy, tpsl fix deployed)
+- Kill check: ai-trader+ 24h 3T 0W −$0.44 stays standing CEO watch (kill rule needs 3T 0W *in last hour*, 0T this hour); pump-chain+ has 0 trades left in 24h window (7d 31T 10W +$0.40 — has wins, killable only via CEO); no new 0%-WR signals
+- No overtrading (0/hr), no 3-neg-hour streak (last trade hour 21:00 −$0.15, before that 16:00 +$0.05)
+- Regime flipped to LONG_BIAS (SHORT=REDUCE) — SHORT signals face macro headwind; ALT SHORT open predates flip, hold per position rules
+- Size-reduce 30% stays (7d WR 34.7% < 35%)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ALT SHORT open ~38min — watch for TP/SL; first pump-chain combo trade since resume
+- ai-trader+ standing CEO escalation (24h 0W/3T −$0.44, 7d 19T 5W 26.3% −$0.93)
+- 7d WR 34.7% still < 35% — size-reduce stays
