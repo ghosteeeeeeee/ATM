@@ -5027,5 +5027,32 @@
     "status": "pre-registered",
     "risk": "low — shadow first, Nov 1 review decides",
     "data_needed": "MFE-CUT shadow fire logs at 0.20 vs counterfactual 0.40 (position_manager already tracks live_pnl; peak-MFE logging one-line addition if needed at review time)"
+  },
+  {
+    "date": "2026-10-17T11:05:00Z",
+    "idea": "Signal-family-scoped trail-arm-timeout extension (NOT universal MFE-cut)",
+    "rationale": "Universal time+unrealized-pnl cut failed candle-level OOS (145 false-kill winners, net -$9.90/30d). Signal-scoped trail-arm-timeout is the only proven chop-exit mechanism (pump-chain 45m, bb-squeeze 60m both live). Extend pattern signal-by-signal: ai-trader+ LONG (shadow already collecting T=55), bb-bounce-v2 (shadow collecting), pump-chain- SHORT (check direction coverage). Each needs individual backtest — no universal configs.",
+    "expected_impact": "Extend proven mechanism to worst live signals without universal-cut false kills",
+    "category": "exit engine",
+    "status": "suggested",
+    "risk": "low (shadow-first, per-signal scope, existing pattern)"
+  },
+  {
+    "date": "2026-10-17T11:44:51Z",
+    "idea": "Peak-armed guard for pump-chain trail-arm-timeout (skip close if peak_since_entry >= 0.40% unleveraged)",
+    "rationale": "Candle OOS shows pump-chain FKs are slow-grinders (flat at T, +4-6% later). A peak-armed guard would NOT save most of them (they never armed by T) — first hypothesis tested and REJECTED by same data. Real lever is T=45 -> 60/90 or a \"life\" detector (recent 5m high > entry). Defer: mechanism net≈0, churn risk > $0.13/30d edge. Recorded so future runs do not re-propose the peak-guard as a fix.",
+    "expected_impact": "Neutral — documented dead end",
+    "category": "exit engine",
+    "status": "rejected-early",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-17T11:44:51Z",
+    "idea": "Exit-ladder commission spec (7th request, NOW WITH CONSTRAINTS): signal-scoped only; template = bb-squeeze T=60/0.40 (+$1.02 candle OOS); failure mode = slow-grinder FK (pump-chain T=45 fk 37%); units rule cf = amount_usdt * live_pnl/100; must clear fk<=20% AND net>0 on candle OOS before ANY shadow flip",
+    "rationale": "Universal MFE-cut dead (11:05 run). bb-squeeze is the only cohort that passes the harsher as-coded test. Self_learner can now validate designs against a known-good and known-bad without re-deriving methodology.",
+    "expected_impact": "Hardens the #1 bleed exit fix pipeline (HML 7d −$5.12)",
+    "category": "exit engine",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

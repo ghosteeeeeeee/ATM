@@ -1,128 +1,42 @@
 {
-  "timestamp": "2026-10-17T09:44:07Z",
+  "timestamp": "2026-10-17T12:05:00Z",
   "run_type": "brain_auditor captain",
-  "pipeline_status": "PAUSED (vacation guardrail since 04:08 UTC — correctly flat)",
-  "trade_summary_24h": {
-    "trades": 38,
-    "pnl": -1.81,
-    "wr": 36.8,
-    "note": "all pre-pause"
+  "pipeline_status": "PAUSED (vacation guardrail since 04:08 UTC — correctly flat; watchdog 11:08)",
+  "trade_summary_24h": {"trades": 35, "pnl": -1.84, "wr": 34.3, "note": "all pre-pause; 0 trades since 01:39"},
+  "trade_summary_7d": {"trades": 213, "pnl": -2.84, "wr": 34.7},
+  "open_trades": "1 BTC SHORT #16258 manual @81522, mark ~81634 (-0.14% unrealized), SL 81766 (~132pts), TP 80299 — HOLD (watchdog: 4h SHORT_BIAS aligned, needs breakdown below 81500; tight SL accepted)",
+  "KEY_FINDING_trail_arm_candle_oos": {
+    "severity": "HIGH",
+    "summary": "As-coded candle OOS on all 4 trail-arm-timeout cohorts — bb-squeeze CONFIRMED, pump-chain retracted to wash, bb-bounce FLIP FAILS fk bar",
+    "method": "live_pnl (unleveraged) at open_time+T from 1m candles vs code condition (age>=T AND lp<0.40%); cf$ = amount_usdt * lp/100; pnl_usdt = amount * unleveraged move (pnl_pct is LEVERAGED % — units landmine)",
+    "pump_chain_LIVE45": "60 fires, 21 FK winners (36.8% of 57), saves $3.18 ≈ costs $3.31, NET −$0.13/30d. Prior +$1.75 'structurally immune' was selection-on-outcome: FOGO/AVAX/ADA/JUP <0.40% at T=45m yet ended +4-6% unleveraged. KEEP live (net≈0, churn risk > edge), claim retracted in comments.",
+    "bb_squeeze_LIVE60": "20 fires, 5 FK (11.1% of 45 winners), NET +$1.02/30d — CONFIRMED under harsher test. Template for exit-ladder work.",
+    "bb_bounce_SHD55": "33 fires, 18 FK (41.9% of 43 winners), NET +$0.31 — FAIL flip bar (fk must be ≤20%). Bounce winners run late. DO NOT flip T=55 without redesign.",
+    "ai_trader_SHD55": "3 fires only (+$0.26, 0 FK) — insufficient engagement. Keep shadow.",
+    "artifacts": "analysis/trail_arm_candle_oos_2026-10-17.py/.out, brain/verdicts/2026-10-17_trail-arm-candle-oos.md"
   },
-  "trade_summary_7d": {
-    "trades": 214,
-    "pnl": -2.87,
-    "wr": 34.6
-  },
-  "trade_summary_30d": {
-    "trades": 786,
-    "pnl": -4.69,
-    "wr": 43.6
-  },
-  "open_trades": "1 BTC SHORT #16258 manual @81522 SL 81766 — near SL, let it resolve",
   "last_run_changes_verified": [
-    {
-      "change": "doji RE-KILL",
-      "status": "HOLDING",
-      "evidence": "0 trades since 20:30 Oct 16"
-    },
-    {
-      "change": "pump-chain+ dead-gap",
-      "status": "HOLDING",
-      "evidence": "0 trades since 01:39 Oct 17"
-    },
-    {
-      "change": "ai-trader drift guard",
-      "status": "HOLDING",
-      "evidence": "0 trades since 03:46 Oct 17"
-    },
-    {
-      "change": "MFE-CUT shadow T=45/0.20",
-      "status": "COLLECTING",
-      "evidence": "pipeline paused, 0 fires expected"
-    },
-    {
-      "change": "bb-bounce trail-arm shadow T=55",
-      "status": "COLLECTING",
-      "evidence": "pipeline paused"
-    },
-    {
-      "change": "sweet-spot MIN 55",
-      "status": "HOLDING",
-      "evidence": "no regression"
-    },
-    {
-      "change": "SHORT midband 45-55",
-      "status": "HOLDING",
-      "evidence": "6T post-fix all pump-chain exempt or pre-pause"
-    },
-    {
-      "change": "EXTREME 0.85",
-      "status": "UNVALIDATED",
-      "evidence": "landed 05:40, pause predates by 32min, 0 trades"
-    }
+    {"change": "MFE-CUT flip blocked (11:05)", "status": "HOLDING", "evidence": "no flip; comment in constants intact"},
+    {"change": "doji re-kill / pump-chain+ dead-gap / ai-trader drift guard", "status": "HOLDING (frozen)", "evidence": "pipeline paused — 0 trades to validate against; verify on resume"},
+    {"change": "EXTREME 0.85 / sweet-spot MIN 55 / SHORT floor-35", "status": "UNVALIDATED (paused)", "evidence": "landed pre-pause, no post-land trades"},
+    {"change": "trail-arm shadows bb-bounce + ai-trader", "status": "COLLECTING / FLIP PATH ASSESSED", "evidence": "see KEY_FINDING — bb-bounce flip fails fk bar, ai-trader n too small"}
   ],
-  "short_floor35_status": {
-    "trigger": "10+ RSI 35-45 SHORTs lose >$1 in 7d",
-    "current": "14L gross −$0.99 — NOT hit (needs >$1)",
-    "band_net": "−$0.06 (28T incl winners) — band is flat, not bleeding",
-    "action": "none — pipeline paused, Oct 13 trades age out of 7d window by Oct 20, trigger resets before resume"
-  },
-  "chop_vs_trend_7d": {
-    "CHOP_hard_max_loss": {
-      "n": 58,
-      "pnl": -5.12,
-      "avg_mfe": 0.12,
-      "arm_rate": "1.7%",
-      "hold_min": 29
-    },
-    "ATR_SL": {
-      "n": 53,
-      "pnl": -4.26,
-      "avg_mfe": 0.46,
-      "arm_rate": "43.4%",
-      "hold_min": 66
-    },
-    "TRAIL": {
-      "n": 71,
-      "pnl": 7.04,
-      "avg_mfe": 1.62,
-      "arm_rate": "95.8%",
-      "hold_min": 83
-    }
-  },
-  "new_finding_atr_sl": {
-    "summary": "atr_sl_hit is #2 bleed (−$4.26/7d) with DISTINCT signature from hard_max_loss",
-    "mfe_bands_14d": {
-      "near_arm_0.20-0.40": {
-        "n": 19,
-        "pnl": -2.01,
-        "mae": 0.6,
-        "note": "biggest sub-band, MAE 2x MFE"
-      },
-      "giveback_>0.80": {
-        "n": 16,
-        "pnl": -0.85
-      },
-      "dead_<0.20": {
-        "n": 14,
-        "pnl": -1.23
-      },
-      "mid_0.40-0.80": {
-        "n": 12,
-        "pnl": -0.77
-      }
-    },
-    "insight": "near-arm trades show momentum (MFE 0.32) but never reach +0.40% trail arm, then reverse into ATR SL. MAE 0.60 = twice as much drawdown as favorable excursion. Current MFE-CUT shadow (MFE_MAX=0.20) only catches dead-entry cohort, NOT near-arm.",
-    "action": "pre-registered for Nov 1 MFE-CUT review: evaluate MFE_MAX 0.20→0.40 extension scoped to non-pump-chain (pump-chain has trail-arm-timeout)"
-  },
-  "defeated_pause_check": "PASS — 0 trades opened since 04:08 pause",
-  "protected_flags": "INTACT (13/13)",
-  "config_changes_applied": [],
-  "next_actions_on_resume": [
-    "verify rsi_at_pick written on first ai-trader pick",
-    "grep [SHADOW] MFE-CUT fires",
-    "grep [REGIME-CONF] 0.85x for EXTREME dampen",
-    "grep AI-TRADER drift lines",
-    "SHORT floor-35: recompute gross (trigger data aged out, fresh 7d window)"
+  "config_changes_applied": [
+    {"file": "hermes_constants.py", "type": "comments only (zero behavior)",
+     "what": "Candle-OOS verdicts embedded: pump-chain 'structurally immune' retracted (net≈0 wash, fk37%), bb-squeeze CONFIRMED, bb-bounce do-not-flip at T=55"}
+  ],
+  "drift_findings": [
+    {"item": "pump-chain trail-arm 'structurally immune' comment vs as-coded behavior", "severity": "MEDIUM", "action": "FIXED (comment corrected). Mechanism kept live — net≈0."},
+    {"item": "trades-level never-armed counters used for exit-gate validation are selection-on-outcome", "severity": "HIGH", "action": "Standard set: candle as-coded OOS mandatory for any exit-gate flip (mirrors MFE-CUT lesson). Written into verdict + constants comments."}
+  ],
+  "creative_improvements": [
+    {"idea": "Peak-armed guard for pump-chain timeout", "status": "rejected-early — data shows FKs never armed by T; guard would not save them"},
+    {"idea": "Exit-ladder commission spec v2: signal-scoped; template bb-squeeze; failure mode slow-grinder FK; units rule cf=amount*lp/100; bar fk≤20% AND net>0 on candle OOS", "status": "suggested — for self_learner on next commission"}
+  ],
+  "next_actions": [
+    "On resume (~Oct 21): verify rsi_at_pick written, grep [SHADOW] lines, extend dead-gap soak clock, 5+ unvalidated changes land together — CEO eyeball",
+    "Do NOT flip bb-bounce trail-arm T=55 — fk 41.9% candle OOS",
+    "Exit-ladder commission (still open, 8th request) now has verified template + units rule",
+    "Monitor open BTC SHORT #16258 — 132pts from SL, correct side of 4h structure"
   ]
 }

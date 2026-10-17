@@ -1664,14 +1664,19 @@ PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20% — tight trail, exits before ATR SL (whi
 # ENABLED 2026-10-12 brain_auditor: independent audit PASSED (captain-run).
 # PG cohort exact-match (<60m 51T 72.5% +$1.17 / >=60m 21T 28.6% −$1.42) + 7/7 candle
 # spot-check at T+60m (incl SEI 15870 u60=+0.99% PASS-through winner; 6/7 stalls <0.40%).
+# CANDLE-LEVEL AS-CODED OOS 2026-10-17 (analysis/trail_arm_candle_oos_2026-10-17.py):
+# CONFIRMED +$1.02/30d, fk 11.1% of winners (20 fires). brain/verdicts/2026-10-17_trail-arm-candle-oos.md.
 # Revert: set False (one line).
 BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED = True
 BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN = 60  # minutes hold before stall check; fires when live_pnl < PM_TRAIL_ACTIVATE_PCT
 # Trail-arm timeout vehicle extended to pump-chain+ LONG (brain_auditor 2026-10-12 15:40Z).
 # Same mechanic as bb-squeeze: LONG hold >=MIN that never arms PM_TRAIL is a stall, not a grind.
-# PG 30d counterfactual (verified twice, morning + captain): pump-chain+ LONG >=45m never-armed
-# = 13T 0%WR -$1.75. Every >=45m WINNER had MFE 2-10% (armed long before check) — structurally
-# immune to live_pnl < 0.40% guard. 24h bleed shape: 9/10 losers never armed (MFE < 0.40%).
+# PG 30d trades-level counterfactual: pump-chain+ LONG >=45m never-armed = 13T 0%WR -$1.75.
+# ⚠️ CANDLE-LEVEL AS-CODED OOS 2026-10-17: NET ≈ −$0.13/30d (saves $3.18 ≈ costs $3.31),
+# fk 36.8% of cohort winners. Prior "structurally immune via live_pnl < arm guard" claim
+# was selection-on-outcome: FOGO/AVAX/ADA/JUP all <0.40% at T=45m yet ended +4-6% unleveraged
+# (slow grinders that spike AFTER the check). Mechanism is a wash, not a $1.75 edge — kept
+# live (net≈0, saves fund costs; churn risk > edge). brain/verdicts/2026-10-17_trail-arm-candle-oos.md.
 # Revert: set False (one line). Monitor: trail_arm_timeout exits on pump-chain cohort.
 PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED = True
 PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45  # pump-chain grinds shorter than bb-squeeze before spike
@@ -1681,14 +1686,26 @@ PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45  # pump-chain grinds shorter than bb-squee
 # bb-bounce: chop 10T -$0.79 vs trail 10T +$0.38. Losers past T=55m: RUNE 80m HML, BABY 102m/ETC 131m/GMX 145m atr_sl.
 # Winners past T=55m: MNT 424m/+3.57%, BIGTIME 84m/+1.61%, POL 80m/+2.22% (all trail — likely armed; shadow confirms).
 # T=55m sits between HML cluster (18-54m, already dead before check) and atr_sl cluster (102-145m, catchable).
-# Flip live only with CEO GO + 14d shadow data + OOS backtest (HR-kill guard mandatory per dead_money lesson).
+# ⚠️ CANDLE-LEVEL AS-CODED OOS 2026-10-17 — BB-BOUNCE FLIP PATH FAILS: net +$0.31/30d but
+# fk 41.9% of cohort winners (33 fires, 18 FK) — way over the 20% bar. Bounce winners run
+# late (flat at 55m then trail). DO NOT flip T=55 without redesign clearing the fk bar.
+# ai-trader: only 3 fires/30d (+$0.26, 0 fk) — insufficient engagement, keep shadow.
+# Flip live only with CEO GO + 14d shadow data + candle OOS re-run (HR-kill guard mandatory).
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW = True  # Revert: set False.
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN = 55
 # MFE-CUT SHADOW — cut-if-stall progressive exit (brain_auditor 2026-10-17).
-# 30d counterfactual: SL-family never-armed, MFE<0.20%, hold>=45m = 54T avoid -$7.46;
-# false-kill winners 3T +$0.08. live_pnl < MFE_MAX at T is the never-armed proxy.
-# Zero behavior — logs would-fires only. Flip live only with CEO GO + candle-level
-# OOS backtest + 14d shadow (HR-kill guard mandatory per dead_money lesson).
+# ⚠️ CANDLE-LEVEL OOS VERDICT 2026-10-17 ~11:00 UTC: FLIP PATH BLOCKED.
+# Prior trades-level counterfactual (54T avoid -$7.46, fk 3T) was selection-on-outcome:
+# conditioned on FINAL MFE<0.20 — by definition excludes winners that armed later.
+# Shadow fires on live_pnl at T (different metric). 30d candle OOS (785T, 1m data):
+#   live_pnl-based as coded: T=45/0.20 fires 517, false-kills 145 winners (40.2% of
+#   all 30d winners), net COST ~$9.90/30d. Every (T 15-60, MFE 0.15-0.40) grid cell
+#   net-negative or >=10% fk. MFE-so-far variant (peak-since-entry): also all NO.
+#   Per-signal: no family passes (fk<20% AND benefit>$0 AND n>=20).
+# Signal-scoped trail-arm-timeout (pump-chain, bb-squeeze pattern) remains the
+# proven mechanism — universal time+unrealized-pnl cut does not work on crypto paths.
+# Shadow stays zero-behavior (logs would-fires only) for data collection.
+# DO NOT flip live. Redesign required: signal-family-scoped timeouts, not universal cut.
 MFE_CUT_SHADOW_ENABLED = True  # Revert: set False.
 MFE_CUT_SHADOW_MIN = 45        # minutes hold before stall check
 MFE_CUT_SHADOW_MFE_MAX = 0.20  # live_pnl % below this at T => would-fire

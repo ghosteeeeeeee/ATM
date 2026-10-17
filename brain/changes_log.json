@@ -1507,5 +1507,16 @@
     "after": "REGIME_CONF_EXTREME_MULT = 0.85",
     "rationale": "7d EXTREME 120T 26.7%WR -$1.99 (worst, 54% of trades). Sep 24 deploy data (EXTREME best 49.7%WR) inverted. 14d: block conf<67.6 band 76T 19.7% -$2.96, keep conf>=67.6 90T 37.8% +$1.79. Net save $2.96/14d. Matches NORMAL 0.85 symmetry; HIGH already 0.70.",
     "impact": "Reduce EXTREME false entries. Revert: set 1.15 if 7d EXTREME WR >= 45%."
+  },
+  {
+    "timestamp": "2026-10-17T11:44:51Z",
+    "agent": "brain_auditor",
+    "change": "Trail-arm-timeout candle OOS verdicts embedded as comments (pump-chain \"structurally immune\" retracted -> net≈0 wash; bb-squeeze CONFIRMED; bb-bounce FLIP FAIL fk 41.9%)",
+    "type": "tweak",
+    "file": "hermes_constants.py",
+    "before": "PG trades-level claims (pump-chain +$1.75 \"immune\", bb-bounce unqualified flip path)",
+    "after": "As-coded candle OOS: pump-chain −$0.13/30d fk37% accepted; bb-squeeze +$1.02 PASS; bb-bounce fk-bar FAIL — do-not-flip at T=55",
+    "rationale": "Trades-level never-armed counters are selection-on-outcome (same disease that blocked MFE-CUT). As-coded live_pnl-at-T evaluation is the only valid test of the mechanism.",
+    "impact": "Zero behavior change (comments only). Flip decision for bb-bounce pre-blocked; exit-ladder commission now has verified template (bb-squeeze) + known failure mode (slow-grinder FKs at T=45)."
   }
 ]

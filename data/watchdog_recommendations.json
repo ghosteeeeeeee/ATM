@@ -1,13 +1,22 @@
 {
-  "timestamp": "2026-10-17T10:08:26.136266+00:00",
+  "timestamp": "2026-10-17T11:38:26.696348+00:00",
   "steers": [
+    {
+      "severity": "urgent",
+      "category": "stale",
+      "title": "BTC open 8h, losing -0.0%",
+      "detail": "Trade open 8 hours and underwater. Thesis may be invalid. Consider cutting.",
+      "trade_id": 16258,
+      "auto_executable": false,
+      "id": "steer-001"
+    },
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 13/20 recent trades lost",
       "detail": "Win rate 25% over last 20 trades. Total PnL: -1.50 USDT. Something is wrong.",
       "auto_executable": false,
-      "id": "steer-001"
+      "id": "steer-002"
     },
     {
       "severity": "warning",
@@ -15,7 +24,7 @@
       "title": "11 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -23,7 +32,7 @@
       "title": "Signal 'ai-trader-manual' losing streak: 3 losses",
       "detail": "Net -0.10 USDT over last 20 trades (losses: -0.11). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-004"
     },
     {
       "severity": "warning",
@@ -31,16 +40,16 @@
       "title": "Signal 'doji-bottom-long' losing streak: 5 losses",
       "detail": "Net -0.59 USDT over last 20 trades (losses: -0.61). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-005"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEG",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
@@ -50,45 +59,8 @@
     "trend_quality": "STRONG_DOWN"
   },
   "open_count": 1,
-  "deep_analysis": "PORTFOLIO: 1 open \u2014 BTC SHORT 16258 (ai-trader-manual, entry 81522, now 81564.5, -0.05%, SL 81766.57 = +0.30%, TP 80299 = -1.5%, 6.7h open). 6 slots free. Unrealized ~0. Health CRITICAL \u2014 13/20 last trades lost, 25% WR, net -$1.50 over last 20.\n\nBTC SHORT THESIS: Intact but stalling. FOR: 15m SHORT_BIAS, 4h SHORT_BIAS, trend_quality STRONG_DOWN, zscore STRONG_NEG (-2.72), 5m/15m/1m linreg all negative (LEAN_BEAR). BTC below EMA300 (81653) \u2014 short is on the right side of the tape. AGAINST: BTC has sat AT EMA300 for 313 consecutive minutes in LOW volatility \u2014 pure chop band (81500-81700). 6.7h open with zero progress = the trade shape that bleeds (atr_sl_hit family dominates losses). R:R is good on paper (risk 0.30% for 1.5% target = 1:5) but LOW vol means TP is far and stop is near. If I were opening fresh: the SHORT direction is correct per regime, but the location (mid-EMA300 chop) and LOW vol make this a coin flip, not an edge. HOLD with a hard plan \u2014 this is not an add.\n\nMANUAL BTC CHURN (VERIFIED 24h PG): 7 ai-trader-manual BTC trades closed in 24h, net -$0.33. Every one flipped long/short inside the same EMA300 chop band. None reached trail. The winning side was: sitting out BTC until it leaves the 81500\u00b1400 zone with volume. We keep re-entering the same coin-flip. ai-trader should skip BTC while 5m regime is NEUTRAL/AT EMA300.\n\nDOJI-BOTTOM-LONG 5-LOSS STREAK (meta_rsi verified): ZEN RSI 29.5 \u2192 -5.08% atr_sl_hit. CRV RSI 39.8 \u2192 -4.39% hard_max_loss. YGG RSI 48.8 \u2192 -3.22% atr_sl_hit. WCT RSI 27.8 \u2192 -3.44% stale_exit. SUSHI RSI 49.0 \u2192 -0.91% scratch. Winners in same signal: GMT RSI 56.3 +0.54% trail, ONDO RSI 56.1 +0.48% trail, XPL RSI 49.2 +3.89% trail, DOGE RSI 43.8 +2.48% trail. The pattern is clean: RSI < 40 = falling knife, RSI 43-56 = stabilization long that trails. doji-bottom-long is systematically entering where the knife is still falling. WINNING side: the same coins, LONG after RSI stabilizes above 43. Flag for brain auditor: add RSI floor ~40 or regime gate.\n\nWORST SIGNAL: volume-breakout-long+ \u2014 3/18 WR (16.7%), -$1.14 over the window. This is the single biggest signal-level PnL drain. Flag for brain auditor.\n\nBEST SIGNAL: volume-buildup- (SHORT) \u2014 7/8 WR (87.5%), +$0.38. Shorting weakness with volume confirmation works. Keep.\n\nRSI SWEET SPOT (meta_rsi, last 48h winners): trail winners clustered at RSI 41-57 (GMT 56.3, ONDO 56.1, XPL 49.2, DOGE 43.8, WLD 41.0, ETH-short 36.4, KAS 57.7). Losers at RSI > 60 (INJ 64.0, BLUR 62.5, FIL 62.6, HBAR-short 63.6) and RSI < 40 for longs (ZEN 29.5, CRV 39.8, WCT 27.8). The band 41-57 is where trail-arm is reachable before SL.\n\nPIPELINE STATUS: STOPPED by VACATION-GUARDRAIL at 10:08. No ai-trader pick this cycle \u2014 a signal written now would go stale before execution resumes. Skip until pipeline restarts.",
-  "agent_timestamp": "2026-10-17T10:13:42.675893+00:00",
-  "regime_context": "BTC @ 81,564 \u2014 BELOW EMA300 (81,653) after 313 consecutive minutes AT it. 15m: SHORT_BIAS. 4h: SHORT_BIAS. 5m continuum: zscore STRONG_NEG (-2.72), linreg LEAN_BEAR (5m -0.015, 15m -0.021, 1h flat +0.001), trend_quality STRONG_DOWN, state_score 15 (very weak), volume LOW (ratio 0.35), velocity SLOW, acceleration POSITIVE (bouncing off bottom), wyckoff UNKNOWN, market_phase RECOVERY.\n\nAggregate alt scan (10:00): 54 SHORT_BIAS vs 4 LONG_BIAS, 63 neutral \u2014 market broadly bearish. BTC itself NEUTRAL on 5m (slope -0.004) but bleeding. Strongest SHORT_BIAS coins: SOPH (conf 94), CHIP (92), BABY (90), MON (89), TRB (88), IO (87), ZRO (86), BCH (83), FIL (82), JUP (80). Strongest LONG_BIAS: NIL (81), CFX (60), AERO (54), TON (56).\n\nMeaning: our open BTC SHORT is regime-aligned (15m/4h SHORT_BIAS, STRONG_DOWN). The risk is LOW-vol chop at EMA300 whipsawing the tight +0.30% stop before the -1.5% TP. Line in the sand: reclaim and hold above 81650-81700 = exit signal; break below 81400 with volume = TP in play. Portfolio is flat otherwise \u2014 no correlation cluster risk. Opportunity cost is low since pipeline is stopped anyway.",
-  "pattern_alerts": "PATTERN 1 (URGENT, VERIFIED 48h PG, n=65): The wealth gap is the entire book. Trail family (profit-monster-trail + atr_trail_hit) = the only winners. Chop family (atr_sl_hit, hard_max_loss, trail_arm_timeout) = the only losers. Every dollar lost is an entry that never reached +0.40% trail-arm; every dollar won is a trend that trailed. WINNING side: only take trades with enough slope/momentum to hit trail-arm fast. Why we weren't on it: doji-bottom-long knife-catches and manual BTC EMA300 flips enter mid-chop with no follow-through path. Evidence: doji RSI<40 entries (ZEN/CRV/WCT) all stopped; same signal RSI 43-56 (GMT/ONDO/XPL/DOGE) all trailed to profit.\n\nPATTERN 2 (WARNING, VERIFIED 24h PG, n=5 losses -$0.59): doji-bottom-long falling-knife machine. ZEN 29.5, CRV 39.8, YGG 48.8, WCT 27.8, SUSHI 49.0 \u2014 all stopped or scratched. The signal enters oversold RSI where hard_max_loss/atr_sl_hit family lives. WINNING side: same coins LONG at RSI 43-56 after stabilization. Flag for brain auditor: add RSI floor ~40 or regime gate.\n\nPATTERN 3 (WARNING, VERIFIED 48h PG, n=7): ai-trader-manual BTC flip-flop churn \u2014 7 trades in 24h, net -$0.33, zero reached trail, all inside 81500\u00b1400 EMA300 band. Alternating long/short every 1-3 hours. WINNING side: flat. BTC chop is untradeable at our SL/TP spacing; only BTC trends (leaving the band with volume) justify a manual.\n\nPATTERN 4 (INFO, VERIFIED window): volume-breakout-long+ is the worst signal \u2014 3/18 WR (16.7%), -$1.14. Almost every entry stopped. WINNING side: volume-buildup- (SHORT) at 7/8 WR +$0.38 \u2014 volume-confirmed shorts work; volume-breakout longs don't in this regime. Flag for brain auditor.\n\nPATTERN 5 (INFO, meta_rsi verified): RSI band 41-57 is the trail-arm sweet spot. Winners: GMT 56.3, ONDO 56.1, XPL 49.2, DOGE 43.8, WLD 41.0, KAS 57.7. Losers above 60 (INJ 64.0, BLUR 62.5, FIL 62.6) = chasing; below 40 longs (ZEN 29.5, CRV 39.8, WCT 27.8) = knife. This is the meta_rsi-verified version of the entry-quality map.",
-  "additional_steers": [
-    {
-      "severity": "urgent",
-      "category": "regime",
-      "title": "BTC SHORT regime-aligned but 6.7h stale in EMA300 chop \u2014 hold with hard exit plan",
-      "detail": "Entry 81522, now 81564.5, -0.05%. 15m/4h SHORT_BIAS, STRONG_DOWN trend, zscore STRONG_NEG \u2014 direction correct. But 313min AT EMA300 in LOW vol = chop band. Tight +0.30% stop, far -1.5% TP. R:R 1:5 on paper but LOW vol means stop is near and TP is far. Prior manual BTC flips in this band: 7 trades, net -$0.33, zero trailed.",
-      "action": "HOLD. Exit if BTC reclaims and holds above 81650-81700 (pre-stop warning). Hard stop 81766 stands. TP 80299 in play only on a volume breakdown below 81400. Do not add. Do not flip long in this band."
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "doji-bottom-long 5-loss streak \u2014 oversold knife entries (meta_rsi verified)",
-      "detail": "ZEN 29.5, CRV 39.8, WCT 27.8, YGG 48.8, SUSHI 49.0 all stopped/scratched. Same signal's winners were RSI 43-56 (GMT 56.3, ONDO 56.1, XPL 49.2, DOGE 43.8 \u2014 all trailed). Signal enters where the 4%-WR knife family lives.",
-      "action": "Flag for brain auditor: add RSI floor ~40 or regime gate to doji-bottom-long. No param change from watchdog."
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "volume-breakout-long+ worst signal: 3/18 WR, -$1.14 window PnL",
-      "detail": "16.7% win rate. Almost every entry atr_sl_hit or hard_max_loss. Contrast volume-buildup- (SHORT): 7/8 WR, +$0.38. Volume-confirmed shorts work; volume-breakout longs don't in this SHORT_BIAS regime.",
-      "action": "Flag for brain auditor: review volume-breakout-long+ entry conditions or disable in SHORT_BIAS regimes."
-    },
-    {
-      "severity": "info",
-      "category": "opportunity",
-      "title": "No ai-trader pick \u2014 pipeline stopped by VACATION-GUARDRAIL",
-      "detail": "hermes-pipeline.timer stopped at 10:08. A signal written now would go stale before execution resumes. 6 slots free but nothing can fill.",
-      "action": "Skip ai-trader this cycle. Resume picks after pipeline restart."
-    },
-    {
-      "severity": "info",
-      "category": "profit_lock",
-      "title": "No trail opportunities \u2014 only open trade is flat (-0.05%)",
-      "detail": "BTC SHORT not up 2%+ (BE) or 5%+ (trail). Breakeven/trailing rules not triggered. Trail family remains the entire edge.",
-      "action": "None until BTC SHORT crosses +0.20% or a new trade opens."
-    }
-  ]
+  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (0 long, 1 short)  |  Unrealized: \u00b10.00 USDT\nRegime: RANGE at EMA300 | Vol LOW | 4h SHORT_BIAS vs 15m LONG_BIAS\nSystem: PAUSED (vacation guardrail since 01:38 UTC, live_trading=false)\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [stale/urgent] BTC SHORT 16258 is a zombie \u2014 8.2h, max favorable\n   excursion was \u2212$3 (never in profit), 8h high 81770 actually\n   pierced the 81766.57 stop yet the trade is still open. Cut it\n   or hard time-stop: exit if not below 81400 within 4h.\n\ud83d\udd34 [health] 24h: 39% WR, 33 closes. hard_max_loss 0% WR (n=6),\n   atr_sl_hit 11% WR (n=9). Only profit-monster-trail wins\n   (88% WR, +9.9%). LONG RSI 50-65 = \u221222.8% (n=10) \u2014 chop bleed.\n\ud83d\udfe1 [health] doji-bottom-long 5-loss streak \u2014 but its 4 trail\n   winners printed +0.5 to +3.9%. Signal works only with reclaim\n   momentum; bottom-calling alone loses.\n\ud83d\udfe1 [cluster] None \u2014 single position, no correlation risk.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nBTC is coiling AT EMA300 (81550 vs 81643) in LOW vol with\nLEAN_BEAR linreg across all frames and DISTRIBUTION wyckoff \u2014\na coil, not a trend. The open short has the right 4h thesis but\nentered chop: it never armed, never profited, and its stop was\nwick-pierced without closing (\u26a0\ufe0f stop execution needs checking \u2014\neither the HL stop didn't fire on the 81770 wick, or our SL\ntracking is off; verify on the exchange).\n\nThe 24h ledger proves the trading rule: trail-family entries\nduring real momentum are +9.9%; every chop entry (hard_max_loss\n0%, atr_sl_hit 11%) lost. Mid-band RSI 50-65 LONGs are the\nbiggest bleeder (\u221222.8%, n=10) \u2014 \"allowed\" RSI is not profitable\nin a range. Oversold LONGs (RSI<35, n=3, 0% WR) were falling\nknives; the winning side was SHORT the breakdown or no trade.\nMirror trap also present: SHORTs at RSI 42-43 got squeezed.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Cut BTC SHORT 16258 (or time-stop below 81400 in 4h).\n   Fresh-eye test fails: I would not open this trade today.\n2. Verify why the 81770 wick did not trigger the 81766 stop \u2014\n   possible stop-tracking bug on manual positions.\n3. Keep the vacation pause until BTC expands (volume leaves LOW,\n   velocity leaves SLOW). Resume = trade the breakout side only:\n   >81800 LONG continuation, <81300 SHORT continuation.\n4. On resume: skip doji-bottom-long unless reclaim confirmed\n   (EMA cross + volume). No AI trader pick fired this cycle \u2014\n   pipeline is dead, a pick would expire uselessly.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json` (deep_analysis, regime_context, pattern_alerts). AI trader skipped \u2014 pipeline timer stopped and live trading off.\n",
+  "agent_timestamp": "2026-10-17T11:44:33.303540+00:00",
+  "regime_context": "BTC 81550 vs EMA300 81643 \u2014 AT the line, not below it with conviction. zscore -1.21 (NEG), velocity SLOW, acceleration FLAT, volume LOW (ratio 0.0), linreg LEAN_BEAR on 1m/5m/15m/1h, wyckoff DISTRIBUTION, market_phase RECOVERY (contradicting the distribution tag), trend_quality STRONG_DOWN, state_score 13.1 (very weak). 5m aggregate: LONG_BIAS 22 / SHORT_BIAS 13 / neutral 90 \u2014 mostly noise. 15m LONG_BIAS vs 4h SHORT_BIAS = mixed timeframes, classic range.\n\nThis is a LOW-VOL COIL at EMA300 after a downtrend (STRONG_DOWN quality, RECOVERY phase). Either resolution works for us IF we wait: break above 81800 = LONG continuation setups; break below 81300 = SHORT continuation setups. Until one side resolves, mid-band LONG entries are the exact profile that lost -22.8% in 24h. The vacation pause is accidentally the correct regime response \u2014 keep it until BTC expands (watch volume_regime leave LOW and velocity leave SLOW).",
+  "pattern_alerts": "VERIFIED (PostgreSQL, last 24h, 33 trades, meta_rsi not entry_rsi_14):\n\n1. MID-BAND RSI LONGS IN CHOP \u2014 RSI 50-65 LONG: n=10, 30% WR, -22.8%. Biggest bleeder. WINNING SIDE: these coins either chopped sideways (hard_max_loss) or dipped through the ATR stop first (atr_sl_hit). The right play was NO TRADE until momentum confirmed, or SHORT the failed bounce. We kept buying \"acceptable\" RSI in a market with zero follow-through. Allowed RSI band != profitable in a range.\n\n2. OVERSOLD LONGS ARE FALLING KNIVES \u2014 RSI<35 LONG: n=3, 0% WR, -12.8% (APT 33.7 hard_max_loss, ZEN 29.5 atr_sl_hit, WCT 27.8 stale_exit). WINNING SIDE: SHORT the breakdown. An RSI-28 coin with STRONG_DOWN BTC quality is not oversold \u2014 it is falling. doji-bottom-long fired on 3 of these bottoms without reclaim confirmation.\n\n3. TRAIL FAMILY = THE ONLY WINNING SIDE \u2014 profit-monster-trail: n=8, 88% WR, +9.95%. Universal_max_hold +3.79 (BTC LONG) is the same family (trend ride to time exit). Every winner had real momentum at entry. 52/56 historical hard_max_loss trades never reached +0.40% for trail to arm \u2014 same story this 24h: 6/6 hard_max_loss never armed. COROLLARY: an entry that cannot plausibly hit +0.40% within its first hour is a chop entry \u2014 the RSI level does not save it.\n\n4. DOJI-BOTTOM-LONG: 5-loss streak (-0.59) BUT its winners (GMT +0.54, DOGE +2.48, ONDO +0.48, XPL +3.89) all exited via trail. The signal works ONLY when the bottom has actual reclaim momentum. WINNING SIDE on its losses: wait for EMA reclaim + volume surge before longing; the pattern alone is insufficient in a range.\n\n5. SHORTING OVERSOLD MIRRORS THE TRAP \u2014 SHORT RSI<45: n=4, 50% WR, -4.3%. FIL 42.1 and DOT 43.5 pump-chain shorts got atr_sl_hit \u2014 bouncing from oversold is exactly when shorts get squeezed. SHORT_RSI_HARD_FLOOR=45 exists for this reason; these slipped through near the floor. WINNING SIDE on those: the LONG reclaim, or no trade.\n\n6. AI-TRADER-MANUAL BTC: 6 trades, mixed, net slightly negative. BTC in a 0.04%-ATR range is the hardest instrument in the book \u2014 every mean-reversion entry stops out. The open 8h zombie short is the latest example. WINNING SIDE: flat until BTC expands."
 }

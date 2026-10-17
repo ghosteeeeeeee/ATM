@@ -1,0 +1,71 @@
+30d LONG closed: 559
+
+=== pump-chain-LIVE45 (T=45m, arm<0.4% unleveraged) ===
+  cohort=133 closed_before_T=44 alive_at_T=89 no_candle=0
+  FIRED=60 (winners_FK=21, losers_saved=39)
+  NET if fired = $-0.13/30d | saves $+3.18 | costs $-3.31
+  fire_rate_of_alive=67.4%
+  fk_rate_of_fires=35.0%
+  fk_pct_of_cohort_winners=36.8% (21/57)
+    ('FOGO', 'T-0.23%', 'end_u+6.22%', 'usdt+0.69', 'cf-0.03', 'ben-0.72', 'FK', 'atr_sl_hit')
+    ('AVAX', 'T-0.07%', 'end_u+4.72%', 'usdt+0.53', 'cf-0.01', 'ben-0.54', 'FK', 'atr_sl_hit')
+    ('ADA', 'T+0.25%', 'end_u+4.61%', 'usdt+0.52', 'cf+0.03', 'ben-0.49', 'FK', 'atr_sl_hit')
+    ('JUP', 'T+0.24%', 'end_u+4.23%', 'usdt+0.47', 'cf+0.03', 'ben-0.44', 'FK', 'atr_sl_hit')
+    ('INJ', 'T-0.72%', 'end_u+0.89%', 'usdt+0.16', 'cf-0.16', 'ben-0.32', 'FK', 'atr_sl_hit')
+    ('FOGO', 'T+0.09%', 'end_u-1.36%', 'usdt-0.30', 'cf+0.02', 'ben+0.32', 'SAVE', 'atr_sl_hit')
+    ('BABY', 'T+0.12%', 'end_u+1.82%', 'usdt+0.30', 'cf+0.02', 'ben-0.28', 'FK', 'atr_sl_hit')
+    ('IMX', 'T-0.25%', 'end_u-1.50%', 'usdt-0.33', 'cf-0.06', 'ben+0.27', 'SAVE', 'atr_sl_hit')
+    ('AIXBT', 'T+0.08%', 'end_u-0.81%', 'usdt-0.18', 'cf+0.02', 'ben+0.20', 'SAVE', 'atr_sl_hit')
+    ('BANANA', 'T+0.07%', 'end_u-0.71%', 'usdt-0.16', 'cf+0.02', 'ben+0.18', 'SAVE', 'hard_max_loss')
+    ... +50 more
+
+=== bb-squeeze-LIVE60 (T=60m, arm<0.4% unleveraged) ===
+  cohort=75 closed_before_T=54 alive_at_T=21 no_candle=0
+  FIRED=20 (winners_FK=5, losers_saved=15)
+  NET if fired = $+1.02/30d | saves $+1.37 | costs $-0.35
+  fire_rate_of_alive=95.2%
+  fk_rate_of_fires=25.0%
+  fk_pct_of_cohort_winners=11.1% (5/45)
+    ('INJ', 'T-0.06%', 'end_u-1.13%', 'usdt-0.25', 'cf-0.01', 'ben+0.24', 'SAVE', 'hard_max_loss')
+    ('TURBO', 'T+0.00%', 'end_u-1.03%', 'usdt-0.16', 'cf+0.00', 'ben+0.16', 'SAVE', 'hard_max_loss')
+    ('LDO', 'T+0.09%', 'end_u+0.61%', 'usdt+0.14', 'cf+0.02', 'ben-0.12', 'FK', 'profit-monster-trail')
+    ('ZORA', 'T+0.00%', 'end_u-1.05%', 'usdt-0.12', 'cf+0.00', 'ben+0.12', 'SAVE', 'hard_max_loss')
+    ('POL', 'T-0.12%', 'end_u-1.20%', 'usdt-0.13', 'cf-0.01', 'ben+0.12', 'SAVE', 'hard_max_loss')
+    ('CHIP', 'T+0.03%', 'end_u-1.08%', 'usdt-0.12', 'cf+0.00', 'ben+0.12', 'SAVE', 'hard_max_loss')
+    ('TURBO', 'T-0.19%', 'end_u-1.04%', 'usdt-0.12', 'cf-0.02', 'ben+0.10', 'SAVE', 'hard_max_loss')
+    ('MERL', 'T-0.17%', 'end_u-1.03%', 'usdt-0.11', 'cf-0.02', 'ben+0.09', 'SAVE', 'hard_max_loss')
+    ('SUSHI', 'T-0.30%', 'end_u-1.11%', 'usdt-0.12', 'cf-0.03', 'ben+0.09', 'SAVE', 'hard_max_loss')
+    ('LDO', 'T-0.18%', 'end_u+0.22%', 'usdt+0.05', 'cf-0.04', 'ben-0.09', 'FK', 'profit-monster-trail')
+    ... +10 more
+
+=== bb-bounce-SHD55 (T=55m, arm<0.4% unleveraged) ===
+  cohort=74 closed_before_T=35 alive_at_T=39 no_candle=0
+  FIRED=33 (winners_FK=18, losers_saved=15)
+  NET if fired = $+0.31/30d | saves $+1.03 | costs $-0.71
+  fire_rate_of_alive=84.6%
+  fk_rate_of_fires=54.5%
+  fk_pct_of_cohort_winners=41.9% (18/43)
+    ('CFX', 'T+0.02%', 'end_u-1.17%', 'usdt-0.26', 'cf+0.00', 'ben+0.26', 'SAVE', 'hard_max_loss')
+    ('COMP', 'T+0.01%', 'end_u-1.27%', 'usdt-0.14', 'cf+0.00', 'ben+0.14', 'SAVE', 'hard_max_loss')
+    ('HBAR', 'T+0.03%', 'end_u+1.11%', 'usdt+0.12', 'cf+0.00', 'ben-0.12', 'FK', 'profit-monster-trail')
+    ('ZORA', 'T-0.13%', 'end_u-0.32%', 'usdt-0.11', 'cf-0.01', 'ben+0.10', 'SAVE', 'hard_sl')
+    ('CFX', 'T-0.28%', 'end_u+0.63%', 'usdt+0.07', 'cf-0.03', 'ben-0.10', 'FK', 'atr_sl_hit')
+    ('MNT', 'T-0.01%', 'end_u+0.71%', 'usdt+0.08', 'cf-0.00', 'ben-0.08', 'FK', 'profit-monster-trail')
+    ('MNT', 'T-0.61%', 'end_u+0.06%', 'usdt+0.01', 'cf-0.07', 'ben-0.08', 'FK', 'profit-monster-trail')
+    ('ETH', 'T+0.08%', 'end_u+0.76%', 'usdt+0.09', 'cf+0.01', 'ben-0.08', 'FK', 'profit-monster-trail')
+    ('HYPE', 'T-0.24%', 'end_u+0.33%', 'usdt+0.04', 'cf-0.03', 'ben-0.07', 'FK', 'profit-monster-trail')
+    ('BABY', 'T-0.69%', 'end_u-1.34%', 'usdt-0.15', 'cf-0.08', 'ben+0.07', 'SAVE', 'atr_sl_hit')
+    ... +23 more
+
+=== ai-trader-SHD55 (T=55m, arm<0.4% unleveraged) ===
+  cohort=28 closed_before_T=22 alive_at_T=6 no_candle=0
+  FIRED=3 (winners_FK=0, losers_saved=3)
+  NET if fired = $+0.26/30d | saves $+0.26 | costs $+0.00
+  fire_rate_of_alive=50.0%
+  fk_rate_of_fires=0.0%
+  fk_pct_of_cohort_winners=0.0% (0/14)
+    ('INJ', 'T-0.07%', 'end_u-0.89%', 'usdt-0.20', 'cf-0.02', 'ben+0.18', 'SAVE', 'atr_sl_hit')
+    ('ME', 'T-0.27%', 'end_u-0.70%', 'usdt-0.08', 'cf-0.03', 'ben+0.05', 'SAVE', 'hard_max_loss')
+    ('BTC', 'T+0.13%', 'end_u-0.05%', 'usdt-0.01', 'cf+0.01', 'ben+0.02', 'SAVE', 'atr_trail_hit')
+
+SUMMARY: {'pump-chain-LIVE45': {'cohort': 133, 'fired': 60, 'fk': 21, 'net_usdt': -0.13, 'save': 3.18, 'cost': -3.31, 'fk_of_winners': 36.8}, 'bb-squeeze-LIVE60': {'cohort': 75, 'fired': 20, 'fk': 5, 'net_usdt': 1.02, 'save': 1.37, 'cost': -0.35, 'fk_of_winners': 11.1}, 'bb-bounce-SHD55': {'cohort': 74, 'fired': 33, 'fk': 18, 'net_usdt': 0.31, 'save': 1.03, 'cost': -0.71, 'fk_of_winners': 41.9}, 'ai-trader-SHD55': {'cohort': 28, 'fired': 3, 'fk': 0, 'net_usdt': 0.26, 'save': 0.26, 'cost': 0.0, 'fk_of_winners': 0.0}}

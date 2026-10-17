@@ -11156,3 +11156,23 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
 - pump-chain+ / pump-chain- standing CEO escalations (still 0W 24h)
 - guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit
+
+## [2026-10-17 11:09] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 35T 12W −$1.84 (34.3% WR) | 7d 213T 74W −$2.84 (34.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Trading PAUSED by vacation guardrail since 04:08 UTC — 0T expected; live_trading=false (kill JSON reason=disabled)
+- Resume check: 7d WR 34.7% < 37% AND 7d PnL −$2.84 < 0 → both fail, stay paused (correct)
+- 1 open position: BTC ai-trader-manual SHORT entry 81522 SL 81766.57 TP 80299.17 size $11.10 (opened 03:25, kept per pause protocol)
+- Kill check: 0T this hour; no new 0% WR signals (need 3+T threshold)
+- atr_sl_hit 9/35 = 25.7% (under 40 threshold; tpsl_utils fix deployed)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
+- pump-chain+ / pump-chain- standing CEO escalations (still 0W 24h)
+- guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit

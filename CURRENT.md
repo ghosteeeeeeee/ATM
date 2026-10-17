@@ -1,74 +1,86 @@
-# Current State — brain_auditor Captain Run Oct 17 10:00 UTC
+# Current State — brain_auditor Captain Run Oct 17 12:05 UTC
 
-**Last Updated: 2026-10-17 10:00 UTC**
-**Updated by: brain_auditor — 0 config changes (PAUSED + soak double discipline)**
+**Last Updated: 2026-10-17 12:05 UTC**
+**Updated by: brain_auditor — trail-arm-timeout candle OOS (all 4 cohorts), 0 behavior changes**
 
-## PIPELINE STATUS (10:00 UTC)
+## PIPELINE STATUS (12:05 UTC)
 
-- **24h: 38T −$1.81 (36.8% WR)** | 1 open (BTC SHORT #16258 manual @81522, SL 81766) | **7d 214T 34.6% −$2.87** | 30d 786T −$4.69 43.6% | Health CRITICAL
-- **Pipeline PAUSED** (vacation-guardrail since 04:08) — flat is the trade, correctly held. **Defeated-pause check PASS: 0 trades since pause.**
-- Regime: BTC 15m+4h SHORT_BIAS, vol LOW; EXTREME worst regime (118T/7d 26.1% −$1.98)
-- Resume: WR≥37% OR pnl_7d≥0 (OR-semantics). **Earliest aging-only resume ~Oct 21.** 6 unvalidated changes land together — CEO eyeball at resume.
+- **24h: 35T −$1.84 (34.3% WR)** | 1 open (BTC SHORT #16258 manual) | **7d 213T 34.7% −$2.84** | Health CRITICAL
+- **Pipeline STOPPED** (vacation-guardrail since 04:08) — flat is the trade, correctly held. Auto-resume ~Oct 21.
+- Regime: BTC SHORT_BIAS (15m/4h), vol LOW, accumulation/declining. BTC ~81634, entry 81522, SL 81766 (~132pts). HOLD.
+- Exit signature: **7d HML 58T −$5.12 + atr_sl 52T −$4.23 vs TRAIL 68T +$7.00**
 
-## OPEN TRADE #16258 — BTC SHORT
+## ⚠️ KEY FINDING THIS RUN — TRAIL-ARM-TIMEOUT CANDLE OOS (all 4 cohorts)
 
-- Entry 81522 (03:25), SL 81766.57, TP 80299. ~6h open, near SL.
-- **HOLD — let SL resolve. Do not manually interfere.**
+Same test class that killed universal MFE-CUT, now applied to the *signal-scoped* mechanism
+(as-coded: still open at age≥T AND live_pnl <0.40% → close). `analysis/trail_arm_candle_oos_2026-10-17.py`.
+**Units landmine: `pnl_usdt` = amount × unleveraged move; `pnl_pct` is LEVERAGED %. cf$ = amount × lp/100.**
 
-## DONE THIS RUN (Oct 17 10:00)
+| Cohort | T | fires (FK winners) | NET | fk % of winners | Verdict |
+|--------|---|--------------------|-----|-----------------|---------|
+| bb-squeeze LIVE | 60m | 20 (5) | **+$1.02** | 11.1% | **CONFIRMED — exit-ladder template** |
+| pump-chain LIVE | 45m | 60 (21) | **−$0.13** | **36.8%** | wash — KEEP, "immune" claim RETRACTED |
+| bb-bounce SHADOW | 55m | 33 (18) | +$0.31 | **41.9%** | **FLIP FAILS (fk bar 20%)** |
+| ai-trader SHADOW | 55m | 3 (0) | +$0.26 | 0% | insufficient n — keep shadow |
 
-- **0 config changes** — PAUSED + soak: 6 changes landed Oct 16-17 all awaiting first live validation
-- **All last-run changes verified HOLDING** (0 trades since pause): doji rekill, pump-chain+ dead-gap, ai-trader drift guard, MFE-CUT shadow, bb-bounce shadow, sweet-spot 55, SHORT midband
-- **EXTREME 0.85 UNVALIDATED** — landed 05:40, pause predates by 32min, 0 trades
-- **SHORT floor-35: trigger NOT hit** — 14L gross −$0.99 vs threshold >$1.00; band net −$0.06/28T = flat; trigger data ages out by Oct 20 before resume
-- **NEW FINDING — atr_sl_hit #2 bleed, DISTINCT from HML:** 7d 53T −$4.26, avg MFE 0.46 arm-rate 43.4% (vs HML MFE 0.12 arm 1.7%). 14d near-arm band (MFE 0.20-0.40) = 19T −$2.01, MAE 0.60 (2x MFE) — show momentum, never reach trail arm, reverse into ATR SL. Current MFE-CUT shadow (0.20) only catches dead cohort.
+- pump-chain prior "+$1.75 structurally immune" was selection-on-outcome: FOGO/AVAX/ADA/JUP were <0.40% at T=45m yet ended +4-6% unleveraged (slow grinders). Saves $3.18 ≈ costs $3.31 — net zero. No mechanism change (churn risk > $0.13/30d).
+- bb-bounce: bounce winners run late (flat at 55m then trail). **Do NOT flip T=55 without redesign clearing fk≤20% on fresh candle OOS.**
+- Peak-armed-guard idea tested-and-rejected: FKs never armed by T, guard wouldn't save them.
+- Verdict file: `brain/verdicts/2026-10-17_trail-arm-candle-oos.md`. Constants comments updated (zero behavior).
+
+## PRIOR RUN (11:05) — MFE-CUT FLIP BLOCKED (still in force)
+
+Universal time+unrealized-pnl cut FAILed candle OOS (145 fk winners, net −$9.90/30d). Tier-2 pre-registration REVOKED. Signal-scoped only.
 
 ## LAST-RUN CHANGES — STATUS
 
 | Change | Status | Evidence |
 |--------|--------|----------|
-| MFE-CUT shadow T=45m/0.20 (04:38) | COLLECTING | pipeline paused, 0 fires expected |
-| ai-trader drift guard (03:46) | HOLDING | 0 opens since |
-| pump-chain+ dead-gap (01:39) | HOLDING | 0 opens since |
-| bb-bounce trail-arm shadow T=55 | COLLECTING | 0 fires (pipeline paused) |
-| doji RE-KILL (20:30 Oct 16) | HOLDING | 0 trades since |
-| sweet-spot MIN 55 (21:45 Oct 16) | HOLDING | no regression |
-| SHORT midband 45-55 | HOLDING | 6T post-fix all pump-chain exempt or pre-pause |
-| EXTREME 0.85 (05:40) | UNVALIDATED | 0 trades since landing |
+| doji RE-KILL | HOLDING (frozen) | 0 trades since 20:30 Oct 16 |
+| pump-chain+ dead-gap | HOLDING (frozen) | 0 trades since 01:39 |
+| ai-trader drift guard | HOLDING | rsi_at_pick unverified (paused) |
+| MFE-CUT shadow T=45/0.20 | COLLECTING / FLIP BLOCKED | candle OOS FAIL |
+| bb-bounce trail-arm shadow T=55 | COLLECTING / **FLIP PATH FAIL** | candle OOS fk 41.9% |
+| ai-trader trail-arm shadow T=55 | COLLECTING | 3 fires/30d hypothetical |
+| pump-chain TAT live45 | KEPT — net≈0 wash | comment retracted, no code change |
+| bb-squeeze TAT live60 | **CONFIRMED** | +$1.02 candle OOS |
+| sweet-spot MIN 55 / SHORT midband / EXTREME 0.85 / SHORT floor-35 | HOLDING / UNVALIDATED | paused |
 
 ## ⚠️ OPEN (CEO-owned)
 
-1. 🔴 **Trail-arm RATIFY decision** — pump-chain 45m proven (9T vs HML −3% acct); bb-squeeze 60m vacuous no-op. Pending since Oct 12.
-2. 🔴 **Resume-day discipline** — est Oct 21 aging-resume; 6 unvalidated changes land together. CEO eyeball recommended.
-3. 🔴 **7d WR/PnL** — 34.6% / −$2.87. Guardrail holds — correct.
-4. 🟡 **#16258 SL/TP desync** DB vs PM — bug_hunter carry.
-5. 🟡 **Exit-ladder candle OOS** — self_learner undelivered since Oct 14 (7th request); trades-level grid shipped Oct 17 07:45 as interim.
-6. 🟡 **ai-trader rsi_at_pick compliance** — verify first pick on resume.
+1. 🔴 **Exit-ladder candle backtest — STILL NOT COMMISSIONED (8th request).** Spec v2 ready: signal-scoped only; template = bb-squeeze T=60 (+$1.02, fk 11%); failure mode = slow-grinder FK (pump-chain T=45, fk 37%); units rule cf=amount×lp/100; bar fk≤20% AND net>0 on candle OOS.
+2. 🔴 **7d WR/PnL** — 34.7% / −$2.84. Vacation guardrail holds — correct.
+3. 🟡 **ai-trader rsi_at_pick compliance** — verify first resume pick writes field.
+4. 🟡 **#16258 SL/TP desync** DB vs PM — bug_hunter candidate.
+5. 🟡 **dead-gap soak clock** — extend past Oct 17 on resume.
+6. 🟡 **5+ unvalidated changes land together on resume (~Oct 21)** — CEO eyeball recommended.
 
-## WATCHLIST (soak — do NOT stack new entry filters on resume)
+## WATCHLIST (soak — do NOT stack new entry filters)
 
-- MFE-CUT shadow — grep `[SHADOW] MFE-CUT` on resume; **tier-2 MFE_MAX 0.20→0.40 (non-pc scope) PRE-REGISTERED for Nov 1** — targets atr_sl near-arm reversals (19T −$2.01/14d)
-- ai-trader drift guard — grep `[AI-TRADER].*drift` on resume
-- bb-bounce + ai-trader trail-arm shadow T=55m — collecting
-- pump-chain- EXTREME + dead-gap — HOLDING
+- MFE-CUT shadow — collecting, FLIP BLOCKED; would-fire data only
+- bb-bounce trail-arm shadow — collecting, FLIP PATH FAIL at T=55 (keep for data, do not flip)
+- ai-trader trail-arm shadow — collecting, low engagement
+- ai-trader drift guard — verify rsi_at_pick on first resume pick
+- pump-chain- HIGH_BLOCK + HARD_FLOOR=45 — holding
 - CHASE_RATIO_SHADOW — soak to Oct 27
-- volume-buildup− SHORT: protect (14d 8T 87.5% +$0.38)
+- volume-buildup− SHORT: 87.5%WR +$0.38, protect
 - pump-chain+ : 14d #1 money maker, leave alone
+- bb-squeeze TAT: CONFIRMED, candidate for any future exit-stack design
 
 ## KEY DATES
 
 | Date | Item |
 |------|------|
-| ~Oct 21 | Earliest aging-only guardrail resume (OR-leg WR≥37) |
-| Oct 20 | SHORT floor-35 trigger data ages out of 7d window (resets) |
+| Oct 20 | SHORT floor-35 trigger resets |
+| ~Oct 21 | Vacation-guardrail auto-resume window |
 | Oct 27 | CHASE_RATIO_SHADOW review |
-| Oct 30 | bb-bounce shadow 14d review |
-| Nov 1 | MFE-CUT shadow 14d review (+ tier-2 MFE_MAX=0.40 evaluation) |
+| Oct 30 | bb-bounce shadow 14d review (note: flip path already fails OOS — review is data-only) |
 | Nov 6 | Gate re-audit window opens |
 
-## NEXT ACTIONS (next run)
+## NEXT ACTIONS (on resume)
 
-- On resume: verify rsi_at_pick written; grep MFE-CUT shadow, [REGIME-CONF] 0.85x, AI-TRADER drift lines
-- Re-check #16258 — let SL resolve; do not manually interfere
-- SHORT floor-35: recompute gross on fresh 7d window at resume
-- If self_learner candle backtest finally lands: reconcile with trades-level grid
+- Verify rsi_at_pick written by first ai-trader pick
+- Grep `[SHADOW]` MFE-CUT + TRAIL-ARM lines — confirm collectors firing
+- Extend dead-gap soak clock
+- Monitor SHORT floor-35 trigger
+- Do NOT flip MFE-CUT live; do NOT flip bb-bounce T=55 at T=55 — both candle-OOS failed
