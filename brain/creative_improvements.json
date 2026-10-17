@@ -5144,5 +5144,14 @@
     "category": "ceiling review",
     "status": "frozen until Oct 24 per CEO directive. Documented for re-evaluation.",
     "risk": "medium (sample confounded by pump-chain+ which fires at high RSI)"
+  },
+  {
+    "date": "2026-10-17T20:45:00Z",
+    "idea": "Wrong-side flip SHADOW collector: on hard_max_loss/atr_sl_hit close of a LONG, log counterfactual SHORT paper-entry at close_price and track 60m forward return. Measures 'the winning side was SHORT' thesis with zero live impact.",
+    "rationale": "48h losers: APT knife (meta_rsi 33.7, price dumped further), DOT midband chop (would have profited fading), ZEN/CRV/YGG/WCT doji knives (all dumped after entry). 7d: SL family 116T 2.6% -$9.32 — if half those were wrong-side, counterfactual SHORT would have captured it. Shadow data tells us whether entry-direction filters (not just quality filters) are the lever.",
+    "expected_impact": "Data for directional-entry decision. If counterfactual SHORTs net positive >$2/14d, consider LONG RSI<40 hard-block (currently only knife-gap blocks exist).",
+    "category": "direction filter",
+    "status": "suggested",
+    "risk": "zero (shadow only)"
   }
 ]

@@ -1,299 +1,88 @@
 {
-  "timestamp": "2026-10-17T19:42:51.264049+00:00",
+  "timestamp": "2026-10-17T20:40:13.438796+00:00",
   "session_brain_stats": {
-    "queries_run": 3,
-    "top_insights": [
-      "Trail family 7d: 69T 89.9%WR +$7.45 vs SL family 114T 0.9%WR -$9.60 — house edge unchanged",
-      "doji-bottom knife zone: rsi<30 = 8T 37.5% -$0.59; rsi 50-60 = 9T 66.7% +$0.35",
-      "volume-buildout- SHORT: 8T 87.5%WR +$0.38 trail 87.5% — only >80% trail signal"
-    ]
+    "queries_run": 1,
+    "note": "Session brain loaded. Morning-stack validation topic dominant — bug_hunter found M1 drift/min-age ordering issue in v6 pump-chain spec (unrelated to live constants)."
   },
   "trade_summary_24h": {
     "closed": 8,
-    "net_pnl": -0.61,
-    "win_rate": 25.0,
-    "winners": 2,
-    "losers": 6,
-    "post_resume_trades": 0,
-    "open_trades": 0,
-    "note": "0 trades since 16:57 resume — chop regime + 0.3x size = correct flat behavior"
+    "wins": 3,
+    "wr": 37.5,
+    "pnl": -0.61,
+    "note": "ALL pre-resume (opened before 16:57 UTC). 0 post-resume trades in 3.5h — correct flat behavior in EMA300 chop + dead volume (BTC vol ratio 0.05)."
   },
-  "regime": {
-    "btc_15m": "LONG_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "regime": "CHOP (timeframe conflict)",
-    "volatility": "LOW",
-    "btc_price": 81451,
-    "btc_vs_ema300": "AT (81468)",
-    "interpretation": "BTC grinding along EMA300 with no directional commitment. Flat book is correct."
+  "post_resume_validation": {
+    "resume_time": "2026-10-17 16:57 UTC",
+    "trades_since": 0,
+    "duration_hours": 3.5,
+    "morning_changes_unvalidated": 8,
+    "conclusion": "Validation cohort NOT started. Soak discipline MUST hold — cannot evaluate morning stack effectiveness yet."
   },
   "drift_findings": [
     {
       "finding": "Watchdog steer-004 (doji-bottom-long 5-loss streak) is STALE",
-      "detail": "Signal killed Oct 16 20:30. Losses are from Oct 14-16 re-enable cohort. 0 trades since kill. Steer references dead signal.",
-      "severity": "low",
-      "action": "No action — signal correctly dead. Watchdog will auto-clear when losses age out of 20-trade window."
+      "detail": "DOJI_BOTTOM_ENABLED=False since Oct 16 (re-killed). Last doji trade Oct 16 18:44. Watchdog reports historical losses as active signal. No action needed — signal already dead.",
+      "severity": "info"
     },
     {
-      "finding": "Watchdog deep_analysis claims 'Fired: SEI LONG' but no SEI trade exists",
-      "detail": "Watchdog text says 'Fired: SEI LONG conf=68 @ 0.06284' but ai_trader_state.json still shows Oct 10 NEAR pick. 0 SEI trades in DB. Watchdog 'fired' language is aspirational analysis, not actual execution.",
-      "severity": "low",
-      "action": "Noted — watchdog analysis text vs actual ai_trader execution disconnect. Not a trading bug."
+      "finding": "Watchdog steer-003 (ai-trader-manual losing streak) is noise",
+      "detail": "ai-trader-manual 11T 5W 45.5% +$0.39 lifetime. 3 recent BTC manual losses are small-sample (n=3) and net-positive signal overall. Drift guard now live for ai-trader+. No action.",
+      "severity": "info"
     }
   ],
-  "last_run_changes_verify": {
-    "doji_rekill": "HOLDING — 0 trades since Oct 16 20:30 kill",
-    "pump_chain_dead_gap_long": "LIVE — 0 post-resume trades to validate yet",
-    "pump_chain_dead_gap_short": "LIVE — same; soak clock restarted at resume",
-    "ai_trader_drift_guard": "LIVE — rsi_at_pick write path confirmed; first resume pick pending",
-    "short_midband_block": "HOLDING — 0 violations; pump-chain exempt (correct)",
-    "sweet_spot_min_55": "LIVE — first cohort pending",
-    "extreme_conf_085": "LIVE — 0 EXTREME trades post-change; pre-change 26T 26.9% -$0.94 confirms need",
-    "mfe_cut_shadow": "COLLECTING — 0 fires (0 trades since deploy)",
-    "bb_bounce_tat_shadow": "COLLECTING — 0 fires (0 trades since deploy)",
-    "vacation_size_reduce": "ACTIVE — 0.3x multiplier confirmed in file + decider read path"
-  },
-  "losing_trade_autopsy_24h": [
+  "recurring_problems": [
     {
-      "trade": "INJ LONG ai-trader+ -$0.20 (-4.44%)",
-      "root_cause": "Entered meta_rsi 64.0 in EXTREME vol — upper-band chase. Price already moved before entry.",
-      "winning_side": "Stayed flat or shorted the fade. EXTREME vol + RSI>60 LONG = late entry, trail arms too late.",
-      "filter_status": "PUMP_CHAIN RSI_MAX=70 doesn't cover ai-trader+. Drift guard only checks RSI delta, not absolute level.",
-      "confidence": "MEDIUM — n=1, but matches standing pattern (INJ/BLUR upper-band bleed)"
+      "problem": "EXTREME regime is #1 bleed source",
+      "data": "7d EXTREME 112T 26.8% -$1.57 (54% of all trades). NORMAL 55T 47.3% +$0.11.",
+      "mitigation_live": "REGIME_CONF_EXTREME_MULT 1.15→0.85 (landed 05:40, 0 EXTREME trades since — unvalidated)",
+      "status": "mitigation in soak"
     },
     {
-      "trade": "APT LONG ai-trader+ -$0.09 (-4.24%)",
-      "root_cause": "Staleness — pick RSI 57.1, fill RSI 33.7 (delta 23.4). Guard now blocks this (AI_TRADER_RSI_DRIFT_MAX=15).",
-      "winning_side": "Not entering on a collapsed pick. The drift guard now prevents this class.",
-      "filter_status": "FIXED — drift guard deployed 03:46 today. This was the last known instance.",
-      "confidence": "HIGH"
-    },
-    {
-      "trade": "DOT LONG pump-chain+ -$0.19 (-4.32%)",
-      "root_cause": "meta_rsi 52.63 (mid-band) in EXTREME vol. Entered during chop, never armed trail.",
-      "winning_side": "Flat or SHORT. EXTREME vol mid-band LONG = chop entry.",
-      "filter_status": "EXTREME conf 0.85 deployed; dead-gap block deployed; EXTREME regime still worst (7d 113T 26.5% -$1.71)",
-      "confidence": "MEDIUM"
-    },
-    {
-      "trade": "BLUR LONG pump-chain+ -$0.20 (-2.70%)",
-      "root_cause": "meta_rsi 62.5 in EXTREME vol. trail_arm_timeout exit = reached +0.40% then stalled. Close call.",
-      "winning_side": "Rode the trail further. Timeout exited before the next leg.",
-      "filter_status": "Not an entry problem — exit timing. Trail-arm-timeout T=45m already live for pump-chain+.",
-      "confidence": "LOW — timeout saved vs deeper loss; trade almost worked"
+      "problem": "Trail family vs SL family wealth gap UNCHANGED",
+      "data": "7d TRAIL 62T 90.3% +$6.81 vs SL 116T 2.6% -$9.32. Chop entries never arm trail.",
+      "mitigation_live": "Dead-gap blocks + MFE-CUT shadow + drift guard (all morning, unvalidated)",
+      "status": "mitigations in soak, MFE-CUT collecting 0 fires"
     }
   ],
-  "chop_vs_trend_7d": {
-    "trail_family": {
-      "trades": 69,
-      "win_rate": 89.9,
-      "pnl": 7.45
-    },
-    "sl_family": {
-      "trades": 114,
-      "win_rate": 0.9,
-      "pnl": -9.6
-    },
-    "other": {
-      "trades": 23,
-      "win_rate": 34.8,
-      "pnl": -0.45
-    },
-    "diagnosis": "Exit engine fine, entry leak. Signals fire on local structure without multi-hour trend confirmation. Trail arms only when momentum exists; chop entries die at ATR stop first."
-  },
-  "signal_trail_arm_ranking_7d": [
+  "missing_implementations": [
     {
-      "signal": "volume-buildout-",
-      "direction": "SHORT",
-      "n": 8,
-      "trail_pct": 87.5,
-      "pnl": 0.38,
-      "verdict": "BEST — genuine trend signal, monitor for expansion"
-    },
-    {
-      "signal": "bb-squeeze+",
-      "direction": "LONG",
-      "n": 4,
-      "trail_pct": 75.0,
-      "pnl": -0.06,
-      "verdict": "small n, trail high, wash"
-    },
-    {
-      "signal": "r2v2-long3",
-      "direction": "LONG",
-      "n": 6,
-      "trail_pct": 66.7,
-      "pnl": 0.64,
-      "verdict": "good trail, positive — keep"
-    },
-    {
-      "signal": "bb-bounce-v2-long+",
-      "direction": "LONG",
-      "n": 17,
-      "trail_pct": 47.1,
-      "pnl": -0.36,
-      "verdict": "mid — TAT shadow collecting"
-    },
-    {
-      "signal": "doji-bottom-long",
-      "direction": "LONG",
-      "n": 20,
-      "trail_pct": 45.0,
-      "pnl": -0.62,
-      "verdict": "DEAD — knife zone rsi<30 bleeds"
-    },
-    {
-      "signal": "pump-chain+",
-      "direction": "LONG",
-      "n": 31,
-      "trail_pct": 29.0,
-      "pnl": 0.4,
-      "verdict": "low trail but positive — dead-gap block should improve"
-    },
-    {
-      "signal": "ai-trader+",
-      "direction": "LONG",
-      "n": 18,
-      "trail_pct": 27.8,
-      "pnl": -0.78,
-      "verdict": "low trail, negative — drift guard + EXTREME conf should help"
-    },
-    {
-      "signal": "pump-chain-",
-      "direction": "SHORT",
-      "n": 32,
-      "trail_pct": 25.0,
-      "pnl": -0.55,
-      "verdict": "lowest trail, chop signal — dead-gap soak ongoing"
-    },
-    {
-      "signal": "oversold-bounce+",
-      "direction": "LONG",
-      "n": 5,
-      "trail_pct": 20.0,
-      "pnl": -0.4,
-      "verdict": "DEAD — knife catch, killed Oct 13"
-    },
-    {
-      "signal": "volume-buildout+",
-      "direction": "LONG",
-      "n": 5,
-      "trail_pct": 20.0,
-      "pnl": -0.21,
-      "verdict": "DEAD — killed Oct 14"
+      "item": "Wrong-side flip SHADOW collector",
+      "detail": "Suggested Oct 14, re-suggested today with 48h trade evidence. Not shipped — needs position_manager close-hook or external poller. Priority: MEDIUM. Zero live impact if shipped as shadow.",
+      "status": "suggested"
     }
-  ],
-  "rsi_band_analysis_7d": {
-    "long_bands": {
-      "rsi<30": {
-        "n": 9,
-        "wr": 22.2,
-        "pnl": -0.67,
-        "trail": 22.2
-      },
-      "30-40": {
-        "n": 7,
-        "wr": 28.6,
-        "pnl": -0.09,
-        "trail": 42.9
-      },
-      "40-50": {
-        "n": 22,
-        "wr": 31.8,
-        "pnl": -0.77,
-        "trail": 31.8
-      },
-      "50-60": {
-        "n": 37,
-        "wr": 40.5,
-        "pnl": -0.3,
-        "trail": 40.5
-      },
-      "60-70": {
-        "n": 41,
-        "wr": 36.6,
-        "pnl": -0.17,
-        "trail": 36.6
-      },
-      "70+": {
-        "n": 31,
-        "wr": 35.5,
-        "pnl": 0.59,
-        "trail": 32.3
-      }
-    },
-    "short_bands": {
-      "30-40": {
-        "n": 8,
-        "wr": 62.5,
-        "pnl": -0.03,
-        "trail": 50.0
-      },
-      "40-50": {
-        "n": 27,
-        "wr": 22.2,
-        "pnl": -0.54,
-        "trail": 25.9
-      },
-      "50-60": {
-        "n": 13,
-        "wr": 15.4,
-        "pnl": -0.53,
-        "trail": 15.4
-      },
-      "60-70": {
-        "n": 4,
-        "wr": 50.0,
-        "pnl": -0.08,
-        "trail": 50.0
-      },
-      "70+": {
-        "n": 7,
-        "wr": 57.1,
-        "pnl": -0.01,
-        "trail": 28.6
-      }
-    },
-    "insight": "LONG 70+ band is POSITIVE (+$0.59/31T) — contradicts 'high RSI chase bad' narrative for LONGs. SHORT mid-band 40-60 is worst (40T 18.8% -$1.07 combined). rsi<30 LONG = knife zone (22.2% -$0.67)."
-  },
-  "config_changes_applied": [],
-  "changes_from_last_run": "All 8 morning changes verified holding. 0 post-resume trades = validation cohort not started. EXTREME conf 0.85 confirmed in constants. Dead-gap blocks confirmed in constants. Drift guard confirmed. Vacation size-reduce active at 0.3x.",
-  "next_actions": [
-    "HOLD — 5+ unvalidated changes in flight, 0 post-resume trades to validate against. Do not stack entry filters.",
-    "First ~20 post-resume trades = validation cohort for morning stack. Evaluate at n=20.",
-    "pump-chain- dead-gap: evaluate at 20 post-resume trades. CEO kill decision if still negative.",
-    "Volume-buildout- SHORT: monitor — only >80% trail signal. If n reaches 20+ and holds, consider confidence boost.",
-    "doji-bottom RSI floor (MIN=35): documented for future re-enable. rsi<30 = 8T 37.5% -$0.59 knife zone. n<20 = insufficient to ship now.",
-    "Momentum gate (|m5|<0.15% block): self_learner backtest undelivered 5x. Exit-ladder closed pump-chain- exit alternatives. Entry-side momentum gate remains the highest-value unshipped idea."
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-17T19:42:51.264078+00:00",
-      "idea": "doji-bottom-long re-enable with meta-RSI execution floor (MIN=35) + EXTREME block",
-      "rationale": "All-time rsi<30 = 8T 37.5% -$0.59 (knife). rsi 40-60 = 21T 62% +$0.37 (reclaim winners). Oct 14-16 re-enable cohort: winners at RSI 40-56, losers at RSI 27-49. Pre-Oct13 25T 56% +$0.55 was profitable. The bleed is deep-oversold entries only.",
-      "expected_impact": "Block ~$0.59/30d of knife losses while preserving reclaim winners. Re-enable with HIGH-block variant (EXTREME 0% WR confirmed).",
-      "category": "entry sniper",
-      "status": "documented — n<20 knife band, awaiting more data + CEO approval for re-enable",
-      "risk": "low (signal currently dead; change is preparation only)"
-    },
-    {
-      "date": "2026-10-17T19:42:51.264081+00:00",
-      "idea": "volume-buildout- SHORT confidence boost (monitor)",
-      "rationale": "8T 87.5%WR +$0.38, trail-arm 87.5%, avg RSI 54.5. Only signal with >80% trail rate. Genuine trend signal — fires when volume builds into a directional move. Mirror asymmetry: volume-buildout+ LONG is dead (20% trail), volume-buildout- SHORT is excellent.",
-      "expected_impact": "+$0.10-0.20/week if edge holds at higher confidence",
-      "category": "confidence tuning",
-      "status": "monitor — n=8 < 20 threshold. Revisit at n=20.",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-17T19:42:51.264082+00:00",
-      "idea": "LONG RSI 70+ band is profitable — challenge the ceiling assumption",
-      "rationale": "7d LONG rsi 70+: 31T 35.5%WR +$0.59 — only positive LONG band. LONG_RSI_CEILING=75 blocks 75+. The 70-75 band was previously validated positive (30d +$0.24). CEO froze churn to Oct 24. The high-RSI LONG narrative may be wrong for trending entries.",
-      "expected_impact": "If ceiling raised to 80: ~$0.20-0.40/30d from 75-80 band (was +$0.51 all-time before Oct 9 change)",
-      "category": "ceiling review",
-      "status": "frozen until Oct 24 per CEO directive. Documented for re-evaluation.",
-      "risk": "medium (sample confounded by pump-chain+ which fires at high RSI)"
+      "idea": "Wrong-side flip SHADOW collector (see creative_improvements.json)",
+      "rationale": "48h losers cluster in knife (<40) and chase (>62) RSI bands. Counterfactual SHORT paper-entry on LONG hard_max_loss would measure whether directional filters beat quality filters.",
+      "status": "suggested — needs backtest/poller"
     }
   ],
-  "protected_flags_verified": "13/13 INTACT (CONFLUENCE, LIVE_TRADING, PM_TRAIL, CUT_LOSER, ATR_TP_MIN, RR_SHADOW + CEO_PROTECTED set)"
+  "config_changes_applied": [],
+  "changes_from_last_run": {
+    "last_run": "2026-10-17 19:40 UTC",
+    "changes_made": 0,
+    "decision": "HOLD — soak discipline",
+    "verification": "All 8 morning changes verified holding in constants. EXTREME conf 0.85 confirmed. Dead-gap blocks confirmed. Drift guard confirmed. Vacation size-reduce active at 0.3x. doji re-kill confirmed. MFE-CUT shadow confirmed enabled, 0 fires.",
+    "note": "Last run correctly chose 0 changes. This run confirms same decision — 0 post-resume trades means morning stack still has zero validation data. Stacking more changes compounds unvalidated risk."
+  },
+  "rejected_changes": [
+    {
+      "change": "LONG meta-RSI 45-55 band block",
+      "data": "7d 27T 22.2% -$1.36 BUT 14d 47T 38.3% -$0.25, 30d 98T 46.9% -$0.84 — pattern REVERSES OOS. Would kill 6/6 7d winners (XPL, BIGTIME, HYPE, ENS, ARB, NXPC all profit-monster-trail).",
+      "verdict": "REJECT — selection-on-outcome, fails OOS check, >20% winner kill"
+    },
+    {
+      "change": "Any new entry filter",
+      "data": "5+ unvalidated morning changes, 0 post-resume trades",
+      "verdict": "REJECT — soak discipline. Wait for validation cohort."
+    }
+  ],
+  "next_actions": [
+    "Monitor first 20 post-resume trades as morning-stack validation cohort (expected ~24-48h at current volume)",
+    "MFE-CUT shadow: 0 fires so far — needs trade volume to collect data. Check at next run.",
+    "WLD LONG pick pending execution (ai-trader signal written 20:08). Pipeline will execute next cycle if volume allows.",
+    "doji steer in watchdog will self-clear next watchdog cycle (signal already dead)",
+    "If 7d WR still <35% after 20 post-resume trades, escalate morning-stack review to CEO"
+  ]
 }
