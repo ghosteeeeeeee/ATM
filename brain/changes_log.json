@@ -1474,5 +1474,16 @@
     "after": "PUMP_CHAIN_LONG_DEAD_GAP_BLOCK_ENABLED=True, MAX=-0.3. Blocks gap<-0.3 falling-knife LONGs. Mirror of SHORT dead-gap shipped Oct 16.",
     "rationale": "30d gap<-0.3: 25T 32%WR -$0.70 (17L -$2.27/8W +$1.57); 14d OOS 11T 27.3%WR -$0.43. Kept gap>=0.8 44T +$3.12 best band. Blocks 8/46 total winners (17.4% < 20% threshold), net +$0.70/30d. Yesterday DOT LONG gap -0.05 (band kept, 30d +$0.35) correctly NOT blocked.",
     "impact": "Expected +$0.70/30d net from stopping falling-knife pump-chain+ LONG entries; chase-up block (MAX_ENTRY_GAP=1.5) already covers the other side."
+  },
+  {
+    "timestamp": "2026-10-17T03:46:39.810867+00:00",
+    "agent": "brain_auditor",
+    "change": "ai-trader fire-time RSI drift guard: AI_TRADER_RSI_DRIFT_MAX=15; reject if |fire_rsi - pick_rsi| > 15; watchdog prompt writes rsi_at_pick",
+    "type": "config",
+    "file": "hermes_constants.py + scripts/signals/ai_trader_signal.py + automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "No fire-time RSI check — state RSI only used at pick; 45min TTL allowed APT 57.1→33.7 collapse",
+    "after": "AI_TRADER_RSI_DRIFT_MAX=15; compute_rsi_1m at fire; reject+mark_rejected on drift; pick/fire RSI in signal_metadata; fail-open if rsi_at_pick missing",
+    "rationale": "Watchdog steer x3 + APT hard_max_loss -$0.09. Absolute RSI ceilings rejected (kill winners GRASS/INJ). Drift-only is surgical.",
+    "impact": "Blocks collapsed picks; 0 winners blocked (fail-open old format); revert AI_TRADER_RSI_DRIFT_MAX=999"
   }
 ]

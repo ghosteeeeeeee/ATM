@@ -275,6 +275,7 @@ signal = {
     "confidence": 75,  # 60-90 range
     "price": 123.45,   # current price
     "conviction": 80,  # how sure are you
+    "rsi_at_pick": 52.3,  # REQUIRED — 1m RSI from precheck at pick time. Signal rejects if fire-time RSI drifts >15 pts (AI_TRADER_RSI_DRIFT_MAX). APT 2026-10-17: pick 57.1→fill 33.7 = hard_max_loss.
     "reasoning": "Why this coin right now — regime alignment, momentum, RSI, ATR room, etc."
 }
 

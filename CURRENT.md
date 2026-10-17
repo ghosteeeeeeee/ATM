@@ -1,64 +1,65 @@
-# Current State — brain_auditor Captain Run Oct 16 23:30 UTC
+# Current State — brain_auditor Captain Run Oct 17 03:40 UTC
 
-**Last Updated: 2026-10-16 23:30 UTC**
-**Updated by: brain_auditor — verification run, 0 new config changes (entry filters exhausted)**
+**Last Updated: 2026-10-17 03:40 UTC**
+**Updated by: brain_auditor — 1 config change (ai-trader RSI drift guard)**
 
-## PIPELINE STATUS (23:30 UTC)
+## PIPELINE STATUS (03:40 UTC)
 
-- **24h: 49T 38.8% WR −$1.89** | 2 open (BTC manual LONG breakeven SL, INJ ai-trader+ LONG new) | 7d 228T 36.0% −$2.62 | 30d 784T 43.8% −$4.43 | 48h guardrail ESCALATE active
-- Health: **CRITICAL** | Kill switch LIVE=true | Regime BTC 15m LONG_BIAS / 4h SHORT_BIAS (conflict), vol LOW
-- Exit signature unchanged: **7d SL family 115T ~1%WR −$9.95 vs trail family 75T 89%WR +$7.34** — bleed remains EXIT-MAGNITUDE
+- **24h: 49T −$2.23** | 1 open (BTC manual) | **7d 222T 34.2% −$3.41** | Health CRITICAL
+- **Pipeline STOPPED** (vacation-guardrail 02:38 UTC) — flat is the trade
+- Regime: BTC 15m LONG_BIAS / 4h SHORT_BIAS unresolved, vol LOW, STRONG_DOWN
+- Exit signature: **7d SL family 134T 2.2%WR −$11.10 vs trail 72T 87.5%WR +$7.09** — bleed EXIT-MAGNITUDE / chop entries
 
-## DONE THIS RUN (Oct 16 23:30)
+## DONE THIS RUN (Oct 17 03:40)
 
-- **0 new config changes** — entry filters exhausted; problem is exit-side. All last-run changes verified HOLDING.
-- **Sweet-spot 55-60 CONFIRMED at 30d:** 70T 60%WR +$3.74 — only profitable LONG band. 40→55 change correct.
-- **30d SHORT meta-RSI:** bleeds ALL bands except 45-50 (+$0.17). Midband block catches death band 50-55 (−$1.21). Entry-side SHORT filters exhausted.
-- **Watchdog steers verified:** losing-streak (exit-magnitude) ✓ | wrong-side (4th cycle) ✓ | doji steer STALE (killed) ✓
+- **SHIPPED: AI_TRADER_RSI_DRIFT_MAX=15** — fire-time RSI drift guard in `ai_trader_signal.py`. APT pick 57.1→fill 33.7 (Δ23.4) hard_max_loss. Absolute RSI ceilings evaluated and REJECTED (RSI≥60 14d blocks winners GRASS +0.07 / INJ +0.13). Fail-open if `rsi_at_pick` missing. Watchdog prompt now writes `rsi_at_pick`. Revert: set 999.
+- **MFE autopsy (exit-ladder input):** SL med MFE 0.171%, only 23.9% reach trail-arm 0.40; **trail winners 0×MFE<0.20** — cut-if-MFE<0.20 @45m counterfactual saves ~$1.29/7d with zero false kills.
+- **Watchdog steers triaged:** doji steer STALE (kill live, 0 opens after 20:30); pump-chain- DOT/FIL predate block ship times — filters holding; ai-trader staleness → FIXED above.
 
 ## LAST-RUN CHANGES — ALL HOLDING ✓
 
 | Change | Status | Evidence |
 |--------|--------|----------|
-| doji RE-KILL 20:30 | HOLDING | 0 trades after 20:30 |
-| pump-chain- EXTREME block 14:44 | HOLDING | 0 SHORT opens after 14:44 |
-| pump-chain- dead-gap 13:30 | HOLDING | 0 SHORT opens after 13:30 |
-| SHORT midband 00:43 | HOLDING | 0 non-pump-chain SHORT 45-55 after 00:43 |
-| sweet-spot MIN 40→55 | CONFIRMED | 30d 55-60 = 70T 60% +$3.74 |
-| bb-bounce shadow T=55m | COLLECTING | 0 fires yet; wiring verified PM:3558 |
+| doji RE-KILL 20:30 | HOLDING | 0 opens after 20:30 |
+| pump-chain- EXTREME block 14:44 | HOLDING | DOT/FIL predate; 0 after |
+| pump-chain- dead-gap 13:30 | HOLDING | FIL opened 13:11 pre-ship |
+| SHORT midband 45-55 | HOLDING | 0 non-PC 45-55 after 00:43 |
+| sweet-spot MIN 40→55 | CONFIRMED | 30d 55-60 70T 60% +$3.74 |
+| bb-bounce shadow T=55m | COLLECTING | pipeline stopped limits data |
+| pump-chain+ LONG dead-gap 01:39 | HOLDING | 0 trades (stopped 02:38) |
+| **ai-trader RSI drift guard (NEW)** | SHIPPED | fires on next resume |
 
 ## ⚠️ OPEN (CEO-owned)
 
-1. 🔴 **Progressive exit ladder backtest — STILL NOT COMMISSIONED.** Overdue since Oct 14. Scope: doji+bb-bounce family, T=45m, HR-kill guard mandatory. **Commission self_learner. P0.**
-2. 🔴 **7d WR/PnL** — 36.0% / −$2.62, vacation guardrail ESCALATE. Entry filters exhausted; exit-ladder is the untried lever.
-3. 🟡 **BTC manual #16251** — breakeven SL 81510. Risk-free. INJ #16255 ai-trader+ new (entry 8.706, SL 8.655).
-4. 🟡 **pump-chain+ 24h 3T 0W −$0.47** — variance (7d still +$0.40). 14d #1 money maker, leave alone.
-5. 🟡 **SHORT side bleeds ALL RSI bands 30d** — entry filters exhausted. Exit-ladder is the lever.
+1. 🔴 **Progressive exit ladder backtest — STILL NOT COMMISSIONED.** Overdue since Oct 14. MFE data ready in `brain/audit_recommendations.json`. **Commission self_learner. P0.**
+2. 🔴 **7d WR/PnL** — 34.2% / −$3.41, vacation guardrail holds pipeline. Exit-ladder is the untried lever.
+3. 🟡 **Watchdog kill-awareness** — keeps steering doji after kill. Prompt fix candidate.
+4. 🟡 **dead-gap 24h soak** — pipeline stopped, clock may need extension past Oct 17.
 
 ## WATCHLIST (soak — do NOT stack new entry filters)
 
-- pump-chain- EXTREME 0.0 block — HOLDING since 14:44
-- pump-chain- dead-gap [−0.5,0.2) — 24h checkpoint Oct 17
-- SHORT midband 45-55 non-pump-chain — HOLDING
+- ai-trader drift guard — verify `[AI-TRADER].*drift` in signals.log on resume
+- pump-chain- EXTREME + dead-gap blocks — HOLDING
+- SHORT midband 45-55 — HOLDING
 - CHASE_RATIO_SHADOW — soak to Oct 27
-- LONG_RSI_SWEET_SPOT 55-60 — 30d confirmed, boost collecting
-- **bb-bounce trail-arm-timeout SHADOW T=55m — collecting, first [SHADOW] log pending**
-- volume-buildup− SHORT: healthy 87.5%WR +$0.38, lean into
+- LONG_RSI_SWEET_SPOT 55-60 — confirmed
+- bb-bounce + ai-trader trail-arm-timeout SHADOW T=55m — collecting
+- volume-buildup− SHORT: 87.5%WR +$0.38, protect
 - pump-chain+ : 14d #1 money maker, leave alone
 
 ## KEY DATES
 
 | Date | Item |
 |------|------|
-| Oct 17 | dead-gap 24h soak check |
-| Oct 27 | CHASE_RATIO_SHADOW review (14d, CEO D2) |
-| Oct 30 | bb-bounce shadow 14d review (Oct 16 + 14d) |
-| Nov 6 | Gate re-audit window opens (D2) |
+| Oct 17 | dead-gap soak check (may extend — pipeline stopped) |
+| Oct 27 | CHASE_RATIO_SHADOW review |
+| Oct 30 | bb-bounce shadow 14d review |
+| Nov 6 | Gate re-audit window opens |
 
 ## NEXT ACTIONS (next run)
 
-1. **Check bb-bounce shadow logs** — grep '[SHADOW] BB-BOUNCE' in PM log
-2. **Check sweet-spot fires** — grep LONG-RSI-SWEET-SPOT in pipeline.log
-3. Oct 17: dead-gap soak checkpoint
-4. **Commission progressive exit ladder backtest (self_learner)** — still #1 overdue, P0
-5. Monitor 7d PnL trajectory through aging
+1. **Commission progressive exit ladder backtest (self_learner)** — still #1 overdue, P0
+2. On pipeline resume: grep `[AI-TRADER].*drift` — confirm guard live
+3. Check bb-bounce shadow `[SHADOW]` logs
+4. Extend dead-gap soak clock if pipeline stays stopped
+5. Ask watchdog to stop doji steers while killed

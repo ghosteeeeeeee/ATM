@@ -4957,5 +4957,14 @@
     "category": "entry sniper",
     "status": "deferred — collect dead-gap block data first",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-17T03:46:55.457570+00:00",
+    "idea": "MFE-threshold progressive exit: cut SL-family trades held >=45m with MFE<0.20% before hard_max_loss magnitude",
+    "rationale": "7d MFE: SL family med 0.171%, only 23.9% reach trail-arm 0.40; trail winners MFE<0.20 count=0 (zero false kills). 49/134 never showed momentum. Counterfactual cut 19T -$1.29.",
+    "expected_impact": "+$1.00-1.50/7d net",
+    "category": "exit engineering",
+    "status": "suggested",
+    "risk": "low — backtest first via self_learner; shadow T=55m already on bb-bounce+ai-trader"
   }
 ]

@@ -3040,6 +3040,7 @@ AI_TRADER_MIN_CONFIDENCE = 60       # minimum confidence for AI trader to fire
 AI_TRADER_STATE_TTL_MINUTES = 45    # state file older than this = stale, don't fire
 AI_TRADER_COOLDOWN_HOURS = 2        # per coin+direction cooldown
 AI_TRADER_PRICE_MAX_AGE_MINUTES = 5 # reject if price data older than this
+AI_TRADER_RSI_DRIFT_MAX = 15        # brain_auditor 2026-10-17: reject if |fire_rsi - pick_rsi| > this. APT pick 57.1→fill 33.7 (Δ23.4) hard_max_loss; watchdog steer +4 loss pattern. Drift guard only — absolute RSI ceilings kill winners (RSI>=60 14d 4W 3L blocks GRASS+0.07/INJ+0.13). Revert: set 999.
 
 # range_finder.py — range-bound mean reversion (flat BB, multi-touch)
 RANGE_FINDER_ENABLED = False  # CEO 2026-08-16: DISABLED. 9T/7d 33.3% WR -$0.14. R:R 0.12:1 (avg win +0.05% vs avg loss -0.43%). Never captures gains. Drags down all combos (hzscore+,range_finder+ and bb_bounce+,range_finder+ both bleeding). Re-enable when R:R >1:1.

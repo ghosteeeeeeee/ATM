@@ -35,6 +35,7 @@ from hermes_constants import (
     AI_TRADER_STATE_TTL_MINUTES,
     AI_TRADER_COOLDOWN_HOURS,
     AI_TRADER_PRICE_MAX_AGE_MINUTES,
+    AI_TRADER_RSI_DRIFT_MAX,
     LONG_BLACKLIST,
     SHORT_BLACKLIST,
 )
@@ -172,6 +173,31 @@ def run():
             _mark_rejected(state, f'price {age:.0f} min old for {token}')
             return None
 
+    # RSI drift guard (brain_auditor 2026-10-17): pick RSI can collapse before fill.
+    # APT pick 57.1 → fill 33.7 (Δ23.4) → hard_max_loss. Require |fire_rsi - pick_rsi|
+    # <= AI_TRADER_RSI_DRIFT_MAX. Fail-open if either RSI unavailable (old state format).
+    fire_rsi = None
+    try:
+        from rsi_utils import compute_rsi_1m
+        fire_rsi = compute_rsi_1m(token)
+    except Exception:
+        fire_rsi = None
+    pick_rsi = state.get('rsi_at_pick')
+    try:
+        pick_rsi = float(pick_rsi) if pick_rsi is not None else None
+    except (TypeError, ValueError):
+        pick_rsi = None
+    if fire_rsi is not None and pick_rsi is not None:
+        drift = abs(fire_rsi - pick_rsi)
+        if drift > AI_TRADER_RSI_DRIFT_MAX:
+            _log(
+                f"  [AI-TRADER] {token} {direction} rejected: RSI drift "
+                f"pick={pick_rsi:.1f} fire={fire_rsi:.1f} Δ={drift:.1f} "
+                f"> {AI_TRADER_RSI_DRIFT_MAX}"
+            )
+            _mark_rejected(state, f'RSI drift {pick_rsi:.1f}→{fire_rsi:.1f} Δ={drift:.1f}')
+            return None
+
     # Determine source
     source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
 
@@ -190,6 +216,8 @@ def run():
             'ai_reasoning': reasoning,
             'ai_conviction': state.get('conviction') or 0,
             'ai_pick_timestamp': state.get('timestamp'),
+            'ai_pick_rsi': pick_rsi,
+            'ai_fire_rsi': fire_rsi,
         },
     )
 
