@@ -37,6 +37,11 @@ ALERT_PATH = os.path.join(HERMES_DATA, '..', 'automation', 'ceo', 'vacation_aler
 # the pipeline timer. Without it the watchdog re-armed the timer ~6min after pause
 # (heartbeat goes stale >300s → CRITICAL → restart) and LIVE trading resumed.
 PAUSE_MARKER = os.path.join(HERMES_DATA, 'vacation_pause.json')
+# T directive 2026-10-17: WR-based pause is counter-productive — pausing prevents
+# WR from improving (no new trades = no new wins to push WR up). Instead of pausing,
+# write a SIZE REDUCE flag that the pipeline reads to cut position sizes to minimum.
+# New trades still come in (WR can recover), losses are minimized.
+SIZE_REDUCE_MARKER = os.path.join(HERMES_DATA, 'vacation_size_reduce.json')
 
 
 def check_guardrails():
@@ -188,6 +193,13 @@ def resume_trading(reason):
         if os.path.exists(PAUSE_MARKER):
             os.remove(PAUSE_MARKER)
             log(f"▶️ [VACATION-GUARDRAIL] Removed pause marker: {reason}")
+        # Also clear size-reduce flag on resume
+        try:
+            if os.path.exists(SIZE_REDUCE_MARKER):
+                os.remove(SIZE_REDUCE_MARKER)
+                log(f"▶️ [VACATION-GUARDRAIL] Removed size-reduce marker")
+        except Exception:
+            pass
         # Restore kill JSON to true (cosmetic for is_live_trading_enabled, but
         # dashboards/watchdogs read it — keep state coherent).
         try:
@@ -230,6 +242,27 @@ def write_alert(level, message, data):
         pass
 
 
+def write_size_reduce(reason):
+    """Write size-reduce flag. Pipeline reads this to cut position sizes.
+
+    T directive 2026-10-17: instead of pausing (which prevents WR recovery),
+    reduce position sizes to minimum. New trades still come in, losses are
+    minimized, WR can improve.
+    """
+    try:
+        config = {
+            'size_reduce': True,
+            'reason': reason,
+            'written_at': datetime.now(timezone.utc).isoformat(),
+            'size_multiplier': 0.3,
+        }
+        with open(SIZE_REDUCE_MARKER, 'w') as f:
+            json.dump(config, f, indent=2)
+        log(f"📉 [VACATION-GUARDRAIL] SIZE REDUCED to 30% (not paused): {reason}")
+    except Exception as e:
+        log(f"❌ [VACATION-GUARDRAIL] Failed to write size-reduce: {e}", 'ERROR')
+
+
 def main():
     should_pause, should_escalate, should_resume, data = check_guardrails()
 
@@ -244,13 +277,23 @@ def main():
         write_alert('INFO', f'TRADING RESUMED: {reason}', data)
     elif should_pause:
         reasons = []
+        size_reduce = False
         if data['pnl_24h'] < PNL_24H_PAUSE:
             reasons.append(f"24h PnL ${data['pnl_24h']:.2f} < ${PNL_24H_PAUSE:.2f}")
         if data['wr_7d'] < WR_7D_PAUSE and data['pnl_7d'] < WR_7D_PNL_CONFIRM and data['n_7d'] >= WR_7D_MIN_TRADES:
-            reasons.append(f"7d WR {data['wr_7d']}% < {WR_7D_PAUSE}% AND pnl_7d ${data['pnl_7d']:.2f} < ${WR_7D_PNL_CONFIRM:.2f} ({data['n_7d']}T)")
+            # T directive 2026-10-17: WR-based triggers get SIZE REDUCE, not pause.
+            # Pausing prevents WR from improving (no new trades = no new wins).
+            size_reduce = True
+            reasons.append(f"7d WR {data['wr_7d']}% < {WR_7D_PAUSE}% AND pnl_7d ${data['pnl_7d']:+.2f} < ${WR_7D_PNL_CONFIRM:.2f} ({data['n_7d']}T) → SIZE REDUCE (not pause — WR can't recover without trades)")
         reason = "; ".join(reasons)
-        pause_trading(reason)
-        write_alert('CRITICAL', f'TRADING PAUSED: {reason}', data)
+        if size_reduce and data['pnl_24h'] >= PNL_24H_PAUSE:
+            # Only size-reduce (don't pause) when 24h PnL is OK
+            write_size_reduce(reason)
+            write_alert('WARNING', f'SIZE REDUCED (not paused): {reason}', data)
+        else:
+            # 24h PnL is also bad → hard pause
+            pause_trading(reason)
+            write_alert('CRITICAL', f'TRADING PAUSED: {reason}', data)
     elif should_escalate:
         reason = f"48h WR {data['wr_48h']}% < {WR_48H_ESCALATE}% with {data['n_48h']} trades"
         log(f"⚠️ [VACATION-GUARDRAIL] ESCALATE: {reason}")

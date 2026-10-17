@@ -246,11 +246,27 @@ def _get_dynamic_position_size() -> float:
 
     Uses 7% of withdrawable balance with HL minimum floor ($11).
     Falls back to DEFAULT_TRADE_SIZE_USDT on API error.
+    T directive 2026-10-17: reads vacation_size_reduce.json — when guardrail
+    detects low WR, cuts position sizes to 30% instead of pausing trading.
+    This lets WR recover (new trades still come in) while minimizing losses.
     """
     try:
         from hyperliquid_exchange import _get_trade_size_usdt
         dynamic = _get_trade_size_usdt()
         if dynamic >= HL_MIN_NOTIONAL_USDT:
+            # Check vacation size-reduce flag
+            try:
+                _sr_path = os.path.join(HERMES_DATA, 'vacation_size_reduce.json')
+                if os.path.exists(_sr_path):
+                    with open(_sr_path) as _sr_f:
+                        _sr = json.load(_sr_f)
+                    if _sr.get('size_reduce'):
+                        _sr_mult = _sr.get('size_multiplier', 0.3)
+                        dynamic = dynamic * _sr_mult
+                        if dynamic < HL_MIN_NOTIONAL_USDT:
+                            return HL_MIN_NOTIONAL_USDT  # Don't go below minimum
+            except Exception:
+                pass
             return round(dynamic, 2)
     except Exception as e:
         print(f"[decider_run] WARN: dynamic sizing failed ({e}), using default")
