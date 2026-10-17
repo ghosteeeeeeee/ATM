@@ -270,7 +270,7 @@ def _save_flags(flags: dict):
         json.dump(flags, f, indent=2)
 
 
-def is_live_trading_enabled() -> bool:
+def is_live_trading_enabled(is_manual: bool = False) -> bool:
     """
     Final kill-switch for live trading on Hyperliquid.
 
@@ -280,9 +280,16 @@ def is_live_trading_enabled() -> bool:
     (health_monitor, smoke_test, manual). hype_live_trading.json is NOT
     consulted (ghost-trades history); the pause marker is the runtime gate.
     Clear vacation_pause.json to resume live trading.
+
+    is_manual=True bypasses the vacation pause marker — direct CEO commands
+    (brain.py trade add --real) always go through. The guardrail still blocks
+    automated signal execution.
     """
     if not LIVE_TRADING_ENABLED:
         return False
+    # manual CEO trades bypass the vacation pause — only the constant gates them
+    if is_manual:
+        return True
     # vacation pause marker → force paper until human clears the marker
     _pause_marker = os.path.join(HERMES_DATA, 'vacation_pause.json')
     if os.path.exists(_pause_marker):

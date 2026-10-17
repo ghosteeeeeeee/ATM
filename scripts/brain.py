@@ -437,8 +437,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     except Exception as _a:
         pass  # Never let audit crash the trade path
 
-    print(f"[brain.py] DEBUG is_live_trading_enabled() = {is_live_trading_enabled()}")
-    if not is_live_trading_enabled():
+    # manual CEO trades bypass the vacation pause marker — only the constant gates them
+    print(f"[brain.py] DEBUG is_live_trading_enabled(is_manual=True) = {is_live_trading_enabled(is_manual=True)}")
+    if not is_live_trading_enabled(is_manual=True):
         print(f"[brain.py] ❌ REJECTED: {token} {direction} — live_trading is DISABLED")
         print(f"[brain.py] DEBUG token={token}, direction={direction}, entry_price={entry_price}, paper={paper}")
         return None
