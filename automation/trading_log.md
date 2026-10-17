@@ -11358,3 +11358,25 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - WLD LONG open ~43min — first post-resume signal trade; watch outcome
 - pump-chain+ standing CEO escalation (1T 0W, under 3T threshold)
 - 7d WR 34.5% still < 35% — size-reduce stays at 30% until window improves
+
+## [2026-10-17 22:14] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** −$0.15 last hour | 24h 7T 2W −$0.59 (28.6% WR) | 7d 203T 70W −$2.56 (34.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- WLD LONG ai-trader+ closed hard_sl −$0.15 (−0.70%): entry 0.50482, SL 0.50269, exit 0.50130 (0.28% slippage below SL, normal for size $22.10) — single small loss, not a pattern
+- atr_sl_hit 1/7 = 14.3% (under 40, tpsl fix deployed) — no SL-tightness issue
+- Kill check: pump-chain+ 1T 0W in 24h (one trade aged out of window), under 3T threshold; standing CEO escalation continues. ai-trader+ 24h 3T 0W −$0.44 flagged as new standing escalation (7d 19T 5W 26.3% −$0.93 worst-by-PnL but has wins, kill rule not met — 1T last hour not 3T)
+- 0%WR 7d signals already killed (oversold-bounce+ Oct 13, volume-breakout-long+ Oct 13, volume-breakout-short- Oct 15) — no action, trades are historical
+- No overtrading (1T/hr), no 3-neg-hour streak (16:00 +$0.05 win, 21:00 −$0.15)
+- Hotset empty (cycle 10289); NXPC SHORT candidate conf 82 at 21:14 gated by confluence gate (single-type), not a detection failure
+- Size-reduce 30% stays (7d WR 34.5% < 35%)
+- 0 open positions; no constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader+ 24h 0W/3T −$0.44 — watch next hour; if 0W continues, CEO decision on disable (7d 26.3% WR, small bleeding)
+- pump-chain+ standing CEO escalation (now 1T 0W in 24h)
+- 7d WR 34.5% still < 35% — size-reduce stays at 30%
