@@ -11114,3 +11114,24 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
 - pump-chain+ / pump-chain- standing CEO escalations (still 0W)
 - hard_max_loss 8 exits −$0.96 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-17 09:09] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 38T 14W −$2.02 (36.8% WR) | 7d 214T 74W −$2.87 (34.6% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Trading PAUSED by vacation guardrail since 04:08 UTC — 0T expected; live_trading=false
+- Resume check: 7d WR 34.6% < 37% AND 7d PnL −$2.87 < 0 → both fail, stay paused (correct)
+- 1 open position: BTC ai-trader-manual SHORT entry 81522 SL 81766.57 TP 80299.17 size $11.10 (opened 03:25, kept per pause protocol)
+- Kill check: 0T this hour; pump-chain+ 24h 2T 0W −$0.39, pump-chain- 4T 0W −$0.24 — standing CEO escalations, not new this hour
+- atr_sl_hit 11/38 = 28.9% (under 40 threshold; tpsl_utils fix deployed)
+- hard_max_loss 8 exits −$0.96 24h — standing CEO hold, momentum-gate already delivered FAIL Oct 16
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
+- pump-chain+ / pump-chain- standing CEO escalations (still 0W 24h)
+- guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit
