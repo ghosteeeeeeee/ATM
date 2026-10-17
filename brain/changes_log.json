@@ -1485,5 +1485,16 @@
     "after": "AI_TRADER_RSI_DRIFT_MAX=15; compute_rsi_1m at fire; reject+mark_rejected on drift; pick/fire RSI in signal_metadata; fail-open if rsi_at_pick missing",
     "rationale": "Watchdog steer x3 + APT hard_max_loss -$0.09. Absolute RSI ceilings rejected (kill winners GRASS/INJ). Drift-only is surgical.",
     "impact": "Blocks collapsed picks; 0 winners blocked (fail-open old format); revert AI_TRADER_RSI_DRIFT_MAX=999"
+  },
+  {
+    "timestamp": "2026-10-17T04:38:38Z",
+    "agent": "brain_auditor",
+    "change": "MFE-CUT SHADOW collector: cut-if-stall@45m (MFE_CUT_SHADOW_ENABLED=True, MIN=45, MFE_MAX=0.20) in position_manager — zero behavior, logs would-fires for SL-family never-armed trades",
+    "type": "creative",
+    "file": "hermes_constants.py + scripts/position_manager.py",
+    "before": "no MFE-cut shadow; exit-ladder lever uninstrumented",
+    "after": "MFE_CUT_SHADOW_ENABLED=True MIN=45 MFE_MAX=0.20; PM logs [SHADOW] MFE-CUT would-fire once/trade",
+    "rationale": "Entry-filter family exhausted (Oct 16 verdict); exit-magnitude is THE lever. 30d counterfactual: 54T never-armed MFE<0.20 hold>=45m avoid -$7.46, false-kill winners 3T +$0.08. Shadow collects live data for CEO GO on progressive exit ladder.",
+    "impact": "Zero live behavior. Data for exit-ladder flip decision. Revert: MFE_CUT_SHADOW_ENABLED=False."
   }
 ]

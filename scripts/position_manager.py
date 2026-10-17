@@ -120,6 +120,7 @@ from hermes_constants import (
     BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED, BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN,
     PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED, PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN,
     BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW, BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN,
+    MFE_CUT_SHADOW_ENABLED, MFE_CUT_SHADOW_MIN, MFE_CUT_SHADOW_MFE_MAX,
     PM_TRAIL_ACTIVATE_PCT,
 )
 
@@ -145,6 +146,7 @@ MAX_POSITIONS = MAX_OPEN_POSITIONS
 
 # Shadow collectors — once-per-trade log dedup (module-level, resets on PM restart)
 _bb_bounce_shadow_logged = set()
+_mfe_cut_shadow_logged = set()
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
 CUT_LOSER_PNL = CUT_LOSER_PNL_HERMES  # from hermes_constants.py (was hardcoded -2.0)
@@ -3615,6 +3617,27 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                             log(f"  [SHADOW] TRAIL-ARM would-fire {token} {direction} {live_pnl:+.2f}% [{_bbs_age_m:.0f}m < arm {_bbs_arm_pct:.2f}%] trade={trade_id} sig={_pos_signal}")
                 except Exception as e:
                     log(f"  [SHADOW] BB-BOUNCE TRAIL-ARM error for {token}: {e}")
+
+        # ── 7b-shadow2. MFE-CUT SHADOW — cut-if-stall@45m (zero behavior) ───────
+        # brain_auditor 2026-10-17. 30d SL-family never-armed MFE<0.20 hold>=45m:
+        # 54T avoid -$7.46; false-kill winners 3T +$0.08. Logs would-fires only;
+        # never closes. Flip live only with CEO GO + candle-level OOS backtest.
+        if MFE_CUT_SHADOW_ENABLED and trade_id not in _mfe_cut_shadow_logged:
+            try:
+                _mcs_ot = pos.get('open_time') or open_time
+                if _mcs_ot:
+                    if isinstance(_mcs_ot, str):
+                        _mcs_dt = datetime.fromisoformat(_mcs_ot.replace('Z', '+00:00'))
+                    else:
+                        _mcs_dt = _mcs_ot
+                    if _mcs_dt.tzinfo is None:
+                        _mcs_dt = _mcs_dt.replace(tzinfo=timezone.utc)
+                    _mcs_age_m = (datetime.now(timezone.utc) - _mcs_dt).total_seconds() / 60
+                    if _mcs_age_m >= MFE_CUT_SHADOW_MIN and live_pnl < MFE_CUT_SHADOW_MFE_MAX:
+                        _mfe_cut_shadow_logged.add(trade_id)
+                        log(f"  [SHADOW] MFE-CUT would-fire {token} {direction} {live_pnl:+.2f}% [{_mcs_age_m:.0f}m < mfe_max {MFE_CUT_SHADOW_MFE_MAX:.2f}%] trade={trade_id} sig={_pos_signal}")
+            except Exception as e:
+                log(f"  [SHADOW] MFE-CUT error for {token}: {e}")
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
         # Catches two patterns:

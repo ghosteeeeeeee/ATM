@@ -1675,6 +1675,14 @@ PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45  # pump-chain grinds shorter than bb-squee
 # Flip live only with CEO GO + 14d shadow data + OOS backtest (HR-kill guard mandatory per dead_money lesson).
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW = True  # Revert: set False.
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN = 55
+# MFE-CUT SHADOW — cut-if-stall progressive exit (brain_auditor 2026-10-17).
+# 30d counterfactual: SL-family never-armed, MFE<0.20%, hold>=45m = 54T avoid -$7.46;
+# false-kill winners 3T +$0.08. live_pnl < MFE_MAX at T is the never-armed proxy.
+# Zero behavior — logs would-fires only. Flip live only with CEO GO + candle-level
+# OOS backtest + 14d shadow (HR-kill guard mandatory per dead_money lesson).
+MFE_CUT_SHADOW_ENABLED = True  # Revert: set False.
+MFE_CUT_SHADOW_MIN = 45        # minutes hold before stall check
+MFE_CUT_SHADOW_MFE_MAX = 0.20  # live_pnl % below this at T => would-fire
 # Tiered trail: loosens as profit grows (2026-09-07 partial-close plan — Option 3)
 # Format: list of (min_profit_pct, trail_distance_pct) — first match wins, never tightens
 PM_TRAIL_TIERS = [

@@ -1,49 +1,48 @@
-# Current State — brain_auditor Captain Run Oct 17 03:40 UTC
+# Current State — brain_auditor Captain Run Oct 17 04:35 UTC
 
-**Last Updated: 2026-10-17 03:40 UTC**
-**Updated by: brain_auditor — 1 config change (ai-trader RSI drift guard)**
+**Last Updated: 2026-10-17 04:35 UTC**
+**Updated by: brain_auditor — 1 shadow (MFE-CUT T=45m)**
 
-## PIPELINE STATUS (03:40 UTC)
+## PIPELINE STATUS (04:35 UTC)
 
-- **24h: 49T −$2.23** | 1 open (BTC manual) | **7d 222T 34.2% −$3.41** | Health CRITICAL
-- **Pipeline STOPPED** (vacation-guardrail 02:38 UTC) — flat is the trade
-- Regime: BTC 15m LONG_BIAS / 4h SHORT_BIAS unresolved, vol LOW, STRONG_DOWN
-- Exit signature: **7d SL family 134T 2.2%WR −$11.10 vs trail 72T 87.5%WR +$7.09** — bleed EXIT-MAGNITUDE / chop entries
+- **24h: 47T −$2.27 (34% WR)** | 1 open (BTC SHORT #16258 manual) | **7d 221T 34.4% −$3.40** | Health CRITICAL
+- **Pipeline STOPPED** (vacation-guardrail) — flat is the trade, correctly held
+- Regime: BTC 15m LONG_BIAS / 4h SHORT_BIAS unresolved, vol LOW
+- Exit signature: **7d CHOP/SL 120T 0.8%WR −$10.27 vs TRAIL+atr_trail 84T ~81%WR +$6.78** — 100% SL-family never armed
 
-## DONE THIS RUN (Oct 17 03:40)
+## DONE THIS RUN (Oct 17 04:35)
 
-- **SHIPPED: AI_TRADER_RSI_DRIFT_MAX=15** — fire-time RSI drift guard in `ai_trader_signal.py`. APT pick 57.1→fill 33.7 (Δ23.4) hard_max_loss. Absolute RSI ceilings evaluated and REJECTED (RSI≥60 14d blocks winners GRASS +0.07 / INJ +0.13). Fail-open if `rsi_at_pick` missing. Watchdog prompt now writes `rsi_at_pick`. Revert: set 999.
-- **MFE autopsy (exit-ladder input):** SL med MFE 0.171%, only 23.9% reach trail-arm 0.40; **trail winners 0×MFE<0.20** — cut-if-MFE<0.20 @45m counterfactual saves ~$1.29/7d with zero false kills.
-- **Watchdog steers triaged:** doji steer STALE (kill live, 0 opens after 20:30); pump-chain- DOT/FIL predate block ship times — filters holding; ai-trader staleness → FIXED above.
+- **SHIPPED: MFE-CUT SHADOW** — `MFE_CUT_SHADOW_ENABLED=True, MIN=45m, MFE_MAX=0.20%` in `hermes_constants.py` + `position_manager.py`. Zero behavior; logs `[SHADOW] MFE-CUT would-fire` once/trade. 30d counterfactual: 54T never-armed MFE<0.20 hold≥45m avoid −$7.46, false-kill 3W +$0.08. Sibling to bb-bounce trail-arm shadow. Flip live only with CEO GO + candle OOS backtest.
+- **Verify last run:** ai-trader drift guard CODE IN PLACE but `ai_trader_state.json` lacks `rsi_at_pick` (pick predates prompt fix) — fail-opens until next pick. dead-gap/doji/midband all HOLDING.
+- **SIDeways:** #16258 SL/TP desync (DB 81766/80299 vs PM self-close 83138/79878) + PM "Found 0 open positions" — bookkeeping split, bug_hunter candidate.
 
-## LAST-RUN CHANGES — ALL HOLDING ✓
+## LAST-RUN CHANGES — STATUS
 
 | Change | Status | Evidence |
 |--------|--------|----------|
-| doji RE-KILL 20:30 | HOLDING | 0 opens after 20:30 |
-| pump-chain- EXTREME block 14:44 | HOLDING | DOT/FIL predate; 0 after |
-| pump-chain- dead-gap 13:30 | HOLDING | FIL opened 13:11 pre-ship |
-| SHORT midband 45-55 | HOLDING | 0 non-PC 45-55 after 00:43 |
-| sweet-spot MIN 40→55 | CONFIRMED | 30d 55-60 70T 60% +$3.74 |
-| bb-bounce shadow T=55m | COLLECTING | pipeline stopped limits data |
-| pump-chain+ LONG dead-gap 01:39 | HOLDING | 0 trades (stopped 02:38) |
-| **ai-trader RSI drift guard (NEW)** | SHIPPED | fires on next resume |
+| ai-trader RSI drift guard 03:46 | CODE OK / UNVERIFIED LIVE | state lacks rsi_at_pick; guard fail-opens; verify first resume pick |
+| pump-chain+ dead-gap 01:39 | HOLDING | 0 opens (pipeline stopped) |
+| bb-bounce + ai-trader shadow T=55m | COLLECTING | no qualifying holds since ship |
+| doji RE-KILL 20:30 | HOLDING | 0 opens |
+| SHORT midband 45-55 | HOLDING | 0 fires |
+| sweet-spot MIN 55 | CONFIRMED | no regression |
+| **MFE-CUT shadow T=45m (NEW)** | SHIPPED | collects on resume |
 
 ## ⚠️ OPEN (CEO-owned)
 
-1. 🔴 **Progressive exit ladder backtest — STILL NOT COMMISSIONED.** Overdue since Oct 14. MFE data ready in `brain/audit_recommendations.json`. **Commission self_learner. P0.**
-2. 🔴 **7d WR/PnL** — 34.2% / −$3.41, vacation guardrail holds pipeline. Exit-ladder is the untried lever.
-3. 🟡 **Watchdog kill-awareness** — keeps steering doji after kill. Prompt fix candidate.
-4. 🟡 **dead-gap 24h soak** — pipeline stopped, clock may need extension past Oct 17.
+1. 🔴 **Progressive exit ladder backtest — STILL NOT COMMISSIONED.** Overdue since Oct 14. Shadow now accruing live would-fires. **Commission self_learner. P0 (5th request).**
+2. 🔴 **7d WR/PnL** — 34.4% / −$3.40. Vacation guardrail holds pipeline — correct.
+3. 🟡 **ai-trader rsi_at_pick compliance** — prompt requires it; verify first pick writes field on resume.
+4. 🟡 **#16258 SL/TP desync** DB vs PM — bug_hunter candidate.
+5. 🟡 **dead-gap soak clock** — pipeline stopped, extend past Oct 17 on resume.
 
 ## WATCHLIST (soak — do NOT stack new entry filters)
 
-- ai-trader drift guard — verify `[AI-TRADER].*drift` in signals.log on resume
-- pump-chain- EXTREME + dead-gap blocks — HOLDING
-- SHORT midband 45-55 — HOLDING
+- MFE-CUT shadow — grep `[SHADOW] MFE-CUT` on resume
+- ai-trader drift guard — grep `[AI-TRADER].*drift` on resume
+- bb-bounce + ai-trader trail-arm shadow T=55m — collecting
+- pump-chain- EXTREME + dead-gap — HOLDING
 - CHASE_RATIO_SHADOW — soak to Oct 27
-- LONG_RSI_SWEET_SPOT 55-60 — confirmed
-- bb-bounce + ai-trader trail-arm-timeout SHADOW T=55m — collecting
 - volume-buildup− SHORT: 87.5%WR +$0.38, protect
 - pump-chain+ : 14d #1 money maker, leave alone
 
@@ -51,15 +50,13 @@
 
 | Date | Item |
 |------|------|
-| Oct 17 | dead-gap soak check (may extend — pipeline stopped) |
+| Oct 17+ | dead-gap soak — EXTEND (pipeline stopped) |
 | Oct 27 | CHASE_RATIO_SHADOW review |
 | Oct 30 | bb-bounce shadow 14d review |
 | Nov 6 | Gate re-audit window opens |
 
 ## NEXT ACTIONS (next run)
 
-1. **Commission progressive exit ladder backtest (self_learner)** — still #1 overdue, P0
-2. On pipeline resume: grep `[AI-TRADER].*drift` — confirm guard live
-3. Check bb-bounce shadow `[SHADOW]` logs
-4. Extend dead-gap soak clock if pipeline stays stopped
-5. Ask watchdog to stop doji steers while killed
+- On resume: verify rsi_at_pick written; grep MFE-CUT + TRAIL-ARM shadow lines
+- Re-check 16258 vs watchdog invalidation rule (15m close >81592 w/vol → exit)
+- Commission exit-ladder candle backtest if still undelivered

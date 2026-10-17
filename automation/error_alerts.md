@@ -1177,3 +1177,8 @@
 - **AUTO-FIX**: Restarted both timers via `systemctl start`. Verified active.
 - **WARN** (1x): `hermes-brain-auditor.service` — timeout, killed (Result: timeout). Flaky, non-critical.
 - **WARN** (1x): `hermes-bug-hunter.service` — exit code 1. Flaky, non-critical.
+
+## Error Alerts — 2026-10-17 04:25 UTC
+- **INFO**: Pipeline paused by vacation guardrail at 04:08 UTC (7d WR 34.2% < 35%, 7d PnL -$3.41). Intentional — NOT restarted. Price-collector + 1m-candle timers left running (data collection safe). Guardian still managing 1 open BTC SHORT position.
+- **WARN** (250x/10min): `hermes-price-collector` — `[LOCK-WAIT] info_rate: waited 0.1s, retrying`. SQLite contention (likely with 1m-candle service). Collector completes successfully each run (rc=0). Noise-level; no fix applied. If it escalates to failures, consider WAL busy_timeout tuning.
+- No auto-fixes applied this cycle.

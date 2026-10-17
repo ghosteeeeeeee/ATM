@@ -1,137 +1,49 @@
 {
-  "timestamp": "2026-10-17T03:46:39.810867+00:00",
-  "session_brain_stats": {
-    "queries": [
-      "ai trader staleness RSI pick fill",
-      "exit ladder progressive trail arm",
-      "oversold bounce long performance"
-    ],
-    "note": "session_brain loaded; top hits were stale (copy_trader, trail_arm_timeout explainers) — no new unimplemented ideas found"
+  "timestamp": "2026-10-17T04:38:38Z",
+  "run": "brain_auditor captain 2026-10-17 04:30 UTC",
+  "pipeline_status": {
+    "state": "STOPPED — vacation-guardrail (7d WR 34.2% < 35 AND 7d PnL -$3.41 < -$2.00)",
+    "kill_json": false,
+    "open_trades": "1: BTC SHORT #16258 manual @81522 SL81766 TP80299 10x, flat pnl",
+    "regime": "BTC 15m LONG_BIAS / 4h SHORT_BIAS unresolved; vol LOW"
   },
-  "trade_summary_24h": {
-    "closed": 49,
-    "pnl": -2.23,
-    "open": 1,
-    "exit_family": "sl/chop n=26 1W -$2.70 vs trail n=16 14W +$0.55 (watchdog verified)",
-    "worst_signals": [
-      "doji-bottom-long 10T -$0.53 (KILLED 20:30)",
-      "pump-chain+ 3T 0W -$0.47 (variance)",
-      "ai-trader+ 7T -$0.40",
-      "pump-chain- 6T 0W -$0.38"
-    ]
+  "trade_summary": {
+    "24h": "47T 34.0%WR -$2.27",
+    "48h": "65T 38.5%WR -$1.59",
+    "7d": "221T 34.4%WR -$3.40",
+    "14d": "382T 40.6%WR -$3.80",
+    "exit_signature_24h": "CHOP/SL 24T 4.2%WR -$2.46 vs TRAIL 14T 78.6% +$0.26 (+atr_trail 3T 66.7% +$0.07)",
+    "exit_signature_7d": "CHOP/SL 120T 0.8%WR -$10.27 vs TRAIL 61T 80.3% +$2.69 + atr_trail 23T 82.6% +$4.09"
   },
-  "trade_summary_7d": {
-    "total": 222,
-    "pnl": -3.41,
-    "wr": 34.2,
-    "sl_family": "134T 2.2%WR -$11.10",
-    "trail_family": "72T 87.5%WR +$7.09",
-    "regime": "EXTREME 121T -$2.00 26.4%WR | HIGH 38T -$1.45 | NORMAL 60T +$0.06"
+  "last_run_verify": {
+    "ai_trader_rsi_drift_guard": "CODE IN PLACE (ai_trader_signal.py:185-198, constants:3043). State file lacks rsi_at_pick (APT pick predates prompt fix 03:46) — guard fail-opens until next pick. Watchdog prompt updated to REQUIRE field. Unverifiable until pipeline resume + new pick.",
+    "pump_chain_dead_gap": "HOLDING — 0 pump-chain+ opens since 01:39 ship (pipeline stopped)",
+    "bb_bounce_shadow_T55": "COLLECTING — no would-fire lines yet (pipeline stopped; no qualifying holds since ship)",
+    "doji_rekill": "HOLDING — 0 doji opens since 20:30",
+    "sweet_spot_55_60": "CONFIRMED — no regression"
   },
-  "losing_trade_autopsy": [
-    {
-      "cluster": "ai-trader+ pick→fill RSI collapse",
-      "trades": "APT LONG pick RSI 57.1 fill 33.7 hard_max_loss -$0.09; INJ LONG meta 64.0 chase atr_sl_hit -$0.20",
-      "root_cause": "State file RSI checked at pick only; 45min TTL allows 20+pt collapse before fire. INJ is chase-at-band-top not staleness.",
-      "fix_shipped": "AI_TRADER_RSI_DRIFT_MAX=15 fire-time guard in ai_trader_signal.py + rsi_at_pick required in watchdog prompt",
-      "impact_on_winners": "Absolute RSI ceilings rejected (RSI>=60 14d blocks GRASS +0.07 / INJ +0.13 winners). Drift-only guard. Fail-open if rsi_at_pick missing (old states).",
-      "confidence": "MEDIUM-HIGH — APT is smoking gun; n=1 exact-drift case but mechanism verified in code (no fire-time RSI check existed)"
-    },
-    {
-      "cluster": "doji-bottom-long 5-loss streak",
-      "trades": "ZEN/CRV/YGG/WCT/MET all LONG RSI 27-48 HIGH regime",
-      "root_cause": "Oversold knives in falling BTC — ALREADY KILLED 20:30 re-kill, 0 opens after",
-      "fix_shipped": "none (prior kill holding)",
-      "confidence": "HIGH"
-    },
-    {
-      "cluster": "pump-chain- SHORT 24h 6T 0W",
-      "trades": "FIL gap -0.135 (dead-gap band, opened 13:11 BEFORE 13:30 block); DOT gap +0.54 EXTREME (opened 14:04 BEFORE 14:44 EXTREME block)",
-      "root_cause": "Both losses predate block ship times — filters working, no new leak",
-      "fix_shipped": "none (prior blocks holding)",
-      "confidence": "HIGH"
-    }
-  ],
-  "mfe_exit_ladder_data": {
-    "7d_sl_family": "n=134 avg_mfe=0.289 med_mfe=0.171 reached_trail_0.40=32 (23.9%) no_momentum_<0.10=49 negative=17",
-    "7d_trail_family": "n=72 avg_mfe=1.536 med_mfe=0.719 winners_MFE<0.20=0 (false-kill risk ZERO)",
-    "worst_sl_signals_mfe": "doji 0/11 trail | bb-bounce-v2 0/9 trail | ai-trader+ 2/13 | pump-chain+ 5/22",
-    "counterfactual_cut_MFE<0.20_held>=45m": "would cut 19T currently -$1.29 — supports progressive exit ladder T=45m threshold MFE<0.20",
-    "note": "Feeds overdue P0 progressive exit ladder backtest (self_learner). Shadow T=55m already collecting on bb-bounce + ai-trader."
+  "losing_autopsy_24h": {
+    "signature": "unchanged — chop entries never arm trail, ride to -3% acct. 100% of 7d SL-family (115T) never armed. med MFE 0.172%, med hold 33m.",
+    "clusters": "ai-trader+ INJ/APT (pre-drift-guard, fixed); doji (killed); pump-chain+ DOT/BLUR (dead-gap block holding post-ship); manual BTC both-sides mid-range",
+    "winning_side": "trend breaks that arm trail (+0.40% fast) — not available at mid-range BTC 81.1-82.4k oscillation"
   },
-  "drift_findings": [],
-  "recurring_problems": [
-    "Chop-entry bleed: sl/chop family -$11.10 vs trail +$7.09 7d — entry filters exhausted, exit ladder is the lever",
-    "ai-trader pick→fill staleness (watchdog 3rd consecutive cycle) — NOW CODE-FIXED",
-    "Watchdog doji steer was STALE (kill already live) — watchdog reads last-20 without kill-awareness"
+  "changes_this_run": [
+    "SHIPPED: MFE-CUT SHADOW (MFE_CUT_SHADOW_ENABLED=True, MIN=45m, MFE_MAX=0.20%) — zero-behavior would-fire collector in position_manager for progressive exit ladder. 30d counterfactual: 54T avoid -$7.46, false-kill 3W +$0.08."
   ],
-  "missing_implementations": [
-    "Progressive exit ladder backtest (self_learner) — OVERDUE since Oct 14, P0. MFE data above is ready input.",
-    "Watchdog kill-awareness: steers should check DOJI_BOTTOM_ENABLED etc. before recommending (prompt fix candidate)"
+  "sideways_findings": [
+    "HIGH: ai_trader_state.json has no rsi_at_pick field (pick 00:15 predates prompt fix). Drift guard silently fail-opens if watchdog agent omits field. Monitor first pick on resume; consider hard-log-warn if missing.",
+    "MED: trade #16258 SL/TP desync — DB SL 81766.566/TP 80299.17 vs position_manager SELF-CLOSE check SL 83138.67/TP 79878.33. PM also logs \"Found 0 open positions\" while DB shows open. Possible paper/HL bookkeeping split — worth bug_hunter look.",
+    "INFO: pipeline.log sparse for Oct 16 22:00-04:00 window — may be log routing, not a failure."
   ],
-  "creative_improvements": [
-    {
-      "date": "2026-10-17T03:46:39.810867+00:00",
-      "idea": "MFE-threshold progressive exit: cut SL-family trades held >=45m with MFE<0.20% (before hard_max_loss magnitude)",
-      "rationale": "7d: 49/134 SL exits never reached 0.10% MFE; trail winners NEVER have MFE<0.20 (0 false kills). Median SL exit MFE 0.171 = no momentum ever existed. Cutting earlier preserves capital for next trend entry.",
-      "expected_impact": "+$1.00-1.50/7d net (cut 19T -$1.29 at partial loss; keep all trail winners)",
-      "category": "exit engineering",
-      "status": "data_ready_backtest_pending",
-      "risk": "low — shadow T=55m already collecting on 2 signals; backtest before flip"
-    }
-  ],
-  "config_changes_applied": [
-    {
-      "change": "AI_TRADER_RSI_DRIFT_MAX=15 + fire-time RSI drift guard in ai_trader_signal.py + rsi_at_pick in watchdog prompt template",
-      "files": [
-        "hermes_constants.py",
-        "scripts/signals/ai_trader_signal.py",
-        "automation/trade-watchdog/trade_watchdog_prompt.md"
-      ],
-      "revert": "AI_TRADER_RSI_DRIFT_MAX=999"
-    }
-  ],
-  "changes_from_last_run": [
-    {
-      "change": "doji RE-KILL 20:30",
-      "status": "HOLDING",
-      "evidence": "0 doji opens after 20:30"
-    },
-    {
-      "change": "pump-chain- EXTREME block 14:44",
-      "status": "HOLDING",
-      "evidence": "DOT/FIL both predate ship; 0 opens after"
-    },
-    {
-      "change": "pump-chain- dead-gap 13:30",
-      "status": "HOLDING",
-      "evidence": "FIL gap -0.135 in band but opened 13:11 pre-ship; 0 opens after"
-    },
-    {
-      "change": "SHORT midband 45-55",
-      "status": "HOLDING",
-      "evidence": "no non-pump-chain SHORT 45-55 opens after 00:43"
-    },
-    {
-      "change": "sweet-spot MIN 40→55",
-      "status": "CONFIRMED",
-      "evidence": "30d 55-60 70T 60%WR +$3.74"
-    },
-    {
-      "change": "bb-bounce shadow T=55m",
-      "status": "COLLECTING",
-      "evidence": "0 [SHADOW] fires yet; pipeline stopped 02:38 limits data"
-    },
-    {
-      "change": "pump-chain+ LONG dead-gap 01:39",
-      "status": "HOLDING",
-      "evidence": "only ~1h live before vacation-guardrail stop; 0 trades"
-    }
+  "open_ceo": [
+    "P0: progressive exit ladder backtest STILL NOT COMMISSIONED (overdue since Oct 14). Shadow now collecting live would-fires. self_learner candle-level OOS still the vehicle.",
+    "7d WR 34.4% / PnL -$3.40 — vacation guardrail correctly holds pipeline. Flat is the position.",
+    "BTC #16258: watchdog invalidation rule (15m close >81592 w/vol => manual exit). Watchdog deep_analysis recommends manage-with-rule not hope."
   ],
   "next_actions": [
-    "Commission progressive exit ladder backtest (self_learner) — MFE data in this file is the input spec",
-    "Watchdog: stop emitting doji steer until DOJI_BOTTOM_ENABLED re-checked",
-    "When pipeline resumes: verify ai-trader drift guard fires (grep AI-TRADER.*drift in signals.log)",
-    "Oct 17: dead-gap 24h soak checkpoint (pipeline stopped — clock may need extension)"
+    "On pipeline resume: verify ai-trader pick writes rsi_at_pick; grep [AI-TRADER].*drift",
+    "On resume: grep [SHADOW] MFE-CUT would-fire — first data points",
+    "Extend dead-gap soak clock (pipeline stopped since ~02:38 — 24h soak clock paused)",
+    "Commission self_learner candle-level exit-ladder backtest (P0, 5th request)"
   ]
 }

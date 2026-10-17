@@ -4966,5 +4966,14 @@
     "category": "exit engineering",
     "status": "suggested",
     "risk": "low — backtest first via self_learner; shadow T=55m already on bb-bounce+ai-trader"
+  },
+  {
+    "date": "2026-10-17T04:38:38Z",
+    "idea": "MFE-cut progressive exit SHADOW: cut SL-family trades held >=45m with live_pnl < 0.20% (never-armed proxy) before hard_max_loss rides to -3% acct",
+    "rationale": "7d CHOP/SL 120T 0.8%WR -$10.27 vs TRAIL 84T ~81%WR +$6.78 — bleed is exit-magnitude on chop entries. 30d: 54T candidates avoid -$7.46, only 3 winners false-killed (+$0.08). Trail-arm timeout (bb-bounce T=55m shadow) is sibling mechanism.",
+    "expected_impact": "Save ~$0.97/7d conservative (full-SL avoid); exact save needs candle-level at-45m prices — self_learner backtest still required before live",
+    "category": "exit ladder",
+    "status": "shadow-shipped — collecting, zero behavior",
+    "risk": "low"
   }
 ]
