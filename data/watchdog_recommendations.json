@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-17T06:38:24.764471+00:00",
+  "timestamp": "2026-10-17T07:08:24.989351+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -40,13 +40,13 @@
     "btc_4h": "SHORT_BIAS",
     "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
     "acceleration_state": "FLAT",
     "volume_regime": "LOW",
     "linreg_alignment": 0.25,
     "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
+    "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
   "open_count": 1,
