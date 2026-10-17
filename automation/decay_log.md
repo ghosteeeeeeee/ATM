@@ -1889,3 +1889,8 @@
 [2026-10-17 08:13 UTC]   🟢 OK: ai-trader+: 6 trades, 50.0% WR, PnL=-1.63
 [2026-10-17 08:13 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-17 08:13 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-17 14:13 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-17 14:13 UTC]   🟢 OK: doji-bottom-long: 7 trades, 28.6% WR, PnL=-3.63
+[2026-10-17 14:13 UTC]   🟢 OK: ai-trader-manual: 5 trades, 40.0% WR, PnL=-0.8
+[2026-10-17 14:13 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-17 14:13 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

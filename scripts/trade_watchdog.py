@@ -32,6 +32,11 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = HERMES_DATA
 LOGS_DIR = HERMES_LOG_DIR
 
+# Price alerts — levels in JSON config (CEO-editable, no code change needed).
+# Fires once per crossing; re-arms when price returns past the rearm level.
+PRICE_ALERT_CONFIG = os.path.join(HERMES_DATA, "watchdog_price_alerts.json")
+PRICE_ALERT_STATE = os.path.join(HERMES_DATA, "watchdog_price_alerts_state.json")
+
 # Thresholds
 PROFIT_LOCK_BREAKEVEN_PCT = 2.0    # Move stop to breakeven at +2%
 PROFIT_LOCK_TRAIL_PCT = 5.0        # Trail stop at +5%
@@ -951,6 +956,91 @@ def analyze_coin_heat(open_trades, coin_tracker):
 # MAIN
 # ============================================================
 
+def collect_btc_price():
+    """Current BTC price from local 1m candles DB (preferred over API per SOP)."""
+    try:
+        import sqlite3
+        db_path = os.path.join(HERMES_DATA, "candles.db")
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        cur.execute("SELECT close FROM candles_1m WHERE token='BTC' AND is_closed=1 "
+                    "ORDER BY ts DESC LIMIT 1")
+        row = cur.fetchone()
+        conn.close()
+        return float(row[0]) if row else None
+    except Exception as e:
+        log(f"BTC price fetch failed: {e}", "WARN")
+        return None
+
+
+def analyze_price_alerts(btc_price):
+    """Persistent price-level alerts (CEO-configured via watchdog_price_alerts.json).
+
+    Fires once per crossing; re-arms when price returns past the rearm level.
+    Survives session restarts — runs every watchdog cycle (30 min).
+    Config format: {"alerts": [{"id", "coin", "level", "direction": "above"|"below",
+                                "rearm", "severity", "title", "detail"}]}
+    """
+    steers = []
+    if btc_price is None or not os.path.exists(PRICE_ALERT_CONFIG):
+        return steers
+    try:
+        with open(PRICE_ALERT_CONFIG) as f:
+            cfg = json.load(f)
+    except Exception as e:
+        log(f"price alert config unreadable: {e}", "WARN")
+        return steers
+    state = {}
+    if os.path.exists(PRICE_ALERT_STATE):
+        try:
+            with open(PRICE_ALERT_STATE) as f:
+                state = json.load(f)
+        except Exception:
+            state = {}
+    changed = False
+    for alert in cfg.get("alerts", []):
+        aid = alert.get("id", "unnamed")
+        coin = alert.get("coin", "BTC")
+        if coin != "BTC":
+            continue  # only BTC priced from candles_1m for now
+        level = float(alert.get("level", 0))
+        direction = alert.get("direction", "above")
+        rearm = alert.get("rearm")
+        fired = state.get(aid, {}).get("fired", False)
+        if fired:
+            # Already alerted — check re-arm (price returned to safe side)
+            if rearm is not None:
+                rearm_level = float(rearm)
+                safe = (btc_price <= rearm_level) if direction == "above" else (btc_price >= rearm_level)
+                if safe:
+                    state[aid] = {"fired": False, "price": btc_price, "ts": time.time()}
+                    changed = True
+                    log(f"price alert {aid} re-armed (BTC {btc_price:.0f} back past {rearm_level:.0f})")
+            continue
+        crossed = (btc_price >= level) if direction == "above" else (btc_price <= level)
+        if crossed:
+            detail = (alert.get("detail") or
+                      f"BTC {btc_price:.0f} crossed {direction} {level:.0f}").format(
+                          level=level, price=btc_price)
+            steers.append({
+                "severity": alert.get("severity", "urgent"),
+                "category": "price-alert",
+                "title": alert.get("title", f"Price alert {aid}"),
+                "detail": detail,
+                "trade_id": None,
+                "auto_executable": False
+            })
+            state[aid] = {"fired": True, "price": btc_price, "ts": time.time()}
+            changed = True
+            log(f"🚨 price alert {aid} FIRED: BTC {btc_price:.0f} crossed {direction} {level:.0f}")
+    if changed:
+        try:
+            atomic_write_json(PRICE_ALERT_STATE, state)
+        except Exception as e:
+            log(f"price alert state write failed: {e}", "WARN")
+    return steers
+
+
 def collect_all():
     """Collect all data sources."""
     log("=== Data Collection ===")
@@ -975,6 +1065,7 @@ def collect_all():
         "open_trades": open_trades,
         "recent_closed": recent_closed,
         "btc_regime": collect_btc_regime(),
+        "btc_price": collect_btc_price(),
         "coin_tracker": collect_coin_tracker(),
         "pipeline_status": collect_pipeline_status(),
         "signal_performance": signal_performance,
@@ -993,6 +1084,7 @@ def analyze_all(data):
     steers = []
 
     steers.extend(analyze_regime_alignment(data["open_trades"], data["btc_regime"]))
+    steers.extend(analyze_price_alerts(data.get("btc_price")))
     steers.extend(analyze_profit_lock(data["open_trades"]))
     steers.extend(analyze_stale_trades(data["open_trades"]))
     steers.extend(analyze_trade_clusters(data["open_trades"]))

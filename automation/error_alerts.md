@@ -1202,3 +1202,34 @@
 - **[INFO]**: Health check at 13:25 UTC — vacation pause active (paused_at 13:08:26, 7d WR 34.4% < 35.0% AND pnl_7d $-2.86 < $-2.00, 212T). Pipeline.timer + trade-watchdog.timer left inactive per guardrail rule — intentional, NOT a crash. Auto-resume handled by guardrail on metric recovery.
 - **[INFO]**: Data collection healthy — price-collector last fired 13:25:49, 1m-candle next fire 13:26:30, candles fresh (1m age 0.9min). 15m-regime-scanner on schedule (last 13:15). hl-sync-guardian active (managing 1 open BTC SHORT from 03:25). 30+ other timers active/waiting.
 - **[INFO]**: 0 signals last 1h (expected: pipeline paused). Trades today: 4 closed, -$0.29, 25% WR. 24h exits: atr_sl_hit 8 (-$0.91), profit-monster-trail 6 (+$0.12), hard_max_loss 5 (-$1.48), HL_CLOSED 2 (+$0.01), trail_arm_timeout 1 (-$0.20), stale_exit 1 (-$0.13), atr_trail_hit 1 (-$0.01). Phantom trades: 0. Regime: SHORT_BIAS (3L/103S/14N of 120). Disk 83% (up from 82% — watch, threshold 85%). trades.json stale (updated 03:25) — expected downstream of pause, guardian still tracks the open position. No auto-fixes needed.
+
+## Error Alerts — 2026-10-17 14:25 UTC
+- **[INFO]**: Health check at 2026-10-17 14:25 UTC — vacation pause active (paused_at 14:08:26, 7d WR 34.4% < 35.0% AND pnl_7d $-2.86 < -$2.00, 212T). Pipeline.timer + trade-watchdog.timer left inactive per guardrail rule — intentional, NOT a crash. Auto-resume handled by guardrail on metric recovery.
+- **[INFO]**: Data collection healthy — price-collector last fired 14:23:19, 1m-candle last fired 14:23:30, candles fresh. 15m-regime-scanner on schedule (last 14:15). hl-sync-guardian active. 40+ other timers active/waiting. candles.db held by 2 python3 procs (normal — price-collector + 1m-candle, not a lock issue).
+- **[INFO]**: 0 signals last 1h (expected: pipeline paused). Trades today: 4 closed, -$0.29. Regime: SHORT_BIAS (13L/16S/95N of 124). Disk 82%. Phantom trades: 0. token_speeds stale (last 03:25) — expected downstream of pause.
+- **[WARN]** (1x): `hermes-trading-checklist.service` — CRIT pipeline.timer inactive at 14:08. False positive: intentional vacation pause. Suggestion: checklist should check vacation_pause.json before flagging.
+- **[INFO]** (repeat, pre-existing): bug-hunter, daily-orchestrator, upgrade-implementer failed on known issues (audit FAILs / timeouts with bad SQL) — documented in prior alerts, not new. No auto-fixes needed.
+
+## Error Alerts — 2026-10-17 15:25 UTC
+- **[INFO]**: Pipeline paused by vacation guardrail (intentional) — paused_at 2026-10-17T15:08:28Z, reason: 7d WR 34.1% < 35.0% AND pnl_7d $-2.93 < $-2.00 (211T). Pipeline/watchdog timers correctly inactive. NOT a crash. Auto-resume handled by guardrail.
+- **[WARN]**: Disk at 82% (92G/118G, 21G free). Under 85% threshold but trending. Consider compressing old logs: pipeline.log 136M, signal-compactor.log 55M, 15m_regime.log 54M.
+- **[WARN]**: 0 signals generated in last hour (expected — pipeline paused). Latest signal: 09:39 UTC (5.7h ago).
+- **[WARN]**: LIVE trade open during pause — BTC SHORT @ 81522, opened 03:25:04 (paper=false, id=16258). Guardrail pause does not close existing positions.
+- **[WARN]**: hermes-trading-checklist.service exits 1 hourly — reporting pipeline.timer inactive as CRITICAL. False positive during vacation pause (checklist not pause-aware).
+- **[WARN]**: hermes-bug-hunter.service exits 1 (09:37 UTC) — 7 pre-existing code quality findings (sqlite leaks, bare excepts, hardcoded passwords, non-atomic JSON). Not new.
+- **[WARN]**: hermes-daily-orchestrator.service failed — not investigated in depth (paused system, low priority).
+- **AUTO-FIX**: None required. All timers active as expected for pause state. Prices fresh (15:24 UTC, <1min). Price-collector + 1m-candle running normally. candles.db 3GB, 2 concurrent writers, no lock issue.
+
+## Error Alerts — 2026-10-17 16:25 UTC
+- **[INFO]**: Health check at 16:25 UTC — vacation pause active (paused_at 16:08:28, 7d WR 34.3% < 35.0% AND pnl_7d $-2.82 < $-2.00, 210T). Pipeline.timer + trade-watchdog.timer correctly inactive per guardrail rule — intentional, NOT a crash. Auto-resume handled by guardrail on metric recovery (WR>=37% or pnl_7d>=0).
+- **[INFO]**: Data collection healthy — price-collector last fired 16:23:11, 1m-candle last fired 16:23:09, candles fresh (1m age ~73s). 15m-regime-scanner on schedule (last 16:15). hl-sync-guardian active (daemon, 24h uptime). 30+ other timers active/waiting. Guardrail timer armed for next check at 16:38.
+- **[INFO]**: 0 signals last 1h (expected — pipeline paused). Trades today: 4 closed, -$0.29 (signal_outcomes). 1 open: BTC SHORT @ 81522, manual CEO trade, opened 03:25, guardrail kept it open intentionally. Regime: SHORT_BIAS (2L/106S/16N of 124). Speed: 128/241 tokens >=50th pct. Phantom trades: 0. Disk 82% (21G free). Logs 402M total, no >7d files >10M to compress.
+- **[WARN]** (repeat, pre-existing): hermes-trading-checklist.service exits 1 hourly — flags pipeline.timer inactive as CRIT during vacation pause. False positive: checklist is not pause-aware (should check vacation_pause.json first). Not new, documented in prior alerts.
+- **[INFO]**: No auto-fixes required. System healthy in pause state.
+
+## Error Alerts — 2026-10-17 17:08 UTC
+- **REPEATED** (11x): `Oct N N:N:N python3[TOK]: [coin_tracker] Done: N coins processed, N skipped, N errors`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3535s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3535s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3484s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3421s left, N failures)`

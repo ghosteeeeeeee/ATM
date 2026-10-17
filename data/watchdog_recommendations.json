@@ -1,22 +1,13 @@
 {
-  "timestamp": "2026-10-17T13:38:27.434919+00:00",
+  "timestamp": "2026-10-17T17:38:28.874178+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 25% over last 20 trades. Total PnL: -1.50 USDT. Something is wrong.",
+      "detail": "Win rate 25% over last 20 trades. Total PnL: -1.51 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "stale",
-      "title": "BTC open 10h, barely profitable",
-      "detail": "Trade open 10 hours. Only +0.1%. Opportunity cost \u2014 consider freeing capital.",
-      "trade_id": 16258,
-      "auto_executable": true,
-      "id": "steer-002"
     },
     {
       "severity": "warning",
@@ -24,15 +15,15 @@
       "title": "11 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-002"
     },
     {
       "severity": "warning",
       "category": "health",
       "title": "Signal 'ai-trader-manual' losing streak: 3 losses",
-      "detail": "Net -0.10 USDT over last 20 trades (losses: -0.11). Consider disabling or tuning this signal.",
+      "detail": "Net -0.05 USDT over last 20 trades (losses: -0.11). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -40,7 +31,7 @@
       "title": "Signal 'doji-bottom-long' losing streak: 5 losses",
       "detail": "Net -0.59 USDT over last 20 trades (losses: -0.61). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-005"
+      "id": "steer-004"
     }
   ],
   "portfolio_health": "critical",
@@ -55,12 +46,8 @@
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "market_phase": "CALM",
+    "trend_quality": "UP"
   },
-  "open_count": 1,
-  "deep_analysis": "Market is overwhelmingly SHORT_BIAS: 89 of 123 scanned tokens short, only 2 long. BTC sits AT its 1m EMA300 (81496 vs 81627) with LEAN_BEAR linreg, STRONG_DOWN trend quality, NEG zscore tier, and LOW volume. This is a bear tape grinding sideways at the mean \u2014 not a trending market yet, but every bounce is being sold.\n\nThe 24h bleed is one-sided: LONGS lost -1.56 USDT across 22 trades; SHORTS lost only -0.15 across 6. We have been repeatedly on the wrong side by buying dips in a market that keeps dumping. The fundamental truth applies: every long that hit hard_max_loss or atr_sl was a short opportunity someone else took.\n\nThe one open trade (BTC SHORT, +0.03%, 9.2h) is on the CORRECT side of the regime \u2014 short in a short-bias market. But BTC is chopping AT the EMA300 with LOW volume and SLOW velocity: this is not the dump we need to reach the 80299 TP. The short is correctly sided but stuck in grind. Direction right, timing passive. Hold while regime holds; the STRONG_DOWN trend quality favors eventual resolution downward. If BTC reclaims EMA300 with volume, exit \u2014 that invalidates the short thesis.\n\nBiggest structural problem is not the open trade \u2014 it is the signal fire pattern. doji-bottom-long has 5 consecutive losses (ZEN RSI 29, CRV 40, YGG 49, WCT 28, MET 48). These are LONG signals firing while 89 tokens are SHORT_BIAS. ZEN at RSI 29 and WCT at RSI 27.8 were oversold falling knives \u2014 shorting those dumps was the winning side. INJ LONG at RSI 64 chased overbought into a downtrend and lost -0.20. APT LONG filled at RSI 33.7 after pick-time drift and hit hard_max_loss. Pattern: we long oversold, get run over by the dump; we long overbought, get faded by the bounce. Both wrong-side.\n\nCorrelation risk is low right now \u2014 only 1 open position. Capital is mostly free. Opportunity cost of the BTC short is real (9h for 0.03%) but acceptable while regime aligns.",
-  "agent_timestamp": "2026-10-17T12:46:27.127796+00:00",
-  "regime_context": "BTC 15m and 4h both SHORT_BIAS. Continuum: AT EMA300, LEAN_BEAR, STRONG_DOWN trend quality, zscore NEG, velocity SLOW, acceleration FLAT, volume LOW. Market phase RECOVERY but state_score only 35. Regime scanner: 89 SHORT_BIAS / 32 NEUTRAL / 2 LONG_BIAS across 123 tokens. High-confidence short-bias names: MET 94.6, AERO 94.7, HYPE 93.9, UNI 93.2, NEAR 92.6, XAI 92.2, GRASS 92.0, WIF 91.6, OP 91.6, ONDO 91.4, CRV 91.8, LINK 91.3. This is a sell-the-bounce tape. LONG signals have no regime edge until BTC reclaims EMA300 with volume confirmation.",
-  "pattern_alerts": "VERIFIED (PostgreSQL, last 24h):\n\n1. LONG-side bleed \u2014 n=22 LONG closed, total -1.56 USDT, avg -0.071; vs n=6 SHORT, total -0.15. Win rate last 20 closed: 25% (13 losses). We are systematically on the wrong side of LONGS in a short-bias market. WINNING side: the shorts taken against those dumps (ETH SHORT +0.02 via volume-buildup-, BTC SHORT +0.01 via HL). Why we weren't on it: long signals keep firing on oversold RSI while the tape is short.\n\n2. doji-bottom-long death spiral \u2014 5 consecutive losses totaling -0.69 USDT (ZEN -0.11 RSI 29.5, CRV -0.10 RSI 39.8, YGG -0.24 RSI 48.8, WCT -0.13 RSI 27.8, MET -0.10 RSI 47.6). Only 6 wins in the window (GMT, DOGE, ONDO, XPL, WLFI, SUSHI). The losers were entered while regime was SHORT_BIAS \u2014 bottom-calling knives. WINNING side: shorting ZEN/WCT/MET on the breakdown instead of buying the 'doji bottom'. Signal is regime-blind; it fires long on any doji regardless of 89-token short bias.\n\n3. Oversold-long trap \u2014 meta_rsi < 35 longs in 24h: APT 33.7 hard_max_loss -0.09, ZEN 29.5 atr_sl -0.11, WCT 27.8 stale -0.13. Shorting oversold is banned for good reason, but LONGING oversold in a STRONG_DOWN regime is the mirror-image mistake. 0 of 3 survived. WINNING side: SHORT those RSI-27-34 dumps.\n\n4. Overbought-chase longs \u2014 INJ LONG RSI 64.0 atr_sl -0.20, BLUR LONG RSI 62.5 trail_arm_timeout -0.20. Longing into RSI 62-64 in a bear tape = buying the local top. WINNING side: fade those pops with shorts.\n\n5. ai-trader-manual chop \u2014 3 consecutive losses on BTC manual picks (-0.11 total). BTC AT EMA300 with LOW volume is not a trending vehicle; manual BTC scalps in this regime are coin flips with negative expectancy after fees. The current open BTC SHORT is the first correctly-sided manual in the streak."
+  "open_count": 0
 }
