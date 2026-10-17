@@ -5003,5 +5003,19 @@
     "category": "trail-arm timeout",
     "status": "suggested",
     "risk": "low (suggestion only)"
+  },
+  {
+    "date": "2026-10-17T07:45:00Z",
+    "idea": "Pre-register MFE-CUT tier-2 (T=15m/MFE=0.20) for Nov 1 shadow review — fast-bleed cohort catch",
+    "rationale": "30d hold-time: 41% of HML die <30m (57T -$5.67). Trades-level grid: T=15/MFE=0.20 catches 77 HML saves $9.35/30d, false-kill cost identical to T=45 (6T already-loser trail -$0.21). Tier-1 T=45 shadow shipping; tier-2 is the aggressive extension for the fast cohort.",
+    "expected_impact": "+$9.35/30d saved on HML cohort (trades-level estimate, needs candle-level OOS)",
+    "category": "exit ladder",
+    "status": "suggested",
+    "risk": "medium — needs self_learner candle OOS (overdue since Oct 14) before flip",
+    "params": {
+      "T_min": 15,
+      "MFE_max": 0.2,
+      "evaluate_at": "2026-11-01"
+    }
   }
 ]

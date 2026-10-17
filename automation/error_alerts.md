@@ -1182,3 +1182,11 @@
 - **INFO**: Pipeline paused by vacation guardrail at 04:08 UTC (7d WR 34.2% < 35%, 7d PnL -$3.41). Intentional — NOT restarted. Price-collector + 1m-candle timers left running (data collection safe). Guardian still managing 1 open BTC SHORT position.
 - **WARN** (250x/10min): `hermes-price-collector` — `[LOCK-WAIT] info_rate: waited 0.1s, retrying`. SQLite contention (likely with 1m-candle service). Collector completes successfully each run (rc=0). Noise-level; no fix applied. If it escalates to failures, consider WAL busy_timeout tuning.
 - No auto-fixes applied this cycle.
+
+## Error Alerts — 2026-10-17 07:26 UTC
+- **INFO**: Pipeline paused by vacation guardrail at 07:08 UTC (7d WR 34.2% < 35.0%, 7d PnL -$3.08 < -$2.00, 219T). Intentional — pipeline.timer + trade-watchdog.timer left inactive. Price-collector + 1m-candle timers active, candles fresh (1 min).
+- **WARN** (4285x): `hermes-coding-mcp.service` — crash-loop: `run_mcp_server.py` missing (Errno 2), restart counter 4285. **AUTO-FIX**: stopped service (already disabled; stop breaks the loop). Needs: restore script or remove unit.
+- **WARN** (1x): `hermes-brain-auditor.service` — timeout at 06:50 after long run; also `psycopg2 round(double precision, integer)` UndefinedFunction errors (needs ::numeric cast). Work completed before timeout. Non-critical.
+- **WARN** (1x): `hermes-daily-orchestrator.service` — timeout at 04:03; queries PG tables `candles_1m`/`price_history` that don't exist (they're SQLite). Pre-existing bug in orchestrator SQL.
+- **WARN** (1x): `hermes-bug-hunter.service` — exit 1 from audit FAILs (52 sqlite no-finally, 81 non-atomic JSON, 4 hardcoded passwords). Findings, not crashes.
+- Disk 82% (was 82% last check — stable, under 85% threshold). 0 signals last 1h (expected: pipeline paused). 24h outcomes: 42T, 38.1% WR, -$2.63. Phantom trades: 0.

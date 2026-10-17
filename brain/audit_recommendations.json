@@ -1,84 +1,72 @@
 {
-  "timestamp": "2026-10-17T06:45:00+00:00",
-  "run": "brain_auditor captain 2026-10-17 06:31 UTC",
-  "pipeline_status": {
-    "state": "PAUSED by vacation-guardrail (marker rewritten 06:08, reason: 7d WR 34.5%<35 AND pnl_7d -$3.02<-$2.00, 220T)",
-    "kill_json": "live_trading=false (double-block with pause marker — both holding)",
-    "resume_condition": "WR_7D_RESUME>=37 OR pnl_7d>=0, AND pnl_24h>=-3.00 (OR-semantics — NOT a deadlock)",
-    "aging_forecast": "Earliest aging-only resume ~Oct 21 (+4d): day-3 cohort (64T 23.4%WR -$0.94) exits window → 92T WR 39.1% but PnL still -$1.70; WR leg of OR fires. CAVEAT: aging-resume = window survivorship, NOT proven recovery; 5 changes landed Oct 16-17 will have zero live validation at that moment. Recommend CEO eyeball at resume, do not blind-trust auto-resume.",
-    "open_trades": "1: BTC SHORT #16258 manual @81522, current 81530, SL 81766 (watchdog invalidation 15m close >81592 w/vol stands). SIDeways: DB SL/TP 81766/80299 vs PM self-close 83138/79878 — bookkeeping split, bug_hunter carry."
-  },
-  "trade_summary": {
-    "24h": "43T -$2.02 35.5%WR (LONG 31T -$1.66 35.5%, SHORT 12T -$0.36 33.3%)",
-    "7d": "220T -$3.02 34.5%WR (LONG 161T -$1.84, SHORT 59T -$1.18)",
-    "exit_family_7d": "CHOP/SL/HML vs TRAIL signature unchanged — trail family carries all profit",
-    "regime_7d": "EXTREME 120T 26.7%WR -$1.99 worst (54% of volume); NORMAL only positive regime",
-    "winners_24h": "11/12 exited via trail-family (profit-monster-trail/atr_trail) — trend entries still the only winners"
-  },
-  "changes_from_last_run": {
-    "REGIME_CONF_EXTREME_MULT_1.15_to_0.85_0540": "VERIFIED with meta final_confidence (avoids stored-conf hot-bonus drift): 14d EXTREME meta<67.6 LONG 40T 20.0% -$1.58 + SHORT 39T 23.1% -$0.61 = block correct both dirs; meta>=67.6 LONG 62T 43.5% +$1.74 = keep correct. CAVEAT: meta>=67.6 SHORT 21T 14.3% -$0.88 still bleeds — conf does NOT separate SHORT in EXTREME (consistent with 'SHORT entry filters exhausted'); 0.85x admits them at 57.5>MIN_EXEC so no regression introduced. Resume-verify: grep [REGIME-CONF] log line on first post-resume EXTREME trade.",
-    "MFE_CUT_SHADOW_0438": "WIRING OK (position_manager.py:3625-3638, constants imported). COLLECTING — 0 would-fires yet (pipeline stopped). This run's counterfactual validates params: see creative.",
-    "AI_TRADER_RSI_DRIFT_GUARD_0346": "CODE IN PLACE; still fail-open until first post-resume pick writes rsi_at_pick. Verify on resume.",
-    "PUMP_CHAIN_DEAD_GAP_0139": "HOLDING — 0 pump-chain+ opens since 01:39 (pipeline stopped).",
-    "DOJI_REKILL_2030_Oct16": "HOLDING — 0 doji trades since kill.",
-    "SHORT_MIDBAND_45_55_Oct16": "HOLDING — watchdog's midband steer PARTIALLY STALE: SHORT side block live since Oct 16 00:43; LONG 45-55 block previously REJECTED at 30d (93T +$0.31 50.5% Welch p=0.91). No action.",
-    "SHORT_RSI_HARD_FLOOR_35": "REVERT TRIGGER NOT FIRED — 7d gross losses -$0.99 vs -$1.00 threshold (n=27, net -$0.06). One cent away. Hold to letter of pre-commit; daily monitor. Next RSI<45 SHORT loss flips it → revert to 45.",
-    "BB_BOUNCE_TRAIL_ARM_SHADOW_T55": "COLLECTING (pipeline stopped)."
-  },
-  "losing_autopsy_24h": {
-    "method": "22 losers pulled with open_time, exit_reason, regime, hold; cross-checked vs fix land-times",
-    "verdict": "ALL clusters are PRE-FIX entries. 0 post-fix violations.",
-    "clusters": "doji 5L (ZEN/WCT/CRV/MET/YGG — all opened before kill 20:30 Oct 16); pump-chain+ DOT 20:46 + BLUR 21:43 (pre dead-gap 01:39); ai-trader+ INJ 23:15 + APT 00:17 (pre drift-guard 03:46); BTC manual 2x (CEO trades, not signals); HBAR volume-buildup- 1L (best short signal's normal variance, n=1)",
-    "winning_side": "Same as every prior run: trail-armed trend entries. XPL doji trail, ENS/CAKE/SOPH/BIGTIME/DOGE profit-monster-trail, SUPER/KAS atr_trail, ENS/POL/ETH volume-buildup- trail.",
-    "pump_chain_post_deadgap": "1 trade #16237 DOT gap=+0.54 correctly PASSED block (band is [-0.5,+0.2)), lost -$0.08 = variance, block working as designed."
-  },
-  "watchdog_steers_disposition": {
-    "steer_001_losing_streak": "VERIFIED — chop-family exit-magnitude, root unchanged, defenses landed after the bleed window",
-    "steer_002_wrong_side": "VERIFIED — 3rd consecutive cycle, all LONG losers in SHORT_BIAS tape, pre-fix cohorts",
-    "steer_003_ai_trader_streak": "STALE-ISH — drift guard landed 03:46 after the streak; unverifiable until resume",
-    "steer_004_doji_streak": "STALE — killed 20:30 Oct 16, 0 trades since; 24h window still shows pre-kill closes",
-    "deep_analysis_midband": "SHORT side already blocked (Oct 16); LONG side rejected at 30d p=0.91 — do not reopen on 72h n=28 windows",
-    "deep_analysis_extremes_work": "CONSISTENT with sweet-spot 55-60 boost (landed Oct 16 21:40) and ceiling 75; SHORT 65+ 100%WR is small-n, no new filter"
-  },
-  "deliverables_this_run": {
-    "exit_ladder_counterfactual_30d": {
-      "note": "P0 backtest delivered at trades-level (self_learner candle version still undelivered since Oct 14). Method: never-armed (trailing_activated=False), hold>=T, mfe_pct<thr. n=786 never-armed of 30d closes.",
-      "cells": "T30/0.15: 82T 0W -$11.97 | T30/0.20: 104T 0W -$14.68 | T45/0.15: 59T 0W -$8.28 | T45/0.20: 73T 0W -$9.94 | T45/0.30: 97T 1W -$12.88 | T55/0.20: 62T 0W -$8.77 | T70/0.20: 49T 0W -$6.64",
-      "false_kill": "ZERO winners at MFE<0.20 any T>=45m over 30d. Single winner at MFE<0.30: BTC SHORT continuum +$0.02 (mfe 0.281). Shadow params T=45/0.20 have perfect false-kill record.",
-      "recommendation": "MFE-CUT shadow ships with validated params. Do NOT flip live without CEO GO + candle OOS. Multi-tier (add T30/0.15) staged for shadow review — see creative."
+    "timestamp": "2026-10-17T07:45:00Z",
+    "session": "brain_auditor captain run",
+    "config_changes_applied": [],
+    "soak_discipline": "0 changes — pipeline PAUSED (vacation-guardrail since 04:08) + 5 unvalidated changes from Oct 16-17 in soak. Double reason to not stack.",
+    "trade_summary": {
+        "24h": {"trades": 43, "wins": 15, "wr": 34.9, "pnl": -2.02, "note": "all losers PRE-FIX; pipeline paused 04:08"},
+        "7d": {"trades": 219, "wins": 75, "wr": 34.2, "pnl": -3.08},
+        "exit_family_7d": {
+            "trail": {"n": 83, "pnl": 6.72, "wr": 80.7},
+            "hard_max_loss": {"n": 60, "pnl": -5.30, "wr": 0.0},
+            "other": {"n": 76, "pnl": -4.50, "wr": 10.5}
+        }
     },
-    "trail_arm_ratify_package_ceo_pending_since_oct12": {
-      "pump_chain_45m": "9 fires since Oct 12, net -$0.35 (3W/6L, avg hold 46m = exactly at timeout, exits -$0.20..+$0.04 vs HML counterfactual ~-3% account). WORKING. RECOMMEND RATIFY.",
-      "bb_squeeze_60m": "0 fires — STRUCTURALLY VACUOUS: bb-squeeze since Oct 12 = 4 closes (3 profit-monster-trail med 20m + 1 HML 32m), nothing survives past 32m un-armed. Harmless no-op. Ratify as-is (1-line revert stands) or backtest T=35-40m post-shadow; do NOT change T now.",
-      "decision_ask": "CEO: ratify PUMP_CHAIN trail-arm 45m (proven), accept BB_SQUEEZE 60m as vacuous placeholder."
-    }
-  },
-  "config_changes_applied": [],
-  "config_change_policy": "0 changes this run. Pipeline PAUSED; 5 changes landed Oct 16-17 (doji rekill, sweet-spot 55, dead-gap, drift-guard, EXTREME 0.85, MFE-CUT shadow) all awaiting first live validation. Stacking more = unresumable confound on resume day. All watchdog-steer candidates either defended, stale, or previously rejected with 30d data.",
-  "creative_improvements": [
-    {
-      "idea": "Two-tier exit ladder (staged): tier-2 = shipped MFE-CUT T45/0.20; tier-1 = pre-registered T30/0.15 for shadow-review evaluation",
-      "status": "staged",
-      "risk": "zero (shadow)"
+    "open_trade": {
+        "id": 16258,
+        "detail": "BTC SHORT ai-trader-manual entry 81522, SL 81766.57, TP 80299. BTC squeezed 81519->81747 since entry; now 81716, 50pts from SL. 15m closes >81592 with vol since 06:45 (invalidation met). HOLD — tight SL caps squeeze risk; market resolves in minutes.",
+        "action": "HOLD"
     },
-    {
-      "idea": "bb-squeeze trail-arm T=60m vacuous — backtest T=35-40m post-shadow (suggestion only)",
-      "status": "suggested",
-      "risk": "low"
+    "last_run_verify": {
+        "doji_rekill": "HOLDING — 0 trades since 20:30 Oct 16",
+        "pump_chain_plus_dead_gap": "HOLDING — 0 opens since 01:39 (pipeline stopped)",
+        "ai_trader_drift_guard": "HOLDING — 0 opens since 03:46 (pipeline stopped)",
+        "mfe_cut_shadow": "COLLECTING — 0 fires (pipeline stopped); params validated",
+        "extreme_0.85": "VERIFIED — meta final_confidence block/keep bands correct both dirs",
+        "sweet_spot_55": "HOLDING — no regression",
+        "short_midband": "HOLDING",
+        "short_floor_35": "gross_losses=-0.99 vs trigger -1.00 — ONE loss from revert to 45. Daily check."
     },
-    {
-      "idea": "EXTREME position-size dampener 0.7x (carried Oct 17 05:46) — needs self_learner backtest, gated",
-      "status": "carried",
-      "risk": "low"
-    }
-  ],
-  "next_actions": [
-    "CEO RATIFY trail-arm: pump-chain 45m proven (9T -$0.35 vs HML -3% acct); bb-squeeze 60m vacuous no-op — decision pending since Oct 12",
-    "CEO at resume (est Oct 21 aging, or sooner if pnl_7d>=0): eyeball the 5 unvalidated changes before/with blind auto-resume",
-    "First post-resume: verify rsi_at_pick written; grep [SHADOW] MFE-CUT, [REGIME-CONF] 0.85x, [AI-TRADER] drift lines",
-    "SHORT_RSI_HARD_FLOOR=35: gross -$0.99 vs -$1.00 — one more RSI<45 SHORT loss flips revert to 45. Daily monitor.",
-    "MFE-CUT shadow review: 14d (Nov 1) or earlier if pipeline resumes and fires accrue",
-    "Exit-ladder candle OOS backtest STILL NOT DELIVERED by self_learner (overdue since Oct 14) — trades-level version shipped this run as interim",
-    "P0 carry: progressive exit ladder remains THE lever; do not stack entry filters on resume"
-  ]
+    "combined_hard_block_counterfactual_7d": {
+        "blocked_trades": 38,
+        "blocked_pnl": -0.99,
+        "net_saved_if_all_active": 0.99,
+        "breakdown": {
+            "doji_kill": {"n": 20, "pnl": -0.62},
+            "pump_chain_plus_dead_gap": {"n": 8, "pnl": -0.27, "kept_cohort": "26T +1.06"},
+            "pump_chain_minus_dead_gap_band": {"n": 10, "pnl": -0.10, "kept_cohort": "26T -0.56"}
+        }
+    },
+    "losing_autopsy_24h": {
+        "pattern": "All 15 top losers are LONGs into SHORT_BIAS market, all PRE-FIX (pipeline paused 04:08). doji 5 losers (killed), pump-chain+ 2 (dead-gap landed), ai-trader+ 2 (drift-guard landed). Winning side was SHORT the same coins — ZEN/APT/DOT/YGG/CRV all now SHORT_BIAS per watchdog.",
+        "post_fix_violations": 0,
+        "verdict": "Fixes correctly timed; losses realized before landing. Resume-day will tell."
+    },
+    "exit_ladder_grid_30d": {
+        "note": "Trades-level using final mfe_pct (valid for never-reached-threshold cohort). T=45 shadow already shipping; grid shows T=15 catches more but aggressive.",
+        "T15_MFE0.20": {"hml_n": 77, "save": 9.35, "trail_false_kill": "6T -0.21 (already losers)", "net": 9.56},
+        "T30_MFE0.15": {"hml_n": 43, "save": 5.81, "trail_false_kill": "6T -0.21", "net": 6.02},
+        "T45_MFE0.20": {"hml_n": 33, "save": 4.14, "trail_false_kill": "6T -0.21", "net": 4.35, "status": "SHIPPING as shadow"},
+        "T45_MFE0.30": {"hml_n": 42, "save": 4.99, "trail_false_kill": "7T -0.41", "net": 5.40}
+    },
+    "regime_7d": {
+        "EXTREME": {"n": 119, "wr": 26.1, "pnl": -2.05},
+        "HIGH": {"n": 37, "wr": 43.2, "pnl": -1.07},
+        "NORMAL": {"n": 60, "wr": 46.7, "pnl": 0.06}
+    },
+    "creative_improvement": {
+        "idea": "Pre-register MFE-CUT tier-2 (T=15m/MFE=0.20) for evaluation at Nov 1 shadow review",
+        "rationale": "Grid shows T=15 catches 77 HML/30d ($9.35 save) vs T=45's 33 ($4.14). False-kill cost identical (6T already-loser trail). T=15 is the fast-bleed cohort (41% of HML die <30m). Aggressive but data-clean at trades level.",
+        "status": "suggested",
+        "category": "exit ladder",
+        "risk": "medium — needs candle-level live-MFE-at-checkpoint OOS before flipping (self_learner backtest STILL overdue since Oct 14)",
+        "action": "NO code change now. Document params; evaluate at MFE-CUT shadow review Nov 1 with tier-1 (T=45) live data."
+    },
+    "next_actions": [
+        "On resume (~Oct 21): verify rsi_at_pick, grep MFE-CUT/[SHADOW] lines, REGIME-CONF 0.85x, AI-TRADER drift, dead-gap blocks",
+        "SHORT floor-35: recompute gross daily — flip at -1.00",
+        "Trail-arm ratify package still CEO-pending (pump-chain 45m proven; bb-squeeze 60m vacuous no-op)",
+        "Exit-ladder candle OOS: self_learner STILL undelivered; trades-level grid this run is interim",
+        "#16258: let SL resolve; do not manually interfere"
+    ]
 }
