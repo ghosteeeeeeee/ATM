@@ -11016,3 +11016,24 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - doji-bottom-long 24h 10T 4W −$0.53 — largest 24h signal loser, positive WR, watch
 - 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
 - hard_max_loss momentum-gate backtest due Oct 17
+
+## [2026-10-17 05:10] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 45T 16W −$2.10 (35.6% WR) | 7d 221T 76W −$3.40 (34.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Trading PAUSED by vacation guardrail since 04:08 UTC — 0T expected; live_trading=false, pipeline/watchdog inactive
+- Resume check: 7d WR 34.4% < 37% AND 7d PnL −$3.40 < 0 → both fail, stay paused (correct)
+- 1 open position: BTC ai-trader-manual SHORT (kept open per pause protocol)
+- Kill check: 0T this hour; pump-chain+ 24h 2T 0W −$0.39 (multi-emitter CEO escalation standing); pump-chain- 24h 5T 0W −$0.29 (standing)
+- atr_sl_hit 13/45 = 28.9% (under 40 threshold; tpsl_utils fix deployed)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
+- pump-chain+ / pump-chain- standing CEO escalations (still 0W)
+- doji-bottom-long 24h 10T 4W −$0.53 — largest 24h signal loser, positive WR, watch
+- hard_max_loss 8 exits −$0.96 24h — standing CEO hold, momentum-gate backtest due Oct 17
