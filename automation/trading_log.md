@@ -11317,3 +11317,24 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - Only 1 hotset token (ALT) and it's CTX-blocked — thin opportunity set; is signal detection under-firing post-resume?
 - pump-chain+ standing CEO escalation (2T 0W, under 3T threshold)
 - atr_sl_hit 45.5% on tiny sample — watch if it stays >40% as 24h window refills with post-resume trades
+
+## [2026-10-17 19:10] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 9T 3W −$0.66 (33.3% WR) | 7d 206T 71W −$2.60 (34.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0T because all 4 detected signals correctly gated: GRASS/CC/STX SHORT blocked by CONTINUUM-BULL (BTC RECOVERY+LEAN_BULL+AT) + SHORT-NEUTRAL (4h NEUTRAL); TRX LONG blocked by LONG-NEUTRAL (no LONG edge) — filters working as intended, not a detection failure
+- Hotset empty (cycle 10108) — expected given 0 signals passed pre-filter; preserve-EMPTY correctly kept 0
+- Vacation guardrail: SIZE REDUCED to 30% (not paused) per 16:57 T-directive — correct
+- 0 open positions
+- Kill check: pump-chain+ 2T 0W −$0.39 still under 3T kill threshold; standing CEO escalation
+- atr_sl_hit 4/9 = 44.4% (>40) but tpsl_utils fix deployed (BUG-030/031/032/063) — elevated from tiny 9T 24h sample, no new atr_sl_hit this hour
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 4h regime NEUTRAL blocks both directions (LONG has no edge, SHORT blocked by BTC bullish structure) — no trade path until regime resolves; watch if this persists into next hours
+- pump-chain+ standing CEO escalation (2T 0W, under 3T threshold)
+- 7d WR 34.5% still < 35% — size-reduce stays at 30%

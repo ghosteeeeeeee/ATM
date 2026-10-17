@@ -4795,3 +4795,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-17 18:09] auto_1hr: NO CONFIG CHANGE — 0T last hour (trading RESUMED 16:57 T-directive, size-reduce 30% not pause; only candidate ALT LONG CTX-GATE blocked: similar WR 20% < 30%) | 24h 11T 3W −$0.87 (27.3%) | 7d 207T 71W −$2.63 (34.3%) | kill: none (pump-chain+ 2T 0W under 3T threshold, standing CEO escalation) | atr_sl_hit 45.5% (>40 but tpsl fix deployed, tiny 11T sample) | 0 open positions | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-17 19:10] auto_1hr: NO CONFIG CHANGE — 0T last hour (4 signals detected, ALL correctly gated: 3 SHORT blocked CONTINUUM-BULL+SHORT-NEUTRAL, 1 TRX LONG blocked LONG-NEUTRAL; 4h NEUTRAL blocks both directions) | 24h 9T 3W −$0.66 (33.3%) | 7d 206T 71W −$2.60 (34.5%) | size-reduce 30% active per 16:57 T-directive | kill: none (pump-chain+ 2T 0W under 3T threshold) | atr_sl_hit 44.4% (>40 but tpsl fix deployed, tiny 9T sample, 0 new) | 0 open positions | No constants change → no signal_versions entry
+BY: auto_1hr
