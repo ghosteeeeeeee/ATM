@@ -3492,7 +3492,7 @@ def run(dry_run=False):
                     token=_s.get('token', '?'),
                     signal_name=_cs_sig,
                     original_direction=_s.get('direction', '?'),
-                    entry_price=_s.get('price', 0),
+                    entry_price=_s.get('price', 0) or get_current_price(_s.get('token', '?')) or 0,
                     confidence=_s.get('final_confidence', 0),
                     reason=f'would-contrarian (30d classification: LOSER)'
                 )
@@ -3611,6 +3611,11 @@ def run(dry_run=False):
                 try:
                     # counterfactual at the pre-Oct-13 floor (0.3): raw product still wins if > 0.3
                     _exec_at_floor_03 = _raw_conf * max(_pp, 0.3)
+                    # pp-conditional floor counterfactual (brain_auditor 2026-10-17 creative):
+                    # pp<0.10 (catastrophic combo history) -> floor 0.3; pp>=0.10 -> floor 0.5 (current).
+                    # Zero behavior — log-only so CEO floor decision has the third option quantified.
+                    _cond_floor = 0.3 if _pp < 0.10 else 0.5
+                    _exec_at_pp_cond = _raw_conf * max(_pp, _cond_floor)
                     with open(os.path.join(HERMES_DATA, 'floor_admit_shadow.jsonl'), 'a') as _f:
                         _f.write(json.dumps({
                             'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
@@ -3621,6 +3626,8 @@ def run(dry_run=False):
                             'exec_mult': round(_exec_mult, 3),
                             'exec_conf': round(confidence, 1),
                             'exec_conf_at_floor_03': round(_exec_at_floor_03, 1),
+                            'exec_conf_at_pp_cond': round(_exec_at_pp_cond, 1),
+                            'pp_cond_would_block': bool(_exec_at_pp_cond < MIN_EXEC_CONFIDENCE <= confidence),
                             'floor_admitted': bool(_exec_at_floor_03 < MIN_EXEC_CONFIDENCE <= confidence),
                         }) + '\n')
                 except Exception as _e:

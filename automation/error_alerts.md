@@ -1236,3 +1236,17 @@
 
 ## Error Alerts — 2026-10-17 18:08 UTC
 - **REPEATED** (11x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-17 21:25 UTC
+- **[WARN]** (8h cadence): `hermes-bug-hunter.service` exits 1 — by-design (findings present): 51 cursor-leak files, 132 bare excepts (39 files), 82 non-atomic JSON writes, 4 hardcoded-password files. Long-standing tech debt, not a new crash. No auto-fix (bulk refactor out of health-monitor scope).
+- **[WARN]**: `hermes-atr-sl-updater.timer` listed as not-found — unit file missing but still referenced by a service trigger. Cosmetic; no functional impact observed.
+- **[WARN]**: trade frequency 0.2/hr (1 trade in 6h) — market/filter condition, not a system fault.
+- AUTO-FIX: none required. All critical timers active, pipeline green, prices fresh (0.5 min), disk 83% (<85% threshold).
+
+## Error Alerts — 2026-10-17 22:08 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-17 22:25 UTC
+- **[WARN]** (8h cadence, repeat of 21:25): `hermes-bug-hunter.service` exits 1 — by-design findings (sqlite/cursor leaks, bare excepts, non-atomic JSON, hardcoded passwords). Long-standing tech debt; no auto-fix (bulk refactor out of health-monitor scope).
+- **[WARN]**: trade frequency ~0.3/hr (2 trades/6h) — market/filter condition, not a system fault. Today: 7 closed, -8.28% PnL.
+- AUTO-FIX: none required. Pipeline green (last run 22:23:21 SUCCESS), all 4 core timers active, prices fresh (~30s), 64 signals in last hour, disk 83% (<85%).

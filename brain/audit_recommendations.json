@@ -1,98 +1,134 @@
 {
-  "timestamp": "2026-10-17T21:43:18Z",
+  "timestamp": "2026-10-17T22:37:57Z",
   "session_brain_stats": {
     "queries": [
-      "ai-trader drift guard penalty floor",
-      "wrong side losing chop trail",
-      "WLD entry quality momentum falling"
+      "floor admit penalty floor confidence",
+      "wrong side fade chop momentum",
+      "ai trader losing drift guard"
     ],
-    "key_insight": "falling-momentum LONGs = worst cohort (27T 48.1% WR vs rising 129T 56.6%). MFE tiny (0.01-0.31%) on losers = chop entries, trail never arms. Consistent with wealth-gap pattern."
+    "key_insight": "Floor-admit shadow confirms 0.5 floor rescues historically-losing combos (pp<0.10 = 35% of floor-bound events). Contrarian shadow pump-chain- PROMOTE signal (55.6% WR, 248T) is promising but half of recent events have entry_price=0.0 (bug fixed this run) — re-evaluate after data quality fix."
   },
   "trade_summary_24h": {
-    "closed_24h": "8T 37.5%WR -$0.57",
-    "closed_7d": "204T 34.3%WR -$2.62",
-    "family_7d": {
-      "TRAIL": "72T 80.6% +$6.45",
-      "SL": "115T 0.9% -$9.72",
-      "OTHER": "17T 64.7% +$0.65"
+    "closed_24h": "6T 2W -$0.39",
+    "closed_7d": "203T 70W -$2.56 (34.5%)",
+    "family_7d_exit": {
+      "hard_max_loss": "55T 0% -$4.87",
+      "atr_sl_hit": "50T 2% -$4.03",
+      "profit-monster-trail": "39T 94.9% +$2.72",
+      "atr_trail_hit": "23T 82.6% +$4.09"
     },
-    "post_resume": "1T (WLD #16259) -$0.15 hard_sl — first morning-stack validation trade, LOST",
-    "regime": "BTC AT EMA300 ~18h dead-volume chop. 15m/4h SHORT_BIAS. Vol LOW. size_reduce 0.3x active (7d WR 34.3%<35, pnl -$2.62<-$2.00 — both still failing)."
+    "regime_7d": "EXTREME 112T 26.8% -$1.66 (worst) | HIGH 32T 40.6% -$1.04 | NORMAL 55T 47.3% +$0.11",
+    "post_resume": "2 closed: WLD LONG #16259 -$0.15 hard_sl (autopsied 21:45), BTC SHORT #16258 +$0.05 UNIVERSAL_MAX_HOLD (risk-free rake paid). 0 open. NXPC SHORT re-picked 22:12 (conf 82, rsi 59.5, SHORT_BIAS slam-dunk) — correct-side entry, awaiting fill.",
+    "resume_conditions": "7d WR 34.5%<35.0 AND 7d PnL -$2.56<-$2.00 — both still failing. size_reduce 0.3x stays."
   },
   "losing_autopsy": [
     {
-      "losing_trade": "WLD LONG #16259 pnl=-$0.15 hard_sl",
+      "losing_trade": "Post-resume cohort n=1 (WLD) — already autopsied 21:45. No new losers since.",
       "signal": "ai-trader+",
-      "regime": "EXTREME",
-      "root_cause": "Falling-momentum entry into fading pump. pick RSI 60.4 (clean trend thesis) -> fire RSI 47.17 (drift 13.2, passed 15-max guard). momentum_state=falling at fire. Spike-filter held 9min at live RSI 75.5-79, entered the moment RSI cooled below 75 — bought the fade of a fade. MFE never reached +0.40% trail arm.",
-      "entry_check": "gap_at_entry 0.975, ATR 1.53%, conf 87 x penalty_raw 0.014 x floor 0.5 -> exec 43.5% (floor-ADMITTED: at old 0.3 floor exec=26.1 would block). CTX-GATE advisory: similar setup n=23 WR=48% -> conf 24%.",
-      "regime_check": "EXTREME — REGIME_CONF_EXTREME_MULT 0.85 applied correctly (morning change working).",
-      "shadows_fired": "MFE-CUT would-fire at 54m/-0.28% (actual exit 56m/-0.70% — shadow would have saved ~50% of loss). TRAIL-ARM timeout would-fire at 56m. FIRST LIVE VALIDATION of both shadows.",
-      "recommended_change": "NONE this run. Drift guard max=15 let 13.2 through but n=1 with metadata field (shipped this morning) — cannot quantify winner-block. Monitor. Falling-momentum block would double-penalize (OSCILLATOR already 0.70x).",
-      "impact_on_winners": "N/A — no change shipped.",
-      "confidence": "HIGH on diagnosis, NO change on n=1"
+      "root_cause": "Falling-momentum LONG into fading pump (pick RSI 60.4 → fire 47.17, momentum=falling). MFE-CUT shadow would-have saved ~50% of loss.",
+      "recommended_change": "NONE — n=1, morning stack needs cohort. Drift guard loose (Δ13.2 passed) but n=1 field — monitor to n>=20.",
+      "confidence": "HIGH diagnosis, NO change on n=1"
     }
   ],
   "drift_findings": [
     {
-      "item": "AI_TRADER_RSI_DRIFT_MAX=15",
-      "status": "WORKING but loose",
-      "evidence": "APT Δ23.4 blocked; WLD Δ13.2 passed and lost. Field only on 1 trade — monitor to n>=20 before tightening."
-    },
-    {
-      "item": "REGIME_CONF_EXTREME_MULT=0.85",
-      "status": "WORKING",
-      "evidence": "WLD log: EXTREME -> 0.85x applied. 1 post-change EXTREME trade (the loss) — unvalidated beyond meta."
-    },
-    {
-      "item": "doji re-kill",
+      "item": "doji RE-KILL",
       "status": "HOLDING",
-      "evidence": "0 trades since Oct 16 20:30."
+      "evidence": "0 opens since Oct 16 20:30"
     },
     {
-      "item": "PENALTY_MULT_FLOOR=0.5",
-      "status": "SHADOW ACCRUING — ESCALATION",
-      "evidence": "Floor-admit cohort since Oct 15: 32 executed trades 11W/21L net -$1.40. All 32 would be blocked at old 0.3 floor (+$1.40 counterfactual save). n>=20 bar met. CEO decision — surface data, do NOT unilateral revert."
+      "item": "pump-chain+ dead-gap",
+      "status": "HOLDING",
+      "evidence": "0 post-resume pump-chain trades"
+    },
+    {
+      "item": "ai-trader drift guard",
+      "status": "LIVE",
+      "evidence": "WLD Δ13.2 passed (works; threshold loose n=1)"
+    },
+    {
+      "item": "EXTREME conf 0.85",
+      "status": "APPLIED",
+      "evidence": "WLD log confirmed 0.85x; unvalidated beyond meta"
+    },
+    {
+      "item": "sweet-spot MIN 55",
+      "status": "LIVE",
+      "evidence": "first cohort pending"
+    },
+    {
+      "item": "SHORT midband",
+      "status": "HOLDING",
+      "evidence": "0 violations"
+    },
+    {
+      "item": "vacation size-reduce 0.3x",
+      "status": "ACTIVE",
+      "evidence": "both resume conditions failing"
+    },
+    {
+      "item": "MFE-CUT shadow",
+      "status": "1st LIVE FIRE validated",
+      "evidence": "WLD would-fire @54m/-0.28% (actual exit @56m/-0.70%)"
+    },
+    {
+      "item": "bb-bounce/ai-trader TAT shadow",
+      "status": "COLLECTING",
+      "evidence": "WLD would-fire @56m"
     }
   ],
   "recurring_problems": [
-    "Wealth gap UNCHANGED: 7d TRAIL 72T 80.6% +$6.45 vs SL 115T 0.9% -$9.72. Every dollar lost = chop entry that never armed trail. Root = exit-magnitude on never-armed cohort (entry-side filters exhausted per Oct 16 verdict).",
-    "Floor-admit bleed: low-penalty-history combos (pp<0.2) keep getting rescued by 0.5 floor into chop entries. 218/424 shadow fires have pp<0.2. The floor converts 'historically losing combo' into live trades.",
-    "Falling-momentum LONGS: session-brain verified worst LONG cohort. OSCILLATOR gate dampens 0.70x but does not block. ai-trader+ specifically n=1 falling — insufficient."
+    "Wealth gap unchanged: 7d hard_max_loss 55T 0% -$4.87 + atr_sl_hit 50T 2% -$4.03 vs trail family 62T ~89% +$6.81. Root = exit-magnitude on never-armed chop entries.",
+    "Floor-admit bleed: 0.5 floor rescues historically-losing combos. 458 floor-bound events, 417 would-block at 0.3. WLD pp=0.014 exec 43.5 = extreme case flat floor can't distinguish. CEO owns decision.",
+    "EXTREME still worst regime: 112T 26.8% -$1.66/7d. conf 0.85 applied, unvalidated (1 post-change trade = WLD loss)."
   ],
   "missing_implementations": [
-    "Exit-ladder candle-level OOS backtest — STILL NOT COMMISSIONED (9th request). MFE-CUT shadow just proved live value (WLD: would save ~50% of loss). Signal-scoped only per Oct 17 OOS verdict. This is THE lever.",
-    "self_learner candle sim for breakeven-stop-after-trail-arm (creative from Oct 17 12:20) — undelivered."
+    "self_learner signal-scoped exit-ladder candle OOS backtest (9th request) — MFE-cut just validated live on WLD, universal stays dead per 11:05 OOS."
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-17T21:43:18Z",
-      "idea": "MFE-CUT shadow FIRST LIVE VALIDATION — WLD #16259 would-fire at 54m/-0.28%, actual hard_sl at 56m/-0.70%. Half the loss avoided. Strengthens flip case but candle-level OOS + 14d shadow data + CEO GO still required per process.",
-      "rationale": "Zero-behavior shadow did exactly what it was built for: proved the counterfactual on a real trade without risk.",
-      "expected_impact": "If flipped with OOS pass: cut never-armed stalls before full ATR stop. Prior counterfactual 30d: T=45/MFE=0.20 catches 33 HML saves $4.14.",
-      "category": "exit engine",
-      "status": "shadow-validated-1st-fire",
-      "risk": "low (still zero-behavior)"
+      "date": "2026-10-17T22:37:57Z",
+      "idea": "pp-conditional penalty floor (shadow field added this run)",
+      "rationale": "pp<0.10 = catastrophic combo history (WLD pp=0.014). Flat 0.5 floor treats pp=0.014 same as pp=0.3. Conditional: pp<0.10 → floor 0.3 (block catastrophic); pp>=0.10 → floor 0.5 (keep mixed-signal rescue). WLD exec 43.5→26.1 would-block; mixed pp=0.3 unchanged.",
+      "expected_impact": "Blocks floor-admits with catastrophic history while preserving mixed-signal rescue. 162/458 floor-bound events have pp<0.10.",
+      "category": "entry sniper",
+      "status": "shadow-logging (exec_conf_at_pp_cond field added to floor_admit_shadow.jsonl)",
+      "risk": "low — zero behavior until CEO GO"
     },
     {
-      "date": "2026-10-17T21:43:18Z",
-      "idea": "pp-conditional penalty floor: instead of flat 0.5, scale floor by penalty_raw. pp<0.10 (catastrophic history like WLD 0.014) -> floor stays 0.3; pp 0.10-0.5 -> floor 0.5. Preserves CEO intent (rescue mixed-signal 0.1-0.5) while stopping catastrophic-history rescues.",
-      "rationale": "Floor-admit shadow: 32T 11W/21L -$1.40 since Oct 15. WLD pp=0.014 is an extreme case the flat 0.5 floor cannot distinguish from pp=0.3 mixed-signal.",
-      "expected_impact": "Would have blocked WLD (pp=0.014). Needs cohort split: pp<0.10 sub-cohort PnL vs pp 0.10-0.5 sub-cohort before any change.",
-      "category": "entry sniper",
-      "status": "suggested-ceo-escalation",
-      "risk": "medium (touches CEO-owned floor)"
+      "date": "2026-10-17T22:37:57Z",
+      "idea": "Contrarian shadow entry_price bug fixed — re-evaluate pump-chain- PROMOTE",
+      "rationale": "contrarian_shadow_summary shows pump-chain- LONG-flip 55.6% WR 248T PROMOTE. But 272/591 events have entry_price=0.0 (recent fires) — monitor can't evaluate those. Bug: decider_run logged _s.get('price') which is often missing. Fixed with get_current_price fallback.",
+      "expected_impact": "Next monitor run evaluates real prices for recent events. If PROMOTE holds on clean data, pump-chain- contrarian LONG could be the wrong-side fade answer.",
+      "category": "wrong-side fade",
+      "status": "bug-fixed, re-evaluate after 48h",
+      "risk": "low — shadow only"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "change": "contrarian shadow entry_price fallback via get_current_price",
+      "type": "bugfix",
+      "file": "decider_run.py:3495",
+      "behavior": "zero — shadow data quality only"
+    },
+    {
+      "change": "pp-conditional floor shadow fields (exec_conf_at_pp_cond, pp_cond_would_block)",
+      "type": "creative",
+      "file": "decider_run.py floor-admit shadow block",
+      "behavior": "zero — log-only counterfactual for CEO floor decision"
+    }
+  ],
   "changes_from_last_run": {
-    "verify": "8 morning changes all HOLDING. MFE-CUT + bb-bounce/ai-trader TAT shadows: first live fires this run (WLD). doji kill 0 trades. EXTREME 0.85 applied on WLD. sweet-spot/midband/dead-gap/drift-guard: no post-resume cohort to validate yet (1 trade).",
-    "verdict": "No regressions. No new changes — soak discipline. First post-resume trade lost; 1T is noise, morning stack needs its cohort."
+    "run": "21:45 UTC soak #3, 0 config changes",
+    "verified": "All 8 changes holding. WLD autopsy complete. Floor-admit escalation standing. MFE-CUT 1st live fire validated.",
+    "impact": "No new trades to validate morning stack (only WLD closed). NXPC SHORT pending = first SHORT-side validation candidate."
   },
   "next_actions": [
-    "CEO: floor-admit cohort 32T -$1.40 — decide keep 0.5 / revert 0.3 / adopt pp-conditional (creative idea 2). Shadow continues collecting either way.",
-    "CEO/self_learner: commission signal-scoped exit-ladder candle OOS (9th request). MFE-cut just validated live on WLD.",
-    "Monitor: AI_TRADER_RSI_DRIFT_MAX to n>=20 before tightening. NXPC SHORT pick (watchdog 21:08) — first precheck-clean SHORT candidate.",
-    "Size-reduce 0.3x stays: 7d WR 34.3%<35 AND pnl -$2.62<-$2.00, both still failing."
+    "CEO: floor-admit pp-conditional field now logged — quantify pp<0.10 cohort after 48h, then decide keep 0.5 / revert 0.3 / adopt conditional",
+    "Monitor NXPC SHORT fill — correct-side SHORT_BIAS entry, first post-resume SHORT validation",
+    "Contrarian monitor re-run after 48h with fixed entry_price — re-check pump-chain- PROMOTE claim",
+    "Morning stack: wait for ~20-trade cohort before any new entry filter",
+    "self_learner: exit-ladder candle OOS (9th request) still undelivered"
   ]
 }

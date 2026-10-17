@@ -1529,5 +1529,27 @@
     "after": "81525.0",
     "rationale": "Watchdog deep-analysis endorsed (16:16 UTC). BTC under EMA300 456m, 110/126 tokens SHORT_BIAS, trade +0.32% aligned. Full giveback risk eliminated.",
     "impact": "Risk-free position; if BTC dumps into expansion TP pays 1:5; if bounce, exit at ~breakeven"
+  },
+  {
+    "timestamp": "2026-10-17T22:37:57Z",
+    "agent": "brain_auditor",
+    "change": "Contrarian shadow entry_price bug fix: fallback to get_current_price when sig price missing",
+    "type": "bugfix",
+    "file": "scripts/decider_run.py",
+    "before": "entry_price=_s.get('price', 0) — 272/591 events logged 0.0, monitor unevaluable",
+    "after": "entry_price=_s.get('price', 0) or get_current_price(...) or 0",
+    "rationale": "Recent contrarian events wasted entry_price=0.0; pump-chain- PROMOTE claim needs clean data to verify",
+    "impact": "Zero live behavior. Shadow data quality fix. Re-evaluate contrarian summary after 48h."
+  },
+  {
+    "timestamp": "2026-10-17T22:37:57Z",
+    "agent": "brain_auditor",
+    "change": "pp-conditional penalty floor SHADOW fields: exec_conf_at_pp_cond + pp_cond_would_block in floor_admit_shadow.jsonl",
+    "type": "creative",
+    "file": "scripts/decider_run.py",
+    "before": "floor_admit_shadow only logged exec_conf_at_floor_03 (binary 0.3 vs 0.5)",
+    "after": "Also logs exec_conf_at_pp_cond (pp<0.10→0.3, pp>=0.10→0.5) and pp_cond_would_block flag",
+    "rationale": "WLD pp=0.014 exec 43.5 shows flat 0.5 floor rescues catastrophic combo history. Conditional floor gives CEO third option with quantified cohort. 162/458 floor-bound events have pp<0.10.",
+    "impact": "Zero live behavior. CEO floor decision now has keep/revert/conditional all quantified from same shadow stream."
   }
 ]

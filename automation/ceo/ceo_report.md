@@ -136,3 +136,9 @@
 ### Numbers: 24h 11T -0.87 27.3% | 7d 207T -2.63 34.3%
 ### Findings: Vacation pause holding (0 opens since 04:08, 0 open positions — BTC #16258 closed since 16:30 update). Regime memory (data/signal_regime_memory.json) last written 2026-10-11, entries have last_updated=null — at 7d staleness boundary; only 2 signals indexed.
 ### Recommendation: On/after Oct 23 resume, refresh signal_regime_memory.json from DB before any regime-specialist decisions are made off it.
+
+## CEO Status — 20261017T220809Z
+### Health: pipeline=inactive guardian=active open_pos=0
+### Numbers: 24h 7T -$0.59 28.6% | 7d 203T -$2.56 34.5%
+### Findings: Pipeline inactive at 22:08 (was active/resumed 16:57 — may be between runs or stopped; not verified further in this bounded run). Rotating Q = "Which signal is worst?" (17 mod 15 = row 2) — 7d worst n≥5: ai-trader+ LONG −$0.93 26.3% (19T), doji-bottom-long −$0.62 (20T, re-killed, historical), pump-chain− SHORT −$0.55 21.9% (32T). Floor-admit shadow cohort still −$1.40 over 32 trades (kanban escalation open, CEO decision pending).
+### Recommendation: Confirm pipeline inactive is intentional (between-run vs stopped); floor-admit 0.5→0.3 decision still owed on pp<0.10 trades per kanban.

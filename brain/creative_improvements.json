@@ -5171,5 +5171,23 @@
     "category": "entry sniper",
     "status": "suggested-ceo-escalation",
     "risk": "medium (touches CEO-owned floor)"
+  },
+  {
+    "date": "2026-10-17T22:37:57Z",
+    "idea": "pp-conditional penalty floor (shadow field added this run)",
+    "rationale": "pp<0.10 = catastrophic combo history (WLD pp=0.014). Flat 0.5 floor treats pp=0.014 same as pp=0.3. Conditional: pp<0.10 → floor 0.3 (block catastrophic); pp>=0.10 → floor 0.5 (keep mixed-signal rescue). WLD exec 43.5→26.1 would-block; mixed pp=0.3 unchanged.",
+    "expected_impact": "Blocks floor-admits with catastrophic history while preserving mixed-signal rescue. 162/458 floor-bound events have pp<0.10.",
+    "category": "entry sniper",
+    "status": "shadow-logging (exec_conf_at_pp_cond field added to floor_admit_shadow.jsonl)",
+    "risk": "low — zero behavior until CEO GO"
+  },
+  {
+    "date": "2026-10-17T22:37:57Z",
+    "idea": "Contrarian shadow entry_price bug fixed — re-evaluate pump-chain- PROMOTE",
+    "rationale": "contrarian_shadow_summary shows pump-chain- LONG-flip 55.6% WR 248T PROMOTE. But 272/591 events have entry_price=0.0 (recent fires) — monitor can't evaluate those. Bug: decider_run logged _s.get('price') which is often missing. Fixed with get_current_price fallback.",
+    "expected_impact": "Next monitor run evaluates real prices for recent events. If PROMOTE holds on clean data, pump-chain- contrarian LONG could be the wrong-side fade answer.",
+    "category": "wrong-side fade",
+    "status": "bug-fixed, re-evaluate after 48h",
+    "risk": "low — shadow only"
   }
 ]
