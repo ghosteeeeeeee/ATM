@@ -49,11 +49,16 @@ if git_config.exists():
         git_config.write_text(clean_url)
         print("Cleaned stale token from .git/config")
 
-# ── 3. Push via embedded token URL ──────────────────────────────────────────
-push_url = f"https://{token}@github.com/ghosteeeeeeee/ATM.git"
+# ── 3. Push via Authorization header (URL-embedded token breaks on GitHub
+# redirect: redirect strips creds → 401 → "could not read Username") ─────────
+import base64, os
+basic = base64.b64encode(f"x-access-token:{token}".encode()).decode()
 r = subprocess.run(
-    ["git", "-C", str(HERMES), "push", push_url, "main"],
-    capture_output=True, text=True
+    ["git", "-C", str(HERMES),
+     "-c", f"http.extraHeader=Authorization: Basic {basic}",
+     "push", REPO_URL, "main"],
+    capture_output=True, text=True,
+    env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
 )
 print(r.stdout)
 if r.stderr:
