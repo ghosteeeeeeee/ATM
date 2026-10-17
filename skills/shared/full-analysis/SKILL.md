@@ -129,6 +129,60 @@ MACD alignment across timeframes shows trend strength:
 - MACD bearish + volume surge = **real selloff**
 - MACD bullish + volume surge = **real rally**
 
+### Probability of Trade Succeeding
+
+Score each factor, sum them, and convert to a probability:
+
+**Scoring System (0-100 points):**
+
+| Factor | Bullish | Bearish | Points |
+|--------|---------|---------|--------|
+| **1h MACD** | BULL | BEAR | +15 / -15 |
+| **15m MACD** | BULL | BEAR | +10 / -10 |
+| **5m MACD** | BULL | BEAR | +10 / -10 |
+| **RSI position** | 45-60 sweet spot | <30 or >70 | +10 / -10 |
+| **Volume** | >1.5x surge | <0.5x dead | +10 / -10 |
+| **Continuum** | ABOVE + BULL linreg | BELOW + BEAR linreg | +15 / -15 |
+| **Z-Score (5m)** | NEUTRAL (-1 to 1) | EXTREME (±>2) | +5 / -10 |
+| **Trend alignment** | Price above EMA50 | Price below EMA50 | +5 / -5 |
+| **Pattern** | Continuation (flag) | Reversal against you | +5 / -5 |
+| **Contrarian** | Contrarian view weaker | Contrarian view stronger | +5 / -5 |
+
+**Probability Conversion:**
+
+| Score | Probability | Action |
+|-------|-------------|--------|
+| **+50 to +100** | 70-90% | **STRONG ENTRY** — full size |
+| **+20 to +49** | 55-70% | **GOOD ENTRY** — normal size |
+| **0 to +19** | 45-55% | **MARGINAL** — small size or skip |
+| **-19 to -1** | 35-45% | **AVOID** — counter-trend |
+| **-50 to -20** | 10-35% | **STRONG AVOID** — wrong side |
+
+**Example: BTC LONG scoring:**
+```
+1h MACD:    BEAR  = -15
+15m MACD:   BULL  = +10
+5m MACD:    BEAR  = -10
+RSI:        46.6  = +10 (sweet spot)
+Volume:     0.2x  = -10 (dead)
+Continuum:  BELOW = -15
+Z-Score:    NEUTRAL = +5
+EMA50:      Below = -5
+Pattern:    None  = 0
+Contrarian: Neutral = 0
+            ─────────
+Total:      -30 points → 25% probability → STRONG AVOID
+```
+
+**Key rules:**
+- **Higher TFs matter more** (1h = 15 points vs 5m = 10 points)
+- **Volume is critical** — no volume = no conviction
+- **Continuum is the macro context** — don't fight it
+- **Score < 0 = wrong side of the trade** — skip or size down
+- **Score > 50 = high conviction** — normal or increased size
+
+**This is a heuristic, not a guarantee.** Use it as one input among many.
+
 ### Trendlines
 
 Trendlines connect swing points to show trend direction and dynamic support/resistance:
