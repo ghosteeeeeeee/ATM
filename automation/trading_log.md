@@ -11276,3 +11276,23 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
 - pump-chain+ standing CEO escalation (2T 0W, under kill threshold)
 - guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit
+
+## [2026-10-17 17:10] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses)
+**PnL:** $0.05 last hour | 24h 13T 3W −$0.92 (23.1% WR) | 7d 209T 72W −$2.71 (34.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Trading PAUSED by vacation guardrail since 04:08 UTC — 1T was the BTC manual SHORT closing on UNIVERSAL_MAX_HOLD (+$0.05, win); live_trading=false (kill JSON reason=disabled)
+- Resume check: 7d WR 34.4% < 37% AND 7d PnL −$2.71 < 0 → both fail, stay paused (correct)
+- 0 open positions now (BTC manual SHORT closed this hour — position fully resolved)
+- Kill check: pump-chain+ 2T 0W −$0.39 and doji-bottom-long 2T 0W −$0.21 both under 3T kill threshold; standing CEO escalations
+- atr_sl_hit 5/13 = 38.5% — under 40 threshold, and tpsl_utils fix already deployed; no new atr_sl_hit this hour (ratio rose only from window aging)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
+- pump-chain+ / doji-bottom-long / pump-chain- standing CEO escalations (0W 24h, under 3T threshold)
+- guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit
