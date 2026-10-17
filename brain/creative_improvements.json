@@ -5090,5 +5090,14 @@
     "category": "exit engineering",
     "status": "completed",
     "risk": "none (analysis only)"
+  },
+  {
+    "date": "2026-10-17T16:44:02Z",
+    "idea": "Wrong-side chop-fade SHADOW collector (retro-validated): on hard_max_loss/atr_sl_hit close, log opposite-direction paper entry at close_price, track 60m. Zero live impact.",
+    "rationale": "7d retro-run: 125 losers −$10.56, exact-fade upper bound +$10.56; chop-family only (HML+atr_sl_hit 102T) fade potential +$9.15. Avg unleveraged counter-move 0.65%. Idea dormant since Oct 7/Oct 14 — quantified basis now exists.",
+    "expected_impact": "Measures the wrong-side thesis; input to entry-momentum gate design",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "zero (shadow-only, needs self_learner backtest before any live path)"
   }
 ]

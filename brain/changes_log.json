@@ -1518,5 +1518,16 @@
     "after": "As-coded candle OOS: pump-chain −$0.13/30d fk37% accepted; bb-squeeze +$1.02 PASS; bb-bounce fk-bar FAIL — do-not-flip at T=55",
     "rationale": "Trades-level never-armed counters are selection-on-outcome (same disease that blocked MFE-CUT). As-coded live_pnl-at-T evaluation is the only valid test of the mechanism.",
     "impact": "Zero behavior change (comments only). Flip decision for bb-bounce pre-blocked; exit-ladder commission now has verified template (bb-squeeze) + known failure mode (slow-grinder FKs at T=45)."
+  },
+  {
+    "timestamp": "2026-10-17T16:46:04Z",
+    "agent": "brain_auditor",
+    "change": "BTC SHORT #16258 SL raked 81766.566→81525.0 (breakeven+tick) — regime flipped SHORT_BIAS 16:00, position_manager frozen by vacation-guardrail, manual risk-free lock. TP 80299 unchanged.",
+    "type": "tweak",
+    "file": "brain DB trade 16258 stop_loss",
+    "before": "81766.566",
+    "after": "81525.0",
+    "rationale": "Watchdog deep-analysis endorsed (16:16 UTC). BTC under EMA300 456m, 110/126 tokens SHORT_BIAS, trade +0.32% aligned. Full giveback risk eliminated.",
+    "impact": "Risk-free position; if BTC dumps into expansion TP pays 1:5; if bounce, exit at ~breakeven"
   }
 ]
