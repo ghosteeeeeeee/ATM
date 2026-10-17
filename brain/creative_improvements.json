@@ -5017,5 +5017,15 @@
       "MFE_max": 0.2,
       "evaluate_at": "2026-11-01"
     }
+  },
+  {
+    "date": "2026-10-17T09:44:07Z",
+    "idea": "Pre-register MFE-CUT MFE_MAX 0.20→0.40 extension (non-pump-chain scope) for Nov 1 review",
+    "rationale": "atr_sl_hit near-arm band (MFE 0.20-0.40) is 19T −$2.01/14d with MAE 0.60 = 2x MFE. These trades show momentum but never reach trail arm, then reverse into ATR SL. Current shadow MFE_MAX=0.20 only catches dead entries. Scoped: exempt pump-chain family (has trail-arm-timeout at 45m already — would collide). doji near-arm cohort (5T −$0.57) ages out post-rekill.",
+    "expected_impact": "If shadow data confirms: potentially −$1.50 to −$2.00/14d saved from near-arm reversals without touching dead-entry or pump-chain grind logic",
+    "category": "exit sniper",
+    "status": "pre-registered",
+    "risk": "low — shadow first, Nov 1 review decides",
+    "data_needed": "MFE-CUT shadow fire logs at 0.20 vs counterfactual 0.40 (position_manager already tracks live_pnl; peak-MFE logging one-line addition if needed at review time)"
   }
 ]

@@ -1880,3 +1880,12 @@
 [2026-10-17 02:13 UTC]   🟢 OK: ai-trader-manual: 6 trades, 50.0% WR, PnL=0.59
 [2026-10-17 02:13 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-17 02:13 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-17 08:13 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-17 08:13 UTC]   🟡 RAPID DISABLE BLOCKED: pump-chain-: 0.0% WR but has winning regimes: ['NORMAL']
+[2026-10-17 08:13 UTC]     → Keeping alive in habitat: NORMAL
+[2026-10-17 08:13 UTC]   🟢 OK: ai-trader-manual: 5 trades, 40.0% WR, PnL=-0.8
+[2026-10-17 08:13 UTC]   🟢 OK: bb-bounce-v2-long+: 5 trades, 40.0% WR, PnL=-1.38
+[2026-10-17 08:13 UTC]   🟢 OK: doji-bottom-long: 10 trades, 40.0% WR, PnL=-3.65
+[2026-10-17 08:13 UTC]   🟢 OK: ai-trader+: 6 trades, 50.0% WR, PnL=-1.63
+[2026-10-17 08:13 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-17 08:13 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
