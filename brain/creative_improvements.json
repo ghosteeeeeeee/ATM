@@ -5153,5 +5153,23 @@
     "category": "direction filter",
     "status": "suggested",
     "risk": "zero (shadow only)"
+  },
+  {
+    "date": "2026-10-17T21:43:18Z",
+    "idea": "MFE-CUT shadow FIRST LIVE VALIDATION — WLD #16259 would-fire at 54m/-0.28%, actual hard_sl at 56m/-0.70%. Half the loss avoided. Strengthens flip case but candle-level OOS + 14d shadow data + CEO GO still required per process.",
+    "rationale": "Zero-behavior shadow did exactly what it was built for: proved the counterfactual on a real trade without risk.",
+    "expected_impact": "If flipped with OOS pass: cut never-armed stalls before full ATR stop. Prior counterfactual 30d: T=45/MFE=0.20 catches 33 HML saves $4.14.",
+    "category": "exit engine",
+    "status": "shadow-validated-1st-fire",
+    "risk": "low (still zero-behavior)"
+  },
+  {
+    "date": "2026-10-17T21:43:18Z",
+    "idea": "pp-conditional penalty floor: instead of flat 0.5, scale floor by penalty_raw. pp<0.10 (catastrophic history like WLD 0.014) -> floor stays 0.3; pp 0.10-0.5 -> floor 0.5. Preserves CEO intent (rescue mixed-signal 0.1-0.5) while stopping catastrophic-history rescues.",
+    "rationale": "Floor-admit shadow: 32T 11W/21L -$1.40 since Oct 15. WLD pp=0.014 is an extreme case the flat 0.5 floor cannot distinguish from pp=0.3 mixed-signal.",
+    "expected_impact": "Would have blocked WLD (pp=0.014). Needs cohort split: pp<0.10 sub-cohort PnL vs pp 0.10-0.5 sub-cohort before any change.",
+    "category": "entry sniper",
+    "status": "suggested-ceo-escalation",
+    "risk": "medium (touches CEO-owned floor)"
   }
 ]
