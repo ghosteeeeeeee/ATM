@@ -1,40 +1,6 @@
 [
   {
     "level": "WARNING",
-    "message": "Early escalation: 48h WR 36.9% < 40.0% with 65 trades",
-    "data": {
-      "pnl_24h": -1.14,
-      "n_24h": 52,
-      "wr_24h": 40.4,
-      "pnl_48h": -1.27,
-      "n_48h": 65,
-      "wr_48h": 36.9,
-      "pnl_7d": -2.09,
-      "n_7d": 227,
-      "wr_7d": 36.1,
-      "checked_at": "2026-10-16T19:38:20.385900+00:00"
-    },
-    "ts": "2026-10-16T19:38:20.386456+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "Early escalation: 48h WR 36.9% < 40.0% with 65 trades",
-    "data": {
-      "pnl_24h": -1.11,
-      "n_24h": 51,
-      "wr_24h": 41.2,
-      "pnl_48h": -1.27,
-      "n_48h": 65,
-      "wr_48h": 36.9,
-      "pnl_7d": -2.09,
-      "n_7d": 227,
-      "wr_7d": 36.1,
-      "checked_at": "2026-10-16T20:08:20.696467+00:00"
-    },
-    "ts": "2026-10-16T20:08:20.696885+00:00"
-  },
-  {
-    "level": "WARNING",
     "message": "Early escalation: 48h WR 36.5% < 40.0% with 63 trades",
     "data": {
       "pnl_24h": -1.11,
@@ -848,5 +814,39 @@
       "checked_at": "2026-10-17T18:38:29.388944+00:00"
     },
     "ts": "2026-10-17T18:38:29.391155+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.5% < 35.0% AND pnl_7d $-2.60 < $-2.00 (206T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.66,
+      "n_24h": 9,
+      "wr_24h": 33.3,
+      "pnl_48h": -1.77,
+      "n_48h": 61,
+      "wr_48h": 39.3,
+      "pnl_7d": -2.6,
+      "n_7d": 206,
+      "wr_7d": 34.5,
+      "checked_at": "2026-10-17T19:08:29.458698+00:00"
+    },
+    "ts": "2026-10-17T19:08:29.461727+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.5% < 35.0% AND pnl_7d $-2.60 < $-2.00 (206T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.61,
+      "n_24h": 8,
+      "wr_24h": 37.5,
+      "pnl_48h": -1.75,
+      "n_48h": 60,
+      "wr_48h": 40.0,
+      "pnl_7d": -2.6,
+      "n_7d": 206,
+      "wr_7d": 34.5,
+      "checked_at": "2026-10-17T19:38:29.768796+00:00"
+    },
+    "ts": "2026-10-17T19:38:29.769936+00:00"
   }
 ]

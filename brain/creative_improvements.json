@@ -5117,5 +5117,32 @@
     "risk": "medium — fk tail on big recovering winners; shadow-first mandatory",
     "verdict_file": "brain/verdicts/2026-10-17_arm-breakeven-stop.md",
     "script": "analysis/arm_breakeven_stop_2026-10-17.py"
+  },
+  {
+    "date": "2026-10-17T19:42:51.264078+00:00",
+    "idea": "doji-bottom-long re-enable with meta-RSI execution floor (MIN=35) + EXTREME block",
+    "rationale": "All-time rsi<30 = 8T 37.5% -$0.59 (knife). rsi 40-60 = 21T 62% +$0.37 (reclaim winners). Oct 14-16 re-enable cohort: winners at RSI 40-56, losers at RSI 27-49. Pre-Oct13 25T 56% +$0.55 was profitable. The bleed is deep-oversold entries only.",
+    "expected_impact": "Block ~$0.59/30d of knife losses while preserving reclaim winners. Re-enable with HIGH-block variant (EXTREME 0% WR confirmed).",
+    "category": "entry sniper",
+    "status": "documented — n<20 knife band, awaiting more data + CEO approval for re-enable",
+    "risk": "low (signal currently dead; change is preparation only)"
+  },
+  {
+    "date": "2026-10-17T19:42:51.264081+00:00",
+    "idea": "volume-buildout- SHORT confidence boost (monitor)",
+    "rationale": "8T 87.5%WR +$0.38, trail-arm 87.5%, avg RSI 54.5. Only signal with >80% trail rate. Genuine trend signal — fires when volume builds into a directional move. Mirror asymmetry: volume-buildout+ LONG is dead (20% trail), volume-buildout- SHORT is excellent.",
+    "expected_impact": "+$0.10-0.20/week if edge holds at higher confidence",
+    "category": "confidence tuning",
+    "status": "monitor — n=8 < 20 threshold. Revisit at n=20.",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-17T19:42:51.264082+00:00",
+    "idea": "LONG RSI 70+ band is profitable — challenge the ceiling assumption",
+    "rationale": "7d LONG rsi 70+: 31T 35.5%WR +$0.59 — only positive LONG band. LONG_RSI_CEILING=75 blocks 75+. The 70-75 band was previously validated positive (30d +$0.24). CEO froze churn to Oct 24. The high-RSI LONG narrative may be wrong for trending entries.",
+    "expected_impact": "If ceiling raised to 80: ~$0.20-0.40/30d from 75-80 band (was +$0.51 all-time before Oct 9 change)",
+    "category": "ceiling review",
+    "status": "frozen until Oct 24 per CEO directive. Documented for re-evaluation.",
+    "risk": "medium (sample confounded by pump-chain+ which fires at high RSI)"
   }
 ]
