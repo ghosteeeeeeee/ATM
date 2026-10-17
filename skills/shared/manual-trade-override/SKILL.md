@@ -23,8 +23,10 @@ Open trades directly on Hyperliquid, bypassing signal gates. **ONLY use when CEO
 ## Command
 
 ```bash
-cd /root/.hermes/scripts && python3 brain.py trade add COIN DIRECTION AMOUNT ENTRY --real --signal ai-trader-manual --strategy ai-trader --confidence 70 --leverage 5 --sl STOP_LOSS --target TAKE_PROFIT
+cd /root/.hermes/scripts && python3 brain.py trade add COIN DIRECTION AMOUNT ENTRY --real --manual --signal ai-trader-manual --strategy ai-trader --confidence 70 --leverage 5 --sl STOP_LOSS --target TAKE_PROFIT
 ```
+
+**`--manual` flag**: Bypasses the vacation guardrail pause marker. Without it, manual trades are blocked when the guardrail auto-pauses (7d WR < 35%). The guardrail still gates automated signal execution — only direct CEO commands with `--manual` pass through.
 
 ## Parameters
 
@@ -35,6 +37,7 @@ cd /root/.hermes/scripts && python3 brain.py trade add COIN DIRECTION AMOUNT ENT
 | `AMOUNT` | ✅ | USDT amount (before leverage) | `11.10` |
 | `ENTRY` | ✅ | Current market price | `0.86897` |
 | `--real` | ✅ | Real trade (not paper) | `--real` |
+| `--manual` | ✅ | Bypass vacation pause marker | `--manual` |
 | `--signal` | ✅ | Signal source tag | `ai-trader-manual` |
 | `--strategy` | ✅ | Strategy name | `ai-trader` |
 | `--confidence` | ✅ | Confidence 0-100 | `70` |
@@ -72,7 +75,7 @@ conn.close()
 "
 
 # 3. Open trade (example: $11 USDT, 5x leverage, SL 3% below, TP 4% above)
-python3 brain.py trade add GRASS long 11.10 0.86897 --real \
+python3 brain.py trade add GRASS long 11.10 0.86897 --real --manual \
     --signal ai-trader-manual --strategy ai-trader --confidence 70 \
     --leverage 5 --sl 0.8437 --target 0.8853
 ```
