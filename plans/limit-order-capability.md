@@ -1,5 +1,7 @@
 # Plan: Limit Order Capability for Manual Trades
 
+**Status:** PHASE 1 SHIPPED 2026-10-17 — `scripts/limit_order.py` (place/list/cancel subcommands, dry-run + confirm guards, HL min-notional check). Tested: dry-run sizing (SELL 0.00068 BTC @ 82100, 5x), live list API, min-notional rejection. Phases 2–4 (brain.py --limit, --tif on trade add, guardian fill-integration) DEFERRED until standalone is proven in use.
+
 ## Context
 Manual trades currently use market orders via `brain.py trade add`. When the CEO identifies a setup at a specific price level (e.g., "SHORT at EMA180 rejection"), there's no way to place a limit order that fills at that price. The trade would need to be entered manually when price reaches the level.
 

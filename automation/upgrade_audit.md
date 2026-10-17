@@ -961,3 +961,33 @@
 2. **limit-order-capability** — Level 2 — MED — plan ready, standalone script first (skip brain.py --limit until standalone proven)
 3. **RR engine U2–U4** — Level 2–3 — HIGH — shadow-mode only, automatic-implementation pattern, needs CEO sequencing
 4. **temporal-confluence / short-rsi-habitat / vol-regime-relative** — Level 2–3 — MED-HIGH — all CEO-gated SPECs
+
+---
+
+## Upgrade Implementer Session — 2026-10-17 15:00 UTC
+
+**Context:** pipeline PAUSED (vacation guardrail, resume ~Oct 23), kill JSON live_trading=false, soak discipline = 0 live-behavior changes across all agents. Scoped to non-trading-logic wins only.
+
+### Plan evaluations (recent-20 re-scan)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| limit-order-capability | L2 | MED | ✅ PHASE 1 SHIPPED | `scripts/limit_order.py` created (place/list/cancel). brain.py --limit + guardian fill-integration deferred per plan ("standalone first") |
+| t-vacation-mode-2026-10-14 | L4 | HIGH | ✅ MoE table updated | #2 conf-clamp already live (decider_run.py:1996); #3 broken-SHORT tail partially done (pullback-entry−/mover± all killed); #1 PARTIAL (CUT_LOSER widened + ATR mult, study escalated) |
+| signal-starvation-fix-2026-10-12 | L1-2 | HIGH | ⏳ CEO-gated | hermes_constants DO-NOT-MODIFY + soak; RR momentum U1 already live in shadow |
+| contrarian-engine / temporal-confluence / short-rsi-habitat / vol-regime-relative / regime-recalibration | L2-3 | MED-HIGH | ⏳ PENDING CEO | SPECs awaiting approval; no code during pause |
+| 2026-10-16_winning-dna-remeasure-verdict | — | HIGH | ✅ CLOSED (prior session) | Escalation on CEO kanban |
+| exit-ladder candle OOS (brain_auditor P0) | L2-3 | HIGH | ⏸️ NOT TOUCHED | brain_auditor plans in-house candle OOS Oct 18; universal MFE-cut already FAILed candle OOS — remaining work is signal-scoped, duplicating risks the pattern-trap |
+| signal_version.py missing | L1 | LOW | ⏸️ SKIPPED | YAGNI — only a paths.py constant, nothing imports the module |
+
+### Implemented this session (1 × Level 2)
+
+1. **`scripts/limit_order.py`** (new, ~150 LOC) — standalone HL limit-order tool: `place` (positional coin/side/price/amount-margin, --lev/--tif/--sl/--target, confirm prompt + --yes + --dry-run, HL min-notional guard, sz rounded UP via _sz_decimals, leverage set pre-order), `list` (openOrders, per-coin filter), `cancel` (reuses cancel_all_open_orders). Verification: py_compile OK; dry-run sizing SELL 0.00068 BTC @ $82100 5x ✓; min-notional rejection ($5 < $11) ✓; live `list` API ✓. Zero impact on automated trading (manual tool only).
+
+2. **Doc updates** — plans/limit-order-capability.md marked PHASE 1 SHIPPED; plans/t-vacation-mode-2026-10-14.md MoE Top-3 table statuses corrected with evidence (was all-PENDING; #2 was already live since Oct 15).
+
+### Next candidates
+1. Exit-ladder signal-scoped candle OOS — L2-3 — HIGH — brain_auditor in-house Oct 18; do not duplicate
+2. SL-width / entry-gate study — L2 — HIGH — CEO kanban GO pending
+3. brain.py --limit + guardian fill-integration — L2 — MED — only after limit_order.py proven in real use
+4. RR engine U2–U4 — L2-3 — HIGH — needs CEO sequencing, shadow-mode pattern
