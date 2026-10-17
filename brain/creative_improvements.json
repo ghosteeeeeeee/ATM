@@ -4975,5 +4975,14 @@
     "category": "exit ladder",
     "status": "shadow-shipped — collecting, zero behavior",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-17T05:40:00Z",
+    "idea": "EXTREME regime position-size dampener (0.7x size multiplier)",
+    "rationale": "EXTREME is 54% of trades at 26.7%WR. Confidence penalty reduces entries but not size of survivors. 0.7x size cuts dollar exposure proportional to regime risk.",
+    "expected_impact": "Reduce EXTREME dollar bleed ~30% without blocking trades",
+    "category": "risk sizing",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

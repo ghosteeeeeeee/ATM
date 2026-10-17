@@ -1027,7 +1027,12 @@ SHORT_NORMAL_PENALTY = 0.85  # brain_auditor Sep 21 — ALL SHORT signals in NOR
 # EXTREME 179T 49.7%WR -$0.39 (best), NORMAL 90T 46.7%WR -$1.38 (worst).
 # Boosts confidence for EXTREME trades, reduces for NORMAL. No trades blocked.
 REGIME_CONF_MULTIPLIER_ENABLED = True
-REGIME_CONF_EXTREME_MULT = 1.15   # +15% confidence boost in EXTREME vol
+# brain_auditor 2026-10-17: 1.15→0.85. Sep 24 data (EXTREME best 49.7%WR) INVERTED.
+# 7d EXTREME: 120T 26.7%WR -$1.99 (worst regime, 54% of all trades).
+# 14d conf<67.6 band (blocked at 0.85x): 76T 19.7%WR -$2.96 | conf>=67.6 (pass): 90T 37.8%WR +$1.79.
+# Net save $2.96/14d. Big winners safe: pump-chain+ EXTREME avg conf 102 → 75.6 at 0.85x.
+# Matches NORMAL penalty symmetry; HIGH already at 0.70 (CEO Oct 10). Revert to 1.15 if 7d EXTREME WR >=45%.
+REGIME_CONF_EXTREME_MULT = 0.85   # -15% confidence penalty in EXTREME vol (was +15% boost — stale Sep 24 data)
 REGIME_CONF_NORMAL_MULT  = 0.85   # -15% confidence penalty in NORMAL vol
 REGIME_CONF_HIGH_MULT    = 0.70   # -30% confidence penalty in HIGH vol — CEO Oct 10: Sep 26 "dead zone" (42.9%WR) stale; last 14d HIGH 102T 52.0%WR -$1.51. bb-squeeze+ HIGH 39T 61.5%WR passes at 0.70x (~60% exec). ZORA/ai-trader stays blocked (35%). Revert to 0.50 if 7d HIGH WR <45% or PnL worsens >-$2/7d.
 REGIME_CONF_FLAT_MULT    = 1.0    # no adjustment for FLAT (too few trades)

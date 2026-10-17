@@ -1496,5 +1496,16 @@
     "after": "MFE_CUT_SHADOW_ENABLED=True MIN=45 MFE_MAX=0.20; PM logs [SHADOW] MFE-CUT would-fire once/trade",
     "rationale": "Entry-filter family exhausted (Oct 16 verdict); exit-magnitude is THE lever. 30d counterfactual: 54T never-armed MFE<0.20 hold>=45m avoid -$7.46, false-kill winners 3T +$0.08. Shadow collects live data for CEO GO on progressive exit ladder.",
     "impact": "Zero live behavior. Data for exit-ladder flip decision. Revert: MFE_CUT_SHADOW_ENABLED=False."
+  },
+  {
+    "timestamp": "2026-10-17T05:40:00Z",
+    "agent": "brain_auditor",
+    "change": "REGIME_CONF_EXTREME_MULT 1.15→0.85 — stale Sep 24 boost corrected (EXTREME flipped best→worst regime)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "REGIME_CONF_EXTREME_MULT = 1.15",
+    "after": "REGIME_CONF_EXTREME_MULT = 0.85",
+    "rationale": "7d EXTREME 120T 26.7%WR -$1.99 (worst, 54% of trades). Sep 24 deploy data (EXTREME best 49.7%WR) inverted. 14d: block conf<67.6 band 76T 19.7% -$2.96, keep conf>=67.6 90T 37.8% +$1.79. Net save $2.96/14d. Matches NORMAL 0.85 symmetry; HIGH already 0.70.",
+    "impact": "Reduce EXTREME false entries. Revert: set 1.15 if 7d EXTREME WR >= 45%."
   }
 ]
