@@ -4984,5 +4984,24 @@
     "category": "risk sizing",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-17T06:45:00Z",
+    "idea": "Two-tier exit ladder (staged): keep MFE-CUT shadow T=45m/MFE<0.20 as tier-2; pre-register tier-1 T=30m/MFE<0.15 for evaluation at shadow review",
+    "rationale": "30d trades-level counterfactual: tier-2 cell (45/0.20) n=73 0Wins sum=-$9.94; tier-1 cell (30/0.15) n=82 0Wins sum=-$11.97. ZERO winners at MFE<0.20 hold>=45m over 30d — shadow params have perfect false-kill record. Progressive ladder remains THE exit-magnitude lever (entry-filter family exhausted Oct 16).",
+    "expected_impact": "If live shadow confirms, tier-2 alone targets ~$4-7/30d net save (partial realization vs full -9.94); tier-1 adds earlier cuts on 82T cohort",
+    "category": "progressive exit ladder",
+    "status": "staged",
+    "risk": "zero now (shadow collects); tier-1 gated on tier-2 shadow review + CEO GO + candle OOS",
+    "data": "brain/audit_recommendations.json 2026-10-17T06:45"
+  },
+  {
+    "date": "2026-10-17T06:45:00Z",
+    "idea": "bb-squeeze trail-arm timeout T=60m is structurally vacuous — suggest backtest T=35-40m (NOT a live change)",
+    "rationale": "Since Oct 12 bb-squeeze has only 4 closes: 3 profit-monster-trail (med 20m, armed early) + 1 HML at 32m. Nothing survives past 32m un-armed, so T=60m can never fire. Harmless no-op, but the family's HML trades (pre-fix 17T -$2.44) exit at ~30m — a T=35m timeout would race HML. Needs candle-level OOS before any T change.",
+    "expected_impact": "unknown — backtest first",
+    "category": "trail-arm timeout",
+    "status": "suggested",
+    "risk": "low (suggestion only)"
   }
 ]
