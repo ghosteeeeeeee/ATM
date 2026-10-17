@@ -150,6 +150,14 @@
         return Math.floor(s/86400) + 'd ago';
     }
 
+    // Escape HTML — steer title/detail come from config JSON (bug_hunter: innerHTML injection)
+    function escHtml(s) {
+        if (s === null || s === undefined) return '';
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+    }
+
     function regimeBadge(r) {
         if (!r || r === 'unknown') return '<span class="regime-badge regime-unknown">?</span>';
         const cls = r.includes('bull') || r.includes('expansion') || r.includes('rising') ? 'regime-bull' :
@@ -247,13 +255,13 @@
         } else {
             const icons = { urgent: '🔴', warning: '🟡', info: '🟢' };
             sc.innerHTML = steers.map(s => `
-                <div class="steer steer-${s.severity}">
+                <div class="steer steer-${escHtml(s.severity)}">
                     <div class="steer-header">
                         <span class="steer-icon">${icons[s.severity] || '⚪'}</span>
-                        <span class="steer-title">${s.title || 'Steer'}</span>
-                        <span class="steer-category">${s.category || ''}</span>
+                        <span class="steer-title">${escHtml(s.title) || 'Steer'}</span>
+                        <span class="steer-category">${escHtml(s.category) || ''}</span>
                     </div>
-                    <div class="steer-detail">${s.detail || ''}</div>
+                    <div class="steer-detail">${escHtml(s.detail) || ''}</div>
                 </div>
             `).join('');
         }

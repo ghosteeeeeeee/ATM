@@ -1233,3 +1233,6 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3535s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3484s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3421s left, N failures)`
+
+## Error Alerts — 2026-10-17 18:08 UTC
+- **REPEATED** (11x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`

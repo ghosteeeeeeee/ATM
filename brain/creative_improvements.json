@@ -5099,5 +5099,23 @@
     "category": "measurement",
     "status": "suggested",
     "risk": "zero (shadow-only, needs self_learner backtest before any live path)"
+  },
+  {
+    "date": "2026-10-17T18:47:41Z",
+    "idea": "ARM-BREAKEVEN-STOP: once trail arms (+0.40%), if live_pnl returns to <=0, exit at breakeven — caps armed-then-reverse give-backs (D3 trail floor rides to -3% acct)",
+    "rationale": "12:20 cohort (armed-then-reverse) is distinct from never-armed chop; TAT cannot catch it. Backtest: 30d 778T candle OOS.",
+    "results": {
+      "universe_30d": "PASS — 184 fired, fk 16.5% of 346 armed winners, NET +$5.94, med arm->BE 15m",
+      "oos_15d_halves": "NET +$3.03 (old) / +$2.91 (new) — positive both halves; fk% 21.9 / 10.1",
+      "non_EXTREME": "PASS both halves — fk 12.6/6.7%, NET +$2.11/+1.35 — THE clean scope (12:20 EXTREME hypothesis INVERTS: EXTREME fails fk 26.6%)",
+      "exclusions": "volume- family FAIL (fk tail COMP/SUPER); pump-chain± fail fk — out of scope"
+    },
+    "expected_impact": "+$3-6/30d at current sizing on non-EXTREME armed trades (pre-fee); complements TAT (different cohort: armed-then-reverse vs never-armed stall)",
+    "category": "exit mechanism",
+    "status": "backtested_pre-registered",
+    "next": "zero-behavior PM shadow (non-EXTREME, exclude volume-) + v6 exit-stack integration with fee/re-arm modeling — CEO GO before live",
+    "risk": "medium — fk tail on big recovering winners; shadow-first mandatory",
+    "verdict_file": "brain/verdicts/2026-10-17_arm-breakeven-stop.md",
+    "script": "analysis/arm_breakeven_stop_2026-10-17.py"
   }
 ]

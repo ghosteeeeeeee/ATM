@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-17T17:38:28.874178+00:00",
+  "timestamp": "2026-10-17T18:38:29.394195+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -36,18 +36,22 @@
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
     "acceleration_state": "FLAT",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 0
+  "open_count": 0,
+  "deep_analysis": "0 open trades \u2014 nothing to steer on positions. Health critical purely from the losing streak: 13/20 recent closes lost, 25% WR.\n\nMarket: BTC 15m/4h scanners both SHORT_BIAS and market_phase DECLINING, but BTC just reclaimed EMA300 (was below 696 min, now AT 81478 vs EMA 81415) with STRONG_POS zscore and short-term slopes up. This is a declining larger phase with an active bounce \u2014 the worst environment for both blanket longs and blanket shorts, and it explains the last 48h of losses on both sides (LONG -0.90/45 trades, SHORT -0.50/17 trades).\n\nVerified loss anatomy (PostgreSQL, 48h): exits that never arm the trail are the bleed \u2014 atr_sl_hit 19 trades 1W -1.69, hard_max_loss 8 trades 0W -0.96, trail_arm_timeout 4 trades 0W -0.30. Exits that ride trails are the harvest \u2014 profit-monster-trail 13/14W +0.54, atr_trail_hit 6/7W +1.13. Every recent loss is a trade that entered during chop/bounce and died before the trend family could take over.\n\nWrong-side cases: doji-bottom-long bought deep-oversold knives (meta_rsi <40: ZEN 29.5, CRV 39.8, WCT 27.8 \u2014 0W/5L in 7d) while its wins all came from mid-band entries (40-56) that trailed. pump-chain- SHORT shorted mid-band pumps (meta_rsi 42-56) and went 0W/8L \u2014 the winning side on those same moves was LONG (pump-chain+ LONG +0.36/48h with trail wins). We keep picking the side that the other participant fades.\n\nAPT LONG fill at meta_rsi 33.7 (pick was 57.1) = hard_max_loss -4.2%. Drift guard (rsi_at_pick) now in place because of this exact trade.\n\nBottom line: we are not unlucky \u2014 we are entering on the wrong side of chop and calling it signal noise. Trend entries (trail family) still print; chop entries (SL family) still bleed. Nothing to close right now (flat book), so the action is on entry quality, not position management.",
+  "agent_timestamp": "2026-10-17T18:15:43.799485+00:00",
+  "regime_context": "BTC: 15m SHORT_BIAS, 4h SHORT_BIAS, continuum AT EMA300 (just reclaimed after ~11.6h below), zscore STRONG_POS, velocity SLOW, acceleration POSITIVE, linreg LEAN_BULL short-term / negative 1h, market_phase DECLINING, trend_quality STRONG_UP, state_score 79.8.\n\nRead: larger phase is declining, current tape is a bounce above EMA300 with resistance confluence 81550-81616 overhead. 15m scanner aggregate: SHORT_BIAS 13 / LONG_BIAS 8 / neutral 99 of 120 tokens. Volatility NORMAL. Implications: (1) chasing longs into the 81.5k resistance ceiling is low-edge; (2) shorting mid-band pumps keeps getting stopped by the bounce (0/8 pump-chain-); (3) the only clean wins lately are coins that actually trend (PUMP +1.1%/3h with volume, FIL/USELESS/GRASS sustained down but RSI now >65 so short band blocks them). Wait for either a clean rejection at 81550-81616 to re-enter shorts with the trend, or a pullback that holds EMA300 to resume longs.",
+  "pattern_alerts": "VERIFIED (PostgreSQL brain DB, queried this run):\n\n1) doji-bottom-long deep-oversold knife catch \u2014 n=5 entries at meta_rsi<40 in 7d (ZEN 29.5, CRV 39.8, WCT 27.8, plus BANANA 13.3, ME 4.0 from 10-13): 0W/5L, all atr_sl/hard_max/stale exits. Same signal at meta_rsi 40-56: GMT/DOGE/ONDO/XPL/WLFI all profit-monster-trail wins. All-time n=36, 19W, +0.04 total. WINNING side: not buying a falling knife \u2014 the dump continued; either stay out or short the breakdown. Mid-band reclaim longs work; deep oversold longs are the wrong side in a DECLINING phase.\n\n2) pump-chain- SHORT mid-band \u2014 n=8 in 48h, 0W, -0.49 USDT. Entry meta_rsi 42-56 (FIL 42.2, DOT 43.5/55.6, INJ 52.9, GRASS 43.6, CRV 48.2, IO 48.5, APT 47.3); 7/8 atr_sl_hit = the pump continued and stopped us out. WINNING side: LONG those same pumps \u2014 pump-chain+ LONG made +0.36 on 7 trades in the same window with the big trail winners. We shorted the momentum; the long side got paid.\n\n3) Trail vs chop exit split \u2014 48h: trail exits 21 trades, 19W, +1.67 combined; SL/max-loss exits 32 trades, 1W, -3.04 combined. Confirms house edge lives entirely in trades that reach +0.40% and arm the trail; every loser family is chop entries that never get there.\n\n4) APT ai-trader+ LONG drift \u2014 pick-time RSI 57.1, fill-time meta_rsi 33.7, hard_max_loss -4.24%. Not an entry-quality miss; a staleness/drift miss. rsi_at_pick + AI_TRADER_RSI_DRIFT_MAX guard is the fix already deployed.\n\nNo open positions repeat any of these right now (book is flat)."
 }

@@ -957,32 +957,72 @@ def analyze_coin_heat(open_trades, coin_tracker):
 # ============================================================
 
 def collect_btc_price():
-    """Current BTC price from local 1m candles DB (preferred over API per SOP)."""
+    """Current BTC price from local 1m candles DB (preferred over API per SOP).
+
+    FIX (2026-10-17, bug_hunter): try/finally closes connection on all paths;
+    rejects candles older than 5 min (stale price would fire alerts on frozen data).
+    """
+    import sqlite3
+    conn = None
     try:
-        import sqlite3
         db_path = os.path.join(HERMES_DATA, "candles.db")
         conn = sqlite3.connect(db_path)
         cur = conn.cursor()
-        cur.execute("SELECT close FROM candles_1m WHERE token='BTC' AND is_closed=1 "
+        cur.execute("SELECT close, ts FROM candles_1m WHERE token='BTC' AND is_closed=1 "
                     "ORDER BY ts DESC LIMIT 1")
         row = cur.fetchone()
-        conn.close()
-        return float(row[0]) if row else None
+        if not row:
+            return None
+        price = float(row[0])
+        # Freshness guard: reject candles older than 5 min (bug_hunter: alerts
+        # firing on frozen price when price_collector timer dies)
+        ts = row[1]
+        try:
+            ts_epoch = float(ts)
+            if ts_epoch > 1e12:  # milliseconds
+                ts_epoch /= 1000.0
+            elif ts_epoch < 1e9:  # already too small to be a valid epoch
+                ts_epoch = None
+        except (TypeError, ValueError):
+            ts_epoch = None
+        if ts_epoch is not None and (time.time() - ts_epoch) > 300:
+            log(f"BTC candle stale ({(time.time()-ts_epoch)/60:.1f}min old) — "
+                f"price alerts skip this cycle", "WARN")
+            return None
+        # Sanity: negative/zero price = corrupt candle
+        if price <= 0:
+            log(f"BTC candle corrupt (close={price}) — price alerts skip", "WARN")
+            return None
+        return price
     except Exception as e:
         log(f"BTC price fetch failed: {e}", "WARN")
         return None
+    finally:
+        try:
+            if conn:
+                conn.close()
+        except Exception:
+            pass
 
 
 def analyze_price_alerts(btc_price):
     """Persistent price-level alerts (CEO-configured via watchdog_price_alerts.json).
 
     Fires once per crossing; re-arms when price returns past the rearm level.
-    Survives session restarts — runs every watchdog cycle (30 min).
+    Survives session restarts — runs every watchdog cycle.
     Config format: {"alerts": [{"id", "coin", "level", "direction": "above"|"below",
                                 "rearm", "severity", "title", "detail"}]}
+
+    FIX (2026-10-17, bug_hunter FAIL): every alert is validated and isolated —
+    a malformed entry (non-numeric level, direction typo, rearm on wrong side of
+    level, bad format placeholders, non-dict config) logs a WARN and skips that
+    entry instead of crashing the whole watchdog cycle (which would kill
+    profit-lock steers for open trades too).
     """
     steers = []
     if btc_price is None or not os.path.exists(PRICE_ALERT_CONFIG):
+        return steers
+    if btc_price <= 0:  # corrupt price — never evaluate alerts against it
         return steers
     try:
         with open(PRICE_ALERT_CONFIG) as f:
@@ -990,54 +1030,127 @@ def analyze_price_alerts(btc_price):
     except Exception as e:
         log(f"price alert config unreadable: {e}", "WARN")
         return steers
+    # Type-check: config must be a dict with an alerts LIST (bug_hunter: a bare
+    # list or string config crashed the cycle)
+    if not isinstance(cfg, dict) or not isinstance(cfg.get("alerts"), list):
+        log("price alert config malformed: expected {\"alerts\": [...]} — skipping", "WARN")
+        return steers
     state = {}
     if os.path.exists(PRICE_ALERT_STATE):
         try:
             with open(PRICE_ALERT_STATE) as f:
                 state = json.load(f)
+            if not isinstance(state, dict):
+                state = {}
         except Exception:
             state = {}
     changed = False
-    for alert in cfg.get("alerts", []):
-        aid = alert.get("id", "unnamed")
-        coin = alert.get("coin", "BTC")
-        if coin != "BTC":
-            continue  # only BTC priced from candles_1m for now
-        level = float(alert.get("level", 0))
-        direction = alert.get("direction", "above")
-        rearm = alert.get("rearm")
-        fired = state.get(aid, {}).get("fired", False)
-        if fired:
-            # Already alerted — check re-arm (price returned to safe side)
+    seen_ids = set()
+    for alert in cfg["alerts"]:
+        # Per-alert isolation: any error in one entry skips it, never the cycle
+        try:
+            if not isinstance(alert, dict):
+                log(f"price alert entry not a dict — skipping: {alert!r}", "WARN")
+                continue
+            aid = alert.get("id")
+            if not aid or not isinstance(aid, str):
+                log(f"price alert entry missing string id — skipping", "WARN")
+                continue
+            if aid in seen_ids:
+                log(f"price alert duplicate id '{aid}' — second entry skipped "
+                    f"(state slots must be unique)", "WARN")
+                continue
+            seen_ids.add(aid)
+            coin = alert.get("coin", "BTC")
+            if coin != "BTC":
+                continue  # only BTC priced from candles_1m for now
+            # Validate level: required, numeric, positive (missing level used to
+            # default to 0 → 'above' fired at any price)
+            level_raw = alert.get("level")
+            if level_raw is None:
+                log(f"price alert {aid}: missing level — skipped", "WARN")
+                continue
+            level = float(level_raw)
+            if level <= 0:
+                log(f"price alert {aid}: level {level} not positive — skipped", "WARN")
+                continue
+            # Validate direction: exact match only (typos used to silently
+            # become 'below')
+            direction = alert.get("direction")
+            if direction not in ("above", "below"):
+                log(f"price alert {aid}: direction {direction!r} not "
+                    f"'above'/'below' — skipped", "WARN")
+                continue
+            # Validate rearm: if set, must be numeric and on the CORRECT side of
+            # level (above→rearm<level, below→rearm>level) — inverted rearm made
+            # alerts refire every other cycle inside the band
+            rearm = alert.get("rearm")
+            rearm_level = None
             if rearm is not None:
-                rearm_level = float(rearm)
-                safe = (btc_price <= rearm_level) if direction == "above" else (btc_price >= rearm_level)
-                if safe:
-                    state[aid] = {"fired": False, "price": btc_price, "ts": time.time()}
-                    changed = True
-                    log(f"price alert {aid} re-armed (BTC {btc_price:.0f} back past {rearm_level:.0f})")
+                try:
+                    rearm_level = float(rearm)
+                except (TypeError, ValueError):
+                    log(f"price alert {aid}: rearm {rearm!r} not numeric — skipped", "WARN")
+                    continue
+                if direction == "above" and rearm_level >= level:
+                    log(f"price alert {aid}: rearm {rearm_level} must be BELOW "
+                        f"level {level} for 'above' — skipped", "WARN")
+                    continue
+                if direction == "below" and rearm_level <= level:
+                    log(f"price alert {aid}: rearm {rearm_level} must be ABOVE "
+                        f"level {level} for 'below' — skipped", "WARN")
+                    continue
+            else:
+                log(f"price alert {aid}: no rearm — will fire once, never re-arm")
+
+            prev = state.get(aid)
+            fired = bool(prev.get("fired")) if isinstance(prev, dict) else False
+
+            if fired:
+                # Already alerted — check re-arm (price returned to safe side)
+                if rearm_level is not None:
+                    safe = (btc_price <= rearm_level) if direction == "above" \
+                        else (btc_price >= rearm_level)
+                    if safe:
+                        state[aid] = {"fired": False, "price": btc_price, "ts": time.time()}
+                        changed = True
+                        log(f"price alert {aid} re-armed (BTC {btc_price:.0f} "
+                            f"back past {rearm_level:.0f})")
+                continue
+
+            crossed = (btc_price >= level) if direction == "above" \
+                else (btc_price <= level)
+            if crossed:
+                # Guard .format(): unknown placeholders / positional {} must not
+                # crash the cycle — fall back to raw string
+                detail_raw = alert.get("detail") or \
+                    f"BTC {btc_price:.0f} crossed {direction} {level:.0f}"
+                try:
+                    detail = detail_raw.format(level=level, price=btc_price)
+                except (KeyError, IndexError, ValueError):
+                    detail = detail_raw  # bad placeholders — show raw text
+                steers.append({
+                    "severity": alert.get("severity", "urgent"),
+                    "category": "price-alert",
+                    "title": str(alert.get("title", f"Price alert {aid}")),
+                    "detail": detail,
+                    "trade_id": None,
+                    "auto_executable": False
+                })
+                state[aid] = {"fired": True, "price": btc_price, "ts": time.time()}
+                changed = True
+                log(f"🚨 price alert {aid} FIRED: BTC {btc_price:.0f} "
+                    f"crossed {direction} {level:.0f}")
+        except Exception as e:
+            log(f"price alert entry error (skipped, cycle continues): {e}", "WARN")
             continue
-        crossed = (btc_price >= level) if direction == "above" else (btc_price <= level)
-        if crossed:
-            detail = (alert.get("detail") or
-                      f"BTC {btc_price:.0f} crossed {direction} {level:.0f}").format(
-                          level=level, price=btc_price)
-            steers.append({
-                "severity": alert.get("severity", "urgent"),
-                "category": "price-alert",
-                "title": alert.get("title", f"Price alert {aid}"),
-                "detail": detail,
-                "trade_id": None,
-                "auto_executable": False
-            })
-            state[aid] = {"fired": True, "price": btc_price, "ts": time.time()}
-            changed = True
-            log(f"🚨 price alert {aid} FIRED: BTC {btc_price:.0f} crossed {direction} {level:.0f}")
+
     if changed:
         try:
             atomic_write_json(PRICE_ALERT_STATE, state)
         except Exception as e:
-            log(f"price alert state write failed: {e}", "WARN")
+            log(f"price alert state write failed: {e} — alert may refire "
+                f"next cycle until state persists", "WARN")
     return steers
 
 
