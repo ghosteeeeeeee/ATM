@@ -1,40 +1,34 @@
-# Current State — brain_auditor Captain Run Oct 17 13:40 UTC
+# Current State — brain_auditor Captain Run Oct 17 14:45 UTC
 
-**Last Updated: 2026-10-17 13:40 UTC**
-**Updated by: brain_auditor — soak verification + ai-trader doctrine-drift find, 0 behavior changes**
+**Last Updated: 2026-10-17 14:45 UTC**
+**Updated by: brain_auditor — EXIT-LADDER P0 CLOSED, 0 config changes**
 
-## PIPELINE STATUS (13:40 UTC)
+## PIPELINE STATUS (14:45 UTC)
 
-- **24h frozen (pre-pause cohort): 25T −$1.65 (28% WR)** | 1 open (BTC SHORT #16258 manual) | **7d 212T 34.4% −$2.86** | Health CRITICAL
-- **Pipeline STOPPED** (vacation-guardrail since 04:08) + kill JSON live_trading=false — flat is the trade, correctly held. Auto-resume ~Oct 21. **Defeated-pause check PASS** (0 closes since 04:08).
-- Regime: BTC SHORT_BIAS (15m/4h), vol LOW, AT EMA300, LEAN_BEAR. Entry 81522, SL 81766. HOLD; invalidation = 15m close >81592 w/vol.
-- Exit signature: **7d HML 58T −$5.12 0%WR vs profit-trail 44T +$2.89 93.2%WR | ATR_SL now 75T −$0.14 near-flat (trail-arm timeouts converting bleeds)**
-- **All 9 last-run changes HOLDING.** ai-trader drift guard now FUNCTIONAL (ai_trader_state writes rsi_at_pick — SEI pick 12:46 rsi=51.9; prior fail-open concern closed).
+- **24h frozen (pre-pause): 25T −$1.57 (26.1% WR)** | 1 open (BTC SHORT #16258 manual, ~flat 11.3h) | **7d 212T 34.4% −$2.86** | Health CRITICAL
+- **Pipeline PAUSED** (vacation-guardrail since 04:08) + kill JSON live_trading=false — flat is the trade. **Defeated-pause check PASS** (0 opens since 04:08). Auto-resume ~Oct 23 (rolling-7d aging math, 12:20 run).
+- Regime: BTC SHORT_BIAS (15m/4h), vol LOW, market CALM, continuum AT. #16258: entry 81522, SL 81766 — HOLD (trend-aligned, tight SL caps risk).
+- Exit signature 7d: **HML 58T −$5.12 0%WR | atr_sl 52T −$4.23 (ATR family 75T −$0.14 near-flat) | profit-trail 44T +$2.89 93.2% | atr_trail 23T +$4.09 82.6%**
+- **ai-trader rsi_at_pick concern CLOSED** — field written (SEI pick 12:46 rsi=51.9); first-resume-pick verify pending.
+- **SHORT floor-35 band HEALTHY** — since Oct 13: 27T −$0.06 37%WR; trigger (−$1.00) nowhere near; resets Oct 20.
 
-## ⚠️ THIS RUN'S FINDING — AI-TRADER DOCTRINE DRIFT (medium)
+## ⚠️ THIS RUN — EXIT-LADDER P0 CLOSED (8th request fulfilled)
 
-Pick reasoning calls SHORT 45-55 a "sweet spot" (SEI rsi 51.9) while decider_run.py:2098 blocks
-exactly that band for all non-pump-chain (14d 9T 0W −$0.89). Manual HL path bypasses decider
-gates — T's channel can enter what the signal channel refuses. **Creative (pre-registered, not
-shipped): SHORT-midband ADVISORY in ai_trader_precheck (warn-only).**
+brain_auditor ran the signal-scoped TAT candle OOS grid itself (self_learner undelivered
+8×). Script `analysis/exit_ladder_tat_grid_2026-10-17.py`, verdict
+`brain/verdicts/2026-10-17_exit-ladder-tat-grid.md`. 30d 782T, ARM 0.40 + creative
+ARM=0.0 (underwater-only, never tested in 11:05 MFE grid):
 
-## ⚠️ PRIOR RUN FINDING (11:46, still in force) — TRAIL-ARM-TIMEOUT CANDLE OOS (all 4 cohorts)
+| Family | Result |
+|--------|--------|
+| bb-squeeze LONG | **PASS all T∈[40,60] both ARMs** — live T=60 +$1.02 revalidated; T=55 delta $0.05 = noise, no churn |
+| pump-chain− SHORT | **FAIL all 14 (T×ARM) cells** — exit-side dead end (underwater winners recover); entry-gap diffuse; only lever = CEO kill decision |
+| pump-chain+ LONG | wash at live T=45; every T≥50 strictly worse (slow-grinder FKs) — keep |
+| Progressive ladder | **FORMAL DEAD** — same root as MFE-CUT: fixed-time cuts cannot separate slow grinders from chop |
 
-Same test class that killed universal MFE-CUT, now applied to the *signal-scoped* mechanism
-(as-coded: still open at age≥T AND live_pnl <0.40% → close). `analysis/trail_arm_candle_oos_2026-10-17.py`.
-**Units landmine: `pnl_usdt` = amount × unleveraged move; `pnl_pct` is LEVERAGED %. cf$ = amount × lp/100.**
-
-| Cohort | T | fires (FK winners) | NET | fk % of winners | Verdict |
-|--------|---|--------------------|-----|-----------------|---------|
-| bb-squeeze LIVE | 60m | 20 (5) | **+$1.02** | 11.1% | **CONFIRMED — exit-ladder template** |
-| pump-chain LIVE | 45m | 60 (21) | **−$0.13** | **36.8%** | wash — KEEP, "immune" claim RETRACTED |
-| bb-bounce SHADOW | 55m | 33 (18) | +$0.31 | **41.9%** | **FLIP FAILS (fk bar 20%)** |
-| ai-trader SHADOW | 55m | 3 (0) | +$0.26 | 0% | insufficient n — keep shadow |
-
-- pump-chain prior "+$1.75 structurally immune" was selection-on-outcome: FOGO/AVAX/ADA/JUP were <0.40% at T=45m yet ended +4-6% unleveraged (slow grinders). Saves $3.18 ≈ costs $3.31 — net zero. No mechanism change (churn risk > $0.13/30d).
-- bb-bounce: bounce winners run late (flat at 55m then trail). **Do NOT flip T=55 without redesign clearing fk≤20% on fresh candle OOS.**
-- Peak-armed-guard idea tested-and-rejected: FKs never armed by T, guard wouldn't save them.
-- Verdict file: `brain/verdicts/2026-10-17_trail-arm-candle-oos.md`. Constants comments updated (zero behavior).
+**TAT-eligibility meta-rule (pre-registered, reusable):** median winner hold < T <
+median loser hold with ≥2× separation, THEN candle OOS fk≤20% ∧ net>0. Screen before
+commissioning any future TAT shadow (bb-squeeze qualifies; pump-chain− fails premise).
 
 ## PRIOR RUN (11:05) — MFE-CUT FLIP BLOCKED (still in force)
 
@@ -46,17 +40,17 @@ Universal time+unrealized-pnl cut FAILed candle OOS (145 fk winners, net −$9.9
 |--------|--------|----------|
 | doji RE-KILL | HOLDING (frozen) | 0 trades since 20:30 Oct 16 |
 | pump-chain+ dead-gap | HOLDING (frozen) | 0 trades since 01:39 |
-| ai-trader drift guard | HOLDING | rsi_at_pick unverified (paused) |
+| ai-trader drift guard | HOLDING | rsi_at_pick WRITTEN (SEI 12:46 rsi=51.9) — concern CLOSED |
 | MFE-CUT shadow T=45/0.20 | COLLECTING / FLIP BLOCKED | candle OOS FAIL |
 | bb-bounce trail-arm shadow T=55 | COLLECTING / **FLIP PATH FAIL** | candle OOS fk 41.9% |
 | ai-trader trail-arm shadow T=55 | COLLECTING | 3 fires/30d hypothetical |
 | pump-chain TAT live45 | KEPT — net≈0 wash | comment retracted, no code change |
-| bb-squeeze TAT live60 | **CONFIRMED** | +$1.02 candle OOS |
+| bb-squeeze TAT live60 | **CONFIRMED + REVALIDATED** | PASS all T∈[40,60] both ARMs, exit-ladder grid |
 | sweet-spot MIN 55 / SHORT midband / EXTREME 0.85 / SHORT floor-35 | HOLDING / UNVALIDATED | paused |
 
 ## ⚠️ OPEN (CEO-owned)
 
-1. 🔴 **Exit-ladder candle backtest — STILL NOT COMMISSIONED (8th request).** Spec v2 ready: signal-scoped only; template = bb-squeeze T=60 (+$1.02, fk 11%); failure mode = slow-grinder FK (pump-chain T=45, fk 37%); units rule cf=amount×lp/100; bar fk≤20% AND net>0 on candle OOS.
+1. ~~Exit-ladder candle backtest~~ **CLOSED this run** — grid complete, verdict `brain/verdicts/2026-10-17_exit-ladder-tat-grid.md`. Do NOT re-request. pump-chain− kill decision remains CEO-owned.
 2. 🔴 **7d WR/PnL** — 34.7% / −$2.84. Vacation guardrail holds — correct.
 3. 🟡 **ai-trader rsi_at_pick compliance** — verify first resume pick writes field.
 4. 🟡 **#16258 SL/TP desync** DB vs PM — bug_hunter candidate.

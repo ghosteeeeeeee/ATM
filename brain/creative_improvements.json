@@ -5072,5 +5072,23 @@
     "category": "entry sniper / doctrine alignment",
     "status": "suggested",
     "risk": "low (advisory only)"
+  },
+  {
+    "date": "2026-10-17T14:43:07Z",
+    "idea": "TAT-eligibility meta-rule: screen future trail-arm-timeout candidates by hold-time asymmetry (median winner hold < T < median loser hold, >=2x separation) BEFORE any shadow",
+    "rationale": "Exit-ladder grid: bb-squeeze winners median 34m (close before T) vs losers 73m (stall past T) = qualifies; pump-chain- winners median 127-134m overlap losers = fails premise, all 14 cells FAIL. Cheap pre-screen avoids commissioning doomed shadows.",
+    "expected_impact": "Prevents wasted shadow cycles on TAT-ineligible signals (pump-chain-, ai-trader class)",
+    "category": "exit engineering",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-17T14:43:07Z",
+    "idea": "Exit-ladder P0 closed: underwater-only TAT (ARM=0.0) tested as creative variant — no failing family rescued; bb-squeeze robustness across full T grid de-rifies the live T=60",
+    "rationale": "11:05 MFE grid never tested ARM=0.0. Ran it: pump-chain- still FAIL all T (underwater winners recover), pump-chain+ still FAIL, bb-squeeze PASS all T (live not overfit). Progressive multi-point ladder concept formally dead.",
+    "expected_impact": "Closes 8x-delegated P0 with data; prevents future re-litigation of fixed-time cuts",
+    "category": "exit engineering",
+    "status": "completed",
+    "risk": "none (analysis only)"
   }
 ]

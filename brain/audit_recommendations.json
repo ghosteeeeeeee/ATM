@@ -1,138 +1,84 @@
 {
-  "timestamp": "2026-10-17T13:39:53Z",
+  "timestamp": "2026-10-17T14:43:07Z",
   "agent": "brain_auditor",
   "run_type": "captain_audit",
+  "session_lock": false,
   "config_changes_applied": [],
-  "run_summary": "0 config changes (PAUSED + kill-JSON-off double discipline). Pipeline vacation-guardrail stopped since 04:08, runtime kill switch live_trading=false. 0 closed trades since pause — defeated-pause check PASS. All 9 last-run changes verified HOLDING. Open 1: BTC SHORT #16258 @81522 (regime-aligned, HOLD per watchdog). Sideways find: ai-trader pick reasoning calls SHORT 45-55 a sweet spot but decider_run SHORT-MIDBAND block (45-55 death band) blocks it for all non-pump-chain signals — manual HL path bypasses the gate. Creative: pre-registered SHORT-midband advisory in ai_trader_precheck.",
-  "session_brain_stats": {
-    "note": "Session brain query skipped this run — pipeline paused, no new trades to correlate; last 3 audit runs (10:00, 11:05, 11:46) already mined sessions for the MFE-CUT/trail-arm OOS verdicts. Query resumes at resume-day audit."
-  },
-  "pipeline_status": {
-    "pipeline_timer": "inactive (vacation-guardrail, stopped 04:08 UTC)",
-    "auto_resume_estimate": "2026-10-21",
-    "kill_json_live_trading": false,
-    "constants_live_trading_enabled": true,
-    "defeated_pause_check": "PASS — 0 trades closed since 04:08",
-    "open_trades": 1
-  },
   "trade_summary_24h": {
-    "window": "close_time > now-24h (pre-pause cohort only; frozen)",
-    "total": 25,
-    "pnl": -1.65,
-    "wr": 28.0,
-    "long": "19T -1.50 26.3%WR",
-    "short": "6T -0.15 33.3%WR",
-    "worst_signals": "doji-bottom-long 8T -0.52, pump-chain+ 2T -0.39, ai-trader+ 3T -0.27 (all pre-kill/pre-block aging)"
+    "note": "frozen pre-pause cohort (pipeline paused 04:08 UTC, vacation guardrail)",
+    "trades": 25,
+    "win_rate": 26.1,
+    "pnl_usdt": -1.57,
+    "open": 1,
+    "open_detail": "BTC SHORT #16258 manual, entry 81522, SL 81766, ~flat 11h+"
   },
   "trade_summary_7d": {
-    "total": 212,
-    "pnl": -2.86,
-    "wr": 34.4,
-    "exit_family": {
-      "HML": "58T -5.12 0%WR (THE bleed)",
-      "profit_monster_trail": "44T +2.89 93.2%WR (THE edge)",
-      "generic_trail": "13T -0.32 38.5%WR",
-      "ATR_SL": "75T -0.14 26.7%WR (near-flat — trail-arm timeouts converting bleeds)",
-      "hard_sl": "5T -0.26"
-    }
+    "trades": 212,
+    "win_rate": 34.4,
+    "pnl_usdt": -2.86
   },
-  "open_trade": {
-    "id": 16258,
-    "coin": "BTC",
-    "direction": "SHORT",
-    "signal": "ai-trader-manual",
-    "entry": 81522.0,
-    "sl": 81766.566,
-    "opened": "2026-10-17T03:25:04Z",
-    "hours_open_at_audit": 10.2,
-    "regime": "SHORT_BIAS 15m + 4h, vol LOW, AT EMA300, LEAN_BEAR",
-    "verdict": "HOLD — correctly sided in short-bias tape. Invalidation rule stands: 15m close above 81592 with volume to exit. Do not manually interfere. Manual trade = CEO/T discretion.",
-    "watchdog_note": "steer-001 (stale 10h) acknowledged; direction right, timing passive, tight SL caps risk."
+  "regime": {
+    "btc_15m": "SHORT_BIAS",
+    "btc_4h": "SHORT_BIAS",
+    "volatility": "LOW",
+    "market_phase": "CALM",
+    "continuum": "AT"
   },
-  "changes_from_last_run": [
-    {"change": "doji-bottom RE-KILL (DOJI_BOTTOM_ENABLED=False)", "status": "HOLDING", "evidence": "0 doji closes since 2026-10-16 18:44 (kill landed 20:30)"},
-    {"change": "pump-chain+ LONG dead-gap block (gap<-0.3%)", "status": "HOLDING", "evidence": "0 pump-chain+ closes since 01:39 block; constant present hermes_constants.py:1444-1445"},
-    {"change": "ai-trader fire-time RSI drift guard (AI_TRADER_RSI_DRIFT_MAX=15)", "status": "FUNCTIONAL — fail-open risk RESOLVED", "evidence": "ai_trader_state.json now writes rsi_at_pick (SEI SHORT pick 12:46 has rsi_at_pick=51.9). Prior run missing-field concern closed."},
-    {"change": "LONG_RSI_SWEET_SPOT_MIN 40 to 55", "status": "HOLDING (frozen, 0 post-change trades)", "evidence": "constant 972 present; 14d OOS 55-60 band +0.85/37T 56.8%WR intact"},
-    {"change": "SHORT_MIDBAND_BLOCK 45-55", "status": "HOLDING (frozen)", "evidence": "decider_run.py:2097-2102 live; 0 post-fix opens"},
-    {"change": "REGIME_CONF_EXTREME_MULT 1.15 to 0.85", "status": "UNVALIDATED (pause predates landing)", "evidence": "0 trades since; resume-day review"},
-    {"change": "MFE-CUT shadow (T=45/MFE=0.20)", "status": "COLLECTING zero-behavior; FLIP PATH BLOCKED by candle OOS (prior run)", "evidence": "constant True; no fires (paused)"},
-    {"change": "bb-bounce-v2 trail-arm-timeout shadow T=55", "status": "COLLECTING; candle OOS says do-NOT-flip at 55 (fk 41.9%)", "evidence": "constant True; verdict 2026-10-17_trail-arm-candle-oos.md"},
-    {"change": "ai-trader+ trail-arm-timeout shadow T=55", "status": "COLLECTING; n insufficient (3 fires/30d)", "evidence": "keep shadow"}
-  ],
-  "drift_findings": [
-    {
-      "id": "DRIFT-1",
-      "severity": "medium",
-      "finding": "ai-trader pick reasoning teaches SHORT 45-55 as sweet spot but decider_run SHORT-MIDBAND block (45-55, non-pump-chain) treats it as a death band (14d 9T 0W -0.89)",
-      "code_evidence": "ai_trader_state.json SEI pick 12:46: 'RSI 51.9 sits dead center of the 45-55 short sweet spot'; decider_run.py:2098-2102 blocks exactly that band",
-      "impact": "Manual HL path bypasses decider gates — T picks can enter bands the signal system blocks. Contradictory band doctrine between manual channel and compactor/decider.",
-      "action": "Pre-registered creative fix (advisory in ai_trader_precheck, not hard block). CEO/T call."
-    }
-  ],
-  "losing_trade_autopsy": {
-    "note": "Pipeline paused — autopsy covers the frozen pre-pause 24h cohort (mandate Step 5b). Pattern verified, matches watchdog deep_analysis.",
-    "cluster_1_oversold_long_traps": {
-      "trades": "APT LONG meta_rsi 33.7 hard_max_loss -0.09; ZEN LONG 29.5 atr_sl -0.11; WCT LONG 27.8 stale -0.13",
-      "regime": "SHORT_BIAS (89/123 tokens), BTC SHORT_BIAS both TFs",
-      "root_cause": "LONGING oversold in STRONG_DOWN tape = catching falling knives. 0/3 survived. Mirror of BANANA short-into-oversold mistake.",
-      "winning_side": "SHORT those RSI-27-34 dumps (ETH SHORT volume-buildup- +0.02 was the winning-side trade same window)",
-      "existing_defenses": "LONG_RSI_FLOOR=20 (allows 20-35 bleed zone); LONG_RSI_SWEET_SPOT now 55-60 (boosts only profit band). Floor raise 20 to 35 REJECTED: 14d 10 LONG winners RSI<35 +0.55 would be killed (prior verification).",
-      "verdict": "No new filter — sweet-spot boost + dead-gap block are the shipped responses; both frozen-paused, validate at resume."
-    },
-    "cluster_2_overbought_chase_longs": {
-      "trades": "INJ LONG RSI 64.0 atr_sl -0.20; BLUR LONG RSI 62.5 trail_arm_timeout -0.20",
-      "root_cause": "Longing RSI 62-64 in bear tape = buying local tops; LONG midband block (60-70 non-EXTREME) shipped Oct 14 covers this exact band",
-      "verdict": "Pre-fix aging trades; midband meta-source fix holding. No action."
-    },
-    "cluster_3_pump_chain_plus_falling_knife": {
-      "trades": "24h pump-chain+ 2T -0.39 0%WR",
-      "root_cause": "gap_at_entry below -0.3% = dump not pump; dead-gap block shipped 01:39 Oct 17",
-      "verdict": "Block holding (0 closes since). 30d counterfactual +$0.70, winner-block 17.4% < 20%. Done."
-    },
-    "chop_vs_trend": {
-      "7d_HML": "58T -5.12 0%WR, avg hold ~30min, never-armed ~70-90% per signal — dead chop entries",
-      "7d_trail": "profit-monster-trail 44T +2.89 93.2%WR — trending entries, trail armed, locked profit",
-      "root_cause_unchanged": "exit-magnitude on chop entries; entry-filter family exhausted per Oct 16 momentum-gate FAIL verdict",
-      "working_mechanism": "signal-scoped trail-arm-timeout: bb-squeeze T=60 candle-OOS CONFIRMED +$1.02/30d fk 11.1%; pump-chain T=45 wash (keep); shadows collecting for bb-bounce/ai-trader (do-NOT-flip at current params)"
-    }
+  "exit_signature_7d": {
+    "hard_max_loss": "58T -$5.12 0%WR (chop die)",
+    "atr_sl_hit": "52T -$4.23 1.9%WR",
+    "atr_sl_family_combined": "75T -$0.14 near-flat (trail variant wins)",
+    "profit_monster_trail": "44T +$2.89 93.2%WR",
+    "atr_trail_hit": "23T +$4.09 82.6%WR"
   },
-  "recurring_problems": [
-    {"problem": "HML #1 bleed (7d -5.12)", "status": "active, mechanism proven only for bb-squeeze; exit-ladder commission spec v2 ready, self_learner STILL undelivered (8th request)", "next": "resume-day: commission or run scoped OOS ourselves"},
-    {"problem": "self_learner backtest non-delivery", "status": "recurring since Oct 12 — exit-ladder P0, momentum-gate, Q4 cap all undelivered", "next": "brain_auditor runs scoped versions in-house at resume if still undelivered"}
-  ],
-  "missing_implementations": [
-    {"item": "Exit-ladder signal-scoped backtest (spec v2, template bb-squeeze T=60)", "owner": "self_learner (overdue)", "status": "8th request logged"},
-    {"item": "SHORT-midband advisory in ai_trader_precheck", "status": "pre-registered creative (this run), not shipped"}
-  ],
+  "last_run_verify": {
+    "defeated_pause_check": "PASS — 0 trades opened since 04:08",
+    "doji_rekill": "HOLDING (0 trades since Oct 16 20:30, frozen)",
+    "pump_chain_dead_gap": "HOLDING (0 trades since Oct 17 01:39, frozen)",
+    "ai_trader_drift_guard": "HOLDING — rsi_at_pick WRITTEN (SEI pick 12:46 rsi=51.9); first-resume-pick verification still pending",
+    "mfe_cut_shadow": "COLLECTING (frozen); FLIP BLOCKED per 11:05 candle OOS",
+    "bb_bounce_shadow": "COLLECTING (frozen); FLIP PATH FAIL per 11:46 candle OOS",
+    "bb_squeeze_tat_live60": "CONFIRMED — exit-ladder grid revalidates PASS at every T in [40,60]",
+    "pump_chain_tat_live45": "CONFIRMED wash — every T>=50 strictly worse; keep",
+    "sweet_spot_55": "HOLDING (frozen; unvalidated, 0 post-change closes)",
+    "short_midband": "HOLDING (frozen)",
+    "extreme_mult_085": "UNVALIDATED (0 trades since, frozen)",
+    "short_floor_35": "HEALTHY — since Oct 13 band 27T -$0.06 37%WR, trigger (-$1.00) nowhere near; resets Oct 20"
+  },
+  "p0_exit_ladder": {
+    "status": "CLOSED (8th request fulfilled by brain_auditor; self_learner undelivered)",
+    "verdict_file": "brain/verdicts/2026-10-17_exit-ladder-tat-grid.md",
+    "script": "analysis/exit_ladder_tat_grid_2026-10-17.py",
+    "headline": "bb-squeeze ONLY TAT-eligible signal (PASS all T in [40,60], both ARMs); pump-chain- SHORT exit-side DEAD END across 14 cells; pump-chain+ T=45 wash confirmed; progressive/underwater TAT variants add nothing",
+    "config_impact": "none — live TAT state already optimal"
+  },
+  "losers_autopsy_24h": {
+    "note": "frozen cohort, all pre-pause; no new patterns beyond known bleed families",
+    "clusters": [
+      "doji-bottom-long 6T -$0.59 — pre-kill aging out (killed Oct 16 20:30)",
+      "pump-chain+ 2T -$0.39 — pre-dead-gap aging out",
+      "ai-trader+ 3T -$0.27 — n too small, shadow TAT collecting"
+    ]
+  },
   "creative_improvements": [
     {
-      "date": "2026-10-17T13:39:53Z",
-      "idea": "SHORT-midband advisory in ai_trader_precheck (warn when pick RSI in 45-55 death band, do not hard-block manual discretion)",
-      "rationale": "Verified drift: SEI pick reasoning 12:46 calls 45-55 a sweet spot while decider_run.py:2098 blocks that band for all non-pump-chain signals (14d 9T 0W -$0.89). Manual HL path bypasses decider gates, so the manual channel can enter exactly what the signal channel refuses. One advisory log line in precheck aligns doctrine without stripping manual override.",
-      "expected_impact": "Prevents manual entries into the verified death band; zero signal-path behavior change",
-      "category": "entry sniper / doctrine alignment",
-      "status": "suggested",
-      "risk": "low (advisory only)"
+      "date": "2026-10-17T14:43:07Z",
+      "idea": "TAT-eligibility meta-rule: screen future trail-arm-timeout candidates by hold-time asymmetry (median winner hold < T < median loser hold, >=2x separation) BEFORE any shadow",
+      "rationale": "Exit-ladder grid: bb-squeeze winners median 34m (close before T) vs losers 73m (stall past T) = qualifies; pump-chain- winners median 127-134m overlap losers = fails premise, all 14 cells FAIL. Cheap pre-screen avoids commissioning doomed shadows.",
+      "expected_impact": "Prevents wasted shadow cycles on TAT-ineligible signals (pump-chain-, ai-trader class)",
+      "category": "exit engineering",
+      "status": "pre-registered",
+      "risk": "low"
     }
   ],
-  "rejected_this_run": [
-    {"proposal": "LONG_RSI_FLOOR 20 to 35 (oversold-long traps)", "reason": "14d 10 winners RSI<35 +$0.55 killed; <35 band 14d 20T 50%WR -0.47 = wash not bleed; prior rejection stands"},
-    {"proposal": "Any live filter change while paused", "reason": "0 trades accrue; joins unvalidated soak pile; 5 changes + 3 shadows already land on resume — CEO eyeball recommended, do not stack"},
-    {"proposal": "Disable ai-trader-manual (watchdog steer-004 3-loss streak)", "reason": "Manual = T discretion channel; last 10 shows mixed small; BTC SHORT currently correctly sided. Advisory (creative) not disable."}
-  ],
+  "config_changes_applied_note": "0 changes — pipeline paused until ~Oct 21; 5+ unvalidated changes already land together on resume; exit-ladder data confirms live state optimal; stacking violates soak discipline",
+  "changes_from_last_run": "all 9 prior changes HOLDING (frozen by pause); ai-trader rsi_at_pick concern CLOSED (field written)",
   "next_actions": [
-    "Resume-day (approx Oct 21) structured soak review: EXTREME 0.85, sweet-spot 55, dead-gap, drift-guard, midband + 3 shadows (MFE-CUT/bb-bounce/ai-trader) — MFE-CUT flip stays BLOCKED, bb-bounce T=55 flip stays BLOCKED per candle OOS",
-    "Exit-ladder commission: run in-house signal-scoped candle OOS Oct 18 if self_learner undelivered (template bb-squeeze T=60)",
-    "Monitor SEI SHORT pick (12:46, rsi 51.9): if executed via HL it enters the death band the signal path blocks — advisory creative would have flagged it",
-    "SHORT floor-35 revert trigger: data ages out Oct 20 before resume — resets, no action",
-    "Disk 83% (>80% goal) — carry CEO escalation (trading-DB retention plan undelivered since Oct 7)"
-  ],
-  "protected_flags_check": {
-    "count": 13,
-    "intact": true,
-    "confluence_required": true,
-    "live_trading_enabled_constants": true,
-    "kill_json": "live_trading=false (runtime, vacation posture — correct)"
-  }
+    "CEO: pump-chain- SHORT kill decision — exit-side now proven unfixable (14-cell grid), entry-gap diffuse; only remaining lever",
+    "CEO: 7d WR 34.4% / PnL -$2.86 — vacation guardrail correctly holds; resume ~Oct 21 needs CEO eyeball on 5+ unvalidated changes landing together",
+    "Verify ai-trader rsi_at_pick on first resume pick",
+    "SHORT floor-35 band daily check — resets Oct 20, currently healthy (-$0.06)",
+    "dead-gap soak clock extend past Oct 17 on resume",
+    "Do NOT re-request exit-ladder backtest — P0 closed"
+  ]
 }
