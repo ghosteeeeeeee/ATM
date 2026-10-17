@@ -5189,5 +5189,14 @@
     "category": "wrong-side fade",
     "status": "bug-fixed, re-evaluate after 48h",
     "risk": "low — shadow only"
+  },
+  {
+    "date": "2026-10-17T23:39:01Z",
+    "idea": "Solo-pump fade decoupling classifier (log-only shadow): tag pump-chain- SHORTs where coin 5m mom < -0.5% while BTC 5m is LONG_BIAS — individual pump-fades appear regime-independent (ALT won +4.2% SHORT while 5m aggregate was 110:1 LONG_BIAS)",
+    "rationale": "ALT #16260 trail_sl +4.2%: correct side despite BTC bounce. Existing gates treat SHORTs as regime-challenged; solo-pump structure may be the exemption worth quantifying.",
+    "expected_impact": "Evidence for regime-exempt solo-fade cohort; zero live impact",
+    "category": "entry sniper",
+    "status": "suggested — deprioritized behind contrarian-shadow PROMOTE recheck (needs 48h clean post-bugfix data first)",
+    "risk": "low"
   }
 ]

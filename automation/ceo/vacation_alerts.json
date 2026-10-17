@@ -1,40 +1,6 @@
 [
   {
     "level": "WARNING",
-    "message": "Early escalation: 48h WR 36.9% < 40.0% with 65 trades",
-    "data": {
-      "pnl_24h": -1.89,
-      "n_24h": 49,
-      "wr_24h": 38.8,
-      "pnl_48h": -1.59,
-      "n_48h": 65,
-      "wr_48h": 36.9,
-      "pnl_7d": -2.62,
-      "n_7d": 228,
-      "wr_7d": 36.0,
-      "checked_at": "2026-10-16T23:38:22.102271+00:00"
-    },
-    "ts": "2026-10-16T23:38:22.102998+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "Early escalation: 48h WR 37.5% < 40.0% with 64 trades",
-    "data": {
-      "pnl_24h": -1.89,
-      "n_24h": 49,
-      "wr_24h": 38.8,
-      "pnl_48h": -1.55,
-      "n_48h": 64,
-      "wr_48h": 37.5,
-      "pnl_7d": -2.67,
-      "n_7d": 226,
-      "wr_7d": 35.4,
-      "checked_at": "2026-10-17T00:08:22.297562+00:00"
-    },
-    "ts": "2026-10-17T00:08:22.301075+00:00"
-  },
-  {
-    "level": "WARNING",
     "message": "Early escalation: 48h WR 36.4% < 40.0% with 66 trades",
     "data": {
       "pnl_24h": -2.18,
@@ -848,5 +814,39 @@
       "checked_at": "2026-10-17T22:38:31.022283+00:00"
     },
     "ts": "2026-10-17T22:38:31.023019+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.7% < 35.0% AND pnl_7d $-2.54 < $-2.00 (202T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.39,
+      "n_24h": 6,
+      "wr_24h": 33.3,
+      "pnl_48h": -2.26,
+      "n_48h": 56,
+      "wr_48h": 39.3,
+      "pnl_7d": -2.54,
+      "n_7d": 202,
+      "wr_7d": 34.7,
+      "checked_at": "2026-10-17T23:08:31.267147+00:00"
+    },
+    "ts": "2026-10-17T23:08:31.268263+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "Early escalation: 48h WR 39.3% < 40.0% with 56 trades",
+    "data": {
+      "pnl_24h": 0.08,
+      "n_24h": 7,
+      "wr_24h": 42.9,
+      "pnl_48h": -1.81,
+      "n_48h": 56,
+      "wr_48h": 39.3,
+      "pnl_7d": -2.07,
+      "n_7d": 203,
+      "wr_7d": 35.0,
+      "checked_at": "2026-10-17T23:38:31.415286+00:00"
+    },
+    "ts": "2026-10-17T23:38:31.415880+00:00"
   }
 ]

@@ -3633,9 +3633,19 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     if _mcs_dt.tzinfo is None:
                         _mcs_dt = _mcs_dt.replace(tzinfo=timezone.utc)
                     _mcs_age_m = (datetime.now(timezone.utc) - _mcs_dt).total_seconds() / 60
-                    if _mcs_age_m >= MFE_CUT_SHADOW_MIN and live_pnl < MFE_CUT_SHADOW_MFE_MAX:
+                    # MFE-based, NOT live_pnl-at-T: the validated cohort (zero
+                    # winners) is "never reached +0.20% MFE". live_pnl-at-T would
+                    # also fire on retraced-after-spike grinds (dead_money class).
+                    # Fail-open: unknown peak (no high/low data) => no shadow fire.
+                    _mcs_mfe = None
+                    if direction == 'LONG' and _peak_high > 0 and _entry > 0:
+                        _mcs_mfe = (_peak_high / _entry - 1.0) * 100
+                    elif direction == 'SHORT' and _peak_low > 0 and _entry > 0:
+                        _mcs_mfe = (1.0 - _peak_low / _entry) * 100
+                    if (_mcs_age_m >= MFE_CUT_SHADOW_MIN and _mcs_mfe is not None
+                            and _mcs_mfe < MFE_CUT_SHADOW_MFE_MAX):
                         _mfe_cut_shadow_logged.add(trade_id)
-                        log(f"  [SHADOW] MFE-CUT would-fire {token} {direction} {live_pnl:+.2f}% [{_mcs_age_m:.0f}m < mfe_max {MFE_CUT_SHADOW_MFE_MAX:.2f}%] trade={trade_id} sig={_pos_signal}")
+                        log(f"  [SHADOW] MFE-CUT would-fire {token} {direction} live={live_pnl:+.2f}% mfe={_mcs_mfe:+.2f}% [{_mcs_age_m:.0f}m < mfe_max {MFE_CUT_SHADOW_MFE_MAX:.2f}%] trade={trade_id} sig={_pos_signal}")
             except Exception as e:
                 log(f"  [SHADOW] MFE-CUT error for {token}: {e}")
 

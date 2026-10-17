@@ -1,18 +1,18 @@
 {
-  "timestamp": "2026-10-17T23:08:31.230560+00:00",
+  "timestamp": "2026-10-17T23:38:31.431140+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 14/20 recent trades lost",
-      "detail": "Win rate 25% over last 20 trades. Total PnL: -1.66 USDT. Something is wrong.",
+      "title": "Losing streak: 13/20 recent trades lost",
+      "detail": "Win rate 30% over last 20 trades. Total PnL: -0.96 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "11 recent losses look like wrong-side trades",
+      "title": "10 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-002"
@@ -46,20 +46,20 @@
   "regime": {
     "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
-    "volatility": "LOW",
+    "continuum": "BELOW",
+    "volatility": "NORMAL",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
-    "volume_regime": "LOW",
+    "acceleration_state": "POSITIVE",
+    "volume_regime": "NORMAL",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "UP"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 1,
-  "deep_analysis": "Market flipped: the 5m regime scan now shows 110/126 coins LONG_BIAS (was overwhelmingly short-biased hours ago). BTC reclaimed EMA300 (AT after 21.6h below), 15m LONG_BIAS, LEAN_BULL linregs, RECOVERY phase \u2014 but the 4h regime is still SHORT_BIAS, so this is a recovery bounce inside a larger downtrend, not a confirmed trend change. Volatility and volume are both LOW: this bounce has not been confirmed by participation.\n\nOur one open trade \u2014 ALT SHORT (id 16260, +5.5%) \u2014 is on the right side and working. It was a pump-fade (pump-chain-v6) entered at 0.009246; ALT has bled to ~0.00874 and the trailing stop sits at 0.00884, already locking ~4.4% of profit. Thesis intact while price stays below the trail; the broad bounce is the only threat, and the trail exits with profit if ALT reverses. No action needed \u2014 let the trail work.\n\nThe real story is the 72h meta_rsi matrix: the ONLY profitable cell is LONG at RSI 60-70 (+0.74 USDT, 5/11). Every mean-reversion cell bleeds \u2014 mid-band longs (RSI 45-60) won just 28.6% (n=21, -1.41), mid-band shorts won 11% (n=9, -0.64), oversold longs (RSI<35) won 1/4 (-0.28). We make money by joining momentum and lose it by fading or bottom-fishing. The 14/20 losing streak is almost entirely doji-bottom-long falling knives (5-loss streak: ZEN@29.5, WCT@27.8, CRV, YGG, SUSHI \u2014 every one a long into a declining tape; the winning side on all five was the SHORT), pump-chain- fade shorts (0/8, -0.49 \u2014 fading pumps while the market bounces), and mid-band ai-trader longs that fill after RSI drift (APT picked at 57, filled at 33.7, hard_max_loss \u2014 longed the knife).",
-  "agent_timestamp": "2026-10-17T23:13:34.225811+00:00",
+  "open_count": 0,
+  "deep_analysis": "Pre-computed data loaded. One open ALT SHORT (winning), 14/20 recent losses, regime mixed (BTC AT EMA300, 4h SHORT_BIAS vs 15m LONG_BIAS). Now verifying patterns in PostgreSQL with meta_rsi and gathering market context.\nNXPC LONG passes all gates. Merging analysis + writing the AI trader pick.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING (regime flip in progress)\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (0 long, 1 short)\nUnrealized PnL: +0.63 USDT\nRegime: RECOVERY bounce | Volatility: LOW | Volume: LOW\nBTC: 81290 \u2248 EMA300 81386 (AT, just reclaimed after 21.6h below)\n     15m LONG_BIAS | 4h SHORT_BIAS | 5m scan: 110 LONG_BIAS / 1 SHORT\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent] 14/20 recent trades lost (25% WR). 72h meta_rsi matrix: the ONLY profitable cell is LONG@RSI 60-70 (+0.74). Mid-band longs 28.6% WR (-1.41), mid-band shorts 11% WR (-0.64), oversold longs 1/4 (-0.28). We keep entering mean-reversion while the tape's only edge is momentum.\n\ud83d\udfe2 [info] ALT SHORT (16260): +5.5%, trail at 0.00884 locks ~4.4% profit. Thesis (pump-fade) intact \u2014 ALT still dumping. Let the trail work; no action.\n\ud83d\udfe1 [warning] doji-bottom-long: 5-loss streak (ZEN@29.5, WCT@27.8, CRV, YGG, SUSHI) \u2014 every one a long into decline; winning side was SHORT continuation. pump-chain- 0/8 (-0.49) \u2014 fade shorts into the bounce; winning side was momentum LONG (pump-chain+ = +0.56).\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe market flipped under us: 5m regime is now overwhelmingly LONG_BIAS and BTC reclaimed EMA300, but 4h remains SHORT_BIAS with LOW volume \u2014 a recovery bounce inside a larger downtrend, not a confirmed trend change. Our lone open trade is correctly on the winning side of its own flow. The bleeding is historical: oversold bottom-fish longs (doji-bottom) and mid-band fade shorts (pump-chain-) were the wrong side of every recent loss \u2014 momentum longs at RSI 60-70 were the right side and we under-took them. APT's hard_max_loss (picked RSI 57 \u2192 filled 33.7) is the purest example: filled into the knife.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Hold ALT SHORT \u2014 trail locked, auto-exits if the bounce squeezes it.\n2. AI Trader pick fired: NXPC LONG conf=78, RSI 56.9 (precheck PASS all gates, regime-aligned conf-95 leader, ATR 2.06%). Prior NXPC SHORT never filled \u2014 flipped with the regime.\n3. Brain-auditor queue (not mine to disable): doji-bottom-long, pump-chain-, bb-bounce-v2-long+ are the three mean-reversion bleeders; pump-chain+ is the only family printing.\n4. Until volume confirms the bounce: no oversold longs, no mid-band shorts \u2014 momentum only, small size (4h still bearish).\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nCommitted `c476b70f`, pushed, memory stored.\n",
+  "agent_timestamp": "2026-10-17T23:14:36.916139+00:00",
   "regime_context": "BTC: 81290 vs EMA300 81386 \u2014 AT the line after 21.6h below (cross attempt in progress). 15m LONG_BIAS / 4h SHORT_BIAS / continuum AT / trend_quality UP / RECOVERY phase. 5m aggregate: 110 LONG_BIAS, 1 SHORT_BIAS (GMX), 15 neutral \u2014 a broad, high-confidence short-term bounce (top confidence: ZORA/BABY/USELESS/NXPC all 95). Velocity SLOW, volume LOW, zscore NEUTRAL: the bounce is structural but unconfirmed by volume. Implication: momentum LONGs on high-confidence 5m leaders are aligned on both timeframes; SHORTS are fighting the short-term tide (except individual pump-fades like ALT that are dumping on their own flow). Do not add oversold mean-reversion longs or mid-band shorts into this bounce. 4h still bearish means keep sizes small and respect the trail \u2014 this can fail back into the downtrend at any time.",
   "pattern_alerts": "VERIFIED (PostgreSQL, 72h, meta_rsi from _signal_metadata, n=54 tagged closes):\n1. LONG @ RSI 60-70: n=11, 5W, +0.74 total \u2014 THE only profitable cell. Momentum longs work. Winning side: buyers in control, we join them.\n2. LONG @ RSI 45-60: n=21, 6W (28.6%), -1.41 \u2014 worst cell by absolute loss. Mid-band longs are chop entries; winning side was the fade/short, and we kept longing.\n3. SHORT @ RSI 45-60: n=9, 1W (11%), -0.64. Mid-band shorts in a bouncing tape are the wrong side \u2014 pump-chain- went 0/8 (-0.49). Winning side: momentum LONG (pump-chain+ made +0.56 over the same window).\n4. LONG @ RSI <35: n=4, 1W, -0.28 \u2014 oversold longs = catching falling knives (ZEN@29.5, WCT@27.8, APT@33.7 all hard losses). Winning side: SHORT continuation until structure breaks.\n5. Signal bleeders 72h: doji-bottom-long -0.51 (n=11), pump-chain- -0.49 (n=8, 0 wins), ai-trader+ -0.46 (n=10), bb-bounce-v2-long+ -0.36 (n=7). All are mean-reversion families. pump-chain+ (momentum) +0.56 is the one family making money.\nRoot cause of the streak: signals keep firing mean-reversion entries (bottom-fish longs, fade shorts) while the tape's only edge is momentum. We were on the wrong side of every one of those trades \u2014 the winning side existed and was visible (momentum longs on RSI 60-70, or shorts only on true pump-fades with locked structure like ALT)."
 }

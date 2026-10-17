@@ -1250,3 +1250,6 @@
 - **[WARN]** (8h cadence, repeat of 21:25): `hermes-bug-hunter.service` exits 1 — by-design findings (sqlite/cursor leaks, bare excepts, non-atomic JSON, hardcoded passwords). Long-standing tech debt; no auto-fix (bulk refactor out of health-monitor scope).
 - **[WARN]**: trade frequency ~0.3/hr (2 trades/6h) — market/filter condition, not a system fault. Today: 7 closed, -8.28% PnL.
 - AUTO-FIX: none required. Pipeline green (last run 22:23:21 SUCCESS), all 4 core timers active, prices fresh (~30s), 64 signals in last hour, disk 83% (<85%).
+
+## Error Alerts — 2026-10-17 23:08 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`

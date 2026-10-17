@@ -1551,5 +1551,16 @@
     "after": "Also logs exec_conf_at_pp_cond (pp<0.10→0.3, pp>=0.10→0.5) and pp_cond_would_block flag",
     "rationale": "WLD pp=0.014 exec 43.5 shows flat 0.5 floor rescues catastrophic combo history. Conditional floor gives CEO third option with quantified cohort. 162/458 floor-bound events have pp<0.10.",
     "impact": "Zero live behavior. CEO floor decision now has keep/revert/conditional all quantified from same shadow stream."
+  },
+  {
+    "timestamp": "2026-10-17T23:38:20Z",
+    "agent": "brain_auditor",
+    "change": "MFE-CUT shadow semantic fix: live_pnl-at-T -> peak-price MFE (validated cohort is never-armed MFE<0.20; pnl-at-T would also fire on retraced-after-spike grinds)",
+    "type": "bugfix",
+    "file": "scripts/position_manager.py",
+    "before": "if age>=45m and live_pnl < 0.20: would-fire",
+    "after": "if age>=45m and peak-derived MFE < 0.20 (fail-open if peak unknown): would-fire; logs live+MFE",
+    "rationale": "Shadow data is the CEO flip-live decision basis; wrong population = wasted 48h soak. 0 fires observed vs WLD 56m hold confirms live_pnl population mismatch or check-cadence miss; MFE-based matches trades-level OOS (zero winners at MFE<0.20 hold>=45m).",
+    "impact": "Zero live behavior. Corrects shadow cohort definition before 48h data accumulates."
   }
 ]
