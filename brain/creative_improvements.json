@@ -4939,5 +4939,23 @@
     "category": "exit engineering",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-17T01:39:53Z",
+    "idea": "BTC dual-timeframe trend-alignment confidence dampener for LONG signals (not block)",
+    "rationale": "Today 35 LONGs vs 15 SHORTs fired while BTC 15m+4h both SHORT_BIAS, trend_quality STRONG_DOWN — 24h 34%WR -$2.35, watchdog \"wrong-side\" steer. Prior CEO rejected blanket LONG regime kills (chop-LONG = best cohort +$3.28). A 15% confidence DAMPEN (not block) when both TFs SHORT_BIAS + STRONG_DOWN would thin chop LONGs without killing the cohort. Requires backtest before ship: 30d LONG trades by (btc_dual_short_bias AND trend_strong_down) x outcome.",
+    "expected_impact": "Reduce chop-LONG entries ~15-20% in confirmed downtrends; estimated +$0.50-1.00/30d if cohort is net-negative",
+    "category": "entry sniper",
+    "status": "suggested — needs backtest, NOT shipped",
+    "risk": "low (dampen not block; reversible; single variable)"
+  },
+  {
+    "date": "2026-10-17T01:39:53Z",
+    "idea": "pump-chain+ gap-band confidence ladder (gap>=0.8 boost, <-0.3 block already shipped)",
+    "rationale": "30d gap bands: >=0.8 = 44T +$3.12 (best), 0.2-0.8 = +$0.69, -0.3-0.2 = +$0.35, <-0.3 = -$0.70 (now blocked). Confidence ladder (e.g. +10 conf at gap>=0.8) would size into the best band. Data exists; lower priority than dead-gap block just shipped. Wait 14d for dead-gap cohort before layering.",
+    "expected_impact": "Concentrate execution in highest-WR band; +10 conf on 44T/30d cohort",
+    "category": "entry sniper",
+    "status": "deferred — collect dead-gap block data first",
+    "risk": "low"
   }
 ]

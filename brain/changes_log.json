@@ -1463,5 +1463,16 @@
     "after": "Shadow matches bb-bounce OR ai-trader; log prefix generalized to TRAIL-ARM",
     "rationale": "ai-trader+ 4th-worst SL-family bleeder 7d 12T -$0.92; long-hold losers INJ 65m/ME 94m catchable at 55m; armed winners structurally immune via live_pnl<arm guard (same pattern as bb-squeeze +$1.48/30d, pump-chain 13T 0%WR)",
     "impact": "Shadow collects counterfactual; flip live only with CEO GO + 14d data + OOS backtest"
+  },
+  {
+    "timestamp": "2026-10-17T01:39:53Z",
+    "agent": "brain_auditor",
+    "change": "pump-chain+ LONG dead-gap falling-knife block: gap_at_entry < -0.3% blocked at exec time",
+    "type": "config",
+    "file": "hermes_constants.py + decider_run.py",
+    "before": "No LONG dead-gap — pump-chain+ LONGs fired at any gap incl price already below EMA",
+    "after": "PUMP_CHAIN_LONG_DEAD_GAP_BLOCK_ENABLED=True, MAX=-0.3. Blocks gap<-0.3 falling-knife LONGs. Mirror of SHORT dead-gap shipped Oct 16.",
+    "rationale": "30d gap<-0.3: 25T 32%WR -$0.70 (17L -$2.27/8W +$1.57); 14d OOS 11T 27.3%WR -$0.43. Kept gap>=0.8 44T +$3.12 best band. Blocks 8/46 total winners (17.4% < 20% threshold), net +$0.70/30d. Yesterday DOT LONG gap -0.05 (band kept, 30d +$0.35) correctly NOT blocked.",
+    "impact": "Expected +$0.70/30d net from stopping falling-knife pump-chain+ LONG entries; chase-up block (MAX_ENTRY_GAP=1.5) already covers the other side."
   }
 ]

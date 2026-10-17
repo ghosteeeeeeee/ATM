@@ -1,170 +1,62 @@
 {
-  "timestamp": "2026-10-17T00:47:12.865587+00:00",
+  "timestamp": "2026-10-17T01:40:19Z",
   "session_brain_stats": {
-    "queries_run": 4,
-    "top_insights": [
-      "chop kills longs before they can run; PM Trail is the only saver (90.5% WR)",
-      "wrong-side trading pattern recurring across sessions",
-      "progressive exit ladder discussed but never commissioned (overdue since Oct 14)"
-    ]
+    "note": "queried: ai-trader regime, pump-chain gap, volume-buildup — no new unshipped insights beyond gap-band analysis"
   },
   "trade_summary_24h": {
-    "total": 49,
-    "wins": 19,
-    "wr": 38.8,
-    "pnl": -1.89,
-    "chop_family_exits": 30,
-    "trend_family_exits": 16,
-    "chop_family_pnl": -2.93,
-    "trend_family_pnl": 0.69,
-    "note": "SL-family 4% WR vs trail-family 94% WR — exit-magnitude bleed, not entry-side"
+    "trades": 50,
+    "pnl": -2.35,
+    "wr": 34.0,
+    "top_losers": [
+      "doji-bottom-long LONG 10T -$0.53 40% (KILLED 20:30 Oct16, aging)",
+      "pump-chain- SHORT 8T -$0.49 0% (dead-gap block live 13:30 Oct16)",
+      "pump-chain+ LONG 3T -$0.47 0% EXTREME chop",
+      "ai-trader+ LONG 7T -$0.40 42.9% (trail-arm shadow collecting)"
+    ],
+    "regime": "BTC 15m+4h SHORT_BIAS, trend STRONG_DOWN, vol LOW, wyckoff ACCUMULATION"
   },
-  "trade_summary_7d": {
-    "total": 228,
-    "wr": 36.0,
-    "pnl": -2.62,
-    "chop_family": "138T -$11.09",
-    "trend_family": "73T +$7.29"
-  },
-  "last_run_changes_verified": [
-    {
-      "change": "doji RE-KILL 20:30",
-      "status": "HOLDING",
-      "evidence": "0 trades after 20:30"
-    },
-    {
-      "change": "pump-chain- EXTREME block 14:44",
-      "status": "HOLDING",
-      "evidence": "0 SHORT opens after 14:44"
-    },
-    {
-      "change": "pump-chain- dead-gap 13:30",
-      "status": "HOLDING",
-      "evidence": "0 SHORT opens after 13:30"
-    },
-    {
-      "change": "SHORT midband 45-55 00:43",
-      "status": "HOLDING",
-      "evidence": "0 non-pump-chain SHORT 45-55 after 00:43"
-    },
-    {
-      "change": "sweet-spot MIN 40→55",
-      "status": "CONFIRMED",
-      "evidence": "30d 55-60 = 70T 60%WR +$3.74"
-    },
-    {
-      "change": "bb-bounce shadow T=55m",
-      "status": "COLLECTING",
-      "evidence": "0 fires yet; wiring verified PM:3558"
-    }
+  "drift_findings": [
+    "Killed signals (oversold-bounce+, hmacd_mtf-+, volume-breakout-long+/-) stopped firing post-kill — 7d trades were aging, NOT a dual-emitter bug. Verified open_time vs kill dates.",
+    "REGIME_CONF_EXTREME_MULT=1.15 BOOSTS ai-trader in EXTREME where it bleeds (14d EXTREME 13T -$0.46). n=13 < 20 threshold — monitor only, not shipped."
   ],
-  "drift_findings": [],
   "recurring_problems": [
-    {
-      "problem": "Chop entries never arm trail, die to hard_max_loss/atr_sl_hit",
-      "evidence": "7d: chop-family 138T -$11.09 (0-6% WR) vs trend-family 73T +$7.29 (89% WR). 52/56 hard_max_loss never reached +0.40%.",
-      "status": "ACTIVE — trail-arm-timeout is the lever; shadow collecting for bb-bounce + ai-trader+"
-    },
-    {
-      "problem": "Progressive exit ladder backtest overdue since Oct 14",
-      "evidence": "Scope: doji+bb-bounce family, T=45m, HR-kill guard. Commission self_learner.",
-      "status": "CEO-OWNED — P0 escalation"
-    }
+    "EXTREME regime 7d: LONG 78T 28.2% -$0.78 + SHORT 43T 23.3% -$1.22 = -$2.00. But pump-chain+ EXTREME +$0.43 — bleed is signal-specific chop entries, not EXTREME blanket.",
+    "watchdog wrong-side steer verified: 35 LONG vs 15 SHORT into STRONG_DOWN trend. Flagged as creative idea (dampen, not block)."
   ],
-  "missing_implementations": [
-    {
-      "item": "Progressive exit ladder backtest",
-      "discussed": "Multiple sessions + watchdog deep_analysis 2026-10-17",
-      "status": "NOT COMMISSIONED — overdue since Oct 14",
-      "impact": "Untried lever; entry filters exhausted, exit-side is the remaining edge"
-    }
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
-    {
-      "date": "2026-10-17T00:47:12.865604+00:00",
-      "idea": "Extend trail-arm-timeout shadow to ai-trader+ LONG (T=55m)",
-      "rationale": "ai-trader+ is 4th-worst SL-family bleeder (7d 12T -$0.92). Long-hold losers INJ 65m/ME 94m would be caught at 55m if never armed. Armed winners (KAS 80m, NEAR 58m, CRV 47m) structurally immune via live_pnl < arm guard — same pattern that made bb-squeeze (+$1.48/30d) and pump-chain (13T 0%WR) timeouts safe.",
-      "expected_impact": "Shadow collects counterfactual; if validated, flip live saves ~$0.50-0.90/7d on ai-trader+ stalls",
-      "category": "exit sniper",
-      "status": "SHIPPED (shadow)",
-      "risk": "zero (shadow only, never closes)"
-    },
-    {
-      "date": "2026-10-17T00:47:12.865606+00:00",
-      "idea": "Commission progressive exit ladder backtest (doji+bb-bounce family, T=45m, HR-kill guard)",
-      "rationale": "Watchdog deep_analysis 2026-10-17: 'if price hasn't moved +0.15% in 30 minutes, the trail will never arm — exit early into the next opportunity.' Entry filters exhausted; exit-side is the untried lever. Overdue since Oct 14.",
-      "expected_impact": "If 20% of chop-family exits convert to trail: +$2.20/7d",
-      "category": "exit sniper",
-      "status": "ESCALATED (CEO-owned, P0)",
-      "risk": "medium (needs OOS backtest + HR-kill guard)"
-    }
+    "BTC dual-TF trend-alignment LONG confidence dampener (suggested, needs backtest)",
+    "pump-chain+ gap-band confidence ladder (deferred pending dead-gap data)"
   ],
   "config_changes_applied": [
-    {
-      "change": "Extend trail-arm-timeout shadow to ai-trader+ LONG",
-      "file": "scripts/position_manager.py + scripts/hermes_constants.py",
-      "detail": "Shadow collector now matches 'ai-trader' in signal (was 'bb-bounce' only). T=55m, live_pnl < 0.40% arm guard. Zero behavior — logs would-fires only.",
-      "revert": "Set BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW=False or remove 'ai-trader' from match"
-    }
+    "PUMP_CHAIN_LONG_DEAD_GAP_BLOCK_ENABLED=True, MAX=-0.3 (hermes_constants.py + decider_run.py) — falling-knife LONG block, mirror of SHORT dead-gap"
   ],
   "changes_from_last_run": [
     {
-      "change": "doji RE-KILL",
-      "impact": "HOLDING — 0 trades after kill"
+      "change": "doji-bottom re-kill (Oct16 20:30)",
+      "status": "WORKING — 0 doji trades since kill"
     },
     {
-      "change": "pump-chain- EXTREME block",
-      "impact": "HOLDING — 0 SHORT opens after block"
+      "change": "SHORT mid-band block RSI 45-55 (Oct16 00:43)",
+      "status": "WORKING — 0 midband SHORT trades since block"
     },
     {
-      "change": "pump-chain- dead-gap block",
-      "impact": "HOLDING — 0 SHORT opens after block"
+      "change": "pump-chain- dead-gap [-0.5,0.2) (Oct16 13:30)",
+      "status": "WORKING — 1 trade since (DOT gap 0.54 allowed, -$0.08); 8T 0W bleed was pre-block aging"
     },
     {
-      "change": "SHORT midband 45-55 block",
-      "impact": "HOLDING — 0 midband SHORT opens after block"
+      "change": "LONG_RSI_SWEET_SPOT 40→55 (Oct16 21:40)",
+      "status": "MONITOR — boost-only, 24h too short"
     },
     {
-      "change": "sweet-spot MIN 40→55",
-      "impact": "CONFIRMED — 30d 55-60 band is only profitable LONG band (+$3.74)"
-    },
-    {
-      "change": "bb-bounce shadow T=55m",
-      "impact": "COLLECTING — 0 fires in first 2h, wiring verified"
+      "change": "bb-bounce + ai-trader trail-arm shadow T=55m (Oct16 22:30/00:48)",
+      "status": "COLLECTING — zero behavior, decision data by ~Oct 30"
     }
   ],
   "next_actions": [
-    "Check [SHADOW] TRAIL-ARM logs in PM for bb-bounce + ai-trader+ would-fires",
-    "Commission progressive exit ladder backtest — self_learner, P0, overdue since Oct 14",
-    "Monitor pump-chain+ 24h 3T 0W (variance, 14d +$2.68 — leave alone)",
-    "Open trades: BTC LONG #16251 breakeven SL (risk-free); INJ LONG #16255 RSI 64 entry (upper band, SL 8.655 is the line)",
-    "48h guardrail ESCALATE active — 7d WR/PnL must recover"
-  ],
-  "open_trades": [
-    {
-      "id": 16251,
-      "coin": "BTC",
-      "dir": "LONG",
-      "signal": "ai-trader-manual",
-      "pnl_pct": 0.09,
-      "hours": 4.6,
-      "note": "breakeven SL 81510, risk-free"
-    },
-    {
-      "id": 16255,
-      "coin": "INJ",
-      "dir": "LONG",
-      "signal": "ai-trader+",
-      "pnl_pct": -0.01,
-      "hours": 0.9,
-      "note": "RSI 64 entry (upper band), SL 8.655, thesis fading"
-    }
-  ],
-  "regime": {
-    "btc_15m": "LONG_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "volatility": "LOW",
-    "trend_quality": "STRONG_DOWN",
-    "note": "Split regime; LOW vol is the enemy — ATR stops get wicked, trails never arm"
-  }
+    "Monitor PUMP-CHAIN-LONG-DEAD-GAP blocks in pipeline.log for false kills (gap near -0.3 boundary)",
+    "Trail-arm shadow: review would-fire counts Oct 24 (7d soak) before CEO flip decision",
+    "ai-trader EXTREME 1.15x boost: re-check at n>=20 (currently 13T/14d) — dampen candidate",
+    "pump-chain- SHORT EXTREME 30T 23.3% -$0.50: meta-RSI band analysis next run (HARD_FLOOR=45 already on; check 45-60 sub-band)"
+  ]
 }

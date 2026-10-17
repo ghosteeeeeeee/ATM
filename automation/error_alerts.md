@@ -1171,3 +1171,9 @@
 - **REPEATED** (10x): `Oct N N:N:N python3[TOK]: IndentationError: unexpected indent`
 - **REPEATED** (10x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Main process exited, code=exited, status=N/FAILURE`
 - **REPEATED** (10x): `Oct N N:N:N systemd[N]: hermes-pipeline.service: Failed with result 'exit-code'.`
+
+## Error Alerts — 2026-10-17 01:24 UTC
+- **CRITICAL**: `hermes-pipeline.timer` and `hermes-watchdog.timer` were both inactive (not scheduled).
+- **AUTO-FIX**: Restarted both timers via `systemctl start`. Verified active.
+- **WARN** (1x): `hermes-brain-auditor.service` — timeout, killed (Result: timeout). Flaky, non-critical.
+- **WARN** (1x): `hermes-bug-hunter.service` — exit code 1. Flaky, non-critical.

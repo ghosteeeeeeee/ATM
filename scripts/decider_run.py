@@ -5127,6 +5127,29 @@ def run(dry_run=False):
         except ImportError:
             pass
 
+        # ── pump-chain+ LONG dead-gap: block gap < -0.3% (falling knife) ─────
+        # brain_auditor 2026-10-17. gap_at_entry < -0.3 = price already below
+        # EMA = dump, not a pump. 30d: 25T 32%WR -$0.70; 14d OOS -$0.43.
+        # Kept gap>=0.8 44T +$3.12 best band. Blocks 8/46 winners (17.4%),
+        # net +$0.70/30d. Mirror of PUMP-CHAIN-SHORT-DEAD-GAP.
+        try:
+            from hermes_constants import (
+                PUMP_CHAIN_LONG_DEAD_GAP_BLOCK_ENABLED,
+                PUMP_CHAIN_LONG_DEAD_GAP_MAX,
+            )
+            _pclg_st = f"{sig.get('signal_type') or ''} {source or ''}"
+            if (PUMP_CHAIN_LONG_DEAD_GAP_BLOCK_ENABLED
+                    and 'pump-chain' in _pclg_st and direction.upper() == 'LONG'
+                    and _gap_at_entry is not None
+                    and _gap_at_entry < PUMP_CHAIN_LONG_DEAD_GAP_MAX):
+                log(f'  🎯 [PUMP-CHAIN-LONG-DEAD-GAP] {token} LONG BLOCKED — gap={_gap_at_entry:.2f}% < {PUMP_CHAIN_LONG_DEAD_GAP_MAX}% (falling knife, 30d 25T 32%WR -$0.70)')
+                if sig_id:
+                    release_signal_claim(sig_id, 'SKIPPED', reason='post-claim block: PUMP-CHAIN-LONG-DEAD-GAP price below EMA, not a pump')
+                skipped += 1
+                continue
+        except ImportError:
+            pass
+
         success, msg = execute_trade(
             token, direction, price, confidence, source,
             signal_type=sig.get('signal_type', ''),

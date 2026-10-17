@@ -1432,6 +1432,8 @@ PUMP_CHAIN_LONG_DEAD_HOURS = []         # DISABLED 2026-09-30 — use entry qual
 PUMP_CHAIN_LONG_MAX_ENTRY_GAP = 1.5  # 14d: gap>1.5% = 6T 33.3%WR -$0.43. Blocks chasing entries.
 PUMP_CHAIN_LONG_RSI_MAX = 70          # brain_auditor 2026-10-13: lowered 75→70 — 70-75 band is dead zone, not keep-open. meta_rsi fine bands: 14d 70-75=10T 30%WR -$0.36, 30d 70-75=16T 31.3%WR -$0.01 (WR ~31% both windows = no edge). 65-70 stays open: 14d 7T 71.4% +$0.15, 30d 13T 61.5% +$0.47. Confounder clean: EXTREME-only RSI<70=59.1% +$2.20 vs RSI 70+=30% -$0.53 (same regime). Impact 7d: blocks 12T -$0.76 losers, 3 winners +$0.28 (17.6% < 20% threshold), net +$0.48. Bull override to 85 preserved (score>80 STRONG_POS). Code comment at signal_compactor:3224 already flagged "RSI>=70 = 17T 23.5%WR dead zone".
 PUMP_CHAIN_LONG_RSI_MIN = 35          # 14d: RSI<35 = 8T 0%WR -$0.67 (ALL losers). Oversold LONG = catching falling knife.
+PUMP_CHAIN_LONG_DEAD_GAP_MAX = -0.3   # brain_auditor 2026-10-17: falling-knife LONG block. gap_at_entry < -0.3% (price already below EMA) = not a pump, a dump. 30d: 25T 32%WR -$0.70 (17L -$2.27 / 8W +$1.57); 14d OOS: 11T 27.3%WR -$0.43 (same direction). Kept: gap>=-0.3 30d +$1.05, incl gap>=0.8 44T +$3.12 best band. Blocks 8/46 winners (17.4% < 20% threshold), net +$0.70/30d. Mirror of PUMP_CHAIN_SHORT_DEAD_GAP (chase-down for SHORT = bounce magnet; this is chase-down for LONG = falling knife).
+PUMP_CHAIN_LONG_DEAD_GAP_BLOCK_ENABLED = True  # Revert: set False. Exec-time in decider_run.py.
 
 # pump-chain- SHORT entry quality (replaced dead hours)
 PUMP_CHAIN_SHORT_DEAD_HOURS = []      # DISABLED 2026-09-30 — use entry quality filters instead
