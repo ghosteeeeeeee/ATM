@@ -11296,3 +11296,24 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
 - pump-chain+ / doji-bottom-long / pump-chain- standing CEO escalations (0W 24h, under 3T threshold)
 - guardrail aging forecast: earliest aging-only resume ~Oct 21 per brain_auditor 06:45 audit
+
+## [2026-10-17 18:09] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 11T 3W −$0.87 (27.3% WR) | 7d 207T 71W −$2.63 (34.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Trading RESUMED 16:57 UTC (T directive: WR-pause counter-productive → size-reduce instead); vacation guardrail now SIZE REDUCES to 30% (not paused) — correct per new policy
+- 0T last hour because only candidate (ALT LONG pump-chain+ combo) hard-blocked by CTX-GATE: similar setup n=5 WR=20% < 30% — filter working as intended
+- Resume check no longer applies (pause lifted by CEO directive)
+- Kill check: pump-chain+ 2T 0W −$0.39 still under 3T kill threshold; standing CEO escalation
+- atr_sl_hit 5/11 = 45.5% (>40%) but tpsl_utils fix IS deployed (last edit 2026-10-12, BUG-030/031/032/063 fixes present) — no alert, ratio elevated from small 24h sample (11T)
+- 0 open positions
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- Only 1 hotset token (ALT) and it's CTX-blocked — thin opportunity set; is signal detection under-firing post-resume?
+- pump-chain+ standing CEO escalation (2T 0W, under 3T threshold)
+- atr_sl_hit 45.5% on tiny sample — watch if it stays >40% as 24h window refills with post-resume trades

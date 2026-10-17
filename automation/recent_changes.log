@@ -4793,3 +4793,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-17 17:10] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC manual SHORT UNIVERSAL_MAX_HOLD +$0.05, win; trading paused by vacation guardrail 04:08) | 24h 13T 3W −$0.92 (23.1%) | 7d 209T 72W −$2.71 (34.4%) — both resume conditions fail (WR<37, PnL<0), stay paused | kill: none this hour (pump-chain+ 2T 0W, doji-bottom-long 2T 0W, both under 3T threshold, standing CEO escalations) | atr_sl_hit 38.5% (under 40, window aging, tpsl fix deployed) | 0 open positions (manual BTC closed) | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-17 18:09] auto_1hr: NO CONFIG CHANGE — 0T last hour (trading RESUMED 16:57 T-directive, size-reduce 30% not pause; only candidate ALT LONG CTX-GATE blocked: similar WR 20% < 30%) | 24h 11T 3W −$0.87 (27.3%) | 7d 207T 71W −$2.63 (34.3%) | kill: none (pump-chain+ 2T 0W under 3T threshold, standing CEO escalation) | atr_sl_hit 45.5% (>40 but tpsl fix deployed, tiny 11T sample) | 0 open positions | No constants change → no signal_versions entry
+BY: auto_1hr
