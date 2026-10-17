@@ -688,10 +688,10 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # TUNED 2026-07-28: trailing SL with breakeven floor is the real profit protector
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
-ATR_SL_MIN             = 0.013   # 1.3% floor — brain_auditor Sep 14: 55% of below-entry ATR SL hits had dist <1.3%, would survive. Expected +$1.33/7d net. Was 1.2%.
-ATR_SL_MAX             = 0.020  # 2.0% cap — brain_auditor Sep 28: widened from 1.8%. EXTREME 64.5% ATR_SL hit rate 7d. 1.2x multiplier DEAD at 1.8% cap (effective range 1.5%-1.8%). Widening to 2.0% gives EXTREME 33% more room (effective 1.5%-2.0%). R:R 1.29:1 → ~1.50:1. Expected +$0.50-1.00/7d.
-ATR_SL_MIN_EXTREME     = 0.015  # 1.5% floor for EXTREME regime — brain_auditor Sep 27: EXTREME 70.2% ATR_SL hit rate. pump-chain+ EXTREME 89.2%. 8 small winners (<$0.15) in 14d cut too early at 1.3%. Widening to 1.5% (effective 1.8% with 1.2x mult = ATR_SL_MAX) gives maximum room.
-ATR_TP_MIN             = 0.013   # 1.30% floor — brain_auditor 2026-10-04: match ATR_SL_MIN. Was 0.80%, below SL floor → low-vol trades got RR 0.62 structurally. 30d: RR<1 = 161T 14.9%WR -$18.47 vs RR>=1 = 785T 59.4%WR +$16.91. Only 1 hard_tp exit/7d (trailing dominates), so exit-path impact minimal.
+ATR_SL_MIN             = 0.015   # 1.5% floor — CEO Oct 16: widened from 1.3%. WLD SL was -0.30% from entry (way below min).
+ATR_SL_MAX             = 0.025  # 2.5% cap — widened from 2.0% to accommodate 1.5% min with ATR scaling.
+ATR_SL_MIN_EXTREME     = 0.015  # 1.5% floor for EXTREME regime — matches ATR_SL_MIN
+ATR_TP_MIN             = 0.015   # 1.5% floor — match ATR_SL_MIN
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-09-29: widened from 1.5x. SHORT R:R 0.59:1 (avg_win $0.088 vs avg_loss $0.149). Only 0.9% of 7d trades hit TP — unreachable at 1.5x. 2.0x gives SHORT winners room to reach 4% TP before PM_TRAIL. PM_TRAIL handles most exits.
 # Only push SL/TP to HL when delta exceeds this threshold
@@ -704,12 +704,12 @@ ATR_SL_MIN_ACCEL   = 0.003  # 0.30% floor — allow trailing to lock in profits.
 ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
-ATR_SL_MIN_INIT    = 0.013  # 1.3% — brain_auditor Sep 14: MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.020  # 2.0% — brain_auditor Sep 28: MUST match ATR_SL_MAX
-SL_PCT_FALLBACK    = 0.013  # 1.3% if ATR unavailable (matched to ATR_SL_MIN) — brain_auditor Sep 14
-TP_PCT_FALLBACK    = 0.060  # 6.0% fallback target (3:1 R:R with 2.0% SL) — brain_auditor Sep 28: widened with ATR_SL_MAX
-STOP_LOSS_DEFAULT  = 0.013  # 1.3% hard fallback (matched to ATR_SL_MIN) — brain_auditor Sep 14
-SL_PCT_MIN        = 0.013  # 1.3% minimum SL for any trade (hard floor, matched to ATR_SL_MIN) — brain_auditor Sep 14
+ATR_SL_MIN_INIT    = 0.015  # 1.5% — CEO Oct 16: MUST match ATR_SL_MIN
+ATR_SL_MAX_INIT    = 0.025  # 2.5% — CEO Oct 16: MUST match ATR_SL_MAX
+SL_PCT_FALLBACK    = 0.015  # 1.5% if ATR unavailable (matched to ATR_SL_MIN)
+TP_PCT_FALLBACK    = 0.075  # 7.5% fallback target (3:1 R:R with 2.5% SL)
+STOP_LOSS_DEFAULT  = 0.015  # 1.5% hard fallback (matched to ATR_SL_MIN)
+SL_PCT_MIN        = 0.015  # 1.5% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
 CUT_LOSER_PNL     = -4.00  # close trade at -4.00% ACCOUNT PnL — CEO Oct 15: widened -3.00→-4.00. Gives trail more room to work before hard kill.
 HML_VOL_ATR_MULT  = 0.5   # brain_auditor 2026-10-08 — HML price-threshold = -0.5×ATR when ATR provides more room than CUT_LOSER_PNL/lev. Trail arms at +0.40% (PM_TRAIL_ACTIVATE) but HML killed at -0.30% price @lev5 — trail never got room in EXTREME. 7d HML 66T -$8.72 #1 bleed, 56/66 had MFE>0, median hold 61min. Example: EXTREME ATR 1.5% → thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%. NORMAL/FLAT ATR low → account threshold unchanged. HML only fires on losers — cannot block winners.
 HML_TRAIL_MIN_GAP_PCT = 0.20  # UNUSED as of CEO 2026-10-12 — D3 trail-floor block REMOVED from position_manager (only fired at lev>=4 and widened HML past CUT_LOSER account limit; same bug class as vol floor capped Oct 10). Value kept for history. DO NOT re-add a trail floor that exceeds CUT_LOSER_PNL/lev.
