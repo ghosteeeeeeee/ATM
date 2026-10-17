@@ -11338,3 +11338,23 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - 4h regime NEUTRAL blocks both directions (LONG has no edge, SHORT blocked by BTC bullish structure) — no trade path until regime resolves; watch if this persists into next hours
 - pump-chain+ standing CEO escalation (2T 0W, under 3T threshold)
 - 7d WR 34.5% still < 35% — size-reduce stays at 30%
+
+## [2026-10-17 21:09] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 7T 3W −$0.42 (42.9% WR) | 7d 203T 70W −$2.47 (34.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0T last hour — quiet post-resume, not a detection failure; 1 position opened 20:26 UTC (WLD LONG ai-trader+, entry 0.50482, SL 0.50269, TP 0.51239, $22.10 size-reduced)
+- 24h WR improved to 42.9% (3W/7T) — window now mostly post-resume trades; 7d WR 34.5% still < 35% so size-reduce 30% stays
+- Kill check: pump-chain+ 1T 0W −$0.20 (second trade aged out of 24h window) — under 3T threshold, standing CEO escalation continues
+- atr_sl_hit 2/7 = 28.6% (under 40, tpsl fix deployed) — elevated ratios earlier today were tiny-sample artifacts, now normalized
+- No overtrading (0/hr), no 3-neg-hour streak (last 4h flat, hour-5 +$0.05 win)
+- Hotset empty (cycle 10228) — expected quiet; no constants change → no signal_versions entry
+
+**Open Questions:**
+- WLD LONG open ~43min — first post-resume signal trade; watch outcome
+- pump-chain+ standing CEO escalation (1T 0W, under 3T threshold)
+- 7d WR 34.5% still < 35% — size-reduce stays at 30% until window improves
