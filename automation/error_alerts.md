@@ -1197,3 +1197,8 @@
 
 ## Error Alerts — 2026-10-17 12:30 UTC
 - **[INFO]**: Health check at 12:30 UTC — vacation pause active (paused_at 12:08:26, 7d WR 34.7% < 35.0% AND pnl_7d $-2.84 < $-2.00). Pipeline.timer + trade-watchdog.timer left inactive per guardrail rule. Price-collector (last 12:29:54) and 1m-candle (last 12:30:22) timers firing normally. Prices fresh (99s). 1 open trade (BTC SHORT from 03:25). 4 closed today (-$0.29). Regime: SHORT_BIAS (4L/83S/39N of 126). Disk 82%. Phantom trades: 0. LOCK-WAIT noise in price-collector continues (known, non-blocking). No auto-fixes needed.
+
+## Error Alerts — 2026-10-17 13:25 UTC
+- **[INFO]**: Health check at 13:25 UTC — vacation pause active (paused_at 13:08:26, 7d WR 34.4% < 35.0% AND pnl_7d $-2.86 < $-2.00, 212T). Pipeline.timer + trade-watchdog.timer left inactive per guardrail rule — intentional, NOT a crash. Auto-resume handled by guardrail on metric recovery.
+- **[INFO]**: Data collection healthy — price-collector last fired 13:25:49, 1m-candle next fire 13:26:30, candles fresh (1m age 0.9min). 15m-regime-scanner on schedule (last 13:15). hl-sync-guardian active (managing 1 open BTC SHORT from 03:25). 30+ other timers active/waiting.
+- **[INFO]**: 0 signals last 1h (expected: pipeline paused). Trades today: 4 closed, -$0.29, 25% WR. 24h exits: atr_sl_hit 8 (-$0.91), profit-monster-trail 6 (+$0.12), hard_max_loss 5 (-$1.48), HL_CLOSED 2 (+$0.01), trail_arm_timeout 1 (-$0.20), stale_exit 1 (-$0.13), atr_trail_hit 1 (-$0.01). Phantom trades: 0. Regime: SHORT_BIAS (3L/103S/14N of 120). Disk 83% (up from 82% — watch, threshold 85%). trades.json stale (updated 03:25) — expected downstream of pause, guardian still tracks the open position. No auto-fixes needed.

@@ -5063,5 +5063,14 @@
     "category": "exit structure",
     "status": "suggested",
     "risk": "low (backtest first, v6 vehicle, no live change)"
+  },
+  {
+    "date": "2026-10-17T13:39:53Z",
+    "idea": "SHORT-midband advisory in ai_trader_precheck (warn when pick RSI in 45-55 death band, do not hard-block manual discretion)",
+    "rationale": "Verified drift: SEI pick reasoning 12:46 calls 45-55 a 'sweet spot' while decider_run.py:2098 blocks that band for all non-pump-chain signals (14d 9T 0W -$0.89). Manual HL path bypasses decider gates, so the manual channel can enter exactly what the signal channel refuses. One advisory log line in precheck aligns doctrine without stripping manual override.",
+    "expected_impact": "Prevents manual entries into the verified death band; zero signal-path behavior change",
+    "category": "entry sniper / doctrine alignment",
+    "status": "suggested",
+    "risk": "low (advisory only)"
   }
 ]

@@ -1,16 +1,24 @@
-# Current State — brain_auditor Captain Run Oct 17 12:05 UTC
+# Current State — brain_auditor Captain Run Oct 17 13:40 UTC
 
-**Last Updated: 2026-10-17 12:05 UTC**
-**Updated by: brain_auditor — trail-arm-timeout candle OOS (all 4 cohorts), 0 behavior changes**
+**Last Updated: 2026-10-17 13:40 UTC**
+**Updated by: brain_auditor — soak verification + ai-trader doctrine-drift find, 0 behavior changes**
 
-## PIPELINE STATUS (12:05 UTC)
+## PIPELINE STATUS (13:40 UTC)
 
-- **24h: 35T −$1.84 (34.3% WR)** | 1 open (BTC SHORT #16258 manual) | **7d 213T 34.7% −$2.84** | Health CRITICAL
-- **Pipeline STOPPED** (vacation-guardrail since 04:08) — flat is the trade, correctly held. Auto-resume ~Oct 21.
-- Regime: BTC SHORT_BIAS (15m/4h), vol LOW, accumulation/declining. BTC ~81634, entry 81522, SL 81766 (~132pts). HOLD.
-- Exit signature: **7d HML 58T −$5.12 + atr_sl 52T −$4.23 vs TRAIL 68T +$7.00**
+- **24h frozen (pre-pause cohort): 25T −$1.65 (28% WR)** | 1 open (BTC SHORT #16258 manual) | **7d 212T 34.4% −$2.86** | Health CRITICAL
+- **Pipeline STOPPED** (vacation-guardrail since 04:08) + kill JSON live_trading=false — flat is the trade, correctly held. Auto-resume ~Oct 21. **Defeated-pause check PASS** (0 closes since 04:08).
+- Regime: BTC SHORT_BIAS (15m/4h), vol LOW, AT EMA300, LEAN_BEAR. Entry 81522, SL 81766. HOLD; invalidation = 15m close >81592 w/vol.
+- Exit signature: **7d HML 58T −$5.12 0%WR vs profit-trail 44T +$2.89 93.2%WR | ATR_SL now 75T −$0.14 near-flat (trail-arm timeouts converting bleeds)**
+- **All 9 last-run changes HOLDING.** ai-trader drift guard now FUNCTIONAL (ai_trader_state writes rsi_at_pick — SEI pick 12:46 rsi=51.9; prior fail-open concern closed).
 
-## ⚠️ KEY FINDING THIS RUN — TRAIL-ARM-TIMEOUT CANDLE OOS (all 4 cohorts)
+## ⚠️ THIS RUN'S FINDING — AI-TRADER DOCTRINE DRIFT (medium)
+
+Pick reasoning calls SHORT 45-55 a "sweet spot" (SEI rsi 51.9) while decider_run.py:2098 blocks
+exactly that band for all non-pump-chain (14d 9T 0W −$0.89). Manual HL path bypasses decider
+gates — T's channel can enter what the signal channel refuses. **Creative (pre-registered, not
+shipped): SHORT-midband ADVISORY in ai_trader_precheck (warn-only).**
+
+## ⚠️ PRIOR RUN FINDING (11:46, still in force) — TRAIL-ARM-TIMEOUT CANDLE OOS (all 4 cohorts)
 
 Same test class that killed universal MFE-CUT, now applied to the *signal-scoped* mechanism
 (as-coded: still open at age≥T AND live_pnl <0.40% → close). `analysis/trail_arm_candle_oos_2026-10-17.py`.
