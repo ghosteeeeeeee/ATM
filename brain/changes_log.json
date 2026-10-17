@@ -1452,5 +1452,16 @@
     "after": "BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW=True, MIN=55; logs [SHADOW] BB-BOUNCE TRAIL-ARM would-fire once per trade",
     "rationale": "Exit-magnitude is THE lever (momentum-gate verdict). 7d bb-bounce chop 10T -$0.79 vs trail 10T +$0.38. T=55m sits between HML cluster (18-54m, already dead) and atr_sl cluster (102-145m, catchable). Shadow-first per CEO D2. Flip live only with CEO GO + 14d data + OOS backtest.",
     "impact": "Zero live behavior change. Gathers would-fire data for exit-ladder decision. Revert: set BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW=False."
+  },
+  {
+    "timestamp": "2026-10-17T00:48:24Z",
+    "agent": "brain_auditor",
+    "change": "Extend trail-arm-timeout SHADOW to ai-trader+ LONG (T=55m, zero behavior)",
+    "type": "creative",
+    "file": "scripts/position_manager.py + scripts/hermes_constants.py",
+    "before": "Shadow matched bb-bounce only",
+    "after": "Shadow matches bb-bounce OR ai-trader; log prefix generalized to TRAIL-ARM",
+    "rationale": "ai-trader+ 4th-worst SL-family bleeder 7d 12T -$0.92; long-hold losers INJ 65m/ME 94m catchable at 55m; armed winners structurally immune via live_pnl<arm guard (same pattern as bb-squeeze +$1.48/30d, pump-chain 13T 0%WR)",
+    "impact": "Shadow collects counterfactual; flip live only with CEO GO + 14d data + OOS backtest"
   }
 ]

@@ -1664,8 +1664,10 @@ BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN = 60  # minutes hold before stall check; fires 
 # Revert: set False (one line). Monitor: trail_arm_timeout exits on pump-chain cohort.
 PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED = True
 PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45  # pump-chain grinds shorter than bb-squeeze before spike
-# bb-bounce-v2 LONG trail-arm-timeout SHADOW (brain_auditor 2026-10-16 22:30Z). Zero behavior — logs would-fires only.
-# 7d bb-bounce: chop 10T -$0.79 vs trail 10T +$0.38. Losers past T=55m: RUNE 80m HML, BABY 102m/ETC 131m/GMX 145m atr_sl.
+# Trail-arm-timeout SHADOW — bb-bounce + ai-trader+ LONG (brain_auditor 2026-10-16 22:30Z / 2026-10-17 00:40Z).
+# Zero behavior — logs would-fires only. ai-trader+ added: 7d 12T SL exits -$0.92, long-hold losers INJ 65m/ME 94m catchable;
+# armed winners (KAS 80m, NEAR 58m, CRV 47m) structurally immune via live_pnl < arm guard.
+# bb-bounce: chop 10T -$0.79 vs trail 10T +$0.38. Losers past T=55m: RUNE 80m HML, BABY 102m/ETC 131m/GMX 145m atr_sl.
 # Winners past T=55m: MNT 424m/+3.57%, BIGTIME 84m/+1.61%, POL 80m/+2.22% (all trail — likely armed; shadow confirms).
 # T=55m sits between HML cluster (18-54m, already dead before check) and atr_sl cluster (102-145m, catchable).
 # Flip live only with CEO GO + 14d shadow data + OOS backtest (HR-kill guard mandatory per dead_money lesson).

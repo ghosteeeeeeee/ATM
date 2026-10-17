@@ -3552,12 +3552,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 except Exception as e:
                     log(f"  TRAIL-ARM TIMEOUT error for {token}: {e}")
 
-        # ── 7b-shadow. BB-BOUNCE TRAIL-ARM TIMEOUT SHADOW (zero behavior) ──────
-        # brain_auditor 2026-10-16 22:30Z. Logs would-fires only; never closes.
-        # Flip live only with CEO GO + 14d shadow data + OOS backtest (HR-kill guard mandatory).
+        # ── 7b-shadow. TRAIL-ARM TIMEOUT SHADOW — bb-bounce + ai-trader+ (zero behavior) ──
+        # brain_auditor 2026-10-16 22:30Z (bb-bounce) / 2026-10-17 00:40Z (ai-trader+).
+        # Logs would-fires only; never closes. Flip live only with CEO GO + 14d shadow data.
         if direction == 'LONG' and BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW:
             _bbs_sig_l = (_pos_signal or '').lower()
-            if 'bb-bounce' in _bbs_sig_l and trade_id not in _bb_bounce_shadow_logged:
+            if ('bb-bounce' in _bbs_sig_l or 'ai-trader' in _bbs_sig_l) and trade_id not in _bb_bounce_shadow_logged:
                 try:
                     _bbs_ot = pos.get('open_time') or open_time
                     if _bbs_ot:
@@ -3571,7 +3571,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         _bbs_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100
                         if _bbs_age_m >= BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN and live_pnl < _bbs_arm_pct:
                             _bb_bounce_shadow_logged.add(trade_id)
-                            log(f"  [SHADOW] BB-BOUNCE TRAIL-ARM would-fire {token} {direction} {live_pnl:+.2f}% [{_bbs_age_m:.0f}m < arm {_bbs_arm_pct:.2f}%] trade={trade_id}")
+                            log(f"  [SHADOW] TRAIL-ARM would-fire {token} {direction} {live_pnl:+.2f}% [{_bbs_age_m:.0f}m < arm {_bbs_arm_pct:.2f}%] trade={trade_id} sig={_pos_signal}")
                 except Exception as e:
                     log(f"  [SHADOW] BB-BOUNCE TRAIL-ARM error for {token}: {e}")
 
