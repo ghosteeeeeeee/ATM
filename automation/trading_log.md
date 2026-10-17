@@ -10931,3 +10931,23 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - doji-bottom-long 24h 10T 4W −$0.53 — positive WR, largest 24h loser by signal, no kill rule, watch
 - 24h PnL −$1.89 sliding — CEO awareness
 - hard_max_loss 7 exits −$0.87 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-17 01:09] Hourly Analysis
+
+**Trades:** 3 closed last hour (0W 3L) — BTC ai-trader-manual atr_trail −$0.01, APT ai-trader+ hard_max_loss −$0.09, INJ ai-trader+ atr_sl_hit −$0.20
+**PnL:** −$0.30 last hour (0% WR) | 24h ~51T atr_sl_hit 17/51 = 33.3%
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: ai-trader+ 2T 0W this hour (needs 3+T); no signal 3+T this hour; pump-chain+ 24h 3T 0W −$0.47 (multi-emitter CEO escalation standing); pump-chain- 24h 8T 0W −$0.49 (standing CEO escalation)
+- atr_sl_hit 33.3% (under 40 threshold; tpsl_utils fix deployed)
+- 1-neg-hour (00:00) after flat 23:00 — no 3-consecutive streak → no size cut
+- Overtrade 3/hr (under 20); live_trading=true, kill JSON=true
+
+**Open Questions:**
+- pump-chain+ 24h 3T 0W −$0.47 — kill threshold MET, multi-emitter blocks unilateral kill → standing CEO escalation with pump-chain-
+- pump-chain- 24h 8T 0W −$0.49 — standing CEO decision
+- doji-bottom-long 24h 10T 4W −$0.53 — positive WR, largest 24h loser by signal, no kill rule, watch
+- 24h PnL sliding (~−$1.9) — CEO awareness
+- hard_max_loss 8 exits −$0.96 24h — standing CEO hold, momentum-gate backtest due Oct 17
