@@ -4767,3 +4767,4 @@ BY: auto_1hr
 
 BY: auto_1hr
 [2026-10-17 03:08] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 47T 20W −$1.89 (42.6%) | kill: none (0T this hour; pump-chain+ 3T 0W multi-emitter CEO escalation; pump-chain- 6T 0W standing CEO escalation) | atr_sl_hit 31.9% (under 40, tpsl fix deployed) | no neg streak | overtrade 0/hr | live_trading=true, kill JSON=true | No constants change → no signal_versions entry
+[2026-10-17 04:10] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 47T 16W −$2.27 (34%) | ⚠️ VACATION-GUARDRAIL PAUSED TRADING 04:08 UTC (7d WR 34.2%<35 AND 7d PnL −$3.41<−$2.00) — timers stopped, kill JSON=false, 1 BTC manual kept open, auto-resume armed | kill: none this hour (pump-chain+ 3T 0W multi-emitter CEO escalation; pump-chain- 6T 0W standing) | atr_sl_hit 31.9% (under 40) | no neg streak | No constants change → no signal_versions entry

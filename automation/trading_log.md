@@ -10992,3 +10992,27 @@ Final set: ['BABY', 'BTC', 'CFX', 'CHIP', 'ICP']
 - doji-bottom-long 24h 10T 4W −$0.53 — largest 24h signal loser, positive WR, watch
 - 24h PnL −$1.89 — CEO awareness
 - hard_max_loss 8 exits −$0.96 24h — standing CEO hold, momentum-gate backtest due Oct 17
+
+## [2026-10-17 04:10] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 47T 16W −$2.27 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T this hour; pump-chain+ 24h 3T 0W −$0.47 (multi-emitter, standing CEO escalation); pump-chain- 24h 6T 0W −$0.38 (standing CEO escalation)
+- atr_sl_hit 15/47 = 31.9% (under 40 threshold; tpsl_utils fix deployed)
+- No neg-hour streak (22:00 −$0.20, flat 23:00, 00:00 −$0.30, 01:00 +$0.01, flat since)
+- Overtrade 0/hr; no constants change → no signal_versions entry
+
+**⚠️ TRADING PAUSED (vacation guardrail, not auto_1hr):**
+- Fired 04:08:24 UTC: 7d WR 34.2% < 35.0% AND 7d PnL −$3.41 < −$2.00 (222T)
+- Stopped watchdog timer + pipeline service/timer; 0 HL positions closed; 1 BTC manual kept open
+- hype_live_trading.json → live_trading=false; guardrail armed for auto-resume (WR≥37% or pnl_7d≥0)
+
+**Open Questions:**
+- pump-chain+ / pump-chain- standing CEO escalations (still 0W)
+- doji-bottom-long 24h 10T 4W −$0.53 — largest 24h signal loser, positive WR, watch
+- 7d bleed is root cause of pause — CEO to decide stay-paused vs resume with size cut
+- hard_max_loss momentum-gate backtest due Oct 17
