@@ -137,12 +137,34 @@ def pause_trading(reason):
             else:
                 log(f"⚠️ [VACATION-GUARDRAIL] Could not stop {unit}: {r.stderr.strip()}", 'WARN')
 
-        # 3. Close all open HL positions + save flags
+        # 3. Close automated HL positions + save flags.
+        # FIX (2026-10-17): manual CEO trades (signal='ai-trader-manual') are
+        # EXEMPT from guardrail closes — trade #16257 BTC SHORT was force-closed
+        # at +0.76% by this pause without CEO intent. Pause gates automated
+        # trading; manual positions stay open until CEO closes them.
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from hyperliquid_exchange import disable_live_trading
-        result = disable_live_trading()
+        manual_coins = []
+        try:
+            import psycopg2
+            from _secrets import BRAIN_PASSWORD, BRAIN_HOST
+            _conn = psycopg2.connect(host=BRAIN_HOST, dbname='brain', user='postgres',
+                                     password=BRAIN_PASSWORD, connect_timeout=5)
+            _cur = _conn.cursor()
+            _cur.execute("""SELECT DISTINCT token FROM trades
+                            WHERE status='open' AND paper=false
+                            AND signal LIKE 'ai-trader-manual%'""")
+            manual_coins = [r[0] for r in _cur.fetchall()]
+            _cur.close()
+            _conn.close()
+        except Exception as mq:
+            log(f"⚠️ [VACATION-GUARDRAIL] manual trade query failed: {mq}", 'WARN')
+        result = disable_live_trading(exclude_coins=manual_coins)
         closed = result.get('closed_positions', [])
+        kept = result.get('kept_open', [])
         log(f"🛑 [VACATION-GUARDRAIL] Closed {len(closed)} HL positions: {closed}")
+        if kept:
+            log(f"🛑 [VACATION-GUARDRAIL] Kept {len(kept)} manual CEO trades open: {kept}")
 
         # 4. Keep the guardrail timer RUNNING so auto-resume can fire when
         #    metrics recover. (Pre-fix: stopped itself → permanent freeze

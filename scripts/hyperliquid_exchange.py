@@ -319,22 +319,32 @@ def enable_live_trading() -> dict:
     return result
 
 
-def disable_live_trading() -> dict:
+def disable_live_trading(exclude_coins=None) -> dict:
     """
     Disable live trading mirroring. Closes all open real positions immediately,
     then disables mirroring for future paper trades.
+
+    exclude_coins: list of coin names to KEEP open (e.g. manual CEO trades).
+    FIX (2026-10-17): vacation guardrail pause was force-closing manual CEO
+    trades (trade #16257 BTC SHORT closed at +0.76% by pause_trading without
+    CEO intent). Manual trades are now exempt from guardrail closes.
     """
+    exclude = {c.upper() for c in (exclude_coins or [])}
     positions = get_open_hype_positions_curl()
     closed = []
+    skipped = []
     errors = []
     for coin, pos in positions.items():
+        if coin.upper() in exclude:
+            skipped.append(coin)
+            continue
         r = close_position(coin)
         if r.get("success"):
             closed.append(coin)
         else:
             errors.append(f"{coin}: {r.get('error', 'unknown')}")
     _save_flags({"live_trading": False, "reason": "disabled", "ts": time.time()})
-    result = {"live_trading": False, "closed_positions": closed}
+    result = {"live_trading": False, "closed_positions": closed, "kept_open": skipped}
     if errors:
         result["close_errors"] = errors
     return result
