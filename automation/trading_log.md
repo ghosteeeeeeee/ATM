@@ -11690,3 +11690,26 @@ Final set: ['ALT', 'APT', 'CFX', 'CHIP', 'DOT', 'FIL']
 - hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
 - 7d PnL drifted −$2.95 → −$2.98; 7d WR 34.1% still below 37% resume threshold — size-reduce stays
 - Third quiet-ish hour (0T/0T/1T) — thin market, no open positions
+
+## [2026-10-18 13:28] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 13T 5W +$0.10 (38.5% WR) | 7d 205T 70W −$2.98 (34.1% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — no data to act on
+- atr_sl_hit 4/13 = 30.8% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; hl_copy_trader 2T 0W −$0.11 (under 3T threshold, standing watch)
+- No overtrading (0T/hr)
+- No new losing hour — prior tiny neg-hour streak remains ended
+- 1 open: HBAR SHORT pump-chain-,pump-chain-v6- @ 0.0885 (entered 12:56)
+- Regime check not needed for size cut — existing 30% size-reduce already active
+- Size-reduce 30% stays (7d WR 34.1% < 37%, 7d PnL −$2.98 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
+- 7d PnL −$2.98; 7d WR 34.1% still below 37% resume threshold — size-reduce stays
+- Third quiet hour in a row (0T/0T/0T over last 3h) — thin market, only HBAR SHORT open
