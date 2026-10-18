@@ -11508,3 +11508,52 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - SUPER LONG (ai-trader+) open ~3.7h, SL trailed above entry — watch for trail_arm/TP close next hour
 - ai-trader+ standing CEO escalation (24h 1T 0W −$0.15, 7d weak)
 - 7d WR 35.5% still below 37% resume threshold — size-reduce stays
+
+## [2026-10-18 05:27] Hourly Analysis
+
+**Trades:** 2 closed last hour (1 win, 1 loss)
+**PnL:** $0.00 last hour | 24h 8T 5W +$0.36 (62.5% WR) | 7d 202T 72W −$1.86 (35.6% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- SUPER LONG ai-trader+ rr_engine_trail_hit +$0.05 (+1.41%) — closed winner after ~4.7h hold, SL had trailed above entry (healthy trail behavior)
+- HYPE LONG hl_copy_trader hard_sl −$0.05 (−0.39%) — small clean loss
+- atr_sl_hit 1/8 = 12.5% last 24h (healthy, tpsl fix deployed)
+- Kill check: hl_copy_trader 2T 0W −$0.11 this 24h (under 3T threshold); ai-trader+ 2T 1W −$0.10 — no signal meets kill criteria
+- No overtrading (2T/hr); no 3-neg-hour streak (01:00 +$0.02, 03:00 −$0.03, 05:00 $0.00)
+- 1 open: BANANA LONG bb-bounce-v2-long+ $11.10 (open ~1.9h, entry 3.5546, SL 3.5236, TP 3.6158)
+- Size-reduce 30% stays (7d WR 35.6% < 37%, 7d PnL −$1.86 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- BANANA LONG bb-bounce-v2-long+ open ~1.9h — watch for TP/SL next hour
+- hl_copy_trader 24h 2T 0W −$0.11 — new standing watch (under kill threshold)
+- 7d WR 35.6% still below 37% resume threshold — size-reduce stays
+
+## LOSERS Update — 2026-10-18 06:05 UTC
+- REMOVE BTC (WR=50.0%, PnL=$-0.13, recovered)
+- REMOVE CRV (insufficient data)
+- ADD ALT (WR=40.0%, PnL=$0.35, low_wr (40.0%))
+
+Final set: ['ALT', 'APT', 'CFX', 'CHIP', 'DOT', 'FIL']
+
+## [2026-10-18 06:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** −$0.09 last hour | 24h 9T 5W +$0.27 (55.6% WR) | 7d 202T 71W −$2.18 (35.1% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- BANANA LONG bb-bounce-v2-long+ atr_sl_hit −$0.09 (−2.24%) — single small loss, healthy ATR-SL exit (same trade open since ~04:28, closed this hour)
+- atr_sl_hit 2/9 = 22.2% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; hl_copy_trader 2T 0W −$0.11 24h (under 3T threshold, standing watch)
+- No overtrading (1T/hr); no 3-neg-hour streak (23:00 +$0.47, 01:00 +$0.02, 03:00 −$0.03, 05:00 −$0.09)
+- 0 open trades
+- Size-reduce 30% stays (7d WR 35.1% < 37%, 7d PnL −$2.18 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (under kill threshold)
+- 7d WR 35.1% still below 37% resume threshold — size-reduce stays

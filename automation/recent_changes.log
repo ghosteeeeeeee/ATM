@@ -4815,3 +4815,9 @@ BY: auto_1hr
 BY: brain_auditor
 [2026-10-18 04:28] auto_1hr: NO CONFIG CHANGE — 1T 0W -$0.06 last hour (ETH SHORT hl_copy_trader atr_sl_hit, -1.72%) | 24h 6T 4W +$0.36 (66.7%) | 7d 200T 71W -$1.86 (35.5%) — size-reduce 30% stays | kill: none (hl_copy_trader 1T 0W under 3T; ai-trader+ standing CEO watch 1T 0W -$0.15) | atr_sl_hit 16.7% (healthy, tpsl deployed) | 3 open: HYPE LONG hl_copy_trader, BANANA LONG bb-bounce-v2-long+, SUPER LONG ai-trader+ (SL trailed above entry) | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-18 05:27] auto_1hr: NO CONFIG CHANGE — 2T 1W $0.00 last hour (SUPER ai-trader+ rr_engine_trail_hit +$0.05 +1.41%; HYPE hl_copy_trader hard_sl -$0.05) | 24h 8T 5W +$0.36 (62.5%) | 7d 202T 72W -$1.86 (35.6%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T; ai-trader+ 2T 1W -$0.10) | atr_sl_hit 12.5% (healthy, tpsl deployed) | 1 open: BANANA LONG bb-bounce-v2-long+ $11.10 | No constants change → no signal_versions entry
+BY: auto_1hr
+BY: brain_auditor
+[2026-10-18 05:41] brain_auditor: 1 infra bugfix (trade_watchdog _SIGNAL_FLAG_MAP +11 killed signals, 14-case assert PASS), 0 trading config — soak #10 | 24h 8T 5W +$0.36 | 7d 202T 35.6% −$1.86 | BANANA TAT shadow first live counterfactual (would-exit 55m ~−0.4%) | generator-gating CLOSED (pump-chain+ EXTREME +$2.14/14d = habitat, no gap) | hl_copy shorts monitor | TAT flip criteria pre-registered | escalation #14 exit-ladder candle OOS | Protected flags INTACT
+[2026-10-18 06:28] auto_1hr: NO CONFIG CHANGE — 1T 0W -$0.09 last hour (BANANA bb-bounce-v2-long+ atr_sl_hit, -2.24%) | 24h 9T 5W +$0.27 (55.6%) | 7d 202T 71W -$2.18 (35.1%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 22.2% (healthy, tpsl deployed) | 0 open | No constants change → no signal_versions entry
+BY: auto_1hr
