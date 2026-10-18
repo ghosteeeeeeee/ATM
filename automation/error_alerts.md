@@ -1253,3 +1253,10 @@
 
 ## Error Alerts — 2026-10-17 23:08 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-18 01:08 UTC
+- **REPEATED** (41x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK] TOK-TOK TOK for TOK: name '_peak_high' is not defined`
+
+## Error Alerts — 2026-10-18 01:24 UTC
+- **WARN** (recurring): `[SHADOW] MFE-CUT error for ADA/SUPER: name '_peak_high' is not defined` — shadow block in `check_and_manage_positions` referenced `_peak_high`/`_entry` defined only in `_collect_atr_updates` scope.
+- **AUTO-FIX**: Changed MFE-CUT shadow to read `highest_price`/`lowest_price`/`entry_price` from `pos` dict directly. Syntax verified, committed `bb41994f`.

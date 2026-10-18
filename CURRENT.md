@@ -1,54 +1,65 @@
-# Current State — brain_auditor Captain Run Oct 18 00:35 UTC
+# Current State — brain_auditor Captain Run Oct 18 01:45 UTC
 
-**Last Updated: 2026-10-18 00:37 UTC**
-**Updated by: brain_auditor — 0 config changes (soak #6), all last-run changes verified**
+**Last Updated: 2026-10-18 01:45 UTC**
+**Updated by: brain_auditor — 0 config changes (soak #7), all last-run changes verified**
 
-## PIPELINE STATUS (00:35 UTC)
+## PIPELINE STATUS (01:45 UTC)
 
-- **Trading LIVE** with 0.3x size-reduce (7d WR 34.8% < 35 AND 7d PnL −$2.13 < $0 — both still failing by a hair).
-- **24h 6T 3W +$0.28 (50% WR) — first positive 24h in ~3 days. | 7d 201T 70W −$2.13 (34.8%). | 30d 778T −$3.26 (44.0%).**
-- **0 open.** Book flat. All 6 slots free.
-- NXPC LONG pick (23:14, conf 78) NEVER FILLED — correctly blocked: RR grade D (0.64), meta RSI drifted 56.9→61.5 > dynamic ceiling 60, tide bearish, osc falling. System worked. Watchdog will re-pick.
-- Regime: BTC 15m LONG_BIAS, 4h SHORT_BIAS, volatility NORMAL→EXTREME flicker, wyckoff ACCUMULATION, market CALM. Long tilt wide (33L/8S) but BTC pinned near EMA300 — correlation risk if stacking alt longs.
-- Watchdog: CRITICAL (stale historical). Steers 001/004/005 STALE, 002 VERIFIED-DEFENDED, 003 scheduled Oct 19.
+- **Trading LIVE** with 0.3x size-reduce (7d WR 35.1% < 37 AND 7d PnL −$2.11 < $0 — both resume conditions still failing).
+- **24h 5T 4W +$0.40 (80% WR) — positive post-resume. | 7d 202T 71W −$2.11 (35.1%). | 30d 776T −$2.79 (44.2%).**
+- **1 open:** SUPER LONG ai-trader+ +0.86% (rsi_at_pick 43.7 written, drift-guard functional). ADA LONG closed trail_arm_timeout **+$0.02** — pump-chain 45m TAT live-validated positive exit.
+- Regime: BTC 15m LONG_BIAS, 4h SHORT_BIAS, continuum AT EMA300, vol LOW — conflict zone. Size-reduce is correct posture.
 
-## THIS RUN — 0 CONFIG CHANGES (SOAK #6)
+## THIS RUN — 0 CONFIG CHANGES (SOAK #7)
 
-6 changes in flight (dead-gap, drift guard, EXTREME 0.85, contrarian fix, pp-cond shadow, MFE-CUT semantic) with only 6 post-resume closes. 24h just turned positive. No new entry filters.
+Last brain_auditor run was 00:35 UTC same night. 11 changes still in soak with thin post-resume cohort. No new entry filters. Watchdog steers triaged (doji STALE, streak STALE, cluster RESOLVED, ai-trader Oct 19 re-eval stands).
 
 ## LAST-RUN CHANGES — ALL 11 VERIFIED
 
 | Change | Status | Evidence |
 |--------|--------|----------|
-| MFE-CUT peak-MFE semantic | CODE-VERIFIED | LONG+SHORT branches, fail-open, once/trade. WLD 21:15 fires were pre-fix. New semantics live next cycle. |
-| Contrarian entry_price fix | HOLDING | Post-fix BANANA event has entry context |
-| pp-cond shadow fields | COLLECTING | 5 pp_cond_would_block events |
-| ai-trader drift guard | FUNCTIONAL | WLD passed Δ13.2; NXPC state has rsi_at_pick; NXPC later blocked by RR-D ceiling (defense-in-depth, correct) |
-| doji re-kill | HOLDING | 0 trades since Oct 16 20:30 |
-| pump-chain+ dead-gap | HOLDING | 0 post-resume opens |
-| SHORT midband | HOLDING | 0 violations |
-| EXTREME conf 0.85 | WORKING (n=2) | ALT SHORT winner +$0.47 entered under 0.85 |
-| sweet-spot MIN 55 | FIRING | meta-source +10 boosts (HYPER/JUP/CFX) |
-| SHORT floor-35 | HOLD | revert trigger not hit |
-| #16258 SL rake | CLOSED | UNIVERSAL_MAX_HOLD +$0.05 |
+| doji re-kill | HOLDING | 0 trades since Oct 16 20:30 (steer-007 stale) |
+| pump-chain+ dead-gap | HOLDING | ADA entered valid gap, timeout +$0.02 |
+| ai-trader drift guard | FUNCTIONAL | SUPER state rsi_at_pick=43.7; WLD passed Δ13.2 |
+| EXTREME conf 0.85 | HOLDING | ALT SHORT winner entered under 0.85 |
+| sweet-spot MIN 55 | FIRING | 14d 55-60 LONG 33T 57.6%WR +$0.86 only profit band |
+| SHORT floor-35 | HOLD | 27T since Oct 13 net −$0.06 (trigger −$1.00 not hit) |
+| SHORT midband | WORKING | PRE 26T −$0.96 → POST 2T −$0.13 |
+| MFE-CUT peak-MFE | COLLECTING | code verified; 0 fires yet (thin 45m+ low-MFE cohort) |
+| bb-bounce/ai-trader TAT shadow | COLLECTING | covers both signals PM:3603 |
+| pp-cond shadow | COLLECTING | CHIP would-block at 29.7 in floor_admit_shadow |
+| contrarian shadow | COLLECTING | 593 events |
 
 ## WEALTH GAP (7d)
 
 | Family | Trades | WR | PnL |
-|--------|--------|----|-----|
-| TRAIL | 67 | 92.5% | **+$7.83** |
+|--------|--------|-----|-----|
 | CHOP (HML/atr_sl/hard_sl/stale) | 112 | 0.9% | **−$9.53** |
-| trail_arm_timeout | 10 | 20% | −$0.36 (realized; vs HML counterfactual −3%acct saves) |
+| TRAIL | 52 | 80.8% | **+$2.79** |
+| atr_trail_hit | 23 | 82.6% | **+$4.09** |
 
-## SHADOWS IN FLIGHT
+Unchanged. Entry quality (never-armed chop) remains THE bleed.
 
-- **MFE-CUT** (peak-MFE semantics): clean population from 23:38. First pre-fix fire WLD confirmed mechanism. Review after 48h.
-- **bb-bounce + ai-trader trail-arm-timeout**: WLD first fire would-exit −0.38% vs actual −0.70% (save 0.32%). Collecting.
-- **contrarian + pp-cond + chase-ratio (to Oct 27)**: collecting.
+## LOSING AUTOPSY
+
+- **24h:** single loser WLD ai-trader+ −$0.15 hard_sl. Post-guard drift-passed (Δ13.2). n=1 variance.
+- **ai-trader+ LONG 7d #1 live bleed:** 19T 26.3% −$0.93. CHOP 14T 7.1% −$1.16 avg MFE 0.219, holds 11-35m. T=45 MFE-cut counterfactual: 1 fire (ME 94m, save ~$0.08), 0 false-kills. Chop dies on SL fast — timeout too slow; drift guard is correct lever.
+
+## REJECTED THIS RUN
+
+- LONG 60-70 EXTREME block: 14d −$0.22 BUT 30d 68T 50% +$2.94, 7d +$0.13, t=−0.22, kills 12 winners +$2.11. OOS fail.
+- Kill ai-trader+ on streak: post-guard n=1, Oct 19 re-eval scheduled.
+- Act on doji steer: signal dead, stale.
+
+## CREATIVE (logged)
+
+1. ai-trader signal-scoped exit T=25-30 if timeout ever flips (fast-bleed profile measured).
+2. Pre-register pp-cond flip criteria: 14d net save >$1 with <10% winner-kill → promote w/ CEO GO.
 
 ## PENDING / ESCALATIONS
 
-1. **ai-trader+ re-evaluate Oct 19** — post-guard cohort n=1 (WLD −$0.15 drift-passed). Pre-guard losses excluded.
-2. **exit-ladder signal-scoped backtest P0 — STILL NOT COMMISSIONED (10th+ request).** Universal version OOS-failed; signal-scoped is the only path. Blocks timeout/MFE-CUT flip decisions.
-3. **Creative logged (not shipped):** (a) ai-trader compactor-hostility precheck skip (NXPC evidence), (b) dump-confirmed SHORT classifier (blocked by soak).
-4. Protected flags 13/13 INTACT.
+1. **ai-trader+ post-guard re-eval Oct 19** — WLD −$0.15 + SUPER cohort.
+2. **exit-ladder signal-scoped backtest P0 — STILL NOT COMMISSIONED (11th+ request).** Use ai-trader fast-bleed (T=25-30) as first scope.
+3. **Size-reduce 0.3x** until 7d WR ≥37 AND 7d PnL ≥$0.
+4. Sideways: hermes-bug-hunter.service FAILING (tech-debt lint: 132 bare excepts, 52 conn leaks) — not trading-critical, backlog.
+5. Protected flags 13/13 INTACT.

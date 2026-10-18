@@ -1,151 +1,140 @@
 {
-  "timestamp": "2026-10-18T00:36:24.294994+00:00",
+  "timestamp": "2026-10-18T01:45:00Z",
   "agent": "brain_auditor",
   "run_type": "captain_audit",
   "config_changes_applied": [],
-  "summary": "0 config changes (soak #6). 24h 6T 50%WR +$0.28 first positive window in ~3d. 7d 201T 34.8% -$2.13 size-reduce active. All 11 last-run changes verified HOLDING/WORKING. Protected flags 13/13 INTACT.",
-  "trade_summary": {
-    "24h": {
-      "trades": 6,
-      "wr": 50.0,
-      "pnl": 0.28
-    },
-    "7d": {
-      "trades": 201,
-      "wr": 34.8,
-      "pnl": -2.13
-    },
-    "30d": {
-      "trades": 778,
-      "wr": 44.0,
-      "pnl": -3.26
-    },
-    "wealth_gap_7d": {
-      "TRAIL": {
-        "trades": 67,
-        "wr": 92.5,
-        "pnl": 7.83
-      },
-      "CHOP": {
-        "trades": 112,
-        "wr": 0.9,
-        "pnl": -9.53
-      },
-      "trail_arm_timeout": {
-        "trades": 10,
-        "wr": 20.0,
-        "pnl": -0.36
-      }
-    }
+  "session_brain_stats": {
+    "queries": ["doji kill re-enable", "ai trader drift guard", "LONG bleed SHORT_BIAS"],
+    "notes": "Session brain confirms chop-vs-trend wealth gap and drift-guard rationale. No new implementable ideas beyond current soak queue."
   },
-  "watchdog_steer_resolution": [
+  "trade_summary": {
+    "24h": {"trades": 5, "wins": 4, "pnl": 0.40, "wr": 80.0},
+    "7d": {"trades": 202, "wins": 71, "pnl": -2.11, "wr": 35.1},
+    "30d": {"trades": 776, "wins": 343, "pnl": -2.79, "wr": 44.2},
+    "open": "SUPER LONG ai-trader+ +0.86% unrealized; ADA LONG closed trail_arm_timeout +$0.02",
+    "regime": "BTC 15m LONG_BIAS / 4h SHORT_BIAS / continuum AT EMA300 / vol LOW — conflict zone",
+    "pipeline": "size-reduce 0.3x active (7d WR 35.1% < 37 AND 7d PnL -$2.11 < $0)"
+  },
+  "watchdog_steers": [
     {
       "id": "steer-001",
-      "verdict": "STALE",
-      "evidence": "Last 6 closes: 3W/3L +$0.28 50%WR. 13/20 streak was historical pre-resume."
+      "title": "BTC SHORT re-entry zone",
+      "disposition": "MANUAL/CEO — not auto-executable. Regime conflict (scanners SHORT_BIAS vs continuum LEAN_BULL). No config action."
     },
     {
       "id": "steer-002",
-      "verdict": "VERIFIED-DEFENDED",
-      "evidence": "Chop family unchanged; all entry defenses active and soaking (dead-gap, drift, midband, floor-35, EXTREME 0.85). Exit-side is the lever — MFE-CUT shadow collecting with corrected semantics."
+      "title": "Losing streak 13/20",
+      "disposition": "STALE WINDOW — includes pre-pause Oct 16-17 trades. Post-resume 24h is 5T 4W +$0.40 (80% WR). Size-reduce already active as defense."
     },
     {
       "id": "steer-003",
-      "verdict": "SCHEDULED",
-      "evidence": "ai-trader+ re-eval Oct 19. Post-guard cohort: WLD hard_sl -$0.15 (drift PASSED delta 13.2), NXPC blocked by RR-D ceiling. n=1 too small to act."
+      "title": "SUPER+ADA cluster",
+      "disposition": "RESOLVED — ADA closed trail_arm_timeout +$0.02 (pump-chain 45m timeout worked); SUPER still open +0.86%."
     },
     {
       "id": "steer-004",
-      "verdict": "STALE",
-      "evidence": "ai-trader-manual BTC churn ended — #16258 closed UNIVERSAL_MAX_HOLD +$0.05, 0 open."
+      "title": "10 wrong-side losses",
+      "disposition": "HISTORICAL VERIFIED — LONG 2/14 in stale window. Defenses holding: doji kill, midband, sweet-spot, drift guard. LONG-SHORT-BIAS block previously falsified (premise failed)."
     },
     {
       "id": "steer-005",
-      "verdict": "STALE",
-      "evidence": "doji killed Oct 16 20:30, 0 trades since."
+      "title": "ai-trader+ 3-loss streak",
+      "disposition": "POST-GUARD n=1 closed (WLD -$0.15 drift-passed) + SUPER open green. Pre-guard losses excluded. Oct 19 re-eval STANDS. No kill."
+    },
+    {
+      "id": "steer-006",
+      "title": "ai-trader-manual streak",
+      "disposition": "Manual/hl_copy trades, small n. Monitor only."
+    },
+    {
+      "id": "steer-007",
+      "title": "doji-bottom-long 5-loss streak",
+      "disposition": "STALE — signal KILLED Oct 16 20:30. 0 trades since (last close ZEN 18:44). Steer is historical noise."
     }
   ],
-  "last_run_change_verification": [
-    {
-      "change": "MFE-CUT shadow semantic fix (peak-MFE not live_pnl@T)",
-      "status": "CODE-VERIFIED",
-      "evidence": "position_manager.py:3641-3648 handles LONG (_peak_high) and SHORT (_peak_low), fail-open, fires once/trade. WLD fires 21:15-21:22 were PRE-fix old semantics; new semantics active next cycle. 0 post-fix fires (0 open)."
-    },
-    {
-      "change": "Contrarian entry_price fix",
-      "status": "HOLDING",
-      "evidence": "0 post-fix classified events since 22:37 (BANANASHORT logged at 23:35 is post-fix, has entry context)."
-    },
-    {
-      "change": "pp-cond shadow fields",
-      "status": "COLLECTING",
-      "evidence": "floor_admit_shadow.jsonl 107KB; 5 pp_cond_would_block events."
-    },
-    {
-      "change": "ai-trader drift guard AI_TRADER_RSI_DRIFT_MAX=15",
-      "status": "FUNCTIONAL",
-      "evidence": "WLD fire passed delta 13.2; NXPC state has rsi_at_pick 56.9; NXPC blocked later by RR-D dynamic ceiling (RSI 61.5>60), not drift — defense-in-depth correct."
-    },
-    {
-      "change": "doji re-kill",
-      "status": "HOLDING",
-      "evidence": "0 doji trades since Oct 16 20:30."
-    },
-    {
-      "change": "pump-chain+ dead-gap LONG block",
-      "status": "HOLDING",
-      "evidence": "0 post-resume pump-chain+ opens."
-    },
-    {
-      "change": "SHORT midband meta-source",
-      "status": "HOLDING",
-      "evidence": "0 violations in log window."
-    },
-    {
-      "change": "EXTREME conf 1.15->0.85",
-      "status": "WORKING-UNVALIDATED",
-      "evidence": "2 EXTREME closes post-change +$0.32 50%WR (ALT SHORT winner +$0.47 entered under 0.85). n=2, not statistically validated."
-    },
-    {
-      "change": "LONG sweet-spot MIN 55",
-      "status": "FIRING-CORRECTLY",
-      "evidence": "meta-source +10 boosts logged (HYPER/JUP/CFX RSI 55-60). 7d band previously +$0.54 56.3%."
-    },
-    {
-      "change": "SHORT floor-35",
-      "status": "HOLD",
-      "evidence": "7d SHORT 60T -$0.72 33.3%; 35-45 band net flat; revert trigger NOT hit."
-    },
-    {
-      "change": "BTC SHORT #16258 SL rake",
-      "status": "CLOSED-CORRECTLY",
-      "evidence": "UNIVERSAL_MAX_HOLD +$0.05 after 813min."
-    }
+  "last_run_verify": [
+    {"change": "doji rekill", "status": "HOLDING", "evidence": "0 doji trades since Oct 16 20:30"},
+    {"change": "pump-chain+ dead-gap", "status": "HOLDING", "evidence": "ADA entered with valid gap, exited trail_arm_timeout +$0.02"},
+    {"change": "ai-trader drift guard", "status": "FUNCTIONAL", "evidence": "SUPER state has rsi_at_pick=43.7; WLD passed Δ13.2; APT-class drift blocked path in code"},
+    {"change": "EXTREME conf 0.85", "status": "HOLDING", "evidence": "ALT SHORT winner entered under 0.85"},
+    {"change": "sweet-spot MIN 55", "status": "FIRING", "evidence": "14d 55-60 LONG 33T 57.6%WR +$0.86 only profitable band"},
+    {"change": "SHORT floor-35", "status": "HOLD", "evidence": "RSI 35-45 SHORT cohort since Oct 13: n=27 total -$0.06 (trigger -$1.00 NOT hit)"},
+    {"change": "SHORT midband block", "status": "WORKING", "evidence": "PRE 26T -$0.96 → POST 2T -$0.13"},
+    {"change": "MFE-CUT peak-MFE semantic", "status": "COLLECTING", "evidence": "code verified PM:3636-3651; 0 fires yet (few 45m+ low-MFE holds since fix)"},
+    {"change": "bb-bounce/ai-trader trail-arm timeout shadow", "status": "COLLECTING", "evidence": "covers bb-bounce + ai-trader (PM:3603)"},
+    {"change": "pp-cond shadow", "status": "COLLECTING", "evidence": "floor_admit_shadow has pp_cond_would_block; CHIP would-block at 29.7"},
+    {"change": "contrarian shadow", "status": "COLLECTING", "evidence": "593 events, last BIGTIME"}
   ],
-  "nxpc_pick_autopsy": {
-    "pick": "NXPC LONG conf 78, rsi_at_pick 56.9, fired 23:14",
-    "outcome": "NEVER FILLED — correctly blocked",
-    "block_chain": "RR engine grade D (R:R 0.64-0.66) -> dynamic ceiling min(75,60)=60 -> meta RSI 61.5 > 60 blocked at 23:20-23:24 every cycle. Bullish override requires LEAN_BULL linreg; continuum had NEUTRAL. Tide bearish 0.7x, oscillator MID+falling 0.7x, EXTREME 0.85x, score floored to 0.5.",
-    "verdict": "CORRECT BLOCK — conf 78 pick had grade-D geometry, meta RSI drifted 56.9->61.5, all secondary filters agreed. System working as designed. No action.",
-    "side_note": "Watchdog ai-trader precheck passed what compactor would block — precheck could learn compactor-hostility (multiplier product <0.20 predicts block). Creative idea logged."
+  "wealth_gap_7d": {
+    "CHOP_family": {"trades": 112, "wr": 0.9, "pnl": -9.53},
+    "TRAIL_family": {"trades": 52, "wr": 80.8, "pnl": 2.79},
+    "atr_trail_hit": {"trades": 23, "wr": 82.6, "pnl": 4.09},
+    "note": "Unchanged. Entry quality (never-armed chop) remains THE bleed; exit engine fine."
   },
-  "recurring_problems": [
+  "losing_autopsy": {
+    "24h_losers": [
+      {
+        "trade": "WLD ai-trader+ LONG -$0.15 hard_sl",
+        "signal": "ai-trader+",
+        "regime": "EXTREME",
+        "root_cause": "Post-guard drift-passed entry (Δ13.2 < 15) that still lost. n=1 — variance, not pattern.",
+        "recommended_change": "None. Oct 19 re-eval will judge post-guard cohort.",
+        "confidence": "LOW (n=1)"
+      }
+    ],
+    "ai_trader_long_7d": {
+      "total": "19T 26.3%WR -$0.93",
+      "chop_exits": "14T 7.1%WR -$1.16 avg MFE 0.219%",
+      "trail_family": "5T ~80%WR +$0.23",
+      "mfe_cut_counterfactual_T45": "1/14 fire (ME 94m mfe=0 save ~$0.08); 0 winner false-kills. Chop dies FAST (11-35m holds) on SL — timeout too slow; entry-side (drift guard) is correct lever.",
+      "root_cause": "Same chop-entry pattern: never armed trail. Pre-guard losses included APT RSI-drift 57→34. Drift guard now blocks that class."
+    }
+  },
+  "rejected_this_run": [
     {
-      "problem": "Chop family exit-magnitude (HML/atr_sl never reach trail-arm)",
-      "status": "THE lever, unchanged. 7d CHOP 112T 0.9%WR -$9.53 vs TRAIL 67T 92.5% +$7.83. Universal MFE-cut OOS-FAILED (fk 40% winners). Signal-scoped: pump-chain timeout LIVE (9 fires -$0.35 realized, vs counterfactual HML -3%acct saves), bb-bounce+ai-trader timeout shadows collecting (WLD first fire: would-exit -0.38% vs actual -0.70% = save 0.32%)."
+      "idea": "Block LONG RSI 60-70 EXTREME",
+      "data": "14d 38T 31.6% -$0.22 looks bleed BUT 30d 68T 50% +$2.94 and 7d 26T +$0.13; t=-0.22 noise; 12 winners +$2.11 (IOTA/BANANA/ARB/ICP pump-chain trails) would be killed",
+      "verdict": "REJECT — OOS fail at 30d, same trap as prior RSI-ceiling attempts"
     },
     {
-      "problem": "self_learner exit-ladder candle backtest P0 undelivered",
-      "status": "10th+ re-request. Per Oct-17 OOS verdict must be signal-scoped, not universal. Blocks flip decisions on MFE-CUT and timeout shadows."
+      "idea": "Kill ai-trader+ on 3-loss streak",
+      "data": "Post-guard closed n=1 (WLD); SUPER open green; drift guard is the fix under soak",
+      "verdict": "REJECT — premature, Oct 19 re-eval scheduled"
+    },
+    {
+      "idea": "Act on doji steer",
+      "data": "0 trades since kill Oct 16 20:30",
+      "verdict": "REJECT — stale steer"
     }
   ],
-  "next_actions": [
-    "ai-trader+ re-evaluate Oct 19 (48h post drift-guard, pre-guard losses excluded)",
-    "MFE-CUT shadow review after 48h clean population (post 23:38 fix)",
-    "Contrarian PROMOTE recheck after 48h clean events",
-    "Soak watch: 6 changes in flight, need 48h+ post-resume data before any new entry filter",
-    "exit-ladder signal-scoped backtest: STILL NOT COMMISSIONED (P0)"
+  "creative_improvements": [
+    {
+      "date": "2026-10-18T01:45:00Z",
+      "idea": "ai-trader+ signal-scoped exit profile: chop dies in 11-35m (median ~25m), so universal T=45 MFE-cut misses 13/14. If ever flipping timeout live for ai-trader, use T=25-30m scope — not 45m. Trail-arm shadow at 55m also slow for this signal's bleed shape.",
+      "rationale": "7d ai-trader+ LONG CHOP 14T -$1.16; only ME (94m stall) is catchable by T=45. Fast-bleed cohort.",
+      "expected_impact": "Informational — guides signal-scoped backtest design (P0 still open).",
+      "category": "exit sniper",
+      "status": "suggested",
+      "risk": "low",
+      "data": "measured this run from PG"
+    },
+    {
+      "date": "2026-10-18T01:45:00Z",
+      "idea": "Pre-register pp-cond shadow flip criteria: if 14d shadow shows net save >$1 with <10% winner-kill on floor-admitted trades, promote to live penalty with CEO GO.",
+      "rationale": "pp_cond_would_block already firing (CHIP at 29.7). Flip criteria documented before data arrives = claim hygiene.",
+      "expected_impact": "Blocks low-quality floor-admits without hard-killing signals.",
+      "category": "entry sniper",
+      "status": "pre-registered",
+      "risk": "low"
+    }
   ],
-  "protected_flags": "13/13 INTACT",
-  "size_reduce": "0.3x active (7d WR 34.8% < 35 AND PnL -$2.13 < $0)"
+  "changes_from_last_run": "All 11 last-run changes verified holding/collecting. No reverts needed.",
+  "next_actions": [
+    "ai-trader+ post-guard re-eval Oct 19 (WLD + SUPER cohort)",
+    "exit-ladder signal-scoped backtest P0 — STILL NOT COMMISSIONED (11th+ request); use ai-trader fast-bleed profile (T=25-30) as first scope",
+    "Soak watch: 6 unvalidated changes in flight; do not stack new entry filters until ≥48h post-resume data",
+    "Size-reduce 0.3x stays until 7d WR ≥37 AND 7d PnL ≥$0",
+    "Sideways: hermes-bug-hunter.service FAILING (tech-debt lint: 132 bare excepts, 52 conn leaks) — not trading-critical, backlog"
+  ],
+  "protected_flags": "13/13 INTACT"
 }

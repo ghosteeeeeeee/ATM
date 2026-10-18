@@ -5218,5 +5218,26 @@
     "status": "suggested",
     "risk": "low",
     "blocked_by": "soak discipline — do not ship new shadow until current 6 changes have 48h data"
+  },
+  {
+    "date": "2026-10-18T01:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "ai-trader+ signal-scoped exit: chop dies 11-35m so T=45 MFE-cut misses 13/14; if timeout ever flips live for ai-trader use T=25-30m",
+    "rationale": "7d ai-trader+ LONG CHOP 14T -$1.16 avg MFE 0.219; only ME 94m stall catchable at T=45; 0 winner false-kills",
+    "expected_impact": "Guides signal-scoped backtest design (P0)",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low",
+    "verification": "PG query this run: 14 CHOP exits hold times 11-94m, 1 fire at T=45/MFE0.20"
+  },
+  {
+    "date": "2026-10-18T01:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "Pre-register pp-cond shadow flip criteria: 14d net save >$1 with <10% winner-kill on floor-admits => promote to live penalty w/ CEO GO",
+    "rationale": "pp_cond_would_block already collecting (CHIP 29.7); claim-hygiene pre-registration",
+    "expected_impact": "Blocks low-quality floor-admits without signal kills",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
