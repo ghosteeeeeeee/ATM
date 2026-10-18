@@ -11402,3 +11402,23 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - ALT SHORT open ~38min — watch for TP/SL; first pump-chain combo trade since resume
 - ai-trader+ standing CEO escalation (24h 0W/3T −$0.44, 7d 19T 5W 26.3% −$0.93)
 - 7d WR 34.7% still < 35% — size-reduce stays
+
+## [2026-10-18 00:09] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses)
+**PnL:** +$0.47 last hour | 24h 7T 2W +$0.08 (28.6% WR) | 7d 201T 70W −$2.13 (34.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- ALT SHORT pump-chain-,pump-chain-v6- closed trail_sl +$0.47 (+4.22%) — first pump-chain combo win since resume; validates the resumed signal pair
+- atr_sl_hit 1/7 = 14.3% (healthy, tpsl fix deployed)
+- Kill check: no signal with 3+ trades 0% WR in last hour (only 1 trade); ai-trader+ standing CEO watch (24h 3T 0W −$0.44) unchanged, 0T this hour
+- No overtrading (1T/hr); no 3-neg-hour streak (21:00 −$0.15, then 23:00 +$0.47)
+- 24h PnL flipped positive (+$0.08) on the ALT win — still tiny sample, no regime conclusion
+- 0 open positions; size-reduce 30% stays (7d WR 34.8% < 35%)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader+ standing CEO escalation (24h 0W/3T −$0.44, 7d 26.3% WR)
+- 7d WR 34.8% still < 35% — size-reduce stays
