@@ -4,10 +4,10 @@ bollinger_squeeze (LONG) — Auto-generated candidate signal.
 
 Pattern: bollinger_squeeze
 Direction: LONG
-Backtest WR: 72.5%
-Backtest PnL: +0.8040%
-Backtest trades: 363
-Generated: 2026-10-17 14:48 UTC
+Backtest WR: 72.1%
+Backtest PnL: +0.7976%
+Backtest trades: 362
+Generated: 2026-10-18 02:48 UTC
 
 STATUS: CANDIDATE — requires human review before enabling.
 """
