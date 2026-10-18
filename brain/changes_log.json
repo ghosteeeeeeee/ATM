@@ -1562,5 +1562,16 @@
     "after": "if age>=45m and peak-derived MFE < 0.20 (fail-open if peak unknown): would-fire; logs live+MFE",
     "rationale": "Shadow data is the CEO flip-live decision basis; wrong population = wasted 48h soak. 0 fires observed vs WLD 56m hold confirms live_pnl population mismatch or check-cadence miss; MFE-based matches trades-level OOS (zero winners at MFE<0.20 hold>=45m).",
     "impact": "Zero live behavior. Corrects shadow cohort definition before 48h data accumulates."
+  },
+  {
+    "timestamp": "2026-10-18T03:41:22Z",
+    "agent": "brain_auditor",
+    "change": "ai_trader_precheck death-zone advisory: flag LONG/SHORT picks with RSI 45-55 as consider-skip (NON-BLOCKING, passed=True always)",
+    "type": "advisory",
+    "file": "scripts/ai_trader_precheck.py",
+    "before": "No death-zone label — operator manually rejected STX/GOAT RSI 49.5/50.3",
+    "after": "check(\"Death zone advisory\", True, ...) appended when 45<=RSI<55",
+    "rationale": "7d meta-RSI 45-55 LONG 27T 22.2%WR -$1.53 / SHORT 17T 11.8%WR -$1.02; ai-trader+ 14d 45-55 = 7T 0%WR -$0.59. Codify operator judgment. Zero behavior change.",
+    "impact": "Advisory label only; operator/AI sees flag and decides. No trade path affected."
   }
 ]

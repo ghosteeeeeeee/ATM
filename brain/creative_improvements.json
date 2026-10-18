@@ -5248,5 +5248,23 @@
     "category": "exit engine",
     "status": "suggested — needs 30d backtest, pairs with exit-ladder commission",
     "risk": "medium — exit-engine change, must not kill profit-monster-trail captures"
+  },
+  {
+    "date": "2026-10-18T03:41:08Z",
+    "idea": "Death-zone advisory in ai_trader_precheck (SHIPPED as advisory label)",
+    "rationale": "Operator already manually rejects 45-55 picks; codify so every pick gets consistent treatment. Zero behavior change.",
+    "expected_impact": "Fewer manual death-zone oversights; measurable only if operator/AI acts on the flag.",
+    "category": "entry sniper",
+    "status": "shipped-advisory",
+    "risk": "zero (non-blocking)"
+  },
+  {
+    "date": "2026-10-18T03:41:08Z",
+    "idea": "ATR-normalized trail-arm (carried from last run) — arm_pct = clamp(0.5×ATR%, 0.25%, 0.60%)",
+    "rationale": "Fixed +0.40% arm is regime-blind. SUPER ATR 0.20% → arm never reached. Needs 30d backtest.",
+    "expected_impact": "Fewer never-armed chop deaths in low-vol; fewer noise-arms in EXTREME.",
+    "category": "exit engine",
+    "status": "suggested — needs backtest",
+    "risk": "medium"
   }
 ]

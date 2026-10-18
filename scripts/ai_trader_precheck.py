@@ -199,6 +199,14 @@ def precheck(coin, direction):
         else:
             passed = rsi_short_min <= rsi <= rsi_short_max
             check(f'RSI {rsi_short_min}-{rsi_short_max}', passed, f'RSI={rsi:.1f}')
+        # Death-zone advisory (brain_auditor 2026-10-18) — NON-BLOCKING label.
+        # 7d all-signal meta-RSI: LONG 45-55 27T 22.2%WR −$1.53, SHORT 45-55 17T 11.8%WR −$1.02.
+        # ai-trader+ 14d: 45-55 = 7T 0%WR −$0.59. Operator already manually rejects
+        # these picks (STX/GOAT RSI 49.5/50.3 rejected Oct 18 deep analysis).
+        # passed=True always — advisory only, does not fail the precheck.
+        if 45 <= rsi < 55:
+            check('Death zone advisory', True,
+                  f'RSI {rsi:.1f} in 45-55 death zone (7d 15-22%WR) — consider skip')
     elif rsi is None and 'RSI' not in [c['name'] for c in results['checks']]:
         check('RSI', False, 'insufficient closed candle data')
 

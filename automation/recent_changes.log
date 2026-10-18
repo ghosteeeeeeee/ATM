@@ -4811,3 +4811,5 @@ BY: auto_1hr
 BY: brain_auditor
 [2026-10-18 03:09] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 4T 3W +$0.39 (75%) | 7d 199T 70W -$2.01 (35.2%) — size-reduce 30% stays | kill: none (ai-trader+ standing CEO watch 1T 0W -$0.15, under 3T threshold) | atr_sl_hit 0% (healthy) | 2 open: SUPER LONG ai-trader+, BTC LONG manual | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-18 03:30] brain_auditor: ADVISORY — ai_trader_precheck death-zone label (RSI 45-55 → consider-skip, non-blocking) | soak #9, 11 changes unvalidated | 24h 5T 4W +$0.42 (80%) | 7d 199T 35.7% −$1.80 — size-reduce 0.3x stays | kill: none (steers aged/stale; doji steer 3rd stale flag, owner fix) | ai-trader+ 45-55 = 7T 0% −$0.59 14d, advisory only n<20 | re-eval Oct 19 | escalation #13: exit-ladder backtest still not commissioned | Protected flags INTACT
+BY: brain_auditor
