@@ -1,115 +1,120 @@
 {
-  "timestamp": "2026-10-18T18:37:31Z",
-  "run": "brain_auditor 2026-10-18 19:00 UTC",
-  "headline": "24h NET +$0.03 despite 35% WR — asymmetry is the edge (avg win $0.128 = 1.9x avg loss $0.068). Watchdog 'urgent losing streak' steer is a WR false alarm, PnL-positive. 0 config changes, soak #17.",
+  "timestamp": "2026-10-18T20:37:58Z",
+  "agent": "brain_auditor",
+  "session_brain_stats": {
+    "queries": [
+      "signal performance winrate regime",
+      "new signal idea improvement strategy",
+      "loss money bleeding losing"
+    ],
+    "top_insight": "exit system remains the #1 profit leak across all recent sessions; entry-side filter family exhausted; next lever is exit-ladder/momentum, not more entry blocks"
+  },
   "trade_summary_24h": {
-    "trades": 14,
+    "n": 14,
     "wins": 5,
     "wr": 35.7,
-    "net_pnl": 0.03,
-    "avg_win": 0.128,
-    "avg_loss": -0.068,
-    "asymmetry_ratio": 1.9,
-    "note": "Top winners ALT +$0.47 trail_sl EXTREME SHORT (v6 SHORT money printer), HBAR +$0.07 rr_engine. All 9 losers small (max -$0.15). System behaving correctly: ride SHORT trend, cut losses small."
+    "pnl": 0.03,
+    "by_exit": "CHOP (hard_max_loss+atr_sl_hit) still the bleed; trail family only profit source",
+    "winners": "HBAR/ALT pump-chain-v6- SHORT EXTREME (+0.54), SUPER ai-trader+ LONG HIGH, BTC manual, ADA pump-chain+ HIGH",
+    "losers": "ETC/BANANA bb-bounce-v2-long+ NORMAL (knife-catch), WLD ai-trader+ EXTREME, HYPE/ETH hl_copy NORMAL, IO pump-chain+ HIGH timeout"
   },
   "trade_summary_7d": {
-    "trades": 201,
-    "net_pnl": -3.58,
-    "wr": 33.8,
-    "avg_win": 0.1,
-    "avg_loss": -0.078,
-    "chop_family": "hard_max_loss 54T -$4.80 (0%WR, MFE 0.111) + atr_sl_hit 52T -$4.06 (1.9%WR, MFE 0.430) + hard_sl 7T -$0.46 = 113T -$9.32",
-    "trail_family": "profit-monster 34T +$1.70 (94.1%) + atr_trail 22T +$3.46 (81.8%) + trail_sl 3T +$0.49 + rr_engine 2T +$0.12",
-    "note": "Entry-side leak persists (too many chop entries) but entry filters EXHAUSTED per Oct-16 momentum-gate verdict. Exit-side lever = atr_sl_hit MFE paradox (see creative)."
+    "n": 200,
+    "wr": 33.5,
+    "pnl": -3.6,
+    "LONG": "136T 33.8% -2.81",
+    "SHORT": "64T 32.8% -0.79",
+    "TRAIL_vs_CHOP": "TRAIL 39T 66.7% +3.65 | CHOP 112T 0.9% -9.24 (hard_max_loss 53T 0% -4.72, atr_sl_hit 52T 1.9% -4.06)",
+    "by_regime": "EXTREME 110T 26.4% -1.72 | HIGH 34T 41.2% -1.28 | NORMAL 53T 41.5% -0.68 | FLAT 2T 100% +0.08"
   },
-  "watchdog_steer_triage": [
+  "drift_findings": [
     {
-      "id": "steer-001",
-      "claim": "13/20 losing streak, 35% WR urgent",
-      "verdict": "FALSE ALARM on PnL",
-      "evidence": "24h net +$0.03. Asymmetry 1.9x. WR alone is not the health metric — trail winners > chop losers. DO NOT intervene on this steer."
+      "finding": "daily_orchestrator CEO DECISION #1 (pump-chain- SHORT blanket-kill) is over-eager",
+      "evidence": "7d 38T 26.3% -0.12 (noise-level) BUT 14d 54T 27.8% +0.46 POSITIVE, 30d 126T 38.9% -0.80. Pure pump-chain- 7d 32T 21.9% -0.55 but 14d 47T 25.5% +0.05. v6 combo 3T 66.7% +0.51. All-regime-lose on a 7d window with -$0.12 total is not a kill signal.",
+      "verdict": "REJECT kill. Would delete a net-positive 14d signal. Existing defenses (HIGH_BLOCK, dead-gap, hard floor 40) already contain it. Keep monitoring; kill only if 14d PnL turns negative with n>=20."
     },
     {
-      "id": "steer-002",
-      "claim": "7 wrong-side losses fading momentum",
-      "verdict": "PARTIAL — covered",
-      "evidence": "All 9 losers chop-family or counter-trend, all small. HYPE double-loss (LONG+SHORT both lose = chop coin) noted but $0.08 total, not config-worthy. Existing defenses (sweet-spot 55, floor 45, dead-gap, EXTREME 0.85) already active."
+      "finding": "daily_orchestrator CEO DECISION #2 (hl_copy_trader NORMAL block) — sample still thin",
+      "evidence": "14d NORMAL 6T 16.7% -0.21 (n=6 < 10 bar), EXTREME 2T +0.01, HIGH 2T +0.06. 24h: 2T both losses. HL_COPY_TRADING_ENABLED=False is a red herring — HL_COPY_SIGNAL_ENABLED=True (CEO 2026-10-08) is the live emitter.",
+      "verdict": "DEFER block. Recheck when NORMAL n>=10. Not enough data to act."
     },
     {
-      "id": "steer-003",
-      "claim": "pump-chain+ 3-loss streak",
-      "verdict": "STALE/noise",
-      "evidence": "7d pump-chain+ LONG = 33T +$0.31, EXTREME 25T +$0.41 POSITIVE. 3-loss streak is window noise. Do NOT kill."
-    },
-    {
-      "id": "steer-004",
-      "claim": "ai-trader+ 3-loss streak",
-      "verdict": "UNDER WATCH — shadow re-eval Oct 19",
-      "evidence": "ai-trader+ EXTREME LONG 14d 14T -$0.61 28.6%WR. n<20 bar. Conf-demote shadow (0.7x) collecting since 16:45. Formal re-eval tomorrow per plan."
+      "finding": "ai-trader+ EXTREME LONG conf-demote shadow (shipped 16:45) — 0 fires, hotset empty, no EXTREME LONG pick since ship",
+      "evidence": "ai_trader_state.json latest pick = YGG SHORT @20:32. 7d ai-trader+ LONG EXTREME 11T 18.2% -0.65 confirms the cohort is bad, but shadow has collected nothing yet.",
+      "verdict": "Re-eval postponed from Oct 19 — n still <20 and 0 shadow events. Wait for data."
     }
   ],
-  "ceo_decisions": [
+  "recurring_problems": [
+    "hard_max_loss / atr_sl_hit chop-family bleed — UNCHANGED (7d CHOP 112T 0.9% -9.24). Entry-side filters exhausted; root is exit-magnitude. #1 lever remains exit-ladder.",
+    "LONG family wrong-side in STRONG_DOWN — 7d LONG -2.81. Defenses (sweet-spot 55, midband, ceiling, drift guard) all in soak. Expected to lose here; not a bug.",
+    "RSI 45-55 death zone — advisory shipped (03:41), functional. LONG/SHORT both bleed in band; no hard block (would kill winners per prior verification)."
+  ],
+  "missing_implementations": [
+    "exit-ladder candle OOS backtest — 15th re-request. brain_auditor scoped version due Oct 19. Still THE P0. Progressive/fixed-time cuts formally dead per Oct 17 TAT grid; only signal-scoped trail-arm-timeout path remains proven.",
+    "atr_sl_hit MFE paradox — 21/52 atr_sl_hit reached MFE>=0.40 (avg MFE 0.76) yet still stopped out at avg -2.01%. These armed and reversed. Post-arm trail-tightening is the un-tested lever for this cohort."
+  ],
+  "losing_trade_autopsy_24h": [
     {
-      "item": "CEO #1: pump-chain- SHORT blanket-kill (orchestrator: all-regime loser)",
-      "verdict": "REJECT — hard data",
-      "evidence": "7d 38T: 10 winners +$1.45, 28 losers -$1.57, net bleed only -$0.12. Blanket kill blocks 100% of winners (+$1.45) to save pennies. Fails >20% winner-kill bar catastrophically. pump-chain- SHORT is a WASH, not a bleed. Also risk: blanket kill may catch profitable pump-chain-v6- SHORT (+$0.54 24h). KEEP signal, rely on existing RSI floor 45 + HIGH-block + dead-gap."
+      "cluster": "bb-bounce-v2-long+ (ETC -0.09, BANANA -0.09)",
+      "regime": "NORMAL",
+      "root_cause": "LONG knife-catch in 13h BTC downtrend; both never armed trail (hard_max_loss / atr_sl_hit)",
+      "recommended_change": "none — LONG bleed is structural in STRONG_DOWN, signal 14d 46.4% recovers",
+      "confidence": "HIGH"
     },
     {
-      "item": "CEO #2: hl_copy_trader NORMAL block (n=5)",
-      "verdict": "HOLD — thin",
-      "evidence": "7d NORMAL 5T net -$0.10. n=5 < 10 recheck bar. Recheck when n>=10. EXTREME/HIGH pockets positive — block would be regime-scoped only when sample sufficient."
+      "cluster": "hl_copy_trader (HYPE LONG, ETH SHORT)",
+      "regime": "NORMAL",
+      "root_cause": "NORMAL-regime copy trades; matches thin NORMAL-bleed pattern",
+      "recommended_change": "defer block until n>=10",
+      "confidence": "MED"
+    },
+    {
+      "cluster": "pump-chain+ IO LONG trail_arm_timeout -2.11%",
+      "regime": "HIGH",
+      "root_cause": "timeout mechanism WORKING — contained loss before hard_max_loss. ADA same signal won via timeout +0.86%",
+      "recommended_change": "none — mechanism functioning as designed",
+      "confidence": "HIGH"
     }
   ],
-  "last_run_verify": {
-    "status": "ALL HOLDING (soak #17)",
-    "items": [
-      "SHORT_RSI_HARD_FLOOR=45 (reverted 11:48) ✓ — 1 SHORT since revert, +$0.07 100%WR",
-      "death-zone advisory RSI 45-55 ✓ (advisory only, passed=True always)",
-      "conf-clamp [0,100] ✓ — 0 violations since Oct 16, max=100",
-      "DOJI_BOTTOM=False ✓ — 0 trades since kill",
-      "REGIME_CONF_EXTREME_MULT=0.85 ✓",
-      "LONG_RSI_SWEET_SPOT_MIN=55 ✓",
-      "MFE_CUT_SHADOW ✓ collecting (zero-behavior)",
-      "ai-trader EXTREME LONG conf-demote shadow ✓ collecting (0 fires yet)",
-      "contrarian PROMOTE 14d gate ✓"
-    ]
-  },
-  "losing_autopsy_24h": {
-    "losers": 9,
-    "total_bleed": -0.66,
-    "largest": "WLD ai-trader+ -$0.15 hard_sl EXTREME (post-guard variance, already tracked)",
-    "clusters": [
-      {
-        "signal": "bb-bounce-v2-long+",
-        "n": 2,
-        "pnl": -0.18,
-        "regime": "NORMAL",
-        "root": "chop entries, ETC died in 5.7min (never armed), BANANA 136min atr_sl. 7d 16T 31.3% -$0.61 — streak within positive 30d (+$0.32 55.6%). No kill threshold fired."
-      },
-      {
-        "signal": "HYPE (multi)",
-        "n": 2,
-        "pnl": -0.08,
-        "regime": "NORMAL",
-        "root": "chop coin — LONG and SHORT both lose. Watchdog correct: avoid HYPE until directional. $0.08 total, not config-worthy."
-      },
-      {
-        "signal": "pump-chain+ HIGH",
-        "n": 2,
-        "pnl": -0.09,
-        "regime": "HIGH",
-        "root": "HIGH regime bleed pocket, existing HIGH-block/dry-gap defenses active, soak."
-      }
-    ],
-    "conclusion": "No new pattern. All losers covered by existing defenses or under soak. Entry-side filter family exhausted per Oct-16 verdict — do not stack."
-  },
+  "creative_improvements": [
+    {
+      "date": "2026-10-18T20:37:58Z",
+      "idea": "Post-arm trail-start tightening for high-MFE reversals",
+      "rationale": "21/52 atr_sl_hit (7d) reached MFE>=0.40 trail-arm threshold (avg MFE 0.76%) yet exited avg -2.01% — a distinct armed-then-reverse cohort, separate from never-armed chop. Trail family winners avg giveback (mfe-pnl) is large. Tightening trail-start (or adding a breakeven-step after arm) for trades whose MFE stalls below 1.0% could harvest part of the 0.40-0.80 giveback without touching the big trend winners (pnl_pct bucket 11 = 10 trades +$3.09).",
+      "expected_impact": "partial recovery of the armed-reverse giveback; complements existing trail_arm_timeout",
+      "category": "exit engineering",
+      "status": "suggested",
+      "risk": "medium — must not false-kill the large trend winners; needs candle-level OOS (rides on exit-ladder backtest vehicle)"
+    }
+  ],
   "config_changes_applied": [],
-  "changes_from_last_run": "0 changes shipped (soak discipline #17). All 9 last-run changes verified holding.",
+  "changes_from_last_run": [
+    {
+      "change": "ai-trader+ EXTREME LONG conf-demote shadow (16:45)",
+      "status": "HOLDING",
+      "evidence": "0 fires (hotset empty, no EXTREME LONG pick since ship)"
+    },
+    {
+      "change": "SHORT floor revert 35->45 (11:48)",
+      "status": "HOLDING",
+      "evidence": "0 SHORT opens with entry_rsi<45 since revert; 2 opens total since (HBAR SHORT rsi 54 won, ETC LONG rsi 50 lost)"
+    },
+    {
+      "change": "death-zone advisory (03:41)",
+      "status": "FUNCTIONAL",
+      "evidence": "advisory-only, no trade-path impact expected"
+    },
+    {
+      "change": "contrarian PROMOTE 14d gate (11:48)",
+      "status": "HOLDING",
+      "evidence": "monitor advisory-only; earliest PROMOTE eligible ~Oct 31"
+    }
+  ],
   "next_actions": [
-    "Oct 19: ai-trader+ EXTREME LONG formal re-eval (shadow + n>=20 bar check).",
-    "Commission candle-level backtest: atr_sl_hit MFE>=0.40 paradox (21 trades reached arm threshold yet exited ATR SL -$1.16) — does true trail takeover at arm prevent these? Only exit-side lever left.",
-    "Recheck hl_copy_trader NORMAL when n>=10 (CEO #2).",
-    "Resume-day ~Oct 23: CEO eyeball — 12+ unvalidated changes land together. Do NOT stack anything more.",
-    "Watch volume-buildup- fire-rate (77.8% WR best SHORT, under-allocated vs pump-chain-)."
+    "Oct 19: re-run exit-ladder candle OOS scoped backtest (P0, 15th request) — must be signal-scoped per Oct 17 verdict",
+    "Monitor ai-trader+ EXTREME LONG shadow until n>=20 before any live demote",
+    "Recheck hl_copy_trader NORMAL band when n>=10",
+    "Watch pump-chain- SHORT: kill only if 14d PnL < 0 with n>=20 (currently +0.46)",
+    "Resume-day (~Oct 23): CEO eyeball — 12+ unvalidated changes land together"
   ]
 }

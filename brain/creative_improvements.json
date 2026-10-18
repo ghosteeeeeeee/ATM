@@ -5452,5 +5452,14 @@
     "risk": "medium — needs OOS candle backtest, do not ship live without CEO GO",
     "agent": "brain_auditor",
     "run": "2026-10-18 19:00"
+  },
+  {
+    "date": "2026-10-18T20:37:58Z",
+    "idea": "Post-arm trail-start tightening for high-MFE reversals",
+    "rationale": "21/52 atr_sl_hit (7d) reached MFE>=0.40 trail-arm threshold (avg MFE 0.76%) yet exited avg -2.01% — a distinct armed-then-reverse cohort, separate from never-armed chop. Trail family winners avg giveback (mfe-pnl) is large. Tightening trail-start (or adding a breakeven-step after arm) for trades whose MFE stalls below 1.0% could harvest part of the 0.40-0.80 giveback without touching the big trend winners (pnl_pct bucket 11 = 10 trades +$3.09).",
+    "expected_impact": "partial recovery of the armed-reverse giveback; complements existing trail_arm_timeout",
+    "category": "exit engineering",
+    "status": "suggested",
+    "risk": "medium — must not false-kill the large trend winners; needs candle-level OOS (rides on exit-ladder backtest vehicle)"
   }
 ]
