@@ -37,6 +37,13 @@ LOGS_DIR = HERMES_LOG_DIR
 PRICE_ALERT_CONFIG = os.path.join(HERMES_DATA, "watchdog_price_alerts.json")
 PRICE_ALERT_STATE = os.path.join(HERMES_DATA, "watchdog_price_alerts_state.json")
 
+# Pending (conditional) entries — internal stop-limit simulation. The watchdog
+# monitors trigger_price each cycle; on cross it alerts (steer) AND executes
+# via brain.py trade add (regular path, NO --manual → vacation pause still
+# gates). One-shot: fires once, never re-arms. CEO-editable JSON.
+PENDING_ORDERS_CONFIG = os.path.join(HERMES_DATA, "pending_orders.json")
+PENDING_ORDERS_STATE = os.path.join(HERMES_DATA, "pending_orders_state.json")
+
 # Thresholds
 PROFIT_LOCK_BREAKEVEN_PCT = 2.0    # Move stop to breakeven at +2%
 PROFIT_LOCK_TRAIL_PCT = 5.0        # Trail stop at +5%
@@ -109,7 +116,7 @@ def _signal_is_disabled(sig: str) -> bool:
         return False
     except Exception:
         return False
-AUTO_EXECUTABLE_CATEGORIES = {"profit_lock"}  # Only these actions auto-execute
+AUTO_EXECUTABLE_CATEGORIES = {"profit_lock", "pending_order"}  # Only these actions auto-execute
 
 
 def get_watchdog_mode():
@@ -1166,6 +1173,211 @@ def analyze_price_alerts(btc_price):
     return steers
 
 
+def _load_orders_state():
+    state = {}
+    if os.path.exists(PENDING_ORDERS_STATE):
+        try:
+            with open(PENDING_ORDERS_STATE) as f:
+                state = json.load(f)
+            if not isinstance(state, dict):
+                state = {}
+        except Exception:
+            state = {}
+    return state
+
+
+def monitor_pending_orders(btc_price):
+    """Internal stop-limit orders: monitor trigger prices, alert + execute.
+
+    Flow: order armed in pending_orders.json → watchdog cycle detects price
+    cross → URGENT steer emitted (local alert) with action payload →
+    execute_safe_actions (autopilot mode ONLY) places the trade via
+    brain.py trade add — the regular path, WITHOUT --manual, so the vacation
+    pause still gates execution. One-shot: fires once, never re-arms.
+
+    Config format: {"orders": [{"id", "coin", "direction": "long"|"short",
+        "trigger": "above"|"below", "trigger_price", "amount_usdt", "leverage",
+        "sl", "target", "confidence", "note"}]}
+    """
+    steers = []
+    if btc_price is None or btc_price <= 0:
+        return steers
+    if not os.path.exists(PENDING_ORDERS_CONFIG):
+        return steers
+    try:
+        with open(PENDING_ORDERS_CONFIG) as f:
+            cfg = json.load(f)
+    except Exception as e:
+        log(f"pending orders config unreadable: {e}", "WARN")
+        return steers
+    if not isinstance(cfg, dict) or not isinstance(cfg.get("orders"), list):
+        log('pending orders config malformed: expected {"orders": [...]} — skipping', "WARN")
+        return steers
+    state = _load_orders_state()
+    changed = False
+    seen_ids = set()
+    for order in cfg["orders"]:
+        # Per-order isolation: a malformed entry skips itself, never the cycle
+        try:
+            if not isinstance(order, dict):
+                log(f"pending order entry not a dict — skipping: {order!r}", "WARN")
+                continue
+            oid = order.get("id")
+            if not oid or not isinstance(oid, str):
+                log("pending order missing string id — skipped", "WARN")
+                continue
+            if oid in seen_ids:
+                log(f"pending order duplicate id '{oid}' — second entry skipped", "WARN")
+                continue
+            seen_ids.add(oid)
+            prev = state.get(oid)
+            if isinstance(prev, dict) and prev.get("status") in ("triggered", "fired", "error"):
+                continue  # one-shot: already handled, never re-fire
+            coin = order.get("coin", "BTC")
+            if coin != "BTC":
+                log(f"pending order {oid}: coin {coin} not supported yet (BTC only) — skipped", "WARN")
+                continue
+            direction = order.get("direction")
+            if direction not in ("long", "short"):
+                log(f"pending order {oid}: direction {direction!r} not 'long'/'short' — skipped", "WARN")
+                continue
+            trigger = order.get("trigger")
+            if trigger not in ("above", "below"):
+                log(f"pending order {oid}: trigger {trigger!r} not 'above'/'below' — skipped", "WARN")
+                continue
+            try:
+                trigger_price = float(order.get("trigger_price"))
+                sl = float(order.get("sl"))
+                target = float(order.get("target"))
+                amount = float(order.get("amount_usdt"))
+                leverage = int(order.get("leverage", 1))
+            except (TypeError, ValueError):
+                log(f"pending order {oid}: non-numeric price/sl/target/amount/leverage — skipped", "WARN")
+                continue
+            if min(trigger_price, sl, target, amount) <= 0:
+                log(f"pending order {oid}: all values must be > 0 — skipped", "WARN")
+                continue
+            if not (1 <= leverage <= 10):
+                log(f"pending order {oid}: leverage {leverage} outside 1-10 — skipped", "WARN")
+                continue
+            # Shape sanity: SL on loss side of trigger, target on profit side
+            if direction == "long" and not (sl < trigger_price < target):
+                log(f"pending order {oid}: LONG shape wrong (need sl < trigger < target) — skipped", "WARN")
+                continue
+            if direction == "short" and not (target < trigger_price < sl):
+                log(f"pending order {oid}: SHORT shape wrong (need target < trigger < sl) — skipped", "WARN")
+                continue
+            crossed = (btc_price >= trigger_price) if trigger == "above" \
+                else (btc_price <= trigger_price)
+            if crossed:
+                note = str(order.get("note", ""))
+                steers.append({
+                    "severity": "urgent",
+                    "category": "pending_order",
+                    "title": f"PENDING ORDER {oid}: {coin} {direction.upper()} @ {trigger_price:.4g}",
+                    "detail": (f"Trigger hit: BTC {btc_price:.0f} crossed {trigger} "
+                               f"{trigger_price:.4g}. Executing {direction} {amount:.2f} USDT "
+                               f"{leverage}x, SL {sl:.4g}, TP {target:.4g}. {note}"),
+                    "trade_id": None,
+                    "auto_executable": True,
+                    "action": {"type": "execute_order", "order": {
+                        "id": oid, "coin": coin, "direction": direction,
+                        "trigger_price": trigger_price, "amount_usdt": amount,
+                        "leverage": leverage, "sl": sl, "target": target,
+                        "confidence": float(order.get("confidence", 65)),
+                        "note": note,
+                    }}
+                })
+                state[oid] = {"status": "triggered", "price": btc_price, "ts": time.time()}
+                changed = True
+                log(f"🚨 pending order {oid} TRIGGERED: {coin} {direction} at {btc_price:.0f}")
+        except Exception as e:
+            log(f"pending order entry error (skipped, cycle continues): {e}", "WARN")
+            continue
+    if changed:
+        try:
+            atomic_write_json(PENDING_ORDERS_STATE, state)
+        except Exception as e:
+            log(f"pending order state write failed: {e}", "WARN")
+    return steers
+
+
+def _execute_pending_order(order):
+    """Place a triggered pending order via brain.py trade add — the regular
+    execution path WITHOUT --manual, so vacation pause / kill switch still gate.
+
+    One-shot: state marked fired on success, error on failure (no auto-retry —
+    double-fire risk; CEO re-arms explicitly)."""
+    import subprocess
+    import re as _re
+    oid = order.get("id", "?")
+    cmd = [
+        sys.executable, os.path.join(SCRIPTS_DIR, "brain.py"),
+        "trade", "add",
+        str(order["coin"]), str(order["direction"]),
+        f'{float(order["amount_usdt"]):.2f}', f'{float(order["trigger_price"]):.8g}',
+        "--real",
+        "--signal", "ai-trader-pending",
+        "--strategy", "ai-trader",
+        "--confidence", f'{float(order.get("confidence", 65)):.0f}',
+        "--leverage", str(int(order["leverage"])),
+        "--sl", f'{float(order["sl"]):.8g}',
+        "--target", f'{float(order["target"]):.8g}',
+    ]
+    log(f"AUTO-EXEC pending order {oid}: {' '.join(cmd[4:])}")
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
+                           cwd=SCRIPTS_DIR)
+        out = (r.stdout or "") + (r.stderr or "")
+        success = r.returncode == 0 and "✓ Added trade" in out
+        trade_ref = None
+        m = _re.search(r"trade #(\d+)", out)
+        if m:
+            trade_ref = f"#{m.group(1)}"
+        # Update state: fired or error — never re-fire either way (one-shot)
+        state = _load_orders_state()
+        state[oid] = {
+            "status": "fired" if success else "error",
+            "price": order.get("trigger_price"),
+            "ts": time.time(),
+            "trade": trade_ref,
+            "output_tail": out[-400:],
+        }
+        atomic_write_json(PENDING_ORDERS_STATE, state)
+        if success:
+            log(f"AUTO-EXEC pending order {oid} ✅ opened {trade_ref}", "INFO")
+        else:
+            log(f"AUTO-EXEC pending order {oid} ❌ FAILED (rc={r.returncode}): "
+                f"{out[-300:]}", "ERROR")
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "type": "pending_order",
+            "order_id": oid,
+            "coin": order.get("coin"),
+            "direction": order.get("direction"),
+            "trigger_price": order.get("trigger_price"),
+            "trade": trade_ref,
+            "reason": order.get("note", ""),
+            "auto_executed": success,
+            "hl_result": "success" if success else f"failed rc={r.returncode}",
+        }
+    except Exception as e:
+        log(f"AUTO-EXEC pending order {oid} exception: {e}", "ERROR")
+        try:
+            state = _load_orders_state()
+            state[oid] = {"status": "error", "ts": time.time(), "error": str(e)}
+            atomic_write_json(PENDING_ORDERS_STATE, state)
+        except Exception:
+            pass
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "type": "pending_order",
+            "order_id": oid,
+            "auto_executed": False,
+            "hl_result": f"exception: {e}",
+        }
+
+
 def collect_all():
     """Collect all data sources."""
     log("=== Data Collection ===")
@@ -1210,6 +1422,7 @@ def analyze_all(data):
 
     steers.extend(analyze_regime_alignment(data["open_trades"], data["btc_regime"]))
     steers.extend(analyze_price_alerts(data.get("btc_price")))
+    steers.extend(monitor_pending_orders(data.get("btc_price")))
     steers.extend(analyze_profit_lock(data["open_trades"]))
     steers.extend(analyze_stale_trades(data["open_trades"]))
     steers.extend(analyze_trade_clusters(data["open_trades"]))
@@ -1493,6 +1706,12 @@ def execute_safe_actions(steers, watchdog_mode):
                     "auto_executed": False,
                     "hl_result": f"error: {e}"
                 })
+
+        elif action_type == "execute_order" and action.get("order"):
+            # Pending (conditional) entry — trigger hit, place via brain.py
+            result = _execute_pending_order(action["order"])
+            if result:
+                executed.append(result)
 
     return executed
 

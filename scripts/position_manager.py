@@ -2019,9 +2019,10 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         # explicit levels at open (--sl/--target); the ATR engine was clobbering
         # them on the first cycle (trade #16263: SL 81530→81465, TP 81898→82936).
         # Manual trades use RR-engine structural exits; ATR management is for
-        # signal trades without explicit levels.
+        # signal trades without explicit levels. ai-trader-pending = conditional
+        # orders armed by CEO with explicit SL/TP — same protection.
         _sig_chk = str(pos.get('signal', '') or '')
-        if 'ai-trader-manual' in _sig_chk:
+        if 'ai-trader-manual' in _sig_chk or 'ai-trader-pending' in _sig_chk:
             continue
         entry_price = float(pos.get('entry_price') or 0)
         current_price = float(pos.get('current_price') or 0)
