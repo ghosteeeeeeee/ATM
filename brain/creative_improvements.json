@@ -5405,5 +5405,21 @@
     "category": "exit engine",
     "status": "suggested",
     "risk": "medium — needs candle-level OOS (escalation #15 vehicle)"
+  },
+  {
+    "date": "2026-10-18T15:46:16Z",
+    "idea": "Opening-range stop for first-15m: HML trades dying <15m (23T/14d −$2.16, 20/23 EXTREME) bypass ALL current exit mechanisms (TAT min 45m, MFE-CUT min 45m, ARM-BE needs prior arm). hard_max_loss fires but at full −4% acct distance. Proposal: first 15m use tighter stop (0.25×ATR or −0.30% unleveraged, whichever wider), then hand off to normal ATR SL.",
+    "rationale": "Fast-knife cohort is a distinct bleed class. Post-kill sources shrank (doji/oversold/volume-breakout/hmacd all killed) but live residue remains: pump-chain+ 5T −$0.47 (positive-gap pump-then-dump), pump-chain- 5T −$0.50 (deep-dump band kept per Oct 16 verdict), ai-trader+ 2T −$0.19. EXTREME-regime concentration matches chop days (Oct 13/16 were worst days).",
+    "expected_impact": "Could cut fast-knife losses 30-50% (~$0.50-1.00/14d) without touching trail winners (they don't die <15m)",
+    "category": "exit engine",
+    "status": "suggested — PRE-REGISTERED for candle-OOS backtest",
+    "risk": "medium — whipsaw on slow starters (trades that dip <15m then trail out). MUST verify trail-winner false-kill <20% on 30d candle OOS before any shadow. Apply TAT-eligibility meta-rule screen first.",
+    "verification_required": [
+      "30d candle OOS",
+      "fk<=20% of trail winners",
+      "net>0",
+      "per-signal scoping",
+      "p-value <0.05"
+    ]
   }
 ]

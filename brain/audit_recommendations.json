@@ -1,285 +1,136 @@
 {
-  "timestamp": "2026-10-18T14:38:48Z",
-  "agent": "brain_auditor",
-  "run_type": "captain_audit",
-  "soak_cycle": 15,
-  "config_changes": 0,
+  "timestamp": "2026-10-18T15:46:16Z",
   "session_brain_stats": {
-    "note": "session brain query skipped this run — PG trade data is authoritative for captain decisions; session insights already encoded in changes_log and kanban history"
+    "note": "session_brain query skipped this run — live PG + verdicts sufficient; no new drift candidates from sessions"
   },
   "trade_summary_24h": {
-    "trades": 15,
-    "wins": 6,
+    "n": 15,
     "pnl": 0.08,
     "wr": 40.0,
-    "note": "HEALED from losing streak. Marginal but positive. Size-reduce 0.3x containing damage."
+    "7d": {
+      "n": 205,
+      "pnl": -3.65,
+      "wr": 33.7
+    },
+    "48h": {
+      "n": 31,
+      "pnl": -1.27,
+      "wr": 29.0
+    },
+    "30d": {
+      "n": 771,
+      "pnl": -4.36,
+      "wr": 43.2
+    },
+    "trail_vs_chop_7d": {
+      "TRAIL": "75T +$5.36 78.7%",
+      "CHOP": "130T −$9.01 7.7%"
+    },
+    "regime": "SHORT_BIAS 15m+4h, BELOW EMA300, LOW vol, CALM",
+    "size_reduce": "30% active (vacation guardrail, 7d WR<35 AND pnl<−$2)",
+    "open_trades": 0
   },
-  "trade_summary_7d": {
-    "trades": 207,
-    "wins": 71,
-    "pnl": -3.0,
-    "wr": 34.3,
-    "note": "Below resume thresholds (WR>=37 AND PnL>=$0). Size-reduce stays."
-  },
-  "wealth_gap_7d": {
-    "trail_family": {
-      "trades": 65,
-      "wr": 89.2,
-      "pnl": 6.43
-    },
-    "chop_family": {
-      "trades": 106,
-      "wr": 1.9,
-      "pnl": -8.86
-    },
-    "detail": "profit-monster-trail 36T 94.4% +$2.35 | atr_trail_hit 23T 78.3% +$3.45 | trail_sl 4T 100% +$0.51 vs hard_max_loss 54T 0% −$4.80 | atr_sl_hit 52T 1.9% −$4.06",
-    "status": "UNCHANGED — exit-magnitude remains THE lever"
-  },
-  "watchdog_steers_triage": [
+  "drift_findings": [
     {
-      "id": "steer-001",
-      "title": "Losing streak 13/20",
-      "verdict": "AGED-OUT",
-      "detail": "Window straddles Oct 16-17 pre-fix. 24h healed +$0.08 40%WR."
+      "finding": "Escalation #15 (exit-ladder candle OOS) STALE — was delivered Oct 17 14:45 by brain_auditor itself (self_learner undelivered). Verdict: brain/verdicts/2026-10-17_exit-ladder-tat-grid.md — P0 CLOSED, 0 config changes, TAT-eligibility meta-rule pre-registered. Later runs (Oct 18 05:41/08:35/13:42/14:39) incorrectly re-carried it.",
+      "impact": "4 runs of wasted escalation bandwidth; closed verdict now properly referenced",
+      "action": "Escalation closed in this run's next_actions. Do NOT re-request universal/progressive exit cuts — dead per same-day MFE-CUT + exit-ladder verdicts."
     },
     {
-      "id": "steer-002",
-      "title": "Wrong-side trades",
-      "verdict": "VERIFIED-STRUCTURAL",
-      "detail": "Trail +$6.43 vs chop −$8.86 unchanged. Standing problem, exit-magnitude root."
-    },
-    {
-      "id": "steer-003",
-      "title": "pump-chain+ losing streak",
-      "verdict": "REJECTED",
-      "detail": "14d 51T +$1.65 net profitable. EXTREME habitat +$2.14/45T. 24h 3T −$0.07 = noise. Do NOT disable."
-    },
-    {
-      "id": "steer-004",
-      "title": "ai-trader+ losing streak",
-      "verdict": "MONITOR→Oct 19",
-      "detail": "EXTREME 14T −$0.61 28.6%WR is the bleed. HIGH +$0.03 71.4%. n=14 < 20 bar — insufficient for change. Death-zone advisory already shipped."
+      "finding": "Watchdog FIL/DOT 'RSI floor drift' steer is STALE — those trades entered Oct 16 when SHORT_RSI_HARD_FLOOR was 35 (CEO Oct 13 recalibration). Legal at the time. Floor reverted 35→45 today 11:48; 0 SHORT opens with meta RSI<45 since. Steer resolved by the revert, not a new guard.",
+      "impact": "none — no action needed",
+      "action": "closed"
     }
   ],
-  "losing_trade_autopsy_24h": {
-    "losers": 9,
-    "total_pnl": -0.63,
-    "clusters": [
-      {
-        "signal": "bb-bounce-v2-long+",
-        "trades": 2,
-        "pnl": -0.18,
-        "pattern": "ETC MFE=-0.03 hold=6m instant knife; BANANA MFE=0.347 armed-near-threshold then reversed. TAT shadow collecting."
-      },
-      {
-        "signal": "pump-chain+",
-        "trades": 3,
-        "pnl": -0.07,
-        "pattern": "IO trail_arm_timeout correctly cut −0.08 (TAT working); LDO 1m micro-exit. Small contained losses."
-      },
-      {
-        "signal": "ai-trader+",
-        "trades": 2,
-        "pnl": -0.1,
-        "pattern": "WLD EXTREME −$0.15 largest 24h loss. Matches EXTREME bleed pattern (14T −$0.61/14d)."
-      },
-      {
-        "signal": "hl_copy_trader",
-        "trades": 2,
-        "pnl": -0.11,
-        "pattern": "HYPE LONG hard_sl after MFE 0.477 (armed-then-reverse); ETH SHORT MFE=0.006 never armed. n=2 monitor."
-      }
-    ],
-    "verdict": "All losses small (max −$0.15), size-reduce containing. No new pattern beyond known chop/armed-reverse cohorts. No action — n too small per signal."
-  },
-  "last_run_change_verification": [
-    {
-      "change": "SHORT floor revert 35→45 (Oct 18 11:48)",
-      "status": "HOLDING",
-      "evidence": "2 trades since revert. HBAR SHORT won +$0.07 via trail. No floor violations."
-    },
-    {
-      "change": "Contrarian PROMOTE gating 14d span (Oct 18 11:48)",
-      "status": "HOLDING",
-      "evidence": "Code verified contrarian_monitor.py:145. Shadow stays SOAK until ~Oct 31."
-    },
-    {
-      "change": "death-zone advisory RSI 45-55 (Oct 18 03:41)",
-      "status": "HOLDING",
-      "evidence": "ai_trader_precheck.py:207 functional. Advisory label only, 0 trades blocked."
-    },
-    {
-      "change": "watchdog _SIGNAL_FLAG_MAP +11 killed signals (Oct 18 05:39)",
-      "status": "HOLDING",
-      "evidence": "Current watchdog steers clean of dead-signal noise. steer-003 now targets live pump-chain+ correctly."
-    },
-    {
-      "change": "REGIME_CONF_EXTREME_MULT 0.85 (Oct 17 05:40)",
-      "status": "EARLY-POSITIVE",
-      "evidence": "3d EXTREME 34T −$0.05 32.4%WR vs 7d 112T −$1.64. Containment signal, needs more cohort to confirm."
-    },
-    {
-      "change": "TAT shadow (bb-squeeze T=60, pump-chain T=45)",
-      "status": "COLLECTING",
-      "evidence": "2 fires total. BANANA directional save + IO correctly-cut loser. Needs 14d for flip review."
-    },
-    {
-      "change": "MFE-CUT shadow",
-      "status": "0-FIRES-STRUCTURAL",
-      "evidence": "No fires — expected per candle-OOS verdict (fixed-time cut cannot distinguish slow grinders)."
-    },
-    {
-      "change": "doji / dead-gap / drift-guard / sweet-spot-55 / midband / volume-breakout-long+ kill",
-      "status": "ALL HOLDING",
-      "evidence": "0 violations across all. Kills confirmed in constants (DOJI=False, HMACD=False, dead-gap=True)."
-    }
-  ],
-  "signal_quality_14d": {
-    "bleeders": [
-      {
-        "signal": "volume-breakout-long+ LONG",
-        "n": 17,
-        "pnl": -1.03,
-        "wr": 17.6,
-        "status": "KILLED — 0 post-kill trades"
-      },
-      {
-        "signal": "ai-trader+ LONG",
-        "n": 25,
-        "pnl": -0.63,
-        "wr": 44.0,
-        "detail": "EXTREME 14T −$0.61 28.6% is the bleed. Monitor→Oct 19. n<20 for EXTREME-specific change."
-      },
-      {
-        "signal": "bb-squeeze+ LONG",
-        "n": 26,
-        "pnl": -0.61,
-        "wr": 61.5,
-        "detail": "Clean split: 17 trail winners +$0.83 vs 9 HML −$1.44 (never-armed MFE 0.179). TAT live at T=60. Entry-quality issue on HML half."
-      },
-      {
-        "signal": "doji-bottom-long",
-        "n": 21,
-        "pnl": -0.5,
-        "status": "KILLED Oct 16 — re-kill holding"
-      },
-      {
-        "signal": "bb-bounce-v2-long+",
-        "n": 28,
-        "pnl": -0.37,
-        "wr": 46.4,
-        "detail": "TAT shadow collecting. 52.9% arm rate. Watch for TAT fire volume."
-      }
-    ],
-    "winners": [
-      {
-        "signal": "pump-chain+ LONG",
-        "n": 51,
-        "pnl": 1.65,
-        "wr": 39.2,
-        "detail": "EXTREME 45T +$2.14 = HABITAT. Do not kill."
-      },
-      {
-        "signal": "volume-buildup- SHORT",
-        "n": 9,
-        "pnl": 0.35,
-        "wr": 77.8,
-        "detail": "Best arm rate 77.8%. n=9 < 20 bar. Scarsity study pending."
-      },
-      {
-        "signal": "r2v2-long3 LONG",
-        "n": 8,
-        "pnl": 0.55,
-        "wr": 62.5
-      }
-    ]
-  },
-  "armed_then_reverse_cohort_14d": {
-    "definition": "atr_sl_hit/hard_max_loss with MFE>=0.40 (armed but still SL exit)",
-    "total": "29T WR 3.4% −$1.67 avgMFE 0.819",
-    "by_signal": [
-      {
-        "signal": "pump-chain-",
-        "n": 14,
-        "pnl": -0.79,
-        "avg_mfe": 0.783,
-        "avg_mae": 0.397
-      },
-      {
-        "signal": "pump-chain+",
-        "n": 4,
-        "pnl": -0.41,
-        "avg_mfe": 0.925,
-        "avg_mae": 0.274
-      },
-      {
-        "signal": "volume-breakout-long+",
-        "n": 4,
-        "pnl": -0.35,
-        "status": "killed"
-      },
-      {
-        "signal": "pump-chain+,pump-chain-v6+",
-        "n": 3,
-        "pnl": -0.28
-      }
-    ],
-    "note": "These confirmed momentum (+0.82% avg MFE) but trail was too wide to lock before reversal. Distinct from never-armed chop. Post-arm tightening = creative idea this run."
-  },
-  "drift_findings": [],
   "recurring_problems": [
     {
-      "problem": "Exit-magnitude / chop-entry wealth gap",
-      "status": "UNCHANGED 7d",
-      "detail": "Trail +$6.43 vs chop −$8.86. 8+ prior cycles confirm. Root fix = exit-ladder candle OOS (escalation #15, self_learner undelivered 9+)."
+      "problem": "CHOP-family exit magnitude remains THE bleed (7d 130T −$9.01 vs TRAIL 75T +$5.36). Entry filters exhausted (multiple verdicts). Exit mechanisms: TAT only bb-squeeze eligible; universal MFE-CUT dead; pump-chain- exit-side DEAD END (14 T×ARM cells FAIL); ARM-BE shadow shipped this morning for armed-then-reverse cohort.",
+      "status": "defended, collecting shadow data, no new lever without candle-OOS"
     },
     {
-      "problem": "self_learner backtest non-delivery",
-      "status": "ESCALATION #15 CARRIED",
-      "detail": "Exit-ladder candle OOS for dual-condition TAT. brain_auditor ran trades-level grid Oct 17 (bb-squeeze only TAT-eligible). Candle-level OOS still needed before any TAT flip."
+      "problem": "ai-trader+ EXTREME LONG bleed: 14d 14T 28.6% −$0.61 vs HIGH 7T 71.4% +$0.03. Interim 0.7x demote counterfactual (this run): would-block 3L/0W save $0.27/14d, winner-kill 0%. BUT n=14<20 bar — insufficient. Re-eval tomorrow per pre-registration.",
+      "status": "monitor → Oct 19 re-eval with this exact counterfactual"
     }
   ],
-  "missing_implementations": [
-    {
-      "item": "exit-ladder candle OOS backtest",
-      "owner": "self_learner",
-      "overdue_since": "2026-10-14",
-      "escalation": 15,
-      "note": "brain_auditor can run scoped version if self_learner fails again Oct 19"
-    }
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-10-18T14:38:48Z",
-      "idea": "Post-arm trail tightening — after trail arms at 0.40%, tighten trail distance by 30-50% for the armed-then-reverse cohort",
-      "rationale": "29T/14d armed-then-reverse (MFE>=0.40, still SL exit) = −$1.67. pump-chain- alone 14T −$0.79 avgMFE 0.78 → avgMAE 0.40. These confirmed momentum but trail too wide to lock before reversal. Distinct from: (a) never-armed chop (MFE<0.40), (b) timeout exit (TAT), (c) fixed-time MFE-cut (FAILed OOS). This is a POST-ARM state change, not a time-based cut.",
-      "expected_impact": "Could recover 30-50% of armed-then-reverse giveback (~$0.50-0.85/14d) without touching never-armed chop or trail winners",
+      "date": "2026-10-18T15:46:16Z",
+      "idea": "Opening-range stop for first-15m: HML trades dying <15m (23T/14d −$2.16, 20/23 EXTREME) bypass ALL current exit mechanisms (TAT min 45m, MFE-CUT min 45m, ARM-BE needs prior arm). hard_max_loss fires but at full −4% acct distance. Proposal: first 15m use tighter stop (0.25×ATR or −0.30% unleveraged, whichever wider), then hand off to normal ATR SL.",
+      "rationale": "Fast-knife cohort is a distinct bleed class. Post-kill sources shrank (doji/oversold/volume-breakout/hmacd all killed) but live residue remains: pump-chain+ 5T −$0.47 (positive-gap pump-then-dump), pump-chain- 5T −$0.50 (deep-dump band kept per Oct 16 verdict), ai-trader+ 2T −$0.19. EXTREME-regime concentration matches chop days (Oct 13/16 were worst days).",
+      "expected_impact": "Could cut fast-knife losses 30-50% (~$0.50-1.00/14d) without touching trail winners (they don't die <15m)",
       "category": "exit engine",
-      "status": "suggested",
-      "risk": "medium — needs candle-level OOS backtest (escalation #15 vehicle). Trail tightening could increase whipsaw exits on genuine trend continuation. Must verify 0 trail-winner impact.",
+      "status": "suggested — PRE-REGISTERED for candle-OOS backtest",
+      "risk": "medium — whipsaw on slow starters (trades that dip <15m then trail out). MUST verify trail-winner false-kill <20% on 30d candle OOS before any shadow. Apply TAT-eligibility meta-rule screen first.",
       "verification_required": [
-        "candle-level OOS 30d",
-        "trail-winner false-kill <5%",
-        "p-value <0.05",
-        "per-signal scoping (pump-chain- first)"
+        "30d candle OOS",
+        "fk<=20% of trail winners",
+        "net>0",
+        "per-signal scoping",
+        "p-value <0.05"
       ]
+    },
+    {
+      "date": "2026-10-18T15:46:16Z",
+      "idea": "volume-buildup- scarcity study CLOSED — signal launched Oct 1, 9T/18d = 0.5 trades/day, 77.8% WR 78% arm rate +$0.35. Not under-firing; just young. No action.",
+      "rationale": "Best arm-rate signal in the book. 30d window only captures its entire life. Wait for n≥20 before any boost or analysis.",
+      "expected_impact": "n/a — study closed",
+      "category": "monitoring",
+      "status": "closed",
+      "risk": "none"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    "SHORT floor revert 35→45: HOLDING (2T since, no violations)",
-    "Contrarian PROMOTE gating: HOLDING (code verified)",
-    "death-zone advisory: HOLDING (functional)",
-    "watchdog _SIGNAL_FLAG_MAP: HOLDING (clean steers)",
-    "EXTREME 0.85: EARLY-POSITIVE (3d EXTREME −$0.05 vs 7d −$1.64)"
+    {
+      "change": "SHORT floor revert 35→45 (11:48)",
+      "status": "HOLDING",
+      "evidence": "0 SHORT opens with meta RSI<45 since revert; 1 SHORT since (HBAR +$0.07 trail win)"
+    },
+    {
+      "change": "ARM-BE shadow shipped (10:35, commit 9b2c95f3 — note: commit msg said '0 config changes' inaccurately)",
+      "status": "LIVE zero-behavior",
+      "evidence": "ARM_BE_SHADOW_ENABLED=True, PM:3666-3685 wiring verified; 0 fires yet (0 open trades since)"
+    },
+    {
+      "change": "ai_trader_precheck death-zone advisory (03:41)",
+      "status": "FUNCTIONAL",
+      "evidence": "code verified prior run; advisory-only, non-blocking"
+    },
+    {
+      "change": "trade_watchdog _SIGNAL_FLAG_MAP +11 killed signals (05:41)",
+      "status": "HOLDING",
+      "evidence": "14-case assert passed at ship"
+    },
+    {
+      "change": "doji kill (Oct 16 20:30)",
+      "status": "HOLDING",
+      "evidence": "0 doji trades since kill"
+    },
+    {
+      "change": "pump-chain+ dead-gap block",
+      "status": "HOLDING",
+      "evidence": "14d gap<-0.3 band 11T −$0.43 contained; no post-block violations"
+    },
+    {
+      "change": "sweet-spot 55-60 boost",
+      "status": "HOLDING",
+      "evidence": "only profitable LONG band in 7d data"
+    },
+    {
+      "change": "MFE-CUT shadow (semantic fix Oct 17 23:38)",
+      "status": "COLLECTING",
+      "evidence": "zero-behavior; flip path blocked by OOS verdict — keep for signal-scoped research only"
+    }
   ],
   "next_actions": [
-    "Re-eval ai-trader+ EXTREME Oct 19 (n needs 20+)",
-    "TAT shadow: collect to 14d for flip review",
-    "Floor-35 daily check until Oct 20 reset (reverted to 45 today — monitor)",
-    "Escalation #15: exit-ladder candle OOS — brain_auditor runs scoped version Oct 19 if self_learner undelivered",
-    "Post-arm trail tightening: commission backtest via escalation #15 vehicle",
-    "Resume-day (~Oct 23): CEO eyeball — 11+ unvalidated changes land together"
-  ],
-  "protected_flags_intact": true
+    "Oct 19: ai-trader+ EXTREME re-eval — run 0.7x demote counterfactual (interim: 3L/0W save $0.27, n=14<20; need n>=20)",
+    "ARM-BE shadow: collect to 14d, flip review with v6 exit-stack (CEO vehicle)",
+    "bb-bounce TAT shadow: FAILed flip at T=55 (fk 41.9%) — redesign (T>=80m or life-detector) before any flip; keep collecting",
+    "Opening-range stop: pre-registered creative — commission candle-OOS when a backtest slot opens",
+    "Escalation #15 CLOSED — exit-ladder P0 delivered Oct 17 (verdict exists). Do not re-request.",
+    "pump-chain- kill decision: CEO-owned standing escalation (dual-emitter: pump_flow also emits profitable pump-chain+)",
+    "SHORT floor-45: daily check until Oct 20 band reset",
+    "Floor-35 band: aging out Oct 20-21, auto-defuses — no pre-empt revert (anti-churn)"
+  ]
 }
