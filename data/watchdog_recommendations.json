@@ -1,29 +1,37 @@
 {
-  "timestamp": "2026-10-18T07:56:41.217505+00:00",
+  "timestamp": "2026-10-18T08:56:41.962894+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.73 USDT. Something is wrong.",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.64 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "health",
-      "title": "9 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "category": "cluster",
+      "title": "Trade cluster: PUMP + HYPE",
+      "detail": "Both opened within 5 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 3 losses",
-      "detail": "Net -0.45 USDT over last 20 trades (losses: -0.47). Consider disabling or tuning this signal.",
+      "title": "8 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'pump-chain+' losing streak: 4 losses",
+      "detail": "Net -0.46 USDT over last 20 trades (losses: -0.48). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-004"
     },
     {
       "severity": "warning",
@@ -31,7 +39,7 @@
       "title": "Signal 'ai-trader+' losing streak: 3 losses",
       "detail": "Net -0.37 USDT over last 20 trades (losses: -0.44). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-005"
     }
   ],
   "portfolio_health": "critical",
@@ -40,18 +48,18 @@
     "btc_4h": "SHORT_BIAS",
     "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "NEG",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
     "market_phase": "CALM",
-    "trend_quality": "STRONG_DOWN"
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 0,
-  "deep_analysis": "No open positions \u2014 flat book during a STRONG_DOWN BTC tape. That is currently the only thing preventing losses; the recent bleed happened because the book kept leaning LONG into a market that was dumping.\n\nMarket: BTC at 81,646, below EMA300 (81,754) for 62 straight 1m candles, linreg LEAN_BEAR across 1m/5m/15m/1h, zscore NEG, both 15m and 4h regimes SHORT_BIAS, trend_quality STRONG_DOWN. Token breadth confirms: 42 SHORT_BIAS vs 4 LONG_BIAS across 127 coins. Volume and velocity are LOW/SLOW \u2014 this is a grind-down, not a crash, which is exactly the environment where counter-trend LONG bounces die slow (trail never arms, hard_max_loss bleeds out).\n\nLast 24h accounting: LONGs n=7 -$0.27 (3W), SHORTs n=3 +$0.46 (2W, +2.2% avg). Every big recent win was a SHORT or a regime-aligned BTC trade: ALT SHORT +4.22% (pump-chain short, meta_rsi 63), BTC SHORT +4.18% (manual, max-hold exit), BTC LONG +2.39% and SUPER LONG +1.40% (the only two LONG wins \u2014 both held <5h and trailed properly). Every big loss was a LONG: ZEN -5.08%, APT -4.24%, INJ -4.44%, DOT -4.32%, CRV -4.39%, YGG -3.22%, WCT -3.44%.\n\nThe trail family still works when the trade is on the right side \u2014 ALT's SHORT trailed to +4.22% and SUPER's LONG trailed to +1.40%. hard_max_loss/trail_arm_timeout losers (IO -2.11%, BLUR -2.70%, CRV -4.39%) never reached +0.40% trail arm because they were LONGs in a SHORT_BIAS tape: chop entries, wrong side, trail irrelevant.\n\nIf opening anything fresh right now: SHORT only, RSI 55-65 (the only profitable SHORT band this week), coins with confirmed SHORT_BIAS regime (r2 > 0.7). LONG only if BTC reclaims EMA300 with bullish linreg alignment \u2014 until then every LONG is a knife catch. Pending queue signals USELESS SHORT rsi 28.4 and SAGA SHORT rsi 27.3 are oversold chases below the hard floor (35) and will bounce-risk; GRASS SHORT rsi 58.5 sits in a valid band but GRASS is ranging (slope +0.004), not trending \u2014 low conviction.",
-  "agent_timestamp": "2026-10-18T08:03:31.097827+00:00",
-  "regime_context": "BTC: SHORT_BIAS (15m + 4h), trend_quality STRONG_DOWN, below EMA300 for 62 candles, linreg LEAN_BEAR on all timeframes, zscore NEG, market_phase CALM, volume LOW, velocity SLOW. Continuum position=AT with state_score 16 (deep bear score). This is a low-energy grind lower \u2014 the worst regime for LONG bounces (fades get chopped, trail never arms) and a clean regime for patient SHORTs on prior support breaks. 42/127 tokens are SHORT_BIAS, only 4 LONG_BIAS \u2014 broad alt weakness, not isolated. VACATION-GUARDRAIL is already active (7d WR 34.7% < 35%, size cut to 30%) \u2014 appropriate; do not fight it. Portfolio is flat (0 open), so regime exposure is currently zero \u2014 correct by accident, but the pending signal queue is still mostly LONG-biased setups and oversold SHORTs. Next regime change to watch: BTC 1m reclaiming EMA300 (~81,754) with linreg flip to LEAN_BULL would unlock LONG side again.",
-  "pattern_alerts": "VERIFIED patterns (PostgreSQL, meta_rsi ground truth):\n\n1) SHORT_BIAS regime vs LONG book = wrong side. 24h: LONG n=7 -$0.27 (43%WR), SHORT n=3 +$0.46 (67%WR). Winning side was SHORT all day \u2014 ALT +4.22%, BTC +4.18%/+0.08%. We kept firing pump-chain+/doji-bottom/ai-trader+ LONGs into it. n=10, direction split is significant enough to act on. Fix: suppress LONG ai-trader picks until BTC reclaims EMA300.\n\n2) LONG meta_rsi 45-55 is the worst band this week: n=27, -$1.53, 22%WR (7d). LONG 55-65: n=36, +$0.16, 47%WR \u2014 the only green LONG band, matching LONG_RSI_SWEET_SPOT 55-60. We entered 27 mid-band LONGs and burned -$1.53. Winning side: momentum LONGs at 55-65 (SUPER rsi 56.25 +1.40%) or nothing. Why we weren't there: pump-chain+/doji/bb-bounce fire on dips, which land in 45-55 \u2014 dip = weakness in this regime, not opportunity.\n\n3) SHORT meta_rsi 45-55 is the SHORT death zone: n=17, -$1.02, 12%WR (7d). SHORT 55-65: n=8 +$0.26 (38%WR); 65+: n=2 +$0.25 (100%WR). Winning side = shorting strength/overbought pops (ALT rsi 63.3 +4.22%). Mid-band shorts are chop-shorts. Precheck surfaced this live: STX SHORT rsi 53.9 flagged 'death zone advisory'.\n\n4) doji-bottom-long = falling knives in this regime. Last 5: ZEN -5.08% (rsi 29.5), CRV -4.39% (39.8), WCT -3.44% (27.8), YGG -3.22% (48.8), GMT +0.54% (56.3 sole winner). 1W/4L, avg loss -4%. ZEN is now SHORT_BIAS (conf 59.3, slope -0.043) \u2014 the winning side was SHORT the whole time. Oversold doji 'bottoms' in a STRONG_DOWN tape are pauses in the dump, not bottoms.\n\n5) ai-trader+ LONG streak: 3 consecutive losses (WLD -0.15 rsi 52.6, INJ -0.20 rsi 64.0, APT -0.09 rsi 33.7-drift), total 25T 44%WR -$0.63. Root cause: LONG picks against SHORT_BIAS regime + APT RSI drift (pick 57.1 -> fill 33.7). Drift guard is now in place; regime alignment is the remaining hole. Winner side of those: WLD SHORT_BIAS conf 84.4 \u2014 shorting WLD was the trade.\n\n6) EXTREME-vol LONGs: recent EXTREME-regime LONGs = APT -4.24%, INJ -4.44%, DOT -4.32%, WLD -0.70 vs WLD +1.04 \u2014 1W/4L. EXTREME vol + LONG = getting run over by the dump. EXTREME-vol SHORT (ALT +4.22%) is where EXTREME pays.\n\nFor each: the winning side existed in real time (SHORT dumps, momentum LONGs at 55-65, shorts at 55-65 pops). We weren't on it because signals fire from dip/bounce logic that is regime-blind at pick time. Action: regime-aligned direction gate on ai-trader picks now; signal-level work belongs to the brain auditor."
+  "open_count": 2,
+  "deep_analysis": "2 open trades, both SHORT, both basically flat (+0.02 USDT combined) after 48 minutes \u2014 and both carry structural problems that historically end in hard_max_loss, not trail wins.\n\nHYPE SHORT (#16269, volume-buildup-): entered at meta_rsi 38.1 \u2014 an OVERSOLD short. 48h PostgreSQL: SHORTs at meta_rsi 35-45 run 33% WR, -$0.18 (n=6). The winning side was already over: HYPE's own 5m regime has flipped LONG_BIAS (conf 55.2, slope +0.027) and the coin is grinding up (78.50 -> 78.64 over last 30m). ATR is 0.19% \u2014 dead calm \u2014 so the +0.40% trail-arm threshold is ~2 ATR moves away; 52/56 historical hard_max_loss trades never reached arm either. Volume regime is LOW market-wide. If I were opening this fresh: no. The oversold dump already happened; shorting it now is catching the bottom of someone else's move. Action: move stop to breakeven 78.71 immediately; exit if still flat in 2h.\n\nPUMP SHORT (#16268, ai-trader-): picked at 08:04 when PUMP was SHORT_BIAS conf 88 slope -0.054. One hour later PUMP's regime is LONG_BIAS (conf 54.7, slope +0.035) \u2014 the coin reversed against the thesis within the hour (same SAGA failure pattern). Currently +0.21% and bouncing off 0.004256 back toward entry 0.004281. The tight SL at 0.004294 (0.30%) is correctly placed; keep it. Exit if price reclaims 0.004281 (breakeven) \u2014 no reason to give back a winner on a flipped regime.\n\n7d system picture (verified, PostgreSQL): 203 closed, 34% WR, -$2.90. The trend/chop split is stark and unchanged: trail exits 79% WR +$5.94 (n=76) vs hard_max_loss 0% WR -$4.71 (n=53) vs atr_sl_hit 2% WR -$3.98 (n=50). We keep making money only when trades trend; everything that chops dies. Both open trades are currently in LOW-volatility, LOW-volume chop conditions \u2014 the exact habitat of the hard_max_loss family. The 13/20 recent-loss streak is real: pump-chain+ has degraded to 31% WR LONG / 24% WR SHORT this week; the only consistently profitable pocket is mid-band (45-65) SHORTS. Today's USELESS SHORT pick deliberately targets that pocket.",
+  "agent_timestamp": "2026-10-18T09:01:40.094619+00:00",
+  "regime_context": "BTC: 15m SHORT_BIAS, 4h SHORT_BIAS, continuum AT EMA300 (below for 180 consecutive 1m candles), linreg LEAN_BEAR, market_phase DECLINING. Volatility LOW, volume_regime LOW, velocity SLOW, acceleration POSITIVE \u2014 a slow grind down, not a crash. 5m scanner: 45 SHORT_BIAS vs 11 LONG_BIAS across 121 tokens \u2014 the alt tape is broadly bearish and aligned with BTC.\n\nImplication: SHORT-side positioning is regime-correct. The portfolio's 2/2 shorts is the right DIRECTION \u2014 the problem is trade QUALITY (oversold entries, dead ATR), not side. LONGs are the dangerous side right now (48h meta_rsi 45-65 LONGs: 32% WR, -$1.53, n=22 \u2014 the single biggest loss bucket in the system). Watch for the tape to bottom (BTC reclaims EMA300 with rising volume) before rotating back to LONG-heavy.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, queried this run):\n\n1. OVERSOLD LONGS ARE BLEEDING \u2014 meta_rsi <35 LONGs: 0% WR, -$0.33 (n=3, 48h). Combined with 45-65 mid-band LONGs at 32% WR -$1.53 (n=22): we are systematically on the wrong side of LONG entries this regime. WINNING side: mid-band SHORTS (45-65: 50% WR +$0.32, n=4) and the big trend SHORTS (ALT +$0.47 at rsi 63.3). Why weren't we on them? pump-chain+ and ai-trader+ still fire LONGs into a SHORT_BIAS tape.\n\n2. PUMP-CHAIN SIGNAL DEGRADED \u2014 7d pump-chain LONG n=35 31%WR +$0.32 (only positive by one ALT-scale winner); SHORT n=37 24%WR -$0.19. Last 20 closes: 4 pump-chain+ losses, 1 win. 4-loss streak flagged by engine. Not a disable recommendation (that's brain auditor) but: stop ADDING pump-chain exposure until it recovers.\n\n3. TRAIL vs CHOP (7d, n=203) \u2014 trail 79%WR +$5.94 vs hard_max_loss 0%WR -$4.71 vs atr_sl_hit 2%WR -$3.98. Every open trade must answer one question: will this reach trail-arm (+0.40%)? HYPE SHORT at ATR 0.19% almost certainly will not. WINNING side for chop losses = the counterparty who waited for trend structure instead of entering mid-range.\n\n4. AI-TRADER RSI-DRIFT LOSERS \u2014 APT LONG pick rsi 57.1 -> fill 33.7 = hard_max_loss (known). Today's PUMP SHORT is the inverse pattern: regime flipped SHORT_BIAS->LONG_BIAS within 60 min of pick. Precheck should ideally re-check regime at fire time; until then, ai-trader picks on weak-confidence regimes (<60) deserve manual scrutiny.\n\n5. HALL OF SHAME for open-trade context \u2014 HYPE SHORT entry meta_rsi 38.1 sits in the 35-45 band that runs 33% WR. hl_copy_trader HYPE LONG at rsi 36.0 also lost earlier today. HYPE specifically is ranging (ATR 0.19%); it is a chop coin in a low-vol tape \u2014 do not add HYPE exposure either direction until ATR > 0.5%."
 }
