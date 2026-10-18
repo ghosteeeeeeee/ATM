@@ -275,6 +275,16 @@ def main():
                   f"(hysteresis WR>={WR_7D_RESUME}% or pnl>=0)")
         resume_trading(reason)
         write_alert('INFO', f'TRADING RESUMED: {reason}', data)
+    elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and
+          data['wr_7d'] >= WR_7D_RESUME or data['pnl_7d'] >= 0):
+        # BH-SR-1 fix: auto-clear size-reduce when metrics recover.
+        # Without this, the flag persists indefinitely after WR recovers.
+        try:
+            os.remove(SIZE_REDUCE_MARKER)
+            log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered")
+            write_alert('INFO', f'Size-reduce cleared: WR {data["wr_7d"]}%', data)
+        except Exception:
+            pass
     elif should_pause:
         reasons = []
         size_reduce = False
