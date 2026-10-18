@@ -1293,3 +1293,7 @@
 - **INFO**: `hermes-atr-sl-updater.timer` shows not-found in list-timers — stale reference to `hermes-atr-sl-updater-DEFUNCT.timer` rename. Harmless, no action.
 - **INFO**: Prior CRITICAL items (hermes-metrics, hermes-coding-mcp crash-loops) confirmed still disabled — no re-enabler regression.
 - **NO AUTO-FIXES NEEDED**: all timers active, pipeline completing every 1min, prices fresh (42s), disk 81% (under 85% threshold), 0 phantom trades, 0 open positions.
+
+## Error Alerts — 2026-10-18 18:43 UTC
+- **WARN** (ongoing since 16:44): `hotset.json empty — no signals survived compaction` — 22 signals in last hour, 12 trades closed today (live trading active), but compactor admits 0 to hotset (MON has hot_cycle_count=2 but decision=SKIPPED). Same gate-tuning issue already flagged for CEO at 16:44 — no new action, just confirming still active.
+- **NO AUTO-FIXES NEEDED**: all 4 core timers active, pipeline 30/30 successful runs in 30min, hl-sync-guardian active, disk 82% (under 85%), prices fresh (87 tokens, ~100s), 0 open positions, 0 phantoms, 0 failed units, hermes-metrics/coding-mcp still correctly disabled.

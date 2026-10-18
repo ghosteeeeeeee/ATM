@@ -1305,10 +1305,11 @@ def monitor_pending_orders(btc_price):
                 steers.append({
                     "severity": "urgent",
                     "category": "pending_order",
-                    "title": f"PENDING ORDER {oid}: {coin} {direction.upper()} @ {trigger_price:.4g}",
+                    # :g not :.4g — 4 sig-figs rendered 81025 as '8.102e+04'
+                    "title": f"PENDING ORDER {oid}: {coin} {direction.upper()} @ {trigger_price:g}",
                     "detail": (f"Trigger hit: BTC {btc_price:.0f} crossed {trigger} "
-                               f"{trigger_price:.4g}. Executing {direction} {amount:.2f} USDT "
-                               f"{leverage}x, SL {sl:.4g}, TP {target:.4g}. {note}"),
+                               f"{trigger_price:g}. Executing {direction} {amount:.2f} USDT "
+                               f"{leverage}x, SL {sl:g}, TP {target:g}. {note}"),
                     "trade_id": None,
                     "auto_executable": True,
                     "action": {"type": "execute_order", "order": {
