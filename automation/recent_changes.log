@@ -4833,3 +4833,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-18 11:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 12T 5W +$0.13 (41.7%) | 7d 204T 70W -$2.95 (34.3%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 25% (healthy, tpsl deployed) | 1 open: HYPE SHORT volume-buildup- | regime SHORT_BIAS (81S/6L/40N) not NEUTRAL, no regime cut | 2nd quiet hour in a row | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-18 12:28] auto_1hr: NO CONFIG CHANGE — 1T 0W -$0.03 last hour (HYPE volume-buildup- atr_sl_hit, -1.32%) | 24h 13T 5W +$0.10 (38.5%) | 7d 205T 70W -$2.98 (34.1%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T; pump-chain+ 3T 1W 33% not 0%) | atr_sl_hit 30.8% (healthy, tpsl deployed) | 0 open | regime SHORT_BIAS not NEUTRAL | No constants change → no signal_versions entry
+BY: auto_1hr
