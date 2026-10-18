@@ -3536,6 +3536,18 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # more room than the account threshold. HML only fires on losers.
         _hml_lev = max(float(pos.get('leverage') or 1), 1.0)
         HARD_MAX_LOSS_PCT = CUT_LOSER_PNL_HERMES / _hml_lev
+        # SHADOW (CEO 2026-10-18): log what HML would be with ATR floor.
+        # MoE finding: CUT_LOSER_PNL=-3% account → -0.6% price @lev5 preempts
+        # the 1.3% ATR stop on every trade. Shadow logs the corrected threshold
+        # without changing behavior. Data for 7d eval before enforcement.
+        try:
+            from hermes_constants import ATR_SL_MIN as _shadow_atr_min
+            _shadow_hml = min(HARD_MAX_LOSS_PCT, -abs(_shadow_atr_min))
+            if _shadow_hml != HARD_MAX_LOSS_PCT:
+                log(f"  📊 [HML-SHADOW] {token}: actual={HARD_MAX_LOSS_PCT:.3f}% shadow={_shadow_hml:.3f}% "
+                    f"(ATR floor {_shadow_atr_min}%, lev={_hml_lev:.0f})", 'INFO')
+        except Exception:
+            pass
         # D3 TRAIL-MIN-GAP REMOVED (CEO 2026-10-12): the -0.60% trail floor only
         # ever fired at lev>=4, and only to WIDEN HML past CUT_LOSER account limit
         # (lev5: -0.60% price = -3.0% acct vs limit -2.0% acct) — same bug class as
