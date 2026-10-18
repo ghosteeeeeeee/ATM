@@ -122,6 +122,7 @@ from hermes_constants import (
     BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW, BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN,
     MFE_CUT_SHADOW_ENABLED, MFE_CUT_SHADOW_MIN, MFE_CUT_SHADOW_MFE_MAX,
     PM_TRAIL_ACTIVATE_PCT,
+    ARM_BE_SHADOW_ENABLED,
 )
 
 # Hyperliquid mirroring — non-blocking, failures don't stop paper trading
@@ -147,6 +148,8 @@ MAX_POSITIONS = MAX_OPEN_POSITIONS
 # Shadow collectors — once-per-trade log dedup (module-level, resets on PM restart)
 _bb_bounce_shadow_logged = set()
 _mfe_cut_shadow_logged = set()
+_arm_be_shadow_armed = set()   # trade_ids that have seen live_pnl >= PM_TRAIL_ACTIVATE
+_arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
 CUT_LOSER_PNL = CUT_LOSER_PNL_HERMES  # from hermes_constants.py (was hardcoded -2.0)
@@ -318,7 +321,7 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
                    open_time, close_time, status, signal, confidence,
                    leverage, paper, sl_distance, sl_group,
                    trailing_activation, trailing_distance, trailing_phase2_dist,
-                   highest_price, lowest_price
+                   highest_price, lowest_price, volatility_regime
             FROM trades
             WHERE status = 'open'
               AND server = %s
@@ -3659,6 +3662,27 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         log(f"  [SHADOW] MFE-CUT would-fire {token} {direction} live={live_pnl:+.2f}% mfe={_mcs_mfe:+.2f}% [{_mcs_age_m:.0f}m < mfe_max {MFE_CUT_SHADOW_MFE_MAX:.2f}%] trade={trade_id} sig={_pos_signal}")
             except Exception as e:
                 log(f"  [SHADOW] MFE-CUT error for {token}: {e}")
+
+        # ── 7b-shadow3. ARM-BE-STOP SHADOW — armed-then-breakeven (zero behavior) ──
+        # brain_auditor 2026-10-18. Verdict PASS 2026-10-17 (arm-breakeven-stop.md):
+        # 30d candle OOS, non-EXTREME fk 9.7% net +$3.46; split-sample positive both
+        # halves. Once trail arms (live_pnl >= PM_TRAIL_ACTIVATE), if price returns
+        # to <= entry, log would-fire. Complements TAT (never-armed stallers) — this
+        # catches armed-then-reversed trades. Scope: non-EXTREME, exclude volume-.
+        # Zero behavior — logs would-fires only. Flip live only with CEO GO + v6.
+        if ARM_BE_SHADOW_ENABLED and trade_id not in _arm_be_shadow_logged:
+            try:
+                _abe_sig_l = (_pos_signal or '').lower()
+                _abe_regime = str(pos.get('volatility_regime') or '')
+                if 'volume-' not in _abe_sig_l and _abe_regime != 'EXTREME':
+                    _abe_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100
+                    if live_pnl >= _abe_arm_pct:
+                        _arm_be_shadow_armed.add(trade_id)
+                    elif trade_id in _arm_be_shadow_armed and live_pnl <= 0:
+                        _arm_be_shadow_logged.add(trade_id)
+                        log(f"  [SHADOW] ARM-BE would-fire {token} {direction} live={live_pnl:+.2f}% [armed@{_abe_arm_pct:.2f}% then crossed entry] trade={trade_id} sig={_pos_signal}")
+            except Exception as e:
+                log(f"  [SHADOW] ARM-BE error for {token}: {e}")
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
         # Catches two patterns:

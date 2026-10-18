@@ -1709,6 +1709,17 @@ BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN = 55
 MFE_CUT_SHADOW_ENABLED = True  # Revert: set False.
 MFE_CUT_SHADOW_MIN = 45        # minutes hold before stall check
 MFE_CUT_SHADOW_MFE_MAX = 0.20  # live_pnl % below this at T => would-fire
+# ARM-BE-STOP SHADOW — armed-then-breakeven exit collector (brain_auditor 2026-10-18).
+# Verdict PASS 2026-10-17 (brain/verdicts/2026-10-17_arm-breakeven-stop.md):
+# 30d candle OOS, UNIVERSE fk 16.5% net +$5.94; non-EXTREME fk 9.7% net +$3.46;
+# split-sample OOS net positive BOTH halves. Mechanism: once live_pnl >= 0.40%
+# (trail armed), if price returns to <= entry (0.00%), counterfactual exit at
+# breakeven. Caps give-back at 0 post-arm. Complements TAT (cuts never-armed
+# stallers) — this catches armed-then-reversed trades. Scope: non-EXTREME only
+# (EXTREME fails fk 26.6% — whipsaw recoveries), exclude volume- family
+# (expensive FKs: COMP +8.42% end, SUPER +2.83%). Zero behavior — logs
+# would-fires only. Flip live only with CEO GO + v6 exit-stack integration.
+ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
 # Tiered trail: loosens as profit grows (2026-09-07 partial-close plan — Option 3)
 # Format: list of (min_profit_pct, trail_distance_pct) — first match wins, never tightens
 PM_TRAIL_TIERS = [

@@ -1,59 +1,62 @@
-# Current State — brain_auditor Captain Run Oct 18 08:35 UTC
+# Current State — brain_auditor Captain Run Oct 18 10:35 UTC
 
-**Last Updated: 2026-10-18 08:35 UTC**
-**Updated by: brain_auditor — 0 config changes, soak #12, arm-registration-gap finding**
+**Last Updated: 2026-10-18 10:35 UTC**
+**Updated by: brain_auditor — 0 config changes, soak #13, watchdog RSI>55 recommendation REJECTED**
 
-## PIPELINE STATUS (08:35 UTC)
+## PIPELINE STATUS (10:35 UTC)
 
-- **Trading LIVE** with 0.3x size-reduce (7d WR 34.5% < 37 AND 7d PnL −$2.90 < $0 — both resume conditions still failing).
-- **24h 11T 5W +$0.18 (45.5%). | 7d 203T 70W −$2.90 (34.5%). | 30d 778T 43.8% −$3.29.**
-- **2 open:** HYPE SHORT volume-buildup- (+0.05%, 0.3h), PUMP SHORT ai-trader- (−0.12%, 0.3h) — both aligned SHORT_BIAS/SHORT_BIAS — HOLD.
+- **Trading LIVE** with 0.3x size-reduce (7d WR 34.3% < 37 AND 7d PnL −$2.95 < $0 — both resume conditions still failing).
+- **24h 12T 5W +$0.13 (41.7%) — HEALED from losing streak. | 7d 204T 70W −$2.95 (34.3%). | 30d 778T 43.8% −$3.29.**
+- **1 open:** HYPE SHORT volume-buildup- @78.71 (RSI 38.1, 2.4h, flat) — HOLD (signal 87.5% WR, SL 0.64% away).
 - Vacation guardrail: ESCALATE mode (48h WR ~38% < 40%).
 
-## THIS RUN — 0 CONFIG CHANGES, SOAK #12
+## THIS RUN — 0 CONFIG CHANGES, SOAK #13
 
-**NEW FINDING: ARM-REGISTRATION GAP.** 28T/14d atr_sl_hit reached MFE≥0.40 (avg 0.83%, hold 70m) with `trailing_activated=FALSE`, net −$1.62. Concentrated: pump-chain- 12T −$0.55, pump-chain+ 6T −$0.58. Hypotheses: (a) candle-MFE vs live_pnl price-source mismatch, (b) spike-between-poll missed arm, (c) trail-subsystem flag desync. **Delegated: bug_hunter zero-behavior close-time instrumentation (escalation #16).** Enables or kills ATR-normalized arm threshold idea with data.
+**WATCHDOG RSI>55 RECOMMENDATION REJECTED.** Watchdog recommended "block pump-chain+ LONG at RSI >55". Evidence: 7d LONG winners RSI≥55 = **30T +$3.93**. RSI 55-60 is the sweet spot (+$0.85/14d, t=2.20 SIG). The watchdog's n=7 meta_rsi sample contradicts 14d PG data (34T 55.9%WR). Sweet-spot boost already handles the profitable band.
 
-**WATCHDOG STEER TRIAGE (08:26 steers):**
+**WATCHDOG STEER TRIAGE:**
 
 | Steer | Verdict | Detail |
 |-------|---------|--------|
-| 001 losing streak 13/20 | AGED-OUT | Window straddles Oct 16-17 pre-fix losses; 24h healed +$0.18. Size-reduce covers. |
-| 002 PUMP+HYPE cluster | ALIGNED | Both SHORT in dual SHORT_BIAS — no action. |
-| 003 wrong-side trades | VERIFIED-STRUCTURAL | 48h LONG 38T −$1.99 vs SHORT 15T +$0.10. LONG-SHORT-BIAS block shadow-falsified Oct 15. Macro REDUCE + size-reduce deployed. No new filter passes bars. |
-| 004 pump-chain+ disable | REJECTED | 14d 51T +$1.65 39.2% net-profitable. 4-loss streak below bar. Dead-gap band soaking. |
-| 005 ai-trader+ streak | MONITOR→Oct 19 | EXTREME band improved to 15T 33.3% −$0.04. Advisory live. |
+| 001 losing streak 13/20 | AGED-OUT | Window straddles Oct 16-17 pre-fix. 24h healed +$0.13. |
+| 002 wrong-side trades | VERIFIED-STRUCTURAL | Trail +$6.36 vs HML −$4.71. Exit-magnitude unchanged. |
+| 003 pump-chain+ disable | REJECTED | 14d 51T +$1.65 net profitable. Dead-gap 1T post-fix ALT +$0.47. |
+| 004 ai-trader+ streak | MONITOR→Oct 19 | EXTREME 14T −$0.61. Death-zone advisory shipped today. |
 
-## LAST-RUN CHANGES — ALL VERIFIED (soak #12)
+## LAST-RUN CHANGES — ALL VERIFIED (soak #13)
 
 | Change | Status | Evidence |
 |--------|--------|----------|
-| watchdog _SIGNAL_FLAG_MAP fix (05:41) | PASS | Dead-signal steers gone from steer list |
-| bb-bounce TAT backfill (07:45) | FLIP BLOCKED | Single-condition: 7/7 eligible winners degraded (100% FK). Dual-condition (MFE<0.20∧pnl<−0.2%) = restructure candidate, needs OOS |
-| MFE-CUT shadow | COLLECTING | 0 fires (structural: only collects on signals without live TAT) |
-| TAT shadow fires | 1 | BANANA counterfactual −0.50% vs −2.24%. Flip needs ≥15 + dual-condition redesign |
-| doji / dead-gap / drift / EXTREME 0.85 / sweet-spot / midband | HOLDING | 0 violations |
-| SHORT floor-35 | HOLD | −$0.12 vs −$1.00 trigger (resets Oct 20) |
-| death-zone advisory | SHIPPED | Non-blocking |
+| death-zone advisory (03:41) | SHIPPED | ai_trader_precheck.py:207 flags RSI 45-55. 0 trades since. |
+| watchdog _SIGNAL_FLAG_MAP (05:39) | PASS | Dead-signal steers gone. |
+| doji / dead-gap / drift / EXTREME 0.85 / sweet-spot / midband | HOLDING | 0 violations. |
+| SHORT floor-35 | HOLD | −$0.12 vs −$1.00 trigger (resets Oct 20). |
+| TAT shadow | 1 FIRE | BANANA would-save directional +. Needs 14 more. |
+| MFE-CUT shadow | 0 FIRES | Structural. |
+| floor-admit shadow | 595 events | 34.6% pp<0.10. CEO decision pending. |
 
 ## WEALTH GAP (7d) — UNCHANGED
 
-| Family | Trades | WR | PnL | Signature |
-|--------|--------|-----|-----|-----------|
-| TRAIL (profit-monster + atr_trail + trail_sl) | 64 | 89.1% | **+$6.36** | armed, held, won |
-| HML | 53 | 0% | −$4.71 | MFE 0.113%, hold 28m |
-| atr_sl_hit | 50 | 2% | −$3.98 | MFE 0.430%, hold 58m |
+| Family | Trades | WR | PnL |
+|--------|--------|-----|-----|
+| TRAIL | 64 | 89.1% | **+$6.36** |
+| hard_max_loss | 53 | 0% | −$4.71 |
+| atr_sl_hit | 50 | 2% | −$3.98 |
 
-Exit-magnitude remains THE lever. Entry-filter family exhausted.
+## CREATIVE THIS RUN
+
+1. **Contrarian shadow data quality fix** — 598 events, 0 resolved. Classification uses 30d historical (look-ahead bias). PROMOTE recs unactionable without live forward-tracking.
+2. **volume-buildup- SHORT RSI floor monitor** — best signal 87.5% WR, n=8 < 20 bar. Monitor only.
 
 ## ESCALATIONS
 
-- **#15:** exit-ladder candle OOS for dual-condition TAT still needed (self_learner undelivered 8+).
-- **#16 (NEW):** arm-registration-gap instrumentation — bug_hunter, zero-behavior close-time debug log.
+- **#15:** exit-ladder candle OOS for dual-condition TAT (self_learner undelivered 8+).
+- **#16:** arm-registration-gap instrumentation — bug_hunter, zero-behavior close-time debug log.
 
 ## NEXT
 
 - Re-eval ai-trader+ death-zone/EXTREME Oct 19.
 - Floor-35 daily check until Oct 20 reset.
-- TAT dual-condition OOS design before any flip.
+- TAT dual-condition OOS before any flip.
+- Contrarian shadow forward-tracking fix.
 - Protected flags 13/13 INTACT.

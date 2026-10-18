@@ -5340,5 +5340,23 @@
     "category": "exit mechanics",
     "status": "carried-needs-backtest",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-18T10:35:00Z",
+    "idea": "Contrarian shadow data quality fix: replace 30d-historical classification with live 60m forward-tracking",
+    "rationale": "598 shadow events, 0 resolved counterfactuals. Classification uses 30d historical outcomes (look-ahead bias). PROMOTE recs are backtests, not live validation.",
+    "expected_impact": "Enables data-driven contrarian flip decision.",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-18T10:35:00Z",
+    "idea": "volume-buildup- SHORT RSI floor monitor (RSI_MIN=35)",
+    "rationale": "7d 8T 87.5% best signal. HYPE open at RSI 38.1 oversold. SHORT <45 band 14d breakeven. n=8 < 20 bar — monitor only.",
+    "expected_impact": "If validated: block oversold SHORT bounce entries.",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
   }
 ]

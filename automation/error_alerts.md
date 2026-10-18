@@ -1269,3 +1269,6 @@
 - **AUTO-FIX**: Stopped `hermes-coding-mcp.service` (inactive now). Unit references a deleted script; needs either the script restored or the unit removed — flagged for cleanup, out of health-monitor scope.
 - **WARN** (recurring 8h): `hermes-bug-hunter.service` exits 1 — known tech debt (hardcoded passwords in study_winning_combos.py, context-compactor.py, hermes_ab_utils.py, trading-checklist.py). Previously logged 2026-10-17 22:25. reset-failed applied.
 - Pipeline: OK — 30 successful runs in last 30min, 3 open / 3 closed today (PG), 44 signals/hour, no phantoms, prices fresh (27s, 87 tokens), disk 81%, all core timers active. Not paused.
+
+## Error Alerts — 2026-10-18 10:26 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
