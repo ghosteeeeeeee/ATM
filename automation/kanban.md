@@ -93,3 +93,6 @@
 
 ## TEAM UPDATES
 - [2026-10-13 03:52] health_monitor: Health check all green. No auto-fixes needed. Disk 84% (watch). 1m-candle timer: accidental enable reverted, still disabled+active per prior CEO-pending state.
+
+## TEAM UPDATES
+- [2026-10-18 04:43 UTC] health_monitor: Pipeline OK — 30/30 runs success in 30m, 3 open / 3 closed today (PG, -0.01 USDT), 44 signals/1h, regime LONG_BIAS (12L/5S/105N), prices fresh (27s, 87 tokens), phantom 0, disk 81%. AUTO-FIX: stopped hermes-coding-mcp.service (crash-looped 939x against missing run_mcp_server.py — third recurrence since Oct 8; something keeps resurrecting a disabled unit, worth a root-cause look). bug-hunter exit-1 = known hardcoded-passwords tech debt. Details: automation/error_alerts.md

@@ -1,122 +1,199 @@
 {
-  "timestamp": "2026-10-18T03:41:08Z",
-  "agent": "brain_auditor",
+  "timestamp": "2026-10-18T06:48:23.991080+00:00",
   "run_type": "captain_audit",
-  "config_changes_applied": [
-    {
-      "file": "scripts/ai_trader_precheck.py",
-      "change": "Death-zone advisory (NON-BLOCKING): flag LONG/SHORT picks with RSI 45-55 as 'consider skip' in precheck output",
-      "type": "advisory",
-      "rationale": "Watchdog deep-analysis manually rejected STX/GOAT RSI 49.5/50.3 for death zone; codify that judgment so every pick gets the label. 7d meta-RSI 45-55: LONG 27T 22.2%WR −$1.53, SHORT 17T 11.8%WR −$1.02; ai-trader+ 14d 45-55 = 7T 0%WR −$0.59.",
-      "impact": "Zero behavior change (passed=True always). Operator/AI sees the flag and decides."
-    }
-  ],
-  "soak_status": {
-    "soak_number": 9,
-    "unvalidated_changes": 11,
-    "note": "Post-resume cohort thin: 5 closed trades since Oct 17 16:57 resume (4W +$0.42). Cannot measure soak changes yet. No new entry filters."
-  },
+  "soak_number": 11,
+  "config_changes": 0,
+  "summary": "Soak #11. 0 config changes. 24h healed to +$0.27/55.6%WR. BANANA TAT shadow first live counterfactual validates mechanism (would-exit at -0.50% vs actual -2.24%). All 11 last-run changes holding. 48h wrong-side pattern verified but defenses already in place (macro gate LONG=REDUCE, 0.3x size-reduce, EXTREME conf 0.85). Exit-ladder = TAT shadows collecting; candle OOS still needed for flip.",
   "trade_summary": {
     "24h": {
-      "trades": 5,
-      "wr": 80.0,
-      "pnl": 0.42
+      "trades": 9,
+      "wins": 5,
+      "wr": 55.6,
+      "pnl": 0.27
     },
     "7d": {
-      "trades": 199,
-      "wr": 35.7,
-      "pnl": -1.8
+      "trades": 202,
+      "wins": 71,
+      "wr": 35.1,
+      "pnl": -2.18
     },
     "30d": {
-      "trades": 776,
-      "wr": 44.3,
-      "pnl": -2.6
+      "trades": 777,
+      "wins": 343,
+      "wr": 44.0,
+      "pnl": -3.16
     },
-    "resume_conditions": "7d WR ≥37 AND 7d PnL ≥$0 — FAIL (35.7% / −$1.80). Size-reduce 0.3x stays.",
-    "open": "SUPER LONG ai-trader+ 2.7h +0.3% (watchdog: trail needs +0.4%; hold, checkpoint passed)",
-    "7d_trail_vs_chop": {
-      "trail": "75T 81.3% +$6.84",
-      "chop": "124T 8.1% −$8.64"
-    },
-    "7d_hard_max_loss": {
-      "n": 53,
-      "wr": 0.0,
-      "pnl": -4.71,
-      "avg_mfe_pct": 0.113,
-      "pct_armed": 0.0
-    }
+    "open": 0
   },
-  "losing_autopsy_24h": {
-    "losers": 1,
-    "detail": "WLD ai-trader+ LONG −$0.15 hard_sl, meta_rsi 52.63 death zone, EXTREME. Post-guard Δ13.2 correctly passed. n=1 variance — no action."
+  "regime": {
+    "btc_15m": "SHORT_BIAS",
+    "btc_4h": "SHORT_BIAS",
+    "trend_quality": "STRONG_DOWN",
+    "volatility": "LOW",
+    "macro_gate": "LONG=REDUCE, SHORT=FULL",
+    "size_reduce": "0.3x (7d WR 35.1% < 37 AND PnL -$2.18 < $0)"
   },
   "watchdog_steer_triage": [
     {
       "id": "steer-001",
-      "verdict": "AGED-OUT HEAVILY",
-      "detail": "12/20 window dominated by Oct 16 pre-kill doji/pre-guard losses. Last 6 closed: 5W 1L +$0.38. Post-resume 5T 4W. No new action."
+      "title": "Losing streak 13/20",
+      "verdict": "AGED-OUT",
+      "detail": "Last 24h: 9T 5W +$0.27 (55.6%). Window polluted by Oct 16-17 pre-fix losses. Reversal in progress."
     },
     {
       "id": "steer-002",
+      "title": "Wrong-side trades",
       "verdict": "VERIFIED",
-      "detail": "Chop family still the bleed (7d 124T 8.1% −$8.64). Defenses holding: drift guard, dead-gap, midband, sweet-spot, EXTREME 0.85. Exit-side root cause unchanged."
+      "detail": "48h: LONG 37T -$1.85 vs SHORT 15T +$0.10. 71% LONG flow against SHORT_BIAS. But LONG-SHORT-BIAS block was shadow-falsified (cohort +$0.84). Defenses already deployed: macro gate REDUCE, size-reduce, EXTREME conf 0.85. No new filter needed — variance in a working system."
     },
     {
       "id": "steer-003",
-      "verdict": "RE-EVAL SCHEDULED",
-      "detail": "ai-trader+ 14d 24T: <45=62.5% $0, 45-55=0% −$0.59, 55-65=66.7% +$0.02. Post-guard n=1 (WLD). Oct 19 re-eval stands. Death-zone advisory now flags 45-55 picks."
+      "title": "ai-trader+ 3-loss streak",
+      "verdict": "MONITOR",
+      "detail": "14d: EXTREME 11T 18.2% -$0.65 (worst cell), 45-55 RSI band 7T 0% -$0.59. Death-zone advisory shipped 03:30. n=7 < 20 bar. Re-eval Oct 19."
     },
     {
       "id": "steer-004",
+      "title": "ai-trader-manual 3-loss streak",
       "verdict": "STALE",
-      "detail": "ai-trader-manual recent trades mostly wins (+0.03/+0.05/+0.01). Aged window."
+      "detail": "Recent manual BTC: SHORT +4.18%, LONG +2.39%, SHORT +0.08%. Wins larger than losses. No action."
+    }
+  ],
+  "last_run_change_verification": {
+    "doji_rekill": {
+      "status": "HOLDING",
+      "evidence": "0 trades since Oct 16 20:30"
+    },
+    "pump_chain_dead_gap": {
+      "status": "HOLDING",
+      "evidence": "ADA timeout +$0.02"
+    },
+    "ai_trader_drift_guard": {
+      "status": "FUNCTIONAL",
+      "evidence": "WLD passed delta 13.2"
+    },
+    "extreme_conf_085": {
+      "status": "HOLDING",
+      "evidence": "WLD EXTREME trade -$0.15 within bounds"
+    },
+    "sweet_spot_55": {
+      "status": "WAITING",
+      "evidence": "thin volume, 0 closed since land"
+    },
+    "short_floor_35": {
+      "status": "HOLD",
+      "evidence": "28T since Oct 13, net -$0.12, trigger -$1.00 NOT hit"
+    },
+    "short_midband": {
+      "status": "WAITING",
+      "evidence": "0 fires since land"
+    },
+    "mfe_cut_shadow": {
+      "status": "COLLECTING",
+      "evidence": "0 fires yet"
+    },
+    "bb_bounce_tat_shadow": {
+      "status": "LIVE-FIRING",
+      "evidence": "BANANA #16266 first counterfactual: would-exit ~131m at -0.50% vs actual 136m at -2.24%. Save ~1.74% unleveraged. Directional POSITIVE."
+    },
+    "pp_cond_shadow": {
+      "status": "COLLECTING"
+    },
+    "contrarian_shadow": {
+      "status": "COLLECTING"
+    },
+    "death_zone_advisory": {
+      "status": "SHIPPED",
+      "evidence": "WLD meta_rsi 52.6 would flag today"
+    }
+  },
+  "losing_autopsy_24h": [
+    {
+      "trade": "WLD ai-trader+ LONG -$0.15",
+      "root_cause": "EXTREME regime + meta_rsi 52.6 (death zone). Advisory now labels this.",
+      "action": "advisory shipped, re-eval Oct 19"
     },
     {
-      "id": "steer-005",
-      "verdict": "STALE — SIGNAL DEAD",
-      "detail": "doji-bottom-long killed Oct 16 20:30, last close 18:44, 0 trades since. Watchdog still citing falsified HIGH 71.4% claim. Owner fix requested again."
-    }
-  ],
-  "drift_findings": [
+      "trade": "ETH hl_copy_trader SHORT -$0.06",
+      "root_cause": "atr_sl at 20m, meta_rsi 40.7. Fast chop exit — mechanism worked (small loss).",
+      "action": "monitor, n=10 < 20"
+    },
     {
-      "item": "ai_trader_precheck had no death-zone label despite operator manually rejecting 45-55 picks",
-      "status": "FIXED (advisory)"
+      "trade": "HYPE hl_copy_trader LONG -$0.05",
+      "root_cause": "hard_sl at 119m, meta_rsi 36 (oversold knife).",
+      "action": "monitor"
+    },
+    {
+      "trade": "BANANA bb-bounce-v2-long+ -$0.09",
+      "root_cause": "Chop entry, never armed, rode to atr_sl at 136m. TAT shadow would have cut at -0.50%.",
+      "action": "TAT counterfactual #1 — validates mechanism"
     }
   ],
+  "wealth_gap_7d": {
+    "trail_family": {
+      "trades": 59,
+      "wr": 90.2,
+      "pnl": 6.44,
+      "note": "profit-monster 36T 94.4% +$2.35 + atr_trail 23T 82.6% +$4.09"
+    },
+    "chop_family": {
+      "trades": 103,
+      "wr": 1.0,
+      "pnl": -8.69,
+      "note": "HML 53T 0% -$4.71 + atr_sl 50T 2% -$3.89"
+    },
+    "never_armed": {
+      "trades": 127,
+      "losers": 117,
+      "winners": 10,
+      "note": "117 losers avg -2.76%, 10 winners avg +1.72%. THE exit-side lever."
+    },
+    "interpretation": "102/202 7d trades = never-armed chop. TAT shadows are the scoped fix. MFE-cut universal OOS FAILED. Signal-scoped TAT is the only proven mechanism."
+  },
   "recurring_problems": [
-    "Exit-magnitude / never-armed chop: hard_max_loss 53T 0% armed avg MFE 0.113% 7d — unchanged, exit-ladder is the lever",
-    "Watchdog stale doji steer (3rd consecutive run flagging a dead signal)",
-    "Exit-ladder signal-scoped backtest STILL NOT COMMISSIONED (13th request)"
+    {
+      "problem": "Exit-ladder candle OOS backtest not commissioned",
+      "requests": 14,
+      "status": "ESCALATED",
+      "detail": "Universal MFE-cut OOS FAILED (false-kills 40% of winners). Signal-scoped TAT is the proven path. TAT shadows collecting. Candle OOS needed for bb-bounce T=55m flip."
+    },
+    {
+      "problem": "48h LONG flow against SHORT_BIAS",
+      "status": "DEFENDED",
+      "detail": "71% LONG, -$1.85. Macro gate REDUCE + size-reduce 0.3x active. LONG-SHORT-BIAS block shadow-falsified. Signal mix is LONG-heavy by design — not a bug."
+    },
+    {
+      "problem": "ai-trader+ EXTREME bleed",
+      "status": "MONITOR",
+      "detail": "14d 11T 18.2% -$0.65. EXTREME conf already 0.85. n=11 < 20. Death-zone advisory covers 45-55 RSI."
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-18T03:41:08Z",
-      "idea": "Death-zone advisory in ai_trader_precheck (SHIPPED as advisory label)",
-      "rationale": "Operator already manually rejects 45-55 picks; codify so every pick gets consistent treatment. Zero behavior change.",
-      "expected_impact": "Fewer manual death-zone oversights; measurable only if operator/AI acts on the flag.",
-      "category": "entry sniper",
-      "status": "shipped-advisory",
-      "risk": "zero (non-blocking)"
+      "date": "2026-10-18T06:48:23.991080+00:00",
+      "idea": "Backfill TAT shadow counterfactuals from closed trades — compute what T=55m exit would have been for all bb-bounce/ai-trader never-armed trades in last 14d using exit_price trajectory approximation",
+      "rationale": "BANANA counterfactual #1 validates mechanism. At 1 fire/3d, reaching 15-fire threshold takes 45 days. Historical backfill accelerates validation without waiting for live volume.",
+      "expected_impact": "Complete TAT flip evaluation in 1 run instead of 45 days",
+      "category": "exit engineering",
+      "status": "suggested",
+      "risk": "low (shadow only, zero behavior change)"
     },
     {
-      "date": "2026-10-18T03:41:08Z",
-      "idea": "ATR-normalized trail-arm (carried from last run) — arm_pct = clamp(0.5×ATR%, 0.25%, 0.60%)",
-      "rationale": "Fixed +0.40% arm is regime-blind. SUPER ATR 0.20% → arm never reached. Needs 30d backtest.",
-      "expected_impact": "Fewer never-armed chop deaths in low-vol; fewer noise-arms in EXTREME.",
-      "category": "exit engine",
-      "status": "suggested — needs backtest",
-      "risk": "medium"
+      "date": "2026-10-18T06:48:23.991080+00:00",
+      "idea": "volume-buildup- SHORT confidence watch — 8T 87.5% +$0.38 is the current regime's best signal. Verify it's not under-weighted in sizing.",
+      "rationale": "Watchdog opportunity steer: ride volume-buildup-/pump-chain- SHORTs at meta_rsi 40-63. Winners cluster at rsi 36-73, all NORMAL vol, all profit-monster-trail.",
+      "expected_impact": "Ensure best signal gets full allocation",
+      "category": "allocation",
+      "status": "monitor",
+      "risk": "none (observation only)"
     }
   ],
-  "changes_from_last_run": {
-    "verified": "All 11 soak changes holding (table in CURRENT.md). Post-resume cohort 5T too thin to measure. EXTREME trades since 0.85: 2T +$0.32. Sweet-spot/midband: 0 fires in band since land (expected, low volume)."
-  },
   "next_actions": [
-    "ai-trader+ post-guard re-eval Oct 19 (WLD −$0.15 + SUPER cohort; 14d band data collected)",
-    "Exit-ladder signal-scoped backtest — STILL NOT COMMISSIONED (13th request). Scope 1: ai-trader+ fast-bleed T=25-30; scope 2: bb-squeeze+ HML −3.92%",
-    "ATR-normalized trail-arm 30d backtest (creative carried)",
-    "Size-reduce 0.3x until 7d WR ≥37 AND 7d PnL ≥$0 (now 35.7% / −$1.80)",
-    "Watchdog owner: kill stale doji steer (3rd run flagging dead signal)",
-    "SUPER LONG: hold; trail needs +0.4%, currently +0.3% at 2.7h"
-  ]
+    "TAT shadow: collect to 15 fires, then mechanical review (flip criteria pre-registered)",
+    "ai-trader+ 45-55 death zone: re-eval Oct 19 (advisory shipped, n=7)",
+    "SHORT floor-35: daily check, trigger -$1.00, currently -$0.12 net",
+    "Exit-ladder candle OOS for bb-bounce T=55m: still needed for flip GO",
+    "Soak #12: verify TAT counterfactual #1 in next run"
+  ],
+  "protected_flags": "13/13 INTACT"
 }

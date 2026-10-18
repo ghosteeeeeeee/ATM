@@ -1573,5 +1573,16 @@
     "after": "check(\"Death zone advisory\", True, ...) appended when 45<=RSI<55",
     "rationale": "7d meta-RSI 45-55 LONG 27T 22.2%WR -$1.53 / SHORT 17T 11.8%WR -$1.02; ai-trader+ 14d 45-55 = 7T 0%WR -$0.59. Codify operator judgment. Zero behavior change.",
     "impact": "Advisory label only; operator/AI sees flag and decides. No trade path affected."
+  },
+  {
+    "timestamp": "2026-10-18T05:39:51Z",
+    "agent": "brain_auditor",
+    "change": "trade_watchdog.py _SIGNAL_FLAG_MAP extended with 11 killed-signal entries (doji-bottom-long, volume-buildup+, volume-breakout-long/short, oversold-bounce, hmacd_mtf±, pump-chain-v5, trend-purity) so DRIFT-W1 filter suppresses steers from historical closes of dead signals",
+    "type": "infra",
+    "file": "scripts/trade_watchdog.py",
+    "before": "12-entry map missing all Oct-2026 kills; doji ZEN/CRV losses could seed false streak steers",
+    "after": "23-entry map; 14-case functional assert PASS (dead signals filtered, live signals pass)",
+    "rationale": "CURRENT.md owner-fix request (3rd); preventive hygiene — dead signals cannot produce new trades but pollute last-20/14d steer windows",
+    "impact": "Zero trade-path change. Cleaner watchdog steers."
   }
 ]

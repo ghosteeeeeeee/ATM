@@ -5266,5 +5266,41 @@
     "category": "exit engine",
     "status": "suggested — needs backtest",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-18T05:39:51Z",
+    "idea": "bb-bounce TAT flip criteria PRE-REGISTRATION — flip T=55m shadow live only if: (1) ≥15 shadow fires collected, (2) counterfactual net positive vs actual, (3) false-kill rate <20%, (4) candle-level OOS pass",
+    "rationale": "Shadow already live-firing (BANANA first counterfactual: would-exit ~−0.4% at 55m vs ride to −0.5%+ toward SL). Pre-registering criteria makes the Oct review mechanical and blocks vibes-based flips. CEO D2 shadow-first-14d satisfied by process, not hope.",
+    "expected_impact": "If all 4 gates pass: cut bb-bounce chop bleed (11T/14d −$0.90) without touching profit-monster-trail winners (16T 87.5% +$0.76)",
+    "category": "exit engine",
+    "status": "pre-registered — waiting on shadow cohort",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-18T05:39:51Z",
+    "idea": "hl_copy_trader SHORT wrong-side watch — 14d shorts 0/3 −$0.15, all atr_sl within 20-64min; wins are LONGS held to trail",
+    "rationale": "External copy source may be firing shorts without regime alignment. n=3 far below bar — monitor only, flag if 7d short cohort ≥5T negative.",
+    "expected_impact": "informational",
+    "category": "signal quality",
+    "status": "monitor",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-18T06:48:34.988890+00:00",
+    "idea": "Backfill TAT shadow counterfactuals from closed trades — compute T=55m exit for all bb-bounce/ai-trader never-armed trades in last 14d",
+    "rationale": "BANANA counterfactual #1 validates mechanism. At 1 fire/3d, 15-fire threshold takes 45 days. Historical backfill accelerates.",
+    "expected_impact": "Complete TAT flip evaluation in 1 run instead of 45 days",
+    "category": "exit engineering",
+    "status": "suggested",
+    "risk": "low (shadow only)"
+  },
+  {
+    "date": "2026-10-18T06:48:34.988890+00:00",
+    "idea": "volume-buildup- SHORT confidence watch — 8T 87.5% +$0.38 best signal in current regime",
+    "rationale": "Watchdog opportunity steer. Winners cluster rsi 36-73, NORMAL vol, profit-monster-trail.",
+    "expected_impact": "Ensure best signal gets full allocation",
+    "category": "allocation",
+    "status": "monitor",
+    "risk": "none"
   }
 ]

@@ -80,6 +80,18 @@ _SIGNAL_FLAG_MAP = (
     ('pump_catcher', 'PUMP_CATCHER_ENABLED'),
     ('pattern-wolf', 'PATTERN_WOLF_ENABLED'),
     ('pattern_wolf', 'PATTERN_WOLF_ENABLED'),
+    # Killed Oct 2026 — kept in map so historical closes stop emitting steers
+    ('doji-bottom-long', 'DOJI_BOTTOM_ENABLED'),
+    ('volume-buildup+', 'VOLUME_BUILDUP_PLUS_ENABLED'),
+    ('volume-breakout-long', 'VOLUME_BREAKOUT_PLUS_ENABLED'),
+    ('volume-breakout-short', 'VOLUME_BREAKOUT_MINUS_ENABLED'),
+    ('oversold-bounce', 'OVERSOLD_BOUNCE_ENABLED'),
+    ('hmacd_mtf-+', 'HMACD_MTF_MINUS_ENABLED'),
+    ('hmacd_mtf+', 'HMACD_MTF_PLUS_ENABLED'),
+    ('hmacd_mtf-', 'HMACD_MTF_MINUS_ENABLED'),
+    ('pump-chain-v5', 'PUMP_CHAIN_V5_ENABLED'),
+    ('trend-purity', 'TREND_PURITY_ENABLED'),
+    ('trend_purity', 'TREND_PURITY_ENABLED'),
 )
 
 

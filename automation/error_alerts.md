@@ -1260,3 +1260,12 @@
 ## Error Alerts — 2026-10-18 01:24 UTC
 - **WARN** (recurring): `[SHADOW] MFE-CUT error for ADA/SUPER: name '_peak_high' is not defined` — shadow block in `check_and_manage_positions` referenced `_peak_high`/`_entry` defined only in `_collect_atr_updates` scope.
 - **AUTO-FIX**: Changed MFE-CUT shadow to read `highest_price`/`lowest_price`/`entry_price` from `pos` dict directly. Syntax verified, committed `bb41994f`.
+
+## Error Alerts — 2026-10-18 04:26 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-18 04:43 UTC
+- **WARN** (939x restarts): `hermes-coding-mcp.service` crash-looping — `/root/.hermes/scripts/run_mcp_server.py` does not exist (Errno 2). Service was disabled but still auto-restarting via Restart= policy.
+- **AUTO-FIX**: Stopped `hermes-coding-mcp.service` (inactive now). Unit references a deleted script; needs either the script restored or the unit removed — flagged for cleanup, out of health-monitor scope.
+- **WARN** (recurring 8h): `hermes-bug-hunter.service` exits 1 — known tech debt (hardcoded passwords in study_winning_combos.py, context-compactor.py, hermes_ab_utils.py, trading-checklist.py). Previously logged 2026-10-17 22:25. reset-failed applied.
+- Pipeline: OK — 30 successful runs in last 30min, 3 open / 3 closed today (PG), 44 signals/hour, no phantoms, prices fresh (27s, 87 tokens), disk 81%, all core timers active. Not paused.

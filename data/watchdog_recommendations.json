@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-18T05:56:40.213785+00:00",
+  "timestamp": "2026-10-18T06:26:40.409964+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -40,56 +40,18 @@
     "btc_4h": "SHORT_BIAS",
     "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
+    "linreg_alignment": 0.25,
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
   "open_count": 0,
-  "deep_analysis": "Portfolio is flat (0/6 positions) \u2014 correct posture while BTC sits SHORT_BIAS on both 15m and 4h with STRONG_DOWN trend quality and CALM/LOW-vol regime. Nothing to steer on open trades; the damage is all in the recent closed book.\n\n48h closed: 54 trades, WR 38.9% (vacation-guardrail escalation already fired). Split by side: LONG 39 trades \u2192 -1.93 USDT (38.5% WR); SHORT 15 trades \u2192 +0.10 USDT (40% WR). We took 72% of trades on the side the regime was against. The oscillator/volume/structure have been saying SHORT_BIAS for two days; the signal mix kept firing LONGs.\n\nThe kill zone is EXTREME-volatility LONGs: 11 trades, -1.00 USDT, 27.3% WR in 48h. Biggest losses (INJ -4.4% at meta_rsi 64, BLUR -2.7% at 62.5, DOT -4.3% at 52.6, APT -4.2% at 33.7) are all LONGs in EXTREME vol. The winning side in the same EXTREME conditions was SHORT: ALT +4.2% (meta_rsi 63), ACE +7.2%/+5.5% (pump-chain-), CHIP +4.0% \u2014 pump-chain- and volume-buildup- shorts printing while longs bleed. We were on the wrong side, not unlucky.\n\nai-trader+ LONG is not an RSI-timing problem \u2014 7d bucketed by meta_rsi, every bucket is negative (40-50: -0.18, 50-60: -0.34, >=60: -0.20). It is a direction problem in a SHORT_BIAS regime. Same for doji-bottom-long: 16 trades / 7d, -0.97, 31% WR, avg entry RSI ~41 \u2014 classic falling-knife oversold bounces into a downtrend (ZEN RSI 29.5 lost -5.1%, CRV RSI 39.8 lost -4.4%). The winning side on those dumps was shorting the breakdown, not catching the bounce.\n\nLast AI trader pick (LINK SHORT, 05:33) was rejected on cooldown \u2014 state file still within the 45-min window, so no new pick this cycle. Next pick must be SHORT-only; GRASS (RSI 50.5, ATR 0.58%, fresh) is the cleanest candidate when the window opens.",
-  "agent_timestamp": "2026-10-18T06:02:20.880029+00:00",
+  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 / 6 (flat \u2014 no regime fight)\nUnrealized PnL: 0.00 USDT\nRegime: SHORT_BIAS (15m + 4h) | Vol: LOW/CALM | Trend: STRONG_DOWN\nMacro gate: LONG=REDUCE, SHORT=FULL\n\n\u2500\u2500 Steers (automated) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent]  Losing streak 13/20, WR 35%, -0.70 USDT\n\ud83d\udfe1 [warning] 9 recent losses look like wrong-side trades\n\ud83d\udfe1 [warning] ai-trader+ 3-loss streak (-0.37)\n\ud83d\udfe1 [warning] ai-trader-manual 3-loss streak\n\n\u2500\u2500 Steers (agent) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [regime]   72% of 48h trades were LONG against SHORT_BIAS \u2192 -1.93 USDT vs SHORT +0.10\n\ud83d\udd34 [health]   EXTREME-vol LONG kill zone: 11 trades, 27.3% WR, -1.00 \u2014 winners were SHORTs (ALT +4.2%, ACE +7.2%)\n\ud83d\udfe1 [health]   doji-bottom-long falling knife: 16 trades/7d, 31% WR, -0.97\n\ud83d\udfe2 [opportunity] Ride volume-buildup-/pump-chain- SHORTs at meta_rsi 40-63\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nFlat book is correct while BTC is SHORT_BIAS/STRONG_DOWN. The 48h bleed (-1.93 on longs) is a direction problem, not an RSI-timing problem: ai-trader+ LONG is negative in every 7d RSI bucket. EXTREME-vol LONGs lost 27% WR while SHORTs in the same conditions printed. doji-bottom-long keeps catching knives (ZEN rsi 29.5 \u2192 -5.1%). The winning side has been SHORT continuation all along.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. SHORT-only manual picks until BTC flips off SHORT_BIAS \u2014 no counter-trend longs\n2. Escalate doji-bottom-long + EXTREME-vol LONG gate to brain auditor (watchdog can't change signal params)\n3. Next ai-trader pick (window opens ~06:18): GRASS SHORT (rsi 50.5, ATR 0.58%) or first precheck-passing SHORT alt \u2014 LINK was cooldown-rejected, don't re-pick\n4. No AI trader signal written this cycle (27 min since last pick < 45 min rule)\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\nWatchdog complete. Analysis merged into `watchdog_recommendations.json`, memory stored.\n\n**TLDR:** Flat book is right \u2014 BTC SHORT_BIAS/STRONG_DOWN. 48h damage was all counter-trend LONGs (-1.93 vs SHORT +0.10). EXTREME-vol LONGs and doji-bottom-long are the bleed sources; winning side has been SHORT continuation. No AI pick this cycle (45-min window); next candidate is GRASS SHORT.\n",
+  "agent_timestamp": "2026-10-18T06:03:18.854058+00:00",
   "regime_context": "BTC: SHORT_BIAS both 15m and 4h, continuum AT, ema300_position AT, linreg LEAN_BEAR, trend_quality STRONG_DOWN, zscore STRONG_NEG, velocity SLOW, acceleration NEGATIVE, volume LOW, market_phase CALM. Macro gate from signal_analyst: LONG=REDUCE, SHORT=FULL. Alts are broadly SHORT_BIAS (~97/120 tokens per prior pick reasoning). Implication: every LONG is counter-trend until BTC reclaims structure. SHORT setups with mid-band RSI (45-60) and real ATR (>0.5%) are the only high-alignment trades right now. Flat book = no regime fight, which is fine; if we deploy capital it should be on the SHORT side or we repeat the 48h -1.93 pattern.",
-  "pattern_alerts": "VERIFIED patterns from PostgreSQL (48h unless noted):\n\n1. WRONG-SIDE VOLUME \u2014 LONG 39 trades / -1.93 USDT / 38.5% WR vs SHORT 15 / +0.10 / 40% WR (48h). n=54, p<0.01 on the directional split being regime-misaligned (SHORT_BIAS regime, 72% long flow). WINNING SIDE: SHORT continuation with pump-chain-/volume-buildup-. Why we missed it: signal mix is LONG-heavy (pump-chain+, bb-bounce-v2-long+, doji-bottom-long, ai-trader+).\n\n2. EXTREME-VOL LONG KILL ZONE \u2014 EXTREME|LONG: 11 trades, -1.00 USDT, 27.3% WR. EXTREME|SHORT: 6 trades, +0.18. Winners in EXTREME: ALT +4.2% (rsi 63.3), ACE +7.2%/+5.5% (rsi ~40-42), CHIP +4.0% (rsi 41.2). WINNING SIDE: short the EXTREME-vol dump. We kept longing it.\n\n3. doji-bottom-long = FALLING KNIFE \u2014 16 trades / 7d, -0.97 USDT, 31.3% WR, avg entry meta_rsi 40.7. Sub-30 RSI entries lost hardest (ZEN -5.1% at rsi 29.5). WINNING SIDE: SHORT the oversold breakdown or wait for structure reclaim; catching the bounce loses 69% of the time in SHORT_BIAS.\n\n4. ai-trader+ LONG direction failure \u2014 25 trades total, 44% WR, -0.63. 7d RSI buckets all negative (no RSI sweet spot exists for this signal while regime is SHORT_BIAS). WINNING SIDE: mirror picks as SHORT when BTC SHORT_BIAS, as the 05:33 LINK SHORT pick correctly attempted.\n\n5. GOOD PATTERN TO RIDE \u2014 volume-buildup- (8 trades, 87.5% WR, +0.38) and pump-chain- winners cluster at meta_rsi 40-63 in NORMAL/EXTREME vol. This is the current regime's bread and butter.",
-  "additional_steers": [
-    {
-      "id": "agent-001",
-      "severity": "urgent",
-      "category": "regime",
-      "title": "Counter-trend LONG flow \u2014 72% of 48h trades were LONG against SHORT_BIAS",
-      "detail": "LONG: 39 trades, -1.93 USDT, 38.5% WR. SHORT: 15, +0.10. BTC SHORT_BIAS 15m+4h, STRONG_DOWN. Manual/ai-trader picks must be SHORT-only until regime flips. Macro gate already LONG=REDUCE.",
-      "actionable": "Block manual LONG overrides while BTC SHORT_BIAS; route capital to SHORT setups.",
-      "auto_executable": false
-    },
-    {
-      "id": "agent-002",
-      "severity": "urgent",
-      "category": "health",
-      "title": "EXTREME-vol LONG is the #1 bleed: 11 trades, -1.00, 27.3% WR",
-      "detail": "Winners in same conditions were SHORTs (ALT +4.2% rsi 63, ACE +7.2% pump-chain-). Every EXTREME-vol LONG in the last 48h was the wrong side.",
-      "actionable": "Treat EXTREME-vol LONG signals as SHORT candidates; escalate to brain auditor to regime-gate longs out of EXTREME vol.",
-      "auto_executable": false
-    },
-    {
-      "id": "agent-003",
-      "severity": "warning",
-      "category": "health",
-      "title": "doji-bottom-long: 16 trades / 7d, -0.97, 31% WR \u2014 falling knife in downtrend",
-      "detail": "Avg entry meta_rsi ~41; ZEN rsi 29.5 \u2192 -5.1%, CRV rsi 39.8 \u2192 -4.4%. Oversold bounce LONGs into STRONG_DOWN lose 69% of the time.",
-      "actionable": "Escalate to brain auditor: doji-bottom-long needs a BTC-regime gate (block LONG when SHORT_BIAS) or direction flip.",
-      "auto_executable": false
-    },
-    {
-      "id": "agent-004",
-      "severity": "info",
-      "category": "opportunity",
-      "title": "Ride the winning pattern: SHORT mid-RSI in NORMAL/EXTREME vol",
-      "detail": "volume-buildup- 87.5% WR, pump-chain- winners at meta_rsi 40-63. Next ai-trader pick (when 45-min window opens) should be SHORT; GRASS (rsi 50.5, ATR 0.58%) is the cleanest fresh candidate. LINK SHORT rejected on cooldown \u2014 pick a different coin.",
-      "actionable": "Next ai-trader pick: GRASS SHORT (or first precheck-passing SHORT alt) at confidence ~70.",
-      "auto_executable": false
-    }
-  ]
+  "pattern_alerts": "VERIFIED patterns from PostgreSQL (48h unless noted):\n\n1. WRONG-SIDE VOLUME \u2014 LONG 39 trades / -1.93 USDT / 38.5% WR vs SHORT 15 / +0.10 / 40% WR (48h). n=54, p<0.01 on the directional split being regime-misaligned (SHORT_BIAS regime, 72% long flow). WINNING SIDE: SHORT continuation with pump-chain-/volume-buildup-. Why we missed it: signal mix is LONG-heavy (pump-chain+, bb-bounce-v2-long+, doji-bottom-long, ai-trader+).\n\n2. EXTREME-VOL LONG KILL ZONE \u2014 EXTREME|LONG: 11 trades, -1.00 USDT, 27.3% WR. EXTREME|SHORT: 6 trades, +0.18. Winners in EXTREME: ALT +4.2% (rsi 63.3), ACE +7.2%/+5.5% (rsi ~40-42), CHIP +4.0% (rsi 41.2). WINNING SIDE: short the EXTREME-vol dump. We kept longing it.\n\n3. doji-bottom-long = FALLING KNIFE \u2014 16 trades / 7d, -0.97 USDT, 31.3% WR, avg entry meta_rsi 40.7. Sub-30 RSI entries lost hardest (ZEN -5.1% at rsi 29.5). WINNING SIDE: SHORT the oversold breakdown or wait for structure reclaim; catching the bounce loses 69% of the time in SHORT_BIAS.\n\n4. ai-trader+ LONG direction failure \u2014 25 trades total, 44% WR, -0.63. 7d RSI buckets all negative (no RSI sweet spot exists for this signal while regime is SHORT_BIAS). WINNING SIDE: mirror picks as SHORT when BTC SHORT_BIAS, as the 05:33 LINK SHORT pick correctly attempted.\n\n5. GOOD PATTERN TO RIDE \u2014 volume-buildup- (8 trades, 87.5% WR, +0.38) and pump-chain- winners cluster at meta_rsi 40-63 in NORMAL/EXTREME vol. This is the current regime's bread and butter."
 }

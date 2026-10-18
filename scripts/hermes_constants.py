@@ -308,14 +308,14 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
+    'ALT',
     'APT',
-    'BTC',
     'CFX',
     'CHIP',
-    'CRV',
     'DOT',
     'FIL'
 }
+
 
 
 
