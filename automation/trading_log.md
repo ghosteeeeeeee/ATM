@@ -11760,3 +11760,53 @@ Final set: ['ALT', 'APT', 'CFX', 'CHIP', 'DOT', 'FIL']
 - hl_copy_trader 24h 2T 0W −$0.11 — standing watch (same)
 - 7d PnL −$3.00 → −$3.65 (rolling-window drift, two winners aged out); WR 33.7% still below 37% resume threshold — size-reduce stays
 - Quiet hour again (5th in last 6h with ≤1 trade) — thin market
+
+## [2026-10-18 16:28] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 15T 6W +$0.08 (40.0% WR) | 7d 205T 69W −$3.65 (33.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — no data to act on
+- atr_sl_hit 4/15 = 26.7% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; bb-bounce-v2-long+ 2T 0W −$0.18 and hl_copy_trader 2T 0W −$0.11 both under 3T threshold — standing watch
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (14:00 −$0.09 was last negative hour; 15:00 and 16:00 no trades)
+- 0 open trades
+- Size-reduce 30% stays (7d WR 33.7% < 37%, 7d PnL −$3.65 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ 24h 2T 0W −$0.18 — standing watch (1 more loss kills it at 3T 0% WR)
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (same)
+- 7d PnL −$3.65, WR 33.7% still below 37% resume threshold — size-reduce stays
+- 7th quiet hour in last 8h with 0 trades — thin market
+
+## [2026-10-18 17:05] Daily Orchestrator Run
+
+**Context:** 12h orchestrator run. brain_auditor shadow-shipped 16:45 same day (ai-trader+ EXTREME LONG conf-demote). Pipeline healthy: 9169/9169 cycles rc=0, 0 real errors, 0 open, 24h 15T 6W +$0.08 (40%), 7d 205T 69W −$3.65 (33.7%). Size-reduce 30% stays. Protected flags 13/13 intact.
+
+**Changes:** none (no code/config — regime checks returned thin samples; role = implement, not decide).
+
+**Regime checks (signal_reporter 15:35 recommendations executed):**
+- pump-chain- SHORT 7d: EXTREME n=36 27.8% −$0.07 | NORMAL n=3 0% −$0.06 — loses ALL regimes → meets blanket-kill criterion, but standing CEO escalation (has historical wins; 24h bundled tag 2T 2W +$0.54). **CEO decision requested.**
+- pump-chain-v6- SHORT 7d EXTREME: n=6 50% +$0.43 — winning, keep. (v6 override ('EXTREME','pump-chain-v6-'):1.0 in volatility_gate_v2.py rescues combined-tag trades from Pump_Flow 0.0 family block — by design.)
+- hl_copy_trader 7d: EXTREME n=2 50% +$0.01 | HIGH n=2 50% +$0.06 | NORMAL n=5 20% −$0.10 — NORMAL-regime block candidate ('NORMAL','*') HL_Copy:0.0, but n=5 < sample-size bar (pattern-trap rule). **Escalated, not shipped. Re-check at n≥10.**
+- bb-bounce-v2-long+ 7d: EXTREME n=9 33.3% −$0.43 | NORMAL n=7 28.6% −$0.18 — loses all regimes but 24h n=2 < 3T kill threshold. Standing watch.
+- ai-trader+ 7d: EXTREME n=15 26.7% −$0.18 | NORMAL n=10 20% −$0.38 | HIGH n=6 66.7% | FLAT n=2 100% — brain_auditor conf-demote shadow live since 16:45, zero fires yet (zero-behavior by design). Oct 19 re-eval.
+
+**Verified:**
+- AI_TRADER_EXTREME_LONG_SHADOW_ENABLED=True, MULT=0.7 — live, collecting.
+- RR-engine shadow actively logging would-blocks (HBAR SHORT EXTREME R:R < 2.0, ~10 logs/hour).
+- 2 TRADE FAILED events = RSI floors working: GMX SHORT 16.3<35 (08:30, pre-revert floor) and ATOM SHORT 39.2<40 (13:03, pump-chain-specific floor). No bug.
+- Blacklist experiment closed (77 tokens, 0 KEEP) — no further batches.
+
+**Open Questions:**
+- pump-chain- SHORT blanket-kill: CEO call (all-regime loser per 7d data vs standing escalation history).
+- hl_copy_trader NORMAL block: revisit when NORMAL n≥10.
+- bb-bounce-v2-long+ / hl_copy_trader both 1 loss away from 3T 0% kill review (auto-1hr watches).
+- Thin market: 7th quiet hour in last 8h; 0 open.
+
+BY: daily_orchestrator

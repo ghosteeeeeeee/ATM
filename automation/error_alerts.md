@@ -1287,3 +1287,9 @@
 - **CRITICAL** (6014x): `hermes-coding-mcp.service` crash-looping — `/root/.hermes/scripts/run_mcp_server.py` does not exist (same cleanup wave). Restarting every 5s, status=2/INVALIDARGUMENT.
 - **AUTO-FIX**: `systemctl disable --now` on both. Non-trading path (pipeline/price-collector/1m-candle/watchdog/hl-sync all active and healthy). Both units were previously disabled in earlier sessions and have since been re-enabled — if they reappear, find the re-enabler or remove the unit files entirely.
 - **INFO**: 59x `[LOCK-WAIT] info_rate` in price_collector last 5m — all self-recovered (0.1s retries), normal SQLite contention, no action needed.
+
+## Error Alerts — 2026-10-18 16:44 UTC
+- **WARN** (ongoing, 1216x/24h): `hotset.json is empty — no signals survived compaction` — 32 signals in last hour (avg conf 78.5, max 88) but 0 admitted; confluence gate blocking 72 (single-type not in standalone bypass), continuum-block 17, BTC-chop 10. Working as designed, not a crash — no auto-fix applied. Flag for CEO review only if trading inactivity is unintended under SHORT_BIAS regime.
+- **INFO**: `hermes-atr-sl-updater.timer` shows not-found in list-timers — stale reference to `hermes-atr-sl-updater-DEFUNCT.timer` rename. Harmless, no action.
+- **INFO**: Prior CRITICAL items (hermes-metrics, hermes-coding-mcp crash-loops) confirmed still disabled — no re-enabler regression.
+- **NO AUTO-FIXES NEEDED**: all timers active, pipeline completing every 1min, prices fresh (42s), disk 81% (under 85% threshold), 0 phantom trades, 0 open positions.
