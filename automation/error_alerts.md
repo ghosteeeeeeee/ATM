@@ -1272,3 +1272,12 @@
 
 ## Error Alerts — 2026-10-18 10:26 UTC
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-18 11:47 UTC
+- **WARN** (1x): `signals_db: 5482 signals in table` — signal-purge only removes executed signals >1h; non-executed old signals accumulate (5387 older than 2h). Checklist exits 1 on this WARN each run.
+- **WARN** (1x): `hermes-atr-sl-updater.timer` unit not-found (stale reference in systemd).
+- **INFO**: `hermes-upgrade-implementer.service` timed out at 04:36 UTC (one-off, killed by systemd timeout). State reset.
+- **AUTO-FIX**: reset-failed on hermes-trading-checklist.service and hermes-upgrade-implementer.service. No pipeline/timer intervention needed — all healthy.
+
+## Error Alerts — 2026-10-18 13:26 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`

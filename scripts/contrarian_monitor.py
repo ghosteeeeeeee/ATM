@@ -88,7 +88,8 @@ def run_monitor():
         return
 
     # Evaluate each event
-    by_signal = defaultdict(lambda: {'n': 0, 'wins': 0, 'total_pnl': 0.0, 'evaluated': 0, 'outcomes': []})
+    by_signal = defaultdict(lambda: {'n': 0, 'wins': 0, 'total_pnl': 0.0, 'evaluated': 0, 'outcomes': [],
+                                     'first_ts': None, 'last_ts': None})
     now = time.time()
 
     for ev in events:
@@ -114,6 +115,10 @@ def run_monitor():
             by_signal[sig]['outcomes'].append({'token': token, 'pnl_pct': round(pnl_pct, 2), 'outcome': outcome})
             if outcome == 'win':
                 by_signal[sig]['wins'] += 1
+            if by_signal[sig]['first_ts'] is None or entry_ts < by_signal[sig]['first_ts']:
+                by_signal[sig]['first_ts'] = entry_ts
+            if by_signal[sig]['last_ts'] is None or entry_ts > by_signal[sig]['last_ts']:
+                by_signal[sig]['last_ts'] = entry_ts
 
     # Build summary
     summary = {
@@ -129,9 +134,17 @@ def run_monitor():
         wr = (100 * wins / evaluated) if evaluated > 0 else 0
         total_pnl = data['total_pnl']
 
+        # CEO D2 shadow-first-14d: PROMOTE/KILL need >=14d of clean-data events (entry_price bug
+        # fixed 2026-10-17 22:37; short windows produce premature flips). Below 14d span: SOAK only.
+        span_days = 0.0
+        if data['first_ts'] and data['last_ts']:
+            span_days = (data['last_ts'] - data['first_ts']) / 86400.0
+
         rec = 'SOAK'
         if evaluated >= 10:
-            if wr >= 55:
+            if span_days < 14.0:
+                rec = 'SOAK'
+            elif wr >= 55:
                 rec = 'PROMOTE'
             elif wr < 45:
                 rec = 'KILL'
@@ -145,6 +158,7 @@ def run_monitor():
             'wr': round(wr, 1),
             'total_pnl_pct': round(total_pnl, 2),
             'avg_pnl_pct': round(total_pnl / evaluated, 2) if evaluated > 0 else 0,
+            'span_days': round(span_days, 1),
             'recommendation': rec,
             'recent_outcomes': data['outcomes'][-5:],  # last 5
         }

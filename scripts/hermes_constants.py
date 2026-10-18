@@ -925,7 +925,7 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Differs from SPIKE_FILTER_RSI_THRESHOLD: spike filter runs at detection time only.
 # This runs at execution time too — catches stale signals where RSI recovered then dipped again.
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
-SHORT_RSI_FLOOR = 35           # CEO 2026-10-13 RECALIBRATION: 45→35. BTC SHORT at RSI 16.1 was blocked during confirmed bear dump. RSI<35 still blocked (BANANA lesson). Revert: 10+ RSI 35-45 SHORTs lose >$1 in 7d.
+SHORT_RSI_FLOOR = 45           # REVERTED 35→45 2026-10-18 brain_auditor: pre-registered trigger HIT — 7d RSI 35-45 SHORT band = 29T 10W 16L, gross losses $1.08 > $1.00 trigger (excl copy/manual still $1.02). Oct 13 recalibration 45→35 opened the known worst band (14d 32T 31.3% −$0.94); aging thesis failed (Oct 14-18 added −$0.40 more). Prior: CEO 2026-10-13, BTC SHORT RSI 16.1 blocked in bear dump. Re-lower to 35 only with fresh ≥20T band data showing net positive.
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
 # The aggregate 40-45 bleed is from OTHER signals, not pump-chain. Pump-chain gets lower floor.
 SHORT_RSI_FLOOR_PUMP_CHAIN = 40  # pump-chain-specific floor (auditor-approved, 2026-10-12)
@@ -935,7 +935,7 @@ SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocke
 # STANDALONE_BYPASS skips signal_compactor (where OVERSOLD_SHORT_RSI_MAX lives), and both compactor
 # and decider bearish-structure overrides allowed RSI<25 SHORT through. 14d: RSI<25 SHORT = 12T 25%WR
 # -$0.89; 0 real winners (3 scratches +$0.01 each). BANANA lesson: oversold = bounce risk even in downtrend.
-SHORT_RSI_HARD_FLOOR = 35      # CEO 2026-10-13 RECALIBRATION: 45→35. Aligns with SHORT_RSI_FLOOR. BTC SHORT at RSI 16.1, INJ at 22.4, FIL at 43.7 all blocked during confirmed bear dumps. RSI<35 still blocked. Revert: 10+ RSI 35-45 SHORTs lose >$1 in 7d.
+SHORT_RSI_HARD_FLOOR = 45      # REVERTED 35→45 2026-10-18 brain_auditor: pre-registered trigger HIT (same as SHORT_RSI_FLOOR) — 7d band 29T 16L gross $1.08 > $1.00. Aligns with SHORT_RSI_FLOOR=45. RSI<45 SHORT blocked (BANANA lesson: oversold = bounce). Prior: CEO 2026-10-13 RECALIBRATION 45→35.
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
 # Blanket 45 floor cuts off this band. Pump-chain gets a lower floor. Revert if 7d n>=5 WR<45% or PnL<-$0.50.
 SHORT_RSI_HARD_FLOOR_PUMP_CHAIN = 40  # pump-chain-specific floor (auditor-approved, 2026-10-12)

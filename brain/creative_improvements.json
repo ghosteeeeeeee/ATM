@@ -5358,5 +5358,52 @@
     "category": "entry sniper",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-18T11:48:10Z",
+    "idea": "hl_copy_trader bleed monitoring — 24h 2T 0W −$0.11 (HYPE LONG hard_sl −0.39%, ETH SHORT atr_sl −1.72%). Copy trades bypass signal gates entirely. Not brain_auditor config scope, but the copy-trader system is losing with the same chop-entry signature as our signals.",
+    "rationale": "Watchdog steers focus on signal losses; copy trades are a parallel bleed channel with no entry-quality gates. ETH SHORT held 20m then atr_sl; HYPE LONG held 119m then hard_sl. Same never-armed pattern.",
+    "expected_impact": "Monitor only — flag to CEO if 7d copy-trader PnL < −$0.50. Potential: apply meta-RSI band filters to copy-trader entries (not currently gated).",
+    "category": "risk",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-18T11:48:10Z",
+    "idea": "floor_admit_shadow outcome tracking — 595 events collected (206 pp<0.10 = 34.6%) but ZERO resolution fields. CEO floor decision (keep 0.5 / revert 0.3 / pp-conditional) has been pending since Oct 17 with unactionable data. Add trade_id join at close time to score would-block outcomes.",
+    "rationale": "The shadow answers \"what would exec confidence be at pp-conditional floor\" but never \"did those trades win/lose\". Without outcomes, the 206 catastrophic-pp events cannot be weighed against false-kills.",
+    "expected_impact": "Unblocks CEO floor decision. Implementation: position_manager on trade close, look up token+ts in floor_admit_shadow within ±5m, write resolved_pnl + would_blocked.",
+    "category": "instrumentation",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-18T13:42:16Z",
+    "idea": "ai-trader+ EXTREME LONG confidence-demote shadow (0.7x mult on final_confidence when signal=ai-trader+ AND direction=LONG AND regime=EXTREME)",
+    "rationale": "ai-trader+ EXTREME 14d 14T -$0.61 28.6%WR, 7d OOS 11T -$0.65 18.2% (worsens out-of-sample — pattern strengthens). HIGH 7T +$0.03 71.4%. Hard EXTREME block fails winner-kill bar (4/11=36%>20%), but conf-demote is soft: 0.7x blocks only INJ winner (+0.13, conf 55.3->38.7) while GRASS/NEAR/WLD winners (conf 58-100) still pass. Losers cluster conf 40-60, most demoted below MIN_EXEC_CONF=40. Global REGIME_CONF_EXTREME_MULT=0.85 already live — this is signal-scoped additional demotion, compounding to ~0.60x.",
+    "expected_impact": "Block ~9/10 EXTREME losers (-$0.74) while killing 1/4 winners (-$0.13), net ~+$0.60/14d. Zero behavior in shadow.",
+    "category": "entry sniper / confidence demotion",
+    "status": "suggested",
+    "risk": "low",
+    "constraints": "n=14 < 20 bar — shadow-first mandatory; pre-registered flip criteria: 14d shadow cohort shows net positive AND winner-kill <=1/4 verified in shadow data. Implementation: 2-line guard in decider_run.py penalty block or ai_trader path; shadow logs would_demote without applying."
+  },
+  {
+    "date": "2026-10-18T13:42:16Z",
+    "idea": "volume-buildup- scarcity study — why does the best arm-rate signal fire only 9T/14d?",
+    "rationale": "volume-buildup- has arm% 77.8 (best in system), 77.8% WR, +$0.35/14d, clean trend signature (arms fast MFE 0.46-1.87 or dies small never-armed). At conf 45-60 it sits just above MIN_EXEC_CONF=40. If the edge is real and the limiter is entry-condition scarcity (volume threshold too tight?), relaxing ONE condition could add trend-aligned trades — the exact 'keep us in trends' lever. Opposite of chop-signal patching: amplify what works.",
+    "expected_impact": "If scarcity is vol-threshold driven: +5-10T/14d at historical 77.8% WR ≈ +$0.20-0.40/14d incremental. Must verify no winner-kill on existing 9T.",
+    "category": "trend amplifier",
+    "status": "suggested",
+    "risk": "low",
+    "constraints": "Study only post-resume (do not touch during soak). Read signal source, compare fired vs near-miss candidate pool, identify binding constraint, backtest single-variable relaxation OOS 30d."
+  },
+  {
+    "date": "2026-10-18T14:38:48Z",
+    "idea": "Post-arm trail tightening — tighten trail 30-50% after arm at 0.40% for armed-then-reverse cohort",
+    "rationale": "29T/14d MFE>=0.40 still SL exit = −$1.67. pump-chain- 14T −$0.79 avgMFE 0.78→MAE 0.40. Trail too wide to lock confirmed momentum before reversal. Post-arm state change, not time-based cut.",
+    "expected_impact": "Recover 30-50% of giveback (~$0.50-0.85/14d), 0 trail-winner impact if scoped correctly",
+    "category": "exit engine",
+    "status": "suggested",
+    "risk": "medium — needs candle-level OOS (escalation #15 vehicle)"
   }
 ]

@@ -1584,5 +1584,27 @@
     "after": "23-entry map; 14-case functional assert PASS (dead signals filtered, live signals pass)",
     "rationale": "CURRENT.md owner-fix request (3rd); preventive hygiene — dead signals cannot produce new trades but pollute last-20/14d steer windows",
     "impact": "Zero trade-path change. Cleaner watchdog steers."
+  },
+  {
+    "timestamp": "2026-10-18T11:48:10Z",
+    "agent": "brain_auditor",
+    "change": "SHORT floor revert 35→45: pre-registered trigger HIT — 7d RSI 35-45 SHORT band 29T 10W 16L gross losses $1.08 > $1.00 (excl copy/manual $1.02). Both SHORT_RSI_FLOOR and SHORT_RSI_HARD_FLOOR reverted. Aging thesis failed (Oct 14-18 added −$0.40).",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "SHORT_RSI_FLOOR=35, SHORT_RSI_HARD_FLOOR=35 (CEO Oct 13 recalibration)",
+    "after": "SHORT_RSI_FLOOR=45, SHORT_RSI_HARD_FLOOR=45 (trigger-hit revert per pre-registration)",
+    "rationale": "Pre-committed revert criteria met. 35-45 band is the known worst SHORT band (14d 32T 31.3% −$0.94). pump-chain-specific floors (40) unchanged.",
+    "impact": "Blocks SHORT entries with meta/live RSI 35-45 (except pump-chain at floor 40). Saves ~$0.15/5d band net, blocks 10 small winners +$0.93. Reversible: re-lower to 35 only with fresh ≥20T positive band data."
+  },
+  {
+    "timestamp": "2026-10-18T11:48:10Z",
+    "agent": "brain_auditor",
+    "change": "contrarian_monitor.py PROMOTE/KILL gated on ≥14d event span (CEO D2 shadow-first-14d). entry_price bug fixed Oct 17 22:37 — short windows produce premature flips. Adds span_days to summary, caps rec at SOAK below 14d.",
+    "type": "infra",
+    "file": "contrarian_monitor.py",
+    "before": "PROMOTE at evaluated≥10 AND WR≥55% regardless of data span (fired after ~36h clean data)",
+    "after": "PROMOTE/KILL require span_days≥14; below that SOAK only",
+    "rationale": "Prevents premature contrarian flip recommendation. pump-chain- contrarian PROMOTE (55.4% 258T) was based on contaminated entry_price era + short span. Zero trading behavior — monitor is advisory-only.",
+    "impact": "Shadow stays collecting. Earliest PROMOTE eligible ~Oct 31 (14d after entry_price fix)."
   }
 ]

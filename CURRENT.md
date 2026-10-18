@@ -1,62 +1,67 @@
-# Current State — brain_auditor Captain Run Oct 18 10:35 UTC
+# Current State — brain_auditor Captain Run Oct 18 14:50 UTC
 
-**Last Updated: 2026-10-18 10:35 UTC**
-**Updated by: brain_auditor — 0 config changes, soak #13, watchdog RSI>55 recommendation REJECTED**
+**Last Updated: 2026-10-18 14:50 UTC**
+**Updated by: brain_auditor — 0 config changes, soak #15, no candidate clears verification bar**
 
-## PIPELINE STATUS (10:35 UTC)
+## PIPELINE STATUS (14:50 UTC)
 
-- **Trading LIVE** with 0.3x size-reduce (7d WR 34.3% < 37 AND 7d PnL −$2.95 < $0 — both resume conditions still failing).
-- **24h 12T 5W +$0.13 (41.7%) — HEALED from losing streak. | 7d 204T 70W −$2.95 (34.3%). | 30d 778T 43.8% −$3.29.**
-- **1 open:** HYPE SHORT volume-buildup- @78.71 (RSI 38.1, 2.4h, flat) — HOLD (signal 87.5% WR, SL 0.64% away).
-- Vacation guardrail: ESCALATE mode (48h WR ~38% < 40%).
+- **Trading LIVE** with 0.3x size-reduce (7d WR 34.3% < 37 AND 7d PnL −$3.00 < $0 — both resume conditions still failing).
+- **24h 15T 6W +$0.08 (40%) — HEALED from losing streak. | 7d 207T 71W −$3.00 (34.3%). | 30d ~778T 43.8% −$3.29.**
+- **0 open.** Regime: SHORT_BIAS (15m+4h), LOW vol, DECLINING, MARKDOWN.
+- Vacation guardrail: ESCALATE mode (7d WR 34.3% < 40%).
 
-## THIS RUN — 0 CONFIG CHANGES, SOAK #13
+## THIS RUN — 0 CONFIG CHANGES, SOAK #15
 
-**WATCHDOG RSI>55 RECOMMENDATION REJECTED.** Watchdog recommended "block pump-chain+ LONG at RSI >55". Evidence: 7d LONG winners RSI≥55 = **30T +$3.93**. RSI 55-60 is the sweet spot (+$0.85/14d, t=2.20 SIG). The watchdog's n=7 meta_rsi sample contradicts 14d PG data (34T 55.9%WR). Sweet-spot boost already handles the profitable band.
+**No candidate clears the n>=20 + OOS verification bar.** Strongest bleed candidate (ai-trader+ LONG EXTREME 14T −$0.61) fails n<20. 11+ unvalidated changes already queued for resume-day. SHORT floor revert (11:48 today) needs its own soak window.
 
 **WATCHDOG STEER TRIAGE:**
 
 | Steer | Verdict | Detail |
 |-------|---------|--------|
-| 001 losing streak 13/20 | AGED-OUT | Window straddles Oct 16-17 pre-fix. 24h healed +$0.13. |
-| 002 wrong-side trades | VERIFIED-STRUCTURAL | Trail +$6.36 vs HML −$4.71. Exit-magnitude unchanged. |
-| 003 pump-chain+ disable | REJECTED | 14d 51T +$1.65 net profitable. Dead-gap 1T post-fix ALT +$0.47. |
-| 004 ai-trader+ streak | MONITOR→Oct 19 | EXTREME 14T −$0.61. Death-zone advisory shipped today. |
+| 001 losing streak 13/20 | AGED-OUT | 24h healed +$0.08 40%WR. |
+| 002 wrong-side trades | VERIFIED-STRUCTURAL | Trail +$6.43 vs chop −$8.86. Exit-magnitude unchanged. |
+| 003 pump-chain+ disable | REJECTED | 14d 51T +$1.65. EXTREME habitat +$2.14/45T. |
+| 004 ai-trader+ streak | MONITOR→Oct 19 | EXTREME 14T −$0.61 28.6%. n<20 bar. Death-zone advisory active. |
 
-## LAST-RUN CHANGES — ALL VERIFIED (soak #13)
+## LAST-RUN CHANGES — ALL VERIFIED (soak #15)
 
 | Change | Status | Evidence |
 |--------|--------|----------|
-| death-zone advisory (03:41) | SHIPPED | ai_trader_precheck.py:207 flags RSI 45-55. 0 trades since. |
-| watchdog _SIGNAL_FLAG_MAP (05:39) | PASS | Dead-signal steers gone. |
-| doji / dead-gap / drift / EXTREME 0.85 / sweet-spot / midband | HOLDING | 0 violations. |
-| SHORT floor-35 | HOLD | −$0.12 vs −$1.00 trigger (resets Oct 20). |
-| TAT shadow | 1 FIRE | BANANA would-save directional +. Needs 14 more. |
-| MFE-CUT shadow | 0 FIRES | Structural. |
-| floor-admit shadow | 595 events | 34.6% pp<0.10. CEO decision pending. |
+| SHORT floor revert 35→45 (11:48) | HOLDING | 2T since. HBAR SHORT won +$0.07. No violations. |
+| Contrarian PROMOTE 14d gate (11:48) | HOLDING | Code verified. SOAK until ~Oct 31. |
+| death-zone advisory RSI 45-55 (03:41) | HOLDING | Functional. Advisory only. |
+| watchdog _SIGNAL_FLAG_MAP (05:39) | HOLDING | Steers clean of dead-signal noise. |
+| REGIME_CONF_EXTREME_MULT 0.85 | EARLY-POSITIVE | 3d EXTREME 34T −$0.05 vs 7d 112T −$1.64. |
+| TAT shadow | 2 FIRES | BANANA directional save + IO correctly-cut loser. |
+| MFE-CUT shadow | 0 FIRES | Structural per candle-OOS verdict. |
+| doji / dead-gap / drift / sweet-spot / midband / vb-long+ kill | ALL HOLDING | 0 violations. |
 
 ## WEALTH GAP (7d) — UNCHANGED
 
 | Family | Trades | WR | PnL |
 |--------|--------|-----|-----|
-| TRAIL | 64 | 89.1% | **+$6.36** |
-| hard_max_loss | 53 | 0% | −$4.71 |
-| atr_sl_hit | 50 | 2% | −$3.98 |
+| TRAIL (profit-monster + atr_trail + trail_sl) | 65 | 89.2% | **+$6.43** |
+| CHOP (hard_max_loss + atr_sl_hit) | 106 | 1.9% | −$8.86 |
+
+## ARMED-THEN-REVERSE COHORT (14d) — NEW QUANTIFICATION
+
+29T with MFE≥0.40 that still exited via SL: WR 3.4%, −$1.67, avgMFE 0.819.
+- pump-chain- 14T −$0.79 (avgMFE 0.78 → avgMAE 0.40)
+- pump-chain+ 4T −$0.41
+- These confirmed momentum but trail too wide to lock before reversal. Distinct from never-armed chop.
 
 ## CREATIVE THIS RUN
 
-1. **Contrarian shadow data quality fix** — 598 events, 0 resolved. Classification uses 30d historical (look-ahead bias). PROMOTE recs unactionable without live forward-tracking.
-2. **volume-buildup- SHORT RSI floor monitor** — best signal 87.5% WR, n=8 < 20 bar. Monitor only.
+**Post-arm trail tightening** — after trail arms at 0.40%, tighten trail distance 30-50% for armed-then-reverse cohort. Targets giveback without touching never-armed chop or trail winners. Needs candle-level OOS (escalation #15 vehicle). Logged to creative_improvements.json.
 
 ## ESCALATIONS
 
-- **#15:** exit-ladder candle OOS for dual-condition TAT (self_learner undelivered 8+).
-- **#16:** arm-registration-gap instrumentation — bug_hunter, zero-behavior close-time debug log.
+- **#15:** exit-ladder candle OOS for dual-condition TAT (self_learner undelivered 9+). brain_auditor runs scoped version Oct 19 if still undelivered.
+- Post-arm trail tightening backtest — commission via #15 vehicle.
 
 ## NEXT
 
-- Re-eval ai-trader+ death-zone/EXTREME Oct 19.
-- Floor-35 daily check until Oct 20 reset.
-- TAT dual-condition OOS before any flip.
-- Contrarian shadow forward-tracking fix.
+- Re-eval ai-trader+ EXTREME Oct 19 (n needs 20+).
+- TAT shadow: collect to 14d for flip review.
+- Resume-day (~Oct 23): CEO eyeball — 11+ unvalidated changes land together.
 - Protected flags 13/13 INTACT.

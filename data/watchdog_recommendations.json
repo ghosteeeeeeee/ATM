@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-10-18T11:56:44.009086+00:00",
+  "timestamp": "2026-10-18T14:26:45.020760+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.56 USDT. Something is wrong.",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.41 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
@@ -20,8 +20,8 @@
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 4 losses",
-      "detail": "Net -0.46 USDT over last 20 trades (losses: -0.48). Consider disabling or tuning this signal.",
+      "title": "Signal 'pump-chain+' losing streak: 3 losses",
+      "detail": "Net -0.27 USDT over last 20 trades (losses: -0.29). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-003"
     },
@@ -29,7 +29,7 @@
       "severity": "warning",
       "category": "health",
       "title": "Signal 'ai-trader+' losing streak: 3 losses",
-      "detail": "Net -0.37 USDT over last 20 trades (losses: -0.44). Consider disabling or tuning this signal.",
+      "detail": "Net -0.39 USDT over last 20 trades (losses: -0.44). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-004"
     }
@@ -38,20 +38,16 @@
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
+    "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "linreg_alignment": 0.75,
+    "wyckoff_phase": "MARKDOWN",
+    "market_phase": "DECLINING",
+    "trend_quality": "UP"
   },
-  "open_count": 0,
-  "deep_analysis": "PORTFOLIO FLAT (0/6 slots) in a STRONG_DOWN SHORT_BIAS tape \u2014 we have zero exposure while BTC sits below EMA300 (337 candles) with LEAN_BEAR linreg and STRONG_NEG zscore. Flat beats long-in-a-bear, but it also means zero participation in the only profitable side: shorts.\n\nThe 48h ledger is unambiguous about which side was right. LONGs: every RSI band negative (mid-band 45-55 worst at 20%WR/-0.83; oversold <35 0%WR/-0.33; even 'sweet spot' 55-65 at 44%WR/-0.57). SHORTs: the 55-65 band went 100%WR/+0.47 (ALT, pump-chain-v6-). 24h totals confirm: SHORTS net +0.38, LONGS net -0.28. We kept buying pumps in a market that was selling them.\n\npump-chain+ LONG is the bleeding wound (7d): 20 trades, only atr_trail_hit makes money (+2.17 on 6/8 trending winners). The other exits bleed: hard_max_loss 0%WR/-0.91, trail_arm_timeout 3/11/-0.41, atr_sl_hit 0/4/-0.55. Average entry RSI on those losers: 62-65 \u2014 we are systematically longing into overbought levels while BTC trends down. The winning side of every one of those losses was a SHORT at the same RSI. IO, BLUR, WCT 'trail_arm_timeout' losses are chop entries that never reached +0.40% arm \u2014 same signature as the hard_max_loss family.\n\nThe exit-reason split (48h) tells the trend-vs-chop story cleanly: profit-monster-trail 7/8 wins +0.25 and trail_sl +0.47 are the trending trades; atr_sl_hit (13 trades, 1 win, -1.17) and hard_max_loss (0/6, -0.75) are the chop trades. Trend is friend; chop is theft. We entered chop 19 times in 48 hours.\n\nai-trader+ also bleeding: WLD LONG -0.15 (RSI 52.6), INJ LONG -0.20 (RSI 64) \u2014 same wrong-side pattern, plus the documented APT drift case (pick RSI 57.1 -> fill 33.7 = hard_max_loss). USELESS SHORT (09:01 pick) expired unfilled \u2014 no trade opened.",
-  "regime_context": "BTC: SHORT_BIAS on both 15m and 4h. Price 81,980 hugging EMA300 (AT, 337 candles duration) after a long stay below \u2014 this is a bear tape trying to base, not a bull reversal. linreg LEAN_BEAR (1m/5m/15m slopes all negative, 1h slightly positive), zscore STRONG_NEG (-1.55), velocity SLOW, acceleration FLAT, volume LOW. Market phase labelled RECOVERY but trend_quality STRONG_DOWN \u2014 recovery labels are premature while every short-term slope points down.\n\n15m regime scanner: 75 SHORT_BIAS vs 4 LONG_BIAS across 126 tokens (overall SHORT_BIAS). Strongest confirmed downtrends: USELESS (conf 94.2), AIXBT (94.0), SUSHI (93.1), SUI (92.6), WLD (92.2). This is a short-first tape. LONG signals should be treated as counter-trend gambles, not default posture. Volatility LOW \u2014 position sizing should reflect it (smaller ATR room for SL/TP).",
-  "pattern_alerts": "VERIFIED (PostgreSQL brain, meta_rsi from _signal_metadata):\n\nPATTERN 1 \u2014 LONG in SHORT_BIAS regime = wrong side. n=8 LONG/24h: 37.5%WR, -0.28. n=5 SHORT/24h: 40%WR, +0.38. 48h by RSI band: LONG all bands negative (worst mid 45-55: 20%WR/-0.83 n=10); SHORT 55-65 band 100%WR/+0.47. WINNING SIDE of every recent long loss: short the same pump. Why weren't we on it? pump-chain+ fires LONG on pump structure regardless of BTC regime direction \u2014 entries averaged RSI 62-65 (overbought) while BTC trended down.\n\nPATTERN 2 \u2014 Chop entries never arm the trail. pump-chain+ LONG 7d exit split: atr_trail_hit 6/8 wins +2.17 (trend winners) vs hard_max_loss 0/9 -0.91 + trail_arm_timeout 3/11 -0.41 + atr_sl_hit 0/4 -0.55 (chop losers). 52/56 hard_max_loss trades historically never reach +0.40% arm. IO (RSI 57.1), BLUR (62.5), WCT (27.8) trail_arm_timeout losses this week are the same signature. WINNING SIDE: no trade, or short the same range. The arm-timeout family is pure chop entry \u2014 the trail only works in trend.\n\nPATTERN 3 \u2014 Exit quality confirms trend/chop split (48h, all signals): profit-monster-trail 7/8 +0.25, trail_sl 1/1 +0.47 (trend exits) vs atr_sl_hit 1/13 -1.17, hard_max_loss 0/6 -0.75 (chop exits). 19 of 26 closed trades exited via chop-family reasons. We are not losing on exits; we are losing on entries into chop.\n\nPATTERN 4 \u2014 ai-trader+ LONG drift + wrong side: WLD LONG -0.15 (meta_rsi 52.6, hard_sl), INJ LONG -0.20 (meta_rsi 64, atr_sl), APT LONG -0.09 (pick 57.1 -> fill 33.7, hard_max_loss). WINNING SIDE: short WLD/INJ at those RSI levels. Fix applied: rsi_at_pick + drift gate now in ai_trader_state.",
-  "agent_timestamp": "2026-10-18T12:03:35.301516+00:00"
+  "open_count": 0
 }

@@ -874,9 +874,9 @@ def main():
 
     # Sort by severity
     Bugs.sort(key=lambda x: x[0])
-    criticals = [b for b in Bugs if "CRITICAL" in b[1]]
-    errors = [b for b in Bugs if "ERROR" in b[1]]
-    warnings = [b for b in Bugs if "WARNING" in b[1]]
+    criticals = [b for b in Bugs if "[CRITICAL]" in b[1]]
+    errors = [b for b in Bugs if "[ERROR]" in b[1]]
+    warnings = [b for b in Bugs if "[WARNING]" in b[1]]
 
     print(f"\n🐝 WASP REPORT — {ts()}")
     print(f"   🚨 CRITICAL: {len(criticals)}  |  ❌ ERROR: {len(errors)}  |  ⚠️ WARNING: {len(warnings)}")
