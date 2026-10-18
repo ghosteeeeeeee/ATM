@@ -5302,5 +5302,25 @@
     "category": "allocation",
     "status": "monitor",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-18T07:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "TAT backfill verdict: bb-bounce T=55m FAILS eligibility (7/7 eligible-winner FK, net +$0.19); dual-condition variant (MFE<0.20 AND live_pnl<-0.2%) nets ~+$0.30 with FK 1/7 — shadow restructure candidate",
+    "rationale": "Accelerated flip criteria per last-run creative. 14d real-candle MFE-at-T backfill, hold<55m corrected out. Single-condition T=55 cuts every slow-grinder winner still sub-arm at 55m. Dual-condition preserves flat-but-not-losing grinders while keeping underwater cuts.",
+    "expected_impact": "~+$0.30/14d bb-bounce family if OOS passes",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-18T07:45:00Z",
+    "agent": "brain_auditor",
+    "idea": "ai-trader+ LONG TAT T=55m NOT a lever — 19/25 exit before 55m, only 1 fire in 14d (+$0.07)",
+    "rationale": "Shadow was extended to ai-trader Oct 17; backfill shows the cohort dies too fast for T=55 to engage. Fast-bleed profile needs shorter-T mechanism (prior creative: T=25-30) if timeout ever flips.",
+    "expected_impact": "n/a — do not prioritize TAT work on ai-trader",
+    "category": "exit sniper",
+    "status": "documented",
+    "risk": "low"
   }
 ]
