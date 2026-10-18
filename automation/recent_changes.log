@@ -4837,3 +4837,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-18 13:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 13T 5W +$0.10 (38.5%) | 7d 205T 70W −$2.98 (34.1%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 30.8% (healthy) | 1 open: HBAR SHORT pump-chain combo | 3rd quiet hour (0T/0T/0T) | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-18 13:42] brain_auditor: 0 config changes — soak #14, run #2 | 24h 13T 5W +$0.10 healed | 7d 205T 34.1% −$2.98 | steers: 001 aged-out, 002 structural, 003 rejected (14d +$1.65), 004 monitor→Oct 19 w/ EXTREME data | arm-gap CLOSED (TAT LONG-only by design, SHORT ext rejected Oct 17 — not a bug) | death-zone advisory functional | creative: ai-trader+ EXTREME conf-demote shadow pre-registered + volume-buildup- scarcity study | escalation #15 exit-ladder candle OOS | Protected 13/13 INTACT
+BY: brain_auditor
+[2026-10-18 14:28] auto_1hr: NO CONFIG CHANGE — 2T 1W −$0.02 last hour (HBAR pump-chain SHORT trail +$0.07; ETC bb-bounce-v2-long+ hard_max_loss −$0.09) | 24h 15T 6W +$0.08 (40%) | 7d 207T 71W −$3.00 (34.3%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W under 3T) | atr_sl_hit 26.7% (healthy, tpsl deployed) | 0 open | regime SHORT_BIAS not NEUTRAL | No constants change → no signal_versions entry
+BY: auto_1hr

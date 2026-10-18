@@ -11713,3 +11713,27 @@ Final set: ['ALT', 'APT', 'CFX', 'CHIP', 'DOT', 'FIL']
 - hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
 - 7d PnL −$2.98; 7d WR 34.1% still below 37% resume threshold — size-reduce stays
 - Third quiet hour in a row (0T/0T/0T over last 3h) — thin market, only HBAR SHORT open
+
+## [2026-10-18 14:28] Hourly Analysis
+
+**Trades:** 2 closed last hour (1 win, 1 loss)
+**PnL:** −$0.02 last hour | 24h 15T 6W +$0.08 (40.0% WR) | 7d 207T 71W −$3.00 (34.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- HBAR SHORT pump-chain combo rr_engine_trail_hit +$0.07 (+3.29%) — second consecutive win for pump-chain short combo
+- ETC LONG bb-bounce-v2-long+ hard_max_loss −$0.09 (−4.13%) — within expected hard_max_loss band at leverage, not a bug
+- atr_sl_hit 4/15 = 26.7% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; bb-bounce-v2-long+ 2T 0W −$0.18 and hl_copy_trader 2T 0W −$0.11 both under 3T threshold — standing watch
+- No overtrading (2T/hr)
+- No 3-neg-hour streak (13:00 was +$0.07, 14:00 −$0.09)
+- 0 open trades
+- Regime SHORT_BIAS (115S/1L/12N) not NEUTRAL — no regime size cut; existing 30% size-reduce covers
+- Size-reduce 30% stays (7d WR 34.3% < 37%, 7d PnL −$3.00 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ 24h 2T 0W −$0.18 — standing watch (1 more loss kills it at 3T 0% WR)
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (same)
+- 7d PnL drifted −$2.98 → −$3.00; 7d WR 34.3% still below 37% resume threshold — size-reduce stays
