@@ -4831,3 +4831,5 @@ BY: brain_auditor
 BY: auto_1hr
 [2026-10-18 10:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 12T 5W +$0.13 (41.7%) | 7d 204T 70W -$2.95 (34.3%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 25% (healthy, tpsl deployed) | 1 open: HYPE SHORT volume-buildup- | neg-hour streak stops at 4 (no new losing hour) | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-18 11:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 12T 5W +$0.13 (41.7%) | 7d 204T 70W -$2.95 (34.3%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 25% (healthy, tpsl deployed) | 1 open: HYPE SHORT volume-buildup- | regime SHORT_BIAS (81S/6L/40N) not NEUTRAL, no regime cut | 2nd quiet hour in a row | No constants change → no signal_versions entry
+BY: auto_1hr

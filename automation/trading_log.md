@@ -11644,3 +11644,26 @@ Final set: ['ALT', 'APT', 'CFX', 'CHIP', 'DOT', 'FIL']
 - hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
 - 7d PnL flat since 09:28 (−$2.95); 7d WR 34.3% still below 37% resume threshold — size-reduce stays
 - Quiet hour (0T) — market thin, wait for setups rather than force trades
+
+## [2026-10-18 11:28] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 12T 5W +$0.13 (41.7% WR) | 7d 204T 70W −$2.95 (34.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — no data to act on
+- atr_sl_hit 3/12 = 25% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; hl_copy_trader 2T 0W −$0.11 (under 3T threshold, standing watch)
+- No overtrading (0T/hr)
+- No new losing hour — prior 4-neg-hour streak (05/07/08/09) remains ended
+- 1 open: HYPE SHORT volume-buildup- @ 78.71 (entered 08:11, HYPE regime NEUTRAL but aggregate SHORT_BIAS aligned)
+- Regime SHORT_BIAS (81S/6L/40N of 127, regime_5m.json 11:15) — not NEUTRAL, no regime size cut; existing 30% size-reduce already active
+- Size-reduce 30% stays (7d WR 34.3% < 37%, 7d PnL −$2.95 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
+- 7d PnL flat at −$2.95 since 09:28; 7d WR 34.3% below resume threshold — size-reduce stays
+- Second consecutive quiet hour (0T) — thin market, HYPE SHORT still the only open position
