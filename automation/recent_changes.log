@@ -4844,3 +4844,5 @@ BY: auto_1hr
 
 [2026-10-18 14:39] brain_auditor: 0 config changes — soak #15 | 24h 15T 6W +$0.08 healed | 7d 207T 34.3% −$3.00 | steers: 001 aged-out, 002 structural, 003 rejected (14d +$1.65), 004 monitor→Oct 19 | SHORT floor revert HOLDING | EXTREME 0.85 early-positive (3d −$0.05) | armed-reverse cohort 29T −$1.67 quantified | creative: post-arm trail tightening (needs candle-OOS) | escalation #15 exit-ladder candle OOS | Protected 13/13 INTACT
 BY: brain_auditor
+BY: auto_1hr
+[2026-10-18 15:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 15T 6W +$0.08 (40%) | 7d 205T 69W −$3.65 (33.7%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W under 3T) | atr_sl_hit 26.7% (healthy, tpsl deployed) | 0 open | no 3-neg-hour streak | No constants change → no signal_versions entry

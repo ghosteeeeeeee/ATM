@@ -11737,3 +11737,26 @@ Final set: ['ALT', 'APT', 'CFX', 'CHIP', 'DOT', 'FIL']
 - bb-bounce-v2-long+ 24h 2T 0W −$0.18 — standing watch (1 more loss kills it at 3T 0% WR)
 - hl_copy_trader 24h 2T 0W −$0.11 — standing watch (same)
 - 7d PnL drifted −$2.98 → −$3.00; 7d WR 34.3% still below 37% resume threshold — size-reduce stays
+
+## [2026-10-18 15:28] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 15T 6W +$0.08 (40.0% WR) | 7d 205T 69W −$3.65 (33.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — no data to act on
+- atr_sl_hit 4/15 = 26.7% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; bb-bounce-v2-long+ 2T 0W −$0.18 and hl_copy_trader 2T 0W −$0.11 both under 3T threshold — standing watch
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (13:00 +$0.07, 14:00 −$0.09, 15:00 no trades)
+- 0 open trades
+- Size-reduce 30% stays (7d WR 33.7% < 37%, 7d PnL −$3.65 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ 24h 2T 0W −$0.18 — standing watch (1 more loss kills it at 3T 0% WR)
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (same)
+- 7d PnL −$3.00 → −$3.65 (rolling-window drift, two winners aged out); WR 33.7% still below 37% resume threshold — size-reduce stays
+- Quiet hour again (5th in last 6h with ≤1 trade) — thin market
