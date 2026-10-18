@@ -5430,5 +5430,16 @@
     "category": "entry sniper",
     "status": "shadow-shipped",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-18T17:42:52Z",
+    "idea": "Signal-density equalizer: study why volume-buildup- (best SHORT, 77.8% WR +$0.35/7d) fires 7x less than pump-chain- (worst SHORT, 21.9% WR -$0.55/7d)",
+    "rationale": "Capital is allocated 7:1 to our worst SHORT signal vs our best. Loosening ONE volume-buildup- entry criterion could double fire rate while holding WR>=60%. Study, not change.",
+    "expected_impact": "+$0.30-0.70/7d if fire rate doubles at 60%+ WR",
+    "category": "capital allocation",
+    "status": "suggested",
+    "risk": "low (study only)",
+    "agent": "brain_auditor",
+    "run": "2026-10-18 17:45"
   }
 ]
