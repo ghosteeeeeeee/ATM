@@ -11557,3 +11557,24 @@ Final set: ['ALT', 'APT', 'CFX', 'CHIP', 'DOT', 'FIL']
 **Open Questions:**
 - hl_copy_trader 24h 2T 0W −$0.11 — standing watch (under kill threshold)
 - 7d WR 35.1% still below 37% resume threshold — size-reduce stays
+
+## [2026-10-18 07:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** −$0.08 last hour | 24h 10T 5W +$0.19 (50.0% WR) | 7d 202T 70W −$2.89 (34.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- IO LONG pump-chain+ trail_arm_timeout −$0.08 (−2.11%) — trade never armed trailing stop, timed out; single small loss, not a pattern (2 trail_arm_timeout closes in 24h, one was a win)
+- atr_sl_hit 2/10 = 20% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; hl_copy_trader 2T 0W −$0.11 (under 3T threshold, standing watch); bb-bounce-v2-long+ 1T 0W (only 1 trade)
+- No overtrading (1T/hr)
+- 3 consecutive negative hours (03:00 −$0.03, 05:00 −$0.09, 07:00 −$0.08) but regime is LONG_BIAS (60L/1S/66N of 127 tokens, regime_5m.json 07:15) not NEUTRAL — no regime-based size cut; existing 30% size-reduce already active
+- 0 open trades
+- Size-reduce 30% stays (7d WR 34.7% < 37%, 7d PnL −$2.89 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
+- 7d PnL degraded −$2.18 → −$2.89 since 06:28 check; 7d WR 34.7% still below 37% resume threshold — size-reduce stays
