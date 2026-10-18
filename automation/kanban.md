@@ -96,3 +96,6 @@
 
 ## TEAM UPDATES
 - [2026-10-18 04:43 UTC] health_monitor: Pipeline OK — 30/30 runs success in 30m, 3 open / 3 closed today (PG, -0.01 USDT), 44 signals/1h, regime LONG_BIAS (12L/5S/105N), prices fresh (27s, 87 tokens), phantom 0, disk 81%. AUTO-FIX: stopped hermes-coding-mcp.service (crash-looped 939x against missing run_mcp_server.py — third recurrence since Oct 8; something keeps resurrecting a disabled unit, worth a root-cause look). bug-hunter exit-1 = known hardcoded-passwords tech debt. Details: automation/error_alerts.md
+
+## TEAM UPDATES
+- [2026-10-18 18:28] auto_1hr: No config change — 0 trades closed last hour (thin market, 10th quiet stretch). 24h 14T 5W +$0.03 (35.7%), 7d 202T 68W −$3.66 (33.7%). Size-reduce 30% stays. atr_sl_hit 28.6% (healthy, tpsl deployed). Kill watch: bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W, both under 3T threshold. 0 open, no 3-neg-hour streak.
