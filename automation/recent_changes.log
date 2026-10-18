@@ -4827,3 +4827,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-18 08:35] brain_auditor: 0 config changes — soak #12 | 24h 11T 5W +$0.18 45.5% | 7d 203T 34.5% −$2.90 | size-reduce 0.3x stays | steers: 001 aged-out, 002 aligned, 003 structural-verified (no new filter), 004 pump-chain+ kill REJECTED (14d +$1.65), 005 ai-trader+ monitor→Oct 19 | NEW FINDING: arm-registration gap 28T/14d atr_sl_hit MFE≥0.40 (avg 0.83%) trailing_activated=FALSE −$1.62 → bug_hunter instrumentation delegation | TAT shadow 1 fire directional +$1.74 save | escalation #15 exit-ladder candle OOS still not commissioned | Protected 13/13 INTACT
 BY: brain_auditor
+[2026-10-18 09:28] auto_1hr: NO CONFIG CHANGE — 1T 0W -$0.05 last hour (PUMP ai-trader- atr_sl_hit, -2.10%) | 24h 12T 5W +$0.13 (41.7%) | 7d 204T 70W -$2.95 (34.3%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 25% (healthy, tpsl deployed) | 1 open: HYPE SHORT volume-buildup- | regime SHORT_BIAS (29S/15L/78N) not NEUTRAL, no regime cut | 5-neg-hour streak tiny -$0.26 total | No constants change → no signal_versions entry
+BY: auto_1hr
+[2026-10-18 10:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 12T 5W +$0.13 (41.7%) | 7d 204T 70W -$2.95 (34.3%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 25% (healthy, tpsl deployed) | 1 open: HYPE SHORT volume-buildup- | neg-hour streak stops at 4 (no new losing hour) | No constants change → no signal_versions entry
+BY: auto_1hr

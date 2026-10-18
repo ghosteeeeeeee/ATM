@@ -11578,3 +11578,69 @@ Final set: ['ALT', 'APT', 'CFX', 'CHIP', 'DOT', 'FIL']
 **Open Questions:**
 - hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
 - 7d PnL degraded −$2.18 → −$2.89 since 06:28 check; 7d WR 34.7% still below 37% resume threshold — size-reduce stays
+
+## [2026-10-18 08:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** −$0.01 last hour | 24h 11T 5W +$0.18 (45.5% WR) | 7d 203T 70W −$2.90 (34.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- LDO LONG pump-chain+ atr_trail_hit −$0.01 (−0.21%) — tiny loss, healthy ATR trail exit (~54s hold)
+- atr_sl_hit 2/11 = 18.2% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; hl_copy_trader 2T 0W −$0.11 (under 3T threshold, standing watch)
+- No overtrading (1T/hr)
+- 4 consecutive negative hours (03 −$0.03, 05 −$0.09, 07 −$0.08, 08 −$0.01) but regime flipped to SHORT_BIAS (79S/3L/45N of 127, regime_5m.json 08:15) not NEUTRAL — no regime-based size cut; existing 30% size-reduce already active
+- 2 open: PUMP SHORT ai-trader-, HYPE SHORT volume-buildup- (both aligned with SHORT_BIAS regime)
+- Size-reduce 30% stays (7d WR 34.5% < 37%, 7d PnL −$2.90 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
+- 7d PnL degraded −$2.89 → −$2.90 since 07:28; 7d WR 34.5% still below 37% resume threshold — size-reduce stays
+- Regime flipped LONG_BIAS → SHORT_BIAS since last check — shorts should have better edge this session
+
+## [2026-10-18 09:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** −$0.05 last hour | 24h 12T 5W +$0.13 (41.7% WR) | 7d 204T 70W −$2.95 (34.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- PUMP SHORT ai-trader- atr_sl_hit −$0.05 (−2.10%) — single small loss, not a pattern (ai-trader- 1T 0W only)
+- atr_sl_hit 3/12 = 25% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; hl_copy_trader 2T 0W −$0.11 (under 3T threshold, standing watch)
+- No overtrading (1T/hr)
+- 5 consecutive negative hours (03 −$0.03, 05 −$0.09, 07 −$0.08, 08 −$0.01, 09 −$0.05, total −$0.26) but regime SHORT_BIAS (29S/15L/78N of 122, regime_5m.json 09:15) not NEUTRAL — no regime-based size cut; existing 30% size-reduce already active
+- 1 open: HYPE SHORT volume-buildup- (aligned with SHORT_BIAS)
+- Size-reduce 30% stays (7d WR 34.3% < 37%, 7d PnL −$2.95 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
+- 7d PnL degraded −$2.90 → −$2.95 since 08:28; 7d WR 34.3% still below 37% resume threshold — size-reduce stays
+- 5-neg-hour streak tiny total (−$0.26) — market slow, not systemic
+
+## [2026-10-18 10:28] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 12T 5W +$0.13 (41.7% WR) | 7d 204T 70W −$2.95 (34.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — no data to act on
+- atr_sl_hit 3/12 = 25% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; hl_copy_trader 2T 0W −$0.11 (under 3T threshold, standing watch)
+- No overtrading (0T/hr)
+- Neg-hour streak (05/07/08/09) stops at 4 — no new losing hour; existing 30% size-reduce already active
+- 1 open: HYPE SHORT volume-buildup- (aligned with SHORT_BIAS regime)
+- Size-reduce 30% stays (7d WR 34.3% < 37%, 7d PnL −$2.95 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- hl_copy_trader 24h 2T 0W −$0.11 — standing watch (1 more loss kills it at 3T 0% WR)
+- 7d PnL flat since 09:28 (−$2.95); 7d WR 34.3% still below 37% resume threshold — size-reduce stays
+- Quiet hour (0T) — market thin, wait for setups rather than force trades
