@@ -1,21 +1,37 @@
 {
-  "timestamp": "2026-10-18T03:08:32.886680+00:00",
+  "timestamp": "2026-10-18T03:56:38.218830+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -0.96 USDT. Something is wrong.",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.83 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "health",
-      "title": "10 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "category": "cluster",
+      "title": "Trade cluster: HYPE + BANANA",
+      "detail": "Both opened within 6 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Portfolio heavily long (3 trades)",
+      "detail": "3 long positions. One BTC dump hits all of them.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "9 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "auto_executable": false,
+      "id": "steer-004"
     },
     {
       "severity": "warning",
@@ -23,43 +39,43 @@
       "title": "Signal 'ai-trader+' losing streak: 3 losses",
       "detail": "Net -0.42 USDT over last 20 trades (losses: -0.44). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-005"
     },
     {
       "severity": "warning",
       "category": "health",
       "title": "Signal 'ai-trader-manual' losing streak: 3 losses",
-      "detail": "Net -0.05 USDT over last 20 trades (losses: -0.11). Consider disabling or tuning this signal.",
+      "detail": "Net -0.02 USDT over last 20 trades (losses: -0.11). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-006"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'doji-bottom-long' losing streak: 5 losses",
-      "detail": "Net -0.59 USDT over last 20 trades (losses: -0.61). Consider disabling or tuning this signal.",
+      "title": "Signal 'doji-bottom-long' losing streak: 3 losses",
+      "detail": "Net -0.43 USDT over last 20 trades (losses: -0.45). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-005"
+      "id": "steer-007"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "ABOVE",
     "volatility": "LOW",
     "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "linreg_alignment": 0.75,
     "wyckoff_phase": "UNKNOWN",
     "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 2,
-  "deep_analysis": "## TRADE WATCHDOG \u2014 CRITICAL (analysis complete; plan mode = writes held)\n\nData read from `watchdog.json` (02:38 UTC), continuum, regime_5m, signals.json, candles.db, PostgreSQL patterns. No files written \u2014 plan mode active.\n\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 2 (2 long, 0 short)  |  Slots: 2/6\nUnrealized PnL: +0.01 USDT\nRegime: equilibrium CHOP | Volatility: LOW\n  BTC: above EMA300 158min, LEAN_BULL, STRONG_UP\n  BUT: velocity SLOW, accel FLAT, 15m scanner SHORT_BIAS\n  vs continuum ABOVE = timeframe conflict\n  Alt aggregate 5m: 70 SHORT_BIAS / 5 long_bias\n\n\u2500\u2500 Steers (automated, unchanged) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 13/20 recent trades lost (30% WR, -0.96)\n\ud83d\udfe1 doji-bottom-long: 5-loss streak\n\ud83d\udfe1 ai-trader+: 3-loss streak (-0.68 lifetime in window)\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nSUPER LONG 16261 (1.9h): WARNING \u2014 thesis fading.\n  Entry meta_rsi 56.25 (good zone). Now 1m RSI ~33.\n  Price -0.26%/30m, only +0.19% \u2014 trail needs +0.4% to arm.\n  ATR 0.26% (below 0.3 floor). Fingerprint of trail_arm_timeout\n  /hard_max_loss. SL -0.30% is tight = small loss if it goes.\n  Verdict: HOLD to hour 3 (03:45 UTC), exit if still < +0.2%.\n  Would NOT open fresh \u2014 momentum dead.\n\nBTC LONG 16263 (0.2h, manual): FINE.\n  Aligned: above EMA300, LEAN_BULL, 1m RSI 58.\n  Scalp geometry (SL -0.22%, TP +0.23%) matches low-vol grind.\n  Hold. If BTC loses 81550 EMA300, exit \u2014 regime flips.\n\nDEATH ZONE intact (7d, meta_rsi): 45-55 LONG -$1.53,\n  45-55 SHORT -$1.02. Trail family still the only edge.\n  Recent losers confirm: ZEN/CRV/WCT doji-longs entered\n  RSI 28-40 falling knives \u2014 winning side was SHORT breakdown\n  or wait reclaim >50. We keep buying knives.\n\n\u2500\u2500 Pattern Alerts \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. doji-bottom-long catches falling knives (5L streak,\n   meta_rsi 29-49). Winning side = short the dump. \u2192 CEO review.\n2. Mid-RSI chop death continues. Mid-band entries = noise stops.\n3. Vacation guardrail ACTIVE (7d WR 34.8% < 35%) \u2014 sizes 30%.\n   Correct. Keep.\n\n\u2500\u2500 AI Trader Pick: SKIP this cycle \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nPrecheck PASS: TURBO SHORT (RSI 60.6), STX SHORT (49.5),\n  GOAT SHORT (50.3). FIL/CHIP FAIL (LOSERS).\n  STX/GOAT sit dead-center in 45-55 death zone \u2014 reject.\n  TURBO 60.6 is outside death zone but R:R 1.33 grade C,\n  30m flat (+0.11%), BTC LEAN_BULL = squeeze risk.\n  Second consecutive skip \u2014 chop at EMA300, no A+ setup.\n  In chop, no pick > a bad pick.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. SUPER: hard checkpoint 03:45 UTC \u2014 exit if <+0.2%.\n2. BTC manual: hold; exit on loss of 81550 EMA300.\n3. CEO: doji-bottom-long needs momentum-confirmation gate\n   (brain auditor's job \u2014 flagging only).\n4. Keep vacation guardrail at 30% size.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\n## Planned writes (need approval \u2014 plan mode)\n\n1. **Merge into `/root/.hermes/data/watchdog_recommendations.json`** \u2014 `deep_analysis`, `regime_context`, `pattern_alerts` (text above, clean narrative), `agent_timestamp`. Steers untouched.\n2. **AI trader pick: write nothing** \u2014 skip justified above. (Alternative if captain insists: TURBO SHORT, conf 65, RSI-at-pick 60.6 \u2014 weakest acceptable pick, not recommended.)\n\nSay \"execute\" and I'll run the merge (and the TURBO pick only if you override the skip).\n",
-  "agent_timestamp": "2026-10-18T02:43:43.133207+00:00",
-  "regime_context": "BTC sitting AT EMA300 for 97 minutes with LEAN_BULL linregs (1m/5m/15m/1h all positive slopes, alignment 0.75) and trend_quality UP / RECOVERY \u2014 nominally bullish structure. However velocity is SLOW, acceleration NEGATIVE, and 15m LONG_BIAS conflicts with 4h SHORT_BIAS. This is equilibrium chop, not trend. Historical lesson: trail family wins 86.5% in trends; hard_max_loss is 0% in chop. Current regime favors: (1) NO new mid-RSI entries, (2) holding existing positions only if stop is tight, (3) waiting for a clean EMA300 break (above ~81800 expansion or below ~81200 dump) before adding exposure. Aggregate alt scan still 42/2 long-biased at 5m \u2014 alts have not confirmed a dump, but most are red on 30m (ALT -2%, SAND -1.7%, ETHFI -1.7%). Correlation risk: 1 LONG now is fine; do not stack correlated LONGs into a BTC that is undecided.",
-  "pattern_alerts": "VERIFIED 7d (PostgreSQL, meta_rsi only \u2014 entry_rsi_14 excluded as unreliable):\n\nPATTERN 1 \u2014 MID-RSI CHOP DEATH (n=44 in 45-55 band): LONG 27T 22.2%WR -$1.53, SHORT 17T 11.8%WR -$1.02. Combined -$2.55 on mid-range entries. WINNING SIDE: stay flat, or only take RSI 55-65 LONG (47%WR) / avoid 45-55 entirely. WE WEREN'T ON IT because signal RSI bands (LONG 20-75, SHORT 35-65) are too wide for chop \u2014 they admit the death zone.\n\nPATTERN 2 \u2014 TRAIL FAMILY IS THE ONLY EDGE (7d exits): profit-monster-trail 37T 94.6%WR +$2.58, atr_trail_hit 23T 82.6%WR +$4.09, trail_sl 4T 100% +$0.51. vs hard_max_loss 55T 0%WR -$4.87, atr_sl_hit 49T 2%WR -$4.01. WINNING SIDE = entries that reach +0.4% trail arm. LOSING SIDE = entries killed by noise before arm. 104 trades never armed. WHY: ATR-tight SLs + chop market = noise stops out before momentum builds.\n\nPATTERN 3 \u2014 doji-bottom-long 5-loss streak (ZEN -0.11, CRV -0.10, YGG -0.24, WCT -0.13, SUSHI -0.03; meta_rsi 29/40/49/28/49): buys oversold dojis in falling tape. WINNING SIDE was SHORT the breakdown or wait for RSI reclaim >50. Signal is catching falling knives \u2014 17T 35.3%WR -$0.74 7d. Recommend CEO review; may need momentum confirmation gate.\n\nPATTERN 4 \u2014 ai-trader+ losing (19T 26.3%WR -$0.93 7d): recent losses WLD rsi52.6 hard_sl, APT rsi33.7 hard_max_loss (the documented RSI-drift victim), INJ rsi64.0 atr_sl_hit (chased overbought). Mixed failure modes \u2014 drift guard now live (AI_TRADER_RSI_DRIFT_MAX=15). Not a disable candidate yet but picks must avoid 45-55 band.\n\nPATTERN 5 \u2014 pump-chain- shorts (32T 21.9%WR -$0.55 7d): SHORT side of pump-chain is bleeding. ALT SHORT +0.47 was the recent winner (rsi 63.3, trail_sl) \u2014 consistent with RSI 55-65 SHORT being the only positive short bucket. The rsi<55 shorts are noise. Suggest reviewing pump-chain- RSI floor effectiveness."
+  "open_count": 3,
+  "deep_analysis": "PORTFOLIO: 3 open LONGs (BANANA +0.2%, HYPE +0.4%, SUPER +1.7%). All positive but all correlated \u2014 one BTC dump hits all three.\n\nCRITICAL: HYPE LONG entered at meta_rsi 36.0 \u2014 this is the oversold-long trap. 7-day data: LONG entries at RSI<40 win only 26.7% (n=15, avg -0.041). The last three oversold longs all lost hard: APT RSI 33.7 (-4.2%), ZEN RSI 29.5 (-5.1%), CRV RSI 39.8 (-4.4%). The winning side was SHORT every time \u2014 the dump continued. HYPE is currently at +0.4% but the entry thesis is weak. If it stalls, exit early rather than ride to hard_max_loss.\n\nSUPER LONG at RSI 56.25 is the healthiest \u2014 center band, +1.65%, approaching the +2% breakeven threshold. Move stop to breakeven (0.19086) once it crosses +2%.\n\nBANANA LONG at RSI 58.33 is fine \u2014 center band, new trade (0.4h), bb-bounce-v2-long+ has 50% WR over 20 trades.\n\nBTC REGIME: Above EMA300 for 70 consecutive candles, LEAN_BULL, STRONG_UP trend quality. BUT acceleration is NEGATIVE, velocity SLOW, volume LOW. The uptrend is mature and losing steam. 15m is LONG_BIAS, 4h is SHORT_BIAS \u2014 mixed. Not a crash setup, but not a strong trending market either. Positioning is reasonable for LONGs, but the lack of momentum means expect chop, not clean trends.",
+  "agent_timestamp": "2026-10-18T04:03:58.823132+00:00",
+  "regime_context": "BTC at 81,907, above EMA300 (81,634) for 70 candles. LEAN_BULL, STRONG_UP trend quality, but NEGATIVE acceleration and SLOW velocity \u2014 the uptrend is fading. Volume regime LOW. 15m scanner: LONG_BIAS (56 long vs 3 short across 124 tokens). 4h scanner: SHORT_BIAS. Market phase: DECLINING on 15m, CALM on continuum.\n\nImplication: LONGs are regime-aligned on the 15m, but the 4h SHORT_BIAS and negative acceleration mean this is a fade-the-rip environment, not a buy-the-dip environment. Chasing strength will get punished. Mean-reversion entries (bb-bounce) are more likely to work than momentum breakouts. The oversold-long pattern (doji-bottom, oversold-bounce) is losing because the 4h downtrend keeps grinding lower \u2014 catching falling knives.",
+  "pattern_alerts": "VERIFIED PATTERNS (7d PostgreSQL, meta_rsi):\n\n1. OVERSOLD LONGS ARE THE #1 MONEY LOSER \u2014 LONG entries at RSI<40: 26.7% WR (n=15), avg -0.041. The winning side was SHORT every time. Recent examples: APT RSI 33.7 \u2192 -4.2% (hard_max_loss), ZEN RSI 29.5 \u2192 -5.1%, CRV RSI 39.8 \u2192 -4.4%. Why weren't we on the SHORT side? doji-bottom-long and oversold-bounce signals are designed to catch falling knives. In a 4h SHORT_BIAS regime, the knife keeps falling. Fix: block LONG signals when meta_rsi < 40 AND 4h regime is SHORT_BIAS.\n\n2. doji-bottom-long IS A NET LOSER \u2014 17 trades in 7d, 35.3% WR, avg -0.044. Three consecutive losses in last 20 (ZEN, CRV, YGG). This signal fires at oversold RSI attempting bottom-calls. In the current regime, bottom-calls fail. The one win (GMT, RSI 56.2) was NOT oversold \u2014 it was center band. The signal works when RSI is 50+, not when RSI is 30.\n\n3. OVERBOUGHT LONGS ARE FINE \u2014 LONG entries at RSI>65: 35% WR but avg +0.012 (net positive). Overbought SHORTS (n=2) were 100% WR \u2014 when RSI>65 AND we short, we win. The ALT SHORT at RSI 63.3 (+4.2%) confirms: fading overbought works.\n\n4. CENTER-BAND SHORTS LOSE \u2014 SHORT entries at RSI 45-60: 18.2% WR (n=22), avg -0.045. Shorting mid-range in a LEAN_BULL regime is suicide. The winning side was LONG.\n\n5. VOLUME SIGNALS ARE BROKEN \u2014 volume-breakout-long+ 17.6% WR (n=17!), volume-buildup+ 20% WR (n=5). These fire on volume spikes that mean-revert. Meanwhile volume-buildup- (SHORT) is 87.5% WR (n=8). Volume spikes are SHORT signals, not LONG signals, in this regime.\n\n6. hl_copy_trader is mediocre \u2014 37.5% WR (n=8), avg +0.002. Barely breakeven. The HYPE LONG currently open came from this signal at RSI 36.0 (oversold zone)."
 }

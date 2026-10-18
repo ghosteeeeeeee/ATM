@@ -11487,3 +11487,24 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 - SUPER LONG (ai-trader+) near 2h hold — watch TP/SL next hour
 - ai-trader+ standing CEO escalation (24h 1T 0W −$0.15, 7d weak)
 - 7d WR 35.2% still below 37% resume threshold — size-reduce stays
+
+## [2026-10-18 04:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** −$0.06 last hour | 24h 6T 4W +$0.36 (66.7% WR) | 7d 200T 71W −$1.86 (35.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- ETH SHORT hl_copy_trader atr_sl_hit −$0.06 (−1.72%) — single small loss, healthy ATR-SL exit
+- atr_sl_hit 1/6 = 16.7% last 24h (healthy, tpsl fix deployed)
+- Kill check: no signal with 3+ trades 0% WR last hour; hl_copy_trader 1T 0W this hour, ai-trader+ standing CEO watch aged to 24h 1T 0W −$0.15 (under threshold)
+- No overtrading (1T/hr); no 3-neg-hour streak (23:00 +$0.47, 01:00 +$0.02, 03:00 −$0.03)
+- 3 open: HYPE LONG hl_copy_trader (open ~1h, entry 78.85, SL 78.62, TP 80.03), BANANA LONG bb-bounce-v2-long+ (open ~1h, entry 3.555, SL 3.524, TP 3.616), SUPER LONG ai-trader+ (open ~3.7h, entry 0.19086, SL 0.19184 — SL now ABOVE entry, TP 0.19571; trailing moved SL up, in profit, hold per rules)
+- Size-reduce 30% stays (7d WR 35.5% < 37%, 7d PnL −$1.86 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- SUPER LONG (ai-trader+) open ~3.7h, SL trailed above entry — watch for trail_arm/TP close next hour
+- ai-trader+ standing CEO escalation (24h 1T 0W −$0.15, 7d weak)
+- 7d WR 35.5% still below 37% resume threshold — size-reduce stays
