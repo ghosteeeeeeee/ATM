@@ -11422,3 +11422,26 @@ Final set: ['APT', 'BTC', 'CFX', 'CHIP', 'CRV', 'DOT', 'FIL']
 **Open Questions:**
 - ai-trader+ standing CEO escalation (24h 0W/3T −$0.44, 7d 26.3% WR)
 - 7d WR 34.8% still < 35% — size-reduce stays
+
+## [2026-10-18 01:09] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 last hour | 24h 4T 3W +$0.38 (75% WR) | 7d 201T 70W −$2.13 (34.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0T last hour — quiet, not a failure; hotset empty, 0 candidates after pre-filter
+- 2 open (both size-reduced $11.10, opened ~20min ago): SUPER LONG ai-trader+ (entry 0.190860, SL 0.190287, TP 0.194677) and ADA LONG pump-chain+ (entry 0.219750, SL 0.217953, TP 0.225157) — watch outcomes next hour
+- atr_sl_hit 0/4 = 0% (healthy, tpsl fix deployed)
+- Kill check: 0T last hour, no 3T 0%-WR signal; ai-trader+ standing CEO watch aged to 24h 1T 0W −$0.15 (window shrinkage, not resolution) — live SUPER LONG trade is its current activity
+- No overtrading (0/hr), no 3-neg-hour streak (recent hours net positive: 23:00 +$0.47, then 24h +$0.38)
+- Regime flipped again: now SHORT_BIAS (LONG=REDUCE, SHORT=FULL, wr=30%) — both open LONGs face macro headwind; hold per position rules, entries predate/parallel flip
+- Size-reduce 30% stays (7d WR 34.8% < 35%, 7d PnL −$2.13 < −$2.00)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- SUPER LONG (ai-trader+) and ADA LONG (pump-chain+) both live — watch for TP/SL next hour; SUPER is ai-trader+'s test trade under CEO watch
+- ai-trader+ standing CEO escalation (24h 1T 0W −$0.15, 7d 19T 5W 26.3% −$0.93)
+- Regime flip-flopping (LONG_BIAS → SHORT_BIAS in 1h) — watch for whipsaw on open LONGs
+- 7d WR 34.8% still < 35% — size-reduce stays
