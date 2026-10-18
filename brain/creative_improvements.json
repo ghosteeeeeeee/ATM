@@ -5322,5 +5322,23 @@
     "category": "exit sniper",
     "status": "documented",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-18T08:35:00Z",
+    "idea": "Arm-gap instrumentation: close-time log of live_pnl-max vs mfe_pct vs trailing_activated for atr_sl_hit/hard_max_loss closes",
+    "rationale": "28T/14d atr_sl_hit reached MFE>=0.40 (avg 0.83%) with trailing_activated=FALSE, net -$1.62. Concentrated pump-chain family. Either candle-MFE vs live_pnl price-source mismatch, spike-between-poll, or trail-subsystem flag desync. Categorize before any arm change.",
+    "expected_impact": "Diagnosis only, zero behavior. Enables or kills ATR-normalized arm threshold idea with data.",
+    "category": "instrumentation",
+    "status": "suggested",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-18T08:35:00Z",
+    "idea": "ATR-normalized trail-arm threshold (carry from 02:37)",
+    "rationale": "Fixed 0.40% arm is regime-dependent difficulty. EXTREME 110T/7d -$1.66 27.3% = largest bleed cohort by volume. Needs self_learner backtest OOS+p<0.05.",
+    "expected_impact": "unknown — needs backtest",
+    "category": "exit mechanics",
+    "status": "carried-needs-backtest",
+    "risk": "medium"
   }
 ]
