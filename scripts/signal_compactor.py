@@ -3845,11 +3845,32 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             except Exception:
                 pass
 
+            # AI-TRADER+ EXTREME LONG conf-demote SHADOW (brain_auditor 2026-10-18).
+            # Zero-behavior: logs would-demote conf to metadata for Oct 19 re-eval.
+            _ai_xlm_shadow = False
+            _ai_xlm_demoted = None
+            try:
+                from hermes_constants import (
+                    AI_TRADER_EXTREME_LONG_SHADOW_ENABLED,
+                    AI_TRADER_EXTREME_LONG_SHADOW_MULT,
+                )
+                if (AI_TRADER_EXTREME_LONG_SHADOW_ENABLED
+                        and 'ai-trader+' in (source or '')
+                        and direction.upper() == 'LONG'
+                        and _vol_regime == 'EXTREME'):
+                    _ai_xlm_shadow = True
+                    _ai_xlm_demoted = round(conf * AI_TRADER_EXTREME_LONG_SHADOW_MULT, 1)
+                    log(f"  👁️ [AI-XLM-SHADOW] {token} ai-trader+ EXTREME LONG: conf {conf:.0f}→{_ai_xlm_demoted:.0f} (shadow, no behavior)")
+            except ImportError:
+                pass
+
             hotset_entries.append({
                 'token': token,
                 'direction': direction.upper(),
                 'confidence': conf,
                 'final_confidence': conf,  # decider_run reads this field
+                'ai_xlm_shadow': _ai_xlm_shadow,
+                'ai_xlm_shadow_demoted_conf': _ai_xlm_demoted,
                 'penalty_product': _penalty_product_tracker.get((token.upper(), direction.upper()), 1.0),
                 'volume_spike': _volume_spike,  # BTC 1m volume spike ratio
                 'source': source,

@@ -1606,5 +1606,16 @@
     "after": "PROMOTE/KILL require span_days≥14; below that SOAK only",
     "rationale": "Prevents premature contrarian flip recommendation. pump-chain- contrarian PROMOTE (55.4% 258T) was based on contaminated entry_price era + short span. Zero trading behavior — monitor is advisory-only.",
     "impact": "Shadow stays collecting. Earliest PROMOTE eligible ~Oct 31 (14d after entry_price fix)."
+  },
+  {
+    "timestamp": "2026-10-18T16:45:00Z",
+    "agent": "brain_auditor",
+    "change": "ai-trader+ EXTREME LONG conf-demote SHADOW: logs would-demote conf (0.7x) to hotset metadata. Zero behavior.",
+    "type": "shadow",
+    "file": "scripts/hermes_constants.py + scripts/signal_compactor.py",
+    "before": "no shadow fields",
+    "after": "AI_TRADER_EXTREME_LONG_SHADOW_ENABLED=True, MULT=0.7; hotset entries carry ai_xlm_shadow + ai_xlm_shadow_demoted_conf",
+    "rationale": "14d EXTREME LONG 14T -$0.61 28.6% WR = worst ai-trader+ cohort. Normal/HIGH fine. Shadow collects counterfactual data for Oct 19 re-eval. n=14 < 20 bar — shadow is zero-behavior instrumentation, not a live filter.",
+    "impact": "Zero live impact. Enables Oct 19 data-driven re-eval of ai-trader+ EXTREME LONG."
   }
 ]

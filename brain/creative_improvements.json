@@ -5421,5 +5421,14 @@
       "per-signal scoping",
       "p-value <0.05"
     ]
+  },
+  {
+    "date": "2026-10-18",
+    "idea": "ai-trader+ EXTREME LONG conf-demote shadow (0.7x mult) — SHIPPED as shadow this run",
+    "rationale": "14d EXTREME LONG 14T -$0.61 28.6% WR. 9 losers across all RSI bands (27-65), 5 winners scattered (27-61). No RSI separator. Regime is the separator: EXTREME bleeds, HIGH 71.4%, NORMAL 50%. Soft demote without hard block.",
+    "expected_impact": "If flipped live: reduce EXTREME LONG bleed ~$0.30/14d while preserving HIGH/NORMAL winners",
+    "category": "entry sniper",
+    "status": "shadow-shipped",
+    "risk": "low"
   }
 ]

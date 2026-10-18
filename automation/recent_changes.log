@@ -4846,3 +4846,5 @@ BY: auto_1hr
 BY: brain_auditor
 BY: auto_1hr
 [2026-10-18 15:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 15T 6W +$0.08 (40%) | 7d 205T 69W −$3.65 (33.7%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W under 3T) | atr_sl_hit 26.7% (healthy, tpsl deployed) | 0 open | no 3-neg-hour streak | No constants change → no signal_versions entry
+BY: auto_1hr
+[2026-10-18 16:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 15T 6W +$0.08 (40%) | 7d 205T 69W −$3.65 (33.7%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W under 3T) | atr_sl_hit 26.7% (healthy) | 0 open | no 3-neg-hour streak | No constants change → no signal_versions entry
