@@ -415,3 +415,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-18 10:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 12T 5W +$0.13 (41.7%) | 7d 204T 70W −$2.95 (34.3%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T, standing watch) | atr_sl_hit 25% (healthy, tpsl deployed) | 1 open: HYPE SHORT volume-buildup- | neg-hour streak stops at 4 | No constants change → no signal_versions entry
 BY: auto_1hr
+## TEAM UPDATES
+- [2026-10-18 14:45] health_monitor: Auto-fixed 2 crash-loops — `hermes-metrics.service` (7829 restarts, missing metrics_collector.py) and `hermes-coding-mcp.service` (6014 restarts, missing run_mcp_server.py), both deleted in scripts cleanup wave 3786b550. Disabled both units (non-trading path). Trading stack clean: pipeline LIVE every 1m, all core timers active, prices fresh (1.6s, 88 tokens), disk 81%, 0 errors in pipeline 30m. Signals 73 last 1h; closed today 12T −$0.07 (33.3% WR). Regime SHORT_BIAS (109 SHORT / 1 LONG / 18 NEUTRAL). No trading-path fixes needed.

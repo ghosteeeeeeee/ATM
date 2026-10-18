@@ -1,57 +1,6 @@
 [
   {
     "level": "CRITICAL",
-    "message": "TRADING PAUSED: 7d WR 34.3% < 35.0% AND pnl_7d $-2.82 < $-2.00 (210T)",
-    "data": {
-      "pnl_24h": -1.35,
-      "n_24h": 16,
-      "wr_24h": 18.8,
-      "pnl_48h": -1.25,
-      "n_48h": 63,
-      "wr_48h": 39.7,
-      "pnl_7d": -2.82,
-      "n_7d": 210,
-      "wr_7d": 34.3,
-      "checked_at": "2026-10-17T15:38:28.145514+00:00"
-    },
-    "ts": "2026-10-17T15:38:28.613106+00:00"
-  },
-  {
-    "level": "CRITICAL",
-    "message": "TRADING PAUSED: 7d WR 34.3% < 35.0% AND pnl_7d $-2.82 < $-2.00 (210T)",
-    "data": {
-      "pnl_24h": -1.19,
-      "n_24h": 14,
-      "wr_24h": 21.4,
-      "pnl_48h": -1.25,
-      "n_48h": 63,
-      "wr_48h": 39.7,
-      "pnl_7d": -2.82,
-      "n_7d": 210,
-      "wr_7d": 34.3,
-      "checked_at": "2026-10-17T16:08:28.417899+00:00"
-    },
-    "ts": "2026-10-17T16:08:28.984923+00:00"
-  },
-  {
-    "level": "CRITICAL",
-    "message": "TRADING PAUSED: 7d WR 34.1% < 35.0% AND pnl_7d $-2.76 < $-2.00 (208T)",
-    "data": {
-      "pnl_24h": -1.21,
-      "n_24h": 13,
-      "wr_24h": 15.4,
-      "pnl_48h": -1.53,
-      "n_48h": 62,
-      "wr_48h": 38.7,
-      "pnl_7d": -2.76,
-      "n_7d": 208,
-      "wr_7d": 34.1,
-      "checked_at": "2026-10-17T16:38:28.593464+00:00"
-    },
-    "ts": "2026-10-17T16:38:29.116057+00:00"
-  },
-  {
-    "level": "CRITICAL",
     "message": "TRADING PAUSED: 7d WR 34.1% < 35.0% AND pnl_7d $-2.76 < $-2.00 (208T)",
     "data": {
       "pnl_24h": -1.21,
@@ -848,5 +797,56 @@
       "checked_at": "2026-10-18T14:26:45.012591+00:00"
     },
     "ts": "2026-10-18T14:26:45.013466+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-3.65 < $-2.00 (205T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": 0.08,
+      "n_24h": 15,
+      "wr_24h": 40.0,
+      "pnl_48h": -1.48,
+      "n_48h": 33,
+      "wr_48h": 30.3,
+      "pnl_7d": -3.65,
+      "n_7d": 205,
+      "wr_7d": 33.7,
+      "checked_at": "2026-10-18T14:56:45.205381+00:00"
+    },
+    "ts": "2026-10-18T14:56:45.206771+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-3.65 < $-2.00 (205T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": 0.08,
+      "n_24h": 15,
+      "wr_24h": 40.0,
+      "pnl_48h": -1.27,
+      "n_48h": 31,
+      "wr_48h": 29.0,
+      "pnl_7d": -3.65,
+      "n_7d": 205,
+      "wr_7d": 33.7,
+      "checked_at": "2026-10-18T15:26:45.433308+00:00"
+    },
+    "ts": "2026-10-18T15:26:45.433987+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-3.65 < $-2.00 (205T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": 0.08,
+      "n_24h": 15,
+      "wr_24h": 40.0,
+      "pnl_48h": -1.27,
+      "n_48h": 31,
+      "wr_48h": 29.0,
+      "pnl_7d": -3.65,
+      "n_7d": 205,
+      "wr_7d": 33.7,
+      "checked_at": "2026-10-18T15:32:37.433199+00:00"
+    },
+    "ts": "2026-10-18T15:32:37.433825+00:00"
   }
 ]

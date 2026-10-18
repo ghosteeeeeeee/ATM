@@ -1281,3 +1281,9 @@
 
 ## Error Alerts — 2026-10-18 13:26 UTC
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-18 14:45 UTC
+- **CRITICAL** (7829x): `hermes-metrics.service` crash-looping — `/root/.hermes/scripts/metrics_collector.py` does not exist (deleted in 3786b550 "delete 116 dead scripts"). Restarting every 5s, status=2/INVALIDARGUMENT.
+- **CRITICAL** (6014x): `hermes-coding-mcp.service` crash-looping — `/root/.hermes/scripts/run_mcp_server.py` does not exist (same cleanup wave). Restarting every 5s, status=2/INVALIDARGUMENT.
+- **AUTO-FIX**: `systemctl disable --now` on both. Non-trading path (pipeline/price-collector/1m-candle/watchdog/hl-sync all active and healthy). Both units were previously disabled in earlier sessions and have since been re-enabled — if they reappear, find the re-enabler or remove the unit files entirely.
+- **INFO**: 59x `[LOCK-WAIT] info_rate` in price_collector last 5m — all self-recovered (0.1s retries), normal SQLite contention, no action needed.
