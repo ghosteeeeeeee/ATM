@@ -3638,10 +3638,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     # also fire on retraced-after-spike grinds (dead_money class).
                     # Fail-open: unknown peak (no high/low data) => no shadow fire.
                     _mcs_mfe = None
-                    if direction == 'LONG' and _peak_high > 0 and _entry > 0:
-                        _mcs_mfe = (_peak_high / _entry - 1.0) * 100
-                    elif direction == 'SHORT' and _peak_low > 0 and _entry > 0:
-                        _mcs_mfe = (1.0 - _peak_low / _entry) * 100
+                    _mcs_high = float(pos.get('highest_price') or 0) or 0
+                    _mcs_low = float(pos.get('lowest_price') or 0) or 0
+                    _mcs_entry = float(pos.get('entry_price') or 0) or 0
+                    if direction == 'LONG' and _mcs_high > 0 and _mcs_entry > 0:
+                        _mcs_mfe = (_mcs_high / _mcs_entry - 1.0) * 100
+                    elif direction == 'SHORT' and _mcs_low > 0 and _mcs_entry > 0:
+                        _mcs_mfe = (1.0 - _mcs_low / _mcs_entry) * 100
                     if (_mcs_age_m >= MFE_CUT_SHADOW_MIN and _mcs_mfe is not None
                             and _mcs_mfe < MFE_CUT_SHADOW_MFE_MAX):
                         _mfe_cut_shadow_logged.add(trade_id)
