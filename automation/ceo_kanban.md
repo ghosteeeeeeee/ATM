@@ -413,3 +413,5 @@
 BY: auto_1hr
 - [2026-10-18 07:28] auto_1hr: NO CONFIG CHANGE — 1T 0W −$0.08 last hour (IO pump-chain+ trail_arm_timeout, −2.11%) | 24h 10T 5W +$0.19 (50%) | 7d 202T 70W −$2.89 (34.7%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 20% (healthy, tpsl deployed) | 0 open | 3-neg-hour streak (03/05/07) but regime LONG_BIAS not NEUTRAL, existing size-reduce covers | No constants change → no signal_versions entry
 BY: auto_1hr
+- [2026-10-18 10:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 12T 5W +$0.13 (41.7%) | 7d 204T 70W −$2.95 (34.3%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T, standing watch) | atr_sl_hit 25% (healthy, tpsl deployed) | 1 open: HYPE SHORT volume-buildup- | neg-hour streak stops at 4 | No constants change → no signal_versions entry
+BY: auto_1hr
