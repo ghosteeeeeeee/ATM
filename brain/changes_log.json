@@ -1617,5 +1617,16 @@
     "after": "AI_TRADER_EXTREME_LONG_SHADOW_ENABLED=True, MULT=0.7; hotset entries carry ai_xlm_shadow + ai_xlm_shadow_demoted_conf",
     "rationale": "14d EXTREME LONG 14T -$0.61 28.6% WR = worst ai-trader+ cohort. Normal/HIGH fine. Shadow collects counterfactual data for Oct 19 re-eval. n=14 < 20 bar — shadow is zero-behavior instrumentation, not a live filter.",
     "impact": "Zero live impact. Enables Oct 19 data-driven re-eval of ai-trader+ EXTREME LONG."
+  },
+  {
+    "timestamp": "2026-10-18T23:43:51Z",
+    "agent": "brain_auditor",
+    "change": "STANDALONE_BYPASS comment for bb-bounce-v2-long corrected: dead '30d 73T 74%WR +$2.08 WINNER' justification replaced with reproducible numbers (30d 51T 49.0% -$0.36, all-time 56T 48.2% -$0.81) + monitor guidance. Bypass tuple UNCHANGED.",
+    "type": "comment",
+    "file": "scripts/hermes_constants.py",
+    "before": "# bb-bounce-v2-long: ... 30d: 73T 74%WR +$2.08 WINNER. Keep bypassed.",
+    "after": "# bb-bounce-v2-long: ... 30d 51T 49.0%WR -$0.36 / all-time 56T 48.2% -$0.81 — old number NOT reproducible. Borderline keeper; TAT shadow needs fires; kill requires fresh backtest.",
+    "rationale": "Comment-rot: non-reproducible justification could freeze a future kill/re-keep decision on fiction. Zero behavior.",
+    "impact": "ZERO live behavior (py_compile + import assert PASS, tuple verified intact). Decision hygiene only."
   }
 ]

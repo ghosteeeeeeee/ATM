@@ -4862,3 +4862,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-18 23:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 13T 4W -$0.35 (30.8%) | 7d 201T 67W -$3.66 (33.3%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ and hl_copy_trader both 2T 0W, under 3T) | atr_sl_hit 38.5% (watch, near 40% threshold) | 2 open (BTC LONG, ME LONG) | no 3-neg-hour streak | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-18 23:44] brain_auditor: 1 comment-hygiene fix (bypass bb-bounce-v2-long stale justification 73T/74%% → reproducible 51T/49.0%% −0.36; tuple untouched) | 24h 14T 5W −0.30 | 7d 201T 33.3%% −3.66 | size-reduce 0.3x stays | regime FLIP to LONG_BIAS, ME LONG open correctly template'd RSI 56.1 | 5 filter candidates REJECTED on stats (45-55 block t=-0.33, gap 0.2-0.5 OOS fail, gap<-0.5 kills 28%% winners, pump-chain- kill rule not met +0.05, conf floor CEO-deliberate) | escalation #15 CONFIRMED-CLOSED (MFE-CUT candle OOS FAIL / ARM-BE-STOP PASS / TAT=shadow path) | creative: gap-asymmetry rejected (7d sign-flip), ai-trader+ universal 0.85 demote pre-registered | Protected 13/13 INTACT
+BY: brain_auditor

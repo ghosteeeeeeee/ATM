@@ -3008,7 +3008,12 @@ STANDALONE_BYPASS_SIGNALS = (
     'mtf-regime-trend',  # multi-timeframe regime trend — works solo (2026-10-01)
     'tl-bounce',  # trendline bounce — works solo (2026-10-06)
     'hmacd-mtf', 'hmacd_mtf',  # multi-timeframe MACD — works solo (2026-10-09). Added underscore variant — signal source uses underscores.
-    # bb-bounce-v2-long: source for bb_bounce_v2_long.py (signal_type='bb_bounce_v2_long'). 30d: 73T 74%WR +$2.08 WINNER. Keep bypassed.
+    # bb-bounce-v2-long: source for bb_bounce_v2_long.py (signal_type='bb_bounce_v2_long').
+    # brain_auditor 2026-10-18 requery: 30d 51T 49.0%WR -$0.36 / all-time 56T 48.2% -$0.81 —
+    # the OLD justification "30d 73T 74%WR +$2.08 WINNER" does NOT reproduce in any window
+    # (all-time n=56). Borderline keeper, NOT a winner: keep bypass ONLY because TAT shadow
+    # (position_manager 7b-shadow, T=55m) needs live fires to its 14d review. Kill/bypass
+    # removal decision requires a FRESH backtest — do not cite the dead number.
     'range_breakout', 'range_breakout_short',
     'continuation', 'continuation_long', 'continuation_short',
     'accel-300',

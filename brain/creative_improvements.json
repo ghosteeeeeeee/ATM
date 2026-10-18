@@ -5461,5 +5461,23 @@
     "category": "exit engineering",
     "status": "suggested",
     "risk": "medium — must not false-kill the large trend winners; needs candle-level OOS (rides on exit-ladder backtest vehicle)"
+  },
+  {
+    "date": "2026-10-18T23:43:51Z",
+    "idea": "REJECTED-WITH-DATA: |gap_at_entry|<0.5 structure-confirmation demote (0.7x shadow) — killed by temporal instability",
+    "rationale": "14d/30d band map: LONG pays gap>=+0.5 (+0.95/+1.10), SHORT fade pays gap>=+0.5 (+1.15 14d), near-EMA bleeds. 7d check: both >=0.5 bands SIGN-FLIP negative (LONG 81T -1.74, SHORT 35T -0.43). Edge unstable — do not re-propose from 14d-only view.",
+    "expected_impact": "n/a — rejected",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-18T23:43:51Z",
+    "idea": "PRE-REGISTER: ai-trader+ auto-pick universal half-conviction demote x0.85 (all regimes; extends EXTREME-only live shadow)",
+    "rationale": "14d auto 25T 44% -$0.63 vs manual 13T 53.8% +$0.47 — clearest auto/manual split. Watchdog: treat auto-picks as half conviction. EXTREME shadow covers one cell only.",
+    "expected_impact": "softly demotes auto bleed; ME/SUPER-class winners still trade at 0.85x",
+    "category": "confidence calibration",
+    "status": "pre-registered (no code — resume-day stack discipline; revisit after Oct 19 EXTREME re-eval)",
+    "risk": "low"
   }
 ]
