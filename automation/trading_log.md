@@ -11948,3 +11948,26 @@ BY: daily_orchestrator
 - hl_copy_trader 24h 2T 0W -$0.11 — standing watch (same)
 - 7d PnL -$3.66, WR 33.3% still below 37% resume threshold — size-reduce stays
 - Quiet stretch continues, occasional single trades
+
+## [2026-10-18 23:28] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 13T 4W -$0.35 (30.8% WR) | 7d 201T 67W -$3.66 (33.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — no data to act on
+- atr_sl_hit 5/13 = 38.5% last 24h (under 40% threshold but creeping up from 35.7% — watch next hour)
+- Kill check: no signal with 3+ trades 0% WR; bb-bounce-v2-long+ 2T 0W -$0.18 and hl_copy_trader 2T 0W -$0.11 both under 3T threshold — standing watch
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (only 1 hour with trades in last 6h)
+- 2 open: BTC ai-trader-manual LONG @81701, ME ai-trader+ LONG @0.05865
+- Size-reduce 30% stays (7d WR 33.3% < 37%, 7d PnL -$3.66 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR dropped to 30.8% (4W/13T) from 35.7% — prior count showed 14T 5W, now 13T 4W (possible reclassification; not actionable)
+- atr_sl_hit at 38.5% — one more SL hit crosses 40% threshold; if it does, check tpsl_utils deploy status
+- bb-bounce-v2-long+ and hl_copy_trader still at 2T 0W — standing watch
+- 7d PnL -$3.66, WR 33.3% — size-reduce stays

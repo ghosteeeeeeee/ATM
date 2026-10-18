@@ -4860,3 +4860,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-18 22:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC SHORT atr_sl_hit -$0.06) | 24h 14T 5W +$0.12 (35.7%) | 7d 201T 67W -$3.66 (33.3%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W under 3T) | atr_sl_hit 35.7% (healthy, tpsl deployed) | 0 open | no 3-neg-hour streak | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-18 23:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 13T 4W -$0.35 (30.8%) | 7d 201T 67W -$3.66 (33.3%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ and hl_copy_trader both 2T 0W, under 3T) | atr_sl_hit 38.5% (watch, near 40% threshold) | 2 open (BTC LONG, ME LONG) | no 3-neg-hour streak | No constants change → no signal_versions entry
+BY: auto_1hr
