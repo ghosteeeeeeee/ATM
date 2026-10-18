@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-10-18T06:56:40.463731+00:00",
+  "timestamp": "2026-10-18T07:26:40.978039+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.70 USDT. Something is wrong.",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.73 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
@@ -20,16 +20,16 @@
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'ai-trader+' losing streak: 3 losses",
-      "detail": "Net -0.37 USDT over last 20 trades (losses: -0.44). Consider disabling or tuning this signal.",
+      "title": "Signal 'pump-chain+' losing streak: 3 losses",
+      "detail": "Net -0.45 USDT over last 20 trades (losses: -0.47). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-003"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'ai-trader-manual' losing streak: 3 losses",
-      "detail": "Net -0.02 USDT over last 20 trades (losses: -0.11). Consider disabling or tuning this signal.",
+      "title": "Signal 'ai-trader+' losing streak: 3 losses",
+      "detail": "Net -0.37 USDT over last 20 trades (losses: -0.44). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-004"
     }
@@ -44,58 +44,14 @@
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.0,
-    "wyckoff_phase": "ACCUMULATION",
+    "linreg_alignment": 0.25,
+    "wyckoff_phase": "UNKNOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 1,
-  "deep_analysis": "Now I have the full picture. Let me write the analysis.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (1 long, 0 short)\nUnrealized PnL: -0.07 USDT\nRegime: mixed (15m LONG_BIAS / 4h SHORT_BIAS) | Vol: LOW | Trend: STRONG_DOWN\nVacation guardrail: 30% size (7d WR 34.8%)\n\n\u2500\u2500 Steers (automated) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent]  Losing streak 13/20, WR 35%, -0.70 USDT\n\ud83d\udfe1 [warning] 9 recent losses look like wrong-side trades\n\ud83d\udfe1 [warning] ai-trader+ 3-loss streak (-0.37)\n\ud83d\udfe1 [warning] ai-trader-manual 3-loss streak\n\n\u2500\u2500 Steers (agent) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [regime]   71% of 48h trades were LONG against SHORT_BIAS \u2192 LONG=-1.85 vs SHORT=+0.10\n\ud83d\udd34 [health]   IO LONG is a broken-thesis chop trade \u2014 precheck would block it today\n\ud83d\udfe1 [health]   doji-bottom-long regime-blind falling knife: 16 trades, 31% WR, -0.97\n\ud83d\udfe1 [health]   22/48h exits hit SL before trail armed \u2014 chop entries, not bad management\n\ud83d\udfe1 [regime]   SAND flash-crashed -6.1% in 20m \u2014 regime scanner lag confirmed\n\ud83d\udfe2 [opportunity] No ai-trader pick this hour \u2014 GOAT SHORT only pass, setup too weak\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe core problem is direction, not timing. 48h: 37 LONGs lost -1.85 (37.8% WR) while 15 SHORTs gained +0.10. We are structurally long-heavy in a SHORT_BIAS regime because pump-chain+, bb-bounce-v2-long+, and doji-bottom-long dominate signal generation. Every LONG RSI band lost money. The winning side was SHORTs at RSI 30-40 (100% WR) and 60-70 (67% WR).\n\nIO LONG (the only open trade): entered chop, not trend. IO ranging (r2 0.01), volume dead, RSI 57\u219232. Precheck would block this entry today (R:R 0.35, LOSERS_LONG). 3 prior IO trades all lost. SL at 0.15154 in low-vol chop = likely SL hit before any trend materializes.\n\nThe exit-reason data confirms the philosophy: 22 chop entries died at SL before trail could arm (-2.23). The trail family (profit-monster-trail 90.9% WR) wins because it enters in trends. Signal quality \u2014 trending vs ranging discrimination \u2014 is the lever, not stop management.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. If IO returns to ~0.1530 breakeven, manual close. This is a chop trade, not a trend trade.\n2. Do NOT widen SLs \u2014 chop entries die before any stop width saves them. The fix is requiring trending structure (r2 > 0.3) before pump-chain+ and bb-bounce signals fire.\n3. Flag doji-bottom-long for brain auditor: add BTC 4h SHORT_BIAS regime gate. It's a regime-blind falling knife.\n4. No ai-trader pick this hour. GOAT SHORT is the only precheck pass but it's ranging with death-zone RSI. Skip until BTC resolves the 15m-vs-4h direction conflict.\n5. Structural fix needed: signal generation is LONG-biased. When BTC 4h is SHORT_BIAS, the SHORT signals (pump-chain-, volume-buildup-) should fire more often. This is a brain auditor item.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
-  "agent_timestamp": "2026-10-18T07:04:40.348910+00:00",
-  "regime_context": "BTC: 15m LONG_BIAS, 4h SHORT_BIAS, trend_quality STRONG_DOWN, wyckoff ACCUMULATION, market_phase RECOVERY, volatility LOW, velocity SLOW, linreg_alignment 0.0 (flat), ema300_position AT. Mixed signal: short-term bounce forming but 4h trend still down. The 4h SHORT_BIAS + STRONG_DOWN is the dominant force \u2014 it has been wrong to fight it.\n\n5m scanner: 43 LONG_BIAS vs 1 SHORT_BIAS across 125 tokens. Alts are bouncing hard (SAND +2.12%, ALT +3.11%, HBAR +1.27%, ARB +1.27%, WLD +1.42%). But SAND just flash-crashed -6.1%, showing these alt bounces are fragile. BTC is AT EMA300 (neutral), not providing directional pull.\n\nPositioning: 1 open LONG (IO) against SHORT_BIAS macro. This is the wrong side. Flat or SHORT would be correct in this regime. The 30% vacation-guardrail size reduction (7d WR 34.8%) is active \u2014 good defense while we figure out the direction problem.",
-  "pattern_alerts": "PATTERN 1 \u2014 WRONG-SIDE DIRECTION (verified, 48h):\nn=52 trades, LONG=-1.85 (37.8% WR), SHORT=+0.10 (40.0% WR). 71% of trades were LONG against SHORT_BIAS regime. Every LONG RSI band lost money. WINNING SIDE: SHORTs at RSI 30-40 (100% WR) and 60-70 (67% WR). WHY WE WEREN'T ON IT: signals are LONG-biased \u2014 pump-chain+, bb-bounce-v2-long+, doji-bottom-long all generate LONGs. The SHORT signals (pump-chain-, volume-buildup-) exist but fire less often. We are structurally long-heavy in a SHORT_BIAS market.\n\nPATTERN 2 \u2014 CHOP ENTRIES KILL BEFORE TRAIL ARMS (verified, 48h):\natr_sl_hit n=14 WR=7.1% + hard_max_loss n=8 WR=0% = 22 trades, -2.23 USDT. 52/56 hard_max_loss trades never reached +0.40%. These are chop entries where price hit SL before any trend developed. WINNING SIDE: the trail family (profit-monster-trail 90.9% WR, atr_trail_hit 67% WR) enters in trends with room to run. WHY WE WEREN'T ON IT: signal quality gate does not distinguish trending from ranging coins. IO is the current example \u2014 ranging coin, pump-chain+ fired, no trend materialized.\n\nPATTERN 3 \u2014 doji-bottom-long FALLING KNIFE (verified, 7d):\nn=16, WR=31%, pnl=-0.97. ZEN -5.08% (rsi 29.5), CRV -4.39% (rsi 39.8), YGG -3.22% (rsi 48.8), WCT -3.44% (rsi 27.8). WINNING SIDE: SHORT these same coins during the dump. WHY WE WEREN'T ON IT: doji-bottom-long interprets oversold as a buy signal. In a SHORT_BIAS regime, oversold = still going lower. This signal has a regime-blindness problem.\n\nPATTERN 4 \u2014 AI-TRADER+ LOSING STREAK (verified, 24h):\n3 consecutive losses. WLD LONG -0.15 (rsi 52.6, hard_sl), APT LONG -0.09 (rsi 33.7, hard_max_loss), INJ LONG -0.20 (rsi 64.0, hard_max_loss). APT was a RSI drift: picked at 57.1, filled at 33.7. WINNING SIDE: SHORT on all three. WHY WE WEREN'T ON IT: ai-trader picks are regime-aligned to SHORT_BIAS on paper but the pipeline executes LONGs when the signal fires. The SHORT_BIAS regime allows SHORTs at full size, but the ai-trader module defaults to LONG when BTC 15m is LONG_BIAS (which it is now, despite 4h SHORT_BIAS).",
-  "agent_steers": [
-    {
-      "severity": "urgent",
-      "category": "regime",
-      "title": "71% of 48h trades were LONG against SHORT_BIAS regime",
-      "detail": "LONG=-1.85 (37.8% WR, n=37) vs SHORT=+0.10 (40% WR, n=15). BTC 4h SHORT_BIAS + STRONG_DOWN. Every LONG RSI band lost. The winning side is SHORT. Structurally long-heavy signal portfolio is the root cause.",
-      "action": "Review why pump-chain+, bb-bounce-v2-long+, doji-bottom-long dominate signal generation. The SHORT signals exist but fire less often. Consider regime-weighting signal generation toward SHORTs when BTC 4h is SHORT_BIAS."
-    },
-    {
-      "severity": "urgent",
-      "category": "health",
-      "title": "IO LONG is a broken-thesis chop trade \u2014 exit if it hits breakeven",
-      "detail": "IO ranging (r2 0.01), volume dead, RSI 57\u219232. Precheck would block this entry today (R:R 0.35, LOSERS_LONG). 3 prior IO trades all lost. SL 0.15154 in low-vol chop = likely SL hit before any trend. Not worth holding for a trend that isn't forming.",
-      "action": "Manual close if IO returns to ~0.1530 breakeven. Do not add. If SL hits at 0.15154, accept the -1.1% and move on \u2014 this was a chop entry, not a trend trade."
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "doji-bottom-long is a regime-blind falling knife: 16 trades, 31% WR, -0.97",
-      "detail": "ZEN -5.08%, CRV -4.39%, YGG -3.22%, WCT -3.44%. All LONGs into oversold during SHORT_BIAS. The winning side was SHORT. This signal needs a regime filter or should be shadow-only in SHORT_BIAS markets.",
-      "action": "Flag for brain auditor: add BTC 4h regime gate to doji-bottom-long. Block LONG when btc_4h = SHORT_BIAS."
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "22/48h exits were SL before trail armed \u2014 chop entries, not bad management",
-      "detail": "atr_sl_hit (n=14, 7.1% WR, -1.27) + hard_max_loss (n=8, 0% WR, -0.96) = -2.23 USDT. Trail family (profit-monster-trail 90.9% WR, atr_trail_hit 67% WR) wins because it enters in trends. The problem is signal quality, not stop placement.",
-      "action": "Do not widen SLs. Instead: require trending structure (r2 > 0.3 or linreg slope > threshold) before pump-chain+ and bb-bounce signals fire. Chop entries die before any stop width saves them."
-    },
-    {
-      "severity": "warning",
-      "category": "regime",
-      "title": "SAND flash-crashed -6.1% in 20m \u2014 regime scanner lag confirmed",
-      "detail": "SAND dumped 0.0677\u21920.0636. Scanner still shows LONG_BIAS 91.5% conf from pre-crash data. ATR spiked to 3.55% (top of board). SAND SHORT blocked by RSI floor (26.6 < 35) \u2014 the dump already happened.",
-      "action": "No action on SAND specifically. General lesson: during violent moves, trust the price action over the regime scanner. The scanner lags by 1-2 candles on 5m."
-    },
-    {
-      "severity": "info",
-      "category": "opportunity",
-      "title": "No ai-trader pick this hour \u2014 GOAT SHORT is the only precheck pass but setup is weak",
-      "detail": "GOAT SHORT passes all gates (RSI 49.6, ATR 0.91%, RR multiplier 0.70) but: ranging (r2 0.16), low volume, death zone advisory (RSI 45-55). SAND SHORT blocked (RSI 26.6), ARB LONG death zone, WLD SHORT death zone. Nothing worth forcing in this chop.",
-      "action": "Skip this hour. Re-evaluate next cycle when BTC direction resolves (15m LONG_BIAS vs 4h SHORT_BIAS conflict)."
-    }
-  ]
+  "open_count": 0,
+  "deep_analysis": "Portfolio is flat (0 open trades) \u2014 and in this regime that is the correct position, not a problem to fix. BTC is at EMA300 with LEAN_BEAR linreg and STRONG_DOWN trend quality on the 4h, while the 15m shows a SHORT-BIAS-vs-LONG-BIAS conflict (15m LONG_BIAS bounce inside a 4h SHORT_BIAS macro). Volatility is LOW. This is chop, and chop is where our hard_max_loss trades die.\n\nThe 48h data is unambiguous on direction: 38 LONGs lost -1.93 USDT at 36.8% WR while 15 SHORTs gained +0.10 at 40% WR. We are structurally long-heavy because pump-chain+, bb-bounce-v2-long+, and doji-bottom-long generate LONGs far more often than their SHORT counterparts. Every LONG RSI band lost money. The winning side was SHORTs at RSI 30-40 (100% WR, n=2) and 60-70 (67% WR, n=3). We were not on that side because signal generation defaults to LONG.\n\nThe exit-reason breakdown confirms the philosophy: atr_sl_hit (n=14, -1.27) plus hard_max_loss (n=8, -0.96) = 22 trades that died at SL before the trail could arm. These are chop entries, not bad stop management. The trail family (profit-monster-trail: 10/11 wins, +0.43; atr_trail_hit: 2/3, +0.07) wins because it enters in trends with room to run. The lever is trending-vs-ranging discrimination at entry, not wider stops.\n\nThe pending signal queue has self-corrected: 15 SHORTs vs 1 LONG pending right now (pump-chain-, ichimoku-, r2-trend-short). That alignment with the 4h SHORT_BIAS is healthy. The structural gap is that pump-chain+ and doji-bottom-long still fire LONGs into this regime \u2014 doji-bottom-long specifically interprets oversold as a buy signal in a market where oversold means still going lower (7d: n=16, 31% WR, -0.97).\n\nAI trader: last pick (SAND LONG, rejected at 05:34) is stale. This hour I picked GRASS SHORT (precheck PASS, R:R 1.50, fading -2.5% over 3h, RSI 39.2 in the winning 30-40 SHORT band). GOAT and GMX SHORT also passed precheck but GOAT is in a local LONG_BIAS regime and GMX was rising +1.16% over 3h \u2014 both would have been wrong-side entries.",
+  "agent_timestamp": "2026-10-18T07:33:30.416031+00:00",
+  "regime_context": "BTC 1m: price 81678, AT EMA300 (duration 489 bars), zscore -0.80 NEUTRAL, linreg LEAN_BEAR, trend_quality STRONG_DOWN, market_phase RECOVERY, velocity SLOW, acceleration POSITIVE, volume LOW. The 15m scanner says LONG_BIAS but the 4h says SHORT_BIAS \u2014 the 4h SHORT_BIAS + STRONG_DOWN is the dominant force and fighting it has cost -1.93 over 48h.\n\n5m scanner: 60 LONG_BIAS vs 1 SHORT_BIAS across 127 tokens. Alts are bouncing (HBAR +1.38%, ALT +2.52%, GRASS -2.50% fading). But SAND flash-crashed -6.1% earlier today, showing these alt bounces are fragile in LOW volatility. BTC AT EMA300 provides no directional pull \u2014 it is waiting to resolve.\n\nVolatility LOW + velocity SLOW = chop regime. This is exactly the environment where 52/56 hard_max_loss trades never reached +0.40% for trail to arm. The correct posture in this regime: flat, or SHORT only at RSI bands that historically win (30-40, 60-70). LONGs are the wrong side until BTC resolves above EMA300 with bullish linreg alignment.",
+  "pattern_alerts": "PATTERN 1 \u2014 WRONG-SIDE DIRECTION (verified, 48h, PostgreSQL):\nn=53 trades. LONG: n=38, pnl=-1.93, WR=36.8%. SHORT: n=15, pnl=+0.10, WR=40.0%. 71% of trades were LONG against a SHORT_BIAS macro. Every LONG RSI band (using meta_rsi, not entry_rsi_14) lost money: <30: 0% WR, 30-40: 0% WR, 40-50: 44% WR, 50-60: 43% WR, 60-70: 33% WR. WINNING SIDE: SHORTs at meta_rsi 30-40 (100% WR, +0.04) and 60-70 (67% WR, +0.40). WHY WE WEREN'T ON IT: pump-chain+, bb-bounce-v2-long+, and doji-bottom-long dominate signal generation and all emit LONGs. The SHORT signals (pump-chain-, volume-buildup-) exist but fire less often. Structural long-bias in a SHORT_BIAS market.\n\nPATTERN 2 \u2014 CHOP ENTRIES DIE BEFORE TRAIL ARMS (verified, 48h, PostgreSQL):\natr_sl_hit n=14 WR=7.1% pnl=-1.27 plus hard_max_loss n=8 WR=0% pnl=-0.96 = 22 trades, -2.23 USDT total. 52/56 hard_max_loss trades historically never reached +0.40% for trail to arm. These are entries into ranging coins where price hits SL before any trend materializes. WINNING SIDE: the trail family \u2014 profit-monster-trail 10/11 wins (+0.43), atr_trail_hit 2/3 (+0.07), UNIVERSAL_MAX_HOLD 2/2 (+0.14) \u2014 enters in trends with room to run. WHY WE WEREN'T ON IT: the signal quality gate does not distinguish trending from ranging. LOW volatility + SLOW velocity right now makes this worse.\n\nPATTERN 3 \u2014 doji-bottom-long IS A REGIME-BLIND FALLING KNIFE (verified, 7d):\nn=16, WR=31%, pnl=-0.97. Recent losers: ZEN -0.11 (meta_rsi 29.5), CRV -0.10 (meta_rsi 39.8). This signal interprets oversold RSI as a buy. In a SHORT_BIAS regime, oversold = still going lower. WINNING SIDE: SHORT the same coins during the dump. WHY WE WEREN'T ON IT: the signal has no regime gate \u2014 it fires on doji bottoms regardless of whether the 4h trend is down. Brain auditor item: add a BTC 4h SHORT_BIAS regime filter to doji-bottom-long.\n\nPATTERN 4 \u2014 SHORT BANDS THAT WIN (verified, 48h meta_rsi, n=15 SHORTs):\nRSI 30-40: n=2, 100% WR, +0.04. RSI 60-70: n=3, 67% WR, +0.40. RSI 40-50: n=5, 0% WR, -0.27. RSI 50-60: n=1, 0% WR, -0.08. The winning SHORT entry is either deeply oversold (30-40) or overextended (60-70) \u2014 the middle band (40-50) loses. Note: the SHORT_RSI_HARD_FLOOR=45 gate blocks the 30-40 band that has 100% WR. This is a tension the brain auditor should examine: the safety gate may be blocking our best SHORT entries. Sample sizes are small (n=2-5) so this is directional, not conclusive."
 }
