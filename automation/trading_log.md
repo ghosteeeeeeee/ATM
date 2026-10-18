@@ -11925,3 +11925,26 @@ BY: daily_orchestrator
 - hl_copy_trader 24h 2T 0W −$0.11 — standing watch (same)
 - 7d PnL −$3.60, WR 33.5% still below 37% resume threshold — size-reduce stays
 - 12th+ quiet stretch — thin market, 0 trades in last hour
+
+## [2026-10-18 22:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.06 last hour | 24h 14T 5W +$0.12 (35.7% WR) | 7d 201T 67W -$3.66 (33.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade: BTC ai-trader-pending SHORT atr_sl_hit -$0.06 (-5.36%) — single loss, no pattern
+- atr_sl_hit 5/14 = 35.7% last 24h (healthy, tpsl fix deployed, under 40% threshold)
+- Kill check: no signal with 3+ trades 0% WR; bb-bounce-v2-long+ 2T 0W -$0.18 and hl_copy_trader 2T 0W -$0.11 both under 3T threshold — standing watch
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (prior hours had no trades)
+- 0 open trades
+- Size-reduce 30% stays (7d WR 33.3% < 37%, 7d PnL -$3.66 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ 24h 2T 0W -$0.18 — standing watch (1 more loss kills it)
+- hl_copy_trader 24h 2T 0W -$0.11 — standing watch (same)
+- 7d PnL -$3.66, WR 33.3% still below 37% resume threshold — size-reduce stays
+- Quiet stretch continues, occasional single trades
