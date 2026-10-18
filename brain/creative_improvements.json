@@ -5239,5 +5239,14 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-18T02:36:18Z",
+    "idea": "ATR-normalized trail-arm threshold — arm_pct = clamp(0.5 × ATR%, min 0.25%, max 0.60%)",
+    "rationale": "Fixed +0.40% arm is regime-blind. LOW vol (SUPER ATR 0.20%): arm = 2 ATR, rarely reached → chop death (104/200 7d trades never armed). EXTREME vol (ATR 4%+): arm = 0.1 ATR, noise-arms → locks tiny and gives back trend. ATR-scaled arm arms faster in high vol (lock profit earlier) and demands real momentum in low vol.",
+    "expected_impact": "Reduce never-armed chop cohort (52% of 7d trades) without cutting trail winners; backtest required before live",
+    "category": "exit engine",
+    "status": "suggested — needs 30d backtest, pairs with exit-ladder commission",
+    "risk": "medium — exit-engine change, must not kill profit-monster-trail captures"
   }
 ]

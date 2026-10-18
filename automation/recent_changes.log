@@ -4807,3 +4807,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-18 02:10] auto_1hr: NO CONFIG CHANGE — 1T 1W +$0.02 last hour (ADA pump-chain+ trail_arm_timeout) | 24h 4T 3W +$0.39 (75%) | 7d 201T 70W -$2.17 (34.8%) — size-reduce 30% stays | kill: none (pump-chain+ 1T 1W this hour; ai-trader+ standing CEO watch 1T 0W -$0.15) | atr_sl_hit 0% (healthy, tpsl deployed) | 1 open: SUPER LONG ai-trader+ $11.10 in profit | regime flipped back to LONG_BIAS | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-18 02:37]] brain_auditor: NO CONFIG CHANGE — soak #8, 11 changes verified | 24h 4T 3W +$0.39 (75%) | 7d 201T 34.8% −$2.17 — size-reduce 0.3x stays | kill: none (doji steer STALE, all bleed signals already killed) | drift guard FUNCTIONAL (ai_trader_signal.py:192 verified) | sweet-spot 55-60 only profit band +$0.84 | SHORT midband WORKING POST 9T 55.6% +$0.39 | open: BTC LONG manual, SUPER LONG ai-trader+ | creative: ATR-normalized trail-arm (needs backtest) | escalation #12: exit-ladder backtest still not commissioned | Protected flags 13/13 INTACT
+BY: brain_auditor
