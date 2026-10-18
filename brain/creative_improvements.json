@@ -5441,5 +5441,16 @@
     "risk": "low (study only)",
     "agent": "brain_auditor",
     "run": "2026-10-18 17:45"
+  },
+  {
+    "date": "2026-10-18T18:37:31Z",
+    "idea": "atr_sl_hit MFE paradox: 21/52 atr_sl_hit trades (7d) reached MFE>=0.40 trail-arm threshold yet still exited via ATR SL for -$1.16 total. Trail-arm eligibility != trail protection.",
+    "rationale": "atr_sl_hit is the #2 bleed family (52T -$4.06). If trail truly took over at arm (MFE 0.40), these trades would ride winners instead of dying on ATR SL reversals. avg MFE of EXTREME atr_sl_hit = 0.492 (above arm) yet 3% WR. Either (a) trail-arm has unsustained-close condition that fails, or (b) ATR SL coexists and fires before trail protects. Needs candle-level backtest of true-trail-takeover-at-arm counterfactual.",
+    "expected_impact": "+$1.0-2.5/7d if half of the 21 arm-eligible losers are rescued by real trail takeover (upper bound, unverified)",
+    "category": "exit engine",
+    "status": "suggested",
+    "risk": "medium — needs OOS candle backtest, do not ship live without CEO GO",
+    "agent": "brain_auditor",
+    "run": "2026-10-18 19:00"
   }
 ]

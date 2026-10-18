@@ -16,6 +16,7 @@ import sys
 import os
 import json
 import time
+import math
 import subprocess
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -43,6 +44,11 @@ PRICE_ALERT_STATE = os.path.join(HERMES_DATA, "watchdog_price_alerts_state.json"
 # gates). One-shot: fires once, never re-arms. CEO-editable JSON.
 PENDING_ORDERS_CONFIG = os.path.join(HERMES_DATA, "pending_orders.json")
 PENDING_ORDERS_STATE = os.path.join(HERMES_DATA, "pending_orders_state.json")
+# Execution context — set in main() before analyze_all. False in recommend mode
+# or --dry-run: triggers still emit steers (visibility) but do NOT persist
+# 'triggered' state, so the order stays armed for when autopilot can execute
+# (bug_hunter: recommend/dry-run used to burn one-shot orders silently).
+PENDING_ORDERS_CAN_PERSIST = True
 
 # Thresholds
 PROFIT_LOCK_BREAKEVEN_PCT = 2.0    # Move stop to breakeven at +2%
@@ -1229,10 +1235,27 @@ def monitor_pending_orders(btc_price):
             if oid in seen_ids:
                 log(f"pending order duplicate id '{oid}' — second entry skipped", "WARN")
                 continue
-            seen_ids.add(oid)
             prev = state.get(oid)
             if isinstance(prev, dict) and prev.get("status") in ("triggered", "fired", "error"):
-                continue  # one-shot: already handled, never re-fire
+                # One-shot: already handled. But surface ORPHANED triggers —
+                # 'triggered' means the emit happened and execution never
+                # completed (process died mid-cycle). No staleness recovery
+                # automation: a re-fire could double-trade; the CEO decides
+                # by deleting the state entry to re-arm.
+                if prev.get("status") == "triggered":
+                    age_min = (time.time() - float(prev.get("ts") or 0)) / 60
+                    if age_min > 15:
+                        steers.append({
+                            "severity": "urgent",
+                            "category": "pending_order",
+                            "title": f"ORPHANED ORDER {oid}: triggered {age_min:.0f}min ago, never executed",
+                            "detail": (f"Order {oid} triggered but no trade was placed "
+                                       f"(watchdog likely died mid-cycle). Delete its entry "
+                                       f"in pending_orders_state.json to re-arm it."),
+                            "trade_id": None,
+                            "auto_executable": False,
+                        })
+                continue
             coin = order.get("coin", "BTC")
             if coin != "BTC":
                 log(f"pending order {oid}: coin {coin} not supported yet (BTC only) — skipped", "WARN")
@@ -1251,8 +1274,13 @@ def monitor_pending_orders(btc_price):
                 target = float(order.get("target"))
                 amount = float(order.get("amount_usdt"))
                 leverage = int(order.get("leverage", 1))
+                confidence = float(order.get("confidence", 65))
             except (TypeError, ValueError):
-                log(f"pending order {oid}: non-numeric price/sl/target/amount/leverage — skipped", "WARN")
+                log(f"pending order {oid}: non-numeric price/sl/target/amount/leverage/confidence — skipped", "WARN")
+                continue
+            # NaN/inf pass plain >0 guards — reject explicitly (bug_hunter GAP-1)
+            if not all(math.isfinite(v) for v in (trigger_price, sl, target, amount, confidence)):
+                log(f"pending order {oid}: non-finite value (NaN/inf) — skipped", "WARN")
                 continue
             if min(trigger_price, sl, target, amount) <= 0:
                 log(f"pending order {oid}: all values must be > 0 — skipped", "WARN")
@@ -1267,6 +1295,9 @@ def monitor_pending_orders(btc_price):
             if direction == "short" and not (target < trigger_price < sl):
                 log(f"pending order {oid}: SHORT shape wrong (need target < trigger < sl) — skipped", "WARN")
                 continue
+            # ID claimed only after FULL validation — a malformed first copy
+            # must not poison a valid duplicate (bug_hunter sideways find)
+            seen_ids.add(oid)
             crossed = (btc_price >= trigger_price) if trigger == "above" \
                 else (btc_price <= trigger_price)
             if crossed:
@@ -1284,13 +1315,18 @@ def monitor_pending_orders(btc_price):
                         "id": oid, "coin": coin, "direction": direction,
                         "trigger_price": trigger_price, "amount_usdt": amount,
                         "leverage": leverage, "sl": sl, "target": target,
-                        "confidence": float(order.get("confidence", 65)),
+                        "confidence": confidence,
                         "note": note,
                     }}
                 })
-                state[oid] = {"status": "triggered", "price": btc_price, "ts": time.time()}
-                changed = True
-                log(f"🚨 pending order {oid} TRIGGERED: {coin} {direction} at {btc_price:.0f}")
+                if PENDING_ORDERS_CAN_PERSIST:
+                    state[oid] = {"status": "triggered", "price": btc_price, "ts": time.time()}
+                    changed = True
+                else:
+                    # recommend/--dry-run: steer shown but order NOT burned —
+                    # stays armed for autopilot
+                    log(f"pending order {oid} trigger seen (recommend/dry-run — "
+                        f"not persisted, order stays armed)")
         except Exception as e:
             log(f"pending order entry error (skipped, cycle continues): {e}", "WARN")
             continue
@@ -1298,7 +1334,12 @@ def monitor_pending_orders(btc_price):
         try:
             atomic_write_json(PENDING_ORDERS_STATE, state)
         except Exception as e:
-            log(f"pending order state write failed: {e}", "WARN")
+            # HIGH (bug_hunter): executing an unpersisted trigger = the next
+            # cycle re-fires it → double trade. Drop ALL steers; the order
+            # stays armed and fires cleanly once state writes work again.
+            log(f"pending order state write failed: {e} — dropping "
+                f"{len(steers)} steer(s) to prevent double execution", "ERROR")
+            return []
     return steers
 
 
@@ -1311,21 +1352,23 @@ def _execute_pending_order(order):
     import subprocess
     import re as _re
     oid = order.get("id", "?")
-    cmd = [
-        sys.executable, os.path.join(SCRIPTS_DIR, "brain.py"),
-        "trade", "add",
-        str(order["coin"]), str(order["direction"]),
-        f'{float(order["amount_usdt"]):.2f}', f'{float(order["trigger_price"]):.8g}',
-        "--real",
-        "--signal", "ai-trader-pending",
-        "--strategy", "ai-trader",
-        "--confidence", f'{float(order.get("confidence", 65)):.0f}',
-        "--leverage", str(int(order["leverage"])),
-        "--sl", f'{float(order["sl"]):.8g}',
-        "--target", f'{float(order["target"]):.8g}',
-    ]
-    log(f"AUTO-EXEC pending order {oid}: {' '.join(cmd[4:])}")
     try:
+        # Cmd build INSIDE try — a KeyError on a bad payload must mark the
+        # order error, not escape to the caller (bug_hunter LOW).
+        cmd = [
+            sys.executable, os.path.join(SCRIPTS_DIR, "brain.py"),
+            "trade", "add",
+            str(order["coin"]), str(order["direction"]),
+            f'{float(order["amount_usdt"]):.2f}', f'{float(order["trigger_price"]):.8g}',
+            "--real",
+            "--signal", "ai-trader-pending",
+            "--strategy", "ai-trader",
+            "--confidence", f'{float(order.get("confidence", 65)):.0f}',
+            "--leverage", str(int(order["leverage"])),
+            "--sl", f'{float(order["sl"]):.8g}',
+            "--target", f'{float(order["target"]):.8g}',
+        ]
+        log(f"AUTO-EXEC pending order {oid}: {' '.join(cmd[4:])}")
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
                            cwd=SCRIPTS_DIR)
         out = (r.stdout or "") + (r.stderr or "")
@@ -1708,10 +1751,22 @@ def execute_safe_actions(steers, watchdog_mode):
                 })
 
         elif action_type == "execute_order" and action.get("order"):
-            # Pending (conditional) entry — trigger hit, place via brain.py
-            result = _execute_pending_order(action["order"])
-            if result:
-                executed.append(result)
+            # Pending (conditional) entry — trigger hit, place via brain.py.
+            # try/except mirrors move_stop: one bad payload must not abort
+            # remaining auto-executions in the batch (bug_hunter LOW).
+            try:
+                result = _execute_pending_order(action["order"])
+                if result:
+                    executed.append(result)
+            except Exception as e:
+                log(f"AUTO-EXEC pending_order error: {e}", "ERROR")
+                executed.append({
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "type": "pending_order",
+                    "order_id": action["order"].get("id", "?"),
+                    "auto_executed": False,
+                    "hl_result": f"error: {e}",
+                })
 
     return executed
 
@@ -1739,6 +1794,11 @@ def main():
             json.dump(data, f, indent=2, default=str)
         log(f"Saved raw data to {raw_path}")
         return
+
+    # Pending orders: only persist one-shot state when execution can actually
+    # follow (autopilot, not dry-run) — recommend/dry-run must not burn orders
+    global PENDING_ORDERS_CAN_PERSIST
+    PENDING_ORDERS_CAN_PERSIST = (watchdog_mode == "autopilot" and not args.dry_run)
 
     steers = analyze_all(data)
     output = build_output(data, steers)
