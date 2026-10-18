@@ -1,52 +1,41 @@
-# Signal Performance Report
-**Generated:** 2026-10-18 03:36 UTC | **Period:** Last 6h + 24h (brain DB, verified live)
+=== Signal Performance Report ===
+Generated: 2026-10-18 09:33 UTC
+Period: Last 6h | 24h (context: 72h)
 
-## System Totals
-- **24h:** 5 closed trades | WR 60% (3/5) | PnL +$0.42
-- **6h:** 3 closed trades | WR 100% (3/3) | PnL +$0.52
-- **7d:** 199 closed trades | WR 35.7% | PnL −$1.80
+Volume note: only 12 closed trades in 24h — thin data, no kill/boost thresholds met.
 
----
-
-## KILLED (executed):
+KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None this cycle — no signal met kill criteria (no signal had 5+ trades in 24h) |
+| (none) | — | — | — | — | No signal met kill criteria (WR<30% + 5+ trades + PnL<-$0.10, 24h) |
 
-## BOOSTED (executed):
+BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None this cycle — no signal met boost criteria (no signal had 5+ trades in 24h) |
+| (none) | — | — | — | — | No signal met boost criteria (WR>55% + 5+ trades + PnL>$0.05, 24h) |
 
-## LOSERS (watch list):
+LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| ai-trader+ | LONG | 27.8% | −$0.86 | 18 (7d) | ⚠️ Still enabled, loses in ALL regimes (EXTREME 2/11, HIGH 2/4, NORMAL 1/3). 24h n=1 (−$0.15) — below kill threshold, but 7d bleed is the worst active signal. Trail-arm shadow + RSI drift guard already deployed (brain_auditor Oct 17). Re-check next cycle; if 24h n≥5 and WR<30%, kill. |
-| pump-chain- | SHORT | 24.3% | −$0.19 | 37 (7d) | Watch only — 24h n=1 WON (+$0.47). CEO re-enabled EXTREME route Oct 7; HIGH blocked, RSI hard floor 45 active. Regime-routed per CEO mandate, not a blanket kill. |
-| bb-bounce-v2 | LONG | 40.0% | −$0.37 | 15 (7d) | Trail-arm-timeout shadow collecting (T=55m). No action until shadow data lands. |
-| doji-bottom | LONG | 35.3% | −$0.74 | 17 (7d) | ✅ Already re-killed Oct 16 (DOJI_BOTTOM_ENABLED=False). 7d trades pre-date the kill. |
-| oversold-bounce+ | LONG | 0% | −$0.40 | 5 (7d) | ✅ Already killed Oct 13 (OVERSOLD_BOUNCE_ENABLED=False). |
-| volume-breakout | LONG/SHORT | 0% | −$0.67 | 8 (7d) | ✅ Already killed Oct 13/15 (PLUS/MINUS=False). |
+| pump-chain+ | LONG | 33.3% | -$0.07 | 3 (24h) | WATCH — below WR target, low volume; recheck next cycle |
+| doji-bottom-long | LONG | 45.5% | -$0.51 | 11 (72h) | WATCH — 72h loser, only 0-2 trades in 24h window |
+| pump-chain- | SHORT | 0.0% | -$0.49 | 8 (72h) | WATCH — 0% WR over 72h; only 1 combo trade in 24h |
+| bb-bounce-v2-long+ | LONG | 28.6% | -$0.36 | 7 (72h) | WATCH — below WR target on 72h; 1 trade in 24h |
+| ai-trader+ | LONG | 50.0% | -$0.37 | 10 (72h) | WATCH — breakeven WR, negative PnL (slippage/RR) |
 
-## WINNERS:
+WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 36.4% | +$1.05 | 33 (7d) | Active, net positive. Dead-gap falling-knife block added Oct 17. |
-| r2v2 | LONG | 66.7% | +$0.66 | 9 (7d) | Healthy. |
-| volume-buildup- | SHORT | 87.5% | +$0.38 | 8 (7d) | Healthy — best WR in system. |
-| hl_copy | LONG | 60.0% (7d 5T) | +$0.17 | 5 (7d) | Active now (2 open trades). |
+| pump-chain-,pump-chain-v6- | SHORT | 100% | +$0.47 | 1 (24h) | OK — single trade, no boost on n=1 |
+| volume-buildup- | SHORT | 75.0% | -$0.03 | 4 (72h) | OK — high WR, costs eating edge; watch |
+
+ISSUES:
+- No direction inversions in last 24h (0 found) — signal naming intact.
+- Very low trade volume (12 closed in 24h vs typical) — likely regime/throttle; no action.
+- 72h losers (doji-bottom-long, pump-chain- SHORT, bb-bounce-v2-long+) fall below 24h kill window; regime check deferred until 24h sample rebuilds.
 
 ---
-
-## ISSUES:
-- **⚠️ TRADE VOLUME COLLAPSE — pipeline producing ~1/10th normal flow.** Created/closed per day: Oct 15=17, Oct 16=49, **Oct 17=5, Oct 18=6 (2 closed so far)**. Investigated: no code bug found. Cause is stacked filters + quiet market:
-  1. Open positions occupying tokens (banana, eth, hype, super) — HOTSET-FILTER blocks re-entry every cycle.
-  2. VOL-FLOOR blocking BTC (price vol <0.30%, regime=FLAT).
-  3. SHORT-NEUTRAL blocking GRASS/GOAT shorts (4h NEUTRAL, BTC flat).
-  4. Recent brain_auditor tightening (ATR_SL_MIN 1.3→1.5, dead-gap blocks, LONG_RSI_SWEET_SPOT 40→55, EXTREME mult 1.15→0.85) reduces surviving signals.
-  - Hotset writes 0 tokens most cycles (pending signals never clear top-10 gates). System is defensive but not broken — execution path verified live in pipeline.log.
-- **No inversions found (24h).** All signal direction labels match trade directions.
-- 7d system PnL is −$1.80 on 199 trades — drag concentrated in signals already killed (doji-bottom, oversold-bounce, volume-breakout account for ~$1.8 of the loss pre-kill). Active-signal 7d PnL is roughly flat.
+*Report auto-generated. Next report: ~6h from now.*
 
 ---
 
@@ -54,6 +43,7 @@
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-10-18 | 836de28 | brain_auditor: Captain audit Oct 18 06:40 — soak #11, 0 conf... |
 | 2026-10-17 | 209c5ae | brain_auditor: trail-arm-timeout candle OOS (all 4 cohorts) ... |
 | 2026-10-17 | b01d329 | brain_auditor: captain run Oct 17 06:45 — 0 changes, verify+... |
 | 2026-10-17 | 75b2af2 | brain_auditor: REGIME_CONF_EXTREME_MULT 1.15→0.85 — stale Se... |
@@ -63,10 +53,5 @@
 | 2026-10-17 | 66716f2 | scripts: extend trail-arm-timeout SHADOW to ai-trader+ LONG ... |
 | 2026-10-17 | 02f6d4e | config: ATR_SL_MIN 1.3% → 1.5% |
 | 2026-10-16 | 70ff616 | scripts: bb-bounce-v2 trail-arm-timeout SHADOW collector T=5... |
-| 2026-10-16 | ccf804e | brain_auditor: LONG_RSI_SWEET_SPOT_MIN 40→55 — boost only si... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
-
----
-
-*Report auto-generated by signal_reporter. Data verified live against brain DB. Next report: ~6h.*
