@@ -5198,5 +5198,25 @@
     "category": "entry sniper",
     "status": "suggested — deprioritized behind contrarian-shadow PROMOTE recheck (needs 48h clean post-bugfix data first)",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-18T00:36:24.294994+00:00",
+    "idea": "ai-trader precheck compactor-hostility skip: if last compactor cycle multiplier product for same coin+direction < 0.20 (predicted block), skip the pick",
+    "rationale": "NXPC pick conf 78 spent 10min cycle-blocked (RR grade D 0.64, meta RSI 61.5>dynamic ceiling 60, tide 0.7x, osc 0.7x, EXTREME 0.85x -> product 0.006-0.13 floored 0.5 then RSI-blocked). Watchdog precheck and compactor disagree on hostile-environment picks. Prediction is free: compactor already logs the product before the block.",
+    "expected_impact": "Eliminates wasted pick cycles; no change to fills (blocked picks never fill anyway). Zero risk — watchdog-side only, no live gate.",
+    "category": "entry sniper / pick quality",
+    "status": "suggested",
+    "risk": "low",
+    "verified_data": "signal-compactor.log 23:20-23:24 NXPC: products 0.1348, 0.0917, 0.0489, 0.0058 all floored then blocked"
+  },
+  {
+    "date": "2026-10-18T00:36:24.294994+00:00",
+    "idea": "dump-confirmed SHORT classifier (log-only shadow): flag SHORT entries where 15m move before entry was <= -2% with volume expansion vs anticipation shorts",
+    "rationale": "Every dump is a SHORT opportunity — but only shorts that ENTER ON the confirmed dump win (ALT +$0.47 riding -6.5%, volume-buildup- 87.5% WR 14d n=8). Anticipation shorts that hope for a dump bleed (SHORT 7d 60T 33.3% -$0.72). Classify post-hoc, compare WR. Same pattern as contrarian_shadow, scoped to dump-confirmation.",
+    "expected_impact": "If confirmed (n>=20, p<0.05): confidence boost for dump-confirmed shorts, or filter for anticipation shorts. First 48h: pure logging.",
+    "category": "entry sniper / short quality",
+    "status": "suggested",
+    "risk": "low",
+    "blocked_by": "soak discipline — do not ship new shadow until current 6 changes have 48h data"
   }
 ]

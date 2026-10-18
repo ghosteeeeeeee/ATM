@@ -1,55 +1,54 @@
-# Current State — brain_auditor Captain Run Oct 17 23:40 UTC
+# Current State — brain_auditor Captain Run Oct 18 00:35 UTC
 
-**Last Updated: 2026-10-17 23:40 UTC**
-**Updated by: brain_auditor — 1 zero-behavior bugfix (MFE-CUT shadow semantic), 0 live config changes (soak #5)**
+**Last Updated: 2026-10-18 00:37 UTC**
+**Updated by: brain_auditor — 0 config changes (soak #6), all last-run changes verified**
 
-## PIPELINE STATUS (23:40 UTC)
+## PIPELINE STATUS (00:35 UTC)
 
-- **Trading live since 16:57 UTC** — 0.3x size-reduce active. Size-reduce trigger: 7d WR 35.0% (71/203=34.98%) < 35.0 AND 7d PnL −$2.07 < −$2.00. Both still failing by a hair. Auto-resume (pause mode) needs WR≥37 OR PnL≥$0.
-- **24h 7T 3W +$0.08 — FIRST POSITIVE 24h window in ~3 days. | 7d 203T 71W −$2.07 (35.0%).**
-- **Post-resume cohort: 2T +$0.32.** ALT SHORT #16260 trail_sl **+$0.47 (+4.2%)** — textbook pump-fade trail ride, correct side while BTC bounced. WLD LONG ai-trader+ hard_sl −$0.15 — drift guard PASSED (Δ13.2<15), small loss, not a blowout. 0 open.
-- **NXPC LONG pick fired 23:14** conf 78, RSI 56.9 dead-center long band, regime-aligned momentum (110/126 LONG_BIAS, BTC reclaimed EMA300). Prior NXPC SHORT expired unfilled — thesis flipped with regime. Awaiting fill.
-- Regime flip in progress: BTC 15m LONG_BIAS, 4h SHORT_BIAS, RECOVERY phase, AT EMA300 after 21.6h below, volatility LOW, volume LOW. Bounce structural but volume-unconfirmed — momentum longs only, small size.
-- Watchdog: CRITICAL (14/20 historical). Steers: 001 PARTIALLY STALE (post-resume +$0.32, 24h positive); 002 VERIFIED (fixes soaking); 003 ai-trader+ SOAK to Oct 19 (APT/INJ pre-guard); 004 STALE (manual noise); 005 STALE (doji dead).
+- **Trading LIVE** with 0.3x size-reduce (7d WR 34.8% < 35 AND 7d PnL −$2.13 < $0 — both still failing by a hair).
+- **24h 6T 3W +$0.28 (50% WR) — first positive 24h in ~3 days. | 7d 201T 70W −$2.13 (34.8%). | 30d 778T −$3.26 (44.0%).**
+- **0 open.** Book flat. All 6 slots free.
+- NXPC LONG pick (23:14, conf 78) NEVER FILLED — correctly blocked: RR grade D (0.64), meta RSI drifted 56.9→61.5 > dynamic ceiling 60, tide bearish, osc falling. System worked. Watchdog will re-pick.
+- Regime: BTC 15m LONG_BIAS, 4h SHORT_BIAS, volatility NORMAL→EXTREME flicker, wyckoff ACCUMULATION, market CALM. Long tilt wide (33L/8S) but BTC pinned near EMA300 — correlation risk if stacking alt longs.
+- Watchdog: CRITICAL (stale historical). Steers 001/004/005 STALE, 002 VERIFIED-DEFENDED, 003 scheduled Oct 19.
 
-## THIS RUN — 1 ZERO-BEHAVIOR BUGFIX, 0 LIVE CONFIG CHANGES
+## THIS RUN — 0 CONFIG CHANGES (SOAK #6)
 
-Soak discipline #5: 5 changes in flight (dead-gap LONG, drift guard, EXTREME 0.85, contrarian fix, pp-cond shadow) with only 2 post-resume closes. No new entry filters.
+6 changes in flight (dead-gap, drift guard, EXTREME 0.85, contrarian fix, pp-cond shadow, MFE-CUT semantic) with only 6 post-resume closes. 24h just turned positive. No new entry filters.
 
-### Bugfix: MFE-CUT shadow semantic (position_manager.py:3625)
-
-- **Bug:** shadow fired on `live_pnl < 0.20` at T=45m. Validated cohort (zero-winner OOS) was **MFE-never-reached-0.20** — different populations. live_pnl-at-T also fires on retraced-after-spike grinds (the dead_money lesson: grind is normal). 0 fires observed vs WLD 56m hold confirms the mismatch.
-- **Fix:** compute MFE from peak prices (`_peak_high`/`_peak_low` vs `_entry`); fire only when peak-MFE < 0.20 at ≥45m; fail-open if peak unknown; log live+MFE both.
-- **Why now:** shadow data is the CEO flip-live decision basis — wrong population = wasted 48h soak. Zero live behavior.
-- **Status:** py_compile OK, MFE semantics self-check passed. Shadow restarts clean population this run.
-
-## LAST-RUN CHANGES — ALL VERIFIED
+## LAST-RUN CHANGES — ALL 11 VERIFIED
 
 | Change | Status | Evidence |
 |--------|--------|----------|
-| Contrarian entry_price fix | CODE-VERIFIED | fix present; 0 post-fix events (last 22:07, fix 22:37) |
-| pp-cond shadow fields | COLLECTING | 468 events, 5 pp_cond_would_block |
-| ai-trader drift guard | FUNCTIONAL | WLD passed Δ13.2; state writes rsi_at_pick (NXPC 56.9) |
+| MFE-CUT peak-MFE semantic | CODE-VERIFIED | LONG+SHORT branches, fail-open, once/trade. WLD 21:15 fires were pre-fix. New semantics live next cycle. |
+| Contrarian entry_price fix | HOLDING | Post-fix BANANA event has entry context |
+| pp-cond shadow fields | COLLECTING | 5 pp_cond_would_block events |
+| ai-trader drift guard | FUNCTIONAL | WLD passed Δ13.2; NXPC state has rsi_at_pick; NXPC later blocked by RR-D ceiling (defense-in-depth, correct) |
 | doji re-kill | HOLDING | 0 trades since Oct 16 20:30 |
-| pump-chain+ dead-gap | HOLDING | 0 post-resume pump-chain+ opens |
+| pump-chain+ dead-gap | HOLDING | 0 post-resume opens |
 | SHORT midband | HOLDING | 0 violations |
-| EXTREME conf 0.85 | UNVALIDATED | 0 EXTREME trades post-resume |
-| sweet-spot MIN 55 | CONFIRMED | 7d 16T +$0.54 56.3% |
-| SHORT floor-35 | HOLD | 7d 35-45 band 27T net −$0.06 flat; trigger NOT flipped |
-| pump-chain- dead-gap SHORT | WORKING | post-ship opens 2T +$0.39 |
+| EXTREME conf 0.85 | WORKING (n=2) | ALT SHORT winner +$0.47 entered under 0.85 |
+| sweet-spot MIN 55 | FIRING | meta-source +10 boosts (HYPER/JUP/CFX) |
+| SHORT floor-35 | HOLD | revert trigger not hit |
+| #16258 SL rake | CLOSED | UNIVERSAL_MAX_HOLD +$0.05 |
 
 ## WEALTH GAP (7d)
 
 | Family | Trades | WR | PnL |
 |--------|--------|----|-----|
-| TRAIL (profit-monster + atr_trail + trail_sl + hard_tp) | 68 | 82.6-100% | **+$7.91** |
-| CHOP (HML + atr_sl + hard_sl + stale) | 112 | 0-2% | **−$9.53** |
+| TRAIL | 67 | 92.5% | **+$7.83** |
+| CHOP (HML/atr_sl/hard_sl/stale) | 112 | 0.9% | **−$9.53** |
+| trail_arm_timeout | 10 | 20% | −$0.36 (realized; vs HML counterfactual −3%acct saves) |
+
+## SHADOWS IN FLIGHT
+
+- **MFE-CUT** (peak-MFE semantics): clean population from 23:38. First pre-fix fire WLD confirmed mechanism. Review after 48h.
+- **bb-bounce + ai-trader trail-arm-timeout**: WLD first fire would-exit −0.38% vs actual −0.70% (save 0.32%). Collecting.
+- **contrarian + pp-cond + chase-ratio (to Oct 27)**: collecting.
 
 ## PENDING / ESCALATIONS
 
-1. **ai-trader+ re-evaluate Oct 19** (48h post-drift-guard) — 7d 19T 26.3% −$0.93 worst signal, but APT/INJ pre-guard; kill stacks on unvalidated guard.
-2. **Contrarian PROMOTE recheck** after 48h clean events (post 22:37 bugfix).
-3. **MFE-CUT shadow** — clean population from this run; review fires after 48h.
-4. **self_learner exit-ladder (P0, 9th+ request)** STILL undelivered — the #1 lever for the chop family.
-5. **Creative (suggested, deprioritized):** solo-pump fade decoupling classifier — ALT won +4.2% SHORT while 5m aggregate was 110:1 LONG_BIAS; log-only, behind contrarian recheck.
-6. **NXPC LONG fill watch** — first regime-aligned momentum LONG post-flip.
+1. **ai-trader+ re-evaluate Oct 19** — post-guard cohort n=1 (WLD −$0.15 drift-passed). Pre-guard losses excluded.
+2. **exit-ladder signal-scoped backtest P0 — STILL NOT COMMISSIONED (10th+ request).** Universal version OOS-failed; signal-scoped is the only path. Blocks timeout/MFE-CUT flip decisions.
+3. **Creative logged (not shipped):** (a) ai-trader compactor-hostility precheck skip (NXPC evidence), (b) dump-confirmed SHORT classifier (blocked by soak).
+4. Protected flags 13/13 INTACT.
