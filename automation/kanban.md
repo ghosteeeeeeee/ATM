@@ -108,3 +108,6 @@
 
 ## TEAM UPDATES
 - [2026-10-19 10:28] auto_1hr: No config change — 3T last hour (1W 2L −$0.12: DOGE/ARB ai-trader+ losses, LTC bb-bounce-v2-long+ trail +$0.03). 24h 17T 9W −$0.09 (52.9%), 7d 199T 68W −$3.79 (34.2%). Size-reduce 0.3x stays. atr_sl_hit 35% (healthy, tpsl deployed). Kill watch: ai-trader+ 2T 0W last hour, one more loss = kill. 3-neg-hour streak (08/09/10) — size-reduce already active. 1 open (ME LONG).
+
+## TEAM UPDATES
+- [2026-10-19 11:28] auto_1hr: No config change — 1T last hour (ME bb-bounce-v2-long+ stale_exit −$0.26 −3.54%, single occurrence not a pattern). 24h 18T 9W −$0.35 (50.0%), 7d 200T 68W −$4.05 (34.0%). Size-reduce 0.3x stays. atr_sl_hit 33% (healthy). Kill watch: ai-trader-pending 24h 2T 0W still under 3T threshold. 3-neg-hour streak (08/09/10) — size-reduce already active. 0 open.

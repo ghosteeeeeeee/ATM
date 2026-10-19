@@ -12230,3 +12230,25 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader+ 2T 0W last hour — 1 more loss triggers kill (3T threshold)
 - 3-neg-hour streak — monitor; size-reduce already on
 - 7d still -$3.79 / 34.2% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+
+## [2026-10-19 11:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 losses)
+**PnL:** -$0.26 last hour | 24h 18T 9W -$0.35 (50.0% WR) | 7d 200T 68W -$4.05 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Loss: ME bb-bounce-v2-long+ stale_exit -$0.26 (-3.54%) — held 56.6min, closed before SL (SL 0.058381, exit 0.05857). Single occurrence, not a pattern
+- atr_sl_hit 6/18 = 33% last 24h (healthy, under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour (only 1 close); ai-trader-pending still 24h 2T 0W under 3T threshold
+- No overtrading (1T/hr)
+- 3-neg-hour streak (08:00 -$0.14, 09:00 -$0.07, 10:00 -$0.31) — size-reduce 0.3x already active, remedy in place
+- Size-reduce 0.3x stays (7d WR 34.0% < 35%, 7d PnL -$4.05 < -$2)
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader-pending 24h 2T 0W still under kill threshold
+- 7d deteriorating slightly: -$3.79 → -$4.05 — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- ME stale_exit at -3.54% — watch if stale_exit repeats as loss vector next hour
