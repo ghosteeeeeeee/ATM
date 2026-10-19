@@ -5707,8 +5707,19 @@
     "rationale": "Watchdog deep analysis 21:06 explicitly flagged this for brain auditor. ai-trader+ LONG 45-55 band 10T 0% −$0.84/14d. Death-zone advisory covers RSI number but doesn't convey market-state context. Pin = both directions get chopped; LLM needs to know WHY, not just that RSI is 50.",
     "expected_impact": "Zero live behavior; improves LLM pick quality via market-state awareness",
     "category": "entry sniper",
-    "status": "pre-registered",
+    "status": "shipped",
     "risk": "low",
-    "blocked_on": "vacation mode — ships when T returns"
+    "blocked_on": "vacation mode — ships when T returns",
+    "shipped_at": "2026-10-19T22:38:39Z",
+    "shipped_note": "Run #27: advisory live in ai_trader_precheck.py, passed=True always, zero behavior. Fires on WLD precheck: BTC AT EMA300 164m."
+  },
+  {
+    "date": "2026-10-19T22:38:39Z",
+    "idea": "ai-trader marginal-pick stack scorecard — tag picks firing with >=2 of {death-zone RSI 45-55, EMA300-pin advisory, RR grade C/D, precheck FAIL} as 'marginal', track 20-sample outcome rate",
+    "rationale": "WLD pick 22:07 stacked 3 marginal signals at once (RSI 52.3 death zone, BTC AT EMA300 ~150m pin, RR engine shadow-block R:R 1.50 grade C) yet still went pending. Advisories exist but nothing aggregates them. If marginal-tagged picks lose >70% over n>=20, operator skip-rule has teeth; if not, the advisories are noise and we stop printing them.",
+    "expected_impact": "Zero trading risk; quantifies whether advisory stacking predicts losses. Data feeds operator skip-rule or kills advisory noise.",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "none"
   }
 ]

@@ -1672,5 +1672,16 @@
     "after": "AI_TRADER_EXTREME_LONG_SHADOW_ENABLED = False",
     "rationale": "signal_reporter hard block b0a2467d (2026-10-19 09:41) supersedes demote mechanism — 0 EXTREME trades since, shadow starved (re-eval moot). Oct-19 formal re-eval from trade data n=16: demote counterfactual = wash (would-block 1L save $0.10 / 1W kill $0.09). Retiring dead instrumentation that pretends to collect data.",
     "impact": "ZERO live behavior (shadow was already starved by hard block; only logged would-demotes). Closes scheduled Oct-19 re-eval loop honestly. Do not re-enable without fresh n>=20 cohort."
+  },
+  {
+    "timestamp": "2026-10-19T22:38:39Z",
+    "agent": "brain_auditor",
+    "change": "EMA300-pin advisory SHIPPED in ai_trader_precheck.py — non-blocking label when BTC AT EMA300 with duration>60m (both directions). Zero behavior, passed=True always. Pre-registered run #26.",
+    "type": "advisory",
+    "file": "scripts/ai_trader_precheck.py",
+    "before": "section 4 loaded continuum only for LONG BTC-trend check",
+    "after": "continuum hoisted, shared with pin advisory: AT + duration>60m -> check(True, \"chop pin, mid-band entries have no edge\")",
+    "rationale": "Watchdog deep analysis: mid-band entries have zero edge during EMA300 pin. Death-zone advisory covers RSI number; this adds market-state WHY. Live-verified: fires on WLD precheck (BTC AT 164m).",
+    "impact": "Zero live behavior change. LLM picker + operator see pin context on every precheck."
   }
 ]

@@ -270,15 +270,33 @@ def precheck(coin, direction, conf=None):
     except Exception as e:
         check('Not in losers/penalty', True, f'error: {e}')
 
-    # 4. BTC trend check for LONG
+    # 4. BTC trend check for LONG + EMA300-pin advisory (both directions)
+    cont = None
+    try:
+        with open(os.path.join(WWW_DATA, 'continuum_data.json')) as f:
+            cont = json.load(f)
+    except Exception:
+        cont = None
     if direction == 'LONG':
         try:
-            with open(os.path.join(WWW_DATA, 'continuum_data.json')) as f:
-                cont = json.load(f)
+            if cont is None:
+                raise RuntimeError('continuum unavailable')
             ema_pos = cont.get('current', {}).get('ema300_position', 'UNKNOWN')
             check('BTC not bearish for LONG', ema_pos != 'BELOW', f'BTC ema300={ema_pos}')
         except Exception as e:
             check('BTC trend', False, f'cannot read continuum: {e}')
+    # EMA300-pin advisory (brain_auditor 2026-10-19, pre-registered run #26) —
+    # NON-BLOCKING. Watchdog deep analysis: mid-band entries (RSI 45-60) have
+    # zero edge while BTC pins on EMA300 (AT + duration>60m = unresolved chop).
+    # Death-zone advisory covers the RSI number; this adds the WHY (market state).
+    # passed=True always — advisory only, zero behavior.
+    if cont is not None:
+        _c = cont.get('current', {})
+        if (_c.get('ema300_position') == 'AT'
+                and (_c.get('ema300_duration') or 0) > 60):
+            check('EMA300 pin advisory', True,
+                  f"BTC AT EMA300 {_c.get('ema300_duration')}m — chop pin, "
+                  f"mid-band entries have no edge — wait for resolution")
 
     # 5. Price data check — use ANY candle (including developing) for freshness
     # The collector updates the developing candle every 30s; closed candles lag by one period

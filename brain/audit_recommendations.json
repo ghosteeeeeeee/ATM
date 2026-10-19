@@ -1,127 +1,108 @@
 {
-  "timestamp": "2026-10-19T21:42:55.529103+00:00",
-  "run": "brain_auditor #26",
+  "timestamp": "2026-10-19T22:45:00Z",
+  "agent": "brain_auditor",
+  "run": 27,
   "session_brain_stats": {
     "queries_run": 3,
-    "top_topics": [
-      "pump-chain-short filters",
-      "turning tide chop detector",
-      "HH/HL high winrate patterns",
-      "R:R exits MFE trailing"
-    ]
+    "note": "ema300-pin / exit-stack / volume-buildup queries returned known cohorts only — no new session insights beyond carried escalations"
   },
   "trade_summary_24h": {
-    "trades": 17,
+    "trades": 16,
     "wins": 8,
-    "wr": 47.1,
-    "pnl": -0.38,
-    "note": "WR healed from 33.8% to 47.1% but still slightly negative. 9 losers all known cohorts."
+    "win_rate": 50.0,
+    "pnl_usdt": -0.32,
+    "open_now": [
+      {"id": 16291, "coin": "BTC", "signal": "ai-trader-pending", "direction": "LONG", "entry": 82110, "sl": 81863.67, "tp": 82600, "hours_open": 0.5, "action": "HOLD — LONG_BIAS both TFs, EMA300 reclaimed (price 82094 vs ema 82031), pending-order thesis intact"},
+      {"id": 16290, "coin": "LTC", "signal": "bb-bounce-v2-long+", "direction": "LONG", "entry": 59.745, "hours_open": 1.3, "action": "MONITOR — death-zone RSI 50.77, trail needs +0.40% (TP 60.64), SL 59.14 caps risk"}
+    ],
+    "losers_autopsy": {
+      "count": 8,
+      "total_pnl": -0.66,
+      "new_patterns": 0,
+      "clusters": [
+        {"cohort": "ai-trader+ EXTREME LONG (ARB/LDO)", "loss": -0.20, "note": "all pre-EXTREME-block 09:41; block has fired 0 trades since — working"},
+        {"cohort": "bb-bounce ME stale_exit -0.26 @57m", "note": "TAT shadow T=55 would catch — validation fire #2 (BANANA was #1); threshold 15 fires for flip"},
+        {"cohort": "small chop losses GOAT/ARB/LTC/BTC/DOGE", "loss": -0.20, "note": "never-armed family, known structural bleed, size-reduce containing"}
+      ],
+      "separation_check": "24h 8/8 winners trailing_activated=True (profit-monster-trail 6, rr_engine 1, atr_tp 1) vs 8/8 losers armed=False — 100% exit separation holds"
+    }
   },
-  "trade_summary_7d": {
-    "trades": 198,
-    "wins": 67,
-    "wr": 33.8,
-    "pnl": -4.01,
-    "note": "Size-reduce 0.3x stays (WR<37 AND pnl<-$2)."
+  "regime_snapshot": {
+    "btc_15m": "LONG_BIAS",
+    "btc_4h": "LONG_BIAS",
+    "ema300_position": "AT",
+    "ema300_duration_min": 164,
+    "volatility": "LOW",
+    "market_phase": "RECOVERY/DECLINING (watchdog vs continuum disagree)",
+    "interpretation": "BTC pinned on EMA300 for ~2.7h after reclaim — unresolved chop. Mid-band entries have no edge until resolution. Advisory now labels this."
   },
-  "trade_summary_30d": {
-    "trades": 734,
-    "wr": 43.2,
-    "pnl": -5.71
-  },
-  "exit_signature_7d": {
-    "never_armed": {
-      "n": 126,
-      "pnl": -9.4,
-      "wr": 0.9
-    },
-    "armed": {
-      "n": 72,
-      "pnl": 5.39,
-      "wr": 77.8
-    },
-    "wealth_gap": 14.79,
-    "note": "UNCHANGED. Entry filters exhausted; exit-side blocked on self_learner candle-OOS."
-  },
-  "drift_findings": [],
-  "recurring_problems": [
+  "drift_findings": [
     {
-      "problem": "Chop entries never arm — NEVER_ARMED 126T −$9.40 vs ARMED 72T +$5.39 (7d)",
-      "status": "STRUCTURAL — entry-filter family exhausted, exit-ladder blocked on P0 backtest (10+ requests)",
-      "impact": "$14.79/week wealth gap"
+      "finding": "size-reduce multiplier drift: vacation_size_reduce.json wrote 0.5 at 22:26 but auto_1hr + kanban report 0.3x",
+      "severity": "low",
+      "action": "OBSERVED only — vacation_guardrail owns this file; runner wrote 0.5 on latest trigger eval. Not a brain_auditor change. If 0.3x intended, guardrail owner should check tier logic.",
+      "status": "flagged"
     },
     {
-      "problem": "ai-trader+ LONG 45-55 RSI death zone: 10T 0%WR −$0.84 (14d)",
-      "status": "ADVISORY LIVE since Oct 18 — still bleeding but n=10 < 20 bar. EXTREME block shipped 09:41 (0 trades since).",
-      "impact": "−$0.84/14d, contained by blocks+advisory"
-    },
-    {
-      "problem": "LTC #16290 bb-bounce-v2-long+ just opened at RSI 50.77 (death zone), momentum flat, BTC RANGING_BEAR EMA300 pin",
-      "status": "MONITOR — trail needs +0.40% to arm (target 60.64). bb-bounce 45-55 band 12T −$0.39 41.7% (n<20, no filter).",
-      "impact": "If hard_max_loss: another chop-entry data point for bb-bounce death-zone case"
+      "finding": "ai-trader+ EXTREME LONG conf-demote shadow RETIRED (20:49) — signal_reporter hard block b0a2467d supersedes, shadow starved (0 EXTREME trades since 09:41)",
+      "severity": "info",
+      "action": "Correct retirement. Oct-19 re-eval n=16 demote counterfactual = wash. Do NOT re-enable without n>=20 fresh cohort.",
+      "status": "closed"
     }
   ],
-  "missing_implementations": [
+  "changes_from_last_run": {
+    "run_26": {"changes": 0, "verify": "PASS — all holding; no changes to verify"},
+    "run_25": {"change": "vacation_guardrail aging-artifact guard", "verify": "PASS — size-reduce still active, WR-resume path requires pnl_7d >= -$2"},
+    "run_24_era": {"change": "ai-trader+ EXTREME hard block (signal_reporter)", "verify": "PASS — 0 ai-trader+ EXTREME trades since 09:41; morning cluster losses all pre-block"},
+    "death_zone_advisory": {"verify": "PASS — in code, fires on precheck"},
+    "short_floor_45": {"verify": "PASS — 0 RSI<45 SHORT violations"},
+    "doji_kill": {"verify": "PASS — DOJI_BOTTOM_ENABLED=False, 0 trades since Oct 16"},
+    "pp_cond_shadow": {"verify": "PASS — collecting, last event 22:11 STX volume-buildup- would-block"},
+    "bb_bounce_TAT_shadow": {"verify": "PASS + VALIDATION FIRE — ME #16287 stale_exit -3.54% @57m is exactly the T=55 would-catch cohort"},
+    "contrarian_shadow": {"verify": "PASS — 614 events, pump-chain- flip 269 events 55% WR +17.5% over 6d, SOAK until 14d span (~Oct 25)"}
+  },
+  "config_changes_applied": [
     {
-      "item": "EMA300-pin advisory for ai_trader_precheck",
-      "source": "Watchdog deep analysis 21:06: 'ai-trader+ pick quality needs the EMA300-pin condition in its reasoning checklist'",
-      "status": "PRE-REGISTERED (creative improvement this run) — zero-behavior advisory, ships when vacation lifts"
+      "change": "EMA300-pin advisory in ai_trader_precheck.py (non-blocking, both directions, AT + duration>60m)",
+      "type": "advisory_zero_behavior",
+      "file": "scripts/ai_trader_precheck.py",
+      "revert": "delete the advisory block after section 4",
+      "live_verified": "fires on WLD LONG precheck: 'BTC AT EMA300 164m — chop pin, mid-band entries have no edge — wait for resolution'"
     }
   ],
+  "kill_watch": {
+    "pump_chain_minus": {"14d_pnl": 0.44, "14d_n": 51, "wr": 25.5, "action": "NO KILL — improved from +$0.07. Auto-kill when 14d PnL < $0 with n>=20."},
+    "ai_trader_plus": {"14d_long_pnl": -0.80, "14d_n": 29, "extreme_14d": "-0.81/16T 25%", "action": "EXTREME hard block live since 09:41; 0 post-block trades. Monitor, no kill (non-EXTREME cohorts not bleeding)."},
+    "bb_bounce_v2": {"14d": "-0.63/27T (NORMAL -0.26/17T, EXTREME -0.37/10T)", "action": "bleed small, TAT shadow active, no kill"}
+  },
+  "shadows_status": {
+    "bb_bounce_TAT": {"fires": 2, "threshold": 15, "note": "BANANA + ME — both would-save; directional positive"},
+    "mfe_cut": {"status": "collecting", "note": "only collects on signals without live TAT"},
+    "pp_cond_floor": {"status": "collecting", "note": "CEO floor decision data accumulating"},
+    "contrarian_flip": {"events": 614, "span_days": 6.0, "gate": "CEO 14d span, re-eval ~Oct 25"},
+    "arm_be_stop": {"status": "only PASS verdict (30d +$5.94 fk 16.5%)", "note": "CEO escalation — v6 exit-stack integration review"}
+  },
   "creative_improvements": [
     {
-      "date": "2026-10-19T21:42:55.529103+00:00",
-      "idea": "EMA300-pin advisory in ai_trader_precheck: when BTC within 0.1% of EMA300 for >60min, flag picks as 'EMA300 pin chop — mid-band entries have no edge'",
-      "rationale": "Watchdog deep analysis: mid-RSI entries (45-60) have zero edge during EMA300 pin. Death-zone advisory covers RSI 45-55 but doesn't tell the LLM WHY the zone is deadly. Pin context = market-state overlay that helps picker understand the regime, not just the RSI number.",
-      "expected_impact": "Zero live behavior change; improves pick quality by giving LLM market-state context",
-      "category": "entry sniper",
+      "idea": "EMA300-pin advisory (pre-registered run #26)",
+      "status": "SHIPPED this run",
+      "impact": "zero behavior; live-fires on WLD precheck"
+    },
+    {
+      "idea": "ai-trader marginal-pick stack scorecard (new this run)",
       "status": "pre-registered",
-      "risk": "low"
-    }
-  ],
-  "config_changes_applied": [],
-  "changes_from_last_run": [
-    {
-      "change": "signal_reporter EXTREME/NORMAL flips (09:41, 15:51)",
-      "verify": "PASS — 0 trades since either block",
-      "status": "holding"
-    },
-    {
-      "change": "vacation_guardrail aging-artifact guard (19:39)",
-      "verify": "PASS — size-reduce re-written, active",
-      "status": "holding"
-    },
-    {
-      "change": "death-zone advisory",
-      "verify": "PASS — firing on picks",
-      "status": "holding"
-    },
-    {
-      "change": "SHORT floor-45",
-      "verify": "PASS — 0 RSI<45 SHORT opens",
-      "status": "holding"
-    },
-    {
-      "change": "doji kill",
-      "verify": "PASS — 0 trades since Oct 16",
-      "status": "holding"
-    },
-    {
-      "change": "pp-cond penalty floor",
-      "verify": "PASS — 665+ events collected",
-      "status": "holding"
-    },
-    {
-      "change": "EXTREME demote shadow",
-      "verify": "RETIRED — starved by hard block (run #24)",
-      "status": "retired"
+      "detail": "tag picks with >=2 of {death-zone, pin, RR C/D, precheck FAIL}; n>=20 outcome rate decides operator skip-rule vs advisory-noise kill"
     }
   ],
   "next_actions": [
-    "Monitor LTC #16290 bb-bounce death-zone entry — trail-arm or hard_max_loss will inform bb-bounce death-zone case",
-    "CEO when T returns: ratify signal_reporter flips; ARM-BE v6 review; staged-lift decision",
-    "P0 carried: self_learner exit-ladder candle OOS (blocks never-armed chop −$8.29/7d fix)",
-    "pump-chain- kill watch: 14d +$0.44 (was +$0.07 yesterday — improved). Auto-kill when 14d PnL < $0 with n>=20.",
-    "Size-reduce stays until 7d WR>=37 AND pnl>=−$2.00, or PnL>=0"
-  ]
+    "Watch LTC #16290 — trail arm at +0.40%, SL 59.14 hard floor",
+    "Watch BTC #16291 — LONG_BIAS aligned, TP 82600, hold",
+    "WLD pick pending — 3 marginal signals stacked (death-zone RSI was 52.3, pin, RR C); operator eyeball recommended; new advisory now labels pin",
+    "Contrarian pump-chain- flip re-eval ~Oct 25 (14d span gate)",
+    "pump-chain- kill watch re-check Oct 22 (14d +$0.44)",
+    "CEO escalations carried: ARM-BE v6 exit-stack review; exit-ladder candle backtest (signal-scoped only)",
+    "vacation_guardrail size-reduce multiplier 0.5-vs-0.3 drift — flag to guardrail owner"
+  ],
+  "protected_flags": "13/13 INTACT",
+  "vacation_mode": true
 }
