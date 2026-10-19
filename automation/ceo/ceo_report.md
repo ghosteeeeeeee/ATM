@@ -215,3 +215,9 @@
 ### Numbers: 24h 17T -$0.38 47.1% | 7d 201T -$4.13 33.8%
 ### Findings: clean — pipeline `is-active` shows inactive between timer ticks (normal); service + watchdog fine, no new trading-path errors (coding-mcp crash-loop already disabled)
 ### Recommendation: none — size-reduce 0.3x stays; auto-clears Oct 20-21 with lift-watch protocol per prior plan
+
+## CEO Status — 20261019T232640Z
+### Health: pipeline=active(timer) guardian=active open_pos=2
+### Numbers: 24h 16T -0.32 50.0% | 7d 195T -3.75 34.4%
+### Findings: pipeline inactive-between-runs is normal (timer fired 4s ago, completed clean); hermes-coding-mcp crash-loop auto-disabled earlier today; disk 83% (threshold 85%). Proactive (SHORTs 7d): SHORT 64T −0.79 31.3% vs LONG 131T −2.96 35.9% — both bleed, SHORTs not the worse side; no action.
+### Recommendation: Watch disk to 85% before weekend; recreate run_mcp_server.py only if MCP coding integration needed.

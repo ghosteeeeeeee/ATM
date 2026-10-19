@@ -5721,5 +5721,23 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-19",
+    "idea": "bb-bounce-v2-long+ meta-RSI confidence demotion for 45-55 band",
+    "rationale": "Signal has no RSI filter. 7d 45-55 band: 9T -$0.56 WR 22.2%. 55-60 sweet spot: 20T +$0.47 WR 55%. Demote conf in 45-55 (not block).",
+    "expected_impact": "+$0.30-0.50/7d by reducing 45-55 entries without killing 55-60 winners",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-19",
+    "idea": "Fix auto_1hr size-reduce reporting: reports 0.3x but actual multiplier is 0.5x",
+    "rationale": "auto_1hr reads comment 'cuts to 30%' not file value 0.5. Trading system correct — reporting bug only.",
+    "expected_impact": "Zero trading impact — reporting accuracy",
+    "category": "infra",
+    "status": "suggested",
+    "risk": "zero"
   }
 ]
