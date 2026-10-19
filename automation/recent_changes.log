@@ -4906,3 +4906,5 @@ BY: auto_1hr
 BY: auto_1hr
 BY: auto_1hr
 [2026-10-19 18:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, 0 open) | 24h 16T 8W -$0.34 (50.0%) | 7d 200T 68W -$4.09 (34.0%) — size-reduce 0.3x stays | kill: none (ai-trader-pending 24h 2T 0W under 3T) | atr_sl_hit 37.5% under 40%, tpsl deployed | no neg-hour streak | 6th consecutive quiet hour | No constants change -> no signal_versions entry
+BY: auto_1hr
+[2026-10-19 19:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (GOAT pump-chain- SHORT atr_sl_hit -$0.04 -0.97%) | 24h 17T 8W -$0.38 (47.1%) | 7d 201T 68W -$4.13 (33.8%) — size-reduce 0.3x stays | kill: none (ai-trader-pending 24h 2T 0W under 3T) | atr_sl_hit 41.2% marginal (n=17, tpsl fix verified deployed) | no neg-hour streak | 0 open | No constants change → no signal_versions entry
