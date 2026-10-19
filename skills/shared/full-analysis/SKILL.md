@@ -331,6 +331,113 @@ Trendlines connect swing points to show trend direction and dynamic support/resi
 - **Timeframe:** 5m+ patterns are more reliable than 1m
 - **Confluence:** Pattern + EMA + S/R = strongest signals
 
+## Decision Protocol: From Reads to Trades
+
+The score is one input. These rules — distilled from the 2026-10-16→19 sessions
+(9 manual BTC trades, +$1.18% net after fixing the chop failures) — govern how
+a score + tape reads become an actual trade.
+
+### 1. Two calls, not one: DIRECTION and ENTRY are separate decisions
+
+A directional read can be right while the entry loses money. **#16283 (LONG
+-1.67%):** the momentum read was right (price did grind higher later) but the
+add entered at the top of the push. **#16273 (SHORT -5.36%):** the structural
+thesis was textbook — the entry just wasn't. The rule:
+
+- **Direction call:** which side, from score + regime + reads (see trust protocol).
+- **Entry call:** WHERE. Never at market on a fresh read. The entry is a LEVEL
+  with a tight structural SL — a reclaim, a retest, a base break. If the level
+  never comes, there is no trade. Missing is cheaper than wrong.
+
+### 2. Level-break confirmation ≠ trend confirmation
+
+A pending order firing on a level break confirms the BREAK, not the trend that
+follows. #16283 fired perfectly on the 82,825 break and still lost — the pull
+back through its SL was immediate. So: confirmation entries get the TIGHTEST
+structural SL (below the pullback low / base low), not a wide thesis SL. The
+first adverse move after a confirmation break is the market voting on the fake.
+
+### 3. Divergence taxonomy — label precisely, three different things get confused
+
+| Type | Price | MACD/RSI | Meaning |
+|------|-------|----------|---------|
+| **Bullish divergence** | LOWER low | HIGHER low | Real reversal signal — momentum recovered UNDER a falling price (5m 10-19: 81,762/-273 → 81,749/-222 = the base that held) |
+| **Momentum recovery** | higher low | higher low | Both rising = straightforward bounce, NOT divergence. Weaker claim. |
+| **Bearish divergence** | higher low | LOWER low | The opposite signal — price holding while momentum fades (1h 10-19 read) |
+
+A "divergence" claim that isn't type 1 is something else — name it correctly
+before scoring it. Both-higher is recovery; price-up/momentum-down is warning.
+
+### 4. Forming-candle vs closed-bar reads — say which one you're using
+
+The CEO reads forming candles (MACD curling, RSI bouncing mid-bar); closed-bar
+analysis lags by up to a full period. Both are legitimate — silently mixing
+them is not. When a read depends on the forming candle: label it
+**(forming)**, and state the close that would confirm it. "1h MACD curving
+toward signal **(forming)** — confirms if the candle closes above X." The
+closed-bar skeptic position (histogram still widening) and the forming-candle
+position (it's curling now) are the SAME observation at different timestamps.
+
+### 5. Base/bottom playbook — the shape that earns a LONG in markdown
+
+A base forms when: (a) a low is tested twice within ~0.1% (double-tap),
+(b) the retest makes a HIGHER low, (c) candle bodies shrink (seller
+exhaustion), (d) an oscillator diverges underneath (type-1 from §3). Example
+2026-10-19: lows 81,762 → 81,749 (double-tap) → 81,770 (higher low), bodies
+shrinking, 5m divergence under it. **The base earns a LONG — but the ENTRY
+waits for the reclaim** (price back above the relevant EMA), never the touch.
+The touch is where knives live; the reclaim is where the base is proven.
+RSI < 30 is bounce FUEL (raises reclaim odds), never a signal by itself —
+the knife-catch cluster (0/6) is the cost of forgetting this.
+
+### 6. Two lines for every open trade
+
+Every open position is stated with exactly two lines: **invalidation** (SL —
+the thesis is dead here) and **confirmation** (the level that proves the
+thesis — prior structure, EMA reclaim, measured target). Every position update
+leads with where price sits BETWEEN the two lines. If you can't state both
+lines in one sentence, the trade isn't defined — close it or size it down.
+
+### 7. Adding to positions = separate tranche, tighter rules
+
+Adds are NEW trades, not extensions: own SL/own TP/signal tag `ai-trader-pending`
+or `ai-trader-manual`. The add's SL is TIGHTER than the original (a round-trip
+on the add = the add thesis was wrong, exit; the original tranche keeps its
+own wider SL). Never stack TPs at the same level — the add's TP sits BEFORE
+the original's (e.g. add TP 82,600 vs system TP 83,687). Chop-regime adds are
+half-size or skipped.
+
+### 8. Trust protocol — who outranks whom, by regime
+
+| Regime | Direction authority | Evidence |
+|--------|--------------------|--------------------|
+| **TREND** (0-1 flips/24h) | The score | Analysis direction went 4/4 in trend phases |
+| **CHOP** (2+ flips/24h) | The CEO's live-tape reads | Score went 0/2 in chop; reads caught every flip |
+| **Always** | Risk engineering (levels/size/slip) is the analyst's job regardless | #16273's paper 4.9:1 paid 2.2:1 without a slip buffer |
+
+When score and reads disagree: the score sets SIZE (its confidence is real
+information), the reads set DIRECTION and TIMING. Never let a negative score
+silence a verified read — arm the read as a conditional order with the score's
+objections priced into the SL.
+
+### 9. Post-trade attribution — close the loop on every trade
+
+After every manual/armed trade closes, run attribution BEFORE the next
+full-analysis: who called the direction (score / CEO read / both / neither),
+what regime, entry quality (did price respect the level), outcome, and the
+lesson. Track it as a running scorecard — the 4/4 vs 0/2 split was only
+visible because each trade was attributed. An unattributed trade teaches
+nothing. Append to `brain/trading.md` or the session log.
+
+### 10. Dead-volume discipline
+
+Volume < 0.5x across the executing TFs = no conviction on EITHER side:
+scores go negative both ways (correctly), level-breaks fire on thin tape, and
+market entries have no edge. In dead volume: (a) bias to conditional orders
+over market entries, (b) require the confirmation close WITH volume ≥ 1.2x
+for momentum adds, (c) halve size. The #16283 add (0.5x volume at entry) and
+the #16273 short (0.0-0.4x) both died of the same missing ingredient.
+
 ## Analysis Script
 
 Run this to get the complete picture:
@@ -433,13 +540,13 @@ python3 /root/.hermes/scripts/ai_trader_precheck.py COIN DIRECTION
 ═══════════════════════════════════════════
 
 📋 0. CURRENT POSITIONS
-  Open: [list open positions on this coin + status]
-  Recent closed: [last trade exit reason + PnL]
-  [If open: "Currently LONG/SHORT at X, SL at Y, unrealized Z%"]
-  [If just closed: "Last trade closed by [reason] at [PnL]%"]
+  Open: [each trade + the TWO LINES: invalidation / confirmation]
+  Recent closed: [exit reason + PnL + attribution: who called it]
+
+⚠️ CHOP CHECK: [N flips/24h — CHOP or TREND regime]
 
 📊 1. MULTI-TIMEFRAME
-  [TF results]
+  [TF results — label forming-candle reads "(forming)"]
 
 📈 2. CONTINUUM
   [continuum data]
@@ -447,14 +554,21 @@ python3 /root/.hermes/scripts/ai_trader_precheck.py COIN DIRECTION
 📐 3. SUPPORT/RESISTANCE
   [key levels]
 
-🔄 4. CONTRARIAN CHECK
-  [contrarian analysis]
+🔄 4. CONTRARIAN + DIVERGENCE
+  [contrarian analysis — label divergence type per taxonomy §3]
 
-🎯 5. VERDICT
-  [LONG/SHORT/NO TRADE + reasoning + probability score]
+🎯 5. SCORE
+  [raw score → chop-adjusted score + regime flag]
+
+🎯 6. VERDICT — two parts:
+  DIRECTION: [LONG/SHORT/NONE + who outranks here per §8 trust protocol]
+  ENTRY: [the LEVEL + tight structural SL + TP + planned AND real R:R
+          (with slip buffer) — or "no trade, level never came"]
 
 ═══════════════════════════════════════════
 ```
 
 ## Date
-Created 2026-10-16 combining all analysis skills.
+Created 2026-10-16 combining all analysis skills. Decision Protocol added
+2026-10-19 after the 9-trade manual BTC session (chop failures #16250/#16273,
+confirmation lesson #16283, divergence taxonomy from the 1m/5m/1h reads).

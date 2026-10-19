@@ -1322,3 +1322,6 @@
 - **WARN** (1x each): `hermes-signal-reporter.service` and `hermes-upgrade-implementer.service` failed with systemd start timeout. Both are Type=oneshot analysis jobs; signal-reporter completed its git push (RC:0) before the kill, upgrade-implementer was mid-analysis. Neither is on the trading path.
 - **AUTO-FIX**: `systemctl reset-failed` on both units — cleared failed state, timers remain active for next scheduled retry (6h / 12h cadence).
 - **INFO**: Disk at 83% (under 85% threshold); no logs >7d to compress. Core timers (pipeline, price-collector, 1m-candle, watchdog) all active. Prices fresh (~43s). 0 open positions, 14 closed today -$0.35. Regime SHORT_BIAS. 43 signals/h. No trading-path issues.
+
+## Health Check — 2026-10-19 21:43 UTC
+- **OK**: No WARN or CRITICAL issues. Disk at 83% (watch, threshold 85%). 1 open trade (LTC LONG @ 59.74). 18 signals/1h. Prices fresh (<1 min).
