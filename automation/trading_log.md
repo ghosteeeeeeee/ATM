@@ -12274,3 +12274,25 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader-pending 24h 2T 0W still under kill threshold
 - 7d -$4.05 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - ARB pump-chain+ LONG open — watch if it becomes 4th consecutive neg-hour contributor
+
+## [2026-10-19 13:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 losses)
+**PnL:** -$0.04 last hour | 24h 18T 9W -$0.36 (50.0% WR) | 7d 201T 68W -$4.09 (33.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- Loss: ARB pump-chain+ LONG atr_sl_hit -$0.04 (-1.67%) — single occurrence, pump-chain+ 24h 1T 0W under 3T kill threshold
+- atr_sl_hit 6/18 = 33% last 24h (healthy, under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour (only 1 close); ai-trader-pending still 24h 2T 0W under 3T threshold
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (8/9/10 negative broke by flat 11:00; 12:00 -$0.04 single)
+- Size-reduce 0.3x stays (7d WR 33.8% < 35%, 7d PnL -$4.09 < -$2)
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader-pending 24h 2T 0W still under kill threshold
+- 7d -$4.09 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- pump-chain+ only 1 trade in 24h — not enough data to judge
