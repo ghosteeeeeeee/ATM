@@ -1,20 +1,23 @@
 {
-  "timestamp": "2026-10-19T07:43:28Z",
-  "run": "brain_auditor #18",
+  "timestamp": "2026-10-19T08:44:50Z",
+  "run": "brain_auditor #19",
   "session_lock": "none (full captain mode)",
   "portfolio_health_watchdog": "CRITICAL (stale label — 24h healed to +$0.09)",
   "trade_summary_24h": {
-    "trades": 12,
-    "wins": 7,
-    "pnl": 0.09,
-    "wr": 58.3,
-    "note": "HEALED from -$0.12 to +$0.09. All 5 losses tiny (max -$0.09 unleveraged), well-capped by trail/SL family. Winners: ME +1.17%, ETC +2.12%, HBAR +3.29%, BTC +4.31%."
+    "trades": 15,
+    "wins": 8,
+    "wr": 53.3,
+    "pnl": -0.02,
+    "note": "HEALED. Trail family wins 8/8. Chop losses capped (max -$0.10)."
   },
   "trade_summary_7d": {
-    "trades": 195,
-    "wins": 66,
-    "pnl": -3.76,
-    "wr": 33.8
+    "trades": 197,
+    "wins": 67,
+    "wr": 34.0,
+    "pnl": -3.79,
+    "trail": "61T +$5.78 90.2pct WR",
+    "chop": "121T -$9.34 3.3pct WR",
+    "note": "Wealth gap unchanged. Aging heals: Oct 12/13 negative days age out Oct 20-21."
   },
   "wealth_gap_14d": {
     "TRAIL": "116T 81.9% +$9.90",
@@ -22,33 +25,64 @@
     "OTHER": "53T 50.9% +$1.86",
     "fundamental_truth_reconfirmed": true
   },
-  "losing_trade_autopsy_24h": {
-    "losers": 5,
-    "total_loss": -0.24,
-    "new_patterns": 0,
-    "detail": [
-      "BTC ai-trader-pending SHORT -$0.06: EMA300 squeeze cohort (n=7 watch) — known",
-      "ETC bb-bounce-v2-long+ -$0.09 HML 6min: chop entry never armed — known (same-signal flip: ETC won +2.1% trail next trade)",
-      "HYPE volume-buildup- SHORT -$0.03: noise n=1 — known",
-      "PUMP ai-trader- SHORT -$0.05 EXTREME: armed-reverse paradox cohort — known",
-      "LDO pump-chain+ LONG -$0.01 atr_trail: tiny trail exit — healthy"
-    ],
-    "verdict": "All 5 = known cohorts. Zero new patterns. Losses properly capped. Risk management working."
-  },
+  "losing_trade_autopsy_24h": [
+    {
+      "trade": "LDO ai-trader+ LONG -$0.10",
+      "regime": "EXTREME",
+      "rsi": 53.57,
+      "root_cause": "Known ai-trader+ EXTREME LONG cohort (7d: 12T 16.7pct -$0.75). Shadow AI_TRADER_EXTREME_LONG would have demoted conf 70.5 to 49.4 < MIN_EXEC_CONF 50. First would-block.",
+      "action": "Shadow collecting. Flip criteria pre-registered."
+    },
+    {
+      "trade": "BTC ai-trader-pending LONG -$0.04",
+      "regime": "FLAT",
+      "root_cause": "Add-long confirm fired into EMA300 squeeze. Same squeeze killed prior SHORT 16273. Cut at atr_sl -1.67pct in 60m.",
+      "action": "EMA300 fail-flip shadow (last run) covers. Monitor."
+    },
+    {
+      "trade": "LTC warrior-sr-confirm+ LONG -$0.03",
+      "regime": "NORMAL",
+      "rsi": 73.47,
+      "root_cause": "Overbought chase. Under LONG_RSI_CEILING=75 so passed. 70+ band 7d 13T -$0.62 30.8pct.",
+      "action": "CEO froze ceiling to Oct 24. No action."
+    },
+    {
+      "trade": "BTC ai-trader-pending SHORT -$0.06",
+      "regime": "FLAT",
+      "root_cause": "Counter-trend short into EMA300. Known n=7 watch. Flipped to LONG 16283 correctly.",
+      "action": "EMA300 fail-flip shadow covers. Monitor."
+    },
+    {
+      "trade": "ETC bb-bounce-v2-long+ LONG -$0.09",
+      "regime": "NORMAL",
+      "rsi": 50.0,
+      "root_cause": "Pure chop, died in 6 minutes via hard_max_loss. Trail never armed. Correct exit.",
+      "action": "TAT shadow would not catch 6min death. hard_max_loss doing its job."
+    },
+    {
+      "trade": "HYPE volume-buildup- SHORT -$0.03",
+      "regime": "NORMAL",
+      "rsi": 38.1,
+      "root_cause": "Oversold short opened Oct 18 08:11 under old floor=35. Floor reverted to 45 same day. Would be blocked now.",
+      "action": "Floor-45 revert working. No action."
+    },
+    {
+      "trade": "PUMP ai-trader- SHORT -$0.05",
+      "regime": "EXTREME",
+      "rsi": 66.67,
+      "root_cause": "EXTREME short. Known cohort. Cut at atr_sl in 62m.",
+      "action": "No new pattern."
+    }
+  ],
   "watchdog_steer_verification": {
-    "steer_001_pending_order": "RESOLVED — btc-add-long-confirm FIRED → #16283 BTC LONG @ 82859 5x live. State: fired. Correct side of EMA300 trend.",
-    "steer_005_wrong_side": "Partially stale — losses are tiny and capped (+$0.09 net 24h). Direction correct: 3 open LONGs aligned with STRONG_UP. LTC@RSI73.5 + GRASS@70.2 overbought chases flagged but under ceiling 75, 2h time-exit covers stalls.",
-    "steer_cluster": "Acknowledged — 3 longs + BTC add = 4 long exposure, all trend-aligned. Moderate."
+    "steer-001_wrong_side": "PARTIALLY STALE. 24h net -$0.02 nearly flat, 53.3 WR. Losers are known cohorts (LDO ai-trader+ EXTREME, BTC EMA300 squeeze n=7, LTC RSI73 chase under CEO freeze, ETC bb-bounce 6min chop, HYPE pre-revert floor). Zero new patterns. Trail family winning 8/8."
   },
   "last_run_verify": {
-    "ai_trader_precheck_CONF_fix": "PASS — code live at line 322-325, CONF argv parsed",
-    "SHORT_floor_45": "HOLDING — 0 trades RSI 35-45 SHORT since Oct 18 revert",
-    "ai_trader_EXTREME_LONG_shadow": "COLLECTING — AI_TRADER_EXTREME_LONG_SHADOW_ENABLED=True MULT=0.7, n=0 still",
-    "floor_admit_shadow": "COLLECTING — last entry 07:25 HYPE warrior-sr-confirm+ floor-admitted conf 49.5",
-    "MFE_CUT_shadow": "True, zero-behavior collecting",
-    "CHASE_RATIO_shadow": "True, collecting",
-    "doji_kill": "HOLDING — DOJI_BOTTOM_ENABLED=False",
-    "protected_flags": "13/13 INTACT"
+    "vacation_guardrail_precedence_fix": "PASS. Code at :279 parenthesized OR. Zero behavior change today (pnl_7d=-3.79, both false).",
+    "short_floor_45": "PASS. 0 violations since Oct 18 revert. HYPE@38.1 was pre-revert.",
+    "ai_trader_extreme_long_shadow": "COLLECTING. First would-block today (LDO conf 70.5 to 49.4). n~1 since Oct 18.",
+    "doji_kill": "PASS. 0 trades since Oct 16.",
+    "size_reduce_0.3x": "ACTIVE. Auto-clears Oct 20-21 via aging. 24h WR 53.3 supports lift."
   },
   "size_reduce_math": {
     "current": "0.3x active (marker written 07:26 today)",
@@ -60,20 +94,44 @@
   "drift_findings": [
     "CURRENT.md resume projection (~Oct 23, both conditions) was pessimistic — actual lift condition is WR>=37 OR pnl>=0, and aging alone crosses 37 by Oct 21. Corrected."
   ],
-  "config_changes_applied": [
-    "vacation_guardrail.py:279 operator-precedence bugfix (parenthesized OR) — safety, zero behavior change today"
-  ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
-    "precheck CONF fix: PASS (verified in code)",
-    "SHORT floor-45: HOLDING (0 violations)",
-    "EXTREME LONG shadow: still n=0 collecting",
-    "soak discipline #17: maintained — no trading-parameter changes"
+    {
+      "change": "vacation_guardrail.py:279 precedence fix",
+      "verified": "PASS",
+      "impact": "Zero behavior change today (correct, latent bug)"
+    }
   ],
   "next_actions": [
-    "Oct 20: size-reduce likely auto-clears (WR>=37 at today pace) — first full-size day, watch closely",
-    "Oct 23 CEO eyeball: 12+ unvalidated changes + BE-ratchet shadow + trail_activated stamp",
-    "ai-trader+ EXTREME re-eval at n>=20",
-    "contrarian pump-chain- PROMOTE re-eval ~Oct 29",
-    "Escalation to CEO: size-reduce lift is aging-artifact — consider staged 0.3→0.6→1.0 lift"
+    "Oct 20-21: size-reduce auto-clears, watch first full-size trades (lift watch protocol)",
+    "Oct 23: resume-day CEO eyeball, 12+ unvalidated changes + BE-ratchet shadow + trail_activated stamp",
+    "ai-trader+ EXTREME LONG shadow re-eval at n>=20 (flip criteria pre-registered)",
+    "LONG 70+ band: no action until Oct 24 CEO freeze lifts",
+    "self_learner candle-OOS backtest STILL UNDELIVERED (escalation standing since Oct 13)"
+  ],
+  "open_trades": {
+    "count": 1,
+    "DOGE": "ai-trader+ LONG 16284, -0.29pct, NORMAL, hold"
+  },
+  "creative_improvements": [
+    {
+      "date": "2026-10-19T08:44:50Z",
+      "idea": "ai-trader+ EXTREME LONG shadow flip criteria pre-registration",
+      "rationale": "Shadow live since Oct 18 16:45. First would-block today (LDO -$0.10). 7d cohort 12T 16.7pct -$0.75 = worst signal x regime cell. Pre-registering flip criteria prevents deliberation drift.",
+      "flip_criteria": "Shadow n>=20 AND would-block cohort WR < 30pct AND would-keep cohort WR > 50pct AND net would-save > $1.00 then flip MULT=0.7 to live demote.",
+      "expected_impact": "Block ~60pct of ai-trader+ EXTREME LONG losers (7d: -$0.75) while keeping HIGH/FLAT winners (+$0.16).",
+      "category": "entry sniper",
+      "status": "pre-registered",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-19T08:44:50Z",
+      "idea": "Size-reduce lift watch protocol (operational)",
+      "rationale": "0.3x auto-clears Oct 20-21 via window aging, not proven recovery. First full-size day needs eyeball.",
+      "protocol": "First 5 full-size trades after lift: if 2+ losers or any loss > $0.50, re-pause via vacation_guardrail. Trail family (90pct WR) justifies full size; chop family (3pct) does not.",
+      "category": "risk",
+      "status": "operational",
+      "risk": "medium"
+    }
   ]
 }

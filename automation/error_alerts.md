@@ -1297,3 +1297,8 @@
 ## Error Alerts — 2026-10-18 18:43 UTC
 - **WARN** (ongoing since 16:44): `hotset.json empty — no signals survived compaction` — 22 signals in last hour, 12 trades closed today (live trading active), but compactor admits 0 to hotset (MON has hot_cycle_count=2 but decision=SKIPPED). Same gate-tuning issue already flagged for CEO at 16:44 — no new action, just confirming still active.
 - **NO AUTO-FIXES NEEDED**: all 4 core timers active, pipeline 30/30 successful runs in 30min, hl-sync-guardian active, disk 82% (under 85%), prices fresh (87 tokens, ~100s), 0 open positions, 0 phantoms, 0 failed units, hermes-metrics/coding-mcp still correctly disabled.
+
+## Error Alerts — 2026-10-19 07:26 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3548s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3375s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3375s left, N failures)`

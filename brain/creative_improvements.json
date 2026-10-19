@@ -5551,5 +5551,24 @@
     "status": "suggested",
     "risk": "zero (shadow)",
     "implementation": "position_manager close-path: if exit_reason in (HML, atr_sl) AND trade direction counter to EMA300 alignment at open → append paper order to ema300_flip_shadow.jsonl"
+  },
+  {
+    "date": "2026-10-19T08:44:50Z",
+    "idea": "ai-trader+ EXTREME LONG shadow flip criteria pre-registration",
+    "rationale": "Shadow live since Oct 18 16:45. First would-block today (LDO -$0.10). 7d cohort 12T 16.7pct -$0.75 = worst signal x regime cell. Pre-registering flip criteria prevents deliberation drift.",
+    "flip_criteria": "Shadow n>=20 AND would-block cohort WR < 30pct AND would-keep cohort WR > 50pct AND net would-save > $1.00 then flip MULT=0.7 to live demote.",
+    "expected_impact": "Block ~60pct of ai-trader+ EXTREME LONG losers (7d: -$0.75) while keeping HIGH/FLAT winners (+$0.16).",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-19T08:44:50Z",
+    "idea": "Size-reduce lift watch protocol (operational)",
+    "rationale": "0.3x auto-clears Oct 20-21 via window aging, not proven recovery. First full-size day needs eyeball.",
+    "protocol": "First 5 full-size trades after lift: if 2+ losers or any loss > $0.50, re-pause via vacation_guardrail. Trail family (90pct WR) justifies full size; chop family (3pct) does not.",
+    "category": "risk",
+    "status": "operational",
+    "risk": "medium"
   }
 ]
