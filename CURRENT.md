@@ -1,61 +1,55 @@
-# Current State — brain_auditor Run Oct 19 05:35 UTC
+# Current State — brain_auditor Run Oct 19 06:38 UTC
 
-**Last Updated: 2026-10-19 05:35 UTC**
-**Updated by: brain_auditor — 0 config changes (soak #16), precheck CONF fix verified PASS**
+**Last Updated: 2026-10-19 06:38 UTC**
+**Updated by: brain_auditor — 0 config changes (soak #17), precheck CONF fix verified PASS**
 
-## PIPELINE STATUS (05:35 UTC)
+## PIPELINE STATUS (06:38 UTC)
 
 - **Trading LIVE** with 0.3x size-reduce (7d WR 33.8% < 37 AND 7d PnL −$3.79 < $0 — both resume conditions still failing). Resume ~Oct 23.
-- **24h 13T 6W −$0.12 (46.2%). | 7d 195T 66W −$3.79 (33.8%). | 30d 747T 330W −$3.53 (44.2%).**
-- **0 open.** Regime: SHORT_BIAS (66/127 tokens), NORMAL vol, BTC trend_quality UP, above EMA300.
+- **24h 12T 5W −$0.12 (41.7%). | 7d 195T 66W −$3.79 (33.8%). | 30d 746T 44.2% −$3.48.**
+- **4 open LONG** (ME +0.44 / GRASS +0.07 / LTC −0.42 / LDO −0.20). Regime: btc_15m LONG_BIAS, btc_4h SHORT_BIAS, BTC above EMA300 ~16h STRONG_UP, NORMAL vol.
+- LTC@RSI73.5 + GRASS@70.2 = overbought chases (watchdog flagged) — PM 2h time-exit covers stalls. 70-75 band historically OK (30d 42T 50% +$1.91 under live ceiling 75).
 - Protected flags 13/13 INTACT.
 
-## THIS RUN — brain_auditor #16 (45min follow-up to 04:45)
+## THIS RUN — brain_auditor #17 (63min follow-up to #16 05:35)
 
-**0 config changes** (soak discipline; resume-day stack already 12+ unvalidated).
+**0 config changes** (soak discipline #17; 12+ unvalidated changes queued for Oct 23).
 
-**LAST-RUN VERIFY:**
-- ai_trader_precheck CONF argv fix — **PASS** (live output shows regime gate evaluating with conf instead of fail-open)
+**LAST-RUN VERIFY (all PASS/HOLDING):**
+- ai_trader_precheck CONF argv fix — PASS (auto_1hr logs show conf-aware regime gate)
 - SHORT floor-45 — HOLDING (0 trades RSI 35-45 SHORT since Oct 18 revert)
-- ai-trader+ EXTREME LONG conf-demote shadow — n=0 since ship, collecting, re-eval at n≥20
-- bb-bounce-v2-long+ kill-watch — CLEARED (ETC trail +$0.05; 3d still 8T 3W −$0.25 monitor)
+- ai-trader+ EXTREME LONG conf-demote shadow — n=0, still collecting
+- doji kill / bb-bounce watch — HOLDING / CLEARED
 
-**STEER-001 VERIFIED (5 wrong-side losses >2%):**
-- BTC SHORT −5.36% at EMA300 floor (MFE≈0, squeezed 26m; manual LONG 7min later +4.31%)
-- ETC −4.13% HML 6m chop, BANANA −2.24%, IO −2.11% TAT — alt LONGs in SHORT_BIAS chop
-- PUMP SHORT −2.10% armed-reverse (MFE 0.58% → ATR SL, EXTREME)
-- All covered by existing entry defenses — no new filter (n too small, soak)
+**24h LOSING AUTOPSY: all 5 losers = known cohorts, zero new patterns.**
+- BTC SHORT EMA300 squeeze (n=7 watch) | ETC chop HML | HYPE volume-buildup- noise n=1 | PUMP EXTREME armed-reverse (paradox cohort) | IO floor-admit
 
-## ATR-SL MFE PARADOX (3rd consecutive run — THE remaining lever)
+**DRIFT FOUND: Oct-17 'LONG 70+ only-positive-band' claim DECAYED** — aggregate 7d −$0.68 / 30d −$0.16, but 70-75 sub-band fine (30d +$1.91). The ≥75 tail (blocked Oct 14 ceiling) was the drag. No action; do NOT promote 70+ aggregate at Oct-24 freeze lift.
 
-| Cohort | n | PnL | Note |
-|--------|---|-----|------|
-| atr_sl_hit MFE≥0.40, 7d | 20/52 | −$0.98 | trail threshold reached, still ATR SL |
-| Same, 14d | 29 | −$1.67 | 24/29 EXTREME, avg MFE 0.82% |
-| pump-chain- slice, 7d | 11 | −$0.48 | biggest signal slice |
-| False-kill risk pool | 97 winners | +$11.19/14d | trail winners with MFE≥0.40 — unknown how many dip below BE after arm |
+**atr_sl MFE PARADOX UNCHANGED (3rd run):** 7d 20T −$0.98 17/20 EXTREME | 14d 29T −$1.67 24/29 EXTREME. BE-ratchet shadow deferral to Oct 23 REAFFIRMED (reversing #16 63min later = churn).
 
-**CREATIVE PRE-REGISTERED: EXTREME post-arm breakeven-ratchet SHADOW** — zero-behavior spec in creative_improvements.json; flip criteria save>$1 AND fk<10% AND candle-OOS PASS. **Added to Oct 23 resume-day stack — NOT shipped now.**
-
-## WEALTH GAP (7d) — UNCHANGED
+## WEALTH GAP (14d)
 
 | Family | Trades | WR | PnL |
 |--------|--------|-----|-----|
-| Trail family (PM/atr_trail/rr/trail_sl) | ~60 | ~90% | **+$5.70** |
-| hard_max_loss + atr_sl_hit + hard_sl | 108 | 0.9% | −$8.84 |
+| TRAIL | 92 | 83.7% | +$5.06 |
+| CHOP | 170 | 0.6% | −$15.58 |
+
+## CREATIVE (this run)
+
+1. **trail_activated + close-time MFE metadata stamp — PRE-REGISTERED → Oct 23 stack** (session brain: mfe_pct only computed when guardian_closed, 1/200 trades — every arm analysis needs candle re-derivation; stamp makes BE-ratchet review SQL-native). Single PM close-path review with BE-ratchet shadow.
+2. **pump-chain family = atr_trail profit engine watch** — 16/21 atr_trail winners are pump-chain family, $3.07 of $3.37 total. Family edge = ATR-trail path only; other paths net −$1.59. Confirms TAT+trail architecture.
 
 ## ACTIVE SHADOWS
 
-- ai-trader+ EXTREME LONG conf-demote — n=0 since Oct 18 16:45, collecting
-- pp-conditional penalty floor — 637 events in floor_admit_shadow.jsonl
-- MFE-CUT / bb-bounce TAT (single-condition) / contrarian PROMOTE — collecting
+- ai-trader+ EXTREME LONG conf-demote — n=0 since Oct 18 16:45
+- pp-conditional penalty floor — collecting in floor_admit_shadow.jsonl
+- MFE-CUT / bb-bounce TAT / contrarian PROMOTE / ARM-BE — collecting
 - RR-engine would-blocks — ~10/hr
 
 ## NEXT
 
-- Oct 23 resume-day CEO eyeball: 12+ unvalidated changes + BE-ratchet shadow spec
+- Oct 23 resume-day CEO eyeball: 12+ unvalidated changes + BE-ratchet shadow + trail_activated stamp (both pre-registered)
 - ai-trader+ EXTREME re-eval at n≥20
 - contrarian pump-chain- PROMOTE re-eval ~Oct 29
-- hl_copy NORMAL recheck at n≥10
-- Infra gap: trail_activated bool not stamped to trade metadata (verify arm from DB impossible; PM close-path candidate)
-- self_learner candle-OOS still missing — brain_auditor runs scoped sims when needed
+- LONG 70+ band: no Oct 24 promotion (aggregate decayed; ceiling 75 covers tail)

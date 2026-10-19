@@ -1,123 +1,95 @@
 {
-  "timestamp": "2026-10-19T05:39:47Z",
-  "agent": "brain_auditor",
-  "run_type": "audit #16 soak (follow-up to 04:45 run, 45min later)",
+  "timestamp": "2026-10-19T06:38:11Z",
+  "run": "brain_auditor #17 (63min follow-up to #16 05:35)",
+  "config_changes_applied": [],
+  "soak_status": "#17 — 0 changes. 12+ unvalidated changes already queued for Oct 23 resume-day review. Session lock absent (no other agent active). Nothing in 63min of new data forces a change.",
   "session_brain_stats": {
-    "queries": 3,
-    "top_hits": "pump-chain-short filter requests, chop v2, trend following signal demand"
+    "queries": ["atr stop mfe paradox breakeven ratchet", "overbought chase rsi entry quality", "pump chain short losing"],
+    "notable": "Session brain confirms MFE root cause known: MFE only computed by hl-sync-guardian when guardian_closed=True (1/200 trades) — DB mfe_pct mostly NULL/stale, which is why every arm-rate analysis needs candle re-derivation. trail_activated metadata stamp remains the structural fix."
   },
-  "trade_summary_24h": {
-    "trades": 13,
-    "wins": 6,
-    "pnl": -0.12,
-    "wr": 46.2
+  "trade_summary": {
+    "24h": "12T 5W -$0.12 (41.7%)",
+    "7d": "195T 66W -$3.79 (33.8%)",
+    "30d": "746T 44.2% -$3.48",
+    "size_reduce": "0.3x ACTIVE (both resume conditions still failing)",
+    "open": "4 LONG (ME +0.44, GRASS +0.07, LTC -0.42, LDO -0.20) — all aligned LONG_BIAS/above-EMA300; LTC@RSI73.5 + GRASS@70.2 overbought chases flagged by watchdog, PM time-exit covers stalls"
   },
-  "trade_summary_7d": {
-    "trades": 195,
-    "wins": 66,
-    "pnl": -3.79,
-    "wr": 33.8,
-    "size_reduce": "0.3x ACTIVE (both resume conditions failing, resume ~Oct 23)"
+  "last_run_verify": {
+    "ai_trader_precheck_CONF_argv_fix": "PASS — auto_1hr logs show regime gate evaluating with conf since 04:41",
+    "SHORT_floor_45": "HOLDING — 0 trades in RSI 35-45 SHORT band since Oct 18 11:48 revert",
+    "ai_trader_EXTREME_shadow": "n=0 since Oct 18 16:45 — still collecting (0 EXTREME LONG ai-trader+ closes since ship)",
+    "bb_bounce_kill_watch": "CLEARED at #16, ETC trail win still the last close of that signal",
+    "doji_kill": "HOLDING — 0 trades since Oct 16 20:30 (7d 16T -$0.97 is pre-kill aging)",
+    "extreme_0.85_demote": "EXTREME 3d 18T 22.2% -$0.84 — bleed continues but contained; demote is conf-level not block"
   },
-  "trade_summary_30d": {
-    "trades": 747,
-    "wins": 330,
-    "pnl": -3.53,
-    "wr": 44.2
-  },
-  "open_trades": 0,
-  "regime": "SHORT_BIAS 66/127 tokens, NORMAL vol, BTC trend_quality UP, above EMA300",
-  "changes_from_last_run": [
+  "losing_trade_autopsy_24h": [
+    {"trade": "BTC SHORT -$0.06 (-5.36% price)", "signal": "ai-trader-pending", "regime": "FLAT", "root_cause": "EMA300-floor squeeze, MFE~0, 26m hold — known cohort n=7 monitor (manual LONG +4.31% 7min later)", "verdict": "COVERED — EMA300-proximity watch monitoring"},
+    {"trade": "ETC LONG -$0.09 (-4.13%)", "signal": "bb-bounce-v2-long+", "regime": "NORMAL", "root_cause": "6m chop HML — never armed; same coin/signal won +2.1% next trade via trail", "verdict": "COVERED — TAT shadow collecting; kill-watch cleared by that win"},
+    {"trade": "HYPE SHORT -$0.03 (-1.32%)", "signal": "volume-buildup-", "regime": "NORMAL", "root_cause": "201m hold to atr_sl_hit — sold weakness into bounce; signal still 14d 9T 77.8% +$0.35", "verdict": "NOISE — n=1, best-short-signal watch stands"},
+    {"trade": "PUMP SHORT -$0.05 (-2.10%)", "signal": "ai-trader-", "regime": "EXTREME", "root_cause": "armed-reverse: MFE 0.58% -> ATR SL. THE paradox cohort (24/29 EXTREME)", "verdict": "COVERED — EXTREME post-arm BE-ratchet shadow pre-registered Oct 23"},
+    {"trade": "IO LONG -$0.08 (-2.11%)", "signal": "pump-chain+", "regime": "HIGH", "root_cause": "floor-admit leak (pp=0.053 exec 49.5 via 0.5 floor) + zero-momentum chop", "verdict": "COVERED — pp-cond floor shadow collecting; CEO owns floor revert"}
+  ],
+  "drift_findings": [
     {
-      "change": "ai_trader_precheck CONF argv[3] parse (04:41)",
-      "verified": "PASS — live run shows 'SHORT regime gate: FLAT vol — gate not applied' instead of conf-unknown fail-open",
-      "status": "HOLDING"
-    },
-    {
-      "change": "dual-condition TAT OOS = FAIL (documented, not shipped)",
-      "verified": "N/A — correctly not shipped",
-      "status": "CLOSED"
-    },
-    {
-      "change": "STANDALONE_BYPASS bb-bounce comment hygiene (Oct 18 23:43)",
-      "verified": "comment-only, tuple untouched",
-      "status": "HOLDING"
+      "item": "Oct 17 'LONG 70+ = only positive band' claim",
+      "status": "DECAYED — REVERSED by ceiling-75 pollution removal",
+      "detail": "7d 12T 25% -$0.68 / 14d 36T -$0.73 / 30d 77T -$0.16 for RSI>=70. BUT 70-75 sub-band (under live ceiling): 7d 6T wash -$0.06, 14d 23T +$0.72, 30d 42T 50% +$1.91. The >=75 tail (blocked since Oct 14 ceiling fix) was dragging the aggregate. Live 70-75 band is fine — LTC@73.5/GRASS@70.2 entries are in the historically OK band.",
+      "action": "None. CEO freeze to Oct 24 stands; when lifted, do NOT promote 70+ aggregate — ceiling 75 already covers the bad tail."
     }
   ],
-  "last_run_verify": {
-    "precheck_conf_argv": "PASS",
-    "short_floor_45": "HOLDING — 0 trades RSI 35-45 SHORT since revert Oct 18 11:48",
-    "ai_trader_extreme_shadow": "COLLECTING n=0 (0 EXTREME LONG ai-trader trades since ship 16:45 Oct 18) — re-eval stays at n>=20",
-    "size_reduce_0.3x": "ACTIVE — 7d WR 33.8%<37 AND PnL -3.79<0 both failing",
-    "bb_bounce_kill_watch": "CLEARED — ETC trail win +$0.05, now 3T 1W; 3d still 8T 3W -0.25 monitor",
-    "protected_flags": "13/13 INTACT"
-  },
-  "steer_triage": {
-    "steer-001_wrong_side_5_losses": "VERIFIED — BTC SHORT -5.36% (EMA300-floor squeeze, MFE~0), ETC -4.13% HML 6m chop, BANANA -2.24%, IO -2.11% TAT, PUMP -2.10% armed-reverse (MFE 0.58 EXTREME). All fit known patterns; existing defenses (midband, floor-45, sweet-spot, TATs) already cover entry side."
-  },
-  "losing_autopsy_24h": {
-    "losers": 7,
-    "clusters": [
-      {
-        "pattern": "alt LONG in SHORT_BIAS chop",
-        "trades": "ETC -4.13 HML, BANANA -2.24 atr_sl, IO -2.11 TAT",
-        "root_cause": "bounce entries with MFE<0.40 never armed — chop habitat",
-        "action": "covered by existing TAT/dead-gap/midband stack; n=3 no new filter"
-      },
-      {
-        "pattern": "BTC SHORT at EMA300 floor",
-        "trades": "BTC -5.36% ai-trader-pending, MFE -0.00%, squeezed in 26m; manual LONG 7min later +4.31%",
-        "root_cause": "shorting into EMA300 support while structure up",
-        "action": "n=1 today, BTC SHORTs 14d only 7T — insufficient for filter; monitor"
-      },
-      {
-        "pattern": "armed-reverse (MFE>=0.40 then ATR SL)",
-        "trades": "PUMP SHORT -2.10% MFE 0.58 EXTREME",
-        "root_cause": "trail armed but reversal pierced trail+ATR SL in EXTREME vol",
-        "action": "see creative — EXTREME post-arm BE-ratchet pre-registered"
-      }
-    ]
-  },
-  "atr_sl_mfe_paradox_quantified": {
-    "finding": "20/52 atr_sl_hit (7d) reached MFE>=0.40 trail-arm threshold yet exited via ATR SL, netting -$0.98. 14d: 29T -$1.67, avg MFE 0.82%, 24/29 EXTREME vol.",
-    "concentration": "pump-chain- 11T -$0.48; EXTREME 24T -$1.19",
-    "why_not_shipped": "BE-ratchet false-kill risk pool = 97 trail winners with mfe>=0.40 (+$11.19/14d). Unknown how many dip below BE after arming — needs candle OOS. Trades-level save upper bound $1.67/14d vs unknown winner-kill cost.",
-    "lever_status": "pre-registered creative, not shipped"
-  },
-  "drift_findings": [],
   "recurring_problems": [
-    "Wealth gap structural: 7d CHOP/SL 108T 0.9% -$8.84 vs trail-family 60T ~90% +$5.70 — entry-quality stack deployed, exit-magnitude (armed-reverse) is remaining lever",
-    "self_learner candle-OOS backtests still undelivered (multiple P0s closed by brain_auditor running scoped versions instead)"
+    {
+      "problem": "atr_sl_hit MFE paradox — 3rd consecutive run tracking",
+      "data": "7d 20T -$0.98 17/20 EXTREME avg MFE 0.77% | 14d 29T -$1.67 24/29 EXTREME avg MFE 0.82%",
+      "status": "UNCHANGED — biggest remaining lever. EXTREME post-arm BE-ratchet shadow pre-registered, deliberately in Oct 23 stack (not shipped — would reverse #16 deferral 63min later = churn; shadows ship with the review batch)",
+      "structural_note": "DB mfe_pct mostly unavailable (guardian_closed only 1/200) — every analysis needs candle re-derivation. trail_activated+MFE metadata stamp would make this queryable from PG permanently."
+    },
+    {
+      "problem": "Wealth gap trail vs chop",
+      "data": "14d: TRAIL 92T 83.7% +$5.06 vs CHOP 170T 0.6% -$15.58 | 7d: 51T +$1.91 vs 108T -$8.84 | 3d: 22T +$0.92 vs 29T -$2.75",
+      "status": "UNCHANGED — entry-filter family exhausted per Oct 16 verdict; exit-side (BE-ratchet + TAT) is the only path. Size-reduce 0.3x correctly dampening chop exposure."
+    },
+    {
+      "problem": "EXTREME regime dominance",
+      "data": "7d 104T (53% of all trades!) 25% WR -$2.00; 3d 18T 22.2% -$0.84",
+      "status": "Monitor — conf-level defenses live (0.85 demote, ai-trader shadow n=0). Market has been volatile; not a filter gap."
+    }
   ],
   "missing_implementations": [
-    "trail_activated bool not written to trade metadata — cannot verify from DB whether trail mechanism actually armed on the 20 paradox trades (only mfe_pct peak exists). PM close-path could stamp it."
+    "trail_activated + close-time MFE stamp to trade metadata (PM close-path) — promoted to pre-registered this run; makes Oct 23 BE-ratchet review + all future arm-rate analysis DB-queryable",
+    "self_learner candle-OOS infra — still the bottleneck for every exit-side flip (BE-ratchet fk pool 97 winners +$11.19/14d needs it)"
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-19T05:39:47Z",
-      "idea": "EXTREME post-arm breakeven-ratchet SHADOW (pre-registered, zero-behavior spec)",
-      "rationale": "14d armed-reverse cohort 29T -$1.67, 24/29 EXTREME, avg MFE 0.82% round-trips to ATR SL. Third consecutive run quantifying this. Distinct from failed MFE-CUT (fixed-time cut) and dual-TAT — this is continuous stop management after arm.",
-      "spec": "In position_manager: when trailing arms (peak>=0.40%), log would_ratchet event; on close via atr_sl_hit/hard_max_loss with mfe>=0.40, log counterfactual BE-exit pnl. Also track min-price-after-arm for eventual trail winners (false-kill measurement). Zero behavior change.",
-      "flip_criteria": "14d shadow: save>$1 AND false-kill<10% of trail winners AND candle-OOS PASS (self_learner). EXTREME scope only first.",
-      "expected_impact": "up to +$0.84/7d raw on armed-reverse cohort",
-      "status": "pre-registered — NOT shipped (resume-day stack: 12+ unvalidated changes already land Oct 23; add to that review, do not stack now)",
-      "risk": "low (shadow-only when shipped)"
+      "date": "2026-10-19T06:38:11Z",
+      "idea": "trail_activated + close-time MFE metadata stamp (infra, zero-behavior)",
+      "rationale": "Session brain + 3 consecutive runs: mfe_pct unavailable from DB (guardian_closed 1/200), every arm-rate/paradox analysis needs candle re-derivation. Stamping trail_activated bool + MFE at close in position_manager makes Oct 23 BE-ratchet review trivially queryable and permanently kills this analysis tax.",
+      "expected_impact": "Zero trading impact; cuts audit cost ~30min/run and enables SQL-native arm-rate cuts (signal x regime x band) without candle joins",
+      "category": "infra",
+      "status": "pre-registered (Oct 23 stack alongside BE-ratchet shadow — single PM close-path review)",
+      "risk": "low (metadata write at close only)"
     },
     {
-      "date": "2026-10-19T05:39:47Z",
-      "idea": "BTC SHORT EMA300-proximity watch",
-      "rationale": "BTC SHORT -5.36% at EMA300 floor (MFE~0) then manual LONG +4.31% 7min later. 14d BTC SHORTs 7T 3W -$0.22. Prior: #16258 raked to BE at same level.",
-      "status": "monitor — n=7 < 20, insufficient. If 2 more EMA300-floor BTC SHORT losses in 14d window, escalate filter proposal.",
-      "risk": "n/a"
+      "date": "2026-10-19T06:38:11Z",
+      "idea": "pump-chain family = atr_trail profit engine (allocation watch)",
+      "rationale": "7d atr_trail_hit winners: pump-chain+ 8T +$2.17, pump-chain- 7T +$0.89, v6- 1T — 16/21 trades and $3.07 of $3.37 total. The pump-chain family's entire edge routes through ATR-trail exits; HML+TAT+atr_sl paths net -$1.59. Confirms TAT (stall cut) + trail (ride) split is the right architecture for this family. No config action — informational for Oct 23 allocation discussion.",
+      "category": "allocation",
+      "status": "monitor",
+      "risk": "none"
     }
   ],
-  "config_changes_applied": [],
+  "changes_from_last_run": [
+    {"change": "ai_trader_precheck CONF argv fix (#16 04:41)", "result": "PASS — live logs show conf-aware regime gate"},
+    {"change": "SHORT floor 35->45 revert (Oct 18)", "result": "HOLDING — 0 band trades since"},
+    {"change": "bb-bounce kill-watch clear (#16)", "result": "HOLDING — no new bb-bounce closes"},
+    {"change": "EXTREME post-arm BE-ratchet pre-registration (#16)", "result": "STILL pre-registered — deferral to Oct 23 reaffirmed (63min reversal would be churn)"}
+  ],
   "next_actions": [
-    "Oct 23 resume-day review: 12+ unvalidated changes + this pre-registered BE-ratchet shadow spec",
-    "ai-trader+ EXTREME re-eval at n>=20 (currently n=0 since ship)",
-    "contrarian pump-chain- PROMOTE re-eval ~Oct 29 (14d span gate)",
-    "hl_copy NORMAL recheck at n>=10",
-    "Watch bb-bounce-v2-long+ (3d 8T 3W -$0.25) — kill threshold if next loss",
-    "Escalation: self_learner candle-OOS capability still missing — brain_auditor runs scoped sims when needed"
-  ]
+    "Oct 23 resume-day CEO eyeball: 12+ unvalidated changes + BE-ratchet shadow + trail_activated stamp (both now pre-registered)",
+    "ai-trader+ EXTREME re-eval at n>=20 (still n=0)",
+    "contrarian pump-chain- PROMOTE re-eval ~Oct 29",
+    "LONG 70+ band: no Oct 24 promotion — aggregate decayed, ceiling 75 covers tail",
+    "Watch open book: LTC/GRASS overbought chases — PM 2h time-exit covers stalls, no manual intervention"
+  ],
+  "protected_flags": "13/13 INTACT (LIVE_TRADING_ENABLED=True verified, no CEO_PROTECTED_FLAGS touched)"
 }

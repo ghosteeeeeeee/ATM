@@ -5514,5 +5514,22 @@
     "category": "entry sniper",
     "status": "monitor (n<20)",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-19T06:38:11Z",
+    "idea": "trail_activated + close-time MFE metadata stamp (infra, zero-behavior)",
+    "rationale": "mfe_pct unavailable from DB (guardian_closed 1/200), every arm-rate analysis needs candle re-derivation (3 consecutive runs). Stamp trail_activated bool + MFE at close in position_manager -> Oct 23 BE-ratchet review SQL-queryable, kills recurring analysis tax.",
+    "expected_impact": "Zero trading impact; ~30min/audit saved; enables native signal x regime x band arm-rate cuts",
+    "category": "infra",
+    "status": "pre-registered (Oct 23 stack alongside BE-ratchet shadow — single PM close-path review)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-19T06:38:11Z",
+    "idea": "pump-chain family = atr_trail profit engine (allocation watch)",
+    "rationale": "7d atr_trail_hit: pump-chain+ 8T +$2.17, pump-chain- 7T +$0.89, v6- 1T = 16/21 trades and $3.07 of $3.37. Family's entire edge routes through ATR-trail exits; other paths net -$1.59. Confirms TAT+trail split architecture. No config action — Oct 23 allocation context.",
+    "category": "allocation",
+    "status": "monitor",
+    "risk": "none"
   }
 ]
