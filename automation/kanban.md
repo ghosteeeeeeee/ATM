@@ -102,3 +102,6 @@
 
 ## TEAM UPDATES
 - [2026-10-19 03:28] auto_1hr: No config change — 0 trades closed last hour. 24h 13T 5W −$0.32 (30.8%), 7d 195T 65W −$4.00 (33.3%). Size-reduce 30% stays. atr_sl_hit 38.5% (near 40% threshold). Kill watch: bb-bounce-v2-long+, hl_copy_trader, pump-chain+ all 2T 0W, one more loss each = kill. 2 open (BTC LONG, ME LONG), no 3-neg-hour streak.
+
+## TEAM UPDATES
+- [2026-10-19 07:30] auto_1hr: No config change — 1T last hour (ME bb-bounce-v2-long+ profit-monster-trail +$0.04). 24h 12T 7W −$0.12 (58.3%), 7d 195T 66W −$3.79 (33.8%). Size-reduce 0.3x stays. atr_sl_hit 25% (healthy). Kill watch: none (pump-chain+ 7d is +$0.59 profitable, earlier 2T 0W was rolling-window artifact). 4 open (BTC, LDO, LTC, GRASS), no 3-neg-hour streak.

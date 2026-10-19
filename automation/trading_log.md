@@ -12138,3 +12138,26 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - pump-chain+ at 2T 0W — 1 more loss kills it
 - 4 open trades — bb-bounce-v2-long+ has ME open; kill is 0% WR only, so safe unless it drops to 0% again
 - 7d still -$3.79 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+
+## [2026-10-19 07:30] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses)
+**PnL:** +$0.04 last hour | 24h 12T 7W -$0.12 (58.3% WR) | 7d 195T 66W -$3.79 (33.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 win: ME bb-bounce-v2-long+ LONG profit-monster-trail +$0.04 (+1.16%) — healthy trail exit
+- atr_sl_hit 3/12 = 25% last 24h (healthy, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour (only 1 trade closed)
+- pump-chain+ 7d: 31T 10W +$0.59 (32% WR but profitable — earlier "2T 0W -$0.09" was a 24h rolling window artifact, not a kill candidate)
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (04:00 +$0.05, 06:00 +$0.04 — last 2 active hours both positive)
+- 4 open: BTC ai-trader-pending LONG @82859, LDO ai-trader+ LONG @0.3965, LTC warrior-sr-confirm+ LONG @60.02, GRASS r2v2-long3 LONG @0.5983
+- Size-reduce 0.3x stays (7d WR 33.8% < 35%, 7d PnL -$3.79)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d still -$3.79 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- 24h WR recovering (58.3%) but PnL still slightly negative — watch
+- pump-chain+ 7d profitable (+$0.59) despite low WR — no action needed
