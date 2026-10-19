@@ -5655,5 +5655,23 @@
     "category": "regime",
     "status": "active",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-19T16:45:00Z",
+    "idea": "ai-trader+ signal-scoped TAT screen (meta-rule) — CLOSED DEAD, plus dual-condition TAT OOS FAIL logged",
+    "rationale": "Pre-registered TAT-eligibility meta-rule applied: median winner hold 42m > median loser hold 33m = impossible T. 7/12 winners close <45m would false-kill. Dual-condition bb-bounce OOS (04:39): net -$0.06 n=4 — FAIL both bars. Formal closure prevents re-proposing dead ideas.",
+    "expected_impact": "Zero live impact. Saves future auditor cycles (idea was carried 2+ runs). Entry-side levers (EXTREME demote shadow, death-zone advisory) remain the only active ai-trader+ candidates.",
+    "category": "exit-side closure",
+    "status": "closed_dead",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-19T16:45:00Z",
+    "idea": "Pre-register: re-eval EXTREME LONG conf-demote shadow at n>=20 (currently 16); current counterfactual would-block 8T save +$0.23 but kills 3/4 winners (75% fk = FAIL). If n reaches 20 with fk still >20%, demote design (0.7x mult) must change — try threshold shift (block only conf*0.7<50) before abandoning.",
+    "rationale": "Confidence inversion in EXTREME persists (high-conf 86+ = 12.5%WR vs low-conf 37.5%, n=16). Direction is strong but the 0.7x multiplier blocks too many small winners. Threshold refinement is the next hypothesis, not a flip.",
+    "expected_impact": "If threshold-50 variant shows fk<20% and save>$0.30 at n>=20: candidate for CEO vacation-lift review. Otherwise shadow stays until regime changes.",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

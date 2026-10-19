@@ -1,36 +1,34 @@
-# Current State — brain_auditor Run Oct 19 14:45 UTC
+# Current State — brain_auditor Run Oct 19 16:45 UTC
 
-**Last Updated: 2026-10-19 14:45 UTC**
-**Updated by: brain_auditor #22 — 0 config changes (vacation mode + soak #22)**
+**Last Updated: 2026-10-19 16:45 UTC**
+**Updated by: brain_auditor #23 — 0 config changes (vacation mode + soak #23)**
 
-## PIPELINE STATUS (14:45 UTC)
+## PIPELINE STATUS (16:45 UTC)
 
-- **Trading LIVE** with 0.3x size-reduce (7d WR 33.8% < 37 AND pnl −$4.09 < $0). **⚠️ Size-reduce auto-clears Oct 20-21 via aging. LIFT WATCH PROTOCOL: first 5 full-size trades — 2+ losers or any loss >$0.50 → re-pause.**
-- **24h 16T 8W −$0.34 (50% WR healed). | 7d 201T 33.8% −$4.09. | TRAIL 62T 90.3% +$5.81 vs CHOP 126T 3.2% −$9.91 (7d, wealth gap ~$15.72).**
-- **0 open — flat. Correct posture in STRONG_DOWN/BELOW EMA300 (516 bars).**
-- **⚠️ REGIME FLIP REVERSED: 12:36 LONG_BIAS was bounce-in-downtrend — BTC fell back below EMA300, STRONG_DOWN/MARKDOWN restored. System correctly stayed flat (1 trade post-12:00).**
+- **Trading LIVE** with 0.3x size-reduce (7d WR 34.0% < 37 AND pnl −$4.09 < $0). **⚠️ Size-reduce auto-clears Oct 20-21 via aging. LIFT WATCH PROTOCOL: first 5 full-size trades — 2+ losers or any loss >$0.50 → re-pause.**
+- **24h 16T 8W −$0.34 (50% WR healed). | 7d 200T 34.0% −$4.09. | TRAIL 74T 79.7% +$5.39 vs CHOP 115T 0.9% −$9.60 (7d, wealth gap $14.99).**
+- **0 open — flat. Correct knife-edge posture: BTC 0.2% below EMA300 (82188 vs 82373), STRONG_DOWN trend quality, RECOVERY phase stalling.**
+- **4 quiet hours since 12:00 — correct.** LONGs blocked by trend filter; SHORTs lack clean setup (watchdog: "forcing a pick repeats the morning's mistake").
 - **Vacation mode ACTIVE** — shadow-first, no enforcement flips. Lifts when T returns.
 - Protected flags 13/13 INTACT.
 
-## THIS RUN — brain_auditor #22
+## THIS RUN — brain_auditor #23
 
-**0 config changes** (vacation mode + soak #22; all candidates fail verification bars).
+**0 config changes** (vacation mode + soak #23; all candidates fail verification bars).
 
-**EXTREME DEMOTE SHADOW RE-EVAL (scheduled Oct 19): KEEP SHADOW.** Post-ship n=2 (LDO+ARB both would-block losers, directional positive). 14d backtest: would-block 8T save +$0.23 but kills 3/4 winners (75% winner-kill = FAILS <20% bar). Re-eval at n≥20.
+**ai-trader+ TAT-ELIGIBILITY SCREEN = FAIL — idea FORMALLY DEAD.** Meta-rule (pre-registered Oct 17): winner med hold 42m > loser med hold 33m = impossible T. 7/12 winners close <45m would false-kill. Prior creative "signal-scoped exit T=25-30" closed. Verdict: `brain/verdicts/2026-10-19_ai-trader-tat-eligibility-screen.md`.
 
-**NEW FINDING: EXTREME confidence inversion.** ai-trader+ high-conf (86+) in EXTREME = 1W/7L vs low-conf (24-73) = 3W/5L. Confidence inversely correlated with outcome in EXTREME. n=16 below 30 bar — pre-registered for monitor.
+**Dual-condition TAT OOS (bb-bounce, 04:39 run) PROCESSED: FAIL.** net −$0.06, n=4 fires (<15 bar), fk 7.4% passes but net/n fail. Flip path closed; live shadow stays instrumentation-only (3 would-fires on 7d: ME/ETC/BABY).
 
-**WATCHDOG STEER TRIAGE:**
-- steer-001 wrong-side 7 losses — VERIFIED: all known cohorts (mid-RSI LONGs, stale bb-bounce, bounce-catches, floor-admits). Defenses firing. No new filter.
-- steer-002 ai-trader+ 3-loss streak — VERIFIED but n=3 below bar. EXTREME LONG 16T 25% −$0.81 = drag. Shadow covers.
+**EXTREME DEMOTE SHADOW RE-EVAL (scheduled Oct 19): KEEP SHADOW.** n=16<20; would-block 8T save +$0.23 but kills 3/4 winners (75% fk = FAILS). Pre-registered refinement for n≥20 re-eval: try threshold conf*0.7<50 instead of <60.
 
-**LOSING AUTOPSY 24h:** zero new patterns — all 8 losers known cohorts, shadows would-catch 5/8.
+**LOSING AUTOPSY 24h: 8 losers, ZERO new patterns** — all known cohorts (ai-trader+ mid-RSI ×3, ME stale TAT-covered, ARB floor-admit, BTC bounce-catch, LTC variance).
 
-**LAST-RUN VERIFY all PASS:** vacation_guardrail precedence ✓ | SHORT floor-45 ✓ | precheck CONF ✓ | TAT wire-check resolved (2/15 fires) | pp-cond shadow 654 events ✓.
+**LAST-RUN VERIFY all PASS:** SHORT floor-45 ✓ (2T +$0.01) | death-zone advisory ✓ (7d LONG 45-55 = −$2.02 bleed) | pp-cond shadow ✓ (665 events) | MFE-CUT/TAT ✓ (ME 2nd live would-fire) | vacation guardrail ✓.
 
-**Sideways: market_phase RECOVERY stale** (wyckoff MARKDOWN + STRONG_DOWN + 516 bars below EMA300) — flag to watchdog owner.
+**Sideways: hotset fallback DB query returned 0 tokens** (pipeline log 16:32) — flag to hotset owner. Prior: market_phase RECOVERY stale (wyckoff MARKDOWN + STRONG_DOWN) — still flagged.
 
-## PREVIOUS RUN #21 (13:40 UTC)
+## PREVIOUS RUN #22 (14:45 UTC)
 
 - **Trading LIVE** with 0.3x size-reduce (7d WR 33.8% < 35 AND pnl −$4.09 < −$2). **⚠️ Size-reduce auto-clears Oct 20-21 via aging. LIFT WATCH PROTOCOL: first 5 full-size trades — 2+ losers or any loss >$0.50 → re-pause.**
 - **24h 18T 9W −$0.36 (50% WR). | 7d 201T 33.8% −$4.09. | TRAIL 8T 100% +$0.36 vs CHOP 10T 10% −$0.72 (24h, 100% separated).**

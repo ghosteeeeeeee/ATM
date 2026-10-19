@@ -1,157 +1,89 @@
 {
-  "timestamp": "2026-10-19T14:37:42Z",
+  "timestamp": "2026-10-19T16:39:46.950188+00:00",
+  "agent": "brain_auditor",
+  "run": 23,
+  "session_lock": "none",
+  "vacation_mode": true,
+  "config_changes_applied": [],
   "session_brain_stats": {
-    "queries": 1,
-    "top_relevance": 0.846,
-    "note": "signal starvation + manual trade penalty insights"
+    "queries": 2,
+    "top_hits": "ema300_dip_short entry-condition check; opposite-side counterfactual (TURBO SHORT +4.45%); pullback-entry SHORT trend-purity (works EXTREME 71%, fails NORMAL 33%)"
   },
   "trade_summary_24h": {
     "trades": 16,
     "wins": 8,
     "pnl": -0.34,
     "wr": 50.0,
-    "note": "WR healed; losses all known cohorts"
+    "open": 0,
+    "closed_since_last_run": 0,
+    "note": "4 quiet hours post-14:45 — correct flat in knife-edge (BTC 0.2% below EMA300, STRONG_DOWN trend quality, RECOVERY phase)"
   },
   "trade_summary_7d": {
-    "trades": 201,
-    "wins": 68,
+    "trades": 200,
+    "wr": 34.0,
     "pnl": -4.09,
-    "wr": 33.8,
-    "trail": {
-      "trades": 62,
-      "wr": 90.3,
-      "pnl": 5.81
-    },
-    "chop": {
-      "trades": 126,
-      "wr": 3.2,
-      "pnl": -9.91
-    },
-    "size_reduce": "0.3x active, both resume conditions FAIL, auto-clears Oct 20-21 via aging"
+    "trail_family": "74T 79.7% +$5.39",
+    "chop_family": "115T 0.9% -$9.60",
+    "wealth_gap": "$14.99"
   },
-  "drift_findings": [
-    {
-      "finding": "market_phase RECOVERY appears stale — wyckoff MARKDOWN + STRONG_DOWN + BELOW EMA300 516 bars",
-      "severity": "low",
-      "action": "flag to watchdog owner; no code change (vacation mode)"
-    }
-  ],
-  "recurring_problems": [
-    "EXTREME regime = chop habitat: 7d 106T 25.5% −$2.02, both directions bleed (LONG −$1.34 / SHORT −$0.68)",
-    "Trail vs chop wealth gap unchanged: TRAIL +$5.81 vs CHOP −$9.91 (7d)",
-    "ai-trader+ EXTREME LONG 14d 16T 25% −$0.81 = worst ai-trader+ cohort (demote shadow collecting n=2)"
-  ],
-  "missing_implementations": [
-    "self_learner candle-OOS backtest still undelivered (P0, carried 10+ runs)",
-    "ARM-BE ratchet v6 exit-stack integration (only PASS verdict, deferred Oct 23)"
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-10-19T14:37:42Z",
-      "idea": "EXTREME confidence inversion — ai-trader+ high-conf (86+) trades in EXTREME are 1W/7L while low-conf (24-73) are 3W/5L. Confidence is inversely correlated with outcome in EXTREME.",
-      "rationale": "14d EXTREME LONG conf distribution: conf 86-205 kept cohort net −$0.58 (1W/7L); conf 24-73 blocked cohort net −$0.23 (3W/5L). If pattern holds at n≥30, demote should target HIGH conf specifically, not blanket 0.7x. Current 0.7x demote fails winner-kill bar (75%) — keep shadow.",
-      "expected_impact": "If validated: targeted high-conf demote could save ~$0.58/14d in EXTREME with <20% winner-kill",
-      "category": "entry sniper",
-      "status": "pre-registered",
-      "risk": "low",
-      "sample": "n=16 (below 30 bar — monitor only)"
-    },
-    {
-      "date": "2026-10-19T14:37:42Z",
-      "idea": "Regime-flip natural experiment first data point: 12:36 LONG_BIAS flip reversed in <2h (bounce-in-downtrend), n=1 trade (ARB pump-chain+ −0.04). Validates bounce-risk flagged Oct 19.",
-      "rationale": "BTC fell back below EMA300 (516 bars), STRONG_DOWN restored. System correctly stayed flat during flip window. Re-eval Oct 21 per pre-registration.",
-      "expected_impact": "Data point only — confirms flip was noise, not regime change",
-      "category": "regime",
-      "status": "active",
-      "risk": "none"
-    }
-  ],
-  "config_changes_applied": [],
-  "changes_from_last_run": [
-    {
-      "change": "vacation_guardrail precedence fix (#20)",
-      "result": "PASS — size-reduce fresh 13:26, 0.3x active"
-    },
-    {
-      "change": "SHORT floor-45 revert (#18)",
-      "result": "PASS — 0 violations"
-    },
-    {
-      "change": "ai-trader precheck CONF argv fix (#20)",
-      "result": "PASS — precheck functional"
-    },
-    {
-      "change": "EXTREME demote shadow (#17)",
-      "result": "COLLECTING n=2 post-ship; 14d backtest FAILS winner-kill bar (75%) — keep shadow"
-    },
-    {
-      "change": "TAT wire-check (#21)",
-      "result": "RESOLVED — fires validated on BANANA+ME, 2/15 toward threshold"
-    },
-    {
-      "change": "pp-cond floor shadow",
-      "result": "654 events / 64 would-blocks; CEO resume-day decision Oct 20-21"
-    }
-  ],
-  "next_actions": [
-    "Oct 20-21: size-reduce auto-clears via aging — LIFT WATCH: first 5 full-size trades, 2+ losers or any loss >$0.50 → re-pause",
-    "Oct 20-21: surface pp-conditional floor flip to CEO (executed cohort 32T −$1.40, shadow 64 would-blocks)",
-    "Oct 21: regime-flip cohort 48h check — first data point logged (flip reversed, n=1)",
-    "ai-trader+ EXTREME LONG shadow re-eval at n>=20 (currently n=2 post-ship)",
-    "EXTREME confidence inversion monitor — recheck at n>=30",
-    "self_learner candle-OOS backtest P0 — still undelivered",
-    "TAT shadow: 2/15 fires toward 15-fire flip threshold"
-  ],
   "watchdog_steer_triage": [
     {
       "id": "steer-001",
       "title": "7 recent losses wrong-side",
-      "verdict": "VERIFIED — all known cohorts (ai-trader+ mid-RSI LONGs, bb-bounce stale, BTC bounce-catches, ARB floor-admit). Defenses firing. No new filter.",
-      "action": "monitor"
+      "verdict": "VERIFIED-STRUCTURAL (3rd cycle)",
+      "action": "known cohorts, defenses firing, no new filter"
     },
     {
       "id": "steer-002",
       "title": "ai-trader+ 3-loss streak",
-      "verdict": "VERIFIED but n=3 below bar. 14d 29T 41.4% −$0.80. EXTREME LONG = drag (16T 25% −$0.81). Shadow covers.",
-      "action": "shadow collecting"
+      "verdict": "VERIFIED n=3 below bar",
+      "action": "EXTREME LONG 20T 30% -$0.85 = structural drag; demote shadow collecting"
     }
   ],
-  "losing_autopsy_24h": [
-    {
-      "trade": "ME bb-bounce stale_exit −0.26",
-      "root": "57m stale — TAT shadow would catch (validation fire)",
-      "cohort": "known"
-    },
-    {
-      "trade": "ARB ai-trader+ hard_max_loss −0.10 EXTREME",
-      "root": "conf 25.5 floor-admit — pp-cond would-block",
-      "cohort": "known"
-    },
-    {
-      "trade": "LDO ai-trader+ atr_sl_hit −0.10 EXTREME",
-      "root": "conf 70.5 — EXTREME demote target (shadow n=2)",
-      "cohort": "known"
-    },
-    {
-      "trade": "BTC pending SHORT −0.06 / LONG −0.04",
-      "root": "bounce-catch in flip window — regime noise",
-      "cohort": "known"
-    },
-    {
-      "trade": "DOGE ai-trader+ −0.05 NORMAL",
-      "root": "mid-RSI LONG, death-zone advisory covers",
-      "cohort": "known"
-    },
-    {
-      "trade": "ARB pump-chain+ −0.04",
-      "root": "floor-admit, pp-cond would-block",
-      "cohort": "known"
-    },
-    {
-      "trade": "LTC warrior-sr −0.03",
-      "root": "noise, n=1",
-      "cohort": "known"
-    }
+  "losing_autopsy_24h": {
+    "losers": 8,
+    "new_patterns": 0,
+    "clusters": [
+      "ai-trader+ mid-RSI LONG x3 (ARB/DOGE/LDO, RSI 46-54, -$0.25) — death-zone advisory + EXTREME demote shadow cover",
+      "ME bb-bounce stale_exit 57m -$0.26 — TAT shadow 2nd live would-fire validated",
+      "ARB pump-chain+ floor-admit conf 29.5 — pp-cond shadow would-block"
+    ],
+    "verdict": "all known cohorts; zero new patterns"
+  },
+  "last_run_verify": {
+    "extreme_demote_re_eval": "KEEP SHADOW — n=16<20 bar; would-block 8T save +$0.23 but fk 3/4=75%>20% bar. Re-eval n>=20.",
+    "short_floor_45": "HOLDING — 2 SHORTs post-revert, net +$0.01, no RSI<45 bleed",
+    "death_zone_advisory": "HOLDING — 7d LONG 45-55 band = -$2.02 bleed confirms advisory value",
+    "pp_cond_floor_shadow": "COLLECTING — 665 events (GMX latest, would-block false)",
+    "mfe_cut_tat_shadow": "COLLECTING — ME #16287 second live would-fire (stale_exit 57m mfe=-0.017)",
+    "vacation_guardrail": "ACTIVE — size-reduce 0.3x; auto-clears Oct 20-21; lift-watch protocol stands",
+    "protected_flags": "13/13 INTACT"
+  },
+  "new_findings": [
+    "ai-trader+ TAT-eligibility meta-rule screen: FAIL (winner med hold 42m > loser med 33m = impossible T). Prior creative 'ai-trader+ signal-scoped exit T=25-30' FORMALLY DEAD. Verdict: brain/verdicts/2026-10-19_ai-trader-tat-eligibility-screen.md",
+    "Dual-condition TAT OOS (bb-bounce, run 04:39): net -$0.06 n=4 — FAIL net and n bars. Flip path closed; shadow stays instrumentation-only.",
+    "7d LONG RSI bands: 50-55 still worst (23T -$1.54 21.7%); 55-60 sweet spot holds (21T +$0.43 52.4%). No new action (advisory+boost already deployed).",
+    "14d arm-rate: volume-buildup- 77.8% 9T +$0.35 best; pump-chain- 65.2%; ai-trader+ 48.3% -$0.80 worst-of-volume. Small-n monitor only."
   ],
-  "protected_flags_check": "13/13 INTACT"
+  "drift_findings": [],
+  "recurring_problems": [
+    "ai-trader+ LONG counter-trend bleed 20T/7d -$0.85 — entry-side shadows (EXTREME demote, death-zone) are the only levers; exit-side closed by meta-rule",
+    "chop-family exit magnitude unchanged: 115T 0.9%WR -$9.60 vs trail 74T 79.7% +$5.39"
+  ],
+  "missing_implementations": [
+    "exit-stack counterfactual daily scorecard (pre-registered Oct 19 run #22 — still not built)",
+    "ARM-BE v6 integration review (CEO escalation carried)"
+  ],
+  "creative_improvements": [
+    "CLOSED: ai-trader+ signal-scoped TAT (meta-rule FAIL, formal verdict written)",
+    "PRE-REG: EXTREME demote threshold refinement at n>=20 (block conf*0.7<50 instead of <60) if fk stays >20%"
+  ],
+  "config_changes_applied_note": "0 changes — vacation mode + all candidates fail verification bars",
+  "next_actions": [
+    "Oct 20-21: size-reduce auto-clears — lift-watch protocol (first 5 full-size trades, 2+ losers or any loss >$0.50 -> re-pause)",
+    "EXTREME demote shadow re-eval at n>=20 (currently 16)",
+    "Oct 21: regime-flip cohort 48h check (wrong-side root cause resolve)",
+    "Oct 21: surface pp-cond floor flip to CEO (vacation lifts, cohort n>=20 met)",
+    "Sideways: hotset fallback DB query returned 0 tokens (pipeline log 16:32) — flag to hotset owner"
+  ]
 }
