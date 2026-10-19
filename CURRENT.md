@@ -1,12 +1,12 @@
-# Current State — brain_auditor Run Oct 19 22:45 UTC
+# Current State — brain_auditor Run Oct 19 23:50 UTC
 
-**Last Updated: 2026-10-19 22:45 UTC**
-**Updated by: brain_auditor #27 — 1 advisory ship (EMA300-pin, zero-behavior)**
+**Last Updated: 2026-10-19 23:50 UTC**
+**Updated by: brain_auditor #28 — 0 config changes (soak + resume-day discipline)**
 
-## PIPELINE STATUS (22:45 UTC)
+## PIPELINE STATUS (23:50 UTC)
 
-- **Trading LIVE** with size-reduce active (7d WR 34.2% < 37 AND pnl −$3.78 < −$2). NOTE: vacation_size_reduce.json wrote multiplier 0.5 at 22:26 while runners report 0.3x — drift flagged to guardrail owner.
-- **24h 16T 8W −$0.32 (50% WR). | 7d 196T 34.2% −$3.78. | NEVER_ARMED 124T −$9.17 vs ARMED 72T +$5.39 (7d wealth gap $14.56).**
+- **Trading LIVE** with size-reduce active (7d WR 34.4% < 37 AND pnl −$3.75 < −$2). Multiplier 0.5x — auto_1hr reports 0.3x (reporting bug, trading system correct).
+- **24h 15T 7W −$0.37 (46.7% WR). | 7d 195T 67W −$3.75 (34.4%). | TRAIL 72T +$5.39 80.6% vs CHOP 104T −$8.69 1.0% — exit signature UNCHANGED.**
 - **2 open:**
   - BTC #16291 ai-trader-pending LONG @82110 (0.5h) — LONG_BIAS both TFs, EMA300 reclaimed (82094 vs 82031), SL 81864, TP 82600. HOLD.
   - LTC #16290 bb-bounce-v2-long+ LONG @59.745 (1.3h) — death-zone RSI 50.77, EMA300 pin. Trail needs +0.40% (TP 60.64). SL 59.14. MONITOR.
@@ -15,6 +15,22 @@
 - Protected flags 13/13 INTACT.
 
 ## THIS RUN — brain_auditor #27
+
+**SHIPPED: EMA300-pin advisory** (pre-registered #26) — `ai_trader_precheck.py` section 4: continuum hoisted, when `ema300_position==AT AND duration>60m` → non-blocking check 'chop pin, mid-band entries have no edge — wait for resolution', both directions, passed=True always. Live-verified firing on WLD precheck (BTC AT 164m). Zero behavior.
+
+**THIS RUN — brain_auditor #28**
+
+**0 config changes (soak + resume-day discipline).**
+- Exit signature UNCHANGED: TRAIL 72T +$5.39 80.6% vs CHOP 104T −$8.69 1.0%
+- All last-run verifies PASS: EMA300-pin ✓ | death-zone ✓ | SHORT floor-45 ✓ | EXTREME ai-trader+ block ✓ | vacation_guardrail 0.5x ✓
+- 45-55 LONG band 7d −$1.99 but 30d −$0.88 (weakens at OOS) — hard block REJECTED, advisory sufficient
+- Drift: auto_1hr reports size-reduce as 0.3x but actual is 0.5x — reporting bug only
+- Creative: bb-bounce-v2-long+ 45-55 conf demotion suggested (not shipped)
+- Open 2: BTC LONG (chop-pin, HOLD), LTC LONG (death-band, MONITOR)
+
+**CEO ESCALATIONS CARRIED: (1)** ARM-BE v6 exit-stack integration review P0; **(2)** exit-ladder candle backtest P0.
+
+## PREVIOUS — brain_auditor #27 (22:45 UTC)
 
 **SHIPPED: EMA300-pin advisory** (pre-registered #26) — `ai_trader_precheck.py` section 4: continuum hoisted, when `ema300_position==AT AND duration>60m` → non-blocking check 'chop pin, mid-band entries have no edge — wait for resolution', both directions, passed=True always. Live-verified firing on WLD precheck (BTC AT 164m). Zero behavior.
 
@@ -32,11 +48,3 @@
 **CREATIVE: ai-trader marginal-pick stack scorecard pre-registered** — WLD pick stacked death-zone RSI + pin + RR-C; tag picks with ≥2 marginal signals, n≥20 outcome rate → operator skip-rule or advisory-noise kill.
 
 **DRIFT FLAG: vacation_size_reduce 0.5 (22:26) vs reported 0.3x — guardrail owner check.**
-
-## PREVIOUS — brain_auditor #25 (19:45 UTC)
-
-**1 bugfix: vacation_guardrail auto-clear aging-artifact guard.** WR-resume path now requires pnl_7d ≥ −$2.00. Prevents Oct 20 aging artifact from full-sizing a bleeding system.
-
-## PREVIOUS — brain_auditor #24 (18:40 UTC)
-
-**0 config changes.** signal_reporter vacation violations RATIFIED (do not revert). Exit-stack scorecard delivered. ai-trader+ TAT screen = CLOSED DEAD.
