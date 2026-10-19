@@ -379,6 +379,9 @@ SIGNAL_TYPE_OVERRIDES = {
     ('EXTREME', 'bb-squeeze'): 0.0,              # BLOCKED 2026-10-02 — 12T 50%WR -$0.15 EXTREME. HIGH 63.6%WR +$0.14 kept. signal_reporter
     ('EXTREME', 'bb-bounce-v2-long+'): 0.0,      # BLOCKED 2026-10-16 signal_reporter — 24h 3 EXTREME trades all losers (-$0.35). 14d EXTREME 9T 33.3%WR -$0.43. All-time EXTREME 12T -$0.63. FLAT 100%WR + NORMAL 50%WR +$0.33 kept — regime issue, not signal issue.
     ('EXTREME', 'bb_bounce_v2_long'): 0.0,       # underscore form
+    ('EXTREME', 'ai-trader-manual'): 1.0,       # OK 2026-10-19 signal_reporter — MUST precede 'ai-trader-' key (substring collision: 'ai-trader-' is inside 'ai-trader-manual'). EXTREME 2T 100%WR +$0.59.
+    ('EXTREME', 'ai-trader+'): 0.0,              # BLOCKED 2026-10-19 signal_reporter — 30d EXTREME 15T 26.7%WR -$0.71 (10-09..10-19). HIGH 8T 75%WR +$0.11 and NORMAL 4T 50% kept — regime issue, not signal issue.
+    ('EXTREME', 'ai-trader-'): 0.0,              # BLOCKED 2026-10-19 signal_reporter — 30d EXTREME 3T 0%WR -$0.26 (incl combo form). No winning regime for SHORT side; sibling LONG keeps HIGH/NORMAL. NOTE: also catches 'ai-trader-pending' via substring — pending EXTREME unproven (0T), acceptable block.
     ('EXTREME', 'mtf-regime-trend-'): 0.0,       # BLOCKED CEO 2026-10-06 — EXTREME 30d 2T 0%WR -$0.23. SHORT model A: EXTREME habitat only profitable with RSI>=40; this signal's oversold leaks make EXTREME a bleed zone.
     ('EXTREME', 'mtf_regime_trend_short'): 0.0,  # underscore form
     ('EXTREME', 'mtf-regime-trend+'): 0.0,       # BLOCKED — signal already disabled (MTF_REGIME_TREND_PLUS_ENABLED=False); gate defense-in-depth
@@ -417,6 +420,7 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'trend_purity'): 0.3,             # PENALIZED — bare form fallback
     ('NORMAL', 'range_reversion'): 0.3,          # PENALIZED — 30d: 6T 17%WR -$0.62. Structurally weak.
     ('NORMAL', 'range-reversion'): 0.3,          # PENALIZED — hyphen variant
+    ('NORMAL', 'ai-trader-manual'): 0.0,         # BLOCKED 2026-10-19 signal_reporter — 30d NORMAL 7T 14.3%WR -$0.28 (10-15..10-17). EXTREME 2T 100% +$0.59, FLAT 3T 100% +$0.13, HIGH 1T +$0.03 kept — regime issue, not signal issue.
     # NOTE: ('NORMAL','ema300_dip_long') removed — dead-by-theft (bare 'ema300_dip' matches first, same 0.3 value)
     # ── NORMAL: wrong-variant signals — REMOVED 2026-10-01 ──
     # ('NORMAL','bb-bounce-v2-long+'), ('NORMAL','open-skies+'), ('NORMAL','rr-struct-v2+')

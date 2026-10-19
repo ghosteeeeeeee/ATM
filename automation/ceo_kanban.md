@@ -417,3 +417,5 @@ BY: auto_1hr
 BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-18 14:45] health_monitor: Auto-fixed 2 crash-loops — `hermes-metrics.service` (7829 restarts, missing metrics_collector.py) and `hermes-coding-mcp.service` (6014 restarts, missing run_mcp_server.py), both deleted in scripts cleanup wave 3786b550. Disabled both units (non-trading path). Trading stack clean: pipeline LIVE every 1m, all core timers active, prices fresh (1.6s, 88 tokens), disk 81%, 0 errors in pipeline 30m. Signals 73 last 1h; closed today 12T −$0.07 (33.3% WR). Regime SHORT_BIAS (109 SHORT / 1 LONG / 18 NEUTRAL). No trading-path fixes needed.
+- [2026-10-19 08:20] signal_reporter: REGIME BLOCKS executed (no kills, no boosts — low volume 14T/24h). ai-trader+ EXTREME blocked (30d 15T 26.7%WR -$0.71; HIGH 75%WR +$0.11 kept). ai-trader- EXTREME blocked (3T 0%WR). ai-trader-manual NORMAL blocked (7T 14.3%WR -$0.28; EXTREME/FLAT/HIGH 100%WR kept). Substring collision fixed ('ai-trader-' matched inside 'ai-trader-manual' — specific key inserted first). FAMILY_MAP += AI_Trader family. 0 inversions. Full report: automation/signal_report.md
+BY: signal_reporter

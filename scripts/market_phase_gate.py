@@ -104,6 +104,9 @@ FAMILY_MAP = {
     'MTF_Regime_Trend': ['mtf-regime-trend', 'mtf-regime-trend+', 'mtf-regime-trend-',
                           'mtf_regime_trend', 'mtf_regime_trend_long', 'mtf_regime_trend_short'],
     'Wyckoff': ['wyckoff', 'wyckoff+', 'wyckoff-', 'wyckoff_accumulation', 'wyckoff_distribution'],
+    # added 2026-10-19 signal_reporter — ai-trader family was 'Other' (ungated composition);
+    # EXTREME LONG/SHORT + NORMAL manual now regime-blocked via volatility_gate_v2 SIGNAL_TYPE_OVERRIDES
+    'AI_Trader': ['ai-trader', 'ai-trader+', 'ai-trader-', 'ai-trader-manual', 'ai-trader-pending'],
 }
 
 # Reverse lookup: signal_type → family
