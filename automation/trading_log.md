@@ -12453,3 +12453,27 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader-pending 24h 2T 0W still under kill threshold
 - 7d -$4.01 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - 8th consecutive quiet hour — vol still ~2-3T/day pace
+
+## [2026-10-19 21:27] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h 17T 8W -$0.38 (47.1% WR) | 7d 198T 67W -$4.01 (33.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed — 9th consecutive quiet hour, vol still collapsed
+- 1 open: LTC bb-bounce-v2-long+ LONG (opened 21:11, +0.09%)
+- atr_sl_hit 7/17 = 41.2% marginally over 40% BUT tpsl fix IS deployed (verified prior runs) — n=17 noise, no alert
+- Kill check: no signal with 0% WR and 3+ trades last hour (zero trades). ai-trader-pending 24h 2T 0W still under 3T kill threshold
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (only 1 trade hour in last 9h)
+- Size-reduce 0.3x stays (7d WR 33.8% < 35%, 7d PnL -$4.01 < -$2)
+- Worst 24h signals: ai-trader+ -$0.17 (4T), bb-bounce-v2-long+ -$0.14 (4T 3W), ai-trader-pending -$0.10 (2T 0W) — all under kill threshold
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ 4T 3W but -$0.14 net — winners small, losers bigger; watch for R:R skew (LTC open is another one)
+- ai-trader-pending 24h 2T 0W still under kill threshold
+- 7d -$4.01 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- 9th consecutive quiet hour — vol still ~2-3T/day pace
