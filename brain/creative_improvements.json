@@ -5479,5 +5479,22 @@
     "category": "confidence calibration",
     "status": "pre-registered (no code — resume-day stack discipline; revisit after Oct 19 EXTREME re-eval)",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-19T04:41:55Z",
+    "idea": "Dual-condition TAT (MFE<0.20 AND live<-0.20) for bb-bounce-v2",
+    "rationale": "Last-run creative to salvage T=55 single-condition",
+    "result": "30d candle OOS FAIL: 4 fires, net -$0.06, FK 2/27. Do not ship.",
+    "category": "exit",
+    "status": "killed_by_oos",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-19T04:41:55Z",
+    "idea": "BTC-ema300-position conditional direction book",
+    "rationale": "14d: LONG when BTC BELOW EMA300 = 37T 51% +$1.01 (only pos LONG pocket); SHORT when BELOW = 23% -$1.37. Confirms Oct-16 btc_bear-long finding.",
+    "status": "monitor — confound audit (signal mix) still owed by self_learner",
+    "category": "regime",
+    "risk": "low"
   }
 ]

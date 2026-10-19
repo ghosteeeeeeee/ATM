@@ -312,14 +312,19 @@ def precheck(coin, direction, conf=None):
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
-        print("Usage: python3 ai_trader_precheck.py COIN DIRECTION")
+        print("Usage: python3 ai_trader_precheck.py COIN DIRECTION [CONF]")
         print("Example: python3 ai_trader_precheck.py W SHORT")
+        print("         python3 ai_trader_precheck.py GOAT SHORT 85")
         sys.exit(1)
 
     coin = sys.argv[1]
     direction = sys.argv[2].upper()
+    # FIX brain_auditor 2026-10-19: parse optional CONF so the SHORT regime gate
+    # (conf>=75 in NORMAL/HIGH vol) can evaluate instead of always failing with
+    # "conf unknown". precheck() already accepted conf — __main__ never passed it.
+    conf = float(sys.argv[3]) if len(sys.argv) >= 4 else None
 
-    result = precheck(coin, direction)
+    result = precheck(coin, direction, conf=conf)
 
     print(f"\n=== AI Trader Pre-check: {coin} {direction} ===")
     for c in result['checks']:

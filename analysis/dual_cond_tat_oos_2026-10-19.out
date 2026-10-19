@@ -1,0 +1,10 @@
+bb-bounce-v2-long+ 30d closed: 51
+early(<55m)=28 miss=0 fired=4
+net=$-0.06 save=$+0.11 cost=$-0.17
+cohort winners=27 false_kills=2 fk_rate=7.4%
+
+fires:
+  (16021, 'RUNE', -0.233, 0.196, -0.06, 0.034, 'save', 80.0, 'hard_max_loss')
+  (15929, 'HYPE', -0.236, 0.081, 0.04, -0.066, 'FK', 190.0, 'profit-monster-trail')
+  (16206, 'BABY', -0.693, 0.173, -0.15, 0.073, 'save', 102.0, 'atr_sl_hit')
+  (15633, 'CFX', -0.28, 0.199, 0.07, -0.101, 'FK', 95.0, 'atr_sl_hit')

@@ -1628,5 +1628,16 @@
     "after": "# bb-bounce-v2-long: ... 30d 51T 49.0%WR -$0.36 / all-time 56T 48.2% -$0.81 — old number NOT reproducible. Borderline keeper; TAT shadow needs fires; kill requires fresh backtest.",
     "rationale": "Comment-rot: non-reproducible justification could freeze a future kill/re-keep decision on fiction. Zero behavior.",
     "impact": "ZERO live behavior (py_compile + import assert PASS, tuple verified intact). Decision hygiene only."
+  },
+  {
+    "timestamp": "2026-10-19T04:41:55Z",
+    "agent": "brain_auditor",
+    "change": "ai_trader_precheck __main__ parses CONF argv[3] — SHORT regime gate now evaluable from CLI",
+    "type": "bugfix",
+    "file": "scripts/ai_trader_precheck.py",
+    "before": "precheck(coin, direction) — conf always None, gate fails \"conf unknown\"",
+    "after": "precheck(coin, direction, conf=argv[3] or None)",
+    "rationale": "Watchdog flagged: every HIGH/NORMAL vol SHORT precheck false-failed; GOAT SHORT conf 91.6 could not clear gate",
+    "impact": "ZERO live-trading behavior change; operator tooling only"
   }
 ]

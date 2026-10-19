@@ -1,74 +1,6 @@
 [
   {
     "level": "WARNING",
-    "message": "Early escalation: 48h WR 39.6% < 40.0% with 53 trades",
-    "data": {
-      "pnl_24h": 0.39,
-      "n_24h": 4,
-      "wr_24h": 75.0,
-      "pnl_48h": -1.84,
-      "n_48h": 53,
-      "wr_48h": 39.6,
-      "pnl_7d": -2.01,
-      "n_7d": 199,
-      "wr_7d": 35.2,
-      "checked_at": "2026-10-18T03:08:32.896390+00:00"
-    },
-    "ts": "2026-10-18T03:08:32.896855+00:00"
-  },
-  {
-    "level": "INFO",
-    "message": "Guardrails OK",
-    "data": {
-      "pnl_24h": 0.42,
-      "n_24h": 5,
-      "wr_24h": 80.0,
-      "pnl_48h": -1.81,
-      "n_48h": 54,
-      "wr_48h": 40.7,
-      "pnl_7d": -1.8,
-      "n_7d": 199,
-      "wr_7d": 35.7,
-      "checked_at": "2026-10-18T03:26:36.400605+00:00"
-    },
-    "ts": "2026-10-18T03:26:36.401235+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "Early escalation: 48h WR 37.7% < 40.0% with 53 trades",
-    "data": {
-      "pnl_24h": 0.36,
-      "n_24h": 6,
-      "wr_24h": 66.7,
-      "pnl_48h": -1.91,
-      "n_48h": 53,
-      "wr_48h": 37.7,
-      "pnl_7d": -1.86,
-      "n_7d": 200,
-      "wr_7d": 35.5,
-      "checked_at": "2026-10-18T03:56:38.225394+00:00"
-    },
-    "ts": "2026-10-18T03:56:38.226751+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "Early escalation: 48h WR 37.7% < 40.0% with 53 trades",
-    "data": {
-      "pnl_24h": 0.36,
-      "n_24h": 6,
-      "wr_24h": 66.7,
-      "pnl_48h": -1.91,
-      "n_48h": 53,
-      "wr_48h": 37.7,
-      "pnl_7d": -1.86,
-      "n_7d": 200,
-      "wr_7d": 35.5,
-      "checked_at": "2026-10-18T04:26:38.429443+00:00"
-    },
-    "ts": "2026-10-18T04:26:38.430022+00:00"
-  },
-  {
-    "level": "WARNING",
     "message": "Early escalation: 48h WR 38.5% < 40.0% with 52 trades",
     "data": {
       "pnl_24h": 0.36,
@@ -848,5 +780,73 @@
       "checked_at": "2026-10-19T02:26:49.840114+00:00"
     },
     "ts": "2026-10-19T02:26:49.841375+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-3.91 < $-2.00 (196T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.29,
+      "n_24h": 14,
+      "wr_24h": 35.7,
+      "pnl_48h": 0.1,
+      "n_48h": 18,
+      "wr_48h": 44.4,
+      "pnl_7d": -3.91,
+      "n_7d": 196,
+      "wr_7d": 33.7,
+      "checked_at": "2026-10-19T02:56:49.975796+00:00"
+    },
+    "ts": "2026-10-19T02:56:49.977288+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 33.3% < 35.0% AND pnl_7d $-4.00 < $-2.00 (195T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.32,
+      "n_24h": 13,
+      "wr_24h": 30.8,
+      "pnl_48h": 0.1,
+      "n_48h": 18,
+      "wr_48h": 44.4,
+      "pnl_7d": -4.0,
+      "n_7d": 195,
+      "wr_7d": 33.3,
+      "checked_at": "2026-10-19T03:26:50.221408+00:00"
+    },
+    "ts": "2026-10-19T03:26:50.222020+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-3.92 < $-2.00 (196T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.18,
+      "n_24h": 13,
+      "wr_24h": 38.5,
+      "pnl_48h": 0.18,
+      "n_48h": 19,
+      "wr_48h": 47.4,
+      "pnl_7d": -3.92,
+      "n_7d": 196,
+      "wr_7d": 33.7,
+      "checked_at": "2026-10-19T03:56:50.479124+00:00"
+    },
+    "ts": "2026-10-19T03:56:50.480778+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.0% < 35.0% AND pnl_7d $-3.91 < $-2.00 (197T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.17,
+      "n_24h": 14,
+      "wr_24h": 42.9,
+      "pnl_48h": 0.19,
+      "n_48h": 20,
+      "wr_48h": 50.0,
+      "pnl_7d": -3.91,
+      "n_7d": 197,
+      "wr_7d": 34.0,
+      "checked_at": "2026-10-19T04:26:50.669726+00:00"
+    },
+    "ts": "2026-10-19T04:26:50.670577+00:00"
   }
 ]
