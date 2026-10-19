@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-19T14:36:24.762137+00:00",
+  "timestamp": "2026-10-19T18:36:26.233296+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -23,15 +23,19 @@
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "BELOW",
-    "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "volatility": "NORMAL",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "MARKDOWN",
-    "market_phase": "RECOVERY",
+    "acceleration_state": "POSITIVE",
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "CALM",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 0
+  "open_count": 0,
+  "deep_analysis": "Flat book, short-bias tape, morning ai-trader LONGs were the wrong side. Writing analysis + INJ SHORT pick.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 (flat)\nUnrealized PnL: 0.00 USDT\nRegime: BTC transition-chop (AT EMA300, LEAN_BEAR all TFs) | Vol: LOW\nAlt tape: 103/125 SHORT_BIAS | 15m SHORT_BIAS vs 4h LONG_BIAS\n\n\u2500\u2500 Steers (automated, untouched) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 7 recent losses look like wrong-side trades\n\ud83d\udfe1 ai-trader+ losing streak: 3 losses (-0.17)\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nDirection error is the story: 15 LONGs vs 1 SHORT in 24h against a\n103:1 short-bias alt tape. Morning ai-trader LONG cluster (ARB/DOGE/LDO,\n-0.25 total, meta_rsi 46-53) was on the wrong side of the dump \u2014 winning\nside was SHORT those continuations. Exits are fine: 8/8 winners exited\nvia trail/TP, 8/8 losers SL-hit in <2.5h and never armed the trail.\nThis is entry quality, not exit quality.\n\n7d bleeding: doji-bottom-long -0.97 (31% WR), bb-bounce-v2-long -0.75,\nvolume-breakout-long 0% WR, ai-trader -1.19 (31% WR). pump-chain +0.48\nstays \u2014 it rides trails. 48h SHORT net +0.34 while LONG net -0.65:\nthe short book is the recovering side.\n\n\u2500\u2500 AI Trader Signal \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n Fired: INJ SHORT conf=75 @ 8.617, RSI 63.8\n Why: 5m SHORT_BIAS conf=88, slope -0.119, ATR 1.87%, precheck PASS\n all hard gates, RSI above death zone. Replaces unfilled FOGO SHORT.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Stay flat or SHORT-only until BTC reclaims EMA300 with bullish\n   linreg alignment \u2014 no counter-trend alt LONGs.\n2. ai-trader 7d at 31% WR / -1.19: keep picks regime-gated (this pick\n   is); if next 5 picks still lose, escalate to brain auditor for\n   signal-family review (doji-bottom / bb-bounce-v2 longs).\n3. Flat book is correct right now \u2014 no stale positions to steer.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json`, INJ SHORT written to `ai_trader_state.json`, memory stored.\n",
+  "agent_timestamp": "2026-10-19T18:13:44.026167+00:00",
+  "regime_context": "BTC: AT EMA300 (crossed up after 307min below), linreg LEAN_BEAR 1m/5m/15m/1h, zscore NEUTRAL, velocity SLOW, acceleration POSITIVE, volume LOW. Conflicting higher-TF: 15m scanner SHORT_BIAS, 4h scanner LONG_BIAS, trend_quality STRONG_UP vs market_phase DECLINING \u2014 classic transition/chop at BTC itself. Alts are NOT conflicted: 103 SHORT_BIAS / 1 LONG / 21 NEUTRAL, ICP/PNUT/INJ leading dumps with conf>88. Positioning rule for this regime: SHORT alts riding the short-bias tape; LONG only BTC-continuation signals that have already proven they can arm a trail (continuum-trend 80% WR 7d). No counter-trend alt LONGs \u2014 that is exactly how the morning cluster lost.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, last 24h/7d, meta_rsi from _signal_metadata):\n\n1. Counter-trend ai-trader LONGs (n=3: ARB/DOGE/LDO, all 2026-10-19 morning): total -0.25, 0% WR, meta_rsi 46-53 (mid-band, not oversold). WINNING side: SHORT the same dump continuations. Why we weren't on it: picks optimized RSI center-of-band without checking the 103:1 alt short-bias tape. Fix shipped: current pick is INJ SHORT.\n\n2. Mean-reversion LONG family 7d (doji-bottom-long + bb-bounce-v2-long + volume-breakout-long): n=40, net ~-1.99, WR ~31-40%. WINNING side: either SHORT the breakdown or wait for reclaim/continuation (continuum-trend+ 80% WR 7d, n=5). These signals fire bounce logic in a DECLINING phase \u2014 chop entries that never reach +0.40% trail arm.\n\n3. SL-first, trail-never pattern 24h: losers avg held 1.3h, 8/8 atr_sl_hit|hard_max_loss|stale_exit; winners avg held 1.7h, 8/8 trail|tp. The system only makes money when a trade becomes a trend. Any entry that cannot show momentum within ~1h is dead weight \u2014 early-exit bias for non-trending holds is justified by this distribution.\n\n4. SHORT book historically weak (7d SHORT n=63, 32% WR, net -0.75) \u2014 but 48h SHORT net +0.34 while LONG net -0.65. The tape turned; Shorts are the recovering side. Stay small, pick high-conf short-bias coins only (conf>=78), avoid RSI 45-55 death zone shorts (7d 15-22% WR)."
 }

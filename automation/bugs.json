@@ -668,16 +668,16 @@
       "id": "BUG-036",
       "title": "HL signing key + GitHub token + DB password leaked in plaintext into trade-watchdog.log",
       "severity": "CRITICAL",
-      "status": "OPEN",
+      "status": "FIXED",
       "files": [
         "/root/.hermes/logs/trade-watchdog.log"
       ],
       "symptom": "21 occurrences of SIGNING_KEY/GITHUB_TOKEN/BRAIN_DB_PASSWORD in plaintext (from a prior session cat-ing .secrets.local). logs/ gitignored but key signs every live HL order.",
       "root_cause": "A prior agent session printed .secrets.local contents into a log that persists.",
-      "fix": "Scrubbed trade-watchdog.log via sed (38 redaction markers, 0 real secrets remain). ROTATION STILL REQUIRED (T decision): rotate HL signing wallet, GitHub token, DB password.",
-      "verified_by": "grep -cE real-secret-pattern = 0; 38 REDACTED markers; no other logs/automation files affected.",
+      "fix": "REOPENED-AND-CLOSED 2026-10-19 (upgrade_implementer): Oct 8 scrub was incomplete \u2014 secrets RE-ACCUMULATED (BRAIN_DB_PASSWORD=Brain123 x3, ghp_ token x1) because trade-watchdog runs an opencode agent every 30min whose session transcript (incl. .secrets.local greps) lands on stderr -> trade-watchdog.log. FIX: (1) full log scrub \u2014 112 PASSWORD=REDACTED, 0 real secrets remain; (2) root cause \u2014 run_watchdog.sh now runs sed scrub on LOG_FILE + AGENT_OUTPUT via EXIT trap every run; (3) defense \u2014 trade_watchdog_prompt.md gained hard SECURITY RULES (never read .secrets.local / never echo credentials). STANDING (T action, not code): rotate the leaked GitHub token ghp_pQJy... and DB password Brain123 \u2014 both sat in plaintext for ~11 days.",
+      "verified_by": "grep -cE \"Brain123|ghp_[A-Za-z0-9]{10}\" trade-watchdog.log = 0; 112 PASSWORD=REDACTED markers; bash -n run_watchdog.sh OK; sed fixture test: PASSWORD/TOKEN/SIGNING_KEY/ghp_ all redacted, ok-line untouched.",
       "date_found": "2026-10-08",
-      "date_fixed": null,
+      "date_fixed": "2026-10-19",
       "found_by": "bug-hunter session 2026-10-08 round 2 (exchange audit)",
       "git_commit": null,
       "related_bugs": []

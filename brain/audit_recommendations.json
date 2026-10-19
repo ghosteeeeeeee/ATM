@@ -1,91 +1,282 @@
 {
-  "timestamp": "2026-10-19T16:39:46.950188+00:00",
+  "timestamp": "2026-10-19T18:40:57Z",
   "agent": "brain_auditor",
-  "run": 23,
-  "session_lock": "none",
+  "run": 24,
+  "session_lock": false,
   "vacation_mode": true,
   "config_changes_applied": [],
+  "config_changes_applied_note": "0 config changes — vacation mode (shadow-first) + soak discipline. signal_reporter's 2 vacation-violation flips RATIFIED (not reverted) — data-backed, already live, reverting = churn. Full rationale below.",
   "session_brain_stats": {
-    "queries": 2,
-    "top_hits": "ema300_dip_short entry-condition check; opposite-side counterfactual (TURBO SHORT +4.45%); pullback-entry SHORT trend-purity (works EXTREME 71%, fails NORMAL 33%)"
+    "query": "vacation enforcement / wrong-side / lift-watch",
+    "note": "session brain returned low-signal results this run; PG trade data is source of truth"
   },
   "trade_summary_24h": {
     "trades": 16,
     "wins": 8,
     "pnl": -0.34,
     "wr": 50.0,
-    "open": 0,
-    "closed_since_last_run": 0,
-    "note": "4 quiet hours post-14:45 — correct flat in knife-edge (BTC 0.2% below EMA300, STRONG_DOWN trend quality, RECOVERY phase)"
+    "direction_split": {
+      "LONG": {
+        "n": 15,
+        "pnl": -0.28,
+        "wr": 53.3
+      },
+      "SHORT": {
+        "n": 1,
+        "pnl": -0.06,
+        "wr": 0.0
+      }
+    },
+    "note": "50% WR healed from 34%. 6 quiet hours since 12:00 — 0 trades, 0 open. Flat is correct knife-edge posture (BTC below EMA300, STRONG_DOWN, 103/125 alt SHORT_BIAS)."
   },
   "trade_summary_7d": {
     "trades": 200,
-    "wr": 34.0,
+    "wins": 68,
     "pnl": -4.09,
-    "trail_family": "74T 79.7% +$5.39",
-    "chop_family": "115T 0.9% -$9.60",
-    "wealth_gap": "$14.99"
+    "wr": 34.0,
+    "by_regime": {
+      "EXTREME": {
+        "n": 106,
+        "wr": 25.5,
+        "pnl": -2.02
+      },
+      "HIGH": {
+        "n": 32,
+        "wr": 43.8,
+        "pnl": -1.09
+      },
+      "NORMAL": {
+        "n": 55,
+        "wr": 40.0,
+        "pnl": -1.05
+      },
+      "FLAT": {
+        "n": 7,
+        "wr": 71.4,
+        "pnl": 0.07
+      }
+    },
+    "by_exit_family": {
+      "never_armed_chop": {
+        "n": 88,
+        "pnl": -8.29,
+        "avg_mfe": 0.135,
+        "note": "THE bleed — MFE<0.40, SL/HML/stale exits"
+      },
+      "armed_then_reverse": {
+        "n": 27,
+        "pnl": -1.31,
+        "avg_mfe": 0.787,
+        "note": "ARM-BE shadow target"
+      },
+      "trail_family_winners": {
+        "n": 56,
+        "pnl": 5.93,
+        "note": "profit-monster-trail 26 + atr_trail 17 + trail_sl 3 + rr_engine 3 + others — 81-100% WR"
+      }
+    },
+    "size_reduce": "0.3x ACTIVE. Auto-clear math: Oct 13 cohort (56T 14W −$1.53) ages out Oct 20-21 → WR 37.5% ≥ 37 threshold. Lift-watch protocol stands: first 5 full-size trades, 2+ losers or any loss >$0.50 → re-pause. Staged-lift escalation carried (0.3x→1.0x = 3.3x risk step)."
   },
   "watchdog_steer_triage": [
     {
       "id": "steer-001",
-      "title": "7 recent losses wrong-side",
-      "verdict": "VERIFIED-STRUCTURAL (3rd cycle)",
-      "action": "known cohorts, defenses firing, no new filter"
+      "title": "7 recent losses look like wrong-side trades",
+      "verdict": "VERIFIED — covered",
+      "detail": "8 losers 24h all known cohorts (ai-trader mid-RSI LONGs ×3, ME stale TAT-covered, ARB floor-admit pp-cond-covered, BTC/LTC variance). Defenses firing. No new filter — soak + vacation."
     },
     {
       "id": "steer-002",
-      "title": "ai-trader+ 3-loss streak",
-      "verdict": "VERIFIED n=3 below bar",
-      "action": "EXTREME LONG 20T 30% -$0.85 = structural drag; demote shadow collecting"
+      "title": "ai-trader+ losing streak: 3 losses",
+      "verdict": "VERIFIED — defended",
+      "detail": "7d ai-trader+ 20T 30%WR −$0.85. Morning ARB/DOGE/LDO cluster = counter-trend LONGs against 103:1 short tape. signal_reporter's EXTREME block (b0a2467d) shipped 09:41; 0 trades since. Death-zone advisory + EXTREME demote shadow (starved by hard block) also cover. Watchdog's own INJ SHORT pick correctly regime-aligned but unfilled (0 open)."
     }
   ],
+  "signal_reporter_violation_triage": {
+    "finding": "2 live enforcement flips during vacation mode (shadow-first): b0a2467d 09:41 ai-trader family EXTREME→0.0 + manual NORMAL→0.0; f56927c5 15:51 pump-chain+ NORMAL dampen 0.5→0.0",
+    "verdict": "RATIFY BOTH — do not revert",
+    "rationale": [
+      "Both data-backed on 30d/all-time windows (ai-trader+ EXTREME 15T 26.7% −$0.71; pump-chain+ NORMAL 8T 12.5% −$0.45) — not 7d noise",
+      "Already live; reverting = second flip = more churn during vacation, zero trade recovery (0 trades since either block)",
+      "Regime-scoped dampens (0.0 mult), not blanket kills — 1-line reversible each",
+      "EXTREME habitat for pump-chain+ preserved (97T 44.3% +$4.01) — surgical, not scorched",
+      "Collateral documented: EXTREME demote shadow STARVED by hard block — re-eval moot until block lifts or CEO retires shadow"
+    ],
+    "ceo_actions_when_t_returns": [
+      "Formally ratify both blocks (or revert — data supports ratify)",
+      "Retire or repurpose starved EXTREME LONG conf-demote shadow",
+      "Decide signal_reporter vacation-guardrail scope: should regime-blocks be shadow-only during vacation?"
+    ]
+  },
   "losing_autopsy_24h": {
     "losers": 8,
+    "total_pnl": -0.62,
     "new_patterns": 0,
-    "clusters": [
-      "ai-trader+ mid-RSI LONG x3 (ARB/DOGE/LDO, RSI 46-54, -$0.25) — death-zone advisory + EXTREME demote shadow cover",
-      "ME bb-bounce stale_exit 57m -$0.26 — TAT shadow 2nd live would-fire validated",
-      "ARB pump-chain+ floor-admit conf 29.5 — pp-cond shadow would-block"
+    "detail": [
+      {
+        "trade": "LDO ai-trader+ LONG −0.10 EXTREME conf=70.5",
+        "root": "counter-trend LONG, EXTREME. EXTREME demote shadow would-block (70.5*0.7=49.35<50)",
+        "shadow_covered": true
+      },
+      {
+        "trade": "ARB ai-trader+ LONG −0.10 EXTREME conf=25.5 HML",
+        "root": "counter-trend LONG, lowest-conf floor-admit leak. Would-block by demote shadow",
+        "shadow_covered": true
+      },
+      {
+        "trade": "DOGE ai-trader+ LONG −0.05 NORMAL conf=63.1",
+        "root": "mid-RSI (52) death zone LONG in SHORT_BIAS tape. Death-zone advisory fired",
+        "shadow_covered": true
+      },
+      {
+        "trade": "ME bb-bounce-v2-long+ −0.26 stale_exit NORMAL conf=100 57m",
+        "root": "armed late, stale exit. TAT shadow 2nd live would-fire (56m −0.94%)",
+        "shadow_covered": true
+      },
+      {
+        "trade": "ARB pump-chain+ LONG −0.04 EXTREME conf=29.5",
+        "root": "floor-admit, pp-cond shadow would-block",
+        "shadow_covered": true
+      },
+      {
+        "trade": "BTC ai-trader-pending LONG −0.04 FLAT",
+        "root": "bounce-catch flip-window hazard, variance",
+        "shadow_covered": false
+      },
+      {
+        "trade": "LTC warrior-sr-confirm+ LONG −0.03 NORMAL conf=100",
+        "root": "variance, single occurrence",
+        "shadow_covered": false
+      },
+      {
+        "trade": "BTC ai-trader-pending SHORT −0.06 FLAT (pre-flip 21:36)",
+        "root": "floor-squeeze, pre-regime-flip. Manual LONG +4.31% followed — EMA300 fail-flip pattern",
+        "shadow_covered": false
+      }
     ],
-    "verdict": "all known cohorts; zero new patterns"
+    "verdict": "Zero new patterns. 5/8 shadow-covered. All known cohorts. No action."
   },
-  "last_run_verify": {
-    "extreme_demote_re_eval": "KEEP SHADOW — n=16<20 bar; would-block 8T save +$0.23 but fk 3/4=75%>20% bar. Re-eval n>=20.",
-    "short_floor_45": "HOLDING — 2 SHORTs post-revert, net +$0.01, no RSI<45 bleed",
-    "death_zone_advisory": "HOLDING — 7d LONG 45-55 band = -$2.02 bleed confirms advisory value",
-    "pp_cond_floor_shadow": "COLLECTING — 665 events (GMX latest, would-block false)",
-    "mfe_cut_tat_shadow": "COLLECTING — ME #16287 second live would-fire (stale_exit 57m mfe=-0.017)",
-    "vacation_guardrail": "ACTIVE — size-reduce 0.3x; auto-clears Oct 20-21; lift-watch protocol stands",
-    "protected_flags": "13/13 INTACT"
+  "exit_stack_scorecard_7d": {
+    "purpose": "CEO decision table for ARM-BE ratify + exit-ladder priorities when T returns",
+    "never_armed_chop": {
+      "n": 88,
+      "pnl": -8.29,
+      "avg_mfe_pct": 0.135,
+      "avg_pnl_pct": -3.17,
+      "lever": "entry-filter family EXHAUSTED (Oct-16 verdict). Only lever = exit-ladder (signal-scoped, P0 self_learner undelivered 10+ requests). These trades never reach +0.40% arm — fixed-time MFE-cut FALSIFIED Oct 17 (candle OOS net −$9.90/30d false-kill)."
+    },
+    "armed_then_reverse": {
+      "n": 27,
+      "pnl": -1.31,
+      "avg_mfe_pct": 0.787,
+      "avg_pnl_pct": -1.73,
+      "extreme_concentration": "38/50 (14d) are EXTREME −$1.10",
+      "lever": "ARM-BE shadow (ARM_BE_SHADOW_ENABLED=True since Oct 18, 0 fires — legit, 0 armed trades in window). Also pre-registered EXTREME post-arm BE-ratchet shadow (Oct 23 stack)."
+    },
+    "trail_family": {
+      "n": 56,
+      "pnl": 5.93,
+      "note": "DO NOT TOUCH. profit-monster-trail 94.3%WR, atr_trail 81%WR."
+    },
+    "net_wealth_gap": 14.22,
+    "decision": "ARM-BE addresses −$1.31/7d slice (needs CEO ratify of v6 exit-stack integration). Exit-ladder addresses −$8.29/7d slice (needs self_learner candle-OOS). Both blocked on delivery, not on data."
   },
-  "new_findings": [
-    "ai-trader+ TAT-eligibility meta-rule screen: FAIL (winner med hold 42m > loser med 33m = impossible T). Prior creative 'ai-trader+ signal-scoped exit T=25-30' FORMALLY DEAD. Verdict: brain/verdicts/2026-10-19_ai-trader-tat-eligibility-screen.md",
-    "Dual-condition TAT OOS (bb-bounce, run 04:39): net -$0.06 n=4 — FAIL net and n bars. Flip path closed; shadow stays instrumentation-only.",
-    "7d LONG RSI bands: 50-55 still worst (23T -$1.54 21.7%); 55-60 sweet spot holds (21T +$0.43 52.4%). No new action (advisory+boost already deployed).",
-    "14d arm-rate: volume-buildup- 77.8% 9T +$0.35 best; pump-chain- 65.2%; ai-trader+ 48.3% -$0.80 worst-of-volume. Small-n monitor only.",
-    "SIDEWAYS-URGENT: signal_reporter made TWO live enforcement flips during vacation mode today: (1) b0a2467d 09:41 — ai-trader+ EXTREME→0.0 hard block (30d 15T 26.7% -$0.71); (2) f56927c5 15:51 — pump-chain+ NORMAL 0.5→0.0 (all-time 8T 12.5% -$0.45). Both directionally defensible but vacation directive = shadow-first NO enforcement flips; n below 20 bar. Collateral: EXTREME demote shadow now STARVED (0 new EXTREME events possible) — hard block supersedes it; shadow re-eval moot until block removed. Flagged to CEO; NOT reverted (churn risk > violation cost)."
+  "last_run_verify": [
+    {
+      "item": "vacation_guardrail precedence fix (#18)",
+      "status": "PASS",
+      "evidence": "size-reduce re-written 11:26 post-fix, auto-clear logic correct"
+    },
+    {
+      "item": "SHORT floor-45",
+      "status": "PASS",
+      "evidence": "24h 1 SHORT, no <45 RSI bleed"
+    },
+    {
+      "item": "ai-trader EXTREME block (signal_reporter b0a2467d)",
+      "status": "HOLDING",
+      "evidence": "0 ai-trader trades since 09:41"
+    },
+    {
+      "item": "pump-chain+ NORMAL block (f56927c5)",
+      "status": "HOLDING",
+      "evidence": "0 pump-chain+ trades since 15:51"
+    },
+    {
+      "item": "death-zone advisory",
+      "status": "PASS",
+      "evidence": "7d LONG 45-55 still −$2.02 bleed — advisory firing"
+    },
+    {
+      "item": "SHORT midband block",
+      "status": "PASS",
+      "evidence": "0 violations"
+    },
+    {
+      "item": "doji re-kill",
+      "status": "HOLDING",
+      "evidence": "0 trades since Oct 16 20:30"
+    },
+    {
+      "item": "pp-cond floor shadow",
+      "status": "COLLECTING",
+      "evidence": "665 events / 64+ would-blocks, CEO resume-day surface"
+    },
+    {
+      "item": "ARM-BE shadow",
+      "status": "COLLECTING",
+      "evidence": "0 fires since Oct 18 ship — consistent with 0 armed trades in window"
+    },
+    {
+      "item": "MFE-CUT / TAT shadows",
+      "status": "COLLECTING",
+      "evidence": "ME bb-bounce 2nd live would-fire validated run #23"
+    },
+    {
+      "item": "EXTREME demote shadow",
+      "status": "STARVED",
+      "evidence": "hard block supersedes — no new EXTREME trades to observe. Re-eval moot; CEO retire/repurpose decision carried"
+    },
+    {
+      "item": "protected flags",
+      "status": "13/13 INTACT",
+      "evidence": "PM_TRAIL_ACTIVATE 0.4% / DISTANCE 0.2% / LIVE_TRADING True verified this run"
+    }
   ],
   "drift_findings": [],
   "recurring_problems": [
-    "ai-trader+ LONG counter-trend bleed 20T/7d -$0.85 — entry-side shadows (EXTREME demote, death-zone) are the only levers; exit-side closed by meta-rule",
-    "chop-family exit magnitude unchanged: 115T 0.9%WR -$9.60 vs trail 74T 79.7% +$5.39"
+    {
+      "problem": "exit-ladder signal-scoped candle OOS undelivered",
+      "note": "P0, 10+ requests. Self_learner non-response. brain_auditor completed signal-scoped grid Oct 17 (exit-ladder-tat-grid verdict) but universal candle-OOS still missing. Blocks never-armed chop −$8.29/7d fix."
+    },
+    {
+      "problem": "vacation-mode process gap",
+      "note": "signal_reporter made 2 enforcement flips during shadow-first vacation. Process question for CEO: should regime-blocks be shadow-only during vacation, or is data-backed dampen acceptable?"
+    }
   ],
   "missing_implementations": [
-    "exit-stack counterfactual daily scorecard (pre-registered Oct 19 run #22 — still not built)",
-    "ARM-BE v6 integration review (CEO escalation carried)"
+    "trail_activated bool not stamped to trade metadata (infra, carried from #16)",
+    "exit-stack counterfactual daily scorecard — automated version (this run delivered manual version)"
   ],
   "creative_improvements": [
-    "CLOSED: ai-trader+ signal-scoped TAT (meta-rule FAIL, formal verdict written)",
-    "PRE-REG: EXTREME demote threshold refinement at n>=20 (block conf*0.7<50 instead of <60) if fk stays >20%"
+    {
+      "date": "2026-10-19T18:40:57Z",
+      "idea": "EXIT-STACK DECISION TABLE (delivered this run, manual): never-armed chop −$8.29/7d | armed-then-reverse −$1.31/7d | trail +$5.93/7d. Single-number daily scorecard for CEO ARM-BE ratify + exit-ladder priority.",
+      "rationale": "Run #19 pre-registered this. Ships as manual artifact now; automation later if CEO wants daily number. Zero trading risk.",
+      "expected_impact": "Decision clarity for 2 blocked-on-delivery levers worth $9.60/7d combined addressable bleed",
+      "category": "observability",
+      "status": "delivered",
+      "risk": "none"
+    }
   ],
-  "config_changes_applied_note": "0 changes — vacation mode + all candidates fail verification bars",
+  "changes_from_last_run": {
+    "run_23_findings_checked": "TAT eligibility screen FAIL confirmed standing; EXTREME demote re-eval KEEP (now moot — starved by hard block); dual-condition TAT FAIL flip-path closed; signal_reporter violation escalated (this run: RATIFY recommendation)",
+    "run_22_findings_checked": "regime-flip reversed correctly, n=1 natural experiment closed; EXTREME confidence inversion n=16 still below bar",
+    "run_18_findings_checked": "vacation_guardrail precedence fix holding; staged-lift escalation still open (auto-clear lands Oct 20-21)"
+  },
   "next_actions": [
-    "CEO: review vacation-mode violation by signal_reporter (2 enforcement flips Oct 19). Ratify or revert both blocks; decide fate of now-starved EXTREME demote shadow (keep as counterfactual for block-reversal analysis, or retire).",
-    "Oct 20-21: size-reduce auto-clears — lift-watch protocol (first 5 full-size trades, 2+ losers or any loss >$0.50 -> re-pause)",
-    "EXTREME demote shadow re-eval at n>=20 (currently 16)",
-    "Oct 21: regime-flip cohort 48h check (wrong-side root cause resolve)",
-    "Oct 21: surface pp-cond floor flip to CEO (vacation lifts, cohort n>=20 met)",
-    "Sideways: hotset fallback DB query returned 0 tokens (pipeline log 16:32) — flag to hotset owner"
+    "CEO when T returns: ratify/revert signal_reporter's 2 vacation flips (recommend RATIFY); retire or repurpose starved EXTREME demote shadow; decide signal_reporter vacation scope",
+    "Oct 20-21: size-reduce auto-clears via aging — lift-watch protocol (first 5 full-size trades, 2+ losers or any loss >$0.50 → re-pause). Consider staged lift (escalation carried run #18)",
+    "P0 carried: self_learner exit-ladder candle OOS (blocks never-armed chop −$8.29/7d fix)",
+    "ARM-BE v6 exit-stack integration review — only PASS verdict on the exit-side; addresses armed-then-reverse −$1.31/7d (38/50 EXTREME)"
   ]
 }

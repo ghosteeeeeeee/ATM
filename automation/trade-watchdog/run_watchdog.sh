@@ -9,6 +9,7 @@ OPENCODE="/root/.opencode/bin/opencode"
 LOG_DIR="/root/.hermes/logs"
 LOG_FILE="${LOG_DIR}/trade-watchdog.log"
 LOCK_FILE="/tmp/hermes-trade-watchdog.lock"
+AGENT_OUTPUT="/tmp/watchdog_agent_analysis.txt"
 
 # Ensure log dir exists
 mkdir -p "$LOG_DIR"
@@ -24,9 +25,26 @@ if [ -f "$LOCK_FILE" ]; then
     rm -f "$LOCK_FILE"
 fi
 
+# Scrub secrets from watchdog artifacts — agent sessions echo .secrets.local greps
+# to stderr which lands in LOG_FILE (BUG-036). Run on every exit.
+scrub() {
+    sed -i -E \
+        -e 's/(PASSWORD=)[^[:space:]"]+/\1REDACTED/g' \
+        -e 's/(TOKEN=)"[^"]*"/\1"REDACTED"/g' \
+        -e 's/(SIGNING_KEY=)[^[:space:]"]+/\1REDACTED/g' \
+        -e 's/ghp_[A-Za-z0-9]+/ghp_REDACTED/g' \
+        "$LOG_FILE" 2>/dev/null || true
+    [ -f "$AGENT_OUTPUT" ] && sed -i -E \
+        -e 's/(PASSWORD=)[^[:space:]"]+/\1REDACTED/g' \
+        -e 's/(TOKEN=)"[^"]*"/\1"REDACTED"/g' \
+        -e 's/(SIGNING_KEY=)[^[:space:]"]+/\1REDACTED/g' \
+        -e 's/ghp_[A-Za-z0-9]+/ghp_REDACTED/g' \
+        "$AGENT_OUTPUT" 2>/dev/null || true
+}
+
 # Create lock
 echo "$$" > "$LOCK_FILE"
-trap 'rm -f "$LOCK_FILE"' EXIT
+trap 'rm -f "$LOCK_FILE"; scrub' EXIT
 
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [START] Trade Watchdog" >> "$LOG_FILE"
 
@@ -35,7 +53,6 @@ cd /root/.hermes
 python3 scripts/trade_watchdog.py >> "$LOG_FILE" 2>&1
 
 # Step 2: Run opencode agent for deep analysis (with timeout)
-AGENT_OUTPUT="/tmp/watchdog_agent_analysis.txt"
 if cat "$PROMPT_FILE" | timeout 480 "$OPENCODE" run --port 4099 > "$AGENT_OUTPUT" 2>>"$LOG_FILE"; then
     echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [OK] Opencode agent completed" >> "$LOG_FILE"
     # Merge agent analysis into recommendations file

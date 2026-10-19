@@ -5673,5 +5673,14 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-19T18:40:57Z",
+    "idea": "EXIT-STACK DECISION TABLE (manual, run #24): 7d wealth split — never-armed chop 88T −$8.29 (avg MFE 0.135%) | armed-then-reverse 27T −$1.31 (avg MFE 0.787%, 38/50 EXTREME @14d) | trail family 56T +$5.93. Two blocked-on-delivery levers: ARM-BE ratify (addresses −$1.31) + exit-ladder candle OOS (addresses −$8.29).",
+    "rationale": "Run #19 pre-registered daily scorecard. Delivered as manual artifact in audit_recommendations.json this run. Single decision surface for CEO return. Zero trading risk, pure observability.",
+    "expected_impact": "CEO decision clarity on $9.60/7d combined addressable bleed; prevents another 6 runs of re-litigating the same exit-side data",
+    "category": "observability",
+    "status": "delivered",
+    "risk": "none"
   }
 ]
