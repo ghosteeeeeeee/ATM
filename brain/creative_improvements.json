@@ -5636,5 +5636,24 @@
     "category": "verification",
     "status": "actioned",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-19T14:37:42Z",
+    "idea": "EXTREME confidence inversion — ai-trader+ high-conf (86+) trades in EXTREME are 1W/7L while low-conf (24-73) are 3W/5L. Confidence is inversely correlated with outcome in EXTREME.",
+    "rationale": "14d EXTREME LONG conf distribution: conf 86-205 kept cohort net −$0.58 (1W/7L); conf 24-73 blocked cohort net −$0.23 (3W/5L). If pattern holds at n≥30, demote should target HIGH conf specifically, not blanket 0.7x. Current 0.7x demote fails winner-kill bar (75%) — keep shadow.",
+    "expected_impact": "If validated: targeted high-conf demote could save ~$0.58/14d in EXTREME with <20% winner-kill",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low",
+    "sample": "n=16 (below 30 bar — monitor only)"
+  },
+  {
+    "date": "2026-10-19T14:37:42Z",
+    "idea": "Regime-flip natural experiment first data point: 12:36 LONG_BIAS flip reversed in <2h (bounce-in-downtrend), n=1 trade (ARB pump-chain+ −0.04). Validates bounce-risk flagged Oct 19.",
+    "rationale": "BTC fell back below EMA300 (516 bars), STRONG_DOWN restored. System correctly stayed flat during flip window. Re-eval Oct 21 per pre-registration.",
+    "expected_impact": "Data point only — confirms flip was noise, not regime change",
+    "category": "regime",
+    "status": "active",
+    "risk": "none"
   }
 ]
