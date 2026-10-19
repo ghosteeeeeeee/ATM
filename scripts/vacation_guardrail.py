@@ -276,13 +276,19 @@ def main():
         resume_trading(reason)
         write_alert('INFO', f'TRADING RESUMED: {reason}', data)
     elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and
-          (data['wr_7d'] >= WR_7D_RESUME or data['pnl_7d'] >= 0)):
+          ((data['wr_7d'] >= WR_7D_RESUME and data['pnl_7d'] >= WR_7D_PNL_CONFIRM) or data['pnl_7d'] >= 0)):
         # BH-SR-1 fix: auto-clear size-reduce when metrics recover.
         # Without this, the flag persists indefinitely after WR recovers.
         # brain_auditor 2026-10-19: parenthesized the OR — without parens,
         # `A and B and C or D` evaluated as `(A and B and C) or D`, so
         # pnl_7d>=0 alone cleared size-reduce AND swallowed the hard-pause
         # elif below (7d-profitable week + catastrophic 24h day = no pause).
+        # brain_auditor 2026-10-19 (run #25): aging-artifact guard — WR path
+        # now ALSO requires pnl_7d >= WR_7D_PNL_CONFIRM (-2.00). Bad-day aging
+        # out of the rolling window inflates WR by denominator change, not
+        # actual recovery (Oct 13 cohort 56T -$1.53 ages out Oct 20: WR
+        # 33.8->37.2% while pnl still -$2.60 — old OR would full-size a
+        # still-bleeding book). Clear paths: (WR>=37 AND pnl>=-2) OR pnl>=0.
         try:
             os.remove(SIZE_REDUCE_MARKER)
             log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered")

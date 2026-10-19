@@ -5682,5 +5682,23 @@
     "category": "observability",
     "status": "delivered",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-19T19:39:09Z",
+    "idea": "Size-reduce auto-clear aging-artifact guard (SHIPPED bugfix) — WR-resume path requires pnl_7d >= -2.00",
+    "rationale": "Verified sim: Oct 13 cohort (56T -$1.53, 25% WR) ages out of rolling 7d on Oct 20, inflating WR 33.8->37.2% via denominator change while remaining window still -$2.60. Old OR auto-cleared size-reduce to full 1.0x (3.3x risk step) on a bleeding book. Lift-watch protocol was manual-only with no automation.",
+    "expected_impact": "Prevents premature full-size resume; ~$0.50-1.00 avoided per premature-resume loser at 0.3x->1.0x step. Clear still fires on genuine healing (WR>=37 AND pnl>=-2) or profitability (pnl>=0).",
+    "category": "risk control",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-19T19:39:09Z",
+    "idea": "Regime-flip natural experiment data point #2: BTC 15m+4h both LONG_BIAS at 19:06 (after 18:13 SHORT-BIAS 103/125 alt tape)",
+    "rationale": "Second flip attempt today (first 12:36 reversed <2h). Continuum still BELOW, market_phase CALM, trend_quality UP, accel POSITIVE. If BTC holds above EMA300 >4h = real reclaim; if reverses = confirmed bounce-in-downtrend. Feeds dampener decision (pre-registered run #22, n>=50 regime-level bar).",
+    "expected_impact": "Data collection only. Zero trading risk.",
+    "category": "monitoring",
+    "status": "active",
+    "risk": "none"
   }
 ]

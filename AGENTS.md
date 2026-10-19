@@ -59,6 +59,7 @@ Two separate stores for trade data — they are NOT the same:
 
 ## Behavioral Directives
 
+- **Trade execution ALWAYS goes through the manual-trade-override skill — no exceptions, don't wait to be asked.** Any BTC/manual trade or armed pending order: (1) run `ai_trader_precheck.py COIN DIRECTION` (advisory), (2) set explicit `--sl` and `--target` at open/arm time, (3) use `--manual --real --signal ai-trader-manual` (or `ai-trader-pending` for conditional orders), (4) verify the trade landed with correct levels in PostgreSQL. Bare opens without TP/SL are never acceptable — the CEO sets direction, the levels are mandatory infrastructure. Precheck FAIL is advisory for CEO trades (standing preference) but must be reported, not hidden.
 - **Lead with action.** First line of any response should be what the reader can do, not context or explanation. Bad: "The pipeline has 3 steps..." Good: "Run `python3 scripts/run_pipeline.py` to start."
 - **TLDR after every resolved job.** When returning from a completed task, investigation, or bug fix, lead with a 2-line summary: (1) what was the problem/ask, (2) what was done and the outcome. Example: "TLDR: RR engine was killing 201 signals from order book noise and SL floor traps. Fixed 3 patterns, kills reduced to 27, momentum filter shipped for shadow collection." No essays — the reader should understand the outcome in 10 seconds.
 - **"I can't" is not in your vocabulary.** Search, read docs, find tutorials, reverse engineer — then ask if stuck.

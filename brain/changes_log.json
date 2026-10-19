@@ -1650,5 +1650,16 @@
     "after": "elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and (data['wr_7d'] >= WR_7D_RESUME or data['pnl_7d'] >= 0)):",
     "rationale": "A and B and C or D parsed as (A and B and C) or D — pnl_7d>=0 alone cleared size-reduce AND swallowed the hard-pause elif below. Latent: 7d-profitable week + catastrophic 24h day would skip pause entirely. Zero behavior change today (pnl_7d=-3.76).",
     "impact": "Safety fix — hard-pause path no longer disabled by 7d PnL>=0. Truth-table verified 4 cases."
+  },
+  {
+    "timestamp": "2026-10-19T19:39:09Z",
+    "agent": "brain_auditor",
+    "change": "vacation_guardrail auto-clear aging-artifact guard: WR-resume path now also requires pnl_7d >= WR_7D_PNL_CONFIRM (-2.00). Prevents Oct 20 aging-driven full-size resume while 7d PnL still -$2.60.",
+    "type": "bugfix",
+    "file": "scripts/vacation_guardrail.py",
+    "before": "(wr_7d >= WR_7D_RESUME or pnl_7d >= 0)  # aging artifact: Oct 13 cohort 56T -$1.53 ages out Oct 20 -> WR 37.2% clears size-reduce on denominator change",
+    "after": "((wr_7d >= WR_7D_RESUME and pnl_7d >= WR_7D_PNL_CONFIRM) or pnl_7d >= 0)  # clear only on genuine healing or profitability",
+    "rationale": "Aging out a bad day is not recovery. Auto-clear on aging artifact would step size 0.3x->1.0x (3.3x risk) on a still-bleeding book (-$2.60 7d). Verified: py_compile OK, 7-case simulation ALL PASS (blocks aging clears, keeps genuine-heal and profitable clears).",
+    "impact": "Size-reduce holds until 7d PnL >= -$2.00 with WR>=37, or PnL>=0. Staged-lift escalation still CEO decision."
   }
 ]
