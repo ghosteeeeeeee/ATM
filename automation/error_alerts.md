@@ -1302,3 +1302,7 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3548s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3375s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3375s left, N failures)`
+
+## Error Alerts — 2026-10-19 10:26 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3532s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3532s left, N failures)`

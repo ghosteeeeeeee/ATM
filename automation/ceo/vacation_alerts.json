@@ -6,40 +6,6 @@
       "pnl_24h": 0.13,
       "n_24h": 12,
       "wr_24h": 41.7,
-      "pnl_48h": -1.65,
-      "n_48h": 48,
-      "wr_48h": 37.5,
-      "pnl_7d": -2.95,
-      "n_7d": 204,
-      "wr_7d": 34.3,
-      "checked_at": "2026-10-18T10:26:43.041574+00:00"
-    },
-    "ts": "2026-10-18T10:26:43.042658+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 34.3% < 35.0% AND pnl_7d $-2.95 < $-2.00 (204T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": 0.13,
-      "n_24h": 12,
-      "wr_24h": 41.7,
-      "pnl_48h": -1.71,
-      "n_48h": 47,
-      "wr_48h": 36.2,
-      "pnl_7d": -2.95,
-      "n_7d": 204,
-      "wr_7d": 34.3,
-      "checked_at": "2026-10-18T10:56:43.219267+00:00"
-    },
-    "ts": "2026-10-18T10:56:43.220454+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 34.3% < 35.0% AND pnl_7d $-2.95 < $-2.00 (204T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": 0.13,
-      "n_24h": 12,
-      "wr_24h": 41.7,
       "pnl_48h": -1.58,
       "n_48h": 46,
       "wr_48h": 37.0,
@@ -848,5 +814,39 @@
       "checked_at": "2026-10-19T09:56:52.731397+00:00"
     },
     "ts": "2026-10-19T09:56:52.732582+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.2% < 35.0% AND pnl_7d $-3.79 < $-2.00 (199T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.09,
+      "n_24h": 17,
+      "wr_24h": 52.9,
+      "pnl_48h": 0.04,
+      "n_48h": 29,
+      "wr_48h": 48.3,
+      "pnl_7d": -3.79,
+      "n_7d": 199,
+      "wr_7d": 34.2,
+      "checked_at": "2026-10-19T10:26:53.146757+00:00"
+    },
+    "ts": "2026-10-19T10:26:53.148398+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.0% < 35.0% AND pnl_7d $-4.05 < $-2.00 (200T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.35,
+      "n_24h": 18,
+      "wr_24h": 50.0,
+      "pnl_48h": -0.22,
+      "n_48h": 30,
+      "wr_48h": 46.7,
+      "pnl_7d": -4.05,
+      "n_7d": 200,
+      "wr_7d": 34.0,
+      "checked_at": "2026-10-19T10:56:53.292776+00:00"
+    },
+    "ts": "2026-10-19T10:56:53.294090+00:00"
   }
 ]
