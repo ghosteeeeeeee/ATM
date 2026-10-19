@@ -1,17 +1,32 @@
-# Current State — brain_auditor Run Oct 19 18:40 UTC
+# Current State — brain_auditor Run Oct 19 19:45 UTC
 
-**Last Updated: 2026-10-19 18:40 UTC**
-**Updated by: brain_auditor #24 — 0 config changes (vacation mode + soak #24)**
+**Last Updated: 2026-10-19 19:45 UTC**
+**Updated by: brain_auditor #25 — 1 bugfix (size-reduce auto-clear aging guard)**
 
-## PIPELINE STATUS (18:40 UTC)
+## PIPELINE STATUS (19:45 UTC)
 
-- **Trading LIVE** with 0.3x size-reduce (7d WR 34.0% < 37 AND pnl −$4.09 < $0). **⚠️ Size-reduce auto-clears Oct 20-21 via aging (Oct 13 cohort 56T −$1.53 drops out → WR 37.5%). LIFT WATCH PROTOCOL: first 5 full-size trades — 2+ losers or any loss >$0.50 → re-pause. Staged-lift escalation carried (0.3x→1.0x = 3.3x risk step).**
-- **24h 16T 8W −$0.34 (50% WR healed). | 7d 200T 34.0% −$4.09. | Never-armed chop 88T −$8.29 vs trail 56T +$5.93 (7d wealth gap $14.22).**
-- **0 open — flat.** 6 quiet hours since 12:00. Correct knife-edge posture: BTC below EMA300, STRONG_DOWN, 103/125 alt SHORT_BIAS. Watchdog INJ SHORT pick regime-aligned but unfilled (no forced entries).
+- **Trading LIVE** with 0.3x size-reduce (7d WR 33.8% < 37 AND pnl −$4.13 < $0). **⚠️ Auto-clear aging guard SHIPPED this run: WR path now requires pnl_7d ≥ −$2.00. Size-reduce will NOT auto-clear Oct 20 via aging artifact (WR would hit 37.2% on denominator change while book still −$2.60). Clears only on genuine healing (WR≥37 ∧ PnL≥−$2) or profitability (PnL≥$0). Staged-lift escalation still CEO.**
+- **24h 17T 8W −$0.38 (47.1% WR healed). | 7d 201T 33.8% −$4.13. | Never-armed chop 127T −$9.95 vs trail 68T +$6.07 (7d wealth gap $16.02).**
+- **0 open — flat.** 6 quiet hours. Transition posture: 19:06 watchdog 15m+4h both LONG_BIAS (regime-flip #2 attempt; first flip 12:36 reversed <2h), but continuum BELOW + alt tape still SHORT-bias. PONS/INJ SHORT picks unfilled (no forced entries).
 - **Vacation mode ACTIVE** — shadow-first, no enforcement flips. Lifts when T returns.
-- Protected flags 13/13 INTACT (verified this run: PM_TRAIL 0.4%/0.2%, LIVE_TRADING=True).
+- Protected flags 13/13 INTACT (verified this run: LIVE_TRADING=True, PM_TRAIL 0.40%/0.20%).
 
-## THIS RUN — brain_auditor #24
+## THIS RUN — brain_auditor #25
+
+**1 bugfix: vacation_guardrail auto-clear aging-artifact guard.**
+- Before: `(wr_7d >= 37 or pnl_7d >= 0)` — Oct 13 cohort (56T −$1.53, 25% WR) ages out Oct 20, inflating WR 33.8→37.2% on denominator change while book still −$2.60 → old OR would full-size (3.3× risk step) a bleeding system.
+- After: `((wr_7d >= 37 and pnl_7d >= -2.00) or pnl_7d >= 0)` — clear only on genuine healing or profitability. py_compile OK, 7-case sim ALL PASS. Timer applies on next 30-min tick.
+- pump-chain− kill watch RE-AFFIRMED: 14d +$0.07 razor-thin (57T 24.6% WR); pre-block EXTREME trades aging out will pull to wash. Auto-kill when 14d PnL < $0 with n≥20.
+
+**WATCHDOG STEERS BOTH AGED:**
+- 001 wrong-side 7 losses = morning ARB/DOGE/LDO cluster pre-EXTREME-block (09:41). Block is the systemic fix; 0 wrong-side trades since.
+- 002 ai-trader+ streak = same pre-block cluster; 0 post-block trades.
+
+**LOSING AUTOPSY 24h: 9 losers −$0.72, ZERO new patterns, max −$0.26, 5/9 shadow-covered.**
+
+**LAST-RUN VERIFY all PASS:** signal_reporter flips ✓ (0 trades since blocks) | precedence fix ✓ | death-zone advisory ✓ (firing on PONS RSI 51.1) | SHORT floor-45 ✓ | doji kill ✓ | pp-cond ✓ | all shadows collecting ✓.
+
+## PREVIOUS — brain_auditor #24 (18:40 UTC)
 
 **0 config changes** (vacation mode + soak #24; all candidates fail bars or already shipped).
 
@@ -56,7 +71,9 @@
 
 ## NEXT
 
-- **Oct 20-21: size-reduce auto-clears** — lift watch protocol active.
+- **Size-reduce auto-clear BLOCKED by aging guard (this run)** — stays until 7d PnL ≥ −$2.00 with WR≥37, or PnL≥$0. Staged-lift decision still CEO.
+- **pump-chain− kill watch: auto-kill when 14d PnL < $0 with n≥20** (currently +$0.07, pre-block EXTREME aging out pulls toward wash).
 - **CEO return: ratify signal_reporter flips; ARM-BE v6 review; staged-lift decision; signal_reporter vacation scope.**
-- P0: self_learner exit-ladder candle OOS (blocks −$8.29/7d never-armed fix).
+- P0: self_learner exit-ladder candle OOS (blocks chop −$9.95/7d fix).
 - Oct 21: pp-cond floor flip surface (n≥20 met).
+- Regime-flip watch: if BTC holds LONG_BIAS >4h = real reclaim; if reverses = bounce #2 confirmed.
