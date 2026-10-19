@@ -1639,5 +1639,16 @@
     "after": "precheck(coin, direction, conf=argv[3] or None)",
     "rationale": "Watchdog flagged: every HIGH/NORMAL vol SHORT precheck false-failed; GOAT SHORT conf 91.6 could not clear gate",
     "impact": "ZERO live-trading behavior change; operator tooling only"
+  },
+  {
+    "timestamp": "2026-10-19T07:43:28Z",
+    "agent": "brain_auditor",
+    "change": "vacation_guardrail.py:279 operator-precedence bugfix — parenthesized size-reduce auto-clear OR",
+    "type": "bugfix",
+    "file": "scripts/vacation_guardrail.py",
+    "before": "elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and data['wr_7d'] >= WR_7D_RESUME or data['pnl_7d'] >= 0):",
+    "after": "elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and (data['wr_7d'] >= WR_7D_RESUME or data['pnl_7d'] >= 0)):",
+    "rationale": "A and B and C or D parsed as (A and B and C) or D — pnl_7d>=0 alone cleared size-reduce AND swallowed the hard-pause elif below. Latent: 7d-profitable week + catastrophic 24h day would skip pause entirely. Zero behavior change today (pnl_7d=-3.76).",
+    "impact": "Safety fix — hard-pause path no longer disabled by 7d PnL>=0. Truth-table verified 4 cases."
   }
 ]

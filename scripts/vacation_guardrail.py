@@ -276,9 +276,13 @@ def main():
         resume_trading(reason)
         write_alert('INFO', f'TRADING RESUMED: {reason}', data)
     elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and
-          data['wr_7d'] >= WR_7D_RESUME or data['pnl_7d'] >= 0):
+          (data['wr_7d'] >= WR_7D_RESUME or data['pnl_7d'] >= 0)):
         # BH-SR-1 fix: auto-clear size-reduce when metrics recover.
         # Without this, the flag persists indefinitely after WR recovers.
+        # brain_auditor 2026-10-19: parenthesized the OR — without parens,
+        # `A and B and C or D` evaluated as `(A and B and C) or D`, so
+        # pnl_7d>=0 alone cleared size-reduce AND swallowed the hard-pause
+        # elif below (7d-profitable week + catastrophic 24h day = no pause).
         try:
             os.remove(SIZE_REDUCE_MARKER)
             log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered")

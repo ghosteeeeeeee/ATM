@@ -5531,5 +5531,25 @@
     "category": "allocation",
     "status": "monitor",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-19T07:43:28Z",
+    "idea": "Staged size-reduce lift (0.3x → 0.6x → 1.0x over 48h) instead of binary clear",
+    "rationale": "Size-reduce auto-clears at 7d WR>=37, but that recovery is window-aging (bad Oct 12-16 trades drop out), not proven new performance. Binary lift = 3.3x risk step-up overnight on an artifact. Trail family is winning (14d +$9.90) so full size eventually correct — but stage it. If WR holds >=37 after first 12h at 0.6x, go 1.0x; if it dips, hold 0.6x.",
+    "expected_impact": "Caps downside of aging-artifact lift; full-size ramp still happens within 48h of qualification",
+    "category": "risk management",
+    "status": "suggested",
+    "risk": "low",
+    "implementation": "vacation_guardrail.py write_size_reduce gains stage field; decider_run.py reads stage; 3 constants. OR: simpler — delay auto-clear 24h (one constant SIZE_REDUCE_LIFT_DELAY_H=24) and let first full-size day happen only after WR confirmed 2 consecutive checks."
+  },
+  {
+    "date": "2026-10-19T07:43:28Z",
+    "idea": "EMA300 fail-flip confirmation shadow — productize the BTC #16273→#16283 pattern",
+    "rationale": "Today: btc-retest-short #16273 lost -$0.06 to EMA300 squeeze (known n=7 cohort — we were on the wrong side). Pending-order btc-add-long-confirm armed at 30m-high+buffer, fired LONG #16283 on momentum resume. The fail-then-flip-with-confirmation pattern worked. Productize as shadow: when a trade closes HML/atr_sl against EMA300 trend alignment, log counterfactual opposite-direction confirmation order (trigger=structure level, entry=breakout+resume confirm). Zero live impact. Extends wrong-side chop-fade shadow (Oct 17) with structure-anchored entries.",
+    "expected_impact": "Quantifies flip-side recovery rate for the EMA300 squeeze cohort; if shadow shows >50% confirmed-flip wins, arm live for that cohort only",
+    "category": "wrong-side recovery",
+    "status": "suggested",
+    "risk": "zero (shadow)",
+    "implementation": "position_manager close-path: if exit_reason in (HML, atr_sl) AND trade direction counter to EMA300 alignment at open → append paper order to ema300_flip_shadow.jsonl"
   }
 ]

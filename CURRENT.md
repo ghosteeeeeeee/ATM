@@ -1,55 +1,53 @@
-# Current State — brain_auditor Run Oct 19 06:38 UTC
+# Current State — brain_auditor Run Oct 19 07:40 UTC
 
-**Last Updated: 2026-10-19 06:38 UTC**
-**Updated by: brain_auditor — 0 config changes (soak #17), precheck CONF fix verified PASS**
+**Last Updated: 2026-10-19 07:40 UTC**
+**Updated by: brain_auditor — 1 bugfix (guardrail precedence), soak discipline on trading params**
 
-## PIPELINE STATUS (06:38 UTC)
+## PIPELINE STATUS (07:40 UTC)
 
-- **Trading LIVE** with 0.3x size-reduce (7d WR 33.8% < 37 AND 7d PnL −$3.79 < $0 — both resume conditions still failing). Resume ~Oct 23.
-- **24h 12T 5W −$0.12 (41.7%). | 7d 195T 66W −$3.79 (33.8%). | 30d 746T 44.2% −$3.48.**
-- **4 open LONG** (ME +0.44 / GRASS +0.07 / LTC −0.42 / LDO −0.20). Regime: btc_15m LONG_BIAS, btc_4h SHORT_BIAS, BTC above EMA300 ~16h STRONG_UP, NORMAL vol.
-- LTC@RSI73.5 + GRASS@70.2 = overbought chases (watchdog flagged) — PM 2h time-exit covers stalls. 70-75 band historically OK (30d 42T 50% +$1.91 under live ceiling 75).
+- **Trading LIVE** with 0.3x size-reduce (7d WR 33.8% < 35 AND pnl −$3.76 < −$2). **⚠️ Size-reduce likely auto-clears Oct 20 07:00** (WR→37.8% at today's pace) or Oct 21 flat (WR→43.0% via aging). Lift is window-aging artifact, not proven recovery — first full-size day needs a close eye. Escalated: consider staged 0.3→0.6→1.0 lift.
+- **24h 12T 7W +$0.09 (58.3% POSITIVE). | 7d 195T 66W −$3.76 (33.8%). | 30d ~746T 44.2% −$3.48.**
+- **4 open LONG** (#16283 BTC ai-trader-pending @82859 +0.01 / #16282 LDO ai-trader+ +0.04 / #16281 LTC warrior-sr-confirm+ −0.01 / #16280 GRASS r2v2-long3 +0.08). All aligned STRONG_UP. BTC add-long pending order FIRED correctly. LTC@RSI73.5 + GRASS@70.2 = overbought chases (under ceiling 75, 2h time-exit covers).
+- Regime: btc_15m LONG_BIAS/NEUTRAL, btc_4h SHORT_BIAS, BTC above EMA300 ~16h STRONG_UP, NORMAL vol, MARKUP/CALM.
 - Protected flags 13/13 INTACT.
 
-## THIS RUN — brain_auditor #17 (63min follow-up to #16 05:35)
+## THIS RUN — brain_auditor #18 (full captain mode, no session lock)
 
-**0 config changes** (soak discipline #17; 12+ unvalidated changes queued for Oct 23).
+**1 BUGFIX: vacation_guardrail.py:279 operator precedence** — `A and B and C or D` parsed as `(A and B and C) or D`, so `pnl_7d>=0` alone cleared size-reduce AND swallowed the hard-pause elif below. Latent: 7d-profitable week + catastrophic 24h day = no pause. Parenthesized the OR. Truth-table verified 4 cases. Zero behavior change today (pnl_7d=−3.76).
 
-**LAST-RUN VERIFY (all PASS/HOLDING):**
-- ai_trader_precheck CONF argv fix — PASS (auto_1hr logs show conf-aware regime gate)
-- SHORT floor-45 — HOLDING (0 trades RSI 35-45 SHORT since Oct 18 revert)
-- ai-trader+ EXTREME LONG conf-demote shadow — n=0, still collecting
-- doji kill / bb-bounce watch — HOLDING / CLEARED
+**0 trading-param changes** (soak #18; 12+ unvalidated changes queued for Oct 23).
 
-**24h LOSING AUTOPSY: all 5 losers = known cohorts, zero new patterns.**
-- BTC SHORT EMA300 squeeze (n=7 watch) | ETC chop HML | HYPE volume-buildup- noise n=1 | PUMP EXTREME armed-reverse (paradox cohort) | IO floor-admit
+**LAST-RUN VERIFY (all PASS):**
+- ai_trader_precheck CONF argv fix — PASS (code live :322-325)
+- SHORT floor-45 — HOLDING (0 violations since Oct 18 revert)
+- ai-trader+ EXTREME LONG shadow — n=0, collecting (MULT=0.7 confirmed)
+- floor_admit_shadow — collecting (last: 07:25 HYPE floor-admit conf 49.5)
+- MFE-CUT / CHASE_RATIO shadows — True, zero-behavior
+- doji kill — HOLDING
 
-**DRIFT FOUND: Oct-17 'LONG 70+ only-positive-band' claim DECAYED** — aggregate 7d −$0.68 / 30d −$0.16, but 70-75 sub-band fine (30d +$1.91). The ≥75 tail (blocked Oct 14 ceiling) was the drag. No action; do NOT promote 70+ aggregate at Oct-24 freeze lift.
+**24h LOSING AUTOPSY: all 5 losers = known cohorts, zero new patterns, losses properly capped (total −$0.24).**
+- BTC SHORT EMA300 squeeze (n=7 watch) | ETC bb-bounce chop HML 6min | HYPE volume-buildup noise | PUMP EXTREME armed-reverse | LDO pump-chain tiny trail
 
-**atr_sl MFE PARADOX UNCHANGED (3rd run):** 7d 20T −$0.98 17/20 EXTREME | 14d 29T −$1.67 24/29 EXTREME. BE-ratchet shadow deferral to Oct 23 REAFFIRMED (reversing #16 63min later = churn).
+**WATCHDOG STEERS:** steer-001 pending order RESOLVED (fired → #16283). steer-005 wrong-side PARTIALLY STALE (net +$0.09, direction correct).
 
-## WEALTH GAP (14d)
-
-| Family | Trades | WR | PnL |
-|--------|--------|-----|-----|
-| TRAIL | 92 | 83.7% | +$5.06 |
-| CHOP | 170 | 0.6% | −$15.58 |
+**WEALTH GAP (14d):** TRAIL 116T 81.9% +$9.90 vs CHOP 159T 0.6% −$14.51 — fundamental truth reconfirmed.
 
 ## CREATIVE (this run)
 
-1. **trail_activated + close-time MFE metadata stamp — PRE-REGISTERED → Oct 23 stack** (session brain: mfe_pct only computed when guardian_closed, 1/200 trades — every arm analysis needs candle re-derivation; stamp makes BE-ratchet review SQL-native). Single PM close-path review with BE-ratchet shadow.
-2. **pump-chain family = atr_trail profit engine watch** — 16/21 atr_trail winners are pump-chain family, $3.07 of $3.37 total. Family edge = ATR-trail path only; other paths net −$1.59. Confirms TAT+trail architecture.
+1. **Staged size-reduce lift (0.3→0.6→1.0 over 48h)** — binary auto-clear at WR≥37 is an aging artifact; 3.3x risk step-up overnight. Simplest implementation: SIZE_REDUCE_LIFT_DELAY_H=24 constant (hold 0.3x one extra day after qualification). Log: brain/creative_improvements.json.
+2. **EMA300 fail-flip confirmation shadow** — productize today's #16273 SHORT-loss→#16283 LONG-confirm pattern. When HML/atr_sl close counter to EMA300 trend, log paper flip order at structure level. Zero live. Extends Oct-17 wrong-side fade shadow.
 
 ## ACTIVE SHADOWS
 
 - ai-trader+ EXTREME LONG conf-demote — n=0 since Oct 18 16:45
-- pp-conditional penalty floor — collecting in floor_admit_shadow.jsonl
+- pp-conditional penalty floor — collecting (floor_admit_shadow.jsonl)
 - MFE-CUT / bb-bounce TAT / contrarian PROMOTE / ARM-BE — collecting
 - RR-engine would-blocks — ~10/hr
 
 ## NEXT
 
-- Oct 23 resume-day CEO eyeball: 12+ unvalidated changes + BE-ratchet shadow + trail_activated stamp (both pre-registered)
+- **Oct 20 07:00: size-reduce likely auto-clears** — first full-size day. Watch trade sizes and first losses carefully.
+- Oct 23 resume-day CEO eyeball: 12+ unvalidated changes + BE-ratchet shadow + trail_activated stamp (pre-registered)
 - ai-trader+ EXTREME re-eval at n≥20
 - contrarian pump-chain- PROMOTE re-eval ~Oct 29
 - LONG 70+ band: no Oct 24 promotion (aggregate decayed; ceiling 75 covers tail)
