@@ -12184,3 +12184,26 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader-pending 24h 2T 0W — 1 more loss kills it (3T threshold)
 - 7d still -$3.79 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - brain_auditor noted size-reduce aging lift Oct 20 — staged-lift escalated, not touched here
+
+## [2026-10-19 09:27] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 last hour | 24h 14T 8W -$0.02 (57.1% WR) | 7d 197T 67W -$3.79 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — quiet window, no data to act on
+- atr_sl_hit 5/14 = 36% last 24h (healthy, under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour; ai-trader-pending still 24h 2T 0W -$0.10 under 3T threshold (watch)
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (08:00 -$0.14 was last negative hour, no closes since)
+- 3 open: DOGE ai-trader+ LONG @0.0798, LTC bb-bounce-v2-long+ LONG @59.93, ARB ai-trader+ LONG @0.1996
+- Size-reduce 0.3x stays (7d WR 34.0% < 35%, 7d PnL -$3.79)
+- 7d worst signal doji-bottom-long 16T 5W -$0.97 — noted, but kill rule is last-hour only; no action
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader-pending 24h 2T 0W — 1 more loss kills it (3T threshold)
+- 7d still -$3.79 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- doji-bottom-long 7d -$0.97 worst cohort — candidate for deeper review in a dedicated session, not an hourly kill
