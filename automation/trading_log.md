@@ -12296,3 +12296,25 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader-pending 24h 2T 0W still under kill threshold
 - 7d -$4.09 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - pump-chain+ only 1 trade in 24h — not enough data to judge
+
+## [2026-10-19 14:28] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h 16T 8W -$0.34 (50.0% WR) | 7d 201T 68W -$4.09 (33.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed, 0 open — market quiet, correct in STRONG_DOWN
+- atr_sl_hit 6/16 = 37.5% last 24h (under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour (zero trades). ai-trader-pending 24h 2T 0W still under 3T kill threshold
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (8/9/10 neg, 11 flat, 12 neg single, 13:00 no trades)
+- Size-reduce 0.3x stays (7d WR 33.8% < 35%, 7d PnL -$4.09 < -$2)
+- Worst 24h signals: ai-trader+ -$0.17 (4T), bb-bounce-v2-long+ -$0.14 (4T, WR 75% but net neg) — both under kill threshold and single-hour activity insufficient
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader-pending 24h 2T 0W still under kill threshold
+- 7d -$4.09 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- 13:00 hour had 0 trades after 12:00 single loss — watch if low activity continues
