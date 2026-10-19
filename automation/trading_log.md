@@ -12340,3 +12340,47 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader-pending 24h 2T 0W still under kill threshold
 - 7d -$4.09 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - 3 consecutive quiet hours (13-15) — low activity persists
+
+## [2026-10-19 16:28] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h 16T 8W -$0.34 (50.0% WR) | 7d 200T 68W -$4.09 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed, 0 open — 4th consecutive quiet hour (last close 12:xx), market quiet in STRONG_DOWN
+- atr_sl_hit 6/16 = 37.5% (under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour (zero trades). ai-trader-pending 24h 2T 0W still under 3T kill threshold
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (flat 13-16 hours break it)
+- Size-reduce 0.3x stays (7d WR 34.0% < 35%, 7d PnL -$4.09 < -$2)
+- Worst 24h signals: ai-trader+ -$0.17 (4T), bb-bounce-v2-long+ -$0.14 (4T), ai-trader-pending -$0.10 (2T 0W) — all under kill threshold
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader-pending 24h 2T 0W still under kill threshold
+- 7d -$4.09 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- 4 consecutive quiet hours (13-16) — vol collapsed to ~2-3T/day pace
+
+## [2026-10-19 17:28] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h 16T 8W -$0.34 (50.0% WR) | 7d 200T 68W -$4.09 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed, 0 open — 5th consecutive quiet hour (last close 12:xx), vol still collapsed
+- atr_sl_hit 6/16 = 37.5% (under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour (zero trades). ai-trader-pending 24h 2T 0W still under 3T kill threshold
+- No overtrading (0T/hr)
+- No 3-neg-hour streak
+- Size-reduce 0.3x stays (7d WR 34.0% < 35%, 7d PnL -$4.09 < -$2)
+- Worst 24h signals: ai-trader+ -$0.17 (4T), bb-bounce-v2-long+ -$0.14 (4T), ai-trader-pending -$0.10 (2T 0W) — all under kill threshold
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader-pending 24h 2T 0W still under kill threshold
+- 7d -$4.09 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- 5 consecutive quiet hours — vol still ~2-3T/day pace
