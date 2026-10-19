@@ -63,7 +63,8 @@
     "ai-trader+ TAT-eligibility meta-rule screen: FAIL (winner med hold 42m > loser med 33m = impossible T). Prior creative 'ai-trader+ signal-scoped exit T=25-30' FORMALLY DEAD. Verdict: brain/verdicts/2026-10-19_ai-trader-tat-eligibility-screen.md",
     "Dual-condition TAT OOS (bb-bounce, run 04:39): net -$0.06 n=4 — FAIL net and n bars. Flip path closed; shadow stays instrumentation-only.",
     "7d LONG RSI bands: 50-55 still worst (23T -$1.54 21.7%); 55-60 sweet spot holds (21T +$0.43 52.4%). No new action (advisory+boost already deployed).",
-    "14d arm-rate: volume-buildup- 77.8% 9T +$0.35 best; pump-chain- 65.2%; ai-trader+ 48.3% -$0.80 worst-of-volume. Small-n monitor only."
+    "14d arm-rate: volume-buildup- 77.8% 9T +$0.35 best; pump-chain- 65.2%; ai-trader+ 48.3% -$0.80 worst-of-volume. Small-n monitor only.",
+    "SIDEWAYS-URGENT: signal_reporter made TWO live enforcement flips during vacation mode today: (1) b0a2467d 09:41 — ai-trader+ EXTREME→0.0 hard block (30d 15T 26.7% -$0.71); (2) f56927c5 15:51 — pump-chain+ NORMAL 0.5→0.0 (all-time 8T 12.5% -$0.45). Both directionally defensible but vacation directive = shadow-first NO enforcement flips; n below 20 bar. Collateral: EXTREME demote shadow now STARVED (0 new EXTREME events possible) — hard block supersedes it; shadow re-eval moot until block removed. Flagged to CEO; NOT reverted (churn risk > violation cost)."
   ],
   "drift_findings": [],
   "recurring_problems": [
@@ -80,6 +81,7 @@
   ],
   "config_changes_applied_note": "0 changes — vacation mode + all candidates fail verification bars",
   "next_actions": [
+    "CEO: review vacation-mode violation by signal_reporter (2 enforcement flips Oct 19). Ratify or revert both blocks; decide fate of now-starved EXTREME demote shadow (keep as counterfactual for block-reversal analysis, or retire).",
     "Oct 20-21: size-reduce auto-clears — lift-watch protocol (first 5 full-size trades, 2+ losers or any loss >$0.50 -> re-pause)",
     "EXTREME demote shadow re-eval at n>=20 (currently 16)",
     "Oct 21: regime-flip cohort 48h check (wrong-side root cause resolve)",

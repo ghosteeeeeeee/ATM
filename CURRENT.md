@@ -26,7 +26,7 @@
 
 **LAST-RUN VERIFY all PASS:** SHORT floor-45 ✓ (2T +$0.01) | death-zone advisory ✓ (7d LONG 45-55 = −$2.02 bleed) | pp-cond shadow ✓ (665 events) | MFE-CUT/TAT ✓ (ME 2nd live would-fire) | vacation guardrail ✓.
 
-**Sideways: hotset fallback DB query returned 0 tokens** (pipeline log 16:32) — flag to hotset owner. Prior: market_phase RECOVERY stale (wyckoff MARKDOWN + STRONG_DOWN) — still flagged.
+**Sideways-URGENT: signal_reporter vacation violation** — 2 live enforcement flips today (ai-trader+ EXTREME→0.0 @09:41 b0a2467d; pump-chain+ NORMAL→0.0 @15:51 f56927c5) during shadow-first vacation. Directionally defensible, n<20. **Collateral: EXTREME demote shadow STARVED** (hard block supersedes it). Flagged to CEO — ratify/revert + shadow scope decision. Also: hotset fallback 0 tokens (16:32); market_phase RECOVERY stale — still flagged.
 
 ## PREVIOUS RUN #22 (14:45 UTC)
 
