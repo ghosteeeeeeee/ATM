@@ -1,37 +1,43 @@
-=== Signal Performance Report ===
-Period: Last 6h | 24h
-Generated: 2026-10-18 (signal_reporter)
+# Signal Performance Report
+**Generated:** 2026-10-19 03:32 UTC | **Period:** Last 6h + 24h
 
-6h closed trades: 0 — quiet period, no action.
-24h closed trades: 13.
+## Summary
+Very quiet period: **13 closed trades in 24h** (3 in 6h), net **-$0.32**. No signal+direction pair reached the 5-trade threshold, so **no kills or boosts executed**. No inversions.
 
-KILLED (executed):
+---
+
+## KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signal met kill criteria (no signal had 5+ trades in 24h) |
+| — | — | — | — | — | none (no candidates met criteria) |
 
-BOOSTED (executed):
+## BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No signal met boost criteria (no signal had 5+ trades in 24h) |
+| — | — | — | — | — | none (no candidates met criteria) |
 
-LOSERS (watch list):
+## LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 0.0% | -0.18 | 2 | WATCH — 7d 31.3% WR -$0.61 (16T). EXTREME already 0.0-blocked (10-16). NORMAL sliding: 7d 6T 33% -$0.18 vs lifetime 46.2% +$0.15. HIGH still 55.6% lifetime — keep alive, re-check next run |
-| pump-chain+ | LONG | 33.3% | -0.07 | 3 | WATCH — 7d 30.3% WR but +$0.31 net. NORMAL already 0.5-dampened (lifetime 11.1% WR -$0.63, 9T). HIGH 0.5. EXTREME carries PnL (+$0.41 7d). No change |
-| hl_copy_trader | SHORT | 0.0% | -0.06 | 1 | noise (1 trade) |
-| ai-trader- | SHORT | 0.0% | -0.05 | 1 | noise (1 trade) |
-| hl_copy_trader | LONG | 0.0% | -0.05 | 1 | noise — 7d LONG 50% WR +$0.12 |
-| volume-buildup- | SHORT | 0.0% | -0.03 | 1 | noise — 7d 77.8% WR +$0.35 (9T) |
+| bb-bounce-v2-long+ | LONG | 0.0% | -$0.18 | 2 (24h) / 16 (7d, 31.3%, -$0.61) | watch — 24h sample too small to kill; 7d persistent bleed |
+| hl_copy_trader | LONG+SHORT | 0.0% | -$0.11 | 2 (24h) | watch |
+| pump-chain- | SHORT | 21.9% | -$0.55 | 32 (7d) | watch — large 7d bleed, only 1 trade in 24h |
+| doji-bottom-long | LONG | 31.3% | -$0.97 | 16 (7d) | watch — worst 7d PnL, 0 trades in 24h |
+| ai-trader+ | LONG | 31.3% | -$0.68 | 16 (7d) | watch — 1 win in 24h |
+| hmacd_mtf- | LONG | 20.0% | -$0.33 | 5 (7d) | watch |
 
-WINNERS:
+## WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain-,pump-chain-v6- | SHORT | 100% | +0.54 | 2 | healthy |
-| ai-trader+ | LONG | 100% | +0.05 | 1 | healthy |
-| ai-trader-manual | LONG | 100% | +0.03 | 1 | healthy |
+| continuum-trend+ | LONG | 100% | +$0.03 | 1 (24h) | healthy |
+| ai-trader+ | LONG | 100% | +$0.05 | 1 (24h) | healthy |
+| ai-trader-manual | LONG | 100% | +$0.05 | 1 (24h) | healthy |
+| pump-chain-,pump-chain-v6- | SHORT | 100% | +$0.07 | 1 (24h) | healthy |
+| volume-buildup- | SHORT | 77.8% | +$0.35 | 9 (7d) | healthy |
 
-ISSUES:
-- None. 0 direction inversions in 24h. No bugs or anomalies detected.
-- Signal volume is very low (13 trades/24h, 0 trades/6h) — insufficient data for kill/boost decisions this cycle. Existing regime gates (bb-bounce-v2-long+ EXTREME=0.0, pump-chain+ NORMAL/HIGH=0.5) remain appropriate.
+---
+
+## ISSUES:
+- **`close_time` is naive UTC in brain DB** — comparing with timezone-aware Python datetimes silently returns 0 rows (psycopg2 sends aware params as timestamptz). Query scripts must strip tzinfo (`datetime.now(timezone.utc).replace(tzinfo=None)`) or the 6h/24h windows look empty. Flag for pipeline query hygiene.
+- Volume very low this period (13 trades/24h) — kill/boost thresholds unreachable. Next runs should watch 7d losers above if 24h volume stays sparse; if bb-bounce-v2-long+ / doji-bottom-long / pump-chain- SHORT continue bleeding, consider regime-gated blocks (check `volatility_regime` win rates before any blanket kill).
+- 2 open trades at report time.
