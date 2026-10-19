@@ -5700,5 +5700,15 @@
     "category": "monitoring",
     "status": "active",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-19T21:42:55.529103+00:00",
+    "idea": "EMA300-pin advisory in ai_trader_precheck — when BTC within 0.1% of EMA300 for >60min, add non-blocking label 'EMA300 pin chop — mid-band entries have no edge, wait for resolution'",
+    "rationale": "Watchdog deep analysis 21:06 explicitly flagged this for brain auditor. ai-trader+ LONG 45-55 band 10T 0% −$0.84/14d. Death-zone advisory covers RSI number but doesn't convey market-state context. Pin = both directions get chopped; LLM needs to know WHY, not just that RSI is 50.",
+    "expected_impact": "Zero live behavior; improves LLM pick quality via market-state awareness",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low",
+    "blocked_on": "vacation mode — ships when T returns"
   }
 ]

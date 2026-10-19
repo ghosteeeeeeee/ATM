@@ -1661,5 +1661,16 @@
     "after": "((wr_7d >= WR_7D_RESUME and pnl_7d >= WR_7D_PNL_CONFIRM) or pnl_7d >= 0)  # clear only on genuine healing or profitability",
     "rationale": "Aging out a bad day is not recovery. Auto-clear on aging artifact would step size 0.3x->1.0x (3.3x risk) on a still-bleeding book (-$2.60 7d). Verified: py_compile OK, 7-case simulation ALL PASS (blocks aging clears, keeps genuine-heal and profitable clears).",
     "impact": "Size-reduce holds until 7d PnL >= -$2.00 with WR>=37, or PnL>=0. Staged-lift escalation still CEO decision."
+  },
+  {
+    "timestamp": "2026-10-19T20:49:44Z",
+    "agent": "brain_auditor",
+    "change": "Retire starved ai-trader+ EXTREME LONG conf-demote shadow (AI_TRADER_EXTREME_LONG_SHADOW_ENABLED True->False)",
+    "type": "shadow",
+    "file": "scripts/hermes_constants.py",
+    "before": "AI_TRADER_EXTREME_LONG_SHADOW_ENABLED = True",
+    "after": "AI_TRADER_EXTREME_LONG_SHADOW_ENABLED = False",
+    "rationale": "signal_reporter hard block b0a2467d (2026-10-19 09:41) supersedes demote mechanism — 0 EXTREME trades since, shadow starved (re-eval moot). Oct-19 formal re-eval from trade data n=16: demote counterfactual = wash (would-block 1L save $0.10 / 1W kill $0.09). Retiring dead instrumentation that pretends to collect data.",
+    "impact": "ZERO live behavior (shadow was already starved by hard block; only logged would-demotes). Closes scheduled Oct-19 re-eval loop honestly. Do not re-enable without fresh n>=20 cohort."
   }
 ]

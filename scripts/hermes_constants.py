@@ -1722,11 +1722,11 @@ MFE_CUT_SHADOW_MFE_MAX = 0.20  # live_pnl % below this at T => would-fire
 # would-fires only. Flip live only with CEO GO + v6 exit-stack integration.
 ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
 # AI-TRADER+ EXTREME LONG conf-demote SHADOW (brain_auditor 2026-10-18).
-# 14d EXTREME LONG: 14T -$0.61 28.6% WR — worst ai-trader+ cohort. Normal/HIGH
-# regimes are fine (4T 50% / 7T 71.4%). Shadow logs would-demote confidence
-# (0.7x) to hotset metadata. Zero behavior — actual conf unchanged. Flip live
-# only with CEO GO + n>=20 + winner-impact check. Revert: set False.
-AI_TRADER_EXTREME_LONG_SHADOW_ENABLED = True
+# RETIRED 2026-10-19 brain_auditor: signal_reporter hard block b0a2467d (09:41,
+# 30d 15T 26.7%WR -$0.71) supersedes — 0 EXTREME trades since, shadow starved.
+# Oct-19 re-eval from trade data (n=16): demote counterfactual = wash (would-block
+# 1L save $0.10 / 1W kill $0.09). Do NOT re-enable without fresh n>=20 cohort.
+AI_TRADER_EXTREME_LONG_SHADOW_ENABLED = False
 AI_TRADER_EXTREME_LONG_SHADOW_MULT = 0.7  # confidence multiplier when live
 # Tiered trail: loosens as profit grows (2026-09-07 partial-close plan — Option 3)
 # Format: list of (min_profit_pct, trail_distance_pct) — first match wins, never tightens

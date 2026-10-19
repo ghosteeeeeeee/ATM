@@ -1,50 +1,99 @@
 {
-  "timestamp": "2026-10-19T19:40:09Z",
-  "run": "brain_auditor #25",
-  "session_brain_stats": "skipped (session lock check passed; direct PG queries used per protocol)",
+  "timestamp": "2026-10-19T21:42:55.529103+00:00",
+  "run": "brain_auditor #26",
+  "session_brain_stats": {
+    "queries_run": 3,
+    "top_topics": [
+      "pump-chain-short filters",
+      "turning tide chop detector",
+      "HH/HL high winrate patterns",
+      "R:R exits MFE trailing"
+    ]
+  },
   "trade_summary_24h": {
     "trades": 17,
     "wins": 8,
-    "pnl": -0.38,
     "wr": 47.1,
-    "note": "WR healed from 41.7%; PnL mildly negative. Max single loss -$0.26 (size-reduce containing). 6 quiet hours, 0 open.",
-    "7d": {
-      "trades": 201,
-      "wins": 68,
-      "pnl": -4.13,
-      "wr": 33.8
-    }
+    "pnl": -0.38,
+    "note": "WR healed from 33.8% to 47.1% but still slightly negative. 9 losers all known cohorts."
   },
-  "config_changes_applied": [
+  "trade_summary_7d": {
+    "trades": 198,
+    "wins": 67,
+    "wr": 33.8,
+    "pnl": -4.01,
+    "note": "Size-reduce 0.3x stays (WR<37 AND pnl<-$2)."
+  },
+  "trade_summary_30d": {
+    "trades": 734,
+    "wr": 43.2,
+    "pnl": -5.71
+  },
+  "exit_signature_7d": {
+    "never_armed": {
+      "n": 126,
+      "pnl": -9.4,
+      "wr": 0.9
+    },
+    "armed": {
+      "n": 72,
+      "pnl": 5.39,
+      "wr": 77.8
+    },
+    "wealth_gap": 14.79,
+    "note": "UNCHANGED. Entry filters exhausted; exit-side blocked on self_learner candle-OOS."
+  },
+  "drift_findings": [],
+  "recurring_problems": [
     {
-      "change": "vacation_guardrail.py auto-clear aging-artifact guard",
-      "file": "scripts/vacation_guardrail.py",
-      "type": "bugfix",
-      "before": "(wr_7d >= 37 or pnl_7d >= 0)",
-      "after": "((wr_7d >= 37 and pnl_7d >= -2.00) or pnl_7d >= 0)",
-      "verification": "py_compile OK; 7-case sim ALL PASS; timer next tick 19:56 applies live",
-      "rationale": "Verified aging sim: Oct 13 cohort (56T -$1.53) ages out Oct 20 -> WR 33.8->37.2% on denominator change while 7d PnL still -$2.60. Old OR auto-cleared size-reduce to full 1.0x (3.3x risk step) on bleeding book. New logic: clear only on genuine healing (WR>=37 AND pnl>=-2) or profitability (pnl>=0)."
+      "problem": "Chop entries never arm — NEVER_ARMED 126T −$9.40 vs ARMED 72T +$5.39 (7d)",
+      "status": "STRUCTURAL — entry-filter family exhausted, exit-ladder blocked on P0 backtest (10+ requests)",
+      "impact": "$14.79/week wealth gap"
+    },
+    {
+      "problem": "ai-trader+ LONG 45-55 RSI death zone: 10T 0%WR −$0.84 (14d)",
+      "status": "ADVISORY LIVE since Oct 18 — still bleeding but n=10 < 20 bar. EXTREME block shipped 09:41 (0 trades since).",
+      "impact": "−$0.84/14d, contained by blocks+advisory"
+    },
+    {
+      "problem": "LTC #16290 bb-bounce-v2-long+ just opened at RSI 50.77 (death zone), momentum flat, BTC RANGING_BEAR EMA300 pin",
+      "status": "MONITOR — trail needs +0.40% to arm (target 60.64). bb-bounce 45-55 band 12T −$0.39 41.7% (n<20, no filter).",
+      "impact": "If hard_max_loss: another chop-entry data point for bb-bounce death-zone case"
     }
   ],
+  "missing_implementations": [
+    {
+      "item": "EMA300-pin advisory for ai_trader_precheck",
+      "source": "Watchdog deep analysis 21:06: 'ai-trader+ pick quality needs the EMA300-pin condition in its reasoning checklist'",
+      "status": "PRE-REGISTERED (creative improvement this run) — zero-behavior advisory, ships when vacation lifts"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-19T21:42:55.529103+00:00",
+      "idea": "EMA300-pin advisory in ai_trader_precheck: when BTC within 0.1% of EMA300 for >60min, flag picks as 'EMA300 pin chop — mid-band entries have no edge'",
+      "rationale": "Watchdog deep analysis: mid-RSI entries (45-60) have zero edge during EMA300 pin. Death-zone advisory covers RSI 45-55 but doesn't tell the LLM WHY the zone is deadly. Pin context = market-state overlay that helps picker understand the regime, not just the RSI number.",
+      "expected_impact": "Zero live behavior change; improves pick quality by giving LLM market-state context",
+      "category": "entry sniper",
+      "status": "pre-registered",
+      "risk": "low"
+    }
+  ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "signal_reporter EXTREME/NORMAL flips ratified",
-      "verify": "PASS — 0 trades since blocks (ai-trader 09:41, pump-chain+ 15:51)",
+      "change": "signal_reporter EXTREME/NORMAL flips (09:41, 15:51)",
+      "verify": "PASS — 0 trades since either block",
       "status": "holding"
     },
     {
-      "change": "vacation_guardrail precedence fix (07:43)",
-      "verify": "PASS — size-reduce re-written 11:26, active",
+      "change": "vacation_guardrail aging-artifact guard (19:39)",
+      "verify": "PASS — size-reduce re-written, active",
       "status": "holding"
-    },
-    {
-      "change": "EXTREME demote shadow",
-      "verify": "STARVED by hard block (acknowledged run #24)",
-      "status": "moot"
     },
     {
       "change": "death-zone advisory",
-      "verify": "PASS — firing on PONS SHORT RSI 51.1 pick",
+      "verify": "PASS — firing on picks",
       "status": "holding"
     },
     {
@@ -54,98 +103,25 @@
     },
     {
       "change": "doji kill",
-      "verify": "PASS — last close Oct 16 18:44",
+      "verify": "PASS — 0 trades since Oct 16",
       "status": "holding"
     },
     {
-      "change": "pp-cond shadow",
-      "verify": "PASS — 665+ events collecting",
+      "change": "pp-cond penalty floor",
+      "verify": "PASS — 665+ events collected",
       "status": "holding"
     },
     {
-      "change": "TAT/MFE-CUT/ARM-BE shadows",
-      "verify": "PASS — collecting; ME stale_exit = 2nd TAT would-fire",
-      "status": "holding"
-    }
-  ],
-  "watchdog_steers": [
-    {
-      "id": "steer-001",
-      "title": "7 recent losses wrong-side",
-      "verdict": "AGED — morning ARB/DOGE/LDO cluster pre-EXTREME-block (09:41). Block is the systemic fix. Zero new wrong-side trades since.",
-      "action": "none"
-    },
-    {
-      "id": "steer-002",
-      "title": "ai-trader+ 3-loss streak",
-      "verdict": "AGED — same pre-block cluster; 20T window polluted by pre-fix losses. Post-block: 0 ai-trader+ trades.",
-      "action": "none"
-    }
-  ],
-  "drift_findings": [
-    {
-      "finding": "pump-chain- 14d +$0.07 razor-thin",
-      "detail": "57T 24.6% WR. Kill criterion (14d PnL < $0, n>=20) NOT met. Pre-block EXTREME trades (+$0.07 on 47T) aging out of window will pull 14d toward wash (NORMAL +$0.35 + HIGH -$0.35). Habitat: EXTREME blocked, HIGH blocked, NORMAL thin-positive. One more NORMAL loss flips it negative.",
-      "action": "RE-AFFIRM kill watch — auto-kill when 14d PnL < $0 with n>=20"
-    },
-    {
-      "finding": "No other drift — all 8 prior changes holding, protected flags verified",
-      "detail": "LIVE_TRADING=True, PM_TRAIL=True 0.40%/0.20%",
-      "action": "none"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "pattern": "Wealth gap UNCHANGED (7d verified)",
-      "detail": "Trail family 68T ~90%WR +$6.07 vs chop family 127T ~2%WR -$9.95. Arm rates: pump-chain- 25%, ai-trader+ 30%, bb-bounce 40%, pump-chain+ 64.5%, volume-buildup- 77.8%, continuum-trend 100%. Root fix = exit-ladder candle OOS (P0, blocked on self_learner, 11+ requests).",
-      "action": "carry P0 escalation"
-    },
-    {
-      "pattern": "Regime-flip bounce #2",
-      "detail": "12:36 flip reversed <2h. 19:06 watchdog: 15m+4h both LONG_BIAS, trend UP, accel POSITIVE, but continuum BELOW + CALM + alt tape still SHORT-bias (18:13). Data point #2 collected for natural experiment.",
-      "action": "monitor — >4h hold = real reclaim"
-    }
-  ],
-  "missing_implementations": [
-    {
-      "item": "self_learner exit-ladder candle OOS backtest",
-      "status": "P0 — 11+ requests, blocks never-armed chop -$8.29/7d fix"
-    },
-    {
-      "item": "ARM-BE v6 exit-stack integration",
-      "status": "only PASS verdict on exit side (30d +$5.94 fk 16.5%); addresses armed-then-reverse -$1.31/7d"
-    }
-  ],
-  "losing_trade_autopsy_24h": {
-    "losers": 9,
-    "total_pnl": -0.72,
-    "max_loss": -0.26,
-    "clusters": [
-      "ai-trader+ mid-RSI LONGs x3 (ARB/DOGE/LDO, -$0.25, pre-EXTREME-block) — death-zone advisory + demote shadow cover; winning side SHORT/flat",
-      "ME bb-bounce stale -$0.26 — TAT shadow 2nd validation would-catch",
-      "GOAT pump-chain- chop exit -$0.04 — NORMAL habitat, contained",
-      "BTC/LTC/pump-chain+ variance x4 — all <$0.06, size-reduce containing"
-    ],
-    "new_patterns": 0,
-    "shadow_covered": "5/9"
-  },
-  "creative_improvements": [
-    {
-      "idea": "Size-reduce auto-clear aging-artifact guard",
-      "status": "SHIPPED this run (config change #1)",
-      "risk": "low"
-    },
-    {
-      "idea": "Regime-flip natural experiment data point #2 collected",
-      "status": "active monitoring",
-      "risk": "none"
+      "change": "EXTREME demote shadow",
+      "verify": "RETIRED — starved by hard block (run #24)",
+      "status": "retired"
     }
   ],
   "next_actions": [
-    "CEO when T returns: ratify signal_reporter flips; ARM-BE v6 review; staged-lift decision; signal_reporter vacation scope",
-    "Oct 20: size-reduce auto-clear NOW BLOCKED by aging guard — stays until 7d PnL >= -$2.00 with WR>=37, or PnL>=0. Staged-lift escalation still CEO.",
-    "pump-chain- kill watch: auto-kill when 14d PnL < $0 with n>=20 (currently +$0.07)",
-    "P0 carried: self_learner exit-ladder candle OOS (blocks never-armed chop -$8.29/7d fix)",
-    "Regime-flip watch: if BTC holds LONG_BIAS >4h = real reclaim; if reverses = bounce #2 confirmed"
+    "Monitor LTC #16290 bb-bounce death-zone entry — trail-arm or hard_max_loss will inform bb-bounce death-zone case",
+    "CEO when T returns: ratify signal_reporter flips; ARM-BE v6 review; staged-lift decision",
+    "P0 carried: self_learner exit-ladder candle OOS (blocks never-armed chop −$8.29/7d fix)",
+    "pump-chain- kill watch: 14d +$0.44 (was +$0.07 yesterday — improved). Auto-kill when 14d PnL < $0 with n>=20.",
+    "Size-reduce stays until 7d WR>=37 AND pnl>=−$2.00, or PnL>=0"
   ]
 }

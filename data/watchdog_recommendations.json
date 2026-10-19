@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-19T19:36:26.596180+00:00",
+  "timestamp": "2026-10-19T21:36:27.463862+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -20,18 +20,22 @@
   ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "AT",
-    "volatility": "NORMAL",
+    "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.25,
+    "acceleration_state": "FLAT",
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "STRONG_UP"
+    "market_phase": "RECOVERY",
+    "trend_quality": "UP"
   },
-  "open_count": 0
+  "open_count": 1,
+  "deep_analysis": "No open trades. Regime is LONG_BIAS. Let me gather market context and check the AI trader slot.\nFull picture assembled. Writing the merged analysis.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 (flat \u2014 correct posture in this regime)\nUnrealized PnL: 0.00 USDT\nRegime: EMA300 PIN CHOP | Volatility: LOW\n  BTC 81,981 vs EMA300 82,004 (AT) \u00b7 linreg NEUTRAL \u00b7 velocity SLOW\n  Scanners say LONG_BIAS/STRONG_UP \u2014 1m continuum says indecision.\n  Scanners are lagging. Treat as chop until BTC resolves the pin.\n\n\u2500\u2500 Steers (automated engine) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning] 6 recent losses look like wrong-side trades\n\ud83d\udfe1 [warning] ai-trader+ losing streak: 3 losses\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n24h: 17 closes, 47% WR, net -0.38. Bleed = atr_sl_hit (n=7, -0.36);\nedge = profit-monster-trail (n=6, +0.21). Chop entries lose, trails win \u2014\nsame story as always.\n\nWorst signal 7d: ai-trader+ LONG (n=20, WR 30%, -0.85). Every loser\nentered meta_rsi 46-54 \u2014 mid-band inside the EMA300 pin. Winners (ME 40.7,\nSUPER 56.3) caught real moves and trailed. Losers were no-side-of-nothing\ntrades. doji-bottom-long: n=16, WR 31%, -0.97 \u2014 knife-catching in\nDISTRIBUTION.\n\n\u26a0\ufe0f WLD SHORT pick (20:14) reasoned off \"BTC below EMA300, STRONG_DOWN\" \u2014\ncontinuum at 20:37 shows AT EMA300, trend STRONG_UP, linreg NEUTRAL.\nPremise drifted. Expect rejection; don't re-pick WLD.\n\nNo new AI-trader pick fired: last write 26 min ago (inside 45-min window).\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Stay flat until BTC closes clean either side of 82,004 with volume.\n   Mid-RSI 45-60 entries have zero edge in this pin.\n2. LONG only on EMA300 reclaim + volume + bullish linreg flip.\n   SHORT only on volume-confirmed rejection (volume-buildup- model:\n   7d WR 77.8%, +0.35 \u2014 the one short playbook that pays).\n3. ai-trader+ pick quality needs the EMA300-pin condition in its\n   reasoning checklist \u2014 flag for brain auditor, not a watchdog param change.\n4. When a trade does open and trails arm: trail family is the only\n   exit engine that made money this week. Let winners trail.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json` (deep_analysis, regime_context, pattern_alerts \u2014 steers untouched). All patterns verified live from PostgreSQL using `meta_rsi`, no `entry_rsi_14`.\n",
+  "agent_timestamp": "2026-10-19T20:41:53.139277+00:00",
+  "regime_context": "BTC @ 81,981 \u2014 0.03% BELOW EMA300 (82,004), effectively pinned. 1m: linreg NEUTRAL, zscore NEUTRAL, velocity SLOW, acceleration FLAT, volume_regime LOW, wyckoff DISTRIBUTION, market_phase CALM. Scanner aggregates (15m/4h) still say LONG_BIAS with STRONG_UP trend quality \u2014 lagging the 1m indecision. Regime_5m: 26 LONG_BIAS vs 5 SHORT_BIAS vs 93 neutral across 124 tokens \u2014 alt-level long bias but no market-wide trend. Practical read: LOW-vol EMA300 decision zone. Mid-RSI entries (RSI 45-60) have no edge here \u2014 both directions get chopped. Trade only on resolution: LONG on reclaim of EMA300 with volume + bullish linreg flip; SHORT on clean rejection with volume. volume-buildup- SHORT (7d WR 77.8%, +0.35) proves volume-confirmed shorts still work; random mid-band shorts do not.",
+  "pattern_alerts": "VERIFIED from PostgreSQL (7d window, n>=5):\n\n1. ai-trader+ LONG \u2014 n=20, WR 30.0%, avg -0.0425, total -0.85 USDT. Losers all entered meta_rsi 46-54 (chop band); winners were trail-family exits after real moves. WINNING SIDE: no trade until BTC resolves EMA300, or wait for momentum + volume confirmation. We weren't on it because picks fired mid-pin on RSI-center alone.\n\n2. doji-bottom-long \u2014 n=16, WR 31.2%, avg -0.0606, total -0.97 USDT. Worst total of any signal. WINNING SIDE: the dump continuation that printed the doji. These are counter-trend longs without trend confirmation \u2014 in DISTRIBUTION at EMA300 the doji resolves down more often than up.\n\n3. atr_sl_hit cluster (24h) \u2014 n=7, total -0.36 of -0.38 net loss. vs profit-monster-trail n=6, +0.21. WINNING SIDE: only trades that escaped the pin into a real trend. Root cause is entry timing in chop, not stop placement.\n\n4. pump-chain- SHORT \u2014 n=32, WR 21.9%, total -0.55. pump-chain+ LONG same period: n=29, WR 31.0%, total +0.70. Asymmetric payoff: our LONG side of the pair pays, SHORT side doesn't (without volume confirmation). WINNING SIDE has been LONG in this 7d window.\n\n5. volume-buildup- SHORT \u2014 n=9, WR 77.8%, total +0.35. Counter-example: shorts work when volume-profile confirms. Direction itself is not the problem; unconfirmed direction is."
 }
