@@ -12080,3 +12080,26 @@ BY: daily_orchestrator
 - bb-bounce-v2-long+ has an OPEN trade right now — if it loses, 2T 0W → 3T 0W triggers kill
 - 24h WR recovering (42.9% from 30.8% earlier), but 7d still -$3.91 / 34.0% — size-reduce stays until 7d WR ≥35% and PnL ≥ -$2
 - Quiet market continuing (only 2T in last hour, ~5T in 12h)
+
+## [2026-10-19 05:27] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses)
+**PnL:** +$0.05 last hour | 24h 13T 6W -$0.12 (46.2% WR) | 7d 195T 66W -$3.79 (33.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 win: ETC bb-bounce-v2-long+ LONG profit-monster-trail +$0.05 (2.12%) — trail exit, healthy
+- bb-bounce-v2-long+ now 3T 1W (was 2T 0W) — win clears the kill-watch
+- pump-chain+ 2T 0W -$0.09 — still under 3T threshold, standing watch
+- atr_sl_hit 4/13 = 30.8% last 24h (healthy, tpsl fix deployed)
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (23:00 +$0.05, 00:00 +$0.03, 03:00 +$0.08, 04:00 +$0.06 — last 4 active hours all positive)
+- 0 open trades
+- Size-reduce 0.3x stays (7d WR 33.8% < 35%, 7d PnL -$3.79)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR recovering (46.2%) but 7d still -$3.79 / 33.8% — size-reduce stays until 7d WR ≥35% and PnL ≥ -$2
+- pump-chain+ at 2T 0W — 1 more loss kills it
+- Quiet market continues (~13T in 24h)
