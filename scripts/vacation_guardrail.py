@@ -254,11 +254,11 @@ def write_size_reduce(reason):
             'size_reduce': True,
             'reason': reason,
             'written_at': datetime.now(timezone.utc).isoformat(),
-            'size_multiplier': 0.3,
+            'size_multiplier': 0.5,
         }
         with open(SIZE_REDUCE_MARKER, 'w') as f:
             json.dump(config, f, indent=2)
-        log(f"📉 [VACATION-GUARDRAIL] SIZE REDUCED to 30% (not paused): {reason}")
+        log(f"📉 [VACATION-GUARDRAIL] SIZE REDUCED to 50% (not paused): {reason}")
     except Exception as e:
         log(f"❌ [VACATION-GUARDRAIL] Failed to write size-reduce: {e}", 'ERROR')
 
