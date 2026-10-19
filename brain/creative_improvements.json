@@ -5496,5 +5496,23 @@
     "status": "monitor — confound audit (signal mix) still owed by self_learner",
     "category": "regime",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-19T05:39:47Z",
+    "idea": "EXTREME post-arm breakeven-ratchet SHADOW (pre-registered)",
+    "rationale": "14d armed-reverse 29T -$1.67 (24/29 EXTREME, avg MFE 0.82% -> ATR SL). Continuous stop mgmt after arm, not fixed-time cut. False-kill risk pool 97 winners +$11.19/14d needs candle OOS.",
+    "expected_impact": "+$0.84/7d raw upper bound",
+    "category": "exit management",
+    "status": "pre-registered (resume-day stack review Oct 23 — not shipped now)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-19T05:39:47Z",
+    "idea": "BTC SHORT EMA300-proximity watch",
+    "rationale": "BTC SHORT -5.36% at EMA300 floor MFE~0; manual LONG +4.31% 7min later; prior #16258 same level raked to BE. n=7 14d insufficient.",
+    "expected_impact": "avoid ~-2% avg squeeze losses on ~1-2 trades/14d if pattern confirms",
+    "category": "entry sniper",
+    "status": "monitor (n<20)",
+    "risk": "low"
   }
 ]
