@@ -206,6 +206,48 @@ Score each factor, sum them, and convert to a probability:
 | **-19 to -1** | 35-45% | **AVOID** — counter-trend |
 | **-50 to -20** | 10-35% | **STRONG AVOID** — wrong side |
 
+### ⚠️ Chop-Regime Adjustment (MANDATORY — run before trusting any score)
+
+The trend inputs (1h/15m/5m MACD, Continuum) assume trend persistence. In a
+chop regime they LAG the flip — a score computed with stale trend data reads
+GOOD on the wrong side. **Lesson: 2026-10-18 trade #16273 SHORT scored +45
+GOOD using STRONG_DOWN continuum that flipped BULL the same evening; the
+CEOs live-tape read (1m momentum bullish) was right and the score lost
+-5.36%.**
+
+**Detect:** count hourly EMA300-position flips in the last 24h from the
+continuum history (hourly sampling filters 1m noise):
+
+```bash
+cat /var/www/hermes/data/continuum_data.json | python3 -c "
+import sys, json, time
+d = json.load(sys.stdin)
+h = [e for e in d['history'] if e.get('token') == 'BTC']
+now = h[-1]['ts']
+hours = {}
+for e in h:
+    if e['ts'] < now - 86400: continue
+    hours[time.gmtime(e['ts']).tm_hour] = 'ABOVE' if e['price'] > e['ema300'] else 'BELOW'
+states = [hours[k] for k in sorted(hours)]
+flips = sum(1 for a, b in zip(states, states[1:]) if a != b)
+print(f'24h hourly EMA300 flips: {flips} ({\"CHOP\" if flips >= 2 else \"TREND\"} regime)')
+"
+```
+
+**Apply:**
+- **flips >= 2 (CHOP regime):** halve all trend-input points (1h/15m/5m MACD,
+  Continuum — round toward zero), and add the flag **"CHOP REGIME — momentum
+  over trend; live-tape reads outrank trend scores"** to the verdict. In chop,
+  the score is a sanity check, not a gate: the CEO's momentum/divergence reads
+  on the executing timeframe carry more weight than the trend inputs.
+- **flips 0-1 (TREND regime):** score as normal.
+
+**Slippage buffer (BTC 10x):** in any BTC trade at 10x, subtract a slippage
+buffer (150-250 points) from the R:R risk side before quoting it. #16273's
+paper 4.9:1 paid 2.2:1 because a squeeze blew 208 points past the stop
+between 1-minute pipeline checks. Quote "planned R:R" and "real R:R (with
+slip)" separately.
+
 **Example: BTC LONG scoring:**
 ```
 1h MACD:    BEAR  = -15

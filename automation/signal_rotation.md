@@ -1,6 +1,6 @@
-# Signal Rotation — 2026-10-18 19:41 UTC
+# Signal Rotation — 2026-10-18 23:41 UTC
 
-## Market Regime: SHORT_BIAS
+## Market Regime: LONG_BIAS
 
 ## Signals Ranked by Regime-Adjusted Score
 

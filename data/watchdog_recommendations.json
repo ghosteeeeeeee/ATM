@@ -1,57 +1,57 @@
 {
-  "timestamp": "2026-10-18T20:56:47.484049+00:00",
+  "timestamp": "2026-10-19T02:36:16.727070+00:00",
   "steers": [
     {
-      "severity": "urgent",
+      "severity": "warning",
       "category": "health",
-      "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.41 USDT. Something is wrong.",
+      "title": "5 recent losses look like wrong-side trades",
+      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
-      "severity": "warning",
-      "category": "health",
-      "title": "7 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
+      "severity": "urgent",
+      "category": "regime",
+      "title": "100% long portfolio vs STRONG_DOWN 4h regime",
+      "detail": "Both open trades are LONGs. BTC 4h is SHORT_BIAS with trend_quality STRONG_DOWN. We're fighting the higher timeframe. The 15m LONG_BIAS is short-term noise \u2014 the 4h defines the trend. Either exit the BTC long or accept it's a counter-trend scalp with tight stop.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-deep-001"
+    },
+    {
+      "severity": "urgent",
+      "category": "profit_lock",
+      "title": "ME LONG deteriorating \u2014 stop only 0.39% below current price",
+      "detail": "ME entered at RSI 40.7 (below healthy long band). Price falling steadily from 0.0600 to 0.0593 over the last hour. Current 0.05933 vs stop 0.0591 = 0.39% buffer. RSI now 9.5 (deeply oversold). The winning side on ME is SHORT. Consider cutting this trade before the stop hit \u2014 the thesis (RSI bounce) has not materialized.",
+      "auto_executable": false,
+      "id": "steer-deep-002"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 3 losses",
-      "detail": "Net -0.27 USDT over last 20 trades (losses: -0.29). Consider disabling or tuning this signal.",
+      "title": "pump-chain+ longs keep losing at mid-RSI in chop",
+      "detail": "pump-chain+ has 36.7% WR over 49 trades. Recent losses (LDO RSI 51.9, IO RSI 57.1) were longs entered mid-RSI that faded. The winning side on these was SHORT. This signal is firing longs into a 4h SHORT_BIAS regime. Consider whether pump-chain+ should be regime-gated to only fire longs when 4h is LONG_BIAS.",
       "auto_executable": false,
-      "id": "steer-003"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'ai-trader+' losing streak: 3 losses",
-      "detail": "Net -0.39 USDT over last 20 trades (losses: -0.44). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-deep-003"
     }
   ],
-  "portfolio_health": "critical",
+  "portfolio_health": "good",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "continuum": "ABOVE",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "linreg_alignment": 0.0,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "DECLINING",
-    "trend_quality": "UP"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 0,
-  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 (flat \u2014 capital safe)\nUnrealized PnL: 0.00 USDT\nRegime: SHORT_BIAS (15m + 4h) | Volatility: LOW | BTC below EMA300 ~15h\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent/health] 13/20 recent trades lost, 7d WR 33.5%, -3.60 USDT. Vacation guardrail at 30% size is active \u2014 keep it until WR recovers.\n\ud83d\udd34 [urgent/regime] 48h: LONGs 27% WR (-1.04) vs SHORTs 57% WR (+0.46). Every meaningful loss was the wrong side of a SHORT_BIAS tape. Pending signals (BTC continuum LONG, BLUR pump-chain LONG) are the losing side \u2014 BLUR is also coin_shame'd (30d WR 20%). Do not chase those LONGs.\n\ud83d\udfe1 [warning/health] volume-breakout-long+ n=17 WR 17.6% pnl -1.03 \u2014 worst signal by far, pure counter-trend longs. Candidate for regime-gated disable (SHORT_BIAS only) \u2014 brain auditor's call, not mine.\n\ud83d\udfe1 [warning/health] bb-squeeze+ 58% WR but -0.69 pnl \u2192 R:R broken, not win-rate. Winners too small / losers too big.\n\ud83d\udfe2 [info/opportunity] AI Trader pick fired: LINK SHORT conf 74, RSI 61.7, all precheck gates PASS (RR mult 0.70 penalty \u2192 smaller size, fine under guardrail).\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n0 open trades after the streak \u2014 nothing to steer positionally, so the steer is directional. The 7d exit-reason autopsy reconfirms the known law: hard_max_loss 0/53 (chop entries, trail never armed) vs profit-monster-trail 31/33 + atr_trail 18/22 (trend rides). Trend-following wins, chop entries bleed. In a grind-down LOW-volume regime, LONG pump-chasing = chop entries at scale. The winning side on ETC/APT/INJ/DOT/BLUR losses was SHORT or flat \u2014 we were buying lower-highs for 15 hours. APT (pick RSI 57 \u2192 fill 33.7) reconfirms DRIFT-E: meta_rsi only, drift guard working. HYPE SHORT at meta_rsi 38.1 lost \u2014 oversold shorts are the mirror trap; SHORT band 45-65 discipline holds both ways.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. SHORT-only bias until BTC reclaims EMA300 (~81,040) with bullish linreg. Block or ignore LONG pump-chain/bb-bounce fires while 15m+4h are SHORT_BIAS.\n2. Let the LINK SHORT (ai-trader) fill; if BTC reclaims EMA300, invalidate thesis immediately \u2014 don't hold through regime flip.\n3. Brain auditor follow-up: regime-gate volume-breakout-long+ and audit bb-squeeze+ R:R sizing (not this session's job).\n4. Keep vacation guardrail at 30% until 7d WR > 35%.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json`; AI trader pick written to `ai_trader_state.json` (LINK SHORT, conf 74, rsi_at_pick 61.7, price 11.6365).\n",
-  "agent_timestamp": "2026-10-18T21:00:29.232037+00:00",
-  "regime_context": "BTC SHORT_BIAS on both 15m and 4h. Price 80,922 below EMA300 (81,040) for 905 minutes (~15h), linreg LEAN_BEAR, market_phase DECLINING, velocity SLOW / acceleration NEGATIVE. Volume regime LOW, zscore NEUTRAL \u2014 this is a grind-down, not a crash: no violent dumps to catch, just persistent supply. Aggregate 15m scanner: 70 SHORT_BIAS vs 1 LONG. In this regime LONGs are counter-trend (27% WR over 48h confirms) and SHORTs trend-follow (57% WR). Vacation guardrail already size-reducing to 30% (7d WR 33.5% < 35%) \u2014 appropriate. Align: prefer SHORT setups, skip LONG pump-chasing until BTC reclaims EMA300 with bullish linreg.",
-  "pattern_alerts": "VERIFIED (PostgreSQL, last 48h, n=22, WR 36%, pnl -0.58):\n1. LONG-side bleed: n=15 WR=27% pnl=-1.04 vs SHORT n=7 WR=57% pnl=+0.46. WINNING side was SHORT the whole time; we kept buying dips in a market making lower highs. Why weren't we on it? pump-chain+ and bb-bounce-v2-long fire on any green candle regardless of BTC regime \u2014 signal-side regime alignment is weak.\n2. hard_max_loss pattern (7d n=53, 0 wins, -4.72): every one is a chop entry \u2014 coin never moved +0.40% for trail to arm. WINNING side = not in the trade at all, or SHORT the same coin. Entry condition is the flaw: these fire on noise, not displacement.\n3. APT ai-trader+ LONG: meta_rsi at fill 33.7 (pick was 57.1) \u2014 RSI drifted -23pts before fill. Already guarded by AI_TRADER_RSI_DRIFT_MAX=15. Reconfirmed: never trust entry_rsi_14 column (DRIFT-E).\n4. volume-buildup- HYPE SHORT at meta_rsi=38.1 lost \u2014 shorting oversold is the mirror of the BANANA lesson. SHORT band discipline (45-65) matters both ways.\n5. IO + BLUR trail_arm_timeout losses: entered, never trended, exited at timeout. Same chop family as hard_max_loss."
+  "open_count": 2,
+  "deep_analysis": "Now let me merge my analysis into the recommendations file.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 2 (2 long, 0 short)\nUnrealized PnL: ~+0.1% (ME +1.21%, BTC -0.09%)\nRegime: mixed | Volatility: LOW\n  15m: LONG_BIAS | 4h: SHORT_BIAS | Continuum: ABOVE\n  Trend quality: STRONG_DOWN\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent/regime] 100% long portfolio vs STRONG_DOWN 4h\n\ud83d\udd34 [urgent/profit_lock] ME LONG: stop only 0.39% below\n   current price, RSI 40.7 (below band), fading hourly\n\ud83d\udfe1 [warning/health] pump-chain+ longs: 36.7% WR over 49T,\n   losing mid-RSI in chop \u2014 winning side was SHORT\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nBoth open trades are LONGs while the 4h says SHORT_BIAS\nwith STRONG_DOWN trend quality. We're fighting the higher\ntimeframe. BTC peaked at 82608 and is fading; ME is in a\nsteady 1h downtrend from 0.0600 to 0.0593. The winning\nside on ME right now is SHORT.\n\nRecent closed: 9W/11L. Losses cluster on pump-chain+\nlongs entered at mid-RSI (51-58) in chop. Winners were\nshorts (ALT +0.47 at RSI 63) and early momentum longs.\n\n\u2500\u2500 AI Trader Pick \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nWLD SHORT conf=76 \u2014 RSI 59.4, ATR 1.95%, precheck PASS\nAll gates clear. Aligns with 4h SHORT_BIAS and market-\nwide alt weakness (20+ coins negative 30m momentum).\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Cut or tighten ME LONG \u2014 thesis not playing out,\n   stop is 0.39% away, RSI below band. Winning side\n   is SHORT.\n2. BTC LONG is counter-trend vs 4h \u2014 keep tight stop\n   at 81551 or exit on any bounce toward 82500.\n3. pump-chain+ should be regime-gated to fire longs\n   only when 4h is LONG_BIAS \u2014 36.7% WR isn't enough.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
+  "regime_context": "BTC: 15m LONG_BIAS, 4h SHORT_BIAS \u2014 conflicting. Continuum ABOVE EMA300 (559 consecutive bars) but trend_quality STRONG_DOWN, linreg_alignment 0.0 (flat). Market phase CALM, volatility LOW, volume LOW. The 4h SHORT_BIAS dominates: higher timeframe trend wins. BTC peaked at 82608 and is fading \u2014 the path of least resistance is sideways-to-down, not up. Being 100% long here is fighting the 4h tape. The correct posture is either flat or selectively short on weak alts, not long BTC.",
+  "pattern_alerts": "VERIFIED PATTERN (n=49, pump-chain+): 36.7% WR, +$1.51 total, avg +$0.03. The signal fires longs that mostly lose. Looking at recent pump-chain+ losses: LDO (RSI 51.9), IO (RSI 57.1) \u2014 both entered mid-RSI in a chop regime and stopped out. The winning side on these trades was SHORT: LDO dropped 3.9% recently, IO faded. We were buying dips that kept dipping.\n\nVERIFIED PATTERN (n=47, pump-chain-): 25.5% WR, +$0.05 total. Shorts fire but only win 1 in 4. The 4h STRONG_DOWN says shorts should work better \u2014 but the entries are at wrong times. HBAR short won (+0.07 at RSI 54.5). The shorts that win are the ones at mid-RSI 50-55 in alignment with the 4h trend.\n\nOPEN TRADE HEALTH: ME LONG is the concern. Entered at RSI 40.7 (below healthy band), price now falling steadily, stop only 0.39% below current. This trade has the profile of a chop long that will hit stop. The winning side on ME right now is SHORT \u2014 it's dropped 1.1% in an hour.",
+  "agent_timestamp": "2026-10-19T02:40:40.089620+00:00"
 }

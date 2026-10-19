@@ -4,9 +4,11 @@ ai_trader_precheck.py — Pre-check a coin before the AI trader picks it.
 Tests the actual RR engine calculation so the watchdog knows if a pick will pass.
 
 Usage:
-    python3 ai_trader_precheck.py COIN DIRECTION
+    python3 ai_trader_precheck.py COIN DIRECTION [CONF]
     python3 ai_trader_precheck.py W SHORT
-    python3 ai_trader_precheck.py AVAX LONG
+    python3 ai_trader_precheck.py AVAX LONG 80
+    # CONF (optional): the confidence you plan to set on the pick.
+    # Required for SHORT picks in NORMAL/HIGH vol — gate needs conf>=75.
 """
 import sys, os, json, time
 
@@ -20,8 +22,9 @@ def _get_candles_db():
     return sqlite3.connect(os.path.join(HERMES_DATA, 'candles.db'), timeout=5)
 
 
-def precheck(coin, direction):
-    """Check if a coin+direction would pass the RR engine and other gates."""
+def precheck(coin, direction, conf=None):
+    """Check if a coin+direction would pass the RR engine and other gates.
+    conf: the confidence value the pick will use (needed for SHORT regime gate)."""
     results = {
         'coin': coin,
         'direction': direction,
@@ -209,6 +212,30 @@ def precheck(coin, direction):
                   f'RSI {rsi:.1f} in 45-55 death zone (7d 15-22%WR) — consider skip')
     elif rsi is None and 'RSI' not in [c['name'] for c in results['checks']]:
         check('RSI', False, 'insufficient closed candle data')
+
+    # 3a. SHORT-REGIME-GATE — signal_compactor.py: NORMAL/HIGH vol kills SHORT
+    # unless conf>=75 (proven family mover- never applies to ai-trader picks).
+    # Added 2026-10-18: LINK conf=74 passed precheck but pipeline blocked it
+    # every cycle — this gate was the one hole in "tests ALL pipeline gates".
+    if direction == 'SHORT':
+        try:
+            from volatility_gate import get_atr_pct, classify_volatility
+            atr = get_atr_pct(token)
+            # regime_params.py default: unknown ATR → NORMAL (conservative)
+            vol_regime = classify_volatility(atr) if atr is not None else 'NORMAL'
+            if vol_regime in ('NORMAL', 'HIGH'):
+                if conf is None:
+                    check('SHORT regime gate', False,
+                          f'{vol_regime} vol requires conf>=75, conf unknown — rerun with CONF arg')
+                elif conf >= 75:
+                    check('SHORT regime gate', True, f'{vol_regime} vol, conf={conf:.0f}>=75')
+                else:
+                    check('SHORT regime gate', False,
+                          f'{vol_regime} vol — conf={conf:.0f}<75, pipeline will block')
+            else:
+                check('SHORT regime gate', True, f'{vol_regime} vol — gate not applied')
+        except Exception as e:
+            check('SHORT regime gate', True, f'error: {e} — skip')
 
     # 3b. HALL-SHAME check — combo-aware via reputation.py (Rep Phase 3, 2026-10-15)
     # Old duplicate leaderboard logic removed; single source = reputation.should_block.

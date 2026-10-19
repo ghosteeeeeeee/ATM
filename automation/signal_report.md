@@ -1,69 +1,37 @@
-# Signal Performance Report
-**Generated:** 2026-10-18 15:31 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: Last 6h | 24h
+Generated: 2026-10-18 (signal_reporter)
 
-## Overall Stats
-- **Total trades (all time):** 3,198 | **WR:** 50.9% | **PnL:** -107.00%
-- **Date range:** 2026-07-29 → 2026-10-18
+6h closed trades: 0 — quiet period, no action.
+24h closed trades: 13.
 
----
+KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | — | — | — | — | No signal met kill criteria (no signal had 5+ trades in 24h) |
 
-## WINNERS (WR > 55%, PnL > 0)
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| (none) | — | — | — | — | No signal met boost criteria (no signal had 5+ trades in 24h) |
 
-None found.
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb-bounce-v2-long+ | LONG | 0.0% | -0.18 | 2 | WATCH — 7d 31.3% WR -$0.61 (16T). EXTREME already 0.0-blocked (10-16). NORMAL sliding: 7d 6T 33% -$0.18 vs lifetime 46.2% +$0.15. HIGH still 55.6% lifetime — keep alive, re-check next run |
+| pump-chain+ | LONG | 33.3% | -0.07 | 3 | WATCH — 7d 30.3% WR but +$0.31 net. NORMAL already 0.5-dampened (lifetime 11.1% WR -$0.63, 9T). HIGH 0.5. EXTREME carries PnL (+$0.41 7d). No change |
+| hl_copy_trader | SHORT | 0.0% | -0.06 | 1 | noise (1 trade) |
+| ai-trader- | SHORT | 0.0% | -0.05 | 1 | noise (1 trade) |
+| hl_copy_trader | LONG | 0.0% | -0.05 | 1 | noise — 7d LONG 50% WR +$0.12 |
+| volume-buildup- | SHORT | 0.0% | -0.03 | 1 | noise — 7d 77.8% WR +$0.35 (9T) |
 
----
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain-,pump-chain-v6- | SHORT | 100% | +0.54 | 2 | healthy |
+| ai-trader+ | LONG | 100% | +0.05 | 1 | healthy |
+| ai-trader-manual | LONG | 100% | +0.03 | 1 | healthy |
 
-## LOSERS (WR < 30%, PnL < -2%)
-
-None found.
-
----
-
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| pump-chain+ | LONG | 3 | 33.3% | -0.57 | ❓ | Needs more data |
-| ai-trader+ | LONG | 2 | 50.0% | -0.23 | ❓ | Needs more data |
-
----
-
-## DISABLED BUT GOOD (candidates for re-enabling)
-
-None found. Top performers are already enabled.
-
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
-
----
-
-## RECOMMENDATIONS
-
-1. **[WATCH] pump-chain+ LONG** — WR=33.3%, PnL=-0.57% over 3 trades. Monitor next cycle.
-2. **[WATCH] ai-trader+ LONG** — WR=50.0%, PnL=-0.23% over 2 trades. Monitor next cycle.
-
----
-
-*Report auto-generated. Next report: ~6h from now.*
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-10-18 | f635705 | brain_auditor: Captain audit run Oct 18 14:50 — 0 config cha... |
-| 2026-10-18 | 9b2c95f | brain_auditor: Audit run Oct 18 10:35 — soak #13, 0 config c... |
-| 2026-10-18 | 836de28 | brain_auditor: Captain audit Oct 18 06:40 — soak #11, 0 conf... |
-| 2026-10-17 | 209c5ae | brain_auditor: trail-arm-timeout candle OOS (all 4 cohorts) ... |
-| 2026-10-17 | b01d329 | brain_auditor: captain run Oct 17 06:45 — 0 changes, verify+... |
-| 2026-10-17 | 75b2af2 | brain_auditor: REGIME_CONF_EXTREME_MULT 1.15→0.85 — stale Se... |
-| 2026-10-17 | ece01f3 | scripts: MFE-CUT shadow collector (T=45m, zero behavior) + a... |
-| 2026-10-17 | 70f45e4 | brain_auditor: ai-trader RSI drift guard + MFE exit-ladder a... |
-| 2026-10-17 | 5a95263 | signals: pump-chain+ LONG dead-gap falling-knife block (gap<... |
-| 2026-10-17 | 66716f2 | scripts: extend trail-arm-timeout SHADOW to ai-trader+ LONG ... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+ISSUES:
+- None. 0 direction inversions in 24h. No bugs or anomalies detected.
+- Signal volume is very low (13 trades/24h, 0 trades/6h) — insufficient data for kill/boost decisions this cycle. Existing regime gates (bb-bounce-v2-long+ EXTREME=0.0, pump-chain+ NORMAL/HIGH=0.5) remain appropriate.
