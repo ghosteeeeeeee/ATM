@@ -12058,3 +12058,25 @@ BY: daily_orchestrator
 - 7d PnL -$4.00 worsening slightly from -$3.91, WR 33.3% — still below 37% resume threshold
 - Zero trades ~3 hours in a row (00:27, 01:28, 02:27, now 03:xx) — quiet market or over-filtering?
 - atr_sl_hit at 38.5%, close to 40% kill threshold — watch next hour
+
+## [2026-10-19 04:27] Hourly Analysis
+
+**Trades:** 2 closed last hour (2 wins, 0 losses)
+**PnL:** +$0.09 last hour | 24h 14T 6W -$0.17 (42.9% WR) | 7d 197T 67W -$3.91 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 wins: ME ai-trader+ LONG rr_engine_trail_hit +$0.08 (2.10%), BTC continuum-trend+ LONG profit-monster-trail +$0.01 (0.30%) — both trail exits, healthy
+- atr_sl_hit 4/14 = 28.6% last 24h (healthy, tpsl fix deployed)
+- Kill check: bb-bounce-v2-long+ 2T 0W -$0.18, pump-chain+ 2T 0W -$0.09, hl_copy_trader 1T 0W -$0.05 — all under 3T threshold, standing watch
+- No overtrading (2T/hr)
+- No 3-neg-hour streak (23:00 +$0.05, 00:00 +$0.03, 03:00 +$0.08, 04:00 +$0.01 — last 4 active hours all positive)
+- 1 open: ETC bb-bounce-v2-long+ LONG @7.73
+- Size-reduce 0.3x active (vacation_size_reduce.json, 7d WR 34.0% < 35%, 7d PnL -$3.91) — stays
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ has an OPEN trade right now — if it loses, 2T 0W → 3T 0W triggers kill
+- 24h WR recovering (42.9% from 30.8% earlier), but 7d still -$3.91 / 34.0% — size-reduce stays until 7d WR ≥35% and PnL ≥ -$2
+- Quiet market continuing (only 2T in last hour, ~5T in 12h)
