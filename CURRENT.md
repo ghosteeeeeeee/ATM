@@ -1,60 +1,59 @@
-# Current State — brain_auditor Run Oct 19 12:43 UTC
+# Current State — brain_auditor Run Oct 19 13:40 UTC
 
-**Last Updated: 2026-10-19 12:43 UTC**
-**Updated by: brain_auditor #20 — 0 config changes, soak discipline, REGIME FLIP detected**
+**Last Updated: 2026-10-19 13:40 UTC**
+**Updated by: brain_auditor #21 — 0 config changes (vacation mode + soak #21), TAT wire-check resolved**
 
-## PIPELINE STATUS (12:43 UTC)
+## PIPELINE STATUS (13:40 UTC)
 
-- **Trading LIVE** with 0.3x size-reduce (7d WR 34.0% < 35 AND pnl −$4.05 < −$2). **⚠️ Size-reduce auto-clears Oct 20-21 via aging** (Oct 12/13 negative days age out of 7d window). 24h WR 52.9% supports lift. **LIFT WATCH PROTOCOL: first 5 full-size trades — 2+ losers or any loss >$0.50 → re-pause.**
-- **24h 17T 9W −$0.32 (52.9% WR healed). | 7d 200T 68W −$4.05 (34.0%). | TRAIL 8T 100% +$0.36 vs CHOP 8T 0% −$0.32 (24h, 100% separated).**
-- **1 open:** ARB pump-chain+ LONG #16285 @0.19796 conf 29.5 EXTREME — opened 12:17, regime-aligned post-flip.
-- **⚠️ REGIME FLIP: 12:06 SHORT_BIAS/BELOW EMA300(227c) → 12:36 LONG_BIAS/AT/STRONG_POS/STRONG_UP.** Both TFs LONG_BIAS. Continuum reclaimed EMA300. zscore STRONG_POS.
+- **Trading LIVE** with 0.3x size-reduce (7d WR 33.8% < 35 AND pnl −$4.09 < −$2). **⚠️ Size-reduce auto-clears Oct 20-21 via aging. LIFT WATCH PROTOCOL: first 5 full-size trades — 2+ losers or any loss >$0.50 → re-pause.**
+- **24h 18T 9W −$0.36 (50% WR). | 7d 201T 33.8% −$4.09. | TRAIL 8T 100% +$0.36 vs CHOP 10T 10% −$0.72 (24h, 100% separated).**
+- **0 open — flat. Correct posture during regime-flip validation window.**
+- **⚠️ REGIME FLIP 12:36: SHORT_BIAS/BELOW-EMA300(227c) → LONG_BIAS both TFs / continuum AT EMA300 / STRONG_POS / STRONG_UP.** market_phase DECLINING (possibly stale). 1m/5m slopes positive = bounce-in-downtrend risk; reclaim must HOLD to confirm. Post-flip cohort n=1 (ARB pump-chain+ −0.04 floor-admit).
+- **Vacation mode ACTIVE** — shadow-first, no enforcement flips, no constants change. Lifts when T returns.
 - Protected flags 13/13 INTACT.
 
-## THIS RUN — brain_auditor #20
+## THIS RUN — brain_auditor #21
 
-**0 config changes** (soak #20; 30T post-stack cohort VALIDATING at 46.7%WR — don't confound).
+**0 config changes** (vacation mode + soak #21; regime flip needs cohort data before any directional filter).
 
-**POST-STACK COHORT (30T since Oct 17 12:00):**
-- Overall: 46.7%WR −$0.22 (vs 7d baseline 34%)
-- TRAIL 13T 84.6% +$0.81 vs CHOP 14T 0% −$1.16 — 100% separated
-- EXTREME: 7T 42.9% +$0.19 (was worst regime, now POSITIVE — defenses working)
-- SHORT: 7T 42.9% +$0.39 (net positive)
-- LONG: 23T 47.8% −$0.61 (still bleeding but improving)
+**WATCHDOG STEER TRIAGE:**
+- steer-001 wrong-side 7 losses — VERIFIED pre-flip (8/9 losers were LONGs before 12:36). Self-resolve watch via cohort tracker. No anti-LONG filter (would fight new trend).
+- steer-002 ai-trader+ 3-loss streak — VERIFIED: counter-trend LONGs + ARB conf 25.5 floor-admit leak + LDO EXTREME demote target. Shadows cover 2/3. No kill (n=3).
 
-**LAST-RUN VERIFY (all PASS):**
-- vacation_guardrail precedence fix — PASS (marker re-written 12:26 post-fix)
-- SHORT floor-45 revert — PASS (0 violations)
-- ai-trader precheck CONF fix — PASS
-- ai-trader+ EXTREME LONG shadow — COLLECTING (n=1, LDO would-block)
-- contrarian 14d span gate — PASS
-- bb-bounce comment hygiene — DONE
+**LOSING AUTOPSY 24h:**
+- ai-trader+ LONG cluster ×3 (−$0.25): shadow-covered (EXTREME demote + pp-cond)
+- bb-bounce ME −0.26 stale_exit 57m: **TAT + MFE-CUT shadows BOTH fired would-save ~2.6pp — wire verified this run**
+- BTC ai-trader-pending SHORT −0.06: bounce-catch (flip-window hazard)
+- ARB pump-chain+ −0.04: floor-admit, pp-cond would-block
 
-**AUDIT FINDINGS:**
-1. **REGIME FLIP** — anti-LONG filters would fight new trend. Wrong-side steer may self-resolve.
-2. **50-55 LONG band RE-VERIFIED REJECT** — 30d 51.4%WR reverses; kills 5/5 trail winners.
-3. **Kill flags: 0 leaks** — all correctly False; post-kill trades were aging.
-4. **SHORT scarcity** — volume-buildup- best SHORT (9T 77.8% +$0.35) but n=9 < 20 bar. Can't boost.
+**LAST-RUN VERIFY (all PASS):** vacation_guardrail precedence ✓ | SHORT floor-45 ✓ | ai-trader precheck CONF ✓ | contrarian span gate ✓ | EXTREME-LONG shadow collecting n=2 (LDO would-block 49.4<60; 7d cohort worsened 13T 15.4% −$0.85 — directional strong, vacation bans flip).
+
+**pp-cond floor shadow:** 653 events / 64 would-blocks. Today ARB×2+CHIP flagged, ARB both losers. Executed cohort 32T −$1.40 n≥20 — **SURFACE for CEO resume day (Oct 20-21).**
+
+**TAT WIRE-CHECK RESOLVED:** TRAIL-ARM would-fire logged on ME #16287 at 10:33:20 (56m, −0.94%) — 1min before stale_exit. MFE-CUT fired 54/55/56m. 1121 total would-fire lines. Datasets VALID. Fire count: BANANA + ME = 2/15 toward flip threshold.
 
 ## CREATIVE (this run)
 
-1. **Regime-flip cohort tracker** — tag post-12:36 trades, measure 48h LONG WR. >50% = regime was cause. <40% = pick-quality root. Zero config, natural experiment.
-2. **pump-chain- EXTREME SHORT conf-demote shadow PRE-REGISTERED for Oct 23** — 14d atr_sl cell 17T −$1.08 (biggest bleed), mirrors ai-trader EXTREME LONG shadow. Shadow-only.
+1. **Regime-flip LONG cohort natural experiment** — query open_time > 12:36, 48h re-eval Oct 21. >50% WR = flip was root cause of wrong-side bleed; <40% = pick-quality root. Zero code.
+2. **SHORT counter-trend watch pre-registered** — if flip holds, SHORTs become wrong side. <30% WR n≥10 over 48h → surface dampen candidates Oct 21. No action before data.
+3. TAT wire-check — RESOLVED (wire OK).
 
 ## ACTIVE SHADOWS
 
-- ai-trader+ EXTREME LONG conf-demote — n~1 (LDO would-block)
-- pp-conditional penalty floor — 653 events
-- MFE-CUT / bb-bounce TAT / contrarian PROMOTE / ARM-BE — collecting
+- ai-trader+ EXTREME LONG conf-demote — n=2 (LDO would-block), re-eval n≥20
+- pp-conditional penalty floor — 653 events / 64 would-blocks, CEO resume-day decision
+- MFE-CUT / bb-bounce TAT (fires validated) / contrarian PROMOTE / ARM-BE — collecting
 - RR-engine would-blocks — ~10/hr
-- wyckoff shadow — 187 events
+- wyckoff shadow — collecting
 
 ## NEXT
 
 - **Oct 20-21: size-reduce auto-clears** — lift watch protocol active.
-- **~Oct 21: regime-flip cohort check** — resolve wrong-side root cause.
-- Oct 23 resume-day CEO eyeball: 12+ unvalidated changes + BE-ratchet shadow + trail_activated stamp + pump-chain- EXTREME shadow (pre-registered).
+- **Oct 21: regime-flip cohort 48h check** — resolve wrong-side root cause.
+- **Oct 21: surface pp-cond floor flip to CEO** (vacation lifts, cohort n≥20 met).
+- Oct 20 EOD: self_learner candle-OOS scoped version if still undelivered (P0).
 - ai-trader+ EXTREME re-eval at n≥20.
+- Oct 23: pump-chain- EXTREME SHORT conf-demote shadow (pre-registered).
 - contrarian pump-chain- PROMOTE re-eval ~Oct 29.
 - LONG 70+ band: no Oct 24 promotion (CEO freeze stands).
-- self_learner candle-OOS backtest: STILL UNDELIVERED (P0). brain_auditor runs scoped version Oct 20 EOD if missing.
+- **Do NOT add anti-LONG filters during flip validation window.**

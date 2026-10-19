@@ -5606,5 +5606,35 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-19T13:38:49Z",
+    "agent": "brain_auditor",
+    "run": 21,
+    "idea": "Regime-flip LONG quality cohort (natural experiment, zero code)",
+    "detail": "Tag trades open_time > 2026-10-19 12:36, measure 48h LONG WR vs pre-flip 72h baseline (43T 37.2% -$2.15). >50% = flip was root cause; <40% = pick-quality root. First point: ARB -0.04. Re-eval Oct 21.",
+    "category": "diagnostic",
+    "status": "active",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-19T13:38:49Z",
+    "agent": "brain_auditor",
+    "run": 21,
+    "idea": "SHORT counter-trend watch pre-registration",
+    "detail": "If flip holds, SHORTs become counter-trend. Metric: 48h post-flip SHORT WR. <30% with n>=10 → surface SHORT dampen candidates for resume day. No action before data — avoids whipsaw filter churn.",
+    "category": "risk",
+    "status": "pre-registered",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-19T13:38:49Z",
+    "agent": "brain_auditor",
+    "run": 21,
+    "idea": "TAT shadow wire-check (ME stale_exit no-fire)",
+    "detail": "ME bb-bounce 57m stale_exit -3.54% should have triggered T=55 TAT would-fire log; grep found 0 shadow lines Oct 19. Verify shadow logging path / trailing_activated flag / live_pnl@T before treating 653-event collection as valid.",
+    "category": "verification",
+    "status": "actioned",
+    "risk": "none"
   }
 ]
