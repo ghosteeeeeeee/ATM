@@ -12207,3 +12207,26 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader-pending 24h 2T 0W — 1 more loss kills it (3T threshold)
 - 7d still -$3.79 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - doji-bottom-long 7d -$0.97 worst cohort — candidate for deeper review in a dedicated session, not an hourly kill
+
+## [2026-10-19 10:27] Hourly Analysis
+
+**Trades:** 3 closed last hour (1 win, 2 losses)
+**PnL:** -$0.12 last hour | 24h 17T 9W -$0.09 (52.9% WR) | 7d 199T 68W -$3.79 (34.2% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 losses: DOGE ai-trader+ atr_sl_hit -$0.05 (-2.04%), ARB ai-trader+ hard_max_loss -$0.10 (-4.64%) — both within expected loss bands at 3-5x leverage
+- Win: LTC bb-bounce-v2-long+ profit-monster-trail +$0.03 — healthy exit
+- atr_sl_hit 6/17 = 35% last 24h (under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour (ai-trader+ 2T 0W -$0.15 under 3T threshold — watch)
+- No overtrading (3T/hr)
+- 3-neg-hour streak (08:00 -$0.14, 09:00 -$0.07, 10:00 -$0.05) — size-reduce 0.3x already active, remedy already in place
+- Size-reduce 0.3x stays (7d WR 34.2% < 35%, 7d PnL -$3.79)
+- 1 open: ME bb-bounce-v2-long+ LONG @0.0593
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader+ 2T 0W last hour — 1 more loss triggers kill (3T threshold)
+- 3-neg-hour streak — monitor; size-reduce already on
+- 7d still -$3.79 / 34.2% — size-reduce stays until 7d WR >=35% and PnL >= -$2
