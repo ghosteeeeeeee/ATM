@@ -1311,3 +1311,14 @@
 - **WARN** (12028x): `hermes-coding-mcp.service` crash-looping — ExecStart points to missing `/root/.hermes/scripts/run_mcp_server.py` (file absent from repo; mcp dir only has empty `dispatcher/`). Restarted 12,028 times over ~16h.
 - **AUTO-FIX**: `systemctl disable --now hermes-coding-mcp.service` — stopped crash loop, disabled unit. Restore requires recreating the MCP server script and re-enabling.
 - **INFO**: Pipeline healthy otherwise — 0 errors/tracebacks in 30min, 95 signals/h, 14 trades closed today (-$0.35), 0 open positions, disk 83%, prices fresh (~107s), all key timers active.
+
+## Error Alerts — 2026-10-19 15:26 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-19 16:26 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-19 16:43 UTC
+- **WARN** (1x each): `hermes-signal-reporter.service` and `hermes-upgrade-implementer.service` failed with systemd start timeout. Both are Type=oneshot analysis jobs; signal-reporter completed its git push (RC:0) before the kill, upgrade-implementer was mid-analysis. Neither is on the trading path.
+- **AUTO-FIX**: `systemctl reset-failed` on both units — cleared failed state, timers remain active for next scheduled retry (6h / 12h cadence).
+- **INFO**: Disk at 83% (under 85% threshold); no logs >7d to compress. Core timers (pipeline, price-collector, 1m-candle, watchdog) all active. Prices fresh (~43s). 0 open positions, 14 closed today -$0.35. Regime SHORT_BIAS. 43 signals/h. No trading-path issues.
