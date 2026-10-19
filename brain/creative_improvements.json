@@ -5570,5 +5570,23 @@
     "category": "risk",
     "status": "operational",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-19T11:40:39Z",
+    "idea": "Exit-stack counterfactual daily scorecard",
+    "rationale": "ARM-BE (PASS verdict, 30d +$5.94 universe fk 16.5%) and TAT shadows are collecting but CEO flip decisions lack a single daily P&L counterfactual. 24h shows 100% exit-family separation (9/9 winners trail, 9/9 losers SL/HML/stale) — the scorecard quantifies the exact rescue opportunity each morning.",
+    "expected_impact": "zero trading risk; accelerates ARM-BE + TAT ratify decisions with one number/day",
+    "category": "exit-stack readiness",
+    "status": "suggested",
+    "risk": "none (reporting only)"
+  },
+  {
+    "date": "2026-10-19T11:40:39Z",
+    "idea": "ai-trader pick-quality scorecard (regime-alignment logged per pick)",
+    "rationale": "Watchdog self-corrected to WLD SHORT after 3-loss LONG streak, but no systematic measure of pick quality vs regime. Log (regime_at_pick, direction, rsi_at_pick, btc_alignment) per pick, score 7d later, feed back into pick prompt. Addresses steer-002 root cause (pick quality, not signal params) without touching live filters.",
+    "expected_impact": "measurable improvement in ai-trader+ 7d WR (currently 30% -$0.85); zero trading risk",
+    "category": "pick quality feedback loop",
+    "status": "suggested",
+    "risk": "none (measurement only)"
   }
 ]
