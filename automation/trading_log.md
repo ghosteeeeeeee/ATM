@@ -12161,3 +12161,26 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - 7d still -$3.79 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - 24h WR recovering (58.3%) but PnL still slightly negative — watch
 - pump-chain+ 7d profitable (+$0.59) despite low WR — no action needed
+
+## [2026-10-19 08:30] Hourly Analysis
+
+**Trades:** 4 closed last hour (1 win, 3 losses)
+**PnL:** -$0.12 last hour | 24h 15T 8W -$0.02 (53.3% WR) | 7d 197T 67W -$3.79 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 3 SL hits (LDO ai-trader+ -$0.10, BTC ai-trader-pending -$0.04, LTC warrior-sr-confirm+ -$0.03) all hit accel/trail floors at ~0.30-0.35% price move — normal profit-lock behavior, not tight-SL bug (ATR_SL_MIN floor 1.30% deployed; tpsl_utils BUG-031 fix verified)
+- atr_sl_hit 6/15 = 40% last 24h — at threshold not over; tpsl fix confirmed deployed, no alert
+- Kill check: no signal with 0% WR and 3+ trades last hour; ai-trader-pending 24h 2T 0W -$0.10 under 3T threshold (open DOGE ai-trader+ — watch)
+- No overtrading (4T/hr)
+- No 3-neg-hour streak (08:00 -$0.14 is first negative hour; 07:00 +$0.02, 06:00 +$0.04, 04:00 +$0.06 all positive)
+- 1 open: DOGE ai-trader+ LONG @0.0798
+- Size-reduce 0.3x stays (7d WR 34.0% < 35%, 7d PnL -$3.79)
+- 24h nearly healed to -$0.02 / 53.3% WR after morning dip
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader-pending 24h 2T 0W — 1 more loss kills it (3T threshold)
+- 7d still -$3.79 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- brain_auditor noted size-reduce aging lift Oct 20 — staged-lift escalated, not touched here
