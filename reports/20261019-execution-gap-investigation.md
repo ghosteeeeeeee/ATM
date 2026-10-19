@@ -1,20 +1,36 @@
 # Investigation: 862 Signals → 17 Trades Execution Gap
 
-**Date:** 2026-10-19 19:45 UTC
-**Investigator:** Hermes (CEO agent)
+> ## ⚠️ CORRECTED 2026-10-19 20:40 UTC — AUDIT FOUND CRITICAL ERRORS
+>
+> Independent own-conclusions audit (`brain/verdicts/2026-10-19-execution-gap-own-conclusions.md`, commit `b24d5a3d`) found:
+>
+> 1. **"Hotset empty 4 days" is FALSE** — a 42MB NUL-blob in `signal-compactor.log` silently truncated plain `grep`. With `grep -a`: 84 non-empty writes today. The hotset is NOT empty.
+> 2. **"Most signals conf 72-74" is FALSE** — 89% have conf≥75. SHORT-REGIME-GATE killed only 50 signals vs 936 CONFLUENCE-GATE-BLOCK and 848 SHORT-RSI-HARD-FLOOR.
+> 3. **"BTC shifted from EXTREME" is FALSE** — BTC never EXTREME in 21+ days. Shift is token-level ATR expansion.
+> 4. **3 real bugs found** — log corruption, compactor/decider vol-gate mismatch (70 wasted executions/day), three divergent RSI sources.
+> 5. **Gates tightened Oct 16/18** — SHORT_MIDBAND added, SHORT_RSI_FLOOR reverted 35→45, pump-chain- EXTREME re-blocked. Never evaluated jointly.
+>
+> **The headline fix (loosen SHORT-REGIME-GATE) would barely help** — it killed 50 signals vs 936/848/695 at the top.
+>
+> **Corrected root cause:** ~38% of signals structurally unpassable + 20-gate stack tightened 3x Oct 16-18 + cross-layer gate/RSI inconsistencies wasting ~70 executions/day.
+>
+> **Use the audit verdict, not this report's Executive Summary, for decisions.**
+
+**Date:** 2026-10-19 19:45 UTC (corrected 20:40)
+**Investigator:** Hermes (CEO agent), audited by independent subagent
 **Trigger:** T reported "no trades taken, no stats generated, winrate stuck at 35%"
 **CEO directive:** "Investigate which gate eats the 862 signals before loosening anything"
 
-## Executive Summary
+## Executive Summary (SUPERSEDED — see correction notice above)
 
-The 862→17 execution gap is **not a bug** — it's the gate system working as designed in a market regime that doesn't favor our signals. The hotset has been **empty since 2026-10-15 04:06** because:
+~~The 862→17 execution gap is **not a bug** — it's the gate system working as designed in a market regime that doesn't favor our signals. The hotset has been **empty since 2026-10-15 04:06** because:~~
 
-1. **Market regime shifted** from EXTREME volatility to NORMAL/HIGH
-2. **SHORT signals blocked** by SHORT-REGIME-GATE (needs conf≥75 in NORMAL/HIGH, most signals have conf 72-74)
-3. **pump-chain- SHORT blocked** in both EXTREME (not in allowed list) and HIGH (PUMP-CHAIN-SHORT-HIGH gate)
-4. **LONG signals blocked** by CONTINUUM-BLOCK (BTC bearish structure) and RR-ENGINE (R:R too low)
+~~1. **Market regime shifted** from EXTREME volatility to NORMAL/HIGH~~
+~~2. **SHORT signals blocked** by SHORT-REGIME-GATE (needs conf≥75 in NORMAL/HIGH, most signals have conf 72-74)~~
+~~3. **pump-chain- SHORT blocked** in both EXTREME (not in allowed list) and HIGH (PUMP-CHAIN-SHORT-HIGH gate)~~
+~~4. **LONG signals blocked** by CONTINUUM-BLOCK (BTC bearish structure) and RR-ENGINE (R:R too low)~~
 
-The gates were designed for a different market regime. When the market was EXTREME, SHORT signals passed. Now the market is NORMAL/HIGH, and the same signals are blocked.
+~~The gates were designed for a different market regime. When the market was EXTREME, SHORT signals passed. Now the market is NORMAL/HIGH, and the same signals are blocked.~~
 
 ## Data Sources (Verified)
 
