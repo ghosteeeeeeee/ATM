@@ -11971,3 +11971,24 @@ BY: daily_orchestrator
 - atr_sl_hit at 38.5% — one more SL hit crosses 40% threshold; if it does, check tpsl_utils deploy status
 - bb-bounce-v2-long+ and hl_copy_trader still at 2T 0W — standing watch
 - 7d PnL -$3.66, WR 33.3% — size-reduce stays
+
+## [2026-10-19 00:27] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses)
+**PnL:** +$0.05 last hour | 24h 14T 5W -$0.30 (35.7% WR) | 7d 202T 68W -$3.61 (33.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade: BTC ai-trader-manual LONG atr_tp_hit +$0.05 (+4.31%) — clean winner, low adverse excursion implied by TP hit
+- atr_sl_hit 5/14 = 35.7% last 24h (under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 3+ trades 0% WR; bb-bounce-v2-long+ 2T 0W -$0.18 and hl_copy_trader 2T 0W -$0.11 both under 3T threshold — standing watch
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (22:00 −$0.06, 23:00 +$0.05)
+- 2 open: ME ai-trader+ LONG @0.05865, BTC continuum-trend+ LONG @82043
+- Size-reduce 30% stays (7d WR 33.7% < 37%, 7d PnL -$3.61 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ and hl_copy_trader still 2T 0W — 1 more loss each kills them
+- 7d PnL -$3.61, WR 33.7% still below 37% resume threshold — size-reduce stays
