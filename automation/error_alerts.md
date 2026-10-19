@@ -1306,3 +1306,8 @@
 ## Error Alerts — 2026-10-19 10:26 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3532s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3532s left, N failures)`
+
+## Error Alerts — 2026-10-19 14:45 UTC
+- **WARN** (12028x): `hermes-coding-mcp.service` crash-looping — ExecStart points to missing `/root/.hermes/scripts/run_mcp_server.py` (file absent from repo; mcp dir only has empty `dispatcher/`). Restarted 12,028 times over ~16h.
+- **AUTO-FIX**: `systemctl disable --now hermes-coding-mcp.service` — stopped crash loop, disabled unit. Restore requires recreating the MCP server script and re-enabling.
+- **INFO**: Pipeline healthy otherwise — 0 errors/tracebacks in 30min, 95 signals/h, 14 trades closed today (-$0.35), 0 open positions, disk 83%, prices fresh (~107s), all key timers active.
