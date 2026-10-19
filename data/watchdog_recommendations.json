@@ -1,13 +1,37 @@
 {
-  "timestamp": "2026-10-19T21:36:27.463862+00:00",
+  "timestamp": "2026-10-19T22:02:01.906305+00:00",
   "steers": [
+    {
+      "severity": "urgent",
+      "category": "pending_order",
+      "title": "PENDING ORDER btc-bounce-long: BTC LONG @ 82085",
+      "detail": "Trigger hit: BTC 82122 crossed above 82085. Executing long 11.10 USDT 5x, SL 81735, TP 82600. 5m bullish divergence (81762/-273 vs 81749/-222) + 1h base at oversold (RSI 30.5, rising lows 81749-81800-81860). Fires only on EMA300 reclaim 82060+ \u2014 bounce confirmed, not guessed. SL below base lows 81735. TP 82600 prior structure; partial at 82424 ok. PRECHECK (advisory): FAIL \u2014 vol floor 0.09%<0.15%, coin_shame 51.9% WR, RR structural R:R 0.95 grade D. Chop regime 4 flips/24h \u2014 half-size $5.55 acceptable.",
+      "trade_id": null,
+      "auto_executable": true,
+      "action": {
+        "type": "execute_order",
+        "order": {
+          "id": "btc-bounce-long",
+          "coin": "BTC",
+          "direction": "long",
+          "trigger_price": 82085.0,
+          "amount_usdt": 11.1,
+          "leverage": 5,
+          "sl": 81735.0,
+          "target": 82600.0,
+          "confidence": 55.0,
+          "note": "5m bullish divergence (81762/-273 vs 81749/-222) + 1h base at oversold (RSI 30.5, rising lows 81749-81800-81860). Fires only on EMA300 reclaim 82060+ \u2014 bounce confirmed, not guessed. SL below base lows 81735. TP 82600 prior structure; partial at 82424 ok. PRECHECK (advisory): FAIL \u2014 vol floor 0.09%<0.15%, coin_shame 51.9% WR, RR structural R:R 0.95 grade D. Chop regime 4 flips/24h \u2014 half-size $5.55 acceptable."
+        }
+      },
+      "id": "steer-001"
+    },
     {
       "severity": "warning",
       "category": "health",
       "title": "6 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-001"
+      "id": "steer-002"
     },
     {
       "severity": "warning",
@@ -15,27 +39,27 @@
       "title": "Signal 'ai-trader+' losing streak: 3 losses",
       "detail": "Net -0.17 USDT over last 20 trades (losses: -0.25). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-003"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "AT",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "linreg_alignment": 0.25,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
+    "market_phase": "DECLINING",
     "trend_quality": "UP"
   },
   "open_count": 1,
-  "deep_analysis": "No open trades. Regime is LONG_BIAS. Let me gather market context and check the AI trader slot.\nFull picture assembled. Writing the merged analysis.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 (flat \u2014 correct posture in this regime)\nUnrealized PnL: 0.00 USDT\nRegime: EMA300 PIN CHOP | Volatility: LOW\n  BTC 81,981 vs EMA300 82,004 (AT) \u00b7 linreg NEUTRAL \u00b7 velocity SLOW\n  Scanners say LONG_BIAS/STRONG_UP \u2014 1m continuum says indecision.\n  Scanners are lagging. Treat as chop until BTC resolves the pin.\n\n\u2500\u2500 Steers (automated engine) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning] 6 recent losses look like wrong-side trades\n\ud83d\udfe1 [warning] ai-trader+ losing streak: 3 losses\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n24h: 17 closes, 47% WR, net -0.38. Bleed = atr_sl_hit (n=7, -0.36);\nedge = profit-monster-trail (n=6, +0.21). Chop entries lose, trails win \u2014\nsame story as always.\n\nWorst signal 7d: ai-trader+ LONG (n=20, WR 30%, -0.85). Every loser\nentered meta_rsi 46-54 \u2014 mid-band inside the EMA300 pin. Winners (ME 40.7,\nSUPER 56.3) caught real moves and trailed. Losers were no-side-of-nothing\ntrades. doji-bottom-long: n=16, WR 31%, -0.97 \u2014 knife-catching in\nDISTRIBUTION.\n\n\u26a0\ufe0f WLD SHORT pick (20:14) reasoned off \"BTC below EMA300, STRONG_DOWN\" \u2014\ncontinuum at 20:37 shows AT EMA300, trend STRONG_UP, linreg NEUTRAL.\nPremise drifted. Expect rejection; don't re-pick WLD.\n\nNo new AI-trader pick fired: last write 26 min ago (inside 45-min window).\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Stay flat until BTC closes clean either side of 82,004 with volume.\n   Mid-RSI 45-60 entries have zero edge in this pin.\n2. LONG only on EMA300 reclaim + volume + bullish linreg flip.\n   SHORT only on volume-confirmed rejection (volume-buildup- model:\n   7d WR 77.8%, +0.35 \u2014 the one short playbook that pays).\n3. ai-trader+ pick quality needs the EMA300-pin condition in its\n   reasoning checklist \u2014 flag for brain auditor, not a watchdog param change.\n4. When a trade does open and trails arm: trail family is the only\n   exit engine that made money this week. Let winners trail.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json` (deep_analysis, regime_context, pattern_alerts \u2014 steers untouched). All patterns verified live from PostgreSQL using `meta_rsi`, no `entry_rsi_14`.\n",
-  "agent_timestamp": "2026-10-19T20:41:53.139277+00:00",
-  "regime_context": "BTC @ 81,981 \u2014 0.03% BELOW EMA300 (82,004), effectively pinned. 1m: linreg NEUTRAL, zscore NEUTRAL, velocity SLOW, acceleration FLAT, volume_regime LOW, wyckoff DISTRIBUTION, market_phase CALM. Scanner aggregates (15m/4h) still say LONG_BIAS with STRONG_UP trend quality \u2014 lagging the 1m indecision. Regime_5m: 26 LONG_BIAS vs 5 SHORT_BIAS vs 93 neutral across 124 tokens \u2014 alt-level long bias but no market-wide trend. Practical read: LOW-vol EMA300 decision zone. Mid-RSI entries (RSI 45-60) have no edge here \u2014 both directions get chopped. Trade only on resolution: LONG on reclaim of EMA300 with volume + bullish linreg flip; SHORT on clean rejection with volume. volume-buildup- SHORT (7d WR 77.8%, +0.35) proves volume-confirmed shorts still work; random mid-band shorts do not.",
-  "pattern_alerts": "VERIFIED from PostgreSQL (7d window, n>=5):\n\n1. ai-trader+ LONG \u2014 n=20, WR 30.0%, avg -0.0425, total -0.85 USDT. Losers all entered meta_rsi 46-54 (chop band); winners were trail-family exits after real moves. WINNING SIDE: no trade until BTC resolves EMA300, or wait for momentum + volume confirmation. We weren't on it because picks fired mid-pin on RSI-center alone.\n\n2. doji-bottom-long \u2014 n=16, WR 31.2%, avg -0.0606, total -0.97 USDT. Worst total of any signal. WINNING SIDE: the dump continuation that printed the doji. These are counter-trend longs without trend confirmation \u2014 in DISTRIBUTION at EMA300 the doji resolves down more often than up.\n\n3. atr_sl_hit cluster (24h) \u2014 n=7, total -0.36 of -0.38 net loss. vs profit-monster-trail n=6, +0.21. WINNING SIDE: only trades that escaped the pin into a real trend. Root cause is entry timing in chop, not stop placement.\n\n4. pump-chain- SHORT \u2014 n=32, WR 21.9%, total -0.55. pump-chain+ LONG same period: n=29, WR 31.0%, total +0.70. Asymmetric payoff: our LONG side of the pair pays, SHORT side doesn't (without volume confirmation). WINNING SIDE has been LONG in this 7d window.\n\n5. volume-buildup- SHORT \u2014 n=9, WR 77.8%, total +0.35. Counter-example: shorts work when volume-profile confirms. Direction itself is not the problem; unconfirmed direction is."
+  "deep_analysis": "1 open trade: LTC LONG bb-bounce-v2-long+ (meta_rsi 50.77, entry 59.745). Live price recovered to ~59.84 (+0.16%); watchdog snapshot caught it at -0.39% mid-dip. LTC 15m regime NEUTRAL/ranging \u2014 this is a chop entry on a net-negative signal family (bb-bounce-v2-long+: 27T, 44.4% WR, -0.63 USDT lifetime). Thesis is weak but the trade is salvageable: hold while above 59.50, exit manually if it stalls below entry for another hour rather than waiting for SL 59.13 \u2014 chop trades rarely earn trail arm (52/56 hard_max_loss history).\n\nLast 20 closes: 7W/13L, net -0.43 USDT. The losses cluster into three wrong-side patterns:\n(1) Mid-RSI LONGs into dead BTC \u2014 DOGE/ARB/LDO ai-trader+ and ME/ETC bb-bounce longs all entered at meta_rsi 46-53 while BTC velocity was SLOW. Right RSI band, wrong market condition: no trend to carry them, stops hit on noise. The winning side was cash, or the short that faded the stall.\n(2) Shorting oversold \u2014 HYPE SHORT volume-buildup- entered at meta_rsi 38.1 and lost -1.32%; HYPE then pumped to LONG_BIAS conf 91.7. BANANA lesson repeating: the winning side was the LONG, we shorted an oversold dip inside an uptrend.\n(3) Right side, wrong timing \u2014 ARB LONG pump-chain+ (-1.67%) and ai-trader+ (-4.64%) were both longs, and ARB then ripped +1.97% (15m LONG_BIAS conf 79.9). We were on the correct side but entered during consolidation with stops too tight for ARB's ~1.8% ATR; the winner was the same long held or entered after the shakeout.\n\nai-trader+ family confirmed bleed: 29T, 41.4% WR, -0.80 USDT, 3-loss streak \u2014 all LONGs at RSI 46-51 under SLOW velocity. Not a disable case (brain auditor's call), but do not stack more mid-RSI longs while BTC velocity stays SLOW.\n\nOnly 1/6 slots deployed \u2014 no cluster or correlation risk. BTC 1h ATR is 0.033% (range 82010-82101): dead quiet. The live opportunity is alt-momentum (WLD/HYPE/SYRUP/ARB LONG_BIAS), not BTC itself.",
+  "agent_timestamp": "2026-10-19T22:07:29.012783+00:00",
+  "regime_context": "BTC 82090, AT EMA300 (82017) after reclaiming it ~22:00 UTC. 15m and 4h both LONG_BIAS, linreg LEAN_BULL, trend_quality UP \u2014 directionally mild-long. But velocity SLOW, volume LOW, 1h ATR 0.033%, continuum state 'AT': this is a low-vol grind at the trend boundary, not a confirmed trend. 4 regime flips/24h = chop risk elevated. Longs are the aligned side (don't short BTC here), but expect noise: size down, demand ATR>0.5% on alt entries, and avoid mid-band RSI chases on dead-vol names. Alts with independent momentum (WLD 88.6, HYPE 91.7, SYRUP 93.6, ARB 79.9 LONG_BIAS) are where the pumps are.",
+  "pattern_alerts": "VERIFIED from watchdog.json signal_performance + last 20 closes (meta_rsi only, entry_rsi_14 excluded per DRIFT-E):\n\n1) ai-trader+ LONG bleed under SLOW velocity \u2014 n=29, WR 41.4%, total -0.80 USDT. Current 3-loss streak: DOGE -2.04% (rsi 46.2), ARB -4.64% (rsi 51.4), LDO -2.22% (rsi 53.6). All mid-band RSI longs. WINNING SIDE: short the stall or stay flat \u2014 these coins went nowhere for the trade's lifetime. Root cause: mid-RSI longs need BTC velocity; velocity is SLOW.\n\n2) bb-bounce-v2-long+ negative expectancy \u2014 n=27, WR 44.4%, total -0.63 USDT. Losers ME -3.54%, ETC -4.12% rode to full SL; winners LTC +1.20%, ME +1.16%, ETC +2.12% took small TPs. WINNING SIDE: same signal but the winners hit TP first \u2014 this is an exit-asymmetry problem on a chop-entry signal. Current open LTC is on this family.\n\n3) Oversold SHORT against uptrend \u2014 HYPE volume-buildup- SHORT at meta_rsi 38.1 lost -1.32%; HYPE now LONG_BIAS conf 91.7, +0.67%/4h. GOAT pump-chain- SHORT at rsi 73.6 lost -0.97%. WINNING SIDE: the LONG. Shorting an oversold dip inside a LONG_BIAS coin is the BANANA pattern repeating \u2014 do not take SHORTs on coins with 15m LONG_BIAS conf > 85.\n\n4) Stop-too-tight on high-ATR alts \u2014 ARB two long losses (-1.67%, -4.64%) then +1.97% pump. ARB 1h ATR 0.79-1.85%. WINNING SIDE: the long, held through the shakeout. Lesson: on ATR>1% coins, SL must clear at least 1.5x recent swing or the trade is a coin flip against noise."
 }
