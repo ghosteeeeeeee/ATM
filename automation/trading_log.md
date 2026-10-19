@@ -12103,3 +12103,38 @@ BY: daily_orchestrator
 - 24h WR recovering (46.2%) but 7d still -$3.79 / 33.8% — size-reduce stays until 7d WR ≥35% and PnL ≥ -$2
 - pump-chain+ at 2T 0W — 1 more loss kills it
 - Quiet market continues (~13T in 24h)
+
+## FAVORITES Update — 2026-10-19 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE SYRUP (inactive 7d, no trades)
+
+Final set: ['ETH']
+
+## LOSERS Update — 2026-10-19 06:05 UTC
+- REMOVE CFX (insufficient data)
+- ADD HYPE (WR=20.0%, PnL=$-0.13, wr_collapse (40.0% → 20.0%))
+- ADD ETC (WR=40.0%, PnL=$-0.03, low_wr (40.0%))
+
+Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
+
+## [2026-10-19 06:29] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 12T 5W -$0.12 | 7d 195T 66W -$3.79 (33.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour (quiet market, 4 active trades in prior hours)
+- atr_sl_hit 3/12 = 25% last 24h (healthy, tpsl fix deployed)
+- Kill check: pump-chain+ 2T 0W -$0.09 (under 3T threshold, standing watch); all other signals >=50% WR or under threshold
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (00:00 +$0.03, 03:00 +$0.08, 04:00 +$0.06, 05:00 +$0.05 — last 4 active hours all positive; 01/02/06 had no closes)
+- 4 open: LDO ai-trader+ LONG @0.3965, LTC warrior-sr-confirm+ LONG @60.02, GRASS r2v2-long3 LONG @0.5983, ME bb-bounce-v2-long+ LONG @0.0593
+- Size-reduce 0.3x stays (7d WR 33.8% < 35%, 7d PnL -$3.79)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- pump-chain+ at 2T 0W — 1 more loss kills it
+- 4 open trades — bb-bounce-v2-long+ has ME open; kill is 0% WR only, so safe unless it drops to 0% again
+- 7d still -$3.79 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
