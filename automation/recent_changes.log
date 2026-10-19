@@ -4866,3 +4866,7 @@ BY: auto_1hr
 BY: brain_auditor
 BY: auto_1hr
 [2026-10-19 00:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-manual LONG atr_tp_hit +$0.05) | 24h 14T 5W -$0.30 (35.7%) | 7d 202T 68W -$3.61 (33.7%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ and hl_copy_trader both 2T 0W, under 3T) | atr_sl_hit 35.7% (healthy, tpsl deployed) | 2 open (ME LONG, BTC continuum LONG) | no 3-neg-hour streak | No constants change → no signal_versions entry
+BY: auto_1hr
+[2026-10-19 01:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC continuum-trend+ LONG profit-monster-trail +$0.03) | 24h 15T 6W -$0.27 (40%) | 7d 201T 69W -$3.41 (34.3%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ and hl_copy_trader both 2T 0W, under 3T) | atr_sl_hit 33.3% (healthy, tpsl deployed) | 2 open (BTC LONG, ME LONG) | no 3-neg-hour streak | No constants change → no signal_versions entry
+BY: auto_1hr
+[2026-10-19 02:27] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 14T 5W -$0.27 (35.7%) | 7d 196T 65W -$3.91 (33.7%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ and hl_copy_trader both 2T 0W, under 3T) | atr_sl_hit 35.7% (healthy, tpsl deployed) | 2 open (BTC LONG, ME LONG) | no 3-neg-hour streak | No constants change → no signal_versions entry
