@@ -99,3 +99,6 @@
 
 ## TEAM UPDATES
 - [2026-10-18 18:28] auto_1hr: No config change — 0 trades closed last hour (thin market, 10th quiet stretch). 24h 14T 5W +$0.03 (35.7%), 7d 202T 68W −$3.66 (33.7%). Size-reduce 30% stays. atr_sl_hit 28.6% (healthy, tpsl deployed). Kill watch: bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W, both under 3T threshold. 0 open, no 3-neg-hour streak.
+
+## TEAM UPDATES
+- [2026-10-19 03:28] auto_1hr: No config change — 0 trades closed last hour. 24h 13T 5W −$0.32 (30.8%), 7d 195T 65W −$4.00 (33.3%). Size-reduce 30% stays. atr_sl_hit 38.5% (near 40% threshold). Kill watch: bb-bounce-v2-long+, hl_copy_trader, pump-chain+ all 2T 0W, one more loss each = kill. 2 open (BTC LONG, ME LONG), no 3-neg-hour streak.

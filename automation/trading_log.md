@@ -12035,3 +12035,26 @@ BY: daily_orchestrator
 - bb-bounce-v2-long+ and hl_copy_trader still 2T 0W — 1 more loss each kills them
 - 7d PnL -$3.91, WR 33.7% still below 37% resume threshold — size-reduce stays
 - Zero trades 2 hours in a row (00:27 and 01:28 and now 02:xx) — is pipeline over-filtering or just quiet market?
+
+## [2026-10-19 03:27] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 wins, 0 losses)
+**PnL:** $0.00 last hour | 24h 13T 5W -$0.32 (30.8% WR) | 7d 195T 65W -$4.00 (33.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour
+- atr_sl_hit 5/13 = 38.5% last 24h (near but under 40% threshold, tpsl fix deployed)
+- Kill check: bb-bounce-v2-long+ 2T 0W -$0.18, hl_copy_trader 2T 0W -$0.11, pump-chain+ 2T 0W -$0.09 — all at 2T, under 3T threshold, standing watch
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (22:00 -$0.06, 23:00 +$0.05, 00:00 +$0.03)
+- 2 open: BTC continuum-trend+ LONG @82441, ME ai-trader+ LONG @0.05865
+- Size-reduce 30% stays (7d WR 33.3% < 37%, 7d PnL -$4.00 < 0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+, hl_copy_trader, pump-chain+ all 2T 0W — 1 more loss each kills them
+- 7d PnL -$4.00 worsening slightly from -$3.91, WR 33.3% — still below 37% resume threshold
+- Zero trades ~3 hours in a row (00:27, 01:28, 02:27, now 03:xx) — quiet market or over-filtering?
+- atr_sl_hit at 38.5%, close to 40% kill threshold — watch next hour
