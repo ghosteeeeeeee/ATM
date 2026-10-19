@@ -12252,3 +12252,25 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader-pending 24h 2T 0W still under kill threshold
 - 7d deteriorating slightly: -$3.79 → -$4.05 — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - ME stale_exit at -3.54% — watch if stale_exit repeats as loss vector next hour
+
+## [2026-10-19 12:28] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h 17T 9W -$0.32 (52.9% WR) | 7d 200T 68W -$4.05 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed — market quiet, 1 open: ARB pump-chain+ LONG @0.1980
+- atr_sl_hit 5/17 = 29% last 24h (healthy, under 40% threshold, tpsl fix deployed)
+- Kill check: no signal with 0% WR and 3+ trades last hour (zero trades). ai-trader-pending still 24h 2T 0W -$0.10 — under 3T kill threshold
+- No overtrading (0T/hr, under-filtered only if regime allows — STRONG_DOWN, low activity correct)
+- Neg-hour streak 8:00 -$0.14 / 9:00 -$0.07 / 10:00 -$0.31 — 11:00 hour flat (0T), streak broken by no-trade; size-reduce 0.3x already active
+- Size-reduce 0.3x stays (7d WR 34.0% < 35%, 7d PnL -$4.05 < -$2)
+- bb-bounce-v2-long+ 24h 5T 3W -$0.23 — WR 60% but net negative (win small, ME stale_exit -$0.26 dominates); single stale_exit occurrence, watch only
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ai-trader-pending 24h 2T 0W still under kill threshold
+- 7d -$4.05 / 34.0% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- ARB pump-chain+ LONG open — watch if it becomes 4th consecutive neg-hour contributor
