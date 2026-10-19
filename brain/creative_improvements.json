@@ -5588,5 +5588,23 @@
     "category": "pick quality feedback loop",
     "status": "suggested",
     "risk": "none (measurement only)"
+  },
+  {
+    "date": "2026-10-19T12:43:48Z",
+    "idea": "Regime-flip cohort tracker (natural experiment)",
+    "rationale": "BTC flipped SHORT_BIAS→LONG_BIAS + BELOW→AT EMA300 at ~12:36 mid-audit. Natural experiment: does 72h LONG bleed (45T -\\.17 37.8%) resolve when regime aligns? Post-flip LONG WR >50% = regime was cause. <40% = signal quality root.",
+    "expected_impact": "Zero config. Resolves #1 watchdog steer root-cause with 48h data.",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-19T12:43:48Z",
+    "idea": "pump-chain- EXTREME SHORT conf-demote shadow (PRE-REGISTER for Oct 23)",
+    "rationale": "14d EXTREME pump-chain- SHORT atr_sl_hit: 17T -\\.08 (biggest bleed cell). EXTREME block CEO-reverted (winners ALT +0.47/ACE +0.30). Conf-demote 0.7x mirrors ai-trader EXTREME LONG shadow. NOT shipped (soak #20).",
+    "expected_impact": "Shadow-only. If n>=20 validates (would-block WR<30%, would-keep WR>50%, net save>\\), flip to live demote.",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
