@@ -12918,3 +12918,24 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL improving slowly (-$2.79 → -$2.61); size-reduce can lift if PnL crosses -$2
 - 24h WR still 20% (n=20) — thin sample
+
+## [2026-10-20 18:35 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 20T 4W -$0.26 (20.0% WR) | 7d 162T 58W -$2.47 (35.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes last hour — quiet, no kill/overtrading checks triggered
+- Kill check: no signal with 0% WR and 3+ trades last hour (0T)
+- atr_sl_hit 8/20 = 40% raw; signal-only 5/14 = 35.7% under 40% — tpsl deployed, no action
+- No 3-neg-hour streak (15:00 -$0.13, 16:00 -$0.12 = 2 consec; quiet 17:00/18:00 resets watch)
+- Size-reduce 0.3x stays (7d PnL -$2.47 still <-$2, WR 35.8%)
+- 1 open: BTC continuum-osc+ LONG +0.14%
+- 24h signal watch: pump-chain+ 2T 0W -$0.39 (under 3T kill line); pump-chain-/v6- 6T 1W -$0.10 (marginally negative, under kill threshold)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL improving (-$2.61 → -$2.47); size-reduce can lift if PnL crosses -$2
+- hard_max_loss 2nd-worst close reason 24h (3T -$0.51) — still worth watching if it clusters
