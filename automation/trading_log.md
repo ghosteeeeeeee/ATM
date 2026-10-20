@@ -12645,3 +12645,25 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - Size-reduce 0.5x stays (7d WR 34.5% < 35%, 7d PnL −$3.39 < −$2)
 - Kill check: no signal with 0% WR and 3+ trades last hour (1 trade). signal_reporter confirmed no kill candidates (both watch signals win in some regimes).
 - Protected flags 13/13 intact. Health OK, all timers firing.
+
+## [2026-10-20 05:27] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.31 last hour | 24h 16T 4W -$0.94 (25.0% WR) | 7d 194T 67W -$3.60 (34.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 close: BLUR pump-chain+ LONG hard_max_loss -$0.31 (-4.16%) — backstop fired correctly, not an SL miss
+- Kill check: no signal with 0% WR and 3+ trades in last hour (1 trade). 24h worst at monitor line only: pump-chain+ 3T 0W -$0.43, ai-trader+ 3T 0W -$0.25 — kill rule is last-hour, so no kill
+- atr_sl_hit 8/16 = 50% — CLOSED as non-issue per 05:00 daily orchestrator verdict (7d aggregate 30.4% < 40%, tpsl fix deployed; daily spikes = thin-volume noise)
+- No overtrading (1T/hr, well under 20)
+- No 3-neg-hour streak (01:00 +$0.07, 04:00 -$0.39 — quiet hours break the streak)
+- Size-reduce 0.3x stays (7d WR 34.5% < 35%, 7d PnL -$3.60 < -$2)
+- 1 open: BTC ai-trader-pending LONG flat
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR hit 25.0% (4W/16T) — worst of the week, but thin-volume sample; 7d still 34.5%
+- hard_max_loss 3 closes in 24h (-$0.49 avg -$0.163) — backstop catching bad entries; frequency up from 2 yesterday, watch tomorrow
+- pump-chain+ and ai-trader+ both 0W/3T over 24h — at kill-candidate monitor line; if either gets 3 closes in one hour with 0 wins, kill immediately next run
