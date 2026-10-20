@@ -208,7 +208,22 @@ def _get_signal_context(token, direction, signal_type, source, created_at):
 
 
 def _get_vol_regime(token):
-    """Get volatility regime from ATR (15m-primary per spec §4.1)."""
+    """Get volatility regime from ATR (15m-primary per spec §4.1).
+
+    bug_hunter fix: use tpsl_utils.get_fresh_atr (15m-primary), not
+    volatility_gate_v2.get_atr_pct (1h). The engine ATR is 15m.
+    """
+    # Try 15m ATR first (engine primary)
+    try:
+        from tpsl_utils import get_fresh_atr
+        atr = get_fresh_atr(token)
+        if atr is not None:
+            # Classify using volatility_gate_v2 thresholds
+            from volatility_gate_v2 import classify_volatility
+            return classify_volatility(atr), atr
+    except Exception:
+        pass
+    # Fallback to 1h ATR (volatility gate)
     try:
         from volatility_gate_v2 import get_atr_pct, classify_volatility
         atr = get_atr_pct(token)
@@ -237,12 +252,28 @@ def _match_exit_config_safe(source):
 
 
 def _get_leverage(token, signals_leverage):
-    """Get leverage from per-token registry (spec §4.3)."""
+    """Get leverage from PG trades per-token history (bug_hunter fix 1).
+
+    The old get_trade_params(token) raises TypeError (needs direction, price)
+    and was silently falling back to cap-at-5. Live PG 14d: lev 3×125 (39%!),
+    5×191, 10×9, 40×1. Source from PG trades history for this token.
+    """
     try:
-        from position_manager import get_trade_params
-        params = get_trade_params(token)
-        if params and 'leverage' in params:
-            return params['leverage']
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain',
+                               user='postgres', connect_timeout=2)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT leverage, COUNT(*) as n
+            FROM trades
+            WHERE token=%s AND leverage IS NOT NULL
+            GROUP BY leverage ORDER BY n DESC LIMIT 1
+        """, (token.upper(),))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        if row and row[0]:
+            return int(row[0])
     except Exception:
         pass
     # Fallback
@@ -600,15 +631,23 @@ def _simulate_universal_hold(entry_price, direction, candles, source):
 
 
 def _simulate_trail_arm_timeout(entry_price, direction, candles, source):
-    """Simulate Trail Arm Timeout (spec §4.8)."""
+    """Simulate Trail Arm Timeout (spec §4.8).
+
+    bug_hunter fix: live is LONG-only (position_manager.py:3599).
+    bb-squeeze SHORTs do NOT have trail-arm timeout.
+    """
     if not candles:
         return None
+    
+    # LONG-only per live code
+    if direction != 'LONG':
+        return {'fired': False, 'exit_type': 'no_timeout', 'notes': 'LONG-only engine'}
     
     # Determine timeout
     bare = (source or '').rstrip('+-')
     if 'bb-squeeze' in bare:
         timeout_min = BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN
-    elif 'pump-chain' in bare and direction == 'LONG':
+    elif 'pump-chain' in bare:
         timeout_min = PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN
     else:
         return {'fired': False, 'exit_type': 'no_timeout', 'notes': 'not applicable'}
@@ -684,13 +723,39 @@ def close_events():
             # Profit-side precedence: ATR TP → PM Trail → Speed Stale Winner
             fired = [(k, v) for k, v in results.items() if v and v.get('fired')]
             
+            # Tie-break precedence (bug_hunter fix 3): NOT alphabetical
+            # Lower number = higher precedence (fires first on same candle)
+            _PRECEDENCE = {
+                'hard_max': 1,           # HML (loss-side worst)
+                'cut_loser': 2,          # Cut Loser (check exit_type for tier)
+                'atr': 3,                # ATR SL/TP
+                'speed_stale': 4,        # Speed Stale
+                'trail_arm_timeout': 5,  # Trail Arm Timeout
+                'universal_hold': 6,     # Universal Max Hold (slowest)
+                'pm_trail': 7,           # PM Trail (profit-side)
+            }
+            
             if fired:
-                # Sort by exit_ts, then by precedence
-                fired.sort(key=lambda x: (x[1].get('exit_ts', 0), x[0]))
+                # Sort by exit_ts, then by precedence (NOT alphabetical)
+                fired.sort(key=lambda x: (
+                    x[1].get('exit_ts', 0),
+                    _PRECEDENCE.get(x[0], 99)
+                ))
                 first_engine, first_result = fired[0]
                 
                 gross_pnl = first_result['pnl_pct']
                 net_pnl = gross_pnl - FEE_PCT - SLIPPAGE_PCT
+                
+                # Compute actual MFE/MAE from price data (bug_hunter fix)
+                # MFE = max favorable excursion, MAE = max adverse excursion
+                highs = [h for ts, o, h, l, c in candles]
+                lows = [l for ts, o, h, l, c in candles]
+                if d == 'LONG':
+                    mfe = (max(highs) / entry_price - 1) * 100
+                    mae = (min(lows) / entry_price - 1) * 100
+                else:
+                    mfe = (entry_price / min(lows) - 1) * 100
+                    mae = (entry_price / max(highs) - 1) * 100
                 
                 cur.execute("""
                     UPDATE shadow_trades SET
@@ -710,10 +775,7 @@ def close_events():
                       json.dumps(results.get('trail_arm_timeout')),
                       first_engine, first_result['exit_price'], gross_pnl,
                       first_result['hold_minutes'], first_result['exit_type'],
-                      gross_pnl, net_pnl,
-                      max([v.get('pnl_pct', 0) for v in results.values() if v] or [0]),
-                      min([v.get('pnl_pct', 0) for v in results.values() if v] or [0]),
-                      sid))
+                      gross_pnl, net_pnl, mfe, mae, sid))
             else:
                 # No engine fired — use last close
                 last_close = candles[-1][4]
@@ -812,6 +874,103 @@ def purge():
         conn.close()
 
 
+def reclose_events():
+    """Re-close slow engines (bug_hunter fix 2).
+
+    close() marks rows closed=1 permanently on partial data. Once the
+    backfill backlog drains (~3-4h), every new signal gets truncated
+    slow-engine results. This re-closes rows where:
+    - first_exit_engine='universal_hold' AND hold_minutes < 480 (truncated)
+    - first_exit_engine='universal_hold' AND hold_minutes < 1440 (ride_it truncated)
+    - first_exit_reason='unclosed_no_candles' (candles now available)
+    """
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        # Find rows that need re-closing
+        pending = cur.execute("""
+            SELECT id, token, direction, source, created_at, leverage_used, context
+            FROM shadow_trades
+            WHERE closed=1 AND (
+                (first_exit_engine='universal_hold' AND first_exit_hold_minutes < 480)
+                OR first_exit_reason='unclosed_no_candles'
+            )
+            AND created_at > datetime('now', '-7 days')
+            LIMIT 500
+        """).fetchall()
+        
+        if not pending:
+            log('reclose: 0 pending')
+            return 0
+        
+        n_ok = 0
+        for sid, tok, d, src, created, lev, ctx_json in pending:
+            try:
+                entry_ts = calendar.timegm(datetime.strptime(created, '%Y-%m-%d %H:%M:%S').timetuple())
+            except (ValueError, TypeError):
+                continue
+            
+            # Load candles for full window (24h for ride_it)
+            candles = _load_candles_window(tok, entry_ts, entry_ts + 86400)
+            if not candles:
+                continue  # still no candles
+            
+            entry_price = candles[0][1]
+            ctx = json.loads(ctx_json) if ctx_json else {}
+            atr_pct = ctx.get('atr_pct')
+            vol_regime = ctx.get('vol_regime', 'UNKNOWN')
+            leverage = lev or MAX_LEVERAGE
+            
+            # Re-simulate all engines with full candle data
+            results = {}
+            results['atr'] = _simulate_atr_sl_tp(entry_price, d, candles, atr_pct)
+            results['pm_trail'] = _simulate_pm_trail(entry_price, d, candles, src, vol_regime)
+            results['hard_max'] = _simulate_hard_max_loss(entry_price, d, candles, leverage)
+            results['cut_loser'] = _simulate_cut_loser(entry_price, d, candles, src)
+            results['speed_stale'] = _simulate_speed_stale(entry_price, d, candles)
+            results['universal_hold'] = _simulate_universal_hold(entry_price, d, candles, src)
+            results['trail_arm_timeout'] = _simulate_trail_arm_timeout(entry_price, d, candles, src)
+            
+            # Tie-break precedence
+            _PRECEDENCE = {
+                'hard_max': 1, 'cut_loser': 2, 'atr': 3,
+                'speed_stale': 4, 'trail_arm_timeout': 5,
+                'universal_hold': 6, 'pm_trail': 7,
+            }
+            fired = [(k, v) for k, v in results.items() if v and v.get('fired')]
+            
+            if fired:
+                fired.sort(key=lambda x: (x[1].get('exit_ts', 0), _PRECEDENCE.get(x[0], 99)))
+                first_engine, first_result = fired[0]
+                gross_pnl = first_result['pnl_pct']
+                net_pnl = gross_pnl - FEE_PCT - SLIPPAGE_PCT
+                
+                cur.execute("""
+                    UPDATE shadow_trades SET
+                        exit_atr_json=?, exit_pm_trail_json=?, exit_hard_max_json=?,
+                        exit_cut_loser_json=?, exit_speed_stale_json=?, exit_universal_hold_json=?,
+                        exit_trail_arm_timeout_json=?,
+                        first_exit_engine=?, first_exit_price=?, first_exit_pnl_pct=?,
+                        first_exit_hold_minutes=?, first_exit_reason=?,
+                        gross_pnl_pct=?, net_pnl_pct=?, updated_at=?
+                    WHERE id=?
+                """, (json.dumps(results.get('atr')), json.dumps(results.get('pm_trail')),
+                      json.dumps(results.get('hard_max')), json.dumps(results.get('cut_loser')),
+                      json.dumps(results.get('speed_stale')), json.dumps(results.get('universal_hold')),
+                      json.dumps(results.get('trail_arm_timeout')),
+                      first_engine, first_result['exit_price'], gross_pnl,
+                      first_result['hold_minutes'], first_result['exit_type'],
+                      gross_pnl, net_pnl, datetime.now(timezone.utc).isoformat(), sid))
+                n_ok += 1
+        
+        conn.commit()
+        log(f"reclose: {len(pending)} pending, {n_ok} re-closed")
+        return n_ok
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description='Shadow-Mode Paper Trading System')
     ap.add_argument('--record', action='store_true', help='Snapshot ALL signals')
@@ -827,6 +986,8 @@ def main():
         record()
     if run_all or args.close:
         close_events()
+    if args.reclose:
+        reclose_events()
     if run_all or args.report:
         report()
     if args.purge:
