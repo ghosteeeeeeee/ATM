@@ -1325,3 +1325,8 @@
 
 ## Health Check — 2026-10-19 21:43 UTC
 - **OK**: No WARN or CRITICAL issues. Disk at 83% (watch, threshold 85%). 1 open trade (LTC LONG @ 59.74). 18 signals/1h. Prices fresh (<1 min).
+
+## Error Alerts — 2026-10-20 00:26 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3528s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3472s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3424s left, N failures)`

@@ -1,13 +1,61 @@
 {
-  "timestamp": "2026-10-19T23:32:03.963111+00:00",
+  "timestamp": "2026-10-20T00:32:05.236798+00:00",
   "steers": [
+    {
+      "severity": "urgent",
+      "category": "pending_order",
+      "title": "PENDING ORDER btc-base-fail-short: BTC SHORT @ 81735",
+      "detail": "Trigger hit: BTC 81617 crossed below 81735. Executing short 11.10 USDT 5x, SL 81960, TP 81400. Double-bottom base (81749-81762) fails. Fires only below 81735 \u2014 divergence invalidated. SL 81960 back inside base. TP 81400 old EMA300 zone (81450 gave 0.88 real R:R after slip \u2014 too thin). Mutually exclusive with btc-bounce-long. PRECHECK (advisory): FAIL \u2014 vol floor, NORMAL-regime SHORT gate wants conf>=75, RR structural R:R 1.00 grade D. Chop regime \u2014 consider half-size.",
+      "trade_id": null,
+      "auto_executable": true,
+      "action": {
+        "type": "execute_order",
+        "order": {
+          "id": "btc-base-fail-short",
+          "coin": "BTC",
+          "direction": "short",
+          "trigger_price": 81735.0,
+          "amount_usdt": 11.1,
+          "leverage": 5,
+          "sl": 81960.0,
+          "target": 81400.0,
+          "confidence": 55.0,
+          "note": "Double-bottom base (81749-81762) fails. Fires only below 81735 \u2014 divergence invalidated. SL 81960 back inside base. TP 81400 old EMA300 zone (81450 gave 0.88 real R:R after slip \u2014 too thin). Mutually exclusive with btc-bounce-long. PRECHECK (advisory): FAIL \u2014 vol floor, NORMAL-regime SHORT gate wants conf>=75, RR structural R:R 1.00 grade D. Chop regime \u2014 consider half-size."
+        }
+      },
+      "id": "steer-001"
+    },
+    {
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.55 USDT. Something is wrong.",
+      "auto_executable": false,
+      "id": "steer-002"
+    },
     {
       "severity": "warning",
       "category": "health",
       "title": "6 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-001"
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'bb-bounce-v2-long+' losing streak: 3 losses",
+      "detail": "Net -0.27 USDT over last 20 trades (losses: -0.39). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-004"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'ai-trader-pending' losing streak: 3 losses",
+      "detail": "Net -0.14 USDT over last 20 trades (losses: -0.14). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-005"
     },
     {
       "severity": "warning",
@@ -15,25 +63,25 @@
       "title": "Signal 'ai-trader+' losing streak: 3 losses",
       "detail": "Net -0.17 USDT over last 20 trades (losses: -0.25). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-006"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "critical",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
+    "continuum": "BELOW",
     "volatility": "NORMAL",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
     "acceleration_state": "NEGATIVE",
     "volume_regime": "NORMAL",
-    "linreg_alignment": 0.0,
+    "linreg_alignment": 0.75,
     "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 2,
+  "open_count": 0,
   "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 2 (2 long, 0 short)\nUnrealized PnL: ~-0.01 USDT (BTC -0.11%, LTC -0.20%)\nRegime: SHORT_BIAS aggregate | BTC AT EMA300, chop/accumulation | Vol: NORMAL\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning] LTC LONG (bb-bounce-v2-long+, rsi 50.77) is the exact chop-entry\n   pattern bleeding this week \u2014 signal is 44.4% WR / -0.63 net over 27 trades.\n   If it doesn't reach +0.40% trail arm within ~2h, cut it. Don't let it become\n   the next ME stale_exit (-3.54%).\n\n\ud83d\udfe1 [warning] Portfolio is 2/2 LONG into a SHORT_BIAS aggregate (26 short-bias\n   tokens vs 7 long). BTC 15m and 4h both SHORT_BIAS. BTC pending LONG is\n   defensible only while price holds AT/above EMA300 (82029) \u2014 a decisive\n   break below with bearish linreg = exit and flip thesis, not average down.\n\n\ud83d\udfe2 [info] Trail family still the only real edge: 7/7 trail exits, 100% WR,\n   +0.29 USDT last 24h. Never manual-close a trade that has armed its trail.\n\n\ud83d\udfe2 [info] WLD ai-trader pick (23:08 UTC, oversold pullback-in-uptrend, independent\n   LONG_BIAS regime) still unfilled after ~27min. Structured correctly \u2014 different\n   from the mid-band LONGs that lost today. No new ai-trader pick this cycle\n   (state file < 45 min old).\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe 24h scoreboard says it plainly: trend exits 7/7 (+$0.29) vs chop entries\n0/8 (-$0.40). Every loss \u2014 DOGE, ARB, LDO, LTC-warrior, ME \u2014 was a mid-band\nLONG (meta_rsi 46-59) fired into SHORT_BIAS aggregate conditions. Someone\nshorted those failed bounces and took our money. We were on the wrong side.\n\nBTC is at a decision point: 274 min above EMA300 but acceleration negative,\nvelocity slow, Wyckoff accumulation. This is not a trend regime \u2014 mid-band\nbounce longs have no edge here. Only valid longs: independent alt momentum\n(WLD setup) or post-breakout trend rides. Only valid shorts: confirmed\nEMA300 breakdown with bearish linreg \u2014 not preemptive.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Set LTC mental stop at 59.50 (already the hard SL) \u2014 but pre-commit to\n   exiting on time if no trail arm by ~01:30 UTC, don't wait for the stop.\n2. Watch BTC 82029 (EMA300). Close below + bearish 15m linreg \u2192 exit BTC LONG\n   immediately; that's a short setup, not a long.\n3. Hold WLD pick; do not fire another ai-trader LONG while aggregate is\n   SHORT_BIAS and the 3-loss ai-trader+ streak is live.\n4. Brain-auditor queue: bb-bounce-v2-long+ (-0.63, n=27) and ai-trader+\n   mid-band entries are structural bleeds \u2014 signal tuning, not watchdog scope.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\n**TLDR:** 2 longs open in a SHORT_BIAS chop tape at the EMA300 decision line. LTC is the fragile one (bleeding bounce signal) \u2014 cut if no trail arm in 2h. BTC valid only above 82029. No new pick fired (WLD still pending, correctly structured). Analysis merged into `watchdog_recommendations.json`.\n",
   "agent_timestamp": "2026-10-19T23:35:49.887475+00:00",
   "regime_context": "BTC continuum: AT EMA300 (consecutive_above=274, last cross ~2.3h ago), zscore NEUTRAL, velocity SLOW, acceleration NEGATIVE, linreg FLAT/NEUTRAL, wyckoff ACCUMULATION, market phase CALM, trend_quality UP. 15m and 4h regime scanners both SHORT_BIAS. Token aggregate SHORT_BIAS 26:7. This is not a trend regime \u2014 it is a range/decision zone at a key level. Longs are only valid on independent alt momentum (like the pending WLD pick), not on generic mid-band bounces. Shorts only valid on confirmed breakdowns below EMA300 with bearish linreg, not preemptively. Volatility NORMAL \u2014 no regime-driven position sizing change needed.",

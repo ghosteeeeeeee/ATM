@@ -1,34 +1,41 @@
-# Current State — brain_auditor Run Oct 19 23:50 UTC
+# Current State — brain_auditor Run Oct 20 00:45 UTC
 
-**Last Updated: 2026-10-19 23:50 UTC**
-**Updated by: brain_auditor #28 — 0 config changes (soak + resume-day discipline)**
+**Last Updated: 2026-10-20 00:45 UTC**
+**Updated by: brain_auditor #29 — 0 config changes (vacation mode: shadow-first, no constants change)**
 
-## PIPELINE STATUS (23:50 UTC)
+## PIPELINE STATUS (00:45 UTC)
 
-- **Trading LIVE** with size-reduce active (7d WR 34.4% < 37 AND pnl −$3.75 < −$2). Multiplier 0.5x — auto_1hr reports 0.3x (reporting bug, trading system correct).
-- **24h 15T 7W −$0.37 (46.7% WR). | 7d 195T 67W −$3.75 (34.4%). | TRAIL 72T +$5.39 80.6% vs CHOP 104T −$8.69 1.0% — exit signature UNCHANGED.**
-- **2 open:**
-  - BTC #16291 ai-trader-pending LONG @82110 (0.5h) — LONG_BIAS both TFs, EMA300 reclaimed (82094 vs 82031), SL 81864, TP 82600. HOLD.
-  - LTC #16290 bb-bounce-v2-long+ LONG @59.745 (1.3h) — death-zone RSI 50.77, EMA300 pin. Trail needs +0.40% (TP 60.64). SL 59.14. MONITOR.
-- **BTC EMA300 PIN ~164m** — chop pin, unresolved. New advisory now labels every precheck during pin.
-- **Vacation mode ACTIVE** — shadow-first, no enforcement flips.
+- **Trading LIVE** with size-reduce 0.5x (7d WR 33.8% < 37 AND pnl −$3.83 < −$2). Auto-clears when either condition heals.
+- **24h 17T 7W −$0.45 (41.2% WR). | 7d 197T 67W −$3.83 (33.8%). | TRAIL 72T +$5.39 80.6% vs CHOP 113T −$9.23 0.9% — exit signature UNCHANGED, 24h separation 100% (7/7 winners armed, 10/10 losers never-armed).**
+- **1 open:**
+  - BTC #16292 ai-trader-pending SHORT @81589 (0.5h) — breakdown SHORT below EMA300 (~82029), SHORT_BIAS aggregate 26:7, STRONG_DOWN. SL 81834, TP 81400, mid 81709 (−0.15% against). HOLD — correct side.
+- **Vacation mode ACTIVE** — shadow-first, no constants changes, no enforcement flips.
+- **atr_sl_hit 24h 47.1% (8/17)** — above 40 monitor line; tpsl deployed; chop variance, monitor.
 - Protected flags 13/13 INTACT.
 
-## THIS RUN — brain_auditor #27
+## THIS RUN — brain_auditor #29
 
-**SHIPPED: EMA300-pin advisory** (pre-registered #26) — `ai_trader_precheck.py` section 4: continuum hoisted, when `ema300_position==AT AND duration>60m` → non-blocking check 'chop pin, mid-band entries have no edge — wait for resolution', both directions, passed=True always. Live-verified firing on WLD precheck (BTC AT 164m). Zero behavior.
+**0 config changes (vacation mode rules).** Steers both VERIFIED. New losses autopsy'd — zero new patterns:
 
-**THIS RUN — brain_auditor #28**
+- **LTC #16290** bb-bounce chop entry (RSI 50.77 death-zone, flat momentum, MFE 0.195 never armed, 175m → atr_sl) = **TAT shadow would-fire #3**. Watchdog had pre-flagged it; SL hit before the 2h mental cut. TAT at 55m would have cut it.
+- **BTC #16291** chop-pin LONG (opened 22:02, EMA300-pin advisory shipped 22:45 — 43m too late for this trade). System self-corrected: flipped to breakdown SHORT #16292.
 
-**0 config changes (soak + resume-day discipline).**
-- Exit signature UNCHANGED: TRAIL 72T +$5.39 80.6% vs CHOP 104T −$8.69 1.0%
-- All last-run verifies PASS: EMA300-pin ✓ | death-zone ✓ | SHORT floor-45 ✓ | EXTREME ai-trader+ block ✓ | vacation_guardrail 0.5x ✓
-- 45-55 LONG band 7d −$1.99 but 30d −$0.88 (weakens at OOS) — hard block REJECTED, advisory sufficient
-- Drift: auto_1hr reports size-reduce as 0.3x but actual is 0.5x — reporting bug only
-- Creative: bb-bounce-v2-long+ 45-55 conf demotion suggested (not shipped)
-- Open 2: BTC LONG (chop-pin, HOLD), LTC LONG (death-band, MONITOR)
+**TAT shadow tally: 3 would-fires / 3 winners armed (0 observed fk) / threshold 15.**
 
-**CEO ESCALATIONS CARRIED: (1)** ARM-BE v6 exit-stack integration review P0; **(2)** exit-ladder candle backtest P0.
+**REJECTED with verification:** volume-breakout-long+ EXTREME block (14d −$0.45 but 30d +$2.30 REVERSES — OOS fail) | bb-bounce 45-55 demote (n=14, both bands bleed = wrong lever) | ai-trader+ 45-55 hard block (n=10 <20, advisory is right weight).
+
+**GIVE-BACK COHORT quantified for ARM-BE escalation:** 14d armed-then-lost 29T −$2.04; pump-chain+ 7T avg MFE 2.81 give back 4.66 pts. ARM-BE remains only OOS-PASS exit fix (30d +$5.94 fk 16.5%).
+
+**CREATIVE (suggested, zero-risk):** (1) ARM-BE counterfactual daily scorecard for CEO ratification; (2) atr_sl_hit post-exit recovery probe (wrong-side vs tight-SL discriminator for exit-ladder v6).
+
+**CEO ESCALATIONS CARRIED: (1)** ARM-BE v6 exit-stack integration P0; **(2)** exit-ladder candle backtest P0 (10th request).
+
+**Sideways:** LTC #16290 metadata final_confidence=137.25 unclamped (cosmetic metadata leak; exec clamp previously verified — dashboard may display >100).
+
+
+## PREVIOUS — brain_auditor #28 (23:50 UTC, abridged)
+
+0 config changes (soak + resume-day). Exit signature unchanged. All verifies PASS. Creative: bb-bounce 45-55 conf demotion (rejected this run on n<20 + both-bands bleed). EMA300-pin advisory shipped #27.
 
 ## PREVIOUS — brain_auditor #27 (22:45 UTC)
 

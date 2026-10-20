@@ -5739,5 +5739,23 @@
     "category": "infra",
     "status": "suggested",
     "risk": "zero"
+  },
+  {
+    "date": "2026-10-20T00:45:00Z",
+    "idea": "ARM-BE counterfactual daily scorecard (carry #28, numbers refreshed)",
+    "rationale": "14d armed-then-lost: 29T −$2.04 (pump-chain+ avg give-back 4.66 pct pts from MFE 2.81). ARM-BE is the only exit mechanism with OOS PASS. Daily one-number scorecard gives CEO the save estimate for ratification without another backtest round-trip.",
+    "expected_impact": "Surfaces ~$0.15/day give-back save; unblocks v6 ARM-BE ratification",
+    "category": "exit-side",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-20T00:45:00Z",
+    "idea": "atr_sl_hit post-exit recovery probe (NEW)",
+    "rationale": "24h atr_sl_hit rate 47.1% (8/17). Two hypotheses: (a) wrong-side entry (price continues against) or (b) SL too tight for chop volatility (price recovers after exit). Probe: on each atr_sl_hit close, snapshot price at +15/+30/+60m into jsonl. n>=50 discriminates wrong-side from tight-SL and directly informs exit-ladder v6 SL-distance tuning. Zero live impact.",
+    "expected_impact": "Root-causes the #1 exit reason; prevents blind ATR-SL widening",
+    "category": "exit-side data collection",
+    "status": "suggested",
+    "risk": "zero (read-only collector)"
   }
 ]
