@@ -22,7 +22,7 @@
   },
   "watchdog_steer_triage": {
     "steer-001_losing_streak": "WIDE-BUT-SHALLOW — 17/20 lost but 24h net −$0.01. Streak driven by conf<30 floor-admits (8T 12.5% −$0.50 today). Size-reduce containing. No emergency action.",
-    "steer-002_cluster": "PARTIAL — HYPE closed green; real finding: TWO identical BTC manual LONGs #16306/#16307 @82735 opened 12min apart (possible scale-in or duplicate). Both aligned LONG_BIAS, #16307 SL raked to breakeven+0.10%. FLAGGED to CEO, not closed (CEO trades).",
+    "steer-002_cluster": "RESOLVED-INTENTIONAL — the two BTC manual LONGs #16306/#16307 @82735 are a deliberate second tranche (protocol §7, commit 6334d4ab at 14:20 added brain.py --force flag for exactly this). Not a duplicate bug. Both aligned LONG_BIAS. No action.",
     "steer-003_wrong_side": "VERIFIED-STRUCTURAL, post-flip cohort now the cleanest test: since 11:45 flip, aligned LONG 3T +$0.57 (2 open green) vs misaligned SHORT 2T −$0.20 (FOGO/COMP pump-chain- counter-regime). Directional validation of 'ride the flip'.",
     "steer-004_pump_chain_": "KILL-NOT-MET — 14d 46T +$0.19 still positive. 24h losses were conf 24.5 floor-admits. Existing floors contain.",
     "steer-005_pump_chain_plus": "KILL-NOT-MET — 14d 52T +$1.08. Today 2T −$0.39 both conf 29.5 floor-admit HML. pp-cond shadow targets exactly this cohort."
@@ -67,8 +67,8 @@
     },
     {
       "finding": "BTC double manual LONG 12min apart same price",
-      "code_state": "No duplicate-open guard for manual trades",
-      "verdict": "OPERATIONAL FLAG — CEO may have scaled in intentionally; if unintentional, position_manager lacks same-coin-same-direction reopen cooldown for manual path. Monitor; bug_hunter only if CEO confirms duplicate."
+      "code_state": "Intentional second tranche via protocol §7 --force (commit 6334d4ab 14:20). Duplicate guard intact for automation.",
+      "verdict": "RESOLVED — intentional scale-in, not a bug. Steering flag cleared."
     }
   ],
   "creative_improvements": [
@@ -91,7 +91,7 @@
     "All 12+ prior soaks HOLDING — 0 violations"
   ],
   "next_actions": [
-    "CEO: confirm whether BTC #16306+#16307 double LONG is intentional scale-in or duplicate",
+    "CEO: BTC #16306+#16307 confirmed intentional second tranche (protocol §7) — no action",
     "Vacation end: evaluate pp-cond floor flip (pre-reg criteria: 14d save>$1, fk<10%)",
     "Continue coin_regime cohort build → 14d flip-alignment backfill at n>=20",
     "Escalation #15: exit-ladder signal-scoped candle OOS — still CEO-priority",
