@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS shadow_trades (
     
     -- Context (captured at signal fire — pull from signals table + signal_metadata)
     context JSON,                       -- full context snapshot (see 3.2)
-    leverage_used INTEGER,              -- execution leverage (capped at MAX_LEVERAGE=5)
+    leverage_used INTEGER,              -- execution leverage (from per-token registry, NOT signals.leverage)
     
     -- Gate information
     decision TEXT,                      -- EXPIRED, SKIPPED, PENDING, FAILED, EXECUTED
@@ -107,20 +107,20 @@ CREATE TABLE IF NOT EXISTS shadow_trades (
     gate_name_backfilled INTEGER DEFAULT 0,  -- 1 if gate_name was parsed from decision_reason
     
     -- Exit engine routing
-    exit_config TEXT,                   -- 'atr', 'pump_exit', 'ride_it', 'rr_engine' (from SIGNAL_EXIT_CONFIG)
+    exit_config TEXT,                   -- 'atr', 'pump_exit', 'ride_it', 'rr_engine' (from _match_exit_config)
     
     -- Exit engine simulation results (one per engine)
     exit_atr_json JSON,                 -- ATR SL/TP simulation result (continuous peak-trailing)
     exit_pm_trail_json JSON,            -- PM Trail simulation result (tiered)
     exit_hard_max_json JSON,            -- Hard Max Loss simulation result
-    exit_cut_loser_json JSON,           -- Cut Loser two-tier result
-    exit_speed_stale_json JSON,         -- Speed Stale exit result
+    exit_cut_loser_json JSON,           -- Cut Loser two-tier result (full closes)
+    exit_speed_stale_json JSON,         -- Speed Stale exit result (fidelity gap: no speed_percentile gate)
     exit_universal_hold_json JSON,      -- Universal Max Hold result
     exit_trail_arm_timeout_json JSON,   -- Trail Arm Timeout result
     exit_rr_engine_json JSON,           -- RR Engine result (NULL in v1 — not simulated)
     
     -- First exit to fire (renamed from best_exit_engine per validation)
-    first_exit_engine TEXT,             -- which engine fired first
+    first_exit_engine TEXT,             -- which engine fired first (deterministic tie-break, see §4.0)
     first_exit_price REAL,              -- exit price
     first_exit_pnl_pct REAL,            -- PnL % (direction-signed, after fees+slippage)
     first_exit_hold_minutes REAL,       -- hold time in minutes
@@ -263,6 +263,27 @@ exit_config = _match_exit_config(source)  # returns 'atr' | 'pump_exit' | 'ride_
 | ride_it | ❌ NO (v2) | — | `ride_it_exit.py` | Route through universal stack, label exit_config |
 
 **v1 scope decision (bug_hunter finding 4):** Simulate the 7 universal engines. Signals routed to `pump_exit` or `ride_it` are simulated through the universal stack (ATR + PM Trail + HML + etc.) and labeled with their `exit_config` for stratified analysis. This is an approximation — `pump_exit` and `ride_it` have different exit logic — but it provides data for 100% of signals without defining two new engine simulations.
+
+#### Tie-Break Rule (bug_hunter finding 8)
+
+When two engines fire in the same 1m candle, use deterministic precedence:
+
+**Loss-side (worst first):** HML → Cut Loser Hard Stop → Cut Loser T2 → Cut Loser T1 → ATR SL → Speed Stale → Trail Arm Timeout → Universal Max Hold
+
+**Profit-side (best first):** ATR TP → PM Trail → Speed Stale Winner
+
+Record multi-fire engines in the engine JSONs (`fired: true` even when not first). This ensures `first_exit_engine` is deterministic across runs.
+
+#### Leverage Sourcing (own-conclusions finding 8)
+
+**⚠️ CRITICAL:** Do NOT use `signals.leverage` (defaults to 10, often NULL). Do NOT hardcode cap-at-5. Live 14d trades show: lev 5×191, **lev 3×125**, 10×9, 40×1 (per-token registry). Use the per-token leverage from the trade registry:
+
+```python
+# CORRECT — use per-token leverage from registry
+from position_manager import get_trade_params
+leverage = get_trade_params(token)['leverage']  # or query the per-token registry
+# Fallback: min(signals.leverage or 5, MAX_LEVERAGE) if registry unavailable
+```
 
 ---
 
@@ -426,22 +447,28 @@ For each 1m candle after entry:
 
 ### 4.3 Hard Max Loss (HML)
 
-> **CORRECTED (own-conclusions):** Formula was INVERTED. Live code uses `CUT_LOSER_PNL / leverage` unconditionally. The ATR branch is dead code after Oct-10 cap fix.
+> **CORRECTED (own-conclusions + bug_hunter):** Formula was INVERTED. Live code uses `CUT_LOSER_PNL / leverage` unconditionally. The ATR branch is dead code after Oct-10 cap fix. **Leverage sourcing corrected:** use per-token registry, NOT cap-at-5 (live trades use lev 3×125, lev 5×191, lev 10×9).
 
 **Constants:**
 - `CUT_LOSER_PNL = -4.00` (account %)
-- `MAX_LEVERAGE = 5` (live cap, NOT `signals.leverage` which defaults to 10)
+- `MAX_LEVERAGE = 5` (fallback cap, but per-token registry is preferred)
 
 **Logic (from `position_manager.py:3551-3587`):**
 ```python
 entry_price = candle_open_at_signal_ts
 
-# CRITICAL: Use execution leverage (capped at 5), NOT signals.leverage
-leverage = min(signals.leverage or 5, MAX_LEVERAGE)  # cap at 5
+# CRITICAL: Use per-token leverage from registry, NOT signals.leverage
+# Live 14d: lev 5×191, lev 3×125, lev 10×9, lev 40×1
+# signals.leverage is often NULL or defaults to 10
+try:
+    from position_manager import get_trade_params
+    leverage = get_trade_params(token)['leverage']  # per-token registry
+except:
+    leverage = min(signals.leverage or 5, MAX_LEVERAGE)  # fallback: cap at 5
 
 # HML threshold = CUT_LOSER_PNL / leverage (unconditionally)
 # The ATR vol floor is dead code — account threshold always governs
-hml_threshold_pct = CUT_LOSER_PNL / leverage  # e.g. -4.00/5 = -0.80% price
+hml_threshold_pct = CUT_LOSER_PNL / leverage  # e.g. -4.00/5 = -0.80% price, -4.00/3 = -1.33% price
 
 hml_price = entry_price * (1 + hml_threshold_pct/100)  # for LONG
 
@@ -449,14 +476,11 @@ For each 1m candle after entry:
     if candle_low <= hml_price:  # LONG
         exit at hml_price, reason='hard_max_loss'
         break
-    if candle_high >= entry_price * (1 + hml_threshold_pct/100 * -1):  # breakeven
-        # HML doesn't fire on winners — only losers
-        pass
 ```
 
 **Key behaviors:**
-- Threshold = `CUT_LOSER_PNL / leverage` (e.g., -4.00/5 = -0.80% price)
-- Use execution leverage (capped at 5), NOT `signals.leverage` (defaults to 10)
+- Threshold = `CUT_LOSER_PNL / leverage` (e.g., -4.00/5 = -0.80% price, -4.00/3 = -1.33% price)
+- **Use per-token leverage from registry** — NOT signals.leverage (NULL/10), NOT cap-at-5
 - ATR branch is dead code — account threshold always governs
 - Only fires on losers (cannot block winners)
 
@@ -616,17 +640,20 @@ elif 'pump-chain' in source and direction == 'LONG':
 else:
     timeout_min = None  # no timeout
 
+# Respect ENABLED kill switches
+if timeout_min and not timeout_enabled:
+    timeout_min = None
+
 If timeout_min:
     For each 1m candle after entry:
         current_pnl_pct = (candle_close / entry_price - 1) * 100
         
-        # Check if trail armed
-        if current_pnl_pct >= activate_pct:
-            break  # trail armed, no timeout
-        
-        # Check timeout
+        # Check timeout: close if current pnl < 0.40% AT the timeout mark
+        # NOTE (bug_hunter finding 6): NOT an "ever-armed" latch.
+        # Live closes if hold >= timeout AND current pnl < activation threshold.
+        # A trade that touched +0.5% then fell to +0.1% IS closed.
         hold_minutes = (current_ts - entry_ts) / 60
-        if hold_minutes >= timeout_min:
+        if hold_minutes >= timeout_min and current_pnl_pct < 0.40:
             exit at candle_close, reason='trail_arm_timeout'
             break
 ```
@@ -743,9 +770,27 @@ This is a multi-hour sub-project. Scope separately.
 - Use atomic writes for DB operations
 - Add `created_at_db` and `updated_at` for audit trail
 
-### 6.4 Performance
+### 6.4 Slow-Engine Truncation (own-conclusions finding 9)
+
+**⚠️ CRITICAL:** The close pass runs at 4.5h, but Universal Max Hold is 8h and ride_it is 24h. Without a re-close pass, slow engines are truncated and A/B biases toward fast engines.
+
+**Fix:** Add a re-close pass that runs every 4 hours on signals where:
+- `closed = 0` AND `created_at < now - 4.5h` (first pass missed)
+- OR `first_exit_engine = 'universal_max_hold'` AND `hold_minutes < 480` (truncated)
+- OR `first_exit_engine = 'universal_max_hold'` AND `hold_minutes < 1440` (ride_it truncated)
+
+This ensures slow engines get full simulation.
+
+### 6.5 Gate Attribution (own-conclusions finding 7)
+
+**⚠️ CRITICAL:** 985/999 signals/24h have `decision_reason='compaction_stale_10min'`. Execution gates only exist in `pipeline.log`, not in the signals DB. The backfill design yields UNKNOWN for every gate except CONFLUENCE-EXPIRY.
+
+**Fix:** Reuse `gate_shadow.py`'s log parser to extract gate names from `pipeline.log`. The parser already handles `[CTX-GATE]`-style strings with leading emoji/whitespace.
+
+### 6.6 Performance
 - Batch processing: record every 30min, close every 1h
 - **Windowed candle reads** (not full-history caching): binary-search `[entry_ts, exit_ts]` window per signal. The 1m table is PK'd on `(token, ts)` so range reads are cheap.
+- **Cache per (token, floor_ts) within a batch** to avoid re-reading same candles for signals on same token
 - Use indexes for common queries
 - Limit to 1000 signals per batch to avoid memory issues
 - **Memory note:** Full-history caching would OOM (~33M tuples for 150 tokens). Use windowed reads only.
@@ -813,12 +858,21 @@ This is a multi-hour sub-project. Scope separately.
 | Metric | Target | How to Measure |
 |--------|--------|----------------|
 | Shadow outcomes/day | ~1000 | `SELECT COUNT(*) FROM shadow_trades WHERE created_at > datetime('now', '-1 day')` |
-| Data completeness | >95% | `SELECT 100.0 * SUM(CASE WHEN first_exit_engine IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) FROM shadow_trades WHERE closed=1` |
+| Data completeness | >95% | `SELECT 100.0 * SUM(CASE WHEN first_exit_engine IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) FROM shadow_trades WHERE closed=1 AND first_exit_reason != 'unclosed_no_candles'` |
 | Gate justification | Answered | Report shows "Gate X blocked N, M would have won" |
 | Exit engine A/B | Complete | Report shows engine rankings per signal type |
 | Validation | Qualitative | Compare shadow PnL vs actual PnL for EXECUTED signals (n≈2/day, too thin for statistical bar — use qualitative reconciliation) |
 
 > **Note (own-conclusions validation):** The original 5%-match validation bar is unachievable at n≈2 EXECUTED/day. Live trades go through the full cascade (cut_loser tiers, soft trigger, speed stale, cascade flip) which the shadow doesn't simulate, so mismatches are guaranteed for structural reasons. Use qualitative reconciliation instead.
+
+> **Note (bug_hunter finding 10):** Completeness metric excludes `unclosed_no_candles` — those are expected outcomes, not data quality issues.
+
+### Retention & Purge (bug_hunter finding 9)
+
+- **90-day retention:** Add purge to `expiry_shadow.py` main or a systemd timer
+- **SQLite concurrency:** Use `PRAGMA journal_mode=WAL` + `busy_timeout=5000` or reuse `hermes_file_lock`
+- **Table size projection:** ~1000 rows/day × 90d ≈ 90k rows + fat JSON columns — acceptable
+- **Purge query:** `DELETE FROM shadow_trades WHERE created_at < datetime('now', '-90 days')`
 
 ---
 
@@ -828,11 +882,12 @@ This is a multi-hour sub-project. Scope separately.
 
 | System | Status | Data | Relationship |
 |--------|--------|------|--------------|
-| `expiry_shadow.py` | Running (15,402 events) | Forward returns for EXPIRED/SKIPPED | **EXTEND** — this spec extends it with exit engine simulation |
-| `gate_shadow.py` | Running (24,470 events) | Per-gate shadow WR | **SUPERSEDES** for gate justification — this spec produces richer data |
+| `expiry_shadow.py` | Running (15,480 events) | Forward returns for EXPIRED/SKIPPED | **EXTEND** — this spec extends it with exit engine simulation |
+| `gate_shadow.py` | Running (24,641 events) | Per-gate shadow WR | **SUPERSEDES** for gate justification — this spec produces richer data |
 | `t5_shadow.py` | Running | WOULD_TRADE/WOULD_SKIP vs live WR | **COMPLEMENTARY** — different purpose |
-| `exit_optimizer_shadow.py` | Running | MFE/MAE replay | **SUPERSEDES** — this spec can know path order, exit_optimizer cannot |
+| `exit_optimizer_shadow.py` | Exists (no timer found) | MFE/MAE replay | **SUPERSEDES** — this spec can know path order, exit_optimizer cannot |
 | `mom_filter_shadow.py` | Running | Momentum filter counterfactual | **COMPLEMENTARY** — different purpose |
+| `temporal_confluence_shadow.py` | Exists (7th shadow system) | Temporal confluence counterfactual | **COMPLEMENTARY** — different purpose |
 | `signal_outcomes` table | Exists | Signal outcome tracking | **EXTEND** — this spec adds exit engine simulation |
 
 **Decision:** This spec EXTENDS `expiry_shadow.py` and SUPERSEDES `gate_shadow.py` + `exit_optimizer_shadow.py` for gate justification and exit engine analysis. The other shadow systems remain complementary.
@@ -879,15 +934,36 @@ This is a multi-hour sub-project. Scope separately.
 **Reuse the `ab_results` schema** for shadow A/B results:
 
 ```sql
--- Shadow A/B results use the same schema
-INSERT INTO ab_results (test_name, variant_id, trades, wins, losses, 
-                        win_rate_pct, total_pnl_pct, total_pnl_usdt)
+**⚠️ ISOLATION (bug_hunter finding 3):** Do NOT write shadow-simulated data into the live `ab_results` table. Use a separate `shadow_ab_results` table or hard `shadow:` namespace prefix. Never feed shadow rows to `get_ab_variant`/live evolution. This prevents simulated outcomes from silently steering live variant selection if live A/B is ever re-enabled.
+
+**Use a separate table for shadow A/B results:**
+
+```sql
+-- Shadow A/B results in a SEPARATE table (not ab_results)
+CREATE TABLE IF NOT EXISTS shadow_ab_results (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    test_name TEXT NOT NULL,
+    variant_id TEXT NOT NULL,
+    trades INTEGER DEFAULT 0,
+    wins INTEGER DEFAULT 0,
+    losses INTEGER DEFAULT 0,
+    win_rate_pct DOUBLE PRECISION DEFAULT 0,
+    total_pnl_pct DOUBLE PRECISION DEFAULT 0,
+    total_pnl_usdt DOUBLE PRECISION DEFAULT 0,
+    avg_win_pct DOUBLE PRECISION DEFAULT 0,
+    avg_loss_pct DOUBLE PRECISION DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(test_name, variant_id)
+);
+
+INSERT INTO shadow_ab_results (test_name, variant_id, trades, wins, losses, 
+                               win_rate_pct, total_pnl_pct, total_pnl_usdt)
 VALUES ('exit-engine-atr', 'atr_sl_tp', 1000, 450, 550, 45.0, 12.5, 3.75)
 ON CONFLICT (test_name, variant_id) 
 DO UPDATE SET trades = EXCLUDED.trades, wins = EXCLUDED.wins, ...;
 ```
 
-**Reuse the evolution engine** for shadow A/B:
+**Reuse the evolution engine** for shadow A/B (but on `shadow_ab_results`, not `ab_results`):
 - Kill exit engines that consistently lose on shadow trades
 - Spawn new exit engine variants (e.g., different trail distances)
 - Redistribute weight to winning engines
@@ -969,8 +1045,9 @@ DO UPDATE SET trades = EXCLUDED.trades, wins = EXCLUDED.wins, ...;
 | `expiry_shadow.py` | Exists, to be extended | `scripts/expiry_shadow.py` |
 | `t5_shadow.py` | Exists | `scripts/t5_shadow.py` |
 | `gate_shadow.py` | Exists (24,470 events) | `scripts/gate_shadow.py` |
-| `exit_optimizer_shadow.py` | Exists | `scripts/exit_optimizer_shadow.py` |
+| `exit_optimizer_shadow.py` | Exists (no timer found) | `scripts/exit_optimizer_shadow.py` |
 | `mom_filter_shadow.py` | Exists | `scripts/mom_filter_shadow.py` |
+| `temporal_confluence_shadow.py` | Exists (7th shadow system) | `scripts/temporal_confluence_shadow.py` |
 | Cell stats | Exists (697 cells) | `brain/cell_stats.db` |
 | `volatility_gate_v2.py` | Exists | `scripts/volatility_gate_v2.py` |
 | `rsi_utils.py` | Exists | `scripts/rsi_utils.py` |
@@ -978,7 +1055,26 @@ DO UPDATE SET trades = EXCLUDED.trades, wins = EXCLUDED.wins, ...;
 | `tpsl_utils.py` | Exists | `scripts/tpsl_utils.py` |
 | `profit_monster.py` | Exists | `scripts/profit_monster.py` |
 | `cut_loser.py` | Exists | `scripts/cut_loser.py` |
+| `ride_it_exit.py` | Exists (v2 scope) | `scripts/ride_it_exit.py` |
 | `risk_reward_engine.py` | Exists (v2 scope) | `scripts/risk_reward_engine.py` |
+| `ab_optimizer.py` | Exists (phased out) | `scripts/ab_optimizer.py` |
+| `hermes_ab_utils.py` | Exists (phased out) | `scripts/hermes_ab_utils.py` |
+
+---
+
+## Appendix D: Known Divergences from Live
+
+> **IMPORTANT (bug_hunter recommendation 5):** These are known fidelity gaps in the shadow simulation. Day-8 analysis must NOT over-read shadow rankings.
+
+| Divergence | Impact | Mitigation |
+|------------|--------|------------|
+| **Entry price optimism** | Shadow uses candle open at signal ts (zero latency). Live enters minutes later. All shadow PnL optimistic. | Fine for relative A/B (same convention). Do NOT read absolute shadow PnL as achievable. |
+| **Speed-stale fidelity gap** | Shadow omits `speed_percentile < 33` gate (in-hold speed history unavailable). Expect more stale fires than live. | Downgrade speed-stale from "ranked" to "informational" in v1. |
+| **ATR engine simplification** | Shadow uses simplified peak-trailing. Live is ~700 lines with entry floor, k-tiering, phase scaling, snap logic. | Acceptable as approximation. Label as "simplified ATR" in reports. |
+| **Partial-close engines** | PM T1/T2 and Cut Loser tiers do partial closes live. Shadow simulates full closes only. | PnL accounting slightly wrong for partial-close trades. Note in reports. |
+| **pump_exit/ride_it approximation** | Signals routed to these configs are simulated through universal stack, not their actual exit logic. | Label `exit_config` for stratified analysis. Do NOT compare pump_exit shadow vs pump_exit live. |
+| **Speed history unavailability** | Shadow cannot reconstruct in-hold speed history (token_speeds keeps only 241-row current snapshot). | Speed-stale engine is informational only in v1. |
+| **Probable live bug** | profit_monster trail appears to activate at +0.004% (percent vs fraction) instead of +0.40%. | Resolve before shadowing. If live bug confirmed, shadow should simulate the CORRECT behavior (+0.40%), not the buggy behavior. |
 
 ## Appendix B: Exit Engine Constants
 
@@ -991,14 +1087,20 @@ DO UPDATE SET trades = EXCLUDED.trades, wins = EXCLUDED.wins, ...;
 | `PM_TRAIL_MIN_HOLD` | 2 | `hermes_constants.py:1738` |
 | `TRAILING_ACTIVATION_PCT` | 0.0040 (0.40%) | `hermes_constants.py:727` |
 | `TRAILING_DISTANCE_PCT` | 1.20% | `hermes_constants.py:728` |
-| `ATR_SL_MIN_INIT` | 1.5% | `tpsl_utils.py` |
-| `ATR_SL_MIN_ACCEL` | 0.30% | `tpsl_utils.py` |
-| `ATR_PERIOD` | 14 (on 1h candles) | `volatility_gate_v2.py:520` |
-| `STALE_LOSER_TIMEOUT_MINUTES` | 8 | `position_manager.py:612` |
-| `STALE_WINNER_TIMEOUT_MINUTES` | 120 | `position_manager.py:626` |
+| `ATR_SL_MIN_INIT` | 1.5% | `hermes_constants.py:711` (not tpsl_utils) |
+| `ATR_SL_MIN_ACCEL` | 0.30% | `hermes_constants.py:705` (not tpsl_utils) |
+| `ATR_SL_MAX` | 2.5% | `hermes_constants.py:696` |
+| `VEL_STALE_THRESHOLD_PCT` | 0.05 (%/candle) | `hermes_constants.py:559` |
+| `STALE_LOSER_TIMEOUT_MINUTES` | 8 | `hermes_constants.py:565` |
+| `STALE_WINNER_TIMEOUT_MINUTES` | 120 | `hermes_constants.py:564` |
+| `STALE_LOSER_MAX_LOSS` | -1.0% | `hermes_constants.py:566` |
+| `STALE_WINNER_MIN_PROFIT` | +0.6% | `hermes_constants.py:567` |
 | `UNIVERSAL_MAX_HOLD_MINUTES` | 480 | `hermes_constants.py:1132` |
-| `RIDE_IT_MAX_HOLD_MINUTES` | 1440 | `position_manager.py:3448` |
-| `MAX_LEVERAGE` | 5 | `position_manager.py:157` |
+| `RIDE_IT_MAX_HOLD_HOURS` | 24 | `hermes_constants.py:4307` (not MINUTES) |
+| `BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN` | 60 | `hermes_constants.py:1671` |
+| `PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN` | 45 | `hermes_constants.py:1682` |
+| `MAX_LEVERAGE` | 5 (fallback) | `position_manager.py:157` |
+| ATR(14) | 15m-primary | `tpsl_utils.get_fresh_atr` (not volatility_gate 1h) |
 
 ## Appendix C: Gate Names (for `gate_name` column)
 
@@ -1020,31 +1122,19 @@ DO UPDATE SET trades = EXCLUDED.trades, wins = EXCLUDED.wins, ...;
 
 ### Gate Name Backfill Mechanism
 
-The `gate_name` column is populated via a backfill pass:
+> **CORRECTED (own-conclusions finding 7):** 985/999 signals/24h have `decision_reason='compaction_stale_10min'`. Execution gates only exist in `pipeline.log`. The simple regex backfill yields UNKNOWN for every gate except CONFLUENCE-EXPIRY.
+
+**Fix:** Reuse `gate_shadow.py`'s log parser to extract gate names from `pipeline.log`. The parser already handles `[CTX-GATE]`-style strings with leading emoji/whitespace.
 
 1. **Record at fire:** Set `decision='PENDING'`, `gate_name=NULL`
-2. **Backfill within 2h purge window:** UPDATE `decision`, `decision_reason`, `gate_name` from runtime DB
-3. **Parse free-text reasons:** Extract structured gate names from `[CTX-GATE]`-style strings
+2. **Backfill within 2h purge window:** 
+   - For `decision_reason='compaction_stale_10min'` → `gate_name='CONFLUENCE-EXPIRY'`
+   - For other reasons → parse from `pipeline.log` using `gate_shadow.py`'s parser
+3. **Parse free-text reasons:** Use `gate_shadow.py`'s regex (handles leading emoji/whitespace)
 
 ```python
-def backfill_gate_name(decision_reason):
-    """Parse decision_reason into structured gate name."""
-    if not decision_reason:
-        return None
-    
-    # Pattern: [GATE-NAME] message
-    import re
-    match = re.match(r'\[([A-Z-]+)\]', decision_reason)
-    if match:
-        return match.group(1)
-    
-    # Known patterns without brackets
-    if 'compaction_stale' in decision_reason:
-        return 'CONFLUENCE-EXPIRY'
-    if 'RSI hard floor' in decision_reason:
-        return 'SHORT-RSI-HARD-FLOOR'
-    if 'trade failed at execution' in decision_reason:
-        return 'EXEC-TIME-GATE'
-    
-    return 'UNKNOWN'
+# CORRECT — reuse gate_shadow.py's parser
+from gate_shadow import parse_gate_name_from_log
+gate_name = parse_gate_name_from_log(pipeline_log_line)
+# Falls back to: compaction_stale → CONFLUENCE-EXPIRY, else UNKNOWN
 ```
