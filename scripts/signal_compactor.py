@@ -3218,6 +3218,34 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                 except ImportError:
                     pass
+            # ── ichimoku SHORT LONG_BIAS block (CEO 2026-10-20) ────────────
+            # Regime-conditional loosening: ichimoku LONG gets standalone bypass,
+            # but ichimoku SHORT is blocked in LONG_BIAS regime (contradicts data:
+            # SHORTs at 22.2% WR in LONG_BIAS market).
+            if 'ichimoku' in bare_source and direction.upper() == 'SHORT':
+                try:
+                    from hermes_constants import ICHIMOKU_SHORT_LONG_BIAS_BLOCK
+                    if ICHIMOKU_SHORT_LONG_BIAS_BLOCK and _regime_4h == 'LONG_BIAS':
+                        log(f"  🚫 [ICHIMOKU-SHORT-BLOCK] {token} SHORT blocked — LONG_BIAS regime, ichimoku SHORT contrarian")
+                        continue
+                except ImportError:
+                    pass
+            # ── ichimoku LONG shadow logging (CEO 2026-10-20) ──────────────
+            # Shadow-log what WOULD have blocked this loosened LONG trade.
+            # This gives us counterfactual data at zero marginal risk.
+            if 'ichimoku' in bare_source and direction.upper() == 'LONG':
+                try:
+                    from hermes_constants import ICHIMOKU_LONG_BYPASS_SHADOW
+                    if ICHIMOKU_LONG_BYPASS_SHADOW:
+                        _shadow_reasons = []
+                        if _vol_regime in ('HIGH', 'EXTREME'):
+                            _shadow_reasons.append(f'vol={_vol_regime}')
+                        if _regime_4h == 'NEUTRAL':
+                            _shadow_reasons.append('4h=NEUTRAL')
+                        if _shadow_reasons:
+                            log(f"  👁️ [ICHIMOKU-LONG-SHADOW] {token} LONG bypass active — would have been blocked by: {', '.join(_shadow_reasons)}")
+                except ImportError:
+                    pass
             # ── bb-bounce-short FLAT regime block (2026-10-13) ──────────
             # Regime data: HIGH 64.3% WR (28T), EXTREME 100% WR (6T), NORMAL 65.5% WR (58T).
             # FLAT = 40% WR (5T) — only bad regime. Re-enabled from auto-kill.

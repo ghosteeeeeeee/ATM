@@ -263,7 +263,73 @@ def write_size_reduce(reason):
         log(f"❌ [VACATION-GUARDRAIL] Failed to write size-reduce: {e}", 'ERROR')
 
 
+def check_ichimoku_bypass_kill():
+    """Check if ichimoku LONG bypass should be auto-reverted (CEO 2026-10-20).
+
+    Pre-registered kill criteria: if loosened LONG cohort 24h WR < 40% with
+    5+ trades, auto-revert ICHIMOKU_LONG_BYPASS_ENABLED to False.
+    """
+    try:
+        from hermes_constants import (
+            ICHIMOKU_LONG_BYPASS_ENABLED,
+            ICHIMOKU_LONG_BYPASS_MIN_WR,
+            ICHIMOKU_LONG_BYPASS_MIN_TRADES,
+        )
+        if not ICHIMOKU_LONG_BYPASS_ENABLED:
+            return  # already disabled
+
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT COUNT(*), SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END),
+                   ROUND(SUM(pnl_usdt), 2),
+                   ROUND(100.0 * SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) / COUNT(*), 1)
+            FROM trades
+            WHERE status = 'closed'
+              AND signal LIKE 'ichimoku%'
+              AND direction = 'LONG'
+              AND close_time > NOW() - INTERVAL '24 hours'
+        """)
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        n_trades = row[0] or 0
+        n_wins = row[1] or 0
+        pnl = row[2] or 0
+        wr = row[3] or 0
+
+        if n_trades >= ICHIMOKU_LONG_BYPASS_MIN_TRADES:
+            if wr < ICHIMOKU_LONG_BYPASS_MIN_WR:
+                # Auto-revert: disable the bypass
+                import re
+                const_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hermes_constants.py')
+                with open(const_path, 'r') as f:
+                    content = f.read()
+                content = content.replace(
+                    'ICHIMOKU_LONG_BYPASS_ENABLED = True',
+                    f'ICHIMOKU_LONG_BYPASS_ENABLED = False  # AUTO-REVERTED {datetime.now(timezone.utc).isoformat()}: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}% ({n_trades}T)'
+                )
+                with open(const_path, 'w') as f:
+                    f.write(content)
+                log(f"🔴 [ICHIMOKU-BYPASS-KILL] Auto-reverted: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}% ({n_trades}T, PnL ${pnl:+.2f})")
+                write_alert('WARNING', f'ichimoku LONG bypass auto-reverted: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}%', {
+                    'n_trades': n_trades, 'wr': wr, 'pnl': pnl
+                })
+            else:
+                log(f"✅ [ICHIMOKU-BYPASS-KILL] OK: WR {wr}% >= {ICHIMOKU_LONG_BYPASS_MIN_WR}% ({n_trades}T, PnL ${pnl:+.2f})")
+        else:
+            log(f"⏳ [ICHIMOKU-BYPASS-KILL] Collecting data: {n_trades}/{ICHIMOKU_LONG_BYPASS_MIN_TRADES} trades (WR {wr}%)")
+
+    except Exception as e:
+        log(f"❌ [ICHIMOKU-BYPASS-KILL] Check failed: {e}", 'ERROR')
+
+
 def main():
+    # Check ichimoku LONG bypass kill criteria first (CEO 2026-10-20)
+    check_ichimoku_bypass_kill()
+
     should_pause, should_escalate, should_resume, data = check_guardrails()
 
     log(f"📊 [VACATION-GUARDRAIL] 24h: {data['n_24h']}T {data['wr_24h']}% ${data['pnl_24h']:+.2f} | "
