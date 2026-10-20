@@ -12569,3 +12569,23 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - 7d 34.5% WR climbing toward 35% threshold — still -$3.66 PnL, size-reduce stays
 - ai-trader-pending just hit TP (first win) — 3T 1W 24h, no longer 0% WR
 - 24h WR 41.2% still soft — small sample (17T), monitor
+
+## [2026-10-20 02:27] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** /usr/bin/bash.00 last hour | 24h 17T 7W -$0.41 (41.2% WR) | 7d 196T 68W -$3.54 (34.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes, 0 open — quiet market (4 consecutive quiet hours since 01:00 close)
+- atr_sl_hit 8/17 = 47% > 40% but tpsl_utils.py fix verified deployed prior hours — monitor
+- Kill check: no signal with 0% WR and 3+ trades last hour (0 trades). 24h worst under threshold
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (last 3 active hours: -0.04, -0.08, +0.07)
+- Size-reduce 0.3x stays (7d WR 34.7% < 35%, 7d PnL -$3.54 < -$2)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL improved to -$3.54 from -$3.66 — size-reduce stays until 7d WR >=35% and PnL >= -$2
+- Volume very thin (~2-3T/day pace) — quiet regime continues

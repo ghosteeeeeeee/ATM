@@ -422,3 +422,6 @@ BY: signal_reporter
 
 ## TEAM UPDATES
 - [2026-10-19 13:30] auto_1hr: No config change — 1T last hour 0W −$0.04 (ARB pump-chain+ LONG atr_sl_hit −1.67%); 24h 18T 9W −$0.36 (50.0% WR); 7d 201T 68W −$4.09 (33.8%) — size-reduce 0.3x stays; kill: none (ai-trader-pending 24h 2T 0W under 3T); atr_sl_hit 33% healthy, tpsl deployed; 0 open; no neg-hour streak; No constants change → no signal_versions entry
+
+## TEAM UPDATES
+- [2026-10-20 02:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, 4th consec) | 24h 17T 7W −$0.41 (41.2%) | 7d 196T 68W −$3.54 (34.7%) — size-reduce 0.3x stays | kill: none | atr_sl_hit 47% >40% but tpsl deployed — monitor | 0 open | No constants change → no signal_versions entry
