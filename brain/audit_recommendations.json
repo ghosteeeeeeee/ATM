@@ -1,67 +1,143 @@
 {
-  "timestamp": "2026-10-20T03:42:16Z",
+  "timestamp": "2026-10-20T04:41:34.624601+00:00",
+  "run": 33,
   "agent": "brain_auditor",
-  "run": 32,
-  "vacation_mode_active": true,
-  "config_changes_applied": [],
-  "infra_changes_applied": [],
+  "mode": "vacation (shadow-first, no constants changes)",
   "trade_summary_24h": {
-    "trades": 17,
-    "wins": 7,
-    "wr": 41.2,
-    "pnl": -0.41,
-    "exit_family": "TRAIL 6T +$0.26 100%WR | SL 9T −$0.48 0%WR | OTHER 2T −$0.19 — separation still ~100%",
-    "open": "1 BTC LONG #16293 ai-trader-pending @81987 SL81741 TP82400, −0.05%, mixed regime (15m LONG_BIAS / 4h SHORT_BIAS / DECLINING). HOLD — explicit SL/TP set."
+    "trades": 16,
+    "wins": 5,
+    "pnl": -0.58,
+    "wr": 31.3,
+    "note": "degrading vs run#32 (41.2% → 31.3%). ARB 3x LONG losses −$0.22 dominate."
   },
   "trade_summary_7d": {
-    "trades": 195,
-    "wr": 34.9,
-    "pnl": -3.3,
-    "exit_family": "TRAIL 72T +$5.39 80.6% | SL 107T −$8.27 0.9%",
-    "arm_rate": "47.4% (92/194 reached MFE≥0.40)"
+    "trades": 194,
+    "wins": 67,
+    "pnl": -3.39,
+    "wr": 34.5,
+    "trail_family": "profit-monster-trail 34T +$1.75 97% + atr_trail_hit 21T +$3.37 81% = ~$5.5",
+    "chop_family": "atr_sl_hit 59T −$4.29 1.7% + hard_max_loss 42T −$3.60 0% = ~−$7.9",
+    "separation": "unchanged — trail-or-die is THE structure"
   },
-  "atr_sl_recovery_probe_7d": {
-    "idea_from_run31": "atr_sl_hit post-exit recovery probe — wrong-side vs tight-SL discriminator",
-    "method": "59 atr_sl_hit exits 7d; 1m candle high/low 30min after exit vs entry",
-    "result": "63% CONTINUED against us (wrong-side) / 37% RECOVERED (tight-SL)",
-    "by_direction": "LONG 13R/17C | SHORT 9R/20C (69% continued — SHORTs mostly wrong-side)",
-    "by_signal_14d": "bb-bounce 0% recovered (pure wrong-side) | pump-chain- 50% | ai-trader+ 62% (tight-SL leaning)",
-    "conclusion": "Majority of atr_sl exits are ENTRY-QUALITY problems, not SL width. bb-bounce needs entry filters, not wider SL. ai-trader+ 62% recovery is the only tight-SL-leaning family — pre-register SL-width study post-vacation."
-  },
-  "tat_shadow_status": {
-    "unique_fires": 12,
-    "threshold": 15,
-    "base_outcomes": "9 saves / 3 FK (rebuilt from PG: losers −0.78, winners +0.12)",
-    "variant_C_correction": "RUN #31 CLAIMED 9S/0FK — WRONG. Live-pnl-at-fire for the 9 saves: 6 negative (−0.06..−0.94), 3 slightly POSITIVE (+0.04..+0.07: #16251 BTC, #16282 LDO, #16284 DOGE). Underwater-only variant C = 6 saves / 0 FK, not 9/0. Still zero-FK but smaller save set. DO NOT flip on inflated #31 numbers.",
-    "fires_needed": "3 more unique fires to threshold"
-  },
-  "steers": {
-    "001_pending_order": "ALREADY EXECUTED as #16293 (btc-momentum-long). Explicit SL/TP present. No action.",
-    "002_wrong_side": "VERIFIED-STRUCTURAL — 7d TRAIL +$5.39 vs SL −$8.27 unchanged. Chop family. TAT is the fix.",
-    "003_pending_streak": "MONITOR — n=3, known chop cohort, TAT shadow covering.",
-    "004_ai_trader_streak": "MONITOR — n=3, EXTREME block holding, TAT shadow covering."
-  },
+  "open_trades": [
+    {
+      "id": 16293,
+      "coin": "BTC",
+      "signal": "ai-trader-pending",
+      "dir": "LONG",
+      "pnl_pct": 0.15,
+      "hours": 1.4,
+      "action": "HOLD — explicit SL/TP set, +0.15%"
+    },
+    {
+      "id": 16295,
+      "coin": "BLUR",
+      "signal": "pump-chain+",
+      "dir": "LONG",
+      "pnl_pct": -0.56,
+      "hours": 0.5,
+      "action": "HOLD — watchdog fade warning, trail needs +0.40% to arm"
+    }
+  ],
+  "watchdog_steers_triage": [
+    {
+      "id": "001",
+      "title": "ARB cluster / 3x LONG losses",
+      "verdict": "VERIFIED — all 3 ARB LONGs were mid-band RSI 51-59, conf≤49.5 floor-admits, gap 1.1-1.5% chasing micro-pumps. Known cohorts. No new pattern. coin_regime stamp shipped this run enables future ARB-regime SQL."
+    },
+    {
+      "id": "002",
+      "title": "Portfolio heavily long",
+      "verdict": "CONTEXT — 15m LONG_BIAS + 73L/4S aggregate. LONG-aligned tape. No action."
+    },
+    {
+      "id": "003",
+      "title": "5 recent losses wrong-side",
+      "verdict": "VERIFIED-STRUCTURAL — trail vs chop separation unchanged. All losers = never-armed chop or armed-reverse. No new filter passes bars."
+    },
+    {
+      "id": "004",
+      "title": "ai-trader-pending losing streak 3",
+      "verdict": "MONITOR — n=3, TAT shadow covers (3 of the fires are ai-trader-pending). No kill at n=3."
+    },
+    {
+      "id": "005",
+      "title": "ai-trader+ losing streak 3",
+      "verdict": "MONITOR — 14d 29T −$0.80 41.4%. EXTREME shadow retired (starved). Vacation = no disable. 3 recent losses all known EXTREME/mid-band cohorts."
+    }
+  ],
   "last_run_verify": {
-    "trailing_activated_COMMENT": "PRESENT ✓",
-    "size_reduce_0.5x": "ACTIVE ✓ (7d WR 34.9% < 35 and pnl −$3.30 < −$2)",
-    "mfe_cut_shadow": "ENABLED ✓",
-    "bb_bounce_tat_shadow": "ENABLED ✓",
-    "protected_flags": "13/13 INTACT ✓",
-    "variant_C_narrative": "CORRECTED this run (see tat_shadow_status)"
+    "trailing_activated_COMMENT": "PASS — infra shipped run#31",
+    "size_reduce_0.5x": "PASS — active, marker written 04:27",
+    "TAT_shadow": "COLLECTING — 11 unique fires since Oct 18 (7 true saves / 3 false-kills under base rule; variant-C underwater-only = 6S/0FK corrected). Needs 15 unique for flip review.",
+    "MFE_CUT_shadow": "COLLECTING — 6 unique fires since Oct 18",
+    "ARM_BE_shadow": "0 fires (downgraded run#30)",
+    "protected_flags": "13/13 INTACT",
+    "vacation_mode": "ACTIVE — shadow_first, no_constants_change"
   },
-  "losing_autopsy_24h": {
-    "verdict": "ZERO new patterns. All 10 losers known cohorts.",
-    "clusters": "ME bb-bounce stale −3.54% (TAT would-save) | LTC/BTC never-armed atr_sl (TAT would-save 3/3) | ARB/LDO EXTREME armed-then-reverse (TAT cannot catch — ARM-BE class) | GOAT/LTC/DOGE/WARrior isolated chop variance",
-    "winner_vs_loser": "6/6 winners trail-family (MFE 0.37–2.00) | 9/10 losers SL-family never-armed or armed-then-reverse"
+  "findings_this_run": [
+    {
+      "finding": "GOAT SHORT RSI 73.6 = bear-exemption working as designed, NOT a gate bug",
+      "evidence": "14d SHORT detect-RSI 65-75 band: n=5 W=2 +$0.09 40%WR (wash). GOAT −$0.04, ETC +$0.14, LTC +$0.11 in same band. Bear-structure exemption (CEO Fix5) letting through overbought shorts in BEAR_TREND is net-neutral. n=5 << 20 bar. No action.",
+      "confidence": "HIGH"
+    },
+    {
+      "finding": "Watchdog '5 pending oversold shorts RSI 21-33' ALREADY BLOCKED by existing floors",
+      "evidence": "SHORT_RSI_HARD_FLOOR=45 (detect+exec), OVERSOLD_SHORT_RSI_MAX=35, SHORT_RSI_FLOOR=45. All fire SKIP for RSI<45. The pending signals won't fill. No new filter needed.",
+      "confidence": "HIGH"
+    },
+    {
+      "finding": "gap_at_entry 1.0+ LONG is the ONLY PROFITABLE gap band (inverts chase narrative for aggregate)",
+      "evidence": "14d ALL LONG by gap: <0.5% = 126T −$3.32 37.3% | 0.5-1.0 = 43T −$1.32 34.9% | 1.0+ = 45T +$2.21 42.2%. ARB's 3 losses (gap 1.1-1.5) are in the profitable band on aggregate — ARB-specific toxicity, not gap toxicity. Do NOT tighten CHASE_GAP or MAX_ENTRY_GAP.",
+      "confidence": "HIGH — contradicts prior chase-intuition; OOS check: chase winners list confirms CRV/LDO/CFX/IOTA/BANANA all gap>1.1 trail winners"
+    },
+    {
+      "finding": "coin_regime was NEVER stamped into _signal_metadata — watchdog's core thesis unverifiable via SQL",
+      "evidence": "ARB metadata keys: btc_regime present, coin_regime absent. hotset.json has per-token regime but it dies at decision time. Fixed this run: stamp coin_regime+coin_regime_conf from _hotset_regime into _exec_meta.",
+      "confidence": "FIXED"
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "change": "Stamp coin_regime + coin_regime_conf into _signal_metadata at execution time",
+      "file": "scripts/decider_run.py",
+      "type": "infra (zero-behavior)",
+      "line": "5000-5006",
+      "rationale": "Watchdog thesis: coin regime at entry is the discriminator. Was never SQL-queryable. Same pattern as gap_at_entry/staleness/final_confidence stamps.",
+      "impact": "Enables coin-regime counterfactual analysis from next closed trade onward. Zero live behavior change."
+    }
+  ],
+  "changes_from_last_run": {
+    "run32_atr_sl_recovery_probe": "VALIDATED — 63% wrong-side / 37% tight-SL conclusion holds on this run's data (all 24h losers = never-armed chop or mid-band; bb-bounce losers 0% recovery consistent).",
+    "run32_TAT_variant_C_correction": "STILL CORRECTED — flip review must use 6S/0FK not 9S/0FK.",
+    "run31_trailing_activated_COMMENT": "PASS.",
+    "run30_ARM_BE_downgrade": "PASS — 0 fires, correctly dormant."
   },
-  "rejections": [
-    "Wider ATR-SL for all signals — recovery probe shows 63% continued = wrong-side, wider SL would give back MORE on the majority cohort",
-    "SHORT-side entry filter change — 69% continued is chop-regime symptom; existing RSI floor + regime gates contain it; n=29 SHORT atr_sl 14d below 50-trade bar for signal-level change"
+  "creative_improvements": [
+    {
+      "date": "2026-10-20T04:41:34.624601+00:00",
+      "idea": "coin_regime-at-entry counterfactual — once 20+ trades have coin_regime stamped, test: LONG on NEUTRAL-coin vs LONG on LONG_BIAS-coin PnL/WR/arm-rate",
+      "rationale": "Watchdog deep-analysis: 'coin regime at entry is the discriminator. We keep buying NEUTRAL coins on micro-pumps that mean-revert.' Never verifiable because coin_regime wasn't stamped. Now it is.",
+      "expected_impact": "If confirmed: coin-regime gate (LONG only when coin LONG_BIAS with conf>60) could be the next entry-quality filter. If refuted: kills the thesis cleanly.",
+      "category": "entry sniper",
+      "status": "collecting (stamp shipped this run)",
+      "risk": "zero (analysis-only until data matures)"
+    },
+    {
+      "date": "2026-10-20T04:41:34.624601+00:00",
+      "idea": "TAT variant-C flip readiness — 11 unique fires, 4 more needed for 15-fire bar. Track FK rate on next 4 fires.",
+      "rationale": "Base TAT 7S/3FK (30% FK > 20% bar). Variant-C (underwater-only) 6S/0FK corrected. Next 4 fires determine flip GO/NO-GO.",
+      "expected_impact": "If variant-C holds 0 FK through 15 fires: ship live for bb-bounce-v2-long+ (worst arm-rate 50%, 14d −$0.67).",
+      "category": "exit sniper",
+      "status": "collecting",
+      "risk": "low (shadow until flip)"
+    }
   ],
   "next_actions": [
-    "TAT base shadow: wait for 3 more unique fires (12/15), then CEO flip review with CORRECTED variant-C numbers (6S/0FK)",
-    "ai-trader+ SL-width candle study pre-registered post-vacation (only 62%-recovery family)",
-    "Exit-ladder signal-scoped backtest P0 — 12th CEO re-request",
-    "Re-check open #16293: SL 81741 must hold; if stopped, autopsy as DECLINING-phase LONG"
+    "Monitor TAT to 15 unique fires — variant-C flip review",
+    "First 20 trades with coin_regime stamped → run coin-regime counterfactual",
+    "ARB: no auto-re-enter LONG (watchdog steer; existing floors don't block ARB specifically — coin_regime data will tell us if it's regime or ARB-specific)",
+    "ai-trader+ 14d −$0.80: vacation blocks disable; re-eval when vacation lifts",
+    "Exit-ladder signal-scoped backtest P0: 13th request — still undelivered by self_learner"
   ]
 }

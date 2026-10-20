@@ -1694,5 +1694,16 @@
     "after": "comment warns analysts; re-scoped open question = trail vs ATR-SL engine race",
     "rationale": "18/55 atr_sl_hit MFE>=0.40 with trailing_activated=FALSE is tautological (trigger only fires on trail-family exits). Stop future analyses from treating FALSE as desync evidence.",
     "impact": "zero behavior; prevents invalid escalation reuse"
+  },
+  {
+    "timestamp": "2026-10-20T04:41:34.624601+00:00",
+    "agent": "brain_auditor",
+    "change": "Stamp coin_regime + coin_regime_conf into _signal_metadata at exec time (zero-behavior infra)",
+    "type": "infra",
+    "file": "scripts/decider_run.py",
+    "before": "coin_regime absent from metadata (only btc_regime present); hotset regime died at decision time",
+    "after": "_exec_meta[coin_regime] + _exec_meta[coin_regime_conf] from _hotset_regime (line 5000-5006)",
+    "rationale": "Watchdog thesis: coin regime at entry is the discriminator — make it SQL-queryable. Same stamp pattern as gap_at_entry/staleness/final_confidence.",
+    "impact": "Enables coin-regime counterfactual once 20+ stamped trades. Zero live behavior."
   }
 ]

@@ -1,31 +1,33 @@
-# Current State — brain_auditor Run #32 Oct 20 03:42 UTC
+# Current State — brain_auditor Run #33 Oct 20 04:40 UTC
 
-**Last Updated: 2026-10-20 03:42 UTC**
-**Updated by: brain_auditor #32 — 0 config changes (vacation mode; atr_sl recovery probe executed; TAT variant-C CORRECTED)**
+**Last Updated: 2026-10-20 04:40 UTC**
+**Updated by: brain_auditor #33 — 1 infra ship (coin_regime stamp, zero-behavior), 0 live filters (vacation)**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.5x** (marker 03:26; 7d WR 34.9% < 35 AND pnl −$3.30 < −$2). Auto-clears when WR≥35 AND pnl≥−$2, or WR≥37 AND pnl≥0.
-- **24h 17T 7W −$0.41 (41.2%). | 7d 195T 68W −$3.30 (34.9%). | TRAIL 72T +$5.39 80.6% vs SL 107T −$8.27 0.9% — separation unchanged.**
-- **1 open: BTC LONG #16293 ai-trader-pending @81987 SL81741 TP82400, −0.05%.** Mixed regime (15m LONG_BIAS / 4h SHORT_BIAS / DECLINING). HOLD — explicit levels set.
+- **Trading LIVE** with size-reduce **0.5x** (marker 04:27; 7d WR 34.5% < 35 AND pnl −$3.39 < −$2). Auto-clears when WR≥35 AND pnl≥−$2, or WR≥37 AND pnl≥0.
+- **24h 16T 5W −$0.58 (31.3%). | 7d 194T 67W −$3.39 (34.5%). | Trail ~$5.5 vs Chop ~−$7.9 — separation unchanged.**
+- **2 open: BTC LONG #16293 ai-trader-pending +0.15% (1.4h, explicit SL/TP) HOLD | BLUR LONG #16295 pump-chain+ −0.56% (0.5h, watchdog fade warning — trail needs +0.40%) HOLD.**
 - **Vacation mode ACTIVE** — shadow-first, no constants changes.
 - Protected flags 13/13 INTACT.
 
-## THIS RUN — brain_auditor #32
+## THIS RUN — brain_auditor #33
 
-**0 config changes. Creative probe EXECUTED: atr_sl post-exit recovery (run #31 idea).**
+**1 infra ship. 0 live filters.**
 
-**ATR_SL RECOVERY PROBE (7d, n=59):** 30min post-exit 1m candles vs entry — **63% CONTINUED against us (wrong-side) / 37% RECOVERED (tight-SL).** SHORT worse: 69% continued. By signal 14d: **bb-bounce 0% recovered (pure wrong-side — entry filters, not SL width)** | pump-chain- 50% | **ai-trader+ 62% recovered (only tight-SL-leaning family — SL-width candle study pre-registered post-vacation).** Conclusion: majority of atr_sl exits are entry-quality problems. Wider SL would give back MORE on the 63% cohort — REJECTED as blanket change.
+**SHIPPED: coin_regime + coin_regime_conf stamp** (decider_run.py:5000-5006) — reads `_hotset_regime` (already in scope at exec time), writes into `_exec_meta` alongside gap_at_entry/staleness/final_confidence. Zero-behavior. Unlocks the watchdog's core thesis ("coin regime at entry is the discriminator") for SQL analysis once 20+ stamped trades accumulate. Metadata previously had btc_regime only — per-token regime died at decision time.
 
-**⚠️ TAT VARIANT-C CORRECTION (run #31 was wrong):** Claimed underwater-only = 9 saves / 0 FK. Rebuilt from pipeline log live-pnl-at-fire: 3 of 9 "saves" had POSITIVE live_pnl at fire (#16251 +0.07, #16282 +0.06, #16284 +0.04). **True variant C = 6 saves / 0 FK.** Still zero-FK but smaller save set. Flip review MUST use corrected numbers. TAT base still 12/15 unique fires (3 more needed).
+**KEY FINDINGS:**
+1. **GOAT SHORT RSI 73.6 = bear-exemption working, NOT a gate bug.** 14d SHORT detect-RSI 65-75 band: n=5 W=2 +$0.09 wash. ETC +$0.14 / LTC +$0.11 won same band. CEO Fix5 design correct. n≪20, no action.
+2. **Watchdog's 5 pending oversold shorts (RSI 21-33) ALREADY BLOCKED** by SHORT_RSI_HARD_FLOOR=45 at both detect and exec time. They won't fill.
+3. **gap_at_entry 1.0+ LONG = only profitable gap band** (14d 45T +$2.21 42.2% vs <0.5% 126T −$3.32 37.3%). ARB's 3 losses (gap 1.1-1.5) sit in the profitable band on aggregate — ARB-specific toxicity, not gap toxicity. **Do NOT tighten chase filters.**
+4. **ARB 3x LONG losses verified:** all mid-band RSI 51-59, conf≤49.5 floor-admits, gap 1.1-1.5% — known cohorts, no new pattern.
 
-**LOSING AUTOPSY 24h: zero new patterns.** 10 losers all known cohorts (ME stale TAT-save, never-armed chop, EXTREME armed-reverse ARM-BE class). 6/6 winners trail-family, 9/10 losers SL-family.
+**TAT STATUS: 11 unique fires since Oct 18** (base 7 true-saves / 3 false-kills; variant-C underwater-only 6S/0FK corrected). 4 more unique fires for the 15-fire flip bar. MFE-CUT: 6 unique fires.
 
-**Steers:** 001 ALREADY EXECUTED (#16293) | 002 VERIFIED-STRUCTURAL (chop) | 003/004 MONITOR (n=3, TAT covers).
+**LAST-RUN VERIFY:** trailing_activated COMMENT ✓ | size-reduce 0.5x ✓ | TAT + MFE-CUT shadows collecting ✓ | ARM-BE dormant ✓ | protected 13/13 ✓.
 
-**Last-run verify:** trailing_activated COMMENT ✓ | size-reduce 0.5x ✓ | MFE-CUT + TAT shadows ✓ | protected 13/13 ✓.
+**CEO ESCALATION CARRIED: exit-ladder signal-scoped backtest P0 (13th request).**
 
-**CEO ESCALATION CARRIED: exit-ladder signal-scoped backtest P0 (12th request).** TAT flip waits for 15 fires with corrected variant-C numbers.
-
-## PREVIOUS — brain_auditor #31 (02:45 UTC, abridged)
-0 config (vacation). COMMENT ON trailing_activated shipped. Re-entry gate REJECTED. TAT variant-C claim CORRECTED this run.
+## PREVIOUS — brain_auditor #32 (03:42 UTC, abridged)
+0 config (vacation). atr_sl recovery probe: 63% wrong-side / 37% tight-SL. TAT variant-C CORRECTED 6S/0FK not 9S/0FK.

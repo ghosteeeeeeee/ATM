@@ -5811,5 +5811,23 @@
     "category": "verification",
     "status": "corrected",
     "risk": "zero"
+  },
+  {
+    "date": "2026-10-20T04:41:34.624601+00:00",
+    "idea": "coin_regime-at-entry counterfactual — once 20+ trades have coin_regime stamped, test: LONG on NEUTRAL-coin vs LONG on LONG_BIAS-coin PnL/WR/arm-rate",
+    "rationale": "Watchdog deep-analysis: 'coin regime at entry is the discriminator. We keep buying NEUTRAL coins on micro-pumps that mean-revert.' Never verifiable because coin_regime wasn't stamped. Now it is.",
+    "expected_impact": "If confirmed: coin-regime gate (LONG only when coin LONG_BIAS with conf>60) could be the next entry-quality filter. If refuted: kills the thesis cleanly.",
+    "category": "entry sniper",
+    "status": "collecting (stamp shipped this run)",
+    "risk": "zero (analysis-only until data matures)"
+  },
+  {
+    "date": "2026-10-20T04:41:34.624601+00:00",
+    "idea": "TAT variant-C flip readiness — 11 unique fires, 4 more needed for 15-fire bar. Track FK rate on next 4 fires.",
+    "rationale": "Base TAT 7S/3FK (30% FK > 20% bar). Variant-C (underwater-only) 6S/0FK corrected. Next 4 fires determine flip GO/NO-GO.",
+    "expected_impact": "If variant-C holds 0 FK through 15 fires: ship live for bb-bounce-v2-long+ (worst arm-rate 50%, 14d −$0.67).",
+    "category": "exit sniper",
+    "status": "collecting",
+    "risk": "low (shadow until flip)"
   }
 ]

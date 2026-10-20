@@ -4995,6 +4995,16 @@ def run(dry_run=False):
         # ponytail: inject final_confidence for post-trade analysis (was 100% NULL)
         if sig.get('final_confidence') is not None:
             _exec_meta['final_confidence'] = sig['final_confidence']
+        # brain_auditor #33: stamp coin-level regime for SQL-native analysis.
+        # Watchdog thesis: "coin regime at entry is the discriminator" — but
+        # coin_regime was never written to _signal_metadata (only btc_regime).
+        # Zero-behavior: read-only from _hotset_regime (already in scope).
+        try:
+            _cr, _crc = _hotset_regime.get(token, ('NEUTRAL', 0))
+            _exec_meta['coin_regime'] = _cr
+            _exec_meta['coin_regime_conf'] = _crc
+        except Exception:
+            pass
 
         # ── CHASE COMPOSITE filter: block LONG chasing extended moves ─────
         # 7d: z>2.5 OR gap>1.0% LONG = 15T 20%WR -$1.25. Non-chase: 96T 53.1%WR +$1.28.
