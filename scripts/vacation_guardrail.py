@@ -268,6 +268,12 @@ def check_ichimoku_bypass_kill():
 
     Pre-registered kill criteria: if loosened LONG cohort 24h WR < 40% with
     5+ trades, auto-revert ICHIMOKU_LONG_BYPASS_ENABLED to False.
+
+    bug_hunter 2026-10-20 fixes:
+    - float() casts for psycopg2 Decimal (json.dump TypeError)
+    - try/finally on PG connection (house convention)
+    - atomic write (temp file + os.replace) to avoid racing compactor import
+    - query counts single-source ichimoku LONG only (not confluence trades)
     """
     try:
         from hermes_constants import (
@@ -279,31 +285,38 @@ def check_ichimoku_bypass_kill():
             return  # already disabled
 
         import psycopg2
-        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT COUNT(*), SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END),
-                   ROUND(SUM(pnl_usdt), 2),
-                   ROUND(100.0 * SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) / COUNT(*), 1)
-            FROM trades
-            WHERE status = 'closed'
-              AND signal LIKE 'ichimoku%'
-              AND direction = 'LONG'
-              AND close_time > NOW() - INTERVAL '24 hours'
-        """)
-        row = cur.fetchone()
-        cur.close()
-        conn.close()
+        conn = None
+        cur = None
+        try:
+            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            cur = conn.cursor()
+            # Count ONLY single-source ichimoku LONG trades (the loosened cohort).
+            # signal='ichimoku+' means single-source; 'ichimoku+,rs_s' means confluence.
+            cur.execute("""
+                SELECT COUNT(*), SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END),
+                       ROUND(SUM(pnl_usdt), 2),
+                       ROUND(100.0 * SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) / COUNT(*), 1)
+                FROM trades
+                WHERE status = 'closed'
+                  AND signal = 'ichimoku+'
+                  AND direction = 'LONG'
+                  AND close_time > NOW() - INTERVAL '24 hours'
+            """)
+            row = cur.fetchone()
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
 
-        n_trades = row[0] or 0
-        n_wins = row[1] or 0
-        pnl = row[2] or 0
-        wr = row[3] or 0
+        n_trades = int(row[0] or 0)
+        n_wins = int(row[1] or 0)
+        pnl = float(row[2] or 0)
+        wr = float(row[3] or 0)
 
         if n_trades >= ICHIMOKU_LONG_BYPASS_MIN_TRADES:
             if wr < ICHIMOKU_LONG_BYPASS_MIN_WR:
-                # Auto-revert: disable the bypass
-                import re
+                # Auto-revert: disable the bypass (atomic write)
                 const_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hermes_constants.py')
                 with open(const_path, 'r') as f:
                     content = f.read()
@@ -311,8 +324,11 @@ def check_ichimoku_bypass_kill():
                     'ICHIMOKU_LONG_BYPASS_ENABLED = True',
                     f'ICHIMOKU_LONG_BYPASS_ENABLED = False  # AUTO-REVERTED {datetime.now(timezone.utc).isoformat()}: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}% ({n_trades}T)'
                 )
-                with open(const_path, 'w') as f:
+                # Atomic write: temp file + os.replace to avoid racing compactor import
+                tmp_path = const_path + '.tmp'
+                with open(tmp_path, 'w') as f:
                     f.write(content)
+                os.replace(tmp_path, const_path)
                 log(f"🔴 [ICHIMOKU-BYPASS-KILL] Auto-reverted: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}% ({n_trades}T, PnL ${pnl:+.2f})")
                 write_alert('WARNING', f'ichimoku LONG bypass auto-reverted: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}%', {
                     'n_trades': n_trades, 'wr': wr, 'pnl': pnl

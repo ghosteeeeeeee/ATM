@@ -3086,16 +3086,18 @@ STANDALONE_BYPASS_SIGNALS = (
     'breakout-pullback', 'breakout-pullback+', 'breakout-pullback-',  # breakout + pullback confirmation — standalone bypass (2026-09-25)
     'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal from trade-watchdog — full market context, standalone bypass
     'hl_copy_trader', 'hl-copy-trader',  # CEO 2026-10-09: pro trader copy signal — quality filter (75%+ WR, $10k+ PnL) already applied
-    'ichimoku',  # ichimoku LONG-only bypass 2026-10-20 (CEO verdict: regime-conditional LONG loosening). SHORT blocked via ICHIMOKU_SHORT_LONG_BIAS_BLOCK.
+    # 'ichimoku' REMOVED from tuple 2026-10-20 bug_hunter — direction-agnostic membership
+    # loosened SHORT too. Now handled by direction-aware gate in signal_compactor.py
+    # that consults ICHIMOKU_LONG_BYPASS_ENABLED (so auto-revert actually works).
 )
 
 # ── ichimoku LONG bypass (CEO 2026-10-20) ─────────────────────────────────────
 # Regime-conditional loosening: ichimoku LONG gets standalone bypass ONLY while
-# BTC is bullish (LONG_BIAS). ichimoku SHORT is blocked in LONG_BIAS regime.
-# Pre-registered kill criteria: if loosened LONG cohort 24h WR < 40%, auto-revert.
+# ICHIMOKU_LONG_BYPASS_ENABLED is True. ichimoku SHORT is NEVER bypassed.
+# Pre-registered kill criteria: if loosened LONG cohort 24h WR < 40%, auto-revert
+# (vacation_guardrail.py flips this flag to False — the compactor reads it).
 # Shadow logging: every gate that WOULD have blocked a loosened trade logs it.
-ICHIMOKU_LONG_BYPASS_ENABLED = True       # ichimoku LONG standalone bypass (regime-conditional)
-ICHIMOKU_SHORT_LONG_BIAS_BLOCK = True     # block ichimoku SHORT in LONG_BIAS regime
+ICHIMOKU_LONG_BYPASS_ENABLED = True       # ichimoku LONG standalone bypass — compactor reads this flag
 ICHIMOKU_LONG_BYPASS_MIN_WR = 40.0         # auto-revert if loosened cohort WR < this
 ICHIMOKU_LONG_BYPASS_MIN_TRADES = 5        # need 5+ trades before evaluating WR
 ICHIMOKU_LONG_BYPASS_SHADOW = True         # shadow-log what WOULD have blocked loosened trades
