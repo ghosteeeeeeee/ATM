@@ -1348,3 +1348,9 @@
 ## Error Alerts — 2026-10-20 05:43 UTC
 - **[WARN]** (8x): `atr_sl_hit` phantom trades (<0.01% PnL) in last 24h — no auto-fix (needs signal quality review)
 - **[WARN]**: Today 20% WR (6 closed, -0.42 USDT) — no auto-fix (performance, not system health)
+
+## Error Alerts — 2026-10-20 08:26 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3465s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3465s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3343s left, N failures)`

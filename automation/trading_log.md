@@ -12749,3 +12749,24 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 - 24h WR 15.4% (2W/13T, -$0.91) — worst window today; thin-volume, 7d still 33.9%
 - hard_max_loss 3 closes in 24h (-$0.49) — unchanged watch, not escalating
 - pump-chain+ 0W/3T 24h at monitor line — if 3 closes in one hour with 0 wins, kill next run
+
+## [2026-10-20 09:28 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h 13T 2W -$0.91 (15.4% WR) | 7d 185T 62W -$4.22 (33.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes last hour — quiet, no signals to evaluate
+- Kill check: no signal with 0% WR and 3+ trades in last hour (0 trades). 24h monitor line unchanged: pump-chain+ 3T 0W — kill rule is last-hour, no kill
+- atr_sl_hit 7d 30.8% — under 40%, tpsl fix deployed, prior verdict closed
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (01:00 +$0.07; quiet hours break it)
+- Size-reduce 0.3x stays (7d WR 33.5% < 35%, 7d PnL -$4.22 < -$2)
+- 3 open: BTC ai-trader-pending LONG flat, ALT pump-chain- SHORT +$0.27, IO pump-chain- SHORT +$0.01
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL slipped -$3.56 → -$4.22 since 08:28 (open-trade mark-to-market + thin closes) — size-reduce still active, no further cut without 3-neg-hour streak
+- 24h WR 15.4% still worst of day — thin-volume, no action on quiet hour

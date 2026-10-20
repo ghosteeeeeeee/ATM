@@ -5847,5 +5847,44 @@
     "category": "allocation",
     "status": "pre_registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-20T08:49:09Z",
+    "idea": "pump-chain+ HIGH+NORMAL conf-dampen 0.7x SHADOW (pre-registered, vacation-blocked)",
+    "rationale": "14d EXTREME 45T +$1.88 (edge) vs HIGH+NORMAL 14T -$0.79 (bleed). 30d OOS confirms: EXTREME 74T +$2.55, HIGH+NORMAL 21T -$0.63. Conf-dampen preserves CEO HIGH re-enable while reducing bleed.",
+    "expected_impact": "+$0.63/30d saved, 0 winners killed (dampen not block)",
+    "category": "entry sniper",
+    "status": "rejected-pending-pp-floor (CORRECTED by #36: 0.7x at conf30 = HARD BLOCK, kills 3/9 winners +$0.09, saves $0.41/14d, n=14<20; overlaps pp-conditional floor cohort — resolve pp-floor first)",
+    "risk": "low",
+    "flip_criteria": "Ship post-vacation as shadow, collect 7d, then CEO GO",
+    "correction": "2026-10-20 #36 offline counterfactual: claim \"0 winners killed (dampen not block)\" is FALSE — all 9 conf-30 trades drop below MIN_EXEC_CONF=40. EXTREME 45T +$1.88 correctly untouched."
+  },
+  {
+    "date": "2026-10-20T08:49:09Z",
+    "idea": "TAT variant-C 13/15 fires — 2 more to flip bar",
+    "rationale": "BANANA would-save 1.74%, ADA +$0.02 timeout win. Variant-C 6S/0FK corrected. Mechanism validated, needs volume.",
+    "expected_impact": "Cut chop-family bleed ~$0.40-0.50/trade on fires",
+    "category": "exit mechanics",
+    "status": "collecting",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-20T09:43:36.130111+00:00",
+    "idea": "Exec-time counter-regime penalty for STANDALONE_BYPASS signals — closes the compactor-skip leak",
+    "rationale": "STANDALONE_BYPASS signals (pump-chain+, volume-buildup+, grind-breakout-) skip signal_compactor, where the counter-regime penalty (min(regime_conf*0.4, 30pt) + survival forgiveness) lives. Exec-time regime gate disabled 2026-05-11 (noisy 1m LR). Result: bypass LONGs fire unpunished in dual SHORT_BIAS/STRONG_DOWN (24h 3T −$0.43, 48h LONG 21T −$0.86). Fix reuses the EXISTING compactor penalty formula at exec time using the 15m/4h scanner regime (not noisy 1m), same confidence plumbing — one variable, no new mechanism.",
+    "expected_impact": "Reduce bypass counter-regime bleed (~$0.40-0.90/48h observed) while keeping aligned bypass flow (volume-buildup- SHORT 7d 9T 78% +$0.35 untouched — regime-aligned)",
+    "category": "entry sniper",
+    "status": "pre_registered — offline study first (30d bypass trades × scanner regime at exec), no shadow until study + vacation end + CEO GO",
+    "risk": "low (penalty not block; max 30pt same as compactor)",
+    "flip_criteria": "Offline: penalty would-drop-below-40 cohort net negative AND winner-kill <20% AND n>=20; then shadow 7d; then CEO GO"
+  },
+  {
+    "date": "2026-10-20T09:43:36.130111+00:00",
+    "idea": "pump-chain+ 0.7x HIGH+NORMAL dampen — REJECTED by offline counterfactual (#36)",
+    "rationale": "14d HIGH/NORMAL n=14: 9 conf-30 floor-admits would be hard-blocked (0.7x→21 < MIN_EXEC_CONF 40), killing 3 winners (+$0.09) while saving −$0.41 losses. n<20 bar. Same cohort as pp-conditional floor shadow (collecting). One variable at a time: pp-floor resolves first.",
+    "expected_impact": "n/a — do not ship",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
   }
 ]

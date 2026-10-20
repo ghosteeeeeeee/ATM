@@ -1,40 +1,41 @@
-# Current State — brain_auditor #35 Oct 20 ~06:45 UTC
+# Current State — brain_auditor #36 Oct 20 09:43 UTC
 
-**Last Updated: 2026-10-20 06:45 UTC**
-**Updated by: brain_auditor #35 — fixed ai_trader_state dual-path bugfix (zero-behavior). Preceded by #34 05:40 (BTC manual close, BE-rake pre-register) and daily_orchestrator 05:00.**
+**Last Updated: 2026-10-20 09:43 UTC**
+**Updated by: brain_auditor #36 — 0 config changes (vacation soak); corrected pump-chain+ dampen pre-registration with offline counterfactual. Preceded by #35 06:45 (dual-path bugfix), #34 05:40 (BTC manual close).**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.5x** (7d WR 34.4% < 35 AND pnl −$3.62 < −$2 — both resume conditions failing).
-- **24h 17T 4W −$0.96 (23.5%). | 7d 195T 67W −$3.62 (34.4%). | Trail ~97% WR vs Chop ~0% — separation unchanged. 24h: 15 LONGs 20%WR −0.99 vs 2 SHORTs 50%WR +0.03 — direction was the whole story.**
-- **0 open (flat)** — correct posture in dual SHORT_BIAS / STRONG_DOWN / BTC below EMA300 (fresh breakdown ~05:47, zscore −2.30).
-- **Regime: SHORT_BIAS 15m+4h | BTC BELOW EMA300 | trend_quality STRONG_DOWN | NORMAL vol.** Stay flat / SHORT-only until EMA300 reclaim with volume. Mid-band RSI 45-58 shorts only (oversold shorts blocked by HARD_FLOOR=45).
+- **Trading LIVE** with size-reduce **0.5x** (7d WR 33.5% < 35 AND pnl −$4.22 < −$2 — both resume conditions failing).
+- **24h 13T 2W −$0.91 (15.4%). | 7d 185T 33.5% −$4.22. | Trail family unchanged: profit-monster-trail 96.8%WR +$1.65 / atr_trail 78.9% +$2.59 vs atr_sl_hit 1.8% −$4.14 / hard_max_loss 0% −$3.65.**
+- **Open: ALT + IO pump-chain- SHORT (aligned, green) | BTC ai-trader-pending LONG (CEO-owned, flat, tight SL).** New SYRUP SHORT pick conf78 RSI55.6 @09:20 — regime-aligned, correct side; awaiting AI_TRADER re-enable.
+- **Regime: SHORT_BIAS 15m+4h | BTC BELOW EMA300 (393min) | STRONG_DOWN | NORMAL vol.** Stay flat / SHORT-only until EMA300 reclaim with volume. Mid-band RSI 45-58 shorts only (HARD_FLOOR=45).
 - **Vacation mode ACTIVE** — shadow-first, no constants changes.
-- Protected flags 13/13 INTACT.
+- Protected flags untouched (13/13).
 
-## THIS RUN — brain_auditor #35 (06:45 UTC)
+## THIS RUN — brain_auditor #36 (09:43 UTC)
 
-**1 bugfix (zero live behavior), 0 constants changes.**
+**0 config changes (soak). 1 pre-registration CORRECTED. 1 new pre-registration (offline study).**
 
-1. **BUGFIX: ai_trader_signal.py dual-path state load** — watchdog wrote SAND SHORT pick (05:49, correct side conf 72, dual SHORT_BIAS) to `/var/www/hermes/data/ai_trader_state.json` while signal read only `HERMES_DATA` (`/root/.hermes/data/`) which held stale WLD. Pick starved in limbo. Fix: `_load_state` reads both paths, freshest timestamp wins; reject/fired_at writes follow the read path. Watchdog prompt hardened with PATH WARNING. Zero live behavior (AI_TRADER_ENABLED=False since CEO Oct 19). py_compile + functional test PASS. Re-enable will now fire the newest pick regardless of which path the agent used.
-2. **Watchdog steers:** 001/002 VERIFIED (wrong-side LONGs in dual SHORT_BIAS — structural, known); 003/004 MONITOR (kill rules not met: pump-chain+ 14d still +$1.09); 005 STALE (ai-trader+ disabled).
-3. **LOSING AUTOPSY 24h: 0 new patterns.** All 13 losers = known cohorts (pump-chain+ floor-admit chases gap 0.9-1.5 HIGH/EXTREME; ai-trader+ pre-disable; bb-bounce chop; GOAT RSI 73.6 bear-exemption). 4/4 winners trail-family — exit mechanics sound, entry direction is the cancer.
-4. **LAST-RUN VERIFY:** #34 BTC close PASS (price kept dumping, saved ~$0.08) | #33 coin_regime HOLDING (0 trades opened since 04:41 = 0 stamps expected) | TAT 13 unique fires (need 15) | MFE-CUT 7 | ARM-BE 0 | SHORT floor-45 0 violations | size-reduce 0.5x holds.
-5. **CREATIVE pre-registered: volume-buildup- SHORT hotset-priority shadow** — only verified positive short family (7d 9T 78% +$0.35 mid-band), crowded out by pump-chain- 32:9. Flip criteria: n≥20 OR conf-boost shadow WR>60% with 0 winner-kill. Vacation-deferred.
+1. **CORRECTED: pump-chain+ HIGH+NORMAL 0.7x conf-dampen pre-reg (08:49 entry) — claim "0 winners killed (dampen not block)" is FALSE.** Offline 14d counterfactual: HIGH/NORMAL n=14; all 9 conf-30 floor-admits drop below MIN_EXEC_CONF=40 at 0.7x = HARD BLOCK; would-block 9T net −$0.41 with **3 winners killed (+$0.09)**; n=14<20 bar; overlaps pp-conditional floor shadow (same floor-admit cohort). Status → rejected-pending-pp-floor. EXTREME 45T +$1.88 correctly untouched.
+2. **NEW pre-registered: exec-time counter-regime penalty for STANDALONE_BYPASS signals** — bypass signals skip signal_compactor where the counter-regime penalty lives (exec-time gate disabled 2026-05-11, noisy 1m LR). Leak quantified: 48h LONG 21T −$0.86 vs SHORT 6T −$0.02; 24h pump-chain+ LONG 3T −$0.43 floor-admit chases. Fix reuses existing min(regime_conf×0.4, 30) formula on 15m/4h scanner regime. Offline study pre-registered; no shadow until study + vacation end + CEO GO.
+3. **WATCHDOG TRIAGE:** 001 VERIFIED-REAL (posture correct — losses small, size-reduce working) | 002 HOLD (IO+ALT cluster aligned SHORT_BIAS) | 003 VERIFIED-STRUCTURAL (bypass leak, see above) | 004 NOISE (pending n=3, −$0.03) | 005 KILL-RULE-NOT-MET (pump-chain+ 14d +$1.09) | 006 STALE (ai-trader+ disabled Oct 19, losses pre-disable).
+4. **LOSING AUTOPSY 24h: 0 new patterns.** 11 losers all known cohorts; 2/2 winners trail/tp family — exit mechanics sound, entry direction remains the cancer.
+5. **LAST-RUN VERIFY:** #35 dual-path ✓ VERIFIED live (HERMES_DATA state fresher 09:20 SYRUP vs www 05:49; freshest-wins works) | #33 coin_regime stamp ✓ VERIFIED (ALT/IO stamped=True; BTC pending different path; BLUR predates ship) | #34 BTC close ✓ (price kept dumping) | floor-45 ✓ | TAT 13/15 | MFE-CUT/ARM-BE collecting | vacation autoclear fix ✓ (size-reduce held).
+
+## PREVIOUS — brain_auditor #35 (06:45 UTC, abridged)
+
+**BUGFIX: ai_trader_signal.py dual-path state load** — watchdog wrote SAND pick to www path while signal read only HERMES_DATA (stale WLD). Fix: read both paths, freshest timestamp wins. Zero live behavior (AI_TRADER_ENABLED=False). py_compile + functional PASS.
 
 ## PREVIOUS — brain_auditor #34 (05:40 UTC, abridged)
 
 **CLOSED BTC LONG #16293** (ai-trader-pending, 81987→81830, −$0.02) — regime flipped SHORT_BIAS both TFs, trade swimming upstream. TAT shadow would-fired @144m −0.21%. **CREATIVE pre-registered: regime-flip BE-rake SHADOW** (direction disagrees with dual-TF flip + ±0.25% of entry → rake SL to BE). Ship post-vacation.
 
-## PREVIOUS — brain_auditor #33 (04:40 UTC, abridged)
-
-**SHIPPED: coin_regime + coin_regime_conf stamp** (decider_run.py:5000-5006) — zero-behavior. GOAT SHORT RSI 73.6 = bear-exemption working. SHORT oversold queue already blocked by HARD_FLOOR=45. gap_at_entry 1.0+ LONG = only profitable gap band — do NOT tighten chase filters.
-
 ## OPEN LOOPS
 
-- **Escalation #15 (13th request):** exit-ladder signal-scoped candle OOS backtest — still CEO-priority.
+- **Escalation #15 (14th request):** exit-ladder signal-scoped candle OOS backtest — still CEO-priority.
 - TAT: 2 more unique fires for 15-fire flip bar.
-- coin_regime stamp: first stamped exec pending (0 trades opened since 04:41).
-- On AI_TRADER re-enable: verify dual-path fires next fresh pick.
-- pump-chain+ recheck (kill only if 14d PnL < 0 with n≥20).
-- Post-vacation stack: BE-rake shadow, volume-buildup- priority shadow, ~12+ unvalidated soak changes — CEO eyeball on resume day.
+- coin_regime stamped cohort: ALT/IO live; watch for n≥20 → LONG-on-SHORT_BIAS-coin counterfactual.
+- pp-conditional floor shadow: resolve floor-admit cohort BEFORE any overlapping dampen ships.
+- On AI_TRADER re-enable: verify dual-path fires SYRUP pick (09:20, conf78, RSI55.6).
+- pump-chain+ recheck (kill only if 14d PnL < 0 with n≥20; currently +$1.09).
+- Post-vacation stack: BE-rake shadow, volume-buildup- priority shadow, bypass-penalty offline study, ~12+ unvalidated soak changes — CEO eyeball on resume day.

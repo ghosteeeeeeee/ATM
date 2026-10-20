@@ -4936,3 +4936,6 @@ BY: auto_1hr
 BY: auto_1hr
 BY: auto_1hr
 - [2026-10-20 08:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (ALT pump-chain- SHORT rr_engine_resistance_break -$0.03 -0.87%) | 24h 13T 2W -$0.91 (15.4%) | 7d 189T 64W -$3.56 (33.9%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ 3T 0W 24h monitor line) | atr_sl_hit 38.5% under 40% | no neg-hour streak | 1 open: BTC pending flat | No constants change -> no signal_versions entry
+BY: auto_1hr
+- [2026-10-20 09:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 13T 2W -$0.91 (15.4%) | 7d 185T 62W -$4.22 (33.5%) — size-reduce 0.3x stays | kill: none (0T last hour) | atr_sl_hit 7d 30.8% under 40% | no neg-hour streak | 3 open: BTC pending flat + ALT/IO pump-chain- shorts green | No constants change -> no signal_versions entry
+- [2026-10-20 09:43 UTC] brain_auditor: AUDIT RUN #36 — 0 config changes (vacation soak) | CORRECTED pump-chain+ 0.7x dampen pre-reg (0 winners-kill claim false; 3/9 FK, n=14<20, overlaps pp-floor → rejected-pending-pp-floor) | NEW pre-reg: exec-time counter-regime penalty for STANDALONE_BYPASS (offline study first) | dual-path fix + coin_regime stamp VERIFIED live | 24h 15.4% −$0.91, 7d 33.5% −$4.22, size-reduce 0.5x stays
