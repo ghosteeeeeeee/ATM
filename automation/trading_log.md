@@ -12667,3 +12667,41 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - 24h WR hit 25.0% (4W/16T) — worst of the week, but thin-volume sample; 7d still 34.5%
 - hard_max_loss 3 closes in 24h (-$0.49 avg -$0.163) — backstop catching bad entries; frequency up from 2 yesterday, watch tomorrow
 - pump-chain+ and ai-trader+ both 0W/3T over 24h — at kill-candidate monitor line; if either gets 3 closes in one hour with 0 wins, kill immediately next run
+
+## FAVORITES Update — 2026-10-20 06:00 UTC
+- Regime: SHORT_BIAS
+- PROMOTE ICP (WR=60.0%, AvgPnL=2.96%, Trades=5)
+
+Final set: ['ETH', 'ICP']
+
+## LOSERS Update — 2026-10-20 06:05 UTC
+- REMOVE ALT (insufficient data)
+- REMOVE HYPE (insufficient data)
+- REMOVE APT (insufficient data)
+- REMOVE FIL (insufficient data)
+- REMOVE DOT (insufficient data)
+- ADD ARB (WR=16.7%, PnL=$-0.09, consecutive_losses (5))
+- ADD LDO (WR=20.0%, PnL=$0.40, wr_collapse (52.9% → 20.0%))
+
+Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
+
+## [2026-10-20 06:30] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.02 last hour | 24h 17T 4W -$0.96 (23.5% WR) | 7d 194T 66W -$3.66 (34.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 close: BTC ai-trader-pending LONG manual_close -$0.02 (-0.96%) — manual close, not a signal failure
+- Kill check: no signal with 0% WR and 3+ trades in last hour (1 trade). 24h monitor line unchanged: pump-chain+ 3T 0W -$0.43, ai-trader+ 3T 0W -$0.25 — kill rule is last-hour, no kill
+- atr_sl_hit 8/17 = 47% — CLOSED as non-issue per 05:00 orchestrator verdict (7d aggregate 30.4% < 40%, tpsl fix deployed; daily spikes = thin-volume noise)
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (01:00 +$0.07 breaks it; 04:00 -$0.39, 05:00 -$0.02)
+- Size-reduce 0.3x stays (7d WR 34.0% < 35%, 7d PnL -$3.66 < -$2)
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR 23.5% (4W/17T) — thin-volume, 7d still 34.0%
+- hard_max_loss 3 closes in 24h (-$0.49) — unchanged from 05:27 watch, not escalating

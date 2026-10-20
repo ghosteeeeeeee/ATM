@@ -4929,3 +4929,5 @@ BY: brain_auditor
 BY: brain_auditor
 - [2026-10-20 05:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (BLUR pump-chain+ LONG hard_max_loss -$0.31 -4.16%) | 24h 16T 4W -$0.94 (25.0%) | 7d 194T 67W -$3.60 (34.5%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ 3T 0W 24h = monitor line, not last-hour rule) | atr_sl_hit 8/16=50% closed as non-issue per 05:00 orchestrator (7d 30.4% <40%, tpsl deployed) | no neg-hour streak (01:00 +$0.07, 04:00 -$0.39) | 1 open: BTC ai-trader-pending LONG flat | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-20 06:30] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-pending LONG manual_close -$0.02 -0.96%) | 24h 17T 4W -$0.96 (23.5%) | 7d 194T 66W -$3.66 (34.0%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ / ai-trader+ still 0W/3T 24h monitor line) | atr_sl_hit 47% closed as non-issue per 05:00 verdict | no neg-hour streak | 0 open | No constants change -> no signal_versions entry
+BY: auto_1hr
