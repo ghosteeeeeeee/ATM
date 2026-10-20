@@ -1354,3 +1354,8 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3465s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3465s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3343s left, N failures)`
+
+## Error Alerts — 2026-10-20 09:45 UTC
+- **WARN** (1x): `hermes-coding-mcp.service` crash-loop — 14,588 restarts, script `/root/.hermes/scripts/run_mcp_server.py` missing, dispatcher dir empty
+- **AUTO-FIX**: Disabled service (`systemctl disable --now`). Needs script restored or unit removed permanently.
+- **WARN** (1x): Disk at 84% (19G free of 118G) — pipeline.log 192M, signal-compactor.log 75M, 15m_regime.log 64M. No logs >7d to compress; consider logrotate or truncation if it crosses 85%.

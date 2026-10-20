@@ -1,129 +1,86 @@
 {
-  "timestamp": "2026-10-20T09:43:09.370942+00:00",
-  "run": "brain_auditor #36",
-  "config_changes_applied": [],
-  "mode": "vacation soak — 0 constants changes; 1 pre-registration CORRECTED with offline counterfactual",
+  "timestamp": "2026-10-20T11:43:06Z",
+  "run": "brain_auditor #37",
+  "mode": "vacation_soak_0_config_changes",
   "session_brain_stats": {
-    "query": "losing trades wrong side LONG SHORT_BIAS regime",
-    "top_hits": "recurring: R:R broken, LONG-in-downtrend bleed, pullback-entry-short analysis — all already-reflected in code or superseded"
+    "queries_run": 1,
+    "top_insight": "pullback/consensus chop entry thresholds too loose — recurring theme, already covered by midband/floor/drift-guard stack"
   },
   "trade_summary_24h": {
-    "trades": 13,
+    "trades": 11,
     "wins": 2,
-    "pnl": -0.91,
-    "wr": 15.4,
+    "wr": 18.2,
+    "pnl": -0.36,
     "7d": {
-      "trades": 185,
-      "wr": 33.5,
-      "pnl": -4.22
+      "trades": 177,
+      "wins": 59,
+      "wr": 33.3,
+      "pnl": -4.0
     },
-    "regime": "dual SHORT_BIAS, STRONG_DOWN, BTC below EMA300 393min, NORMAL vol",
-    "open": "ALT+IO pump-chain- SHORT (aligned, green), BTC ai-trader-pending LONG (CEO, flat)",
-    "new_pick": "SYRUP SHORT conf78 RSI55.6 @09:20 — regime-aligned, correct side; dual-path fix verified live"
+    "trail_family_7d": "52T 90.4% +$4.65",
+    "chop_family_7d": "98T 1.0% −$7.87",
+    "structural_gap": "UNCHANGED — trail wins, chop loses"
   },
-  "watchdog_steers": [
-    {
-      "id": "steer-001",
-      "verdict": "VERIFIED-REAL",
-      "detail": "24h 15.4%WR window is current (not stale). Posture already correct: size-reduce 0.5x, both resume conditions failing. Losses small (max −$0.31) — death by cuts, not blowups."
-    },
-    {
-      "id": "steer-002",
-      "verdict": "HOLD",
-      "detail": "IO+ALT cluster = pump-chain- SHORT, both dual-SHORT_BIAS aligned, 0.1h open green. Correlation exists but direction correct."
-    },
-    {
-      "id": "steer-003",
-      "verdict": "VERIFIED-STRUCTURAL",
-      "detail": "48h LONG 21T −$0.86 38.1% vs SHORT 6T −$0.02. Root = LONGs via STANDALONE_BYPASS (skip compactor counter-regime penalty). Defenses: regime penalty at compaction (bypass skips), exec-time gate disabled May-2026 (noisy 1m LR), size-reduce. New lever queued: exec-time penalty for bypass signals (see creative)."
-    },
-    {
-      "id": "steer-004",
-      "verdict": "NOISE",
-      "detail": "ai-trader-pending n=3 streak, net −$0.03. BTC #16293 was #34's correct regime-flip manual close. CEO-owned orders."
-    },
-    {
-      "id": "steer-005",
-      "verdict": "KILL-RULE-NOT-MET",
-      "detail": "pump-chain+ 14d 59T +$1.09 (n≥20, PnL>0). 24h 3L losers = HIGH/NORMAL floor-admit chases (gap 0.89-1.47, RSI 57-59) — exactly the pre-registered dampen cohort, now corrected below."
-    },
-    {
-      "id": "steer-006",
-      "verdict": "STALE",
-      "detail": "ai-trader+ disabled Oct 19 (AI_TRADER_ENABLED=False). Last open Oct 19 09:23. Losses are pre-disable closes."
-    }
-  ],
-  "losing_autopsy_24h": {
-    "n_losers": 11,
-    "new_patterns": 0,
-    "clusters": [
-      {
-        "signal": "pump-chain+ LONG",
-        "n": 3,
-        "pnl": -0.43,
-        "root_cause": "floor-admit chases in HIGH/EXTREME against STRONG_DOWN macro; gap 0.89-1.47, RSI 57-59; STANDALONE_BYPASS skips compactor regime penalty",
-        "contained_by": "size-reduce 0.5x; kill rule fails (14d +$1.09)"
-      },
-      {
-        "signal": "ai-trader+ LONG",
-        "n": 2,
-        "pnl": -0.15,
-        "root_cause": "pre-disable closes (signal OFF since Oct 19)"
-      },
-      {
-        "signal": "bb-bounce-v2-long+",
-        "n": 2,
-        "pnl": -0.3,
-        "root_cause": "chop entries, known; LTC winner same-day = trail family works when momentum exists"
-      },
-      {
-        "signal": "pump-chain- SHORT",
-        "n": 2,
-        "pnl": -0.07,
-        "root_cause": "small contained losses; ALT hold=0m rr_engine_resistance_break instant-exit (n=1, monitor)"
-      }
-    ],
-    "winners_note": "2/2 winners trail/tp family (BTC atr_tp +1.56%, LTC profit-monster-trail) — exit mechanics sound; entry direction remains the cancer"
+  "watchdog_triage": {
+    "steer-001": "VERIFIED (20-window 25%WR) — 24h only 11T losses all small (max −$0.31), size-reduce containing. Posture correct.",
+    "steer-002": "PARTIALLY SELF-RESOLVING — 48h LONG bleed −$0.86 occurred under SHORT_BIAS; regime flipped LONG_BIAS+STRONG_UP both TFs ~11:00. Open BTC LONG now aligned. Monitor post-flip LONG cohort.",
+    "steer-003": "NOISE — ai-trader-pending n=3 −$0.03, CEO-owned signal, BTC SHORT win +$0.07 in window.",
+    "steer-004": "KILL-RULE-NOT-MET — pump-chain+ 14d +$1.09 (needs n≥20 AND PnL<0). 24h 3L all floor-admit chases during SHORT_BIAS.",
+    "steer-005": "STALE — ai-trader+ disabled Oct 19 by CEO; losses pre-disable."
   },
-  "last_run_verify": {
-    "dual_path_state_load": "PASS — HERMES_DATA state fresher (SYRUP 09:20) than www (05:49); freshest-wins logic will fire correct pick on re-enable; py_compile OK",
-    "coin_regime_stamp": "PASS — ALT/IO/ALT-closed stamped=True; BTC pending stamped=False (different path, expected); BLUR predates ship",
-    "size_reduce_0.5x": "HOLDING — 7d WR 33.5%<35 AND pnl −$4.22<−$2, both resume conditions failing",
-    "short_floor_45": "HOLDING — 24h SHORT losses mid-band/normal, 0 oversold-short violations",
-    "tat_shadow": "13/15 unique fires (pipeline.log rotation limits grep; per CURRENT.md counter) — 2 more to flip bar",
-    "mfe_cut_arm_be": "collecting, 0 new fires in window",
-    "vacation_guardrail_autoclear_fix": "HOLDING — size-reduce did not auto-clear (correct)"
-  },
-  "pre_registration_corrected": {
-    "target": "pump-chain+ HIGH+NORMAL conf-dampen 0.7x SHADOW (creative entry 2026-10-20T08:49)",
-    "claim_was": "+$0.63/30d saved, 0 winners killed (dampen not block)",
-    "offline_counterfactual_14d": "HIGH/NORMAL n=14: 0.7x drops all 9 conf-30 floor-admits below MIN_EXEC_CONF=40 → HARD BLOCK (not soft dampen). Would-block 9T net −$0.41 with 3 winners killed (+$0.09). Pass cohort 5T net −$0.38. EXTREME 45T +$1.88 untouched (correct).",
-    "verdict": "DO-NOT-SHIP as registered — '0 winners killed' claim FALSE (3/9), n=14<20 bar, overlaps pp-conditional floor shadow (same conf-30 floor-admit cohort). Resolve pp-floor data FIRST, one variable at a time.",
-    "status_update": "creative_improvements.json entry demoted: pre_registered → rejected-pending-pp-floor"
+  "offline_study_executed": {
+    "name": "counter-regime penalty for STANDALONE_BYPASS (pre-registered #36)",
+    "method": "30d pump-chain+ × btc_regime (metadata) × direction; 14d counter-regime long detail",
+    "result": "HYPOTHESIS PARTIALLY REFUTED. pump-chain+ LONG in BEAR_TREND 8T 37.5% +$0.07 (slightly positive); 14d counter-regime longs 5T 2W +$0.26. The bleed is RANGING (chop) 13T 30.8% −$0.81, not counter-trend. 48h LONG −$0.86 was SHORT_BIAS-era wrong-side, regime has since flipped.",
+    "verdict": "Counter-regime penalty NOT shippable — bear-regime LONGs are not the loss source. Reframe: RANGING-dampen candidate for pump-chain+ LONG (n=13<20 bar, monitor). Existing chop gates (BTC_CHOP_GATE, CHOP_DETECTOR) should cover; verify coverage post-flip."
   },
   "drift_findings": [],
   "recurring_problems": [
-    "LONG flow in SHORT_BIAS/STRONG_DOWN — structural; bypass-signal penalty leak now quantified as the exec-time gap",
-    "Trail vs chop separation unchanged (profit-monster-trail 96.8%WR +$1.65 / atr_trail 78.9% +$2.59 vs atr_sl 1.8% −$4.14 / hard_max_loss 0% −$3.65, 7d)"
+    "chop-family exit-magnitude: 7d −$7.87 unchanged — MFE-CUT shadow + TAT still collecting, only proven levers",
+    "floor-admit leak: conf-30 floor-admits still entering (BLUR/ARB pump-chain+ 24h) — pp-conditional floor shadow resolving"
   ],
-  "missing_implementations": [
-    "Escalation #15 (13th request): exit-ladder signal-scoped candle OOS backtest — CEO priority, still not commissioned",
-    "Exec-time counter-regime penalty for STANDALONE_BYPASS signals — new creative, offline study first"
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
-    "CORRECTED: pump-chain+ 0.7x dampen pre-reg (see pre_registration_corrected)",
-    "NEW: exec-time counter-regime penalty for STANDALONE_BYPASS signals — closes compactor-skip leak using existing penalty formula min(regime_conf*0.4,30); offline study on 30d bypass trades before any shadow"
+    {
+      "date": "2026-10-20T11:43:06Z",
+      "idea": "Regime-flip fresh-alignment offline study — trades opened within 6h of dual-TF same-bias flip, direction-aligned vs misaligned",
+      "rationale": "steer-002 wrong-side bleed was all pre-flip SHORT_BIAS-era LONGs. If post-flip aligned entries win at trail-family rates, regime-flip alignment becomes a confidence signal (complements existing REGIME_CONF_MULTIPLIER, does not duplicate — this is flip-event-scoped, not static regime score).",
+      "expected_impact": "Validates or kills 'ride the flip' thesis with existing data; zero live impact",
+      "category": "entry sniper / regime",
+      "status": "pre_registered",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-20T11:43:06Z",
+      "idea": "pump-chain+ LONG RANGING (btc_regime) 0.7x conf-dampen — offline counterfactual from #37 study",
+      "rationale": "30d RANGING LONG 13T 30.8% −$0.81 worst band; TRANSITIONING +$1.53 / RANGING_BULL +$0.95 are habitats. But n=13<20 bar; overlaps chop gates.",
+      "expected_impact": "Save ~$0.81/30d if real; kill 4 winners +$0.45 if shipped today = FAIL",
+      "category": "entry sniper",
+      "status": "monitor_n_lt_20",
+      "risk": "low"
+    }
   ],
-  "changes_from_last_run": [
-    "#35 dual-path fix: VERIFIED live (SYRUP pick visible, freshest-wins)",
-    "#33 coin_regime stamp: VERIFIED on pump-chain- path (ALT/IO stamped)",
-    "#34 BTC manual close: price kept dumping after close — save held"
-  ],
+  "config_changes_applied": [],
+  "changes_from_last_run": {
+    "#35_dual_path": "VERIFIED live — HERMES_DATA state fresher (SYRUP 09:20 vs www 05:49), freshest-wins works",
+    "#33_coin_regime_stamp": "VERIFIED — 3 trades stamped since ship; cohort building for n≥20 counterfactual",
+    "#34_btc_manual_close": "VALIDATED — price kept dumping after close",
+    "#36_pump_chain_dampen_correction": "HOLDS — offline counterfactual this run confirms rejection path was correct",
+    "doji_kill": "HOLDING — 0 trades since Oct 16 20:30",
+    "short_floor_45": "HOLDING — 0 non-bypass SHORT RSI<45 opens since revert (2 bypass/copy leaks: HYPE volume-buildup- RSI38, ETH hl_copy RSI40 — bypass signals skip compactor floor, covered by pre-reg counter-regime study → reframed)",
+    "size_reduce_0.5x": "HOLDING — 7d WR 33.3%<37 AND pnl −$4.00<−$2, both resume conditions failing"
+  },
+  "open_trade_action": {
+    "trade": "BTC LONG ai-trader-pending #16297 @81402 → 81568 (+0.2%), 3h",
+    "regime": "LONG_BIAS 15m+4h, STRONG_UP, NORMAL vol — ALIGNED",
+    "action": "HOLD — trail needs +0.40% arm; SL 81310 caps risk at −0.11%; CEO-owned pending"
+  },
   "next_actions": [
-    "TAT: 2 more unique fires → evaluate variant-C flip (6S/0FK corrected counterfactual)",
-    "coin_regime stamped cohort: watch for n≥20 → run LONG-on-SHORT_BIAS-coin counterfactual",
-    "pp-conditional floor shadow: resolve floor-admit cohort before any overlapping dampen ships",
-    "Post-vacation queue: BE-rake shadow, volume-buildup- priority shadow, bypass-penalty study, ~12 soak changes — CEO eyeball on resume",
-    "pump-chain+ recheck: kill only if 14d PnL<0 with n≥20 (currently +$1.09)"
+    "TAT: 2 more unique shadow fires for 15-fire flip bar",
+    "coin_regime stamped cohort → n≥20 → LONG-on-SHORT_BIAS-coin counterfactual",
+    "pp-conditional floor shadow: resolve floor-admit cohort BEFORE overlapping ships",
+    "Regime-flip alignment study (new pre-reg): query post-flip LONG cohort next run",
+    "Escalation #15 (15th request): exit-ladder signal-scoped candle OOS — still CEO-priority",
+    "Post-vacation stack: BE-rake shadow, bypass offline study reframe, ~12+ unvalidated soaks — CEO eyeball on resume"
   ]
 }

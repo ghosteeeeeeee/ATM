@@ -233,3 +233,9 @@
 ### Numbers: 24h 16T -1.00 18.8% | 7d 191T -3.53 34.6%
 ### Findings: Rotating Q (new errors): hotset failure cooldown blocks (~1h TOK), mark_signal_executed rollbacks, atr_sl_hit phantom warnings — all previously flagged, no new structural errors. Flat open correct in dual SHORT_BIAS/STRONG_DOWN; size-reduce 0.5x still active.
 ### Recommendation: none — continue vacation shadow posture; recheck size-reduce lift once 24h WR recovers above 35%.
+
+## CEO Status — 20261020T112642Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 11T -0.36 18.2% | 7d 177T -4.00 33.3%
+### Findings: New errors (rotating Q6): hermes-coding-mcp crash-loop 14,588 restarts auto-disabled (missing script); disk 84% (pipeline.log 192M); atr_sl_hit phantom warns; no pipeline-affecting errors. DB 7d WR 33.3% <35 and pnl −$4.00 <−$2 — both size-reduce resume conditions still failing, 0.5x correctly held.
+### Recommendation: none — after vacation, restore or permanently remove run_mcp_server.py unit and add logrotate for pipeline.log (disk trend, not yet urgent).

@@ -5886,5 +5886,32 @@
     "category": "entry sniper",
     "status": "rejected",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-20T11:43:06Z",
+    "idea": "Regime-flip fresh-alignment offline study — trades opened within 6h of dual-TF same-bias flip, direction-aligned vs misaligned",
+    "rationale": "steer-002 wrong-side bleed was all pre-flip SHORT_BIAS-era LONGs. If post-flip aligned entries win at trail-family rates, regime-flip alignment becomes a confidence signal (complements existing REGIME_CONF_MULTIPLIER, does not duplicate — this is flip-event-scoped, not static regime score).",
+    "expected_impact": "Validates or kills 'ride the flip' thesis with existing data; zero live impact",
+    "category": "entry sniper / regime",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-20T11:43:06Z",
+    "idea": "pump-chain+ LONG RANGING (btc_regime) 0.7x conf-dampen — offline counterfactual from #37 study",
+    "rationale": "30d RANGING LONG 13T 30.8% −$0.81 worst band; TRANSITIONING +$1.53 / RANGING_BULL +$0.95 are habitats. But n=13<20 bar; overlaps chop gates.",
+    "expected_impact": "Save ~$0.81/30d if real; kill 4 winners +$0.45 if shipped today = FAIL",
+    "category": "entry sniper",
+    "status": "monitor_n_lt_20",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-20T11:43:06Z",
+    "idea": "Counter-regime penalty for STANDALONE_BYPASS (pre-reg #36) — OFFLINE STUDY COMPLETE",
+    "rationale": "30d btc_regime×direction study: BEAR_TREND LONG +$0.07 (not the bleed); RANGING LONG −$0.81 IS. Counter-regime hypothesis partially refuted.",
+    "expected_impact": "Avoids shipping a penalty that would not have stopped the 24h bleed",
+    "category": "entry sniper / regime",
+    "status": "rejected_reframed_to_ranging_monitor",
+    "risk": "low"
   }
 ]
