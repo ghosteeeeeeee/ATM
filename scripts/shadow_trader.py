@@ -1093,6 +1093,242 @@ def reclose_events():
         conn.close()
 
 
+def flip_test(signal_type_filter=None):
+    """Flip test: simulate both original and flipped direction (T directive 1).
+
+    For signals with low WR, test if flipping direction would be profitable.
+    Simulates both directions on the same candles and compares outcomes.
+    """
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("═" * 60)
+        log("FLIP TEST — Original vs Flipped Direction")
+        log("═" * 60)
+        
+        # Get signals to test
+        if signal_type_filter:
+            rows = cur.execute("""
+                SELECT id, token, direction, signal_type, source, created_at, 
+                       leverage_used, context, first_exit_pnl_pct
+                FROM shadow_trades 
+                WHERE closed=1 AND signal_type LIKE ?
+                ORDER BY created_at DESC LIMIT 500
+            """, (f'%{signal_type_filter}%',)).fetchall()
+        else:
+            # Default: test worst signals
+            rows = cur.execute("""
+                SELECT id, token, direction, signal_type, source, created_at,
+                       leverage_used, context, first_exit_pnl_pct
+                FROM shadow_trades 
+                WHERE closed=1
+                GROUP BY signal_type, direction
+                HAVING COUNT(*) >= 10 AND AVG(net_pnl_pct) < -0.1
+                LIMIT 10
+            """).fetchall()
+        
+        if not rows:
+            log("No signals to test")
+            return
+        
+        # Group by signal_type
+        by_type = {}
+        for r in rows:
+            key = (r[3], r[2])  # signal_type, direction
+            if key not in by_type:
+                by_type[key] = []
+            by_type[key].append(r)
+        
+        for (sig_type, orig_dir), sig_rows in by_type.items():
+            if len(sig_rows) < 5:
+                continue
+            
+            log(f"\n─── {sig_type} {orig_dir} (n={len(sig_rows)}) ───")
+            
+            # Row indices: 0=id, 1=token, 2=direction, 3=signal_type, 4=source,
+            # 5=created_at, 6=leverage_used, 7=context, 8=first_exit_pnl_pct
+            orig_wins = sum(1 for r in sig_rows if r[8] and r[8] > 0)
+            orig_total = sum(r[8] or 0 for r in sig_rows)
+            orig_wr = orig_wins / len(sig_rows) * 100
+            orig_avg = orig_total / len(sig_rows)
+            
+            # Simulate flipped direction
+            flip_results = []
+            for r in sig_rows:
+                try:
+                    entry_ts = calendar.timegm(datetime.strptime(r[5], '%Y-%m-%d %H:%M:%S').timetuple())
+                except:
+                    continue
+                
+                candles = _load_candles_window(r[1], entry_ts, entry_ts + 86400)
+                if not candles:
+                    continue
+                
+                entry_price = candles[0][1]
+                ctx = json.loads(r[7]) if r[7] else {}
+                atr_pct = ctx.get('atr_pct')
+                leverage = r[6] or MAX_LEVERAGE
+                
+                # Flip direction
+                flip_dir = 'SHORT' if orig_dir == 'LONG' else 'LONG'
+                
+                # Simulate with flipped direction
+                result = _simulate_atr_sl_tp(entry_price, flip_dir, candles, atr_pct)
+                if result:
+                    flip_results.append(result['pnl_pct'])
+            
+            if flip_results:
+                flip_wins = sum(1 for p in flip_results if p > 0)
+                flip_total = sum(flip_results)
+                flip_wr = flip_wins / len(flip_results) * 100
+                flip_avg = flip_total / len(flip_results)
+                
+                log(f"  Original {orig_dir}: WR={orig_wr:.1f}% avg={orig_avg:+.3f}% total={orig_total:+.2f}%")
+                log(f"  Flipped  {flip_dir}: WR={flip_wr:.1f}% avg={flip_avg:+.3f}% total={flip_total:+.2f}%")
+                log(f"  Delta: WR={flip_wr-orig_wr:+.1f}% avg={flip_avg-orig_avg:+.3f}%")
+                
+                if flip_avg > orig_avg:
+                    log(f"  ✅ FLIP IS BETTER by {flip_avg-orig_avg:+.3f}%")
+                else:
+                    log(f"  ❌ Original is better by {orig_avg-flip_avg:+.3f}%")
+        
+        log("\n═" * 60)
+    finally:
+        conn.close()
+
+
+def analyze_exit_engines(signal_type_filter=None):
+    """Compare exit engine outcomes for a signal type (T directive 2).
+
+    Queries existing exit_*_json columns to see which engine would have
+    been best for each signal.
+    """
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("═" * 60)
+        log("EXIT ENGINE COMPARISON")
+        log("═" * 60)
+        
+        if signal_type_filter:
+            rows = cur.execute("""
+                SELECT exit_atr_json, exit_pm_trail_json, exit_hard_max_json,
+                       exit_cut_loser_json, exit_speed_stale_json, exit_universal_hold_json,
+                       exit_trail_arm_timeout_json
+                FROM shadow_trades 
+                WHERE closed=1 AND signal_type LIKE ?
+            """, (f'%{signal_type_filter}%',)).fetchall()
+        else:
+            rows = cur.execute("""
+                SELECT exit_atr_json, exit_pm_trail_json, exit_hard_max_json,
+                       exit_cut_loser_json, exit_speed_stale_json, exit_universal_hold_json,
+                       exit_trail_arm_timeout_json
+                FROM shadow_trades WHERE closed=1
+            """).fetchall()
+        
+        if not rows:
+            log("No data")
+            return
+        
+        log(f"\nTotal signals: {len(rows)}")
+        
+        # Parse and aggregate
+        engine_stats = {}
+        engine_names = ['atr', 'pm_trail', 'hard_max', 'cut_loser', 'speed_stale', 'universal_hold', 'trail_arm_timeout']
+        
+        for row in rows:
+            for i, engine_name in enumerate(engine_names):
+                if row[i]:
+                    try:
+                        data = json.loads(row[i])
+                        if data and data.get('fired'):
+                            if engine_name not in engine_stats:
+                                engine_stats[engine_name] = {'n': 0, 'wins': 0, 'total_pnl': 0}
+                            engine_stats[engine_name]['n'] += 1
+                            pnl = data.get('pnl_pct', 0)
+                            engine_stats[engine_name]['total_pnl'] += pnl
+                            if pnl > 0:
+                                engine_stats[engine_name]['wins'] += 1
+                    except:
+                        pass
+        
+        log(f"\n{'Engine':25} {'n':>5} {'WR':>6} {'Total':>8} {'Avg':>8}")
+        log("-" * 60)
+        for engine, stats in sorted(engine_stats.items(), key=lambda x: x[1]['total_pnl'], reverse=True):
+            wr = stats['wins'] / stats['n'] * 100 if stats['n'] > 0 else 0
+            avg = stats['total_pnl'] / stats['n'] if stats['n'] > 0 else 0
+            log(f"  {engine:25} {stats['n']:5} {wr:5.1f}% {stats['total_pnl']:+8.2f}% {avg:+8.3f}%")
+        
+        log("\n═" * 60)
+    finally:
+        conn.close()
+
+
+def analyze_hold_times(signal_type_filter=None):
+    """Analyze hold time distribution for winners vs losers (T directive 3)."""
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("═" * 60)
+        log("HOLD TIME ANALYSIS")
+        log("═" * 60)
+        
+        if signal_type_filter:
+            rows = cur.execute("""
+                SELECT direction, first_exit_pnl_pct, first_exit_hold_minutes
+                FROM shadow_trades 
+                WHERE closed=1 AND signal_type LIKE ? AND first_exit_hold_minutes IS NOT NULL
+            """, (f'%{signal_type_filter}%',)).fetchall()
+        else:
+            rows = cur.execute("""
+                SELECT direction, first_exit_pnl_pct, first_exit_hold_minutes
+                FROM shadow_trades 
+                WHERE closed=1 AND first_exit_hold_minutes IS NOT NULL
+            """).fetchall()
+        
+        for d in ['LONG', 'SHORT']:
+            dir_rows = [r for r in rows if r[0] == d]  # direction is index 0
+            if not dir_rows:
+                continue
+            
+            # Row indices: 0=direction, 1=first_exit_pnl_pct, 2=first_exit_hold_minutes
+            winners = [r for r in dir_rows if r[1] and r[1] > 0]
+            losers = [r for r in dir_rows if r[1] and r[1] <= 0]
+            
+            log(f"\n  {d}: n={len(dir_rows)}, winners={len(winners)}, losers={len(losers)}")
+            
+            if winners:
+                avg_win = sum(r[2] for r in winners) / len(winners)
+                log(f"    Winners avg hold: {avg_win:.0f} min ({avg_win/60:.1f}h)")
+            
+            if losers:
+                avg_loss = sum(r[2] for r in losers) / len(losers)
+                log(f"    Losers avg hold: {avg_loss:.0f} min ({avg_loss/60:.1f}h)")
+            
+            # Winner hold time distribution
+            if winners:
+                holds = sorted([r[2] for r in winners])
+                log(f"    Winner hold distribution:")
+                buckets = {'<30m': 0, '30-60m': 0, '1-2h': 0, '2-4h': 0, '4-8h': 0, '>8h': 0}
+                for h in holds:
+                    if h < 30: buckets['<30m'] += 1
+                    elif h < 60: buckets['30-60m'] += 1
+                    elif h < 120: buckets['1-2h'] += 1
+                    elif h < 240: buckets['2-4h'] += 1
+                    elif h < 480: buckets['4-8h'] += 1
+                    else: buckets['>8h'] += 1
+                for bucket, count in buckets.items():
+                    pct = count / len(winners) * 100
+                    log(f"      {bucket:8}: {count:3} ({pct:.0f}%)")
+        
+        log("\n═" * 60)
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description='Shadow-Mode Paper Trading System')
     ap.add_argument('--record', action='store_true', help='Snapshot ALL signals')
@@ -1101,9 +1337,17 @@ def main():
     ap.add_argument('--reclose', action='store_true', help='Re-close slow engines')
     ap.add_argument('--purge', action='store_true', help='Delete >90 days')
     ap.add_argument('--analyze-hml', action='store_true', help='HML threshold + dead signals analysis')
+    ap.add_argument('--flip-test', action='store_true', help='Test flipping signal direction')
+    ap.add_argument('--flip-signal', type=str, help='Signal type to flip test')
+    ap.add_argument('--analyze-exits', action='store_true', help='Compare exit engine outcomes')
+    ap.add_argument('--exit-signal', type=str, help='Signal type for exit engine comparison')
+    ap.add_argument('--analyze-hold', action='store_true', help='Hold time analysis')
+    ap.add_argument('--hold-signal', type=str, help='Signal type for hold time analysis')
     args = ap.parse_args()
     
-    run_all = not (args.record or args.close or args.report or args.reclose or args.purge or args.analyze_hml)
+    run_all = not (args.record or args.close or args.report or args.reclose or 
+                   args.purge or args.analyze_hml or args.flip_test or 
+                   args.analyze_exits or args.analyze_hold)
     
     if run_all or args.record:
         record()
@@ -1115,6 +1359,12 @@ def main():
         report()
     if args.analyze_hml:
         analyze_hml_thresholds()
+    if args.flip_test:
+        flip_test(args.flip_signal)
+    if args.analyze_exits:
+        analyze_exit_engines(args.exit_signal)
+    if args.analyze_hold:
+        analyze_hold_times(args.hold_signal)
     if args.purge:
         purge()
     
