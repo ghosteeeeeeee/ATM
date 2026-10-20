@@ -4965,3 +4965,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-20 21:30] auto_1hr: NO CONFIG CHANGE — 1T last hour (ZRO r2v2-long3 LONG atr_trail_hit +$0.06 +2.82%) | 24h 20T 5W -$0.16 (25.0%) | 7d 163T 59W -$2.41 (36.2%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0W/2T under 3T line) | atr_sl_hit 35% under 40% | no neg-hour streak | 1 open BTC +0.58% | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-20 22:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (AIXBT pump-chain+ LONG trail_arm_timeout flat $0.00) | 24h 21T 5W -$0.16 (23.8%) | 7d 162T 59W -$2.37 (36.4%) — size-reduce 0.3x stays | kill: none (pump-chain+ 24h 0W/3T reviewed: 7d +$0.32 profitable, noise not kill) | atr_sl_hit 33.3% under 40% | no neg-hour streak | 1 open BTC +0.82% | No constants change -> no signal_versions entry
+BY: auto_1hr

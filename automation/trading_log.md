@@ -13001,3 +13001,25 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL improving slightly (-$2.47 → -$2.41); size-reduce can lift if PnL crosses -$2
 - 24h WR recovered to 25% (from 21%); hard_max_loss still 2nd-worst close reason (3T -$0.51)
+
+## [2026-10-20 22:28 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 0 losses — flat)
+**PnL:** $0.00 last hour | 24h 21T 5W -$0.16 (23.8% WR) | 7d 162T 59W -$2.37 (36.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- AIXBT pump-chain+ LONG trail_arm_timeout flat +$0.00 (+0.03%)
+- pump-chain+ 24h 0W/3T -$0.39 checked vs kill line: 7d is 22T 7W +$0.32 (31.8% WR, profitable) — 24h blip is small-sample noise, kill rule requires 3+ trades in last hour (had 1T). Stays enabled.
+- Kill check: no other signal at 0% WR with 3+ trades last hour
+- atr_sl_hit 7/21 = 33.3% under 40% — tpsl deployed, no action
+- No neg-hour streak (21:00 +$0.06, 22:00 $0.00)
+- Size-reduce 0.3x stays (7d PnL -$2.37 still <-$2, WR 36.4%)
+- 1 open: BTC continuum-osc+ LONG +0.82% (best open of day)
+- Frequency 1T/hr — not overtraded
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL improving (-$2.41 → -$2.37); size-reduce lifts if PnL crosses -$2
+- hard_max_loss 3T -$0.51 still 2nd-worst 24h close reason — monitor if it clusters
