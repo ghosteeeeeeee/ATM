@@ -5932,5 +5932,15 @@
     "category": "analysis",
     "status": "executed-partial (n=5, building via coin_regime)",
     "risk": "none (offline)"
+  },
+  {
+    "date": "2026-10-20T15:45:00Z",
+    "idea": "coin_regime-aligned confidence dampen (SHORT × coin LONG_BIAS) — ship shadow when stamped cohort n>=20",
+    "rationale": "Stamped cohort 7d: SHORT×LONG_BIAS 4T 0%WR -$0.14 vs SHORT×SHORT_BIAS 2T 50% +$0.03 vs LONG×LONG_BIAS 3T 66.7% +$0.57. Watchdog confirmed pump-chain SHORT family firing into LONG_BIAS (FOGO/COMP post-11:45 flip both lost). Directionally perfect, n=9 < 20 bar.",
+    "expected_impact": "Blocks ~$0.14-0.30/7d counter-regime SHORT bleed; 0 winners in stamped counter-regime SHORT cohort",
+    "category": "entry sniper / regime gate",
+    "status": "pre_registered",
+    "risk": "low",
+    "flip_criteria": "stamped cohort n>=20, counter-regime SHORT net negative, fk on aligned SHORT winners <10%"
   }
 ]

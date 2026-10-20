@@ -1716,5 +1716,16 @@
     "after": "Dual-path _load_state picks newest timestamp; _active_state_path threads reject/fired writes; watchdog prompt hardened with PATH WARNING",
     "rationale": "SAND SHORT pick (correct side, dual SHORT_BIAS, conf 72) written to www never reached signal — zero live impact while AI_TRADER_ENABLED=False, but would silently break re-enable",
     "impact": "Zero live behavior (AI_TRADER disabled CEO 2026-10-19). Prevents pick-limbo on re-enable. py_compile PASS; functional test PASS (fresh www pick loads, mark_rejected writes back to www)."
+  },
+  {
+    "timestamp": "2026-10-20T15:40:00Z",
+    "agent": "brain_auditor",
+    "change": "TAT shadow signal-scope FIX: ai-trader match tightened to ai-trader+ (excludes ai-trader-manual/pending CEO trades from flip cohort)",
+    "type": "bugfix",
+    "file": "position_manager.py:3627",
+    "before": "('bb-bounce' in sig or 'ai-trader' in sig) — matched manual/pending",
+    "after": "('bb-bounce' in sig or 'ai-trader+' in sig) — confluence signals only",
+    "rationale": "7/16 unique TAT shadow fires were CEO manual/pending trades (16251/16283/16291/16293/16297/16306/16307). CEO trades have explicit SL/TP and must never be TAT-eligible; pollutes 15-fire flip bar and would auto-exit CEO trades if flipped with same predicate.",
+    "impact": "Zero live behavior (shadow only). Flip cohort corrected from 16 to 9 unique signal trades (4 ai-trader+ + 5 bb-bounce). Valid flip count: 9/15."
   }
 ]

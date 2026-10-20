@@ -3622,9 +3622,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # ── 7b-shadow. TRAIL-ARM TIMEOUT SHADOW — bb-bounce + ai-trader+ (zero behavior) ──
         # brain_auditor 2026-10-16 22:30Z (bb-bounce) / 2026-10-17 00:40Z (ai-trader+).
         # Logs would-fires only; never closes. Flip live only with CEO GO + 14d shadow data.
+        # FIX 2026-10-20: 'ai-trader' matched ai-trader-manual/pending (CEO trades — never
+        # TAT-eligible). 7/16 unique shadow fires were manual/pending, polluting flip cohort.
         if direction == 'LONG' and BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW:
             _bbs_sig_l = (_pos_signal or '').lower()
-            if ('bb-bounce' in _bbs_sig_l or 'ai-trader' in _bbs_sig_l) and trade_id not in _bb_bounce_shadow_logged:
+            if ('bb-bounce' in _bbs_sig_l or 'ai-trader+' in _bbs_sig_l) and trade_id not in _bb_bounce_shadow_logged:
                 try:
                     _bbs_ot = pos.get('open_time') or open_time
                     if _bbs_ot:
