@@ -91,32 +91,46 @@ CREATE TABLE IF NOT EXISTS shadow_trades (
     -- Timing
     created_at TEXT NOT NULL,           -- signal fire time (ISO)
     recorded_at TEXT NOT NULL,          -- shadow record time (ISO)
+    context_computed_at TEXT,           -- when context was computed (measures drift)
     closed INTEGER DEFAULT 0,           -- 0=pending, 1=closed
     closed_at TEXT,                     -- shadow close time (ISO)
     
-    -- Context (captured at signal fire)
+    -- Context (captured at signal fire — pull from signals table + signal_metadata)
     context JSON,                       -- full context snapshot (see 3.2)
+    leverage_used INTEGER,              -- execution leverage (capped at MAX_LEVERAGE=5)
     
     -- Gate information
     decision TEXT,                      -- EXPIRED, SKIPPED, PENDING, FAILED, EXECUTED
     decision_reason TEXT,               -- e.g. 'compaction_stale_10min', 'RSI hard floor'
     gate_blocked INTEGER DEFAULT 0,     -- 1 if blocked by a gate, 0 if passed
     gate_name TEXT,                     -- which gate blocked it (if any)
+    gate_name_backfilled INTEGER DEFAULT 0,  -- 1 if gate_name was parsed from decision_reason
+    
+    -- Exit engine routing
+    exit_config TEXT,                   -- 'atr', 'pump_exit', 'ride_it', 'rr_engine' (from SIGNAL_EXIT_CONFIG)
     
     -- Exit engine simulation results (one per engine)
-    exit_atr_json JSON,                 -- ATR SL/TP simulation result
-    exit_pm_trail_json JSON,            -- PM Trail simulation result
+    exit_atr_json JSON,                 -- ATR SL/TP simulation result (continuous peak-trailing)
+    exit_pm_trail_json JSON,            -- PM Trail simulation result (tiered)
     exit_hard_max_json JSON,            -- Hard Max Loss simulation result
-    exit_profit_monster_json JSON,      -- Profit Monster Trail result
-    exit_stale_json JSON,               -- Stale exit result
-    exit_rr_engine_json JSON,           -- RR Engine result
+    exit_cut_loser_json JSON,           -- Cut Loser two-tier result
+    exit_speed_stale_json JSON,         -- Speed Stale exit result
+    exit_universal_hold_json JSON,      -- Universal Max Hold result
+    exit_trail_arm_timeout_json JSON,   -- Trail Arm Timeout result
+    exit_rr_engine_json JSON,           -- RR Engine result (NULL in v1 — not simulated)
     
-    -- Best exit (first to fire)
-    best_exit_engine TEXT,              -- which engine fired first
-    best_exit_price REAL,               -- exit price
-    best_exit_pnl_pct REAL,             -- PnL % (direction-signed)
-    best_exit_hold_minutes REAL,        -- hold time in minutes
-    best_exit_reason TEXT,              -- e.g. 'atr_sl_hit', 'trail_sl'
+    -- First exit to fire (renamed from best_exit_engine per validation)
+    first_exit_engine TEXT,             -- which engine fired first
+    first_exit_price REAL,              -- exit price
+    first_exit_pnl_pct REAL,            -- PnL % (direction-signed, after fees+slippage)
+    first_exit_hold_minutes REAL,       -- hold time in minutes
+    first_exit_reason TEXT,             -- e.g. 'atr_sl_hit', 'trail_sl'
+    
+    -- Fee/slippage application (per §12 decisions)
+    fee_pct REAL DEFAULT 0.04,          -- fee percentage (0.04% per trade)
+    slippage_pct REAL DEFAULT 0.10,     -- slippage percentage (0.10%)
+    gross_pnl_pct REAL,                 -- PnL before fees/slippage
+    net_pnl_pct REAL,                   -- PnL after fees/slippage
     
     -- Forward returns (for comparison)
     fwd_30m REAL,                       -- +30m forward return %
@@ -127,8 +141,11 @@ CREATE TABLE IF NOT EXISTS shadow_trades (
     excess_4h REAL,                     -- market-neutral excess @4h
     mfe_4h REAL,                        -- max favorable excursion @4h
     mae_4h REAL,                        -- max adverse excursion @4h
-    mfe_pct REAL,                       -- MFE % (from best exit sim)
-    mae_pct REAL,                       -- MAE % (from best exit sim)
+    mfe_pct REAL,                       -- MFE % (from first exit sim)
+    mae_pct REAL,                       -- MAE % (from first exit sim)
+    
+    -- Validation join (for EXECUTED signals)
+    trade_id TEXT,                      -- PostgreSQL trades.trade_id for validation
     
     -- Metadata
     created_at_db TEXT DEFAULT (datetime('now')),
@@ -211,41 +228,157 @@ Each `exit_*_json` column stores:
 
 ## 4. Exit Engine Simulation Logic
 
-### 4.1 ATR SL/TP (Initial Stop)
+> **IMPORTANT (own-conclusions validation 2026-10-20):** Section 4 was rewritten based on independent validation. The original spec had 3 of 6 engines factually wrong. All formulas below are verified against live code.
+
+### 4.0 SIGNAL_EXIT_CONFIG Routing (CRITICAL)
+
+**Before simulating any exit engine, each signal must be routed to the correct engine family.**
+
+The live system routes each signal to exactly one exit config via `_match_exit_config()` (`position_manager.py:55`) against `SIGNAL_EXIT_CONFIG` (`hermes_constants.py:1832`):
+
+```python
+SIGNAL_EXIT_CONFIG = {
+    # signal_family: exit_config
+    'pump-chain+': 'pump_exit',      # pump-chain+ LONG, v5/v6 LONG
+    'mover-': 'ride_it',             # mover-, volume-breakout, trend-ride
+    'volume-breakout': 'ride_it',
+    'trend-ride': 'ride_it',
+    # ... others route to 'atr' or 'rr_engine'
+}
+```
+
+**Routing logic:**
+```python
+def match_exit_config(source):
+    """Route signal to exit engine family."""
+    # Check exact match
+    if source in SIGNAL_EXIT_CONFIG:
+        return SIGNAL_EXIT_CONFIG[source]
+    # Check prefix match (strip +/-)
+    bare = source.rstrip('+-')
+    if bare in SIGNAL_EXIT_CONFIG:
+        return SIGNAL_EXIT_CONFIG[bare]
+    # Default
+    return 'atr'  # ATR SL/TP is the default engine
+```
+
+**v1 scope:** Simulate `atr`, `pump_exit`, `ride_it` engines. `rr_engine` is a multi-hour sub-project (structural S/R re-implementation) — scope to v2 with explicit "not simulated" label.
+
+---
+
+### 4.1 ATR SL/TP (Continuous Peak-Trailing Engine)
+
+> **CORRECTED (own-conclusions):** The live engine is NOT a static initial stop. It continuously trails SL from peak. This is its defining behavior.
 
 **Constants:**
-- `CUT_LOSER_PNL = -4.00` (account %)
-- `HML_VOL_ATR_MULT = 0.5`
-- `ATR_PERIOD = 14`
+- `TRAILING_DISTANCE_PCT = 1.20%` (`hermes_constants.py:728`)
+- `ATR_SL_MIN_INIT = 1.5%` (initial floor)
+- `ATR_SL_MIN_ACCEL = 0.30%` (established floor)
+- `ATR_SL_MAX = 5.0%` (cap)
+- `ATR_PERIOD = 14` (computed on **1h candles**, not 5m/1m)
 
-**Logic:**
-```
+**Logic (from `tpsl_utils.compute_atr_sl_tp`):**
+```python
 entry_price = candle_open_at_signal_ts
-sl_distance_pct = atr_pct * SL_MULTIPLIER  # from get_sl_multiplier_v2()
+atr_pct = compute_atr_1h(token)  # ATR(14) on 1h candles
+
+# Initial SL/TP
+sl_distance_pct = atr_pct * get_sl_multiplier_v2(atr_pct, signal_type)
+tp_distance_pct = atr_pct * get_tp_multiplier_v2(atr_pct, signal_type)
 sl_price = entry_price * (1 - sl_distance_pct/100)  # for LONG
-tp_distance_pct = atr_pct * TP_MULTIPLIER
 tp_price = entry_price * (1 + tp_distance_pct/100)  # for LONG
 
+# Tracking state
+peak_price = entry_price  # highest price since entry (LONG)
+trail_active = False
+min_sl_distance = ATR_SL_MIN_INIT  # starts at 1.5%
+
 For each 1m candle after entry:
-    if candle_low <= sl_price:  # LONG
-        exit at sl_price, reason='atr_sl_hit'
-        break
-    if candle_high >= tp_price:  # LONG
-        exit at tp_price, reason='atr_tp_hit'
-        break
+    # Update peak
+    if direction == 'LONG':
+        peak_price = max(peak_price, candle_high)
+    else:
+        peak_price = min(peak_price, candle_low)
+    
+    # Trail SL from peak (tightens only, never loosens)
+    if direction == 'LONG':
+        new_sl = peak_price * (1 - TRAILING_DISTANCE_PCT/100)
+        sl_price = max(sl_price, new_sl)  # tighten only
+        # Apply floors
+        min_sl_distance = ATR_SL_MIN_ACCEL  # after first PM cycle
+        max_sl = peak_price * (1 - min_sl_distance/100)
+        sl_price = min(sl_price, max_sl)  # cap at floor
+    else:
+        new_sl = peak_price * (1 + TRAILING_DISTANCE_PCT/100)
+        sl_price = min(sl_price, new_sl)  # tighten only
+        min_sl_distance = ATR_SL_MIN_ACCEL
+        min_sl = peak_price * (1 + min_sl_distance/100)
+        sl_price = max(sl_price, min_sl)  # cap at floor
+    
+    # Check exits
+    if direction == 'LONG':
+        if candle_low <= sl_price:
+            # Relabel: profitable trail exit vs initial SL
+            if sl_price > entry_price:
+                exit at sl_price, reason='atr_trail_hit'  # profitable
+            else:
+                exit at sl_price, reason='atr_sl_hit'  # loss
+            break
+        if candle_high >= tp_price:
+            exit at tp_price, reason='atr_tp_hit'
+            break
+    else:
+        if candle_high >= sl_price:
+            if sl_price < entry_price:
+                exit at sl_price, reason='atr_trail_hit'
+            else:
+                exit at sl_price, reason='atr_sl_hit'
+            break
+        if candle_low <= tp_price:
+            exit at tp_price, reason='atr_tp_hit'
+            break
 ```
+
+**Key behaviors:**
+- SL trails from peak (highest/lowest since entry)
+- Trail distance = 1.20% from peak
+- Tightens only (never loosens)
+- INIT floor 1.5%, ACCEL floor 0.30%
+- EXTREME vol widens ×1.2
+- Profitable trail exits labeled `atr_trail_hit`, not `atr_sl_hit`
+
+---
 
 ### 4.2 PM Trail (Profit Monster Trail)
 
+> **CORRECTED (own-conclusions):** Added tiered distances, min hold, spider override, bypass signals.
+
 **Constants:**
 - `PM_TRAIL_ACTIVATE_PCT = 0.004` (0.40%)
-- `PM_TRAIL_DISTANCE_PCT = 0.002` (0.20%)
+- `PM_TRAIL_TIERS = {0.20%: <1.5%, 0.50%: 1.5-3%, 0.80%: 3-5%, 1.20%: 5%+}` (tiered by peak profit)
+- `PM_TRAIL_MIN_HOLD = 2` (min post-activation candles before exit)
+- `SPIDER_TRAIL_ACTIVATE_PCT = 0.003` (0.30% in NEUTRAL/spider regime)
+- `PROFIT_MONSTER_BYPASS_SIGNALS` (~40 families — pump-chain, atr-spike, ai-trader, hh-hl, continuum-osc)
 
-**Logic:**
-```
+**Logic (from `profit_monster.py run_trail()`):**
+```python
 entry_price = candle_open_at_signal_ts
 trail_active = False
 peak_price = entry_price
+activation_candle = None
+bypass_check = source.rstrip('+-') in PROFIT_MONSTER_BYPASS_SIGNALS
+
+# Spider regime override
+if regime_4h == 'NEUTRAL':
+    activate_pct = SPIDER_TRAIL_ACTIVATE_PCT * 100  # 0.30%
+    tiers = {0.10: 1.5, 0.30: 3.0, 0.50: 5.0}  # tighter tiers
+else:
+    activate_pct = PM_TRAIL_ACTIVATE_PCT * 100  # 0.40%
+    tiers = PM_TRAIL_TIERS  # 0.20/0.50/0.80/1.20
+
+If bypass_check:
+    # Signal bypasses PM Trail entirely
+    return {'fired': False, 'notes': 'bypass signal'}
 
 For each 1m candle after entry:
     # Update peak
@@ -256,100 +389,308 @@ For each 1m candle after entry:
     
     # Check activation
     current_pnl_pct = (candle_close / entry_price - 1) * 100  # for LONG
-    if current_pnl_pct >= PM_TRAIL_ACTIVATE_PCT * 100:
-        trail_active = True
+    if current_pnl_pct >= activate_pct:
+        if not trail_active:
+            trail_active = True
+            activation_candle = current_candle_index
     
-    # Check trail exit
+    # Check trail exit (with tiered distance and min hold)
     if trail_active:
+        # Min hold check
+        if current_candle_index - activation_candle < PM_TRAIL_MIN_HOLD:
+            continue
+        
+        # Get tiered distance based on peak profit
+        peak_profit_pct = (peak_price / entry_price - 1) * 100  # for LONG
+        trail_distance = get_tiered_distance(peak_profit_pct, tiers)
+        
         if direction == 'LONG':
-            trail_price = peak_price * (1 - PM_TRAIL_DISTANCE_PCT)
+            trail_price = peak_price * (1 - trail_distance/100)
             if candle_low <= trail_price:
                 exit at trail_price, reason='trail_sl'
                 break
         else:
-            trail_price = peak_price * (1 + PM_TRAIL_DISTANCE_PCT)
+            trail_price = peak_price * (1 + trail_distance/100)
             if candle_high >= trail_price:
                 exit at trail_price, reason='trail_sl'
                 break
 ```
 
+**Key behaviors:**
+- Tiered trail distance (0.20% → 1.20% based on peak profit)
+- Min hold = 2 candles after activation
+- Spider regime override (tighter activation and tiers)
+- ~40 signal families bypass PM Trail entirely
+
+---
+
 ### 4.3 Hard Max Loss (HML)
+
+> **CORRECTED (own-conclusions):** Formula was INVERTED. Live code uses `CUT_LOSER_PNL / leverage` unconditionally. The ATR branch is dead code after Oct-10 cap fix.
 
 **Constants:**
 - `CUT_LOSER_PNL = -4.00` (account %)
-- `HML_VOL_ATR_MULT = 0.5`
+- `MAX_LEVERAGE = 5` (live cap, NOT `signals.leverage` which defaults to 10)
 
-**Logic:**
-```
+**Logic (from `position_manager.py:3551-3587`):**
+```python
 entry_price = candle_open_at_signal_ts
-# HML price threshold = max(account_threshold/leverage, ATR-based_threshold)
-account_threshold_pct = CUT_LOSER_PNL / leverage  # e.g. -4.00/5 = -0.80% price
-atr_threshold_pct = -atr_pct * HML_VOL_ATR_MULT   # e.g. -1.5% * 0.5 = -0.75%
-hml_threshold_pct = max(account_threshold_pct, atr_threshold_pct)  # less negative
+
+# CRITICAL: Use execution leverage (capped at 5), NOT signals.leverage
+leverage = min(signals.leverage or 5, MAX_LEVERAGE)  # cap at 5
+
+# HML threshold = CUT_LOSER_PNL / leverage (unconditionally)
+# The ATR vol floor is dead code — account threshold always governs
+hml_threshold_pct = CUT_LOSER_PNL / leverage  # e.g. -4.00/5 = -0.80% price
+
 hml_price = entry_price * (1 + hml_threshold_pct/100)  # for LONG
 
 For each 1m candle after entry:
     if candle_low <= hml_price:  # LONG
         exit at hml_price, reason='hard_max_loss'
         break
+    if candle_high >= entry_price * (1 + hml_threshold_pct/100 * -1):  # breakeven
+        # HML doesn't fire on winners — only losers
+        pass
 ```
 
-### 4.4 Profit Monster Trail (Full)
+**Key behaviors:**
+- Threshold = `CUT_LOSER_PNL / leverage` (e.g., -4.00/5 = -0.80% price)
+- Use execution leverage (capped at 5), NOT `signals.leverage` (defaults to 10)
+- ATR branch is dead code — account threshold always governs
+- Only fires on losers (cannot block winners)
 
-Same as PM Trail but with additional logic:
-- Bypasses certain signals (`PROFIT_MONSTER_BYPASS_SIGNALS`)
-- Has different activation/distance for different signal types
+**Unit test (from validation):**
+```python
+# Verify HML formula matches live code
+assert compute_hml_threshold(atr_pct=0.3, leverage=5) == -0.80  # NOT -0.15
+assert compute_hml_threshold(atr_pct=1.0, leverage=5) == -0.80  # NOT -0.50
+assert compute_hml_threshold(atr_pct=2.0, leverage=5) == -0.80  # NOT -1.00
+```
 
-### 4.5 Stale Exit
+---
+
+### 4.4 Profit Monster T1/T2 Tier Exits
+
+> **NEW (own-conclusions):** The original spec double-counted PM Trail. The real system has additional T1/T2 tier exits for quick-scalp/runner partial profit-taking.
 
 **Constants:**
-- `MAX_HOLD_MINUTES = 240` (4 hours, configurable)
+- `PM_T1_EXIT_PCT = 1.5%` (take 50% at +1.5%)
+- `PM_T2_EXIT_PCT = 3.0%` (take 25% at +3.0%)
+- Remainder rides with trail
 
-**Logic:**
-```
-entry_ts = signal_created_at
-exit_ts = entry_ts + MAX_HOLD_MINUTES * 60
-exit_price = candle_close_at_exit_ts
-reason = 'stale_exit'
-```
-
-### 4.6 RR Engine
-
-**Constants:**
-- `RR_ENGINE_CONF_HARD_BLOCK_RR = 0.55`
-- `RR_ENGINE_CONF_HARD_BLOCK_RR_CONFIRMED = 0.35`
-
-**Logic:**
-```
+**Logic (from `profit_monster.py:535-557`):**
+```python
 entry_price = candle_open_at_signal_ts
-rr_ratio = tp_distance_pct / sl_distance_pct
+t1_taken = False
+t2_taken = False
+position_pct = 100.0  # start with 100%
 
-if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
-    # Would have been blocked by RR engine
-    return {'fired': False, 'notes': f'R:R {rr_ratio} < 0.55 hard block'}
-
-# Simulate ATR SL/TP with RR engine adjustments
-# (RR engine adjusts SL/TP based on S/R levels, ATR, etc.)
+For each 1m candle after entry:
+    current_pnl_pct = (candle_close / entry_price - 1) * 100  # for LONG
+    
+    # T1: take 50% at +1.5%
+    if not t1_taken and current_pnl_pct >= 1.5:
+        exit 50% at candle_close, reason='pm_t1_exit'
+        t1_taken = True
+        position_pct = 50.0
+    
+    # T2: take 25% at +3.0%
+    if t1_taken and not t2_taken and current_pnl_pct >= 3.0:
+        exit 25% at candle_close, reason='pm_t2_exit'
+        t2_taken = True
+        position_pct = 25.0
+    
+    # Remainder rides with trail
 ```
+
+---
+
+### 4.5 Cut Loser (Two-Tier Loss Cutting)
+
+> **NEW (own-conclusions):** The original spec omitted cut_loser.py. This is a two-tier loss cutting + trailing loss engine.
+
+**Constants:**
+- `CL_TIER1_MIN = -1.0%` (cut 50% if below -1.0%)
+- `CL_TIER1_MAX = -2.5%` (cut remaining if below -2.5%)
+- `CL_TIER2_MIN = -2.5%` (second tier start)
+- `CL_TIER2_MAX = -3.0%` (second tier end)
+
+**Logic (from `cut_loser.py`):**
+```python
+entry_price = candle_open_at_signal_ts
+tier1_cut = False
+tier2_cut = False
+position_pct = 100.0
+
+For each 1m candle after entry:
+    current_pnl_pct = (candle_close / entry_price - 1) * 100  # for LONG
+    
+    # Tier 1: cut 50% if below -1.0%
+    if not tier1_cut and current_pnl_pct <= -1.0:
+        exit 50% at candle_close, reason='cut_loser_t1'
+        tier1_cut = True
+        position_pct = 50.0
+    
+    # Tier 2: cut remaining if below -2.5%
+    if tier1_cut and not tier2_cut and current_pnl_pct <= -2.5:
+        exit remaining at candle_close, reason='cut_loser_t2'
+        tier2_cut = True
+        position_pct = 0.0
+        break
+```
+
+---
+
+### 4.6 Speed Stale Exit (Loser/Winner)
+
+> **CORRECTED (own-conclusions):** The original spec's flat 240-min stale exit matches no live rule. Actual exits are speed-stale based on momentum stall.
+
+**Constants:**
+- `STALE_LOSER_TIMEOUT_MINUTES = 8` (stalled 8min + pnl ≤ -1.0%)
+- `STALE_WINNER_TIMEOUT_MINUTES = 120` (stalled 120min + pnl ≥ +0.6%)
+- `SPEED_PERCENTILE_STALL = 33` (speed_percentile < 33 = stalled)
+- `VELOCITY_STALL_THRESHOLD = 0.001` (|velocity| < 0.1% = stalled)
+
+**Logic (from `position_manager.py:612-637`):**
+```python
+entry_price = candle_open_at_signal_ts
+last_move_ts = entry_ts
+last_price = entry_price
+
+For each 1m candle after entry:
+    current_pnl_pct = (candle_close / entry_price - 1) * 100  # for LONG
+    
+    # Check if price moved (updates last_move_ts)
+    if abs(candle_close - last_price) / last_price > VELOCITY_STALL_THRESHOLD:
+        last_move_ts = current_ts
+        last_price = candle_close
+    
+    # Check stall duration
+    stall_minutes = (current_ts - last_move_ts) / 60
+    
+    # Speed stale loser: stalled 8min + pnl ≤ -1.0%
+    if stall_minutes >= 8 and current_pnl_pct <= -1.0:
+        exit at candle_close, reason='speed_stale_loser'
+        break
+    
+    # Speed stale winner: stalled 120min + pnl ≥ +0.6%
+    if stall_minutes >= 120 and current_pnl_pct >= 0.6:
+        exit at candle_close, reason='speed_stale_winner'
+        break
+```
+
+---
+
+### 4.7 Universal Max Hold
+
+> **CORRECTED (own-conclusions):** The original spec used 240min. Actual is 480min with ride_it exemption.
+
+**Constants:**
+- `UNIVERSAL_MAX_HOLD_MINUTES = 480` (8 hours)
+- `RIDE_IT_MAX_HOLD_MINUTES = 1440` (24 hours for ride_it signals)
+
+**Logic (from `position_manager.py:3448-3472`):**
+```python
+entry_ts = signal_created_at
+max_hold = 480  # default
+
+# Check if signal is ride_it exempt
+if match_exit_config(source) == 'ride_it':
+    max_hold = 1440  # 24 hours
+
+exit_ts = entry_ts + max_hold * 60
+exit_price = candle_close_at_exit_ts
+reason = 'universal_max_hold'
+```
+
+---
+
+### 4.8 Trail Arm Timeout
+
+> **NEW (own-conclusions):** bb-squeeze and pump-chain LONGs that never reach +0.40% activation get timed out.
+
+**Constants:**
+- `BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN = 60` (60min for bb-squeeze)
+- `PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45` (45min for pump-chain LONGs)
+
+**Logic (from `position_manager.py:3599-3630`):**
+```python
+entry_ts = signal_created_at
+activate_pct = 0.40  # +0.40% needed to arm trail
+
+# Determine timeout based on signal family
+if 'bb-squeeze' in source:
+    timeout_min = 60
+elif 'pump-chain' in source and direction == 'LONG':
+    timeout_min = 45
+else:
+    timeout_min = None  # no timeout
+
+If timeout_min:
+    For each 1m candle after entry:
+        current_pnl_pct = (candle_close / entry_price - 1) * 100
+        
+        # Check if trail armed
+        if current_pnl_pct >= activate_pct:
+            break  # trail armed, no timeout
+        
+        # Check timeout
+        hold_minutes = (current_ts - entry_ts) / 60
+        if hold_minutes >= timeout_min:
+            exit at candle_close, reason='trail_arm_timeout'
+            break
+```
+
+---
+
+### 4.9 RR Engine (v2 — NOT SIMULATED IN V1)
+
+> **CORRECTED (own-conclusions):** The original spec had a placeholder. The actual RR engine is ~1200+ lines with structural S/R detection, stop-hunt buffering, regime-exempted thresholds, and continuous re-evaluation.
+
+**v1 decision:** Do NOT simulate RR engine. Mark signals routed to `rr_engine` as `exit_rr_engine_json = None` with note "not simulated in v1".
+
+**v2 scope:** Faithful RR engine simulation requires:
+- Structural S/R level detection (`risk_reward_engine.py:608-638`)
+- Stop-hunt buffering
+- Regime-exempted thresholds
+- Continuous re-evaluation at every PM cycle
+- Immediate-close on trail breach
+
+This is a multi-hour sub-project. Scope separately.
 
 ---
 
 ## 5. Implementation Plan
 
-### Phase 1: Extend `expiry_shadow.py` (2-3 hours)
+> **REVISED (own-conclusions validation):** The original 5-6 hour estimate is achievable only for a simplified v1. Corrected estimate: 6-8 hours for v1 (without RR engine). RR engine is a separate multi-hour sub-project.
+
+### Phase 1: Extend `expiry_shadow.py` (3-4 hours)
 
 **Goal:** Add exit engine simulation to existing shadow infrastructure.
 
 **Changes:**
 1. **Extend `record()` function:**
    - Record ALL signals (not just EXPIRED/SKIPPED)
-   - Capture full context JSON (regime, vol, RSI, MACD, ATR, etc.)
-   - Store gate information (which gate blocked it)
+   - Pull free context from `signals` table + `signal_metadata` (don't recompute)
+   - Store `context_computed_at` to measure drift
+   - Store `exit_config` from SIGNAL_EXIT_CONFIG routing
+   - Store `leverage_used` = min(signals.leverage, MAX_LEVERAGE=5)
 
 2. **Extend `close_events()` function:**
-   - Add exit engine simulation (6 engines)
+   - Add SIGNAL_EXIT_CONFIG routing (`_match_exit_config()`)
+   - Add exit engine simulation (7 engines, not 6):
+     - ATR SL/TP (continuous peak-trailing)
+     - PM Trail (tiered, with bypass check)
+     - Hard Max Loss (CUT_LOSER_PNL/leverage, unconditional)
+     - Cut Loser (two-tier)
+     - Speed Stale (loser 8min / winner 120min)
+     - Universal Max Hold (480min, ride_it 1440min)
+     - Trail Arm Timeout (bb-squeeze 60min, pump-chain 45min)
+   - Apply fees (0.04%) and slippage (0.10%) to PnL
    - Store results in `exit_*_json` columns
-   - Determine `best_exit_engine` (first to fire)
+   - Determine `first_exit_engine` (first to fire)
+   - Backfill `gate_name` from `decision_reason`
 
 3. **Add `report_v2()` function:**
    - Gate justification analysis
@@ -362,23 +703,24 @@ if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
 **Goal:** Capture full context at signal fire time.
 
 **Changes:**
-1. Import `volatility_gate_v2`, `rsi_utils`, `chop_detector`, etc.
-2. At record time, compute and store:
-   - Volatility regime (from ATR)
+1. Pull free context from `signals` table + `signal_metadata` (don't recompute):
+   - `z_score`, `z_score_tier`, `rsi_14`, `macd_value/signal/hist`, `momentum_state`, `leverage`, `price`
+   - `signal_metadata` JSON: `bb_position`, `speed_percentile`, `wave_phase`, `momentum_score`, `price_at_signal`, `btc_score`, `btc_regime`, `btc_linreg_bias`
+2. Compute additional context at record time (drift ≤30min):
+   - Volatility regime (from ATR on 1h candles)
    - Market bias (1m, 4h)
    - BTC context (regime, ATR, EMA300, linreg)
-   - RSI, MACD, z-score, momentum
-   - BB width, volume ratio
    - Chop score, tide state, market phase
+3. Store `context_computed_at` to measure drift
 
 ### Phase 3: A/B Testing Framework (1 hour)
 
 **Goal:** Compare exit engines on the same signals.
 
 **Changes:**
-1. For each signal, simulate ALL exit engines
+1. For each signal, simulate ALL applicable exit engines (based on SIGNAL_EXIT_CONFIG routing)
 2. Record which engine fired first
-3. Compare PnL across engines
+3. Compare PnL across engines (after fees + slippage)
 4. Aggregate by signal type, regime, direction
 
 ### Phase 4: Reporting & Analysis (1 hour)
@@ -390,6 +732,8 @@ if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
 2. **Exit Engine A/B:** "Trailing stop works best for pump-chain (70% WR), ATR works best for bb-bounce (65% WR)"
 3. **Signal Quality:** "bb-squeeze 70% WR in EXTREME, 30% in NORMAL → trade only in EXTREME"
 4. **Regime Analysis:** "LONG signals work in trend (65% WR), fail in chop (35% WR)"
+
+**Note:** This supersedes `gate_shadow.py` for gate justification analysis (see Section 10).
 
 ---
 
@@ -412,14 +756,20 @@ if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
 
 ### 6.4 Performance
 - Batch processing: record every 30min, close every 1h
-- Cache candles in memory (per token)
+- **Windowed candle reads** (not full-history caching): binary-search `[entry_ts, exit_ts]` window per signal. The 1m table is PK'd on `(token, ts)` so range reads are cheap.
 - Use indexes for common queries
 - Limit to 1000 signals per batch to avoid memory issues
+- **Memory note:** Full-history caching would OOM (~33M tuples for 150 tokens). Use windowed reads only.
 
 ### 6.5 Timezone Handling
 - All timestamps in UTC (ISO format)
 - Use `calendar.timegm()` for timestamp conversion
 - Store both signal time and record time
+
+### 6.6 Entry Price Convention
+- Entry = candle open at signal ts (assumes zero detection-to-execution latency)
+- Live trades enter minutes later (staleness gotcha)
+- **All shadow PnL will be optimistic vs live** — fine for relative A/B (same convention across engines), but do NOT read absolute shadow PnL as achievable
 
 ---
 
@@ -427,6 +777,7 @@ if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
 
 ### 7.1 Unit Tests
 - Test each exit engine simulation independently
+- **HML formula test:** `compute_hml_threshold(atr_pct=0.3, leverage=5) == -0.80` (NOT -0.15)
 - Test context capture with known values
 - Test edge cases (missing candles, insufficient data)
 
@@ -437,8 +788,9 @@ if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
 
 ### 7.3 Validation
 - Compare shadow PnL vs actual PnL for EXECUTED signals
-- Should match within 5% (accounting for slippage/fees)
-- If mismatch: investigate and fix
+- **Qualitative reconciliation** (n≈2/day too thin for statistical bar)
+- Live trades go through full cascade (cut_loser tiers, soft trigger, speed stale) which shadow doesn't simulate — mismatches are expected for structural reasons
+- Use validation to check for gross errors, not statistical accuracy
 
 ---
 
@@ -472,14 +824,33 @@ if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
 | Metric | Target | How to Measure |
 |--------|--------|----------------|
 | Shadow outcomes/day | ~1000 | `SELECT COUNT(*) FROM shadow_trades WHERE created_at > datetime('now', '-1 day')` |
-| Data completeness | >95% | `SELECT 100.0 * SUM(CASE WHEN best_exit_engine IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) FROM shadow_trades WHERE closed=1` |
+| Data completeness | >95% | `SELECT 100.0 * SUM(CASE WHEN first_exit_engine IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) FROM shadow_trades WHERE closed=1` |
 | Gate justification | Answered | Report shows "Gate X blocked N, M would have won" |
 | Exit engine A/B | Complete | Report shows engine rankings per signal type |
-| Validation accuracy | >95% | Shadow PnL matches actual PnL for EXECUTED signals |
+| Validation | Qualitative | Compare shadow PnL vs actual PnL for EXECUTED signals (n≈2/day, too thin for statistical bar — use qualitative reconciliation) |
+
+> **Note (own-conclusions validation):** The original 5%-match validation bar is unachievable at n≈2 EXECUTED/day. Live trades go through the full cascade (cut_loser tiers, soft trigger, speed stale, cascade flip) which the shadow doesn't simulate, so mismatches are guaranteed for structural reasons. Use qualitative reconciliation instead.
 
 ---
 
-## 10. Risks & Mitigations
+## 10. Reconciliation with Existing Shadow Systems
+
+> **IMPORTANT (own-conclusions validation):** 7 shadow systems already exist and accumulate data. This spec must explicitly state its relationship to them.
+
+| System | Status | Data | Relationship |
+|--------|--------|------|--------------|
+| `expiry_shadow.py` | Running (15,402 events) | Forward returns for EXPIRED/SKIPPED | **EXTEND** — this spec extends it with exit engine simulation |
+| `gate_shadow.py` | Running (24,470 events) | Per-gate shadow WR | **SUPERSEDES** for gate justification — this spec produces richer data |
+| `t5_shadow.py` | Running | WOULD_TRADE/WOULD_SKIP vs live WR | **COMPLEMENTARY** — different purpose |
+| `exit_optimizer_shadow.py` | Running | MFE/MAE replay | **SUPERSEDES** — this spec can know path order, exit_optimizer cannot |
+| `mom_filter_shadow.py` | Running | Momentum filter counterfactual | **COMPLEMENTARY** — different purpose |
+| `signal_outcomes` table | Exists | Signal outcome tracking | **EXTEND** — this spec adds exit engine simulation |
+
+**Decision:** This spec EXTENDS `expiry_shadow.py` and SUPERSEDES `gate_shadow.py` + `exit_optimizer_shadow.py` for gate justification and exit engine analysis. The other shadow systems remain complementary.
+
+---
+
+## 11. Risks & Mitigations
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
@@ -534,11 +905,17 @@ if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
 |-----------|--------|----------|
 | `expiry_shadow.py` | Exists, to be extended | `scripts/expiry_shadow.py` |
 | `t5_shadow.py` | Exists | `scripts/t5_shadow.py` |
-| `gate_shadow.py` | Exists | `scripts/gate_shadow.py` |
+| `gate_shadow.py` | Exists (24,470 events) | `scripts/gate_shadow.py` |
+| `exit_optimizer_shadow.py` | Exists | `scripts/exit_optimizer_shadow.py` |
+| `mom_filter_shadow.py` | Exists | `scripts/mom_filter_shadow.py` |
 | Cell stats | Exists (697 cells) | `brain/cell_stats.db` |
 | `volatility_gate_v2.py` | Exists | `scripts/volatility_gate_v2.py` |
 | `rsi_utils.py` | Exists | `scripts/rsi_utils.py` |
 | `chop_detector.py` | Exists | `scripts/chop_detector.py` |
+| `tpsl_utils.py` | Exists | `scripts/tpsl_utils.py` |
+| `profit_monster.py` | Exists | `scripts/profit_monster.py` |
+| `cut_loser.py` | Exists | `scripts/cut_loser.py` |
+| `risk_reward_engine.py` | Exists (v2 scope) | `scripts/risk_reward_engine.py` |
 
 ## Appendix B: Exit Engine Constants
 
@@ -547,21 +924,64 @@ if rr_ratio < RR_ENGINE_CONF_HARD_BLOCK_RR:
 | `CUT_LOSER_PNL` | -4.00% | `hermes_constants.py:717` |
 | `HML_VOL_ATR_MULT` | 0.5 | `hermes_constants.py:718` |
 | `PM_TRAIL_ACTIVATE_PCT` | 0.004 (0.40%) | `hermes_constants.py:1659` |
-| `PM_TRAIL_DISTANCE_PCT` | 0.002 (0.20%) | `hermes_constants.py:1660` |
+| `PM_TRAIL_TIERS` | 0.20/0.50/0.80/1.20% | `hermes_constants.py:1732-1737` |
+| `PM_TRAIL_MIN_HOLD` | 2 | `hermes_constants.py:1738` |
 | `TRAILING_ACTIVATION_PCT` | 0.0040 (0.40%) | `hermes_constants.py:727` |
-| `ATR_PERIOD` | 14 | `volatility_gate_v2.py` |
+| `TRAILING_DISTANCE_PCT` | 1.20% | `hermes_constants.py:728` |
+| `ATR_SL_MIN_INIT` | 1.5% | `tpsl_utils.py` |
+| `ATR_SL_MIN_ACCEL` | 0.30% | `tpsl_utils.py` |
+| `ATR_PERIOD` | 14 (on 1h candles) | `volatility_gate_v2.py:520` |
+| `STALE_LOSER_TIMEOUT_MINUTES` | 8 | `position_manager.py:612` |
+| `STALE_WINNER_TIMEOUT_MINUTES` | 120 | `position_manager.py:626` |
+| `UNIVERSAL_MAX_HOLD_MINUTES` | 480 | `hermes_constants.py:1132` |
+| `RIDE_IT_MAX_HOLD_MINUTES` | 1440 | `position_manager.py:3448` |
+| `MAX_LEVERAGE` | 5 | `position_manager.py:157` |
 
 ## Appendix C: Gate Names (for `gate_name` column)
 
-| Gate | Description |
-|------|-------------|
-| `CONFLUENCE-GATE-BLOCK` | Single-source not in STANDALONE_BYPASS |
-| `SHORT-RSI-HARD-FLOOR` | SHORT RSI < 35 |
-| `PUMP-CHAIN-SHORT-HIGH` | pump-chain- SHORT in HIGH vol |
-| `VOL-GATE-BYPASS` | Vol gate override=0.0 |
-| `CONTINUUM-BLOCK` | BTC bearish structure blocks LONG |
-| `SHORT-REGIME-GATE` | SHORT in NORMAL/HIGH, conf < 75 |
-| `LONG-NEUTRAL-CHOP` | LONG in NEUTRAL, BTC flat |
-| `RR-ENGINE` | R:R < 0.55 hard block |
-| `LONG-RSI-CEILING` | LONG RSI > 75 |
-| `PUMP-CHAIN-RSI-MAX` | pump-chain+ LONG RSI >= 70 |
+> **Note (own-conclusions validation):** CONFLUENCE-EXPIRY is the single largest filter (974/986 blocks in 24h = 98.9%). It must be included.
+
+| Gate | Description | Est. Frequency |
+|------|-------------|----------------|
+| `CONFLUENCE-EXPIRY` | Single-source expired waiting for co-signal | ~98.9% of blocks |
+| `CONFLUENCE-GATE-BLOCK` | Single-source not in STANDALONE_BYPASS | <1% |
+| `SHORT-RSI-HARD-FLOOR` | SHORT RSI < 35 | ~50/day |
+| `PUMP-CHAIN-SHORT-HIGH` | pump-chain- SHORT in HIGH vol | ~50/day |
+| `VOL-GATE-BYPASS` | Vol gate override=0.0 | ~50/day |
+| `CONTINUUM-BLOCK` | BTC bearish structure blocks LONG | ~50/day |
+| `SHORT-REGIME-GATE` | SHORT in NORMAL/HIGH, conf < 75 | ~50/day |
+| `LONG-NEUTRAL-CHOP` | LONG in NEUTRAL, BTC flat | ~50/day |
+| `RR-ENGINE` | R:R < 0.55 hard block | ~50/day |
+| `LONG-RSI-CEILING` | LONG RSI > 75 | ~10/day |
+| `PUMP-CHAIN-RSI-MAX` | pump-chain+ LONG RSI >= 70 | ~10/day |
+
+### Gate Name Backfill Mechanism
+
+The `gate_name` column is populated via a backfill pass:
+
+1. **Record at fire:** Set `decision='PENDING'`, `gate_name=NULL`
+2. **Backfill within 2h purge window:** UPDATE `decision`, `decision_reason`, `gate_name` from runtime DB
+3. **Parse free-text reasons:** Extract structured gate names from `[CTX-GATE]`-style strings
+
+```python
+def backfill_gate_name(decision_reason):
+    """Parse decision_reason into structured gate name."""
+    if not decision_reason:
+        return None
+    
+    # Pattern: [GATE-NAME] message
+    import re
+    match = re.match(r'\[([A-Z-]+)\]', decision_reason)
+    if match:
+        return match.group(1)
+    
+    # Known patterns without brackets
+    if 'compaction_stale' in decision_reason:
+        return 'CONFLUENCE-EXPIRY'
+    if 'RSI hard floor' in decision_reason:
+        return 'SHORT-RSI-HARD-FLOOR'
+    if 'trade failed at execution' in decision_reason:
+        return 'EXEC-TIME-GATE'
+    
+    return 'UNKNOWN'
+```
