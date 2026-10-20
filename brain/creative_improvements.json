@@ -5913,5 +5913,24 @@
     "category": "entry sniper / regime",
     "status": "rejected_reframed_to_ranging_monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-20T14:46:30Z",
+    "idea": "Post-flip counter-regime cooldown (SHADOW-CANDIDATE, NOT shipped): within 6h of dual-TF same-bias flip, apply 0.5x confidence dampen to trades counter to the new bias",
+    "rationale": "Today's natural experiment: 11:45 flip → aligned LONGs +$0.57, misaligned SHORTs −$0.20 (FOGO/COMP). Both shorts were conf 24.5 floor-admits fighting the fresh flip. Complements REGIME_CONF_MULTIPLIER (static score) with flip-event-scoped dampen.",
+    "expected_impact": "Blocks ~30-50% of counter-flip conf<30 admits; near-zero winner-kill (flip-aligned winners unaffected)",
+    "category": "entry sniper / wrong-side prevention",
+    "status": "pre-registered — needs coin_regime 14d cohort (currently 9T) before shadow ship",
+    "risk": "low (dampen not block; flip detection already exists)",
+    "verification": "n=5 closed post-flip — BELOW BAR. Will NOT ship until n>=20 via coin_regime backfill."
+  },
+  {
+    "date": "2026-10-20T14:46:30Z",
+    "idea": "Regime-flip alignment study EXECUTED (pre-reg #37)",
+    "rationale": "Natural experiment: dual-TF flip 11:45. Aligned LONG 3T +$0.57 vs misaligned SHORT 2T −$0.20. Early directional validation.",
+    "expected_impact": "Feeds flip-event dampen decision",
+    "category": "analysis",
+    "status": "executed-partial (n=5, building via coin_regime)",
+    "risk": "none (offline)"
   }
 ]
