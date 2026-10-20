@@ -1344,3 +1344,7 @@
 ## Error Alerts — 2026-10-20 04:26 UTC
 - **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-20 05:43 UTC
+- **[WARN]** (8x): `atr_sl_hit` phantom trades (<0.01% PnL) in last 24h — no auto-fix (needs signal quality review)
+- **[WARN]**: Today 20% WR (6 closed, -0.42 USDT) — no auto-fix (performance, not system health)

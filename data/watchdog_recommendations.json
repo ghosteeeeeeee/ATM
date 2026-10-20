@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-10-20T05:13:32.968802+00:00",
+  "timestamp": "2026-10-20T07:13:35.212505+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.77 USDT. Something is wrong.",
+      "title": "Losing streak: 13/20 recent trades lost",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.82 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
@@ -20,10 +20,18 @@
     {
       "severity": "warning",
       "category": "health",
+      "title": "Signal 'ai-trader-pending' losing streak: 3 losses",
+      "detail": "Net -0.03 USDT over last 20 trades (losses: -0.10). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
       "title": "Signal 'pump-chain+' losing streak: 3 losses",
       "detail": "Net -0.43 USDT over last 20 trades (losses: -0.43). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-004"
     },
     {
       "severity": "warning",
@@ -31,27 +39,27 @@
       "title": "Signal 'ai-trader+' losing streak: 3 losses",
       "detail": "Net -0.17 USDT over last 20 trades (losses: -0.25). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-005"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "AT",
-    "volatility": "LOW",
+    "volatility": "NORMAL",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "LOW",
+    "volume_regime": "NORMAL",
     "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 1,
-  "deep_analysis": "Open trade + regime data ingested. Now running verified PostgreSQL pattern queries (meta_rsi only) and brain search in parallel.\nVerified patterns in hand. Writing merged analysis into the recommendations file.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n2026-10-20 05:19 UTC\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (1 long, 0 short)\nUnrealized PnL: +0.01 USDT\nRegime: SHORT_BIAS (15m + 4h + 5m aggregate) | Volatility: LOW\n        BTC AT EMA300 81940 after 900min above | trend_quality STRONG_DOWN\n\n\u2500\u2500 Steers (automated engine) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent]  Losing streak: 12/20 recent trades lost (WR 40%, -0.77)\n\ud83d\udfe1 [warning] 6 recent losses look like wrong-side trades\n\ud83d\udfe1 [warning] pump-chain+ losing streak: 3 losses\n\ud83d\udfe1 [warning] ai-trader+ losing streak: 3 losses\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nREGIME FLIPPED AGAINST US ~15 min ago: 14 long-bias /\n34 short-bias / 74 neutral (was 76 long-bias at 04:48).\nBTC lost EMA300 after holding it 900+ minutes \u2014 support\ntest in progress, state_score 32.6 (was ~90).\n\nBTC LONG #16293 (+0.06%, 2h): regime-misaligned. Opened\nwhen tape was friendlier; now SHORT_BIAS both timeframes.\n24h verified: LONGs WR 21.4% net -0.97 | SHORTs WR 50%\nnet +0.03. The winning side has been SHORT BTC or flat.\nWould NOT open this fresh. SL 81741 sits inside LOW-vol\nnoise (atr_sl_hit signature, 7d WR 1.7%).\n\nPattern (PG verified): RSI is NOT the discriminator \u2014\nloss avg meta_rsi 57.6 vs win 61.2. Entry CONTEXT is the\nfailure. BLUR/ARB/LDO LONGs all lost on coins now in\nSHORT_BIAS. ARB = 3 losses in 48h, signal re-fires each\ncycle. Trail family still THE winner (97% WR, n=34).\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. BTC LONG #16293: exit now at ~breakeven OR treat\n   81741 as hard invalidation \u2014 below EMA300 81940 the\n   winning side is SHORT. Do not add to it.\n2. No new LONG exposure until 15m flips back or BTC\n   reclaims EMA300 with volume.\n3. CEO call: gate ARB LONGs while its 5m regime is\n   SHORT_BIAS (coin-direction gate, not signal disable).\n4. AI trader pick skipped \u2014 LTC LONG (04:47) still\n   inside 45-min window; regime flipped after that pick,\n   re-evaluate next cycle.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged to `watchdog_recommendations.json`. No repo files changed (data dir is gitignored) \u2014 no commit needed. Next cycle: watch whether BTC breaks EMA300 81940; that decides the open trade.\n",
-  "agent_timestamp": "2026-10-20T05:20:06.466475+00:00",
-  "regime_context": "BTC 1m continuum: price 82034 AT EMA300 81940 (+0.12%), zscore -0.07 neutral, velocity SLOW, acceleration POSITIVE, linreg LEAN_BULL, but trend_quality STRONG_DOWN, state_score 32.6 (was ~90 one hour ago), market_phase CALM, volume LOW (ratio 0.46). Continuum spent 900+ consecutive minutes ABOVE EMA300 and has just flipped to AT \u2014 support test in progress. 5m aggregate scan: SHORT_BIAS (14 long / 34 short / 74 neutral). 15m scanner: SHORT_BIAS. 4h scanner: SHORT_BIAS. Volatility LOW. Implication: the higher-timeframe tape has turned down while the 1m still leans bull \u2014 this is the transition chop where both directions get wicked. Longs are no longer the default right side; shorts on high-confidence 5m downtrend coins (PNUT, SAND, BLUR, STX, XAI, SOPH) or flat are. The open BTC LONG is swimming upstream: SL 81741 is hard invalidation, EMA300 81940 is the line in the sand.",
-  "pattern_alerts": "VERIFIED (PostgreSQL, meta_rsi only):\n1. WRONG-SIDE LONGS ON DOWNTREND COINS. 24h LONG losses: BLUR -0.31 (hard_max_loss, meta_rsi 57.1) \u2014 BLUR is now SHORT_BIAS conf 89.6 slope -0.103; ARB 3 losses in 48h net -0.22 (meta_rsi 51-59) \u2014 ARB now SHORT_BIAS, pump-chain+ keeps re-firing; LDO -0.10 \u2014 now SHORT_BIAS; ME -0.26 (stale_exit). WINNING SIDE: SHORT those coins or no trade. WHY we took them: pump-chain+/ai-trader+ fire on mid-band RSI (46-59) without checking the coin's own 5m regime.\n2. RSI IS NOT THE DISCRIMINATOR. 24h loss avg meta_rsi 57.6 (n=12) vs win avg 61.2 (n=4) \u2014 mid-band on both sides. Entry CONTEXT (coin regime + BTC regime) is the failure, not RSI level. Two true wrong-side RSI plays: GOAT SHORT @ 73.6 and LTC LONG @ 73.5, both atr_sl_hit.\n3. CHOP VS TREND SPLIT HOLDS. 7d: hard_max_loss n=43 WR 0% (top offenders pump-chain+ n=7 -0.79, bb-bounce-v2-long+ n=6 -0.43, pump-chain- n=5 -0.36); profit-monster-trail n=34 WR 97% +0.051 avg; atr_trail_hit n=21 WR 81%. Trail family remains THE winning side. Every fresh entry needs trail-arming room (must reach +0.40% before the noise stop).\n4. ARB REPEAT OFFENDER. 3 LONG losses in 48h (#16286, #16288, #16294), signals re-fire every cycle. RECOMMENDATION to CEO: gate ARB LONGs off while its 5m regime is SHORT_BIAS (coin-direction gate, not a blanket signal disable \u2014 that's banned at this layer).\n5. 24h DIRECTIONAL SPLIT. LONG n=14 net -0.97 WR 21.4% | SHORT n=2 net +0.03 WR 50%. The market gave us the answer: shorts (or flat) were the winning side over the last day."
+  "open_count": 0,
+  "deep_analysis": "Portfolio is flat (0 open) in a STRONG_DOWN regime \u2014 correct posture, nothing to steer on exits. The damage is already booked: last 24h closed 17 trades at 24% WR (-0.96 USDT). Directional split is the whole story: 15 LONGs at 20% WR (-0.99) vs 2 SHORTs at 50% WR (+0.03). Every long family \u2014 pump-chain+ (BLUR -4.2%, ARB -3.4%/-4.6% hard_max_loss), bb-bounce-v2-long+ (ME -3.5% stale_exit), ai-trader+ (ARB/LDO/DOGE) \u2014 fired LONG while btc_15m AND btc_4h printed SHORT_BIAS and 74/123 coins trended SHORT. The winning side on every one of those trades was the SHORT we never took; BLUR is now a conf-95 SHORT_BIAS coin, the exact dump we ate long.\n\nBTC just re-broke BELOW EMA300 (34 min consecutive, prior 995-min ABOVE run ended) at zscore -2.30 STRONG_NEG, linreg LEAN_BEAR, all four linreg timeframes negative. This is not chop-pin anymore \u2014 it's a fresh breakdown. LONG entries are wrong-side until BTC reclaims EMA300 with bull linreg.\n\nPending short queue is the new trap: CC (RSI 8.2), XPL (23.9), HBAR (27.0), ZEN (27.9), COMP (30.8) \u2014 five oversold shorts waiting. Shorting RSI<35 is the BANANA pattern: the bounce is the winning side and we'd be shorting into it. Only mid-band shorts in the queue: INJ (RSI 48.1, volume-buildup-) and KLUNC (RSI 58.2, pump-chain-). INJ matches the one verified-winning template.\n\nVerified 7d families: volume-buildup- SHORT 78% WR +0.35 (avg meta_rsi 52.7, mid-band buildup) is the only positive short family. pump-chain- SHORT 22% WR -0.55 (avg meta_rsi 43.9, dump aftermath) is broken. Exit mechanics are NOT the problem: all 4 winners reached trail/TP, all 12 losers died at SL pre-trail \u2014 entry direction is the failure point.\n\nAI trader pick skipped this cycle: AI_TRADER_ENABLED=False since CEO verdict 2026-10-19 (automated 30% WR vs manual 45%). Additionally, the previous SAND SHORT pick (05:49) never reached the pipeline \u2014 it was written to /var/www/hermes/data/ai_trader_state.json while ai_trader_signal.py reads HERMES_DATA (/root/.hermes/data/). Path mismatch + disabled flag = two reasons nothing fired. Flag for brain auditor when AI_TRADER is re-enabled.",
+  "agent_timestamp": "2026-10-20T06:21:03.147948+00:00",
+  "regime_context": "BTC: fresh BELOW-EMA300 breakdown (34 min and counting; prior ABOVE run 995 min). Price 81632 vs EMA300 81867. zscore -2.30 STRONG_NEG, velocity SLOW, linreg LEAN_BEAR with 1m/5m/15m/1h slopes all negative, linreg_alignment 0.75, trend_quality STRONG_DOWN, wyckoff ACCUMULATION, market_phase RECOVERY. Both scanners SHORT_BIAS (15m + 4h). 5m aggregate: 74 SHORT_BIAS / 41 neutral / 8 LONG_BIAS across 123 coins. Strongest SHORT_BIAS by confidence: OP 95.0 (slope -0.21, -3.0%/16c), CC 95.0, HYPE 94.0, PNUT 93.9, UNI 92.8, ETH 92.7, CRV 92.6, LTC 91.9. Long outliers only: SAGA 80.7, TIA 79.3 \u2014 low-conviction counter-trend. Implication: SHORT-only book; prefer mid-band RSI 45-58 on highest-confidence shorts with ATR>0.5%; LONG blocked until EMA300 reclaim. Volatility NORMAL on BTC but alt ATR elevated: ALT 1.37%, TIA 0.95%, IO/SOPH 0.80%, CHIP 0.76%.",
+  "pattern_alerts": "VERIFIED patterns from PostgreSQL (queried this session):\n\n1. WRONG-SIDE LONGS, DUAL SHORT_BIAS REGIME (24h): n=15 LONG, 3 wins (20% WR), -0.99 USDT; n=2 SHORT, 50% WR +0.03. Losers: pump-chain+ BLUR -0.31 (hard_max_loss, meta_rsi 57.1) / ARB -0.08 (hard_max_loss, 57.9) / ARB -0.04; bb-bounce-v2-long+ ME -0.26 (stale_exit) / LTC -0.04; ai-trader+ ARB -0.10 (hard_max_loss) / LDO -0.10 / DOGE -0.05; warrior-sr-confirm+ LTC -0.03 (meta_rsi 73.5 overbought long). WINNING SIDE: SHORT \u2014 BLUR now scans SHORT_BIAS conf 95 slope -0.157; the -4.2% we ate was the short's profit. We weren't on it because pump-chain+ fires on pump bursts blind to dual-timeframe SHORT_BIAS.\n\n2. VOLUME-BUILDUP- SHORT = THE EDGE; PUMP-CHAIN- SHORT = BROKEN (7d): volume-buildup- n=9, 78% WR, +0.35, avg meta_rsi 52.7. pump-chain- n=32, 22% WR, -0.55, avg meta_rsi 43.9. WINNING SIDE: short the mid-band buildup before continuation, not the dump aftermath at RSI<45. Why absent: pump-chain- dominates short volume 32:9; volume-buildup- rarely fires and gets crowded out.\n\n3. OVERSOLD-SHORT TRAP IN LIVE QUEUE (right now): 5 of 7 pending shorts have meta RSI < 31 \u2014 CC 8.2, XPL 23.9, HBAR 27.0, ZEN 27.9, COMP 30.8. BANANA SHORT lesson: shorting oversold = wrong side when the bounce comes. Only INJ (48.1) and KLUNC (58.2) sit in the valid mid-band. WINNING SIDE on oversold shorts = LONG the bounce; we weren't on it because ichimoku-/rs-r63/pump-chain- fire on oversold conditions without a short RSI floor tight enough.\n\n4. EXIT MECHANICS SOUND, ENTRIES ARE THE CANCER (24h): losers = 8 atr_sl_hit + 3 hard_max_loss + 1 stale_exit (all pre-trail); winners = 3 profit-monster-trail + 1 atr_tp_hit (all reached management). Zero losers reached trail; zero winners failed to. The trail family works when the entry is on the right side. Fix direction selection, not exits.\n\n5. AI-TRADER FAMILY NEGATIVE EXPECTANCY, NOW DISABLED (7d): ai-trader+ LONG n=18, 33% WR, -0.73; ai-trader- SHORT n=2, 0% WR, -0.12. CEO disabled 2026-10-19 (30% WR vs manual 45%). Note: ai-trader-pending BTC SHORT +0.07 was the only pending-side winner \u2014 BTC shorts align with regime; BTC longs (-0.02/-0.04/-0.04) do not."
 }

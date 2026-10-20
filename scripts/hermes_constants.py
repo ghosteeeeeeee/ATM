@@ -278,7 +278,8 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
-    'ETH'
+    'ETH',
+    'ICP'
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
@@ -307,14 +308,12 @@ LOSERS_SHORT = {
 }
 # Legacy combined set
 LOSERS = {
-    'ALT',
-    'APT',
+    'ARB',
     'CHIP',
-    'DOT',
     'ETC',
-    'FIL',
-    'HYPE'
+    'LDO'
 }
+
 
 
 
