@@ -111,3 +111,6 @@
 
 ## TEAM UPDATES
 - [2026-10-19 11:28] auto_1hr: No config change — 1T last hour (ME bb-bounce-v2-long+ stale_exit −$0.26 −3.54%, single occurrence not a pattern). 24h 18T 9W −$0.35 (50.0%), 7d 200T 68W −$4.05 (34.0%). Size-reduce 0.3x stays. atr_sl_hit 33% (healthy). Kill watch: ai-trader-pending 24h 2T 0W still under 3T threshold. 3-neg-hour streak (08/09/10) — size-reduce already active. 0 open.
+
+## TEAM UPDATES
+- [2026-10-20 18:35 UTC] auto_1hr: No config change — 0 trades closed last hour (quiet). 24h 20T 4W −$0.26 (20.0%), 7d 162T 58W −$2.47 (35.8%). Size-reduce 0.3x stays (7d PnL still <$2 recovery threshold). atr_sl_hit 35.7% signal-only (healthy, tpsl deployed). Kill watch: pump-chain+ 2T 0W and pump-chain-/v6- 6T 1W, both under kill threshold. 1 open (BTC continuum-osc+ +0.14%), no 3-neg-hour streak.
