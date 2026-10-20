@@ -41,6 +41,11 @@ from hermes_constants import (
 )
 
 STATE_FILE = os.path.join(HERMES_DATA, 'ai_trader_state.json')
+# ponytail: watchdog agents sometimes write here instead (2026-10-20 SAND pick
+# landed in www while signal read HERMES_DATA — pick starved in limbo).
+# Dual-path load; collapse to single path once agent prompts are fixed.
+STATE_FILE_ALT = '/var/www/hermes/data/ai_trader_state.json'
+_active_state_path = STATE_FILE
 SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
 
 SIGNAL_TYPE = 'ai-trader'
@@ -57,37 +62,50 @@ def _log(msg):
         pass
 
 
-def _load_state():
-    """Load AI trader state. Returns dict or None if stale/missing."""
-    if not os.path.exists(STATE_FILE):
+def _read_state_file(path):
+    """Read one state file. Returns dict or None."""
+    if not os.path.exists(path):
         return None
-
     try:
-        with open(STATE_FILE) as f:
+        with open(path) as f:
             state = json.load(f)
     except (json.JSONDecodeError, OSError):
         return None
-
-    if not state or not isinstance(state, dict):
+    if not state or not isinstance(state, dict) or not state.get('timestamp'):
         return None
+    return state
 
-    # Check freshness — state older than TTL is stale
-    ts = state.get('timestamp')
-    if not ts:
+
+def _load_state():
+    """Load freshest AI trader state. Checks HERMES_DATA and www fallback path.
+
+    Returns dict or None if stale/missing. Sets _active_state_path so
+    reject/fired_at writes land on the file that was actually read.
+    """
+    global _active_state_path
+    best = None
+    for path in (STATE_FILE, STATE_FILE_ALT):
+        state = _read_state_file(path)
+        if state and (best is None or str(state.get('timestamp', '')) > str(best.get('timestamp', ''))):
+            best = state
+            _active_state_path = path
+    state = best
+    if not state:
         return None
 
     # Skip rejected picks — watchdog should pick a different coin
     if state.get('rejected_at'):
         return None
 
+    # Check freshness — state older than TTL is stale
     try:
-        ts_dt = datetime.fromisoformat(ts.replace('Z', '+00:00'))
+        ts_dt = datetime.fromisoformat(state['timestamp'].replace('Z', '+00:00'))
         if ts_dt.tzinfo is None:
             ts_dt = ts_dt.replace(tzinfo=timezone.utc)
         age_min = (datetime.now(timezone.utc) - ts_dt).total_seconds() / 60
         if age_min > AI_TRADER_STATE_TTL_MINUTES:
             return None
-    except (ValueError, AttributeError):
+    except (ValueError, AttributeError, KeyError):
         return None
 
     return state
@@ -98,10 +116,10 @@ def _mark_rejected(state, reason):
     state['rejected_at'] = datetime.now(timezone.utc).isoformat()
     state['reject_reason'] = reason
     try:
-        tmp_path = STATE_FILE + '.tmp'
+        tmp_path = _active_state_path + '.tmp'
         with open(tmp_path, 'w') as f:
             json.dump(state, f, indent=2)
-        os.replace(tmp_path, STATE_FILE)
+        os.replace(tmp_path, _active_state_path)
     except Exception:
         pass
 
@@ -233,10 +251,10 @@ def run():
         state['fired_at'] = datetime.now(timezone.utc).isoformat()
         state['fired_signal_id'] = sid
         try:
-            tmp_path = STATE_FILE + '.tmp'
+            tmp_path = _active_state_path + '.tmp'
             with open(tmp_path, 'w') as f:
                 json.dump(state, f, indent=2)
-            os.replace(tmp_path, STATE_FILE)
+            os.replace(tmp_path, _active_state_path)
         except Exception:
             pass
         return sid

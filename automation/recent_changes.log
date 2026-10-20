@@ -4931,3 +4931,4 @@ BY: brain_auditor
 BY: auto_1hr
 - [2026-10-20 06:30] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-pending LONG manual_close -$0.02 -0.96%) | 24h 17T 4W -$0.96 (23.5%) | 7d 194T 66W -$3.66 (34.0%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ / ai-trader+ still 0W/3T 24h monitor line) | atr_sl_hit 47% closed as non-issue per 05:00 verdict | no neg-hour streak | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-20 06:42 UTC] brain_auditor: BUGFIX ai_trader_signal.py dual-path state load (HERMES_DATA + www fallback, freshest wins) — SAND pick limbo prevention; zero live behavior (AI_TRADER disabled); watchdog prompt PATH WARNING; py_compile+functional PASS

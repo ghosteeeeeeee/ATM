@@ -1705,5 +1705,16 @@
     "after": "_exec_meta[coin_regime] + _exec_meta[coin_regime_conf] from _hotset_regime (line 5000-5006)",
     "rationale": "Watchdog thesis: coin regime at entry is the discriminator — make it SQL-queryable. Same stamp pattern as gap_at_entry/staleness/final_confidence.",
     "impact": "Enables coin-regime counterfactual once 20+ stamped trades. Zero live behavior."
+  },
+  {
+    "timestamp": "2026-10-20T06:41:25Z",
+    "agent": "brain_auditor",
+    "change": "ai_trader_signal.py dual-path state load — reads freshest of HERMES_DATA and /var/www/hermes/data/ai_trader_state.json; reject/fired_at writes follow the read path",
+    "type": "bugfix",
+    "file": "scripts/signals/ai_trader_signal.py",
+    "before": "STATE_FILE only (HERMES_DATA); watchdog picks written to www path starve in limbo (SAND SHORT 2026-10-20 05:49)",
+    "after": "Dual-path _load_state picks newest timestamp; _active_state_path threads reject/fired writes; watchdog prompt hardened with PATH WARNING",
+    "rationale": "SAND SHORT pick (correct side, dual SHORT_BIAS, conf 72) written to www never reached signal — zero live impact while AI_TRADER_ENABLED=False, but would silently break re-enable",
+    "impact": "Zero live behavior (AI_TRADER disabled CEO 2026-10-19). Prevents pick-limbo on re-enable. py_compile PASS; functional test PASS (fresh www pick loads, mark_rejected writes back to www)."
   }
 ]

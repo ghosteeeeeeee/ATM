@@ -292,6 +292,8 @@ with open("/root/.hermes/data/ai_trader_state.json", "w") as f:
 print(f"AI Trader pick: {signal['coin']} {signal['direction']} conf={signal['confidence']}")
 ```
 
+**⚠️ PATH WARNING:** The path MUST be `/root/.hermes/data/ai_trader_state.json` — NOT `/var/www/hermes/data/`. The signal (`ai_trader_signal.py`) reads `HERMES_DATA` (= `/root/.hermes/data/`). A 2026-10-20 SAND SHORT pick written to the www path starved in limbo (AI_TRADER re-enabled would never have fired it). The signal now dual-loads both paths as a safety net — still write to the HERMES_DATA path.
+
 **If no slot is open or nothing looks good:** Don't force it. Write nothing — the system will pick up the next hourly cycle.
 
 ## Step 7: Print Summary

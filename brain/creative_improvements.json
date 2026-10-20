@@ -5838,5 +5838,14 @@
     "category": "exit sniper",
     "status": "pre-registered (vacation blocks ship; needs 7d shadow + CEO GO)",
     "risk": "low (shadow first; log would-rake vs actual reclaim rate for whipsaw check)"
+  },
+  {
+    "date": "2026-10-20T06:41:25Z",
+    "idea": "volume-buildup- SHORT hotset-priority shadow (pre-registered, vacation-deferred)",
+    "rationale": "Only verified positive short family 7d (9T 78%WR +$0.35, avg meta_rsi 52.7 mid-band); crowded out by pump-chain- 32:9 short volume; winning template = short mid-band buildup before continuation, not dump aftermath",
+    "expected_impact": "Capture edge currently unexpressed; +1-2 trades/wk at current rate",
+    "category": "allocation",
+    "status": "pre_registered",
+    "risk": "low"
   }
 ]
