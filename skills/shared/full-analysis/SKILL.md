@@ -438,6 +438,56 @@ over market entries, (b) require the confirmation close WITH volume ≥ 1.2x
 for momentum adds, (c) halve size. The #16283 add (0.5x volume at entry) and
 the #16273 short (0.0-0.4x) both died of the same missing ingredient.
 
+### 11. BTC chop zigzag — the liquidity-sweep pattern (CEO's thesis, tape-proven)
+
+**BTC's chop signature: it sweeps BOTH sides of the range to collect all the
+liquidity — zapping the longs, then the shorts (or reverse) — before the real
+move.** CEO stated it directly: "btc loves zigzagging like that and getting
+all the liquidity, zapping the longs and then the shorts." The 2026-10-19/20
+six-trade sequence is the proof case:
+
+- Range 81,334-82,270. Support swept TWICE (81,735→81,334; 81,550→81,357),
+  resistance rejected 3x. Every conditional trigger sat at an OBVIOUS level —
+  which means it sat ON a liquidity pool.
+- Then the real impulse: +2,105 pts (81,334→83,439) after both sides were
+  cleared. Then the reverse zap: -1,146 pts back through every breakout
+  long's stop. Result: 4 chop trades = 1 win/3 losses, and both tranches of
+  the "confirmed" breakout died (#16306 -1.08%, #16307 40x at -21.4% margin
+  on a mere -0.53% price move).
+
+**The rules this earns:**
+
+1. **Obvious levels are liquidity, not structure.** Support/resistance where
+   everyone's stops cluster gets SWEPT before the real move. A conditional
+   trigger at an obvious level is a resting order waiting to be harvested.
+2. **Expect ONE full sweep through each side before committing.** First
+   touch/break of a level in chop = probable sweep. After a level has swept
+   twice, the third resolution is real — or stand down until a RECLAIM
+   (price back through the level and holding), never a touch/break entry.
+3. **Break fills pay the sweep tax.** Breakout/level-break entries fill
+   AFTER the level (slippage into the sweep): adverse fills of 200-300 pts
+   were routine (#16273: -208 pts stop slip; #16306: -301 pts entry slip).
+   The one winner (#16292) worked by riding INTO a flush, not by sitting
+   on a level.
+4. **The zap sequence predicts the next leg.** After the range's LONG side
+   is zapped (stops below support fired), the next liquidity grab is
+   typically UP (shorts' stops above the range) — and vice versa. Read
+   which side just paid, and lean toward the OTHER side's zap next.
+5. **Post-impulse flushes are liquidity, not reversals** (unless higher TFs
+   break): after a real impulse, the deep flush (often 50-70%) grabs the
+   breakout crowd's stops while 1h/4h stay intact. The re-entry is the
+   flush INTO structure with a reclaim confirmation — never the impulse
+   chase (worst fills) and never the mid-flush knife.
+6. **Chop leverage ceiling: 5-10x. NEVER max leverage in chop.** #16307's
+   40x turned a -0.53% flush into -21.4% margin — and stops slipped past
+   the SL on top of it. High leverage converts ordinary sweeps into
+   account-level damage. Save 40x for TREND regime with volume.
+7. **Same-coin tranches MERGE on HL.** Two DB rows on one coin = one HL
+   position at the average entry; whichever DB row's level hits first
+   closes the ENTIRE position, and per-tranche attribution corrupts (both
+   rows sync to the merged entry). Multi-tranche = plan for "tightest
+   level governs everything" (align TPs, expect first-hit-closes-all).
+
 ## Analysis Script
 
 Run this to get the complete picture:
@@ -572,3 +622,7 @@ python3 /root/.hermes/scripts/ai_trader_precheck.py COIN DIRECTION
 Created 2026-10-16 combining all analysis skills. Decision Protocol added
 2026-10-19 after the 9-trade manual BTC session (chop failures #16250/#16273,
 confirmation lesson #16283, divergence taxonomy from the 1m/5m/1h reads).
+§11 BTC chop zigzag added 2026-10-20 after the 6-trade sweep sequence
+(#16291-#16307: both range sides swept, +2,105-pt impulse, -1,146-pt reverse
+zap took the 40x tranche at -21.4% margin). CEO thesis: BTC collects all
+liquidity — zap the longs, then the shorts — before the real move.

@@ -239,3 +239,9 @@
 ### Numbers: 24h 11T -0.36 18.2% | 7d 177T -4.00 33.3%
 ### Findings: New errors (rotating Q6): hermes-coding-mcp crash-loop 14,588 restarts auto-disabled (missing script); disk 84% (pipeline.log 192M); atr_sl_hit phantom warns; no pipeline-affecting errors. DB 7d WR 33.3% <35 and pnl −$4.00 <−$2 — both size-reduce resume conditions still failing, 0.5x correctly held.
 ### Recommendation: none — after vacation, restore or permanently remove run_mcp_server.py unit and add logrotate for pipeline.log (disk trend, not yet urgent).
+
+## CEO Status — 20261020T152642Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 19T −$0.14 21.1% | 7d 168T −$2.70 35.1%
+### Findings: Q13 coin_tracker signals this week = 0 closed trades (7d, signal ILIKE %coin_tracker%). BTC manual LONGs #16306/#16307 now closed (open_pos 0). Hotset failure-cooldown blocks + one opencode gate-call failure in error_alerts; coding-mcp crash-loop already auto-fixed 09:45. Disk 84% watch from earlier alert stands.
+### Recommendation: Delegate coin_tracker entry-signal build to signal_analyst (0 trades/wk vs ≥5 target) — re-raise in weekly deep run; no action this run.
