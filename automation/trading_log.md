@@ -12770,3 +12770,45 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL slipped -$3.56 → -$4.22 since 08:28 (open-trade mark-to-market + thin closes) — size-reduce still active, no further cut without 3-neg-hour streak
 - 24h WR 15.4% still worst of day — thin-volume, no action on quiet hour
+
+## [2026-10-20 10:28 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1 win, 1 loss)
+**PnL:** +$0.17 last hour | 24h 12T 2W -$0.62 (16.7% WR) | 7d 182T 61W -$3.97 (33.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 closes: ALT pump-chain- SHORT trail_sl +$0.20 (+1.81%), IO pump-chain- SHORT hard_sl -$0.03 (-0.29%) — net positive hour, trailing exit working
+- Kill check: no signal with 0% WR and 3+ trades last hour (2 trades, 1 win each signal). 24h: pump-chain+ 3T 0W -$0.43 still at monitor line, not last-hour rule
+- atr_sl_hit 4/12 = 33.3% last 24h — under 40%, tpsl deployed
+- No overtrading (2T/hr)
+- No 3-neg-hour streak (04 -0.31, 05 -0.02, 08 -0.03, 09 -0.03, 10 +0.20 — quiet gaps break sequence, and 10:00 is positive)
+- Size-reduce 0.3x stays (7d WR 33.5% < 35%, 7d PnL -$3.97 < -$2)
+- 1 open: BTC ai-trader-pending LONG flat (+$0.02)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR still weak at 16.7% (2W/12T, -$0.62) but small sample, positive hour helps
+- pump-chain+ 0W/3T 24h monitor line unchanged — kill rule is last-hour only
+
+## [2026-10-20 11:28] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h 11T 2W -$0.36 (18.2% WR) | 7d ~182T 61W ~-$3.97 (33.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes last hour — no signals to evaluate
+- Kill check: no signal with 0% WR and 3+ trades last hour. pump-chain+ 3T 0W 24h still at monitor line (kill rule is last-hour only)
+- atr_sl_hit 4/11 = 36.4% last 24h — under 40%, tpsl fix deployed
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (10:00 +$0.20 positive; 04/05 consecutive but broken by 08/09 quiet negatives and 10 positive)
+- Size-reduce 0.3x stays (7d WR 33.5% < 35%, 7d PnL -$3.97 < -$2)
+- 1 open: BTC ai-trader-pending LONG flat (+$0.14%)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h PnL improved -$0.62 → -$0.36 (mark-to-market on open BTC) but WR still 18.2% — thin volume, small sample
+- pump-chain+ 0W/3T 24h monitor line unchanged
