@@ -1,24 +1,26 @@
-# Current State — daily_orchestrator Oct 20 05:00 UTC
+# Current State — brain_auditor Oct 20 05:40 UTC
 
-**Last Updated: 2026-10-20 05:00 UTC**
-**Updated by: daily_orchestrator — disk cleanup (84%→83%), atr_sl_hit verified NOT a bug (7d 30.4% < 40%). Preceded by brain_auditor #33 04:40 (coin_regime stamp, zero-behavior).**
+**Last Updated: 2026-10-20 05:40 UTC**
+**Updated by: brain_auditor #34 — closed BTC #16293 regime-misaligned LONG at 81830 (−$0.02). Preceded by daily_orchestrator 05:00 (disk, atr_sl resolved) and brain_auditor #33 04:40 (coin_regime stamp).**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.5x** (marker 04:27; 7d WR 34.5% < 35 AND pnl −$3.39 < −$2). Auto-clears when WR≥35 AND pnl≥−$2, or WR≥37 AND pnl≥0.
-- **24h 17T 5W −$0.88 (29.4%). | 7d 194T 67W −$3.39 (34.5%). | Trail ~$5.5 vs Chop ~−$7.9 — separation unchanged.**
-- **1 open: BTC LONG #16293 ai-trader-pending +0.10% (1.7h, explicit SL/TP) HOLD.** (BLUR #16295 closed since last snapshot)
+- **Trading LIVE** with size-reduce **0.5x** (7d WR 34.4% < 35 AND pnl −$3.62 < −$2 — both resume conditions failing).
+- **24h 17T 4W −$0.96 (23.5%). | 7d 195T 67W −$3.62 (34.4%). | Trail ~97% WR vs Chop ~1% — separation unchanged. 24h winners 4/4 trail-family.**
+- **0 open (flat)** — BTC #16293 closed 05:37 at 81830 (regime-misaligned SHORT_BIAS flip; price continued dumping after exit).
+- **Regime: SHORT_BIAS 15m+4h | BTC AT/BELOW EMA300 81940 | trend_quality STRONG_DOWN | LOW vol CALM.** Stay flat / SHORT-only until EMA300 reclaim with volume.
 - **Vacation mode ACTIVE** — shadow-first, no constants changes.
 - Protected flags 13/13 INTACT.
-- **atr_sl_hit flag RESOLVED:** 24h 50% is n=8 thin-sample noise (avg −$0.05); 7d aggregate 30.4% < 40% line. SL-width study (CEO-gated) is the lever. Do not re-flag.
-- **Disk 83%** (was 84%): journal vacuum 3d (717M freed) + stale archives removed. Remaining bloat = live DBs, not vacuumed mid-trading.
+- **atr_sl_hit flag RESOLVED** (7d 30.4% < 40%). Do not re-flag.
 
-## THIS RUN — daily_orchestrator 05:00 UTC
+## THIS RUN — brain_auditor #34 (05:40 UTC)
 
-**0 config changes. 1 infra action. 1 false-flag resolved.**
+**0 config changes (vacation). 1 position action.**
 
-1. **Disk cleanup** — journalctl vacuum 3d freed 717M, removed 3 Oct-10 rotated log archives (~32M). 84%→83%, back under 85% WARN.
-2. **atr_sl_hit 47-50% "monitor" flag closed** — not a bug (see above). auto_1hr can stop re-flagging; 7d rate is the correct measure and it's under threshold.
+1. **CLOSED BTC LONG #16293** (ai-trader-pending, entry 81987 → exit 81830, −$0.02) — regime flipped SHORT_BIAS both TFs ~05:00, trade swimming upstream, watchdog: would-not-open-fresh. Exit preceded continued dump (saved ~$0.08 vs SL 81741 path).
+2. Watchdog steers 001/002 VERIFIED, 003/004 MONITOR (kill rules not met: pump-chain+ 14d still +$1.09).
+3. #33 coin_regime stamp verified PASS (0 stamped trades yet — expected, no execs since 04:41).
+4. **CREATIVE pre-registered: regime-flip BE-rake SHADOW** — when direction disagrees with dual-TF flip and trade ±0.25% of entry, rake SL to BE. Ship post-vacation.
 
 ## PREVIOUS — brain_auditor #33 (04:40 UTC, abridged)
 

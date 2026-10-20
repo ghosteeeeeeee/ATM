@@ -5829,5 +5829,14 @@
     "category": "exit sniper",
     "status": "collecting",
     "risk": "low (shadow until flip)"
+  },
+  {
+    "date": "2026-10-20T05:40:00Z",
+    "idea": "Regime-flip breakeven-rake SHADOW (pre-registered, post-vacation ship candidate)",
+    "rationale": "Manual close of BTC #16293 at -0.19% saved ~$0.08 vs SL-81741 path in SHORT_BIAS/STRONG_DOWN regime. Pattern: open trade direction disagrees with dual-TF regime flip AND trade within +/-0.25% of entry -> rake SL to BE+tick. position_manager already has _persist_sl + replace_sl plumbing. Zero new infra.",
+    "expected_impact": "Cuts wrong-side hold losses to ~0 on regime-flip transitions; preserves TP upside. 7d regime-flip cohort ~4-6 trades.",
+    "category": "exit sniper",
+    "status": "pre-registered (vacation blocks ship; needs 7d shadow + CEO GO)",
+    "risk": "low (shadow first; log would-rake vs actual reclaim rate for whipsaw check)"
   }
 ]
