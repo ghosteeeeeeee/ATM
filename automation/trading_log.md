@@ -12960,3 +12960,24 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL flat at -$2.47; size-reduce can lift if PnL crosses -$2
 - Quiet stretch (17:00-19:30 zero closes) — trade frequency thin, not overtraded
+
+## [2026-10-20 20:30 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 19T 4W -$0.22 (21.1% WR) | 7d 162T 58W -$2.47 (35.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes last hour — quiet (17:00-20:30 zero closes), no kill/overtrading checks triggered
+- Kill check: no signal with 0% WR and 3+ trades last hour (0T)
+- atr_sl_hit 7/19 = 36.8% under 40% — tpsl deployed, no action
+- No neg-hour streak (15:00/16:00 neg then quiet resets; last neg 16:00 -$0.12)
+- Size-reduce 0.3x stays (7d PnL -$2.47 still <-$2, WR 35.8%)
+- 1 open: BTC continuum-osc+ LONG +0.26%
+- 24h hard_max_loss still 2nd-worst close reason (3T -$0.51) — monitor if it clusters
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL flat at -$2.47; size-reduce can lift if PnL crosses -$2
+- Quiet stretch ~3.5h zero closes — frequency thin, not overtraded
