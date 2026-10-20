@@ -1683,5 +1683,16 @@
     "after": "continuum hoisted, shared with pin advisory: AT + duration>60m -> check(True, \"chop pin, mid-band entries have no edge\")",
     "rationale": "Watchdog deep analysis: mid-band entries have zero edge during EMA300 pin. Death-zone advisory covers RSI number; this adds market-state WHY. Live-verified: fires on WLD precheck (BTC AT 164m).",
     "impact": "Zero live behavior change. LLM picker + operator see pin context on every precheck."
+  },
+  {
+    "timestamp": "2026-10-20T02:45:00Z",
+    "agent": "brain_auditor",
+    "change": "COMMENT ON COLUMN trades.trailing_activated — documented as post-hoc trigger label (TRUE iff exit_reason ILIKE %trail%), not a live arming flag. Invalidates Oct 18 arm-registration-gap metric (escalation #15 re-scoped to trail-engine race audit).",
+    "type": "infra",
+    "file": "brain DB: trades.trailing_activated",
+    "before": "no comment; misread as live arming flag in Oct 18 escalation",
+    "after": "comment warns analysts; re-scoped open question = trail vs ATR-SL engine race",
+    "rationale": "18/55 atr_sl_hit MFE>=0.40 with trailing_activated=FALSE is tautological (trigger only fires on trail-family exits). Stop future analyses from treating FALSE as desync evidence.",
+    "impact": "zero behavior; prevents invalid escalation reuse"
   }
 ]

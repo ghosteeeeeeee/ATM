@@ -5775,5 +5775,23 @@
     "category": "process",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-20T02:45:00Z",
+    "idea": "TAT underwater-only flip variant C",
+    "rationale": "Independent rebuild of 12 TAT fires: all 3 false kills had positive live_pnl at fire (+0.29..+0.39%), all 9 saves negative. Filtering to live_pnl<0 = 9/9 saves, 0 FK, net +13.13pp on existing data. Zero code (offline log filter).",
+    "expected_impact": "TAT flip with fk 25%→0%, cleaner CEO GO path",
+    "category": "exit sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-20T02:45:00Z",
+    "idea": "Trail-engine race audit (re-scoped escalation #15)",
+    "rationale": "trailing_activated is a post-hoc trigger label, not a live flag — the Oct 18 'arm-registration gap' metric was invalid. Real question: 18/55 atr_sl_hit 7d losers had poll-tracked MFE>=0.40; trail engine (pump_exit/profit-monster) lost the race to ATR-SL. Trace arming lag, ATR_SL_MIN_ACCEL floor, trail-distance vs initial-SL geometry.",
+    "expected_impact": "Convert part of atr_sl_hit -$4.29/7d bleed into trail exits (up to ~$1.14/7d from the MFE>=0.40 sub-cohort)",
+    "category": "exit infrastructure",
+    "status": "suggested",
+    "risk": "none (analysis)"
   }
 ]
