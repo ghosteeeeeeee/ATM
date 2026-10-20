@@ -12812,3 +12812,45 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 24h PnL improved -$0.62 → -$0.36 (mark-to-market on open BTC) but WR still 18.2% — thin volume, small sample
 - pump-chain+ 0W/3T 24h monitor line unchanged
+
+## [2026-10-20 12:28 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (0 wins, 2 losses)
+**PnL:** -$0.08 last hour | 24h 13T 2W -$0.44 (15.4% WR) | 7d 175T 59W -$3.78 (33.7% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 closes: FOGO pump-chain-v6- SHORT atr_sl_hit -$0.03 (-0.75%), ADA pump-chain- SHORT hard_sl -$0.05 (-0.48%) — both small losses, no blowups
+- Kill check: no signal with 0% WR and 3+ trades last hour (pump-chain- and pump-chain-v6- 1T each). pump-chain+ 3T 0W 24h still monitor line (kill rule is last-hour only)
+- atr_sl_hit 5/13 = 38.5% last 24h — under 40%, tpsl deployed
+- No overtrading (2T/hr)
+- No 3-neg-hour streak (10:00 +$0.20 breaks sequence; 12:00 -$0.08 fresh)
+- Size-reduce 0.3x stays (7d WR 33.7% < 35%, 7d PnL -$3.78 < -$2)
+- 2 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 12:00 hour 0W/2T — small losses, watch if next hour continues red
+- pump-chain+ 0W/3T 24h monitor line unchanged
+
+## [2026-10-20 13:28 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.17 last hour | 24h 13T 2W -$0.57 (15.4% WR) | 7d 168T 57W -$3.58 (33.9% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 close: COMP pump-chain-,pump-chain-v6- SHORT atr_sl_hit -$0.17 (-7.61%) — large loss; SL was 22.872 (0.30% from entry 22.804) but exit filled at 23.151 = ~1.2% slippage beyond stop at ~5x lev. Flagged, not a constants issue
+- Kill check: no signal with 0% WR and 3+ trades last hour (only 1T). pump-chain+ 0W/2T 24h now BELOW the 3T monitor line (trade aged out of window)
+- atr_sl_hit 5/13 = 38.5% last 24h — under 40%, tpsl deployed (05:00 orchestrator closed the spike flag as thin-sample noise)
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (12:00 -$0.08 + 13:00 -$0.17 = 2 consec; 10:00 +$0.20 earlier; watch 14:00)
+- Size-reduce 0.3x stays (7d WR 33.9% < 35%, 7d PnL -$3.58 < -$2)
+- 2 open: ETH hl_copy_trader LONG flat (-0.06%), BTC ai-trader-pending LONG flat (+0.01%)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- COMP trade: why was ATR SL only 0.30% away on a ~$23 alt? Worth checking atr_sl width logic in the pump-chain-v6 path if this recurs
+- 24h WR 15.4% weak but n=13 thin; 2 consec neg hours to watch

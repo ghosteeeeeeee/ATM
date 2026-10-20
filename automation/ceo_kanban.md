@@ -430,3 +430,7 @@ BY: signal_reporter
 
 ## TEAM UPDATES
 - [2026-10-20 05:00 UTC] daily_orchestrator: 0 config changes (vacation). DISK CLEANUP: journal vacuum 3d (717M freed) + 3 stale log archives removed — 84%→83%, back under 85% WARN (health_monitor advice acted on). atr_sl_hit 47-50% "monitor" flag VERIFIED NOT A BUG and closed: 24h 50% is n=8 thin-sample noise (avg −$0.05, total −$0.38); 7d aggregate 30.4% < 40% line; daily spikes are thin-volume artifacts. auto_1hr should stop re-flagging — SL-width study (CEO GO pending) is the tuning lever. 1 open BTC ai-trader-pending LONG +0.10%. Full report: automation/daily_orchestrator_report.md
+
+## TEAM UPDATES
+- [2026-10-20 13:28] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W −$0.17 (COMP pump-chain-/v6- SHORT atr_sl_hit −7.61%) | 24h 13T 2W −$0.57 (15.4%) | 7d 168T 57W −$3.58 (33.9%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ 0W/2T 24h now below 3T monitor line) | atr_sl_hit 38.5% under 40%, tpsl deployed | 2 consec neg hours (12:00 −$0.08, 13:00 −$0.17) — not 3, watch next hour | 2 open flat | FLAG: COMP SL placed only 0.30% from entry (22.872) but exit 23.151 — ~1.2% slippage beyond stop (~5x lev → −7.61% account). First hour this size. No constants change → no signal_versions entry
+BY: auto_1hr

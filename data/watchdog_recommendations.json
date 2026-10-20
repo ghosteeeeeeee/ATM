@@ -1,13 +1,21 @@
 {
-  "timestamp": "2026-10-20T11:43:39.727463+00:00",
+  "timestamp": "2026-10-20T14:13:42.226161+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 15/20 recent trades lost",
-      "detail": "Win rate 25% over last 20 trades. Total PnL: -0.82 USDT. Something is wrong.",
+      "title": "Losing streak: 17/20 recent trades lost",
+      "detail": "Win rate 15% over last 20 trades. Total PnL: -0.74 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: HYPE + BTC",
+      "detail": "Both opened within 11 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-002"
     },
     {
       "severity": "warning",
@@ -15,15 +23,15 @@
       "title": "6 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-003"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'ai-trader-pending' losing streak: 3 losses",
-      "detail": "Net -0.03 USDT over last 20 trades (losses: -0.10). Consider disabling or tuning this signal.",
+      "title": "Signal 'pump-chain-,pump-chain-v6-' losing streak: 5 losses",
+      "detail": "Net -0.10 USDT over last 20 trades (losses: -0.30). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-004"
     },
     {
       "severity": "warning",
@@ -31,25 +39,27 @@
       "title": "Signal 'pump-chain+' losing streak: 3 losses",
       "detail": "Net -0.43 USDT over last 20 trades (losses: -0.43). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-004"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'ai-trader+' losing streak: 3 losses",
-      "detail": "Net -0.25 USDT over last 20 trades (losses: -0.25). Consider disabling or tuning this signal.",
-      "auto_executable": false,
       "id": "steer-005"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
     "btc_15m": "LONG_BIAS",
-    "btc_4h": "LONG_BIAS"
+    "btc_4h": "LONG_BIAS",
+    "continuum": "ABOVE",
+    "volatility": "NORMAL",
+    "zscore_tier": "STRONG_POS",
+    "velocity_state": "RISING",
+    "acceleration_state": "POSITIVE",
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 1.0,
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 2,
-  "deep_analysis": "48h verdict: SHORTs were the right side (+0.15 USDT, 38% WR), LONGs were wrong (-0.86 USDT, 38% WR). We keep firing pump-chain+ LONGs into ranging coins and paying the chop tax. BLUR is the poster child: pump-chain+ fired LONG at 0.009456 expecting a pump, BLUR dumped 1.37% to hard_max_loss (-0.31). The winning side was SHORT - BLUR had been bleeding from 0.00938 to 0.00925 for hours. ARB repeated the same pattern 3x: LONG into a 0.1891-0.1904 range, chop-killed each time. The market is telling us clearly: in this regime, fades of pump signals outperform chasing them. Signal-level confirmation: pump-chain- (SHORT) has 30 trades at 16.7% WR totaling -0.77 - even the shorts from that family lose because they fire in chop too. The winners are volume-buildup- (77.8% WR) and r2v2-long3 (80% WR) - these catch actual trends, not bounces. The RSI 'sweet spot' of 50-60 is actually our worst bucket (n=14, 35.7% WR, avg -0.047) - not because 50-60 is bad, but because we are entering mid-RSI in chop where there is no follow-through. The only profitable RSI bucket is 40-50 (60% WR) - closer to extremes where mean reversion has fuel. Root cause: pump-chain+ detects volume spikes that fizzle in ranging conditions. The signal cannot distinguish 'about to trend' from 'one candle of volume then silence.'",
-  "agent_timestamp": "2026-10-20T11:20:58.383182+00:00",
-  "regime_context": "BTC is AT EMA300 (81568 vs 81634) with SLOW velocity and NEUTRAL linreg - textbook chop. The 15m and 4h scanners say LONG_BIAS and STRONG_UP trend quality, but the 1m reality is a 81480-81660 range for the past 2 hours with declining volume. This mismatch between higher-TF bias and lower-TF chop is exactly where hard_max_loss trades breed: the signal sees 'bull trend' on 4h, fires LONG, and the 1m chop eats the stop. Portfolio is 1/10 positions - appropriately cautious. The single open BTC LONG sits right at the EMA300 pivot with a tight 0.11% SL; it will resolve quickly but it is a coin flip, not an edge. When BTC is AT EMA300 in chop, the profitable playbook from the last 48h is: wait for a clear break above or below, then ride the trend that follows. Do not position in the middle.",
-  "pattern_alerts": "VERIFIED patterns (PostgreSQL, 48h window):\n\n1. PUMP-CHAIN+ LONG FADE PATTERN (n=26, 7d): pump-chain+ has 26.9% WR, avg -0.001, total -0.02. Every pump in chop fizzles. BLUR -0.31, ARB -0.08, ARB -0.10 all from this signal. WINNING side: SHORT the fade - when a coin pumps in chop and stalls, the dump follows. Why weren't we on it? The signal only fires LONG on volume spikes; it has no fade mode.\n\n2. HARD_MAX_LOSS = CHOP ENTRIES (7d, n=20 sampled): 52/56 hard_max_loss trades never reached +0.40% trail arm. Avg duration 28min. The entry conditions were wrong from minute one - there was no trend to catch. WINNING side: not in these trades at all. Capital preserved = profit.\n\n3. RSI 50-60 DEATH ZONE IN CHOP (48h, n=14): WR 35.7%, avg -0.047. Mid-range RSI in chop = no edge. The only green bucket is RSI 40-50 (n=5, 60% WR, avg +0.008). WINNING side: enter closer to extremes where mean reversion has fuel, or skip entirely when RSI is neutral.\n\n4. ARB CHOP MACHINE (48h, 3 losses, total -0.22): Three LONG entries into a 0.1891-0.1904 range. All pump-chain+ or ai-trader+. All hard_max_loss or atr_sl. WINNING side: SHORT the range high or do not trade ARB at all - it has no trend.\n\n5. WINNERS COME FROM TRAILING EXITS (48h): All 10 biggest winners exited via trail_sl, rr_engine_trail_hit, profit-monster-trail, or atr_tp_hit. The system's edge is in catching and riding trends. Losers exit via hard_max_loss, atr_sl_hit, stale_exit - chop entries that never got traction. The fix is not better exits; it is better entries that find trends sooner."
+  "deep_analysis": "Book is FLAT (0 open). No position-level steers apply; portfolio health is CRITICAL from realized bleed, not open risk. 24h closed (PG verified): 2W/13L (13% WR) -0.66 USDT. Last 20: 3W/17L -1.08. Directional split is unambiguous: LONG 0/7 -0.58 | SHORT 2/8 -0.08. Every long lost. Only money made was SHORT structure: ALT trail_sl +0.20 (meta_rsi 52.9), BTC SHORT atr_tp +0.07. Regime mid-flip: BTC spent ~7h BELOW EMA300 (STRONG_DOWN, 422min), reclaimed ~14min ago to ABOVE/STRONG_UP zscore+1.58 \u2014 but market_phase still DECLINING, acceleration NEGATIVE, volume LOW, linreg NEUTRAL. Thin reclaim, not a confirmed bull trend. 24h losses straddle the flip: early SHORTS worked while BTC was below EMA300; late SHORTS (COMP -0.17 RSI46.8 held 42m into reclaim, FOGO, ADA) got squeezed after reclaim; LONGs (BLUR -0.31 hard_max_loss RSI57, ARB -0.08 hard_max_loss RSI58) chased pumps while phase was still DECLINING \u2014 wrong side of both regimes. Winners share one trait: SHORT into structure with trail, or clean TP. Losers are chop entries. hard_max_loss 7d = LONG 0/24 -2.49, SHORT 0/4 -0.42 \u2014 zero winners both sides. Flat is correct posture until reclaim confirms. If re-entering: prefer SHORT-with-trail (only 7d positive exit family) or LONG only after phase leaves DECLINING.",
+  "agent_timestamp": "2026-10-20T13:50:07.374390+00:00",
+  "regime_context": "BTC 1m: ABOVE EMA300 (price ~81665 vs ema300 ~81536), consecutive_above only ~14min after 422min below. trend_quality STRONG_UP, zscore_tier STRONG_POS (+1.58), BUT market_phase=DECLINING, acceleration_state=NEGATIVE, velocity SLOW, volume_regime LOW, linreg_direction NEUTRAL, linreg_alignment 0.0, wyckoff ACCUMULATION. 15m scanner aggregate: LONG_BIAS 25 / SHORT_BIAS 8 / neutral 90. Read: reclaim inside a still-declining structure \u2014 not a green light for aggressive LONGs. Wait for acceleration>0 and/or 60+ min hold above EMA300 before sizing into LONG. SHORT only if BTC loses EMA300 again (regime re-aligns down) \u2014 mid-reclaim shorts get squeezed (COMP lesson). No time-of-day blocks; structure and oscillator decide side.",
+  "pattern_alerts": "VERIFIED from PostgreSQL (meta_rsi, not entry_rsi_14):\n1) hard_max_loss = pure chop, 0 winners. 7d: LONG 0/24 -2.49, SHORT 0/4 -0.42. Examples: BLUR LONG hard_max_loss -0.31 meta_rsi 57.1; ARB LONG hard_max_loss -0.08 meta_rsi 57.9. WINNING side was SHORT (fade the pump-chase). Why weren't we on it? pump-chain+ fires LONG on pump z-score without requiring market_phase != DECLINING.\n2) Late SHORT into EMA reclaim = squeeze. COMP SHORT meta_rsi 46.8, 42m hold, atr_sl_hit -0.17 as BTC reclaimed EMA300. WINNING side was LONG after reclaim confirmation. We shorted mid-reclaim while trend flipped.\n3) trail_sl SHORT is the ONLY positive exit family 7d: n=2 W=2 +0.67. Trend-following SHORT with trail works; chopped SHORT with hard/atr SL does not. Trail-family thesis (86.5% WR) still holds on the SHORT side.\n4) bb-bounce mixed without trail: LTC +0.03 profit-monster-trail WIN vs ME -0.26 stale_exit, LTC -0.04 atr_sl. WINNING side = hold with trail; losers bleed on stale/atr exits.\n5) Last 20 overall 15% WR is regime-transition whipsaw, not a single bad signal. Disabling one signal will not fix it (CEO brain note already flagged filter-stacking frequency collapse)."
 }

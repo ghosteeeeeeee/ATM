@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-10-20 05:50:11",
+  "timestamp": "2026-10-20 13:50:11",
   "total_checks": 20,
-  "passed": 13,
+  "passed": 12,
   "critical_count": 7,
-  "warning_count": 0,
+  "warning_count": 1,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -48,5 +48,12 @@
       "fix": "Use 'from _secrets import BRAIN_DB_DICT' instead of inline passwords"
     }
   ],
-  "warnings": []
+  "warnings": [
+    {
+      "name": "win_rate",
+      "msg": "14.3% (2/14)",
+      "file": "",
+      "fix": "Kill 0% WR signals, enable profitable ones, or activate dynamic inverter"
+    }
+  ]
 }

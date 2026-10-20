@@ -4945,3 +4945,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-20 11:43 UTC] brain_auditor: AUDIT RUN #37 — 0 config changes (vacation soak) | counter-regime offline study REFUTED (bleed=RANGING not BEAR; reframed to monitor) | regime flipped LONG_BIAS, BTC open aligned HOLD | 24h 18.2% −$0.36, 7d 33.3% −$4.00, size-reduce 0.5x
 BY: brain_auditor
+- [2026-10-20 12:28] auto_1hr: NO CONFIG CHANGE — 2T last hour (FOGO pump-chain-v6- atr_sl_hit -$0.03; ADA pump-chain- hard_sl -$0.05) | 24h 13T 2W -$0.44 (15.4%) | 7d 175T 59W -$3.78 (33.7%) — size-reduce 0.3x stays | kill: none (under 3T/hr last hour; pump-chain+ 3T 0W 24h monitor line) | atr_sl_hit 38.5% under 40% | no neg-hour streak (10:00 +$0.20) | 2 open | No constants change -> no signal_versions entry
+BY: auto_1hr
+- [2026-10-20 13:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (COMP pump-chain-/v6- SHORT atr_sl_hit -$0.17 -7.61%, SL 0.30% wide with ~1.2% slippage at ~5x lev — flagged) | 24h 13T 2W -$0.57 (15.4%) | 7d 168T 57W -$3.58 (33.9%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ 0W/2T 24h below 3T line) | atr_sl_hit 38.5% under 40% | 2 consec neg hours (watch 14:00) | 2 open flat | No constants change -> no signal_versions entry
+BY: auto_1hr

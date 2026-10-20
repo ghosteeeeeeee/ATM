@@ -355,13 +355,16 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                # Eliminates need for per-signal columns — new signals just write to this dict.
                signal_metadata: dict = None,
                exp_metadata: dict = None,
-               is_manual: bool = False):
+               is_manual: bool = False,
+               force: bool = False):
     """
     Add a new trade. HL-first: open on Hyperliquid FIRST, write to local DB only
     if HL confirms. Eliminates phantom trades (DB writes deleted when HL fails,
     leaving consumed signals with no corresponding position).
 
     is_manual=True: direct CEO command — bypasses vacation pause marker.
+    force=True: deliberate second tranche — bypasses the same-coin duplicate
+    guard (protocol §7 adds). NEVER passed by the automated pipeline.
     """
     import sys, os, random
 
@@ -477,12 +480,15 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     cur_check.execute(
         "SELECT id FROM trades WHERE token=%s AND server=%s AND status='open'", (token, server))
     dup_row = cur_check.fetchone()
-    if dup_row:
+    if dup_row and not force:
         print(f"[brain.py] ❌ REJECTED: {token} {direction} — DUPLICATE: open trade exists in PostgreSQL (id={dup_row[0]})")
         cur_check.close(); conn_check.close()
         return None
+    if dup_row and force:
+        print(f"[brain.py] ⚠️ FORCE: second tranche on {token} alongside open trade id={dup_row[0]} (CEO --force)")
     cur_check.close(); conn_check.close()
-    print(f"[brain.py] ✔ no duplicate open in PostgreSQL for {token}")
+    if not dup_row:
+        print(f"[brain.py] ✔ no duplicate open in PostgreSQL for {token}")
 
     # ── Stale orphan check: reject if DB has a zombie open trade with no HL position ──
     # These are trades left behind by failed mirror_open attempts or guardian orphan
@@ -1303,6 +1309,8 @@ if __name__ == "__main__":
         add_parser.add_argument("--experiment", help="A/B test experiment info (JSON)")
         add_parser.add_argument("--manual", action="store_true", default=False,
                                 help="Manual CEO trade — bypasses vacation pause marker")
+        add_parser.add_argument("--force", action="store_true", default=False,
+                                help="Deliberate second tranche — bypasses same-coin duplicate guard (never used by automation)")
         add_parser.add_argument("--flipped", action="store_true", default=False,
                                 help="Mark this trade as flipped from original signal direction")
         add_parser.add_argument("--signal-z-score", type=float, dest="signal_z_score",
@@ -1384,6 +1392,7 @@ if __name__ == "__main__":
                 experiment=args.experiment,
                 flipped_from_trade=args.flipped,
                 is_manual=args.manual,
+                force=args.force,
                 regime=args.regime,
                 signal_z_score=args.signal_z_score,
                 signal_rsi_14=args.signal_rsi_14,
