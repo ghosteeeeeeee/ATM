@@ -12609,3 +12609,39 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 **Open Questions:**
 - 7d PnL improved to -$3.30 from -$3.54 — still under -$2 threshold, size-reduce stays
 - 5th consecutive quiet hour — thin volume regime, nothing actionable
+
+## [2026-10-20 04:27] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.08 last hour | 24h 16T 5W -$0.58 (31.2% WR) | 7d 194T 67W -$3.39 (34.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 close: ARB pump-chain+ LONG hard_max_loss -$0.08 (-3.41%) — backstop fired, not SL miss
+- Kill check: no signal with 0% WR and 3+ trades last hour (1 trade). 24h worst under threshold (ai-trader+ 3T 0W, pump-chain+ 2T 0W — both at/below 3T monitor line, not last-hour rule)
+- atr_sl_hit 8/16 = 50% > 40% but tpsl_utils.py fix verified deployed prior hours — monitor
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (last active hours: 01:00 +$0.07, 04:00 -$0.08)
+- Size-reduce 0.3x stays (7d WR 34.5% < 35%, 7d PnL -$3.39 < -$2)
+- 2 open: BTC ai-trader-pending LONG +0.13%, BLUR pump-chain+ LONG -0.40%
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR dropped 41.2%→31.2% (small sample, trades rolling off window)
+- 2 hard_max_loss closes in 24h (-$0.18) — backstop doing its job, but watch if frequency rises
+- ai-trader+ 3T 0W 24h — at monitor threshold, kill only if it hits 3T in a single hour
+
+## [2026-10-20 05:00] Daily Orchestrator
+
+**Trades:** 1 open BTC ai-trader-pending LONG +0.10% | 24h 17T 5W −$0.88 | 7d 194T 67W −$3.39 (34.5%)
+**Changes:** none (vacation mode)
+
+**Actions:**
+- Disk cleanup: journalctl vacuum 3d freed 717M + removed 3 stale rotated log archives (~32M). Disk 84%→83%, back under 85% WARN. Remaining bloat is live DBs (candles 3.0G, coin_tracker 3.3G) — not vacuumed mid-trading.
+- atr_sl_hit 47-50% "monitor" flag verified and CLOSED: not a bug. 24h n=8 avg −$0.05; 7d aggregate 30.4% < 40% line. Daily 40-50% spikes = thin-volume sample noise. auto_1hr can stop re-flagging; SL-width study (CEO GO pending) is the lever.
+
+**No Change Needed:**
+- Size-reduce 0.5x stays (7d WR 34.5% < 35%, 7d PnL −$3.39 < −$2)
+- Kill check: no signal with 0% WR and 3+ trades last hour (1 trade). signal_reporter confirmed no kill candidates (both watch signals win in some regimes).
+- Protected flags 13/13 intact. Health OK, all timers firing.

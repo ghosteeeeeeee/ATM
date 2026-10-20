@@ -1,19 +1,26 @@
-# Current State — brain_auditor Run #33 Oct 20 04:40 UTC
+# Current State — daily_orchestrator Oct 20 05:00 UTC
 
-**Last Updated: 2026-10-20 04:40 UTC**
-**Updated by: brain_auditor #33 — 1 infra ship (coin_regime stamp, zero-behavior), 0 live filters (vacation)**
+**Last Updated: 2026-10-20 05:00 UTC**
+**Updated by: daily_orchestrator — disk cleanup (84%→83%), atr_sl_hit verified NOT a bug (7d 30.4% < 40%). Preceded by brain_auditor #33 04:40 (coin_regime stamp, zero-behavior).**
 
 ## PIPELINE STATUS
 
 - **Trading LIVE** with size-reduce **0.5x** (marker 04:27; 7d WR 34.5% < 35 AND pnl −$3.39 < −$2). Auto-clears when WR≥35 AND pnl≥−$2, or WR≥37 AND pnl≥0.
-- **24h 16T 5W −$0.58 (31.3%). | 7d 194T 67W −$3.39 (34.5%). | Trail ~$5.5 vs Chop ~−$7.9 — separation unchanged.**
-- **2 open: BTC LONG #16293 ai-trader-pending +0.15% (1.4h, explicit SL/TP) HOLD | BLUR LONG #16295 pump-chain+ −0.56% (0.5h, watchdog fade warning — trail needs +0.40%) HOLD.**
+- **24h 17T 5W −$0.88 (29.4%). | 7d 194T 67W −$3.39 (34.5%). | Trail ~$5.5 vs Chop ~−$7.9 — separation unchanged.**
+- **1 open: BTC LONG #16293 ai-trader-pending +0.10% (1.7h, explicit SL/TP) HOLD.** (BLUR #16295 closed since last snapshot)
 - **Vacation mode ACTIVE** — shadow-first, no constants changes.
 - Protected flags 13/13 INTACT.
+- **atr_sl_hit flag RESOLVED:** 24h 50% is n=8 thin-sample noise (avg −$0.05); 7d aggregate 30.4% < 40% line. SL-width study (CEO-gated) is the lever. Do not re-flag.
+- **Disk 83%** (was 84%): journal vacuum 3d (717M freed) + stale archives removed. Remaining bloat = live DBs, not vacuumed mid-trading.
 
-## THIS RUN — brain_auditor #33
+## THIS RUN — daily_orchestrator 05:00 UTC
 
-**1 infra ship. 0 live filters.**
+**0 config changes. 1 infra action. 1 false-flag resolved.**
+
+1. **Disk cleanup** — journalctl vacuum 3d freed 717M, removed 3 Oct-10 rotated log archives (~32M). 84%→83%, back under 85% WARN.
+2. **atr_sl_hit 47-50% "monitor" flag closed** — not a bug (see above). auto_1hr can stop re-flagging; 7d rate is the correct measure and it's under threshold.
+
+## PREVIOUS — brain_auditor #33 (04:40 UTC, abridged)
 
 **SHIPPED: coin_regime + coin_regime_conf stamp** (decider_run.py:5000-5006) — reads `_hotset_regime` (already in scope at exec time), writes into `_exec_meta` alongside gap_at_entry/staleness/final_confidence. Zero-behavior. Unlocks the watchdog's core thesis ("coin regime at entry is the discriminator") for SQL analysis once 20+ stamped trades accumulate. Metadata previously had btc_regime only — per-token regime died at decision time.
 

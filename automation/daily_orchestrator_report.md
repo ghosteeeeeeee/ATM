@@ -1,42 +1,43 @@
-# Daily Orchestrator Report — 2026-10-15 15:50 UTC
+# Daily Orchestrator Report — 2026-10-20
 
-## PIPELINE STATUS
-- **Trades (24h):** 14 closed, 3 open (all pump-chain+ LONG, green +2.7-3.2%)
-- **Win rate:** 21.4% (24h) | 34.7% (7d, 193T)
-- **PnL:** −$0.56 (24h) | −$1.47 (7d)
-- **Health:** OK | Disk 79% (<80% goal MET) | Kill switch LIVE=true | Regime LONG_BIAS | 0 real errors
+**Mode:** vacation (shadow-first, no constants/live-filter changes)
+**Run:** ~04:55 UTC
 
-## TEAM ACTIVITY (from TEAM UPDATES in kanban)
-- **brain_auditor (captain 14:45):** RATIFIED trail-arm KEEP both; KILLED LONG-SHORT-BIAS shadow (14d cohort +$0.84, premise falsified); CONF-CALIB clamp verified (0 conf>100 since land); progressive exit ladder creative → self_learner backtest.
-- **signal_reporter (14:20):** No kills/boosts — 13T/24h thin volume below all sample thresholds. Watch: pump-chain- SHORT (23% WR but +$0.02 PnL +$0.29 EXTREME — correctly not killed). Sideways: TREND-ALIGN vs SPIKE-FILTER BTC disagreement.
-- **auto_1hr (15:10):** No changes. 2 losses (IO vbo-short− atr_sl, BTC manual SHORT HL_CLOSED). volume-breakout-short− at 2T 0W threshold watch. atr_sl_hit 50% = sample artifact, tpsl fix deployed.
-- **health_monitor (15:27):** All clean. Disk 79%, timers 4/4, prices fresh. 60x LOCK-WAIT 0.1s info_rate (contention only).
+## Pipeline Status
+- **LIVE**, size-reduce 0.5x active (7d WR 34.5% < 35, 7d PnL −$3.39 < −$2)
+- **24h:** 17T 5W −$0.88 (~29%) | **7d:** 194T 67W −$3.39 (34.5%)
+- **1 open:** BTC LONG #16293 ai-trader-pending +0.10% (1.7h, explicit SL/TP) HOLD
+- Regime: LONG_BIAS (76L/7S/40N). Coin tracker: STORMY, WR 38% flagged.
+- Health: OK — 0 errors, all timers firing, prices fresh, protected flags 13/13 INTACT
 
-## IMPLEMENTED TODAY
-1. **Rep 2b Phase 3 (bde1070d)** — ai_trader_precheck.py HALL-SHAME logic replaced with reputation.should_block() (combo-aware). CEO-approved plan, due Oct 15. Verified: py_compile OK, BTC SHORT live test → coin_shame 54.5% mult=0.30.
+## Team Activity (24h)
+- **health_monitor:** clean runs; disk 84% WARN advice (acted on below); no auto-fixes needed
+- **auto_1hr:** 24 consecutive hours NO CONFIG CHANGE (correct under vacation); flags atr_sl_hit 47-50% "monitor" and 7d size-reduce hold — both verified correct below
+- **signal_reporter:** no kills/boosts; regime analysis shows ai-trader+ and bb-bounce win in some regimes — blanket kills correctly withheld; ai-trader+ EXTREME regime already blocked (Oct 19)
+- **brain_auditor #33:** coin_regime stamp shipped (zero-behavior); GOAT SHORT RSI 73.6 bear-exemption confirmed working; gap_at_entry 1.0+ LONG only profitable band — chase filters must NOT tighten
+- **blacklist_tester:** experiment closed (77 tokens, 0 KEEP — blacklist is symptom not cause)
 
-## OCT 15 CHECKPOINT — ALL CLOSED
-1. **7d WR ≥50%: MISSED** (34.7%) — retarget CEO. Guardrail ESCALATE active, no stacking.
-2. **Trail-arm soak + ratify HARD deadline: CLOSED** — captain brain_auditor RATIFIED BOTH KEEP (pump-chain 6 fires −$0.06 vs HML counterfactual; bb-squeeze 0 fires/0 cost). CEO veto = 1-line revert each.
-3. **Disk <80% Oct 14 goal: MET** (79%). Deep-prune plan → backlog.
-4. **Rep 2b: SHIPPED.**
+## Implemented Today
+1. **Disk cleanup** — journalctl vacuum 3d freed **717M** + removed 3 stale rotated log archives (~32M). Disk **84% → 83%** (20G free), back under 85% WARN line. Remaining bloat is live DBs (candles 3.0G, coin_tracker 3.3G, session_brain 1.4G) — not vacuumed mid-trading (risk > reward).
 
-## ANALYSIS — WYCKOFF PAIRING (for CEO GO)
-- 71 shadow fires/7d (46 LONG / 25 SHORT).
-- ±30min same-token co-signal: ANY 37% | **volume-family 4%** | **rs-family 0%** | NONE 63%.
-- **Mandated volume/rs co-source does not co-occur with wyckoff fires — pairing premise fails structurally. Recommend KEEP WYCKOFF_SHADOW_MODE=True.** Pump-chain co-source alternative co-occurs more but often opposite-direction (needs direction-agreement rule).
+## Verified (no action needed)
+- **atr_sl_hit 47-50% flag:** NOT a bug. 24h n=8 losses avg −$0.05 (total −$0.38); **7d aggregate 30.4% — under 40% line**. Daily 40-50% spikes are thin-volume sample noise (4-15T/day). CEO-gated SL-width study (escalated) is the correct lever; SL changes are live params, vacation-blocked anyway.
+- **Size-reduce 0.5x:** correctly held by auto-1hr; auto-clear conditions unchanged.
 
-## CRITICAL ISSUES
-- None new. Standing: hard_max_loss bleed (self_learner Oct 17), wyckoff COOLDOWN_BARS CEO question, volume-breakout-short− 1 loss from kill threshold.
+## Critical Issues
+- None. Kill switch, blacklist, pipeline all healthy.
 
-## NEXT STEPS
-1. volume-breakout-short− kill check (Oct 16)
-2. Wyckoff CEO GO — implement per decision (keep shadow recommended)
-3. RSI tilt re-test window opens Oct 16
-4. self_learner momentum-gate backtest follow-up (Oct 17)
-5. 7d WR retarget decision (CEO)
+## Standing Escalations (CEO — unchanged)
+1. **exit-ladder signal-scoped backtest P0** — 13th request
+2. bb-squeeze + pump-chain trail-arm flags live w/o documented CEO GO (RATIFY pending)
+3. SL-width + entry-gate study GO pending
 
-## QUALITY METRICS
-- Tasks completed: 2 implementations + 4 checkpoint closes + 1 analysis
-- First-attempt success: 100% (precheck wired + verified first try)
-- Critical issues found: 0 new
+## Next Steps
+1. Continue vacation soak — shadows (TAT 11/15 fires, MFE-CUT 6) collect until flip bar
+2. Disk: re-check at next health run; if >85% again, evaluate coin_tracker.db retention (needs care)
+3. ai-trader+ standing watch (24h 3T 0W at monitor line, has 7d wins — kill rule not met)
+
+## Quality Metrics
+- Tasks completed: 2/2 (disk cleanup, atr_sl_hit verification)
+- First-attempt success: 100%
+- Critical issues found: 0

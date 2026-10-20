@@ -221,3 +221,9 @@
 ### Numbers: 24h 16T -0.32 50.0% | 7d 195T -3.75 34.4%
 ### Findings: pipeline inactive-between-runs is normal (timer fired 4s ago, completed clean); hermes-coding-mcp crash-loop auto-disabled earlier today; disk 83% (threshold 85%). Proactive (SHORTs 7d): SHORT 64T −0.79 31.3% vs LONG 131T −2.96 35.9% — both bleed, SHORTs not the worse side; no action.
 ### Recommendation: Watch disk to 85% before weekend; recreate run_mcp_server.py only if MCP coding integration needed.
+
+## CEO Status — 20261020T032641Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 17T -$0.41 41.2% | 7d 195T -$3.30 34.9%
+### Findings: Rotating Q (confluence blocks): pipeline.log confluence entries are stale (last Oct 15) — ichimoku- single-type SHORTs were the main blocked family, no recent block activity logged. Open pos 1: BTC LONG ai-trader-pending @ -0.16% (opened 03:13). Error alerts show hotset failure-cooldown blocks + signal rollbacks (known, non-critical). CURRENT.md claimed 0 open — DB shows 1, DB wins.
+### Recommendation: none

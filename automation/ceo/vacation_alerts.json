@@ -1,74 +1,6 @@
 [
   {
     "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-3.91 < $-2.00 (196T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.29,
-      "n_24h": 14,
-      "wr_24h": 35.7,
-      "pnl_48h": 0.1,
-      "n_48h": 18,
-      "wr_48h": 44.4,
-      "pnl_7d": -3.91,
-      "n_7d": 196,
-      "wr_7d": 33.7,
-      "checked_at": "2026-10-19T02:26:49.840114+00:00"
-    },
-    "ts": "2026-10-19T02:26:49.841375+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-3.91 < $-2.00 (196T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.29,
-      "n_24h": 14,
-      "wr_24h": 35.7,
-      "pnl_48h": 0.1,
-      "n_48h": 18,
-      "wr_48h": 44.4,
-      "pnl_7d": -3.91,
-      "n_7d": 196,
-      "wr_7d": 33.7,
-      "checked_at": "2026-10-19T02:56:49.975796+00:00"
-    },
-    "ts": "2026-10-19T02:56:49.977288+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 33.3% < 35.0% AND pnl_7d $-4.00 < $-2.00 (195T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.32,
-      "n_24h": 13,
-      "wr_24h": 30.8,
-      "pnl_48h": 0.1,
-      "n_48h": 18,
-      "wr_48h": 44.4,
-      "pnl_7d": -4.0,
-      "n_7d": 195,
-      "wr_7d": 33.3,
-      "checked_at": "2026-10-19T03:26:50.221408+00:00"
-    },
-    "ts": "2026-10-19T03:26:50.222020+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-3.92 < $-2.00 (196T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.18,
-      "n_24h": 13,
-      "wr_24h": 38.5,
-      "pnl_48h": 0.18,
-      "n_48h": 19,
-      "wr_48h": 47.4,
-      "pnl_7d": -3.92,
-      "n_7d": 196,
-      "wr_7d": 33.7,
-      "checked_at": "2026-10-19T03:56:50.479124+00:00"
-    },
-    "ts": "2026-10-19T03:56:50.480778+00:00"
-  },
-  {
-    "level": "WARNING",
     "message": "SIZE REDUCED (not paused): 7d WR 34.0% < 35.0% AND pnl_7d $-3.91 < $-2.00 (197T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
     "data": {
       "pnl_24h": -0.17,
@@ -848,5 +780,73 @@
       "checked_at": "2026-10-20T02:26:59.568383+00:00"
     },
     "ts": "2026-10-20T02:26:59.569438+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.9% < 35.0% AND pnl_7d $-3.30 < $-2.00 (195T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.41,
+      "n_24h": 17,
+      "wr_24h": 41.2,
+      "pnl_48h": -0.7,
+      "n_48h": 31,
+      "wr_48h": 38.7,
+      "pnl_7d": -3.3,
+      "n_7d": 195,
+      "wr_7d": 34.9,
+      "checked_at": "2026-10-20T02:56:59.721168+00:00"
+    },
+    "ts": "2026-10-20T02:56:59.721961+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.9% < 35.0% AND pnl_7d $-3.30 < $-2.00 (195T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.41,
+      "n_24h": 17,
+      "wr_24h": 41.2,
+      "pnl_48h": -0.73,
+      "n_48h": 30,
+      "wr_48h": 36.7,
+      "pnl_7d": -3.3,
+      "n_7d": 195,
+      "wr_7d": 34.9,
+      "checked_at": "2026-10-20T03:26:59.948383+00:00"
+    },
+    "ts": "2026-10-20T03:26:59.949376+00:00"
+  },
+  {
+    "level": "INFO",
+    "message": "Guardrails OK",
+    "data": {
+      "pnl_24h": -0.49,
+      "n_24h": 16,
+      "wr_24h": 37.5,
+      "pnl_48h": -0.67,
+      "n_48h": 29,
+      "wr_48h": 37.9,
+      "pnl_7d": -3.3,
+      "n_7d": 194,
+      "wr_7d": 35.1,
+      "checked_at": "2026-10-20T03:57:00.115409+00:00"
+    },
+    "ts": "2026-10-20T03:57:00.118770+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "SIZE REDUCED (not paused): 7d WR 34.5% < 35.0% AND pnl_7d $-3.39 < $-2.00 (194T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
+    "data": {
+      "pnl_24h": -0.58,
+      "n_24h": 16,
+      "wr_24h": 31.3,
+      "pnl_48h": -0.75,
+      "n_48h": 30,
+      "wr_48h": 36.7,
+      "pnl_7d": -3.39,
+      "n_7d": 194,
+      "wr_7d": 34.5,
+      "checked_at": "2026-10-20T04:27:00.144165+00:00"
+    },
+    "ts": "2026-10-20T04:27:00.145093+00:00"
   }
 ]

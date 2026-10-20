@@ -1,17 +1,17 @@
-# Signal Research — 2026-10-19 16:06 UTC
+# Signal Research — 2026-10-20 04:06 UTC
 
 ## Hypotheses Tested
 
 | Pattern | Tokens | Trades | WR | Avg PnL | Verdict |
 |---------|--------|--------|-----|---------|--------|
-| bollinger_squeeze | 20 | 789 | 70.6% | +0.7637% | ✅ PASS |
-| volume_breakout | 20 | 369 | 0.0% | +0.0000% | ❌ FAIL |
-| consecutive_3_candles | 19 | 105 | 0.0% | +0.0000% | ❌ FAIL |
+| bollinger_squeeze | 20 | 858 | 69.5% | +0.7170% | ✅ PASS |
+| volume_breakout | 20 | 343 | 0.0% | +0.0000% | ❌ FAIL |
+| consecutive_3_candles | 17 | 111 | 0.0% | +0.0000% | ❌ FAIL |
 
 ## Candidates Generated
 
-- `bollinger_squeeze_long_candidate.py` — bollinger_squeeze LONG (WR=68.1%, 379 trades)
-- `bollinger_squeeze_short_candidate.py` — bollinger_squeeze SHORT (WR=72.9%, 410 trades)
+- `bollinger_squeeze_long_candidate.py` — bollinger_squeeze LONG (WR=67.1%, 435 trades)
+- `bollinger_squeeze_short_candidate.py` — bollinger_squeeze SHORT (WR=71.9%, 423 trades)
 
 ## Next Steps
 
