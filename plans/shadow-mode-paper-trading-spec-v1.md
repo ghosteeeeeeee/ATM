@@ -850,6 +850,80 @@ This is a multi-hour sub-project. Scope separately.
 
 ---
 
+## 10.5 Integration with Existing A/B Engine
+
+> **IMPORTANT (T directive 2026-10-20):** An existing A/B testing engine was installed when the system started but was phased out. This spec must incorporate it.
+
+### Existing A/B Engine (Verified)
+
+| Component | Status | Location |
+|-----------|--------|----------|
+| `ab_optimizer.py` | Exists (phased out) | `scripts/ab_optimizer.py` |
+| `hermes_ab_utils.py` | Exists (phased out) | `scripts/hermes_ab_utils.py` |
+| `ab_results` table | Exists (stale data) | PostgreSQL `brain.ab_results` |
+| `ab_tests.json` | Exists (empty config) | `config/ab_tests.json` |
+
+**What it does:**
+- **Epsilon-greedy selection** (15% exploration): picks one variant per live trade
+- **Thompson sampling** (`hermes_ab_utils.py`): statistical variant selection
+- **Evolution engine**: kills losing variants (PnL < -15%), spawns new variants
+- **W&B tracking**: offline Weights & Biases logging
+
+**Current state:**
+- `ab_results` table has 5 rows but all show 0 wins / 0% WR / 0% PnL (stale)
+- `ab_tests.json` is empty (no tests configured)
+- Was used by `decider_run.py` for SL distance, entry timing, trailing stop
+- Was used by `hl-sync-guardian.py` for flip strategy
+
+### Key Difference: Live A/B vs Shadow A/B
+
+| Aspect | Live A/B (existing) | Shadow A/B (this spec) |
+|--------|---------------------|------------------------|
+| Selection | Picks ONE variant per trade | Simulates ALL variants |
+| Data source | Live trade outcomes | Simulated exit engine outcomes |
+| Purpose | "Which variant should we use?" | "Which variant WOULD have worked?" |
+| Cost | Real money at risk | Zero cost |
+| Sample size | ~20 trades/day | ~1000 signals/day |
+
+### Integration Strategy
+
+**Reuse the `ab_results` schema** for shadow A/B results:
+
+```sql
+-- Shadow A/B results use the same schema
+INSERT INTO ab_results (test_name, variant_id, trades, wins, losses, 
+                        win_rate_pct, total_pnl_pct, total_pnl_usdt)
+VALUES ('exit-engine-atr', 'atr_sl_tp', 1000, 450, 550, 45.0, 12.5, 3.75)
+ON CONFLICT (test_name, variant_id) 
+DO UPDATE SET trades = EXCLUDED.trades, wins = EXCLUDED.wins, ...;
+```
+
+**Reuse the evolution engine** for shadow A/B:
+- Kill exit engines that consistently lose on shadow trades
+- Spawn new exit engine variants (e.g., different trail distances)
+- Redistribute weight to winning engines
+
+**Adapt the selection logic:**
+- Live A/B: `get_ab_variant()` picks ONE variant
+- Shadow A/B: simulate ALL variants, record all outcomes
+
+### New Shadow A/B Tests to Create
+
+| Test Name | Variants | Purpose |
+|-----------|----------|---------|
+| `exit-engine-atr` | ATR SL/TP (static vs trailing) | Which ATR exit works best? |
+| `exit-engine-trail` | PM Trail (0.20%/0.50%/0.80%/1.20%) | Which trail distance works best? |
+| `exit-engine-hml` | HML (-0.5%/-0.8%/-1.2%) | Which HML threshold works best? |
+| `exit-engine-combo` | ATR+Trail, Trail-only, ATR-only | Which combination works best? |
+
+### Implementation
+
+1. **Extend `expiry_shadow.py --close`**: After simulating exit engines, write results to `ab_results` table
+2. **Add `--evolve` mode**: Run evolution on shadow A/B results
+3. **Add `--report` mode**: Show which exit engines work best per signal type/regime
+
+---
+
 ## 11. Risks & Mitigations
 
 | Risk | Impact | Mitigation |
