@@ -12705,3 +12705,47 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 24h WR 23.5% (4W/17T) — thin-volume, 7d still 34.0%
 - hard_max_loss 3 closes in 24h (-$0.49) — unchanged from 05:27 watch, not escalating
+
+## [2026-10-20 07:27 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet)
+**PnL:** $0.00 last hour | 24h 16T 3W -$1.00 (18.8% WR) | 7d 191T 66W -$3.53 (34.6% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes last hour — quiet, no signals to evaluate
+- Kill check: no signal with 0% WR and 3+ trades in last hour. 24h monitor line unchanged: pump-chain+ 3T 0W -$0.43, ai-trader+ 3T 0W -$0.25 — kill rule is last-hour, no kill
+- atr_sl_hit 8/16 = 50% — still closed as non-issue per 05:00 verdict (7d aggregate ~30% < 40%, tpsl fix deployed)
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (01:00 +$0.07; quiet hours break it)
+- Size-reduce 0.3x stays (7d WR 34.6% < 35%, 7d PnL -$3.53 < -$2)
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR dropped to 18.8% (3W/16T, -$1.00) — worst so far today but thin-volume; 7d still 34.6%
+- hard_max_loss 3 closes in 24h (-$0.49) — backstop catching bad entries; watch frequency
+- pump-chain+ / ai-trader+ both 0W/3T over 24h at monitor line; if either gets 3 closes in one hour with 0 wins, kill immediately next run
+
+## [2026-10-20 08:28] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.03 last hour | 24h 13T 2W -$0.91 (15.4% WR) | 7d 189T 64W -$3.56 (33.9% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 close: ALT pump-chain- SHORT rr_engine_resistance_break -$0.03 (-0.87%) — resistance broke against short, correct exit behavior, tiny loss
+- Kill check: no signal with 0% WR and 3+ trades in last hour (1 trade). 24h monitor line unchanged: pump-chain+ 3T 0W -$0.43, ai-trader+ 2T 0W -$0.15 — kill rule is last-hour, no kill
+- atr_sl_hit 5/13 = 38.5% — under 40% threshold this window; prior verdict (05:00) already closed as non-issue (7d ~30%, tpsl deployed)
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (01:00 +$0.07; quiet 06:00/07:00 break sequence; 08:00 -$0.03 isolated)
+- Size-reduce 0.3x stays (7d WR 33.9% < 35%, 7d PnL -$3.56 < -$2)
+- 1 open: BTC ai-trader-pending LONG flat (+$0.02)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR 15.4% (2W/13T, -$0.91) — worst window today; thin-volume, 7d still 33.9%
+- hard_max_loss 3 closes in 24h (-$0.49) — unchanged watch, not escalating
+- pump-chain+ 0W/3T 24h at monitor line — if 3 closes in one hour with 0 wins, kill next run
