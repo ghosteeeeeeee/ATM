@@ -4956,3 +4956,5 @@ BY: auto_1hr
 - [2026-10-20 16:35] auto_1hr: NO CONFIG CHANGE — 1T last hour (PUMP r2v2-long3 LONG hard_max_loss -$0.12 -5.41%) | 24h 20T 4W -$0.26 (20.0%) | 7d 168T 59W -$2.79 (35.1%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (r2v2-long3 1T only) | atr_sl_hit signal-only 35.7% under 40% | no neg-hour streak (watch 17:00) | 1 open BTC flat | No constants change -> no signal_versions entry
 [2026-10-20 16:47 UTC] brain_auditor: AUDIT RUN #40 — 1 infra (ARM-GAP close-time log MFE>=0.40 trail=FALSE pnl<0, zero-behavior) | btc_regime backfill REFUTES BTC-align lever (TRANSITIONING=chop $2.88/30d bleed; RANGING=only profit) | coin_regime n=10/20 directionally perfect | pump-chain± kills rejected | TAT scope fix verified | 24h 20% -$0.26 shallow, 7d 35.1% -$2.79, size-reduce 0.5x
 BY: brain_auditor
+BY: auto_1hr
+- [2026-10-20 17:35] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 4W -$0.26 (20.0%) | 7d 165T 59W -$2.61 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (0T) | atr_sl_hit 40% raw / ~35% signal-only, tpsl deployed | no neg-hour streak | 1 open BTC +0.42% | No constants change -> no signal_versions entry
