@@ -1,112 +1,67 @@
 {
-  "timestamp": "2026-10-20T02:45:00Z",
+  "timestamp": "2026-10-20T03:42:16Z",
   "agent": "brain_auditor",
-  "run": 31,
+  "run": 32,
   "vacation_mode_active": true,
   "config_changes_applied": [],
-  "infra_changes_applied": [
-    {
-      "change": "COMMENT ON COLUMN trades.trailing_activated — documented as post-hoc trigger label, not live arming flag",
-      "type": "infra/doc",
-      "behavior": "zero",
-      "rationale": "Oct 18 arm-registration-gap escalation (#15) misread the column. Trigger trg_trades_trailing_activated sets TRUE iff exit_reason ILIKE '%trail%' at close. atr_sl_hit exits are always FALSE by design. Future MFE/trailing analyses must not treat FALSE as desync evidence."
-    }
-  ],
+  "infra_changes_applied": [],
   "trade_summary_24h": {
-    "trades": 17, "wins": 7, "wr": 41.2, "pnl": -0.41,
-    "exits": "atr_sl_hit 8T -$0.38 (47%rate, chop variance) | stale 1T -$0.26 (ME, TAT would-save) | HML 1T -$0.10 | trail family 7T +$0.33",
-    "winners_all_trailing": true,
-    "losers_all_sl_family": true,
-    "separation_100pct": true
+    "trades": 17,
+    "wins": 7,
+    "wr": 41.2,
+    "pnl": -0.41,
+    "exit_family": "TRAIL 6T +$0.26 100%WR | SL 9T −$0.48 0%WR | OTHER 2T −$0.19 — separation still ~100%",
+    "open": "1 BTC LONG #16293 ai-trader-pending @81987 SL81741 TP82400, −0.05%, mixed regime (15m LONG_BIAS / 4h SHORT_BIAS / DECLINING). HOLD — explicit SL/TP set."
   },
-  "trade_summary_7d": {"trades": 196, "wr": 34.7, "pnl": -3.54, "size_reduce": "0.5x marker re-written 02:26"},
-  "steer_verification": {
-    "steer-001_wrong_side": "VERIFIED-STRUCTURAL — 7d LONG 131T -$2.82 / SHORT 65T -$0.72, both bleed in chop. LONG-SHORT-BIAS shadow falsified Oct 15. No new filter; defenses (macro REDUCE, size-reduce, regime gates) already deployed.",
-    "steer-002_ai-trader-pending_streak": "MONITOR — 14d only 4T -$0.07 25%WR, n below bar. Both 24h losses (BTC LONGs) would be TAT-saved (trades 16283, 16291, +2.90pp combined). TAT is the fix, not a kill.",
-    "steer-003_ai-trader-plus_streak": "VERIFIED-MONITOR — 14d 29T -$0.80 41.4% known bleeder. EXTREME block holding (0 opens since Oct 19 09:41). Death-zone advisory live. TAT would-save 3 of its 4 24h losses. No kill (post-guard n too small)."
+  "trade_summary_7d": {
+    "trades": 195,
+    "wr": 34.9,
+    "pnl": -3.3,
+    "exit_family": "TRAIL 72T +$5.39 80.6% | SL 107T −$8.27 0.9%",
+    "arm_rate": "47.4% (92/194 reached MFE≥0.40)"
   },
-  "losing_trade_autopsy_24h": {
-    "new_patterns": 0,
-    "clusters": [
-      {"cohort": "bb-bounce chop stallers (LTC/ME)", "loss": "-0.30", "note": "ME stale_exit -3.54% is biggest single loss; TAT would-exit at -0.94% (save 2.60pp). LTC atr_sl at -0.20 live → -1.72 actual (save 1.52pp)."},
-      {"cohort": "ai-trader+ mid-band/EXTREME LONGs (DOGE/ARB/LDO)", "loss": "-0.25", "note": "All predate or circumvent EXTREME block (ARB conf 25.5 floor-admit). LDO/DOGE/ARB all TAT would-saves. Known death-zone/midband cohorts."},
-      {"cohort": "ai-trader-pending counter-trend LONG pins (BTC x2)", "loss": "-0.08", "note": "Both TAT would-saves. EMA300-pin advisory shipped Oct 19 covers future picks."},
-      {"cohort": "isolated variance (GOAT SHORT, LTC warrior, ARB pump-chain+)", "loss": "-0.11", "note": "Small atr_sl hits, no pattern."}
-    ]
+  "atr_sl_recovery_probe_7d": {
+    "idea_from_run31": "atr_sl_hit post-exit recovery probe — wrong-side vs tight-SL discriminator",
+    "method": "59 atr_sl_hit exits 7d; 1m candle high/low 30min after exit vs entry",
+    "result": "63% CONTINUED against us (wrong-side) / 37% RECOVERED (tight-SL)",
+    "by_direction": "LONG 13R/17C | SHORT 9R/20C (69% continued — SHORTs mostly wrong-side)",
+    "by_signal_14d": "bb-bounce 0% recovered (pure wrong-side) | pump-chain- 50% | ai-trader+ 62% (tight-SL leaning)",
+    "conclusion": "Majority of atr_sl exits are ENTRY-QUALITY problems, not SL width. bb-bounce needs entry filters, not wider SL. ai-trader+ 62% recovery is the only tight-SL-leaning family — pre-register SL-width study post-vacation."
   },
   "tat_shadow_status": {
-    "unique_fires": 12, "threshold": 15,
-    "counterfactual_independently_rebuilt": {
-      "saves": 9, "false_kills": 3, "fk_rate_pct": 25.0,
-      "gross_save_pp": 13.13, "gross_fk_cost_pp": 2.78, "net_pp": 10.35,
-      "per_signal": {
-        "ai-trader-pending": {"fires": 2, "saves": 2, "fk": 0, "note": "cleanest"},
-        "ai-trader-manual": {"fires": 1, "saves": 1, "fk": 0},
-        "ai-trader+": {"fires": 4, "saves": 3, "fk": 1},
-        "bb-bounce-v2-long+": {"fires": 5, "saves": 3, "fk": 2, "note": "dirtiest"}
-      }
-    },
-    "new_finding_underwater_only": "ALL 3 false kills had positive live_pnl at fire (+0.29..+0.39%); ALL 9 saves negative (-0.20..-0.94%). Filter fire to live_pnl<0: 9 fires, 9 saves, 0 FK, net +13.13pp. Zero code needed — filter offline on existing log field. Pre-registered as TAT flip variant C (underwater-only) alongside signal-scoped A/B."
+    "unique_fires": 12,
+    "threshold": 15,
+    "base_outcomes": "9 saves / 3 FK (rebuilt from PG: losers −0.78, winners +0.12)",
+    "variant_C_correction": "RUN #31 CLAIMED 9S/0FK — WRONG. Live-pnl-at-fire for the 9 saves: 6 negative (−0.06..−0.94), 3 slightly POSITIVE (+0.04..+0.07: #16251 BTC, #16282 LDO, #16284 DOGE). Underwater-only variant C = 6 saves / 0 FK, not 9/0. Still zero-FK but smaller save set. DO NOT flip on inflated #31 numbers.",
+    "fires_needed": "3 more unique fires to threshold"
   },
-  "corrections_to_carried_narratives": [
-    {
-      "item": "trailing_activated 'arm-registration gap' (escalation #15, Oct 18)",
-      "verdict": "INVALID-METRIC",
-      "detail": "Column is a post-hoc trigger label (TRUE iff exit_reason contains 'trail'), not a live arming flag. 18/55 atr_sl_hit MFE>=0.40 with FALSE is tautological. The real open question: why trail engine failed to convert those peaks into trail exits (engine race/coverage, not flag desync). COMMENT ON COLUMN shipped. Re-scoped escalation: analyze trail-vs-ATR-SL engine race for pump-chain family, post-vacation."
-    },
-    {
-      "item": "mfe_pct 'never written' (run #30 sideways note)",
-      "verdict": "CORRECTED",
-      "detail": "Top-level mfe_pct column populated 194/195 in 7d. Only the _signal_metadata JSON copy is missing. MFE analyses can use DB column directly — no dependency on shadow logs."
-    },
-    {
-      "item": "ai-trader re-entry-after-loss gate (watchdog deep-analysis ARB narrative)",
-      "verdict": "REJECTED-WITH-VERIFICATION",
-      "detail": "14d dedup: 53 re-entry seconds = 34.0% WR vs 36.2% baseline (wash, z n.s.); after-HML subset 26T 30.8% net +$0.19 (slightly positive). ARB double-loss was variance within wash cohort. No re-entry gate."
-    }
-  ],
+  "steers": {
+    "001_pending_order": "ALREADY EXECUTED as #16293 (btc-momentum-long). Explicit SL/TP present. No action.",
+    "002_wrong_side": "VERIFIED-STRUCTURAL — 7d TRAIL +$5.39 vs SL −$8.27 unchanged. Chop family. TAT is the fix.",
+    "003_pending_streak": "MONITOR — n=3, known chop cohort, TAT shadow covering.",
+    "004_ai_trader_streak": "MONITOR — n=3, EXTREME block holding, TAT shadow covering."
+  },
   "last_run_verify": {
-    "size_reduce_0.5x": "HOLDING (marker re-written 02:26 by vacation_guardrail)",
-    "doji_kill": "HOLDING (0 trades since Oct 16 20:30)",
-    "tat_shadow": "FIRING (16290/16291 would-fires 00:04, both TAT-saves)",
-    "extreme_block_pump_chain": "HOLDING",
-    "death_zone_advisory": "IN CODE (precheck.py:212)",
-    "ema300_pin_advisory": "IN CODE (precheck.py:288)",
-    "protected_flags": "13/13 INTACT",
-    "arm_be_shadow": "0 fires (downgraded Oct 20 #30, stays downgraded)",
-    "mfe_cut_shadow": "6 unique fires (collecting, universal-flip dead per OOS)"
+    "trailing_activated_COMMENT": "PRESENT ✓",
+    "size_reduce_0.5x": "ACTIVE ✓ (7d WR 34.9% < 35 and pnl −$3.30 < −$2)",
+    "mfe_cut_shadow": "ENABLED ✓",
+    "bb_bounce_tat_shadow": "ENABLED ✓",
+    "protected_flags": "13/13 INTACT ✓",
+    "variant_C_narrative": "CORRECTED this run (see tat_shadow_status)"
   },
-  "atr_sl_hit_monitor": {
-    "rate_24h": 47.1, "rate_7d_family_pnl": -4.29,
-    "regime_concentration_7d": "EXTREME 34T -$2.52 | HIGH 9T -$1.05 | NORMAL 14T -$0.62 | FLAT 2T -$0.10",
-    "mfe_shape": "18/55 losers reached MFE>=0.40 (armed-looking peaks that ATR-SL beat to the exit), 16/55 MFE<0.20 (true chop), avg 0.386",
-    "action": "none during vacation — chop variance + tpsl deployed; engine-race analysis post-vacation"
+  "losing_autopsy_24h": {
+    "verdict": "ZERO new patterns. All 10 losers known cohorts.",
+    "clusters": "ME bb-bounce stale −3.54% (TAT would-save) | LTC/BTC never-armed atr_sl (TAT would-save 3/3) | ARB/LDO EXTREME armed-then-reverse (TAT cannot catch — ARM-BE class) | GOAT/LTC/DOGE/WARrior isolated chop variance",
+    "winner_vs_loser": "6/6 winners trail-family (MFE 0.37–2.00) | 9/10 losers SL-family never-armed or armed-then-reverse"
   },
-  "rejected_this_run": [
-    "re-entry-after-loss gate — wash vs baseline at 14d (see corrections)",
-    "any new entry filter — vacation mode + known-cohort autopsy + soak stack",
-    "TAT live flip — 12/15 fires < threshold; underwater-only variant needs fk data maturity"
-  ],
-  "creative_improvements": [
-    {
-      "idea": "TAT underwater-only flip variant C (pre-registered)",
-      "detail": "Fire only when live_pnl < 0 at T. Current 12-fire set: 9 saves all negative-at-fire, 3 FK all positive-at-fire. Variant C = 9/9 saves, 0 FK on existing data. Zero code — offline filter. Flip criteria: at 15+ fires, if variant C retains fk=0 and net>0 → ship underwater-only as the live condition (strictly cleaner than raw live<0.40).",
-      "category": "exit sniper",
-      "risk": "low"
-    },
-    {
-      "idea": "Trail-engine race audit (re-scoped escalation #15)",
-      "detail": "18/55 atr_sl_hit 7d losers had poll-tracked MFE>=0.40 — trail engine (pump_exit ATR-trail / profit-monster) lost the race to ATR-SL. Questions: floor ATR_SL_MIN_ACCEL keeping SL too wide? trail distance (atr*PUMP_EXIT_TRAIL_MULT) wider than initial ATR-SL so no tightening? one-cycle arming lag? Needs code-path trace, post-vacation.",
-      "category": "exit infrastructure",
-      "risk": "none (analysis only)"
-    }
+  "rejections": [
+    "Wider ATR-SL for all signals — recovery probe shows 63% continued = wrong-side, wider SL would give back MORE on the majority cohort",
+    "SHORT-side entry filter change — 69% continued is chop-regime symptom; existing RSI floor + regime gates contain it; n=29 SHORT atr_sl 14d below 50-trade bar for signal-level change"
   ],
   "next_actions": [
-    "TAT: 3 more unique fires → variant-C fk package → CEO GO (signal-scoped: pending/manual first, bb-bounce last or never)",
-    "Post-vacation: trail-engine race audit (re-scoped #15) — why MFE>=0.40 trades exit atr_sl_hit not trail",
-    "Post-vacation: mfe_pct backfill into _signal_metadata (cosmetic JSON gap, column fine)",
-    "CEO escalations carried: exit-ladder signal-scoped backtest P0 (11th request); ARM-BE stays downgraded",
-    "Contrarian pump-chain- flip soak re-eval ~Oct 25",
-    "atr_sl_hit rate monitor (>40 line, 47% now — chop variance, tpsl deployed)"
+    "TAT base shadow: wait for 3 more unique fires (12/15), then CEO flip review with CORRECTED variant-C numbers (6S/0FK)",
+    "ai-trader+ SL-width candle study pre-registered post-vacation (only 62%-recovery family)",
+    "Exit-ladder signal-scoped backtest P0 — 12th CEO re-request",
+    "Re-check open #16293: SL 81741 must hold; if stopped, autopsy as DECLINING-phase LONG"
   ]
 }

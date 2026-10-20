@@ -5793,5 +5793,23 @@
     "category": "exit infrastructure",
     "status": "suggested",
     "risk": "none (analysis)"
+  },
+  {
+    "date": "2026-10-20T03:42:16Z",
+    "idea": "atr_sl recovery discriminator executed — entry-quality vs SL-width split per signal",
+    "rationale": "63% of 7d atr_sl exits continued against us within 30min (wrong-side), only 37% recovered (tight-SL). bb-bounce 0% recovered = pure wrong-side; ai-trader+ 62% = only tight-SL-leaning family.",
+    "expected_impact": "Prevents wasted SL-widening on wrong-side cohort; targets ai-trader+ only for SL study post-vacation",
+    "category": "exit analysis",
+    "status": "executed",
+    "risk": "zero (read-only probe)"
+  },
+  {
+    "date": "2026-10-20T03:42:16Z",
+    "idea": "CORRECTION: TAT variant-C is 6S/0FK not 9S/0FK — three 'saves' had +0.04..+0.07% live_pnl at fire",
+    "rationale": "Run #31 claimed all 9 saves were underwater at fire. Rebuilt from log: #16251/#16282/#16284 were slightly green at fire. Underwater-only filter still zero-FK but saves 6 not 9. Flip review must use corrected numbers.",
+    "expected_impact": "Prevents premature TAT flip on inflated counterfactual",
+    "category": "verification",
+    "status": "corrected",
+    "risk": "zero"
   }
 ]
