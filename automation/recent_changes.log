@@ -4917,3 +4917,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-20 01:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-pending SHORT atr_tp_hit +$0.07 +1.56%) | 24h 17T 7W -$0.41 (41.2%) | 7d 197T 68W -$3.66 (34.5%) — size-reduce 0.3x stays | kill: none (under 3T/hr) | atr_sl_hit 47% >40% but tpsl fix deployed — monitor | no neg-hour streak | 0 open | No constants change → no signal_versions entry
 BY: auto_1hr
+[2026-10-20 01:46] brain_auditor: AUDIT RUN #30 — 0 config changes (vacation mode) | TAT 12/15, ARM-BE downgraded, 2 filters rejected as inverted | 24h 41.2% -$0.41, 7d 34.5% -$3.66, size-reduce 0.5x
+BY: brain_auditor

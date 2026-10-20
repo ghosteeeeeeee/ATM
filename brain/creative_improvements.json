@@ -5757,5 +5757,23 @@
     "category": "exit-side data collection",
     "status": "suggested",
     "risk": "zero (read-only collector)"
+  },
+  {
+    "date": "2026-10-20T01:45:44Z",
+    "idea": "TAT flip-readiness: per-signal fk breakdown at threshold (signal-scoped flip candidate)",
+    "rationale": "12 unique would-fires: ai-trader-pending 0W/2T (0% fk), ai-trader+ 1W/4T (25%), bb-bounce 2W/5T (40%). Aggregate fk 25% may fail bar but pending/ai-trader scopes pass clean. Pre-build package so CEO GO is instant at fire 15.",
+    "expected_impact": "Catch ~75% of never-armed chop stalls (9/12 so far), net +$0.66 counterfactual",
+    "category": "exit lever",
+    "status": "collecting",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-20T01:45:44Z",
+    "idea": "ARM-BE escalation downgrade — give-back problem evaporated",
+    "rationale": "0 ARM-BE fires; armed-then-lost 7d only 4T -$0.06 (was 29T/14d -$2.04). Low-vol chop produces no armed-then-give-back trades. Exit-stack integration no longer P0.",
+    "expected_impact": "Focus CEO attention on TAT flip (12/15) instead of ARM-BE v6",
+    "category": "process",
+    "status": "suggested",
+    "risk": "none"
   }
 ]
