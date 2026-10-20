@@ -12525,3 +12525,25 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - ai-trader-pending 24h 1T 0W still under kill threshold
 - 7d -$3.75 / 34.4% — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - 11th consecutive quiet hour — vol still ~2-3T/day pace
+
+## [2026-10-20 00:27] Hourly Analysis
+
+**Trades:** 2 closed last hour (0 wins, 2 losses)
+**PnL:** -$0.08 last hour | 24h 17T 7W -$0.45 (41.2% WR) | 7d 197T 67W -$3.83 (33.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 closes: LTC bb-bounce-v2-long+ LONG atr_sl_hit -$0.04 (-1.72%), BTC ai-trader-pending LONG atr_sl_hit -$0.04 (-1.74%) — both tiny SL hits
+- atr_sl_hit 8/17 = 47% > 40% threshold, but tpsl_utils.py fix verified deployed (ATR tier + scaled K present in code) — no alert, monitor
+- Kill check: no signal with 0% WR and 3+ trades last hour (each signal had 1T). bb-bounce-v2-long+ 24h 5T 3W -$0.18, ai-trader+ 4T 1W -$0.17 — both under kill threshold
+- No overtrading (2T/hr)
+- No 3-neg-hour streak (only 1 trade hour in last 6h)
+- Size-reduce 0.3x stays (7d WR 33.8% < 35%, 7d PnL -$3.83 < -$2)
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- atr_sl_hit creeping up (47% of 24h closes) — both last-hour exits were ~-1.7% account (normal for 3-5x lev SL); watch if it stays >50% next hour
+- 24h WR dropped to 41.2% from 50% — small sample, not actionable yet
+- 7d -$3.83 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
