@@ -12547,3 +12547,25 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 - atr_sl_hit creeping up (47% of 24h closes) — both last-hour exits were ~-1.7% account (normal for 3-5x lev SL); watch if it stays >50% next hour
 - 24h WR dropped to 41.2% from 50% — small sample, not actionable yet
 - 7d -$3.83 / 33.8% — size-reduce stays until 7d WR >=35% and PnL >= -$2
+
+## [2026-10-20 01:27] Hourly Analysis
+
+**Trades:** 1 closed last hour (1 win, 0 losses)
+**PnL:** +$0.07 last hour | 24h 17T 7W -$0.41 (41.2% WR) | 7d 197T 68W -$3.66 (34.5% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 close: BTC ai-trader-pending SHORT atr_tp_hit +$0.07 (+1.56%) — clean winner
+- atr_sl_hit 8/17 = 47% > 40% but tpsl_utils.py fix verified deployed (prior hours) — no alert, monitor
+- Kill check: no signal with 0% WR and 3+ trades last hour (1 trade total). 24h worst: pump-chain+ 1T 0W, pump-chain- 1T 0W, warrior-sr-confirm+ 1T 0W — all under 3T threshold
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (only 1 trade hour in last 9h)
+- Size-reduce 0.3x stays (7d WR 34.5% < 35%, 7d PnL -$3.66 < -$2)
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d 34.5% WR climbing toward 35% threshold — still -$3.66 PnL, size-reduce stays
+- ai-trader-pending just hit TP (first win) — 3T 1W 24h, no longer 0% WR
+- 24h WR 41.2% still soft — small sample (17T), monitor
