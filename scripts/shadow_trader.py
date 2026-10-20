@@ -1329,6 +1329,200 @@ def analyze_hold_times(signal_type_filter=None):
         conn.close()
 
 
+def sweep_arm_timeouts(signal_type_filter=None, direction_filter=None):
+    """Sweep different arm timeout values to find the most profitable (T directive 3).
+
+    Tests multiple timeout values: 30min, 45min, 60min, 90min, 120min, 180min.
+    For each, simulates what would happen if the trade was closed at that time
+    (if still open and pnl < activation threshold).
+    """
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("═" * 60)
+        log("ARM TIMEOUT SWEEP")
+        log("═" * 60)
+        
+        # Get pump-chain signals
+        if signal_type_filter:
+            rows = cur.execute("""
+                SELECT id, token, direction, source, created_at, leverage_used, context,
+                       first_exit_pnl_pct, first_exit_hold_minutes, first_exit_engine
+                FROM shadow_trades 
+                WHERE closed=1 AND signal_type LIKE ?
+                ORDER BY created_at DESC LIMIT 500
+            """, (f'%{signal_type_filter}%',)).fetchall()
+        else:
+            rows = cur.execute("""
+                SELECT id, token, direction, source, created_at, leverage_used, context,
+                       first_exit_pnl_pct, first_exit_hold_minutes, first_exit_engine
+                FROM shadow_trades 
+                WHERE closed=1 AND signal_type LIKE '%pump-chain%'
+                ORDER BY created_at DESC LIMIT 500
+            """).fetchall()
+        
+        if direction_filter:
+            rows = [r for r in rows if r[2] == direction_filter]
+        
+        if not rows:
+            log("No data")
+            return
+        
+        log(f"\nTotal signals: {len(rows)}")
+        
+        # Test different timeout values
+        timeouts = [30, 45, 60, 90, 120, 180]
+        results = {t: {'n': 0, 'wins': 0, 'total_pnl': 0} for t in timeouts}
+        
+        for r in rows:
+            try:
+                entry_ts = calendar.timegm(datetime.strptime(r[4], '%Y-%m-%d %H:%M:%S').timetuple())
+            except:
+                continue
+            
+            candles = _load_candles_window(r[1], entry_ts, entry_ts + 86400)
+            if not candles or len(candles) < 30:
+                continue
+            
+            entry_price = candles[0][1]
+            direction = r[2]
+            
+            for timeout_min in timeouts:
+                # Find exit candle at timeout
+                exit_ts = entry_ts + timeout_min * 60
+                exit_candle = None
+                for ts, o, h, l, c in candles:
+                    if ts >= exit_ts:
+                        exit_candle = (ts, o, h, l, c)
+                        break
+                
+                if exit_candle:
+                    exit_price = exit_candle[4]
+                    pnl = (exit_price / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / exit_price - 1) * 100
+                    pnl -= FEE_PCT + SLIPPAGE_PCT  # Apply costs
+                    
+                    results[timeout_min]['n'] += 1
+                    results[timeout_min]['total_pnl'] += pnl
+                    if pnl > 0:
+                        results[timeout_min]['wins'] += 1
+        
+        # Report results
+        log(f"\n{'Timeout':>10} {'n':>5} {'WR':>6} {'Total':>8} {'Avg':>8}")
+        log("-" * 50)
+        for timeout_min in timeouts:
+            r = results[timeout_min]
+            if r['n'] > 0:
+                wr = r['wins'] / r['n'] * 100
+                avg = r['total_pnl'] / r['n']
+                log(f"  {timeout_min:>6}m {r['n']:5} {wr:5.1f}% {r['total_pnl']:+8.2f}% {avg:+8.3f}%")
+        
+        # Find best
+        best = max(timeouts, key=lambda t: results[t]['total_pnl'] if results[t]['n'] > 0 else -999)
+        if results[best]['n'] > 0:
+            log(f"\n  🏆 Best timeout: {best}min (WR={results[best]['wins']/results[best]['n']*100:.1f}%, avg={results[best]['total_pnl']/results[best]['n']:+.3f}%)")
+        
+        log("\n═" * 60)
+    finally:
+        conn.close()
+
+
+def sweep_hml_thresholds(signal_type_filter=None):
+    """Sweep different HML thresholds to find the most profitable (T directive 1 correction).
+
+    Tests: what if CUT_LOSER_PNL was -3%, -4%, -5%, -6%, -8%, -10%?
+    """
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("═" * 60)
+        log("HML THRESHOLD SWEEP")
+        log("═" * 60)
+        
+        # Get all closed signals
+        rows = cur.execute("""
+            SELECT id, token, direction, created_at, leverage_used, context,
+                   exit_hard_max_json
+            FROM shadow_trades 
+            WHERE closed=1 AND exit_hard_max_json IS NOT NULL
+            ORDER BY created_at DESC LIMIT 1000
+        """).fetchall()
+        
+        if not rows:
+            log("No HML data")
+            return
+        
+        log(f"\nTotal signals with HML data: {len(rows)}")
+        
+        # Test different thresholds
+        thresholds = [-3.0, -4.0, -5.0, -6.0, -8.0, -10.0]
+        results = {t: {'n': 0, 'wins': 0, 'total_pnl': 0} for t in thresholds}
+        
+        for r in rows:
+            try:
+                entry_ts = calendar.timegm(datetime.strptime(r[3], '%Y-%m-%d %H:%M:%S').timetuple())
+            except:
+                continue
+            
+            candles = _load_candles_window(r[1], entry_ts, entry_ts + 86400)
+            if not candles or len(candles) < 10:
+                continue
+            
+            entry_price = candles[0][1]
+            direction = r[2]
+            leverage = r[4] or MAX_LEVERAGE
+            
+            for threshold in thresholds:
+                # Simulate HML at this threshold
+                price_threshold = threshold / leverage
+                hml_price = entry_price * (1 + price_threshold/100) if direction == 'LONG' else entry_price * (1 - price_threshold/100)
+                
+                exited = False
+                for ts, o, h, l, c in candles:
+                    if direction == 'LONG' and l <= hml_price:
+                        pnl = price_threshold - FEE_PCT - SLIPPAGE_PCT
+                        results[threshold]['n'] += 1
+                        results[threshold]['total_pnl'] += pnl
+                        exited = True
+                        break
+                    elif direction == 'SHORT' and h >= hml_price:
+                        pnl = price_threshold - FEE_PCT - SLIPPAGE_PCT
+                        results[threshold]['n'] += 1
+                        results[threshold]['total_pnl'] += pnl
+                        exited = True
+                        break
+                
+                if not exited:
+                    # Trade didn't hit threshold — use last close
+                    last_close = candles[-1][4]
+                    pnl = (last_close / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / last_close - 1) * 100
+                    pnl -= FEE_PCT + SLIPPAGE_PCT
+                    results[threshold]['n'] += 1
+                    results[threshold]['total_pnl'] += pnl
+                    if pnl > 0:
+                        results[threshold]['wins'] += 1
+        
+        # Report results
+        log(f"\n{'Threshold':>10} {'Account%':>10} {'n':>5} {'WR':>6} {'Total':>8} {'Avg':>8}")
+        log("-" * 60)
+        for threshold in thresholds:
+            r = results[threshold]
+            if r['n'] > 0:
+                wr = r['wins'] / r['n'] * 100
+                avg = r['total_pnl'] / r['n']
+                log(f"  {threshold:>8.1f}% {'lev=5':>8} {r['n']:5} {wr:5.1f}% {r['total_pnl']:+8.2f}% {avg:+8.3f}%")
+        
+        # Find best
+        best = max(thresholds, key=lambda t: results[t]['total_pnl'] if results[t]['n'] > 0 else -999)
+        if results[best]['n'] > 0:
+            log(f"\n  🏆 Best threshold: {best}% account (WR={results[best]['wins']/results[best]['n']*100:.1f}%, avg={results[best]['total_pnl']/results[best]['n']:+.3f}%)")
+        
+        log("\n═" * 60)
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description='Shadow-Mode Paper Trading System')
     ap.add_argument('--record', action='store_true', help='Snapshot ALL signals')
@@ -1343,11 +1537,15 @@ def main():
     ap.add_argument('--exit-signal', type=str, help='Signal type for exit engine comparison')
     ap.add_argument('--analyze-hold', action='store_true', help='Hold time analysis')
     ap.add_argument('--hold-signal', type=str, help='Signal type for hold time analysis')
+    ap.add_argument('--sweep-arm', action='store_true', help='Sweep arm timeout values')
+    ap.add_argument('--sweep-signal', type=str, help='Signal type for arm timeout sweep')
+    ap.add_argument('--sweep-dir', type=str, help='Direction filter for sweep')
+    ap.add_argument('--sweep-hml', action='store_true', help='Sweep HML thresholds')
     args = ap.parse_args()
     
     run_all = not (args.record or args.close or args.report or args.reclose or 
                    args.purge or args.analyze_hml or args.flip_test or 
-                   args.analyze_exits or args.analyze_hold)
+                   args.analyze_exits or args.analyze_hold or args.sweep_arm or args.sweep_hml)
     
     if run_all or args.record:
         record()
@@ -1365,6 +1563,10 @@ def main():
         analyze_exit_engines(args.exit_signal)
     if args.analyze_hold:
         analyze_hold_times(args.hold_signal)
+    if args.sweep_arm:
+        sweep_arm_timeouts(args.sweep_signal, args.sweep_dir)
+    if args.sweep_hml:
+        sweep_hml_thresholds()
     if args.purge:
         purge()
     
