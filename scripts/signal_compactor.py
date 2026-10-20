@@ -4925,6 +4925,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🔄 [CONTRARIAN-FLIP-FINAL] {tkn}: {original_dir}→{direction} (trend_momentum_near_sma always wrong)")
                 elif ACCEL_300_STANDALONE_BYPASS_ENABLED and src.startswith('accel-300'):
                     log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} accel-300 standalone ({src}) allowed at final guard")
+                # ── ichimoku LONG standalone bypass (CEO 2026-10-20) ──────────
+                elif ('ichimoku' in bare_src and direction.upper() == 'LONG'):
+                    try:
+                        from hermes_constants import ICHIMOKU_LONG_BYPASS_ENABLED
+                        if ICHIMOKU_LONG_BYPASS_ENABLED:
+                            log(f"  ➡️  [HOTSET-FINAL-BYPASS] {tkn}:{direction} ichimoku LONG bypass (CEO 2026-10-20) at final guard")
+                        else:
+                            log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — ichimoku bypass disabled")
+                            continue
+                    except ImportError:
+                        log(f"  🚫 [HOTSET-FINAL-BLOCK] {tkn}:{direction} SINGLE-SOURCE BLOCKED at final guard — ichimoku import failed")
+                        continue
                 elif CONFLUENCE_NEUTRAL_RELAX:
                     _r4h, _ = get_regime_4h(tkn)
                     bare_src_final = re.sub(r'\d+$', '', src.rstrip('+-')) if src else ''
@@ -5029,6 +5041,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     log(f"  🔄 [CONTRARIAN-FLIP-PRESERVE] {pe['token']}: {original_dir}→{pe['direction']} (trend_momentum_near_sma always wrong)")
                             elif ACCEL_300_STANDALONE_BYPASS_ENABLED and pe_src.startswith('accel-300'):
                                 log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} accel-300 standalone ({pe_src}) allowed at merge")
+                            # ── ichimoku LONG standalone bypass (CEO 2026-10-20) ──
+                            elif ('ichimoku' in bare_pe and pe['direction'].upper() == 'LONG'):
+                                try:
+                                    from hermes_constants import ICHIMOKU_LONG_BYPASS_ENABLED
+                                    if ICHIMOKU_LONG_BYPASS_ENABLED:
+                                        log(f"  ➡️  [PRESERVE-MERGE-BYPASS] {pe['token']}:{pe['direction']} ichimoku LONG bypass (CEO 2026-10-20) at merge")
+                                    else:
+                                        log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — ichimoku bypass disabled")
+                                        continue
+                                except ImportError:
+                                    log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — ichimoku import failed")
+                                    continue
                             else:
                                 log(f"  🚫 [PRESERVE-MERGE-BLOCK] {pe['token']}:{pe['direction']} SINGLE-SOURCE BLOCKED at merge — src='{pe_src}' — investigate _filter_safe_prev_hotset confluence check")
                                 continue
@@ -5535,6 +5559,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 log(f"  🔄 [CONTRARIAN-FLIP-APPROVE] {tok}: {original_dir}→{d} (trend_momentum_near_sma always wrong)")
                         elif ACCEL_300_STANDALONE_BYPASS_ENABLED and source.startswith('accel-300'):
                             log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} accel-300 standalone ({source}) allowed at pending approve")
+                        # ── ichimoku LONG standalone bypass (CEO 2026-10-20) ──
+                        elif ('ichimoku' in bare_src and d.upper() == 'LONG'):
+                            try:
+                                from hermes_constants import ICHIMOKU_LONG_BYPASS_ENABLED
+                                if ICHIMOKU_LONG_BYPASS_ENABLED:
+                                    log(f"  ➡️  [PENDING-APPROVE-BYPASS] {tok}:{d} ichimoku LONG bypass (CEO 2026-10-20) at pending approve")
+                                else:
+                                    log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — ichimoku bypass disabled")
+                                    continue
+                            except ImportError:
+                                log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — ichimoku import failed")
+                                continue
                         else:
                             log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — src='{source}' parts={len(src_parts)} — need 2+ for confluence")
                             continue
@@ -5710,6 +5746,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🔄 [CONTRARIAN-FLIP-SAFETY] {e['token']}: {original_dir}→{e['direction']} (trend_momentum_near_sma always wrong)")
                 elif ACCEL_300_STANDALONE_BYPASS_ENABLED and (src or '').startswith('accel-300'):
                     log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} accel-300 standalone ({src}) allowed at safety filter")
+                # ── ichimoku LONG standalone bypass (CEO 2026-10-20) ──────────
+                elif ('ichimoku' in bare_src and (e.get('direction') or '').upper() == 'LONG'):
+                    try:
+                        from hermes_constants import ICHIMOKU_LONG_BYPASS_ENABLED
+                        if ICHIMOKU_LONG_BYPASS_ENABLED:
+                            log(f"  🛡️ [SAFETY-FILTER-BYPASS] {e['token']}:{e.get('direction')} ichimoku LONG bypass (CEO 2026-10-20) at safety filter")
+                        else:
+                            log(f"  🛡️ [SAFETY-FILTER] {e['token']}:{e.get('direction')} BLOCKED from hotset.json — ichimoku bypass disabled (LAST RESORT BLOCK)")
+                            continue
+                    except ImportError:
+                        log(f"  🛡️ [SAFETY-FILTER] {e['token']}:{e.get('direction')} BLOCKED from hotset.json — ichimoku import failed (LAST RESORT BLOCK)")
+                        continue
                 else:
                     log(f"  🛡️ [SAFETY-FILTER] {e['token']}:{e.get('direction')} BLOCKED from hotset.json — single-source src='{src}' parts_count={entries_count} (LAST RESORT BLOCK)")
                     continue
@@ -6105,6 +6153,18 @@ def _filter_safe_prev_hotset(prev_hotset):
             _src_stripped_p = src.rstrip('+-') if src else ''
             if bare_src_check in STANDALONE_BYPASS_SIGNALS or _src_stripped_p in STANDALONE_BYPASS_SIGNALS:
                 pass  # backtested standalone — allow through preserve
+            # ── ichimoku LONG standalone bypass (CEO 2026-10-20) ──────────
+            elif ('ichimoku' in bare_src_check and direction.upper() == 'LONG'):
+                try:
+                    from hermes_constants import ICHIMOKU_LONG_BYPASS_ENABLED
+                    if ICHIMOKU_LONG_BYPASS_ENABLED:
+                        pass  # ichimoku LONG bypass — allow through preserve
+                    else:
+                        log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — ichimoku bypass disabled")
+                        continue
+                except ImportError:
+                    log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — ichimoku import failed")
+                    continue
             else:
                 log(f"  🚫 [PRESERVE-FILTER] {tok}:{direction} skipped — only {len(sp)} sources (need 2+): {sp}")
                 continue

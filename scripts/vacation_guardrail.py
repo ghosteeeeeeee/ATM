@@ -291,14 +291,15 @@ def check_ichimoku_bypass_kill():
             conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
             cur = conn.cursor()
             # Count ONLY single-source ichimoku LONG trades (the loosened cohort).
-            # signal='ichimoku+' means single-source; 'ichimoku+,rs_s' means confluence.
+            # bug_hunter r2: executor stores signal_type or source. SIGNAL_TYPE_LONG
+            # is 'ichimoku_long', source is 'ichimoku+'. Match all single-source forms.
             cur.execute("""
                 SELECT COUNT(*), SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END),
                        ROUND(SUM(pnl_usdt), 2),
                        ROUND(100.0 * SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END) / COUNT(*), 1)
                 FROM trades
                 WHERE status = 'closed'
-                  AND signal = 'ichimoku+'
+                  AND signal IN ('ichimoku_long', 'ichimoku', 'ichimoku+')
                   AND direction = 'LONG'
                   AND close_time > NOW() - INTERVAL '24 hours'
             """)
@@ -325,9 +326,12 @@ def check_ichimoku_bypass_kill():
                     f'ICHIMOKU_LONG_BYPASS_ENABLED = False  # AUTO-REVERTED {datetime.now(timezone.utc).isoformat()}: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}% ({n_trades}T)'
                 )
                 # Atomic write: temp file + os.replace to avoid racing compactor import
+                # Preserve original file mode (bug_hunter r2: 0600→0644 regression)
+                orig_mode = os.stat(const_path).st_mode
                 tmp_path = const_path + '.tmp'
                 with open(tmp_path, 'w') as f:
                     f.write(content)
+                os.chmod(tmp_path, orig_mode)
                 os.replace(tmp_path, const_path)
                 log(f"🔴 [ICHIMOKU-BYPASS-KILL] Auto-reverted: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}% ({n_trades}T, PnL ${pnl:+.2f})")
                 write_alert('WARNING', f'ichimoku LONG bypass auto-reverted: WR {wr}% < {ICHIMOKU_LONG_BYPASS_MIN_WR}%', {
