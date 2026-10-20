@@ -160,7 +160,7 @@ CREATE INDEX IF NOT EXISTS idx_shadow_source ON shadow_trades(source);
 CREATE INDEX IF NOT EXISTS idx_shadow_created ON shadow_trades(created_at);
 CREATE INDEX IF NOT EXISTS idx_shadow_closed ON shadow_trades(closed);
 CREATE INDEX IF NOT EXISTS idx_shadow_gate ON shadow_trades(gate_blocked, gate_name);
-CREATE INDEX IF NOT EXISTS idx_shadow_best_exit ON shadow_trades(best_exit_engine);
+CREATE INDEX IF NOT EXISTS idx_shadow_first_exit ON shadow_trades(first_exit_engine);
 ```
 
 ### 3.2 Context JSON Schema
@@ -230,57 +230,57 @@ Each `exit_*_json` column stores:
 
 > **IMPORTANT (own-conclusions validation 2026-10-20):** Section 4 was rewritten based on independent validation. The original spec had 3 of 6 engines factually wrong. All formulas below are verified against live code.
 
-### 4.0 SIGNAL_EXIT_CONFIG Routing (CRITICAL)
+### 4.0 SIGNAL_EXIT_CONFIG Routing + Engine Roster (CRITICAL)
+
+> **IMPORTANT (bug_hunter finding 7):** This is the ONE authoritative engine roster. Sections 2 and 5 must reference this table.
 
 **Before simulating any exit engine, each signal must be routed to the correct engine family.**
 
-The live system routes each signal to exactly one exit config via `_match_exit_config()` (`position_manager.py:55`) against `SIGNAL_EXIT_CONFIG` (`hermes_constants.py:1832`):
+The live system routes each signal to exactly one exit config via `_match_exit_config()` (`position_manager.py:55`) against `SIGNAL_EXIT_CONFIG` (`hermes_constants.py:1832`).
+
+**⚠️ MANDATE (bug_hunter finding 4.0):** Import the REAL `_match_exit_config` from `position_manager`. Do NOT reimplement routing — the spec's simplified pseudocode misroutes versioned signals like `pump-chain-v5` (live strips `-vN` suffixes, handles `-`/`_` prefixes, and does stem matching).
 
 ```python
-SIGNAL_EXIT_CONFIG = {
-    # signal_family: exit_config
-    'pump-chain+': 'pump_exit',      # pump-chain+ LONG, v5/v6 LONG
-    'mover-': 'ride_it',             # mover-, volume-breakout, trend-ride
-    'volume-breakout': 'ride_it',
-    'trend-ride': 'ride_it',
-    # ... others route to 'atr' or 'rr_engine'
-}
+# CORRECT — import the real function
+from position_manager import _match_exit_config
+exit_config = _match_exit_config(source)  # returns 'atr' | 'pump_exit' | 'ride_it' | 'rr_engine' | None
 ```
 
-**Routing logic:**
-```python
-def match_exit_config(source):
-    """Route signal to exit engine family."""
-    # Check exact match
-    if source in SIGNAL_EXIT_CONFIG:
-        return SIGNAL_EXIT_CONFIG[source]
-    # Check prefix match (strip +/-)
-    bare = source.rstrip('+-')
-    if bare in SIGNAL_EXIT_CONFIG:
-        return SIGNAL_EXIT_CONFIG[bare]
-    # Default
-    return 'atr'  # ATR SL/TP is the default engine
-```
+#### Engine Roster (Authoritative)
 
-**v1 scope:** Simulate `atr`, `pump_exit`, `ride_it` engines. `rr_engine` is a multi-hour sub-project (structural S/R re-implementation) — scope to v2 with explicit "not simulated" label.
+| Engine | v1 Simulated? | Schema Column | Source File | Notes |
+|--------|---------------|---------------|-------------|-------|
+| ATR SL/TP | ✅ YES | `exit_atr_json` | `tpsl_utils.py` | Continuous peak-trailing |
+| PM Trail | ✅ YES | `exit_pm_trail_json` | `profit_monster.py` | Tiered, with bypass check |
+| Hard Max Loss | ✅ YES | `exit_hard_max_json` | `position_manager.py` | CUT_LOSER_PNL/leverage |
+| Cut Loser | ✅ YES | `exit_cut_loser_json` | `cut_loser.py` | Two-tier full closes |
+| Speed Stale | ✅ YES (info) | `exit_speed_stale_json` | `position_manager.py` | Fidelity gap: no speed_percentile gate |
+| Universal Max Hold | ✅ YES | `exit_universal_hold_json` | `position_manager.py` | 480min, ride_it 24h |
+| Trail Arm Timeout | ✅ YES | `exit_trail_arm_timeout_json` | `position_manager.py` | bb-squeeze 60min, pump-chain 45min |
+| PM T1/T2 Tier | ❌ NO (v2) | — | `profit_monster.py` | Complex windows, full closes |
+| RR Engine | ❌ NO (v2) | `exit_rr_engine_json` (NULL) | `risk_reward_engine.py` | Multi-hour sub-project |
+| pump_exit | ❌ NO (v2) | — | `position_manager.py` | Route through universal stack, label exit_config |
+| ride_it | ❌ NO (v2) | — | `ride_it_exit.py` | Route through universal stack, label exit_config |
+
+**v1 scope decision (bug_hunter finding 4):** Simulate the 7 universal engines. Signals routed to `pump_exit` or `ride_it` are simulated through the universal stack (ATR + PM Trail + HML + etc.) and labeled with their `exit_config` for stratified analysis. This is an approximation — `pump_exit` and `ride_it` have different exit logic — but it provides data for 100% of signals without defining two new engine simulations.
 
 ---
 
 ### 4.1 ATR SL/TP (Continuous Peak-Trailing Engine)
 
-> **CORRECTED (own-conclusions):** The live engine is NOT a static initial stop. It continuously trails SL from peak. This is its defining behavior.
+> **CORRECTED (own-conclusions + bug_hunter):** The live engine is NOT a static initial stop. It continuously trails SL from peak. Engine ATR is **15m-primary** (via `tpsl_utils.get_fresh_atr` → atr_cache), not 1h. ATR_SL_MAX is **2.5%**, not 5.0%.
 
 **Constants:**
 - `TRAILING_DISTANCE_PCT = 1.20%` (`hermes_constants.py:728`)
-- `ATR_SL_MIN_INIT = 1.5%` (initial floor)
-- `ATR_SL_MIN_ACCEL = 0.30%` (established floor)
-- `ATR_SL_MAX = 5.0%` (cap)
-- `ATR_PERIOD = 14` (computed on **1h candles**, not 5m/1m)
+- `ATR_SL_MIN_INIT = 1.5%` (`hermes_constants.py:711`)
+- `ATR_SL_MIN_ACCEL = 0.30%` (`hermes_constants.py:705`)
+- `ATR_SL_MAX = 2.5%` (`hermes_constants.py:696`)
+- ATR(14) computed on **15m candles** (via `tpsl_utils.get_fresh_atr`), not 1h
 
 **Logic (from `tpsl_utils.compute_atr_sl_tp`):**
 ```python
 entry_price = candle_open_at_signal_ts
-atr_pct = compute_atr_1h(token)  # ATR(14) on 1h candles
+atr_pct = compute_atr_15m(token)  # ATR(14) on 15m candles (tpsl_utils.get_fresh_atr)
 
 # Initial SL/TP
 sl_distance_pct = atr_pct * get_sl_multiplier_v2(atr_pct, signal_type)
@@ -470,87 +470,71 @@ assert compute_hml_threshold(atr_pct=2.0, leverage=5) == -0.80  # NOT -1.00
 
 ---
 
-### 4.4 Profit Monster T1/T2 Tier Exits
+### 4.4 Profit Monster T1/T2 Tier Exits (v2 — NOT SIMULATED IN V1)
 
-> **NEW (own-conclusions):** The original spec double-counted PM Trail. The real system has additional T1/T2 tier exits for quick-scalp/runner partial profit-taking.
+> **DROPPED FROM V1 (bug_hunter finding 2):** The original spec had fabricated thresholds (PM_T1_EXIT_PCT=1.5%, PM_T2_EXIT_PCT=3.0%) and partial-exit logic (50%/25%). The real system uses windows-in-range semantics and FULL closes, not partials.
 
-**Constants:**
-- `PM_T1_EXIT_PCT = 1.5%` (take 50% at +1.5%)
-- `PM_T2_EXIT_PCT = 3.0%` (take 25% at +3.0%)
-- Remainder rides with trail
+**Real behavior (for v2 reference):**
+- Windows: `PM_TIER1 [0.65–2.0%]` / `PM_TIER2 [2.0–5.0%]` (`hermes_constants.py:1641–1649`)
+- Full closes via `brain.py trade close`, NOT partial exits
+- Has `max_close` caps, fire windows, and trail-state skipping
+- No schema column stores T1/T2 results in v1
 
-**Logic (from `profit_monster.py:535-557`):**
-```python
-entry_price = candle_open_at_signal_ts
-t1_taken = False
-t2_taken = False
-position_pct = 100.0  # start with 100%
-
-For each 1m candle after entry:
-    current_pnl_pct = (candle_close / entry_price - 1) * 100  # for LONG
-    
-    # T1: take 50% at +1.5%
-    if not t1_taken and current_pnl_pct >= 1.5:
-        exit 50% at candle_close, reason='pm_t1_exit'
-        t1_taken = True
-        position_pct = 50.0
-    
-    # T2: take 25% at +3.0%
-    if t1_taken and not t2_taken and current_pnl_pct >= 3.0:
-        exit 25% at candle_close, reason='pm_t2_exit'
-        t2_taken = True
-        position_pct = 25.0
-    
-    # Remainder rides with trail
-```
+**v1 decision:** Do NOT simulate T1/T2. Mark as "not simulated in v1" in the engine roster.
 
 ---
 
 ### 4.5 Cut Loser (Two-Tier Loss Cutting)
 
-> **NEW (own-conclusions):** The original spec omitted cut_loser.py. This is a two-tier loss cutting + trailing loss engine.
+> **CORRECTED (bug_hunter finding 2):** The original spec had fabricated partial-exit logic ("cut 50% / cut remaining"). The real system does FULL closes at each tier.
 
 **Constants:**
-- `CL_TIER1_MIN = -1.0%` (cut 50% if below -1.0%)
-- `CL_TIER1_MAX = -2.5%` (cut remaining if below -2.5%)
-- `CL_TIER2_MIN = -2.5%` (second tier start)
-- `CL_TIER2_MAX = -3.0%` (second tier end)
+- `CL_TIER1_MIN_PCT = -1.0%` / `CL_TIER1_MAX_PCT = -2.5%` (`hermes_constants.py:1965–1966`)
+- `CL_TIER2_MIN_PCT = -2.5%` / `CL_TIER2_MAX_PCT = -3.0%` (`hermes_constants.py:1970–1971`)
+- `CL_HARD_STOP_PCT = -3.0%` (cut any trade at -3.0% immediately)
 
 **Logic (from `cut_loser.py`):**
 ```python
 entry_price = candle_open_at_signal_ts
-tier1_cut = False
-tier2_cut = False
-position_pct = 100.0
+tier1_fired = False
+tier2_fired = False
 
 For each 1m candle after entry:
     current_pnl_pct = (candle_close / entry_price - 1) * 100  # for LONG
     
-    # Tier 1: cut 50% if below -1.0%
-    if not tier1_cut and current_pnl_pct <= -1.0:
-        exit 50% at candle_close, reason='cut_loser_t1'
-        tier1_cut = True
-        position_pct = 50.0
+    # Hard stop: cut any trade at -3.0% immediately
+    if current_pnl_pct <= -3.0:
+        exit FULL POSITION at candle_close, reason='cut_loser_hard_stop'
+        break
     
-    # Tier 2: cut remaining if below -2.5%
-    if tier1_cut and not tier2_cut and current_pnl_pct <= -2.5:
-        exit remaining at candle_close, reason='cut_loser_t2'
-        tier2_cut = True
-        position_pct = 0.0
+    # Tier 1: full close if in [-1.0%, -2.5%] range
+    if not tier1_fired and CL_TIER1_MIN_PCT >= current_pnl_pct >= CL_TIER1_MAX_PCT:
+        exit FULL POSITION at candle_close, reason='cut_loser_t1'
+        tier1_fired = True
+        break
+    
+    # Tier 2: full close if in [-2.5%, -3.0%] range
+    if not tier2_fired and CL_TIER2_MIN_PCT >= current_pnl_pct >= CL_TIER2_MAX_PCT:
+        exit FULL POSITION at candle_close, reason='cut_loser_t2'
+        tier2_fired = True
         break
 ```
+
+**Note:** `cut_loser.py` excludes the 40 `PROFIT_MONSTER_BYPASS_SIGNALS` families. The shadow sim should check this list before applying cut_loser.
 
 ---
 
 ### 4.6 Speed Stale Exit (Loser/Winner)
 
-> **CORRECTED (own-conclusions):** The original spec's flat 240-min stale exit matches no live rule. Actual exits are speed-stale based on momentum stall.
+> **CORRECTED (bug_hunter finding 5 + own-conclusions):** The original spec's velocity constant was fabricated. Live is `VEL_STALE_THRESHOLD_PCT = 0.05` (% per candle), not 0.001. The live stall predicate requires `speed_percentile < 33 AND |vel| < thresh`, but shadow cannot reconstruct in-hold speed history (token_speeds keeps only a 241-row current snapshot).
 
 **Constants:**
 - `STALE_LOSER_TIMEOUT_MINUTES = 8` (stalled 8min + pnl ≤ -1.0%)
 - `STALE_WINNER_TIMEOUT_MINUTES = 120` (stalled 120min + pnl ≥ +0.6%)
+- `VEL_STALE_THRESHOLD_PCT = 0.05` (% per candle, `hermes_constants.py:559`)
 - `SPEED_PERCENTILE_STALL = 33` (speed_percentile < 33 = stalled)
-- `VELOCITY_STALL_THRESHOLD = 0.001` (|velocity| < 0.1% = stalled)
+
+**⚠️ FIDELITY GAP (bug_hunter finding 5):** The live stall predicate is `speed_percentile < 33 AND |vel| < thresh`. Shadow omits the `speed_percentile` gate because in-hold speed history is unavailable. **Expect more stale fires than live.** Add `stall_gate_note` in `exit_speed_stale_json`. Consider downgrading speed-stale from "ranked engine" to "informational" in v1.
 
 **Logic (from `position_manager.py:612-637`):**
 ```python
@@ -562,7 +546,8 @@ For each 1m candle after entry:
     current_pnl_pct = (candle_close / entry_price - 1) * 100  # for LONG
     
     # Check if price moved (updates last_move_ts)
-    if abs(candle_close - last_price) / last_price > VELOCITY_STALL_THRESHOLD:
+    # NOTE: VEL_STALE_THRESHOLD_PCT is % per candle, not fraction
+    if abs(candle_close - last_price) / last_price * 100 > VEL_STALE_THRESHOLD_PCT:
         last_move_ts = current_ts
         last_price = candle_close
     
@@ -584,20 +569,22 @@ For each 1m candle after entry:
 
 ### 4.7 Universal Max Hold
 
-> **CORRECTED (own-conclusions):** The original spec used 240min. Actual is 480min with ride_it exemption.
+> **CORRECTED (own-conclusions):** The original spec used 240min. Actual is 480min with ride_it exemption. Citation corrected: `RIDE_IT_MAX_HOLD_HOURS = 24` (`hermes_constants.py:4307`), enforced in `ride_it_exit.py:342`.
 
 **Constants:**
-- `UNIVERSAL_MAX_HOLD_MINUTES = 480` (8 hours)
-- `RIDE_IT_MAX_HOLD_MINUTES = 1440` (24 hours for ride_it signals)
+- `UNIVERSAL_MAX_HOLD_MINUTES = 480` (8 hours, `hermes_constants.py:1132`)
+- `RIDE_IT_MAX_HOLD_HOURS = 24` (24 hours for ride_it signals, `hermes_constants.py:4307`)
 
 **Logic (from `position_manager.py:3448-3472`):**
 ```python
 entry_ts = signal_created_at
-max_hold = 480  # default
+max_hold = 480  # default (minutes)
 
-# Check if signal is ride_it exempt
-if match_exit_config(source) == 'ride_it':
-    max_hold = 1440  # 24 hours
+# Check if signal is ride_it exempt (substring match on signal string)
+# NOTE: live uses substring match, NOT _match_exit_config
+ride_it_substrings = ('ride_it', 'trend-ride', 'trend_ride', 'volume-breakout', 'volume_breakout', 'mover-')
+if any(sub in source for sub in ride_it_substrings):
+    max_hold = 1440  # 24 hours (RIDE_IT_MAX_HOLD_HOURS=24)
 
 exit_ts = entry_ts + max_hold * 60
 exit_price = candle_close_at_exit_ts
@@ -608,11 +595,13 @@ reason = 'universal_max_hold'
 
 ### 4.8 Trail Arm Timeout
 
-> **NEW (own-conclusions):** bb-squeeze and pump-chain LONGs that never reach +0.40% activation get timed out.
+> **CORRECTED (bug_hunter finding 6):** The original spec had "armed once → never times out" semantics. Live closes when **current** pnl < 0.40% **at** the 45/60-min mark. A trade that touched +0.5% then fell back to +0.1% before minute 45 IS closed live.
 
 **Constants:**
-- `BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN = 60` (60min for bb-squeeze)
-- `PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45` (45min for pump-chain LONGs)
+- `BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN = 60` (60min for bb-squeeze, `hermes_constants.py:1671`)
+- `PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45` (45min for pump-chain LONGs, `hermes_constants.py:1682`)
+- `PM_TRAIL_ACTIVATE_PCT = 0.004` (0.40% activation threshold)
+- `BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED` / `PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED` (kill switches)
 
 **Logic (from `position_manager.py:3599-3630`):**
 ```python

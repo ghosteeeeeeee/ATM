@@ -5978,5 +5978,15 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-20T20:38:00Z",
+    "idea": "Mid-trade regime-flip exit monitor (close-time log: entry coin_regime vs close-time scanner regime)",
+    "rationale": "COMP SHORT #16302 entered SHORT_BIAS conf=53, regime flipped LONG_BIAS 89 during hold — MFE +1.18% then full giveback to -7.61%. Entry stamp is static; a close-time comparison (already-stamped entry regime vs scanner file at close) is zero-behavior infra answering whether flip-triggered exits would help. Distinct from TAT (condition-based, not time-based).",
+    "expected_impact": "Would have flagged COMP -7.6% for earlier exit; cohort measurable via one SQL query once log exists",
+    "category": "exit sniper",
+    "status": "pre-registered (vacation-end — do not build during soak; entry-side dampen shadow n=10/20 is primary lever)",
+    "risk": "low (zero-behavior log only)",
+    "blocked_by": "vacation soak; build only if counter-regime dampen flips live OR cohort matures"
   }
 ]

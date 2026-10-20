@@ -1,40 +1,40 @@
-# Current State — brain_auditor #41 Oct 20 ~19:45 UTC
+# Current State — brain_auditor #42 Oct 20 ~20:45 UTC
 
-**Last Updated: 2026-10-20 19:45 UTC**
-**Updated by: brain_auditor #41 — 0 config changes (vacation soak). ARM-GAP 1m FORENSICS EXECUTED: mechanism question CLOSED (whipsaw-through-arm, trail working as designed; ATR-normalized arm KILLED; failed-arm-cut REFUTED 36% winner-FK).**
+**Last Updated: 2026-10-20 20:45 UTC**
+**Updated by: brain_auditor #42 — 0 config changes (vacation soak). coin_regime alignment early signal: COUNTER 5T 0%WR −$0.26 vs ALIGNED 5T 60%WR +$0.60 (n=10/20). All last-run changes verified holding.**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.5x** (marker active; 7d WR 35.8% < 37 AND pnl −$2.47 < −$2 — both resume conditions still failing).
-- **24h 19T 4W −$0.22 (21.1%) — wide-but-shallow, size-reduce containing.** Watchdog URGENT losing-streak steer = same shallow pattern, no action taken (3rd+ occurrence).
-- **7d 162T 35.8% −$2.47 | 30d 722T 41.8% −$8.18.** Wealth gap UNCHANGED: TRAIL 58T 81.0% +$4.38 vs NO_TRAIL 104T 10.6% −$6.85.
-- **Open: 1 BTC LONG continuum-osc+ #16309 @82398, +0.14%.** Aligned LONG_BIAS/BULL_TREND at entry, SL raked, trail arms at +0.40%. HOLD.
-- **Regime: btc_15m SHORT_BIAS (flipped 16:13), btc_4h LONG_BIAS, LOW vol, CALM.** Open trade stamped aligned at entry.
-- **Vacation mode ACTIVE** — shadow-first, no constants changes. Bug fixes / zero-behavior infra / offline studies exempt.
-- Protected flags untouched (CEO_PROTECTED 13/13).
+- **Trading LIVE** with size-reduce **0.5x** (vacation_size_reduce.json authoritative; auto_1hr log text drifts "0.3x" — reporting-only, runtime reads 0.5).
+- **24h 19T 4W −$0.22 (21.1%) — wide-but-shallow, size-reduce containing.** Watchdog 16/20 losing-streak steer = same shallow pattern, REJECTED (3rd+ occurrence).
+- **7d 162T 35.8% −$2.47 | 30d 722T 41.8% −$8.18.** Wealth gap UNCHANGED: 7d TRAIL 36T 97.2% +$2.98 vs NO_TRAIL 126T 18.3% −$5.45. hard_max_loss 14d 87T 0%WR −$8.66.
+- **Open: 1 BTC LONG continuum-osc+ #16309 @82398, +0.23%.** coin_regime=LONG_BIAS aligned at entry. Trail arms ~82728; no arm by ~22:15 UTC or back below EMA300 82604 → exit. HOLD until decision point.
+- **Regime: BTC pinned at EMA300 (chop pin), 15m NEUTRAL, 4h LONG_BIAS, NORMAL vol.**
+- **Vacation mode ACTIVE** — shadow-first, no constants changes. Protected NEVER_REENABLE flags 25/25 False intact.
 
-## THIS RUN — brain_auditor #41 (19:45 UTC)
+## THIS RUN — brain_auditor #42 (20:45 UTC)
 
-**0 config changes. 1 definitive forensic study executed. ARM-GAP mechanism question CLOSED.**
+**0 config changes. Verification + new early data.**
 
-1. **ARM-GAP 1m FORENSICS (offline, candles.db replay of 45T/14d giveback cohort −$3.26):**
-   - **41/45 (91%) had 1m CLOSES at/above +0.40% arm level** — not pure wick-spike.
-   - **But best consecutive run above arm = 1 minute, max = 1, for ALL 41.** Never 2 consecutive minutes. Median 15 scattered single-minute pokes.
-   - **VERDICT: WHIPSWAW-THROUGH-ARM.** Price poked arm, closed above, reversed next minute every time. Trail system correctly stayed disarmed on 1-minute pokes. **NOT a trail-desync bug. NOT classic spike-MFE. Trail working as designed.**
-   - **Concentration:** pump-chain family 29/45 (64%).
-   - **Refuted levers:** (a) failed-arm-reversal cut — 36% of 7d trail winners (17/47, +$33.97) also poked-then-fell-below-entry; cut would false-kill 36% of winners = FAIL winner-kill bar. (b) ATR-normalized easier-arm — lower threshold on whipsaw pokes = more premature arms = MORE giveback. **KILLED with evidence.**
-   - **Closed loops:** #32 (mechanism question, pending 9 days), #40 (instrumentation purpose — answer arrived offline before first live fire). ARM-GAP live log line stays armed to confirm on future closes.
-   - **Conclusion: no exit-side lever in the giveback cohort. These are chop entries that never trended. Lever remains entry-side.**
-2. **WATCHDOG TRIAGE: 001 losing-streak REJECT** (shallow −$0.22, size-reduce containing) | **002 wrong-side VERIFIED structural** (chop + counter-regime SHORTs FOGO/COMP + CEO manual BTC cluster; no new filter clears bars) | **003 pump-chain− kill REJECT** (14d family net +$0.13; losses conf~24.5 floor-admits; pp-cond shadow covers, flip failed criteria #39).
-3. **LAST-RUN VERIFY:** ARM-GAP instrumentation ✓ in place (PM:1313-1321, 0 qualifying live closes yet — all 24h losers pre-ship 16:46) | TAT scope fix ✓ (0 manual/pending fires post-15:40; valid unique 9/15) | coin_regime ✓ 10/20 stamps | size-reduce 0.5x ✓ marker active | protected 13/13 ✓.
-4. **conf<30 floor-admits:** 24h 8T −$0.50 12.5% | 14d 44T −$1.71 25% — chronic bleed, pp-cond shadow is the deployed answer, flip failed bars, vacation bans flip.
-5. **24h winners confirm thesis:** 3/4 trail-family (ZRO hard_tp, HYPE profit-monster, ALT trail_sl MFE 3.3%). 4/4 losers-side never armed.
+1. **coin_regime ALIGNMENT COHORT (n=10/20, early but directionally perfect):**
+   - COUNTER-regime (entry regime opposes direction): **5T 0.0%WR −$0.26**
+   - ALIGNED: **5T 60.0%WR +$0.60**
+   - Poster child: COMP SHORT #16302 entered SHORT_BIAS 53, flipped LONG_BIAS 89 mid-trade, −7.61% (MFE +1.18% full giveback). PUMP r2v2-long3 LONG into SHORT_BIAS conf=0, −5.4%.
+   - Counter-regime 0.5x dampen shadow continues collecting. **Decision at n≥20** (pre-registered: would-block WR<30%, would-keep WR>50%, save>$1).
+2. **WATCHDOG TRIAGE: 001 REJECT** (shallow, containing, 3rd+ identical) | **002 VERIFIED-STRUCTURAL** (hard_max_loss cohort unchanged, no new filter clears bars) | **003 KILL-REJECT** (14d pump-chain- family net +$0.13; counter-regime sub-cohort is the real lever).
+3. **LAST-RUN VERIFY all holding:** ARM-GAP ✓ (PM:1313-1321, 0 qualifying closes = correct silence) | TAT scope fix ✓ | coin_regime stamps 10/13 (3 missing = manual/pending, correct) | size-reduce 0.5x ✓ | protected 25/25 ✓.
+4. **24h autopsy: 15 losers, 0 new patterns.** 3 known cohorts: chop-LONGs hard_max_loss (PUMP/BLUR/ARB), counter/mid-band pump-chain- SHORTs, CEO manual bad-SL cluster. Winners all trail-family high-RSI (ZRO 74.5, HYPE 65.6) — thesis confirmed again.
+5. **CREATIVE pre-registered (no build during soak):** mid-trade regime-flip exit monitor — close-time log comparing entry coin_regime stamp vs scanner regime at close. Zero-behavior, vacation-end. Primary lever remains entry-side dampen shadow.
+
+## SIDeways FIND
+
+- **auto_1hr reporting drift:** log lines say "size-reduce 0.3x stays" but vacation_size_reduce.json = 0.5 and decider_run.py:264 reads the file. Runtime correct; message text stale. Low severity, auto_1hr owner fix.
 
 ## OPEN LOOPS
 
-- **Escalation #15 (18th request):** exit-ladder signal-scoped candle OOS backtest — still not commissioned.
-- **TAT bb-bounce flip: 9/15 valid unique fires** (scope fixed #39; need 6 more).
-- **coin_regime cohort: 10/20** → counter-regime dampen shadow decision at n≥20.
-- **ARM-GAP live log lines:** instrumentation armed, 0 fires yet (forensics answered early); next qualifying close will confirm.
-- **TRANSITIONING entry-quality study:** pre-registered, offline, vacation-end.
-- **Post-vacation stack: ~14+ unvalidated soaks** + pp-cond flip re-eval + ATR-normalized-arm formally dead — CEO eyeball on resume.
+- **Escalation #15 (19th request):** exit-ladder signal-scoped candle OOS backtest — still not commissioned.
+- **TAT bb-bounce flip: 9/15 valid unique fires** (need 6 more).
+- **coin_regime counter-regime dampen: 10/20** → decision at n≥20.
+- **pp-cond shadow flip:** failed bars (#39), re-eval vacation-end.
+- **Post-vacation stack: ~14+ unvalidated soaks** — CEO eyeball on resume (~Oct 23).
+- **Mid-trade regime-flip monitor:** pre-registered this run, build only after dampen decision or cohort matures.
