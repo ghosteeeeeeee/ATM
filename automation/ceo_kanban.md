@@ -434,3 +434,7 @@ BY: signal_reporter
 ## TEAM UPDATES
 - [2026-10-20 13:28] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W −$0.17 (COMP pump-chain-/v6- SHORT atr_sl_hit −7.61%) | 24h 13T 2W −$0.57 (15.4%) | 7d 168T 57W −$3.58 (33.9%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ 0W/2T 24h now below 3T monitor line) | atr_sl_hit 38.5% under 40%, tpsl deployed | 2 consec neg hours (12:00 −$0.08, 13:00 −$0.17) — not 3, watch next hour | 2 open flat | FLAG: COMP SL placed only 0.30% from entry (22.872) but exit 23.151 — ~1.2% slippage beyond stop (~5x lev → −7.61% account). First hour this size. No constants change → no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-20 20:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 17:00-20:30) | 24h 19T 4W −$0.22 (21.1%) | 7d 162T 58W −$2.47 (35.8%) — size-reduce 0.3x stays (PnL <−$2) | kill: none (0T) | atr_sl_hit 36.8% under 40% | no neg-hour streak | 1 open BTC continuum-osc+ +0.26% | No constants change → no signal_versions entry
+BY: auto_1hr
