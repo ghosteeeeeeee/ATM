@@ -1,104 +1,133 @@
 {
-  "timestamp": "2026-10-20T15:40:00Z",
-  "run": "brain_auditor #39",
-  "portfolio_health": "critical (wide-but-shallow)",
+  "timestamp": "2026-10-20T16:46:50Z",
+  "run": "brain_auditor #40",
+  "session_lock": "none",
+  "vacation_soak": true,
   "trade_summary_24h": {
-    "trades": 19,
+    "trades": 20,
     "wins": 4,
-    "wr_pct": 21.1,
-    "pnl_usdt": -0.14,
-    "note": "Watchdog 'critical' = 16/20 loss streak but losses tiny (max -$0.31). Size-reduce 0.5x containing. Net flat."
+    "win_rate": 20.0,
+    "pnl": -0.26,
+    "note": "wide-but-shallow; size-reduce 0.5x containing (max loss -$0.31)"
   },
   "trade_summary_7d": {
-    "trades": 167,
-    "wr_pct": 35.3,
-    "pnl_usdt": -2.67,
-    "trail_vs_chop": "trailing=True 61T 78.7% +$4.37 vs trailing=False 106T 10.4% -$7.04 — wealth gap UNCHANGED"
+    "trades": 168,
+    "wins": 59,
+    "win_rate": 35.1,
+    "pnl": -2.79
   },
-  "open_trades": {
-    "ids": [16306, 16307],
-    "detail": "2x BTC LONG ai-trader-manual @82735, +0.28% each, intentional tranche (protocol §7). SLs raked BE+ (82820/82486.8), TP 83687. LONG_BIAS/STRONG_UP aligned. HOLD both.",
-    "action": "none — regime-aligned, trail needs +0.40% arm"
+  "trade_summary_30d": {
+    "trades": 726,
+    "win_rate": 42.1,
+    "pnl": -6.89
   },
-  "watchdog_steers_triage": {
-    "steer_001_btc_pullback": "add OFF confirmed; price recovered 82537→82970. HOLD open longs.",
-    "steer_002_btc_cluster": "intentional tranche RESOLVED (prior run)",
-    "steer_003_losing_streak_16_20": "wide-but-shallow, net -$0.14/24h. No action — size-reduce containing.",
-    "steer_005_wrong_side": "VERIFIED-STRUCTURAL (5th cycle). trail vs chop gap unchanged. No new filter passes bars.",
-    "steer_006_pump_chain_minus_streak": "14d +$0.19 net positive. Counter-regime stamp collecting (n=9). Wait n>=20 for gate.",
-    "steer_007_pump_chain_plus_streak": "14d 52T +$1.08 KILL REJECTED (reconfirmed). BLUR/ARB mid-band chase = known death-zone pattern, advisory covers."
-  },
-  "losing_trade_autopsy_24h": {
-    "total_losers": 14,
-    "clusters": [
-      {"cluster": "pump-chain SHORT family (COMP/FOGO/ADA/IO/ALT/GOAT)", "pnl": "-0.35", "root_cause": "Counter-regime: FOGO/ADA/IO stamped coin_regime=LONG_BIAS. COMP SHORT_BIAS but 1.2% slippage on EXTREME. Post-11:45 flip SHORTs were wrong side.", "recommended_change": "coin_regime-aligned dampen — PRE-REGISTERED (n=9<20)", "confidence": "MEDIUM"},
-      {"cluster": "BTC manual/pending LONGs (3T)", "pnl": "-0.15", "root_cause": "BTC chop pre-flip; one cut_loser -21% account anomaly (#16307 leg sizing), one atr_sl. Post-flip open longs green.", "recommended_change": "none — pre-flip window", "confidence": "HIGH"},
-      {"cluster": "pump-chain+ LONG BLUR/ARB", "pnl": "-0.39", "root_cause": "meta_rsi 57-59 mid-expansion chase (death zone). Winners enter 65-75 fresh squeeze.", "recommended_change": "none — death-zone advisory already live, n=2", "confidence": "HIGH"}
-    ]
-  },
-  "pp_cond_flip_evaluation": {
-    "criteria": "14d save>$1 AND fk<10% (pre-registered)",
-    "matched_trades": 6,
-    "save_usd": 0.27,
-    "fk_rate_pct": 16.7,
-    "verdict": "FAIL both criteria on matched live trades — KEEP SHADOW collecting. Unmatched 89/95 would-blocks never became trades (other filters caught them)."
-  },
-  "config_changes_applied": [
+  "open_positions": [
     {
-      "change": "TAT shadow signal-scope FIX (ai-trader → ai-trader+)",
-      "file": "position_manager.py:3627",
-      "type": "bugfix",
-      "behavior": "zero (shadow only)",
-      "detail": "7/16 unique shadow fires were CEO manual/pending trades polluting flip cohort. Valid flip count corrected to 9/15."
+      "id": 16309,
+      "coin": "BTC",
+      "direction": "LONG",
+      "signal": "continuum-osc+",
+      "entry": 82398,
+      "sl_raked": 81628,
+      "tp": 83688,
+      "pnl_pct": 0.21,
+      "coin_regime": "LONG_BIAS",
+      "btc_regime": "BULL_TREND",
+      "action": "HOLD — aligned, in profit, trail arms at +0.40%"
     }
   ],
-  "changes_from_last_run": {
-    "run_38_coin_regime_stamp": "VERIFIED — 9T stamped, directionally perfect (SHORT×LONG_BIAS 0%, LONG×LONG_BIAS 67%)",
-    "run_38_pre_reg_flip_study": "EARLY POSITIVE — aligned LONG +$0.57 vs misaligned SHORT -$0.20, n=5 < bar",
-    "run_38_pp_cond_flip_queued": "EVALUATED this run — FAIL criteria, stays shadow",
-    "run_37_counter_regime_study": "REFUTED as RANGING-bleed, reframed monitor — holding",
-    "all_prior_soaks": "0 violations"
+  "watchdog_steer_triage": {
+    "steer-001": "losing-streak 16/20 URGENT — total PnL only -$0.18. Wide-but-shallow again; size-reduce already active. No new action.",
+    "steer-002": "cluster PUMP+BTC — PUMP closed (hard_max_loss -$0.12), cluster resolved. BTC open alone, HOLD.",
+    "steer-003": "wrong-side 4 losses >2% — VERIFIED mixed: PUMP LONG stamped coin SHORT_BIAS (COUNTER, -5.4%); BLUR/ARB pump-chain+ chop entries (MFE<0, never positive); COMP SHORT aligned but 1.2% slippage EXTREME. No new systemic pattern.",
+    "steer-004": "pump-chain- 5-loss streak — REJECTED kill. 14d 62T +$0.21 net positive.",
+    "steer-005": "pump-chain+ 3-loss streak — REJECTED kill. 14d 59T +$1.09 net positive (atr_trail_hit 10T +$3.74 funds the hard_max_loss bleed)."
   },
   "last_run_verify": {
-    "doji_kill": "HOLDING — 0 trades since Oct 16",
-    "short_floor_45": "HOLDING — 0 RSI<45 SHORT opens post-revert",
-    "extreme_085": "HOLDING",
-    "size_reduce_0.5x": "HOLDING",
-    "coin_regime_stamp": "HOLDING — live",
-    "dual_path_state_load": "HOLDING",
-    "tat_scope_fix": "SHIPPED this run — py_compile + 9/9 predicate self-check PASS"
+    "tat_shadow_scope_fix": "VERIFIED — position_manager.py:3627 matches 'ai-trader+' only; py_compile OK. Valid flip cohort 9/15 (4 ai-trader+ + 5 bb-bounce).",
+    "pp_cond_stays_shadow": "correct per #39 FAIL verdict (save $0.27<$1, FK 16.7%>10%)",
+    "coin_regime_stamp": "LIVE, 10 closed stamped trades. ALIGNED 5T 60%WR +$0.60 vs COUNTER 5T 0%WR -$0.26. Directionally perfect, n=10<20 bar. Keep collecting.",
+    "size_reduce_0_5x": "ACTIVE (vacation_size_reduce.json, written 14:57 today). auto_1hr text says 0.3x — stale label only, marker is source of truth.",
+    "protected_flags": "13/13 INTACT"
   },
-  "creative_improvements": [
+  "losing_trade_autopsy_24h": {
+    "losers": 16,
+    "net": -0.26,
+    "clusters": [
+      {
+        "cluster": "hard_max_loss chop entries 3T (PUMP/BLUR/ARB)",
+        "root_cause": "MFE<0 at close — never went positive. Pure chop entries, zero momentum.",
+        "detail": "PUMP r2v2-long3 stamped coin SHORT_BIAS (counter-regime LONG); BLUR/ARB pump-chain+ in BULL_TREND but signal fired on no momentum",
+        "recommended_change": "none new — TAT/MFE-CUT shadows already collecting; ARM-GAP instrumentation shipped this run"
+      },
+      {
+        "cluster": "pump-chain- SHORT family 5 losses (FOGO/ADA/IO/ALT/GOAT)",
+        "root_cause": "4/5 stamped coin LONG_BIAS (counter-regime). Small losses, size-reduce containing.",
+        "detail": "ALT also WON +$0.20 trail same day — same signal same regime, mixed outcomes. n too small per-signal.",
+        "recommended_change": "none — coin_regime dampen pre-registered, waits n>=20"
+      }
+    ]
+  },
+  "studies_executed": [
     {
-      "idea": "coin_regime-aligned confidence dampen (SHORT × LONG_BIAS)",
-      "status": "pre_registered",
-      "flip_criteria": "stamped cohort n>=20, counter-regime SHORT net negative, fk<10%",
-      "current_cohort": "9T stamped, 4T counter-regime SHORT all losers"
+      "name": "btc_regime 14d/30d backfill (meta field, 951 trades since Sep 12)",
+      "finding": "BTC-level ALIGNED vs COUNTER REFUTED as lever: 30d COUNTER -$1.38 vs ALIGNED -$3.27 (aligned worse). COUNTER_LONG 14d 38T +$0.22 even positive. BTC-direction alignment is NOT the edge.",
+      "chop_regime": "TRANSITIONING = the real chop: 14d 77T -$1.39 29.9% / 30d 165T -$2.88 37% (consistent bleed, large n). RANGING only profitable regime: 14d 46T +$0.51 52.2% / 30d 124T +$0.46 53.2%.",
+      "implication": "CHOP_DETECTOR_ENABLED=True already live yet TRANSITIONING still bleeds $2.88/30d — detector logic drift vs btc_regime=TRANSITIONING. Vacation-end study candidate.",
+      "verdict": "No config change. Documented for vacation-end."
     },
     {
-      "idea": "TAT flip ledger via unique trade_id count (methodology note)",
-      "status": "methodology_fixed",
-      "detail": "In-memory dedup resets each PM run; raw log line counts overcount ~50x. Count unique trade=NNNN ids. Valid cohort after scope fix: 9/15."
+      "name": "giveback cohort 14d (MFE>=0.40, trailing_activated=FALSE, pnl<0)",
+      "finding": "45T -$3.26 0%WR avg MFE 0.81%. Concentrated pump-chain- 16T -$0.99, pump-chain+ 5T -$0.45. Arm-registration gap (#32) still unfixed.",
+      "action": "ARM-GAP close-time instrumentation SHIPPED (zero-behavior log line, position_manager.py:1313). Answers candle-spike-MFE vs trail-desync with close-time data."
     }
   ],
-  "rejected_this_run": [
-    "kill volume-breakout-long+ (14d 18.8% -$0.76) — 30d 26T +$1.44 OOS reversal, fails pattern bar",
-    "kill pump-chain- (watchdog steer) — 14d +$0.19 net positive, n=4 streak below bar",
-    "kill pump-chain+ (watchdog steer) — 14d +$1.08, reconfirmed",
-    "pp-cond floor flip — FAIL criteria (save $0.27<$1, FK 16.7%>10%)",
-    "ship counter-regime hard gate — n=9<20 bar"
+  "config_changes_applied": [
+    {
+      "type": "infra",
+      "file": "scripts/position_manager.py",
+      "change": "ARM-GAP instrumentation: log [ARM-GAP] line at close when MFE>=0.40 and trailing_activated=FALSE and pnl<0",
+      "behavior": "zero — log only",
+      "rationale": "45T/14d giveback cohort -$3.26 with unregistered trail arms; pending since #32. Resolves candle-spike vs desync hypothesis with data."
+    }
   ],
-  "open_loops": [
-    "Escalation #15 (16th request): exit-ladder signal-scoped candle OOS backtest — still not commissioned",
-    "TAT bb-bounce flip: 9/15 valid unique fires (after scope fix)",
-    "coin_regime cohort: 9T, need n>=20 for 14d backfill + gate decision",
-    "pp-cond shadow: keep collecting, flip re-eval at next audit",
-    "Post-vacation stack: ~12+ unvalidated soaks — CEO eyeball on resume"
+  "changes_from_last_run": [
+    "TAT scope fix VERIFIED live (9/15 valid fires)",
+    "pp-cond stays shadow (FAIL on matched criteria) — correct",
+    "coin_regime stamp collecting (n=10, directionally perfect early)"
+  ],
+  "rejected_this_run": [
+    "kill pump-chain- (14d +$0.21 net positive)",
+    "kill pump-chain+ (14d +$1.09 net positive)",
+    "BTC-level counter-regime dampen (backfill REFUTED: aligned trades bleed more)",
+    "TRANSITIONING blanket 0.5x dampen (would cut winners harder than losers: 23W +$2.84 vs 54L -$4.23)",
+    "act on watchdog losing-streak URGENT (PnL only -$0.18, size-reduce already containing)"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-20T16:46:50Z",
+      "idea": "TRANSITIONING-chop entry-quality study (pre-registered, offline)",
+      "rationale": "btc_regime backfill: TRANSITIONING is the only large consistent bleed (165T/30d -$2.88, 37%WR) while CHOP_DETECTOR is already enabled — detector logic drifts from btc_regime. RANGING is profitable (53%WR). Study what separates the 23 TRANSITIONING winners from 54 losers (14d).",
+      "expected_impact": "identify single entry filter that works specifically in chop regime",
+      "category": "entry sniper",
+      "status": "pre_registered",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-20T16:46:50Z",
+      "idea": "ARM-GAP instrumentation (SHIPPED this run)",
+      "rationale": "45T/14d MFE>=0.40 giveback -$3.26 trail never registered. Close-time log answers whether MFE is candle-spike (physical miss) or trail-desync (bug).",
+      "expected_impact": "resolves root cause of largest identified unfixed leak",
+      "category": "infra",
+      "status": "shipped",
+      "risk": "zero (log only)"
+    }
   ],
   "next_actions": [
-    "Monitor open BTC longs — trail arm at +0.40%, TP 83687",
-    "Watch TAT shadow fires on bb-bounce/ai-trader+ only (scope fixed)",
-    "Re-eval coin_regime gate at stamped n>=20",
-    "pp-cond flip stays queued until matched save>$1 and FK<10%"
+    "Monitor ARM-GAP log lines — if spike-MFE dominates, ATR-normalized arm is the fix; if desync dominates, trail subsystem bug",
+    "coin_regime cohort: n=10/20 — counter-regime dampen decision at n>=20",
+    "TAT bb-bounce flip: 9/15 valid unique fires, need 15",
+    "Vacation-end stack: TRANSITIONING drift study + pp-cond re-eval + arm-gap verdict (~14 unvalidated soaks — CEO eyeball on resume)",
+    "Escalation #15 (17th): exit-ladder signal-scoped candle OOS still not commissioned"
   ]
 }

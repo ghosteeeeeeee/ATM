@@ -12876,3 +12876,24 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 24h PnL recovered -$0.57 → -$0.14 and 7d WR crossed 35% (33.9% → 35.3%) — watch if size-reduce can lift when PnL recovers
 - Manual BTC trade SL levels (0.006%/0.103% distances) — CEO should verify SL-setting on ai_trader manual path
+
+## [2026-10-20 16:35 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.12 last hour | 24h 20T 4W -$0.26 (20.0% WR) | 7d 168T 59W -$2.79 (35.1% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 close: PUMP r2v2-long3 LONG hard_max_loss -$0.12 (-5.41%) — hard_max_loss fired as designed; r2v2-long3 has only 1T in 24h so kill rule (0% WR, 3+T) not met
+- Kill check: no signal with 0% WR and 3+ trades last hour (only r2v2-long3 1T). pump-chain+ 2T 0W 24h still under 3T line
+- atr_sl_hit signal-only 5/14 = 35.7% under 40% — tpsl deployed, no action
+- No overtrading (1T/hr)
+- No 3-neg-hour streak (14:00 +$0.65 breaks; 15:00 -$0.13, 16:00 -$0.12 = 2 consec, watch 17:00)
+- Size-reduce 0.3x stays (7d WR 35.1% but 7d PnL -$2.79 still <-$2)
+- 1 open: BTC continuum-osc+ LONG flat (+0.02%)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR 20% still weak (n=20); 7d PnL worsening (-$2.67 → -$2.79)
+- hard_max_loss is 2nd-worst close reason 24h (3T -$0.51) — worth reviewing if it clusters

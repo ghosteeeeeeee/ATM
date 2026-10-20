@@ -1727,5 +1727,16 @@
     "after": "('bb-bounce' in sig or 'ai-trader+' in sig) — confluence signals only",
     "rationale": "7/16 unique TAT shadow fires were CEO manual/pending trades (16251/16283/16291/16293/16297/16306/16307). CEO trades have explicit SL/TP and must never be TAT-eligible; pollutes 15-fire flip bar and would auto-exit CEO trades if flipped with same predicate.",
     "impact": "Zero live behavior (shadow only). Flip cohort corrected from 16 to 9 unique signal trades (4 ai-trader+ + 5 bb-bounce). Valid flip count: 9/15."
+  },
+  {
+    "timestamp": "2026-10-20T16:46:50Z",
+    "agent": "brain_auditor",
+    "change": "ARM-GAP close-time instrumentation: log line when MFE>=0.40, trailing_activated=FALSE, pnl<0",
+    "type": "infra",
+    "file": "scripts/position_manager.py",
+    "before": "no visibility into giveback cohort (45T/14d -$3.26)",
+    "after": "[ARM-GAP] token dir MFE=X% trail=FALSE exit=Y pnl=Z% trade=N logged at close",
+    "rationale": "Pending since #32. Resolves candle-spike-MFE vs trail-desync hypothesis with close-time data. Zero behavior.",
+    "impact": "Enables or kills ATR-normalized arm idea; targets -$3.26/14d giveback leak"
   }
 ]

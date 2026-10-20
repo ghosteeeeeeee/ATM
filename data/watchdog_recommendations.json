@@ -1,29 +1,21 @@
 {
-  "timestamp": "2026-10-20T16:13:43.225981+00:00",
+  "timestamp": "2026-10-20T16:43:43.479933+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 16/20 recent trades lost",
-      "detail": "Win rate 20% over last 20 trades. Total PnL: -0.18 USDT. Something is wrong.",
+      "detail": "Win rate 20% over last 20 trades. Total PnL: -0.26 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: PUMP + BTC",
-      "detail": "Both opened within 4 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
-    {
-      "severity": "warning",
       "category": "health",
-      "title": "4 recent losses look like wrong-side trades",
+      "title": "5 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-002"
     },
     {
       "severity": "warning",
@@ -31,31 +23,23 @@
       "title": "Signal 'pump-chain-,pump-chain-v6-' losing streak: 5 losses",
       "detail": "Net -0.10 USDT over last 20 trades (losses: -0.30). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-004"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 3 losses",
-      "detail": "Net -0.43 USDT over last 20 trades (losses: -0.43). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-005"
+      "id": "steer-003"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "ABOVE",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "FLAT",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "linreg_alignment": 0.0,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 2
+  "open_count": 1
 }

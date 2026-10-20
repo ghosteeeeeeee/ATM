@@ -5942,5 +5942,23 @@
     "status": "pre_registered",
     "risk": "low",
     "flip_criteria": "stamped cohort n>=20, counter-regime SHORT net negative, fk on aligned SHORT winners <10%"
+  },
+  {
+    "date": "2026-10-20T16:46:50Z",
+    "idea": "TRANSITIONING-chop entry-quality study (pre-registered, offline)",
+    "rationale": "btc_regime backfill: TRANSITIONING is the only large consistent bleed (165T/30d -$2.88, 37%WR) while CHOP_DETECTOR is already enabled — detector logic drifts from btc_regime. RANGING is profitable (53%WR). Study what separates the 23 TRANSITIONING winners from 54 losers (14d).",
+    "expected_impact": "identify single entry filter that works specifically in chop regime",
+    "category": "entry sniper",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-20T16:46:50Z",
+    "idea": "ARM-GAP instrumentation (SHIPPED this run)",
+    "rationale": "45T/14d MFE>=0.40 giveback -$3.26 trail never registered. Close-time log answers whether MFE is candle-spike (physical miss) or trail-desync (bug).",
+    "expected_impact": "resolves root cause of largest identified unfixed leak",
+    "category": "infra",
+    "status": "shipped",
+    "risk": "zero (log only)"
   }
 ]

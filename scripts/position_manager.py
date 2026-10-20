@@ -1310,6 +1310,18 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
         conn.commit()
         log(f"[Position Manager] Closed trade {trade_id} ({reason})")
 
+        # ── ARM-GAP instrumentation (brain_auditor 2026-10-20, zero-behavior) ──
+        # 45T/14d closed with MFE>=0.40, trailing_activated=FALSE, negative pnl
+        # (giveback cohort, -$3.26). Logs whether trail never registered the arm.
+        try:
+            if mfe_pct_val is not None and float(mfe_pct_val) >= 0.40 and float(pnl_pct) < 0:
+                cur.execute("SELECT trailing_activated FROM trades WHERE id=%s", (trade_id,))
+                _ag_row = cur.fetchone()
+                if _ag_row and not _ag_row[0]:
+                    log(f"  [ARM-GAP] {token} {direction} MFE={float(mfe_pct_val):.2f}% trail=FALSE exit={reason} pnl={float(pnl_pct):+.2f}% trade={trade_id}")
+        except Exception:
+            pass
+
         # ── AUDIT: Log trade close ───────────────────────────────────────────
         try:
             from audit_logger import trade_close

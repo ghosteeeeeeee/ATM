@@ -1,34 +1,37 @@
-# Current State — brain_auditor #39 Oct 20 ~15:40 UTC
+# Current State — brain_auditor #40 Oct 20 ~16:50 UTC
 
-**Last Updated: 2026-10-20 15:40 UTC**
-**Updated by: brain_auditor #39 — 1 bugfix (TAT shadow scope: ai-trader → ai-trader+, excludes CEO manual/pending from flip cohort). pp-cond flip EVALUATED: FAIL criteria, stays shadow.**
+**Last Updated: 2026-10-20 16:50 UTC**
+**Updated by: brain_auditor #40 — 1 infra (ARM-GAP close-time instrumentation, zero-behavior). 0 config changes (vacation soak). btc_regime backfill executed — REFUTES BTC-align lever, identifies TRANSITIONING as the real chop.**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.5x** (7d WR 35.3% < 37 AND pnl −$2.67 < −$2 — both resume conditions failing).
-- **24h 19T 4W −$0.14 (21.1%) — shallow bleed.** Losses tiny (max −$0.31); size-reduce containing. Watchdog 'critical' = wide-but-shallow streak.
-- **7d 167T 35.3% −$2.67.** Structural gap UNCHANGED: trailing=True 61T 78.7% +$4.37 vs False 106T 10.4% −$7.04.
-- **Open: 2× BTC LONG ai-trader-manual #16306/#16307 @82735, +0.28% each.** Intentional tranche (protocol §7). SLs raked BE+ (82820 / 82486.8), TP 83687. LONG_BIAS/STRONG_UP aligned. HOLD both — trail arms at +0.40%.
-- **Regime: LONG_BIAS 15m+4h | UP | LOW vol | MARKUP | continuum ABOVE.** Flipped ~11:45 today.
-- **Vacation mode ACTIVE** — shadow-first, no constants changes, no enforcement flips. Bug fixes exempt.
+- **Trading LIVE** with size-reduce **0.5x** (marker: vacation_size_reduce.json, 7d WR 35.1% < 37 AND pnl −$2.79 < −$2 — both resume conditions failing).
+- **24h 20T 4W −$0.26 (20%) — wide-but-shallow again.** Max single loss −$0.31; size-reduce containing. Watchdog URGENT losing-streak steer = same shallow-streak pattern, no new action.
+- **7d 168T 35.1% −$2.79 | 30d 726T 42.1% −$6.89.** Structural gap UNCHANGED: TRAIL 61T 78.7% +$4.37 vs NO_TRAIL 107T 10.3% −$7.16.
+- **Open: 1 BTC LONG continuum-osc+ #16309 @82398, +0.21% in profit.** SL raked to 81628 (eff 0.30%), TP 83688. Coin LONG_BIAS / btc BULL_TREND — aligned. HOLD. Trail arms at +0.40%.
+- **Regime: btc_regime BULL_TREND, coin LONG_BIAS, continuum ABOVE, LOW vol.** (15m flipped SHORT_BIAS per watchdog 16:13 but open trade stamped at entry was aligned.)
+- **Vacation mode ACTIVE** — shadow-first, no constants changes, no enforcement flips. Bug fixes / zero-behavior infra exempt.
 - Protected flags untouched (CEO_PROTECTED 13/13).
 
-## THIS RUN — brain_auditor #39 (15:40 UTC)
+## THIS RUN — brain_auditor #40 (16:50 UTC)
 
-**1 bugfix (shadow scope), 0 config changes, 1 flip decision executed (pp-cond: FAIL → keep shadow). 1 creative pre-registered (updated).**
+**1 infra ship (zero-behavior), 0 config changes, 2 studies executed.**
 
-1. **BUGFIX SHIPPED: TAT shadow signal-scope.** `'ai-trader' in sig` matched ai-trader-manual/pending — 7/16 unique shadow fires were CEO trades (16251/16283/16291/16293/16297/16306/16307). CEO trades have explicit SL/TP, never TAT-eligible. Fix: `'ai-trader+' in sig`. Zero live behavior. Valid flip count corrected: **9/15** (4 ai-trader+ + 5 bb-bounce). py_compile + 9/9 predicate self-check PASS. position_manager.py:3627.
-2. **PP-COND FLIP EVALUATED (queued from #38): FAIL both pre-registered criteria.** Matched would-block events to live trades: 6/95 became trades, save $0.27 (<$1 bar), FK 16.7% (1 ADA winner, >10% bar). 89/95 would-blocks never became trades (other filters caught them). **KEEP SHADOW collecting.**
-3. **LOSING AUTOPSY 24h (14 losers, net −$0.14):** (a) pump-chain SHORT family −$0.35 — FOGO/ADA/IO stamped coin LONG_BIAS (counter-regime), COMP SHORT_BIAS but 1.2% slippage EXTREME; (b) BTC pre-flip LONGs −$0.15 — chop window, post-flip open longs green; (c) pump-chain+ BLUR/ARB −$0.39 — meta_rsi 57-59 mid-expansion chase (death zone). No new pattern beyond known cohorts.
-4. **REJECTED:** kill volume-breakout-long+ (14d 18.8% −$0.76 but 30d +$1.44 OOS reversal) | kill pump-chain± (14d net positive both) | counter-regime hard gate (n=9<20) | pp-cond flip (criteria FAIL).
-5. **WATCHDOG TRIAGE:** 001 add-OFF held, price recovered 82537→82970, HOLD longs | 002/004 resolved (intentional tranche) | 003 wide-but-shallow no action | 005 structural 5th cycle, all defenses holding | 006/007 14d positive, kills rejected.
-6. **LAST-RUN VERIFY (#38):** coin_regime stamp ✓ live 9T, directionally perfect (SHORT×LONG_BIAS 0% −$0.14 / SHORT×SHORT_BIAS 50% +$0.03 / LONG×LONG_BIAS 67% +$0.57) | flip study early-positive n=5 | doji ✓ | floor-45 ✓ | EXTREME-0.85 ✓ | size-reduce ✓ | dual-path ✓ | 12+ soaks 0 violations.
+1. **SHIPPED: ARM-GAP close-time instrumentation** (position_manager.py:1313). Logs `[ARM-GAP] token dir MFE=X% trail=FALSE exit=Y pnl=Z% trade=N` when a trade closes with MFE≥0.40 but trailing never armed and pnl<0. Targets the giveback cohort: **45T/14d −$3.26, 0% WR, avg MFE 0.81%** (concentrated pump-chain− 16T −$0.99 / pump-chain+ 5T −$0.45). Pending since #32. Answers candle-spike-MFE vs trail-desync with data. py_compile + 5/5 predicate self-check PASS.
+2. **btc_regime BACKFILL STUDY (951T stamped since Sep 12 — no need to wait for coin_regime n≥20):**
+   - **BTC-level ALIGNED vs COUNTER REFUTED as lever.** 30d: ALIGNED −$3.27 vs COUNTER −$1.38 (aligned bleeds MORE). COUNTER_LONG 14d 38T +$0.22 even positive. Trend-following BTC direction is NOT the edge.
+   - **TRANSITIONING = the real chop.** 14d 77T −$1.39 29.9% / 30d 165T −$2.88 37% — consistent bleed, large n both windows.
+   - **RANGING = only profitable regime.** 14d 46T +$0.51 52.2% / 30d 124T +$0.46 53.2%.
+   - **Drift flag:** CHOP_DETECTOR_ENABLED=True already live, yet TRANSITIONING still bleeds $2.88/30d — detector logic may not map to btc_regime=TRANSITIONING. **Pre-registered: TRANSITIONING entry-quality study (offline, vacation-end).**
+3. **WATCHDOG TRIAGE:** 001 losing-streak URGENT — rejected action (PnL only −$0.18, shallow, size-reduce active) | 002 cluster resolved (PUMP closed) | 003 wrong-side mixed (PUMP counter-regime LONG −5.4%, BLUR/ARB chop MFE<0, COMP slippage 1.2%) | 004/005 pump-chain± kills REJECTED (14d +$0.21 / +$1.09 net positive).
+4. **coin_regime stamp n=10/20:** ALIGNED 5T 60%WR +$0.60 vs COUNTER 5T 0%WR −$0.26. Directionally perfect early. Counter-regime dampen decision at n≥20.
+5. **LAST-RUN VERIFY (#39):** TAT scope fix VERIFIED ('ai-trader+' match, 9/15 valid fires, compiles) | pp-cond stays shadow (FAIL: save $0.27<$1, FK 16.7%>10%) | size-reduce 0.5x marker active (auto_1hr '0.3x' text stale) | dual-path + coin_regime stamp live | 12+ soaks 0 violations.
 
 ## OPEN LOOPS
 
-- **Escalation #15 (16th request):** exit-ladder signal-scoped candle OOS backtest — still not commissioned.
-- **TAT bb-bounce flip: 9/15 valid unique fires** (scope fixed; count unique trade_ids, not log lines — in-memory dedup resets each PM run).
-- **coin_regime cohort: 9T; n≥20** → 14d backfill + counter-regime gate decision.
-- **pp-cond shadow:** FAIL on matched (n=6); keep collecting, re-eval next audit.
-- pump-chain+ RANGING dampen: monitor to n≥20.
-- Post-vacation stack: ~12+ unvalidated soaks — CEO eyeball on resume.
+- **Escalation #15 (17th request):** exit-ladder signal-scoped candle OOS backtest — still not commissioned.
+- **TAT bb-bounce flip: 9/15 valid unique fires** (scope fixed #39; count unique trade_ids).
+- **coin_regime cohort: 10/20** → counter-regime dampen shadow decision at n≥20.
+- **ARM-GAP log lines:** watch next closes with MFE≥0.40 — spike-MFE vs desync verdict enables/kills ATR-normalized arm.
+- **TRANSITIONING drift study:** pre-registered, offline, vacation-end.
+- **Post-vacation stack: ~14+ unvalidated soaks** — CEO eyeball on resume.
