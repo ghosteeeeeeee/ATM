@@ -4967,3 +4967,7 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-20 22:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (AIXBT pump-chain+ LONG trail_arm_timeout flat $0.00) | 24h 21T 5W -$0.16 (23.8%) | 7d 162T 59W -$2.37 (36.4%) — size-reduce 0.3x stays | kill: none (pump-chain+ 24h 0W/3T reviewed: 7d +$0.32 profitable, noise not kill) | atr_sl_hit 33.3% under 40% | no neg-hour streak | 1 open BTC +0.82% | No constants change -> no signal_versions entry
 BY: auto_1hr
+[2026-10-20 22:46 UTC] brain_auditor: AUDIT RUN #44 — 1 infra (ARM-GAP peak-trail counterfactual estimate, zero-behavior) | giveback D=0.3% NET +14.7pts fragile (IMX outlier) | pump-chain- kill rejected (14d +$0.23) | BTC trail steer FALSE ALARM | 24h 23.8% −$0.16 shallow, 7d 36.4% −$2.41, size-reduce 0.5x
+BY: brain_auditor
+- [2026-10-20 23:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (MET warrior-sr-confirm+ LONG hard_sl -/usr/bin/bash.14 -1.21%) | 24h 22T 5W -/usr/bin/bash.38 (22.7%) | 7d 161T 58W -.52 (36.0%) — size-reduce 0.3x stays (PnL <-) | kill: none (1T only) | atr_sl_hit 31.8% under 40% | no neg-hour streak | 2 open (BTC +0.59%, APT -0.16%) | No constants change -> no signal_versions entry
+BY: auto_1hr
