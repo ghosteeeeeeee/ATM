@@ -860,6 +860,128 @@ def report():
         conn.close()
 
 
+def analyze_hml_thresholds():
+    """Analyze HML threshold effectiveness (T directive 2026-10-20).
+
+    Tests multiple HML thresholds to find the optimal CUT_LOSER_PNL setting.
+    Simulates: what would happen if HML was at -3%, -4%, -5%, -6%, -8% account?
+    """
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("═" * 60)
+        log("HML THRESHOLD ANALYSIS")
+        log("═" * 60)
+        
+        # Current HML exits
+        rows = cur.execute("""
+            SELECT leverage_used, COUNT(*) n,
+                   ROUND(AVG(net_pnl_pct),3) avg_net,
+                   ROUND(AVG(first_exit_hold_minutes),0) avg_hold,
+                   ROUND(AVG(mfe_pct),3) avg_mfe,
+                   ROUND(AVG(mae_pct),3) avg_mae
+            FROM shadow_trades 
+            WHERE closed=1 AND first_exit_engine='hard_max'
+            GROUP BY leverage_used ORDER BY n DESC
+        """).fetchall()
+        
+        log("\n─── CURRENT HML EXITS BY LEVERAGE ───")
+        for lev, n, avg_net, avg_hold, avg_mfe, avg_mae in rows:
+            log(f"  lev={lev}: n={n}, avg_net={avg_net:+.3f}%, avg_hold={avg_hold:.0f}m, MFE={avg_mfe:+.3f}%, MAE={avg_mae:+.3f}%")
+        
+        # Simulate different thresholds
+        log("\n─── THRESHOLD SIMULATION ───")
+        log("(What if CUT_LOSER_PNL was different?)")
+        log(f"  {'Threshold':>12} {'Account%':>10} {'Price%':>8} {'Would Cut':>10} {'Would Hold':>10} {'Est PnL':>10}")
+        
+        for account_pnl in [-3.0, -4.0, -5.0, -6.0, -8.0, -10.0]:
+            for lev in [3, 5]:
+                price_threshold = account_pnl / lev
+                # Count HML exits that would still fire (hit threshold before recovery)
+                # and those that would have been held (didn't hit threshold)
+                result = cur.execute("""
+                    SELECT 
+                        SUM(CASE WHEN first_exit_pnl_pct <= ? THEN 1 ELSE 0 END) as would_cut,
+                        SUM(CASE WHEN first_exit_pnl_pct > ? THEN 1 ELSE 0 END) as would_hold,
+                        ROUND(AVG(CASE WHEN first_exit_pnl_pct > ? THEN net_pnl_pct END),3) as est_hold_pnl
+                    FROM shadow_trades 
+                    WHERE closed=1 AND first_exit_engine='hard_max' AND leverage_used=?
+                """, (price_threshold, price_threshold, price_threshold, lev)).fetchone()
+                
+                if result and result[0]:
+                    would_cut, would_hold, est_pnl = result
+                    log(f"  {account_pnl:>8.1f}% {'lev='+str(lev):>8} {price_threshold:>7.2f}% {would_cut:>10} {would_hold:>10} {est_pnl if est_pnl else 'n/a':>10}")
+        
+        # Dead signals analysis
+        log("\n" + "═" * 60)
+        log("DEAD SIGNALS ANALYSIS (bought peak / wrong side)")
+        log("═" * 60)
+        
+        log("\n─── WORST SIGNALS (n>=10, WR<35%) ───")
+        log(f"  {'Source':35} {'Dir':5} {'n':>5} {'WR':>6} {'Avg':>8} {'MFE':>8} {'MAE':>8} {'Hold':>6}")
+        rows = cur.execute("""
+            SELECT source, direction, COUNT(*) n,
+                   ROUND(100.0*SUM(CASE WHEN net_pnl_pct>0 THEN 1 ELSE 0 END)/COUNT(*),1) wr,
+                   ROUND(AVG(net_pnl_pct),3) avg_net,
+                   ROUND(AVG(mfe_pct),3) avg_mfe,
+                   ROUND(AVG(mae_pct),3) avg_mae,
+                   ROUND(AVG(first_exit_hold_minutes),0) avg_hold
+            FROM shadow_trades 
+            WHERE closed=1
+            GROUP BY source, direction 
+            HAVING COUNT(*) >= 10 AND 100.0*SUM(CASE WHEN net_pnl_pct>0 THEN 1 ELSE 0 END)/COUNT(*) < 35
+            ORDER BY avg_net ASC
+            LIMIT 15
+        """).fetchall()
+        for src, d, n, wr, avg_net, avg_mfe, avg_mae, avg_hold in rows:
+            log(f"  {src:35} {d:5} {n:5} {wr:5.1f}% {avg_net:+.3f}% {avg_mfe:+.3f}% {avg_mae:+.3f}% {avg_hold:.0f}m")
+        
+        log("\n─── PEAK BUYERS (high MFE but negative outcome) ───")
+        log("(Signals that spike up then crash down — bought the peak)")
+        log(f"  {'Source':35} {'Dir':5} {'n':>5} {'WR':>6} {'Avg':>8} {'MFE':>8} {'MAE':>8} {'Giveback':>9}")
+        rows = cur.execute("""
+            SELECT source, direction, COUNT(*) n,
+                   ROUND(100.0*SUM(CASE WHEN net_pnl_pct>0 THEN 1 ELSE 0 END)/COUNT(*),1) wr,
+                   ROUND(AVG(net_pnl_pct),3) avg_net,
+                   ROUND(AVG(mfe_pct),3) avg_mfe,
+                   ROUND(AVG(mae_pct),3) avg_mae,
+                   ROUND(AVG(mfe_pct) - AVG(net_pnl_pct),3) giveback
+            FROM shadow_trades 
+            WHERE closed=1
+            GROUP BY source, direction 
+            HAVING COUNT(*) >= 10 AND AVG(mfe_pct) > 1.0 AND AVG(net_pnl_pct) < 0
+            ORDER BY giveback DESC
+            LIMIT 10
+        """).fetchall()
+        for src, d, n, wr, avg_net, avg_mfe, avg_mae, giveback in rows:
+            log(f"  {src:35} {d:5} {n:5} {wr:5.1f}% {avg_net:+.3f}% {avg_mfe:+.3f}% {avg_mae:+.3f}% {giveback:+.3f}%")
+        
+        log("\n─── WRONG SIDE (high MAE, low MFE) ───")
+        log("(Signals that immediately go against us — wrong side of trade)")
+        log(f"  {'Source':35} {'Dir':5} {'n':>5} {'WR':>6} {'Avg':>8} {'MFE':>8} {'MAE':>8} {'MFE/MAE':>8}")
+        rows = cur.execute("""
+            SELECT source, direction, COUNT(*) n,
+                   ROUND(100.0*SUM(CASE WHEN net_pnl_pct>0 THEN 1 ELSE 0 END)/COUNT(*),1) wr,
+                   ROUND(AVG(net_pnl_pct),3) avg_net,
+                   ROUND(AVG(mfe_pct),3) avg_mfe,
+                   ROUND(AVG(mae_pct),3) avg_mae,
+                   ROUND(AVG(mfe_pct) / NULLIF(AVG(mae_pct), 0), 2) ratio
+            FROM shadow_trades 
+            WHERE closed=1
+            GROUP BY source, direction 
+            HAVING COUNT(*) >= 10 AND AVG(mfe_pct) < 1.0 AND AVG(mae_pct) < -2.0
+            ORDER BY ratio ASC
+            LIMIT 10
+        """).fetchall()
+        for src, d, n, wr, avg_net, avg_mfe, avg_mae, ratio in rows:
+            log(f"  {src:35} {d:5} {n:5} {wr:5.1f}% {avg_net:+.3f}% {avg_mfe:+.3f}% {avg_mae:+.3f}% {ratio:.2f}")
+        
+        log("\n═" * 60)
+    finally:
+        conn.close()
+
+
 def purge():
     """Delete records older than 90 days."""
     conn = get_db()
@@ -978,9 +1100,10 @@ def main():
     ap.add_argument('--report', action='store_true', help='Generate reports')
     ap.add_argument('--reclose', action='store_true', help='Re-close slow engines')
     ap.add_argument('--purge', action='store_true', help='Delete >90 days')
+    ap.add_argument('--analyze-hml', action='store_true', help='HML threshold + dead signals analysis')
     args = ap.parse_args()
     
-    run_all = not (args.record or args.close or args.report or args.reclose or args.purge)
+    run_all = not (args.record or args.close or args.report or args.reclose or args.purge or args.analyze_hml)
     
     if run_all or args.record:
         record()
@@ -990,6 +1113,8 @@ def main():
         reclose_events()
     if run_all or args.report:
         report()
+    if args.analyze_hml:
+        analyze_hml_thresholds()
     if args.purge:
         purge()
     
