@@ -4971,3 +4971,5 @@ BY: auto_1hr
 BY: brain_auditor
 - [2026-10-20 23:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (MET warrior-sr-confirm+ LONG hard_sl -/usr/bin/bash.14 -1.21%) | 24h 22T 5W -/usr/bin/bash.38 (22.7%) | 7d 161T 58W -.52 (36.0%) — size-reduce 0.3x stays (PnL <-) | kill: none (1T only) | atr_sl_hit 31.8% under 40% | no neg-hour streak | 2 open (BTC +0.59%, APT -0.16%) | No constants change -> no signal_versions entry
 BY: auto_1hr
+[2026-10-20 23:36 UTC] brain_auditor: AUDIT RUN #45 — 0 config changes (vacation soak) | BTC trail ratchet about to arm (peak 0.901%) | APT TAT contained -0.04 | ARM-GAP ext verified 0 fires=correct | steers 001 reject / 002 structural / 003 kill-reject | 24h 22.7% -0.30 shallow, 7d 36.0% -2.52, size-reduce 0.5x
+BY: brain_auditor

@@ -1,117 +1,84 @@
 {
-  "timestamp": "2026-10-20T21:40:17Z",
-  "run": "brain_auditor #43",
-  "config_changes": 0,
-  "mode": "vacation soak — 0 live changes (last run #42 was 45min ago; 1 new closed trade since)",
+  "timestamp": "2026-10-20T23:36:15Z",
+  "run": "brain_auditor #45",
   "session_brain_stats": {
     "queries": 3,
-    "notable": "chop-detector SIGNAL_OVERRIDES hyphen/underscore mismatch flagged in old session — verify ownership"
+    "notes": "no new actionable insights; arm-gap/HML topics recur from prior sessions"
   },
   "trade_summary_24h": {
-    "trades": 20,
-    "wins": 5,
-    "wr": 25.0,
-    "pnl": -0.16,
-    "7d": {
-      "trades": 162,
-      "wr": 36.4,
-      "pnl": -2.41
-    },
-    "7d_exit_family": {
-      "TRAIL": "59T 81.4% +$4.44",
-      "HML": "26T 0% -$2.77",
-      "OTHER": "77T 14.3% -$4.08 (atr_sl_hit 51T 2%WR -$3.57 = #1 bleed)"
-    }
+    "total": "22T 5W -0.30 22.7%",
+    "7d": "161T 36.0% -2.52",
+    "30d": "724T 41.7% -8.32",
+    "size_reduce": "0.5x active (correct)",
+    "open": "BTC #16309 LONG continuum-osc+ +0.61% peak 0.90% — trail ratchet threshold crossed, arm expected next poll. HOLD.",
+    "closed_since_last": "APT #16313 pump-chain+ LONG trail_arm_timeout -0.04 — TAT live-contained (opened 22:47 closed 23:33 = 46m ≈ T=45). Mechanism working.",
+    "7d_exit_family": "TRAIL/TP 60T 81.7% +4.76 | CHOP/SL 85T 1.2% -6.96 | atr_sl_hit 50T 2% -3.53 (#1 bleed, armed=0, avgMFE 0.451)"
   },
-  "watchdog_steer_triage": [
-    {
-      "id": "steer-001",
-      "verdict": "REJECT (4th+ occurrence)",
-      "reason": "shallow -$0.16 24h, size-reduce 0.5x containing; identical steer rejected in #36-42"
-    },
-    {
-      "id": "steer-002",
-      "verdict": "VERIFIED-STRUCTURAL",
-      "reason": "hard_max_loss/atr_sl_hit chop cohort unchanged; no new filter clears winner-kill bars during soak"
-    },
-    {
-      "id": "steer-003",
-      "verdict": "KILL-REJECT (2nd confirm)",
-      "reason": "pump-chain- SHORT 14d net +$0.54 (57T 24.6% WR) — positive; counter-regime sub-cohort is the real lever, dampen shadow collecting"
-    },
-    {
-      "id": "btc-trail-arm steer (watchdog deep-analysis)",
-      "verdict": "FALSE-ALARM — field misuse",
-      "reason": "trailing_activated is a post-hoc label (TRUE iff exit_reason ILIKE %trail%), documented in trades schema comment Oct 20. Always NULL/FALSE on OPEN trades. BTC 16309 HOLD: LONG_BIAS aligned, +0.53%, peak_exit protection live (armed peak>=0.3% → close on return-to-negative). Recommend watchdog owner stop reading trailing_activated on open trades."
-    }
+  "drift_findings": [],
+  "recurring_problems": [
+    "arm-gap: 20T/7d atr_sl_hit MFE>=0.40 unarmed = -1.04; 17/20 EXTREME, 12/20 pump-chain family — instrumentation shipping (#44 peak-trail est), candle OOS blocked on escalation #15",
+    "low-conf floor-admits conf 24-30 pump-chain still bleed (6T/24h ~-0.45) — pp-cond shadow stays until vacation-end re-eval",
+    "trail vs chop wealth gap unchanged structural"
   ],
-  "losing_trade_autopsy_24h": {
-    "losers": 15,
-    "clusters": [
-      {
-        "cohort": "chop-LONGs hard_max_loss (PUMP -5.41 r2v2, BLUR -4.16, ARB -3.41 pump-chain+)",
-        "root_cause": "mid-band/no-momentum entries, MFE~0, never armed",
-        "status": "known, defenses holding"
-      },
-      {
-        "cohort": "counter-regime pump-chain- SHORTs (FOGO/ADA/IO/ALT, coin LONG_BIAS)",
-        "root_cause": "fading long tide",
-        "status": "dampen shadow collecting 11/20"
-      },
-      {
-        "cohort": "CEO manual BTC cluster (16306/16307/16291/16293/16297)",
-        "root_cause": "manual SL levels, not signal quality",
-        "status": "not signal-disable case"
-      },
-      {
-        "cohort": "COMP SHORT aligned (SHORT_BIAS 53) -7.61% MFE+1.18 giveback",
-        "root_cause": "EXTREME static-ATR-SL gave back full arm — trail never protected",
-        "status": "new quantification below"
-      }
-    ],
-    "new_quantification": "GIVEBACK COHORT 7d (MFE>=0.40, pnl<0): 25T -$1.38; atr_sl_hit 17T -$1.06; deep (MFE>=0.80) 11T -$0.74. Armed trades dying to STATIC ATR-SL — SL computed from entry, never ratchets with peak. pump_exit path already trails from peak; default ATR path does not."
-  },
-  "coin_regime_study": {
-    "stamped": 11,
-    "threshold": 20,
-    "raw": "COUNTER 6T 16.7% -$0.20 vs ALIGNED 5T 60% +$0.60",
-    "conf_floor_finding": "4/6 COUNTER stamps have conf<=15 (PUMP/ZRO conf=0 = unknown, not counter). With conf>=25 floor: COUNTER 2T -$0.06 vs ALIGNED 3T +$0.03. Direction holds, sample thinner. Decision protocol amended: classify with conf>=25 at n=20.",
-    "counterexample": "COMP SHORT was ALIGNED (SHORT_BIAS 53) and lost -7.61% — alignment prevents wrong-side bleed, not EXTREME giveback"
-  },
-  "drift_findings": [
-    {
-      "severity": "low",
-      "item": "watchdog deep-analysis recommends 'confirm trail arms next cycle' using trailing_activated on an open trade — field is post-hoc-only; recommendation text misleading but auto_executable=false so no live risk",
-      "owner": "trade_watchdog"
-    },
-    {
-      "severity": "info",
-      "item": "auto_1hr still logs 'size-reduce 0.3x stays' while runtime reads 0.5x from vacation_size_reduce.json — known reporting drift, runtime correct"
-    }
+  "missing_implementations": [
+    "escalation #15 candle-OOS vehicle (21st request) — blocks peak-trail flip and dual-condition TAT",
+    "post-vacation stack ~15+ unvalidated soaks awaiting resume cohort"
   ],
-  "last_run_verify": {
-    "arm_gap_instrumentation": "SHIPPED, 0 fires (correct — only close since ship was ZRO win, no qualifying MFE>=0.40 loser)",
-    "tat_scope_fix": "HOLDING (ai-trader+ predicate in code)",
-    "coin_regime_stamps": "11/20 closed 24h stamped — all new trades stamped",
-    "protected_flags": "78 NEVER_REENABLE/CEO_PROTECTED references intact, 25/25 False",
-    "size_reduce": "0.5x authoritative file, holds (7d PnL -$2.41 < -$2.00 trigger)"
-  },
   "creative_improvements": [
     {
-      "date": "2026-10-20T21:40:17Z",
-      "idea": "Peak-trail shadow for static-ATR-SL path: extend pump-exit style trailing_sl = peak - ATR*k to the default ATR SL refresh (_collect_atr_updates), zero-behavior shadow logging would-exit prices",
-      "rationale": "7d giveback cohort: 17 armed trades (MFE>=0.40) died to static entry-based ATR-SL for -$1.06; deep giveback (MFE>=0.80) 11T -$0.74. COMP: MFE +1.18% → exited -7.61%. pump_exit signals already trail from peak (position_manager.py:2909); default path doesn't.",
-      "expected_impact": "Convert ~$0.70-1.00/7d of giveback into breakeven/small-win exits",
-      "category": "exit engine",
-      "status": "pre-registered — needs candle-level OOS backtest (signal-scoped per Oct 17 verdict), NOT shipped during soak",
-      "risk": "medium — EXTREME whipsaw may re-arm poorly; must exclude or separately gate EXTREME"
+      "date": "2026-10-20T23:36:15Z",
+      "idea": "pump-chain+ HIGH-volatility 0.7x confidence dampen — offline study only, vacation-end",
+      "rationale": "7d pump-chain+ by vol: HIGH 6T -0.31 50%WR | NORMAL 2T -0.03 | EXTREME 15T +0.63 26.7%. HIGH band is the only negative habitat; EXTREME net-positive despite low WR (big trail winners). n=6 < 20 bar — offline counterfactual now, no ship.",
+      "expected_impact": "avoid ~0.30/7d if pattern holds; must not kill EXTREME winners",
+      "category": "entry sniper",
+      "status": "pre-registered offline study",
+      "risk": "low (study only)"
     }
   ],
+  "config_changes_applied": [],
+  "changes_from_last_run": [
+    {
+      "change": "ARM-GAP peak-trail counterfactual est (D=0.3%) in position_manager.py:1316-1335",
+      "status": "CODE PRESENT",
+      "fires_since_ship": 0,
+      "note": "0 fires correct — APT MFE 0.12<0.40, ZRO win, no qualifying unarmed MFE>=0.40 closes since ship"
+    },
+    {
+      "change": "coin_regime stamp at exec",
+      "status": "HOLDING",
+      "note": "BTC #16309 stamped NORMAL; collecting toward n>=20"
+    },
+    {
+      "change": "TAT shadow ai-trader+ scope fix",
+      "status": "HOLDING",
+      "note": "9/15 valid unique fires, need 6 more"
+    },
+    {
+      "change": "size-reduce 0.5x",
+      "status": "ACTIVE",
+      "note": "7d WR 36.0% < resume 37% AND pnl -2.52 < 0 — both resume conditions failing"
+    }
+  ],
+  "watchdog_steer_triage": {
+    "steer-001": "REJECT — losing streak shallow (24h -0.30 total at 0.5x); 7d WR recovering 33→36.0%",
+    "steer-002": "VERIFIED-STRUCTURAL — trail +4.76 vs chop -6.96 unchanged; known cohorts under active defenses",
+    "steer-003": "KILL-REJECT — pump-chain- 14d +0.23 net; combo +0.39; 7d bleed -0.28 is variance inside net-positive signal"
+  },
+  "losing_autopsy_24h": {
+    "losers": 17,
+    "max_loss": "-0.31 (BLUR pump-chain+ conf29.5 floor-admit HML)",
+    "clusters": [
+      "pump-chain+ LONG conf~29 floor-admits (BLUR/ARB): known pp-cond cohort",
+      "pump-chain- SHORT conf~25 EXTREME (COMP/FOGO/IO/ALT): known; 14d net positive",
+      "BTC manual RSI96.5 + broken SL levels 0.006%/0.103%: CEO domain, flagged again",
+      "warrior-sr n=3 30d: noise, no action"
+    ],
+    "new_patterns": "none — no filter candidate clears n>=20 + OOS + winner-kill bars"
+  },
   "next_actions": [
-    "Continue coin_regime dampen collection → decision at n>=20 with conf>=25 floor",
-    "ARM-GAP instrumentation: first qualifying close validates the log path",
-    "Escalation #15 (19th): signal-scoped trail-engine race audit — giveback cohort data now quantified (17T -$1.06/7d), self_learner candle backtest still the blocker",
-    "Watchdog owner: stop using trailing_activated on open trades in deep-analysis text",
-    "Vacation soak holds — post-vacation stack ~14+ unvalidated, CEO eyeball ~Oct 23"
+    "BTC #16309: verify trail arms on next PM poll (peak 0.901% > ratchet ~0.90%)",
+    "vacation soak continues — 0 constants until resume (~Oct 23) or pre-committed trigger",
+    "escalation #15 candle-OOS vehicle (21st request) — blocks 3 shadow flips",
+    "vacation-end queue: pp-cond flip re-eval, TAT bb-bounce (9/15), coin_regime (n=5/20), pump-chain+ HIGH study, ~15 soaks cohort"
   ]
 }

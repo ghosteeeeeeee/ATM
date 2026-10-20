@@ -5997,5 +5997,23 @@
     "category": "exit engine",
     "status": "pre-registered — needs candle-level OOS backtest (signal-scoped per Oct 17 verdict), NOT shipped during soak",
     "risk": "medium — EXTREME whipsaw may re-arm poorly; must exclude or separately gate EXTREME"
+  },
+  {
+    "date": "2026-10-20T22:45:45Z",
+    "idea": "Signal-scoped peak-trail OOS: pump-chain SHORT in EXTREME only (9T/7d armed losers −$0.50, 12/16 of EXTREME giveback)",
+    "rationale": "Universal peak-trail is fragile (IMX outlier). Scoping to the exact concentration slice removes outlier dependency and matches the TAT-eligibility meta-rule pattern (signal-scoped before universal).",
+    "expected_impact": "If candle OOS passes: contain ~$0.50/7d giveback on this slice without touching winners in other regimes.",
+    "category": "exit mechanics",
+    "status": "pre-registered — needs candle OOS (escalation #15 vehicle, signal-scoped per Oct 17 verdict)",
+    "risk": "low (zero-behavior until OOS + CEO GO)"
+  },
+  {
+    "date": "2026-10-20T23:36:15Z",
+    "idea": "pump-chain+ HIGH-volatility 0.7x confidence dampen — offline study only, vacation-end",
+    "rationale": "7d pump-chain+ by vol: HIGH 6T -0.31 50%WR | NORMAL 2T -0.03 | EXTREME 15T +0.63 26.7%. HIGH band is the only negative habitat; EXTREME net-positive despite low WR (big trail winners). n=6 < 20 bar — offline counterfactual now, no ship.",
+    "expected_impact": "avoid ~0.30/7d if pattern holds; must not kill EXTREME winners",
+    "category": "entry sniper",
+    "status": "pre-registered offline study",
+    "risk": "low (study only)"
   }
 ]
