@@ -5960,5 +5960,23 @@
     "category": "infra",
     "status": "shipped",
     "risk": "zero (log only)"
+  },
+  {
+    "date": "2026-10-20T19:40:53Z",
+    "idea": "ARM-GAP 1m forensics EXECUTED (was the creative lever this run) — killed ATR-normalized arm with evidence; closed 9-day mechanism question",
+    "rationale": "Offline candle replay of 45T giveback cohort answered spike-vs-desync without waiting for rare live fires",
+    "expected_impact": "zero live impact; prevents a bad lever (easier arm) from shipping; redirects focus to entry-side chop defenses",
+    "category": "exit mechanics verdict",
+    "status": "executed",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-20T19:40:53Z",
+    "idea": "coin_regime counter-regime 0.5x dampen — await cohort n>=20 (currently 10/20)",
+    "rationale": "ALIGNED 5T 60%WR +$0.60 vs COUNTER 5T 0%WR -$0.26 — directionally perfect early; flip decision pre-registered",
+    "expected_impact": "cut counter-regime bleed without touching aligned trades",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
