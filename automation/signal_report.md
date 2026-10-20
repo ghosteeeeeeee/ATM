@@ -1,74 +1,34 @@
-# Signal Performance Report
-**Generated:** 2026-10-20 09:40 UTC | **Period:** Last 6h + 24h
+=== Signal Performance Report ===
+Period: Last 6h | 24h — 2026-10-20 ~15:30 UTC
 
-## Overall Stats
-- **Total trades (all time, closed):** 5,918 | **WR:** 45.3% | **PnL:** -$15.50
-- **24h:** 13 closed trades | **PnL:** -$0.91
-
----
-
-## KILLED (executed)
-
-None — no signal met kill criteria this cycle.
-
----
-
-## BOOSTED (executed)
-
-None — no signal met boost criteria (no signal with WR > 55% and 5+ trades in 24h).
-
----
-
-## LOSERS (watch list)
-
-| Signal | Dir | WR | PnL | Trades (24h) | Status |
+KILLED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 0.0% | -$0.43 | 3 | WATCH — regime-gated already: NORMAL=0.0 block (2026-10-19), HIGH family 0.5 dampen. 24h losers: 2 EXTREME (habitat, lifetime +$3.93) + 1 HIGH (hard_max_loss -$0.31). Lifetime 142T 40.8% +$3.12. Does NOT meet kill bar (<5 trades 24h, EXTREME still profitable). |
-| bb-bounce-v2-long+ | LONG | 33.3% | -$0.27 | 3 | WATCH — EXTREME already 0.0 block (2026-10-16). NORMAL 29T 44.8% -$0.43 lifetime (block was deliberately removed, near break-even). HIGH 52.9% and FLAT 100% are winning habitats. Lifetime 61T 49.2% -$0.99. Does NOT meet kill bar. |
-| ai-trader+ | LONG | 25.0% | -$0.17 | 4 (48h) | WATCH — CEO manual vehicle, not a kill target via reporter. |
-| ai-trader-pending | LONG | 0.0% | -$0.10 | 3 (48h) | WATCH — CEO manual vehicle. |
+| (none) | | | | | No kill candidates — see LOSERS |
 
-**pump-chain+ HIGH note (tuning candidate, NOT actioned):** HIGH lifetime 36T 38.9% -$0.36 (30d: 9T 33.3% -$0.31). Already at 0.5 family dampen. n=9/30d is below confidence bar for tightening to 0.0 — would need independent verification first (THE PATTERN: don't ship on unverified regime edges).
-
----
-
-## WINNERS
-
-| Signal | Dir | WR | PnL | Trades (24-48h) | Status |
+BOOSTED (executed):
+| Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| continuum-trend+ | LONG | 100% | +$0.04 | 2 (48h) | Healthy, sample too small to boost |
-| pump-chain-,pump-chain-v6- | SHORT | 33.3% | $0.00 | 3 (48h) | Flat, NORMAL habitat boost (1.2) already live |
-| ai-trader-pending | SHORT | 50% | +$0.01 | 2 (48h) | Healthy |
+| (none) | | | | | No boost candidates (max 1-2 trades per winner in 24h) |
 
-No signal met boost bar (WR > 55%, 5+ trades 24h, PnL > $0.05).
+LOSERS (watch list):
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain-,pump-chain-v6- | SHORT | 16.7% | -$0.10 | 6 | NO KILL — NORMAL SHORT habitat is 56.3% WR +$0.39 all-time (>=55% → regime-block only per SOP). HIGH already blocked (PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED=True). Bare pump-chain- EXTREME already 0.0-blocked (working since 2026-10-16, 0 trades since). Combined EXTREME profitable 7d: 8T 3W +$0.48; v6- EXTREME 14d 12T 4W +$0.35. 24h = small-sample bad day (EXTREME -$0.06/5T, NORMAL -$0.09/2T). |
+| pump-chain+ | LONG | 0% | -$0.39 | 2 | WATCH — under kill threshold (needs 5+T). 7d EXTREME +$0.65 (14T). HIGH LONG dampened 0.5x already. |
+| ai-trader-manual | LONG | 0% | -$0.13 | 2 | CEO manual trades — out of scope for signal kill |
+| ai-trader-pending | LONG | 0% | -$0.07 | 3 | CEO pending trades — out of scope |
 
----
+WINNERS:
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| r2v2-long5 | LONG | 100% | +$0.37 | 1 | OK — 1T, no boost (needs 5+T). ZRO hard_tp. |
+| bb-squeeze+ | LONG | 100% | +$0.28 | 1 | OK — 1T, no boost. 7d: 4T 75% +$0.21. HYPE profit-monster-trail. |
+| ai-trader-pending | SHORT | 100% | +$0.07 | 1 | CEO trade — OK |
 
-## ISSUES
+ISSUES:
+- No direction inversions in last 24h (checked long-signal/SHORT and short-signal/LONG — zero matches).
+- Signal volume is very low this cycle (19 closed trades/24h total; only 1 signal group with 5+ trades). No structural changes made — existing regime blocks already cover the pump-chain SHORT bleed paths.
+- Regime checks verified before declining the pump-chain SHORT kill: NORMAL 56.3% WR (+$0.39, 16T), EXTREME SHORT trades now route via v6 (profitable), HIGH blocked. Existing VOL_PHASE_MULTS + HIGH block + EXTREME bare-pump-chain- 0.0 block are all in place and working.
 
-- **Signal inversions (24h):** none. All direction labels consistent.
-- **Sideways find (low severity):** pipeline log shows `[hotset] fallback DB query returned 0 tokens` — hotset falling back to empty. Worth a look by hotset owner; may mean hot-set prioritization is inert.
-- Low trade volume (13 closed / 24h) — consistent with current regime gating; not an anomaly by itself.
-
----
-
-## Actions Taken
-
-- **0 kills, 0 boosts, 0 regime-gate edits.** Both 24h losers already have appropriate regime blocks from prior signal_reporter runs (NORMAL pump-chain+ blocked 2026-10-19; EXTREME bb-bounce-v2-long+ blocked 2026-10-16). Recent losses occurred in *allowed* regimes and are within variance for those habitats.
-
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-10-20 | (this run) | signal_reporter: 0 kills, 0 boosts — watch pump-chain+ HIGH, bb-bounce NORMAL |
-| 2026-10-20 | 0f0a656 | Daily trading system update (2026-10-20) |
-| 2026-10-19 | d02c9bf | brain_auditor: AUDIT RUN #26 — 0 config changes |
-| 2026-10-19 | 8d26e2e | risk: CEO verdict — lift size reduce 30→50%, disable ai-trad... |
-| 2026-10-19 | 96ad7b6 | Daily trading system update (2026-10-19) |
-| 2026-10-18 | 4e0ab75 | brain_auditor: audit run 2026-10-18 23:44 — comment hygiene |
-
----
-
-*Report auto-generated by signal_reporter. Next report: ~6h.*
+6h snapshot: ai-trader-manual LONG -$0.13 (2T), pump-chain SHORT -$0.03 (4T). Nothing actionable.
