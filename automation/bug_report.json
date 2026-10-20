@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-20 13:50:11",
+  "timestamp": "2026-10-20 21:50:11",
   "total_checks": 20,
   "passed": 12,
   "critical_count": 7,
@@ -37,7 +37,7 @@
     },
     {
       "name": "non_atomic_json",
-      "msg": "83 files write JSON without atomic pattern: continuum_api.py, cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, limit_order.py",
+      "msg": "84 files write JSON without atomic pattern: continuum_api.py, cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, limit_order.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },
@@ -50,10 +50,10 @@
   ],
   "warnings": [
     {
-      "name": "win_rate",
-      "msg": "14.3% (2/14)",
+      "name": "trade_frequency",
+      "msg": "2 trades in 6h (0.3/hr)",
       "file": "",
-      "fix": "Kill 0% WR signals, enable profitable ones, or activate dynamic inverter"
+      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
     }
   ]
 }
