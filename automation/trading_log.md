@@ -12854,3 +12854,25 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - COMP trade: why was ATR SL only 0.30% away on a ~$23 alt? Worth checking atr_sl width logic in the pump-chain-v6 path if this recurs
 - 24h WR 15.4% weak but n=13 thin; 2 consec neg hours to watch
+
+## [2026-10-20 15:32 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (0 wins, 2 losses)
+**PnL:** -$0.13 last hour | 24h 19T 4W -$0.14 (21.1% WR) | 7d 167T 59W -$2.67 (35.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 closes: both BTC ai-trader-manual LONG (CEO manual) — atr_sl_hit -$0.01 (-1.08%), cut_loser -$0.12 (-21.37%). Not signal trades, kill rule N/A
+- Manual trade SL levels flagged: SL distances were 0.006% and 0.103% from entry — absurdly tight; cut_loser filled -0.53% below entry. Level-setting issue on manual path, not constants
+- Kill check: no signal with 0% WR and 3+ trades last hour (only ai-trader-manual 2T)
+- atr_sl_hit 8/19 = 42.1% raw >40%, but 3/8 are manual/pending; signal-only atr_sl_hit 5/15 = 33% — tpsl deployed, 05:00 verdict stands (thin sample)
+- No overtrading (2T/hr)
+- No 3-neg-hour streak (14:00 +$0.65 breaks it; 15:00 -$0.13 fresh)
+- Vacation size-reduce marker auto-refreshed 14:57 at 0.5x (was 0.3x earlier logs — guardrail manages it; 7d WR now 35.3% ≥35% but PnL -$2.67 <-$2, marker stays until guardrail re-evaluates)
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h PnL recovered -$0.57 → -$0.14 and 7d WR crossed 35% (33.9% → 35.3%) — watch if size-reduce can lift when PnL recovers
+- Manual BTC trade SL levels (0.006%/0.103% distances) — CEO should verify SL-setting on ai_trader manual path
