@@ -1,97 +1,117 @@
 {
-  "timestamp": "2026-10-20T20:38:00Z",
-  "run": "brain_auditor #42",
-  "session_lock": false,
-  "vacation_soak": true,
+  "timestamp": "2026-10-20T21:40:17Z",
+  "run": "brain_auditor #43",
+  "config_changes": 0,
+  "mode": "vacation soak — 0 live changes (last run #42 was 45min ago; 1 new closed trade since)",
+  "session_brain_stats": {
+    "queries": 3,
+    "notable": "chop-detector SIGNAL_OVERRIDES hyphen/underscore mismatch flagged in old session — verify ownership"
+  },
   "trade_summary_24h": {
-    "trades": 19,
-    "wins": 4,
-    "wr": 21.1,
-    "pnl": -0.22
-  },
-  "trade_summary_7d": {
-    "trades": 162,
-    "wr": 35.8,
-    "pnl": -2.47
-  },
-  "trade_summary_30d": {
-    "trades": 722,
-    "wr": 41.8,
-    "pnl": -8.18
-  },
-  "wealth_gap_7d": {
-    "trail": "36T 97.2% +$2.98",
-    "no_trail": "126T 18.3% -$5.45"
-  },
-  "hard_max_loss_14d": "87T 0.0%WR -$8.66",
-  "size_reduce": {
-    "active": true,
-    "multiplier": 0.5,
-    "source": "vacation_size_reduce.json"
-  },
-  "open_trades": [
-    {
-      "id": 16309,
-      "coin": "BTC",
-      "dir": "LONG",
-      "sig": "continuum-osc+",
-      "entry": 82398,
-      "coin_regime_entry": "LONG_BIAS",
-      "action": "HOLD (trail arm 82728 decision point)"
+    "trades": 20,
+    "wins": 5,
+    "wr": 25.0,
+    "pnl": -0.16,
+    "7d": {
+      "trades": 162,
+      "wr": 36.4,
+      "pnl": -2.41
+    },
+    "7d_exit_family": {
+      "TRAIL": "59T 81.4% +$4.44",
+      "HML": "26T 0% -$2.77",
+      "OTHER": "77T 14.3% -$4.08 (atr_sl_hit 51T 2%WR -$3.57 = #1 bleed)"
     }
-  ],
-  "watchdog_triage": [
+  },
+  "watchdog_steer_triage": [
     {
       "id": "steer-001",
-      "title": "Losing streak 16/20",
-      "verdict": "REJECT",
-      "reason": "Shallow -$0.22 wide-but-shallow pattern, size-reduce 0.5x containing. 3rd+ identical steer, no action."
+      "verdict": "REJECT (4th+ occurrence)",
+      "reason": "shallow -$0.16 24h, size-reduce 0.5x containing; identical steer rejected in #36-42"
     },
     {
       "id": "steer-002",
-      "title": "Wrong-side trades",
       "verdict": "VERIFIED-STRUCTURAL",
-      "reason": "hard_max_loss 14d 87T 0%WR -$8.66 unchanged. No new filter clears n>=20+OOS bars. Existing defenses + size-reduce active."
+      "reason": "hard_max_loss/atr_sl_hit chop cohort unchanged; no new filter clears winner-kill bars during soak"
     },
     {
       "id": "steer-003",
-      "title": "pump-chain- 5-loss streak",
-      "verdict": "KILL-REJECT",
-      "reason": "14d pump-chain- family net +$0.13 (rule requires 14d<0, n>=20). Counter-regime sub-cohort (n=10/20 dampen shadow) is the real lever, collecting."
+      "verdict": "KILL-REJECT (2nd confirm)",
+      "reason": "pump-chain- SHORT 14d net +$0.54 (57T 24.6% WR) — positive; counter-regime sub-cohort is the real lever, dampen shadow collecting"
+    },
+    {
+      "id": "btc-trail-arm steer (watchdog deep-analysis)",
+      "verdict": "FALSE-ALARM — field misuse",
+      "reason": "trailing_activated is a post-hoc label (TRUE iff exit_reason ILIKE %trail%), documented in trades schema comment Oct 20. Always NULL/FALSE on OPEN trades. BTC 16309 HOLD: LONG_BIAS aligned, +0.53%, peak_exit protection live (armed peak>=0.3% → close on return-to-negative). Recommend watchdog owner stop reading trailing_activated on open trades."
     }
   ],
-  "last_run_verify": [
-    "ARM-GAP instrumentation IN PLACE (PM:1313-1321), 0 qualifying closes since ship = correct silence",
-    "TAT scope fix holding (0 manual/pending fires post-fix)",
-    "coin_regime stamps 10/13 (3 missing = ai-trader manual/pending, correct — no signal path)",
-    "size-reduce 0.5x active (file authoritative; auto_1hr log text drifts '0.3x' — reporting-only bug)",
-    "NEVER_REENABLE False flags 25/25 intact"
-  ],
-  "new_data": {
-    "coin_regime_alignment_n10": {
-      "counter": "5T 0.0%WR -$0.26",
-      "aligned": "5T 60.0%WR +$0.60",
-      "status": "early, n=10/20, counter-regime 0.5x dampen shadow continues collecting",
-      "decision_point": "n>=20 — flip criteria pre-registered (would-block WR<30%, would-keep WR>50%, save>$1)"
-    }
-  },
-  "losing_autopsy_24h": {
+  "losing_trade_autopsy_24h": {
     "losers": 15,
-    "new_patterns": 0,
-    "cohorts": [
-      "hard_max_loss chop-LONGs (3T): PUMP r2v2-long3 counter-regime SHORT_BIAS conf=0 RSI 66 -5.4%; BLUR/ARB pump-chain+ RSI 57-58 mid-band -4.2%/-3.4%. Never armed trail. Known cohort.",
-      "pump-chain- SHORTs (6T -$0.06): COMP entered SHORT_BIAS 53, regime flipped LONG_BIAS 89 mid-trade -7.6% (MFE +1.18% full giveback); FOGO/ADA/IO/ALT mid-band RSI 45-57. Counter-regime sub-bleed.",
-      "CEO BTC manual/pending (6T -$0.13): bad SL levels (auto_1hr flagged 0.006%/0.103% distances). CEO process issue, not config."
+    "clusters": [
+      {
+        "cohort": "chop-LONGs hard_max_loss (PUMP -5.41 r2v2, BLUR -4.16, ARB -3.41 pump-chain+)",
+        "root_cause": "mid-band/no-momentum entries, MFE~0, never armed",
+        "status": "known, defenses holding"
+      },
+      {
+        "cohort": "counter-regime pump-chain- SHORTs (FOGO/ADA/IO/ALT, coin LONG_BIAS)",
+        "root_cause": "fading long tide",
+        "status": "dampen shadow collecting 11/20"
+      },
+      {
+        "cohort": "CEO manual BTC cluster (16306/16307/16291/16293/16297)",
+        "root_cause": "manual SL levels, not signal quality",
+        "status": "not signal-disable case"
+      },
+      {
+        "cohort": "COMP SHORT aligned (SHORT_BIAS 53) -7.61% MFE+1.18 giveback",
+        "root_cause": "EXTREME static-ATR-SL gave back full arm — trail never protected",
+        "status": "new quantification below"
+      }
     ],
-    "winners_confirm_thesis": "ZRO r2v2-long5 RSI 74.5 +16.4% | HYPE bb-squeeze+ RSI 65.6 +11.9% | ALT pump-chain- trail +1.8% | BTC SHORT +1.6% — all trail-family, high-RSI or regime-aligned"
+    "new_quantification": "GIVEBACK COHORT 7d (MFE>=0.40, pnl<0): 25T -$1.38; atr_sl_hit 17T -$1.06; deep (MFE>=0.80) 11T -$0.74. Armed trades dying to STATIC ATR-SL — SL computed from entry, never ratchets with peak. pump_exit path already trails from peak; default ATR path does not."
   },
-  "config_changes_applied": [],
-  "changes_from_last_run": "All holding. 0 violations.",
+  "coin_regime_study": {
+    "stamped": 11,
+    "threshold": 20,
+    "raw": "COUNTER 6T 16.7% -$0.20 vs ALIGNED 5T 60% +$0.60",
+    "conf_floor_finding": "4/6 COUNTER stamps have conf<=15 (PUMP/ZRO conf=0 = unknown, not counter). With conf>=25 floor: COUNTER 2T -$0.06 vs ALIGNED 3T +$0.03. Direction holds, sample thinner. Decision protocol amended: classify with conf>=25 at n=20.",
+    "counterexample": "COMP SHORT was ALIGNED (SHORT_BIAS 53) and lost -7.61% — alignment prevents wrong-side bleed, not EXTREME giveback"
+  },
+  "drift_findings": [
+    {
+      "severity": "low",
+      "item": "watchdog deep-analysis recommends 'confirm trail arms next cycle' using trailing_activated on an open trade — field is post-hoc-only; recommendation text misleading but auto_executable=false so no live risk",
+      "owner": "trade_watchdog"
+    },
+    {
+      "severity": "info",
+      "item": "auto_1hr still logs 'size-reduce 0.3x stays' while runtime reads 0.5x from vacation_size_reduce.json — known reporting drift, runtime correct"
+    }
+  ],
+  "last_run_verify": {
+    "arm_gap_instrumentation": "SHIPPED, 0 fires (correct — only close since ship was ZRO win, no qualifying MFE>=0.40 loser)",
+    "tat_scope_fix": "HOLDING (ai-trader+ predicate in code)",
+    "coin_regime_stamps": "11/20 closed 24h stamped — all new trades stamped",
+    "protected_flags": "78 NEVER_REENABLE/CEO_PROTECTED references intact, 25/25 False",
+    "size_reduce": "0.5x authoritative file, holds (7d PnL -$2.41 < -$2.00 trigger)"
+  },
+  "creative_improvements": [
+    {
+      "date": "2026-10-20T21:40:17Z",
+      "idea": "Peak-trail shadow for static-ATR-SL path: extend pump-exit style trailing_sl = peak - ATR*k to the default ATR SL refresh (_collect_atr_updates), zero-behavior shadow logging would-exit prices",
+      "rationale": "7d giveback cohort: 17 armed trades (MFE>=0.40) died to static entry-based ATR-SL for -$1.06; deep giveback (MFE>=0.80) 11T -$0.74. COMP: MFE +1.18% → exited -7.61%. pump_exit signals already trail from peak (position_manager.py:2909); default path doesn't.",
+      "expected_impact": "Convert ~$0.70-1.00/7d of giveback into breakeven/small-win exits",
+      "category": "exit engine",
+      "status": "pre-registered — needs candle-level OOS backtest (signal-scoped per Oct 17 verdict), NOT shipped during soak",
+      "risk": "medium — EXTREME whipsaw may re-arm poorly; must exclude or separately gate EXTREME"
+    }
+  ],
   "next_actions": [
-    "Continue coin_regime counter-regime dampen collection to n>=20",
-    "TAT bb-bounce flip: 9/15 valid unique fires (need 6 more)",
-    "Watch BTC #16309 trail-arm decision (~82728 or exit if back below EMA300 82604 by ~22:15 UTC)",
-    "Post-vacation stack: 14+ unvalidated soaks + pp-cond flip re-eval — CEO eyeball on resume",
-    "Escalation #15 (18th request): exit-ladder signal-scoped candle OOS still not commissioned"
+    "Continue coin_regime dampen collection → decision at n>=20 with conf>=25 floor",
+    "ARM-GAP instrumentation: first qualifying close validates the log path",
+    "Escalation #15 (19th): signal-scoped trail-engine race audit — giveback cohort data now quantified (17T -$1.06/7d), self_learner candle backtest still the blocker",
+    "Watchdog owner: stop using trailing_activated on open trades in deep-analysis text",
+    "Vacation soak holds — post-vacation stack ~14+ unvalidated, CEO eyeball ~Oct 23"
   ]
 }

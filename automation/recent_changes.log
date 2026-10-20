@@ -4963,3 +4963,5 @@ BY: auto_1hr
 - [2026-10-20 19:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 19T 4W -$0.22 (21.1%) | 7d 162T 58W -$2.47 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (0T) | atr_sl_hit 36.8% under 40% | no neg-hour streak | 1 open BTC flat | No constants change -> no signal_versions entry
 - [2026-10-20 20:30] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 17:00-20:30) | 24h 19T 4W -$0.22 (21.1%) | 7d 162T 58W -$2.47 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (0T) | atr_sl_hit 36.8% under 40% | no neg-hour streak | 1 open BTC +0.26% | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-20 21:30] auto_1hr: NO CONFIG CHANGE — 1T last hour (ZRO r2v2-long3 LONG atr_trail_hit +$0.06 +2.82%) | 24h 20T 5W -$0.16 (25.0%) | 7d 163T 59W -$2.41 (36.2%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0W/2T under 3T line) | atr_sl_hit 35% under 40% | no neg-hour streak | 1 open BTC +0.58% | No constants change -> no signal_versions entry
+BY: auto_1hr

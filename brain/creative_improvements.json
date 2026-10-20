@@ -5988,5 +5988,14 @@
     "status": "pre-registered (vacation-end — do not build during soak; entry-side dampen shadow n=10/20 is primary lever)",
     "risk": "low (zero-behavior log only)",
     "blocked_by": "vacation soak; build only if counter-regime dampen flips live OR cohort matures"
+  },
+  {
+    "date": "2026-10-20T21:40:17Z",
+    "idea": "Peak-trail shadow for static-ATR-SL path: extend pump-exit style trailing_sl = peak - ATR*k to the default ATR SL refresh (_collect_atr_updates), zero-behavior shadow logging would-exit prices",
+    "rationale": "7d giveback cohort: 17 armed trades (MFE>=0.40) died to static entry-based ATR-SL for -$1.06; deep giveback (MFE>=0.80) 11T -$0.74. COMP: MFE +1.18% → exited -7.61%. pump_exit signals already trail from peak (position_manager.py:2909); default path doesn't.",
+    "expected_impact": "Convert ~$0.70-1.00/7d of giveback into breakeven/small-win exits",
+    "category": "exit engine",
+    "status": "pre-registered — needs candle-level OOS backtest (signal-scoped per Oct 17 verdict), NOT shipped during soak",
+    "risk": "medium — EXTREME whipsaw may re-arm poorly; must exclude or separately gate EXTREME"
   }
 ]
