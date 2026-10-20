@@ -12589,3 +12589,23 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 **Open Questions:**
 - 7d PnL improved to -$3.54 from -$3.66 — size-reduce stays until 7d WR >=35% and PnL >= -$2
 - Volume very thin (~2-3T/day pace) — quiet regime continues
+
+## [2026-10-20 03:27] Hourly Analysis
+
+**Trades:** 0 closed last hour (quiet, 5th consec)
+**PnL:** $0.00 last hour | 24h 17T 7W -$0.41 (41.2% WR) | 7d 195T 68W -$3.30 (34.9% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes — quiet market continues; 1 open: BTC ai-trader-pending LONG flat (0.00)
+- atr_sl_hit 8/17 = 47% > 40% but tpsl_utils.py fix verified deployed prior hours — monitor
+- Kill check: no signal with 0% WR and 3+ trades last hour (0 trades). 24h worst all under 3T threshold (pump-chain+, warrior-sr-confirm+ 1T 0W each)
+- No overtrading (0T/hr)
+- No 3-neg-hour streak (last active hour 01:00 was +$0.07)
+- Size-reduce 0.3x stays (7d WR 34.9% < 35%, 7d PnL -$3.30 < -$2)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL improved to -$3.30 from -$3.54 — still under -$2 threshold, size-reduce stays
+- 5th consecutive quiet hour — thin volume regime, nothing actionable
