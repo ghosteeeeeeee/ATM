@@ -535,6 +535,27 @@ six-trade sequence is the proof case:
    rows sync to the merged entry). Multi-tranche = plan for "tightest
    level governs everything" (align TPs, expect first-hit-closes-all).
 
+### 12. The no-edge default: ARM THE BRACKET (CEO directive, 2026-10-21)
+
+When the analysis finds no clear direction — both scores negative or
+MARGINAL, chop pin at the EMA300, LOSERS-list flags, dead volume, no
+verified live read — **the default action is NOT a market entry and NOT
+standing aside: it is arming a conditional bracket at the chart's support
+and resistance.** The stop-limit process IS the backup strategy.
+
+- Take the levels from the structure engine (swing SH/SL) cross-checked
+  with the CEO's chart levels; cushion both triggers (§11-1 style);
+  SLs get 200pt+ wick room; TPs exit INTO the opposing level, never AT
+  round numbers; both legs verified non-overlapping.
+- Market entries in no-edge states are the #16283/#16291/#16317 pattern —
+  paying the sweep tax for information the bracket gets for free by
+  waiting. The bracket converts indecision into defined-risk optionality:
+  chop between the levels = no trade (correct), a real move = caught with
+  structure-based invalidation.
+- Every full-analysis that ends in "no trade" must END with the bracket
+  proposal: the two levels, the four numbers per leg (trigger/SL/TP/size),
+  armed and verified — not an empty verdict.
+
 ## Analysis Script
 
 Run this to get the complete picture:
@@ -686,3 +707,7 @@ Structure engine added 2026-10-20 (scripts/structure_analysis.py): zigzag
 0.6xATR swing detection, four states (UPTREND/DOWNTREND/COMPRESSION/
 EXPANSION), close-based break rule. Reproduces the CEO's manual 1h HH/HL
 read exactly (SH=83189 SL=82394 = the 22:00 high / 19:00 low).
+§12 no-edge default added 2026-10-21 (CEO directive): when the analysis
+finds no clear direction, the default action is arming the conditional
+bracket at chart support/resistance — the stop-limit process is the
+backup strategy; market entries in no-edge states are the sweep-tax pattern.

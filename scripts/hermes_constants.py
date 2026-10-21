@@ -3139,8 +3139,8 @@ SHADOW_BYPASS_SIGNALS = {
         'direction': 'LONG',
         'stage': 'A',
     },
-    'hmacd-mtf+': {
-        'reason': 'HMACD_MTF_PLUS_ENABLED=False (killed Oct 13)',
+    'hmacd_mtf-+': {
+        'reason': 'HMACD_MTF_PLUS_ENABLED=False (killed Oct 13) — source: hmacd_mtf-+',
         'direction': 'LONG',
         'stage': 'A',
     },
@@ -3151,23 +3151,24 @@ SHADOW_BYPASS_SIGNALS = {
     },
     
     # Stage B: gate-blocked signals
-    'ichimoku_short': {
-        'reason': 'Blocked by SHORT-REGIME-GATE in NORMAL/HIGH',
+    # bug_hunter fix: use actual source values, not signal_type names
+    'ichimoku-': {
+        'reason': 'Blocked by SHORT-REGIME-GATE in NORMAL/HIGH (source: ichimoku-)',
         'direction': 'SHORT',
         'stage': 'B',
     },
-    'ichimoku_long': {
-        'reason': 'Single-source, blocked by CONFLUENCE-GATE',
+    'ichimoku+': {
+        'reason': 'Single-source, blocked by CONFLUENCE-GATE (source: ichimoku+)',
         'direction': 'LONG',
         'stage': 'B',
     },
-    'support_resistance_long': {
-        'reason': 'Single-source, blocked by CONFLUENCE-GATE',
+    'rs-r': {
+        'reason': 'Support/resistance LONG — single-source, blocked by CONFLUENCE-GATE',
         'direction': 'LONG',
         'stage': 'B',
     },
-    'support_resistance_short': {
-        'reason': 'Single-source, blocked by CONFLUENCE-GATE',
+    'rs-s': {
+        'reason': 'Support/resistance SHORT — single-source, blocked by CONFLUENCE-GATE',
         'direction': 'SHORT',
         'stage': 'B',
     },
