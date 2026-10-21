@@ -5016,3 +5016,5 @@ BY: auto_1hr
 BY: auto_1hr
 BY: brain_auditor
 [2026-10-21 16:39 UTC] brain_auditor: AUDIT RUN #59 — 0 config changes (vacation soak) | WLD MFE root-caused: false round-peak 0.60 → false trail arm → premature atr_trail_hit (bug_hunter P1; ZRO #16310 same class) | peak-sanity shadow pre-registered | pump-chain- kill recheck still MET Oct 22 | 24h 41.2% -0.59 shallow, 7d 37.0% -2.92, size-reduce 0.5x
+- [2026-10-21 17:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (STX r2v2-long4 LONG hard_max_loss -$0.11 -4.90%) | 24h 35T 14W -$0.70 (40.0%) | 7d 159T 59W -$2.87 (37.1%) — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ 6T 0%WR + ai-trader-pending 3T 0%WR both 0T last hour; pump-chain recheck pre-reg Oct 22) | atr_sl_hit 6/35=17.1% under 40% | neg streak broken by empty 16:00 | 4 open | No constants change -> no signal_versions entry
+BY: auto_1hr

@@ -13441,3 +13441,22 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 - pump-chain- kill recheck — pre-registered Oct 22, brain_auditor owns the Option A matrix
 - logrotate for logs/ (disk 84%, 19G free) — backlog; health monitor watches the 85% warn
 - blacklist-tester.timer disable — concluded experiment (0 KEEP/77); summarizer decision-needed → CEO call, not taken unilaterally
+
+## [2026-10-21 17:28 UTC] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.11 (24h: 35T 14W -$0.70, WR 40.0%) | 7d 159T 59W -$2.87 (37.1%) | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- Sole close: STX r2v2-long4 LONG hard_max_loss -$0.11 (-4.90%) — single trade, no 3+T signal at 0%WR
+- Kill check: pump-chain+ 6T 0%WR -$0.32 and ai-trader-pending 3T 0%WR -$0.18 both had 0T last hour — no regime-kill candidate this hour (pump-chain kill recheck pre-registered Oct 22)
+- atr_sl_hit 6/35 = 17.1% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: 15:00 -$0.09, 16:00 empty (breaks streak), 17:00 -$0.11 = 1 consecutive — no 3h trigger, regime check not required
+- Frequency 1/hr — not overtraded (limit 20)
+- 4 open (BTC/NEO/SOL LONG, CFX SHORT)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.70 deepening from -$0.59; hard_max_loss 5T -$0.48 + atr_sl_hit 6T -$0.44 remain the loss clusters (standing SL-width escalation with CEO, Oct 16)
