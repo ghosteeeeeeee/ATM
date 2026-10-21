@@ -304,11 +304,34 @@ def record():
         
         now = datetime.now(timezone.utc).isoformat()
         n = 0
+        
+        # Load shadow bypass registry (T directive 2026-10-21)
+        shadow_bypass = {}
+        try:
+            from hermes_constants import SHADOW_BYPASS_SIGNALS, SHADOW_BYPASS_ENABLED
+            if SHADOW_BYPASS_ENABLED:
+                shadow_bypass = SHADOW_BYPASS_SIGNALS
+        except ImportError:
+            pass
+        
         for sid, tok, d, st, src, conf, dec, reason, created in rows:
             try:
                 # Get context
                 ctx = _get_signal_context(tok, d, st, src, created)
                 ctx['context_computed_at'] = now
+                
+                # Check if this signal is in shadow bypass registry
+                bare_src = (src or '').rstrip('+-')
+                shadow_bypass_tag = False
+                shadow_bypass_reason = None
+                for bypass_key, bypass_info in shadow_bypass.items():
+                    if bypass_key in bare_src or bypass_key in (src or ''):
+                        shadow_bypass_tag = True
+                        shadow_bypass_reason = bypass_info.get('reason', '')
+                        ctx['shadow_bypass'] = True
+                        ctx['shadow_bypass_reason'] = shadow_bypass_reason
+                        ctx['shadow_bypass_stage'] = bypass_info.get('stage', 'unknown')
+                        break
                 
                 # Get vol regime
                 vol_regime, atr = _get_vol_regime(tok)

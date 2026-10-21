@@ -3107,6 +3107,112 @@ ICHIMOKU_LONG_BYPASS_MIN_WR = 40.0         # auto-revert if loosened cohort WR <
 ICHIMOKU_LONG_BYPASS_MIN_TRADES = 5        # need 5+ trades before evaluating WR
 ICHIMOKU_LONG_BYPASS_SHADOW = True         # shadow-log what WOULD have blocked loosened trades
 
+# ── Shadow Bypass Registry (T directive 2026-10-21) ──────────────────────────
+# T wants ALL old/disabled signals simulated in shadow mode to collect data.
+# CEO approved: shadow-only, staged rollout, zero live-flag changes.
+#
+# These signals are DISABLED (their *_ENABLED flags are False) but we want
+# shadow_trader to simulate what would happen if they fired.
+#
+# CRITICAL: shadow_bypass fires are tagged 'shadow_bypass=true' in shadow log
+# so analysis cleanly separates "passed real gates" from "would have passed".
+#
+# Do NOT weaken CONFLUENCE_EXPIRY for live — it's the one gate proven helping.
+#
+# Stage A: signals killed for parameter reasons or with positive WR in some regime
+# Stage B: currently gate-blocked signals
+# Stage C: structurally-killed signals (knife-catching, momentum-fade) — rarely flip
+SHADOW_BYPASS_SIGNALS = {
+    # Stage A: parameter-killed or regime-specific winners
+    'bb-squeeze-': {
+        'reason': 'SHORT side killed (66.9%WR research but -$1.16/7d live)',
+        'direction': 'SHORT',
+        'stage': 'A',
+    },
+    'bb-bounce-v3-long': {
+        'reason': 'Removed from STANDALONE_BYPASS 2026-10-06 (DRIFT-A)',
+        'direction': 'LONG',
+        'stage': 'A',
+    },
+    'volume-breakout-long': {
+        'reason': 'KILLED Oct 13 (12T 0%WR) — shadow shows 11.8% WR, flip test shows SHORT would be profitable',
+        'direction': 'LONG',
+        'stage': 'A',
+    },
+    'hmacd-mtf+': {
+        'reason': 'HMACD_MTF_PLUS_ENABLED=False (killed Oct 13)',
+        'direction': 'LONG',
+        'stage': 'A',
+    },
+    'doji-bottom-long': {
+        'reason': 'Shadow shows 54.3% WR but -$18.4% total — needs different exit',
+        'direction': 'LONG',
+        'stage': 'A',
+    },
+    
+    # Stage B: gate-blocked signals
+    'ichimoku_short': {
+        'reason': 'Blocked by SHORT-REGIME-GATE in NORMAL/HIGH',
+        'direction': 'SHORT',
+        'stage': 'B',
+    },
+    'ichimoku_long': {
+        'reason': 'Single-source, blocked by CONFLUENCE-GATE',
+        'direction': 'LONG',
+        'stage': 'B',
+    },
+    'support_resistance_long': {
+        'reason': 'Single-source, blocked by CONFLUENCE-GATE',
+        'direction': 'LONG',
+        'stage': 'B',
+    },
+    'support_resistance_short': {
+        'reason': 'Single-source, blocked by CONFLUENCE-GATE',
+        'direction': 'SHORT',
+        'stage': 'B',
+    },
+    
+    # Stage C: structurally-killed signals (rarely flip)
+    'open-skies+': {
+        'reason': 'KILLED 2026-09-17 (11T/36.4%WR -$0.73, wave_phase=falling, NEVER_REENABLE)',
+        'direction': 'LONG',
+        'stage': 'C',
+    },
+    'squeeze-cross+': {
+        'reason': 'DISABLED 2026-07-28: 0% WR on LONG',
+        'direction': 'LONG',
+        'stage': 'C',
+    },
+    'squeeze-cross-': {
+        'reason': 'DISABLED 2026-08-02: 40% on SHORT — no edge',
+        'direction': 'SHORT',
+        'stage': 'C',
+    },
+    'rs-broken-short': {
+        'reason': 'DISABLED 2026-07-21 — broken support SHORT = 26.5% WR, massive drag',
+        'direction': 'SHORT',
+        'stage': 'C',
+    },
+    'rs-broken-resistance-long': {
+        'reason': 'DISABLED — broken resistance LONG, momentum is bearish',
+        'direction': 'LONG',
+        'stage': 'C',
+    },
+    'vel-hermes+': {
+        'reason': 'CEO 2026-08-04 — KILLED. 0% WR (12 trades 7d), -$1.61',
+        'direction': 'LONG',
+        'stage': 'C',
+    },
+    'vel-hermes-': {
+        'reason': 'AUTO-DISABLED by signal_decay_detector',
+        'direction': 'SHORT',
+        'stage': 'C',
+    },
+}
+
+# Shadow bypass master switch
+SHADOW_BYPASS_ENABLED = True  # Master switch for shadow bypass registry
+
 # ── AI Trader Signal ──────────────────────────────────────────────────────────
 # The trade-watchdog opencode agent runs every 30 min with full market context.
 # Every hour, if < max positions, it picks ONE coin and writes to ai_trader_state.json.

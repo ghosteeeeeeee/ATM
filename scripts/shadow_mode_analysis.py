@@ -222,6 +222,26 @@ def full_analysis():
         """):
             log(f"  {r['token']:10} n={r['n']:5} WR={r['wr']:5.1f}% total={r['total']:+8.1f}%")
         
+        # Shadow bypass analysis (T directive 2026-10-21)
+        log("\n--- SHADOW BYPASS SIGNALS (disabled signals being simulated) ---")
+        for r in cur.execute("""
+            SELECT source, direction, 
+              json_extract(context, '$.shadow_bypass_stage') stage,
+              COUNT(*) n,
+              ROUND(100.0*SUM(CASE WHEN net_pnl_pct>0 THEN 1 ELSE 0 END)/COUNT(*),1) wr,
+              ROUND(SUM(net_pnl_pct),1) total,
+              ROUND(AVG(net_pnl_pct),3) avg,
+              json_extract(context, '$.shadow_bypass_reason') reason
+            FROM shadow_trades 
+            WHERE closed=1 AND net_pnl_pct IS NOT NULL 
+              AND json_extract(context, '$.shadow_bypass') = 1
+            GROUP BY source, direction, stage
+            ORDER BY stage, total DESC
+        """):
+            log(f"  Stage {r['stage'] or '?'} | {r['source']:30} {r['direction']:5} n={r['n']:5} WR={r['wr']:5.1f}% total={r['total']:+8.1f}% avg={r['avg']:+.3f}%")
+            if r['reason']:
+                log(f"    Reason: {r['reason'][:80]}")
+        
         # Flip candidates
         log("\n--- FLIP CANDIDATES (WR<35%, n>=30) ---")
         for r in cur.execute("""
