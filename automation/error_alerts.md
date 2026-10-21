@@ -1437,3 +1437,10 @@
 ## Error Alerts — 2026-10-21 20:27 UTC
 - **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-21 22:47 UTC
+- **WARN** (3x): `signals: WARNING — only 4 signals in last 5 min (min 20)` (watchdog; 118 signals/hr created, 46 sources running 0 errors — rate below watchdog threshold, not a stall)
+- **WARN** (179x/6h): watchdog `Cleaned 4 stale locks: pipeline_heartbeat.lock, hotset_json.lock, signal_compactor_critical.lock, hotset_last_updated.lock` — dead-PID leftovers, housekeeping only (no live locks held)
+- **WARN** (2x): `hermes-brain-auditor` transient SQL errors — `column "coin_regime" does not exist`, `syntax error at or near "trailing"` (ad-hoc heredoc queries; auditor self-corrected and completed run #63, RC 0)
+- **WATCH**: disk 84% (warn at 85%), no logs >7d to gzip yet
+- **AUTO-FIX**: none required — all 72 hermes timers active, pipeline every 1min rc=0, no tracebacks, prices fresh (87 tokens <5min), 0 phantom trades, not vacation-paused
