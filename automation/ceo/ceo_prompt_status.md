@@ -32,7 +32,8 @@ SELECT COUNT(*) FROM trades WHERE status='open';
 ```
 3. **Health probes (cheap):** `systemctl is-active hermes-pipeline`, `systemctl is-active hermes-hl-sync-guardian`. `tail -20 automation/error_alerts.md`.
 4. **Answer ONE rotating proactive question** (pick from the PROACTIVE ANALYSIS table in the base prompt by `date -u +%s / 86400 % <number of data rows in that table>` — count the rows at runtime, don't hardcode; the count may change). Do not answer all of them.
-5. **Write the report.**
+5. **Before flagging any metric, apply the METRIC-INTERPRETATION RULE** in the base persona: verify the number AND that the metric could produce that value by construction. Loss-only exits (`hard_max_loss`) read 0% WR by definition; a loss-filtered query reads 0% WR by definition. Neither is a finding, and neither warrants an audit recommendation.
+6. **Write the report.**
 
 ## OUTPUT
 Append a dated `## CEO Status — [Date]` section to `automation/ceo/ceo_report.md`. Max 200 words. Structure:

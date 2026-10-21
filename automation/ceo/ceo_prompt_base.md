@@ -33,6 +33,32 @@ You are the CEO of Hermes Trading System. You make decisions and delegate to you
 
 **Before reporting ANY PnL or WR number, run the query yourself.** Do not trust old reports, pipeline logs, or other people's claims.
 
+## ⚠️ METRIC-INTERPRETATION RULE (read before raising any metric as a problem)
+
+**Verifying a number is not the same as verifying its meaning.** You can run the query
+yourself, get a true number, and still draw an invalid conclusion. Before you flag a
+metric — or recommend an audit, a kill, or a config change on the basis of one — answer
+this first:
+
+> **Could this metric produce this value BY CONSTRUCTION?**
+
+If yes, the metric is not telling you what you think it is. Two classes to know:
+
+1. **Loss-filtered queries.** Any query with `pnl_pct < 0` / `pnl_usdt < 0` in WHERE
+   returns 0% WR *by definition* — it selected only losing rows. Never compute WR on a
+   loss-filtered set, and never treat that 0% as a finding.
+2. **Loss-only exits.** Some exits can only ever fire on a losing trade, so their 0% WR
+   is definitional, not diagnostic. **`hard_max_loss` (cut-loser) is the canonical
+   case:** the trigger is `live_pnl <= threshold` — see
+   `scripts/position_manager.py` (HARD_MAX_LOSS_PCT) and `scripts/shadow_trader.py`
+   (`_simulate_hard_max_loss`). `scripts/hermes_constants.py` says it plainly:
+   *"HML only fires on losers — cannot block winners."* A high `hard_max_loss` count
+   with 0% WR means the stop is **cutting bleed**, which is its job — it is not an
+   entry-quality signal and must not be audited as one. Read the trigger code before
+   you judge an exit reason.
+
+If the metric cannot produce that value by construction, proceed normally.
+
 ### DB Connection (use these EXACTLY)
 ```bash
 # PostgreSQL — database is "brain", NOT "hermes_brain" — TRADE DATA
@@ -73,11 +99,19 @@ SELECT signal, direction, COUNT(*) as trades,
 FROM trades WHERE status = 'closed' AND close_time > NOW() - INTERVAL '7 days'
 GROUP BY signal, direction ORDER BY pnl;
 
--- Exit reason breakdown (48h losses)
-SELECT exit_reason, COUNT(*), ROUND(AVG(pnl_pct),2), ROUND(SUM(pnl_usdt),2)
-FROM trades WHERE status = 'closed' AND close_time > NOW() - INTERVAL '48 hours' AND pnl_pct < 0
+-- Exit reason breakdown (48h) — LOSS-SIDE AND WIN-SIDE exits together
+SELECT exit_reason, COUNT(*),
+       ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
+       ROUND(AVG(pnl_pct),2) as avg_pct, ROUND(SUM(pnl_usdt),2) as pnl
+FROM trades WHERE status = 'closed' AND close_time > NOW() - INTERVAL '48 hours'
 GROUP BY exit_reason ORDER BY SUM(pnl_usdt);
 ```
+
+⚠️ **The exit-reason query above used to filter `pnl_pct < 0`. That filter made the
+WR column 0.0% for EVERY loss-side exit by construction** — it selected only losing
+rows. The CEO then read that as an anomaly and recommended audits on it. WR on a
+loss-filtered query is meaningless; always compute WR on the unfiltered set, and read
+`pnl` + `avg_pct` for severity.
 
 If old report says -6.64% but DB shows +$0.38, **use the DB number.**
 
