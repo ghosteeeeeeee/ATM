@@ -6123,5 +6123,23 @@
     "category": "exit engineering",
     "status": "pre-registered",
     "risk": "zero (read-only)"
+  },
+  {
+    "date": "2026-10-21T06:42:00.519042+00:00",
+    "idea": "ARM-GAP peak-trail estimate validation protocol (n≥10) → trail-start tightening escalation",
+    "rationale": "ARM-GAP is now quantified as the LARGEST bleed: 45T −$3.19 14d (3.6× bare pump-chain- bleed). COMP SHORT #16313 MFE 1.18% → exit −7.61% = 8.79pt giveback. Instrumentation live since 05:50 logs peak-trail D=0.3% estimate per qualifying close. At n≥10: compare estimated vs actual peak-trail save. If R²>0.5 and net save >$1, escalate trail-start tightening to CEO with quantified expectation. If estimate is garbage, kill D=0.3% and investigate arming mechanism directly (spike-between-poll vs flag desync).",
+    "expected_impact": "If 50% of ARM-GAP trades would be saved by faster trail: ~$1.60/14d recovered. Tail events (COMP 8.79pt giveback) alone justify the study.",
+    "category": "exit mechanics",
+    "status": "pre-registered",
+    "risk": "low (validation protocol only, no code change)"
+  },
+  {
+    "date": "2026-10-21T06:42:00.519042+00:00",
+    "idea": "REJECTED: bare-path pump-chain- 0.7x conf-demote shadow",
+    "rationale": "Pre-registered #48 as 'v6-confirmation is the edge' shadow. Backtest kills it: would-block 35T saves $0.81 (<$1 bar) but kills 7 winners $0.97 = net −$0.16. fk=20% (>10% bar). 30d whole signal bleeds both sides. The demote is a half-measure — kill is the correct answer, and kill trigger is already MET (deferred to Oct 22 recheck).",
+    "expected_impact": "Avoided shipping a net-negative shadow that would waste collection bandwidth proving what backtest already shows.",
+    "category": "verification",
+    "status": "rejected-with-data",
+    "risk": "n/a"
   }
 ]

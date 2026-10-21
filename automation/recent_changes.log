@@ -4991,3 +4991,5 @@ BY: auto_1hr
 BY: brain_auditor
 - [2026-10-21 06:35] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 24T 5W -$0.24 (20.8%) | 7d 154T 56W -$2.66 (36.4%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (0T) | atr_sl_hit 33.3% under 40% | 3h neg streak 01-03 but size already reduced | 2 open (BTC SHORT, DOGE LONG) | No constants change -> no signal_versions entry
 BY: auto_1hr
+BY: brain_auditor
+- [2026-10-21 06:45 UTC] brain_auditor: AUDIT RUN #49 — 0 config changes (vacation soak) | ARM-GAP confirmed LARGEST bleed 45T -$3.19 14d | bare-path demote shadow REJECTED-WITH-DATA (net -$0.16) | pump-chain- kill recheck Oct 22 | 24h 20.8% -$0.24 shallow, 7d 35.2% -$2.96, size-reduce 0.5x
