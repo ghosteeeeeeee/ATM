@@ -6394,5 +6394,16 @@
     "category": "kill arbitration",
     "status": "decided",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-21",
+    "idea": "PRE-REGISTERED: ai-trader-pending BTC stop width vs BTC 15m ATR — arm-time SL >= 2x ATR instead of fixed 0.11-0.30%",
+    "rationale": "Watchdog handoff item 1 answered with data: stop width does NOT causally predict WR across all trades (14d narrow<1.5xATR 34.5% vs wide 36.1%, p=0.774 — the 'losers have tighter stops' view is selection-on-outcome). BUT the CEO pending-order mechanism is a specific, sized instance: 9 BTC trades since Oct 19, SL 0.113-0.300% vs BTC 15m ATR 0.145-0.293% = SL/ATR 0.72-2.07 (avg 1.49) — stops sit inside one 15m candle's noise. Result: 1W 8L -$0.28, 0/9 reached +0.40% trail arm (avg MFE 0.156). Every loser died before trail could arm — mid-chop entries with stops below the noise floor. The one winner had the worst R:R (0.77) — n=1, no conclusion.",
+    "expected_impact": "Uncertain — n=9 < 20 bar. If ATR-scaled SL lets more trades reach arm, it converts pre-trail deaths into trail-family trades (74.6% WR family).",
+    "category": "exit/entry quality — stop placement",
+    "status": "pre-registered",
+    "risk": "low",
+    "trigger": "Recheck Oct 26 (n approaches 20 at current 3/day rate). Flip proposal only if: n>=20 AND armed-rate <20% AND PnL<0 AND proposed SL>=2xATR would not increase avg loss >50%.",
+    "note": "CEO domain — orders are CEO-armed via trade_watchdog pending path (passes --sl/--target, respects kill switch). Advisory only."
   }
 ]

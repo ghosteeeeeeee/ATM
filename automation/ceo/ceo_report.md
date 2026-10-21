@@ -289,3 +289,32 @@ LONG_BIAS both TFs (btc_15m + btc_4h), continuum BELOW EMA300, zscore STRONG_NEG
 ### Numbers: 24h 41T -1.03 36.6% | 7d 164T -3.48 36.0% (DB self-query)
 ### Findings: Rotation Q7 (confluence blocks): zero CONFLUENCE-GATE-BLOCK events since Oct 15 — single-types either pass via STANDALONE_BYPASS or aren't firing; by-design, not a finding. 5 open positions drained to 0 since 17:45 (flat). Portfolio display -32.04% still display-calc suspect (DB = -$1.03/24h). Error alerts = hotset cooldowns + JUP RSI-floor blocks (filters working). Disk 84% watch-only.
 ### Recommendation: none (vacation soak; pump-chain- kill recheck Oct 22 per pre-reg)
+
+## Risk-Budget Decision — 2026-10-21
+
+**Decision: MODIFY — shadow the 2-3% band, not 4% extreme. LONG-only. Do not flip live params today.**
+
+### Coupled change for shadow trial
+- CUT_LOSER_PNL: -4.00 → **-6.00** (not -8.00; 2% cell captures 77% of upside at half risk)
+- ATR_SL_MAX: 2.5% → **3.5%**
+- Position size: 0.5x → **0.35x** (constant dollar risk: $0.44/trade)
+- Direction: **LONG-only** (SHORTs bleed worse at all wider SL levels)
+
+### Shadow parameters
+- Duration: 7 days OR 200 closed LONG trades, whichever later
+- Metrics: LONG WR ≥ +10pts vs current, HML count < 150% baseline, PM-trail activation rate up
+- Ship shadow config, collect data, revisit. No live flip without metrics.
+
+### Key insight
+Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. At 5x, CUT_LOSER=-6 gives -1.2% price stop. The right lever is wider stops + smaller size to keep dollar risk constant.
+
+### Status
+- Brief: `automation/ceo/brief-risk-budget-hml-2026-10-21.md`
+- Plan updated: `plans/t-vacation-mode-2026-10-14.md` (Risk-Budget Decision section)
+- Shadow config: PENDING (not yet shipped)
+
+## CEO Status — 20261021T232644Z
+### Health: pipeline=inactive(timer active, fired 8s ago — oneshot normal) guardian=active open_pos=0
+### Numbers: 24h 38T -0.95 36.8% | 7d 161T -3.43 36.0%
+### Findings: Rotating Q (coin_tracker signals this week): 0 trades in 7d with coin_tracker/wyckoff/phase signals — well below the <5 threshold. Alerts clean (watchdog stale-lock housekeeping + disk 84%, no errors). Confirms CURRENT.md (shallow chop bleed, flat posture correct).
+### Recommendation: Post-vacation (Oct 23+), delegate a coin_tracker phase-transition signal build to signal_analyst — the system currently harvests zero edge from its coin_tracker intelligence.

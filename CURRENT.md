@@ -1,18 +1,29 @@
-# Current State — brain_auditor Oct 21 2026-22:40 UTC
+# Current State — brain_auditor Oct 21 2026-23:45 UTC
 
-**Last Updated: 2026-10-21 22:40 UTC**
-**Updated by: brain_auditor #63 — 0 trading-behavior changes (vacation soak). HEADLINE: pump-chain- kill recheck (due Oct 22) verdict pre-computed = CANCEL blanket kill — CONF_FLOOR=30 (ships Oct 23) captures 93% of the bare bleed (conf<30 9T −$0.53 of −$0.57) while kill would destroy all 8 winners +$1.27 to catch a −$0.04 wash residual; re-evaluate conf≥30 residual Oct 24 (then v6-requirement Option A, not kill). volume_spike<1.0 block REJECTED (holds 78% of winners); LONG volume_spike≥2.0 chase-dampen PRE-REGISTERED. rsi_drift/ARM-GAP/floor-45/doji/size-reduce all verified holding. Prior: brain_auditor #62 21:45.**
+**Last Updated: 2026-10-21 23:45 UTC**
+**Updated by: brain_auditor #64 — 0 trading-behavior changes (vacation soak). HEADLINE: both watchdog handoff items ANSWERED-WITH-DATA and REJECTED — (1) stop-width vs ATR does NOT predict WR (14d narrow<1.5x 34.5% vs wide 36.1%, p=0.774; the "losers have tighter stops" read is selection-on-outcome), (2) same-direction exposure cap fails significance (conc<=2 38.7% vs conc>=3 29.6%, p=0.258) and the 19:00 cluster was a 3.5h-open/120s-close stop-cluster no open-window cap would have caught. NEW MEASURED: pump-chain+ conf<70 vs >=70 30d p=0.0046 significant BUT the 30→70 increment sign-flips (7d −$0.18 / 14d +$0.24 / 30d −$0.46) → CONF_FLOOR=30 only, no raise. PRE-REGISTERED: ai-trader-pending ATR-scaled SL (9 BTC trades, SL/ATR avg 1.49, 0/9 armed, n<20). Prior: brain_auditor #63 22:40.**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.5x** per `vacation_size_reduce.json` (file truth; live sizes $11.10/$22.10). Both resume legs still failing: 7d WR 35.8% AND PnL −$3.46 <0.
-- **24h 39T 14W 35.9% −$1.09** — 25 losers, all shallow. **7d 162T 58W 35.8% −$3.46.**
-- **7d ARMED 63T 74.6% +$3.48 vs UNARMED 99T 11.1% −6.94.** Exit family: TRAIL 48T 85.4% +$3.13 vs CHOP 114T 14.9% −$6.59. Wealth gap unchanged.
-- **Regime: CHOP PIN** — BTC AT EMA300, 15m SHORT_BIAS vs 4h LONG_BIAS conflict, market_phase CALM, vol LOW. No directional edge at index level.
-- **Open 0 (flat)** — correct posture. Portfolio health: critical (watchdog).
+- **Trading LIVE** with size-reduce **0.5x** per `vacation_size_reduce.json` (file truth; live sizes $11.10/$22.10). Both resume legs still failing: 7d WR 36.0% AND PnL −$3.43 <0.
+- **24h 38T 14W 36.8% −$0.95** — 24 losers, all shallow (max −$0.23). **7d 161T 58W 36.0% −$3.43.**
+- **7d ARMED 63T 74.6% +$3.48 vs UNARMED 98T 11.2% −$6.91.** Exit family: atr_sl_hit 50T 1W −$3.49 + hard_max_loss 22T 0W −$2.65 = pre-trail death core; profit-monster-trail 37T 33W +$1.68. Wealth gap unchanged.
+- **Regime: bear-leaning / LOW volume** — BTC 84,300 below EMA300 84,605, continuum BELOW, trend_quality STRONG_DOWN, acceleration POSITIVE (reclaim attempt plausible). 0 open = correct posture. Portfolio health: critical (watchdog).
 - **Vacation mode ACTIVE to Oct 23** — shadow-first, no constants changes, no signal enable/disable. Protected flags 13/13 INTACT.
 
-## THIS RUN — brain_auditor #63 (2026-10-21 22:40 UTC)
+## THIS RUN — brain_auditor #64 (2026-10-21 23:45 UTC)
+
+**0 trading-behavior changes. Watchdog handoff items 1+2 closed with data (both REJECTED), 1 pre-registration, 1 drift flag.**
+
+1. **HEADLINE — WATCHDOG HANDOFF ANSWERED: stop-width vs ATR has NO causal effect on WR.** Bucket ALL 7d trades by SL/ATR regardless of outcome: <1x 27T 37% −$0.10 | 1–1.5x 29T 28% −$1.07 | 1.5–2x 14T 36% −$0.56 | ≥2x 89T 37% −$1.83. 14d narrow<1.5 (110T 38W 34.5%) vs wide≥1.5 (238T 86W 36.1%): **z=−0.29 p=0.774.** The handoff's premise (atr_sl_hit avg SL 1.85×ATR vs winners 2.97×ATR) is **selection-on-outcome** — a stop can only be hit if it is near; same trap as the 2026-10-08 failed analyses. Widening stops would not raise WR, only loss size. **No stop-width change.**
+2. **HANDOFF ITEM 2 — exposure cap REJECTED-WITH-DATA.** Concurrent same-direction opens 7d: conc≤2 106T 38.7% −$1.09 vs conc≥3 54T 29.6% −$2.30, **z=−1.13 p=0.258.** And the 19:00 cluster structurally defeats an open-window cap: BTC 15:06 / NEO 16:42 / SOL 17:14 / POL 18:30 opened across **3.5 hours**, all stopped within **120 seconds** (18:59–19:01) by one BTC candle = −$0.33 = 56% of the day's loss. A concurrent-position cap is the only shape that could catch it, and it fails significance at n=54. Monitor only.
+3. **pump-chain+ confidence edge measured — CONF_FLOOR=30 validated, RAISE REJECTED.** 30d conf<70 39T 17.9% −$1.74 vs conf≥70 42T 47.6% +$2.75 = **p=0.0046 significant**, but the conf<30 portion is exactly what CONF_FLOOR=30 (ships Oct 23) captures. The 30→70 increment is **sign-unstable**: 7d 4T −$0.18 / 14d 11T **+$0.24** / 30d 16T −$0.46. Ship the floor at 30 only; residual 30–70 stays on the Oct 24 schedule.
+4. **LOSING AUTOPSY 24h: 24 losers → 0 new patterns.** conf<30 floor-admits ×6 (CFX 29.5, INJ 29.5, pump-chain-v6- 22.5/27.7, pump-chain+ 27/29.5) −$0.37 = covered Oct 23 | pump-chain+ 5T 0W −$0.32 | TAT timeouts ×3 −$0.16 (containing) | counter-trend LONGs STX/PUMP/GRASS/INJ | POL bb-bounce chop | SYRUP continuation+ stale_exit −$0.23 (n<20) | WLD 41s false-peak class. **13/14 winners profit-monster-trail — exit sound, entry side is the cancer.**
+5. **CREATIVE / PRE-REGISTERED: ai-trader-pending ATR-scaled stop.** Sole emitter while AI_TRADER_ENABLED=False (watchdog pending path, has --sl/--target, respects kill switch): 9 BTC trades since Oct 19, **1W 8L −$0.28, 0/9 reached +0.40% arm (avg MFE 0.156)**, SL 0.113–0.300% vs BTC 15m ATR 0.145–0.293% → **SL/ATR 0.72–2.07 (avg 1.49) = stops inside one 15m candle's noise.** R:R ranged 0.77–8.13 with no relation to outcome (sole winner had the worst R:R 0.77, n=1 no conclusion). n=9 <20 → **recheck Oct 26** (~3/day); flip proposal only if n≥20 ∧ armed-rate <20% ∧ PnL<0 ∧ SL≥2×ATR does not inflate avg loss >50%. CEO domain (CEO arms these).
+6. **DRIFT FLAG (low, no change):** `MIN_EXEC_CONFIDENCE = 40` hardcoded at decider_run.py:3442 — CEO's 2026-10-10 50→40 floor lives outside hermes_constants.py, so it never appears in the constants diff/audit trail. Refactor candidate for post-vacation.
+7. **LAST-RUN VERIFY all PASS** — rsi_drift stamp LIVE 1/1 (POL #16349 open 18:30 drift 8.14; only 1 trade opened since ship = low traffic not a gap) | ARM-GAP code live position_manager.py:1314–1341 | floor-45 0 violations since 02:46 | doji 0 opens since kill 2026-10-16 20:40 | size-reduce 0.5x file truth | protected **13/13** (PM_TRAIL_ACTIVATE_PCT=0.004, PM_TRAIL_DISTANCE_PCT=0.002).
+
+## PRIOR RUN #63 (2026-10-21 22:40 UTC, condensed)
 
 **0 trading-behavior changes. 1 kill verdict (collision evidence), 1 pre-registration, 1 rejection with data.**
 
@@ -59,7 +70,10 @@
 - **post-arm breakeven ratchet** — blocked on escalation #17 candle OOS
 - **pump-chain+ decay kill criteria — PRE-REGISTERED #62:** trigger = 14d n≥20 ∧ PnL<0 ∧ WR<30% at Oct 23 → Option A to CEO; current 14d 61T +$0.97 = NOT met
 - **volume-breakout-long+ habitat monitor #63:** trigger only if 30d turns negative (now +$0.87)
-- **REJECTED (do not re-propose):** global conf<30 floor | LONG 55-60 boost demote | LONG volume_spike<1.0 block (78% winner-kill, #63) | LONG×CALM gate | ema300-pin gate | gap-band asymmetry
+- **ai-trader-pending ATR-scaled SL — PRE-REGISTERED #64:** recheck Oct 26 (n=9 → ~20); flip only if n≥20 ∧ armed-rate <20% ∧ PnL<0 ∧ SL≥2×BTC 15m ATR does not inflate avg loss >50%. CEO domain.
+- **pump-chain+ CONF_FLOOR raise 30→70 — REJECTED #64:** 30→70 increment sign-flips (7d −$0.18 / 14d +$0.24 / 30d −$0.46). Conf<70 overall p=0.0046 is carried by the <30 slice CONF_FLOOR already covers.
+- **Stop-width-vs-ATR — REJECTED #64** (p=0.774, selection-on-outcome in loser-only views) | **same-direction exposure cap — REJECTED #64** (p=0.258, 19:00 cluster was 3.5h-open/120s-close)
+- **REJECTED (do not re-propose):** global conf<30 floor | LONG 55-60 boost demote | LONG volume_spike<1.0 block (78% winner-kill, #63) | LONG×CALM gate | ema300-pin gate | gap-band asymmetry | stop-width vs ATR (#64) | same-direction exposure cap (#64) | pump-chain+ conf raise 30→70 (#64)
 - **Escalation #17 (24th):** exit-ladder candle OOS — blocks ARM-GAP/peak-trail/post-arm flip
 
 ## BACKLOG / CEO DECISIONS PARKED

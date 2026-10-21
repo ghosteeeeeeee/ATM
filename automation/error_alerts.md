@@ -1444,3 +1444,15 @@
 - **WARN** (2x): `hermes-brain-auditor` transient SQL errors — `column "coin_regime" does not exist`, `syntax error at or near "trailing"` (ad-hoc heredoc queries; auditor self-corrected and completed run #63, RC 0)
 - **WATCH**: disk 84% (warn at 85%), no logs >7d to gzip yet
 - **AUTO-FIX**: none required — all 72 hermes timers active, pipeline every 1min rc=0, no tracebacks, prices fresh (87 tokens <5min), 0 phantom trades, not vacation-paused
+
+## Error Alerts — 2026-10-21 23:27 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3534s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3534s left, N failures)`
+
+## Error Alerts — 2026-10-21 23:45 UTC
+- **WARN** (recurring): disk hit 85% used (18G free) — threshold reached; no logs >7d exist to gzip, largest is pipeline.log 227M (all logs <7d old)
+- **WARN** (recurring since 22:47): `signals: WARNING — only 5 signals in last 5 min (min 20)` — 88 signals/hr generated, pipeline rc=0 every 1min; rate below watchdog threshold, not a stall
+- **WATCH**: hotset.json empty — signals generated but none survived compaction above 40% confidence (market condition, not a fault); BTC-CRASH momentum gate blocking LONGs as designed (BTC 30m mom -0.3~-0.4%)
+- **AUTO-FIX**: none required — vacation_pause absent, all core timers active (pipeline/price-collector/1m-candle/watchdog), 0 tracebacks, prices fresh (130 tokens, max age 68s on active set), 0 open trades, 0 phantom trades; watchdog self-cleaned 4 stale locks at 23:43
