@@ -4973,3 +4973,5 @@ BY: brain_auditor
 BY: auto_1hr
 [2026-10-20 23:36 UTC] brain_auditor: AUDIT RUN #45 — 0 config changes (vacation soak) | BTC trail ratchet about to arm (peak 0.901%) | APT TAT contained -0.04 | ARM-GAP ext verified 0 fires=correct | steers 001 reject / 002 structural / 003 kill-reject | 24h 22.7% -0.30 shallow, 7d 36.0% -2.52, size-reduce 0.5x
 BY: brain_auditor
+- [2026-10-21 00:35] auto_1hr: NO CONFIG CHANGE — 2T last hour (BTC continuum-osc+ UNIVERSAL_MAX_HOLD +$0.09 +3.73%, APT pump-chain+ trail_arm_timeout -$0.04 -1.70%) | 24h 22T 6W -$0.17 (27.3%) | 7d 161T 58W -$2.68 (36.0%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0W/4T 24h but 1T last hour, 7d verified profitable) | atr_sl_hit 22.7% under 40% | no neg-hour streak | 3 open | No constants change -> no signal_versions entry
+BY: auto_1hr

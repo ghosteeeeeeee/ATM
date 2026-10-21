@@ -13044,3 +13044,24 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL slipped -$2.37 → -$2.52; size-reduce stays until PnL crosses -$2
 - hard_max_loss 3T -$0.51 still worst-avg close reason (24h) — monitor clustering
+
+## [2026-10-21 00:35 UTC] Hourly Analysis
+
+**Trades:** 2 closed last hour (1 win, 1 loss)
+**PnL:** +$0.05 last hour | 24h 22T 6W -$0.17 (27.3% WR) | 7d 161T 58W -$2.68 (36.0% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- BTC continuum-osc+ LONG UNIVERSAL_MAX_HOLD +$0.09 (+3.73%); APT pump-chain+ LONG trail_arm_timeout -$0.04 (-1.70%)
+- Kill check: pump-chain+ 24h 0W/4T -$0.43 but 0 trades at kill line last hour (1T only); 7d previously verified profitable — noise, stays enabled
+- atr_sl_hit 5/22 = 22.7% under 40% — tpsl deployed, no action
+- No neg-hour streak (23:00 -$0.14, 00:00 +$0.05)
+- Size-reduce 0.3x stays (7d PnL -$2.68 still <-$2)
+- 3 open: COMP r2v2-long3 +0.46%, BLUR pump-chain+ -0.21%, CFX pump-chain+ -0.12%
+- Frequency 2T/hr — not overtraded
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL slipped -$2.52 → -$2.68; size-reduce stays until PnL crosses -$2
+- pump-chain+ 24h now 0W/4T — keep watching; if 7d turns negative, kill review
