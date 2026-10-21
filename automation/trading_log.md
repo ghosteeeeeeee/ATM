@@ -13297,3 +13297,25 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 **No inversions. No flags changed. Report: automation/signal_report.md**
 
 **Side finding:** trading_log.md recent entries show mangled PnL strings (e.g. "-/usr/bin/bash.63" where "-$0.63" should be) — a previous writer expanded `$0` as a shell variable. Cosmetic, but worth a cleanup pass on the log-writing script.
+
+## [2026-10-21 10:29 UTC] Hourly Analysis
+
+**Trades:** 6 closed (2 wins, 4 losses)
+**PnL:** -$0.19 last hour | 24h 30T 8W -$0.50 (26.7% WR) | 7d 154T 56W -$2.75 (36.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 6 closes: DOGE continuation+ trail +$0.02, PONS r2v2-long7 trail +$0.04 | losses: PUMP r2v2-long3 hard_max_loss -$0.13 (-5.91%), XPL bb-squeeze+ hard_max_loss -$0.08 (-3.51%), BTC ai-trader-pending atr_sl_hit -$0.03, GOAT bb-bounce-v2-long+ trail -$0.01
+- Kill check: max 1T per signal last hour — no 3+T candidate. 24h 0%WR with 3+T = pump-chain+ LONG 4T and pump-chain-,v6- SHORT 3T, both 0T last hour and repeatedly audit-rejected — no kill
+- atr_sl_hit 10/30 = 33.3% under 40% — tpsl_utils.py deployed (Oct 12), no action
+- Entry quality: winners MAE avg 0.204% (<0.5% threshold) — OK; losers 0.386%, gap is exit-side not entry-side
+- Hard_max_loss 3T -$0.33/24h — standing SL-width escalation with CEO (Oct 16), not a new finding
+- Neg-hour streak: 10:00 -$0.24 but 08(+)/09(+) before it — no 3 consecutive negative hours
+- Regime LONG_BIAS (not NEUTRAL) — no size action; size-reduce 0.3x already active (7d -$2.75 < -$2)
+- Frequency 6/hr — under 20, not overtraded
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 26.7% with -$0.50 — soft bleed, monitor; hard_max_loss + atr_sl_hit remain the loss clusters (3T -$0.33 / 10T -$0.66)
