@@ -5009,3 +5009,5 @@ BY: brain_auditor
 - [2026-10-21 12:38 UTC] brain_auditor: AUDIT RUN #55 — 0 config changes (vacation soak) | 24h 29T 31.0% -$0.31 shallow, 7d 153T 35.9% -$2.78 | TRAIL +$3.74 vs UNARMED -$6.29 | coin_regime n=28 MET | hmacd kill-criteria pre-registered | pump-chain- kill DEFER Oct 22 | size-reduce 0.3x
 - [2026-10-21 13:30] auto_1hr: NO CONFIG CHANGE — 4T last hour 3W/1L +$0.20 (all profit-monster-trail) | 24h 32T 37.5% +$0.06 (green) | 7d 155T 36.8% -$2.46 — size-reduce 0.3x stays | kill: none (0T for 0%WR candidates) | atr_sl_hit 25.0% under 40% | no neg streak | 3 open all LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-21 14:29] auto_1hr: NO CONFIG CHANGE — 4T last hour 1W/3L -$0.37 | 24h 32T 34.4% -$0.87 (flipped red: aged-out winners +$0.56 gone) | 7d 158T 36.7% -$2.81 — size-reduce 0.3x stays | kill: none (max 1T/signal) | atr_sl_hit 21.9% under 40% | no neg streak (14:00 -0.31 isolated) | regime SHORT_BIAS now, 0 open | No constants change -> no signal_versions entry
+BY: auto_1hr

@@ -13379,3 +13379,26 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 
 **Open Questions:**
 - 24h just turned positive (+$0.06) — first green 24h window; keep watching whether it holds. Loss clusters unchanged: atr_sl_hit 8T -$0.46, hard_max_loss 3T -$0.33 (standing SL-width escalation with CEO, Oct 16)
+
+## [2026-10-21 14:29 UTC] Hourly Analysis
+
+**Trades:** 4 closed (1 win, 3 losses)
+**PnL:** -$0.37 (WR: 25.0%) | 24h 32T 11W -$0.87 (34.4%) | 7d 158T 58W -$2.81 (36.7%)
+
+**Changes:** none
+
+**No Change Needed:**
+- 4 closes: HYPER bb-bounce-v2-long+ +$0.02 (only win), SYRUP continuation+ stale_exit -$0.23 (MAE 1.11%), GRASS r2v2-long3 atr_sl_hit -$0.08, INJ pump-chain+ hard_max_loss -$0.08
+- Entry quality: 24h winners avg MAE 0.28% (<0.5% — good); losers avg MAE 0.50%. All 3 losses this hour breached >0.69% adverse before exit
+- Kill check: max 1T/signal last hour — no 3+T 0%WR candidate. 24h 0%WR groups (pump-chain+ 5T, ai-trader-pending 3T) both 0T/1T last hour; pump-chain+ repeatedly audit-rejected — no kill
+- atr_sl_hit 7/32 = 21.9% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: 13:00 +$0.16 then 14:00 -$0.31 — no 3 consecutive negative hours (11:00 empty broke earlier run)
+- Frequency 4/hr — under 20, not overtraded
+- Regime now SHORT_BIAS (regime_5m 14:15: 7L/60S/60N) but no 3-consecutive-neg-hours trigger and not NEUTRAL; size-reduce 0.3x already active (7d -$2.81 < -$2)
+- 0 open trades — no exposure
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flipped +$0.06 (13:30) → -$0.87: verified real, not a query bug — -$0.56 from aged-out window (yesterday ZRO +0.37, HYPE +0.28 left the 24h band) + new hour's -$0.37
+- Regime flipped LONG_BIAS → SHORT_BIAS; all recent closes were LONG side — if shorts start printing, check whether signals are still biased long
+- Loss clusters unchanged: hard_max_loss 4T -$0.41, atr_sl_hit 7T -$0.45 (standing SL-width escalation with CEO, Oct 16)
