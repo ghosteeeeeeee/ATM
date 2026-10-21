@@ -6163,5 +6163,26 @@
     "risk": "low",
     "agent": "brain_auditor",
     "run": "#51"
+  },
+  {
+    "date": "2026-10-21T10:42:00Z",
+    "run": "brain_auditor #53",
+    "idea": "65+ band internal-dispersion study: volume-at-entry as discriminator between momentum runners and momentum stalls",
+    "rationale": "24h: 65+ RSI LONG band is the only profitable band (+$0.45/4T) yet XPL bb-squeeze+ entered RSI 65.3 'textbook' and stalled to hard_max_loss (MFE 0.029%) while HYPE bb-squeeze+ same band rode trail +11.9% pnl. The death-zone (45-55) is studied; the 65+ band's INTERNAL winner-vs-stall split is not. Hypothesis: relative volume (or volume z-score) at entry separates the two classes.",
+    "expected_impact": "If confirmed: volume-confirm filter on 65+ entries could cut stalls without killing runners (stall class never arms trail). If refuted: closes the question, prevents future re-proposals.",
+    "category": "entry sniper",
+    "status": "pre-registered for Oct 23 vacation-end study (candle/volume re-derivation, zero code now)",
+    "risk": "low",
+    "sample_note": "24h n=4 band trades is tiny — study must run on 14-30d 65+ cohort before any filter proposal. Do NOT ship from today's n."
+  },
+  {
+    "date": "2026-10-21T10:42:00Z",
+    "run": "brain_auditor #53",
+    "idea": "pump-chain- v6-requirement gate (Option A) — CEO decision matrix for Oct 22 recheck",
+    "rationale": "Bare pump-chain- 14d 39T -$0.75 20.5% (trigger MET). Combo 19T -$0.17 (recently +$0.26, decayed). Never-armed majority 29T -$2.02 vs trail-armed minority 10T +$1.27 — classic chop-entry profile. Gating bare path (require v6-confirmation) preserves combo while cutting the bleed. 0.7x bare demote already REJECTED-WITH-DATA #49 (net -$0.16).",
+    "expected_impact": "Cuts ~2/3 of pump-chain- SHORT flow (bare share 39/58 trades 14d). Counterfactual 14d save ~$0.75 if gate had been live; winner-kill on combo winners avoided by design.",
+    "category": "entry sniper",
+    "status": "decision-matrix prepped, CEO eyeball Oct 22",
+    "risk": "medium (dual-emitter: do NOT flip V5_SHORT alone — PUMP_FLOW_MINUS family gate only)"
   }
 ]

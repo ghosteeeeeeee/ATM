@@ -1,42 +1,32 @@
-# Current State — brain_auditor #52 Oct 21 ~09:55 UTC
+# Current State — brain_auditor #53 Oct 21 ~10:42 UTC
 
-**Last Updated: 2026-10-21 09:55 UTC**
-**Updated by: brain_auditor #52 — 1 bugfix (ARM-GAP dead-code FIXED), 0 constants changes. Watchdog CRITICAL shallow-bleed. DOGE trail-arm WON. Oct 22 pump-chain- kill recheck stands.**
+**Last Updated: 2026-10-21 10:42 UTC**
+**Updated by: brain_auditor #53 — 0 config changes (vacation soak). SHORT bleed 7T 0% entire deficit. pump-chain- kill matrix PREPPED for Oct 22. All #52 changes holding.**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.5x** (vacation_size_reduce.json — 7d WR 37.3% ≥37 but PnL −$2.40 < 0, resume leg 2 failing).
-- **24h 26T 7W −$0.14 (26.9%) — shallow, containing.** SHORT side THE bleed: 9T 1W −$0.41 vs LONG 17T 6W +$0.27. All 24h SHORT losers counter-trend pump-chain- family + BTC pendings. 7d 150T 56W −$2.40 (37.3%).
-- **7d exit family: TRAIL 58T 77.6% +$3.88 | CHOP 92T 12.0% −$6.28.** Wealth gap unchanged — every dollar of profit comes from trail-armed trades. 7/7 24h winners trail-armed or hard_tp.
-- **Open 4 LONG:** GOAT #16324 bb-bounce-v2-long+ +0.66% (55m, near 0.40% arm) | XPL #16325 bb-squeeze+ −0.38% | PUMP #16326 r2v2-long3 −0.39% | BTC #16328 ai-trader-pending LONG just opened 09:44. All aligned 4h LONG_BIAS — HOLD.
-- **Regime: btc_15m SHORT_BIAS (flipped this morning), btc_4h LONG_BIAS, continuum ABOVE, LOW vol, STRONG_UP, DECLINING market phase.** Mixed 15m/4h — watch SHORT counter-trend risk on alt LONGs.
+- **Trading LIVE** with size-reduce **0.5x** (vacation_size_reduce.json — both resume legs failing: 7d WR 36.4% <37 AND PnL −$2.75 <0).
+- **24h 30T 8W 26.7% −$0.50 — shallow, containing. SHORT side THE bleed: 7T 0% −$0.58 (all counter-trend vs BTC continuum ABOVE). LONG 23T 34.8% +$0.08 net flat.** 7d 154T 56W 36.4% −$2.75. 30d 726T 41.7% −$9.09.
+- **7d exit family: TRAIL 59T 76.3% +$3.77 | CHOP 95T 11.6% −$6.52.** Wealth gap unchanged. 8/9 24h winners trail-armed/hard_tp/max_hold.
+- **Open 0 (flat)** — correct in LOW-vol CALM mixed-tape (watchdog: btc_15m/4h LONG_BIAS, continuum ABOVE, but trend_quality STRONG_DOWN — intraday clocks not aligned; 1m continuum is live truth).
 - **Vacation mode ACTIVE to Oct 23** — shadow-first, no constants changes. Protected flags 13/13 INTACT.
-- **DOGE #16323 WON +$0.02 profit-monster-trail** — last run's trail-arm deadline watch resolved positive (meta_rsi 28.57 didn't matter).
 
-## THIS RUN — brain_auditor #52 (09:55 UTC)
+## THIS RUN — brain_auditor #53 (10:42 UTC)
 
-**1 bugfix, 0 constants changes.**
+**0 config changes.**
 
-1. **🐛 ARM-GAP INSTRUMENTATION WAS DEAD — FIXED.** Shipped #44 (Oct 20 16:46) accessed RealDictCursor row via integer index `[0]/[1]/[2]` → KeyError swallowed by `except:pass` → zero log lines in 17h. CRV #16318 (MFE 0.585% trail=FALSE −2.22%) was a perfect first candidate and never logged. Fixed: dict-key access + `[ARM-GAP-ERROR]` logging. py_compile + self-check PASS. **Validation protocol (n≥10 log lines) NOW UNBLOCKED** for vacation-end exit-stack review.
-2. **WATCHDOG TRIAGE:** 001 losing-streak WIDE-SHALLOW (13/20 aged; 24h net −$0.14 contained) | 002 wrong-side VERIFIED (SHORT 9T 1W −$0.41 counter-trend; kill recheck tomorrow) | 003 pump-chain+ NOT MET (14d +$1.00; HIGH block shipped 03:37 by signal_reporter — CFX/BLUR would-block confirmed) | 004 ai-trader-pending (BTC LONG #16328 fresh; standing: report don't block).
-3. **LOSING AUTOPSY 24h: 19 losers, 3 clusters, ZERO new patterns.** pump-chain- SHORTs ×6 (COMP #16302 MFE 1.18% armed-reverse −7.61% largest single loss) | pump-chain+ timeouts ×4 (HIGH/EXTREME; HIGH block catches HIGH class) | pending BTC SHORTs ×2. Winners all momentum-at-entry.
-4. **LAST-RUN VERIFY:** floor revert HOLDING ✓ | TAT scope fix HOLDING ✓ | size-reduce 0.5x HELD ✓ | protected 13/13 ✓ | HIGH block first validation pending (0 HIGH fires since ship).
-
-## REJECTED THIS RUN
-
-- **v6-confirmation shadow** — SQL signal-string split ('pump-chain-' vs 'pump-chain-,pump-chain-v6-') already answers bare-vs-combo. Skip redundant code; use SQL cohort at Oct 22 kill recheck.
-- **btc_regime filter (TRANSITIONING/BULL_TREND LONG block)** — bleeds are standard HML chop (18T/27T hard_max_loss); trail winners positive in both; would kill winners. Fails bars.
-
-## CREATIVE (this run)
-
-- **ARM-GAP live log validation protocol UNBLOCKED** — track n≥10 [ARM-GAP] lines with peakTrail@0.3% counterfactuals before Oct 23 exit-stack review. DB counterfactual shows +138pts/14d delta but is outlier-carried; live logs give per-trade forensics.
-- **Near-miss arm band scorecard (MFE 0.20-0.40)** — 48T/14d −$4.11 one rung below arm. Existing TAT shadows cover parts. Monitor for growth (new chop signal flooding band).
+1. **WATCHDOG TRIAGE:** 001 wide-shallow REJECT-URGENT (13/20 window = known cohorts, 24h net −$0.50 contained) | 002 VERIFIED-STRUCTURAL (SHORT 7T 0% all counter-trend; addresses = Oct 22 kill recheck) | 003 r2v2-long3 MONITOR (7d n=6<20, EXTREME chop MFE<0.17) | 004 pump-chain+ KILL-NOT-MET (7d +$0.16; HIGH block live, 0 fires pending).
+2. **LOSING AUTOPSY 19 losers ZERO new patterns:** counter-trend SHORTs ×7 (BTC pendings ×2 CEO-domain precheck-FAIL reported, pump-chain- family ×5) | pump-chain+ mid-band timeouts ×4 (CFX/BLUR HIGH pre-block-ship; APT/AIXBT EXTREME = #46 scope) | r2v2-long3 EXTREME chop ×3 | CEO manual ×2 (report only) | hl_copy oversold ×1 (n=6 deferred kill stands).
+3. **LAST-RUN VERIFY #52 all HOLDING:** ARM-GAP fix correct-by-zero (0 error lines; 3 closes since fix all MFE<0.40 = zero qualifying) | floor-45 0 violations since 02:46 | TAT scope 0 fires | size-reduce 0.5x held | HIGH block present 0 fires | doji 0 since Oct 16 | protected 13/13 | coin_regime 27/154 (LONG_BIAS×SHORT 5T 0% −$0.19 directionally perfect, n<20).
+4. **pump-chain- KILL RECHECK PREPPED (tomorrow):** bare 14d 39T −$0.75 20.5% **trigger MET** | combo 19T −$0.17 (v6-edge decayed from +$0.26) | never-armed 29T −$2.02 vs trail-armed 10T +$1.27 | **recommendation: Option A v6-requirement gate** (preserves combo, cuts bare bleed; do NOT flip V5_SHORT alone; 0.7x demote already REJECTED #49).
 
 ## STANDING PRE-REGISTRATIONS (vacation-end Oct 23)
 
-- **pump-chain- kill recheck Oct 22** — v6-requirement gate or CEO decision on PUMP_FLOW_MINUS. Do NOT flip V5_SHORT alone (dual emitter).
-- **ARM-GAP n≥10 log-line protocol** (unblocked this run)
+- **pump-chain- kill recheck Oct 22** — matrix PREPPED this run (Option A recommended, CEO eyeball)
+- **ARM-GAP n≥10 log-line protocol** (unblocked #52, 0 qualifying closes since = correct)
+- **65+ band volume-at-entry dispersion study** (#53 creative — XPL stall vs HYPE runner same band)
 - **pump-chain+ non-EXTREME 0.7x dampen** (#46)
-- **Escalation #17 (17th):** exit-ladder candle OOS — blocks ARM-GAP/peak-trail flip
+- **Escalation #17 (18th):** exit-ladder candle OOS — blocks ARM-GAP/peak-trail flip
 - **pp-cond shadow flip:** failed bars (#39), re-eval vacation-end
-- **coin_regime:** n=25 stamped 7d, building toward 14d backfill
+- **coin_regime:** n=27 stamped 7d, building toward 14d backfill (n≥20 bar)
+- **atr_sl recovery probe** (44% recover ≤30m) — needs fee-adjusted 30d OOS before re-entry mechanism
