@@ -454,3 +454,7 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-21 08:20 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour net +$0.03 (DOGE trail win, BTC pending SHORT SL). | 24h 25T 6W -$0.18 (24.0%) | 7d 152T 55W -$2.70 — size-reduce 0.3x stays (PnL < -$2) | kill: none (max 1T/signal last hour) | atr_sl_hit 36.0% under 40% (tpsl deployed) | regime flipped LONG_BIAS (not NEUTRAL) | 2 open both LONG, regime-aligned | No constants change -> no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-21 21:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 40T 35.0% '-$1.09' | 7d 162T 35.8% '-$3.46' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending both 0T last hour; recheck pre-reg Oct 22) | atr_sl_hit 10/40=25.0% under 40% | neg streak broken by empty 20:00/21:00 | 0 open | No constants change -> no signal_versions entry
+BY: auto_1hr
