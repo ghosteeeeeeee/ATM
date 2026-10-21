@@ -704,6 +704,25 @@ ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-09-29: widened from 
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
+# ── Price sanity (brain_auditor 2026-10-21) ─────────────────────────────────
+# A single bad HL mid poll used to become a PERMANENT peak: it feeds
+# highest_price -> peak_price -> trail arm -> SL ratchet, so the fabricated
+# number is never re-checked. WLD #16341 stored highest_price=0.600000 while
+# no 1m print in the trade window exceeded 0.5792 (+4.2% phantom) -> false
+# +0.40% trail arm -> atr_trail_hit 41 seconds after open. Census vs 1m
+# candles, 14d: 6/356 trades with peaks unsupported by any candle (WLD +4.22,
+# IMX +14.55, LDO +3.63, ZRO +1.83, BLUR x2); 4/6 exited as atr_trail_hit and
+# all 6 wrote fabricated mfe_pct (WLD recorded MFE 4.31% on a trade whose
+# candle high was +0.09%) — which contaminates the trailing_activated /
+# wealth-gap metric every audit decision uses.
+# Guard: HL unrealized_pnl is an independent price source already in hand.
+# If mids disagrees with the HL-implied price beyond this tolerance, the mid
+# tick is the liar — use the HL price for peak tracking, PnL and DB.
+# 0.5% chosen because the smallest observed false peak was +0.72% while
+# normal mid-vs-mark divergence is well under 0.1%. Log line
+# "[PriceSanity]" doubles as the ongoing census.
+PRICE_SANITY_MAX_DRIFT_PCT = 0.5   # Revert: set to a very large number (e.g. 1e9).
+
 # Acceleration-phase trailing — _collect_atr_updates (first candle against us, we're out)
 ATR_SL_MIN_ACCEL   = 0.003  # 0.30% floor — allow trailing to lock in profits. CEO directive: do NOT change
 # Was 0.5% — too wide, prevented trailing from locking in profits

@@ -22,6 +22,7 @@ from hermes_constants import (
     DEFAULT_TRADE_SIZE_USDT,
     ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX, ATR_TP_K_MULT,
     ATR_SL_MIN_ACCEL, ATR_TP_MIN_ACCEL,
+    PRICE_SANITY_MAX_DRIFT_PCT,
     ATR_SL_MIN_INIT, ATR_SL_MAX_INIT, SL_PCT_FALLBACK, TP_PCT_FALLBACK, STOP_LOSS_DEFAULT, SL_PCT_MIN,
     ATR_K_LOW_VOL, ATR_K_NORMAL_VOL, ATR_K_HIGH_VOL,
     ATR_K_INITIAL,
@@ -2509,6 +2510,25 @@ def refresh_current_prices(server: str = SERVER_NAME):
                             """, (hl_entry, trade_id))
                         except Exception:
                             pass
+
+                # ── PRICE SANITY (brain_auditor 2026-10-21) ────────────────────
+                # Cross-check the mids tick against HL's own unrealized PnL
+                # (independent source) before it is allowed to become
+                # current_price / a permanent peak. See
+                # PRICE_SANITY_MAX_DRIFT_PCT for the incident census.
+                if hl_entry > 0 and hl_size > 0 and cur_price > 0:
+                    _san_pct = compute_hl_pnl_pct(hl_unrealized, hl_entry * hl_size)
+                    if direction == 'SHORT':
+                        _san_price = hl_entry * (1 - _san_pct / 100.0)
+                    else:
+                        _san_price = hl_entry * (1 + _san_pct / 100.0)
+                    if _san_price > 0:
+                        _san_drift = abs(cur_price / _san_price - 1) * 100.0
+                        if _san_drift > PRICE_SANITY_MAX_DRIFT_PCT:
+                            log(f"  [PriceSanity] {token} mids={cur_price} hl_implied={_san_price:.6f} "
+                                f"drift={_san_drift:.3f}% > {PRICE_SANITY_MAX_DRIFT_PCT}% — using HL price "
+                                f"(entry={hl_entry} trade={trade_id})")
+                            cur_price = round(_san_price, 6)
 
                 # Use mid price as current_price (most accurate real-time value)
                 if cur_price > 0:
