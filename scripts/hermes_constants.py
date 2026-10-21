@@ -927,8 +927,8 @@ SPIKE_FILTER_RSI_THRESHOLD = 30      # block SHORT when RSI < this (oversold = b
 # Backtest 48h: RSI<35 blocks 4 losers ($-0.87), 1 tiny winner ($+0.05). Net: +$0.82/48h.
 SHORT_RSI_FLOOR = 45           # REVERTED 35→45 2026-10-18 brain_auditor: pre-registered trigger HIT — 7d RSI 35-45 SHORT band = 29T 10W 16L, gross losses $1.08 > $1.00 trigger (excl copy/manual still $1.02). Oct 13 recalibration 45→35 opened the known worst band (14d 32T 31.3% −$0.94); aging thesis failed (Oct 14-18 added −$0.40 more). Prior: CEO 2026-10-13, BTC SHORT RSI 16.1 blocked in bear dump. Re-lower to 35 only with fresh ≥20T band data showing net positive.
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
-# The aggregate 40-45 bleed is from OTHER signals, not pump-chain. Pump-chain gets lower floor.
-SHORT_RSI_FLOOR_PUMP_CHAIN = 40  # pump-chain-specific floor (auditor-approved, 2026-10-12)
+# REVERTED 2026-10-21 brain_auditor: pre-registered revert trigger HIT (7d n=5 WR 20% < 45% bar; 14d n=17 WR 23.5% net +$0.04; 30d decayed to 41.2% WR +$0.29). Band edge gone — carve-out lifted, pump-chain aligned to standard floor 45.
+SHORT_RSI_FLOOR_PUMP_CHAIN = 45  # REVERTED 40→45 2026-10-21 (trigger hit; was auditor-approved 2026-10-12)
 SHORT_RSI_CEILING = 65         # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ SHORT = 9T 33.3%WR -$0.66 (block). RSI 55-65 SHORT = 14T 42.9%WR -$0.25 (marginal). Ceiling at 65 blocks overbought SHORT entries.
 SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocked — NO bear exemption. RSI 65-75 SHORT: bear-structure-gated exemption only (overbought+pump in bear = short per philosophy). DYDX RSI=75.3 blocked by this.
 # Loss-prevention guardrail (NOT a tunable signal-quality filter). Completes OVERSOLD_SHORT_RSI_MAX hole:
@@ -938,7 +938,9 @@ SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocke
 SHORT_RSI_HARD_FLOOR = 45      # REVERTED 35→45 2026-10-18 brain_auditor: pre-registered trigger HIT (same as SHORT_RSI_FLOOR) — 7d band 29T 16L gross $1.08 > $1.00. Aligns with SHORT_RSI_FLOOR=45. RSI<45 SHORT blocked (BANANA lesson: oversold = bounce). Prior: CEO 2026-10-13 RECALIBRATION 45→35.
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
 # Blanket 45 floor cuts off this band. Pump-chain gets a lower floor. Revert if 7d n>=5 WR<45% or PnL<-$0.50.
-SHORT_RSI_HARD_FLOOR_PUMP_CHAIN = 40  # pump-chain-specific floor (auditor-approved, 2026-10-12)
+# REVERTED 2026-10-21 brain_auditor: trigger HIT — 7d n=5 w=1 (20% WR) | 14d n=17 w=4 (23.5%) net +$0.04 | 30d 41.2% WR +$0.29.
+# GRANT-CONDITION (63.2% WR) decayed across all three windows. Winner-kill check: 14d block 4W +$0.75 vs save 13L −$0.71 ≈ wash; 7d +$0.13 saved.
+SHORT_RSI_HARD_FLOOR_PUMP_CHAIN = 45  # REVERTED 40→45 2026-10-21 brain_auditor (pre-registered trigger hit; aligns w/ SHORT_RSI_HARD_FLOOR)
 
 # ── Oversold SHORT guard: prevent BANANA-repeat entries ──────────────────────
 # When SHORT_RSI_FLOOR is 40, RSI <40 is blocked. Extra guard for extreme oversold.
@@ -3163,7 +3165,7 @@ PUMP_CHAIN_STALE_BLOCK_AGE_MIN = 10  # brain_auditor 2026-09-16 — data: 5 stal
 
 # pump-chain+ HIGH regime block — 14T/7d 35.7%WR +$0.19 (noise). EXTREME 57.1%WR +$1.65 (edge).
 # Block pump-chain+ LONG in HIGH regime to free slots for proven EXTREME edge.
-PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = False  # RE-ENABLED signals 2026-09-22 (CEO)
+PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED = True  # signal_reporter 2026-10-21: HIGH 38T 37%WR -$0.48 (all-time) + 24h HIGH 3T 0W -$0.43. EXTREME 100T 43%WR +$3.89 kept. Prior False from 2026-09-22 CEO re-enable.
 PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED = True  # brain_auditor 2026-10-07 — HIGH is the bleed regime. 14d HIGH 7T 14.3%WR -$0.66 | NORMAL 7T 71.4% +$0.43. 30d HIGH 27T 44.4%WR -$0.42 | NORMAL 12T 75% +$0.53. Block HIGH, keep NORMAL+EXTREME. ADA 2026-10-07 HIGH RSI 56 SHORT lost — shorted bullish coin. Prior False from Sep 22 re-enable.
 PUMP_CHAIN_SHORT_EXTREME_BLOCK_ENABLED = False  # brain_auditor 2026-10-07 20:30 UTC REVERT of signal_reporter a907babd True. CEO re-enabled vol_gate ('EXTREME','pump-chain-'):1.0 same day ("every dump is a SHORT"). 30d meta-RSI EXTREME: >=60 n=18 61.1%WR +$0.37 (PAYS); <45 n=33 42.4% -$1.18 (blocked by SHORT_RSI_HARD_FLOOR=45). Block killed 26/32 14d EXTREME winners incl APT +0.53 trail. HIGH_BLOCK=True + HARD_FLOOR=45 + CUT_LOSER_PNL=-1.50 are the real defenses. signal_reporter 7d -$0.60 was one noisy window.
 
