@@ -6271,5 +6271,41 @@
     "category": "exit integrity",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-21T17:45:37Z",
+    "idea": "RSI-drift stamp at execution (rsi_detect / rsi_exec / rsi_drift in _signal_metadata)",
+    "rationale": "Every prior RSI analysis used DETECT-time rsi_14 only. AGENTS.md documents trades where detect RSI passed every gate and exec RSI was on the other side of it (CFX 44.6 -> 31.28). The exec-time gates re-check, so the only trades that leak are the ones whose drift lands INSIDE the gate windows — that residue was unmeasurable. Now it is SQL-native, same vehicle as the coin_regime stamp (#33) which produced the LONG x LONG_BIAS +$0.29 finding.",
+    "expected_impact": "Decision input for vacation-end: if |drift|>=10 trades are n>=20 and lose while drift<3 wins, a drift-aware size dampen (not a block) becomes a candidate. If the residue is a wash, the existing exec gates are confirmed sufficient and this line of attack closes permanently.",
+    "category": "entry sniper / data infra",
+    "status": "shipped zero-behavior infra 2026-10-21",
+    "risk": "none (log-only stamp)"
+  },
+  {
+    "date": "2026-10-21T17:45:37Z",
+    "idea": "REJECTED-WITH-DATA: staleness filter (10-30m block or 3-10m boost)",
+    "rationale": "30d showed 3-10m staleness as the only profitable bucket (+0.82/208T, 46.2%) and 10-30m at 0% (0/6). Battery: 7d reverses the 3-10m band to -1.30/32T (sign flip) and the 10-30m band is n=6 <20. The 30d 'edge' is temporal instability, not signal.",
+    "expected_impact": "n/a — do not build",
+    "category": "verification",
+    "status": "rejected-with-data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-21T17:45:37Z",
+    "idea": "REJECTED-WITH-DATA: blanket EXTREME-regime entry block",
+    "rationale": "24h EXTREME 15T 3W -0.72 is the entire bleed, but 7d EXTREME contains pump-chain+ 17T +0.46 and pump-chain combo 9T +0.32 — +0.78 of positive flow. Block would kill >20% of winners. The SHORT x EXTREME 0.5x SIZE dampen (already pre-registered, n=59, OOS-consistent) is the correct shape, not a block.",
+    "expected_impact": "n/a — do not build the block",
+    "category": "verification",
+    "status": "rejected-with-data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-21T17:45:37Z",
+    "idea": "Standing metric addition: armed-vs-unarmed split BY DIRECTION (30d)",
+    "rationale": "Per-signal arm-rate leaderboard shipped #57. The per-direction split is the sharper number and it is the decision input for the Oct 22 pump-chain- kill: 30d SHORT armed 48T 79.2% +4.31 vs unarmed 165T 23.6% -9.87; LONG armed 248T 77.0% +15.92 vs unarmed 273T 14.7% -19.17. Bare pump-chain- arms at 22.2% vs combo 27.3% — the confirmation premium shows up as arm-rate, which is the structural case for Option A.",
+    "expected_impact": "Feeds the Oct 22 kill matrix; zero code (audit metric)",
+    "category": "audit metric",
+    "status": "shipped as audit metric",
+    "risk": "none"
   }
 ]

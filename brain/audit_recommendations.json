@@ -1,24 +1,26 @@
 {
-  "timestamp": "2026-10-21T16:38:26Z",
-  "run": "brain_auditor #59",
+  "timestamp": "2026-10-21T17:45:37Z",
+  "run": "brain_auditor #60",
   "session_lock": "absent — full audit OK",
-  "vacation_mode": "ACTIVE to Oct 23 — 0 constants changes",
+  "vacation_mode": "ACTIVE to Oct 23 — 0 trading-behavior constants changes",
   "trade_summary_24h": {
-    "trades": 34,
+    "trades": 35,
     "wins": 14,
-    "wr": 41.2,
-    "pnl": -0.59,
-    "long": "30T 46.7% -0.26",
-    "short": "4T 0% -0.33 (all counter-trend)",
-    "since_run_58": "0 closes (quiet window)"
+    "wr": 40.0,
+    "pnl": -0.7,
+    "long": "31T",
+    "short": "4T 0W -0.33 (all counter-trend / CEO pendings)",
+    "by_exit": "CHOP 15T 0W -1.51 (HML 5 / atr_sl 6 / TAT 4 / stale 1) vs TRAIL/PROFIT 18T 14W +0.75"
   },
   "trade_summary_7d": {
-    "trades": 162,
-    "wr": 37.0,
-    "pnl": -2.92,
-    "trail_family": "49T 85.7% +3.43",
-    "chop_family": "82T 3.7% -6.45",
-    "wealth_gap": "UNCHANGED — trail wins, chop loses"
+    "trades": 158,
+    "wr": 36.7,
+    "pnl": -3.15,
+    "armed": "63T 47W 74.6% +3.48",
+    "unarmed": "95T 11W 11.6% -6.63",
+    "chop_family": "80T 1W -7.22",
+    "trail_profit_family": "71T 55W 77.5% +4.26",
+    "wealth_gap": "UNCHANGED — trail wins, chop loses. 30d: armed 296T +20.23 vs unarmed 438T -29.04"
   },
   "open_trades": [
     {
@@ -26,68 +28,148 @@
       "coin": "BTC",
       "signal": "continuum-trend+",
       "dir": "LONG",
-      "entry": 84624,
-      "sl": 83770.05,
-      "hours": 1.4,
-      "verdict": "HOLD — dual LONG_BIAS/STRONG_UP aligned; SL below EMA300 thesis-correct"
+      "conf": 77.1,
+      "hours": 2.7,
+      "verdict": "HOLD — best signal in book (30d 8T 87.5% +0.36, arm 87.5%); SL 84365 below EMA300 thesis-correct"
+    },
+    {
+      "id": 16344,
+      "coin": "NEO",
+      "signal": "bb-bounce-v2-long+",
+      "dir": "LONG",
+      "conf": 100,
+      "hours": 1.1,
+      "verdict": "HOLD but watchdog-correct: ranging coin in ranging regime, would not open fresh; must confirm to +0.40% or TAT exit is the right outcome"
+    },
+    {
+      "id": 16346,
+      "coin": "SOL",
+      "signal": "hl_copy_trader",
+      "dir": "LONG",
+      "conf": 99,
+      "hours": 0.5,
+      "verdict": "HOLD — +0.48% near arm; hl_copy_trader 10T 30% arm 20% is a chop-band emitter (n=10 <20, monitor)"
+    },
+    {
+      "id": 16347,
+      "coin": "CFX",
+      "signal": "pump-chain-",
+      "dir": "SHORT",
+      "conf": 29.5,
+      "hours": 0.3,
+      "verdict": "LIVE CONF<30 FLOOR-ADMIT — first since CONF_FLOOR=30 pre-registration. Confirmed bleed cohort (14d conf<30 39T -1.94). HOLD only because SL 0.48% caps risk; ships Oct 23."
+    },
+    {
+      "id": 16348,
+      "coin": "BANANA",
+      "signal": "bb-bounce-v2-long+",
+      "dir": "LONG",
+      "conf": 77.6,
+      "hours": 0.2,
+      "verdict": "HOLD — fresh, near arm window"
     }
   ],
   "watchdog_triage": [
     {
-      "steer": "6 recent losses wrong-side",
+      "steer": "7 recent losses look like wrong-side trades",
       "verdict": "VERIFIED-STRUCTURAL",
-      "detail": "4/4 shorts 0% -0.33 counter-trend + 15 chop longs. Known cohorts. No new pattern."
+      "detail": "21 losers 24h: 11/21 EXTREME regime, 4 SHORT (0W -0.33), 4 TAT (never armed), 2 INJ HML. 12/14 winners are profit-monster-trail. Direction is not the discriminator (winners RSI 22-73, losers mid-band); confirmation is. No NEW pattern."
     },
     {
-      "steer": "freeze shorts / prefer trail-confirmed",
-      "verdict": "ACCEPTED-ADVISORY",
-      "detail": "Shorts already frozen via floor-45 + regime; 1 short since 02:46 (BTC pending). Trail preference = standing playbook."
+      "steer": "pending queue 5/9 SHORT against rising tape (16:50)",
+      "verdict": "SUPERSEDED + DEFENSES WORKING",
+      "detail": "15m flipped SHORT_BIAS ~17:25 (aggregate 11L/35S/77N). All pending pump-chain- shorts died correctly: AIXBT rsi 41-42, BTC 42.8, DYDX 41.9, COMP 44.44, KPEPE 33.8, CHIP 30.85 — every one blocked at SHORT_RSI_HARD_FLOOR=45 (02:46 revert holding). 0 counter-trend shorts filled since 02:46 floor revert."
+    },
+    {
+      "steer": "stop-chop entry family still prints (85T 3.5% vs 48T 85.4%)",
+      "verdict": "VERIFIED — UNCHANGED",
+      "detail": "7d CHOP 80T 1W -7.22 vs TRAIL 71T 55W +4.26. 30d armed 296T +20.23 vs unarmed 438T -29.04 = the system's only structural edge. All entry-quality levers already shipped or pre-registered for Oct 22/23."
+    },
+    {
+      "steer": "STX r2v2-long4 weakest open",
+      "verdict": "CLOSED — STX #16345 lost -0.11 hard_max_loss at 17:03",
+      "detail": "r2v2-long4 now 0W/4L -0.27 all-time. n=4 < 20 bar = monitor only, no kill. Watchdog call was correct in real time."
+    },
+    {
+      "steer": "NEO ranging-coin bounce",
+      "verdict": "ACCEPTED-ADVISORY — still open, flat"
+    },
+    {
+      "steer": "BTC continuum-trend+ is the one to keep",
+      "verdict": "ACCEPTED — HOLD"
     }
   ],
+  "last_run_verify": {
+    "arm_gap_RealDictCursor_fix_#52": "PASS correct-by-zero — 0 qualifying closes (MFE>=0.40, trail=FALSE, pnl<0) since 09:55 fix; last qualifying was CRV #16318 03:40 pre-fix. 0 ARM-GAP-ERROR lines.",
+    "short_rsi_hard_floor_pump_chain_45_revert": "PASS — AIXBT/BTC/DYDX/COMP/KPEPE/CHIP/FOGO shorts all blocked or expired at floor today. 0 RSI<45 SHORT opens since 02:46.",
+    "pump_chain_long_high_block": "PASS — 0 HIGH-regime pump-chain+ LONG opens since 03:05 block (CFX/BLUR 00:17 TAT losses predate the block).",
+    "doji_kill": "PASS — 0 doji-bottom-long trades since Oct 16 18:44.",
+    "size_reduce": "ACTIVE 0.5x per data/vacation_size_reduce.json (file truth). 7d WR 36.7% and PnL -3.15 both still failing resume legs.",
+    "coin_regime_stamp": "LIVE — 36/34-ish stamped trades; SHORT x LONG_BIAS cell still n=5 <20.",
+    "arm_rate_leaderboard_shipped_#57": "RE-VERIFIED this run per-signal + per-direction.",
+    "protected_flags": "13/13 INTACT (constants untouched this run)"
+  },
   "losing_autopsy_24h": {
-    "losers": 19,
+    "losers": 21,
     "new_patterns": 0,
     "clusters": [
-      "INJ x2 pump-chain+ EXTREME hard_max_loss -0.16 (known coin-level chop)",
-      "pump-chain+ trail_arm_timeout x3 (CFX/BLUR/APT HIGH+EXTREME) -0.16 — never armed",
-      "SHORTS x4 counter-trend -0.33 (BTC x2 pending, COMP, CRV)",
-      "SYRUP continuation+ stale_exit -0.23 (stale cohort watch)",
-      "PUMP r2v2-long3 EXTREME HML -0.13"
+      "EXTREME regime 15T 3W -0.72 = the entire 24h bleed (NORMAL 15T 9W +0.08). But blanket EXTREME block REJECTED: 7d pump-chain+ EXTREME 17T 4W +0.46 and pump-chain combo EXTREME 9T +0.32 carry the band.",
+      "pump-chain+ trail_arm_timeout x3 (CFX/BLUR/APT, HIGH/EXTREME) -0.16 — never armed, HIGH block now covers the HIGH class going forward",
+      "INJ pump-chain+ HML x2 EXTREME -0.16 — coin-level chop, known",
+      "SHORTS x4 (BTC x2 pending CEO, CRV, COMP) -0.33 — all pre-floor-revert or CEO domain",
+      "STX r2v2-long4 + PUMP r2v2-long3 + GRASS r2v2-long3 HML EXTREME -0.32 — r2v2 EXTREME chop, 7d r2v2-long3 8T 4W -0.15 = noise",
+      "SYRUP continuation+ stale_exit -0.23 — stale cohort 3T/7d n<20 monitor",
+      "WLD r2v2-long4 false-peak arm (41s trade, highest_price=0.60000000 no supporting ticks) -0.01 — bug class, peak-sanity census attempted this run, DB-only census TOO NOISY (every stored price has 8-decimal padding; BTC .50 levels are legitimate) → close-time tick-comparison instrumentation required, stays pre-registered for vacation-end"
     ],
-    "winners": "14/14 trail-family (12 profit-monster-trail) — exit mechanics sound"
+    "winners": "12/14 profit-monster-trail + 1 UNIVERSAL_MAX_HOLD + 1 atr_trail_hit — exit mechanics 100% sound. Entry quality is the cancer, not exits."
   },
-  "last_run_verify": {
-    "floor_45": "HOLDING — 1 SHORT open since revert, meta_rsi null (ai-trader path)",
-    "arm_gap": "0 fires since 09:55 = correct-by-zero (0 qualifying unarmed MFE>=0.40 closes)",
-    "size_reduce": "ACTIVE — file 0.5x, live sizes $11.10/$22.10 (kanban text says 0.3x = cosmetic drift, file is truth)",
-    "doji_kill": "HOLDING — 10 trades since Oct 16 are pre-kill aging, net -0.53 contained",
-    "protected_flags": "13/13 INTACT",
-    "pump_chain_kill_recheck_prep": "STILL MET — bare 14d 36T 22.2% -0.53; combo 15T +0.13 (edge decaying from +0.26). Recheck tomorrow Oct 22 as pre-registered."
+  "signal_quality_deep_dive": {
+    "method": "14d n>=15 signals, arm-rate + regime + OOS (7d/14d/30d) on every candidate",
+    "killed_holding": "doji-bottom-long (0T since Oct 16), volume-breakout-long+ / minus (VOLUME_BREAKOUT_PLUS/MINUS_ENABLED=False; the 14d 16T -0.76 cohort is all pre-kill, 30d +0.87 = OOS reversal anyway — correctly dead)",
+    "below_bar_watch": [
+      "r2v2-long4: 0W/4L -0.27, n=4 — monitor, kill criteria = 14d n>=20 AND PnL<0 AND WR<30%",
+      "hl_copy_trader: 10T 30% arm 20% -0.18, n=10 — young emitter, CEO domain",
+      "hmacd_mtf family: n<20, criteria already locked",
+      "oversold-bounce+: 7T 28.6% -0.32, n=7"
+    ],
+    "kill_not_met": "pump-chain+ 14d 56T 32.1% +0.97 (9th rejection). EXTREME is its habitat (+0.46/7d). Recheck after Oct 23 stack."
   },
-  "wld_mfe_anomaly": {
-    "trade": "WLD #16341 r2v2-long4 LONG 41s hold",
-    "root_cause": "CONFIRMED: highest_price=0.60000000 exactly (round number, zero supporting ticks in window — price_history max 0.57549). price_history had 0 rows BETWEEN open/close (41s window < 1m candle spacing) → MFE fell back to highest_price → mfe_pct=4.31% false → trailing_activated=True false arm → atr_trail_hit premature exit at -0.36%.",
-    "second_instance": "ZRO #16310 highest=2.00000000, window max tick 1.95405 (+0.14% real vs +2.50% recorded) — same bug class",
-    "impact": "False trail arms + poisoned ARM-GAP analytics. Frequency ~2/14d but live exit-behavior impact.",
-    "fix_path": "bug_hunter P1 — peak-price sanity clamp (reject cur_price move >3x ATR from last persisted price as bad tick). NOT shipped (vacation, live exit behavior). Shadow pre-registered.",
-    "status": "ESCALATED"
-  },
-  "config_changes_applied": [],
-  "creative_improvements": [
+  "rejected_this_run_with_data": [
     {
-      "date": "2026-10-21T16:38:26Z",
-      "idea": "Peak-price sanity gate (shadow): when cur_price jumps >3x ATR from last persisted current_price in one PM cycle, skip highest_price update + log counterfactual",
-      "rationale": "WLD #16341 and ZRO #16310 show exact round-number highest_price (0.60, 2.00) with zero supporting ticks — false trail arms and poisoned MFE. Gate is zero-behavior in shadow.",
-      "expected_impact": "Prevents false atr_trail_hit exits; cleans ARM-GAP dataset",
-      "category": "exit integrity",
-      "status": "pre-registered",
-      "risk": "low"
+      "idea": "Block/reduce entries with staleness 10-30m, or boost the 3-10m band",
+      "battery": "1) sample: 30d D-band n=6-10 <20 FAIL. 2) OOS: C 3-10m band is +0.82/208T at 30d but -1.30/32T at 7d = SIGN FLIP FAIL. 3) B 1-3m (the bulk, 445T) is negative in every window but is the modal band — a filter there is a blanket change FAIL.",
+      "verdict": "REJECTED-WITH-DATA. Logged so it is not re-proposed from the 30d view. staleness_minutes IS stamped (found existing, did not need a new stamp)."
+    },
+    {
+      "idea": "Blanket EXTREME-regime block (24h EXTREME = whole bleed)",
+      "battery": "7d EXTREME LONG 45T -0.49 and SHORT 22T -0.54 look blockable, BUT pump-chain+ EXTREME 17T +0.46 + pump-chain combo EXTREME 9T +0.32 = +0.78 of positive flow inside the same cell. Block kills winners > 20% bar FAIL.",
+      "verdict": "REJECTED-WITH-DATA. SHORT x EXTREME 0.5x SIZE dampen (not block) stays pre-registered for Oct 23."
+    },
+    {
+      "idea": "Kill r2v2-long4 (0W/4L)",
+      "battery": "n=4 < 20 minimum FAIL.",
+      "verdict": "MONITOR. Kill criteria pre-registered: 14d n>=20 AND PnL<0 AND WR<30%."
+    },
+    {
+      "idea": "Kill hl_copy_trader (10T 30% arm 20%)",
+      "battery": "n=10 < 20 FAIL. Also CEO-domain (copy trader).",
+      "verdict": "MONITOR. Recheck at n>=20."
+    },
+    {
+      "idea": "DB-only false-peak census to size the WLD/ZRO bug class",
+      "battery": "Executed. Round-number filter returns 1848 all-time trades because numeric() pads to 8 decimals — BTC .50 levels are legitimate prices. Cannot distinguish false peaks without tick comparison.",
+      "verdict": "REJECTED-METHOD. Close-time tick-comparison log line remains the only valid census; stays pre-registered for vacation-end (exit-adjacent)."
     }
   ],
-  "next_actions": [
-    "Oct 22: pump-chain- bare kill recheck (pre-registered, matrix ready)",
-    "Oct 23: vacation end — ship PUMP_CHAIN_CONF_FLOOR=30 + resume-day stack",
-    "bug_hunter: peak-price false-high investigation (WLD #16341, ZRO #16310)",
-    "Hold BTC #16342; BE ratchet only at +2% (86317)"
-  ]
+  "config_changes_applied": [
+    {
+      "type": "infra (zero-behavior)",
+      "file": "scripts/decider_run.py",
+      "change": "Stamp rsi_detect / rsi_exec / rsi_drift into _signal_metadata at execution time, immediately after the existing coin_regime stamp",
+      "rationale": "AGENTS.md documents the CFX class (detect RSI 44.6 passed gates, exec RSI 31.28 by fill) but |drift| was never SQL-verifiable. Detect RSI was already stamped as 'rsi'; live RSI comes from the same _ctx_gate_get_rsi the exec gates use.",
+      "impact": "Zero live behavior. Unlocks: (a) does |drift| predict losses, (b) are the existing exec-time RSI gates catching enough of the drift class, at n>=20.",
+      "verification": "py_compile PASS. No constants touched. Protected flags 13/13."
+    }
+  ],
+  "changes_from_last_run": "#59 had 0 changes (verified above). #52 ARM-GAP RealDictCursor fix PASS correct-by-zero. #33 coin_regime stamp LIVE. #56 SHORT floor-45 revert PASS. #57 arm-rate leaderboard RE-VERIFIED."
 }

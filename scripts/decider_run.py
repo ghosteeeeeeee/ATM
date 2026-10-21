@@ -5005,6 +5005,21 @@ def run(dry_run=False):
             _exec_meta['coin_regime_conf'] = _crc
         except Exception:
             pass
+        # brain_auditor #60: stamp detect->exec RSI drift (zero-behavior).
+        # AGENTS.md CFX class: detect RSI 44.6 passed gates, exec RSI 31.28 by
+        # fill — drift magnitude was never SQL-verifiable. rsi (detect) is
+        # already stamped above; live RSI comes from the same fetch the
+        # exec-time gates use. Enables: does |drift| predict losses, and are
+        # the exec RSI gates catching enough of the drift class.
+        try:
+            _drift_detect = _exec_meta.get('rsi_14') if _exec_meta.get('rsi_14') is not None else _exec_meta.get('rsi')
+            _drift_live = _ctx_gate_get_rsi(token)
+            if _drift_detect is not None and _drift_live is not None:
+                _exec_meta['rsi_detect'] = round(float(_drift_detect), 2)
+                _exec_meta['rsi_exec'] = round(float(_drift_live), 2)
+                _exec_meta['rsi_drift'] = round(abs(float(_drift_live) - float(_drift_detect)), 2)
+        except Exception:
+            pass
 
         # ── CHASE COMPOSITE filter: block LONG chasing extended moves ─────
         # 7d: z>2.5 OR gap>1.0% LONG = 15T 20%WR -$1.25. Non-chase: 96T 53.1%WR +$1.28.

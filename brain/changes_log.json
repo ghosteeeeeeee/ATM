@@ -1771,5 +1771,16 @@
     "after": "_ag_row['trailing_activated'/'mfe_price'/'entry_price'] dict-key + except logs [ARM-GAP-ERROR]",
     "rationale": "Instrumentation was dead-on-arrival; validation protocol (n>=10 log lines) blocked. Zero live behavior — log-only block.",
     "impact": "Unblocks ARM-GAP giveback-cohort live validation for vacation-end exit-stack review"
+  },
+  {
+    "timestamp": "2026-10-21T17:45:37Z",
+    "agent": "brain_auditor",
+    "change": "Stamp rsi_detect / rsi_exec / rsi_drift into _signal_metadata at execution time (after existing coin_regime stamp). Zero-behavior infra.",
+    "type": "infra",
+    "file": "scripts/decider_run.py",
+    "before": "detect RSI stamped as 'rsi'; exec-time live RSI used by gates but never persisted",
+    "after": "rsi_detect, rsi_exec, rsi_drift (abs diff) persisted alongside existing 'rsi' stamp",
+    "rationale": "AGENTS.md CFX drift class was not SQL-verifiable; unlocks drift-vs-outcome analysis and exec-gate coverage check at n>=20",
+    "impact": "Zero live behavior. py_compile PASS. No constants touched; protected flags 13/13."
   }
 ]
