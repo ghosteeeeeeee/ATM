@@ -1,52 +1,52 @@
-# Current State — brain_auditor Oct 21 2026-17:45 UTC
+# Current State — brain_auditor Oct 21 2026-20:56 UTC
 
-**Last Updated: 2026-10-21 17:45 UTC**
-**Updated by: brain_auditor #60 — 1 zero-behavior infra ship (rsi_drift stamp in decider_run.py), 0 trading-behavior changes (vacation soak). Staleness filter REJECTED-WITH-DATA (7d sign-flip). Blanket EXTREME block REJECTED-WITH-DATA (kills +$0.78 of pump-chain+ positives). CFX #16347 = first live CONF<30 floor-admit. Prior: daily_orchestrator 17:00 / brain_auditor #59 16:39.**
+**Last Updated: 2026-10-21 20:56 UTC**
+**Updated by: brain_auditor #61 — 0 trading-behavior changes (vacation soak). Watchdog "wrong-side" steer REFUTED by new opposite-side signal audit (15.4% vs 6.9%, p=0.116). LONG×CALM gate and ema300-pin gate both REJECTED-WITH-DATA (p>0.05 / no discriminator). ARM-GAP + rsi_drift stamps both verified LIVE. 3 creative entries (1 measured, 2 pre-registered). Prior: brain_auditor #60 17:45 / daily_orchestrator 17:00.**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.5x** per `vacation_size_reduce.json` (live sizes $11.10/$22.10). Both resume legs still failing: 7d WR 36.7% AND PnL −$3.15 <0.
-- **24h 35T 14W 40.0% −$0.70** — shallow. **7d 158T 58W 36.7% −$3.15.**
-- **7d ARMED 63T 74.6% +$3.48 vs UNARMED 95T 11.6% −$6.63** (30d: armed 296T +$20.23 vs unarmed 438T −$29.04). Wealth gap unchanged.
-- **Regime: 15m flipped SHORT_BIAS ~17:25** (aggregate 11L/35S/77N; BTC 5m NEUTRAL @84404). 4h still LONG_BIAS.
-- **Open 5 (4 LONG + 1 SHORT, DIR-CAP at 4/5):** BTC #16342 continuum-trend+ (HOLD), NEO #16344 (HOLD, would-not-open-fresh), SOL #16346 hl_copy (HOLD near arm), **CFX #16347 pump-chain- SHORT conf 29.5 = CONF<30 floor-admit**, BANANA #16348 (HOLD). STX #16345 lost −0.11 hard_max_loss 17:03.
-- **Vacation mode ACTIVE to Oct 23** — shadow-first, no constants changes. Protected flags 13/13 INTACT.
+- **Trading LIVE** with size-reduce **0.5x** per `vacation_size_reduce.json` (file truth; live sizes $11.10/$22.10). Both resume legs still failing: 7d WR 36.0% AND PnL −$3.48 <0.
+- **24h 41T 15W 36.6% −$1.03** — 25 losers, max single loss −$0.23 (shallow). **7d 164T 59W 36.0% −$3.48.**
+- **7d ARMED 63T 74.6% +$3.48 vs UNARMED 100T 11.0% −$7.00** (30d: armed 296T +$20.23 vs unarmed 438T −$29.04). Wealth gap unchanged.
+- **Regime: CHOP PIN** — BTC AT EMA300 ~150m, 15m SHORT_BIAS vs 4h LONG_BIAS conflict, market_phase CALM, vol NORMAL, trend_quality STRONG_UP (4h residue). No directional edge at index level.
+- **Open 0 (flat)** — correct posture until the EMA300 pin resolves. Portfolio health: critical.
+- **Vacation mode ACTIVE to Oct 23** — shadow-first, no constants changes, no signal enable/disable. Protected flags 13/13 INTACT.
 
-## THIS RUN — brain_auditor #60 (2026-10-21 17:45 UTC)
+## THIS RUN — brain_auditor #61 (2026-10-21 20:56 UTC)
 
-**1 zero-behavior infra ship, 0 trading-behavior changes.**
+**0 trading-behavior changes. All candidate gates failed verification bars.**
 
-1. **SHIPPED: rsi_detect / rsi_exec / rsi_drift stamp** (decider_run.py, after the coin_regime stamp) — AGENTS.md's CFX drift class (detect RSI 44.6 passed gates, exec RSI 31.28 at fill) was never SQL-verifiable. Zero live behavior, py_compile PASS, no constants touched. Unlocks drift-vs-outcome + exec-gate-coverage analysis at n≥20.
-2. **REJECTED-WITH-DATA: staleness filter** — 30d 3-10m band +$0.82/208T looks like an edge but 7d flips to −$1.30/32T (sign flip = temporal instability); 10-30m 0% is n=6 <20. `staleness_minutes` was already stamped; no new stamp needed. Logged so it is not re-proposed.
-3. **REJECTED-WITH-DATA: blanket EXTREME block** — 24h EXTREME 15T 3W −$0.72 is the whole bleed, but 7d EXTREME holds pump-chain+ +$0.46 and pump-chain combo +$0.32 (+$0.78 of positives). SHORT×EXTREME 0.5x SIZE dampen (pre-registered) is the correct shape.
-4. **LAST-RUN VERIFY: all PASS** — ARM-GAP #52 correct-by-zero | SHORT floor-45 (AIXBT/BTC/DYDX/COMP/KPEPE/CHIP/FOGO all blocked at floor; 0 violations since 02:46) | HIGH block (0 HIGH pump-chain+ LONG opens since 03:05) | doji 0T since Oct 16 | size-reduce 0.5x | protected 13/13.
-5. **FALSE-PEAK CENSUS ATTEMPTED + FAILED METHOD** — DB-only round-number filter matches 1848 trades (8-decimal padding; BTC .50 levels are legitimate). Close-time tick comparison is the only valid census; stays pre-registered.
+1. **WATCHDOG steer-002 "wrong-side trades" REFUTED (new measurement).** Opposite-side signal existence audit: for each trade, was there an OPPOSITE-direction signal in `signals_hermes_runtime.signals` within ±10m of open? **7d losers 16/104 = 15.4% | winners 4/58 = 6.9% | z=1.57 p=0.116 NOT significant.** 85% of losers had NO opposing setup anywhere in the roster → we are not on the wrong side of a signaled move, there is no other side → **chop, stay flat** (not flip direction). Caveat: table is 8581/8650 EXPIRED roster rows; generation-time blocks never insert → opposing setups undercounted. Directional evidence only.
+2. **REJECTED-WITH-DATA: LONG × market_phase CALM gate** — 7d 11/37=29.7% −$1.78 vs other-LONG 37/84=44.0% −$0.54 **p=0.069** | 14d p=0.128 | 30d p=0.139. Negative direction consistent at all 3 windows but **p>0.05 everywhere** AND winner-kill 11/48 = **22.9% > 20% bar**. Logged so it is not re-proposed.
+3. **REJECTED-WITH-DATA: ema300_position chop-pin gate** — 14d at open: ABOVE 141T 36.9% −$2.19 / AT 137T 37.2% −$1.18 / BELOW 78T 30.8% −$0.66. All three lose, WR ranges overlap → pin position is not the variable; chop entries are.
+4. **VERIFIED NOT-DRIFT: STANDALONE_BYPASS × chop_detector exemption** — `signal_compactor.py:1427` exempts 144 bypass signals; comment cites **CEO 2026-10-01 decree** ("proven edge, explicitly allowed to fire solo"). Intentional. Not reported as a bug.
+5. **LAST-RUN VERIFY: all PASS** — rsi_drift stamp **LIVE** (1 stamp: POL #16349 detect 53.62 → exec 61.76 drift 8.14, lost −0.22, coin_regime SHORT_BIAS conf 8) | ARM-GAP **LIVE** (`[ARM-GAP] SOL LONG MFE=0.97% trail=FALSE exit=atr_sl_hit pnl=-1.23% peakTrail@0.3%=+0.66% trade=16346`, 1 qualifying close / 1 line = 100% capture, 0 ERROR) | SHORT floor-45 (2 SHORT opens since 02:46, 0 violations) | doji (0 opens since kill) | pump-chain+ HIGH block (0 opens since 03:05) | size-reduce 0.5x | protected 13/13.
+6. **LOSING AUTOPSY 25 losers → 0 new patterns.** Cohorts: pump-chain+ TAT timeouts ×3 (−$0.16, contained), conf<30 floor-admits ×5 (−$0.34), EXTREME chop longs ×6 (−$0.54), BTC ai-trader-pending ×3 (CEO domain), SYRUP stale_exit (n<20). All shallow.
+7. **coin_regime counterfactual: HOLD COLLECTING** — 14d stamped n=48: ALIGNED LONG 22T 45.5% +$0.24 | COUNTER LONG 17T 41.2% −$0.42 | ALIGNED SHORT 4T | COUNTER SHORT 5T. Pre-reg criteria (cell n≥20 AND WR<30%) **not met**.
 
-## PRIOR RUN — daily_orchestrator (2026-10-21 17:00 UTC)
+## PRIOR RUNS (condensed)
 
-**0 trading-behavior changes.**
-
-1. **$0 SHELL-EXPANSION CORRUPTION FIXED** — 48 strings in recent_changes.log + 5 in trading_log.md healed (`-/usr/bin/bash.14` → `-$0.14`; unquoted `$0` in agent bash = shell path). Guards added: single-quote-$-amounts rule in auto_1hr/brain_auditor/summarizer prompts. Backups /tmp/opencode/*.bak.
-2. **SIZE-REDUCE REPORTING DRIFT FIXED (root cause)** — auto_1hr/summarizer said "0.3x" while file = 0.5x since Oct 20 14:57; prompts never read `data/vacation_size_reduce.json`, agents parroted history. All 3 prompts now file-truth.
-3. **auto_1hr BLANKET-KILL INSTRUCTION REPLACED** — Step 4 said "3T 0%WR → SIGNAL_ENABLED=False immediately" (banned by SIGNAL KILL POLICY). Now: regime query → 0.0x losing-regime block via volatility_gate_v2.py + FAMILY_MAP → blanket kill only if all regimes lose n≥20 + CEO approval.
-4. **SUMMARIZER TRIAGE VERIFIED:** HYPE mirror_close orphans NONE (HL = 3 DB opens); failed HYPER SHORT (13:49) left zero residue (no DB row, no HL position, signal aged out).
-5. **LAST-RUN VERIFY #59 context:** health clean; auto_1hr "Changes: none" all day; signal_reporter rejected pump-chain+ kill (EXTREME habitat +$1.87/30d).
+- **#60 17:45** — shipped rsi_detect/rsi_exec/rsi_drift stamp (decider_run.py:5019, zero-behavior). Staleness filter + blanket EXTREME block both REJECTED-WITH-DATA.
+- **daily_orchestrator 17:00** — fixed `$0` shell-expansion corruption (48 strings), size-reduce reporting drift (prompts now file-truth), auto_1hr blanket-kill instruction replaced with regime-based kill policy.
+- **#59 16:39** — WLD #16341 MFE false-peak root-caused (round-number 0.60, zero supporting ticks → false trail arm → premature exit); peak-sanity shadow pre-registered (close-time tick census is the only valid vehicle).
 
 ## STANDING PRE-REGISTRATIONS (vacation-end Oct 23)
 
-- **pump-chain- kill recheck Oct 22 (TOMORROW)** — bare 14d 36T 22.2% −$0.53 / 30d 116T −$1.15 still MET; combo 11T +$0.26; bare arm-rate 22.2% vs combo 27.3% = confirmation premium (structural case for Option A v6-requirement gate)
-- **PUMP_CHAIN_CONF_FLOOR=30** — conf<30 14d 39T −$1.94; blocks 6 winners +$0.74 = net +$1.20. Ships Oct 23. **LIVE PROOF: CFX #16347 entered at conf 29.5 today.**
-- **rsi_drift analysis** — stamp live since #60; re-eval at n≥20 stamped trades (does |drift| predict losses; are exec RSI gates catching enough)
-- **Peak-price sanity gate SHADOW** — DB-only census FAILED (8-decimal padding noise); close-time tick comparison is the only valid vehicle. Targets WLD/ZRO false-peak class (bug_hunter P1)
-- **coin_regime SHORT×LONG_BIAS 0.5x dampen** — flip at cell n>=20 with WR<30%
-- **SHORT×EXTREME 0.5x size dampen shadow** (14d 59T 23.7% −$1.18) — reaffirmed correct shape this run (blanket block REJECTED)
-- **r2v2-long4 kill criteria** — 0W/4L −0.27, n=4: kill only if 14d n≥20 AND PnL<0 AND WR<30%
-- **hl_copy_trader watch** — 10T 30% WR arm 20% −0.18, n=10 <20; CEO domain
-- **post-arm breakeven ratchet** — blocked on escalation #17 candle OOS
-- **Escalation #17 (22nd):** exit-ladder candle OOS — blocks ARM-GAP/peak-trail/post-arm flip
-- **pp-cond shadow flip:** failed bars, re-eval vacation-end
+- **pump-chain- kill recheck Oct 22 (TOMORROW)** — bare 14d **37T 21.6% −$0.57 arm 21.6%** still MET; combo 11T +$0.26; bare vs combo arm gap = confirmation premium (structural case for Option A v6-requirement gate)
+- **PUMP_CHAIN_CONF_FLOOR=30** — pump-chain conf<30 14d **40T 15.0% −$1.98**; blocks 6 winners +$0.64 = **net +$1.34** (fresh). Ships Oct 23. LIVE PROOF: CFX #16347 entered conf 29.5.
+- **rsi_drift severity gate — criteria LOCKED this run** (before data): n≥20 stamped AND would-block WR<30% AND would-keep WR>45% AND net save>$1.00 AND winner-kill<20%
+- **Arm-rate size dampen — PRE-REGISTERED this run** (shadow at vacation-end): 0.5x size when 7d arm-rate <15% AND n≥10; flip only if shadow net-positive with 0 winner-kill
+- **Opposite-side signal audit** — method validated; re-run at n≥200 losers + generation-time signal log if available
+- **Peak-price sanity gate SHADOW** — DB-only census FAILED; close-time tick comparison is the only valid vehicle (WLD/ZRO false-peak class, bug_hunter P1)
+- **coin_regime COUNTER 0.5x dampen** — flip at cell n≥20 with WR<30% (LONG cell n=17, SHORT n=5)
+- **SHORT×EXTREME 0.5x size dampen shadow** (14d 59T 23.7% −$1.18) — correct shape; blanket EXTREME block rejected
+- **r2v2-long4 kill criteria** — 14d 4T 0W −$0.27, n=4 <20: kill only if 14d n≥20 AND PnL<0 AND WR<30%
+- **hmacd family kill-criteria** — 14d 13T −$0.79, n=13 <20, criteria locked
+- **hl_copy_trader watch** — 14d 12T 25% −$0.24, n<20; CEO domain
 - **stale_exit cohort watch** — 3T/7d −$0.62 0%; SYRUP −$0.23 today
-- **hmacd family kill-criteria** — n<20, criteria locked
+- **pp-cond shadow flip** — failed bars, re-eval vacation-end
+- **post-arm breakeven ratchet** — blocked on escalation #17 candle OOS
+- **Escalation #17 (23rd):** exit-ladder candle OOS — blocks ARM-GAP/peak-trail/post-arm flip
 
 ## BACKLOG / CEO DECISIONS PARKED
 

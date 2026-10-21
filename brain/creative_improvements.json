@@ -6307,5 +6307,35 @@
     "category": "audit metric",
     "status": "shipped as audit metric",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-21T20:56:29Z",
+    "idea": "MEASURED+VERIFIED: opposite-side signal existence audit (wrong-side vs no-side discriminator)",
+    "rationale": "Mandate: 'someone else gained what we lost'. For each closed trade, query signals_hermes_runtime.signals for an OPPOSITE-direction signal on the same token within +/-10m of open_time. If losers routinely had an opposing setup -> direction problem (flip/filter). If not -> chop (stay flat).",
+    "expected_impact": "n/a — measurement, zero code",
+    "result": "7d losers 16/104=15.4% had an opposing signal; winners 4/58=6.9%; z=1.57 p=0.116 NOT significant. 85% of losers had NO opposing setup anywhere in the roster. Watchdog steer-002 ('wrong-side trades') REFUTED in the strong sense: we are not missing the other side, there is no other side — we are entering chop. Fix = stay flat, not flip. Caveat: signals table holds 8581/8650 EXPIRED roster rows; generation-time blocks never insert, so opposing setups are undercounted. Directional evidence only.",
+    "category": "regime/method",
+    "status": "measured",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-21T20:56:29Z",
+    "idea": "PRE-REGISTERED: rsi_drift severity gate criteria (lock BEFORE data arrives)",
+    "rationale": "Run #60 shipped rsi_detect/rsi_exec/rsi_drift stamps (zero-behavior). Only n=1 stamped (POL drift 8.14, lost). Locking criteria now prevents post-hoc threshold shopping when n>=20 lands.",
+    "expected_impact": "if met: block LONG/SHORT entries whose |detect-exec RSI| drift >= 5.0 at exec time (conditions changed between detection and fill — the AGENTS.md CFX class)",
+    "flip_criteria": "n>=20 stamped closes AND would-block WR < 30% AND would-keep WR > 45% AND net save > $1.00 AND winner-kill < 20%",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-21T20:56:29Z",
+    "idea": "PRE-REGISTERED: arm-rate size dampen (trend-evidence sizing, not WR sizing)",
+    "rationale": "Run #57 arm-rate leaderboard showed structural split: trend band pump-chain+ 65.2% / volume-buildup- 66.7% arm vs chop band hl_copy 0% / ai-trader-pending 0% / pump-chain- bare 9.1%. Arm rate = did momentum exist, measured directly — the mandate's trend proxy. Existing size levers key off WR/regime; none key off arm rate.",
+    "expected_impact": "0.5x size on signals with 7d arm-rate < 15% AND n>=10 closes; full size at >= 40%. Shrinks chop-cell losses without blocking trades (size dampen = reversible, non-destructive).",
+    "flip_criteria": "vacation-deferred to Oct 23; ship as SHADOW first (log would-dampen), flip only if shadow 7d shows net positive delta with winner-kill 0% (winners are by definition arm-eligible, so kill risk is structural-low)",
+    "category": "trend riding / sizing",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
