@@ -13402,3 +13402,22 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 - 24h flipped +$0.06 (13:30) → -$0.87: verified real, not a query bug — -$0.56 from aged-out window (yesterday ZRO +0.37, HYPE +0.28 left the 24h band) + new hour's -$0.37
 - Regime flipped LONG_BIAS → SHORT_BIAS; all recent closes were LONG side — if shorts start printing, check whether signals are still biased long
 - Loss clusters unchanged: hard_max_loss 4T -$0.41, atr_sl_hit 7T -$0.45 (standing SL-width escalation with CEO, Oct 16)
+
+## [2026-10-21 16:27 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h 34T 14W -$0.59 (41.2%) | 7d 162T 60W -$2.92 (37.0%)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes last hour — nothing to diagnose on entry quality/SL behavior this hour
+- Kill check: 0T last hour; 24h 0%WR groups pump-chain+ (6T -$0.32) and ai-trader-pending (3T -$0.18) both 0T last hour — no 3+T/last-hour candidate; pump-chain+ repeatedly audit-rejected (kill DEFER Oct 22)
+- atr_sl_hit 6/34 = 17.6% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: 14:00 -$0.19, 15:00 -$0.09 = 2 consecutive, not 3 — no trigger
+- Frequency 0/hr — not overtraded
+- 1 open: BTC continuum-trend+ LONG (+0.05%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d bleed widened to -$2.92; loss clusters: atr_sl_hit 6T -$0.44, hard_max_loss 4T -$0.37, trail_arm_timeout 4T -$0.16 (standing SL-width escalation with CEO, Oct 16)
