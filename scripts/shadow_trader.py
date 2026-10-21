@@ -1971,7 +1971,8 @@ def sweep_sl_levels(signal_type_filter=None, direction_filter=None):
         log(f"\nTotal signals: {len(rows)}")
         
         # Test different SL levels
-        sl_levels = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
+        # T directive: cap doesn't have to be 4%, could be 50% — find the best combos
+        sl_levels = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 15.0, 20.0, 30.0, 50.0]
         results = {sl: {'n': 0, 'wins': 0, 'total_pnl': 0, 'stopped': 0} for sl in sl_levels}
         
         for r in rows:
