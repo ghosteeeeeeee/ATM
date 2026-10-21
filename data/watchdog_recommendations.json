@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-21T21:44:00.523453+00:00",
+  "timestamp": "2026-10-21T22:14:00.580676+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -22,16 +22,16 @@
   "regime": {
     "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "ABOVE",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "DISTRIBUTION",
-    "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
   "open_count": 0,
   "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING (engine flags CRITICAL)\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 (flat) \u2014 unrealized PnL 0.00 USDT\nRegime: BTC AT EMA300 (flipped ABOVE\u2192AT 20:57) | Vol LOW | phase CALM\n        btc_15m NEUTRAL | btc_4h LONG_BIAS | continuum AT\n\n\u2500\u2500 Steers (automated, untouched) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent]  Losing streak: 12/20 recent trades lost (40% WR, -0.58)\n\ud83d\udfe1 [warning] 7 recent losses look like wrong-side trades\n\n\u2500\u2500 Enforced checks \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\u2705 0 open \u2192 +2% breakeven / +5% trail / 8h stale checks all N/A\n\u2705 Directional exposure: 0 long / 0 short \u2014 nothing to misalign\n\u2705 Recent loss patterns analyzed (below, verified in PostgreSQL)\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nFlat is the right stance. 24h: 40 closed, 35% WR, -1.09. 7d: 162\nclosed, 35.8% WR, -3.46. The whole P&L is exit structure: trail\nfamily 53T/87%WR/+4.0 vs stop family 92T/2%WR/-7.8 \u2014 73/162 trades\nnever armed the trail, they died in chop first.\n\nWrong-side cases from the last 20: STX LONG -4.90% entered while\nSTX 15m regime was already SHORT_BIAS conf 87.4 \u2014 winning side was\nSHORT and the tape said so pre-entry. POL/INJ\u00d72 hard_max_losses in\nranging coins: winning side was no trade. None of the 12 losers\nwould pass our own regime check if opened fresh today.\n\nAI trader pick deliberately NOT written: AI_TRADER_ENABLED=False\n(CEO 2026-10-19, do-not-modify). Stale ZEN pick (12:50, TTL 45m)\nnever fired. Slots open, gate closed by verdict \u2014 not forcing it.\n\n\u2500\u2500 Pattern Alerts (verified, reproducible, p-values) \u2500\u2500\n\ud83d\udd34 pump-chain- SHORT: 0/10 WR, -0.58, p=0.002 \u2014 winning side was\n   LONG (uptrend all week). Brain-auditor agenda; I don't disable.\n\ud83d\udd34 SHORT @ meta_rsi 40-55: 3/20 WR, p=0.003 \u2014 worst cell in matrix.\n\ud83d\udfe1 pump-chain+ LONG: 4/21 WR, p=0.007 (lifetime 32.7% \u2014 decaying).\n\ud83d\udfe1 LONG band split: meta_rsi\u226565 = 9/15 +0.091 (only green cell,\n   p=0.61 \u2014 suggestive, n too small) vs 40-65 band ~38% negative \u2014\n   our filter prefers 45-60, i.e. we deploy into the losing band.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Stay flat until BTC reclaims EMA300-ABOVE with volume (LONG\n   side) or loses ~84,588 with 15m linreg bearish (SHORT side).\n2. Next open: run 15m regime-alignment first \u2014 STX case proves the\n   check works when it's consulted.\n3. Feed Patterns 1 & 3 to the brain auditor (signal/param scope,\n   not mine): pump-chain- and mid-band SHORT entries.\n4. Keep AI trader off; re-evaluate only on CEO verdict change.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged to `watchdog_recommendations.json` (steers untouched); OpenMemory stored.\n",

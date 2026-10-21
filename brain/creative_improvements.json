@@ -6367,5 +6367,32 @@
     "status": "rejected",
     "risk": "n/a",
     "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-21T22:40:43Z",
+    "idea": "PRE-REGISTERED: LONG volume_spike>=2.0 chase-dampen — 0.5x size when 14d n>=20 AND PnL<0 AND WR<30%",
+    "rationale": "Measured this run: entering AFTER a >=2x volume spike = chasing an extended move. 14d LONG >=2.0: 12T 33.3% -$0.55; 7d: 6T -$0.31 — same sign both windows. Currently n=12<20 so monitor-only.",
+    "expected_impact": "cut ~$0.50/14d of chase bleed without touching default-state entries",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-21T22:40:43Z",
+    "idea": "REJECTED-WITH-DATA: volume_spike<1.0 LONG block/dampen",
+    "rationale": "<1.0 is the DEFAULT state (214/268 14d LONGs) containing 79/101 = 78% of winners — fails the 20% winner-kill bar catastrophically. Logged so it is never re-proposed.",
+    "expected_impact": "n/a — rejected",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-21T22:40:43Z",
+    "idea": "pump-chain- blanket kill CANCELLED on collision evidence (kill vs CONF_FLOOR overlap 93%)",
+    "rationale": "Kill criteria paper-MET but conf>=30 residual is wash -$0.04 while kill destroys all 8 winners +$1.27; CONF_FLOOR=30 ships same day and captures -$0.53 of -$0.57 bleed with zero bare-winner loss.",
+    "expected_impact": "preserve +$1.27 winners, still capture the conf<30 bleed",
+    "category": "kill arbitration",
+    "status": "decided",
+    "risk": "low"
   }
 ]
