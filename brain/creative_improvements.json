@@ -6184,5 +6184,16 @@
     "category": "entry sniper",
     "status": "decision-matrix prepped, CEO eyeball Oct 22",
     "risk": "medium (dual-emitter: do NOT flip V5_SHORT alone — PUMP_FLOW_MINUS family gate only)"
+  },
+  {
+    "date": "2026-10-21T11:41:02Z",
+    "idea": "SHORT x EXTREME 0.5x size dampen SHADOW (pre-registered vacation-end Oct 23)",
+    "rationale": "30d SHORT EXTREME 154T 35.7% -$3.49 OOS-consistent. 14d 62T -$1.40 worst cell. Dampen not block preserves 14 winners +$2.10. Complements pump-chain- bare kill — residual EXTREME SHORT from other signals still bleeds after kill.",
+    "expected_impact": "cut ~$0.50-0.70/14d bleed, zero trades blocked",
+    "category": "position sizing",
+    "status": "pre-registered",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 54
   }
 ]
