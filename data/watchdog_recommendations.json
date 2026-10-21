@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-21T10:43:54.217105+00:00",
+  "timestamp": "2026-10-21T11:13:54.471698+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -39,15 +39,15 @@
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "ABOVE",
-    "volatility": "NORMAL",
+    "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
+    "acceleration_state": "NEGATIVE",
+    "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "DECLINING",
-    "trend_quality": "UP"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 0
+  "open_count": 1
 }

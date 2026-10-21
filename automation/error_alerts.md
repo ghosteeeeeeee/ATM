@@ -1407,3 +1407,6 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: ME TOK in hotset failure cooldown — TOK in cooldown (3480s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3421s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: ME TOK in hotset failure cooldown — TOK in cooldown (3421s left, N failures)`
+
+## Error Alerts — 2026-10-21 11:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`

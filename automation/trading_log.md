@@ -13319,3 +13319,23 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 
 **Open Questions:**
 - 24h WR 26.7% with -$0.50 — soft bleed, monitor; hard_max_loss + atr_sl_hit remain the loss clusters (3T -$0.33 / 10T -$0.66)
+
+## [2026-10-21 11:27 UTC] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (last hour) | 24h 30T 8W -$0.50 (26.7% WR) | 7d 154T 56W -$2.75 (36.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 closes last hour — nothing to diagnose
+- Kill check: 0T per signal — no 3+T 0%WR candidate. 24h groups (pump-chain+ 4T 0%WR, r2v2-long3 4T 25%WR, pump-chain-,v6- 3T 0%WR) all 0T last hour and previously audit-rejected — no kill
+- atr_sl_hit 10/30 = 33.3% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: 10:00 -$0.24 but 11:00 empty — streak broken
+- Frequency 0/hr — not overtraded
+- 3 open all LONG (HYPER +0.14%, AIXBT +0.28%, SYRUP -0.07%) — aligned with LONG_BIAS
+- Size-reduce 0.3x stays (7d -$2.75 < -$2)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 10:00 hour was -$0.24 (3T all losses) — watch if it repeats; hard_max_loss + atr_sl_hit remain loss clusters (3T -$0.33 / 10T -$0.66)

@@ -1,40 +1,6 @@
 [
   {
     "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 33.7% < 35.0% AND pnl_7d $-4.14 < $-2.00 (184T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.87,
-      "n_24h": 12,
-      "wr_24h": 8.3,
-      "pnl_48h": -0.91,
-      "n_48h": 28,
-      "wr_48h": 35.7,
-      "pnl_7d": -4.14,
-      "n_7d": 184,
-      "wr_7d": 33.7,
-      "checked_at": "2026-10-20T09:57:02.498423+00:00"
-    },
-    "ts": "2026-10-20T09:57:02.501101+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 33.5% < 35.0% AND pnl_7d $-3.97 < $-2.00 (182T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.62,
-      "n_24h": 12,
-      "wr_24h": 16.7,
-      "pnl_48h": -0.71,
-      "n_48h": 29,
-      "wr_48h": 37.9,
-      "pnl_7d": -3.97,
-      "n_7d": 182,
-      "wr_7d": 33.5,
-      "checked_at": "2026-10-20T10:27:02.764715+00:00"
-    },
-    "ts": "2026-10-20T10:27:02.765991+00:00"
-  },
-  {
-    "level": "WARNING",
     "message": "SIZE REDUCED (not paused): 7d WR 33.5% < 35.0% AND pnl_7d $-3.97 < $-2.00 (182T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
     "data": {
       "pnl_24h": -0.36,
@@ -848,5 +814,39 @@
       "checked_at": "2026-10-21T10:27:13.011163+00:00"
     },
     "ts": "2026-10-21T10:27:13.011521+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "Early escalation: 48h WR 24.4% < 40.0% with 41 trades",
+    "data": {
+      "pnl_24h": -0.5,
+      "n_24h": 30,
+      "wr_24h": 26.7,
+      "pnl_48h": -0.86,
+      "n_48h": 41,
+      "wr_48h": 24.4,
+      "pnl_7d": -2.75,
+      "n_7d": 154,
+      "wr_7d": 36.4,
+      "checked_at": "2026-10-21T10:57:13.238205+00:00"
+    },
+    "ts": "2026-10-21T10:57:13.238837+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "Early escalation: 48h WR 24.4% < 40.0% with 41 trades",
+    "data": {
+      "pnl_24h": -0.5,
+      "n_24h": 30,
+      "wr_24h": 26.7,
+      "pnl_48h": -0.86,
+      "n_48h": 41,
+      "wr_48h": 24.4,
+      "pnl_7d": -2.75,
+      "n_7d": 154,
+      "wr_7d": 36.4,
+      "checked_at": "2026-10-21T11:27:14.225523+00:00"
+    },
+    "ts": "2026-10-21T11:27:14.225982+00:00"
   }
 ]
