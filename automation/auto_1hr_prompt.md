@@ -9,7 +9,10 @@ You are analyzing Hermes trades and **making fixes** every hour. Be concise, dat
 ```bash
 cat automation/trading_log.md | tail -50  # Past learnings
 cat automation/recent_changes.log | tail -20  # Recent changes (don't revert)
+cat data/vacation_size_reduce.json 2>/dev/null  # size-reduce status — FILE IS TRUTH
 ```
+
+**Size-reduce reporting:** quote `size_multiplier` from `data/vacation_size_reduce.json` (e.g. 0.5 → "0.5x"). Never infer the multiplier from past log entries — it changes without history rewriting.
 
 ## Step 2: Query Last Hour's Trades
 
@@ -63,11 +66,17 @@ Answer these:
 Check if `tpsl_utils.py` fix is deployed. If not, alert CEO.
 
 ### If a signal has 0% WR with 3+ trades in last hour:
-Kill it immediately:
-```python
-# Edit hermes_constants.py
-SIGNAL_ENABLED = False  # Kill the signal
+**DO NOT blanket-kill (`SIGNAL_ENABLED = False` is banned without CEO approval).** Mandatory regime-based kill policy:
+1. Query regime performance first:
+```sql
+SELECT volatility_regime, COUNT(*),
+       ROUND(100.0*SUM(CASE WHEN pnl_usdt>0 THEN 1 ELSE 0 END)/NULLIF(COUNT(*),0),1) wr,
+       ROUND(SUM(pnl_usdt),2) pnl
+FROM trades WHERE signal LIKE '%X%' AND close_time > NOW() - INTERVAL '14 days'
+GROUP BY volatility_regime;
 ```
+2. Signal wins in ANY regime → keep it alive; block only the losing regime(s) via `scripts/volatility_gate_v2.py` (0.0x multiplier for that regime) + `scripts/market_phase_gate.py` FAMILY_MAP entry.
+3. Signal loses in ALL regimes (n≥20) → write the kill recommendation to the CEO kanban with the numbers; disable in `hermes_constants.py` only after CEO approval (or an explicit pre-registered kill criterion being met).
 
 ### If avg_pnl is negative for 3+ consecutive hours:
 Check market regime. If NEUTRAL, consider reducing position size.
@@ -142,6 +151,12 @@ Append to `automation/trading_log.md`:
 **Open Questions:**
 - [Anything unclear]
 ```
+
+## CRITICAL: Bash Quoting for $ Amounts
+
+When writing money amounts via bash `echo`/`printf`/heredoc, SINGLE-QUOTE the string. Unquoted `$0` expands to the shell path and corrupts the audit trail (`-$0.14` becomes `-/usr/bin/bash.14`):
+- ✅ `echo "- [time] 24h -$0.14 (WR 41%)"`
+- ❌ `echo - [time] 24h -$0.14 (WR 41%)`
 
 ## CRITICAL: SQL Rules
 

@@ -45,7 +45,12 @@ journalctl -u hermes-pipeline.service --since "5 minutes ago" --no-pager | grep 
 ```bash
 # Recent changes
 tail -100 /root/.hermes/automation/trading_log.md | grep -E "^## |Changes Implemented|disabled|blacklist|CRITICAL"
+
+# Size-reduce status — FILE IS TRUTH (don't copy "0.3x" text from old logs; quote size_multiplier)
+cat /root/.hermes/data/vacation_size_reduce.json 2>/dev/null
 ```
+
+When writing $ amounts in bash, single-quote strings (unquoted `$0` expands to the shell path and corrupts logs).
 
 ## Step 3: Compile Summary
 

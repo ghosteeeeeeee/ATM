@@ -598,7 +598,7 @@
     Pullback_Entry_Short -> Pullback_Entry (NORMAL 0.0, HIGH 0.7)
     R2 -> R2_Structural (NORMAL 0.5)
     Bug: keys never matched signal_family() output, multipliers silently ignored.
-    Impact: Pullback-entry SHORT blocked in NORMAL (15T -/usr/bin/bash.01), penalized in HIGH (0.7x).
+    Impact: Pullback-entry SHORT blocked in NORMAL (15T -$0.01), penalized in HIGH (0.7x).
   Creative: (1) Key mismatch bug fix — multipliers now applied (2) Monitor rr-struct- at 15T (3) rr_engine_resistance SHORT exit needs code change
   BY: brain_auditor
 
@@ -1331,7 +1331,7 @@
   BY: auto_1hr
   NEXT: Re-run at 16:06 UTC
 [2026-08-28 16:06 UTC] auto_1hr: NO CHANGES
-  WHY: 2T last hour (1W 1L +/usr/bin/bash.41). 87T 24h 49.4%WR -$0.06 breakeven. atr_sl_hit 94.3% avg -$0.003 structural. No kill criteria triggered. Trade freq 2/hr low. System stable, no action required.
+  WHY: 2T last hour (1W 1L +$0.41). 87T 24h 49.4%WR -$0.06 breakeven. atr_sl_hit 94.3% avg -$0.003 structural. No kill criteria triggered. Trade freq 2/hr low. System stable, no action required.
   BY: auto_1hr
   NEXT: Re-run at 17:06 UTC
 [2026-08-28 19:15 UTC] auto_1hr: NO CHANGES
@@ -1391,7 +1391,7 @@
   BY: auto_1hr
   NEXT: Re-run at 19:05 UTC
 [2026-08-29 20:05 UTC] auto_1hr: NO CHANGES
-  WHY: 5T last hour (4W 1L +/usr/bin/bash.06). 48T 24h 50%WR -/usr/bin/bash.44. atr_sl_hit 98% avg -/usr/bin/bash.009. No kill candidates (bb-bounce-short 3T 67%WR last hour). Trade freq normal. 3 consecutive positive hours. 7-day 444T 50.5%WR -.00 flat. 4 open positions, CHIP SHORT +44.94% managed by trailing SL. System healthy.
+  WHY: 5T last hour (4W 1L +$0.06). 48T 24h 50%WR -$0.44. atr_sl_hit 98% avg -$0.009. No kill candidates (bb-bounce-short 3T 67%WR last hour). Trade freq normal. 3 consecutive positive hours. 7-day 444T 50.5%WR -.00 flat. 4 open positions, CHIP SHORT +44.94% managed by trailing SL. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 21:05 UTC
 [2026-08-29 21:05 UTC] auto_1hr: NO CHANGES
@@ -1419,7 +1419,7 @@
   BY: auto_1hr
   NEXT: Re-run at 02:05 UTC
 [2026-08-30 03:05 UTC] auto_1hr: NO CHANGES
-  WHY: 2T last hour (2W +/usr/bin/bash.10, both bb-bounce-short atr_sl_hit). 24h 38T 65.8%WR +$0.37. atr_sl_hit 97.4% avg +$0.011 trailing SL working. No kill candidates (0 signals with 0%WR 3+T last hour). Trade freq ~1.6/hr normal. 6 consecutive positive hours. 2 open SHORT (DOGE +42%, ADA +10%). 7-day 433T 51.3%WR -$2.11 flat. System healthy.
+  WHY: 2T last hour (2W +$0.10, both bb-bounce-short atr_sl_hit). 24h 38T 65.8%WR +$0.37. atr_sl_hit 97.4% avg +$0.011 trailing SL working. No kill candidates (0 signals with 0%WR 3+T last hour). Trade freq ~1.6/hr normal. 6 consecutive positive hours. 2 open SHORT (DOGE +42%, ADA +10%). 7-day 433T 51.3%WR -$2.11 flat. System healthy.
   BY: auto_1hr
   NEXT: Re-run at 04:05 UTC
 [2026-08-30 09:05 UTC] auto_1hr: NO CHANGES
@@ -1487,7 +1487,7 @@
   BY: auto_1hr
   NEXT: Re-run at 09:05 UTC
 [2026-08-31 09:05 UTC] auto_1hr: NO CHANGES
-  WHY: 5T last hour (2W 3L -/usr/bin/bash.26). 39T 24h 51.3%WR -/usr/bin/bash.49 near flat. Kill criteria not met (no signal 0%WR with 3+ trades last hour; bb-bounce-short 5T 20%WR all-time profitable; macd-div- 5T 20%WR all-time 61%WR). 97.4% atr_sl_hit trailing SL working. 2 open (ATOM SHORT, BANANA LONG) normal. Trade freq 5/hr acceptable. No consecutive negative hours. 7d 404T 51%WR -.53 breakeven. System healthy, flat market.
+  WHY: 5T last hour (2W 3L -$0.26). 39T 24h 51.3%WR -$0.49 near flat. Kill criteria not met (no signal 0%WR with 3+ trades last hour; bb-bounce-short 5T 20%WR all-time profitable; macd-div- 5T 20%WR all-time 61%WR). 97.4% atr_sl_hit trailing SL working. 2 open (ATOM SHORT, BANANA LONG) normal. Trade freq 5/hr acceptable. No consecutive negative hours. 7d 404T 51%WR -.53 breakeven. System healthy, flat market.
   BY: auto_1hr
   NEXT: Re-run at 10:05 UTC
 [2026-08-31 10:05 UTC] auto_1hr: NO CHANGES
@@ -1587,7 +1587,7 @@
   BY: auto_1hr
   NEXT: Re-run at 20:05 UTC
 [2026-09-01 22:05 UTC] auto_1hr: NO CHANGES
-  WHY: 3T last hour (3W 0L +/usr/bin/bash.08). 60T 24h 51.7%WR -.97. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 53.3% trailing SL working. profit-monster-trail 41.7% profitable. Trade freq 3/hr normal. 3 consecutive positive hours. 1 open position (LDO $0.00). accel-300-v2-long killed 14:05 rolling off. System healthy.
+  WHY: 3T last hour (3W 0L +$0.08). 60T 24h 51.7%WR -.97. Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 53.3% trailing SL working. profit-monster-trail 41.7% profitable. Trade freq 3/hr normal. 3 consecutive positive hours. 1 open position (LDO $0.00). accel-300-v2-long killed 14:05 rolling off. System healthy.
 [2026-09-01 23:05 UTC] auto_1hr: NO CHANGES
   WHY: 2T last hour (1W 1L -$0.02 flat). 58T 24h 51.7%WR -$0.85 (improved). Kill criteria not met (no signal 0%WR 3+T last hour). atr_sl_hit 50% working. profit-monster-trail 44.8% profitable. Trade freq 2/hr normal. 0 open positions. accel-300-v2-long killed rolling off. System healthy.
   BY: auto_1hr
@@ -1637,7 +1637,7 @@
   BY: auto_1hr
   NEXT: Re-run at 18:15 UTC
 [2026-09-02 18:15 UTC] auto_1hr: NO CHANGES
-  WHY: 3T last hour (2W 1L +/usr/bin/bash.03). 60T/24h 45%WR -.75. Kill criteria not met. Short signals profitable, long signals dragging but no signal meets kill criteria (0%WR 3+T last hour). atr_sl_hit 73% structural but PM trail offsets (/usr/bin/bash.051 vs -/usr/bin/bash.045 per hit). 5 open positions. AVNT atr_sl_hit positive (+/usr/bin/bash.05) confirms trailing working. System steady state.
+  WHY: 3T last hour (2W 1L +$0.03). 60T/24h 45%WR -.75. Kill criteria not met. Short signals profitable, long signals dragging but no signal meets kill criteria (0%WR 3+T last hour). atr_sl_hit 73% structural but PM trail offsets ($0.051 vs -$0.045 per hit). 5 open positions. AVNT atr_sl_hit positive (+$0.05) confirms trailing working. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 19:15 UTC
 [2026-09-02 19:15 UTC] auto_1hr: NO CHANGES
@@ -1690,7 +1690,7 @@
   BY: auto_1hr
   NEXT: Re-run at 09:15 UTC
 [2026-09-03 09:06 UTC] auto_1hr: NO CHANGES
-  WHY: 5T last hour (5W 0L +/usr/bin/bash.13). All PM trail exits — ideal. 52T/24h ~50%WR -.39 (improving). Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 34% under 40%, trending down. profit-monster-trail 30T avg +/usr/bin/bash.046 carrying system. accel-300-v3-long+ CEO_PROTECTED until Sep 4 05:00 UTC. Trade freq ~2/hr normal. 5 open positions. System steady state.
+  WHY: 5T last hour (5W 0L +$0.13). All PM trail exits — ideal. 52T/24h ~50%WR -.39 (improving). Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 34% under 40%, trending down. profit-monster-trail 30T avg +$0.046 carrying system. accel-300-v3-long+ CEO_PROTECTED until Sep 4 05:00 UTC. Trade freq ~2/hr normal. 5 open positions. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 10:15 UTC
 [2026-09-03 10:06 UTC] auto_1hr: NO CHANGES
@@ -1711,10 +1711,10 @@
   NEXT: Re-run at 15:06 UTC
 2026-09-03T15:40:36Z | CEO ALERT: Preserve mechanism bug — STX LONG executed as v3 but detection returns None. Stale signal from previous hotset. Fix: re-validate preserved signals before execution. Trade: STX -6.95% loss.
 [2026-09-03 16:15 UTC] auto_1hr: NO CHANGES
-  WHY: 8T last hour (4W 4L +/usr/bin/bash.0.13). profit-monster-trail carrying system. 62T/24h 64.5%WR -$0.02 (nearly breakeven, improving steadily). Kill criteria not met (no 0%WR signal with 3+T last hour). atr_sl_hit 19.4% under 40%, healthy. accel-300-v3-long+ CEO_PROTECTED until Sep 4 05:00. Trade freq 8/hr normal. 2 open positions ($22.20). System steady state, trending positive.
+  WHY: 8T last hour (4W 4L +$0.0.13). profit-monster-trail carrying system. 62T/24h 64.5%WR -$0.02 (nearly breakeven, improving steadily). Kill criteria not met (no 0%WR signal with 3+T last hour). atr_sl_hit 19.4% under 40%, healthy. accel-300-v3-long+ CEO_PROTECTED until Sep 4 05:00. Trade freq 8/hr normal. 2 open positions ($22.20). System steady state, trending positive.
   BY: auto_1hr
   NEXT: Re-run at 17:15 UTC
-[2026-09-03 17:06 UTC] auto_1hr: KILLED bb-bounce-short — 3T/33.3%WR/-/usr/bin/bash.35 today, 2 consecutive losses, below 60% KILL_WR. BB_BOUNCE_SHORT_ENABLED=False. System +/usr/bin/bash.56 today, profit-monster-trail 91.7%WR carrying PnL.
+[2026-09-03 17:06 UTC] auto_1hr: KILLED bb-bounce-short — 3T/33.3%WR/-$0.35 today, 2 consecutive losses, below 60% KILL_WR. BB_BOUNCE_SHORT_ENABLED=False. System +$0.56 today, profit-monster-trail 91.7%WR carrying PnL.
 [2026-09-04 04:06 UTC] auto_1hr: NO CHANGES
   WHY: 5T last hour (1W 4L -$0.63). 85T/24h ~50%WR +$0.09. Kill criteria not met: accel-300-v3-short- 2T 0%WR and bb-bounce-short 2T 0%WR — both under 3T threshold. atr_sl_hit 20% under 40%. profit-monster-trail 54T avg +$0.055 carrying system. accel-300-v3-long+ CEO_PROTECTED until 05:00 UTC (~54min). Choppy market — 5 consecutive negative hours since midnight but 24h flat. Trade freq 5/hr normal. No changes — review accel-300-v3-long+ at 05:00 when lock expires.
   BY: auto_1hr
@@ -1769,7 +1769,7 @@
   BY: auto_1hr
   NEXT: Re-run at 09:07 UTC
 [2026-09-05 10:07 UTC] auto_1hr: NO CHANGES
-  WHY: 2T last hour (2W +/usr/bin/bash.09). 31T/24h profit-monster-trail 17T +.45 dominant. Kill criteria not met. atr_sl_hit 16.1% under 40%. open-skies+/continuation+/bb-bounce-v2-long+ all 100%WR stars. ema300-dip 11T 45%WR -/usr/bin/bash.91 drag but not killable. Trade freq 2/hr normal. System steady state.
+  WHY: 2T last hour (2W +$0.09). 31T/24h profit-monster-trail 17T +.45 dominant. Kill criteria not met. atr_sl_hit 16.1% under 40%. open-skies+/continuation+/bb-bounce-v2-long+ all 100%WR stars. ema300-dip 11T 45%WR -$0.91 drag but not killable. Trade freq 2/hr normal. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 11:07 UTC
 [2026-09-05 11:07 UTC] auto_1hr: NO CHANGES
@@ -1953,7 +1953,7 @@
   BY: auto_1hr
   NEXT: Re-run at 05:10 UTC
 [2026-09-08 05:10 UTC] auto_1hr: NO CHANGES
-  WHY: 4T last hour (2W 2L +/usr/bin/bash.13). 59T/24h 69.5%WR +$1.83. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 17% healthy. Trade freq 4/hr normal. 3 open positions fresh. System steady state.
+  WHY: 4T last hour (2W 2L +$0.13). 59T/24h 69.5%WR +$1.83. Kill criteria not met: no 0%WR signal with 3+T last hour. atr_sl_hit 17% healthy. Trade freq 4/hr normal. 3 open positions fresh. System steady state.
   BY: auto_1hr
   NEXT: Re-run at 06:10 UTC
 [2026-09-08 07:10 UTC] auto_1hr: NO CHANGES
@@ -2087,7 +2087,7 @@
   BY: auto_1hr
   NEXT: Re-run at 13:10 UTC
 [2026-09-10 15:00 UTC] auto_1hr: NO CHANGES
-  WHY: 2T last hour (1W 1L +/usr/bin/bash.04). 47T/24h 63.8%WR +.63. Kill criteria not met: no signal at 0%WR with 3+T last hour. pullback-entry+ already killed (5T 0%WR). atr_sl_hit 44.7% above 40% but avg +/usr/bin/bash.070 profitable. pump-chain- 8T 75%WR -/usr/bin/bash.19 R:R drag persists. Trade freq 1.5/hr normal. 5 open SHORTs near breakeven. 3d trend positive: Sep 9 +.03, Sep 10 +.63.
+  WHY: 2T last hour (1W 1L +$0.04). 47T/24h 63.8%WR +.63. Kill criteria not met: no signal at 0%WR with 3+T last hour. pullback-entry+ already killed (5T 0%WR). atr_sl_hit 44.7% above 40% but avg +$0.070 profitable. pump-chain- 8T 75%WR -$0.19 R:R drag persists. Trade freq 1.5/hr normal. 5 open SHORTs near breakeven. 3d trend positive: Sep 9 +.03, Sep 10 +.63.
   BY: auto_1hr
   NEXT: Re-run at 16:10 UTC
 [2026-09-10 16:00 UTC] auto_1hr: NO CHANGES
@@ -2286,7 +2286,7 @@
   
   FILES: brain/audit_recommendations.json, brain/creative_improvements.json
   BY: brain_auditor
-[2026-09-12 14:00 UTC] auto_1hr: NO CHANGES — system healthy. 2 trades, +/usr/bin/bash.07. 24h 65.2%WR +/usr/bin/bash.91. All kill/fix criteria below threshold.
+[2026-09-12 14:00 UTC] auto_1hr: NO CHANGES — system healthy. 2 trades, +$0.07. 24h 65.2%WR +$0.91. All kill/fix criteria below threshold.
 [2026-09-12 14:30 UTC] brain_auditor: FULL AUDIT COMPLETE. Key findings: (1) Stale signals = #1 drag: 35% of 24h trades stale, 40% WR vs 78.6% fresh. Stale SHORTs lose $0.87/24h. (2) NORMAL regime worst: 51.4% WR -$2.36/7d across all signals. (3) rr_engine_resistance structural SHORT: 14 exits/7d, 28.6% WR -$0.76. (4) Creative: stale+oversold SHORT block would save $0.30-0.50/24h. Files: brain/audit_recommendations.json
 
 [2026-09-12 22:00 UTC] brain_auditor: AUDIT RUN — no config change
@@ -2465,8 +2465,8 @@
   No config change — monitoring.
   BY: brain_auditor
 [2026-09-15 18:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
-  1h: 1T closed (SAND SHORT /usr/bin/bash.00), 5 open (2 breakout-long+ new signal)
-  24h: 30T 50.0%WR +/usr/bin/bash.06 | 90% atr_sl_hit | avg +/usr/bin/bash.003/trade
+  1h: 1T closed (SAND SHORT $0.00), 5 open (2 breakout-long+ new signal)
+  24h: 30T 50.0%WR +$0.06 | 90% atr_sl_hit | avg +$0.003/trade
   No signal meets kill criteria. Trade frequency healthy. System breakeven 3h.
   BY: auto_1hr
 [2026-09-15 19:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
@@ -2492,13 +2492,13 @@
   No signal meets kill criteria. breakout-long+ 2T/0%WR but below 3T threshold.
   BY: auto_1hr
 [2026-09-16 00:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
-  1h: 1T closed (IMX SHORT +/usr/bin/bash.16), 0 open
-  24h: 29T 51.7%WR +/usr/bin/bash.16 | 83% atr_sl_hit
+  1h: 1T closed (IMX SHORT +$0.16), 0 open
+  24h: 29T 51.7%WR +$0.16 | 83% atr_sl_hit
   No signal meets kill criteria. breakout-long+ 2T/0%WR below 3T threshold.
   BY: auto_1hr
 [2026-09-16 01:10 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
   1h: 0T closed (flat), 4 open (DOT SHORT, BIGTIME LONG, SYRUP SHORT, ETH SHORT)
-  24h: 28T 53.6%WR +/usr/bin/bash.16 | 82% atr_sl_hit
+  24h: 28T 53.6%WR +$0.16 | 82% atr_sl_hit
   No signal meets kill criteria. breakout-long+ 3T all-time 0%WR but 0 trades in last hour.
   Root cause: breakout-long+ fires LONG in NEUTRAL without BTC regime gate — needs code fix.
   BY: auto_1hr
@@ -2515,8 +2515,8 @@
   Monitor 24h to verify
   BY: brain_auditor
 [2026-09-16 05:11 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
-  1h: 2T closed (DOT -/usr/bin/bash.25, ETC -/usr/bin/bash.28) — both ATR SL hits
-  24h: 28T 50%WR -/usr/bin/bash.12 | 82% ATR SL | pullback-entry- 21T 61.9%WR +/usr/bin/bash.44
+  1h: 2T closed (DOT -$0.25, ETC -$0.28) — both ATR SL hits
+  24h: 28T 50%WR -$0.12 | 82% ATR SL | pullback-entry- 21T 61.9%WR +$0.44
   No signal meets kill criteria. 6h pullback-entry- dip (50% vs 61.9%) normal variance.
   BY: auto_1hr
 [2026-09-16 07:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
@@ -2690,7 +2690,7 @@
   Kill check: no signal at 0%WR with 3+T last hour. No action.
   BY: auto_1hr
 [2026-09-17 17:30 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
-  1h: 0T closed (quiet period). Open: 4 volume-breakout-long+ (all /usr/bin/bash.00)
+  1h: 0T closed (quiet period). Open: 4 volume-breakout-long+ (all $0.00)
   24h: 14T 21.4%WR $-\1.37 | 7d: 227T 51.1%WR $-\2.61
   Kill check: 0T last hour. ATR SL 64% avg -$0.080 (breakeven).
   No action needed. BY: auto_1hr
@@ -2860,8 +2860,8 @@
   No kill criteria met. No changes.
   BY: auto_1hr
 [2026-09-19 13:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
-  24h: 46T 34.8%WR +/usr/bin/bash.99 | 6h: 12T recovering
-  Last hour: 2T 2W 0L +/usr/bin/bash.21
+  24h: 46T 34.8%WR +$0.99 | 6h: 12T recovering
+  Last hour: 2T 2W 0L +$0.21
   No kill criteria met. No changes.
   BY: auto_1hr
 [2026-09-19 16:00 UTC] auto_1hr: NO CONFIG CHANGE — monitoring only
@@ -2870,10 +2870,10 @@
   No kill criteria met. No changes.
   BY: auto_1hr
 [2026-09-19 17:30 UTC] brain_auditor: NO CONFIG CHANGE — full audit
-  24h: 49T 42.9%WR +/usr/bin/bash.55 | 7d: 207T 49.3%WR +/usr/bin/bash.06
-  DRIFT: BAD_TRADE_HOURS wrong (Hour 15 +.04 in set, Hour 20 -/usr/bin/bash.89 not in set)
+  24h: 49T 42.9%WR +$0.55 | 7d: 207T 49.3%WR +$0.06
+  DRIFT: BAD_TRADE_HOURS wrong (Hour 15 +.04 in set, Hour 20 -$0.89 not in set)
   RECURRING: BEAR_TREND #1 loss source (-.23/7d)
-  CREATIVE: Block LONG in BEAR_TREND (+/usr/bin/bash.28/7d), restore grind-trend+ HIGH (+/usr/bin/bash.35/7d)
+  CREATIVE: Block LONG in BEAR_TREND (+$0.28/7d), restore grind-trend+ HIGH (+$0.35/7d)
   NO ACTION TAKEN — flagged for CEO
   BY: brain_auditor
 [2026-09-19 19:36 UTC] brain_auditor: NO CONFIG CHANGE — full audit
@@ -2928,7 +2928,7 @@
   BY: auto_1hr
 [2026-09-21 00:10 UTC] auto_1hr: NO CHANGE — system stable
   24h: 28T 64.3%WR +$1.85 | 7d: 202T 49.5%WR +$1.06
-  1T closed last hour (BLUR SHORT ATR SL -/usr/bin/bash.43). 4 open positions.
+  1T closed last hour (BLUR SHORT ATR SL -$0.43). 4 open positions.
   No kill criteria. No overtrading. pump-chain+ carrying at +$1.35/24h.
   BY: auto_1hr
 [2026-09-21 01:10 UTC] auto_1hr: NO CHANGE — system stable
@@ -3026,7 +3026,7 @@
 [2026-09-22 11:10 UTC] auto_1hr: NO CHANGE — system stable
   24h: 30T 33.3%WR -$2.26 | 7d: 196T 46.9%WR +$0.99
   1 trade last hour (ZEN SHORT +$0.10), 2 open (DOT SHORT, LINK SHORT).
-  pump-chain+ killed at 09:30. pump-chain- SHORT 33%WR, -/usr/bin/bash.38 — small sample.
+  pump-chain+ killed at 09:30. pump-chain- SHORT 33%WR, -$0.38 — small sample.
   atr_sl_hit 73.3% — within 55-75% baseline.
   No kill criteria met. System stable.
   BY: auto_1hr
@@ -3086,7 +3086,7 @@
   No signal meets kill criteria. System stable.
   BY: auto_1hr
 [2026-09-23 03:00 UTC] auto_1hr: NO CHANGE — system stable
-  Last hour: 2 wins (+/usr/bin/bash.11). 24h: 25T 25%WR -.24 | 7d: 186T 44.6%WR
+  Last hour: 2 wins (+$0.11). 24h: 25T 25%WR -.24 | 7d: 186T 44.6%WR
   3 open positions (YGG, BTC, CFX).
   atr_sl_hit 64% within baseline.
   No signal meets kill criteria. System stable.
@@ -3310,9 +3310,9 @@
   3 fresh LONGs (POL/IOTA/HYPER), 0 closures, 120h+ idle ended. ATR_SL 67.5% (pre-fix). BY: auto_1hr
 [2026-09-27 18:10 UTC] auto_1hr: NO CHANGE — ATR_SL fix validated working
   ATR_SL 0% post-fix (was 68% pre-fix). Last atr_sl_hit Sep 24. 5 post-fix closes all trailing/ORPHAN/MAX_HOLD.
-  1T last hour (-/usr/bin/bash.04), 5 open LONGs. 7d 122T 35.2%WR -.93 | 14d 330T 44.2%WR -.28. BY: auto_1hr
+  1T last hour (-$0.04), 5 open LONGs. 7d 122T 35.2%WR -.93 | 14d 330T 44.2%WR -.28. BY: auto_1hr
 [2026-09-27 22:10 UTC] auto_1hr: NO CHANGE — analysis only
-  2T last hour (0W 2L, -/usr/bin/bash.09 scratches). ATR_SL 0% post-fix (11T). 0 open. 24h +/usr/bin/bash.72 (54.5%WR).
+  2T last hour (0W 2L, -$0.09 scratches). ATR_SL 0% post-fix (11T). 0 open. 24h +$0.72 (54.5%WR).
   System flat, trailing working, no kill candidates. BY: auto_1hr
 [2026-09-27 22:37 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 11T 45.5%WR +$0.72 (24h) | 332T 44.6%WR -$3.29 (14d)
@@ -3326,7 +3326,7 @@
 [2026-09-28 00:10 UTC] auto_1hr: NO CHANGE — analysis only
   0T last hour, 0 open. ATR_SL 0% post-fix (11T). 24h +$0.72 (45.5%WR). System flat, no kill candidates. BY: auto_1hr
 [2026-09-28 08:10 UTC] auto_1hr: NO CHANGE — analysis only, system flat
-  0T last hour. 24h 15T 33.3%WR +/usr/bin/bash.51. ATR_SL 0% (fix validated). 0 kill candidates. BY: auto_1hr
+  0T last hour. 24h 15T 33.3%WR +$0.51. ATR_SL 0% (fix validated). 0 kill candidates. BY: auto_1hr
 [2026-09-28 15:35 UTC] brain_auditor: NO CONFIG CHANGE — audit
 [2026-09-28 17:15 UTC] auto_1hr: NO CHANGE — analysis only, system flat
   0T last hour, 6 open. ATR_SL 0% post-fix (15T). 24h 13T 30.8%WR +$0.42. No kill candidates. BY: auto_1hr
@@ -3347,7 +3347,7 @@
   1T last hour (1W +$0.02 profit-monster-trail). ATR_SL 0% post-fix (15T+). 24h 15T 86.7%WR +$0.66.
   All 7d signal losses from pre-fix era. System healthy. BY: auto_1hr
 [2026-09-28 20:11 UTC] auto_1hr: NO CHANGE — analysis only
-  0T last hour. 6 open (+/usr/bin/bash.47 combined). ATR_SL 0% post-fix. 24h 13T 86.7%WR +/usr/bin/bash.40.
+  0T last hour. 6 open (+$0.47 combined). ATR_SL 0% post-fix. 24h 13T 86.7%WR +$0.40.
   System healthy, trading lightly. No kill candidates. BY: auto_1hr
 [2026-09-28 22:50 UTC] brain_auditor: NO CONFIG CHANGE — audit
   DB-verified: 13T 46.2%WR +$0.04 (24h) | 114T 41.0%WR -$4.34 (7d) | 301T 44.2%WR -$2.89 (14d)
@@ -3360,13 +3360,13 @@
   CREATIVE: (1) HIGH SHORT MIN_EXEC_CONFIDENCE=70 (2) Monitor EXTREME post-fix (3) NEW NEUTRAL signal.
   0 CHANGES APPLIED. BY: brain_auditor
 [2026-09-28 23:11 UTC] auto_1hr: NO CHANGE — analysis only
-  1T last hour (1W +/usr/bin/bash.05 hard_sl trailed). 24h 14T 50%WR +/usr/bin/bash.09. Post-fix 26T 50%WR +/usr/bin/bash.86.
+  1T last hour (1W +$0.05 hard_sl trailed). 24h 14T 50%WR +$0.09. Post-fix 26T 50%WR +$0.86.
   ATR_SL 0% post-fix (26T+). EXTREME LONG only profitable regime +.22/14d. System healthy. BY: auto_1hr
 [2026-09-29 01:11 UTC] auto_1hr: NO CHANGE — analysis only
   3T last hour (3W +$0.36). ATR_SL 0% post-fix (35T+). 24h 17T 65%WR +$0.70.
   System healthy, no kill candidates. BY: auto_1hr
 [2026-09-29 02:11 UTC] auto_1hr: NO CHANGE — analysis only
-  2T last hour (1W 1L +/usr/bin/bash.02). 24h 17T 71%WR +/usr/bin/bash.87. ATR_SL 0% (15T+ post-fix).
+  2T last hour (1W 1L +$0.02). 24h 17T 71%WR +$0.87. ATR_SL 0% (15T+ post-fix).
   hard_sl 47% but 5/8 profitable (trailing stops working). No kill candidates.
   EXTREME 90%WR dominant. System healthy. BY: auto_1hr
 [2026-09-29 03:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
@@ -3378,7 +3378,7 @@
   CREATIVE: (1) SHORT_MIN_EXEC_CONFIDENCE=70 code change (2) Monitor EXTREME (3) New NEUTRAL signal.
   0 CHANGES APPLIED. BY: brain_auditor
 [2026-09-29 03:11 UTC] auto_1hr: NO CHANGE — analysis only
-  0T last hour (quiet period). 24h 17T 71%WR +/usr/bin/bash.87. 7d 113T 43%WR -.33.
+  0T last hour (quiet period). 24h 17T 71%WR +$0.87. 7d 113T 43%WR -.33.
   hard_sl 47% but 5/8 profitable (trailing stops working). ATR_SL 0% (15T+ post-fix).
   EXTREME 90%WR dominant. No kill candidates. System healthy. BY: auto_1hr
 [2026-09-29 04:11 UTC] auto_1hr: NO CHANGE — analysis only
@@ -3401,7 +3401,7 @@
   No open mover- trades. pump-chain- SHORT dominant (5T 5W +$0.81) untouched.
   BY: auto_1hr
 [2026-09-29 10:00 UTC] auto_1hr: NO CHANGE — analysis only
-  0T last hour. 24h 24T 66.7%WR +/usr/bin/bash.33. ATR_SL 0% (26T+ post-fix).
+  0T last hour. 24h 24T 66.7%WR +$0.33. ATR_SL 0% (26T+ post-fix).
   5 open trades normal. No kill candidates. System healthy. BY: auto_1hr
 [2026-09-29 11:00 UTC] auto_1hr: NO CHANGE — analysis only
   3T last hour (1W2L -$0.28). 24h 27T 59.3%WR +$0.05. 7d 115T 42.6%WR -$3.43.
@@ -3417,11 +3417,11 @@
   0 CHANGES APPLIED. BY: brain_auditor
 
 [2026-09-29 14:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
-  DB-verified: 22T ~55%WR +/usr/bin/bash.20 (24h) | 123T 41.5%WR -.04 (7d) | 311T 44.7%WR -.51 (14d)
+  DB-verified: 22T ~55%WR +$0.20 (24h) | 123T 41.5%WR -.04 (7d) | 311T 44.7%WR -.51 (14d)
   ATR SL 35.3% 7d — PASS. Post-fix: 0 ATR_SL hits.
   pump-chain+ cold streak 7d (0 trades). 14d still +.23.
-  LOSING AUTOPSY: 16 losers 24h all small (</usr/bin/bash.47). Normal chop.
-  7d REGIME: EXTREME -.49, HIGH -/usr/bin/bash.78, NORMAL +/usr/bin/bash.23.
+  LOSING AUTOPSY: 16 losers 24h all small (<$0.47). Normal chop.
+  7d REGIME: EXTREME -.49, HIGH -$0.78, NORMAL +$0.23.
   CREATIVE: (1) EMA-reclaim signal (2) Monitor pump-chain+ (3) SHORT TP multiplier.
   BY: brain_auditor
 [2026-09-29 15:00 UTC] brain_auditor: NO CONFIG CHANGE — audit
@@ -4426,7 +4426,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-09 08:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 2 open ICP/IOTA pump-chain LONGs | 24h 13T 5W −$0.25 WR 38.5% | hard_max_loss 6/13=46.2% (hold brain_auditor Oct 9/10) | atr_sl_hit 0% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
-[2026-10-09 09:12] auto_1hr: NO CONFIG CHANGE — 1T last hour ICP pump-chain-v6+ LONG hard_max_loss −/usr/bin/bash.08 | 1 open IOTA pump-chain LONG (tight SL 0.155%) | 24h 14T 5W −/usr/bin/bash.33 WR 35.7% | hard_max_loss 7/14=50% (hold brain_auditor Oct 9/10) | atr_sl_hit 0% (tpsl stable) | Kill: none (1T) | Overtrade 1/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
+[2026-10-09 09:12] auto_1hr: NO CONFIG CHANGE — 1T last hour ICP pump-chain-v6+ LONG hard_max_loss −$0.08 | 1 open IOTA pump-chain LONG (tight SL 0.155%) | 24h 14T 5W −$0.33 WR 35.7% | hard_max_loss 7/14=50% (hold brain_auditor Oct 9/10) | atr_sl_hit 0% (tpsl stable) | Kill: none (1T) | Overtrade 1/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 [2026-10-09 10:12] auto_1hr: NO CONFIG CHANGE — 1T last hour IOTA pump-chain combo LONG atr_sl_hit −$0.04 | 0 open | 24h 15T 5W −$0.37 WR 33.3% | hard_max_loss 7/15=46.7% (hold brain_auditor Oct 9/10) | atr_sl_hit 1/15=6.7% (tpsl stable) | Kill: none (1T, no 0%WR 3+T signal) | Overtrade 1/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 [2026-10-09 11:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 0 open | 24h 15T 5W −$0.37 WR 33.3% | hard_max_loss 7/15=46.7% (hold brain_auditor Oct 9/10) | atr_sl_hit 6.7% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 [2026-10-09 12:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 2 open BTC continuum+ / BANANA pump-chain+ LONGs | 24h 15T 5W −$0.37 WR 33.3% | hard_max_loss 7/15=46.7% (hold brain_auditor eval) | atr_sl_hit 6.7% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
@@ -4448,7 +4448,7 @@ BY: auto_1hr
 [2026-10-09 21:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 3h) | 0 open | 24h 18T 7W -$0.45 WR 39% | hard_max_loss 33% (hold brain_auditor) | atr_sl_hit 27.8% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 [2026-10-09 22:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet but 1 open BABY volume-breakout-long+ SL/TP OK) | 24h 16T 6W ≈−0.46 WR 38% | hard_max_loss 31.3% (hold brain_auditor) | atr_sl_hit 31.3% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
-[2026-10-09 23:12] auto_1hr: NO CONFIG CHANGE — 2T last hour BABY volume-breakout-long+ stale_exit +/usr/bin/bash.30 + W hmacd_mtf- SHORT atr_sl_hit −/usr/bin/bash.14 | 4 open (ZEN/SEI/YGG vol-breakout, CAKE hmacd — all sized OK) | 24h 18T 7W ≈−/usr/bin/bash.30 WR 39% | hard_max_loss 27.8% (hold brain_auditor) | atr_sl_hit 33.3% (tpsl stable) | Kill: none | Overtrade 2/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
+[2026-10-09 23:12] auto_1hr: NO CONFIG CHANGE — 2T last hour BABY volume-breakout-long+ stale_exit +$0.30 + W hmacd_mtf- SHORT atr_sl_hit −$0.14 | 4 open (ZEN/SEI/YGG vol-breakout, CAKE hmacd — all sized OK) | 24h 18T 7W ≈−$0.30 WR 39% | hard_max_loss 27.8% (hold brain_auditor) | atr_sl_hit 33.3% (tpsl stable) | Kill: none | Overtrade 2/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
 BY: auto_1hr
 [2026-10-10 00:13] auto_1hr: NO CONFIG CHANGE — 2T last hour CAKE hmacd_mtf-+ profit-monster-trail +$0.03 + SYRUP ai-trader+ profit-monster-trail +$0.02 | 3 open ZEN/SEI/YGG vol-breakout cluster (sized OK) | 24h 20T 7W -$0.25 WR 35% | hard_max_loss 25% -$0.58 (hold brain_auditor) | atr_sl_hit 30% (tpsl stable) | Kill: none (2W) | Overtrade 2/hr | Streak inactive (positive hour) | timers fresh, live_trading=true, kill JSON=true
@@ -4563,14 +4563,14 @@ BY: auto_1hr
 BY: auto_1hr
 BY: auto_1hr
 [2026-10-12 17:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 7 of 8h) | 0 open | 24h 21T 9W +$0.10 (42.9%) | hard_max_loss 38% (hold brain_auditor) | atr_sl_hit 4.8% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
-[2026-10-12 18:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 8 of 9h) | 0 open | 24h 19T 8W +/usr/bin/bash.09 (42.1%) | hard_max_loss 42% (hold brain_auditor) | atr_sl_hit 5.3% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
+[2026-10-12 18:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 8 of 9h) | 0 open | 24h 19T 8W +$0.09 (42.1%) | hard_max_loss 42% (hold brain_auditor) | atr_sl_hit 5.3% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
 [2026-10-12 19:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 9 of 10h) | 0 open | 24h 17T 8W +$0.17 (47.1%) | hard_max_loss 41% (hold brain_auditor) | atr_sl_hit 5.9% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-12 20:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 9 of 10h) | 2 open pump-chain+ longs (HYPER/KAS, new) | 24h 17T 8W +$0.17 (47.1%) | hard_max_loss 41% (hold brain_auditor) | atr_sl_hit 5.9% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-12 21:14] auto_1hr: NO CONFIG CHANGE — 3T last hour all pump-chain+ (1W −$0.12 net) | 0 open | 24h 19T 8W +$0.03 (42.1%) | hard_max_loss 42% (hold brain_auditor) | atr_sl_hit 5.3% (tpsl stable) | kill: none qualifying (pump-chain+ 33% WR last hour, not 0%) | overtrade 3/hr | streak not 3-neg | live_trading=true, kill JSON=true
 BY: auto_1hr
-[2026-10-12 22:13] auto_1hr: NO CONFIG CHANGE — 2T last hour both oversold-bounce+ hard_max_loss (−/usr/bin/bash.23) | 0 open | 24h 21T 8W −$0.20 (38.1%) — first negative day-net | kill: oversold-bounce+ 2T 0W last hour (rule needs 3+, not met; 0/4 since Oct 11 — ESCALATE, one more red = kill) | hard_max_loss 47.6% (hold brain_auditor) | atr_sl_hit 4.8% (tpsl stable) | overtrade 2/hr | streak 2-neg (20h/21h), not 3 | live_trading=true, kill JSON=true
+[2026-10-12 22:13] auto_1hr: NO CONFIG CHANGE — 2T last hour both oversold-bounce+ hard_max_loss (−$0.23) | 0 open | 24h 21T 8W −$0.20 (38.1%) — first negative day-net | kill: oversold-bounce+ 2T 0W last hour (rule needs 3+, not met; 0/4 since Oct 11 — ESCALATE, one more red = kill) | hard_max_loss 47.6% (hold brain_auditor) | atr_sl_hit 4.8% (tpsl stable) | overtrade 2/hr | streak 2-neg (20h/21h), not 3 | live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-12 23:13] auto_1hr: NO CONFIG CHANGE — 1T last hour BTC hl_copy_trader atr_sl_hit (−$0.03) | 0 open | 24h 22T 8W −$0.23 (36.4%) | kill: none qualifying (oversold-bounce+ 0T last hour, rule needs 3+) | hard_max_loss 45.5% (hold brain_auditor) | atr_sl_hit 9.1% (tpsl stable) | overtrade 1/hr | streak 3-neg but tiny (−$0.38) + regime SHORT_BIAS not NEUTRAL, no size cut | live_trading=true, kill JSON=true
 BY: auto_1hr
@@ -4949,7 +4949,7 @@ BY: brain_auditor
 BY: auto_1hr
 - [2026-10-20 13:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (COMP pump-chain-/v6- SHORT atr_sl_hit -$0.17 -7.61%, SL 0.30% wide with ~1.2% slippage at ~5x lev — flagged) | 24h 13T 2W -$0.57 (15.4%) | 7d 168T 57W -$3.58 (33.9%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ 0W/2T 24h below 3T line) | atr_sl_hit 38.5% under 40% | 2 consec neg hours (watch 14:00) | 2 open flat | No constants change -> no signal_versions entry
 BY: auto_1hr
-- [2026-10-20 14:45 UTC] brain_auditor: AUDIT RUN #38 — 0 config changes (vacation soak) | conf<30 floor-admit bleed confirmed (14d 44T −.71; pp-cond shadow flip decision queued vacation-end) | pre-reg flip-alignment study EXECUTED (post-flip LONG +/usr/bin/bash.57 vs SHORT −/usr/bin/bash.20, n=5 early-positive) | BTC double manual LONG flagged to CEO | creative: post-flip counter-regime 0.5x dampen pre-registered | 24h net-flat −/usr/bin/bash.01, 7d 33.5% −.58, size-reduce 0.5x
+- [2026-10-20 14:45 UTC] brain_auditor: AUDIT RUN #38 — 0 config changes (vacation soak) | conf<30 floor-admit bleed confirmed (14d 44T −.71; pp-cond shadow flip decision queued vacation-end) | pre-reg flip-alignment study EXECUTED (post-flip LONG +$0.57 vs SHORT −$0.20, n=5 early-positive) | BTC double manual LONG flagged to CEO | creative: post-flip counter-regime 0.5x dampen pre-registered | 24h net-flat −$0.01, 7d 33.5% −.58, size-reduce 0.5x
 BY: auto_1hr
 - [2026-10-20 15:32] auto_1hr: NO CONFIG CHANGE — 2T last hour (both BTC ai-trader-manual losses: atr_sl_hit -$0.01, cut_loser -$0.12; manual SL levels 0.006%/0.103% flagged) | 24h 19T 4W -$0.14 (21.1%) | 7d 167T 59W -$2.67 (35.3% WR recovered past 35%) — vacation size-reduce 0.5x stays (PnL <-$2) | kill: none (only manual trades last hour) | atr_sl_hit 42.1% raw but 33% signal-only, tpsl deployed | no neg-hour streak | 0 open | No constants change -> no signal_versions entry
 [2026-10-20 15:40 UTC] brain_auditor: AUDIT RUN #39 — 1 bugfix (TAT shadow scope ai-trader→ai-trader+, excludes CEO manual/pending from flip cohort; valid count 9/15) | pp-cond flip EVALUATED FAIL (save $0.27<$1, FK 16.7%>10%) stays shadow | counter-regime gate still n=9<20 | 24h 19T 21.1% −$0.14 shallow, 7d 35.3% −$2.67, size-reduce 0.5x | open 2× BTC LONG +0.28% HOLD
@@ -4969,7 +4969,7 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-20 22:46 UTC] brain_auditor: AUDIT RUN #44 — 1 infra (ARM-GAP peak-trail counterfactual estimate, zero-behavior) | giveback D=0.3% NET +14.7pts fragile (IMX outlier) | pump-chain- kill rejected (14d +$0.23) | BTC trail steer FALSE ALARM | 24h 23.8% −$0.16 shallow, 7d 36.4% −$2.41, size-reduce 0.5x
 BY: brain_auditor
-- [2026-10-20 23:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (MET warrior-sr-confirm+ LONG hard_sl -/usr/bin/bash.14 -1.21%) | 24h 22T 5W -/usr/bin/bash.38 (22.7%) | 7d 161T 58W -.52 (36.0%) — size-reduce 0.3x stays (PnL <-) | kill: none (1T only) | atr_sl_hit 31.8% under 40% | no neg-hour streak | 2 open (BTC +0.59%, APT -0.16%) | No constants change -> no signal_versions entry
+- [2026-10-20 23:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (MET warrior-sr-confirm+ LONG hard_sl -$0.14 -1.21%) | 24h 22T 5W -$0.38 (22.7%) | 7d 161T 58W -.52 (36.0%) — size-reduce 0.3x stays (PnL <-) | kill: none (1T only) | atr_sl_hit 31.8% under 40% | no neg-hour streak | 2 open (BTC +0.59%, APT -0.16%) | No constants change -> no signal_versions entry
 BY: auto_1hr
 [2026-10-20 23:36 UTC] brain_auditor: AUDIT RUN #45 — 0 config changes (vacation soak) | BTC trail ratchet about to arm (peak 0.901%) | APT TAT contained -0.04 | ARM-GAP ext verified 0 fires=correct | steers 001 reject / 002 structural / 003 kill-reject | 24h 22.7% -0.30 shallow, 7d 36.0% -2.52, size-reduce 0.5x
 BY: brain_auditor

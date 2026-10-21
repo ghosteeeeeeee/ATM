@@ -6843,7 +6843,7 @@ Final set: ['IMX', 'INJ']
 ## [2026-10-09 07:12 UTC] Hourly Analysis
 
 **Trades:** 0 closed (quiet hour)
-**PnL:** /usr/bin/bash.00 | 24h: 13T 5W −/usr/bin/bash.25 (WR 38.5%)
+**PnL:** $0.00 | 24h: 13T 5W −$0.25 (WR 38.5%)
 **Last hour:** none
 **24h exits:** hard_max_loss 6T −$0.86 | stale_exit 4T +$0.60 | profit-monster-trail 1T +$0.09 | pump_exit_dead_money 1T +$0.01 | pump_exit_momentum 1T −$0.09 | atr_sl_hit 0T
 **Open:** 0
@@ -8909,7 +8909,7 @@ Final set: []
 - atr_sl_hit 1/19 ≈ 5.3% — under 40%, tpsl_utils deployed
 - hard_max_loss 8/19 ≈ 42% −$0.61 — hold brain_auditor (SL width lever), not auto_1hr's to touch
 - Overtrade: 3/hr — well under 20
-- Streak: only 20:00 negative (−$0.12); prior hours zero-trade /usr/bin/bash.00 — not 3 consecutive negative hours
+- Streak: only 20:00 negative (−$0.12); prior hours zero-trade $0.00 — not 3 consecutive negative hours
 - live_trading=true (constants line 33 + kill JSON), verified this run
 - No constants edit → no signal_versions.json entry
 - OpenMemory skipped per task instruction
@@ -10504,7 +10504,7 @@ BY: daily_orchestrator
 ## [2026-10-16 01:10] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet)
-**PnL:** /usr/bin/bash.00 last hour | 24h 15T 5W +$0.34 (~33.3% WR)
+**PnL:** $0.00 last hour | 24h 15T 5W +$0.34 (~33.3% WR)
 
 **Changes:** none
 
@@ -12573,7 +12573,7 @@ Final set: ['ALT', 'APT', 'CHIP', 'DOT', 'ETC', 'FIL', 'HYPE']
 ## [2026-10-20 02:27] Hourly Analysis
 
 **Trades:** 0 closed last hour (quiet)
-**PnL:** /usr/bin/bash.00 last hour | 24h 17T 7W -$0.41 (41.2% WR) | 7d 196T 68W -$3.54 (34.7% WR)
+**PnL:** $0.00 last hour | 24h 17T 7W -$0.41 (41.2% WR) | 7d 196T 68W -$3.54 (34.7% WR)
 
 **Changes:** none
 
@@ -13278,7 +13278,7 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 
 **Open Questions:**
 - 7d PnL improving: -.70 → -.40; size-reduce 0.3x stays until it crosses -
-- Loss cluster unchanged: atr_sl_hit (9T -/usr/bin/bash.63) + trail_arm_timeout (4T -/usr/bin/bash.16) + hard_sl (3T -/usr/bin/bash.22)
+- Loss cluster unchanged: atr_sl_hit (9T -$0.63) + trail_arm_timeout (4T -$0.16) + hard_sl (3T -$0.22)
 
 ---
 
@@ -13296,7 +13296,7 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 
 **No inversions. No flags changed. Report: automation/signal_report.md**
 
-**Side finding:** trading_log.md recent entries show mangled PnL strings (e.g. "-/usr/bin/bash.63" where "-$0.63" should be) — a previous writer expanded `$0` as a shell variable. Cosmetic, but worth a cleanup pass on the log-writing script.
+**Side finding:** trading_log.md recent entries show mangled PnL strings (e.g. "-$0.63" where "-$0.63" should be) — a previous writer expanded `$0` as a shell variable. Cosmetic, but worth a cleanup pass on the log-writing script.
 
 ## [2026-10-21 10:29 UTC] Hourly Analysis
 
@@ -13421,3 +13421,23 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 
 **Open Questions:**
 - 7d bleed widened to -$2.92; loss clusters: atr_sl_hit 6T -$0.44, hard_max_loss 4T -$0.37, trail_arm_timeout 4T -$0.16 (standing SL-width escalation with CEO, Oct 16)
+
+## [2026-10-21 17:00 UTC] Daily Orchestrator Run
+
+**Trades:** 3 open (BTC/STX/NEO LONG) | 24h 34T 14W 41.2% −$0.59 | 7d 158T 37.3% −$2.76
+**Changes:** 3 (reporting/audit-trail only — 0 trading-behavior changes; vacation soak intact, protected flags untouched)
+
+**Implemented:**
+1. **$0 shell-expansion corruption FIXED** — 48 strings in recent_changes.log + 5 in trading_log.md healed (`-/usr/bin/bash.14` → `-$0.14`; unquoted `$0` in agent bash expanded to shell path). Root-cause guards: single-quote-$-amounts rule added to auto_1hr_prompt.md, brain_auditor_prompt.md, summarizer_prompt.md. Backups: /tmp/opencode/*.bak
+2. **size-reduce reporting drift FIXED (root cause)** — auto_1hr/summarizer reported stale "0.3x" while `data/vacation_size_reduce.json` has been 0.5x since Oct 20 14:57; prompts never read the file, agents parroted log history (brain_auditor #59 flagged as cosmetic). All 3 prompts now read the file and quote `size_multiplier` (file = truth).
+3. **auto_1hr blanket-kill instruction REPLACED with mandatory regime-based kill policy** — Step 4 said "0%WR 3+T → kill immediately via SIGNAL_ENABLED=False", directly contradicting the SIGNAL KILL POLICY. Now: regime query first → 0.0x block only losing regimes in volatility_gate_v2.py + FAMILY_MAP → blanket kill only if ALL regimes lose (n≥20) with CEO approval.
+
+**Verified (summarizer decisions-needed triage):**
+- HYPE mirror_close FAILED×2 orphans: **NONE** — HL open positions = BTC/STX/NEO LONG = exactly the 3 DB open trades (later SUCCESS closes worked).
+- HYPER SHORT failed-trade (13:49) state: **CLEAN** — no DB row, no HL position, signal aged out of feed; the 16:56 HYPER SHORT PENDING is a new signal (conf 87), not stale residue.
+
+**Not done (deliberate):**
+- Peak-sanity shadow + PUMP_CHAIN_CONF_FLOOR — pre-registered vacation-end Oct 23 (standing pre-regs, not shipped during soak)
+- pump-chain- kill recheck — pre-registered Oct 22, brain_auditor owns the Option A matrix
+- logrotate for logs/ (disk 84%, 19G free) — backlog; health monitor watches the 85% warn
+- blacklist-tester.timer disable — concluded experiment (0 KEEP/77); summarizer decision-needed → CEO call, not taken unilaterally

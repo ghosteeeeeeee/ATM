@@ -466,6 +466,14 @@ print('Changes logged.')
    - ❌ `WHERE status = "closed"` (double quotes = column identifier)
    - ✅ `WHERE status = 'closed'`
 
+## ⚠️ BASH QUOTING RULE ($ Amounts)
+
+When writing money amounts via bash `echo`/`printf`/heredoc into logs, SINGLE-QUOTE the string. Unquoted `$0` expands to the shell path and corrupts the audit trail (`-$0.14` becomes `-/usr/bin/bash.14` — 48+ historical instances, backfilled 2026-10-21):
+- ✅ `echo '- [time] 24h -$0.14 (WR 41%)'`
+- ❌ `echo - [time] 24h -$0.14 (WR 41%)`
+
+**Size-reduce reporting:** quote `size_multiplier` from `data/vacation_size_reduce.json` — the file is truth (kanban/text drifts).
+
 ## RULES
 
 1. **Captain the ship** — you don't just report, you STEER. Make changes, drive improvement.
