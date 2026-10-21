@@ -1,5 +1,10 @@
 # Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
 
+## Error Alerts — 2026-10-21 06:42 UTC (health_monitor)
+- **WARN** (1x): `hermes-upgrade-implementer.service` failed at 04:36 (systemd start timeout, killed by TERM after ~2h — audit itself completed and wrote "audit written" just before the kill). Non-critical 12h agent. **AUTO-FIX**: `systemctl reset-failed` so the next timer run isn't blocked. Consider raising `TimeoutStartSec` in the unit if it recurs.
+- **INFO**: Pipeline healthy — LIVE run 06:42:25 rc=0, position_manager rc=0, 0 Tracebacks in 30min. Timers 3/3 active (price-collector, 1m-candle, pipeline). 64 signals generated last hour. Portfolio: 2 open | 7 closed today | -0.32 USDT. Exit reasons 24h: atr_sl_hit 8 (-$0.59), trail_arm_timeout 4 (-$0.15), hard_sl 3 (-$0.22), profit-monster-trail 2 (+$0.27). 0 phantom trades. Regime 5m SHORT_BIAS (11L/46S/72N of 129). token_speeds 241 rows, 128 stale-flagged (avg percentile 48.5). Prices fresh (~0.5min, 87 tokens). Disk 83%. Vacation pause: not active.
+- **INFO**: Side findings unchanged — `hermes-atr-sl-updater.timer` ghost entry (unit file missing); pipeline logged `[hotset] fallback DB query returned 0 tokens` (hotset empty this cycle, same pattern as 2026-10-08 WARN); `signals_hermes_runtime.db` still unbounded.
+
 ## Error Alerts — 2026-10-15 22:24 UTC (health_monitor)
 - **WARN** (1x): `hermes-brain-auditor.service` failed with timeout at 21:50 (killed by systemd after exceeding start timeout). Non-critical hourly analysis agent; timer still active, will self-retry next hour. No action needed.
 - **INFO**: Pipeline healthy — LIVE run 22:23:23 rc=0, position_manager rc=0, 0 Tracebacks in 30min. Timers 3/3 active (price-collector, 1m-candle, pipeline). 26 signals generated last hour. Portfolio: 3 open | 14 closed today | +18.64% PnL. Exit reasons 24h: atr_sl_hit 5 (-$0.36), hard_max_loss 3 (-$0.29), atr_trail_hit 3 (+$1.19), trail_arm_timeout 2 (-$0.08), profit-monster-trail 1 (+$0.04), HL_CLOSED 1 (-$0.18). 0 phantom trades. Regime 5m LONG_BIAS (42L/12S/72N of 126). Speeds top: INIT 100, BLZ 100, CASHCAT 99.4. Disk improved to 80% (was 85%). Prices fresh (~2min). Vacation pause: not active.
@@ -1380,3 +1385,9 @@
 ## Error Alerts — 2026-10-21 02:45 UTC
 - **WARN** (1x): disk usage at 85% on / (17.6G free of 118G)
 - **AUTO-FIX**: none possible — no *.log older than 7d to gzip; largest recent files are active (pipeline.log 206M, signal-compactor.log 80M, 15m_regime.log 67M). Monitor only; if >90%, enable logrotate on /root/.hermes/logs.
+
+## Error Alerts — 2026-10-21 06:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3482s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3421s left, N failures)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3537s left, N failures)`

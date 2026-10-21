@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-21T05:43:50.591207+00:00",
+  "timestamp": "2026-10-21T07:13:51.200876+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -36,18 +36,18 @@
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
+    "continuum": "AT",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "linreg_alignment": 0.25,
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 1
+  "open_count": 2
 }
