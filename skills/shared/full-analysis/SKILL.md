@@ -11,11 +11,12 @@ The master analysis framework combining all sub-skills into one comprehensive ou
 
 This skill combines:
 - **Position check** — Current open/closed positions, exit reasons, PnL
+- **Structure engine** (computed) — `scripts/structure_analysis.py`: per-TF HH/HL/LH/LL sequences, swing levels, channel state, structure breaks
 - **mtf-analysis** — Multi-timeframe analysis (1m/5m/15m/1h/4h)
 - **technical-analysis** — RSI, MACD, EMAs, volume, patterns
 - **contrarian-analysis** — "What if I'm wrong?" checklist
 - **Continuum oscillator** — Macro regime
-- **Support/Resistance** — Key levels
+- **Support/Resistance** — Key levels (the structure engine's swing SH/SL are the authoritative ones)
 - **Bollinger Bands** — BB position (0=lower band, 1=upper band)
 - **EMA200** — Long-term dynamic support/resistance
 - **Volume ratio** — Per-timeframe volume confirmation
@@ -272,6 +273,52 @@ Total:      -30 points → 25% probability → STRONG AVOID
 - **Score > 50 = high conviction** — normal or increased size
 
 **This is a heuristic, not a guarantee.** Use it as one input among many.
+
+### Structure Analysis — HH/HL sequences, channels, breaks (COMPUTED — run every analysis)
+
+Indicators lag; structure doesn't. The CEO's manual 1h read on 2026-10-20
+("higher-highs and higher-lows since 16:00") was the correct trade context
+before any indicator confirmed it — and the structure engine now computes
+exactly that read for every timeframe, every analysis:
+
+```bash
+python3 /root/.hermes/scripts/structure_analysis.py COIN
+# default TFs: 1m 5m 15m 1h 4h — output: state, tags, swing levels, slope
+```
+
+**The four states per TF:**
+
+| State | Tags | Meaning | Trade implication |
+|-------|------|---------|-------------------|
+| **UPTREND** | HH HL | Higher highs + higher lows | Direction bias LONG; buy flushes into the HL ladder |
+| **DOWNTREND** | LH LL | Lower highs + lower lows | Direction bias SHORT; sell rallies into the LH ladder |
+| **COMPRESSION** | LH HL | Lower highs + higher lows (coil) | Triangle — expansion is coming; do NOT fade the eventual break; the coil IS the §11 liquidity pile |
+| **EXPANSION** | HH LL | Higher highs + lower lows (broadening) | Chaos/transition — no structure to trade; smallest size or stand down |
+
+**The rules:**
+
+1. **Swing levels are the real S/R** — the engine's SH/SL values (zigzag,
+   0.6×ATR threshold) are where SL/TP belong. Round numbers are decoration;
+   the 22:00 swing low at 82,944 is a level, 83,000 is not.
+2. **Structure break = CLOSE beyond the last opposite swing.** A wick
+   through is the §11 sweep (liquidity grab — often reverses); only the
+   close-through is a break. Never enter on a wick-break of structure.
+3. **Multi-TF structure reads as a sentence**: higher-TF state sets DIRECTION
+   bias, executing-TF state sets ENTRY. 1h UPTREND + 5m DOWNTREND =
+   "buy the pullback in the uptrend" — the disagreement is the entry, not a
+   contradiction. 1h COMPRESSION + any lower-TF trend = the lower-TF move is
+   probably the pre-break noise inside the coil — size down.
+4. **Executing-TF structure outranks indicators at that TF.** If 5m says
+   BEAR MACD but structure says UPTREND (HH HL), the MACD is the pullback
+   inside the ladder — structure wins for direction, indicators only time
+   the entry within it.
+5. **States flip with the trend** — recompute after every swing confirms;
+   a UPTREND whose last swing printed LL is now COMPRESSION or DOWNTREND.
+   Never quote yesterday's state.
+
+**Evidence of the engine matching the tape:** 2026-10-20 23:00 — engine
+reported 1h UPTREND [HH HL] SH=83,189 SL=82,394; those are precisely the
+22:00 high and 19:00 low the CEO read by eye. Same levels, no eyeballing.
 
 ### Trendlines
 
@@ -598,6 +645,15 @@ python3 /root/.hermes/scripts/ai_trader_precheck.py COIN DIRECTION
 📊 1. MULTI-TIMEFRAME
   [TF results — label forming-candle reads "(forming)"]
 
+🧱 1b. STRUCTURE (python3 scripts/structure_analysis.py COIN)
+  1m: [state HH/HL tags | SH/SL levels | slope]
+  5m: ...
+  15m: ...
+  1h: ...
+  4h: ...
+  [Multi-TF read as a sentence: direction bias (higher TF) + entry context
+   (executing TF) — flag any BROKEN tags]
+
 📈 2. CONTINUUM
   [continuum data]
 
@@ -626,3 +682,7 @@ confirmation lesson #16283, divergence taxonomy from the 1m/5m/1h reads).
 (#16291-#16307: both range sides swept, +2,105-pt impulse, -1,146-pt reverse
 zap took the 40x tranche at -21.4% margin). CEO thesis: BTC collects all
 liquidity — zap the longs, then the shorts — before the real move.
+Structure engine added 2026-10-20 (scripts/structure_analysis.py): zigzag
+0.6xATR swing detection, four states (UPTREND/DOWNTREND/COMPRESSION/
+EXPANSION), close-based break rule. Reproduces the CEO's manual 1h HH/HL
+read exactly (SH=83189 SL=82394 = the 22:00 high / 19:00 low).
