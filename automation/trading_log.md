@@ -13154,3 +13154,24 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL -$2.97 → -$2.96; size-reduce stays until PnL crosses -$2
 - 24h WR 19.2% (5W/26T) second-worst reading; hard_max_loss cluster (2T -$0.43) and trail_arm_timeout (4T -$0.16) still bleeding — watch next hour
+
+## [2026-10-21 05:27 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 25T 5W -$0.26 (20.0% WR) | 7d 159T 56W -$2.96 (35.2% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour — quiet window, neg-hour streak (01:00-03:00) broken by no-close hour
+- Kill check: 0T last hour, no signal with 3+ trades — no kill candidate
+- pump-chain+ 24h 0W/4T -$0.16 but 7d verified profitable — stays enabled (prior audit rejections)
+- atr_sl_hit 8/25 = 32.0% under 40% — tpsl deployed, no action
+- Size-reduce 0.3x stays (7d PnL -$2.96 still <-$2)
+- 1 open: BTC ai-trader-pending SHORT -0.13% (CEO pending, manual class)
+- Frequency 0T/hr — not overtraded
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL flat -$2.96; size-reduce stays until PnL crosses -$2
+- 24h WR 20.0% (5W/25T) still weak — monitor; hard_max_loss + trail_arm_timeout clusters ongoing
