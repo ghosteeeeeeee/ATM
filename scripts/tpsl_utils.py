@@ -505,6 +505,13 @@ def compute_atr_sl_tp(
             MIN_SL_PCT = ATR_SL_MIN   # 1.0% — initial SL, even for established trades
         elif atr is not None and atr > 0:
             MIN_SL_PCT = ATR_SL_MIN_ACCEL   # 0.30% — established trade floor in profit
+            # FIX 2026-10-21: widen SL floor in chop. T directive: "SL is too tight,
+            # we're getting stopped out in chop." At 0.30% floor, any noise dip hits
+            # the SL. In FLAT/NORMAL regime, widen to 0.60% to survive chop noise.
+            # BTC SL was -0.31%, SOL -0.23% — both below 0.30% floor, both stopped
+            # out by noise, both had favorable moves after.
+            if volatility_regime in ('FLAT', 'NORMAL'):
+                MIN_SL_PCT = max(MIN_SL_PCT, 0.006)  # 0.60% floor in chop
         MIN_TP_PCT = ATR_TP_MIN_ACCEL   # 1.0% — tighter for established trades
 
     # ── Clamp effective percentages ─────────────────────────────────────────────
