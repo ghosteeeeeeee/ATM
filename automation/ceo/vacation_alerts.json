@@ -1,57 +1,6 @@
 [
   {
     "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 34.0% < 35.0% AND pnl_7d $-3.66 < $-2.00 (194T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.96,
-      "n_24h": 17,
-      "wr_24h": 23.5,
-      "pnl_48h": -0.99,
-      "n_48h": 29,
-      "wr_48h": 34.5,
-      "pnl_7d": -3.66,
-      "n_7d": 194,
-      "wr_7d": 34.0,
-      "checked_at": "2026-10-20T06:27:01.077911+00:00"
-    },
-    "ts": "2026-10-20T06:27:01.079593+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 34.0% < 35.0% AND pnl_7d $-3.66 < $-2.00 (194T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -1.0,
-      "n_24h": 16,
-      "wr_24h": 18.8,
-      "pnl_48h": -0.99,
-      "n_48h": 29,
-      "wr_48h": 34.5,
-      "pnl_7d": -3.66,
-      "n_7d": 194,
-      "wr_7d": 34.0,
-      "checked_at": "2026-10-20T06:57:01.455156+00:00"
-    },
-    "ts": "2026-10-20T06:57:01.455958+00:00"
-  },
-  {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 34.6% < 35.0% AND pnl_7d $-3.53 < $-2.00 (191T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -1.0,
-      "n_24h": 16,
-      "wr_24h": 18.8,
-      "pnl_48h": -0.91,
-      "n_48h": 28,
-      "wr_48h": 35.7,
-      "pnl_7d": -3.53,
-      "n_7d": 191,
-      "wr_7d": 34.6,
-      "checked_at": "2026-10-20T07:27:01.643065+00:00"
-    },
-    "ts": "2026-10-20T07:27:01.643689+00:00"
-  },
-  {
-    "level": "WARNING",
     "message": "SIZE REDUCED (not paused): 7d WR 33.9% < 35.0% AND pnl_7d $-3.59 < $-2.00 (189T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
     "data": {
       "pnl_24h": -1.02,
@@ -848,5 +797,56 @@
       "checked_at": "2026-10-21T06:57:11.020916+00:00"
     },
     "ts": "2026-10-21T06:57:11.021573+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "Early escalation: 48h WR 20.0% < 40.0% with 40 trades",
+    "data": {
+      "pnl_24h": -0.24,
+      "n_24h": 24,
+      "wr_24h": 20.8,
+      "pnl_48h": -1.24,
+      "n_48h": 40,
+      "wr_48h": 20.0,
+      "pnl_7d": -2.64,
+      "n_7d": 153,
+      "wr_7d": 36.6,
+      "checked_at": "2026-10-21T07:27:11.239352+00:00"
+    },
+    "ts": "2026-10-21T07:27:11.240422+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "Early escalation: 48h WR 17.9% < 40.0% with 39 trades",
+    "data": {
+      "pnl_24h": -0.29,
+      "n_24h": 25,
+      "wr_24h": 20.0,
+      "pnl_48h": -1.31,
+      "n_48h": 39,
+      "wr_48h": 17.9,
+      "pnl_7d": -2.72,
+      "n_7d": 153,
+      "wr_7d": 35.9,
+      "checked_at": "2026-10-21T07:57:11.761865+00:00"
+    },
+    "ts": "2026-10-21T07:57:11.762511+00:00"
+  },
+  {
+    "level": "WARNING",
+    "message": "Early escalation: 48h WR 21.1% < 40.0% with 38 trades",
+    "data": {
+      "pnl_24h": -0.18,
+      "n_24h": 25,
+      "wr_24h": 24.0,
+      "pnl_48h": -1.09,
+      "n_48h": 38,
+      "wr_48h": 21.1,
+      "pnl_7d": -2.7,
+      "n_7d": 152,
+      "wr_7d": 36.2,
+      "checked_at": "2026-10-21T08:27:12.240882+00:00"
+    },
+    "ts": "2026-10-21T08:27:12.241268+00:00"
   }
 ]

@@ -6152,5 +6152,16 @@
     "risk": "medium",
     "sample_size": 23,
     "would_block_winners": "0 (0% WR in band)"
+  },
+  {
+    "date": "2026-10-21T08:50:13Z",
+    "idea": "pump-chain- v6-confirmation SHADOW — log bare SHORT fires without v6 co-signal",
+    "rationale": "Dual-emitter finding: bare path -$0.75/14d (39T), combo +$0.26/14d (11T). Confirmation IS the edge.",
+    "expected_impact": "Quantifies bare-fire cohort for v6-requirement gate. Zero live behavior.",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": "#51"
   }
 ]

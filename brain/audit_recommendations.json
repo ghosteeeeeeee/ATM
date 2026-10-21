@@ -1,125 +1,100 @@
 {
-  "timestamp": "2026-10-21T07:40:30Z",
-  "run": "brain_auditor #50",
+  "timestamp": "2026-10-21T08:50:13Z",
+  "run": "brain_auditor #51",
   "session_brain_stats": {
-    "queries": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy shadow"
-    ],
+    "queries_run": 6,
     "top_insights": [
-      "pump-chain-short: dig deeper, add filters, backtest original trades",
-      "trend following signal requested by CEO",
-      "winrate fluctuates up to 65% — keep it high"
+      "Dual emitter for bare pump-chain- CONFIRMED: pump_flow_signal.py + pump_chain_v5_short.py both emit SOURCE='pump-chain-'. Pre-registered V5_SHORT kill would NOT stop the bleed.",
+      "Combo path (v5+v6 confirm) 14d +$0.26 vs bare -$0.75 — confirmation layer IS the edge.",
+      "No new session insights — all findings already in code or pre-registrations."
     ]
   },
   "trade_summary_24h": {
-    "trades": 25,
-    "wins": 5,
-    "wr": 20.0,
-    "pnl": -0.28,
-    "note": "shallow bleed, containing (max single loss $0.17, size-reduce 0.5x working)"
-  },
-  "trade_summary_7d": {
-    "trades": 154,
-    "wins": 56,
-    "wr": 36.4,
-    "pnl": -2.68,
-    "note": "both resume legs failing (need WR>=37 AND PnL>=0) — size-reduce 0.5x stays"
-  },
-  "wealth_gap_7d": {
-    "TRAIL/WIN": {
-      "n": 55,
-      "pnl": 5.14,
-      "wr": 92.7
-    },
-    "CHOP/LOSS": {
-      "n": 91,
-      "pnl": -7.52,
-      "wr": 3.3
-    },
-    "insight": "Every dollar of profit comes from trail-armed trades. Chop entries are the loss."
+    "total": "25T 5W -$0.18 (20.0% WR)",
+    "long": "16T 5W +$0.23 (31.3%)",
+    "short": "9T 1W -$0.41 (11.1%) — THE BLEED, every loser closed above entry",
+    "regime": "LONG_BIAS 15m+4h, continuum ABOVE 88min, zscore +1.29, STRONG_UP, MARKUP, CALM, LOW vol",
+    "exit_family_7d": "CHOP 85T 3.5% -$6.82 vs TRAIL 43T 90.7% +$4.12 — wealth gap unchanged",
+    "open": "2 LONG: DOGE #16323 continuation+ meta_rsi 28.6 (trail-arm deadline ~10:15 UTC), BTC #16322 continuum-trend+ rsi 50 (clean hold)"
   },
   "drift_findings": [
     {
-      "finding": "pump-chain- bare-path kill trigger STILL MET (14d 41T 19.5% -$0.88)",
-      "status": "scheduled Oct 22 recheck — NOT flipped this run (vacation soak + already deferred)",
-      "evidence": "bare 48T -$1.30 vs combo 12T +$0.25 — v6-confirmation IS the edge"
+      "finding": "PUMP-CHAIN- DUAL EMITTER — pre-registered Oct 22 kill plan is WRONG",
+      "detail": "pump_flow_signal.py:51 SOURCE_SHORT='pump-chain-' gated by PUMP_FLOW_MINUS_ENABLED. pump_chain_v5_short.py:43 SOURCE='pump-chain-' gated by PUMP_CHAIN_V5_SHORT_ENABLED. signal_schema.py:2012 blocks only if BOTH False. Killing V5_SHORT alone leaves pump_flow emitting the bare bleed.",
+      "impact": "If executed as-is: lose combo +$0.26, keep pump_flow bleed alive. Net worse.",
+      "status": "CRITICAL — kill plan must be corrected before Oct 22 recheck"
     },
     {
-      "finding": "pump-chain+ kill rejected 9th (14d 55T 32.7% +$0.99)",
-      "status": "verified — EXTREME habitat +$1.68 carries it",
-      "evidence": "by regime: EXTREME 41T +$1.68, HIGH 11T -$0.59, NORMAL 3T -$0.10"
-    },
-    {
-      "finding": "BTC SHORT #16320 closed at atr_sl_hit -$0.10 — counter-trend in LONG_BIAS regime",
-      "status": "watchdog steer VERIFIED — wrong side confirmed",
-      "evidence": "both BTC timeframes LONG_BIAS, STRONG_UP, trade opened 03:13 during SHORT_BIAS window but regime flipped against it"
+      "finding": "pump-chain+ HIGH block shipped 03:37 today — verified catches CFX/BLUR",
+      "detail": "CFX (HIGH rsi 57.14) and BLUR (HIGH rsi 53.33) were HIGH-regime trail_arm_timeout losses. HIGH block now catches them. APT/AIXBT were EXTREME — correctly not blocked (14d EXTREME +$1.91 carries the signal).",
+      "status": "HOLDING — first clean validation cycle pending"
     }
   ],
   "recurring_problems": [
-    "CHOP/LOSS family: 91T 3.3% -$7.52 7d — structural, unchanged 10+ runs",
-    "ARM-GAP (MFE>=0.40 trail=FALSE): 67T 28.4% -$0.02 14d — instrumentation live, 0 fires yet",
-    "pump-chain- bare bleed: 14d 41T 19.5% — kill trigger met, deferred Oct 22"
+    {
+      "problem": "Counter-trend SHORTs into LONG_BIAS tape",
+      "evidence": "24h SHORT 9T 1W -$0.41, all 5 losers closed ABOVE entry. Tape 101 LONG_BIAS / 3 SHORT_BIAS. Stream emits 8/10 PENDING SHORTs into this tape; gates catch most, one slips per cycle.",
+      "existing_defenses": "SHORT_RSI_HARD_FLOOR=45, SHORT_MIDBAND_BLOCK 45-55, PUMP_CHAIN_SHORT_HIGH_BLOCK, SHORT_NEUTRAL_BLOCK, BTC timing guards",
+      "gap": "No tape-alignment block (BTC>EMA300>60min + tape>80% long → SHORT dampen). SHORT_NEUTRAL_BLOCK only covers NEUTRAL regime, not LONG_BIAS.",
+      "recommendation": "Monitor 48h. If SHORT bleed continues past vacation-end, propose tape-alignment SHORT confidence dampen (0.5x) as shadow."
+    },
+    {
+      "problem": "pump-chain- bare path 14d 39T -$0.75 (20.5% WR), kill trigger met",
+      "evidence": "Bare 39T -$0.75 vs combo 11T +$0.26. Confirmation layer (v6) is the edge. Bare signal has none.",
+      "recommendation": "Do NOT flip V5_SHORT alone Oct 22. Correct kill target: require v6 confirmation for pump-chain- SHORT execution, OR CEO decision on PUMP_FLOW_MINUS_ENABLED."
+    }
   ],
   "missing_implementations": [
-    "near-miss timeout (MFE 0.30-0.40 stuck cohort): 23T 0%WR -$2.25 14d — needs candle OOS",
-    "TAT extension to pump-chain family: near-miss data supports, needs OOS validation"
+    {
+      "item": "v6-confirmation gate for pump-chain- SHORT",
+      "detail": "Combo +$0.26 vs bare -$0.75 proves confirmation is the edge. Code change (confluence requirement), not constant flip. Pre-register shadow: log bare SHORT fires without v6 co-signal.",
+      "status": "CREATIVE — pre-registered this run"
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-21T07:40:30Z",
-      "idea": "Near-miss timeout: cut trades stuck at MFE 0.30-0.40% without trail arm",
-      "rationale": "14d: 23T reached MFE 0.30-0.40% but trail never armed — 0% WR, -$2.25. Exits: atr_sl_hit 14T -$1.38, hard_max_loss 6T -$0.52. These trades had momentum but no follow-through. Existing trail_arm_timeout (0.40%) misses them. A tighter timeout at 0.30% MFE could cut before SL collects.",
-      "expected_impact": "Save ~$1.00-1.50/14d if 50% of near-miss losses cut at breakeven",
-      "category": "exit mechanism",
-      "status": "pre-registered — needs candle OOS via escalation #16 vehicle",
-      "risk": "medium — could cut winners that eventually arm (need OOS to verify)",
-      "sample_size": 23,
-      "would_block_winners": "0 (0% WR in band — none won)"
+      "date": "2026-10-21T08:50:13Z",
+      "idea": "pump-chain- v6-confirmation SHADOW — log when pump-chain- SHORT fires without concurrent pump-chain-v6- co-signal",
+      "rationale": "Dual-emitter finding: bare path -$0.75/14d, combo +$0.26/14d. Confirmation IS the edge. Shadow quantifies counterfactual before any code change.",
+      "expected_impact": "Identifies exact bare-fire cohort for v6-requirement gate. Zero live behavior.",
+      "category": "entry sniper",
+      "status": "pre-registered",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "pump-chain SHORT RSI floor carve-out REVERTED (40→45)",
-      "shipped": "2026-10-21T02:46",
-      "verified": "0 violations since revert — floor holding",
-      "status": "PASS"
+      "change": "Pump-chain SHORT RSI floor 40→45 (02:46 today)",
+      "verify": "HOLDING — 0 shorts with RSI<45 since revert. COMP 54.24, CRV 59.49 both passed floors correctly.",
+      "verdict": "working as intended"
     },
     {
-      "change": "ARM-GAP close-time instrumentation + peak-trail estimate",
-      "shipped": "2026-10-20T16:46 / 22:45",
-      "verified": "code live, 0 ARM-GAP log lines (correct — no qualifying closes since restart)",
-      "status": "PASS (awaiting first validation fire)"
+      "change": "ARM-GAP instrumentation (16:46 Oct 20)",
+      "verify": "Code LIVE in position_manager.py:1313. CRV #16318 MFE 0.585% trail=FALSE should have logged. Zero-behavior, collecting.",
+      "verdict": "live, awaiting first log line confirmation"
     },
     {
-      "change": "TAT shadow signal-scope FIX (ai-trader → ai-trader+)",
-      "shipped": "2026-10-20T15:40",
-      "verified": "code in place, no behavior change expected",
-      "status": "PASS"
+      "change": "TAT shadow signal-scope fix (15:40 Oct 20)",
+      "verify": "HOLDING — ai-trader+ match tightened, excludes ai-trader-manual/pending.",
+      "verdict": "working"
     },
     {
-      "change": "ai_trader_signal.py dual-path state load bugfix",
-      "shipped": "2026-10-20T06:41",
-      "verified": "zero live behavior (AI_TRADER_ENABLED=False)",
-      "status": "PASS"
+      "change": "Size-reduce 0.5x (vacation)",
+      "verify": "HELD — 7d WR 36.4% < 37 AND PnL -$2.53 < 0, both resume legs still failing.",
+      "verdict": "active, correct posture"
+    },
+    {
+      "change": "Protected flags 13/13",
+      "verify": "INTACT — LIVE_TRADING=True, AI_TRADER=False, V5=False, V5_SHORT=True, FLOW_MINUS=True, DOJI=False.",
+      "verdict": "clean"
     }
   ],
-  "open_trade_monitor": {
-    "DOGE_LONG_16321": {
-      "signal": "bb-bounce-v2-long+",
-      "meta_rsi": 50.0,
-      "band": "45-55 (worst LONG band: 14d 33T 8W -1.92)",
-      "pnl": "+0.31%",
-      "action": "WATCHDOG RECOMMENDS: exit flat if no trail arm (+0.40%) by ~08:30 UTC",
-      "status": "monitoring — trail needs +0.09% more to arm"
-    }
-  },
   "next_actions": [
-    "Oct 22: pump-chain- bare-path kill recheck (PUMP_CHAIN_V5_SHORT_ENABLED→False if 14d still <0)",
-    "Oct 23: vacation-end — 12+ pre-registered changes queued for evaluation",
-    "Monitor DOGE #16321: trail arm by 08:30 UTC or exit flat",
-    "ARM-GAP: first validation fire at next qualifying close (instrumentation live since 05:50)",
-    "Escalation #16 (23rd): signal-scoped candle OOS vehicle — blocks near-miss timeout, dual-condition TAT, dampen confirmation, ARM-GAP trail-start fix"
+    "Oct 22: CORRECT the pump-chain- kill plan — do NOT flip V5_SHORT alone (dual emitter). Propose v6-requirement gate or CEO decision on PUMP_FLOW_MINUS.",
+    "Monitor DOGE #16323 trail-arm deadline (~10:15 UTC). meta_rsi 28.6 worst band, must prove bounce fast.",
+    "Vacation-end Oct 23: evaluate near-miss timeout OOS, pump-chain+ dampen, pp-cond shadow, coin_regime n=20.",
+    "Watch SHORT bleed — if persists past vacation-end, propose tape-alignment SHORT dampen shadow.",
+    "Confirm ARM-GAP first log line fires (CRV-class MFE>=0.40 trail=FALSE close)."
   ]
 }

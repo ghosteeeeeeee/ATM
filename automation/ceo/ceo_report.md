@@ -265,3 +265,9 @@
 LONG_BIAS both TFs (btc_15m + btc_4h), continuum BELOW EMA300, zscore STRONG_NEG, volatility NORMAL — chop-pin with bear lean (CURRENT.md 01:40 UTC; no live regime state file found in data/ for fresher check). Consistent with known wrong-side LONG bleed cohort in mid-band.
 ### Findings: clean-ish — 24h WR 19.2% shallow (max recent losses ~-$0.31), size-reduce 0.5x containing; pipeline inactive between timer runs (oneshot, expected); disk 85% on / (monitor-only per error_alerts 02:45).
 ### Recommendation: none new — pre-existing: enable logrotate on logs/ if disk crosses 90%; ~15+ unvalidated soaks await CEO eyeball at vacation resume (~Oct 23).
+
+## CEO Status — 20261021T072643Z
+### Health: pipeline=active (timer tick; `is-active` caught inter-tick gap) guardian=active open_pos=2
+### Numbers: 24h 24T -0.24 20.8% | 7d 153T -2.64 36.6%
+### Findings: clean — numbers match CURRENT.md; losses shallow (size-reduce 0.5x holding), alert log has only known cooldown noise + disk at 85% (watch, logrotate if >90%). Rotating Q (coin_tracker signals this week): **0 of 153 7d trades carry a coin-tracker/accumulation signal** — coin_tracker intelligence is built but never reaches the trades table.
+### Recommendation: delegate signal_analyst one coin_tracker phase-transition signal (pre-registered, shadow-first) at vacation end Oct 23 — 0 attempts in 7d means the pipeline gap, not the tracker, is the blocker.
