@@ -1,78 +1,125 @@
 {
-  "timestamp": "2026-10-21T06:41:34.572246+00:00",
-  "run": "brain_auditor #49",
+  "timestamp": "2026-10-21T07:40:30Z",
+  "run": "brain_auditor #50",
+  "session_brain_stats": {
+    "queries": [
+      "signal performance winrate regime",
+      "new signal idea improvement strategy shadow"
+    ],
+    "top_insights": [
+      "pump-chain-short: dig deeper, add filters, backtest original trades",
+      "trend following signal requested by CEO",
+      "winrate fluctuates up to 65% — keep it high"
+    ]
+  },
   "trade_summary_24h": {
-    "trades": 24,
+    "trades": 25,
     "wins": 5,
-    "wr": 20.8,
-    "pnl": -0.24,
-    "verdict": "SHALLOW-BLEED-CONTAINED (size-reduce 0.5x working; max loss $0.17)"
+    "wr": 20.0,
+    "pnl": -0.28,
+    "note": "shallow bleed, containing (max single loss $0.17, size-reduce 0.5x working)"
   },
   "trade_summary_7d": {
     "trades": 154,
-    "wr": 35.2,
-    "pnl": -2.96
+    "wins": 56,
+    "wr": 36.4,
+    "pnl": -2.68,
+    "note": "both resume legs failing (need WR>=37 AND PnL>=0) — size-reduce 0.5x stays"
   },
-  "open_trades": [
+  "wealth_gap_7d": {
+    "TRAIL/WIN": {
+      "n": 55,
+      "pnl": 5.14,
+      "wr": 92.7
+    },
+    "CHOP/LOSS": {
+      "n": 91,
+      "pnl": -7.52,
+      "wr": 3.3
+    },
+    "insight": "Every dollar of profit comes from trail-armed trades. Chop entries are the loss."
+  },
+  "drift_findings": [
     {
-      "id": 16320,
-      "coin": "BTC",
-      "direction": "SHORT",
-      "signal": "ai-trader-pending",
-      "entry": 82717,
-      "cur": 82639.5,
-      "pnl_pct": 0.09,
-      "hours_open": 3.0,
-      "sl": 82965.151,
-      "tp": 81600.0,
-      "action": "HOLD — aligned SHORT_BIAS 15m + STRONG_DOWN trend; precheck FAIL already reported (vol floor, RR grade D); SL caps risk 0.29%"
+      "finding": "pump-chain- bare-path kill trigger STILL MET (14d 41T 19.5% -$0.88)",
+      "status": "scheduled Oct 22 recheck — NOT flipped this run (vacation soak + already deferred)",
+      "evidence": "bare 48T -$1.30 vs combo 12T +$0.25 — v6-confirmation IS the edge"
+    },
+    {
+      "finding": "pump-chain+ kill rejected 9th (14d 55T 32.7% +$0.99)",
+      "status": "verified — EXTREME habitat +$1.68 carries it",
+      "evidence": "by regime: EXTREME 41T +$1.68, HIGH 11T -$0.59, NORMAL 3T -$0.10"
+    },
+    {
+      "finding": "BTC SHORT #16320 closed at atr_sl_hit -$0.10 — counter-trend in LONG_BIAS regime",
+      "status": "watchdog steer VERIFIED — wrong side confirmed",
+      "evidence": "both BTC timeframes LONG_BIAS, STRONG_UP, trade opened 03:13 during SHORT_BIAS window but regime flipped against it"
     }
   ],
-  "watchdog_triage": {
-    "steer-001": "SHALLOW-BLEED-CONTAINED — 15/20 lost but net −$0.33, size-reduce 0.5x active. No emergency action. Root = chop family (13/18 losers never-armed or SL-stopped).",
-    "steer-002": "VERIFIED-STRUCTURAL — wrong-side = chop family (ARM-GAP 45T −$3.19 + near-miss 23T −$2.25 + trail_arm_timeout 16T −$0.50 7d). Same cohorts as 48 runs.",
-    "steer-003": "VERIFIED — bare pump-chain- 14d 41T 19.5% −$0.88. Kill trigger STILL MET. Deferred to Oct 22 recheck (pre-registered). Combo path (v6-) survives: 11T +$0.26.",
-    "steer-004": "REJECTED 8th — pump-chain+ 14d 55T +$0.99. 7d +$0.17. 3-loss streak is noise (n=3). Kill rules not met."
-  },
-  "losing_autopsy_24h": {
-    "total_losers": 18,
-    "patterns": "ZERO new patterns. All known cohorts:",
-    "clusters": [
-      "pump-chain- combo SHORT EXTREME ×6 (COMP×2, FOGO, ALT, IO, ADA) — known EXTREME short bleed, floor revert holding (0 RSI<45 opens since 02:46)",
-      "pump-chain+ LONG trail_arm_timeout ×3 (CFX, BLUR, APT) — avg MFE 0.12-0.28, pure chop entries, timeout correctly contained",
-      "BTC ai-trader ×3 tiny (−$0.14 total) — manual/pending noise",
-      "ARM-GAP cohort ×7 (CRV MFE 0.59, COMP MFE 1.18, BTC MFE 1.04) — momentum reached, trail never armed, all reversed"
-    ],
-    "winners_vs_losers": "4/5 winners trail-armed or hard_tp (ZRO r2v2-long5 +16.4%, HYPE bb-squeeze +11.9%). Exit mechanics sound; entry direction during chop is the cancer."
-  },
-  "arm_gap_deep_dive": {
-    "finding": "ARM-GAP (MFE≥0.40, pnl<0, trailing=FALSE) = 45T −$3.19 14d — LARGEST bleeding vein, 3.6× bare pump-chain- bleed",
-    "by_exit": "atr_sl_hit 31T −$2.09 avg MFE 0.826 | hard_sl 7T −$0.29 | hard_max_loss 4T −$0.48",
-    "by_signal": "pump-chain- 15T −$0.87 | pump-chain+ 5T −$0.45 | volume-breakout-long+ 4T −$0.35 (pre-kill trades) | combo paths 8T −$0.42",
-    "hypothesis": "spike-between-poll: MFE≥0.40 reached intra-minute, trail arm check at poll time misses it, price reverses before next poll",
-    "status": "Instrumentation live since 05:50 (ARM-GAP log line + peak-trail D=0.3% estimate). 0 log lines yet = no qualifying closes since restart (expected). First validation at next qualifying close.",
-    "escalation": "exit-ladder candle OOS still NOT commissioned (16th request) — the ONLY path to validate trail-start tightening"
-  },
-  "last_run_verify": {
-    "floor_revert": "HOLDING — 0 pump-chain SHORT opens since 02:46; CAKE blocked at RSI 32 (log line 06:36)",
-    "arm_gap_code": "LIVE since 05:50 restart — 0 log lines (correct: no qualifying closes since restart)",
-    "near_miss_band": "DATA-CONFIRMED — 14d 23T −$2.25 0%WR (MFE 0.30-0.39, pnl<0, no trail)",
-    "size_reduce": "0.5x HELD — auto-clear conditions still failing (7d WR 35.2%<37, PnL −$2.96<−$2)",
-    "protected_flags": "13/13 INTACT"
-  },
-  "rejections": [
+  "recurring_problems": [
+    "CHOP/LOSS family: 91T 3.3% -$7.52 7d — structural, unchanged 10+ runs",
+    "ARM-GAP (MFE>=0.40 trail=FALSE): 67T 28.4% -$0.02 14d — instrumentation live, 0 fires yet",
+    "pump-chain- bare bleed: 14d 41T 19.5% — kill trigger met, deferred Oct 22"
+  ],
+  "missing_implementations": [
+    "near-miss timeout (MFE 0.30-0.40 stuck cohort): 23T 0%WR -$2.25 14d — needs candle OOS",
+    "TAT extension to pump-chain family: near-miss data supports, needs OOS validation"
+  ],
+  "creative_improvements": [
     {
-      "idea": "bare-path pump-chain- 0.7x conf-demote shadow (pre-registered #48)",
-      "verdict": "REJECTED-WITH-DATA — fails own flip criteria on backtest",
-      "data": "would-block 35T (conf<71.4) save $0.81 (<$1 bar), kills 7 winners $0.97, net −$0.16. fk=20% (>10% bar). 30d: would-block 38T −$0.48, would-keep 78T −$0.67 (whole signal bleeds).",
-      "action": "Do NOT ship shadow. Kill remains correct answer — Oct 22 recheck."
+      "date": "2026-10-21T07:40:30Z",
+      "idea": "Near-miss timeout: cut trades stuck at MFE 0.30-0.40% without trail arm",
+      "rationale": "14d: 23T reached MFE 0.30-0.40% but trail never armed — 0% WR, -$2.25. Exits: atr_sl_hit 14T -$1.38, hard_max_loss 6T -$0.52. These trades had momentum but no follow-through. Existing trail_arm_timeout (0.40%) misses them. A tighter timeout at 0.30% MFE could cut before SL collects.",
+      "expected_impact": "Save ~$1.00-1.50/14d if 50% of near-miss losses cut at breakeven",
+      "category": "exit mechanism",
+      "status": "pre-registered — needs candle OOS via escalation #16 vehicle",
+      "risk": "medium — could cut winners that eventually arm (need OOS to verify)",
+      "sample_size": 23,
+      "would_block_winners": "0 (0% WR in band — none won)"
     }
   ],
   "config_changes_applied": [],
+  "changes_from_last_run": [
+    {
+      "change": "pump-chain SHORT RSI floor carve-out REVERTED (40→45)",
+      "shipped": "2026-10-21T02:46",
+      "verified": "0 violations since revert — floor holding",
+      "status": "PASS"
+    },
+    {
+      "change": "ARM-GAP close-time instrumentation + peak-trail estimate",
+      "shipped": "2026-10-20T16:46 / 22:45",
+      "verified": "code live, 0 ARM-GAP log lines (correct — no qualifying closes since restart)",
+      "status": "PASS (awaiting first validation fire)"
+    },
+    {
+      "change": "TAT shadow signal-scope FIX (ai-trader → ai-trader+)",
+      "shipped": "2026-10-20T15:40",
+      "verified": "code in place, no behavior change expected",
+      "status": "PASS"
+    },
+    {
+      "change": "ai_trader_signal.py dual-path state load bugfix",
+      "shipped": "2026-10-20T06:41",
+      "verified": "zero live behavior (AI_TRADER_ENABLED=False)",
+      "status": "PASS"
+    }
+  ],
+  "open_trade_monitor": {
+    "DOGE_LONG_16321": {
+      "signal": "bb-bounce-v2-long+",
+      "meta_rsi": 50.0,
+      "band": "45-55 (worst LONG band: 14d 33T 8W -1.92)",
+      "pnl": "+0.31%",
+      "action": "WATCHDOG RECOMMENDS: exit flat if no trail arm (+0.40%) by ~08:30 UTC",
+      "status": "monitoring — trail needs +0.09% more to arm"
+    }
+  },
   "next_actions": [
-    "Oct 22: bare pump-chain- kill recheck (PUMP_CHAIN_V5_SHORT_ENABLED→False if 14d still <0) — pre-registered",
-    "Oct 23: vacation-end stack (~16 unvalidated soaks) — CEO eyeball",
-    "ARM-GAP peak-trail validation at n≥10 log lines — compare estimate vs actual, then escalate trail-start fix",
-    "Escalation #16: exit-ladder signal-scoped candle OOS — still the only path to fix ARM-GAP root cause"
+    "Oct 22: pump-chain- bare-path kill recheck (PUMP_CHAIN_V5_SHORT_ENABLED→False if 14d still <0)",
+    "Oct 23: vacation-end — 12+ pre-registered changes queued for evaluation",
+    "Monitor DOGE #16321: trail arm by 08:30 UTC or exit flat",
+    "ARM-GAP: first validation fire at next qualifying close (instrumentation live since 05:50)",
+    "Escalation #16 (23rd): signal-scoped candle OOS vehicle — blocks near-miss timeout, dual-condition TAT, dampen confirmation, ARM-GAP trail-start fix"
   ]
 }

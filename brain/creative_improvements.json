@@ -6141,5 +6141,16 @@
     "category": "verification",
     "status": "rejected-with-data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-21T07:42:37Z",
+    "idea": "Near-miss timeout: cut trades stuck at MFE 0.30-0.40% without trail arm",
+    "rationale": "14d: 23T reached MFE 0.30-0.40% but trail never armed — 0% WR, -$2.25. Exits: atr_sl_hit 14T -$1.38, hard_max_loss 6T -$0.52. Existing trail_arm_timeout (0.40%) misses them. Tighter timeout at 0.30% MFE could cut before SL collects.",
+    "expected_impact": "Save ~$1.00-1.50/14d if 50% of near-miss losses cut at breakeven",
+    "category": "exit mechanism",
+    "status": "pre-registered — needs candle OOS via escalation #16 vehicle",
+    "risk": "medium",
+    "sample_size": 23,
+    "would_block_winners": "0 (0% WR in band)"
   }
 ]
