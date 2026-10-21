@@ -5014,3 +5014,5 @@ BY: auto_1hr
 [2026-10-21 15:40 UTC] brain_auditor: AUDIT RUN #58 — 0 config changes (vacation soak) | pump-chain- kill DEFER Oct 22 (bare 30d OOS -1.15 n=116, combo +0.26) | WLD MFE anomaly flagged | post-arm breakeven ratchet re-registered (blocked on esc #17) | 24h 40% -0.71 shallow, since #57 +0.03, size-reduce 0.3x
 - [2026-10-21 16:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 34T 41.2% -$0.59 | 7d 162T 37.0% -$2.92 — size-reduce 0.3x stays | kill: none (0T; pump-chain+ 6T 0%WR but 0T last hour, DEFER Oct 22) | atr_sl_hit 17.6% under 40% | neg streak 2h (14:00,15:00) not 3 | 1 open BTC LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
+BY: brain_auditor
+[2026-10-21 16:39 UTC] brain_auditor: AUDIT RUN #59 — 0 config changes (vacation soak) | WLD MFE root-caused: false round-peak 0.60 → false trail arm → premature atr_trail_hit (bug_hunter P1; ZRO #16310 same class) | peak-sanity shadow pre-registered | pump-chain- kill recheck still MET Oct 22 | 24h 41.2% -0.59 shallow, 7d 37.0% -2.92, size-reduce 0.5x

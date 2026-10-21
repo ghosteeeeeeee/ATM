@@ -6262,5 +6262,14 @@
     "risk": "medium",
     "agent": "brain_auditor",
     "run": 58
+  },
+  {
+    "date": "2026-10-21T16:38:26Z",
+    "idea": "Peak-price sanity gate (shadow): when cur_price jumps >3x ATR from last persisted current_price in one PM cycle, skip highest_price update + log counterfactual",
+    "rationale": "WLD #16341 and ZRO #16310 show exact round-number highest_price (0.60, 2.00) with zero supporting ticks — false trail arms and poisoned MFE. Gate is zero-behavior in shadow.",
+    "expected_impact": "Prevents false atr_trail_hit exits; cleans ARM-GAP dataset",
+    "category": "exit integrity",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

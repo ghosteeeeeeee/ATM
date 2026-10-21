@@ -4083,31 +4083,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # only ADDS a stricter tier on top. Revert: MAXXED_BLOCK_ENABLED=False.
             from hermes_constants import MAXXED_BLOCK_ENABLED, MAXXED_REGIME_LOG, MAXXED_ATR_PCT_THRESH
             if MAXXED_BLOCK_ENABLED or MAXXED_REGIME_LOG:
-                _conn_mx = None
                 try:
-                    from volatility_gate_v2 import is_maxxed
-                    _conn_mx = sqlite3.connect(CANDLES_DB, timeout=5)
-                    _cur_mx = _conn_mx.cursor()
-                    _cur_mx.execute("""
-                        SELECT open, high, low, close FROM candles_1h
-                        WHERE token = ? AND is_closed = 1
-                        ORDER BY ts DESC LIMIT 20
-                    """, (tkn.upper(),))
-                    _mx_rows = _cur_mx.fetchall()
-                    _mx_atr = None
-                    if len(_mx_rows) >= 15:
-                        _mx_candles = list(reversed(_mx_rows))
-                        _mx_trs = []
-                        for _mx_i in range(1, len(_mx_candles)):
-                            _h, _l, _pc = _mx_candles[_mx_i][1], _mx_candles[_mx_i][2], _mx_candles[_mx_i-1][3]
-                            _mx_trs.append(max(_h - _l, abs(_h - _pc), abs(_l - _pc)))
-                        if len(_mx_trs) >= 14:
-                            _mx_atr = sum(_mx_trs[-14:]) / 14
-                            _mx_close = _mx_candles[-1][3]
-                            if _mx_close > 0:
-                                _mx_atr = (_mx_atr / _mx_close) * 100
-                            else:
-                                _mx_atr = None
+                    from volatility_gate_v2 import is_maxxed, get_atr_pct as _v2_get_atr_pct
+                    _mx_atr = _v2_get_atr_pct(tkn)  # shared helper — was inlined duplicate (drift risk)
                     if is_maxxed(_mx_atr):
                         if MAXXED_REGIME_LOG:
                             log(f"  🔥 [MAXXED] {tkn} {direction}: ATR%={_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (maxxed-out tier)")
@@ -4116,12 +4094,6 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             continue
                 except Exception:
                     pass  # non-fatal — fail-open on MAXXED check
-                finally:
-                    if _conn_mx:
-                        try:
-                            _conn_mx.close()
-                        except Exception:
-                            pass
             if direction == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
                 _conn_rsh = None
                 try:

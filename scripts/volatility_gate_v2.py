@@ -71,11 +71,11 @@ REGIME_SIGNALS = {
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
         'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-12 CEO sync from v1: FLAT only; 90d FLAT 5T 100%WR +$0.49. NOTE: HIGH/EXTREME were already admitted 2026-10-09 (commit 6c042a7f), NOT by this change — and 90d EXTREME is -$0.14/16T (watch).
         'doji-bottom-long', 'doji-top-short',  # doji mean-reversion — added 2026-10-12 CEO sync from v1: FLAT mean-reversion habitat; 0 trades 90d (never admitted, no negative evidence). NOTE: the 100 real doji vol-gate blocks were NORMAL/HIGH, not FLAT.
-        'tl-bounce+',  # TL bounce — added 2026-10-12 CEO sync from v1: FLAT only (v1 also curates NORMAL, but NOT added here — NORMAL tl-bounce+ blocks remain); 0 trades 90d (never admitted).
+        'tl-bounce+',  # TL bounce — added 2026-10-12 CEO sync from v1: FLAT only. QUESTION CLOSED 2026-10-21: stays FLAT-only — 16 fires/90d, ALL expired at confluence/hotset (15 compaction_stale + 1 hotset-fallout), zero reached vol-gate admission; adding NORMAL would not fix the actual blocker. Revisit only if fire rate rises.
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d FLAT 0T (never admitted).
     },
     'NORMAL': {
-        'pump-catcher+', 'pump-catcher-',
+        # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
@@ -110,7 +110,7 @@ REGIME_SIGNALS = {
         'volume-buildup+', 'volume-buildup-', 'volume_buildup',  # sustained volume buildup — added 2026-10-11
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, best in NORMAL
         'ema300-breakthrough+', 'ema300-breakthrough-',  # EMA300 breakout — 15m, trend continuation/reversal
-        'trend_purity+', 'trend_purity-',  # trend following — fires in NORMAL (primary regime)
+        # trend_purity REMOVED 2026-10-21 — ENABLED=False since 2026-09-23 emergency fix (NEVER_REENABLE). Dead allowlist entry.
         'continuum+', 'continuum-',  # continuum score extreme signals — regime-agnostic
         'continuum-mom+', 'continuum-mom-',  # continuum momentum zone-transition — regime-agnostic
         'continuum-osc+', 'continuum-osc-',  # continuum oscillator cadence — regime-agnostic
@@ -129,7 +129,7 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"). v2 omission was an oversight: ATOM SHORT reached exec 10x on 2026-10-12 and vol gate was sole blocker. 90d NORMAL 1T +$0.01.
     },
     'HIGH': {
-        'pump-catcher+', 'pump-catcher-',
+        # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
@@ -210,7 +210,7 @@ REGIME_SIGNALS = {
         'volume-breakout-short-', 'volume_breakout_short',  # volume-confirmed breakout SHORT — added 2026-10-09: BANANA SHORT blocked
         'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-09: APT LONG blocked in EXTREME
         'doji-top', 'doji-top-short',  # doji patterns — added 2026-10-09; doji-bottom-long REMOVED from EXTREME 2026-10-13 signal_reporter — EXTREME 3T 0%WR -$0.25 (mean-reversion LONG in storm = falling knife; TURBO/IMX hard_max_loss). HIGH 12T 83.3% +$0.89 and NORMAL 8T 50% +$0.12 kept.
-        'trend_purity+', 'trend_purity-',  # trend following — penalized in EXTREME via VOL_PHASE_MULTS (0.15x)
+        # trend_purity REMOVED 2026-10-21 — ENABLED=False since 2026-09-23 emergency fix (NEVER_REENABLE). Dead allowlist entry.
         'oversold-bounce+',  # oversold bounce LONG — mean reversion at extreme oversold
         'accel-300-breakout',  # ATR breakout signal — works solo, added 2026-09-23 (bug hunt: was killing PONS SHORT)
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes

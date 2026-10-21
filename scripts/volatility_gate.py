@@ -66,8 +66,7 @@ REGIME_SIGNALS = {
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'NORMAL': {
-        # pump_catcher — momentum breakout (velocity + acceleration)
-        'pump-catcher+', 'pump-catcher-',
+        # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
         'pump-chain-v6+', 'pump-chain-v6-',  # V6 — NORMAL is profitable SHORT habitat (spec rev1 §6.3)
@@ -138,7 +137,7 @@ REGIME_SIGNALS = {
     },
     'HIGH': {
         # Breakout works in big moves
-        'pump-catcher+', 'pump-catcher-',  # momentum breakout — catches explosive moves
+        # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+',  # chain correlation LONG — HIGH edge for +
         # pump-chain- SHORT removed 2026-10-01 — HIGH 48%WR -$0.36 bleed. NORMAL 85.7%WR edge. signal_reporter
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters — works in high vol
@@ -197,7 +196,7 @@ REGIME_SIGNALS = {
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — works in high vol (2026-10-09)
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout — works in high vol
         'grind-trend+', 'grind-trend-',  # accumulation grind — steady drift, works in high vol
-        'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-13)
+        # trend_purity REMOVED 2026-10-21 — ENABLED=False since 2026-09-23 emergency fix (NEVER_REENABLE). Dead allowlist entry.
         'doji-bottom-long', 'doji-top-short',  # doji exhaustion — SHORT added 2026-10-02: asymmetry fix (doji-top-short was only in FLAT)
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R + candlestick — structural, works in high vol
         'breakout-pullback+', 'breakout-pullback-',  # breakout → pullback — trend continuation, works in high vol
@@ -229,7 +228,7 @@ REGIME_SIGNALS = {
         'bb-bounce-short',  # standalone SHORT bounce signal
         'confluence+', 'confluence-',  # meta-signal — persistence + compounding, regime-agnostic
         'macd-div', 'macd-div+', 'macd-div-',  # MACD divergence — counter-trend
-        'pump-catcher+', 'pump-catcher-',  # momentum breakout — works in storms
+        # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+',  # chain correlation LONG — EXTREME edge (57% WR)
         # pump-chain- SHORT removed 2026-10-01 — EXTREME Pump_Flow=0.0 hard block; REGIME_SIGNALS was stale dead path
         'pump-chain-v5',  # V5 — LONG killed, SHORT regime-routed via VOL_PHASE_MULTS
@@ -239,7 +238,7 @@ REGIME_SIGNALS = {
         'pullback-entry', 'pullback-entry+', 'pullback-entry-',  # post-impulse consolidation — mean-reversion
         'oversold-bounce+',  # oversold bounce LONG — mean-reversion at extreme oversold
         'atr-spike+', 'atr-spike-',  # ATR compression spike
-        'trend_purity', 'trend_purity+', 'trend_purity-',  # trend purity — works in all regimes (2026-09-11)
+        # trend_purity REMOVED 2026-10-21 — ENABLED=False since 2026-09-23 emergency fix (NEVER_REENABLE). Dead allowlist entry.
         'rs', 'rs-s', 'rs-r',  # support/resistance — structural
         'accel-300', 'accel-300-', 'accel-300-v2-short+', 'accel-300-v2-short-', 'accel-300-v3-short+', 'accel-300-v3-short-', 'accel-300-v4-short-', 'accel-300-breakout',  # trend momentum + ATR breakout
         'open-skies+',  # open skies breakout — structural, regime-agnostic

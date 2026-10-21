@@ -1,146 +1,93 @@
 {
-  "timestamp": "2026-10-21T15:40:05Z",
-  "run": "brain_auditor #58",
-  "mode": "vacation_soak",
-  "session_brain_stats": {
-    "queries": [
-      "signal performance winrate regime recent",
-      "losing trades wrong side chop",
-      "new signal idea improvement"
-    ],
-    "top_insights": [
-      "Recurring: wrong-side/chop entries discussed across sessions (RR+k, chop v2, trend following) — structural, defenses holding",
-      "Trend-following signal + grind-to-spike ideas already in pipeline; no missing implementation blocking"
-    ]
-  },
+  "timestamp": "2026-10-21T16:38:26Z",
+  "run": "brain_auditor #59",
+  "session_lock": "absent — full audit OK",
+  "vacation_mode": "ACTIVE to Oct 23 — 0 constants changes",
   "trade_summary_24h": {
-    "trades": 35,
+    "trades": 34,
     "wins": 14,
-    "wr": 40.0,
-    "pnl": -0.71,
-    "since_last_run_1439": {
-      "trades": 5,
-      "wins": 3,
-      "pnl": 0.03
-    },
-    "7d": {
-      "trades_approx": 158,
-      "wr": 36.7,
-      "pnl": -2.81
-    },
-    "size_reduce": "0.3x active (both resume legs failing)",
-    "open": "BTC #16342 LONG continuum-trend+ conf=77.1 entry=84624 pnl~-0.17% — HOLD (dual LONG_BIAS/STRONG_UP/MARKUP)",
-    "regime": "dual LONG_BIAS, continuum ABOVE, zscore STRONG_POS, MARKUP/STRONG_UP (market_phase DECLINING lagging)"
+    "wr": 41.2,
+    "pnl": -0.59,
+    "long": "30T 46.7% -0.26",
+    "short": "4T 0% -0.33 (all counter-trend)",
+    "since_run_58": "0 closes (quiet window)"
   },
+  "trade_summary_7d": {
+    "trades": 162,
+    "wr": 37.0,
+    "pnl": -2.92,
+    "trail_family": "49T 85.7% +3.43",
+    "chop_family": "82T 3.7% -6.45",
+    "wealth_gap": "UNCHANGED — trail wins, chop loses"
+  },
+  "open_trades": [
+    {
+      "id": 16342,
+      "coin": "BTC",
+      "signal": "continuum-trend+",
+      "dir": "LONG",
+      "entry": 84624,
+      "sl": 83770.05,
+      "hours": 1.4,
+      "verdict": "HOLD — dual LONG_BIAS/STRONG_UP aligned; SL below EMA300 thesis-correct"
+    }
+  ],
   "watchdog_triage": [
     {
-      "id": "steer-001",
-      "verdict": "RESOLVED-BY-EXIT",
-      "detail": "BTC+INJ cluster: INJ #16343 closed HML -$0.08 within 14m; only BTC remains open and aligned"
+      "steer": "6 recent losses wrong-side",
+      "verdict": "VERIFIED-STRUCTURAL",
+      "detail": "4/4 shorts 0% -0.33 counter-trend + 15 chop longs. Known cohorts. No new pattern."
     },
     {
-      "id": "steer-002",
-      "verdict": "SHALLOW-KNOWN-COHORTS",
-      "detail": "Wrong-side look: 20 losers all known chop cohorts (SYRUP stale, PUMP r2v2 EXTREME HML, pump-chain+ timeouts, BTC pending). Max loss -$0.23. No new pattern"
+      "steer": "freeze shorts / prefer trail-confirmed",
+      "verdict": "ACCEPTED-ADVISORY",
+      "detail": "Shorts already frozen via floor-45 + regime; 1 short since 02:46 (BTC pending). Trail preference = standing playbook."
     }
   ],
-  "last_run_verify": {
-    "floor_45": "HOLDING — 0 SHORT opens with meta_rsi<45 since 02:46 revert",
-    "arm_gap_instrumentation": "HOLDING — 0 [ARM-GAP] log lines and 0 qualifying closes since 09:55 fix (correct-by-zero; quiet window)",
-    "tat_scope": "HOLDING — 0 in-scope fires; trail_arm_timeout only pump-chain path working as designed",
-    "doji_kill": "HOLDING — 0 opens since Oct 16 18:44",
-    "size_reduce_0.3x": "HOLDING — losses contained (max -$0.23)",
-    "protected_flags": "INTACT — OVERSOLD_BOUNCE/AI_TRADER/HL_COPY/PUMP_CHAIN_V4 all False; LIVE_TRADING True",
-    "arm_rate_leaderboard_57": "RECONFIRMED — bare pump-chain- arm 9.1% vs combo 30%; SHORT ARMED 8T/7d 100% +$0.91"
-  },
-  "losing_trade_autopsy_24h": {
-    "total_losers": 20,
-    "max_loss": -0.23,
+  "losing_autopsy_24h": {
+    "losers": 19,
     "new_patterns": 0,
     "clusters": [
-      {
-        "pattern": "INJ pump-chain+ LONG ×2 HML EXTREME",
-        "trades": "#16336 mfe~0, #16343 mfe=0.20",
-        "root_cause": "chop entry in EXTREME — never armed",
-        "action": "known cohort; size-reduce containing"
-      },
-      {
-        "pattern": "PUMP r2v2-long3 ×2 HML EXTREME",
-        "root_cause": "same chop/no-momentum profile",
-        "action": "monitor; no filter passes bars"
-      },
-      {
-        "pattern": "SYRUP continuation+ stale_exit -$0.23",
-        "root_cause": "stale cohort (3T/7d -$0.62 0%)",
-        "action": "watch — n>=10 WR<20% → TAT scope candidate"
-      }
+      "INJ x2 pump-chain+ EXTREME hard_max_loss -0.16 (known coin-level chop)",
+      "pump-chain+ trail_arm_timeout x3 (CFX/BLUR/APT HIGH+EXTREME) -0.16 — never armed",
+      "SHORTS x4 counter-trend -0.33 (BTC x2 pending, COMP, CRV)",
+      "SYRUP continuation+ stale_exit -0.23 (stale cohort watch)",
+      "PUMP r2v2-long3 EXTREME HML -0.13"
     ],
-    "anomaly": "WLD #16341 r2v2-long4: mfe_pct=4.31 hold=1m atr_trail_hit pnl=-0.01 — possible mfe spike miscalc on sub-2m trades; bug_hunter candidate"
+    "winners": "14/14 trail-family (12 profit-monster-trail) — exit mechanics sound"
   },
-  "pump_chain_kill_recheck_prep_oct22": {
-    "bare_14d": {
-      "n": 36,
-      "pnl": -0.53,
-      "wr": 22.2,
-      "arm": 22.2
-    },
-    "bare_30d_oos": {
-      "n": 116,
-      "pnl": -1.15,
-      "wr": 37.9,
-      "arm": 13.8,
-      "verdict": "OOS confirms bleed"
-    },
-    "combo_14d": {
-      "n": 11,
-      "pnl": 0.26,
-      "wr": 27.3,
-      "arm": 27.3
-    },
-    "combo_30d_oos": {
-      "n": 11,
-      "pnl": 0.26,
-      "wr": 27.3
-    },
-    "option_a": "require v6-confirmation (kill bare path): blocks 8 winners +$1.27, saves net +$0.53; arm-structure 9.1% vs 27-30% is the edge",
-    "status": "DEFERRED to Oct 22 recheck per pre-registration — not jumped today"
+  "last_run_verify": {
+    "floor_45": "HOLDING — 1 SHORT open since revert, meta_rsi null (ai-trader path)",
+    "arm_gap": "0 fires since 09:55 = correct-by-zero (0 qualifying unarmed MFE>=0.40 closes)",
+    "size_reduce": "ACTIVE — file 0.5x, live sizes $11.10/$22.10 (kanban text says 0.3x = cosmetic drift, file is truth)",
+    "doji_kill": "HOLDING — 10 trades since Oct 16 are pre-kill aging, net -0.53 contained",
+    "protected_flags": "13/13 INTACT",
+    "pump_chain_kill_recheck_prep": "STILL MET — bare 14d 36T 22.2% -0.53; combo 15T +0.13 (edge decaying from +0.26). Recheck tomorrow Oct 22 as pre-registered."
   },
-  "drift_findings": [],
-  "recurring_problems": [
-    "ARM-GAP 14d 51T -$1.16 (MFE>=0.40 trail=FALSE SL-family) still largest structural bleed — flip blocked on escalation #17 candle OOS",
-    "stale_exit cohort 3T/7d -$0.62 0% — n too small, watch",
-    "pump-chain+ armed-then-giveback 14d: 13T armed-LOSS avgMFE 1.22 → -1.27% vs 12T armed-WIN avgMFE 3.41 → +3.24%"
-  ],
-  "missing_implementations": [
-    "exit-ladder candle OOS (escalation #17, 20th request) — still blocks ARM-GAP/peak-trail/post-arm tighten flips"
-  ],
+  "wld_mfe_anomaly": {
+    "trade": "WLD #16341 r2v2-long4 LONG 41s hold",
+    "root_cause": "CONFIRMED: highest_price=0.60000000 exactly (round number, zero supporting ticks in window — price_history max 0.57549). price_history had 0 rows BETWEEN open/close (41s window < 1m candle spacing) → MFE fell back to highest_price → mfe_pct=4.31% false → trailing_activated=True false arm → atr_trail_hit premature exit at -0.36%.",
+    "second_instance": "ZRO #16310 highest=2.00000000, window max tick 1.95405 (+0.14% real vs +2.50% recorded) — same bug class",
+    "impact": "False trail arms + poisoned ARM-GAP analytics. Frequency ~2/14d but live exit-behavior impact.",
+    "fix_path": "bug_hunter P1 — peak-price sanity clamp (reject cur_price move >3x ATR from last persisted price as bad tick). NOT shipped (vacation, live exit behavior). Shadow pre-registered.",
+    "status": "ESCALATED"
+  },
+  "config_changes_applied": [],
   "creative_improvements": [
     {
-      "date": "2026-10-21T15:40:05Z",
-      "idea": "WLD #16341 MFE anomaly → bug_hunter on _compute_mfe_mae sub-2m spike handling",
-      "rationale": "mfe_pct=4.31% with 1m hold and pnl=-0.01% poisons ARM-GAP detection and any MFE-based shadow if mfe is wrong; verify before trusting mfe filters",
-      "expected_impact": "data integrity for all MFE-gated logic",
-      "category": "data_quality",
-      "status": "flagged_bug_hunter",
-      "risk": "none"
-    },
-    {
-      "date": "2026-10-21T15:40:05Z",
-      "idea": "Post-arm breakeven ratchet for pump-chain+ (pre-registered, carried): after trail arms at +0.40%, if live_pnl drops below -0.30% flip to breakeven stop",
-      "rationale": "14d armed-LOSS 13T avgMFE 1.22% gave back to -1.27% avg; winners ride to 3.41%. Targets giveback cohort without fixed-time cut (MFE-CUT OOS fail lesson)",
-      "expected_impact": "~+$0.30-0.50/14d raw on giveback cohort; needs candle OOS via escalation #17",
-      "category": "exit_quality",
-      "status": "pre_registered_blocked_on_OOS",
-      "risk": "medium"
+      "date": "2026-10-21T16:38:26Z",
+      "idea": "Peak-price sanity gate (shadow): when cur_price jumps >3x ATR from last persisted current_price in one PM cycle, skip highest_price update + log counterfactual",
+      "rationale": "WLD #16341 and ZRO #16310 show exact round-number highest_price (0.60, 2.00) with zero supporting ticks — false trail arms and poisoned MFE. Gate is zero-behavior in shadow.",
+      "expected_impact": "Prevents false atr_trail_hit exits; cleans ARM-GAP dataset",
+      "category": "exit integrity",
+      "status": "pre-registered",
+      "risk": "low"
     }
   ],
-  "config_changes_applied": [],
-  "changes_from_last_run": "ALL HOLDING (see last_run_verify). Since #57: 5T 3W +$0.03 green micro-window",
   "next_actions": [
-    "OCT 22: pump-chain- kill recheck — Option A matrix ready (bare 30d -$1.15 n=116 OOS confirms; combo +$0.26 keep)",
-    "OCT 23 vacation-end stack: PUMP_CHAIN_CONF_FLOOR=30 (recheck winner-kill: conf<30 kills 6 winners +$0.74, net save +$1.20), SHORT×EXTREME dampen shadow, pp-cond re-eval",
-    "Escalation #17 (21st): exit-ladder candle OOS — unblocks ARM-GAP/post-arm ratchet",
-    "bug_hunter: WLD #16341 mfe_pct anomaly sub-2m trades",
-    "Monitor stale_exit cohort and INJ repeat-HML coin behavior"
+    "Oct 22: pump-chain- bare kill recheck (pre-registered, matrix ready)",
+    "Oct 23: vacation end — ship PUMP_CHAIN_CONF_FLOOR=30 + resume-day stack",
+    "bug_hunter: peak-price false-high investigation (WLD #16341, ZRO #16310)",
+    "Hold BTC #16342; BE ratchet only at +2% (86317)"
   ]
 }
