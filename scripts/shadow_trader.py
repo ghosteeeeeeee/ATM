@@ -54,6 +54,18 @@ BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN = 60
 PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45
 MAX_LEVERAGE = 5               # fallback cap
 
+# ── Shadow Trial: Wider SL for LONG signals (CEO verdict 2026-10-21) ──────────
+# CEO: "Shadow rollout of CUT_LOSER -6.00 + ATR_SL_MAX 4.0, LONG only;
+#       SHORT untouched; size unchanged; 7d/200T review."
+# Evidence threshold: shadow LONGs must hit >=55% WR over >=200 trades.
+SHADOW_TRIAL_ENABLED = True           # Master switch for wider SL shadow trial
+SHADOW_TRIAL_CUT_LOSER = -6.00        # Wider CUT_LOSER (was -4.00)
+SHADOW_TRIAL_ATR_SL_MAX = 4.0         # Wider ATR_SL_MAX (was 2.5)
+SHADOW_TRIAL_DIRECTION = 'LONG'       # LONG only (SHORT stays at -4.00)
+SHADOW_TRIAL_MIN_TRADES = 200         # Min trades per direction for review
+SHADOW_TRIAL_MIN_WR = 55.0            # Min WR to justify wider stops
+SHADOW_TRIAL_REVIEW_DAYS = 7          # Days before review
+
 # Pump Exit constants (hermes_constants.py:4403-4407)
 PUMP_EXIT_TRAIL_MULT = 3.0     # ATR multiplier for trailing stop
 PUMP_EXIT_MOMENTUM_VEL = -0.5  # 5m velocity threshold for momentum exit
@@ -128,6 +140,7 @@ def get_db():
             exit_rr_engine_json JSON,
             exit_pump_exit_json JSON,
             exit_ride_it_json JSON,
+            exit_wider_sl_json JSON,  -- Shadow trial: wider SL for LONG (CUT_LOSER -6, ATR_SL_MAX 4.0)
             first_exit_engine TEXT,
             first_exit_price REAL,
             first_exit_pnl_pct REAL,
@@ -173,6 +186,10 @@ def get_db():
         pass  # column already exists
     try:
         conn.execute("ALTER TABLE shadow_trades ADD COLUMN exit_ride_it_json JSON")
+    except sqlite3.OperationalError:
+        pass  # column already exists
+    try:
+        conn.execute("ALTER TABLE shadow_trades ADD COLUMN exit_wider_sl_json JSON")
     except sqlite3.OperationalError:
         pass  # column already exists
     
@@ -552,6 +569,72 @@ def _simulate_atr_sl_tp(entry_price, direction, candles, atr_pct):
     # No exit — hold to end
     last_close = candles[-1][4]
     pnl = (last_close / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / last_close - 1) * 100
+    return {'fired': False, 'exit_type': 'no_exit', 'exit_price': last_close,
+            'exit_ts': candles[-1][0], 'pnl_pct': pnl,
+            'hold_minutes': (candles[-1][0] - candles[0][0]) / 60}
+
+
+def _simulate_atr_sl_tp_wider(entry_price, direction, candles, atr_pct):
+    """Simulate ATR SL/TP with WIDER stops for LONG signals (CEO shadow trial).
+
+    Uses SHADOW_TRIAL_CUT_LOSER and SHADOW_TRIAL_ATR_SL_MAX instead of
+    CUT_LOSER_PNL and ATR_SL_MAX. Only applies to LONG direction.
+    SHORT signals use the same simulation as normal (SHORT untouched per CEO).
+    """
+    if not candles or atr_pct is None:
+        return None
+    
+    # Only widen for LONG direction (CEO: SHORT untouched)
+    if direction != 'LONG':
+        return _simulate_atr_sl_tp(entry_price, direction, candles, atr_pct)
+    
+    # Wider SL/TP distances
+    sl_dist = min(atr_pct * 1.0, SHADOW_TRIAL_ATR_SL_MAX)  # Wider cap: 4.0% (was 2.5%)
+    tp_dist = atr_pct * 2.0  # Same TP
+    
+    sl_price = entry_price * (1 - sl_dist/100)
+    tp_price = entry_price * (1 + tp_dist/100)
+    
+    peak_price = entry_price
+    min_sl_dist = ATR_SL_MIN_INIT
+    
+    # HML threshold with wider CUT_LOSER
+    hml_threshold_pct = SHADOW_TRIAL_CUT_LOSER / MAX_LEVERAGE  # -6.00/5 = -1.20% (was -0.80%)
+    hml_price = entry_price * (1 + hml_threshold_pct/100)
+    
+    for ts, o, h, l, c in candles:
+        # Update peak
+        peak_price = max(peak_price, h)
+        
+        # Trail SL from peak (tighten only) — same as normal
+        new_sl = peak_price * (1 - TRAILING_DISTANCE_PCT/100)
+        sl_price = max(sl_price, new_sl)
+        min_sl_dist = ATR_SL_MIN_ACCEL
+        max_sl = peak_price * (1 - min_sl_dist/100)
+        sl_price = min(sl_price, max_sl)
+        
+        # Check HML first (wider threshold)
+        if l <= hml_price:
+            pnl = (hml_price / entry_price - 1) * 100
+            return {'fired': True, 'exit_type': 'hard_max_loss', 'exit_price': hml_price,
+                    'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - candles[0][0]) / 60}
+        
+        # Check ATR SL (wider cap)
+        if l <= sl_price:
+            exit_type = 'atr_trail_hit' if sl_price > entry_price else 'atr_sl_hit'
+            pnl = (sl_price / entry_price - 1) * 100
+            return {'fired': True, 'exit_type': exit_type, 'exit_price': sl_price,
+                    'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - candles[0][0]) / 60}
+        
+        # Check TP
+        if h >= tp_price:
+            pnl = (tp_price / entry_price - 1) * 100
+            return {'fired': True, 'exit_type': 'atr_tp_hit', 'exit_price': tp_price,
+                    'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - candles[0][0]) / 60}
+    
+    # No exit — hold to end
+    last_close = candles[-1][4]
+    pnl = (last_close / entry_price - 1) * 100
     return {'fired': False, 'exit_type': 'no_exit', 'exit_price': last_close,
             'exit_ts': candles[-1][0], 'pnl_pct': pnl,
             'hold_minutes': (candles[-1][0] - candles[0][0]) / 60}
@@ -1100,7 +1183,7 @@ def close_events():
             vol_regime = ctx.get('vol_regime', 'UNKNOWN')
             leverage = lev or MAX_LEVERAGE
             
-            # Simulate all 10 engines
+            # Simulate all 10 engines + wider SL shadow trial
             results = {}
             results['atr'] = _simulate_atr_sl_tp(entry_price, d, candles, atr_pct)
             results['pm_trail'] = _simulate_pm_trail(entry_price, d, candles, src, vol_regime)
@@ -1112,6 +1195,11 @@ def close_events():
             results['pump_exit'] = _simulate_pump_exit(entry_price, d, candles, atr_pct)
             results['ride_it'] = _simulate_ride_it(entry_price, d, candles, atr_pct)
             results['rr_engine'] = _simulate_rr_engine(entry_price, d, candles, atr_pct)
+            
+            # Shadow trial: wider SL for LONG signals (CEO verdict 2026-10-21)
+            wider_sl_result = None
+            if SHADOW_TRIAL_ENABLED and d == SHADOW_TRIAL_DIRECTION:
+                wider_sl_result = _simulate_atr_sl_tp_wider(entry_price, d, candles, atr_pct)
             
             # Determine first exit to fire (deterministic tie-break per spec §4.0)
             # Loss-side precedence: HML → Cut Loser Hard → Cut Loser T2 → Cut Loser T1 → ATR SL → Speed Stale → Trail Arm → Universal
@@ -1162,6 +1250,7 @@ def close_events():
                         exit_cut_loser_json=?, exit_speed_stale_json=?, exit_universal_hold_json=?,
                         exit_trail_arm_timeout_json=?, exit_rr_engine_json=?,
                         exit_pump_exit_json=?, exit_ride_it_json=?,
+                        exit_wider_sl_json=?,
                         first_exit_engine=?, first_exit_price=?, first_exit_pnl_pct=?,
                         first_exit_hold_minutes=?, first_exit_reason=?,
                         gross_pnl_pct=?, net_pnl_pct=?,
@@ -1173,6 +1262,7 @@ def close_events():
                       json.dumps(results.get('speed_stale')), json.dumps(results.get('universal_hold')),
                       json.dumps(results.get('trail_arm_timeout')), json.dumps(results.get('rr_engine')),
                       json.dumps(results.get('pump_exit')), json.dumps(results.get('ride_it')),
+                      json.dumps(wider_sl_result),
                       first_engine, first_result['exit_price'], gross_pnl,
                       first_result['hold_minutes'], first_result['exit_type'],
                       gross_pnl, net_pnl, mfe, mae, sid))
@@ -2105,6 +2195,126 @@ def sweep_sl_levels(signal_type_filter=None, direction_filter=None):
         conn.close()
 
 
+def report_wider_sl():
+    """Compare current SL vs wider SL shadow trial (CEO verdict 2026-10-21).
+
+    Shows: current ATR SL vs wider SL (CUT_LOSER -6, ATR_SL_MAX 4.0) for LONG signals.
+    Evidence threshold: >=55% WR over >=200 trades.
+    """
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("═" * 60)
+        log("WIDER SL SHADOW TRIAL REPORT")
+        log(f"CUT_LOSER: {SHADOW_TRIAL_CUT_LOSER} (was {CUT_LOSER_PNL})")
+        log(f"ATR_SL_MAX: {SHADOW_TRIAL_ATR_SL_MAX} (was {ATR_SL_MAX})")
+        log(f"Direction: {SHADOW_TRIAL_DIRECTION} only")
+        log("═" * 60)
+        
+        # Count wider SL results
+        wider_count = cur.execute("""
+            SELECT COUNT(*) FROM shadow_trades 
+            WHERE closed=1 AND exit_wider_sl_json IS NOT NULL
+        """).fetchone()[0]
+        
+        log(f"\nSignals with wider SL simulation: {wider_count}")
+        
+        if wider_count == 0:
+            log("No data yet — run --close first")
+            return
+        
+        # Compare current vs wider for LONG signals
+        log("\n--- CURRENT vs WIDER SL (LONG signals) ---")
+        log(f"  {'Metric':25} {'Current':>12} {'Wider':>12} {'Delta':>12}")
+        log("-" * 65)
+        
+        # Current ATR SL results for LONG
+        current = cur.execute("""
+            SELECT COUNT(*) n,
+              ROUND(100.0*SUM(CASE WHEN json_extract(exit_atr_json, '$.pnl_pct') > 0 THEN 1 ELSE 0 END)/COUNT(*),1) wr,
+              ROUND(SUM(json_extract(exit_atr_json, '$.pnl_pct')),1) total,
+              ROUND(AVG(json_extract(exit_atr_json, '$.pnl_pct')),3) avg
+            FROM shadow_trades 
+            WHERE closed=1 AND direction='LONG' 
+              AND exit_atr_json IS NOT NULL
+              AND json_extract(exit_atr_json, '$.pnl_pct') IS NOT NULL
+        """).fetchone()
+        
+        # Wider SL results for LONG
+        wider = cur.execute("""
+            SELECT COUNT(*) n,
+              ROUND(100.0*SUM(CASE WHEN json_extract(exit_wider_sl_json, '$.pnl_pct') > 0 THEN 1 ELSE 0 END)/COUNT(*),1) wr,
+              ROUND(SUM(json_extract(exit_wider_sl_json, '$.pnl_pct')),1) total,
+              ROUND(AVG(json_extract(exit_wider_sl_json, '$.pnl_pct')),3) avg
+            FROM shadow_trades 
+            WHERE closed=1 AND direction='LONG' 
+              AND exit_wider_sl_json IS NOT NULL
+              AND json_extract(exit_wider_sl_json, '$.pnl_pct') IS NOT NULL
+        """).fetchone()
+        
+        if current[0] > 0 and wider[0] > 0:
+            log(f"  {'Trades':25} {current[0]:12} {wider[0]:12} {wider[0]-current[0]:+12}")
+            log(f"  {'Win Rate':25} {current[1]:11.1f}% {wider[1]:11.1f}% {wider[1]-current[1]:+11.1f}%")
+            log(f"  {'Total PnL':25} {current[2]:+11.1f}% {wider[2]:+11.1f}% {wider[2]-current[2]:+11.1f}%")
+            log(f"  {'Avg PnL':25} {current[3]:+11.3f}% {wider[3]:+11.3f}% {wider[3]-current[3]:+11.3f}%")
+            
+            # Check evidence threshold
+            log(f"\n--- EVIDENCE THRESHOLD ---")
+            log(f"  Required: WR >= {SHADOW_TRIAL_MIN_WR}% with >= {SHADOW_TRIAL_MIN_TRADES} trades")
+            log(f"  Current: WR = {wider[1]}%, trades = {wider[0]}")
+            
+            if wider[0] >= SHADOW_TRIAL_MIN_TRADES:
+                if wider[1] >= SHADOW_TRIAL_MIN_WR:
+                    log(f"  ✅ THRESHOLD MET — wider SL is justified")
+                else:
+                    log(f"  ❌ THRESHOLD NOT MET — WR {wider[1]}% < {SHADOW_TRIAL_MIN_WR}%")
+            else:
+                log(f"  ⏳ COLLECTING DATA — {wider[0]}/{SHADOW_TRIAL_MIN_TRADES} trades")
+        
+        # HML fire rate comparison
+        log("\n--- HML FIRE RATE ---")
+        hml_current = cur.execute("""
+            SELECT COUNT(*) FROM shadow_trades 
+            WHERE closed=1 AND direction='LONG'
+              AND json_extract(exit_atr_json, '$.exit_type') = 'hard_max_loss'
+        """).fetchone()[0]
+        
+        hml_wider = cur.execute("""
+            SELECT COUNT(*) FROM shadow_trades 
+            WHERE closed=1 AND direction='LONG'
+              AND json_extract(exit_wider_sl_json, '$.exit_type') = 'hard_max_loss'
+        """).fetchone()[0]
+        
+        log(f"  Current HML fires: {hml_current}")
+        log(f"  Wider HML fires: {hml_wider}")
+        if hml_current > 0:
+            log(f"  Reduction: {hml_current - hml_wider} ({(hml_current - hml_wider)/hml_current*100:.0f}%)")
+        
+        # MFE-at-HML (would the trade have recovered?)
+        log("\n--- MFE AT HML (would trade have recovered?) ---")
+        mfe_at_hml = cur.execute("""
+            SELECT COUNT(*) n,
+              ROUND(AVG(json_extract(exit_atr_json, '$.pnl_pct')),3) current_pnl,
+              ROUND(AVG(json_extract(exit_wider_sl_json, '$.pnl_pct')),3) wider_pnl
+            FROM shadow_trades 
+            WHERE closed=1 AND direction='LONG'
+              AND json_extract(exit_atr_json, '$.exit_type') = 'hard_max_loss'
+              AND exit_wider_sl_json IS NOT NULL
+        """).fetchone()
+        
+        if mfe_at_hml[0] > 0:
+            log(f"  Trades stopped by HML (current): {mfe_at_hml[0]}")
+            log(f"  Avg PnL at HML (current): {mfe_at_hml[1]:+.3f}%")
+            log(f"  Avg PnL at HML (wider): {mfe_at_hml[2]:+.3f}%")
+            if mfe_at_hml[2] > mfe_at_hml[1]:
+                log(f"  ✅ Wider SL recovers {mfe_at_hml[2] - mfe_at_hml[1]:+.3f}% per trade")
+        
+        log("\n═" * 60)
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description='Shadow-Mode Paper Trading System')
     ap.add_argument('--record', action='store_true', help='Snapshot ALL signals')
@@ -2124,12 +2334,13 @@ def main():
     ap.add_argument('--sweep-dir', type=str, help='Direction filter for sweep')
     ap.add_argument('--sweep-hml', action='store_true', help='Sweep HML thresholds')
     ap.add_argument('--sweep-sl', action='store_true', help='Sweep SL levels')
+    ap.add_argument('--report-wider', action='store_true', help='Compare current vs wider SL (shadow trial)')
     args = ap.parse_args()
     
     run_all = not (args.record or args.close or args.report or args.reclose or 
                    args.purge or args.analyze_hml or args.flip_test or 
                    args.analyze_exits or args.analyze_hold or args.sweep_arm or 
-                   args.sweep_hml or args.sweep_sl)
+                   args.sweep_hml or args.sweep_sl or args.report_wider)
     
     if run_all or args.record:
         record()
@@ -2153,6 +2364,8 @@ def main():
         sweep_hml_thresholds()
     if args.sweep_sl:
         sweep_sl_levels(args.sweep_signal, args.sweep_dir)
+    if args.report_wider:
+        report_wider_sl()
     if args.purge:
         purge()
     
