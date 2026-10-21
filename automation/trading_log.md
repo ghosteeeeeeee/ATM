@@ -13175,3 +13175,42 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL flat -$2.96; size-reduce stays until PnL crosses -$2
 - 24h WR 20.0% (5W/25T) still weak — monitor; hard_max_loss + trail_arm_timeout clusters ongoing
+
+## FAVORITES Update — 2026-10-21 06:00 UTC
+- Regime: NEUTRAL
+- DEMOTE ETH (WR=40.0%, PnL=$-0.12, 1 consecutive bad days, regime=NEUTRAL)
+
+Final set: ['ICP']
+
+## LOSERS Update — 2026-10-21 06:05 UTC
+- REMOVE CHIP (insufficient data)
+- REMOVE LDO (insufficient data)
+- ADD IO (WR=0.0%, PnL=$-0.39, consecutive_losses (5))
+- ADD BTC (WR=42.9%, PnL=$-0.31, low_wr (42.9%))
+- ADD APT (WR=20.0%, PnL=$-0.25, low_wr (20.0%))
+- ADD ETH (WR=40.0%, PnL=$-0.12, wr_collapse (66.7% → 40.0%))
+- ADD HYPE (WR=40.0%, PnL=$0.19, low_wr (40.0%))
+
+Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
+
+## [2026-10-21 06:35 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 24T 5W -$0.24 (20.8% WR) | 7d 154T 56W -$2.66 (36.4% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour — quiet window; last close 03:xx, hours 04-06 empty
+- Kill check: 0T last hour, no signal with 3+ trades — no kill candidate
+- pump-chain+ 24h 0W/4T -$0.16 but 7d verified profitable — stays enabled (prior 6 audit rejections)
+- atr_sl_hit 8/24 = 33.3% under 40% — tpsl_utils.py deployed (51KB, Oct 12), no action
+- Neg-hour streak 01:00-03:00 (-$0.22/-$0.13/-$0.05) → regime rule says "consider size reduce" but size already at 0.3x (standing mitigation until 7d PnL > -$2)
+- Regime: 5m aggregate SHORT_BIAS (11L/46S/72N); FAVORITES said NEUTRAL at 06:00
+- 2 open: BTC ai-trader-pending SHORT, DOGE bb-bounce-v2-long+
+- Frequency 0T/hr — not overtraded
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL improved -$2.96 → -$2.66; size-reduce 0.3x stays until it crosses -$2
+- 24h WR 20.8% still weak; hard_sl (3T -$0.22) and trail_arm_timeout (4T -$0.16) clusters — watch next hour

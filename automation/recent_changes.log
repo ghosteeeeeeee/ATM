@@ -4989,3 +4989,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-21 06:00 UTC] brain_auditor: AUDIT RUN #48 — 0 config changes (vacation soak) | bare pump-chain- kill trigger MET (14d -$0.88 n=41, 30d -$1.15) but DEFERRED to Oct 22 recheck + attribution hygiene (floor revert shipped 02:46) | combo vs bare split: v6-confirmation IS the edge (+$0.26 vs -$0.88) | bare-path 0.7x demote shadow pre-registered | ARM-GAP first fire candidate CRV #16318 (MFE 0.59 trail=FALSE) reconstructed from DB, log missed pre-restart | BTC SHORT #16320 precheck FAIL reported HOLD | 24h 20.0% -$0.26 shallow, 7d 35.2% -$2.96, size-reduce 0.5x
 BY: brain_auditor
+- [2026-10-21 06:35] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 24T 5W -$0.24 (20.8%) | 7d 154T 56W -$2.66 (36.4%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (0T) | atr_sl_hit 33.3% under 40% | 3h neg streak 01-03 but size already reduced | 2 open (BTC SHORT, DOGE LONG) | No constants change -> no signal_versions entry
+BY: auto_1hr
