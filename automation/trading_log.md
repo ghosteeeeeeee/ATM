@@ -13279,3 +13279,21 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 **Open Questions:**
 - 7d PnL improving: -.70 → -.40; size-reduce 0.3x stays until it crosses -
 - Loss cluster unchanged: atr_sl_hit (9T -/usr/bin/bash.63) + trail_arm_timeout (4T -/usr/bin/bash.16) + hard_sl (3T -/usr/bin/bash.22)
+
+---
+
+## 2026-10-21 09:35 UTC — signal_reporter (6h run)
+
+**Query:** Fresh brain DB query (6h + 24h windows). 6h: 4 closed trades, no groups. 24h: 26 closed.
+
+**Kills executed:** None. Top candidate `pump-chain-,pump-chain-v6-` SHORT (5T/20%WR/-$0.16 24h) rejected after regime check: 7d +$0.28, EXTREME confluence +$0.32/7d — profitable window, 24h is noise. `pump-chain+` LONG (4T/0%WR/-$0.16) below 5T threshold, 7d +$0.16.
+
+**Boosts executed:** None. No signal met 5+ trades at WR>55%.
+
+**Verification:** Standalone `pump-chain-` EXTREME block (commit 3dabb044, Oct 16 14:44) effective — 8 EXTREME losers on Oct 16 all opened pre-commit. Post-block: 0 EXTREME standalone trades. Combined confluence EXTREME flow is intentional (v6- override 1.0, FIRST MATCH WINS) and profitable.
+
+**Watch list:** pump-chain+ LONG (trail_arm_timeout cluster), pump-chain- SHORT (7d WR trigger hit but pre-block contaminated; regime routing works), r2v2-long3 (3T, 7d 60%WR +$0.02).
+
+**No inversions. No flags changed. Report: automation/signal_report.md**
+
+**Side finding:** trading_log.md recent entries show mangled PnL strings (e.g. "-/usr/bin/bash.63" where "-$0.63" should be) — a previous writer expanded `$0` as a shell variable. Cosmetic, but worth a cleanup pass on the log-writing script.
