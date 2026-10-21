@@ -1,77 +1,54 @@
 # Signal Performance Report
-**Generated:** 2026-10-21 09:35 UTC | **Period:** Last 6h + 24h
-**Window:** 6h closed=4 trades | 24h closed=26 trades | **No OpenMemory (tenant_mismatch workaround)**
+**Generated:** 2026-10-21 15:45 UTC | **Period:** Last 6h + 24h
+
+## 6h Performance (closed, n≥2)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| continuation+ | LONG | 4 | 50.0% | -$0.18 |
+| pump-chain+ | LONG | 2 | 0.0% | -$0.16 |
+| r2v2-long3 | LONG | 4 | 50.0% | -$0.14 |
+| bb-bounce-v2-long+ | LONG | 4 | 75.0% | +$0.18 |
+
+## 24h Performance (closed, n≥3)
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain+ | LONG | 6 | 0.0% | -$0.32 |
+| r2v2-long3 | LONG | 7 | 42.9% | -$0.21 |
+| continuation+ | LONG | 4 | 50.0% | -$0.18 |
+| bb-bounce-v2-long+ | LONG | 5 | 80.0% | +$0.26 |
 
 ---
 
-## KILLED (executed)
+## KILLED (executed):
+None.
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None. No signal met all three kill criteria (WR<30% + 5+ trades + PnL<-$0.10) with all-regimes-<50% WR. |
+## BOOSTED (executed):
+None.
 
-**Candidate analyzed and rejected:**
-
-`pump-chain-,pump-chain-v6-` SHORT — 24h: 5T, 20% WR, -$0.16. Met raw kill criteria but:
-- 7d: 10T, 30% WR, **+$0.28** (profitable window)
-- EXTREME regime (only meaningful habitat): 7d 9T 3W +$0.32 | all-time 14T 4W +$0.17
-- Combined confluence = v6 RSI floor filtering the bleed; 24h is noise on a profitable confluence
-- Blanket kill would violate CEO "never blanket disable pump-chain SHORT, route via regime"
-
-`pump-chain+` LONG — 24h: 4T, 0% WR, -$0.16. Below 5T kill threshold. 7d: 22T 27.3% **+$0.16**. All-time EXTREME habitat 106T 42.5% +$4.18. All 4 losses were `trail_arm_timeout` (exit mechanism, not signal failure). Watch list.
-
----
-
-## BOOSTED (executed)
-
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None. Boost criteria (WR>55% + 5+ trades + PnL>$0.05) not met — top 24h winners each have 1 trade (r2v2-long5 +$0.37, bb-squeeze+ +$0.28, continuum-osc+ +$0.09). |
-
----
-
-## LOSERS (watch list)
-
+## LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 0.0% | -$0.16 | 4 (24h) | WATCH — below kill threshold (4T). 7d +$0.16. HIGH regime all-time 35% -$0.74 already dampened 0.5x. NORMAL blocked 0.0. All 24h losses trail_arm_timeout. |
-| pump-chain- | SHORT | 8.3% | -$0.55 | 12 (7d) | ROUTED — EXTREME blocked 0.0 (commit 3dabb044, Oct 16 14:44). Post-block: 0 EXTREME trades, 1 NORMAL -$0.05. Pre-registered "revert if 7d WR<50%" trigger is numerically hit but window is pre-block contaminated; regime routing works post-commit. CEO directive: never blanket disable. |
-| r2v2-long3 | LONG | 33.3% | -$0.07 | 3 (24h) | WATCH — 3T below kill threshold. 7d 5T 60% +$0.02. All-time EXTREME 7T 42.9% -$0.10 (tiny bleed), HIGH 5T 60% WR. n=13 all-time too small to act. |
+| pump-chain+ | LONG | 0.0% | -$0.32 | 6 | CONTAINED — HIGH blocked 03:37 today (CFX/BLUR pre-block), NORMAL=0.0 since 10-19. EXTREME habitat kept (30d 77T +$1.87, 14d +$1.13, all-time +$3.69). Kill NOT met: regime check shows profitable EXTREME pocket; brain_auditor kill-rejected ×8. |
+| r2v2-long3 | LONG | 42.9% | -$0.21 | 7 | WATCH — all-time 17T 52.9% +$0.25. EXTREME 10T 40% -$0.27 / HIGH 5T 60% -$0.10. No kill (WR>30%), no boost. Recheck next cycle. |
+| continuation+ | LONG | 50.0% | -$0.18 | 4 | WATCH — small n, all-time 22T 40.9% +$0.35. No action. |
 
----
-
-## WINNERS
-
+## WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| r2v2-long5 | LONG | 100% | +$0.37 | 1 (24h) | Single trade — not boost-eligible |
-| bb-squeeze+ | LONG | 100% | +$0.28 | 1 (24h) | Single trade |
-| continuum-osc+ | LONG | 100% | +$0.09 | 1 (24h) | Single trade |
-| bb-bounce-v2-long+ | LONG | 100% | +$0.08 | 1 (24h) | Single trade |
-| continuum-trend+ | LONG | 100% | +$0.04 | 1 (24h) | Single trade |
+| bb-bounce-v2-long+ | LONG | 80.0% | +$0.26 | 5 | KEPT — weight already 1.4. Boost NOT executed: 7d is 19T 47.4% -$0.46 (contradicts 24h window). Recheck if 7d turns green. Tokens: AIXBT/DOGE/GOAT/HYPER/XAI (4/5 won). |
 
 ---
 
-## VERIFICATION NOTES (Step 1 mandatory re-query)
+## SIGNAL INVERSIONS (24h):
+**None found.** 0 direction mismatches.
 
-- All numbers queried fresh from PostgreSQL brain DB at 09:32 UTC 2026-10-21. Not trusted from prior report.
-- 6h window: 4 closed trades total, no signal+direction group with ≥2 trades. Quiet window.
-- 24h: 26 closed trades. Grouped by signal+direction with ≥2: pump-chain+ LONG (4T), pump-chain-,pump-chain-v6- SHORT (5T), r2v2-long3 LONG (3T), ai-trader-manual LONG (2T), ai-trader-pending SHORT (2T). Manual/CEO trades excluded from signal kill analysis.
-
----
+## DECISIONS
+1. **pump-chain+ LONG kill REJECTED** — 24h 0%WR -$0.32 meets surface kill bar, but regime check overrides: EXTREME all-time 265T 42.3%WR +$3.69 (positive), 30d LONG EXTREME +$1.87. HIGH/NORMAL losses already blocked (PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED=True shipped 03:37 today — CFX/BLUR were pre-block opens at 00:17). NORMAL override 0.0 since 10-19. Remaining 24h bleed is 4 EXTREME trades -$0.20 — noise inside a +$1.87/30d habitat. CEO philosophy: every pump is a LONG opportunity.
+2. **bb-bounce-v2-long+ boost REJECTED** — 24h meets boost bar (5T 80% +$0.26) but 7d is -$0.46. Boosting into a losing week is overfit to one window. Weight stays 1.4.
+3. **Prior 15:31 report discarded** — used % instead of $ PnL units and recommended DISABLE pump-chain+ (wrong: would kill EXTREME edge).
 
 ## ISSUES
-
-- **No inversions** (Step 5 clean): 0 direction mismatches in 24h (signal names containing "long"/"short" vs direction column).
-- **Standalone pump-chain- EXTREME trades on Oct 16 (01:58–14:04 UTC, 8T 0%WR -$0.49):** all opened BEFORE the `('EXTREME','pump-chain-'): 0.0` block commit at 14:44 UTC (3dabb044). Not a bypass bug — block is effective post-commit. No action needed.
-- **Combined-signal EXTREME confluence (`pump-chain-,pump-chain-v6-`):** flows through `('EXTREME','pump-chain-v6-'): 1.0` override (FIRST MATCH WINS, substring match hits v6- before pump-chain-). This is intentional per spec rev1 §6.3 (v6 SHORT neutral in EXTREME; confluence edge +$0.32/7d). Not a bug.
-- **Pre-registered revert trigger (PUMP_CHAIN_V5_SHORT_ENABLED "revert if 7d WR<50%"):** numerically hit (8.3% WR standalone 7d) but window contaminated by pre-block trades; post-block routing verified effective (0 EXTREME leaks). Documented for CEO awareness — recommend keeping regime-routed state; blanket revert would contradict "every dump is a SHORT" standing order and kill the profitable v6 confluence.
-- **Brain_auditor action already in stack today:** SHORT_RSI_FLOOR_PUMP_CHAIN + SHORT_RSI_HARD_FLOOR_PUMP_CHAIN reverted 40→45 (commit-level change, hermes_constants.py:934,946). Adds another defense layer on pump-chain SHORT oversold entries.
+- None new. Inversions clean. HIGH block (c9092ae) live, first post-block HIGH open validation pending.
 
 ---
-
-## SYSTEM HEALTH
-
-- Kill switches: LIVE_TRADING_ENABLED=True | runtime kill switch untouched
-- No flags modified this run. No commits required (no file changes).
-- Next report: ~2026-10-21 15:35 UTC
+*Auto-generated by signal_reporter. Next run ~6h.*
