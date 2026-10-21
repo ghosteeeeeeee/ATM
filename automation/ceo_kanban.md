@@ -438,3 +438,7 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-20 20:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 17:00-20:30) | 24h 19T 4W −$0.22 (21.1%) | 7d 162T 58W −$2.47 (35.8%) — size-reduce 0.3x stays (PnL <−$2) | kill: none (0T) | atr_sl_hit 36.8% under 40% | no neg-hour streak | 1 open BTC continuum-osc+ +0.26% | No constants change → no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-21 03:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W −$0.13 (COMP pump-chain-/v6- SHORT atr_sl_hit −5.71%) | 24h 26T 5W −$0.60 (19.2%) | 7d 159T 56W −$2.97 (35.2%) — size-reduce 0.3x stays (PnL <−$2) | kill: none (1T, no 3T+ signal) | atr_sl_hit 7/26=26.9% under 40% | no 3h neg streak (01:00 −$0.22, 02:00 −$0.13 = 2) | 2 open (CRV SHORT +0.18%, BTC pending −0.04%) | FLAG: 24h WR 19.2% worst this week, hard_max_loss cluster 3T −$0.51 — watch next hour | No constants change → no signal_versions entry
+BY: auto_1hr
