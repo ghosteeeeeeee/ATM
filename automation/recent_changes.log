@@ -5011,3 +5011,4 @@ BY: brain_auditor
 BY: auto_1hr
 - [2026-10-21 14:29] auto_1hr: NO CONFIG CHANGE — 4T last hour 1W/3L -$0.37 | 24h 32T 34.4% -$0.87 (flipped red: aged-out winners +$0.56 gone) | 7d 158T 36.7% -$2.81 — size-reduce 0.3x stays | kill: none (max 1T/signal) | atr_sl_hit 21.9% under 40% | no neg streak (14:00 -0.31 isolated) | regime SHORT_BIAS now, 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+[2026-10-21 15:40 UTC] brain_auditor: AUDIT RUN #58 — 0 config changes (vacation soak) | pump-chain- kill DEFER Oct 22 (bare 30d OOS -1.15 n=116, combo +0.26) | WLD MFE anomaly flagged | post-arm breakeven ratchet re-registered (blocked on esc #17) | 24h 40% -0.71 shallow, since #57 +0.03, size-reduce 0.3x

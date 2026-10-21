@@ -1,94 +1,146 @@
 {
-  "timestamp": "2026-10-21T14:39:32Z",
-  "run": 57,
-  "agent": "brain_auditor",
-  "mode": "vacation soak (shadow-first, no constants changes until Oct 23)",
+  "timestamp": "2026-10-21T15:40:05Z",
+  "run": "brain_auditor #58",
+  "mode": "vacation_soak",
   "session_brain_stats": {
-    "queries": ["signal performance winrate regime", "new signal idea improvement strategy"],
-    "top_insight": "R:R relaxation + trend-following signal ideas dominate; pump-chain-short WR improvement discussed repeatedly — matches scheduled Oct 22 kill recheck. No new unimplemented idea clears bars today."
+    "queries": [
+      "signal performance winrate regime recent",
+      "losing trades wrong side chop",
+      "new signal idea improvement"
+    ],
+    "top_insights": [
+      "Recurring: wrong-side/chop entries discussed across sessions (RR+k, chop v2, trend following) — structural, defenses holding",
+      "Trend-following signal + grind-to-spike ideas already in pipeline; no missing implementation blocking"
+    ]
   },
   "trade_summary_24h": {
-    "trades": 32,
-    "wins": 11,
-    "wr": 34.4,
-    "pnl": -0.87,
-    "note": "Slipped from #56 green +$0.06 — the 4 open LONGs closed mixed (3 trail winners +$0.23 vs SYRUP stale -0.23, GRASS -0.08, INJ -0.08). Shallow, size-reduce 0.3x containing (max loss -$0.23)."
+    "trades": 35,
+    "wins": 14,
+    "wr": 40.0,
+    "pnl": -0.71,
+    "since_last_run_1439": {
+      "trades": 5,
+      "wins": 3,
+      "pnl": 0.03
+    },
+    "7d": {
+      "trades_approx": 158,
+      "wr": 36.7,
+      "pnl": -2.81
+    },
+    "size_reduce": "0.3x active (both resume legs failing)",
+    "open": "BTC #16342 LONG continuum-trend+ conf=77.1 entry=84624 pnl~-0.17% — HOLD (dual LONG_BIAS/STRONG_UP/MARKUP)",
+    "regime": "dual LONG_BIAS, continuum ABOVE, zscore STRONG_POS, MARKUP/STRONG_UP (market_phase DECLINING lagging)"
   },
-  "trade_summary_7d": {
-    "trades": 158,
-    "wr": 36.7,
-    "pnl": -2.81,
-    "trail_family": "62T 75.8% +$3.85",
-    "unarmed_family": "96T 11.5% -$6.66",
-    "wealth_gap": "UNCHANGED — armed vs unarmed separation holds"
+  "watchdog_triage": [
+    {
+      "id": "steer-001",
+      "verdict": "RESOLVED-BY-EXIT",
+      "detail": "BTC+INJ cluster: INJ #16343 closed HML -$0.08 within 14m; only BTC remains open and aligned"
+    },
+    {
+      "id": "steer-002",
+      "verdict": "SHALLOW-KNOWN-COHORTS",
+      "detail": "Wrong-side look: 20 losers all known chop cohorts (SYRUP stale, PUMP r2v2 EXTREME HML, pump-chain+ timeouts, BTC pending). Max loss -$0.23. No new pattern"
+    }
+  ],
+  "last_run_verify": {
+    "floor_45": "HOLDING — 0 SHORT opens with meta_rsi<45 since 02:46 revert",
+    "arm_gap_instrumentation": "HOLDING — 0 [ARM-GAP] log lines and 0 qualifying closes since 09:55 fix (correct-by-zero; quiet window)",
+    "tat_scope": "HOLDING — 0 in-scope fires; trail_arm_timeout only pump-chain path working as designed",
+    "doji_kill": "HOLDING — 0 opens since Oct 16 18:44",
+    "size_reduce_0.3x": "HOLDING — losses contained (max -$0.23)",
+    "protected_flags": "INTACT — OVERSOLD_BOUNCE/AI_TRADER/HL_COPY/PUMP_CHAIN_V4 all False; LIVE_TRADING True",
+    "arm_rate_leaderboard_57": "RECONFIRMED — bare pump-chain- arm 9.1% vs combo 30%; SHORT ARMED 8T/7d 100% +$0.91"
   },
-  "open_trades": "3 LONG (CFX/WLD r2v2-long3 conf=100, BTC continuum-trend+ conf=77.4) — all dual LONG_BIAS/STRONG_UP/MARKUP aligned, all with SL/TP — HOLD",
-  "watchdog_triage": {
-    "steer_001_wrong_side": "REJECT-SHALLOW — losses are chop entries in EXTREME alts (PUMP r2v2 HML x2, pump-chain+ timeouts x4 contained) + counter-trend COMP/CRV SHORTs + SYRUP gap-0.81 chase. Direction is NOT wrong (LONG_BIAS aligned); entry quality in EXTREME vol is the issue. Known cohorts, size-reduce containing."
-  },
-  "changes_from_last_run": {
-    "floor_45_revert": "HOLDING — 1 SHORT open since 02:46 (#16320 BTC pending, no RSI meta) = 0 violations",
-    "arm_gap_realldictcursor_fix": "HOLDING — 0 [ARM-GAP] log lines since 09:55 = same correct-by-zero posture as #56",
-    "tat_scope_fix": "HOLDING — 0 in-scope fires last 24h (no bb-bounce/ai-trader+ timeout exits); 14d proxy 1T -$0.26; fire count still short of 15",
-    "size_reduce_0.3x": "HOLDING — losses contained, max -$0.23",
-    "doji_kill": "HOLDING — 0 trades since Oct 16 18:44 (10 in window were pre-kill aging)",
-    "protected_flags": "INTACT — key killed signals verified False (OVERSOLD_BOUNCE, AI_TRADER, HL_COPY_TRADING)"
-  },
-  "losing_trade_autopsy": {
-    "losers_24h": 20,
+  "losing_trade_autopsy_24h": {
+    "total_losers": 20,
+    "max_loss": -0.23,
     "new_patterns": 0,
     "clusters": [
-      "SYRUP continuation+ stale_exit -$0.23 gap=0.81 chase (biggest loss; stale_exit cohort 3T/7d -$0.62 0% — n<20 monitor)",
-      "PUMP r2v2-long3 x2 hard_max_loss EXTREME -$0.25 (known EXTREME chop; 14d signal +$0.32 50% = variance)",
-      "pump-chain+ 4x trail_arm_timeout + 1x HML -$0.24 (TAT target cohort, each contained <=-$0.10, mechanism working)",
-      "BTC ai-trader x3 -$0.20 (CEO domain chop-pin, known)",
-      "COMP/CRV counter-EXTREME SHORTs -$0.18 (pump-chain- family — kill recheck tomorrow)",
-      "XPL bb-squeeze+ gap=1.21 chase -$0.08 (single; chase filter must NOT tighten — gap 1.0+ is only profitable band)"
+      {
+        "pattern": "INJ pump-chain+ LONG ×2 HML EXTREME",
+        "trades": "#16336 mfe~0, #16343 mfe=0.20",
+        "root_cause": "chop entry in EXTREME — never armed",
+        "action": "known cohort; size-reduce containing"
+      },
+      {
+        "pattern": "PUMP r2v2-long3 ×2 HML EXTREME",
+        "root_cause": "same chop/no-momentum profile",
+        "action": "monitor; no filter passes bars"
+      },
+      {
+        "pattern": "SYRUP continuation+ stale_exit -$0.23",
+        "root_cause": "stale cohort (3T/7d -$0.62 0%)",
+        "action": "watch — n>=10 WR<20% → TAT scope candidate"
+      }
     ],
-    "winners": "8/11 profit-monster-trail — exit mechanics sound; entry quality is the cancer",
-    "verification": "Would any new filter hurt winners? No new filter proposed — every cluster is a known cohort with a scheduled or pre-registered response."
+    "anomaly": "WLD #16341 r2v2-long4: mfe_pct=4.31 hold=1m atr_trail_hit pnl=-0.01 — possible mfe spike miscalc on sub-2m trades; bug_hunter candidate"
   },
-  "coin_regime_analysis": {
-    "stamped_7d": 36,
-    "cells": {
-      "LONG_x_LONG_BIAS": "17T +$0.29 47.1% — aligned wins",
-      "LONG_x_SHORT_BIAS": "11T -$0.10 45.5% — counter wash",
-      "SHORT_x_LONG_BIAS": "5T -$0.19 0.0% — counter SHORT all lose (n=5 < 20 bar)",
-      "SHORT_x_SHORT_BIAS": "3T -$0.10 33.3% (n=3)"
+  "pump_chain_kill_recheck_prep_oct22": {
+    "bare_14d": {
+      "n": 36,
+      "pnl": -0.53,
+      "wr": 22.2,
+      "arm": 22.2
     },
-    "verdict": "Direction thesis holds (aligned LONG wins, counter SHORT loses). Dampen pre-reg UNCHANGED: flip at cell n>=20 AND WR<30%."
-  },
-  "arm_rate_leaderboard_7d": {
-    "chop_band": "hl_copy 0% | ai-trader-pending 0% | ai-trader-manual 7.7% | pump-chain- bare 9.1% | combo v6- 30% | ai-trader+ 33.3%",
-    "trend_band": "bb-bounce 52.6% | r2v2-long3 57.1% | pump-chain+ 65.2% | volume-buildup- 66.7%",
-    "direction_x_family": "SHORT ARMED 9T 100% +$1.05 (every armed SHORT wins) vs SHORT UNARMED 36T 8.3% -$2.17 | LONG ARMED 53T 71.7% +$2.80 vs UNARMED 60T 13.3% -$4.49",
-    "structural_support": "pump-chain- bare arms at 9.1% vs combo 27.3% (3x) — Option A v6-requirement for Oct 22 kill recheck gains structural confirmation"
+    "bare_30d_oos": {
+      "n": 116,
+      "pnl": -1.15,
+      "wr": 37.9,
+      "arm": 13.8,
+      "verdict": "OOS confirms bleed"
+    },
+    "combo_14d": {
+      "n": 11,
+      "pnl": 0.26,
+      "wr": 27.3,
+      "arm": 27.3
+    },
+    "combo_30d_oos": {
+      "n": 11,
+      "pnl": 0.26,
+      "wr": 27.3
+    },
+    "option_a": "require v6-confirmation (kill bare path): blocks 8 winners +$1.27, saves net +$0.53; arm-structure 9.1% vs 27-30% is the edge",
+    "status": "DEFERRED to Oct 22 recheck per pre-registration — not jumped today"
   },
   "drift_findings": [],
   "recurring_problems": [
-    "pump-chain- bare SHORT: arm-rate 9.1%, 14d 36T 22.2% -$0.53 — kill trigger MET, recheck scheduled Oct 22 (tomorrow), Option A matrix ready",
-    "EXTREME-vol chop entries (r2v2/PUMP/pump-chain+ timeouts): contained by size-reduce + TAT shadow collecting",
-    "ai-trader-pending 0% arm rate 9T -$0.28 — CEO domain, n<20, monitor"
+    "ARM-GAP 14d 51T -$1.16 (MFE>=0.40 trail=FALSE SL-family) still largest structural bleed — flip blocked on escalation #17 candle OOS",
+    "stale_exit cohort 3T/7d -$0.62 0% — n too small, watch",
+    "pump-chain+ armed-then-giveback 14d: 13T armed-LOSS avgMFE 1.22 → -1.27% vs 12T armed-WIN avgMFE 3.41 → +3.24%"
   ],
-  "missing_implementations": [],
+  "missing_implementations": [
+    "exit-ladder candle OOS (escalation #17, 20th request) — still blocks ARM-GAP/peak-trail/post-arm tighten flips"
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-21T14:39:32Z",
-      "idea": "Arm-rate leaderboard as standing daily audit metric (per-signal % of closes with trailing_activated, 7d rolling, n>=5)",
-      "rationale": "Makes the Captain's trend-vs-chop philosophy SQL-native: arm% <35 = chop signal (don't enter), arm% >=50 = trend signal (ride). First run already structural-confirms Option A (bare 9.1% vs combo 27.3% arm) and shows SHORT ARMED = 100% WR (9/9).",
-      "expected_impact": "Zero-behavior; one query per audit run; surfaces signal decay 1-2 runs earlier than PnL alone",
-      "category": "monitoring",
-      "status": "shipped-as-audit-metric",
+      "date": "2026-10-21T15:40:05Z",
+      "idea": "WLD #16341 MFE anomaly → bug_hunter on _compute_mfe_mae sub-2m spike handling",
+      "rationale": "mfe_pct=4.31% with 1m hold and pnl=-0.01% poisons ARM-GAP detection and any MFE-based shadow if mfe is wrong; verify before trusting mfe filters",
+      "expected_impact": "data integrity for all MFE-gated logic",
+      "category": "data_quality",
+      "status": "flagged_bug_hunter",
       "risk": "none"
+    },
+    {
+      "date": "2026-10-21T15:40:05Z",
+      "idea": "Post-arm breakeven ratchet for pump-chain+ (pre-registered, carried): after trail arms at +0.40%, if live_pnl drops below -0.30% flip to breakeven stop",
+      "rationale": "14d armed-LOSS 13T avgMFE 1.22% gave back to -1.27% avg; winners ride to 3.41%. Targets giveback cohort without fixed-time cut (MFE-CUT OOS fail lesson)",
+      "expected_impact": "~+$0.30-0.50/14d raw on giveback cohort; needs candle OOS via escalation #17",
+      "category": "exit_quality",
+      "status": "pre_registered_blocked_on_OOS",
+      "risk": "medium"
     }
   ],
   "config_changes_applied": [],
+  "changes_from_last_run": "ALL HOLDING (see last_run_verify). Since #57: 5T 3W +$0.03 green micro-window",
   "next_actions": [
-    "OCT 22: pump-chain- kill recheck — Option A (require v6-confirmation, kill bare path) matrix ready; arm-rate 9.1% vs 27.3% now structural evidence",
-    "OCT 23 vacation-end stack: PUMP_CHAIN_CONF_FLOOR=30, SHORT×EXTREME 0.5x dampen shadow, coin_regime dampen (flip at n>=20), pp-cond re-eval, TAT fire-count check",
-    "coin_regime SHORT×LONG_BIAS cell watch: n=5 -> 20 for dampen flip",
-    "Escalation #17 (20th): exit-ladder candle OOS — still blocks ARM-GAP/peak-trail flip",
-    "Monitor stale_exit cohort (3T/7d -$0.62 0%) — if n>=10 and WR<20%, TAT scope candidate for continuation+",
-    "SIDWAYS: portfolio PnL display -45.22% (watchdog) — display-calc suspect, informational only; real 24h -$0.87"
+    "OCT 22: pump-chain- kill recheck — Option A matrix ready (bare 30d -$1.15 n=116 OOS confirms; combo +$0.26 keep)",
+    "OCT 23 vacation-end stack: PUMP_CHAIN_CONF_FLOOR=30 (recheck winner-kill: conf<30 kills 6 winners +$0.74, net save +$1.20), SHORT×EXTREME dampen shadow, pp-cond re-eval",
+    "Escalation #17 (21st): exit-ladder candle OOS — unblocks ARM-GAP/post-arm ratchet",
+    "bug_hunter: WLD #16341 mfe_pct anomaly sub-2m trades",
+    "Monitor stale_exit cohort and INJ repeat-HML coin behavior"
   ]
 }

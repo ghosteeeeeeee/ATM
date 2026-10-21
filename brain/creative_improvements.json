@@ -6240,5 +6240,27 @@
     "category": "monitoring",
     "status": "shipped-as-audit-metric",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-21T15:40:05Z",
+    "idea": "WLD #16341 MFE anomaly → bug_hunter on _compute_mfe_mae sub-2m spike handling",
+    "rationale": "mfe_pct=4.31% with 1m hold and pnl=-0.01% poisons ARM-GAP detection and any MFE-based shadow if mfe is wrong; verify before trusting mfe filters",
+    "expected_impact": "data integrity for all MFE-gated logic",
+    "category": "data_quality",
+    "status": "flagged_bug_hunter",
+    "risk": "none",
+    "agent": "brain_auditor",
+    "run": 58
+  },
+  {
+    "date": "2026-10-21T15:40:05Z",
+    "idea": "Post-arm breakeven ratchet for pump-chain+ (pre-registered, carried): after trail arms at +0.40%, if live_pnl drops below -0.30% flip to breakeven stop",
+    "rationale": "14d armed-LOSS 13T avgMFE 1.22% gave back to -1.27% avg; winners ride to 3.41%. Targets giveback cohort without fixed-time cut (MFE-CUT OOS fail lesson)",
+    "expected_impact": "~+$0.30-0.50/14d raw on giveback cohort; needs candle OOS via escalation #17",
+    "category": "exit_quality",
+    "status": "pre_registered_blocked_on_OOS",
+    "risk": "medium",
+    "agent": "brain_auditor",
+    "run": 58
   }
 ]
