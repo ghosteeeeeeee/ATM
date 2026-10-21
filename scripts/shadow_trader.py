@@ -819,11 +819,13 @@ def _simulate_pump_exit(entry_price, direction, candles, atr_pct):
             peak_price = min(peak_price, l)
         
         # Trail SL check
+        # bug_hunter fix: accel clamp was INVERTED — live uses min-style cap
+        # (SL never tighter than entry±0.3%), not max-style floor
         if direction == 'LONG':
             trailing_sl = peak_price * (1 - trail_distance)
-            # Enforce ATR_SL_MIN_ACCEL floor
-            accel_floor = entry_price * (1 - ATR_SL_MIN_ACCEL / 100)
-            trailing_sl = max(trailing_sl, accel_floor)
+            # Cap: SL must stay at least 0.3% below entry (not tighter)
+            accel_cap = entry_price * (1 - ATR_SL_MIN_ACCEL / 100)
+            trailing_sl = min(trailing_sl, accel_cap)  # FIX: was max()
             
             if l <= trailing_sl:
                 pnl = (trailing_sl / entry_price - 1) * 100
@@ -831,8 +833,9 @@ def _simulate_pump_exit(entry_price, direction, candles, atr_pct):
                         'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - entry_ts) / 60}
         else:
             trailing_sl = peak_price * (1 + trail_distance)
-            accel_ceiling = entry_price * (1 + ATR_SL_MIN_ACCEL / 100)
-            trailing_sl = min(trailing_sl, accel_ceiling)
+            # Cap: SL must stay at least 0.3% above entry (not tighter)
+            accel_cap = entry_price * (1 + ATR_SL_MIN_ACCEL / 100)
+            trailing_sl = max(trailing_sl, accel_cap)  # FIX: was min()
             
             if h >= trailing_sl:
                 pnl = (entry_price / trailing_sl - 1) * 100
@@ -860,11 +863,13 @@ def _simulate_pump_exit(entry_price, direction, candles, atr_pct):
                 return {'fired': True, 'exit_type': 'pump_exit_momentum', 'exit_price': c,
                         'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - entry_ts) / 60}
         
-        # Time exit
+        # Time exit — dead money check
+        # bug_hunter fix: polarity was INVERTED — live exits LOSERS (profit < 2%),
+        # not winners (profit >= 2%)
         hold_hours = (ts - entry_ts) / 3600
         current_pnl = (c / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / c - 1) * 100
-        if hold_hours >= PUMP_EXIT_TIME_HOURS and current_pnl >= PUMP_EXIT_TIME_THRESHOLD:
-            return {'fired': True, 'exit_type': 'pump_exit_time', 'exit_price': c,
+        if hold_hours >= PUMP_EXIT_TIME_HOURS and current_pnl < PUMP_EXIT_TIME_THRESHOLD:
+            return {'fired': True, 'exit_type': 'pump_exit_dead_money', 'exit_price': c,
                     'exit_ts': ts, 'pnl_pct': current_pnl, 'hold_minutes': (ts - entry_ts) / 60}
     
     # No exit — hold to end
@@ -930,27 +935,32 @@ def _simulate_ride_it(entry_price, direction, candles, atr_pct):
                     return {'fired': True, 'exit_type': 'ride_it_tp', 'exit_price': tp_price,
                             'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': hold_minutes}
         
-        # Phase 2: Trail activation
-        if current_pnl >= RIDE_IT_TRAIL_ACTIVATE * 100:
-            trail_active = True
+        # Phase 2: Trail activation (only after phase 1 ends)
+        # bug_hunter fix: gate trail to phase 2 only (after 2h)
+        if hold_minutes >= RIDE_IT_PHASE1_TO_PHASE2_TIME:
+            if current_pnl >= RIDE_IT_TRAIL_ACTIVATE * 100:
+                trail_active = True
+            
+            if trail_active:
+                trail_dist = RIDE_IT_TRAIL_DISTANCE * 100
+                if direction == 'LONG':
+                    trail_price = peak_price * (1 - trail_dist/100)
+                    if l <= trail_price:
+                        pnl = (trail_price / entry_price - 1) * 100
+                        return {'fired': True, 'exit_type': 'ride_it_trail', 'exit_price': trail_price,
+                                'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': hold_minutes}
+                else:
+                    trail_price = peak_price * (1 + trail_dist/100)
+                    if h >= trail_price:
+                        pnl = (entry_price / trail_price - 1) * 100
+                        return {'fired': True, 'exit_type': 'ride_it_trail', 'exit_price': trail_price,
+                                'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': hold_minutes}
         
-        if trail_active:
-            trail_dist = RIDE_IT_TRAIL_DISTANCE * 100
-            if direction == 'LONG':
-                trail_price = peak_price * (1 - trail_dist/100)
-                if l <= trail_price:
-                    pnl = (trail_price / entry_price - 1) * 100
-                    return {'fired': True, 'exit_type': 'ride_it_trail', 'exit_price': trail_price,
-                            'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': hold_minutes}
-            else:
-                trail_price = peak_price * (1 + trail_dist/100)
-                if h >= trail_price:
-                    pnl = (entry_price / trail_price - 1) * 100
-                    return {'fired': True, 'exit_type': 'ride_it_trail', 'exit_price': trail_price,
-                            'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': hold_minutes}
-        
-        # Momentum exit (check last 2 candles)
-        if i >= RIDE_IT_MOMENTUM_CANDLES:
+        # Momentum exit (check last 2 candles) — only in phase 2 with profit > 1%
+        # bug_hunter fix: add phase gate and profit gate
+        if (hold_minutes >= RIDE_IT_PHASE1_TO_PHASE2_TIME and 
+            current_pnl > 1.0 and  # Live requires profit > 1%
+            i >= RIDE_IT_MOMENTUM_CANDLES):
             neg_count = 0
             for j in range(i - RIDE_IT_MOMENTUM_CANDLES + 1, i + 1):
                 prev_c = candles[j-1][4]
@@ -1004,12 +1014,14 @@ def _simulate_rr_engine(entry_price, direction, candles, atr_pct):
     entry_ts = candles[0][0]
     
     # Simplified RR: use ATR-based SL/TP with tighter stops
-    # RR engine typically uses tighter SL than ATR default
+    # bug_hunter fix: add floors/caps like live ATR engine
+    # bug_hunter fix: remove TP (live RR engine doesn't have TP, it uses structural S/R)
     sl_pct = atr_pct * 0.8  # Tighter than ATR default (1.0x)
-    tp_pct = atr_pct * 1.6  # 2:1 R:R ratio
+    # Apply floors/caps like live ATR engine
+    sl_pct = max(ATR_SL_MIN_ACCEL, min(sl_pct, ATR_SL_MAX))  # Floor 0.3%, cap 2.5%
     
     sl_price = entry_price * (1 - sl_pct/100) if direction == 'LONG' else entry_price * (1 + sl_pct/100)
-    tp_price = entry_price * (1 + tp_pct/100) if direction == 'LONG' else entry_price * (1 - tp_pct/100)
+    # No TP — live RR engine exits on structural S/R break, not fixed TP
     
     peak_price = entry_price
     
@@ -1021,6 +1033,7 @@ def _simulate_rr_engine(entry_price, direction, candles, atr_pct):
             peak_price = min(peak_price, l)
         
         # Trail SL (tighter than ATR default)
+        # bug_hunter fix: no TP — live RR engine exits on structural S/R break
         trail_dist = atr_pct * 0.6 / 100  # 0.6x ATR trail
         if direction == 'LONG':
             trailing_sl = peak_price * (1 - trail_dist)
@@ -1031,10 +1044,6 @@ def _simulate_rr_engine(entry_price, direction, candles, atr_pct):
                 pnl = (sl_price / entry_price - 1) * 100
                 return {'fired': True, 'exit_type': exit_type, 'exit_price': sl_price,
                         'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - entry_ts) / 60}
-            if h >= tp_price:
-                pnl = (tp_price / entry_price - 1) * 100
-                return {'fired': True, 'exit_type': 'rr_tp_hit', 'exit_price': tp_price,
-                        'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - entry_ts) / 60}
         else:
             trailing_sl = peak_price * (1 + trail_dist)
             sl_price = min(sl_price, trailing_sl)
@@ -1043,10 +1052,6 @@ def _simulate_rr_engine(entry_price, direction, candles, atr_pct):
                 exit_type = 'rr_trail_hit' if sl_price < entry_price else 'rr_sl_hit'
                 pnl = (entry_price / sl_price - 1) * 100
                 return {'fired': True, 'exit_type': exit_type, 'exit_price': sl_price,
-                        'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - entry_ts) / 60}
-            if l <= tp_price:
-                pnl = (entry_price / tp_price - 1) * 100
-                return {'fired': True, 'exit_type': 'rr_tp_hit', 'exit_price': tp_price,
                         'exit_ts': ts, 'pnl_pct': pnl, 'hold_minutes': (ts - entry_ts) / 60}
     
     # No exit — hold to end
@@ -1439,7 +1444,7 @@ def reclose_events():
             vol_regime = ctx.get('vol_regime', 'UNKNOWN')
             leverage = lev or MAX_LEVERAGE
             
-            # Re-simulate all engines with full candle data
+            # Re-simulate all 10 engines with full candle data
             results = {}
             results['atr'] = _simulate_atr_sl_tp(entry_price, d, candles, atr_pct)
             results['pm_trail'] = _simulate_pm_trail(entry_price, d, candles, src, vol_regime)
@@ -1448,12 +1453,15 @@ def reclose_events():
             results['speed_stale'] = _simulate_speed_stale(entry_price, d, candles)
             results['universal_hold'] = _simulate_universal_hold(entry_price, d, candles, src)
             results['trail_arm_timeout'] = _simulate_trail_arm_timeout(entry_price, d, candles, src)
+            results['pump_exit'] = _simulate_pump_exit(entry_price, d, candles, atr_pct)
+            results['ride_it'] = _simulate_ride_it(entry_price, d, candles, atr_pct)
+            results['rr_engine'] = _simulate_rr_engine(entry_price, d, candles, atr_pct)
             
-            # Tie-break precedence
+            # Tie-break precedence (10 engines)
             _PRECEDENCE = {
-                'hard_max': 1, 'cut_loser': 2, 'atr': 3,
-                'speed_stale': 4, 'trail_arm_timeout': 5,
-                'universal_hold': 6, 'pm_trail': 7,
+                'hard_max': 1, 'cut_loser': 2, 'atr': 3, 'rr_engine': 4,
+                'pump_exit': 5, 'ride_it': 6, 'speed_stale': 7,
+                'trail_arm_timeout': 8, 'universal_hold': 9, 'pm_trail': 10,
             }
             fired = [(k, v) for k, v in results.items() if v and v.get('fired')]
             
@@ -1467,7 +1475,8 @@ def reclose_events():
                     UPDATE shadow_trades SET
                         exit_atr_json=?, exit_pm_trail_json=?, exit_hard_max_json=?,
                         exit_cut_loser_json=?, exit_speed_stale_json=?, exit_universal_hold_json=?,
-                        exit_trail_arm_timeout_json=?,
+                        exit_trail_arm_timeout_json=?, exit_rr_engine_json=?,
+                        exit_pump_exit_json=?, exit_ride_it_json=?,
                         first_exit_engine=?, first_exit_price=?, first_exit_pnl_pct=?,
                         first_exit_hold_minutes=?, first_exit_reason=?,
                         gross_pnl_pct=?, net_pnl_pct=?, updated_at=?
@@ -1475,7 +1484,8 @@ def reclose_events():
                 """, (json.dumps(results.get('atr')), json.dumps(results.get('pm_trail')),
                       json.dumps(results.get('hard_max')), json.dumps(results.get('cut_loser')),
                       json.dumps(results.get('speed_stale')), json.dumps(results.get('universal_hold')),
-                      json.dumps(results.get('trail_arm_timeout')),
+                      json.dumps(results.get('trail_arm_timeout')), json.dumps(results.get('rr_engine')),
+                      json.dumps(results.get('pump_exit')), json.dumps(results.get('ride_it')),
                       first_engine, first_result['exit_price'], gross_pnl,
                       first_result['hold_minutes'], first_result['exit_type'],
                       gross_pnl, net_pnl, datetime.now(timezone.utc).isoformat(), sid))
