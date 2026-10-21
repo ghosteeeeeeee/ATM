@@ -1,29 +1,13 @@
 {
-  "timestamp": "2026-10-21T18:43:59.464437+00:00",
+  "timestamp": "2026-10-21T19:44:00.102096+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.43 USDT. Something is wrong.",
+      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.58 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: SOL + BANANA",
-      "detail": "Both opened within 21 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Portfolio heavily long (5 trades)",
-      "detail": "5 long positions. One BTC dump hits all of them.",
-      "auto_executable": false,
-      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -31,25 +15,25 @@
       "title": "7 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-002"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "ABOVE",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
+    "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 5,
+  "open_count": 0,
   "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 4 (4 long, 0 short)\nUnrealized PnL: +0.06 USDT   [BANANA closed +0.04 trail \u2014 prior \"cut\" call was wrong]\nRegime: LONG_BIAS (15m+4h, continuum ABOVE, BTC >EMA300 1,347 ticks, STRONG_UP)\nVolatility: LOW | Volume: LOW | Velocity: SLOW | Slots: 4/6\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent/health] 7d book: 160 closed, 36.9% WR, -3.15 USDT. 24h 40.5% WR, -0.70. Streak 12/20.\n\ud83d\udd34 [urgent/cluster] pump-chain+ is 0/6 in 24h (max MFE 0.275%, holds 13-46min) AND still\n   queueing KBONK/APT/ARB LONG pending at 18:42. Referred to brain auditor + CEO \u2014\n   watchdog does not disable signals.\n\ud83d\udfe1 [warning/profit_lock] SOL +0.67% (1.52h) has cleared the +0.40% arm \u2192 move SL from\n   107.855 to BREAKEVEN 108.10. Risk-free. Signal family is weak (hl_copy 30% WR) \u2014 lock it.\n\ud83d\udfe1 [warning/stale] POL (0.26h, -0.23%): weakest tape in the book (-0.57% 1h), entry zscore 1.63\n   (already extended), R:R 1.08 = worst open. No +0.40% by 19:15 UTC \u2192 exit before\n   it becomes hard_max_loss #6.\n\ud83d\udfe1 [warning/health] NEO +0.14% at 2.06h is below the arm curve (winners arm ~58min).\n   Arm deadline 21:00 UTC. Signal itself is the day's best (bb-bounce 6T/83.3%).\n\ud83d\udfe1 [warning/cluster] 4/4 long = correct for regime; correlated but aligned. Trim only if\n   BTC loses 84365 (would break 3 of 4 positions together).\n\ud83d\udfe2 [info] BTC continuum-trend+ +0.04% at 3.65h: HOLD. Best-WR signal (85.7%), R:R ~4.8.\n\ud83d\udfe2 [info] No trade \u2265+2% or \u22658h \u2192 no other BE/trail/stale mandates due this cycle.\n\ud83d\udfe2 [info] AI trader pick SKIPPED \u2014 AI_TRADER_ENABLED=False (CEO 2026-10-19). State untouched.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nWe're on the right SIDE and still losing \u2014 coin selection, not direction. Shorts 5/5 lost in\n24h (meta_rsi 51-59, dead center band \u2014 RSI wasn't the mistake, direction was) and the book\nhas already corrected to 0 shorts. The remaining bleed is exit path: hard_max_loss losers\naveraged MFE 0.069% and died in 29 minutes; trail_arm_timeout hit 0.117% at 45min; atr_sl_hit\nground 75 minutes to 0.206% before the stop took it. All 16 winners exited profit-monster-trail\n(+0.65, 58min). The separator is binary and early \u2014 does the coin make +0.40% in its first\n30-60 minutes? Losers peak at 0.07-0.21% and never get there. We're long beta on flat coins\ninstead of coins with their own local trend (CRV +2.22%, IOTA +1.89%, GRT +1.73% \u2014 none held).\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Move SOL stop to 108.10 breakeven now (armed at +0.67%).\n2. POL: hard 19:15 UTC arm deadline; exit if unarm or if 1h tape stays negative.\n3. Escalate pump-chain+ (0/6, still firing) to brain auditor for quarantine decision.\n4. Refer atr_sl_hit bucket (7T, -0.48, MFE 0.206) \u2014 stop placement vs arm threshold is\n   parameter work, not a watchdog lever.\n5. Stay long-only until BTC loses 84365 / EMA300. No AI pick written (constant disabled).\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\n**TLDR:** Book is on the right side (4/4 LONG, LONG_BIAS) but 75% of 24h gross losses are trades that never reached the +0.40% trail arm \u2014 coin selection, not direction. SOL is the only armed trade \u2192 BE stop recommended; pump-chain+ is 0/6 today and still firing \u2192 escalated; AI pick skipped (`AI_TRADER_ENABLED=False`). Analysis merged into `watchdog_recommendations.json` with automated `steers` preserved, memory stored.\n",
   "agent_timestamp": "2026-10-21T18:51:14.028479+00:00",
   "regime_context": "LONG_BIAS confirmed independently on all four axes: btc_15m LONG_BIAS, btc_4h LONG_BIAS, continuum ABOVE, and BTC trading above EMA300 for 1,347 consecutive ticks with trend_quality STRONG_UP and zscore POS. The 15m regime scanner aggregates 80 long-bias vs 5 short-bias vs 44 neutral across 129 tokens \u2014 a lopsided tape. Volatility LOW, volume LOW, velocity SLOW, acceleration FLAT: this is a grind, not a melt-up, which is the critical nuance. In a grind, beta to BTC is not enough \u2014 only coins with their own local trend arm the trail (CRV +2.22% conf 93.9, IOTA +1.89, GRT +1.73, ARB +1.29, HYPE +1.10 over 16 candles), and we hold none of them. Positioning 4/4 LONG is correct for this regime. Do NOT add shorts while BTC holds EMA300 (last cross 2026-10-21 ~05:29 UTC). Mixed signal to watch: market_phase flips CALM/DECLINING alongside STRONG_UP trend quality \u2014 favor trail-family and trend-following entries over bounce/chop entries while that contradiction persists. Polarity flip threshold: BTC losing 84365 (BTC long's own stop) would break three of four positions together.",
