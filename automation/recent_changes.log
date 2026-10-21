@@ -5023,3 +5023,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-21 19:28] auto_1hr: NO CONFIG CHANGE — 5T last hour 1W/4L -$0.29 (bb-bounce-v2-long+ 3T 1W2L, not 0%WR) | 24h 41T 15W -$1.03 (36.6%) | 7d 164T 59W -$3.48 (36.0%) — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ 6T 0%WR + ai-trader-pending 3T 0%WR both 0T last hour; recheck pre-reg Oct 22) | atr_sl_hit 10/41=24.4% under 40% | neg streak 3h but regime SHORT_BIAS not NEUTRAL, no size cut | freq 5/hr OK | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-21 20:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 41T 36.6% -$1.03 | 7d 164T 36.0% -$3.48 — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending both 0T last hour; recheck pre-reg Oct 22) | atr_sl_hit 10/41=24.4% under 40% | no neg streak (empty hour breaks) | 0 open | No constants change -> no signal_versions entry
+BY: auto_1hr
