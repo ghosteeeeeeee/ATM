@@ -6337,5 +6337,35 @@
     "category": "trend riding / sizing",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-21T21:45:00Z",
+    "idea": "PRE-REGISTERED: pump-chain+ decay kill-criteria (criteria locked BEFORE data arrives)",
+    "rationale": "Watchdog P2 verified: 7d 21T 19.0% -$0.26, 24h 6T 0W -$0.32, lifetime WR 32.7% decaying — but 14d 54T +$0.96 still positive so kill is NOT met today (prior runs rejected pump-chain+ kill 7x on positive 14d). Locking the trigger now prevents post-hoc criteria (THE PATTERN discipline). Trigger: 14d n>=20 AND PnL<0 AND WR<30% at Oct 23 recheck.",
+    "expected_impact": "If trigger hits: Option A (require HIGH/EXTREME habitat or 0.7x demote) to CEO, projected ~$0.6-1.0/14d bleed cut. If trigger misses: zero change, criteria documented as failed.",
+    "category": "signal decay watch",
+    "status": "pre-registered",
+    "risk": "low",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-21T21:45:00Z",
+    "idea": "REJECTED-WITH-DATA: global conf<30 floor (measured this run, logged so not re-proposed)",
+    "rationale": "Watchdog worst-cell coverage decomposition: non-pump-chain conf<30 = 14d 11T 6W -$0.10 / 7d 6T -$0.02 = wash. 96% of conf<30 bleed (-$1.98 of -$2.08) is pump-chain, already covered by pre-registered PUMP_CHAIN_CONF_FLOOR=30. A global floor adds coverage risk (ai-trader/r2v2/continuation conf<30 winners 6W +$0.37/14d) with no edge.",
+    "expected_impact": "none — rejection record",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a",
+    "agent": "brain_auditor"
+  },
+  {
+    "date": "2026-10-21T21:45:00Z",
+    "idea": "REJECTED-WITH-DATA: LONG_RSI_SWEET_SPOT_BOOST demote (55-60 band 7d bleed)",
+    "rationale": "55-60 band PnL: 7d 20T 40% -$0.96 / 14d 41T -$0.08 / 30d 75T 52% +$1.13 — sign flip across windows = temporal instability, same failure class as the rejected staleness filter. 30d evidence (orig t=2.20 significant) outweighs a single negative week. Boost stays at 10.",
+    "expected_impact": "none — rejection record",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a",
+    "agent": "brain_auditor"
   }
 ]
