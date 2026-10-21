@@ -1760,5 +1760,16 @@
     "after": "45 / 45",
     "rationale": "Grant condition was \"40-45 band 63.2% WR; revert if 7d n>=5 WR<45% or PnL<-$0.50\". Trigger HIT: 7d n=5 w=1 (20% WR), 14d n=17 23.5% WR net +$0.04, 30d decayed 41.2% WR +$0.29 (was 63.2%). Edge gone across all windows.",
     "impact": "Blocks pump-chain SHORT entries with detect/live RSI<45 (oversold = bounce, BANANA lesson). Winner-kill: 14d 4W +$0.75 vs 13L -$0.71 saved ≈ wash; 7d +$0.13 saved. Aligned with standard SHORT floor 45."
+  },
+  {
+    "timestamp": "2026-10-21T09:55:00Z",
+    "agent": "brain_auditor",
+    "change": "ARM-GAP instrumentation bugfix: RealDictCursor rows accessed via integer index [0]/[1]/[2] raised KeyError swallowed by except:pass — zero log lines since Oct 20 deploy despite CRV #16318 qualifying (MFE 0.585 trail=FALSE). Fixed to dict-key access + error logging.",
+    "type": "bugfix",
+    "file": "scripts/position_manager.py",
+    "before": "_ag_row[0]/[1]/[2] integer index + except:pass silent",
+    "after": "_ag_row['trailing_activated'/'mfe_price'/'entry_price'] dict-key + except logs [ARM-GAP-ERROR]",
+    "rationale": "Instrumentation was dead-on-arrival; validation protocol (n>=10 log lines) blocked. Zero live behavior — log-only block.",
+    "impact": "Unblocks ARM-GAP giveback-cohort live validation for vacation-end exit-stack review"
   }
 ]

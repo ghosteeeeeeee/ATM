@@ -1320,10 +1320,13 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
             if mfe_pct_val is not None and float(mfe_pct_val) >= 0.40 and float(pnl_pct) < 0:
                 cur.execute("SELECT trailing_activated, mfe_price, entry_price FROM trades WHERE id=%s", (trade_id,))
                 _ag_row = cur.fetchone()
-                if _ag_row and not _ag_row[0]:
+                # FIX (brain_auditor 2026-10-21): cur is RealDictCursor — row is
+                # dict-like; integer index [0]/[1]/[2] raised KeyError, swallowed
+                # by except:pass, so ARM-GAP never logged (CRV #16318 miss).
+                if _ag_row and not _ag_row['trailing_activated']:
                     _ag_pt = ""
                     try:
-                        _ag_mfe_p, _ag_entry = float(_ag_row[1] or 0), float(_ag_row[2] or 0)
+                        _ag_mfe_p, _ag_entry = float(_ag_row['mfe_price'] or 0), float(_ag_row['entry_price'] or 0)
                         if _ag_mfe_p > 0 and _ag_entry > 0:
                             if str(direction).upper() == 'LONG':
                                 _ag_cf = (_ag_mfe_p * 0.997 / _ag_entry - 1) * 100
@@ -1333,8 +1336,8 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
                     except Exception:
                         pass
                     log(f"  [ARM-GAP] {token} {direction} MFE={float(mfe_pct_val):.2f}% trail=FALSE exit={reason} pnl={float(pnl_pct):+.2f}%{_ag_pt} trade={trade_id}")
-        except Exception:
-            pass
+        except Exception as _ag_e:
+            log(f"  [ARM-GAP-ERROR] trade={trade_id}: {_ag_e}")
 
         # ── AUDIT: Log trade close ───────────────────────────────────────────
         try:
