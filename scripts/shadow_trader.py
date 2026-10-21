@@ -1928,6 +1928,182 @@ def sweep_hml_thresholds(signal_type_filter=None):
         conn.close()
 
 
+def sweep_sl_levels(signal_type_filter=None, direction_filter=None):
+    """Sweep different SL levels to find the most profitable (T directive 2026-10-21).
+
+    T: "I have a feeling we're getting stopped out too soon. In shadow-mode
+    can we simulate different SL levels to find the best, most profitable?"
+
+    Tests: what if SL was 0.5%, 1.0%, 1.5%, 2.0%, 2.5%, 3.0% instead of current?
+    For each SL, simulates: exit when price hits SL, else hold to end.
+    """
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("═" * 60)
+        log("SL LEVEL SWEEP")
+        log("═" * 60)
+        
+        # Get signals
+        if signal_type_filter:
+            rows = cur.execute("""
+                SELECT id, token, direction, source, created_at, context
+                FROM shadow_trades 
+                WHERE closed=1 AND signal_type LIKE ?
+                ORDER BY created_at DESC LIMIT 500
+            """, (f'%{signal_type_filter}%',)).fetchall()
+        else:
+            rows = cur.execute("""
+                SELECT id, token, direction, source, created_at, context
+                FROM shadow_trades 
+                WHERE closed=1
+                ORDER BY created_at DESC LIMIT 1000
+            """).fetchall()
+        
+        if direction_filter:
+            rows = [r for r in rows if r[2] == direction_filter]
+        
+        if not rows:
+            log("No data")
+            return
+        
+        log(f"\nTotal signals: {len(rows)}")
+        
+        # Test different SL levels
+        sl_levels = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
+        results = {sl: {'n': 0, 'wins': 0, 'total_pnl': 0, 'stopped': 0} for sl in sl_levels}
+        
+        for r in rows:
+            try:
+                entry_ts = calendar.timegm(datetime.strptime(r[4], '%Y-%m-%d %H:%M:%S').timetuple())
+            except:
+                continue
+            
+            candles = _load_candles_window(r[1], entry_ts, entry_ts + 86400)
+            if not candles or len(candles) < 10:
+                continue
+            
+            entry_price = candles[0][1]
+            direction = r[2]
+            
+            for sl_pct in sl_levels:
+                # SL price
+                sl_price = entry_price * (1 - sl_pct/100) if direction == 'LONG' else entry_price * (1 + sl_pct/100)
+                
+                # Simulate: exit when SL hit, else hold to end
+                exited = False
+                for ts, o, h, l, c in candles:
+                    if direction == 'LONG' and l <= sl_price:
+                        # Stopped out
+                        pnl = -sl_pct - FEE_PCT - SLIPPAGE_PCT
+                        results[sl_pct]['n'] += 1
+                        results[sl_pct]['total_pnl'] += pnl
+                        results[sl_pct]['stopped'] += 1
+                        exited = True
+                        break
+                    elif direction == 'SHORT' and h >= sl_price:
+                        pnl = -sl_pct - FEE_PCT - SLIPPAGE_PCT
+                        results[sl_pct]['n'] += 1
+                        results[sl_pct]['total_pnl'] += pnl
+                        results[sl_pct]['stopped'] += 1
+                        exited = True
+                        break
+                
+                if not exited:
+                    # Held to end
+                    last_close = candles[-1][4]
+                    pnl = (last_close / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / last_close - 1) * 100
+                    pnl -= FEE_PCT + SLIPPAGE_PCT
+                    results[sl_pct]['n'] += 1
+                    results[sl_pct]['total_pnl'] += pnl
+                    if pnl > 0:
+                        results[sl_pct]['wins'] += 1
+        
+        # Report results
+        log(f"\n{'SL Level':>10} {'n':>5} {'WR':>6} {'Stopped':>8} {'Total':>8} {'Avg':>8}")
+        log("-" * 60)
+        for sl_pct in sl_levels:
+            r = results[sl_pct]
+            if r['n'] > 0:
+                wr = r['wins'] / r['n'] * 100
+                avg = r['total_pnl'] / r['n']
+                stop_pct = r['stopped'] / r['n'] * 100
+                log(f"  {sl_pct:>6.2f}% {r['n']:5} {wr:5.1f}% {stop_pct:7.0f}% {r['total_pnl']:+8.2f}% {avg:+8.3f}%")
+        
+        # Find best
+        best = max(sl_levels, key=lambda sl: results[sl]['total_pnl'] if results[sl]['n'] > 0 else -999)
+        if results[best]['n'] > 0:
+            r = results[best]
+            wr = r['wins'] / r['n'] * 100
+            avg = r['total_pnl'] / r['n']
+            log(f"\n  🏆 Best SL: {best}% (WR={wr:.1f}%, avg={avg:+.3f}%, stopped={r['stopped']}/{r['n']})")
+        
+        # Per-signal breakdown if signal_type_filter provided
+        if signal_type_filter:
+            log(f"\n--- Per-Signal SL Analysis for {signal_type_filter} ---")
+            # Group by signal_type
+            by_signal = {}
+            for r in rows:
+                st = r[3] or 'unknown'  # source is index 3
+                if st not in by_signal:
+                    by_signal[st] = []
+                by_signal[st].append(r)
+            
+            for st, sig_rows in sorted(by_signal.items(), key=lambda x: -len(x[1])):
+                if len(sig_rows) < 10:
+                    continue
+                
+                # Quick analysis: find best SL for this signal
+                best_sl = None
+                best_pnl = -999
+                for sl_pct in sl_levels:
+                    total_pnl = 0
+                    n = 0
+                    for r in sig_rows:
+                        try:
+                            entry_ts = calendar.timegm(datetime.strptime(r[4], '%Y-%m-%d %H:%M:%S').timetuple())
+                        except:
+                            continue
+                        candles = _load_candles_window(r[1], entry_ts, entry_ts + 86400)
+                        if not candles or len(candles) < 10:
+                            continue
+                        entry_price = candles[0][1]
+                        direction = r[2]
+                        sl_price = entry_price * (1 - sl_pct/100) if direction == 'LONG' else entry_price * (1 + sl_pct/100)
+                        
+                        exited = False
+                        for ts, o, h, l, c in candles:
+                            if direction == 'LONG' and l <= sl_price:
+                                total_pnl += -sl_pct - FEE_PCT - SLIPPAGE_PCT
+                                n += 1
+                                exited = True
+                                break
+                            elif direction == 'SHORT' and h >= sl_price:
+                                total_pnl += -sl_pct - FEE_PCT - SLIPPAGE_PCT
+                                n += 1
+                                exited = True
+                                break
+                        
+                        if not exited:
+                            last_close = candles[-1][4]
+                            pnl = (last_close / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / last_close - 1) * 100
+                            pnl -= FEE_PCT + SLIPPAGE_PCT
+                            total_pnl += pnl
+                            n += 1
+                    
+                    if n > 0 and total_pnl > best_pnl:
+                        best_pnl = total_pnl
+                        best_sl = sl_pct
+                
+                if best_sl:
+                    log(f"  {st:35} n={len(sig_rows):4} best SL={best_sl:.2f}% (PnL={best_pnl:+.2f}%)")
+        
+        log("\n═" * 60)
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description='Shadow-Mode Paper Trading System')
     ap.add_argument('--record', action='store_true', help='Snapshot ALL signals')
@@ -1946,11 +2122,13 @@ def main():
     ap.add_argument('--sweep-signal', type=str, help='Signal type for arm timeout sweep')
     ap.add_argument('--sweep-dir', type=str, help='Direction filter for sweep')
     ap.add_argument('--sweep-hml', action='store_true', help='Sweep HML thresholds')
+    ap.add_argument('--sweep-sl', action='store_true', help='Sweep SL levels')
     args = ap.parse_args()
     
     run_all = not (args.record or args.close or args.report or args.reclose or 
                    args.purge or args.analyze_hml or args.flip_test or 
-                   args.analyze_exits or args.analyze_hold or args.sweep_arm or args.sweep_hml)
+                   args.analyze_exits or args.analyze_hold or args.sweep_arm or 
+                   args.sweep_hml or args.sweep_sl)
     
     if run_all or args.record:
         record()
@@ -1972,6 +2150,8 @@ def main():
         sweep_arm_timeouts(args.sweep_signal, args.sweep_dir)
     if args.sweep_hml:
         sweep_hml_thresholds()
+    if args.sweep_sl:
+        sweep_sl_levels(args.sweep_signal, args.sweep_dir)
     if args.purge:
         purge()
     
