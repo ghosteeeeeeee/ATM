@@ -4979,3 +4979,5 @@ BY: auto_1hr
 - [2026-10-21 01:30] auto_1hr: NO CONFIG CHANGE — 3T last hour (all loss: CFX/BLUR pump-chain+ trail_arm_timeout, COMP r2v2-long3 trail) | 24h 22T 6W -$0.17 (27.3%) | 7d 159T 57W -$2.73 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0W/6T 24h but 2T last hour, 7d +$0.16) | atr_sl_hit 22.7% under 40% | no neg-hour streak | 1 open BTC SHORT | No constants change -> no signal_versions entry
 [2026-10-21 01:37 UTC] brain_auditor: AUDIT RUN #47 — 0 config changes (vacation soak) | BTC SHORT #16317 HOLD (precheck FAIL reported) | pump-chain± kills rejected 6th | HML re-entry cooldown REJECTED-WITH-DATA (net -$0.16) | near-miss arm band pre-registered | 24h 20.8% -$0.37 shallow, 7d 35.8% -$2.73, size-reduce 0.5x
 BY: brain_auditor
+BY: auto_1hr
+- [2026-10-21 02:30] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-pending SHORT atr_sl_hit -$0.10 -2.13%) | 24h 23T 6W -$0.27 (26.1%) | 7d 159T 57W -$2.87 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0T last hour, 7d +$0.16) | atr_sl_hit 26.1% under 40% | no neg-hour streak | 0 open | No constants change -> no signal_versions entry

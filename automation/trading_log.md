@@ -13087,3 +13087,25 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL -$2.68 → -$2.73; size-reduce stays until PnL crosses -$2
 - pump-chain+ trail_arm_timeout: 3 of 4 timeout closes are pump-chain+ — if pattern continues, review trail arm params next audit
+
+## [2026-10-21 02:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.10 last hour | 24h 23T 6W -$0.27 (26.1% WR) | 7d 159T 57W -$2.87 (35.8% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- BTC ai-trader-pending SHORT atr_sl_hit -$0.10 (-2.13%) — CEO pending trade, manual class, not signal-tunable
+- Kill check: pump-chain+ 0W/6T 24h but 0 trades last hour (needs 3+); 7d 25T 7W +$0.16 verified profitable — stays enabled
+- atr_sl_hit 6/23 = 26.1% under 40% — tpsl deployed, no action
+- No neg-hour streak (23:00 -$0.18, 00:00 +$0.08, 01:00 -$0.22, 02:00 flat)
+- Size-reduce 0.3x stays (7d PnL -$2.87 still <-$2)
+- 0 open positions
+- Frequency 1T/hr — not overtraded
+- 7d worst signals checked (n>=3): bb-bounce-v2-long+ -$0.74, ai-trader+ -$0.61, pump-chain- -$0.58 — all previously reviewed/audited, no new 0%-WR-at-kill-line signal
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL -$2.73 → -$2.87; size-reduce stays until PnL crosses -$2
+- 02:00 hour currently has 0 closes — quiet window
