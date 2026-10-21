@@ -4997,3 +4997,5 @@ BY: brain_auditor
 BY: auto_1hr
 BY: auto_1hr
 - [2026-10-21 08:20] auto_1hr: NO CONFIG CHANGE — 2T last hour (1W DOGE trail +$0.08, 1L BTC pending SHORT atr_sl_hit -$0.05) | 24h 25T 6W -$0.18 (24.0%) | 7d 152T 55W -$2.70 (36.2%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (max 1T/signal) | atr_sl_hit 9/25=36.0% under 40% | no neg-hour streak | regime LONG_BIAS (not NEUTRAL) | 2 open (both LONG, aligned) | No constants change -> no signal_versions entry
+BY: auto_1hr
+- [2026-10-21 09:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC continuum-trend+ LONG trail +$0.04 +1.56%) | 24h 26T 7W -$0.14 (26.9%) | 7d 150T 56W -$2.40 (37.3%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (1T) | atr_sl_hit 9/26=34.6% under 40% | no live neg-hour streak | regime LONG_BIAS, deployment REDUCE | 5 open all LONG | No constants change -> no signal_versions entry

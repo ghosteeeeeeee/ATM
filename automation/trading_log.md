@@ -13257,3 +13257,25 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 - 24h losers: pump-chain+ 0W/4T, ai-trader-pending 0W/3T — both under kill threshold (need 3+T last hour); pump-chain+ kill already rejected 6x by audits, stays
 - 7d PnL -$2.70 (worse than -$2.64) — size-reduce 0.3x stays
 - trail_arm_timeout (4T -$0.16) + hard_sl (3T -$0.22) remain secondary loss clusters alongside atr_sl_hit (9T -$0.63)
+
+## [2026-10-21 09:28 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.04 last hour | 24h 26T 7W -$0.14 (26.9% WR) | 7d 150T 56W -$2.40 (37.3% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 close: BTC continuum-trend+ LONG profit-monster-trail +$0.04 (+1.56%)
+- Kill check: 1T last hour — no signal with 3+ trades, no kill candidate (pump-chain+ 0W/4T and ai-trader-pending 0W/3T are 24h losers but 0-1T last hour; pump-chain+ kill already rejected 6x by audits)
+- atr_sl_hit 9/26 = 34.6% under 40% — tpsl_utils.py deployed (Oct 12), no action
+- Entry quality: winners MAE avg 0.32% (<0.5% threshold) — OK; losses MAE 0.34% similar, so edge loss is exit-side not entry-side
+- Neg-hour streak 01-03 (-0.22/-0.13/-0.05) broken by empty 04-06; current 07(-)/08(+) — no live streak
+- Regime LONG_BIAS (not NEUTRAL), macro deployment already REDUCE + size 0.3x (7d PnL -.40 < -) — no size action
+- Frequency 1/hr — not overtraded
+- 5 open all LONG (DOGE/GOAT/XPL/PUMP/PONS), aligned with LONG_BIAS
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL improving: -.70 → -.40; size-reduce 0.3x stays until it crosses -
+- Loss cluster unchanged: atr_sl_hit (9T -/usr/bin/bash.63) + trail_arm_timeout (4T -/usr/bin/bash.16) + hard_sl (3T -/usr/bin/bash.22)
