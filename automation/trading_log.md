@@ -13109,3 +13109,26 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL -$2.73 → -$2.87; size-reduce stays until PnL crosses -$2
 - 02:00 hour currently has 0 closes — quiet window
+
+## [2026-10-21 03:27 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.13 last hour | 24h 26T 5W -$0.60 (19.2% WR) | 7d 159T 56W -$2.97 (35.2% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- COMP pump-chain-/pump-chain-v6- SHORT atr_sl_hit -$0.13 (-5.71%) — normal SL close, ~-5% account at leverage
+- Kill check: 0 signals with 3+ trades last hour (1T total) — no candidate
+- pump-chain+ 24h 0W/6T -$0.55 but 7d 25T 7W +$0.16 verified profitable — stays enabled (6th audit rejection)
+- atr_sl_hit 7/26 = 26.9% under 40% — tpsl deployed, no action
+- No 3+ neg-hour streak (00:00 +$0.08, 01:00 -$0.22, 02:00 -$0.13 = 2)
+- Size-reduce 0.3x stays (7d PnL -$2.97 still <-$2)
+- 2 open: CRV SHORT +0.18%, BTC ai-trader-pending SHORT -0.04%
+- Frequency 1T/hr — not overtraded
+- 24h WR dipped to 19.2% (5W/26T) — small sample, driven by hard_max_loss cluster (3T -$0.51); monitor next hour
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL -$2.87 → -$2.97; size-reduce stays until PnL crosses -$2
+- 24h WR 19.2% worst of the week — if next hour is also negative, review hard_max_loss cluster
