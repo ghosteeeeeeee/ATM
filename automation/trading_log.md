@@ -13214,3 +13214,24 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 **Open Questions:**
 - 7d PnL improved -$2.96 → -$2.66; size-reduce 0.3x stays until it crosses -$2
 - 24h WR 20.8% still weak; hard_sl (3T -$0.22) and trail_arm_timeout (4T -$0.16) clusters — watch next hour
+
+## [2026-10-21 07:27 UTC] Hourly Analysis
+
+**Trades:** 0 closed last hour
+**PnL:** $0.00 last hour | 24h 24T 5W -$0.24 (20.8% WR) | 7d 153T 56W -$2.64 (36.6% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour — quiet window; no closes since 03:xx (hours 04-07 empty)
+- Kill check: 0T last hour, no signal with 3+ trades — no kill candidate
+- pump-chain+ 24h 0W/4T -$0.16 but 7d verified profitable — stays enabled (prior 6 audit rejections)
+- atr_sl_hit 8/24 = 33.3% under 40% — tpsl_utils.py deployed (Oct 12), no action
+- Neg-hour streak 01:00-03:00 (-$0.10/-$0.13/-$0.05) broken by 3 empty hours; size already at 0.3x (standing mitigation until 7d PnL > -$2)
+- 2 open: BTC ai-trader-pending SHORT -0.22% (precheck FAIL reported, HOLD), DOGE bb-bounce-v2-long+ +0.56%
+- Frequency 0T/hr — not overtraded
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL improved -$2.66 → -$2.64; size-reduce 0.3x stays until it crosses -$2
+- 24h WR 20.8% still weak; atr_sl_hit (8T -$0.58) + trail_arm_timeout (4T -$0.16) + hard_sl (3T -$0.22) dominate losses — quiet window, resume monitoring next close burst
