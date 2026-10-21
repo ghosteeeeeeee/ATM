@@ -4975,3 +4975,5 @@ BY: auto_1hr
 BY: brain_auditor
 - [2026-10-21 00:35] auto_1hr: NO CONFIG CHANGE — 2T last hour (BTC continuum-osc+ UNIVERSAL_MAX_HOLD +$0.09 +3.73%, APT pump-chain+ trail_arm_timeout -$0.04 -1.70%) | 24h 22T 6W -$0.17 (27.3%) | 7d 161T 58W -$2.68 (36.0%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0W/4T 24h but 1T last hour, 7d verified profitable) | atr_sl_hit 22.7% under 40% | no neg-hour streak | 3 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+BY: auto_1hr
+- [2026-10-21 01:30] auto_1hr: NO CONFIG CHANGE — 3T last hour (all loss: CFX/BLUR pump-chain+ trail_arm_timeout, COMP r2v2-long3 trail) | 24h 22T 6W -$0.17 (27.3%) | 7d 159T 57W -$2.73 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0W/6T 24h but 2T last hour, 7d +$0.16) | atr_sl_hit 22.7% under 40% | no neg-hour streak | 1 open BTC SHORT | No constants change -> no signal_versions entry
