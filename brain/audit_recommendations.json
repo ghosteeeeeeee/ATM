@@ -1,116 +1,78 @@
 {
-  "timestamp": "2026-10-21T00:44:48Z",
-  "run": "brain_auditor #46",
+  "timestamp": "2026-10-21T01:36:12Z",
+  "run": "brain_auditor #47",
   "session_brain_stats": {
-    "queries": 4,
-    "top_hits": "rsi gate, trend_purity, chop detector, signal failure"
+    "queries": 3,
+    "note": "pump-chain confidence kills, vacation soak, atr_sl giveback"
   },
   "trade_summary_24h": {
-    "trades": 23,
-    "wins": 6,
-    "win_rate": 26.1,
-    "pnl": -0.18,
-    "note": "shallow losses, size-reduce 0.5x containing; max single loss -$0.31"
+    "trades": 24,
+    "wins": 5,
+    "pnl": -0.37,
+    "wr": 20.8,
+    "by_signal_top_bleed": "pump-chain+ LONG 6T 0W -$0.55",
+    "open": "BTC SHORT #16317 ai-trader-pending entry 82804, cur 82933.5, -0.16%, SL 83052 TP 82350"
   },
   "trade_summary_7d": {
-    "trades": 162,
-    "wins": 58,
-    "win_rate": 35.8,
-    "pnl": -2.69
+    "trades": 159,
+    "wins": 57,
+    "pnl": -2.73,
+    "wr": 35.8,
+    "exit_family": "TRAIL/TP +$3.69 (profit-monster +$1.70 / trail-tp +$1.99) vs atr_sl_hit -$3.44 + CHOP/SL -$3.15 — wealth gap unchanged"
   },
-  "trade_summary_30d": {
-    "trades": 726,
-    "win_rate": 41.7,
-    "pnl": -8.11
-  },
-  "watchdog_steer_triage": [
-    {
-      "id": "steer-001",
-      "verdict": "REJECT-ACT, STRUCTURAL",
-      "detail": "14/20 streak = chop-family cohort (atr_sl_hit/hard_max_loss 0% WR). Trail/TP 7d 58T 77.6% +$4.26 vs CHOP/SL 35T 0% -$3.45. Root unchanged; size-reduce containing."
-    },
-    {
-      "id": "steer-002",
-      "verdict": "VERIFIED-STRUCTURAL",
-      "detail": "wrong-side = chop entries. 24h 16 losers all small (max -$0.31). COMP SHORT gap 2.16 = shorting into extended pump (gap>=2.0 cohort 3T 0W all-time recent, n<20 watch)."
-    },
-    {
-      "id": "steer-003",
-      "verdict": "KILL-REJECT (4th)",
-      "detail": "pump-chain- 14d still +$0.23 net positive. 24h 5T -$0.06 noise. Existing defenses (RSI_MIN 45, dead-gap -0.5..0.2, SHORT midband 45-55 block) contain it."
-    }
-  ],
-  "drift_findings": [
-    {
-      "item": "watchdog 'pump-chain+ mid-band wipeout' steer",
-      "verdict": "NOISE-REJECT",
-      "detail": "24h n=3 (BLUR/ARB/APT -$0.43). Band 55-60 is net positive 14d 10T +$0.16 and 30d 13T +$0.27. 45-55 is BEST band 14d 7T +$1.20. No mid-band filter for pump-chain+."
-    },
-    {
-      "item": "ARM-GAP instrumentation (#44 ship)",
-      "verdict": "WORKING, 0 FIRES CORRECT",
-      "detail": "Code present PM:1313-1335. 0 fires since 16:46 ship = correct (no qualifying atr_sl_hit closes post-ship; last qualifying closed 15:32 pre-ship). 7d cohort: 20T unarmed MFE>=0.40 atr_sl_hit -$1.04 — peak-trail counterfactual target."
-    },
-    {
-      "item": "BTC #16309 trail ratchet",
-      "verdict": "RESOLVED POSITIVE",
-      "detail": "Closed UNIVERSAL_MAX_HOLD +$0.09 +3.73% after 8h. Trail/hold mechanism worked."
-    }
+  "drift_findings": [],
+  "recurring_problems": [
+    "atr_sl_hit 7d 47T 2.1% WR -$3.44 = #1 bleed (armed-then-reverse + unarmed cohorts); ARM-GAP instrumentation shipping Oct 20, 0 fires since = correct (no qualifying closes yet)",
+    "pump-chain+ 24h 0W/6T -$0.55 but 14d 63T +$0.93 net positive, 30d EXTREME-only profit (+$1.69) — non-EXTREME dampen pre-registered for Oct 23 decision, kill rejected 6th time",
+    "watchdog 14/20 losing-streak = same structural chop-vs-trail gap, shallow losses (max -$0.31) under 0.5x size-reduce"
   ],
   "losing_trade_autopsy_24h": {
-    "total_losers": 16,
-    "max_loss": -0.31,
-    "new_patterns": 0,
-    "cohorts": [
-      "pump-chain+ HIGH-vol mid-band (BLUR -0.31 rsi57.1, ARB -0.08 rsi57.9): non-EXTREME bleed cohort — pre-registered dampen covers",
-      "pump-chain- extended-gap shorts (COMP -0.17 gap2.16, IO -0.03 gap2.23): shorting into pumps above EMA; n=3 gap>=2.0 0W watch",
-      "r2v2-long3 exhaustion (PUMP -0.12 rsi66 EXTREME): chasing stalled pump, trail never armed; signal 14d healthy +$0.53 58.3%",
-      "BTC manual bad SL levels (CEO domain, re-flagged)"
-    ]
+    "losers": 19,
+    "max_loss": "-$0.31 (BLUR pump-chain+ HML)",
+    "clusters": "pump-chain+ LONG 6T -$0.55 (HML/timeout chop cohort, HIGH/EXTREME); pump-chain- SHORT 6T -$0.11; BTC manual/pending scalps 4T -$0.16",
+    "new_patterns": "ZERO — all losers are known cohorts, all losses contained (size-reduce working)"
   },
-  "changes_from_last_run": [
+  "watchdog_steer_triage": {
+    "001_pending_BTC_SHORT": "ALREADY EXECUTED as #16317 (01:13). Precheck advisory FAIL (chop 6 flips). HOLD — CEO pending with explicit SL 83052 (~0.3% risk) / TP 82350, tight scalp geometry per design. Report FAIL, do not hide.",
+    "002_losing_streak_14_20": "STRUCTURAL — trail/profit exits +$3.69 vs chop/SL -$6.59 7d. Shallow losses under size-reduce. No new filter passes bars.",
+    "003_wrong_side_4_losses": "VERIFIED known cohorts: COMP SHORT gap 2.16 (gap>=2.0 watch n=3), BLUR/PUMP HML knife-catches, BTC manual cut_loser (leverage artifact -21% pct).",
+    "004_pump_chain_plus_streak": "KILL REJECTED 6th — 14d +$0.93. Non-EXTREME 0.7x dampen pre-registered (#46), decision Oct 23.",
+    "005_pump_chain_minus_streak": "KILL REJECTED 6th — 14d +$0.23 net positive. Existing defenses contain."
+  },
+  "last_run_verify": [
+    "ARM-GAP peak-trail counterfactual (#44): 0 fires since ship = CORRECT (CFX/BLUR timeout trades MFE<0.40 never qualified)",
+    "TAT scope fix (#39): holding, 9/15 valid unique fires",
+    "non-EXTREME dampen pre-reg (#46): standing for Oct 23",
+    "BTC #16309 trail: RESOLVED +$0.09",
+    "size-reduce 0.5x: ACTIVE, containing (24h max loss -$0.31)"
+  ],
+  "creative_improvements": [
     {
-      "change": "ARM-GAP peak-trail counterfactual estimate (#44)",
-      "status": "VERIFIED WORKING (0 fires = correct, no qualifying events)"
+      "date": "2026-10-21T01:36:12Z",
+      "idea": "HML re-entry cooldown (no same token+direction within 24h of hard_max_loss)",
+      "rationale": "14d re-entry cohort 28T 25%WR -$0.53 looks like revenge-trading bleed",
+      "expected_impact": "REJECTED WITH DATA: blocking all 28 saves $0.53 but kills $0.69 of winners = net -$0.16. Logged so it is not re-proposed from loser-only view.",
+      "category": "exit quality",
+      "status": "rejected",
+      "risk": "n/a"
     },
     {
-      "change": "TAT scope ai-trader→ai-trader+ (#39)",
-      "status": "VERIFIED (9/15 valid unique fires)"
-    },
-    {
-      "change": "size-reduce 0.5x",
-      "status": "ACTIVE, containing (24h max loss -$0.31)"
-    },
-    {
-      "change": "doji kill",
-      "status": "HOLDING (0 trades since Oct 16)"
+      "date": "2026-10-21T01:36:12Z",
+      "idea": "Near-miss arm band study (MFE 0.30-0.40 cohort on trail-armed signals)",
+      "rationale": "ARM-GAP logs MFE>=0.40 only; trail_arm_timeout 15T -$0.57 (pump-chain+ 14d) may cluster just under arm threshold",
+      "expected_impact": "Pre-register only — extend ARM-GAP log floor to 0.30 at vacation-end IF timeout cohort data justifies; evaluates ARM=0.35 without candle re-derivation",
+      "category": "exit quality",
+      "status": "pre-registered",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
-  "creative_improvements": [
-    {
-      "date": "2026-10-21T00:44:48Z",
-      "idea": "pump-chain+ non-EXTREME (HIGH/NORMAL/FLAT) 0.7x confidence dampen — SHADOW at vacation-end",
-      "rationale": "EXTREME is the ONLY profitable regime for pump-chain+ LONG: 14d 47T +$1.84 vs non-EXTREME 14T -$0.79 28.6%; 30d 71T +$1.69 vs 20T -$1.15 25%. Extends #45 HIGH-only pre-reg (n=6) to full non-EXTREME (n=14/14d, n=20/30d). 0.7x sim: would-block 9T (3W +$0.09 / 6L -$0.50) = net save $0.41/30d; total winner-kill 3/19=15.8% < 20% threshold.",
-      "expected_impact": "+$0.30-0.50/30d, fewer non-EXTREME chop entries",
-      "category": "entry sniper",
-      "status": "pre-registered (vacation soak — shadow only, decision Oct 23)",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-21T00:44:48Z",
-      "idea": "pump-chain- SHORT gap>=2.0 watch (fighting-momentum short into extended pumps)",
-      "rationale": "gap>=2.0 shorts: 3T 30d 0W -$0.23, zero winners. COMP gap 2.16 lost -$0.17 today. Contradicts 'every dump is SHORT' — these aren't dumps, they're pumps still running above EMA. n=3 << 20 bar. WATCH ONLY.",
-      "expected_impact": "monitor; if n reaches 10+ with 0W, propose ceiling",
-      "category": "watchlist",
-      "status": "monitoring",
-      "risk": "none (no change)"
-    }
-  ],
+  "changes_from_last_run": "ALL HOLDING — ARM-GAP 0 fires correct, TAT scope 9/15, dampen pre-reg standing, BTC #16309 resolved +$0.09",
   "next_actions": [
-    "Vacation-end Oct 23: evaluate pump-chain+ non-EXTREME dampen shadow (data above)",
-    "Escalation #15 (22nd request): signal-scoped candle OOS vehicle — blocks peak-trail flip, dual-condition TAT, non-EXTREME dampen confirmation",
-    "Open: CFX+BLUR pump-chain+ LONGs in HIGH regime — trail_arm_timeout at 45m contains if no momentum (APT validated -$0.04)",
-    "Post-vacation stack: ~15+ unvalidated soaks — CEO eyeball on resume"
+    "Monitor BTC SHORT #16317 — SL 83052 caps risk 0.3%; precheck FAIL already reported",
+    "Oct 23 vacation-end: evaluate pump-chain+ non-EXTREME 0.7x dampen (pre-registered #46)",
+    "ARM-GAP data accumulation — near-miss 0.30 floor decision once fires accrue",
+    "Escalation #15 (22nd): signal-scoped candle OOS vehicle still blocking peak-trail flip + dual-condition TAT",
+    "Resume math: 7d WR 35.8% (pass) but PnL -$2.73 (fail) — size-reduce 0.5x stays"
   ]
 }

@@ -6033,5 +6033,23 @@
     "category": "watchlist",
     "status": "monitoring",
     "risk": "none (no change)"
+  },
+  {
+    "date": "2026-10-21T01:36:12Z",
+    "idea": "HML re-entry cooldown (no same token+direction within 24h of hard_max_loss)",
+    "rationale": "14d re-entry cohort 28T 25%WR -$0.53 looks like revenge-trading bleed",
+    "expected_impact": "REJECTED WITH DATA: blocking all 28 saves $0.53 but kills $0.69 of winners = net -$0.16. Logged so it is not re-proposed from loser-only view.",
+    "category": "exit quality",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-21T01:36:12Z",
+    "idea": "Near-miss arm band study (MFE 0.30-0.40 cohort on trail-armed signals)",
+    "rationale": "ARM-GAP logs MFE>=0.40 only; trail_arm_timeout 15T -$0.57 (pump-chain+ 14d) may cluster just under arm threshold",
+    "expected_impact": "Pre-register only — extend ARM-GAP log floor to 0.30 at vacation-end IF timeout cohort data justifies; evaluates ARM=0.35 without candle re-derivation",
+    "category": "exit quality",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
