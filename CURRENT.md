@@ -1,39 +1,38 @@
-# Current State — brain_auditor #55 Oct 21 2026-10-21 12:39 UTC
+# Current State — brain_auditor #56 Oct 21 2026-10-21 13:39 UTC
 
-**Last Updated: 2026-10-21 2026-10-21 12:39 UTC**
-**Updated by: brain_auditor #55 — 0 config changes (vacation soak). Watchdog critical REJECTED shallow. coin_regime n>=20 MET (28/34). hmacd_mtf kill-criteria pre-registered. pump-chain- kill DEFER Oct 22 (trigger still met).**
+**Last Updated: 2026-10-21 13:39 UTC**
+**Updated by: brain_auditor #56 — 0 config changes (vacation soak). FIRST GREEN 24h (+$0.06). coin_regime first analysis: aligned LONG wins / counter SHORT loses (n=32). pump-chain- kill recheck data ready for Oct 22.**
 
 ## PIPELINE STATUS
 
-- **Trading LIVE** with size-reduce **0.3x** (recent closed sizes $11.10; auto_1hr confirms both resume legs still failing: 7d WR 35.9% <37 AND PnL −$2.78 <0).
-- **24h 29T 9W 31.0% −$0.31 — shallow, containing.** 7d 153T 55W 35.9% −$2.78. 14d 340T 35.0% −$3.73.
-- **7d exit family: TRAIL 58T 75.9% +$3.74 | UNARMED 94T 11.7% −$6.29.** Wealth gap unchanged. atr_sl_hit still #1 bleed (49T 2% −$3.51).
-- **Open 3 LONG** (HYPER/AIXBT bb-bounce-v2-long+ #16329/#16330, SYRUP continuation+ #16332 after +$0.11 trail win on #16331) — all aligned dual LONG_BIAS/STRONG_UP/MARKUP — HOLD.
-- **Vacation mode ACTIVE to Oct 23** — shadow-first, no constants changes. Protected flags 13/13 INTACT.
+- **Trading LIVE** with size-reduce **0.3x** (both resume legs still failing: 7d WR 36.8% <37 AND PnL −$2.46 <0).
+- **24h 32T 12W 37.5% +$0.06 — FIRST GREEN 24h.** 7d 155T 57W 36.8% −$2.46. 20 losers all small (max −$0.14).
+- **7d exit family: TRAIL 61T 75.4% +$3.83 | UNARMED 94T 11.7% −$6.29.** 11/12 24h winners trail-armed. Wealth gap unchanged.
+- **Open 4 LONG** (HYPER/XAI bb-bounce, GRASS r2v2-long3, SYRUP continuation+) — all aligned dual LONG_BIAS/STRONG_UP/MARKUP — HOLD.
+- **Vacation mode ACTIVE to Oct 23** — shadow-first, no constants changes. Protected flags INTACT.
 
-## THIS RUN — brain_auditor #55 (2026-10-21 12:39 UTC)
+## THIS RUN — brain_auditor #56 (2026-10-21 13:39 UTC)
 
 **0 config changes.**
 
-1. **WATCHDOG TRIAGE:** 001 REJECT-SHALLOW (13/20 lost but net −$0.31, WR recovering 20.8→31%) | 002-005 ALIGNED-OK (3 longs correct side) | 006 VERIFIED-STRUCTURAL (chop family) | 007 MONITOR ai-trader-pending (9T n<20 CEO) | 008 KILL-NOT-MET pump-chain+ (14d +$1.13).
-2. **LAST-RUN VERIFY all HOLDING:** floor-45 ✓ 0 SHORT opens since 02:46 | ARM-GAP RealDictCursor fix ✓ 0 ERROR / 0 qualifying closes since 09:55 = correct | doji ✓ 0T since Oct 16 | TAT ✓ 6 fires −$0.22 | size-reduce 0.3x ✓ | protected 13/13 ✓.
-3. **LOSING AUTOPSY 24h: 0 new patterns** — pump-chain+ TAT timeouts contained | pump-chain− EXTREME shorts known | BTC chop-pin CEO | PUMP r2v2 EXTREME HML n=4.
-4. **pump-chain− KILL STILL TRIGGER MET** (bare 14d 39T 20.5% −$0.75; combo v6- 11T +$0.26 = confirmation premium). **DEFER to Oct 22 pre-reg recheck. Option A v6-requirement matrix ready for CEO.**
-5. **coin_regime stamp n>=20 MET: 28/34 closed stamped** — first ALIGNED vs COUNTER analysis ready this week.
+1. **WATCHDOG TRIAGE:** 001 REJECT-SHALLOW (GREEN despite 13/20) | 002-005 ALIGNED-OK | 006 VERIFIED-STRUCTURAL (SHORTs 0/5 −$0.50 wrong-side) | 007 MONITOR n<20 | 008 KILL-NOT-MET (14d +$1.13).
+2. **LAST-RUN VERIFY all PASS:** ARM-GAP ✓ | floor-45 ✓ | size-reduce ✓ | doji ✓ | protected ✓.
+3. **LOSING AUTOPSY: 0 new patterns** — giveback timeouts, counter-regime SHORTs, chop LONGs, BTC chop. Trail family intact.
+4. **COIN_REGIME FIRST ANALYSIS (n=32):** LONG×LONG_BIAS +$0.66/53.8% | SHORT×LONG_BIAS −$0.19/0% | wash elsewhere. Dampen pre-registered at n≥20.
+5. **pump-chain- KILL RECHECK Oct 22 READY:** bare 14d −$0.75 trigger MET; combo v6- +$0.26. Option A: require v6-confirmation (kill bare path).
 
 ## STANDING PRE-REGISTRATIONS (vacation-end Oct 23)
 
-- **pump-chain- kill recheck Oct 22** — Option A v6-requirement gate recommended (CEO eyeball)
+- **pump-chain- kill recheck Oct 22** — Option A v6-requirement matrix ready (bare −$0.75 vs combo +$0.26)
 - **PUMP_CHAIN_CONF_FLOOR=30** — conf<30 14d 38T 15.8% −$1.86; kills 6W +$0.64 → net +$1.86
+- **coin_regime SHORT×LONG_BIAS 0.5x dampen** — flip at n≥20 with WR<30%
 - **SHORT×EXTREME 0.5x size dampen shadow** (14d 62T 22.6% −$1.40)
-- **hmacd_mtf family kill-criteria** (#55 creative — 13T 23.1% −$0.79; kill only if 14d n≥20 ∧ PnL<0 ∧ WR<30%)
-- **coin_regime ALIGNED vs COUNTER first analysis** (n=28≥20 MET — run this week)
+- **hmacd_mtf kill-criteria** — MOOT (signal dead since Oct 13, n=13 all-time)
 - **ARM-GAP n≥10 log-line protocol** (0 qualifying closes since fix = correct)
 - **Escalation #17 (19th):** exit-ladder candle OOS — blocks ARM-GAP/peak-trail flip
 - **pp-cond shadow flip:** failed bars, re-eval vacation-end
-- **atr_sl recovery probe** — needs fee-adjusted 30d OOS
 
 ## SIDEWAYS FINDINGS
 
-- **LOW:** `[hotset] fallback DB query returned 0 tokens` in pipeline.log — hotset empty, coin-tracker priority degraded. Investigate post-vacation.
-- **INFO:** pipeline.log Portfolio PnL shows −25.72% — likely bad cumulative calc (real 24h is −$0.31 unleveraged). Audit when back.
+- **LOW:** hotset fallback `0 tokens` — 10473 log hits, coin-tracker priority degraded. Post-vacation cleanup.
+- **INFO:** bb-bounce-v2-long+ writes meta_rsi=50.0 constant — RSI unverifiable for that signal (watchdog deep-analysis noted).

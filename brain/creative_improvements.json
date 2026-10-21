@@ -6213,5 +6213,23 @@
     "category": "entry sniper",
     "status": "ready-to-analyze",
     "risk": "none (analysis only)"
+  },
+  {
+    "date": "2026-10-21T13:38:29Z",
+    "idea": "coin_regime SHORT x LONG_BIAS dampen PRE-REGISTER (0.5x size, shadow-only until n>=20)",
+    "rationale": "First coin_regime analysis: COUNTER SHORT cell 5T 0% -$0.19; 24h reinforces 0/5. Same wrong-side class as watchdog steer-006.",
+    "expected_impact": "contain ~$0.19-0.50/14d counter-short bleed if pattern holds at n>=20",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-21T13:38:29Z",
+    "idea": "pump-chain+ atr_trail-only scorecard — daily single number: atr_trail_hit PnL vs all-other-exits PnL",
+    "rationale": "14d: atr_trail_hit 10T 80% +$3.74 vs hard_max_loss 18T 0% -$2.06 / atr_sl 9T 0% -$0.91 / timeout 15T 20% -$0.57. Signal is a trail-only profit engine; scorecard makes the split SQL-native daily for CEO ARM-GAP/exit-ladder decisions.",
+    "expected_impact": "zero-behavior instrumentation; accelerates exit-ladder OOS prioritization",
+    "category": "instrumentation",
+    "status": "suggested",
+    "risk": "none"
   }
 ]
