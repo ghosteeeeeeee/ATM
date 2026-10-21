@@ -324,53 +324,83 @@ def record():
                 # bug_hunter fix: check BOTH signal_type and source
                 # bug_hunter fix: split composite sources by comma
                 # bug_hunter fix: check direction match
+                # bug_hunter fix: exact match for suffixed keys, substring only for compound
+                # bug_hunter fix: only tag if ALL source parts are in registry (not just one)
                 shadow_bypass_tag = False
                 shadow_bypass_reason = None
                 
-                # Build searchable strings: signal_type, source, and individual source parts
-                search_strings = set()
-                if st:
-                    search_strings.add(st.lower())
-                if src:
-                    search_strings.add(src.lower())
-                    # Split composite sources by comma
-                    for part in src.split(','):
-                        part = part.strip().lower()
-                        if part:
-                            search_strings.add(part)
-                            # Also add stripped version (remove +/-)
-                            search_strings.add(part.rstrip('+-'))
+                # For composite sources, check if ANY part is NOT in registry
+                # If so, this is a live signal — don't tag as shadow_bypass
+                skip_composite = False
+                if src and ',' in src:
+                    parts = [p.strip().lower() for p in src.split(',') if p.strip()]
+                    for part in parts:
+                        part_stripped = part.rstrip('+-')
+                        in_registry = False
+                        for bypass_key in shadow_bypass:
+                            key_lower = bypass_key.lower()
+                            has_suffix = key_lower.endswith('+') or key_lower.endswith('-')
+                            if has_suffix:
+                                if key_lower == part:
+                                    in_registry = True
+                                    break
+                            else:
+                                if key_lower in part or key_lower == part_stripped:
+                                    in_registry = True
+                                    break
+                        if not in_registry:
+                            skip_composite = True
+                            break
                 
-                for bypass_key, bypass_info in shadow_bypass.items():
-                    key_lower = bypass_key.lower()
-                    key_stripped = key_lower.rstrip('+-')
+                if not skip_composite:
+                    # Build searchable strings: signal_type, source, and individual source parts
+                    search_strings = set()
+                    if st:
+                        search_strings.add(st.lower())
+                    if src:
+                        search_strings.add(src.lower())
+                        # Split composite sources by comma
+                        for part in src.split(','):
+                            part = part.strip().lower()
+                            if part:
+                                search_strings.add(part)
+                                # Also add stripped version (remove +/-)
+                                search_strings.add(part.rstrip('+-'))
                     
-                    # Check if any search string matches the key
-                    matched = False
-                    for s in search_strings:
-                        if key_lower == s or key_stripped == s:
-                            matched = True
-                            break
-                        # Also check substring for compound names
-                        if key_stripped and key_stripped in s:
-                            matched = True
-                            break
-                    
-                    if not matched:
-                        continue
-                    
-                    # Check direction match
-                    bypass_dir = bypass_info.get('direction', '').upper()
-                    if bypass_dir and bypass_dir != (d or '').upper():
-                        continue
-                    
-                    shadow_bypass_tag = True
-                    shadow_bypass_reason = bypass_info.get('reason', '')
-                    ctx['shadow_bypass'] = True
-                    ctx['shadow_bypass_reason'] = shadow_bypass_reason
-                    ctx['shadow_bypass_stage'] = bypass_info.get('stage', 'unknown')
-                    ctx['shadow_bypass_key'] = bypass_key
-                    break
+                    for bypass_key, bypass_info in shadow_bypass.items():
+                        key_lower = bypass_key.lower()
+                        
+                        # Determine match type: exact vs substring
+                        has_suffix = key_lower.endswith('+') or key_lower.endswith('-')
+                        
+                        matched = False
+                        for s in search_strings:
+                            if has_suffix:
+                                # Exact match for suffixed keys
+                                if key_lower == s:
+                                    matched = True
+                                    break
+                            else:
+                                # Substring match for compound keys
+                                if key_lower in s:
+                                    matched = True
+                                    break
+                        
+                        if not matched:
+                            continue
+                        
+                        # Check direction match
+                        bypass_dir = bypass_info.get('direction', '').upper()
+                        if bypass_dir and bypass_dir != (d or '').upper():
+                            continue
+                        
+                        shadow_bypass_tag = True
+                        shadow_bypass_reason = bypass_info.get('reason', '')
+                        ctx['shadow_bypass'] = True
+                        ctx['shadow_bypass_reason'] = shadow_bypass_reason
+                        ctx['shadow_bypass_stage'] = bypass_info.get('stage', 'unknown')
+                        ctx['shadow_bypass_key'] = bypass_key
+                        break
                 
                 # Get vol regime
                 vol_regime, atr = _get_vol_regime(tok)
