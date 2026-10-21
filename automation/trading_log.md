@@ -13132,3 +13132,25 @@ Final set: ['ARB', 'CHIP', 'ETC', 'LDO']
 **Open Questions:**
 - 7d PnL -$2.87 → -$2.97; size-reduce stays until PnL crosses -$2
 - 24h WR 19.2% worst of the week — if next hour is also negative, review hard_max_loss cluster
+
+## [2026-10-21 04:30 UTC] Hourly Analysis
+
+**Trades:** 1 closed last hour (0 wins, 1 loss)
+**PnL:** -$0.05 last hour | 24h 26T 5W -$0.57 (19.2% WR) | 7d 159T 56W -$2.96 (35.2% WR)
+
+**Changes:** none
+
+**No Change Needed:**
+- CRV pump-chain-v6- SHORT atr_sl_hit -$0.05 (-2.22%) — normal SL close at leverage
+- Kill check: 1T last hour, no signal with 3+ trades — no kill candidate
+- pump-chain- 7d 13T 1W -$0.58 — worst 7d signal but no last-hour trades; prior audits rejected kills on pump-chain family (7d +$0.16 for + variant); monitor
+- atr_sl_hit 8/26 = 30.8% under 40% — tpsl deployed, no action
+- 3h neg streak (01:00 -$0.22, 02:00 -$0.13, 03:00 -$0.05) → rule triggers "consider size reduce" but size already at 0.3x (existing mitigation until 7d PnL > -$2) — no further reduction
+- Size-reduce 0.3x stays (7d PnL -$2.96 still <-$2)
+- 1 open: BTC ai-trader-pending SHORT -0.12% (CEO pending, manual class)
+- Frequency 1T/hr — not overtraded
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d PnL -$2.97 → -$2.96; size-reduce stays until PnL crosses -$2
+- 24h WR 19.2% (5W/26T) second-worst reading; hard_max_loss cluster (2T -$0.43) and trail_arm_timeout (4T -$0.16) still bleeding — watch next hour

@@ -4983,3 +4983,5 @@ BY: auto_1hr
 - [2026-10-21 02:30] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-pending SHORT atr_sl_hit -$0.10 -2.13%) | 24h 23T 6W -$0.27 (26.1%) | 7d 159T 57W -$2.87 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0T last hour, 7d +$0.16) | atr_sl_hit 26.1% under 40% | no neg-hour streak | 0 open | No constants change -> no signal_versions entry
 - [2026-10-21 03:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (COMP pump-chain- SHORT atr_sl_hit -$0.13 -5.71%) | 24h 26T 5W -$0.60 (19.2%) | 7d 159T 56W -$2.97 (35.2%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (1T) | atr_sl_hit 26.9% under 40% | no 3h neg streak | 2 open (CRV +0.18%, BTC -0.04%) | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-21 04:30] auto_1hr: NO CONFIG CHANGE — 1T last hour (CRV pump-chain-v6- SHORT atr_sl_hit -$0.05 -2.22%) | 24h 26T 5W -$0.57 (19.2%) | 7d 159T 56W -$2.96 (35.2%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (1T) | atr_sl_hit 30.8% under 40% | 3h neg streak but size already reduced | 1 open BTC SHORT | No constants change -> no signal_versions entry
+BY: auto_1hr
