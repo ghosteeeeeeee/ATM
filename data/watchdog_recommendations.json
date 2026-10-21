@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-10-21T17:43:58.974892+00:00",
+  "timestamp": "2026-10-21T18:13:59.211003+00:00",
   "steers": [
     {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: SOL + CFX",
-      "detail": "Both opened within 12 minutes. Correlation risk.",
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.43 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
@@ -20,18 +20,10 @@
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: CFX + BANANA",
-      "detail": "Both opened within 9 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
       "title": "Portfolio heavily long (4 trades)",
       "detail": "4 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -39,27 +31,29 @@
       "title": "7 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-005"
+      "id": "steer-004"
     }
   ],
-  "portfolio_health": "warning",
+  "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "ABOVE",
-    "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "volatility": "NORMAL",
+    "zscore_tier": "POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.0,
+    "acceleration_state": "FLAT",
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
     "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 5,
-  "deep_analysis": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING (cycle 2026-10-21 16:50 UTC)\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 3 (3 long, 0 short) \u2014 3/6 slots\nUnrealized PnL: ~0.00 USDT (BTC flat, NEO flat, STX just filled)\nRegime: LONG_BIAS 15m + 4h | BTC above EMA300 (84116) for 1100+ min | vol LOW, velocity SLOW\n24h closed: 34, 14W/19L, net -0.59\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent/regime] Pending queue is 5/9 SHORT against a tape that has not lost EMA300 all day \u2014 GRASS SHORT conf 88 at RSI 53.9 while GRASS 15m regime is LONG_BIAS conf 83.4 (+3.18%/16c), GMX SHORT conf 88 at RSI 50. pump-chain- family is 0W/9L (-0.54) over 7d. Let KPEPE/FOGO die (RSI 33.8/42.9 are below the 45 short floor anyway) and block GRASS/GMX shorts while BTC holds EMA300. Winning side = LONG or no trade.\n\ud83d\udd34 [urgent/health] Stop-chop entry family still prints: 7d atr_sl_hit + hard_max_loss + hard_sl + trail_arm_timeout = 85T, 3W (3.5%), -6.74, and only 3 of those 85 ever reached +0.40%. Trail family same window = 48T, 41W (85.4%), +3.37. Until volume expands, only entries that reach the +0.40% confirm deserve size \u2014 the other 96% never arm and hand the money back.\n\ud83d\udfe1 [warning/health] STX LONG (id 16345, r2v2-long4, vol EXTREME) is the weakest of the three opens: r2v2-long4 is 0W/3L (-0.16) over 14d and EXTREME-regime entries took all 14 of the last 24h's losing slots. Small size or tighter invalidation; do not add.\n\ud83d\udfe1 [warning/health] NEO LONG (id 16344, bb-bounce-v2-long+) is a ranging coin entering a ranging regime: NEO 15m NEUTRAL (ranging), last hour range 0.22%, BTC volume LOW. bb-bounce-v2-long+ 7d is 19T/9W/-0.46. Verdict: I would not open this fresh today. It must confirm to +0.40% inside the arm window \u2014 if it stalls, the trail-arm timeout exit is the correct outcome, not a hold.\n\ud83d\udfe2 [info/profit_lock] BTC LONG (id 16342) is the one to keep: continuum-trend+ is the best signal in the book (6W/7L window, 85.7%). Stop 83770 sits 0.41% under EMA300 = thesis-correct. No action until +2% (86317) then move to breakeven.\n\ud83d\udfe2 [info/opportunity] 4 idle slots in a LONG_BIAS tape while trail-confirmed LONGs run 85% WR \u2014 capital efficiency is the real cost right now, not the 3 flat positions.\n\ud83d\udfe2 [info/health] Post-exit giveback re-verified this cycle: 5/19 (26%) of 24h losers traded >=0.5% in our direction within 2h of our stop (GRASS +7.38%, COMP +1.76%, SYRUP +1.10%, BLUR +0.96%, INJ +0.60%). Prior cycle claimed 8/20 \u2014 not reproducible now, use 5/19.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nWe are on the right side today: all three opens are LONG in a LONG_BIAS regime with BTC pinned above EMA300, and no short is open. The 24h loss of -0.59 is fully explained by two self-inflicted buckets, not by direction: 4 shorts fired against a rising tape (-0.33, 0/4) and chop entries that never confirmed (-0.37 hard_max_loss, -0.44 atr_sl_hit). The winning side for every one of those was the same coin going the other way or nothing at all \u2014 BTC ran +2.10% since the 01:13 short entry that stopped us out, and the COMP short that lost -5.7% closed +0.16% above where we shorted it.\n\nDirection is not the discriminator and RSI is not either (7d losers cluster mid-band 45-65; 24h winners span 22-73 on meta_rsi). The discriminator is confirmation: entries that reach +0.40% and let the trail arm win 85% of the time, entries that do not lose 97% of the time. That is the trend-versus-chop line, and everything in the pending queue this cycle \u2014 5 pump-chain- shorts, a rsi=100 SUSHI print, a ranging-coin NEO bounce \u2014 sits on the chop side of it.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Block shorts while BTC holds EMA300 AND 15m reads LONG_BIAS \u2014 pending GRASS/GMX/KPEPE/FOGO/BANANA shorts are the P1 pattern recurring in real time.\n2. Treat trail-arm confirm as the entry: no size on any signal that has not printed +0.40% (85T/3.5% WR vs 48T/85.4% WR).\n3. Downsize or tightly-invalidate STX (r2v2-long4 0/3, EXTREME vol) and stand aside on NEO-style ranging bounces; hold BTC untouched until +2%, then breakeven at 86317.\n4. Reallocate idle slots only into trail-confirming LONGs with fresh price data \u2014 that is where the +3.37 is coming from.",
-  "agent_timestamp": "2026-10-21T16:51:56.086085+00:00",
-  "regime_context": "LONG_BIAS on both timeframes (btc_15m LONG_BIAS, btc_4h LONG_BIAS) with BTC at 84630 \u2014 0.62% above EMA300 (84116), unbroken for 1100+ minutes, linreg LEAN_BULL, trend_quality STRONG_UP. Caveat: volume_regime LOW, velocity SLOW, market_phase alternating CALM/DECLINING \u2014 this is a low-volume drift, not an expansion trend. 15m scanner: 22 long-bias vs 11 short-bias of 124 tokens; strongest tapes are RUNE 90.8, LINK 88.4, ICP 85.8, USELESS 85.6, KBONK 85.4, PONS 84.8, GRASS 83.4, ALGO 82.8 \u2014 all LONG_BIAS. Short-side tapes exist (GMX 89.3, SUPER 85.3, CRV 74.3, SOPH 77.0) but taking them means fading a BTC that has not lost its EMA300 all day. Positioning check: 3/3 opens are LONG = aligned. In a LOW-volume drift the risk is not direction, it is that a 1% wiggle exits a long before the +0.40% trail arms \u2014 which is exactly how -6.74 accumulated over 7d.",
-  "pattern_alerts": "VERIFIED patterns (PostgreSQL re-run this cycle; RSI source = (_signal_metadata::json->>'rsi_14'), never entry_rsi_14):\n\nP1 \u2014 SHORTS AGAINST THE TAPE [urgent, regime]. 7d: SHORT n=40, 10W (25% WR), -1.10 vs LONG n=118, 49W (41.5% WR), -1.66. 24h: SHORT n=4, 0W, -0.33 (BTC x2 ai-trader-pending, COMP -5.7%, CRV -2.2%). WINNING SIDE: LONG or no trade \u2014 BTC printed +2.10% from the 01:13 short entry to now, and the COMP short stopped -5.7% at a price 0.16% ABOVE where we entered. WHY NOT US: conditional/ai-trader-pending path keeps firing shorts while BTC holds EMA300 (1100+ min) and 15m reads LONG_BIAS. RECURRENCE: 5 of 9 pending signals right now are pump-chain- shorts (GRASS conf 88 RSI 53.9, GMX 88/50.0, BANANA no RSI, FOGO 42.9, KPEPE 33.8).\n\nP2 \u2014 CONFIRMATION IS THE ONLY EDGE [urgent, health]. 7d exit families: stop-chop (atr_sl_hit n=47, hard_max_loss n=21, hard_sl n=6, trail_arm_timeout n=11) = 85T, 3W (3.5%), -6.74 \u2014 and only 3 of those 85 trades ever reached +0.40%. Trail family (profit-monster-trail n=35, atr_trail_hit n=13) = 48T, 41W (85.4%), +3.37. WINNING SIDE: the SAME longs, entered only after the +0.40% confirm lets the trail arm. WHY NOT US: pump-chain+/r2v2/bb-bounce fire into LOW-volume drift where a 1% wiggle exits before arm. Direction and RSI are not the edge (7d losers mid-band 45-65, winners 22-73 on meta_rsi).\n\nP3 \u2014 STOPS TAKEN OUT, THEN THE MOVE HAPPENS [warning, health]. 5/19 (26%) of 24h losers moved >=0.5% in our direction within 2h after our exit: GRASS LONG -2.2% stop then +7.38%, COMP +1.76%, SYRUP +1.10%, BLUR +0.96%, INJ +0.60%. Winning side was ours in a quarter of cases \u2014 this is stop placement/timing in LOW-volume drift, not wrong direction. Prior cycle's 8/20 claim did not reproduce at this timestamp; use 5/19.\n\nP4 \u2014 SIGNAL FAMILY LEDGER (7d, n>=5 worst): ai-trader+ 15T 40% -0.58; pump-chain- 9T 0% -0.54; doji-bottom-long 11T 45.5% -0.51; bb-bounce-v2-long+ 19T 47.4% -0.46; ai-trader-pending 9T 11.1% -0.28; ai-trader-manual 13T 38.5% -0.25. Positive: pump-chain-,pump-chain-v6- combo 10T +0.28, pump-chain+ 24T breakeven. r2v2-long4: 0W/3L, -0.16 over 14d \u2014 and a 4th just opened (STX id 16345)."
+  "open_count": 4,
+  "deep_analysis": "We are on the RIGHT side of the market and STILL bleeding. That is the whole story this cycle.\n\nPositions: 4 open, all LONG, +0.08 unrealized \u2014 regime-aligned (btc_15m LONG_BIAS, btc_4h LONG_BIAS, continuum ABOVE, BTC above EMA300 for 1,288 consecutive ticks, trend_quality STRONG_UP). No open trade is up 2%+ or open 8h+, so no breakeven/trail/stale steers are due yet. Directional alignment is NOT the problem.\n\nSelection is the problem. Last 24h: 36 closed, 14W/21L, 39% WR, -0.74 USDT. 9 of the 21 losses ended in hard_max_loss or trail_arm_timeout \u2014 they never reached the +0.40% trail arm, meaning they went straight down from entry (STX -4.9%, PUMP -5.9%, COMP -5.7%, XPL -3.5%, INJ -3.7%/-3.4%). These are not wrong-direction trades in a bear; they are LONGs placed in coins that had NO trend of their own while the market trended. The winning side in each case was simply: no trade, or wait until the coin itself shows trend (like continuum-trend+ did \u2014 85.7% WR, and 13 of 14 winners today exited via profit-monster-trail, i.e. the trail family).\n\nWorst single position: BANANA long (0.6h). Coin tracker has BANANA trend=BEAR 60.8 with the weakest momentum of the book (42.9) while BTC trends up. It is the only open trade fighting its own tape \u2014 if it does not arm the trail (+0.4%) soon, it becomes the next hard_max_loss. SOL is fine (mom 75.8, BULL, +0.53%) but its stop sits only 0.30% below entry \u2014 tightest risk in the book; NEO and BTC are quiet and thesis-intact (meta_rsi 52.6 / 55.7, center of band).\n\nOpportunity cost: 6 slots, 4 used, and the capital is sitting in two flat chop trades (BANANA, NEO at +0.07%) while top-momentum coins (JUP, CRV, ZEN, IOTA, USELESS all mom 80+/BULL) run without us. AI trader pick SKIPPED this hour: AI_TRADER_ENABLED=False (CEO 2026-10-19) \u2014 writing a state file would be dead signal, not a co-pilot move.",
+  "regime_context": "LONG_BIAS confirmed on every axis: btc_15m LONG_BIAS, btc_4h LONG_BIAS, continuum ABOVE, zscore POS, BTC above EMA300 for 1,288 ticks with STRONG_UP trend quality. Velocity is SLOW and acceleration FLAT \u2014 this is a grind, not a melt-up, which means entries still need the coin itself to be moving (coin-level trend), not just beta to BTC. 15m scanner aggregate: 25 long-bias vs 19 short-bias tokens. Positioning 4/4 LONG is correct for this regime; do NOT add shorts until BTC loses the EMA300 (last cross 2026-10-21 ~05:29 UTC). One caveat: market_phase=DECLINING alongside STRONG_UP trend quality is mixed tape \u2014 favor trend-following signals (continuum-trend+, trail family) over bounce/chop signals while that contradiction persists.",
+  "pattern_alerts": "VERIFIED from PostgreSQL (24h window: 36 closed, 39% WR, -0.74 USDT; 7d: LONG 118T 40.7%WR -2.05, SHORT 41T 24.4%WR -1.14):\n\nPATTERN 1 \u2014 Chop entries, no trail arm (URGENT): 9/21 24h losses = hard_max_loss (6) + trail_arm_timeout (3), gross -0.78 of -1.54 total losses (51%). Coins: STX, INJ x2, PUMP, XPL, MET, CFX, BLUR, APT \u2014 none reached +0.40% before dying. WINNING SIDE: the trend riders (continuum-trend+ 85.7% WR; all 13 trail-exit winners). Why we weren't on it: signals fired LONG on coins with flat/fading local structure while BTC trended \u2014 beta longs without coin-level trend. n=9, this is the single largest loss bucket.\n\nPATTERN 2 \u2014 Shorts are auto-loss in this regime: 5 of 5 shorts closed in 24h lost (-0.37 total: CFX, CRV, COMP, BTC x2); 7d SHORT 24.4% WR. pump-chain- family: 37 trades, 21.6% WR, -0.57. WINNING SIDE: LONG \u2014 BTC above EMA300 1,288 consecutive ticks. Why we weren't on it: pump-chain short probes firing against a confirmed uptrend. Current book already corrected this: 4/4 long.\n\nPATTERN 3 \u2014 r2v2-long4 is dead: 4 trades, 0W, -0.27, including today's STX -4.9% (meta_rsi 57.6 \u2014 center band, so RSI is NOT the discriminator; coin selection is). Entry RSI across 24h winners (22-73) vs losers (44-71) overlaps almost completely \u2014 DRIFT-E confirmed: signal-time RSI does not separate winners from losses. The separator is exit path: trail family wins, hard_max_loss loses.\n\nPATTERN 4 \u2014 Same-coin churn: INJ took two consecutive pump-chain+ LONG hard_max_loss in one day (-0.08 each, RSI 50.0 and 55.3); SYRUP traded 4x (2W/2L, net +0.01 \u2014 pure fee churn). Re-entering the same losing coin/signal same-day is adding nothing.\n\nFor every loser: the winning side was either (a) the same direction but in a coin that actually trended (trail family), or (b) no trade at all (chop coins). Almost never the opposite direction \u2014 shorting here is fighting the tape.",
+  "ai_trader_pick": null,
+  "ai_trader_note": "Skipped: AI_TRADER_ENABLED=False (CEO 2026-10-19). Slots free 4/6, candidates pre-checked (CRV/IOTA/ZEN/USELESS all PASS, JUP blocked RSI 85.9) \u2014 pick held until CEO re-enables.",
+  "agent_timestamp": "2026-10-21T18:20:54.497914+00:00"
 }
