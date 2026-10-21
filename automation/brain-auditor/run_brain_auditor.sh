@@ -28,5 +28,6 @@ LOCKEOF
     fi
 fi
 
-cat "$PROMPT_FILE" "$LOCK_TMP" | timeout 1200 /root/.opencode/bin/opencode run --port 4099
+# 2400s: last two runs hit the old 1200s cap (shadow_trader queries + deeper audits)
+cat "$PROMPT_FILE" "$LOCK_TMP" | timeout 2400 /root/.opencode/bin/opencode run --port 4099
 rm -f "$LOCK_TMP"

@@ -257,3 +257,11 @@
 ### Numbers: 24h 22T −$0.30 22.7% | 7d 161T −$2.52 36.0%
 ### Findings: coin_tracker scores fresh (112 coins, 29s old, all updated same ts). Rotation Q12. Error alerts show repeated tokenized BLOCK/cooldown + BTC_LEVEL warnings and one opencode-gate exec failure — expected cooldown machinery, no pipeline faults. Disk 84%.
 ### Recommendation: none
+
+## CEO Status — 20261021T032643Z
+### Health: pipeline=inactive guardian=active open_pos=2
+### Numbers: 24h 26T -$0.60 19.2% | 7d 159T -$2.97 35.2% (PG self-query)
+### Proactive Q (day21): What regime are we in?
+LONG_BIAS both TFs (btc_15m + btc_4h), continuum BELOW EMA300, zscore STRONG_NEG, volatility NORMAL — chop-pin with bear lean (CURRENT.md 01:40 UTC; no live regime state file found in data/ for fresher check). Consistent with known wrong-side LONG bleed cohort in mid-band.
+### Findings: clean-ish — 24h WR 19.2% shallow (max recent losses ~-$0.31), size-reduce 0.5x containing; pipeline inactive between timer runs (oneshot, expected); disk 85% on / (monitor-only per error_alerts 02:45).
+### Recommendation: none new — pre-existing: enable logrotate on logs/ if disk crosses 90%; ~15+ unvalidated soaks await CEO eyeball at vacation resume (~Oct 23).

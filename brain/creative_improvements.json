@@ -6051,5 +6051,59 @@
     "category": "exit quality",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-21T02:47:43Z",
+    "idea": "pump-chain- kill EXECUTION PLAN pre-registered for Oct 22",
+    "rationale": "Kill rule (14d PnL<0, n>=20) met today: -0.91/42T. CEO monitor rule (7d WR<50%) met: 7.7%. Only blocker: dual emitter (v5_short + pump_flow share SOURCE) - plan: grep decider fire logs for module attribution over next 24h, then flip ONLY the emitting flag; if both emit, flip both and re-verify with n>=5 next day",
+    "expected_impact": "stop ~-0.91/14d bleed from bare pump-chain- (combo 'pump-chain-,pump-chain-v6-' 14d +0.39 STAYS - separate emitter path)",
+    "category": "signal lifecycle",
+    "status": "pre-registered",
+    "risk": "medium-attribution"
+  },
+  {
+    "date": "2026-10-21T02:47:43Z",
+    "idea": "Exception-trigger registry (governance, zero trading risk)",
+    "rationale": "This run found the pump-chain floor revert only by manually reading constants comments. hermes_constants now carries 6+ pre-registered revert triggers (sweet-spot 14d, volume-breakout 7d, v5-short 7d WR, bb-bounce kill, pump-chain floor). A single daily check evaluating documented triggers vs fresh data would institutionalize drift detection",
+    "expected_impact": "no missed trigger reverts; converts comment-rot into checklist",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "zero"
+  },
+  {
+    "date": "2026-10-21T02:47:43Z",
+    "idea": "REJECTED-LOGGED: pump-chain SHORT midband exemption removal (45-55)",
+    "rationale": "4 of 6 SHORT losers in band 45-51, but exemption removal nets NEGATIVE: block saves 0.57, kills 5W +0.72 = -0.15",
+    "expected_impact": "n/a",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-21T02:47:43Z",
+    "idea": "REJECTED-LOGGED: pump-chain+ momentum_state=flat filter",
+    "rationale": "30d flat -0.46 vs rising +1.03 BUT 7d sign-flips (flat +0.54, rising -0.38) - temporal instability, fails OOS",
+    "expected_impact": "n/a",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-21T04:41:14.142684+00:00",
+    "idea": "atr_sl_hit recovery probe — 44% of SL exits recovered to entry within 30m",
+    "rationale": "25 atr_sl_hit trades last 7d probed against 1m candles: 11/25 (44%) crossed back to entry within 30m. Best post-exit moves: BTC +1.31%, ETH +1.26%, ARB +0.63%. Suggests ~half of atr_sl exits are tight-stop-in-chop, not wrong-direction.",
+    "expected_impact": "If post-SL re-entry or wider structural stops capture even 25% of recovered cohort: ~+$0.30-0.50/7d",
+    "category": "exit-side",
+    "status": "measured-first-run",
+    "risk": "medium — re-entry whipsaw risk needs candle-OOS before any mechanism"
+  },
+  {
+    "date": "2026-10-21T04:41:14.142684+00:00",
+    "idea": "PUMP_CHAIN_CONF_FLOOR = 30 (trades.confidence)",
+    "rationale": "See recurring_problems. 14d conf<30 = 38T 15.8%WR -$1.86 all-time-consistent (30d=14d, band is recent). Winner-kill 19.4% passes bar. Net +$1.22/14d.",
+    "expected_impact": "+$1.22/14d saved, WR lift ~3-5pp on pump-chain family",
+    "category": "entry sniper",
+    "status": "pre-registered Oct 23",
+    "risk": "low"
   }
 ]

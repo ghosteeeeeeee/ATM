@@ -991,3 +991,44 @@
 2. SL-width / entry-gate study — L2 — HIGH — CEO kanban GO pending
 3. brain.py --limit + guardian fill-integration — L2 — MED — only after limit_order.py proven in real use
 4. RR engine U2–U4 — L2-3 — HIGH — needs CEO sequencing, shadow-mode pattern
+
+---
+
+## Upgrade Implementer Session — 2026-10-21 04:35 UTC
+
+**Context:** pipeline LIVE (kill JSON resumed by T directive), soak over, trading active. Scoped to reliability/disk wins + verification of overnight changes.
+
+### Plan evaluations (recent-20 re-scan)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| shadow-mode-paper-trading-spec-v1 | L3 | HIGH | ✅ IMPLEMENTED (prior session Oct 20) | `scripts/shadow_trader.py` shipped (55d57379 + bug_hunter fixes 4d2063a8), timer active, 7,998 shadow rows flowing, analyses already delivered to CEO briefs |
+| t-vacation-mode-2026-10-14 | L4 | HIGH | ✅ CLOSED (prior) | Remaining items CEO-gated; vacation soak ended |
+| limit-order-capability | L2 | MED | ✅ PHASE 1 SHIPPED (prior) | Phase 2-4 deferred until standalone proven |
+| signal-starvation-fix / short-rsi-habitat / temporal-confluence / vol-regime-relative / contrarian-engine / regime-recalibration | L2-3 | MED-HIGH | ⏳ CEO-gated SPECs | No code during soak; still awaiting approval |
+| 2026-10-16_winning-dna-remeasure-verdict | — | HIGH | ✅ CLOSED (prior) | SL-width study on CEO kanban |
+| bug-hunt-master-plan (open bugs 037/044/056/064) | — | HIGH | ⏳ CEO-gated | All 4 open bugs explicitly need T/CEO decision (kill-switch AND-gate, sniper-exit enable, orphan flags, continuum SL policy) — not auto-fixable |
+| hermes-better-coder (disabled unit) | L2+ | LOW | ⏸️ SKIPPED | dispatcher/ package empty (code deleted ~Sep 1); rebuilding = new feature, nothing missed it in 7 weeks |
+
+### Implemented this session (2 × Level 1)
+
+1. **brain-auditor timeout fix** — last 2 runs (02:30, 03:30) died at the 1200s cap (`Failed with result 'timeout'`); hourly intelligence was down. Root cause: audit scope grew (shadow_trader queries, deeper PG pulls) past the old 20-min budget. Fix: `timeout 1200→2400` in `automation/brain-auditor/run_brain_auditor.sh` + `TimeoutStartSec=1200→2400` in `/etc/systemd/system/hermes-brain-auditor.service` (daemon-reload done, failed state reset). Typical successful runs were 7-17 min — 40 min cap gives 2x headroom. Verified: unit shows new timeout, timer next-fire armed.
+2. **candles_1m 30d retention (disk fix)** — the standing "retention delegation undelivered since Oct 7" item. Root cause: price_collector's prune ran ONLY for candles_5m; candles_1m grew unpruned to 20.5M rows / 3.1G / data back to Feb 2024, driving disk to 85%. Fix: batched 30d prune (500K rows/txn) added to `main()` in `scripts/price_collector.py`, same policy as 5m. First run deleted 13,498,418 rows; one-time VACUUM shrank candles.db 3.1G→1.22G. Disk 85%→83% (+2G free). Steady-state verified: next cycle pruned the natural 30d edge (308 rows), no errors. 15m/1h/4h left untouched (smaller, long-horizon alt data has no alternate home — extend later only if disk tightens again).
+
+### Verifications (no code change)
+
+- **PM_TRAIL_ACTIVATE "percent-vs-fraction" probable-bug (shadow-spec appendix D): FALSE ALARM.** `profit_monster.py:24` does `PM_TRAIL_ACTIVATE_PCT *= 100` at import (0.004→0.4) before comparing to percent-scale pnl at line 454. Live behavior correct (+0.40% activation). Spec appendix item can be struck.
+- **pump-chain+ LONG HIGH block (c9092aea, 03:37 today): CONFIRMED LIVE.** signal-compactor is Type=simple short-lived (820ms/cycle, re-imports constants each run) — flag active since 03:38 cycle, no restart needed.
+- **Open bugs re-checked:** BUG-037 (kill-switch AND-gate), BUG-044 (sniper-exit timer), BUG-056 (orphan MA300 flag), BUG-064 (continuum SL-less trades) — all unchanged, all correctly parked as T/CEO decisions.
+
+### Sideways findings
+- **Severity: INFO** — hermes-better-coder unit references an empty `mcp/hermes-coding-mcp/dispatcher/` package (code removed ~Sep 1). Unit correctly disabled; leave dead or delete unit files at T's discretion.
+- **Severity: LOW** — 15m/1h/4h candle tables also reach Feb 2024 (2.1M/637K/134K rows >30d). Not pruned this session (deliberate — long-horizon alt data). Revisit if disk exceeds 85% again.
+- **Severity: MED (standing)** — trail-arm ratify (bb-squeeze 60m + pump-chain 45m flags) still lacks documented CEO GO; brain_auditor recommended RATIFY Oct 15.
+
+### Next candidates
+1. SL-width / entry-gate study — L2 — HIGH — CEO kanban GO pending
+2. RR engine U2–U4 — L2-3 — HIGH — needs CEO sequencing, shadow-mode pattern
+3. brain.py --limit + guardian fill-integration — L2 — MED — only after limit_order.py proven in real use
+4. temporal-confluence / short-rsi-habitat / vol-regime-relative — L2-3 — MED-HIGH — CEO-gated SPECs
+5. 15m/1h/4h candle retention — L1 — LOW — only if disk tightens; 2.9M rows reclaimable

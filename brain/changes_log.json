@@ -1749,5 +1749,16 @@
     "after": "ARM-GAP log: + peakTrail@0.3%=X% (counterfactual exit if trail from mfe_price at 0.3% distance)",
     "rationale": "Giveback cohort needs per-trade peak-trail visibility for candle-OOS scoring. 7d D=0.3% trades-level NET +14.7pts fragile.",
     "impact": "Zero live behavior. Enables signal-scoped OOS without re-query."
+  },
+  {
+    "timestamp": "2026-10-21T02:46:39Z",
+    "agent": "brain_auditor",
+    "change": "Pump-chain SHORT RSI floor carve-out REVERTED (pre-registered trigger hit): SHORT_RSI_HARD_FLOOR_PUMP_CHAIN 40->45 and SHORT_RSI_FLOOR_PUMP_CHAIN 40->45",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "40 / 40",
+    "after": "45 / 45",
+    "rationale": "Grant condition was \"40-45 band 63.2% WR; revert if 7d n>=5 WR<45% or PnL<-$0.50\". Trigger HIT: 7d n=5 w=1 (20% WR), 14d n=17 23.5% WR net +$0.04, 30d decayed 41.2% WR +$0.29 (was 63.2%). Edge gone across all windows.",
+    "impact": "Blocks pump-chain SHORT entries with detect/live RSI<45 (oversold = bounce, BANANA lesson). Winner-kill: 14d 4W +$0.75 vs 13L -$0.71 saved ≈ wash; 7d +$0.13 saved. Aligned with standard SHORT floor 45."
   }
 ]

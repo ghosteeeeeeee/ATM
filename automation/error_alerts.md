@@ -1376,3 +1376,7 @@
 
 ## Error Alerts — 2026-10-20 18:26 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3481s left, N failures)`
+
+## Error Alerts — 2026-10-21 02:45 UTC
+- **WARN** (1x): disk usage at 85% on / (17.6G free of 118G)
+- **AUTO-FIX**: none possible — no *.log older than 7d to gzip; largest recent files are active (pipeline.log 206M, signal-compactor.log 80M, 15m_regime.log 67M). Monitor only; if >90%, enable logrotate on /root/.hermes/logs.

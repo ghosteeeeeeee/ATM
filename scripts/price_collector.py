@@ -841,6 +841,26 @@ def main():
             except Exception as e:
                 print(f'  {table}: aggregation error: {e}')
 
+        # 30d retention for candles_1m — same policy as candles_5m (see _aggregate_tf).
+        # 1m was never pruned: 20.5M rows / Feb-2024→now / 3.1G file drove disk to 85%.
+        # Batched deletes keep each txn small; freed pages reuse as new candles flow in.
+        try:
+            _cutoff = int(time.time()) - 2592000
+            _pruned_1m = 0
+            while True:
+                _r = candle_conn.execute(
+                    "DELETE FROM candles_1m WHERE rowid IN ("
+                    "SELECT rowid FROM candles_1m WHERE ts < ? LIMIT 500000)",
+                    (_cutoff,)).rowcount
+                candle_conn.commit()
+                if _r <= 0:
+                    break
+                _pruned_1m += _r
+            if _pruned_1m:
+                print(f'  [candles_1m] Pruned {_pruned_1m} rows older than 30d')
+        except Exception as e:
+            print(f'  [candles_1m] prune error: {e}')
+
         # ponytail: truncate WAL after writers release so disk doesn't balloon
         try:
             candle_conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
