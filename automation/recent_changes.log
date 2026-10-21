@@ -4995,3 +4995,5 @@ BY: brain_auditor
 - [2026-10-21 06:45 UTC] brain_auditor: AUDIT RUN #49 — 0 config changes (vacation soak) | ARM-GAP confirmed LARGEST bleed 45T -$3.19 14d | bare-path demote shadow REJECTED-WITH-DATA (net -$0.16) | pump-chain- kill recheck Oct 22 | 24h 20.8% -$0.24 shallow, 7d 35.2% -$2.96, size-reduce 0.5x
 - [2026-10-21 07:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, no closes since 03:xx) | 24h 24T 5W -$0.24 (20.8%) | 7d 153T 56W -$2.64 (36.6%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (0T) | atr_sl_hit 33.3% under 40% | neg streak 01-03 broken by empty hours | 2 open (BTC SHORT, DOGE LONG +0.56%) | No constants change -> no signal_versions entry
 BY: auto_1hr
+BY: auto_1hr
+- [2026-10-21 08:20] auto_1hr: NO CONFIG CHANGE — 2T last hour (1W DOGE trail +$0.08, 1L BTC pending SHORT atr_sl_hit -$0.05) | 24h 25T 6W -$0.18 (24.0%) | 7d 152T 55W -$2.70 (36.2%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (max 1T/signal) | atr_sl_hit 9/25=36.0% under 40% | no neg-hour streak | regime LONG_BIAS (not NEUTRAL) | 2 open (both LONG, aligned) | No constants change -> no signal_versions entry
