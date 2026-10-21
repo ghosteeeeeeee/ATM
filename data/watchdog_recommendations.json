@@ -1,89 +1,29 @@
 {
-  "timestamp": "2026-10-21T12:13:55.215577+00:00",
+  "timestamp": "2026-10-21T14:13:56.717424+00:00",
   "steers": [
     {
-      "severity": "urgent",
-      "category": "health",
-      "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -0.56 USDT. Something is wrong.",
-      "auto_executable": false,
-      "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: HYPER + AIXBT",
-      "detail": "Both opened within 15 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: HYPER + SYRUP",
-      "detail": "Both opened within 21 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: AIXBT + SYRUP",
-      "detail": "Both opened within 6 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-004"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
-      "auto_executable": false,
-      "id": "steer-005"
-    },
-    {
       "severity": "warning",
       "category": "health",
-      "title": "7 recent losses look like wrong-side trades",
+      "title": "8 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-006"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'ai-trader-pending' losing streak: 3 losses",
-      "detail": "Net -0.18 USDT over last 20 trades (losses: -0.18). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-007"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 3 losses",
-      "detail": "Net -0.16 USDT over last 20 trades (losses: -0.16). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-008"
+      "id": "steer-001"
     }
   ],
-  "portfolio_health": "critical",
+  "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "NEUTRAL",
     "btc_4h": "LONG_BIAS",
     "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.75,
     "wyckoff_phase": "MARKUP",
-    "market_phase": "DECLINING",
+    "market_phase": "CALM",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 3,
-  "deep_analysis": "MARKET: BTC sits above EMA300 for 500+ consecutive 1m ticks, linreg LEAN_BULL, trend_quality UP/STRONG_UP, both 15m and 4h regimes LONG_BIAS. But volatility is LOW, volume LOW, velocity SLOW, market_phase oscillating CALM/DECLINING. That is a grind, not an expansion. The 129-token 5m tape reads 80 LONG_BIAS vs 5 SHORT_BIAS.\n\nPOSITIONING: 3/3 open trades are LONG. On side-selection we are correct \u2014 longs into a long-bias tape above EMA300 is the right side. The portfolio-level problem is not direction, it is that we are in the wrong KIND of long. Two of the three (AIXBT, HYPER) are low-range chop entries: AIXBT 15m regime is NEUTRAL with r2=0.002 (literally no slope) and ATR5m 0.10%; HYPER ATR5m 0.08%. A +0.40% trail arm on 0.08-0.10% ATR needs a 4-5x ATR move to arm. Those are the exact conditions behind our two bleed buckets. SYRUP is the exception and the only one I would re-open fresh: LONG_BIAS 92.1 confidence, slope +0.077, real trend, ATR5m 0.24% gives the trail something to work with.\n\nTHE P&L STRUCTURE (7d, 154 trades, net -2.75): our money is made entirely by trades that reach the trail, and lost entirely by trades that never move. profit-monster-trail 31T/28W/90.3%/+1.58 and atr_trail_hit 12T/10W/83.3%/+1.80 are the only positive buckets. atr_sl_hit 50T/1W/2.0%/-3.74 and hard_max_loss 19T/0W/0%/-2.22 are -5.96 combined from 69 trades with 1 win between them. We do not have a direction problem at portfolio level; we have an entry-selection problem where roughly 45% of entries are placed in conditions that produce no movement, and those never become winners.\n\nSIDES WE WERE ON AND SHOULD NOT HAVE BEEN: 24h is 30 closed, 8W/22L, -0.50 USDT. Worst single coin COMP: 3 trades, 0 wins, -0.31, all SHORT via pump-chain- while COMP was pumping \u2014 the winning side was LONG. BTC pending shorts 16317/16320 both lost -0.10/-0.05 while BTC held above EMA300 for the entire window; the winning side was LONG (16322 continuum-trend+ +0.04, 16309 continuum-osc+ +0.09 on the same days). Every one of those shorts was a fight against a trend that was visibly intact.\n\nWHAT I WOULD DO: hold SYRUP with its existing stop; treat AIXBT as the weakest of the three and exit it if it has not arming-qualified the trail within ~2 hours of open rather than let it walk to hard_max_loss; accept that HYPER's 0.08% ATR means a low-probability arm and cut it early if it stalls flat. No new SHORTs while the tape is 80/5 long-bias. No new AIXBT-style ranging-coin entries while volatility is LOW.",
-  "agent_timestamp": "2026-10-21T11:51:29.994632+00:00",
-  "regime_context": "BTC: above EMA300 (500+ consecutive 1m ticks, no cross since 1792567740), linreg_direction LEAN_BULL, trend_quality UP/STRONG_UP, zscore drifting NEUTRAL->POS, 15m regime LONG_BIAS and 4h regime LONG_BIAS, continuum ABOVE. Expansion is NOT happening: volatility LOW, volume_regime LOW, velocity SLOW, acceleration oscillating, market_phase CALM/DECLINING.\n\nImplication for our book: LONG is the correct side and SHORT is the wrong side \u2014 5m aggregate tape is 80 LONG_BIAS / 5 SHORT_BIAS / 44 neutral across 129 tokens. But because this is a low-vol grind rather than an expansion, expectations must be set for shallow moves: TP distance and the +0.40% trail arm are both harder to reach than in a normal-vol regime. That is a statement about which trades to take (fewer, more selective, trend-confirmed coins only), not a time-of-day or blanket kill. Shorts are not blocked by a regime rule here \u2014 they simply have to beat an 80/5 tape, and the last 7 days say they do not (SHORT 47T 27.7% WR -1.03).",
-  "pattern_alerts": "All figures verified by running SQL against PostgreSQL (trades table, meta_rsi = _signal_metadata->>'rsi_14', NEVER entry_rsi_14). p-values are exact binomial vs the 7d base win rate of 34.4% (53/154).\n\nVERIFIED (p<0.05):\n\n1) atr_sl_hit exit: 50 trades, 1 win, 2.0% WR, net -3.74 over 7d. p=1.9e-08. By far the largest bleed in the book. These are entries where price went straight against entry and never came back \u2014 no trade ever validated. WINNING SIDE: either no trade at all, or the opposite direction at the same moment. We cannot see the counterfactual per-trade, but at 1 win in 50 the entry condition itself is the defect, not the exit.\n\n2) hard_max_loss exit: 19 trades, 0 wins, 0% WR, net -2.22 over 7d. p=3.3e-04. Zero wins in 19 is not noise. These are chop entries that never reached +0.40% for the trail to arm. WINNING SIDE: cash. The right action was to not be in the position \u2014 there was no winning directional alternative, the market simply went nowhere and fees/SL took the rest.\n\n3) pump-chain- SHORT: 12 trades, 1 win, 8.3% WR, net -0.55 over 7d. p=0.046. WINNING SIDE: LONG. The 5m tape is 80 LONG_BIAS vs 5 SHORT_BIAS, BTC has been above EMA300 for 500+ ticks, and this signal shorted into that. Concrete: COMP SHORT x3 = 0 wins, -0.31, while COMP was pumping \u2014 the money was on the long side of COMP all three times.\n\n4) The trail family is the ONLY profitable structure. profit-monster-trail: 31T 28W 90.3% +1.58, p=1.4e-10. atr_trail_hit: 12T 10W 83.3% +1.80, p=7.3e-04. Combined +3.38. Every other exit bucket is flat or negative. This confirms the trail-vs-chop thesis with data rather than assertion: the edge exists only for trades that survive long enough to arm the trail.\n\n5) ai-trader-pending on BTC: 9 trades, 1 win, 11.1% WR, -0.28 over 7d. The last two BTC pending SHORTs (16317 -0.10, 16320 -0.05) both lost while BTC was above EMA300 the entire time. WINNING SIDE: LONG \u2014 16322 continuum-trend+ LONG +0.04 and 16309 continuum-osc+ LONG +0.09 closed in the same 48h window.\n\nDIRECTIONAL ONLY \u2014 NOT STATISTICALLY VERIFIED, MONITOR DO NOT ACT:\n\nA) LONG meta_rsi 45-55 band: 35T, 10W, 28.6% WR, -1.72 \u2014 the worst LONG band in 7d, versus LONG 65+ at 14T 50% +1.09. p=0.108 vs the LONG base rate, so this does NOT clear significance and must not be treated as a confirmed pattern. Flagging it only because all three currently open LONGs sit in exactly this band (meta_rsi 50.0, 50.0, 52.4). Re-test with another week of data before proposing any filter.\n\nB) SHORT overall: 47T 27.7% WR -1.03 over 7d, p=0.207 \u2014 not significant on its own. Combined with the 80/5 tape and pattern 3 above it is directionally consistent, but no blanket short block is justified from this data.\n\nC) trail_arm_timeout: 11T 2W 18.2% -0.48, p=0.212. Not significant, but it is the mechanism that feeds buckets 1 and 2 \u2014 worth watching given current LOW volatility makes arming harder.\n\nREPEATED-MISTAKE CHECK: the same failure (enter a coin with no trend, watch it fail to arm) is present in 24h (30T, 8W, -0.50), 48h (41T, 10W, -0.86) and 7d (154T, net -2.75) windows. We are not doing anything new and wrong \u2014 we are still doing the old wrong thing at reduced frequency."
+  "open_count": 0
 }

@@ -6231,5 +6231,14 @@
     "category": "instrumentation",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-21T14:39",
+    "idea": "Arm-rate leaderboard as standing daily audit metric (per-signal % closes with trailing_activated, 7d, n>=5)",
+    "rationale": "SQL-native trend-vs-chop scoreboard. Run #57 first pass: chop band hl_copy 0% / ai-trader-pending 0% / pump-chain- bare 9.1% vs trend band volume-buildup- 66.7% / pump-chain+ 65.2%. SHORT ARMED 9T 100% +$1.05 — when SHORTs arm they always win; bleed is all unarmed. Structural evidence for Oct 22 Option A: bare arms 9.1% vs combo v6- 27.3% (3x).",
+    "expected_impact": "Zero-behavior; surfaces signal decay 1-2 runs earlier than PnL; one query per audit",
+    "category": "monitoring",
+    "status": "shipped-as-audit-metric",
+    "risk": "none"
   }
 ]
