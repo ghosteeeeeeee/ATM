@@ -1,11 +1,11 @@
 ---
 name: shadow-mode-analysis
-description: Analyze shadow-mode paper trading data to find trends, winners, losers, and gate/filter impact. Use when asked about shadow data, signal quality, exit engine performance, gate analysis, or "what's working in shadow mode". Triggers: "shadow analysis", "shadow mode analysis", "analyze shadow data", "which signals work", "which gates help", "exit engine comparison".
+description: Analyze shadow-mode paper trading data to find trends, winners, losers, gate/filter impact, and optimal SL levels. Use when asked about shadow data, signal quality, exit engine performance, gate analysis, stop-loss optimization, or "what's working in shadow mode". Triggers: "shadow analysis", "shadow mode analysis", "analyze shadow data", "which signals work", "which gates help", "exit engine comparison", "SL sweep", "stop loss optimization", "best stop loss".
 ---
 
 # Shadow-Mode Analysis
 
-Analyze shadow-mode paper trading data to find trends, winners, losers, and gate/filter impact.
+Analyze shadow-mode paper trading data to find trends, winners, losers, gate/filter impact, and optimal stop-loss levels.
 
 ## Quick Start
 
@@ -30,6 +30,11 @@ python3 scripts/shadow_trader.py --sweep-arm --sweep-signal <signal_type> --swee
 
 # HML threshold sweep
 python3 scripts/shadow_trader.py --sweep-hml
+
+# SL level sweep (find optimal stop-loss)
+python3 scripts/shadow_trader.py --sweep-sl
+python3 scripts/shadow_trader.py --sweep-sl --sweep-signal <signal_type>
+python3 scripts/shadow_trader.py --sweep-sl --sweep-dir LONG
 ```
 
 ## Analysis Framework
@@ -140,6 +145,37 @@ FROM shadow_trades WHERE closed=1
 GROUP BY rsi_band ORDER BY rsi_band;
 ```
 
+### 7.5 SL Level Sweep (Stop-Loss Optimization)
+
+Find the optimal stop-loss level for each signal type. Tests SL from 0.5% to 50%.
+
+**When to use:** When trades are being stopped out too soon, or when looking to optimize exit parameters.
+
+```bash
+# Global SL sweep (all signals)
+python3 scripts/shadow_trader.py --sweep-sl
+
+# Per-signal SL sweep
+python3 scripts/shadow_trader.py --sweep-sl --sweep-signal <signal_type>
+
+# Direction-specific
+python3 scripts/shadow_trader.py --sweep-sl --sweep-dir LONG
+python3 scripts/shadow_trader.py --sweep-sl --sweep-dir SHORT
+```
+
+**Key findings from 2026-10-21 analysis:**
+- Current ATR SL (0.35-1.03%) is in the WORST zone — stops out 58-79% of trades
+- Best SL: 8.0% (WR=52.7%, +405% total, 6% stopped)
+- Sweet spot: 8% SL. Beyond 10%, held losers drag down average.
+- LONG signals benefit from wider SL (3-8%), SHORT signals harder to profit from
+
+**Interpretation:**
+- **High stopped%**: SL too tight, cutting winners before they develop
+- **Low stopped% + negative total**: SL too wide, holding losers too long
+- **Optimal**: Balance between stopped% and total PnL (typically 3-8%)
+
+**Per-signal optimization:** Different signals have different optimal SL levels. Run `--sweep-sl --sweep-signal <type>` to find signal-specific optima.
+
 ### 8. Direction x Regime Cross-Analysis
 
 Check which direction works best in which regime:
@@ -194,9 +230,20 @@ python3 scripts/shadow_trader.py --sweep-arm --sweep-signal <signal_type> --swee
 
 # HML threshold sweep
 python3 scripts/shadow_trader.py --sweep-hml
+
+# SL level sweep (stop-loss optimization)
+python3 scripts/shadow_trader.py --sweep-sl
+python3 scripts/shadow_trader.py --sweep-sl --sweep-signal <signal_type>
 ```
 
 ## Common Findings & Patterns
+
+### Pattern: Tight SL (Stopped Out Too Soon)
+Trades stopped out before they have room to breathe. Price moves favorably after stop-out.
+- **Diagnosis**: Run `--sweep-sl`. If high SL levels (3-8%) show much better PnL than current, SL is too tight.
+- **Symptoms**: High stopped% at low SL levels, STX/CFX-type trades (stopped at -0.5%, then +1% within 1h)
+- **Fix**: Widen SL, or use per-signal SL optimization
+- **Key insight**: LONG signals typically benefit from wider SL (3-8%). Current ATR SL (0.35-1.03%) may be too tight for current market conditions.
 
 ### Pattern: Peak Buyers
 Signals with high MFE but negative outcome — they spike up then crash down.
@@ -227,8 +274,14 @@ When reporting shadow analysis findings:
 3. **Losers**: Bottom signals by total PnL (n>=10)
 4. **Exit engines**: Which engine performs best
 5. **Gates**: Which gates are helping vs hurting
-6. **Patterns**: Peak buyers, wrong side, giveback, hold time asymmetry
-7. **Recommendations**: What to flip, what to filter, what to change
+6. **SL optimization**: Optimal stop-loss levels (global and per-signal)
+7. **Patterns**: Tight SL, peak buyers, wrong side, giveback, hold time asymmetry
+8. **Recommendations**: What to flip, what to filter, what to change, optimal SL
+
+## Reports
+
+Saved reports:
+- `reports/20261021-shadow-sl-sweep.md` — SL sweep analysis
 
 ## Data Source
 
