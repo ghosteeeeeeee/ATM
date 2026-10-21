@@ -13359,3 +13359,23 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 
 **Open Questions:**
 - 24h soft bleed -$0.31; atr_sl_hit (9T -$0.63) + hard_max_loss (3T -$0.33) still the loss clusters — standing SL-width escalation with CEO (Oct 16)
+
+## [2026-10-21 13:30 UTC] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss)
+**PnL:** +$0.20 (WR: 75.0%) | 24h 32T 12W +$0.06 (37.5%) | 7d 155T 57W -$2.46 (36.8%)
+
+**Changes:** none
+
+**No Change Needed:**
+- 4 closes all profit-monster-trail: XAI +$0.07, AIXBT +$0.10, SYRUP +$0.05, SYRUP -$0.02 — exits working as designed
+- Kill check: 0T last hour for 24h 0%WR groups (ai-trader-pending 4T, pump-chain+ 4T) — no 3+T 0%WR candidate this hour; pump-chain+ repeatedly audit-rejected — no kill
+- atr_sl_hit 8/32 = 25.0% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: 10:00 -$0.24 but 11:00 empty, 12:00 +$0.09, 13:00 +$0.22 — no 3 consecutive negative hours
+- Frequency 4/hr — under 20, not overtraded
+- Regime LONG_BIAS — no size action; size-reduce 0.3x stays (7d -$2.46 < -$2)
+- 3 open all LONG (HYPER +0.52%, GRASS +0.01%, INJ -0.21%) — aligned with regime
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h just turned positive (+$0.06) — first green 24h window; keep watching whether it holds. Loss clusters unchanged: atr_sl_hit 8T -$0.46, hard_max_loss 3T -$0.33 (standing SL-width escalation with CEO, Oct 16)
