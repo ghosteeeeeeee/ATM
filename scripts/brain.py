@@ -577,6 +577,19 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # Compute pre-computed size and pass to mirror_open
     from hyperliquid_exchange import _get_trade_size_usdt as _get_hl_base_size
     _base_size = _get_hl_base_size()
+    # FIX 2026-10-21 (bug_hunter HIGH): apply vacation size-reduce here too.
+    # brain.py recomputes size directly from _get_hl_base_size(), bypassing
+    # decider_run's _get_dynamic_position_size() which reads the size-reduce flag.
+    # Without this, the size-reduce multiplier is discarded for every trade.
+    try:
+        _sr_path = os.path.join(HERMES_DATA, 'vacation_size_reduce.json')
+        if os.path.exists(_sr_path):
+            with open(_sr_path) as _sr_f:
+                _sr = json.load(_sr_f)
+            if _sr.get('size_reduce'):
+                _base_size = _base_size * _sr.get('size_multiplier', 0.3)
+    except Exception:
+        pass
     _precomputed_size = _base_size * _size_mult
     # FIX 2026-10-12 (code review RISK 1): this chain bypasses every cap in
     # decider_run (they cap _trade_size, not this override) and relies solely on

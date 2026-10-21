@@ -3516,7 +3516,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # set a tight trailing SL 0.3% from current price. The trailing engine then
         # tightens this as price moves favorably. Captures whatever profit is available.
         SOFT_TRIGGER_HOURS = 2.0  # was 1.0 — 1h kills trades that haven't developed yet
-        SOFT_TRAIL_PCT = 0.003  # 0.3% trailing distance
+        # FIX 2026-10-21: widened 0.003→0.006. T directive: "SL is too tight, we're
+        # getting stopped out in chop." Bug_hunter found this was the REAL cause of
+        # BTC (-0.31%), NEO (-0.33%), SOL (-0.23%) stop-outs — not the ATR floor.
+        # At 0.3%, any noise dip in chop hits the SL. 0.6% survives chop noise while
+        # still protecting against real reversals. Evidence: 0.5-1.0% SL band has
+        # 51% WR vs 32.8% for <0.5% band.
+        SOFT_TRAIL_PCT = 0.006  # 0.6% trailing distance (was 0.3%)
         _ot = pos.get('open_time')
         if _ot and live_pnl <= 0:
             try:
