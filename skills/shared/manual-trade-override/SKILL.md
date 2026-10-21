@@ -152,6 +152,44 @@ conn.close()
 - **Use appropriate position sizing** — manual trades should be same size as signal trades ($11-20 USDT)
 - **Log the reason** — include why you're overriding in the `--signal` or notes
 
+## Conditional (Pending) Orders — arming rules
+
+Config: `/root/.hermes/data/pending_orders.json`. Engine: trade_watchdog
+cycle (~30min) monitors price, fires via `brain.py trade add` with
+`ai-trader-pending` (NO `--manual` → vacation pause still gates). One-shot:
+fires once, never re-arms; orphaned `triggered` state surfaces as an urgent
+steer after 15min (re-arm = delete the state entry). Verify any armed order
+with the engine on a temp state path — never the live state file.
+
+**The arming lessons (all paid for in real money, 2026-10-19/20):**
+
+1. **Cushion the trigger beyond the level — the cushion IS your wick
+   filter.** The engine fires on price CROSS, not candle close, so a
+   trigger AT the level is a wick-catcher. Trigger at an 83,439 peak fired
+   on every poke; the fix was 83,500 — ~60pts beyond the peak (CEO number
+   for BTC at 0.4-0.5% ATR). Cushion = recent wick depth, floor ~50-60pts
+   on BTC; the far overshoot (83,560) costs breakout catches, so size the
+   cushion to the wick, not beyond it. R:R always re-quoted after cushioning.
+2. **Triggers near fresh minor support/resistance = sweep-catchers.** A
+   trigger 70pts under a just-formed ascending-lows shelf (#16317 SHORT
+   -2.13%) fired on the LIQUIDITY GRAB below the shelf — buyers were
+   stacked right there (full-analysis §11). Breakdown/breakout triggers go
+   at MAJOR structure: the 1h/4h swing levels from structure_analysis.py,
+   never a shelf formed in the last few bars.
+3. **SLs need wick room: 200+ pts in BTC chop.** A 70pt SL got slipped;
+   a 226pt SL got slipped 208pts (#16273). Quote REAL R:R with a
+   100-200pt slip buffer — if real R:R < 1.0, deepen the TP or don't arm.
+4. **Both-sides brackets must be verified non-overlapping** — each order's
+   SL must sit between the other's trigger path, so neither can be open
+   when the other fires (no same-coin hedge/netting surprise).
+5. **Same-coin tranches merge on HL** — first level hit closes the whole
+   position; align TPs when a runner should run (#16306/16307: staged TPs
+   were void, the lower one clipped everything).
+6. **Leverage: 5-10x ceiling in chop** — 40x turned a -0.53% sweep into
+   -21.4% margin (#16307). Max leverage is for TREND + volume, never chop.
+7. **Precheck runs and its FAIL reasons go in the order `note`** — advisory
+   for CEO trades, never hidden.
+
 ## Related Skills
 
 - `signal-lab` — for testing signal logic
