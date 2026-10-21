@@ -6105,5 +6105,23 @@
     "category": "entry sniper",
     "status": "pre-registered Oct 23",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-21T05:53:28Z",
+    "idea": "bare pump-chain- (no v6 confirmation) 0.7x conf-demote SHADOW",
+    "rationale": "confirmation premium quantified: combo (v5_short+v6- agree) 11T +$0.26/14d vs bare 41T −$0.88/14d, 30d bare −$1.15. When v6 confirms the short it works; when v5_short fires alone it bleeds. Mirror of #46 pump-chain+ dampen. Zero-behavior shadow, vacation-end stack.",
+    "expected_impact": "blocks/sizes-down the bare-path bleed (~$0.88/14d) while keeping combo winners (+$0.26)",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-21T05:53:28Z",
+    "idea": "daily ARM-GAP DB reconstruction (log-line-independent)",
+    "rationale": "CRV #16318 proved the fire case (MFE 0.59 trail=FALSE −2.22%, peakTrail@0.3% ≈ +0.17%) but log line missed due to service-restart lag. DB query (mfe_pct>=0.40, pnl<0, trailing_activated=FALSE) works regardless. Add 1 query per audit run; flip peak-trail D=0.3% to CEO when n≥10 net >+20pts after fees.",
+    "expected_impact": "accelerates ARM-GAP verdict without infrastructure dependency",
+    "category": "exit engineering",
+    "status": "pre-registered",
+    "risk": "zero (read-only)"
   }
 ]

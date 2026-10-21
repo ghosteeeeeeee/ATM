@@ -1,97 +1,147 @@
 {
-  "timestamp": "2026-10-21T04:41:14.142684+00:00",
-  "session_brain_stats": {
-    "queried": true,
-    "top_insight": "pump-chain conf bands; CONF_FILTER_MIN=70 continuum"
-  },
+  "timestamp": "2026-10-21T05:53:28Z",
+  "run": "brain_auditor #48",
+  "session_lock": "absent — full audit authority, vacation soak discipline held",
   "trade_summary_24h": {
-    "trades": 26,
+    "trades": 25,
     "wins": 5,
-    "wr": 19.2,
-    "pnl": -0.57,
-    "7d": {
-      "trades": 159,
-      "wins": 56,
-      "wr": 35.2,
-      "pnl": -2.96
-    },
-    "trail_family_24h": {
-      "n": 6,
-      "wr": 83.3,
-      "pnl": 0.99
-    },
-    "chop_family_24h": {
-      "n": 18,
-      "wr": 0.0,
-      "pnl": -1.51
-    },
-    "open": "BTC SHORT #16320 @82717 SL 82965 TP 81600 — HOLD (aligned SHORT_BIAS, below EMA300)"
+    "win_rate": 20.0,
+    "pnl": -0.26,
+    "note": "shallow bleed, size-reduce 0.5x containing (max single loss $0.17)",
+    "trades_7d": 159,
+    "wins_7d": 56,
+    "wr_7d": 35.2,
+    "pnl_7d": -2.96,
+    "size_reduce": "0.5x ACTIVE — both resume legs failing (WR<37, PnL<0)"
   },
+  "exit_family_7d": {
+    "TRAIL": "60T 75.0% +$3.85",
+    "ATR_SL": "49T 2.0% −$3.69",
+    "CHOP/HML": "23T 0.0% −$2.55",
+    "hard_sl": "8T 0% −$0.54",
+    "separation": "wealth gap unchanged — trail wins, chop dies"
+  },
+  "watchdog_steers": [
+    {
+      "id": "steer-001",
+      "verdict": "SHALLOW-BLEED-NO-ACTION",
+      "detail": "15/20 lost but net only −$0.33 over 20T, max loss $0.17 — size-reduce containing. Same pattern as #44-47."
+    },
+    {
+      "id": "steer-002",
+      "verdict": "VERIFIED-STRUCTURAL",
+      "detail": "7 wrong-side losses = chop family: pump-chain+ trail_arm_timeout (MFE 0.12-0.28 never armed) + EXTREME pump-chain- shorts + BTC chop-pin SHORT. Winning side was trail/flat."
+    },
+    {
+      "id": "steer-003",
+      "verdict": "BARE-v5_SHORT-BLEED-CONFIRMED",
+      "detail": "bare 'pump-chain-' 14d 41T 19.5% −$0.88 (t=−1.22); combo 'pump-chain-,pump-chain-v6-' 11T +$0.26 profitable. Bleed = v5_short firing WITHOUT v6 confirmation."
+    },
+    {
+      "id": "steer-004",
+      "verdict": "KILL-REJECTED-7th",
+      "detail": "pump-chain+ 14d 56T +$0.92 net positive. Recheck per rule Oct 22."
+    }
+  ],
+  "losing_autopsy_24h": {
+    "total_losers": 19,
+    "max_loss": -0.17,
+    "new_patterns": 0,
+    "clusters": [
+      {
+        "cluster": "pump-chain+ LONG trail_arm_timeout x3 (CFX/BLUR/APT)",
+        "root_cause": "chop entries — MFE 0.12-0.28 never reached 0.40 arm, timeout exit. CFX/BLUR HIGH covered by #46 pre-registered 0.7x dampen; APT EXTREME not covered.",
+        "pnl": -0.16
+      },
+      {
+        "cluster": "pump-chain- SHORT x6 (COMP x2, FOGO, IO, ADA, ALT, CRV)",
+        "root_cause": "EXTREME SHORT bleed — 14d bare pump-chain- EXTREME 37T 21.6% −$0.72. Floor revert (40→45) shipped 02:46 today; holding (0 RSI<45 SHORT opens since).",
+        "pnl": -0.46
+      },
+      {
+        "cluster": "BTC ai-trader chop-pin SHORT x2",
+        "root_cause": "#16317 lost −2.13% atr_sl_hit, #16320 re-entered SHORT same pin. Precheck FAIL on #16320 (vol floor 0.06%<0.15, NORMAL regime conf gate). SL 82965 caps risk 0.29%. HOLD + report.",
+        "pnl": -0.1
+      }
+    ],
+    "verdict": "zero new patterns — all known chop/EXTREME cohorts. Losses shallow (max $0.17)."
+  },
+  "last_run_verify": [
+    {
+      "item": "floor revert 40→45 (02:46 today)",
+      "status": "HOLDING",
+      "detail": "0 SHORT RSI<45 opens since revert; 2 closed trades, n too small for impact read"
+    },
+    {
+      "item": "ARM-GAP instrumentation",
+      "status": "CODE-LIVE-SERVICE-RESTARTED-05:50",
+      "detail": "0 log lines — CRV #16318 (MFE 0.59 trail=FALSE −2.22%) closed 03:40 BEFORE service restart loaded new code. Reconstructed from DB: 1 fire candidate. First live log line expected on next qualifying close."
+    },
+    {
+      "item": "near-miss arm band (MFE 0.30-0.40)",
+      "status": "DATA-CONFIRMED",
+      "detail": "14d 26T pnl<0 net −$2.28 avg MFE 0.35 — pre-registration from #47 validated, extend ARM-GAP log floor at vacation-end"
+    },
+    {
+      "item": "size-reduce 0.5x",
+      "status": "ACTIVE",
+      "detail": "vacation_size_reduce.json confirmed, both resume legs still failing"
+    },
+    {
+      "item": "TAT / MFE-CUT / pp-cond / EXTREME shadows",
+      "status": "COLLECTING",
+      "detail": "no flip criteria met"
+    },
+    {
+      "item": "CEO_PROTECTED_FLAGS",
+      "status": "13/13 INTACT",
+      "detail": "verified by direct read"
+    }
+  ],
   "drift_findings": [
     {
-      "finding": "ARM-GAP instrumentation deployed (Oct 20) but ZERO runtime log lines despite 9 matching trades (MFE>=0.4, trail=FALSE, pnl<0) in 48h",
-      "impact": "Giveback cohort visibility incomplete — either guardian-close path bypasses position_manager instrumentation, or log() routing drops lines",
-      "action": "VERIFY path coverage next run; extend to guardian close if gap confirmed"
-    }
-  ],
-  "recurring_problems": [
-    {
-      "problem": "pump-chain family chop entries — conf 22-29.5 / fc 45-50 band never arms trail",
-      "data": "14d fc<50: 58T 19%WR -$1.60 (L -$1.21 / S -$0.39); conf>=30: 86T +$1.71. 24h: 13/20 losers = pump-chain low-conf mid-band.",
-      "root_cause": "Low-confluence entries in 0.058% ATR chop — momentum never reaches +0.40% arm threshold",
-      "status": "PRE-REGISTERED: PUMP_CHAIN_CONF_FLOOR — trades.confidence < 30 blocks 38T/14d -$1.86, kills 6 winners +$0.64 (19.4% < 20% bar), net +$1.22. SHIP after soak window (Oct 23) with CEO eyeball. fc<50 variant FAILS winner-kill bar (35%)."
+      "item": "pump-chain midband exemption (constants line ~992)",
+      "detail": "EXEMPTION cites '14d 16T 4W +$0.42 only profitable pocket' — fresh exact-match: bare pump-chain- 45-55 band now 14T 2W −$0.50. Justification decayed. Not changed (vacation + needs exemption-removal verification). Flagged for Oct 23 stack."
     },
     {
-      "problem": "BTC ai-trader-pending/manual LONGs firing while BTC below EMA300",
-      "data": "7d ai-trader-pending: 7T 1W6L -$0.25. All losses were LONGs below EMA300; the one win was SHORT.",
-      "root_cause": "Pending-order path fires LONG thesis without re-checking EMA300 lean at exec time",
-      "status": "EMA300-pin advisory live (Oct 19). Consider hard gate if pattern persists post-Oct 23."
+      "item": "SHORT_RSI_HARD_FLOOR_PUMP_CHAIN revert rationale",
+      "detail": "RSI<45 band was nearly flat (22T −$0.04) — the actual bare-v5_short bleed is RSI 45-55 (−$0.50) and 55+ (−$0.34). Floor revert is hygiene, not the bleed fix. The bleed fix = bare-path demote/kill (see kill trigger below)."
     }
   ],
-  "missing_implementations": [],
+  "kill_trigger_status": {
+    "signal": "bare pump-chain- (PUMP_CHAIN_V5_SHORT emitter path)",
+    "pre_registered_rule": "Kill only if 14d PnL < 0 with n≥20 (rule from #16, recheck date Oct 22)",
+    "fresh_data": "14d 41T 19.5% −$0.88 (n≥20 MET, PnL<0 MET) | 30d 116T −$1.15 OOS confirms | 7d 13T 7.7% −$0.58",
+    "flag_monitor": "PUMP_CHAIN_V5_SHORT_ENABLED comment: 'revert if 7d WR < 50%' — 7d WR 7.7% BREACHED",
+    "decision": "DEFER to Oct 22 recheck (pre-registered date, 1 day away) + same-family floor revert shipped 02:46 today (attribution hygiene). Staged: flip PUMP_CHAIN_V5_SHORT_ENABLED=False at Oct 22 recheck if 14d still <0. Combo path (v6-) survives independently.",
+    "blocking_reason": "vacation soak + same-day same-family change + recheck date pre-registered as Oct 22"
+  },
+  "config_changes_applied": [],
   "creative_improvements": [
     {
-      "date": "2026-10-21T04:41:14.142684+00:00",
-      "idea": "atr_sl_hit recovery probe — 44% of SL exits recovered to entry within 30m",
-      "rationale": "25 atr_sl_hit trades last 7d probed against 1m candles: 11/25 (44%) crossed back to entry within 30m. Best post-exit moves: BTC +1.31%, ETH +1.26%, ARB +0.63%. Suggests ~half of atr_sl exits are tight-stop-in-chop, not wrong-direction.",
-      "expected_impact": "If post-SL re-entry or wider structural stops capture even 25% of recovered cohort: ~+$0.30-0.50/7d",
-      "category": "exit-side",
-      "status": "measured-first-run",
-      "risk": "medium — re-entry whipsaw risk needs candle-OOS before any mechanism"
-    },
-    {
-      "date": "2026-10-21T04:41:14.142684+00:00",
-      "idea": "PUMP_CHAIN_CONF_FLOOR = 30 (trades.confidence)",
-      "rationale": "See recurring_problems. 14d conf<30 = 38T 15.8%WR -$1.86 all-time-consistent (30d=14d, band is recent). Winner-kill 19.4% passes bar. Net +$1.22/14d.",
-      "expected_impact": "+$1.22/14d saved, WR lift ~3-5pp on pump-chain family",
+      "date": "2026-10-21T05:53:28Z",
+      "idea": "bare pump-chain- (no v6 confirmation) 0.7x conf-demote SHADOW",
+      "rationale": "confirmation premium quantified: combo (v5_short+v6- agree) 11T +$0.26/14d vs bare 41T −$0.88/14d, 30d bare −$1.15. When v6 confirms the short it works; when v5_short fires alone it bleeds. Mirror of #46 pump-chain+ dampen. Zero-behavior shadow, vacation-end stack.",
+      "expected_impact": "blocks/sizes-down the bare-path bleed (~$0.88/14d) while keeping combo winners (+$0.26)",
       "category": "entry sniper",
-      "status": "pre-registered Oct 23",
+      "status": "pre-registered",
       "risk": "low"
-    }
-  ],
-  "config_changes_applied": [],
-  "changes_from_last_run": [
-    {
-      "change": "SHORT_RSI_HARD/FLOOR_PUMP_CHAIN 40→45 revert (Oct 21 02:46)",
-      "status": "HOLDING",
-      "evidence": "No RSI<45 pump-chain SHORT opens since revert. Post-revert pump-chain SHORTs (COMP rsi 46.8/54.2, CRV 59.5) passed floor=45 correctly — losses were mid-band not oversold."
     },
     {
-      "change": "ARM-GAP instrumentation + peak-trail counterfactual (Oct 20)",
-      "status": "CONCERN — 0 runtime log lines",
-      "evidence": "9 matching trades in 48h per SQL, zero [ARM-GAP] lines in any log file. Path coverage or log routing gap."
-    },
-    {
-      "change": "size-reduce 0.3x (vacation guardrail)",
-      "status": "ACTIVE — stays (7d PnL -$2.96 < -$2 resume condition)",
-      "evidence": "Recent sizes $11.10/$22.10 confirm 0.3x scaling working. Contained 24h losses to -$0.57 despite 80% loss rate."
+      "date": "2026-10-21T05:53:28Z",
+      "idea": "daily ARM-GAP DB reconstruction (log-line-independent)",
+      "rationale": "CRV #16318 proved the fire case (MFE 0.59 trail=FALSE −2.22%, peakTrail@0.3% ≈ +0.17%) but log line missed due to service-restart lag. DB query (mfe_pct>=0.40, pnl<0, trailing_activated=FALSE) works regardless. Add 1 query per audit run; flip peak-trail D=0.3% to CEO when n≥10 net >+20pts after fees.",
+      "expected_impact": "accelerates ARM-GAP verdict without infrastructure dependency",
+      "category": "exit engineering",
+      "status": "pre-registered",
+      "risk": "zero (read-only)"
     }
   ],
   "next_actions": [
-    "HOLD open BTC SHORT — regime-aligned, SL above EMA300 82906, TP 81600 = 4.5:1. Invalidation: 15m close >82906 with volume.",
-    "VERIFY ARM-GAP path coverage — check if guardian closes bypass position_manager instrumentation",
-    "OCT 23 resume-day stack: 12+ unvalidated changes land together — CEO eyeball recommended. PUMP_CHAIN_CONF_FLOOR candidate joins queue.",
-    "atr_sl recovery probe: extend to 30d window, compute fee-adjusted PnL of hypothetical re-entry at +15m",
-    "Monitor: pump-chain fc<50 band (currently 58T/14d) — if grows past 80T with sustained bleed, escalate urgency"
+    "Oct 22: pump-chain- kill recheck — flip PUMP_CHAIN_V5_SHORT_ENABLED=False if 14d still <0 (staged)",
+    "Vacation-end Oct 23 stack: bare-path conf-demote shadow, pump-chain+ non-EXTREME dampen (#46), midband exemption re-verify, near-miss ARM-GAP floor 0.30",
+    "Escalation #15 (23rd): signal-scoped candle OOS vehicle — still blocks peak-trail flip + dual-condition TAT",
+    "Watch: BTC SHORT #16320 — precheck FAIL reported (vol floor + regime gate), SL 82965 caps 0.29% risk, HOLD",
+    "TAT bb-bounce: 9/15 valid fires — need 6 more"
   ]
 }
