@@ -5003,3 +5003,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-21 11:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 30T 8W -$0.50 (26.7%) | 7d 154T 56W -$2.75 (36.4%) — size-reduce 0.3x stays | kill: none (0T) | atr_sl_hit 33.3% under 40% | neg streak broken by empty hour | 3 open all LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-21 12:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (SYRUP warrior-sr-confirm+ trail +$0.11 +1.43%) | 24h 29T 9W -$0.31 (31.0%) | 7d 153T 55W -$2.78 (35.9%) — size-reduce 0.3x stays | kill: none (1T) | atr_sl_hit 31.0% under 40% | no neg streak | 3 open all LONG | No constants change -> no signal_versions entry
+BY: auto_1hr
