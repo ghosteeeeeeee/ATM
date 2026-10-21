@@ -1738,5 +1738,16 @@
     "after": "[ARM-GAP] token dir MFE=X% trail=FALSE exit=Y pnl=Z% trade=N logged at close",
     "rationale": "Pending since #32. Resolves candle-spike-MFE vs trail-desync hypothesis with close-time data. Zero behavior.",
     "impact": "Enables or kills ATR-normalized arm idea; targets -$3.26/14d giveback leak"
+  },
+  {
+    "timestamp": "2026-10-20T22:45:45Z",
+    "agent": "brain_auditor",
+    "change": "ARM-GAP log extended with peak-trail counterfactual estimate (D=0.3% from mfe_price) — zero-behavior infra",
+    "type": "infra",
+    "file": "scripts/position_manager.py",
+    "before": "ARM-GAP log: token dir MFE=X% trail=FALSE exit=reason pnl=X% trade=N",
+    "after": "ARM-GAP log: + peakTrail@0.3%=X% (counterfactual exit if trail from mfe_price at 0.3% distance)",
+    "rationale": "Giveback cohort needs per-trade peak-trail visibility for candle-OOS scoring. 7d D=0.3% trades-level NET +14.7pts fragile.",
+    "impact": "Zero live behavior. Enables signal-scoped OOS without re-query."
   }
 ]

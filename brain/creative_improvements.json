@@ -6015,5 +6015,23 @@
     "category": "entry sniper",
     "status": "pre-registered offline study",
     "risk": "low (study only)"
+  },
+  {
+    "date": "2026-10-21T00:44:48Z",
+    "idea": "pump-chain+ non-EXTREME (HIGH/NORMAL/FLAT) 0.7x confidence dampen — SHADOW at vacation-end",
+    "rationale": "EXTREME is the ONLY profitable regime for pump-chain+ LONG: 14d 47T +$1.84 vs non-EXTREME 14T -$0.79 28.6%; 30d 71T +$1.69 vs 20T -$1.15 25%. Extends #45 HIGH-only pre-reg (n=6) to full non-EXTREME (n=14/14d, n=20/30d). 0.7x sim: would-block 9T (3W +$0.09 / 6L -$0.50) = net save $0.41/30d; total winner-kill 3/19=15.8% < 20% threshold.",
+    "expected_impact": "+$0.30-0.50/30d, fewer non-EXTREME chop entries",
+    "category": "entry sniper",
+    "status": "pre-registered (vacation soak — shadow only, decision Oct 23)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-21T00:44:48Z",
+    "idea": "pump-chain- SHORT gap>=2.0 watch (fighting-momentum short into extended pumps)",
+    "rationale": "gap>=2.0 shorts: 3T 30d 0W -$0.23, zero winners. COMP gap 2.16 lost -$0.17 today. Contradicts 'every dump is SHORT' — these aren't dumps, they're pumps still running above EMA. n=3 << 20 bar. WATCH ONLY.",
+    "expected_impact": "monitor; if n reaches 10+ with 0W, propose ceiling",
+    "category": "watchlist",
+    "status": "monitoring",
+    "risk": "none (no change)"
   }
 ]
