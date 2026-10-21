@@ -13479,3 +13479,23 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 
 **Open Questions:**
 - 7d bleed widened to -$3.19; loss clusters: atr_sl_hit 7T -$0.48, hard_max_loss 5T -$0.48, trail_arm_timeout 4T -$0.16 (standing SL-width escalation with CEO, Oct 16)
+
+## [2026-10-21 19:28 UTC] Hourly Analysis
+
+**Trades:** 5 closed (1 wins, 4 losses)
+**PnL:** -$0.29 (24h: 41T 15W -$1.03, WR 36.6%) | 7d 164T 59W -$3.48 (36.0%) | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- bb-bounce-v2-long+ 3T last hour (BANANA trail +$0.04, POL hard_max_loss -$0.22, NEO atr_sl_hit -$0.05) — 1W/2L, NOT 0%WR, no regime-kill candidate
+- Kill check: pump-chain+ 6T 0%WR / ai-trader-pending 3T 0%WR both 0T last hour — no candidate (pump-chain recheck pre-reg Oct 22)
+- atr_sl_hit 10/41 = 24.4% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak 3h (17:00 -$0.11, 18:00 -$0.05, 19:00 -$0.28) — trigger hit BUT regime is SHORT_BIAS (regime_5m aggregate: 26 short/2 long/101 neutral), not NEUTRAL; size-reduce already active at 0.5x (file). No further cut.
+- Frequency 5/hr — not overtraded (limit 20)
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h bleed widened to -$1.03; hard_max_loss 6T -$0.70 + atr_sl_hit 10T -$0.59 remain loss clusters (standing SL-width escalation with CEO, Oct 16)
+- All 3 bb-bounce-v2-long+ entries were LONG into SHORT_BIAS aggregate — signal still net-positive 24h, watching not acting
