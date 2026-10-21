@@ -6195,5 +6195,23 @@
     "risk": "low",
     "agent": "brain_auditor",
     "run": 54
+  },
+  {
+    "date": "2026-10-21T12:37:56Z",
+    "idea": "hmacd_mtf family kill-criteria PRE-REGISTER (no code): kill only if 14d n>=20 AND PnL<0 AND WR<30%",
+    "rationale": "Family is young and uniformly bleeding (hmacd_mtf-+ 8T -$0.46, hmacd_mtf-- 4T -$0.19, combo 1T -$0.14 = 13T 23.1% -$0.79). Matches pump-chain- kill pattern so we don't re-litigate ad-hoc. Criteria locked before cohort matures.",
+    "expected_impact": "Prevents ad-hoc kill debates; auto-surfaces Oct 24+ when n>=20",
+    "category": "governance",
+    "status": "pre-registered",
+    "risk": "none (no code)"
+  },
+  {
+    "date": "2026-10-21T12:37:56Z",
+    "idea": "coin_regime counterfactual FIRST ANALYSIS — stamp now at 28/34 (n>=20 MET)",
+    "rationale": "Ship was Oct 20 04:41 with n>=20 bar. 28 stamped closes available. Run ALIGNED vs COUNTER WR/PnL split this week to decide counter-regime dampen flip.",
+    "expected_impact": "Unlocks the pre-registered counter-regime 0.5x dampen decision with real data",
+    "category": "entry sniper",
+    "status": "ready-to-analyze",
+    "risk": "none (analysis only)"
   }
 ]
