@@ -446,3 +446,7 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-21 05:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 25T 5W -$0.26 (20.0%) | 7d 159T 56W -$2.96 (35.2%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (0T) | atr_sl_hit 8/25=32.0% under 40% | neg-hour streak (01:00-03:00) broken by no-close hour | 1 open BTC ai-trader-pending SHORT -0.13% | No constants change -> no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-21 07:27 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, no closes since 03:xx) | 24h 24T 5W -$0.24 (20.8%) | 7d 153T 56W -$2.64 (36.6%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (0T) | atr_sl_hit 8/24=33.3% under 40% | neg streak 01-03 broken by empty hours | 2 open (BTC pending SHORT -0.22%, DOGE LONG +0.56%) | No constants change -> no signal_versions entry
+BY: auto_1hr
