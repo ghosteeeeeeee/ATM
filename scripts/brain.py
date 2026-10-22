@@ -376,10 +376,15 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # Root cause 2026-10-06: LTC pump-chain- SHORT entered with entry_rsi_14=9.90
     # via brain.py trade add. decider_run CTX-GATE/EXEC floors exist, but this
     # path is the final money gate — reject extreme oversold SHORTs here too.
-    # No bearish override (mirror SHORT_RSI_HARD_FLOOR semantics).
+    # CEO UNCLOG flip #1 (consult 20261022T144234Z, T directive 2026-10-22 14:39):
+    # knife (< OVERSOLD_SHORT_RSI_MAX) rejects on EVERY path (BANANA lesson);
+    # band [35, HARD_FLOOR) allowed only under BTC bear structure — otherwise the
+    # ctx/exec exemptions die here at the final gate (approval→exec→brain
+    # contradiction → FAILED claim + hotset cooldown). Bear-query errors fail
+    # CLOSED (block), mirroring the decider helper.
     if direction == 'SHORT':
         try:
-            from hermes_constants import SHORT_RSI_HARD_FLOOR
+            from hermes_constants import SHORT_RSI_HARD_FLOOR, OVERSOLD_SHORT_RSI_MAX
             _rsi_chk = signal_rsi_14
             if _rsi_chk is None and signal_metadata:
                 if isinstance(signal_metadata, str):
@@ -391,8 +396,30 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                 if isinstance(signal_metadata, dict):
                     _rsi_chk = signal_metadata.get('rsi_14', signal_metadata.get('rsi'))
             if _rsi_chk is not None and float(_rsi_chk) < SHORT_RSI_HARD_FLOOR:
-                print(f"[brain.py] ❌ REJECTED: {token} {direction} — SHORT RSI {_rsi_chk} < HARD_FLOOR {SHORT_RSI_HARD_FLOOR} (extreme oversold)")
-                return None
+                _rsi_chk = float(_rsi_chk)
+                if _rsi_chk < OVERSOLD_SHORT_RSI_MAX:
+                    print(f"[brain.py] ❌ REJECTED: {token} {direction} — SHORT RSI {_rsi_chk} < knife {OVERSOLD_SHORT_RSI_MAX} (BANANA lesson — no bearish override ever)")
+                    return None
+                _bear_exempt = False
+                try:
+                    import sqlite3 as _s3
+                    _s3_conn = _s3.connect(os.path.join(paths.HERMES_DATA, 'continuum.db'), timeout=3)
+                    try:
+                        _s3_row = _s3_conn.execute(
+                            "SELECT linreg_direction, ts FROM continuum_states "
+                            "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                        ).fetchone()
+                    finally:
+                        _s3_conn.close()
+                    if (_s3_row and _s3_row[1] and (_time.time() - _s3_row[1]) < 600
+                            and _s3_row[0] in ('LEAN_BEAR', 'BEAR')):
+                        _bear_exempt = True
+                except Exception:
+                    _bear_exempt = False  # fail-closed: no bear data → block
+                if not _bear_exempt:
+                    print(f"[brain.py] ❌ REJECTED: {token} {direction} — SHORT RSI {_rsi_chk} < HARD_FLOOR {SHORT_RSI_HARD_FLOOR} (extreme oversold)")
+                    return None
+                print(f"[brain.py] ✅ UNCLOG: {token} {direction} — SHORT RSI {_rsi_chk} < {SHORT_RSI_HARD_FLOOR} allowed — BTC bearish structure (oversold = continuation)")
         except Exception:
             pass  # non-fatal — other gates still apply
 

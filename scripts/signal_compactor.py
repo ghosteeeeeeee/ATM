@@ -3248,6 +3248,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     from hermes_constants import PUMP_CHAIN_SHORT_RSI_MIN
                     _rsi_val_s = row[8] if len(row) > 8 else None
                     if _rsi_val_s is not None and _rsi_val_s < PUMP_CHAIN_SHORT_RSI_MIN:
+                        # CEO UNCLOG flip #1 (consult 20261022T144234Z): knife
+                        # (< OVERSOLD_SHORT_RSI_MAX) dead on EVERY path — the bear override
+                        # below only ever applies to [35, floor).
+                        from hermes_constants import OVERSOLD_SHORT_RSI_MAX
+                        if _rsi_val_s < OVERSOLD_SHORT_RSI_MAX:
+                            log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)")
+                            continue
                         # Bearish override: when BTC is bearish, allow SHORT even if RSI < min
                         _pcs_bearish_override = False
                         try:
@@ -4095,6 +4102,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 except Exception:
                     pass  # non-fatal — fail-open on MAXXED check
             if direction == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
+                # CEO UNCLOG flip #1: import hoisted ABOVE the try below — a failure inside
+                # the non-fatal try would be swallowed and fail-OPEN (signal approved despite
+                # RSI<45). Knife check must not depend on code the outer except can eat.
+                from hermes_constants import OVERSOLD_SHORT_RSI_MAX
                 _conn_rsh = None
                 try:
                     _conn_rsh = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -4121,8 +4132,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 # OVERSOLD_SHORT_RSI_MAX (35) stays hard-dead on every path (BANANA).
                                 # This approval layer had NO override while hard==soft==45, so it
                                 # fired first (265 kills in the 00:00-02:59 dump window) and made
-                                # every override below it dead code.
-                                from hermes_constants import OVERSOLD_SHORT_RSI_MAX
+                                # every override below it dead code. (OVERSOLD_SHORT_RSI_MAX
+                                # is imported above, outside the non-fatal try.)
                                 _rsh_bear_override = False
                                 if _rsh_rsi >= OVERSOLD_SHORT_RSI_MAX:
                                     try:
@@ -4174,6 +4185,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _rsf_al > 0:
                             _rsf_rsi = 100 - (100 / (1 + _rsf_ag / _rsf_al))
                             if _rsf_rsi < SHORT_RSI_FLOOR:
+                                # CEO UNCLOG flip #1 (consult 20261022T144234Z): knife
+                                # (< OVERSOLD_SHORT_RSI_MAX) dead on EVERY path — the bear
+                                # override below only ever applies to [35, floor).
+                                from hermes_constants import OVERSOLD_SHORT_RSI_MAX
+                                if _rsf_rsi < OVERSOLD_SHORT_RSI_MAX:
+                                    log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)")
+                                    continue
                                 # Bearish override: when BTC is bearish, oversold = continuation
                                 # T directive 2026-10-08: restore override — 118 SHORT signals expired during dump
                                 _rsf_bearish_override = False
@@ -4237,33 +4255,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             if _os_al > 0:
                                 _os_rsi = 100 - (100 / (1 + _os_ag / _os_al))
                                 if _os_rsi < OVERSOLD_SHORT_RSI_MAX:
-                                    # Bearish override: when BTC is bearish, oversold = continuation
-                                    _os_bearish_override = False
-                                    try:
-                                        import os as _os_os
-                                        import time as _os_time
-                                        _os_cont = sqlite3.connect(_os_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
-                                        try:
-                                            _os_row = _os_cont.execute(
-                                                "SELECT market_phase, linreg_direction, ema300_position, ts FROM continuum_states "
-                                                "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                                            ).fetchone()
-                                        finally:
-                                            _os_cont.close()
-                                        if _os_row:
-                                            _os_phase, _os_linreg, _os_ema, _os_ts = _os_row
-                                            _os_age = _os_time.time() - (_os_ts or 0)
-                                            if _os_age < 600:
-                                                _os_bearish = (_os_linreg in ('LEAN_BEAR', 'BEAR'))
-                                                if _os_bearish:
-                                                    _os_bearish_override = True
-                                    except Exception:
-                                        pass
-                                    if _os_bearish_override:
-                                        log(f"  ✅ [OVERSOLD-SHORT] {tkn}: SHORT bypass — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} but BTC bearish (oversold = continuation)")
-                                    else:
-                                        log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention)")
-                                        continue
+                                    # CEO UNCLOG flip #1 (consult 20261022T144234Z, T directive
+                                    # 2026-10-22): knife <35 dead on EVERY path — the prior bear
+                                    # override here could only ever admit knife entries (this
+                                    # block triggers exclusively below OVERSOLD_SHORT_RSI_MAX) and
+                                    # was only masked by the 5m hard floor when that compute
+                                    # succeeds (len>=15 candles). Supersedes the 2026-10-08-era
+                                    # bear allow AT THIS SITE ONLY; [35,45) bear allowance lives
+                                    # in the hard-floor blocks above.
+                                    log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention — no bearish override ever)")
+                                    continue
                     finally:
                         if _conn_os:
                             try: _conn_os.close()

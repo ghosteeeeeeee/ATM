@@ -38,8 +38,12 @@ CLOSE_AFTER_HOURS = 24
 #   🚫 [GATE-NAME] TOKEN DIRECTION blocked — reason
 #   🔒 [CONFLUENCE-GATE-BLOCK] TOKEN DIRECTION: reason
 #   🚧 [BTC-CHOP-GATE] TOKEN DIRECTION ... BLOCKED — reason
+#   🚫 [GATE-NAME] TOKEN: SHORT blocked at approval — reason   (compactor form,
+#     colon after token — FIX code-review b6d1b071 2026-10-22: the optional `:?`
+#     makes approval-layer kills recordable; previously ZERO compactor block lines
+#     matched, so the highest-volume gates never reached gate_shadow.db)
 BLOCK_RE = re.compile(
-    r'(?:🚫|🔒|🚧|🌊)\s+\[([A-Za-z0-9_-]+)\]\s+([A-Za-z0-9]+)\s+(LONG|SHORT)\b'
+    r'(?:🚫|🔒|🚧|🌊)\s+\[([A-Za-z0-9_-]+)\]\s+([A-Za-z0-9]+):?\s+(LONG|SHORT)\b'
     r'.*?(?:blocked|BLOCKED)',
     re.IGNORECASE,
 )

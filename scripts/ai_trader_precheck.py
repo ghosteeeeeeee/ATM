@@ -201,7 +201,21 @@ def precheck(coin, direction, conf=None):
             check(f'RSI {rsi_long_min}-{rsi_long_max}', passed, f'RSI={rsi:.1f}')
         else:
             passed = rsi_short_min <= rsi <= rsi_short_max
-            check(f'RSI {rsi_short_min}-{rsi_short_max}', passed, f'RSI={rsi:.1f}')
+            # CEO UNCLOG note (2026-10-22): pipeline now EXECUTES [35,45) SHORTs under
+            # BTC bear structure and hard-blocks only the <35 knife — annotate so this
+            # advisory doesn't contradict live behavior.
+            _band_note = ''
+            if not passed:
+                try:
+                    from hermes_constants import SHORT_RSI_HARD_FLOOR, OVERSOLD_SHORT_RSI_MAX
+                    if rsi < SHORT_RSI_HARD_FLOOR:
+                        if rsi < OVERSOLD_SHORT_RSI_MAX:
+                            _band_note = f' | PIPELINE: <{OVERSOLD_SHORT_RSI_MAX} = hard knife block everywhere'
+                        else:
+                            _band_note = f' | PIPELINE: [{OVERSOLD_SHORT_RSI_MAX},{SHORT_RSI_HARD_FLOOR}) EXECUTES under BTC bear structure (CEO unclog 2026-10-22)'
+                except Exception:
+                    pass
+            check(f'RSI {rsi_short_min}-{rsi_short_max}', passed, f'RSI={rsi:.1f}{_band_note}')
         # Death-zone advisory (brain_auditor 2026-10-18) — NON-BLOCKING label.
         # 7d all-signal meta-RSI: LONG 45-55 27T 22.2%WR −$1.53, SHORT 45-55 17T 11.8%WR −$1.02.
         # ai-trader+ 14d: 45-55 = 7T 0%WR −$0.59. Operator already manually rejects

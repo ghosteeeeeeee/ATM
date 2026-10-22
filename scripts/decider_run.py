@@ -862,6 +862,18 @@ def process_delayed_entries(paper=False):
                 _barg('--confidence', str(round(conf, 1))),
                 _barg('--leverage', '5')]
                + exp_arg)
+        # CEO UNCLOG follow-up (code review b6d1b071): delayed entries previously passed
+        # no --signal-rsi-14 and no metadata → brain's final RSI money gate skipped
+        # entirely (a delayed SHORT could open at RSI 10). Pass live entry-time 1m RSI so
+        # brain's knife(<35 dead)/[35,45)-under-bear gate applies like every other path.
+        # Missing RSI → flag omitted → behavior unchanged (same fail-open as before).
+        try:
+            from rsi_utils import compute_rsi_1m as _de_rsi_fn
+            _de_rsi = _de_rsi_fn(token)
+            if _de_rsi is not None:
+                cmd += [_barg('--signal-rsi-14', str(round(float(_de_rsi), 2)))]
+        except Exception:
+            pass
 
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)

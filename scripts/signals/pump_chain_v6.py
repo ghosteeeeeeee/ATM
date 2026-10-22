@@ -173,7 +173,36 @@ def _gate_rsi_momentum(token, direction):
     if rsi is None:
         _log(f"  [PUMP-CHAIN-V6] {token} {direction} rsi_14 MISSING — fail open (spec §10)")
     elif rsi < floor:
-        return False, f"RSI {rsi:.1f} < {floor}"
+        # CEO UNCLOG flip #1 (consult 20261022T144234Z, T directive 2026-10-22 14:39):
+        # SHORT knife (< OVERSOLD_SHORT_RSI_MAX) dead on every path; [35, floor) allowed
+        # under BTC bear structure (oversold = continuation in a dump). LONG unchanged.
+        # Generation-time floor: without this, v6 SHORT never even FIRES in [35,45)
+        # during a dump — flip #1 could never reach it.
+        if direction == 'SHORT':
+            from hermes_constants import OVERSOLD_SHORT_RSI_MAX
+            if rsi < OVERSOLD_SHORT_RSI_MAX:
+                return False, f"RSI {rsi:.1f} < knife {OVERSOLD_SHORT_RSI_MAX} (BANANA lesson — no bearish override ever)"
+            _v6_bear = False
+            try:
+                _v6_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                try:
+                    _v6_row = _v6_conn.execute(
+                        "SELECT linreg_direction, ts FROM continuum_states "
+                        "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                    ).fetchone()
+                finally:
+                    _v6_conn.close()
+                import time as _v6_time
+                if (_v6_row and _v6_row[1] and (_v6_time.time() - _v6_row[1]) < 600
+                        and _v6_row[0] in ('LEAN_BEAR', 'BEAR')):
+                    _v6_bear = True
+            except Exception:
+                _v6_bear = False  # fail-closed: no bear data → keep floor
+            if not _v6_bear:
+                return False, f"RSI {rsi:.1f} < {floor}"
+            _log(f"  [PUMP-CHAIN-V6] {token} SHORT rsi={rsi:.1f} < {floor} allowed — BTC bearish structure (CEO unclog 2026-10-22)")
+        else:
+            return False, f"RSI {rsi:.1f} < {floor}"
 
     momentum = enriched.get('momentum_state')
     if PUMP_CHAIN_V6_BLOCK_FLAT_MOMENTUM:
