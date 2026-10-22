@@ -1859,5 +1859,16 @@
     "after": "comment documents 3-source reality (ctx 1m / exec 5m / compactor inline 5m simple-avg) + measurement reference; ZERO code behavior change",
     "rationale": "Part 2 measured B-vs-C decision straddle 33.6% — the claim was false and would mislead the n>=30 rsi_drift pre-reg reading",
     "impact": "documentation accuracy only; rsi_drift stamp behavior unchanged"
+  },
+  {
+    "timestamp": "2026-10-22T21:05:00Z",
+    "agent": "brain_auditor",
+    "change": "UGB (UNARMED-GIVEBACK) shadow in position_manager: log-only would-fire lines UGB-BE (round trip to entry after +0.40% favorable) and UGB-PT (0.3% off running peak, EXT #44 D)",
+    "type": "infra",
+    "file": "scripts/position_manager.py",
+    "before": "no shadow for the unarmed giveback cohort (ARM-GAP only logged at close, negatives only -> no fk denominator)",
+    "after": "[SHADOW] UGB-PT / UGB-BE would-fire lines, dedup per trade, gated on existing ARM_BE_SHADOW_ENABLED; UGB_PT_DISTANCE_PCT=0.30 module-local (hermes_constants ZERO diff); zero behavior",
+    "rationale": "30d candle OOS n=179 unarmed: ACTUAL -7.24pp vs BE +27.61 (+34.85, p=0.00000) vs peak-trail +78.24 (+85.48, p=0.00000), positive in all 3 split halves, no outlier carry; armed half measured HARMFUL so flip must ship unarmed scope only",
+    "impact": "collects the fk denominator needed for the Oct 25 flip decision; no trading behavior change"
   }
 ]

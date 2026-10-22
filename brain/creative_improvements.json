@@ -6811,5 +6811,35 @@
     "status": "pre_registered",
     "risk": "low — one variable, only after CONF_FLOOR has soaked",
     "flip_criteria": "re-measure Oct 30 (7d after CONF_FLOOR ships); block only if pc+ conf 30-59 has n>=20 AND PnL<0 AND fk<20%"
+  },
+  {
+    "date": "2026-10-22T21:05:00Z",
+    "idea": "UNARMED-GIVEBACK (UGB) breakeven + peak-trail exit — candle OOS for EXT #44, delivered",
+    "rationale": "ARM-GAP cohort = trades that reached +0.40% favorable but where the PM trail never armed (bypass engines: pump-exit/rr_engine/volbo/hl_fill, plus trail-registration gaps). They round-trip to a stop and own the bleed.",
+    "measured": "30d candle walk (brain/analysis/giveback_rules_headtohead_2026-10-22.py), n=179 unarmed, MFE>=+0.40: ACTUAL -7.24pp | UGB-BE (exit at entry on round trip) +27.61pp = +34.85pp, sign-p 0.00000, fk 30/179 | UGB-PT (trail 0.3% off running peak) +78.24pp = +85.48pp, sign-p 0.00000, fk 65/179. Split halves ALL positive (PT: last7d +21.84, d8-14 +22.59, d15-21 +13.19; BE: +10.07/+11.61/+8.99). Sensitivity: top3 only +6.63 of +85.48, ex-worst-trade +93.73 (no outlier carry). By exit reason PT gains concentrated in atr_sl_hit +54.98pp and hard_max_loss +25.27pp; harms concentrated in stale_exit/UNIVERSAL_MAX_HOLD/hard_tp (right tail). non-EXTREME excl-volume- scope also positive (+26.13pp PT, p=0.00000). ARMED half measured HARMFUL for BE (-0.43pp on trailing_activated=TRUE) -> ship unarmed scope ONLY.",
+    "expected_impact": "unclaimed ~+$6-12/30d in $ terms at current size (PT $ equivalent not computed; BE-equivalent dollar delta +$6.14/30d on the same cohort measured with $ conversion)",
+    "category": "exit engine / giveback protection",
+    "status": "SHIPPED AS SHADOW (zero behavior) + pre-registered flip criteria: n>=20 armed-split fires, fk<20% on unarmed winners, OOS same sign, CEO GO",
+    "risk": "low (log-only; flip is the risky step and needs CEO)"
+  },
+  {
+    "date": "2026-10-22T21:05:00Z",
+    "idea": "ARM-BE-STOP shadow verdict independently REPLICATED (not shipped, verified)",
+    "rationale": "arm-breakeven-stop.md (2026-10-17) claimed 30d non-EXTREME excl-volume net +$3.46, fk 9.7%. Verify, don't trust.",
+    "measured": "brain/analysis/breakeven_unarmed_giveback_2026-10-22.py: cohort = >=+0.40 favorable under the shadow's own scope. Using candle-observed max favorable (what the live shadow's live_pnl>=0.40 poll approximates): +$2.26, fkB 24/232 = 10.3%, sign-p 0.0034 -> same sign, same fk ballpark, magnitude 34% lower than claimed. Using trades.trailing_activated as 'armed': -$0.02 (neutral), sign-p 0.39.",
+    "expected_impact": "verdict direction upheld; note the definition sensitivity for the Oct 25 read",
+    "category": "verification",
+    "status": "replicated-with-caveat",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T21:05:00Z",
+    "idea": "atr_sl_hit is the largest 7d bleed bucket — split it entry-vs-exit before touching entry filters",
+    "rationale": "7d exit-reason table shows atr_sl_hit 46T 1W -$3.23 > hard_max_loss 19T 0W -$2.36, but only 8/46 never reached +0.20% (entry problem). 17/46 reached +0.40 (giveback = exit problem).",
+    "measured": "14d: 88T, 43 reached +0.40 (49%), 13 below +0.20 (15%)",
+    "expected_impact": "prevents the wrong fix: no entry filter will recover givebacks; UGB/TAT/MFE-CUT will",
+    "category": "diagnosis",
+    "status": "measured (informs UGB)",
+    "risk": "low"
   }
 ]

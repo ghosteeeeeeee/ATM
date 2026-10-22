@@ -1,0 +1,44 @@
+COHORT: unarmed (trailing_activated=FALSE) trades reaching +0.40% favorable, 30d, n=179
+ALL                                n=179 actual    -7.24pp | BE   +27.61 ( +34.85, p=0.00000, fk 30/179) | PEAK-TRAIL   +78.24 ( +85.48, p=0.00000, fk 65/179)
+OOS (last 7d)                      n= 43 actual    -7.98pp | BE    +2.09 ( +10.07, p=0.00007, fk 7/43) | PEAK-TRAIL   +13.86 ( +21.84, p=0.00000, fk 7/43)
+IS (d8-14)                         n= 48 actual    -5.36pp | BE    +6.25 ( +11.61, p=0.00000, fk 5/48) | PEAK-TRAIL   +17.23 ( +22.59, p=0.00001, fk 10/48)
+d15-21                             n= 24 actual    -0.79pp | BE    +8.19 (  +8.99, p=0.00342, fk 1/24) | PEAK-TRAIL   +12.39 ( +13.19, p=0.01062, fk 10/24)
+non-EXTREME excl volume-           n= 54 actual    -6.23pp | BE    +4.96 ( +11.19, p=0.00222, fk 10/54) | PEAK-TRAIL   +19.90 ( +26.13, p=0.00000, fk 16/54)
+
+By exit_reason (unarmed cohort):
+  HARD_SL_FAILED             n=  1 actual    +8.42 | BE    +0.00 (  -8.42) | PT    +0.18 (  -8.24)
+  hard_tp                    n=  3 actual    +4.98 | BE    +0.74 (  -4.24) | PT    +2.04 (  -2.93)
+  stale_exit                 n=  8 actual    +8.56 | BE    +5.89 (  -2.66) | PT    +4.38 (  -4.18)
+  rr_engine_resistance_break n=  2 actual    +4.03 | BE    +0.72 (  -3.31) | PT    +1.20 (  -2.83)
+  UNIVERSAL_MAX_HOLD         n=  9 actual    +4.46 | BE    +0.82 (  -3.65) | PT    +3.28 (  -1.18)
+  atr_tp_hit                 n=  2 actual    +0.74 | BE    +0.74 (  +0.00) | PT    +0.74 (  +0.00)
+  manual_tp_hit              n=  1 actual    +0.93 | BE    +0.93 (  +0.00) | PT    +0.93 (  +0.00)
+  no_sl_tp                   n=  1 actual    +0.00 | BE    +0.00 (  +0.00) | PT    +0.18 (  +0.18)
+  manual_close               n=  1 actual    +0.01 | BE    +0.00 (  -0.01) | PT    +0.55 (  +0.54)
+  (none)                     n=  1 actual    -0.26 | BE    +0.00 (  +0.26) | PT    +0.12 (  +0.38)
+  cut_loser                  n=  1 actual    -0.53 | BE    +0.00 (  +0.53) | PT    +0.29 (  +0.83)
+  HL_CLOSED                  n=  3 actual    +0.10 | BE    +0.14 (  +0.04) | PT    +1.87 (  +1.76)
+  pump_exit_momentum         n=  2 actual    -0.88 | BE    +0.00 (  +0.88) | PT    +0.65 (  +1.52)
+  pump_exit_dead_money       n= 20 actual    +9.58 | BE    +9.67 (  +0.09) | PT   +11.94 (  +2.36)
+  cut-loser-MAE-GUARD        n=  2 actual    -1.07 | BE    +0.00 (  +1.07) | PT    +0.71 (  +1.78)
+  hard_sl                    n= 30 actual    +1.39 | BE    +2.98 (  +1.59) | PT   +16.64 ( +15.25)
+  hard_max_loss              n= 23 actual   -18.24 | BE    +0.00 ( +18.24) | PT    +7.03 ( +25.27)
+  atr_sl_hit                 n= 69 actual   -29.46 | BE    +4.97 ( +34.43) | PT   +25.52 ( +54.98)
+
+By signal (top 12 by combined delta):
+  pump-chain-                        n= 67 actual   -5.90 | BE  +14.15 | PT  +36.16
+  pump-chain-v5                      n=  9 actual   -1.60 | BE   +3.94 | PT   +7.96
+  pump-chain-,pump-chain-v6-         n=  6 actual   -3.48 | BE   +3.48 | PT   +5.68
+  pump-chain+                        n= 21 actual   +4.78 | BE   +3.17 | PT   +5.26
+  doji-bottom-long                   n=  3 actual   -2.81 | BE   +2.81 | PT   +3.56
+  ai-trader+                         n=  6 actual   -2.13 | BE   +2.13 | PT   +3.10
+  mover+                             n=  4 actual   -1.16 | BE   +1.09 | PT   +3.56
+  pump-chain-,rs-r68                 n=  1 actual   -1.51 | BE   +1.51 | PT   +2.33
+  pump-chain+,pump-chain-v6+         n=  3 actual   -1.28 | BE   +1.28 | PT   +2.10
+  pump-chain-v6-                     n=  3 actual   -1.22 | BE   +1.22 | PT   +1.98
+  ema300-breakthrough+               n=  1 actual   -1.25 | BE   +1.25 | PT   +1.79
+  r2-trend-long4                     n=  1 actual   -1.04 | BE   +1.04 | PT   +1.94
+
+BE sensitivity: total +34.85pp | top3 +4.70 | worst trade (-8.423399999999999, 15757, 'COMP') | ex-top3 +30.15 | ex-worst +43.27
+
+PT sensitivity: total +85.48pp | top3 +6.63 | worst trade (-8.24247384330908, 15757, 'COMP') | ex-top3 +78.85 | ex-worst +93.73

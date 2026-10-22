@@ -1,0 +1,70 @@
+30d closed trades walked: 716; median |$implied-actual| = 0.1847 USDT (conversion sanity)
+
+== A) ARM-BE under EXISTING SHADOW SCOPE (non-EXTREME, exclude volume-) ==
+A1 30d armed(=trailing_activated)            n= 178 BE-fires= 34 | actual   +76.14pp $+10.40 -> BE   +75.71pp $+10.38 | delta $-0.02 (-0.43pp) | fk 14/155=9.0% | sign-p=0.39153
+A2 30d armed(candle-arm observed)            n= 232 BE-fires= 75 | actual   +69.91pp $+8.90 -> BE   +80.67pp $+11.16 | delta $+2.26 (+10.76pp) | fk 24/177=13.6% | sign-p=0.00337
+A3 14d armed(=trailing_activated)            n=  64 BE-fires= 15 | actual   +26.06pp $+3.57 -> BE   +22.93pp $+3.15 | delta $-0.42 (-3.13pp) | fk 11/58=19.0% | sign-p=0.11847
+
+== B) UNARMED-GIVEBACK (NEW) ==
+B1 30d unarmed(=NOT trailing_activated)      n= 179 BE-fires=134 | actual    -7.24pp $+0.03 -> BE   +30.89pp $+6.17 | delta $+6.14 (+38.13pp) | fk 29/73=39.7% | sign-p=0.00000
+B1s 30d unarmed + same scope                 n=  54 BE-fires= 41 | actual    -6.23pp $-1.50 -> BE    +4.96pp $+0.78 | delta $+2.28 (+11.19pp) | fk 10/22=45.5% | sign-p=0.00222
+B2 14d unarmed                               n=  86 BE-fires= 75 | actual   -11.55pp $-2.07 -> BE   +11.61pp $+1.47 | delta $+3.54 (+23.16pp) | fk 10/21=47.6% | sign-p=0.00000
+B3 7d unarmed (OOS half)                     n=  40 BE-fires= 35 | actual    -6.78pp $-1.42 -> BE    +5.37pp $+0.65 | delta $+2.07 (+12.15pp) | fk 6/11=54.5% | sign-p=0.00012
+B4 d8-14 unarmed (IS half)                   n=  46 BE-fires= 40 | actual    -4.77pp $-0.65 -> BE    +6.25pp $+0.82 | delta $+1.47 (+11.01pp) | fk 4/10=40.0% | sign-p=0.00000
+
+== C) ARM-INDEPENDENT (naive) ==
+C1 30d all                                   n= 450 BE-fires=202 | actual  +149.26pp $+20.95 -> BE  +169.34pp $+24.91 | delta $+3.96 (+20.08pp) | fk 66/309=21.4% | sign-p=0.00000
+
+30d UNARMED by exit_reason (n, actual$, BE$):
+  HARD_SL_FAILED             n=  1 actual   +0.94 -> BE   +0.00  delta   -0.94
+  hard_tp                    n=  3 actual   +1.76 -> BE   +1.19  delta   -0.57
+  stale_exit                 n=  8 actual   +1.31 -> BE   +0.81  delta   -0.50
+  UNIVERSAL_MAX_HOLD         n=  9 actual   +0.52 -> BE   +0.10  delta   -0.42
+  rr_engine_resistance_break n=  2 actual   +0.45 -> BE   +0.08  delta   -0.37
+  no_sl_tp                   n=  1 actual   +0.08 -> BE   +0.00  delta   -0.08
+  pump_exit_dead_money       n= 20 actual   +1.45 -> BE   +1.43  delta   -0.02
+  (none)                     n=  1 actual   +0.00 -> BE   +0.00  delta   +0.00
+  manual_close               n=  1 actual   +0.00 -> BE   +0.00  delta   +0.00
+  atr_tp_hit                 n=  2 actual   +0.12 -> BE   +0.12  delta   +0.00
+  manual_tp_hit              n=  1 actual   +0.11 -> BE   +0.11  delta   +0.00
+  pump_exit_momentum         n=  2 actual   -0.09 -> BE   +0.00  delta   +0.09
+  cut_loser                  n=  1 actual   -0.12 -> BE   +0.00  delta   +0.12
+  HL_CLOSED                  n=  3 actual   +0.01 -> BE   +0.16  delta   +0.15
+  cut-loser-MAE-GUARD        n=  2 actual   -0.22 -> BE   +0.00  delta   +0.22
+  hard_sl                    n= 30 actual   +0.88 -> BE   +1.52  delta   +0.64
+  hard_max_loss              n= 23 actual   -2.74 -> BE   +0.00  delta   +2.74
+  atr_sl_hit                 n= 69 actual   -4.43 -> BE   +0.65  delta   +5.08
+
+30d UNARMED by signal (n, actual$ -> BE$ delta):
+  pump-chain-                          n= 67   -0.40 ->   +1.83    +2.23
+  pump-chain-v5                        n=  9   -0.12 ->   +0.47    +0.59
+  ai-trader+                           n=  6   -0.53 ->   +0.00    +0.53
+  doji-bottom-long                     n=  3   -0.44 ->   +0.00    +0.44
+  pump-chain-,pump-chain-v6-           n=  6   -0.41 ->   +0.00    +0.41
+  pump-chain+                          n= 21   +0.73 ->   +1.10    +0.37
+  mover+                               n=  4   -0.35 ->   -0.01    +0.34
+  pump-chain-,rs-r68                   n=  1   -0.33 ->   +0.00    +0.33
+  ema300-breakthrough+                 n=  1   -0.28 ->   +0.00    +0.28
+  pump-chain+,pump-chain-v6+           n=  3   -0.28 ->   +0.00    +0.28
+  r2-trend-long4                       n=  1   -0.23 ->   +0.00    +0.23
+  pump-chain-v6-                       n=  3   -0.14 ->   +0.00    +0.14
+  continuum-osc+                       n=  7   +0.14 ->   +0.26    +0.12
+  bb-squeeze+                          n=  1   -0.12 ->   +0.00    +0.12
+  bb-bounce-v2-long+                   n=  3   -0.02 ->   +0.07    +0.09
+  pump-chain+,pump-chain-v5            n=  1   -0.09 ->   +0.00    +0.09
+  continuation+                        n=  1   -0.09 ->   +0.00    +0.09
+  hl_copy_trader                       n=  4   -0.06 ->   +0.00    +0.06
+  ai-trader-                           n=  1   -0.05 ->   +0.00    +0.05
+  hmacd_mtf-+                          n=  1   -0.02 ->   +0.00    +0.02
+  ai-trader-pending                    n=  3   +0.17 ->   +0.18    +0.01
+  accel-300-breakout                   n=  1   +0.01 ->   +0.01    +0.00
+  pump-chain-,rs-r61                   n=  1   +0.00 ->   +0.00    +0.00
+  pump-chain-v5,rs-s32                 n=  1   +0.23 ->   +0.23    +0.00
+  ema-reclaim-long,volume-breakout-lon n=  1   +0.12 ->   +0.12    +0.00
+  r2-trend-long5                       n=  1   +0.00 ->   +0.00    +0.00
+  r2v2-long5                           n=  1   +0.37 ->   +0.37    +0.00
+  continuum-osc-                       n=  1   +0.01 ->   +0.00    -0.01
+  continuum_engine                     n=  2   +0.08 ->   +0.00    -0.08
+  (none)                               n=  1   +0.09 ->   +0.00    -0.09
+  volume-breakout-long+                n= 14   +1.65 ->   +1.44    -0.21
+  ai-trader-manual                     n=  8   +0.39 ->   +0.10    -0.29

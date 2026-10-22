@@ -1,0 +1,57 @@
+Cohort: 174 trades reached +0.40% favorable (14d); skipped 175
+actual total  +69.64 pp
+BE-after-arm  +67.32 pp   delta -2.32 pp
+breakeven exit fired on 83/174
+helped (actual<0, BE saves): 48  sum +18.10 pp
+harmed (winner cut to 0):    35  sum -20.42 pp
+winner-kill rate: 35/174 = 20.1% of cohort, 35/119 of actual winners
+
+Top harmed (actual winners turned to 0):
+  #16020 ATOM SHORT pump-chain-                  actual +3.312pp rr_engine_resistance dur 30m trail=False
+  #16116 ACE SHORT pump-chain-                  actual +1.843pp atr_trail_hit        dur 127m trail=True
+  #16010 CC LONG pump-chain+                  actual +1.556pp stale_exit           dur 128m trail=False
+  #16260 ALT SHORT pump-chain-,pump-chain-v6-   actual +1.406pp trail_sl             dur 39m trail=True
+  #16113 CHIP SHORT pump-chain-                  actual +1.349pp atr_trail_hit        dur 72m trail=True
+  #16330 AIXBT LONG bb-bounce-v2-long+           actual +0.872pp profit-monster-trail dur 112m trail=True
+  #15997 GRASS LONG ai-trader+                   actual +0.774pp profit-monster-trail dur 35m trail=True
+  #16211 BTC LONG (none)                       actual +0.758pp UNIVERSAL_MAX_HOLD   dur 481m trail=False
+  #16309 BTC LONG continuum-osc+               actual +0.746pp UNIVERSAL_MAX_HOLD   dur 481m trail=False
+  #16177 CASHCAT LONG bb-bounce-v2-long+           actual +0.746pp profit-monster-trail dur 27m trail=True
+
+Top helped (givebacks saved at breakeven):
+  #16302 COMP SHORT pump-chain-,pump-chain-v6-   actual -1.522pp atr_sl_hit           dur 42m trail=False
+  #16084 GRASS LONG pump-chain+                  actual -1.329pp atr_sl_hit           dur 6m trail=False
+  #16175 SEI LONG r2-trend-long4               actual -1.038pp atr_sl_hit           dur 60m trail=False
+  #16050 AIXBT LONG pump-chain+,pump-chain-v6+   actual -0.812pp atr_sl_hit           dur 97m trail=False
+  #16023 BABY LONG volume-breakout-long+        actual -0.791pp hard_max_loss        dur 59m trail=False
+  #16146 CRV SHORT pump-chain-v6-               actual -0.751pp atr_sl_hit           dur 41m trail=False
+  #16105 CRV LONG volume-breakout-long+        actual -0.732pp hard_max_loss        dur 54m trail=False
+  #16026 PURR LONG volume-breakout-long+        actual -0.639pp atr_sl_hit           dur 208m trail=False
+  #16208 APT SHORT pump-chain-                  actual -0.586pp atr_sl_hit           dur 22m trail=False
+  #16307 BTC LONG ai-trader-manual             actual -0.534pp cut_loser            dur 57m trail=False
+  IS (last 7d): n=78 actual +25.52 vs BE +25.44 = -0.08 pp, winner-kills 17
+  OOS (d7-14): n=96 actual +44.13 vs BE +41.89 = -2.24 pp, winner-kills 18
+
+By trailing_activated:
+  trail=True: n=112 actual +74.80 vs BE +62.27 = -12.53 pp
+  trail=False: n=62 actual -5.16 vs BE +5.06 = +10.21 pp
+
+By exit_reason (delta pp):
+  profit-monster-trail     n= 76 delta -5.59 pp
+  atr_trail_hit            n= 25 delta -4.44 pp
+  rr_engine_resistance_break n=  1 delta -3.31 pp
+  UNIVERSAL_MAX_HOLD       n=  5 delta -1.76 pp
+  stale_exit               n=  4 delta -1.56 pp
+  trail_sl                 n=  5 delta -1.46 pp
+  rr_engine_trail_hit      n=  3 delta -1.12 pp
+  HL_CLOSED                n=  1 delta -0.28 pp
+  pump_exit_dead_money     n=  1 delta +0.00 pp
+  cut-loser-CL-T1          n=  1 delta +0.00 pp
+  atr_tp_hit               n=  1 delta +0.00 pp
+  hard_tp                  n=  1 delta +0.00 pp
+  manual_tp_hit            n=  1 delta +0.00 pp
+  trail_arm_timeout        n=  3 delta +0.09 pp
+  hard_sl                  n=  6 delta +0.43 pp
+  cut_loser                n=  1 delta +0.53 pp
+  hard_max_loss            n=  2 delta +1.52 pp
+  atr_sl_hit               n= 37 delta +14.64 pp

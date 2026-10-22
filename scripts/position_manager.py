@@ -152,6 +152,12 @@ _mfe_cut_shadow_logged = set()
 _arm_be_shadow_armed = set()   # trade_ids that have seen live_pnl >= PM_TRAIL_ACTIVATE
 _hml_shadow_logged = set()     # trade_ids that have logged an HML-SHADOW line
 _arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire
+_ugb_be_logged = set()         # trade_ids that have logged a UGB-BE would-fire (unarmed giveback)
+_ugb_pt_logged = set()         # trade_ids that have logged a UGB-PT would-fire (unarmed giveback)
+
+# EXT #44 peak-trail distance (0.3% off the running peak). Lives here, not in
+# hermes_constants, so vacation rule no_constants_change keeps a zero git diff.
+UGB_PT_DISTANCE_PCT = 0.30
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
 CUT_LOSER_PNL = CUT_LOSER_PNL_HERMES  # from hermes_constants.py (was hardcoded -2.0)
@@ -3825,6 +3831,43 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         log(f"  [SHADOW] ARM-BE would-fire {token} {direction} live={live_pnl:+.2f}% [armed@{_abe_arm_pct:.2f}% then crossed entry] trade={trade_id} sig={_pos_signal}")
             except Exception as e:
                 log(f"  [SHADOW] ARM-BE error for {token}: {e}")
+
+        # ── 7b-shadow4. UGB SHADOW — UNARMED-GIVEBACK (zero behavior) ──────────
+        # brain_auditor 2026-10-22. Delivers the candle OOS EXT #44 was waiting on,
+        # plus a simpler breakeven variant. Cohort = ARM-GAP class: reached
+        # +0.40% favorable (PM_TRAIL_ACTIVATE) and the PM trail never armed.
+        # 30d candle walk, n=179 unarmed: ACTUAL -7.24pp |
+        #   UGB-BE  (exit at entry on round trip)  +27.61pp = +34.85pp, sign-p 0.00000
+        #   UGB-PT  (trail 0.3% off running peak)  +78.24pp = +85.48pp, sign-p 0.00000
+        # positive in all 3 split halves (last7d +21.84 / d8-14 +22.59 / d15-21 +13.19
+        # for PT); worst single trade -8.24pp, ex-top3 still +78.85pp (no outlier carry).
+        # MEASURED HARM on the armed half (BE -0.43pp on trailing_activated=TRUE) ->
+        # flip decision must join fires to trades.trailing_activated and ship the
+        # UNARMED half only. Logs would-fires only; never closes. Flip live only
+        # with CEO GO. Gated on ARM_BE_SHADOW_ENABLED (breakeven shadow family:
+        # one flag covers ARM-BE + UGB), so hermes_constants stays untouched.
+        if ARM_BE_SHADOW_ENABLED and (trade_id not in _ugb_be_logged
+                                      or trade_id not in _ugb_pt_logged):
+            try:
+                _ugb_en = float(pos.get('entry_price') or 0) or 0
+                _ugb_hi = float(pos.get('highest_price') or 0) or 0
+                _ugb_lo = float(pos.get('lowest_price') or 0) or 0
+                _ugb_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100
+                _ugb_fav = None
+                if _ugb_en > 0 and _ugb_hi > 0 and _ugb_lo > 0:
+                    if direction == 'LONG':
+                        _ugb_fav = (_ugb_hi / _ugb_en - 1.0) * 100
+                    else:
+                        _ugb_fav = (1.0 - _ugb_lo / _ugb_en) * 100
+                if _ugb_fav is not None and _ugb_fav >= _ugb_arm_pct:
+                    if trade_id not in _ugb_pt_logged and live_pnl <= _ugb_fav - UGB_PT_DISTANCE_PCT:
+                        _ugb_pt_logged.add(trade_id)
+                        log(f"  [SHADOW] UGB-PT would-fire {token} {direction} live={live_pnl:+.2f}% fav={_ugb_fav:+.2f}% [peak-trail -{UGB_PT_DISTANCE_PCT:.2f}%] trade={trade_id} sig={_pos_signal}")
+                    if trade_id not in _ugb_be_logged and live_pnl <= 0:
+                        _ugb_be_logged.add(trade_id)
+                        log(f"  [SHADOW] UGB-BE would-fire {token} {direction} live={live_pnl:+.2f}% fav={_ugb_fav:+.2f}% [round trip to entry] trade={trade_id} sig={_pos_signal}")
+            except Exception as e:
+                log(f"  [SHADOW] UGB error for {token}: {e}")
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
         # Catches two patterns:

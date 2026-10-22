@@ -1,337 +1,148 @@
 {
-  "timestamp": "2026-10-22T19:48:00Z",
-  "run": "brain_auditor #81",
+  "timestamp": "2026-10-22T21:05:00Z",
+  "run": 82,
   "session_brain_stats": {
-    "sessions_total": 268,
-    "chunks_total": 392187,
-    "last_ingest": "2026-10-22T19:00:18Z"
+    "queries": 2,
+    "verdict": "UNRELIABLE this run — returned 6 hits with identical score 0.909 and identical text under 6 different titles (title/text field mismatch) on query 1; query 2 scores 0.95-0.99 uniformly. Not used for any audit conclusion.",
+    "action": "flagged as drift finding (index quality); audit based on PG + candles only"
   },
   "trade_summary_24h": {
-    "trades": 4,
-    "wins": 3,
-    "win_rate": 75.0,
-    "pnl_usdt": 0.27,
-    "note": "FIRST GREEN 24h window in weeks: ZRO warrior-sr-confirm- SHORT trail +0.08, HBAR volume-buildup- SHORT trail +0.08, BTC ai-trader-pending SHORT manual_tp +0.11, BTC pending LONG rr_engine flat 0.00. All trend-side.",
-    "by_signal": [
-      [
-        "warrior-sr-confirm-",
-        "SHORT",
-        1,
-        0.08,
-        100.0
-      ],
-      [
-        "volume-buildup-",
-        "SHORT",
-        1,
-        0.08,
-        100.0
-      ],
-      [
-        "ai-trader-pending",
-        "SHORT",
-        1,
-        0.11,
-        100.0
-      ],
-      [
-        "ai-trader-pending",
-        "LONG",
-        1,
-        0.0,
-        0.0
-      ]
-    ],
-    "window_7d": {
-      "trades": 155,
-      "wins": 59,
-      "pnl_usdt": -3.08,
-      "wr": 38.1
-    },
-    "window_30d": {
-      "trades": 718,
-      "wins": 305,
-      "pnl_usdt": -6.36
-    },
-    "armed_vs_unarmed_14d": {
-      "armed": {
-        "n": 133,
-        "wr": 78.2,
-        "pnl": 9.21
-      },
-      "unarmed": {
-        "n": 218,
-        "wr": 10.6,
-        "pnl": -13.69
-      }
-    }
+    "closed_24h": "4T 3W 75.0% +$0.27 (ai-trader-pending SHORT +0.11, volume-buildup- SHORT +0.08, warrior-sr-confirm- SHORT +0.08, ai-trader-pending LONG 0.00)",
+    "closed_7d": "154T 38.3% -$3.05",
+    "closed_14d": "349T -$4.75",
+    "armed_vs_unarmed_7d": "armed 61T 75.4% +$2.53 | unarmed 91T 13.2% -$6.07",
+    "armed_vs_unarmed_14d": "armed 133T 78.2% +$9.21 | unarmed 216T 9.7% -$13.96",
+    "regime_7d": "EXTREME 55T 27.3% -1.78 | HIGH 22T 45.5% -0.89 | NORMAL 61T 42.6% -0.82 | FLAT 14T 50.0% -0.05",
+    "exit_reason_7d_head": "profit-monster-trail 39T 35W +$1.84 (ONLY profitable exit) | atr_sl_hit 46T 1W -$3.23 | hard_max_loss 19T 0W -$2.36 | stale_exit 3 -$0.62 | hard_sl 6 -$0.51",
+    "fundamental_truth_check": "trail family 7d = +$1.84; chop exits (atr_sl_hit+hard_max_loss+stale+hard_sl) = -$6.72. Trend = how we win, chop = how we lose, unchanged."
   },
   "open_position_assessment": {
-    "open": 1,
-    "trade": "BTC SHORT #16353 @81139 (ai-trader-pending, CEO domain), SL 81760 TP 80300, -0.28%",
-    "verdict": "HOLD with hard exit rule — BTC is AT the 1m EMA300 reclaim zone",
-    "evidence": "price 81401.7 vs 1m EMA300 81455.4 = gap -0.066%, 12/30 last closes above EMA300, pipeline log shows BTC score 62.3 LEAN_BULL with SHORT-CONTINUUM-HYSTERESIS holding (flapping bounce <30min). Watchdog: kill only on SUSTAINED 15-30min 1m reclaim+hold above ~81455.",
-    "regime": "15m+4h SHORT_BIAS, continuum AT, LOW vol, CALM, velocity SLOW, accel NEGATIVE"
+    "trade": "BTC SHORT #16353 ai-trader-pending, entry 81139, SL 81760, TP 80300, conf 55, regime NORMAL, opened 17:14 UTC (3h50m)",
+    "now": "price 81,267 (81,278 last 1m close) vs 1m EMA300 ~81,359 = -0.11% below; 24/60 last 1m closes above EMA300 = still flapping at the pin",
+    "pnl": "-0.158% price (-$0.00 to -$0.04 depending on poll)",
+    "verdict": "HOLD — standing rule unchanged: exit only on a SUSTAINED 15-30m 1m hold ABOVE EMA300 ~81,360; SL 81760 / TP 80300 stay. Nothing in this run changes the rule.",
+    "mfe_cut_note": "MFE-CUT shadow is firing on it (live -0.17% mfe +0.12%, 208m) — never-armed stall class; UGB shadow does NOT fire (fav 0.12% < 0.40% arm).",
+    "readiness": "LONGs: only a reclaim of EMA300 that HOLDS 15-30m with volume. SHORTS: aligned while price stays under EMA300. Mid-band (price within ±0.2% of EMA300, as now) = no new risk. Watchdog 0 steers, health good."
   },
-  "losing_trade_autopsy_24h": {
-    "n_24h": 0,
-    "note": "ZERO losing closes in the last 24h (4 closes, 3 wins +$0.27). Extended to 48h as mandated.",
-    "n_extended_48h": 25,
-    "method": "1m replay from open_time on candles.db, window = open_time to min(close, open+30m), LONG needs high >= entry*0.998, SHORT needs low <= entry*1.002",
-    "recovered_within_0.2pct_30m": 24,
-    "never_recovered": 1,
-    "never_detail": "16341 WLD r2v2-long4 41s trade = no 1m rows in window (known round-number MFE false-peak, bug_hunter open)",
-    "worst_excursions_pct": [
-      [
-        "INJ",
-        -1.14
-      ],
-      [
-        "COMP",
-        -0.99
-      ],
-      [
-        "SYRUP",
-        -0.93
-      ],
-      [
-        "POL",
-        -0.91
-      ],
-      [
-        "STX",
-        -0.9
-      ]
-    ],
-    "verdict": "WRONG-SIDE REFUTED — 15th consecutive run. 24/25 traded back within -0.2% of entry inside 30m; worst bar-low only -1.14%. The winning side in this window was FLAT / already-trend-SHORT, not the opposite direction.",
-    "clusters": "hard_max_loss never-armed chop (POL/STX/INJ/PUMP/XPL), atr_sl_hit tiny givebacks, stale SYRUP, known WLD false-peak — all known cohorts, 0 new patterns"
+  "losing_trade_autopsy_48h": {
+    "n_losers": 25,
+    "window": "close_time > now-48h, all pnl_usdt<0",
+    "method": "own 1m candle replay from open_time in data/candles.db (candles_1m, long: close >= entry*0.998; short: close <= entry*1.002), 30m window",
+    "recovered_within_30m": "25/25 (100%)",
+    "never_recovered": 0,
+    "worst_excursion": "INJ -1.14% (bar low vs entry)",
+    "clusters": "hard_max_loss never-armed chop x7 (POL -0.22, STX -0.11, INJ x2, XPL, PUMP, MET-hard_sl) | atr_sl_hit x10 tiny | trail_arm_timeout x4 (CFX/BLUR/APT HIGH) | trail givebacks x3 | stale SYRUP -0.23 | WLD 41s false-peak known",
+    "verdict": "WRONG-SIDE REFUTED 16th consecutive run. Winning side in this window = flat / already-short. 0 new patterns.",
+    "exit_style_split": "0/25 losers armed the trail (trailing_activated FALSE on 24 of 25; only WLD armed and lost -$0.01)."
   },
   "signal_quality_deep_dive": {
-    "target": "pump-chain+ (bare) — the ONLY 14d sub-50% WR signal with n>=15 that is not already killed, disabled, or deep-dived",
-    "baseline": "14d 51T 15W 29.4% -0.35 | 7d 18T 2W 11.1% -0.83 | 30d 68T 25W 36.8% +1.85",
-    "by_conf": [
-      [
-        "<30",
-        23,
-        4,
-        -1.28
-      ],
-      [
-        "30-59",
-        7,
-        1,
-        -0.2
-      ],
-      [
-        "60+",
-        21,
-        10,
-        1.13
-      ]
-    ],
-    "by_regime": [
-      [
-        "EXTREME",
-        38,
-        12,
-        0.41
-      ],
-      [
-        "HIGH",
-        10,
-        3,
-        -0.66
-      ],
-      [
-        "NORMAL",
-        3,
-        0,
-        -0.1
-      ]
-    ],
-    "by_exit": [
-      [
-        "hard_max_loss",
-        16,
-        0,
-        -1.8
-      ],
-      [
-        "trail_arm_timeout",
-        15,
-        3,
-        -0.57
-      ],
-      [
-        "atr_trail_hit",
-        8,
-        6,
-        2.17
-      ],
-      [
-        "atr_sl_hit",
-        6,
-        0,
-        -0.63
-      ],
-      [
-        "stale_exit",
-        3,
-        3,
-        0.44
-      ]
-    ],
-    "root_cause": "chop entries at conf<30 (never arm, hard_max_loss 16T 0W -1.80) + HIGH-vol residual (HIGH block already live Oct 21). The profit comes from conf>=30 and from atr_trail_hit (6/8 winners).",
-    "single_best_filter": "CONF_FLOOR=30 bare-only (ships Oct 23) — removes -1.28 of the -0.35 bleed while keeping conf>=30's +0.93. A blanket signal KILL would forfeit +0.93 and fail OOS.",
-    "would_block_winners": "CONF_FLOOR blocks 4 of 24 in-scope 14d bare winners = fkA 16.7% (<20% bar); 4/127 = 3.1% of all window winners"
+    "atr_sl_hit_decomposition_7d": "46T -$3.23, 1 win (2.2% WR): 17/46 reached +0.40% favorable then gave it back (EXIT problem), 8/46 never reached +0.20% (ENTRY problem), 21 in between. 14d: 88T 43 reached +0.40 / 13 below +0.20. => fix the giveback, not the clock.",
+    "atr_sl_hit_by_signal_7d": "pump-chain- 8T -0.45 (75% reach +0.40), pump-chain-v6- combo 4T -0.37 (50%), pump-chain+ 3T -0.31 (67%), bb-bounce 5T -0.37 (0% reach), ai-trader-pending 7T -0.33 (14%)",
+    "new_targets": "NO new n>=15 sub-50% target that is not already killed/disabled/dived/queued: volume-breakout-long+ 16T 18.8% -0.76 (killed Oct 13), doji 20T 40% (killed Oct 16), ai-trader+ 29T 41.4% (disabled), bb-bounce 36T 47.2% (dived #75), pump-chain- 36T 22.2% (CONF_FLOOR)",
+    "pump_chain_plus": "kill trigger MET-by-letter AGAIN (14d 54T 14W 25.9% -$0.39; n>=20 AND PnL<0 AND WR<30%) — RECOMMEND DO-NOT-KILL: 30d OOS 75T 26W +$1.86 positive, conf>=30 cohort 14d +$0.89 (30-59 +0.43 / 60+ +0.46), entire bleed is conf<30 23T 4W -$1.28 which CONF_FLOOR=30 bare-only already covers. Bring table to CEO Oct 23."
   },
   "pre_reg_rechecks": {
-    "CONF_FLOOR_30_bare_only": "PASS fresh — 32T 4W blocked, net save +1.81/14d, fkA 4/24=16.7%, fkB 4/32=12.5%, n=32. CONF_FLOOR constant NOT in tree (staged, verified via grep) → ship Oct 23 bare-only. Family-wide stays REJECTED (20.7%).",
-    "pump_chain_plus_kill": "TRIGGER MET BY LETTER for the first time (14d n=51>=20, PnL -0.35<0, WR 29.4%<30%) BUT RECOMMEND DO-NOT-KILL: 30d OOS +1.85 (36.8%) reverses positive; conf>=30 cohort +0.93 forfeited; conf<30 bleed already covered by CONF_FLOOR; mandatory out-of-sample check fails. Recheck date was always Oct 23 — bring this table to CEO.",
-    "pump_chain_minus_cancel": "CANCEL stands (bare 36T 8W -0.34; CONF_FLOOR is the lever)",
-    "TAT": "14/15 — only 2 scoped-looking log lines since Oct 21 18:58, both the already-counted NEO #16344 (dup pair). 0 new valid fires.",
-    "arm_dampen_61": "same 3 qualifiers at n>=10 arm<15%: pump-chain- 10T 0% -0.58 | ai-trader-pending 11T 9.1% -0.17 | ai-trader-manual 12T 8.3% -0.07. Set 33T 7W -0.82, armed pnl in set -0.01. 2 of 3 = CEO-domain → scope ruling Oct 23 unchanged.",
-    "coin_regime": "stamps LIVE (50 opens carry coin_regime, last = ZRO 18:46 today). ALIGNED 27T 44.4% +0.18 vs COUNTER 23T 34.8% -0.53. COUNTER n>=20 BUT WR 34.8%>30% → still COLLECT per locked criteria.",
-    "volume_breakout_kill": "0 leaks — 4 opens on Oct 13 all before the 21:42 kill commit 80fb2750",
-    "size_reduce": "0.5x file truth (vacation_size_reduce.json, both resume legs failing)"
+    "CONF_FLOOR_30_bare_only": "PASS FRESH — pump-chain bare 14d: would-block 33T 4W -$1.86 => save +$1.86/14d; kept 57T 18W +$0.69; fkA 4/22 = 18.2% (<20% bar). Constant NOT in tree and NOT staged -> still to ship Oct 23 (bare-only, not family-wide).",
+    "pump_chain_plus_kill": "MET-by-letter, RECOMMEND NO-KILL (30d OOS +1.86)",
+    "pump_chain_minus_kill": "CANCEL stands",
+    "TAT_flip": "14/15 in-scope unique fires (last NEO #16344 2026-10-21 18:58) — one fire short, then CEO GO",
+    "arm_dampen_scope": "unchanged, CEO scope ruling Oct 23 (2 of 3 qualifiers ai-trader)",
+    "coin_regime": "still COLLECT (WR>30% rule; ALIGNED/COUNTER stamped live on ZRO #16354)",
+    "waiver_expiry": "Oct 24 per pre-registered criteria; conversion still 1 open +$0.08 (HBAR #16352)",
+    "CONF_FLOOR_60": "re-measure Oct 30 per #81 pre-registration"
   },
   "drift_findings": [
     {
-      "item": "pump-chain+ kill status text in prior audit files said 'NOT MET (+$0.13 / +$0.02)'",
-      "state": "now MET-by-letter at 14d -0.35 / WR 29.4%",
-      "impact": "if the next run reads the stale verdict instead of re-querying, it would miss that the recheck date (Oct 23) now lands on a live trigger",
-      "action": "re-queried fresh this run; table above supersedes prior text"
+      "severity": "MED",
+      "finding": "session_brain query returns mismatched/duplicated records — 6 hits, identical score 0.909, identical text under 6 different titles; second query uniformly 0.95-0.99",
+      "impact": "memory retrieval is untrustworthy; this run used PG+candles only",
+      "fix": "session_brain index/embedding rebuild (owner: whoever owns scripts/session_brain.py) — flagged, not fixed (not my file, needs investigation)"
     },
     {
-      "item": "decider_run.py:5104-5113 rsi_drift stamp comment",
-      "state": "HOLDING — #80's correction present, describes the three RSI sources accurately",
-      "impact": "none",
-      "action": "no change"
+      "severity": "LOW",
+      "finding": "ARM-BE shadow 'armed' definition differs between live code and offline analysis: live uses observed live_pnl>=0.40 at a poll; offline analysis on trades.trailing_activated gives a different (and here, opposite-sign) answer on the armed cohort (-0.43pp vs +10.76pp)",
+      "impact": "the Oct 25 ARM-BE flip read must replicate the live observation rule (max favorable so far), not the DB flag, or it will mis-estimate",
+      "fix": "documented in this run's analysis scripts + creative entry; no code change"
     },
     {
-      "item": "watchdog FIRED-vs-PICK wording (#79 prompt fix)",
-      "state": "HOLDING",
+      "severity": "INFO",
+      "finding": "hermes_constants.py zero git diff (vacation no_constants_change honored); kill flags verified (oversold 0 post-kill opens, doji last open = kill minute in-flight only, volume-breakout+ last Oct 13 / - last Oct 15 all pre-kill)",
       "impact": "none",
-      "action": "no change"
+      "fix": "n/a"
     }
   ],
   "recurring_problems": [
-    {
-      "topic": "exit system is the #1 profit leak (session brain, score 0.991 across 5 sessions: trend following / wider exits / train to trade / signal failure / vacation mode)",
-      "code_state": "measured and confirmed (#78 round-trip ledger: 50/350 gave back -2.90 = 70% of the 14d bleed) but NOT implemented — blocked on escalation #17",
-      "gap": "the exit-ladder / pump-exit candle OOS has been requested 36 times; it is the single largest measured recovery path and it is still undelivered"
-    },
-    {
-      "topic": "R:R threshold 0.95 / signal-quality entry filters (session brain)",
-      "code_state": "RR-ENGINE live with grade penalties (HYPER today: R:R=1.10 grade C -> 0.70x)",
-      "gap": "none material"
-    }
+    "hard_max_loss / never-armed chop entries — standing, covered by CONF_FLOOR (ship Oct 23) + TAT (14/15) + MFE-CUT (live shadow)",
+    "atr_sl_hit giveback — now the LARGEST 7d bleed bucket (-$3.23/46T) and measured this run: 17/46 reached +0.40 before the ATR stop took it; UGB shadow now collects the counterpart data",
+    "escalation #17 (exit-ladder / pump-exit candle OOS) carried for the 37th run"
   ],
   "missing_implementations": [
     {
-      "idea": "exit-ladder / pump-exit signal-scoped candle OOS",
-      "source": "session brain 'exit system is the #1 profit leak' + #78 measurement",
-      "status": "BLOCKED — escalation #17, 36th request this run",
-      "impact": "the measured +99.4pp counterfactual stays unvalidated, so we keep bleeding the give-back leg"
+      "item": "CONF_FLOOR=30 bare-only",
+      "status": "still not in tree, not staged — ships Oct 23 (CEO eyeball)",
+      "impact": "+$1.86/14d unclaimed"
     },
     {
-      "idea": "CONF_FLOOR=30 bare-only",
-      "source": "audits #71-#80",
-      "status": "STAGED, ships Oct 23 (not in tree)",
-      "impact": "+1.81/14d projected"
+      "item": "exit engine giveback protection for unarmed (bypass) trades",
+      "status": "was missing entirely; this run shipped the UGB shadow (log-only) to collect fk data",
+      "impact": "measured +34.85pp (BE) to +85.48pp (peak-trail) over 30d on n=179 unarmed givebacks, unclaimed until flip"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-22T19:48:00Z",
-      "idea": "Arm-rate x EMA300-gap interaction MEASURED and REFUTED",
-      "rationale": "Hypothesis: entries within 0.2% of 1m EMA300 (the chop/reclaim band) arm the trail far less than extended entries — would have made 'AT EMA300 = no trade' an entry-quality rule rather than a time block.",
-      "measured": "n=351 (all 14d closes, EMA300 recomputed from candles_1m at each open_time). abs gap<0.2: n=79 arm 41.8% pnl +0.32; abs gap>=1.0: n=92 arm 32.6% pnl -0.70; two-proportion z=0.81 (p~0.42); raw-gap bands non-monotonic (-0.5..0.2: 41.7% arm / 0.5..1.0: 45.6% / >=1.0: 33.9%).",
-      "expected_impact": "none — closes the route",
-      "category": "entry sniper",
-      "status": "refuted-with-data",
+      "date": "2026-10-22T21:05:00Z",
+      "idea": "UNARMED-GIVEBACK (UGB) breakeven + peak-trail exit — candle OOS for EXT #44, delivered",
+      "rationale": "ARM-GAP cohort = trades that reached +0.40% favorable but where the PM trail never armed (bypass engines: pump-exit/rr_engine/volbo/hl_fill, plus trail-registration gaps). They round-trip to a stop and own the bleed.",
+      "measured": "30d candle walk (brain/analysis/giveback_rules_headtohead_2026-10-22.py), n=179 unarmed, MFE>=+0.40: ACTUAL -7.24pp | UGB-BE (exit at entry on round trip) +27.61pp = +34.85pp, sign-p 0.00000, fk 30/179 | UGB-PT (trail 0.3% off running peak) +78.24pp = +85.48pp, sign-p 0.00000, fk 65/179. Split halves ALL positive (PT: last7d +21.84, d8-14 +22.59, d15-21 +13.19; BE: +10.07/+11.61/+8.99). Sensitivity: top3 only +6.63 of +85.48, ex-worst-trade +93.73 (no outlier carry). By exit reason PT gains concentrated in atr_sl_hit +54.98pp and hard_max_loss +25.27pp; harms concentrated in stale_exit/UNIVERSAL_MAX_HOLD/hard_tp (right tail). non-EXTREME excl-volume- scope also positive (+26.13pp PT, p=0.00000). ARMED half measured HARMFUL for BE (-0.43pp on trailing_activated=TRUE) -> ship unarmed scope ONLY.",
+      "expected_impact": "unclaimed ~+$6-12/30d in $ terms at current size (PT $ equivalent not computed; BE-equivalent dollar delta +$6.14/30d on the same cohort measured with $ conversion)",
+      "category": "exit engine / giveback protection",
+      "status": "SHIPPED AS SHADOW (zero behavior) + pre-registered flip criteria: n>=20 armed-split fires, fk<20% on unarmed winners, OOS same sign, CEO GO",
+      "risk": "low (log-only; flip is the risky step and needs CEO)"
+    },
+    {
+      "date": "2026-10-22T21:05:00Z",
+      "idea": "ARM-BE-STOP shadow verdict independently REPLICATED (not shipped, verified)",
+      "rationale": "arm-breakeven-stop.md (2026-10-17) claimed 30d non-EXTREME excl-volume net +$3.46, fk 9.7%. Verify, don't trust.",
+      "measured": "brain/analysis/breakeven_unarmed_giveback_2026-10-22.py: cohort = >=+0.40 favorable under the shadow's own scope. Using candle-observed max favorable (what the live shadow's live_pnl>=0.40 poll approximates): +$2.26, fkB 24/232 = 10.3%, sign-p 0.0034 -> same sign, same fk ballpark, magnitude 34% lower than claimed. Using trades.trailing_activated as 'armed': -$0.02 (neutral), sign-p 0.39.",
+      "expected_impact": "verdict direction upheld; note the definition sensitivity for the Oct 25 read",
+      "category": "verification",
+      "status": "replicated-with-caveat",
       "risk": "low"
     },
     {
-      "date": "2026-10-22T19:48:00Z",
-      "idea": "Alignment-scoped arm-dampen (signal-agnostic route around the CEO-domain scope problem) MEASURED and REFUTED",
-      "rationale": "arm-dampen #61 is stuck because 2 of 3 qualifiers are CEO-domain ai-trader. If COUNTER-regime trades simply armed less, a coin_regime-based dampen would be signal-agnostic and sidestep the scope ruling.",
-      "measured": "stamped 14d: ALIGNED 27T arm 55.6% +0.18 vs COUNTER 23T arm 47.8% -0.53. Delta 7.8pts on n=50 — alignment does NOT predict arming. COUNTER SHORT arm 1/6=16.7% (n=6).",
-      "expected_impact": "none — refuted; arm-dampen stays signal-scoped and still needs the CEO scope ruling",
-      "category": "position sizing",
-      "status": "refuted-with-data",
+      "date": "2026-10-22T21:05:00Z",
+      "idea": "atr_sl_hit is the largest 7d bleed bucket — split it entry-vs-exit before touching entry filters",
+      "rationale": "7d exit-reason table shows atr_sl_hit 46T 1W -$3.23 > hard_max_loss 19T 0W -$2.36, but only 8/46 never reached +0.20% (entry problem). 17/46 reached +0.40 (giveback = exit problem).",
+      "measured": "14d: 88T, 43 reached +0.40 (49%), 13 below +0.20 (15%)",
+      "expected_impact": "prevents the wrong fix: no entry filter will recover givebacks; UGB/TAT/MFE-CUT will",
+      "category": "diagnosis",
+      "status": "measured (informs UGB)",
       "risk": "low"
-    },
-    {
-      "date": "2026-10-22T19:48:00Z",
-      "idea": "CONF_FLOOR_60 staged second floor for pump-chain+ bare",
-      "rationale": "pc+ conf bands 14d: <30 = -1.28 (covered by tomorrow's CONF_FLOOR), 30-59 = -0.20 on n=7, 60+ = +1.13 on n=21. If the residual 30-59 band keeps bleeding after the 30-floor ships, the edge in this signal is a 60+ cohort.",
-      "measured": "n=7 <20 → monitoring only, no change",
-      "expected_impact": "+0.20/14d projected if it holds",
-      "category": "entry sniper",
-      "status": "pre_registered",
-      "risk": "low — ships only at n>=20 AND PnL<0 AND fk<20%, one variable after CONF_FLOOR has soaked",
-      "flip_criteria": "re-measure 7d after CONF_FLOOR=30 ships (Oct 30); block only if pc+ conf 30-59 has n>=20 AND PnL<0 AND fk<20%"
     }
   ],
   "config_changes_applied": [],
-  "changes_from_last_run": [
-    {
-      "run": "#80",
-      "change": "decider_run.py rsi_drift stamp comment corrected (comment-only)",
-      "verified": "PASS — comment at :5104-5113 present and accurate; zero git diff on scripts/ now (already committed)"
-    },
-    {
-      "run": "#80",
-      "change": "RSI gate-source fragmentation measurement + Oct 23 migration proposal",
-      "verified": "STANDING — pre-registered for Oct 23 CEO decision (one variable: migrate approval floor to rsi_utils.compute_rsi('5m'))"
-    },
-    {
-      "run": "#79",
-      "change": "watchdog prompt FIRED -> PICK watchlist-only while AI_TRADER_ENABLED=False",
-      "verified": "PASS — prompt fixed, no 'FIRED' claim since"
-    }
-  ],
-  "last_run_verify": [
-    {
-      "item": "HML-SHADOW live_pnl",
-      "state": "PASS — 19:34:20 BTC trade_id=16353 actual=-0.800% shadow=-1.500% live_pnl=-0.484%"
-    },
-    {
-      "item": "SHORT_RSI_HARD_FLOOR / knife<35",
-      "state": "PASS — HYPER blocked at RSI 37.5 and 29.7 (19:23-19:30); bear exemption correctly NOT applied because BTC is now LEAN_BULL; BTC SHORT bypass at 40.9 = legal waiver band"
-    },
-    {
-      "item": "kill-flag leaks",
-      "state": "PASS — volume-breakout 4 opens all pre-kill (commit 80fb2750 2026-10-13 21:42); doji/volume-buildup+/oversold 0 post-kill opens"
-    },
-    {
-      "item": "TAT scoped fires",
-      "state": "PASS — 0 new valid fires since Oct 21 18:58 (14/15)"
-    },
-    {
-      "item": "size-reduce",
-      "state": "PASS — 0.5x file truth"
-    },
-    {
-      "item": "protected flags",
-      "state": "PASS — 13/13, scripts/hermes_constants.py zero git diff"
-    },
-    {
-      "item": "pipeline errors",
-      "state": "PASS — 4 Traceback lines in log, oldest 2026-10-11, 0 on Oct 22"
-    },
-    {
-      "item": "rsi_drift stamp",
-      "state": "PASS — ZRO #16354 metadata carries coin_regime; drift stamps flow for signal-path opens (ai-trader exempt by design)"
-    }
-  ],
+  "changes_from_last_run": {
+    "run_81_items_verified": [
+      "HML-SHADOW live_pnl flowing: 888 lines, latest 2026-10-22 20:54 trade_id=16353 PASS",
+      "rsi_drift stamp code decider_run.py:5117-5119 present + 3 stamped signal-path trades (POL 8.14, HBAR 12.26, ZRO 5.95 new) PASS",
+      "watchdog 0 steers / health good PASS",
+      "SHORT floor-45: 0 violations in last 24h opens (HBAR 67.61, ZRO 61.54; ai-trader-pending exempt) PASS",
+      "kill flags: oversold 0 post-kill, doji last open = kill minute only, volume-breakout+ last Oct 13 / - last Oct 15 (both pre-kill) PASS",
+      "size-reduce 0.5x file truth (data/vacation_size_reduce.json) PASS",
+      "protected 13/13 — hermes_constants.py zero git diff PASS",
+      "0 Tracebacks on Oct 22 (last Oct 18) PASS",
+      "TAT 14/15 unchanged PASS",
+      "CONF_FLOOR bare-only still absent from tree — Oct 23 ship stands (informational, not a failure)"
+    ],
+    "this_run_ship": "position_manager.py UGB shadow (log-only, gated on existing ARM_BE_SHADOW_ENABLED, new module-local UGB_PT_DISTANCE_PCT=0.30 — hermes_constants untouched)"
+  },
   "next_actions": [
-    "OCT 23 RESUME (CEO eyeball): ship CONF_FLOOR=30 BARE-ONLY (+'$1.81'/14d, fkA 16.7%) — NOT family-wide",
-    "OCT 23: bring the pump-chain+ kill table — trigger MET-by-letter but RECOMMENDED DO-NOT-KILL (30d OOS +1.85, forfeits conf>=30 +0.93); decide with fresh eyes",
-    "OCT 23: arm-dampen scope ruling (2 of 3 qualifiers CEO-domain) + TAT flip at 15th fire + rsi approval-floor unification decision",
-    "OCT 24: unclog-waiver expiry per pre-registered criteria (conversion 1 open +0.08 so far)",
-    "OCT 25: HML-SHADOW eval, MFE-CUT (bb-bounce scope), habitat subtype, re-enter-on-recovery sim, short-gate loosening (token-day dedup convention), CONF_FLOOR_60 re-measure starts",
-    "ESCALATION #17 (36th): exit-ladder / pump-exit candle OOS — still the largest measured recovery path (+99.4pp counterfactual unvalidated)"
+    "OCT 23 RESUME (CEO eyeball): ship CONF_FLOOR=30 BARE-ONLY (+$1.86/14d, fkA 18.2%) — NOT family-wide; constant not in tree",
+    "OCT 23: pump-chain+ kill table — trigger MET-by-letter (54T 25.9% -$0.39), RECOMMEND NO-KILL (30d OOS +$1.86, conf>=30 +$0.89)",
+    "OCT 23: arm-dampen scope ruling (2 of 3 CEO-domain) + TAT flip at 15th fire + rsi approval-floor unification",
+    "OCT 24: unclog-waiver expiry per pre-registered criteria (conversion 1 open +$0.08)",
+    "OCT 25: HML-SHADOW eval, MFE-CUT eval, habitat subtype, re-enter-on-recovery, short-gate loosening, CONF_FLOOR_60 re-measure, + FIRST UGB-PT/UGB-BE shadow read (join fires to trades.trailing_activated; ship unarmed half only if fk<20% and OOS same sign)",
+    "ESCALATION #17 (37th): exit-ladder / pump-exit candle OOS — note this run's UGB-PT result is the same family and partly overlaps; fold EXT #44 + #17 together",
+    "OWN: session_brain index quality (title/text mismatch) — rebuild before anyone trusts its output"
   ]
 }
