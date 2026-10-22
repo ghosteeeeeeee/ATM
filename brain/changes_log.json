@@ -1826,5 +1826,16 @@
     "after": "[HML-SHADOW] {token}: actual=... shadow=... (ATR floor ..., lev=N, trade_id=N)",
     "rationale": "Oct 25 HML-SHADOW eval needs DISTINCT-per-trade data; in-memory set resets every minute",
     "impact": "log-only, zero trading behavior; py_compile + self-check PASS"
+  },
+  {
+    "timestamp": "2026-10-22T09:59:00Z",
+    "agent": "brain_auditor",
+    "change": "HML-SHADOW log line now carries live_pnl={:+.3f}% alongside actual/shadow/trade_id",
+    "type": "infra",
+    "file": "scripts/position_manager.py",
+    "before": "HML-SHADOW BTC: actual=-0.800% shadow=-1.500% (ATR floor 1.50%, lev=5, trade_id=16351)",
+    "after": "HML-SHADOW BTC: actual=-0.800% shadow=-1.500% live_pnl=-0.123% (ATR floor 1.50%, lev=5, trade_id=16351)",
+    "rationale": "Every poll emits an identical threshold line, so the Oct 25 eval cannot tell an exit-time poll from an idle one. live_pnl makes the series positionally analyzable (filter live_pnl ~= actual).",
+    "impact": "zero trading behavior; unlocks path-level read of the CEO-pre-registered HML-SHADOW eval"
   }
 ]

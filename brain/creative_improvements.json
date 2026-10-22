@@ -6608,5 +6608,42 @@
     "category": "regime",
     "status": "monitoring",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-22T09:59:00Z",
+    "idea": "Pre-committed add-at-arm (pyramid into confirmed trends) via resting stop order at +0.40%",
+    "rationale": "14d armed 131T +$9.05 vs unarmed 224T -$13.92. Same-notional add at exactly +0.40% price, exit at original exit => 14d incremental +$10.66 (combined +$19.71), 30d +$21.18 (combined +$41.25). Structural mirror of size-reduce: trend cohort sizes up, chop cohort stays small.",
+    "expected_impact": "roughly doubles the armed-cohort PnL; unarmed bleed unchanged",
+    "fragility": "FILL SENSITIVITY FLIPS SIGN: +0.60% fill => 14d -$3.22 / 30d -$11.93; +0.80% => 14d -$17.11. Valid ONLY with a resting stop-limit at +0.40%. Worst single combined BLUR -$0.20 -> -$1.06; add-side losses -$13.12/14d.",
+    "category": "position sizing / trend-following",
+    "status": "pre_registered",
+    "risk": "high"
+  },
+  {
+    "date": "2026-10-22T09:59:00Z",
+    "idea": "Standardise winner-kill (fk) definition once, in writing: fk = blocked winners / ALL winners in the overlapping window (def A)",
+    "rationale": "Run #67 used blocked_wins/blocked_total (15.0% for CONF_FLOOR), run #71 used blocked_wins/window_wins (20.7%). The two disagree and flip the CONF_FLOOR ship decision. A 30d fk denominator is invalid here because all 40 blocked trades fall Oct 13-21.",
+    "expected_impact": "stops filter verdicts flip-flopping between runs",
+    "category": "meta / verification",
+    "status": "suggested",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-22T09:59:00Z",
+    "idea": "CONF_FLOOR=30 scoped BARE pump-chain only (exclude any signal containing 'pump-chain-v6')",
+    "rationale": "Family-wide: 40T blocked, net +$1.98, but kills 6/29 = 20.7% of 14d winners (>20% bar). Bare-only: 32T blocked, net +$1.81, fk 16.7% (def A) / 12.5% (def B), n=32 — all bars pass. Combo conf<30 is only +$0.17 net while killing 2/5 = 40% of combo winners; v6 confirmation premium stays untouched.",
+    "expected_impact": "ships the pre-registered floor without breaching the winner-kill bar or the combo edge",
+    "category": "entry sniper",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T09:59:00Z",
+    "idea": "Block volume_spike>=2.0",
+    "rationale": "Pre-registered trigger reached (14d n=18, 30d n=27) but significance FAILS: Fisher p=0.312 (14d), p=0.325 (30d), p=1.000 (7d); 22-33% of blocked trades are winners; band table non-monotonic (1-2 band is +$0.10).",
+    "expected_impact": "none - would add noise",
+    "category": "entry filter",
+    "status": "rejected",
+    "risk": "n/a"
   }
 ]

@@ -3668,8 +3668,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 # is a fresh process every pipeline minute, so dedup does not persist
                 # across runs (102 lines / 1 trade observed 2026-10-22). Eval must
                 # DISTINCT on trade_id.
+                # live_pnl added (brain_auditor 2026-10-22): without it every line is
+                # identical thresholds, so the Oct 25 eval cannot tell an exit-time
+                # poll from an idle one. Filter lines where live_pnl ~= actual.
                 log(f"  📊 [HML-SHADOW] {token}: actual={HARD_MAX_LOSS_PCT:.3f}% shadow={_shadow_hml:.3f}% "
-                    f"(ATR floor {_shadow_atr_min * 100:.2f}%, lev={_hml_lev:.0f}, trade_id={trade_id})", 'INFO')
+                    f"live_pnl={live_pnl:+.3f}% (ATR floor {_shadow_atr_min * 100:.2f}%, "
+                    f"lev={_hml_lev:.0f}, trade_id={trade_id})", 'INFO')
         except Exception:
             pass
         # D3 TRAIL-MIN-GAP REMOVED (CEO 2026-10-12): the -0.60% trail floor only
