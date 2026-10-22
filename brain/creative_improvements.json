@@ -6745,5 +6745,32 @@
     "category": "diagnostic",
     "status": "done",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-22T17:52:00Z",
+    "idea": "SLOPE-FILTER short-gate loosening candidate KILLED-WITH-DATA before Oct 25 review",
+    "rationale": "It was the only short gate near the locked criteria (14d net +0.82, WR 2.6%, n=196). Concentration check: +1.56 of positive PnL from 5 events of which 3 are duplicate ATOM blocks the same day (Oct 9, +1.11); ex-ATOM net flips to -0.29; 7d already -0.29; only 17/196 events have would_pnl (n=17 < 50 under resolved-with-pnl reading).",
+    "expected_impact": "prevents a wrong short-gate loosening on cluster-inflated net",
+    "category": "gate scoreboard",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T17:52:00Z",
+    "idea": "Gate-evaluation convention: token-day dedup + pnl-nonnull n when applying the locked loosening criteria",
+    "rationale": "gate_shadow dedup_key is per-minute so one setup can count 3x (ATOM); 14d coverage is 2885/17922 closed events with pnl (16%) — 'resolved n>=50' must mean pnl-nonnull n or the bar is meaningless. Zero code — analytic convention for the Oct 25 review.",
+    "expected_impact": "correct candidate selection at Oct 25 short-gate review",
+    "category": "methodology",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T17:52:00Z",
+    "idea": "rsi_drift execution-quality pre-registration (zero code)",
+    "rationale": "rsi_drift stamp (shipped Oct 21 17:45) now live: POL detect 53.62->exec 61.76 (8.14), HBAR detect 67.61->exec 55.35 (12.26). At n>=30 stamped signal-path trades, test |rsi_drift|>10 vs WR (Fisher) and vs hard_max_loss rate; criteria locked now to avoid post-hoc reading.",
+    "expected_impact": "execution-quality signal; may justify staleness-style reject if drift predicts chop exits",
+    "category": "execution quality",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

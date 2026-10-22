@@ -1,202 +1,167 @@
 {
-  "timestamp": "2026-10-22T16:51:55Z",
-  "run": "brain_auditor #78",
+  "timestamp": "2026-10-22T17:52:00Z",
+  "run": "brain_auditor #79",
   "session_brain_stats": {
     "queries": 3,
-    "top_topics": [
-      "signal winrate regime",
-      "new signal idea",
-      "loss bleeding"
+    "top_hits": [
+      "pump-chain-short filters backtest",
+      "chop entries / momentum filter recurring",
+      "wave_phase falling on losers (already tested #70, not survived)"
     ]
   },
   "trade_summary_24h": {
-    "trades": 9,
+    "trades": 8,
     "wins": 2,
-    "wr": 22.2,
-    "pnl": -0.33,
-    "open": 0
+    "wr": 25.0,
+    "pnl": -0.22,
+    "long": "6T -0.29 16.7%",
+    "short": "2T +0.07 50%",
+    "note": "no closes since Oct 21 19:01 UTC (quiet LOW-vol market); 2 new opens 17:13-17:14 Oct 22"
   },
   "trade_summary_7d": {
-    "trades": 157,
-    "wins": 59,
-    "wr": 37.6,
-    "pnl": -2.69
+    "trades": 156,
+    "wr": 37.2,
+    "pnl": -2.97
   },
   "trade_summary_14d": {
     "trades": 350,
-    "wins": 126,
     "pnl": -4.16,
-    "armed_pnl": 9.05,
-    "unarmed_pnl": -13.21
+    "armed": "131T 102W +9.05",
+    "unarmed": "219T 24W -13.21",
+    "round_trip_ledger": "172/350 reached +0.40; 50 gave back = -2.90 = 70% of bleed; RT by exit: atr_sl_hit 32T -2.11 (reproduces #78)"
   },
-  "HEADLINE": "Round-trip ledger: 50 of 350 14d closes (mfe_pct>=0.40 AND pnl<0) = -$2.90 = 70% of the entire 14d bleed (-$4.16). These are trades that REACHED trail-activation level (+0.40% favorable) and gave it all back. Owned 59% by pump-exit (30T, -$1.71); PM_TRAIL-managed only 7T/-$0.21 -> PM_TRAIL is NOT the leak.",
+  "HEADLINE": "Watchdog 'FIRED: FIL SHORT' reported a trade that CANNOT execute — AI_TRADER_ENABLED=False since CEO 2026-10-19, ai_trader_signal.run() returns early. Prompt drift fixed (trade_watchdog_prompt.md): pick now reported as 'PICK (watchlist only)' when flag False. Second drift: waiver flip #2 first EXERCISED — HBAR SHORT volume-buildup- opened 17:13 in volatility_regime=HIGH (confidence 77.10, coin_regime SHORT_BIAS); exemption-to-open conversion still 0/1 (ALGO RSI 44.0 approved 15:46, blocked same second by SHORT-BB-DEAD-ZONE2 — BB dead zone, not RSI floor, governs short supply).",
   "drift_findings": [
     {
-      "item": "arm-registration-gap framing",
-      "status": "already corrected in #31 (trailing_activated is a post-hoc DB trigger label TRUE iff exit_reason ILIKE %trail%) - re-verified this run, no new drift"
+      "severity": "high",
+      "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+      "issue": "Line 198 claimed hourly picks 'become a live signal the pipeline executes' while AI_TRADER_ENABLED=False since 2026-10-19; watchdog deep_analysis reported 'FIRED: FIL SHORT conf 75' 16:47 with no executable path",
+      "fix": "prompt updated: check AI_TRADER_ENABLED before reporting; disabled => 'PICK (watchlist only — will NOT execute)'",
+      "verified": "ai_trader_signal.py:129 run() returns early when disabled; FIL not in trades (no open)"
     },
     {
-      "item": "gate_registry pump-chain+ HIGH block ship date",
-      "status": "fixed #76, re-checked: no new date drift"
+      "severity": "low",
+      "file": "scripts/ai_trader_precheck.py",
+      "issue": "Uncommitted FIX 2026-10-22 direction-scoping LOSERS_LONG/LOSERS_SHORT (cross-direction membership hard-blocked e.g. HBAR SHORT because HBAR in LOSERS_LONG)",
+      "fix": "none needed — verified consistent with decider_run.py:369 and signal_compactor.py:1757, HBAR-in-LOSERS_LONG confirmed True, already committed in deac0d83 by another agent",
+      "verified": "py_compile PASS, working tree clean"
     }
   ],
   "recurring_problems": [
-    "hard_max_loss chop bleed (#1, 81T -$8.16/14d) - covered by CONF_FLOOR ships Oct 23",
-    "atr_sl_hit round-trip bleed (#2, 88T 1W -$6.29/14d) - NEW decomposition this run: exit-engine owned, not entry owned",
-    "wrong-side steer - refuted 11th consecutive run"
+    {
+      "problem": "chop entries (hard_max_loss never-armed) — 5/5 24h losers recovered within -0.2% of entry <=30m, worst bar-low POL -1.31%; winning side = flat",
+      "status": "wrong-side REFUTED 13th consecutive run, 0 new patterns"
+    },
+    {
+      "problem": "round-trip give-back = 70% of 14d bleed (50T -2.90 / -4.16); atr_sl_hit owns 32/50 RT (-2.11)",
+      "status": "standing metric #78 reproduces; pump-exit trail counterfactual still blocked on escalation #17 (exit-ladder candle OOS)"
+    },
+    {
+      "problem": "short supply gated: 14d gate scoreboard replicates (#76: avoided 141.42 / foregone 76.76 / net saved 64.66)",
+      "status": "no short gate passes locked loosening criteria (see creative #1)"
+    }
   ],
   "missing_implementations": [
     {
-      "item": "escalation #17 exit-ladder candle OOS",
-      "status": "still not commissioned since Oct 14 - blocks the highest-value measured lever (round-trip trail)"
+      "item": "CONF_FLOOR=30 BARE-ONLY (ships Oct 23)",
+      "fresh_check": "32T 4W blocked, net +1.81, fkA 4/24=16.7%, fkB 12.5% — PASS; family-wide 40T 6W fkA 6/29=20.7% FAILS — do not ship family-wide"
+    },
+    {
+      "item": "TAT flip (15th scoped fire + CEO GO)",
+      "fresh_check": "14/15 — 0 new scoped fires since Oct 21 18:58 (POL held only 30m; opens since are ai-trader-pending/volume-buildup-, out of scope)"
+    },
+    {
+      "item": "arm-dampen scope ruling (2 of 3 qualifiers CEO-domain)",
+      "fresh_check": "queued Oct 23 unchanged"
+    },
+    {
+      "item": "MFE-CUT / HML-SHADOW eval Oct 25",
+      "fresh_check": "HML-SHADOW live_pnl flowing (4 lines, trade 16352, first HML close still pending)"
     }
   ],
-  "creative_improvements": [],
-  "config_changes_applied": [],
+  "creative_improvements": [
+    {
+      "date": "2026-10-22T17:52:00Z",
+      "idea": "SLOPE-FILTER short-gate loosening candidate KILLED-WITH-DATA before Oct 25 review",
+      "rationale": "It was the only short gate near the locked criteria (14d net +0.82, WR 2.6%, n=196). Concentration check: +1.56 of positive PnL from 5 events of which 3 are duplicate ATOM blocks the same day (Oct 9, +1.11); ex-ATOM net flips to -0.29; 7d already -0.29; only 17/196 events have would_pnl (n=17 < 50 under resolved-with-pnl reading).",
+      "expected_impact": "prevents a wrong short-gate loosening on cluster-inflated net",
+      "category": "gate scoreboard",
+      "status": "rejected-with-data",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-22T17:52:00Z",
+      "idea": "Gate-evaluation convention: token-day dedup + pnl-nonnull n when applying the locked loosening criteria",
+      "rationale": "gate_shadow dedup_key is per-minute so one setup can count 3x (ATOM); 14d coverage is 2885/17922 closed events with pnl (16%) — 'resolved n>=50' must mean pnl-nonnull n or the bar is meaningless. Zero code — analytic convention for the Oct 25 review.",
+      "expected_impact": "correct candidate selection at Oct 25 short-gate review",
+      "category": "methodology",
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-22T17:52:00Z",
+      "idea": "rsi_drift execution-quality pre-registration (zero code)",
+      "rationale": "rsi_drift stamp (shipped Oct 21 17:45) now live: POL detect 53.62->exec 61.76 (8.14), HBAR detect 67.61->exec 55.35 (12.26). At n>=30 stamped signal-path trades, test |rsi_drift|>10 vs WR (Fisher) and vs hard_max_loss rate; criteria locked now to avoid post-hoc reading.",
+      "expected_impact": "execution-quality signal; may justify staleness-style reject if drift predicts chop exits",
+      "category": "execution quality",
+      "status": "pre-registered",
+      "risk": "low"
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+      "type": "drift",
+      "before": "picks reported as 'FIRED' / 'live signal the pipeline executes'",
+      "after": "AI_TRADER_ENABLED checked first; disabled => 'PICK (watchlist only — will NOT execute)'",
+      "rationale": "misleading to CEO + stale since AI_TRADER disable 2026-10-19",
+      "vacation_rules": "doc-only, hermes_constants.py zero diff"
+    }
+  ],
   "changes_from_last_run": [
     {
-      "change": "HML-SHADOW live_pnl={:+.3f}% (PM:3675)",
-      "verified": "PRESENT",
-      "testable": "no HML close since - correct by traffic"
+      "run": "#78",
+      "change": "round-trip ledger standing metric",
+      "check": "REPRODUCES: 50/350 reached +0.40 gave back -2.90 = 70% of -4.16; RT exits: atr_sl_hit 32 (-2.11) dominates",
+      "verdict": "holding"
     },
     {
-      "change": "rsi_drift stamp (decider_run.py:5115)",
-      "verified": "PRESENT"
+      "run": "#78",
+      "change": "pre-regs",
+      "check": "CONF_FLOOR bare-only PASS fresh (+1.81 / fkA 16.7%) | TAT 14/15 | pump-chain+ kill NOT MET (52T 30.8% +0.13) | pump-chain- CANCEL stands (-0.34)",
+      "verdict": "holding"
     },
     {
-      "change": "wrong-side steer unit fix (price-term >1.5%)",
-      "verified": "0 steers emitted, 0 fires"
-    },
-    {
-      "change": "gate_registry pump-chain+ date correction",
-      "verified": "no re-drift"
-    },
-    {
-      "change": "ARM-GAP instrumentation (position_manager:1335-1362)",
-      "verified": "PRESENT, 1 line logged (SOL #16346) since Oct 21 fix; covers this run's cohort offline via trade_id join"
+      "run": "#77/#76",
+      "change": "unclog waiver + gate scoreboard + exemption-to-open conversion",
+      "check": "flip #1 exercised (ALGO allowed 15:46, knife<35 dead); flip #2 EXERCISED (HBAR volume-buildup- HIGH regime opened 17:13); conversion 0/1 (approved trade blocked same second by BB dead zone)",
+      "verdict": "holding, BB dead zone = binding governor"
     }
   ],
-  "verification_2026_10_22": {
-    "protected_flags": "13/13 resolve, hermes_constants.py ZERO git diff",
-    "tracebacks_oct22": 0,
-    "kill_flags_false": [
-      "DOJI_BOTTOM",
-      "OVERSOLD_BOUNCE",
-      "VOLUME_BUILDUP_PLUS",
-      "HMACD_MTF_PLUS",
-      "HMACD_MTF_MINUS",
-      "VOLUME_BREAKOUT_MINUS"
-    ],
-    "post_kill_opens": 0,
-    "size_reduce": "0.5x file truth (data/vacation_size_reduce.json)",
-    "vacation": "no_constants_change honored - 0 config changes",
-    "conf_floor_bare_only_fresh": {
-      "blocked": 32,
-      "blocked_wins": 4,
-      "net_save": 1.81,
-      "fkA_pct": 16.7,
-      "verdict": "PASS - ship Oct 23 bare-only"
-    },
-    "tat_scoped_fires": "14/15 (last fire 2026-10-21 18:58 NEO)",
-    "short_rsi_hard_floor": "0 violations",
-    "unclog_waiver": "3 scoped items already implemented in tree; expires 2026-10-24"
-  },
-  "losing_autopsy_24h": {
-    "n": 6,
-    "recovered_within_0_2pct_30m": 5,
-    "wrong_side": "REFUTED 11th consecutive run",
-    "detail": "BTC -0.108%/SOL +0.444%/NEO -0.113%/CFX -0.063% recovered <=30m; STX recovered to -0.313% (worst -0.902%); POL #16349 only true non-recovery (-0.883% at 30m, markdown LONG in bear grind). Winning side = FLAT.",
-    "clusters": [
-      "hard_max_loss never-armed chop x2 (POL, STX)",
-      "atr_sl_hit x4 tiny (BTC/SOL/NEO/CFX)"
-    ]
-  },
-  "signal_quality_deep_dive": {
-    "targets_n_ge_15_wr_lt_50_14d": [
-      "ai-trader+ (disabled)",
-      "volume-breakout-long+ (killed Oct 13)",
-      "bb-bounce-v2-long+ (dived #75)",
-      "doji-bottom-long (killed Oct 16)",
-      "pump-chain- (CONF_FLOOR lever)",
-      "pump-chain+ (kill NOT met, +$0.02)",
-      "ai-trader-manual (CEO domain, positive PnL)"
-    ],
-    "new_target": "NONE - every sufficient-n bleed cohort already covered by a shipped kill or a queued Oct 23/25 lever"
-  },
-  "round_trip_ledger_14d": {
-    "method": "candles_1m replay, direction-aware favorable peak, PM_TRAIL bypass attribution from PROFIT_MONSTER_BYPASS_SIGNALS",
-    "system": {
-      "closes": 350,
-      "pnl": -4.16,
-      "roundtrips": 50,
-      "roundtrip_pnl": -2.9,
-      "roundtrip_share_of_bleed_pct": 70
-    },
-    "by_engine": [
-      {
-        "engine": "pump-exit",
-        "n": 110,
-        "wr": 26.4,
-        "pnl": 0.06,
-        "roundtrips": 30,
-        "rt_pnl": -1.71,
-        "pct_reach_040": 55.5
-      },
-      {
-        "engine": "PM_TRAIL-managed",
-        "n": 148,
-        "wr": 46.6,
-        "pnl": -1.85,
-        "roundtrips": 7,
-        "rt_pnl": -0.21,
-        "pct_reach_040": 50.0
-      },
-      {
-        "engine": "rr_engine",
-        "n": 58,
-        "wr": 36.2,
-        "pnl": -0.89,
-        "roundtrips": 5,
-        "rt_pnl": -0.31,
-        "pct_reach_040": 36.2
-      },
-      {
-        "engine": "volbo_atr",
-        "n": 20,
-        "wr": 20.0,
-        "pnl": -1.01,
-        "roundtrips": 4,
-        "rt_pnl": -0.35,
-        "pct_reach_040": 40.0
-      },
-      {
-        "engine": "hl_fill_monitor",
-        "n": 12,
-        "wr": 25.0,
-        "pnl": -0.24,
-        "roundtrips": 3,
-        "rt_pnl": -0.09,
-        "pct_reach_040": 50.0
-      },
-      {
-        "engine": "r2_atr",
-        "n": 2,
-        "wr": 0.0,
-        "pnl": -0.23,
-        "roundtrips": 1,
-        "rt_pnl": -0.23,
-        "pct_reach_040": 100.0
-      }
-    ],
-    "dwell_analysis": "31/64 atr_sl_hit losers dwelled >= +0.40% favorable on 1m closes; median 11 bars, 25 with >=5min, 19 with >=10min (max 86min SOL). Not a sub-minute poll race for the majority.",
-    "verdict": "PM_TRAIL is NOT the leak (7 round-trips/-$0.21). pump-exit owns 59% of round-trip bleed while reaching +0.40% most often. Exit-engine scoped, not entry scoped."
-  },
-  "next_actions": [
-    "Oct 23: ship CONF_FLOOR=30 BARE-ONLY (fresh PASS: 32T4W, net +$1.81, fkA 16.7%) + arm-dampen scope ruling + vacation-end shadow stack - CEO eyeball",
-    "Oct 23: TAT flip still waiting on 15th scoped fire (14/15) + CEO GO",
-    "Oct 25: HML-SHADOW eval, MFE-CUT eval (bb-bounce scope), habitat subtype, re-enter-on-recovery sim, short-gate loosening review",
-    "Oct 25: PUMP-EXIT round-trip counterfactual (scoped trail for PROFIT_MONSTER_BYPASS family) - pairs with escalation #17 candle OOS",
-    "ESCALATION #17 (32nd): exit-ladder / peak-trail candle OOS STILL NOT COMMISSIONED since Oct 14 - it now blocks the single largest measured recovery path (70% of bleed)"
+  "verify_last_run": [
+    "HML-SHADOW live_pnl: 4 lines trade=16352 ✓",
+    "rsi_drift stamp: signal-path opens stamped (POL, HBAR); ai-trader exempt ✓",
+    "wrong-side steer: 0 fires (steers = pending_order only) ✓ unit fix holding 9 runs",
+    "SHORT floor-45: 0 violations (HBAR exec RSI 55.35; WLD 33.6 blocked; waiver band legal) ✓",
+    "kill flags: 0 opens of doji/oversold/volume-breakout-family/ai-trader+ in last 3d ✓",
+    "size-reduce: 0.5x file truth ✓",
+    "CEO_PROTECTED: 13/13, hermes_constants.py zero git diff ✓",
+    "Tracebacks Oct 22: 0 (4 total in log, last Oct 11) ✓"
   ],
-  "readiness": "0 open, flat correct. BTC 15m + 4h SHORT_BIAS, continuum AT/BELOW, LOW vol, CHOP/auto-trader shadow bracket. LONGs only on reclaim of EMA300 WITH volume -> continuum-trend+ (14d 8T 75%). SHORTs aligned until price closes above EMA300 with 15m/1h linreg turning positive. Mid-band = no trade."
+  "signal_quality_deep_dive": {
+    "target": "none new",
+    "14d_n_ge_15_negative": "ai-trader+ (disabled), volume-breakout-long+ (killed Oct 13), bb-bounce-v2-long+ (dived #75, stall-exit levers queued), doji-bottom-long (killed Oct 16), pump-chain- (CONF_FLOOR)",
+    "7d_watch": "pump-chain+ 20T 15.0% -0.54 (14d still +0.13 → kill trigger NOT MET, recheck Oct 23 per pre-reg: 14d n>=20 AND PnL<0 AND WR<30%)",
+    "ceo_domain": "ai-trader-pending 11T 18.2% -0.17 = arm-dampen qualifier, scope ruling Oct 23"
+  },
+  "open_trades": [
+    "16352 HBAR SHORT volume-buildup- entry 0.079349 SL 0.080968 TP 0.077762 conf 77.1 regime HIGH (waiver flip #2)",
+    "16353 BTC SHORT ai-trader-pending entry 81139 SL 81760 TP 80300 (CEO bracket 81480, levels verified correct)"
+  ],
+  "next_actions": [
+    "Oct 23: ship CONF_FLOOR=30 BARE-ONLY (not family-wide) + arm-dampen scope ruling (CEO) + TAT flip at 15th fire + pump-chain+ kill recheck (trigger: 14d PnL<0 AND WR<30) + waiver scoreboard baseline",
+    "Oct 24: unclog waiver expiry decision (pre-registered criteria)",
+    "Oct 25: HML-SHADOW eval + MFE-CUT eval + habitat subtype re-measure + re-enter-on-recovery sim + short-gate loosening review (use token-day dedup convention; SLOPE-FILTER already rejected)",
+    "escalation #17 (34th): exit-ladder candle OOS — still blocks pump-exit trail counterfactual"
+  ]
 }
