@@ -13951,3 +13951,25 @@ Final set: ['BTC', 'INJ']
 - 24h unchanged '-$0.33' on 9T (WR 22.2%); loss clusters: hard_max_loss 2T '-$0.33', atr_sl_hit 4T '-$0.15' (standing SL-width escalation with CEO, Oct 16)
 - 7d '-$2.69' slightly improved from earlier '-$3.03'
 - CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #76
+
+## [2026-10-22 17:28] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (24h: 8T 2W '-$0.22', WR 25.0%) | 7d 156T 37.2% '-$2.97' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour (quiet since ~09:00) — no signal at 0%WR with 3+T last hour
+- Kill check: all 0%WR signals (continuum-trend+, hl_copy_trader, pump-chain-) have <3T 24h and 0T last hour — below threshold; CONF_FLOOR ships Oct 23
+- atr_sl_hit 4/8 = 50% (>40%) BUT tpsl_utils.py deployed (Oct 12 + SL floor 0.60% Oct 21) — tiny n=8 artifact, no alert
+- Neg-hour streak: no trades — no 3h trigger
+- Frequency 0/hr — not overtraded (limit 20)
+- 2 open positions — monitor
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-$0.22' on 8T (WR 25.0%); loss clusters: hard_max_loss 1T '-$0.22', atr_sl_hit 4T '-$0.15' (standing SL-width escalation with CEO, Oct 16)
+- 7d '-$2.97' (was '-$2.69' at 16:27)
+- 2 open positions — check next hour
+- CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #78
