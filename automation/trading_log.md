@@ -14017,3 +14017,25 @@ Final set: ['BTC', 'INJ']
 - 7d '-$3.08' flat vs '-$3.18' last hour
 - 1 open BTC SHORT — check next hour
 - CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #79
+
+## [2026-10-22 20:28 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A) | 24h: 4T 3W '+$0.27' | 7d: 154T 38.0% '-$3.05' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- Empty hour — last close was ZRO SHORT at ~19:28
+- Kill check: no signals closed last hour, no kill trigger
+- atr_sl_hit 0/4 = 0% (<40%) over 24h — no SL-tightness issue
+- Neg-hour streak: none (empty hour), no 3h trigger
+- Frequency 0/hr — not overtraded
+- 1 open position — BTC ai-trader-pending SHORT since 17:14 (entry 81139), audit #81 says HOLD at EMA300 reclaim zone, exit on sustained 15-30m hold above
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '+$0.27' on 4T (WR 75%) — 3rd consecutive green-ish hour, quiet market
+- 7d '-$3.05' slightly better than '-$3.08' last hour
+- BTC SHORT open 3h15m — watch for EMA reclaim exit per audit #81
+- CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #81
