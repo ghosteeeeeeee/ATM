@@ -1544,3 +1544,15 @@
 - **WARN** (1x, recurring 4th): `hermes-signal-reporter.service failed: start operation timed out (40min TimeoutStartUSec, 03:51 UTC)` — analysis/reporting only, 5 prior runs succeeded, no trading impact.
 - **AUTO-FIX**: `systemctl reset-failed hermes-signal-reporter.service` — unit cleared, timer active, retries ~09:49 UTC.
 - **INFO**: Disk 84% (19G free) — still under 85% threshold; no logs >7d to compress. Watch `data/coin_tracker.db`.
+
+## Error Alerts — 2026-10-22 11:45 UTC
+- **WARN** (1030x/30min): `[LOCK-WAIT] info_rate: waited 0.1s, retrying` in hermes-price-collector — signals_hermes.db write contention (price_collector vs pipeline readers). All waits resolved at 0.1s; no failed writes; prices fresh (57s age). No auto-fix applied (transient contention, not a stuck lock).
+- **WARN**: Disk 84% used (94G/118G) — approaching 85% threshold. No logs >7d to compress; largest live log pipeline.log at 237M. Suggest logrotate size cap in a future pass.
+- **WARN**: `[hotset] fallback DB query returned 0 tokens` / `hotset.json is empty — no signals survived compaction` — hotset empty because no signals survived compaction, not a query failure. Market condition, no fix needed.
+- **INFO**: Pipeline portfolio line reports "23 closed today | -11.68% PnL" while PostgreSQL shows 2 closed today (+0.11 USDT, 50% WR). Pipeline "today" appears to count last-24h exits (matches signal_outcomes n=23); the -11.68% appears to be portfolio-% not USDT sum (-0.36 USDT across 24h exits). Flagging for CEO awareness, not a defect confirmed.
+- No vacation pause active. All 4 timers (price-collector, 1m-candle, pipeline, watchdog) active and firing on schedule.
+
+## Error Alerts — 2026-10-22 12:43 UTC
+- **WARN** (1x): Disk usage at 85% on / (94G/118G, 18G free). No logs older than 7 days found to compress; largest logs: pipeline.log 238M, signal-compactor.log 93M, 15m_regime.log 72M.
+- **INFO**: hermes-hl-sync-guardian.timer had no future triggers listed (OnUnitActiveSec cosmetic); timer restarted, service verified active and syncing (0 positions, no orphans/missing).
+- No pipeline errors, no phantom trades, prices fresh (48s). No auto-fixes required.

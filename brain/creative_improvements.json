@@ -6645,5 +6645,41 @@
     "category": "entry filter",
     "status": "rejected",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-22T11:50:00Z",
+    "idea": "conf<30 arm-decomposition: post-ship review criterion for CONF_FLOOR armed stratum",
+    "rationale": "conf<30 UNARMED = 25T 0W -$2.08 = 100% of the bleed; conf<30 ARMED = 15T 6W +$0.10 wash (Fisher arm conf<30 vs >=30 p=0.54 — arm rate is NOT the discriminator, conf<30 arms at 37.5% vs 31.1%). The floor blocks a mix of total-loss unarmed chop and a net-zero armed stratum.",
+    "expected_impact": "no code change; sharpens Oct 23 CEO ship rationale + pre-registers the review question: if post-ship would-block logging ever shows armed-equivalent conf<30 strongly positive at n>=20, revisit block -> 0.5x dampen instead",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T11:50:00Z",
+    "idea": "REJECTED: volume_spike as arm-rate predictor (arm angle)",
+    "rationale": "Hypothesis: no volume at entry -> no momentum -> never arms. Tested 14d: arm% by band <0.5=39.2 / 0.5-1=43.5 / 1-2=45.5 / 2+=22.2(n=18); vol<1 40.1% vs vol>=1 37.3%, Fisher p=0.757. Non-monotonic, not significant. Closes the arm-angle route for volume filters (PnL route already closed #73).",
+    "expected_impact": "none — logged so nobody re-proposes volume filters via the arm/no-arm angle",
+    "category": "entry filter",
+    "status": "rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T12:42:54Z",
+    "idea": "bb-bounce+ signal-scoped MFE-CUT counterfactual (evidence for Oct 25 eval)",
+    "rationale": "14d unarmed bb-bounce+ trades with MFE<0.20 (highest_price vs entry): 11 would-cuts, save $1.16, 0 winner-kill. Regime and confidence do not separate the bleed (EXTREME -$0.37 / NORMAL -$0.27; conf all bands ~wash) — low-MFE never-armed is the separator. n=11<20: evidence only, fold into Oct 25 MFE-CUT eval as bb-bounce scope.",
+    "expected_impact": "if shape holds at n>=20: ~$2.3/14d for this signal; also sharpens TAT-vs-MFE-CUT pick for CEO",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T12:42:54Z",
+    "idea": "TAT vs MFE-CUT overlap map — COMPLEMENTARY not redundant",
+    "rationale": "On the 14-trade TAT-shadow cohort (first-poll live_pnl vs highest_price MFE): 2 trades hit by both levers, 3 TAT-only (MFE>=0.20 but pnl<0 at 55m = retraced-from-high), 1 MFE-only (MFE<0.20 but pnl>=0), 8 neither. Assumption that they overlap was tested and REFUTED — first-close-wins means no double-fire risk either way.",
+    "expected_impact": "informs Oct 23 CEO ratification order for stall-exit levers; adds ~4 extra catches/14d if both ship",
+    "category": "meta",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
