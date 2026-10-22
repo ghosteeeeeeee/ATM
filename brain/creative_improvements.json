@@ -6841,5 +6841,35 @@
     "category": "diagnosis",
     "status": "measured (informs UGB)",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-22T21:45:00Z",
+    "idea": "0.40%-reached ledger — standing metric: did price ever show +0.40% fav before exit",
+    "rationale": "One binary separates the entire book. Trail arm, UGB cohort, ARM-GAP, TAT all orbit this threshold; one ledger reports it every run.",
+    "measured": "14d: reached 173T +8.89 (armed 112 +9.82 / unarmed 61 -0.93) vs not-reached 167T -13.24. 7d atr_sl #1-bleed split: 16T -0.80 reached (UGB class) vs 30T -2.43 never (entry-side).",
+    "expected_impact": "sets honest UGB flip ceiling (~-0.80/7d, ~25% of atr_sl bleed); 75% stays entry-side = queued CONF_FLOOR/arm-dampen stack",
+    "category": "diagnosis",
+    "status": "measured",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T21:45:00Z",
+    "idea": "peak-recording gap: DB trades.highest_price undercounts peak for ~16% of armed trades",
+    "rationale": "21/133 armed 14d show DB-implied fav <0.40 although arm requires live_pnl>=0.40. Any DB-snapshot cohort (UGB/ARM-GAP reconstructions) will misclassify.",
+    "measured": "14d armed 133, of which 21 have (highest_price-based fav) <0.40; live position tracker vs DB snapshot divergence",
+    "expected_impact": "UGB Oct 25 eval must join to live [SHADOW] log lines / candle-walk, not trades.highest_price alone",
+    "category": "data-quality",
+    "status": "flagged",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T21:45:00Z",
+    "idea": "CONF_FLOOR fkA slide watch — pre-ship recompute locked",
+    "rationale": "fkA moved 16.7%->19.0% in 2h purely from window aging (bare winners 24->21). Ship decision must be made on fkA computed at ship time, not on #81's number.",
+    "measured": "blocked wins 4 constant; fkA = 4/21 = 19.0% now, bar is 20%",
+    "expected_impact": "prevents shipping on a stale passing number (same failure mode as #71's stale 6.3%)",
+    "category": "process",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
