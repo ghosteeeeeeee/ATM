@@ -1568,3 +1568,11 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3239s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3239s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] USELESS TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-22 16:43 UTC
+- **[WARN]** Disk at 84% (19G free of 118G). Top consumers: coin_tracker.db 3.3G, session_brain.db 1.5G, candles.db 1.2G, signals_hermes.db 1.1G, pipeline.log 241M. Compressed old .err.log files (minimal gain — big logs are active). Monitor; clean coin_tracker.db / session_brain.db if it crosses 85%.
+- **[WARN]** Performance: 9 Hermes trades closed in last 24h, cumulative -11.00% pnl_pct. Worst: STX r2v2-long4 -4.90%, POL bb-bounce-v2-long+ -4.85%, NEO bb-bounce-v2-long+ -2.35%. bb-bounce-v2-long+ took 3 losses in 24h — review signal quality.
+- **[INFO]** Pipeline log shows "[hotset] fallback DB query returned 0 tokens" — hotset.json has 3 tokens; fallback path may need review. Non-blocking.
+
+## Error Alerts — 2026-10-22 17:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor: N.N < N`

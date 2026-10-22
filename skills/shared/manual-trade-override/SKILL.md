@@ -52,11 +52,16 @@ cd /root/.hermes/scripts && python3 brain.py trade add COIN DIRECTION AMOUNT ENT
 cd /root/.hermes/scripts && python3 ai_trader_precheck.py COIN DIRECTION
 ```
 
-Even for manual trades, the RR engine and exit management will manage the position. The precheck tells you:
-- RR engine verdict (will exit management work?)
-- RSI position (avoid extremes)
+The precheck is ADVISORY for CEO trades (2026-10-22 standing rule): a FAIL never blocks, but it MUST be reported to the CEO, never hidden. It tells you:
+- RR engine verdict (context only — the RR engine does NOT manage CEO trades, see THE CONTRACT below)
+- RSI position — direction sanity vs extremes: never short an extreme oversold / long an extreme overbought (BANANA lesson: entry at RSI 10.53 was the fault, not the timing)
 - Volatility (is there room for SL/TP?)
 - 30d winrate (is this coin a known loser?)
+
+**Before hitting enter — the three mandatory checks:**
+1. **Explicit levels**: `--sl` and `--target` ALWAYS set — bare opens are never acceptable
+2. **Leverage**: 5x in chop (≥2 EMA300 flips/24h), 10x max, 40x only ever TREND + volume (#16307: a -0.53% sweep cost -21.4% margin at 40x)
+3. **Fill sanity**: current price vs the level you're entering at — if price has already blown through your SL zone, the trade is dead on arrival (#16350: filled 488pt deep, below its own SL, closed on the first tick)
 
 ## Example: Open GRASS LONG
 
@@ -85,17 +90,18 @@ python3 brain.py trade add GRASS long 11.10 0.86897 --real --manual \
 1. **Trade opens on Hyperliquid** — mirrored position
 2. **PostgreSQL records trade** — `signal='ai-trader-manual'`, `atr_managed=False`
 3. **Dashboard shows trade** — via trades.json (updated every minute)
-4. **Exit management activates** — `ai-trader` prefix matches `SIGNAL_EXIT_CONFIG` → `rr_engine`
-5. **Position manager manages** — trailing stops, ATR SL/TP, guardian protection
+4. **Exit management activates** — `manual_exit_manager.py` is the SOLE exit authority for this trade (THE CONTRACT below): your predefined SL/TP + one close trail, nothing else rewrites levels
+5. **Guardian protection** — safety nets only (hard caps, max-hold, staleness)
 
 ## Exit Management
 
-Manual trades use the same exit management as AI trader signals:
-- **RR Engine exit** — structural S/R based SL/TP
-- **Trailing stops** — activated at profit threshold
-- **Guardian protection** — loss limits, staleness checks
-
-The `ai-trader` prefix in the signal tag (`ai-trader-manual`) matches the exit config automatically.
+CEO trades do NOT use the rr_engine/ATR exit path — **THE CONTRACT below is
+authoritative** (this section said "same as AI trader signals" before
+2026-10-22; that was pre-contract and is wrong). Summary: your predefined
+SL/TP are honored exactly as set, one close trail (0.40% activate / 0.20%
+distance / ratchet-only), guardian safety nets on top, and the
+`manual_sl_hit`/`manual_tp_hit`/`manual_trail_hit` labels are the ownership
+receipt.
 
 ## Exit Management for CEO Trades — THE CONTRACT (manual / pending / auto)
 
@@ -106,7 +112,9 @@ trades** (CEO directive 2026-10-22). The rules:
    (`--sl` / `--target`); NOTHING structurally rewrites them. Every other
    SL actor is excluded for these signals: the RR engine (was moving them
    — #16306 81990→82486, #16317 83150→82965), sl_zones tighten, the soft
-   peak-trigger, and the ATR level manager. Auto signal trades
+   peak-trigger, the ATR level manager, the watchdog `move_stop` auto-exec,
+   the pump/ride gates, and profit-monster (`ai-trader` substring
+   bypass). Auto signal trades
    (ai-trader+/pump-chain etc.) keep all their engines — the exclusion is
    CEO-trade-only.
 2. **Close trailing** — the only automatic SL movement:
@@ -122,6 +130,12 @@ trades** (CEO directive 2026-10-22). The rules:
    - `manual_trail_hit` — the close trail took profit
    - Seeing `rr_engine_*` or `atr_*` on one of these trades = a routing
      bug — report it immediately.
+5. **OPEN ITEM (bug_hunter 2026-10-22, pending CEO ruling):** structural
+   CLOSE actors — `wave_turn`, MACD cascade flips — can still exit these
+   trades. They don't write SLs (contract item 1 holds) but they are a
+   third exit philosophy. `cut_loser`/`stale_exit`/weather-vane are
+   treated as safety. Ruling pending: leave / exclude the structural two
+   / strict safety-only.
 
 ### Setting/adjusting manual SL
 
@@ -149,25 +163,35 @@ print('SL moved to', NEW_SL)
 
 ## Verification
 
-After opening, verify the trade:
+After opening, verify — **levels included, and compare them to what you set**:
 ```bash
-# Check PostgreSQL
+# 1. PostgreSQL (source of truth) — must show your exact SL/TP/leverage
 python3 -c "
 import sys; sys.path.insert(0, '/root/.hermes/scripts')
 import psycopg2
-conn = psycopg2.connect('host=/var/run/postgresql dbname=brain user=postgres')
+from _secrets import BRAIN_DB_DICT
+conn = psycopg2.connect(**BRAIN_DB_DICT)
 cur = conn.cursor()
-cur.execute('SELECT id, token, direction, entry_price, signal, status FROM trades WHERE token=\"COIN\" AND status=\"open\" ORDER BY id DESC LIMIT 1')
+cur.execute('SELECT id, direction, entry_price, stop_loss, target, leverage, signal, status FROM trades WHERE token=%s AND status=%s ORDER BY id DESC LIMIT 1', ('COIN', 'open'))
 for row in cur.fetchall():
-    print(f'#{row[0]} {row[1]} {row[2]} entry={row[3]} signal={row[4]} status={row[5]}')
+    print(f'#{row[0]} {row[1]} entry={row[2]} SL={row[3]} TP={row[4]} lev={row[5]}x signal={row[6]} status={row[7]}')
 conn.close()
 "
+# 2. Exchange side (verify, don't trust) — DB and HL must agree
+python3 -c "
+import sys; sys.path.insert(0, '/root/.hermes/scripts')
+from hyperliquid_exchange import get_open_hype_positions
+print(get_open_hype_positions())
+"
 ```
+Mismatch between DB levels and what you set = fix before walking away.
+Also note the FILL vs your entry price (adverse slip in fast tape — see
+arming rule 9) — report it, it feeds the slip-buffer sizing.
 
 ## Safety Notes
 
 - **This bypasses signal gates** — the trade will open even if RSI, RR engine, or other filters would normally block it
-- **Exit management still applies** — the trade will be managed by rr_engine after opening
+- **Exit management still applies** — via `manual_exit_manager` (THE CONTRACT): your predefined SL/TP + one close trail; guardian safety nets on top — NOT the rr_engine path
 - **Use appropriate position sizing** — manual trades should be same size as signal trades ($11-20 USDT)
 - **Log the reason** — include why you're overriding in the `--signal` or notes
 
@@ -196,7 +220,8 @@ with the engine on a temp state path — never the live state file.
    at MAJOR structure: the 1h/4h swing levels from structure_analysis.py,
    never a shelf formed in the last few bars.
 3. **SLs need wick room: 200+ pts in BTC chop.** A 70pt SL got slipped;
-   a 226pt SL got slipped 208pts (#16273). Quote REAL R:R with a
+   a 226pt SL got slipped 208pts (#16273); a fast-tape fire slipped 281pt
+   adverse on the fill (#16353, 2026-10-22). Quote REAL R:R with a
    100-200pt slip buffer — if real R:R < 1.0, deepen the TP or don't arm.
 4. **Both-sides brackets must be verified non-overlapping** — each order's
    SL must sit between the other's trigger path, so neither can be open
@@ -208,6 +233,26 @@ with the engine on a temp state path — never the live state file.
    -21.4% margin (#16307). Max leverage is for TREND + volume, never chop.
 7. **Precheck runs and its FAIL reasons go in the order `note`** — advisory
    for CEO trades, never hidden.
+8. **Direction mapping is printed back and confirmed BEFORE the config is
+   written** (full-analysis §12): **lower break = SHORT, upper break =
+   LONG** — the mapping, at the CEO's own levels. 2026-10-22 miss: an
+   analyst proposal wired BOTH bracket legs LONG; at the 84,240 break a
+   LONG fired while the CEO expected a SHORT — the 1,100-pt decline went
+   the wrong way. When the CEO writes the level together with the
+   direction ("short below X, long above Y"), that sentence IS the
+   confirmation — quote it back and arm.
+9. **After a fire, verify the FILL against the trigger and the SL.**
+   #16350: filled 488pt deep — already through its own SL, dead on
+   arrival, closed on the first tick. #16353: 281pt adverse slip in a
+   fast tape (still a live, workable trade — entry 281pt worse, SL/TP
+   unchanged). Report the slip; a fill ALREADY beyond the SL is a bug
+   event — stop and report (fill-sanity engine guard pending CEO ruling).
+
+**Tranche adds to an existing position:** brain.py's duplicate guard blocks
+a second same-coin open — for a CEO-directed add pass `--force`
+(manual-only; the pipeline never passes it). Remember same-coin tranches
+MERGE on Hyperliquid (rule 5): first level closes the whole position, so
+align TPs before adding.
 
 ## Related Skills
 

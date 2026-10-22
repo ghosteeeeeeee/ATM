@@ -268,7 +268,12 @@ def precheck(coin, direction, conf=None):
     # 3c. LOSERS/PENALTY check
     try:
         from hermes_constants import LOSERS, LOSERS_LONG, LOSERS_SHORT, PENALTY_TOKENS
-        in_losers = token in LOSERS or token in LOSERS_LONG or token in LOSERS_SHORT
+        # FIX 2026-10-22: direction-scope LOSERS_LONG/LOSERS_SHORT to match pipeline
+        # (decider_run.py:369, signal_compactor.py:1757). Cross-direction membership
+        # was hard-blocking e.g. HBAR SHORT because HBAR in LOSERS_LONG, with an
+        # empty reason string. Combined LOSERS and PENALTY still block both directions.
+        in_losers = token in LOSERS or (direction == 'LONG' and token in LOSERS_LONG) \
+            or (direction == 'SHORT' and token in LOSERS_SHORT)
         in_penalty = token in PENALTY_TOKENS
         if in_losers or in_penalty:
             reasons = []
