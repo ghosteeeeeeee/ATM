@@ -1804,5 +1804,16 @@
     "after": "BTC_REGIME_ALIGN_ENABLED = False (unchanged), comment now carries 2026-10-22 review verdict KEEP OFF + numbers",
     "rationale": "vacation no_constants_change respected (value untouched); closes a stale promised review on an OFF feature that would loosen the worst-performing cell",
     "impact": "zero live behavior; prevents future enable without OOS evidence"
+  },
+  {
+    "timestamp": "2026-10-22T05:46:03Z",
+    "agent": "brain_auditor",
+    "change": "Watchdog wrong-side steer unit fix: account% pnl_pct (price% x leverage) threshold >2.0 counted every designed stop at 5x as wrong-side; converted to price-term >1.5% with leverage normalization",
+    "type": "bugfix",
+    "file": "scripts/trade_watchdog.py",
+    "before": "abs(pnl_pct) > 2.0 (account%) — fired >=3 on 23/30 days, counted HML/atr_sl stops as wrong-side; steer refuted 6 consecutive runs (17/17 24h losers recovered within -0.2% in 30m)",
+    "after": "abs(pnl_pct)/leverage > 1.5 (price%) — 30d: 10/384 losses fire (vs 234), >=3-cluster exactly 1 day (Sep 24 genuine squeeze); 24h self-check 0 fires, Sep 24 self-check 5 fires, py_compile PASS | post-review hardening: leverage<=0 rows are skipped (cannot normalize) instead of falling back to account% comparison (reviewer: SHIP, 0/5970 rows have NULL leverage)",
+    "rationale": "Root cause of 6-run false-positive loop: detector measured account terms where leverage multiplies chop noise past threshold; safety net firing read as directional error",
+    "impact": "steer-001 goes quiet on chop stop clusters (correct), still fires on real wrong-side days (price >1.5% x3+) — advisory only, zero trading behavior"
   }
 ]

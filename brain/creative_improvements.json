@@ -6527,5 +6527,31 @@
     "category": "verification",
     "status": "pre-registered",
     "risk": "zero (read-only candle replay)"
+  },
+  {
+    "date": "2026-10-22T05:46:52Z",
+    "idea": "Wrong-side steer precision fix (shipped): leverage-normalized price-term threshold",
+    "rationale": "6 consecutive refuted runs = detector measured account noise; 17/17 24h losers recovered within -0.2% of entry in 30m (1m candles)",
+    "expected_impact": "steer precision 0/6 -> fires only on genuine adverse clusters (10/384 losses 30d, 1 cluster/30d)",
+    "category": "steer quality",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T05:46:52Z",
+    "idea": "Steer-precision retirement rule: any steer type refuted 3 consecutive runs -> auto-demote to info until verified once",
+    "rationale": "wrong-side was 0/6 precise and consumed audit attention every run; generalize the fix into a standing rule",
+    "expected_impact": "less audit noise, steers actionable",
+    "category": "steer quality",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T05:46:52Z",
+    "idea": "btc_score band sweep — MEASURED AND REJECTED (redundant with btc_regime)",
+    "rationale": "55-65 band positive all 3 windows (+0.04/+0.02/+0.53) but cross-tab flat: within RANGING score adds nothing (+0.82/+0.86 both bands), within OTHER all negative — btc_regime carries the entire edge",
+    "category": "feature sweep",
+    "status": "rejected-redundant",
+    "risk": "n/a"
   }
 ]

@@ -841,9 +841,15 @@ def analyze_recent_losses(recent_trades):
 
     # Pattern: wrong direction
     # brain_auditor 2026-10-08: was abs(pnl_usdt)/entry_price > 0.02 — unit bug.
-    # pnl_usdt is USDT, entry_price is coin price; ratio fires on EVERY loss
-    # regardless of magnitude (FIL -2.70% and APT -0.47% both triggered).
-    # Correct: loss > 2% of position = wrong-side. Uses pnl_pct.
+    # brain_auditor 2026-10-22: account% threshold was a 2nd unit bug. pnl_pct is
+    # account% (price% x leverage), so EVERY designed stop at 5x (HML -4% account
+    # = -0.8% price) cleared the 2% bar — detector counted the safety net as
+    # wrong-side. Evidence: fired >=3 on 23/30 days; 6 consecutive audit runs
+    # refuted it (17/17 24h losers recovered within -0.2% of entry in 30m of
+    # 1m candles); 7d account>2% losses avg only 0.53-1.12% PRICE against.
+    # Correct: price-term loss > 1.5% = real adverse move. 30d: fires on 10/384
+    # losses (vs 234), >=3-cluster on exactly 1 day (Sep 24: 4 pump-chain SHORTs
+    # + 1 LONG squeezed 1.5-2.0% = genuine wrong-side day).
     wrong_side = 0
     for t in losses:
         pnl_pct = t.get("pnl_pct")
@@ -853,16 +859,20 @@ def analyze_recent_losses(recent_trades):
             if amt <= 0:
                 continue
             pnl_pct = (pnl / amt) * 100
-        if abs(float(pnl_pct)) > 2.0:
+        lev = float(t.get("leverage") or 0)
+        if lev <= 0:
+            continue  # can't normalize to price terms — skip rather than fall back to account% (the old bug)
+        if abs(float(pnl_pct)) / lev > 1.5:
             wrong_side += 1
 
     if wrong_side >= 3:
         steers.append({
             "severity": "warning",
             "category": "health",
-            "title": f"{wrong_side} recent losses look like wrong-side trades",
-            "detail": "Multiple losses >2% of position suggest we're fading momentum. "
-                      "Check if signals are aligned with trend.",
+            "title": f"{wrong_side} recent losses moved >1.5% price against us",
+            "detail": "Multiple price-term losses >1.5% (leverage-normalized) "
+                      "suggest we're fading momentum. Check if signals are "
+                      "aligned with trend.",
             "auto_executable": False
         })
 
