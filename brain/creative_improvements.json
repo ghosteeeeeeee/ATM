@@ -6432,5 +6432,35 @@
     "category": "regime",
     "status": "noted",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-22T01:43:16Z",
+    "idea": "TAT flip-readiness: 14/15 valid unique fires + first-fire counterfactual table",
+    "rationale": "Counted from pipeline.log [SHADOW] TRAIL-ARM would-fire lines, scope-fixed (bb-bounce + ai-trader+ only, manual/pending excluded per Oct 20 fix): 14 unique valid trades (9 pre-Oct20 + 5 since). One more fire = flip-eval bar hit.",
+    "counterfactual_first_fire": {
+      "base_variant": "7 SAVE +13.14pp vs 7 KILL -9.75pp = NET +3.39pp but fk 7/14=50% FAILS fk<20% bar",
+      "variant_C_fire_only_negative_pnl": "5 SAVE +8.79pp vs 0 KILL = fk 0% — passes fk bar, smaller save",
+      "worst_kills": "DOGE 16321 (+0.31 fire -> +3.64 actual = -3.33pp), AIXBT 16330 (-2.45pp), BANANA 16348 (-0.71pp)",
+      "best_saves": "ME 16287 +2.60, NEO 16344 +2.32, DOGE 16284 +2.08, LDO 16282 +2.28"
+    },
+    "expected_impact": "Variant-C flip would cut never-armed losers at ~-0.2% instead of -2.0% without touching trail winners",
+    "category": "exit early in chop",
+    "status": "pre-registered",
+    "risk": "low (shadow until 15th fire + CEO GO)",
+    "flip_criteria": "15 valid fires AND variant-C fk<20% AND net>0 AND CEO GO (locked before 15th fire arrives)"
+  },
+  {
+    "date": "2026-10-22T01:43:16Z",
+    "idea": "REJECTED-WITH-DATA: same-token re-entry cooldown after same-day loss",
+    "rationale": "14d: re-entries after same-day loss 65T 33.8% -0.62 vs no-prior-loss 288T 35.8% -4.36 — 2pp WR difference = wash, no edge in blocking.",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-22T01:43:16Z",
+    "idea": "Gate-pileup hotset stall hypothesis VERIFIED NOT-A-BUG (watchdog handoff #2)",
+    "rationale": "hotset.json rewritten 01:32, gates actively firing (CONTINUUM-BLOCK 55 / BTC-CHOP 26). Not a stalled path.",
+    "status": "decided",
+    "risk": "n/a"
   }
 ]
