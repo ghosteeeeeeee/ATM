@@ -6508,5 +6508,24 @@
     "status": "rejected-with-data",
     "risk": "none",
     "n": 188
+  },
+  {
+    "date": "2026-10-22T04:50:00Z",
+    "idea": "BTC-regime habitat map: RANGING/RANGING_BULL is the only profitable BTC regime — pre-register RANGING-class confidence boost (positive lever) and a scoped non-RANGING fc<50 dampen whose criteria currently FAIL (re-measure Oct 25)",
+    "rationale": "Fresh feature sweep (14 continuous + 6 categorical, Bonferroni 0.0025): btc_regime is the only separator that survives — RANGING-class 7d 22T 72.7% +$0.41 / 14d 75T 53.3% +$0.58 / 30d 163T 56.4% +$1.68 vs rest 31.5%/30.5%/38.8% (Fisher p=0.0005/0.0005/0.0001), 5/5 weeks better, 28/29 days mixed (not period-clustered), both directions, within-family too (bb RANGING 28T +0.59 vs rest 60T -0.93; pump RANGING 47T +1.70 vs rest 178T -1.29). Arm rate 50.3% vs 40.3% explains part but not all (armed WR 87.8% vs 73.7%).",
+    "expected_impact": "dampen variant: +$3.04/30d if shipped at 0.80x, BUT 14d within-class p=0.0945 and fk 21.6% both FAIL bars -> not shipped. Boost variant: zero winner-kill but catch unmeasurable without new instrumentation.",
+    "category": "regime habitat / entry sniper",
+    "status": "pre-registered",
+    "risk": "low (nothing shipped; vacation soak, no_constants_change)",
+    "criteria": "Dampen ship only if: non-RANGING fc<50 vs fc>=50 p<0.05 AND fk<20% AND save>$1/14d (all three FAIL today: p=0.0945, fk 21.6%, save $3.04/30d~$1.41/14d) — re-measure Oct 25. Boost ship only with CEO GO + defined measurement vehicle."
+  },
+  {
+    "date": "2026-10-22T04:50:00Z",
+    "idea": "BTC-REGIME-ALIGN shadow outcome study: replay 1m/5m candle path after each would-allow fire to score the counterfactual trades (method from audit #68 1m path autopsy)",
+    "rationale": "5081 shadow would-allow lines exist but have zero outcome data; class-level proxy (p=0.90) says no edge, but the bypassed set is narrower (LONG in 4h NEUTRAL only) and never directly scored.",
+    "expected_impact": "Definitive keep-OFF/enable verdict for CEO on a feature specced Oct 8 whose 7d review was never delivered until today.",
+    "category": "verification",
+    "status": "pre-registered",
+    "risk": "zero (read-only candle replay)"
   }
 ]

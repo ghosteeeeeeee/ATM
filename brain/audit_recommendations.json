@@ -1,172 +1,194 @@
 {
-  "timestamp": "2026-10-22T03:59:35Z",
-  "run": "brain_auditor #68",
+  "timestamp": "2026-10-22T04:51:41Z",
+  "run": "brain_auditor #69",
   "session_brain_stats": {
     "queries_run": [
-      "signal performance winrate regime chop trend",
+      "signal performance winrate regime",
       "new signal idea improvement strategy",
-      "loss money bleeding losing wrong side"
+      "loss money bleeding losing"
     ],
     "top_hits": [
-      "pump-chain-short (dig deeper / filters / backtest original winners)",
-      "turning tide - chop detector (mean-reversion signals during oscillation)",
-      "trend following signal (build a really solid trend-following signal)",
-      "trend following / wider exits (exit system = #1 profit leak, 30d)"
-    ],
-    "drift_vs_code": "No unresolved drift. 'exit system is the #1 profit leak' thesis is already the live exit-ladder/HML body of work; this run tested and REJECTED the inverse policy (hold through stops) with corrected units."
+      "trend following signal / wider exits: exit system #1 profit leak thesis (recurs 4+ sessions)",
+      "signal-lab build ideas (grind-to-spike, trend following) discussed",
+      "R:R threshold 0.95 suggestion on record"
+    ]
   },
   "trade_summary_24h": {
     "n": 31,
     "wins": 13,
     "wr": 41.9,
     "pnl_usdt": -0.59,
-    "armed": 17,
-    "by_direction": {
-      "LONG": "29T 13W ~-0.45",
-      "SHORT": "3T 0W -0.14 (approx from prior query)"
-    },
     "7d": {
       "n": 158,
       "wins": 58,
       "wr": 36.7,
       "pnl_usdt": -3.14
     },
-    "7d_exit_families": {
-      "trail_family": "profit-monster-trail 37T 89.2% +1.68 + atr_trail_hit 11T 72.7% +1.45 = 48T +3.13",
-      "chop_family": "atr_sl_hit 48T 2.1% -3.41 + hard_max_loss 21T 0% -2.56 + trail_arm_timeout 10T 10% -0.52 + stale_exit 3T 0% -0.62 = 82T -7.11"
+    "armed_7d": {
+      "n": 64,
+      "wr": 73.4,
+      "pnl_usdt": 3.48
     },
-    "7d_armed_vs_unarmed": {
-      "armed": "64T 73.4% +3.48",
-      "unarmed": "95T 11.6% -6.74"
+    "unarmed_7d": {
+      "n": 94,
+      "wr": 11.6,
+      "pnl_usdt": -6.62
     },
-    "open_trades": 0,
-    "size_multiplier": 0.5
+    "open": 0,
+    "size_reduce": "0.5x (vacation_size_reduce.json file truth)",
+    "exits_7d_top": "profit-monster-trail 37T 33W +1.68 | atr_sl_hit 48T 1W -3.41 | hard_max_loss 20T 0W -2.44"
   },
   "drift_findings": [
     {
-      "id": "drift-1",
-      "severity": "HIGH (data integrity, zero trading impact)",
-      "finding": "HML-SHADOW (CEO 2026-10-18, eval pre-registered for Oct 25) produced 0 log lines since ship because ATR_SL_MIN (0.015, a FRACTION) was negated raw against percent thresholds: min(-0.80, -0.015) == -0.80 == actual, so the != gate never fired.",
-      "evidence": "grep -c HML-SHADOW logs/*.log = 0; HARD MAX-LOSS EXIT = 129 lines in same file (path works); repro: CUT_LOSER=-4.0 lev5 -> HML=-0.800, shadow=-0.800, would_log=False.",
-      "action": "FIXED this run (unit *100 + once-per-trade dedup). Zero live behavior. py_compile + assert self-check PASS (lev3 -1.333->-1.500, lev5 -0.800->-1.500, lev10 -0.400->-1.500 all fire; old logic confirmed dead).",
-      "file": "scripts/position_manager.py"
+      "finding": "BTC_REGIME_ALIGN_ENABLED (CEO-approved 2026-10-08) never got its promised 7d review",
+      "status": "FIXED THIS RUN — review delivered with data, flag stays OFF, comment stamped (hermes_constants.py:1186-1196, zero behavior)",
+      "evidence": "trigger class BULL_TREND/RANGING_BULL LONG since Oct 8: 117T 37.6% -$2.02 vs others 131T 38.9% -$1.71, Fisher p=0.90 = no edge in the class the bypass would loosen; 5081 shadow would-allow lines with no outcome data"
     },
     {
-      "id": "drift-2",
-      "severity": "MEDIUM (audit-trail only)",
-      "finding": "auto_1hr's Oct 22 pump-chain- kill-recheck line cites 'EXTREME +$0.75 wins' — that number is family-wide (signal LIKE 'pump-chain%' 14d EXTREME 92T 26W +$0.75), NOT the bare 'pump-chain-' signal under the pre-registered kill rule (bare 14d EXTREME 33T 8W -$0.43).",
-      "evidence": "exact signal='pump-chain-' 14d: 37T 8W -$0.57; EXTREME -$0.43, NORMAL -$0.14; 7d bare EXTREME -$0.49. No scope reproduces +$0.75 for bare.",
-      "action": "Verdict UNCHANGED (CANCEL) — collision math holds under bare scope: conf>=30 bare 28T 8W -$0.04 = wash, conf<30 bare 9T 0W -$0.53 = 93% of bleed, all 8 bare winners are conf>=30 (+$1.27). Number corrected in this run's record.",
-      "file": "automation/recent_changes.log"
+      "finding": "MIN_EXEC_CONFIDENCE hardcoded = 40 in decider_run.py:3442 (flagged #64, still open)",
+      "status": "carried, no action (vacation; global raise already REJECTED #67 with data)"
+    },
+    {
+      "finding": "STANDALONE_BYPASS chop exemption",
+      "status": "NOT drift — CEO 2026-10-01 decree (reconfirmed #61)"
     }
   ],
   "recurring_problems": [
     {
-      "topic": "wealth gap: trail-family wins, chop-family loses",
-      "status": "structural, unchanged 4th run",
-      "data": "7d trail +$3.13 (48T 83%) vs chop -$7.11 (82T 4%); armed +$3.48 vs unarmed -$6.74",
-      "note": "Both directions lose (7d LONG 120T -$2.19, SHORT 39T -$1.07) — entry quality, not direction, is the cancer."
+      "topic": "watchdog steer-001 wrong-side trades",
+      "runs_flagged": "5th consecutive",
+      "verdict": "REFUTED again with this run's autopsy: 14/17 24h losers = never-armed chop (13 never reached +0.40%), 3 armed losers all <= -$0.02 (trail giveback contained); #68 1m path: 13/18 recovered within -0.2% of entry in 30m; #61 opposite-side audit p=0.116 = 85% have NO opposing setup. Winning side on the losers = FLAT, not the other direction."
     },
     {
-      "topic": "watchdog steer 001 'wrong-side trades'",
-      "status": "REFUTED (3rd+ consecutive run)",
-      "method": "1m candle path check for all 18 24h losers: price at entry+30m vs entry",
-      "result": "13/18 recovered to within -0.2% of entry (chop/noise stop-outs), 4 mixed, only 1 clear wrong-side (POL bb-bounce LONG, -1.12% against). Combined with #61 opposite-side audit (p=0.116)."
+      "topic": "trail-vs-chop wealth gap",
+      "status": "UNCHANGED and healthy: 7d armed 64T 73.4% +$3.48 vs unarmed 94T 11.6% -$6.62; 14d by family ALL families positive-when-armed / negative-when-unarmed (pump armed 38T +3.91 vs unarmed 76T -4.55)"
     },
     {
-      "topic": "signal stream long-heavy in a bear tape",
-      "status": "MONITOR (coin_regime stamp n=48 collecting)",
-      "data": "14d stamped: ALIGNED 26T 42.3% +$0.10 vs COUNTER 22T 31.8% -$0.61 — directional but p>0.05 (Fisher n=48). COUNTER conf>=25 19T -$0.50 just under n>=20 bar."
+      "topic": "fc40-50 confidence bleed",
+      "status": "CONF_FLOOR=30 ships Oct 23 (pump-chain scope): 14d conf<30 51T 12W -$2.08, 2 fresh live proofs today CFX #16347 conf 29.5 -$0.04 + INJ #16343 conf 29.5 -$0.08"
     }
   ],
-  "missing_implementations": [],
-  "tested_and_rejected_this_run": [
+  "missing_implementations": [
     {
-      "idea": "Hold through stop-outs (ignore SL, exit at +15/30/60m with -4% floor)",
-      "first_pass_result": "FAKE +$9.77/14d — unit bug: compared actual pnl_pct (ACCOUNT %, = price% x leverage) against counterfactual price%",
-      "corrected_result": "price% terms, n=188 stopped trades (atr_sl_hit + hard_max_loss + trail_arm_timeout, 14d): actual -119.4% vs hold30/floor-1.5 -124.9% => delta -5.4% price, $-0.20 over 14d; floor -2.0..-3.0 worse ($-1.09..$-2.18); only 40-48% of trades improve; OOS sign-flips (7d +$0.70 vs d8-14 -$0.90 at floor-1.5)",
-      "verdict": "REJECTED-WITH-DATA. Exit timing is not the leak in price terms; log so it is never re-proposed from the account%-only view.",
-      "confidence": "HIGH"
+      "item": "CONF_PUMP_CHAIN_FLOOR=30",
+      "state": "pre-ship verified, code not staged, ships Oct 23 with CEO eyeball"
     },
     {
-      "idea": "Block z_score_tier='low' (all directions)",
-      "result": "30d 127T 34.6% -$3.45, 7d winner-kill 2/49=4.1% (good) BUT Fisher p=0.0588 > 0.05; 14d p=0.1398. Multiple-comparison exposure (5 tiers x 2 directions scanned).",
-      "verdict": "REJECTED (p>0.05). Monitor only."
+      "item": "TAT flip",
+      "state": "14/15 valid fires, variant-C fk 0%, waiting 15th fire + CEO GO"
     },
     {
-      "idea": "Block LONG at low bb_position / low z_score (median split, pooled scan looked significant)",
-      "result": "Pooled 30d arm p=0.009 and z p=0.014 COLLAPSE after direction split: LONG-only bb p_arm=0.278/p_wr=0.276, z p_arm=0.208; SHORT-only p=1.000/0.375.",
-      "verdict": "REJECTED — confounded by direction mix. Classic Simpson collapse; flagged so nobody ships the pooled number."
-    },
-    {
-      "idea": "Momentum_score as arm predictor",
-      "result": "30d p_arm=0.025 but 14d p_arm=0.732 and sign flips (14d hi worse, 30d lo worse).",
-      "verdict": "REJECTED — OOS inconsistent."
+      "item": "signal-scoped exit-ladder / residual confidence-bleed ledger",
+      "state": "re-measure Oct 25 per #67"
     }
   ],
-  "config_changes_applied": [],
-  "bugfixes_applied": [
-    {
-      "file": "scripts/position_manager.py",
-      "what": "HML-SHADOW unit fix (*100) + once-per-trade dedup",
-      "live_behavior": "none (log-only shadow)",
-      "verified": "py_compile OK + assert self-check PASS"
-    }
-  ],
+  "losing_trade_autopsy_24h": {
+    "losers": 17,
+    "clusters": [
+      {
+        "cluster": "never-armed chop (14T)",
+        "examples": "POL bb-bounce -0.22 hard_max_loss 30m mfe -0.01 coin SHORT_BIAS rsi_drift 8.14 | STX r2v2-long4 -0.11 HML 15m EXTREME | INJ pump-chain+ -0.08/-0.08 HML 14/24m EXTREME | XPL bb-squeeze -0.08 HML gap 1.21 chase | PUMP r2v2 -0.13 HML",
+        "root_cause": "no momentum, never reached trail arm (+0.40%) — correct exits, wrong (or absent) setup; winning side = flat, per opposite-side audit (p=0.116) and 1m path (13/18 recovered <=30m)",
+        "recommended_change": "NONE new — covered by CONF_FLOOR (ships Oct 23), chase filter (already live), EXTREME conf mult 0.85 (live), size-reduce 0.5x (active)"
+      },
+      {
+        "cluster": "conf<30 floor admits (2T)",
+        "examples": "CFX pump-chain- conf 29.5 -0.04 | INJ pump-chain+ conf 29.5 -0.08",
+        "root_cause": "below the verified floor that ships tomorrow",
+        "recommended_change": "PUMP_CHAIN_CONF_FLOOR=30 — already staged for Oct 23, do not touch today"
+      },
+      {
+        "cluster": "armed losers (3T)",
+        "examples": "WLD r2v2 -0.01 (mfe 4.3% gave back) | SYRUP continuation -0.02 | GOAT bb-bounce -0.01",
+        "root_cause": "trail giveback, all <= $0.02 — exit mechanics working",
+        "recommended_change": "none"
+      }
+    ],
+    "impact_on_winners": "n/a — no filter shipped today"
+  },
+  "signal_quality_deep_dive": {
+    "method": "14d winners-vs-losers feature sweep: 14 continuous features (welch t) + 6 categorical (btc_regime, coin_regime, momentum_state, z_score_tier, wave_phase) — Bonferroni bar 0.0025 across ~20 tests",
+    "separators_after_correction": [
+      "btc_regime ONLY (see creative)"
+    ],
+    "rejected_on_correction": [
+      "momentum_score p=0.0437",
+      "speed_percentile p=0.0446",
+      "coin_regime_conf p=0.014 (n=24/24)",
+      "rsi_14 p=0.44",
+      "volume_spike p=0.90",
+      "gap_at_entry p=0.38",
+      "staleness p=0.68",
+      "bb_position p=0.23",
+      "final_confidence p=0.27 (post-vol-mult scale)",
+      "macd_hist p=0.17"
+    ],
+    "arm_rate_7d_low_signals": "pump-chain- bare 10T 0% arm 0W -$0.58 | ai-trader-pending 10T 10% arm | hl_copy 6T 0% arm — all pre-registered elsewhere (kill CANCELLED #63 collision, ATR-SL Oct 26, hl_copy n=8<10)"
+  },
+  "verification_batteries": {
+    "btc_regime_ranging_pattern": {
+      "sample": "30d n=163 vs 528 PASS",
+      "significance": "Fisher p=0.0001/0.0005/0.0005 at 30/14/7d PASS",
+      "oos": "holds all 3 windows + 5/5 weeks PASS",
+      "existing_checks": "no gate keys on RANGING habitat; vol-regime multiplier is a different axis PASS",
+      "collisions": "dampen variant collides with REJECTED MIN_EXEC 40->50 (#67) — same band",
+      "confounders": "family mix NOT driving (within-family RANGING wins both bb and pump), day clustering 28/29 mixed, arm rate partial mediator only FAIL-as-explanation",
+      "verdict": "pattern REAL, lever FAILS bars today -> PRE-REGISTER, re-measure Oct 25"
+    },
+    "conf_floor_30_pranship": "holds: net save +$1.61/14d, fk 6.3%, 2 more live proofs today — ships Oct 23 unchanged",
+    "pump_chain_kill_recheck": "CANCEL stands (audit #63) — bare 14d -$0.57 but conf>=30 residual -$0.04 wash; CONF_FLOOR is the lever"
+  },
   "changes_from_last_run": [
     {
-      "change": "rsi_detect/rsi_exec/rsi_drift exec-time stamp (#67 ship 2026-10-21 17:45)",
-      "status": "HOLDING",
-      "evidence": "1/2 signal-path trades since ship stamped (POL drift 8.14), 0 ERROR. Low traffic, not a gap."
+      "change": "HML-SHADOW unit fix (ATR_SL_MIN fraction->percent + dedup) #68",
+      "verified": "0 hard_max_loss exits since fix (0 pipeline closes since 03:55) — no live data yet; py_compile+self-check passed at ship; re-verified code line 3665-3666 present, log tag greps clean. Will confirm on first HML exit."
     },
     {
-      "change": "ARM-GAP peak-trail instrumentation",
-      "status": "HOLDING",
-      "evidence": "code present position_manager.py, 0 ERROR lines"
+      "change": "pump-chain- kill CANCEL recheck (due today) #68",
+      "verified": "CANCEL confirmed, no bare-scope reproduction of +$0.75 claim"
     },
     {
-      "change": "SHORT_RSI_HARD_FLOOR=45 (revert 2026-10-21 02:46)",
-      "status": "HOLDING",
-      "evidence": "1 pump-chain SHORT since revert, no RSI<45 violation"
+      "change": "rsi_drift stamp #60",
+      "verified": "1/1 signal-path opens post-ship stamped (POL drift 8.14); 6 unstamped closes all OPENED before the stamp went live — NOT a gap"
     },
     {
-      "change": "CONF_FLOOR=30 pre-registration",
-      "status": "ON TRACK for Oct 23",
-      "evidence": "re-verified: pump-chain family conf<30 = 40T 6W -$1.98; fk 6.3%; net +$1.61"
+      "change": "coin_regime stamp #33",
+      "verified": "48/48 signal-path trades stamped since live (57 total - 8 ai-trader - 1 pre-deploy)"
     },
     {
-      "change": "doji kill / size-reduce 0.5x / protected 13/13",
-      "status": "HOLDING",
-      "evidence": "doji 0 opens; vacation_size_reduce.json size_multiplier=0.5; CEO_PROTECTED_FLAGS = 13 keys intact"
+      "change": "TAT shadow scope fix #39",
+      "verified": "still 14/15 valid fires, no new fire since Oct 21 18:58 — flip criteria intact"
+    },
+    {
+      "change": "SHORT floor-45 revert #",
+      "verified": "0 violations (1 pump-chain SHORT since, rsi 51.16)"
     }
   ],
-  "leverage_finding": {
-    "claim": "Leverage sets the HML stop width in PRICE terms; at 5x the account-denominated cap binds ~25% closer than at 3x, so fewer 5x trades ever reach the +0.40% trail arm.",
-    "data_14d": {
-      "hml_rate": "lev5 61/207=29.5% vs lev3 22/136=16.2%, Fisher p=0.0047",
-      "arm_rate": "lev5 67/208=32.2% vs lev3 63/136=46.3%, Fisher p=0.0091",
-      "hml_price_threshold": "lev5 avg exit -0.731% price (30d -0.784) vs lev3 -0.972% (30d -0.992); account% nearly equal (-3.65 vs -2.92) => cap is account-denominated, as coded (CUT_LOSER_PNL/lev)",
-      "wr": "lev5 32.7% vs lev3 39.0% (p=0.249, NOT significant)",
-      "pnl": "lev3 136T -$1.25 vs lev5 208T -$3.57"
-    },
-    "confounders": [
-      "leverage comes from token maxLeverage via get_max_leverage() (decider_run.py:552), not a strategy dial — lev3 vs lev5 = different coin properties/volatility",
-      "same signal families appear in BOTH cohorts (pump-chain+ 25 lev3 / 28 lev5, bb-bounce 18/18, pump-chain- 13/24) so it is not purely a signal-mix artifact",
-      "CUT_LOSER_PNL widened -3.00 -> -4.00 on Oct 15, spanning the 14d window for both cohorts equally",
-      "prior art: D3 TRAIL-MIN-GAP removed by CEO 2026-10-12 (same bug class) and HML-SHADOW shipped 2026-10-18 = this exact question is already pre-registered for Oct 25"
-    ],
-    "verdict": "NO SHIP. Fold into the HML-SHADOW eval on Oct 25 (now collecting after this run's fix). Any leverage/threshold change is CEO territory (risk-per-trade)."
-  },
-  "next_actions": [
-    "Oct 23 (tomorrow): ship CONF_FLOOR=30 as pre-registered (verified net +$1.61, fk 6.3%) + doji kill; CEO eyeball",
-    "Oct 25: HML-SHADOW 7d eval — first data available because of this run's unit fix; pair with the lev3-vs-lev5 cohort table above",
-    "Oct 24: pump-chain- residual recheck (criteria: n>=20 AND PnL<0 AND WR<30% -> Option A v6-requirement gate, NOT blanket kill)",
-    "Oct 26: ai-trader-pending recheck (n=10 <20)",
-    "Continue coin_regime stamping (n=48, COUNTER conf>=25 at 19T just under n>=20)",
-    "Escalation #17 carried (27th)"
+  "config_changes_applied": [
+    {
+      "type": "comment/drift-doc (zero behavior)",
+      "file": "scripts/hermes_constants.py:1186-1196",
+      "change": "BTC_REGIME_ALIGN review completed and stamped: KEEP OFF with 30d/plan-window data; flag value unchanged (False -> False)",
+      "rationale": "the feature's own comment promised a '7d review before enable' that was never delivered; current data shows no edge in the loosened class"
+    }
   ],
-  "watchdog_triage": {
-    "steer-001_wrong_side": "REFUTED with 1m path evidence (1/18 clear wrong-side, 13/18 recovered within 30m)"
-  },
-  "readiness": "BTC still below EMA300, continuum BELOW, LOW volume, 0 open = correct. Reclaim of EMA300 WITH volume -> continuum-trend+ LONG (14d 8T 75% WR, 75% arm) remains the one setup worth taking. Neither side pays mid-band."
+  "creative_improvements": [
+    {
+      "idea": "BTC-regime habitat map (RANGING-class only profitable regime) — dampen pre-registered, criteria FAIL today, re-measure Oct 25",
+      "status": "pre-registered"
+    },
+    {
+      "idea": "BTC-REGIME-ALIGN shadow outcome study via 1m candle replay",
+      "status": "pre-registered"
+    }
+  ],
+  "next_actions": [
+    "Oct 23: stage + ship PUMP_CHAIN_CONF_FLOOR=30 with CEO eyeball (verified +$1.61/14d, fk 6.3%); final disposition of pump-chain- kill = CANCEL",
+    "Oct 23: vacation mode expires — evaluate queued stack (CONF_FLOOR, residual ledger, arm-rate dampen shadow, ai-trader-pending ATR-SL recheck Oct 26)",
+    "Oct 25: re-measure non-RANGING fc<50 dampen (p, fk, save) + HML-SHADOW + residual confidence ledger",
+    "TAT: flip at 15th valid fire if variant-C fk<20% (currently 0%) and CEO GO",
+    "Watch: first hard_max_loss exit after 03:55 must emit HML-SHADOW line — confirm unit fix live",
+    "Recheck hl_copy NORMAL block at n>=10 (now 8)"
+  ],
+  "readiness": "0 open flat correct: CONTINUUM BELOW EMA300 ~661min, LOW volume, mid-band = no trade. Trigger A: reclaim EMA300 with volume -> continuum-trend+ LONG (14d 8T 75% WR, 75% arm). Trigger B: volume break below 82.6k -> SHORT 55-65 band only."
 }

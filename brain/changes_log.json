@@ -1793,5 +1793,16 @@
     "after": "_shadow_hml = min(HARD_MAX_LOSS_PCT, -abs(_shadow_atr_min) * 100.0)  # -1.50% vs -0.80% -> logs once per trade",
     "rationale": "Pre-registered HML-SHADOW eval due Oct 25 had no data 4 days in. Zero live behavior (log-only shadow).",
     "impact": "Restores data collection for the account-cap vs ATR-floor eval; 0 trades affected."
+  },
+  {
+    "timestamp": "2026-10-22T04:51:41Z",
+    "agent": "brain_auditor",
+    "change": "BTC_REGIME_ALIGN_ENABLED review delivered + data comment stamped (flag UNCHANGED False): trigger class no edge since plan date, 30d habitat map recorded",
+    "type": "drift",
+    "file": "scripts/hermes_constants.py",
+    "before": "BTC_REGIME_ALIGN_ENABLED = False, comment promised \"7d review before enable\" (never done)",
+    "after": "BTC_REGIME_ALIGN_ENABLED = False (unchanged), comment now carries 2026-10-22 review verdict KEEP OFF + numbers",
+    "rationale": "vacation no_constants_change respected (value untouched); closes a stale promised review on an OFF feature that would loosen the worst-performing cell",
+    "impact": "zero live behavior; prevents future enable without OOS evidence"
   }
 ]

@@ -1187,6 +1187,12 @@ CHOP_GATE_LOG_ONLY = False                # Activated 2026-09-21 — was log-onl
 # Bullish BTC continuum (BULL_TREND/RANGING_BULL, score>=60) bypasses the LONG-NEUTRAL block.
 # Bearish/NULL regimes: no change. Does NOT loosen SHORT filters, RSI ceiling, RR engine,
 # confluence gate, or blacklists. Default OFF — shadow-log counterfactual, 7d review before enable.
+# brain_auditor 2026-10-22 (7d review, DONE — result: KEEP OFF): trigger class BULL_TREND/RANGING_BULL
+# LONG since plan date 2026-10-08 = 117T 37.6%WR -$2.02 vs other regimes 131T 38.9% -$1.71
+# (Fisher p=0.90 — no edge in the class this would loosen). 30d cell map: BULL_TREND LONG is the
+# WORST cell (173T -$2.55); the only profitable BTC habitat is RANGING/RANGING_BULL
+# (30d 163T 56.4%WR +$1.68, beats rest all 5 weeks, Fisher p=0.0001). Shadow has logged 5081
+# would-allow lines (outcome-less). Do NOT enable without OOS evidence of edge in the bypassed set.
 BTC_REGIME_ALIGN_ENABLED = False
 BTC_REGIME_ALIGN_MIN_SCORE = 60           # btc continuum score floor (CEO-mod: score >= 60)
 
