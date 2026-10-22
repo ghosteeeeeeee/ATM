@@ -1,56 +1,63 @@
 # Signal Performance Report
-**Generated:** 2026-10-22 03:31 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-22 09:33 UTC | **Period:** Last 6h + 24h
 
-## Overall Stats
-- **Total trades (all time):** 3,276 | **WR:** 50.6% | **PnL:** -102.89%
-- **Date range:** 2026-07-29 → 2026-10-22
-
----
-
-## WINNERS (WR > 55%, PnL > 0)
-
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| bb-bounce-v2-long+ | LONG | — | —% | — | 8 | 62.5% | +1.28 | ❓ |
+## Volume
+- **6h:** 1 closed trade | PnL +$0.11
+- **24h:** 29 closed trades | PnL -$0.55
 
 ---
 
-## LOSERS (WR < 30%, PnL < -2%)
+## KILLED (executed)
 
-None found.
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| — | — | — | — | — | None met kill criteria |
 
----
-
-## MARGINAL (30-50% WR)
-
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| r2v2-long3 | LONG | 4 | 50.0% | -1.16 | ❓ | Needs more data |
-| ai-trader-pending | LONG | 2 | 50.0% | -0.32 | ❓ | Needs more data |
+No signal has WR < 30% with 5+ trades AND PnL < -$0.10 (24h).
 
 ---
 
-## DISABLED BUT GOOD (candidates for re-enabling)
+## BOOSTED (executed)
 
-None found. Top performers are already enabled.
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| — | — | — | — | — | None met boost criteria |
 
----
-
-## SIGNAL INVERSIONS (24h)
-
-**No inversions found.** All signals respect their direction labels.
+bb-bounce-v2-long+ has 57.1% WR (7 trades) but PnL is -$0.05 — fails the PnL > $0.05 gate.
 
 ---
 
-## RECOMMENDATIONS
+## LOSERS (watch list)
 
-1. **[WATCH] r2v2-long3 LONG** — WR=50.0%, PnL=-1.16% over 4 trades. Monitor next cycle.
-2. **[WATCH] ai-trader-pending LONG** — WR=50.0%, PnL=-0.32% over 2 trades. Monitor next cycle.
-3. **[KEEP] 1 winning combos** — bb-bounce-v2-long+. LONG side dominant.
+| Signal | Dir | 24h WR | 24h PnL | Trades | Status |
+|--------|-----|--------|---------|--------|--------|
+| continuation+ | LONG | 50.0% | -$0.18 | 4 | WATCH — needs 5+ trades to judge |
+| pump-chain+ | LONG | 0.0% | -$0.16 | 2 | WATCH — HIGH regime already blocked |
+| r2v2-long3 | LONG | 50.0% | -$0.14 | 4 | WATCH — needs 5+ trades to judge |
+| r2v2-long4 | LONG | 0.0% | -$0.12 | 2 | WATCH — sample too small |
+| bb-bounce-v2-long+ | LONG | 57.1% | -$0.05 | 7 | WATCH — winning WR, small net loss |
 
 ---
 
-*Report auto-generated. Next report: ~6h from now.*
+## WINNERS
+
+| Signal | Dir | 24h WR | 24h PnL | Trades | Status |
+|--------|-----|--------|---------|--------|--------|
+| warrior-sr-confirm+ | LONG | 100.0% | +$0.11 | 1 | OK |
+| ai-trader-pending | SHORT | 100.0% | +$0.11 | 1 | OK (manual) |
+| r2v2-long7 | LONG | 100.0% | +$0.04 | 1 | OK |
+| continuum-trend+ | LONG | 50.0% | +$0.01 | 2 | OK |
+
+---
+
+## ISSUES
+- No direction inversions found (24h).
+- Low trade volume: 6h window had only 1 closed trade — no signal qualified for 6h analysis (HAVING COUNT >= 2 returned empty).
+- 6h winners/losers indeterminate this cycle.
+
+---
+
+*Report auto-generated from brain DB. Next report: ~6h from now.*
 
 ---
 
@@ -58,6 +65,8 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-10-22 | 2d78f19 | Daily trading system update (2026-10-22) |
+| 2026-10-22 | 24225f3 | brain_auditor: AUDIT RUN #69 — BTC-regime habitat map verifi... |
 | 2026-10-22 | 0747cdd | scripts: wire shadow_signals_runner into pipeline with shado... |
 | 2026-10-21 | 0c57042 | plans: spec v2 autonomous BTC loop — CEO answers baked in: B... |
 | 2026-10-21 | c625517 | skills+data: add §12 no-edge default (CEO directive — arm th... |
@@ -66,7 +75,5 @@ None found. Top performers are already enabled.
 | 2026-10-21 | c9092ae | signals: block pump-chain+ LONG in HIGH regime — 37%WR $-0.4... |
 | 2026-10-20 | 06e7bd3 | fix: ichimoku bypass — bug_hunter FAIL fixes (CRITICAL + HIG... |
 | 2026-10-20 | a1b8095 | signals: ichimoku LONG standalone bypass (CEO regime-conditi... |
-| 2026-10-20 | 0f0a656 | Daily trading system update (2026-10-20) |
-| 2026-10-19 | d02c9bf | brain_auditor: AUDIT RUN #26 — 0 config changes (vacation so... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
