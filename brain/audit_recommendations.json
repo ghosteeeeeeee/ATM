@@ -1,118 +1,95 @@
 {
-  "timestamp": "2026-10-21T23:45:03Z",
-  "run": "brain_auditor #64",
-  "session_brain_stats": {
-    "queries": 2,
-    "note": "stop-width/exposure-cap handoff searches; no unimplemented ideas surfaced (all prior pre-regs tracked in CURRENT.md)"
-  },
+  "timestamp": "2026-10-22T00:36:50Z",
+  "run": "brain_auditor #65",
+  "mode": "vacation soak day -2 (to Oct 23), 0 config changes",
   "trade_summary_24h": {
-    "trades": 38,
-    "wins": 14,
-    "wr": 36.8,
-    "pnl": -0.95,
-    "open": 0,
-    "7d": {
-      "trades": 161,
-      "wins": 58,
-      "wr": 36.0,
-      "pnl": -3.43
-    },
-    "7d_armed": {
-      "n": 63,
-      "wr": 74.6,
-      "pnl": 3.48
-    },
-    "7d_unarmed": {
-      "n": 98,
-      "wr": 11.2,
-      "pnl": -6.91
-    },
-    "size_reduce": 0.5,
-    "source": "data/vacation_size_reduce.json"
+    "trades": 35,
+    "wins": 13,
+    "wr": 37.1,
+    "pnl": -0.99,
+    "losers": 22,
+    "max_loss": -0.23,
+    "winners_exit": "13/13 profit-monster-trail"
   },
-  "watchdog_handoff_verdicts": [
-    {
-      "item": "hard_max_loss/atr_sl_hit stop-width vs ATR (82 trades, 2 wins)",
-      "verdict": "REJECTED-WITH-DATA",
-      "method": "Bucket ALL 7d trades by SL/ATR regardless of outcome (avoids selection-on-outcome); 14d narrow<1.5x (110T 38W 34.5%) vs wide>=1.5x (238T 86W 36.1%)",
-      "stat": "z=-0.29 p=0.774",
-      "why_loser_view_is_wrong": "atr_sl_hit avg SL=1.85xATR vs winners 2.97xATR is an artifact: a stop can only be 'hit' if it is near. Same selection-on-outcome trap as 2026-10-08 failed analyses.",
-      "consequence": "Widening stops does not raise WR (all buckets 28-37%), it only widens loss size. No stop-width change."
-    },
-    {
-      "item": "per-cycle same-direction exposure cap after 19:00 cluster",
-      "verdict": "REJECTED-WITH-DATA",
-      "method": "Concurrent same-direction open count per trade, 7d",
-      "stat": "conc<=2 106T 38.7% -$1.09 vs conc>=3 54T 29.6% -$2.30, z=-1.13 p=0.258",
-      "cluster_facts": "The 19:00 cluster was NOT an open-window burst: BTC 15:06, NEO 16:42, SOL 17:14, POL 18:30 opened across 3.5h and all closed 18:59-19:01 on one BTC candle (4 stops, -0.33). An open-window cap would not have fired; a concurrent-position cap fails significance.",
-      "consequence": "Monitor only. Real structural fact remains: 4 positions sharing one BTC candle as stop driver."
-    },
-    {
-      "item": "pump-chain+ confidence floor raise 30->70",
-      "verdict": "REJECTED-WITH-DATA",
-      "stat_overall": "30d conf<70 39T 17.9% vs >=70 42T 47.6% p=0.0046 (significant) — but conf<30 portion is what CONF_FLOOR=30 (ships Oct 23) already captures",
-      "increment_30_to_70": "7d 4T -$0.18 | 14d 11T +$0.24 | 30d 16T -$0.46 — SIGN FLIP, temporally unstable",
-      "consequence": "Ship CONF_FLOOR=30 only; do not raise. Re-evaluate residual conf 30-70 on Oct 24 as scheduled."
-    }
-  ],
-  "losing_trade_autopsy_24h": {
-    "losers": 24,
-    "new_patterns": 0,
-    "cohorts": [
-      "conf<30 floor-admits x6 (CFX 29.5, INJ 29.5, pump-chain-v6- 22.5/27.7, pump-chain+ 27/29.5) = -$0.37 24h — covered by CONF_FLOOR=30 Oct 23",
-      "pump-chain+ 5T 0W -$0.32 — 14d/30d conf<70 bleed, raise rejected above",
-      "pump-chain+ trail_arm_timeout x3 -$0.16 — mechanism containing, not bleeding",
-      "counter-trend LONGs STX/PUMP/GRASS/INJ (EXTREME/NEUTRAL) — known wrong-side cohort",
-      "POL bb-bounce-v2-long+ chop -$0.22; SYRUP continuation+ stale_exit -$0.23 (n<20 watch)",
-      "ai-trader-pending BTC x3 CEO domain",
-      "WLD 41s atr_trail_hit = known false-peak class (#59)"
-    ],
-    "winners": "13/14 winners profit-monster-trail — exit mechanics sound, entry side is the cancer (unchanged from #63)"
+  "trade_summary_7d": {
+    "trades": 160,
+    "wins": 58,
+    "wr": 36.3,
+    "pnl": -3.39,
+    "armed": "63T 74.6% +$3.48",
+    "unarmed": "97T 11.3% -$6.87",
+    "exit_core": "atr_sl_hit 49T 1W -$3.45 + hard_max_loss 22T 0W -$2.65 = pre-trail death; profit-monster-trail 37T 33W +$1.68"
   },
-  "changes_from_last_run": [
-    {
-      "change": "rsi_detect/rsi_exec/rsi_drift stamp (#60 17:45)",
-      "status": "PASS",
-      "evidence": "1/1 trades opened since ship stamped (POL #16349 open 18:30, drift 8.14); only 1 trade opened since — low traffic, not a coverage gap"
-    },
-    {
-      "change": "pump-chain- blanket kill CANCELLED (#63)",
-      "status": "HOLDING",
-      "evidence": "no re-proposal; CONF_FLOOR collision analysis stands"
-    },
-    {
-      "change": "volume_spike<1.0 block REJECTED (#63)",
-      "status": "HOLDING",
-      "evidence": "not re-proposed"
-    },
-    {
-      "change": "size-reduce 0.5x",
-      "status": "ACTIVE",
-      "evidence": "data/vacation_size_reduce.json size_multiplier=0.5; both resume legs still failing (7d WR 36.0%<37? PnL -3.43<0)"
-    },
-    {
-      "change": "floor-45 / doji kill / ARM-GAP",
-      "status": "PASS",
-      "evidence": "0 SHORT RSI<45 opens since 02:46 | 0 doji opens since 2026-10-16 20:40 | ARM-GAP code at position_manager.py:1314-1341 live"
-    }
-  ],
-  "config_changes_applied": [],
-  "protected_flags": "13/13 INTACT (PM_TRAIL_ACTIVATE_PCT=0.004, PM_TRAIL_DISTANCE_PCT=0.002, etc.)",
+  "watchdog_triage": {
+    "steer-001": "VERIFIED-KNOWN — 12/20 streak = chop family; wealth gap unchanged (armed +3.48 vs unarmed -6.87); portfolio flat = correct; scheduled Oct 23 ships address it",
+    "steer-002": "REFUTED-PARTIAL — #61 opposite-side audit stands (p=0.116, 85% no opposing setup = chop not wrong-side). Watchdog handoff item ANSWERED-REJECTED this run (see drift_findings)"
+  },
+  "headline_finding": {
+    "title": "Watchdog 65+ LONG band handoff REJECTED-WITH-DATA — 7d artifact, fails OOS",
+    "detail": "Watchdog deep_analysis recommends building a momentum-continuation entry path because 'RSI 65+ is the only profitable band (+1.37, 60% WR)'. Fresh PG: 7d 15T 60% +$1.37 BUT 14d 68T 33.8% -$0.20 AND 30d 131T 40.5% -$0.87. Sign flips positive→negative at both OOS windows. Top 65+ contributors: volume-breakout-long+ 10T 0W -$1.14, pump-chain+ 21T 6W -$0.25. Building a new signal family on this premise = building on noise. No momentum-continuation signal ships.",
+    "confidence": "HIGH — 3 windows, n=15/68/131"
+  },
   "drift_findings": [
     {
-      "severity": "low",
-      "finding": "MIN_EXEC_CONFIDENCE = 40 hardcoded at decider_run.py:3442 instead of hermes_constants.py",
-      "impact": "CEO's 2026-10-10 50->40 floor change lives outside the guarded constants file; floor changes won't show up in constants diff/audit trail",
-      "action": "flag only, no change during vacation soak"
+      "item": "LONG 45-55 death band block",
+      "status": "RE-REJECTED (fresh data)",
+      "detail": "7d n=42 -$1.88 / 14d n=60 -$0.88 / 30d n=110 -$1.35 all negative BUT z=-0.88 p>0.05 (not significant), fk 19.8-27.1% (>20% bar), pump-chain+ carries +$1.10 of 14d band. Death-zone ADVISORY already live (correct weight). No hard block."
+    },
+    {
+      "item": "MIN_EXEC_CONFIDENCE=40 hardcoded decider_run.py:3442",
+      "status": "drift flag carried (low)",
+      "detail": "CEO 2026-10-10 floor lives outside hermes_constants.py, invisible to constants diff/audit. Refactor post-vacation."
     }
   ],
-  "creative_improvements": [],
+  "kill_criteria_recheck_oct22": {
+    "pump-chain-_blanket_kill": "CANCELLED CONFIRMED — paper MET (14d 37T 21.6% -$0.57) but CONF_FLOOR=30 captures 93% of bleed (conf<30 9T -$0.53); all 8 bare winners conf≥30 +$1.27; conf≥30 residual 28T -$0.04 wash. Kill destroys +$1.27 to catch -$0.04. Ship CONF_FLOOR only.",
+    "pump-chain+_decay_kill": "NOT MET (14d 54T 31.5% +$0.96 > 0)",
+    "r2v2-long4_kill": "NOT MET (14d n=4 <20)",
+    "hmacd_family_kill": "NOT MET (14d n=13 <20)",
+    "volume_spike>=2.0_chase_dampen": "NOT MET (14d n=12 <20, 33.3% -$0.55 — monitor)"
+  },
+  "conf_floor_30_preShip_verification": {
+    "verdict": "PASS — ship Oct 23 per schedule with CEO eyeball",
+    "would_block_14d": "40T 6W -$1.98 (pump-chain+ 23T -$1.28 | pump-chain- 9T -$0.53 | combo 7T -$0.12 | v6- 1T -$0.05)",
+    "winner_kill": "6 winners +$0.37 (15% of cohort, 6/96=6.3% of 14d pump-chain winners — under 20% bar)",
+    "net_save": "+$1.61 (save 1.98 - lose 0.37)",
+    "7d_consistency": "31T 3W -$1.98 same sign",
+    "scope_leak": "conf<30 non-pump residual small: hmacd -$0.18 + ai-trader+ -$0.07 = -$0.28 (covered by other pre-regs)",
+    "code_status": "NOT YET IMPLEMENTED — no PUMP_CHAIN_CONF_FLOOR constant exists; stage tomorrow"
+  },
+  "losing_autopsy_24h": {
+    "losers": 22,
+    "new_patterns": 0,
+    "cohorts": [
+      "conf<30 floor-admits ×6 -$0.42 (CFX 29.5, INJ 29.5, CRV 22.5, COMP 27.7, CFX 27, BLUR 29.5) — covered Oct 23",
+      "counter-trend/drift LONGs EXTREME ×4 -$0.40 (STX r2v2-long4, INJ pump-chain+, PUMP r2v2-long3, GRASS r2v2-long3) — known EXTREME LONG cohort",
+      "POL bb-bounce chop -$0.22 hard_max_loss (rsi_drift stamp fired: detect 53.62 → exec 61.76, drift 8.14)",
+      "SYRUP continuation+ stale_exit -$0.23 (pre-reg watch, n<20)",
+      "BTC ai-trader-pending ×3 -$0.18 (CEO domain, ATR-scaled SL pre-reg Oct 26)",
+      "WLD 41s false-peak atr_trail (known class, peak-sanity shadow pre-reg)"
+    ],
+    "verdict": "13/14 winners profit-monster-trail (SYRUP stale_exit was a loser) — exit sound, entry side is the cancer. Zero new patterns."
+  },
+  "config_changes_applied": [],
+  "last_run_verify": {
+    "rsi_drift_stamp": "LIVE 1/1 (POL #16349 rsi_detect=53.62 rsi_exec=61.76 drift=8.14 — only trade since ship)",
+    "ARM-GAP": "code live position_manager.py:1314-1341",
+    "floor-45": "0 violations since 2026-10-21 02:46",
+    "doji_kill": "0 opens since 2026-10-16 20:40",
+    "size_reduce": "0.5x file truth",
+    "protected_flags": "13/13 INTACT (PM_TRAIL_ACTIVATE_PCT=0.004, PM_TRAIL_DISTANCE_PCT=0.002)"
+  },
+  "arm_rate_watch_7d": {
+    "never_arm": "hl_copy_trader 0/6 | ai-trader-pending 0/9 | pump-chain- bare 0/10 -$0.58 | ai-trader-manual 1/13",
+    "combo_confirms_edge": "pump-chain-,pump-chain-v6- 3/9 arm +$0.31 (confirmation premium holds)",
+    "best_arm": "continuum-trend+ 4/5 80% +$0.09"
+  },
+  "readiness_note": "BTC 4h LONG_BIAS, acceleration POSITIVE, reclaim attempt plausible. When BTC reclaims EMA300 ~84,600 WITH volume → continuum-trend+ LONG (4/5 7d, 80% arm rate) is the setup. Signals ready. No config change needed for reclaim readiness.",
   "next_actions": [
-    "Oct 22: pump-chain- kill recheck disposition (verdict pre-computed CANCEL #63)",
-    "Oct 23: ship PUMP_CHAIN_CONF_FLOOR=30 (net +$1.34/14d) + vacation resume stack with CEO eyeball",
-    "Oct 24: conf 30-70 residual recheck -> v6-requirement Option A only if n>=20 & PnL<0 & WR<30%",
-    "Oct 26: ai-trader-pending ATR-scaled-SL pre-registration recheck (n approaches 20 at 3/day)",
-    "Escalation #17 (24th): exit-ladder candle OOS still blocks ARM-GAP/peak-trail/post-arm flips",
-    "Report to CEO: ai-trader-pending is the sole emitter while AI_TRADER_ENABLED=False — 9 BTC trades/3d, 1W 8L -$0.28, 0/9 reached trail arm"
+    "Oct 23 vacation-end: ship PUMP_CHAIN_CONF_FLOOR=30 (pre-ship verified this run, net +$1.61, fk 6.3%) + CEO eyeball",
+    "Oct 23: pump-chain- kill final disposition with CEO (CANCELLED #63, reconfirmed today)",
+    "Oct 24: conf≥30 bare pump-chain- residual recheck → v6-requirement Option A only if n≥20 ∧ PnL<0 ∧ WR<30%",
+    "Oct 26: ai-trader-pending ATR-scaled SL recheck (n=9→~20)",
+    "Escalation #17 (25th): exit-ladder candle OOS — blocks ARM-GAP/peak-trail/post-arm flip"
   ]
 }

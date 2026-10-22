@@ -1456,3 +1456,6 @@
 - **WARN** (recurring since 22:47): `signals: WARNING — only 5 signals in last 5 min (min 20)` — 88 signals/hr generated, pipeline rc=0 every 1min; rate below watchdog threshold, not a stall
 - **WATCH**: hotset.json empty — signals generated but none survived compaction above 40% confidence (market condition, not a fault); BTC-CRASH momentum gate blocking LONGs as designed (BTC 30m mom -0.3~-0.4%)
 - **AUTO-FIX**: none required — vacation_pause absent, all core timers active (pipeline/price-collector/1m-candle/watchdog), 0 tracebacks, prices fresh (130 tokens, max age 68s on active set), 0 open trades, 0 phantom trades; watchdog self-cleaned 4 stale locks at 23:43
+
+## Error Alerts — 2026-10-22 00:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   [TS] [shadow_signals_runner] TOK: N signals recorded, N skipped, N errors`

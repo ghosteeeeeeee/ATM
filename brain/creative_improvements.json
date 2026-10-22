@@ -6405,5 +6405,32 @@
     "risk": "low",
     "trigger": "Recheck Oct 26 (n approaches 20 at current 3/day rate). Flip proposal only if: n>=20 AND armed-rate <20% AND PnL<0 AND proposed SL>=2xATR would not increase avg loss >50%.",
     "note": "CEO domain — orders are CEO-armed via trade_watchdog pending path (passes --sl/--target, respects kill switch). Advisory only."
+  },
+  {
+    "date": "2026-10-22T00:36:50Z",
+    "idea": "REJECTED-WITH-DATA: watchdog 65+ LONG band momentum-continuation entry path",
+    "rationale": "Watchdog handoff said 65+ is the only profitable LONG band (7d +1.37/60%). Fresh PG: 14d 68T 33.8% -$0.20, 30d 131T 40.5% -$0.87 — sign flips both OOS windows. volume-breakout-long+ 10T 0W -$1.14 and pump-chain+ 21T 6W -$0.25 drag the band. Building a new signal family on a 7d artifact repeats the 2026-10-08 pattern-fail pattern.",
+    "expected_impact": "avoided: wasted signal build on noise premise",
+    "category": "verification",
+    "status": "rejected",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-22T00:36:50Z",
+    "idea": "CONF_FLOOR=30 final pre-ship verification delivered (ships Oct 23)",
+    "rationale": "Pre-ship audit: 14d would-block 40T 6W -$1.98, net save +$1.61 after 6 winner kills (+$0.37), fk 6.3% of pump-chain winners (under 20% bar), 7d consistent 31T -$1.98, scope leak small (-$0.28 non-pump covered elsewhere). Code not yet staged — stage tomorrow with CEO eyeball.",
+    "expected_impact": "+$1.61/14d net save on pump-chain family",
+    "category": "entry sniper",
+    "status": "verified_ready_to_ship",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T00:36:50Z",
+    "idea": "Regime-reclaim readiness (no code): continuum-trend+ LONG is the reclaim setup",
+    "rationale": "BTC acceleration POSITIVE, reclaim attempt plausible. continuum-trend+ = 5T/7d 80% arm rate +$0.09, only signal family firing at the reclaim structure. When BTC reclaims EMA300 ~84,600 WITH volume, this is the trade. No config change — operational readiness note for captain/CEO.",
+    "expected_impact": "correct-side positioning on regime flip",
+    "category": "regime",
+    "status": "noted",
+    "risk": "none"
   }
 ]
