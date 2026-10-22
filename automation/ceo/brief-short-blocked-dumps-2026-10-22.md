@@ -18,7 +18,12 @@ Market (candles.db):
 
 Short-side behavior (signals_hermes_runtime.db `signals`, direction='SHORT'):
 - **Last 6h: 205 EXPIRED (compaction_stale_10min), 9 SKIPPED, 4 FAILED, 1 PENDING — 0 executed.**
-- **Last 7d: 0 SHORT rows with decision in (EXECUTED, TRADED, APPROVED).**
+- ~~Last 7d: 0 SHORT rows with decision in (EXECUTED, TRADED, APPROVED)~~ — **CORRECTED:
+  this was an artifact.** `_purge_executed_signals` (signal_compactor.py:5849) deletes
+  EXECUTED rows after 1h, so the signals table can't answer this. PostgreSQL brain says
+  7d: **LONG 120T (-$2.19), SHORT 38T (-$1.07)** — shorts do trade, just 3× fewer.
+  **Tonight is the real anomaly: exactly ONE trade opened 00:00-04:00 UTC — a LONG at
+  01:44 (closed, $0.00). Last 12h: LONG 6 (-$0.36), SHORT 1 (-$0.04).**
 - Observed kill reasons in that window:
   - `trade failed at execution: RSI hard floor (detect): 23.5 < 45` (YGG ×2),
     `RSI hard floor: 30.7 < 45` (SUSHI), `RSI hard floor (detect): 20.0 < 45` (WLFI)
@@ -30,6 +35,35 @@ Short-side behavior (signals_hermes_runtime.db `signals`, direction='SHORT'):
 
 Note: prior notes say SHORT_RSI_FLOOR / SHORT_RSI_HARD_FLOOR = **35**, but every live
 message tonight says **45**. Find where 45 actually comes from.
+
+## Head start — prior consult run (timed out at 900s, verified queries, don't re-derive)
+
+**Gate census, " SHORT " lines in logs/pipeline.log, window 00:00–02:59 UTC** (mixed
+✅ pass / 🚫 block — count is volume, not blocks; classify the 🚫 ones first):
+`SPIKE-FILTER 598 · BTC-CHOP-3H 448 · SHORT-NEUTRAL-BYPASS 426 · VOL-GATE-BYPASS 325 ·
+SHORT-RSI-HARD-FLOOR 265 · CONTINUUM-OVERRIDE 230 · PUMP-CHAIN-SHORT-HIGH 201 ·
+SHORT-NORMAL 150 · CONFLUENCE-GATE-BLOCK 116 · BTC-CHOP-OVERRIDE 67 · MAXXED-BLOCK 21 ·
+VEL-FILTER 13 · SHORT-REGIME-GATE 10 · CTX-GATE 8 · SLOPE-FILTER 6 · PUMP-CHAIN-VEL-SHORT 5 ·
+EXEC-RSI-DETECT-FLOOR 4 · OVERSOLD-SHORT 4 · SHORT-RSI-CEILING-OVERRIDE 2`
+
+Lead observations to verify, then move past them:
+1. **Two-layer RSI trap.** `[OVERSOLD-SHORT] YGG: SHORT bypass — 1m RSI 23.5 < 35 but
+   BTC bearish (oversold = continuation)` PASSED at detect, yet
+   `[EXEC-RSI-DETECT-FLOOR] YGG SHORT BLOCKED — detect RSI 23.5 < 45 (live recovered
+   to 49.5)` killed it at execution — **live RSI was 49.5, above the floor, and it
+   still blocked on detect-time RSI.** Is the exec floor using stale detect RSI when
+   live says OK? That would mean the oversold override can never actually fire.
+2. **FIL**: vel filter passed (BTC bearish pullback) → PUMP-CHAIN-VEL-SHORT blocked
+   (30m vel +0.314% > +0.300% "token rising") 01:10 → CTX-GATE "misaligned, accel
+   rising" 01:12 — FIL then fell 1.0566 (01:00) → 1.0122 (02:30) ≈ **-4.2%**.
+3. **Code pointers**: `rule_based_context_gate` decider_run.py:1052 · bear overrides
+   signal_compactor.py:3252/3271, 4149/4168, 4211/4229 · confluence gate +
+   VOL-GATE-BYPASS enforcement signal_compactor.py:3400-3470 · exec RSI floor sites
+   decider_run.py ~1911/1925 · accel = (vel_5m − vel_15m)/span speed_tracker.py:~300 ·
+   vol-gate overrides volatility_gate_v2.py:338+ (EXTREME pump-chain- = 0.0 @:376,
+   NORMAL pump-chain- = 1.2 @:401) · CONFLUENCE_REQUIRED signal_compactor.py:3531.
+4. Also classify: MAXXED-BLOCK (21) and CONFLUENCE-GATE-BLOCK (116) — confluence
+   requirement may be starving single-source short setups during fast dumps.
 
 ## Questions to answer
 
@@ -56,7 +90,9 @@ message tonight says **45**. Find where 45 actually comes from.
 
 ## Verdict required
 
-Lead with: **"Yes/No, we are blocking shorts"** — then:
+**Budget is ~30 min but a prior run died at 15 min with zero output. Print your full
+answer by ~minute 22 even if secondary questions are unresolved — delivered beats
+perfect.** Lead with: **"Yes/No, we are blocking shorts"** — then:
 - Ranked list of what to change (each with the exact gate + suggested value + estimated
   impact), each recommendation **shadow-first per the automatic-implementation skill**
   (ship OFF, collect counterfactual, flip with T's approval). Do NOT propose blanket
