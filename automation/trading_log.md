@@ -13973,3 +13973,25 @@ Final set: ['BTC', 'INJ']
 - 7d '-$2.97' (was '-$2.69' at 16:27)
 - 2 open positions — check next hour
 - CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #78
+
+## [2026-10-22 18:27 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.08 (WR: 100%) | 24h: 8T 3W '-$0.10' | 7d: 155T 37.4% '-$3.18' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- HBAR SHORT volume-buildup- won +$0.08 (profit-monster-trail, +1.78%) — first closed winner since ~09:00
+- Kill check: no signal at 0%WR with 3+T last hour (only 1T closed); bb-bounce-v2-long+ 3T 24h but 0T last hour; CONF_FLOOR ships Oct 23
+- atr_sl_hit 3/8 = 37.5% (<40%) — under threshold
+- Neg-hour streak: none — last hour positive (+$0.08), no 3h trigger
+- Frequency 1/hr — not overtraded (limit 20)
+- 1 open position — monitor
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h improved to '-$0.10' on 8T (WR 37.5%, was '-$0.22'/25% last hour)
+- 7d '-$3.18' slightly worse than '-$2.97' at 17:28
+- 1 open position — check next hour
+- CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #79
