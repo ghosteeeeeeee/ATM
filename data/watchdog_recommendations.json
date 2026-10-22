@@ -1,59 +1,27 @@
 {
-  "timestamp": "2026-10-22T01:44:03.712533+00:00",
+  "timestamp": "2026-10-22T02:14:05.274292+00:00",
   "steers": [
-    {
-      "severity": "urgent",
-      "category": "pending_order",
-      "title": "PENDING ORDER btc-defend-long: BTC LONG @ 84240",
-      "detail": "Trigger hit: BTC 83823 crossed below 84240. Executing long 11.10 USDT 5x, SL 84020, TP 85100. Defensive flush LONG at the CEO chart support 84278 (BTC defending 84k). Trigger cushioned 38pts below support (84240) \u2014 buys the flush/sweep, not the touch-knife (\u00a75/\u00a711). SL 84020 below the 84k psychological defense, 220pt wick room (16317 rule). TP 85100 exits INTO the 85k psychological before it (16292: never at the round number) and before original TP 85893 per \u00a77. R:R 3.9 planned / 2.7 real. Merges with #16342 on HL \u2014 add SL governs the stack if it hits first. PRECHECK (advisory): FAIL \u2014 BTC on LOSERS list + chop-pin advisory (AT EMA300 1376m, mid-band no edge \u2014 exactly why conditional entries are the no-edge default per CEO directive). 5x ceiling.",
-      "trade_id": null,
-      "auto_executable": true,
-      "action": {
-        "type": "execute_order",
-        "order": {
-          "id": "btc-defend-long",
-          "coin": "BTC",
-          "direction": "long",
-          "trigger_price": 84240.0,
-          "amount_usdt": 11.1,
-          "leverage": 5,
-          "sl": 84020.0,
-          "target": 85100.0,
-          "confidence": 55.0,
-          "note": "Defensive flush LONG at the CEO chart support 84278 (BTC defending 84k). Trigger cushioned 38pts below support (84240) \u2014 buys the flush/sweep, not the touch-knife (\u00a75/\u00a711). SL 84020 below the 84k psychological defense, 220pt wick room (16317 rule). TP 85100 exits INTO the 85k psychological before it (16292: never at the round number) and before original TP 85893 per \u00a77. R:R 3.9 planned / 2.7 real. Merges with #16342 on HL \u2014 add SL governs the stack if it hits first. PRECHECK (advisory): FAIL \u2014 BTC on LOSERS list + chop-pin advisory (AT EMA300 1376m, mid-band no edge \u2014 exactly why conditional entries are the no-edge default per CEO directive). 5x ceiling."
-        }
-      },
-      "id": "steer-001"
-    },
-    {
-      "severity": "urgent",
-      "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.58 USDT. Something is wrong.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
     {
       "severity": "warning",
       "category": "health",
       "title": "7 recent losses look like wrong-side trades",
       "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-001"
     }
   ],
-  "portfolio_health": "critical",
+  "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "BELOW",
-    "volatility": "PARABOLIC",
+    "volatility": "NORMAL",
     "zscore_tier": "STRONG_NEG",
-    "velocity_state": "FALLING",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "PARABOLIC",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "ACCUMULATION",
+    "velocity_state": "SLOW",
+    "acceleration_state": "POSITIVE",
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 1.0,
+    "wyckoff_phase": "MARKDOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },

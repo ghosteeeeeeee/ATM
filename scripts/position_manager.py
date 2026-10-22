@@ -536,6 +536,26 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
             elif cur <= tp:
                 hit = 'atr_tp_hit'
 
+        # ── CEO trades: dedicated exit labels (manual_exit_manager owns them) ──
+        # manual_tp_hit = predefined target hit; manual_sl_hit = predefined stop
+        # did its job; manual_trail_hit = the close trail took profit. Makes the
+        # exit-reason unambiguous about WHO managed the trade (CEO directive
+        # 2026-10-22: no more rr_engine_* / atr_* labels on manual/pending).
+        if hit in ('atr_sl_hit', 'atr_tp_hit'):
+            import manual_exit_manager as _mxm2
+            if _mxm2.is_managed_signal(pos.get('signal', '')):
+                if hit == 'atr_tp_hit':
+                    hit = 'manual_tp_hit'
+                else:
+                    try:
+                        _mep = float(pos.get('entry_price') or 0)
+                    except (TypeError, ValueError):
+                        _mep = 0.0
+                    _profit_side = _mep > 0 and (
+                        (direction == 'LONG' and sl > _mep) or
+                        (direction == 'SHORT' and sl < _mep))
+                    hit = 'manual_trail_hit' if _profit_side else 'manual_sl_hit'
+
         # FIX (2026-09-30, verified 385bc167): reclassify profitable trail exits.
         # A trailed SL sits on the PROFIT side of entry (LONG sl>entry, SHORT
         # sl<entry). Guardian's _check_hard_stops already got this fix; this is
@@ -1375,7 +1395,8 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
             # If closing due to ATR SL/TP hit, cancel any stale HL trigger orders
             # so they don't fire after the position is already closed.
             # This is best-effort: failures don't block the mirror_close.
-            if reason in ('atr_sl_hit', 'atr_tp_hit'):
+            if reason in ('atr_sl_hit', 'atr_tp_hit',
+                          'manual_sl_hit', 'manual_tp_hit', 'manual_trail_hit'):
                 try:
                     from hyperliquid_exchange import cancel_all_open_orders as _cancel_all
                     cleanup = _cancel_all(hype_token)
@@ -2828,6 +2849,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         pnl_pct = float(pos.get("pnl_pct") or 0)
         trade_id = pos.get("id")
         open_time = pos.get('open_time')
+        # CEO trades (ai-trader-manual/pending/auto): the MANUAL EXIT MANAGER is
+        # the SOLE SL/TP authority — predefined levels honored as set, close
+        # trailing only (CEO directive 2026-10-22). Hoisted to loop top: guards
+        # sl_zones (0b), soft trigger (6b), and the RR exclusion (step 0) all
+        # read this one flag.
+        import manual_exit_manager as _mxm
+        is_ceo_trade = _mxm.is_managed_signal(pos.get('signal', ''))
 
         # ── Compute live pnl first (before any exit decisions) ──
         entry = float(pos.get("entry_price") or 0)
@@ -2864,7 +2892,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     _trs_slz.append(max(_h - _l, abs(_h - _pc), abs(_l - _pc)))
                 _atr_slz = sum(_trs_slz[-14:]) / 14
             _exit_check = zone_aware_exit_check(token, direction, cur, _atr_slz)
-            if _exit_check['action'] == 'tighten_trail' and _exit_check.get('new_trail_pct'):
+            # CEO trades: zone tightening is a THIRD SL actor — forbidden;
+            # manual_exit_manager owns their SL exclusively (2026-10-22).
+            if _exit_check['action'] == 'tighten_trail' and _exit_check.get('new_trail_pct') and not is_ceo_trade:
                 _new_trail_pct = _exit_check['new_trail_pct']
                 if direction == 'LONG':
                     _zone_sl = round(cur * (1 - _new_trail_pct), 8)
@@ -3101,15 +3131,27 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             except Exception as e:
                 log(f"  [RIDE-IT] Error: {e}", "WARN")
         
-        # ── 0. RR Engine structural exit (for configured signals) ──────────────
-        # Check if this trade's signal uses RR engine exits
-        # FIX: Use prefix matching — 'rs-s34' should match 'rs' key in config
+        # ── 0. Exit routing ────────────────────────────────────────────────────
+        # CEO trades (manual/pending/auto): the MANUAL EXIT MANAGER owns their
+        # SL/TP — predefined levels honored as set + close trailing only.
+        # RR engine EXCLUDED for them (CEO directive 2026-10-22: it moved these
+        # SLs structurally — #16306/#16317 — and mislabelled exits rr_engine_*).
+        # FIX: prefix matching — 'rs-s34' should match 'rs' key in config
+        # (is_ceo_trade + _mxm hoisted to loop top)
         use_rr_engine = False
-        if RR_EXIT_ENABLED:
+        if RR_EXIT_ENABLED and not is_ceo_trade:
             for part in signal_parts:
                 if _match_exit_config(part) == 'rr_engine':
                     use_rr_engine = True
                     break
+        if is_ceo_trade:
+            try:
+                _mx_cur = float(pos.get("current_price") or 0)
+                _mx_entry = float(pos.get("entry_price") or 0)
+                if _mxm.update_trail(pos, direction, _mx_cur, _mx_entry):
+                    adjusted_count += 1
+            except Exception as e:
+                log(f"  [MANUAL-TRAIL] {token} {direction}: error — {e}", "WARN")
         if use_rr_engine:
             try:
                 from risk_reward_engine import manage_exit
@@ -3524,7 +3566,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # 51% WR vs 32.8% for <0.5% band.
         SOFT_TRAIL_PCT = 0.006  # 0.6% trailing distance (was 0.3%)
         _ot = pos.get('open_time')
-        if _ot and live_pnl <= 0:
+        # CEO trades: soft trigger rewrites the predefined SL on old losers —
+        # third actor, forbidden; CEO levels + safety nets only (2026-10-22).
+        if _ot and live_pnl <= 0 and not is_ceo_trade:
             try:
                 if isinstance(_ot, str):
                     _ot_dt = datetime.fromisoformat(_ot.replace('Z', '+00:00'))

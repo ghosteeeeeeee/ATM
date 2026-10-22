@@ -555,6 +555,21 @@ and resistance.** The stop-limit process IS the backup strategy.
 - Every full-analysis that ends in "no trade" must END with the bracket
   proposal: the two levels, the four numbers per leg (trigger/SL/TP/size),
   armed and verified — not an empty verdict.
+- **⚠️ DIRECTION MAPPING IS FIXED — never silently all-longs.** Two levels
+  given as a pair = the CEO's bracket by default:
+  **break DOWN through the lower level → SHORT, break UP through the
+  upper level → LONG.** Only an explicit CEO instruction overrides a leg
+  (e.g. "defense long" for a flush-bounce thesis). 2026-10-22 miss:
+  CEO gave support 84,278 / resistance 84,933 expecting the standard
+  bracket; both legs were wired LONG from an analyst-side proposal —
+  when 84,240 broke, a LONG fired at the breakdown (the CEO's model
+  said SHORT) and the 1,100-pt decline was the trade that never existed.
+  Whenever arming two levels, PRINT the mapping back
+  ("lower break = SHORT at X, upper break = LONG at Y") and get the
+  confirm before writing the config. Bracket legs also never re-fire at
+  a spent level — a lower level already broken 1,000+ pts ago moves the
+  short leg to the NEXT major shelf (§11 lesson: major structure only,
+  cushioned), not back to the old number.
 
 ## Analysis Script
 
