@@ -13578,3 +13578,23 @@ Final set: ['APT', 'ARB', 'BTC', 'ETC', 'ETH', 'HYPE', 'IO']
 **Open Questions:**
 - 24h improved to -$0.95 (was -$1.09); loss clusters unchanged: hard_max_loss 6T -$0.70, atr_sl_hit 10T -$0.59 (standing SL-width escalation with CEO, Oct 16)
 - profit-monster-trail only positive cluster: 16T +$0.65 24h
+
+## [2026-10-22 00:27 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (24h: 36T 13W -$1.00, WR 36.1%) | 7d 160T 58W -$3.39 (36.3%) | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour (20/21/22/23 empty) — no signal at 0%WR with 3+T
+- Kill check: pump-chain+ 4T 0%WR / ai-trader-pending 3T 0%WR both 0T last hour — no regime-kill candidate; pump-chain- kill CANCELLED audit #63, recheck pre-reg Oct 22
+- atr_sl_hit 10/36 = 27.8% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: 19:00 -$0.28 then empty 20-23 breaks it — no 3h trigger
+- Frequency 0/hr — not overtraded (limit 20)
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h -$1.00 / 7d -$3.39 roughly flat vs 23:27; loss clusters unchanged: hard_max_loss 6T -$0.70, atr_sl_hit 10T -$0.59 (standing SL-width escalation with CEO, Oct 16)
+- profit-monster-trail only positive cluster: 16T +$0.65 24h
