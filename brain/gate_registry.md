@@ -37,7 +37,7 @@ Per CEO D2: any gate added after 2026-10-12 must accrue **14d shadow** before tr
 
 | Gate | Ship date | Shadow review due | Status |
 |------|-----------|-------------------|--------|
-| pump-chain+ LONG HIGH block | 2026-10-22 03:38 | 2026-11-05 | Collecting (commit c9092aea) |
+| pump-chain+ LONG HIGH block | 2026-10-21 03:38 | 2026-11-04 | Collecting (commit c9092aea — committed 2026-10-21 03:37:59 UTC; registry had wrong day, fixed brain_auditor #76) |
 | CHASE_RATIO_SHADOW (comment corrected 14d/Oct 27) | pre-2026-10-12 | 2026-10-27 | True, thresholds unchanged |
 
 ## Rules for editors

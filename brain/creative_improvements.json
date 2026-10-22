@@ -6681,5 +6681,23 @@
     "category": "meta",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-22T14:46:17Z",
+    "idea": "14d direction-signed expiry counterfactual — which side are we NOT taking?",
+    "rationale": "Watchdog steer-004 claimed 124/168 expired SHORTs sit below SHORT_RSI_HARD_FLOOR=45 so the system idles while alts fall. Measured on brain/expiry_shadow.db (direction-signed fwd minus market mean; 16,906 resolved events; 14d): LONG n=9101 excess_1h -0.0358% t=-3.00, raw fwd_4h -0.098% t=-3.84; SHORT n=7805 excess_1h +0.0225% t=+2.03, raw fwd_4h +0.068% t=+2.40. Same sign at 4h (LONG -0.081 t=-3.79 / SHORT +0.0494 t=+2.20).",
+    "expected_impact": "Numbers behind the posture: the longs we are not firing would have LOST (gates right), the shorts we are not firing would have WON slightly (short supply is the only missed side). Magnitude sub-fee (+0.068%/4h vs ~0.05% round-trip) = NOT a fill-everything argument; it is the evidence for loosening SHORT supply, never LONG supply, when the vacation stack opens Oct 23.",
+    "category": "regime",
+    "status": "measured",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T14:46:17Z",
+    "idea": "PRE-REGISTER: short-gate loosening criteria (gate counterfactual scoreboard)",
+    "rationale": "brain/gate_shadow.db 14d, 2895 resolved counterfactuals: gates avoid $142.14 of would-be losses while foregoing $77.10 of would-be wins = net +$65.04 saved. Only 5 gates have any positive net blocked-PnL; largest is LONG-NEUTRAL +$1.16 over 275 resolved (median 0.00, max +0.37) = noise. Short gates currently saving: SHORT-CONTINUUM -$2.15, SHORT-NEUTRAL -$2.19, SHORT-REGIME -$0.65. Only positive short-side cohort = EXEC-RSI-HARD-FLOOR +$0.34 on 11 resolved of 56.",
+    "expected_impact": "Criteria locked NOW (pre-data, no post-hoc invention): propose loosening any short gate only when direction=SHORT AND resolved n>=50 AND net would_pnl > +$1.00 AND 30d OOS same sign AND blocked-set WR < 30%. Every current candidate fails. Review Oct 25.",
+    "category": "entry sniper",
+    "status": "pre_registered",
+    "risk": "low"
   }
 ]
