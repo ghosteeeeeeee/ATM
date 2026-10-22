@@ -1556,3 +1556,7 @@
 - **WARN** (1x): Disk usage at 85% on / (94G/118G, 18G free). No logs older than 7 days found to compress; largest logs: pipeline.log 238M, signal-compactor.log 93M, 15m_regime.log 72M.
 - **INFO**: hermes-hl-sync-guardian.timer had no future triggers listed (OnUnitActiveSec cosmetic); timer restarted, service verified active and syncing (0 positions, no orphans/missing).
 - No pipeline errors, no phantom trades, prices fresh (48s). No auto-fixes required.
+
+## Error Alerts — 2026-10-22 13:43 UTC
+- **WARN** (1x): Disk usage at 85% (threshold)
+- **AUTO-FIX**: Vacuumed systemd journals — freed 570.6M, disk now 84%. No *.log files older than 7d to gzip.

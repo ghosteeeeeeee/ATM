@@ -21,6 +21,14 @@ This skill combines:
 - **EMA200** — Long-term dynamic support/resistance
 - **Volume ratio** — Per-timeframe volume confirmation
 
+**Data source rule (2026-10-22):** ALL price/candle/indicator reads come from
+the LOCAL stores — `data/candles.db` (refreshed every minute by the
+price_collector timer) and `data/prices.json`. Never make ad-hoc
+`candleSnapshot`/Hyperliquid API calls from an analysis session: they burn
+shared rate-limit budget (429 risk) that order placement depends on, and the
+local data is never staler than ~60s. API is only for what the local DB does
+not have (live mid on a delisted/edge case, exchange positions state).
+
 ## Step 0: Current Position Check (MANDATORY)
 
 **Always check current positions before any analysis.** This tells you:
