@@ -13995,3 +13995,25 @@ Final set: ['BTC', 'INJ']
 - 7d '-$3.18' slightly worse than '-$2.97' at 17:28
 - 1 open position — check next hour
 - CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #79
+
+## [2026-10-22 19:28 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.08 (WR: 100%) | 24h: 4T 3W '+$0.27' | 7d: 155T 38.1% '-$3.08' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- ZRO SHORT warrior-sr-confirm- won +$0.08 (profit-monster-trail, +3.41%) — 2nd consecutive winning hour
+- Kill check: no signal at 0%WR with 3+T last hour (only 1T closed)
+- atr_sl_hit 0/4 = 0% (<40%) — under threshold
+- Neg-hour streak: none — last 2 hours both positive, no 3h trigger
+- Frequency 1/hr — not overtraded (limit 20)
+- 1 open position — BTC ai-trader-pending SHORT since 17:14, monitor
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h turned positive '+$0.27' on 4T (WR 75%) — quiet market, quality over quantity
+- 7d '-$3.08' flat vs '-$3.18' last hour
+- 1 open BTC SHORT — check next hour
+- CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #79
