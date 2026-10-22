@@ -6781,5 +6781,35 @@
     "category": "gate integrity",
     "status": "suggested",
     "risk": "medium — changes gate decisions at the margin (17% of boundary obs), needs CEO eyeball Oct 23, one variable at a time (tf-authority ruling is a SEPARATE later question)"
+  },
+  {
+    "date": "2026-10-22T19:48:26Z",
+    "idea": "Arm-rate x EMA300-gap interaction measured and REFUTED",
+    "rationale": "Tested whether entries inside 0.2% of 1m EMA300 (chop/reclaim band) arm the trail less than extended entries — would have justified an AT-EMA300 entry-quality rule.",
+    "measured": "n=351 (all 14d closes, EMA300 recomputed per open_time from candles_1m): abs gap<0.2 n=79 arm 41.8% pnl +0.32; abs gap>=1.0 n=92 arm 32.6% pnl -0.70; two-proportion z=0.81 p~0.42; bands non-monotonic.",
+    "expected_impact": "none — route closed",
+    "category": "entry sniper",
+    "status": "refuted-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T19:48:26Z",
+    "idea": "Alignment-scoped arm-dampen (signal-agnostic route past the CEO-domain scope problem) measured and REFUTED",
+    "rationale": "arm-dampen #61 is blocked on a scope ruling because 2 of 3 qualifiers are ai-trader. If COUNTER-regime trades simply armed less, a coin_regime-scoped dampen would be signal-agnostic.",
+    "measured": "stamped 14d: ALIGNED 27T arm 55.6% +0.18 vs COUNTER 23T arm 47.8% -0.53 — 7.8pt delta on n=50, alignment does not predict arming; COUNTER SHORT arm 1/6 (n=6).",
+    "expected_impact": "none — refuted; arm-dampen stays signal-scoped and still needs the Oct 23 CEO scope ruling",
+    "category": "position sizing",
+    "status": "refuted-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T19:48:26Z",
+    "idea": "CONF_FLOOR_60 staged second floor for pump-chain+ bare",
+    "rationale": "pc+ conf bands 14d: <30 = -1.28 (covered by CONF_FLOOR shipping Oct 23), 30-59 = -0.20 on n=7, 60+ = +1.13 on n=21 — the residual edge may be a 60+ cohort only.",
+    "expected_impact": "+0.20/14d projected if it holds",
+    "category": "entry sniper",
+    "status": "pre_registered",
+    "risk": "low — one variable, only after CONF_FLOOR has soaked",
+    "flip_criteria": "re-measure Oct 30 (7d after CONF_FLOOR ships); block only if pc+ conf 30-59 has n>=20 AND PnL<0 AND fk<20%"
   }
 ]
