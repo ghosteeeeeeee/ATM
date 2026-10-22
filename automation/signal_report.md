@@ -1,52 +1,57 @@
 # Signal Performance Report
-**Generated:** 2026-10-22 15:36 UTC | **Period:** Last 6h | 24h | (48h context)
+**Generated:** 2026-10-22 21:35 UTC | **Period:** Last 6h + 24h (7d context for watch list)
 
-All numbers verified by direct PostgreSQL query against brain DB this run.
+All numbers verified directly against brain DB this run.
 
-## Overall Windows
-- **6h:** 0 closed trades, $0.00 PnL
-- **24h:** 9 closed trades, -$0.33 PnL
-- **48h:** 44 closed trades, -$1.04 PnL
+## Headline
+
+Trade throughput collapsed: **4 closed trades in 24h** (vs 37 on 10-21, 23 on 10-20).
+No signal reaches any kill or boost threshold (all have ≤1 trade in 24h). No kills,
+no boosts executed. No direction inversions found (24h or 7d).
+
+---
 
 ## KILLED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no signal met kill criteria (WR<30%, 5+ trades, PnL<-$0.10, 24h) |
+| — | — | — | — | — | none — no candidate met 24h criteria (5+ trades) |
 
 ## BOOSTED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no signal had 5+ trades in 24h |
+| — | — | — | — | — | none — no candidate met 24h criteria |
 
-## LOSERS (watch list)
+## LOSERS (watch list, 7d — 24h sample too thin)
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 33.3% | -0.23 | 3 (24h) | watch — below kill bar (3<5T); 48h is 62.5% +0.03, all-time regime: FLAT 4/4 +0.17, NORMAL ~51%, HIGH 55.6%, EXTREME 46% — not a blanket kill |
-| pump-chain+ | LONG | 0.0% | -0.32 | 6 (48h) | watch — 24h only 1T (fails 24h kill bar); all-time EXTREME 43% WR **+$3.73** → regime-dependent, would need vol-gate not kill |
-| r2v2-long3 | LONG | 42.9% | -0.21 | 7 (48h) | watch — WR in tune range but 48h only, no 24h signal |
+| pump-chain+ | LONG | 6.7% | -1.29 | 15 | WATCH — HIGH blocked at runtime; EXTREME still 1.0 but decaying: 30d +2.54 / 14d +0.25 / **7d 0W-9T -0.79**. Re-evaluate EXTREME if 7d bleed continues; no kill (30d edge exists) |
+| bb-bounce-v2-long+ | LONG | 47.6% | -0.60 | 21 | WATCH — FLAT-only admission gate active; NORMAL 9W/17T but still net negative, exit-side issue not entry |
+| pump-chain- | SHORT | 0.0% | -0.58 | 10 | WATCH — 8 EXTREME losses all pre/post-block edge on 10-16 only; post-10-16 only 2 NORMAL trades (-0.09). EXTREME 0.0 gate holding |
+| ai-trader+ | LONG | 42.9% | -0.54 | 14 | WATCH — EXTREME 0.0 gate (10-19) verified holding: 0 EXTREME opens since. HIGH kept (4W/5T) |
+| doji-bottom-long | LONG | 45.5% | -0.51 | 11 | WATCH |
+| ai-trader-pending | LONG | 0.0% | -0.14 | 6 | WATCH — n too small |
+| r2v2-long3 | LONG | 55.6% | -0.12 | 9 | WATCH — WR ok, PnL negative (exit asymmetry) |
 
-## WINNERS
+## WINNERS (7d, none boost-eligible in 24h)
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| ai-trader-pending | SHORT | 100% | +0.11 | 1 (24h) | n=1, no boost |
-| continuum-trend+ | LONG | 66.7% | +0.05 | 3 (48h) | n=3, no boost |
-| bb-bounce-v2-long+ | LONG | 62.5% | +0.03 | 8 (48h) | healthy over 48h despite 24h blip |
+| continuum-trend+ | LONG | 80.0% | +0.09 | 5 | Not boosted — all 5 trades on one chain (hyperliquid), fails multi-token criterion; n=5 |
+| volume-buildup- | SHORT | 66.7% | +0.02 | 6 | Not boosted — PnL below $0.05 bar |
+| pump-chain-,pump-chain-v6- | SHORT | 33.3% | +0.31 | 9 | Not boosted — WR below bar |
+| 24h: volume-buildup- / warrior-sr-confirm- / ai-trader-pending(+) | — | 100/100/100 | +0.08/+0.08/+0.11 | 1 each | n=1, no action |
 
 ## ISSUES
 
-### 1. System is fully gated — 0 trades closed in 6h (MEDIUM, by design so far)
-- 188 signals created in 6h (998 in 24h): 162 EXPIRED, 12 PENDING, 11 SKIPPED, 3 FAILED, **0 APPROVED**.
-- Filter sandwich during the dump:
-  - **LONG blocked** by `LONG-NEUTRAL-CHOP` (BTC below EMA300): 212 blocks in log window.
-  - **SHORT blocked** by `SHORT-RSI-HARD-FLOOR` (floor=45): ~1,300 blocks across ~60 tokens, most with 5m RSI 28–35.
-- The BTC-bearish exemption for shorts (`RSI >= OVERSOLD_SHORT_RSI_MAX`=35 + continuum LEAN_BEAR/BEAR, age<600s) shipped **today 14:39 UTC** and is live (confirmed in log: "SHORT allowed at approval — BTC bearish"). RSI<35 shorts stay hard-dead per BANANA lesson.
-- **Action taken:** none — the exemption is <2h old, needs observation window before further gate changes. Re-evaluate at next run: if 0 approvals persist 6h after the override, the RSI<35 hard-dead band + LONG chop block is a collision trap and needs CEO decision.
-
-### 2. No inversions (clean)
-- 24h direction-mismatch query: 0 rows.
-
-### 3. Hotset fallback warning (LOW)
-- `[hotset] fallback DB query returned 0 tokens` in pipeline.log — follows from empty hotset, not an independent bug.
-
----
-*Kill/boost thresholds applied: kill = WR<30% + 5T + PnL<-$0.10 (24h, active>24h); boost = WR>55% + 5T + PnL>$0.05 (24h). Regime check required before any kill.*
+- **Trade drought:** 4 closes in last 24h vs 23-37/day on 10-20/10-21. Pipeline is alive
+  (cycle #253060, 46 signals in runner) but pre-filter/confluence-gate passes ≈0-1 signals
+  per cycle; hotset wrote 0 tokens at 21:33. Gates are filtering hard — monitor; if 24h
+  closes stay <5 tomorrow, audit which gate went hyper-aggressive (visible blocks:
+  CONFLUENCE-GATE single-type, PUMP-CHAIN-HIGH, PUMP-CHAIN-RSI-MAX, CONTINUUM-BULL).
+- **No inversions:** 0 direction mismatches in 24h and 7d windows.
+- **Gate leak check:** pump-chain- EXTREME (blocked 10-16) — no EXTREME opens after
+  10-16 14:04 ✓. ai-trader+ EXTREME (blocked 10-19) — no EXTREME opens since ✓.
+- Prior kills/regime gates verified in place: volatility_gate_v2.py lines 363/378/385/386.
