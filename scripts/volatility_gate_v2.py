@@ -148,6 +148,7 @@ REGIME_SIGNALS = {
         'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-09
         'volume-breakout-long+',  # volume-confirmed breakout LONG — added 2026-10-09: sync with v1
         'volume-breakout-short-', 'volume_breakout_short',  # volume-confirmed breakout SHORT — added 2026-10-09
+        'volume-buildup-',  # sustained volume buildup SHORT — CEO UNCLOG flip #2 (consult 20261022T144234Z, T directive 2026-10-22): 16 EXEC/day killed "not suited for HIGH"; family=Other so Volume=0.0 family block does NOT apply; NORMAL 9T 77.8% +$0.35/30d
         'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-09
         'doji-bottom-long', 'doji-top', 'doji-top-short',  # doji patterns — added 2026-10-09
         'btc-pump-rider+',  # BTC breakout → alt lagging LONG — added 2026-10-09: sync with v1
@@ -208,6 +209,7 @@ REGIME_SIGNALS = {
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
         'volume-breakout-long+',  # volume-confirmed breakout LONG (hyphen variant) — added 2026-10-09: sync with v1
         'volume-breakout-short-', 'volume_breakout_short',  # volume-confirmed breakout SHORT — added 2026-10-09: BANANA SHORT blocked
+        'volume-buildup-',  # sustained volume buildup SHORT — CEO UNCLOG flip #2 (consult 20261022T144234Z, T directive 2026-10-22): 16 EXEC/day killed "not suited for EXTREME"; family=Other so Volume=1.0 EXTREME phase applies
         'bb-bounce-v2-long+', 'bb_bounce_v2_long',  # BB bounce v2 LONG — added 2026-10-09: APT LONG blocked in EXTREME
         'doji-top', 'doji-top-short',  # doji patterns — added 2026-10-09; doji-bottom-long REMOVED from EXTREME 2026-10-13 signal_reporter — EXTREME 3T 0%WR -$0.25 (mean-reversion LONG in storm = falling knife; TURBO/IMX hard_max_loss). HIGH 12T 83.3% +$0.89 and NORMAL 8T 50% +$0.12 kept.
         # trend_purity REMOVED 2026-10-21 — ENABLED=False since 2026-09-23 emergency fix (NEVER_REENABLE). Dead allowlist entry.

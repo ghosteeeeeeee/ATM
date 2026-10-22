@@ -4114,8 +4114,38 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         if _rsh_al > 0:
                             _rsh_rsi = 100 - (100 / (1 + _rsh_ag / _rsh_al))
                             if _rsh_rsi < SHORT_RSI_HARD_FLOOR:
-                                log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} (exec-time floor would reject anyway)")
-                                continue
+                                # CEO UNCLOG flip #1 — consult 20261022T144234Z, T directive
+                                # 2026-10-22 14:39 UTC: BTC-bear structure exemption, mirror of the
+                                # pump-chain/soft/oversold overrides below (linreg LEAN_BEAR/BEAR,
+                                # age<600s) — oversold = continuation in a dump. RSI <
+                                # OVERSOLD_SHORT_RSI_MAX (35) stays hard-dead on every path (BANANA).
+                                # This approval layer had NO override while hard==soft==45, so it
+                                # fired first (265 kills in the 00:00-02:59 dump window) and made
+                                # every override below it dead code.
+                                from hermes_constants import OVERSOLD_SHORT_RSI_MAX
+                                _rsh_bear_override = False
+                                if _rsh_rsi >= OVERSOLD_SHORT_RSI_MAX:
+                                    try:
+                                        import os as _rsh_os
+                                        import time as _rsh_time
+                                        _rsh_cont = sqlite3.connect(_rsh_os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+                                        try:
+                                            _rsh_row = _rsh_cont.execute(
+                                                "SELECT linreg_direction, ts FROM continuum_states "
+                                                "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+                                            ).fetchone()
+                                        finally:
+                                            _rsh_cont.close()
+                                        if (_rsh_row and _rsh_row[1] and (_rsh_time.time() - _rsh_row[1]) < 600
+                                                and _rsh_row[0] in ('LEAN_BEAR', 'BEAR')):
+                                            _rsh_bear_override = True
+                                    except Exception:
+                                        pass
+                                if _rsh_bear_override:
+                                    log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} but BTC bearish (oversold = continuation)")
+                                else:
+                                    log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} (exec-time floor would reject anyway)")
+                                    continue
                 except Exception:
                     pass  # non-fatal
                 finally:

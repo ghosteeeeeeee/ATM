@@ -1049,6 +1049,33 @@ def _ctx_gate_get_market_context():
     btc_cont = _ctx_gate_get_btc_continuum()
     return {'btc_z': btc_z, 'eth_z': eth_z, 'btc_continuum': btc_cont}
 
+def _short_rsi_floor_bear_exempt():
+    """BTC bear-structure exemption for the SHORT RSI<floor blocks.
+
+    CEO UNCLOG flip #1 — consult 20261022T144234Z, T directive 2026-10-22 14:39 UTC
+    ("unclog the system"). Mirrors the compactor's bear overrides
+    (signal_compactor.py pump-chain/soft/oversold blocks): BTC continuum linreg in
+    {LEAN_BEAR, BEAR} and fresher than 600s → oversold = continuation in a dump.
+    Callers must keep RSI < OVERSOLD_SHORT_RSI_MAX (35) hard-dead on every path
+    (BANANA lesson — falling knife, no exemption). Fail-open on DB error so a stale
+    continuum never freezes SHORT execution.
+    """
+    try:
+        _sr_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+        try:
+            _sr_row = _sr_conn.execute(
+                "SELECT linreg_direction, ts FROM continuum_states "
+                "WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+            ).fetchone()
+        finally:
+            _sr_conn.close()
+        if (_sr_row and _sr_row[1] and (time.time() - _sr_row[1]) < 600
+                and _sr_row[0] in ('LEAN_BEAR', 'BEAR')):
+            return True
+    except Exception:
+        pass
+    return False
+
 def rule_based_context_gate(token, direction, source, sig):
     """
     Free, instant gate. Returns (verdict, data):
@@ -1155,15 +1182,32 @@ def rule_based_context_gate(token, direction, source, sig):
         # DRIFT-002 fix: fall back to top-level sig RSI when metadata lacks rsi_14
         if _detect_rsi_floor is None and isinstance(sig, dict):
             _detect_rsi_floor = sig.get('rsi_14') or sig.get('rsi')
-        # HARD FLOOR first — no bearish override. RSI<25 SHORT = falling knife even in downtrend.
-        # 14d: 12T 25%WR -$0.89; 0 real winners. Catches STANDALONE_BYPASS + bearish-override hole.
+        # HARD FLOOR — RSI < OVERSOLD_SHORT_RSI_MAX (35) is dead on EVERY path (BANANA lesson:
+        # falling knife, no override ever). Band [35, floor) gets the BTC-bear structure exemption.
+        # CEO UNCLOG flip #1 — consult 20261022T144234Z, T directive 2026-10-22 14:39 UTC: both
+        # floors were 45, so the bear override below this block was dead code AND the exec layer
+        # rejected whatever the compactor let through ("no bearish override") — approval→exec
+        # contradiction that could never survive execution.
         # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12: 40-45 band = 19T 63.2%WR +$0.48.
-        from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
+        from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN, OVERSOLD_SHORT_RSI_MAX
         _hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_HARD_FLOOR
+        _floor_bear_cache = {}
+        def _floor_bear_ok():
+            if 'v' not in _floor_bear_cache:
+                _floor_bear_cache['v'] = _short_rsi_floor_bear_exempt()
+            return _floor_bear_cache['v']
         if _live_rsi_floor is not None and _live_rsi_floor < _hard_floor:
-            return ('SKIP', f'{source or "SHORT"}: LIVE RSI {_live_rsi_floor:.1f} < {_hard_floor} (extreme oversold — hard block, no bearish override)', 0)
+            if _live_rsi_floor < OVERSOLD_SHORT_RSI_MAX:
+                return ('SKIP', f'{source or "SHORT"}: LIVE RSI {_live_rsi_floor:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)', 0)
+            if not _floor_bear_ok():
+                return ('SKIP', f'{source or "SHORT"}: LIVE RSI {_live_rsi_floor:.1f} < {_hard_floor} (extreme oversold — hard block, no bearish override)', 0)
+            log(f'  ✅ [CTX-RSI-FLOOR-BEAR] {token} {source}: LIVE RSI {_live_rsi_floor:.1f} < {_hard_floor} allowed — BTC bearish structure (oversold = continuation)')
         if _detect_rsi_floor is not None and _detect_rsi_floor < _hard_floor:
-            return ('SKIP', f'{source or "SHORT"}: DETECT RSI {_detect_rsi_floor:.1f} < {_hard_floor} (extreme oversold — hard block, no bearish override)', 0)
+            if _detect_rsi_floor < OVERSOLD_SHORT_RSI_MAX:
+                return ('SKIP', f'{source or "SHORT"}: DETECT RSI {_detect_rsi_floor:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)', 0)
+            if not _floor_bear_ok():
+                return ('SKIP', f'{source or "SHORT"}: DETECT RSI {_detect_rsi_floor:.1f} < {_hard_floor} (extreme oversold — hard block, no bearish override)', 0)
+            log(f'  ✅ [CTX-RSI-FLOOR-BEAR] {token} {source}: DETECT RSI {_detect_rsi_floor:.1f} < {_hard_floor} allowed — BTC bearish structure (oversold = continuation)')
         # FIX 2026-10-05 CEO: b960ffe8 fail-closed gap — both RSI sources None = allow.
         # IMX mtf-regime-trend- SHORT entry_rsi=14.47 + HBAR pump-chain- SHORT entry_rsi=24.30 leaked 2026-10-05.
         if _live_rsi_floor is None and _detect_rsi_floor is None:
@@ -1197,12 +1241,20 @@ def rule_based_context_gate(token, direction, source, sig):
             pass
         
         # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12.
+        # CEO UNCLOG flip #1: same knife/bear pattern as the hard floor above — with both floors
+        # at 45 this block would instantly re-kill every signal the hard-floor exemption let pass.
         from hermes_constants import SHORT_RSI_FLOOR_PUMP_CHAIN
         _soft_floor = SHORT_RSI_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_FLOOR
         if _live_rsi_floor is not None and _live_rsi_floor < _soft_floor:
-            return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {_soft_floor} (extremely oversold — bounce risk)', 0)
+            if _live_rsi_floor < OVERSOLD_SHORT_RSI_MAX:
+                return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)', 0)
+            if not _floor_bear_ok():
+                return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {_soft_floor} (extremely oversold — bounce risk)', 0)
         if _detect_rsi_floor is not None and _detect_rsi_floor < _soft_floor:
-            return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {_soft_floor} (detected in oversold — bounce risk)', 0)
+            if _detect_rsi_floor < OVERSOLD_SHORT_RSI_MAX:
+                return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)', 0)
+            if not _floor_bear_ok():
+                return ('SKIP', f'{_sig_label}: DETECT RSI {_detect_rsi_floor:.1f} < {_soft_floor} (detected in oversold — bounce risk)', 0)
         # XPL DNA: LIVE z > 0.5 means price above mean — downtrend weakened (pullback-entry only)
         # Catches trades where detect() 5m z passed but execution-time 1m z is positive
         _is_pullback = source and 'pullback-entry' in source
@@ -2062,13 +2114,28 @@ def execute_trade(token, direction, price, confidence, source,
         if _exec_rsi is not None:
             # volume-breakout-long+ rides momentum — use higher ceiling (RSI>70 is its best band)
             _long_ceiling = VOLUME_BREAKOUT_LONG_RSI_CEILING if 'volume-breakout' in (source or '') else LONG_RSI_CEILING
-            # HARD FLOOR first — no bearish override. Catches STANDALONE_BYPASS + override hole at exec time.
-            # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12.
-            from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
+            # HARD FLOOR — knife (< OVERSOLD_SHORT_RSI_MAX) dead on every path (BANANA lesson);
+            # [35, floor) gets the BTC-bear structure exemption. CEO UNCLOG flip #1 — consult
+            # 20261022T144234Z, T directive 2026-10-22 14:39 UTC: mirrors the compactor bear
+            # override (linreg LEAN_BEAR/BEAR, age<600s). This layer previously said
+            # "no bearish override" and rejected whatever the compactor's own override let
+            # through — the approval→exec contradiction (morning rec #3) that killed YGG
+            # (detect 23.5 / live 49.5) and every dump-window short.
+            from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN, OVERSOLD_SHORT_RSI_MAX
             _exec_hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_HARD_FLOOR
+            _exec_bear_cache = {}
+            def _exec_bear_ok():
+                if 'v' not in _exec_bear_cache:
+                    _exec_bear_cache['v'] = _short_rsi_floor_bear_exempt()
+                return _exec_bear_cache['v']
             if direction.upper() == 'SHORT' and _exec_hard_floor > 0 and _exec_rsi < _exec_hard_floor:
-                log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {_exec_hard_floor} at execution time (extreme oversold — no bearish override)')
-                return False, f'RSI hard floor: {_exec_rsi:.1f} < {_exec_hard_floor}'
+                if _exec_rsi < OVERSOLD_SHORT_RSI_MAX:
+                    log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)')
+                    return False, f'RSI knife floor: {_exec_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX}'
+                if not _exec_bear_ok():
+                    log(f'  🚫 [EXEC-RSI-HARD-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {_exec_hard_floor} at execution time (extreme oversold — no bearish override)')
+                    return False, f'RSI hard floor: {_exec_rsi:.1f} < {_exec_hard_floor}'
+                log(f'  ✅ [EXEC-RSI-FLOOR-BEAR] {token} {source}: RSI {_exec_rsi:.1f} < {_exec_hard_floor} allowed at execution — BTC bearish structure (oversold = continuation)')
             # BUGFIX brain_auditor 2026-10-13: detect-RSI hard-floor for STANDALONE_BYPASS path.
             # Context gate (non-bypass) blocks when EITHER live OR detect RSI < floor. Bypass
             # signals skip the context gate, so a signal fired in oversold (meta RSI < floor)
@@ -2091,8 +2158,14 @@ def execute_trade(token, direction, price, confidence, source,
                 _detect_floor_rsi = None
             if (direction.upper() == 'SHORT' and _exec_hard_floor > 0
                     and _detect_floor_rsi is not None and _detect_floor_rsi < _exec_hard_floor):
-                log(f'  🚫 [EXEC-RSI-DETECT-FLOOR] {token} SHORT BLOCKED — detect RSI {_detect_floor_rsi:.1f} < {_exec_hard_floor} (signal fired in oversold; live recovered to {_exec_rsi:.1f})')
-                return False, f'RSI hard floor (detect): {_detect_floor_rsi:.1f} < {_exec_hard_floor}'
+                # CEO UNCLOG flip #1: knife dead / bear-exempt band, same as live floor above.
+                if _detect_floor_rsi < OVERSOLD_SHORT_RSI_MAX:
+                    log(f'  🚫 [EXEC-RSI-DETECT-FLOOR] {token} SHORT BLOCKED — detect RSI {_detect_floor_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — fired in deep oversold, no bearish override ever)')
+                    return False, f'RSI knife floor (detect): {_detect_floor_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX}'
+                if not _exec_bear_ok():
+                    log(f'  🚫 [EXEC-RSI-DETECT-FLOOR] {token} SHORT BLOCKED — detect RSI {_detect_floor_rsi:.1f} < {_exec_hard_floor} (signal fired in oversold; live recovered to {_exec_rsi:.1f})')
+                    return False, f'RSI hard floor (detect): {_detect_floor_rsi:.1f} < {_exec_hard_floor}'
+                log(f'  ✅ [EXEC-RSI-FLOOR-BEAR] {token} {source}: detect RSI {_detect_floor_rsi:.1f} < {_exec_hard_floor} allowed at execution — BTC bearish structure (oversold = continuation; live={_exec_rsi:.1f})')
             # 2026-10-06 brain_auditor: removed c4097276 exec bear override on SHORT_RSI_FLOOR.
             # Standing decision: exec RSI>=45 all paths; HARD_FLOOR=45 (aligned 2026-10-07) no override.
             # 7d SHORT meta RSI<40: 13T 31%WR -$0.77; pump-chain- RSI<40: 3T 0%WR -$0.38.
@@ -2101,8 +2174,15 @@ def execute_trade(token, direction, price, confidence, source,
             from hermes_constants import SHORT_RSI_FLOOR_PUMP_CHAIN
             _exec_soft_floor = SHORT_RSI_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_FLOOR
             if direction.upper() == 'SHORT' and _exec_soft_floor > 0 and _exec_rsi < _exec_soft_floor:
-                log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {_exec_soft_floor} at execution time (oversold — standing decision: no bearish override)')
-                return False, f'RSI floor: {_exec_rsi:.1f} < {_exec_soft_floor}'
+                # CEO UNCLOG flip #1: knife dead / bear-exempt band — with soft==hard==45 this
+                # block would otherwise instantly re-kill what the hard-floor exemption passed.
+                if _exec_rsi < OVERSOLD_SHORT_RSI_MAX:
+                    log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)')
+                    return False, f'RSI knife floor: {_exec_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX}'
+                if not _exec_bear_ok():
+                    log(f'  🚫 [EXEC-RSI-FLOOR] {token} SHORT BLOCKED — RSI {_exec_rsi:.1f} < {_exec_soft_floor} at execution time (oversold — standing decision: no bearish override)')
+                    return False, f'RSI floor: {_exec_rsi:.1f} < {_exec_soft_floor}'
+                log(f'  ✅ [EXEC-RSI-FLOOR-BEAR] {token} {source}: RSI {_exec_rsi:.1f} < {_exec_soft_floor} allowed at execution (soft floor) — BTC bearish structure')
             if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
                 log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
                 return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
