@@ -6699,5 +6699,24 @@
     "category": "entry sniper",
     "status": "pre_registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-22T15:45:00Z",
+    "idea": "Unclog-waiver impact scoreboard (3 cohorts from existing log lines, evaluate at Oct 24 waiver expiry)",
+    "rationale": "T's waiver ships 3 gate opens that historically show tension (BEAR_TREND 35-45 band 30d 32T 31.3% -$1.12 realized vs +$0.34 blocked-cohort counterfactual). No measurement = we won't know if the unclog helped or bled. Counters: (a) SHORT-RSI-HARD-FLOOR allowed-at-approval lines -> opens/WR/PnL, (b) knife<35 blocks, (c) volume-buildup- HIGH/EXTREME regime pass/blocks — all already in pipeline.log, grep only, zero code.",
+    "expected_impact": "decision quality: make-permanent vs revert at waiver expiry backed by data instead of feel",
+    "category": "impact tracking",
+    "status": "pre_registered",
+    "risk": "low",
+    "criteria": "make permanent if: exemption-band SHORT opens n>=5 AND WR>=40% AND no single loss >1% AND gate-shadow EXEC-RSI-HARD-FLOOR OOS same sign; else let waiver expire Oct 24"
+  },
+  {
+    "date": "2026-10-22T15:45:00Z",
+    "idea": "Exemption-to-open conversion rate (flip1 survivors vs next-gate kills)",
+    "rationale": "BIGTIME cleared the new RSI exemption at 15:34-15:36 and was killed the same second by SHORT-BB-DEAD-ZONE (bb 0.7348) — if conversion from exempt-pass to actual open is <10%, flip #1 is log noise beyond the unclog intent and the real binding gate is elsewhere (BB dead zone / midband / confluence). Measurable from existing log pairs.",
+    "expected_impact": "tells us WHICH gate actually governs short supply in this dump",
+    "category": "funnel diagnostics",
+    "status": "suggested",
+    "risk": "none (read-only)"
   }
 ]

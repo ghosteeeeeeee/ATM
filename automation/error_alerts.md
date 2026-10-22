@@ -1560,3 +1560,11 @@
 ## Error Alerts — 2026-10-22 13:43 UTC
 - **WARN** (1x): Disk usage at 85% (threshold)
 - **AUTO-FIX**: Vacuumed systemd journals — freed 570.6M, disk now 84%. No *.log files older than 7d to gzip.
+
+## Error Alerts — 2026-10-22 15:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3418s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3299s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3299s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3239s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3239s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] USELESS TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`

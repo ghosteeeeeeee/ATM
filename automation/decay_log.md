@@ -1957,3 +1957,5 @@
 [2026-10-22 09:31 UTC]   🟢 OK: bb-bounce-v2-long+: 7 trades, 57.1% WR, PnL=0.49
 [2026-10-22 09:31 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-22 09:31 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-22 15:31 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-22 15:31 UTC] No signals with sufficient trades in 24h window

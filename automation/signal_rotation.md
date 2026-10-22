@@ -1,4 +1,4 @@
-# Signal Rotation — 2026-10-22 11:41 UTC
+# Signal Rotation — 2026-10-22 15:41 UTC
 
 ## Market Regime: SHORT_BIAS
 
