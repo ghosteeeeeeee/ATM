@@ -65,7 +65,12 @@ cur.close(); conn.close()
 **Key questions to answer:**
 1. Is there an open position on this coin? If yes, are you adding to it or flipping?
 2. What exit reason killed the last trade on this coin? (`atr_trail_hit` = trailing worked; `hard_max_loss` = stop hit; `atr_sl_hit` = ATR stop hit)
-3. Is the exit management (RR engine, trailing) actually firing for this signal type?
+3. Is the exit management actually firing for this signal type? For CEO
+   trades (`ai-trader-manual`/`ai-trader-pending`/`ai-trader-auto`) that
+   means `manual_exit_manager` per THE CONTRACT (manual-trade-override
+   skill): labels should be `manual_sl_hit`/`manual_tp_hit`/
+   `manual_trail_hit` — an `rr_engine_*` or `atr_*` label on a CEO trade
+   is a routing bug. For pipeline signals: RR engine / ATR trailing.
 4. Are you already on the right side or the wrong side?
 
 **Exit reason interpretation:**
@@ -75,6 +80,16 @@ cur.close(); conn.close()
 - `rr_engine_*` — RR engine managed exit (structural support/resistance)
 - `HL_CLOSED` — Closed on Hyperliquid directly
 - `trail_sl` — Trailing stop loss hit
+- `manual_sl_hit` — CEO trade's predefined stop did its job (exit contract)
+- `manual_tp_hit` — CEO trade's predefined target hit (exit contract)
+- `manual_trail_hit` — CEO trade's close trail took profit (exit contract)
+- `manual_*`/`rr_engine_*`/`atr_*` mismatch on a signal type = routing bug — report it
+
+**Also check what's ARMED:** positions are only half the exposure. Read
+`data/pending_orders.json` + `data/pending_orders_state.json` — an armed
+bracket between its triggers is live optionality that shapes every verdict
+(e.g. a fired-but-unverified order needs recovery, not analysis). The
+§12 bracket from the last analysis usually lives here.
 
 ## Key Indicators
 
@@ -251,11 +266,12 @@ print(f'24h hourly EMA300 flips: {flips} ({\"CHOP\" if flips >= 2 else \"TREND\"
   on the executing timeframe carry more weight than the trend inputs.
 - **flips 0-1 (TREND regime):** score as normal.
 
-**Slippage buffer (BTC 10x):** in any BTC trade at 10x, subtract a slippage
-buffer (150-250 points) from the R:R risk side before quoting it. #16273's
-paper 4.9:1 paid 2.2:1 because a squeeze blew 208 points past the stop
-between 1-minute pipeline checks. Quote "planned R:R" and "real R:R (with
-slip)" separately.
+**Slippage buffer (all BTC trades, any leverage):** before quoting R:R,
+subtract a slip buffer from the risk side — 150-250pts on a normal tape,
+**250-300pts in a fast tape** (the buffer sizes to the tape, not the
+leverage: #16273 blew 208pts at 10x; #16353 filled 281pt adverse at 5x).
+Quote "planned R:R" and "real R:R (with slip)" separately — armed
+conditionals must clear ≥1.0 real (manual-trade-override arming rule 3).
 
 **Example: BTC LONG scoring:**
 ```
@@ -581,6 +597,13 @@ and resistance.** The stop-limit process IS the backup strategy.
 
 ## Analysis Script
 
+**Fast path (2026-10-22):** `python3 scripts/auto_analysis.py` runs the
+SAME engines this skill specifies (chop flip counter, structure engine,
+MTF scoring with chop adjustment) and emits the machine-readable decision
+object — price, regime, structure per TF, scores, §12 bracket proposal
+with triggers/SL/TP, reasons. Run it first, then fill in the tape reads
+it can't compute (divergence nuance, live-momentum, CEO reads) by hand.
+
 Run this to get the complete picture:
 ```bash
 python3 -c "
@@ -662,6 +685,10 @@ After analysis, run the precheck:
 ```bash
 python3 /root/.hermes/scripts/ai_trader_precheck.py COIN DIRECTION
 ```
+**FAIL is advisory for CEO trades (never hidden):** report the FAIL reasons
+in the verdict and in the order `note` — the CEO decides. The precheck
+catches what the eye misses: RSI band (shorting an oversold extreme =
+BANANA), vol floor, LOSERS list, RR gate.
 
 ## Verdict Rules
 
