@@ -195,13 +195,14 @@ print("Analysis merged into watchdog_recommendations.json")
 
 ## Step 6: AI Trader Signal (Hourly Pick)
 
-Every hour, if there are open slots (fewer positions than MAX_POSITIONS), you pick ONE coin that "makes sense right now" and write it to the AI trader state file. This becomes a live signal (`ai-trader`) that the pipeline executes.
+Every hour, if there are open slots (fewer positions than MAX_POSITIONS), you pick ONE coin that "makes sense right now" and write it to the AI trader state file. The pipeline signal (`ai_trader_signal.py`) executes it ONLY when `AI_TRADER_ENABLED = True` in hermes_constants.py — **check that flag before reporting**. While it is False (CEO disabled automated picks 2026-10-19), the pick is WATCHLIST-ONLY: it will NOT become a trade regardless of how good the precheck is.
 
 **When to fire:**
 - Check the open trades count from watchdog.json
 - If open_trades < MAX_POSITIONS (check hermes_constants.py for MAX_POSITIONS), you may fire
 - Only fire once per hour — check if ai_trader_state.json was written in the last 45 minutes
 - **Check ai_trader_state.json for `rejected_at` field** — if the last pick was rejected (cooldown, blacklist, etc.), pick a DIFFERENT coin. Don't pick the same coin that just got rejected.
+- **If `AI_TRADER_ENABLED = False`:** still write the pick (watchlist + manual-trade reference), but NEVER report it as "FIRED". Report: `PICK (watchlist only — AI_TRADER_ENABLED=False, will NOT execute)`. 2026-10-22: FIL SHORT was reported "FIRED" with no executable path — misleading to the CEO.
 
 ### GATE AWARENESS — Pick coins that WILL pass
 
