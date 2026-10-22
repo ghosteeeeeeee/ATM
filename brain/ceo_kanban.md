@@ -8,3 +8,6 @@
 ## TEAM UPDATES
 
 - [2026-10-11 02:14] auto_1hr: No config change — 1 win last hour (NXPC doji +$0.06); 24h WR ~39% at ~−$1.07; volume-breakout-long+ (7T 0W −$0.97) still CEO-owned; AIXBT $22.10 open = recurring 2× size flag, sizing audit pending brain_auditor.
+
+## TEAM UPDATES
+- [2026-10-22 16:27] auto_1hr: NO CHANGE — 0T last hour (quiet since 09:00). 24h 9T WR 22.2% '-$0.33', 7d '-$2.69', size-reduce 0.5x. atr_sl_hit 44.4% tiny-n artifact (tpsl_utils deployed). CONF_FLOOR ships Oct 23.
