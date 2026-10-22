@@ -1032,3 +1032,54 @@
 3. brain.py --limit + guardian fill-integration — L2 — MED — only after limit_order.py proven in real use
 4. temporal-confluence / short-rsi-habitat / vol-regime-relative — L2-3 — MED-HIGH — CEO-gated SPECs
 5. 15m/1h/4h candle retention — L1 — LOW — only if disk tightens; 2.9M rows reclaimable
+
+---
+
+## Upgrade Implementer Session — 2026-10-22 04:30 UTC
+
+**Context:** pipeline LIVE. Prior overnight sessions shipped autonomous-BTC phase 0 (auto_trader.*), shadow_signals_runner, shadow-registry matcher fix. This session: deliver two CEO-GO'd undelivered docs (R2/D3) + fix remaining HIGH-5 pollution bug in shadow_signals_runner.
+
+### Plan evaluations (recent-20 re-scan)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| autonomous-btc-loop-spec | L4 | HIGH | ✅ PHASE 0 LIVE (prior session ~01:24 UTC) | auto_trader.py/db/analysis + trade_watchdog integration + dashboard; 14 decisions / 4 hypotheticals accruing. Spec header updated this session (was stale "DRAFT — no code") |
+| shadow-mode-paper-trading-spec | L3 | HIGH | ✅ IMPLEMENTED (prior) | shadow_trader.py + timers; SL sweeps + exit engines landed Oct 21 |
+| shadow-registry (6fee8ef8 + e5e5b313) | L2 | HIGH | ✅ MATCHER FIXED (prior) + HIGH-5 FIXED THIS SESSION | Stage B keys corrected; runner built; this session: source+direction filter stops live-path pollution |
+| shadow_signals_runner (0747cdd3) | L2 | HIGH | ⚠️→✅ PARTIAL THEN COMPLETE | ff9d08c5 fixed HIGH-1/2/3+MEDIUM; HIGH-5 (filter) + LOW fail-open + LOW error-counter fixed this session |
+| 2026-10-12_gate-conundrum (R2 registry) | L1 | HIGH | ✅ DELIVERED THIS SESSION | CEO GO D2 2026-10-12, delegated signal_analyst, never landed → brain/gate_registry.md |
+| 2026-10-12_gate-conundrum (D3 claim hygiene) | L1 | MED-HIGH | ✅ DELIVERED THIS SESSION | CEO GO D3; missing from brain/SOPs.md → added §10 |
+| 2026-10-12_gate-conundrum (R4 deadband) | L1 | MED | ✅ ALREADY LIVE | PUMP_CHAIN_VEL_30M_MIN both sides (CEO GO comment in signal_compactor) |
+| 2026-10-13_rr-engine-smart-upgrades | L2-3 | HIGH | U1 LIVE / U2-U4 ⏳ CEO | MOMENTUM_PROJECTION + MOMENTUM_SR_FILTER live; TF-aware + quality + Fib need CEO sequencing |
+| signal-starvation-fix / short-rsi-habitat / temporal-confluence / vol-regime / contrarian / regime-recalibration | L2-3 | MED-HIGH | ⏳ CEO-gated SPECs | No code without approval; hermes_constants DO-NOT-MODIFY |
+| winning-dna-remeasure-verdict | — | HIGH | ✅ CLOSED | SL-width study on CEO kanban |
+| strategic-six-options | L4 | HIGH | PARTIAL | vacation-mode + phase-aware v2 direction active; gate report card = this registry + gate_shadow |
+| grind-breakout-v2-coin-tracker | L3 | LOW | ⏸️ DEFERRED | Plan trigger (>50% missed breakouts) not evaluated |
+| limit-order-capability | L2 | MED | ✅ PHASE 1 (prior) | Phase 2-4 deferred until proven |
+
+### Implemented this session (2× L1 docs + 1× L2 bugfix + 2× L1 hygiene)
+
+1. **(L1) brain/gate_registry.md** — R2 gate registry, CEO D2 GO 2026-10-12, never delivered despite delegation. Ten active hard-veto gates with first-seen / evidence grade / n-effect / last-verified; young-gate watchlist (14d shadow-first clock); editor rules. Docs only — no trading behavior change.
+2. **(L1) brain/SOPs.md §10** — D3 claim-hygiene standard (episode counts, first-seen dates, null-model check, direction-signed counterfactual, registry update). References gate-conundrum cautionary tale.
+3. **(L2) shadow_signals_runner.py HIGH-5** — `_sig_matches_registry()` direction + SOURCE_FILTERS before shadow record. Prevents whole-module runs from tagging LIVE-enabled paths as shadow_bypass (proven pollution: 8× rs-s126/rs-s124 etc. tagged broken-short). Also: fail-closed on missing SHADOW_SIGNALS_RUNNER_ENABLED (was fail-open); empty vs error counters split (was "N errors" for benign no-detection).
+   - **Verified:** py_compile OK; 15-case unit matrix all PASS (incl. all pollution cases from bug_hunter verdict); full live run 35 recorded / 0 errors / 0 filtered; loss_cooldowns.json byte-identical; PG signal_cooldowns count+hash unchanged; zero non-broken rs-* bypass rows after fix; created_at format `YYYY-MM-DD HH:MM:SS` confirmed.
+4. **(L1) plans/autonomous-btc-loop-spec.md** — status header DRAFT→Phase 0 SHADOW LIVE (scripts shipped ~3h earlier; header was stale).
+5. **(L1) shadow_trader.py** — cosmetic: `log("\n═" * 60)` → `log("\n" + "═" * 60)` (13 sites; verdict LOW, 60-line banner spam).
+
+### Verifications (no code change)
+- Confirmed prior ff9d08c5 already fixed HIGH-1 (cooldown noop), HIGH-2 (master flags), HIGH-3 (created_at), MEDIUM try/finally, MEDIUM STAGES consumption.
+- LDO/GOAT/CAKE pollution cooldowns from pre-fix runs: already self-expired; no recurrence post-fix.
+- Disk 84% — 15m/1h/4h retention still deferred (prior decision: only if >85%).
+
+### Sideways findings
+- **Severity: LOW** — historical 9 polluted bypass rows (pre-fix, rs-s*/rs-r* live sources tagged broken-short) remain in shadow_trades.db. Self-contained; exclude `source like '%broken%'` when analyzing Stage C rs-broken cohort, or DELETE those 9 rows next touch.
+- **Severity: LOW** — SOPs.md has duplicate "## 7" section numbers (pre-existing); left as-is to avoid renumber churn.
+- **Severity: INFO** — shadow_bypass cohort now 623+ rows / 193 closed and growing ~35/run; ready for first Stage A/C readout once n per key is meaningful.
+
+### Success rate this session: 5/5 implemented (100%)
+### Next candidates (priority order)
+1. Stage A/C shadow readout — L1 analysis — MED — wait for n≥15 per key on doji/volume-breakout/bb-squeeze-/sqx
+2. RR engine U2-U4 — L2-3 — HIGH — needs CEO sequencing, shadow-mode pattern
+3. SL-width / entry-gate study — L2 — HIGH — CEO kanban GO pending
+4. temporal-confluence / short-rsi-habitat / vol-regime-relative — L2-3 — MED-HIGH — CEO-gated SPECs
+5. brain.py --limit + guardian fill-integration — L2 — MED — only after limit_order.py proven

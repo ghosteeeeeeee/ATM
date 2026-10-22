@@ -1354,7 +1354,7 @@ def report():
         for src, n, wr, avg_pnl in rows:
             log(f"  {src:30} n={n:5} WR={wr:5}% avg_pnl={avg_pnl:+.2f}")
         
-        log("\n═" * 60)
+        log("\n" + "═" * 60)
     finally:
         conn.close()
 
@@ -1476,7 +1476,7 @@ def analyze_hml_thresholds():
         for src, d, n, wr, avg_net, avg_mfe, avg_mae, ratio in rows:
             log(f"  {src:35} {d:5} {n:5} {wr:5.1f}% {avg_net:+.3f}% {avg_mfe:+.3f}% {avg_mae:+.3f}% {ratio:.2f}")
         
-        log("\n═" * 60)
+        log("\n" + "═" * 60)
     finally:
         conn.close()
 
@@ -1697,7 +1697,7 @@ def flip_test(signal_type_filter=None):
                 else:
                     log(f"  ❌ Original is better by {orig_avg-flip_avg:+.3f}%")
         
-        log("\n═" * 60)
+        log("\n" + "═" * 60)
     finally:
         conn.close()
 
@@ -1765,7 +1765,7 @@ def analyze_exit_engines(signal_type_filter=None):
             avg = stats['total_pnl'] / stats['n'] if stats['n'] > 0 else 0
             log(f"  {engine:25} {stats['n']:5} {wr:5.1f}% {stats['total_pnl']:+8.2f}% {avg:+8.3f}%")
         
-        log("\n═" * 60)
+        log("\n" + "═" * 60)
     finally:
         conn.close()
 
@@ -1828,7 +1828,7 @@ def analyze_hold_times(signal_type_filter=None):
                     pct = count / len(winners) * 100
                     log(f"      {bucket:8}: {count:3} ({pct:.0f}%)")
         
-        log("\n═" * 60)
+        log("\n" + "═" * 60)
     finally:
         conn.close()
 
@@ -1926,7 +1926,7 @@ def sweep_arm_timeouts(signal_type_filter=None, direction_filter=None):
         if results[best]['n'] > 0:
             log(f"\n  🏆 Best timeout: {best}min (WR={results[best]['wins']/results[best]['n']*100:.1f}%, avg={results[best]['total_pnl']/results[best]['n']:+.3f}%)")
         
-        log("\n═" * 60)
+        log("\n" + "═" * 60)
     finally:
         conn.close()
 
@@ -2022,7 +2022,7 @@ def sweep_hml_thresholds(signal_type_filter=None):
         if results[best]['n'] > 0:
             log(f"\n  🏆 Best threshold: {best}% account (WR={results[best]['wins']/results[best]['n']*100:.1f}%, avg={results[best]['total_pnl']/results[best]['n']:+.3f}%)")
         
-        log("\n═" * 60)
+        log("\n" + "═" * 60)
     finally:
         conn.close()
 
@@ -2199,7 +2199,7 @@ def sweep_sl_levels(signal_type_filter=None, direction_filter=None):
                 if best_sl:
                     log(f"  {st:35} n={len(sig_rows):4} best SL={best_sl:.2f}% (PnL={best_pnl:+.2f}%)")
         
-        log("\n═" * 60)
+        log("\n" + "═" * 60)
     finally:
         conn.close()
 

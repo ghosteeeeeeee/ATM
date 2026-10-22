@@ -152,6 +152,20 @@ When: Always — this is a core system principle.
 
 ---
 
+## 10. Gate Proposal Claim Hygiene (CEO D3, 2026-10-12)
+
+When proposing ANY new gate, filter, or hard veto — no exceptions:
+
+1. **Episode-level counts** — dedupe consecutive log lines into episodes. Raw line counts inflate (one gate firing 50 lines in one minute ≠ 50 independent blocks).
+2. **First-seen dates** — a gate younger than the analysis window cannot be a "top blocker over 2 weeks." Check `git log -S` or the registry before ranking.
+3. **Null-model check** — for any "always / never / 99%" statistic, state what a null model expects. The deadlock episode: 99.7% both-dir-blocked *reproduces*, but three nulls all expect 100% — the stat was vacuous.
+4. **Direction-signed counterfactual** — blocked cohort PnL in dollars, long/short signed, vs what the trade would have done. WR alone is not enough.
+5. **Register the gate** — add/update the row in `brain/gate_registry.md` in the same change. New gates: shadow-first 14d before hard-veto trust.
+
+Cautionary tale: plans/2026-10-12_gate-conundrum-deadlock-plan.md — a &lt;24h-old gate circulated as a 2-week top blocker; pincer "deadlock" was statistically vacuous. Claim hygiene is the filter that stops that class.
+
+---
+
 ## Key Gotchas
 
 - **Two data directories:** `HERMES_DATA=/root/.hermes/data` (local) and `WWW_DATA=/var/www/hermes/data` (served)

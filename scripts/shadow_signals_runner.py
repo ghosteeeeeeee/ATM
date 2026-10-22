@@ -63,6 +63,25 @@ SIGNAL_MODULE_MAP = {
     'vel-hermes-': None,  # Module removed — no detector to run
 }
 
+# bug_hunter HIGH-5: only record signals that match the registry key's
+# expected source path + direction. Whole-module runs also emit LIVE-enabled
+# paths (e.g. rs.py emits rs-s126 alongside rs-s-broken) — without this
+# filter those pollute the shadow-bypass cohort with live-eligible signals.
+# Match rule: direction must equal registry direction AND some comma-part of
+# source must contain one of the listed substrings. Empty tuple = any source.
+SOURCE_FILTERS = {
+    'bb-squeeze-': ('bb-squeeze-',),
+    'bb-bounce-v3-long': ('bb-bounce-v3-long',),
+    'volume-breakout-long': ('volume-breakout-long+',),
+    'hmacd_mtf-+': ('hmacd_mtf-+',),
+    'doji-bottom-long': ('doji-bottom-long',),
+    'open-skies+': ('open-skies+',),
+    'squeeze-cross+': ('sqx+', 'squeeze-cross+'),
+    'squeeze-cross-': ('sqx-', 'squeeze-cross-'),
+    'rs-broken-short': ('rs-s-broken',),
+    'rs-broken-resistance-long': ('rs-r-broken',),
+}
+
 # Maps signal keys to their ENABLED flag name
 ENABLED_FLAG_MAP = {
     'bb-squeeze-': 'BOLLINGER_SQUEEZE_MINUS_ENABLED',
@@ -151,7 +170,25 @@ def record_to_shadow(signal_data, stage, reason):
         conn.close()
 
 
-def run_shadow_signal(signal_key, module_path, flag_name, stage, reason):
+def _sig_matches_registry(sig, signal_key, expected_direction):
+    """bug_hunter HIGH-5: direction + source-path filter before shadow record."""
+    exp_dir = (expected_direction or '').upper()
+    got_dir = (sig.get('direction') or '').upper()
+    if exp_dir and got_dir != exp_dir:
+        return False
+    filters = SOURCE_FILTERS.get(signal_key)
+    if not filters:
+        return True
+    src = (sig.get('source') or '').lower()
+    parts = [p.strip().lower() for p in src.split(',') if p.strip()]
+    for part in parts:
+        for needle in filters:
+            if needle in part:
+                return True
+    return False
+
+
+def run_shadow_signal(signal_key, module_path, flag_name, stage, reason, direction=''):
     """Run a single signal detector in shadow mode."""
     # bug_hunter fixes:
     # HIGH-1: no-op set_cooldown/clear_cooldown during run (prevent live writes)
@@ -260,25 +297,34 @@ def run_shadow_signal(signal_key, module_path, flag_name, stage, reason):
             log(f"  {signal_key}: ERROR running detector: {e}")
             result = None
         
-        # Record captured signals to shadow
+        # Record captured signals to shadow (HIGH-5: filter to registry path+dir)
         n_recorded = 0
+        n_filtered = 0
         for sig in captured_signals:
+            if not _sig_matches_registry(sig, signal_key, direction):
+                n_filtered += 1
+                continue
             if record_to_shadow(sig, stage, reason):
                 n_recorded += 1
-        
+
         if n_recorded > 0:
-            log(f"  {signal_key}: ✅ {n_recorded} signals recorded to shadow")
+            log(f"  {signal_key}: ✅ {n_recorded} signals recorded to shadow"
+                + (f" ({n_filtered} filtered as wrong source/dir)" if n_filtered else ""))
+        elif n_filtered:
+            log(f"  {signal_key}: 0 signals ({n_filtered} captured but filtered — "
+                f"wrong source/dir for this registry key)")
         else:
             log(f"  {signal_key}: 0 signals (detector ran but found nothing)")
-        
-        return n_recorded
-        
+
+        return ('recorded', n_recorded) if n_recorded else (
+            ('filtered', 0) if n_filtered else ('empty', 0))
+
     except ImportError as e:
         log(f"  {signal_key}: Could not import {module_path}: {e}")
-        return 0
+        return ('import_error', 0)
     except Exception as e:
         log(f"  {signal_key}: ERROR: {e}")
-        return 0
+        return ('run_error', 0)
     finally:
         # bug_hunter MEDIUM: try/finally ensures all patches are restored
         signal_schema.add_signal = original_add_signal
@@ -305,13 +351,15 @@ def run_shadow_signal(signal_key, module_path, flag_name, stage, reason):
 
 def main():
     # Check shadow-mode flag first (T directive 2026-10-22)
+    # bug_hunter LOW: fail CLOSED if flag cannot be resolved (was pass = fail-open)
     try:
         from hermes_constants import SHADOW_SIGNALS_RUNNER_ENABLED
         if not SHADOW_SIGNALS_RUNNER_ENABLED:
             log("SHADOW_SIGNALS_RUNNER_ENABLED is False — exiting")
             return 0
     except ImportError:
-        pass  # Flag not found — continue (backwards compatible)
+        log("ERROR: SHADOW_SIGNALS_RUNNER_ENABLED not found — fail-closed, exiting")
+        return 0
     
     # bug_hunter MEDIUM: use SHADOW_SIGNALS_RUNNER_STAGES config
     try:
@@ -337,12 +385,14 @@ def main():
     total_recorded = 0
     total_skipped = 0
     total_errors = 0
-    
+    total_empty = 0
+    total_filtered = 0
+
     for signal_key, info in registry.items():
         stage = info.get('stage', '?')
         reason = info.get('reason', '')
         direction = info.get('direction', '')
-        
+
         # Filter by stage (CLI arg overrides config)
         if args.stage:
             if stage != args.stage:
@@ -350,36 +400,41 @@ def main():
         elif stage not in allowed_stages:
             total_skipped += 1
             continue
-        
+
         # Skip Stage B (already firing)
         if stage == 'B':
             total_skipped += 1
             continue
-        
+
         module_path = SIGNAL_MODULE_MAP.get(signal_key)
         flag_name = ENABLED_FLAG_MAP.get(signal_key)
-        
+
         if not module_path or not flag_name:
             log(f"  {signal_key}: No module or flag mapping — skipped")
             total_skipped += 1
             continue
-        
+
         if args.dry_run:
             log(f"  Stage {stage} | {signal_key:25} -> {module_path} ({flag_name})")
             continue
-        
-        n = run_shadow_signal(signal_key, module_path, flag_name, stage, reason)
+
+        status, n = run_shadow_signal(signal_key, module_path, flag_name, stage, reason, direction)
         total_recorded += n
-        if n == 0:
+        if status == 'run_error' or status == 'import_error':
             total_errors += 1
-    
+        elif status == 'empty':
+            total_empty += 1
+        elif status == 'filtered':
+            total_filtered += 1
+
     if args.dry_run:
         log("\n(dry-run — no signals executed)")
     else:
         log("\n" + "=" * 60)
-        log(f"DONE: {total_recorded} signals recorded, {total_skipped} skipped, {total_errors} errors")
+        log(f"DONE: {total_recorded} recorded, {total_skipped} skipped, "
+            f"{total_empty} empty, {total_filtered} filtered, {total_errors} errors")
         log("=" * 60)
-    
+
     return 0
 
 
