@@ -13888,3 +13888,24 @@ Final set: ['BTC', 'INJ']
 - 24h worsened '-$0.67' (was '-$0.47' at 12:28), WR dropped to 33.3%; 7d '-$3.03'; loss clusters: hard_max_loss 4T '-$0.49' (avg '-$0.12'), atr_sl_hit 5T '-$0.23' (standing SL-width escalation with CEO, Oct 16)
 - profit-monster-trail 5T '+$0.18' only positive close-reason cluster
 - CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #75
+
+## [2026-10-22 14:27 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (24h: 14T 5W '-$0.30', WR 35.7%) | 7d 159T 37.1% '-$3.03' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour (last close ~09:00) — no signal at 0%WR with 3+T last hour
+- Kill check: r2v2-long4 2T 0%WR 24h, pump-chain+ 1T 0%WR 24h, pump-chain- 1T 0%WR — all below 3T/last-hour threshold; CONF_FLOOR ships Oct 23
+- atr_sl_hit 4/14 = 28.6% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: no trades — no 3h trigger
+- Frequency 0/hr — not overtraded (limit 20)
+- 0 open positions
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h improved to '-$0.30' (was '-$0.67' at 13:28), WR 35.7%; loss clusters: hard_max_loss 3T '-$0.41', atr_sl_hit 4T '-$0.15' (standing SL-width escalation with CEO, Oct 16)
+- profit-monster-trail 4T '+$0.16' only positive signal cluster; bb-bounce+ 3T '-$0.23' worst
+- CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #75
