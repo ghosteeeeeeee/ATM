@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-22T00:14:02.212500+00:00",
+  "timestamp": "2026-10-22T00:52:57.655244+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -20,7 +20,7 @@
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "BELOW",
     "volatility": "LOW",
@@ -28,10 +28,10 @@
     "velocity_state": "SLOW",
     "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "DECLINING",
-    "trend_quality": "UP"
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 0,
   "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 (flat)\nUnrealized PnL: 0.00 USDT | 24h realized: -0.95 (LONG 13/31, SHORT 0/5)\nRegime: bear drift | Volatility: LOW | BTC 84,241 < EMA300 84,487 (184 ticks below)\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent][regime] 23:17 reclaim watch FAILED \u2014 BTC went 61\u2192184 ticks below EMA300, acceleration flipped back negative (-0.139), volume still 0.45 LOW. No reclaim is coming on this tape; stop expecting one until volume expands.\n\ud83d\udd34 [urgent][health] LONG 45-55 RSI band = death band: 7d n=42, 31% WR, -1.88. Only profitable LONG band is RSI 65+ (+1.37, 60% WR). Our bounce signals fill the losing band, not the paying one.\n\ud83d\udd34 [urgent][health] 12/12 recent hard_max_loss trades have MFE\u22480 \u2014 every one was a LONG that never traded above entry. Wrong-side entries into down-drift (POL/STX/INJ/XPL/PUMP/BLUR/ARB/ETC/APT). Winning side on all 12: SHORT.\n\ud83d\udfe1 [warning][health] Exit economics unchanged: profit-monster-trail 13/16 +0.65 vs all stop exits 0/16. Trades that reach the trail win; the rest die in 11-45 min.\n\ud83d\udfe2 [info][opportunity] No AI-trader pick fired \u2014 AI_TRADER_ENABLED=False (CEO 2026-10-19). Prior ZEN pick is stale/moot.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nFlat is the correct book. Shorts keep bounce-stopping (0/5 24h), longs get bled by the LOW-volume drift. Neither side pays without participation. The 4h LONG_BIAS means this is intraday weakness, not a crash \u2014 but 184 ticks below with negative acceleration is not a reclaim setup either.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Stay flat. Two triggers only: BTC reclaims 84,487 WITH volume \u2192 continuum-trend+ LONG (4/5 7d); BTC breaks 84,180 WITH volume \u2192 SHORT leg, RSI must fill 55-65 (the only paying SHORT band).\n2. Brain auditor handoff: entry signals cluster at RSI 45-60 (the bleed band) \u2014 the profitable 65+ LONG band is allowed by the ceiling but never produced by bounce/chop signal families. Needs a momentum-continuation entry path, not more filter tuning.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json` (steers untouched), memory stored. No git-tracked files changed.\n",

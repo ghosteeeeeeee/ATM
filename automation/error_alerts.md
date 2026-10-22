@@ -1459,3 +1459,7 @@
 
 ## Error Alerts — 2026-10-22 00:27 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   [TS] [shadow_signals_runner] TOK: N signals recorded, N skipped, N errors`
+
+## Error Alerts — 2026-10-22 00:43 UTC
+- **[WARN]** (1x): Disk usage at 85% on / (94G/118G). No logs >7d to compress. Monitor; consider pruning pipeline.log (228M) or lowering retention.
+- No CRITICAL issues. Pipeline rc=0 across all steps, timers active, prices fresh, not paused.

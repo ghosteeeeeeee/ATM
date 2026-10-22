@@ -1802,7 +1802,20 @@ def main():
     PENDING_ORDERS_CAN_PERSIST = (watchdog_mode == "autopilot" and not args.dry_run)
 
     steers = analyze_all(data)
+
+    # Autonomous BTC loop (spec v2, phase 0): shadow cycle journals decisions
+    # + tracks hypotheticals — zero live effect. Never breaks the watchdog:
+    # any failure logs and continues.
+    auto_trader_summary = None
+    try:
+        from auto_trader import run_cycle as _auto_run_cycle
+        auto_trader_summary = _auto_run_cycle()
+    except Exception as e:
+        log(f"auto_trader cycle failed (watchdog continues): {e}", "WARN")
+
     output = build_output(data, steers)
+    if auto_trader_summary is not None:
+        output["auto_trader"] = auto_trader_summary
     output["mode"] = watchdog_mode
     output["deploy_time"] = deploy_time.isoformat()
     output["autopilot_in_hours"] = round(remaining, 1)

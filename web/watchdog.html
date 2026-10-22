@@ -136,6 +136,13 @@
         <div class="deep-analysis" id="deep-analysis-text"></div>
     </div>
 
+    <div id="auto-trader-container" style="display: none;">
+        <h3 style="color: #8888ff; font-size: 12px; text-transform: uppercase; margin: 20px 0 10px;">
+            BTC Auto-Trader <span id="at-banner"></span>
+        </h3>
+        <div class="deep-analysis" id="at-body"></div>
+    </div>
+
     <script>
     const API = 'http://127.0.0.1:54322/api/brain/watchdog';
 
@@ -270,6 +277,58 @@
         if (data.deep_analysis) {
             document.getElementById('deep-analysis-container').style.display = 'block';
             document.getElementById('deep-analysis-text').textContent = data.deep_analysis;
+        }
+
+        // BTC Auto-Trader (spec v2 — shadow watermark on all PnL until phase 1)
+        const at = data.auto_trader;
+        const atc = document.getElementById('auto-trader-container');
+        if (at && at.enabled) {
+            atc.style.display = 'block';
+            const mode = (at.mode || 'shadow').toUpperCase();
+            const bannerCls = mode === 'LIVE' ? 'regime-bull' : mode === 'PAUSED' ? 'regime-bear' : 'regime-chop';
+            document.getElementById('at-banner').innerHTML =
+                `<span class="regime-badge ${bannerCls}">${escHtml(mode)}</span>` +
+                (mode === 'SHADOW' ? ' <span style="color:#888;font-size:10px;">hypothetical — not live</span>' : '');
+
+            const sc = at.scores || {};
+            const st = at.stats || {};
+            let html = `<div style="font-size:12px; line-height:1.7;">
+                <b>Decision:</b> ${escHtml(at.decision || '—')} |
+                <b>Scores:</b> LONG ${sc.long ?? '—'} / SHORT ${sc.short ?? '—'} |
+                <b>Regime:</b> ${escHtml(sc.regime || '—')} |
+                <b>Price:</b> ${at.price ?? '—'}<br>
+                <b>Scorecard:</b> ${st.n ?? 0} trades, WR ${st.wr ?? '—'}%,
+                PnL ${st.pnl_usdt ?? 0} USDT,
+                R:R planned ${st.avg_planned_rr ?? '—'} vs real ${st.avg_real_rr ?? '—'}
+                ${mode === 'SHADOW' ? '(shadow)' : ''}</div>`;
+
+            if (Array.isArray(at.armed_detail) && at.armed_detail.length) {
+                html += `<div style="margin-top:8px;"><b style="font-size:11px; color:#8888ff;">ARMED ORDERS</b>
+                    <table style="width:100%; font-size:11px; border-collapse:collapse; margin-top:4px;">
+                    <tr style="color:#666;"><td>ID</td><td>Leg</td><td>Trigger</td><td>SL</td><td>TP</td><td>Δ to trig</td><td>Age</td></tr>` +
+                    at.armed_detail.map(o => `<tr>
+                        <td>${escHtml(String(o.order_id).replace('btc-auto-',''))}</td>
+                        <td>${o.direction === 'long' ? '🟢 LONG' : '🔴 SHORT'}</td>
+                        <td>${o.trigger}</td><td>${o.sl}</td><td>${o.tp}</td>
+                        <td>${o.dist_pct != null ? o.dist_pct + '%' : '—'}</td>
+                        <td>${o.age_min}m</td></tr>`).join('') + '</table></div>';
+            }
+            if (Array.isArray(at.recent_trades) && at.recent_trades.length) {
+                html += `<div style="margin-top:8px;"><b style="font-size:11px; color:#8888ff;">RECENT ${mode} TRADES</b>` +
+                    at.recent_trades.slice(0, 5).map(t => {
+                        const when = timeAgo(t.ts * 1000);
+                        return `<div style="font-size:11px;">${when} — ${t.direction === 'long' ? '🟢' : '🔴'} ${t.pnl_pct > 0 ? '+' : ''}${t.pnl_pct}% (${t.pnl_usdt} USDT) ${t.won ? '✅' : '❌'} ${escHtml(t.exit_reason || '')} [${escHtml(t.regime || '?')}]</div>`;
+                    }).join('') + '</div>';
+            }
+            if (Array.isArray(at.self_tuning_log) && at.self_tuning_log.length) {
+                html += `<div style="margin-top:8px;"><b style="font-size:11px; color:#8888ff;">SELF-TUNING</b>` +
+                    at.self_tuning_log.slice(0, 3).map(t =>
+                        `<div style="font-size:11px;">${escHtml(t.parameter)} ${t.old}→${t.new} — ${escHtml(t.reason || '')}</div>`
+                    ).join('') + '</div>';
+            }
+            document.getElementById('at-body').innerHTML = html;
+        } else {
+            atc.style.display = 'none';
         }
     }
 
