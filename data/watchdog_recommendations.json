@@ -1,33 +1,20 @@
 {
-  "timestamp": "2026-10-22T04:44:06.474820+00:00",
-  "steers": [
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "7 recent losses look like wrong-side trades",
-      "detail": "Multiple losses >2% of position suggest we're fading momentum. Check if signals are aligned with trend.",
-      "auto_executable": false,
-      "id": "steer-001"
-    }
-  ],
+  "timestamp": "2026-10-22T07:14:08.477588+00:00",
+  "steers": [],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "NEUTRAL",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "BELOW",
-    "volatility": "LOW",
+    "volatility": "NORMAL",
     "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.25,
-    "wyckoff_phase": "UNKNOWN",
+    "acceleration_state": "NEGATIVE",
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 0.75,
+    "wyckoff_phase": "ACCUMULATION",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 0,
-  "deep_analysis": "Flat book (0 open) in a LOW-volume bear-grind \u2014 staying flat is currently the right side, and the enforced profit-lock/stale checks are N/A with no positions. The risk right now is not exposure, it's the queue and the armed bracket: all 7 pending signals are SHORTs fired at oversold RSI 13.6-40.0 (KAS 31.1, ARB 13.6, ALT 28.4, BABY 14.3, COMP 21.2, CHIP 35.2, GMX 40.0), every one below SHORT_RSI_HARD_FLOOR=45 and SHORT_RSI_HARD_FLOOR_PUMP_CHAIN=45, so decider_run will hard-block all 7 at exec time \u2014 they die at the gate, not in the book. That is the correct outcome: oversold = bounce (BANANA lesson), and the winning side of those dumps is LONG or flat, not another short after the move already happened.\n\n24h book: 31 closes, -$0.59. Direction split 29 LONG (13W) / 2 SHORT (0W) while BTC has been below EMA300 for 721 consecutive minutes \u2014 we were over-long in a short tape, exactly the prior session's pattern. Exit breakdown is unchanged and unambiguous: profit-monster-trail 15T 13W +$0.66 (all gross profit), hard_max_loss 6T 0W -$0.70, atr_sl_hit 7T 0W -$0.31 \u2014 chop entries that never reach +0.40% to arm the trail can only lose. Recent losers were all mid-band (meta_rsi 32.7-57.6): POL -4.9%, STX -4.9%, NEO -2.4% longs fading a downtrend, CFX -1.9% shorting after the dump. Winning side on each: short/flat for the three longs, flat/long for CFX \u2014 none was a trade worth taking fresh today.\n\n7d meta_rsi bands re-verified this run (n reproduces exactly): LONG 45-55 = 40T -$1.75 and LONG 55-65 = 28T -$1.13 are the bleed cells; only green cells with n>=6 are LONG 65-75 (15T 9W +$1.37) and SHORT 55-65 (6T 2W +$0.28). Extremes pay, center pays nobody \u2014 but in this tape (BELOW EMA300, volume_ratio 0.59 dipping to 0.09) even the long-extreme band is a counter-trend bounce play, so the edge belongs to waiting for one of the two triggers below rather than forcing mid-band entries on either side.\n\nPipeline healthy: all systemd timers firing on schedule, watchdog regenerated 04:44, 0 executed/approved signals, last close 01:00 UTC (~3.7h quiet) \u2014 a frequency dip explained by LOW volume CALM tape, not a stall. AI Trader pick skipped: AI_TRADER_ENABLED=False (CEO 2026-10-19); state file untouched since 10-21 12:50.",
-  "agent_timestamp": "2026-10-22T04:48:22.529455+00:00",
-  "regime_context": "Regime: BEAR-GRIND with weakening bounce / CHOP. BTC 82,778 vs EMA300 83,456 = -0.81%, BELOW for 721 consecutive minutes (~12h), linreg_direction LEAN_BEAR, trend_quality STRONG_DOWN, linreg_alignment 0.25, zscore -1.05 NEG (re-worsened from -0.09 an hour ago), volume_regime LOW (volume_ratio 0.59, dipped to 0.09 in the last 3 samples), acceleration POSITIVE, market_phase RECOVERY, velocity SLOW. 15m scanner 04:30: 16 LONG_BIAS / 18 SHORT_BIAS / 89 NEUTRAL = NEUTRAL aggregate \u2014 tape has neither flipped nor resolved. Watchdog regime_summary: btc_15m NEUTRAL, btc_4h LONG_BIAS, continuum BELOW, volatility LOW.\n\nImplication: 0 open = zero exposure while neither side pays; the auto-trader agrees (score long -15 / short +25, regime CHOP, BRACKET). Key hazard: an armed BTC SHORT bracket at 84,888 sits ABOVE both current price (+2.5%) and the EMA300 (83,456) \u2014 a genuine reclaim-with-volume would fill it short into the exact moment the tape flips LONG_BIAS. Flip triggers unchanged: (a) BTC reclaims ~83.5k with volume expansion -> LONG side, continuum-trend+ / LONG 65-75 band become the entries and the 84,888 bracket must be cancelled; (b) volume expansion below 82.6k resumes markdown -> SHORT only in the 55-65 band. Until one fires, mid-band entries on either side are the documented bleed.",
-  "pattern_alerts": "VERIFIED this run (PostgreSQL, meta_rsi only \u2014 entry_rsi_14 never used; 2026-10-22 04:46 UTC; band counts reproduce the 04:18 run exactly):\n\n1) OVER-LONG IN A SHORT TAPE (24h, n=31, -$0.59): LONG 29T 44.8% WR, SHORT 2T 0%. All 6 losers of the last 12h were mid-band entries: POL -4.9% (bb-bounce-v2-long+, meta_rsi 53.6, hard_max_loss), STX -4.9% (r2v2-long4, 57.6, hard_max_loss), NEO -2.4% (52.6), BTC -1.8% (continuum-trend+, 55.7), CFX SHORT -1.9% (51.2), SOL -1.0% (32.7). WINNING SIDE: short or flat on the three longs (downtrend, 721min below EMA300); flat on CFX (shorted after the dump). WHY NOT US: bounce families (bb-bounce-v2-long+, r2v2-long*, pump-chain+, continuation+) fire LONG inside markdown.\n\n2) MID-BAND BLEED, BOTH SIDES (7d, meta_rsi): LONG 45-55 = 40T 32.5% WR -$1.75 (worst cell), LONG 55-65 = 28T 39.3% -$1.13, LONG <45 = 19T 47.4% -$0.45, SHORT 45-55 = 14T 21.4% -$0.62, SHORT <45 = 7T 28.6% -$0.21. Green n>=6: LONG 65-75 = 15T 60% +$1.37, SHORT 55-65 = 6T 33.3% +$0.28. WINNING SIDE: extremes, not center. WHY NOT US: highest-volume signals target the 45-60 center by construction.\n\n3) TRAIL-OR-DIE (24h exits, n=31): profit-monster-trail 15T 13W +$0.66 = 100% of gross profit; hard_max_loss 6T 0W -$0.70, atr_sl_hit 7T 0W -$0.31, stale_exit 1T -$0.23. WINNING SIDE: real moves that reach +0.40% and trail. WHY NOT US: low-ATR chop entries never arm the trail.\n\n4) OVERSOLD-SHORT FLOOD (live queue, 04:44): all 7 PENDING signals are SHORTs at RSI 13.6-40.0 (ARB 13.6, BABY 14.3, COMP 21.2, ALT 28.4, KAS 31.1, CHIP 35.2, GMX 40.0), 6x pump-chain- + 1x volume-buildup-. All are below SHORT_RSI_HARD_FLOOR=45 and SHORT_RSI_HARD_FLOOR_PUMP_CHAIN=45, so decider_run exec gates hard-block every one. WINNING SIDE of these dumps: LONG or flat \u2014 the move already happened. No action needed; gates handle it, but the signal family is generating 100% wrong-side output right now.\n\n5) SIGNAL FAMILIES 24h (n>=3): negatives = continuation+ 4T 2W -$0.18, r2v2-long3 4T 2W -$0.14, ai-trader-pending 3T 0W -$0.08. Positives = continuum-trend+ 3T 2W +$0.05, bb-bounce-v2-long+ 8T 5W +$0.03. 7d pump-chain- (LIKE match): 21T 4W -$0.31. For the brain auditor only \u2014 no parameter changes made here."
+  "open_count": 1
 }

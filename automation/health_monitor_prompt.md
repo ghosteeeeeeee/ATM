@@ -170,6 +170,27 @@ If any WARN or CRITICAL issue found, append to `automation/error_alerts.md`:
 - Speed DB: via RUNTIME_DB
 - Regime: `/var/www/hermes/data/regime_5m.json`
 
+## Connection Facts (VERIFIED — do not improvise variants)
+
+**PostgreSQL trades table** (5,972+ closed rows):
+```bash
+psql -h /var/run/postgresql -d brain -U postgres -t -c "SELECT status, COUNT(*) FROM trades GROUP BY status;"
+```
+- DO NOT use `-d hermes`, `-d hermes_brain`, `-U hermes`, or `localhost`+password — all fail (peer auth on unix socket, database name is `brain`).
+
+**Price staleness** (prices live in signals_hermes.db, NOT candles.db):
+```bash
+python3 -c "import sqlite3,time; c=sqlite3.connect('/root/.hermes/data/signals_hermes.db'); r=c.execute('SELECT MAX(timestamp) FROM price_history').fetchone(); print('age_s:', round(time.time()-r[0],1) if r[0] else 'n/a'); c.close()"
+```
+- `price_history` columns: `id, token, price, timestamp` (epoch seconds) — there is NO `ts` column, and candles.db has NO `price_history` table (it holds `candles_1m/5m/15m/1h/4h` only).
+
+**Unit file inspection** — direct reads of `/etc/systemd/system/*` are permission-REJECTED for you. Use instead:
+```bash
+systemctl cat <unit-name>
+systemctl status <unit-name> --no-pager
+```
+Same for `/etc/logrotate.d/*` — skip it; logrotate is not in your scope.
+
 ## Database Reference (USE THESE TABLE NAMES)
 
 **Signal DB:** `data/signals_hermes_runtime.db`
