@@ -11,3 +11,12 @@ PART 2 — all three sources, 7d, 57 traded tokens
   knife-35 flips: A-vs-C 14013 (24.62%)
 
 NOTE: B-vs-C flip rate = the false-comment impact (stamp claims 'same fetch as exec gates').
+
+VALIDATION (replication vs live log, HBAR 2026-10-22 17:13):
+  live log: approval A=36.3 (17:13:00) / exec B=40.7 (17:13:20)
+  script on candles, best cutoff (last closed 5m = 17:05): A=35.05 (d=1.25) / B=41.22 (d=0.52)
+  next-candle cutoffs (17:10/17:15) overshoot by 5-9pts -> cutoff = 17:05 correct; residuals
+  attributed to candle availability/seeder rewrites between live read and post-hoc read + 30s
+  rsi_utils cache. Replication validated to ~1.3pts; headline gaps (6.8-13.5pts, 17-34% flips)
+  are an order of magnitude larger than residual. Not bit-exact; stated as caveat.
+  Reproducibility: full rerun gave identical rates to 0.01pp (obs +23 from candles accruing).
