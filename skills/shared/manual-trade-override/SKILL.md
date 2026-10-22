@@ -97,9 +97,35 @@ Manual trades use the same exit management as AI trader signals:
 
 The `ai-trader` prefix in the signal tag (`ai-trader-manual`) matches the exit config automatically.
 
-## Setting Manual SL (Breakeven Protection)
+## Exit Management for CEO Trades — THE CONTRACT (manual / pending / auto)
 
-After opening a trade, you can move SL to breakeven to make it risk-free:
+**`scripts/manual_exit_manager.py` is the SOLE exit authority for these
+trades** (CEO directive 2026-10-22). The rules:
+
+1. **Predefined SL/TP are honored exactly as set.** You set them at open
+   (`--sl` / `--target`); NOTHING structurally rewrites them. Every other
+   SL actor is excluded for these signals: the RR engine (was moving them
+   — #16306 81990→82486, #16317 83150→82965), sl_zones tighten, the soft
+   peak-trigger, and the ATR level manager. Auto signal trades
+   (ai-trader+/pump-chain etc.) keep all their engines — the exclusion is
+   CEO-trade-only.
+2. **Close trailing** — the only automatic SL movement:
+   - activates once the trade is up **≥ +0.40%** (PM_TRAIL_ACTIVATE_PCT)
+   - trails **0.20% behind price** (PM_TRAIL_DISTANCE_PCT)
+   - **ratchet-only**: the stop never moves backward, the TP never moves
+   - CAS-protected: your own concurrent edits always win
+3. **Safety nets remain**: guardian hard caps, max-hold, staleness checks
+   still apply — safety, not exit management.
+4. **Exit labels are the ownership receipt:**
+   - `manual_sl_hit` — your predefined stop did its job
+   - `manual_tp_hit` — your predefined target hit
+   - `manual_trail_hit` — the close trail took profit
+   - Seeing `rr_engine_*` or `atr_*` on one of these trades = a routing
+     bug — report it immediately.
+
+### Setting/adjusting manual SL
+
+After opening, move SL freely (e.g. to breakeven) — your write wins:
 
 ```bash
 python3 -c "
@@ -115,18 +141,11 @@ print('SL moved to', NEW_SL)
 "
 ```
 
-**Manual SL is protected** — the RR engine will NOT overwrite it because:
-1. **CAS write** — TRAIL_SL only updates if SL hasn't changed since read
-2. **Breakeven guard** — engine won't trail past breakeven (SL >= entry for LONG)
-3. **entry_price=0 check** — skips trail if entry price is invalid
-4. **Status check** — won't update closed trades
-
 **When to set manual SL:**
 - Trade is in profit and you want to make it risk-free
 - You have a specific level in mind (support/resistance)
-- You want to override the engine's SL for any reason
-
-**The engine respects your SL** but will still trail it UPWARD (tighter) as price moves in your favor.
+- You want to override for any reason — trailing resumes from YOUR level
+  once profit ≥ 0.40%, ratcheting only tighter
 
 ## Verification
 

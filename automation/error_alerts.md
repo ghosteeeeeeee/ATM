@@ -1466,3 +1466,8 @@
 
 ## Error Alerts — 2026-10-22 01:27 UTC
 - **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   [TS] [shadow_signals_runner] TOK: N signals recorded, N skipped, N errors`
+
+## Error Alerts — 2026-10-22 02:27 UTC
+- **REPEATED** (14x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (26x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,TOK,MOMENTUM,BTC_LEVEL | vol=N.1x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
