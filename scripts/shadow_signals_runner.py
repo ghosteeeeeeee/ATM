@@ -67,16 +67,16 @@ SIGNAL_MODULE_MAP = {
 ENABLED_FLAG_MAP = {
     'bb-squeeze-': 'BOLLINGER_SQUEEZE_MINUS_ENABLED',
     'bb-bounce-v3-long': 'BB_BOUNCE_V3_LONG_ENABLED',
-    'volume-breakout-long': 'VOLUME_BREAKOUT_LONG_ENABLED',
+    'volume-breakout-long': 'VOLUME_BREAKOUT_PLUS_ENABLED',  # bug_hunter: correct flag name
     'hmacd_mtf-+': 'HMACD_MTF_PLUS_ENABLED',
-    'doji-bottom-long': 'DOJI_BOTTOM_LONG_ENABLED',
+    'doji-bottom-long': 'DOJI_BOTTOM_ENABLED',  # bug_hunter: correct flag name
     'open-skies+': 'OPEN_SKIES_PLUS_ENABLED',
     'squeeze-cross+': 'SQUEEZE_CROSS_PLUS_ENABLED',
     'squeeze-cross-': 'SQUEEZE_CROSS_MINUS_ENABLED',
     'rs-broken-short': 'RS_BROKEN_SHORT_ENABLED',
     'rs-broken-resistance-long': 'RS_BROKEN_RESISTANCE_LONG_ENABLED',
-    'vel-hermes+': 'VEL_HERMES_PLUS_ENABLED',
-    'vel-hermes-': 'VEL_HERMES_MINUS_ENABLED',
+    'vel-hermes+': None,  # Module removed
+    'vel-hermes-': None,  # Module removed
 }
 
 
@@ -153,6 +153,47 @@ def record_to_shadow(signal_data, stage, reason):
 
 def run_shadow_signal(signal_key, module_path, flag_name, stage, reason):
     """Run a single signal detector in shadow mode."""
+    # bug_hunter fixes:
+    # HIGH-1: no-op set_cooldown/clear_cooldown during run (prevent live writes)
+    # HIGH-3: created_at must match shadow_trader format ('%Y-%m-%d %H:%M:%S')
+    # MEDIUM: try/finally around all patches
+    
+    import signal_schema
+    
+    # Store originals
+    original_add_signal = signal_schema.add_signal
+    original_set_cooldown = getattr(signal_schema, 'set_cooldown', None)
+    original_clear_cooldown = getattr(signal_schema, 'clear_cooldown', None)
+    captured_signals = []
+    
+    # No-op cooldown functions (bug_hunter HIGH-1)
+    def noop_set_cooldown(*args, **kwargs):
+        pass  # Do not write live cooldowns
+    
+    def noop_clear_cooldown(*args, **kwargs):
+        pass  # Do not clear live cooldowns
+    
+    def capture_add_signal(**kwargs):
+        """Capture signal instead of writing to live DB."""
+        shadow_id = f"shadow_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{kwargs.get('token', 'unknown')}"
+        # bug_hunter HIGH-3: use consistent date format
+        now_str = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+        captured_signals.append({
+            'shadow_id': shadow_id,
+            'token': kwargs.get('token'),
+            'direction': kwargs.get('direction'),
+            'signal_type': kwargs.get('signal_type'),
+            'source': kwargs.get('source'),
+            'confidence': kwargs.get('confidence'),
+            'created_at': now_str,  # Fixed: matches shadow_trader's strptime
+        })
+        return shadow_id  # Return fake ID
+    
+    mod = None
+    original_flag = None
+    original_master_flag = None
+    master_flag_name = None
+    
     try:
         # Import the signal module
         mod = importlib.import_module(module_path)
@@ -160,38 +201,51 @@ def run_shadow_signal(signal_key, module_path, flag_name, stage, reason):
         # Get the original flag value
         original_flag = getattr(mod, flag_name, None)
         if original_flag is None:
-            # Flag might be in hermes_constants, not in the module
             import hermes_constants as hc
             original_flag = getattr(hc, flag_name, None)
         
-        # Override the flag to True
+        # bug_hunter HIGH-2: also override master flag if it exists
+        # Map to master flag name
+        MASTER_FLAG_MAP = {
+            'bb-squeeze-': 'BOLLINGER_SQUEEZE_ENABLED',
+            'volume-breakout-long': 'VOLUME_BREAKOUT_ENABLED',
+            'doji-bottom-long': 'DOJI_BOTTOM_ENABLED',  # bug_hunter: correct master flag
+            'open-skies+': 'OPEN_SKIES_ENABLED',
+            'squeeze-cross+': 'SQUEEZE_CROSS_ENABLED',
+            'squeeze-cross-': 'SQUEEZE_CROSS_ENABLED',
+        }
+        master_flag_name = MASTER_FLAG_MAP.get(signal_key)
+        if master_flag_name:
+            import hermes_constants as hc
+            original_master_flag = getattr(hc, master_flag_name, None)
+            # Also check module
+            if hasattr(mod, master_flag_name):
+                setattr(mod, master_flag_name, True)
+            # Also set in hermes_constants (module may read from there)
+            if original_master_flag is not None:
+                setattr(hc, master_flag_name, True)
+        
+        # Override the specific flag
         if hasattr(mod, flag_name):
             setattr(mod, flag_name, True)
         
-        # Monkey-patch add_signal to capture instead of writing to live DB
-        import signal_schema
-        original_add_signal = signal_schema.add_signal
-        captured_signals = []
+        # Also override in hermes_constants if flag exists there
+        import hermes_constants as hc
+        if getattr(hc, flag_name, None) is not None:
+            setattr(hc, flag_name, True)
         
-        def capture_add_signal(**kwargs):
-            """Capture signal instead of writing to live DB."""
-            shadow_id = f"shadow_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{kwargs.get('token', 'unknown')}"
-            captured_signals.append({
-                'shadow_id': shadow_id,
-                'token': kwargs.get('token'),
-                'direction': kwargs.get('direction'),
-                'signal_type': kwargs.get('signal_type'),
-                'source': kwargs.get('source'),
-                'confidence': kwargs.get('confidence'),
-                'created_at': datetime.now(timezone.utc).isoformat(),
-            })
-            return shadow_id  # Return fake ID
-        
+        # Apply all patches
         signal_schema.add_signal = capture_add_signal
+        if original_set_cooldown:
+            signal_schema.set_cooldown = noop_set_cooldown
+        if original_clear_cooldown:
+            signal_schema.clear_cooldown = noop_clear_cooldown
         
-        # Also patch the module's reference if it imported add_signal directly
+        # Also patch module's references if it imported them directly
         if hasattr(mod, 'add_signal'):
             mod.add_signal = capture_add_signal
+        if hasattr(mod, 'set_cooldown'):
+            mod.set_cooldown = noop_set_cooldown
         
         # Run the signal detector
         try:
@@ -212,15 +266,6 @@ def run_shadow_signal(signal_key, module_path, flag_name, stage, reason):
             if record_to_shadow(sig, stage, reason):
                 n_recorded += 1
         
-        # Restore original add_signal
-        signal_schema.add_signal = original_add_signal
-        if hasattr(mod, 'add_signal'):
-            mod.add_signal = original_add_signal
-        
-        # Restore original flag
-        if hasattr(mod, flag_name) and original_flag is not None:
-            setattr(mod, flag_name, original_flag)
-        
         if n_recorded > 0:
             log(f"  {signal_key}: ✅ {n_recorded} signals recorded to shadow")
         else:
@@ -234,6 +279,28 @@ def run_shadow_signal(signal_key, module_path, flag_name, stage, reason):
     except Exception as e:
         log(f"  {signal_key}: ERROR: {e}")
         return 0
+    finally:
+        # bug_hunter MEDIUM: try/finally ensures all patches are restored
+        signal_schema.add_signal = original_add_signal
+        if original_set_cooldown:
+            signal_schema.set_cooldown = original_set_cooldown
+        if original_clear_cooldown:
+            signal_schema.clear_cooldown = original_clear_cooldown
+        
+        if mod:
+            if hasattr(mod, 'add_signal'):
+                mod.add_signal = original_add_signal
+            if original_flag is not None and hasattr(mod, flag_name):
+                setattr(mod, flag_name, original_flag)
+            if master_flag_name and original_master_flag is not None and hasattr(mod, master_flag_name):
+                setattr(mod, master_flag_name, original_master_flag)
+        
+        # Restore hermes_constants flags
+        import hermes_constants as hc
+        if original_flag is not None and getattr(hc, flag_name, None) is not None:
+            setattr(hc, flag_name, original_flag)
+        if master_flag_name and original_master_flag is not None:
+            setattr(hc, master_flag_name, original_master_flag)
 
 
 def main():
@@ -245,6 +312,13 @@ def main():
             return 0
     except ImportError:
         pass  # Flag not found — continue (backwards compatible)
+    
+    # bug_hunter MEDIUM: use SHADOW_SIGNALS_RUNNER_STAGES config
+    try:
+        from hermes_constants import SHADOW_SIGNALS_RUNNER_STAGES
+        allowed_stages = SHADOW_SIGNALS_RUNNER_STAGES
+    except ImportError:
+        allowed_stages = ('A', 'C')  # Default
     
     ap = argparse.ArgumentParser(description='Shadow Signals Runner')
     ap.add_argument('--stage', choices=['A', 'B', 'C'], help='Run only this stage')
@@ -269,8 +343,12 @@ def main():
         reason = info.get('reason', '')
         direction = info.get('direction', '')
         
-        # Filter by stage
-        if args.stage and stage != args.stage:
+        # Filter by stage (CLI arg overrides config)
+        if args.stage:
+            if stage != args.stage:
+                continue
+        elif stage not in allowed_stages:
+            total_skipped += 1
             continue
         
         # Skip Stage B (already firing)
