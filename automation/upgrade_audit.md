@@ -1083,3 +1083,59 @@
 3. SL-width / entry-gate study — L2 — HIGH — CEO kanban GO pending
 4. temporal-confluence / short-rsi-habitat / vol-regime-relative — L2-3 — MED-HIGH — CEO-gated SPECs
 5. brain.py --limit + guardian fill-integration — L2 — MED — only after limit_order.py proven
+
+---
+
+## Upgrade Implementer Session — 2026-10-22 16:30 UTC
+
+**Context:** pipeline LIVE, vacation mode ON (T waiver for unclog shipped by parallel session 371400c7, expires Oct 24). Re-scanned recent-20 plans (no material status changes vs 04:32 session). Picked up prior session's next-candidate #1: Stage A/C shadow readout (n≥15 thresholds now met).
+
+### Plan evaluations (recent-20 re-scan, deltas vs 04:32 UTC session)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| autonomous-btc-loop-spec | L4 | HIGH | ✅ PHASE 0 SHADOW LIVE (prior) | No change; shadow soak accruing |
+| t-vacation-mode-2026-10-14 | L4 | HIGH | ✅ ACTIVE (vacation_mode.json ON) | Waiver scope shipped by parallel session; this session stayed inside allowed envelope (analysis + cleanup only) |
+| shadow-mode-paper-trading-spec | L3 | HIGH | ✅ IMPLEMENTED (prior) | shadow_trades.db now 11,372 rows / 1,215 SHADOW_BYPASS — cohort matured enough for readout |
+| limit-order-capability | L2 | MED | ✅ PHASE 1 (prior) | Unchanged; phases 2-4 still deferred |
+| 2026-10-16_winning-dna-remeasure-verdict | — | HIGH | ✅ CLOSED (prior) | SL-width study still on CEO kanban |
+| strategic-six-options-2026-10-14 | L4 | HIGH | PARTIAL (prior) | Unchanged |
+| contrarian-engine-2026-10-13 | L2-3 | MED-HIGH | ⏳ CEO-gated SPEC | Untouched (vacation freeze) |
+| contrarian-zone-backtest | L2 | LOW | ⏸️ PAPER-TRADE PENDING (prior) | CONTRARIAN_ZONE_ENABLED=False; needs 50+ paper trades — no action |
+| vol-regime-relative-thresholds-2026-10-13 | L2-3 | MED-HIGH | ⏳ CEO-gated SPEC | Untouched |
+| temporal-confluence-spec | L2 | MED-HIGH | ⏳ CEO-gated SPEC | Untouched; temporal_confluence_shadow.db accruing separately |
+| signal-starvation-fix-2026-10-12 | L2-3 | MED-HIGH | ⏳ CEO-gated SPEC | Partially superseded by CEO unclog flips (371400c7, parallel session) |
+| short-rsi-habitat-spec | L2 | MED-HIGH | ⏳ CEO-gated SPEC | Untouched; bear-structure exemption shipped by parallel session under T waiver |
+| 2026-10-13_rr-engine-smart-upgrades | L2-3 | HIGH | U1 LIVE / U2-U4 ⏳ CEO | Unchanged |
+| 2026-10-12_gate-conundrum-deadlock-plan | L1-2 | HIGH | ✅ R1-R5 SHIPPED (prior) | Registry + claim hygiene landed 04:32 session |
+| grind-breakout-v2-coin-tracker-integration | L3 | LOW | ⏸️ DEFERRED (by plan) | Unchanged |
+| regime-recalibration-2026-10-12 | L2 | MED-HIGH | ⏳ CEO-gated | MAXXED tier proposal untouched |
+| 2026-09-04_continuum-engine-spec | L3 | — | ✅ LIVE (prior) | No action |
+| shadow-registry / shadow_signals_runner fixes | L2 | HIGH | ✅ COMPLETE (prior 04:32) | This session consumed its output (readout) |
+| bug-hunt-master-plan (open bugs 037/044/056/064) | — | HIGH | ⏳ CEO-gated | Untouched |
+| 2026-10-08_winning-dna-population-report | L1-3 | HIGH | PARTIAL (prior) | Except-swallow fixed 10-12; remaining asks CEO-gated |
+
+### Implemented this session (1 × L1 analysis + 1 × L1 hygiene)
+
+1. **(L1) Stage A/C shadow-bypass readout** — `brain/stage-ac-shadow-readout-2026-10-22.md`. Prior session's next-candidate #1, n≥15 thresholds met for 6/10 registry keys. Findings: (a) 3 disabled SHORT signals show broad positive shadow edge contradicting their Jul-Aug disable theses — sqx- WR 73.4% n=575 CI95[69.6,76.8] +74.2% sum net, rs-s-broken WR 82.9% n=105, bb-squeeze- WR 69.6% n=56, all token-spread (top token ≤9%); (b) 3 disabled LONG signals confirmed losers (sqx+ 32.1%, doji 31.5%, vol-breakout 14.3%) — kills now independently validated; (c) all measurable winners DEGRADE in newer half-split (sqx- 81.6→61.0% WR); (d) fire rates operationally absurd (sqx- 44.8/hr) — naive flag flip impossible, any re-test needs throttle design. Zero fires on hmacd_mtf-+/bb-bounce-v3/open-skies+ (LOW, diagnostic pending). **No flags touched** — analysis only, vacation freeze respected. Recommendations routed to CEO in report §6.
+2. **(L1) Orphan 0-byte shadow DB cleanup** — deleted `data/gate_shadow.db`, `data/expiry_shadow.db`, `data/shadow_trades.db` (all 0 bytes, created Oct 20-21). Verified no code path opens them: all shadow scripts write to `brain/*.db` (gate_shadow.py:32, expiry_shadow.py:34, shadow_trader.py:33); only `*_offset.txt` files in HERMES_DATA are live. This session itself nearly queried the wrong 0-byte data/shadow_trades.db before finding brain/ — the orphans were a live confusion hazard.
+
+### Verifications (no code change)
+- All 10 SHADOW_BYPASS registry ENABLED flags confirmed False in hermes_constants.py (lines 672-4611).
+- Readout numbers reproducible: single deterministic SQL against brain/shadow_trades.db (11,372 rows, window 2026-10-21 00:22 → 2026-10-22 16:22 UTC).
+- Wilson CI95 computed for every cohort with n_closed≥10; half-splits reported both ways per AGENTS.md discipline.
+
+### Sideways findings
+- **Severity: LOW** — 8 pollution rows (rs-s120/s32/s124/s126 LONG, all −0.800%) from pre-HIGH-5-fix remain in shadow_trades.db. Self-contained; exclude or delete next touch (prior session already flagged).
+- **Severity: LOW** — hmacd_mtf-+, bb-bounce-v3-long, open-skies+ have zero shadow fires in 40h. Runner counters work post-fix; likely detector-quiet, but one --dry-run import check warranted.
+- **Severity: INFO** — rs-s-broken half2 has only 7/100 closed (93 open) — half2 stats uninformative until resolves; readout re-run recommended in 7d.
+- **Severity: INFO** — data disk 84% (threshold for 15m/1h/4h retention is 85%) — one bad day from triggering; watch.
+
+### Success rate this session: 2/2 implemented (100%)
+### Cumulative (today, 3 sessions): 7/7 (100%)
+### Next candidates (priority order)
+1. Stage A/C re-readout — L1 analysis — MED — in ~7d when rs-s-broken/bb-squeeze- half2 closes resolve and sqx- degradation trend clarifies
+2. Zero-fire key diagnostic (--dry-run import check) — L1 — LOW — quick, next session
+3. RR engine U2-U4 — L2-3 — HIGH — still needs CEO sequencing
+4. Throttled re-test design for top shadow SHORT candidate (sqx-) — L2 design — MED-HIGH — only if CEO wants it; vacation freeze blocks implementation
+5. 15m/1h/4h candle retention — L1 — LOW — disk at 84%, one point from 85% trigger
