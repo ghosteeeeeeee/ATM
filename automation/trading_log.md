@@ -13784,3 +13784,23 @@ Final set: ['BTC', 'INJ']
 - 24h flat '-$0.62'; 7d '-$3.14'; loss clusters: hard_max_loss 6T '-$0.70' (avg '-$0.12'), atr_sl_hit 6T '-$0.26' (standing SL-width escalation with CEO, Oct 16)
 - profit-monster-trail positive: 14T +$0.58 24h; continuum-trend+ 3T 66.7% +$0.05; warrior-sr-confirm+ 1T +$0.11
 - 7-hour quiet stretch — low volatility/conviction environment; CONF_FLOOR=30 ship due tomorrow (Oct 23)
+
+## [2026-10-22 09:27 UTC] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $+0.11 (WR: 100%) | 24h: 29T 41.4% '-$0.55' | 7d: 159T 37.1% '-$3.03' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 winner last hour: BTC ai-trader-pending SHORT manual_tp_hit +$0.11 (+4.65%) — pending SHORT from 06:44 hit its TP, position now flat
+- No signal at 0%WR with 3+T last hour (only 1 trade, a win)
+- atr_sl_hit 6/29 = 20.7% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: last hour POSITIVE — no 3h trigger
+- Frequency 1/hr — not overtraded (limit 20)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-$0.55' improved from '-$0.62'; 7d '-$3.03'; loss clusters: hard_max_loss 6T '-$0.70', atr_sl_hit 6T '-$0.26' (standing SL-width escalation with CEO, Oct 16)
+- profit-monster-trail 13T '+$0.54' still only positive cluster; continuation+ 4T 50% '-$0.18', r2v2-long3 4T 50% '-$0.14' dragging
+- CONF_FLOOR=30 ship due tomorrow (Oct 23)
