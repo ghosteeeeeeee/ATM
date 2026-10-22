@@ -3664,8 +3664,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             _shadow_hml = min(HARD_MAX_LOSS_PCT, -abs(_shadow_atr_min) * 100.0)
             if _shadow_hml != HARD_MAX_LOSS_PCT and trade_id not in _hml_shadow_logged:
                 _hml_shadow_logged.add(trade_id)
+                # trade_id in line: _hml_shadow_logged is per-process and position_manager
+                # is a fresh process every pipeline minute, so dedup does not persist
+                # across runs (102 lines / 1 trade observed 2026-10-22). Eval must
+                # DISTINCT on trade_id.
                 log(f"  📊 [HML-SHADOW] {token}: actual={HARD_MAX_LOSS_PCT:.3f}% shadow={_shadow_hml:.3f}% "
-                    f"(ATR floor {_shadow_atr_min * 100:.2f}%, lev={_hml_lev:.0f})", 'INFO')
+                    f"(ATR floor {_shadow_atr_min * 100:.2f}%, lev={_hml_lev:.0f}, trade_id={trade_id})", 'INFO')
         except Exception:
             pass
         # D3 TRAIL-MIN-GAP REMOVED (CEO 2026-10-12): the -0.60% trail floor only

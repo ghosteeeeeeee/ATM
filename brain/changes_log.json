@@ -1815,5 +1815,16 @@
     "after": "abs(pnl_pct)/leverage > 1.5 (price%) — 30d: 10/384 losses fire (vs 234), >=3-cluster exactly 1 day (Sep 24 genuine squeeze); 24h self-check 0 fires, Sep 24 self-check 5 fires, py_compile PASS | post-review hardening: leverage<=0 rows are skipped (cannot normalize) instead of falling back to account% comparison (reviewer: SHIP, 0/5970 rows have NULL leverage)",
     "rationale": "Root cause of 6-run false-positive loop: detector measured account terms where leverage multiplies chop noise past threshold; safety net firing read as directional error",
     "impact": "steer-001 goes quiet on chop stop clusters (correct), still fires on real wrong-side days (price >1.5% x3+) — advisory only, zero trading behavior"
+  },
+  {
+    "timestamp": "2026-10-22T08:08:27Z",
+    "agent": "brain_auditor",
+    "change": "HML-SHADOW log line now carries trade_id (dedup set is per-process; position_manager runs fresh every pipeline minute so once-per-trade dedup never persisted across runs — 102 lines for 1 trade observed; line had no trade_id so Oct 25 eval could not dedupe)",
+    "type": "bugfix",
+    "file": "scripts/position_manager.py",
+    "before": "[HML-SHADOW] {token}: actual=... shadow=... (ATR floor ..., lev=N)",
+    "after": "[HML-SHADOW] {token}: actual=... shadow=... (ATR floor ..., lev=N, trade_id=N)",
+    "rationale": "Oct 25 HML-SHADOW eval needs DISTINCT-per-trade data; in-memory set resets every minute",
+    "impact": "log-only, zero trading behavior; py_compile + self-check PASS"
   }
 ]

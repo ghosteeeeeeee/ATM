@@ -6553,5 +6553,60 @@
     "category": "feature sweep",
     "status": "rejected-redundant",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-22T08:08:27Z",
+    "idea": "Stalled-breakeven early exit (age X, unarmed, price >= -0.2% -> exit) — MEASURED, FAILS winner-kill bar, NOT shipping",
+    "rationale": "All 8 top-24h losers touched breakeven within 30m before dying. Grid 4 ages x 3 BE levels x 7d/14d excl ai-trader: 23/24 cells positive (best 15m/-0.5% 14d +$4.75 t=4.41), but winner-kill 40-60% of winners >> 20% bar and regime split weak (BULL +0.70 t=1.97 / BEAR -0.09 t=-0.41).",
+    "expected_impact": "n/a — rejected as exit rule",
+    "category": "exit mechanics",
+    "status": "rejected-bar / monitor",
+    "risk": "high",
+    "revisit": "only reframed with winner-kill <=20% AND measured in a non-bear regime"
+  },
+  {
+    "date": "2026-10-22T08:08:27Z",
+    "idea": "HML-SHADOW trade_id stamp (shipped)",
+    "rationale": "per-process dedup reset each pipeline minute (102 lines/1 trade); eval must DISTINCT trade_id",
+    "expected_impact": "clean Oct 25 eval",
+    "category": "instrumentation",
+    "status": "shipped",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-22T08:08:27Z",
+    "idea": "ai-trader-pending metadata stamp pre-registered Oct 23+",
+    "rationale": "#16350/#16351 _signal_metadata = {} — CEO pending cohort (10T 1W 8L, 0/9 armed) is invisible to every metadata counterfactual; ATR-scaled SL eval Oct 26 needs it",
+    "expected_impact": "unlocks regime/gap/RSI analysis on pending cohort",
+    "category": "instrumentation",
+    "status": "pre-registered",
+    "risk": "zero-behavior"
+  },
+  {
+    "date": "2026-10-22T08:08:27Z",
+    "idea": "CONF_FLOOR fk measurement correction (drift record)",
+    "rationale": "recorded fk 6.3% / killed +$0.37 / net +$1.61 unreproducible; fresh: fk 14d 20.7% (6/29) 16d 17.6% 30d 7.7%, killed +$0.64, net +$1.98 — blocked set identical all windows (40T/6W/-$1.98). 14d marginally fails the <20% bar.",
+    "expected_impact": "corrected numbers to CEO at Oct 23 ship decision",
+    "category": "verification",
+    "status": "decided",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-22T08:49:32Z",
+    "idea": "Re-enter-on-recovery study (post-stop 1m census measured, n=213/14d)",
+    "rationale": "71% of stopped trades trade back through entry within 60m (recovered subset 60m-fwd avg +0.34%, 83/153 pos); 28% never do (60T avg -1.84%, 0/60 pos). Confirmation re-entry captures the first class, structurally excludes the second — different from rejected hold-through-stop (#68) and cooldown (#66).",
+    "expected_impact": "bounds: ~+0.34% avg on ~71% of stop events minus fees/re-stops; needs fee-adjusted sim",
+    "category": "exit mechanism",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T08:49:32Z",
+    "idea": "Habitat RANGING-class 7d sign-flip (subtype decomposition for Oct 25)",
+    "rationale": "Class RANGING% 7d +$0.10/22T (#70) -> -$0.28/27T now; bare RANGING subtype +$0.31/15T 80% vs RANGING_BEAR/BULL negative. Profitable pattern may be subtype-specific, not class-wide.",
+    "expected_impact": "sharper Oct 25 dampen verdict; no change now (bars already failing)",
+    "category": "regime",
+    "status": "monitoring",
+    "risk": "none"
   }
 ]
