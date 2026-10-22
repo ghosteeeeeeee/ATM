@@ -14061,3 +14061,26 @@ Final set: ['BTC', 'INJ']
 - 7d '-$3.54' vs '-$3.05' last hour — window slide (2 winners aged out), no new losses
 - BTC SHORT open ~4h15m — watch EMA reclaim exit per audit #81
 - CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #81
+
+## [2026-10-22 22:28 UTC] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A) | 24h: 4T 3W '+$0.27' | 7d: 151T 37.7% '-$3.59' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- Empty hour — last close was ZRO SHORT ~19:28; no closes 21:28→22:28
+- Kill check: no signals closed last hour, no kill trigger
+- atr_sl_hit 0/4 = 0% (<40%) over 24h — no SL-tightness issue
+- Neg-hour streak: none (empty hour), no 3h trigger
+- Frequency 0/hr — not overtraded (limit 20)
+- 2 open positions: (1) BTC ai-trader-pending SHORT since 17:14 (entry 81139, SL 81760, TP 80300) — HOLD per audit #81 at EMA300 reclaim zone; (2) NEO warrior-sr-confirm- SHORT opened 21:51 (entry 2.1913, SL 2.2103, TP 2.1584) — new position, monitor next hour
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flat '+$0.27' on 4T (WR 75%) — quiet market since 09:00
+- 7d '-$3.59' vs '-$3.54' last hour — window slide (ZRO win aging out of 7d window), no new losses
+- BTC SHORT open ~5h15m — watch EMA reclaim exit per audit #81
+- NEO SHORT new (21:51) — first trade in ~3h, first close to watch next hour
+- CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #83
