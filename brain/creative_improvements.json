@@ -6718,5 +6718,32 @@
     "category": "funnel diagnostics",
     "status": "suggested",
     "risk": "none (read-only)"
+  },
+  {
+    "date": "2026-10-22T16:50:10Z",
+    "idea": "Round-trip ledger as a standing audit metric: closes with mfe_pct>=0.40 AND pnl_usdt<0, segmented by owning exit engine (PROFIT_MONSTER_BYPASS_SIGNALS attribution)",
+    "rationale": "14d: 50/350 closes round-tripped = -$2.90 = 70% of the entire -$4.16 bleed. By engine: pump-exit 30T/-$1.71 (59% of round-trip bleed, reaches +0.40% on 55.5% of trades) vs PM_TRAIL 7T/-$0.21. The leak is in the BYPASS exit engines, not in profit_monster.",
+    "expected_impact": "Isolates the fix target; directs Oct 25 eval at pump-exit rather than PM_TRAIL constants (which are CEO-protected)",
+    "category": "exit engine",
+    "status": "shipped-as-metric (offline query, zero code)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T16:50:10Z",
+    "idea": "pump-exit scoped trail counterfactual (pre-registered, NOT shipped): arm at +0.40% favorable, trail 0.20%, applied to PM-bypass trades only",
+    "rationale": "1m replay of 101 PM-bypass trades that reached +0.40% (14d): actual +141.6pp account vs trail +241.0pp = +99.4pp delta; losers -98.7pp -> +79.0pp; but winners give back 78.3pp (29/56 harmed, 1 made negative) and top contributor BTC #16307 alone = 32pp of delta. Fees and intra-bar wick path NOT modeled.",
+    "expected_impact": "Unverified - directionally large but fragile. Required checks: fee-adjusted, wick-path candle OOS (escalation #17), 7d/30d OOS sign, sensitivity excluding top-3 contributors.",
+    "category": "exit sniper",
+    "status": "pre-registered",
+    "risk": "medium - winner-kill 29/56 must be re-measured on candle path"
+  },
+  {
+    "date": "2026-10-22T16:50:10Z",
+    "idea": "Dwell-time measurement for round-trips (decides poll-race vs ownership)",
+    "rationale": "Of 64 14d atr_sl_hit losers, 31 dwelled >= +0.40% favorable on 1m closes; median 11 bars, 19 >=10min, max 86min (SOL hl_copy_trader). 18 had <=1 bar = genuine sub-minute spike. So the majority is NOT a profit_monster polling race (timer confirmed firing every 60s) - it is bypass ownership.",
+    "expected_impact": "Prevents a wrong fix (tightening PM_TRAIL poll cadence would address only 18/64)",
+    "category": "diagnostic",
+    "status": "done",
+    "risk": "none"
   }
 ]
