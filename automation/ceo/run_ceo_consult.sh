@@ -11,6 +11,8 @@
 # Usage:
 #   run_ceo_consult.sh /path/to/brief.md
 #   run_ceo_consult.sh          # no brief → refuses (consult needs a question)
+#   CEO_CONSULT_BUDGET=900 run_ceo_consult.sh /path/to/brief.md   # extended budget
+#   (CEO_CONSULT_BUDGET default 300; >300 also switches the prompt to deep-consult mode)
 #
 # Design basis: CEO decision 20261013T000026Z (automation/ceo/ceo_report.md).
 
@@ -58,6 +60,21 @@ esac
 INJECT_BLOCK=$(cat "$INJECTED_BRIEF")
 echo "[CEO-CONSULT] brief attached: $INJECTED_BRIEF"
 
+# ── Budget override (added 2026-10-22, T: "give a long timeout") ─────────────
+# CEO_CONSULT_BUDGET=<seconds> extends the consult beyond the default 300s.
+# Default (unset or <=300) is byte-identical to the original behavior.
+CEO_CONSULT_BUDGET="${CEO_CONSULT_BUDGET:-300}"
+case "$CEO_CONSULT_BUDGET" in
+    ''|*[!0-9]*) echo "[CEO-CONSULT] CEO_CONSULT_BUDGET must be integer seconds, got: $CEO_CONSULT_BUDGET" >&2; exit 4 ;;
+esac
+if [ "$CEO_CONSULT_BUDGET" -gt 300 ]; then
+    _mins=$(( (CEO_CONSULT_BUDGET + 59) / 60 ))
+    BUDGET_LINE="**BUDGET: ~${_mins} minutes (extended consult: CEO_CONSULT_BUDGET=${CEO_CONSULT_BUDGET}s). This is a DEEP consult — work the question thoroughly: read the relevant code (cite file:line) and run the SQL you need to verify every number you cite. Still READ-ONLY — recommend, do not edit. Depth welcome; the ~400-word soft cap below does not apply when the brief demands a detailed answer.**"
+    unset _mins
+else
+    BUDGET_LINE="**BUDGET: ~3 minutes. Do not exceed a few file/DB reads.**"
+fi
+
 # ── Build the bounded consult task (inline — no template file to drift) ─────
 cat > "$TASK" <<TASK
 # CONSULT RUN ${TS} (UTC)
@@ -65,7 +82,7 @@ cat > "$TASK" <<TASK
 You are running a BOUNDED, READ-ONLY consult. Base persona/rules follow after this block.
 
 ## HARD LIMITS (this run)
-- **BUDGET: ~3 minutes. Do not exceed a few file/DB reads.**
+- $BUDGET_LINE
 - **READ-ONLY. Do NOT edit ANY file. Do NOT change params, flags, or blacklists.**
 - Do NOT develop signals. Do NOT tune signals. Do NOT dispatch subagents.
 - Do NOT write to ceo_report.md or ceo_kanban.md — answer HERE, in this session.
@@ -97,16 +114,16 @@ if ! ceo_assert_prompt "$PROMPT_FILE" "$CEO_PERSONA_MARKER" "consult"; then
     exit 5
 fi
 
-echo "[CEO-CONSULT] run ${TS} starting (in-process, read-only, budget 300s)"
+echo "[CEO-CONSULT] run ${TS} starting (in-process, read-only, budget ${CEO_CONSULT_BUDGET}s)"
 # Foreground, stdout passes through to the caller (this is the point of consult).
 # Stderr also passes through so errors are visible. Both are also logged.
-timeout 300 "$OPENCODE" run --format json < "$PROMPT_FILE" \
+timeout "$CEO_CONSULT_BUDGET" "$OPENCODE" run --format json < "$PROMPT_FILE" \
     2> "$CEO_LOG_DIR/consult-${TS}.err" | tee "$CEO_LOG_DIR/consult-${TS}.jsonl"
 rc=${PIPESTATUS[0]}
 echo "$(ceo_classify_run "$CEO_LOG_DIR/consult-${TS}.jsonl") rc=$rc" > "$CEO_LOG_DIR/consult-${TS}.exit"
 
 if [ "$rc" -eq 124 ]; then
-    echo "[CEO-CONSULT] ⚠️ TIMED OUT (300s)." >&2
+    echo "[CEO-CONSULT] ⚠️ TIMED OUT (${CEO_CONSULT_BUDGET}s)." >&2
 elif [ "$rc" -ne 0 ]; then
     echo "[CEO-CONSULT] ⚠️ exited rc=$rc — inspect $CEO_LOG_DIR/consult-${TS}.err" >&2
 fi
