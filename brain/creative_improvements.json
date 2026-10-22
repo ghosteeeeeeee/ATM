@@ -6462,5 +6462,25 @@
     "rationale": "hotset.json rewritten 01:32, gates actively firing (CONTINUUM-BLOCK 55 / BTC-CHOP 26). Not a stalled path.",
     "status": "decided",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-22T02:45:00Z",
+    "idea": "Residual confidence-bleed ledger with a permanent kill-criteria",
+    "rationale": "final_confidence 40-50 is the single largest bleed bucket we have ever isolated (124T 31.5% -3.22 over 16d). Decomposition: CONF_FLOOR=30 captures -1.85 (39T), doji kill captures -0.97 (16T) => queued Oct-23 stack covers 88% of it; residual -0.40. Nobody has quantified what is left AFTER the stack lands, so this bucket keeps getting re-proposed as a global floor.",
+    "expected_impact": "zero-behavior; either closes the confidence-bleed chapter permanently (residual < -$1.00/14d not reached) or produces one signal-scoped floor proposal with n>=20 backing",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low",
+    "criteria": "Re-measure 2026-10-25: fc40-50 residual over non-killed signals. Ship only if 14d residual <= -$1.00 AND n>=20 AND fk<20%; else CLOSE permanently."
+  },
+  {
+    "date": "2026-10-22T02:45:00Z",
+    "idea": "pump-chain confidence 60-75 premium study (positive filter, not a block)",
+    "rationale": "pump-chain family's entire edge sits in conf 60-75: 13T +$2.16 from 10% of trades. Top 3 winners (CRV +0.94, LDO +0.68, APT +0.53) share the same signature: EXTREME regime, gap_at_entry >= 1.10, trail-armed. Prior work only ever built floors; nobody tested whether the family has a high-confidence cell worth sizing INTO once size-reduce lifts.",
+    "expected_impact": "identify a >=60% WR cell for pump-chain (currently 30.2% family WR) instead of continuing to bleed the mid-band",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "criteria": "collect to n>=20 in the conf>=60 EXTREME cell; test gap>=1.0 interaction as a SECOND, separate variable (one at a time)."
   }
 ]
