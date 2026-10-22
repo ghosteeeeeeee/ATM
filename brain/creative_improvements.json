@@ -6871,5 +6871,28 @@
     "category": "process",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-22T22:48:38Z",
+    "run": "brain_auditor #84",
+    "idea": "Scope the Oct 25 UGB / pump-exit giveback eval to the pump-chain family FIRST, using a reached-but-unarmed (RBU) ledger",
+    "rationale": "Measured fresh: of 341 14d closes with mfe_pct, 60 (18%) reached +0.40% favorable yet ended unarmed — final PnL '-$0.34' (46 losers '-$2.77' vs 14 winners '+$2.43'). The pump-chain family owns 32 of those 60 (53%); pump-chain- alone is 16/36 = 44% RBU. Signals that never reach momentum show 0% RBU (bb-bounce 0/36, doji 0/20) — those are ENTRY problems already handled by kills/MFE-CUT. pump-chain- reaches +0.40 on 67% of trades but arms only 22% = it gets the trend and fails to lock it, which is a pure EXIT problem and exactly the class UGB-BE/UGB-PT shadows were built for (PM:3835-3868, 0 fires so far).",
+    "expected_impact": "Concentrates the giveback lever where 53% of the RBU population lives instead of applying it universally; keeps the winner-kill test honest and bounded by the 14 RBU winners ('+$2.43') that must survive.",
+    "category": "exit sniper",
+    "status": "pre-registered for Oct 25",
+    "risk": "low",
+    "criteria_locked_pre_data": "pump-chain RBU n>=20 (now 21, MET) AND fee-adjusted sim net > +$0.50/14d AND winner-kill < 20% AND pump-chain-only scope (no universal flip). Blocked on escalation #17 for the candle path; DB path available.",
+    "honest_ceiling": "RBU final PnL is only '-$0.34'/14d — the lever's real ceiling is the giveback amount measured in #78 ('-$2.90' on the reach-and-reverse class), not the RBU net. Do not pitch this as a '$4 trade': it is a slice of the #78 counterfactual, scoped."
+  },
+  {
+    "date": "2026-10-22T22:48:38Z",
+    "run": "brain_auditor #84",
+    "idea": "CHOP-COVERAGE LEDGER — standing KPI: what % of the hard_max_loss bleed is owned by a shipped or queued lever",
+    "rationale": "The mandate is 'keep us out of chop' but nothing tracks whether coverage is improving — each run re-derives it by hand. One query decomposes 14d hard_max_loss (79T, '-$7.89') into: killed/disabled signals '-$3.11' (39%), CONF_FLOOR bare-only (ships Oct 23) '-$0.88' (11%), bb-bounce MFE-CUT (Oct 25) '-$0.71' (9%), live uncovered residual '-$1.60' spread across cells all n<5. Today's coverage = 59%.",
+    "expected_impact": "Turns a philosophy into a tracked number. Target >=80% before any new chop gate is proposed; if coverage stalls, that is the signal to build the next lever instead of re-litigating kills.",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "zero (read-only metric)",
+    "criteria": "recompute each run; publish coverage% + residual owners. No config change."
   }
 ]

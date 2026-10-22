@@ -192,6 +192,42 @@ print("Analysis merged into watchdog_recommendations.json")
 2. Time-based — "avoid trading at 3am" ← BANNED
 3. Obvious — "price went down" ← not helpful
 4. Unactionable — "hope for the best" ← useless
+5. Condition-free — "EXIT now at ~81442" with no stated trigger ← looks urgent forever
+
+### Steer Validity & Retraction (MANDATORY — added 2026-10-22)
+
+A steer that keys on a **market condition** (regime, bias, EMA position, RSI band, hold
+duration) must state the condition next to the action, so the next cycle can re-test it:
+
+- ✅ `Exit BTC SHORT if 1m closes hold above EMA300 for 15-30m` — verifiable, expires when the condition reverses
+- ❌ `EXIT BTC SHORT at ~81442 (-0.41%)` — a level with no trigger; reads as permanently urgent
+
+This applies to **both steer channels** — entries in the `steers` array *and* steer-class
+recommendations you write inside `deep_analysis`. They are read by the same human, and the
+2026-10-22 double-issue below happened entirely in `deep_analysis` prose while `steers`
+was `[]`.
+
+**Before re-issuing a steer that a previous cycle already wrote and no human executed:**
+
+1. **Re-read the condition from candles/DB at write time.** Never copy the prior cycle's
+   prose. The condition is data, not history.
+2. **If the condition no longer holds**, do NOT restate it as urgent. Write:
+   `RETRACTED — <steer text> (condition reversed at HH:MM; prior steer superseded)`
+   and drop it out of the actionable list.
+3. **If the condition still holds and the steer is now ≥2 cycles old**, keep the severity
+   but append `age=<n> cycles unexecuted` so the human can see it has been standing.
+
+**Why this rule exists (measured 2026-10-22, trade #16353 BTC SHORT):** an urgent 🔴
+"exit — 1m holds above EMA300, ignored 57 min" steer was written at 21:51 and again at
+22:14. Verified independently in `candles.db`: 1m crossed **above** EMA300 at 21:09 and
+crossed back **below** at 22:18 (close 81392 vs EMA300 81416). By the next cycle the
+trigger had reversed — a third copy of the same text would have had the human exit on
+reverted evidence. One steer must never stand as "urgent" across an opposite reversal
+without a retraction in between.
+
+**Cost accounting:** the missed window cost ~0bps (steer price 81442 vs 81440 twenty-two
+minutes later). It was free *this time* — which is precisely why the retraction rule must
+exist before the first time it isn't.
 
 ## Step 6: AI Trader Signal (Hourly Pick)
 

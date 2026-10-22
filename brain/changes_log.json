@@ -1870,5 +1870,16 @@
     "after": "[SHADOW] UGB-PT / UGB-BE would-fire lines, dedup per trade, gated on existing ARM_BE_SHADOW_ENABLED; UGB_PT_DISTANCE_PCT=0.30 module-local (hermes_constants ZERO diff); zero behavior",
     "rationale": "30d candle OOS n=179 unarmed: ACTUAL -7.24pp vs BE +27.61 (+34.85, p=0.00000) vs peak-trail +78.24 (+85.48, p=0.00000), positive in all 3 split halves, no outlier carry; armed half measured HARMFUL so flip must ship unarmed scope only",
     "impact": "collects the fk denominator needed for the Oct 25 flip decision; no trading behavior change"
+  },
+  {
+    "timestamp": "2026-10-22T22:48:38Z",
+    "agent": "brain_auditor",
+    "change": "trade_watchdog_prompt.md: added mandatory Steer Validity & Retraction section (state the condition; re-test before re-issuing; write RETRACTED when the condition reversed) + 'condition-free' added as steer failure mode #5",
+    "type": "doc",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "steers carried a level/action with no stated trigger; an urgent BTC SHORT exit steer was written 21:51 and again 22:14 while its EMA300 condition reversed at 22:18",
+    "after": "condition must be stated and re-read from candles/DB each cycle; reversed conditions are emitted as RETRACTED and dropped from the actionable list; >=2-cycle old steers carry age=N cycles unexecuted",
+    "rationale": "root cause of a stale-urgent steer: no validity protocol, so the same text could be re-issued across an opposite reversal and trigger an exit on reverted evidence",
+    "impact": "zero live behavior (prompt convention only); prevents the next stale-steer execution. hermes_constants.py untouched (vacation no_constants_change honored)."
   }
 ]
