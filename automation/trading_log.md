@@ -13804,3 +13804,45 @@ Final set: ['BTC', 'INJ']
 - 24h '-$0.55' improved from '-$0.62'; 7d '-$3.03'; loss clusters: hard_max_loss 6T '-$0.70', atr_sl_hit 6T '-$0.26' (standing SL-width escalation with CEO, Oct 16)
 - profit-monster-trail 13T '+$0.54' still only positive cluster; continuation+ 4T 50% '-$0.18', r2v2-long3 4T 50% '-$0.14' dragging
 - CONF_FLOOR=30 ship due tomorrow (Oct 23)
+
+## [2026-10-22 10:28] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (24h: 23T 10W '-$0.36', WR 43.5%) | 7d 159T 37.1% '-$3.03' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour (previous close was 09:00 BTC pending TP) — no signal at 0%WR with 3+T last hour
+- Kill check: pump-chain+ 2T 0%WR 24h but 0T last hour; pump-chain- 1T 0%WR 0T last hour — all below 3T/last-hour threshold
+- atr_sl_hit 5/23 = 21.7% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: no trades — no 3h trigger
+- Frequency 0/hr — not overtraded (limit 20)
+- 0 open positions
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h improved '-$0.36' (was '-$0.55' at 09:27); 7d '-$3.03'; loss clusters: hard_max_loss 4T '-$0.49' (avg '-$0.12'), atr_sl_hit 5T '-$0.23' (standing SL-width escalation with CEO, Oct 16)
+- profit-monster-trail 10T '+$0.49' only positive signal cluster; continuation+ 3T 33% '-$0.20' worst
+- CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #73
+
+## [2026-10-22 11:28 UTC] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (24h: 23T 10W '-$0.36', WR 43.5%) | 7d 159T 37.1% '-$3.03' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour (last close 09:00 BTC pending TP) — no signal at 0%WR with 3+T last hour
+- Kill check: pump-chain+ 2T 0%WR 24h but 0T last hour; r2v2-long4 2T 0%WR 0T last hour — all below 3T/last-hour threshold
+- atr_sl_hit 5/23 = 21.7% under 40% — tpsl_utils.py deployed (Oct 12)
+- Neg-hour streak: no trades — no 3h trigger
+- Frequency 0/hr — not overtraded (limit 20)
+- 0 open positions
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flat '-$0.36'; 7d '-$3.03'; loss clusters: hard_max_loss 4T '-$0.49' (avg '-$0.12'), atr_sl_hit 5T '-$0.23' (standing SL-width escalation with CEO, Oct 16)
+- profit-monster-trail 10T '+$0.49' only positive signal cluster; continuation+ 3T 33% '-$0.20' worst
+- CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #73
