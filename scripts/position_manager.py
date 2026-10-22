@@ -2069,11 +2069,13 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         # MANUAL CEO TRADES: skip ATR SL/TP management entirely. The CEO sets
         # explicit levels at open (--sl/--target); the ATR engine was clobbering
         # them on the first cycle (trade #16263: SL 81530→81465, TP 81898→82936).
-        # Manual trades use RR-engine structural exits; ATR management is for
-        # signal trades without explicit levels. ai-trader-pending = conditional
-        # orders armed by CEO with explicit SL/TP — same protection.
+        # CEO trades are owned by manual_exit_manager (predefined SL/TP + close
+        # trailing) — ATR level management is for signal trades only.
+        # (bug_hunter 2026-10-22: filter now uses is_managed_signal so the
+        # ai-trader-auto tag is covered before auto_trader leaves shadow.)
         _sig_chk = str(pos.get('signal', '') or '')
-        if 'ai-trader-manual' in _sig_chk or 'ai-trader-pending' in _sig_chk:
+        import manual_exit_manager as _mxm_atr
+        if _mxm_atr.is_managed_signal(_sig_chk):
             continue
         entry_price = float(pos.get('entry_price') or 0)
         current_price = float(pos.get('current_price') or 0)
@@ -2826,7 +2828,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 pos['stop_loss'] = u['new_sl']
                 pos['target'] = u['new_tp']
         if ATR_HL_ORDERS_ENABLED:
-            _execute_atr_bulk_updates(_atr_updates)  # HL path (kill switch controlled)
+            # bug_hunter 2026-10-22 (sideways): _execute_atr_bulk_updates is
+            # called but DEFINED NOWHERE — flipping this flag used to NameError
+            # the whole manage loop. Look the function up defensively; if it's
+            # ever (re)implemented, the flag works again.
+            _atr_bulk_fn = globals().get('_execute_atr_bulk_updates')
+            if callable(_atr_bulk_fn):
+                _atr_bulk_fn(_atr_updates)  # HL path (kill switch controlled)
+            else:
+                log("  [ATR] HL orders ENABLED but _execute_atr_bulk_updates "
+                    "is not implemented — flag ignored, DB path only", "WARN")
         else:
             log(f"  [ATR] HL orders DISABLED — SL/TP managed locally by guardian via DB")
         log(f"  [ATR] Updated {len(_atr_updates)} position SL/TP levels")
@@ -2931,7 +2942,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 if _match_exit_config(part) == 'pump_exit':
                     use_pump_exit = True
                     break
-        if use_pump_exit:
+        # CEO trades never enter pump/ride exit paths — matcher resolution
+        # alone is not enough (comma-combo signals could leak; bug_hunter #8).
+        if use_pump_exit and not is_ceo_trade:
             try:
                 import sqlite3 as _sqlite3
                 from hermes_constants import (
@@ -3109,7 +3122,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 if _match_exit_config(part) == 'ride_it':
                     use_ride_it = True
                     break
-        if use_ride_it:
+        if use_ride_it and not is_ceo_trade:
             try:
                 from ride_it_exit import manage_ride_it_exit
                 ride_result = manage_ride_it_exit(token, direction, cur, pos, trade_id)

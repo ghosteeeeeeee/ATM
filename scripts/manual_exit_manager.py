@@ -50,6 +50,8 @@ def update_trail(pos: dict, direction: str, current_price: float,
         old_sl = float(pos.get('stop_loss') or 0)
     except (TypeError, ValueError):
         return False
+    if direction not in ('LONG', 'SHORT'):
+        return False                    # validate — never fall through to SHORT
     if current_price <= 0 or entry_price <= 0 or old_sl <= 0:
         return False
     trade_id = pos.get('id')

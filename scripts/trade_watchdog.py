@@ -1699,6 +1699,38 @@ def execute_safe_actions(steers, watchdog_mode):
         trade_id = steer.get("trade_id")
 
         if action_type == "move_stop" and symbol and new_stop:
+            # CEO trades: manual_exit_manager owns their stops. Moving the HL
+            # stop here without the DB counterpart (adjust_stop_loss is
+            # paper=TRUE only) = DB/exchange divergence + a third actor on a
+            # CEO stop (bug_hunter 2026-10-22 #3). Skip managed signals.
+            _skip_ceo_stop = False
+            if trade_id:
+                try:
+                    import manual_exit_manager as _mxmw
+                    _conn_ms = get_db()
+                    if _conn_ms:
+                        _cur_ms = _conn_ms.cursor()
+                        _cur_ms.execute("SELECT signal FROM trades WHERE id=%s", (trade_id,))
+                        _row_ms = _cur_ms.fetchone()
+                        _cur_ms.close()
+                        _conn_ms.close()
+                        if _row_ms and _mxmw.is_managed_signal(_row_ms[0]):
+                            _skip_ceo_stop = True
+                except Exception:
+                    pass
+            if _skip_ceo_stop:
+                log(f"AUTO-EXEC: SKIP {symbol} stop move — CEO trade "
+                    f"(manual_exit_manager owns its stop)", "INFO")
+                executed.append({
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "type": "move_stop",
+                    "symbol": symbol,
+                    "new_stop": new_stop,
+                    "reason": "skipped: CEO trade, manual exit system owns stop",
+                    "auto_executed": False,
+                    "hl_result": "skipped"
+                })
+                continue
             log(f"AUTO-EXEC: Moving {symbol} stop to {new_stop} — {steer.get('detail', '')}")
             try:
                 # FIX (BUG-042, 2026-10-08): HL FIRST, DB only on HL success. The old
