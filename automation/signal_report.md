@@ -1,35 +1,72 @@
 # Signal Performance Report
+**Generated:** 2026-10-22 03:31 UTC | **Period:** Last 6h + 24h
 
-Period: Last 6h | 24h
-Generated: 2026-10-21 ~20:40 UTC
+## Overall Stats
+- **Total trades (all time):** 3,276 | **WR:** 50.6% | **PnL:** -102.89%
+- **Date range:** 2026-07-29 → 2026-10-22
 
-KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none met kill criteria |
+---
 
-BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none met boost criteria |
+## WINNERS (WR > 55%, PnL > 0)
 
-LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 0.0% | -$0.32 | 6 (24h) | EXTREME habitat still +$1.99/30d (22W/59T) — 24h is variance window. HIGH already blocked (c9092aea 2026-10-21 03:37), NORMAL already 0.0 in vol gate. Monitor: if EXTREME 7d stays 0% WR, revisit. |
-| r2v2-long3 | LONG | 40.0% | -$0.15 | 5 (24h) | Small bleed, no regime win — tuning candidate if persists 24h. |
-| continuation+ | LONG | 50.0% | -$0.18 | 4 (24h) | 50% WR but negative PnL — exit quality issue, not entry. Watch. |
-| bb-bounce-v2-long+ | LONG | 33.3% | -$0.23 | 3 (6h) | 24h still positive (62.5% +$0.03). 6h window noise. EXTREME already blocked in vol gate. |
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| bb-bounce-v2-long+ | LONG | — | —% | — | 8 | 62.5% | +1.28 | ❓ |
 
-WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 62.5% | +$0.03 | 8 (24h) | Healthy but thin PnL — no boost (needs >$0.05). |
-| continuum-trend+ | LONG | 66.7% | +$0.05 | 3 (24h) | Small n, consistent. No boost (needs 5+ trades). |
-| pump-chain-,pump-chain-v6- | SHORT | 30.0% | +$0.28 | 10 (7d) | EXTREME combo pocket profitable since Oct 16 gate (+$0.31, 4W/10T). Leave alone. |
+---
 
-ISSUES:
-- **Low trade volume**: only 5 signal+direction cells hit n>=3 in 24h. Thin data makes kill decisions high-variance — correct to hold fire this cycle.
-- **pump-chain- EXTREME bare gate working**: bare 'pump-chain-' SHORT last opened EXTREME trade Oct 16 14:04 (before 0.0 gate commit 3dabb044 14:44). Combo 'pump-chain-,pump-chain-v6-' still trades EXTREME — intentional (v6 has own validated gates; combo EXTREME +$0.31 since Oct 16).
-- **Inversions**: 0 found in 24h. Clean.
-- **pump-chain+ HIGH leak closed**: 2 HIGH trades opened 01:03-01:04 UTC today, before HIGH block commit c9092aea at 03:37. No HIGH trades since. Block effective.
+## LOSERS (WR < 30%, PnL < -2%)
+
+None found.
+
+---
+
+## MARGINAL (30-50% WR)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| r2v2-long3 | LONG | 4 | 50.0% | -1.16 | ❓ | Needs more data |
+| ai-trader-pending | LONG | 2 | 50.0% | -0.32 | ❓ | Needs more data |
+
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[WATCH] r2v2-long3 LONG** — WR=50.0%, PnL=-1.16% over 4 trades. Monitor next cycle.
+2. **[WATCH] ai-trader-pending LONG** — WR=50.0%, PnL=-0.32% over 2 trades. Monitor next cycle.
+3. **[KEEP] 1 winning combos** — bb-bounce-v2-long+. LONG side dominant.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-10-22 | 0747cdd | scripts: wire shadow_signals_runner into pipeline with shado... |
+| 2026-10-21 | 0c57042 | plans: spec v2 autonomous BTC loop — CEO answers baked in: B... |
+| 2026-10-21 | c625517 | skills+data: add §12 no-edge default (CEO directive — arm th... |
+| 2026-10-21 | 6fee8ef | scripts: shadow-registry + shadow-bypass system (T directive... |
+| 2026-10-21 | 1630544 | Daily trading system update (2026-10-21) |
+| 2026-10-21 | c9092ae | signals: block pump-chain+ LONG in HIGH regime — 37%WR $-0.4... |
+| 2026-10-20 | 06e7bd3 | fix: ichimoku bypass — bug_hunter FAIL fixes (CRITICAL + HIG... |
+| 2026-10-20 | a1b8095 | signals: ichimoku LONG standalone bypass (CEO regime-conditi... |
+| 2026-10-20 | 0f0a656 | Daily trading system update (2026-10-20) |
+| 2026-10-19 | d02c9bf | brain_auditor: AUDIT RUN #26 — 0 config changes (vacation so... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

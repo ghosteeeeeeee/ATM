@@ -1520,3 +1520,7 @@
 - **WARN** (1x): `disk usage 85% (95G/118G) — at warn threshold`
 - **AUTO-FIX**: `journalctl --vacuum-size=500M` freed 1.1G archived journals → disk now 84%, 19G free. No logs >7d found to compress.
 - **INFO**: `shadow_signals_runner` DONE line reports 6–10 "errors" per run — verified benign (counter names quiet detectors `0 signals (detector ran but found nothing)`; zero real exceptions/import failures). Counter label misleading; suggest renaming to `idle` in shadow_signals_runner.py:374.
+
+## Error Alerts — 2026-10-22 04:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1138s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1138s left, N failures)`
