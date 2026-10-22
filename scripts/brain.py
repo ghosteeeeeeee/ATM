@@ -1343,7 +1343,7 @@ if __name__ == "__main__":
         add_parser.add_argument("--sl-group", choices=["control", "test_a", "test_b"], default="control", help="A/B test group for SL distance")
         add_parser.add_argument("--sl-distance", type=float, help="SL distance (0.005 = 0.5%%, 0.01 = 1%%)")
         add_parser.add_argument("--trailing-threshold", type=float, dest="trailing_activation", help="Trailing activation threshold")
-        add_parser.add_argument("--trailing-distance", type=float, dest="trailing_distance", help="Trailing distance (e.g. 0.010 = 1%)")
+        add_parser.add_argument("--trailing-distance", type=float, dest="trailing_distance", help="Trailing distance (e.g. 0.010 = 1%%)")
         add_parser.add_argument("--trailing-phase2", type=float, dest="trailing_phase2", help="Phase 2 trailing distance (tighter, activates after phase 1)")
         add_parser.add_argument("--leverage", type=int, default=1, help="Leverage (1-10)")
         add_parser.add_argument("--experiment", help="A/B test experiment info (JSON)")

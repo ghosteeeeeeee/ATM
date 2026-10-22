@@ -869,7 +869,10 @@ def process_delayed_entries(paper=False):
         # Missing RSI → flag omitted → behavior unchanged (same fail-open as before).
         try:
             from rsi_utils import compute_rsi_1m as _de_rsi_fn
-            _de_rsi = _de_rsi_fn(token)
+            # bug_hunter MED-3 (2026-10-22): max_age_s=900 — without it rsi_utils
+            # happily computes RSI from arbitrarily old candles (HYPER lesson); the
+            # delayed path has no ctx/exec floors, so brain's input must be fresh.
+            _de_rsi = _de_rsi_fn(token, max_age_s=900)
             if _de_rsi is not None:
                 cmd += [_barg('--signal-rsi-14', str(round(float(_de_rsi), 2)))]
         except Exception:
@@ -1069,8 +1072,8 @@ def _short_rsi_floor_bear_exempt():
     (signal_compactor.py pump-chain/soft/oversold blocks): BTC continuum linreg in
     {LEAN_BEAR, BEAR} and fresher than 600s → oversold = continuation in a dump.
     Callers must keep RSI < OVERSOLD_SHORT_RSI_MAX (35) hard-dead on every path
-    (BANANA lesson — falling knife, no exemption). Fail-open on DB error so a stale
-    continuum never freezes SHORT execution.
+    (BANANA lesson — falling knife, no exemption). Fail-CLOSED on DB error: returns
+    False → block, so a stale/broken continuum never opens the band by accident.
     """
     try:
         _sr_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
