@@ -1536,3 +1536,11 @@
 - **AUTO-FIX**: `systemctl stop hermes-coding-mcp.service` — script was deleted in 3786b550 ("delete 116 dead scripts"), unit left behind; zero callers, nothing on port 8765, unit already `disabled`. Verified inactive and not respawning. Follow-up: remove `/etc/systemd/system/hermes-coding-mcp.service` (agent has no write access to /etc/systemd/system).
 - **INFO**: `systemctl list-timers hermes-*` in the health-monitor prompt returns "0 timers listed" — bash expands the unquoted glob to `hermes-trading-system-*.zip` in /root/.hermes. Use `systemctl list-timers 'hermes-*'` (quoted). All 75 hermes timers verified active when queried correctly.
 - **INFO**: Disk 84% (19G free) — under 85% threshold, no logs >7d to compress. Watch: `data/coin_tracker.db` is 3.4GB.
+
+## Error Alerts — 2026-10-22 07:27 UTC
+- **REPEATED** (12x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-22 07:47 UTC
+- **WARN** (1x, recurring 4th): `hermes-signal-reporter.service failed: start operation timed out (40min TimeoutStartUSec, 03:51 UTC)` — analysis/reporting only, 5 prior runs succeeded, no trading impact.
+- **AUTO-FIX**: `systemctl reset-failed hermes-signal-reporter.service` — unit cleared, timer active, retries ~09:49 UTC.
+- **INFO**: Disk 84% (19G free) — still under 85% threshold; no logs >7d to compress. Watch `data/coin_tracker.db`.
