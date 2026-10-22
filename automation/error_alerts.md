@@ -1524,3 +1524,15 @@
 ## Error Alerts — 2026-10-22 04:27 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1138s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1138s left, N failures)`
+
+## Error Alerts — 2026-10-22 05:27 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   [TS] [shadow_signals_runner] TOK: N recorded, N skipped, N empty, N filtered, N errors`
+
+## Error Alerts — 2026-10-22 06:27 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-22 06:47 UTC
+- **WARN** (17031x): `hermes-coding-mcp.service` restart storm — `can't open file '/root/.hermes/scripts/run_mcp_server.py': No such file or directory`, restart counter at 17031 (every 5s).
+- **AUTO-FIX**: `systemctl stop hermes-coding-mcp.service` — script was deleted in 3786b550 ("delete 116 dead scripts"), unit left behind; zero callers, nothing on port 8765, unit already `disabled`. Verified inactive and not respawning. Follow-up: remove `/etc/systemd/system/hermes-coding-mcp.service` (agent has no write access to /etc/systemd/system).
+- **INFO**: `systemctl list-timers hermes-*` in the health-monitor prompt returns "0 timers listed" — bash expands the unquoted glob to `hermes-trading-system-*.zip` in /root/.hermes. Use `systemctl list-timers 'hermes-*'` (quoted). All 75 hermes timers verified active when queried correctly.
+- **INFO**: Disk 84% (19G free) — under 85% threshold, no logs >7d to compress. Watch: `data/coin_tracker.db` is 3.4GB.

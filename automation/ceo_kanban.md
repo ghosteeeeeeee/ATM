@@ -458,3 +458,7 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-21 21:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 40T 35.0% '-$1.09' | 7d 162T 35.8% '-$3.46' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending both 0T last hour; recheck pre-reg Oct 22) | atr_sl_hit 10/40=25.0% under 40% | neg streak broken by empty 20:00/21:00 | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-22 06:47 UTC] health_monitor: Auto-fixed `hermes-coding-mcp.service` restart storm (17031 restarts — unit references `scripts/run_mcp_server.py`, deleted in commit 3786b550) — stopped the service; nothing listens on :8765, unit already disabled. Follow-up: delete the unit file from /etc/systemd/system. Rest of system green: pipeline ran clean 06:42, 47 signals/1h, prices 38s fresh, 4/4 core timers active, disk 84%, 0 phantom trades, 1 open BTC SHORT (SL 83050 / TP 81800).
+BY: health_monitor
