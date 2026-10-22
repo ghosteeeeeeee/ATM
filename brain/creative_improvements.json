@@ -6894,5 +6894,35 @@
     "status": "suggested",
     "risk": "zero (read-only metric)",
     "criteria": "recompute each run; publish coverage% + residual owners. No config change."
+  },
+  {
+    "date": "2026-10-22T23:51:00Z",
+    "run": "brain_auditor #85",
+    "idea": "VACUITY AUDIT of the mandatory losing-autopsy method + corrected adverse-first replay (shipped)",
+    "rationale": "Measured 198/206 (96.1%) of 14d losers satisfy 'recovered within -0.2% of entry in 30m' on candle 1 alone because the candle containing open_time includes the entry print — every 'X/X recovered -> wrong-side REFUTED' claim from ~#70-#84 was construction-guaranteed. Corrected: 14d 206 losers = 40 never-adverse / 137 recovered-after-adverse / 29 never (17.5% of the 166 that went adverse = structural never-recover class, consistent with #72 stop-anchored 28%). Wrong-side verdict survives on non-vacuous evidence (#61 opposite-side signals p=0.116; #84 forward returns t=-0.04).",
+    "expected_impact": "every future autopsy claim carries real evidence; the 29/166 never-recover cohort re-confirms re-enter-on-recovery as the correct lever",
+    "category": "measurement integrity",
+    "status": "implemented",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T23:51:00Z",
+    "run": "brain_auditor #85",
+    "idea": "5m-aggregate flip-rate KPI from existing logs/15m_regime.log (zero code)",
+    "rationale": "The aggregate flipped 7 times in 9.75h today (SHORT 14:45 -> LONG 16:30 -> SHORT 17:00 -> LONG 18:00 -> SHORT 18:30 -> LONG 19:15 -> SHORT 20:00 -> LONG 21:30 peak 93L/1S -> NEUTRAL 22:30 -> SHORT 22:45 peak 3L/95S -> softening 4L/59S/66N 23:45). Snapshot directional prose was accurate at write time (#84's '70/3 long', watchdog's 'strongest short tilt') and stale within 1-2 cycles. Flip history already logged every 15min — no new code, just a read.",
+    "expected_impact": "flips/24h >= 6 = flag snapshot-directional steers as high-churn and demand condition-based rules; turns 'is the tape chop?' into a tracked number alongside the chop-coverage ledger",
+    "category": "chop detection / steer quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-22T23:51:00Z",
+    "run": "brain_auditor #85",
+    "idea": "SHORT RSI 60-70 ceiling-edge proposal REJECTED-WITH-DATA (watchdog-assigned item)",
+    "rationale": "Claim reproduces exactly (7d n=6 66.7% +0.51) but 14d n=9 +0.48 and 30d n=28 53.6% -0.12 REVERSES negative; gated band 65-70 alone is 30d 13T -0.15 (n<20); 75+ is 0% -0.55 (hard ceiling right); 0 exec-RSI>65 shorts in 30d; NEO's '66.7 entry' was exec 46.17 (drift 20.5). Fails n>=20, OOS same-sign, and PnL>0.",
+    "expected_impact": "no change shipped; revisit only at n>=20 AND 30d same-sign AND fk<20% (criteria locked pre-data)",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "low"
   }
 ]

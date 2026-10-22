@@ -1881,5 +1881,27 @@
     "after": "condition must be stated and re-read from candles/DB each cycle; reversed conditions are emitted as RETRACTED and dropped from the actionable list; >=2-cycle old steers carry age=N cycles unexecuted",
     "rationale": "root cause of a stale-urgent steer: no validity protocol, so the same text could be re-issued across an opposite reversal and trigger an exit on reverted evidence",
     "impact": "zero live behavior (prompt convention only); prevents the next stale-steer execution. hermes_constants.py untouched (vacation no_constants_change honored)."
+  },
+  {
+    "timestamp": "2026-10-22T23:51:00Z",
+    "agent": "brain_auditor",
+    "change": "brain_auditor_prompt.md Step 5b: added METHOD VALIDITY block — open-anchored recovery test ('recovered within -0.2% in 30m' anchored at open_time) measured VACUOUS (candle 1 contains the entry print; 198/206 = 96.1% of 14d losers pass on candle 1 alone); mandates corrected adverse-first reference script and re-bases wrong-side refutation on #61/#84 evidence",
+    "type": "doc",
+    "file": "automation/brain-auditor/brain_auditor_prompt.md",
+    "before": "no method-validity guidance; runs ~#70-#84 cited candle-1-guaranteed recovery as wrong-side evidence",
+    "after": "vacuity warning + corrected definition (recovery counts only AFTER >0.2% adverse excursion; never_adverse reported separately) + pointer to brain/analysis/recovery_replay.py --selfcheck",
+    "rationale": "root-cause fix for a 12-run evidence artifact; conclusions survive on #61 (p=0.116) and #84 (fwd t=-0.04) but the recovery chain was illusory",
+    "impact": "future autopsy claims are non-vacuous; no live behavior change"
+  },
+  {
+    "timestamp": "2026-10-22T23:51:00Z",
+    "agent": "brain_auditor",
+    "change": "brain/analysis/recovery_replay.py — corrected adverse-first recovery replay reference with --selfcheck asserting the candle-1 vacuity",
+    "type": "infra",
+    "file": "brain/analysis/recovery_replay.py",
+    "before": "no reusable implementation; each run ad-hoc (and open-anchored = vacuous)",
+    "after": "adverse-first anchor: 14d 206 losers = 40 never-adverse / 137 recovered-after-adverse / 29 never (17.5%); 48h = 6/16/1 (SYRUP stale); assert passes at 96.1% vacuity",
+    "rationale": "corrected method must be reproducible across runs, not re-derived",
+    "impact": "zero live behavior; replaces the invalid measurement"
   }
 ]

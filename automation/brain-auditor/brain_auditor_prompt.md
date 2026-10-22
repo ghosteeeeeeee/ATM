@@ -175,6 +175,29 @@ results = brain.query("we should build new signal idea plan", top_k=10)
 ### The Perspective:
 When a trade loses, someone else gained what we lost. The same way we lost fast — there was an opportunity to gain on the other side. We were just on the wrong side.
 
+### ⚠️ METHOD VALIDITY — the open-anchored recovery test is VACUOUS (measured 2026-10-22, run #85)
+
+Do **NOT** report "X/X losers recovered within -0.2% of entry in 30m" when the window is
+anchored at `open_time`. The 1m candle containing `open_time` includes the entry print
+itself, so candle 1 satisfies the recovery condition almost always: **measured 198/206
+(96.1%) of 14d losers pass on candle 1 alone.** Runs ~#70–#84 used this as primary
+wrong-side evidence — the test was near-guaranteed by construction and carried no
+directional information.
+
+Use the corrected reference implementation instead: `brain/analysis/recovery_replay.py`
+(adverse-first anchor — recovery only counts AFTER price has moved >0.2% against entry;
+trades that never went adverse are reported separately as shallow). Self-check:
+`python3 brain/analysis/recovery_replay.py --selfcheck`.
+
+Corrected 14d numbers (for calibration): 206 losers = 40 never adverse / 137 recovered
+after adverse / **29 never traded back = 17.5% structural never-recover cohort** (the
+same class as #72's stop-anchored 28% census, which pre-registered re-enter-on-recovery).
+
+Wrong-side refutation that survives this correction (cite these, not the vacuous replay):
+`#61` opposite-side-signal test (losers 15.4% vs winners 6.9%, p=0.116) and `#84`
+forward-return census (fwd_4h mean -0.012%, t=-0.04). Methods that are valid but
+differently anchored must be labeled with their anchor (open / first-adverse / stop).
+
 ### The Process:
 
 1. **Find the losers**: Query last 24h trades where `pnl_usdt < 0`:
