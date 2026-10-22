@@ -3233,6 +3233,13 @@ SHADOW_BYPASS_SIGNALS = {
 # Shadow bypass master switch
 SHADOW_BYPASS_ENABLED = True  # Master switch for shadow bypass registry
 
+# ── Shadow Signals Runner (T directive 2026-10-22) ─────────────────────────────
+# Runs disabled signal detectors in shadow mode every 10 minutes via pipeline.
+# ZERO impact on live trading — no flags changed, no writes to live signals DB.
+# Captures signals to shadow_trader with shadow_bypass=true tag.
+SHADOW_SIGNALS_RUNNER_ENABLED = True  # Master switch for shadow signals runner
+SHADOW_SIGNALS_RUNNER_STAGES = ('A', 'C')  # Which stages to run (B already fires)
+
 # ── AI Trader Signal ──────────────────────────────────────────────────────────
 # The trade-watchdog opencode agent runs every 30 min with full market context.
 # Every hour, if < max positions, it picks ONE coin and writes to ai_trader_state.json.

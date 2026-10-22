@@ -40,7 +40,7 @@ STEPS_EVERY_MIN  = ['signal_analyst', 'breakout_engine', 'signals_runner', 'deci
 #   - Now runs exclusively via hermes-price-collector.timer (standalone, every 1 min)
 #   - Pipeline no longer blocked by ~26s aggregation; other steps get faster execution
 STEPS_EVERY_5M   = ['signals_runner_slow']  # slow signals: momentum, mtf_momentum (>60s per run)
-STEPS_EVERY_10M  = ['strategy_optimizer', 'ab_optimizer']
+STEPS_EVERY_10M  = ['strategy_optimizer', 'ab_optimizer', 'shadow_signals_runner']
 
 # Per-step timeouts (seconds)
 STEP_TIMEOUTS = {
@@ -53,6 +53,7 @@ STEP_TIMEOUTS = {
     'position_manager': 120,
     'strategy_optimizer': 300,
     'ab_optimizer': 300,
+    'shadow_signals_runner': 180,  # shadow-mode signal detection (T directive 2026-10-22)
     'live_decider': 240,
     'hermes-trades-api': 60,
 }

@@ -237,6 +237,15 @@ def run_shadow_signal(signal_key, module_path, flag_name, stage, reason):
 
 
 def main():
+    # Check shadow-mode flag first (T directive 2026-10-22)
+    try:
+        from hermes_constants import SHADOW_SIGNALS_RUNNER_ENABLED
+        if not SHADOW_SIGNALS_RUNNER_ENABLED:
+            log("SHADOW_SIGNALS_RUNNER_ENABLED is False — exiting")
+            return 0
+    except ImportError:
+        pass  # Flag not found — continue (backwards compatible)
+    
     ap = argparse.ArgumentParser(description='Shadow Signals Runner')
     ap.add_argument('--stage', choices=['A', 'B', 'C'], help='Run only this stage')
     ap.add_argument('--dry-run', action='store_true', help='Show what would run')
