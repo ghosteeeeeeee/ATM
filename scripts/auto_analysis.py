@@ -56,7 +56,10 @@ def _ema(data, period):
 
 
 def tf_indicators(token, tf, limit=200):
-    conn = sqlite3.connect(os.path.join(HERMES_DATA, 'candles.db'))
+    db_path = os.path.join(HERMES_DATA, 'candles.db')
+    if not os.path.exists(db_path):   # never create an empty candles.db
+        return None
+    conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     cur.execute(f"SELECT high, low, close, volume FROM candles_{tf} "
                 "WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT ?",
@@ -87,7 +90,10 @@ def tf_indicators(token, tf, limit=200):
 
 
 def atr_pct(token, tf='1h', length=14):
-    conn = sqlite3.connect(os.path.join(HERMES_DATA, 'candles.db'))
+    db_path = os.path.join(HERMES_DATA, 'candles.db')
+    if not os.path.exists(db_path):
+        return None
+    conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     cur.execute(f"SELECT high, low, close FROM candles_{tf} "
                 "WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT ?",
@@ -123,48 +129,73 @@ def structure_summary(token):
 
 # ---------- scoring (skill table verbatim) ----------
 
-def score_direction(ind, continuum, chop):
-    """Raw score per skill probability table; caller applies chop halving."""
+def score_direction(ind, continuum, direction='long'):
+    """Skill probability table. Returns (total, trend_part, reasons).
+
+    trend_part = 1h/15m/5m MACD + continuum — ONLY this gets halved in CHOP
+    (skill chop-regime rule: halve trend inputs, not the total — bug_hunter
+    parity fix). direction='short' inverts sign-carrying rows (MACD,
+    continuum, EMA50); RSI/volume/Z rows are direction-neutral per the table.
+    """
+    sign = 1 if direction == 'long' else -1
     s = 0
+    trend = 0
     reasons = []
-    # trend inputs: 1h/15m/5m MACD + continuum (halved in chop)
+    # trend inputs: 1h/15m/5m MACD (halved in chop)
     for tf, pts in (('1h', 15), ('15m', 10), ('5m', 10)):
         t = ind.get(tf)
         if not t:
             continue
-        v = pts if t['macd_bull'] else -pts
+        v = (pts if t['macd_bull'] else -pts) * sign
         s += v
+        trend += v
         reasons.append(f"{tf} MACD {'BULL' if t['macd_bull'] else 'BEAR'} {v:+d}")
-    cont_bull = continuum and continuum.get('ema300_position') == 'ABOVE'
-    cont_pts = 15 if cont_bull else -15
-    s += cont_pts
-    reasons.append(f"continuum {'ABOVE' if cont_bull else 'BELOW'} {cont_pts:+d}")
-    # RSI: executing TF (5m) extremes
+    # continuum with linreg (skill row: ABOVE+BULL = +15, BELOW+BEAR = -15;
+    # position-vs-linreg mismatch = partial ±5)
+    if continuum:
+        pos = continuum.get('ema300_position')
+        lin = str(continuum.get('linreg_direction') or '')
+        above = pos == 'ABOVE'
+        matching = (above and 'BULL' in lin) or ((not above) and 'BEAR' in lin)
+        base = (15 if above else -15) if matching else (5 if above else -5)
+        pts = base * sign
+        s += pts
+        trend += pts
+        reasons.append(f"continuum {pos}+{lin or '?'} {pts:+d}")
+    # RSI: executing TF (5m) extremes — direction-neutral row
     t5 = ind.get('5m')
     if t5:
         if 45 <= t5['rsi'] <= 60:
-            s += 10; reasons.append("RSI sweet spot +10")
+            s += 10
+            reasons.append("RSI sweet spot +10")
         elif t5['rsi'] < 30 or t5['rsi'] > 70:
-            s -= 10; reasons.append(f"RSI {t5['rsi']:.0f} extreme -10")
-    # volume
+            s -= 10
+            reasons.append(f"RSI {t5['rsi']:.0f} extreme -10")
+    # volume — direction-neutral row
     vols = [ind[t]['vol'] for t in ('1m', '5m', '15m') if t in ind]
     if vols:
         mv = sum(vols) / len(vols)
         if mv >= 1.5:
-            s += 10; reasons.append(f"volume surge {mv:.1f}x +10")
+            s += 10
+            reasons.append(f"volume surge {mv:.1f}x +10")
         elif mv < 0.5:
-            s -= 10; reasons.append(f"volume dead {mv:.1f}x -10")
-    # Z-Score (5m): extreme against, neutral for
+            s -= 10
+            reasons.append(f"volume dead {mv:.1f}x -10")
+    # Z-Score (5m): direction-neutral row
     if t5:
         if abs(t5['z']) > 2:
-            s -= 10; reasons.append(f"5m Z {t5['z']:+.2f} extreme -10")
+            s -= 10
+            reasons.append(f"5m Z {t5['z']:+.2f} extreme -10")
         elif abs(t5['z']) <= 1:
-            s += 5; reasons.append("5m Z neutral +5")
-    # EMA50 alignment: count TFs above
+            s += 5
+            reasons.append("5m Z neutral +5")
+    # EMA50 alignment — direction-aware (parity fix: short must NOT get +5
+    # for price sitting above EMA50)
     above = sum(1 for t in ind.values() if t['ema50_dist'] > 0)
-    s += 5 if above >= 3 else -5
-    reasons.append(f"EMA50 above on {above}/5 TFs")
-    return s, reasons
+    ema_pts = (5 if above >= 3 else -5) * sign
+    s += ema_pts
+    reasons.append(f"EMA50 above on {above}/5 TFs {ema_pts:+d}")
+    return s, trend, reasons
 
 
 def build_decision(cycle_id, open_positions, cfg):
@@ -174,22 +205,41 @@ def build_decision(cycle_id, open_positions, cfg):
     price = price_rows['price'] if price_rows else None
     flips, continuum = chop_flips_24h(token)
     chop = flips is not None and flips >= 2
-    regime = 'CHOP' if chop else 'TREND'
+    regime = 'CHOP' if chop else ('TREND' if flips is not None else 'UNKNOWN')
 
-    ind = {tf: tf_indicators(token, tf) for tf in ('1m', '5m', '15m', '1h', '4h')}
-    ind = {k: v for k, v in ind.items() if v}
-    struct = structure_summary(token)
+    try:
+        ind = {tf: tf_indicators(token, tf) for tf in ('1m', '5m', '15m', '1h', '4h')}
+        ind = {k: v for k, v in ind.items() if v}
+        struct = structure_summary(token)
+    except Exception as e:
+        # missing candles table etc — fail to STAND_DOWN, never crash (note 2)
+        return {'ts': time.time(), 'cycle_id': cycle_id, 'price': price,
+                'regime_state': regime, 'flips_24h': flips, 'structure': {},
+                'score_long': 0, 'score_short': 0, 'score_adj_best': 'ERR',
+                'decision': 'STAND_DOWN', 'mode': cfg.get('mode', 'shadow'),
+                'reasons': [f'indicator failure: {e}']}
 
-    score_long, reasons_long = score_direction(ind, continuum, chop)
-    score_short, reasons_short = score_direction(
-        {k: {**v, 'macd_bull': not v['macd_bull']} for k, v in ind.items()},
-        None if not continuum else {**continuum,
-            'ema300_position': 'BELOW' if continuum.get('ema300_position') == 'ABOVE' else 'ABOVE'},
-        chop)
-    # chop halving of trend inputs: approximate by halving the total toward zero
+    score_long, trend_long, reasons_long = score_direction(ind, continuum, 'long')
+    score_short, trend_short, reasons_short = score_direction(ind, continuum, 'short')
+    # CHOP halving: ONLY trend inputs (skill rule), toward zero per subtotal
     if chop:
-        score_long = int(score_long / 2)
-        score_short = int(score_short / 2)
+        score_long = int(trend_long / 2) + (score_long - trend_long)
+        score_short = int(trend_short / 2) + (score_short - trend_short)
+        reasons_long.append("CHOP REGIME — trend inputs halved; momentum over "
+                            "trend, live-tape reads outrank trend scores")
+        reasons_short.append("CHOP REGIME — trend inputs halved")
+
+    # Missing-data guards: no chop check or no indicators → no aggression
+    if flips is None or not ind:
+        reasons = (["chop check unavailable — mandatory gate failed, "
+                    "STAND_DOWN"] if flips is None else
+                   ["no indicator data — STAND_DOWN"])
+        return {'ts': time.time(), 'cycle_id': cycle_id, 'price': price,
+                'regime_state': regime, 'flips_24h': flips,
+                'structure': {tf: s['state'] for tf, s in struct.items()},
+                'score_long': score_long, 'score_short': score_short,
+                'score_adj_best': regime, 'decision': 'STAND_DOWN',
+                'mode': cfg.get('mode', 'shadow'), 'reasons': reasons}
 
     btc_open = [p for p in open_positions if p['token'] == token]
     reasons = []

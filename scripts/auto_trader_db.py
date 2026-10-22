@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS hypotheticals (
 );
 CREATE TABLE IF NOT EXISTS attribution (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    trade_id TEXT,
+    trade_id TEXT UNIQUE,
     ts_closed REAL NOT NULL,
     direction TEXT,
     regime_at_entry TEXT,
@@ -133,6 +133,13 @@ def init_db():
     try:
         conn.executescript(SCHEMA)
         conn.executescript(VIEWS)
+        # Migration for pre-UNIQUE DBs (phase 0 data): dedupe by trade_id
+        # (keep newest — the BUG-A double-attribution rows), then enforce.
+        cur = conn.cursor()
+        cur.execute("DELETE FROM attribution WHERE id NOT IN "
+                    "(SELECT MAX(id) FROM attribution GROUP BY trade_id)")
+        cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_attr_unique "
+                    "ON attribution(trade_id)")
         conn.commit()
     finally:
         conn.close()
@@ -155,16 +162,24 @@ def _exec(sql, params=(), fetch=None):
 
 
 def record_decision(d):
-    """d: dict with regime/structure/scores/decision/reasons/mode/price/cycle_id."""
-    cur = _exec(
-        "INSERT INTO decisions (ts, cycle_id, price, regime_state, flips_24h, "
-        "structure_json, score_long, score_short, score_adj_best, decision, "
-        "reasons_json, mode) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
-        (time.time(), d.get('cycle_id'), d.get('price'), d.get('regime_state'),
-         d.get('flips_24h'), json.dumps(d.get('structure', {})),
-         d.get('score_long'), d.get('score_short'), d.get('score_adj_best'),
-         d.get('decision'), json.dumps(d.get('reasons', [])), d.get('mode')))
-    return _exec("SELECT last_insert_rowid() AS id", fetch='one')['id']
+    """d: dict with regime/structure/scores/decision/reasons/mode/price/cycle_id.
+    Returns lastrowid from the SAME connection (E1: was 0 from a fresh conn)."""
+    conn = connect()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO decisions (ts, cycle_id, price, regime_state, flips_24h, "
+            "structure_json, score_long, score_short, score_adj_best, decision, "
+            "reasons_json, mode) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            (time.time(), d.get('cycle_id'), d.get('price'), d.get('regime_state'),
+             d.get('flips_24h'), json.dumps(d.get('structure', {})),
+             d.get('score_long'), d.get('score_short'), d.get('score_adj_best'),
+             d.get('decision'), json.dumps(d.get('reasons', [])), d.get('mode')))
+        rowid = cur.lastrowid
+        conn.commit()
+        return rowid
+    finally:
+        conn.close()
 
 
 def record_order(decision_id, leg, o, action, size, leverage):
@@ -207,10 +222,12 @@ def update_hypothetical(order_id, **fields):
 
 
 def record_attribution(a):
+    """INSERT OR IGNORE — trade_id is UNIQUE (BUG A: exactly one row per
+    resolution; hit-time rows removed)."""
     _exec(
-        "INSERT INTO attribution (trade_id, ts_closed, direction, regime_at_entry, "
-        "entry_quality, planned_rr, real_rr, pnl_pct, pnl_usdt, exit_reason, won, "
-        "lesson_tags) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        "INSERT OR IGNORE INTO attribution (trade_id, ts_closed, direction, "
+        "regime_at_entry, entry_quality, planned_rr, real_rr, pnl_pct, pnl_usdt, "
+        "exit_reason, won, lesson_tags) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
         (a.get('trade_id'), a.get('ts_closed', time.time()), a.get('direction'),
          a.get('regime_at_entry'), a.get('entry_quality'), a.get('planned_rr'),
          a.get('real_rr'), a.get('pnl_pct'), a.get('pnl_usdt'),

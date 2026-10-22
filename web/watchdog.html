@@ -314,7 +314,7 @@
                         <td>${o.age_min}m</td></tr>`).join('') + '</table></div>';
             }
             if (Array.isArray(at.recent_trades) && at.recent_trades.length) {
-                html += `<div style="margin-top:8px;"><b style="font-size:11px; color:#8888ff;">RECENT ${mode} TRADES</b>` +
+                html += `<div style="margin-top:8px;"><b style="font-size:11px; color:#8888ff;">RECENT ${escHtml(mode)} TRADES</b>` +
                     at.recent_trades.slice(0, 5).map(t => {
                         const when = timeAgo(t.ts * 1000);
                         return `<div style="font-size:11px;">${when} — ${t.direction === 'long' ? '🟢' : '🔴'} ${t.pnl_pct > 0 ? '+' : ''}${t.pnl_pct}% (${t.pnl_usdt} USDT) ${t.won ? '✅' : '❌'} ${escHtml(t.exit_reason || '')} [${escHtml(t.regime || '?')}]</div>`;

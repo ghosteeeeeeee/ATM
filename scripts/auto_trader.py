@@ -68,23 +68,18 @@ def track_hypotheticals(cfg, size):
         return events
 
     now = time.time()
-    regime = None
     for h in DB.get_hypotheticals('armed'):
         # HIT: price crossed the trigger
         hit = (price <= h['trigger']) if h['direction'] == 'long' \
             else (price >= h['trigger'])
         if hit:
+            # BUG A fix: NO attribution at hit — one row per resolution only
+            # (trade_id UNIQUE; the zero-pnl hit row diluted the scorecard
+            # and tripped pause after 2 losses).
             DB.update_hypothetical(h['order_id'], status='hit',
-                                   ts_hit=now, ts_closed=now,
+                                   ts_hit=now,
                                    exit_price=h['trigger'],
-                                   pnl_pct=0.0, pnl_usdt=0.0,
                                    regime_at_entry=h['regime_at_entry'])
-            DB.record_attribution({
-                'trade_id': f"shadow:{h['order_id']}",
-                'direction': h['direction'], 'regime_at_entry': h['regime_at_entry'],
-                'entry_quality': 'shadow_fill_at_trigger',
-                'pnl_pct': 0.0, 'pnl_usdt': 0.0, 'exit_reason': 'shadow_hit',
-                'won': 0, 'lesson_tags': ['shadow_entry']})
             events.append(f"{h['order_id']} shadow HIT at trigger {h['trigger']}")
         elif now - h['ts_armed'] > 48 * 3600:
             DB.update_hypothetical(h['order_id'], status='expired',
@@ -162,7 +157,8 @@ def bounded_self_tune(cfg):
     if not sc or sc.get('n', 0) < 10:
         return None
     bounds = cfg.get('self_tuning_bounds', {'min': 0.5, 'max': 1.0})
-    wr = sc.get('wr') or 50
+    # BUG C fix: wr=0.0 is falsy — `or 50` made a 0% scorecard look like 50%
+    wr = 50 if sc.get('wr') is None else sc['wr']
     # size mult: WR 40% → 0.5, WR 60% → 1.0 (linear within bounds)
     mult = round(max(bounds.get('min', 0.5),
                      min(bounds.get('max', 1.0), 0.5 + (wr - 40) * 0.025)), 2)
@@ -178,13 +174,19 @@ def bounded_self_tune(cfg):
 
 
 def pause_checks(cfg, summary):
-    """3 consecutive auto-losses or daily cap → event + pause flag."""
+    """Consecutive LIVE losses (config count) or daily cap → event + pause flag.
+    Shadow rows never trip it (they are hypotheticals, not risk taken);
+    hardcoded count replaced by config consecutive_loss_pause."""
     sc = DB.get_scorecard()
-    recent = DB.recent_attribution(3)
-    if len(recent) == 3 and all(r['won'] == 0 for r in recent):
-        DB.log_event('ESCALATE', "3 consecutive losses — shadow pause flagged "
-                                 "for CEO (config unchanged by system)")
-        summary['pause_flag'] = '3_consecutive_losses'
+    need = int(cfg.get('consecutive_loss_pause', 3))
+    # Live-prefixed rows only — 'trade:%' (BUG A note: shadow: rows mixed in
+    # would trip pause from hypothetical losses)
+    live = DB._exec("SELECT won FROM attribution WHERE trade_id LIKE 'trade:%' "
+                    "ORDER BY ts_closed DESC LIMIT ?", (need,), fetch='all')
+    if len(live) == need and all(r['won'] == 0 for r in live):
+        DB.log_event('ESCALATE', f"{need} consecutive LIVE losses — pause "
+                                 f"flagged for CEO (config unchanged by system)")
+        summary['pause_flag'] = f'{need}_consecutive_losses'
     pnl = (sc.get('pnl_usdt') or 0) if sc else 0
     if sc and pnl <= cfg.get('daily_loss_cap_pct', -3.0):
         DB.log_event('ESCALATE', "daily loss cap reached — shadow pause "
@@ -198,7 +200,11 @@ def run_cycle():
     if not cfg.get('enabled'):
         return {'enabled': False, 'mode': cfg.get('mode', 'shadow')}
     DB.init_db()
-    cycle_id = f"{int(time.time())}"
+    # BUG B fix: uuid suffix — same-second cycles must never collide on
+    # order_id (UNIQUE upsert silently swallowed re-arms and reported
+    # superseded ids as armed).
+    import uuid
+    cycle_id = f"{int(time.time())}-{uuid.uuid4().hex[:6]}"
     summary = {'enabled': True, 'mode': cfg.get('mode', 'shadow')}
 
     open_positions = get_open_btc()
@@ -216,52 +222,75 @@ def run_cycle():
                          'regime': decision['regime_state']}
     summary['price'] = decision['price']
 
-    # 3 JOURNAL + SHADOW-ARM hypotheticals
-    size = cfg.get('size_usdt', 11.10) * DB._exec(
-        "SELECT new_value FROM self_tuning WHERE parameter='size_mult' "
-        "ORDER BY ts DESC LIMIT 1", fetch='one')['new_value'] \
-        if DB._exec("SELECT 1 FROM self_tuning WHERE parameter='size_mult' "
-                    "ORDER BY ts DESC LIMIT 1", fetch='one') else cfg.get('size_usdt', 11.10)
-    if decision.get('decision') == 'BRACKET' and decision.get('bracket'):
-        # Re-arm policy (spec §2): keep existing armed legs unless the fresh
-        # structure shifted >= 1 ATR from the armed trigger (cancel+rewrite)
-        # or nothing is armed yet. Never duplicate arms (one-shot state).
-        armed_existing = DB.get_hypotheticals('armed')
-        h1_atr = (decision.get('structure_detail', {}).get('1h') or {}).get('atr', 400) or 400
-        if armed_existing:
-            refreshed = False
-            for h in armed_existing:
-                new_trig = decision['bracket'].get(h['direction'], {}).get('trigger')
-                if new_trig and abs(new_trig - h['trigger']) >= h1_atr:
-                    DB.update_hypothetical(h['order_id'], status='superseded',
-                                           ts_closed=time.time())
-                    refreshed = True
-            if not refreshed:
-                summary['shadow_armed'] = 'kept (levels within 1 ATR)'
-            else:
-                armed_existing = []  # fall through and re-arm below
-        if not armed_existing:
-            armed = []
-            for leg, o in decision['bracket'].items():
-                order_id = f"btc-auto-{cycle_id}-{leg}"
-                DB.record_order(did, leg, {**o, 'order_id': order_id},
-                                'shadow_armed', size, cfg.get('leverage_max', 5))
-                hid = DB.upsert_hypothetical(
-                    {'order_id': order_id, 'direction': leg,
-                     'trigger': o['trigger'], 'sl': o['sl'], 'tp': o['tp']},
-                    decision['regime_state'], size)
-                if hid:
-                    armed.append(order_id)
-            if armed:
-                summary['shadow_armed'] = armed
-                DB.log_event('INFO', f"cycle {cycle_id}: bracket shadow-armed "
-                                     f"{armed} @ price {decision['price']}")
+    # size: config base × last self-tuned multiplier (bounds-clamped there)
+    _mt = DB._exec("SELECT new_value FROM self_tuning WHERE parameter='size_mult' "
+                   "ORDER BY ts DESC LIMIT 1", fetch='one')
+    size = cfg.get('size_usdt', 11.10) * (_mt['new_value'] if _mt else 1.0)
 
-    # 4 TRACK existing hypotheticals against live price
+    # 3 TRACK existing hypotheticals FIRST (E4 fix: resolve hits before any
+    # supersede logic can touch them — a leg crossed this cycle but
+    # structure-shifted would have been superseded, losing the fill)
     events = track_hypotheticals(cfg, size)
     summary['hypo_events'] = events
     for e in events:
         DB.log_event('INFO', f"hypothetical: {e}")
+
+    # 4 JOURNAL + SHADOW-ARM hypotheticals
+    if decision.get('decision') == 'BRACKET' and decision.get('bracket'):
+        price_now = decision.get('price') or 0
+        # Pre-write checklist (E2/spec §2): shape validity + not already ITM
+        shape_ok = True
+        for leg, o in decision['bracket'].items():
+            if leg == 'long' and not (o['sl'] < o['trigger'] < o['tp']):
+                shape_ok = False
+            if leg == 'short' and not (o['tp'] < o['trigger'] < o['sl']):
+                shape_ok = False
+        if not shape_ok:
+            DB.log_event('WARN', f"cycle {cycle_id}: bracket failed shape "
+                                 f"checklist — not armed")
+        else:
+            armed_existing = DB.get_hypotheticals('armed')
+            h1_atr = (decision.get('structure_detail', {}).get('1h') or {}).get('atr', 400) or 400
+            if armed_existing:
+                refreshed = False
+                for h in armed_existing:
+                    new_trig = decision['bracket'].get(h['direction'], {}).get('trigger')
+                    age_h = (time.time() - h['ts_armed']) / 3600
+                    stale = age_h > 12  # E3: levels stale >12h → refresh
+                    if new_trig and (abs(new_trig - h['trigger']) >= h1_atr or stale):
+                        DB.update_hypothetical(h['order_id'], status='superseded',
+                                               ts_closed=time.time())
+                        DB.log_event('INFO', f"superseded {h['order_id']} "
+                                             f"({'stale %.0fh' % age_h if stale else 'ATR shift'})")
+                        refreshed = True
+                if not refreshed:
+                    summary['shadow_armed'] = 'kept (levels fresh)'
+                else:
+                    armed_existing = []  # fall through and re-arm below
+            if not armed_existing:
+                for leg, o in decision['bracket'].items():
+                    # E2 checklist: never arm an already-crossed (ITM) level —
+                    # instant shadow fill at arm time was observed live.
+                    already = (price_now <= o['trigger']) if leg == 'long' \
+                        else (price_now >= o['trigger'])
+                    if already:
+                        DB.log_event('WARN', f"cycle {cycle_id}: {leg} trigger "
+                                             f"{o['trigger']} already crossed by "
+                                             f"price {price_now} — leg skipped")
+                        continue
+                    order_id = f"btc-auto-{cycle_id}-{leg}"
+                    DB.record_order(did, leg, {**o, 'order_id': order_id},
+                                    'shadow_armed', size, cfg.get('leverage_max', 5))
+                    DB.upsert_hypothetical(
+                        {'order_id': order_id, 'direction': leg,
+                         'trigger': o['trigger'], 'sl': o['sl'], 'tp': o['tp']},
+                        decision['regime_state'], size)
+                # Truthful report: whatever is armed in DB AFTER this cycle
+                summary['shadow_armed'] = [h['order_id'] for h in
+                                           DB.get_hypotheticals('armed')]
+                if summary['shadow_armed']:
+                    DB.log_event('INFO', f"cycle {cycle_id}: shadow-armed "
+                                         f"{summary['shadow_armed']} @ {price_now}")
 
     # 5 LEARN: live attribution + bounded self-tune
     live_attribution(cfg)
