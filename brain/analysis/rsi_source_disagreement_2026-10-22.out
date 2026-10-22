@@ -1,0 +1,13 @@
+PART 1 — approval(5m-simple A) vs exec(5m-Wilder B), 14d, 182 tokens
+  obs=242799  mean|A-B|=6.82  median=5.36  p95=18.03
+  floor-45 decision flips: 42063 (17.32% of obs)
+  knife-35 decision flips: 29647 (12.21% of obs)
+  top tokens by 45-flip count: [('WLFI', 279), ('HEMI', 270), ('BANANA', 266), ('CFX', 265), ('SNX', 265), ('NOT', 262), ('W', 258), ('GRIFFAIN', 257)]
+
+PART 2 — all three sources, 7d, 57 traded tokens
+  obs=56917
+  mean|A-B|=6.59  mean|A-C|=14.25  mean|B-C|=13.49
+  floor-45 flips: A-vs-B 9850 (17.31%)  A-vs-C 19179 (33.70%)  B-vs-C 19143 (33.63%)
+  knife-35 flips: A-vs-C 14013 (24.62%)
+
+NOTE: B-vs-C flip rate = the false-comment impact (stamp claims 'same fetch as exec gates').

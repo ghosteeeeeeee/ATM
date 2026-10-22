@@ -5103,9 +5103,13 @@ def run(dry_run=False):
         # brain_auditor #60: stamp detect->exec RSI drift (zero-behavior).
         # AGENTS.md CFX class: detect RSI 44.6 passed gates, exec RSI 31.28 by
         # fill — drift magnitude was never SQL-verifiable. rsi (detect) is
-        # already stamped above; live RSI comes from the same fetch the
-        # exec-time gates use. Enables: does |drift| predict losses, and are
-        # the exec RSI gates catching enough of the drift class.
+        # already stamped above; live RSI here = _ctx_gate_get_rsi = rsi_utils
+        # 1m (matches the :1189 safety floor, NOT the :2113 exec hard floor
+        # which is rsi_utils 5m, NOT the compactor approval floor which is an
+        # inline 5m simple-avg). #80 measured: the three sources straddle the
+        # <45 decision 17-34% of obs (brain/analysis/rsi_source_disagreement_
+        # 2026-10-22.out) — do not treat rsi_exec as "the gate's view".
+        # Enables: does |drift| predict losses (pre-registered n>=30).
         try:
             _drift_detect = _exec_meta.get('rsi_14') if _exec_meta.get('rsi_14') is not None else _exec_meta.get('rsi')
             _drift_live = _ctx_gate_get_rsi(token)

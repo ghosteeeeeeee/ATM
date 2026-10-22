@@ -1848,5 +1848,16 @@
     "after": "flag checked first; disabled picks labeled watchlist-only",
     "rationale": "watchdog reported FIRED FIL SHORT 2026-10-22 16:47 with no executable path (ai_trader_signal.py:129 returns early) — misleading to CEO",
     "impact": "reporting accuracy only, zero trading behavior"
+  },
+  {
+    "timestamp": "2026-10-22T18:55:00Z",
+    "agent": "brain_auditor",
+    "change": "decider_run.py rsi_drift stamp comment: corrected false claim 'live RSI comes from the same fetch the exec-time gates use'",
+    "type": "tweak",
+    "file": "decider_run.py",
+    "before": "comment claimed rsi_drift live RSI = same fetch as exec-time gates",
+    "after": "comment documents 3-source reality (ctx 1m / exec 5m / compactor inline 5m simple-avg) + measurement reference; ZERO code behavior change",
+    "rationale": "Part 2 measured B-vs-C decision straddle 33.6% — the claim was false and would mislead the n>=30 rsi_drift pre-reg reading",
+    "impact": "documentation accuracy only; rsi_drift stamp behavior unchanged"
   }
 ]

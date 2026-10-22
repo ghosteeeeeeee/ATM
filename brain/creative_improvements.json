@@ -6772,5 +6772,14 @@
     "category": "execution quality",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-22T18:55:00Z",
+    "idea": "RSI gate-source unification: migrate signal_compactor approval floor (inline 5m simple-avg) to rsi_utils.compute_rsi(tf='5m')",
+    "rationale": "Measured #80 (brain/analysis/rsi_source_disagreement_2026-10-22.py, reproduced): three live RSI sources enforce the same 35/45 thresholds with different math/tf — approval=inline 5m simple-avg (A), exec hard floor=rsi_utils 5m Wilder (B), ctx safety floor+rsi_drift stamp=rsi_utils 1m (C). A-vs-B mean diff 6.8pts straddles <45 on 17.3% of 242,822 obs (14d, 182 tokens); B-vs-C 13.5pts / 33.6% (56,926 obs); knife-35 A-vs-C 24.6%. Completes CEO 2026-09-22 Part 3 (rsi_utils exists but compactor approval never migrated — its own docstring admits partial consolidation). NOT a new pattern claim: implementation comparison, no trade-outcome selection.",
+    "expected_impact": "Removes approval-vs-exec contradiction class (YGG kill comment at decider_run.py:2128); makes every band/floor tune (meta_rsi cells, SHORT_RSI_HARD_FLOOR=45) mean the same thing at every layer. Boundary-only behavior change.",
+    "category": "gate integrity",
+    "status": "suggested",
+    "risk": "medium — changes gate decisions at the margin (17% of boundary obs), needs CEO eyeball Oct 23, one variable at a time (tf-authority ruling is a SEPARATE later question)"
   }
 ]

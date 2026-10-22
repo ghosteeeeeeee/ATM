@@ -1576,3 +1576,13 @@
 
 ## Error Alerts — 2026-10-22 17:27 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor: N.N < N`
+
+## Error Alerts — 2026-10-22 18:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: BIGTIME TOK — signal TOK rolled back (prevents retry loop)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: BIGTIME TOK (count=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`
+
+## Error Alerts — 2026-10-22 18:45 UTC
+- **[CRITICAL]** (RESOLVED): `sentiment-aggregator.service` crash-looping — WorkingDirectory `/root/.openclaw/workspace/scripts` missing (status=200/CHDIR), 13,280 restarts over ~4.6 days. Script only exists in `/root/Dallas/workspace-20260306-0000/scripts/sentiment-aggregator.py` backup. No consumers of `/var/www/logs/sentiment.json` (stale since Apr 3 2026). **AUTO-FIX**: `systemctl disable --now sentiment-aggregator.service` — dead OpenClaw-era service, no hermes consumers.
+- **[WARN]** (RESOLVED): `hermes-summarizer.service` failed at 16:16 UTC — start operation timed out (TimeoutStartSec=600). Actual work completed (summary written to automation/summaries/2026-10-22_16.md + OpenMemory stored); timeout hit during trailing git commit of gitignored path (`.gitignore:177 automation/summaries/`). **AUTO-FIX**: `systemctl reset-failed`. Note: run_summarizer.sh wastes time on git add of ignored paths — consider skipping git when path is gitignored.
+- **[INFO]** Disk at 84% (18G free of 118G). pipeline.log 243M, signal-compactor.log 95M, 15m_regime.log 73M — active logs, do not rotate while running.
