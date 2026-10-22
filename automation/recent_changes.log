@@ -5040,3 +5040,5 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-22 00:37 UTC] brain_auditor: AUDIT RUN #65 — 0 config changes (vacation soak) | watchdog 65+ band handoff REJECTED (14d/30d OOS negative) | pump-chain- kill CANCELLED reconfirmed | CONF_FLOOR=30 pre-ship VERIFIED net '+$1.61' fk 6.3% ships Oct 23 | 24h 35T 37.1% '-$0.99', 7d 160T 36.3% '-$3.39', armed '+$3.48' vs unarmed '-$6.87', size-reduce 0.5x
 BY: brain_auditor
+BY: auto_1hr
+- [2026-10-22 01:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, 00/01 empty) | 24h 33T 39.4% '-$0.87' | 7d 159T 36.5% '-$3.35' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending both 0T last hour; pump-chain- recheck date reached: EXTREME +$0.75 wins, HIGH/NORMAL lose — blanket kill dead, audit #63 CANCEL stands, CONF_FLOOR ships Oct 23) | atr_sl_hit 10/33=30.3% under 40% | no neg streak (empty hours) | 0 open | No constants change -> no signal_versions entry
