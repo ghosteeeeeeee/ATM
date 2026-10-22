@@ -150,6 +150,7 @@ MAX_POSITIONS = MAX_OPEN_POSITIONS
 _bb_bounce_shadow_logged = set()
 _mfe_cut_shadow_logged = set()
 _arm_be_shadow_armed = set()   # trade_ids that have seen live_pnl >= PM_TRAIL_ACTIVATE
+_hml_shadow_logged = set()     # trade_ids that have logged an HML-SHADOW line
 _arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire
 
 # ─── Thresholds ────────────────────────────────────────────────────────────────
@@ -3655,10 +3656,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # without changing behavior. Data for 7d eval before enforcement.
         try:
             from hermes_constants import ATR_SL_MIN as _shadow_atr_min
-            _shadow_hml = min(HARD_MAX_LOSS_PCT, -abs(_shadow_atr_min))
-            if _shadow_hml != HARD_MAX_LOSS_PCT:
+            # UNIT FIX (brain_auditor 2026-10-22): ATR_SL_MIN is a FRACTION
+            # (0.015 = 1.5%) while live_pnl / HARD_MAX_LOSS_PCT are PERCENT.
+            # Was: min(HML, -0.015) — shadow always == actual, so the CEO
+            # 2026-10-18 pre-registered shadow logged 0 lines since ship (7d
+            # eval would have had no data). Now: -1.5% price ATR floor.
+            _shadow_hml = min(HARD_MAX_LOSS_PCT, -abs(_shadow_atr_min) * 100.0)
+            if _shadow_hml != HARD_MAX_LOSS_PCT and trade_id not in _hml_shadow_logged:
+                _hml_shadow_logged.add(trade_id)
                 log(f"  📊 [HML-SHADOW] {token}: actual={HARD_MAX_LOSS_PCT:.3f}% shadow={_shadow_hml:.3f}% "
-                    f"(ATR floor {_shadow_atr_min}%, lev={_hml_lev:.0f})", 'INFO')
+                    f"(ATR floor {_shadow_atr_min * 100:.2f}%, lev={_hml_lev:.0f})", 'INFO')
         except Exception:
             pass
         # D3 TRAIL-MIN-GAP REMOVED (CEO 2026-10-12): the -0.60% trail floor only

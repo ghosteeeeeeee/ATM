@@ -6482,5 +6482,31 @@
     "status": "suggested",
     "risk": "low",
     "criteria": "collect to n>=20 in the conf>=60 EXTREME cell; test gap>=1.0 interaction as a SECOND, separate variable (one at a time)."
+  },
+  {
+    "date": "2026-10-22T03:59:35Z",
+    "idea": "Leverage-normalized HML study: the account-denominated hard-max-loss gives 5x trades ~25% less price room than 3x trades before killing them, and 5x trades arm the trail at 32.2% vs 46.3% (p=0.0091, n=344, 14d)",
+    "rationale": "Wealth gap is arm-vs-no-arm. HML fires at CUT_LOSER_PNL/lev = -4.00%/lev => lev5 -0.80% price vs lev3 -1.33% price (measured avg exits -0.731% vs -0.972%, 30d -0.784/-0.992), while the trail arm needs +0.40% price regardless of leverage. Narrower price room before the kill = fewer arms. HML rate lev5 29.5% vs lev3 16.2% (Fisher p=0.0047). Same signal families appear in both cohorts, so it is not purely a signal-mix artifact.",
+    "expected_impact": "If 5x trades got 3x-equivalent price room, HML rate falls toward 16% and arm rate toward 46% — directionally the entire armed/unarmed wealth gap. Exact dollars require the HML-SHADOW counterfactual.",
+    "category": "exit mechanics / risk normalization",
+    "status": "pre-registered",
+    "risk": "medium (changes risk-per-trade; CEO decision; ship only via shadow)",
+    "vehicle": "Fold into the existing HML-SHADOW 7d eval on 2026-10-25 — that shadow was dead (0 log lines, ATR_SL_MIN unit bug) and is fixed this run, so data starts 2026-10-22. Confounders: leverage comes from token maxLeverage (get_max_leverage), not a dial; CUT_LOSER widened -3->-4 on Oct 15 spanning the window; CEO already removed D3 TRAIL-MIN-GAP (2026-10-12) for the same bug class.",
+    "n": 344,
+    "p_values": {
+      "hml_rate": 0.0047,
+      "arm_rate": 0.0091,
+      "wr": 0.2494
+    }
+  },
+  {
+    "date": "2026-10-22T03:59:35Z",
+    "idea": "Rejected-forever log: 'hold through stop-outs' policy (zero code, document only)",
+    "rationale": "1m autopsy showed 13/18 24h losers recovered to within -0.2% of entry within 30m of the stop, which invites the proposal 'widen/delay stops'. Tested properly this run: in PRICE% terms (the first pass mixed account% actual vs price% counterfactual and produced a fake +$9.77/14d) the policy is a wash-to-worse, n=188, delta -$0.20 to -$2.18 depending on floor, only 40-48% of trades improve, OOS sign-flips (7d +$0.70 vs d8-14 -$0.90).",
+    "expected_impact": "Prevents a re-litigated, unit-bugged stop-widening proposal from reaching the queue.",
+    "category": "guardrail / knowledge",
+    "status": "rejected-with-data",
+    "risk": "none",
+    "n": 188
   }
 ]

@@ -1782,5 +1782,16 @@
     "after": "rsi_detect, rsi_exec, rsi_drift (abs diff) persisted alongside existing 'rsi' stamp",
     "rationale": "AGENTS.md CFX drift class was not SQL-verifiable; unlocks drift-vs-outcome analysis and exec-gate coverage check at n>=20",
     "impact": "Zero live behavior. py_compile PASS. No constants touched; protected flags 13/13."
+  },
+  {
+    "timestamp": "2026-10-22T03:55:00Z",
+    "agent": "brain_auditor",
+    "change": "HML-SHADOW unit fix: ATR_SL_MIN is a fraction (0.015=1.5%) but was negated raw against percent thresholds, so shadow==actual and the CEO 2026-10-18 pre-registered shadow logged 0 lines since ship. Also added once-per-trade dedup (_hml_shadow_logged).",
+    "type": "bugfix",
+    "file": "scripts/position_manager.py",
+    "before": "_shadow_hml = min(HARD_MAX_LOSS_PCT, -abs(_shadow_atr_min))  # -0.015 vs -0.80 -> never differs, 0 log lines",
+    "after": "_shadow_hml = min(HARD_MAX_LOSS_PCT, -abs(_shadow_atr_min) * 100.0)  # -1.50% vs -0.80% -> logs once per trade",
+    "rationale": "Pre-registered HML-SHADOW eval due Oct 25 had no data 4 days in. Zero live behavior (log-only shadow).",
+    "impact": "Restores data collection for the account-cap vs ATR-floor eval; 0 trades affected."
   }
 ]
