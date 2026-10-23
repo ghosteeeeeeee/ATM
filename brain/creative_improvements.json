@@ -7165,5 +7165,51 @@
     "category": "gate governance",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T09:49:05Z",
+    "idea": "CONFIDENCE-TAIL PACKAGE — block RAW trades.confidence <30 (ALL signals, not just bare pump-chain) OR >100 (excluding pump-chain-) as the fk-passing middle option between CONF_FLOOR (+1.81) and full CONF_FILTER (+4.99)",
+    "rationale": "CONF_FILTER [70,95) enforce is held because fkA-literal 81.1% of 14d winners dies. Splitting the blocked book into tails shows BOTH legs individually fail the bar on some definition, but the surgical tails pass on the standing-recommended definition (fkA-literal + 14d): 7d n=27 W=6 net +1.50 fk 11.1% | 14d n=85 W=18 net +3.98 fk 14.2% | 30d n=110 W=30 net +3.85 fk 9.9%. Blocked-cohort WR 21.8% vs rest-of-book 41.2% = z=-3.26 (p<0.002). Captures ~80% of CONF_FILTER's net at ~18% of its fk cost. The pump-chain- exclusion matters: conf>100 pump-chain- alone is 23T 12W +0.43 (positive) while the rest of >100 is -1.77/30d.",
+    "expected_impact": "+$1.50/7d to +$3.98/14d saved; fkA-literal 14.2% (PASS <20%). Caveat: fkA-family 14d = 24.4% FAIL and fkB 14d = 21.8% FAIL — verdict flips on the SAME pending CEO fk-definition ruling as CONF_FLOOR. Rides that ruling, does not create a new one.",
+    "category": "entry sniper / gate",
+    "status": "suggested",
+    "risk": "medium",
+    "checks": {
+      "sample_size": "n=85 (14d) >= 20 MET",
+      "significance": "z=-3.26 p<0.002 MET",
+      "oos_7d_30d": "same sign all three windows MET",
+      "existing_filters": "no global conf<30 or conf>100 gate exists; CONF_FILTER not enforce-flipped; per-signal MIN_CONFIDENCE are emit floors not exec blocks — no duplicate",
+      "filter_collisions": "kills 18 of 127 14d winners = 14.2% < 20% bar; largest killed positive cohort is pump-chain- conf>100 (+0.43/30d) which is why it is excluded",
+      "confounders": "conf<30 14d n=51 == 30d n=51 (cohort entirely inside 14d, none aged out) and conf>100 7d n=0 (upper leg currently dormant) — the package's live value today comes almost entirely from the conf<30 leg",
+      "one_variable": "single gate, single threshold pair, no compound change"
+    },
+    "files": "brain/fk_definitions.md (option table appended this run)"
+  },
+  {
+    "date": "2026-10-23T09:49:05Z",
+    "idea": "CUT NEVER-ARMED TRADES AT HOUR 6 — tested and REJECTED-WITH-DATA (log so it is never re-proposed)",
+    "rationale": "Open trade BTC #16358 hit hour 6 at 08:44 still unarmed (peak +0.197%), which makes 'cut unarm at hour 6' feel obviously right. Measured instead of felt: 14d trades that survived to >=6h AND ended unarmed = 10T 60% WR +$0.07; 30d = 20T 60% WR +$0.45. Cutting them would forfeit POSITIVE expectancy. Sample is small and conditioned on surviving to 6h (correct population for the rule, but n is thin), and #86's STALL-MARGINAL ledger already showed held>=7h mean -$0.252 with p~0.25 and 3/10 gaining after 7h. UNIVERSAL_MAX_HOLD stays 480.",
+    "expected_impact": "$0 (would be negative: -$0.07/14d, -$0.45/30d)",
+    "category": "exit timing",
+    "status": "rejected_with_data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-23T09:49:05Z",
+    "idea": "RAISE GLOBAL CONFIDENCE FLOOR 30 -> 45 — tested and REJECTED-WITH-DATA (dominated by CONF_FLOOR=30)",
+    "rationale": "Threshold scan for block confidence<T: T=45 passes fkA-literal on all windows (7d 14.8% / 14d 15.7% / 30d 6.6%) with net +1.77/+1.93/+2.07, so it LOOKED shippable. But fine bands 30d show 30-34 +0.62, 35-39 -0.23, 40-44 -0.38 => bands 30-44 net +$0.01. Raising 30->45 therefore buys +$0.01 of extra save while doubling winners killed (12 -> 20, fk 4.0% -> 6.6%) and colliding with #67's already-rejected MIN_EXEC_CONFIDENCE 40->50. CONF_FLOOR=30 remains the knife edge exactly as #67 measured.",
+    "expected_impact": "+$0.01 marginal over CONF_FLOOR=30 — noise",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-23T09:49:05Z",
+    "idea": "CONF-FILTER-SHADOW MARGINAL-FIRE RATE — track what fraction of would-blocks never opened anyway (downstream-redundant) alongside the gross fk",
+    "rationale": "First telemetry since the #88 ship: 8 lines / 6 unique fires in 3h50m (projected ~25/day). Of the 6, only 3 opened: ME -0.05 (saved), WLFI -0.11 (saved), PUMP +0.03 (winner killed) => gross net +0.13 on n=3; COMP/AIXBT/AVAX never opened at all = downstream-redundant. Redundancy rate 3/6 = 50%. Gross fk on historical winners is unchanged by this (all 127 winners did open), but for FUTURE fires the marginal rate determines how much incremental behaviour the enforce flip would actually have — worth logging next to the fk in the Oct 25 first read instead of discovering it then.",
+    "expected_impact": "zero behaviour; sharper Oct 25 read",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

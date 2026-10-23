@@ -51,3 +51,51 @@ Ship-time numbers **unchanged** across 55 minutes (00:45 → 01:40): blocked set
 −$1.81; fkA-literal 4/125 = **3.2%**, fkA-family 4/25 = **16.0%**, fkA-scope 4/20 =
 **20.0%**, fkB 4/32 = **12.5%**. No drift into the CEO ruling — the hold verdict stands as
 written above.
+
+## Option comparison table (run #94, 2026-10-23 09:50 UTC) — three levers, one ruling
+
+The pending fk-definition ruling now decides **three** ships instead of one. All numbers
+recomputed fresh from PostgreSQL this run; `fkA-literal / fkA-family / fkA-scope / fkB`
+per the definitions above (for multi-signal sets, family/scope denominators = winners of
+every signal appearing in that run's blocked set).
+
+**Blocked sets**
+- **A. CONF_FLOOR bare** — `signal IN ('pump-chain+','pump-chain-') AND confidence < 30`
+- **B. CONF_FILTER enforce** — `confidence < 70 OR confidence >= 95` (window `[70,95)`)
+- **C. CONFIDENCE-TAIL PACKAGE (new)** — `confidence < 30` (all signals) `OR (confidence > 100 AND signal <> 'pump-chain-')`
+  - upper leg scoped out because `pump-chain-` at conf>100 is 23T 12W **+0.43/30d** (positive) while the rest of conf>100 is −1.77/30d
+
+| option | window | blocked | net save | fkA-literal | fkA-family | fkA-scope | fkB | verdict (bar <20%) |
+|--------|--------|---------|----------|-------------|------------|-----------|-----|--------------------|
+| A CONF_FLOOR bare | 14d | 32T 4W −1.81 | +1.81 | **3.1%** | **16.0%** | 20.0% | **12.5%** | 3/4 PASS, scope FAIL-at-bar |
+| A | 30d | 32T 4W −1.81 | +1.81 | **1.3%** | **6.0%** | **6.0%** | **12.5%** | 4/4 PASS |
+| B CONF_FILTER enforce | 14d | 291T 103W −4.99 | +4.99 | 81.1% | 82.4% | 82.4% | 35.4% | 0/4 PASS |
+| B | 30d | 509T 203W −7.48 | +7.48 | 67.2% | 70.2% | 70.2% | 39.9% | 0/4 PASS |
+| **C PACKAGE (new)** | 7d | 27T 6W | +1.50 | **11.1%** | 60.0% | 60.0% | 22.2% | 1/4 PASS |
+| **C PACKAGE (new)** | 14d | 85T 18W | +3.98 | **14.2%** | 24.4% | 24.4% | 21.2% | 1/4 PASS |
+| **C PACKAGE (new)** | 30d | 110T 30W | +3.85 | **9.9%** | **19.3%** | **19.3%** | 27.3% | 3/4 PASS |
+
+Supporting tests for **C** (all pre-registered bars, computed this run):
+- sample n=85 (14d) ≥ 20 **MET**
+- blocked-cohort WR 21.8% vs rest-of-book 41.2% → **z = −3.26, p < 0.002 MET**
+- same-sign net at 7d / 14d / 30d **MET**; fkA-literal < 20% at all three **MET**
+- no existing global conf gate duplicates it (CONF_FILTER not enforce-flipped; per-signal
+  `MIN_CONFIDENCE` values are emit floors, not exec blocks) **MET**
+- winner impact 18/127 = 14.2% < 20% **MET**
+- single threshold pair, no compound change **MET**
+- confounder flagged: conf>100 leg has **n=0 in 7d** (dormant) and conf<30 has 51T at both
+  14d and 30d (cohort entirely inside the recent window) → **C's live value today is
+  essentially the conf<30 leg**; the upper leg is a cheap dormant add-on, not current PnL
+
+**Why this matters for the ruling:** under the standing recommendation already written
+above (**fkA-literal + 14d**), option C ships and **dominates A** (14.2% vs 3.1% fk, both
+pass; +3.98 vs +1.81 = 2.1× the save) while capturing ~80% of B's net at ~18% of B's fk
+cost. Under fkB or fkA-family at 14d, **C FAILS and only A survives**. So the definition
+choice now has a materially different consequence than it did on Oct 23 00:45 — the CEO
+should rule with this table in view.
+
+**Not shipped this run** (vacation_mode.json `no_constants_change` still true, 8th
+consecutive run) — C is pre-registered, ships same-day as A once (a) the fk definition is
+pinned and (b) the vacation file is cleared. Ship-time requirement for C, mirroring A's:
+pin the gate column to RAW `trades.confidence` and self-check the blocked count equals 85
+at 14d.

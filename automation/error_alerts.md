@@ -1649,3 +1649,15 @@
 
 ## Error Alerts — 2026-10-23 05:27 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-23 07:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: brain.py rc=N`
+
+## Error Alerts — 2026-10-23 08:27 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CC TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-23 09:45 UTC
+- **WARN** (1x): `hermes-upgrade-implementer.service: Failed with result 'timeout'` (04:36 UTC — script exceeded TimeoutStartSec=900)
+- **AUTO-FIX**: `systemctl reset-failed` applied; timer unaffected (next run 16:21 UTC). Suggested: raise TimeoutStartSec or cap script runtime to <900s.
+- **WARN**: Disk at 84% (threshold 85%) — largest log: pipeline.log 256M. No action taken yet; compress >7d logs if it crosses 85%.

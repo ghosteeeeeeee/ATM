@@ -1,37 +1,23 @@
 {
-  "timestamp": "2026-10-23T07:14:25.223734+00:00",
+  "timestamp": "2026-10-23T09:44:29.228508+00:00",
   "steers": [
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ME + WLFI",
-      "detail": "Both opened within 12 minutes. Correlation risk.",
+      "category": "health",
+      "title": "Signal 'bb-bounce-v2-long+' losing streak: 3 losses",
+      "detail": "Net -0.34 USDT over last 20 trades (losses: -0.38). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
-      "auto_executable": false,
-      "id": "steer-002"
     }
   ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "NEUTRAL",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
-    "volatility": "NORMAL",
-    "zscore_tier": "NEUTRAL",
-    "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "DISTRIBUTION",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "btc_15m": "LONG_BIAS",
+    "btc_4h": "SHORT_BIAS"
   },
-  "open_count": 3
+  "open_count": 1,
+  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (1 long, 0 short) \u2014 BTC #16358, 7.1h, -0.28%\nUnrealized PnL: -0.03 USDT\nRegime: SHORT_BIAS (regime_5m aggregate+BTC, 09:45) | continuum: BTC BELOW EMA300, LEAN_BEAR, STRONG_DOWN | auto_trader: CHOP, MANAGE_ONLY\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [regime] EXIT BTC LONG #16358 \u2014 condition MET, not developing:\n   24 consecutive 1m closes below EMA300 (threshold 15) at 09:45,\n   verified independently in candles.db (EMA300 ~81750, price ~81646;\n   continuum reports 37). age=3 cycles unexecuted. Re-test before acting:\n   if 1m reclaims and holds above EMA300 15+ closes, this re-opens.\n\ud83d\udfe1 [stale] Trail never armed (mfe null) after 7.1h \u2014 cut flat at hour 10\n   (~12:44 UTC) if still un-armed; 8h flag lands ~10:44 UTC.\n\ud83d\udfe1 [cluster] Pending queue re-crept to 9 with MERL LONG + BTC LONG\n   against an aggregate SHORT_BIAS tape \u2014 no LONG adds while BTC holds\n   below EMA300 (re-tested each cycle).\n\ud83d\udfe2 [health] steer-001 confirmed, not retracted: bb-bounce-v2-long+ 7d\n   n=21, 48% WR, avg -0.027 (WLFI meta_rsi 57.1 / POL 53.6 both losers).\n\ud83d\udfe2 [opportunity] New pick ATOM SHORT (precheck PASS, RSI 56.3, conf 81,\n   R:R 1.33 best of 10 candidates) \u2014 WATCHLIST ONLY, AI_TRADER_ENABLED=False,\n   will NOT execute. Prior WLD SHORT superseded (past 45-min window).\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe only position is a chop trade on the wrong side: TP needs +0.65% while\nBTC 1h range runs ~0.06%/h, so the trail can never arm on drift, and all\nthree live sources say SHORT. Verified: BTC 7d is a loser on BOTH sides\n(LONG 21T/8W -0.21, SHORT 10T/4W -0.05) \u2014 the winning side on BTC was not\ntrading it in this chop. 24h book SHORT 4W +0.046 vs LONG 2W -0.003; 7d\nLONG 106T 38% -0.029 vs SHORT 35T 40% +0.002. Winners = trail family\n(39T/35W +0.050); losers = atr_sl_hit (37T/1W -0.068), hard_max_loss\n(19T/0W -0.126). Flip rate 24 agg / 23 BTC per 24h = p50\u2013p95 standing\nstate, not an anomaly \u2014 no churn flag, every direction steer is\ncondition-worded. Every repeated losing token (BTC/ARB/APT/BLUR/INJ) is a\nLONG \u2014 the tape has been paying shorts.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Exit BTC LONG #16358 now \u2014 the 15\u00d71m-below-EMA300 trigger has fired\n   (streak 24); it was a never-arming chop entry on the wrong side\n2. No LONG adds (incl. the MERL/BTC pendings) while BTC holds below EMA300;\n   re-test that condition next cycle, don't copy this prose\n3. ATOM SHORT sits in ai_trader_state.json as watchlist reference only \u2014\n   AI_TRADER_ENABLED=False, do not report as fired\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nMerged analysis into `watchdog_recommendations.json` (steers untouched), wrote pick to `/root/.hermes/data/ai_trader_state.json`, stored memory. Both data dirs are gitignored \u2014 nothing to commit.\n",
+  "agent_timestamp": "2026-10-23T09:51:07.060097+00:00",
+  "regime_context": "Sources (always cited by name, 09:44-09:45 UTC):\n- regime_5m scanner: aggregate SHORT_BIAS (long_bias 11 / short_bias 50 / neutral 62) AND regimes.BTC = SHORT_BIAS \u2014 both keys agree at 09:45.\n- continuum (09:44): BTC 81646-81659 vs EMA300 ~81776 (continuum) / 81750 (independent candles.db EMA) = BELOW, duration 37+ 1m closes, linreg_direction LEAN_BEAR, trend_quality STRONG_DOWN, wyckoff DISTRIBUTION, phase CALM, volume LOW.\n- auto_trader shadow (09:44): CHOP, MANAGE_ONLY, score long=-35 short=-5, record 0/5 (all 5 losses CHOP, all shadow_sl).\n- watchdog regime_summary (09:44): btc_15m LONG_BIAS, btc_4h SHORT_BIAS \u2014 the 15m key lags the scanner's 09:45 SHORT_BIAS flip; cite the scanner, not the cached summary, for direction this cycle.\n\nFlip-rate KPI (mandatory): aggregate 24 flips/24h, BTC 15m 23 flips/24h over 96 dumps. That sits between p50=19 and the p95 anomaly threshold=26 \u2014 the STANDING STATE, not an anomaly; the old '>=6 = high churn' line is vestigial and satisfied by 100% of the last 14 days. Average direction state survives ~1h, so every direction-flavored steer below is condition-worded and re-tested next cycle. The informative tail (<6 flips = real trend tape) has not occurred since Oct 2.\n\nPractical read: low-vol distribution chop with BTC pinned below EMA300 for 24+ minutes and all three live sources on SHORT. Nothing supports adding long exposure here; the standing long #16358 is the only directional position and its exit trigger has fired.",
+  "pattern_alerts": "VERIFIED this cycle from PostgreSQL (numbers re-run 09:48 UTC, meta_rsi truth source; entry_rsi_14 never used):\n\nP1. BTC is a loser on BOTH sides \u2014 7d: LONG 21T/8W (38%) -0.210 total, SHORT 10T/4W (40%) -0.050 total = 31T/12W, -0.26 net; 30d 61T/22W (36%) -0.0075 avg. WINNING SIDE: not trading BTC in this chop, or only trail-armed trend entries. We are on the long side of the one coin that has paid nobody either direction for 7 days (open trade #16358).\n\nP2. pump-chain+ LONG: 7d n=14, 1W (7%), avg -0.086 \u2014 worst signal/direction pair with volume. WINNING SIDE: the short leg \u2014 pump-chain- continues to outperform its long twin. Why we miss it: pump-chain+ keeps firing LONG in a book whose 7d LONG avg is -0.029.\n\nP3. ai-trader-pending by direction (7d): LONG 6T 0W avg -0.023 vs SHORT 6T 2W. WINNING SIDE: the short leg of our own picks. The open position is exactly the 0W pair (BTC LONG ai-trader-pending).\n\nP4. bb-bounce-v2-long+ LONG: 7d n=21, 10W (48%), avg -0.027 \u2014 confirms automated steer-001, NOT retracted. Recent losers WLFI (meta_rsi 57.14, hard_max_loss, -4.83%) and POL (meta_rsi 53.62, -4.85%) were mid-band longs in a SHORT_BIAS tape. WINNING SIDE on both: fade the bounce instead of buying it.\n\nP5. Exit-family scoreboard (7d): profit-monster-trail 39T/35W +0.050 (how we win) vs atr_sl_hit 37T/1W -0.068, hard_max_loss 19T/0W -0.126, hard_sl 6T/0W -0.085 (how we lose). 52/56 hard_max_loss-class trades never reach +0.40% to arm the trail = chop entries. Every new entry should be asked: does this arm the trail?\n\nP6. Repeated losing tokens (7d, >=3 losses): BTC LONG 11L, BTC SHORT 5L, ARB LONG 4L, APT LONG 3L, BLUR LONG 3L, INJ LONG 3L. Every one of those is a LONG \u2014 the tape has been paying shorts.\n\nP7. 24h losers (n=3, meta_rsi): WLFI LONG bb-bounce-v2+ rsi 57.14 hard_max_loss; ME LONG bb-squeeze+ rsi 74.68 trail_arm_timeout (entered overbold, never trailed); BTC SHORT ai-trader-pending rsi n/a UNIVERSAL_MAX_HOLD. Two of three are 'entered, never trailed' failures inside chop, not direction calls.\n\nNo time-of-day pattern asserted \u2014 banned steer class; all patterns above are exit-family, direction-pair, or coin-level with n>=5 stated."
 }
