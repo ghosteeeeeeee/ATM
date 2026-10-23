@@ -5,14 +5,14 @@ Covers: phase boundaries (0.10% BE-lock / 0.40% trail), ratchet-only per
 direction, BE→trail supersede sequences, CEO-edit protection, NaN/Inf guards
 (bug_hunter 2026-10-23 F-2), direction validation.
 
-Run: python3 scripts/test_manual_exit_manager.py   (exit 0 = all pass)
+Run: python3 analysis/test_manual_exit_manager.py   (exit 0 = all pass)
 Real-trade calibration cases: #16351 (winner), #16353 / #16358 (max-hold exits
 that the BE-lock would have turned into scratches).
 """
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
 import manual_exit_manager as M  # noqa: E402
 
 decide = M.decide_sl
