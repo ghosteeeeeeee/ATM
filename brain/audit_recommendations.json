@@ -182,6 +182,12 @@
       "severity": "LOW",
       "detail": "watchdog band 49T/35%/-2.26 vs rsi_14-based 46T/37.0%/-1.82 — same conclusion, source must be named",
       "action": "watchdog prompt names its RSI source next pass"
+    },
+    {
+      "item": "git push divergence blocked pushes (resolved this run)",
+      "severity": "MED",
+      "detail": "push_gh.py rejected with non-fast-forward: local HEAD 7eb8fca7 vs remote 07b0c5d4 were SIBLING commits (same parent adb586f7, same message/timestamp, trees differing only in analysis/test_manual_exit_manager.py 2 lines) — two agents committed the same watchdog cycle. Separately, the github/main tracking ref was stale at Oct 14 (576 behind) because push_gh.py pushes by URL, which does not update that ref — cosmetic, not 9 days of failed pushes.",
+      "action": "resolved stash -> git rebase github/main -> push_gh.py (RC 0, 07b0c5d4..858d90c7), then readiness-correction commit 33b073dc pushed. If it recurs, rebase — never force-push."
     }
   ],
   "recurring_problems": [
