@@ -31,7 +31,7 @@ def load(hours=336):
     cur.execute("""
         SELECT id, open_time, COALESCE(close_time, (NOW() AT TIME ZONE 'UTC')), pnl_usdt
         FROM trades
-        WHERE status='closed' AND open_time > NOW() - INTERVAL '%d hours'
+        WHERE status='closed' AND pnl_usdt IS NOT NULL AND open_time > NOW() - INTERVAL '%d hours'
         ORDER BY open_time""" % int(hours))
     rows = cur.fetchall()
     conn.close()
@@ -44,13 +44,14 @@ def replay(rows, cap):
     for i, (a, b) in enumerate(iv):
         ev.append((a, 1, i))
         ev.append((b, -1, i))
-    ev.sort(key=lambda x: (x[0], -x[1]))
+    ev.sort(key=lambda x: (x[0], x[1]))  # close(-1) before open(1) at equal ts
     active, blocked = set(), set()
     for t, d, i in ev:
         if d == 1:
             if len(active) >= cap:
-                blocked.add(i)
-            active.add(i)
+                blocked.add(i)   # never opened -> occupies no slot
+            else:
+                active.add(i)
         else:
             active.discard(i)
     return blocked
@@ -77,7 +78,7 @@ def concurrency_time(rows):
     for a, b in ((r[1], r[2]) for r in rows):
         ev.append((a, 1))
         ev.append((b, -1))
-    ev.sort(key=lambda x: (x[0], -x[1]))
+    ev.sort(key=lambda x: (x[0], x[1]))  # close(-1) before open(1) at equal ts
     prev = None
     cur = 0
     time_at = {}
@@ -103,6 +104,13 @@ def selfcheck():
     assert replay(rows, 2) == {2}, replay(rows, 2)   # C blocked at 10:45 (A,B already open)
     assert replay(rows, 1) == {1, 2}, replay(rows, 1)  # B and C blocked, D later keeps a free slot
     assert replay(rows, 3) == set(), replay(rows, 3)
+    # discriminating case: a BLOCKED trade must not hold the slot for later opens
+    disc = [
+        (1, dt.datetime(2026, 10, 23, 10, 0), dt.datetime(2026, 10, 23, 11, 0), +1.0),
+        (2, dt.datetime(2026, 10, 23, 10, 30), dt.datetime(2026, 10, 23, 13, 0), -1.0),
+        (3, dt.datetime(2026, 10, 23, 12, 0), dt.datetime(2026, 10, 23, 13, 0), +1.0),
+    ]
+    assert replay(disc, 1) == {1}, replay(disc, 1)  # B blocked, C must be KEPT
     ct = concurrency_time(rows)
     assert abs(sum(ct.values()) - 100.0) < 0.01, ct
     # cap2 blocks only C (-0.5): save = +0.5, fk = 0 of 2 winners

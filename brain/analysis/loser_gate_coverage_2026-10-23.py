@@ -56,7 +56,7 @@ def parse_log(path=LOG):
     return idx
 
 
-def hits(idx, token, direction, ts_str, window=61):
+def hits(idx, token, direction, ts_str, window=60):
     """gates whose block falls within +-window seconds of ts_str (zero-padded
     'YYYY-MM-DD HH:MM:SS' compares chronologically as a string)."""
     import datetime as dt
@@ -86,7 +86,7 @@ def trades(hours=336):
     cur.execute("""
         SELECT id, token, direction, open_time, pnl_usdt, pnl_pct, signal, status, exit_reason
         FROM trades
-        WHERE status='closed' AND close_time > NOW() - INTERVAL '%d hours'
+        WHERE status='closed' AND pnl_usdt IS NOT NULL AND close_time > NOW() - INTERVAL '%d hours'
         ORDER BY open_time""" % int(hours))
     rows = cur.fetchall()
     conn.close()
@@ -176,7 +176,7 @@ def summarize(rows, idx, shift_hours=0):
     }
 
 
-def bypass_cover(idx2, tok, direc, ot, window=61):
+def bypass_cover(idx2, tok, direc, ot, window=60):
     lo = (ot - __import__('datetime').timedelta(seconds=window)).strftime('%Y-%m-%d %H:%M:%S')
     hi = (ot + __import__('datetime').timedelta(seconds=window)).strftime('%Y-%m-%d %H:%M:%S')
     rows_ = idx2.get((tok.upper(), direc), [])
@@ -214,7 +214,9 @@ def selfcheck():
     assert ('LTC', 'SHORT') not in b, 'bypass-denied lines must be excluded'
     assert bypass_cover(b, 'ME', 'LONG', __import__('datetime').datetime(2026, 10, 23, 6, 50, 30))
     assert not bypass_cover(b, 'ME', 'LONG', __import__('datetime').datetime(2026, 10, 23, 7, 5, 0))
-    assert fisher_two_sided(3, 7, 7, 3) <= 1.0 and fisher_two_sided(0, 10, 0, 10) == 1.0
+    _fp = fisher_two_sided(3, 7, 7, 3)
+    assert 0.178 <= _fp <= 0.180, _fp   # hand-computable 2-sided value for 3/7 vs 7/3
+    assert fisher_two_sided(0, 10, 0, 10) == 1.0 and fisher_two_sided(7, 3, 1, 9) <= 1.0
     print('SELFCHECK PASS — parser, +-60s window, control shift, bypass cohort, fisher')
     return True
 
@@ -231,8 +233,17 @@ if __name__ == '__main__':
             hours = int(a)
     idx = parse_log()
     idx2 = parse_bypass()
-    rows = trades(hours)
+    rows_all = trades(hours)   # unrestricted, used for the per-loser table (needs no control)
+    rows = list(rows_all)
+    # FAIRNESS (bug_hunter #2/#3): the log has a live end and a start. Restrict to
+    # trades whose full control window (+6h) exists inside the log, and whose
+    # open is inside the log, so OBS and CONTROL see identical opportunity.
+    log_start = min(min(v)[0] for v in idx.values() if v)
+    rows = [r for r in rows
+            if r[3].strftime('%Y-%m-%d %H:%M:%S') >= log_start
+            and (_dtm.datetime.utcnow() - r[3]).total_seconds() > 6 * 3600 + 60]
     print(f'gate block lines: {sum(len(v) for v in idx.values())} across {len(idx)} token/dir keys')
+    print(f'trades restricted to log window (open >= {log_start}, and >=6h old for a valid +6h control): {len(rows)}')
     print(f'chop/neutral/continuum allow lines: {sum(len(v) for v in idx2.values())} across {len(idx2)} keys')
     print(f'trades in {hours}h: {len(rows)}')
 
@@ -260,8 +271,8 @@ if __name__ == '__main__':
               f"complement n={len(unc):3} W={uw:3} wr={100*uw/max(len(unc),1):5.1f}% pnl={up:+7.2f} | "
               f"fisher p={p:.3f}")
 
-    print('\n[3] 24h losers — same-cycle gate intent:')
-    for tid, tok, direc, ot, pnl, pct, sig, st, exr in rows:
+    print('\n[3] 24h losers — same-cycle gate intent (unrestricted rows, no control needed):')
+    for tid, tok, direc, ot, pnl, pct, sig, st, exr in rows_all:
         if pnl >= 0 or (dt_now - ot).total_seconds() > 86400:
             continue
         print(f"    #{tid} {tok} {direc} {sig} {float(pnl):+.2f} "

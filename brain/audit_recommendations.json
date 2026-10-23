@@ -10,7 +10,7 @@
     "top_insight": "identical diagnosis every run: 'exit system is the #1 profit leak' + repeated 'trend following signal' requests — both already owned (queued TAT/MFE-CUT/CONF_FLOOR stack; continuum-trend+ exists and is 6W/8T 75% arm but only fires 10x/30d) or rejected with data",
     "note": "corpus still duplicate-heavy (byte-identical chunks); used for ideation only, no decision sourced from it"
   },
-  "headline": "WATCHDOG SYSTEMIC CLAIM DOES NOT REPRODUCE — '4/6 losers violated existing gates (bypassed or late)' tested as a census: 0/6 losers had a same-cycle gate BLOCK, 14d block coverage 10.3% vs control 4.9% with covered trades winning MORE (41.7% vs 36.1%, pnl -0.44 of -4.09), and the a-priori chop/neutral/continuum-override cohort 215T 37.2% '-2.73' vs complement 134T 35.8% '-1.36' Fisher p=0.820 -> no separation. The four per-trade stories are TRUE but they are documented ALLOW decisions (waiver x2, ceiling bypass x1, in-band x1), not bypass bugs. Gate intent does not identify the bleed; no gate owed.",
+  "headline": "WATCHDOG SYSTEMIC CLAIM DOES NOT REPRODUCE — '4/6 losers violated existing gates (bypassed or late)' tested as a census (bug_hunter-hardened: log-window restricted n=303, +6h control only on trades old enough to have one, NULL pnl excluded): 0/6 24h losers had a same-cycle gate BLOCK; 14d block coverage 11.6% vs control 5.6%, covered set owns only '-0.38' of '-3.66' and its WR is NOT distinguishable from uncovered (42.9% vs 35.1%, Fisher p=0.714); a-priori chop/neutral/continuum-override cohort 212T 37.7% '-2.41' vs complement 91T 31.9% '-1.25' Fisher p=0.362 (control p=0.786) -> REJECTED-WITH-DATA, route closed. The four per-trade stories are TRUE but they are documented ALLOW decisions (waiver x2, ceiling bypass x1, in-band x1), not bypass bugs. Gate intent does not identify the bleed; no gate owed.",
   "trade_summary_24h": {
     "trades": 13,
     "wins": 7,
@@ -188,6 +188,12 @@
       "severity": "MED",
       "detail": "push_gh.py rejected with non-fast-forward: local HEAD 7eb8fca7 vs remote 07b0c5d4 were SIBLING commits (same parent adb586f7, same message/timestamp, trees differing only in analysis/test_manual_exit_manager.py 2 lines) — two agents committed the same watchdog cycle. Separately, the github/main tracking ref was stale at Oct 14 (576 behind) because push_gh.py pushes by URL, which does not update that ref — cosmetic, not 9 days of failed pushes.",
       "action": "resolved stash -> git rebase github/main -> push_gh.py (RC 0, 07b0c5d4..858d90c7), then readiness-correction commit 33b073dc pushed. If it recurs, rebase — never force-push."
+    },
+    {
+      "item": "bug_hunter audit of run #98's two new scripts — 1 HIGH + 2 MED + 3 LOW, all fixed and re-run",
+      "severity": "HIGH",
+      "detail": "(HIGH) slot_cap replay kept BLOCKED trades inside `active`, so a ghost held the slot until its original close_time: over-blocked everything (cap3 falsely FAILED fk at 24.2%, cap4 falsely PASSED with +0.28). (MED) +6h control looked past the log's live end into structurally-empty territory, biasing control coverage down. (MED) 14d close-time window admits trades opened before the log start (Oct 10 20:50) that can never be covered. (MED) NULL pnl_usdt would crash both scripts. (LOW) window labelled +-60s used 61s; equal-timestamp opens sorted before closes; Fisher selfcheck was vacuous.",
+      "action": "fixed in both scripts (blocked trades occupy no slot + discriminating selfcheck case, control/log-window fairness restriction to n=303, pnl IS NOT NULL, window=60, closes-before-opens, Fisher asserted against the hand-computable 0.178-0.180) and ALL numbers above re-derived post-fix — slot-cap verdict unchanged (REJECTED) but its numbers were materially wrong before the fix; gate-census verdict unchanged (REJECTED) with corrected figures."
     }
   ],
   "recurring_problems": [
@@ -224,7 +230,7 @@
   "creative_improvements": [
     {
       "idea": "GATE-INTENT CENSUS WITH +6h CONTROL (new script, zero behavior)",
-      "result": "block-line coverage 10.3% vs control 4.9%; covered WR 41.7% > uncovered 36.1%; covered owns -0.44 of -4.09; a-priori chop/neutral/continuum-override cohort 215T 37.2% '-2.73' vs 134T 35.8% '-1.36' p=0.820 (7d p=0.456). VERDICT: REJECTED-WITH-DATA — logs so the 'gates were bypassed' route is not re-proposed from per-trade anecdotes"
+      "result": "block-line coverage 11.6% (35/303) vs control(+6h) 5.6% (17/303); covered owns '-0.38' of '-3.66'; WR 42.9% vs 35.1% Fisher p=0.714 = NOT significant; a-priori chop/neutral/continuum-override cohort 212T 37.7% '-2.41' vs 91T 31.9% '-1.25' Fisher p=0.362 (7d p=0.456), control p=0.786. VERDICT: REJECTED-WITH-DATA — gate intent does not identify the bleed; logged so the bypass-as-root-cause route is not re-proposed from per-trade anecdotes. Post-bug_hunter: control restricted to trades >=6h old (log live end) and opens >= log start (Oct 10 20:50), window 60s, NULL pnl excluded."
     },
     {
       "idea": "TAT variant-C PACK REFRESH (n=16)",
@@ -232,11 +238,15 @@
     },
     {
       "idea": "SIZE-REDUCE BOOK-LEVEL BINDING CENSUS (extends #92's function-level finding)",
-      "result": "283/349 = 81% of 14d closes sit at amount_usdt <= 11.5 (HL floor) -> 0.5x multiplier is floored away on 81% of the book; avg size 13.06, avg leverage 4.51. Notional below $11 is physically impossible, so the only notional-independent levers are count/frequency"
+      "result": "283/349 = 81% of 14d closes sit at amount_usdt <= 11.5 (HL floor) -> 0.5x multiplier is floored away on 81% of the book; avg size 13.06, avg leverage 4.51. Notional below $11 is physically impossible, so the only notional-independent levers are count/frequency",
+      "measurement": "283/349 (81%) of 14d closes at amount_usdt<=11.5 (HL min-notional floor), avg size 13.06, avg leverage 4.51 -> 0.5x binds on 19%. Slot replay 14d CORRECTED after bug_hunter HIGH (blocked trades must not hold a slot): time at concurrency 0:31.6% 1:33.3% 2:16.9% 3:9.2% 4:5.2% 5:2.9% 6:1.0%; cap2 blocks 127T 39W '-3.35' save +3.35 fk 30.5% FAIL (Fisher p=0.085); cap3 blocks 55T 20W '-0.89' save +0.89 fk 15.6% PASS but WR 36.4% vs kept 36.7% = noise (p=1.000); cap4 blocks a NET POSITIVE set '+0.59' (save -0.59); cap5 '-0.05'.",
+      "verdict": "REJECTED-WITH-DATA — the only cap with a real save (cap2, +3.35) fails the <20% winner-kill bar at 30.5%; the only fk-passing caps are noise (cap3 +0.89 at p=1.0, cap4/cap5 net-negative saves). Notional below $11 is physically impossible, leverage does not move pnl_usdt, so NO effective risk dial exists for the floor book other than not trading; documented so neither a slot cap nor a leverage-variant size-reduce is re-proposed."
     },
     {
       "idea": "SLOT-CAP COUNTERFACTUAL (new script, zero behavior) — measured and REJECTED-WITH-DATA",
-      "result": "time at concurrency: 0:31.6% 1:33.3% 2:16.9% 3:9.2% 4:5.2% 5:2.9% 6:1.0%. cap2 saves +3.66/14d but blocks 57/128 winners (fk 44.5% FAIL, Fisher p=0.267); cap3 saves +2.21 fk 24.2% FAIL (p=0.321); best fk-passing is cap4 = +0.28 (noise). Logged so neither a cap nor a 'reduce max-open' size-reduce variant is re-proposed"
+      "result": "time at concurrency: 0:31.6% 1:33.3% 2:16.9% 3:9.2% 4:5.2% 5:2.9% 6:1.0%. cap2 saves +3.66/14d but blocks 57/128 winners (fk 44.5% FAIL, Fisher p=0.267); cap3 saves +2.21 fk 24.2% FAIL (p=0.321); best fk-passing is cap4 = +0.28 (noise). Logged so neither a cap nor a 'reduce max-open' size-reduce variant is re-proposed",
+      "measurement": "283/349 (81%) of 14d closes at amount_usdt<=11.5 (HL min-notional floor), avg size 13.06, avg leverage 4.51 -> 0.5x binds on 19%. Slot replay 14d CORRECTED after bug_hunter HIGH (blocked trades must not hold a slot): time at concurrency 0:31.6% 1:33.3% 2:16.9% 3:9.2% 4:5.2% 5:2.9% 6:1.0%; cap2 blocks 127T 39W '-3.35' save +3.35 fk 30.5% FAIL (Fisher p=0.085); cap3 blocks 55T 20W '-0.89' save +0.89 fk 15.6% PASS but WR 36.4% vs kept 36.7% = noise (p=1.000); cap4 blocks a NET POSITIVE set '+0.59' (save -0.59); cap5 '-0.05'.",
+      "verdict": "REJECTED-WITH-DATA — the only cap with a real save (cap2, +3.35) fails the <20% winner-kill bar at 30.5%; the only fk-passing caps are noise (cap3 +0.89 at p=1.0, cap4/cap5 net-negative saves). Notional below $11 is physically impossible, leverage does not move pnl_usdt, so NO effective risk dial exists for the floor book other than not trading; documented so neither a slot cap nor a leverage-variant size-reduce is re-proposed."
     }
   ],
   "pre_reg_rechecks": {
@@ -264,6 +274,11 @@
       "run": 96,
       "change": "TAT flip pack readiness",
       "verify": "fire count 15 -> 16 (POLYX #16365 added 12:26)"
+    },
+    {
+      "run": 98,
+      "change": "bug_hunter verification of the two shipped scripts (mandatory post-change step)",
+      "verify": "1 HIGH found in slot_cap (blocked-trades-hold-slots) + 2 MED fairness + 3 LOW — all fixed, selfchecks re-run PASS, every published number re-derived"
     }
   ],
   "last_run_verify_97": "all PASS: arm_leak selfcheck | entry_feature selfcheck | recovery_replay selfcheck (200/208 vacuity assert) | kill flags 0 post-kill opens (doji max open 10-16 17:43 < re-kill commit 20:40; vb+ max 10-13 19:40 < kill 21:42; vb- 10-15 14:24 < kill 17:45; hmacd 0) | floor-45 0 knife<35 violations (PUMP rsi_exec 33.39 = known #80 1m-vs-5m source split, gate read 43.4) | rsi_drift 12/132 stamped | HML-SHADOW live_pnl flowing 13:43 trade 16365 | SIZE-REDUCE-SHADOW 5 lines today | 0 Tracebacks Oct 20-23 (4 total, last Oct 18) | protected flags untouched by c4edf08 | session lock absent (no /tmp/hermes-session-active.lock)",

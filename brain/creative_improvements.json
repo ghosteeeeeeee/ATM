@@ -7324,5 +7324,17 @@
     "category": "steer quality",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-23",
+    "run": 98,
+    "correction": true,
+    "idea": "BUG_HUNTER ROUND ON RUN #98 SHIPS — slot-cap replay bug found and every number re-derived",
+    "rationale": "Mandatory post-change verification. The HIGH finding invalidated the first slot-cap table (blocked trades still held their slot, inflating blocked-n, save and fk).",
+    "measurement": "Fixes: blocked trades no longer enter `active` (+ discriminating selfcheck A/B/C case), control restricted to trades >=6h old so +6h never reads past the log's live end, opens restricted to >= log start (Oct 10 20:50) -> census n 349->303, pnl IS NOT NULL, window 61->60s, closes sort before opens, Fisher selfcheck asserted at 0.178-0.180. POST-FIX numbers: gate census 11.6% vs control 5.6%, covered owns -0.38 of -3.66, WR 42.9 vs 35.1 p=0.714, override cohort p=0.362 (was 0.820) | slot cap cap2 save +3.35 fk 30.5% FAIL p=0.085, cap3 save +0.89 fk 15.6% PASS but p=1.000 noise, cap4/cap5 negative saves.",
+    "verdict": "both verdicts UNCHANGED (gate census REJECTED-WITH-DATA, slot cap REJECTED-WITH-DATA) but the pre-fix slot-cap figures I first published were materially wrong — correction recorded rather than overwritten.",
+    "category": "verification",
+    "status": "fixed",
+    "risk": "none"
   }
 ]
