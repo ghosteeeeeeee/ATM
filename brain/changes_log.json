@@ -2057,5 +2057,27 @@
     "after": "reachable assert, corrected message, explicit FAIL",
     "rationale": "mandatory post-change verification",
     "impact": "zero behavior — analysis scripts only; negative-path probes PASS"
+  },
+  {
+    "timestamp": "2026-10-23T13:47:49Z",
+    "agent": "brain_auditor",
+    "change": "New gate-intent census: same-cycle block lines vs +6h control, plus a-priori chop/neutral/continuum-override cohort with Fisher",
+    "type": "infra",
+    "file": "brain/analysis/loser_gate_coverage_2026-10-23.py",
+    "before": "none",
+    "after": "script with --selfcheck PASS",
+    "rationale": "test the watchdog's 'gates bypassed or late' claim as a census instead of per-trade anecdotes",
+    "impact": "zero behavior (read-only); verdict REJECTED-WITH-DATA, route closed"
+  },
+  {
+    "timestamp": "2026-10-23T13:47:49Z",
+    "agent": "brain_auditor",
+    "change": "Slot-cap counterfactual for concurrent-position caps 2-6 with fk arithmetic",
+    "type": "infra",
+    "file": "brain/analysis/slot_cap_counterfactual_2026-10-23.py",
+    "before": "none",
+    "after": "script with --selfcheck PASS",
+    "rationale": "#92 named count/frequency as the only remaining size-reduce lever; measure before proposing",
+    "impact": "zero behavior; REJECTED-WITH-DATA (cap2/3 fail fk 44.5%/24.2%, cap4 saves only +0.28)"
   }
 ]

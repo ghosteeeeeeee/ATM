@@ -7280,5 +7280,49 @@
     "category": "instrumentation",
     "status": "shipped",
     "risk": "none (analysis script only)"
+  },
+  {
+    "date": "2026-10-23",
+    "run": 98,
+    "idea": "GATE-INTENT CENSUS WITH +6h CONTROL (loser_gate_coverage_2026-10-23.py, --selfcheck PASS)",
+    "rationale": "Watchdog asserted '4/6 losers violated existing gates — bypassed or late'. Tested as a census with a control instead of per-trade anecdotes: a block line for the same token+direction within +-60s of open = gate intent on that tape at that moment.",
+    "measurement": "14d n=349: block coverage 10.3% vs control(+6h) 4.9%; covered WR 41.7% vs uncovered 36.1%; covered pnl -0.44 of -4.09 total; 0 of 6 24h losers had any same-cycle block. A-priori chop/neutral/continuum-override cohort (gate-name semantic, not pnl-selected) 215T 37.2% '-2.73' vs complement 134T 35.8% '-1.36', Fisher p=0.820 (7d p=0.456, n=85/47).",
+    "verdict": "REJECTED-WITH-DATA — gate intent does not identify the bleed; logged so the bypass-as-root-cause route is not re-proposed. Real per-trade mechanism = documented ALLOW decisions (waiver x2, ceiling bypass x1, in-band x1), all CEO/waiver-gated.",
+    "category": "root-cause audit",
+    "status": "rejected",
+    "risk": "none (read-only script)"
+  },
+  {
+    "date": "2026-10-23",
+    "run": 98,
+    "idea": "TAT VARIANT-C PACK REFRESH at n=16 fires",
+    "rationale": "Pre-registered bar (15 fires) was met at #93; POLYX #16365 added the 16th in-scope fire, so recompute before the CEO GO so the pack ships with fresh numbers.",
+    "measurement": "16 in-scope unique trades (bb-bounce + ai-trader+ excl manual/pending). BASE: 16 cuts, net +8.01pp, kills 7/7 winners (fk 100% — never ship). VARIANT-C (cut only when fire-time live_pnl<0): 7 cuts, net +13.40pp, fk 0/7 = 0%, sign 7/7 p=0.008, split halves +4.99/+8.40, ex-top-contributor +9.18pp. Cuts: WLD +0.32, BANANA +2.07, ME +2.60, LTC +1.47, NEO +2.32, WLFI +4.22, POLYX +0.40(open).",
+    "verdict": "all three pre-registered data criteria MET and stronger than #93 (16>=15 fires, fk 0%<20%, net>0). Caveats unchanged: n=7 cuts<20, no 30d OOS (shadow shipped Oct 16), fees unmodeled, fire-time pnl is a poll snapshot not a candle fill (#17).",
+    "category": "exit engine",
+    "status": "ready-ceo-go",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23",
+    "run": 98,
+    "idea": "SIZE-REDUCE BOOK-LEVEL BINDING CENSUS + SLOT-CAP COUNTERFACTUAL (both measured, slot cap REJECTED)",
+    "rationale": "#92 proved the 0.5x multiplier is floored away at function level; this run measures how much of the BOOK sits at the floor and then evaluates the count-lever #92 named (concurrent-position cap) so nobody re-derives it later.",
+    "measurement": "283/349 (81%) of 14d closes at amount_usdt<=11.5 (HL min-notional floor), avg size 13.06, avg leverage 4.51 -> 0.5x binds on only 19% of trades. Slot replay 14d: time at concurrency 0:31.6% 1:33.3% 2:16.9% 3:9.2% 4:5.2% 5:2.9% 6:1.0%; cap2 blocks 170T 57W '-3.66' save +3.66 fk 44.5% FAIL (Fisher p=0.267); cap3 blocks 96T 31W '-2.21' save +2.21 fk 24.2% FAIL (p=0.321); cap4 blocks 42T 16W '-0.28' fk 12.5% PASS save +0.28; cap5 +0.13.",
+    "verdict": "REJECTED-WITH-DATA — every cap with a meaningful save kills >20% of winners, the only fk-passing caps are noise. Notional below $11 is physically impossible, leverage does not change pnl_usdt, so NO effective risk dial exists for the floor book other than not trading; documented so neither a slot cap nor a leverage-variant size-reduce is re-proposed. Residual lever = CEO accept-as-designed vs frequency throttle (pre-register if ever proposed).",
+    "category": "risk guardrail",
+    "status": "rejected",
+    "risk": "none (read-only script)"
+  },
+  {
+    "date": "2026-10-23",
+    "run": 98,
+    "idea": "WATCHDOG STEER LIVENESS — re-read POLYX exit condition before acting",
+    "rationale": "The urgent exit steer keyed on '1m closes do not hold >0.0345'. Re-tested at 13:36 (true: closes stepped 0.034500->0.034200, never above entry) and again at 13:44 where it REVERSED (close 0.0346, DB +0.264% unrealized). Acting 8 minutes later on the stale text would have closed a trade the market had just turned.",
+    "measurement": "candles_1m POLYX: 13:10-13:33 flat 0.034500/0.034400, 13:34-13:39 0.034300/0.034200 (steer true), 13:43 0.0345, 13:44 0.0346 (steer false); DB current_price 0.034599 pnl_pct +0.2637; TAT fires flipped negative(-0.29 at 13:43) to positive(+0.17 at 13:45).",
+    "verdict": "no action taken; demonstrates the #84 steer-validity/retraction rule working inside a single audit run. Recommendation: watchdog re-tests condition at emit time and appends 'condition tested HH:MM' (prompt convention only).",
+    "category": "steer quality",
+    "status": "suggested",
+    "risk": "none"
   }
 ]
