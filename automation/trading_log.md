@@ -14391,3 +14391,24 @@ Final set: ['BTC']
 - 7d `-$3.06` vs `-$3.12` last hour — stable, size-reduce auto-clear ETA ~19:35 UTC today
 - CONF_FLOOR=30 bare-only + TAT variant-C still blocked on CEO rulings / vacation file
 - Waiver expiry Oct 24 (tomorrow)
+
+## 2026-10-23 14:28 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.14 (WR: 0%) | 24h: 14T 7W `-$0.11` (50%) | 7d: 130T 36.2% `-$3.04` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade: POLYX bb-bounce-v2-long+ LONG hard_sl -$0.14/-1.26% — single loss, no kill trigger (n=1 <3)
+- atr_sl_hit 0/14 = 0% (<40%) over 24h — dominant close = profit-monster-trail (6T +$0.47), winners riding
+- No 0%WR signal with 3+ trades last hour
+- No negative-hour streak (12:30 red, 13:30 empty, this hour 1 loss — not 3 consecutive red)
+- Frequency 1/hr — not overtraded (limit 20)
+- 1 open: ME volume-buildup- SHORT flat — bracketed, let it ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d -$3.04 vs -$3.06 last hour — size-reduce still active (file 0.5x)
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
+- Waiver expiry Oct 24
