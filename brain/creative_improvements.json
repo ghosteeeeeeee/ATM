@@ -7043,5 +7043,23 @@
     "category": "sizing",
     "status": "rejected_with_data",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T04:50:00Z",
+    "idea": "ATR-SL early-death coverage grid — universal fast-stall REJECTED-WITH-DATA; stall cuts stay signal-scoped",
+    "rationale": "atr_sl_hit is the #1 7d bleed line (43T -$2.97) and 17/43 (40%, -$1.42) die before MFE-CUT's 45m window opens. Tested a universal T in {20,30,45} x MFE {0.10,0.20} grid on 14d: best net cell T>=30/MFE<0.20 saves $5.08 (60T) but kills 62 winners $4.89 = net +$0.19 noise; T>=45/MFE<0.20 net negative; T>=20 clearly negative. Early deaths concentrate in pump-chain- family (18/33 n>=3 cells, avg hold 22-26m).",
+    "expected_impact": "Prevents a universal stall-cut ship that would fail the fk bar; confirms signal-scoped MFE-CUT (Oct 25) is the only valid route",
+    "category": "exit engine",
+    "status": "rejected_with_data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T04:50:00Z",
+    "idea": "EARLY-DEATH LEDGER standing KPI (zero code): weekly % of SL-family exits before 45m",
+    "rationale": "Baseline this run: 7d 17/43 = 40% of atr_sl_hit deaths unreachable by any 45m stall rule. Tracking weekly detects entry-speed degradation without touching behavior. Pre-registered criteria for any scoped fast-stall: family 30d early-atr_sl n>=20 AND scoped fk<20% AND net > +$1.00.",
+    "expected_impact": "Measurement only — flags when entry quality is worsening before PnL shows it",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
