@@ -14106,3 +14106,24 @@ Final set: ['BTC', 'INJ']
 - 7d '-$3.39' vs '-$3.44' last hour — flat, no new bleed
 - BTC SHORT open ~7h — still at EMA300 pin, exit rule unchanged
 - CONF_FLOOR=30 bare-only ships Oct 23 (audit #85)
+
+## 2026-10-23 01:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.03 (WR: 0%) | 24h: 6T 4W '+$0.31' | 7d: 150T 37.3% '-$3.55' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- BTC ai-trader-pending SHORT #16353 exited UNIVERSAL_MAX_HOLD (-1.53% account, ~8h hold) — max-hold timer not SL, no bleed
+- atr_sl_hit 0/6 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour — no kill trigger (ai-trader-pending n=1)
+- No negative-hour streak (23:00 green +$0.07, 01:00 red -$0.03, not consecutive)
+- Frequency 1/hr — not overtraded (limit 20)
+- 0 open positions — clean slate
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d '-$3.55' vs '-$3.39' last hour — single -$0.03 loss, no structural issue
+- 24h '+$0.31' on 6T (67% WR) — 5th green window
+- CONF_FLOOR=30 bare-only ships today (Oct 23) per audit #85 — watch for first fires

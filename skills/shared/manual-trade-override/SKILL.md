@@ -247,6 +247,14 @@ with the engine on a temp state path — never the live state file.
    fast tape (still a live, workable trade — entry 281pt worse, SL/TP
    unchanged). Report the slip; a fill ALREADY beyond the SL is a bug
    event — stop and report (fill-sanity engine guard pending CEO ruling).
+10. **The TP must be reachable within the 8h max-hold at prevailing ATR.**
+    `UNIVERSAL_MAX_HOLD_MINUTES = 480` force-closes every trade by TIME —
+    a thesis-true trade still exits at whatever price the clock finds.
+    #16353: TP 80,300 sat 839pts (~1.6x 1h ATR) below entry in 8-flip
+    chop; MFE in 8 hours was 91pts, max-hold closed it −1.53% (SL never
+    hit, exit still beat holding). Contrast #16351: 732pt TP filled in
+    2h17m on fresh momentum. Rule: in chop/mixed scale TP to ≈1x 1h ATR
+    of realistic momentum travel; deep-shelf TPs are for TREND + volume.
 
 **Tranche adds to an existing position:** brain.py's duplicate guard blocks
 a second same-coin open — for a CEO-directed add pass `--force`

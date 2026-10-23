@@ -1620,3 +1620,15 @@
 - **WARN** (1x): `disk: / at 85% used (18G free) — at warning threshold`
 - **WARN** (1x): `watchdog: signals 3/5min below min 20; cleaned 5 stale locks (pipeline_heartbeat, guardian_closing, hotset_json, signal_compactor_critical, hotset_last_updated)`
 - **AUTO-FIX**: none needed — no logs >7d to compress (0 files); locks self-cleaned by watchdog; all timers active; signals flowing (31/hour). Disk flagged for CEO: largest consumers are data/coin_tracker.db (3.3G), session_brain.db (1.5G), candles.db (1.2G).
+
+## Error Alerts — 2026-10-23 01:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2999s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2998s left, N failures)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK mid-band death band: N.N in N-N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3360s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3360s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3423s left, N failures)`
