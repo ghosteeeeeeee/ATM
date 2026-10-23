@@ -1903,5 +1903,27 @@
     "after": "adverse-first anchor: 14d 206 losers = 40 never-adverse / 137 recovered-after-adverse / 29 never (17.5%); 48h = 6/16/1 (SYRUP stale); assert passes at 96.1% vacuity",
     "rationale": "corrected method must be reproducible across runs, not re-derived",
     "impact": "zero live behavior; replaces the invalid measurement"
+  },
+  {
+    "timestamp": "2026-10-23T00:48:00Z",
+    "agent": "brain_auditor",
+    "change": "trade_watchdog_prompt.md: added mandatory Regime Flip-Rate KPI section (compute aggregate/BTC flips per 24h from logs/15m_regime.log; >=6 flips/day => high-churn => condition-based steers + state the direction SOURCE)",
+    "type": "doc",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "no flip-rate guidance; snapshot-directional prose allowed without churn context or source",
+    "after": "flip-rate computed before any direction-flavored steer, source (aggregate vs regimes.BTC vs continuum) required, measured baseline 22/20 flips per 24h embedded",
+    "rationale": "#85 creative #2 adopted after measurement: 22 aggregate flips/24h = 3.7x the 6/day threshold; 00:15 aggregate flipped SHORT_BIAS->LONG_BIAS while BTC stayed NEUTRAL",
+    "impact": "zero live behavior; steer quality only"
+  },
+  {
+    "timestamp": "2026-10-23T00:48:00Z",
+    "agent": "brain_auditor",
+    "change": "brain/fk_definitions.md: pinned the 4 fk denominator definitions + CONF_FLOOR=30 bare-only ship-time table; CONF_FLOOR ship HELD pending CEO fk-definition ruling (fkA-scope at ship time = 20.0% >= 20% pre-registered bar)",
+    "type": "doc",
+    "file": "brain/fk_definitions.md",
+    "before": "fk definition chosen ad hoc per run; fkA slid 16.7%->19.0%->20.0% across #83/#85/#86 on window aging",
+    "after": "definitions named and pinned (fkA-literal / fkA-family / fkA-scope / fkB), ship-time table 14d+30d, pre-registration trigger honored (>=20% => CEO ruling before ship)",
+    "rationale": "#85 next_action 'fk-definition pinned in writing'; the ship decision flips entirely on definition+window (3.2% vs 20.0%)",
+    "impact": "no live change; unblocks a same-day CONF_FLOOR ship once CEO rules"
   }
 ]

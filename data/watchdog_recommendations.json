@@ -1,20 +1,20 @@
 {
-  "timestamp": "2026-10-23T00:14:21.469188+00:00",
+  "timestamp": "2026-10-23T00:44:21.718754+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "continuum": "AT",
     "volatility": "NORMAL",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "NORMAL",
-    "linreg_alignment": 0.0,
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 1,
   "deep_analysis": "Data gathered. NEO SHORT closed green at 23:44 (+0.07, profit-monster-trail) \u2014 watchdog snapshot was 11 seconds pre-close. Only open trade is BTC SHORT #16353. Writing analysis:\nNo new AI trader pick \u2014 last pick (NEAR SHORT, watchlist-only) written 23:19 is 27 min old, inside the 45-min window. `AI_TRADER_ENABLED=False` regardless.\n\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (0 long, 1 short)  [NEO SHORT closed +0.07 at 23:44 \u2014 trail win]\nUnrealized PnL: -0.03 USDT\nRegime: SHORT_BIAS (BTC 15m+4h, 84S/4L/51N) | Vol: crushed (BTC 5m bar 0.053%)\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning] [profit_lock/stale] BTC SHORT #16353 \u2014 6.7h open, max favorable\n   +0.11%, trail never armed (needs +0.40%). This IS the hard_max_loss\n   signature (7d n=19, 0% WR). Direction correct (below EMA300 30 min,\n   both timeframes SHORT_BIAS) but entry was range-bottom (81139 vs 4h\n   range 81200-81568) \u2014 wrong micro-location for a short.\n   Condition to HOLD: 1m stays below EMA300 (81367).\n   Condition to EXIT: 1m closes >81400 AND holds 15-30m\n     (prior condition verified NOT triggered \u2014 23:06/23:14 pokes\n      both closed <81400, reverted in 4 min). age=2 cycles unexecuted.\n   If still no trail arm by 01:14 UTC (8h): exit as stale regardless.\n\ud83d\udfe2 [info] NEO SHORT closed +0.07 profit-monster-trail (meta_rsi 66.7).\n   3rd trail-family win in 24h. Zero losses in last 24h (4W/1L-flat).\n\ud83d\udfe2 [info] No new AI trader pick \u2014 NEAR SHORT 23:19 still within 45-min\n   window. Watchlist-only (AI_TRADER_ENABLED=False).\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nDirection right, location wrong. Everything aligned short \u2014 BTC both\ntimeframes SHORT_BIAS, aggregate 84S/4L, auto-trader short score 25 \u2014\nbut the one open trade shorted the BOTTOM of the 4h range. 6.7h, +0.11%\nbest, no room for trail to arm before a bounce. Fresh-setup test: I\nwould NOT open this today; range-high shorts (81500+) were the winning\nsetup. Volatility is crushed (0.053% avg 5m bar) \u2014 nothing runs to TP\nin this tape. Prior exit steers correctly retracted/verified: condition\n(1m >81400 15-30m) tested twice, failed both times, price now back below\nEMA300 for 30 consecutive minutes.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Hold BTC SHORT only while 1m stays below EMA300 81367; exit on a\n   1m close >81400 with 15-30m hold. If no trail arm by 01:14 UTC,\n   stale-exit \u2014 don't wait for SL.\n2. Keep hunting SHORTs at range highs with meta_rsi 60-70 \u2014 that band\n   is 3/3 in 24h and 7d-confirmed. Avoid range-bottom shorts (no room).\n3. Brain auditor: pump-chain both polarities and volume-breakout-long+\n   are the top 30d bleeders (~140 trades, WR 19-26%) \u2014 flag for weekly\n   tune.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\nCycle complete. Analysis merged into `watchdog_recommendations.json`, memory stored.\n\n**TLDR:** NEO SHORT closed +0.07 via trail (watchdog snapshot was 11s pre-close); only open trade is BTC SHORT #16353 \u2014 right direction (SHORT_BIAS everywhere, below EMA300 30min) but range-bottom entry means hard_max_loss signature (+0.11% max favorable in 6.7h). Standing exit condition verified untriggered; hold while 1m below EMA300 81367, stale-exit if no trail arm by 01:14 UTC. 24h: 4W/0L, +0.34. No new AI trader pick (NEAR SHORT 23:19 within window, watchlist-only).\n",

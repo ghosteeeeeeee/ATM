@@ -6924,5 +6924,61 @@
     "category": "entry sniper",
     "status": "rejected_with_data",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T00:48:00Z",
+    "run": "brain_auditor #86",
+    "idea": "RANGE-LOCATION SHORT gate — block shorts entered in the bottom half of the prior 16h range",
+    "rationale": "Watchdog's diagnosis of BTC #16353 (shorted the range bottom, no room to fall) generalized into a filter and measured on local 1h candles.",
+    "measured": "14d SHORT top-half n=41 '+0.68' vs bottom-half n=48 '-1.57' t=2.08 (p~0.04) — then OOS FAILS: 7d t=-0.27 (reversed), 30d t=1.13 ns ('-0.12' top-half); fk(book) 48/75 = 64% of 30d SHORT winners; confounder bottom-half = 68/131 pump-chain-. LONG side t=0.14.",
+    "expected_impact": "none — rejected",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T00:48:00Z",
+    "run": "brain_auditor #86",
+    "idea": "STALL-MARGINAL LEDGER — standing zero-code metric: PnL change per hour for trades held past 7h",
+    "rationale": "Quantifies whether the 8h UNIVERSAL_MAX_HOLD backstop is cutting stalls too late, independent of the arm-based levers.",
+    "measured": "14d n=10 held>=7h: mean marginal 7h->exit '-0.252%/trade' (sum '-2.52pp') but t=-1.22 p~0.25, 3/10 gained after 7h (+0.60/+0.46/+0.07); unrealized decay +0.905%@5h -> +0.634%@6h -> +0.283%@7h.",
+    "expected_impact": "no change — UNIVERSAL_MAX_HOLD stays 480; collapses into TAT/UGB/MFE-CUT if it passes",
+    "criteria": "re-measure at n>=20 AND p<0.05 AND post-7h-gainer share <20%",
+    "category": "exit engine",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T00:48:00Z",
+    "run": "brain_auditor #86",
+    "idea": "CONF_FLOOR_60 EARLY WARNING — fk bar pre-computed before the Oct 30 re-measure",
+    "rationale": "2 of 3 pre-registered criteria already true, so the fk bar is the only thing that can stop it — compute it now, not on the day.",
+    "measured": "bare pump-chain conf 30-59 (14d) 28T 7W '-0.37'; fk = 7/20 = 35% of bare winners > 20% bar -> FAILS today",
+    "expected_impact": "prevents a wasted Oct 30 run and an accidental over-broad floor",
+    "category": "entry sniper",
+    "status": "measured_will_fail",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T00:48:00Z",
+    "run": "brain_auditor #86",
+    "idea": "FLIP-RATE KPI ADOPTED into the watchdog prompt (#85 creative #2 executed)",
+    "rationale": "22 aggregate flips / 24h and 20 BTC-15m flips / 24h vs the 6/day threshold = 3.7x; direction states survive ~1h, so snapshot-directional steer prose is structurally stale by the next cycle.",
+    "measured": "96 dumps/24h; live proof 00:15 aggregate SHORT_BIAS->LONG_BIAS (alt long_bias 11->40) while regimes.BTC stayed NEUTRAL and continuum LEAN_BEAR — sources disagree, prose without a source is unauditable",
+    "expected_impact": "steer quality: condition-based wording + stated source, shipped as a mandatory prompt section (zero live behavior)",
+    "category": "chop detection / steer quality",
+    "status": "implemented",
+    "risk": "zero"
+  },
+  {
+    "date": "2026-10-23T00:48:00Z",
+    "run": "brain_auditor #86",
+    "idea": "session_brain INGEST HASH-DEDUP — replaces the 'rebuild the index' action",
+    "rationale": "The #82/#85 'index broken' diagnosis is wrong: equal scores are byte-identical duplicated text (161 sessions share a checkpoint prelude, 57 share skill markdown); chunks==vectors==392214. Rebuilding would not change retrieval, but dedup at ingest would.",
+    "measured": "dup groups: 389 chunks/161 sessions, 62/57, 384/8 (all identical text)",
+    "expected_impact": "higher top-k diversity for the same query cost; no index surgery",
+    "category": "tooling",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

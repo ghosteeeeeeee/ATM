@@ -229,6 +229,48 @@ without a retraction in between.
 minutes later). It was free *this time* — which is precisely why the retraction rule must
 exist before the first time it isn't.
 
+### Regime Flip-Rate KPI (MANDATORY — added 2026-10-23, brain_auditor #86)
+
+Before writing any direction-flavored steer ("stay short", "bias flipped long"), read the
+flip rate from the last 24h of `logs/15m_regime.log` — each JSON dump has `timestamp`,
+`aggregate.overall` and `regimes.BTC.regime`:
+
+```bash
+python3 - <<'PY'
+import json, datetime
+dumps, cur = [], []
+for line in open('/root/.hermes/logs/15m_regime.log'):
+    if line.startswith('{'):
+        if cur: dumps.append(''.join(cur))
+        cur = [line]
+    elif cur:
+        cur.append(line)
+        if line.startswith('}'): dumps.append(''.join(cur)); cur = []
+cut = datetime.datetime.utcnow() - datetime.timedelta(hours=24)
+agg = []; btc = []
+for d in dumps:
+    try: p = json.loads(d)
+    except Exception: continue
+    if datetime.datetime.fromisoformat(p['timestamp']) < cut: continue
+    agg.append((p['timestamp'], p.get('aggregate',{}).get('overall')))
+    btc.append((p['timestamp'], p.get('regimes',{}).get('BTC',{}).get('regime')))
+def flips(seq): return sum(1 for i in range(1,len(seq)) if seq[i][1]!=seq[i-1][1])
+print(f"aggregate flips/24h={flips(agg)}  BTC flips/24h={flips(btc)}  last={agg[-1] if agg else None}")
+PY
+```
+
+**Measured baseline 2026-10-23:** aggregate **22 flips/24h**, BTC 15m **20 flips/24h**
+(96 dumps). A 15m dump every 15 min means an average direction state survives **~1 hour**.
+
+- **≥6 flips/24h = high-churn tape** → any snapshot-directional steer decays within 1-2
+  cycles. Report flips/24h alongside the steer, and default to **condition-based** wording
+  (re-test the condition next cycle, retraction rule above) rather than "the bias is X now".
+- Also state **which source** the direction came from — the sources disagree:
+  2026-10-23 00:14 the aggregate was `SHORT_BIAS`, at 00:15 it flipped to `LONG_BIAS`
+  (alt long_bias 11→40) while `regimes.BTC` stayed `NEUTRAL` and continuum stayed
+  `LEAN_BEAR`. "Regime says X" without a source is unauditable.
+- Below 6 flips/24h, snapshot-directional prose is cheap — no extra ceremony needed.
+
 ## Step 6: AI Trader Signal (Hourly Pick)
 
 Every hour, if there are open slots (fewer positions than MAX_POSITIONS), you pick ONE coin that "makes sense right now" and write it to the AI trader state file. The pipeline signal (`ai_trader_signal.py`) executes it ONLY when `AI_TRADER_ENABLED = True` in hermes_constants.py — **check that flag before reporting**. While it is False (CEO disabled automated picks 2026-10-19), the pick is WATCHLIST-ONLY: it will NOT become a trade regardless of how good the precheck is.

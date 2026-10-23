@@ -1615,3 +1615,8 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3116s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3116s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3058s left, N failures)`
+
+## Error Alerts — 2026-10-23 00:42 UTC
+- **WARN** (1x): `disk: / at 85% used (18G free) — at warning threshold`
+- **WARN** (1x): `watchdog: signals 3/5min below min 20; cleaned 5 stale locks (pipeline_heartbeat, guardian_closing, hotset_json, signal_compactor_critical, hotset_last_updated)`
+- **AUTO-FIX**: none needed — no logs >7d to compress (0 files); locks self-cleaned by watchdog; all timers active; signals flowing (31/hour). Disk flagged for CEO: largest consumers are data/coin_tracker.db (3.3G), session_brain.db (1.5G), candles.db (1.2G).
