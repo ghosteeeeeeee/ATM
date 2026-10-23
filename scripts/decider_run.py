@@ -1090,7 +1090,19 @@ def _short_rsi_floor_bear_exempt():
     Callers must keep RSI < OVERSOLD_SHORT_RSI_MAX (35) hard-dead on every path
     (BANANA lesson — falling knife, no exemption). Fail-CLOSED on DB error: returns
     False → block, so a stale/broken continuum never opens the band by accident.
+
+    EXPIRY (brain_auditor #102): vacation_mode.json rules.unclog_waiver.expires was
+    read by nothing, so the planned Oct-24 lapse would never have happened. Gate it
+    here — every decider flip#1 call site routes through this one helper. Fail-closed:
+    unreadable expiry → False → band blocks. Flip#2 (volgate) intentionally untouched.
     """
+    try:
+        from waiver_expiry import flip1_active
+        if not flip1_active():
+            log('  🚫 [UNCLOG-EXPIRED] flip#1 waiver expired — SHORT RSI<floor bear exemption lapsed (band blocks again)')
+            return False
+    except Exception:
+        return False
     try:
         _sr_conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
         try:

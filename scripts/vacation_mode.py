@@ -46,6 +46,16 @@ def enable(reason='T on vacation'):
             'ceo_every_30min': True,     # CEO checks every 30 min
         }
     }
+    # Re-enable must not clobber hand-added rules — rules.unclog_waiver.expires is now a
+    # load-bearing timestamp read by waiver_expiry.flip1_active(); dropping it would lapse
+    # the CEO unclog band early and silently (brain_auditor #102). Read BEFORE overwriting.
+    try:
+        with open(SWITCH_PATH) as f:
+            _prev_rules = json.load(f).get('rules') or {}
+        if 'unclog_waiver' in _prev_rules:
+            config['rules']['unclog_waiver'] = _prev_rules['unclog_waiver']
+    except Exception:
+        pass
     with open(SWITCH_PATH, 'w') as f:
         json.dump(config, f, indent=2)
     print(f"✅ Vacation mode ENABLED: {reason}")

@@ -204,6 +204,8 @@ def precheck(coin, direction, conf=None):
             # CEO UNCLOG note (2026-10-22): pipeline now EXECUTES [35,45) SHORTs under
             # BTC bear structure and hard-blocks only the <35 knife — annotate so this
             # advisory doesn't contradict live behavior.
+            # EXPIRY (brain_auditor #102): the band note must lapse with the waiver or
+            # precheck starts advising the opposite of live behavior after 2026-10-24T00:00Z.
             _band_note = ''
             if not passed:
                 try:
@@ -212,7 +214,15 @@ def precheck(coin, direction, conf=None):
                         if rsi < OVERSOLD_SHORT_RSI_MAX:
                             _band_note = f' | PIPELINE: <{OVERSOLD_SHORT_RSI_MAX} = hard knife block everywhere'
                         else:
-                            _band_note = f' | PIPELINE: [{OVERSOLD_SHORT_RSI_MAX},{SHORT_RSI_HARD_FLOOR}) EXECUTES under BTC bear structure (CEO unclog 2026-10-22)'
+                            try:
+                                from waiver_expiry import flip1_active as _pre_flip1
+                                _pre_on = _pre_flip1()
+                            except Exception:
+                                _pre_on = False
+                            if _pre_on:
+                                _band_note = f' | PIPELINE: [{OVERSOLD_SHORT_RSI_MAX},{SHORT_RSI_HARD_FLOOR}) EXECUTES under BTC bear structure (CEO unclog 2026-10-22)'
+                            else:
+                                _band_note = f' | PIPELINE: [{OVERSOLD_SHORT_RSI_MAX},{SHORT_RSI_HARD_FLOOR}) BLOCKED (unclog waiver expired 2026-10-24)'
                 except Exception:
                     pass
             check(f'RSI {rsi_short_min}-{rsi_short_max}', passed, f'RSI={rsi:.1f}{_band_note}')

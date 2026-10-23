@@ -7428,5 +7428,33 @@
     "category": "trend alignment",
     "status": "collect",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T18:05:00Z",
+    "idea": "Waiver-expiry gate (ships this run) + pre-registered post-lapse counterfactual read",
+    "rationale": "The expiry existed only as prose. Now that it is code, the lapse is measurable for free: gate_shadow BLOCK_RE records every [35,45) SHORT the re-blocked band stops, and waiver_scoreboard already counts allow-lines.",
+    "expected_impact": "Removes the current 4-loss volume-buildup- streak at its source; expected save ~+0.42/24h on the band's realized cohort, without touching the >=60 half that carries the family",
+    "category": "entry sniper",
+    "status": "shipped",
+    "risk": "low",
+    "read_criteria": "On 2026-10-24, waiver_scoreboard must show 0 [EXEC-RSI-FLOOR-BEAR] allow-lines after 00:00Z; BLOCK_RE records in [35,45) become the CEO's make-permanent-vs-lapse evidence"
+  },
+  {
+    "date": "2026-10-23T18:05:00Z",
+    "idea": "Hand-added directive keys must survive vacation_mode.py enable()/disable()",
+    "rationale": "A load-bearing timestamp living in a file whose writer rebuilds the dict is a silent-failure machine. enable() now carries unclog_waiver forward (verified off+on preserves it, fresh enable does not crash).",
+    "expected_impact": "Prevents an early, invisible lapse; zero behavior change in the normal path",
+    "category": "process guard",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T18:05:00Z",
+    "idea": "Chunk-free session_brain trust rule (no code): never cite session_brain retrieval as evidence while scores/text are duplicated across titles",
+    "rationale": "13th consecutive run where identical score+text records return under 6 different titles. #86 showed the corpus itself is duplicate-heavy (392,214 chunks == 392,214 vectors) so retrieval is 'correct' but useless for dedup.",
+    "expected_impact": "Prevents citing a duplicate as independent corroboration",
+    "category": "process guard",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

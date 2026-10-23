@@ -2090,5 +2090,27 @@
     "after": "log-truth attribution: 25 unique allow events / 16 tokens, 15 unique knife blocks, attributable closed 6 net -0.17, open 1",
     "rationale": "Oct 24 00:00Z waiver expiry decision needs the value the gate actually compared; metadata sources disagree (#80 fragmentation)",
     "impact": "zero live behavior (read-only analysis); makes the lapse/expiry verdict reproducible"
+  },
+  {
+    "timestamp": "2026-10-23T18:05:00Z",
+    "agent": "brain_auditor",
+    "change": "CEO unclog flip#1 waiver EXPiry gate — [35, floor) SHORT BTC-bear exemption now honours vacation_mode.json rules.unclog_waiver.expires (2026-10-24T00:00:00Z); new scripts/waiver_expiry.py as single fail-closed source of truth, wired into decider _short_rsi_floor_bear_exempt(), signal_compactor approval hard-floor, brain.py final money gate, ai_trader_precheck band annotation",
+    "type": "config",
+    "file": "scripts/waiver_expiry.py + decider_run.py + signal_compactor.py + brain.py + ai_trader_precheck.py",
+    "before": "expiry field existed in vacation_mode.json but was read by zero files — the planned Oct-24 lapse had no code path; band would have kept firing after T's stated expiry",
+    "after": "gated: inert (True) before the timestamp = byte-identical decisions; blocks at approval/ctx/exec/brain at/after it with pre-waiver log messages; fail-closed on any read/import error; flip#2 (volgate vb- HIGH/EXTREME) deliberately untouched",
+    "rationale": "T's directive included an expiry nobody implemented; 48h NEVER cohort is 3/4 this exact band; exemption-attributable cohort is 3W/4L net -0.34; would-block winners = 2.4% of 14d winners (bar 20%)",
+    "impact": "Zero behavior change before 2026-10-24T00:00:00Z (verified live, pipeline 17:56 rc=0); after, re-blocks the band that owns the current volume-buildup- losing streak. Expected save ~+0.42/24h on realized band cohort."
+  },
+  {
+    "timestamp": "2026-10-23T18:05:00Z",
+    "agent": "brain_auditor",
+    "change": "vacation_mode.py enable() preserves hand-added rules.unclog_waiver across re-enable (read previous file BEFORE overwrite)",
+    "type": "config",
+    "file": "scripts/vacation_mode.py",
+    "before": "enable() rebuilt the whole rules dict from scratch and silently dropped rules.unclog_waiver, so a routine vacation_mode.py on would lapse the band early",
+    "after": "unclog_waiver carried forward; fresh enable with no prior file unchanged",
+    "rationale": "root-cause guard for the expiry timestamp this run made load-bearing",
+    "impact": "no behavior change in the normal path; prevents an early invisible lapse. Verified in temp dir: off+on preserves waiver, fresh enable works, live file untouched."
   }
 ]

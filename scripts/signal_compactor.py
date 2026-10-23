@@ -4152,6 +4152,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                             _rsh_bear_override = True
                                     except Exception:
                                         pass
+                                # EXPIRY (brain_auditor #102): flip#1 waiver has a recorded
+                                # expiry nobody read. Fail-closed → reverts to the pre-waiver
+                                # block message below.
+                                if _rsh_bear_override:
+                                    try:
+                                        from waiver_expiry import flip1_active
+                                        if not flip1_active():
+                                            _rsh_bear_override = False
+                                    except Exception:
+                                        _rsh_bear_override = False
                                 if _rsh_bear_override:
                                     log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} but BTC bearish (oversold = continuation)")
                                 else:

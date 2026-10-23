@@ -401,6 +401,13 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                     print(f"[brain.py] ❌ REJECTED: {token} {direction} — SHORT RSI {_rsi_chk} < knife {OVERSOLD_SHORT_RSI_MAX} (BANANA lesson — no bearish override ever)")
                     return None
                 _bear_exempt = False
+                # EXPIRY (brain_auditor #102): flip#1 waiver expiry was read by nothing;
+                # fail-closed here so the final money gate reverts to pre-waiver blocking.
+                try:
+                    from waiver_expiry import flip1_active as _flip1
+                    _flip1_on = _flip1()
+                except Exception:
+                    _flip1_on = False
                 try:
                     import sqlite3 as _s3
                     _s3_conn = _s3.connect(os.path.join(paths.HERMES_DATA, 'continuum.db'), timeout=3)
@@ -411,7 +418,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                         ).fetchone()
                     finally:
                         _s3_conn.close()
-                    if (_s3_row and _s3_row[1] and (_time.time() - _s3_row[1]) < 600
+                    if (_flip1_on and _s3_row and _s3_row[1] and (_time.time() - _s3_row[1]) < 600
                             and _s3_row[0] in ('LEAN_BEAR', 'BEAR')):
                         _bear_exempt = True
                 except Exception:
