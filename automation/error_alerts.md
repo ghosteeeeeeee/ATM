@@ -1636,3 +1636,6 @@
 ## Error Alerts — 2026-10-23 01:43 UTC
 - **WARN** (1x): Disk usage at 85% on / (95G/118G, 18G free) — no logs older than 7d to compress; actively-written logs total 587M (pipeline.log 249M, signal-compactor.log 97M, 15m_regime.log 74M). Monitor; if >90% consider logrotate or truncating rotated segments.
 - **INFO**: ARB SHORT mid-band death band blocks (RSI 51.9 in 45-55) at 01:20-01:24 — filter working as designed, cooldown engaged, no action needed.
+
+## Error Alerts — 2026-10-23 02:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-23T01:44:22.227709+00:00",
+  "timestamp": "2026-10-23T02:14:22.744053+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
@@ -16,5 +16,5 @@
     "market_phase": "DECLINING",
     "trend_quality": "UP"
   },
-  "open_count": 0
+  "open_count": 1
 }
