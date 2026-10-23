@@ -14326,3 +14326,47 @@ Final set: ['BTC']
 - 7d `-$3.00` vs `-$3.03` last hour — stable
 - CONF_FLOOR=30 bare-only + TAT variant-C still blocked on CEO rulings / vacation file
 - Waiver expiry Oct 24
+
+## 2026-10-23 11:29 Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.07 (WR: 50%) | 24h: 11T 7W `+$0.29` (63.6%) | 7d: 139T 38.1% `-$2.86` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 trades: LTC warrior-sr-confirm- SHORT profit-monster-trail +$0.09/+4.08%; BTC ai-trader-pending LONG UNIVERSAL_MAX_HOLD -$0.02/-1.03%
+- atr_sl_hit 0/11 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour (bb-bounce n=1, ai-trader-pending n=2, both <3) — no kill trigger
+- No negative-hour streak (last 4h: -0.02, -0.11, -0.02, +0.09 — green, not 3+ consecutive red)
+- Frequency 2/hr — not overtraded (limit 20)
+- 2 open: CC SHORT (-0.07), ZRO SHORT (-0.01) — both volume-buildup-, bracketed, let them ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d `-$2.86` vs `-$3.00` last hour — slightly improving, size-reduce still active
+- CONF_FLOOR=30 bare-only still blocked on RAW-confidence pin (audit #85/#88/#90/#91/#92/#95)
+- Waiver expiry Oct 24
+- Size-reduce auto-clear ETA ~19:35 UTC today
+
+## 2026-10-23 12:30 Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.26 (WR: 0%) | 24h: 13T 7W `+$0.03` (53.8%) | 7d: 135T 36.3% `-$3.12` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 trades: CC volume-buildup- SHORT stale_exit -$0.15/-3.95%; ZRO volume-buildup- SHORT hard_max_loss -$0.11/-4.88% — both were the waiver-era [35,45) band opens flagged in audit #96, already expiring Oct 24
+- atr_sl_hit 0/13 = 0% (<40%) over 24h — no SL-tightness issue; dominant close = profit-monster-trail (6T, +$0.47) = winners riding
+- No 0%WR signal with 3+ trades last hour (volume-buildup- n=2 <3) — no kill trigger
+- No negative-hour streak (prior hour +$0.07 green)
+- Frequency 2/hr — not overtraded (limit 20)
+- 1 open: POLYX bb-bounce-v2-long+ LONG flat — let it ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d -$3.12 vs -$2.86 last hour — size-reduce still active, auto-clear ETA ~19:14-19:35 UTC today
+- volume-buildup- short family: 2 losses this hour but 14d 11T 81.8% +$0.46 (audit #93) — keep alive
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
+- Waiver expiry Oct 24
