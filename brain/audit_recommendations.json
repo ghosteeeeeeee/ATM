@@ -1,148 +1,176 @@
 {
-  "timestamp": "2026-10-23T21:41:15Z",
-  "run": 106,
+  "timestamp": "2026-10-23T22:53:21Z",
+  "run": 107,
   "agent": "brain_auditor",
-  "headline": "ARM-DECOMPOSITION: every bleeding signal's bleed sits ENTIRELY in its never-reached-arm cohort (pc+ never 28T 1W '-2.38' vs reached 16T 10W '+1.89'; pc- never 12T 0W '-0.96' vs reached 23T 8W '+0.69'; bb-bounce never 19T 0W '-1.79' vs reached 18T 16W '+0.80') = the queued levers (CONF_FLOOR / TAT variant-C / MFE-CUT) target exactly these cohorts; only reached-arm leak is pc- atr_sl_hit 13T 0W '-0.61' + hard_sl 4T '-0.11' round-trip = escalation #17 territory.",
+  "headline": "TWO FINDINGS. (1) ESCALATION #17 IS STALE — the exit-ladder candle OOS was CLOSED 2026-10-17 by two verdicts (brain/verdicts/2026-10-17_exit-ladder-tat-grid.md: 'P0 CLOSED, do not re-request a universal or progressive cut'; 2026-10-17_trail-arm-candle-oos.md) and has been re-printed as an open escalation 61 times since. The REAL remaining reached-arm leak is now quantified and re-scoped: atr_sl_hit reached-arm 14d = 33T 3.0% '-1.99', avg MFE 0.797% / MAX MFE 1.177% / 0 of 33 ever reached +1.50% vs profit-monster-trail avg MFE 0.756% and atr_trail_hit avg MFE 3.031% -> these are ARM-THEN-IMMEDIATE-REVERSAL trades that armed at +0.40 and fell back through the untouched ATR SL (avg MAE 0.341) before the ratchet's first rung could move it. Next measurement (pre-registered): what fraction of reached-arm trades ever see the stop tightened past entry, i.e. is the BE/ratchet path firing at all between arm and atr_sl_hit. (2) BUG SHIPPED: momentum_cache.trend was a dual-writer collision — 15m_regime_scanner.py:297 wrote it with threshold 0.05 on 15m slope 96x/day while 4h_regime_scanner.py:289 wrote it with threshold 0.10 on 4h slope 6x/day into the SAME momentum_cache(token) row; last writer won and the 15m scanner won ~94% of the time, so trades.entry_trend was a coin-flip between two timeframes. Fixed: trend is now 4h-scanner-owned, 15m no longer writes it. Zero trading behavior (no gate reads momentum_cache.trend; sniper_exit.py:161's trend branch is dead code comparing against 'rising'/'falling' which neither writer emits — it still works via regime_4h).",
   "session_brain_stats": {
     "used": "ideation only",
-    "note": "dup-heavy retrieval; no decision sourced from it (standing rule 14th run)"
+    "note": "dup-heavy retrieval; no decision sourced (standing rule 15th run)"
   },
   "trade_summary_24h": {
     "trades": 19,
     "wins": 8,
     "wr": 42.1,
     "pnl": "-0.47",
-    "by_signal": "volume-buildup- SHORT 7T '-0.36' (steer-001 class) | bb-bounce 2T '-0.25' | rest small"
+    "by_signal": "volume-buildup- SHORT 7T '-0.36' | bb-bounce 2T '-0.25' | ai-trader-pending x2 '-0.05' | pc+ '-0.07' | r2v2-long9 '-0.01' | winners: warrior-sr-confirm- 2T '+0.16', bb-squeeze+ 3T '+0.10', WLD/ICP/DYDX vb- trail '+0.11/+0.04/+0.16'"
   },
   "windows": {
-    "7d": "121T 38.0% '-2.22'",
+    "24h": "19T 8W 42.1% '-0.47'",
+    "7d": "121T 38.8% '-1.76'  <- BOTH size-reduce legs now PASS",
     "14d": "349T 36.7% '-4.50'",
-    "30d": "704T 42.6% '-5.71'"
+    "30d": "703T"
   },
   "mandate_numbers_restated_fresh": {
-    "trail_family_14d": "139T 109W 78.4% '+9.44'",
-    "hard_max_loss_14d": "77T 0W '-7.70'",
-    "reached_arm_14d": "164T 67.7% '+9.21'",
-    "never_reached_14d": "185T 9.2% '-13.71'",
-    "7d_exit_axis": "hard_max_loss 15T 0% '-1.88' | atr_sl_hit 31T 3.2% '-1.81' = #1/#2 bleed, both owned (TAT/MFE-CUT queued + escalation #17)"
+    "trail_family_14d": "119T 104W 87.4% '+10.12' (profit-monster-trail 87T 89.7% '+5.10' + atr_trail_hit 27T 77.8% '+4.31' + trail_sl 5T 100% '+0.71')",
+    "hard_max_loss_14d": "77T 0W 0.0% '-7.70'",
+    "armed_14d": "163T 110W 67.5% '+8.91' (mfe_pct>=0.40)",
+    "unarmed_14d": "174T 11W 6.3% '-13.99'",
+    "reached_arm_non_trail_leak_14d": "atr_sl_hit 33T '-1.99' | hard_max_loss 2T '-0.25' | hard_sl 6T '-0.19' | cut_loser 2T '-0.24' | offset by hard_tp '+0.94' + rr_resistance_break '+0.37' + UNIVERSAL_MAX_HOLD '+0.27'"
   },
-  "changes_from_last_run": [
+  "config_changes_applied": [
     {
-      "change": "#104 entry_regime_4h root-cause fix (feature_recorder.py:127 any-not-None gate + guardian delegation)",
-      "verified": "code present, guardian active, selfcheck PASS; 0 trades opened since 19:46Z = STILL UNTESTED BY TRAFFIC (first new trade is the test)"
+      "type": "bugfix",
+      "file": "scripts/15m_regime_scanner.py",
+      "change": "write_to_brain_cache no longer writes momentum_cache.trend (removed from INSERT column list, VALUES and ON CONFLICT SET). trend is now owned solely by 4h_regime_scanner.",
+      "before": "INSERT INTO momentum_cache (token, slope_15m, regime_15m, trend, updated_at) ... ON CONFLICT ... trend = EXCLUDED.trend",
+      "after": "INSERT INTO momentum_cache (token, slope_15m, regime_15m, updated_at) ... ON CONFLICT ... (trend untouched)",
+      "rationale": "Dual-writer collision: 15m scanner wrote trend from 15m slope with REGIME_SCANNER_TREND_THRESHOLD=0.05 every 15min; 4h scanner wrote trend from 4h slope with threshold 0.10 every 4h. Same column, same row, different thresholds, different timeframes — last writer wins and 15m runs 16x more often, so the 4h trend was destroyed continuously. feature_recorder.get_token_intel reads that column and stores it as trades.entry_trend, so entry_trend was a coin-flip. 4h scanner now also carries an ownership comment.",
+      "impact": "Zero trading behavior. No gate reads momentum_cache.trend (verified: only feature_recorder -> trades.entry_trend, and sniper_exit.py:161 whose trend branch is dead code comparing 'rising'/'falling' vs the writers' 'uptrend'/'downtrend'/'ranging'). Analysis correctness restored; entry_trend becomes unambiguously 4h going forward.",
+      "verification": "brain/analysis/trend_ownership_2026-10-23.py --selfcheck PASS: AST parse asserts 15m writes 0 / 4h writes 2 momentum_cache.trend sites; live Postgres round-trip on a scratch row proves the 15m statement shape preserves a 4h-written trend and the 4h shape still updates it.",
+      "config_change": false
     },
     {
-      "change": "#105 continuum_alignment_2026-10-23.py",
-      "verified": "--selfcheck PASS (verdict-lock p-values intact)"
-    },
-    {
-      "change": "#102 waiver_expiry gate",
-      "verified": "flip1_active()==True before 00:00Z, --selfcheck PASS (4 states), inert-until-timestamp as designed"
-    },
-    {
-      "change": "#103 TAT variant-C pack (units-correct)",
-      "verified": "--selfcheck PASS; refresh = 16 in-scope fires unchanged (bar 15), variant-C fk 0/7 net '+0.410' sign p=0.016"
+      "type": "creative",
+      "file": "brain/analysis/short_band_tape_state_2026-10-23.py",
+      "change": "New selfchecked analysis (H1 test). No production code touched.",
+      "config_change": false
     }
   ],
-  "config_changes_applied": [],
-  "config_change_reason": "0 changes: no candidate passes bars; review-queue constraints (T directive 18:35Z) honored — every lever is held/rejected/queued behind CEO rulings; no_signal_enable_disable still true; hermes_constants.py git diff EMPTY; CEO_PROTECTED_FLAGS 13/13",
+  "config_change_reason": "1 bugfix (data integrity, zero trading behavior — not a trading constant) + 1 analysis ship. NO trading-constant change: no candidate passes the pre-registered bars and the review-queue constraints (T directive 18:35Z: shadow data + significance n>=15 + p-value + OOS). no_signal_enable_disable still true. hermes_constants.py git diff EMPTY vs HEAD. CEO_PROTECTED_FLAGS 13/13.",
   "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py adverse-first anchor, --selfcheck PASS (vacuity 196/206 re-asserted)",
-    "24h": "n=11 = 2 never-adverse / 5 recovered-after-adverse / 4 NEVER",
-    "48h": "n=11 = 2/5/4",
+    "method": "brain/analysis/recovery_replay.py adverse-first anchor, --selfcheck PASS",
+    "48h": "n=11 = 2 never-adverse / 5 recovered-after-adverse / 4 NEVER",
     "NEVER": [
-      "ALT #16367 volume-buildup- '-0.17' rsi 41.18",
-      "CC #16363 volume-buildup- '-0.15' rsi 38.10",
-      "ZRO #16364 volume-buildup- '-0.11' rsi 43.33",
-      "PUMP #16370 r2v2-long9 '-0.01' trail giveback"
+      "ALT #16367 volume-buildup- SHORT '-0.17' rsi 41.18 hard_max_loss",
+      "CC #16363 volume-buildup- SHORT '-0.15' rsi 38.10 stale_exit",
+      "ZRO #16364 volume-buildup- SHORT '-0.11' rsi 43.33 hard_max_loss",
+      "PUMP #16370 r2v2-long9 LONG '-0.01' profit-monster-trail giveback"
     ],
-    "verdict": "3 of 4 NEVER = waiver-band [35,45) volume-buildup- shorts = the exact class the 00:00Z waiver-expiry gate re-blocks -> WRONG-SIDE REFUTED 37th consecutive run on corrected + independent evidence (#61 opposite-side p=0.116, #84 forward-return t=-0.04), never the vacuous open-anchored replay",
-    "new_patterns": 0
+    "verdict": "3 of 4 NEVER = waiver-band [35,45) volume-buildup- shorts = the exact class the 00:00Z waiver-expiry gate (#102) re-blocks -> WRONG-SIDE REFUTED 38th consecutive run on corrected + independent evidence (#61 opposite-side p=0.116, #84 forward-return t=-0.04), never the vacuous open-anchored replay.",
+    "new_patterns": 0,
+    "winner_contrast": "Same band, same family, opposite outcome within 8h: LOSERS 10:59-14:31 UTC (CC 38.10 / ALT 41.18 / ZRO 43.33, all EXTREME/NORMAL chop pin) vs WINNERS 19:02-22:39 UTC (CFX 36.17 '+0.27' / DYDX 36.51 '+0.16' / ICP 36.67 '+0.04' / MON 43.78 '+0.13', all under a sustained EMA300 break). This is what H1 tested — see creative_improvements, REJECTED-WITH-DATA."
   },
   "signal_quality_deep_dive": {
-    "new_sub50_targets_nge15": 0,
-    "owned_cohorts": "bb-bounce 37T 43.2% (TAT variant-C + MFE-CUT) / ai-trader+ 28T disabled / volume-breakout-long+ 16T killed / doji 20T killed / pump-chain+ 44T 25.0% + pump-chain- 35T 22.9% (CONF_FLOOR held; 30d pc+ 69T 25W '+1.78' = NO-KILL stands) / ai-trader-pending 13T n<15 CEO-domain / hl_copy 11T n<15 deferred",
-    "conf_split_pc+": "14d conf<30 24T 4W '-1.35' vs conf>=30 20T 7W '+0.86' = CONF_FLOOR story holds exactly; 7d <30 11T 1W '-0.97' of the '-1.09' bleed"
+    "new_targets": 0,
+    "detail": "14d n>=15 negatives, all owned: volume-breakout-long+ 15T 13.3% '-1.06' (killed) | bb-bounce-v2-long+ 37T 43.2% '-0.99' (TAT variant-C + MFE-CUT queued) | ai-trader+ 28T 39.3% '-0.89' (disabled) | doji-bottom-long 20T 40.0% '-0.62' (killed) | pump-chain+ 44T 25.0% '-0.49' (CONF_FLOOR held) | pump-chain- 35T 22.9% '-0.27' (CONF_FLOOR held). Positives: volume-buildup- 18T 66.7% '+0.23' | ai-trader-manual 15T 46.7% '+0.34' | r2v2-long3 15T 53.3% '+0.36'.",
+    "exit_axis_14d": "hard_max_loss 77T 0% '-7.70' | atr_sl_hit 84T 1.2% '-6.10' | hard_sl 11T 0% '-0.82' | trail_arm_timeout 18T 22.2% '-0.60' | profit-monster-trail 87T 89.4% '+5.10' | atr_trail_hit 27T 77.8% '+4.31'"
   },
   "watchdog_steer_triage": [
     {
-      "id": "steer-001",
-      "claim": "volume-buildup- losing streak 4 losses, '-0.36' over last 20",
-      "verdict": "ANSWERED WITH ZERO CONFIG — all 4 24h losers entry_rsi_14 35.14/38.10/41.18/43.33 entirely <45 = waiver-expiry gate re-blocks at 2026-10-24T00:00:00Z (<2.5h out); 14d vb- 17T 64.7% '+0.07' positive; watchdog's meta_rsi>=55 proposal only adds [45,55) = #96 rejected (fk 27.3% of 30d SHORT winners) -> DO NOT DISABLE, no new gate"
+      "steer": "steer-001 volume-buildup- losing streak 4 losses, net '-0.36' over last 20",
+      "verdict": "ANSWERED WITH ZERO CONFIG, 3rd run — and now carries COUNTER-evidence from the same night: the band produced DYDX '+0.16' (rsi 36.51) and ICP '+0.04' (rsi 36.67) trail wins at the same rsi levels as the losers. Fresh band fk: 14d 14/128 = 10.9% (save '+0.37') | 30d 23/299 = 7.7% (save '+1.24') | 7d save '+0.31'. The gate is net-saving and fires automatically at 00:00Z — no new gate, no disable. 14d vb- 18T 66.7% '+0.23' is positive."
     }
   ],
   "pre_registrations_fresh": {
-    "CONF_FLOOR_bare": "reproduces EXACTLY 33T 4W '-1.88'; fkA-literal 4/128=3.1% PASS | fkA-family AND fkA-scope 4/19=21.1% FAIL (2 definitions gated) | metadata final_confidence<30 = 0 rows -> RAW pin required at ship; HELD on CEO fk ruling + vacation",
-    "pump_chain_plus_kill": "MET-by-letter (14d 44T 25.0% '-0.49') -> RECOMMEND NO-KILL (30d 69T 25W '+1.78', conf>=30 14d '+0.86')",
-    "pump_chain_minus": "CANCEL stands (reached-arm cohort '+0.69' positive, bleed = never-armed conf<30 = CONF_FLOOR's target)",
-    "TAT_variant_C": "16 in-scope fires (bar 15) unchanged; fk 0/7, net '+0.410', sign p=0.016, both halves positive -> AWAITING CEO GO",
-    "waiver_lapse": "flip1_active()==True, expires 2026-10-24T00:00:00Z; waiver_scoreboard --selfcheck PASS; flip#2 decoupled for CEO",
-    "size_reduce": "0.5x file truth STAYS (7d 121T 38.0% WR leg PASS >=37.0, pnl '-2.22' leg FAIL < -2.00); auto-clear ~00:23-00:35Z; marker inert anyway (SIZE-REDUCE-SHADOW NO-OP every exec, base $11.00 = HL floor)"
+    "H1_band_tape_state": "REJECTED-WITH-DATA — band [35,45) SHORT split by sustained BTC-tape state (>=60 consecutive 1m closes below converged EMA300). 30d SUSTAINED 18T 38.9% '-0.01' vs NOT 38T 42.1% '-0.80', Fisher p=1.0000. Fails b1 (SUSTAINED n=18<20) AND b2 (p=1.00). fk of the proposed gate 24.2% at 30d and 28.6% at 14d also fail the <20% bar. MONITOR ONLY. Logged so it is never re-proposed from tonight's 4-win/3-loss anecdote.",
+    "C3_vb_pc_sustained_sentinel": "PRE-REGISTERED standing watch, zero code. vb-/pc- SHORT under SUSTAINED tape: 30d 39T 43.6% '+1.58' vs NOT 80T 37.5% '-1.33' (p=0.554) | 14d 18T 55.6% '+0.96' vs 50T 30.0% '-0.73' (p=0.086) | 7d 8T 75.0% '+1.01' vs 15T 20.0% '-0.87' (p=0.023). Same sign all three windows, edge STRENGTHENING toward now. LOCKED TRIGGER: 30d Fisher p<0.05 with same sign -> then propose a CONDITIONAL waiver replacement (allow [35,45) vb-/pc- SHORT only under sustained tape) with fresh fk. Currently p=0.554 -> monitor.",
+    "CONF_FLOOR_bare": "still HELD on (a) CEO fk-definition ruling (2 gated definitions: fkA-scope 21.1% and fkA-family fail at the 20% bar; fkA-literal 3.1% and fkB 12.5% pass), (b) RAW-column pin + blocked==33 self-check, (c) no_signal_enable_disable.",
+    "TAT_variant_C": "16 in-scope fires, criteria MET, AWAITING CEO GO. Corrected units +3.14pp (not +13pp).",
+    "size_reduce_0.5x": "BOTH LEGS NOW PASS -> AUTO-CLEARS on the next guardrail run (22:57Z). See drift_findings.",
+    "waiver_expiry_gate": "fires 2026-10-24T00:00:00Z, flip1_active()==True, selfcheck PASS. fk 10.9% 14d / 7.7% 30d, saves '+0.37'/'+1.24'. 3 open trades sit in the grandfathered band (CFX rsi 36.17, MON 43.78, SYRUP 38.46) — exiting is unaffected, no NEW band short may open after 00:00Z."
   },
   "last_run_verify": {
-    "selfchecks_PASS": [
-      "recovery_replay",
-      "waiver_expiry",
-      "waiver_scoreboard",
-      "tat_variant_c_pack",
-      "arm_leak",
-      "continuum_alignment"
-    ],
-    "kill_flags": "correct (doji-bottom/vb+/oversold/hmacd-mtf/ai-trader False; vb- True intended) + 0 post-kill opens 7d",
-    "floor45": "0 knife (<35) SHORT opens in 3d (19 opens checked)",
-    "protected": "13/13, hermes_constants.py git diff EMPTY",
-    "tracebacks": "4 total in pipeline.log, none new (last Oct 18)",
+    "recovery_replay": "selfcheck PASS",
+    "waiver_scoreboard_2026-10-23": "selfcheck PASS — allows 37, blocks 17, non-knife detect-blocks 0, shorts 15, attributable 11",
+    "arm_leak_2026-10-23": "selfcheck PASS — cells 337, leak 55 matches exit_reason detail",
+    "tat_forward_2026-10-23": "selfcheck PASS — predicate 8/8, 18 TAT closes",
+    "waiver_expiry_gate": "flip1_active True at 22:43Z, inert until 00:00Z",
+    "kill_flags": "7/7 correct; 0 post-kill opens 3d",
+    "protected_flags": "13/13",
+    "constants_git_diff": "EMPTY vs HEAD",
+    "tracebacks": "4 total in logs/pipeline.log, last Oct 11 — none new",
     "session_lock": "absent",
-    "timers": "live (pipeline/watchdog/compactor/price-collector all firing)"
+    "timers": "live — 15m-regime-scanner (last 22:45), 4h-regime-scanner (last 19:26, next 23:26), vacation-guardrail (last 22:27, next 22:57)",
+    "entry_regime_4h_fix": "LIVE AND NOW HAS TRAFFIC — 2 of 5 recent opens populated (DYDX 'LONG_BIAS', SYRUP 'NEUTRAL'); MON NULL is CORRECT, not a bug (MON is one of the 26 tokens the 4h scanner does not cover — momentum_cache has 157 rows, 131 with regime_4h; MON/GRASS/CC/GOAT etc. get slope_15m+regime_15m only). Cache coverage 131/157 tokens; 4h scanner writes 105, 15m scanner writes 129."
   },
   "drift_findings": [
     {
-      "finding": "#105 'watchdog stop field vs DB disagree' -> RESOLVED NON-BUG",
-      "detail": "both read trades.stop_loss live; position_manager ratchets the stop each poll as a trailing SHORT prices in profit (21:14 wd 0.05203704 -> 21:47 db 0.05195709) = profit lock TIGHTENING, not staleness; the earlier 0.05227486 vs 0.05203704 gap was the same ratchet across two read times. Downgrade MED -> closed."
-    },
-    {
-      "finding": "vacation_mode.json still true (no_constants_change=false + review queue since 18:16Z)",
       "severity": "MED",
-      "action": "T/CEO: vacation_mode.py off or correct the record — fk ruling, CONF_FLOOR, TAT variant-C GO all sit behind it"
+      "finding": "ESCALATION #17 STALE — 'exit-ladder candle OOS' has been printed as an open escalation 61 consecutive runs after the P0 was CLOSED on 2026-10-17 by brain/verdicts/2026-10-17_exit-ladder-tat-grid.md ('P0 CLOSED. No config change. Do not re-request a universal or progressive cut') and 2026-10-17_trail-arm-candle-oos.md. The boilerplate is now actively misleading — it points at a solved problem while the real leak (reached-arm atr_sl_hit, quantified above) goes unnamed.",
+      "action": "Re-scoped this run. Future runs must cite the RE-SCOPED item (reached-arm atr_sl_hit ratchet gap), never the closed exit-ladder P0."
     },
     {
-      "finding": "NEW LOW: regime_5m aggregate read LONG_BIAS 65/10/48 at 21:30 while BTC pins BELOW EMA300 (27 consecutive 1m closes below, '-0.104%', watchdog 15m SHORT_BIAS)",
-      "action": "token-level vs BTC-level source disagreement — verify the aggregate's tape-side before citing it as direction next run"
+      "severity": "MED",
+      "finding": "SIZE-REDUCE AUTO-CLEAR ETA WAS WRONG FOR A 3RD CONSECUTIVE RUN. #101/#105/#106 carried 19:14 / 19:35 / 00:23-00:35Z. The window has ALREADY aged clear: 7d now 121T WR 38.8% (>=37.0 RESUME) AND pnl '-1.76' (>= -2.00 CONFIRM) -> both legs of vacation_guardrail.py:365 pass NOW. Guardrail timer next fires 22:57Z and will auto-clear the marker. Note the marker is inert anyway (SIZE-REDUCE-SHADOW fires every exec and reports base=11.00 floored to 11.00 = 0% effective cut at the HL floor).",
+      "action": "No manual action — the timer does it. Do not re-carry an ETA; just re-read the 7d window each run."
     },
     {
-      "finding": "entry_regime_4h fix untested by traffic (0 trades opened since 19:46Z ship)",
       "severity": "LOW",
-      "action": "first new trade is the test — check all 4 fields non-null"
+      "finding": "vacation_mode.json rules CHANGED mid-day and prior drift claims are now half-stale: no_constants_change flipped to FALSE with a constants_change_review_queue (T directive 2026-10-23 18:35 UTC, mechanism 'propose -> CEO auto-approve-within-session', constraints shadow-data + significance n>=15 + p + OOS + guardrails + no_signal_enable_disable + kill-switch untouched). no_signal_enable_disable is STILL true. So the 'vacation blocks everything' drift of runs #93-#106 is only half true now: trading-constant proposals are admissible through the queue, signal enable/disable is not.",
+      "action": "Corrected here. Nothing qualified this run under the queue constraints."
     },
     {
-      "finding": "session_brain dup-heavy (ideation only)",
-      "severity": "LOW"
+      "severity": "LOW",
+      "finding": "SIDeways (found while fixing the trend collision): sniper_exit.py:161 get_btc_momentum_state compares trend against 'rising'/'falling', but BOTH momentum_cache writers emit 'uptrend'/'downtrend'/'ranging'. Those two branches are dead code. The function still works because the regime_4h == 'LONG_BIAS'/'SHORT_BIAS' checks come first and BTC is 4h-covered. No action taken — dead branch, not a live bug.",
+      "action": "Noted. Fix opportunistically if sniper_exit is next touched."
+    },
+    {
+      "severity": "LOW",
+      "finding": "26 of 157 momentum_cache tokens (GOAT, MON, MELANIA, FARTCOIN, POPCAT, ZORA, PURR, SPX, PONS, KPEPE, KAS, MNT, STABLE, GRASS, BSV, VV, KLUNC, KBONK, KSHIB, AZTEC, CC, KFLOKI, CASHCAT, USELESS, MERL, KNEIRO) have slope_4h=NULL and regime_4h=NULL — written by the 15m scanner only. entry_regime_4h will stay NULL for trades on ~1 in 6 traded tokens. Not a bug; an upstream 4h-scanner coverage gap.",
+      "action": "MONITOR. Only act if a traded token's missing 4h regime actually costs an analysis."
     }
   ],
   "creative_improvements": [
     {
-      "idea": "conf<30 NON-PUMP SENTINEL (pre-registered standing watch, zero code)",
-      "detail": "baseline fresh: non-pump conf<30 14d = 12T 7W '-0.09' (wash, reconfirms #62 rejection of a global floor); all-conf<30 14d = 53T 13W '-2.14' of which pump-chain owns 41T '-2.05'. Locked trigger: non-pump conf<30 14d n>=20 AND PnL <= '-1.00' -> then propose CONF_FLOOR scope extension with fresh fk; prevents both re-proposal debates and premature scope creep"
+      "idea": "H1 — conditional [35,45) SHORT gate keyed on BTC tape state (sustained EMA300 break vs chop pin)",
+      "rationale": "Tonight's band split cleanly: losers 10:59-14:31 under a failed-reclaim chop pin, winners 19:02-22:39 under a sustained EMA300 break. Same band, same family, same direction.",
+      "expected_impact": "would have saved '+0.80' at 30d while blocking 38T",
+      "category": "entry sniper",
+      "status": "REJECTED-WITH-DATA",
+      "risk": "n/a",
+      "evidence": "brain/analysis/short_band_tape_state_2026-10-23.py --selfcheck PASS. SUSTAINED cell n=18 < 20 (b1 FAIL); Fisher p=1.0000 (b2 FAIL); fk 24.2% 30d / 28.6% 14d (b4 FAIL). Logged so the anecdote is never re-proposed."
     },
     {
-      "idea": "ARM-DECOMPOSITION LEDGER as standing per-signal KPI (headline above)",
-      "detail": "reached vs never-reached split per signal, pure SQL from existing mfe_pct: proves each bleeding signal's bleed is 100% pre-arm while reached-arm cohorts are positive; if a reached-arm cohort ever goes negative that is the escalation-#17/exit-side signal, and if a never-armed cohort grows past a queued lever's scope that is a scope-extension trigger"
+      "idea": "C3 SUSTAINED-TAPE SENTINEL for vb-/pc- SHORT (pre-registered standing watch, zero code)",
+      "rationale": "The same tape-state split on the SIGNAL family rather than the RSI band is consistent across all three windows and strengthens toward now: 30d '+1.58' vs '-1.33' (p=0.554) / 14d '+0.96' vs '-0.73' (p=0.086) / 7d '+1.01' vs '-0.87' (p=0.023). n is adequate (39/80 at 30d).",
+      "expected_impact": "if it holds, a CONDITIONAL waiver replacement (keep [35,45) vb-/pc- SHORT only under sustained tape) instead of the blanket 00:00Z lapse — preserves the '+1.58' cohort while removing the '-1.33' cohort",
+      "category": "entry sniper",
+      "status": "pre-registered-monitor",
+      "risk": "low — zero code, zero behavior",
+      "locked_trigger": "30d Fisher p<0.05 with same sign -> propose with fresh fk; currently p=0.554"
     },
     {
-      "idea": "drift closure: watchdog stop-field 'staleness' root-caused as trail ratchet (see drift_findings)",
-      "detail": "saves future runs from re-flagging a moving target as a bug"
+      "idea": "RE-SCOPED ESCALATION: reached-arm atr_sl_hit ratchet gap (replaces the stale #17)",
+      "rationale": "14d reached-arm atr_sl_hit = 33T 3.0% '-1.99' with avg MFE 0.797 / MAX MFE 1.177 / 0 of 33 ever >= +1.50. Compare profit-monster-trail avg MFE 0.756 (same ballpark of move, opposite outcome) and atr_trail_hit avg MFE 3.031. The move is happening; the stop is not following it. avg MAE 0.341 on the armed cohort vs 0.228 on PM-trail.",
+      "expected_impact": "up to '+1.99'/14d if the ratchet's first rung is proven not to fire",
+      "category": "exit sniper",
+      "status": "pre-registered-measurement",
+      "risk": "low until measured",
+      "next_measurement": "what fraction of reached-arm trades ever see stop_loss tighten past entry between arm-time and exit; if ~0, the BE/ratchet path between +0.40 arm and ATR SL is not executing. Existing PM_BREAKEVEN_LOCK_PCT=0.001 is manual_exit_manager-only and does not cover this path."
+    },
+    {
+      "idea": "momentum_cache.trend single-owner rule (SHIPPED this run as the bugfix)",
+      "rationale": "Two writers, one column, two timeframes, two thresholds, 16x frequency asymmetry. Same fragmentation class as #80's rsi source disagreement.",
+      "expected_impact": "trades.entry_trend becomes unambiguous 4h; removes a standing class of silent analysis corruption",
+      "category": "infrastructure",
+      "status": "shipped",
+      "risk": "zero — no gate reads the column"
     }
   ],
+  "changes_from_last_run": {
+    "verify_of_106": "arm-decomposition KPI re-derived and HOLDS: reached-arm atr_sl_hit is the dominant non-trail leak ('-1.99' of the '-2.55' non-trail reached-arm total). trail ratchet drift-closure by #106 stands (not re-flagged). steer-001 zero-config answer stands and is reinforced by tonight's two band wins.",
+    "impact": "No reversal needed on any #106 claim."
+  },
   "next_actions": [
-    "ONE COMBINED CHECK after 00:35Z Oct 24: (a) waiver lapse proof — 0 [35,45) SHORT allow-lines post 00:00Z + [UNCLOG-EXPIRED] appears + short-traffic rate vs pre-lapse baseline (restored floor blocks ~44.8% of 14d SHORT entries per #105); (b) size-reduce auto-clear state (earliest ~00:23-00:35Z, margins thin); (c) flip#2 (vb- HIGH/EXTREME) separate CEO ruling",
-    "First trade opened after 19:46Z = entry_regime_4h fix test (all 4 fields non-null)",
-    "CEO stack unchanged: fk ruling (2 definitions) -> CONF_FLOOR + CONFIDENCE-TAIL | TAT variant-C GO on corrected numbers (+$0.410, n-unit ruling) | VACATION STATE | flip#2 decoupled | Oct 25 eval batch (MFE-CUT/HML/habitat/re-enter/UGB/short-gate/first CONF-FILTER read from trades.confidence)",
-    "Escalation #17 (61st): exit-ladder candle OOS — now owns the pc- reached-arm atr_sl round-trip '-0.72' as well"
+    "POST-00:00Z CHECK (combined): (a) waiver gate fired — count new [35,45) SHORT opens, expect 0; (b) size-reduce marker auto-cleared by the 22:57Z guardrail run — confirm the file is gone; (c) the 3 grandfathered band trades (CFX/MON/SYRUP) unaffected.",
+    "POST-23:26Z CHECK: the 4h regime scanner's next run is the first with the trend-ownership fix — confirm 'Brain momentum_cache: wrote N tokens' (no '(5m)' suffix) and that momentum_cache.trend for a 4h-covered token is a 4h-derived value, not a 15m one.",
+    "CEO stack unchanged: fk ruling -> CONF_FLOOR bare + CONFIDENCE-TAIL | TAT variant-C GO | VACATION STATE | flip#2 decoupled | Oct 25 eval batch (MFE-CUT / HML / habitat / re-enter / UGB / short-gate / CONF-FILTER first read).",
+    "Re-scoped escalation #17: measure the reached-arm atr_sl_hit ratchet gap (fraction of armed trades whose stop ever tightens past entry)."
   ],
   "readiness": {
-    "open": "CFX SHORT #16373 pump-chain- @0.052188, +1.55%, stop ratcheted to 0.05195709 = '+0.44%' price locked, TP 0.050886, UGB-PT shadow firing (Oct 25 eval data) -> HOLD",
-    "tape": "BTC sideways pin just BELOW EMA300: 81386 vs EMA300 81471 = '-0.104%', 27 consecutive 1m closes below, 1/30 above (NO dump — last hour flat)",
-    "regime": "watchdog 15m SHORT_BIAS vs 4h LONG_BIAS, vol LOW, CALM, flips high; regime_5m aggregate LONG_BIAS contradicts BTC tape (flagged LOW)",
-    "posture": "MID-BAND -> NO fresh entries. LONGs only on sustained reclaim WITH volume; SHORTs only under EMA300 with 4h aligned (4h not aligned = no fresh shorts either); size 0.5x (inert at floor)"
+    "open_trades": "3, ALL SHORT, ALL in the grandfathered [35,45) waiver band: CFX #16373 pump-chain- rsi 36.17 '+2.46%' (stop ratcheted, trail locked) | MON #16375 volume-buildup- rsi 43.78 '+1.16%' | SYRUP #16376 volume-buildup- rsi 38.46 '+0.04%'. All bracketed, all on the below-EMA300 side.",
+    "regime": "BTC 1m pin just below EMA300, 15m SHORT_BIAS vs 4h LONG_BIAS (sources disagree — cite which), volatility LOW, flip-rate high. -> NO fresh directional entries. SHORTs only under EMA300 with 4h aligned; LONGs only on a sustained reclaim WITH volume; mid-band = no new directional risk.",
+    "concentration": "3/3 opens are <45-RSI shorts in one family. Not a new risk class tonight (all green, all bracketed, one is the pc- trail winner) but it is the exact cohort the 00:00Z gate removes — after midnight this shape cannot recur.",
+    "size": "0.5x until the 22:57Z guardrail clears it, then back to 1.0x. Inert either way at the $11 HL floor (0% effective cut)."
   }
 }

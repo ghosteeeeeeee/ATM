@@ -2189,5 +2189,27 @@
     "after": "reproducible 7/14/30d aligned/counter/neutral split with Fisher + fk",
     "rationale": "readiness \"aligned only\" prose had never been measured; counter-trend trades turn out to be the better cohort (30d 49.5% \"+0.91\") but the block fails every bar",
     "impact": "zero trading behaviour; logs the rejection so it is never re-proposed from a 7d snapshot"
+  },
+  {
+    "timestamp": "2026-10-23T22:53:51Z",
+    "agent": "brain_auditor",
+    "change": "momentum_cache.trend single-owner fix: 15m_regime_scanner no longer writes trend (was clobbering 4h_regime_scanner 16x more often with a different threshold on a different timeframe); 4h scanner carries an ownership comment",
+    "type": "bugfix",
+    "file": "scripts/15m_regime_scanner.py",
+    "before": "INSERT INTO momentum_cache (token, slope_15m, regime_15m, trend, updated_at) ... ON CONFLICT ... trend = EXCLUDED.trend",
+    "after": "INSERT INTO momentum_cache (token, slope_15m, regime_15m, updated_at) ... ON CONFLICT ... (trend untouched)",
+    "rationale": "dual-writer column collision; trades.entry_trend was a coin-flip between 15m and 4h semantics",
+    "impact": "zero trading behavior (no gate reads it); analysis correctness restored. Verified by brain/analysis/trend_ownership_2026-10-23.py --selfcheck PASS (AST + live Postgres round-trip)"
+  },
+  {
+    "timestamp": "2026-10-23T22:53:51Z",
+    "agent": "brain_auditor",
+    "change": "H1 band-tape-state analysis shipped (REJECTED-WITH-DATA) + C3 sustained-tape sentinel pre-registered + escalation #17 re-scoped off the closed 2026-10-17 exit-ladder P0 onto the reached-arm atr_sl_hit ratchet gap",
+    "type": "creative",
+    "file": "brain/analysis/short_band_tape_state_2026-10-23.py",
+    "before": "escalation #17 printed the closed exit-ladder candle OOS 61 times",
+    "after": "re-scoped to reached-arm atr_sl_hit 33T -1.99 (avg MFE 0.797, 0/33 >= +1.50)",
+    "rationale": "stale escalation boilerplate was pointing at a solved problem while the real leak went unnamed",
+    "impact": "zero behavior; corrects the standing escalation and logs two pre-registrations"
   }
 ]

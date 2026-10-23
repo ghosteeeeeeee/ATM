@@ -291,17 +291,22 @@ def write_to_brain_cache(results):
         for token, r in results.items():
             regime = r.get('regime', 'NEUTRAL')
             slope_pct = r.get('slope_pct', 0)
-            trend = 'uptrend' if slope_pct > REGIME_SCANNER_TREND_THRESHOLD else 'downtrend' if slope_pct < -REGIME_SCANNER_TREND_THRESHOLD else 'ranging'
-            
+            # brain_auditor #107 bugfix: `trend` was written here AND by
+            # 4h_regime_scanner.py:289 into the same momentum_cache(token) row, with
+            # DIFFERENT thresholds (0.05 here vs 0.10 there) on DIFFERENT timeframes.
+            # Whichever scanner ran last won, and the 15m scanner runs ~96x/day so it
+            # destroyed the 4h trend continuously. feature_recorder.get_token_intel
+            # then stored the result as trades.entry_trend — a coin-flip between the
+            # two timeframes. `trend` is now 4h-scanner-owned; this scanner no longer
+            # writes it.
             cur.execute("""
-                INSERT INTO momentum_cache (token, slope_15m, regime_15m, trend, updated_at)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO momentum_cache (token, slope_15m, regime_15m, updated_at)
+                VALUES (%s, %s, %s, %s)
                 ON CONFLICT (token) DO UPDATE SET
                     slope_15m = EXCLUDED.slope_15m,
                     regime_15m = EXCLUDED.regime_15m,
-                    trend = EXCLUDED.trend,
                     updated_at = EXCLUDED.updated_at
-            """, (token, slope_pct, regime, trend, now))
+            """, (token, slope_pct, regime, now))
         conn.commit()
         cur.close()
         conn.close()

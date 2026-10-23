@@ -7583,5 +7583,44 @@
     "category": "governance",
     "status": "resolved",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T22:53:51Z",
+    "idea": "H1: conditional [35,45) SHORT gate keyed on sustained BTC EMA300 break",
+    "rationale": "tonight's band losers (10:59-14:31) sat under a failed-reclaim chop pin, winners (19:02-22:39) under a sustained break — same band, same family",
+    "expected_impact": "+0.80/30d saved, 38T blocked",
+    "category": "entry sniper",
+    "status": "REJECTED-WITH-DATA",
+    "risk": "n/a",
+    "evidence": "short_band_tape_state_2026-10-23.py: SUSTAINED n=18<20 (b1 FAIL), Fisher p=1.0000 (b2 FAIL), fk 24.2% 30d (b4 FAIL). Logged so the anecdote is never re-proposed."
+  },
+  {
+    "date": "2026-10-23T22:53:51Z",
+    "idea": "C3 SUSTAINED-TAPE SENTINEL for volume-buildup-/pump-chain- SHORT (zero code)",
+    "rationale": "same tape split on the signal family is same-sign 30/14/7d and strengthens toward now: 30d 39T 43.6% +1.58 vs 80T 37.5% -1.33 (p=0.554) | 14d p=0.086 | 7d p=0.023",
+    "expected_impact": "conditional waiver replacement preserving the +1.58 cohort, removing the -1.33 cohort, instead of the blanket 00:00Z lapse",
+    "category": "entry sniper",
+    "status": "pre-registered-monitor",
+    "risk": "low — zero code",
+    "locked_trigger": "30d Fisher p<0.05 same sign -> propose with fresh fk; currently p=0.554"
+  },
+  {
+    "date": "2026-10-23T22:53:51Z",
+    "idea": "RE-SCOPED escalation #17: reached-arm atr_sl_hit ratchet gap",
+    "rationale": "14d reached-arm atr_sl_hit 33T 3.0% -1.99 with avg MFE 0.797 / MAX 1.177 / 0-of-33 >= +1.50, vs PM-trail avg MFE 0.756 (same size move, opposite outcome) — the move happens, the stop does not follow",
+    "expected_impact": "up to +1.99/14d if the first ratchet rung is proven not to fire",
+    "category": "exit sniper",
+    "status": "pre-registered-measurement",
+    "risk": "low until measured",
+    "next_measurement": "fraction of reached-arm trades whose stop_loss ever tightens past entry between arm-time and exit; PM_BREAKEVEN_LOCK_PCT=0.001 is manual_exit_manager-only"
+  },
+  {
+    "date": "2026-10-23T22:53:51Z",
+    "idea": "momentum_cache.trend single-owner rule",
+    "rationale": "two writers, one column, two timeframes, two thresholds (0.05 on 15m @96x/day vs 0.10 on 4h @6x/day) — same fragmentation class as #80 rsi-source disagreement",
+    "expected_impact": "trades.entry_trend becomes unambiguous 4h; removes a standing class of silent analysis corruption",
+    "category": "infrastructure",
+    "status": "shipped",
+    "risk": "zero — no gate reads the column"
   }
 ]

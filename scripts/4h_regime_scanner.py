@@ -285,6 +285,9 @@ def write_to_brain_cache(results):
             regime = r.get('regime', 'NEUTRAL')
             slope_pct = r.get('slope_pct', 0)
             trend = 'uptrend' if slope_pct > 0.1 else 'downtrend' if slope_pct < -0.1 else 'ranging'
+            # brain_auditor #107: `trend` is OWNED by this scanner (4h threshold 0.10).
+            # 15m_regime_scanner used to clobber it every ~5min with a 15m-slope value.
+            # Do not add trend to any other writer of momentum_cache.
             cur.execute("""
                 INSERT INTO momentum_cache (token, slope_4h, regime_4h, trend, updated_at)
                 VALUES (%s, %s, %s, %s, %s)
