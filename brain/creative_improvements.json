@@ -7259,5 +7259,26 @@
     "category": "entry sniper",
     "status": "rejected_with_data",
     "risk": "high"
+  },
+  {
+    "date": "2026-10-23",
+    "idea": "ARM-LEAK LEDGER — do the trail and the arm mechanism convert the favorable moves we are given?",
+    "rationale": "Mandate says keep us in trends. If trades print +0.40% (the arm threshold) and still die at a stop, the mechanism leaks; if they convert, the bleed must be pre-arm (entries with no move).",
+    "measurement": "14d: reached-arm 169T -> 110 trail exits (+9.75, 90% WR) / 59 no-trail exits (-0.30 net = LEAK; atr_sl_hit 35T -2.05, hard_sl 6T -0.19, offset by stale_exit +0.71, hard_tp +0.94). Pre-arm cohort MFE<0.40 no-trail = 153T -13.58.",
+    "expected_impact": "zero — mechanism healthy, no gate owed; validates the queued exit stack as the only lever",
+    "category": "verification",
+    "status": "measured",
+    "risk": "none",
+    "script": "brain/analysis/arm_leak_2026-10-23.py"
+  },
+  {
+    "date": "2026-10-23",
+    "idea": "SELF-CHECK CRITERION CORRECTION — raw min-p<0.05 over 55 tests is not evidence",
+    "rationale": "#96's tripwire fired FAIL when fresh data moved min-p 0.073->0.038 on volume_spike, despite the phenomenon being unchanged noise. A min-p across ~55 unadjusted tests crosses 0.05 routinely; the honest criterion is Bonferroni + a same-sign, non-decayed split-half.",
+    "measurement": "min p=0.038 at volume_spike>=2.075 (7/77 vs 3/136), Bonferroni bar 0.0009, candidate-field split-half +0.14/+0.09 same-sign 63% retention -> does not survive multiplicity => NO SEPARATOR stands.",
+    "expected_impact": "no false FAIL alarms on future runs; raw p still printed so nothing is hidden",
+    "category": "instrumentation",
+    "status": "shipped",
+    "risk": "none (analysis script only)"
   }
 ]

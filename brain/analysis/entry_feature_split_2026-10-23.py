@@ -111,7 +111,7 @@ def report():
 
     print(f'\nthreshold sweep + Fisher exact (5 cut points per field, block if field >= t):')
     sweep = []
-    global_min_p, arg = 1.0, None
+    global_min_p, arg, n_tests = 1.0, None, 0
     for f in FIELDS:
         h = [(m[f], ct) for ct, m in meta['HML'] if _is_num(m.get(f))]
         a = [(m[f], ct) for ct, m in meta['ARMED'] if _is_num(m.get(f))]
@@ -119,6 +119,7 @@ def report():
             continue
         lo = min(x for x, _ in h + a)
         hi = max(x for x, _ in h + a)
+        n_tests += 5
         for k in range(1, 6):
             t = lo + (hi - lo) * k / 6
             hb = sum(1 for x, _ in h if x >= t)
@@ -135,12 +136,17 @@ def report():
 
     from datetime import timedelta
     allct = [ct for ct, m in meta['HML']] + [ct for ct, m in meta['ARMED']]
+    if not allct:
+        raise SystemExit('FAIL: no stamped HML/ARMED trades in window (nothing to split)')
     cut = max(allct) - timedelta(days=7)
-    print('\nsplit-half mean gap (recent half should match prior half if the feature is real):')
+    bonf = 0.05 / n_tests if n_tests else 0.05
+    cand_field = arg[0] if arg else best_field
+    print(f'\nsplit-half mean gap on candidate field {cand_field!r} '
+          f'(recent half should match prior half if the feature is real):')
     half_delta = []
     for name, sel in (('prior7', lambda ct: ct < cut), ('recent7', lambda ct: ct >= cut)):
-        h = [m[best_field] for ct, m in meta['HML'] if _is_num(m.get(best_field)) and sel(ct)]
-        a = [m[best_field] for ct, m in meta['ARMED'] if _is_num(m.get(best_field)) and sel(ct)]
+        h = [m[cand_field] for ct, m in meta['HML'] if _is_num(m.get(cand_field)) and sel(ct)]
+        a = [m[cand_field] for ct, m in meta['ARMED'] if _is_num(m.get(cand_field)) and sel(ct)]
         if not h or not a:
             print(f'  {name}: empty')
             continue
@@ -149,13 +155,20 @@ def report():
         print(f'  {name}: HML n={len(h)} mean={statistics.mean(h):.2f} | '
               f'ARMED n={len(a)} mean={statistics.mean(a):.2f} | delta {d:+.2f}')
 
-    verdict = ('NO SEPARATOR' if min_p >= 0.05 else 'CANDIDATE')
-    print(f'\nVERDICT: {verdict} (min Fisher p={min_p:.3f} over ~55 unadjusted tests; '
-          f'split-half deltas {[round(d, 2) for d in half_delta]})')
-    if verdict == 'CANDIDATE':
-        print('NOTE: min-p over many tests is downward-biased — a candidate must also survive a '
-              'multiplicity adjustment (Bonferroni ~0.05/55), an independent split-half re-selection, '
-              'and the fk<20% bar before any gate is proposed.')
+    survives_bonf = min_p < bonf
+    durable = (len(half_delta) == 2 and half_delta[0] * half_delta[1] > 0
+               and half_delta[0] != 0
+               and abs(half_delta[1]) / abs(half_delta[0]) >= 0.5)
+    verdict = 'CANDIDATE' if survives_bonf else 'NO SEPARATOR'
+    print(f'\nVERDICT: {verdict} (min Fisher p={min_p:.3f} over {n_tests} unadjusted tests, '
+          f'Bonferroni bar {bonf:.4f}; split-half deltas '
+          f'{[round(d, 2) for d in half_delta]})')
+    if not survives_bonf:
+        print(f'  no test survives multiplicity — raw min-p {min_p:.3f} against '
+              f'{n_tests} tests is within noise; not a separator.')
+    if survives_bonf and not durable:
+        print('  survives multiplicity but split-half is reversed/decayed — not durable, '
+              're-check before citing.')
     if len(half_delta) == 2:
         same = half_delta[0] * half_delta[1] > 0
         decay = abs(half_delta[1]) / abs(half_delta[0]) if half_delta[0] else 0.0
@@ -163,23 +176,41 @@ def report():
         if not same or decay < 0.5:
             label += ' -> DECAYED, not a durable edge'
         print(f'temporal stability: {label}')
-    return min_p, half_delta, (n_hml, n_arm, n_una)
+    return min_p, half_delta, (n_hml, n_arm, n_una), n_tests
 
 
 def selfcheck():
-    min_p, half_delta, counts = report()
+    min_p, half_delta, counts, n_tests = report()
     n_hml, n_arm, _ = counts
+    bonf = 0.05 / n_tests if n_tests else 0.05
     # explicit raises, not assert — asserts vanish under `python -O`
     if not (n_hml >= 50 and n_arm >= 100):
         raise SystemExit(f'SELFCHECK FAIL: sample too small {counts} (need HML>=50, ARMED>=100)')
     if not (0.0 <= min_p <= 1.0):
         raise SystemExit(f'SELFCHECK FAIL: bad p {min_p}')
+    survives_bonf = min_p < bonf
+    durable = (len(half_delta) == 2 and half_delta[0] * half_delta[1] > 0
+               and half_delta[0] != 0
+               and abs(half_delta[1]) / abs(half_delta[0]) >= 0.5)
+    if survives_bonf and durable:
+        raise SystemExit(
+            f'SELFCHECK FAIL: a stamped entry feature separates at p={min_p:.3f} which SURVIVES '
+            f'Bonferroni ({n_tests} tests, bar {bonf:.4f}) with a same-sign split-half '
+            f'{[round(d, 2) for d in half_delta]} — the negative verdict is stale, re-run '
+            'the analysis and re-check before citing')
     if min_p < 0.05:
-        raise SystemExit(f'SELFCHECK FAIL: entry feature separates at p={min_p:.3f} < 0.05 — '
-                         'the negative verdict is stale, re-run the analysis and re-check '
-                         'multiplicity + split-half before citing it')
-    print('\nSELFCHECK PASS — negative result holds: no stamped entry feature separates '
-          'HML from trail-armed at p<0.05, no admission gate from these fields.')
+        if survives_bonf:
+            print(f'\nSELFCHECK PASS (raw min-p {min_p:.3f} SURVIVES Bonferroni '
+                  f'({n_tests} tests, bar {bonf:.4f}) but the split-half on '
+                  f'{[round(d, 2) for d in half_delta]} is not durable) — negative result '
+                  'holds on durability; re-run the analysis before citing.')
+        else:
+            print(f'\nSELFCHECK PASS (raw min-p {min_p:.3f} < 0.05 does NOT survive '
+                  f'multiplicity: {n_tests} tests, Bonferroni bar {bonf:.4f}, split-half '
+                  f'{[round(d, 2) for d in half_delta]}) — negative result holds.')
+    else:
+        print('\nSELFCHECK PASS — negative result holds: no stamped entry feature separates '
+              'HML from trail-armed, no admission gate from these fields.')
     return 0
 
 

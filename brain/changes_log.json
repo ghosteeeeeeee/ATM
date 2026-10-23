@@ -2024,5 +2024,38 @@
     "after": "exists, --selfcheck PASS",
     "rationale": "mandate 'keep us out of chop at admission' was untested against the metadata already stamped at entry; negative result must be reproducible so it is not re-proposed",
     "impact": "none on live trading; closes the entry-feature admission-gate route (global min Fisher p=0.073, no field separates)"
+  },
+  {
+    "timestamp": "2026-10-23T12:37:48Z",
+    "agent": "brain_auditor",
+    "change": "entry_feature_split selfcheck/verdict now gates on Bonferroni (0.05/n_tests) + candidate-field split-half durability instead of raw min-p<0.05",
+    "type": "infra",
+    "file": "brain/analysis/entry_feature_split_2026-10-23.py",
+    "before": "SELFCHECK FAIL whenever raw min Fisher p over 55 tests < 0.05",
+    "after": "FAIL only if min-p survives Bonferroni AND split-half is same-sign with >=50% retention; raw p disclosed on PASS",
+    "rationale": "#96 tripwire fired on noise (min-p 0.073->0.038 with fresh trades); min-p over many unadjusted tests is downward-biased",
+    "impact": "zero behavior — analysis script only; prevents false alarm fatigue"
+  },
+  {
+    "timestamp": "2026-10-23T12:37:48Z",
+    "agent": "brain_auditor",
+    "change": "New arm_leak_2026-10-23.py standing KPI: reached-arm conversion vs arm leak (MFE>=0.40 x trail-exit cells + exit/signal detail, --selfcheck)",
+    "type": "infra",
+    "file": "brain/analysis/arm_leak_2026-10-23.py",
+    "before": "(none)",
+    "after": "4-cell ledger + leak breakdown, selfcheck asserts cell/detail consistency",
+    "rationale": "answers 'keep us in trends' — measures whether the trail converts the moves we are given",
+    "impact": "zero behavior — measurement only; baseline leak -0.30/14d"
+  },
+  {
+    "timestamp": "2026-10-23T12:45:20Z",
+    "agent": "brain_auditor",
+    "change": "bug_hunter review of run #97 analysis ships: 3 findings fixed (dead converted-cell assert, misleading PASS branch message, max() crash on empty window)",
+    "type": "infra",
+    "file": "brain/analysis/{arm_leak,entry_feature_split}_2026-10-23.py",
+    "before": "dead assert / misleading PASS text / ValueError on empty data",
+    "after": "reachable assert, corrected message, explicit FAIL",
+    "rationale": "mandatory post-change verification",
+    "impact": "zero behavior — analysis scripts only; negative-path probes PASS"
   }
 ]
