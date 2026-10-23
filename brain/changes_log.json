@@ -1980,5 +1980,16 @@
     "after": "prints base / mult / effective cut% (NO-OP tag when base already at floor); return values byte-identical (replica self-check 9/9), py_compile PASS",
     "rationale": "live measurement showed the 0.5x marker cuts 0% today (base $11) — shadow-first per vacation rules, makes the inert state observable",
     "impact": "zero behavior; feeds CEO size-reduce semantics decision"
+  },
+  {
+    "timestamp": "2026-10-23T09:54:18Z",
+    "agent": "brain_auditor",
+    "change": "Option-comparison table appended to brain/fk_definitions.md: CONF_FLOOR bare vs full CONF_FILTER vs new CONFIDENCE-TAIL PACKAGE, with all four fk definitions across 7d/14d/30d plus pre-ship checks",
+    "type": "doc",
+    "file": "brain/fk_definitions.md",
+    "before": "fk_definitions.md pinned only the CONF_FLOOR bare blocked set and its ship-time table",
+    "after": "adds a three-option table so the single pending CEO fk-definition ruling decides all three ships; CONFIDENCE-TAIL PACKAGE pre-registered (14d 85T 18W +3.98, fkA-literal 14.2%, z=-3.26), not shipped",
+    "rationale": "the fk verdict flips on definition+window, so the CEO must see all options together; package passes the standing-recommended definition and dominates CONF_FLOOR there, fails fkB/fkA-family",
+    "impact": "zero behaviour — documentation and pre-registration only; any actual gate still blocked on vacation_mode no_constants_change + RAW-column pin + blocked==N self-check"
   }
 ]
