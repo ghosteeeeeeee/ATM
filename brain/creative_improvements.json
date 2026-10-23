@@ -7211,5 +7211,25 @@
     "category": "measurement",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T10:40:00Z",
+    "idea": "CONFIDENCE-CRUSH CENSUS — the [70,95) CONF window measures the PENALTY GATE, not signal confidence",
+    "rationale": "The compactor checks the window pre-penalty; PENALTY-GATE prints both ends (conf 98 x 0.003 x 0.5 -> exec 49.0). If out-of-window exec confs are penalty-crushed approval-passing signals, then enforcing the window at exec is a penalty-block wearing a confidence label.",
+    "method": "brain/analysis/conf_crush_census_2026-10-23.py — parse PENALTY-GATE + EXEC lines from 13d of pipeline.log, join to closed trades by token+direction+minute (self-check PASS: cohort sum == joined)",
+    "results": {
+      "joined": 271,
+      "CRUSHED (pre>=70 -> exec<70)": "160T 35.0% -3.41",
+      "LOW (pre<70)": "0T — nobody executes below the window at approval",
+      "IN [70,95)": "24T 37.5% -0.17",
+      "HOT >=95": "41T 39.0% -0.07",
+      "NO-GATE": "46T 39.1% +0.01",
+      "CRUSHED by source": "pump-chain 63T -1.01 | doji-bottom-long 18T -0.68 | bb-bounce-v2-long 18T -0.35 | ai-trader 11T -0.31 | oversold-bounce 4T -0.39 -> -1.64 of -3.41 already inside killed/disabled families",
+      "fk_if_exec_conf_lt70_enforced": "56/99 = 56.6% of winners blocked"
+    },
+    "conclusion": "Exec-time CONF enforcement is dead twice over: fk 56.6% (bar <20%) AND it would block approval-passing trades for being penalized. The residual live CRUSHED bleed (pump-chain -1.01, bb-bounce -0.35) is already owned by CONF_FLOOR / MFE-CUT / TAT. Route the CEO's queued net-vs-fk ruling with this decomposition; do NOT flip the window at exec.",
+    "category": "entry sniper / decision quality",
+    "status": "measured this run",
+    "risk": "low (zero code beyond the analysis script)"
   }
 ]

@@ -1991,5 +1991,27 @@
     "after": "adds a three-option table so the single pending CEO fk-definition ruling decides all three ships; CONFIDENCE-TAIL PACKAGE pre-registered (14d 85T 18W +3.98, fkA-literal 14.2%, z=-3.26), not shipped",
     "rationale": "the fk verdict flips on definition+window, so the CEO must see all options together; package passes the standing-recommended definition and dominates CONF_FLOOR there, fails fkB/fkA-family",
     "impact": "zero behaviour — documentation and pre-registration only; any actual gate still blocked on vacation_mode no_constants_change + RAW-column pin + blocked==N self-check"
+  },
+  {
+    "timestamp": "2026-10-23T10:40:00Z",
+    "agent": "brain_auditor",
+    "change": "SIZE-REDUCE-SHADOW sink print() -> log() (decider_run.py:272/280) — run_pipeline only echoes the last 8 stdout lines of decider_run so the #92 shadow could never appear",
+    "type": "infra",
+    "file": "scripts/decider_run.py",
+    "before": "print(f'[SIZE-REDUCE-SHADOW] ...')",
+    "after": "log(f'[SIZE-REDUCE-SHADOW] ...')",
+    "rationale": "unfalsifiable instrumentation is worse than none; #92 verification was unverifiable by construction",
+    "impact": "zero behaviour; first verified fire 2026-10-23 10:37:03 UTC confirming base 11.00 x0.5 floored to 11.00 = 0% effective cut"
+  },
+  {
+    "timestamp": "2026-10-23T10:47:00Z",
+    "agent": "brain_auditor",
+    "change": "decider_run.py class fix: all 10 diagnostic print() sites -> log() (SIZE-REDUCE-SHADOW x2, dynamic-sizing WARN, SpeedTracker, hotset-failures, Volume Warmup x3, RECOVERY x3); hermes_log import hoisted above module-level SpeedTracker block",
+    "type": "infra",
+    "file": "scripts/decider_run.py",
+    "before": "print() swallowed by run_pipeline 8-line stdout echo for decider_run",
+    "after": "log() -> logs/pipeline.log directly",
+    "rationale": "bug_hunter on this run found the same invisibility at :288 (dynamic-sizing WARN) + 7 more; one class fix instead of 10 future bugs",
+    "impact": "zero behaviour; observability only; fires verified 10:37:03 + 10:44:23 UTC"
   }
 ]

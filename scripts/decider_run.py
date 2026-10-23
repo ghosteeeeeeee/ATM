@@ -190,11 +190,12 @@ except Exception:
 
 # Speed feature: speed-weighted hot set scoring
 from hermes_constants import SPEED_HOTSET_WEIGHT as SPEED_WEIGHT
+from hermes_log import log  # hoisted: module-level prints below must be able to log()
 try:
     from speed_tracker import SpeedTracker
     speed_tracker_dr = SpeedTracker()
 except Exception as e:
-    print(f"[decider-run] SpeedTracker unavailable: {e}")
+    log(f"[decider-run] SpeedTracker unavailable: {e}")
     speed_tracker_dr = None
 
 # Hot-set discipline: track when signal_compactor last ran compaction.
@@ -217,7 +218,6 @@ def _get_hotset_last_updated():
 
 from hermes_constants import DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, FAVORITES, FAVORITES_LONG, FAVORITES_SHORT, FAVORITES_SIZE_MULT, LOSERS, LOSERS_LONG, LOSERS_SHORT, LOSERS_SIZE_MULT
 
-from hermes_log import log
 BRAIN_CMD       = '/root/.hermes/scripts/brain.py'
 
 
@@ -265,24 +265,27 @@ def _get_dynamic_position_size() -> float:
                         _sr_base = dynamic
                         dynamic = dynamic * _sr_mult
                         if dynamic < HL_MIN_NOTIONAL_USDT:
+                            # log() not print(): run_pipeline only echoes the LAST 8 stdout
+                            # lines of decider_run, so a print here is structurally invisible
+                            # (brain_auditor #95 — the #92 shadow never showed any fire).
                             try:
-                                print(f'[SIZE-REDUCE-SHADOW] base={_sr_base:.2f} x{_sr_mult} -> {dynamic:.2f} '
-                                      f'floored to {HL_MIN_NOTIONAL_USDT:.2f} '
-                                      f'(effective cut {max(0.0, 100.0 * (1.0 - HL_MIN_NOTIONAL_USDT / _sr_base)):.0f}%)'
-                                      + (' NO-OP: base already at HL floor' if HL_MIN_NOTIONAL_USDT >= _sr_base else ''))
+                                log(f'[SIZE-REDUCE-SHADOW] base={_sr_base:.2f} x{_sr_mult} -> {dynamic:.2f} '
+                                    f'floored to {HL_MIN_NOTIONAL_USDT:.2f} '
+                                    f'(effective cut {max(0.0, 100.0 * (1.0 - HL_MIN_NOTIONAL_USDT / _sr_base)):.0f}%)'
+                                    + (' NO-OP: base already at HL floor' if HL_MIN_NOTIONAL_USDT >= _sr_base else ''))
                             except Exception:
                                 pass
                             return HL_MIN_NOTIONAL_USDT  # Don't go below minimum
                         try:
-                            print(f'[SIZE-REDUCE-SHADOW] base={_sr_base:.2f} x{_sr_mult} -> {dynamic:.2f} '
-                                  f'(effective cut {100.0 * (1.0 - dynamic / _sr_base):.0f}%)')
+                            log(f'[SIZE-REDUCE-SHADOW] base={_sr_base:.2f} x{_sr_mult} -> {dynamic:.2f} '
+                                f'(effective cut {100.0 * (1.0 - dynamic / _sr_base):.0f}%)')
                         except Exception:
                             pass
             except Exception:
                 pass
             return round(dynamic, 2)
     except Exception as e:
-        print(f"[decider_run] WARN: dynamic sizing failed ({e}), using default")
+        log(f"[decider_run] WARN: dynamic sizing failed ({e}), using default")
     return DEFAULT_TRADE_SIZE_USDT
 LOG_FILE        = '/var/www/hermes/logs/signals.log'
 DELAYED_FILE    = '/var/www/hermes/data/pending-delayed-entries.json'
@@ -2763,7 +2766,7 @@ def _save_hotset_failures(data):
             with open(_HOTSET_FAILURE_FILE, 'w') as f:
                 json.dump(existing, f)
     except Exception as e:
-        print(f"Save hotset failures error: {e}")
+        log(f"Save hotset failures error: {e}")
 
 def _check_hotset_cooldown(token: str, direction: str, failures: dict) -> tuple:
     """
@@ -3448,7 +3451,7 @@ def _warmup_volume_cache():
             )
             import time as _time
         except Exception as e:
-            print(f"[Volume Warmup] import failed: {e}")
+            log(f"[Volume Warmup] import failed: {e}")
             return
 
         try:
@@ -3458,7 +3461,7 @@ def _warmup_volume_cache():
             open_tokens = [r[0].upper() for r in cur.fetchall()]
             conn.close()
         except Exception as e:
-            print(f"[Volume Warmup] failed to get open tokens: {e}")
+            log(f"[Volume Warmup] failed to get open tokens: {e}")
             return
 
         if not open_tokens:
@@ -3486,7 +3489,7 @@ def _warmup_volume_cache():
 
         if cache:
             _save_volume_cache(cache)
-        print(f"[Volume Warmup] {fetched} fetched, {errors} errors ({len(open_tokens)} open tokens)")
+        log(f"[Volume Warmup] {fetched} fetched, {errors} errors ({len(open_tokens)} open tokens)")
 
     t = threading.Thread(target=_background_warmup, daemon=True)
     t.start()
@@ -3510,13 +3513,13 @@ def run(dry_run=False):
     try:
         incomplete = detect_incomplete_run()
         if incomplete:
-            print(f'[RECOVERY] Detected incomplete run from {incomplete.get("ts")}')
+            log(f'[RECOVERY] Detected incomplete run from {incomplete.get("ts")}')
             last = checkpoint_read_last('trade_pending')
             if last:
-                print(f'[RECOVERY] Last trade: {last.get("token")} {last.get("direction")}')
+                log(f'[RECOVERY] Last trade: {last.get("token")} {last.get("direction")}')
             checkpoint_write('decider_recovery_complete', {'workflow_state': 'IDLE'})
     except Exception as e:
-        print(f'[RECOVERY] Check failed: {e}')
+        log(f'[RECOVERY] Check failed: {e}')
 
     # Run hot-set auto-approver every minute
     _run_hot_set()

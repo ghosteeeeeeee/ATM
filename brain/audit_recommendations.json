@@ -1,228 +1,250 @@
 {
-  "timestamp": "2026-10-23T09:48:36Z",
-  "run": 94,
-  "headline": "BTC LONG #16358 EXIT CONDITION MET (26/15 consecutive 1m closes below EMA300 since 09:21, threshold crossed ~09:36) — flagged, not executed from this seat. Plus new pre-registered lever: CONFIDENCE-TAIL PACKAGE (conf<30 all-signals OR conf>100 ex-pump-chain-) = +$3.98/14d at fkA-literal 14.2%.",
+  "timestamp": "2026-10-23T10:45:00Z",
+  "run": "brain_auditor #95",
   "session_brain_stats": {
-    "queries_run": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing"
-    ],
-    "top_hits": [
-      "ceo (2) losers table 0.972",
-      "btc pump filter / signal-lab 0.900",
-      "wave periods 0.898"
-    ],
-    "note": "corpus still duplicate-heavy (known 8-run drift); used as ideation input only, no decision sourced from it"
+    "queries": 3,
+    "status": "dup-heavy 8th run (identical text under different titles)",
+    "used_for_conclusions": false,
+    "note": "retrieval correct, corpus duplicate-heavy -> ingest-time hash-dedupe still not shipped"
   },
   "trade_summary_24h": {
     "trades": 9,
-    "wins": 6,
     "wr": 66.7,
     "pnl_usdt": 0.22,
-    "by_signal_direction": {
-      "warrior-sr-confirm- SHORT": "2T 100% +0.15",
-      "volume-buildup- SHORT": "2T 100% +0.11",
-      "bb-squeeze+ LONG": "3T 66.7% +0.10",
-      "bb-bounce-v2-long+ LONG": "1T 0% -0.11",
-      "ai-trader-pending SHORT": "1T 0% -0.03"
-    },
-    "7d": "141T 38.3% -3.03",
-    "14d_trail_vs_hml": "trail_family 119T 86.6% +9.92 vs hard_max_loss 78T 0.0% -7.80 (0/78 armed)",
-    "14d_armed_vs_unarmed": "armed 137T 78.1% +9.32 vs unarmed 212T 9.4% -13.60",
-    "7d_by_regime": {
-      "EXTREME": "44T 27.3% -1.37",
-      "NORMAL": "65T 41.5% -0.86",
-      "HIGH": "18T 44.4% -0.75",
-      "FLAT": "14T 50.0% -0.05"
-    }
+    "losers": 3,
+    "by_signal": "volume-buildup- SHORT 2T +0.11 | warrior-sr-confirm- SHORT 2T +0.15 | bb-squeeze+ LONG 3T +0.10 | bb-bounce-v2-long+ LONG 1T -0.11 | ai-trader-pending SHORT 1T -0.03",
+    "7d": "139T 38.1% -3.00",
+    "14d": "349T 36.4% -4.28",
+    "30d": "706T 42.6% -5.31"
   },
-  "losing_autopsy_corrected": {
-    "method": "brain/analysis/recovery_replay.py adverse-first anchor; --selfcheck PASS (asserts 96.1% vacuity of open-anchored test)",
+  "mandate_fresh": {
+    "trail_family_14d": "119T 86.6% +9.92 (profit-monster-trail 83T 89.2% +4.70 + atr_trail_hit 27T 77.8% +4.31 + trail_sl 5T +0.71 + rr_engine_trail_hit 4T +0.20)",
+    "hard_max_loss_14d": "78T 0.0% -7.80",
+    "armed_14d": "137T 78.1% +9.32 vs unarmed 212T 9.4% -13.60",
+    "read": "THIS IS HOW WE WIN / THIS IS HOW WE LOSE — restated from DB this run (brief's 89T/56T absolutes are stale, direction confirmed)"
+  },
+  "watchdog_steer_response": {
+    "steer": "steer-001 bb-bounce-v2-long+ losing streak 3 losses, -0.34 over last 20",
+    "verdict": "DO NOT DISABLE — the losses are the unarmed-chop cohort, not a broken signal",
+    "evidence_14d": "n=37 45.9% -0.75 | armed 20T 18W +0.90 vs unarmed 17T 0W -1.65 | exits: profit-monster-trail 20T 18W +0.90 vs hard_max_loss 9T 0W -0.82 + atr_sl_hit 6T 0W -0.46",
+    "owner": "TAT variant-C (criteria MET #93: 6 cuts +13.00pp, fk 0% winner-kills, sign-p 0.031) — WLFI #16360 WAS the 15th TAT fire and variant-C would have cut -0.61% instead of -4.83% — plus MFE-CUT (Oct 25)",
+    "action": "CEO GO on TAT variant-C is the fix for this exact steer; disabling forfeits +0.90 of armed winners"
+  },
+  "losing_trade_autopsy": {
+    "method": "brain/analysis/recovery_replay.py adverse-first anchor (--selfcheck PASS); open-anchored replay is VACUOUS, not used",
     "24h": {
       "n": 3,
       "never_adverse": 1,
-      "recovered_after_adverse": 2,
-      "NEVER": 0
+      "recovered_after_adverse": 1,
+      "never": 1,
+      "split": "48h n=15 = 3 never-adverse / 11 recovered-after-adverse / 1 NEVER (SYRUP #16337)"
     },
-    "48h": {
-      "n": 19,
-      "never_adverse": 5,
-      "recovered_after_adverse": 13,
-      "NEVER": 1,
-      "only_NEVER": "SYRUP #16337 continuation+ stale_exit -0.23"
-    },
-    "verdict": "WRONG-SIDE REFUTED 28th consecutive run on corrected evidence; independent support unchanged (#61 opposite-side p=0.116, #84 fwd-return t=-0.04)",
-    "losers": [
+    "verdict": "WRONG-SIDE REFUTED 28th consecutive run on corrected + independent evidence (#61 p=0.116, #84 fwd t=-0.04); winning side on the losers = flat / already-short",
+    "trades": [
       {
-        "id": 16360,
-        "coin": "WLFI",
+        "losing_trade": "WLFI LONG -0.11 USDT / -4.831% acct",
         "signal": "bb-bounce-v2-long+",
-        "pnl": -0.11,
+        "regime": "NORMAL",
         "exit": "hard_max_loss",
-        "regime": "NORMAL",
-        "conf": 48.5,
-        "root_cause": "unarmed chop entry, mid-band against both-TF SHORT_BIAS; MFE +0.16 never armed",
-        "class": "never-armed chop (covered by queued TAT variant-C + MFE-CUT)"
+        "opened": "2026-10-23 07:02:52",
+        "closed": "08:32:19",
+        "root_cause": "unarmed chop LONG mid-band against both-TF SHORT_BIAS; MFE +0.16 never reached +0.40 trail arm (same class as POL #16349 -4.85 two days earlier)",
+        "entry_check": "meta_rsi 57.14 mid-band (not an extreme) — entry CONDITION was direction, not RSI",
+        "recommended_change": "TAT variant-C (pre-registered, CEO GO pending) — would cut at -0.61% not -4.83%",
+        "impact_on_winners": "0 of 7 in-scope winners killed (fk 0% PASS, #93 counterfactual)",
+        "confidence": "HIGH (criteria met; caveat n=6 cuts)"
       },
       {
-        "id": 16359,
-        "coin": "ME",
+        "losing_trade": "ME LONG -0.05 USDT / -1.366% acct",
         "signal": "bb-squeeze+",
-        "pnl": -0.05,
-        "exit": "trail_arm_timeout",
         "regime": "NORMAL",
-        "conf": 100.0,
-        "root_cause": "entry RSI 74.68 (at SIGNAL_FILTER_RSI_MAX=75 ceiling), conf 100, 61m hold, never trailed",
-        "class": "armed-giveback / timeout (covered by TAT variant-C)"
+        "exit": "trail_arm_timeout",
+        "root_cause": "entered overbought (meta_rsi 74.68, 0.3pt under SIGNAL_FILTER_RSI_MAX=75), trail never armed",
+        "recommended_change": "none now — n=1; queued MFE-CUT (Oct 25) owns the never-armed giveback class",
+        "confidence": "LOW (n=1)"
       },
       {
-        "id": 16353,
-        "coin": "BTC",
+        "losing_trade": "BTC SHORT -0.03 USDT / -1.528% acct",
         "signal": "ai-trader-pending",
-        "pnl": -0.03,
-        "exit": "UNIVERSAL_MAX_HOLD",
         "regime": "NORMAL",
-        "conf": 55.0,
-        "root_cause": "8h LOW-vol pin chop, went adverse then traded back",
-        "class": "CEO-domain pending; not wrong-side"
+        "exit": "UNIVERSAL_MAX_HOLD",
+        "root_cause": "8h LOW-vol pin, never armed — CEO-domain trade, backstop worked as designed",
+        "recommended_change": "none (CEO domain; backstop exit was ~0.06-0.08% better than the standing rule's own trigger, #87)",
+        "confidence": "HIGH"
       }
-    ],
-    "new_patterns": 0
-  },
-  "watchdog_triage": {
-    "steers": 1,
-    "steer_001": "bb-bounce-v2-long+ 3-loss streak, -0.34 over last 20 -> CONFIRMED as a 7d/14d fact (7d 21T 47.6% -0.56 / 14d 37T 45.9% -0.75) but KILL REJECTED: 30d 62T 54.8% -0.08 reverses on WR; coverage already queued as TAT variant-C + MFE-CUT. No action.",
-    "stale_steer_caught": "watchdog snapshot 09:14 says exit-rule 'streak 4/15 NOT met'; own candle re-read at 09:47 shows 26/15 MET since 09:36 -> stale-by-33min, see readiness"
-  },
-  "regime_readiness": {
-    "watchdog_0914": "btc_15m SHORT_BIAS, btc_4h SHORT_BIAS, volatility LOW, volume LOW, market_phase CALM, trend_quality UP",
-    "continuum": "AT (price straddling EMA300), linreg LEAN_BULL flipped 08:44",
-    "auto_trader_shadow": "CHOP, MANAGE_ONLY, scores -5/-5, 0/5 record",
-    "sources_disagree": "SHORT_BIAS / NEUTRAL / LEAN_BULL within 60min -> no directional conviction to add"
+    ]
   },
   "signal_deep_dive": {
-    "sub_50_pct_n_ge_15_14d": [
-      [
-        "ai-trader+ LONG",
-        28,
-        39.3,
-        -0.89,
-        "AI_TRADER_ENABLED=False (disabled)"
-      ],
-      [
-        "volume-breakout-long+ LONG",
-        16,
-        18.8,
-        -0.76,
-        "KILLED"
-      ],
-      [
-        "bb-bounce-v2-long+ LONG",
-        37,
-        45.9,
-        -0.75,
-        "TAT variant-C + MFE-CUT queued"
-      ],
-      [
-        "doji-bottom-long LONG",
-        20,
-        40.0,
-        -0.62,
-        "KILLED"
-      ],
-      [
-        "pump-chain+ LONG",
-        46,
-        26.1,
-        -0.36,
-        "CONF_FLOOR (bare)"
-      ],
-      [
-        "pump-chain- SHORT",
-        36,
-        22.2,
-        -0.34,
-        "CONF_FLOOR (bare)"
-      ]
-    ],
-    "verdict": "0 NEW targets — all 6 covered by killed/disabled/queued/CONF_FLOOR",
-    "only_live_uncovered": "hl_copy_trader 14d 12T 25.0% -0.24 = 30d 12T identical (last trade Oct 21) -> n stuck at 12, DORMANT-low-rate; n>=20 ETA ~9 days at current rate. Pre-register the deep-dive for when n>=20 instead of re-querying every run.",
-    "chop_exit_axis_7d": "atr_sl_hit 37T 2.7% -2.50 | hard_max_loss 19T 0% -2.39 | stale_exit 3T -0.62 | hard_sl 6T -0.51 | trail_arm_timeout 10T 20% -0.45 | profit-monster-trail 39T 89.7% +1.95"
+    "new_sub50_n15_targets": 0,
+    "reason": "every 14d negative with n>=10 is owned: ai-trader+ disabled | volume-breakout-long+/short- killed | doji-bottom-long killed | oversold-bounce+ killed | volume-buildup+ killed | hmacd_mtf± killed | bb-bounce-v2-long+ = TAT variant-C + MFE-CUT | pump-chain+/- = CONF_FLOOR bare | ai-trader-pending CEO-domain | hl_copy_trader 11T 27.3% n<20 MONITOR (only live uncovered family)",
+    "watchdog_would_block_cohort": "conf<70 14d = 205T -4.00 (see creative: this population is penalty-crushed, not low-confidence)"
   },
-  "pre_reg_rechecks": {
-    "CONF_FLOOR_30_bare": "REPRODUCES EXACTLY: blocked signal IN (pump-chain+,pump-chain-) conf<30 = 32T 4W -1.81 (23+9 / 4+0 / -1.28+-0.53); fkA-literal 4/127=3.1% PASS; fkA-family 4/25=16.0% PASS; fkA-scope 4/20=20.0% FAIL-at-bar; fkB 4/32=12.5% PASS. metadata final_confidence<30 = 0 ROWS (column blocker stands). SHIP STILL HELD on (a) CEO fk-definition ruling, (b) raw-column pin + blocked==32 self-check, (c) vacation no_constants_change.",
-    "pump_chain_plus_kill": "RECHECK DATE PASSED -> NO-KILL stands (14d 46T 26.1% -0.36; 30d 68T 36.8% +1.85 OOS reverses; conf>=30 30d 45T +3.13 forfeited; bleed = conf<30 -1.28 = CONF_FLOOR's exact target)",
-    "pump_chain_minus_kill": "CANCEL stands (bare conf<30 = 9T -0.53 = 93% of bleed; conf>=30 wash)",
-    "TAT_variant_C": "in-scope fires = 15 (22 raw - 7 manual/pending excluded); no 16th since WLFI #16360 07:58 -> bar stays crossed at exactly 15; variant-C still PRE-REGISTERED PASS (6 cuts, net +13.00pp, fk 0% of 7 winner-kills) awaiting CEO GO",
-    "arm_dampen": "CANCELLED-WITH-DATA (#91)",
-    "waiver_expiry": "expires 2026-10-24T00:00:00Z (T directive, in ~14h); flip1 exemption-attributable opens 2 of 5 bar -> default LAPSE; recommend decoupling flip2 (vb- HIGH/EXTREME) for separate CEO ruling",
-    "size_reduce": "file truth size_multiplier=0.5; 7d 141T 38.3% >=35 PASS / pnl -3.03 < -2.00 FAIL -> STAYS. guardrail timer ACTIVE (next 09:57, last 09:27). auto-clear projected ~19:35 UTC today as the Oct 16-17 cohort exits the rolling 7d window — aging only, no new wins required. Do not re-apply manually.",
-    "CONF_FILTER": "enforce flip still blocked on net-vs-fk CEO ruling: 14d would-block 291T 103W -4.99 -> fkA-literal 81.1% FAIL vs net +4.99"
+  "chop_coverage_ledger": {
+    "axis": "hard_max_loss 14d -7.80",
+    "owned": "killed/disabled -3.20 (33T) + CONF_FLOOR bare cohort -0.88 (8T) + bb-bounce MFE-CUT/TAT -0.82 (9T) = -4.90 = 63%",
+    "residual": "-2.90 across 15 cells, every cell n<=4 -> no new kill qualifies (target >=80%)",
+    "unchanged_from": "#90's 63% exit-axis reading"
   },
-  "changes_from_last_run": {
-    "run_93_items": [
-      "TAT 15-fire bar -> VERIFIED still 15 in-scope (no 16th)",
-      "CONF_FLOOR blocked set -> VERIFIED 32T/4W/-1.81 unchanged, fkA-scope still 20.0% FAIL-at-bar",
-      "vacation_mode.json -> STILL true/no_constants_change (mtime Oct 22 15:29), 8th consecutive run of drift",
-      "size-reduce auto-clear ETA -> guardrail timer live, ETA still ~19:35 UTC today",
-      "recovery_replay --selfcheck -> PASS"
-    ],
-    "run_92_items": [
-      "SIZE-REDUCE-SHADOW -> 0 fires, but ALSO 0 sizing execs since ship 07:46 (no opens since) = correct-by-traffic, still untestable",
-      "auto-clear ETA ~19:35 -> re-verified (WR leg now PASSES at 38.3%, pnl leg -3.03 still fails)"
-    ],
-    "did_it_work": "no behavioral change shipped last 2 runs (doc/shadow only) -> nothing to revert"
-  },
-  "last_run_verify": {
-    "recovery_replay_selfcheck": "PASS (96.1% vacuity asserted)",
-    "kill_flags": "0 killed-signal opens in last 3d (doji/volume-breakout/oversold/ai-trader+/hmacd all absent) = correct",
-    "floor_45": "0 open SHORTS in 3d -> 0 violations",
-    "constants_git_diff": "ZERO (scripts/hermes_constants.py clean)",
-    "protected_flags": "untouched",
-    "tracebacks": "4 total in logs/pipeline.log, none new on 2026-10-23",
-    "timers": "price-collector, 1m-candle, signal-compactor, watchdog, pump-hunter, vacation-guardrail all live",
-    "conf_filter_shadow": "8 lines / 6 unique fires since 06:50 = FIRST REAL TELEMETRY (see creative)",
-    "ugb_shadow": "last fire YGG #16356 03:04-03:05, still armed trades only",
-    "hml_shadow": "live_pnl flowing on #16358 (09:36, actual -0.800 / shadow -1.500 / lev5)",
-    "tat_live": "last live TAT fire HBAR 03:36 (+0.25% cut, closed a winner)"
-  },
-  "config_changes_applied": [],
   "drift_findings": [
     {
+      "id": "D1",
       "severity": "MED",
-      "item": "vacation_mode.json true/no_constants_change 8th consecutive run vs kanban #86 prose 'vacation ENDED' -> whole resume stack (CONF_FLOOR etc.) blocked behind it. Action for T/CEO: run vacation_mode.py off or correct the record."
+      "finding": "VACATION STATE MISMATCH — 8th run. data/vacation_mode.json reads vacation_mode=true / no_constants_change=true while kanban prose (#86) says vacation ENDED. File treated as source of truth -> 0 constants changes this run. ACTION FOR T/CEO: run vacation_mode.py off if truly over, else correct the record.",
+      "status": "open"
     },
     {
-      "severity": "LOW",
-      "item": "session_brain duplicate-heavy (corpus, not index) 8th run — used for ideation only"
-    },
-    {
+      "id": "D2",
       "severity": "MED",
-      "item": "trades.entry_regime_4h 0/713 populated over 30d despite two write paths (feature_recorder.py:196, hl-sync-guardian.py:2604); audit_gate_unfreeze.py:146 prints an empty regime split"
+      "finding": "[SIZE-REDUCE-SHADOW] (#92 ship) used print() inside decider_run; run_pipeline.py:111-118 echoes only the LAST 8 stdout lines of decider_run, so the line was structurally invisible -> '#92 0 fires correct-by-traffic' was unfalsifiable, not evidence.",
+      "fix": "SHIPPED this run: class fix — all 10 diagnostic print() sites in decider_run.py converted to log(), import hoisted",
+      "verification": "first fire 2026-10-23 10:37:03 base=11.00 x0.5 -> floored 11.00 effective cut 0% NO-OP — confirms #92's live-0%-cut finding on real data"
     },
     {
+      "id": "D3",
+      "severity": "MED",
+      "finding": "CONF-FILTER-SHADOW now firing (5 unique today: AVAX/DOGE/LTC ...). ALL 11 lines used=final, raw=None — the decider layer never receives the raw compactor confidence, so a CONF_FLOOR gate placed there cannot be pinned to RAW without plumbing (pre-ship blocker from #88 now observed live).",
+      "status": "open, feeds CEO fk ruling"
+    },
+    {
+      "id": "D4",
       "severity": "LOW",
-      "item": "trades.regime 674/674 NEUTRAL over 30d = zero-variance axis (read by audit_bb_bounce_v2.py:97)"
+      "finding": "session_brain duplicate-heavy 8th run (identical text under different titles) — unused for conclusions; ingest-time hash-dedupe still not shipped",
+      "status": "open"
+    },
+    {
+      "id": "D5",
+      "severity": "MED",
+      "finding": "trades.entry_regime_4h 0/713 despite 2 write paths (from #90) — unresolved",
+      "status": "open"
+    },
+    {
+      "id": "D6",
+      "severity": "LOW",
+      "finding": "sideways (bug_hunter): other scripts may ship print()-based diagnostics into run_pipeline steps that only echo a stdout tail — same class; audit before shipping further print() shadows",
+      "status": "noted"
     }
   ],
-  "readiness": {
-    "open": "BTC #16358 LONG @81872, opened 02:44:31, 7h03m open, SL 81380 / TP 82400, leverage 5, trailing_activated=False, peak 82033.5 = +0.197% (never reached +0.40% arm)",
-    "EXIT_RULE": "MET — 26 consecutive 1m closes below converged EMA300 (81748.6), streak started 09:21, threshold 15 crossed ~09:36. Last close 81630.01 = -0.145% vs EMA300. Verified on 1000 bars with 2000-bar warm-up; price is below BOTH the watchdog's EMA300 (~81797) and mine (81748), so the call is source-independent.",
-    "backstop": "UNIVERSAL_MAX_HOLD 480m auto-closes at 10:44:31 UTC (~57min out) whether or not anyone acts; trail_arm_timeout also applies (7d 10T 2W)",
-    "max_additional_downside": "81630 -> SL 81380 = -0.31% price = -1.54% on 5x (bracketed, bounded)",
-    "action": "FLAGGED not executed — manual execution goes through the manual-trade-override skill and requires an explicit CEO request; 10 prior runs set this precedent. Watchdog's next agent cycle must re-read the condition from candles and issue/act on the exit instead of re-issuing the stale 09:15 'NOT met' prose.",
-    "fresh_entries": "NONE. Mid-band: price AT EMA300, both TF SHORT_BIAS, vol LOW, volume 0.69x of base (fails the with-volume leg), auto_trader CHOP 0/5. LONGs only on a sustained reclaim WITH volume; SHORTs only under EMA300 with 4h aligned. Size stays 0.5x."
-  },
+  "recurring_problems": [
+    "unarmed chop entries = the entire 14d bleed (armed +9.32 vs unarmed -13.60) — every queued lever (TAT variant-C / MFE-CUT / UGB / CONF_FLOOR) targets this one class",
+    "vacation-file vs prose mismatch blocks the whole Oct 23 CEO stack (8 runs)",
+    "escalation #17 exit-ladder candle OOS still blocks the largest measured recovery path (49th request)"
+  ],
+  "missing_implementations": [
+    "TAT variant-C — criteria MET (#93), waiting on CEO GO only",
+    "CONF_FLOOR=30 bare-only — blocked set reproduces exactly (32T/4W/-1.81 RAW), fkA-scope 20.0% FAIL-at-bar -> needs fk-definition ruling + raw pin + vacation off",
+    "MFE-CUT enforce (Oct 25)",
+    "re-enter-on-recovery (Oct 25)"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-23T10:40:00Z",
+      "idea": "CONFIDENCE-CRUSH CENSUS — the [70,95) CONF window measures the PENALTY GATE, not signal confidence",
+      "rationale": "The compactor checks the window pre-penalty; PENALTY-GATE prints both ends (conf 98 x 0.003 x 0.5 -> exec 49.0). If out-of-window exec confs are penalty-crushed approval-passing signals, then enforcing the window at exec is a penalty-block wearing a confidence label.",
+      "method": "brain/analysis/conf_crush_census_2026-10-23.py — parse PENALTY-GATE + EXEC lines from 13d of pipeline.log, join to closed trades by token+direction+minute (self-check PASS: cohort sum == joined)",
+      "results": {
+        "joined": 271,
+        "CRUSHED (pre>=70 -> exec<70)": "160T 35.0% -3.41",
+        "LOW (pre<70)": "0T — nobody executes below the window at approval",
+        "IN [70,95)": "24T 37.5% -0.17",
+        "HOT >=95": "41T 39.0% -0.07",
+        "NO-GATE": "46T 39.1% +0.01",
+        "CRUSHED by source": "pump-chain 63T -1.01 | doji-bottom-long 18T -0.68 | bb-bounce-v2-long 18T -0.35 | ai-trader 11T -0.31 | oversold-bounce 4T -0.39 -> -1.64 of -3.41 already inside killed/disabled families",
+        "fk_if_exec_conf_lt70_enforced": "56/99 = 56.6% of winners blocked"
+      },
+      "conclusion": "Exec-time CONF enforcement is dead twice over: fk 56.6% (bar <20%) AND it would block approval-passing trades for being penalized. The residual live CRUSHED bleed (pump-chain -1.01, bb-bounce -0.35) is already owned by CONF_FLOOR / MFE-CUT / TAT. Route the CEO's queued net-vs-fk ruling with this decomposition; do NOT flip the window at exec.",
+      "category": "entry sniper / decision quality",
+      "status": "measured this run",
+      "risk": "low (zero code beyond the analysis script)",
+      "refinement_vs_94": {
+        "finding": "ALL 50 joined 13d trades with stored trades.confidence < 30 were approved at PENALTY-GATE pre-penalty conf 85-99 and then crushed by the multiplier chain (exec 42-58 -> stored 20.4-29.6); 36/50 lost. The <30 leg of #94s CONFIDENCE-TAIL PACKAGE is 100% penalty-crushed approval-passing signals, not low-confidence detections.",
+        "cohorts_13d_joined_271": "CRUSHED (pre>=70 -> exec<70) 160T 35.0% -3.41 | no-gate/bypass 84T 41.7% +0.28 (median stored conf 100, max 499 = the >100 tail leg) | genuine pre<70 approvals: 0",
+        "read_for_ceo": "the tail block works as measured (it blocks a losing class) but it is an AFTER-the-penalty gate; the upstream alternative is the SCORE-FLOOR / multiplier chain that rescues near-zero penalty products (live example: LTC SHORT \"multiplier product 0.0034 floored to 0.5\" -> executed at exec conf 49). One variable at a time: ship #94s tail block as the single lever, record the mechanism so the floor question is not double-solved later.",
+        "fk_if_conf_window_enforced_at_exec": "56/99 = 56.6% of 13d winners -> do NOT enforce [70,95) at exec (bar <20%)"
+      }
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "file": "scripts/decider_run.py",
+      "change": "diagnostic print() -> log() at 10 sites (SIZE-REDUCE-SHADOW x2, dynamic-sizing WARN :288, SpeedTracker :197, Save-hotset-failures :2769, Volume Warmup x3, RECOVERY x3) + hermes_log import hoisted above the module-level SpeedTracker block",
+      "type": "infra / shadow sink fix (class fix, zero behaviour)",
+      "before": "print() -> run_pipeline.py:111-118 echoes only the LAST 8 stdout lines of decider_run -> structurally invisible; #92 SIZE-REDUCE shadow showed 0 fires in 3h and its verification was unfalsifiable",
+      "after": "log() -> appends to logs/pipeline.log directly (and still prints to stdout)",
+      "rationale": "a shadow/diagnostic that cannot be observed is worse than none; highest-severity instance was :288 the dynamic-sizing WARN, which fires exactly when sizing breaks (bug_hunter finding this run)",
+      "impact": "zero behaviour; first verified fire 2026-10-23 10:37:03 and again 10:44:23 UTC (base 11.00 x0.5 floored to 11.00 = 0% effective cut)",
+      "verification": "py_compile PASS | import OK (log bound to hermes_log) | live call returns 11.0 | git diff = sink changes + import hoist only | bug_hunter subagent PASS 5/6 (item 5 = the 8 pre-existing invisible prints this run then fixed)",
+      "constants_diff": "ZERO (hermes_constants.py untouched, CEO_PROTECTED_FLAGS 13/13)"
+    }
+  ],
+  "changes_from_last_run": [
+    {
+      "check": "TAT variant-C pack (#93)",
+      "result": "PASS — bar still 15 in-scope fires (last fire WLFI #16360 08:31, no new since), pack ready, CEO GO still the only blocker"
+    },
+    {
+      "check": "CONF_FLOOR bare-only blocked set",
+      "result": "PASS — reproduces exactly 32T / 4W / -1.81 (pump-chain+ 23T -1.28, pump-chain- 9T -0.53); fkA-literal 4/127=3.1% PASS | fkA-family 6/25=24.0% FAIL | fkA-scope 4/20=20.0% FAIL-at-bar | fkB 4/32=12.5% PASS -> still held on fk-definition ruling + raw pin + vacation"
+    },
+    {
+      "check": "pump-chain+ NO-KILL",
+      "result": "PASS — 14d 46T 26.1% -0.36 vs 30d 68T 36.8% +1.85 reverses positive"
+    },
+    {
+      "check": "size-reduce 0.5x file truth",
+      "result": "PASS — data/vacation_size_reduce.json size_multiplier 0.5; 7d WR 38.1>=35 PASS, PnL -3.00 < -2.00 FAIL -> stays; auto-clear ETA re-reproduced 19:35 UTC today (first +9h window n=110 WR 38.2 pnl -1.88 clears both legs)"
+    },
+    {
+      "check": "waiver (expires 2026-10-24T00:00Z)",
+      "result": "3 exemption-attributable SHORT opens (HBAR 36.3 +0.08, PUMP 39.3 +0.03, LTC 36.6 open) vs n>=5 bar -> LAPSE recommendation stands"
+    },
+    {
+      "check": "recovery_replay --selfcheck",
+      "result": "PASS (asserts 198/206=96.1% open-anchored vacuity)"
+    },
+    {
+      "check": "kill flags",
+      "result": "7/7 correct — DOJI_BOTTOM False, VOLUME_BREAKOUT_LONG/SHORT False, VOLUME_BUILDUP_PLUS False, HMACD_MTF_+/- False, AI_TRADER_ENABLED False, PUMP_CHAIN_V5_SHORT True (cancel confirmed)"
+    },
+    {
+      "check": "SHORT floor-45",
+      "result": "0 violations — LTC signal-time RSI 38.64 / PUMP 39.68 waiver-legal (>=35), ALT 26.9 knife-blocked (dead by design)"
+    },
+    {
+      "check": "HML shadow",
+      "result": "flowing 10:38:19 trades 16358 + 16362"
+    },
+    {
+      "check": "SIZE-REDUCE-SHADOW (#92)",
+      "result": "FIXED this run — was invisible (D2); now fires and confirms 0% effective cut"
+    },
+    {
+      "check": "protected flags / constants",
+      "result": "CEO_PROTECTED_FLAGS 13/13, hermes_constants.py ZERO git diff"
+    },
+    {
+      "check": "Tracebacks",
+      "result": "0 dated 2026-10-23 (4 total in log, Oct 11/18)"
+    },
+    {
+      "check": "recovery/TAT/UGB/CONF shadows",
+      "result": "all present and firing: UGB-PT YGG fires 03:04, CONF-FILTER 5 unique today, MFE-CUT BTC 10:16, TAT WLFI last 08:31"
+    }
+  ],
   "next_actions": [
-    "P0 CEO/watchdog: BTC #16358 exit rule MET (26/15 since 09:36) — act or explicitly stand down; do not let the 09:15 'NOT met' steer be re-issued",
-    "P1 CEO: fk-definition ruling (already pinned in brain/fk_definitions.md) -> unblocks CONF_FLOOR bare-only same-day AND the new CONFIDENCE-TAIL PACKAGE option",
-    "P1 CEO: TAT variant-C GO (pre-registered PASS: 6 cuts, +13.00pp, fk 0%)",
-    "P1 T/CEO: vacation_mode state — file says ON 8th run, kanban says ENDED; whole resume stack blocked",
-    "P2 Oct 24: unclog-waiver expiry (default LAPSE; decouple flip2/vb- for separate ruling)",
-    "P2 ~19:35 UTC today: size-reduce 0.5x expected to auto-clear on window aging — acknowledge, do not re-apply",
-    "P3 Oct 25: MFE-CUT / HML-SHADOW / habitat / re-enter-on-recovery / UGB / short-gate / first CONF-FILTER-SHADOW read (+ new marginal-fire redundancy rate)",
-    "P3 Escalation #17 (49th): exit-ladder candle OOS",
-    "P3 hl_copy_trader deep-dive deferred until n>=20 (~Nov 1) — stop re-querying every run"
-  ]
+    "T/CEO: vacation_mode.py off (or correct #86 prose) — 8 runs blocked behind the file",
+    "CEO: #94 CONFIDENCE-TAIL PACKAGE — mechanism now measured (100% penalty-crushed); ship as the single confidence lever, do NOT also flip the [70,95) window at exec (fk 56.6%)",
+    "CEO: TAT variant-C GO — directly answers watchdog steer-001 (would have cut WLFI -0.61% not -4.83%), fk 0% winner-kills",
+    "CEO: fk-definition ruling WITH this run's conf-crush decomposition — recommend NOT flipping CONF window at exec (fk 56.6% + it is a penalty-block); CONF_FLOOR bare-only ships same day only under literal/fkB definitions",
+    "CEO: pump-chain+ NO-KILL verdict (table attached), SIZE-REDUCE semantics (0% cut at current balance, auto-clear 19:35 UTC today)",
+    "Oct 24: waiver lapses (3/5 opens)",
+    "Oct 25: MFE-CUT / HML / habitat subtype / re-enter-on-recovery / UGB pump-chain-first / short-gate loosening / CONF-FILTER net-vs-fk first read + first UGB join",
+    "Escalation #17 (49th): exit-ladder candle OOS"
+  ],
+  "readiness": {
+    "open": "2 — BTC #16358 LONG @81872 (7.5h, never armed; watchdog standing condition: cut flat at 12:44 UTC if still un-armed; MFE-CUT shadow firing live -0.14% live_pnl) + LTC #16362 SHORT @59.395 (+0.27% live, exec conf 49, RR grade D, waiver-legal RSI 38.6)",
+    "regime": "both TF SHORT_BIAS, vol LOW, velocity SLOW, market_phase DECLINING, trend_quality STRONG_UP, aggregate ~22-24 flips/24h = STANDING high-churn state (>=26 = anomaly)",
+    "posture": "no fresh entries mid-band; LONGs only on a sustained reclaim WITH volume (current volume leg FAILS), SHORTs only while below EMA300 with 4h aligned; size 0.5x (no-op at current balance)",
+    "btc_note": "#94 flagged the standing exit condition MET at ~09:36 (26 consecutive 1m closes below EMA300, threshold crossed 09:36); UNIVERSAL_MAX_HOLD backstop auto-closes #16358 at 10:44:31 UTC regardless — watchdog 10:14 snapshot still stale on this. FLAGGED NOT EXECUTED (CEO domain, manual-trade-override requires explicit request)."
+  },
+  "prior_run_note": "#94 ran 09:50 UTC (doc ship fk_definitions option table; flagged BTC #16358 exit condition MET at 09:36 and pre-registered the CONFIDENCE-TAIL PACKAGE). This run #95 supersedes nothing of #94 — it adds the mechanism behind that package."
 }
