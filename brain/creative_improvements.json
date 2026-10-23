@@ -7364,5 +7364,42 @@
     "status": "suggested",
     "risk": "low",
     "n": 1
+  },
+  {
+    "date": "2026-10-23T15:45:00Z",
+    "idea": "VB- STRENGTH-BAND GATE PRE-REGISTERED — block volume-buildup- SHORT when signal-time rsi_14 < 55 (watchdog P1, brain-auditor scope)",
+    "rationale": "full-history lt45 9T 44.4% '-0.45' vs ge60 6T 83.3% '+0.37'; 7d lt55 6T 16.7% '-0.54' vs ge55 2T 100% '+0.19'. Matches watchdog P1 exactly. NOT SHIPPED: signal-scope blocked ~10T incl 4-5 winners = fk 40-50% > 20% bar and n=10 < 20.",
+    "expected_impact": "saves ~$0.45/30d if criteria mature; avoids shipping a fk-failing band now",
+    "category": "entry sniper",
+    "status": "pre_registered",
+    "risk": "low",
+    "ship_criteria": "blocked-set n>=20 AND fk<20% AND save>$1.00 AND 30d OOS same sign"
+  },
+  {
+    "date": "2026-10-23T15:45:00Z",
+    "idea": "REJECTED-WITH-DATA: general SHORT meta_rsi<55 entry block + ge60 SHORT entry-wash finding",
+    "rationale": "30d block <55 = 139T blocked incl 48 of 78 short winners = fk 61.5% (bar 20%). ge60 band: 38T 50% WR but net '-0.40' (avg loss -0.135 > avg win 0.114) while whole 30d SHORT bleed is sub-60 ('-3.33'/156T). 'Short strength' = hit-rate edge, not expectancy edge.",
+    "expected_impact": "prevents re-proposing the 'short strength' entry gate after waiver lapse",
+    "category": "kill-with-data",
+    "status": "rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T15:45:00Z",
+    "idea": "SIZE-REDUCE AUTO-CLEAR ETA CORRECTED — earliest clear 00:35 UTC Oct 24, not 19:14 today",
+    "rationale": "fresh rolling sim: +4h (19:35) 120T WR 36.7 pnl '-2.46' FAIL; first passing window +9h 115T WR 37.4 pnl '-1.80' (margin only $0.20). Runs #92-#98 carried 19:14-19:35 which no longer reproduces after today's losses. Marker is inert anyway (0% effective cut at HL floor).",
+    "expected_impact": "CEO stops expecting an afternoon clear; timer does it automatically, one small loser delays again",
+    "category": "guardrail",
+    "status": "measured",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T15:45:00Z",
+    "idea": "warrior-sr-confirm- WATCH — 3/3 today '+0.24', 30d 3T 100%, family 30d 7T 71.4% '+0.19'",
+    "rationale": "only positive new signal family observed this run; n=3 far below 15-trade bar",
+    "expected_impact": "none yet — accrue",
+    "category": "watchlist",
+    "status": "monitor",
+    "risk": "low"
   }
 ]
