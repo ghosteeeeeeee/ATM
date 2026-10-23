@@ -14456,3 +14456,24 @@ Final set: ['BTC']
 - 7d -$3.01 vs -$3.15 last hour — slight improvement, size-reduce 0.5x still active (file truth)
 - CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
 - Waiver expiry Oct 24 (tomorrow)
+
+## 2026-10-23 17:28 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: n/a) | 24h: 19T 8W `-$0.36` (42.1%) | 7d: 125T 35.2% `-$2.77` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — nothing to diagnose
+- atr_sl_hit 1/19 = 5.3% (<40%) over 24h — dominant close = profit-monster-trail (8T +$0.57), winners riding
+- No 0%WR signal with 3+ trades last hour (no trades at all)
+- No negative-hour streak (empty hour resets prior 16:28 green/empty)
+- Frequency 0/hr — not overtraded
+- 1 open: AVAX r2v2-long4 LONG (-0.15%) bracketed SL 9.075/TP 9.279 — let it ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d -$2.77 vs -$3.01 last hour — slight improvement, size-reduce 0.5x still active (file truth)
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
+- Waiver expiry Oct 24
