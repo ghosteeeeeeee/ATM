@@ -7061,5 +7061,32 @@
     "category": "measurement",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T05:55:00Z",
+    "idea": "PATH-TO-FULL-SIZE forecast (zero code): size-reduce auto-clears within <=24h",
+    "rationale": "Guardrail rule = (7d WR>=37.0 AND 7d PnL>=-2.00) OR PnL>=0, evaluated every 30min by hermes-vacation-guardrail.timer (ACTIVE, last run 05:27). NOW: WR 37.9 PASS / PnL -3.19 FAIL = stays 0.5x. But the 45 closes worth -2.10 from Oct 16-17 leave the rolling window within 24h -> projected 6d window: n=100 WR 39.0% PnL -1.09 -> CLEARS with zero new wins. Mechanism is aging of one bad cohort, not fresh PnL (exactly the artifact #25 added the -2.00 floor to blunt; the floor is thinner than one bad day). Decision point for CEO: accept as designed vs require earned recovery (pnl>=0 path, 3d away at current +0.46/24h run-rate).",
+    "expected_impact": "Sizing returns to 1.0x automatically ~Oct 24; forecast published so the flip is not mistaken for a manual change",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T05:55:00Z",
+    "idea": "ARMED-SIDE LEAK LEDGER (zero code): the ride-the-trend side has one leak class and it is already owned",
+    "rationale": "14d armed 135T = winners +10.14 / losers -0.80 (78.5% WR). All 17 trail_arm_timeout trades (-0.55) are inside the LIVE TAT scope (pump-chain 15T, bb-squeeze 1T, v6-combo 1T) — 0 timeout trades exist outside it, so no TAT scope extension is justified. Residual uncovered armed losers = 6T -0.25 across 6 signals (negligible). Conclusion: every remaining material lever is on the UNARMED side (213T -13.61) = entry/arming, which is exactly the queued stack (CONF_FLOOR, MFE-CUT, arm-dampen, TAT-shadow flip). Also measured and NOT shipped: bb-squeeze hard_max_loss 17/69=24.6% pre-TAT vs 2/8=25.0% post-TAT = same rate on n=8, so TAT cannot be credited with an HML reduction; consistent with #89 (40% of SL deaths happen before any 45m rule can fire) -> TAT only handles the survive-to-45m staller cohort.",
+    "expected_impact": "Closes the 'add another exit rule' route with data; keeps the queue pointed at entries",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T05:55:00Z",
+    "idea": "CHOP-COVERAGE KPI refreshed: 63% of 14d hard_max_loss bleed owned (target 80%)",
+    "rationale": "Standing KPI from #84/#86: killed 42% + CONF_FLOOR 11% + MFE-CUT 9% = 63% of -7.77; residual 28T -2.91 spread over 12 cells with max n=7 -> no new kill qualifies (all n<20). Gap to target = 17pp and cannot be closed by a kill; closes by CONF_FLOOR shipping and MFE-CUT eval (both queued).",
+    "expected_impact": "Keeps 'keep us out of chop' a tracked number; signals when a residual cell reaches n>=20",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
