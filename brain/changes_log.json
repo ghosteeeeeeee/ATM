@@ -1936,5 +1936,27 @@
     "after": "recompute-confirmation line added (identical numbers at 01:40)",
     "rationale": "#83 pre-reg requires fkA recompute AT ship time; showing stability across the morning removes the stale-number failure mode (#71)",
     "impact": "zero behavior; supports same-day CEO ruling"
+  },
+  {
+    "timestamp": "2026-10-23T04:05:00Z",
+    "agent": "brain_auditor",
+    "change": "[CONF-FILTER-SHADOW] log-only would-block line in context_gate (decider_run.py) - CONF_FILTER_MAX/MIN are compactor-resident and STANDALONE_BYPASS signals skip them",
+    "type": "infra",
+    "file": "scripts/decider_run.py",
+    "before": "no exec-time confidence-window check outside signal_compactor._score_signal",
+    "after": "log-only [CONF-FILTER-SHADOW] would-block line (no return, zero behaviour), placed after the vol-gate chain and before rule_based_context_gate",
+    "rationale": "85T/14d at conf>=95 and 203T at conf<70 opened despite CONF_FILTER_ENABLED=True; outside-window 288T -4.86/14d vs in-window 58T +0.82, OOS-consistent 7/14/30d. Same toothless-gate class as the documented RSI_MAX hardening. Enforce-flip blocked by fk=80% -> CEO net-vs-fk ruling.",
+    "impact": "zero live behaviour; produces the Oct 25 counterfactual"
+  },
+  {
+    "timestamp": "2026-10-23T04:05:00Z",
+    "agent": "brain_auditor",
+    "change": "Regime flip-rate KPI threshold recalibrated: >=6 found vestigial (satisfied 100% of last 14d, min 11, p50 19, p95 26)",
+    "type": "doc",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": ">=6 flips/24h = high-churn tape; below 6 = cheap snapshot prose",
+    "after": "empirical distribution pinned (min 0 / p50 19 / p95 26 / max 31 over 1969 dumps; 14d min 11), condition-based wording stated as the always-on default, >=26 = anomaly flag, <6 = informative low-churn tail unobserved since Oct 2",
+    "rationale": "a threshold satisfied on every observation cannot discriminate and invites false anomaly reports",
+    "impact": "zero behaviour; prevents misreading the baseline as an anomaly"
   }
 ]

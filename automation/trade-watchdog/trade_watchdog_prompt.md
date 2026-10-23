@@ -262,14 +262,22 @@ PY
 **Measured baseline 2026-10-23:** aggregate **22 flips/24h**, BTC 15m **20 flips/24h**
 (96 dumps). A 15m dump every 15 min means an average direction state survives **~1 hour**.
 
-- **≥6 flips/24h = high-churn tape** → any snapshot-directional steer decays within 1-2
-  cycles. Report flips/24h alongside the steer, and default to **condition-based** wording
-  (re-test the condition next cycle, retraction rule above) rather than "the bias is X now".
+**Threshold calibration (brain_auditor #88, 2026-10-23 — the original ≥6 line is VESTIGIAL).**
+Full-log rolling-24h aggregate flips, 1969 dumps 2026-10-02 → 10-23:
+`min 0 / p5 12 / p25 16 / p50 19 / p75 22 / p95 26 / max 31`. **Last 14d: min 11, p50 20** —
+so the old "≥6 = high-churn" line is satisfied on **100% of the last 14d** (96.9% of all
+dumps). It cannot distinguish anything and must not be reported as an anomaly.
+
+- **Condition-based wording is the DEFAULT, always.** Report flips/24h alongside any
+  direction-flavored steer, re-test the condition next cycle, apply the retraction rule
+  above. Do not write "≥6 = high churn" as if it were a finding — it is the standing state.
+- **An "unusually unstable" flag is ≥26 flips/24h (p95).** The genuinely informative tail
+  is the LOW one: **<6 has not occurred since Oct 2** (28/1969 dumps). Measuring <6 means a
+  real trend tape — the one time snapshot-directional prose is cheap. Verify before using it.
 - Also state **which source** the direction came from — the sources disagree:
   2026-10-23 00:14 the aggregate was `SHORT_BIAS`, at 00:15 it flipped to `LONG_BIAS`
   (alt long_bias 11→40) while `regimes.BTC` stayed `NEUTRAL` and continuum stayed
   `LEAN_BEAR`. "Regime says X" without a source is unauditable.
-- Below 6 flips/24h, snapshot-directional prose is cheap — no extra ceremony needed.
 
 ## Step 6: AI Trader Signal (Hourly Pick)
 

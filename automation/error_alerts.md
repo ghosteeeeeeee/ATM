@@ -1639,3 +1639,10 @@
 
 ## Error Alerts — 2026-10-23 02:27 UTC
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`
+
+## Error Alerts — 2026-10-23 02:45 UTC
+- **WARN** (1x): `disk usage 85% on / (95G/118G, 18G free)` — threshold is 85%
+- **AUTO-FIX**: gzipped stale logs (mtime+1d, >100k) in /root/.hermes/logs; active logs (pipeline.log 250M, signal-compactor.log 97M) are still being written so left alone. No missed timers, no crashes, no stale prices — otherwise healthy.
+
+## Error Alerts — 2026-10-23 03:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+TOK+TOK, allowing despite TOK filter`

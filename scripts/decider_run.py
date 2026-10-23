@@ -1877,6 +1877,29 @@ def context_gate(token, direction, source, sig):
         log(f'  [VOL-GATE] {token}: error {e} (fail-closed — loss prevention)')
         return ('SKIP', f'volatility gate error (fail-closed): {e}', 0)
 
+    # ── CONF_FILTER parity SHADOW (brain_auditor #88, 2026-10-23) ───────────
+    # CONF_FILTER_MAX/MIN are referenced ONLY inside signal_compactor._score_signal.
+    # STANDALONE_BYPASS signals skip signal_compactor, so the [70,95) window is
+    # unenforced on that path — same toothless-gate class as the SIGNAL_FILTER_RSI_MAX
+    # hardening (hermes_constants.py:897 / decider_run.py:1101).
+    # Measured on trades.confidence (14d): outside-window 288T '-$4.86' vs in-window
+    # 58T '+$0.82'; 30d '-$7.71' vs '+$2.23'. Confluence-path trades cannot reach this
+    # line out-of-window (blocked upstream), so ANY line here = a genuine leak.
+    # LOG-ONLY — zero behaviour. Flip needs a CEO ruling: fk would be 102/127 = 80% of
+    # 14d winners (fails the <20% fk bar) while net is +$4.86/14d — net-vs-fk is a CEO call.
+    try:
+        from hermes_constants import CONF_FILTER_ENABLED as _CFE, CONF_FILTER_MAX as _CFX, CONF_FILTER_MIN as _CFN
+        if _CFE and isinstance(sig, dict):
+            _cf_raw = sig.get('confidence')
+            _cf_fin = sig.get('final_confidence')
+            _cf_val = _cf_raw if _cf_raw is not None else _cf_fin
+            _cf_used = 'raw' if _cf_raw is not None else 'final'
+            if _cf_val is not None and (_cf_val >= _CFX or _cf_val < _CFN):
+                log(f'  [CONF-FILTER-SHADOW] {token} {direction}: would-block used={_cf_used} '
+                    f'conf={_cf_val} raw={_cf_raw} final={_cf_fin} window=[{_CFN},{_CFX}) src={source}')
+    except Exception as _cf_e:
+        log(f'  [CONF-FILTER-SHADOW] {token}: error {_cf_e}')
+
     verdict, ctx, _ = rule_based_context_gate(token, direction, source, sig)
 
     if verdict == 'SKIP':

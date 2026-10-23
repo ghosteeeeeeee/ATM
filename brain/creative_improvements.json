@@ -7011,5 +7011,37 @@
     "category": "process guard",
     "status": "suggested (CEO to resolve the actual state first)",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-23T04:05:00Z",
+    "run": "brain_auditor #88",
+    "idea": "CHURN-AT-ENTRY (aggregate flips/24h before open) - measured and REFUTED-WITH-DATA",
+    "rationale": "#86 shipped flips/24h as a watchdog KPI but never joined it to trade outcomes. Mandate: 'keep us out of chop'. Joined 349/349 14d trades to the last regime dump strictly before open_time.",
+    "expected_impact": "none - zero variance: every 14d trade opened at churn >= 11 (min 11, p50 20), so the split has no treated/control group. Logged so it is never re-proposed.",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "low",
+    "artifact": "brain/analysis/churn_at_entry_2026-10-23.py"
+  },
+  {
+    "date": "2026-10-23T04:05:00Z",
+    "run": "brain_auditor #88",
+    "idea": "FLIP-KPI THRESHOLD RECALIBRATION - >=6 is vestigial",
+    "rationale": "1969 dumps Oct 2->Oct 23: min 0 / p50 19 / p95 26 / max 31; last 14d min 11. The >=6 line is satisfied on 100% of the last 14d (96.9% all-time) so it cannot distinguish anything and would be reported as an anomaly by mistake.",
+    "expected_impact": "prevents false 'high-churn' findings; condition-based prose stated as the always-on default; >=26 (p95) = the real anomaly flag; <6 = the informative low-churn tail (unobserved since Oct 2).",
+    "category": "process",
+    "status": "shipped",
+    "risk": "low",
+    "artifact": "automation/trade-watchdog/trade_watchdog_prompt.md"
+  },
+  {
+    "date": "2026-10-23T04:05:00Z",
+    "run": "brain_auditor #88",
+    "idea": "CONFIDENCE-SIZING route CLOSED with a calibration curve (pre-registered rejection)",
+    "rationale": "14d/30d WR+PnL by conf band is non-monotonic (14d 60-74 +0.30 best-of-positive, 75+ -1.57; 30d 60-74 +2.82 vs 75+ 443T -4.73 worst absolute) and the 75+ bleed is confounded by killed/disabled signals (ai-trader+, volume-breakout-long+, bb-bounce-v2-long+ own the worst cells).",
+    "expected_impact": "no ship; blocks a non-monotonic, confounded sizing proposal before it is made.",
+    "category": "sizing",
+    "status": "rejected_with_data",
+    "risk": "low"
   }
 ]
