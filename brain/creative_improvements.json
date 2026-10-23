@@ -7231,5 +7231,33 @@
     "category": "entry sniper / decision quality",
     "status": "measured this run",
     "risk": "low (zero code beyond the analysis script)"
+  },
+  {
+    "date": "2026-10-23T11:40:00Z",
+    "idea": "ENTRY-FEATURE SEPARATION TEST — admission-time chop gate from 13 stamped metadata fields, measured then REJECTED-WITH-DATA (HML 78 vs ARMED 138: all medians noise, global min Fisher p=0.073 over 65 field x threshold tests, btc_score delta decays +7.70 -> +0.99 across halves). Artifact brain/analysis/entry_feature_split_2026-10-23.py --selfcheck PASS.",
+    "rationale": "Mandate: keep us out of chop at ADMISSION. If stamped entry features separated never-armed from trail-armed, an entry gate exists. They do not — the separation only appears after entry.",
+    "expected_impact": "none; closes a route so it is not re-proposed",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T11:40:00Z",
+    "idea": "WITHIN-SLOT LOWEST-CONFIDENCE ADMISSION THROTTLE as the size-reduce fallback (drop the hour-slot's lowest-confidence candidate when it sits >=15 conf below the slot median AND effective size cut == 0%)",
+    "rationale": "size-reduce 0.5x cuts 0% at the HL min-notional floor, so the guardrail has no expression; 30d test 196 slots/545 closes: 57 drops / 16 winners / +1.98 saved / fk 6.7% (bar <20%), both halves same sign; residual after removing already-killed signals + conf<30 = 33T / 11W / -0.64 (fk 3.6%).",
+    "expected_impact": "+0.64 per 30d residual (gross +1.98 mostly already owned by kills + CONF_FLOOR) — trivial, monitor",
+    "category": "exit/size mechanics",
+    "status": "suggested",
+    "risk": "low",
+    "pre_registered_bars": "residual net>0 at ship AND fk<20% AND only as the size-reduce fallback when cut==0%; confidence was already rejected as a sizing axis (#94)"
+  },
+  {
+    "date": "2026-10-23T11:40:00Z",
+    "idea": "BLOCK SHORT ENTRIES IN signal-time rsi_14 [45,55) (watchdog 'death band') — REJECTED-WITH-DATA",
+    "rationale": "Reproduces 14d 29T 5W -1.10 and 30d 66T 21W -1.41 (same sign, n>=20) but fk 21/77 = 27.3% of 30d SHORT winners (>20% bar), in-band pump-chain- bare is positive (30d 40T 17W +0.45), save only +1.41/30d across 66 blocked trades.",
+    "expected_impact": "+1.41 per 30d at 27.3% winner-kill — fails bar",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "high"
   }
 ]
