@@ -29,6 +29,7 @@ Exit labels produced for these trades (via position_manager hit check):
 from hermes_constants import (PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT,
                               PM_BREAKEVEN_LOCK_PCT)
 from hermes_log import log
+import math
 
 # Any signal containing one of these tags is managed by this module.
 MANAGED_TAGS = ('ai-trader-manual', 'ai-trader-pending', 'ai-trader-auto')
@@ -52,6 +53,12 @@ def decide_sl(direction: str, current_price: float, entry_price: float,
     """
     if direction not in ('LONG', 'SHORT'):
         return None                        # validate — never fall through
+    # NaN/Inf guards (bug_hunter 2026-10-23 F-2): a NaN price survives `<=0`
+    # comparisons, poisons the ratchet compare, and would reach the CAS write
+    # as a PERMANENTLY dead stop ('NaN'='NaN' is TRUE in PG numeric). Refuse.
+    if not (math.isfinite(current_price) and math.isfinite(entry_price)
+            and math.isfinite(old_sl)):
+        return None
     if current_price <= 0 or entry_price <= 0 or old_sl <= 0:
         return None
 
