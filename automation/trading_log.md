@@ -14582,3 +14582,24 @@ Final set: ['BTC']
 - 7d -$2.24 vs -$2.22 last hour — flat, size-reduce 0.5x still active (file truth)
 - Waiver expiry Oct 24 00:00Z (audit #102 waiver_expiry.py gate) + size-reduce auto-clear ~00:23-00:35Z → one combined check after 00:35Z
 - CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings
+
+## 2026-10-23 23:29 Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** $0.32 (WR: 100%) | 24h: 22T 11W 50.0% `-$0.15` | 7d: 122T 39.3% `-$1.72` | **size-reduce CLEARED 22:57:55Z -> 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 3 wins all volume-buildup- SHORT trail exits (DYDX +0.16, MON +0.12, SYRUP +0.04) — winners riding, good entries
+- atr_sl_hit 1/22 = 4.5% (<40%) over 24h — dominant close = profit-monster-trail (11T +0.78)
+- No 0%WR signal with 3+ trades last hour (volume-buildup- 3T 3W)
+- No negative-hour streak (18h +0.01, 19h +0.04, 20-21h empty, 22h +0.32)
+- Frequency 3/hr — not overtraded
+- 2 open: CFX pump-chain- SHORT +3.07% bracketed + BTC ai-trader-pending SHORT -0.46% bracketed SL 81180 / TP 79950 — hold
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- **size-reduce auto-cleared 22:57:55Z** (guardrail: WR 39.3% >= 37% AND pnl_7d -$1.72 >= -$2.00) -> positions now full size (1.0x). Prior log lines claiming 0.5x are stale.
+- Signal flow 1-7 per 5min vs watchdog min 20 + `[hotset] fallback DB query returned 0 tokens` every run (chronic, 13288 hits) — regime pin / no-entry steering, flagging not changing
+- unclog_waiver expires 2026-10-24T00:00:00Z (~30min) — waiver_expiry gate goes live; combined check after 00:35Z
