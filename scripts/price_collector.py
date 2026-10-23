@@ -841,25 +841,30 @@ def main():
             except Exception as e:
                 print(f'  {table}: aggregation error: {e}')
 
-        # 30d retention for candles_1m — same policy as candles_5m (see _aggregate_tf).
-        # 1m was never pruned: 20.5M rows / Feb-2024→now / 3.1G file drove disk to 85%.
-        # Batched deletes keep each txn small; freed pages reuse as new candles flow in.
-        try:
-            _cutoff = int(time.time()) - 2592000
-            _pruned_1m = 0
-            while True:
-                _r = candle_conn.execute(
-                    "DELETE FROM candles_1m WHERE rowid IN ("
-                    "SELECT rowid FROM candles_1m WHERE ts < ? LIMIT 500000)",
-                    (_cutoff,)).rowcount
-                candle_conn.commit()
-                if _r <= 0:
-                    break
-                _pruned_1m += _r
-            if _pruned_1m:
-                print(f'  [candles_1m] Pruned {_pruned_1m} rows older than 30d')
-        except Exception as e:
-            print(f'  [candles_1m] prune error: {e}')
+        # Retention: 1m = 30d (same policy as candles_5m, see _aggregate_tf);
+        # 15m/1h/4h = 90d. 1m was never pruned: 20.5M rows / Feb-2024→now /
+        # 3.1G file drove disk to 85% — 15m/1h/4h had the same unpruned Feb-2024
+        # history (2.07M rows >90d). 90d not 30d because coin_tracker reads
+        # 200x4h bars (~33d) and offline analytics want depth; batched deletes
+        # keep each txn small and interleave with other candle writers.
+        for _tbl, _days in (('candles_1m', 30), ('candles_15m', 90),
+                            ('candles_1h', 90), ('candles_4h', 90)):
+            try:
+                _cutoff = int(time.time()) - _days * 86400
+                _pruned = 0
+                while True:
+                    _r = candle_conn.execute(
+                        f"DELETE FROM {_tbl} WHERE rowid IN ("
+                        f"SELECT rowid FROM {_tbl} WHERE ts < ? LIMIT 500000)",
+                        (_cutoff,)).rowcount
+                    candle_conn.commit()
+                    if _r <= 0:
+                        break
+                    _pruned += _r
+                if _pruned:
+                    print(f'  [{_tbl}] Pruned {_pruned} rows older than {_days}d')
+            except Exception as e:
+                print(f'  [{_tbl}] prune error: {e}')
 
         # ponytail: truncate WAL after writers release so disk doesn't balloon
         try:

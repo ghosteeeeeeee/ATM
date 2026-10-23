@@ -1,47 +1,37 @@
 {
-  "timestamp": "2026-10-23T03:44:23.220924+00:00",
-  "steers": [],
+  "timestamp": "2026-10-23T07:14:25.223734+00:00",
+  "steers": [
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: ME + WLFI",
+      "detail": "Both opened within 12 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-001"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Portfolio heavily long (3 trades)",
+      "detail": "3 long positions. One BTC dump hits all of them.",
+      "auto_executable": false,
+      "id": "steer-002"
+    }
+  ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "NEUTRAL",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "ABOVE",
-    "volatility": "LOW",
+    "continuum": "AT",
+    "volatility": "NORMAL",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "FLAT",
-    "volume_regime": "LOW",
+    "volume_regime": "NORMAL",
     "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "STRONG_UP"
+    "wyckoff_phase": "DISTRIBUTION",
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 1,
-  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 GOOD\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n2026-10-23 03:47 UTC | autopilot | portfolio_health=good\n\nOpen Trades: 1 (1 long, 0 short)\nUnrealized PnL: +0.01 USDT (BTC #16358, 1.1h, flat)\nRegime: 1m ABOVE EMA300 / LEAN_BULL vs 4h SHORT_BIAS\n        | Volatility: LOW/CALM | flips/24h: agg 21, BTC 20 (normal)\n\n\u2500\u2500 Steers (agent) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning/regime] BTC LONG #16358 valid ONLY while 1m holds\n   above EMA300\u224881587. Re-read: 03:47 price ~81954, 163 min\n   above \u2014 condition HOLDS, no exit. If 1m closes below\n   EMA300 for 15-30m \u2192 exit (4h SHORT_BIAS resumes control).\n\ud83d\udfe2 [info/profit_lock] If BTC prints 82100+ (near 4h high\n   82027), move SL to BE 81872 \u2014 R:R is thin (~1.08).\n\ud83d\udfe2 [info/health] 1/limit positions, no cluster risk.\n   Low-vol: keep size small until velocity picks up.\n(retract rule checked: no prior urgent steers to retract;\n automated `steers` array empty, untouched)\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n24h actual (PG, n=7): 6W/1L, 86% WR, +0.46 \u2014 best stretch\nin weeks. Winners entered at meta_rsi 61-75; the multi-day\nloser cluster was ALL mid-band 50-57 death-zone entries\n(POL -4.85, STX -4.90, INJ -3.67). We are not repeating\nthat mistake right now.\n\nDead 7d (verified): pump-chain+ 7% WR -1.29, pump-chain-\n0% -0.47, hl_copy_trader 0% -0.21, ai-trader-pending 17%.\nWinning side this regime: continuum-trend+ 80%, bb-squeeze+\n75%, volume-buildup- 80% \u2014 trend/structure over mean-revert.\n\nAI Trader pick: NONE this hour. All precheck PASS candidates\nfail the verified pattern: HYPER/USELESS RSI 45-55 death\nzone (7d 15-22% WR), SOL R:R grade D (0.51), ONDO RSI 71.2\nnear ceiling. Nothing worth a slot. AI_TRADER_ENABLED=False\nanyway \u2014 watchlist-only even if fired.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Hold BTC long while 1m > EMA300 81587; BE at 82100+.\n2. Weekly tune candidates: pump-chain both sides, death-zone\n   45-55 band (brain auditor's job \u2014 flagged only).\n3. Skip mid-band RSI 45-55 entries until confluence appears.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nMerged `deep_analysis`, `regime_context`, `pattern_alerts`, `agent_steers` into `watchdog_recommendations.json` (automated `steers` untouched). No AI trader pick written.\n",
-  "regime_context": "Sources (2026-10-23 ~03:45 UTC):\n- continuum 1m BTC: ABOVE EMA300=81587, price 81883-81954, 163 min above, linreg_direction LEAN_BULL, trend_quality STRONG_UP, but 1m/5m slopes slightly negative (consolidating under 82027 high).\n- 15m scanner: aggregate LONG_BIAS (60 long / 3 short / 66 neutral), BTC regime NEUTRAL at last dump (03:45) after LONG_BIAS earlier \u2014 flip-prone as always.\n- 4h scanner: SHORT_BIAS (stale higher-TF view; conflicts with 1m/15m).\n- Volatility: LOW / CALM / velocity SLOW \u2014 low-vol reclaim tape, not a trend day yet.\n- Regime flip-rate 24h: aggregate 21, BTC 20 (p50\u224820 baseline) \u2014 NORMAL standing churn, not an anomaly. No unusually stable (<6) window.\n\nImplication: longs are only valid while 1m holds above EMA300; shorts remain valid on the 4h view but will get squeezed while EMA300 holds. One BTC dump below 81587 invalidates the open long AND every alt-long correlation bet.",
-  "pattern_alerts": "VERIFIED from PostgreSQL (close_time last 24h/7d, meta_rsi from _signal_metadata):\n\n1) DEATH-ZONE ENTRIES (meta_rsi 45-57) \u2014 the standing loser cluster. Watchdog last-20: POL LONG bb-bounce mRSI 53.6 -4.85%, STX LONG r2v2-long4 mRSI 57.6 -4.90%, INJ LONG pump-chain+ mRSI 50.0 -3.67%, NEO LONG bb-bounce mRSI 52.6 -2.35%, CFX SHORT pump-chain- mRSI 51.2 -1.89%. WINNING side: entries at mRSI 61-75 (HBAR/YGG bb-squeeze longs +1.2/+3.2% at 73-75; NEO/ZRO warrior shorts +3.0/+3.4% at 61-67). Why we weren't on it: mid-band 5m RSI has no edge \u2014 precheck death-zone advisory now flags 45-55 as 15-22% WR. Action: treat 45-55 as skip-or-require-confluence, not a sweet spot.\n\n2) pump-chain BOTH SIDES dead 7d: pump-chain+ n=15 W=1 7% WR -1.29 USDT avg -2.06%; pump-chain- n=8 W=0 0% WR -0.47. WINNING side: continuum-trend+ n=5 80% WR +0.09 and bb-squeeze+ (today 75% WR). pump-chain fires in this low-vol CALM regime and gets chopped. Not a watchdog action (signal params = brain auditor) \u2014 flagged for weekly tune.\n\n3) ai-trader-pending 7d: n=12 W=2 17% WR -0.20. Today's BTC pending short #16353 was the UNIVERSAL_MAX_HOLD loser (-1.53% at 8h) \u2014 chop exit, not a direction call. BTC pending shorts #16351 (+4.65%) and today's open long show the vehicle works when direction is right; the 8h max-hold is the correct chop killer. WINNING side on #16353: staying short after the 21:09 EMA300 reclaim failed \u2014 the reclaim was the signal to flatten, and max-hold did it 8 hours late. Steer: if a pending BTC trade sits flat 4+ hours against a fresh EMA300 cross, exit early rather than waiting for UNIVERSAL_MAX_HOLD.\n\n4) hl_copy_trader 7d: n=4 W=0 0% WR -0.21 (SOL LONG mRSI 32.7 today -1.02% \u2014 shorting-the-bottom pattern inverted: longing deep oversold via copy-trader). Copy-trader entries at mRSI <35 are the anti-pattern of #1. No open copy-trader positions.",
-  "agent_timestamp": "2026-10-23T03:51:52.553777+00:00",
-  "agent_steers": [
-    {
-      "severity": "warning",
-      "category": "regime",
-      "action": "BTC LONG #16358: thesis valid ONLY while 1m closes hold above EMA300 (~81587). Re-test each cycle; if 1m closes below EMA300 for 15-30m, exit \u2014 4h SHORT_BIAS will resume control. Current: price ~81954, 163 min above, condition HOLDS (03:47 UTC re-read).",
-      "retest": "1m close vs EMA300=81587",
-      "age": 0
-    },
-    {
-      "severity": "info",
-      "category": "profit_lock",
-      "action": "BTC #16358 R:R is thin (~1.08, SL 81380 / TP 82400). If price prints 82100+ (near 4h high 82027), move SL to breakeven 81872 before TP chase. Not yet 2% \u2014 no forced BE.",
-      "retest": "price >= 82100",
-      "age": 0
-    },
-    {
-      "severity": "info",
-      "category": "health",
-      "action": "No other positions open. Portfolio 1/limit, 24h 86% WR. No cluster/correlation risk. Low-vol CALM \u2014 position sizing should stay small until velocity picks up.",
-      "retest": "open_count and volatility_regime",
-      "age": 0
-    }
-  ]
+  "open_count": 3
 }
