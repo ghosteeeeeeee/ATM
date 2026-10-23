@@ -14084,3 +14084,25 @@ Final set: ['BTC', 'INJ']
 - BTC SHORT open ~5h15m — watch EMA reclaim exit per audit #81
 - NEO SHORT new (21:51) — first trade in ~3h, first close to watch next hour
 - CONF_FLOOR=30 ships tomorrow (Oct 23) — bare-only scope per brain_auditor audit #83
+
+## 2026-10-23 00:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.07 (WR: 100%) | 24h: 5T 4W '+$0.34' | 7d: 150T 38.0% '-$3.39' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- NEO warrior-sr-confirm- SHORT closed profit-monster-trail +2.99% (+$0.07)
+- atr_sl_hit 0/5 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour — no kill trigger
+- Pos-hour streak continues (19:00 and 23:00 green, no 3h negative streak)
+- Frequency 1/hr — not overtraded (limit 20)
+- 1 open: BTC ai-trader-pending SHORT #16353 since 17:14 (SL 81760 / TP 80300) — HOLD per audit #81 exit rule (sustained 15-30m 1m hold >81400)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '+$0.34' on 5T (80% WR) — 4th green window
+- 7d '-$3.39' vs '-$3.44' last hour — flat, no new bleed
+- BTC SHORT open ~7h — still at EMA300 pin, exit rule unchanged
+- CONF_FLOOR=30 bare-only ships Oct 23 (audit #85)

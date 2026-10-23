@@ -1604,3 +1604,14 @@
 ## Error Alerts — 2026-10-22 22:44 UTC
 - **WARN** (1x): `disk usage / = 85% (18G free of 118G)`
 - **AUTO-FIX**: none safe — 0 logs older than 7 days (gzip no-op), journal only 128M; largest files (pipeline.log 246M) are actively written, left untouched
+
+## Error Alerts — 2026-10-22 23:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] BIGTIME TOK BLOCKED — TOK in cooldown (3540s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: BIGTIME TOK in hotset failure cooldown — TOK in cooldown (3540s left, N failures)`
+
+## Error Alerts — 2026-10-23 00:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3236s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3178s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3116s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3116s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3058s left, N failures)`
