@@ -14412,3 +14412,47 @@ Final set: ['BTC']
 - 7d -$3.04 vs -$3.06 last hour — size-reduce still active (file 0.5x)
 - CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
 - Waiver expiry Oct 24
+
+## 2026-10-23 15:30 Hourly Analysis
+
+**Trades:** 5 closed (1 win, 4 losses)
+**PnL:** -$0.25 (WR: 20%) | 24h: 19T 8W `-$0.36` (42.1%) | 7d: 129T 34.9% `-$3.15` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 5 trades: WLD volume-buildup- SHORT +$0.11 (trail), GRASS pump-chain+ LONG -$0.07 (atr_sl_hit), PUMP r2v2-long9 LONG -$0.01 (trail), ALT volume-buildup- SHORT -$0.17 (hard_max_loss), ME volume-buildup- SHORT -$0.11 (cut-loser)
+- volume-buildup- 3T last hour 33.3% -$0.17 — 14d 16T 62.5% +$0.03, wins NORMAL (63.6% +$0.09) and HIGH (100% +$0.08), EXTREME 50% -$0.14 (n=4) — no regime loses with n≥20 → keep alive per regime-based kill policy
+- pump-chain+ 1T 0% -$0.07 — n=1 <3, no kill trigger
+- r2v2-long9 1T 0% -$0.01 — n=1 <3, no kill trigger
+- atr_sl_hit 1/19 = 5.3% (<40%) over 24h — dominant close = profit-monster-trail (8T +$0.57)
+- No negative-hour streak: 14:28 red -$0.14, 13:30 empty (reset), 12:30 red -$0.26 — not 3 consecutive
+- Frequency 5/hr — not overtraded (limit 20)
+- 1 open: AVAX r2v2-long4 LONG (-0.37%) bracketed SL 8.994/TP 9.279 — let it ride
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d -$3.15 vs -$3.04 last hour — slightly worse, size-reduce 0.5x still active (file truth)
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
+- Waiver expiry Oct 24 (tomorrow)
+
+## 2026-10-23 16:28 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: n/a) | 24h: 19T 8W `-$0.36` (42.1%) | 7d: 126T 34.9% `-$3.01` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — nothing to diagnose
+- atr_sl_hit 1/19 = 5.3% (<40%) over 24h — dominant close = profit-monster-trail (8T +$0.57), winners riding
+- No 0%WR signal with 3+ trades last hour (no trades at all)
+- No negative-hour streak (empty hour resets prior 15:30 red)
+- Frequency 0/hr — not overtraded
+- 1 open: AVAX r2v2-long4 LONG bracketed SL 8.994/TP 9.279 — let it ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d -$3.01 vs -$3.15 last hour — slight improvement, size-reduce 0.5x still active (file truth)
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
+- Waiver expiry Oct 24 (tomorrow)
