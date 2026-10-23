@@ -7401,5 +7401,32 @@
     "category": "watchlist",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T16:40:00Z",
+    "idea": "SHORT rsi_14 45-60 systemic band gate — REJECTED-WITH-DATA (full decomposition, closes the watchdog P1 ship route)",
+    "rationale": "Watchdog P1 calls 45-60 'the most reliable loss generator' (14d n=36 19.4% -1.14) and recommends shorting strength >=60 only. Naive bars pass (fkA 5.5%, fkB 19.4%, save +1.14, n=36) but decomposition kills it: (a) 45-55 = 14d -1.10 / 30d -1.41 = identical to #96's rejected candidate; (b) 55-60 = -0.04/-0.02 WASH, so extending the edge to 60 adds nothing; (c) 30d blocked set = 63/83 pump-chain with bare pc- in-band 49T +0.36 POSITIVE (sign-flips vs 14d) = re-opens the pc- kill that was CANCELLED; (d) non-pump -1.18 mostly = killed/disabled signals (volume-breakout-short, hmacd, ai-trader) = saving already-saved money; (e) live-signal 14d residual sign-unstable (14d -0.51 vs 30d -0.25 vs bare pc- 30d +0.36).",
+    "expected_impact": "0 (route closed — prevents a re-proposal that would have collided with pc- CANCEL and CONF_FLOOR)",
+    "category": "entry sniper / rejected-with-data",
+    "status": "rejected_with_data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T16:40:00Z",
+    "idea": "SIZE-REDUCE auto-clear ETA independently reproduced + fragility quantified (no code)",
+    "rationale": "Runs #92-#99 carried 19:14-19:35 Oct 23, #100 corrected to 00:35Z Oct 24. Independent rolling-7d sim this run: first clear 2026-10-24 00:23Z at 116T/WR 37.1%/pnl -1.89 vs thresholds 37.0/-2.00 = margins 0.1pp AND $0.11. Clear path in code = (WR>=37 ∧ pnl>=-2) OR pnl>=0; pnl>=0 unreachable in 24h (only -1.21 of window content ages out in next 12h). Any single new loss before ~00:30Z delays again; any single win accelerates. Marker is trading-inert regardless (base $11 = HL min floor, 11/11 shadow lines today 0% cut).",
+    "expected_impact": "0 (verification — gives CEO an exact fragile window instead of three different ETAs)",
+    "category": "ops verification",
+    "status": "verified",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T16:40:00Z",
+    "idea": "coin_regime LONG x SHORT_BIAS counter-trend gate — n-bar crossed, quality bars failed, criteria locked",
+    "rationale": "'Don't fight the trend' axis finally has n>=20: 21T 33.3% -0.75 vs LONG x LONG_BIAS 25T 48.0% +0.34 (stamped since Oct 20 only). Fails: WR 33.3%>30%, Fisher p=0.377, save 0.75<1.00, zero OOS (4-day stamp history), 9/21 bb-bounce + 6/21 r2v2 collision with queued owners. fk 5.5% and would-keep 48% pass. Criteria locked NOW pre-data: ship only if blocked WR<30% ∧ p<0.05 ∧ save>$1.00 ∧ >=7d same-sign.",
+    "expected_impact": "+0.75/14d if it ever qualifies (currently would-block a 33% WR set = marginal)",
+    "category": "trend alignment",
+    "status": "collect",
+    "risk": "low"
   }
 ]
