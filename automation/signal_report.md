@@ -1,57 +1,45 @@
 # Signal Performance Report
-**Generated:** 2026-10-22 21:35 UTC | **Period:** Last 6h + 24h (7d context for watch list)
 
-All numbers verified directly against brain DB this run.
-
-## Headline
-
-Trade throughput collapsed: **4 closed trades in 24h** (vs 37 on 10-21, 23 on 10-20).
-No signal reaches any kill or boost threshold (all have ≤1 trade in 24h). No kills,
-no boosts executed. No direction inversions found (24h or 7d).
-
----
+Period: Last 6h | 24h (as of 2026-10-23 03:33 UTC)
 
 ## KILLED (executed)
-
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no candidate met 24h criteria (5+ trades) |
+| — | — | — | — | — | None qualified |
 
 ## BOOSTED (executed)
-
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no candidate met 24h criteria |
+| — | — | — | — | — | None qualified |
 
-## LOSERS (watch list, 7d — 24h sample too thin)
+## LOSERS (watch list)
 
+24h (all under kill threshold — max 2 trades per signal+direction):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 6.7% | -1.29 | 15 | WATCH — HIGH blocked at runtime; EXTREME still 1.0 but decaying: 30d +2.54 / 14d +0.25 / **7d 0W-9T -0.79**. Re-evaluate EXTREME if 7d bleed continues; no kill (30d edge exists) |
-| bb-bounce-v2-long+ | LONG | 47.6% | -0.60 | 21 | WATCH — FLAT-only admission gate active; NORMAL 9W/17T but still net negative, exit-side issue not entry |
-| pump-chain- | SHORT | 0.0% | -0.58 | 10 | WATCH — 8 EXTREME losses all pre/post-block edge on 10-16 only; post-10-16 only 2 NORMAL trades (-0.09). EXTREME 0.0 gate holding |
-| ai-trader+ | LONG | 42.9% | -0.54 | 14 | WATCH — EXTREME 0.0 gate (10-19) verified holding: 0 EXTREME opens since. HIGH kept (4W/5T) |
-| doji-bottom-long | LONG | 45.5% | -0.51 | 11 | WATCH |
-| ai-trader-pending | LONG | 0.0% | -0.14 | 6 | WATCH — n too small |
-| r2v2-long3 | LONG | 55.6% | -0.12 | 9 | WATCH — WR ok, PnL negative (exit asymmetry) |
+| ai-trader-pending | SHORT | 50.0% | +0.08 | 2 | watch |
 
-## WINNERS (7d, none boost-eligible in 24h)
-
+7d context (NOT kill-eligible under 24h criteria, but bleeding):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| continuum-trend+ | LONG | 80.0% | +0.09 | 5 | Not boosted — all 5 trades on one chain (hyperliquid), fails multi-token criterion; n=5 |
-| volume-buildup- | SHORT | 66.7% | +0.02 | 6 | Not boosted — PnL below $0.05 bar |
-| pump-chain-,pump-chain-v6- | SHORT | 33.3% | +0.31 | 9 | Not boosted — WR below bar |
-| 24h: volume-buildup- / warrior-sr-confirm- / ai-trader-pending(+) | — | 100/100/100 | +0.08/+0.08/+0.11 | 1 each | n=1, no action |
+| pump-chain+ | LONG | 6.7% | -1.29 | 15 | WATCH — no trades 48h; stale/HIGH-regime/BTC guards likely gating it already |
+| ai-trader+ | LONG | 38.5% | -0.67 | 13 | watch |
+| doji-bottom-long | LONG | 40.0% | -0.53 | 10 | watch |
+| pump-chain- | SHORT | 0.0% | -0.47 | 8 | watch — RSI floor reverted to 45 on 2026-10-21 |
+| bb-bounce-v2-long+ | LONG | 50.0% | -0.45 | 20 | watch — WR ok, exit/R:R drag |
+
+## WINNERS
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| warrior-sr-confirm- | SHORT | 100.0% | +0.15 | 2 | healthy (under 5T boost bar) |
+| bb-squeeze+ | LONG | 100.0% | +0.12 | 1 | healthy |
+| volume-buildup- | SHORT | 100.0% | +0.08 | 1 | healthy |
+| ai-trader-pending | SHORT | 50.0% | +0.08 | 2 | healthy |
+
+24h net (all closed): **6 trades, +$0.43, 83.3% WR (5W/1L)**
 
 ## ISSUES
-
-- **Trade drought:** 4 closes in last 24h vs 23-37/day on 10-20/10-21. Pipeline is alive
-  (cycle #253060, 46 signals in runner) but pre-filter/confluence-gate passes ≈0-1 signals
-  per cycle; hotset wrote 0 tokens at 21:33. Gates are filtering hard — monitor; if 24h
-  closes stay <5 tomorrow, audit which gate went hyper-aggressive (visible blocks:
-  CONFLUENCE-GATE single-type, PUMP-CHAIN-HIGH, PUMP-CHAIN-RSI-MAX, CONTINUUM-BULL).
-- **No inversions:** 0 direction mismatches in 24h and 7d windows.
-- **Gate leak check:** pump-chain- EXTREME (blocked 10-16) — no EXTREME opens after
-  10-16 14:04 ✓. ai-trader+ EXTREME (blocked 10-19) — no EXTREME opens since ✓.
-- Prior kills/regime gates verified in place: volatility_gate_v2.py lines 363/378/385/386.
+- **No signal met kill criteria this window** (needs 5+ trades, WR<30%, PnL<-$0.10 in 24h). No boost candidates either (needs 5+ trades; max was 2). Nothing executed.
+- **Zero direction inversions** in 24h — no bug.
+- **Low execution volume**: 800 signals generated in 24h → only 6 closed trades (0.75%). Pipeline alive and firing (last signal 03:33 UTC); likely gate filtering, but worth watching if closes stay near zero next window.
+- 6h window had 0 closed trades meeting HAVING >=2 (3 single-trade closes happened).
