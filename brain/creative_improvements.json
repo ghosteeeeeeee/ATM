@@ -7336,5 +7336,33 @@
     "category": "verification",
     "status": "fixed",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-23T14:52:55Z",
+    "idea": "GATE-TRUTH WAIVER SCOREBOARD (shipped) — join [EXEC-RSI-FLOOR-BEAR]/[EXEC-RSI-DETECT-FLOOR] log lines to trades by open_time instead of reconstructing the gate's RSI from 3 disagreeing metadata sources",
+    "rationale": "#80 fragmentation meant every prior attribution was approximate (#93 n=2 vs log-truth n=6); the log already prints the authoritative value",
+    "expected_impact": "definitive Oct 24 lapse/expiry decisions; reusable for any future RSI-floor waiver",
+    "category": "measurement",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T14:52:55Z",
+    "idea": "BLANKET sub-45 SHORT floor REJECTED-WITH-DATA",
+    "rationale": "p=0.902, fk 39%",
+    "expected_impact": "prevents a doomed permanent-floor proposal after the waiver lapses",
+    "category": "kill-with-data",
+    "status": "rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T14:52:55Z",
+    "idea": "STEER CLAUSE LABELLING — watchdog steers must mark DURABLE (structure/ATR/arm-path) vs TACTICAL (last-N-candles) clauses",
+    "rationale": "POLYX #16365: durable clause right, tactical clause caused a wrong-footed reversal at 13:44, trade then closed hard_sl -1.26%",
+    "expected_impact": "steer re-reads act on the part that survives a bounce",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low",
+    "n": 1
   }
 ]

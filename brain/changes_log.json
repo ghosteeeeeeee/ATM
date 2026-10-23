@@ -2079,5 +2079,16 @@
     "after": "script with --selfcheck PASS",
     "rationale": "#92 named count/frequency as the only remaining size-reduce lever; measure before proposing",
     "impact": "zero behavior; REJECTED-WITH-DATA (cap2/3 fail fk 44.5%/24.2%, cap4 saves only +0.28)"
+  },
+  {
+    "timestamp": "2026-10-23T14:52:55Z",
+    "agent": "brain_auditor",
+    "type": "infra",
+    "change": "New gate-truth waiver scoreboard brain/analysis/waiver_scoreboard_2026-10-23.py (--selfcheck PASS, py_compile PASS): joins EXEC-RSI-FLOOR-BEAR / EXEC-RSI-DETECT-FLOOR log lines to SHORT trades by open_time+-120s",
+    "file": "brain/analysis/waiver_scoreboard_2026-10-23.py",
+    "before": "waiver attribution reconstructed from 3 disagreeing RSI metadata sources (rsi_exec / entry_rsi_14 / own 5m replay) -> #93 counted n=2",
+    "after": "log-truth attribution: 25 unique allow events / 16 tokens, 15 unique knife blocks, attributable closed 6 net -0.17, open 1",
+    "rationale": "Oct 24 00:00Z waiver expiry decision needs the value the gate actually compared; metadata sources disagree (#80 fragmentation)",
+    "impact": "zero live behavior (read-only analysis); makes the lapse/expiry verdict reproducible"
   }
 ]
