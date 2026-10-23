@@ -14242,3 +14242,24 @@ Final set: ['BTC']
 **Open Questions:**
 - 7d `-$3.11` vs `-$3.19` last hour — slightly improving
 - CONF_FLOOR=30 bare-only still pending ship (audit #85/#88 Oct 23) — gate reads wrong confidence column per #88, do not ship until RAW-confidence pin lands
+
+## 2026-10-23 07:27 Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h: 7T 6W `+$0.46` (85.7%) | 7d: 143T 37.8% `-$3.11` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — quiet since ~03:36
+- atr_sl_hit 0/7 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour — no kill trigger
+- No negative-hour streak (empty hour)
+- Frequency 0/hr — not overtraded (limit 20)
+- 3 open all small red: WLFI LONG #16360 (-0.01), ME LONG #16359 (-0.03), BTC LONG #16358 (-0.02) — all bracketed, let them ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d `-$3.11` flat vs last hour — still bleeding slowly
+- CONF_FLOOR=30 bare-only still blocked on RAW-confidence pin (audit #85/#88/#90/#91)
+- Waiver expiry Oct 24
