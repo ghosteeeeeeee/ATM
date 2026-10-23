@@ -1684,6 +1684,13 @@ PM_TRAIL_ENABLED     = True   # act 0.40%, dist 0.20%. Floor = +0.20%. DO NOT WI
 # Widening trail = ATR SL wins the race = trail never fires = system broken.
 PM_TRAIL_ACTIVATE_PCT = 0.004  # 0.40% — activate sooner so trail catches profit before ATR SL
 PM_TRAIL_DISTANCE_PCT = 0.002  # 0.20% — tight trail, exits before ATR SL (which trails at ~0.15%)
+# Breakeven lock for CEO trades (ai-trader-manual/pending/auto) — CEO-approved
+# 2026-10-23 after the two max-hold exits (#16353 -1.53%, #16358 -1.03%).
+# At +0.10% favorable the SL moves to ENTRY (ratchet-only, CAS), then the
+# 0.40/0.20 trail takes over from +0.40% as before (values above UNTOUCHED).
+# 3-trade backtest: net +4.65% vs +2.09% current — tight-trailing instead
+# (+0.33%) was rejected: it amputates the runner (+4.65→+1.80).
+PM_BREAKEVEN_LOCK_PCT = 0.001  # 0.10% — SL→entry for CEO trades (manual_exit_manager only)
 # Trail-arm timeout (bb-squeeze LONG stall pre-emption) — brain_auditor 2026-10-12.
 # Verdict PASS: plans/2026-10-12_bb-squeeze-trail-arm-timeout-verdict.md — 30d counterfactual +$1.48
 # (20/21 >=60m never-armed stalls pre-empted; $1.75 saved on losers / $0.24 forgone winners).

@@ -117,11 +117,19 @@ trades** (CEO directive 2026-10-22). The rules:
    bypass). Auto signal trades
    (ai-trader+/pump-chain etc.) keep all their engines — the exclusion is
    CEO-trade-only.
-2. **Close trailing** — the only automatic SL movement:
-   - activates once the trade is up **≥ +0.40%** (PM_TRAIL_ACTIVATE_PCT)
-   - trails **0.20% behind price** (PM_TRAIL_DISTANCE_PCT)
-   - **ratchet-only**: the stop never moves backward, the TP never moves
-   - CAS-protected: your own concurrent edits always win
+2. **Dynamic SL in profit** (CEO-approved 2026-10-23) — two steps, both
+   ratchet-only (the stop never moves backward), TP never moves,
+   CAS-protected (your own concurrent edits always win):
+   - **BREAKEVEN LOCK at +0.10%** (PM_BREAKEVEN_LOCK_PCT): SL → entry.
+     Turns chop-wiggles into scratches — #16353 −1.53% / #16358 −1.03%
+     max-hold exits would both have been 0.00%. 3-trade backtest: net
+     +4.65% vs +2.09% without it.
+   - **CLOSE TRAIL from +0.40%** (PM_TRAIL_ACTIVATE_PCT): trails **0.20%
+     behind price** (PM_TRAIL_DISTANCE_PCT). Deliberately NOT tighter:
+     a 0.15/0.10 trail amputates the runner (+4.65% → +1.80% on #16351)
+     and the runner pays for the chop. (The 2026-09-06 DO-NOT-CHANGE
+     note on these two constants stands — this change ADDS the BE step
+     below them, doesn't retune them.)
 3. **Safety nets remain**: guardian hard caps, max-hold, staleness checks
    still apply — safety, not exit management.
 4. **Exit labels are the ownership receipt:**

@@ -7,8 +7,14 @@ CEO directive (2026-10-22): manual and pending trades must be managed by
 exactly two things —
   1. PREDEFINED SL/TP, honored as set (CEO sets them at open; nothing
      structurally rewrites them), and
-  2. CLOSE TRAILING once in profit (activate 0.40%, trail 0.20% behind
-     price, ratchet-only — the stop never moves backward).
+  2. DYNAMIC SL management in profit (all ratchet-only, CAS-protected,
+     never touching the TP — CEO-approved 2026-10-23):
+       a. BREAKEVEN LOCK at +0.10% (PM_BREAKEVEN_LOCK_PCT): SL → entry.
+          Turns chop-wiggles into scratches instead of max-hold bleeds
+          (#16353 -1.53% / #16358 -1.03% would have been 0.00%).
+       b. CLOSE TRAIL from +0.40% (PM_TRAIL_ACTIVATE_PCT): trail 0.20%
+          (PM_TRAIL_DISTANCE_PCT) behind price. Untuned — the runner
+          (+4.65% #16351) pays for the chop; tight trails amputate it.
 
 The RR engine is EXCLUDED for these signals (it was moving SLs
 structurally — #16306 81990→82486, #16317 83150→82965 — and mislabeling
@@ -16,11 +22,12 @@ exits rr_engine_*). Guardian safety nets (staleness, hard caps,
 max-hold) still apply — this module owns SL/TP semantics, not safety.
 
 Exit labels produced for these trades (via position_manager hit check):
-    manual_sl_hit     — the predefined stop did its job
+    manual_sl_hit     — the stop did its job (predefined OR breakeven lock)
     manual_tp_hit     — the predefined target hit
     manual_trail_hit  — the close trail took profit
 """
-from hermes_constants import PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT
+from hermes_constants import (PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT,
+                              PM_BREAKEVEN_LOCK_PCT)
 from hermes_log import log
 
 # Any signal containing one of these tags is managed by this module.
@@ -33,16 +40,56 @@ def is_managed_signal(signal) -> bool:
     return any(tag in s for tag in MANAGED_TAGS)
 
 
+def decide_sl(direction: str, current_price: float, entry_price: float,
+              old_sl: float):
+    """Pure phase decision: what should the SL become? Returns
+    (new_sl, profit_pct, phase) or None when the SL must stay put.
+
+    Phases (ratchet-only in every branch):
+      — profit <  PM_BREAKEVEN_LOCK_PCT:          untouched
+      — BE lock ≤ profit <  PM_TRAIL_ACTIVATE_PCT: SL := entry (breakeven)
+      — profit ≥ PM_TRAIL_ACTIVATE_PCT:            SL := price ∓ trail distance
+    """
+    if direction not in ('LONG', 'SHORT'):
+        return None                        # validate — never fall through
+    if current_price <= 0 or entry_price <= 0 or old_sl <= 0:
+        return None
+
+    if direction == 'LONG':
+        profit_pct = (current_price - entry_price) / entry_price
+        if profit_pct < PM_BREAKEVEN_LOCK_PCT:
+            return None                    # SL untouched
+        if profit_pct < PM_TRAIL_ACTIVATE_PCT:
+            new_sl = round(entry_price, 8)         # breakeven lock
+            if new_sl <= old_sl:
+                return None                # ratchet: LONG SL only rises
+            return new_sl, profit_pct, 'BE-LOCK'
+        new_sl = round(current_price * (1 - PM_TRAIL_DISTANCE_PCT), 8)
+        if new_sl <= old_sl:
+            return None                    # ratchet: LONG SL only rises
+        return new_sl, profit_pct, f'TRAIL {PM_TRAIL_DISTANCE_PCT*100:.2f}%'
+    else:  # SHORT
+        profit_pct = (entry_price - current_price) / entry_price
+        if profit_pct < PM_BREAKEVEN_LOCK_PCT:
+            return None
+        if profit_pct < PM_TRAIL_ACTIVATE_PCT:
+            new_sl = round(entry_price, 8)         # breakeven lock
+            if new_sl >= old_sl:
+                return None                # ratchet: SHORT SL only falls
+            return new_sl, profit_pct, 'BE-LOCK'
+        new_sl = round(current_price * (1 + PM_TRAIL_DISTANCE_PCT), 8)
+        if new_sl >= old_sl:
+            return None                    # ratchet: SHORT SL only falls
+        return new_sl, profit_pct, f'TRAIL {PM_TRAIL_DISTANCE_PCT*100:.2f}%'
+
+
 def update_trail(pos: dict, direction: str, current_price: float,
                  entry_price: float) -> bool:
-    """Close-trail ratchet for a managed trade. Returns True if the SL moved.
+    """Dynamic SL for a managed trade (breakeven lock + close trail).
 
-    Phases:
-      — Before activation (price profit < PM_TRAIL_ACTIVATE_PCT): SL stays
-        EXACTLY where the CEO set it. No writes, no touches.
-      — After activation: trail = price ∓ PM_TRAIL_DISTANCE_PCT, written only
-        if it IMPROVES on the current stop (ratchet — LONG SL only rises,
-        SHORT SL only falls). Never touches the TP.
+    Returns True if the SL moved. Writes are CAS-protected: only if the
+    SL hasn't changed since read and the trade is still open — the CEO's
+    own concurrent edits always win.
     """
     try:
         current_price = float(current_price or 0)
@@ -50,28 +97,14 @@ def update_trail(pos: dict, direction: str, current_price: float,
         old_sl = float(pos.get('stop_loss') or 0)
     except (TypeError, ValueError):
         return False
-    if direction not in ('LONG', 'SHORT'):
-        return False                    # validate — never fall through to SHORT
-    if current_price <= 0 or entry_price <= 0 or old_sl <= 0:
-        return False
     trade_id = pos.get('id')
     if not trade_id:
         return False
 
-    if direction == 'LONG':
-        profit_pct = (current_price - entry_price) / entry_price
-        if profit_pct < PM_TRAIL_ACTIVATE_PCT:
-            return False                    # not in profit enough — SL untouched
-        new_sl = round(current_price * (1 - PM_TRAIL_DISTANCE_PCT), 8)
-        if new_sl <= old_sl:
-            return False                    # ratchet: never move SL down
-    else:  # SHORT
-        profit_pct = (entry_price - current_price) / entry_price
-        if profit_pct < PM_TRAIL_ACTIVATE_PCT:
-            return False
-        new_sl = round(current_price * (1 + PM_TRAIL_DISTANCE_PCT), 8)
-        if new_sl >= old_sl:
-            return False                    # ratchet: never move SL up
+    decided = decide_sl(direction, current_price, entry_price, old_sl)
+    if decided is None:
+        return False                       # nothing to do — SL untouched
+    new_sl, profit_pct, phase = decided
 
     # CAS write — only if the SL hasn't changed since read, trade still open
     db_conn = None
@@ -94,9 +127,7 @@ def update_trail(pos: dict, direction: str, current_price: float,
             return False
         pos['stop_loss'] = new_sl           # keep in-memory copy consistent
         log(f"  [MANUAL-TRAIL] {pos.get('token')} {direction}: "
-            f"${old_sl:.6g} → ${new_sl:.6g} (profit {profit_pct*100:.2f}%, "
-            f"activate {PM_TRAIL_ACTIVATE_PCT*100:.2f}% / trail "
-            f"{PM_TRAIL_DISTANCE_PCT*100:.2f}%)")
+            f"${old_sl:.6g} → ${new_sl:.6g} ({phase}, profit {profit_pct*100:.2f}%)")
         return True
     except Exception as e:
         log(f"  [MANUAL-TRAIL] {pos.get('token')} {direction}: DB write failed: {e}",
