@@ -14305,3 +14305,24 @@ Final set: ['BTC']
 - 7d `-$3.03` vs `-$3.18` last hour — slightly improving
 - CONF_FLOOR=30 bare-only + TAT variant-C still blocked on CEO rulings / vacation file
 - Waiver expiry Oct 24
+
+## 2026-10-23 10:29 Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 | 24h: 9T 6W `+$0.22` (66.7%) | 7d: 139T 38.1% `-$3.00` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — quiet window
+- atr_sl_hit 0/9 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour — no kill trigger
+- No negative-hour streak (prior hours mixed red, not 3+ consecutive)
+- Frequency 0/hr — not overtraded (limit 20)
+- 2 open: BTC ai-trader-pending LONG + LTC warrior-sr-confirm- SHORT — let them ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d `-$3.00` vs `-$3.03` last hour — stable
+- CONF_FLOOR=30 bare-only + TAT variant-C still blocked on CEO rulings / vacation file
+- Waiver expiry Oct 24
