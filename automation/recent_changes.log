@@ -5136,3 +5136,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-23 19:28] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L net '+$0.05' (ICP vb- SHORT trail +0.04, AVAX r2v2-long4 trail +0.01) | 24h 19T 42.1% '-$0.47' | 7d 122T 37.7% '-$2.41' — size-reduce 0.5x stays (file truth) | kill: none (n=2 both wins) | atr_sl_hit 1/19=5.3% under 40% | no neg streak (green hour) | 1 open CFX SHORT bracketed | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-23 20:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 19T 8W 42.1% `-$0.47` | 7d 122T 37.7% `-$2.41` — size-reduce 0.5x stays (file truth) | kill: none (no trades) | atr_sl_hit 1/19=5.3% under 40% | no neg streak (prior green + empty hour) | 1 open CFX SHORT +1.35% bracketed winner | No constants change -> no signal_versions entry
+BY: auto_1hr

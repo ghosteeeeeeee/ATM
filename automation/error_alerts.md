@@ -1717,3 +1717,21 @@
 - **WARN** (1x): disk `/` at 85% capacity (18G free; 84.6% exact) — still no logs >7d to gzip; largest: /root/.hermes/logs/pipeline.log 264M, signal-compactor.log 103M. No safe auto-fix available (active logs only).
 - **INFO** (1x): CRV SHORT trade execution FAILED at 18:42 (`RSI ceiling: 71.2 > 65`) — handled gracefully, signal 1686297 marked FAILED, hotset cooldown recorded. Not a system error.
 - **AUTO-FIX**: none required — all key timers active (price-collector, 1m-candle, pipeline, watchdog), pipeline last run OK at 18:42 (1 open / 18 closed today), prices 68s fresh, 56 signals in last 1h, 0 phantom trades, no crashes.
+
+## Error Alerts — 2026-10-23 19:27 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-23 20:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: IO TOK — signal TOK rolled back (prevents retry loop)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: IO TOK (count=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2458s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2398s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2398s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2339s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2339s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2275s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2217s left, N failures)`

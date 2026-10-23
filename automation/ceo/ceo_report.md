@@ -379,3 +379,9 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 24h 19T -0.36 42.1% | 7d 129T -3.15 34.9%
 ### Findings: rotating Q = "Any new errors?" — yes, 3 classes: disk / at 85% (94G/118G; pipeline.log 261M, signal-compactor.log 102M, no >7d logs to reclaim), CC hotset failure-cooldown loop (14:27), price_collector 291s stall at 14:43 (self-recovered, age back to 56s). Also hermes-upgrade-implementer timeout earlier (auto reset-failed, timer fine).
 ### Recommendation: ship logrotate for pipeline.log + signal-compactor.log now — disk has zero reclaimable headroom left before the 85% warn threshold.
+
+## CEO Status — 20261023T192649Z
+### Health: pipeline=active(timer, svc inactive between fires, last run 56s ago) guardian=active open_pos=1
+### Numbers: 24h 19T -0.47 42.1% | 7d 122T -2.41 37.7%
+### Findings: rotating Q = "Which signals are regime-specialists?" — by volatility_regime 7d: EXTREME 43T 27.9% -$1.26 (worst), NORMAL 56T 41.1% -$0.81, HIGH 9T 44.4% -$0.29, FLAT 14T 50.0% -$0.05. No winning regime cell (all PnL negative); EXTREME bleed already covered by the pre-registered SHORT×EXTREME 0.5x dampen — no new action.
+### Recommendation: none — clean; deep run should clear today's stacked CEO decisions (vacation state, fk ruling/CONF_FLOOR, TAT variant-C GO, AVAX exit call).

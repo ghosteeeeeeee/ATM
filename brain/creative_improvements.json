@@ -7519,5 +7519,42 @@
     "category": "operations",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T20:43:13Z",
+    "idea": "BTC-continuum direction-alignment gate — MEASURED THEN REJECTED-WITH-DATA",
+    "rationale": "the readiness prose 'LONGs only on reclaim / SHORTs only under EMA300' had never been measured; block = trade against the tape",
+    "result": "7d counter 6T '-0.12' / 14d 33T '-0.26' / 30d 99T 49.5% '+0.91' vs ALIGNED 352T 38.1% '-7.43'; p=0.4075/0.7096/0.1541, fk 2.2/10.2/16.3%, save sign-flips -> no ship; aligned cohort carries the whole 30d bleed = 'aligned only' is a risk convention, not an edge",
+    "expected_impact": "0 (rejected); artifact brain/analysis/continuum_alignment_2026-10-23.py --selfcheck PASS with verdict lock",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T20:43:13Z",
+    "idea": "FORMAL PROPOSAL (first item under constants_change_review_queue): ship TAT VARIANT-C ONLY",
+    "rationale": "16 in-scope closed fires (bar 15) / fk 0/7=0% (bar<20%) / net +$0.410 / sign p=0.016 / both split halves positive; BASE is fk 7/16=43.8% and must never ship",
+    "expected_impact": "+3.14 unleveraged pp (units-correct; the earlier '+13.00pp' was unit-wrong) — CEO must also rule the n-unit question (fires 16 vs cuts 7)",
+    "category": "exit snatcher",
+    "status": "proposed-awaiting-CEO",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T20:43:13Z",
+    "idea": "POST-LAPSE SHORT-TRAFFIC KPI (zero code)",
+    "rationale": "restored SHORT_RSI_HARD_FLOOR=45 blocks 43/96 = 44.8% of 14d SHORT entries and 16/33 = 48.5% of SHORT winners for net '-0.66' at p=0.668 (no edge either way)",
+    "expected_impact": "short-side traffic roughly halves after 00:00Z; first 48h read distinguishes 'standing rule re-engaged' from a bug",
+    "category": "operations",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T20:43:13Z",
+    "idea": "LIVE FK PROOF: CFX #16373 raw conf 26.50 (CONF_FLOOR would-block) is '+1.31%' with +0.29% locked",
+    "rationale": "direct evidence that the blocked cohort is not uniformly bad — relevant to the fk ruling",
+    "expected_impact": "0 code; strengthens fkA-literal+14d recommendation",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

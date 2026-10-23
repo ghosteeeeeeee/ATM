@@ -1,29 +1,33 @@
 {
-  "timestamp": "2026-10-23T18:44:33.961103+00:00",
+  "timestamp": "2026-10-23T20:44:34.974659+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "health",
       "title": "Signal 'volume-buildup-' losing streak: 4 losses",
-      "detail": "Net -0.32 USDT over last 20 trades (losses: -0.54). Consider disabling or tuning this signal.",
+      "detail": "Net -0.36 USDT over last 20 trades (losses: -0.54). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-001"
     }
   ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "NEUTRAL",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
-    "volatility": "NORMAL",
-    "zscore_tier": "STRONG_NEG",
+    "continuum": "AT",
+    "volatility": "LOW",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.75,
+    "acceleration_state": "POSITIVE",
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.0,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 1
+  "open_count": 1,
+  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 GOOD\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (0 long, 1 short)\nUnrealized PnL: +0.70% (+3.5% @5x) \u2014 CFX SHORT\nRegime: SHORT_BIAS (112/129 tokens) | Volatility: LOW\nFlip rate: agg 30/24h (\u2265p95 26 = unusually unstable), BTC 15m 15/24h (normal)\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [profit_lock] CFX SHORT is +0.70% \u2014 past the +0.40% trail-arm level, but\n   DB stop still reads original SL 0.05234456. Move SL to breakeven 0.052188\n   while 1m closes hold below 0.05198. If 1m closes back above 0.05200 with\n   volume \u2192 exit (35-45 band oversold-bounce risk becomes live). age=1 cycle unexecuted\n\ud83d\udfe1 [health] volume-buildup- 4-loss streak is a band problem: all 4 entries\n   meta_rsi 35-43 (14d band = 36% WR, -0.53). Signal's SHORT side is 65% WR\n   +0.07 \u2014 gate at meta_rsi \u226555 rather than disable (brain auditor's call).\n\ud83d\udfe2 [regime] Invalidated if: BTC 1m closes hold above EMA300 81556 for 15-30m\n   (was 81611 last cycle \u2014 re-test with current value, not prior prose).\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nCFX SHORT is the right side: trend (r2 0.90), not chop \u2014 BTC 201 consecutive\n1m candles below EMA300, STRONG_DOWN. 24h: 19 closed, 8W/11L, -0.47. Shorts\n5W/4L positive, longs 3W/7L negative. Paid sides today: RSI \u226560 shorts 2/2\n(+0.18), RSI \u226572 longs 3W/1L; losing sides: 35-45 shorts (7T, -0.38), mid-band\nlongs (45-60, 14d worst bucket -2.13). Both BTC pending trades died at\nUNIVERSAL_MAX_HOLD without arming trail \u2014 chop holds again.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Tighten CFX trail: SL \u2192 breakeven 0.052188 while below 0.05198.\n2. No new AI pick this cycle \u2014 GMX SHORT (19:21) still in 45-min window;\n   PICK (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute).\n3. 1/6 slots used in SHORT_BIAS tape = opportunity cost, but 30 flips/24h\n   justifies a thin book until direction stabilizes.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json` (`steers` array untouched; all numbers re-verified this cycle from PostgreSQL/meta_rsi).\n",
+  "agent_timestamp": "2026-10-23T19:49:47.745037+00:00",
+  "regime_context": "Sources (stated separately, last dumps 19:30-19:44 UTC). Aggregate 5m regime: SHORT_BIAS \u2014 112 short / 2 long / 15 neutral of 129 tokens; flips/24h = 30, measured this cycle, >= p95 26 = unusually unstable (direction state survives ~1h \u2014 all direction-flavored steers carry re-test conditions). BTC 15m regime: SHORT_BIAS at 19:30 (prior 3 dumps NEUTRAL; flips/24h = 15 = normal band, p50 ~19). Continuum 1m: BELOW EMA300 \u2014 price 81305-81358 vs EMA300 81556, 201 consecutive candles below, linreg LEAN_BEAR, zscore NEG, volume LOW, trend_quality STRONG_DOWN, wyckoff ACCUMULATION. btc_4h: LONG_BIAS. Net read: short-term tape is down-trending under EMA300 (shorts aligned), higher-timeframe accumulation/recovery \u2014 no conviction beyond the stated condition. Re-test: BTC 1m closes hold above EMA300 81556 for 15-30m invalidates the short case (EMA300 was 81611 last cycle, now 81556 \u2014 use current value).",
+  "pattern_alerts": "All verified this cycle by re-running PostgreSQL on meta_rsi (not entry_rsi_14):\n\nP1 \u2014 SHORT 35-45 dead band (14d n=36, 36% WR, -0.53; today n=7, 43% WR, -0.38): ALT -4.61%, ME -2.85%, ZRO -4.88%, CC -3.95% all entered short at meta_rsi 35-43. Winning side = >=60 band: 14d n=12, 67% WR, +0.78 (only profitable short band); today 2/2 (+0.18). Why weren't we on it: pump-chain-/volume-buildup- keep firing in the oversold pocket where the move already happened. CFX (open, 36.17) is the exception riding structure \u2014 band alone is not an exit, structure break is.\n\nP2 \u2014 LONG bands (14d, n=227): >=72 = +0.52 (n=27, 41% WR, re-verified); 60-72 = -0.92 (n=68); 45-60 = -2.13 (n=89, worst bucket system-wide). Today: longs >=72 went 3W/1L, mid-band longs all lost (WLFI 57.14 -4.83% hard_max_loss). Winning side for mid-band longs: wait for RSI >=72 or stay out.\n\nP3 \u2014 volume-buildup- (steer-001, automated): 14d SHORT side 65% WR +0.07 (healthy); the 4-loss streak is entirely 35-43 band shorts, not a signal defect. Suggested gate meta_rsi >=55 for SHORT entries \u2014 parameter change is brain auditor's call, watchdog does not touch it.\n\nP4 \u2014 Chop holds never arm (repeat): both BTC ai-trader-pending exits at UNIVERSAL_MAX_HOLD (-1.03%, -1.53%) never reached +0.40% trail arm; auto_trader shadow: 6 CHOP trades, 16.7% WR, longs 0/4. Trend trades win, chop trades lose \u2014 no new finding, still repeating."
 }

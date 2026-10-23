@@ -2178,5 +2178,16 @@
     "after": "hold strengthened; CEO ruling now gates 2 definitions instead of 1",
     "rationale": "pre-registration #83 requires fkA recomputed at ship time",
     "impact": "zero behavior (doc only); prevents shipping on stale numbers"
+  },
+  {
+    "timestamp": "2026-10-23T20:43:13Z",
+    "agent": "brain_auditor",
+    "change": "Ship brain/analysis/continuum_alignment_2026-10-23.py (creative idea #1: BTC-continuum direction-alignment gate, measured then REJECTED-WITH-DATA, --selfcheck PASS with verdict lock)",
+    "type": "creative",
+    "file": "brain/analysis/continuum_alignment_2026-10-23.py",
+    "before": "did not exist",
+    "after": "reproducible 7/14/30d aligned/counter/neutral split with Fisher + fk",
+    "rationale": "readiness \"aligned only\" prose had never been measured; counter-trend trades turn out to be the better cohort (30d 49.5% \"+0.91\") but the block fails every bar",
+    "impact": "zero trading behaviour; logs the rejection so it is never re-proposed from a 7d snapshot"
   }
 ]
