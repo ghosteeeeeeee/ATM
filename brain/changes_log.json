@@ -1958,5 +1958,16 @@
     "after": "empirical distribution pinned (min 0 / p50 19 / p95 26 / max 31 over 1969 dumps; 14d min 11), condition-based wording stated as the always-on default, >=26 = anomaly flag, <6 = informative low-churn tail unobserved since Oct 2",
     "rationale": "a threshold satisfied on every observation cannot discriminate and invites false anomaly reports",
     "impact": "zero behaviour; prevents misreading the baseline as an anomaly"
+  },
+  {
+    "timestamp": "2026-10-23T07:05:00Z",
+    "agent": "brain_auditor",
+    "change": "brain/analysis/tat_forward_2026-10-23.py — close-anchored TAT forward-return audit (zero-behavior, --selfcheck PASS)",
+    "type": "infra",
+    "file": "brain/analysis/tat_forward_2026-10-23.py",
+    "before": "no post-cut forward evidence for trail_arm_timeout exits",
+    "after": "17/14d measured: depth-bucket split 12/12 vs 0/5 (recovery = cut depth restatement), fwd30m flat both groups, verdict INCONCLUSIVE; corrected post-bug_hunter (exit_price fwd base, TZ, selfcheck 8/8)",
+    "rationale": "inform TAT flip / Oct 25 stall-exit eval with valid close-anchored method",
+    "impact": "measurement only, no live behavior"
   }
 ]

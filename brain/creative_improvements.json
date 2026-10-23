@@ -7088,5 +7088,37 @@
     "category": "measurement",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T07:05:00Z",
+    "run": 91,
+    "idea": "TAT forward-return audit (close-anchored) + ship + bug_hunter correction",
+    "rationale": "Live TAT exit (pump-chain/bb-squeeze) never had a post-cut forward check; directly informs pending TAT-scope flip and Oct 25 stall-exit eval",
+    "measured": "17 TAT closes 14d, 0 nodata, 0 partial: recovery perfectly partitioned by exit depth (depth>=-0.40%: 12/12 | depth<-0.40%: 0/5) => 70.6% headline = cut-depth restatement; fwd30m from exit_price: recovered -0.10% vs never +0.05% (flat); realized sum '-$0.40' max '-$0.20'",
+    "expected_impact": "evidence input only (n=17<20): verdict INCONCLUSIVE for prematurity; TAT = near-breakeven stall converter by construction (cut always within 0.40% of arm line); cite depth buckets",
+    "category": "exit engine",
+    "status": "shipped_as_measurement",
+    "risk": "zero (zero-behavior script with --selfcheck)",
+    "file": "brain/analysis/tat_forward_2026-10-23.py"
+  },
+  {
+    "date": "2026-10-23T07:05:00Z",
+    "run": 91,
+    "idea": "arm-dampen 0.5x ship CANCELLED with data (was queued for Oct 23 scope ruling)",
+    "rationale": "7d qualifiers shrank from 3 to 2 (pump-chain- aged out to n=7<10); remaining 2 both CEO-domain ai-trader; 0.5x save fell +$0.50 -> +$0.15/7d",
+    "expected_impact": "avoids shipping a sub-noise lever into CEO-domain trades",
+    "category": "sizing",
+    "status": "cancelled_with_data",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-23T07:05:00Z",
+    "run": 91,
+    "idea": "TAT semantics correction: trail_arm_timeout exits are all trailing_activated=True",
+    "rationale": "17/14d and 9/7d TAT exits are ARMED=True giveback cuts (condition = age>=MIN AND live_pnl<0.40 includes armed trades that faded below arm level); live TAT is an armed-giveback cutter not a never-armed cutter — prior narratives conflated shadow scope (bb-bounce|ai-trader+, 0/17 of actual exits) with live scope (pump-chain|bb-squeeze, 17/17)",
+    "expected_impact": "prevents mislabeling in the Oct 23/25 flip decision materials",
+    "category": "documentation/measurement",
+    "status": "logged",
+    "risk": "zero"
   }
 ]
