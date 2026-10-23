@@ -14284,3 +14284,24 @@ Final set: ['BTC']
 - 7d `-$3.18` vs `-$3.11` last hour — stable bleed, size-reduce still active until ~19:34 UTC auto-clear check
 - CONF_FLOOR=30 bare-only still blocked on RAW-confidence pin (audit #85/#88/#90/#91/#92)
 - Waiver expiry Oct 24
+
+## 2026-10-23 09:29 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.11 (WR: 0%) | 24h: 9T 6W `+$0.22` (66.7%) | 7d: 141T 38.3% `-$3.03` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade: WLFI bb-bounce-v2-long+ LONG hard_max_loss -$0.11 / -4.83% — same WLFI trade already flagged as TAT 15th fire (audit #93), variant-C counterfactual would have cut at -0.61% not -4.83%; not a new signal issue
+- atr_sl_hit 0/9 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour (bb-bounce-v2-long+ n=1 < 3) — no kill trigger
+- No negative-hour streak (2 mildly red, not 3+)
+- Frequency 1/hr — not overtraded (limit 20)
+- 1 open: BTC #16358 LONG bracketed (-0.26 live) — let it ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d `-$3.03` vs `-$3.18` last hour — slightly improving
+- CONF_FLOOR=30 bare-only + TAT variant-C still blocked on CEO rulings / vacation file
+- Waiver expiry Oct 24
