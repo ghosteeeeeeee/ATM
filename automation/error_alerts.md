@@ -1707,3 +1707,13 @@
 - **WARN** (1x): disk `/` at 85% used (18G free) — no logs >7d to gzip; largest local consumers: /root/.hermes/data 7.9G, journal 412M. No auto-fix applied (nothing safe to delete).
 - **WARN** (1x): `hermes-upgrade-implementer.service` FAILED at 16:36 UTC — `start operation timed out` (TimeoutStartSec=900) after running 2m15s CPU; timer retries next 16:06+12h. Log also shows SQL executed as shell (`LINE 1: select token, direction, size_usdt...` caret error) — likely a plan file eval'd into sh.
 - **AUTO-FIX**: none required — pipeline, price-collector, 1m-candle, watchdog timers all active and firing; no crash, no stale prices, no phantom trades.
+
+## Error Alerts — 2026-10-23 18:27 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: v2 recheck: momentum -N.N < N.N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3479s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3479s left, N failures)`
+
+## Error Alerts — 2026-10-23 18:43 UTC
+- **WARN** (1x): disk `/` at 85% capacity (18G free; 84.6% exact) — still no logs >7d to gzip; largest: /root/.hermes/logs/pipeline.log 264M, signal-compactor.log 103M. No safe auto-fix available (active logs only).
+- **INFO** (1x): CRV SHORT trade execution FAILED at 18:42 (`RSI ceiling: 71.2 > 65`) — handled gracefully, signal 1686297 marked FAILED, hotset cooldown recorded. Not a system error.
+- **AUTO-FIX**: none required — all key timers active (price-collector, 1m-candle, pipeline, watchdog), pipeline last run OK at 18:42 (1 open / 18 closed today), prices 68s fresh, 56 signals in last 1h, 0 phantom trades, no crashes.

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-23T17:44:33.211674+00:00",
+  "timestamp": "2026-10-23T18:44:33.961103+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -12,15 +12,15 @@
   ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "NEUTRAL",
     "btc_4h": "LONG_BIAS",
-    "continuum": "AT",
-    "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "continuum": "BELOW",
+    "volatility": "NORMAL",
+    "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "acceleration_state": "FLAT",
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 0.75,
     "wyckoff_phase": "UNKNOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"

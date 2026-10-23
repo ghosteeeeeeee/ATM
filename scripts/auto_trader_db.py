@@ -142,20 +142,36 @@ def init_db():
                     "ON attribution(trade_id)")
         # One-time backfill: rows resolved BEFORE the R:R fix get planned/real
         # R:R from their hypothetical's armed levels (slip = 0.12% of trigger,
-        # same convention as the full-analysis skill).
+        # 150pt floor per skill). CORRELATED form (bug_hunter fix: the old
+        # UPDATE...FROM self-join with unqualified attribution refs stamped
+        # EVERY row with one pair's values — production corruption event).
+        # Unqualified trade_id/direction in WHERE/SET resolve against the
+        # UPDATE target row; the join matches per-row on 'shadow:'||order_id.
         cur.execute("""
             UPDATE attribution SET
-              planned_rr = CASE WHEN a.direction='long'
+              planned_rr = CASE WHEN attribution.direction='long'
                 THEN ROUND((h.tp - h.trigger) / NULLIF(h.trigger - h.sl, 0), 2)
                 ELSE ROUND((h.trigger - h.tp) / NULLIF(h.sl - h.trigger, 0), 2) END,
-              real_rr = CASE WHEN a.direction='long'
-                THEN ROUND((h.tp - h.trigger) / NULLIF(h.trigger - h.sl + h.trigger*0.0012, 0), 2)
-                ELSE ROUND((h.trigger - h.tp) / NULLIF(h.sl - h.trigger + h.trigger*0.0012, 0), 2) END
-            FROM hypotheticals h, attribution a
-            WHERE a.trade_id = 'shadow:' || h.order_id
-              AND a.planned_rr IS NULL
+              real_rr = CASE WHEN attribution.direction='long'
+                THEN ROUND((h.tp - h.trigger) / NULLIF(h.trigger - h.sl + MAX(h.trigger*0.0012, 150), 0), 2)
+                ELSE ROUND((h.trigger - h.tp) / NULLIF(h.sl - h.trigger + MAX(h.trigger*0.0012, 150), 0), 2) END
+            FROM hypotheticals h
+            WHERE attribution.trade_id = 'shadow:' || h.order_id
+              AND attribution.planned_rr IS NULL
               AND h.trigger IS NOT NULL AND h.sl IS NOT NULL AND h.tp IS NOT NULL
         """)
+        # Trigger-direction column: continuation mapping (skill §12 FIXED)
+        # fires long ABOVE / short BELOW, but legs armed before the flip were
+        # fade-style (long below / short above). Column + backfill preserves
+        # correct hit-tracking for both generations.
+        try:
+            cur.execute("ALTER TABLE hypotheticals ADD COLUMN trigger_dir TEXT")
+        except sqlite3.OperationalError:
+            pass  # column exists
+        cur.execute("UPDATE hypotheticals SET trigger_dir='below' "
+                    "WHERE direction='long' AND trigger_dir IS NULL")
+        cur.execute("UPDATE hypotheticals SET trigger_dir='above' "
+                    "WHERE direction='short' AND trigger_dir IS NULL")
         conn.commit()
     finally:
         conn.close()
@@ -207,7 +223,10 @@ def record_order(decision_id, leg, o, action, size, leverage):
 
 
 def upsert_hypothetical(o, regime_at_entry, size):
-    """One per order_id (UNIQUE). Shadow paper-tracking."""
+    """One per order_id (UNIQUE). Shadow paper-tracking.
+    o may carry trigger_dir ('above'/'below') — which side of the trigger
+    price must cross to fire; required for hit-tracking after the §12
+    continuation mapping flip."""
     conn = connect()
     try:
         cur = conn.cursor()
@@ -217,9 +236,9 @@ def upsert_hypothetical(o, regime_at_entry, size):
             return row['id']  # already tracked — never re-arm (one-shot)
         cur.execute(
             "INSERT INTO hypotheticals (order_id, ts_armed, direction, trigger, sl, tp, "
-            "size, regime_at_entry) VALUES (?,?,?,?,?,?,?,?)",
+            "size, regime_at_entry, trigger_dir) VALUES (?,?,?,?,?,?,?,?,?)",
             (o['order_id'], time.time(), o['direction'], o['trigger'],
-             o['sl'], o['tp'], size, regime_at_entry))
+             o['sl'], o['tp'], size, regime_at_entry, o.get('trigger_dir')))
         conn.commit()
         return cur.lastrowid
     finally:

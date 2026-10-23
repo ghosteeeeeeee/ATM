@@ -174,8 +174,9 @@ def score_direction(ind, continuum, direction='long', struct=None):
         elif t5['rsi'] < 30 or t5['rsi'] > 70:
             s -= 10
             reasons.append(f"RSI {t5['rsi']:.0f} extreme -10")
-    # volume — direction-neutral row
-    vols = [ind[t]['vol'] for t in ('1m', '5m', '15m') if t in ind]
+    # volume — direction-neutral row. 5m/15m only: skill "1m volume alone =
+    # noise" — averaging it in dilutes conviction readings (parity fix).
+    vols = [ind[t]['vol'] for t in ('5m', '15m') if t in ind]
     if vols:
         mv = sum(vols) / len(vols)
         if mv >= 1.5:
@@ -242,9 +243,6 @@ def build_decision(cycle_id, open_positions, cfg):
     if chop:
         score_long = int(trend_long / 2) + (score_long - trend_long)
         score_short = int(trend_short / 2) + (score_short - trend_short)
-        reasons_long.append("CHOP REGIME — trend inputs halved; momentum over "
-                            "trend, live-tape reads outrank trend scores")
-        reasons_short.append("CHOP REGIME — trend inputs halved")
 
     # Missing-data guards: no chop check or no indicators → no aggression
     if flips is None or not ind:
@@ -260,6 +258,12 @@ def build_decision(cycle_id, open_positions, cfg):
 
     btc_open = [p for p in open_positions if p['token'] == token]
     reasons = []
+    # CHOP REGIME flag goes FIRST in decision-level reasons (persisted in
+    # full — the skill mandates the flag; per-direction lists are truncated
+    # to [:4] for display and silently dropped it, bug_hunter finding).
+    if chop:
+        reasons.append("CHOP REGIME — trend inputs halved; momentum over "
+                       "trend, live-tape reads outrank trend scores")
     decision = 'STAND_DOWN'
     bracket = None
 
@@ -280,17 +284,35 @@ def build_decision(cycle_id, open_positions, cfg):
             h1 = struct.get('1h') or {}
             sh, sl = h1.get('sh'), h1.get('sl')
             if sh and sl and sh > sl:
-                cushion = max(30.0, 0.10 * h1.get('atr', 400))
-                risk = 0.5 * h1.get('atr', 400)
-                into = 0.10 * h1.get('atr', 400)
+                atr1 = h1.get('atr', 400) or 400
+                cushion = max(30.0, 0.10 * atr1)
+                risk = 0.5 * atr1
+                rng = sh - sl  # range for measured-move targets
+                # §12 FIXED DIRECTION MAPPING (skill: break down = SHORT,
+                # break up = LONG — never silently all-longs; the 10-22 miss
+                # wired both legs LONG and a breakdown long fired at the low).
+                # Continuation geometry: SL retests the broken level (failed
+                # break), TP = measured move of the range. CEOS: any leg
+                # override (e.g. "defense long") is an explicit instruction,
+                # never the default.
                 bracket = {
-                    'long': {'trigger': round(sl - cushion, 2),
-                             'sl': round(sl - cushion - risk, 2),
-                             'tp': round(sh - into, 2)},
-                    'short': {'trigger': round(sh + cushion, 2),
-                              'sl': round(sh + cushion + risk, 2),
-                              'tp': round(sl + into, 2)},
+                    'short': {'trigger': round(sl - cushion, 2),
+                              'sl': round(sl + risk, 2),
+                              'tp': round(sl - rng, 2),
+                              'trigger_dir': 'below'},
+                    'long': {'trigger': round(sh + cushion, 2),
+                             'sl': round(sh - risk, 2),
+                             'tp': round(sh + rng, 2),
+                             'trigger_dir': 'above'},
                 }
+                # Skill mandate: PRINT the mapping back with every bracket
+                reasons.append(
+                    f"BRACKET MAPPING: lower-break {sl:.0f} → SHORT "
+                    f"@{bracket['short']['trigger']:.0f} "
+                    f"(SL {bracket['short']['sl']:.0f}, TP {bracket['short']['tp']:.0f}); "
+                    f"upper-break {sh:.0f} → LONG "
+                    f"@{bracket['long']['trigger']:.0f} "
+                    f"(SL {bracket['long']['sl']:.0f}, TP {bracket['long']['tp']:.0f})")
             else:
                 decision = 'STAND_DOWN'
                 reasons.append('no usable 1h structure for bracket')

@@ -69,8 +69,12 @@ def track_hypotheticals(cfg, size):
 
     now = time.time()
     for h in DB.get_hypotheticals('armed'):
-        # HIT: price crossed the trigger
-        hit = (price <= h['trigger']) if h['direction'] == 'long' \
+        # HIT: price crossed the trigger — direction from trigger_dir (which
+        # side price must cross). Legacy rows (armed before the §12 mapping
+        # flip) were fade-style: long fired below / short above; migration
+        # backfills those, this fallback covers anything older.
+        tdir = h['trigger_dir'] or ('below' if h['direction'] == 'long' else 'above')
+        hit = (price <= h['trigger']) if tdir == 'below' \
             else (price >= h['trigger'])
         if hit:
             # BUG A fix: NO attribution at hit — one row per resolution only
@@ -97,20 +101,19 @@ def track_hypotheticals(cfg, size):
                     (h['trigger'] - exit_px) / h['trigger'] * 100)
             pnl_usd = move / 100 * h['size']
             exit_reason = 'shadow_sl' if sl_hit else 'shadow_tp'
-            # R:R backfill (gap fix): planned from armed levels, real with the
-            # standard slip buffer (~0.12% of trigger ≈ 100pts at 81k) — same
-            # convention as the full-analysis skill's planned-vs-real quoting.
+            # R:R: planned from armed levels; real with the skill's slip buffer
+            # = max(0.12% of trigger, 150pt floor — the skill's BTC chop floor,
+            # bug_hunter parity fix; ~97pt at 81k was below the 150-250 range).
             if direction == 'long':
                 reward, risk = h['tp'] - h['trigger'], h['trigger'] - h['sl']
             else:
                 reward, risk = h['trigger'] - h['tp'], h['sl'] - h['trigger']
-            slip = h['trigger'] * 0.0012
+            slip = max(h['trigger'] * 0.0012, 150.0)
             planned_rr = round(reward / risk, 2) if risk > 0 else None
             real_rr = round(reward / (risk + slip), 2) if risk > 0 else None
-            DB.update_hypothetical(h['order_id'], status='stopped' if sl_hit else 'tp',
-                                   ts_closed=time.time(), exit_price=exit_px,
-                                   pnl_pct=round(move, 4),
-                                   pnl_usdt=round(pnl_usd, 4))
+            # Attribution BEFORE the status flip (crash-between protection:
+            # INSERT OR IGNORE dedupes if we crash after this and the next
+            # cycle re-resolves from 'hit'; the old order lost the row).
             DB.record_attribution({
                 'trade_id': f"shadow:{h['order_id']}",
                 'direction': direction, 'regime_at_entry': h['regime_at_entry'],
@@ -119,6 +122,10 @@ def track_hypotheticals(cfg, size):
                 'pnl_pct': round(move, 4), 'pnl_usdt': round(pnl_usd, 4),
                 'exit_reason': exit_reason, 'won': won,
                 'lesson_tags': ['shadow', exit_reason]})
+            DB.update_hypothetical(h['order_id'], status='stopped' if sl_hit else 'tp',
+                                   ts_closed=time.time(), exit_price=exit_px,
+                                   pnl_pct=round(move, 4),
+                                   pnl_usdt=round(pnl_usd, 4))
             events.append(f"{h['order_id']} shadow {'TP' if won else 'SL'} "
                           f"({move:+.2f}%)")
     return events
@@ -216,7 +223,8 @@ def run_cycle():
     # superseded ids as armed).
     import uuid
     cycle_id = f"{int(time.time())}-{uuid.uuid4().hex[:6]}"
-    summary = {'enabled': True, 'mode': cfg.get('mode', 'shadow')}
+    summary = {'enabled': True, 'mode': cfg.get('mode', 'shadow'),
+               'shadow_armed': []}
 
     open_positions = get_open_btc()
     if open_positions is None:
@@ -282,20 +290,40 @@ def run_cycle():
                         keep = True  # levels fresh — this leg stays as-is
                 if keep:
                     continue  # fresh armed leg exists for this direction
-                # E2 checklist: never arm an already-crossed (ITM) level
-                already = (price_now <= o['trigger']) if leg == 'long' \
-                    else (price_now >= o['trigger'])
+                # E2 checklist: never arm an already-crossed (ITM) level.
+                # Polarity from trigger_dir (continuation mapping: long
+                # triggers ABOVE, short BELOW — the old direction-keyed
+                # polarity skipped both legs as "crossed" after the flip).
+                _tdir = o.get('trigger_dir') or \
+                    ('above' if leg == 'long' else 'below')
+                already = (price_now >= o['trigger']) if _tdir == 'above' \
+                    else (price_now <= o['trigger'])
                 if already:
                     DB.log_event('WARN', f"cycle {cycle_id}: {leg} trigger "
                                          f"{o['trigger']} already crossed by "
                                          f"price {price_now} — leg skipped")
+                    continue
+                # Arming gate (skill rule): a leg must clear ≥1.0 REAL R:R
+                # (slip = max(0.12%, 150pt floor)) — never arm negative-R:R
+                # geometry just because structure shifted.
+                if leg == 'long':
+                    _rwd, _rsk = o['tp'] - o['trigger'], o['trigger'] - o['sl']
+                else:
+                    _rwd, _rsk = o['trigger'] - o['tp'], o['sl'] - o['trigger']
+                _slip = max(o['trigger'] * 0.0012, 150.0)
+                _real = (_rwd / (_rsk + _slip)) if _rsk > 0 else 0
+                if _real < 1.0:
+                    DB.log_event('WARN', f"cycle {cycle_id}: {leg} real R:R "
+                                         f"{_real:.2f} < 1.0 — leg not armed")
                     continue
                 order_id = f"btc-auto-{cycle_id}-{leg}"
                 DB.record_order(did, leg, {**o, 'order_id': order_id},
                                 'shadow_armed', size, cfg.get('leverage_max', 5))
                 DB.upsert_hypothetical(
                     {'order_id': order_id, 'direction': leg,
-                     'trigger': o['trigger'], 'sl': o['sl'], 'tp': o['tp']},
+                     'trigger': o['trigger'], 'sl': o['sl'], 'tp': o['tp'],
+                     'trigger_dir': o.get('trigger_dir') or
+                     ('above' if leg == 'long' else 'below')},
                     decision['regime_state'], size)
             # Truthful report: whatever is armed in DB AFTER this cycle
             summary['shadow_armed'] = [h['order_id'] for h in
