@@ -255,6 +255,14 @@ with the engine on a temp state path — never the live state file.
     hit, exit still beat holding). Contrast #16351: 732pt TP filled in
     2h17m on fresh momentum. Rule: in chop/mixed scale TP to ≈1x 1h ATR
     of realistic momentum travel; deep-shelf TPs are for TREND + volume.
+    **Corollary (from #16358, −1.03%): the TP goes at the FIRST opposing
+    structure level, never past it.** #16358's MFE touched the 82,034
+    coil top EXACTLY — that was the first opposing level and it would
+    have filled; the armed 82,400 deep-shelf TP sailed past the only
+    structure the tape actually reached in 8 hours. When the first
+    opposing level can't pay real R:R ≥ 1.0 after buffers, the trade is
+    too close to the level to arm — don't reach for a deeper TP to fix
+    the math, skip or re-shelve further away.
 
 **Tranche adds to an existing position:** brain.py's duplicate guard blocks
 a second same-coin open — for a CEO-directed add pass `--force`

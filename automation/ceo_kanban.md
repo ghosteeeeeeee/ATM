@@ -470,3 +470,7 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-22 11:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 23T 43.5% '-$0.36' | 7d 159T 37.1% '-$3.03' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ 2T 0%WR 24h but 0T last hour; r2v2-long4 2T 0%WR 0T last hour; CONF_FLOOR ships Oct 23) | atr_sl_hit 5/23=21.7% under 40% | no neg streak (empty hour) | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-23 10:50 UTC] health_monitor: ROOT-CAUSE FIX — `hermes-coding-mcp.service` crash-loop returned again (3,252 restarts since 06:00 UTC today, 20,307 total). Root cause found: `hermes-better-coder-health.service` (daily 06:00) and `hermes-better-coder-audit.service` (weekly) both had `Wants=hermes-coding-mcp.service`, pulling the dead unit (missing `scripts/run_mcp_server.py`, deleted in commit 3786b550) back up after every previous stop. Removed `Wants=` from both units + daemon-reload + stopped the service — verified health check runs green and coding-mcp stays inactive. This closes the recurring 10-07/10-21/10-22/10-23 loop for good. Rest green: pipeline LIVE 10:42 rc=0, 4/4 core timers active, 39 signals/1h, hotset 1 token (NEAR SHORT, 14s fresh), prices 9s fresh, 2 open | 9 closed today | +6.35%, 0 phantom trades, regime 5m NEUTRAL (16L/18S/95N), disk 84%, vacation pause not active.
+BY: health_monitor

@@ -2,7 +2,7 @@
 
 ## Error Alerts — 2026-10-23 10:45 UTC (health_monitor)
 - **CRITICAL→FIXED** (20,307 restarts ≈28h @5s): `hermes-coding-mcp.service` crash-looping again — `can't open file '/root/.hermes/scripts/run_mcp_server.py': No such file or directory` (script deleted in commit 3786b550 dead-scripts cleanup; same fault as 2026-10-07, unit had been re-started despite `disabled`).
-  - **AUTO-FIX**: `systemctl stop hermes-coding-mcp.service` — verified `ActiveState=inactive`, `UnitFileState=disabled`, no attached timer, not on trading path. Do not restart until `run_mcp_server.py` is restored.
+  - **AUTO-FIX (root cause)**: `hermes-better-coder-health.service` (daily 06:00) and `hermes-better-coder-audit.service` (weekly Sun 03:00) both had `Wants=hermes-coding-mcp.service`, pulling the dead unit back up — verified: current storm resumed exactly Oct 23 06:00:00 at the health service start. This is why the fault kept recurring after previous stop/fix attempts. Removed the `Wants=` lines from both units, `systemctl daemon-reload`, verified: health service runs green while coding-mcp stays `inactive`. Also `systemctl stop hermes-coding-mcp.service`. Do not restart until `run_mcp_server.py` is restored.
 - **INFO**: Pipeline healthy — LIVE run 10:42:23 rc=0, position_manager rc=0, 0 Tracebacks in 30min. Timers 4/4 active (price-collector, 1m-candle, pipeline, watchdog). 39 signals/hr. Hotset fresh (14s, 1 token NEAR SHORT). Portfolio: 2 open | 9 closed today | +6.35% PnL. Exit reasons 24h: profit-monster-trail 5 (+$0.33), trail_arm_timeout 2 (-$0.02), hard_max_loss 1 (-$0.11), UNIVERSAL_MAX_HOLD 1 (-$0.03). 0 phantom trades. Regime 5m NEUTRAL (16L/18S/95N of 129). Speeds 128/241 (53.1%) ≥50th pct. Prices fresh (9s). Disk 84% (threshold 85%). Vacation pause: not active.
 - **INFO**: Side findings unchanged — `hermes-atr-sl-updater.timer` ghost entry; `signals_hermes_runtime.db` unbounded; `decisions` table dormant since 2026-04-13 (expected — ai_decider defunct, signal_compactor replaced it).
 
@@ -1667,3 +1667,7 @@
 - **WARN** (1x): `hermes-upgrade-implementer.service: Failed with result 'timeout'` (04:36 UTC — script exceeded TimeoutStartSec=900)
 - **AUTO-FIX**: `systemctl reset-failed` applied; timer unaffected (next run 16:21 UTC). Suggested: raise TimeoutStartSec or cap script runtime to <900s.
 - **WARN**: Disk at 84% (threshold 85%) — largest log: pipeline.log 256M. No action taken yet; compress >7d logs if it crosses 85%.
+
+## Error Alerts — 2026-10-23 11:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3542s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
