@@ -2,12 +2,15 @@
 """tat_variant_c_pack_2026-10-23.py — TAT variant-C counterfactual, UNITS-CORRECT.
 
 WHY (brain_auditor run #103, 2026-10-23):
-The TAT variant-C pack queued for CEO GO (#93/#98) reported net "+13.40pp" and per-trade
-credits like WLFI "+4.22pp". That per-trade number is exactly `live_pnl (-0.61) -
-trades.pnl_pct (-4.83)` = 4.22 — i.e. an UNLEVERAGED poll snapshot subtracted from a
-LEVERAGED close figure. The trail-arm-candle-oos verdict (2026-10-17) flagged this as the
-"units landmine": pnl_pct = unleveraged_move x leverage, pnl_usdt = amount_usdt x
-unleveraged_move. Mixing them inflates every credit by ~leverage (~5x).
+The TAT variant-C pack queued for CEO GO reported net "+13.00pp" at #93 (6 cuts, Oct 23
+08:49) and "+13.40pp" at #98 (7 cuts with POLYX open-time +0.40), with per-trade credits
+like WLFI "+4.22pp". That per-trade number is exactly `live_pnl (-0.61) - trades.pnl_pct
+(-4.83)` = 4.22 — an UNLEVERAGED poll snapshot subtracted from a LEVERAGED close figure.
+The trail-arm-candle-oos verdict (2026-10-17) flagged this as the "units landmine": for the
+leveraged class pnl_pct = price_move x leverage and pnl_usdt = notional x price_move.
+Mixing the bases inflates every credit by ~leverage (~5x). Reproducer check: this script's
+naive column on the #93 cohort (ex-POLYX) = +13.00pp EXACT; with POLYX closed = +14.08pp
+(+13.00 + POLYX's own 1.09, vs the 0.40 the open-time snapshot showed).
 
 This script computes BOTH:
   * naive_pp  = live_pnl_at_first_fire - trades.pnl_pct        (prior method, reproduces
@@ -19,7 +22,7 @@ Counterfactual: close at FIRST shadow fire (the minute TAT would actually have c
   BASE      = cut every in-scope fire
   VARIANT-C = cut only when live_pnl < 0   (the pre-registered variant)
 
-In-scope mirrors position_manager.py:3763 exactly: direction LONG AND
+In-scope mirrors position_manager.py:3760-3762 exactly: direction LONG AND
 ('bb-bounce' in sig or 'ai-trader+' in sig) — manual/pending never match that substring
 (#39 fix); scope flag BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW must be on (it is).
 
@@ -61,15 +64,18 @@ def in_scope(direction, sig):
     return direction == 'LONG' and ('bb-bounce' in s or 'ai-trader+' in s)
 
 
-def evaluate(fires, rows):
-    """rows: {trade_id: (status, pnl_usdt, pnl_pct, amount, leverage, signal, open_time)}
+def evaluate(fires, rows, excluded=None):
+    """rows: {trade_id: (status, pnl_usdt, pnl_pct, notional, leverage, signal, open_time)}
 
-    Returns (base, variant_c) dicts of UNITS-CORRECT numbers plus naive reproducer.
+    notional = COALESCE(hl_notional_usdt, amount_usdt) — pnl_usdt is computed on
+    hl_notional (pnl_utils.compute_close_pnl), so cf$ must use the same basis.
+    excluded: optional list to record why a fired trade was dropped.
     """
     out = {'base': [], 'variant_c': [], 'naive_base': [], 'naive_c': []}
-    excluded = []
+    excluded = excluded if excluded is not None else []
     for tid, (ts, token, direction, live, sig) in sorted(fires.items()):
         if not in_scope(direction, sig):
+            excluded.append((tid, f'scope {direction} {sig}'))
             continue
         row = rows.get(tid)
         if row is None:
@@ -137,7 +143,8 @@ def report(path=LOG_DEFAULT):
     conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres')
     cur = conn.cursor()
     cur.execute("""
-        SELECT id, status, pnl_usdt, pnl_pct, amount_usdt, leverage, signal,
+        SELECT id, status, pnl_usdt, pnl_pct,
+               COALESCE(hl_notional_usdt, amount_usdt) AS notional, leverage, signal,
                to_char(open_time, 'YYYY-MM-DD HH24:MI')
         FROM trades WHERE id = ANY(%s)""", (list(fires.keys()),))
     rows = {r[0]: (r[1], r[2], r[3], r[4], r[5], r[6], r[7]) for r in cur.fetchall()}
@@ -176,27 +183,59 @@ def report(path=LOG_DEFAULT):
 
 
 def _selfcheck():
-    # 1) units discrimination on the published WLFI credit (#93/#98 '+4.22pp')
-    amount, live, pnl_pct, pnl_usdt, lev = 11.10, -0.61, -4.8306, -0.11, 5
-    cf = amount * live / 100.0
-    naive = live - pnl_pct
-    correct = cf - pnl_usdt
-    assert abs(naive - 4.2206) < 0.01, f'naive reproducer broken: {naive}'
-    assert abs(correct - 0.0423) < 0.005, f'correct delta broken: {correct}'
-    assert correct < naive / 10, 'correct must be ~5x smaller (leverage inflation)'
-    # 2) leveraged-consistency: pnl_pct/lev must equal pnl_usdt/amount
-    assert abs(pnl_pct / lev - pnl_usdt / amount * 100) < 0.15, 'units model wrong'
-    # 3) variant-C never cuts a winner at fire time by construction (live<0)
-    rec = {'pnl_usdt': 0.05, 'live': -0.1}
-    assert (rec['live'] < 0) and rec['pnl_usdt'] > 0  # fk possible only via recovery after fire
-    # 4) parser round-trip on a real-format line
+    """Runs the REAL evaluate()/summarize()/_sign_p() on a fixture — bug_hunter MED-1
+    (2026-10-23): a constant-only selfcheck survived a dropped /100, a sign inversion
+    and a one-sided sign test. Break-test: any of those now fails an assert below."""
+    fires = {
+        101: ('2026-10-23 07:58:00', 'WLFI', 'LONG', -0.61, 'bb-bounce-v2-long+'),
+        102: ('2026-10-18 04:28:00', 'BANANA', 'LONG', -0.17, 'bb-bounce-v2-long+'),
+        103: ('2026-10-19 22:07:00', 'LTC', 'LONG', -0.25, 'bb-bounce-v2-long+'),
+        104: ('2026-10-23 13:00:00', 'SAFE', 'LONG', 0.25, 'bb-bounce-v2-long+'),
+        105: ('2026-10-23 13:05:00', 'MAN', 'LONG', -0.50, 'ai-trader-manual'),
+    }
+    rows = {
+        101: ('closed', -0.11, -4.8306, 11.10, 5, 'bb-bounce-v2-long+', '2026-10-23 07:02'),
+        102: ('closed', -0.09, -2.2400, 11.10, 5, 'bb-bounce-v2-long+', '2026-10-18 03:30'),
+        103: ('closed', -0.04, -1.7200, 11.10, 5, 'bb-bounce-v2-long+', '2026-10-19 21:40'),
+        104: ('closed', 0.05, 1.3500, 11.10, 5, 'bb-bounce-v2-long+', '2026-10-23 12:30'),
+        105: ('closed', -0.10, -4.5000, 11.10, 5, 'ai-trader-manual', '2026-10-23 12:40'),
+    }
+    res, excluded = evaluate(fires, rows)
+    base, varc = summarize(res['base']), summarize(res['variant_c'])
+
+    # scope: manual dropped, live>0 kept only in BASE
+    assert len(excluded) == 1 and excluded[0][0] == 105, f'scope drop broken: {excluded}'
+    assert base['n_cuts'] == 4, f"base should cut all 4 in-scope, got {base['n_cuts']}"
+    assert varc['n_cuts'] == 3, f"variant-C should cut the 3 live<0, got {varc['n_cuts']}"
+
+    # units inside the real code path (the bug this script exists to catch)
+    wlfi = [r for r in res['variant_c'] if r['tid'] == 101][0]
+    assert abs(wlfi['naive_pp'] - 4.2206) < 0.01, f"naive reproducer broken: {wlfi['naive_pp']}"
+    assert abs(wlfi['delta_usdt'] - 0.0423) < 0.005, f"correct delta broken: {wlfi['delta_usdt']}"
+    assert wlfi['delta_usdt'] < wlfi['naive_pp'] / 10, 'correct must be ~5x smaller than naive'
+
+    # summarize: net, fk, sign (fixture = 3 improving cuts, no winner among them)
+    assert abs(varc['net_usdt'] - 0.126) < 0.005, f"variant net broken: {varc['net_usdt']}"
+    assert varc['fk_winners_cut'] == 0 and varc['improved'] == 3 and varc['worsened'] == 0
+    assert abs(varc['sign_p_two_sided'] - 0.25) < 1e-9, f"sign p(3/0) broken: {varc['sign_p_two_sided']}"
+    # base includes the positive-live winner -> fk 1/4 and a worse net
+    assert base['fk_winners_cut'] == 1, f"base fk broken: {base['fk_winners_cut']}"
+    assert abs(base['net_usdt'] - 0.103) < 0.005, f"base net broken: {base['net_usdt']}"
+
+    # two-sided sign test (one-sided would return half of these)
+    assert abs(_sign_p(7, 0) - 0.015625) < 1e-9, f'_sign_p(7,0) broken: {_sign_p(7,0)}'
+    assert abs(_sign_p(0, 4) - 0.125) < 1e-9, f'_sign_p(0,4) broken: {_sign_p(0,4)}'
+
+    # parser round-trip on a real-format line + scope mirror
     line = ('2026-10-23 14:12:18   [SHADOW] TRAIL-ARM would-fire POLYX LONG -0.29% '
             '[162m < arm 0.40%] trade=16365 sig=bb-bounce-v2-long+\n')
     m = RE_FIRE.match(line)
     assert m and m.group(4) == '-0.29' and m.group(5) == '16365', 'regex broken'
     assert in_scope('LONG', 'bb-bounce-v2-long+') and not in_scope('LONG', 'ai-trader-manual')
+
     print('tat_variant_c_pack --selfcheck PASS '
-          f'(naive {naive:+.2f}pp vs correct {correct:+.3f}pp, parser+scope ok)')
+          '(evaluate+summarize+sign on fixture: naive +4.22pp vs correct +$0.042, '
+          'base 4 cuts fk1 / variant 3 cuts fk0 p=0.25, parser+scope ok)')
     return True
 
 

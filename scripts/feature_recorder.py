@@ -117,16 +117,32 @@ def get_token_intel(token: str) -> dict:
             row = cur.fetchone()
             conn.close()
 
-            if row and row[0] is not None:
-                return {
-                    'rsi_14': float(row[0]) if row[0] else None,
-                    'macd_hist': float(row[1]) if row[1] else None,
-                    'atr_14': float(row[2]) if row[2] else None,
-                    'bb_position': float(row[3]) if row[3] else None,
-                    'slope_4h': float(row[4]) if row[4] else None,
-                    'regime_4h': row[5] if row[5] else None,
-                    'trend': row[6] if row[6] else None,
-                }
+            # FIX brain_auditor #104 (2026-10-23): this gate required row[0] = rsi_14,
+            # but 4h_regime_scanner.py:289 INSERTs only (token, slope_4h, regime_4h,
+            # trend) — rsi_14 is NULL in 157/157 momentum_cache rows, so the cache path
+            # NEVER fired and trades.entry_slope_4h / entry_regime_4h / entry_trend sat
+            # NULL on 0/707 trades over 30d while the data was in the cache all along.
+            # Gate is now "any field present"; price-computed indicators still win.
+            # ponytail: only the three 4h columns come from cache, nothing else changes.
+            if row and any(v is not None for v in row):
+                if row[0] is not None:
+                    return {
+                        'rsi_14': float(row[0]) if row[0] else None,
+                        'macd_hist': float(row[1]) if row[1] else None,
+                        'atr_14': float(row[2]) if row[2] else None,
+                        'bb_position': float(row[3]) if row[3] else None,
+                        'slope_4h': float(row[4]) if row[4] is not None else None,
+                        'regime_4h': row[5] or None,
+                        'trend': row[6] or None,
+                    }
+                computed = _compute_intel_from_prices(token)
+                if row[4] is not None:
+                    computed['slope_4h'] = float(row[4])
+                if row[5]:
+                    computed['regime_4h'] = row[5]
+                if row[6]:
+                    computed['trend'] = row[6]
+                return computed
         except Exception:
             try:
                 conn.close()
@@ -261,7 +277,35 @@ def record_exit_features(trade_id: int, exit_price: float, exit_reason: str):
 
 
 if __name__ == '__main__':
-    import psycopg2
+    import sys
+    if '--selfcheck' in sys.argv:
+        # Read-only root-cause check: cache must be reachable without rsi_14.
+        import psycopg2
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*), COUNT(rsi_14), COUNT(slope_4h) FROM momentum_cache")
+        n_cache, n_rsi, n_slope = cur.fetchone()
+        assert n_cache > 0, 'momentum_cache empty — cannot check'
+        assert n_rsi == 0, f'rsi_14 now populated ({n_rsi}) — root-cause premise changed, re-read the gate'
+        cur.execute("SELECT token FROM momentum_cache WHERE slope_4h IS NOT NULL AND regime_4h IS NOT NULL LIMIT 1")
+        tok_row = cur.fetchone()
+        assert tok_row, 'no cache row with slope_4h+regime_4h'
+        tok = tok_row[0]
+        intel = get_token_intel(tok)
+        assert intel.get('slope_4h') is not None, f'cache path still dead for {tok}: {intel}'
+        assert intel.get('regime_4h'), f'regime_4h missing for {tok}: {intel}'
+        assert intel.get('trend'), f'trend missing for {tok}: {intel}'
+        # computed indicators must still come from prices, not cache (cache rsi is NULL)
+        cur.execute("SELECT COUNT(*) FROM trades WHERE close_time > NOW()-INTERVAL '30 days' AND entry_regime_4h IS NOT NULL")
+        backfilled = cur.fetchone()[0]
+        cur.close(); conn.close()
+        print(f'feature_recorder --selfcheck PASS: cache {n_cache} rows (rsi_14 {n_rsi} NULL = premise), '
+              f'{tok} slope={intel["slope_4h"]} regime={intel["regime_4h"]} trend={intel["trend"]}; '
+              f'trades.entry_regime_4h currently populated {backfilled}/707 (backfills as new trades open)')
+        sys.exit(0)
+    print("[feature_recorder] WARNING: bare run REWRITES entry_rsi_14/macd/atr/bb on the 5 newest "
+          "open trades with PRESENT-tense values (undoes DRIFT-E entry-time ground truth). "
+          "Use --selfcheck for the read-only check.")
     conn = psycopg2.connect(**BRAIN_DB_DICT)
     cur = conn.cursor()
     cur.execute("SELECT id, token FROM trades WHERE status='open' ORDER BY open_time DESC LIMIT 5")

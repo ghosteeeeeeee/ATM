@@ -1097,9 +1097,14 @@ def _short_rsi_floor_bear_exempt():
     unreadable expiry → False → band blocks. Flip#2 (volgate) intentionally untouched.
     """
     try:
-        from waiver_expiry import flip1_active
-        if not flip1_active():
-            log('  🚫 [UNCLOG-EXPIRED] flip#1 waiver expired — SHORT RSI<floor bear exemption lapsed (band blocks again)')
+        # flip1_state (run #103): 'expired' = T's timestamp passed; 'unreadable:*' =
+        # file/key problem fail-closing EARLY. They logged identically before, which
+        # hid a 20-minute false lapse (2026-10-23 17:36-17:56, key missing from
+        # vacation_mode.json) behind an "expired" message 6h before the real expiry.
+        from waiver_expiry import flip1_state
+        _flip1_on, _flip1_why = flip1_state()
+        if not _flip1_on:
+            log(f'  🚫 [UNCLOG-EXPIRED] flip#1 waiver gate OFF ({_flip1_why}) — SHORT RSI<floor bear exemption lapsed (band blocks again)')
             return False
     except Exception:
         return False

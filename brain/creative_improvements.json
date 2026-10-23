@@ -7456,5 +7456,68 @@
     "category": "process guard",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T19:08:25Z",
+    "idea": "Ship TAT variant-C with CORRECTED magnitude (or decline on corrected numbers)",
+    "rationale": "Units fix: published '+13.00pp' mixed unleveraged live_pnl against leveraged trades.pnl_pct. Money basis +$0.410/14d, 7 cuts, fk 0/7, sign p=0.016, split-halves same sign -> criteria still MET, magnitude 4.4x smaller.",
+    "expected_impact": "+$0.41 per 14d, 0 winner-kills",
+    "category": "exit discipline",
+    "status": "recommended-with-corrected-numbers",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T19:08:25Z",
+    "idea": "Unit-safe money basis mandated for the whole Oct-25 eval batch (HML-SHADOW/MFE-CUT/UGB/exit-ladder)",
+    "rationale": "Four pending evals are live_pnl-log-line counterfactuals of exactly the class that inflated the TAT pack twice before anyone divided by leverage.",
+    "expected_impact": "Prevents 4 wrong GO/no-GO calls",
+    "category": "process guard",
+    "status": "shipped (verdict doc)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T19:08:25Z",
+    "idea": "flip1_state(reason) — fail-closed gates must log WHY they closed, not the message of the state they mimic",
+    "rationale": "A missing JSON key logged 'waiver expired' 6h before the real expiry (10 lines, 17:36-17:56) and cost an audit; reason field now separates expired vs unreadable:KeyError/FileNotFoundError.",
+    "expected_impact": "Next vacation_mode.json flap is self-diagnosing",
+    "category": "instrumentation",
+    "status": "shipped",
+    "risk": "none (boolean unchanged, in-pipeline verified)"
+  },
+  {
+    "date": "2026-10-23T19:08:25Z",
+    "idea": "Band-lapse counterfactual read pre-registered for 2026-10-24 (baseline locked now)",
+    "rationale": "Baseline: exemption-attributable 7 closes 3W/4L -$0.34, all 4 of today's volume-buildup- losers in [35,45), gate-source RSI 35.1-43.3. After 00:00Z the same attempts must print a BLOCK line instead.",
+    "expected_impact": "Confirms +$0.34/waiver-window save; feeds the flip#2 ruling on data",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T19:49:36Z",
+    "idea": "FK-FEASIBILITY FRONTIER: CONF_FILTER-enforce is structurally fk-infeasible (fk driven by its 84% book coverage), retire option B from the net-vs-fk ruling; rule on A (CONF_FLOOR) and C (tail package) only. 14d floors: last fk-passing = conf<45 (+2.07, 15.6%) which is dominated by conf<30 (+2.14, 10.2%); 30d conf<55 passes (18.0%) but fails 14d (41.4%) -> no ship.",
+    "rationale": "in-window [70,95) is the profitable keep-set at every window (+0.13/+0.95/+2.44); the enforcement scope is the problem, not the window",
+    "expected_impact": "makes the pending CEO net-vs-fk ruling decidable as two items and permanently closes option B",
+    "category": "decision infrastructure",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T19:49:36Z",
+    "idea": "CONF-FILTER-SHADOW day-1 scoreboard: 43 unique would-block / 115 lines, 14 opened net -$0.47 (save +0.47 if enforced) but 5 of 8 winners killed = fk 62.5% on opens; 29/43 = 67% never opened (downstream-redundant, up from #94's 50%)",
+    "rationale": "live confirmation of the pre-registered NET-VS-FK trade-off: net positive, fk catastrophic",
+    "expected_impact": "pre-read for Oct 25 first formal CONF-FILTER-SHADOW read",
+    "category": "telemetry",
+    "status": "collected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T19:49:36Z",
+    "idea": "CONCURRENT-FLIP WATCH: waiver expiry (00:00Z) and size-reduce auto-clear (~00:30Z) both land within ~30min — report as ONE combined posture check, not two siloed ones",
+    "rationale": "position size 0.5x->1.0x at the same moment the [35,45) SHORT gate re-tightens",
+    "expected_impact": "zero code; one combined verification after 00:30Z",
+    "category": "operations",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

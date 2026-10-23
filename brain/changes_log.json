@@ -2112,5 +2112,71 @@
     "after": "unclog_waiver carried forward; fresh enable with no prior file unchanged",
     "rationale": "root-cause guard for the expiry timestamp this run made load-bearing",
     "impact": "no behavior change in the normal path; prevents an early invisible lapse. Verified in temp dir: off+on preserves waiver, fresh enable works, live file untouched."
+  },
+  {
+    "timestamp": "2026-10-23T19:08:25Z",
+    "agent": "brain_auditor",
+    "change": "Units-correct TAT variant-C counterfactual pack (analysis, zero live behavior)",
+    "type": "creative",
+    "file": "brain/analysis/tat_variant_c_pack_2026-10-23.py",
+    "before": "published pack: live_pnl (unleveraged) minus trades.pnl_pct (leveraged on 87% of rows) -> '+13.00pp'/6 cuts",
+    "after": "cf_usdt = COALESCE(hl_notional_usdt,amount_usdt)*live_pnl/100 vs trades.pnl_usdt -> +$0.410/14d, 7 cuts, fk 0/7, p=0.016; naive column reproduces +13.00pp exactly",
+    "rationale": "pnl_pct semantics differ by exit path; the CEO GO packet was inflated ~4.4x",
+    "impact": "Corrected TAT variant-C GO decision; criteria still MET"
+  },
+  {
+    "timestamp": "2026-10-23T19:08:25Z",
+    "agent": "brain_auditor",
+    "change": "pnl_pct two-meanings verdict + unit-safe derivation rule",
+    "type": "creative",
+    "file": "brain/verdicts/2026-10-23_pnl_pct-units-inconsistency.md",
+    "before": "undocumented: hard_sl writes price %, other exits write leveraged %",
+    "after": "documented with entry/exit price proof (6 trades), 30d class-by-exit table, and the Oct-25 eval warning",
+    "rationale": "Same column, two meanings; already broke the TAT pack and taints pnl_pct/leverage analyses",
+    "impact": "Prevents the Oct-25 batch repeating the bug"
+  },
+  {
+    "timestamp": "2026-10-23T19:08:25Z",
+    "agent": "brain_auditor",
+    "change": "flip1_state(now)->(active, reason) + decider log prints reason; flip1_active() now a wrapper (identical boolean)",
+    "type": "tweak",
+    "file": "scripts/waiver_expiry.py, scripts/decider_run.py",
+    "before": "fail-closed on missing expiry logged the same 'waiver expired' text as a real expiry (false-lapse 17:36-17:56, 10 lines)",
+    "after": "reason distinguishes 'expired' from 'unreadable:KeyError'/'unreadable:FileNotFoundError'; gate behavior unchanged",
+    "rationale": "A mislabeled fail-closed hid a premature 6h lapse and cost the audit 30 min",
+    "impact": "Zero behavior; next vacation_mode.json flap self-diagnoses (verified py_compile + selfcheck + live True + in-pipeline 19:04)"
+  },
+  {
+    "timestamp": "2026-10-23T19:49:36Z",
+    "agent": "brain_auditor",
+    "type": "bugfix",
+    "file": "scripts/feature_recorder.py",
+    "change": "get_token_intel momentum_cache gate row[0](rsi_14) is not None -> any(v is not None for v in row); cache now supplies slope_4h/regime_4h/trend; price-computed indicators still win; added --selfcheck + bare-run mutation warning",
+    "before": "entry_slope_4h / entry_regime_4h / entry_trend NULL on 0/707 trades over 30d (cache branch never fired: rsi_14 NULL in 157/157 momentum_cache rows because 4h_regime_scanner only INSERTs token/slope_4h/regime_4h/trend)",
+    "after": "three columns write entry-time values from momentum_cache; verified live get_token_intel('GRT') returns slope=0.413 regime=LONG_BIAS trend=downtrend",
+    "rationale": "silent-empty feature axis; audit_gate_unfreeze.py:146 was printing an empty regime split as if meaningful; flagged MED in 4 prior runs with no owner",
+    "impact": "ZERO trading behavior (feature columns only; no code path gates on them). --selfcheck PASS, py_compile PASS."
+  },
+  {
+    "timestamp": "2026-10-23T19:49:36Z",
+    "agent": "brain_auditor",
+    "type": "bugfix",
+    "file": "scripts/hl-sync-guardian.py",
+    "change": "get_token_intel body replaced with delegation to feature_recorder.get_token_intel (was a byte-copy carrying the identical dead gate); service restarted 19:46Z",
+    "before": "independent duplicate of get_token_intel + _compute_intel_from_prices, same dead gate, same 0/707 outcome",
+    "after": "single source of truth; guardian _compute_intel_from_prices now unreferenced (left in place, inert)",
+    "rationale": "the duplication IS the root cause of the drift; fixing it by duplicating the fix would re-create the same bug",
+    "impact": "ZERO trading behavior (same BRAIN_DB_DICT source verified). py_compile PASS, guardian active + clean sync after restart."
+  },
+  {
+    "timestamp": "2026-10-23T19:49:36Z",
+    "agent": "brain_auditor",
+    "type": "creative",
+    "file": "brain/fk_definitions.md",
+    "change": "CONF_FLOOR ship-time recompute appended: blocked set 33T/4W/-$1.88; fkA-literal 3.1% PASS / fkB 12.1% PASS / fkA-family 21.1% FAIL / fkA-scope 21.1% FAIL (2 of 4 definitions now over the bar, was 1 at 00:45)",
+    "before": "32T/4W/-$1.81, only fkA-scope 20.0% failing at the boundary",
+    "after": "hold strengthened; CEO ruling now gates 2 definitions instead of 1",
+    "rationale": "pre-registration #83 requires fkA recomputed at ship time",
+    "impact": "zero behavior (doc only); prevents shipping on stale numbers"
   }
 ]

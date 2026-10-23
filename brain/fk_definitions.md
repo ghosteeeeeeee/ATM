@@ -99,3 +99,18 @@ consecutive run) — C is pre-registered, ships same-day as A once (a) the fk de
 pinned and (b) the vacation file is cleared. Ship-time requirement for C, mirroring A's:
 pin the gate column to RAW `trades.confidence` and self-check the blocked count equals 85
 at 14d.
+
+## Ship-time recompute (run #104, 2026-10-23 19:45 UTC) — **SECOND definition now trips**
+
+Blocked set drifted **32T/4W/−$1.81 → 33T/4W/−$1.88** (GRASS #16369 conf 29.50, closed 15:13, entered the window). Bare pump-chain *winners* in the 14d window dropped 20 → 19.
+
+| window | blocked | fkA-literal | fkA-family | fkA-scope | fkB | bar |
+|--------|---------|-------------|------------|-----------|-----|-----|
+| 14d | 33T 4W −1.88 | 4/128 = **3.1% PASS** | 4/19 = **21.1% FAIL** | 4/19 = **21.1% FAIL** | 4/33 = **12.1% PASS** | **2 of 4 now FAIL (was 1)** |
+| 30d | 33T 4W −1.88 | 4/301 = **1.3% PASS** | 4/65 = **6.2% PASS** | 4/65 = **6.2% PASS** | 4/33 = **12.1% PASS** | all PASS |
+
+Drift trajectory of fkA-scope across #83 → #104: 16.7% → 19.0% → 20.0% → **21.1%** — monotonic, driven purely by bare pump-chain winners aging out (24 → 21 → 20 → 19) while blocked wins stay at 4. It will keep rising.
+
+**Verdict unchanged but strengthened:** still HELD on the CEO fk-definition ruling. Under the standing recommendation (**fkA-literal + 14d**) it still passes at 3.1% with a +$1.88/14d save. Under fkA-family or fkA-scope on 14d it now fails outright. Do not ship without an explicit ruling — the boundary case is gone, this is now a real disagreement between definitions.
+
+**Also added this run (run #104 creative): CONF_FILTER-enforce (option B) is structurally fk-infeasible.** [70,95) covers only 54/349 = 15% of the 14d book, so "block outside" blocks 84% of trades by construction: fkA-literal 56.2% (14d) / 67.7% (30d). Both legs fail independently (leg_lo save +4.50 fk 56.2%; leg_hi save +0.81 fk 24.2% at 14d). Floor frontier: 14d last fk-passing floor = conf<45 (+2.07, 15.6%) and it is **dominated** by conf<30 (+2.14, 10.2%, 7 fewer winners killed) → CONF_FLOOR=30 is the efficient point on 14d; 30d conf<55 passes (18.0%) but fails 14d (41.4%) → window disagreement, no ship. in-window [70,95) is the keep-set at every window (+0.13 / +0.95 / +2.44) so the window is right, the enforcement scope is not. **Recommendation: rule on A and C only; drop B from the net-vs-fk framing.**

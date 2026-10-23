@@ -2425,39 +2425,21 @@ def get_token_intel(token: str) -> dict:
     """
     Token intel: reads from momentum_cache, falls back to computing from price_history.
     Returns dict with rsi_14, macd_hist, atr_14, bb_position, slope_4h, regime_4h, trend.
+
+    SINGLE SOURCE OF TRUTH since brain_auditor #104 (2026-10-23): this was a byte-copy of
+    feature_recorder.get_token_intel and carried the same dead gate — momentum_cache.rsi_14
+    is NULL in every row (4h_regime_scanner only writes slope_4h/regime_4h/trend), so the
+    cache branch never fired and trades.entry_slope_4h/entry_regime_4h/entry_trend stayed
+    NULL on 0/707 trades over 30d. Delegates now so the two copies cannot drift again.
+    feature_recorder imports nothing from this module (it was extracted from here).
     """
-    # Try momentum_cache first
-    conn = get_db_connection()
-    if conn is not None:
-        try:
-            cur = conn.cursor()
-            cur.execute("""
-                SELECT rsi_14, macd_hist, atr_14, bb_position, slope_4h, regime_4h, trend
-                FROM momentum_cache
-                WHERE token=%s
-                ORDER BY updated_at DESC LIMIT 1
-            """, (token,))
-            row = cur.fetchone()
-            conn.close()
-
-            if row and row[0] is not None:
-                return {
-                    'rsi_14': float(row[0]) if row[0] else None,
-                    'macd_hist': float(row[1]) if row[1] else None,
-                    'atr_14': float(row[2]) if row[2] else None,
-                    'bb_position': float(row[3]) if row[3] else None,
-                    'slope_4h': float(row[4]) if row[4] else None,
-                    'regime_4h': row[5] if row[5] else None,
-                    'trend': row[6] if row[6] else None,
-                }
-        except Exception:
-            try:
-                conn.close()
-            except:
-                pass
-
-    # Fallback: compute from price_history
-    return _compute_intel_from_prices(token)
+    import os as _os
+    import sys as _sys
+    _here = _os.path.dirname(_os.path.abspath(__file__))
+    if _here not in _sys.path:
+        _sys.path.insert(0, _here)
+    from feature_recorder import get_token_intel as _get_token_intel
+    return _get_token_intel(token)
 
 
 def _compute_intel_from_prices(token: str) -> dict:
