@@ -14169,3 +14169,24 @@ Final set: ['BTC', 'INJ']
 - 7d '-$3.35' vs '-$3.51' last hour — improving slightly on the YGG win
 - 24h '+$0.43' on 6T (83% WR) — 7th green window
 - CONF_FLOOR=30 bare-only ships today (Oct 23) per audit #85 — watch for first fires
+
+## 2026-10-23 04:28 Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** +$0.03 (WR: 100%) | 24h: 7T 6W '+$0.46' | 7d: 147T 37.4% '-$3.36' | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- HBAR bb-squeeze+ LONG #opened 02:35 closed trail_arm_timeout +1.22% (+$0.03) — winner, no action
+- atr_sl_hit 0/7 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour — no kill trigger
+- No negative-hour streak (03:00 green, 04:00 green — not 3 consecutive red)
+- Frequency 1/hr — not overtraded (limit 20)
+- 1 open: BTC ai-trader-pending LONG (02:44, SL 81380/TP 82400, live -0.02) — bracketed, let it ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d '-$3.36' vs '-$3.35' last hour — flat, no new bleed
+- 24h '+$0.46' on 7T (86% WR) — 8th green window, best streak this week
+- CONF_FLOOR=30 bare-only still pending ship (audit #85/#88 Oct 23) — watch for first fires
