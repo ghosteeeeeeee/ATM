@@ -1,25 +1,23 @@
 # Signal Performance Report
-**Generated:** 2026-10-23 15:32 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-23 21:35 UTC | **Period:** Last 6h + 24h
 
-## Totals
-- **6h:** 10 closed trades | PnL: -$0.58
-- **24h:** 19 closed trades | PnL: -$0.36
+## Summary
+- **Trades closed:** 2 (6h) | 19 (24h) — low flow, pipeline healthy (LIVE, 1 open position)
+- **Kills executed:** 0 — no signal met kill criteria this cycle
+- **Boosts executed:** 0 — no signal met boost criteria (5+ trades)
+- **Inversions:** 0
 
 ---
 
 ## KILLED (executed)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None met kill criteria (WR<30%, n>=5, PnL<-$0.10) |
+None — no signal met all three kill criteria (WR<30%, 5+ trades, PnL<-$0.10, active>24h).
 
 ---
 
 ## BOOSTED (executed)
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None met boost criteria (WR>55%, n>=5) |
+None — closest candidates fell short on trade count.
 
 ---
 
@@ -27,24 +25,44 @@
 
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-buildup- | SHORT | 42.9% | -$0.32 | 7 (24h) | WATCH — active since 2026-10-12, all regimes 50% WR (NORMAL n=16, EXTREME n=4); no regime >=55%, but WR above 30% kill bar. Re-check next cycle. |
-| bb-bounce-v2-long+ | LONG | 0.0% | -$0.25 | 2 (24h) | WATCH — below trade-count threshold |
-
----
+| volume-buildup- | SHORT | 42.9% | -$0.36 | 7 (24h) | WATCH — 7d: 44.4% WR, -$0.31, 9T. Regimes (7d): EXTREME 50% (n=4), NORMAL 25% (n=4). No regime ≥55% WR, but 24h WR ≥30% → no kill per rules. Bleeding small losses consistently — revisit if 24h WR drops below 35%. |
+| bb-bounce-v2-long+ | LONG | 0.0% | -$0.25 | 2 (24h) | WATCH — only 2T (kill needs 5+). 7d: 17T, 47.1% WR, -$0.58. Both 24h losses via hard_max_loss/hard_sl. Not a kill, not a boost. |
+| pump-chain+ | LONG | 0.0% | -$0.07 | 1 (24h) | WATCH — sample too small. HIGH-regime block already shipped 2026-10-21. |
+| ai-trader-pending | SHORT/LONG | 0.0% | -$0.05 | 2 (24h) | Manual/pending orders — outside signal governance. |
 
 ## WINNERS
 
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| warrior-sr-confirm- | SHORT | 100.0% | +$0.24 | 3 (24h) | Enabled — n<5, no boost yet |
-| bb-squeeze+ | LONG | 66.7% | +$0.10 | 3 (24h) | Enabled — n<5, no boost yet |
+| warrior-sr-confirm- | SHORT | 100.0% | +$0.16 | 2 (24h) | ENABLED — below 5T boost threshold; single-token (hyperliquid). Re-check next cycle. |
+| bb-squeeze+ | LONG | 66.7% | +$0.10 | 3 (24h) | ENABLED — below 5T boost threshold; single-token (hyperliquid). Re-check next cycle. |
+| r2v2-long4 | LONG | 100.0% | +$0.01 | 1 (24h) | ENABLED — sample too small. |
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
 
 ---
 
 ## ISSUES
 
-- No signal met kill or boost thresholds this cycle — trade volume is low (19 in 24h).
-- No signal inversions found (0 direction mismatches in 24h).
+- **Low trade throughput:** only 2 closes in the last 6h (19 in 24h). Pipeline is running normally (LIVE, sync clean) — likely just quiet flow, but watch the next cycle for a stall.
+- **`[hotset] fallback DB query returned 0 tokens`** in pipeline.log — hotset fallback returns empty; low severity, worth a look if hotset dashboard shows blank.
+- **Boost candidates concentrated on one token:** both near-boost winners (warrior-sr-confirm-, bb-squeeze+) are hyperliquid-only — not yet "consistent across multiple tokens."
+
+---
+
+## RECOMMENDATIONS
+
+1. **[WATCH] volume-buildup- SHORT** — persistent small bleed (7d -$0.31). Monitor WR; if 24h WR <30% with 5+ trades next cycle, kill.
+2. **[NO ACTION] bb-bounce-v2-long+** — 2T insufficient. Accumulate more data.
+3. **[RE-CHECK] warrior-sr-confirm- / bb-squeeze+** — promote to boost if either hits 5T with WR>55% next cycle.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
 
 ---
 
