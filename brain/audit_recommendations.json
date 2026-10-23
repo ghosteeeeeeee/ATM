@@ -1,92 +1,153 @@
 {
-  "timestamp": "2026-10-23T07:05:00Z",
-  "run": 91,
+  "timestamp": "2026-10-23T07:51:50Z",
+  "run": 92,
+  "headline": "SIZE-REDUCE 0.5x IS STRUCTURALLY INERT AT CURRENT BALANCE — live base notional = $11.00 = MIN floor, x0.5 -> $5.50 -> floored back to $11.00 = 0% risk cut; multipliers are applied AFTER that floor (decider_run:815/2417) so the cut never survives to the order",
   "session_brain_stats": {
-    "status": "STILL_BROKEN_MED",
-    "detail": "1 duplicate group of 3 titles at identical score/text (R:R exits / R:R exits extras / MFE trailling @0.856); known since #82, rebuild never done"
+    "status": "BROKEN 6th run",
+    "unique_texts": "4 of 6",
+    "note": "dup-score/dup-text records under multiple titles — still unused, hash-dedup rebuild not done"
   },
   "trade_summary_24h": {
-    "24h": "7T 6W 85.7% +$0.46 (quiet since 03:36)",
-    "48h": "38T 19W 50.0% -$0.13",
-    "7d": "143T 54W 37.8% -$3.11",
-    "14d": "348T 126W 36.2% -$4.27",
-    "30d": "709T 302W 42.6% -$5.51",
-    "armed_14d": "135T 106W 78.5% +$9.34 vs unarmed 213T 20W 9.4% -$13.61",
-    "mandate_restated": "hard_max_loss 78T 0W -$7.77 | atr_trail_hit 27T 21W +$4.31 | profit-monster-trail 82T 73W +$4.67 | trail_sl 5T +$0.71 | atr_sl_hit 88T 1W -$6.29 (#2 bleed line)",
-    "size_reduce": "0.5x file truth holds (clear legs: WR 37.8>=37 PASS, pnl_7d -3.11 < -2.00 FAIL)"
+    "n": 7,
+    "wins": 6,
+    "wr": 85.7,
+    "pnl": 0.46,
+    "7d": "143T 37.8% -3.11",
+    "14d": "348T 36.2% -4.27",
+    "armed_14d": "135T 78.5% +9.34",
+    "unarmed_14d": "213T 9.4% -13.61",
+    "trail_family_14d": "118T 86.4% +9.89 (PM-trail 82T 89.0% +4.67 / atr_trail 27T 77.8% +4.31 / trail_sl 5T 100% +0.71 / rr_trail 4T 75% +0.20)",
+    "hard_max_loss_14d": "78T 0% -7.77"
+  },
+  "headline_finding": {
+    "finding": "size-reduce marker (0.5x) currently cuts risk by 0%",
+    "root_cause": "_get_trade_size_usdt() = max(withdrawable*0.07, MIN_TRADE_USDT=11.0) returns exactly 11.0 today -> 11.0*0.5=5.5 < HL_MIN_NOTIONAL_USDT(11.0) -> function returns 11.0. The reduce is applied INSIDE _get_dynamic_position_size BEFORE the fav/amplitude multipliers at decider_run.py:815 and :2417, which then scale the already-restored 11.0 and re-floor with max(..., HL_MIN).",
+    "evidence": [
+      "executed _get_trade_size_usdt() live = 11.0",
+      "decider EXEC arg for YGG #16356 = 'brain.py trade add YGG long 11.0' (identical to unreduced base)",
+      "10/10 trades opened since the Oct-21 21:45 brain.py fix sit at 11.10 = 11.0 + MIN_ORDER_BUFFER 0.10, same as the 184/208 pre-flag cohort",
+      "replica self-check 9/9 return-identity vs old code",
+      "partial-cut table: base 11.0 -> 0%, base 15.0 -> 27%, base 22.1 -> 50%, base 44.2 -> 50%"
+    ],
+    "physical_limit": "HL min notional is $10 — while 7% of withdrawable sits at/below $11 the cut CANNOT exist in notional terms; remaining risk levers during a reduce window are leverage, concurrent-position cap, or pause",
+    "shipped": "[SIZE-REDUCE-SHADOW] log-only line in _get_dynamic_position_size printing base/mult/effective-cut% + NO-OP tag (py_compile PASS, return-identity 9/9, zero behavior; correct-by-traffic — last exec 07:41 predated the 07:46 edit)",
+    "ceo_decision": "size-reduce semantics: (i) accept as notional-floor-limited and add a leverage/max-open cut when the marker is on, or (ii) keep as trigger-only (pause logic intact) and stop reporting 0.5x as risk reduction"
   },
   "losing_autopsy_corrected": {
-    "method": "brain/analysis/recovery_replay.py adverse-first anchor (open-anchored = vacuous per #85)",
-    "24h": "n=1: 0 never-adverse / 1 recovered / 0 NEVER",
-    "48h": "n=18: 5 never-adverse / 12 recovered-after-adverse / 1 NEVER (SYRUP #16337 stale_exit)",
-    "verdict": "wrong-side REFUTED 25th consecutive run on corrected evidence; winning side = flat"
+    "method": "brain/analysis/recovery_replay.py adverse-first (open-anchored method is VACUOUS, #85)",
+    "24h": "n=1: 0 never-adverse / 1 recovered-after-adverse / 0 NEVER (BTC #16353 UNIVERSAL_MAX_HOLD)",
+    "48h": "n=17: 4 shallow / 12 recovered / 1 NEVER (SYRUP #16337 stale_exit)",
+    "verdict": "WRONG-SIDE REFUTED 26th consecutive run on corrected evidence; independent: #61 opposite-side p=0.116, #84 forward-return t=-0.04",
+    "patterns": "0 new — chop/tight-stop cohorts already covered by shipped kills and queued levers"
   },
-  "watchdog_triage": {
-    "steers": 0,
-    "open": "BTC #16358 LONG ai-trader-pending @81872 SL81380 TP82400 +0.01% 3.5h HOLD bracketed",
-    "regime": "15m LONG_BIAS vs 4h SHORT_BIAS divergence, continuum ABOVE, LOW vol, market_phase DECLINING",
-    "readiness": "no fresh entries mid-band (reclaim holds but volume leg fails); HML/MFE-CUT shadows flowing on 16358"
-  },
-  "drift_findings": [
-    "MED: session_brain duplicate-text records persist (2nd+ run), rebuild still not done",
-    "INFO: hermes_constants.py uncommitted diff = favorites_updater auto-update (FAVORITES_LONG lost ICP, LOSERS lost INJ); zero protected flags touched; daily commit 07:15 catches",
-    "RESOLVED-NOT-DRIFT: #90 '17/17 TAT exits inside live TAT scope' verified true (17/17 = pump-chain|bb-squeeze = LIVE scope); earlier confusion was shadow-scope (bb-bounce|ai-trader+ = 0/17) — scope semantics documented in creative log"
+  "watchdog_triage": [
+    {
+      "id": "steer-001",
+      "title": "cluster ME + WLFI",
+      "verdict": "NO ACTION — both bracketed (SL/TP set), size at floor 11.10, correlation real but unloading mid-band is not a config lever; monitor"
+    },
+    {
+      "id": "steer-002",
+      "title": "portfolio heavily long (3L, now +1S)",
+      "verdict": "NO ACTION — counter-cohort evidence does not support force-unloading: coin_regime 7d LONG_BIAS 31T 45.2% +0.35 vs SHORT_BIAS 22T 40.9% -0.48 (COLLECT); wrong-side refuted 26 runs; position cap = CEO/vacation domain"
+    }
   ],
-  "recurring_problems": [
-    "chop entries: 14d hard_max_loss 78T 0W -$7.77 + atr_sl_hit 88T 1W -$6.29 vs trail family +$9.69 — trend/chop wealth gap unchanged, coverage via CONF_FLOOR+TAT pending CEO",
-    "CONF_FLOOR=30 bare-only STILL HELD on CEO fk ruling (fkA-scope 4/20=20.0% exactly at bar) + confidence-column blocker (final_confidence<30 = 0 rows; gate must read raw trades.confidence)"
-  ],
-  "missing_implementations": [
-    "CONF_FLOOR=30 bare-only: staged since Oct 22, ship blocked by pre-registered trigger (fkA-scope >=20%) — CEO fk-definition ruling REQUIRED today",
-    "arm-dampen: RECOMMEND DROP (see creative — set shrank to 2 CEO-domain qualifiers, save +$0.15/7d)",
-    "TAT flip: waiting on 15th scoped fire (last fire NEO #16344 Oct 21 18:58) + CEO GO"
-  ],
-  "creative_improvements": [
-    "TAT forward-return audit SHIPPED + CORRECTED post-bug_hunter: 17/14d close-anchored (exit_price-based fwd, TZ-hardened, predicate selfcheck 8/8) — recovery is PERFECTLY PARTITIONED by exit depth (depth>=-0.40%: 12/12 recovered | depth<-0.40%: 0/5) => raw 70.6% restates CUT DEPTH, not post-cut reversal; fwd30m from exit_price flat in BOTH groups (-0.10% recovered vs +0.05% never) => no systematic post-cut rally. VERDICT: INCONCLUSIVE — neither premature-cut evidence nor saving evidence; realized TAT pnl ~breakeven (sum '-$0.40', max '-$0.20'); n=17<20 => feeds Oct 25 stall-exit eval, cites the bucketed depth split NOT the 70.6% headline",
-    "arm-dampen SHIP-CANCELLED with data: qualifiers 3->2 (pump-chain- aged to n=7), both CEO-domain, 0.5x save +$0.15/7d (was +$0.50) — drop from Oct 23 stack",
-    "semantics correction recorded: all 17 14d trail_arm_timeout exits are trailing_activated=True => live TAT is an armed-giveback cutter, not a never-armed cutter (prevents mislabeling in future flip narratives)"
-  ],
-  "config_changes_applied": [],
-  "changes_from_last_run": [
-    "#90 zero-code metrics: coverage KPI / armed-side leak ledger VERIFIED (17/17 TAT scope true via live-scope reading)",
-    "#90 size-reduce auto-clear forecast: NOT yet realized — pnl_7d -3.11 still fails >=-2 leg; guardrail timer owns it",
-    "#88 CONF-FILTER-SHADOW: 0 fires (correct-by-traffic)",
-    "#85/#86 fk_definitions: ship-time table reproduces exactly (32T 4W -1.81, fkA-scope 20.0%)"
-  ],
-  "pre_reg_rechecks": {
-    "CONF_FLOOR_bare_only": "HOLD for CEO — blocked 32T 4W -$1.81 UNCHANGED since 00:45; fkA-lit 4/126=3.2% PASS, fkA-fam 4/25=16.0% PASS, fkA-scope 4/20=20.0% FAIL-at-bar, fkB 12.5% PASS; 30d all pass; column blocker re-confirmed 0 rows",
-    "pump_chain_plus_kill": "NO-KILL stands — 7d 14T 1W 7.1% -$1.21 decayed but 14d -$0.36 / conf>=30 +$0.92 / 30d +$1.85; bleed = conf<30 -$1.28 covered by (held) CONF_FLOOR",
-    "pump_chain_minus_kill": "CANCEL stands",
-    "TAT": "14/15 (0 new scoped fires since Oct 21 18:58)",
-    "arm_dampen": "qualifiers now 2, both CEO-domain, save +$0.15/7d -> recommend DROP",
-    "waiver": "[35,45) band 0 opens; all 4 waiver-period shorts opened exec RSI>=45 (55.35/55.59/46.17 + BTC exempt); exemption-to-open conversion 0 -> default LAPSE Oct 24 stands; flip#2 HBAR volume-buildup- HIGH +$0.08",
-    "coin_regime": "COLLECT (n=48<50 regime bar)",
-    "size_reduce": "0.5x file truth"
-  },
-  "last_run_verify_90": {
-    "HML_live_pnl": "PASS — #16358 flowing 06:33/06:34 today",
-    "rsi_drift_stamps": "PASS — 6/6 non-ai since Oct 21 17:45 ship (NEO d=20.5 largest, HBAR d=12.26, HBAR2 d=10.03)",
-    "CONF_FILTER_SHADOW": "PASS — 0 fires",
-    "UGB_shadow": "PASS — 0 fires today (BTC fav +0.03 < 0.40) correct-by-traffic",
-    "floor_45": "PASS — 0 violations (4 waiver-period shorts all exec RSI>=45)",
-    "kill_flags": "PASS — doji last open Oct 16 17:43, 0 post-kill opens",
-    "size_reduce": "PASS — 0.5x file truth",
-    "protected": "PASS — 13/13 (12 attrs + SIGNALS_REGISTRY note intact; uncommitted diff = favorites auto only)",
-    "tracebacks": "PASS — 0 since Oct 18 (file total 4: Oct 11/17/18)",
-    "TAT_live": "PASS — 17/17 14d exits in live scope (pump-chain|bb-squeeze)"
+  "regime_readiness": {
+    "btc_1m_vs_ema300": "+0.099% (81845 vs 81764), 16/30 last closes above = marginal/mixed reclaim",
+    "btc_4h": "SHORT_BIAS",
+    "trend_quality": "STRONG_DOWN",
+    "zscore": "STRONG_NEG",
+    "accel": "NEGATIVE",
+    "wyckoff": "ACCUMULATION",
+    "verdict": "MID-BAND: no fresh entries until sustained reclaim WITH volume (long) or confirmed breakdown (short); 4 open all bracketed; size marker 0.5x (nominal — see headline)"
   },
   "signal_deep_dive": {
-    "new_target": "NONE — no sub-50% n>=15 cohort that is not already killed/disabled/dived/queued",
-    "checked": "ai-trader+ disabled (last open Oct 19) | volume-breakout+doji killed (aging) | bb-bounce dived #75 (TAT/MFE-CUT queued) | pump-chain± = CONF_FLOOR | hl_copy 11T n<20 COLLECT | ai-trader-pending 12T 16.7% CEO-domain"
+    "new_targets": "NONE — every 14d sub-50% n>=15 cohort is killed (volume-breakout-long+ Oct 13, doji Oct 16, oversold Oct 13, volume-buildup+ Oct 14), disabled (ai-trader+), deep-dived (bb-bounce #75), or held by CONF_FLOOR (pump-chain+/-)",
+    "hl_copy": "14d 12T 25.0% -0.24 — n<20 COLLECT",
+    "ai-trader-pending": "7d 12T 16.7% -0.20 — CEO-domain, not an agent kill"
   },
-  "next_actions": [
-    "CEO TODAY: fk-definition ruling -> same-day CONF_FLOOR=30 bare-only ship (pin gate to RAW trades.confidence, self-check blocked==32)",
-    "CEO TODAY: arm-dampen DROP recommended (weak set, CEO-domain only)",
-    "Oct 24: waiver expiry per pre-registered criteria (default LAPSE — 0 band opens)",
-    "Oct 25: HML-SHADOW eval, MFE-CUT eval, TAT flip if 15th fire, re-enter-on-recovery sim, short-gate review, TAT forward recheck at n>=20",
-    "Escalation #17 (44th): exit-ladder candle OOS"
+  "idea_rejected_existing": {
+    "idea": "LONG rsi_14>=75 entry ceiling (chase/exhaustion)",
+    "data": "14d 9T 11.1% -0.79 (Fisher one-sided p=0.088) | 30d 27T 29.6% -1.27 (p=0.077) | 7d 1T +0.12 | fk 8/479=1.7% — same sign both windows but p>0.05 both",
+    "verdict": "ALREADY SHIPPED — LONG_RSI_CEILING=75 at hermes_constants.py:972 (CEO 2026-10-09) and BINDING: 140 CTX-GATE LONG blocks incl GRASS 82.4 today 02:36; 24/27 of the band trades predate the Oct-9 ceiling cut and the Oct-14 detect-ceiling fix, so the band is the residue of the fixed leak, not a live edge. Boundary note: YGG #16356 entered at exactly 75.0 (gate uses strict >) and won +0.12 — no change.",
+    "rule_checked": "mandated pre-ship checks #4 (existing implementations) and #1/#2 (n>=20, p<0.05) both fail"
+  },
+  "pre_reg_rechecks": {
+    "CONF_FLOOR_bare": "REPRODUCES EXACTLY 07:45: blocked 32T 4W -1.81; fkA-literal 4/126=3.2% PASS, fkA-family 4/25=16.0% PASS, fkA-scope 4/20=20.0% FAIL-at-bar, fkB 4/32=12.5%; 30d all pass (1.3/5.1/6.0/12.5) -> SHIP STILL HELD on CEO fk ruling + raw-confidence column pin (#88) + vacation file",
+    "pump_chain_plus_kill": "7d 14T 7.1% -1.21 | 14d 50T 26.0% -0.01 (MET-by-letter: n>=20, PnL<0, WR<30) | 30d 75T 34.7% +1.86 OOS positive -> RECOMMEND NO-KILL (unchanged, CEO table)",
+    "pump_chain_minus": "CANCEL stands",
+    "TAT": "14/15 — 0 new scoped shadow fires since NEO #16344 Oct 21 18:58; live TAT fired today HBAR #16357 03:36 (+0.03 win)",
+    "waiver": "0 band-opens since ship; PUMP #16361 today used the [35,45) bear exemption at approval 39.3 / exec 43.4 / detect 39.7 = legal, 0 knife (<35) reads on any gate source -> default LAPSE Oct 24",
+    "coin_regime": "7d LONG_BIAS 31T 45.2% +0.35 / SHORT_BIAS 22T 40.9% -0.48 — COLLECT",
+    "size_reduce_marker": "still true 0.5x (file truth) AND now shown structurally inert at current base — see headline"
+  },
+  "changes_from_last_run": [
+    "#91 tat_forward_2026-10-23.py present, --selfcheck intact",
+    "#90/#85 recovery_replay.py --selfcheck PASS, corrected counts reproduce (14d 206 = 40/137/29-class)",
+    "#86 fk_definitions.md recompute identical after 7 hours",
+    "#88 CONF-FILTER-SHADOW :1898 0 fires = correct-by-traffic",
+    "#91 arm-dampen CANCEL stands (not re-proposed)"
   ],
-  "last_run_verify_91_self": {
-    "tat_forward_script": "SHIPPED then FIXED per bug_hunter: exit_price fwd base (bar0 close deviated up to 0.47%), TZ hardening, docstring bar0 wording, partial-window flag, predicate selfcheck 8/8; depth-bucket reframing added"
-  }
+  "last_run_verify": {
+    "kill_flags": "7/7 correct (VOLUME_BUILDUP_PLUS/HMACD±/AI_TRADER/VOLUME_BREAKOUT±/OVERSOLD/DOJI False, PUMP_CHAIN_V5_SHORT True); doji 1 'post-kill' open = same-minute in-flight at the kill timestamp",
+    "floor_45": "0 violations — all gate-read SHORT RSI values in waiver band or >=45; PUMP stored rsi_exec 33.39 is the 1m stamp (source C) and differs 10pts from the gate's 5m read 43.4 = #80 fragmentation, tf-authority ruling still pending",
+    "rsi_drift": "PUMP #16361 detect 39.68 -> exec(1m) 33.39 = -6.3 (collect)",
+    "tracebacks": "4 total in pipeline.log, last Oct 18 — 0 new; decider ran clean 07:47/07:48 post-edit",
+    "protected_constants": "hermes_constants.py ZERO git diff",
+    "timers": "pipeline / signal-compactor / watchdog / vacation-guardrail all live",
+    "sizes_post_ship": "no new trade since 07:46 edit yet -> [SIZE-REDUCE-SHADOW] correct-by-traffic"
+  },
+  "drift_findings": [
+    {
+      "severity": "HIGH",
+      "finding": "vacation_mode.json still true/no_constants_change 6th run (kanban #86 said ENDED; #87 flagged as MED drift) — resume stack blocked behind it; T/CEO action: vacation_mode.py off or correct the record"
+    },
+    {
+      "severity": "HIGH",
+      "finding": "size-reduce 0.5x ineffective (headline) — reported as risk reduction since Oct 20 but cuts 0% at current balance"
+    },
+    {
+      "severity": "MED",
+      "finding": "session_brain broken 6th run (4/6 unique texts) — rebuild not done"
+    },
+    {
+      "severity": "MED",
+      "finding": "trades.entry_regime_4h still 0/713 (carried from #90)"
+    },
+    {
+      "severity": "LOW",
+      "finding": "signal-compactor.err.log NameErrors (_conn_mx, PUMP_FLOW_PLUS_ENABLED) all predate Oct 21 16:27, code no longer references them, compactor exits 0 every minute = historical, closed"
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "file": "scripts/decider_run.py",
+      "change": "[SIZE-REDUCE-SHADOW] log-only effective-cut line",
+      "type": "shadow/zero-behavior",
+      "constants_diff": "0"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "idea": "SIZE-REDUCE EFFECTIVENESS LEDGER (shipped as shadow line)",
+      "detail": "reports effective cut % per trade so an inert marker can never be reported as risk reduction again",
+      "risk": "none"
+    },
+    {
+      "idea": "SIZE-REDUCE AUTO-CLEAR ETA (zero code)",
+      "detail": "rolling simulation of the guardrail clear condition: current 143T 37.8% -3.11 (clear needs wr>=37 AND pnl>=-2.00 OR pnl>=0); on aging alone with zero new trades the marker clears ~19:34 UTC today; flap window — WR leg dips to 36.2% at +8h so a clear cannot happen 13:34-17:34 UTC; one ~$0.50 loser delays/undoes it. Guardrail timer every 30min will do it automatically; CEO decision from #90 (accept as designed vs require pnl>=0) still open"
+    },
+    {
+      "idea": "LONG rsi>=75 chase band measured and REJECTED as already-shipped (see idea_rejected_existing) — closes the route so it is never re-proposed from a 7d snapshot"
+    }
+  ],
+  "next_actions": [
+    "CEO: fk-definition ruling -> CONF_FLOOR=30 bare-only same-day (numbers re-verified 07:45)",
+    "CEO: size-reduce semantics (accept floor-limited vs add leverage/max-open cut while marker on)",
+    "CEO/accept: size-reduce auto-clear ETA ~19:34 UTC today — accept as designed or require pnl>=0",
+    "Oct 24: unclog waiver lapses by default (1/5 conversions)",
+    "Oct 25: HML-SHADOW / MFE-CUT / habitat subtype / re-enter-on-recovery / UGB-pump-chain / short-gate loosening (token-day dedup convention)",
+    "T: turn vacation_mode off or correct the record (6th run of drift)",
+    "Escalation #17 (47th): exit-ladder candle OOS still not commissioned — still blocks the round-trip recovery path"
+  ]
 }

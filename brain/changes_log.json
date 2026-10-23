@@ -1969,5 +1969,16 @@
     "after": "17/14d measured: depth-bucket split 12/12 vs 0/5 (recovery = cut depth restatement), fwd30m flat both groups, verdict INCONCLUSIVE; corrected post-bug_hunter (exit_price fwd base, TZ, selfcheck 8/8)",
     "rationale": "inform TAT flip / Oct 25 stall-exit eval with valid close-anchored method",
     "impact": "measurement only, no live behavior"
+  },
+  {
+    "timestamp": "2026-10-23T07:51:50Z",
+    "agent": "brain_auditor",
+    "change": "[SIZE-REDUCE-SHADOW] log-only effective-cut line in _get_dynamic_position_size",
+    "type": "shadow",
+    "file": "scripts/decider_run.py",
+    "before": "size-reduce x0.5 applied then silently floored back to HL_MIN_NOTIONAL with no visibility",
+    "after": "prints base / mult / effective cut% (NO-OP tag when base already at floor); return values byte-identical (replica self-check 9/9), py_compile PASS",
+    "rationale": "live measurement showed the 0.5x marker cuts 0% today (base $11) — shadow-first per vacation rules, makes the inert state observable",
+    "impact": "zero behavior; feeds CEO size-reduce semantics decision"
   }
 ]

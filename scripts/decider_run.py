@@ -262,9 +262,22 @@ def _get_dynamic_position_size() -> float:
                         _sr = json.load(_sr_f)
                     if _sr.get('size_reduce'):
                         _sr_mult = _sr.get('size_multiplier', 0.3)
+                        _sr_base = dynamic
                         dynamic = dynamic * _sr_mult
                         if dynamic < HL_MIN_NOTIONAL_USDT:
+                            try:
+                                print(f'[SIZE-REDUCE-SHADOW] base={_sr_base:.2f} x{_sr_mult} -> {dynamic:.2f} '
+                                      f'floored to {HL_MIN_NOTIONAL_USDT:.2f} '
+                                      f'(effective cut {max(0.0, 100.0 * (1.0 - HL_MIN_NOTIONAL_USDT / _sr_base)):.0f}%)'
+                                      + (' NO-OP: base already at HL floor' if HL_MIN_NOTIONAL_USDT >= _sr_base else ''))
+                            except Exception:
+                                pass
                             return HL_MIN_NOTIONAL_USDT  # Don't go below minimum
+                        try:
+                            print(f'[SIZE-REDUCE-SHADOW] base={_sr_base:.2f} x{_sr_mult} -> {dynamic:.2f} '
+                                  f'(effective cut {100.0 * (1.0 - dynamic / _sr_base):.0f}%)')
+                        except Exception:
+                            pass
             except Exception:
                 pass
             return round(dynamic, 2)

@@ -7120,5 +7120,23 @@
     "category": "documentation/measurement",
     "status": "logged",
     "risk": "zero"
+  },
+  {
+    "date": "2026-10-23T07:51:50Z",
+    "idea": "SIZE-REDUCE EFFECTIVENESS: 0.5x marker measures 0% cut today (base $11 = HL floor; x0.5 floored back to $11 before multipliers) + shadow log line shipped",
+    "rationale": "T relies on this marker as the soft risk net instead of pausing; a silently inert marker misreports risk. Physical limit: min notional $10 blocks any notional cut at floor balance.",
+    "expected_impact": "visibility; enables CEO decision on leverage/max-open levers during reduce windows",
+    "category": "risk infrastructure",
+    "status": "shipped-shadow",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-23T07:51:50Z",
+    "idea": "SIZE-REDUCE AUTO-CLEAR ETA ~19:34 UTC Oct 23 (rolling simulation of guardrail clear condition, zero code)",
+    "rationale": "pre-registered by #90; aging alone takes 7d WR 37.8/pnl -3.11 to a clearing state; flap window 13:34-17:34 UTC where WR<37",
+    "expected_impact": "full size resumes today unless a ~$0.50 loser lands first",
+    "category": "risk infrastructure",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
