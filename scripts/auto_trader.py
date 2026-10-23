@@ -97,6 +97,16 @@ def track_hypotheticals(cfg, size):
                     (h['trigger'] - exit_px) / h['trigger'] * 100)
             pnl_usd = move / 100 * h['size']
             exit_reason = 'shadow_sl' if sl_hit else 'shadow_tp'
+            # R:R backfill (gap fix): planned from armed levels, real with the
+            # standard slip buffer (~0.12% of trigger ≈ 100pts at 81k) — same
+            # convention as the full-analysis skill's planned-vs-real quoting.
+            if direction == 'long':
+                reward, risk = h['tp'] - h['trigger'], h['trigger'] - h['sl']
+            else:
+                reward, risk = h['trigger'] - h['tp'], h['sl'] - h['trigger']
+            slip = h['trigger'] * 0.0012
+            planned_rr = round(reward / risk, 2) if risk > 0 else None
+            real_rr = round(reward / (risk + slip), 2) if risk > 0 else None
             DB.update_hypothetical(h['order_id'], status='stopped' if sl_hit else 'tp',
                                    ts_closed=time.time(), exit_price=exit_px,
                                    pnl_pct=round(move, 4),
@@ -105,6 +115,7 @@ def track_hypotheticals(cfg, size):
                 'trade_id': f"shadow:{h['order_id']}",
                 'direction': direction, 'regime_at_entry': h['regime_at_entry'],
                 'entry_quality': 'shadow_triggered',
+                'planned_rr': planned_rr, 'real_rr': real_rr,
                 'pnl_pct': round(move, 4), 'pnl_usdt': round(pnl_usd, 4),
                 'exit_reason': exit_reason, 'won': won,
                 'lesson_tags': ['shadow', exit_reason]})
@@ -249,48 +260,49 @@ def run_cycle():
             DB.log_event('WARN', f"cycle {cycle_id}: bracket failed shape "
                                  f"checklist — not armed")
         else:
-            armed_existing = DB.get_hypotheticals('armed')
+            # PER-LEG refresh (fix: partial supersede used to clear the whole
+            # pair and re-arm both — a kept leg ended up armed alongside a new
+            # twin of the same direction; observed live at 14:14). Each leg
+            # refreshes independently; a direction is never double-armed.
             h1_atr = (decision.get('structure_detail', {}).get('1h') or {}).get('atr', 400) or 400
-            if armed_existing:
-                refreshed = False
-                for h in armed_existing:
-                    new_trig = decision['bracket'].get(h['direction'], {}).get('trigger')
+            armed_now = DB.get_hypotheticals('armed')
+            for leg, o in decision['bracket'].items():
+                existing = [h for h in armed_now if h['direction'] == leg]
+                keep = False
+                for h in existing:
                     age_h = (time.time() - h['ts_armed']) / 3600
                     stale = age_h > 12  # E3: levels stale >12h → refresh
-                    if new_trig and (abs(new_trig - h['trigger']) >= h1_atr or stale):
+                    shifted = abs(o['trigger'] - h['trigger']) >= h1_atr
+                    if stale or shifted:
                         DB.update_hypothetical(h['order_id'], status='superseded',
                                                ts_closed=time.time())
                         DB.log_event('INFO', f"superseded {h['order_id']} "
                                              f"({'stale %.0fh' % age_h if stale else 'ATR shift'})")
-                        refreshed = True
-                if not refreshed:
-                    summary['shadow_armed'] = 'kept (levels fresh)'
-                else:
-                    armed_existing = []  # fall through and re-arm below
-            if not armed_existing:
-                for leg, o in decision['bracket'].items():
-                    # E2 checklist: never arm an already-crossed (ITM) level —
-                    # instant shadow fill at arm time was observed live.
-                    already = (price_now <= o['trigger']) if leg == 'long' \
-                        else (price_now >= o['trigger'])
-                    if already:
-                        DB.log_event('WARN', f"cycle {cycle_id}: {leg} trigger "
-                                             f"{o['trigger']} already crossed by "
-                                             f"price {price_now} — leg skipped")
-                        continue
-                    order_id = f"btc-auto-{cycle_id}-{leg}"
-                    DB.record_order(did, leg, {**o, 'order_id': order_id},
-                                    'shadow_armed', size, cfg.get('leverage_max', 5))
-                    DB.upsert_hypothetical(
-                        {'order_id': order_id, 'direction': leg,
-                         'trigger': o['trigger'], 'sl': o['sl'], 'tp': o['tp']},
-                        decision['regime_state'], size)
-                # Truthful report: whatever is armed in DB AFTER this cycle
-                summary['shadow_armed'] = [h['order_id'] for h in
-                                           DB.get_hypotheticals('armed')]
-                if summary['shadow_armed']:
-                    DB.log_event('INFO', f"cycle {cycle_id}: shadow-armed "
-                                         f"{summary['shadow_armed']} @ {price_now}")
+                    else:
+                        keep = True  # levels fresh — this leg stays as-is
+                if keep:
+                    continue  # fresh armed leg exists for this direction
+                # E2 checklist: never arm an already-crossed (ITM) level
+                already = (price_now <= o['trigger']) if leg == 'long' \
+                    else (price_now >= o['trigger'])
+                if already:
+                    DB.log_event('WARN', f"cycle {cycle_id}: {leg} trigger "
+                                         f"{o['trigger']} already crossed by "
+                                         f"price {price_now} — leg skipped")
+                    continue
+                order_id = f"btc-auto-{cycle_id}-{leg}"
+                DB.record_order(did, leg, {**o, 'order_id': order_id},
+                                'shadow_armed', size, cfg.get('leverage_max', 5))
+                DB.upsert_hypothetical(
+                    {'order_id': order_id, 'direction': leg,
+                     'trigger': o['trigger'], 'sl': o['sl'], 'tp': o['tp']},
+                    decision['regime_state'], size)
+            # Truthful report: whatever is armed in DB AFTER this cycle
+            summary['shadow_armed'] = [h['order_id'] for h in
+                                       DB.get_hypotheticals('armed')]
+            if summary['shadow_armed']:
+                DB.log_event('INFO', f"cycle {cycle_id}: shadow-armed "
+                                     f"{summary['shadow_armed']} @ {price_now}")
 
     # 5 LEARN: live attribution + bounded self-tune
     live_attribution(cfg)

@@ -140,6 +140,22 @@ def init_db():
                     "(SELECT MAX(id) FROM attribution GROUP BY trade_id)")
         cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_attr_unique "
                     "ON attribution(trade_id)")
+        # One-time backfill: rows resolved BEFORE the R:R fix get planned/real
+        # R:R from their hypothetical's armed levels (slip = 0.12% of trigger,
+        # same convention as the full-analysis skill).
+        cur.execute("""
+            UPDATE attribution SET
+              planned_rr = CASE WHEN a.direction='long'
+                THEN ROUND((h.tp - h.trigger) / NULLIF(h.trigger - h.sl, 0), 2)
+                ELSE ROUND((h.trigger - h.tp) / NULLIF(h.sl - h.trigger, 0), 2) END,
+              real_rr = CASE WHEN a.direction='long'
+                THEN ROUND((h.tp - h.trigger) / NULLIF(h.trigger - h.sl + h.trigger*0.0012, 0), 2)
+                ELSE ROUND((h.trigger - h.tp) / NULLIF(h.sl - h.trigger + h.trigger*0.0012, 0), 2) END
+            FROM hypotheticals h, attribution a
+            WHERE a.trade_id = 'shadow:' || h.order_id
+              AND a.planned_rr IS NULL
+              AND h.trigger IS NOT NULL AND h.sl IS NOT NULL AND h.tp IS NOT NULL
+        """)
         conn.commit()
     finally:
         conn.close()

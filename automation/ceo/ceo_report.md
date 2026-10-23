@@ -373,3 +373,9 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 24h 11T +$0.29 63.6% | 7d 139T -$2.86 38.1%
 ### Findings: Worst 7d signal (n>=10): pump-chain+ LONG 14T -$1.21 7.1% — known CONF_FLOOR cohort, NO-KILL already stands (30d OOS positive); disk 84-85% WARN, auto-fix compressed logs, no action needed now.
 ### Recommendation: none — clean run; execute today's stacked CEO decisions (fk ruling → CONF_FLOOR, vacation state, size-reduce semantics) in a deep run.
+
+## CEO Status — 20261023T152649Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 19T -0.36 42.1% | 7d 129T -3.15 34.9%
+### Findings: rotating Q = "Any new errors?" — yes, 3 classes: disk / at 85% (94G/118G; pipeline.log 261M, signal-compactor.log 102M, no >7d logs to reclaim), CC hotset failure-cooldown loop (14:27), price_collector 291s stall at 14:43 (self-recovered, age back to 56s). Also hermes-upgrade-implementer timeout earlier (auto reset-failed, timer fine).
+### Recommendation: ship logrotate for pipeline.log + signal-compactor.log now — disk has zero reclaimable headroom left before the 85% warn threshold.

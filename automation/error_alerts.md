@@ -1671,3 +1671,39 @@
 ## Error Alerts — 2026-10-23 11:27 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3542s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-23 14:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CC TOK — signal TOK rolled back (prevents retry loop)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: CC TOK (count=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: CC TOK in hotset failure cooldown — TOK in cooldown (3539s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: CC TOK in hotset failure cooldown — TOK in cooldown (3466s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3554s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: CC TOK in hotset failure cooldown — TOK in cooldown (3420s left, N failures)`
+
+## Error Alerts — 2026-10-23 14:48 UTC
+- **WARN** (1x): disk `/` at 85% (94G/118G, 18G free) — no logs older than 7d to compress; largest active: pipeline.log 261M, signal-compactor.log 102M. **AUTO-FIX**: none applied (nothing safe to reclaim in scope; monitor).
+- **WARN** (1x): price staleness hit ~5min at ~14:43 — one price_collector run took 291s (normal ~20s), price age peaked ~250s. **AUTO-FIX**: self-recovered; cadence back to 30s, age 56s at check. No restart issued.
+- **INFO** (1x): `decisions` table last row 2026-04-13 — compactor logs decisions in pipeline log but no longer writes here. Verify intended, not a crash.
+
+## Error Alerts — 2026-10-23 15:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3494s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: CC TOK in hotset failure cooldown — TOK in cooldown (3360s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3433s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: CC TOK in hotset failure cooldown — TOK in cooldown (3299s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: CC TOK in hotset failure cooldown — TOK in cooldown (3239s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-23 16:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2759s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2759s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CC TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-23 17:45 UTC
+- **WARN** (1x): disk `/` at 85% used (18G free) — no logs >7d to gzip; largest local consumers: /root/.hermes/data 7.9G, journal 412M. No auto-fix applied (nothing safe to delete).
+- **WARN** (1x): `hermes-upgrade-implementer.service` FAILED at 16:36 UTC — `start operation timed out` (TimeoutStartSec=900) after running 2m15s CPU; timer retries next 16:06+12h. Log also shows SQL executed as shell (`LINE 1: select token, direction, size_usdt...` caret error) — likely a plan file eval'd into sh.
+- **AUTO-FIX**: none required — pipeline, price-collector, 1m-candle, watchdog timers all active and firing; no crash, no stale prices, no phantom trades.

@@ -129,13 +129,16 @@ def structure_summary(token):
 
 # ---------- scoring (skill table verbatim) ----------
 
-def score_direction(ind, continuum, direction='long'):
+def score_direction(ind, continuum, direction='long', struct=None):
     """Skill probability table. Returns (total, trend_part, reasons).
 
     trend_part = 1h/15m/5m MACD + continuum — ONLY this gets halved in CHOP
     (skill chop-regime rule: halve trend inputs, not the total — bug_hunter
     parity fix). direction='short' inverts sign-carrying rows (MACD,
-    continuum, EMA50); RSI/volume/Z rows are direction-neutral per the table.
+    continuum, EMA50, Pattern); RSI/volume/Z rows are direction-neutral per
+    the table. Pattern row = structure-engine state (skill: Continuation
+    +5 / Reversal-against-you -5): UPTREND=continuation for long,
+    DOWNTREND=reversal against long, COMPRESSION/EXPANSION=0.
     """
     sign = 1 if direction == 'long' else -1
     s = 0
@@ -195,6 +198,18 @@ def score_direction(ind, continuum, direction='long'):
     ema_pts = (5 if above >= 3 else -5) * sign
     s += ema_pts
     reasons.append(f"EMA50 above on {above}/5 TFs {ema_pts:+d}")
+    # Pattern row (skill table) — structure engine as the deterministic proxy
+    if struct:
+        cell = struct.get('15m') or struct.get('1h')
+        pst = cell.get('state') if isinstance(cell, dict) else cell
+        if pst == 'UPTREND':
+            pts = 5 * sign
+        elif pst == 'DOWNTREND':
+            pts = -5 * sign
+        else:
+            pts = 0
+        s += pts
+        reasons.append(f"pattern {pst or 'unavailable'} {pts:+d}")
     return s, trend, reasons
 
 
@@ -219,8 +234,10 @@ def build_decision(cycle_id, open_positions, cfg):
                 'decision': 'STAND_DOWN', 'mode': cfg.get('mode', 'shadow'),
                 'reasons': [f'indicator failure: {e}']}
 
-    score_long, trend_long, reasons_long = score_direction(ind, continuum, 'long')
-    score_short, trend_short, reasons_short = score_direction(ind, continuum, 'short')
+    score_long, trend_long, reasons_long = score_direction(
+        ind, continuum, 'long', struct)
+    score_short, trend_short, reasons_short = score_direction(
+        ind, continuum, 'short', struct)
     # CHOP halving: ONLY trend inputs (skill rule), toward zero per subtotal
     if chop:
         score_long = int(trend_long / 2) + (score_long - trend_long)
