@@ -5108,3 +5108,4 @@ BY: brain_auditor
 BY: auto_1hr
 
 - [2026-10-23 07:52 UTC] brain_auditor: AUDIT RUN #92 — 1 zero-behavior ship ([SIZE-REDUCE-SHADOW] log line), 0 config changes (vacation true 6th run, constants zero git diff) | HEADLINE size-reduce 0.5x = 0% cut live (base '$11.00' = HL min floor, x0.5 floored back before multipliers) -> shadow line ships effective-cut% + CEO semantics decision | 24h 7T 6W 85.7% '+$0.46' | 7d 143T 37.8% '-$3.11' | 14d '-$4.27' | armed '+$9.34' vs unarmed '-$13.61' | size-reduce auto-clear ETA ~19:34 UTC today | losing autopsy 24h n=1 0-1-0 / 48h n=17 4-12-1 -> wrong-side REFUTED 26th run | deep-dive 0 new targets | CONF_FLOOR reproduces 32T/4W/'-1.81' fk-scope 20.0% FAIL -> held | pc+ NO-KILL (30d '+1.86') | TAT 14/15 | waiver legal 0 knife -> lapse Oct 24 | verify #91 all PASS
+- [2026-10-23 07:59 UTC] brain_auditor: #92 follow-up — 24h 9T 7W 77.8% '+$0.44', autopsy re-run n=2 = 0/2/0 -> wrong-side refuted 26th run unchanged, no new changes
