@@ -5120,3 +5120,5 @@ BY: auto_1hr
 BY: auto_1hr
 
 - [2026-10-23 12:30] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W2L net '-$0.26' (CC/ZRO volume-buildup- SHORT, both waiver-era [35,45) band) | 24h 13T 7W 53.8% '+$0.03' | 7d 135T 36.3% '-$3.12' — size-reduce 0.5x stays (file truth) | kill: none (volume-buildup- n=2 <3, 14d 81.8% +0.46 keep) | atr_sl_hit 0/13=0% under 40%, dominant close profit-monster-trail 6T +0.47 | no neg streak (prior hour green) | 1 open POLYX LONG flat | No constants change -> no signal_versions entry
+- [2026-10-23 13:30] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 13T 7W 53.8% `+$0.03` | 7d 132T 36.4% `-$3.06` — size-reduce 0.5x stays (file truth) | kill: none (no signals closed last hour) | atr_sl_hit 0/13=0% under 40% | no neg streak (empty hour resets prior red) | 1 open POLYX LONG bracketed | No constants change -> no signal_versions entry
+BY: auto_1hr
