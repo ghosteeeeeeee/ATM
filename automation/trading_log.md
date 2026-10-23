@@ -14263,3 +14263,24 @@ Final set: ['BTC']
 - 7d `-$3.11` flat vs last hour — still bleeding slowly
 - CONF_FLOOR=30 bare-only still blocked on RAW-confidence pin (audit #85/#88/#90/#91)
 - Waiver expiry Oct 24
+
+## 2026-10-23 08:28 UTC Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.02 (WR: 50%) | 24h: 9T 7W `+$0.44` (77.8%) | 7d: 144T 37.5% `-$3.18` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 trades closed: PUMP volume-buildup- SHORT win +$0.03 (trail), ME bb-squeeze+ LONG loss -$0.05 (trail timeout)
+- atr_sl_hit 0/9 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour — no kill trigger
+- No negative-hour streak (first mildly red hour after green/empty)
+- Frequency 2/hr — not overtraded (limit 20)
+- 2 open both small red: WLFI LONG (-0.03), BTC LONG (-0.01) — all bracketed, let them ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d `-$3.18` vs `-$3.11` last hour — stable bleed, size-reduce still active until ~19:34 UTC auto-clear check
+- CONF_FLOOR=30 bare-only still blocked on RAW-confidence pin (audit #85/#88/#90/#91/#92)
+- Waiver expiry Oct 24
