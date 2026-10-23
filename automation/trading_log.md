@@ -14498,3 +14498,24 @@ Final set: ['BTC']
 - 7d -$2.72 vs -$2.77 last hour — flat, size-reduce 0.5x still active (file truth)
 - CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
 - Waiver expiry Oct 24 (imminent — audit #102 shipped waiver_expiry.py gate, inert until 00:00Z)
+
+## 2026-10-23 19:28 Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.05 (WR: 100%) | 24h: 19T 8W `-$0.47` (42.1%) | 7d: 122T 37.7% `-$2.41` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- Both closes profit-monster-trail (ICP vb- SHORT +0.04/+1.92%, AVAX r2v2-long4 LONG +0.01/+0.54%) — winners riding trails correctly
+- atr_sl_hit 1/19 = 5.3% (<40%) over 24h; dominant close = profit-monster-trail (8T +$0.46)
+- No 0%WR signal with 3+ trades last hour (n=2, both wins, different signals)
+- No negative-hour streak (green hour resets prior)
+- Frequency 2/hr — not overtraded
+- 1 open: CFX pump-chain- SHORT (+0.38%) bracketed SL 0.0523/TP 0.0509 — let it ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d -$2.41 vs -$2.72 last hour — improving, size-reduce 0.5x still active (file truth)
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings / vacation file
+- Waiver expiry Oct 24 — audit #102 shipped waiver_expiry.py gate (inert until 00:00Z)
