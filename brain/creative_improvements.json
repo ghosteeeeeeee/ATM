@@ -7138,5 +7138,32 @@
     "category": "risk infrastructure",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T08:46:09Z",
+    "idea": "TAT VARIANT-C FLIP PACK COMPLETE — 15/15 fire bar crossed, all 3 pre-registered data criteria pass, awaiting CEO GO only",
+    "rationale": "variant-C (cut only at negative live_pnl) = 6 cuts +13.00pp 0/7 winner-kills fk 0%; base rule = fk 100% FAIL. Criteria locked pre-data by #66/#75 so this is a pre-registered read, not a new pattern.",
+    "expected_impact": "+13.00pp per 7d cohort; directly attacks the unarmed give-back class (unarmed 14d -$13.64)",
+    "category": "exit engine / chop cut",
+    "status": "ready_for_ceo",
+    "risk": "medium (n=6 cuts, no 30d OOS)"
+  },
+  {
+    "date": "2026-10-23T08:46:09Z",
+    "idea": "SIGNAL-AXIS UNARMED COVERAGE LEDGER (zero-code standing KPI)",
+    "rationale": "14d unarmed -$13.64 splits into killed 41% + CONF_FLOOR 24% + MFE-CUT 12% + combos-outside-bare 7% + residual 18% (max cell n=9). Shipping the two queued levers moves coverage 41% -> 77% and proves no further kill qualifies.",
+    "expected_impact": "makes 'keep us out of chop' a tracked number on the signal axis, complementing #90's exit-axis 63%",
+    "category": "measurement",
+    "status": "shipped_as_kpi",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-23T08:46:09Z",
+    "idea": "WAIVER PRE-EXPIRY SCOREBOARD WITH DECOUPLING RECOMMENDATION — lapse flip1 (2/5 opens), CEO to decide flip2 separately",
+    "rationale": "flip1 exemption-band attributable opens = 2 (both tiny wins, +$0.11) vs n>=5 bar; flip2's signal (volume-buildup-) is the best live family at 11T 81.8% +$0.46 but its HIGH/EXTREME regime cohort is n=2. Renewing them as one bundle forces a bad flip1 to ride a defensible flip2.",
+    "expected_impact": "avoids either (a) keeping a no-value RSI exemption alive or (b) losing HIGH/EXTREME eligibility for the strongest live short family by bundled default",
+    "category": "gate governance",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
