@@ -14190,3 +14190,24 @@ Final set: ['BTC', 'INJ']
 - 7d '-$3.36' vs '-$3.35' last hour — flat, no new bleed
 - 24h '+$0.46' on 7T (86% WR) — 8th green window, best streak this week
 - CONF_FLOOR=30 bare-only still pending ship (audit #85/#88 Oct 23) — watch for first fires
+
+## 2026-10-23 05:28 Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h: 7T 6W `+$0.46` | 7d: 145T 37.2% `-$3.19` | size-reduce 0.5x (file)
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — quiet since ~03:36 (HBAR close)
+- atr_sl_hit 0/7 = 0% (<40%) over 24h — no SL-tightness issue
+- No 0%WR signal with 3+ trades last hour — no kill trigger
+- No negative-hour streak (03:00 green +$0.15, then empty hour)
+- Frequency 0/hr — not overtraded (limit 20)
+- 1 open: BTC ai-trader-pending LONG #16358 (opened 02:44, SL 81380/TP 82400, live -0.24) — bracketed, let it ride
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d `-$3.19` vs `-$3.36` last hour — slowly improving
+- 24h `+$0.46` on 7T (86% WR) — 8th consecutive green window
+- CONF_FLOOR=30 bare-only still pending ship (audit #85/#88) — gate reads wrong confidence column per #88, do not ship until RAW-confidence pin lands
