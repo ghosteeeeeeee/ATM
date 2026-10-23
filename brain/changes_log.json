@@ -1925,5 +1925,16 @@
     "after": "definitions named and pinned (fkA-literal / fkA-family / fkA-scope / fkB), ship-time table 14d+30d, pre-registration trigger honored (>=20% => CEO ruling before ship)",
     "rationale": "#85 next_action 'fk-definition pinned in writing'; the ship decision flips entirely on definition+window (3.2% vs 20.0%)",
     "impact": "no live change; unblocks a same-day CONF_FLOOR ship once CEO rules"
+  },
+  {
+    "timestamp": "2026-10-23T01:45:00Z",
+    "agent": "brain_auditor",
+    "change": "fk_definitions.md: appended 01:40 UTC ship-time recompute confirmation (fkA-scope 20.0% stable vs 00:45, blocked set unchanged) so the CEO ruling sees the number did not drift",
+    "type": "doc",
+    "file": "brain/fk_definitions.md",
+    "before": "ship-time table computed 00:45 UTC only",
+    "after": "recompute-confirmation line added (identical numbers at 01:40)",
+    "rationale": "#83 pre-reg requires fkA recompute AT ship time; showing stability across the morning removes the stale-number failure mode (#71)",
+    "impact": "zero behavior; supports same-day CEO ruling"
   }
 ]

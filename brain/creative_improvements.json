@@ -6980,5 +6980,36 @@
     "category": "tooling",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T01:45:00Z",
+    "run": "brain_auditor #87",
+    "idea": "CONFIRMED-BUT-UNWATCHED EXIT WINDOW ledger (measured; code criteria pre-registered, not built)",
+    "rationale": "BTC SHORT #16353's standing exit condition confirmed at 00:57 (15 consecutive 1m closes >81400, ran to 22) and held to 01:04 with watchdog steers=[] the entire window; the UM_HOLD backstop closed it 01:15:18. 18-minute window where a code-verifiable condition was met with zero actor. Cost this run ~0bps (backstop 81387 was actually ~0.06-0.08% better than the rule's own trigger price at 00:57), same benign outcome as #86's cost accounting - but the gap is now timestamped.",
+    "expected_impact": "prevents silent unexecuted exits when the backstop is NOT lucky; zero cost now",
+    "category": "process guard",
+    "status": "suggested",
+    "risk": "low",
+    "build_criteria": "build a deterministic condition-counter log ONLY when a 2nd standing exit condition exists for an open trade (n=1 now -> YAGNI); until then each audit re-tests the condition in candles per the steer-validity rule"
+  },
+  {
+    "date": "2026-10-23T01:45:00Z",
+    "run": "brain_auditor #87",
+    "idea": "CHOP-COVERAGE LEDGER ACCOUNTING FIX - coverage is 61%, not 67%",
+    "rationale": "#86 attributed ALL 14d pump-chain hard_max_loss (-1.89) to CONF_FLOOR, but the floor only blocks confidence<30 which is -0.88 (8T). Correct: killed -2.60 (33%) + ai-trader+ disabled -0.60 (8%) + CONF_FLOOR -0.88 (11%) + bb-bounce MFE-CUT -0.71 (9%) = -4.79 of -7.89 = 61%. Residual -3.10 all cells n<=4.",
+    "expected_impact": "KPI no longer overstates coverage; honest distance to the 80% target (19pts, not 13pts)",
+    "category": "measurement",
+    "status": "shipped in report (zero code)",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-23T01:45:00Z",
+    "run": "brain_auditor #87",
+    "idea": "VACATION-STATE CANARY - reports asserting a state change must cite the source-of-truth file",
+    "rationale": "kanban #86 says 'vacation ENDED' while data/vacation_mode.json still reads true/no_constants_change (mtime Oct 22 15:29). Two records disagree about whether constants ships are allowed - exactly the class of drift that causes an unintended config change. Fix is one line of verification discipline (run `vacation_mode.py status` and quote it) before any run claims vacation state.",
+    "expected_impact": "eliminates state-prose drift before the next constants ship",
+    "category": "process guard",
+    "status": "suggested (CEO to resolve the actual state first)",
+    "risk": "none"
   }
 ]

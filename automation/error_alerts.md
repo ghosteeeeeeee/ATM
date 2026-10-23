@@ -1632,3 +1632,7 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3360s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3360s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3423s left, N failures)`
+
+## Error Alerts — 2026-10-23 01:43 UTC
+- **WARN** (1x): Disk usage at 85% on / (95G/118G, 18G free) — no logs older than 7d to compress; actively-written logs total 587M (pipeline.log 249M, signal-compactor.log 97M, 15m_regime.log 74M). Monitor; if >90% consider logrotate or truncating rotated segments.
+- **INFO**: ARB SHORT mid-band death band blocks (RSI 51.9 in 45-55) at 01:20-01:24 — filter working as designed, cooldown engaged, no action needed.

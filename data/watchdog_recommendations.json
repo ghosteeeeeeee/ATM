@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-23T01:14:21.974662+00:00",
+  "timestamp": "2026-10-23T01:44:22.227709+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
@@ -11,10 +11,10 @@
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "ACCUMULATION",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "UNKNOWN",
     "market_phase": "DECLINING",
     "trend_quality": "UP"
   },
-  "open_count": 1
+  "open_count": 0
 }

@@ -44,3 +44,10 @@ Notes:
    it is unstable by construction (denominator = winners in a cohort that is itself shrinking).
 
 Once ruled, CONF_FLOOR=30 bare-only ships the same day (numbers above are fresh).
+
+## Recompute confirmation (run #87, 2026-10-23 01:40 UTC)
+
+Ship-time numbers **unchanged** across 55 minutes (00:45 → 01:40): blocked set 32T / 4W /
+−$1.81; fkA-literal 4/125 = **3.2%**, fkA-family 4/25 = **16.0%**, fkA-scope 4/20 =
+**20.0%**, fkB 4/32 = **12.5%**. No drift into the CEO ruling — the hold verdict stands as
+written above.
