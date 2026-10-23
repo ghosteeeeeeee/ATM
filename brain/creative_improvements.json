@@ -7556,5 +7556,32 @@
     "category": "governance",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-23T21:41:15Z",
+    "idea": "conf<30 NON-PUMP SENTINEL pre-registered (zero code)",
+    "rationale": "global conf<30 floor was rejected #62 as a wash (fresh baseline: non-pump conf<30 14d 12T 7W '-0.09'); a standing watch with locked trigger (n>=20 AND PnL <= '-1.00') gives CONF_FLOOR a future scope-extension path without re-proposal debates",
+    "expected_impact": "early warning if non-pump conf<30 bleed grows past wash",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T21:41:15Z",
+    "idea": "ARM-DECOMPOSITION LEDGER — per-signal reached-arm vs never-reached split as standing KPI",
+    "rationale": "fresh cut: pc+ never 28T 1W '-2.38' vs reached 16T 10W '+1.89'; pc- never 12T 0W '-0.96' vs reached 23T 8W '+0.69'; bb-bounce never 19T 0W '-1.79' vs reached 18T 16W '+0.80' — all bleed pre-arm, queued levers target exactly those cohorts; reached-arm leak = pc- atr_sl round-trip '-0.72' = escalation #17",
+    "expected_impact": "zero code; proves/detects shift of bleed from pre-arm to post-arm (exit-side regression tripwire)",
+    "category": "monitor",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-23T21:41:15Z",
+    "idea": "Watchdog stop-field 'staleness' CLOSED as non-bug (trail ratchet)",
+    "rationale": "both watchdog and DB read trades.stop_loss live; position_manager tightens trailing stops each poll (0.05227486 -> 0.05203704 -> 0.05195709 as CFX price fell) = profit lock working, not stale data",
+    "expected_impact": "prevents future runs re-flagging a moving target as MED drift",
+    "category": "governance",
+    "status": "resolved",
+    "risk": "low"
   }
 ]
