@@ -50,6 +50,22 @@ def should_fire(ab_group: str, last_run_ts: float, fire_windows: dict) -> bool:
 
 
 # ── DB Queries ───────────────────────────────────────────────────────────────
+def _ceo_shielded_tokens(cur):
+    """Tokens with an open LIVE CEO-managed row (manual_exit_manager contract).
+
+    Shared by every cut_loser action — list AND MAE-guard paths (bug_hunter
+    F-1: the MAE path bypassed the original guard and could still HL-close a
+    pipeline row on a CEO-shielded token = same wrong-authority class as
+    #16384). Paper managed rows don't shield live coins (F-2)."""
+    from manual_exit_manager import MANAGED_TAGS
+    cur.execute(
+        "SELECT DISTINCT token FROM trades WHERE server='Hermes' "
+        "AND status='open' AND paper IS FALSE AND (" +
+        " OR ".join(["signal LIKE %s"] * len(MANAGED_TAGS)) + ")",
+        [f"%{t}%" for t in MANAGED_TAGS])
+    return {str(r[0]).upper() for r in cur.fetchall()}
+
+
 def get_losing_positions():
     """Return all open Hermes positions ordered by pnl_pct ASC (worst losers first)."""
     try:
@@ -75,19 +91,15 @@ def get_losing_positions():
                 ORDER BY pnl_pct ASC
             """, params)
             rows = cur.fetchall()
-            # CEO-tranche token guard (2026-10-24, mirrors profit_monster): a
-            # CEO-managed row (ai-trader-manual/pending/auto) merged into this
-            # coin's HL position means cut_loser must not cut the coin either —
-            # manual_exit_manager owns those exits (merge = one HL position).
-            from manual_exit_manager import MANAGED_TAGS
-            cur.execute(
-                "SELECT DISTINCT token FROM trades WHERE server='Hermes' "
-                "AND status='open' AND (" +
-                " OR ".join(["signal LIKE %s"] * len(MANAGED_TAGS)) + ")",
-                [f"%{t}%" for t in MANAGED_TAGS])
-            ceo_tokens = {r[0] for r in cur.fetchall()}
-            if ceo_tokens:
-                rows = [r for r in rows if r[1] not in ceo_tokens]
+            # CEO-tranche token guard (2026-10-24, mirrors profit_monster)
+            ceo = _ceo_shielded_tokens(cur)
+            if ceo:
+                kept = [r for r in rows if str(r[1]).upper() not in ceo]
+                if len(kept) != len(rows):
+                    log(f"  [CUT-LOSER] CEO-tranche token guard: standing down on "
+                        f"{sorted(ceo & {str(r[1]).upper() for r in rows})} — "
+                        f"manual_exit_manager owns those exits")
+                    rows = kept
             return [
                 {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
                  "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6]}
@@ -330,6 +342,12 @@ def get_positions_for_mae_guard():
                 ORDER BY open_time DESC
             """)
             rows = cur.fetchall()
+            # CEO-tranche token guard — MAE path (bug_hunter F-1 HIGH): this
+            # list ran BEFORE the guarded list and could HL-close a pipeline
+            # row on a CEO-shielded token.
+            ceo = _ceo_shielded_tokens(cur)
+            if ceo:
+                rows = [r for r in rows if str(r[1]).upper() not in ceo]
             return [
                 {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
                  "current_price": float(r[4]), "highest_price": float(r[5]) if r[5] else float(r[3]),

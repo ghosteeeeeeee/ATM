@@ -105,15 +105,15 @@ def get_all_open_positions():
         from manual_exit_manager import MANAGED_TAGS
         cur.execute(
             "SELECT DISTINCT token FROM trades WHERE server='Hermes' "
-            "AND status='open' AND (" +
+            "AND status='open' AND paper IS FALSE AND (" +
             " OR ".join(["signal LIKE %s"] * len(MANAGED_TAGS)) + ")",
             [f"%{t}%" for t in MANAGED_TAGS])
-        ceo_tokens = {r[0] for r in cur.fetchall()}
+        ceo_tokens = {str(r[0]).upper() for r in cur.fetchall()}
         if ceo_tokens:
-            kept = [r for r in rows if r[1] not in ceo_tokens]
+            kept = [r for r in rows if str(r[1]).upper() not in ceo_tokens]
             if len(kept) != len(rows):
                 log(f"  [PM] CEO-tranche token guard: standing down on "
-                    f"{sorted(ceo_tokens & {r[1] for r in rows})} — "
+                    f"{sorted(ceo_tokens & {str(r[1]).upper() for r in rows})} — "
                     f"manual_exit_manager owns those exits")
                 rows = kept
         return [

@@ -1409,7 +1409,7 @@ if __name__ == "__main__":
         add_parser.add_argument("--manual", action="store_true", default=False,
                                 help="Manual CEO trade — bypasses vacation pause marker")
         add_parser.add_argument("--force", action="store_true", default=False,
-                                help="Deliberate second tranche — bypasses same-coin duplicate guard (never used by automation)")
+                                help="Deliberate second tranche — bypasses same-coin duplicate guard (CEO-directed adds and CEO-configured pending orders; the signal pipeline never passes it)")
         add_parser.add_argument("--flipped", action="store_true", default=False,
                                 help="Mark this trade as flipped from original signal direction")
         add_parser.add_argument("--signal-z-score", type=float, dest="signal_z_score",
