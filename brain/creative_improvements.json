@@ -7716,5 +7716,23 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "zero (no code, playbook only)"
+  },
+  {
+    "date": "2026-10-24T04:38:11Z",
+    "run": 113,
+    "idea": "Blocked-candidate census as standing gate-effectiveness KPI",
+    "rationale": "Watchdog escalated starvation as cost; measured answer: gates blocked net losers. Pre-register trigger: if blocked fwd avg > 0 with n>=20 and t>2, gates over-blocking -> re-examine.",
+    "category": "instrumentation",
+    "status": "shipped-as-one-shot this run; re-run inline when starvation recurs",
+    "risk": "zero (read-only)"
+  },
+  {
+    "date": "2026-10-24T04:38:11Z",
+    "run": 113,
+    "idea": "SHORT-NEUTRAL gate watch (marginal band)",
+    "rationale": "Largest single blocker today (n=10) but avg fwd -0.027% = wash, not clearly bad. volume-buildup- already has confluence standalone bypass but not SHORT-NEUTRAL bypass. If census re-run shows positive fwd at n>=15, propose vb- SHORT-NEUTRAL exemption with fresh fk.",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low (data-gated)"
   }
 ]

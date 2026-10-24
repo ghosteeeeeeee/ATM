@@ -1768,3 +1768,6 @@
 - **WARN**: disk 85% (df: 95G/118G used, 17G free; raw 80.5%). No logs >7d to gzip, so no safe reclaim from logs/ — same out-of-scope hogs as 2026-10-23 (/var/log/syslog* 1.2G, /root/zscore 2.2G, /root/hermes-agent 2.0G, /root/snap 1.7G).
 - **INFO**: `decisions` table (signals_hermes_runtime.db) last row 2026-04-13 — likely legacy schema left behind by the signal_compactor migration; not read by the live path.
 - **AUTO-FIX**: none required — no vacation pause, all 4 timers active, pipeline service running (rc=0 every cycle, 0 tracebacks/30min), position_manager healthy, prices fresh (14s, 87 tokens), no DB locks held, no phantom trades.
+
+## Error Alerts — 2026-10-24 04:27 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] GRIFFAIN TOK BLOCKED — WARNING — BTC_LEVEL`

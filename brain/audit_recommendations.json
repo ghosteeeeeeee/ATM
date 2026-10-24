@@ -1,130 +1,114 @@
 {
-  "timestamp": "2026-10-24T03:45:00Z",
-  "run": 112,
-  "session_brain_stats": {
-    "note": "dup-heavy ideation only (17th consecutive), no new actionable drift found"
-  },
+  "timestamp": "2026-10-24T04:38:11Z",
+  "run": 113,
+  "session_lock": "absent",
+  "vacation_mode": true,
+  "size_reduce": "1.0x (file absent)",
+  "config_changes_applied": [],
+  "headline": "HOTSET STARVATION REFUTED AS COST — blocked-candidate census: 52 measurable, 30m fwd -0.171% avg, taking all = -$0.89 at $10 notional, pos/neg t=8.00. Gates correctly sort signal from noise; idle is correct in chop-pin. steer-001 vb- retraction stands 16th run. Wrong-side refuted 42nd run. 0 config changes.",
   "trade_summary_24h": {
-    "trades": 21,
-    "wins": 10,
-    "wr": 47.6,
-    "pnl": -0.05,
-    "direction": {
-      "SHORT": "13T 61.5% +0.31",
-      "LONG": "8T 25.0% -0.36"
-    },
-    "winners": "10/10 trail-armed (CFX pc- +0.34 rr_trail, 6x vb- PM-trail, LTC warrior, HBAR bb-squeeze, AVAX r2v2)",
-    "losers": "11 = 10 unarmed + 1 armed giveback (PUMP r2v2-long9 -0.01)",
-    "7d": "120T 40.0% -1.17 | 14d 342T 36.3% -4.58",
+    "trades": 20,
+    "wr": 45.0,
+    "pnl": -0.08,
+    "long": "7T 14.3% -0.39",
+    "short": "13T 61.5% +0.31",
     "open": 0,
-    "flat_reason": "both-sides-gated at EMA300 pin (BTC 80972 vs EMA300 81012, -0.04%, AT after 18.4h below)"
+    "flat_reason": "EMA300 chop-pin, gates correctly blocking"
+  },
+  "trade_summary_windows": {
+    "7d": "120T 40.0% -1.17",
+    "14d": "341T 36.4% -4.57",
+    "30d": "700T 43.0% -5.04"
   },
   "mandate_fresh": {
-    "trail_family_14d": "116T 86.2% +9.75",
-    "hard_max_loss_14d": "75T 0% -7.47",
-    "armed_14d": "139T 78.4% +9.86 vs unarmed 203T 7.4% -14.44",
-    "atr_sl_hit_leak": "83T 1.2% -5.96, armed=0 — escalation #17 (63rd), vehicle = Oct 25 BE-at-arm 1m replay"
+    "trail_family_14d": "138T 79.0% +9.87",
+    "hard_max_loss_14d": "75T 0.0% -7.47",
+    "reached_arm_14d": "138T 79.0% +9.87",
+    "never_arm_14d": "203T 7.4% -14.44",
+    "atr_sl_hit_14d": "83T 1.2% -5.96 armed=0 (escalation #17, 64th)"
   },
-  "post_lapse_checkpoint": {
-    "status": "PASS (2nd consecutive run)",
-    "flip1_active": false,
-    "unclog_expired_lines": 18,
-    "opens_since_0000Z": 0,
-    "vb_short_signals_post_lapse": "15 signals, 0 executed (RSI span 0-52, majority <45 = exact blocked class)",
-    "verdict": "waiver-expiry gate live and correct-by-traffic"
+  "watchdog_triage": {
+    "steer-001_volume-buildup_disable": "RETRACTION HOLDS 16th run — DO NOT DISABLE. 14d vb- SHORT 20T 70% +0.39. All 4 recent losses were RSI 35-44 waiver-band class, now re-blocked by expired waiver gate (flip1_active=False, 0 trades post-lapse).",
+    "hotset_starvation_red": "DIAGNOSED + MEASURED. 257 cycles 0 entries. Root cause: EMA300 chop-pin + flip-rate 31/24h>=p95. Blocked-candidate census (n=52 measurable): gates blocked would-be net LOSERS (-$0.89 at $10). No gate loosening. Idle = correct posture. Escalation returned to watchdog with data — parameter fix NOT warranted.",
+    "ema300_short_favor": "STANDS condition-locked: shorts only while 1m holds below ~80970, longs only on 15-30m sustained reclaim WITH volume.",
+    "zora_long_watchlist": "AI_TRADER_ENABLED=False, will not execute — noted."
+  },
+  "blocked_candidate_census_2026-10-24": {
+    "method": "compactor.log block lines today -> 1m candles forward 30m, direction-aware",
+    "measurable": "52/60",
+    "pos_rate": "18/52 (35%)",
+    "avg_fwd": "-0.171%",
+    "net_if_all_taken_10usd": "-0.89 USDT pre-fee",
+    "pos_vs_neg_tstat": 8.0,
+    "verdict": "GATES CORRECT — starvation is correct-by-configuration in chop-pin. Taking blocked candidates loses money.",
+    "worst_gates_saved_most": "PUMP-CHAIN-SHORT-HIGH -0.514%, PUMP-CHAIN-RSI-MAX -0.483%, CONTINUUM-BLOCK -0.401%",
+    "marginal_gates_watch": "SHORT-NEUTRAL n=10 avg -0.027% (wash) — pre-registered watch; if fwd avg turns positive n>=15, re-examine neutral bypass for volume-buildup-"
   },
   "losing_autopsy_48h": {
-    "method": "recovery_replay.py adverse-first, selfcheck PASS (vacuity 193/203)",
     "n": 12,
     "never_adverse": 2,
-    "recovered": 5,
-    "never": 5,
-    "never_cohort": "ALT/CC/ZRO volume-buildup- shorts (RSI 35-43 waiver-band, NOW BLOCKED by lapsed gate) + BTC ai-trader-pending manual_sl (CEO) + PUMP r2v2-long9 trail giveback -0.01",
-    "wrong_side": "REFUTED 41st consecutive run (#61 p=0.116, #84 t=-0.04)",
+    "recovered_after_adverse": 5,
+    "never_traded_back": 5,
+    "never_cohort": "ALT/CC/ZRO volume-buildup- SHORT (waiver-band RSI<45, NOW BLOCKED) + BTC ai-trader-pending + PUMP r2v2-long9 giveback",
+    "wrong_side": "REFUTED 42nd consecutive run (#61 p=0.116, #84 t=-0.04)",
     "new_patterns": 0
   },
-  "drift_findings": [
-    {
-      "item": "vacation_mode",
-      "severity": "low",
-      "detail": "18th run half-open (no_constants_change=false + review queue; no_signal_enable_disable=true). T/CEO: vacation_mode.py off when ready — fk ruling, CONF_FLOOR, TAT GO behind it."
-    },
-    {
-      "item": "session_brain",
-      "severity": "low",
-      "detail": "dup-heavy 18th (ideation only), no new drift surfaced"
-    },
-    {
-      "item": "conf metadata RAW pin",
-      "severity": "standing",
-      "detail": "final_confidence metadata populated but decider's 40% skip means CONF_FLOOR=30 would block 0 metadata rows — RAW column pin mandatory at any future ship (#88 standing)"
-    }
-  ],
-  "recurring_problems": [
-    "trail arming is THE win lever — candle-vs-poll gap (escalation #17) is the sole failure mode, 0/83 atr_sl_hit armed",
-    "LONG inventory bleeds (7d 82T 37.8% -1.73) while SHORT wins (38T 44.7% +0.56) — signal inventory generates ~2x more longs than shorts regardless of tape",
-    "[40,50) confidence bleed bucket: 14d 74T 37.8% -1.50 — CONFIDENCE-TAIL queue owns it (7d flipped +0.26 at n=15, monitor)"
-  ],
-  "missing_implementations": [
-    "CONF_FLOOR=30 bare-only: 14d 42T 7W -1.71 blocked-set (grew from 33T), ships Oct 25 pending CEO fk ruling (2 defs gated)",
-    "TAT variant-C: 16 in-scope fires, fk 0/7, +0.410, p=0.016 — AWAITING CEO GO",
-    "Escalation #17 candle-aware arming: Oct 25 BE-at-arm 1m replay vehicle scheduled"
-  ],
-  "creative_improvements": [
-    {
-      "date": "2026-10-24T03:45:00Z",
-      "idea": "Waiver-lapse 24h scoreboard (zero code, pre-registered)",
-      "rationale": "15 volume-buildup- SHORT signals fired post-00:00Z, 0 executed, RSI span 0-52 mostly <45 — the exact class the lapsed waiver admitted. If this holds 24h with 0 executions of the RSI<45 class, the lapse is validated as a permanent gate; CEO re-waiver only with fresh counterfactual data.",
-      "expected_impact": "validates/removes the re-waiver decision with live data instead of assumption",
-      "category": "verification",
-      "status": "pre-registered",
-      "risk": "zero (no code)"
-    },
-    {
-      "date": "2026-10-24T03:45:00Z",
-      "idea": "Reclaim-readiness ladder (playbook, zero code)",
-      "rationale": "All 24h winners were SHORTs (vb-/warrior/pc-). If the EMA300 pin resolves UP, short-edge inventory goes quiet and long-bleed inventory reactivates. First longs after a sustained reclaim should prefer trail-family signals (continuum-trend+, bb-squeeze+) over chop-family bare bounces — the mandate is stay in trends, out of chop.",
-      "expected_impact": "reduces first-post-reclaim chop-entry bleed (known 0% WR unarmed cohort)",
-      "category": "entry sniper",
-      "status": "suggested",
-      "risk": "zero (no code, playbook only)"
-    }
-  ],
-  "config_changes_applied": [],
-  "changes_from_last_run": {
-    "#111": "0 config changes — nothing to verify",
-    "#107": "trend-ownership + entry_regime_4h fixes stand (feature_recorder.py:212 present); no new traffic since 00:00Z to test",
-    "size_reduce": "file ABSENT = 1.0x truth (cleared 22:57Z, auto-clear correct)",
-    "waiver_expiry": "live, flip1_active()=False, UNCLOG-EXPIRED firing, 0 leaks",
-    "protected_flags": "constants git CLEAN, LIVE_TRADING_ENABLED=True",
-    "tracebacks": "4 total, last Oct 11 — none new",
-    "session_lock": "absent",
-    "pipeline": "rc=0, sleeping, hotset 0 tokens (both-sides-gated, working as designed)"
+  "conf_floor_status": {
+    "blocked_14d": "42T -1.71",
+    "fk_family": "7/24 pc winners = 29.2% FAIL",
+    "fk_literal": "7/124 all winners = 5.6% PASS",
+    "verdict": "STILL GATED ON CEO fk-ruling — definitions disagree, ship bare-only when CEO rules"
   },
-  "deep_dive": {
-    "sub_50pct_n15_14d": [
-      "bb-bounce-v2-long+ 35T 42.9% -0.94 → TAT variant-C owner (armed 18T 83.3% +0.79 vs unarmed 17T 0% -1.73)",
-      "ai-trader+ 27T 37.0% -0.91 → CEO domain",
-      "doji-bottom-long 20T 40.0% -0.62 → KILLED Oct 16, 0 opens since, aging cohort",
-      "pump-chain+ 44T 25.0% -0.49 → NO-KILL stands (30d +1.78; bleed = conf<30 = CONF_FLOOR target)",
-      "pump-chain- 35T 22.9% -0.30 → CANCEL stands (CONF_FLOOR collision)",
-      "ai-trader-manual 15T 46.7% +0.34 → positive PnL, CEO domain"
-    ],
-    "new_targets": 0
+  "tat_status": {
+    "fires_14d": "15 fires / 12 unique tokens",
+    "variant_c": "AWAITING CEO GO (fk 0/7, +0.410, p=0.016 at last measure)"
   },
   "pre_reg_rechecks": {
-    "high_conf_60_95_decay": "7d n=27 44.4% +0.04 POSITIVE — trigger NOT met (needs negative at n>=20). 30d +1.84, 14d -0.27. Watch continues.",
-    "conf_lt30_nonpump_sentinel": "14d n=12 58.3% -0.09 wash — trigger not met (needs n>=20 AND pnl<=-1.00)",
-    "conf_floor_bare": "14d 42T 7W -1.71 blocked-set, fkA-literal 7/311≈2.2% PASS / fkA-family still gated — Oct 25 ship pending CEO fk ruling",
-    "pc_plus_kill": "NOT MET (14d 44T 25.0% -0.49 but 30d 69T +1.78; conf>=30 14d +0.86; bleed=conf<30 CONF_FLOOR target)",
-    "steer_001_volume_buildup": "DO NOT DISABLE re-confirmed 15th run — 5 straight PM-trail wins after flagged losses, 14d armed 14T 100% +1.09 vs unarmed 6T 0% -0.70"
+    "conf30_nonpump_sentinel": "12T -0.09 wash — trigger n>=20 AND PnL<=-1.00 NOT met",
+    "pump_chain_plus_kill": "NOT MET (14d 44T 25% -0.49 but 30d positive historically; CONF_FLOOR targets bleed)",
+    "pump_chain_minus_cancel": "STANDS",
+    "escalation_17": "64th request — candle-aware arming, atr_sl_hit 83T armed=0/83"
+  },
+  "deep_dive_targets": {
+    "new_sub50_n15": 0,
+    "owned": "bb-bounce->TAT | ai-trader->CEO | doji killed Oct16 | pc+->CONF_FLOOR | pc-->CANCEL | ai-trader-manual positive PnL"
+  },
+  "last_run_verify_112": {
+    "waiver_gate": "PASS flip1_active=False, 0 trades post-lapse",
+    "constants_git_diff": "CLEAN",
+    "protected_flags": "13/13",
+    "kill_flags": "correct (doji/oversold-bounce/vb+ all False, 0 post-kill opens)",
+    "size_reduce": "1.0x file absent = truth",
+    "tracebacks": "4 in pipeline.log all Oct 11, none new",
+    "recovery_replay_selfcheck": "PASS"
+  },
+  "drift": {
+    "vacation_mode": "true 20th run (T/CEO: off when ready — blocks CONF_FLOOR, TAT GO, fk ruling)",
+    "session_brain_dup": "still heavy",
+    "entry_regime_4h": "still untested by traffic (0 trades opened)"
   },
   "next_actions": [
-    "Oct 25: CONF_FLOOR bare-only ship (after CEO fk ruling) + TAT variant-C GO + BE-at-arm 1m replay (escalation #17 vehicle) + MFE-CUT/habitat/re-enter/UGB/short-gate batch",
-    "CEO: fk definition ruling (2 defs disagree, flip decision)",
-    "CEO: vacation_mode off when ready",
-    "Monitor: waiver-lapse 24h scoreboard (creative #1) — check 03:00Z Oct 25",
-    "Monitor: [60,95) 7d band — escalate if negative at n>=20",
-    "Reclaim playbook: if BTC 1m holds above EMA300 ~81012 for 15-30m WITH volume, longs open — prefer trail-family (continuum-trend+, bb-squeeze+) for first entries"
+    "CEO: fk-ruling (2 defs) -> CONF_FLOOR bare ships",
+    "CEO: TAT variant-C GO",
+    "CEO: vacation_mode off",
+    "Escalation #17 (64th): candle-aware arming vehicle = Oct 25 BE-at-arm 1m replay",
+    "Watch SHORT-NEUTRAL marginal gate (n=10 wash) — census re-run when starvation recurs",
+    "Reclaim readiness: trail-family first (continuum-trend+, bb-squeeze+) on 15-30m hold above 80970 WITH volume"
+  ],
+  "creative_ideas": [
+    {
+      "idea": "Blocked-candidate census as standing gate-effectiveness KPI",
+      "rationale": "Watchdog escalated starvation as cost; measured answer: gates blocked net losers. Pre-register trigger: if blocked fwd avg > 0 with n>=20 and t>2, gates over-blocking -> re-examine.",
+      "category": "instrumentation",
+      "status": "shipped-as-one-shot this run; re-run inline when starvation recurs",
+      "risk": "zero (read-only)"
+    },
+    {
+      "idea": "SHORT-NEUTRAL gate watch (marginal band)",
+      "rationale": "Largest single blocker today (n=10) but avg fwd -0.027% = wash, not clearly bad. volume-buildup- already has confluence standalone bypass but not SHORT-NEUTRAL bypass. If census re-run shows positive fwd at n>=15, propose vb- SHORT-NEUTRAL exemption with fresh fk.",
+      "category": "entry sniper",
+      "status": "pre-registered",
+      "risk": "low (data-gated)"
+    }
   ]
 }
