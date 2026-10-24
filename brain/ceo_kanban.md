@@ -1,4 +1,6 @@
 ## TEAM UPDATES
+- [2026-10-24 18:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 11T 9W 81.8% '+$0.87' (GREEN) | 7d 123T 40.7% '-$0.98' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 0/11=0% under 40% | no neg streak (15:00 positive) | 1 open BTC continuum+ LONG +0.85% | No constants change -> no signal_versions entry
+BY: auto_1hr
 - [2026-10-24 09:28 UTC] auto_1hr: No config change — 0T last hour (quiet); 24h 18T 9W 50.0% '+$0.06' (green); 7d 121T 40.5% '-$1.16' — size-reduce 1.0x (file absent = truth) | kill: none (0T) | atr_sl_hit 1/18=5.6% under 40% | no neg streak (empty hour resets) | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-23 15:30 UTC] auto_1hr: No config change — 5T last hour 1W4L net '-$0.25' (WLD vb- SHORT +0.11 trail, ALT vb- SHORT -0.17 hard_max_loss, ME vb- SHORT -0.11 cut-loser, GRASS pc+ -0.07 atr_sl, PUMP r2v2-long9 -0.01 trail) | 24h 19T 8W 42.1% '-$0.36' | 7d 129T 34.9% '-$3.15' — size-reduce 0.5x stays (file truth) | kill: none (volume-buildup- 3T 33.3% last hour but 14d 16T 62.5% +0.03 wins NORMAL+HIGH, no regime loses n≥20 -> keep alive) | atr_sl_hit 1/19=5.3% under 40% | no neg streak (empty 13:30 resets) | 1 open AVAX LONG bracketed | No constants change -> no signal_versions entry
