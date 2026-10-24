@@ -8025,5 +8025,24 @@
     "category": "data infrastructure",
     "status": "shipped",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T19:39:50.379802+00:00",
+    "idea": "pump-chain+ conf<30 SIZE-DAMPEN 0.25x instead of hard CONF_FLOOR block",
+    "rationale": "conf<30 owns the bleed (-1.34 of -0.48 net) but hard-block kills 5/12=41.7% of winners (fkA FAIL). Dampen keeps winners alive at smaller size; 0.25x turns cohort -1.34 into -0.34 (save +1.00) with fkA=0 by construction. Consistent with vacation size-reduce vehicle.",
+    "expected_impact": "capture ~75% of conf<30 bleed without winner-kill; monitor 7d",
+    "category": "entry sniper / sizing",
+    "status": "pre-registered",
+    "risk": "low",
+    "criteria": "ship only if CEO rejects hard CONF_FLOOR; n>=15 conf<30 fills post-ship; dampened cohort PnL improves vs pre-period; no single dampened loss >0.5% account"
+  },
+  {
+    "date": "2026-10-24T19:39:50.379805+00:00",
+    "idea": "volume-buildup- SHORT weight 1.2 (SHIPPED by signal_reporter 15:35, not auditor) — verify only",
+    "rationale": "14d 22T 68.2% +0.58, armed 14/14 +1.09 vs unarmed 0/6 -0.70; 24h carrier. Already in tree — do not double-touch.",
+    "expected_impact": "higher score rank → more vb- fills in trend",
+    "category": "entry quality",
+    "status": "shipped-by-other",
+    "risk": "low"
   }
 ]

@@ -1,35 +1,33 @@
-# Current State — daily_orchestrator 2026-10-24 16:55 UTC
-**Last Updated: 2026-10-24 16:55 UTC**
-**Updated by: daily_orchestrator — 0 trading config changes (system green, all CEO-gated items pending), 1 L1 diagnostic (shadow zero-fire: 0/10 broken). Prior: brain_auditor #121.**
+# Current State — brain_auditor #124 2026-10-24 ~19:40 UTC
+**Last Updated: 2026-10-24 19:40 UTC**
+**Updated by: brain_auditor — 0 config changes, 0 ships. Prior: daily_orchestrator 16:55.**
 
-## HEADLINE — pump-chain+ bare kill criteria ALL MET; CONF_FLOOR fkA at exact bar
-pump-chain+ bare 14d: **45T 12W 26.7% '-0.48'** — all three pre-reg kill criteria met (n≥20 ∧ PnL<0 ∧ WR<30%). Auditor cannot kill (`no_signal_enable_disable=True`). **CEO GO/NO-GO required.**
-CONF_FLOOR bare-only fkA drifted **16.7%→20.0%** (5/25; BLUR +0.01 trail_arm_timeout today tipped). Exactly at <20% bar. Money net still '+1.34'. **Do NOT ship without CEO fk definition ruling.**
+## HEADLINE — pump-chain+ kill STILL MET; CONF_FLOOR fkA corrected to 41.7% FAIL
+pump-chain+ bare 14d: **45T 12W 26.7% '-0.48'** — all kill criteria met (n≥20 ∧ PnL<0 ∧ WR<30%). 7d worse: 14T 2W 14.3% '-0.88'. **CEO GO/NO-GO required.**
+**CONF_FLOOR fkA CORRECTION:** true fkA = killed_winners/all_winners = **5/12 = 41.7% FAILS <20%**. The "20.0% exact bar" in #121 was fkB (5/25). Bare-only does NOT pass def-A. conf<30 bleed: 25T 5W '-1.34' (winners '+0.38' / losers '-1.72'). Alternative pre-registered: **conf<30 size-dampen 0.25x** (cohort → '-0.34', save '+1.00', fkA=0) if CEO rejects hard floor.
 
-## OSCILLATOR WEEKLY REVALIDATION (first KPI from #120)
-zone×phase live join n=298: **BOOST(mult>1) 48T 37.5% '-0.37' vs PENAL(mult<1) 175T 36.6% '-1.61', Fisher p=0.52 = NO separation.** Mult stays ON (post-treatment caveat; not a kill). Mult table stale on two cells (LOW:decelerating now '+0.92'/64.3% still 0.95 penal; MID:accelerating now '-0.42'/36.6% still 1.1 boost) — n=14/41 below bar, **pre-registered refresh at n≥30/cell OR Oct 31**.
-
-## T UNCLOG WAIVER RE-GRANTED + LOSERS_LONG
-T directive 15:40 UTC: new unclog waiver (expires **2026-10-27T00:00Z**), flip1_active=True. BTC moved **LOSERS→LOSERS_LONG** (UNCLOG-2 #1): size path direction-scoped correctly; HARD-BLOCK/conf-penalty in decider still direction-blind on LOSERS = BTC LONG conf also unpenalized (side effect, monitor — not a bug).
+## OPEN — 2 trades
+**BTC #16382 continuum+ LONG +1.04%** — trail armed, floor +0.966% (peak 1.1656 − 0.20), TP 80899.99. HOLD; both exits above entry. Do not touch.
+**HYPE #16383 hl_copy_trader LONG** — opened 19:22, conf 84, RSI detect 26.79 → exec 44.11 (drift +17.32 stamped). hl_copy 14d 11T 3W 27.3% '-0.13' n<20 monitor. Bracket present (SL 75.73 / TP 77.10).
 
 ## LAST-RUN VERIFY
-TAT-C #117 HOLDING (0 fires, correct-by-traffic, flag True) · precheck #118 + RSI logs #119 + UNITS RULE in tree · size-reduce **cleared 1.0x** · kill flags correct · session lock absent · protected intact · **constants git diff EMPTY** · 0 new Tracebacks.
+TAT-C #117 HOLDING (flag True, variant-C live, 0 fires = correct-by-traffic) · sweet-spot BOOST=0 #122 · contrarian join #123 live (pump-chain- flip_wr **63.9%** = Oct 27 PROMOTE) · vb- weight 1.2 in tree (signal_reporter ship, not auditor) · HML-SHADOW flowing trade_id+live_pnl · SHORT floor-45 blocking ME (RSI 33-35) · size-reduce **file absent = 1.0x** · constants **zero git diff** · 0 new Tracebacks (08:50 IndentationError = mid-edit during cell_stats, fixed 08:57).
 
-## LOSING AUTOPSY 24h n=2
-0 never-adverse / 1 recovered / **1 NEVER** (BTC CEO pending '-0.08') → **wrong-side REFUTED 48th** (#61 p=0.116, #84 t=-0.04).
+## LOSING AUTOPSY 48h n=13
+2 never-adverse / 6 recovered / **5 NEVER** (ALT/CC/ZRO vb- shorts, BTC pending, PUMP r2v2 — small, known). **Wrong-side still REFUTED** (#61 p=0.116, #84 t=-0.04).
 
 ## NUMBERS
-24h **11T 9W 81.8% '+0.87' GREEN** (vb- SHORT carrier 6T 83.3% '+0.55') | 7d 124T 41.1% '-0.93'.
-**Mandate 14d:** trail proxy **163T 74.8% '+10.81'** vs stop-ish **169T 0.6% '-14.45'** | hard_max_loss **70T 0W '-6.69'** (100% never-armed chop) | atr_sl_hit **81T 1W '-5.86'** (round-trip mfe≥0.40 = 31T 1W '-1.89').
-
-## OPEN — BTC #16382 continuum+ LONG
-conf 49.5, entry 79658, SL 78744, TP 80852. Contrarian (RSI detect 27.48 → exec 40.24, drift +12.76). Against SHORT_BIAS/BEAR_TREND, volume_spike 0.74 (<1.0). continuum+ LONG 30d 2T 0W '-0.21'. **Hold bracket; monitor — countertrend.**
+24h **9T 7W 77.8% '+0.82' GREEN** (carrier volume-buildup- SHORT 5T 80% '+0.51') | 7d 123T 40.7% '-0.98'.
+**14d:** ARMED 159T 69.2% '+9.30' vs UNARMED 165T 6.1% '-13.07' | round-trips 43T 0W '-2.41' (pump-family 27T '-1.61') | hard_max_loss 69T 0W '-6.66' | atr_sl_hit 81T 1W '-5.86'.
 
 ## READINESS
-Regime: SHORT_BIAS all sources, continuum BELOW, vol LOW. **SHORTs aligned; LONGs only on sustained EMA300 reclaim WITH volume; trail-family first; size 1.0x.**
+Regime: thin broad bounce inside 4h SHORT_BIAS (watchdog 19:14). volume_ratio 0.23 = no chase longs. LONG #16382 already armed (hold ≠ re-enter). SHORT floor-45 active. size 1.0x.
 
 ## CEO STACK
-**pump-chain+ kill GO/NO-GO** → CONF_FLOOR **fk definition ruling** (fkA 20.0% exact bar) | TAT-C live (veto = flag False) | **Oct-25 eval batch** (HML-SHADOW, MFE-CUT, UGB, exit-ladder, re-enter-on-recovery) | **Oct-27** contrarian PROMOTE (needs outcome-join first) + unclog waiver expiry.
+**pump-chain+ kill GO/NO-GO** → **CONF_FLOOR: fkA 41.7% FAIL / fkB 20.0% at bar — definition ruling OR accept size-dampen 0.25x alternative** | TAT-C live (veto = flag False) | **Oct-25 eval batch** (HML-SHADOW, MFE-CUT, UGB, exit-ladder, re-enter-on-recovery) | **Oct-27** contrarian PROMOTE (flip_wr 63.9%) + unclog waiver expiry.
 
 ## CREATIVE (this run)
-(1) Oscillator mult cell refresh pre-registered (n<30 bar). (2) floor_overrode_pp re-poll dedup (401 entries, 9/200 matchable = BTC noise). (3) continuum+ LONG BEAR volume gate — monitor only (n=2).
+(1) conf<30 size-dampen 0.25x pre-registered (criteria in audit_recommendations.json). (2) vb- weight 1.2 verified as other-agent ship — auditor will measure impact next run, not double-touch.
+
+## ESCALATION #17 (34th)
+exit-ladder / peak-trail candle OOS still not commissioned — blocks largest recovery path (43T RT '-2.41').
