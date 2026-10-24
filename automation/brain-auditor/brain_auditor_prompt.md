@@ -103,7 +103,30 @@ for r in results:
 
 We're collecting counterfactual data on what WOULD have happened. This is gold — analyze it every run.
 
-### Shadow Data Sources:
+### Use the shadow-mode-analysis skill:
+```bash
+# Full shadow report
+python3 scripts/shadow_trader.py --report
+
+# HML threshold + dead signals
+python3 scripts/shadow_trader.py --analyze-hml
+
+# Exit engine comparison
+python3 scripts/shadow_trader.py --analyze-exits --exit-signal <signal_type>
+
+# SL level sweep (find optimal stop-loss)
+python3 scripts/shadow_trader.py --sweep-sl
+
+# Flip test (test if reversing a losing signal would be profitable)
+python3 scripts/shadow_trader.py --flip-test --flip-signal <signal_type>
+
+# Arm timeout sweep
+python3 scripts/shadow_trader.py --sweep-arm --sweep-signal <signal_type> --sweep-dir <direction>
+```
+
+**Full skill reference:** `/root/.hermes/skills/shared/shadow-mode-analysis/SKILL.md`
+
+### Shadow Data Sources (raw files):
 
 ```python
 import json
