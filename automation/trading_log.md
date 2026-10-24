@@ -15045,3 +15045,23 @@ Final set: ['BTC', 'ME', 'PUMP']
 **Open Questions:**
 - 24h +$0.82 (77.8% WR) still GREEN; 7d still -$0.98
 - Signal flow low + hotset 0-token fallback (chronic)
+
+## 2026-10-24 20:27 UTC Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.24 (WR: 100%) | 24h: 11T 9W 81.8% `+$1.06` (GREEN) | 7d: 125T 52W 41.6% `-$0.74` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 trades closed: BTC ai-trader-pending LONG HL_CLOSED +$0.12 (+1.08%), BTC continuum+ LONG profit-monster-trail +$0.12 (+2.72%)
+- atr_sl_hit 0/11 = 0% (<40%) — dominant close = profit-monster-trail (6T +$0.63)
+- No 0%WR signal with 3+ trades; n>=3 24h signals healthy (volume-buildup- 5T 4W 83.3% +$0.51, ai-trader-pending 3T 2W +$0.08)
+- No negative-hour streak (15:00 +$0.23, 20:00 +$0.24 — both positive)
+- Frequency 2/hr — not overtrading
+- 1 open: HYPE hl_copy_trader LONG +0.41% (opened 19:22)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h +$1.06 (81.8% WR) GREEN; 7d still -$0.74 but improving
+- Signal flow low + hotset 0-token fallback (chronic)
