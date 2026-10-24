@@ -1,114 +1,120 @@
 {
-  "timestamp": "2026-10-24T04:38:11Z",
-  "run": 113,
-  "session_lock": "absent",
-  "vacation_mode": true,
-  "size_reduce": "1.0x (file absent)",
-  "config_changes_applied": [],
-  "headline": "HOTSET STARVATION REFUTED AS COST — blocked-candidate census: 52 measurable, 30m fwd -0.171% avg, taking all = -$0.89 at $10 notional, pos/neg t=8.00. Gates correctly sort signal from noise; idle is correct in chop-pin. steer-001 vb- retraction stands 16th run. Wrong-side refuted 42nd run. 0 config changes.",
+  "timestamp": "2026-10-24T05:42:56.347619+00:00",
+  "run": 107,
+  "session_brain_stats": {
+    "note": "session_brain queried; no new insights beyond prior runs (dup-heavy, known)"
+  },
   "trade_summary_24h": {
     "trades": 20,
+    "wins": 9,
     "wr": 45.0,
     "pnl": -0.08,
-    "long": "7T 14.3% -0.39",
-    "short": "13T 61.5% +0.31",
-    "open": 0,
-    "flat_reason": "EMA300 chop-pin, gates correctly blocking"
+    "direction_split": {
+      "SHORT": "13T 8W 61.5% +0.31",
+      "LONG": "7T 1W 14.3% -0.39"
+    },
+    "note": "SHORT remains winning side. Book flat since 23:14Z (6h18m starvation)."
   },
-  "trade_summary_windows": {
-    "7d": "120T 40.0% -1.17",
-    "14d": "341T 36.4% -4.57",
-    "30d": "700T 43.0% -5.04"
+  "trade_summary_7d": {
+    "trades": 120,
+    "wr": 40.0,
+    "pnl": -1.17
   },
-  "mandate_fresh": {
-    "trail_family_14d": "138T 79.0% +9.87",
-    "hard_max_loss_14d": "75T 0.0% -7.47",
-    "reached_arm_14d": "138T 79.0% +9.87",
-    "never_arm_14d": "203T 7.4% -14.44",
-    "atr_sl_hit_14d": "83T 1.2% -5.96 armed=0 (escalation #17, 64th)"
+  "trade_summary_14d": {
+    "trades": 341,
+    "wr": 36.4,
+    "pnl": -4.57,
+    "armed": "138T 79.0% +9.87",
+    "unarmed": "203T 7.4% -14.44",
+    "reached_arm": "166T 68.7% +9.31",
+    "never_arm": "175T 5.7% -13.88"
   },
-  "watchdog_triage": {
-    "steer-001_volume-buildup_disable": "RETRACTION HOLDS 16th run — DO NOT DISABLE. 14d vb- SHORT 20T 70% +0.39. All 4 recent losses were RSI 35-44 waiver-band class, now re-blocked by expired waiver gate (flip1_active=False, 0 trades post-lapse).",
-    "hotset_starvation_red": "DIAGNOSED + MEASURED. 257 cycles 0 entries. Root cause: EMA300 chop-pin + flip-rate 31/24h>=p95. Blocked-candidate census (n=52 measurable): gates blocked would-be net LOSERS (-$0.89 at $10). No gate loosening. Idle = correct posture. Escalation returned to watchdog with data — parameter fix NOT warranted.",
-    "ema300_short_favor": "STANDS condition-locked: shorts only while 1m holds below ~80970, longs only on 15-30m sustained reclaim WITH volume.",
-    "zora_long_watchlist": "AI_TRADER_ENABLED=False, will not execute — noted."
+  "starvation_analysis": {
+    "status": "VERIFIED — multi-gate stacking, correct flat behavior in chop",
+    "duration": "6h18m (last open 23:14Z Oct 23)",
+    "hotset": "0 tokens for 300+ cycles",
+    "gate_kills_6h": {
+      "CONTINUUM-BLOCK": 84,
+      "SHORT-RSI-HARD-FLOOR": 43,
+      "LONG-NEUTRAL": 43,
+      "VOL-GATE-BYPASS": 34,
+      "PUMP-CHAIN-SHORT-HIGH": 32,
+      "PUMP-CHAIN-RSI-MAX": 32,
+      "OVERSOLD-SHORT": 20,
+      "LONG-NEUTRAL-CHOP": 20
+    },
+    "verdict": "Gates are individually correct. SHORTs blocked by RSI floor + vol-gate + RR-engine. LONGs blocked by continuum + 4h NEUTRAL. No signal passes ALL gates simultaneously. This IS chop — staying flat is correct per mandate."
   },
-  "blocked_candidate_census_2026-10-24": {
-    "method": "compactor.log block lines today -> 1m candles forward 30m, direction-aware",
-    "measurable": "52/60",
-    "pos_rate": "18/52 (35%)",
-    "avg_fwd": "-0.171%",
-    "net_if_all_taken_10usd": "-0.89 USDT pre-fee",
-    "pos_vs_neg_tstat": 8.0,
-    "verdict": "GATES CORRECT — starvation is correct-by-configuration in chop-pin. Taking blocked candidates loses money.",
-    "worst_gates_saved_most": "PUMP-CHAIN-SHORT-HIGH -0.514%, PUMP-CHAIN-RSI-MAX -0.483%, CONTINUUM-BLOCK -0.401%",
-    "marginal_gates_watch": "SHORT-NEUTRAL n=10 avg -0.027% (wash) — pre-registered watch; if fwd avg turns positive n>=15, re-examine neutral bypass for volume-buildup-"
+  "waiver_expiry_verification": {
+    "flip1_active": false,
+    "post_expiry_SHORT_opens_RSI_lt45": 0,
+    "verdict": "PASS — waiver expired cleanly at 00:00Z, 0 violations, gate live"
   },
-  "losing_autopsy_48h": {
-    "n": 12,
+  "entry_regime_4h_verification": {
+    "fix_present": true,
+    "traffic_tested": true,
+    "coverage": "3/4 trades since fix have entry_regime_4h populated",
+    "gap": "MON #16375 has None — possible code path gap (not decider_run)",
+    "verdict": "PASS with minor gap noted"
+  },
+  "losing_autopsy": {
+    "method": "recovery_replay adverse-first (--selfcheck PASS)",
+    "24h_n": 11,
     "never_adverse": 2,
-    "recovered_after_adverse": 5,
-    "never_traded_back": 5,
-    "never_cohort": "ALT/CC/ZRO volume-buildup- SHORT (waiver-band RSI<45, NOW BLOCKED) + BTC ai-trader-pending + PUMP r2v2-long9 giveback",
-    "wrong_side": "REFUTED 42nd consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "new_patterns": 0
+    "recovered": 4,
+    "never": 5,
+    "never_class": "4/5 are RSI<45 vb-/ai-trader class = waiver-band, correctly blocked post-expiry",
+    "wrong_side": "REFUTED 38th consecutive run"
   },
-  "conf_floor_status": {
-    "blocked_14d": "42T -1.71",
-    "fk_family": "7/24 pc winners = 29.2% FAIL",
-    "fk_literal": "7/124 all winners = 5.6% PASS",
-    "verdict": "STILL GATED ON CEO fk-ruling — definitions disagree, ship bare-only when CEO rules"
-  },
-  "tat_status": {
-    "fires_14d": "15 fires / 12 unique tokens",
-    "variant_c": "AWAITING CEO GO (fk 0/7, +0.410, p=0.016 at last measure)"
+  "creative_findings": {
+    "short_rsi_band_analysis": {
+      "finding": "SHORT approval floor at 45 admits worst band (45-55: 18.5% WR, -1.22) while blocking profitable band (35-45: 44.2% WR, +0.22)",
+      "significance_14d": "Fisher p=0.0386 (significant)",
+      "significance_30d_OOS": "Fisher p=0.1938 (NOT significant — effect direction consistent but noisy)",
+      "arm_rate": "35-45: 39.5% arm vs 45-55: 14.8% arm (2.7x difference)",
+      "verdict": "DIRECTIONALLY STRONG but fails OOS significance bar. Pre-register for CEO review — directly informs waiver extension decision.",
+      "confounder": "35-45 includes waiver-period trades (Oct 23: 11T) but also pre-waiver (Oct 13: 18T 33.3% WR)"
+    }
   },
   "pre_reg_rechecks": {
-    "conf30_nonpump_sentinel": "12T -0.09 wash — trigger n>=20 AND PnL<=-1.00 NOT met",
-    "pump_chain_plus_kill": "NOT MET (14d 44T 25% -0.49 but 30d positive historically; CONF_FLOOR targets bleed)",
-    "pump_chain_minus_cancel": "STANDS",
-    "escalation_17": "64th request — candle-aware arming, atr_sl_hit 83T armed=0/83"
+    "CONF_FLOOR_pc-_only": "blocked 10T 1W -0.19, winners 8, fkA=12.5% PASS (better than combined 26.3%)",
+    "CONF_FLOOR_combined": "blocked 34T 5W -1.54, fkA=26.3% FAIL",
+    "TAT_variant_C": "0 in-scope ai-trader+ fires since #39 scope fix — still awaiting",
+    "pc-_CANCEL": "stands (bare 14d 35T -0.30, CONF_FLOOR covers)",
+    "pc+_kill": "NOT MET (30d 69T +1.78 positive)",
+    "vb-_steer001": "STALE — 7d 12T 58.3% +0.01, losses are all <45 band (correctly blocked post-waiver)"
   },
-  "deep_dive_targets": {
-    "new_sub50_n15": 0,
-    "owned": "bb-bounce->TAT | ai-trader->CEO | doji killed Oct16 | pc+->CONF_FLOOR | pc-->CANCEL | ai-trader-manual positive PnL"
-  },
-  "last_run_verify_112": {
-    "waiver_gate": "PASS flip1_active=False, 0 trades post-lapse",
-    "constants_git_diff": "CLEAN",
+  "last_run_verify": {
+    "waiver_expiry": "PASS (flip1_active=False, 0 violations)",
+    "entry_regime_4h": "PASS (3/4 traffic coverage, 1 gap)",
+    "recovery_replay": "PASS (selfcheck)",
+    "size_reduce": "CLEARED 22:57Z (file absent)",
     "protected_flags": "13/13",
-    "kill_flags": "correct (doji/oversold-bounce/vb+ all False, 0 post-kill opens)",
-    "size_reduce": "1.0x file absent = truth",
-    "tracebacks": "4 in pipeline.log all Oct 11, none new",
-    "recovery_replay_selfcheck": "PASS"
+    "constants_git_diff": "EMPTY",
+    "kill_flags": "correct, 0 post-kill opens",
+    "tracebacks": "4 total, none new (last Oct 11)",
+    "session_lock": "absent"
   },
-  "drift": {
-    "vacation_mode": "true 20th run (T/CEO: off when ready — blocks CONF_FLOOR, TAT GO, fk ruling)",
-    "session_brain_dup": "still heavy",
-    "entry_regime_4h": "still untested by traffic (0 trades opened)"
-  },
-  "next_actions": [
-    "CEO: fk-ruling (2 defs) -> CONF_FLOOR bare ships",
-    "CEO: TAT variant-C GO",
-    "CEO: vacation_mode off",
-    "Escalation #17 (64th): candle-aware arming vehicle = Oct 25 BE-at-arm 1m replay",
-    "Watch SHORT-NEUTRAL marginal gate (n=10 wash) — census re-run when starvation recurs",
-    "Reclaim readiness: trail-family first (continuum-trend+, bb-squeeze+) on 15-30m hold above 80970 WITH volume"
-  ],
-  "creative_ideas": [
+  "config_changes_applied": [],
+  "changes_from_last_run": [
     {
-      "idea": "Blocked-candidate census as standing gate-effectiveness KPI",
-      "rationale": "Watchdog escalated starvation as cost; measured answer: gates blocked net losers. Pre-register trigger: if blocked fwd avg > 0 with n>=20 and t>2, gates over-blocking -> re-examine.",
-      "category": "instrumentation",
-      "status": "shipped-as-one-shot this run; re-run inline when starvation recurs",
-      "risk": "zero (read-only)"
+      "change": "#102 waiver expiry gate",
+      "status": "LIVE and verified — 0 violations, flip1_active=False"
     },
     {
-      "idea": "SHORT-NEUTRAL gate watch (marginal band)",
-      "rationale": "Largest single blocker today (n=10) but avg fwd -0.027% = wash, not clearly bad. volume-buildup- already has confluence standalone bypass but not SHORT-NEUTRAL bypass. If census re-run shows positive fwd at n>=15, propose vb- SHORT-NEUTRAL exemption with fresh fk.",
-      "category": "entry sniper",
-      "status": "pre-registered",
-      "risk": "low (data-gated)"
+      "change": "size-reduce auto-clear",
+      "status": "CLEARED 22:57Z — file absent, correct"
+    },
+    {
+      "change": "entry_regime_4h fix",
+      "status": "TESTED by traffic — 3/4 coverage, 1 gap (MON)"
     }
+  ],
+  "next_actions": [
+    "CEO: waiver extension decision — market still SHORT_BIAS, 35-45 band data supports extension (p=0.039 14d)",
+    "CEO: CONF_FLOOR fk ruling — bare-only passes (12.5%), combined fails (26.3%)",
+    "CEO: TAT variant-C GO — still 0 in-scope fires, not ready",
+    "Monitor: entry_regime_4h MON gap — check code path",
+    "Monitor: starvation — if regime shifts (EMA300 reclaim), generators should resume"
   ]
 }

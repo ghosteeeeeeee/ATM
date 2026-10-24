@@ -7734,5 +7734,30 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "low (data-gated)"
+  },
+  {
+    "date": "2026-10-24T05:42:56.347619+00:00",
+    "run": 107,
+    "idea": "SHORT RSI band re-evaluation: floor at 45 admits worst band (45-55: 18.5% WR) while blocking profitable band (35-45: 44.2% WR)",
+    "rationale": "14d: 35-45 band 43T 44.2% +0.22 vs 45-55 band 27T 18.5% -1.22, Fisher p=0.0386. Arm-rate 39.5% vs 14.8%. 30d OOS: direction consistent but p=0.194 (not significant). Directly informs waiver extension decision.",
+    "expected_impact": "If floor lowered to 35 (bear-structure only): admits 35-45 band which is +0.22/14d. If floor raised to 55: skips bad 45-55 band. Needs CEO ruling + OOS validation.",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "medium — 30d OOS not significant, waiver-period confounder present",
+    "significance": {
+      "14d_p": 0.0386,
+      "30d_OOS_p": 0.1938,
+      "direction_consistent": true
+    }
+  },
+  {
+    "date": "2026-10-24T05:42:56.347619+00:00",
+    "run": 107,
+    "idea": "Starvation root-cause documentation: multi-gate stacking creates dead zone in chop regime",
+    "rationale": "6h18m starvation verified. Gate kills: CONTINUUM-BLOCK 84, SHORT-RSI-HARD-FLOOR 43, LONG-NEUTRAL 43, VOL-GATE-BYPASS 34, PUMP-CHAIN-SHORT-HIGH 32. No signal passes ALL gates. This is correct behavior in chop — not a bug.",
+    "expected_impact": "Zero code. Documents that starvation = correct flat behavior. Prevents future misdiagnosis as system failure.",
+    "category": "meta",
+    "status": "documented",
+    "risk": "none"
   }
 ]
