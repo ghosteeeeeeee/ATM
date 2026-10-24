@@ -325,7 +325,7 @@ def precheck(coin, direction, conf=None):
                             if _pre_on:
                                 _band_note = f' | PIPELINE: [{OVERSOLD_SHORT_RSI_MAX},{SHORT_RSI_HARD_FLOOR}) EXECUTES under BTC bear structure (CEO unclog 2026-10-22)'
                             else:
-                                _band_note = f' | PIPELINE: [{OVERSOLD_SHORT_RSI_MAX},{SHORT_RSI_HARD_FLOOR}) BLOCKED (unclog waiver expired 2026-10-24)'
+                                _band_note = f' | PIPELINE: [{OVERSOLD_SHORT_RSI_MAX},{SHORT_RSI_HARD_FLOOR}) BLOCKED (unclog waiver lapsed — see vacation_mode.json unclog_waiver.expires)'
                 except Exception:
                     pass
             check(f'RSI {rsi_short_min}-{rsi_short_max}', passed, f'RSI={rsi:.1f}{_band_note}')

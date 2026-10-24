@@ -242,6 +242,14 @@ def run():
         for token, token_stats in stats.items():
             if token in current_losers or is_blacklisted(token):
                 continue
+            # CEO UNCLOG-2 #1 guard (consult 20261024T154339Z, code review 89047f90):
+            # tokens already scoped to a DIRECTION set are already-flagged
+            # underperformers — re-adding them to the direction-blind legacy LOSERS
+            # would resurrect the exact bug UNCLOG-2 removed (dry-run: this loop would
+            # have re-ADDed BTC on 2026-10-25 06:05 at low_wr 46.2%, zeroing BTC
+            # SHORT conf again within 14h of the fix shipping).
+            if token in LOSERS_LONG or token in LOSERS_SHORT:
+                continue
 
             wr = token_stats['winrate']
             pnl = token_stats['total_pnl_usdt']

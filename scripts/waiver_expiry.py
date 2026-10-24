@@ -1,7 +1,10 @@
 """waiver_expiry.py — CEO unclog flip#1 expiry gate (single source of truth).
 
 WHY THIS EXISTS (brain_auditor run #102, 2026-10-23):
-data/vacation_mode.json records `rules.unclog_waiver.expires` = 2026-10-24T00:00:00Z
+data/vacation_mode.json records `rules.unclog_waiver.expires`
+(initially 2026-10-24T00:00:00Z; re-armed by T directive 2026-10-24 →
+2026-10-27T00:00:00Z — _selfcheck derives its probes from the file, never from
+a hardcoded date)
 but NOTHING read it. Every audit run since #93 planned "the waiver lapses Oct 24"
 and no code path was ever going to do it — the [35, floor) SHORT band would have
 kept firing after T's stated expiry, silently.
@@ -64,9 +67,18 @@ def flip1_active(now=None):
 def _selfcheck():
     import paths
     real_data = paths.HERMES_DATA
-    before = datetime.datetime(2026, 10, 23, 23, 59, 59, tzinfo=datetime.timezone.utc)
-    after = datetime.datetime(2026, 10, 24, 0, 0, 1, tzinfo=datetime.timezone.utc)
-    at = datetime.datetime(2026, 10, 24, 0, 0, 0, tzinfo=datetime.timezone.utc)
+    # CEO UNCLOG-2 follow-up (code review 89047f90): probes derive from the FILE's own
+    # expires — the old hardcoded 2026-10-24 fixture broke the moment the waiver was
+    # re-armed (2026-10-27), and brain_auditor runs this every audit: a fixture
+    # failure would burn audit time looking at healthy gate code.
+    with open(os.path.join(real_data, 'vacation_mode.json')) as f:
+        _exp_str = json.load(f)['rules']['unclog_waiver']['expires']
+    _exp = datetime.datetime.fromisoformat(str(_exp_str).replace('Z', '+00:00'))
+    if _exp.tzinfo is None:
+        _exp = _exp.replace(tzinfo=datetime.timezone.utc)
+    before = _exp - datetime.timedelta(seconds=1)
+    at = _exp
+    after = _exp + datetime.timedelta(seconds=1)
 
     assert flip1_active(now=before) is True, 'must be active before expiry'
     assert flip1_active(now=after) is False, 'must lapse at expiry'

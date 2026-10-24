@@ -2816,6 +2816,15 @@ def _check_hotset_cooldown(token: str, direction: str, failures: dict) -> tuple:
         dir_failures['last'] = 0
         failures[token][direction] = dir_failures
         _save_hotset_failures(failures)
+    # CEO UNCLOG-2 #2 follow-up (code review 89047f90): stale count==1 entries never
+    # decayed (reset path only ran at count>=2) — one genuine failure on a months-old
+    # refusal would arm a fresh 1h cooldown. Expire single-failure entries past the
+    # window; a fresh (<1h) first failure still counts toward the 2-strike rule.
+    if 0 < dir_count < 2 and (now - dir_last) >= COOLDOWN_SECS:
+        dir_failures['count'] = 0
+        dir_failures['last'] = 0
+        failures[token][direction] = dir_failures
+        _save_hotset_failures(failures)
     
     # Check if opposite direction has failures (to allow opposite signals through)
     opp_count = opp_failures.get('count', 0)
