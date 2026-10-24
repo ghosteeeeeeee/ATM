@@ -1783,3 +1783,8 @@
 - **INFO**: pipeline log reports "20 closed today" but PostgreSQL calendar-day count = 1 closed (−0.08 USDT); the 20 are a rolling-24h window (max close_time 00:00:19 UTC). Reporting discrepancy only, not data loss.
 - **INFO**: `hermes-atr-sl-updater.timer` shows as not-found in list-units (unit renamed to `-DEFUNCT`) — harmless stale reference.
 - **AUTO-FIX**: none required — vacation_pause.json absent; price-collector/1m-candle/pipeline/watchdog timers all active; pipeline rc=0 at 06:42 & 06:44, 0 tracebacks; prices fresh (75s, 130 tokens); 1 open trade; 0 phantom trades (atr_sl_hit <0.01%) in 24h; regime SHORT_BIAS.
+
+## Error Alerts — 2026-10-24 07:46 UTC
+- **WARN** (1x): disk 85% used (95G/118G, 17G free) after journal vacuum + tmp/pip cache cleanup (freed ~1G, 86%→85%). Remaining hogs need CEO approval: /root/.local/share/opencode 12G, /usr 32G, /root/.cache 3.5G (camoufox 1.4G + playwright 910M + puppeteer 651M).
+- **INFO**: "CRASH" grep hit in pipeline log = `BTC-CRASH` warning label, not a traceback. 0 real tracebacks in 30m.
+- **AUTO-FIX**: log cleanup applied (gzip >7d logs, journal vacuum 300M, tmp >7d purge, pip cache purge). No service restarts needed — vacation_pause absent, all core timers active, pipeline rc=0 at 07:42.
