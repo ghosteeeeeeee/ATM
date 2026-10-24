@@ -7989,5 +7989,32 @@
     "status": "monitor",
     "risk": "n too small — do not ship",
     "date": "2026-10-24"
+  },
+  {
+    "date": "2026-10-24T17:44:57Z",
+    "idea": "LONG_RSI_SWEET_SPOT_BOOST killed (10→0) — pre-reg trigger fired, edge decayed post-concentration",
+    "rationale": "Watchdog steer #4 flagged 7d LONG 45-60 as largest bleed bucket (n=43 37.2% -1.62). Audit found: (a) code already narrowed to 55-60 on Oct 16, watchdog prose was stale; (b) the 55-60 band itself decayed after concentration (19T 42.1% -0.86 post vs 14T 50% +0.60 pre); (c) pre-reg revert trigger HIT on both conditions (14d PnL -0.26, WR 45.5%). Block of 45-60 REJECTED (fk 38-55% all windows). BOOST=0 shipped.",
+    "expected_impact": "Removes +10 conf boost from a net-negative band. Reduced frequency of 55-60 LONGs. Neutral-to-positive EV.",
+    "category": "entry sniper",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T17:44:57Z",
+    "idea": "SHORT RSI_CEILING=65 may be cutting the winning >=65 cell — 14d 65+ SHORT 7T 71.4% +0.42 (ceiling blocks at approval; these trades passed via other paths)",
+    "rationale": "14d SHORT 65+ = 7T 71.4% +0.42 while 30d 65+ = 18T 55.6% -0.68. 60-65 = 7T 57.1% +0.55 (14d). Ceiling was set on older 65+ bleed data. Not shipped — 30d still negative, n small. Monitor: if 14d 65+ stays positive at n>=15, propose ceiling 65→70 revert.",
+    "expected_impact": "If shipped later: +0.42/14d from re-opening 65+ SHORT. Risk: 30d says -0.68.",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-24T17:44:57Z",
+    "idea": "Oscillator shadow actual_outcome is ALWAYS None (24598 entries, 0 resolved) — structural data gap",
+    "rationale": "Every oscillator_shadow.json entry has actual_outcome=None. The shadow records would_be_multiplier at write time but never joins back to trade outcomes. The Oct 20 weekly revalidation (#120) had to use a separate live trades join. The shadow file itself is unusable for multiplier efficacy. Same pattern in contrarian_shadow (807 ALL write-time-classified LOSER, 0 outcome-resolved — known, blocks Oct 27 PROMOTE).",
+    "expected_impact": "If fixed: oscillator multiplier table becomes self-validating. If not: weekly revalidation continues via live join (works, but shadow file is dead weight for efficacy questions).",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

@@ -2313,5 +2313,16 @@
     "after": "UNITS RULE + run #119 case (+$145pp flawed vs +$0.19 corrected) before BASH QUOTING RULE",
     "rationale": "run #119 first-cut atr_sl hold counterfactual compared unleveraged price moves to leveraged pnl_pct and would have justified an SL-widening ship",
     "impact": "prevents class of false-positive exit counterfactuals"
+  },
+  {
+    "timestamp": "2026-10-24T17:44:57Z",
+    "agent": "brain_auditor",
+    "change": "LONG_RSI_SWEET_SPOT_BOOST 10→0 — pre-reg revert trigger HIT (14d 55-60 PnL -0.26<0 AND WR 45.5%<48%); post-10-16 edge decayed (19T 42.1% -0.86 vs pre 14T 50% +0.60); BOOST=0 stops amplifying decayed band without reopening 40-55 bleed (14d -2.56)",
+    "type": "tweak",
+    "file": "hermes_constants.py",
+    "before": "LONG_RSI_SWEET_SPOT_BOOST = 10",
+    "after": "LONG_RSI_SWEET_SPOT_BOOST = 0",
+    "rationale": "Pre-registered revert trigger on the sweet-spot boost fired. Literal pre-reg action (restore MIN=40) would amplify the 40-55 band which is now clear bleed (14d 73T 34.2% -2.56 / 30d -1.40). BOOST=0 is the correct deviation: stops boosting decayed 55-60 without reopening bleed. Blocks nothing (confidence-only lever).",
+    "impact": "Fewer marginal 55-60 LONGs clear confidence gates. Band is net-negative post-concentration so reduced frequency is +EV. fk not applicable (not a hard block)."
   }
 ]

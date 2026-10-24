@@ -986,14 +986,16 @@ CONTRARIAN_ZONE_POSITION_SIZE_MULT = 0.5   # position size multiplier (marginal 
 
 # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
 # brain_auditor 2026-10-16: MIN 40→55 — 40-55 window is wash/bleed, not sweet.
-# 30d meta-RSI fine bands (verified PG): 55-60 = 72T 59.7%WR +$3.82 t=2.20 (SIG, OOS both 14d +$1.31 / 30d +$3.82);
-# 50-55 = 71T −$0.72 t=-0.48 (was inside old window — dead weight); 45-50 = 29T +$0.22 wash; 40-55 = 147T +$0.14 t=0.07.
-# 60-65 NOT included: 30d 95T +$0.02 t=0.01 wash (14d +$0.82 positive but fails longer-window OOS).
-# Blocks nothing — only boosts confidence for entries already in the sweet spot.
-# Revert trigger: 14d 55-60 PnL < $0 or WR < 48% → restore MIN=40.
-LONG_RSI_SWEET_SPOT_MIN = 55  # was 40 — 40-55 is wash/bleed, only 55-60 is significant profit band
-LONG_RSI_SWEET_SPOT_MAX = 60  # 55-60 only: 30d t=2.20; do NOT extend to 65 (60-65 30d wash t=0.01)
-LONG_RSI_SWEET_SPOT_BOOST = 10  # confidence points added when RSI in sweet spot
+# brain_auditor 2026-10-24 #122: BOOST 10→0 — pre-reg revert trigger HIT (14d 55-60
+# PnL '-0.26' < 0 AND WR 45.5% < 48%). Post-10-16 (boost active on 55-60 only):
+# 19T 42.1% '-0.86' vs pre-10-16 14T 50.0% '+0.60' — edge decayed after concentration.
+# Pre-reg said restore MIN=40, but 40-55 has since become clear bleed (14d 73T 34.2%
+# '-2.56' / 30d 146T 45.2% '-1.40') — restoring MIN=40 would amplify a bleed band.
+# BOOST=0 stops amplifying the decayed 55-60 without reopening 40-55. Blocks nothing.
+# Re-boost trigger: 14d 55-60 PnL > +$0.50 AND WR > 50% AND Fisher p<0.05 vs 30-45.
+LONG_RSI_SWEET_SPOT_MIN = 55  # kept — window bounds unused while BOOST=0
+LONG_RSI_SWEET_SPOT_MAX = 60
+LONG_RSI_SWEET_SPOT_BOOST = 0  # was 10 — band decayed (see 2026-10-24 comment)
 
 # ── LONG mid-band chop block: skip LONG when RSI 60-70 outside EXTREME ──────
 # Death zone (meta-RSI): breakout signals (volume-breakout, pump-chain, r2v2)
