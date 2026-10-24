@@ -14730,3 +14730,35 @@ Final set: ['BTC']
 - 24h still -$0.08, flat across quiet hours — no action on empty hours
 - Signal flow still low + hotset 0-token fallback (chronic)
 - CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings
+
+## FAVORITES Update — 2026-10-24 06:00 UTC
+- Regime: SHORT_BIAS
+- DEMOTE WLD (WR=50.0%, PnL=$-0.01, 1 consecutive bad days, regime=SHORT_BIAS)
+
+Final set: []
+
+## LOSERS Update — 2026-10-24 06:05 UTC
+- ADD ME (WR=40.0%, PnL=$-0.30, low_wr (40.0%))
+- ADD PUMP (WR=20.0%, PnL=$-0.28, low_wr (20.0%))
+
+Final set: ['BTC', 'ME', 'PUMP']
+
+## 2026-10-24 06:28 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 20T 9W 45.0% `-$0.08` | 7d: 120T 48W 40.0% `-$1.17` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — quiet
+- 1 open: BLUR pump-chain+ LONG -0.18% (bracketed)
+- atr_sl_hit 1/20 = 5.0% (<40%) — dominant close = profit-monster-trail (9T +$0.59)
+- No 0%WR signal with 3+ trades last hour (0 trades)
+- No negative-hour streak (empty hour resets)
+- Frequency 0/hr — not overtraded
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flat at -$0.08 across quiet hours
+- Signal flow low + hotset 0-token fallback (chronic)
