@@ -65,6 +65,7 @@ from hermes_constants import (
     WALL_ST_CYCLE_ENABLED, WALL_ST_CYCLE_PLUS_ENABLED, WALL_ST_CYCLE_MINUS_ENABLED,
     TREND_IGNITION_ENABLED, TREND_IGNITION_PLUS_ENABLED, TREND_IGNITION_MINUS_ENABLED,
     HMACD_MTF_PLUS_ENABLED, HMACD_MTF_MINUS_ENABLED,
+    VOLMOM_ENABLED, VOLBREAK_CONT_ENABLED,
 )
 
 
@@ -490,6 +491,16 @@ try:
 except Exception:
     _wyckoff_run = None
 
+try:
+    from signals.vol_momentum import run as _vol_momentum_run
+except Exception:
+    _vol_momentum_run = None
+
+try:
+    from signals.volbreak_cont import run as _volbreak_cont_run
+except Exception:
+    _volbreak_cont_run = None
+
 
 # ── Signal Registry ───────────────────────────────────────────────────────────
 # Each entry: {'name': '<name>', 'enabled': <flag>, 'run': <callable>}
@@ -582,6 +593,9 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'mtf_macd',                  'enabled': 'HMACD_MTF_PLUS_ENABLED',    'run': _mtf_macd_run},
     # wyckoff: PLUS/MINUS checked inside run(); registry gate is True so either direction can fire.
     {'name': 'wyckoff',                   'enabled': True,                        'run': _wyckoff_run},
+    # NEW 2026-10-24 shadow-data mining (brief-signal-analyst-new-signals) — SHADOW MODE (disabled)
+    {'name': 'vol_momentum',              'enabled': 'VOLMOM_ENABLED',            'run': _vol_momentum_run},
+    {'name': 'volbreak_cont',             'enabled': 'VOLBREAK_CONT_ENABLED',     'run': _volbreak_cont_run},
 ]
 
 # ── Registry sanity check (BUG-048, 2026-10-11) ──────────────────────────────

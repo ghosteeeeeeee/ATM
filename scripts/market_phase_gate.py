@@ -37,7 +37,10 @@ FAMILY_MAP = {
                  # Backtest hermes_constants.py: EXTREME 99T 58.6%WR +$5.69 (keep);
                  # HIGH 91T 51.6%WR -$2.38 / NORMAL 79T 45.6%WR -$1.38 (no edge → gated).
                  # NORMAL inherits ('NORMAL','*')['Momentum']=0.0; HIGH explicit 0.0 in v2.
-                 'trend-ride', 'trend-ride+', 'trend_ride', 'trend_ride_long'],
+                 'trend-ride', 'trend-ride+', 'trend_ride', 'trend_ride_long',
+                 # Volatility Momentum — added 2026-10-24 shadow-data mining (EXTREME-only signal)
+                 'vol_momentum', 'vol_momentum_long', 'vol_momentum_short',
+                 'vol-momentum+', 'vol-momentum-'],
     'MACD': ['hmacd', 'macd_accel', 'macd_1m', 'mtf_macd', 'macd_divergence_short', 'macd_divergence_long'],
     'Bollinger': ['bb_bounce', 'bb_bounce_short', 'bb-bounce-v2-long', 'bb-bounce-v3-long',
                    'bbbouncev2long', 'bbbouncev3long',
@@ -84,7 +87,9 @@ FAMILY_MAP = {
     'Stop_Hunt': ['stop_hunt_reversal_long', 'liquidation_hunt_long', 'liquidation_hunt_short'],
     'Confluence': ['signal_confluence'],
     'Volume': ['volume_hl', 'pump_catcher_long', 'volume_breakout_long', 'volume_breakout_short',
-               'volume-breakout-long', 'volume-breakout-long+', 'volume-breakout-short', 'volume-breakout-short+'],
+               'volume-breakout-long', 'volume-breakout-long+', 'volume-breakout-short', 'volume-breakout-short+',
+               # Volume Breakout Continuation — added 2026-10-24 shadow-data mining (EXTREME-only signal)
+               'volbreak_cont', 'volbreak_cont_long', 'volbreak-cont+', 'volbreak_cont+'],
     'ATR': ['atr_spike_long'],
     'Open_Skies': ['open_skies', 'open_skies_long', 'open-skies', 'open-skies+'],
     'Coiled_Spring': ['coiled_spring_long', 'coiled_spring_short'],

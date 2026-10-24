@@ -217,6 +217,10 @@ REGIME_SIGNALS = {
         'accel-300-breakout',  # ATR breakout signal — works solo, added 2026-09-23 (bug hunt: was killing PONS SHORT)
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d EXTREME 2T 100%WR +$0.13. This is T's reported ATOM SHORT case (blocked 10x by "storm: ATR>1.5%").
+        'vol-momentum+', 'vol-momentum-',  # Volatility Momentum continuation — added 2026-10-24 shadow-data mining. EXTREME-only habitat by design (ATR>1.5 entry condition); SHORT side collides with OVERSOLD_SHORT_RSI_MAX knife guard — CEO ruling required before enable.
+        'vol_momentum_long', 'vol_momentum_short',  # underscore/signal_type variants
+        'volbreak-cont+',  # Volume Breakout Continuation LONG — added 2026-10-24 shadow-data mining. EXTREME-only habitat by design (volume_breakout_short was best EXTREME performer; this is the LONG mirror).
+        'volbreak_cont_long',  # underscore/signal_type variant
     },
 }
 
