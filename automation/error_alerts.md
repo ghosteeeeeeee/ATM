@@ -1793,3 +1793,24 @@
 - **WARN** (recurring): disk 86% used (95G/118G, 17G free) — no logs >7d to gzip; safe cleanup already applied at 07:46 (journal vacuum + tmp/pip purge). Remaining hogs need CEO approval (/root/.local/share/opencode 12G, /usr 32G, /root/.cache 3.5G).
 - **WARN** (1x, handled): `TRADE FAILED: NXPC SHORT — mid-band death band: 53.1 in 45-55` at 08:41 — signal marked FAILED, hotset cooldown engaged (2 failures), no retry loop. Design working as intended.
 - **AUTO-FIX**: none required — vacation_pause absent; price-collector/1m-candle/pipeline/watchdog timers all active and firing; pipeline rc=0 at 08:42, 0 tracebacks/30min; prices fresh (9.7s); 0 DB locks; 0 open positions; 0 phantom trades/24h; 52 signals/hour; regime SHORT_BIAS.
+
+## Error Alerts — 2026-10-24 09:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3362s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3362s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   position_manager: TOK in N.6s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TOK position_manager: IndentationError: unexpected indent`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: position_manager`
+
+## Error Alerts — 2026-10-24 09:46 UTC
+- **WARN** (recurring): disk 86% used (95G/118G, 17G free) — no uncompressed logs >7d (all already gzipped, journals 237M); remaining hogs need CEO approval (/usr 32G, /root/.local/share/opencode 12G, /root/.cache 3.5G) per 07:46 entry.
+- **WARN** (1x, self-resolved): `position_manager: IndentationError: unexpected indent` at 08:50 — 0 recurrences in 55min, rc=0 on 8+ consecutive runs since, `position_manager.py` parses clean (mtime Oct 22). Transient; watch for recurrence.
+- **INFO**: stale unit reference `hermes-atr-sl-updater.timer` = not-found/inactive/dead — no references in config/ or scripts/; cosmetic, unit file likely deleted while still loaded in manager cache.
+- **AUTO-FIX**: none required — vacation_pause absent; price-collector/1m-candle/pipeline/watchdog timers all active and firing; pipeline rc=0 at 09:42 (0 tracebacks/30min); prices fresh (51s); 0 DB locks; 0 open positions; 0 phantom trades/24h; 43 signals/h; regime SHORT_BIAS; disk cleanup: nothing eligible (checked).
+
+## Error Alerts — 2026-10-24 11:44 UTC
+- **WARN** (recurring): disk 86% used (96G/118G, 17G free) — no logs >7d to gzip (all already compressed); journals 268M; remaining hogs need CEO approval (/usr 32G, /root/.local/share/opencode 12G, /root/.cache 3.5G) per 07:46/09:46 entries.
+- **AUTO-FIX**: none required — vacation_pause absent; price-collector/1m-candle/pipeline/watchdog timers active and firing (next runs within 60s); pipeline rc=0 at 11:42, 0 tracebacks/1h; prices fresh (54s, 87 tokens); candles.db lock = transient single writer (1m collector), not stuck; 0 open positions; 0 phantom trades/24h; 46 signals/h; regime LONG_BIAS (29L/10S/90N); disk: nothing eligible to clean.
