@@ -8044,5 +8044,27 @@
     "category": "entry quality",
     "status": "shipped-by-other",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T20:36:05Z",
+    "idea": "Contrarian pump-chain- flip OOS verification — holds 64.0% post-Oct18",
+    "rationale": "Pre-registered Oct 27 PROMOTE needed OOS check. Same-arm/adv classifier (0.40/0.40, 30x5m) on contrarian_shadow: pre-cut (Oct18) 63.9% n=252, post-cut 64.0% n=86. Sign and magnitude stable.",
+    "expected_impact": "Strengthens Oct 27 PROMOTE case for flipping pump-chain- direction in shadow→live evaluation",
+    "category": "exit/entry flip",
+    "status": "verified-oos",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 125
+  },
+  {
+    "date": "2026-10-24T20:36:05Z",
+    "idea": "pump-chain+ kill scoping note for CEO: bare 45T -0.48 vs combo 3T +0.39",
+    "rationale": "If CEO approves kill, implementation should target bare 'pump-chain+' (signal exact) — combo 'pump-chain+,pump-chain-v6+' is n=3 noise but positive; don't collateral-damage v6 confirmation premium.",
+    "expected_impact": "protects v6 confirmation path during kill",
+    "category": "kill scoping",
+    "status": "noted-for-ceo",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 125
   }
 ]
