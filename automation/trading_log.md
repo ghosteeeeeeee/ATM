@@ -14603,3 +14603,47 @@ Final set: ['BTC']
 - **size-reduce auto-cleared 22:57:55Z** (guardrail: WR 39.3% >= 37% AND pnl_7d -$1.72 >= -$2.00) -> positions now full size (1.0x). Prior log lines claiming 0.5x are stale.
 - Signal flow 1-7 per 5min vs watchdog min 20 + `[hotset] fallback DB query returned 0 tokens` every run (chronic, 13288 hits) — regime pin / no-entry steering, flagging not changing
 - unclog_waiver expires 2026-10-24T00:00:00Z (~30min) — waiver_expiry gate goes live; combined check after 00:35Z
+
+## 2026-10-24 00:15 Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.26 (WR: 50%) | 24h: 23T 11W 47.8% `+$0.04` | 7d: 123T 39.8% `-$1.26` | **size-reduce CLEARED 22:57:55Z -> 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- CFX pump-chain- SHORT +15.11% (`rr_engine_trail_hit` +$0.34) — full winner ride from 19:02 entry, trail worked as designed
+- BTC ai-trader-pending SHORT -3.42% account (`manual_sl_hit` -$0.08) — CEO manual trade, SL hit at account scale expected for 3-5x leverage; not a signal issue
+- atr_sl_hit 1/23 = 4.3% (<40%) — dominant close remains profit-monster-trail (10T +$0.71)
+- No 0%WR signal with 3+ trades last hour (only 2 trades, one per signal)
+- No negative-hour streak (23h +$0.32, this hour +$0.26)
+- Frequency 2/hr — not overtraded
+- 0 open trades
+- **Waiver expiry gate went live 00:00Z** — clean: 0 new Tracebacks (4 total all pre-existing Oct 18), 0 waiver errors in pipeline log
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flipped green (+$0.04) and 7d improved to -$1.26 — first positive 24h in many runs; watch if it holds at full 1.0x size
+- Signal flow still low (1-7/5min) + hotset 0-token fallback (chronic) — flagged repeatedly, not changing
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings
+
+## 2026-10-24 01:28 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 22T 11W 50.0% `+$0.07` | 7d: 121T 40.5% `-$1.16` | **size-reduce 1.0x (file absent = truth, cleared 22:57Z)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour, 0 open — quiet after waiver gate went live 00:00Z
+- atr_sl_hit 1/22 = 4.5% (<40%) — dominant close = profit-monster-trail (10T +$0.71)
+- No 0%WR signal with 3+ trades last hour (0 trades)
+- No negative-hour streak (23h +$0.34 green, this hour empty resets)
+- Frequency 0/hr — not overtraded
+- 24h now $0.07 green, 7d improved to -$1.16 — trend holding at full 1.0x size
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Waiver gate live since 00:00Z — 1 trade closed since (BTC manual SL), 0 new Tracebacks, still clean
+- Signal flow still low + hotset 0-token fallback (chronic) — flagged repeatedly
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings

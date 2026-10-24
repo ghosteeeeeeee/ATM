@@ -7670,5 +7670,14 @@
     "category": "monitoring",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T01:47:06Z",
+    "idea": "Reached-arm leak decomposition EXECUTED: 100% trailing_activated=False (41T/14d: atr_sl_hit 33T -1.99, hard_sl 6T -0.19, hard_max_loss 2T -0.25). ZERO armed-but-caught trades. The failure mode is candle-vs-poll gap: MFE (candle high/low) sees +0.40%+ but live_pnl polling never catches it before retrace. Fix direction = candle-aware trail arming, NOT exit-ladder priority.",
+    "rationale": "Decomposition was the pre-registered KPI. Answer is unambiguous: every reached-arm leak trade has trailing_activated=False. Escalation #17 is purely an arming-latency problem. The ARM-GAP instrumentation (logs trailing_activated=FALSE with MFE>=0.40) is correctly targeting the right cohort.",
+    "expected_impact": "Scopes escalation #17 precisely: candle-aware arming (check MFE on candle close, not just live_pnl poll) would capture the full 41T/14d -2.43 cohort. Peak-trail counterfactual from #106: NET +14.7pts but fragile (IMX outlier) — needs candle OOS before any flip.",
+    "category": "exit-side forensics",
+    "status": "executed",
+    "risk": "low"
   }
 ]
