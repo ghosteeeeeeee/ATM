@@ -1837,3 +1837,11 @@
 - **INFO**: "CRASH"/"error" grep hits in 30m pipeline log = `BTC-CRASH` filter labels + coin_tracker "0 errors" lines — 0 real tracebacks, all pipeline steps rc=0.
 - **INFO**: hotset.json holds 3 tokens; hotset fallback query returned 0 tokens at 14:42 (compaction produced empty hotset at 14:42:21) — WATCH: 0 approved signals, but 127 signals created in last hour.
 - **AUTO-FIX**: journal vacuum 310M→114M (freed 196M). Otherwise none required: vacation_pause absent; price-collector/1m-candle/pipeline/watchdog timers active and firing (pipeline rc=0 at 14:42, 1 open / 6 max position); prices fresh (10.7s); 0 phantom trades/24h; 127 signals/h; regime SHORT_BIAS (2L/94S/33N); speed 53.1% tokens ≥50th pct (128/241).
+
+## Error Alerts — 2026-10-24 15:27 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor (detect): N.N < N`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

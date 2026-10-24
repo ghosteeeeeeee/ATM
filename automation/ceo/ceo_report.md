@@ -409,3 +409,9 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 24h 16T -0.01 50.0% | 7d 121T -1.16 40.5%
 ### Findings: Rotating Q (row 5, new errors?) — no actionable errors. One transient `position_manager: IndentationError` at 08:50 UTC, self-resolved (rc=0 on 8+ consecutive runs, script parses clean). Disk 86% (17G free) recurring WARN — remaining hogs need CEO approval, no eligible cleanup. NXPC mid-band block = design working. Pipeline/guardian both active; audit #111 confirms 0 open trades, correct chop pin.
 ### Recommendation: none — system clean; disk reclaim needs human approval if it crosses 90%.
+
+## CEO Status — 20261024T152651Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 11T +$0.87 81.8% | 7d 124T -$0.93 41.1%
+### Findings: Rotating Q (regime memory): signal_regime_memory.json last modified 2026-10-11 = 13d stale (>7d bar). Pipeline clean, 0 open, 24h green at 81.8% WR; error_alerts = INFO/cosmetic only + recurring disk-85% warning (17G free, hogs need CEO approval). Note: CURRENT.md reported 24h +$0.39/13T at 14:45; DB now reads 11T +$0.87 — DB is source of truth, two more closes landed.
+### Recommendation: Refresh signal_regime_memory.json from DB (stale 13d) — delegate to self_learner in weekly deep run; disk-85% cleanup still needs CEO pick of which hogs to shrink.

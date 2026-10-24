@@ -1,16 +1,47 @@
 {
-  "timestamp": "2026-10-24T14:44:42.132355+00:00",
+  "timestamp": "2026-10-24T15:14:42.250400+00:00",
   "steers": [
     {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: CHIP + MET",
-      "detail": "Both opened within 5 minutes. Correlation risk.",
-      "auto_executable": false,
+      "severity": "urgent",
+      "category": "pending_order",
+      "title": "PENDING ORDER btc-ceo-short-80k: BTC SHORT @ 79940",
+      "detail": "Trigger hit: BTC 79780 crossed below 79940. Executing short 11.10 USDT 5x, SL 80280, TP 79100. CEO directive 2026-10-24 02:00 UTC: 'overdue for a long move on the bigger timeframes, but we're currently testing 80k \u2014 if it LOSES 80k, short is the play.' \u00a712 mapping: break BELOW 80000 (psychological, CEO-designated line) = SHORT. Trigger 79940 = 60pt cushion under the round (wick filter; single pokes of round numbers are sweeps per \u00a711 \u2014 first break may be the sweep-reclaim, SL prices that risk). SL 80280: 340pt above trigger / 280 above the round \u2014 dies on reclaim of 80k (200pt+ wick room). TP 79100: 840pt into the VOID \u2014 no 1h structure exists below 79800 in 21 DAYS (3-week range floor), next shelf 75-76k (4h); a genuine 80k loss is a vacuum cascade (#16351 precedent: 732pts/2h17m on fresh momentum). R:R planned 2.47 / real 1.19 (200pt slip). BE-lock + trail back it dynamically (rule-10 aware: 2x ATR TP but momentum-conditional entry; trail captures the cascade if it runs). \u00a711 caveat noted: first break of a major round = probable sweep; reclaim-to-80280 kills the thesis at a priced -340. PRECHECK (advisory): FAIL \u2014 LOSERS, coin_shame (reported, standing rule). Chop 8 flips \u2014 5x. Supersedes fired btc-ceo-short-80900 (#16377 manual_sl_hit -3.42%, rule-11 lesson: impulse already spent). Stale btc-ceo-long-82034 CLEARED (premise died with the coil breakdown).",
+      "trade_id": null,
+      "auto_executable": true,
+      "action": {
+        "type": "execute_order",
+        "order": {
+          "id": "btc-ceo-short-80k",
+          "coin": "BTC",
+          "direction": "short",
+          "trigger_price": 79940.0,
+          "amount_usdt": 11.1,
+          "leverage": 5,
+          "sl": 80280.0,
+          "target": 79100.0,
+          "confidence": 60.0,
+          "note": "CEO directive 2026-10-24 02:00 UTC: 'overdue for a long move on the bigger timeframes, but we're currently testing 80k \u2014 if it LOSES 80k, short is the play.' \u00a712 mapping: break BELOW 80000 (psychological, CEO-designated line) = SHORT. Trigger 79940 = 60pt cushion under the round (wick filter; single pokes of round numbers are sweeps per \u00a711 \u2014 first break may be the sweep-reclaim, SL prices that risk). SL 80280: 340pt above trigger / 280 above the round \u2014 dies on reclaim of 80k (200pt+ wick room). TP 79100: 840pt into the VOID \u2014 no 1h structure exists below 79800 in 21 DAYS (3-week range floor), next shelf 75-76k (4h); a genuine 80k loss is a vacuum cascade (#16351 precedent: 732pts/2h17m on fresh momentum). R:R planned 2.47 / real 1.19 (200pt slip). BE-lock + trail back it dynamically (rule-10 aware: 2x ATR TP but momentum-conditional entry; trail captures the cascade if it runs). \u00a711 caveat noted: first break of a major round = probable sweep; reclaim-to-80280 kills the thesis at a priced -340. PRECHECK (advisory): FAIL \u2014 LOSERS, coin_shame (reported, standing rule). Chop 8 flips \u2014 5x. Supersedes fired btc-ceo-short-80900 (#16377 manual_sl_hit -3.42%, rule-11 lesson: impulse already spent). Stale btc-ceo-long-82034 CLEARED (premise died with the coil breakdown)."
+        }
+      },
       "id": "steer-001"
+    },
+    {
+      "severity": "info",
+      "category": "profit_lock",
+      "title": "Move MET stop to breakeven \u2014 up 2.1%",
+      "detail": "Trade is +2.1%. Lock breakeven at 0.3090.",
+      "trade_id": 16380,
+      "action": {
+        "type": "move_stop",
+        "symbol": "MET",
+        "direction": "short",
+        "new_stop": 0.30898
+      },
+      "auto_executable": true,
+      "id": "steer-002"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "critical",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
@@ -18,14 +49,14 @@
     "volatility": "LOW",
     "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 1.0,
+    "linreg_alignment": 0.75,
     "wyckoff_phase": "MARKDOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 2,
+  "open_count": 1,
   "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 GOOD\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 2 (0 long, 2 short) \u2014 CHIP + MET, both volume-buildup-\nUnrealized PnL: -0.02 USDT (both <15min old)\nRegime: STRONG_DOWN (bear) | Volatility: LOW\nBTC 80215 vs 1m EMA300 80611 (-0.49%), 61 closes below,\n1m RSI 41 (recovered from ~6 knife) | Flips/24h: agg 23 / BTC 15 (normal)\nSources agree: watchdog 15m+4h SHORT_BIAS, regime_5m 94/129, continuum BELOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [regime] Bias stays SHORT \u2014 re-verified 14:44 (below EMA300 \u2713,\n   aggregate SHORT_BIAS \u2713, continuum BELOW \u2713). age=2 cycles\n   unexecuted. Flip-back: 1m holds above ~80611 for 15-30m OR\n   aggregate LONG_BIAS 4+ dumps.\n\ud83d\udfe2 [regime] RESOLVED \u2014 prior stay-flat knife gate. Condition (15m\n   below-hold) met ~14:26; gate lifted, CHIP/MET opened after it.\n\ud83d\udfe1 [cluster] CHIP + MET = ONE risk (same signal, 4 min apart, 100%\n   net short). Condition: 1m BTC holds above 80611 15-30m \u2192 exit\n   BOTH as a unit, don't manage them separately.\n\ud83d\udfe1 [health] CHIP bracket R:R 0.60 (TP +1.50% vs SL -2.50%,\n   breakeven 62.5% vs signal 58.3% = negative EV). Action: SL to\n   ~0.04240 (R:R 1.1) or pre-commit to trail-arm-failure exit at\n   45-60m with MFE<0.20%. MET at 0.93 is acceptable.\n\ud83d\udfe2 [opportunity] PICK (watchlist only \u2014 AI_TRADER_ENABLED=False,\n   will NOT execute): SEI SHORT, precheck PASS all gates, CONF 80.8,\n   1m RSI 61.3, ATR 1.00%, no cooldown, 0 SEI trades in 7d.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nBoth shorts are on the right side and in the one RSI cell that\npays (SHORT \u226560: 7d 71% WR +0.72; entries at 63.0/63.3). Verified\n7d PostgreSQL: no-trail exits 52T 0%WR -4.62 vs trail/tp 52T 44W\n+3.96; LONG -1.72 vs SHORT +0.56. Corrected finding: inside\nvolume-buildup- itself meta_rsi does NOT separate winners from\nlosers (36.5W/38.1L overlap) \u2014 all 7 winners exited via\nprofit-monster-trail, all 5 losers via no-trail: the exit family\nis the separator, so trail-arm (CHIP 0.041718 / MET 0.307744) is\nthe whole trade. Sideways find: a CHIP LONG pump-chain-v6+ is\nPENDING at 1m RSI 76.4 conf 88 against our short \u2014 ignore, that's\nthe exact overbought-long shape that lost GRASS/PUMP in 24h.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Hold both shorts; single invalidation: 1m above 80611 15-30m \u2192\n   exit both.\n2. Fix CHIP bracket (SL ~0.04240) or pre-commit to the 45-60m\n   trail-arm-failure exit.\n3. No third correlated alt short \u2014 2/6 slots stay open.\n4. SEI SHORT = watchlist/manual reference only, no execution path.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nTLDR: Held 2 fresh shorts that are on the right side (meta_rsi ~63 = best SHORT cell) in a verified STRONG_DOWN tape; flagged CHIP's negative-EV bracket (R:R 0.60) and the cluster's single BTC-bounce invalidation level. Patterns re-queried live in PostgreSQL (found+corrected: exit family, not entry RSI, separates volume-buildup winners from losers); SEI SHORT precheck-passed and written as watchlist-only (AI_TRADER_ENABLED=False); analysis merged, committed `df41a40f`, pushed, memory stored.\n",
   "agent_timestamp": "2026-10-24T14:51:10.032975+00:00",
   "regime_context": "Breakdown regime, one-sided. BTC 80215 vs 1m EMA300 80611 (-0.49%)\nat 14:44, 61 consecutive closes below (cross-down ~13:44), 1m RSI 41\nafter recovering from ~6 at 14:18, 5m RSI 30, zscore -1.79\nSTRONG_NEG, velocity SLOW, acceleration FLAT, volume LOW,\nlinreg 1m/5m/15m/1h all BEAR (alignment 1.0), wyckoff MARKDOWN,\nmarket_phase RECOVERY, trend_quality STRONG_DOWN.\nSources (stated per BUG on unauditable direction claims): watchdog\n15m SHORT_BIAS and 4h SHORT_BIAS; regime_5m 14:30 aggregate\nSHORT_BIAS 94/129 (long_bias 2); continuum ema300_position BELOW,\nduration 61m. All three agree this cycle.\nFlip rate 24h: aggregate 23, BTC 15 \u2014 inside the standing churn band\n(p50 19, p95 26); not an anomaly by the calibrated thresholds, and\nnot a <6 real-trend tape either, so direction-flavored prose stays\ncondition-keyed rather than asserted.\nWhat it means for positions: both open shorts are aligned with the\ntape and with the best-paying RSI cell. The live risk is a\nreclaim of EMA300 ~80611 \u2014 a +0.45% move \u2014 which would bounce both\nalts together. Until that happens the regime supports holding; the\nmoment it happens the pair should be exited as one unit.",
