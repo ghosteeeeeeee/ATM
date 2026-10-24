@@ -113,9 +113,14 @@ def btc_long_trend(token):
               + (f' | {note}' if note else ''))
     if would_block:
         detail += ' → LONG-side BTC gate runs only in NEUTRAL 4h and WOULD block (confluence/coin-momentum escapes not simulated)'
+    elif regime_4h != 'NEUTRAL':
+        # message-only honesty fix, bug_hunter #118 MED#8/LOW#9: bear/chop gates are
+        # NEUTRAL-scoped, but BTC_CHOP_GATE (velocity flat, CHOP_GATE_LOG_ONLY=False)
+        # can still block a MOMENTUM-family LONG in ANY regime.
+        detail += ' → BTC bear/chop-structure gates do not bite outside NEUTRAL 4h; the separate BTC velocity/CHOP gate can still block'
     else:
-        detail += (' → BTC-structure gates do not bite outside NEUTRAL 4h'
-                   if regime_4h != 'NEUTRAL' else ' → clear')
+        detail += (' → bear/chop structure not blocking, but the LONG-NEUTRAL gate still runs here'
+                   ' (1m regime / confluence / BTC-velocity legs NOT simulated — not a clean pass)')
     return would_block, detail
 
 

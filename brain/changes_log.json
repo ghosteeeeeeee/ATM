@@ -2279,5 +2279,17 @@
     "after": "comment states FLIP PATH BLOCKED, names the candle numbers, points at hermes_constants.py:1749 and analysis/trail_arm_candle_oos_2026-10-17.py",
     "rationale": "comment-only diff (0 behavior) edited 12:45 UTC by an interrupted run, unlogged; numbers cross-checked byte-for-byte against constants and the script exists; py_compile PASS",
     "impact": "zero behavior; removes an active \"flip me\" trap next to MFE_CUT_SHADOW_ENABLED=True"
+  },
+  {
+    "timestamp": "2026-10-24T13:47:00Z",
+    "agent": "brain_auditor",
+    "run": 118,
+    "change": "precheck btc_long_trend detail messages made honest (bug_hunter #118 MED#8 + LOW#9): NEUTRAL+ema-ABOVE no longer prints \"clear\" (the LONG-NEUTRAL gate still runs there via the 1m-regime/confluence/BTC-velocity legs, un-simulated), and the outside-NEUTRAL message no longer implies total safety (BTC_CHOP_GATE velocity-flat can still block a MOMENTUM-family LONG in any regime, CHOP_GATE_LOG_ONLY=False)",
+    "type": "tweak",
+    "file": "scripts/ai_trader_precheck.py",
+    "before": "NEUTRAL+ABOVE -> ' | clear'; non-NEUTRAL -> 'BTC-structure gates do not bite outside NEUTRAL 4h'",
+    "after": "NEUTRAL+ABOVE -> 'bear/chop structure not blocking, but the LONG-NEUTRAL gate still runs here (legs NOT simulated - not a clean pass)'; non-NEUTRAL -> adds 'the separate BTC velocity/CHOP gate can still block'",
+    "rationale": "bug_hunter subagent verdict SHIP with findings 1-7 NONE; MED#8 was an over-claimed \"clear\" on the exact gate the fix claims to mirror. Message-only, zero decision change (would_block unchanged).",
+    "impact": "advisory text only; py_compile PASS, live calls PASS, ai_trader_precheck --selfcheck PASS"
   }
 ]
