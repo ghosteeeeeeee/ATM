@@ -7934,5 +7934,32 @@
     "category": "entry sniper",
     "status": "hold (pre-registered, revisit after supply normalizes, n>=50)",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-24T15:44:16.356292+00:00",
+    "idea": "Weekly oscillator-mult revalidation join (zero code — standing KPI in audit run)",
+    "rationale": "Oct-1 shadow said boost +9.87/50.9% vs penal -8.61/33.3%; live metadata join 14d shows boost -1.99 vs penal -1.67 (no edge). Multipliers may be stale for current regime.",
+    "expected_impact": "Catches inverted/stale mults before they silently degrade confidence ranking",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T15:44:16.356292+00:00",
+    "idea": "Contrarian pump-chain- PROMOTE checkpoint 2026-10-27T17:12Z (span hits 14d, wr already 55.2% >= 55 bar)",
+    "rationale": "Contrarian shadow: flipping pump-chain- would-win 55.2% n=337. D2 rule requires 14d clean span. Auto-fire date is mechanical.",
+    "expected_impact": "If still >=55% at n>=10 on Oct-27: propose live contrarian enable via CEO (no_signal_enable_disable active)",
+    "category": "exit engine",
+    "status": "pre-registered",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-24T15:44:16.356292+00:00",
+    "idea": "Floor-admit override cohort outcome join (386 floor_overrode_pp events)",
+    "rationale": "91% admit rate + 386 overrides of condition gate — unknown if floor is admitting garbage past pp_cond",
+    "expected_impact": "If override cohort WR <40%: tighten floor; if >=50%: floor is correctly rescuing borderline setups",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
