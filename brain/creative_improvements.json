@@ -7650,5 +7650,25 @@
     "category": "risk",
     "status": "suggested-CEO",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T00:55:00Z",
+    "run": 107,
+    "idea": "Narrower re-waiver pre-registration: [35,40) SHORT only (not [35,45))",
+    "rationale": "Waiver band contained profitable [35,40) 17T 64.7% +0.38 and losing [40,45) 23T 26.1% -0.25. Blanket expiry re-blocks both. If post-lapse [35,40) SHORTs lose edge, trend-carried-oversold was real.",
+    "criteria": "Post-lapse [35,40) SHORT n>=20 AND 7d WR<50% AND pnl<0 → propose narrower re-waiver",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T00:55:00Z",
+    "run": 107,
+    "idea": "Post-lapse SHORT arm-rate KPI",
+    "rationale": "Pre-lapse 7d: waiver-band arm_rate 53.8% vs outside 60.0%. If post-lapse SHORT arm_rate drops below 50%, the [35,45) block is removing armed-capable entries.",
+    "criteria": "Read at n>=20 post-lapse SHORTs",
+    "category": "monitoring",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

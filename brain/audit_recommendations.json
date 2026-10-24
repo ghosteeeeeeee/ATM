@@ -1,129 +1,101 @@
 {
-  "timestamp": "2026-10-24T00:03:37Z",
-  "run": 108,
-  "session_brain_stats": {
-    "queries": 3,
-    "dup_heavy": true,
-    "note": "identical-score pairs across titles, 16th run — ideation only, no decision sourced"
-  },
+  "timestamp": "2026-10-24T00:55:00Z",
+  "run": 107,
+  "headline": "BOTH CONCURRENT FLIPS LANDED CLEAN — waiver expired (flip1_active=False, [35,45) SHORT band gate LIVE, 0 trades since = untested by traffic) + size-reduce auto-cleared (file absent, guardrail timer still active). 24h RECOVERED to +$0.04/47.8% WR. Watchdog Pattern D (LONG 55-65 worst band) does NOT reproduce at 14d — actual worst is 45-55; 55-60 Fisher fails all windows AND 30d sign-flips positive. NEW FINDING: the [35,40) SHORT band the waiver just re-blocked was the MOST profitable SHORT band at 14d (17T 64.7% +$0.38) — blanket expiry also blocks the winning slice. entry_regime_4h fix tested: 3/4 new trades populated (was 0/707).",
   "trade_summary_24h": {
     "trades": 23,
-    "wins": 11,
-    "wr": 52.2,
+    "wr": 47.8,
     "pnl": 0.04,
-    "7d": "124T 39.5% -1.46",
-    "14d": "351T 37.3% -4.00"
+    "note": "RECOVERED from -0.47 earlier in the day — SYRUP/MON/DYDX/ICP/WLD wins cleared the deficit"
   },
-  "headline": "WAIVER LAPSE VERIFIED LIVE at 2026-10-24T00:00Z: flip1_state=(False,'expired'), 0 opens post-lapse, grandfathered cohort closed pre-lapse 5W (CFX+0.34/DYDX+0.16/MON+0.12/SYRUP+0.04/ICP+0.04), BTC #16377 CEO pending SL-hit -0.08 at 00:00:19 (precheck FAIL reported). Escalation #17 re-scope MEASURED: reached-arm atr_sl_hit 33T 0/33 final-stop-past-entry vs atr_trail_hit 23T 23/23 = arm-then-reversal leak confirmed; BE-at-arm needs 1m replay, pre-registered Oct 25.",
-  "mandate_fresh_14d": {
-    "trail_family_pm": "88T 89.8% +5.14",
-    "hard_max_loss": "77T 0% -7.70",
-    "reached_arm": "164T 67.7% +9.25",
-    "never": "187T 10.7% -13.25"
+  "trade_summary_windows": {
+    "7d": {"trades": 123, "wr": 39.8, "pnl": -1.26},
+    "14d": {"trades": 350, "wr": 36.9, "pnl": -4.13},
+    "30d": {"trades": 704, "wr": 42.8, "pnl": -5.43}
   },
-  "drift_findings": [],
-  "recurring_problems": [],
-  "missing_implementations": [],
+  "mandate_fresh": {
+    "trail_family_14d": "123T ~86% +$10.65 (PM-trail 86T 89.5% +5.09 + atr_trail 27T 77.8% +4.31 + trail_sl 5T 100% +0.71 + rr_trail 5T 80% +0.54)",
+    "hard_max_loss_14d": "77T 0% -$7.70",
+    "armed_14d": "173T 68.8% +$9.93",
+    "unarmed_14d": "174T 5.7% -$14.06",
+    "note": "Trend family still carries the edge. Entire bleed is pre-arm chop entries."
+  },
+  "concurrent_flips_verification": {
+    "waiver_expiry": "LANDED — flip1_active=False, flip1_state=(False,'expired'), gate wired into decider+compactor+brain, 0 trades opened since 00:00Z = untested by traffic. First post-lapse SHORT entry is the test.",
+    "size_reduce_clear": "LANDED — data/vacation_size_reduce.json absent, guardrail timer active (next 00:57Z). Marker cleared on schedule.",
+    "combined_posture": "BOTH FLIPS CLEAN. 0 open trades, flat book, regime MIXED (aggregate LONG_BIAS vs continuum BELOW EMA300). Correct to be flat."
+  },
+  "watchdog_steer_response": {
+    "steer_001_volume_buildup_4loss": "ALREADY ANSWERED (#106) — all 4 losers in [35,45) waiver band, gate now re-blocks them. 0 vb- trades since expiry. DO NOT DISABLE stands (14d vb- 20T 70% +$0.39). Watchdog deep-analysis itself RETRACTED this steer.",
+    "pattern_D_LONG_rsi_bands": "DOES NOT REPRODUCE at 14d — watchdog claims 55-65 worst (30% WR, -1.18) but fresh meta_rsi shows 45-55 worst (30.9%, -2.17) and 55-65 at 42.9% -0.85. Fine bands: 55-60 Fisher p=0.33 (14d) / 0.36 (30d) ALL FAIL, 30d sign-flips +$1.01. REJECTED-WITH-DATA. Only consistent winner is 70-75 (+1.10/14d, +0.92/30d) — r2v2-long3 carries it (7T 85.7% +0.76), pump-chain+ already blocked at 70+ by PUMP_CHAIN_LONG_RSI_MAX."
+  },
+  "losing_autopsy": {
+    "method": "recovery_replay adverse-first, selfcheck PASS",
+    "24h_losers": "12 — 4x volume-buildup- SHORT in [35,45) band (the class the expiry gate now blocks) + 2x bb-bounce LONG unarmed-chop + 1x pump-chain+ GRASS (CONF_FLOOR cohort) + 3x BTC ai-trader-pending (CEO domain) + 2x misc",
+    "wrong_side": "REFUTED 38th consecutive run (#61 p=0.116, #84 t=-0.04)",
+    "new_patterns": "0"
+  },
+  "new_finding_waiver_band_35_40": {
+    "observation": "The [35,40) SHORT band that the waiver just re-blocked was the MOST profitable SHORT band at 14d: 17T 64.7% +$0.38. The [40,45) slice is negative: 23T 26.1% -$0.25. Blanket expiry blocks both.",
+    "pre_lapse_7d": "waiver-band [35,45): 13T 53.8% +$0.19 arm_rate 53.8% | outside band: 25T 44.0% +$0.46 arm_rate 60.0% — band trades had HIGHER WR than outside",
+    "recommendation": "MONITOR post-lapse. If [35,40) SHORT WR collapses without the waiver, the trend-carried-oversold edge was real and CEO should consider a narrower re-waiver for [35,40) only. n=17 < 20 bar — pre-register, do not ship.",
+    "confidence": "MEDIUM"
+  },
+  "entry_regime_4h_fix_verification": {
+    "status": "TESTED — 4 trades opened since fix, 3/4 have entry_regime_4h populated (NEUTRAL/LONG_BIAS/NEUTRAL). 1/4 (MON) None = opened before 4h scanner ran for that token. Was 0/707 before fix. Fix works.",
+    "remaining_gap": "Population depends on 4h scanner having run for the token. First-trade-of-new-tokens may still miss. Acceptable."
+  },
+  "signal_deep_dive": {
+    "new_targets": "0 — every n>=15 sub-50% signal is covered by kills/disables/CONF_FLOOR/TAT+MFE-CUT",
+    "14d_negatives": "volume-breakout-long+ 15T 13.3% -1.06 (killed) | bb-bounce 37T 43.2% -0.99 (TAT+MFE-CUT) | ai-trader+ 27T 37.0% -0.91 (disabled) | doji 20T 40.0% -0.62 (killed) | pump-chain+ 44T 25.0% -0.49 (CONF_FLOOR)",
+    "positive": "volume-buildup- 20T 70.0% +0.39 | r2v2-long3 15T 53.3% +0.36 | ai-trader-manual 15T 46.7% +0.34 (CEO domain)"
+  },
   "creative_improvements": [
     {
-      "date": "2026-10-24T00:03:37Z",
-      "idea": "Escalation #17 measurement executed: BE-at-arm counterfactual (stop->entry at trail-arm) pre-registered for Oct 25 1m-replay batch",
-      "rationale": "reached-arm atr_sl_hit 14d 33T -1.99 with 0/33 final-stop-past-entry vs atr_trail_hit 23/23 past = the stop never ratchets before the first ATR rung; whole-trade MAE cannot split pre-arm vs post-arm dips so DB-only sim is invalid",
-      "expected_impact": "if post-arm dips are rare among winners, saves up to +1.99/14d; winner-harm unknown until replay",
-      "category": "exit-side",
+      "idea": "Narrower re-waiver pre-registration: [35,40) SHORT only, not [35,45)",
+      "rationale": "The blanket waiver band contained a profitable slice ([35,40) 17T 64.7% +0.38) and a losing slice ([40,45) 23T 26.1% -0.25). The expiry re-blocks both. If post-lapse data shows [35,40) SHORTs losing their edge, the trend-carried-oversold pattern was real.",
+      "criteria": "Pre-registered: post-lapse [35,40) SHORT n>=20 AND 7d WR < 50% AND pnl < 0 → propose narrower re-waiver to CEO",
+      "category": "entry sniper",
       "status": "pre-registered",
-      "risk": "medium",
-      "criteria": "fee-adjusted AND OOS 7d+30d same sign AND winner-harm <20% (mirror #78 pump-exit criteria)"
-    },
-    {
-      "date": "2026-10-24T00:03:37Z",
-      "idea": "Grandfathered-band lap scoreboard CLOSED: pre-lapse cohort ends net positive (tonight 5 straight trail wins +0.66 at rsi 35-44), lifetime gate-truth 3W/4L -0.17 to -0.34",
-      "rationale": "post-lapse BLOCK_RE records in gate_shadow.db become the make-permanent-vs-C3-conditional evidence; C3 sustained-tape sentinel trigger unchanged (30d Fisher p<0.05)",
-      "expected_impact": "decides whether to propose conditional waiver replacement",
-      "category": "meta",
-      "status": "monitoring",
       "risk": "low"
     },
     {
-      "date": "2026-10-24T00:03:37Z",
-      "idea": "BTC pending-order chop-pin bleed (CEO-domain monitor): #16353 UM_HOLD -1.53, #16358 UM_HOLD -0.02, #16377 manual_sl_hit -0.08 — 3 straight pending BTC losses during flip-rate>=p95 pin",
-      "rationale": "conditional brackets armed both directions keep filling into chop; shadow auto_trader CHOP shorts 75% vs longs 0%",
-      "expected_impact": "suggest CEO consider suspending bracket arming during high-churn pins",
-      "category": "risk",
-      "status": "suggested-CEO",
+      "idea": "Post-lapse SHORT arm-rate KPI",
+      "rationale": "Pre-lapse 7d: waiver-band arm_rate 53.8% vs outside 60.0%. If post-lapse arm_rate for SHORTs drops below 50%, the [35,45) block is removing armed-capable entries, not just chop.",
+      "criteria": "Read at n>=20 post-lapse SHORTs",
+      "category": "monitoring",
+      "status": "pre-registered",
       "risk": "low"
     }
   ],
   "config_changes_applied": [],
-  "changes_from_last_run": [
-    {
-      "change": "#107 momentum_cache.trend single-owner fix",
-      "verified": "PASS — trend rows coherent post-fix (slope_4h sign matches trend label, 23:30 snapshot); 15m scanner no longer writes trend"
-    },
-    {
-      "change": "#107 escalation #17 re-scope",
-      "verified": "PASS — measurement executed this run, leak quantified 0/33 vs 23/23"
-    },
-    {
-      "change": "#102 waiver-expiry gate",
-      "verified": "PASS LIVE — flip1_state (False,'expired') at 00:00Z, 0 opens post-lapse, pipeline rc=0 every minute, 0 new Tracebacks; lazy-fire means no UNCLOG-EXPIRED line without a band candidate (correct)"
-    },
-    {
-      "change": "#92/#100 size-reduce",
-      "verified": "PASS — cleared 22:57:55Z to 1.0x per auto_1hr, file absent confirmed 23:47Z"
-    },
-    {
-      "change": "#103 TAT units-correct pack",
-      "verified": "HOLDING — no GO yet (CEO stack), shadow continues"
-    }
-  ],
-  "losing_autopsy_48h": {
-    "n": 11,
-    "never_adverse": 2,
-    "recovered": 5,
-    "never": 4,
-    "never_list": [
-      "ALT vb- -0.17",
-      "CC vb- -0.15",
-      "ZRO vb- -0.11",
-      "PUMP r2v2-long9 -0.01 giveback"
-    ],
-    "verdict": "wrong-side REFUTED 39th consecutive run (#61 p=0.116, #84 t=-0.04)"
+  "changes_from_last_run": {
+    "#106_entry_regime_4h_fix": "VERIFIED WORKING — 3/4 new trades populated (was 0/707). PASS.",
+    "#106_arm_decomposition_kpi": "Standing KPI, no alert condition met. PASS.",
+    "#106_conf30_sentinel": "Pre-registered, baseline 12T 7W -0.09, trigger n>=20 AND PnL<=-1.00. Not yet triggered. PASS.",
+    "#102_waiver_expiry_gate": "LANDED as designed — flip1_active=False, gate LIVE. 0 trades to test it yet. PASS (by design).",
+    "#100_size_reduce_eta": "CLEARED on schedule — file absent. PASS."
   },
-  "deep_dive": {
-    "new_targets": 0,
-    "note": "all 14d sub-50% n>=15 families owned (bb-bounce=TAT+MFE-CUT, ai-trader+ disabled, vb+/doji/oversold killed, pc+-=CONF_FLOOR-held, hl_copy n<20)"
+  "last_run_verify_all": {
+    "waiver_expiry_selfcheck": "PASS",
+    "recovery_replay_selfcheck": "PASS",
+    "arm_leak_selfcheck": "PASS (346 cells, leak 55)",
+    "tat_forward_selfcheck": "PASS",
+    "waiver_scoreboard_selfcheck": "PASS (allows 40, blocks 17)",
+    "protected_flags": "13/13",
+    "constants_git_diff": "EMPTY",
+    "tracebacks": "4 total, none new (last Oct 11/18)",
+    "session_lock": "ABSENT"
   },
-  "waiver_lapse_verification": {
-    "timestamp_checked": "2026-10-24T00:02Z",
-    "flip1_state": [
-      false,
-      "expired"
-    ],
-    "opens_post_0000": 0,
-    "new_tracebacks": 0,
-    "pipeline_rc": 0,
-    "grandfathered_closed_pre_lapse": [
-      "CFX +0.34 rr_engine_trail_hit",
-      "DYDX +0.16 PM-trail",
-      "MON +0.12 PM-trail",
-      "SYRUP +0.04 PM-trail"
-    ],
-    "btc_16377": "manual_sl_hit -0.08 USDT (-0.69% price) at 00:00:19, CEO pending, precheck FAIL reported, loss cooldown streak=2"
-  },
-  "pre_reg_status": {
-    "CONF_FLOOR_bare": "HELD on fk ruling (2 defs over bar) + RAW pin + vacation",
-    "TAT_variant_c": "16 fires MET awaiting CEO GO (+0.410, fk 0/7)",
-    "pc+_NO-KILL": "stands (30d positive)",
-    "pc-_CANCEL": "stands",
-    "C3_sustained_tape_sentinel": "trigger unchanged",
-    "BE_at_arm_1m_replay": "NEW pre-registered this run for Oct 25"
+  "drift": {
+    "vacation_mode": "still true (16th run) — no_constants_change now FALSE, constants_change_review_queue active per T directive 18:35. T/CEO: vacation_mode.py off when ready.",
+    "entry_regime_4h_remaining": "MON None = scanner hadn't run for token yet. Not a bug, a timing gap."
   },
   "next_actions": [
-    "Oct 24: post-lapse KPI — expect band SHORT opens 0; short traffic roughly halved; BLOCK_RE records feed C3",
-    "Oct 24: first 4h-scanner trend-ownership run already in (23:30 cache coherent) — continue monitoring entry_trend writes",
-    "Oct 24 CEO: fk ruling -> CONF_FLOOR bare + CONFIDENCE-TAIL; TAT variant-C GO; VACATION STATE; flip#2 decoupled ruling",
-    "Oct 25: eval batch + NEW BE-at-arm 1m counterfactual (criteria locked)",
-    "Watch BTC SHORT loss cooldown expiry ~00:44Z; 0 open = flat correct under stretched tape"
+    "CEO: RATIFY waiver expiry (landed clean, 0 knife trades since) + confirm flip#2 (vb- HIGH/EXTREME) stays decoupled",
+    "CEO: note the [35,40) SHORT band finding — narrower re-waiver pre-registered, awaiting post-lapse data",
+    "Monitor post-lapse SHORT traffic: first entry tests the gate; arm-rate KPI at n>=20",
+    "Oct 25: MFE-CUT / HML / habitat / re-enter / UGB / short-gate / first CONF-FILTER read",
+    "Escalation #17 (62nd): exit-ladder candle OOS"
   ]
 }
