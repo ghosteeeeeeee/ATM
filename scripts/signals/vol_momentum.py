@@ -158,7 +158,9 @@ def _evaluate(closes, volumes, atr_pct, rsi_5m, momentum_state) -> Optional[dict
         confidence += VOLMOM_CONF_EXTREME_BONUS
     if direction == 'SHORT' and rsi_5m < VOLMOM_SHORT_RSI_MAX - 5:
         confidence += VOLMOM_CONF_RSI_BONUS
-    if direction == 'LONG' and rsi_5m > VOLMOM_LONG_RSI_MIN + 5:
+    # F4 fix: LONG_RSI_CEILING=75 blocks RSI>=75, so RSI>75 bonus is unreachable.
+    # Use RSI>73 (+3) instead — within the allowed (70,75] band.
+    if direction == 'LONG' and rsi_5m > VOLMOM_LONG_RSI_MIN + 3:
         confidence += VOLMOM_CONF_RSI_BONUS
     confidence = max(VOLMOM_CONF_FLOOR, min(VOLMOM_CONF_CAP, confidence))
 

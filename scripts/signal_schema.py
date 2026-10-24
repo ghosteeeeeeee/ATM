@@ -827,6 +827,8 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             PATTERN_CHANNEL_ENABLED, PATTERN_FLAG_ENABLED, PATTERN_MICRO_FLAG_ENABLED, PATTERN_WOLF_ENABLED,
             OC_MTF_MACD_ENABLED, OC_RSI_ENABLED, OC_MTF_RSI_ENABLED, OC_PENDING_ENABLED,
             MOMENTUM_ENABLED, MOMENTUM_PLUS_ENABLED, MOMENTUM_MINUS_ENABLED,
+            VOLMOM_ENABLED, VOLMOM_PLUS_ENABLED, VOLMOM_MINUS_ENABLED,
+            VOLBREAK_CONT_ENABLED, VOLBREAK_CONT_PLUS_ENABLED,
         )
         from hermes_constants import SIGNAL_SOURCE_BLACKLIST as _BL
         # Fast path: if source is blocklisted, blacklist layer already caught it
@@ -925,6 +927,21 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" MOMENTUM_MINUS_ENABLED=False', flush=True)
                 return None
             if _comp == 'momentum' and not MOMENTUM_ENABLED:
+                return None
+            # vol-momentum (F3 fix: add_signal-layer kill-switch gates)
+            if _comp == 'vol-momentum+' and not VOLMOM_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VOLMOM_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'vol-momentum-' and not VOLMOM_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VOLMOM_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'vol-momentum' and not VOLMOM_ENABLED:
+                return None
+            # volbreak-cont (F3 fix: add_signal-layer kill-switch gates)
+            if _comp == 'volbreak-cont+' and not VOLBREAK_CONT_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" VOLBREAK_CONT_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'volbreak-cont' and not VOLBREAK_CONT_ENABLED:
                 return None
             # gap-300
             if _comp in ('gap-300+', 'gap300-5m+') and not GAP_300_PLUS_ENABLED:
