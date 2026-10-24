@@ -1845,3 +1845,9 @@
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor (detect): N.N < N`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-24 15:44 UTC
+- **WARN** (recurring): disk 86% used (96G/118G, 17G free) — 0 logs >7d to gzip; hogs still need CEO approval (/usr 32G, /var/lib 7.8G, /root/zscore 2.2G, /root/hermes-agent 2.0G) per earlier entries.
+- **INFO**: 4 "CRASH" grep hits in 30m pipeline log = `BTC-CRASH` filter labels — 0 real tracebacks, all steps rc=0.
+- **INFO**: GRASS SHORT "TRADE FAILED" = correct rejection (RSI hard floor 40.9 < 45), signal marked FAILED, not a crash.
+- **AUTO-FIX**: none required. vacation_pause absent; pipeline ran 15:42 rc=0 (0 open, 11 closed 24h); price-collector/1m-candle/pipeline/watchdog timers all active; prices fresh (69s); 102 signals/h; regime SHORT_BIAS (2L/95S/32N); speed 53.1% ≥50th pct.
