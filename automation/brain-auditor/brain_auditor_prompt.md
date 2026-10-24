@@ -489,6 +489,14 @@ print('Changes logged.')
    - ❌ `WHERE status = "closed"` (double quotes = column identifier)
    - ✅ `WHERE status = 'closed'`
 
+## ⚠️ UNITS RULE (leverage landmine — caught a would-be ship 2026-10-24)
+
+`pnl_pct` in PG is **LEVERAGED %** (`pnl_pct = price_move × leverage`, lev 3-10). `pnl_usdt = amount_usdt × price_move / 100` (unleveraged on notional). Any counterfactual MUST compare same units:
+- ✅ `pnl_usdt` vs `pnl_usdt`, or price-move% vs price-move%
+- ❌ raw price-move (held) vs stored `pnl_pct` (actual) — inflates "held" advantage by the leverage multiplier
+
+Run #119 first cut of the atr_sl_hit "hold longer" counterfactual showed '+$145pp' saved (would have justified an SL-widening ship); corrected to pnl_usdt basis = **'+$0.19' at 30m / '+$0.37' at 60m / '+$1.77' at 4h over 81 trades = noise**. Same landmine is documented in `analysis/tat_variant_c_candle_oos_2026-10-24.py` ("units landmine", `end_u = pnl_pct / lev`). When in doubt, derive price move from `entry_price`/`exit_price` and weight by `amount_usdt`.
+
 ## ⚠️ BASH QUOTING RULE ($ Amounts)
 
 When writing money amounts via bash `echo`/`printf`/heredoc into logs, SINGLE-QUOTE the string. Unquoted `$0` expands to the shell path and corrupts the audit trail (`-$0.14` becomes `-/usr/bin/bash.14` — 48+ historical instances, backfilled 2026-10-21):

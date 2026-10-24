@@ -7904,5 +7904,35 @@
     "category": "data integrity",
     "status": "pre-registered (trigger >=3 tokens/7d)",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T14:44:05Z",
+    "run": 119,
+    "idea": "UNITS RULE (leverage landmine) shipped to brain_auditor_prompt.md",
+    "rationale": "pnl_pct is price_move x lev; first atr_sl_hit hold-counterfactual compared raw price moves to leveraged pnl_pct and showed '+$145pp' saved — corrected pnl_usdt basis = '+$0.19'/'-$1.16' noise. Same landmine documented in tat_variant_c_candle_oos.",
+    "expected_impact": "prevents false-positive exit-counterfactual ships (SL widening would have exposed the '-6.8%' tail for '+$0.2/14d')",
+    "category": "method",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T14:44:05Z",
+    "run": 119,
+    "idea": "REJECTED-WITH-DATA: widen ATR SL in LOW vol (watchdog carry-forward steer)",
+    "rationale": "81 14d atr_sl_hit trades: 37/51/78% ever touch entry by 30/60/240m but only 23% close back in profit at 60m (median -0.39%); notional-weighted hold counterfactual +$0.19/+$0.37/'+$1.77' = noise-to-marginal; FLAT/LOW cohort n=6. Stops are correct; leak is unarmed entries.",
+    "expected_impact": "zero — logged so the steer is not re-proposed; 4h residual reopens only via escalation #17 path-aware candle OOS",
+    "category": "exit quality",
+    "status": "closed-rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T14:44:05Z",
+    "run": 119,
+    "idea": "SHORT_RSI_FLOOR 45->55 (block admitted 45-55 band; keep 55-65/65+)",
+    "rationale": "14d SHORT bands: 45-55 = 25T 16.0% '-$1.20' (floor admits it) while 55-65 +$0.26 / 65+ +$0.42; 30d 45-55 '-$0.45' same sign, n=54. But 14d fk ~23% of SHORT winners > 20% bar, effect '+$0.45/30d' noise-adjacent, and it cuts short supply right after the 14.5h outage.",
+    "expected_impact": "+$0.45-1.20 per 14-30d if band persists; contradict short-supply priority",
+    "category": "entry sniper",
+    "status": "hold (pre-registered, revisit after supply normalizes, n>=50)",
+    "risk": "medium"
   }
 ]

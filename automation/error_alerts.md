@@ -1824,3 +1824,16 @@
 ## Error Alerts — 2026-10-24 13:27 UTC
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] BIGTIME TOK — continuum says DECLINING+LEAN_BULL+AT, allowing despite TOK filter`
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] BIGTIME TOK — continuum says TOK+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-24 14:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,TOK,MOMENTUM,BTC_LEVEL | vol=N.8x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — CONTAGION+MULTI_ALT+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: CONTAGION,MULTI_ALT,MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=+N.N% | MULTI_ALT: N weak alts`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — TOK+CONTAGION+MULTI_ALT+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,CONTAGION,MULTI_ALT,MOMENTUM,BTC_LEVEL | vol=N.6x eth_div=+N.N% | MULTI_ALT: N weak alts`
+
+## Error Alerts — 2026-10-24 14:44 UTC
+- **WARN** (recurring): disk 85% used (95G/118G, 17G free) — no logs >7d to gzip; remaining hogs need CEO approval (/usr 32G, /var/lib 7.8G, /root/zscore 2.2G, /root/hermes-agent 2.0G) per 07:46→13:27 entries.
+- **INFO**: "CRASH"/"error" grep hits in 30m pipeline log = `BTC-CRASH` filter labels + coin_tracker "0 errors" lines — 0 real tracebacks, all pipeline steps rc=0.
+- **INFO**: hotset.json holds 3 tokens; hotset fallback query returned 0 tokens at 14:42 (compaction produced empty hotset at 14:42:21) — WATCH: 0 approved signals, but 127 signals created in last hour.
+- **AUTO-FIX**: journal vacuum 310M→114M (freed 196M). Otherwise none required: vacation_pause absent; price-collector/1m-candle/pipeline/watchdog timers active and firing (pipeline rc=0 at 14:42, 1 open / 6 max position); prices fresh (10.7s); 0 phantom trades/24h; 127 signals/h; regime SHORT_BIAS (2L/94S/33N); speed 53.1% tokens ≥50th pct (128/241).

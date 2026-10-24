@@ -4167,9 +4167,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     except Exception:
                                         _rsh_bear_override = False
                                 if _rsh_bear_override:
-                                    log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} but BTC bearish (oversold = continuation)")
+                                    log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.2f} < {SHORT_RSI_HARD_FLOOR} but BTC bearish (oversold = continuation)")
                                 else:
-                                    log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.1f} < {SHORT_RSI_HARD_FLOOR} (exec-time floor would reject anyway)")
+                                    log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.2f} < {SHORT_RSI_HARD_FLOOR} (exec-time floor would reject anyway)")
                                     continue
                 except Exception:
                     pass  # non-fatal

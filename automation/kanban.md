@@ -114,3 +114,6 @@
 
 ## TEAM UPDATES
 - [2026-10-20 18:35 UTC] auto_1hr: No config change — 0 trades closed last hour (quiet). 24h 20T 4W −$0.26 (20.0%), 7d 162T 58W −$2.47 (35.8%). Size-reduce 0.3x stays (7d PnL still <$2 recovery threshold). atr_sl_hit 35.7% signal-only (healthy, tpsl deployed). Kill watch: pump-chain+ 2T 0W and pump-chain-/v6- 6T 1W, both under kill threshold. 1 open (BTC continuum-osc+ +0.14%), no 3-neg-hour streak.
+
+## TEAM UPDATES
+- [2026-10-24 14:44 UTC] health_monitor: Auto-fixed journal bloat — vacuumed 310M→114M (freed 196M). Disk now 85%. No pipeline/service restarts needed: vacation pause absent, all 3 core timers firing, prices fresh (10.7s), 0 tracebacks, 127 signals/h, 1 open position. WARN remains: disk 85% (needs CEO-approved cleanup of /usr 32G etc).
