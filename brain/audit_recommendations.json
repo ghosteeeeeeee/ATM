@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-10-24T05:42:56.347619+00:00",
-  "run": 107,
+  "timestamp": "2026-10-24T06:36:20+00:00",
+  "run": 114,
   "session_brain_stats": {
-    "note": "session_brain queried; no new insights beyond prior runs (dup-heavy, known)"
+    "note": "session_brain queried (3 queries: starvation/gate-stacking, short RSI floor, trail arming); results dup-heavy and low-signal, known drift — no new insights beyond prior runs"
   },
   "trade_summary_24h": {
     "trades": 20,
@@ -13,108 +13,139 @@
       "SHORT": "13T 8W 61.5% +0.31",
       "LONG": "7T 1W 14.3% -0.39"
     },
-    "note": "SHORT remains winning side. Book flat since 23:14Z (6h18m starvation)."
+    "note": "SHORT remains winning side. Starvation broke at 06:25Z: BLUR #16378 pump-chain+ LONG opened = first open in 6h11m."
   },
   "trade_summary_7d": {
     "trades": 120,
+    "wins": 48,
     "wr": 40.0,
-    "pnl": -1.17
+    "pnl": -1.17,
+    "by_exit_reason": {
+      "profit-monster-trail": "36T 32W +2.08",
+      "hard_max_loss": "14T 0W -1.79",
+      "atr_sl_hit": "29T 0W -1.63",
+      "stale_exit": "3T 0W -0.64",
+      "trail_arm_timeout": "8T 2W -0.24"
+    }
   },
   "trade_summary_14d": {
-    "trades": 341,
-    "wr": 36.4,
-    "pnl": -4.57,
-    "armed": "138T 79.0% +9.87",
-    "unarmed": "203T 7.4% -14.44",
-    "reached_arm": "166T 68.7% +9.31",
-    "never_arm": "175T 5.7% -13.88"
+    "trades": 340,
+    "wr": 36.5,
+    "pnl": -4.19,
+    "trailed": "138T 109W 79.0% +9.87",
+    "untrailed": "202T 15W 7.4% -14.06"
   },
-  "starvation_analysis": {
-    "status": "VERIFIED — multi-gate stacking, correct flat behavior in chop",
-    "duration": "6h18m (last open 23:14Z Oct 23)",
-    "hotset": "0 tokens for 300+ cycles",
-    "gate_kills_6h": {
-      "CONTINUUM-BLOCK": 84,
-      "SHORT-RSI-HARD-FLOOR": 43,
-      "LONG-NEUTRAL": 43,
-      "VOL-GATE-BYPASS": 34,
-      "PUMP-CHAIN-SHORT-HIGH": 32,
-      "PUMP-CHAIN-RSI-MAX": 32,
-      "OVERSOLD-SHORT": 20,
-      "LONG-NEUTRAL-CHOP": 20
-    },
-    "verdict": "Gates are individually correct. SHORTs blocked by RSI floor + vol-gate + RR-engine. LONGs blocked by continuum + 4h NEUTRAL. No signal passes ALL gates simultaneously. This IS chop — staying flat is correct per mandate."
+  "mandate_fresh": {
+    "trail_family_vs_chop": "TRAILED 138T 79.0% +9.87 vs UNTRAILED 202T 7.4% -14.06 (14d); 7d HML 14T 0W -1.79, atr_sl_hit 29T 0W -1.63, profit-monster-trail 36T 32W +2.08 — trend entries win, chop entries lose, unchanged"
   },
-  "waiver_expiry_verification": {
-    "flip1_active": false,
-    "post_expiry_SHORT_opens_RSI_lt45": 0,
-    "verdict": "PASS — waiver expired cleanly at 00:00Z, 0 violations, gate live"
-  },
-  "entry_regime_4h_verification": {
-    "fix_present": true,
-    "traffic_tested": true,
-    "coverage": "3/4 trades since fix have entry_regime_4h populated",
-    "gap": "MON #16375 has None — possible code path gap (not decider_run)",
-    "verdict": "PASS with minor gap noted"
-  },
-  "losing_autopsy": {
-    "method": "recovery_replay adverse-first (--selfcheck PASS)",
-    "24h_n": 11,
-    "never_adverse": 2,
-    "recovered": 4,
-    "never": 5,
-    "never_class": "4/5 are RSI<45 vb-/ai-trader class = waiver-band, correctly blocked post-expiry",
-    "wrong_side": "REFUTED 38th consecutive run"
-  },
-  "creative_findings": {
-    "short_rsi_band_analysis": {
-      "finding": "SHORT approval floor at 45 admits worst band (45-55: 18.5% WR, -1.22) while blocking profitable band (35-45: 44.2% WR, +0.22)",
-      "significance_14d": "Fisher p=0.0386 (significant)",
-      "significance_30d_OOS": "Fisher p=0.1938 (NOT significant — effect direction consistent but noisy)",
-      "arm_rate": "35-45: 39.5% arm vs 45-55: 14.8% arm (2.7x difference)",
-      "verdict": "DIRECTIONALLY STRONG but fails OOS significance bar. Pre-register for CEO review — directly informs waiver extension decision.",
-      "confounder": "35-45 includes waiver-period trades (Oct 23: 11T) but also pre-waiver (Oct 13: 18T 33.3% WR)"
-    }
-  },
-  "pre_reg_rechecks": {
-    "CONF_FLOOR_pc-_only": "blocked 10T 1W -0.19, winners 8, fkA=12.5% PASS (better than combined 26.3%)",
-    "CONF_FLOOR_combined": "blocked 34T 5W -1.54, fkA=26.3% FAIL",
-    "TAT_variant_C": "0 in-scope ai-trader+ fires since #39 scope fix — still awaiting",
-    "pc-_CANCEL": "stands (bare 14d 35T -0.30, CONF_FLOOR covers)",
-    "pc+_kill": "NOT MET (30d 69T +1.78 positive)",
-    "vb-_steer001": "STALE — 7d 12T 58.3% +0.01, losses are all <45 band (correctly blocked post-waiver)"
-  },
-  "last_run_verify": {
-    "waiver_expiry": "PASS (flip1_active=False, 0 violations)",
-    "entry_regime_4h": "PASS (3/4 traffic coverage, 1 gap)",
-    "recovery_replay": "PASS (selfcheck)",
-    "size_reduce": "CLEARED 22:57Z (file absent)",
-    "protected_flags": "13/13",
-    "constants_git_diff": "EMPTY",
-    "kill_flags": "correct, 0 post-kill opens",
-    "tracebacks": "4 total, none new (last Oct 11)",
-    "session_lock": "absent"
-  },
-  "config_changes_applied": [],
-  "changes_from_last_run": [
+  "watchdog_triage": [
     {
-      "change": "#102 waiver expiry gate",
-      "status": "LIVE and verified — 0 violations, flip1_active=False"
+      "steer": "steer-001 volume-buildup- losing streak (4 losses), consider disable",
+      "verdict": "REJECTED-STALE (retraction holds 16th run)",
+      "evidence": "0 volume-buildup trades opened since waiver lapse 00:00Z (HARD_FLOOR re-blocked the exact RSI<45 class: ME 35.14 / ALT 41.18 / CC 38.10 / ZRO 43.33); 14d vb- 20T 70% +0.39 positive; the flagged losses are Oct-23 afternoon waiver-era entries. no_signal_enable_disable also active."
     },
     {
-      "change": "size-reduce auto-clear",
-      "status": "CLEARED 22:57Z — file absent, correct"
+      "steer": "STARVATION ESCALATION #6 (hotset 0, 152 pending expiries, 0 opens 6h)",
+      "verdict": "PARTIALLY RESOLVED this cycle",
+      "evidence": "hotset refreshed to 1 token (YGG SHORT volume-buildup- conf 75, rsi_14 27.27 — will correctly die at SHORT_RSI_HARD_FLOOR 45 / OVERSOLD 35, expected not a bug); BLUR opened 06:25Z. Flat book 00:00-06:25 remains correct posture (blocked-candidate census run #113: taking all blocked candidates = -$0.89 pre-fee, 35% pos)."
     },
     {
-      "change": "entry_regime_4h fix",
-      "status": "TESTED by traffic — 3/4 coverage, 1 gap (MON)"
+      "steer": "SHORT-FAVOR stands (re-read required each cycle)",
+      "verdict": "RE-VERIFIED — condition-locked",
+      "evidence": "24h SHORT 61.5% +0.31 vs LONG 14.3% -0.39; btc_15m + btc_4h SHORT_BIAS (watchdog 06:14); BTC pinned at EMA300 ~80816 with zero >=15m above-runs in 12h. Shorts valid ONLY while 1m holds <=EMA300; longs only on 15-30m held reclaim WITH volume."
+    },
+    {
+      "steer": "ATOM SHORT conf=70 opportunity",
+      "verdict": "NO ACTION (CEO domain)",
+      "evidence": "AI_TRADER_ENABLED=False, watchlist reference only per prior runs."
     }
   ],
+  "losing_autopsy": {
+    "method": "brain/analysis/recovery_replay.py adverse-first anchor, --selfcheck PASS (vacuity check)",
+    "window_48h": {
+      "n": 12,
+      "never_adverse": 2,
+      "recovered_after_adverse": 5,
+      "never_traded_back": 5,
+      "never_list": [
+        "ALT -0.17 volume-buildup- SHORT RSI 41.18 (waiver-band, now blocked)",
+        "CC -0.15 volume-buildup- SHORT RSI 38.10 (waiver-band, now blocked)",
+        "ZRO -0.11 volume-buildup- SHORT RSI 43.33 (waiver-band, now blocked)",
+        "BTC -0.08 ai-trader-pending SHORT manual_sl (CEO domain)",
+        "PUMP -0.01 r2v2-long9 LONG profit-monster giveback (rounding)"
+      ]
+    },
+    "wrong_side_verdict": "REFUTED 43rd consecutive run (#61 opposite-side p=0.116, #84 fwd-return t=-0.04). 3 of 5 NEVER are the waiver-band class the 00:00Z floor lapse already removed; 0 new patterns."
+  },
+  "signal_deep_dive": {
+    "new_targets": 0,
+    "sub_50_wr_n_ge_15_14d": {
+      "bb-bounce-v2-long+": "35T 42.9% -0.94 (owner: TAT variant-C + MFE-CUT)",
+      "ai-trader+": "27T 37.0% -0.91 (disabled, CEO domain)",
+      "doji-bottom-long": "20T 40.0% -0.62 (killed Oct 16; ZEN 'post-kill' = in-flight at kill boundary 17:43:02, 0 opens since)",
+      "pump-chain+": "44T 25.0% -0.49 (owner: CONF_FLOOR, bleed = conf<30; 30d +1.78 NO-KILL stands)",
+      "pump-chain-": "35T 22.9% -0.30 (owner: CANCEL — v6 combo +0.28 carries)",
+      "ai-trader-manual": "15T 46.7% +0.34 positive PnL (CEO domain)"
+    }
+  },
+  "last_run_verify": {
+    "waiver_gate": "PASS — flip1_active()=False, 0 [35,45) SHORT opens post-lapse, 0 knife<35 SHORT opens, 0 new Tracebacks",
+    "entry_regime_4h_fix": "NOW TESTED BY TRAFFIC — 5/5 post-fix opens: DYDX LONG_BIAS / SYRUP NEUTRAL / BTC NEUTRAL / BLUR SHORT_BIAS full stamps, MON trend-only partial (regime/slope NULL = 1/5 coverage gap). Closes #106 'untested' item.",
+    "constants": "DIRTY but NOT a violation — favorites_updater.timer 06:00Z wrote FAVORITES_LONG {WLD}→set() and LOSERS += ME,PUMP (file header: AUTO-UPDATED daily by design; none are CEO_PROTECTED_FLAGS). Protected 13/13 verified. Daily commit 07:15Z sweeps it.",
+    "kill_flags": "PASS — doji 1 'post-kill' = ZEN in-flight same-minute as kill (known, cleared), volume-breakout 0, hmacd 0",
+    "size_reduce": "PASS — file absent = 1.0x (cleared 22:57Z Oct 23)",
+    "recovery_replay_selfcheck": "PASS",
+    "session_lock": "absent",
+    "protected_flags": "13/13"
+  },
+  "drift_findings": [
+    "constants_change_review_queue: honored (0 qualifies — everything CEO-gated, rejected-with-data, or pre-registered)",
+    "vacation_mode.json still true — 21st run (T/CEO: fk ruling, CONF_FLOOR, TAT GO all behind it)",
+    "entry_regime_4h MON partial stamp (trend written, regime/slope NULL) — LOW, 1/5, feature column only, no gate reads it",
+    "session_brain dup-heavy (known)"
+  ],
+  "recurring_problems": [
+    "Starvation = multi-gate stacking in EMA300 chop-pin — documented correct-flat last run, partially resolved this cycle (hotset 1, BLUR open)",
+    "Escalation #17 (65th request): atr_sl_hit 7d 29T 0W -1.63, armed=0 class — candle-vs-poll arming gap, vehicle = Oct 25 BE-at-arm 1m replay"
+  ],
+  "missing_implementations": [
+    "CONF_FLOOR bare-only — blocked 42T -1.71, fk definitions disagree (literal 5.6% PASS vs family 29.2% FAIL) — awaits CEO fk ruling",
+    "TAT variant-C — 16 in-scope fires, fk 0/7, +0.410, p=0.016 — awaits CEO GO",
+    "entry_regime_4h alignment gate — stamp now live, n=1 counter datapoint (BLUR) — pre-registered this run"
+  ],
+  "creative_findings": [
+    {
+      "idea": "entry_regime_4h alignment sentinel — PRE-REGISTERED (zero code)",
+      "detail": "The #104 stamp fix proved live this run (4/5 full + 1 partial). Lock criteria NOW pre-data: cohort COUNTER = LONG×SHORT_BIAS or SHORT×LONG_BIAS at entry_regime_4h; trigger n_counter>=20 closed; bars = Fisher p<0.05 AND fk<20% AND save>$1.00 AND OOS same-sign -> then propose as shadow gate. First datapoint: BLUR #16378 LONG×SHORT_BIAS (also btc BEAR_TREND, coin SHORT_BIAS) — n=1, monitor. Distinct from coin_regime 15m watch (COUNTER 14d 31T 38.7% -0.50, still COLLECT)."
+    },
+    {
+      "idea": "momentum_state entry filter for counter-looking pump-chain+ LONG — MEASURED THEN REJECTED-WITH-DATA",
+      "detail": "BLUR's metadata looks terrible (BEAR_TREND + SHORT_BIAS + momentum falling + gap -0.25 + vol_spike 0.25) but pc+ LONG by momentum_state: 14d falling 3T 66.7% +0.58 / flat 23T +0.05 / rising 21T -0.73; 30d falling 4T +0.51, rising 42T +1.43 — 'falling' is NOT the bleed, signs flip across windows, n=3<20. Logged so the scary-metadata story is never re-proposed from one trade."
+    },
+    {
+      "idea": "waiver-lapse scoreboard FIRST READ (pre-registered item)",
+      "detail": "Since 00:00Z: 0 blocked-class [35,45) SHORT opens (gate working), 1 close total (BTC -0.08), 0 vb trades. n=0 for band comparison — too early, keeps collecting."
+    }
+  ],
+  "config_changes_applied": [],
+  "changes_from_last_run": {
+    "waiver_expiry_gate": "PASS — holding post-lapse, 0 violations",
+    "entry_regime_4h_stamp": "PASS — tested by traffic 4/5 full",
+    "blocked_candidate_census_kpi": "one-shot delivered last run; starvation broken this cycle, re-run when starvation recurs",
+    "short_rsi_band_re_evaluation": "refreshed — 14d <45 40T 42.5% +0.13 vs 45-55 25T 16.0% -1.20 vs >=55 19T 52.6% +0.74; 30d <45 flips to -1.18 (p=0.194 OOS) -> stays CEO-waiver question, no action"
+  },
   "next_actions": [
-    "CEO: waiver extension decision — market still SHORT_BIAS, 35-45 band data supports extension (p=0.039 14d)",
-    "CEO: CONF_FLOOR fk ruling — bare-only passes (12.5%), combined fails (26.3%)",
-    "CEO: TAT variant-C GO — still 0 in-scope fires, not ready",
-    "Monitor: entry_regime_4h MON gap — check code path",
-    "Monitor: starvation — if regime shifts (EMA300 reclaim), generators should resume"
-  ]
+    "CEO: waiver extension decision — 14d data favors the blocked 35-45 band (+0.13) over admitted 45-55 (-1.20) but 30d OOS sign-flips (p=0.194); waiver-lapse scoreboard accumulating live",
+    "CEO: fk ruling (2 definitions) -> CONF_FLOOR bare; TAT variant-C GO; vacation_mode state",
+    "Monitor: BLUR #16378 counter-regime LONG — hold to bracket (SL -1.15% / TP +2.47%), first entry_regime_4h COUNTER datapoint, n=1 do not act",
+    "Monitor: entry_regime_4h sentinel accumulation (n=1/20)",
+    "Escalation #17 (65th): candle-aware arming — vehicle Oct 25 BE-at-arm 1m replay",
+    "Oct 25 eval batch unchanged: MFE-CUT / habitat / re-enter / UGB / short-gate / CONF-FILTER"
+  ],
+  "readiness": {
+    "open": "1 — BLUR #16378 pump-chain+ LONG, bracketed SL 0.00808876 (-1.15%) TP 0.008384 (+2.47%), EXTREME vol — HOLD to bracket; counter-regime by 4h stamp but momentum_state cell historically positive (n=1 watch, no force-unload)",
+    "regime": "chop-pin at EMA300 ~80816 (BTC 80816.2 vs 80816.5, flickered above 06:13-06:15 only), 15m+4h SHORT_BIAS, vol LOW, volume LOW, flips 31/24h >= p95 unstable",
+    "rule": "SHORTs only while 1m holds <=EMA300 ~80816; LONGs only on 15-30m held close above WITH volume; prefer trail-family first entries (continuum-trend+, bb-squeeze+); size 1.0x",
+    "hotset": "1 token YGG SHORT conf 75 rsi 27.27 — expected to die at HARD_FLOOR, gates working"
+  }
 }

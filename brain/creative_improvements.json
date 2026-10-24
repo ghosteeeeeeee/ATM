@@ -7759,5 +7759,23 @@
     "category": "meta",
     "status": "documented",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-24T06:50",
+    "idea": "entry_regime_4h alignment sentinel — PRE-REGISTERED (zero code)",
+    "rationale": "Stamp fix (#104) proved live this run: 5/5 post-fix opens stamped (4 full + MON partial), first values in (DYDX LONG_BIAS, SYRUP NEUTRAL, BTC NEUTRAL, BLUR SHORT_BIAS). Lock criteria pre-data: COUNTER = LONG x SHORT_BIAS or SHORT x LONG_BIAS; trigger n_counter>=20 closed; bars Fisher p<0.05 AND fk<20% AND save>$1.00 AND OOS same-sign -> propose shadow gate. Distinct from coin_regime 15m watch (COUNTER 14d 31T 38.7% -0.50 still COLLECT).",
+    "expected_impact": "Blocks counter-4h-trend entries only if they prove structurally negative; first datapoint BLUR #16378 LONG x SHORT_BIAS (n=1, held to bracket)",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "zero (no code until n>=20 and all bars pass)"
+  },
+  {
+    "date": "2026-10-24T06:50",
+    "idea": "REJECTED-WITH-DATA: momentum_state gate for pump-chain+ LONG (do not re-propose from BLUR scary metadata)",
+    "rationale": "BLUR #16378 entry metadata looks terrible (btc BEAR_TREND, coin SHORT_BIAS, momentum_state=falling, gap -0.25, volume_spike 0.25) suggesting a counter-momentum filter. Measured pc+ LONG by momentum_state: 14d falling 3T 66.7% +0.58 / flat 23T +0.05 / rising 21T -0.73; 30d falling 4T +0.51 / rising 42T +1.43. Falling is the BEST small cell, rising carries 30d, signs flip, n=3<20.",
+    "expected_impact": "none — filter would have blocked positive cells",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "n/a"
   }
 ]

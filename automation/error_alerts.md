@@ -1771,3 +1771,7 @@
 
 ## Error Alerts — 2026-10-24 04:27 UTC
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] GRIFFAIN TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-24 05:43 UTC
+- **WARN** (1x): `disk usage 86% on /` (95G/118G, 17G free) — no logs older than 7d to compress; largest consumers: data/coin_tracker.db (3.3G), session_brain.db (1.5G), candles.db (1.2G), logs/pipeline.log (274M). No auto-fix available; monitor.
+- No CRITICAL issues. All timers active, 0 tracebacks, prices fresh (63s).
