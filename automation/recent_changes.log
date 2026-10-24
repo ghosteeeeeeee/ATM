@@ -5160,3 +5160,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-24 06:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 9W 45.0% '-$0.08' | 7d 120T 40.0% '-$1.17' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 1/20=5.0% under 40% | no neg streak (empty hour resets) | 1 open BLUR pump-chain+ LONG -0.18% bracketed | No constants change -> no signal_versions entry
 - [2026-10-24 07:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 9W 45.0% '-$0.08' | 7d 120T 40.0% '-$1.17' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 1/20=5.0% under 40% | no neg streak (empty hour resets) | 1 open BLUR pump-chain+ LONG +0.77% bracketed | No constants change -> no signal_versions entry
+- [2026-10-24 08:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L net '+$0.01' (BLUR pump-chain+ LONG trail_arm_timeout +0.15%) | 24h 19T 9W 47.4% '-$0.05' | 7d 121T 40.5% '-$1.16' — size-reduce 1.0x (file absent = truth) | kill: none (1 trade, a win) | atr_sl_hit 1/19=5.3% under 40% | no neg streak (positive hour) | 0 open | No constants change -> no signal_versions entry
+BY: auto_1hr

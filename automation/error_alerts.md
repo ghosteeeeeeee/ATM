@@ -1788,3 +1788,8 @@
 - **WARN** (1x): disk 85% used (95G/118G, 17G free) after journal vacuum + tmp/pip cache cleanup (freed ~1G, 86%→85%). Remaining hogs need CEO approval: /root/.local/share/opencode 12G, /usr 32G, /root/.cache 3.5G (camoufox 1.4G + playwright 910M + puppeteer 651M).
 - **INFO**: "CRASH" grep hit in pipeline log = `BTC-CRASH` warning label, not a traceback. 0 real tracebacks in 30m.
 - **AUTO-FIX**: log cleanup applied (gzip >7d logs, journal vacuum 300M, tmp >7d purge, pip cache purge). No service restarts needed — vacation_pause absent, all core timers active, pipeline rc=0 at 07:42.
+
+## Error Alerts — 2026-10-24 08:45 UTC
+- **WARN** (recurring): disk 86% used (95G/118G, 17G free) — no logs >7d to gzip; safe cleanup already applied at 07:46 (journal vacuum + tmp/pip purge). Remaining hogs need CEO approval (/root/.local/share/opencode 12G, /usr 32G, /root/.cache 3.5G).
+- **WARN** (1x, handled): `TRADE FAILED: NXPC SHORT — mid-band death band: 53.1 in 45-55` at 08:41 — signal marked FAILED, hotset cooldown engaged (2 failures), no retry loop. Design working as intended.
+- **AUTO-FIX**: none required — vacation_pause absent; price-collector/1m-candle/pipeline/watchdog timers all active and firing; pipeline rc=0 at 08:42, 0 tracebacks/30min; prices fresh (9.7s); 0 DB locks; 0 open positions; 0 phantom trades/24h; 52 signals/hour; regime SHORT_BIAS.
