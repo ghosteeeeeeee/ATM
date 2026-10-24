@@ -1760,3 +1760,11 @@
 - **WARN** (recurring, 28x/hr): `hermes-watchdog: locks: WARNING — Cleaned 5-7 stale locks` (pipeline_heartbeat, guardian_closing, hotset_json, signal_compactor_critical, …) — watchdog self-heals each run, no pipeline errors, but stale-lock churn every cycle is noisy; owners may not be removing locks on exit.
 - **WARN**: disk 85.0% used (95G/118G, 17G free) — no logs >7d to gzip, journal vacuum previously freed 0B. Same hogs as 2026-10-23 (outside health-monitor scope): /var/log/syslog* 1.2G, /root/zscore 2.2G, /root/hermes-agent 2.0G, /root/snap 1.7G.
 - **AUTO-FIX**: none required — pipeline timer firing on schedule (last run 02:42, all rc=0, 0 tracebacks/30min), price-collector/1m-candle timers active, prices fresh (72s), no DB locks held, 0 open positions, no phantom trades in 24h. vacation_pause.json absent.
+
+## Error Alerts — 2026-10-24 03:45 UTC
+- **WARN** (recurring): `hermes-watchdog: signals: WARNING — only 0-4 signals in last 5 min (min 20)` — 21 signals generated in the last hour, so this is rate variance vs an aggressive threshold, not a stall.
+- **WARN** (recurring): `hermes-watchdog: locks: WARNING — Cleaned 5 stale locks` (pipeline_heartbeat, guardian_closing, hotset_json, signal_compactor_critical, hotset_last_updated) every ~2min cycle — owners not clearing locks on exit; noisy but self-healing.
+- **WARN**: `hotset.json is empty — no signals survived compaction` + `No signals above 40% confidence — skipping execution` every minute → 0 executions, 0 open positions, 0 trades in the last hour (20 closed in last 24h, +0.14 USDT). Compaction is filtering everything out — worth a signal-lab look if it persists.
+- **WARN**: disk 85% (df: 95G/118G used, 17G free; raw 80.5%). No logs >7d to gzip, so no safe reclaim from logs/ — same out-of-scope hogs as 2026-10-23 (/var/log/syslog* 1.2G, /root/zscore 2.2G, /root/hermes-agent 2.0G, /root/snap 1.7G).
+- **INFO**: `decisions` table (signals_hermes_runtime.db) last row 2026-04-13 — likely legacy schema left behind by the signal_compactor migration; not read by the live path.
+- **AUTO-FIX**: none required — no vacation pause, all 4 timers active, pipeline service running (rc=0 every cycle, 0 tracebacks/30min), position_manager healthy, prices fresh (14s, 87 tokens), no DB locks held, no phantom trades.

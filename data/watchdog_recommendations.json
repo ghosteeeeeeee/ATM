@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-24T03:14:37.467300+00:00",
+  "timestamp": "2026-10-24T03:44:37.597759+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -13,17 +13,17 @@
   "portfolio_health": "good",
   "regime": {
     "btc_15m": "LONG_BIAS",
-    "btc_4h": "LONG_BIAS",
+    "btc_4h": "SHORT_BIAS",
     "continuum": "AT",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
+    "linreg_alignment": 0.25,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
   "open_count": 0,
   "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 0 (0 long, 0 short) \u2014 0/6 slots\nUnrealized PnL: 0.00 USDT\nRegime: chop-pin at EMA300 | Volatility: LOW | Flips/24h: agg 30 (\u2265p95=unstable), BTC 18\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [regime] BTC pinned AT EMA300 after 18.4h below (80980 vs 81012, -0.04% at 03:14).\n   Both sides gated at once \u2014 CONTINUUM-BULL denied every SHORT 03:08-03:15 (\"bullish\n   structure\"), CHOP/RR/CONFLUENCE block longs \u2192 0/6 idle. No new risk until the 1m\n   reclaims 81012 and HOLDS 15-30m (longs open) or rejects again (shorts stay favored,\n   age\u22485 cycles unexecuted). RETRACT the short-favor steer on a 15-30m hold above 81012.\n\ud83d\udfe1 [health] steer-001 RETRACTED \u2014 \"disable volume-buildup-\" condition re-read 03:16:\n   last loss 14:54 Oct 23, then 5 straight trail wins +0.47, window 70% WR +0.39.\n   Do not disable. Re-trigger: any new loss on that signal.\n\ud83d\udfe2 [info] 24h exits: every winner exited via trail (+0.93), every loser unarmed (-0.98).\n   Trail arming (escalation #17) remains the single win lever.\n\ud83d\udfe2 [opportunity] DOT LONG pick written \u2014 PICK (watchlist only \u2014 AI_TRADER_ENABLED=False,\n   will NOT execute). Precheck PASS: RSI 51.8 center band, ATR 1.45%, 30d LONG 67% WR.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nFlat book is gate-made, not chosen \u2014 both directions blocked simultaneously while\nsignal_compactor's hot_set stays empty (3 pending never compacted). 24h net -0.05\n(21 closes) but the split is stark: SHORT 62% WR +0.31 vs LONG 25% -0.36 (7d same\nshape: -1.73 vs +0.56). The winning side was the short side and the armed side.\nSources: structure bullish (continuum LEAN_BULL, AT), aggregate LONG_BIAS (03:00),\nauto-trader CHOP bracket, price still under the macro line \u2014 condition-locked only,\ndirectional prose is noise at 30 flips/24h.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Take no new risk until the EMA300 pin resolves: longs only on 1m close >81012\n   held 15-30m; shorts only while below. (Trend filter already enforces this.)\n2. Do NOT disable volume-buildup- \u2014 streak steer retracted on re-read evidence.\n3. Watch hot_set: if still empty next cycle after pending signals exist, escalate\n   to signal_compactor \u2014 idle slots are our biggest cost right now, not losses.\n4. If AI_TRADER re-enables, DOT LONG is queued (watchlist); APT SHORT is EXPIRED\n   (RSI 67.7, band lost).\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n",
