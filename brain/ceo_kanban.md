@@ -1,4 +1,5 @@
 ## TEAM UPDATES
+- [2026-10-24 22:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 11T 9W 81.8% '+$1.06' (GREEN) | 7d 124T 41.9% '-$0.59' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 0/11=0% under 40% | no neg streak (20:00 positive) | 3 open HBAR -0.24%, BTC +0.20%, HYPE +0.14% | No constants change -> no signal_versions entry
 - [2026-10-24 19:27 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 9T 7W 77.8% '+$0.82' (GREEN) | 7d 123T 40.7% '-$0.98' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 0/9=0% under 40% | no neg streak (15:00 positive) | 2 open BTC +1.06%, HYPE -0.09% | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-24 18:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 11T 9W 81.8% '+$0.87' (GREEN) | 7d 123T 40.7% '-$0.98' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 0/11=0% under 40% | no neg streak (15:00 positive) | 1 open BTC continuum+ LONG +0.85% | No constants change -> no signal_versions entry
