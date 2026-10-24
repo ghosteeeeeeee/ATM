@@ -5341,14 +5341,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _sf_conn.close()
                         except Exception:
                             pass
-                    # Volatility floor check
-                    if _rescue_ok:
-                        try:
-                            vol_ok = check_volatility_floor(tok)
-                            if vol_ok == 0.0:
-                                _rescue_ok = False
-                        except Exception:
-                            pass
+                    # CEO UNCLOG-2 #4 (consult 20261024T154339Z, T directive 2026-10-24
+                    # 15:40): conflict rescue deliberately does NOT re-check the volatility
+                    # floor. The floor had already killed the conflict WINNER (first-pass
+                    # check with tkn), so re-checking the same token's floor here guaranteed
+                    # the demoted loser could never be rescued either — both sides of every
+                    # cross-dir conflict died and the signal sat PENDING until
+                    # compaction_stale_10min (1,183 SHORT expiries since 10-22 16:00; the
+                    # 11:11-14:14 BTC SHORT gap on 10-24). Scope: rescue path ONLY —
+                    # first-pass admission everywhere still applies the floor. Monitor 48h
+                    # for wrong-direction admits (CEO risk note).
                     # ── Pump-chain velocity filter for conflict rescue ────────
                     # FIX (2026-09-10): Conflict rescue bypasses velocity filter,
                     # allowing wrong-direction entries (same class as PRESERVE bug).

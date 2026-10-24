@@ -298,14 +298,15 @@ PENALTY_MULT = 0.7              # 30% score penalty in signal_compactor _score_s
 # AUTO-UPDATED daily by losers_tracker.py (direction-specific)
 # Note: Tokens should NOT be in both FAVORITES and LOSERS for same direction
 LOSERS_LONG = {
+    'BTC',  # MOVED from LOSERS 2026-10-24 — CEO UNCLOG-2 #1 (consult 20261024T154339Z, T directive 15:40): BTC's losers-bleed is LONG/manual (7d BTC LONG 17T 41.2% incl. one -21.37% ai-trader-manual cut; 7d BTC SHORT 9T 44.4% flat -$0.05). decider's legacy-LOSERS HARD-BLOCK/conf-penalty is direction-blind — it zeroed BTC SHORT conf (88%→0%) and blocked the only 2 actionable BTC SHORTs of the 10-24 dump. Size path (decider _get_dynamic_position_size) + compactor penalty already honor LOSERS_LONG directionally.
     'BIGTIME', 'ETC', 'GMT', 'HBAR', 'IO', 'NOT', 'SUSHI', 'WLFI'
 }
 LOSERS_SHORT = {
     'DOT', 'ZRO'
 }
-# Legacy combined set
+# Legacy combined set — DIRECTION-BLIND in decider (HARD-BLOCK + conf penalty).
+# BTC removed 2026-10-24 → LOSERS_LONG (see above). ME/PUMP left per CEO scope.
 LOSERS = {
-    'BTC',
     'ME',
     'PUMP'
 }
@@ -1776,12 +1777,26 @@ ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
 AI_TRADER_EXTREME_LONG_SHADOW_ENABLED = False
 AI_TRADER_EXTREME_LONG_SHADOW_MULT = 0.7  # confidence multiplier when live
 # Tiered trail: loosens as profit grows (2026-09-07 partial-close plan — Option 3)
-# Format: list of (min_profit_pct, trail_distance_pct) — first match wins, never tightens
+# Format: list of (min_profit_pct, trail_distance_pct) — LAST match wins (highest
+# applicable tier); at a tier boundary the floor intentionally LOOSENS (PM
+# semantics: peak 1.50→1.51 widens giveback 0.20→0.50) — bug_hunter F-9 fix.
 PM_TRAIL_TIERS = [
     (0.0,  0.002),   # 0%–1.5%: 0.20% trail (scalp zone — tight)
     (0.015, 0.005),  # 1.5%–3.0%: 0.50% trail (move confirmed — give room)
     (0.030, 0.008),  # 3.0%–5.0%: 0.80% trail (trend mode — let it run)
     (0.050, 0.012),  # 5.0%+: 1.20% trail (parabolic — only exit on real reversal)
+]
+# manual_exit_manager — CEO-trade trail tiers (2026-10-24 CEO directive: "the SL
+# trail has to survive slightly bigger pullbacks"). DECOUPLED from PM_TRAIL_TIERS
+# (profit-monster pipeline trades untouched): +0.30 giveback cushion per level,
+# base sized to ~1.1x 1h ATR — #16381's cascade bounced 0.46% off its 0.60% peak
+# before continuing; a 0.50% base survives that class of pullback. Floor never
+# below breakeven; the TP stays the giant-candle backstop.
+MANUAL_TRAIL_TIERS = [
+    (0.0,  0.005),   # <1.5%:  0.50% giveback (bounce survival zone)
+    (0.015, 0.007),  # >=1.5%: 0.70%
+    (0.030, 0.010),  # >=3.0%: 1.00%
+    (0.050, 0.014),  # >=5.0%: 1.40% (parabolic)
 ]
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B

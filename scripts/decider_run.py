@@ -3094,7 +3094,6 @@ def _run_hot_set():
             _is_pump_src = 'pump-catcher' in (hot_sig.get('source', '') or '')
             if _is_pump_src and _hotset_age_min > PUMP_CATCHER_MAX_STALENESS_MIN:
                 log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED — pump signal stale ({_hotset_age_min:.1f}min > {PUMP_CATCHER_MAX_STALENESS_MIN}min)')
-                _record_hotset_failure(token, direction, failures)
                 continue
 
             # Check: is this token+direction already APPROVED (don't double-approve)?
@@ -3136,7 +3135,6 @@ def _run_hot_set():
                 if sig_conf < 55:
                     log(f'  🚫 [ZSCORE-GATE] {token} {direction} BLOCKED: zscore-pump '
                         f'failed/invalid (effective conf={sig_conf:.0f}% < 55)')
-                    _record_hotset_failure(token, direction, failures)
                     continue
 
             # ── RS TOUCH COUNT GATE (FIX 3, 2026-05-21) ─────────────────────────
@@ -3151,7 +3149,6 @@ def _run_hot_set():
                 if RS_TOUCH_HARD_CAP and rs_touches > RS_TOUCH_HARD_CAP:
                     log(f'  🚫 [TOUCH-CAP] {token} {direction}: rs_touches={rs_touches} > {RS_TOUCH_HARD_CAP} '
                         f'→ blocked (level is exhausted/trampled)')
-                    _record_hotset_failure(token, direction, failures)
                     continue
                 # Z-score bonus: strong momentum (|z| > threshold) compensates for weaker level
                 min_touches = RS_DECIDER_ZBONUS_TOUCHES if abs(z_score) >= RS_DECIDER_ZBONUS_ZSCORE else RS_DECIDER_MIN_TOUCHES
@@ -3162,7 +3159,6 @@ def _run_hot_set():
                     if sig_conf < RS_DECIDER_CONF_FLOOR:
                         log(f'  🚫 [TOUCH-GATE] {token} {direction} BLOCKED: weak level '
                             f'(touches={rs_touches}, effective conf={sig_conf:.0f}% < {RS_DECIDER_CONF_FLOOR})')
-                        _record_hotset_failure(token, direction, failures)
                         continue
 
             # ── WAVE-AWARENESS FILTER (SPEED FEATURE, 2026-04-03) ─────────────
@@ -3202,7 +3198,6 @@ def _run_hot_set():
             if _overext and not (_wave == 'bottoming' and direction == 'LONG'):
                 log(f'  🌊 [HOT-SET] {token} {direction} BLOCKED: overextended '
                     f'(vel={_vel:+.2f}%, phase={_wave})')
-                _record_hotset_failure(token, direction, failures)
                 continue
 
             # ── MOMENTUM EXHAUSTION FILTER ────────────────────────────────────────
@@ -3221,12 +3216,10 @@ def _run_hot_set():
                 if direction == 'LONG' and _chg_30m > 0:
                     log(f'  ⚡ [HOT-SET] {token} {direction} BLOCKED: momentum exhausted '
                         f'(30m move={_chg_30m:+.2f}% > +{MOMENTUM_EXHAUSTION_THRESHOLD}%)')
-                    _record_hotset_failure(token, direction, failures)
                     continue
                 elif direction == 'SHORT' and _chg_30m < 0:
                     log(f'  ⚡ [HOT-SET] {token} {direction} BLOCKED: momentum exhausted '
                         f'(30m move={_chg_30m:+.2f}% < -{MOMENTUM_EXHAUSTION_THRESHOLD}%)')
-                    _record_hotset_failure(token, direction, failures)
                     continue
 
             # Compute direction-wave alignment multiplier (affects threshold)
@@ -3286,7 +3279,6 @@ def _run_hot_set():
                 if confidence < 55:
                     log(f'  🧊 [HOT-SET] {token} {direction} BLOCKED: {trap_reason} '
                         f'(counter-trend trap penalty={trap_penalty}, conf below threshold)')
-                    _record_hotset_failure(token, direction, failures)
                     continue
                 log(f'  🧊 [HOT-SET] {token} {direction} penalized {trap_penalty}pts: {trap_reason} (conf now {confidence:.0f}%)')
 
@@ -3378,7 +3370,6 @@ def _run_hot_set():
             # merged to pass. source='hzscore' = bare hzscore, no confluence → block.
             if sig_src == 'hzscore':
                 log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED: hzscore (combo-only, no confluence)')
-                _record_hotset_failure(token, direction, failures)
                 continue
 
             # APPROVAL IS NOW THE SOLE RESPONSIBILITY OF signal_compactor.py (every 5 min).
@@ -3396,7 +3387,16 @@ def _run_hot_set():
     return 0
 
 def _record_hotset_failure(token: str, direction: str, failures: dict):
-    """Record a failed trade for back-to-back cooldown tracking."""
+    """Record a failed trade for back-to-back cooldown tracking.
+
+    CEO UNCLOG-2 #2 (consult 20261024T154339Z, T directive 2026-10-24 15:40):
+    called ONLY from the trade-failed (brain execution) branch — the BUG-049
+    backstop. Quality/refusal paths (LOSERS-BLOCK, HARD-BLOCK, ZSCORE-GATE,
+    TOUCH-CAP/GATE, overextended, momentum-exhaustion, trap, hzscore, stale)
+    must NOT count: their refusals were recorded as "failures", 2 refusals →
+    a 1h token+direction cooldown mid-dump (BTC 10-24: the only 2 actionable
+    BTC SHORTs became the 2 failures that then locked the signal out for ~58min).
+    """
     now = time.time()
     if token not in failures:
         failures[token] = {'LONG': {'count': 0, 'last': 0}, 'SHORT': {'count': 0, 'last': 0}}
@@ -4825,19 +4825,16 @@ def run(dry_run=False):
                 if _wr is not None and _wr < LOSERS_HARD_BLOCK_WR:
                     log(f'  🚫 [HARD-BLOCK] {token} {direction}: WR={_wr}% < {LOSERS_HARD_BLOCK_WR}% — BLOCKED')
                     skipped += 1
-                    _record_hotset_failure(token, direction, failures)
                     continue
                 elif _wr is None:
                     # No trades data — fail closed (block)
                     log(f'  🚫 [HARD-BLOCK] {token} {direction}: no trade data — BLOCKED (fail-closed)')
                     skipped += 1
-                    _record_hotset_failure(token, direction, failures)
                     continue
             except Exception as e:
                 # DB error — fail closed (block trade)
                 log(f'  🚫 [HARD-BLOCK] {token} {direction}: DB error ({e}) — BLOCKED (fail-closed)')
                 skipped += 1
-                _record_hotset_failure(token, direction, failures)
                 continue
             finally:
                 if _conn:
@@ -4853,7 +4850,6 @@ def run(dry_run=False):
             if confidence < 50:
                 log(f'  🗑️ [LOSERS-BLOCK] {token} {direction} BLOCKED — confidence {confidence:.0f}% < 50% — SKIP')
                 skipped += 1
-                _record_hotset_failure(token, direction, failures)
                 continue
 
         # ── EMA300 STABLE CONDITION CHECK for SHORT trades ────────────────────
