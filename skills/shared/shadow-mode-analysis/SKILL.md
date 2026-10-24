@@ -282,6 +282,65 @@ When reporting shadow analysis findings:
 
 Saved reports:
 - `reports/20261021-shadow-sl-sweep.md` — SL sweep analysis
+- `reports/2026-10-24-shadow-mode-disabled-signals-analysis.md` — Disabled signals & gate impact analysis
+
+## Shadow-Bypass Registry (Re-Enabled Signals)
+
+The shadow-bypass registry contains 16 signals disabled in the main system but tracked in shadow mode. Defined in `hermes_constants.py:3168` as `SHADOW_BYPASS_SIGNALS`.
+
+### Query Shadow-Bypass Signals
+
+```sql
+-- Get shadow stats for all bypass signals
+SELECT source, direction, COUNT(*) as n,
+  ROUND(100.0*SUM(CASE WHEN net_pnl_pct>0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
+  ROUND(AVG(net_pnl_pct),3) as avg_pnl,
+  ROUND(SUM(net_pnl_pct),1) as total_pnl,
+  ROUND(AVG(mfe_pct),3) as avg_mfe,
+  ROUND(AVG(mae_pct),3) as avg_mae
+FROM shadow_trades WHERE closed=1
+  AND (source LIKE '%bb-squeeze-%' OR source LIKE '%bb-bounce-v3%' 
+       OR source LIKE '%volume-breakout-long%' OR source LIKE '%hmacd_mtf-+%'
+       OR source LIKE '%doji-bottom%' OR source LIKE '%ichimoku-%'
+       OR source LIKE '%ichimoku+%' OR source LIKE '%rs-r%' OR source LIKE '%rs-s%'
+       OR source LIKE '%open-skies%' OR source LIKE '%squeeze-cross%'
+       OR source LIKE '%rs-broken%' OR source LIKE '%vel-hermes%')
+GROUP BY source, direction
+ORDER BY n DESC;
+```
+
+### Bypass Signal Categories
+
+**Stage A: Parameter-Killed / Regime-Specific Winners**
+- `bb-squeeze-` (SHORT) — SHORT side killed
+- `bb-bounce-v3-long` (LONG) — Removed from STANDALONE_BYPASS
+- `volume-breakout-long+` (LONG) — KILLED Oct 13
+- `hmacd_mtf-+` (LONG) — HMACD_MTF_PLUS_ENABLED=False
+- `doji-bottom-long` (LONG) — Needs different exit
+
+**Stage B: Gate-Blocked Signals**
+- `ichimoku-` (SHORT) — Blocked by SHORT-REGIME-GATE
+- `ichimoku+` (LONG) — Single-source, blocked by CONFLUENCE-GATE
+- `rs-r` (LONG) — Single-source, blocked by CONFLUENCE-GATE
+- `rs-s` (SHORT) — Single-source, blocked by CONFLUENCE-GATE
+
+**Stage C: Killed Signals (NEVER_REENABLE)**
+- `open-skies+` (LONG) — 13.6% WR
+- `squeeze-cross+` (LONG) — 0% WR
+- `squeeze-cross-` (SHORT) — no edge
+- `rs-broken-short` (SHORT) — 26.5% WR, massive drag
+- `rs-broken-resistance-long` (LONG) — momentum bearish
+- `vel-hermes+` (LONG) — 0% WR, -$1.61
+- `vel-hermes-` (SHORT) — AUTO-DISABLED
+
+### Key Findings (2026-10-24 Analysis)
+
+1. **All gates are HELPING** — removing all gates would add ~$1,172 in losses
+2. **Entries are the problem** — ALL SL levels show negative avg PnL (even 50% SL = -0.224%)
+3. **Disabled signals are mostly worse** — ichimoku- (1,591T, 61.1% WR) still loses -$173
+4. **SHORT beats LONG by 10pp** — 52.3% vs 42.4% WR
+5. **Only 4 signals positive (n≥20)** — volume_breakout_short, hl_copy_minus, ai-trader, grind_breakout_short
+6. **pump-chain #1 bleeder** — 3,834T, 31.7% WR, -$442.2
 
 ## Data Source
 
