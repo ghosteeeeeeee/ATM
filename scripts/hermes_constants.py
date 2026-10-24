@@ -1725,6 +1725,20 @@ PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45  # pump-chain grinds shorter than bb-squee
 # late (flat at 55m then trail). DO NOT flip T=55 without redesign clearing the fk bar.
 # ai-trader: only 3 fires/30d (+$0.26, 0 fk) — insufficient engagement, keep shadow.
 # Flip live only with CEO GO + 14d shadow data + candle OOS re-run (HR-kill guard mandatory).
+# ── VARIANT-C CANDLE OOS 2026-10-24 (analysis/tat_variant_c_candle_oos_2026-10-24.py,
+# --selfcheck PASS) — the mandated re-run on the REDESIGN (fire only when live_pnl < 0):
+#   30d, scope bb-bounce + ai-trader+ LONG (manual/pending excluded): 21 fires,
+#   net +$0.71/30d (bb-bounce +0.41 / ai-trader+ +0.30), saves +1.02, costs -0.31,
+#   fk 5/57 = 8.8% of cohort winners (BAR MET, was 41.9% for BASE),
+#   split-halves same sign: early +$0.01 / late +$0.70.
+#   TRANSPARENT CAVEAT: fk/fires = 5/21 = 23.8% (bb-bounce alone 27.8%) — over 20% if the
+#   bar is read as share-of-cuts instead of share-of-cohort-winners (the units file uses
+#   cohort-winners; #66 wrote the bar as "fk<20%" without a denominator). fk/cohorts is
+#   the denominator hermes_constants.py:1723 itself quotes.
+#   CARRIED RISK: the 5 false-kills are late runners (MNT 424m/498m, HYPE 190m, HYPER 107m)
+#   — the exact "bounce winners run late" class the Oct-17 verdict named. Net cost -0.31.
+#   CEO: VETO = set BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED False (one flag, zero code).
+BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED = True  # variant-C enforcement (age>=55m AND live_pnl<0). Revert: set False.
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW = True  # Revert: set False.
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN = 55
 # MFE-CUT SHADOW — cut-if-stall progressive exit (brain_auditor 2026-10-17).

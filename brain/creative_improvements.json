@@ -7830,5 +7830,49 @@
     "category": "exit sniper / chop early-exit",
     "status": "awaiting CEO GO (criteria PASS)",
     "risk": "low — fk 0/7, zero winner-kills observed"
+  },
+  {
+    "date": "2026-10-24T11:51:36Z",
+    "run": 117,
+    "agent": "brain_auditor",
+    "idea": "TAT variant-C candle OOS shipped as a standing script (the one missing mandated prerequisite)",
+    "rationale": "hermes_constants.py:1727 required \"CEO GO + 14d shadow data + candle OOS re-run\" for any bb-bounce TAT flip. The 2026-10-17 candle OOS only tested BASE (live_pnl<0.40, fk 41.9% = FAIL); variant-C had only an 8-day trades-level log-line pack. New analysis/tat_variant_c_candle_oos_2026-10-24.py runs the variant-C condition on 1m candle closes over 30d.",
+    "expected_impact": "21 fires / net +$0.71 / fk 8.8% of cohort winners / halves +0.01 and +0.70 same sign -> removes the block on the only queued exit lever that had data but no candle test",
+    "category": "exit quality",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T11:51:36Z",
+    "run": 117,
+    "agent": "brain_auditor",
+    "idea": "CONF_FLOOR fk denominator is window-dependent AND currently FAILS on the scope denominator - do NOT ship",
+    "rationale": "Fresh sweep: bare pump-chain conf<30 = 35T 6W -1.53 (14d). fk_scope = 6/20 bare-pump-chain winners = 30% (>20% bar) at 14d and 6/60 = 10% at 30d, but ALL blocked trades fall inside the last 14d so the 30d denominator is invalid (#71). fk_literal (all-wallet winners) = 6/123 = 4.9% PASS. At 7d scope fk is 3/3 = 100%. Threshold sweep finds no alternative cut point: conf<28 blocks only 4T 1W and LOSES -0.11; conf<30 is a cliff. fk_scope trend: 16.7% (#73) -> 21.1% (#105) -> 30.0% now.",
+    "expected_impact": "Prevents shipping a lever that kills 30% of its own family winners",
+    "category": "gate tuning",
+    "status": "measured-rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T11:51:36Z",
+    "run": 117,
+    "agent": "brain_auditor",
+    "idea": "SHORT RSI floor 45->40 / narrow re-waiver [35,40): REJECTED-WITH-DATA on OOS",
+    "rationale": "Band table consistent in direction ([35,40) 14d 17T 64.7% +0.38 / 30d 20T 60% +0.22 / 7d 9T 66.7% +0.41 with arm rate 76.5-80% = trend entries; [40,45) negative all three windows) but the lever fails: Fisher [35,40) vs [40,45) p=0.024 at 14d, p=0.100 at 30d, p=0.266 at 7d = only the derivation window is significant, and floor=40 net delta vs floor=45 sign-flips (+0.13 / -0.40 / +0.19). gate_shadow agrees the floor is net-saving (all SHORT RSI floor gates combined: 285 resolved, would_pnl -3.09, 18 wins). Pre-registered narrower re-waiver trigger (post-lapse n>=20) not evaluable - 0 SHORT opens since the 00:00Z lapse.",
+    "expected_impact": "No change; closes the run-#107 pre-registration instead of letting it drift into a CEO decision",
+    "category": "entry filter",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T11:51:36Z",
+    "run": 117,
+    "agent": "brain_auditor",
+    "idea": "T=70 variant-C is an exploratory candidate ONLY - needs held-out OOS before it can be proposed",
+    "rationale": "Same 30d candle grid: T=55 fk/fire 23.8% net +0.71 | T=70 fk/fire 20.0% fk/win 7.0% net +0.74 halves +0.30/+0.43 | T=80 +0.49 | T=90 +0.08 (early half negative). T=70 is the only point meeting BOTH fk readings with balanced halves, but it was selected on the same data it scores on = post-hoc. Lock criteria now: T=70 ships only if a fresh window (Oct 24 onward, n>=10 fires) keeps fk/fire <=20% AND net>0.",
+    "expected_impact": "+$0.03/30d over T=55 (immaterial) but fk/fire drops 23.8%->20.0%",
+    "category": "exit quality",
+    "status": "pre-registered",
+    "risk": "medium"
   }
 ]

@@ -120,7 +120,7 @@ from hermes_constants import (
     CUT_LOSER_PNL as CUT_LOSER_PNL_HERMES,
     BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED, BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN,
     PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED, PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN,
-    BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW, BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN,
+    BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED, BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW, BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN,
     MFE_CUT_SHADOW_ENABLED, MFE_CUT_SHADOW_MIN, MFE_CUT_SHADOW_MFE_MAX,
     PM_TRAIL_ACTIVATE_PCT,
     ARM_BE_SHADOW_ENABLED,
@@ -148,6 +148,7 @@ MAX_POSITIONS = MAX_OPEN_POSITIONS
 
 # Shadow collectors — once-per-trade log dedup (module-level, resets on PM restart)
 _bb_bounce_shadow_logged = set()
+_bb_bounce_tat_enforced = set()
 _mfe_cut_shadow_logged = set()
 _arm_be_shadow_armed = set()   # trade_ids that have seen live_pnl >= PM_TRAIL_ACTIVATE
 _hml_shadow_logged = set()     # trade_ids that have logged an HML-SHADOW line
@@ -3752,14 +3753,21 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 except Exception as e:
                     log(f"  TRAIL-ARM TIMEOUT error for {token}: {e}")
 
-        # ── 7b-shadow. TRAIL-ARM TIMEOUT SHADOW — bb-bounce + ai-trader+ (zero behavior) ──
+        # ── 7b-shadow. TRAIL-ARM TIMEOUT — bb-bounce + ai-trader+ (variant-C enforced) ──
         # brain_auditor 2026-10-16 22:30Z (bb-bounce) / 2026-10-17 00:40Z (ai-trader+).
-        # Logs would-fires only; never closes. Flip live only with CEO GO + 14d shadow data.
+        # Logs would-fires; variant-C enforcement live since 2026-10-24 (see constants comment).
         # FIX 2026-10-20: 'ai-trader' matched ai-trader-manual/pending (CEO trades — never
         # TAT-eligible). 7/16 unique shadow fires were manual/pending, polluting flip cohort.
-        if direction == 'LONG' and BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW:
+        # Variant-C ENFORCEMENT (brain_auditor 2026-10-24) — cut only when actually negative.
+        # Mandated candle OOS re-run shipped as analysis/tat_variant_c_candle_oos_2026-10-24.py:
+        # 30d 21 fires, net +$0.71, fk 5/57 = 8.8% of cohort winners (BASE was 41.9% = FAIL).
+        # Enforcement has its OWN dedup set: the shadow set dedups the log line at first
+        # poll where pnl < arm, and reusing it would silently disable enforcement for a
+        # trade that goes negative after its first (non-negative) shadow sighting.
+        # The shadow log below keeps running for 0 <= pnl < arm stalls.
+        if direction == 'LONG' and (BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW or BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED):
             _bbs_sig_l = (_pos_signal or '').lower()
-            if ('bb-bounce' in _bbs_sig_l or 'ai-trader+' in _bbs_sig_l) and trade_id not in _bb_bounce_shadow_logged:
+            if 'bb-bounce' in _bbs_sig_l or 'ai-trader+' in _bbs_sig_l:
                 try:
                     _bbs_ot = pos.get('open_time') or open_time
                     if _bbs_ot:
@@ -3771,9 +3779,20 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                             _bbs_dt = _bbs_dt.replace(tzinfo=timezone.utc)
                         _bbs_age_m = (datetime.now(timezone.utc) - _bbs_dt).total_seconds() / 60
                         _bbs_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100
-                        if _bbs_age_m >= BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN and live_pnl < _bbs_arm_pct:
-                            _bb_bounce_shadow_logged.add(trade_id)
-                            log(f"  [SHADOW] TRAIL-ARM would-fire {token} {direction} {live_pnl:+.2f}% [{_bbs_age_m:.0f}m < arm {_bbs_arm_pct:.2f}%] trade={trade_id} sig={_pos_signal}")
+                        if _bbs_age_m >= BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN:
+                            if (BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED and live_pnl < 0
+                                    and trade_id not in _bb_bounce_tat_enforced):
+                                _bb_bounce_tat_enforced.add(trade_id)
+                                _bb_bounce_shadow_logged.add(trade_id)
+                                close_paper_position(trade_id, "trail_arm_timeout",
+                                                     exit_detail=f"bb-bounce TAT variant-C age={_bbs_age_m:.0f}m pnl={live_pnl:+.2f}%")
+                                closed_count += 1
+                                log(f"  TRAIL-ARM TIMEOUT {token} {direction} {live_pnl:+.2f}% [variant-C {_bbs_age_m:.0f}m >= {BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN}m & pnl<0]")
+                                continue
+                            if (BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW and live_pnl < _bbs_arm_pct
+                                    and trade_id not in _bb_bounce_shadow_logged):
+                                _bb_bounce_shadow_logged.add(trade_id)
+                                log(f"  [SHADOW] TRAIL-ARM would-fire {token} {direction} {live_pnl:+.2f}% [{_bbs_age_m:.0f}m < arm {_bbs_arm_pct:.2f}%] trade={trade_id} sig={_pos_signal}")
                 except Exception as e:
                     log(f"  [SHADOW] BB-BOUNCE TRAIL-ARM error for {token}: {e}")
 

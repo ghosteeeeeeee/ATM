@@ -438,6 +438,32 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         except Exception:
             volatility_regime = 'UNKNOWN'
 
+    # ── Entry metadata backfill (brain_auditor #117, 2026-10-24) ─────────
+    # Root cause: callers that omit --signal-metadata-json (trade_watchdog
+    # _exec_pending_order is the live one) insert '{}' → every meta-keyed
+    # read is blind for that fill: trade_watchdog meta_rsi, feature_recorder
+    # DRIFT-E entry_rsi_14, and all offline counterfactuals. Measured 14d:
+    # 37 closed trades with no meta.rsi_14, incl. 14/14 ai-trader-pending
+    # (14.3% WR, -$0.30 = worst signal). One chokepoint covers all callers.
+    # PLACEMENT IS LOAD-BEARING: runs AFTER the SHORT hard-floor check above
+    # (which reads the caller's metadata) and BEFORE the _cluster_size block,
+    # which would see a dict where it previously saw None — cluster_size is
+    # never set here, so _cluster_size stays 1 and sizing is unchanged.
+    # ponytail: rsi_14 only — the one field every gate/counterfactual reads.
+    if not signal_metadata or (isinstance(signal_metadata, dict)
+                               and signal_metadata.get('rsi_14') is None):
+        try:
+            from signal_schema import _enrich_indicators as _enrich_meta
+            _en = _enrich_meta(token) or {}
+            if _en.get('rsi_14') is not None:
+                _base = signal_metadata if isinstance(signal_metadata, dict) else {}
+                _base['rsi_14'] = _en['rsi_14']  # direct assign: guard matches an explicit null too
+                _base.setdefault('meta_source', 'brain_add_entry_backfill')
+                signal_metadata = _base
+        except Exception as _meta_bf_e:
+            print(f'[brain.py] ⚠️ {token} {direction} metadata backfill skipped: '
+                  f'{type(_meta_bf_e).__name__}: {_meta_bf_e}')
+
     # ── Step 1: Pre-flight checks ───────────────────────────────────────
 
     # Block conf-1s at the trade entry level
@@ -1218,6 +1244,32 @@ def backfill_embeddings():
         conn.close()
 
 if __name__ == "__main__":
+    if '--selfcheck-meta-backfill' in sys.argv:
+        # brain_auditor #117 — one check for the entry-metadata backfill.
+        # Placement is load-bearing (see the comment in add_trade), so the
+        # first assertions are source-ordering; the last proves the helper
+        # path actually yields an rsi_14 for a token we trade.
+        _src = open(os.path.abspath(__file__)).read()
+        _floor = _src.index('_rsi_chk = signal_rsi_14')
+        _bf = _src.index('metadata backfill (brain_auditor #117')
+        _clu = _src.index('_cluster_size = 1')
+        assert _floor < _bf < _clu, \
+            f'backfill out of order: floor={_floor} backfill={_bf} cluster={_clu}'
+        _blk = _src[_bf:_src.index('Step 1: Pre-flight checks', _bf)]
+        # strip comments first — the block comment legitimately names both keys
+        _blk_code = '\n'.join(l.split('#', 1)[0] for l in _blk.splitlines())
+        for _forbidden in ('cluster_size', 'confidence'):
+            assert _forbidden not in _blk_code, f'backfill writes {_forbidden} — changes sizing/grades'
+        _branch = ('if not signal_metadata or (isinstance(signal_metadata, dict)\n'
+                   '                               and signal_metadata.get(\'rsi_14\') is None):')
+        assert _branch in _src, 'backfill guard predicate changed — re-read invariants'
+        from signal_schema import _enrich_indicators
+        _en = _enrich_indicators('BTC') or {}
+        assert _en.get('rsi_14') is not None, f'_enrich_indicators(BTC) gave no rsi_14: {_en}'
+        print(f'selfcheck-meta-backfill PASS: order floor<backfill<cluster, no sizing keys, '
+              f'BTC rsi_14={_en["rsi_14"]}')
+        sys.exit(0)
+
     if len(sys.argv) < 2:
         print("Usage:")
         print("  brain.py add \"Your thought here\"")

@@ -2244,5 +2244,16 @@
     "after": "[CELL-STATS] ... (wr=76%, n=25, last=2026-09-08) -> 1.2x",
     "rationale": "make the stale-cohort amplification visible in the log; decision path (tradeable->1.2x, n>=15 & wr<0.40->0.5x) intentionally unchanged",
     "impact": "zero trading behavior — log format only. bug_hunter VERDICT: SHIP"
+  },
+  {
+    "timestamp": "2026-10-24T11:51:36Z",
+    "agent": "brain_auditor",
+    "change": "TAT variant-C ENFORCED: BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True added; position_manager now closes bb-bounce/ai-trader+ LONG at age>=55m AND live_pnl<0 (candle OOS 30d: 21 fires, net +0.71, fk 5/57=8.8% of cohort winners, split-halves same sign). BASE (pnl<arm) stays unshipped at fk 41.9%.",
+    "type": "config",
+    "file": "scripts/hermes_constants.py + scripts/position_manager.py",
+    "before": "BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW=True only (log would-fires, never closes); no ENABLED flag",
+    "after": "BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True (new) + enforcement branch with own dedup set _bb_bounce_tat_enforced; shadow log still runs for 0<=pnl<arm",
+    "rationale": "hermes_constants.py:1727 mandated a candle OOS re-run before any bb-bounce TAT flip; it had never been run for variant-C (only an 8-day trades-level pack). Ran it (analysis/tat_variant_c_candle_oos_2026-10-24.py, --selfcheck PASS): variant-C clears the fk-of-cohort-winners bar 8.8% vs BASE 41.9%, net positive, n=21>=15. Implements mandate \"exit early in chop\". CEO veto = set the new flag False.",
+    "impact": "Expected ~+$0.71/30d; risk = 5 late-runner false kills (-$0.31 total, MNT/HYPE/HYPER). Untested by traffic at ship time (0 open positions) - first bb-bounce/ai-trader+ LONG >=55m at pnl<0 is the test."
   }
 ]

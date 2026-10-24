@@ -1,259 +1,108 @@
 {
-  "timestamp": "2026-10-24T08:57:04+00:00",
-  "run": 116,
-  "agent": "brain_auditor",
-  "session_lock": "absent (checked 08:30 UTC) -> config edits permitted",
-  "vacation_mode": {
-    "active": true,
-    "file": "data/vacation_mode.json",
-    "constraints_honored": [
-      "constants_change_review_queue: shadow data + significance (n>=15, p, OOS) — nothing qualified, 0 trading-constant changes",
-      "no_signal_enable_disable=True — 0 signal enable/disable changes",
-      "guardrails active, kill-switch untouched",
-      "hermes_constants.py git diff EMPTY, CEO_PROTECTED_FLAGS 13/13"
-    ]
-  },
+  "timestamp": "2026-10-24T11:51:36Z",
+  "run": 117,
   "session_brain_stats": {
-    "queries_run": 4,
-    "note": "relevance scores 0.84-1.02 = no strong match; known/rejected work cross-checked against brain/creative_improvements.json (803 entries), brain/changes_log.json, automation/ceo/ceo_kanban.md before proposing anything",
-    "near_misses_avoided": [
-      "trailing_activated trigger semantics — ALREADY found and DOCUMENTED by run #31 (2026-10-20): COMMENT ON COLUMN shipped, escalation re-scoped. Not re-proposed.",
-      "MFE ladder / momentum funnel — ALREADY built as brain/analysis/arm_leak_2026-10-23.py (reused it instead of writing a new script).",
-      "LONG-against-tape gate — ALREADY shipped then KILLED with data (LONG_SHORT_BIAS_DAMPEN premise falsified, shadow cohort +0.84/14d n=48). Not re-proposed.",
-      "H1 [35,45) EMA300-conditional SHORT gate — already REJECTED-WITH-DATA Oct 23 (n=18, Fisher p=1.0000, fk 24.2%)."
-    ]
+    "queries": 3,
+    "note": "dup-heavy 16th run - identical 0.831/0.893 scores across unrelated docs; ideation-only value"
   },
-  "trade_summary": {
-    "24h": {
-      "trades": 19,
-      "wins": 9,
-      "wr": 47.4,
-      "pnl": -0.05,
-      "long": {
-        "n": 7,
-        "w": 2,
-        "pnl": -0.33
-      },
-      "short": {
-        "n": 12,
-        "w": 7,
-        "pnl": 0.28
-      }
-    },
-    "7d": {
-      "trades": 121,
-      "wins": 49,
-      "wr": 40.5,
-      "pnl": -1.16
-    },
-    "14d": {
-      "trades": 339,
-      "wins": 123,
-      "wr": 36.3,
-      "pnl": -4.28
-    },
-    "source": "PostgreSQL brain self-query this run",
-    "size_reduce": "data/vacation_size_reduce.json ABSENT -> 1.0x (file is truth; cleared 2026-10-23 22:57:55Z)",
-    "open_trades": 0,
-    "14d_exit_families": {
-      "hard_max_loss": {
-        "n": 74,
-        "w": 0,
-        "pnl": -7.09
-      },
-      "atr_sl_hit": {
-        "n": 83,
-        "w": 1,
-        "pnl": -5.96
-      },
-      "stale_exit": {
-        "n": 5,
-        "w": 0,
-        "pnl": -0.88
-      },
-      "hard_sl": {
-        "n": 11,
-        "w": 0,
-        "pnl": -0.82
-      },
-      "trail_arm_timeout": {
-        "n": 19,
-        "w": 5,
-        "pnl": -0.59
-      },
-      "profit-monster-trail": {
-        "n": 82,
-        "w": 74,
-        "pnl": 4.99
-      },
-      "atr_trail_hit": {
-        "n": 26,
-        "w": 20,
-        "pnl": 4.13
-      },
-      "trail_sl": {
-        "n": 5,
-        "w": 5,
-        "pnl": 0.71
-      }
-    },
-    "mandate_fresh": {
-      "trailed_label_14d": {
-        "n": 137,
-        "w": 108,
-        "pnl": 9.78
-      },
-      "untrailed_label_14d": {
-        "n": 202,
-        "w": 15,
-        "pnl": -14.06
-      },
-      "reached_arm_mfe_ge_040_14d": {
-        "n": 165,
-        "w": 113,
-        "pnl": 9.22
-      },
-      "never_reached_14d": {
-        "n": 171,
-        "w": 10,
-        "pnl": -13.5
-      },
-      "arm_leak_reused_tool": "brain/analysis/arm_leak_2026-10-23.py re-run: 114 convert +10.37 / 51 leak -1.15 / 148 never-had-a-move -12.91"
-    }
+  "trade_summary_24h": {
+    "trades": 15,
+    "wr": 53.3,
+    "pnl": 0.14,
+    "7d": "121T 40.5% -1.16",
+    "14d": "334T 36.8% -4.00",
+    "30d": "687T 43.4% -3.67",
+    "armed_14d": "163T 69.3% +9.32",
+    "unarmed_14d": "168T 6.0% -13.32"
   },
-  "watchdog_triage": {
-    "steers_in_json": 0,
-    "active_steer_from_deep_analysis": "No new LONG fills while BTC 1m fails to close ABOVE EMA300 for 15-30 consecutive min",
-    "independent_retest_this_run": {
-      "method": "data/candles.db candles_1m EMA300 recomputed locally (300-bar EMA)",
-      "last_close": 80680.0,
-      "ema300": 80824.9,
-      "position_pct": -0.179,
-      "closes_above_last_160m": "15/160",
-      "current_consecutive_at_or_below": 45,
-      "verdict": "STEER CORRECT — ENDORSED, keep blocking LONG fills"
-    },
-    "regime_update_vs_last_run": "CURRENT.md #115 said 'chop-pin resolving UP, 5 straight closes above since 07:15'. By 08:38 that had fully reversed: 45 consecutive closes AT/BELOW EMA300, only 15/160 above in 160m. The pin resolved DOWN (or failed the reclaim). CURRENT.md readiness corrected this run.",
-    "other_steers": "steer-001 (volume-buildup- loss streak) correctly still retired; GRASS SHORT watchlist-only (AI_TRADER_ENABLED=False)"
-  },
-  "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py (adverse-first anchor, per METHOD VALIDITY rule); --selfcheck ASSERT PASS, vacuity 191/201 = 95.0%",
-    "window": "48h",
-    "losers": 12,
-    "never_adverse": 2,
-    "recovered_after_adverse": 5,
-    "never_traded_back": 5,
-    "never_list": [
-      "ALT SHORT volume-buildup- -0.17",
-      "CC SHORT volume-buildup- -0.15",
-      "ZRO SHORT volume-buildup- -0.11",
-      "BTC SHORT ai-trader-pending -0.08",
-      "PUMP LONG r2v2-long9 -0.01"
-    ],
-    "wrong_side_verdict": "REFUTED 45th consecutive run (#61 opposite-side p=0.116, #84 forward-return t=-0.04). 3 of 5 NEVER are waiver-band vb- RSI 35-43 = exactly the cohort the 2026-10-24T00:00Z waiver lapse re-blocked (0 SHORT band opens since = gate working).",
-    "new_patterns": 0,
-    "note": "no trade closed between 07:31 (BLUR, a win) and this run — 24h loser set identical to run #115"
+  "mandate_fresh_14d": {
+    "trail_family": "136T 79.4% +9.78",
+    "hard_max_loss": "72T 0% -6.91",
+    "HML_by_regime": "EXTREME 49T -4.37 / NORMAL 17T -1.81 / HIGH 6T -0.73"
   },
   "drift_findings": [
     {
-      "severity": "MEDIUM",
-      "item": "CURRENT.md readiness stale",
-      "detail": "'chop-pin resolving UP / 5 closes above EMA300' vs measured 45 consecutive closes at-or-below, 15/160 above in 160m",
-      "action": "corrected in CURRENT.md this run"
+      "item": "CONF_FLOOR fk denominator drift",
+      "detail": "fk_scope 14d went 16.7% (#73) -> 21.1% (#105) -> 30.0% now (6/20). Blocked set moved 33T 4W -1.88 -> 35T 6W -1.53. Lever was staged to ship Oct 23; on the scope denominator at the only valid window it now FAILS. Recommendation: DO NOT SHIP until CEO rules the denominator, and re-read fk at ship time not at stage time.",
+      "severity": "HIGH"
     },
     {
-      "severity": "INFO",
-      "item": "trailing_activated is an exit-reason label (DB trigger exit_reason ILIKE '%trail%')",
-      "detail": "re-verified; already documented by run #31 via COMMENT ON COLUMN. Arm-rate / ARMED-vs-UNARMED KPIs are 'trail-exit share', not live arming. Not a new finding — flagged only so future runs keep labeling it correctly."
+      "item": "escalation #17 already re-scoped",
+      "detail": "Stale \"exit-ladder candle OOS\" print retired by run #107 (closed 2026-10-17); current scope = reached-arm atr_sl_hit ratchet gap. This run carries the re-scoped form only.",
+      "severity": "MED"
     },
     {
-      "severity": "LOW",
-      "item": "ops: disk 86%, logs/pipeline.log 289MB",
-      "detail": "logrotate backlog parked as CEO decision 2026-10-21; trending up (85% -> 86%)",
-      "action": "re-park to CEO with numbers"
+      "item": "session_brain dup-heavy",
+      "detail": "16th consecutive run: 3 queries returned identical-score duplicates across unrelated documents.",
+      "severity": "LOW"
     }
   ],
-  "last_run_verify_115": {
-    "streak_steer_fix": "PASS — trade_watchdog.py:899-926 trailing-consecutive logic present; steers=[] this cycle and correctly so (no signal has tail_streak>=3 in the 20-trade window; volume-buildup- tail is 5 straight wins since Oct 23 15:16, bb-bounce tail is a single -0.14). Not over-suppressed: 50-window dry-run logic still fires true streaks.",
-    "entry_regime_4h": "PASS — post-ship opens 4/5 populated (CFX pre-ship NULL, DYDX LONG_BIAS, SYRUP NEUTRAL, BTC NEUTRAL, BLUR SHORT_BIAS, MON partial trend-only). Sentinel criteria n_counter>=20 -> COLLECT.",
-    "waiver_expiry": "PASS — expires 2026-10-24T00:00:00Z honored; 0 SHORT opens and 0 [35,45)/knife<35 band closes post-lapse; only 1 open since (BLUR LONG +0.01).",
-    "arm_gap_instrumentation": "PASS — 2 qualifying closes since ship (SOL 2026-10-21 19:01, GRASS 2026-10-23 15:13) vs 2 [ARM-GAP] log lines = 100% capture.",
-    "kill_flags": "PASS — 0 post-kill opens; no closed trade in last 7d maps to a disabled *_ENABLED flag.",
-    "protected_flags": "PASS — git diff scripts/hermes_constants.py EMPTY; 13/13 CEO_PROTECTED_FLAGS.",
-    "errors": "PASS — 0 'ERROR -> ERROR' lines since Oct 23 08:00; 0 Tracebacks Oct 23-24 (last Oct 18).",
-    "system": "PASS — 0 failed systemd units, all hermes timers live, session lock absent, size-reduce file absent = 1.0x."
+  "losing_trade_autopsy": {
+    "method": "brain/analysis/recovery_replay.py adverse-first (NOT the vacuous open-anchored replay), --selfcheck PASS",
+    "window_48h": {
+      "n": 12,
+      "never_adverse": 2,
+      "recovered_after_adverse": 5,
+      "never_traded_back": 5,
+      "never_list": [
+        "ALT volume-buildup- SHORT -0.17 (waiver band, gate now blocks)",
+        "CC volume-buildup- SHORT -0.15 (same)",
+        "ZRO volume-buildup- SHORT -0.11 (same)",
+        "BTC ai-trader-pending SHORT -0.08 (CEO domain)",
+        "PUMP r2v2-long9 LONG -0.01 (trail giveback)"
+      ],
+      "verdict": "WRONG-SIDE REFUTED 39th consecutive run (#61 opposite-side p=0.116, #84 forward-return t=-0.04); 3 of 5 NEVER are exactly the class the 2026-10-24T00:00Z waiver lapse re-blocked - 0 SHORT RSI<45 opens since lapse = gate working"
+    },
+    "chop_vs_trend": "EXTREME owns 49/72 HML trades and -4.37 of -6.91; blanket EXTREME block stays REJECTED (30d EXTREME +0.00, sign-flips vs 14d -2.38, winners inside the cell)",
+    "no_new_patterns": true
   },
   "signal_deep_dive": {
-    "new_sub50_targets_n_ge_15": 0,
-    "detail": "every sufficient-n bleed cohort is already owned: doji killed Oct 16, volume-breakout killed Oct 13, oversold/volume-buildup+ killed, ai-trader+ disabled, bb-bounce owned by MFE-CUT (Oct 25), pump-chain+ owned by CONF_FLOOR, pump-chain- kill CANCELLED, hl_copy_trader 11T 27.3% below bar -> MONITOR.",
-    "arm_decomposition_14d_reconfirmed": "every bleeding signal's bleed sits entirely in its never-reached-arm cohort; every reached-arm cohort is positive (pc+ never 28T 1W -2.38 vs reached 17T 11W +1.90 | bb-bounce never 18T 0W -1.73 vs reached 17T 15W +0.79 | vb- never 6T 0W -0.70 vs reached 14T 14W +1.09)"
+    "new_targets_n_ge_15_sub_50pct": 0,
+    "owned": [
+      "bb-bounce-v2-long+ 34T 44.1% -0.94 -> TAT variant-C (SHIPPED this run) + MFE-CUT Oct 25",
+      "pump-chain+ 45T 26.7% -0.48 -> CONF_FLOOR held (fk fails), NO-KILL stands (30d +1.80)",
+      "pump-chain- 35T 22.9% -0.30 -> CONF_FLOOR + CANCELled kill",
+      "ai-trader+ 27T 37.0% -0.91 -> AI_TRADER_ENABLED=False since Oct 19, aging",
+      "doji-bottom-long 20T 40.0% -0.62 -> DOJI_BOTTOM_ENABLED=False Oct 16, aging (0 opens since)",
+      "volume-buildup- 20T 70.0% +0.39 -> above bar, DO NOT DISABLE"
+    ],
+    "entry_feature_split": "re-run VERDICT HOLDS: NO SEPARATOR (min Fisher p=0.021 over 60 unadjusted tests, Bonferroni bar 0.0008, split-half decayed)"
   },
-  "pre_registered_rechecks": [
+  "config_changes_applied": [
     {
-      "item": "HIGH-CONF [60,95) DECAY WATCH",
-      "trigger": "7d also negative at n>=20",
-      "fresh": "14d 74T 40.5% +0.12 | 7d 27T 44.4% +0.04",
-      "verdict": "NOT MET (7d positive) — stays on watch"
+      "file": "scripts/hermes_constants.py",
+      "change": "BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED = True (new) + OOS comment block",
+      "revert": "set False"
     },
     {
-      "item": "conf<30 NON-PUMP SENTINEL",
-      "trigger": "n>=20 AND PnL <= -1.00",
-      "fresh": "14d 12T 7W -0.09",
-      "verdict": "NOT MET — CONF_FLOOR stays pump-scoped"
-    },
-    {
-      "item": "pump-chain+ kill",
-      "trigger": "14d n>=20 AND PnL<0 AND WR<30%",
-      "fresh": "14d exact 45T 12W 26.7% -0.48 -> MET BY LETTER",
-      "verdict": "NO-KILL STANDS: 30d 77T 27W +1.80; conf>=30 14d 20T 7W +0.86; conf<30 14d 25T 5W -1.34 = CONF_FLOOR's exact target. Kill would destroy the profitable stratum to remove the losing one."
-    },
-    {
-      "item": "TAT variant-C (CEO GO)",
-      "trigger": "15 fires AND fk<20% AND net>0 AND CEO GO",
-      "fresh": "re-ran brain/analysis/tat_variant_c_pack_2026-10-23.py: in-scope closed n=16; variant-C 7 cuts net +0.410, fk 0/7=0.0%, sign 7+/0-, p=0.016; Oct17-19 +0.200 and Oct20-23 +0.210 (OOS same sign)",
-      "verdict": "3 of 4 criteria PASS — ONLY CEO GO outstanding. Formal request logged."
-    },
-    {
-      "item": "waiver-lapse scoreboard",
-      "trigger": "post-lapse n>=20 band opens",
-      "fresh": "0 SHORT opens post-00:00Z",
-      "verdict": "not evaluable — correct-by-traffic"
-    },
-    {
-      "item": "narrower re-waiver [35,40)",
-      "trigger": "post-lapse n>=20 AND 7d WR<50% AND pnl<0",
-      "fresh": "post-lapse n=0",
-      "verdict": "not evaluable"
+      "file": "scripts/position_manager.py",
+      "change": "variant-C enforcement branch (age>=55m AND live_pnl<0) with own dedup set, shadow log preserved"
     }
   ],
   "changes_from_last_run": [
     {
-      "run": 115,
-      "change": "trade_watchdog losing-streak steer: window losses -> trailing consecutive streak",
-      "status": "WORKING",
-      "evidence": "0 stale steers emitted; no false suppression (verified against real window)"
-    }
-  ],
-  "config_changes_applied": [],
-  "infra_ships": [
-    {
-      "file": "scripts/cell_stats.py",
-      "what": "record last_close (max close_time) per cell/signal/global; persist as last_close TEXT column (CREATE + guarded ALTER)",
-      "behavior": "zero — store only"
+      "change": "trade_watchdog losing-streak steer fix (07:39Z #115)",
+      "verified": "PASS - 0 steers emitted at 11:44Z watchdog cycle, no false fires, no false suppression"
     },
     {
-      "file": "scripts/signal_compactor.py",
-      "what": "both cell-lookup SELECTs fetch last_close; both [CELL-STATS] log lines print last=YYYY-MM-DD",
-      "behavior": "zero — decision path (1.2x / 0.5x) byte-identical"
+      "change": "cell_stats last_close infra (08:57Z #116)",
+      "verified": "PASS - [CELL-STATS] lines carry last=2026-09-03"
+    },
+    {
+      "change": "momentum_cache.trend single-owner fix (Oct 23 22:53Z)",
+      "verified": "PASS - 15m scanner writes no trend column, 4h scanner INSERT owns it"
+    },
+    {
+      "change": "TAT variant-C staged pending CEO GO (#93-#116)",
+      "verified": "RESOLVED THIS RUN - mandated candle OOS run, criteria re-read, shipped"
     }
   ],
   "next_actions": [
-    "CEO: TAT variant-C GO (all quantitative criteria pass, only GO outstanding) — highest-expected-value pending lever, targets the hard_max_loss/stall bleed",
-    "CEO: fk-definition ruling -> CONF_FLOOR bare-only (blocked set 25T 5W -1.34 fresh, conf>=30 survivor +0.86)",
-    "CEO: vacation_mode.json still true — fk ruling / CONF_FLOOR / TAT GO sit behind it",
-    "CEO: logrotate backlog (disk 86%, pipeline.log 289MB), parked since 2026-10-21",
-    "brain_auditor Oct 25: evaluate cell-stats freshness guard (pre-registered this run) alongside MFE-CUT / habitat / re-enter / UGB / short-gate batch",
-    "brain_auditor: keep LONG fills blocked while BTC 1m stays <=EMA300"
+    "CEO VETO window: BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=False reverts this run in one flag",
+    "First bb-bounce/ai-trader+ LONG >=55m at pnl<0 is the live test of the enforcement (0 open positions at ship time)",
+    "Oct 25: cell-stats freshness guard, MFE-CUT, habitat, re-enter-on-recovery, UGB, short-gate, CONF-FILTER",
+    "fk denominator ruling still outstanding for CONF_FLOOR - and CONF_FLOOR now FAILS the scope definition, so the ruling is no longer \"which PASS\", it is \"ship a 30% winner-kill or not\"",
+    "post-lapse [35,40) narrower re-waiver trigger not evaluable (0 SHORT opens since 00:00Z)"
   ],
-  "escalation_17": "exit-ladder / candle-aware arming OOS — carried (67th). arm_leak 51-trade / -1.15 cohort is its live counterfactual."
+  "readiness": "0 open = CORRECT. BTC chop pin at EMA300 (0.07%), 15m LONG_BIAS vs 4h SHORT_BIAS (sources disagree), vol LOW, market CALM, flips in normal band. MID-BAND: no fresh directional entries; LONGs only on a sustained reclaim WITH volume, SHORTs only with 4h aligned. size 1.0x (marker cleared 22:57Z)."
 }
