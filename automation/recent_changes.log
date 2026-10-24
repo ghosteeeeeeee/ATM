@@ -5179,3 +5179,5 @@ BY: auto_1hr
 - [2026-10-24 16:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 11T 9W 81.8% '+$0.87' (GREEN) | 7d 124T 41.1% '-$0.93' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 0/11=0% under 40% | no neg streak (last traded hour 15:00 positive) | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-24 16:43 UTC] brain_auditor: AUDIT RUN #121 — 0 config changes | pump-chain+ kill criteria MET but no_signal_enable_disable blocks (CEO) | CONF_FLOOR fkA 20.0% exact bar | oscillator weekly NO separation p=0.52 | TAT-C holding | waiver re-granted + LOSERS_LONG live | autopsy n=2 wrong-side REFUTED 48th | 24h 11T 9W +0.87 GREEN | BY: brain_auditor
+- [2026-10-24 17:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 11T 9W 81.8% `+$0.87` (GREEN) | 7d 124T 41.1% `-$0.93` — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 0/11=0% under 40% | no neg streak (15:00 positive) | 1 open BTC continuum+ LONG +0.70% | No constants change -> no signal_versions entry
+BY: auto_1hr
