@@ -14883,3 +14883,23 @@ Final set: ['BTC', 'ME', 'PUMP']
 **Open Questions:**
 - 24h improved to +$0.25 (best of the day) but 7d still -$1.16
 - Signal flow low + hotset 0-token fallback (chronic)
+
+## 2026-10-24 13:28 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 14T 8W 57.1% `+$0.25` (GREEN) | 7d: 121T 49W 40.5% `-$1.16` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — quiet
+- 0 open trades
+- atr_sl_hit 1/14 = 7.1% (<40%) — dominant close = profit-monster-trail (7T +$0.47)
+- No 0%WR signal with 3+ trades last hour (0 trades); only n>=3 24h signal = volume-buildup- 7T 71.4% +$0.19 (healthy)
+- No negative-hour streak (only traded hour 07:00 +$0.01; empty hours reset)
+- Frequency 0/hr — not overtrading
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h holds green +$0.25 but 7d still -$1.16
+- Signal flow low + hotset 0-token fallback (chronic)
