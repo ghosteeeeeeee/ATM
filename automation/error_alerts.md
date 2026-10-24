@@ -1884,3 +1884,8 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1026s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (967s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (967s left, N failures)`
+
+## Error Alerts — 2026-10-24 18:47 UTC
+- **WARN** (1x): `disk usage 85% on / (17G free) — threshold 85%`
+- **AUTO-FIX**: removed 721 stale `/tmp/.bcf*-00000000.so` leaked libs (3.74 GB, only 2 in-use kept — verified via /proc/*/maps before delete) → disk now 82% (21G free). No service/timer restarted. Vacation pause absent; all core timers active (pipeline rc=0 at 18:43, prices 30s fresh, 25 signals/1h, 0 phantom trades).
+- **INFO (cleared)**: hotset failure-cooldown alerts from 17:27 — 0 occurrences in last 30m.
