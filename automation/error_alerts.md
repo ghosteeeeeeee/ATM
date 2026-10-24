@@ -1775,3 +1775,11 @@
 ## Error Alerts — 2026-10-24 05:43 UTC
 - **WARN** (1x): `disk usage 86% on /` (95G/118G, 17G free) — no logs older than 7d to compress; largest consumers: data/coin_tracker.db (3.3G), session_brain.db (1.5G), candles.db (1.2G), logs/pipeline.log (274M). No auto-fix available; monitor.
 - No CRITICAL issues. All timers active, 0 tracebacks, prices fresh (63s).
+
+## Error Alerts — 2026-10-24 06:45 UTC
+- **WARN** (recurring): `hermes-watchdog: signals: WARNING — only 0 signals in last 5 min (min 20)` — actual 41 signals/hour (4 in last 5m at check time); rate variance vs aggressive threshold, not a stall.
+- **WARN** (recurring): `hermes-watchdog: locks: WARNING — Cleaned 4 stale locks` (pipeline_heartbeat, hotset_json, signal_compactor_critical, hotset_last_updated) — self-heals each 2min cycle; owners not clearing locks on exit.
+- **WARN** (recurring): disk 86% used (95G/118G, 17G free) — no logs >7d to gzip, /tmp has no files >7d. Hogs outside scope: /usr 32G, /root/.local 13G, /root/zscore 2.2G, /root/hermes-agent 2.0G.
+- **INFO**: pipeline log reports "20 closed today" but PostgreSQL calendar-day count = 1 closed (−0.08 USDT); the 20 are a rolling-24h window (max close_time 00:00:19 UTC). Reporting discrepancy only, not data loss.
+- **INFO**: `hermes-atr-sl-updater.timer` shows as not-found in list-units (unit renamed to `-DEFUNCT`) — harmless stale reference.
+- **AUTO-FIX**: none required — vacation_pause.json absent; price-collector/1m-candle/pipeline/watchdog timers all active; pipeline rc=0 at 06:42 & 06:44, 0 tracebacks; prices fresh (75s, 130 tokens); 1 open trade; 0 phantom trades (atr_sl_hit <0.01%) in 24h; regime SHORT_BIAS.
