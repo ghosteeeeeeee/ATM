@@ -718,6 +718,8 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('trend_ignition_long', 'trend-ignition+'):  1.3,  # NEW — 100% WR 7-day backtest, volume+compression breakout
     # volume_breakout — 68.8%WR +$1.41/7d, wins across 10+ tokens. signal_reporter 2026-09-22
     ('volume_breakout_long', 'volume-breakout-long+'): 1.4,  # BOOSTED 1.25→1.4 2026-10-10 — 14d 15T 46.7%WR +$1.35 +3.01%avg. High-volatility winner. CEO re-enabled 10-10.
+    # volume_buildup SHORT — sustained volume accumulation SHORT. signal_reporter 2026-10-24
+    ('volume_buildup_short', 'volume-buildup-'): 1.2,  # BOOSTED 1.0→1.2 — 24h 6T 83.3%WR +$0.55 across 6 tokens; 14d 22T 68.2%WR +$0.58
 }
 DEFAULT_SOURCE_WEIGHT = 1.0
 
