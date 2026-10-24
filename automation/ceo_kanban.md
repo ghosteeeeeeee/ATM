@@ -478,3 +478,7 @@ BY: health_monitor
 ## TEAM UPDATES
 - [2026-10-24 18:47 UTC] health_monitor: Auto-fixed disk back to 85% WARN — deleted 721 stale `/tmp/.bcf*-00000000.so` files (3.74 GB leaked libs from exited opencode processes; confirmed unmapped in /proc before delete, 2 in-use kept) → now 82% (21G free). No restarts applied (vacation pause absent). Rest green: pipeline LIVE rc=0 18:43 + heartbeat 14s, 4/4 core timers active & firing, 25 signals/1h, prices 87 tokens 30s fresh, 1 open | 5 closed today | +0.16 (pipeline: 11 closed rolling-24h), 0 phantom trades, regime 5m LONG_BIAS (50L/7S/72N, STORMY), speed 128/241 >=50th pct, 0 failed units. NOTE: hotset empty since 17:32 (~75m) — compaction rejects all (RR<2.5, vol floor, oversold-short block); historically 85% of cycles are empty, filters behaving as designed.
 BY: health_monitor
+
+## TEAM UPDATES
+- [2026-10-24 21:27 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 11T 9W 81.8% '+$1.06' (GREEN) | 7d 124T 41.9% '-$0.59' (improving) — size-reduce 1.0x (file absent = truth) | kill: none (no trades; pump-chain+ still blocked on CEO GO per audit #124) | atr_sl_hit 0/11=0% under 40% | no neg streak (20:00 positive) | 2 open HYPE +0.39%, BTC +0.15% | No constants change -> no signal_versions entry
+BY: auto_1hr
