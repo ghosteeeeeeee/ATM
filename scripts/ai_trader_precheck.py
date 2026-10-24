@@ -22,6 +22,104 @@ def _get_candles_db():
     return sqlite3.connect(os.path.join(HERMES_DATA, 'candles.db'), timeout=5)
 
 
+def cont_bearish(phase, linreg, ema):
+    """Pure predicate — identical to signal_compactor's _cont_bearish
+    (CONTINUUM-BLOCK for LONG): phase + linreg + ema, not ema alone."""
+    return (phase in ('DECLINING', 'CALM', 'RECOVERY')
+            and linreg in ('LEAN_BEAR', 'BEAR')
+            and ema in ('BELOW', 'AT'))
+
+
+def long_btc_blocked(regime_4h, bearish, ema):
+    """Pure predicate for 'would BTC structure/chop block this LONG?'.
+
+    Both LONG-side BTC gates in signal_compactor only bite when the COIN'S OWN
+    4h regime is NEUTRAL (LONG_NEUTRAL_BLOCK_ENABLED reads _regime_4h from PG
+    momentum_cache with a NEUTRAL fallback):
+        bearish          -> CONTINUUM-BLOCK
+        ema != 'ABOVE'   -> LONG-NEUTRAL-CHOP (unknown ema counts as chop)
+    Outside NEUTRAL neither gate runs, so bear structure alone is not a block.
+    """
+    return regime_4h == 'NEUTRAL' and (bearish or ema != 'ABOVE')
+
+
+def coin_regime_4h(token):
+    """Mirror signal_compactor.get_regime_4h — same PG table, same NEUTRAL
+    fallback (including on connection error) so a precheck FAIL means the
+    pipeline's own read would also have said NEUTRAL."""
+    conn = None
+    try:
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
+                                user='postgres', connect_timeout=3)
+        cur = conn.cursor()
+        cur.execute("SELECT regime_4h FROM momentum_cache WHERE token=%s",
+                    (token.upper(),))
+        row = cur.fetchone()
+        cur.close()
+        if row and row[0]:
+            return row[0]
+    except Exception:
+        pass
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return 'NEUTRAL'
+
+
+def btc_long_trend(token):
+    """(would_block, detail) — does BTC structure/chop block a LONG here?
+
+    FIX brain_auditor 2026-10-24 (watchdog steer "gate mismatch"): the old test
+    read only ema300_position != 'BELOW' from continuum_data.json, so it blessed
+    LONGs the pipeline was blocking. The pin state has ema=AT (not BELOW) while
+    linreg flaps LEAN_BULL<->LEAN_BEAR minute-to-minute, and the bear test needs
+    phase + linreg + ema together.
+
+    Read source/staleness mirror signal_compactor exactly: structure row stale
+    (>600s) is DROPPED by the pipeline (= not-bearish, fail-open); the ema read
+    has NO staleness guard in the pipeline, so ema is kept either way.
+
+    Escapes are NOT simulated (confluence >=2, coin momentum, BTC score 60-80
+    mean-reversion, exempt signal families) — a FAIL is "will likely be
+    blocked", not a certainty. The EMA300-pin advisory below stays separate.
+    """
+    import sqlite3, time
+    phase = linreg = ema = None
+    note = ''
+    conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+    try:
+        row = conn.execute(
+            "SELECT market_phase, linreg_direction, ema300_position, ts "
+            "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+        ).fetchone()
+    finally:
+        conn.close()
+    if not row:
+        note = 'no continuum row — pipeline treats as not-bearish'
+    else:
+        phase, linreg, ema, ts = row
+        if ts and (time.time() - ts) > 600:
+            note = f'continuum stale {int((time.time() - ts) / 60)}m — structure dropped (not-bearish)'
+            phase = linreg = None
+    bearish = cont_bearish(phase, linreg, ema) if phase else False
+    regime_4h = coin_regime_4h(token)
+    would_block = long_btc_blocked(regime_4h, bearish, ema)
+    detail = (f'coin4h={regime_4h} | BTC phase={phase or "?"} linreg={linreg or "?"} '
+              f'ema300={ema or "?"} ({"bear structure" if bearish else "chop: not ABOVE" if ema != "ABOVE" else "no BTC-trend problem"})'
+              + (f' | {note}' if note else ''))
+    if would_block:
+        detail += ' → LONG-side BTC gate runs only in NEUTRAL 4h and WOULD block (confluence/coin-momentum escapes not simulated)'
+    else:
+        detail += (' → BTC-structure gates do not bite outside NEUTRAL 4h'
+                   if regime_4h != 'NEUTRAL' else ' → clear')
+    return would_block, detail
+
+
+
 def precheck(coin, direction, conf=None):
     """Check if a coin+direction would pass the RR engine and other gates.
     conf: the confidence value the pick will use (needed for SHORT regime gate)."""
@@ -308,12 +406,10 @@ def precheck(coin, direction, conf=None):
         cont = None
     if direction == 'LONG':
         try:
-            if cont is None:
-                raise RuntimeError('continuum unavailable')
-            ema_pos = cont.get('current', {}).get('ema300_position', 'UNKNOWN')
-            check('BTC not bearish for LONG', ema_pos != 'BELOW', f'BTC ema300={ema_pos}')
+            would_block, detail = btc_long_trend(token)
+            check('BTC not bearish for LONG', not would_block, detail)
         except Exception as e:
-            check('BTC trend', False, f'cannot read continuum: {e}')
+            check('BTC not bearish for LONG', False, f'cannot read continuum: {e}')
     # EMA300-pin advisory (brain_auditor 2026-10-19, pre-registered run #26) —
     # NON-BLOCKING. Watchdog deep analysis: mid-band entries (RSI 45-60) have
     # zero edge while BTC pins on EMA300 (AT + duration>60m = unresolved chop).
@@ -358,6 +454,28 @@ def precheck(coin, direction, conf=None):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) >= 2 and sys.argv[1] == '--selfcheck':
+        # Asserts precheck's OWN predicates (signal_compactor keeps its own copy
+        # of both — drift between the two copies is a known debt, not caught here).
+        assert cont_bearish('DECLINING', 'LEAN_BEAR', 'AT') is True
+        assert cont_bearish('CALM', 'BEAR', 'BELOW') is True
+        assert cont_bearish('DECLINING', 'LEAN_BULL', 'AT') is False
+        assert cont_bearish('DECLINING', 'LEAN_BEAR', 'ABOVE') is False
+        assert cont_bearish('STORMY', 'LEAN_BEAR', 'BELOW') is False
+        # the gate only bites in the coin's own 4h NEUTRAL regime
+        assert long_btc_blocked('NEUTRAL', True, 'AT') is True
+        assert long_btc_blocked('NEUTRAL', False, 'AT') is True   # chop half
+        assert long_btc_blocked('NEUTRAL', False, None) is True   # unknown ema = chop
+        assert long_btc_blocked('NEUTRAL', False, 'ABOVE') is False
+        assert long_btc_blocked('BEAR_TREND', True, 'AT') is False  # gate not run
+        try:
+            b, d = btc_long_trend('BTC')
+            print(f'selfcheck OK — BTC-trend would_block={b} ({d})')
+        except Exception as e:
+            print(f'selfcheck ERROR — live read failed: {e}')
+            sys.exit(1)
+        sys.exit(0)
+
     if len(sys.argv) < 3:
         print("Usage: python3 ai_trader_precheck.py COIN DIRECTION [CONF]")
         print("Example: python3 ai_trader_precheck.py W SHORT")

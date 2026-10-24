@@ -7874,5 +7874,35 @@
     "category": "exit quality",
     "status": "pre-registered",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-24T13:41:40Z",
+    "run": 118,
+    "idea": "PRECHECK FALSE-PASS CENSUS — quantifies the recovered precheck fix",
+    "rationale": "LONG-NEUTRAL-CHOP blocks since Oct 17 split by the BTC ema300 position the OLD test required only != BELOW: ema=AT 2233 (1936 short-branch + 297 confluence-branch) vs ema=BELOW 1386 -> 61.7% of LONG blocks since Oct 17 happened where old precheck returned PASS; 24h 134 vs 47 = 74%.",
+    "expected_impact": "removes ~2/3 of false PASSes; the 12:14Z burn (GRASS/YGG/BABY/BTC 4/4 PASS then CONTINUUM-BLOCK) is the pick-level instance",
+    "category": "entry sniper",
+    "status": "shipped-with-fix",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T13:41:40Z",
+    "run": 118,
+    "idea": "PRECHECK DELTA KPI + coin-momentum escape criterion (zero code)",
+    "rationale": "the new precheck deliberately does NOT simulate escapes: since Oct 17 escapes fire CHOP-BYPASS 2276 + NEUTRAL-BYPASS 3819 vs 15811 blocks (~28% allow), so a conservative FAIL will sometimes refuse a pick the pipeline would have filled. Watch for it before adding complexity.",
+    "expected_impact": "if the advisor reports >=3 'precheck FAIL but pipeline allowed' instances, add chop_detector.get_coin_trend_score(>=61) + continuum score 60-80 mean-reversion to btc_long_trend(); until then keep the conservative FAIL",
+    "category": "instrumentation",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T13:41:40Z",
+    "run": 118,
+    "idea": "VENUE-BASIS SENTINEL (Binance candles vs Hyperliquid fills)",
+    "rationale": "see drift_findings MED — 3/120 trades >0.5% basis, all ALT; signal math runs on Binance series while fills/SL/MFE run on Hyperliquid",
+    "expected_impact": "catches a token whose price feed is 1-2% away from where we trade, before it silently distorts gap/arm/SL logic",
+    "category": "data integrity",
+    "status": "pre-registered (trigger >=3 tokens/7d)",
+    "risk": "low"
   }
 ]

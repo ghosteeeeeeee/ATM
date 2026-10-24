@@ -1814,3 +1814,13 @@
 ## Error Alerts — 2026-10-24 11:44 UTC
 - **WARN** (recurring): disk 86% used (96G/118G, 17G free) — no logs >7d to gzip (all already compressed); journals 268M; remaining hogs need CEO approval (/usr 32G, /root/.local/share/opencode 12G, /root/.cache 3.5G) per 07:46/09:46 entries.
 - **AUTO-FIX**: none required — vacation_pause absent; price-collector/1m-candle/pipeline/watchdog timers active and firing (next runs within 60s); pipeline rc=0 at 11:42, 0 tracebacks/1h; prices fresh (54s, 87 tokens); candles.db lock = transient single writer (1m collector), not stuck; 0 open positions; 0 phantom trades/24h; 46 signals/h; regime LONG_BIAS (29L/10S/90N); disk: nothing eligible to clean.
+
+## Error Alerts — 2026-10-24 12:46 UTC
+- **WARN** (recurring): disk 86% used (95G/118G, 17G free) — no logs >7d to gzip (all already compressed); journals 284M; remaining hogs need CEO approval (/usr 32G, /root/.local/share/opencode 12G, /root/.cache 3.5G) per 07:46/09:46/11:44 entries.
+- **INFO**: 31 "CRASH" grep hits in 24h pipeline log = `BTC-CRASH`/`BTC-CRASH-OVERRIDE` filter labels, 0 real tracebacks.
+- **INFO**: stale unit `hermes-atr-sl-updater.timer` = not-found (renamed to `-DEFUNCT`, still in manager cache) — cosmetic, no action.
+- **AUTO-FIX**: /tmp stale purge (17 files, ~340M: old sess*.jsonl, ATM zips, shadow/signals copy DBs) — disk 96G→95G. Otherwise none required: vacation_pause absent; price-collector/1m-candle/pipeline/watchdog timers active and firing (pipeline rc=0 at 12:42, 0 open positions); prices fresh (71s, 87 tokens/5min); 0 phantom trades/24h; 40 signals/h; regime NEUTRAL (19L/19S/85N); speed avg 48.5 (128/241 ≥50th pct).
+
+## Error Alerts — 2026-10-24 13:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] BIGTIME TOK — continuum says DECLINING+LEAN_BULL+AT, allowing despite TOK filter`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] BIGTIME TOK — continuum says TOK+LEAN_BULL+AT, allowing despite TOK filter`

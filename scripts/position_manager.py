@@ -3797,9 +3797,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     log(f"  [SHADOW] BB-BOUNCE TRAIL-ARM error for {token}: {e}")
 
         # ── 7b-shadow2. MFE-CUT SHADOW — cut-if-stall@45m (zero behavior) ───────
-        # brain_auditor 2026-10-17. 30d SL-family never-armed MFE<0.20 hold>=45m:
-        # 54T avoid -$7.46; false-kill winners 3T +$0.08. Logs would-fires only;
-        # never closes. Flip live only with CEO GO + candle-level OOS backtest.
+        # brain_auditor 2026-10-17. Logs would-fires only; never closes.
+        # ⚠️ CANDLE OOS ALREADY RAN AND FAILED (2026-10-17 ~11:00 UTC) — the
+        # "54T avoid -$7.46 / fk 3T" trades-level counterfactual below was
+        # SELECTION-ON-OUTCOME (conditioned on FINAL MFE<0.20). 30d candle OOS:
+        # 517 fires, 145 false-kills (40.2% of 30d winners), net COST ~$9.90/30d;
+        # every (T, MFE) grid cell net-negative or >=10% fk. FLIP PATH BLOCKED.
+        # Full verdict + numbers: hermes_constants.py above MFE_CUT_SHADOW_ENABLED,
+        # and brain/verdicts via analysis/trail_arm_candle_oos_2026-10-17.
+        # DO NOT flip live on the old trades-level numbers. Redesign required:
+        # signal-family-scoped timeouts, not a universal cut.
         if MFE_CUT_SHADOW_ENABLED and trade_id not in _mfe_cut_shadow_logged:
             try:
                 _mcs_ot = pos.get('open_time') or open_time

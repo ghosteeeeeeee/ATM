@@ -2255,5 +2255,29 @@
     "after": "BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True (new) + enforcement branch with own dedup set _bb_bounce_tat_enforced; shadow log still runs for 0<=pnl<arm",
     "rationale": "hermes_constants.py:1727 mandated a candle OOS re-run before any bb-bounce TAT flip; it had never been run for variant-C (only an 8-day trades-level pack). Ran it (analysis/tat_variant_c_candle_oos_2026-10-24.py, --selfcheck PASS): variant-C clears the fk-of-cohort-winners bar 8.8% vs BASE 41.9%, net positive, n=21>=15. Implements mandate \"exit early in chop\". CEO veto = set the new flag False.",
     "impact": "Expected ~+$0.71/30d; risk = 5 late-runner false kills (-$0.31 total, MNT/HYPE/HYPER). Untested by traffic at ship time (0 open positions) - first bb-bounce/ai-trader+ LONG >=55m at pnl<0 is the test."
+  },
+  {
+    "timestamp": "2026-10-24T13:41:40Z",
+    "agent": "brain_auditor",
+    "run": 118,
+    "change": "RECOVERED+VERIFIED: precheck BTC-bearish LONG test rewritten (old: ema300_position != BELOW; new: btc_long_trend() mirrors signal_compactor _cont_bearish + NEUTRAL-only gating + >600s fail-open)",
+    "type": "tweak",
+    "file": "scripts/ai_trader_precheck.py",
+    "before": "ema_pos != \"BELOW\" read from continuum_data.json — blessed LONGs the pipeline blocked (watchdog steer 12:14Z: GRASS/YGG/BABY/BTC PASS then CONTINUUM-BLOCK)",
+    "after": "btc_long_trend(token) -> (would_block, detail); mirrors signal_compactor:2815/2976, escapes explicitly not simulated (FAIL = \"will likely be blocked\")",
+    "rationale": "watchdog gate-mismatch steer; file was edited 13:03 UTC by an interrupted run with no log entry — verified this run (py_compile, predicates vs signal_compactor, live calls on GRASS/BTC) and recorded here",
+    "impact": "advisory only, 0 pipeline behavior; removes ~62% of false PASSes (2233/3619 LONG-NEUTRAL-CHOP blocks since Oct 17 sat at ema=AT where old test passed); untested by traffic — first advisor LONG pick is the test"
+  },
+  {
+    "timestamp": "2026-10-24T13:41:40Z",
+    "agent": "brain_auditor",
+    "run": 118,
+    "change": "RECOVERED+VERIFIED: MFE-CUT shadow comment replaced with the 2026-10-17 candle-OOS FAIL verdict (517 fires / 145 fk = 40.2% of 30d winners / ~-$9.90 net / every grid cell NO)",
+    "type": "creative",
+    "file": "scripts/position_manager.py",
+    "before": "comment advertised \"54T avoid -$7.46 / fk 3T\" + \"flip live only with CEO GO + candle OOS\" — the trades-level numbers were selection-on-outcome",
+    "after": "comment states FLIP PATH BLOCKED, names the candle numbers, points at hermes_constants.py:1749 and analysis/trail_arm_candle_oos_2026-10-17.py",
+    "rationale": "comment-only diff (0 behavior) edited 12:45 UTC by an interrupted run, unlogged; numbers cross-checked byte-for-byte against constants and the script exists; py_compile PASS",
+    "impact": "zero behavior; removes an active \"flip me\" trap next to MFE_CUT_SHADOW_ENABLED=True"
   }
 ]
