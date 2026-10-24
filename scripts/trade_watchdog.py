@@ -278,7 +278,7 @@ def collect_recent_closed(limit=20):
             FROM trades
             WHERE close_time IS NOT NULL
               AND exit_price IS NOT NULL AND exit_price != 0
-            ORDER BY close_time DESC
+            ORDER BY close_time DESC, id DESC
             LIMIT %s
         """, (limit,))
         rows = cur.fetchall()
@@ -818,7 +818,12 @@ def analyze_trade_clusters(open_trades):
 
 
 def analyze_recent_losses(recent_trades):
-    """Analyze recent closed trades for patterns."""
+    """Analyze recent closed trades for patterns.
+
+    Contract (bug-hunter #115): recent_trades must be close_time DESC —
+    the per-signal streak walk (line ~897) counts TRAILING losses from index 0.
+    Sole caller: analyze_all <- collect_recent_closed (ORDER BY close_time DESC, id DESC).
+    """
     steers = []
 
     if not recent_trades:
