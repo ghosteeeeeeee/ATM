@@ -2222,5 +2222,27 @@
     "after": "fires only on >=3 TRAILING consecutive losses (close_time DESC, first non-loss ends streak) AND net PnL < 0",
     "rationale": "steer-001 (volume-buildup- '4-loss streak') re-emitted stale for 17 consecutive audit runs even though the streak ended Oct 23 15:16 — losses were scattered in-window, not trailing. Advisory-only (auto_executable=false), zero trading behavior.",
     "impact": "Production window dry-run: OLD fires stale vb- steer, NEW fires 0 steers. 50-window: correctly keeps true streaks (bb-bounce 4L tail, ai-trader-pending 3L tail), suppresses pump-chain+ (tail has a win). py_compile PASS."
+  },
+  {
+    "timestamp": "2026-10-24T08:57:34+00:00",
+    "agent": "brain_auditor",
+    "change": "cell_stats: record last_close (max close_time) per cell/signal/global and persist as last_close TEXT column (guarded ALTER for existing stores)",
+    "type": "infra",
+    "file": "scripts/cell_stats.py",
+    "before": "cells table had no freshness datum — a cell whose trades stopped weeks ago looked identical to a fresh one; computed_at is nightly so it never reveals staleness",
+    "after": "cells.last_close TEXT (22-col schema, CREATE + ALTER), populated 714/714; surfaced in data/cell_stats_latest.json snapshot",
+    "rationale": "run #116 found 11/12 tradeable (1.2x-boosting) cells have had no trade since 2026-08-10..09-09; the datum had to exist before any guard could be evaluated",
+    "impact": "zero trading behavior — store only"
+  },
+  {
+    "timestamp": "2026-10-24T08:57:34+00:00",
+    "agent": "brain_auditor",
+    "change": "signal_compactor: both cell-lookup SELECTs fetch last_close; both [CELL-STATS] log lines print last=YYYY-MM-DD",
+    "type": "infra",
+    "file": "scripts/signal_compactor.py",
+    "before": "[CELL-STATS] POL LONG: tradeable cell [bb_bounce_v2_long] (wr=76%, n=25) -> 1.2x  (no way to see the cohort is 46 days dead)",
+    "after": "[CELL-STATS] ... (wr=76%, n=25, last=2026-09-08) -> 1.2x",
+    "rationale": "make the stale-cohort amplification visible in the log; decision path (tradeable->1.2x, n>=15 & wr<0.40->0.5x) intentionally unchanged",
+    "impact": "zero trading behavior — log format only. bug_hunter VERDICT: SHIP"
   }
 ]

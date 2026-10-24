@@ -7795,5 +7795,40 @@
     "category": "watchdog signal quality",
     "status": "shipped",
     "risk": "low (advisory engine only, zero trading behavior)"
+  },
+  {
+    "date": "2026-10-24T08:57:34+00:00",
+    "run": 116,
+    "agent": "brain_auditor",
+    "idea": "CELL-STATS STALE-BOOST: 11 of 12 cells carrying the live 1.2x confidence boost have had NO trade in >14 days — surfaced last_close so the stale cohort is visible",
+    "rationale": "Root-cause audit of the cell-stats multiplier (CEO 2026-10-14 wiring). cell_stats.db keys cells by trades.signal; signal_compactor looks up by runtime signal_type. Two vocabularies collide: 'bb_bounce_v2_long' (73 trades, ALL 2026-09-02..09-08, +2.08) and 'bb-bounce-v2-long+' (71 trades, 2026-09-10..10-23, -1.21). The runtime emits signal_type='bb_bounce_v2_long' (399 rows), so the exact-key lookup introduced by the 2026-10-14 fix resolves to the DEAD cohort and boosts it; the live negative cohort's row (n=39, wr 46%, -0.65, tradeable=0) is never selected. Same class: 'r2_trend_long' (127 trades, 2026-08-13..09-02, dead). Measured blast radius: 1,288 [CELL-STATS] 1.2x log lines since Oct 21 across only 4 keys — bb_bounce_v2_long 723 (56%), pump-chain- 291, bb-squeeze+ 154, r2_trend_long 120 (9%) = 843/1288 = 65% of all boosts keyed to cohorts that stopped trading 46-52 days ago; 0.5x losing-cell dampen has fired 0 times in the same span (one-sided amplifier). Fresh store after this run: 11/12 tradeable cells have last_close between 2026-08-10 and 2026-09-09; only bb-squeeze+ LONG NORMAL (2026-10-23) is current.",
+    "expected_impact": "Makes the amplification auditable instead of silent; the log now reads last=2026-09-08 next to every bb_bounce_v2_long boost. Feeds the Oct 25 guard evaluation.",
+    "category": "instrumentation / confidence-multiplier integrity",
+    "status": "shipped (zero behavior) + guard pre-registered",
+    "risk": "none — log + column only; 1.2x/0.5x decision path byte-identical",
+    "verification": "py_compile PASS both files; cell_stats.py re-run PASS (714 cells, last_close populated 714/714); consumer SELECT returns 5-tuple; inline self-check 12/12 tradeable cells resolve + format; bug_hunter VERDICT: SHIP (all findings NONE/LOW)"
+  },
+  {
+    "date": "2026-10-24T08:57:34+00:00",
+    "run": 116,
+    "agent": "brain_auditor",
+    "idea": "PRE-REGISTER: cell-stats freshness guard — tradeable requires last_close within FRESH_DAYS; two candidate scopes locked BEFORE any counterfactual is run",
+    "rationale": "The guard is the fix, but it changes live confidence multipliers on the largest signal families, so it must not ship blind. Pre-locked criteria: (A) HARD scope = de-boost any cell whose last_close is older than FRESH_DAYS (candidate 14d) — counterfactual = count of suppressed 1.2x fires/day and fk measured against last 7d winners; ship only if fk<20% AND OOS same-sign at 7d AND 30d. (B) MERGE scope (alternative): normalize keys at cell_stats fetch so dash-form and underscore-form trades.signal aggregate into one row — this fixes the duplicate-key confusion but the blended numbers are still 90d-stale-contaminated (bb_bounce_v2_long merges to n=144, wr 61.8%, avg +0.006 -> STILL tradeable), so B alone does not stop the stale boost. Decision: measure A first, B only if A's fk fails. NOT SHIPPING TODAY — r2v2-long3 14d is positive (15T 8W +0.36) and may be receiving the r2_trend_long boost; removing a boost can reduce executions of a profitable family, which is exactly why shadow evidence is required.",
+    "expected_impact": "If A passes: stops ~65% of all 1.2x boosts being driven by dead cohorts, without touching bb-squeeze+ (the only fresh tradeable cell).",
+    "category": "entry sniper / confidence-multiplier integrity",
+    "status": "pre-registered",
+    "risk": "medium — could reduce executions of a profitable family (r2v2) if shipped without the fk/OOS bars; hence shadow-first",
+    "blocked_on": "Oct 25 eval batch; vacation_mode / constants_change_review_queue (shadow data + significance n>=15 + p + OOS)"
+  },
+  {
+    "date": "2026-10-24T08:57:34+00:00",
+    "run": 116,
+    "agent": "brain_auditor",
+    "idea": "CEO GO request: TAT variant-C — all quantitative pre-registered criteria re-verified fresh this run",
+    "rationale": "Re-ran brain/analysis/tat_variant_c_pack_2026-10-23.py against the live log: in-scope closed n=16 (>=15), variant-C 7 cuts, net +0.410, fk 0/7 = 0.0% (<20%), sign 7+/0-, p=0.016, and both sub-windows positive (Oct17-19 +0.200, Oct20-23 +0.210 = OOS same sign). BASE variant fails fk at 7/16=43.8% — variant-C (fire only at negative live pnl) is the only form that passes. Targets the #1 bleed family (hard_max_loss 14d 74T 0W -7.09) by cutting stalls before they reach max loss. Criteria locked on Oct 21; 3 of 4 met for 3 runs, only CEO GO outstanding.",
+    "expected_impact": "+0.41 per 16-fire cohort at fk 0% — no winner is killed.",
+    "category": "exit sniper / chop early-exit",
+    "status": "awaiting CEO GO (criteria PASS)",
+    "risk": "low — fk 0/7, zero winner-kills observed"
   }
 ]

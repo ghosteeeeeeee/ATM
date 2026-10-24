@@ -2158,7 +2158,7 @@ def _score_signal(token, direction, conf, source, signal_type,
                 if not _cs_key:
                     continue
                 _cs_row = _cs_conn.execute(
-                    "SELECT wr_raw, total_pnl, n, tradeable FROM cells "
+                    "SELECT wr_raw, total_pnl, n, tradeable, last_close FROM cells "
                     "WHERE signal=? AND direction=? AND regime=? LIMIT 1",
                     (_cs_key, _cs_dir, _cs_reg)).fetchone()
                 if _cs_row:
@@ -2170,20 +2170,24 @@ def _score_signal(token, direction, conf, source, signal_type,
                         continue
                     _cs_norm = _cs_key.replace('-', '_').replace('+', '').replace(' ', '_').lower().rstrip('_')
                     _cs_row = _cs_conn.execute(
-                        "SELECT wr_raw, total_pnl, n, tradeable FROM cells "
+                        "SELECT wr_raw, total_pnl, n, tradeable, last_close FROM cells "
                         "WHERE signal=? AND direction=? AND regime=? LIMIT 1",
                         (_cs_norm, _cs_dir, _cs_reg)).fetchone()
                     if _cs_row:
                         _cs_used = _cs_norm
                         break
             if _cs_row:
-                _cs_wr, _cs_pnl, _cs_n, _cs_tradeable = _cs_row
+                _cs_wr, _cs_pnl, _cs_n, _cs_tradeable = _cs_row[:4]
+                # brain_auditor #116: surface cell freshness. Decision path unchanged
+                # (still wr/n/tradeable) — last_close only makes a stale-cohort boost
+                # visible in the log instead of silent.
+                _cs_last = (_cs_row[4] or '?')[:10]
                 if _cs_tradeable:
                     _cell_mult = 1.2
-                    log(f"  📊 [CELL-STATS] {token} {direction}: tradeable cell [{_cs_used}] (wr={_cs_wr*100:.0f}%, n={_cs_n}) → 1.2x")
+                    log(f"  📊 [CELL-STATS] {token} {direction}: tradeable cell [{_cs_used}] (wr={_cs_wr*100:.0f}%, n={_cs_n}, last={_cs_last}) → 1.2x")
                 elif _cs_n >= 15 and _cs_wr < 0.40:
                     _cell_mult = 0.5
-                    log(f"  📊 [CELL-STATS] {token} {direction}: losing cell [{_cs_used}] (wr={_cs_wr*100:.0f}%, n={_cs_n}) → 0.5x")
+                    log(f"  📊 [CELL-STATS] {token} {direction}: losing cell [{_cs_used}] (wr={_cs_wr*100:.0f}%, n={_cs_n}, last={_cs_last}) → 0.5x")
         finally:
             _cs_conn.close()
     except Exception:

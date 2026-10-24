@@ -79,7 +79,7 @@ def fetch_trades(days):
                    -- — psycopg2 parses them as parameter placeholders.)
                    COALESCE(NULLIF(volatility_regime, ''), NULLIF(regime, ''), 'UNKNOWN') AS regime,
                    exit_reason, pnl_usdt, pnl_pct,
-                   mfe_pct, mae_pct, entry_rsi_14, confidence
+                   mfe_pct, mae_pct, entry_rsi_14, confidence, close_time
             FROM trades
             WHERE status = 'closed'
               AND close_time > NOW() - (%s || ' days')::interval
@@ -213,9 +213,10 @@ def compute_cells(rows):
 
     cells = {}       # (signal, direction, regime) -> raw aggregates
     signals = {}     # (signal, direction) -> raw aggregates
-    glob = {'n': 0, 'wins': 0, 'pnl': 0.0, 'pf_vals': [], 'mfe': [], 'mae': []}
+    glob = {'n': 0, 'wins': 0, 'pnl': 0.0, 'pf_vals': [], 'mfe': [], 'mae': [],
+            'last': None}
 
-    for signal, direction, regime, exit_reason, pnl_usdt, pnl_pct, mfe, mae, rsi, conf in rows:
+    for signal, direction, regime, exit_reason, pnl_usdt, pnl_pct, mfe, mae, rsi, conf, ct in rows:
         signal = (signal or 'UNKNOWN').strip()
         direction = (direction or 'UNKNOWN').strip().upper()
         regime = (regime or 'UNKNOWN').strip().upper()
@@ -226,10 +227,16 @@ def compute_cells(rows):
                            (glob, None)):
             agg = store if key is None else store.setdefault(
                 key, {'n': 0, 'wins': 0, 'pnl': 0.0, 'pf_vals': [], 'mfe': [], 'mae': [],
-                      'exits': {}})
+                      'exits': {}, 'last': None})
             agg['n'] += 1
             agg['wins'] += win
             agg['pnl'] += float(pnl_usdt or 0)
+            # brain_auditor #116: freshness datum. A cell whose newest trade predates
+            # the live signal's own key (e.g. bb_bounce_v2_long stopped 2026-09-08
+            # while bb-bounce-v2-long+ kept trading) must be identifiable as stale.
+            _ct = ct.isoformat() if hasattr(ct, 'isoformat') else ct
+            if _ct and (agg['last'] is None or _ct > agg['last']):
+                agg['last'] = _ct
             if pnl_pct is not None:
                 agg['pf_vals'].append(float(pnl_pct))
             if mfe is not None:
@@ -251,6 +258,7 @@ def compute_cells(rows):
             'mfe_p75': _pct(agg['mfe'], 75), 'mae_p25': _pct(agg['mae'], 25),
             'mae_p50': _pct(agg['mae'], 50),
             'exits': agg.get('exits', {}),
+            'last_close': agg.get('last'),
         }
 
     glob_f = finish(glob)
@@ -292,6 +300,7 @@ def compute_cells(rows):
             'signal_n': sig['n'] if sig else 0,
             'signal_wr': sig['wr'] if sig else None,
             'exits': c['exits'],
+            'last_close': c.get('last_close'),
         })
     out.sort(key=lambda r: (-r['n'], r['signal']))
     return out, glob_f, sig_f
@@ -312,9 +321,15 @@ def write_store(cells, glob_f, days):
                 mfe_p25 REAL, mfe_p50 REAL, mfe_p75 REAL,
                 mae_p25 REAL, mae_p50 REAL,
                 signal_n INTEGER, signal_wr REAL, exits_json TEXT,
-                computed_at TEXT,
+                computed_at TEXT, last_close TEXT,
                 PRIMARY KEY (signal, direction, regime))
         """)
+        # existing stores created before run #116 lack the column — ALTER appends
+        # it last, matching the CREATE order above.
+        try:
+            cur.execute("ALTER TABLE cells ADD COLUMN last_close TEXT")
+        except sqlite3.OperationalError:
+            pass  # already present
         cur.execute("""
             CREATE TABLE IF NOT EXISTS meta (
                 key TEXT PRIMARY KEY, value TEXT)
@@ -323,12 +338,13 @@ def write_store(cells, glob_f, days):
         now = datetime.now(timezone.utc).isoformat()
         for c in cells:
             cur.execute("""
-                INSERT INTO cells VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                INSERT INTO cells VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """, (c['signal'], c['direction'], c['regime'], c['n'], c['wins'],
                   c['wr_raw'], c['wr_blended'], c['avg_pnl_raw'], c['avg_pnl_blended'],
                   c['total_pnl'], c['admission'], int(c['tradeable']),
                   c['mfe_p25'], c['mfe_p50'], c['mfe_p75'], c['mae_p25'], c['mae_p50'],
-                  c['signal_n'], c['signal_wr'], json.dumps(c['exits']), now))
+                  c['signal_n'], c['signal_wr'], json.dumps(c['exits']), now,
+                  c.get('last_close')))
         for k, v in (('computed_at', now), ('window_days', str(days)),
                      ('global_wr', str(glob_f['wr'])), ('global_n', str(glob_f['n'])),
                      ('cells_total', str(len(cells))),
