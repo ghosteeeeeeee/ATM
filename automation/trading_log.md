@@ -14647,3 +14647,24 @@ Final set: ['BTC']
 - Waiver gate live since 00:00Z — 1 trade closed since (BTC manual SL), 0 new Tracebacks, still clean
 - Signal flow still low + hotset 0-token fallback (chronic) — flagged repeatedly
 - CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings
+
+## 2026-10-24 02:28 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 22T 11W 50.0% `+$0.07` | 7d: 120T 40.0% `-$1.17` | **size-reduce 1.0x (file absent = truth, cleared 22:57Z)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour, 0 open — quiet
+- atr_sl_hit 1/22 = 4.5% (<40%) — dominant close = profit-monster-trail (10T +$0.71)
+- No 0%WR signal with 3+ trades last hour (0 trades)
+- No negative-hour streak (last closed hour 00:00 -$0.08 single trade, prior hours green; empty hour resets)
+- Frequency 0/hr — not overtraded
+- 24h $0.07 green / 50% WR holding
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Waiver gate live since 00:00Z — still clean, 0 new Tracebacks
+- Signal flow still low + hotset 0-token fallback (chronic) — flagged repeatedly
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings

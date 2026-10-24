@@ -1,81 +1,62 @@
 {
-  "timestamp": "2026-10-24T01:46:22Z",
-  "audit_run": 110,
+  "timestamp": "2026-10-24T02:37:29Z",
+  "run": "brain_auditor #111",
   "session_brain_stats": {
-    "queries": 3,
-    "top_hits": "profit-monster tier / chop v2 / delisted tokens"
+    "query": "hotset/compactor + post-lapse waiver",
+    "note": "dup-heavy persists (ideation only); hotset-empty recurring topic corroborates watchdog deep_analysis"
   },
   "trade_summary_24h": {
-    "closed": 22,
-    "wins": 11,
+    "n": 22,
+    "w": 11,
     "wr": 50.0,
-    "pnl": "+0.07",
-    "note": "FIRST GREEN 24h. Flat book, 0 open. Waiver gate live 00:00Z clean, 0 trades since.",
-    "losers_11": "4x volume-buildup- SHORT RSI 35-43 (waiver-band, now blocked by #102 gate), 2x bb-bounce-v2-long+, 1x pc+ LONG GRASS, 1x r2v2-long9 giveback, 2x ai-trader-pending, 1x bb-squeeze+ trail_arm_timeout",
-    "recovery_replay_24h": "2 never-adverse / 4 recovered / 5 NEVER = 3 waiver-band vb- (now gated) + BTC pending + PUMP giveback. Wrong-side REFUTED 38th consecutive run."
+    "pnl": 0.07,
+    "7d": "120T 40.0% -1.17",
+    "14d": "344T 36.0% -4.81"
+  },
+  "mandate_fresh_14d": {
+    "trail_family": "111T 86.5% +9.21 (PM-trail 85T 89.4% +5.08 + atr_trail_hit 26T 76.9% +4.13)",
+    "hard_max_loss": "77T 0% -7.70",
+    "armed_col": "True 139T 78.4% +9.86 vs False 204T 7.4% -14.61"
+  },
+  "post_lapse_verification": {
+    "flip1_active": false,
+    "unclog_expired_in_log": true,
+    "post_lapse_opens": 0,
+    "band_shorts_opened": 0,
+    "verdict": "PASS — gate live, correct-by-traffic (flat book, both sides gated by structure/trend filters)",
+    "narrower_re_waiver_trigger": "NOT EVALUABLE (needs post-lapse n>=20)"
   },
   "drift_findings": [],
   "recurring_problems": [
-    {
-      "pattern": "LONG-side bleed 7d: n82 -1.73 38% WR vs SHORT n39 +0.57 46% WR",
-      "status": "standing, condition-locked steer active (favor SHORT while BTC below EMA300 81071)",
-      "watchdog_rec_eval": "pc+ LONG block REJECT-WITH-DATA: 30d n76 +1.79 POSITIVE, EXTREME habitat n60 +2.70. 7d n13 8% is variance below n>=20 bar. 14d n47 -0.10 wash.",
-      "long_50_60_block_eval": "REJECT-WITH-DATA: 30d n143 -0.07 flat. 7d -1.56 does not hold at 30d. LONG_MIDBAND_RSI_MIN=60 already covers 60-70 non-EXTREME."
-    },
-    {
-      "pattern": "Chop entries dying before trail arms: hard_max_loss 14T 0% -1.79, atr_sl_hit 29T 0% -1.63 vs profit-monster-trail 36T 89% +2.08",
-      "status": "standing. Arm decomposition 7d: armed 46T 84.8% +3.33 vs never 75T 13.3% -4.49. Queued levers (CONF_FLOOR/TAT/MFE-CUT) target exactly never-armed cohort."
-    },
-    {
-      "pattern": "Reached-arm leak (escalation #17): atr_sl_hit with MFE>=0.40 = 33T -1.99 14d. pc- SHORT biggest cluster 15T. Trail armed but ATR SL trailing independently caught retrace before profit-monster locked more.",
-      "status": "ARM-GAP instrumentation live (logs MFE>=0.40 + trailing_activated=FALSE). Exit-ladder candle OOS pre-registered for Oct 25 eval.",
-      "decomposition_result": "41T/14d all trailing_activated=False. Candle-vs-poll gap confirmed as sole failure mode."
-    }
+    "escalation #17 arm-then-reversal leak STILL PRESENT: 14d atr_sl_hit mfe>=0.40 = 33T 1W -1.99, all trailing_activated=False (candle-vs-poll gap). Vehicle = Oct 25 1m replay. No re-proposal.",
+    "hotset empty 86% of cycles = opportunity cost but CORRECT given both-sides-gated regime (BTC below EMA300 + structure gate flip). Not a bug."
   ],
   "missing_implementations": [],
   "creative_improvements": [
-    {
-      "date": "2026-10-24T01:46:22Z",
-      "idea": "Reached-arm leak decomposition KPI: separate ARMED-but-ATR-SL-caught (trailing_activated=TRUE, exit=atr_sl_hit, MFE>=0.40) from NEVER-ARMED (trailing_activated=FALSE). The 33T -1.99 cohort may be mostly ARMED — trail fired but ATR SL ratcheted tighter and caught a retrace first. If so, the fix is exit-ladder priority (escalation #17), not trail activation tuning.",
-      "rationale": "ARM-GAP instrumentation only logs trailing_activated=FALSE. If most reached-arm leak trades have trailing_activated=TRUE, the instrumentation is blind to the actual failure mode. This decomposition tells us which lever to pull.",
-      "expected_impact": "Clarifies escalation #17 scope; if ARMED-but-caught dominates, exit-ladder candle OOS is the right fix; if NEVER-ARMED dominates, trail activation tuning is.",
-      "category": "exit-side forensics",
-      "status": "executed",
-      "risk": "low",
-      "result": "100% trailing_activated=False (41T/14d). ZERO armed-but-caught. Fix = candle-aware arming, not exit-ladder."
-    }
+    "HIGH-CONF [60,95) DECAY WATCH pre-registered (30d +0.97 -> 14d -0.45; trigger 7d negative n>=20)",
+    "post-lapse checkpoint verified PASS"
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    {
-      "change": "#102 waiver expiry gate",
-      "status": "LIVE since 00:00Z, 0 new Tracebacks, selfcheck PASS, 0 trades opened since — first trade will test it"
-    },
-    {
-      "change": "#106 entry_regime_4h fix",
-      "status": "populating (3/60 in 3d — sparse but working for new trades)"
-    },
-    {
-      "change": "#107 trend single-owner fix",
-      "status": "verified in code: 15m_regime_scanner does not write trend, 4h_regime_scanner does"
-    },
-    {
-      "change": "#100 size-reduce ETA",
-      "status": "CLEARED 22:57Z to 1.0x (file absent)"
-    },
-    {
-      "change": "steer-001 volume-buildup- disable recommendation",
-      "status": "REJECTED — 14d SHORT 20T 70% +0.39. Losses are waiver-band class the gate now blocks. DO NOT DISABLE."
-    },
-    {
-      "change": "watchdog rec #2 pc+ / ai-trader-pending LONG block below EMA300",
-      "status": "REJECT-WITH-DATA — pc+ 30d +1.79 positive, EXTREME habitat +2.70. ai-trader-pending LONG 7d n7 too small. No regime-conditional gate ships without shadow data + n>=20."
-    }
+    "#109: 0 config changes — nothing to verify",
+    "#109 pre-regs: narrower re-waiver + SHORT arm-rate KPI both NOT EVALUABLE (post-lapse n=0) — correct deferral",
+    "#104/#107 fixes (entry_regime_4h, trend ownership): no new traffic since 00:00Z, prior verification stands"
   ],
+  "losing_autopsy_48h": {
+    "method": "recovery_replay adverse-first, selfcheck PASS",
+    "n": 12,
+    "never_adverse": 2,
+    "recovered": 5,
+    "never": 5,
+    "never_list": "ALT/CC/ZRO (waiver-band vb- shorts = now blocked) + BTC pending + PUMP giveback",
+    "wrong_side": "REFUTED 40th consecutive run (#61 p=0.116, #84 t=-0.04)"
+  },
+  "deep_dive": "0 new sub-50% n>=15 targets (6 negatives all owned: bb-bounce=TAT+MFE-CUT, ai-trader+ disabled, doji killed, pump-chain±=CONF_FLOOR, ai-trader-manual CEO-domain positive)",
+  "steer_001": "RETRACTED confirmed with fresh data — vb- 24h 10T 6W -0.04; 5 straight PM-trail wins after flagged losses; DO NOT DISABLE",
   "next_actions": [
-    "CEO: RATIFY waiver expiry (landed clean, 0 knife trades since) + confirm flip#2 (vb- HIGH/EXTREME) stays decoupled",
-    "Monitor post-lapse SHORT traffic: first entry tests the gate; arm-rate KPI at n>=20",
-    "Oct 25: MFE-CUT / HML / habitat / re-enter / UGB / short-gate / first CONF-FILTER read + escalation #17 exit-ladder candle OOS + reached-arm leak decomposition",
-    "Vacation mode still true — no_signal_enable_disable active, constants_change_review_queue constraints honored (nothing qualified: 0 shadow data + significance ships)"
+    "Post-lapse KPIs: watch band opens stay 0; narrower re-waiver trigger at n>=20",
+    "HIGH-CONF decay watch: 7d [60,95) negative at n>=20 -> escalate same-day",
+    "Oct 25 batch unchanged: MFE-CUT / HML / habitat / re-enter / UGB / short-gate / CONF-FILTER + BE-at-arm 1m replay (escalation #17)",
+    "CEO: vacation_mode off when ready (rules now half-open: no_constants_change=false)"
   ]
 }

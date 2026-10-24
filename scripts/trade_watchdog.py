@@ -452,6 +452,11 @@ def collect_pipeline_status():
     log_path = os.path.join(LOGS_DIR, "pipeline.log")
     if os.path.exists(log_path):
         try:
+            # flock never updates the lock file's mtime, so lock_age alone reads
+            # constant-false once the lock file exists (mtime frozen 2026-10-18).
+            # Log freshness is the real liveness signal — pipeline logs every cycle.
+            if time.time() - os.path.getmtime(log_path) < 300:
+                status["running"] = True
             result = subprocess.run(
                 ["tail", "-1", log_path],
                 capture_output=True, text=True, timeout=5

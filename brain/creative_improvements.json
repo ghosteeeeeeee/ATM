@@ -7679,5 +7679,24 @@
     "category": "exit-side forensics",
     "status": "executed",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T02:37:29Z",
+    "idea": "HIGH-CONF [60,95) DECAY WATCH — pre-register escalation if 7d also negative at n>=20",
+    "rationale": "final_confidence [60,95) is the only positive confidence band at 30d (168T 48.2% +0.97) but flipped negative at 14d (55T 36.4% -0.45). This is the system's core executed edge. [40,50) is the standing bleed bucket (136T 33.8% -2.93 both windows) = CONFIDENCE-TAIL CEO queue already owns it. If high-conf decay holds at 7d n>=20, the engine itself is degrading — escalate same-day, not Oct 25 batch.",
+    "expected_impact": "Early warning on core-edge decay; zero code",
+    "category": "monitor",
+    "status": "pre-registered",
+    "risk": "low",
+    "trigger": "7d [60,95) pnl < 0 AND n >= 20"
+  },
+  {
+    "date": "2026-10-24T02:37:29Z",
+    "idea": "POST-LAPSE CHECKPOINT PASSED — waiver gate live, 0 band opens, UNCLOG-EXPIRED firing; narrower re-waiver trigger NOT yet evaluable (post-lapse n=0)",
+    "rationale": "Planned #109 checkpoint. flip1_active()=False confirmed in code; log shows UNCLOG-EXPIRED at 01:00-01:01Z; 0 trades opened at all post-00:00Z (flat book, both-sides-gated market — correct-by-traffic). Pre-registered narrower [35,40) re-waiver trigger needs n>=20 post-lapse band losers — nothing to evaluate yet.",
+    "expected_impact": "Gate-truth evidence accumulating; make-permanent-vs-conditional ruling deferred until n>=20",
+    "category": "verification",
+    "status": "verified-pass",
+    "risk": "low"
   }
 ]
