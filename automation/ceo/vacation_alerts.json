@@ -1,22 +1,5 @@
 [
   {
-    "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 34.9% < 35.0% AND pnl_7d $-3.15 < $-2.00 (129T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.36,
-      "n_24h": 19,
-      "wr_24h": 42.1,
-      "pnl_48h": -0.69,
-      "n_48h": 28,
-      "wr_48h": 35.7,
-      "pnl_7d": -3.15,
-      "n_7d": 129,
-      "wr_7d": 34.9,
-      "checked_at": "2026-10-23T15:27:49.732714+00:00"
-    },
-    "ts": "2026-10-23T15:27:49.733300+00:00"
-  },
-  {
     "level": "INFO",
     "message": "Guardrails OK",
     "data": {
@@ -848,5 +831,22 @@
       "checked_at": "2026-10-24T15:58:02.645636+00:00"
     },
     "ts": "2026-10-24T15:58:02.646205+00:00"
+  },
+  {
+    "level": "INFO",
+    "message": "Guardrails OK",
+    "data": {
+      "pnl_24h": 0.87,
+      "n_24h": 11,
+      "wr_24h": 81.8,
+      "pnl_48h": 0.51,
+      "n_48h": 30,
+      "wr_48h": 56.7,
+      "pnl_7d": -0.93,
+      "n_7d": 124,
+      "wr_7d": 41.1,
+      "checked_at": "2026-10-24T16:28:02.919436+00:00"
+    },
+    "ts": "2026-10-24T16:28:02.920372+00:00"
   }
 ]
