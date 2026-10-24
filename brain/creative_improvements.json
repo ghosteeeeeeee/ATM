@@ -8111,5 +8111,24 @@
     "category": "pre-registration",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T23:35:07Z",
+    "idea": "LONG mid-band (meta_rsi 45-60) size-dampen 0.5x - MEASURED, REJECTED-WITH-DATA at 30d, pre-registered re-measure",
+    "rationale": "Largest real-n LONG bucket: 7d n=48 -1.50 (save +0.75), 14d n=97 -1.97 (save +0.99), but 30d n=195 +0.71 -> dampen COSTS -0.36 = sign flip = temporal instability (same class that killed sweet-spot demote #62). Size dampen has fkA=0 by construction (winners still trade at half size), unlike the block rejected in #122 (fk 38-55%).",
+    "expected_impact": "+0.99/14d if recent regime persists; -0.36/30d if mean-reverts",
+    "category": "position sizing",
+    "status": "rejected-with-data + pre-registered",
+    "risk": "low",
+    "lock": "ship only if 30d window negative AND n>=50 at re-measure Oct 27"
+  },
+  {
+    "date": "2026-10-24T23:35:07Z",
+    "idea": "RSI-bucket entry steering needs an n>=50-per-cell bar before watchdog prose can cite it as a rule",
+    "rationale": "Watchdog's extremes-only recommendation uses cells of 4-25 trades; LONG <35 flips +0.17 (7d) -> -0.45 (14d) -> -0.32 (30d). SHORT 60+ 7d 8T +0.44 also n<20. Only 45-60 LONG has real n (97T/195T) and it flips at 30d.",
+    "expected_impact": "Prevents live entries steered by noise; no code change",
+    "category": "meta/guardrail",
+    "status": "pre-registered",
+    "risk": "none"
   }
 ]
