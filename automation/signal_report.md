@@ -1,36 +1,43 @@
 # Signal Performance Report
+**Generated:** 2026-10-24 22:15 UTC | **Period:** Last 6h + 24h
 
-Period: Last 6h | 24h (generated 2026-10-24, signal_reporter)
+## Overall Stats (24h)
+- **Closed trades:** 11 | **Net PnL:** +$1.06
+- **Inversions:** 0
+
+---
 
 ## KILLED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | No kill candidates |
+
+None — no signal met kill criteria (no WR < 30% with 5+ trades and negative PnL).
+
+---
 
 ## BOOSTED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| volume-buildup- | SHORT | 83.3% | +$0.55 | 6 (24h) | Source weight 1.0→1.2 in signal_compactor.py |
 
-Boost justification: 24h 6T 83.3%WR +$0.55 across 6 tokens (CHIP, ICP, SYRUP, MON, DYDX, MET); 14d 22T 68.2%WR +$0.58. Multi-token consistent.
+None — no signal met boost criteria (only one signal with 5+ trades, already performing; no weight change made without stronger signal).
+
+---
 
 ## LOSERS (watch list)
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| ai-trader-pending | SHORT | 50% | -$0.04 | 2 | Manual CEO trades — not a signal, skip |
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|-------|--------|---------|--------|
+| ai-trader-pending | SHORT | 2 | 50.0% | -$0.04 | WATCH — below min sample, manual/pending flow |
+
+---
 
 ## WINNERS
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| volume-buildup- | SHORT | 83.3% | +$0.55 | 6 | BOOSTED 1.0→1.2 |
-| pump-chain- | SHORT | 100% | +$0.34 | 1 | Monitoring |
-| pump-chain+ | LONG | 100% | +$0.01 | 1 | Monitoring |
-| r2v2-long4 | LONG | 100% | +$0.01 | 1 | Monitoring |
 
-## 6h window
-Only volume-buildup- SHORT qualified (2T, 50%WR, +$0.19). Quiet period.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| volume-buildup- | SHORT | — | — | — | 5 | 80.0% | +$0.51 | ENABLED — consistent top performer |
+
+Other positive 24h singles (n<3, informational): pump-chain- SHORT (+$0.34, 100%), continuum+ LONG (+$0.12, 100%), ai-trader-pending LONG (+$0.12, 100%), pump-chain+ LONG (+$0.01, 100%).
+
+---
 
 ## ISSUES
-- No direction inversions in 24h.
-- Schema note: the trades table has BOTH `token` and `chain` columns — the reporter prompt's "token column is chain" gotcha is wrong; `token` works and holds the ticker.
-- volume-buildup- all-time regimes mixed (NORMAL 9/17 53%WR, EXTREME 4/7, HIGH 3/3 +$0.49) but 24h performance is a clean multi-token win — boost only, no regime gate needed.
+
+- Very low trade volume in the last 24h (11 closed trades) — nothing actionable at this sample size. Next 6h run should re-check; kill/boost thresholds need 5–10+ trades per signal.
+- No direction inversions detected. No critical bugs found.
