@@ -5152,3 +5152,5 @@ BY: auto_1hr
 BY: auto_1hr
 BY: auto_1hr
 - [2026-10-24 03:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 21T 10W 47.6% '-$0.05' | 7d 120T 40.0% '-$1.17' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 1/21=4.8% under 40% | no neg streak (empty hour resets) | 0 open | No constants change -> no signal_versions entry
+- [2026-10-24 04:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 9W 45.0% '-$0.08' | 7d 120T 40.0% '-$1.17' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 1/20=5.0% under 40% | no neg streak (empty hour resets) | 0 open | No constants change -> no signal_versions entry
+BY: auto_1hr

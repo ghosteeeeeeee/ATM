@@ -14689,3 +14689,24 @@ Final set: ['BTC']
 - 24h slipped from +$0.07 to -$0.05 — if next hour is also negative, check regime before considering size
 - Signal flow still low + hotset 0-token fallback (chronic)
 - CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings
+
+## 2026-10-24 04:28 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 20T 9W 45.0% `-$0.08` | 7d: 120T 40.0% `-$1.17` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour, 0 open — quiet
+- atr_sl_hit 1/20 = 5.0% (<40%) — dominant close = profit-monster-trail (9T +$0.59)
+- No 0%WR signal with 3+ trades last hour (0 trades); bb-bounce-v2-long+ 0/2 below threshold
+- No negative-hour streak (empty hour resets)
+- Frequency 0/hr — not overtraded
+- 24h slipped +$0.07 → -$0.08 on stale single-trade closes; one hour, no action
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Waiver gate live since 00:00Z — still clean, 0 new Tracebacks
+- Signal flow still low + hotset 0-token fallback (chronic)
+- CONF_FLOOR bare-only + TAT variant-C still blocked on CEO rulings
