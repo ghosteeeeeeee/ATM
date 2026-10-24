@@ -97,6 +97,65 @@ for r in results:
     print()
 ```
 
+## Step 2b: Analyze Shadow Mode Data (MANDATE — every run)
+
+**Shadow mode is generating 100x more data than actual trades. USE IT.**
+
+We're collecting counterfactual data on what WOULD have happened. This is gold — analyze it every run.
+
+### Shadow Data Sources:
+
+```python
+import json
+
+# 1. Oscillator shadow (7.4MB, 24K+ entries) — what multiplier WOULD have been applied
+with open('/root/.hermes/data/oscillator_shadow.json') as f:
+    osc = json.load(f)
+# Fields: token, direction, signal, confidence_before, confidence_after, 
+#         wave_phase, score_zone, would_be_multiplier, actual_outcome
+print(f"Oscillator shadow: {len(osc)} entries")
+# Check: are the would_be_multipliers helping or hurting?
+# Cross-reference with actual_outcome to see if shadow predictions were correct
+
+# 2. Contrarian shadow (806 entries) — what if we flipped direction?
+with open('/root/.hermes/data/contrarian_shadow.jsonl') as f:
+    contrarian = [json.loads(line) for line in f]
+# Fields: token, signal, original_direction, contrarian_direction, 
+#         entry_price, confidence, classification (WINNER/LOSER)
+print(f"Contrarian shadow: {len(contrarian)} entries")
+# Check: how many LOSER signals would have been WINNERS if flipped?
+losers = [c for c in contrarian if c.get('classification') == 'LOSER']
+print(f"  Losers that would flip: {len(losers)}")
+
+# 3. Wyckoff shadow (289 entries) — Wyckoff signal predictions
+with open('/root/.hermes/data/wyckoff_shadow.jsonl') as f:
+    wyckoff = [json.loads(line) for line in f]
+print(f"Wyckoff shadow: {len(wyckoff)} entries")
+
+# 4. Floor admit shadow (1717 entries)
+with open('/root/.hermes/data/floor_admit_shadow.jsonl') as f:
+    floor = [json.loads(line) for line in f]
+print(f"Floor admit shadow: {len(floor)} entries")
+
+# 5. R:R shadow audit (1655 entries)
+with open('/root/.hermes/data/rr_shadow_audit_7d.json') as f:
+    rr = json.load(f)
+print(f"R:R shadow audit: {len(rr)} entries")
+```
+
+### Shadow Analysis Questions (answer every run):
+1. **Oscillator**: Are the would_be_multipliers actually improving outcomes? Cross-reference with actual_outcome.
+2. **Contrarian**: How many LOSER signals would have been WINNERS if we flipped direction? What's the pattern?
+3. **Wyckoff**: Are Wyckoff predictions accurate? What's the hit rate?
+4. **Floor admit**: Are floor admits catching good entries or bad ones?
+5. **R:R**: Are the R:R shadow audits finding better exits?
+6. **Overall**: Which shadow collectors are generating useful data? Which are noise?
+
+### Shadow Data Quality Check:
+- Are there gaps? (timestamps clustering, missing periods)
+- Are the classifications accurate? (spot-check a few)
+- Is the data being written reliably? (check for missing fields)
+
 ## Step 3: Query Trade Data
 
 ```python
@@ -402,6 +461,14 @@ cat > brain/audit_recommendations.json << 'EOF'
     "timestamp": "ISO timestamp",
     "session_brain_stats": {...},
     "trade_summary_24h": {...},
+    "shadow_analysis": {
+        "oscillator": "Are multipliers helping? Hit rate?",
+        "contrarian": "How many losers would flip to winners?",
+        "wyckoff": "Prediction accuracy?",
+        "floor_admit": "Catching good or bad entries?",
+        "rr_shadow": "Better exits found?",
+        "overall": "Which shadow collectors are generating useful data?"
+    },
     "drift_findings": [...],
     "recurring_problems": [...],
     "missing_implementations": [...],
