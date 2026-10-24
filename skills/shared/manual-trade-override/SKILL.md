@@ -289,9 +289,23 @@ with the engine on a temp state path — never the live state file.
 
 **Tranche adds to an existing position:** brain.py's duplicate guard blocks
 a second same-coin open — for a CEO-directed add pass `--force`
-(manual-only; the pipeline never passes it). Remember same-coin tranches
+(manual-only; the pipeline never passes it — the pending engine now does,
+CEO-configured orders only, 2026-10-24). Remember same-coin tranches
 MERGE on Hyperliquid (rule 5): first level closes the whole position, so
 align TPs before adding.
+
+**⚠️ The flat check BEFORE arming any same-coin add (learned from #16384,
+2026-10-24):** if a PIPELINE position is open on the coin, the add merges
+into it and — pre-fix — the pipeline's exit stack (profit-monster trail)
+governed the whole merged position: #16384 was trailed out at PM's 0.20%
+giveback 90 seconds after opening, its own BE-lock/tiered trail never
+acted (`HL_CLOSED`), and both rows re-synced to a blended entry (§11-7
+attribution corruption; the visible +2.72% was the OTHER row's ride).
+Fixes shipped: profit_monster + cut_loser now skip any token holding an
+`ai-trader-manual/pending/auto` row (token-level CEO guard — exit
+authority follows the contract, not the row). Procedure still stands:
+**check the coin is flat first** — the pipeline row's ATR SL/TP still
+participates on a merged position, and attribution corrupts either way.
 
 ## Related Skills
 

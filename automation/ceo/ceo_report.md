@@ -415,3 +415,9 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 24h 11T +$0.87 81.8% | 7d 124T -$0.93 41.1%
 ### Findings: Rotating Q (regime memory): signal_regime_memory.json last modified 2026-10-11 = 13d stale (>7d bar). Pipeline clean, 0 open, 24h green at 81.8% WR; error_alerts = INFO/cosmetic only + recurring disk-85% warning (17G free, hogs need CEO approval). Note: CURRENT.md reported 24h +$0.39/13T at 14:45; DB now reads 11T +$0.87 — DB is source of truth, two more closes landed.
 ### Recommendation: Refresh signal_regime_memory.json from DB (stale 13d) — delegate to self_learner in weekly deep run; disk-85% cleanup still needs CEO pick of which hogs to shrink.
+
+## CEO Status — 20261024T192651Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 9T +0.82 77.8% | 7d 123T -0.98 40.7%
+### Findings: clean — services active, errors only disk/hotset-cooldown already auto-fixed; 7d still negative (-0.98) but improving vs prior runs (-2.77 → -0.98)
+### Recommendation: pump-chain- family is the 7d PnL leader (+0.31 combo / +0.25 bare SHORT) despite 33% WR — snapshot its params as a candidate regime-specialist (proactive Q: best signal). None else.

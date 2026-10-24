@@ -96,6 +96,26 @@ def get_all_open_positions():
             ORDER BY pnl_pct DESC
         """, params)
         rows = cur.fetchall()
+        # CEO-tranche token guard (2026-10-24, #16384 merge): when a CEO-managed
+        # row (ai-trader-manual/pending/auto) shares a coin with a pipeline row,
+        # HL MERGES them into one position — PM closing the pipeline row closes
+        # the CEO tranche too, with PM's trail instead of manual_exit_manager's
+        # (the #16384 add was trailed out at PM's 0.20% 90 seconds after opening).
+        # Exit authority follows the contract, not the row: skip the whole token.
+        from manual_exit_manager import MANAGED_TAGS
+        cur.execute(
+            "SELECT DISTINCT token FROM trades WHERE server='Hermes' "
+            "AND status='open' AND (" +
+            " OR ".join(["signal LIKE %s"] * len(MANAGED_TAGS)) + ")",
+            [f"%{t}%" for t in MANAGED_TAGS])
+        ceo_tokens = {r[0] for r in cur.fetchall()}
+        if ceo_tokens:
+            kept = [r for r in rows if r[1] not in ceo_tokens]
+            if len(kept) != len(rows):
+                log(f"  [PM] CEO-tranche token guard: standing down on "
+                    f"{sorted(ceo_tokens & {r[1] for r in rows})} — "
+                    f"manual_exit_manager owns those exits")
+                rows = kept
         return [
             {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
              "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6],

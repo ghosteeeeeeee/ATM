@@ -75,6 +75,19 @@ def get_losing_positions():
                 ORDER BY pnl_pct ASC
             """, params)
             rows = cur.fetchall()
+            # CEO-tranche token guard (2026-10-24, mirrors profit_monster): a
+            # CEO-managed row (ai-trader-manual/pending/auto) merged into this
+            # coin's HL position means cut_loser must not cut the coin either —
+            # manual_exit_manager owns those exits (merge = one HL position).
+            from manual_exit_manager import MANAGED_TAGS
+            cur.execute(
+                "SELECT DISTINCT token FROM trades WHERE server='Hermes' "
+                "AND status='open' AND (" +
+                " OR ".join(["signal LIKE %s"] * len(MANAGED_TAGS)) + ")",
+                [f"%{t}%" for t in MANAGED_TAGS])
+            ceo_tokens = {r[0] for r in cur.fetchall()}
+            if ceo_tokens:
+                rows = [r for r in rows if r[1] not in ceo_tokens]
             return [
                 {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
                  "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6]}
