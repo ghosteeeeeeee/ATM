@@ -31,7 +31,7 @@ if not token:
     print("ERROR: No valid GITHUB_TOKEN found in .secrets.local")
     raise SystemExit(1)
 
-print(f"Using token: {token[:10]}...")
+print(f"Using token: {token[:4]}*** (len={len(token)})")  # run #127: prefix was leaking into session/watchdog logs — scheme tag only
 
 # ── 2. Clean stale tokens from .git/config remote URL ───────────────────────
 # git remote set-url stores token visibly and can cause "could not read Username"

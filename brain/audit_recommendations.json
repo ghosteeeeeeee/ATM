@@ -1,135 +1,83 @@
 {
-  "timestamp": "2026-10-24T21:52:00Z",
-  "run": 126,
+  "timestamp": "2026-10-24T22:40:42Z",
+  "run": 127,
   "session_brain_stats": {
-    "note": "queried 3x (kill/conf-floor/creative); index loads but returns duplicate-scored chunks — MED rebuild still pending (known since #82)"
+    "queries": [
+      "hl_copy unmanaged stop giveback",
+      "mid-band long rsi block filter",
+      "wrong side losing trade pattern"
+    ],
+    "finding": "no new actionable insight — hl_copy management gap already known (bypass design); session hits were old daemon/429 issues"
   },
   "trade_summary_24h": {
-    "trades": 11,
-    "wins": 9,
-    "wr": 81.8,
-    "pnl_usdt": 1.06,
-    "green": true,
-    "7d": {"trades": 124, "wr": 41.9, "pnl_usdt": -0.59},
-    "7d_by_direction": {"SHORT": "40T 18W +0.74", "LONG": "84T 34W -1.33"},
-    "14d_armed_vs_unarmed": {"armed": "158T 69.6% +9.41", "unarmed": "164T 6.1% -12.93"},
-    "14d_mandate": {"trail_family": "122T 107W 88.5% +11.75", "chop_stop_family": "165T 1W -14.08"}
+    "closed": "11T 8W 72.7% +0.89 (HBAR trail_arm_timeout -0.01 at 22:38 = TAT-C FIRST LIVE ENFORCEMENT FIRE)",
+    "7d": "125T 52W 41.6% -0.60 (SHORT 40T +0.74 vs LONG 85T -1.34)",
+    "14d": "328T 122W 37.2% -3.16",
+    "open_at_write": "HYPE #16383 hl_copy LONG (deadline 23:22Z), BTC #16385 continuum+ LONG (EMA300 hold, SL ratcheted 79525->79620), HYPER #16387 pump-chain+ LONG conf 25.5 rsi 55.6 = CONF_FLOOR target cohort live",
+    "armed_14d": "134T 79.1% +9.94 vs unarmed 193T 8.3% -13.09 | trail family 134T +9.94 vs chop/stop 165T 0.6% -14.14 — mandate holds"
   },
-  "open_trades": [
-    {
-      "id": 16385,
-      "coin": "BTC",
-      "signal": "continuum+",
-      "meta_rsi": 5.48,
-      "steer_retest": "EMA300 re-tested 21:50 UTC: 80435.6 vs 80356.2 = +0.099%, 24 consecutive closes above, 52/60 — HOLD condition HOLDS; exit trigger (3 consecutive closes below) NOT met"
-    },
-    {
-      "id": 16383,
-      "coin": "HYPE",
-      "signal": "hl_copy_trader",
-      "steer": "proof-or-exit deadline 23:22 UTC per 21:14 watchdog cycle (trail arm line 76.264 = +0.40%). #125 CURRENT.md '21:23' was prior-cycle text — superseded, corrected this run"
-    }
-  ],
   "shadow_analysis": {
-    "oscillator": "FROZEN BY DESIGN — OSCILLATOR_MULT_ENABLED=True since Oct 1 stops shadow writes (last entry 2026-10-01, 24,598 rows). actual_outcome = null on 24,598/24,598 (signal_compactor.py:2075 always writes None) — file is pre-live evidence only. Live join revalidation (#121): boost 48T 37.5% -0.37 vs penal 175T 36.6% -1.67, Fisher p=0.52 = NO separation, weekly KPI pre-registered.",
-    "contrarian": "USEFUL — 807 entries (pump-chain- 546, btc-pump-rider+ 260), all write-time LOSER-classified by design; outcome join live since #123 (contrarian_outcome_join.py): flip would-win 63.9% pre / 64.0% post-Oct18 (55W/31L n=86) = Oct 27 PROMOTE candidate. btc-pump-rider+ flip 25% = flip is signal-specific, not blanket.",
-    "wyckoff": "WEAK — 298 entries, no outcome join, cannot answer hit-rate. Needs same join pattern as contrarian.",
-    "floor_admit": "UNUSABLE-WITHOUT-JOIN — 1,778 entries, rich fields (raw_conf/penalty/exec_mult/floor), 1,609 admit (91%) vs 169 block, top admit sources ichimoku+ 361 / volume-buildup- 270 / pump-family 443. NO outcome column = cannot say good vs bad entries. Join pre-registered (piggyback contrarian join pattern).",
-    "rr_shadow": "DEAD ARTIFACT — data/rr_shadow_audit_7d.json mtime 21 days old, NO producing script anywhere in repo (only cited in prompts), replayed=110 vs no_candles=91 (45% missing). Stop citing as a live source.",
-    "overall": "1 of 5 useful (contrarian, join live). Oscillator correct-by-design dead. rr_shadow orphaned. Wyckoff + floor_admit blocked on outcome joins."
+    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1, 24,598 rows actual_outcome null) — no new data",
+    "contrarian": "outcome join live: 807 rows / 535 joinable; pump-chain- flip-WR 63.9% (n=338), btc-pump-rider+ 25.0% — Oct 27 PROMOTE stands",
+    "wyckoff": "PENDING join (298 rows, no outcome column) — not answerable",
+    "floor_admit": "PENDING join (1,778 rows, 91% admit, no outcome column) — pre-registered n>=200",
+    "rr_shadow": "ORPHANED (no producer script, 21d stale) — do not cite",
+    "arm_be": "FIXED RUN #127 — 0 runtime fires since Oct 18 ship (structural: fresh subprocess resets arm set); now DB-peak basis, starts collecting armed-half data",
+    "ugb": "504 fires live (70 UGB-BE + 434 UGB-PT); UGB-BE caught HYPE round-trip today 22:21 live=-0.07% fav=+0.60%",
+    "overall": "2/5 useful now (contrarian + UGB, up from 1 after ARM-BE fix); oscillator frozen, rr orphaned, floor/wyckoff awaiting joins"
   },
   "drift_findings": [
-    {
-      "severity": "low",
-      "finding": "CURRENT.md #125 wrote HYPE exit deadline '21:23 UTC' vs 21:14 watchdog cycle '23:22 UTC' (open 19:22 + 4h) — prior-cycle/superseded text, corrected to 23:22 this run"
-    },
-    {
-      "severity": "low",
-      "finding": "rr_shadow_audit_7d.json cited in brain_auditor_prompt Step 2b as a shadow data source but has no producer script and is 21d stale — prompt annotated this run"
-    }
+    "HEADLINE CORRECTION: watchdog 'HYPE no stop manager owns it, SL still entry-time 75.7301' is WRONG — sl_distance=0.015 (init 74.818) but stored SL = 75.730126 = entry*(1-0.003) EXACTLY = RR-trail ratcheted to ATR_SL_MIN_ACCEL floor (hl_copy routes to rr_engine; RR_EXIT_TRAIL active). The manager exists and worked; the binding constraint is the accel floor (constants:725 'CEO directive: do NOT change'), which caps the ratchet at -0.30% and can never lock profit. Watchdog recommendation 'manually ratchet SL to entry' would be a CEO call ABOVE the current floor, not a missing-manager fix. Queued fix path = ARM-BE/UGB flip (verdict PASS Oct 17, pre-registered this run).",
+    "ARM-BE shadow structurally dead 6 days (fixed this run) — see changes_log",
+    "push_gh token prefix leak in trade-watchdog.log (3 hits, fixed this run)",
+    "vacation_mode.json still true (review queue path active, no_signal_enable_disable active)",
+    "escalation #17 (72nd): exit-ladder/BE-at-arm candle OOS still not commissioned — now has stop-location-class ledger (floor_pinned giveback)"
   ],
   "recurring_problems": [
-    "pump-chain+ kill vs NO-KILL: 4th consecutive run on CEO stack (14d bare MET, 30d reverses +1.79, conf>=30 pays +3.13/30d)",
-    "CONF_FLOOR fk definition: fkA 41.7% FAIL / fkB 20.0% exact — CEO ruling or size-dampen 0.25x alternative",
-    "Escalation #17 exit-ladder candle OOS — 71st carry; this run adds ranked recovery ceiling (see creative)"
+    "mid-band LONG (45-60) bleed persists: 14d 93T 39.8% -1.97 — but 30d 180T +0.71 flips POSITIVE (55-60 = +1.17) -> blanket block REJECTED-WITH-DATA (already rejected #122 fk 38-55%); watch only",
+    "ARM-GAP class unchanged: reached-arm never-trail = the -13.09 unarmed bleed; owns the fix stack (TAT-C live-fired today, ARM-BE collector now works, UGB flip pending Oct 25/CEO)",
+    "pump-chain+ kill criteria MET 14d but 30d +1.79 NO-KILL stands — CEO GO/NO-GO still pending (blocked by no_signal_enable_disable anyway)",
+    "CONF_FLOOR fkA 41.7% FAIL — CEO fk-definition ruling OR accept conf<30 size-dampen 0.25x alternative (fkA=0 by construction); live demo: HYPER #16387 opened conf 25.5 this cycle"
   ],
   "missing_implementations": [
-    "floor_admit outcome join (1,778 rows awaiting)",
-    "wyckoff outcome join (298 rows awaiting)",
-    "rr shadow producer (file orphaned — restore script or drop the source from prompt)"
+    "floor_admit + wyckoff outcome joins (pre-registered)",
+    "escalation #17 candle OOS commission",
+    "none new this run"
   ],
   "creative_improvements": [
-    {
-      "date": "2026-10-24T21:52:00Z",
-      "idea": "Round-trip giveback ledger by signal (units-correct upper bound)",
-      "rationale": "14d round-trips (mfe>=0.40 AND pnl<0) = 43T; perfect-peak-exit ceiling computed as amount_usdt*(mfe_pct - pnl_pct/leverage)/100 (unleveraged, no fees) = +$8.28 vs actual cohort -$2.41. pump-chain+ owns +$2.61 (6 RT of 45T), pump-chain- +$1.51 (12 RT of 35T), combo +$0.60.",
-      "expected_impact": "Ranks escalation #17 recovery potential by signal — pump-chain family owns 45% of the ceiling",
-      "category": "exit quality",
-      "status": "measured",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-24T21:52:00Z",
-      "idea": "volume-buildup- weight 1.2 revert criterion (LOCKED pre-data)",
-      "rationale": "14d 22T 68.2% +0.58 backed the boost, but 7d is already washed: 12T 58.3% +0.01. Revert if 7d PnL<0 AND WR<50% at n>=15 — one variable, criterion locked before data arrives.",
-      "expected_impact": "Prevents holding a decayed confidence boost",
-      "category": "confidence tuning",
-      "status": "pre-registered",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-24T21:52:00Z",
-      "idea": "floor_admit outcome join (piggyback contrarian_outcome_join.py)",
-      "rationale": "1,778 rows with rich conf fields but zero outcome — 91% admit rate means we cannot tell if the floor rescues or admits garbage. Join criteria locked pre-data: n>=200 joined AND admit-vs-block Fisher p<0.05 AND 30d same sign.",
-      "expected_impact": "Makes a 1,778-row shadow source answerable",
-      "category": "measurement",
-      "status": "pre-registered",
-      "risk": "low"
-    }
+    "RR-trail accel-floor giveback ledger by stop-location class (floor_pinned 34T 4W, 33/34 reached-arm, 15 arm-then-lost) — quantifies UGB-PT/ARM-BE flip target without touching ATR_SL_MIN_ACCEL",
+    "ARM-BE armed-half flip read pre-registered (n>=15 ∧ trailing_activated join ∧ fk<20% ∧ candle replay net>0)"
   ],
-  "config_changes_applied": [],
-  "doc_changes_applied": [
+  "config_changes_applied": [
     {
-      "file": "automation/brain-auditor/brain_auditor_prompt.md",
-      "change": "Step 2b shadow-source status table (oscillator frozen / rr orphan / joins pending)",
-      "type": "doc"
+      "file": "scripts/position_manager.py",
+      "change": "ARM-BE shadow: in-memory arm set -> DB highest/lowest_price (shadow only, zero behavior)",
+      "selfcheck": "brain/analysis/arm_be_fix_2026-10-24.py --selfcheck PASS (source asserts + 9/9 truth table + compile)"
     },
     {
-      "file": "CURRENT.md",
-      "change": "HYPE deadline corrected to 23:22 UTC (21:14 cycle) + full run #126 refresh",
-      "type": "doc"
+      "file": "skills/productivity/update-git/references/push_gh.py",
+      "change": "token prefix redact ghp_*** (zero behavior)"
     }
   ],
   "changes_from_last_run": [
-    {"change": "#122 LONG_RSI_SWEET_SPOT_BOOST 10->0", "verify": "PASS — BOOST=0 at hermes_constants.py:998, constants zero git diff"},
-    {"change": "#117 BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED variant-C", "verify": "PASS — flag True (:1744), enforcement branch PM:3783, 0 bb-bounce closes since 11:51 = correct-by-traffic"},
-    {"change": "#123 contrarian_outcome_join.py", "verify": "PASS — script + analysis json present, flip_wr 63.9% carried, OOS 64.0% verified #125"},
-    {"change": "#124 fkA correction 41.7%", "verify": "PASS — reproduced fresh: bare pc+ conf<30 winners 5 / bare winners 12 = 41.7%, fkB 5/25 = 20.0%"},
-    {"change": "#115 streak-steer fix", "verify": "PASS — 0 stale losing-streak steers; current cycle 0 top-level steers"}
-  ],
-  "autopsy_48h": {
-    "n": 13,
-    "method": "recovery_replay.py adverse-first (selfcheck PASS)",
-    "never_adverse": 2,
-    "recovered_after_adverse": 6,
-    "never_traded_back": 5,
-    "never_list": ["ALT vb- short -0.17", "CC vb- short -0.15", "ZRO vb- short -0.11", "BTC pending short -0.08", "PUMP r2v2 long -0.01"],
-    "verdict": "wrong-side REFUTED 51st consecutive run (#61 opposite-side p=0.116, #84 fwd-return t=-0.04 stand). Winning side = flat; ALT/CC/ZRO = waiver-band class correctly re-blocked since Oct 24 lapse."
-  },
-  "last_run_verify": "ALL PASS (changes_from_last_run + constants zero git diff + CEO_PROTECTED_FLAGS untouched + 0 Tracebacks 2026-10-24 + session lock absent + size-reduce file absent = 1.0x)",
-  "watchdog_steer_triage": [
-    "HYPE proof-or-exit 23:22 UTC — STANDS, deadline corrected in CURRENT.md",
-    "BTC EMA300 conditional hold — RE-TESTED LIVE 21:50: +0.099% above, 24 consec closes, 52/60 = holds, no exit trigger",
-    "Volume feed degradation — RE-TESTED: 58 tokens latest candle vol=0 (<100 escalate line), majors alive (BTC 1m fresh), 8 tokens stale>90min = 6 K-tokens + LIT + XMR (dead pairs) → NO ESCALATION, re-test next cycle",
-    "pump-chain+ flag — ANSWERED: NO-KILL stands (30d +1.79, conf>=30 +3.13), CONF_FLOOR is the lever, fk ruling is CEO's"
+    "#126: 0 config changes — 2 doc fixes verified (shadow-status table present in prompt, CURRENT.md deadline corrected; deadline now superseded again by 23:22 cycle — tracked)",
+    "#122: LONG_RSI_SWEET_SPOT_BOOST=0 verified at constants:998",
+    "#117: BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True verified AND first live enforcement fire 22:38 HBAR -0.01 (variant-C 56m>=55m & pnl<0) — the ship works as designed",
+    "#123: contrarian_outcome_join.py present and re-ran clean (535 joinable, pump-chain- 63.9%)"
   ],
   "next_actions": [
-    "CEO: pump-chain+ kill GO/NO-GO (recommend NO-KILL; bare scope if killed)",
-    "CEO: CONF_FLOOR fk definition ruling OR accept conf<30 size-dampen 0.25x (fkA=0 by construction)",
-    "Watch HYPE to 23:22 UTC proof-or-exit deadline; BTC EMA300 trigger re-test each cycle",
-    "Oct 25 eval batch unchanged (HML-SHADOW, MFE-CUT, UGB, exit-ladder/BE-at-arm replay, re-enter-on-recovery, floor-join)",
-    "Oct 27 contrarian PROMOTE checkpoint + waiver items",
-    "Re-test volume feed next watchdog cycle (>100 tokens or >90 min majors → escalate pipeline owner)"
+    "HYPE #16383 proof-or-exit 23:22Z — condition pending (last closes below 76.20); watchdog owns execution",
+    "BTC #16385 EMA300 3-close trigger — SL ratcheting confirmed (79514->79620), hold",
+    "HYPER #16387 conf 25.5 pump-chain+ mid-band — CONF_FLOOR live demo, monitor (no action, CEO ruling owns the cohort)",
+    "CEO stack unchanged: pump-chain+ GO/NO-GO + CONF_FLOOR fk ruling (or size-dampen alt) + Oct-25 eval batch + Oct-27 contrarian PROMOTE",
+    "Next run: verify ARM-BE shadow produces first fire when an armed trade round-trips; re-test HYPE outcome post-deadline"
   ],
-  "escalation_17": "exit-ladder / candle-aware arming OOS — 71st carry. New: per-signal recovery ceiling ranked (pump-chain+ +$2.61, pump-chain- +$1.51 of +$8.28 total/14d upper bound, unleveraged, no fees)."
+  "autopsy": {
+    "method": "recovery_replay adverse-first (selfcheck PASS)",
+    "48h": "n=13: 2 never-adverse / 6 recovered / 5 NEVER (ALT/CC/ZRO vb- shorts = re-blocked class, BTC manual, PUMP r2v2 tiny) -> wrong-side REFUTED 52nd consecutive run (#61 p=0.116, #84 t=-0.04)"
+  },
+  "mandate_check": {
+    "trail_vs_chop": "trail family 14d 134T 79.1% +9.94 vs chop/stop 165T 0.6% -14.14 — trend edge intact",
+    "trend_following": "3/3 longs on a SHORT_BIAS aggregate held only by BTC 1m > EMA300 (+131, 486min) — EMA300 conditional wired; HBAR mid-band long correctly cut by TAT-C at -0.01 (this run's proof that chop entries get exited fast)"
+  }
 }

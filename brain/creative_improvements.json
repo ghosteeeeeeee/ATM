@@ -8093,5 +8093,23 @@
     "category": "measurement",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T22:40:23Z",
+    "idea": "RR-trail accel-floor giveback ledger (stop-location class x arm-outcome, 14d)",
+    "rationale": "Measured: floor_pinned = stop exactly at entry*(1-/+0.003) ATR_SL_MIN_ACCEL = 34T 4W -1.07 with 33/34 reached-arm (MFE>=0.40) and 15 arm-then-lost, vs trailed 134T 106W +9.94. The accel floor caps the RR ratchet at -0.30% so this cohort can reduce loss but never lock profit — it is the live giveback machine the UGB-PT/ARM-BE flip targets (UGB OOS +85pp). Verified HYPE #16383 is exactly this class: SL moved 74.818 (1.5% init) -> 75.730126 = entry*0.997 floor, peak +0.60% never lockable.",
+    "expected_impact": "Ranks escalation #17 recovery by stop-location class (floor_pinned giveback = (MFE+0.30)/trade on 15 arm-then-lost); quantifies what the ARM-BE/UGB flip can recover without touching ATR_SL_MIN_ACCEL (CEO: do NOT change)",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T22:40:23Z",
+    "idea": "ARM-BE armed-half flip read pre-registered (now that the collector works)",
+    "rationale": "Collector was dead (0 fires Oct 18-24); DB-state fix shipped run #127. Pre-data lock: flip criterion = ARM-BE fires n>=15, join trades.trailing_activated=TRUE cohort only (armed half), fk<20%, net>0 on candle replay — mirrors #66/#75 bar. UGB-BE (504 fires, unfiltered) provides the control.",
+    "expected_impact": "Turns the Oct-18 verdict-PASS offline analysis (fk 9.7% +3.46) into a live-monitored, pre-registered flip path for CEO GO",
+    "category": "pre-registration",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

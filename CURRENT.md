@@ -1,44 +1,49 @@
-# Current State — brain_auditor #126 2026-10-24 ~21:55 UTC
-**Last Updated: 2026-10-24 21:55 UTC**
-**Updated by: brain_auditor — 0 config changes (vacation review-queue; nothing passed bars), 0 ships, 2 doc fixes (prompt shadow-status table + this deadline correction). Prior: #125 20:45.**
+# Current State — brain_auditor #127 2026-10-24 ~22:50 UTC
+**Last Updated: 2026-10-24 22:50 UTC**
+**Updated by: brain_auditor — 2 zero-behavior fixes (ARM-BE shadow root-cause + push_gh token redact), 0 trading-constant changes, 1 selfcheck ship. Prior: #126 21:55.**
 
-## HEADLINE — shadow-collector triage + round-trip giveback ranking; pump-chain+ kill/CONF_FLOOR still CEO's
-**Shadow triage (mandate, 5 sources): 1 useful / 1 frozen-by-design / 1 orphaned / 2 pending joins.** contrarian = only live-answerable source (flip 63.9% / OOS 64.0% → Oct 27 PROMOTE). oscillator frozen since Oct 1 by design (`OSCILLATOR_MULT_ENABLED=True`), `actual_outcome` null on all 24,598 rows. **rr_shadow_audit_7d.json is an ORPHAN** — no producer script in repo, mtime 21d, 45% no_candles. floor_admit (1,778, 91% admit) + wyckoff (298) have no outcome join. Prompt Step 2b now status-annotated so runs stop re-discovering dead files.
-**Round-trip giveback ledger (new, units-correct):** 14d 43 RT trades, perfect-peak-exit ceiling **+$8.28** (unleveraged, no fees) vs actual RT cohort **-$2.41** → **pump-chain+ +$2.61 (6/45T) > pump-chain- +$1.51 (12/35T)** — ranks escalation #17 recovery by signal; pump-chain family owns 45% of the ceiling.
-**pump-chain+ kill stack unchanged for CEO:** 14d bare MET (45T 12W 26.7% -0.48) BUT 30d bare +1.79 and conf>=30 30d 45T 21W +3.13 → **NO-KILL stands**, bleed = conf<30 (25T 5W -1.34) = CONF_FLOOR's exact target. **CONF_FLOOR: fkA 41.7% FAIL (5/12) / fkB 20.0% (5/25) — CEO fk ruling OR accept conf<30 size-dampen 0.25x (fkA=0 by construction).**
+## HEADLINE — watchdog HYPE claim corrected + ARM-BE shadow resurrected
+**HYPE "no manager owns its stop" is WRONG.** `sl_distance=0.015` (init SL 74.818 = entry×0.985) but stored SL **75.730126 = entry×0.997 EXACTLY** = RR-engine trail (hl_copy → `rr_engine` routing, `RR_EXIT_TRAIL` active) ratcheted the stop to the **ATR_SL_MIN_ACCEL floor** (constants:725, "CEO directive: do NOT change"). The manager works — the floor caps the ratchet at **-0.30% and structurally cannot lock profit** past it (peak +0.60% un-lockable, round-trip at 22:21 caught by UGB-BE shadow live=-0.07% fav=+0.60%). Manual SL ratchet above the floor = CEO call; queued fix path = ARM-BE/UGB flip (verdict PASS Oct 17, pre-registered this run).
+**ARM-BE shadow was structurally DEAD since its Oct 18 ship:** module-level `_arm_be_shadow_armed` resets every pipeline pass (position_manager = fresh subprocess per STEPS_EVERY_MIN), and one-eval-per-trade-per-process makes arm→cross impossible in-process — **0 runtime fires in 6 days while DB-state sibling UGB-BE logged 504.** Fixed: arm state = DB `highest/lowest_price` (same persistence basis as UGB-BE; non-EXTREME/non-volume- scope kept). Selfcheck `brain/analysis/arm_be_fix_2026-10-24.py` PASS (source asserts + 9/9 truth table + compile).
 
-## OPEN — 2 trades
-**HYPE #16383 hl_copy_trader LONG @75.958** — proof-or-exit deadline **23:22 UTC** (21:14 watchdog cycle; arm line 76.264 = +0.40%). ⚠️ Prior CURRENT.md "21:23" was superseded/prior-cycle text — corrected this run. hl_copy 14d 10T 3W 27.3% n<20 monitor; bracket SL 75.73 / TP 77.24.
-**BTC #16385 continuum+ LONG @80292 (meta_rsi 5.48)** — EMA300 hold re-tested 21:50: 80435.6 vs 80356.2 = **+0.099% above, 24 consecutive closes above, 52/60 → HOLDS**. Exit trigger = 3 consecutive 1m closes below EMA300 (not met).
+## LIVE EVENTS THIS RUN
+1. **TAT-C #117 FIRST ENFORCEMENT FIRE 22:38** — HBAR #16386 bb-bounce-v2-long+ (meta_rsi 56.5 = watchdog's exact 39.5% mid-band bucket) cut `trail_arm_timeout` at **-0.01 USDT** (variant-C 56m ≥ 55m & pnl<0) instead of riding to hard_max_loss. The ship works as designed.
+2. **HYPER #16387 pump-chain+ LONG** opened 22:38 — **conf 25.50, rsi 55.56** = conf<30 mid-band cohort = live CONF_FLOOR demo (monitor; CEO ruling owns the cohort).
+3. **BTC #16385 SL ratcheted 79514.7 → 79620.45** — continuum+ trail healthy.
 
-## WATCHDOG STEER TRIAGE (21:14 cycle)
-1. HYPE proof-or-exit 23:22 — STANDS (deadline corrected above).
-2. BTC EMA300 conditional — RE-TESTED LIVE, holds (above).
-3. Volume feed degradation — **RE-TESTED: NO ESCALATION**. 58 tokens latest candle vol=0 (<100 line), majors alive (BTC 1m fresh 1 min ago), 8 tokens stale>90min = KBONK/KFLOKI/KLUNC/KNEIRO/KPEPE/KSHIB + LIT + XMR = dead/illiquid pairs. Re-test next cycle: >100 tokens OR >90min on a major → escalate pipeline owner.
-4. pump-chain+ flag — ANSWERED (headline above).
+## OPEN — 3 trades (all LONG)
+**HYPE #16383 hl_copy_trader LONG @75.958** — proof-or-exit deadline **23:22 UTC** (condition pending; SL at accel floor 75.730126).
+**BTC #16385 continuum+ LONG @80292** — EMA300 3-close exit trigger; SL ratcheting confirmed above.
+**HYPER #16387 pump-chain+ LONG @0.064509** conf 25.5 rsi 55.6 — bracketed, monitor.
+
+## WATCHDOG STEER TRIAGE (22:14 cycle)
+1. HYPE proof-or-exit 23:22 — **STANDS** (watchdog owns execution).
+2. BTC EMA300 conditional hold — re-tested, gap +131, holds.
+3. "Manually ratchet HYPE SL to entry" — **CORRECTED above**: trail already ratcheted to its allowed floor; going above floor = CEO decision, not a missing-manager fix.
+4. push_gh token prefix leak — **FIXED** (`ghp_***` redact).
+5. Portfolio 3/3 long vs SHORT_BIAS — EMA300 alignment holds; no forced action, conditions wired.
 
 ## LAST-RUN VERIFY (all PASS)
-#122 sweet-spot BOOST=0 (:998) · #117 TAT-C flag True (:1744) + enforcement PM:3783, 0 bb-bounce closes = correct-by-traffic · #123 contrarian join present · #124 fkA 41.7% reproduced fresh · #115 streak-steer 0 stale fires · constants **zero git diff** · protected untouched · **0 Tracebacks 2026-10-24** (4 total, last Oct 18) · session lock absent · size-reduce **file absent = 1.0x**.
+#122 sweet-spot BOOST=0 (:998) · #117 TAT-C flag True + **now proven live (HBAR fire 22:38)** · #123 contrarian join re-ran clean (535 joinable, pc- flip **63.9% n=338 = Oct 27 PROMOTE stands**) · #126 doc fixes present · constants **EMPTY git diff** · protected 13/13 · size-reduce **absent = 1.0x** · 0 new Tracebacks (4 total, last Oct 18) · session lock absent.
 
-## WAIVER — CLOSED
-Lapsed Oct 24 00:00 UTC, floor-45 hard. Pre-lapse band 11T 64% '+0.28'. Re-waiver [35,40) rejected (30d OOS p=0.194).
-
-## LOSING AUTOPSY 48h n=13 (adverse-first, selfcheck PASS)
-2 never-adverse / 6 recovered / **5 NEVER** (ALT/CC/ZRO vb- shorts = waiver-band class correctly re-blocked, BTC pending, PUMP r2v2 tiny). **Wrong-side REFUTED 51st consecutive** (#61 p=0.116, #84 t=-0.04 stand). Winning side = flat.
+## SHADOW STATUS (post-fix)
+2/5 useful: **contrarian** (live join) + **UGB** (504 fires) + **ARM-BE** (fixed, collecting from now). oscillator frozen-by-design · rr_shadow orphaned · floor_admit/wyckoff pending outcome joins.
 
 ## NUMBERS
-24h **11T 9W 81.8% '+1.06' GREEN** | 7d 124T 41.9% '-0.59' (SHORT 40T '+0.74' vs LONG 84T '-1.33').
-**14d:** ARMED 158T 69.6% '+9.41' vs UNARMED 164T 6.1% '-12.93' | trail family 122T 88.5% '+11.75' vs chop/stop 165T 1W '-14.08' | round-trips 43T 0W '-2.41' (ceiling '+8.28').
+24h **11T 8W 72.7% '+0.89' GREEN** | 7d 125T 41.6% '-0.60' (SHORT 40T '+0.74' vs LONG 85T '-1.34') | 14d 328T 37.2% '-3.16'.
+**14d mandate:** armed 134T 79.1% '+9.94' vs unarmed 193T 8.3% '-13.09' | trail family 134T 79.1% '+9.94' vs chop/stop 165T 0.6% '-14.14'.
+
+## LOSING AUTOPSY 48h n=13 (adverse-first, selfcheck PASS)
+2 never-adverse / 6 recovered / **5 NEVER** (ALT/CC/ZRO vb- shorts = re-blocked waiver class, BTC manual, PUMP r2v2 tiny). **Wrong-side REFUTED 52nd consecutive** (#61 p=0.116, #84 t=-0.04 stand).
 
 ## READINESS
-Regime (watchdog 21:14): 15m LONG_BIAS vs 4h SHORT_BIAS, continuum AT EMA300, LOW vol, STRONG_DOWN trend_quality (watchdog) / STRONG_UP (#125 — cite source, they disagree), auto_trader CHOP MANAGE_ONLY. Thin tape (volume LOW, 58 zero-vol tokens). 4/6 slots idle; AI_TRADER_ENABLED=False (watchlist-only).
-**Rules: hold HYPE to proof-or-exit 23:22; hold BTC while 1m holds EMA300 (3-close trigger); no fresh mid-band entries on thin tape; trail-family first; size 1.0x.**
+Regime: SHORT_BIAS aggregate both TFs, continuum AT EMA300, vol LOW, portfolio 3/3 long held by the EMA300 condition only. **Rules: hold HYPE to 23:22Z; hold BTC while 1m holds EMA300 (3-close trigger); monitor HYPER conf-25.5 (no action); no fresh mid-band entries on thin tape; trail-family first; size 1.0x.**
 
-## CEO STACK
-**pump-chain+ kill GO/NO-GO** (recommend NO-KILL; bare scope if killed) → **CONF_FLOOR: fkA 41.7% FAIL / fkB 20.0% — fk definition ruling OR accept conf<30 size-dampen 0.25x** | TAT-C live (veto = flag False) | **Oct-25 eval batch** (HML-SHADOW, MFE-CUT, UGB, exit-ladder/BE-at-arm replay, re-enter-on-recovery, floor-join) | **Oct-27 contrarian PROMOTE** (63.9%/64.0% verified) + waiver items.
+## CEO STACK (unchanged)
+**pump-chain+ kill GO/NO-GO** (recommend NO-KILL; 14d bare MET but 30d +1.79) → **CONF_FLOOR: fkA 41.7% FAIL / fkB 20.0% — fk ruling OR accept conf<30 size-dampen 0.25x** (HYPER #16387 is the live demo) | TAT-C live + proven (veto = flag False) | **Oct-25 eval batch** (HML-SHADOW, MFE-CUT, UGB, BE-at-arm replay, re-enter-on-recovery, floor-join) | **Oct-27 contrarian PROMOTE** (63.9%/64.0% verified) + waiver items.
 
 ## CREATIVE (this run)
-(1) Round-trip giveback ledger by signal (units-correct ceiling, ranks escalation #17). (2) vb- weight 1.2 revert criterion LOCKED pre-data (7d washed '+0.01'). (3) floor_admit outcome join pre-registered (n>=200 ∧ Fisher p<0.05 ∧ 30d same sign).
+(1) **RR-trail accel-floor giveback ledger** — floor_pinned 14d 34T 4W '-1.07' (33/34 reached-arm, 15 arm-then-lost) vs trailed 134T 106W '+9.94'; quantifies the UGB-PT/ARM-BE flip target without touching ATR_SL_MIN_ACCEL. (2) **ARM-BE armed-half flip read pre-registered**: fires n≥15 ∧ trailing_activated=TRUE join ∧ fk<20% ∧ candle replay net>0.
 
-## ESCALATION #17 (71st)
-exit-ladder / candle-aware arming OOS still not commissioned — now has a ranked per-signal recovery ceiling (pump-chain+ '+2.61' / pump-chain- '+1.51' of '+8.28'/14d upper bound).
+## ESCALATION #17 (73rd)
+exit-ladder / BE-at-arm candle OOS still not commissioned — recovery ceilings now ranked by stop-location class as well as signal.

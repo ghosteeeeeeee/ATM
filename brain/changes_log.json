@@ -2346,5 +2346,27 @@
     "after": "23:22 UTC",
     "rationale": "#125 carried prior-cycle/superseded deadline; newest steer says 23:22",
     "impact": "correct open-trade deadline in state file"
+  },
+  {
+    "timestamp": "2026-10-24T22:40:23Z",
+    "agent": "brain_auditor",
+    "change": "ARM-BE shadow arm-state: module-level set -> DB highest/lowest_price (structurally dead since Oct 18: fresh subprocess per pipeline pass, 0 runtime fires vs UGB-BE 504)",
+    "type": "tweak",
+    "file": "scripts/position_manager.py",
+    "before": "if live_pnl >= arm: _arm_be_shadow_armed.add(id); elif id in _arm_be_shadow_armed and live_pnl <= 0: fire",
+    "after": "fav = DB peak (highest/lowest vs entry); if fav >= 0.40 and live_pnl <= 0: fire",
+    "rationale": "position_manager = fresh subprocess every STEPS_EVERY_MIN pass, so arm->cross never survived one process; shadow collected zero data for the armed-half BE flip. DB peak has the same persistence basis as sibling UGB-BE.",
+    "impact": "zero trading behavior (shadow log only); armed-half BE collector starts producing data; selfcheck brain/analysis/arm_be_fix_2026-10-24.py PASS 9/9"
+  },
+  {
+    "timestamp": "2026-10-24T22:40:23Z",
+    "agent": "brain_auditor",
+    "change": "push_gh.py token prefix redaction (Using token: ghp_*** instead of first 10 chars)",
+    "type": "tweak",
+    "file": "skills/productivity/update-git/references/push_gh.py",
+    "before": "print(f\"Using token: {token[:10]}...\")",
+    "after": "print(f\"Using token: {token[:4]}*** (len={len(token)})\")",
+    "rationale": "watchdog 22:15 steer #4: token prefix landed in trade-watchdog.log (3 hits) — same class as BUG-036 leak",
+    "impact": "no functional change; session/log transcripts stop receiving a token prefix"
   }
 ]

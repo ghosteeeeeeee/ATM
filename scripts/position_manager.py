@@ -150,9 +150,8 @@ MAX_POSITIONS = MAX_OPEN_POSITIONS
 _bb_bounce_shadow_logged = set()
 _bb_bounce_tat_enforced = set()
 _mfe_cut_shadow_logged = set()
-_arm_be_shadow_armed = set()   # trade_ids that have seen live_pnl >= PM_TRAIL_ACTIVATE
 _hml_shadow_logged = set()     # trade_ids that have logged an HML-SHADOW line
-_arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire
+_arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire (dedup per process; analysis joins by trade_id)
 _ugb_be_logged = set()         # trade_ids that have logged a UGB-BE would-fire (unarmed giveback)
 _ugb_pt_logged = set()         # trade_ids that have logged a UGB-PT would-fire (unarmed giveback)
 
@@ -3840,21 +3839,34 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # ── 7b-shadow3. ARM-BE-STOP SHADOW — armed-then-breakeven (zero behavior) ──
         # brain_auditor 2026-10-18. Verdict PASS 2026-10-17 (arm-breakeven-stop.md):
         # 30d candle OOS, non-EXTREME fk 9.7% net +$3.46; split-sample positive both
-        # halves. Once trail arms (live_pnl >= PM_TRAIL_ACTIVATE), if price returns
+        # halves. Once trail arms (peak >= PM_TRAIL_ACTIVATE), if price returns
         # to <= entry, log would-fire. Complements TAT (never-armed stallers) — this
         # catches armed-then-reversed trades. Scope: non-EXTREME, exclude volume-.
         # Zero behavior — logs would-fires only. Flip live only with CEO GO + v6.
+        # FIX 2026-10-24 run #127: arm state moved from the module-level
+        # _arm_be_shadow_armed set to DB highest/lowest_price. position_manager is
+        # a fresh subprocess every pipeline pass (run_pipeline STEPS_EVERY_MIN),
+        # so the set reset every ~120s and the arm->cross sequence could never
+        # survive one process — 0 runtime fires 2026-10-18..24 while UGB-BE
+        # (DB-state, sibling below) logged 504. ponytail: same persistence basis
+        # as UGB-BE; this keeps the non-EXTREME/non-volume- scope at collection.
         if ARM_BE_SHADOW_ENABLED and trade_id not in _arm_be_shadow_logged:
             try:
                 _abe_sig_l = (_pos_signal or '').lower()
                 _abe_regime = str(pos.get('volatility_regime') or '')
                 if 'volume-' not in _abe_sig_l and _abe_regime != 'EXTREME':
+                    _abe_en = float(pos.get('entry_price') or 0) or 0
+                    _abe_hi = float(pos.get('highest_price') or 0) or 0
+                    _abe_lo = float(pos.get('lowest_price') or 0) or 0
                     _abe_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100
-                    if live_pnl >= _abe_arm_pct:
-                        _arm_be_shadow_armed.add(trade_id)
-                    elif trade_id in _arm_be_shadow_armed and live_pnl <= 0:
-                        _arm_be_shadow_logged.add(trade_id)
-                        log(f"  [SHADOW] ARM-BE would-fire {token} {direction} live={live_pnl:+.2f}% [armed@{_abe_arm_pct:.2f}% then crossed entry] trade={trade_id} sig={_pos_signal}")
+                    if _abe_en > 0 and _abe_hi > 0 and _abe_lo > 0:
+                        if direction == 'LONG':
+                            _abe_fav = (_abe_hi / _abe_en - 1.0) * 100
+                        else:
+                            _abe_fav = (1.0 - _abe_lo / _abe_en) * 100
+                        if _abe_fav >= _abe_arm_pct and live_pnl <= 0:
+                            _arm_be_shadow_logged.add(trade_id)
+                            log(f"  [SHADOW] ARM-BE would-fire {token} {direction} live={live_pnl:+.2f}% fav={_abe_fav:+.2f}% [armed@{_abe_arm_pct:.2f}% then crossed entry] trade={trade_id} sig={_pos_signal}")
             except Exception as e:
                 log(f"  [SHADOW] ARM-BE error for {token}: {e}")
 
