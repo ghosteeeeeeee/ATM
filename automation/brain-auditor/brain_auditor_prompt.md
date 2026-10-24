@@ -126,6 +126,16 @@ python3 scripts/shadow_trader.py --sweep-arm --sweep-signal <signal_type> --swee
 
 **Full skill reference:** `/root/.hermes/skills/shared/shadow-mode-analysis/SKILL.md`
 
+### Shadow Source Status (verified 2026-10-24, run #126 — read BEFORE analyzing)
+
+| Source | Rows | Status | Answerable question |
+|---|---|---|---|
+| contrarian_shadow.jsonl | 807 | ✅ USEFUL — outcome join live (`analysis/contrarian_outcome_join.py`) | flip would-win % (pump-chain- 63.9%, OOS 64.0%) |
+| oscillator_shadow.json | 24,598 | 🧊 FROZEN BY DESIGN — `OSCILLATOR_MULT_ENABLED=True` since Oct 1 stops writes; `actual_outcome` null on 24,598/24,598. **JSONL, not JSON array** (`json.load` crashes) | none — pre-live evidence only; use the live metadata join + weekly KPI |
+| floor_admit_shadow.jsonl | 1,778 | ⏳ PENDING JOIN — 91% admit, no outcome column | none until outcome join ships (pre-registered) |
+| wyckoff_shadow.jsonl | 298 | ⏳ PENDING JOIN — no outcome column | none until join ships |
+| rr_shadow_audit_7d.json | dict (replayed 110 / no_candles 91) | ☠️ ORPHANED — no producer script in repo, mtime 21d stale | none — do not cite as a live source |
+
 ### Shadow Data Sources (raw files):
 
 ```python

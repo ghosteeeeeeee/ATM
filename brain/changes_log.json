@@ -2324,5 +2324,27 @@
     "after": "LONG_RSI_SWEET_SPOT_BOOST = 0",
     "rationale": "Pre-registered revert trigger on the sweet-spot boost fired. Literal pre-reg action (restore MIN=40) would amplify the 40-55 band which is now clear bleed (14d 73T 34.2% -2.56 / 30d -1.40). BOOST=0 is the correct deviation: stops boosting decayed 55-60 without reopening bleed. Blocks nothing (confidence-only lever).",
     "impact": "Fewer marginal 55-60 LONGs clear confidence gates. Band is net-negative post-concentration so reduced frequency is +EV. fk not applicable (not a hard block)."
+  },
+  {
+    "timestamp": "2026-10-24T21:52:00Z",
+    "agent": "brain_auditor",
+    "change": "brain_auditor_prompt Step 2b: shadow-source status table (oscillator frozen-by-design / rr_shadow orphaned / wyckoff+floor pending outcome joins)",
+    "type": "tweak",
+    "file": "automation/brain-auditor/brain_auditor_prompt.md",
+    "before": "Step 2b lists 5 shadow sources as live",
+    "after": "status-annotated: 1 useful (contrarian), 1 frozen-by-design (oscillator), 1 orphan (rr), 2 pending joins",
+    "rationale": "stop future runs re-discovering dead shadow files every run",
+    "impact": "audit-loop time saved; zero trading behavior"
+  },
+  {
+    "timestamp": "2026-10-24T21:52:00Z",
+    "agent": "brain_auditor",
+    "change": "CURRENT.md HYPE deadline drift fix 21:23 -> 23:22 UTC (21:14 watchdog cycle) + run #126 refresh",
+    "type": "tweak",
+    "file": "CURRENT.md",
+    "before": "21:23 UTC",
+    "after": "23:22 UTC",
+    "rationale": "#125 carried prior-cycle/superseded deadline; newest steer says 23:22",
+    "impact": "correct open-trade deadline in state file"
   }
 ]

@@ -8066,5 +8066,32 @@
     "risk": "low",
     "agent": "brain_auditor",
     "run": 125
+  },
+  {
+    "date": "2026-10-24T21:52:00Z",
+    "idea": "Round-trip giveback ledger by signal (units-correct perfect-peak-exit upper bound)",
+    "rationale": "14d round-trips (mfe>=0.40 AND pnl<0) 43T; ceiling = amount_usdt*(mfe_pct - pnl_pct/leverage)/100 = +$8.28 vs actual cohort -$2.41. pump-chain+ +$2.61 (6/45T), pump-chain- +$1.51 (12/35T), combo +$0.60.",
+    "expected_impact": "Ranks escalation #17 recovery by signal — pump-chain family owns 45% of ceiling",
+    "category": "exit quality",
+    "status": "measured",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T21:52:00Z",
+    "idea": "volume-buildup- weight 1.2 revert criterion LOCKED pre-data",
+    "rationale": "14d 22T 68.2% '+0.58' backed the boost; 7d already washed 12T 58.3% '+0.01'. Revert to 1.0 if 7d PnL<0 AND WR<50% at n>=15.",
+    "expected_impact": "Prevents holding a decayed confidence boost",
+    "category": "confidence tuning",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T21:52:00Z",
+    "idea": "floor_admit outcome join (piggyback contrarian_outcome_join.py)",
+    "rationale": "1,778 rows, 91% admit, no outcome column — join criteria locked pre-data: n>=200 AND admit-vs-block Fisher p<0.05 AND 30d same sign.",
+    "expected_impact": "Makes a 1,778-row shadow source answerable",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
