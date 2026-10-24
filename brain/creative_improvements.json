@@ -7777,5 +7777,23 @@
     "category": "entry sniper",
     "status": "rejected_with_data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-24T07:40:00Z",
+    "idea": "UGB-PT first-fire census with armed/unarmed join + TAT peaked-vs-stall cohort split (both zero code)",
+    "rationale": "position_manager UGB shadow comment demands the flip decision join fires to trailing_activated and ship unarmed-only. Census of 8 unique UGB-PT would-fire trades since Oct 21: armed half n=7 = -19.61pp vs actual (CFX -14.80, MON -4.01), unarmed half n=1 = +2.11pp (GRASS) -> armed harm REPRODUCED on fresh data. TAT split: 14d trail_arm_timeout never-peaked 15T 2W -0.65 (designed stall target) vs peaked 4T 3W +0.06 avg exit +0.63 -> TAT is working backstop, not the leak.",
+    "expected_impact": "If UGB-PT ever ships: unarmed-only scope is MANDATORY (armed ship would be net-negative on this week's cohort alone). No flip now: n=1 unarmed, vacation + candle OOS (escalation #17) still pending.",
+    "category": "exit quality / counterfactual guardrail",
+    "status": "measured-armed-harm-confirmed",
+    "risk": "low (zero code, log+DB join only)"
+  },
+  {
+    "date": "2026-10-24T07:40:00Z",
+    "idea": "Shipped: losing-streak steer semantics fix (window losses -> trailing consecutive streak)",
+    "rationale": "steer-001 fired stale 17 runs; root cause was count-vs-streak mismatch in trade_watchdog.py:903.",
+    "expected_impact": "Removes recurring false 'losing streak' noise; true current streaks still fire (verified both windows).",
+    "category": "watchdog signal quality",
+    "status": "shipped",
+    "risk": "low (advisory engine only, zero trading behavior)"
   }
 ]

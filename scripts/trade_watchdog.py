@@ -885,11 +885,24 @@ def analyze_recent_losses(recent_trades):
     # brain_auditor 2026-10-08: only flag when the signal is NET NEGATIVE in the
     # window. Was counting raw losses — pump-chain- "7-loss streak" was actually
     # net +$0.34 over 7d (wins offset losses). Losses alone are normal variance.
+    # brain_auditor #115 2026-10-24: title said "streak" but data["count"] was ALL
+    # window losses — stale losses re-fired long after the streak ended
+    # (volume-buildup- steer-001 emitted stale 17 audit runs). Fire on the
+    # TRAILING consecutive losses only: recent_trades is close_time DESC, so walk
+    # each signal's trades newest-first and stop at its first non-loss.
     sig_pnl = {}
+    sig_tail_streak = {}
+    _streak_broken = set()
     sig_losses = {}
     for t in recent_trades:
         sig = t.get("signal_name", "unknown")
-        sig_pnl[sig] = sig_pnl.get(sig, 0) + (t.get("pnl_usdt", 0) or 0)
+        pnl = t.get("pnl_usdt", 0) or 0
+        sig_pnl[sig] = sig_pnl.get(sig, 0) + pnl
+        if sig not in _streak_broken:
+            if pnl < 0:
+                sig_tail_streak[sig] = sig_tail_streak.get(sig, 0) + 1
+            else:
+                _streak_broken.add(sig)
     for t in losses:
         sig = t.get("signal_name", "unknown")
         if sig not in sig_losses:
@@ -900,13 +913,14 @@ def analyze_recent_losses(recent_trades):
     for sig, data in sig_losses.items():
         if _signal_is_disabled(sig):
             continue  # DRIFT-W1: historical losses from killed signals — not actionable
-        if data["count"] >= 3 and sig_pnl.get(sig, 0) < 0:
+        streak = sig_tail_streak.get(sig, 0)
+        if streak >= 3 and sig_pnl.get(sig, 0) < 0:
             steers.append({
                 "severity": "warning",
                 "category": "health",
-                "title": f"Signal '{sig}' losing streak: {data['count']} losses",
+                "title": f"Signal '{sig}' losing streak: {streak} consecutive losses",
                 "detail": f"Net {sig_pnl[sig]:+.2f} USDT over last {len(recent_trades)} trades "
-                          f"(losses: {data['total_loss']:+.2f}). "
+                          f"(window losses: {data['total_loss']:+.2f}). "
                           f"Consider disabling or tuning this signal.",
                 "auto_executable": False
             })

@@ -397,3 +397,9 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 21T -0.05 47.6% | 7d 120T -1.17 40.0%
 ### Findings: Rotating Q (regime memory): scripts/signal_regime_memory.json stale — updated_at 2026-10-11, 13d > 7d bar (data/signal_regime_memory.json). Watchdog WARNs: signal rate ~17/h (<20/5min threshold) and stale-lock churn 28x/hr; disk 85%. Error alerts otherwise clean, 0 tracebacks.
 ### Recommendation: Refresh signal_regime_memory.json from DB this week (stale 13d); no action on health/numbers — flat book is correct-by-traffic.
+
+## CEO Status — 20261024T072650Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 20T -0.08 45.0% | 7d 120T -1.17 40.0%
+### Findings: Rotating Q (regime memory): signal_regime_memory.json last updated 2026-10-11 (13d stale, threshold 7d), 29 signals — stale regime params may be mis-scoring regime-specialist gates. Other: disk 86%, recurring stale-lock/signal-count watchdog WARNs, self-healing.
+### Recommendation: Refresh signal_regime_memory.json from DB in the next deep run; none else.

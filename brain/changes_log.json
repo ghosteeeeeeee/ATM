@@ -2211,5 +2211,16 @@
     "after": "re-scoped to reached-arm atr_sl_hit 33T -1.99 (avg MFE 0.797, 0/33 >= +1.50)",
     "rationale": "stale escalation boilerplate was pointing at a solved problem while the real leak went unnamed",
     "impact": "zero behavior; corrects the standing escalation and logs two pre-registrations"
+  },
+  {
+    "timestamp": "2026-10-24T07:39:44Z",
+    "agent": "brain_auditor",
+    "change": "trade_watchdog.py losing-streak steer: window-loss count -> trailing consecutive-loss streak (title now truthful; stale steer-001 can no longer re-fire)",
+    "type": "bugfix",
+    "file": "scripts/trade_watchdog.py",
+    "before": "fired when a signal had >=3 losses anywhere in 20-trade window AND net PnL < 0 (title claimed 'losing streak')",
+    "after": "fires only on >=3 TRAILING consecutive losses (close_time DESC, first non-loss ends streak) AND net PnL < 0",
+    "rationale": "steer-001 (volume-buildup- '4-loss streak') re-emitted stale for 17 consecutive audit runs even though the streak ended Oct 23 15:16 — losses were scattered in-window, not trailing. Advisory-only (auto_executable=false), zero trading behavior.",
+    "impact": "Production window dry-run: OLD fires stale vb- steer, NEW fires 0 steers. 50-window: correctly keeps true streaks (bb-bounce 4L tail, ai-trader-pending 3L tail), suppresses pump-chain+ (tail has a win). py_compile PASS."
   }
 ]
