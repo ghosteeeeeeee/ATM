@@ -1,53 +1,29 @@
 {
-  "timestamp": "2026-10-23T23:14:35.967952+00:00",
+  "timestamp": "2026-10-23T23:44:36.256364+00:00",
   "steers": [
-    {
-      "severity": "urgent",
-      "category": "pending_order",
-      "title": "PENDING ORDER btc-ceo-short-80900: BTC SHORT @ 80840",
-      "detail": "Trigger hit: BTC 80675 crossed below 80840. Executing short 11.10 USDT 5x, SL 81180, TP 79950. CEO bracket 2026-10-23 01:45 UTC: break BELOW 80900 = SHORT (CEO-set level, \u00a712 mapping lower=SHORT, upper=LONG). Level sits under the overnight sweep extreme 80940 \u2014 fires only if the EMA300 reclaim FAILS and the sweep low breaks. Trigger 80840 = 60pt cushion (wick filter). SL 81180: 340pt above trigger / 280 above level \u2014 above the 81048 base low and 81200 band, dies on full base reclaim (200pt+ wick room rule). TP 79950 into the 79800-80116 opposing demand (stops before 79800, not a round number). R:R planned 2.62 / real 1.28 (200pt slip each side). Non-overlap: short SL 81180 < long trigger 81664 (short dies first on rally). Rule 10 note: TP 890pts > 1x 1h ATR \u2014 fires only on fresh breakdown momentum (the #16351 pattern); if momentum stalls the 8h max-hold time-exit is the accepted exit, NOT a resting-in-chop deep TP. PRECHECK (advisory): FAIL \u2014 LOSERS list, coin_shame WR<55%, death-zone RSI 47.6 (reported, standing CEO rule). Chop 8 flips/24h \u2014 5x ceiling. Supersedes fired btc-ceo-short-81480 (#16353 UNIVERSAL_MAX_HOLD -1.53%).",
-      "trade_id": null,
-      "auto_executable": true,
-      "action": {
-        "type": "execute_order",
-        "order": {
-          "id": "btc-ceo-short-80900",
-          "coin": "BTC",
-          "direction": "short",
-          "trigger_price": 80840.0,
-          "amount_usdt": 11.1,
-          "leverage": 5,
-          "sl": 81180.0,
-          "target": 79950.0,
-          "confidence": 55.0,
-          "note": "CEO bracket 2026-10-23 01:45 UTC: break BELOW 80900 = SHORT (CEO-set level, \u00a712 mapping lower=SHORT, upper=LONG). Level sits under the overnight sweep extreme 80940 \u2014 fires only if the EMA300 reclaim FAILS and the sweep low breaks. Trigger 80840 = 60pt cushion (wick filter). SL 81180: 340pt above trigger / 280 above level \u2014 above the 81048 base low and 81200 band, dies on full base reclaim (200pt+ wick room rule). TP 79950 into the 79800-80116 opposing demand (stops before 79800, not a round number). R:R planned 2.62 / real 1.28 (200pt slip each side). Non-overlap: short SL 81180 < long trigger 81664 (short dies first on rally). Rule 10 note: TP 890pts > 1x 1h ATR \u2014 fires only on fresh breakdown momentum (the #16351 pattern); if momentum stalls the 8h max-hold time-exit is the accepted exit, NOT a resting-in-chop deep TP. PRECHECK (advisory): FAIL \u2014 LOSERS list, coin_shame WR<55%, death-zone RSI 47.6 (reported, standing CEO rule). Chop 8 flips/24h \u2014 5x ceiling. Supersedes fired btc-ceo-short-81480 (#16353 UNIVERSAL_MAX_HOLD -1.53%)."
-        }
-      },
-      "id": "steer-001"
-    },
     {
       "severity": "warning",
       "category": "health",
       "title": "Signal 'volume-buildup-' losing streak: 4 losses",
       "detail": "Net -0.04 USDT over last 20 trades (losses: -0.54). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-001"
     }
   ],
-  "portfolio_health": "critical",
+  "portfolio_health": "good",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "BELOW",
-    "volatility": "NORMAL",
-    "zscore_tier": "STRONG_NEG",
+    "volatility": "LOW",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 1.0,
-    "wyckoff_phase": "MARKDOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "acceleration_state": "FLAT",
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 1,
   "deep_analysis": "2 open trades (watchdog snapshot showed 1 \u2014 BTC SHORT #16377 opened 23:14:46 on the steer-001 trigger, entry 80629, SL 81180, TP 79950). Both SHORT, aligned with the tape: BTC 1m has been below EMA300 for 621+ consecutive minutes (80628 vs 81310, gap widened to -0.84% from -0.16% last cycle), linreg BEAR on 1m/5m/15m/1h, trend_quality STRONG_DOWN.\n\nCFX SHORT #16373 (+3.9%, 4.25h): stop 0.05058178 has trailed in and locks +3.08% \u2014 worst case is a win. Fresh-open test: YES, would open fresh \u2014 meta_rsi 36.2 sits in the <40 band which runs 62.5% WR (n=8, +0.07, 7d) because a STRONG_DOWN tape carries oversold shorts. Entry thesis intact, no change: hold. TP 0.04960714 needs another -1.14% while CFX 1h ATR is ~0.83% \u2014 the stop, not the TP, is the plan. Exit condition (re-tested at write time from continuum 23:14:39 + BTC 1m closes 80545-80708): BTC 1m closes hold ABOVE EMA300 (now 81310, re-read from data each cycle) for 15-30m -> take trail profit; down-tape thesis gone. Condition NOT met as of 23:15 \u2014 prior cycle's steer stands, age=2 cycles unexecuted. If CFX reclaims 0.05058 first, the stop exits at +3.08% automatically.\n\nBTC SHORT #16377: just opened, 0.00. Precheck advisory was FAIL (LOSERS list, coin_shame WR<55%, death-zone meta_rsi 47.6) \u2014 reported per standing CEO-bracket rule, not hidden. Real R:R 1.23 (risk 551pts / reward 679pts). SL 0.59% away, TP 0.93% away into the 79800-80116 demand. Condition keys: TP only on fresh breakdown momentum (1h range already 80513-81390 \u2014 -0.93% is a full 1h-range extension); if momentum stalls, the 8h max-hold time-exit is the accepted exit, NOT a resting deep TP. Invalidation: BTC 1m reclaims EMA300 81310 and holds 15-30m -> thesis dead, SL 81180 does its job within 0.6%.\n\nPortfolio: 2/6 slots, 22.2 USDT net short, no longs. Both positions win on a BTC dump and both die on a squeeze \u2014 correlated-consistent, not hedged, fine while the tape stays below EMA300; combined stops cap loss at ~+profit for CFX and -0.55 for BTC. No capital-efficiency problem: 4 slots idle, but aggregate 5m reads 123/129 SHORT_BIAS (96% one-sided) with zscore -2.02 \u2014 a stretched tape where adding MORE shorts is the crowded trade; idle slots are acceptable this cycle.\n\n24h: 22 closes, 50% WR, -0.15 USDT. LONG 33% WR -0.24 (fought STRONG_DOWN), SHORT 61.5% +0.09 (right side). The volume-buildup- 4-loss streak in steer-002 is BROKEN \u2014 SYRUP/MON/DYDX/ICP all won 22:25-22:38 (signal window now 70% WR, +0.39). Do not disable on the stale streak; the real bleed is the 40-55 RSI entry band (see pattern_alerts).\n\nWatchlist pick this cycle: NEAR SHORT conf 72 (rsi_at_pick 58.0, price 4.611) \u2014 AI_TRADER_ENABLED=False, PICK (watchlist only, will NOT execute). Precheck PASS all gates; NEAR regime SHORT_BIAS conf 95, -3.47%/15m, 1h -2.87%, RSI 58 in the 55+ winning band (n=17, 52.9% WR, +0.64).",

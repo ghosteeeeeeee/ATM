@@ -385,3 +385,9 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 24h 19T -0.47 42.1% | 7d 122T -2.41 37.7%
 ### Findings: rotating Q = "Which signals are regime-specialists?" — by volatility_regime 7d: EXTREME 43T 27.9% -$1.26 (worst), NORMAL 56T 41.1% -$0.81, HIGH 9T 44.4% -$0.29, FLAT 14T 50.0% -$0.05. No winning regime cell (all PnL negative); EXTREME bleed already covered by the pre-registered SHORT×EXTREME 0.5x dampen — no new action.
 ### Recommendation: none — clean; deep run should clear today's stacked CEO decisions (vacation state, fk ruling/CONF_FLOOR, TAT variant-C GO, AVAX exit call).
+
+## CEO Status — 20261023T232650Z
+### Health: pipeline=active (timer-triggered, running at check) guardian=active open_pos=2
+### Numbers: 24h 22T -0.15 50.0% | 7d 122T -1.72 39.3%
+### Findings: 24h WR recovered to 50% (was 42.1% at 19:26 run), PnL still slightly negative. Rotating Q (regime-specialists, 7d by volatility_regime): NORMAL 56T 41.1% -0.81 | EXTREME 42T 31.0% -0.73 | HIGH 10T 50% -0.13 | FLAT 14T 50% -0.05 — NO winning regime cell; EXTREME bleed already owned by pre-registered SHORT×EXTREME dampen, no new lever. Error alerts: upgrade-implementer timeout auto-fixed (900→1800s), IO-token hotset failure cooldown entries, disk 85% (18G free).
+### Recommendation: disk trending to 90% — schedule scoped cleanup (/var/log/syslog 1.2G, /root/zscore 2.2G) in weekly deep run; everything else clean.

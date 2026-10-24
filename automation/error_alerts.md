@@ -1746,3 +1746,11 @@
 - **WARN** (1x): `hermes-upgrade-implementer.service` FAILED at 16:36 UTC — systemd `TimeoutStartSec=900` killed a run the wrapper script allows to run 1800s (`timeout 1800` in run_upgrade_implementer.sh; its comment claimed the unit matched, but the unit still said 900). Log also shows the agent ran bad SQL (`column "size_usdt" does not exist` — column is `amount_usdt`).
 - **AUTO-FIX**: unit edited 900→1800 via sed, `systemctl daemon-reload`, `reset-failed` — timer active, next run 04:21 UTC. (SQL error is agent-side, non-blocking.)
 - **WARN**: disk 85% used (95G/118G, 18G free). Prescribed cleanup ran: 0 log files >7d to gzip, journal vacuum freed 0B. Hermes logs = 622M (all actively written, safe). Main hogs are out of health-monitor scope: /var/log/syslog* 1.2G, /root/zscore 2.2G, /root/hermes-agent 2.0G, /root/snap 1.7G — recommend CEO run a scoped cleanup if disk trends past 90%.
+
+## Error Alerts — 2026-10-23 23:27 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3539s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: ME TOK in hotset failure cooldown — TOK in cooldown (3539s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3478s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: ME TOK in hotset failure cooldown — TOK in cooldown (3478s left, N failures)`

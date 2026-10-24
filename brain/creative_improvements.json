@@ -7622,5 +7622,33 @@
     "category": "infrastructure",
     "status": "shipped",
     "risk": "zero — no gate reads the column"
+  },
+  {
+    "date": "2026-10-24T00:03:37Z",
+    "idea": "Escalation #17 measurement executed: BE-at-arm counterfactual (stop->entry at trail-arm) pre-registered for Oct 25 1m-replay batch",
+    "rationale": "reached-arm atr_sl_hit 14d 33T -1.99 with 0/33 final-stop-past-entry vs atr_trail_hit 23/23 past = the stop never ratchets before the first ATR rung; whole-trade MAE cannot split pre-arm vs post-arm dips so DB-only sim is invalid",
+    "expected_impact": "if post-arm dips are rare among winners, saves up to +1.99/14d; winner-harm unknown until replay",
+    "category": "exit-side",
+    "status": "pre-registered",
+    "risk": "medium",
+    "criteria": "fee-adjusted AND OOS 7d+30d same sign AND winner-harm <20% (mirror #78 pump-exit criteria)"
+  },
+  {
+    "date": "2026-10-24T00:03:37Z",
+    "idea": "Grandfathered-band lap scoreboard CLOSED: pre-lapse cohort ends net positive (tonight 5 straight trail wins +0.66 at rsi 35-44), lifetime gate-truth 3W/4L -0.17 to -0.34",
+    "rationale": "post-lapse BLOCK_RE records in gate_shadow.db become the make-permanent-vs-C3-conditional evidence; C3 sustained-tape sentinel trigger unchanged (30d Fisher p<0.05)",
+    "expected_impact": "decides whether to propose conditional waiver replacement",
+    "category": "meta",
+    "status": "monitoring",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-24T00:03:37Z",
+    "idea": "BTC pending-order chop-pin bleed (CEO-domain monitor): #16353 UM_HOLD -1.53, #16358 UM_HOLD -0.02, #16377 manual_sl_hit -0.08 — 3 straight pending BTC losses during flip-rate>=p95 pin",
+    "rationale": "conditional brackets armed both directions keep filling into chop; shadow auto_trader CHOP shorts 75% vs longs 0%",
+    "expected_impact": "suggest CEO consider suspending bracket arming during high-churn pins",
+    "category": "risk",
+    "status": "suggested-CEO",
+    "risk": "low"
   }
 ]
