@@ -8016,5 +8016,14 @@
     "category": "data quality",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T18:41:23Z",
+    "idea": "Contrarian shadow outcome-join (pump-chain- flip edge)",
+    "rationale": "Oct 27 PROMOTE was blocked on outcome-join. Built analysis/contrarian_outcome_join.py: 535 decided, pump-chain- flip-WR 63.9% (n=338), btc-pump-rider+ 25% (n=196). Path-test shows directional edge for pump-chain- flips only.",
+    "expected_impact": "Unblocks Oct 27 CEO decision with real data",
+    "category": "data infrastructure",
+    "status": "shipped",
+    "risk": "low"
   }
 ]

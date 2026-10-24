@@ -1,112 +1,116 @@
 {
-  "timestamp": "2026-10-24T17:44:57Z",
-  "audit_run": 122,
-  "session_brain_stats": {
-    "queries": [
-      "signal performance winrate regime",
-      "new signal idea improvement",
-      "loss money bleeding losing"
-    ],
-    "top_insight": "Session brain confirms exit-system-is-the-leak diagnosis (recurring across trend_following, wider_exits, signal_failure sessions). TAT variant-C was the shipped response (#117)."
-  },
+  "timestamp": "2026-10-24T18:41:23Z",
+  "run": 123,
   "trade_summary_24h": {
-    "closed": 11,
+    "trades": 11,
     "wins": 9,
     "wr": 81.8,
     "pnl": 0.87,
-    "by_signal": "volume-buildup- SHORT 6T 83.3% +0.55 (workhorse); ai-trader-pending SHORT 2T -0.04; pump-chain- SHORT 1T +0.34",
-    "open": "BTC #16382 continuum+ LONG entry 79658, current ~80092 (+0.61%), TRAIL ARMED (arm line 79976.6). meta_rsi 27.48 oversold bounce. Hold bracket.",
+    "carrier": "volume-buildup- SHORT 6T 83.3% +0.55",
+    "losers": "CHIP trail giveback -0.06, BTC pending manual_sl -0.08 (both known, shallow)",
     "state": "GREEN"
   },
+  "trade_summary_7d": {
+    "trades": 123,
+    "wr": 41.1,
+    "pnl": -0.98
+  },
+  "trade_summary_14d_mandate": {
+    "trail": "135T 78.5% +9.83",
+    "unarmed": "194T 7.7% -13.41",
+    "hard_max": "69T 0% -6.66",
+    "atr_sl": "81T 1.2% -5.86",
+    "wealth_gap": "UNCHANGED — trail is the edge, chop is the bleed"
+  },
+  "open_trades": [
+    {
+      "id": 16382,
+      "coin": "BTC",
+      "direction": "LONG",
+      "signal": "continuum+",
+      "pnl_pct": 0.84,
+      "hours": 1.6,
+      "action": "HOLD — countertrend but above EMA300; exit if 1m closes below EMA300 for 15-30m"
+    }
+  ],
+  "watchdog_triage": {
+    "steer_6_floor45": "ANSWERED — floor uses exec-time 5m RSI (not meta_rsi detect-time). 14 meta_rsi<45 shorts in 7d got through via BTC-bear exemption (flip1 waiver, expires Oct 27) or exec-time RSI >=45. Net +0.33 on those 14. Gate working as designed, no bleed, no action.",
+    "portfolio_health": "good — 0 steers from automated engine"
+  },
+  "last_run_verify": {
+    "LONG_RSI_SWEET_SPOT_BOOST": "0 ✓ (shipped #122, 45min old, 0 trades to measure yet)",
+    "TAT-C BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED": "True ✓ (0 fires since 11:52 ship, correct-by-traffic: 3 closes, none bb-bounce)",
+    "constants_git_diff": "EMPTY ✓",
+    "tracebacks": "0 in last 200 pipeline.log lines ✓",
+    "protected_flags": "LIVE_TRADING_ENABLED=True, STANDALONE_BYPASS present ✓",
+    "size_reduce": "file absent = 1.0x ✓"
+  },
   "shadow_analysis": {
-    "oscillator": "24598 entries, mult_avg 0.940 (11253 >1 / 10680 <1). actual_outcome ALWAYS None — cannot cross-reference efficacy from file. Weekly revalidation (#120) used live join instead: BOOST vs PENAL Fisher p=0.52 = NO separation.",
-    "contrarian": "807 entries, ALL classified LOSER at write time, 0 outcome-resolved. Blocks Oct 27 PROMOTE until outcome-join path exists.",
-    "wyckoff": "294 entries, schema has no outcome field. Accuracy unmeasurable from shadow file.",
-    "floor_admit": "1776 entries. Data present.",
-    "rr_shadow": "1656 lines, 110 replayed / 91 no_candles.",
-    "overall": "Oscillator and contrarian shadows are write-only collectors — they record decisions but never resolve outcomes. The useful counterfactual data comes from shadow_trader.py (17980 signals, gate justification) and live SHADOW log lines. Structural gap flagged as creative improvement #3."
+    "oscillator": "24598 entries, actual_outcome 100% None — dead field. Effectiveness un-measurable from shadow file; weekly revalidation (#120) used SQL join instead. p=0.52 no separation.",
+    "contrarian": "807 entries, all LOSER-classified at write time (30d signal-level filter). No outcome field — NOW JOINED via analysis/contrarian_outcome_join.py: pump-chain- flip-WR 63.9% (n=338), btc-pump-rider+ 25.0% (n=196), TOTAL 49.5% (n=535).",
+    "floor_admit": "1776 entries, 90.5% admitted. No outcome field.",
+    "overall": "Shadow collectors write but don't join outcomes. Contrarian join now built — unblocks Oct 27 PROMOTE."
+  },
+  "contrarian_outcome_join": {
+    "script": "analysis/contrarian_outcome_join.py",
+    "params": "arm=0.40% fav / 0.40% adv, 30×5m candles, price-move units",
+    "pump_chain_minus": "338 decided, 216 WIN / 122 LOSS = 63.9% flip-WR",
+    "btc_pump_rider": "196 decided, 49 WIN / 147 LOSS = 25.0% flip-WR",
+    "total": "535 decided, 265 WIN / 270 LOSS = 49.5%",
+    "caveats": "Path-test (±0.4% first-touch) overstates vs actual outcomes — ignores exit mechanism, fees, asymmetric payoffs. Selection at signal level (30d WR<50%), not trade level.",
+    "oct27_decision_context": "pump-chain- specific flip edge EXISTS in path data (63.9%). Not shipped — needs fee-adjusted PnL simulation + CEO GO. btc-pump-rider+ flip is WORSE than original (25%) — do NOT flip."
   },
   "drift_findings": [
     {
-      "item": "Watchdog \"aim LONG 45-60\" prose vs code",
-      "severity": "LOW",
-      "finding": "Code already narrowed sweet-spot to 55-60 on Oct 16 (MIN=55). Watchdog pattern alert #3 referenced stale 45-60 framing. Resolved: BOOST=0 shipped this run (band decayed).",
-      "status": "RESOLVED"
+      "item": "Oscillator shadow actual_outcome field",
+      "status": "DEAD since collector inception — 24598 entries with None. Not blocking (SQL join works) but wastes collector write.",
+      "severity": "LOW"
     },
     {
-      "item": "LONG_RSI_SWEET_SPOT pre-reg revert trigger",
-      "severity": "MED",
-      "finding": "Trigger HIT (14d 55-60 PnL -0.26<0, WR 45.5%<48%). Pre-reg action (restore MIN=40) would amplify 40-55 bleed. Deviated to BOOST=0 with data justification.",
-      "status": "FIXED (BOOST=0)"
-    },
-    {
-      "item": "oscillator_shadow actual_outcome empty",
-      "severity": "MED",
-      "finding": "24598/24598 entries have actual_outcome=None. Shadow file cannot answer efficacy questions. Revalidation uses live join workaround.",
-      "status": "OPEN (creative improvement)"
-    },
-    {
-      "item": "contrarian_shadow all-LOSER write-time classification",
-      "severity": "MED",
-      "finding": "807/807 classified LOSER at write, 0 outcome-resolved. Known since #121. Blocks Oct 27 PROMOTE.",
-      "status": "OPEN (pre-registered)"
+      "item": "Contrarian shadow outcome field",
+      "status": "MISSING — was the Oct 27 PROMOTE blocker. NOW RESOLVED via outcome-join script.",
+      "severity": "RESOLVED"
     }
   ],
   "recurring_problems": [
-    "Exit-system leak: trail family 14d 80T 90.0% +5.04 vs stop-ish 162T 0.6% -13.37. Mandate unchanged. TAT-C (#117) + MFE-CUT + CONF_FLOOR queue aimed here.",
-    "hard_max_loss 14d: 70T 0W -6.69 — 100% never-armed chop entries. Largest single bleed family.",
-    "pump-chain+ bare kill criteria met (14d 48T 27.1% -0.09) but no_signal_enable_disable blocks auditor — CEO GO/NO-GO outstanding 3rd run."
+    "Trail-vs-chop wealth gap unchanged for 30+ runs — structural, not a bug. Entry quality is the lever.",
+    "pump-chain+ conf<30 bleed (n=25, 20% WR, -1.34) — CONF_FLOOR=30 targets this, awaiting CEO fkA ruling.",
+    "Oscillator mult no separation (p=0.52) — weekly revalidation holding, refresh at n>=30/cell or Oct 31."
   ],
-  "missing_implementations": [
-    "Contrarian shadow outcome-join (pre-registered Oct 27 PROMOTE dependency)",
-    "Oscillator shadow outcome resolution (structural — file unusable for efficacy)"
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
-    "LONG_RSI_SWEET_SPOT_BOOST 10→0 (SHIPPED)",
-    "SHORT RSI_CEILING=65 monitor — 14d 65+ 7T 71.4% +0.42 may justify ceiling revert if n grows",
-    "Oscillator shadow actual_outcome fix (suggested)"
-  ],
-  "config_changes_applied": [
     {
-      "file": "hermes_constants.py",
-      "change": "LONG_RSI_SWEET_SPOT_BOOST = 10 → 0",
-      "trigger": "Pre-reg revert: 14d 55-60 PnL < 0 AND WR < 48%",
-      "deviation": "Pre-reg said restore MIN=40; BOOST=0 instead because 40-55 is now clear bleed (14d -2.56)",
-      "blocks_winners": "N/A — confidence boost, not a hard block. Reduces frequency of net-negative band entries."
+      "idea": "Contrarian outcome-join script",
+      "status": "SHIPPED",
+      "detail": "analysis/contrarian_outcome_join.py — joins contrarian_shadow with 5m candles, computes contrarian-direction MFE/MAE path. Answers Oct 27 PROMOTE question. pump-chain- 63.9% flip-WR, btc-pump-rider+ 25%.",
+      "risk": "zero (analysis only, no trading behavior)"
     }
   ],
-  "changes_from_last_run": {
-    "run_121_verify": "No config changes in #121. TAT-C (#117) holding: 0 fires since 11:52 enforcement, correct-by-traffic (only 1 closed bb-bounce/ai-trader+ since — a win via manual_trail). size-reduce cleared 1.0x. protected 13/13. constants diff was EMPTY (now +1 from this run). 0 new Tracebacks. session lock absent."
+  "config_changes_applied": [],
+  "changes_from_last_run": [
+    {
+      "change": "LONG_RSI_SWEET_SPOT_BOOST 10→0 (#122)",
+      "verified": "HOLDING (=0)",
+      "impact": "0 trades since ship — too early to measure"
+    },
+    {
+      "change": "TAT-C BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True (#117)",
+      "verified": "HOLDING (=True)",
+      "impact": "0 fires since ship — correct-by-traffic (no bb-bounce closes)"
+    }
+  ],
+  "ceo_stack": {
+    "pump_chain_plus_kill": "CRITERIA MET (45T 26.7% -0.48) — no_signal_enable_disable blocks auditor. CEO GO/NO-GO required.",
+    "conf_floor_fk_ruling": "fkA at exact 20.0% bar. Money net +1.34. CEO fk definition ruling required before ship.",
+    "oct25_eval_batch": "HML-SHADOW, MFE-CUT, UGB, exit-ladder, re-enter-on-recovery — tomorrow.",
+    "oct27_contrarian_promote": "Outcome-join DONE. pump-chain- 63.9% flip-WR. Needs fee-adjusted PnL sim + CEO GO.",
+    "unclog_waiver": "Re-granted, expires 2026-10-27T00:00Z. flip1_active=True."
   },
   "next_actions": [
-    "CEO: pump-chain+ kill GO/NO-GO (criteria met 3rd run)",
-    "CEO: CONF_FLOOR fk definition ruling (fkA 20.0% exact bar)",
-    "Oct 25 eval batch: HML-SHADOW, MFE-CUT, UGB, exit-ladder, re-enter-on-recovery",
-    "Oct 27: contrarian PROMOTE (needs outcome-join) + unclog waiver expiry",
-    "Monitor: SHORT RSI_CEILING 65+ cell (14d positive, 30d negative)",
-    "Monitor: LONG 55-60 band recovery (BOOST=0, re-boost trigger documented in constants)"
-  ],
-  "autopsy_48h": {
-    "n": 13,
-    "never_adverse": 2,
-    "recovered": 6,
-    "never": 5,
-    "never_list": [
-      "ALT vb- -0.17",
-      "CC vb- -0.15",
-      "ZRO vb- -0.11",
-      "BTC CEO -0.08",
-      "PUMP trail giveback -0.01"
-    ],
-    "verdict": "wrong-side REFUTED 49th consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "note": "3/5 NEVER are waiver-band vb- shorts (now blocked post-lapse) + BTC CEO pending + PUMP trail giveback"
-  },
-  "mandate_fresh": {
-    "trail_14d": "80T 90.0% +5.04",
-    "stop_ish_14d": "162T 0.6% -13.37",
-    "hard_max_loss_14d": "70T 0W -6.69",
-    "armed_14d": "80T 90.0% +5.04",
-    "unarmed_14d": "252T 19.8% -8.73"
-  },
-  "readiness": "1 open BTC #16382 continuum+ LONG ARMED (+0.61%, arm line 79976.6). Oversold bounce (meta_rsi 27.5) against 4h SHORT_BIAS — countertrend, hold bracket. SHORTs remain the paid side. No fresh LONG while 1m below EMA300 80147. Size 1.0x."
+    "Monitor TAT-C first fire (bb-bounce-v2-long hard_max/atr_sl cohort)",
+    "Monitor LONG_RSI_SWEET_SPOT_BOOST impact (0→demoted 55-60 band)",
+    "Oct 25: run eval batch (HML-SHADOW, MFE-CUT, UGB, exit-ladder, re-enter-on-recovery)",
+    "Oct 27: contrarian PROMOTE decision with outcome-join data; unclog waiver expiry",
+    "CEO: pump-chain+ kill GO/NO-GO; CONF_FLOOR fkA definition ruling"
+  ]
 }
