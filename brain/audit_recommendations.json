@@ -1,62 +1,130 @@
 {
-  "timestamp": "2026-10-24T02:37:29Z",
-  "run": "brain_auditor #111",
+  "timestamp": "2026-10-24T03:45:00Z",
+  "run": 112,
   "session_brain_stats": {
-    "query": "hotset/compactor + post-lapse waiver",
-    "note": "dup-heavy persists (ideation only); hotset-empty recurring topic corroborates watchdog deep_analysis"
+    "note": "dup-heavy ideation only (17th consecutive), no new actionable drift found"
   },
   "trade_summary_24h": {
-    "n": 22,
-    "w": 11,
-    "wr": 50.0,
-    "pnl": 0.07,
-    "7d": "120T 40.0% -1.17",
-    "14d": "344T 36.0% -4.81"
+    "trades": 21,
+    "wins": 10,
+    "wr": 47.6,
+    "pnl": -0.05,
+    "direction": {
+      "SHORT": "13T 61.5% +0.31",
+      "LONG": "8T 25.0% -0.36"
+    },
+    "winners": "10/10 trail-armed (CFX pc- +0.34 rr_trail, 6x vb- PM-trail, LTC warrior, HBAR bb-squeeze, AVAX r2v2)",
+    "losers": "11 = 10 unarmed + 1 armed giveback (PUMP r2v2-long9 -0.01)",
+    "7d": "120T 40.0% -1.17 | 14d 342T 36.3% -4.58",
+    "open": 0,
+    "flat_reason": "both-sides-gated at EMA300 pin (BTC 80972 vs EMA300 81012, -0.04%, AT after 18.4h below)"
   },
-  "mandate_fresh_14d": {
-    "trail_family": "111T 86.5% +9.21 (PM-trail 85T 89.4% +5.08 + atr_trail_hit 26T 76.9% +4.13)",
-    "hard_max_loss": "77T 0% -7.70",
-    "armed_col": "True 139T 78.4% +9.86 vs False 204T 7.4% -14.61"
+  "mandate_fresh": {
+    "trail_family_14d": "116T 86.2% +9.75",
+    "hard_max_loss_14d": "75T 0% -7.47",
+    "armed_14d": "139T 78.4% +9.86 vs unarmed 203T 7.4% -14.44",
+    "atr_sl_hit_leak": "83T 1.2% -5.96, armed=0 — escalation #17 (63rd), vehicle = Oct 25 BE-at-arm 1m replay"
   },
-  "post_lapse_verification": {
+  "post_lapse_checkpoint": {
+    "status": "PASS (2nd consecutive run)",
     "flip1_active": false,
-    "unclog_expired_in_log": true,
-    "post_lapse_opens": 0,
-    "band_shorts_opened": 0,
-    "verdict": "PASS — gate live, correct-by-traffic (flat book, both sides gated by structure/trend filters)",
-    "narrower_re_waiver_trigger": "NOT EVALUABLE (needs post-lapse n>=20)"
+    "unclog_expired_lines": 18,
+    "opens_since_0000Z": 0,
+    "vb_short_signals_post_lapse": "15 signals, 0 executed (RSI span 0-52, majority <45 = exact blocked class)",
+    "verdict": "waiver-expiry gate live and correct-by-traffic"
   },
-  "drift_findings": [],
-  "recurring_problems": [
-    "escalation #17 arm-then-reversal leak STILL PRESENT: 14d atr_sl_hit mfe>=0.40 = 33T 1W -1.99, all trailing_activated=False (candle-vs-poll gap). Vehicle = Oct 25 1m replay. No re-proposal.",
-    "hotset empty 86% of cycles = opportunity cost but CORRECT given both-sides-gated regime (BTC below EMA300 + structure gate flip). Not a bug."
-  ],
-  "missing_implementations": [],
-  "creative_improvements": [
-    "HIGH-CONF [60,95) DECAY WATCH pre-registered (30d +0.97 -> 14d -0.45; trigger 7d negative n>=20)",
-    "post-lapse checkpoint verified PASS"
-  ],
-  "config_changes_applied": [],
-  "changes_from_last_run": [
-    "#109: 0 config changes — nothing to verify",
-    "#109 pre-regs: narrower re-waiver + SHORT arm-rate KPI both NOT EVALUABLE (post-lapse n=0) — correct deferral",
-    "#104/#107 fixes (entry_regime_4h, trend ownership): no new traffic since 00:00Z, prior verification stands"
-  ],
   "losing_autopsy_48h": {
-    "method": "recovery_replay adverse-first, selfcheck PASS",
+    "method": "recovery_replay.py adverse-first, selfcheck PASS (vacuity 193/203)",
     "n": 12,
     "never_adverse": 2,
     "recovered": 5,
     "never": 5,
-    "never_list": "ALT/CC/ZRO (waiver-band vb- shorts = now blocked) + BTC pending + PUMP giveback",
-    "wrong_side": "REFUTED 40th consecutive run (#61 p=0.116, #84 t=-0.04)"
+    "never_cohort": "ALT/CC/ZRO volume-buildup- shorts (RSI 35-43 waiver-band, NOW BLOCKED by lapsed gate) + BTC ai-trader-pending manual_sl (CEO) + PUMP r2v2-long9 trail giveback -0.01",
+    "wrong_side": "REFUTED 41st consecutive run (#61 p=0.116, #84 t=-0.04)",
+    "new_patterns": 0
   },
-  "deep_dive": "0 new sub-50% n>=15 targets (6 negatives all owned: bb-bounce=TAT+MFE-CUT, ai-trader+ disabled, doji killed, pump-chain±=CONF_FLOOR, ai-trader-manual CEO-domain positive)",
-  "steer_001": "RETRACTED confirmed with fresh data — vb- 24h 10T 6W -0.04; 5 straight PM-trail wins after flagged losses; DO NOT DISABLE",
+  "drift_findings": [
+    {
+      "item": "vacation_mode",
+      "severity": "low",
+      "detail": "18th run half-open (no_constants_change=false + review queue; no_signal_enable_disable=true). T/CEO: vacation_mode.py off when ready — fk ruling, CONF_FLOOR, TAT GO behind it."
+    },
+    {
+      "item": "session_brain",
+      "severity": "low",
+      "detail": "dup-heavy 18th (ideation only), no new drift surfaced"
+    },
+    {
+      "item": "conf metadata RAW pin",
+      "severity": "standing",
+      "detail": "final_confidence metadata populated but decider's 40% skip means CONF_FLOOR=30 would block 0 metadata rows — RAW column pin mandatory at any future ship (#88 standing)"
+    }
+  ],
+  "recurring_problems": [
+    "trail arming is THE win lever — candle-vs-poll gap (escalation #17) is the sole failure mode, 0/83 atr_sl_hit armed",
+    "LONG inventory bleeds (7d 82T 37.8% -1.73) while SHORT wins (38T 44.7% +0.56) — signal inventory generates ~2x more longs than shorts regardless of tape",
+    "[40,50) confidence bleed bucket: 14d 74T 37.8% -1.50 — CONFIDENCE-TAIL queue owns it (7d flipped +0.26 at n=15, monitor)"
+  ],
+  "missing_implementations": [
+    "CONF_FLOOR=30 bare-only: 14d 42T 7W -1.71 blocked-set (grew from 33T), ships Oct 25 pending CEO fk ruling (2 defs gated)",
+    "TAT variant-C: 16 in-scope fires, fk 0/7, +0.410, p=0.016 — AWAITING CEO GO",
+    "Escalation #17 candle-aware arming: Oct 25 BE-at-arm 1m replay vehicle scheduled"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-10-24T03:45:00Z",
+      "idea": "Waiver-lapse 24h scoreboard (zero code, pre-registered)",
+      "rationale": "15 volume-buildup- SHORT signals fired post-00:00Z, 0 executed, RSI span 0-52 mostly <45 — the exact class the lapsed waiver admitted. If this holds 24h with 0 executions of the RSI<45 class, the lapse is validated as a permanent gate; CEO re-waiver only with fresh counterfactual data.",
+      "expected_impact": "validates/removes the re-waiver decision with live data instead of assumption",
+      "category": "verification",
+      "status": "pre-registered",
+      "risk": "zero (no code)"
+    },
+    {
+      "date": "2026-10-24T03:45:00Z",
+      "idea": "Reclaim-readiness ladder (playbook, zero code)",
+      "rationale": "All 24h winners were SHORTs (vb-/warrior/pc-). If the EMA300 pin resolves UP, short-edge inventory goes quiet and long-bleed inventory reactivates. First longs after a sustained reclaim should prefer trail-family signals (continuum-trend+, bb-squeeze+) over chop-family bare bounces — the mandate is stay in trends, out of chop.",
+      "expected_impact": "reduces first-post-reclaim chop-entry bleed (known 0% WR unarmed cohort)",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "zero (no code, playbook only)"
+    }
+  ],
+  "config_changes_applied": [],
+  "changes_from_last_run": {
+    "#111": "0 config changes — nothing to verify",
+    "#107": "trend-ownership + entry_regime_4h fixes stand (feature_recorder.py:212 present); no new traffic since 00:00Z to test",
+    "size_reduce": "file ABSENT = 1.0x truth (cleared 22:57Z, auto-clear correct)",
+    "waiver_expiry": "live, flip1_active()=False, UNCLOG-EXPIRED firing, 0 leaks",
+    "protected_flags": "constants git CLEAN, LIVE_TRADING_ENABLED=True",
+    "tracebacks": "4 total, last Oct 11 — none new",
+    "session_lock": "absent",
+    "pipeline": "rc=0, sleeping, hotset 0 tokens (both-sides-gated, working as designed)"
+  },
+  "deep_dive": {
+    "sub_50pct_n15_14d": [
+      "bb-bounce-v2-long+ 35T 42.9% -0.94 → TAT variant-C owner (armed 18T 83.3% +0.79 vs unarmed 17T 0% -1.73)",
+      "ai-trader+ 27T 37.0% -0.91 → CEO domain",
+      "doji-bottom-long 20T 40.0% -0.62 → KILLED Oct 16, 0 opens since, aging cohort",
+      "pump-chain+ 44T 25.0% -0.49 → NO-KILL stands (30d +1.78; bleed = conf<30 = CONF_FLOOR target)",
+      "pump-chain- 35T 22.9% -0.30 → CANCEL stands (CONF_FLOOR collision)",
+      "ai-trader-manual 15T 46.7% +0.34 → positive PnL, CEO domain"
+    ],
+    "new_targets": 0
+  },
+  "pre_reg_rechecks": {
+    "high_conf_60_95_decay": "7d n=27 44.4% +0.04 POSITIVE — trigger NOT met (needs negative at n>=20). 30d +1.84, 14d -0.27. Watch continues.",
+    "conf_lt30_nonpump_sentinel": "14d n=12 58.3% -0.09 wash — trigger not met (needs n>=20 AND pnl<=-1.00)",
+    "conf_floor_bare": "14d 42T 7W -1.71 blocked-set, fkA-literal 7/311≈2.2% PASS / fkA-family still gated — Oct 25 ship pending CEO fk ruling",
+    "pc_plus_kill": "NOT MET (14d 44T 25.0% -0.49 but 30d 69T +1.78; conf>=30 14d +0.86; bleed=conf<30 CONF_FLOOR target)",
+    "steer_001_volume_buildup": "DO NOT DISABLE re-confirmed 15th run — 5 straight PM-trail wins after flagged losses, 14d armed 14T 100% +1.09 vs unarmed 6T 0% -0.70"
+  },
   "next_actions": [
-    "Post-lapse KPIs: watch band opens stay 0; narrower re-waiver trigger at n>=20",
-    "HIGH-CONF decay watch: 7d [60,95) negative at n>=20 -> escalate same-day",
-    "Oct 25 batch unchanged: MFE-CUT / HML / habitat / re-enter / UGB / short-gate / CONF-FILTER + BE-at-arm 1m replay (escalation #17)",
-    "CEO: vacation_mode off when ready (rules now half-open: no_constants_change=false)"
+    "Oct 25: CONF_FLOOR bare-only ship (after CEO fk ruling) + TAT variant-C GO + BE-at-arm 1m replay (escalation #17 vehicle) + MFE-CUT/habitat/re-enter/UGB/short-gate batch",
+    "CEO: fk definition ruling (2 defs disagree, flip decision)",
+    "CEO: vacation_mode off when ready",
+    "Monitor: waiver-lapse 24h scoreboard (creative #1) — check 03:00Z Oct 25",
+    "Monitor: [60,95) 7d band — escalate if negative at n>=20",
+    "Reclaim playbook: if BTC 1m holds above EMA300 ~81012 for 15-30m WITH volume, longs open — prefer trail-family (continuum-trend+, bb-squeeze+) for first entries"
   ]
 }

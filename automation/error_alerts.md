@@ -1754,3 +1754,9 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: ME TOK in hotset failure cooldown — TOK in cooldown (3539s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] ME TOK BLOCKED — TOK in cooldown (3478s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: ME TOK in hotset failure cooldown — TOK in cooldown (3478s left, N failures)`
+
+## Error Alerts — 2026-10-24 02:45 UTC
+- **WARN** (recurring, 30x/hr): `hermes-watchdog: signals: WARNING — only 0-4 signals in last 5 min (min 20)` — actual rate ≈17 signals/hour. Not a crash; signal generation rate below watchdog threshold.
+- **WARN** (recurring, 28x/hr): `hermes-watchdog: locks: WARNING — Cleaned 5-7 stale locks` (pipeline_heartbeat, guardian_closing, hotset_json, signal_compactor_critical, …) — watchdog self-heals each run, no pipeline errors, but stale-lock churn every cycle is noisy; owners may not be removing locks on exit.
+- **WARN**: disk 85.0% used (95G/118G, 17G free) — no logs >7d to gzip, journal vacuum previously freed 0B. Same hogs as 2026-10-23 (outside health-monitor scope): /var/log/syslog* 1.2G, /root/zscore 2.2G, /root/hermes-agent 2.0G, /root/snap 1.7G.
+- **AUTO-FIX**: none required — pipeline timer firing on schedule (last run 02:42, all rc=0, 0 tracebacks/30min), price-collector/1m-candle timers active, prices fresh (72s), no DB locks held, 0 open positions, no phantom trades in 24h. vacation_pause.json absent.

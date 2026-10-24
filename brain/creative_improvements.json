@@ -7698,5 +7698,23 @@
     "category": "verification",
     "status": "verified-pass",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-24T03:45:00Z",
+    "idea": "Waiver-lapse 24h scoreboard (zero code, pre-registered)",
+    "rationale": "15 volume-buildup- SHORT signals fired post-00:00Z, 0 executed, RSI span 0-52 mostly <45 — the exact class the lapsed waiver admitted. If this holds 24h with 0 executions of the RSI<45 class, the lapse is validated as a permanent gate; CEO re-waiver only with fresh counterfactual data.",
+    "expected_impact": "validates/removes the re-waiver decision with live data instead of assumption",
+    "category": "verification",
+    "status": "pre-registered",
+    "risk": "zero (no code)"
+  },
+  {
+    "date": "2026-10-24T03:45:00Z",
+    "idea": "Reclaim-readiness ladder (playbook, zero code)",
+    "rationale": "All 24h winners were SHORTs (vb-/warrior/pc-). If the EMA300 pin resolves UP, short-edge inventory goes quiet and long-bleed inventory reactivates. First longs after a sustained reclaim should prefer trail-family signals (continuum-trend+, bb-squeeze+) over chop-family bare bounces — the mandate is stay in trends, out of chop.",
+    "expected_impact": "reduces first-post-reclaim chop-entry bleed (known 0% WR unarmed cohort)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "zero (no code, playbook only)"
   }
 ]

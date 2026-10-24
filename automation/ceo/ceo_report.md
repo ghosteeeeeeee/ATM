@@ -391,3 +391,9 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 24h 22T -0.15 50.0% | 7d 122T -1.72 39.3%
 ### Findings: 24h WR recovered to 50% (was 42.1% at 19:26 run), PnL still slightly negative. Rotating Q (regime-specialists, 7d by volatility_regime): NORMAL 56T 41.1% -0.81 | EXTREME 42T 31.0% -0.73 | HIGH 10T 50% -0.13 | FLAT 14T 50% -0.05 — NO winning regime cell; EXTREME bleed already owned by pre-registered SHORT×EXTREME dampen, no new lever. Error alerts: upgrade-implementer timeout auto-fixed (900→1800s), IO-token hotset failure cooldown entries, disk 85% (18G free).
 ### Recommendation: disk trending to 90% — schedule scoped cleanup (/var/log/syslog 1.2G, /root/zscore 2.2G) in weekly deep run; everything else clean.
+
+## CEO Status — 20261024T032650Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 21T -0.05 47.6% | 7d 120T -1.17 40.0%
+### Findings: Rotating Q (regime memory): scripts/signal_regime_memory.json stale — updated_at 2026-10-11, 13d > 7d bar (data/signal_regime_memory.json). Watchdog WARNs: signal rate ~17/h (<20/5min threshold) and stale-lock churn 28x/hr; disk 85%. Error alerts otherwise clean, 0 tracebacks.
+### Recommendation: Refresh signal_regime_memory.json from DB this week (stale 13d); no action on health/numbers — flat book is correct-by-traffic.
