@@ -1964,6 +1964,18 @@ SIGNAL_EXIT_CONFIG = {
     'volume-buildup+': 'ride_it',
     'volume-buildup-': 'ride_it',
     'volume_buildup': 'ride_it',   # underscore variant
+    # Volatility Momentum (shadow-mined EXTREME continuation, 2026-10-24):
+    # SHORT best exit pump_exit (83.1% WR +$0.691 HIGH / 64.7% +$0.538 EXTREME per shadow data);
+    # LONG default pm_trail (100% WR +$0.424 EXTREME). EXPLICIT direction keys mandatory so
+    # versioned/direction forms never fall through unmatched (pump-chain v5/v6 lesson).
+    'vol-momentum+': 'pm_trail',
+    'vol-momentum-': 'pump_exit',
+    'vol_momentum_long': 'pm_trail',    # underscore/signal_type variant
+    'vol_momentum_short': 'pump_exit',  # underscore/signal_type variant
+    # Volume Breakout Continuation LONG (shadow-mined 2026-10-24) — pm_trail
+    # (100% WR +$0.424 EXTREME LONG per shadow data). Explicit keys per v5/v6 lesson.
+    'volbreak-cont+': 'pm_trail',
+    'volbreak_cont_long': 'pm_trail',   # underscore/signal_type variant
     # Default: PM trail (current behavior for all signals not listed)
 }
 
@@ -3720,6 +3732,57 @@ VOLUME_BREAKOUT_RSI_PERIOD = 14        # RSI period
 VOLUME_BREAKOUT_COOLDOWN_MINUTES = 60  # cooldown per token
 VOLUME_BREAKOUT_LONG_HIGH_BLOCK_ENABLED = True  # HIGH regime block CEO 2026-10-10 — 30d HIGH 10T 30%WR -$0.79 | EXTREME 19T 68.4% +$3.56 | NORMAL 9T 66.7% +$0.31. Regime specialist: keep EXTREME+NORMAL, block HIGH.
 VOLUME_BREAKOUT_LONG_RSI1M_FLOOR = 35  # brain_auditor 2026-10-10 — 1m freefall guard. 5m RSI gate (rsi_val>50) can lag a 1m dump: YGG 2026-10-10 LONG at 5m RSI>50 while 1m RSI 22.2, bb_pos 1.10, HML -$0.14. All-time vol-breakout meta_rsi<40 = 1T 0W; 30d winners below 40 = 0. Blocks knife catches only; mid-band/oversold winners (rsi_1m>=35) untouched.
+
+# ── Volatility Momentum Signal (NEW 2026-10-24, shadow-data mining) ───────────
+# vol_momentum.py — EXTREME-vol trend-continuation signal, both directions.
+# Thesis (brain/shadow_trades.db, 17,321 shadow signals, brief 2026-10-24):
+# in EXTREME volatility, oversold+falling BELOW EMA300 = SHORT continuation
+# (not reversal); overbought+rising ABOVE EMA300 = LONG continuation (not
+# exhaustion). Mean-reversion at the extremes is the losing pattern to avoid.
+# Family: Momentum. Habitat: EXTREME ONLY (ATR% > VOLMOM_ATR_PCT_MIN).
+VOLMOM_ENABLED = False            # master toggle — SHADOW MODE (enable after validation, CEO approval)
+VOLMOM_PLUS_ENABLED = False       # LONG — overbought (RSI>70) momentum continuation
+VOLMOM_MINUS_ENABLED = False      # SHORT — oversold (RSI<35) momentum continuation
+VOLMOM_ATR_PCT_MIN = 1.5          # ATR% floor = EXTREME regime (matches volatility_gate_v2.classify_volatility boundary)
+VOLMOM_SHORT_RSI_MAX = 35         # SHORT: 5m RSI(14) must be BELOW this (oversold continuation)
+# ⚠️ COLLISION (2026-10-24 signal_analyst): VOLMOM_MINUS with RSI<35 SHORT is hard-dead
+# at execution time — OVERSOLD_SHORT_RSI_MAX=35 knife guard (BANANA lesson) rejects on EVERY
+# path (brain.py, decider_run.py, ai_trader_precheck.py), and SHORT_RSI_HARD_FLOOR=45 blocks
+# RSI<45 SHORTs. Shadow-data thesis (oversold SHORT continuation in storms) directly conflicts
+# with the BANANA guardrail. Do NOT enable VOLMOM_MINUS_ENABLED without an explicit CEO ruling
+# on the guardrail. VOLMOM_PLUS (LONG) has no such collision (RSI 70-75 LONG band is kept open).
+VOLMOM_LONG_RSI_MIN = 70          # LONG: 5m RSI(14) must be ABOVE this (overbought continuation)
+VOLMOM_EMA_PERIOD = 300           # EMA period for trend confirmation (5m closes)
+VOLMOM_EMA_MIN_CANDLES = 350      # EMA warmup + buffer (closed 5m candles)
+VOLMOM_VOL_MULT = 1.2             # volume confirmation: last 5m bar >= 1.2x 20-bar avg (price without volume is noise)
+VOLMOM_VOL_AVG_PERIOD = 20        # bars for average volume
+VOLMOM_COOLDOWN_MINUTES = 60      # per token+direction cooldown
+VOLMOM_MAX_PRICE_AGE_MIN = 10     # skip token when latest price older than this
+VOLMOM_CONF_BASE = 65             # base confidence
+VOLMOM_CONF_FLOOR = 55            # min confidence (above add_signal's 50 floor)
+VOLMOM_CONF_CAP = 88              # max confidence
+VOLMOM_CONF_EXTREME_BONUS = 5     # +5 when ATR% >= 2x the EXTREME floor (deep storm)
+VOLMOM_CONF_RSI_BONUS = 5         # +5 when RSI is 5+ pts beyond the extreme band edge
+
+# ── Volume Breakout Continuation Signal (NEW 2026-10-24, shadow-data mining) ──
+# volbreak_cont.py — LONG-only. volume_breakout_short was the best shadow-data
+# performer (14T 100% WR +1.70 avg EXTREME; 20T 100% WR +1.63 HIGH); this is the
+# LONG mirror: volume spike + 3-bar breakout in EXTREME vol, uptrend-confirmed.
+# Family: Volume. Habitat: EXTREME ONLY (ATR% > VOLBREAK_CONT_ATR_PCT_MIN).
+VOLBREAK_CONT_ENABLED = False       # master toggle — SHADOW MODE (enable after validation, CEO approval)
+VOLBREAK_CONT_PLUS_ENABLED = False  # LONG direction (SHORT side is legacy volume_breakout_short, killed 2026-10-15)
+VOLBREAK_CONT_VOL_MULT = 2.0        # volume >= 2x 20-bar average (matches VOLUME_BREAKOUT_SPIKE_MULT)
+VOLBREAK_CONT_VOL_AVG_PERIOD = 20   # bars for average volume
+VOLBREAK_CONT_ATR_PCT_MIN = 1.5     # ATR% floor = EXTREME regime (matches volatility_gate_v2.classify_volatility boundary)
+VOLBREAK_CONT_BREAKOUT_BARS = 3     # close must exceed the HIGH of the previous N bars
+VOLBREAK_CONT_EMA_PERIOD = 300      # EMA period for trend confirmation (5m closes)
+VOLBREAK_CONT_EMA_MIN_CANDLES = 350 # EMA warmup + buffer (closed 5m candles)
+VOLBREAK_CONT_COOLDOWN_MINUTES = 60 # per token cooldown
+VOLBREAK_CONT_MAX_PRICE_AGE_MIN = 10 # skip token when latest price older than this
+VOLBREAK_CONT_CONF_BASE = 65        # base confidence
+VOLBREAK_CONT_CONF_FLOOR = 55       # min confidence (above add_signal's 50 floor)
+VOLBREAK_CONT_CONF_CAP = 88         # max confidence
+VOLBREAK_CONT_CONF_VOL_BONUS = 5    # +5 when vol ratio >= 2x the spike threshold
 
 # ── Range Reversion Signal ─────────────────────────────────────────────────────
 # range_reversion.py — Mean-reversion for flat/ranging markets (NEUTRAL regime)
