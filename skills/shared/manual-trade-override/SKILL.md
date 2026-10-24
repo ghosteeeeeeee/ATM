@@ -271,6 +271,16 @@ with the engine on a temp state path — never the live state file.
     opposing level can't pay real R:R ≥ 1.0 after buffers, the trade is
     too close to the level to arm — don't reach for a deeper TP to fix
     the math, skip or re-shelve further away.
+11. **Count the impulse BEFORE arming a continuation.** If the move that
+    motivated the trigger has ALREADY traveled ≥ 1x 1h ATR, the
+    "continuation" entry is the mid-flush knife (§11-5) — the market has
+    spent the leg and your TP needs a second move that rarely comes.
+    #16377 (−3.42%): the coil breakdown traveled 605pts (81,118→80,513)
+    before the 80,840 trigger fired; the TP needed 679 more; MFE was
+    27pts and the 81,200 retest of the broken floor — the textbook
+    structure — was the stopper. When late: wait for the RETEST of the
+    broken level with a reclaim/fail confirmation, never arm the flush
+    itself.
 
 **Tranche adds to an existing position:** brain.py's duplicate guard blocks
 a second same-coin open — for a CEO-directed add pass `--force`
