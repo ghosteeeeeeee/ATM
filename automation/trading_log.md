@@ -14923,3 +14923,25 @@ Final set: ['BTC', 'ME', 'PUMP']
 **Open Questions:**
 - 24h improved to +$0.39 (best of the day) but 7d still -$1.16
 - Signal flow low + hotset 0-token fallback (chronic)
+
+## 2026-10-24 15:30 UTC Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** $0.23 (WR: 66.7%) | 24h: 11T 9W 81.8% `+$0.87` (GREEN) | 7d: 124T 51W 41.1% `-$0.93` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 3 trades closed: MET volume-buildup- SHORT +$0.25 (+6.74%), BTC ai-trader-pending SHORT +$0.04 (+1.74%), CHIP volume-buildup- SHORT -$0.06 (-1.63%)
+- 0 open trades
+- atr_sl_hit 0/11 = 0% (<40%) — dominant close = profit-monster-trail (7T +$0.56)
+- No 0%WR signal with 3+ trades last hour; only n>=3 24h signal = volume-buildup- 6T 5W 83.3% +$0.55 (healthy)
+- No negative-hour streak (only traded hour 15:00 +$0.23; empty hours reset)
+- Frequency 3/hr — not overtrading (<20)
+- Entry quality: BTC winner MAE 0.036% (<0.5%); MET/CHIP MAE not recorded (data gap, noted)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h best of day at +$0.87 (81.8% WR) but 7d still -$0.93
+- mae_pct/mfe_pct NULL on volume-buildup- trades (data gap)
+- Signal flow low + hotset 0-token fallback (chronic)
