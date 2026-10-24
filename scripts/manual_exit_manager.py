@@ -41,8 +41,20 @@ import json
 import os
 import time
 
-# The tier function IS the profit-monster's — single source, never diverges.
-from profit_monster import _trail_distance_for_peak  # runtime percent tiers
+# CEO-trade tiers (2026-10-24): roomier than profit-monster's on purpose —
+# "the SL trail has to survive slightly bigger pullbacks" (CEO). Decoupled
+# so pipeline PM trades are untouched. Percent-space, same last-match loop.
+from hermes_constants import MANUAL_TRAIL_TIERS
+_MANUAL_TIERS_PCT = [(min_p * 100, dist * 100) for min_p, dist in MANUAL_TRAIL_TIERS]
+
+
+def _manual_dist_pct(peak_pct: float) -> float:
+    """Trail giveback distance (percent) for the current peak profit."""
+    dist = _MANUAL_TIERS_PCT[0][1]
+    for min_p, d in _MANUAL_TIERS_PCT:
+        if peak_pct >= min_p:
+            dist = d
+    return dist
 
 _STATE_FILE = os.path.join(
     os.environ.get('HERMES_DATA_OVERRIDE',
@@ -71,10 +83,19 @@ def _load_state() -> dict:
 
 def _save_state(state: dict) -> None:
     try:
-        # prune stale entries (closed trades) opportunistically
+        # Prune stale entries (closed trades). Malformed siblings must never
+        # poison the whole file (bug_hunter F-2: one bad entry raised forever,
+        # persistence died silently, which opened the door to stop relaxation).
         now = time.time()
-        state = {k: v for k, v in state.items()
-                 if now - float(v.get('ts') or 0) < _STATE_MAX_AGE_S}
+
+        def _alive(v):
+            try:
+                return (isinstance(v, dict)
+                        and now - float(v.get('ts') or 0) < _STATE_MAX_AGE_S)
+            except Exception:
+                return False                    # drop the junk, keep going
+
+        state = {k: v for k, v in state.items() if _alive(v)}
         tmp = _STATE_FILE + '.tmp'
         with open(tmp, 'w') as f:
             json.dump(state, f)
@@ -118,14 +139,17 @@ def decide_sl(direction: str, current_price: float, entry_price: float,
             return None                    # ratchet: never worsen the stop
         return new_sl, profit_frac, 'BE-LOCK', peak_frac
 
-    # ── Tiered peak trail (profit-monster semantics) ──
+    # ── Tiered peak trail (CEO roomier tiers — same floor semantics as
+    # profit-monster, +0.30 giveback cushion per level so slightly bigger
+    # pullbacks don't clip the trade) ──
     peak_frac = max(peak_frac or 0.0, profit_frac)   # peak tracks the best
-    dist_frac = _trail_distance_for_peak(peak_frac * 100) / 100.0
+    dist_frac = _manual_dist_pct(peak_frac * 100) / 100.0
     floor_frac = max(0.0, peak_frac - dist_frac)
-    # exit at the floor-profit PRICE: LONG locks entry*(1+floor),
-    # SHORT locks entry*(1−floor) — verified against #16377's actual
-    # manual_trail_hit fill (79,721 entry, floor 0.3506% → 79,442.0 vs
-    # real exit 79,441.50).
+    # Exit at the floor-profit PRICE: SHORT locks entry*(1−floor),
+    # LONG locks entry*(1+floor) — calibrated against #16381's real
+    # trail fill (short 79,721: code floor → 79,402.12 vs actual
+    # 79,402.989 stop-at-close; trajectory replay 79,442.67 vs actual
+    # exit 79,444.00 — bug_hunter 2026-10-24 check B).
     new_sl = (round(entry_price * (1 - floor_frac), 8) if direction == 'SHORT'
               else round(entry_price * (1 + floor_frac), 8))
     return (new_sl, profit_frac,
@@ -162,6 +186,23 @@ def update_trail(pos: dict, direction: str, current_price: float,
         _save_state(state)                # persist peak progress (prune too)
         return False                      # SL untouched
     new_sl, profit_frac, phase, new_peak = decided
+    merged_peak = new_peak if new_peak is not None else peak_frac
+
+    def _state_entry(last_sl_val):
+        """Never persist a null peak (bug_hunter F-5); keep any known peak."""
+        e = {'ts': time.time()}
+        if merged_peak is not None:
+            e['peak_frac'] = merged_peak
+        if last_sl_val is not None:
+            e['last_sl'] = last_sl_val
+        return e
+
+    # No-op guard (bug_hunter F-4): a floor that lands exactly on the live SL
+    # must not run the UPDATE — no rowcount theater, no "$X → $X" log spam.
+    if abs(new_sl - old_sl) < 1e-12:
+        state[str(trade_id)] = _state_entry(st.get('last_sl'))
+        _save_state(state)
+        return False
 
     # CEO-tightened stop protection: if the live SL is NOT what we last wrote,
     # only improve on it (never relax a hand-set stop at a tier boundary).
@@ -169,7 +210,7 @@ def update_trail(pos: dict, direction: str, current_price: float,
     if last_sl is not None and abs(float(last_sl) - old_sl) > 1e-8:
         better = (new_sl > old_sl) if direction == 'LONG' else (new_sl < old_sl)
         if not better:
-            st.update({'peak_frac': new_peak or peak_frac, 'ts': time.time()})
+            st.update(_state_entry(st.get('last_sl')))
             state[str(trade_id)] = st
             _save_state(state)
             log(f"  [MANUAL-TRAIL] {pos.get('token')} {direction}: CEO stop "
@@ -197,8 +238,7 @@ def update_trail(pos: dict, direction: str, current_price: float,
                 f"SL changed since read (CEO edit?) or trade closed", "WARN")
             return False
         pos['stop_loss'] = new_sl           # keep in-memory copy consistent
-        state[str(trade_id)] = {'peak_frac': new_peak or peak_frac,
-                                'last_sl': new_sl, 'ts': time.time()}
+        state[str(trade_id)] = _state_entry(new_sl)
         _save_state(state)
         log(f"  [MANUAL-TRAIL] {pos.get('token')} {direction}: "
             f"${old_sl:.6g} → ${new_sl:.6g} ({phase}, profit {profit_frac*100:.2f}%)")

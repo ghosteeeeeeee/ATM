@@ -1,23 +1,6 @@
 [
   {
     "level": "WARNING",
-    "message": "SIZE REDUCED (not paused): 7d WR 34.9% < 35.0% AND pnl_7d $-3.40 < $-2.00 (129T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
-    "data": {
-      "pnl_24h": -0.4,
-      "n_24h": 17,
-      "wr_24h": 41.2,
-      "pnl_48h": -0.82,
-      "n_48h": 28,
-      "wr_48h": 32.1,
-      "pnl_7d": -3.4,
-      "n_7d": 129,
-      "wr_7d": 34.9,
-      "checked_at": "2026-10-23T14:57:49.228602+00:00"
-    },
-    "ts": "2026-10-23T14:57:49.230133+00:00"
-  },
-  {
-    "level": "WARNING",
     "message": "SIZE REDUCED (not paused): 7d WR 34.9% < 35.0% AND pnl_7d $-3.15 < $-2.00 (129T) \u2192 SIZE REDUCE (not pause \u2014 WR can't recover without trades)",
     "data": {
       "pnl_24h": -0.36,
@@ -848,5 +831,22 @@
       "checked_at": "2026-10-24T15:28:02.447020+00:00"
     },
     "ts": "2026-10-24T15:28:02.447377+00:00"
+  },
+  {
+    "level": "INFO",
+    "message": "Guardrails OK",
+    "data": {
+      "pnl_24h": 0.87,
+      "n_24h": 11,
+      "wr_24h": 81.8,
+      "pnl_48h": 0.51,
+      "n_48h": 30,
+      "wr_48h": 56.7,
+      "pnl_7d": -0.93,
+      "n_7d": 124,
+      "wr_7d": 41.1,
+      "checked_at": "2026-10-24T15:58:02.645636+00:00"
+    },
+    "ts": "2026-10-24T15:58:02.646205+00:00"
   }
 ]

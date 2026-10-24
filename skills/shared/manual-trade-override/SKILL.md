@@ -117,21 +117,26 @@ trades** (CEO directive 2026-10-22). The rules:
    bypass). Auto signal trades
    (ai-trader+/pump-chain etc.) keep all their engines — the exclusion is
    CEO-trade-only.
-2. **Dynamic SL in profit** (CEO-approved 2026-10-23) — two steps, both
-   ratchet-only (the stop never moves backward), TP never moves,
-   CAS-protected (your own concurrent edits always win):
+2. **Dynamic SL in profit** (CEO-approved 2026-10-23/24) — two steps,
+   CAS-protected (your concurrent edits always win), TP never moves:
    - **BREAKEVEN LOCK at +0.10%** (PM_BREAKEVEN_LOCK_PCT): SL → entry.
      Turns chop-wiggles into scratches — #16353 −1.53% / #16358 −1.03%
      max-hold exits would both have been 0.00%. 3-trade backtest: net
      +4.65% vs +2.09% without it.
-   - **CLOSE TRAIL from +0.40%** (PM_TRAIL_ACTIVATE_PCT): trails **0.20%
-     behind price** (PM_TRAIL_DISTANCE_PCT). Deliberately NOT tighter:
-     a 0.15/0.10 trail amputates the runner (+4.65% → +1.80% on #16351)
-     and the runner pays for the chop. (The 2026-09-06 DO-NOT-CHANGE
-     note on these two constants stands — this change ADDS the BE step
-     below them, doesn't retune them.)
+   - **TIERED PEAK TRAIL from +0.40%** (PM_TRAIL_ACTIVATE_PCT): the profit
+     floor = PEAK − giveback tier (**MANUAL_TRAIL_TIERS**, roomier than
+     profit-monster's on purpose — CEO directive 2026-10-24: "survive
+     slightly bigger pullbacks", sized ~1.1x 1h ATR so a #16381-class
+     bounce off the peak doesn't clip the trade):
+     peak <1.5% → **0.50%** giveback · ≥1.5% → 0.70% · ≥3.0% → 1.00% ·
+     ≥5.0% → 1.40%. Floor never below breakeven; the TP stays the
+     giant-candle backstop. Tier boundaries intentionally LOOSEN the
+     floor on our own stops (PM semantics); a stop you tightened by hand
+     is only ever improved, never relaxed.
 3. **Safety nets remain**: guardian hard caps, max-hold, staleness checks
-   still apply — safety, not exit management.
+   still apply — safety, not exit management. Guardian hard-stop closes
+   relabel to `manual_*` too (bug_hunter F-1 fix 2026-10-24 — the label
+   race that recorded 2 CEO trades as `hard_tp`).
 4. **Exit labels are the ownership receipt:**
    - `manual_sl_hit` — your predefined stop did its job
    - `manual_tp_hit` — your predefined target hit

@@ -2,15 +2,17 @@
 """Regression suite for manual_exit_manager — the CEO-trade exit brain.
 
 Covers: phase boundaries (0.10% BE-lock / 0.40% trail), TIERED peak trail
-(profit-monster tiers: 0.20/0.50/0.80/1.20% giveback at 0/1.5/3.0/5.0%
-peaks), tier-boundary relaxation (own stops only), CEO-stop improve-only
-guard, NaN/Inf guards, direction validation.
+(MANUAL_TRAIL_TIERS: 0.50/0.70/1.00/1.40% giveback at 0/1.5/3.0/5.0% peaks —
+CEO 2026-10-24 "survive slightly bigger pullbacks" directive), tier-boundary
+relaxation (own stops only), CEO-stop improve-only guard, NaN/Inf guards,
+state-file poison resilience (bug_hunter F-2), direction validation.
 
 Run: python3 analysis/test_manual_exit_manager.py   (exit 0 = all pass)
 Real-trade calibration: #16351 (winner, TP beats trail), #16353/#16358
-(BE-lock scratches), #16377 (tiered trail booked +1.75% — SL must
-reproduce the actual 79,441.50 fill).
+(BE-lock scratches), #16381 (cascade +1.74% — 0.50% base tier must survive
+the 0.46% bounce off its peak, bug_hunter-verified actuals).
 """
+import json
 import os
 import sys
 import tempfile
@@ -52,28 +54,44 @@ check('NaN current_price guarded (F-2)', decide('LONG', float('nan'), 81872, 813
 check('Inf current_price guarded (F-2)', decide('LONG', float('inf'), 81872, 81380), expect_none=True)
 
 # ── Tiered trail: floor = entry ∓ (peak − tier_dist) ──────────────────────
-# #16377 replay: short 79721, peak 0.5506% (price 79283), dist 0.20% (tier 1)
-sl_16377 = 79721 * (1 - (0.005506 - 0.002))
-check('#16377 short trail reproduces actual 79441.50 fill',
-      decide('SHORT', 79283, 79721, 79721, peak_frac=0.005506), sl_16377, 'TRAIL')
-check('long tier-1 floor (peak 0.50% → +0.30%)', decide('LONG', 100.5, 100, 100), 100.30, 'TRAIL')
-check('long tier-2 floor (peak 2.00% → +1.50%)', decide('LONG', 102.0, 100, 101.3, peak_frac=0.02), 101.50, 'TRAIL')
-check('long tier-3 floor (peak 3.50% → +2.70%)', decide('LONG', 103.5, 100, 102.0, peak_frac=0.035), 102.70, 'TRAIL')
-check('long tier-4 floor (peak 6.00% → +4.80%)', decide('LONG', 106.0, 100, 104.0, peak_frac=0.06), 104.80, 'TRAIL')
-check('short tier-2 floor (peak 2.00% → 98.50)', decide('SHORT', 98.0, 100, 99.0, peak_frac=0.02), 98.50, 'TRAIL')
-# tier-boundary relaxation (PM semantics): peak 1.51% → dist 0.50 → floor 1.01
-# (a peak of 1.49 gave floor 1.29 — the boundary intentionally gives room back)
-check('tier boundary relaxes own stop (peak 1.51 → floor 1.01)',
-      decide('LONG', 101.51, 100, 101.29, peak_frac=0.0151), 101.01, 'TRAIL')
-check('peak holds at stored value on giveback (peak 4.0, now 3.6 → floor 3.2)',
-      decide('LONG', 103.6, 100, 103.0, peak_frac=0.04), 103.20, 'TRAIL')
+# #16381 replay (bug_hunter actuals): short 79721, peak 0.60% (price 79244.5).
+# New 0.50% base → floor 0.10% → SL 79641.3 — SURVIVES the 0.46% bounce
+# (high 79583 < SL 79641.3) that killed the old 0.20% base at 79444.
+r = decide('SHORT', 79244.5, 79721, 79721, peak_frac=0.006)
+check('#16381 replay: floor +0.10% → SL 79641.3', r, 79721 * (1 - 0.001), 'TRAIL')
+assert r is not None and r[0] > 79583, 'must survive the 79583 bounce'
+check('long tier-1 floor (peak 0.90% → +0.40%)', decide('LONG', 100.9, 100, 100), 100.40, 'TRAIL')
+check('long tier-2 floor (peak 2.00% → +1.30%)', decide('LONG', 102.0, 100, 101.0, peak_frac=0.02), 101.30, 'TRAIL')
+check('long tier-3 floor (peak 3.50% → +2.50%)', decide('LONG', 103.5, 100, 102.0, peak_frac=0.035), 102.50, 'TRAIL')
+check('long tier-4 floor (peak 6.00% → +4.60%)', decide('LONG', 106.0, 100, 104.0, peak_frac=0.06), 104.60, 'TRAIL')
+check('short tier-2 floor (peak 2.00% → 98.70)', decide('SHORT', 98.0, 100, 99.0, peak_frac=0.02), 98.70, 'TRAIL')
+check('zero-floor edge (peak 0.50 → floor 0 = BE)', decide('LONG', 100.5, 100, 100.0), 100.0, 'TRAIL')
+# tier-boundary relaxation (PM semantics): 1.49 → floor 0.99; 1.51 → floor 0.81
+check('tier boundary relaxes own stop (peak 1.49 → floor 0.99)',
+      decide('LONG', 101.49, 100, 100.99, peak_frac=0.0149), 100.99, 'TRAIL')
+check('tier boundary relaxes own stop (peak 1.51 → floor 0.81)',
+      decide('LONG', 101.51, 100, 100.99, peak_frac=0.0151), 100.81, 'TRAIL')
+check('peak holds at stored value on giveback (peak 4.0, now 3.6 → floor 3.0)',
+      decide('LONG', 103.6, 100, 103.0, peak_frac=0.04), 103.00, 'TRAIL')
 
 # ── #16351 winner: TP beats trail ────────────────────────────────────────
-# short 82532, peak 0.888% → floor 0.688% → trail SL 81963.7 — TP 81800
-# fills FIRST (lower price for a short), so manual_tp_hit stays the exit.
+# short 82532, peak 0.888% → dist 0.50 → floor 0.388% → SL 82210.7;
+# TP 81800 fills FIRST (lower price for a short) → manual_tp_hit stays.
 r = decide('SHORT', 81900, 82532, 82200, peak_frac=0.00888)
-check('#16351 trail stays above TP (81963.7 > 81800)', r, 82532 * (1 - 0.00688), 'TRAIL')
+check('#16351 trail stays above TP (82210.7 > 81800)', r, 82532 * (1 - 0.00388), 'TRAIL')
 assert r is None or r[0] > 81800, 'trail must not undercut the TP'
+
+# ── State file poison resilience (bug_hunter F-2) ────────────────────────
+import time as _t
+M._save_state({'good': {'peak_frac': 0.01, 'last_sl': 101.0, 'ts': _t.time()},
+               'bad_string': 'garbage',
+               'bad_junk': {'ts': 'not-a-number'},
+               'bad_none': None})
+reloaded = M._load_state()
+ok = list(reloaded.keys()) == ['good']
+print(('✓' if ok else '✗ FAIL'), 'state prune drops malformed siblings, keeps valid →', list(reloaded.keys()))
+PASS += ok
+FAIL += not ok
 
 print(f"\n{PASS} passed, {FAIL} failed")
 sys.exit(1 if FAIL else 0)

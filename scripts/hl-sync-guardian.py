@@ -2067,6 +2067,23 @@ def _check_hard_stops(prices: dict):
                    (direction == 'SHORT' and sl < entry_px):
                     hit_reason = 'trail_sl'
 
+            # FIX (2026-10-24, bug_hunter trail-SL audit F-1): CEO trades
+            # (ai-trader-manual/pending/auto) also close through guardian's
+            # hard-stop check, and the exit contract requires the manual_*
+            # ownership labels regardless of WHICH actor fired the cross.
+            # Money was identical (atr_managed=false → margin 0.0) but the
+            # taxonomy leaked: 2 CEO trades were recorded 'hard_tp'.
+            if hit_reason:
+                try:
+                    import manual_exit_manager as _mxm_guard
+                    if _mxm_guard.is_managed_signal(signal_str):
+                        hit_reason = {'hard_tp': 'manual_tp_hit',
+                                      'trail_sl': 'manual_trail_hit',
+                                      'hard_sl': 'manual_sl_hit'}.get(
+                                          hit_reason, hit_reason)
+                except Exception:
+                    pass                    # label fix must never block a close
+
             if hit_reason:
                 pnl_pct = 0
                 if entry_px > 0 and cur_price > 0:
