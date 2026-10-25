@@ -15270,3 +15270,24 @@ Final set: ['BTC', 'ME', 'PUMP']
 **Open Questions:**
 - 24h GREEN at 75.0% WR (12T); 7d still -$0.74
 - pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 07:28 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 12T 9W 75.0% `+$0.70` (GREEN) | 7d 122T 42.6% `-$0.66` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — nothing to diagnose (entry quality, SL behavior N/A)
+- atr_sl_hit 0/12 = 0% (<40%); dominant close = profit-monster-trail (5T +$0.43)
+- No signal with 3+ trades in 24h (max n=2) — no kill candidates
+- No negative-hour streak: 05:00 -$0.10 single negative, 06:00/07:00 empty (streak broken)
+- Frequency 0/hr — not overtrading
+- 2 open: ACE volume-buildup- SHORT +0.07%, SAGA bb-bounce-v2-long+ LONG -0.28%
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN at 75.0% WR (12T); 7d still -$0.66
+- pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
+- hotset.json 0 tokens since 05:56 (audit #134 SIDeways flag) — still monitor
