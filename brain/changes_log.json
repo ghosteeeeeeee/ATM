@@ -2709,5 +2709,27 @@
     "after": "hazard documented at the gate site with reproduction command",
     "rationale": "next implementer of CONF_FLOOR reads this site first",
     "impact": "zero behavior; py_compile PASS"
+  },
+  {
+    "timestamp": "2026-10-25T20:55:00Z",
+    "agent": "brain_auditor",
+    "change": "session_brain.query() retrieval dedup on chunk text + search headroom top_k*2 -> top_k*4 + new --selfcheck CLI gate (fixes 8-run duplicate-record drift; root = 294,753/404,091 = 73% duplicate chunk text under different session_ids)",
+    "type": "infra",
+    "file": "scripts/session_brain.py",
+    "before": "query() returned 2 unique texts of 6 for probe 'loss money bleeding losing'",
+    "after": "3 probes x top_k=6 -> 6/6 unique each; --selfcheck PASS",
+    "rationale": "near-identical duplicate-session vectors land adjacent in the vector index; dedup belongs at the single retrieval path all callers route through, not in ingest (which already does per-session delete+reinsert)",
+    "impact": "mandate Step 2 (session brain) returns distinct sessions again; zero change to ingest, stats, or any trading path"
+  },
+  {
+    "timestamp": "2026-10-25T21:05:00Z",
+    "agent": "brain_auditor",
+    "change": "bug_hunter fixes on the session_brain dedup: (HIGH) dedup key full text -> row[1][:500] so it is byte-identical to the returned value; (MED) headroom comment corrected to document the 423-copy ceiling and unique>filled intent; (LOW) selfcheck probes 3 -> 5; (LOW sideways) duplicate db_size_mb key deleted from stats()",
+    "type": "tweak",
+    "file": "scripts/session_brain.py",
+    "before": "dedup keyed on full text; comment claimed top_k*4 fills top_k; 3 probes; duplicate db_size_mb key",
+    "after": "dedup keyed on the returned 500-char prefix; ceiling documented; 5 probes; single db_size_mb key",
+    "rationale": "bug_hunter round 1 FIX-REQUIRED: 2,690 prefix groups hold >1 distinct full text, so 3/15 diverse probes still returned duplicate strings — exactly the reported symptom",
+    "impact": "round 2 SHIP 0 HIGH/0 MED; 5/5 probes 6/6 unique; independent off-list probes clean"
   }
 ]

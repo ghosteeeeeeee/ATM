@@ -1,224 +1,282 @@
 {
-  "timestamp": "2026-10-25T19:52:00Z",
-  "run": 146,
+  "timestamp": "2026-10-25T21:05:00Z",
+  "run": 147,
   "agent": "brain_auditor",
-  "headline": "0 trading-constant changes (nothing passed bars), 3 zero-behavior ships. HEADLINE: confidence-field SEMANTICS trap found before it became a live no-op — `trades.confidence` (post-penalty) and the value `MIN_EXEC_CONFIDENCE` compares at decider_run.py:3796 (gate-time) are different numbers: 14d LEAK 58/58 stored<40 were >=40 at the gate, avg divergence +18.18; 30d gate-time conf<30 = 0/649 while stored conf<30 = 56 -> implementing the pending CONF_FLOOR at the natural site would block 0 of the 56 trades every fk number was computed on. Also: gate-time confidence SCALE halved (p50 95.0 -> 51.8, <50 share 12.5% -> 49.4%) across cell_stats _cell_mult (Oct 14) + CONF-CALIB clamp (Oct 15), which invalidates any pre-Oct-14 confidence-keyed calibration.",
+  "session_lock": "absent (report+modify allowed)",
+  "headline": "1 code ship (session-brain retrieval dedup — 8-run duplicate-record drift root-caused and fixed; bug_hunter round 1 FIX-REQUIRED 1 HIGH -> fixed -> round 2 SHIP 0 HIGH/0 MED), 0 config changes, 6 candidates REJECTED/COLLECT-WITH-DATA.",
   "session_brain_stats": {
-    "method": "SessionBrain.query, 4 queries x top_k 6",
-    "notable": [
-      "pump-chain confidence-filter topic is a recurring session thread (6 near-duplicate records) — same duplicate-record defect flagged for the 7th run",
-      "entry-timing/exhaustion discussed repeatedly for bounce/pullback families (mtf-trend / chop-v2 / trend-following) — no new implementable lever beyond what TAT-C/MFE-CUT already cover",
-      "new-signal ideas (trend-following, consolidation, slow-grind) recur but signal-lab is the venue, not an audit cycle"
-    ],
-    "duplicate_records_flag": "7th consecutive run (MED, owned outside this run)"
+    "status": "REPAIRED this run",
+    "root_cause": "294,753 of 404,091 chunk rows (73%) are duplicate `text` stored under a DIFFERENT session_id (38,167 shared texts across 269 sessions = DSH session forks/copies). Near-identical vectors land adjacent, so query() returned the same record under 6 titles.",
+    "before": "'loss money bleeding losing' -> 2 unique texts of 6 (5 identical duplicates)",
+    "after": "3 probes x top_k=6 -> 6/6 unique each (python3 scripts/session_brain.py --selfcheck PASS)",
+    "why_not_ingest_fix": "ingest already does per-session delete+reinsert; skipping shared text there would punch holes when the OTHER holder of that text is re-ingested. Dedup belongs at the single retrieval path.",
+    "db_size_mb": 1508,
+    "chunk_rows": 404091,
+    "duplicate_extra_rows": 294753,
+    "selfcheck": "python3 scripts/session_brain.py --selfcheck -> 5 probes x top_k=6 -> 6/6 unique each, PASS (py_compile PASS)",
+    "bug_hunter": "round1 FIX-REQUIRED (HIGH prefix-key mismatch) -> fixed -> round2 SHIP 0 HIGH/0 MED"
   },
-  "trade_summary": {
-    "24h": "18T 11W 61.1% +0.51 GREEN",
-    "48h": "27T 18W 66.7% +1.33",
-    "7d": "127T 56W 44.1% -0.50 (LONG 90T 42.2% -0.92 | SHORT 37T 48.6% +0.42)",
-    "14d": "328T 124W 37.8% -4.08",
-    "30d": "696T 305W 43.8% -2.08",
-    "open_at_end": "1 — BTC #16395 LONG continuum-trend+ @80637, flat (ETH #16400 closed during run)"
+  "trade_summary_24h": {
+    "trades": 16,
+    "wins": 9,
+    "wr": 56.2,
+    "pnl_usdt": 0.27,
+    "losers": "6, ALL LONG (ETH hl_copy atr_sl -0.09 / KAS bb-squeeze TAT -0.04 / PENDLE bb-bounce ugb_pt -0.02 / SAGA bb-bounce TAT -0.05 / ICP r2v2-long3 HML -0.10 / HBAR bb-bounce TAT -0.01)",
+    "windows": {
+      "7d": "127T 56W 44.1% -$0.50",
+      "14d": "327T 123W 37.6% -$4.10",
+      "30d": "696T 305W 43.8% -$2.08"
+    }
   },
   "mandate_chop_vs_trend": {
-    "armed_mfe_ge_040_vs_unarmed": {
-      "7d": "62T 71.0% +3.23 vs 58T 8.6% -4.10",
-      "14d": "155T 69.0% +8.48 vs 164T 6.1% -12.93",
-      "30d": "391T 72.4% +25.40 vs 289T 4.8% -27.93"
+    "armed_mfe_ge_0.40_vs_unarmed": {
+      "7d": "armed 62T 44W 71.0% +$3.23 vs unarmed 65T 12W 18.5% -$3.73",
+      "14d": "armed 154T 106W 68.8% +$8.46 vs unarmed 173T 17W 9.8% -$12.56",
+      "30d": "armed 391T 283W 72.4% +$25.40 vs unarmed 305T 22W 7.2% -$27.48"
     },
-    "trail_tp_vs_chop_stop": {
-      "7d": "TRAIL/TP 60T 52W +4.26 | CHOP/STOP 67T 4W -4.76",
-      "14d": "TRAIL/TP 124T 110W +10.65 | CHOP/STOP 204T 14W -14.73"
+    "exit_cohorts_14d": "profit-monster-trail 79T 72W +$4.44 | atr_trail_hit 25T 20W +$3.56 || hard_max_loss 67T 0W -$6.52 | atr_sl_hit 78T 1W -$5.55 | stale_exit 5T 0W -$0.88",
+    "never_armed_share_of_gross_loss": {
+      "7d": "83.9%",
+      "14d": "85.5%",
+      "30d": "80.7%"
     },
-    "never_armed_share_of_gross_loss": "7d 79.6% | 14d 83.4% (baseline band 70-92, no breach)",
-    "reading": "trend entries carry the entire edge; chop entries carry the entire bleed — unchanged from prior runs. No new lever passed bars."
+    "arm_rate_by_signal_14d_n_ge_15": {
+      "volume-buildup-": "66.7% arm, +$0.66",
+      "pump-chain-": "65.7% arm, -$0.30",
+      "r2v2-long3": "46.7% arm, -$0.12",
+      "ai-trader+": "42.9% arm, -$0.92 (disabled)",
+      "bb-bounce-v2-long+": "41.7% arm, -$1.03 (avg MFE 0.399 = sitting ON the 0.40 arm line)",
+      "pump-chain+": "37.8% arm, -$0.45",
+      "doji-bottom-long": "31.3% arm, -$0.97 (killed Oct 16)",
+      "ai-trader-pending": "18.8% arm, -$0.14 (avg MFE 0.232 — worst arm rate live)"
+    },
+    "atr_sl_hit_mfe_bands_14d": "29/78 DID arm and still lost -$1.65 (round-trip class); 36/78 never reached 0.20 (-$2.72). Arm threshold is not the binding problem for this family.",
+    "hard_max_loss_mfe_bands_14d": "28/67 at MFE<0.05 (-$3.29) — pure no-momentum entries."
   },
-  "losing_trade_autopsy_48h": {
-    "tool": "brain/analysis/recovery_replay.py (adverse-first anchor)",
-    "n": 8,
+  "losing_trade_autopsy_24h": {
+    "method": "brain/analysis/recovery_replay.py adverse-first anchor (open-anchored replay is VACUOUS per #85)",
+    "n": 6,
     "never_adverse": 4,
-    "recovered_after_adverse": 3,
-    "never_traded_back": 1,
-    "never_detail": "BTC #16377 ai-trader-pending SHORT manual_sl_hit -0.08 (CEO trade, immaterial)",
-    "verdict": "WRONG-SIDE REFUTED 70th consecutive run",
-    "valid_references": "#61 opposite-side-signal (losers 15.4% vs winners 6.9%, p=0.116), #84 forward-return census (fwd_4h mean -0.012%, t=-0.04)",
-    "new_patterns": "0"
+    "recovered_after_adverse": 2,
+    "never_traded_back": 0,
+    "verdict": "WRONG-SIDE REFUTED 71st consecutive run. 0 new patterns.",
+    "valid_refs": [
+      "#61 opposite-side-signal p=0.116",
+      "#84 forward-return census t=-0.04"
+    ],
+    "extended_48h": {
+      "n": 8,
+      "never_adverse": 4,
+      "recovered": 3,
+      "never": "1 = BTC #16377 ai-trader-pending manual_sl -$0.08 (CEO domain, immaterial)"
+    }
   },
   "shadow_analysis": {
-    "usable": "2 of 5",
-    "contrarian": "RE-RAN this run: 814 entries / 542 joinable. pump-chain- flip-WR 64.2% n=344 (63.9 -> 64.0 -> 64.1 -> 64.2 monotone) = Oct 27 PROMOTE stands. btc-pump-rider+ 24.9% n=197 = flipping LOSES, excluded. hmacd dead. TOTAL 49.8% = flip is family-specific, not global.",
-    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1, actual_outcome null on all rows, file is JSONL) — pre-live evidence only, none",
-    "wyckoff": "no outcome column — unanswerable until join ships",
-    "floor_admit": "no outcome column in the raw file; analysis/floor_admit_outcome_join.py exists, 30d bar pre-registered to 2026-11-15 COLLECT",
-    "rr_shadow": "ORPHANED (no producer script, mtime 21d) — do not cite",
-    "main_book": "shadow_trader --report: 21,826 signals / 20,995 closed. Gate justification: CONFLUENCE-EXPIRY blocked 10,669 @48% would-win avg -0.12 (gates justified); EXEC-BLOCK 16 @12% -0.44 (best gate); BTC-CRASH 116 @31% -0.36. Exit A/B: pm_trail +3,043 vs hard_max -4,611 vs rr_engine -827.",
-    "overall": "contrarian + main shadow book are the only answerable sources; contrarian is the one carrying a live ship decision (Oct 27)."
+    "contrarian": "814 rows; outcome-join 542 decided. pump-chain- flip-WR 64.2% (n=344) STANDS -> PROMOTE eval stays Oct 27. btc-pump-rider+ flip-WR 24.9% (n=197) = flipping HURTS, original direction right 75.1% (0 live trades/14d, non-factor). Total flip 49.8%. NOTE: data/contrarian_shadow_summary.json reports 54.7% for pump-chain- — different (stale/divergent) computation than analysis/contrarian_outcome_join.py; the join is authoritative.",
+    "floor_admit": "1,901 rows; outcome join SHIPPED (#132) — n=679 PASSes the n>=200 bar, but the 30d same-sign bar is unreachable until 2026-11-15 -> COLLECT. 91% admit rate still unaudited for outcome quality until then.",
+    "wyckoff": "313 rows, no outcome column -> still PENDING JOIN (pre-registered).",
+    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1; actual_outcome null on 24,598/24,598; JSONL not JSON array). Pre-live evidence only.",
+    "rr_shadow": "ORPHANED (no producer script, mtime 21d) — do not cite.",
+    "gate_shadow": "brain/gate_shadow.db LIVE 7.3MB @20:00. data/gate_shadow.db is a 0-byte stale artifact of the pre-2026-10-04 path — INFO: prompt examples pointing at data/*.db should cite brain/gate_shadow.db.",
+    "shadow_trader_report": "21,956 signals / 21,182 closed. Gate justification: CONFLUENCE-EXPIRY blocked 10,718 at would_win 48% avg_pnl -0.12, BTC-CRASH 116 at 31%/-0.36, EXEC-BLOCK 16 at 12%/-0.44 -> blocked cohorts are losers = gates justified. Exit A/B: hard_max n=4,901 WR 0.0% avg -0.95 | rr_engine 2,201 17.1% -0.39 | trail_arm_timeout 555 51.5% -0.14 vs pm_trail 8,129 +0.38.",
+    "overall": "contrarian join + floor-admit join + gate_shadow are the useful collectors. oscillator frozen, wyckoff/rr pending/orphaned = noise."
   },
   "drift_findings": [
     {
-      "severity": "HIGH",
-      "finding": "MIN_EXEC_CONFIDENCE is not the final cutoff. decider_run.run() checks confidence < 40 at :3796, then reduces it three times before execute_trade(): :4308 WRONG_SIDE_PENALTY (-10), :4811 CTX-GATE WARN (-20 typical, 760 log lines), :4856 LOSERS_CONF_PENALTY (-50). 14d n=294: 58/58 trades stored below 40 were >=40 at the gate (LEAK), avg divergence +18.18. Contradicts decider_run.py:4298 comment 'MIN_EXEC_CONFIDENCE handles the final cutoff'.",
-      "impact": "Any confidence floor implemented at :3796 is calibrated against a value ~18pts above the field every fk table uses. For CONF_FLOOR=30 specifically: 30d gate-time conf<30 = 0/649 vs stored conf<30 = 56 -> would block 0 of the 56 measured trades = STRUCTURAL NO-OP (same class as #129 size-dampen).",
-      "fix": "comment block added at decider_run.py:3796 + brain/fk_definitions.md CONFIDENCE FIELD SEMANTICS section + reproducible script. Enforcement for any confidence floor must sit after :4856 and ship-time self-check must assert blocked_count, not just the constant's existence."
-    },
-    {
-      "severity": "HIGH",
-      "finding": "Confidence SCALE changed twice in 10 days: cell_stats _cell_mult wiring (2026-10-14) + CONF-CALIB clamp (2026-10-15 03:41, commit 82c90ccd). Gate-time confidence p50 95.0 (Oct 1-14) -> 51.8 (Oct 15+); share below 50 12.5% -> 49.4%. Book-wide stored p50 96 -> 55.",
-      "impact": "Every confidence split that straddles 2026-10-14/15 is time-confounded. This run caught and rejected exactly such a candidate (see config_changes_rejected #1). Any *_CONF_FLOOR constant calibrated before 2026-10-14 is on the old scale.",
-      "fix": "confidence-scale drift KPI pre-registered (creative_improvements)."
-    },
-    {
-      "severity": "LOW",
-      "finding": "hermes_constants.py:1512-1514 stale comment: 'Now -10 / 50 (matches MIN_EXEC_CONFIDENCE)' and 'WRONG_SIDE_SKIP_THRESHOLD = 50 # ... (= MIN_EXEC_CONFIDENCE)' — MIN_EXEC_CONFIDENCE has been 40 since 2026-10-10 (CEO), not 50.",
-      "impact": "an implementer could 'align' WRONG_SIDE_SKIP_THRESHOLD to 40 believing they are restoring parity.",
-      "fix": "reported, NOT edited this run (keeps hermes_constants.py git diff EMPTY as a standing verify). Re-open if a wrong-side change is ever proposed."
+      "severity": "FIXED-HIGH",
+      "finding": "session_brain.query() returned duplicate records under 6 titles for 8 runs straight (#82, #85, and 5 in between). Root = 73% duplicate chunk text under different session_ids.",
+      "fix": "scripts/session_brain.py query() text-dedup + --selfcheck; search window top_k*2 -> top_k*4.",
+      "evidence": "before: 2/6 unique; after: 6/6 unique on 3 probes; py_compile PASS"
     },
     {
       "severity": "INFO",
-      "finding": "brain/analysis/rr_shadow_audit_7d.json still present as an orphan (no producer script, mtime 21d) and the audit prompt still ships raw json.load examples for it and for oscillator_shadow.json (JSONL — json.load crashes).",
-      "impact": "a fresh run following the prompt literally raises before reading anything.",
-      "fix": "prompt status table (shipped run #126) already covers this; file deletion left to owner."
+      "finding": "data/gate_shadow.db is 0 bytes (mtime 2026-10-24 14:36) while brain/gate_shadow.db is the live writer (7.3MB).",
+      "impact": "an analyst following a data/*.db pointer reads an empty file.",
+      "suggested": "point docs/prompts at brain/gate_shadow.db; delete the 0-byte artifact"
+    },
+    {
+      "severity": "INFO",
+      "finding": "data/contrarian_shadow_summary.json (pump-chain- wr 54.7) DISAGREES with analysis/contrarian_outcome_join.py (64.2) on the same 344 events.",
+      "impact": "two numbers for one KPI; only the join is outcome-joined.",
+      "suggested": "regenerate or annotate the summary file"
+    },
+    {
+      "severity": "INFO",
+      "finding": "brain/analysis/rr_shadow_audit_7d.json still orphaned (no producer, mtime 21d) while the audit prompt still ships a raw json.load example for it and for oscillator_shadow.json (JSONL).",
+      "impact": "a fresh run following the prompt crashes on oscillator.",
+      "carried_from": "#146"
     }
   ],
   "recurring_problems": [
-    "exit-system / never-armed bleed — 79.6% (7d) / 83.4% (14d) of gross loss is never-armed; every lever measured and CEO-gated (CONF_FLOOR held for fk ruling, TAT-C live, MFE-CUT rejected, BE-at-arm/UGB-PT shipped)",
-    "confidence-keyed calibration keeps being re-proposed without a scale check — this run is the 2nd time a conf-based candidate was invalidated by a scale/era confound",
-    "session_brain duplicate records — 7th consecutive run flagged, rebuild still not done (MED)"
+    "never-armed entries own 80.7-85.5% of gross loss across every window (30d/14d/7d) — ENTRY quality, not exit machinery. Trail machinery is printing +$4.44/14d.",
+    "bb-bounce-v2-long+ sits ON the arm line: avg MFE 0.399 vs PM_TRAIL_ACTIVATE_PCT 0.40 — 36T/14d, kill bars fail (#138), compactor co-signal stamp in flight. Do NOT re-propose a kill.",
+    "confidence-field semantics (#146) still blocks CONF_FLOOR: fk tables measure post-penalty trades.confidence while the natural gate site is pre-penalty."
   ],
   "missing_implementations": [],
   "config_changes_applied": [],
   "config_changes_rejected": [
     {
-      "candidate": "pump-chain+ confidence floor at 70 (block conf<70)",
-      "naive_result": "30d BLOCKED 36T 8W -1.60 vs KEPT 35T 19W +3.44, Fisher p=0.0073, fkA 22.2%",
-      "reason": "CONFOUNDER — the split is the confidence-scale change, not signal quality. Per-day: conf>=70 trades exist only Oct 3-13 (old scale, values to 499); from Oct 14 nearly every pump-chain+ trade is pinned at 29.5. Post-2026-10-14 conf>=70 has n=3. Book-wide gate p50 moved 95.0 -> 51.8 in the same week. FAILS confounder check (mandate 5); fkA 22.2% also fails the 20% bar.",
-      "status": "REJECTED-WITH-DATA — do not re-propose without a within-era test"
+      "candidate": "MEAN_REVERSION x btc_regime (BULL_TREND+BEAR_TREND) block — NEW cross-cut (mirror of the existing BTC-CHOP-GATE, which blocks MOMENTUM when BTC is flat)",
+      "data": "7d blocked 32T 9W 28.1% -$0.85 save +0.85 z=-2.10 p=0.035 | 14d blocked 100T 27W 27.0% -$2.22 save +2.22 z=-2.63 p=0.0085 | 30d blocked 224T 91W 40.6% -$0.50 save +0.50 z=-1.17 p=0.2416",
+      "why_rejected": "30d OOS FAIL (p=0.24) AND save collapses to +0.50 AND fkA-literal 22.0%/29.8% + fkB 27-41% all FAIL the <20% bar. 3-of-4 bars fail.",
+      "note": "the cross itself is real and coherent (MR works in RANGING +0.74/25T 64% WR, bleeds in trending regimes) — recorded so nobody re-derives it from a 14d snapshot"
     },
     {
-      "candidate": "hard block on stored trades.confidence < 40",
-      "naive_result": "30d n=62 19W -1.35, Fisher p=0.0316",
-      "reason": "fkA 30.6% (30d) / 31.0% (14d) / 30.4% (7d) all > 20% bar; 14d Fisher p=0.296 and 7d p=0.169 = OOS significance fails; 14d save -1.72 vs 1.45 of winner pnl is thin.",
-      "status": "REJECTED-WITH-DATA"
+      "candidate": "coin_regime COUNTER block (direction against coin regime)",
+      "data": "7d ALIGNED 56T 30W 53.6% +$0.95 vs COUNTER 35T 14W 40.0% -$0.47; worst cell LONG-COUNTER 26T 10W -$0.71",
+      "why_rejected": "stamps only exist since 2026-10-20 08:11 (identical n at 7d/14d/30d = no OOS window at all) AND fkB 10/26 = 38.5% FAIL. COLLECT -> 14d OOS recheck 2026-11-01, 30d 2026-11-19."
     },
     {
-      "candidate": "hard block on the CTX-GATE WARN cohort (meta_final - stored in [19,26])",
-      "naive_result": "14d n=90 27W -2.32; 7d p=0.0136; 10d p=0.0082",
-      "reason": "fkA 30.0% (14d) / 39.8% (30d) FAIL; 14d p=0.244 and 30d p=0.244 FAIL; 30d cohort PnL is +0.58 = blocking LOSES money over the long window. Sign instability across windows.",
-      "status": "REJECTED-WITH-DATA — the -20 WARN lever never blocks and should not be turned into one on this evidence"
+      "candidate": "pump-chain+ non-HIGH regime block (WATCHDOG-ASSIGNED item)",
+      "data": "14d by regime: EXTREME 34T 9W +$0.08 | NORMAL 2T -$0.03 | HIGH 9T -$0.50. 7d: EXTREME 9T -$0.42, HIGH 3T -$0.43.",
+      "why_rejected": "14d EXTREME is POSITIVE — 7d -$0.42 is window noise (same class as the EXTREME-sign-flip already rejected in #146). All 9 HIGH trades opened BEFORE the 2026-10-21 03:38 block ship (last HIGH open 2026-10-21 00:18) = 0 post-block leaks. The real split is confidence: conf<30 26T 6W -$1.29 vs 60+ 14T 6W +$1.10 -> that is CONF_FLOOR, still held on the CEO fk ruling."
     },
     {
-      "candidate": "EXTREME volatility-regime entry gate",
-      "naive_result": "14d EXTREME 149T 28.2% -2.50 (worst regime); 7d 39T -0.78",
-      "reason": "30d EXTREME 290T 37.6% +0.57 = the BEST regime by PnL in the long window, and it carries the highest arm rate (59.3% 30d). Sign reversal between 14d and 30d; also collides with CEO 'every dump is a SHORT' and the PUMP_CHAIN_SHORT_EXTREME_BLOCK revert of Oct 7.",
-      "status": "REJECTED-WITH-DATA (window disagreement)"
+      "candidate": "r2v2-long3 entry filter (14d 15T 46.7% -$0.12 = sub-50% n>=15 target)",
+      "data": "losers RSI at entry 60.3/65.9/68.7/72.7 vs winners 59.2/61.7/70.0/70.2/71.6/72.1/73.3",
+      "why_rejected": "no separation at any RSI cut; n=15 is at the bar with -$0.12 total. monitor only."
     },
     {
-      "candidate": "watchdog-queued bleed families (pump-chain+ / bb-bounce-v2-long+ / ai-trader-pending)",
-      "reason": "pump-chain+ 30d +1.84 = standing NO-KILL, CONF_FLOOR queue (now documented with the enforcement-site hazard); bb-bounce-v2-long+ conf split Fisher p=0.74, regime split n=9/n=27 both under-powered, TAT-C already live; ai-trader-pending 16T 25% arm 18.8% = n<20 AND CEO/autopilot domain.",
-      "status": "NO CHANGE — all owned or under-powered"
+      "candidate": "ai-trader-pending dead-flag leak",
+      "data": "AI_TRADER_ENABLED=False since 2026-10-19 yet 16T opened 2026-10-19..24",
+      "why_rejected": "NOT A BUG. Pending orders are CEO-armed conditional directives (trade_watchdog.py:1405 -> brain.py trade add --signal ai-trader-pending --force); signal_schema gates components 'ai-trader'/'ai-trader+'/'ai-trader-' only, by design — AI_TRADER_ENABLED covers automated picks, 'Manual trades unaffected' per the CEO verdict. 16T 25% -$0.14 = CEO domain, n<20."
+    },
+    {
+      "candidate": "session-brain ingest-side dedup (skip texts already stored)",
+      "why_rejected": "ingest already does per-session DELETE then INSERT; skipping shared text would drop it whenever the OTHER holder of that text is re-ingested. Retrieval-side dedup is the single point all callers route through."
     }
-  ],
-  "pre_registered_evals_closed": [
-    {
-      "item": "CONF_FLOOR fk refresh (standing CEO item)",
-      "result": "bare pump-chain conf<30 blocked set now 14d 36T 7W -1.48 / 30d 36T 7W -1.48. fkB moved 12.1% (Oct 23) -> 19.4% — one winner away from the 20% bar. fkA-family 35.0% (14d) FAIL. fkA-literal 5.6% (14d) / 2.3% (30d) PASS.",
-      "verdict": "STILL HELD on the fk-definition ruling, but the fkB margin has collapsed from 7.9pts to 0.6pts. The ruling is now time-critical: under fkB it fails at the next blocked winner. Add the new enforcement-site requirement (after decider_run.py:4856) to the ruling.",
-      "config_change": null
-    },
-    {
-      "item": "TAT-C fk tripwire (pre-registered run #145, n>=10 attributed fires)",
-      "result": "attributed fires still 3 (HBAR -0.01 / SAGA -0.05 / DOGE 0.00), no new fires since 10-25 17:57",
-      "verdict": "NOT TRIPPED — n=3 < 10, keep collecting"
-    },
-    {
-      "item": "hl_copy_trader quality floor (pre-registered run #145, n>=15 14d)",
-      "result": "14d 12T 4W -0.02 (n=12 < 15); 30d 13T 4W -0.13",
-      "verdict": "NOT TRIPPED — keep on watchlist"
-    },
-    {
-      "item": "arm-rate chop KPI (pre-registered run #131: n>=15 AND arm%<40 AND PnL<0)",
-      "result": "14d: bb-bounce 42.9% (arm ok), doji 31.3% (killed), ai-trader+ 45.5% (killed), pump-chain+ 37.8% -0.45 (only live qualifier, already owned by CONF_FLOOR), ai-trader-pending 18.8% -0.14 (n=16 CEO domain)",
-      "verdict": "no NEW candidate"
-    }
-  ],
-  "change_tracking_last_run": [
-    {"run": "#145 cell-stats freshness guard HOLD", "status": "HOLD honored — not re-proposed, no code landed", "evidence": "no cell_stats freshness edit in git status"},
-    {"run": "#144 price_collector SKIP_TOKENS fix", "status": "VERIFIED HOLDING (soak still due)", "evidence": "latest_prices 267 rows, newest 0.5min; hermes-price-collector.timer fired 19:50:38Z (9s before check)"},
-    {"run": "#143 escalation #17 closed as superseded", "status": "HOLDING", "evidence": "CURRENT.md contains 0 'awaiting CEO GO' occurrences; no re-listing"},
-    {"run": "#141 decider_run co-signal source stamp", "status": "VERIFIED LIVE", "evidence": "6/6 trades opened since 15:15Z carry _signal_metadata.source (continuum-trend+, bb-bounce-v2-long+ x3, bb-squeeze+, hl_copy_trader)"},
-    {"run": "#135 spider PM_TRAIL_TIERS unit fix", "status": "VERIFIED HOLDING", "evidence": "0 negative trail_floor lines after 2026-10-25 08:51 (last negative was 2026-10-23 10:30 LTC)"},
-    {"run": "#117 TAT variant-C", "status": "FIRING at 3 fires, tripwire n=10 not reached", "evidence": "exit_conditions LIKE '%variant-C%' n=3"},
-    {"run": "#140 gate_leak_census", "status": "not re-run this cycle (0 gates changed; constants git diff EMPTY)", "evidence": "no gate constant touched"}
   ],
   "signal_quality_deep_dive": {
-    "targets_reviewed": ["pump-chain+", "bb-bounce-v2-long+", "ai-trader-pending", "r2v2-long3", "hl_copy_trader"],
-    "pump-chain+": "7d 12T 16.7% -0.76 | 14d 45T 26.7% -0.45 | 30d 71T 38.0% +1.84 -> NO-KILL stands. 14d exit mix: hard_max_loss 13T -1.46 (MFE 0.075), trail_arm_timeout 16T -0.56, atr_trail_hit 9T +2.22 (MFE 4.53). Arm rate 37.8%. Bleed is the conf<30 cohort = CONF_FLOOR queue.",
-    "bb-bounce-v2-long+": "14d 36T 38.9% -1.03. Confidence split Fisher p=0.74 (none); regime EXTREME 9T/n=9 and NORMAL 27T both under-powered. All 14 winners are profit-monster-trail; all 20 losers are never-armed/stop. TAT-C live, MFE-CUT rejected (#134 fk 23.5%). No new lever.",
-    "ai-trader-pending": "16T 25% -0.14, arm rate 18.8%, avg MFE 0.232 = textbook never-armed chop signal. n=16 < 20 minimum AND autopilot-bracket/CEO domain -> MONITOR only.",
-    "r2v2-long3": "15T 53% -0.12, conf split Fisher p=1.0, n<20 -> MONITOR.",
-    "hl_copy_trader": "14d 12T 4W -0.02 (n=12<15 watchlist bar) — did not trip.",
-    "new_sub50_targets_with_n_ge_15": 0
+    "targets_14d_sub50_n_ge_15": "bb-bounce-v2-long+ 36T 38.9% -$1.03 (kill bars fail #138, compactor stamp in flight) | doji-bottom-long 16T 31.3% -$0.97 (killed Oct 16, last open 2026-10-16 17:43 = pre-kill aging out) | ai-trader+ 21T 28.6% -$0.92 (disabled, last open 2026-10-19) | pump-chain+ 45T 26.7% -$0.45 (conf<30 bleed = CONF_FLOOR) | pump-chain- 35T 22.9% -$0.30 (contrarian PROMOTE Oct 27) | ai-trader-pending 16T 25% -$0.14 (CEO) | ai-trader-manual 15T 46.7% +$0.34 (positive PnL)",
+    "post_kill_leak_check": "doji-bottom-long max open 2026-10-16 17:43 (= kill commit time, pre-kill) | volume-breakout 0 rows | hmacd-mtf 0 rows | oversold-bounce+ max open 2026-10-13 | volume-buildup+ max open 2026-10-14 | ai-trader+ max open 2026-10-19 -> 0 leaks",
+    "verdict": "no NEW shippable sub-50% target; every sufficient-n bleed cohort is killed, disabled, owned by CONF_FLOOR, or CEO-domain."
+  },
+  "watchdog_triage": {
+    "steers": "0 top-level steers in watchdog.json; deep_analysis carries 5 recommendations",
+    "steer_1_16395_8h_arm_or_exit": "STANDS, NOT YET DUE — condition = un-armed at 8h open (23:47 UTC today) AND btc_15m still SHORT_BIAS -> exit at market; retracts if trail arms or 15m flips. At 20:14 the trade was 4.5h in a 228-pt range with zero MFE above +0.40 (never-armed profile = 80.7-85.5% of gross loss).",
+    "steer_2_no_new_long_exposure": "STANDS, CONDITION-KEYED — btc_15m + btc_4h both SHORT_BIAS and BTC 1m below EMA300 (~80609). Re-test each cycle: expires on a 15-30m hold above EMA300 or a 15m flip. Advisory for new entries only, does not apply to holding #16395.",
+    "ai_trader_pick": "BABY SHORT reported as PICK (watchlist only) = CORRECT, AI_TRADER_ENABLED=False verified live in constants",
+    "assigned_item_pump_chain_high_regime_share": "ANSWERED — see config_changes_rejected[2]; 0 post-block HIGH leaks, bleed is conf<30 = CONF_FLOOR",
+    "fundamental_truth_check": "trail family 14d 79T 91.1% +$4.44 (PM) + atr_trail 25T 80% +$3.56 vs hard_max_loss 67T 0% -$6.52 + atr_sl_hit 78T 1.3% -$5.55 — mandate confirmed fresh"
+  },
+  "change_tracking_last_run": [
+    {
+      "run": "#146 conf_field_semantics + fk_definitions CONFIDENCE FIELD SEMANTICS + decider_run:3796 comment",
+      "status": "VERIFIED",
+      "evidence": "--selfcheck PASS (LEAK 58/58, NO-OP 0/649, SCALE 95.0->51.8); fk_definitions.md:120 section present; decider_run.py:3796 hazard comment present; py_compile OK"
+    },
+    {
+      "run": "#145 cell-stats freshness guard HOLD",
+      "status": "HOLD honored",
+      "evidence": "no cell_stats freshness edit"
+    },
+    {
+      "run": "#145 watchdog DEAD-FLAG CHECK doc",
+      "status": "VERIFIED",
+      "evidence": "applied this run to ai-trader-pending: flagged then verified as correct-by-design, not a leak"
+    },
+    {
+      "run": "#144 price_collector SKIP_TOKENS intersection",
+      "status": "HOLDING (24h soak complete)",
+      "evidence": "price_collector timer firing every 60s (20:41:14Z)"
+    },
+    {
+      "run": "#143 escalation #17 closed as superseded",
+      "status": "HOLDING",
+      "evidence": "no re-listing"
+    },
+    {
+      "run": "#141 co-signal source stamp",
+      "status": "VERIFIED LIVE",
+      "evidence": "_signal_metadata.source present on opens since 15:15Z"
+    },
+    {
+      "run": "#135 spider PM_TRAIL_TIERS unit fix",
+      "status": "VERIFIED HOLDING",
+      "evidence": "0 negative trail_floor lines after 2026-10-25 08:51"
+    },
+    {
+      "run": "#117 TAT variant-C",
+      "status": "FIRING",
+      "evidence": "BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True; 3 attributed fires, tripwire n=10 not reached"
+    },
+    {
+      "run": "#147 session_brain retrieval dedup",
+      "status": "VERIFIED AFTER 2 BUG_HUNTER ROUNDS",
+      "evidence": "5/5 probes 6/6 unique; independent probes \"regime scanner\" and \"manual trade override\" show no duplicate text lines"
+    }
+  ],
+  "standing_verifies": {
+    "session_lock": "absent",
+    "hermes_constants_git_diff": "EMPTY (zero trading-constant changes this run)",
+    "ceo_protected_flags": "13/13 present at hermes_constants.py:2918 (incl PM_TRAIL_ACTIVATE_PCT 0.40 and PM_TRAIL_DISTANCE_PCT 0.20 untouched)",
+    "kill_flags": "LIVE_TRADING True | AI_TRADER False | VOLUME_BREAKOUT_PLUS False | VOLUME_BREAKOUT_MINUS False | VOLUME_BUILDUP_PLUS False | VOLUME_BUILDUP_MINUS True | HMACD_MTF_PLUS/MINUS False | OVERSOLD_BOUNCE False | DOJI_BOTTOM False | PUMP_CHAIN_V5_SHORT True | PUMP_CHAIN_V6_PLUS True | BB_BOUNCE_V2_LONG True | BB_BOUNCE_TRAIL_ARM_TIMEOUT True | CHOP_DETECTOR True | BTC_CHOP_GATE True — all correct",
+    "post_kill_leaks": "0 (all 6 killed signals' last opens predate their kill commits)",
+    "size_reduce_file": "data/vacation_size_reduce.json empty = 1.0x",
+    "vacation_rules": "vacation_mode true; no_constants_change=FALSE (review queue active), no_signal_enable_disable=TRUE, shadow_first=TRUE, unclog_waiver expires 2026-10-27",
+    "tracebacks": "5 total in pipeline.log, all pre-existing (Oct 11 x2, Oct 14 x2, Oct 15) — 0 new today",
+    "py_compile": "session_brain.py OK after both fix rounds",
+    "selfchecks": "session_brain.py --selfcheck PASS (5 probes, 6/6 unique each)",
+    "timers": "all hermes-* timers firing (pipeline/compactor/1m-candle/watchdog/regime-scanner/price-collector)",
+    "bug_hunter": "round 1 FIX-REQUIRED 1 HIGH + 1 MED + 3 LOW, all applied; round 2 SHIP 0 HIGH / 0 MED"
   },
   "creative_improvements": [
     {
-      "date": "2026-10-25T19:52:00Z",
-      "idea": "CONFIDENCE FIELD SEMANTICS — pin which column means what, and require a blocked-count self-check on any confidence floor",
-      "rationale": "trades.confidence is post-penalty (+18.18 avg above gate-time), _signal_metadata.final_confidence is gate-time. Every fk table in fk_definitions.md is measured on the post-penalty column while the natural enforcement site reads the gate-time column.",
-      "expected_impact": "prevents a CONF_FLOOR=30 ship that would block 0 of the 56 measured trades (structural no-op, same class as #129)",
-      "category": "process / gate integrity",
-      "status": "SHIPPED (3 zero-behavior artifacts)",
-      "risk": "none"
-    },
-    {
-      "date": "2026-10-25T19:52:00Z",
-      "idea": "CONFIDENCE-SCALE DRIFT KPI (pre-registered, zero code until adopted)",
-      "rationale": "gate-time confidence p50 moved 95.0 -> 51.8 and the <50 binding share moved 12.5% -> 49.4% in one week (cell_stats _cell_mult Oct 14 + CONF-CALIB clamp Oct 15). Half the book now sits under thresholds calibrated when the median was 95.",
-      "expected_impact": "catches the next scale change before a confidence-keyed constant silently changes meaning; costs one weekly query",
-      "category": "measurement",
-      "criteria": "publish weekly gate-time p10/p50/p90 + share below MIN_EXEC_CONFIDENCE(40) / WRONG_SIDE_SKIP_THRESHOLD(50) / RS_DECIDER_CONF_FLOOR(60) / CONF_FLOOR(30). Escalate when any binding share moves >10pp week-over-week.",
-      "status": "pre-registered",
+      "date": "2026-10-25T20:55:00Z",
+      "idea": "SESSION-BRAIN RETRIEVAL DEDUP + duplicate-session census",
+      "rationale": "73% of 404,091 chunk rows are duplicate text under different session_ids; near-identical vectors returned the same record under 6 titles for 8 runs, making mandate Step 2 useless.",
+      "expected_impact": "Step 2 returns 6 distinct sessions again; 3-probe selfcheck is the regression guard",
+      "category": "infra / insight quality",
+      "status": "shipped",
       "risk": "low"
     },
     {
-      "date": "2026-10-25T19:52:00Z",
-      "idea": "POST-PENALTY RE-CHECK OPTION for the CEO — move (not duplicate) the MIN_EXEC check after decider_run.py:4856",
-      "rationale": "the comment at :4298 says MIN_EXEC is the final cutoff; three reductions run after it. Making the order match the documented intent is a one-line move, but it changes what binds: measured on stored confidence, a 40 floor has fkA 30.6% (FAIL).",
-      "expected_impact": "none measured at threshold 40 — documented so the ordering question is decided with data, not by assuming the comment is true",
-      "category": "gate integrity",
-      "status": "measurement only, REJECTED as a ship at threshold 40",
-      "risk": "medium if shipped without an fk-passing threshold"
+      "date": "2026-10-25T20:55:00Z",
+      "idea": "MEAN_REVERSION x btc_regime cross-cut (mirror of BTC-CHOP-GATE: block MR when BTC is trending, not just block momentum when BTC is flat)",
+      "rationale": "14d MEAN_REVERSION splits cleanly the opposite way from the existing gate: RANGING 25T 64% WR +$0.74 vs BULL_TREND+BEAR_TREND 100T 27% WR -$2.22 (p=0.0085).",
+      "expected_impact": "+$2.22/14d if it held",
+      "category": "entry sniper",
+      "status": "rejected-with-data",
+      "risk": "low — recorded so it is never re-derived from a 14d snapshot",
+      "kill_reason": "30d OOS p=0.2416, save collapses to +$0.50, fkA-literal 22.0%/29.8% and fkB 27-41% all FAIL the <20% bar"
+    },
+    {
+      "date": "2026-10-25T20:55:00Z",
+      "idea": "coin_regime ALIGNED/COUNTER standing KPI (zero code — stamps already live since 2026-10-20)",
+      "rationale": "7d ALIGNED 56T 53.6% +$0.95 vs COUNTER 35T 40.0% -$0.47 (LONG-COUNTER 26T -$0.71); arm rate 50.0% vs 60.0% says direction-vs-regime is not an arming problem, it is a direction problem.",
+      "expected_impact": "if it survives OOS, a direction-quality lever that is NOT a time block and NOT a blanket RSI band",
+      "category": "entry sniper",
+      "status": "pre-registered",
+      "risk": "low",
+      "recheck": "14d OOS 2026-11-01, 30d 2026-11-19; ship only if OOS same-sign AND fkB <20% AND n>=20"
+    },
+    {
+      "date": "2026-10-25T20:55:00Z",
+      "idea": "ARM-RATE LEDGER per signal (mandated chop question, zero code)",
+      "rationale": "arm% is the cleanest pre-outcome proxy for 'entered during chop': ai-trader-pending 18.8% / doji 31.3% / pump-chain+ 37.8% / bb-bounce 41.7% vs volume-buildup- 66.7% / pump-chain- 65.7%.",
+      "expected_impact": "surfaces chop signals before their PnL turns negative",
+      "category": "monitoring",
+      "status": "pre-registered",
+      "risk": "zero (read-only)"
     }
   ],
-  "watchdog_triage": {
-    "steers_seen": "watchdog.json steers=[]; recommendations deep_analysis carried 2 warnings + 1 info",
-    "ETH #16400 knife-edge SL": "AGREE — leave it; trade has since closed. Copy-trader family is the weakest open book, tight stop is correct for a chop pin.",
-    "NEW-ENTRY BLOCK (pin-scoped mid-band LONG)": "ENDORSE as advisory, no config change — pin-scoped and condition-keyed (unlike the blanket block refuted in #139). Not a config gate.",
-    "bleeding families flagged for brain_auditor": "triaged in config_changes_rejected — pump-chain+ / bb-bounce-v2-long+ / ai-trader-pending all owned or under-powered.",
-    "AI trader pick (STX SHORT, watchlist only)": "verified AI_TRADER_ENABLED=False, will not execute."
-  },
-  "standing_verifies": {
-    "session_lock": "absent",
-    "hermes_constants_git_diff": "EMPTY",
-    "CEO_PROTECTED_FLAGS": "13/13 keys present (SIGNALS_REGISTRY is the signals/__init__.py registry entry — bb_bounce present, 165 registry rows)",
-    "size_reduce_file": "absent = 1.0x",
-    "kill_flags": "AI_TRADER False, VOLUME_BUILDUP_PLUS False, HMACD_MTF_PLUS/MINUS False, LIVE_TRADING True, BB_BOUNCE_TRAIL_ARM_TIMEOUT True — all correct",
-    "tracebacks_2026_10_25": "5 total in pipeline.log, all pre-existing (Oct 11 x2, Oct 17, Oct 18, Oct 25 03:00 known Sunday self-healing) — 0 new this run",
-    "py_compile": "decider_run.py OK after comment ship",
-    "selfchecks": "conf_field_semantics_2026-10-25.py --selfcheck PASS"
-  },
-  "readiness": {
-    "open": "1 — BTC #16395 LONG continuum-trend+ @80637, flat, SL 80151.7, TP 81846.6, 4h+",
-    "regime": "btc_15m SHORT_BIAS / btc_4h LONG_BIAS / continuum AT EMA300 / volatility LOW / zscore STRONG_NEG / velocity SLOW / acceleration POSITIVE / volume LOW / market_phase RECOVERY / trend_quality STRONG_DOWN / auto=CHOP",
-    "rule": "no added size while auto=CHOP AND volume LOW (both true); trail-family first; LONGs only on sustained reclaim WITH volume; SHORTs only with 4h aligned; size 1.0x; mid-band = no added exposure",
-    "watch": "BTC #16395 is a LONG on a 15m SHORT_BIAS tape — exit condition is 15+ min of 1m closes below EMA300; SL backstop 80151.7 stays untouched until arm"
-  },
+  "changes_from_last_run": [
+    "#146 x3 ships all verified present and selfcheck PASS",
+    "#145/#144/#143/#141/#135/#117 all HOLDING or VERIFIED (evidence in change_tracking_last_run)",
+    "0 reverts needed"
+  ],
   "next_actions": [
-    "CEO: CONF_FLOOR fk ruling — NOW TIME-CRITICAL: fkB moved 12.1% -> 19.4% (bar 20), one blocked winner from failing; add the new requirement that enforcement sit AFTER decider_run.py:4856 with a blocked-count self-check (gate site = 0 of 56)",
-    "Oct 27: waiver expiry + mid-band [35,45) re-measure + pump-chain- contrarian PROMOTE (flip 64.2% n=344 re-verified this run)",
-    "Oct 28: solo-bypass conversion recheck",
-    "TAT-C fk tripwire at n>=10 attributed fires (currently 3)",
-    "hl_copy_trader watchlist re-check at 14d n>=15 (currently 12)",
-    "24h soak completion for #144 price-feed fix (early verify PASS, newest row 0.5min)",
-    "MED: session_brain duplicate-record rebuild (7th run flagged)"
-  ]
+    "CEO (time-critical): CONF_FLOOR fk-definition ruling — fkB 19.4% vs 20% bar; enforcement must sit AFTER decider_run.py:4856 with a ship-time blocked-count self-check (gate site = 0 of 56 = structural no-op)",
+    "TODAY 23:47 UTC: re-test #16395 arm-or-exit condition (un-armed at 8h AND btc_15m still SHORT_BIAS); retracts if trail arms or 15m flips",
+    "EVERY CYCLE: re-test no-new-long-exposure condition (btc_15m+4h SHORT_BIAS AND BTC below EMA300 ~80609) — expires on 15-30m hold above or a 15m flip",
+    "2026-10-27: unclog waiver expiry + contrarian pump-chain- PROMOTE eval (flip 64.2% n=344) + waiver scoreboard",
+    "2026-11-01: coin_regime ALIGNED/COUNTER 14d OOS recheck; 2026-11-15 floor-admit 30d same-sign bar",
+    "INFO: point docs at brain/gate_shadow.db (data/ copy is a 0-byte stale artifact); regenerate or annotate data/contrarian_shadow_summary.json (54.7 vs 64.2 divergence)"
+  ],
+  "readiness": {
+    "open": "1 — BTC LONG #16395 continuum-trend+ @80637, SL 80151.7 / TP 81846.6, 4.5h, MFE 0 (never armed), meta_rsi 58.15",
+    "posture": "NO NEW LONG exposure while btc_15m + btc_4h both SHORT_BIAS and BTC 1m holds below EMA300 ~80609; LONGs only on a sustained 15-30m reclaim WITH volume; SHORTs aligned; mid-band = no trade",
+    "regime": "btc_15m SHORT_BIAS | btc_4h SHORT_BIAS | continuum AT | vol LOW | flips/24h agg 20 BTC 16 (p50, ordinary churn — no direction has survived long enough to be called 'the trend', so all direction-flavored steers stay condition-keyed)",
+    "north_star": "chop-bleed KPI 7d 83.9% / 14d 85.5% / 30d 80.7% — inside the 70-92 baseline band, neither threshold breached, no stop work due"
+  }
 }

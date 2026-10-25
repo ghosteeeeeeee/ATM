@@ -8557,5 +8557,43 @@
     "category": "gate integrity",
     "status": "measurement only, rejected as a ship at threshold 40",
     "risk": "medium if shipped without fk"
+  },
+  {
+    "date": "2026-10-25T20:55:00Z",
+    "idea": "SESSION-BRAIN RETRIEVAL DEDUP + duplicate-session census",
+    "rationale": "73% of 404,091 chunk rows are duplicate text under different session_ids; near-identical vectors returned the same record under 6 titles for 8 runs, making mandate Step 2 useless.",
+    "expected_impact": "Step 2 returns 6 distinct sessions again; 3-probe selfcheck is the regression guard",
+    "category": "infra / insight quality",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T20:55:00Z",
+    "idea": "MEAN_REVERSION x btc_regime cross-cut (mirror of BTC-CHOP-GATE: block MR when BTC is trending, not just block momentum when BTC is flat)",
+    "rationale": "14d MEAN_REVERSION splits cleanly the opposite way from the existing gate: RANGING 25T 64% WR +$0.74 vs BULL_TREND+BEAR_TREND 100T 27% WR -$2.22 (p=0.0085).",
+    "expected_impact": "+$2.22/14d if it held",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "low — recorded so it is never re-derived from a 14d snapshot",
+    "kill_reason": "30d OOS p=0.2416, save collapses to +$0.50, fkA-literal 22.0%/29.8% and fkB 27-41% all FAIL the <20% bar"
+  },
+  {
+    "date": "2026-10-25T20:55:00Z",
+    "idea": "coin_regime ALIGNED/COUNTER standing KPI (zero code — stamps already live since 2026-10-20)",
+    "rationale": "7d ALIGNED 56T 53.6% +$0.95 vs COUNTER 35T 40.0% -$0.47 (LONG-COUNTER 26T -$0.71); arm rate 50.0% vs 60.0% says direction-vs-regime is not an arming problem, it is a direction problem.",
+    "expected_impact": "if it survives OOS, a direction-quality lever that is NOT a time block and NOT a blanket RSI band",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low",
+    "recheck": "14d OOS 2026-11-01, 30d 2026-11-19; ship only if OOS same-sign AND fkB <20% AND n>=20"
+  },
+  {
+    "date": "2026-10-25T20:55:00Z",
+    "idea": "ARM-RATE LEDGER per signal (mandated chop question, zero code)",
+    "rationale": "arm% is the cleanest pre-outcome proxy for 'entered during chop': ai-trader-pending 18.8% / doji 31.3% / pump-chain+ 37.8% / bb-bounce 41.7% vs volume-buildup- 66.7% / pump-chain- 65.7%.",
+    "expected_impact": "surfaces chop signals before their PnL turns negative",
+    "category": "monitoring",
+    "status": "pre-registered",
+    "risk": "zero (read-only)"
   }
 ]

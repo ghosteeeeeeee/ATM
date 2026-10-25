@@ -1,3 +1,66 @@
+# Current State — brain_auditor #147 2026-10-25 20:55 UTC
+**Last Updated: 2026-10-25 20:55 UTC**
+**Updated by: brain_auditor #147. Prior: brain_auditor #146 19:52 / #145 18:58 / #144 17:50 (preserved below + git history).**
+
+## HEADLINE — SESSION BRAIN REPAIRED (8-run drift, root-caused), 0 trading-constant changes, 6 candidates REJECTED/COLLECT-WITH-DATA
+
+**1. SESSION-BRAIN DUPLICATE-RECORD DRIFT — FIXED AT ROOT.**
+294,753 of 404,091 chunk rows (**73%**) are duplicate `text` stored under a *different*
+`session_id` (38,167 shared texts across 269 sessions = DSH session forks/copies). Near-identical
+vectors land adjacent, so `query()` returned the same record under 6 titles for 8 runs straight
+(#82, #85 and 5 in between) — mandate Step 2 has been returning garbage since then.
+- **Before:** probe `loss money bleeding losing` -> **2 unique texts of 6** (5 identical copies)
+- **After:** 5 probes x top_k=6 -> **6/6 unique each**; `python3 scripts/session_brain.py --selfcheck` **PASS**; py_compile PASS
+- **bug_hunter:** round 1 FIX-REQUIRED (HIGH — dedup key was the full `text` while the returned dict
+  stores `text[:500]`, so 2,690 prefix groups could still return duplicate strings; 3/15 diverse probes
+  reproduced) -> fixed (`key = row[1][:500]`) + MED comment correction + 2 more probes + duplicate
+  `db_size_mb` key deleted from `stats()` -> **round 2 SHIP, 0 HIGH / 0 MED**.
+- **Where:** `scripts/session_brain.py query()` — text-dedup + search window `top_k*2 -> top_k*4`.
+  Deliberately **not** at ingest: ingest already does per-session DELETE+INSERT, so skipping a
+  shared text there would drop it whenever the *other* holder of that text is re-ingested.
+
+**2. SIX CANDIDATES REJECTED/COLLECT-WITH-DATA (0 config changes).**
+| candidate | verdict | why |
+|---|---|---|
+| **MEAN_REVERSION x btc_regime block** (mirror of BTC-CHOP-GATE) | **REJECTED** | real at 7d (p=0.035) and 14d (p=0.0085): MR in RANGING 25T 64% WR `+$0.74` vs BULL_TREND+BEAR_TREND 100T 27% WR `-$2.22`. But **30d OOS p=0.2416**, save collapses to `+$0.50`, **fkA-literal 22.0%/29.8% and fkB 27-41% all FAIL** the <20% bar. Logged so nobody re-derives it from a 14d snapshot. |
+| coin_regime COUNTER block | **COLLECT** | 7d ALIGNED 56T 53.6% `+$0.95` vs COUNTER 35T 40.0% `-$0.47` (worst cell LONG-COUNTER 26T `-$0.71`) — but stamps only exist since **2026-10-20 08:11** (identical n at 7/14/30d = no OOS window) and fkB 10/26 = 38.5% FAIL. 14d OOS recheck **2026-11-01**. |
+| **pump-chain+ non-HIGH regime** (watchdog-assigned) | **ANSWERED — no lever** | 14d EXTREME 34T 9W `+$0.08` **positive**, NORMAL 2T `-$0.03`, HIGH 9T `-$0.50` with **all 9 opens before the 2026-10-21 03:38 block ship** (last HIGH open 00:18) = **0 post-block leaks**; 7d EXTREME `-$0.42` is window noise. Real split is confidence: conf<30 26T 6W `-$1.29` vs 60+ 14T 6W `+$1.10` = CONF_FLOOR cohort. |
+| r2v2-long3 entry filter | **MONITOR** | 14d 15T 46.7% `-$0.12`; losers RSI 60.3/65.9/68.7/72.7 vs winners 59-73 — no separation. |
+| ai-trader-pending dead-flag leak | **NOT A BUG** | CEO-armed conditional directives (`trade_watchdog.py:1405` -> `brain.py trade add --force`); signal_schema gates components `ai-trader`/`ai-trader+`/`ai-trader-` only, by design ("Manual trades unaffected"). 16T 25% `-$0.14` = CEO domain, n<20. |
+| session-brain ingest-side dedup | **REJECTED** | would punch holes (see above). |
+
+**3. SHIPPED: `scripts/session_brain.py` retrieval dedup + `--selfcheck`.** Zero trading behavior.
+
+## MANDATE — CHOP vs TREND (fresh, verified this run)
+- armed(mfe>=0.40) vs unarmed: **7d 62T 71.0% `+$3.23` vs 65T 18.5% `-$3.73`** | **14d 154T 68.8% `+$8.46` vs 173T 9.8% `-$12.56`** | **30d 391T 72.4% `+$25.40` vs 305T 7.2% `-$27.48`**
+- 14d exit cohorts: **profit-monster-trail 79T 72W `+$4.44` + atr_trail_hit 25T 20W `+$3.56`** vs **hard_max_loss 67T 0W `-$6.52` + atr_sl_hit 78T 1W `-$5.55`**
+- never-armed share of gross loss: **7d 83.9% | 14d 85.5% | 30d 80.7%** (baseline band 70-92, no threshold breach)
+- arm-rate ledger: volume-buildup- 66.7% / pump-chain- 65.7% / r2v2-long3 46.7% / **bb-bounce 41.7% (avg MFE 0.399 = ON the 0.40 line)** / pump-chain+ 37.8% / doji 31.3% / **ai-trader-pending 18.8%**
+- 24h 16T 9W 56.2% `+$0.27` GREEN | 7d 127T 44.1% `-$0.50` | 14d 327T 37.6% `-$4.10` | 30d 696T 43.8% `-$2.08`
+
+## LOSING AUTOPSY — WRONG-SIDE REFUTED 71st CONSECUTIVE RUN
+`recovery_replay.py` adverse-first: **24h n=6 = 4 never-adverse / 2 recovered / 0 NEVER**;
+**48h n=8 = 4 / 3 / 1** (the 1 = BTC #16377 ai-trader-pending manual_sl `-$0.08`, CEO, immaterial).
+Valid refs: #61 opposite-side p=0.116, #84 forward-return t=-0.04. 0 new patterns.
+All 6 24h losers were LONG into a SHORT_BIAS tape — 100% never-adverse or recovered = chop, not wrong side.
+
+## READINESS
+**1 open: BTC LONG #16395 continuum-trend+ @80637, SL 80151.7 / TP 81846.6, 4.5h, MFE 0 (never-armed profile), meta_rsi 58.15.**
+- **Arm-or-exit at 8h open = 23:47 UTC today IF btc_15m still SHORT_BIAS** (watchdog condition; retracts if trail arms or 15m flips).
+- **NO NEW LONG exposure** while btc_15m + btc_4h both SHORT_BIAS and BTC 1m holds below EMA300 ~80609 —
+  expires on a 15-30m hold above or a 15m flip; re-test every cycle. Advisory for new entries only.
+- LONGs only on a sustained reclaim WITH volume; SHORTs aligned; mid-band = no trade; size 1.0x.
+
+## QUEUE
+- **CEO (time-critical): CONF_FLOOR fk-definition ruling** — fkB 19.4% vs 20% bar; enforcement MUST sit
+  AFTER `decider_run.py:4856` with a ship-time blocked-count self-check (gate site = 0 of 56 = structural no-op).
+- **2026-10-27:** unclog waiver expiry + contrarian pump-chain- PROMOTE (flip 64.2% n=344) + waiver scoreboard.
+- **2026-11-01:** coin_regime ALIGNED/COUNTER 14d OOS recheck. **2026-11-15:** floor_admit 30d same-sign bar.
+- **INFO:** point docs at `brain/gate_shadow.db` (the `data/` copy is a 0-byte stale artifact);
+  `data/contrarian_shadow_summary.json` says 54.7% where the outcome-join says 64.2% — the join is authoritative.
+
+---
+
 # Current State — brain_auditor #146 2026-10-25 19:52 UTC
 **Last Updated: 2026-10-25 19:52 UTC**
 **Updated by: brain_auditor #146. Prior: brain_auditor #145 18:58 / #144 17:50 / daily_orchestrator 17:05 (preserved below + git history).**

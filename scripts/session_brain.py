@@ -752,7 +752,11 @@ class SessionBrain:
         # Embed query
         query_vec = self.embedder.embed_one(query_text)
         
-        # Search — 4x headroom so text-dedup below can still fill top_k
+        # Search — candidate window is top_k*4. CEILING (measured #147): the
+        # largest duplicate group in the book is 423 copies of one text, so no
+        # fixed multiplier guarantees top_k unique results. Under-filling with
+        # UNIQUE results is the intended trade — callers get distinct records,
+        # never padded with repeats.
         results = self.vector_store.search(query_vec, top_k=top_k * 4)
 
         # Enrich with metadata
@@ -781,9 +785,13 @@ class SessionBrain:
                 (chunk_id,)
             ).fetchone()
             if row:
-                if row[1] in seen_text:
+                # key MUST be the value actually returned (row[1][:500]) — 2,690
+                # prefix groups hold >1 distinct full text, so keying on the full
+                # text lets identical returned strings through (bug_hunter HIGH).
+                key = row[1][:500]
+                if key in seen_text:
                     continue
-                seen_text.add(row[1])
+                seen_text.add(key)
                 enriched.append({
                     "session_id": row[0],
                     "text": row[1][:500],
@@ -837,7 +845,6 @@ class SessionBrain:
                 "duration_s": last_ingest[3] if last_ingest else 0,
                 "mode": last_ingest[4] if last_ingest else None,
             } if last_ingest else None,
-            "db_size_mb": round(BRAIN_DB.stat().st_size / 1024 / 1024, 1) if BRAIN_DB.exists() else 0,
         }
 
     def rebuild_index(self):
@@ -917,7 +924,9 @@ def main():
         # Runs the real query path; fails if any two results share a text.
         probes = ["signal performance winrate regime",
                   "loss money bleeding losing",
-                  "new signal idea improvement strategy"]
+                  "new signal idea improvement strategy",
+                  "trailing stop loss",
+                  "win rate backtest results"]
         ok = True
         for q in probes:
             res = brain.query(q, top_k=6)
