@@ -12,6 +12,12 @@ Ship criteria (locked by #116, unchanged here):
     AND OOS same-sign at 7d and 30d windows
     AND suppressed-fires/day reported so the CEO sees the traffic cost.
 
+Per window also reports:
+    stale_boost_pnl          PnL of the stale-boosted cohort (suppressing the boost
+                             removes these trades — negative = suppress is profitable)
+    hard_blocked_would_be_*  subset whose de-boosted conf (conf/1.2) falls under
+                             MIN_EXEC_CONFIDENCE=40 i.e. conf<48 => fk_hard_pct
+
 Usage: python3 brain/analysis/cell_stats_freshness_cf_2026-10-24.py [--fresh-days 14]
        python3 brain/analysis/cell_stats_freshness_cf_2026-10-24.py --selfcheck
 """
@@ -66,7 +72,8 @@ def cell_last_close(conn):
 def closed_trades(conn, days):
     cur = conn.cursor()
     cur.execute("""
-        SELECT id, token, signal, direction, open_time, close_time, pnl_usdt, exit_reason
+        SELECT id, token, signal, direction, open_time, close_time, pnl_usdt, exit_reason,
+               COALESCE(confidence, 0)
         FROM trades
         WHERE status='closed' AND close_time > NOW() - INTERVAL '%s days'
         ORDER BY open_time""" % int(days))
@@ -88,9 +95,11 @@ def run(fresh_days=14):
         rows = closed_trades(conn, days)
         stale_boost_w = stale_boost_l = matched = 0
         stale_boost_pnl = 0.0
+        stale_blocked_w = stale_blocked_l = 0
+        stale_blocked_pnl = 0.0
         winners = losers = 0
         stale_cells = defaultdict(lambda: [0, 0])
-        for tid, tok, sig, d, ot, ct, pnl, ex in rows:
+        for tid, tok, sig, d, ot, ct, pnl, ex, conf in rows:
             if ct is None:
                 continue
             is_win = (pnl or 0) > 0
@@ -109,10 +118,19 @@ def run(fresh_days=14):
             age = (fire_ts - lc).total_seconds() / 86400.0 if lc else 9999.0
             if age > fresh_days:
                 stale_cells[(cell, (d or '').upper())][0 if is_win else 1] += 1
+                stale_boost_pnl += float(pnl or 0)
                 if is_win:
                     stale_boost_w += 1
                 else:
                     stale_boost_l += 1
+                # de-boost 1.2 -> 1.0 divides exec confidence by 1.2; MIN_EXEC_CONFIDENCE
+                # = 40 (decider_run.py) => hard-blocked iff conf < 48. conf here is the
+                # stored trade confidence (pre-penalty-product scale) — reading (b) below
+                # is therefore an upper bound on blocks, reading (a) a lower bound.
+                if conf and float(conf) / 1.2 < 40:
+                    stale_blocked_w += int(is_win)
+                    stale_blocked_l += int(not is_win)
+                    stale_blocked_pnl += float(pnl or 0)
         n_win = max(1, winners)
         result[days] = {
             'trades': len(rows),
@@ -121,7 +139,12 @@ def run(fresh_days=14):
             'matched_to_fire': matched,
             'stale_boost_winners': stale_boost_w,
             'stale_boost_losers': stale_boost_l,
+            'stale_boost_pnl': round(stale_boost_pnl, 3),
             'fk_upper_pct': round(100.0 * stale_boost_w / n_win, 1),
+            'hard_blocked_would_be_winners': stale_blocked_w,
+            'hard_blocked_would_be_losers': stale_blocked_l,
+            'hard_blocked_pnl': round(stale_blocked_pnl, 3),
+            'fk_hard_pct': round(100.0 * stale_blocked_w / n_win, 1),
             'stale_cells': {f'{k[0]}|{k[1]}': v for k, v in sorted(
                 stale_cells.items(), key=lambda x: -(x[1][0] + x[1][1]))},
         }
@@ -142,6 +165,17 @@ def run(fresh_days=14):
         'stale_fires_per_day': round(stale_fires / days_span, 1),
         'fresh_days': fresh_days,
     }
+    # Ship criteria locked by #116: fk_upper < 20% AND OOS same-sign at 7d and 30d.
+    # Sign convention: stale_boost_pnl is the cohort's PnL — suppressing the boost
+    # removes those trades, so a NEGATIVE cohort PnL = removing boost is POSITIVE.
+    s7, s30 = result[7]['stale_boost_pnl'], result[30]['stale_boost_pnl']
+    result['verdict'] = {
+        'fk_upper_lt_20_all_windows': all(
+            result[w]['fk_upper_pct'] < 20 for w in (7, 14, 30)),
+        'oos_same_sign_7d_30d': (s7 < 0 and s30 < 0) or (s7 > 0 and s30 > 0),
+        'suppress_is_profitable_7d_30d': (s7 < 0 and s30 < 0),
+        'note': 'suppress_is_profitable = de-boost removes a net-losing cohort',
+    }
     return result
 
 
@@ -158,7 +192,14 @@ def selfcheck():
     fires = parse_fires()
     assert fires and fires == sorted(fires), 'fires parse + sorted'
     assert all(c for _, _, _, c in fires), 'every fire has a cell key'
-    print(f'SELFCHECK PASS: {len(fires)} fires parsed, stale/fresh fixtures OK')
+    res = run(14)
+    for w in (7, 14, 30):
+        assert 'stale_boost_pnl' in res[w], f'missing stale_boost_pnl for {w}d'
+        assert 'fk_hard_pct' in res[w], f'missing fk_hard_pct for {w}d'
+        assert res[w]['fk_upper_pct'] >= res[w]['fk_hard_pct'], 'upper must bound hard'
+    assert 'fk_upper_lt_20_all_windows' in res['verdict'], 'verdict missing'
+    print(f'SELFCHECK PASS: {len(fires)} fires parsed, stale/fresh fixtures OK, '
+          f'pnl+verdict fields present')
     return True
 
 
