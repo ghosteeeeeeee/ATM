@@ -1989,3 +1989,5 @@
 [2026-10-24 21:31 UTC]   🟢 OK: volume-buildup-: 5 trades, 80.0% WR, PnL=5.65
 [2026-10-24 21:31 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-24 21:31 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-25 03:31 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-25 03:31 UTC] No signals with sufficient trades in 24h window

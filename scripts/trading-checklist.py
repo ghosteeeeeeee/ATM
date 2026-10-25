@@ -201,7 +201,7 @@ def check_brain_db():
             issues.append(f'{open_trades} open trades (high — verify positions are real)')
 
         return (len(issues) == 0,
-                f'brain OK: {open_trades} open, {closed_24h} closed today',
+                f'brain OK: {open_trades} open, {closed_24h} closed 24h',
                 issues)
     except Exception as e:
         return False, f'brain DB error: {e}', [str(e)]

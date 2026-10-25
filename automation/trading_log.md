@@ -15210,3 +15210,24 @@ Final set: ['BTC', 'ME', 'PUMP']
 **Open Questions:**
 - 24h GREEN at 80% WR but low volume (10T); 7d still -$0.87
 - pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 04:33 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.08 (WR: 100.0%) | 24h: 11T 9W 81.8% `+$0.80` (GREEN) | 7d 125T 42.4% `-$0.73` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade: BTC continuum+ LONG profit-monster-trail +3.49% (+$0.08)
+- atr_sl_hit 0/11 = 0% (<40%) — dominant close = profit-monster-trail (5T +$0.43)
+- No 0%WR signal with 3+ trades (max n=2; only loser bb-bounce-v2-long+ 1T -$0.01)
+- Entry quality good: winners MAE mostly <0.5% (only 2 recovered from >0.5%)
+- No negative-hour streak: 00:00 +$0.09, 02:00 +$0.16, 03:00 +$0.08
+- Frequency 1/hr — not overtrading
+- 1 open: ICP r2v2-long3 LONG -0.21%
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN at 81.8% WR but low volume (11T); 7d still -$0.73
+- pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising

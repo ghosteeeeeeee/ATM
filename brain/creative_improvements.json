@@ -8216,5 +8216,14 @@
     "risk": "low",
     "agent": "brain_auditor",
     "run": 132
+  },
+  {
+    "date": "2026-10-25T05:05:54Z",
+    "idea": "rsi_drift severity gate CLOSED (inverted) + low-ATR/ATR-band blocks rejected-with-data",
+    "rationale": "drift>=10 wins 100% (n=10) — gate would kill winners; low-ATR 53.9% WR refutes incapability claim; ATR 0.30-0.50 band fk 26%+confounded",
+    "expected_impact": "0 — prevents two bad ships, closes one pre-registration",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "low"
   }
 ]

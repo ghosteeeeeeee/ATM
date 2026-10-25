@@ -286,7 +286,7 @@ def main():
         cur.execute("SELECT COUNT(*), COALESCE(SUM(pnl_pct),0) FROM trades WHERE server='Hermes' AND status='open'")
         open_c, open_pnl = cur.fetchone()
         total_pnl = closed_pnl + open_pnl
-        log(f'Portfolio: {open_c} open | {closed_today} closed today | {total_pnl:+.2f}% PnL')
+        log(f'Portfolio: {open_c} open | {closed_today} closed 24h | {total_pnl:+.2f}% PnL')
     except:
         pass
 
