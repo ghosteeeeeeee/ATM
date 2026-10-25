@@ -5249,3 +5249,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-25 21:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 16T 9W 56.3% '+$0.27' (GREEN) | 7d 127T 44.1% '-$0.50' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; worst bb-bounce-v2-long+ 5T 1W 20%WR not 0%) | atr_sl_hit 1/16=6% under 40% | no neg streak (17 +, 18 -, 19 -, 20 empty = streak broken) | 1 open BTC bracketed | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-25 22:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L '+$0.02' (ACE volume-buildup- SHORT profit-monster-trail +0.43%) | 24h 17T 10W 58.8% '+$0.29' (GREEN) | 7d 127T 44.9% '-$0.42' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR signal 24h) | atr_sl_hit 1/17=5.9% under 40% | no neg streak (18 -, 19 -, 20/21 empty, 22 +) | 1 open BTC bracketed SL 80151/TP 81846 | No constants change -> no signal_versions entry
+BY: auto_1hr
