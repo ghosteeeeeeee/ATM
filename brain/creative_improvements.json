@@ -8390,5 +8390,68 @@
     "category": "entry sniper",
     "status": "rejected-with-data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-25T13:55:00Z",
+    "idea": "GATE-LEAK CENSUS — standing tripwire that every executed SHORT is explainable by a live rule or active waiver (brain/analysis/gate_leak_census.py, --selfcheck PASS, exit 1 on LEAK)",
+    "rationale": "Gates are the whole defence and nothing checked them end-to-end. Manual pipeline.log archaeology this run resolved 10 apparent sub-45 leaks, 1 apparent ceiling leak and 1 apparent knife breach to 0 real leaks — 20 min nobody would repeat per run. Scope is deliberately narrow: only rules whose gate INPUT is meta rsi_14 (knife/hard-floor/midband); ceiling + all LONG rules are OUT-OF-SCOPE (exec-time compute_rsi, not adjudicable from the DB); rows before the 2026-10-18 floor revert are PRE-RULE; ai-trader-pending is PATH-EXEMPT.",
+    "result": "14d: ALLOW 10 | WAIVER 19 | PATH-EXEMPT 16 | PRE-RULE 56 | LEAK 0 — gates holding; 30d same verdict.",
+    "category": "measurement",
+    "status": "SHIPPED",
+    "risk": "none (read-only)"
+  },
+  {
+    "date": "2026-10-25T13:55:00Z",
+    "idea": "WITHDRAWN rule for measured-refuted watchdog steers (trade_watchdog_prompt.md rule 4)",
+    "rationale": "#139 measured the 45-64 x BELOW-EMA300 LONG steer as keying the PROFITABLE cell and wrote 'do NOT re-issue'; the watchdog re-affirmed it 19 min later because the retraction rule only fires on condition reversal, and the condition (price below EMA300) genuinely still held.",
+    "result": "refuted steers now WITHDRAW regardless of condition status, checked before the condition re-read. Prompt convention only.",
+    "category": "steering",
+    "status": "SHIPPED",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T13:55:00Z",
+    "idea": "pump-chain SHORT is a CONFIDENCE problem, not an RSI-band problem (in-band split measured)",
+    "rationale": "in-band meta45-54 pump-chain SHORT by confidence: conf60+ 30d 23T 12W 52.2% '+1.53' vs conf30-59 5T '-0.42' and conf<30 12T 2W '-0.47' (both cohorts entirely inside the last 14d). RSI says block, confidence says keep the 60+; 30d counterfactual for blocking the band is '-0.64' = would LOSE money.",
+    "result": "supports keeping the pump-chain exemption (reconfirms #134 OOS sign flip); routes the residual conf<30 bleed to the pending size-dampen / CONF_FLOOR CEO ruling. SHORT_RSI_HARD_FLOOR stays 45.",
+    "category": "entry sniper",
+    "status": "measured — supports status quo",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T13:55:00Z",
+    "idea": "REJECTED-WITH-DATA: arm-rate by volatility_regime as a regime gate",
+    "rationale": "if trail-arming were vol-dependent we could gate entries by regime",
+    "result": "14d arm% is FLAT: FLAT 45.0% (20T) / HIGH 43.2% (44T) / EXTREME 50.3% (151T) / NORMAL 47.3% (112T). Unarmed bleed tracks trade count only (EXTREME -6.76 / NORMAL -3.92 / HIGH -2.04 / FLAT -0.17). Logged so it is never re-proposed.",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-25T15:15:00Z",
+    "idea": "COMPONENT SOURCE STAMP on _signal_metadata (shipped run #141)",
+    "rationale": "trades never persisted the component confluence string the COSIG-GATE sees; #138 blocker for bb-bounce bypass-removal lever",
+    "expected_impact": "enables solo-vs-confluence split at n>=20 for bb-bounce (30d 56T 50% -0.56 solo vs combo +0.46)",
+    "category": "measurement",
+    "status": "shipped",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T15:15:00Z",
+    "idea": "LOWER ARM THRESHOLD (0.40->0.30/0.20) to rescue hard_max_loss chop exits",
+    "rationale": "armed earlier = lock smaller profits before stop",
+    "expected_impact": "REJECTED-WITH-DATA: HML MFE ceiling 14d only 4/68 reached 0.30 (5.9%), 13/68 reached 0.20 — lower arm touches <=6% of chop cohort; 30d 24/155. Route CLOSED — chop is entry-quality, not exit-timing.",
+    "category": "exit engine",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-25T15:15:00Z",
+    "idea": "UNIVERSAL trail-arm timeout for uncovered LONG signals (TAT gap)",
+    "rationale": "TAT only covers bb-squeeze/pump-chain/bb-bounce/ai-trader+; other LONG signals keep dying to hard_max_loss after 45m+",
+    "expected_impact": "COLLECT: 30d uncovered LONG HML >=45m = n=19 (-2.17) but 5T killed signals -> live n=14 (-1.46) across 12 signals; re-measure at n>=30 or pnl <= -3.00",
+    "category": "exit engine",
+    "status": "collected",
+    "risk": "low"
   }
 ]

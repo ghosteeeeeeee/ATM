@@ -2588,5 +2588,49 @@
     "after": "refutation table + re-measure Oct 27; KPI SQL verified returning 85.6 (14d)",
     "rationale": "the steer keys the wrong cell and would cost money; the chop question needed a number",
     "impact": "stops re-issuing a money-losing steer; gives the watchdog a calibrated entry-quality metric"
+  },
+  {
+    "timestamp": "2026-10-25T13:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Watchdog prompt: Steer Validity gains rule 4 — steers under \"Measured-refuted steer patterns\" are WITHDRAWN on the next cycle even when the market condition still holds (root cause: retraction rule only covered condition reversal, so the refuted 45-64 x EMA300 steer was correctly re-affirmed 19 min after #139 refuted it)",
+    "type": "prompt",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "retraction fired only when the condition reversed",
+    "after": "measurement refutation outranks condition persistence; checked before the condition re-read",
+    "rationale": "a steer whose blocked cell was measured to be the profitable one must not stand just because the market condition persists",
+    "impact": "prompt convention only, zero trading behavior"
+  },
+  {
+    "timestamp": "2026-10-25T13:55:00Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/gate_leak_census.py — standing gate-integrity census (SHORT knife/hard-floor/midband on meta rsi_14), --selfcheck PASS, exit 1 on LEAK. First run: 0 LEAK (14d and 30d), gates holding.",
+    "type": "creative",
+    "file": "brain/analysis/gate_leak_census.py",
+    "before": "no automated gate-integrity check existed",
+    "after": "one-command census with explicit OUT-OF-SCOPE / PRE-RULE / PATH-EXEMPT labels",
+    "rationale": "gates are the whole defence; manual log archaeology is not repeatable per run",
+    "impact": "read-only tripwire, zero trading behavior"
+  },
+  {
+    "timestamp": "2026-10-25T13:55:00Z",
+    "agent": "brain_auditor",
+    "change": "SHORT_RSI_HARD_FLOOR 45 -> 55 PROPOSED BY WATCHDOG, MEASURED, REJECTED-WITH-DATA (no constants change)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "45",
+    "after": "45 (unchanged)",
+    "rationale": "30d p=0.0911 FAIL, fkA 30d 22.2% FAIL, save +0.48/30d sub-materiality, pump-chain (100% of live band trades) 30d counterfactual -0.64 = blocking would LOSE, non-PC portion already blocked by SHORT_MIDBAND with 0 leaks/37 opens",
+    "impact": "no change; hypothesis closed for this window, re-open only with new data"
+  },
+  {
+    "timestamp": "2026-10-25T15:15:00Z",
+    "agent": "brain_auditor",
+    "change": "Component co-signal source stamp: _exec_meta['source'] at trade open (zero-behavior instrumentation; closes #138 in-flight co-signal stamp)",
+    "type": "creative",
+    "file": "scripts/decider_run.py",
+    "before": "trades._signal_metadata had no confluence/source string (only signal names in trades.signal)",
+    "after": "_signal_metadata.source = component-level comma-joined source (e.g. bb_bounce+,ma100-cross+) on every new trade",
+    "rationale": "solo-vs-confluence outcomes for STANDALONE_BYPASS signals (bb-bounce 30d 56T 50% -0.56 solo vs 4T combo +0.46) were unmeasurable — blocker for the bypass-removal lever",
+    "impact": "unblocks bb-bounce bypass-removal measurement; py_compile PASS, self-check 5/5, bug_hunter SHIP 6/6 (1 LOW: MAX(source) group-level aggregation, pre-existing)"
   }
 ]

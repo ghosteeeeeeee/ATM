@@ -5180,6 +5180,18 @@ def run(dry_run=False):
                 _exec_meta['rsi_drift'] = round(abs(float(_drift_live) - float(_drift_detect)), 2)
         except Exception:
             pass
+        # brain_auditor #141: stamp component-level co-signal source (zero-behavior).
+        # Closes #138's "compactor co-signal stamp in flight": trades only carried
+        # signal names (trades.signal), never the confluence string the COSIG-GATE
+        # sees (e.g. 'bb_bounce+,ma100-cross+'), so solo-vs-confluence outcomes for
+        # the STANDALONE_BYPASS cohort (bb-bounce etc.) were unmeasurable.
+        # Same pattern as coin_regime/rsi_drift stamps above; read-only, no gate.
+        try:
+            _cs_src = sig.get('source')
+            if _cs_src:
+                _exec_meta['source'] = _cs_src
+        except Exception:
+            pass
 
         # ── CHASE COMPOSITE filter: block LONG chasing extended moves ─────
         # 7d: z>2.5 OR gap>1.0% LONG = 15T 20%WR -$1.25. Non-chase: 96T 53.1%WR +$1.28.

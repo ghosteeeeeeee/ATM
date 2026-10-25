@@ -238,6 +238,14 @@ was `[]`.
    and drop it out of the actionable list.
 3. **If the condition still holds and the steer is now ≥2 cycles old**, keep the severity
    but append `age=<n> cycles unexecuted` so the human can see it has been standing.
+4. **If the steer appears under "Measured-refuted steer patterns" below, WITHDRAW it** —
+   write `WITHDRAWN — <steer text> (measured-refuted by brain_auditor; cell/condition does
+   not key the bleed)` and drop it from the actionable list. **This fires even when the
+   market condition still holds.** Measurement refutation outranks condition persistence:
+   knowing that price is still below EMA300 does not resurrect a steer whose *blocked cell
+   was measured to be the profitable one*. Re-reading the condition answers "is the steer's
+   premise about the market true?" — it does not answer "does acting on the steer make
+   money?", which is the only question that matters. Check this list **before** step 1.
 
 **Why this rule exists (measured 2026-10-22, trade #16353 BTC SHORT):** an urgent 🔴
 "exit — 1m holds above EMA300, ignored 57 min" steer was written at 21:51 and again at
