@@ -120,3 +120,6 @@
 
 ## TEAM UPDATES
 - [2026-10-25 05:55 UTC] health_monitor: Auto-fixed `hermes-auto-1hr.service` failed state (start timeout 05:37 — opencode build hung >10min) via `systemctl reset-failed`; next run 06:27 fires normally. No pipeline restarts needed: vacation pause absent, all 3 core timers firing, prices fresh (14.8s), 0 tracebacks/30min, 62 signals/h, 0 open | 5 closed today +$0.22. ONGOING WARNs: hotset fallback 0-tokens 25x/30min (hotset now only 1 token), openclaw-gateway crash-loop NRestarts=116,943 (non-Hermes, CEO choice pending from 02:46 alert).
+
+## TEAM UPDATES
+- [2026-10-25 08:55 UTC] health_monitor: Auto-fixed 2 dead tuner timers — `hermes-ma-cross-5m-tuner` (stale ExecStart path from signal migration + missing PYTHONPATH + DATA_DIR pointing at scripts/data graveyard + unreachable 120s freshness guard on 5m candles) and `hermes-zscore-momentum-tuner` (never fired since 2026-10-18 boot, OnBootSec race left Trigger: n/a). Verified by run: 104 + 82 tokens tuned, both timers re-armed (next 24h / 4h). Core healthy: vacation pause absent, all 3 core timers firing, 0 tracebacks/30min, 55 signals/h, prices fresh 66s, 0 phantom, disk 82%. CEO NOTE: ma_cross_5m signal family disabled in constants (WR=19%) — tuner could be renamed -DEFUNCT instead of maintained.

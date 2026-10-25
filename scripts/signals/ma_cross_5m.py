@@ -25,9 +25,9 @@ from typing import Dict, List, Optional
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR   = os.path.join(os.path.dirname(SCRIPT_DIR), 'data')
 sys.path.insert(0, SCRIPT_DIR)
-from paths import CANDLES_DB   # price_history.db (candles.db is a symlink/alias)
+from paths import CANDLES_DB, HERMES_DATA   # canonical data dir — never derive it from this file's location (migration to signals/ broke that)
+DATA_DIR   = HERMES_DATA
 _RUNTIME_DB = os.path.join(DATA_DIR, 'signals_hermes_runtime.db')
 _TUNER_DB   = os.path.join(DATA_DIR, 'ma_cross_5m_tuner.db')
 
@@ -78,7 +78,9 @@ def get_5m_candles(token: str, lookback: int = LOOKBACK_CANDLES) -> List[dict]:
         row = c.fetchone()
         if row and row[0]:
             age_seconds = time.time() - row[0]
-            if age_seconds > 120:  # 2 minutes
+            # candles_5m ts = OPEN of latest 5m window → age cycles 0–300s between
+            # fetches (plus ~60-90s collector lag). 120s was unreachable most runs.
+            if age_seconds > 420:  # 7 minutes (300s window + ~2min lag slack)
                 print(f"[ma_cross_5m] Stale data for {token}: {age_seconds/60:.1f}m old — skipping")
                 conn.close()
                 return []

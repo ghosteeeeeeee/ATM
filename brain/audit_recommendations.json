@@ -1,138 +1,123 @@
 {
-  "timestamp": "2026-10-25T06:50:00Z",
-  "run": 134,
+  "timestamp": "2026-10-25T08:51:00Z",
+  "run": 135,
   "session_brain_stats": {
-    "queries": 3,
-    "top_topics": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing"
+    "queries": [
+      "spider trail tier NEUTRAL regime profit monster",
+      "trail distance arm lock profit giveback"
     ],
-    "insight": "Recurring: 'exit system is the #1 profit leak' dominates session recall — consistent with measured armed/unarmed split (14d ARMED 157T 70.1% +9.17 vs UNARMED 162T 6.2% -12.84). Trend-following/new-signal requests keep surfacing; no unimplemented signal idea cleared bars."
+    "finding": "spider-profit spec (plans/spider-profit.md) exists and describes SPIDER_DISTANCE_PCT=0.10; NO session ever recorded the tier-threshold unit mismatch. The bug was undocumented drift, not a rejected decision.",
+    "drift": "none attributable to session brain — PM trail tiered design is documented as intended (0.20 -> 0.50 at +1.5% etc.), which matches the non-spider path exactly."
   },
   "trade_summary_24h": {
-    "n": 12,
-    "wins": 9,
-    "wr": 75.0,
-    "pnl_usdt": 0.7,
-    "status": "GREEN",
-    "7d": {
-      "n": 123,
-      "wins": 52,
-      "wr": 42.3,
-      "pnl_usdt": -0.74
-    },
-    "14d": {
-      "n": 324,
-      "wins": 122,
-      "wr": 37.7,
-      "pnl_usdt": -3.55
-    },
-    "30d": {
-      "n": 686,
-      "wins": 300,
-      "wr": 43.7,
-      "pnl_usdt": -2.13
-    },
-    "14d_arm_split_mfe_basis": {
-      "armed_mfe_ge_0.40": "157T 70.1% +9.17",
-      "unarmed": "162T 6.2% -12.84"
-    },
-    "7d_exits_chop_cohort": "hard_max_loss 15T 0W -1.89 | atr_sl_hit 27T 0W -1.48 | stale_exit 3T 0W -0.64 | hard_sl 4T 0W -0.36 = 49T 0W -4.37; profit-monster-trail 41T 36W +2.51 is the whole profit engine",
-    "14d_arm_split_note": "mfe_pct>=0.40 basis (trailing_activated boolean gives a different count — always name the basis)"
+    "24h": "13T 9W 69.2% +0.66 GREEN",
+    "7d": "123T 43.1% -0.68",
+    "14d": "326T 37.7% -3.58",
+    "30d": "688T 43.9% -2.16",
+    "armed_unarmed_7d": "ARMED 63T 71.4% +3.27 vs UNARMED 60T 13.3% -3.95",
+    "armed_unarmed_14d": "ARMED 157T 70.1% +9.17 vs UNARMED 169T 7.7% -12.75",
+    "open": "0 — flat book (DISAGREED regime: 15m LONG_BIAS / 4h SHORT_BIAS, BTC below EMA300 5.5h, LOW vol = chop)",
+    "worst_24h_loser": "ICP r2v2-long3 LONG -4.58% hard_max_loss (RSI 72.7 at entry, meta_rsi overbought — 14d family still 8W)",
+    "by_signal_24h_worst": "bb-bounce-v2-long+ 2T -0.06 | r2v2-long3 1T -0.10 (n too small, no action)"
   },
   "shadow_analysis": {
-    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1; actual_outcome null 24,598/24,598; JSONL not JSON). Pre-live evidence only — no outcome question answerable.",
-    "contrarian": "RE-RUN this run: 535 decided, pump-chain- flip-WR 63.9% n=338 (OOS post-Oct18 64.0%). Oct-27 PROMOTE stands. btc-pump-rider+ 25.0% n=196 = fade is WRONG for that family.",
-    "wyckoff": "Still no outcome join — not answerable. shadow_trader's own wyckoff- row (n=18, 88.9%) is a different, shadow-trader-internal source.",
-    "floor_admit": "Outcome join running + selfcheck PASS: 638ep, admit+win 48.2% vs 38.2%, p=0.126. n>=200 bar PASS, 30d same-sign bar unreachable until 2026-11-15 -> COLLECT.",
-    "rr_shadow": "ORPHANED (no producer, 21d stale) — do not cite.",
-    "overall": "3/5 usable: contrarian (decision-ready), floor_admit (collecting to Nov-15), oscillator (pre-live evidence). wyckoff + rr_shadow unusable."
+    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1 stops writes; actual_outcome null on 24,598/24,598; JSONL not JSON array). Pre-live evidence only — no outcome question answerable.",
+    "contrarian": "USEFUL. Fresh outcome join: pump-chain- contrarian flip-WR 64.0% (n=339, was 63.9% n=338), OOS post-Oct18 64.0%. btc-pump-rider+ flip-WR 25.0% (n=196) = original direction correct, do not flip. TOTAL 536 joinable / 808 entries. Remains the Oct-27 PROMOTE candidate.",
+    "wyckoff": "PENDING JOIN — 298 rows, no outcome column, no producer script wired. not answerable.",
+    "floor_admit": "PENDING JOIN (shipped #132): 638ep, 48.2% vs 38.2% p=0.126, COLLECT to Nov-15. 91% admit, no live edge yet.",
+    "rr_shadow": "ORPHANED — no producer script in repo, mtime 21d stale. Do not cite.",
+    "shadow_trader_report": "20104 signals / 19444 closed. Gate justification: CONFLUENCE-EXPIRY blocked 10235 would_win 48% avg_pnl -0.12; EXEC-BLOCK 15 blocked would_win 7% avg -0.51 (tightest); BTC-CRASH 116 would_win 31% avg -0.36. Exit A/B: pm_trail 7258 WR100% +2737 vs hard_max 4637 WR0% -4382 — trail-or-nothing reproduced independently in shadow.",
+    "overall": "1 of 5 raw shadow files answerable (contrarian). Shadow-trader's own gate/exit tables remain the highest-value shadow artifact."
   },
   "drift_findings": [
-    "Escalation #17 leg 1 was 78x escalated and never measured — SCRIPT EXISTED BUT UNRUN at session open (be_at_arm_replay_2026-10-25.py, mtime 06:04). Ran it: pre-reg bars MET. Escalation now measured, not just escalated.",
-    "Oct-17 verdict (arm-breakeven-stop) said 'deployment = shadow collector then v6 exit-stack + CEO GO'. Shadow shipped 2026-10-18, root-cause fixed #127, still 0 fires — see changes_from_last_run. No drift on the decision itself; drift was in nobody running the pre-registered re-measurement.",
-    "bug_hunter on the two new scripts: HIGH mfe_cut MFE window included the 1m candle AFTER the T=55m cut (inflated MFE -> under-counted fires); HIGH be_at_arm candle bound close_ts+60 admitted the candle entirely after the exit (invented touches/saves). Both fixed, selfchecks extended so each would now fail, all numbers re-derived."
+    "SPIDER PM_TRAIL_TIERS unit mismatch (NEW, SHIPPED this run): profit_monster.py:517 wrote tier thresholds as decimals (0.015/0.030) while every sibling value in the same block was converted to percent (ACTIVATE*100, DISTANCE*100) and peak_pnl is percent (pnl_utils.compute_live_pnl). Result: min threshold matched EVERY activated peak (0.30% >= 0.015) -> the 0.50% tier always won -> trail floor = peak-0.50 sat BELOW entry for 83 of 239 logged activations (NEO 2026-10-22 22:30 pnl=0.30 floor=-0.20). SPEC (plans/spider-profit.md) and inline comments both say 0.10% in the scalp zone. FIXED + assert guard.",
+    "#134 BE-at-arm independently reproduced this run: script reports 30d NET +2.140, my separate head-to-head replay computed +2.140 on the same scope — cross-path reproduction, no drift.",
+    "NO session-brain/code drift found on the non-spider PM trail tiers: main path converts at import (profit_monster.py:26), manual_exit_manager converts (line 48), shadow_trader hardcodes percent literals — only the spider block was wrong. Root cause isolated to ONE site."
   ],
   "recurring_problems": [
-    "Chop/stop cohort (HML+atr_sl+stale+hard_sl) 7d 49T 0W -4.37 vs profit-monster-trail 41T 36W +2.51 — the trend/chop law, unchanged. Escalation #17 (exit-ladder) partially answered this run by the BE-at-arm leg.",
-    "pump-chain+ bleed 7d: standing CEO stack, no new lever passed bars this run.",
-    "Round-trip giveback ceiling +$8.28/14d (pump-chain+ +2.61 / pump-chain- +1.51) — BE-at-arm captures +2.20/30d of it on non-EXTREME scope; rest needs the armed-trail-distance OOS (pre-registered this run)."
+    "TRAIL-OR-NOTHING unchanged: 7d ARMED 63T 71.4% +3.27 vs UNARMED 60T 13.3% -3.95; 14d +9.17 vs -12.75. 7d exits: PM-trail 41T 36W +2.53 vs hard_max_loss 15T 0W -1.89 + atr_sl 27T 0W -1.48 + stale 3T 0W -0.64 + hard_sl 4T 0W -0.36 = 49T 0W -4.37.",
+    "Round-trip bleed: armed trades (MFE>=+0.40%) that still close negative are the loss engine — this run measured WHO owns them (see creative #2).",
+    "pump-chain+ kill criteria still MET-by-letter (14d 46T 28.3% -0.43; needs n>=20 AND PnL<0 AND WR<30%) but 30d +1.84 reverses positive and no_signal_enable_disable blocks unilaterally — NO-KILL stands, CEO owns the verdict (unchanged since #121).",
+    "Weekly 'Self-healing test: FAIL' in pipeline.log at 03:00 every Sunday (Oct 11, 18, 25) — pre-existing 3rd occurrence, unrelated to this run, never triaged."
   ],
   "missing_implementations": [
-    "exit-ladder / armed-trail-distance candle OOS (escalation #17 leg 2) — BE-at-arm done, trail-distance sweep not yet built",
-    "wyckoff_shadow outcome join (sibling to floor_admit/contrarian joins)"
+    "None new. Re-enter-on-recovery (pre-reg #72, due Oct-25) was the last unrun pre-registered study — MEASURED this run and CLOSED as REJECTED-WITH-DATA (see creative #3)."
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-25T06:50:00Z",
-      "idea": "BE-at-arm activation gate above arm — MEASURED, REJECTED-WITH-DATA (parent policy PASSES all bars)",
-      "rationale": "BE-at-arm passed pre-reg bars — check whether a higher activation gate buys fk headroom without losing the save.",
-      "expected_impact": "MEASURED (post-fix), REJECTED-WITH-DATA: non-EXTREME close-variant 30d NET +2.14 (gate 0.40 = arm) -> +1.18 (0.60) -> +0.56 (0.80) -> +0.63 (1.00); fk_armed 9.4% -> 2.9%. Arm-level already passes every bar including 7d (17.6%), so the gate buys no bar and costs ~45% of the edge. Keep BE at arm-level as pre-registered.",
-      "category": "exit quality",
+      "date": "2026-10-25T08:51:00Z",
+      "idea": "SPIDER trail-tier unit fix — ship (1 config/code change)",
+      "rationale": "thresholds 0.015/0.030 compared against percent peak_pnl -> always third tier -> dist 0.50% and floor below entry at arm; spec + comments both say 0.10%. 83/239 activations locked nothing.",
+      "expected_impact": "spider-active (~34% of fires) trades arm with floor at peak-0.10 (e.g. +0.20 at the 0.30 activation) instead of peak-0.50 (e.g. -0.20). Direction validated by the trail sweep: 0.10 nets +3.972/30d vs 0.50 +2.121, fk_zeroed 1.8% vs 3.6%.",
+      "category": "exit stack",
+      "status": "shipped",
+      "risk": "medium-low — restores documented spec, one-line revert, assert prevents regression"
+    },
+    {
+      "date": "2026-10-25T08:51:00Z",
+      "idea": "ESCALATION #17 LEG 2 MEASURED — armed trail distance sweep; verdict COVERAGE-not-LEASH, and it DOMINATES the pending BE-at-arm CEO ask",
+      "rationale": "flat post-arm leash D swept 0.05-1.60% on 30d non-EXTREME/no-volume- armed cohort (n=216), pnl_usdt both sides, close-through exit, fee-neutral delta.",
+      "expected_impact": "D=0.20% 30d NET +3.925 (halves +1.759/+2.166, t=3.122 p~0.002, fk_zeroed 1.8%, top-3-removal +3.726) PASSES EVERY BAR; 14d +1.820 passes; 7d +0.137 halves FAIL. Head-to-head on the same 216 armed trades: trail-0.20 +3.925 vs BE-at-arm +2.140, per-trade wins 131 vs 61. Decomposition: PM_EXIT cohort n=131 net only +0.271 = PM tiers already optimal NO CHANGE; the whole edge is 56 armed trades handed to loss-side engines (41 bypass-by-design + 12 Hermes rows PM never logged an activation for). 13/15 PM-eligible leaks have NO activation line in profit_monster.log during their own trade window. Sampling-robust: arm-on-1m-CLOSE gives +3.920 (30d) / +2.246 (14d), both pass — not a wick artifact.",
+      "category": "exit stack",
+      "status": "measured — CEO GO ask, upgrade of the BE-at-arm ask",
+      "risk": "medium — 7d halves fail, must not ship as a one-constant change (replaces whole post-arm exit stack)"
+    },
+    {
+      "date": "2026-10-25T08:51:00Z",
+      "idea": "RE-ENTER-ON-RECOVERY counterfactual (pre-reg #72, Oct-25 batch) — MEASURED, REJECTED-WITH-DATA",
+      "rationale": "30d losers with a stored bracket (355), limit re-entry at original entry, 60m trigger window, 60m walk, SL-wins-ties, fee-adjusted bars, candle-contain-close skipped (avoids #85 vacuity).",
+      "expected_impact": "recovery/fill rate only 31.5% (the #72 71% census does NOT reproduce — it was a +-0.2% band touch, not a limit-at-entry fill). ALL n=110 net_after_fees +1.686 but p_t=0.158 FAIL; RAW-bracket scope n=58 newer_half -0.041 FAIL, p=0.52 FAIL. VERDICT REJECTED-WITH-DATA — do not re-propose without a redesigned trigger.",
+      "category": "re-entry",
       "status": "rejected-with-data",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-25T06:50:00Z",
-      "idea": "Family-scoped MFE-CUT candle OOS for bb-bounce-v2-long+ (pre-reg #837 blocker) — MEASURED, BAR FAIL",
-      "rationale": "Trade-level shadow numbers were selection-on-outcome; this is the candle replay of the actual code condition (open at T=55m AND MFE<0.20% -> exit at 1m close).",
-      "expected_impact": "30d: cohort 33 (open at T with candles), cohort_W 17, fired 9, saved 4 (+0.31 delta), killed 4 (-0.18), NET +0.14, fk_cohort 23.5% > 20% BAR -> REJECTED-WITH-DATA. 14d NET +0.18 fk 0% (n=2 fires), 7d NET +0.10 fk 0% (n=1). Even setting the bar aside the edge is $0.005/trade. NOTE: the pre-fix run divided by ALL window winners and read fk 14.3% = false PASS; the house bar is cohort winners.",
-      "category": "exit quality",
-      "status": "rejected-with-data",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-25T06:50:00Z",
-      "idea": "ARMED-TRAIL-DISTANCE candle OOS (escalation #17 leg 2, pre-registered)",
-      "rationale": "BE-at-arm only pays when price round-trips all the way through entry. The PM trail stop sits at peak-1.20% while UGB-PT already uses peak-0.30% for the UNARMED half — the armed half has the wider, asymmetric leash. Round-trip giveback ledger ceiling is +$8.28/14d vs BE-at-arm's +$2.14/30d, so most of the giveback never reaches entry.",
-      "expected_impact": "Unknown until swept; single variable (trail distance D after arm), pnl_usdt basis both sides, house bar fk<20% + net>0 in both 15d halves + non-EXTREME scope.",
-      "category": "exit quality",
-      "status": "pre-registered",
-      "risk": "medium (touches the profit engine — shadow first, CEO GO before live)"
-    },
-    {
-      "date": "2026-10-25T06:50:00Z",
-      "idea": "Arm-rate-by-signal chop KPI — MEASURED (extends #131)",
-      "rationale": "14d n>=15 arm% (mfe/trailing_activated): volume-buildup- 72.7% arm +68.2% WR (trend signal) | r2v2-long3 60.0% +53.3% | pump-chain+ 58.7% +28.3% | bb-bounce-v2-long+ 48.5% +42.4% | doji 37.5% (killed) | ai-trader+ 30.4% (killed) | pump-chain- 25.7% +22.9% -0.30 | ai-trader-pending 12.5% +25.0%. Standing rule n>=15 AND arm<40% AND PnL<0 flags exactly ONE live family: pump-chain- SHORT.",
-      "expected_impact": "Independent second axis on the Oct-27 contrarian PROMOTE: low arm% (chop entry) and 63.9% flip-WR (wrong direction) are the same claim from two methods. No config change — Oct-27 ruling owns it.",
-      "category": "measurement",
-      "status": "measured",
-      "risk": "none"
-    },
-    {
-      "date": "2026-10-25T06:50:00Z",
-      "idea": "Habitat dampen re-measure (Oct-25 due date, pre-reg #671)",
-      "rationale": "Criteria were p<0.05 AND fk<20% AND save>$1/14d, all three failing Oct-22 (p=0.0945, fk 21.6%).",
-      "expected_impact": "RE-STILL-REJECTED: 14d non-RANGING fc<50 108T 29.6% -2.40 vs fc>=50 123T 39.0% -1.07 -> Fisher p=0.0025 PASSES (was 0.0945), but fk 32/122 = 26.2% FAILS and 0.80x save = $0.48/14d FAILS. 30d passes all three (fk 11.3%, p<0.0001, save $0.49 — save still <$1) but 7d fk 30.8% -> window-unstable. Dampen also remains a structural no-op while DEFAULT_TRADE_SIZE_USDT == HL_MIN_NOTIONAL_USDT (size-lever rule #8145). BOOST still needs CEO GO + measurement vehicle.",
-      "category": "regime habitat",
-      "status": "rejected-with-data",
-      "risk": "low"
+      "risk": "n/a"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "file": "scripts/profit_monster.py",
+      "change": "spider PM_TRAIL_TIERS thresholds 0.015/0.030 -> 1.5/3.0 (percent, matching the *100 conversions of ACTIVATE/DISTANCE in the same block) + assert guard",
+      "before": "always resolved to the 0.50% tier; floor = peak-0.50, below entry for 83/239 activations",
+      "after": "0.10% / 0.30% / 0.50% at 0% / 1.5% / 3.0% peak as the comments and plans/spider-profit.md specify; floor = peak-0.10 (>= +0.20 at the 0.30 activation)",
+      "verification": "py_compile PASS, _trail_distance_for_peak repro floor +0.20 at peak 0.30 (was -0.20), assert trips on the old values, hermes_constants.py git diff EMPTY, CEO_PROTECTED_FLAGS 13/13, PM_TRAIL_ACTIVATE_PCT/PM_TRAIL_DISTANCE_PCT untouched",
+      "note": "profit-monster is a oneshot systemd timer (fresh process/min), so the module-global override does not leak across fires; the missing else-restore is latent only if it ever becomes a daemon"
+    }
+  ],
   "changes_from_last_run": [
-    "#132 floor_admit_outcome_join.py --selfcheck PASS fresh (638ep, COLLECT to Nov-15) — WORKING",
-    "#132 TAT probe CLI / watchdog DEAD-SIGNAL CHECK — WORKING (present at trade_watchdog_prompt.md:129)",
-    "#133 rsi_drift/low-ATR/ATR-band all closed — no re-open, still rejected",
-    "#131/#130 UGB-PT: 491 would-fire logs, 1 fire live, selfcheck PASS — WORKING",
-    "#127 ARM-BE DB-state fix: 0 fires since 22:50 Oct-24, BUT so is sibling UGB-BE (0 fires in same window) and 0 open positions for most of it — 'correct-by-traffic' is UNPROVEN, it is 'no eligible traffic'. First real test needs an armed trade that round-trips.",
-    "protected: hermes_constants.py git diff vs HEAD EMPTY | size-reduce file absent = 1.0x | 0 Tracebacks logged 2026-10-25",
-    "THIS RUN bug_hunter fixes: be_at_arm close-bound + armed-winner fk denominator, mfe_cut t_cut-bound + cohort-winner fk + delta-based save/harm — both selfchecks extended (post-close candle, post-cut candle, SHORT direction) and PASS; all published numbers re-derived"
+    "#134 be_at_arm_replay_2026-10-25.py — WORKING: selfcheck PASS, and this run independently reproduced its published 30d NET +2.140 via a separate head-to-head replay path.",
+    "#134 mfe_cut_bb_bounce_oos_2026-10-25.py — selfcheck PASS, verdict stays BAR FAIL (fk_cohort 23.5%, NET +0.14/30d). CLOSED, not re-proposed.",
+    "#134 habitat dampen re-measure — STAYS REJECTED (fk 26.2%, save +0.48, size-lever structural no-op). No action.",
+    "#132 floor_admit_outcome_join --selfcheck — PASS (638ep, COLLECT Nov-15).",
+    "#131 UGB-PT forward ledger — correct-by-traffic; 0 open positions for most of the window.",
+    "#127 ARM-BE DB-state — still 0 fires, but 0 armed round-trip positions in the window = no eligible traffic, NOT proof of health.",
+    "Protected/health: hermes_constants.py git diff EMPTY | size-reduce file absent = 1.0x | CEO_PROTECTED_FLAGS 13/13 | 0 uncaught component Tracebacks 2026-10-25 (only the recurring Sunday 03:00 self-healing test FAIL, 3rd occurrence)."
   ],
-  "watchdog_triage": [
-    "P1 direction-misalignment (7d LONG 85T 41%WR -1.07 vs SHORT 38T 45%WR +0.33 while 91/122 tokens SHORT_BIAS): ACKNOWLEDGED, NO ACTION. Short-gate CLOSED #129 (SLOPE-FILTER +0.98 fails bar), counter-regime penalty REJECTED #608, time blocks BANNED. Correct lever already exists and is pre-registered: contrarian pump-chain- flip (Oct 27).",
-    "P3 pump-chain+ 14T 2W -0.85: standing CEO stack (bare kill MET but 30d +1.85 NO-KILL; CONF_FLOOR fkA 41.7% FAIL; TAT BASE vs VARIANT-C held). No new lever passed bars.",
-    "P3 bb-bounce-v2-long+ 17T 8W -0.50: candle OOS this run — family-scoped MFE-CUT bars pass mechanically (fk 14.3%, fired 9, net +0.14/30d) but the edge is $0.005/trade -> NO SHIP. Watch, not act.",
-    "ICP #16389 r2v2-long3 CLOSED hard_max_loss -4.58% at 05:46 — executor steer self-resolved; autopsy shows it as the sole 2h loser, never_adverse within 30m window per corrected replay (reported as-is, not used as wrong-side evidence).",
-    "HOTSET SIDEWAYS: hotset.json has written 0 tokens every minute since 05:56 (was 1); health monitor WARN '0 tokens 25x/30min'. hermes-trades-api falls back to DB query and signals still execute (12 trades/24h) -> MONITOR, not a fault. Worth one look at the compaction gate if it stays 0 for >24h."
-  ],
+  "changes_from_last_run_verified": true,
+  "losing_trade_autopsy_48h": {
+    "n": 14,
+    "never_adverse": 4,
+    "recovered_after_adverse": 5,
+    "never_traded_back": 5,
+    "never_traded_back_list": "ALT vb- hard_max_loss -0.17 | CC vb- stale_exit -0.15 | ZRO vb- hard_max_loss -0.11 | BTC ai-trader-pending manual_sl_hit -0.08 | PUMP r2v2-long9 profit-monster-trail -0.01",
+    "verdict": "wrong-side REFUTED 59th consecutive run (valid refs #61 p=0.116, #84 t=-0.04). 3 of 5 NEVER are the volume-buildup- SHORT cluster, all tiny (-0.11..-0.17). Never-adverse 4/14 = shallow, no directional information.",
+    "method": "brain/analysis/recovery_replay.py adverse-first anchor (NOT the vacuous open-anchored replay)"
+  },
+  "signal_quality_deep_dive": {
+    "sub50_n15_14d": [
+      "bb-bounce-v2-long+ 34T 41.2% -1.01 (already flagged to weekly auditor — in flight)",
+      "ai-trader+ 23T 30.4% -0.98 (disabled)",
+      "doji-bottom-long 16T 31.3% -0.97 (killed Oct 16)",
+      "pump-chain+ 46T 28.3% -0.43 (kill MET, CEO-owned)",
+      "pump-chain- 35T 22.9% -0.30 (Oct-27 contrarian PROMOTE)"
+    ],
+    "new_targets": "NONE — every sufficient-n bleed cohort is already killed, disabled, in flight, or pre-registered to a dated ruling."
+  },
   "next_actions": [
-    "CEO GO ASK: BE-at-arm (pre-reg #785) — ALL FOUR Oct-17 bars met on the pre-registered scope AFTER bug fixes: armed-rate 59.0%, fk_armed 9.4% (30d) / 15.6% (14d) / 17.6% (7d) all <20%, split halves OLD +1.04 fk 4.0% / NEW +1.10 fk 16.7%, non-EXTREME 30d NET +$2.14 close-variant. Ship path per Oct-17 verdict = v6 exit-stack + CEO GO; ARM-BE shadow stays on.",
-    "Escalation #17 leg 2 (armed-trail-distance candle OOS) — now the only unmeasured piece of the exit ladder; pre-registered this run.",
-    "Oct 27: contrarian pump-chain- PROMOTE (63.9% n=338, OOS 64.0%) + arm-rate corroboration (25.7% arm, n=35) + coin_regime n>=50 re-measure + mid-band dampen re-measure",
-    "Nov 15: floor_admit 30d same-sign bar",
-    "MFE-CUT bb-bounce: CLOSED as REJECTED-WITH-DATA (fk_cohort 23.5% > 20% bar, NET +0.14/30d) — do not re-propose without a redesign that clears the bar"
-  ],
-  "headline_correction": "MID-RUN BUG-HUNTER FIX: two HIGH window-boundary bugs (post-close candle in be_at_arm, post-cut candle feeding MFE in mfe_cut) + the fk denominator (all-winners vs policy-cohort winners) were corrected and every number below RE-DERIVED. MFE-CUT verdict FLIPPED from bar-pass to bar-FAIL."
+    "CEO GO — UPGRADED ASK: ship the post-arm trail floor at peak-0.20% (close-through) INSTEAD of / ahead of BE-at-arm. Same v6 exit-stack path per the Oct-17 verdict; measured better on every axis (+3.925 vs +2.140/30d, 131 vs 61 per-trade wins, fk_zeroed 1.8% vs 9.4%). ARM-BE shadow stays on.",
+    "CEO VETO WINDOW — spider trail tier fix is live in tree: revert is one line (profit_monster.py:517-523) if CEO wants the old 0.50% floor. Independent measurement says tighter is better (0.10 +3.972 vs 0.50 +2.121/30d) but the fix's primary justification is spec conformance, not the sweep.",
+    "Oct 27: contrarian pump-chain- PROMOTE (flip-WR 64.0% n=339, OOS 64.0%) + arm-rate corroboration (25.7% arm n=35) + coin_regime n>=50 + mid-band dampen re-measure.",
+    "Nov 15: floor_admit 30d same-sign bar (638ep, p=0.126 COLLECT).",
+    "Pre-register for next run: PM activation-coverage KPI — count open PM-eligible trades where MFE>=0.40 (1m close basis) but no '[TRAIL] activated' line exists during the trade window. 12/15 this run. If it holds at n>=20 the fix is poll cadence or a resting trail order, not a trail parameter.",
+    "Escalation #17 now has ONE unmeasured piece left: pump-exit/bypass-engine candle OOS (the 41-bypass cohort, +2.368/30d) — the largest single slice of the remaining giveback.",
+    "SIDEWAYS: weekly 'Self-healing test: FAIL' pipeline.log 03:00 Sundays (Oct 11/18/25) — 3rd occurrence, never triaged."
+  ]
 }

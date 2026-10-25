@@ -513,12 +513,17 @@ def run(dry_run=False):
         PM_TRAIL_DISTANCE_PCT = SPIDER_TRAIL_DISTANCE_PCT * 100
         PM_TIER1_MIN_PCT = SPIDER_T1_MIN_PCT
         PM_TIER1_MAX_PCT = SPIDER_T1_MAX_PCT
-        # Tighter trail tiers for flat markets
+        # Tighter trail tiers for flat markets. Thresholds are PERCENT, same as
+        # PM_TRAIL_ACTIVATE_PCT/DISTANCE above — peak_pnl is percent (pnl_utils
+        # compute_live_pnl), so decimal-style 0.015/0.030 matched EVERY peak and
+        # pinned the 0.50% tier (floor below entry at arm) instead of the 0.10% tier.
         PM_TRAIL_TIERS = [
-            (0.0,   0.1),   # 0%–1.5%: 0.10% trail (spider — very tight)
-            (0.015, 0.3),   # 1.5%–3.0%: 0.30% trail
-            (0.030, 0.5),   # 3.0%+: 0.50% trail
+            (0.0,  0.1),   # 0%–1.5%: 0.10% trail (spider — very tight)
+            (1.5,  0.3),   # 1.5%–3.0%: 0.30% trail
+            (3.0,  0.5),   # 3.0%+: 0.50% trail
         ]
+        assert min(t[0] for t in PM_TRAIL_TIERS[1:]) > 1.0, \
+            "spider PM_TRAIL_TIERS thresholds must be percent, not decimal"
 
     log(f"Firing — group {ab_group}" + (" [DRY RUN]" if effective_dry_run else "") + (" [SPIDER]" if spider_active else ""))
 

@@ -1939,3 +1939,13 @@
 - **INFO**: Pipeline healthy — 63 signals/hr, 0 open | 5 closed today +$0.22, 80% WR | 12 closed 24h (portfolio +16.37%). Regime 5m SHORT_BIAS (2L/104S/20N of 126 @06:30). Speeds 128/241 (53.1%) ≥50th pct.
 - **INFO (data quality)**: previous 06:27 alert entry has token names/timestamps redacted into `TOK`/`TS` placeholders — mangled, not diagnostic. Likely a bad redaction regex in that run.
 - **CARRIED**: `openclaw-gateway.service` crash-loop (non-Hermes, NRestarts>116k) still awaiting CEO choice: npm restore vs disable.
+
+## Error Alerts — 2026-10-25 07:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+
+## Error Alerts — 2026-10-25 08:55 UTC
+- **WARN (AUTO-FIXED)**: `hermes-ma-cross-5m-tuner` dead since signal migration — unit ExecStart pointed at deleted `scripts/ma_cross_5m.py`, no PYTHONPATH so `from paths import` failed, script `DATA_DIR` resolved to graveyard `/root/.hermes/scripts/data` (would have tuned a dead May-7 DB), freshness guard 120s unreachable for 5m candles (ts=window open, age cycles 0-300s). Companion: `hermes-zscore-momentum-tuner` never fired since boot 2026-10-18 (OnBootSec elapse race → service never activated → no OnUnitActiveSec anchor → Trigger: n/a forever).
+- **AUTO-FIX**: unit ExecStart → `scripts/signals/ma_cross_5m.py` + `Environment=PYTHONPATH=/root/.hermes/scripts`; script `DATA_DIR = HERMES_DATA`, guard 120s → 420s. Force-ran both services: **ma-cross 104 tokens tuned** (tuner DB now created at correct path `/root/.hermes/data/ma_cross_5m_tuner.db`), **zscore 82 tokens tuned** (4m58s, rc=0). Both timers re-armed — next fire: ma-cross Mon 2026-10-26 08:53 (24h), zscore 12:47 (4h).
+- **INFO**: `ma_cross_5m` signal family fully disabled in hermes_constants (`MA_CROSS_5M*_ENABLED=False`, WR=19%) — tuner feeds a disabled signal; candidate for `-DEFUNCT` rename (like atr-sl-updater) with CEO approval.
+- **INFO**: Core healthy — vacation pause absent, all 3 core timers firing (pipeline 08:53, price-collector 08:53, 1m-candle 08:53), 0 tracebacks/30min, 55 signals/h, prices fresh (66s), 87 tokens ≤5min, 0 phantom trades, disk 82% (<85%). 1 TRADE FAILED (ZRO SHORT: RSI 29.0 < 35 knife floor) — filter working as designed, not a bug. hotset.json fresh (19s) but 0 entries: confidence≥70 gate, not a failure.

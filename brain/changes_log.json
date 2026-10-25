@@ -2500,5 +2500,16 @@
     "after": "pump-chain exempt (own gate governs); RE-MEASURED 2026-10-25: 14d -0.71 / 30d +0.64, OOS sign flip, not removed",
     "rationale": "the justification string no longer matches the data; next reader would trust a stale number",
     "impact": "zero behavior — no constant value touched"
+  },
+  {
+    "timestamp": "2026-10-25T08:51:00Z",
+    "agent": "brain_auditor",
+    "change": "Spider trail tier unit fix: profit_monster.py PM_TRAIL_TIERS spider override thresholds 0.015/0.030 -> 1.5/3.0 (percent, matching the *100 conversion of ACTIVATE/DISTANCE in the same block) + assert guard",
+    "type": "config",
+    "file": "scripts/profit_monster.py",
+    "before": "[(0.0,0.1),(0.015,0.3),(0.030,0.5)] -> always third tier (dist 0.50%), floor = peak-0.50 below entry on 83/239 activations",
+    "after": "[(0.0,0.1),(1.5,0.3),(3.0,0.5)] -> 0.10/0.30/0.50 at 0/1.5/3.0% peak; floor = peak-0.10 (>=+0.20 at 0.30 activation) + assert min(t[0])>1.0",
+    "rationale": "peak_pnl is percent (pnl_utils.compute_live_pnl); decimal thresholds matched every activated peak and pinned the loosest tier, so armed spider trades locked nothing. Inline comments and plans/spider-profit.md both specify 0.10% in the scalp zone.",
+    "impact": "spider-active trades (~34% of profit-monster fires) get a floor above entry at arm. Sweep: 0.10 nets +3.972/30d vs 0.50 +2.121 (fk_zeroed 1.8% vs 3.6%). hermes_constants.py git diff EMPTY, CEO_PROTECTED_FLAGS 13/13 untouched, py_compile PASS, revert is one line."
   }
 ]

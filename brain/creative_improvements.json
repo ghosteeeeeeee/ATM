@@ -8288,5 +8288,32 @@
     "category": "entry sniper",
     "status": "rejected-with-data",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-25T08:51:00Z",
+    "idea": "SPIDER trail-tier unit fix — thresholds in percent",
+    "rationale": "profit_monster.py spider block multiplied ACTIVATE and DISTANCE by 100 but wrote tier thresholds as decimals; peak_pnl is percent so 0.015/0.030 matched every peak and pinned the 0.50% tier. Comments and plans/spider-profit.md both specify 0.10% in the scalp zone. 83/239 logged activations had trail_floor <= 0 (NEO 2026-10-22 pnl=0.30 floor=-0.20) = armed with no protection.",
+    "expected_impact": "spider-active (~34% of fires) arms at floor peak-0.10 (>= +0.20 at the 0.30 activation) instead of peak-0.50 (negative). Sweep corroboration: 0.10 nets +3.972/30d vs 0.50 +2.121, fk_zeroed 1.8% vs 3.6%. Assert guard added so the class cannot recur.",
+    "category": "exit stack",
+    "status": "shipped",
+    "risk": "medium-low"
+  },
+  {
+    "date": "2026-10-25T08:51:00Z",
+    "idea": "ARMED-TRAIL-DISTANCE candle OOS (escalation #17 leg 2) — MEASURED: COVERAGE not LEASH, and it beats the pending BE-at-arm ask",
+    "rationale": "flat post-arm leash D swept 0.05-1.60% over the 30d armed non-EXTREME/no-volume- cohort (n=216), pnl_usdt both sides, 1m close-through exit, fee-neutral delta, house bars n>=20 / net>0 / both 15d halves>0 / p<0.05 / fk_zeroed<20%.",
+    "expected_impact": "D=0.20 30d NET +3.925 (halves +1.759/+2.166, t=3.122, fk_zeroed 1.8%, EX-top3 +3.726) PASSES; 14d +1.820 PASSES; 7d +0.137 halves FAIL. Head-to-head vs BE-at-arm on the same 216: +3.925 vs +2.140, per-trade 131 vs 61. DECOMPOSITION: PM_EXIT n=131 net +0.271 = PM tiers already optimal (NO change to any PM constant); all edge = 56 armed trades routed to loss-side engines (41 PROFIT_MONSTER_BYPASS by design + 12 Hermes rows with zero '[TRAIL] activated' line in their own window). Sampling robust: arm-on-close +3.920/+2.246 — not a wick artifact.",
+    "category": "exit stack",
+    "status": "measured - CEO GO ask (upgrades BE-at-arm)",
+    "risk": "medium - 7d halves fail; not a single-constant ship"
+  },
+  {
+    "date": "2026-10-25T08:51:00Z",
+    "idea": "RE-ENTER-ON-RECOVERY counterfactual (pre-reg #72, Oct-25 batch) — MEASURED, REJECTED-WITH-DATA",
+    "rationale": "limit re-entry at original entry after a 30d loser, 60m trigger + 60m walk, SL-wins-ties, net-of-fee bars, candle-containing-close skipped (avoids #85 open-anchor vacuity), RAW-bracket scope required to pass alongside ALL.",
+    "expected_impact": "fill rate 31.5% (the 71% census was a +-0.2% touch, does not reproduce). ALL n=110 net +1.686 but p=0.158 FAIL; RAW n=58 newer_half -0.041 FAIL, p=0.52 FAIL. REJECTED — pre-registration closed. selfcheck PASS (15 cases).",
+    "category": "re-entry",
+    "status": "rejected-with-data",
+    "risk": "n/a"
   }
 ]

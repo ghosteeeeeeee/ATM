@@ -1,0 +1,302 @@
+{
+ "7": {
+  "n": 74,
+  "no_candles": 1,
+  "armed": 45,
+  "winners": 34,
+  "armed_winners": 34,
+  "variants": {
+   "0.002": {
+    "fills": 41,
+    "net": 0.137,
+    "save": 1.135,
+    "harm": 0.998,
+    "saved_losers": 10,
+    "harmed_winners": 17,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 50.0,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 0.394,
+    "new_half": -0.258,
+    "t": 0.269
+   },
+   "0.003": {
+    "fills": 34,
+    "net": 0.097,
+    "save": 0.885,
+    "harm": 0.788,
+    "saved_losers": 10,
+    "harmed_winners": 12,
+    "zeroed_winners": 1,
+    "fk_armed_pct": 35.3,
+    "fk_zeroed_pct": 2.9,
+    "old_half": 0.309,
+    "new_half": -0.212,
+    "t": 0.211
+   },
+   "0.005": {
+    "fills": 22,
+    "net": -0.087,
+    "save": 0.641,
+    "harm": 0.728,
+    "saved_losers": 9,
+    "harmed_winners": 9,
+    "zeroed_winners": 4,
+    "fk_armed_pct": 26.5,
+    "fk_zeroed_pct": 11.8,
+    "old_half": 0.264,
+    "new_half": -0.351,
+    "t": -0.193
+   },
+   "0.008": {
+    "fills": 13,
+    "net": 0.102,
+    "save": 0.434,
+    "harm": 0.332,
+    "saved_losers": 7,
+    "harmed_winners": 3,
+    "zeroed_winners": 1,
+    "fk_armed_pct": 8.8,
+    "fk_zeroed_pct": 2.9,
+    "old_half": 0.243,
+    "new_half": -0.14,
+    "t": 0.356
+   },
+   "0.012": {
+    "fills": 7,
+    "net": 0.123,
+    "save": 0.162,
+    "harm": 0.04,
+    "saved_losers": 2,
+    "harmed_winners": 0,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 0.0,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 0.061,
+    "new_half": 0.062,
+    "t": 1.493
+   },
+   "0.016": {
+    "fills": 2,
+    "net": -0.041,
+    "save": 0.0,
+    "harm": 0.041,
+    "saved_losers": 0,
+    "harmed_winners": 0,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 0.0,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 0.0,
+    "new_half": -0.041,
+    "t": -6.581
+   }
+  }
+ },
+ "14": {
+  "n": 154,
+  "no_candles": 1,
+  "armed": 89,
+  "winners": 66,
+  "armed_winners": 64,
+  "variants": {
+   "0.002": {
+    "fills": 84,
+    "net": 1.82,
+    "save": 3.266,
+    "harm": 1.446,
+    "saved_losers": 21,
+    "harmed_winners": 27,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 42.2,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 1.683,
+    "new_half": 0.137,
+    "t": 2.183
+   },
+   "0.003": {
+    "fills": 73,
+    "net": 1.903,
+    "save": 2.839,
+    "harm": 0.936,
+    "saved_losers": 21,
+    "harmed_winners": 22,
+    "zeroed_winners": 1,
+    "fk_armed_pct": 34.4,
+    "fk_zeroed_pct": 1.6,
+    "old_half": 1.806,
+    "new_half": 0.097,
+    "t": 2.604
+   },
+   "0.005": {
+    "fills": 46,
+    "net": 1.488,
+    "save": 2.263,
+    "harm": 0.774,
+    "saved_losers": 19,
+    "harmed_winners": 11,
+    "zeroed_winners": 5,
+    "fk_armed_pct": 17.2,
+    "fk_zeroed_pct": 7.8,
+    "old_half": 1.575,
+    "new_half": -0.087,
+    "t": 2.208
+   },
+   "0.008": {
+    "fills": 33,
+    "net": 1.166,
+    "save": 1.633,
+    "harm": 0.467,
+    "saved_losers": 15,
+    "harmed_winners": 7,
+    "zeroed_winners": 2,
+    "fk_armed_pct": 10.9,
+    "fk_zeroed_pct": 3.1,
+    "old_half": 1.064,
+    "new_half": 0.102,
+    "t": 2.291
+   },
+   "0.012": {
+    "fills": 21,
+    "net": 0.347,
+    "save": 0.606,
+    "harm": 0.259,
+    "saved_losers": 9,
+    "harmed_winners": 3,
+    "zeroed_winners": 1,
+    "fk_armed_pct": 4.7,
+    "fk_zeroed_pct": 1.6,
+    "old_half": 0.224,
+    "new_half": 0.123,
+    "t": 1.325
+   },
+   "0.016": {
+    "fills": 8,
+    "net": -0.012,
+    "save": 0.159,
+    "harm": 0.172,
+    "saved_losers": 3,
+    "harmed_winners": 1,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 1.6,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 0.028,
+    "new_half": -0.041,
+    "t": -0.067
+   }
+  }
+ },
+ "30": {
+  "n": 367,
+  "no_candles": 5,
+  "armed": 216,
+  "winners": 175,
+  "armed_winners": 171,
+  "variants": {
+   "0.002": {
+    "fills": 193,
+    "net": 3.925,
+    "save": 7.234,
+    "harm": 3.309,
+    "saved_losers": 38,
+    "harmed_winners": 66,
+    "zeroed_winners": 3,
+    "fk_armed_pct": 38.6,
+    "fk_zeroed_pct": 1.8,
+    "old_half": 1.786,
+    "new_half": 2.139,
+    "t": 3.122
+   },
+   "0.003": {
+    "fills": 149,
+    "net": 3.35,
+    "save": 5.918,
+    "harm": 2.568,
+    "saved_losers": 38,
+    "harmed_winners": 46,
+    "zeroed_winners": 6,
+    "fk_armed_pct": 26.9,
+    "fk_zeroed_pct": 3.5,
+    "old_half": 1.252,
+    "new_half": 2.098,
+    "t": 2.908
+   },
+   "0.005": {
+    "fills": 89,
+    "net": 2.133,
+    "save": 3.967,
+    "harm": 1.834,
+    "saved_losers": 34,
+    "harmed_winners": 28,
+    "zeroed_winners": 9,
+    "fk_armed_pct": 16.4,
+    "fk_zeroed_pct": 5.3,
+    "old_half": 0.555,
+    "new_half": 1.578,
+    "t": 2.058
+   },
+   "0.008": {
+    "fills": 49,
+    "net": 1.822,
+    "save": 2.581,
+    "harm": 0.759,
+    "saved_losers": 24,
+    "harmed_winners": 13,
+    "zeroed_winners": 4,
+    "fk_armed_pct": 7.6,
+    "fk_zeroed_pct": 2.3,
+    "old_half": 0.512,
+    "new_half": 1.31,
+    "t": 2.924
+   },
+   "0.012": {
+    "fills": 33,
+    "net": 0.442,
+    "save": 0.955,
+    "harm": 0.514,
+    "saved_losers": 16,
+    "harmed_winners": 6,
+    "zeroed_winners": 3,
+    "fk_armed_pct": 3.5,
+    "fk_zeroed_pct": 1.8,
+    "old_half": 0.041,
+    "new_half": 0.401,
+    "t": 1.257
+   },
+   "0.016": {
+    "fills": 14,
+    "net": -0.334,
+    "save": 0.181,
+    "harm": 0.515,
+    "saved_losers": 5,
+    "harmed_winners": 4,
+    "zeroed_winners": 2,
+    "fk_armed_pct": 2.3,
+    "fk_zeroed_pct": 1.2,
+    "old_half": -0.322,
+    "new_half": -0.012,
+    "t": -1.338
+   }
+  }
+ }
+}
+=== 7d n=74 no_candles=1 armed=45 armed_W=34 winners=34
+   D=0.20%  fills= 41 NET +0.137 (save +1.135 / harm -0.998) savedL=10 zeroedW=0 dmgW=17 fk_zeroed=0.0% (HOUSE <20%) fk_delta=50.0%  halves old +0.394 new -0.258 t=0.269  [n>=20 | net>0 | halves FAIL | fk<20]
+   D=0.30%  fills= 34 NET +0.097 (save +0.885 / harm -0.788) savedL=10 zeroedW=1 dmgW=12 fk_zeroed=2.9% (HOUSE <20%) fk_delta=35.3%  halves old +0.309 new -0.212 t=0.211  [n>=20 | net>0 | halves FAIL | fk<20]
+   D=0.50%  fills= 22 NET -0.087 (save +0.641 / harm -0.728) savedL=9 zeroedW=4 dmgW=9 fk_zeroed=11.8% (HOUSE <20%) fk_delta=26.5%  halves old +0.264 new -0.351 t=-0.193  [n>=20 | net FAIL | halves FAIL | fk<20]
+   D=0.80%  fills= 13 NET +0.102 (save +0.434 / harm -0.332) savedL=7 zeroedW=1 dmgW=3 fk_zeroed=2.9% (HOUSE <20%) fk_delta=8.8%  halves old +0.243 new -0.140 t=0.356  [n FAIL | net>0 | halves FAIL | fk<20]
+   D=1.20%  fills=  7 NET +0.123 (save +0.162 / harm -0.040) savedL=2 zeroedW=0 dmgW=0 fk_zeroed=0.0% (HOUSE <20%) fk_delta=0.0%  halves old +0.061 new +0.062 t=1.493  [n FAIL | net>0 | halves>0 | fk<20]
+   D=1.60%  fills=  2 NET -0.041 (save +0.000 / harm -0.041) savedL=0 zeroedW=0 dmgW=0 fk_zeroed=0.0% (HOUSE <20%) fk_delta=0.0%  halves old +0.000 new -0.041 t=-6.581  [n FAIL | net FAIL | halves FAIL | fk<20]
+=== 14d n=154 no_candles=1 armed=89 armed_W=64 winners=66
+   D=0.20%  fills= 84 NET +1.820 (save +3.266 / harm -1.446) savedL=21 zeroedW=0 dmgW=27 fk_zeroed=0.0% (HOUSE <20%) fk_delta=42.2%  halves old +1.683 new +0.137 t=2.183  [n>=20 | net>0 | halves>0 | fk<20]
+   D=0.30%  fills= 73 NET +1.903 (save +2.839 / harm -0.936) savedL=21 zeroedW=1 dmgW=22 fk_zeroed=1.6% (HOUSE <20%) fk_delta=34.4%  halves old +1.806 new +0.097 t=2.604  [n>=20 | net>0 | halves>0 | fk<20]
+   D=0.50%  fills= 46 NET +1.488 (save +2.263 / harm -0.774) savedL=19 zeroedW=5 dmgW=11 fk_zeroed=7.8% (HOUSE <20%) fk_delta=17.2%  halves old +1.575 new -0.087 t=2.208  [n>=20 | net>0 | halves FAIL | fk<20]
+   D=0.80%  fills= 33 NET +1.166 (save +1.633 / harm -0.467) savedL=15 zeroedW=2 dmgW=7 fk_zeroed=3.1% (HOUSE <20%) fk_delta=10.9%  halves old +1.064 new +0.102 t=2.291  [n>=20 | net>0 | halves>0 | fk<20]
+   D=1.20%  fills= 21 NET +0.347 (save +0.606 / harm -0.259) savedL=9 zeroedW=1 dmgW=3 fk_zeroed=1.6% (HOUSE <20%) fk_delta=4.7%  halves old +0.224 new +0.123 t=1.325  [n>=20 | net>0 | halves>0 | fk<20]
+   D=1.60%  fills=  8 NET -0.012 (save +0.159 / harm -0.172) savedL=3 zeroedW=0 dmgW=1 fk_zeroed=0.0% (HOUSE <20%) fk_delta=1.6%  halves old +0.028 new -0.041 t=-0.067  [n FAIL | net FAIL | halves FAIL | fk<20]
+=== 30d n=367 no_candles=5 armed=216 armed_W=171 winners=175
+   D=0.20%  fills=193 NET +3.925 (save +7.234 / harm -3.309) savedL=38 zeroedW=3 dmgW=66 fk_zeroed=1.8% (HOUSE <20%) fk_delta=38.6%  halves old +1.786 new +2.139 t=3.122  [n>=20 | net>0 | halves>0 | fk<20]
+   D=0.30%  fills=149 NET +3.350 (save +5.918 / harm -2.568) savedL=38 zeroedW=6 dmgW=46 fk_zeroed=3.5% (HOUSE <20%) fk_delta=26.9%  halves old +1.252 new +2.098 t=2.908  [n>=20 | net>0 | halves>0 | fk<20]
+   D=0.50%  fills= 89 NET +2.133 (save +3.967 / harm -1.834) savedL=34 zeroedW=9 dmgW=28 fk_zeroed=5.3% (HOUSE <20%) fk_delta=16.4%  halves old +0.555 new +1.578 t=2.058  [n>=20 | net>0 | halves>0 | fk<20]
+   D=0.80%  fills= 49 NET +1.822 (save +2.581 / harm -0.759) savedL=24 zeroedW=4 dmgW=13 fk_zeroed=2.3% (HOUSE <20%) fk_delta=7.6%  halves old +0.512 new +1.310 t=2.924  [n>=20 | net>0 | halves>0 | fk<20]
+   D=1.20%  fills= 33 NET +0.442 (save +0.955 / harm -0.514) savedL=16 zeroedW=3 dmgW=6 fk_zeroed=1.8% (HOUSE <20%) fk_delta=3.5%  halves old +0.041 new +0.401 t=1.257  [n>=20 | net>0 | halves>0 | fk<20]
+   D=1.60%  fills= 14 NET -0.334 (save +0.181 / harm -0.515) savedL=5 zeroedW=2 dmgW=4 fk_zeroed=1.2% (HOUSE <20%) fk_delta=2.3%  halves old -0.322 new -0.012 t=-1.338  [n FAIL | net FAIL | halves FAIL | fk<20]
