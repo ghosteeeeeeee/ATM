@@ -39,22 +39,33 @@ def diagnose(key, registry):
         return True
     ssr.record_to_shadow = stub_record
 
-    status, n = ssr.run_shadow_signal(
-        key, module_path, flag_name, info.get('stage', '?'),
-        info.get('reason', ''), info.get('direction', ''))
+    # Wrap the source/dir filter so rejected samples are visible
+    orig_match = ssr._sig_matches_registry
+    filter_log = []
+    def wrapped_match(sig, reg_key, direction):
+        ok = orig_match(sig, reg_key, direction)
+        filter_log.append((ok, sig))
+        return ok
+    ssr._sig_matches_registry = wrapped_match
 
-    pre_filter = n + sum(1 for c in calls if False)  # n = post-filter count
-    detail = (f'status={status} post_filter={n} '
-              f'captured_by_recorder={len(calls)} '
-              f'filters={ssr.SOURCE_FILTERS.get(key)}')
-    # captured == len(calls) + (filtered count is not exposed); status tells us:
-    #  'empty'    -> detector ran, 0 captures            => QUIET
-    #  'filtered' -> captures existed, all rejected      => FILTER MISMATCH
-    #  'recorded' -> would have fired                    => WAS QUIET BEFORE
-    #  'import_error' / 'run_error'                      => BROKEN
-    if status == 'filtered':
-        sample = calls[0] if calls else {}
-        detail += f" sample_src={sample.get('source')!r} dir={sample.get('direction')!r}"
+    try:
+        status, n = ssr.run_shadow_signal(
+            key, module_path, flag_name, info.get('stage', '?'),
+            info.get('reason', ''), info.get('direction', ''))
+    finally:
+        ssr._sig_matches_registry = orig_match
+
+    n_pre = len(filter_log)
+    n_pass = sum(1 for ok, _ in filter_log if ok)
+    n_rej = n_pre - n_pass
+    detail = (f'status={status} pre_filter={n_pre} post_filter={n_pass} '
+              f'rejected={n_rej} filters={ssr.SOURCE_FILTERS.get(key)}')
+    # status: empty=QUIET, filtered=FILTER MISMATCH, recorded=WAS QUIET BEFORE,
+    #         import_error/run_error=BROKEN
+    if n_rej:
+        rej = next(s for ok, s in filter_log if not ok)
+        detail += (f" rej_sample_src={rej.get('source')!r} "
+                   f"dir={rej.get('direction')!r}")
     return key, status, detail
 
 

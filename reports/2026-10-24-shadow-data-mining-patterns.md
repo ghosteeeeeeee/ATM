@@ -1,5 +1,15 @@
 # Shadow Data Mining: Patterns for New Signals
 
+> **⚠️ UPGRADE-IMPLEMENTER CAVEAT (2026-10-25):** This report groups trades by
+> *outcome* (winner = positive PnL), so claims like "winners have MFE/MAE 36–50x"
+> are tautological and the per-signal "100% WR" rows are not independently verified.
+> Today's significance-tested analysis (`reports/20261025-shadow-fresh-analysis.md`)
+> contradicts several rows here — e.g. pump-chain SHORT is t=-6.38 and pump-chain
+> LONG is t=-7.77 (both significantly *negative* net of fees), not "100% WR".
+> **Do not build new signals from §3/§6 without own-conclusions re-verification.**
+> The only signal-level finding that survives significance testing today is
+> squeeze_cross SHORT (t=2.01, but fire-rate ~65/hr and per-trade edge ~+0.01%).
+
 **Date:** 2026-10-24
 **Analyst:** Hermes (CEO agent)
 **Data:** 17,321 shadow signals (16,819 closed)

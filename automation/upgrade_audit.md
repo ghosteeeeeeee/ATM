@@ -1139,3 +1139,54 @@
 3. RR engine U2-U4 — L2-3 — HIGH — still needs CEO sequencing
 4. Throttled re-test design for top shadow SHORT candidate (sqx-) — L2 design — MED-HIGH — only if CEO wants it; vacation freeze blocks implementation
 5. 15m/1h/4h candle retention — L1 — LOW — disk at 84%, one point from 85% trigger
+
+---
+
+## Upgrade Implementer Session — 2026-10-25 16:30 UTC
+
+**Context:** pipeline LIVE, vacation mode ON (constants_change_review_queue active per T directive Oct 23; unclog_waiver expires Oct 27). Disk 83% (below 85% retention trigger). Prior session's next-candidate #2 (zero-fire diagnostic) picked up. 3 × L1 implemented.
+
+### Plan evaluations (recent-20 re-scan, deltas vs 2026-10-22 16:30 session)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| autonomous-btc-loop-spec | L4 | HIGH | ✅ PHASE 0 SHADOW LIVE (prior) | Day 3 of ≥7d shadow soak; <15 resolved hypotheticals — too early for phase gate |
+| t-vacation-mode-2026-10-14 | L4 | HIGH | ✅ ACTIVE | Small cleanups (dead allowlist, tl-bounce+ NORMAL, compactor ATR) all already closed 2026-10-21 — nothing left |
+| shadow-mode-paper-trading-spec-v1 | L3 | HIGH | ✅ IMPLEMENTED (prior) | Consumed for readout; 8 pollution rows deleted this session |
+| limit-order-capability | L2 | MED | ✅ PHASE 1 (prior) | Unchanged; phases 2-4 deferred until standalone proven |
+| 2026-10-16_winning-dna-remeasure-verdict | — | HIGH | ✅ CLOSED (prior) | SL-width study still on CEO kanban |
+| vol-regime-relative-thresholds | L2-3 | MED-HIGH | ⏳ CEO-gated SPEC | Untouched |
+| signal-starvation-fix-2026-10-12 | L2-3 | MED-HIGH | PARTIAL | Unclog waiver (bear-structure exemption) shipped by parallel session; RR floor/BB dead-zone still CEO-gated |
+| short-rsi-habitat-spec | L2 | MED-HIGH | ⏳ CEO-gated SPEC | Untouched |
+| 2026-10-13_rr-engine-smart-upgrades | L2-3 | HIGH | U1 LIVE / U2-U4 ⏳ CEO | Unchanged |
+| grind-breakout-v2-coin-tracker-integration | L3 | LOW | ⏸️ DEFERRED (by plan) | Unchanged |
+| 2026-10-09_D4-structured-block-logging | L1 | MED | ✅ COMPLETE (2026-10-09) | Verified complete |
+| bug-hunt-master-plan (open 036/037/044/056/064) | — | HIGH/LOW | ⏳ T-gated | BUG-056 (orphan constants) verified still open — NOT touched (constants-protected, explicitly T-review) |
+| contrarian-engine / temporal-confluence / regime-recalibration | L2-3 | MED | ⏳ CEO-gated | Untouched |
+| shadow-data-mining-patterns (report, not plan) | — | — | ⚠️ FLAGGED | See sideways finding #1 — methodological flaw |
+
+### Implemented this session (3 × L1)
+
+1. **(L1) Zero-fire shadow key diagnostic** — prior session's next-candidate #2. Ran `shadow_zero_fire_diag.py` for the 3 zero-fire keys (hmacd_mtf-+, bb-bounce-v3-long, open-skies+). Result: **all 3 resolved**. (a) hmacd_mtf-+ now fires 229× since Oct 23 (zero-fire condition self-resolved); (b) open-skies+ now fires 32× since Oct 23 (self-resolved); (c) bb-bounce-v3-long still 0 — **legitimately quiet, not broken**: detector-quiet is explained by FILTER-1 (BB-touch proximity 0.20%) killing 84/96 tradeable tokens, plus a contradictory habitat (buy lower-BB dip AND require 30m momentum ≥0 AND NORMAL-regime conf=0.0). Funnel: 267 tokens → 95 delisted → 76 blacklisted → 96 scanned → 84 fail touch → 0 pass. No code fix warranted — the signal is dormant by design.
+2. **(L1) Pollution row cleanup** — deleted 8 pre-HIGH-5-fix pollution rows from `brain/shadow_trades.db` (rs-s120/s32/s124/s126 LONG, all shadow_ prefixed, created 2026-10-22 04:00–04:20). Prior sessions flagged these twice; finally executed. Verified 0 remaining.
+3. **(L1) shadow_zero_fire_diag.py filtered-sample bug fix** — the diag could never show which source/dir caused a SOURCE_FILTERS rejection: `record_to_shadow` is only called *after* the filter, so `calls` was always empty for `status=filtered` and the `sample_src` line was dead code. Fixed: wrap `_sig_matches_registry` to log pre-filter matches/rejections; detail now reports `pre_filter` / `post_filter` / `rejected` counts + first rejected sample's source and direction. py_compile OK; live run on bb-bounce-v3-long produces correct `empty pre_filter=0 post_filter=0 rejected=0`.
+
+### Verifications (no code change)
+- Confirmed all three vacation-plan "small cleanups" already closed: dead allowlist entries (pump-catcher, trend_purity) removed from volatility_gate_v2.py 2026-10-21; tl-bounce+ NORMAL question closed (stays FLAT-only, comment at gate line); compactor inline TR computation (line 1953) is an intentional cur/avg TR *ratio* for VOL-GATE expansion, not a drift-risk duplicate of get_atr_pct.
+- Confirmed unclog_waiver scope fully shipped: bear-structure exemptions live in decider_run.py (ctx ~1084, exec ~2189) and signal_compactor.py (~4135); LOSERS_LONG exists (decider_run.py:219, 385).
+- Confirmed BUG-056 (MA300_CANDLE_MINUS_ENABLED=True, no consumer) still open — deliberately not touched (constants line-2 protection + bug record says "NOT auto-fixed, T review").
+- Vacation_mode status re-read: constants_change_review_queue + unclog_waiver both active; no_signal_enable_disable still frozen.
+
+### Sideways findings
+- **Severity: MEDIUM** — `reports/2026-10-24-shadow-data-mining-patterns.md` has a **survivorship/selection-on-outcome flaw**. Its "winners" table is defined by outcome (positive PnL), so "winners have MFE/MAE 36–50x" is tautological. Its per-signal "100% WR" rows (pump-chain EXTREME n=453, volume_breakout_short n=14) are inconsistent with today's significance-tested `reports/20261025-shadow-fresh-analysis.md`, which shows pump-chain SHORT t=-6.38 and pump-chain LONG t=-7.77 (both significantly negative). The mining report's PM-Trail "100% WR" is by-design circular (same report admits this). **Do NOT build new signals from the mining report without own-conclusions re-verification.** The trustworthy signal-level finding is squeeze_cross SHORT (t=2.01) from the Oct 25 analysis — but its shadow edge is thin (+0.011% avg net last 24h) and fire rate absurd (~65/hr), so any live re-test needs throttle design first.
+- **Severity: LOW** — bb-bounce-v3-long's habitat is self-contradictory by construction (lower-BB dip entry gated on non-negative 30m momentum). Even if un-disabled it would fire ~never. Worth a one-line note if anyone proposes re-enabling it.
+- **Severity: INFO** — shadow_trades.db now 21,302 rows (7,430 shadow_signals_runner-sourced). sqx- half2 degradation from the Oct 22 readout still unresolved (prior 24h avg -0.034% vs last 24h +0.011% — sign flip, not clearly recovered). Re-readout still due ~Oct 29.
+
+### Success rate this session: 3/3 implemented (100%)
+### Cumulative (today, sessions on Oct 22+25): 10/10 (100%)
+### Next candidates (priority order)
+1. Stage A/C re-readout — L1 analysis — MED — ~Oct 29 when rs-s-broken/bb-squeeze- half2 resolves and sqx- trend clarifies
+2. Throttled sqx- re-test design — L2 design (docs only) — MED-HIGH — only verified shadow edge (t=2.01); needs fire-rate cap spec before any CEO constants-review-queue proposal; vacation freeze blocks implementation
+3. RR engine U2-U4 — L2-3 — HIGH — still needs CEO sequencing
+4. Own-conclusions re-verification of mining-report patterns — L1-2 analysis — MED — block bad signal builds; only if someone proposes acting on that report
+5. 15m/1h/4h candle retention — L1 — LOW — disk 83%, one bad day from 85% trigger
