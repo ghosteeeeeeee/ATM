@@ -15524,3 +15524,23 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 **Open Questions:**
 - 24h GREEN 73.3% WR; 7d still -$0.37
 - pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 18:28 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $0.00 (WR: 0.0%) | 24h: 16T 11W 68.8% +$0.64 (GREEN) | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade last hour: DOGE bb-bounce-v2-long+ trail_arm_timeout -0.19% ($0.00 breakeven)
+- atr_sl_hit 0/16 = 0% (<40%) — dominant close = profit-monster-trail (8T +$0.49)
+- Kill check: no signal with 0%WR n>=3 last hour (1 trade total); 24h worst bb-bounce-v2-long+ 5T 1W 20%WR -$0.02 (not 0%, and 7d-regime check would apply anyway)
+- No negative-hour streak: 08 +, 11 +, 15 +, 17 +, 18:00 ~$0.00
+- Frequency 1/hr — not overtrading
+- 3 open: BTC continuum-trend+, KAS bb-squeeze+, ETH hl_copy_trader (all bracketed, running ~0)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN 68.8% WR; 7d still negative
+- pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
