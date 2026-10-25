@@ -1,61 +1,46 @@
 # Signal Performance Report
-**Generated:** 2026-10-25 03:32 UTC | **Period:** Last 6h | 24h
 
-## Summary
-Very quiet cycle: 4 trades in 6h, 10 trades in 24h. No signal meets kill criteria (5+ trades, WR<30%, PnL<-$0.10) or boost criteria (5+ trades, WR>55%, PnL>$0.05). **No kills, no boosts executed.** 24h total: +$0.82, 80% WR (8/10).
+**Generated:** 2026-10-25 | Period: last 6h / 24h | Source: PostgreSQL `brain.trades` (queried live)
 
----
+Trading volume was very light: 5 closed trades in 6h, 14 closed trades in 24h. No signal met the kill threshold (WR <30% with 5+ trades AND negative PnL). No signal met the full boost threshold (WR >55% with 5+ trades) — nearest is `volume-buildup-` SHORT at 75% WR / 4 trades.
 
-## KILLED (executed):
+No direction inversions detected. No anomalies found.
+
+## KILLED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no candidates |
+| — | — | — | — | — | None. No kill candidates. |
 
-## BOOSTED (executed):
+## BOOSTED (executed)
+
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no candidates (no signal has 5+ trades in 24h) |
+| — | — | — | — | — | None. Closest: volume-buildup- SHORT (75% WR, +$0.27, 4 trades) — below 5-trade minimum. Watch for boost if it continues. |
 
-## LOSERS (watch list):
+## LOSERS (watch list)
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 0.0% (6h) | -0.01 | 1 (6h) | WATCH — single tiny loser, below kill threshold |
+| bb-bounce-v2-long+ | LONG | 0.0% | -$0.06 | 2 | Watch. Only 2 trades, not enough to act. |
+| r2v2-long3 | LONG | 0.0% | -$0.10 | 1 | Watch. Single trade. |
 
-## WINNERS:
+## WINNERS
+
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-buildup- | SHORT | 50.0% | +0.19 | 2 (24h) | ENABLED — best 24h PnL |
-| pump-chain+ | LONG | 100.0% | +0.06 | 2 (24h) | ENABLED |
-| ai-trader-pending | mixed | 100.0% | +0.16 | 2 (24h) | ENABLED (manual/pending) |
-| hl_copy_trader | LONG | 100.0% | +0.16 | 1 (6h) | ENABLED (copy trader) |
-| continuum+ | LONG | 100.0% | +0.12 | 1 (24h) | ENABLED |
-| bb-squeeze+ | LONG | 100.0% | +0.04 | 1 (6h) | ENABLED |
+| volume-buildup- | SHORT | 75.0% | +$0.27 | 4 | Boost candidate pending 5th trade. |
+| continuum+ | LONG | 100.0% | +$0.20 | 2 | Healthy. |
+| bb-squeeze+ | LONG | 100.0% | +$0.04 | 1 | Healthy (low volume). |
+| ai-trader-pending | LONG/SHORT | 100.0% | +$0.16 | 2 | Healthy (manual/pending orders). |
+| hl_copy_trader | LONG | 100.0% | +$0.16 | 1 | Healthy. |
+| pump-chain+ | LONG | 100.0% | +$0.05 | 1 | Healthy. |
 
-## ISSUES:
-- **No current inversions (24h).** 46 all-time hits are `tl_break_long`/`tl_break_short` from the old FLIP mechanism, disabled 2026-08-01 (`scripts/decider_run.py:1444`) — last inversion closed 2026-08-01, matching the fix date exactly. Historical/resolved, no action needed.
-- **Sample sizes below thresholds everywhere** — max 2 trades per signal in 24h. Kill/boost rules untestable this cycle; next run may have actionable data.
-- Prior report (03:31 UTC) listed "3,313 all-time trades"; DB actually has 6,009 closed. Old report used a narrower scope — numbers re-verified fresh this run.
-- 2 open positions (both LONG, no inversion risk): `continuum+`, `r2v2-long3`.
+## ISSUES
 
----
+- None. No direction inversions, bugs, or anomalies in this window.
+- Note: `volume-buildup-` full history shows NORMAL regime at 52.9% WR (9/17, -$0.08) and EXTREME at 57.1% WR (4/7, -$0.04) but HIGH at 100% (5/5, +$0.57). If it degrades, tune regime gate before killing.
 
-*Report auto-generated. Next report: ~6h from now.*
+## Actions taken
 
----
-
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-10-24 | f96aa8a | brain_auditor: AUDIT RUN #122 — LONG_RSI_SWEET_SPOT_BOOST 10... |
-| 2026-10-24 | c10b227 | scripts: UNCLOG-2 — 4 CEO-approved flips (consult 20261024T1... |
-| 2026-10-24 | 186ff1c | watchdog: 14:20 UTC cycle — BTC broke EMA300 pin DOWN (knife... |
-| 2026-10-24 | 9482523 | logs: hourly analysis 2026-10-24 12:28 — no change, quiet ho... |
-| 2026-10-24 | 7553d4e | brain_auditor: AUDIT RUN #114 (2026-10-24) — entry_regime_4h... |
-| 2026-10-23 | c4edf08 | exit-system: breakeven lock for CEO trades — SL→entry at +0.... |
-| 2026-10-23 | 10d6898 | Daily trading system update (2026-10-23) |
-| 2026-10-22 | 2d78f19 | Daily trading system update (2026-10-22) |
-| 2026-10-22 | 24225f3 | brain_auditor: AUDIT RUN #69 — BTC-regime habitat map verifi... |
-| 2026-10-22 | 0747cdd | scripts: wire shadow_signals_runner into pipeline with shado... |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+None this cycle — trading too light to trigger kill/boost rules.
