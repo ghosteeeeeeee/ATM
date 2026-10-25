@@ -15127,3 +15127,24 @@ Final set: ['BTC', 'ME', 'PUMP']
 - 7d widened to -$1.07 (from -$0.59) — window rolled, 24h still GREEN
 - Signal flow low + hotset 0-token fallback (chronic)
 - pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 00:30 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.05 (WR: 100.0%) | 24h: 8T 6W 75.0% `+$0.52` (GREEN) | 7d: 125T 52W 41.6% `-$1.02` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade: HYPER pump-chain+ LONG atr_trail_hit +1.31% (winner)
+- atr_sl_hit 0/8 = 0% (<40%) — dominant close = profit-monster-trail (3T +$0.31)
+- No 0%WR signal with 3+ trades (max n=2, all positive except bb-bounce-v2-long+ 1T -$0.01)
+- No negative-hour streak: 20:00 +$0.24, 22:00 -$0.01 (scratch), 00:00 +$0.05
+- Frequency 1/hr — not overtrading
+- 3 open: HYPE hl_copy +0.82%, BTC continuum+ +0.63%, ENS bb-squeeze+ +0.32%
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN but volume dropped to 8T; 7d still -$1.02
+- Signal flow low + hotset 0-token fallback (chronic)
+- pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
