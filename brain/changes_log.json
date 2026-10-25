@@ -2643,5 +2643,16 @@
     "after": "[TRAIL] trailing exit: peak/current/floor/dist + trade_id",
     "rationale": "per-trade trail-exit attribution for round-trip ledger; was joining on token+window only",
     "impact": "zero-behavior log instrumentation; py_compile + line self-check PASS"
+  },
+  {
+    "timestamp": "2026-10-25T17:44:56Z",
+    "agent": "brain_auditor",
+    "change": "price_collector SKIP_TOKENS union->intersection of blacklists: one-sided-blacklisted coins (40, incl PENDLE/CELO/ENA/BCH) keep a fresh latest_prices row; added --selfcheck",
+    "type": "config",
+    "file": "scripts/price_collector.py",
+    "before": "SKIP_TOKENS = (SHORT_BLACKLIST | LONG_BLACKLIST) - BROAD_MARKET_TOKENS (129 tokens; 40 one-sided coins 15-98d stale -> price_age gates permanently blocked their legal side)",
+    "after": "SKIP_TOKENS = (SHORT_BLACKLIST & LONG_BLACKLIST) - BROAD_MARKET_TOKENS (89 tokens; both-sides-blocked coins still unstored)",
+    "rationale": "price_age gates (5-10min max) read latest_prices; skipping price storage for direction-blacklisted coins silently gated legal entries and served 29%-off stale prices to consumers (PENDLE row 1.5324 vs real 1.99). Direction blacklists remain enforced at compactor/decider block level.",
+    "impact": "Restores price feed for 40 partially-tradeable coins; live-verified next timer cycle (87->113 fresh rows, PENDLE 0.3min); hermes_constants untouched"
   }
 ]

@@ -1,99 +1,50 @@
-# Current State — daily_orchestrator 2026-10-25 17:05 UTC
-**Last Updated: 2026-10-25 17:05 UTC**
-**Updated by: daily_orchestrator. Prior: brain_auditor #143 16:55 (preserved below + git history).**
+# Current State — brain_auditor #144 2026-10-25 17:46 UTC
+**Last Updated: 2026-10-25 17:46 UTC**
+**Updated by: brain_auditor #144. Prior: daily_orchestrator 17:05 / brain_auditor #143 16:55 (preserved below + git history).**
 
-## HEADLINE — 1 ship (sqx- edge REFUTED), 0 config changes, pipeline GREEN
-squeeze_cross SHORT shadow edge **REFUTED** — upgrade queue's "only verified edge (t=2.01)"
-is a pre-fee artifact: net t=+1.02 p=0.31 (not significant), gross t=+12.54 (fees erase it),
-last-72h t=−2.73 (significantly negative). Candidate #2 (throttled sqx- re-test design)
-WITHDRAWN from upgrade queue. Evidence: automation/upgrade_audit.md (Daily Orchestrator
-Session 16:55). Pipeline 24h 13T 10W 76.9% +$0.60 GREEN, 1 open BTC bracketed, 0 errors.
-Standing verify #141 (source stamp) independently CONFIRMED (BTC #16395 has `source=
-'continuum-trend+'`) — agrees with #143.
-**DRIFT FIXED: CEO queue item "post-arm floor D=0.20 GO" was STALE** — that floor is
-ALREADY LIVE: UGB-PT enforced on every non-PM-armed trade at +0.40 (CEO GO Oct 24, ship
-#130) and PM-managed armed trades trail at D=0.20 (verified live: `[TRAIL] HYPER floor=0.65
-dist=0.20` from peak 0.85). Residual tightening UGB_PT_DISTANCE_PCT 0.30→0.20 measured FRESH
-this run on the exact bypass cohort (#136 scope): 30d `+2.368` vs `+2.247` = `+0.12` = NOISE
-(14d `+1.323` vs `+1.318`) → MONITOR, no change. Escalation #17 = CLOSED (superseded by
-live UGB-PT), no longer "awaiting GO". hermes_constants.py EMPTY git diff.
+## HEADLINE — 1 ship (price-feed fix), 1 code change, 0 trading-constant changes
+**Watchdog REC-5 ROOT-CAUSED AND FIXED: price_collector skipped every coin blacklisted on
+EITHER side, so 40 one-sided-blacklisted coins (tradeable on the open side) had 15-98d-stale
+`latest_prices` rows — every `*_MAX_PRICE_AGE` gate (5-10min) hard-blocked them permanently.
+PENDLE traded 3x TODAY while its price row read 1.5324 vs real 1.99 (29% off).**
+FIX: `SKIP_TOKENS = (SHORT|LONG)` -> `(SHORT & LONG)` (129->89; SUI both-side still skipped = correct);
+per-side blacklists still enforced at compactor/decider block level. `--selfcheck` PASS.
+LIVE-VERIFIED next timer cycle: fresh rows 87->113, PENDLE/CELO/ENA/BCH/RENDER/W 0.3min.
+hermes_constants.py EMPTY git diff. Soak re-check 24h.
 
-## CREATIVE #1 — PRE-ENTRY DISPLACEMENT GATE: REJECTED-WITH-DATA
-Mandate hypothesis (trend entries move first, chop entries don't) measured on every closed
-trade, 6 1m candles strictly `ts < open_time`, direction-adjusted, price-move % vs pnl_usdt:
-- 14d: no-disp 153T 34.6% `-3.59` vs >0.15 103T 38.8% `-0.15` — **Fisher p=0.510**
-- 30d: no-disp 311T 41.5% `-4.06` vs >0.15 220T 44.5% `+0.08` — **Fisher p=0.533**
-- Winner impact: **42.7% / 42.4% of winners killed** (bar <20%) = destroys `+4.37`/`+12.14`
-- Family-confounded both ways (doji/bb-bounce no-disp BETTER; bb-squeeze disp better)
-→ fails significance, fails fk, kills winners. **Not shipping.**
-Script `brain/analysis/pre_entry_displacement_2026-10-25.py` — first cut had a
-MIS-PARAMETRIZED Fisher (reported p=0.106); independent brute-force cross-check caught it;
-rewritten with `FISHER_SELFCHECK` assertions (0.5101/1.0/0.001093) PASS.
+## CREATIVE — UGB-PT EXECUTION LEDGER pre-registered (n>=10 enforcement exits)
+2 exits so far: HYPE decision +0.80 vs floor +0.81 (clean) | PENDLE #16398 decision -0.01 vs
+floor +0.14 = 0.15pp poll-gap + 0.12pp decision-to-fill (realized -0.13 price-move).
+Dollars immaterial ('-$0.02'). Trigger: median breach >0.10pp at n>=10.
 
-## CREATIVE #2 — CONTRARIAN FLIP-POOL NARROWED (zero code)
-Fresh outcome join 541/813: pump-chain- flip-WR 64.1% n=344 (Oct 27 PROMOTE recheck);
-**btc-pump-rider+ flip-WR 25.0% n=196 = flipping LOSES 75%** → excluded with data;
-hmacd_mtf-+ n=1 dead. Pool overall 49.8% = flip is family-specific, not generic.
-Oct 27 evaluates **pump-chain- only**.
-
-## LOSING AUTOPSY 48h — WRONG-SIDE REFUTED 67th CONSECUTIVE RUN
-`recovery_replay.py` adverse-first (selfcheck PASS, open-anchored vacuity reproduced
-181/190=95.3%): n=5 = 2 never-adverse / 2 recovered-after-adverse / **1 NEVER**
-(BTC #16377 manual_sl_hit `-0.08`, immaterial). Winning side for all 5: flat or
-already-short. Valid refs: #61 p=0.116, #84 fwd t=-0.04.
+## LOSING AUTOPSY 48h — WRONG-SIDE REFUTED 68th CONSECUTIVE RUN
+`recovery_replay.py` adverse-first (selfcheck PASS): n=6 = 3 never-adverse / 2 recovered /
+1 NEVER (BTC #16377 manual_sl '-0.08' immaterial). Valid refs: #61 p=0.116, #84 t=-0.04.
 
 ## MANDATE — CHOP vs TREND (fresh)
-- 7d: armed (mfe>=0.40) 61T 72.1% `+3.25` vs never-armed 61T 18.0% `-3.66`
-- 7d exits: profit-monster-trail 45T 40W `+2.70` · hard_max_loss 14T 0W `-1.80`
-  · atr_sl_hit 25T 0W `-1.40` · stale_exit 3T 0W `-0.64`
-- 14d: armed 155T 69.7% `+8.52` vs unarmed 172T 9.3% `-12.58`
-- chop-bleed KPI 7d 83.8% / 14d 85.6% / 30d 80.6% = at baseline → entry quality, not exits
-- 24h 13T 10W 76.9% `+0.60` GREEN · 7d 122T `-0.41` · 30d 691T `-1.99`
-- No NEW uncovered sub-50% n>=15 signal (all killed / disabled / dived / CONF_FLOOR / CEO)
+- 14d: trail_family 80T 73W +4.46 vs chop_exits 164T 1W -14.10
+- 14d armed 156T 69.2% +8.50 vs unarmed 173T 9.8% -12.52
+- chop-bleed (PnL-weighted) 7d 83.5% / 14d 85.5% / 30d 80.6% = AT baseline -> entry quality, gates own it
+- 24h 15T 11W +0.64 GREEN | 7d 124T 45.2% -0.37 | 30d 693T -1.95
+- 0 NEW uncovered sub-50% n>=15 signals (all killed / disabled / auditor-owned / CEO domain)
 
-## WATCHDOG TRIAGE
-- 0 top-level steers. BTC #16395 LONG HOLD re-VERIFIED IN CANDLES: **113 consecutive 1m
-  closes ABOVE EMA300** (close 80631 vs 80505) → exit condition (15+ min below) NOT met.
-- Arm-time steer (raise SL 79427→80476 at arm 80960): price 80631 < arm — not yet actionable.
-- Mid-band-long steer's EMA300 condition has LAPSED (was keyed on BTC below EMA300) →
-  expect automatic retraction next cycle; RSI-band half still re-measures Oct 27.
+## SHADOW (2/5 usable)
+contrarian join RE-RAN: pump-chain- flip 64.2% n=344 = **Oct 27 PROMOTE stands**;
+btc-pump-rider+ 24.9% do-not-flip; shadow_trader 21,470 signals gates justified;
+oscillator frozen / wyckoff+floor pending / rr orphaned.
 
-## STANDING VERIFIES
-- #141 source stamp **PASS** — first post-15:15Z trade BTC #16395 (15:47) carries
-  `_signal_metadata.source='continuum-trend+'` (bb-bounce solo-vs-confluence unblocked).
-- #142 [TRAIL] trade_id: activation lines carry trade_id (PURR 16393 / AVAX 16394), floors
-  sane positive dist=0.20. #135 spider tiers WORKING (no zero/negative floors).
-- #134 hotset MONITOR stays CLEARED — fresh 16:33 with 2 tokens (cycle 10062). **[daily_orchestrator 17:05: re-checked 16:53 → `hotset: []` cycle 10082 — hotset is FLAPPING (tokens↔empty), not stably cleared. Empty 20 cycles later is likely normal quiet-market compaction, not a bug; no action without scoring-defect evidence.]**
-- Gate census **0 LEAK** (ALLOW 10 / WAIVER 19 / PATH-EXEMPT 16 / PRE-RULE 56).
-- UGB-PT live fire today: HYPE #16383 `ugb_pt +0.16`.
-- Kill flags: AI_TRADER/VB+/HMACD±/OVERSOLD/DOJI all False; PUMP_CHAIN_V5_SHORT True (design).
-- size-reduce: `vacation_size_reduce.json` absent = **1.0x** (file truth). vacation_mode ON,
-  no_signal_enable_disable ON, unclog waiver expires **2026-10-27T00:00Z**.
-- Tracebacks today: 0 new (signal-compactor IndentationError last Oct 24 08:50, file
-  compiles OK; 03:00 self-healing FAIL = Sunday pre-fix line, SKIP guard shipped 09:46).
-- Side-find ANSWERED: confluence-gate `regime=` label = per-token 1m linreg
-  (`get_regime_1m`, signal_compactor.py:378) vs scanner's 5m regime — different source AND
-  message-only in that branch (block reason is single-type); APT later logs SHORT_BIAS
-  same-day → **benign, no bug**. Watchdog's open question closed.
-- Shadow 2/5 usable (contrarian join live, main shadow book); oscillator frozen; wyckoff
-  (304) / floor (1861) fresh but pending outcome join; rr orphaned (Oct 4).
-  **[daily_orchestrator: sqx- edge REFUTED this run — remove sqx- from any "usable shadow
-  edge" shortlist; see HEADLINE.]**
-- Disk 83% (< 85% trigger). price_history (15.3M rows) unpruned = real lever; candles
-  already pruned by price_collector. Standing call: prune only at >85% AND after retention
-  plan + bug_hunter. **New next-candidate: draft price_history 30d retention plan NOW so
-  it's ready when trigger hits** (execution stays gated).
+## WATCHDOG TRIAGE (17:14 cycle)
+- steer-001/002 (cluster + 3-long): valid — exit conditions govern; no size added while volume LOW
+- REC-5 PENDLE price feed: **FIXED this run** (above); REC-4 GRASS pick watchlist-only correct
+- BTC #16395 LONG aligned (+0.17, continuum-trend+) — EMA300 hold stands; DOGE/PENDLE unarmed
+  bb-bounce against alt SHORT_BIAS tape → exit conditions on flip, per watchdog
 
-## CEO QUEUE
-1. **CONF_FLOOR fk ruling** — fkA 22.2% > 20% bar, held.
-2. **Oct 27 cluster**: waiver expiry + mid-band re-measure + [35,45) waiver re-measure +
-   pump-chain- PROMOTE (flip 64.1% n=344). *[summarizer also lists contrarian PROMOTE +
-   pump-chain+ HIGH/NORMAL regime gate for Oct 27 — CEO-gated, not orchestrator.]**
-3. ~~Post-arm floor D=0.20 GO~~ **CLOSED this run — already live (UGB-PT + PM trail),
-   residual tightening 0.30→0.20 = `+0.12`/30d noise → MONITOR.**
-Escalation #17: **CLOSED (superseded by live UGB-PT)** — stop listing as awaiting GO.
+## STANDING VERIFIES — ALL PASS
+source stamp 4/4 · [TRAIL] trade_id activation+exit · gate census 0 LEAK · kill opens 0 ·
+constants EMPTY · protected 13/13 · size-reduce absent=1.0x · 0 Tracebacks today · lock absent
+SIDEWAYS: session_brain duplicate records (6th run flagged — rebuild still not done, MED)
 
-## NEXT STEPS (orchestrator, non-CEO)
-1. Stage A/C re-readout ~Oct 29 — **re-check sqx- net significance here** (refuted this run).
-2. Draft price_history 30d retention plan + route to bug_hunter (design only; execution
-   gated on disk >85%). Cancel the mis-targeted 15m/1h/4h candle-retention candidate.
+## QUEUE
+**Oct 27:** waiver expiry + mid-band + [35,45) re-measure + pump-chain- contrarian PROMOTE
+**Oct 28:** solo-bypass conversion recheck
+**CEO:** CONF_FLOOR fkA 22.2% ruling (queue unchanged; escalation #17 CLOSED as superseded)

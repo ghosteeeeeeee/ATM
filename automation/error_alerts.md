@@ -1965,3 +1965,14 @@
 - **WARN (1x, filter by design)**: `TRADE FAILED: CC SHORT` 13:41 — `EXEC-RSI-DETECT-FLOOR` blocked (detect RSI 24.7 < 35 knife), signal 1688566 marked FAILED, no rollback. Same class as ZRO SHORT 08:55 — not a bug.
 - **INFO**: hotset fallback 0 tokens (28x/30m) — known monitored issue (confidence≥70 gate), unchanged since 09:46.
 - **AUTO-FIXES**: none needed.
+
+## Error Alerts — 2026-10-25 16:27 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: USELESS TOK — signal TOK rolled back (prevents retry loop)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: USELESS TOK (count=N)`
+
+## Error Alerts — 2026-10-25 17:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`

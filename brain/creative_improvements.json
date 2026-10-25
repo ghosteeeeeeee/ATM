@@ -8482,5 +8482,24 @@
     "category": "direction",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-25T17:44:56Z",
+    "idea": "UGB-PT execution-quality ledger (decision-live vs realized fill vs intended floor, n>=10 enforcement exits)",
+    "rationale": "2 enforcement exits so far: HYPE decision +0.80 vs floor +0.81 (0.01pp breach, clean); PENDLE #16398 decision -0.01 vs floor +0.44-0.30=+0.14 (0.15pp poll-gap breach) and realized price-move -0.13 (0.27pp below floor, +0.12pp decision-to-fill). Dollars immaterial (-0.02) but mechanism (poll cadence / fill source) unmeasured.",
+    "expected_impact": "detect systematic floor breach >0.10pp before it compounds on larger notionals",
+    "category": "exit instrumentation",
+    "status": "pre-registered",
+    "risk": "low",
+    "trigger": "n>=10 ugb_pt enforcement closes"
+  },
+  {
+    "date": "2026-10-25T17:44:56Z",
+    "idea": "SHIPPED: one-sided blacklist price-feed restore (price_collector SKIP_TOKENS union->intersection)",
+    "rationale": "40 coins blacklisted on exactly one side are legally tradeable on the other but had 15-98d-stale latest_prices rows — every *_MAX_PRICE_AGE gate (5-10min) hard-blocked them silently. PENDLE traded today 3x while its price row said 1.5324 vs real 1.99 (29% error for any consumer of the stale value).",
+    "expected_impact": "unblocks legal entries on 40 coins; fixes 29%-off price reads for R:R/confluence consumers",
+    "category": "data integrity",
+    "status": "shipped",
+    "risk": "low"
   }
 ]

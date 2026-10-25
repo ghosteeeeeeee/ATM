@@ -23,9 +23,15 @@ from hyperliquid_exchange import is_delisted as _is_delisted, _info_rate_limit
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, BROAD_MARKET_TOKENS
 from candles_lock import acquire as _candles_lock_acquire, release as _candles_lock_release
 
-# Combined blacklist — tokens that should never be stored (not tradeable or systematically losing)
-# EXCEPT broad market tokens — they must always have fresh data for speed/volatility calculations
-SKIP_TOKENS = (SHORT_BLACKLIST | LONG_BLACKLIST) - BROAD_MARKET_TOKENS
+# Tokens never stored: blocked on BOTH sides (untradeable) — EXCEPT broad market
+# tokens (always fresh for speed/volatility). One-sided blacklist coins stay
+# tradeable on the open side, so they MUST keep a fresh latest_prices row:
+# price_age gates (SIGNAL_CONFLUENCE / GRIND_ACCUM / VOLMOM / RR_STRUCTURAL /
+# ai_trader_precheck price_age_minutes) hard-block rows older than 5-10 min, so
+# the old union definition silently gated every legal entry on 40 one-sided
+# coins (15-98d stale; PENDLE traded today on a 98d-old row). Per-side
+# blacklists stay enforced at compactor/decider block level, not by price feed.
+SKIP_TOKENS = (SHORT_BLACKLIST & LONG_BLACKLIST) - BROAD_MARKET_TOKENS
 
 STATIC = STATIC_DB
 init_db()  # Ensure tables exist
@@ -891,4 +897,12 @@ def main():
         _candles_lock_release(_lock_fd)
 
 if __name__ == '__main__':
+    if '--selfcheck' in sys.argv:
+        # one-sided blacklist coin keeps price feed; both-sides coin does not
+        assert 'PENDLE' in SHORT_BLACKLIST and 'PENDLE' not in LONG_BLACKLIST
+        assert 'PENDLE' not in SKIP_TOKENS, 'one-sided coin must keep price feed'
+        assert 'SUI' in SHORT_BLACKLIST and 'SUI' in LONG_BLACKLIST and 'SUI' in SKIP_TOKENS
+        assert 'BTC' not in SKIP_TOKENS
+        print(f'selfcheck PASS (skip={len(SKIP_TOKENS)})')
+        sys.exit(0)
     main()
