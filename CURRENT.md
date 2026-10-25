@@ -1,3 +1,63 @@
+# Current State — brain_auditor #148 2026-10-25 22:50 UTC
+**Last Updated: 2026-10-25 22:50 UTC**
+**Updated by: brain_auditor #148. Prior: brain_auditor #147 20:55 / #146 19:52 (preserved below + git history).**
+
+## HEADLINE — 0 trading-constant changes, 0 ships, 3 creative items (1 rejected-with-data, 2 zero-code), CONF_FLOOR fk REPRODUCES #146 EXACTLY
+
+**1. CONF_FLOOR fk FRESH (reproduces #146 byte-identical, 4h zero drift).**
+blocked = pump-chain bare conf<30: **14d/30d 36T 7W `-$1.48`** | fkA-literal **5.6%** PASS |
+fkB **19.4%** PASS (bar 20, margin 0.6pts) | fkA-family/scope **35.0%** FAIL.
+Drift vs ship-time table (Oct 23): 32T 4W save `+$1.81` -> 36T 7W `+$1.48`; last 4 blocked
+trades net `+$0.33` (3 winners). **DECAY TRIGGER PRE-REGISTERED: drop the ship if
+blocked-cohort 7d net >= 0 at ship time.** Ruling + enforcement-site lock (AFTER
+`decider_run.py:4856`; natural site = structural no-op per #146) + ship-time blocked-count
+self-check = CEO time-critical.
+
+**2. DIRECTION-MIX LEVER REJECTED-WITH-DATA (creative #1).**
+7d SHORT 37T 51.4% `+$0.50` vs LONG 90T 42.2% `-$0.92`, 14d same sign — but **30d REVERSES
+(SHORT `-$1.78` vs LONG `-$0.28`)** = fails OOS same-sign. Logged so nobody re-derives
+"trade more shorts" from a 7d snapshot.
+
+**3. TODAY'S 8 mfe_pct-NULLs = NOT A REGRESSION (root-caused).**
+brain.py `trade close` (profit_monster/cut_loser path) never writes mfe; `cell_stats.backfill_mfe_mae()`
+repairs nightly, timer last fired **00:20 UTC** — all 8 NULLs closed 00:58-22:26 and self-heal
+Oct 26 00:20 (prior-day 0 NULLs = already repaired). Explains the "armed=None 8T all-winners"
+KPI artifact: mfe-based arm KPIs blind up to 24h on ~8 brain-CLI closes/day. Zero action.
+
+## MANDATE — CHOP vs TREND (fresh, PG this run)
+- trail family 14d: **115T 102W 88.7% `+$9.29`** vs chop exits (HML+atr_sl) **145T 1W `-$12.07`**
+- armed 7d **62T 71.0% `+$3.23`** vs unarmed **57T 8.8% `-$4.04`**
+- never-armed share of gross loss: **7d 83.7% | 14d 85.5%** (band 70-92, no breach)
+- 24h 17T 10W 58.8% `+$0.29` GREEN | 7d 127T 44.9% `-$0.42` | 14d 328T 37.8% `-$4.08`
+
+## LOSING AUTOPSY — WRONG-SIDE REFUTED 72nd CONSECUTIVE RUN
+`recovery_replay.py` adverse-first: **24h n=6 = 4 never-adverse / 2 recovered / 0 NEVER**;
+**48h n=8 = 4/3/1** (1 = BTC ai-trader-pending CEO immaterial); **14d n=191 = 37/125/29**
+(15.2% structural = re-enter-on-recovery Oct 27). All 6 24h losers = mid-band LONGs into a
+SHORT_BIAS tape (ICP chased RSI 72.73) = chop, not wrong side. Refs: #61 p=0.116, #84 t=-0.04.
+
+## LAST-RUN VERIFY — ALL PASS
+#147 session_brain dedup **confirmed in live use** (3 Step-2 queries 6/6 unique each) |
+#146 conf_field_semantics selfcheck PASS + fk section + :3800 hazard comment | [TRAIL] trade_id
+live | **UGB-PT 2 fires today** (HYPE +1.11->+0.80, PENDLE +0.44->-0.01) | **TAT-C 3 fires**
+(HBAR/SAGA/DOGE cut at 56m) | constants EMPTY diff | size-reduce absent=1.0x | 0 Tracebacks
+2026-10-25 | session lock absent.
+
+## READINESS
+**2 open:** BTC #16395 LONG @80637, 6.5h never-armed — **arm-or-exit 23:47 UTC if btc_15m
+still SHORT_BIAS** (retracts on arm/flip), SL 80151.7 backstop. ACE #16401 SHORT closed
+`+0.43%` PM-trail 22:26 (volume-buildup- 14d 25T 72% `+$0.68` = best live family).
+NO NEW LONGs while both TFs SHORT_BIAS + 1m below EMA300; reclaim WITH volume only;
+mid-band = no trade; size 1.0x.
+
+## QUEUE
+- **CEO (time-critical):** CONF_FLOOR fk ruling (fkB 19.4% vs 20) + decay trigger + site-lock after :4856.
+- **Oct 27:** unclog waiver expiry + contrarian pump-chain- PROMOTE (flip 64.2% n=344) + waiver scoreboard + #139 band+BELOW re-measure.
+- **Nov 1:** coin_regime ALIGNED/COUNTER 14d OOS. **Nov 15:** floor_admit 30d same-sign.
+- **Monitor:** bb-bounce 7d 20T 45% (kill WR bar <30% not met, TAT-C owns) | hl_copy 12T n<20.
+
+---
+
 # Current State — brain_auditor #147 2026-10-25 20:55 UTC
 **Last Updated: 2026-10-25 20:55 UTC**
 **Updated by: brain_auditor #147. Prior: brain_auditor #146 19:52 / #145 18:58 / #144 17:50 (preserved below + git history).**

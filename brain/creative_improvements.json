@@ -8595,5 +8595,32 @@
     "category": "monitoring",
     "status": "pre-registered",
     "risk": "zero (read-only)"
+  },
+  {
+    "date": "2026-10-25T22:45:00Z",
+    "idea": "Direction-mix lever (trade more SHORTs) REJECTED-WITH-DATA",
+    "rationale": "7d SHORT +0.50 vs LONG -0.92 same-sign at 14d (SHORT -0.35 vs LONG -3.73) but 30d REVERSES (SHORT -1.78 vs LONG -0.28) — fails OOS same-sign",
+    "expected_impact": "n/a — rejected",
+    "category": "direction",
+    "status": "rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T22:45:00Z",
+    "idea": "CONF_FLOOR decay trigger: drop ship if blocked-cohort 7d net >= 0 at ship time",
+    "rationale": "blocked set drifted 32T/4W/-1.81 -> 36T/7W/-1.48 in 2 days (last 4 net +0.33); fkA-family/scope 16%->35% FAIL. Pre-register so the floor is never shipped on stale positives",
+    "expected_impact": "prevents shipping a stopped-paying gate",
+    "category": "guardrail",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T22:45:00Z",
+    "idea": "mfe backfill blind-spot noted: brain-CLI closes (profit_monster/cut_loser) get mfe only at nightly cell_stats 00:20 repair — mfe-based KPIs blind up to 24h on ~8 trades/day; self-heals, upgrade only if a KPI flips on it",
+    "rationale": "root-caused this run's '8/16 mfe NULL today' — by design (cell_stats.backfill_mfe_mae docstring), not a regression",
+    "expected_impact": "zero code; prevents future false-bug reports",
+    "category": "data quality",
+    "status": "noted",
+    "risk": "low"
   }
 ]
