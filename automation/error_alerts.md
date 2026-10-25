@@ -1955,3 +1955,7 @@
 - **AUTO-FIX**: `scripts/hermes-better-coder-audit.py` now returns `SKIP(disabled, parked)` for disabled units (both probes target intentionally-parked subsystems: `hermes-better-coder.timer` + `hermes-coding-mcp.service` are disabled, dispatcher package empty since Sep 1). Dispatcher probe SKIP guard was already added by brain_auditor earlier today. Verified: py_compile PASS, probe logic tested on 3 units. Next Sunday: SKIP, no FAIL.
 - **WARN (monitored, no fix applied)**: `hotset.json` 0 tokens all cycles — 18 signals PENDING top-10 approval while `SHORT-RSI-HARD-FLOOR` blocks shorts at RSI 27-30 in a 113/123-token SHORT_BIAS tape. Filter behaving as designed (BANANA oversold-short lesson); do not weaken without backtest + CEO approval.
 - **INFO**: Core green — vacation pause absent, pipeline LIVE rc=0 every 1m, 3/3 core timers fired <60s, 73 hermes timers active, 81 signals/h, prices 49s fresh, 0 open | 8 closed today +$0.26 | 14 closed 24h +$0.67, 0 phantom trades, 0 pipeline tracebacks/30m, disk 82% (under 85 threshold; pipeline.log 300M — compress when >85%).
+
+## Error Alerts — 2026-10-25 12:27 UTC
+- **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
