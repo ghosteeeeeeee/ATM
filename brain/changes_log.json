@@ -2731,5 +2731,16 @@
     "after": "dedup keyed on the returned 500-char prefix; ceiling documented; 5 probes; single db_size_mb key",
     "rationale": "bug_hunter round 1 FIX-REQUIRED: 2,690 prefix groups hold >1 distinct full text, so 3/15 diverse probes still returned duplicate strings — exactly the reported symptom",
     "impact": "round 2 SHIP 0 HIGH/0 MED; 5/5 probes 6/6 unique; independent off-list probes clean"
+  },
+  {
+    "timestamp": "2026-10-25T23:55:55Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/arm_sweep_oos_2026-10-25.py + 2 .out artifacts — arm-line sweep (0.20/0.30/0.40/0.50) x D=0.20, all-trades + #135-scoped, paired old-half OOS test; verdict REJECTED-WITH-DATA for every arm",
+    "type": "creative",
+    "file": "brain/analysis/arm_sweep_oos_2026-10-25.py",
+    "before": "n/a (new analysis script, zero live behavior)",
+    "after": "ships with --selfcheck (5 assertions) and --verdict (locked ship bar); exit code 2 = rejected",
+    "rationale": "mandated creative item: test whether the near-arm giveback cohort (0.30<=mfe<0.40, all-window negative) is rescued by a lower arm line, without shipping on a recent-half artifact",
+    "impact": "no trading-constant change; closes the lower-arm question with data and surfaces a scope caveat on the pending D=0.20 GO ask"
   }
 ]

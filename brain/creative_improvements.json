@@ -8622,5 +8622,41 @@
     "category": "data quality",
     "status": "noted",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-25T23:55:55Z",
+    "idea": "ARM-LINE SWEEP (arm 0.40 -> 0.30/0.20, D locked 0.20) — measured, REJECTED-WITH-DATA",
+    "rationale": "near-arm cohort (0.30<=mfe<0.40) never arms and rides to the stop: 7d 8T -0.36 / 14d 25T -1.95 / 30d 49T -3.33, same-sign all windows. Would a lower arm line pay once harm to winners is counted?",
+    "result": "REJECTED. Paired delta(ARM)-delta(0.40) on disagreeing trades: ARM0.30 all-scope 14d +1.226 p=0.0198 (old half +0.808 p=0.049) BUT 30d +0.862 p=0.295 with OLD HALF -0.180; scoped 14d p=0.273 / 30d p=0.322. ARM0.20 30d old half -1.156 (all) / -0.387 (scoped). Whole lower-ARM edge is new-half concentrated and reverses OOS.",
+    "bars_failed": [
+      "paired p at 30d both scopes",
+      "30d old-half negative",
+      "absolute bars at 30d unscoped"
+    ],
+    "category": "exit/arming",
+    "status": "rejected-with-data",
+    "risk": "n/a",
+    "collisions_named": [
+      "PM_TRAIL_ACTIVATE_PCT is CEO_PROTECTED ('MUST BE 0.40% DO NOT CHANGE')",
+      "TAT-C tripwire predicate is live_pnl < PM_TRAIL_ACTIVATE_PCT — changing the arm line mid-flight confounds the in-flight TAT-C eval"
+    ]
+  },
+  {
+    "date": "2026-10-25T23:55:55Z",
+    "idea": "MFE-BUCKET LEDGER as the standing arm-quality KPI (zero code)",
+    "rationale": "14d net by max-MFE bucket is monotone and clean: <0.20 = -8.72 | 0.20-0.40 = -4.29 | 0.40-0.80 = +0.98 | >=0.80 = +7.48. Quantifies 'the trend is your friend' as an MFE law rather than a slogan; read it with the never-armed share each run.",
+    "expected_impact": "no behavior change; earlier warning when arm-quality degrades",
+    "category": "kpi",
+    "status": "adopted-this-run",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T23:55:55Z",
+    "idea": "SCOPE CAVEAT for the pending D=0.20 post-arm floor CEO GO ask",
+    "rationale": "the published absolute bars reproduce on the pre-registered #135 scope (14d PASS / 30d PASS) but NOT on the whole book: unscoped ARM0.40 30d net +3.659 with p=0.2149 and older-half only +0.398 of +3.659 (89% of the edge sits in the newest 15d). The scope was pre-registered so this is a caveat, not a refutation — but the CEO should see it next to the GO.",
+    "expected_impact": "better-informed GO decision",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

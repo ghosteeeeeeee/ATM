@@ -1,0 +1,487 @@
+{
+ "scope": "scoped",
+ "result": {
+  "7": {
+   "n": 79,
+   "no_candles": 1,
+   "winners": 36,
+   "variants": {
+    "0.002": {
+     "fills": 61,
+     "net": 0.842,
+     "p": 0.2142,
+     "save": 2.178,
+     "harm": 1.336,
+     "saved_losers": 25,
+     "harmed_winners": 25,
+     "zeroed_winners": 2,
+     "fk_zeroed_pct": 5.6,
+     "fk_harmed_pct": 69.4,
+     "old_half": 1.047,
+     "new_half": -0.204,
+     "armed": 63,
+     "armed_winners": 36,
+     "t": 1.255
+    },
+    "0.003": {
+     "fills": 51,
+     "net": 0.414,
+     "p": 0.4454,
+     "save": 1.525,
+     "harm": 1.111,
+     "saved_losers": 17,
+     "harmed_winners": 21,
+     "zeroed_winners": 1,
+     "fk_zeroed_pct": 2.8,
+     "fk_harmed_pct": 58.3,
+     "old_half": 0.489,
+     "new_half": -0.075,
+     "armed": 54,
+     "armed_winners": 36,
+     "t": 0.769
+    },
+    "0.004": {
+     "fills": 45,
+     "net": 0.141,
+     "p": 0.784,
+     "save": 1.18,
+     "harm": 1.039,
+     "saved_losers": 11,
+     "harmed_winners": 19,
+     "zeroed_winners": 0,
+     "fk_zeroed_pct": 0.0,
+     "fk_harmed_pct": 52.8,
+     "old_half": 0.318,
+     "new_half": -0.177,
+     "armed": 48,
+     "armed_winners": 36,
+     "t": 0.276
+    },
+    "0.005": {
+     "fills": 36,
+     "net": 0.111,
+     "p": 0.812,
+     "save": 0.871,
+     "harm": 0.761,
+     "saved_losers": 7,
+     "harmed_winners": 13,
+     "zeroed_winners": 0,
+     "fk_zeroed_pct": 0.0,
+     "fk_harmed_pct": 43.3,
+     "old_half": 0.362,
+     "new_half": -0.251,
+     "armed": 38,
+     "armed_winners": 30,
+     "t": 0.24
+    }
+   },
+   "paired": {
+    "0.002": {
+     "n": 27,
+     "mean_diff": 0.026,
+     "total": 0.702,
+     "t": 1.543,
+     "p": 0.1348,
+     "old_n": 19,
+     "old_total": 0.729,
+     "old_p": 0.0923,
+     "new_n": 8,
+     "new_total": -0.028,
+     "new_p": 0.8857
+    },
+    "0.003": {
+     "n": 12,
+     "mean_diff": 0.0228,
+     "total": 0.273,
+     "t": 1.431,
+     "p": 0.1802,
+     "old_n": 8,
+     "old_total": 0.172,
+     "old_p": 0.3009,
+     "new_n": 4,
+     "new_total": 0.101,
+     "new_p": 0.4921
+    },
+    "0.005": {
+     "n": 14,
+     "mean_diff": -0.0022,
+     "total": -0.03,
+     "t": -0.139,
+     "p": 0.8913,
+     "old_n": 10,
+     "old_total": 0.044,
+     "old_p": 0.805,
+     "new_n": 4,
+     "new_total": -0.074,
+     "new_p": 0.6381
+    }
+   }
+  },
+  "14": {
+   "n": 157,
+   "no_candles": 1,
+   "winners": 67,
+   "variants": {
+    "0.002": {
+     "fills": 115,
+     "net": 3.03,
+     "p": 0.0018,
+     "save": 5.063,
+     "harm": 2.033,
+     "saved_losers": 48,
+     "harmed_winners": 44,
+     "zeroed_winners": 5,
+     "fk_zeroed_pct": 7.6,
+     "fk_harmed_pct": 66.7,
+     "old_half": 2.188,
+     "new_half": 0.842,
+     "armed": 119,
+     "armed_winners": 66,
+     "t": 3.204
+    },
+    "0.003": {
+     "fills": 98,
+     "net": 2.303,
+     "p": 0.0063,
+     "save": 3.95,
+     "harm": 1.647,
+     "saved_losers": 34,
+     "harmed_winners": 36,
+     "zeroed_winners": 2,
+     "fk_zeroed_pct": 3.0,
+     "fk_harmed_pct": 54.5,
+     "old_half": 1.889,
+     "new_half": 0.414,
+     "armed": 104,
+     "armed_winners": 66,
+     "t": 2.792
+    },
+    "0.004": {
+     "fills": 85,
+     "net": 1.934,
+     "p": 0.0171,
+     "save": 3.234,
+     "harm": 1.3,
+     "saved_losers": 21,
+     "harmed_winners": 28,
+     "zeroed_winners": 0,
+     "fk_zeroed_pct": 0.0,
+     "fk_harmed_pct": 43.1,
+     "old_half": 1.793,
+     "new_half": 0.141,
+     "armed": 90,
+     "armed_winners": 65,
+     "t": 2.433
+    },
+    "0.005": {
+     "fills": 73,
+     "net": 2.271,
+     "p": 0.0048,
+     "save": 3.2,
+     "harm": 0.929,
+     "saved_losers": 16,
+     "harmed_winners": 20,
+     "zeroed_winners": 0,
+     "fk_zeroed_pct": 0.0,
+     "fk_harmed_pct": 35.7,
+     "old_half": 2.16,
+     "new_half": 0.111,
+     "armed": 76,
+     "armed_winners": 56,
+     "t": 2.912
+    }
+   },
+   "paired": {
+    "0.002": {
+     "n": 57,
+     "mean_diff": 0.0192,
+     "total": 1.096,
+     "t": 1.877,
+     "p": 0.0658,
+     "old_n": 30,
+     "old_total": 0.395,
+     "old_p": 0.2978,
+     "new_n": 27,
+     "new_total": 0.702,
+     "new_p": 0.1348
+    },
+    "0.003": {
+     "n": 30,
+     "mean_diff": 0.0123,
+     "total": 0.369,
+     "t": 1.118,
+     "p": 0.2729,
+     "old_n": 18,
+     "old_total": 0.095,
+     "old_p": 0.7294,
+     "new_n": 12,
+     "new_total": 0.273,
+     "new_p": 0.1802
+    },
+    "0.005": {
+     "n": 28,
+     "mean_diff": 0.012,
+     "total": 0.337,
+     "t": 1.129,
+     "p": 0.269,
+     "old_n": 14,
+     "old_total": 0.367,
+     "old_p": 0.0868,
+     "new_n": 14,
+     "new_total": -0.03,
+     "new_p": 0.8913
+    }
+   }
+  },
+  "30": {
+   "n": 375,
+   "no_candles": 5,
+   "winners": 178,
+   "variants": {
+    "0.002": {
+     "fills": 267,
+     "net": 4.902,
+     "p": 0.0015,
+     "save": 10.858,
+     "harm": 5.957,
+     "saved_losers": 93,
+     "harmed_winners": 110,
+     "zeroed_winners": 21,
+     "fk_zeroed_pct": 11.9,
+     "fk_harmed_pct": 62.1,
+     "old_half": 1.74,
+     "new_half": 3.162,
+     "armed": 281,
+     "armed_winners": 177,
+     "t": 3.203
+    },
+    "0.003": {
+     "fills": 241,
+     "net": 4.789,
+     "p": 0.0005,
+     "save": 9.332,
+     "harm": 4.543,
+     "saved_losers": 74,
+     "harmed_winners": 92,
+     "zeroed_winners": 9,
+     "fk_zeroed_pct": 5.1,
+     "fk_harmed_pct": 52.0,
+     "old_half": 2.354,
+     "new_half": 2.435,
+     "armed": 261,
+     "armed_winners": 177,
+     "t": 3.533
+    },
+    "0.004": {
+     "fills": 208,
+     "net": 4.192,
+     "p": 0.0011,
+     "save": 7.624,
+     "harm": 3.431,
+     "saved_losers": 48,
+     "harmed_winners": 69,
+     "zeroed_winners": 3,
+     "fk_zeroed_pct": 1.7,
+     "fk_harmed_pct": 39.4,
+     "old_half": 2.126,
+     "new_half": 2.066,
+     "armed": 231,
+     "armed_winners": 175,
+     "t": 3.312
+    },
+    "0.005": {
+     "fills": 172,
+     "net": 3.439,
+     "p": 0.0046,
+     "save": 6.361,
+     "harm": 2.922,
+     "saved_losers": 28,
+     "harmed_winners": 56,
+     "zeroed_winners": 1,
+     "fk_zeroed_pct": 0.6,
+     "fk_harmed_pct": 35.7,
+     "old_half": 1.067,
+     "new_half": 2.372,
+     "armed": 192,
+     "armed_winners": 157,
+     "t": 2.873
+    }
+   },
+   "paired": {
+    "0.002": {
+     "n": 119,
+     "mean_diff": 0.006,
+     "total": 0.709,
+     "t": 0.751,
+     "p": 0.4543,
+     "old_n": 62,
+     "old_total": -0.387,
+     "old_p": 0.6005,
+     "new_n": 57,
+     "new_total": 1.096,
+     "new_p": 0.0658
+    },
+    "0.003": {
+     "n": 64,
+     "mean_diff": 0.0093,
+     "total": 0.596,
+     "t": 0.999,
+     "p": 0.3215,
+     "old_n": 34,
+     "old_total": 0.228,
+     "old_p": 0.6534,
+     "new_n": 30,
+     "new_total": 0.369,
+     "new_p": 0.2729
+    },
+    "0.005": {
+     "n": 63,
+     "mean_diff": -0.012,
+     "total": -0.754,
+     "t": -1.417,
+     "p": 0.1616,
+     "old_n": 32,
+     "old_total": -1.06,
+     "old_p": 0.013,
+     "new_n": 31,
+     "new_total": 0.306,
+     "new_p": 0.3307
+    }
+   }
+  }
+ },
+ "verdict": {
+  "7|0.002": {
+   "pass_all": false,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": false,
+    "p": false,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "7|0.003": {
+   "pass_all": false,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": false,
+    "p": false,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "7|0.004": {
+   "pass_all": false,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": false,
+    "p": false,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "7|0.005": {
+   "pass_all": false,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": false,
+    "p": false,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "14|0.002": {
+   "pass_all": true,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": true,
+    "p": true,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "14|0.003": {
+   "pass_all": true,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": true,
+    "p": true,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "14|0.004": {
+   "pass_all": true,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": true,
+    "p": true,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "14|0.005": {
+   "pass_all": true,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": true,
+    "p": true,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "30|0.002": {
+   "pass_all": true,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": true,
+    "p": true,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "30|0.003": {
+   "pass_all": true,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": true,
+    "p": true,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "30|0.004": {
+   "pass_all": true,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": true,
+    "p": true,
+    "fk": true,
+    "beats_baseline": true
+   }
+  },
+  "30|0.005": {
+   "pass_all": false,
+   "checks": {
+    "n": true,
+    "net": true,
+    "halves": true,
+    "p": true,
+    "fk": true,
+    "beats_baseline": false
+   }
+  }
+ }
+}
