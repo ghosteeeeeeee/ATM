@@ -1,44 +1,64 @@
 # Signal Performance Report
+**Generated:** 2026-10-25 21:34 UTC | **Period:** Last 6h + 24h
 
-=== Signal Performance Report ===
-Period: Last 6h | 24h — generated 2026-10-25 15:35 UTC
-
-Volume note: thin window — only 3 closed trades in 6h, 12 in 24h. No signal met the 24h kill/boost thresholds (5+ trades).
-
-## KILLED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no signal met kill criteria (WR<30%, 5+ trades, PnL<-$0.10) |
-
-## BOOSTED (executed)
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no signal met boost criteria (WR>55%, 5+ trades) |
-
-## LOSERS (watch list)
-| Signal | Dir | WR | PnL | Trades (24h) | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 0.0% | -$0.06 | 2 | WATCH — worst 24h; 7d: 47.1% WR, -$0.46 / 17T. Below 5T kill threshold. |
-| r2v2-long3 | LONG | 50.0% | -$0.01 | 2 | WATCH — noise-level losses. |
-| pump-chain+ | LONG | 100% | +$0.05 | 1 (winner) | 7d CONTEXT: HIGH 36.8% WR -$0.48, NORMAL 12.5% WR -$0.45, but EXTREME 42.9% +$3.72 / 105T. Regime-blocking candidate for HIGH+NORMAL — NOT a blanket kill. |
-| pump-chain-,pump-chain-v6- | SHORT | — | — | 0 in 24h | 7d: 14.3% WR -$0.23 / 7T. EXTREME already gate-blocked (volatility_gate_v2 0.0), HIGH blocked via PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED. NORMAL 58.8% +$0.73 keeps pump-chain- alive. |
-| ai-trader-pending | LONG/SHORT | 12.5%/37.5% | -$0.04/-$0.10 | 1 (7d 8T ea) | CEO-driven signal — watch only, do not auto-kill. |
-
-## WINNERS
-| Signal | Dir | WR | PnL | Trades (24h) | Status |
-|--------|-----|-----|-----|--------|--------|
-| continuum+ | LONG | 100% | +$0.20 | 2 | Healthy |
-| bb-squeeze+ | LONG | 100% | +$0.06 (1 in 6h) | 2 | Healthy |
-| volume-buildup- | SHORT | 100% | +$0.08 | 2 | Healthy — 7d 66.7% +$0.31 / 15T |
-| hl_copy_trader | LONG | 100% | +$0.16 | 1 | Healthy |
-| ai-trader-pending | LONG | 100% | +$0.12 | 1 | Healthy (24h) |
-| pump-chain+ | LONG | 100% | +$0.05 | 1 | Healthy (24h); see watch-list regime notes |
-
-## ISSUES
-- **No inversions found** (24h) — all signal direction labels match execution direction.
-- **Thin activity**: 12 closed trades / 24h — below threshold for any kill/boost action this cycle.
-- **pump-chain+ regime split**: EXTREME is a strong earner (+$3.72 / 105T) while HIGH and NORMAL bleed. If next cycles confirm, add 0.0x multipliers for HIGH+NORMAL in `volatility_gate_v2.py` + FAMILY_MAP entry in `market_phase_gate.py` — do NOT flip PUMP_FLOW_PLUS_ENABLED.
-- 6h window had only 2 signals fire (bb-squeeze+, r2v2-long3), both winners.
+**Volume context:** 6h = 5 closed trades (-$0.09), 24h = 16 closed trades (+$0.27), 72h = 46 (+$0.86). Low sample sizes this cycle.
 
 ---
-*No flags changed this cycle. Next report: ~6h from now.*
+
+## KILLED (executed):
+
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| — | — | — | — | — | No kills — no signal met all kill criteria (WR<30% AND PnL<-$0.10 AND 5+ trades, 24h) |
+
+## BOOSTED (executed):
+
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| — | — | — | — | — | No boosts — no signal met all boost criteria (WR>55% AND PnL>$0.05 AND 5+ trades, 24h) |
+
+## LOSERS (watch list):
+
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| bb-bounce-v2-long+ | LONG | 20.0% | -$0.02 | 5 (24h) | WATCH — fails kill bar (PnL -$0.02 > -$0.10). 72h: 14.3% WR, -$0.27. All-time regime split: FLAT 100% (4T), HIGH 55.6% (18T), NORMAL 45.7% (46T), EXTREME 46.2% (13T) — wins in FLAT/HIGH, so blanket kill inappropriate per regime check. Matches audit #138 finding (kill bars fail on 30d/14d/7d). Next cycle: kill if 24h PnL drops below -$0.10 |
+| r2v2-long3 | LONG | 50.0% | -$0.01 | 2 (24h) | WATCH — sample too small |
+| hl_copy_trader | LONG | 50.0% | +$0.07 | 2 (24h) | WATCH — 6h -$0.09 (atr_sl_hit), monitor |
+
+## WINNERS:
+
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| pump-chain+ | LONG | 100.0% | +$0.05 | 1 (24h) | OK — below sample threshold |
+| continuum+ | LONG | 100.0% | +$0.08 | 1 (24h) | OK — below sample threshold |
+| volume-buildup- | SHORT | 100.0% | +$0.08 | 2 (24h) | OK — 72h: 64.3% WR, +$0.23 (14T). Below 5T boost bar, recheck next cycle |
+| bb-squeeze+ | LONG | 66.7% | +$0.02 | 3 (24h) | OK — 72h: 66.7% WR, +$0.12 (6T). Below 5T 24h boost bar, recheck next cycle |
+
+## ISSUES:
+
+- **No direction inversions** in last 24h — signal/direction labels consistent.
+- **Low trade volume** (16 closed trades/24h) — most signals below sample thresholds; conclusions this cycle are necessarily tentative.
+- **bb-bounce-v2-long+** remains the primary watch item: 3 consecutive sub-30% WR days but PnL losses are tiny (trail_arm_timeout exits mostly breakeven/small). Do NOT blanket-kill — regime data shows FLAT/HIGH winners; regime-based blocking only if it degrades further.
+- No kill/boost actions executed this cycle — no git commits, no hermes_constants.py edits.
+
+---
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-10-25 | f6a7ed8 | brain_auditor: audit run #138 — escalation #17 closed as sup... |
+| 2026-10-25 | f86261f | brain_auditor: #134 addendum — watchdog 06:44 P1 rejected-wi... |
+| 2026-10-24 | f96aa8a | brain_auditor: AUDIT RUN #122 — LONG_RSI_SWEET_SPOT_BOOST 10... |
+| 2026-10-24 | c10b227 | scripts: UNCLOG-2 — 4 CEO-approved flips (consult 20261024T1... |
+| 2026-10-24 | 186ff1c | watchdog: 14:20 UTC cycle — BTC broke EMA300 pin DOWN (knife... |
+| 2026-10-24 | 9482523 | logs: hourly analysis 2026-10-24 12:28 — no change, quiet ho... |
+| 2026-10-24 | 7553d4e | brain_auditor: AUDIT RUN #114 (2026-10-24) — entry_regime_4h... |
+| 2026-10-23 | c4edf08 | exit-system: breakeven lock for CEO trades — SL→entry at +0.... |
+| 2026-10-23 | 10d6898 | Daily trading system update (2026-10-23) |
+| 2026-10-22 | 2d78f19 | Daily trading system update (2026-10-22) |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
