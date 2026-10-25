@@ -8148,5 +8148,14 @@
     "category": "process",
     "status": "logged",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-25T01:44:43Z",
+    "idea": "hl_copy_trader exit-quality audit: bypass list shields copy trades from profit_monster (reason: hl_fill_monitor correlation) but family runs 30d 3W/12T -0.20 with avg hold 118m — the fill monitor may not be delivering exits. UGB-PT now covers unarmed giveback as backstop.",
+    "rationale": "Watchdog flagged HYPE MFE +1.16% given back with no manager. UGB-PT fixes the giveback class, but the deeper question is whether hl_fill_monitor is effective at all. If not, removing hl_copy_trader from PROFIT_MONSTER_BYPASS_SIGNALS would let PM trail manage these trades like any other.",
+    "expected_impact": "Could recover giveback bleed on copy trades (family -$0.20/30d currently); needs fill-monitor effectiveness measurement first",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "medium — fill monitor interaction unknown, measure before changing bypass list"
   }
 ]

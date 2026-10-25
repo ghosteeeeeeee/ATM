@@ -2368,5 +2368,16 @@
     "after": "print(f\"Using token: {token[:4]}*** (len={len(token)})\")",
     "rationale": "watchdog 22:15 steer #4: token prefix landed in trade-watchdog.log (3 hits) — same class as BUG-036 leak",
     "impact": "no functional change; session/log transcripts stop receiving a token prefix"
+  },
+  {
+    "timestamp": "2026-10-25T01:44:43Z",
+    "agent": "brain_auditor",
+    "change": "UGB-PT enforcement live (CEO GO): unarmed giveback peak-trail exit at market, peak-0.30% giveback. Fixes bug_hunter HIGH: unarmed guard uses profit_monster trail-state (trailing_activated DB col is close-time-only). exit_detail label live= -> pnl= (realized-pnl extractor).",
+    "type": "config",
+    "file": "scripts/position_manager.py",
+    "before": "UGB shadow only (logs would-fires, never closes)",
+    "after": "UGB-PT closes live on unarmed-half giveback; UGB-BE stays shadow; ARM_BE_SHADOW_ENABLED gates both (kill switch)",
+    "rationale": "30d candle OOS n=179 unarmed +85.48pp sign-p 0.00000, positive all 3 split halves. CEO GO 2026-10-24. Live demo: HYPE #16383 fav +1.01% unarmed, would lock profit on 25% WR family. BTC #16385 armed in PM trail state -> correctly excluded.",
+    "impact": "Closes unarmed trades giving back from peak+0.40% to peak-0.30%; expected +85pp/30d on unarmed cohort; armed half excluded (measured harm -0.43pp)"
   }
 ]
