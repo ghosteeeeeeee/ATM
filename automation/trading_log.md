@@ -15629,3 +15629,24 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 - 24h WR 58.8% (recovered from 56.3%), 7d still -$0.42
 - BTC open trade 6.7h old — monitor for trail arm / timeout
 - pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 23:29 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.07 (WR: 0.0%) | 24h: 17T 10W 58.8% +$0.22 (GREEN) | 7d 128T 44.5% -$0.50 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade last hour: BTC continuum-trend+ LONG atr_sl_hit -$0.07 (-3.01% account, ATR stop on the ~7.7h hold from 15:47) — expected loss size at leverage, not a bug
+- atr_sl_hit 2/17 = 11.8% (<40%) — dominant close = profit-monster-trail (8T +$0.39); ATR-vs-hard-loss distinction deployed in position_manager.py:545-580
+- Kill check: no 0% WR signal with n≥3 last hour; 24h worst n≥2 bb-bounce-v2-long+ 4T 1W 25% WR -$0.01 (not kill criteria)
+- No 3+ negative-hour streak (18 -, 19 -, 20/21 empty, 22 +, 23 -) — no size reduction
+- Frequency 1/hr — not overtrading
+- Entry quality: no winners this hour to evaluate; loss was stop-out not a bad-RR exit
+- 1 open DOT volume-buildup- SHORT bracketed SL 1.0483 / TP 1.0135 (+0.35%)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h +$0.22 (down from +$0.29), 7d still -$0.50
+- pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising

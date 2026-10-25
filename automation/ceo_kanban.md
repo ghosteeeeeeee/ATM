@@ -490,3 +490,7 @@ BY: health_monitor
 ## TEAM UPDATES
 - [2026-10-25 13:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 15T 11W 73.3% '+$0.81' (GREEN) | 7d 123T 44.7% '-$0.45' (improving) — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; worst bb-bounce-v2-long+ 2T 0W n<3) | atr_sl_hit 0/15=0% under 40% | no neg streak (05:00 single -, 06/07 empty, 08/09 +, 10 empty, 11 +, 12 empty) | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-25 23:29 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '-$0.07' (BTC continuum-trend+ LONG atr_sl_hit -3.01% account, ATR stop on long hold) | 24h 17T 10W 58.8% '+$0.22' (GREEN) | 7d 128T 44.5% '-$0.50' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 last hour; worst 24h bb-bounce-v2-long+ 4T 1W 25% WR) | atr_sl_hit 2/17=11.8% under 40% | no neg streak (20/21 empty broke it; 22 +, 23 -) | 1 open DOT volume-buildup- SHORT bracketed SL 1.0483/TP 1.0135 | No constants change -> no signal_versions entry
+BY: auto_1hr
