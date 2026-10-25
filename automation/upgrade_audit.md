@@ -1178,7 +1178,7 @@
 - Vacation_mode status re-read: constants_change_review_queue + unclog_waiver both active; no_signal_enable_disable still frozen.
 
 ### Sideways findings
-- **Severity: MEDIUM** — `reports/2026-10-24-shadow-data-mining-patterns.md` has a **survivorship/selection-on-outcome flaw**. Its "winners" table is defined by outcome (positive PnL), so "winners have MFE/MAE 36–50x" is tautological. Its per-signal "100% WR" rows (pump-chain EXTREME n=453, volume_breakout_short n=14) are inconsistent with today's significance-tested `reports/20261025-shadow-fresh-analysis.md`, which shows pump-chain SHORT t=-6.38 and pump-chain LONG t=-7.77 (both significantly negative). The mining report's PM-Trail "100% WR" is by-design circular (same report admits this). **Do NOT build new signals from the mining report without own-conclusions re-verification.** The trustworthy signal-level finding is squeeze_cross SHORT (t=2.01) from the Oct 25 analysis — but its shadow edge is thin (+0.011% avg net last 24h) and fire rate absurd (~65/hr), so any live re-test needs throttle design first.
+- **Severity: MEDIUM** — `reports/2026-10-24-shadow-data-mining-patterns.md` has a **survivorship/selection-on-outcome flaw**. Its "winners" table is defined by outcome (positive PnL), so "winners have MFE/MAE 36–50x" is tautological. Its per-signal "100% WR" rows (pump-chain EXTREME n=453, volume_breakout_short n=14) are inconsistent with today's significance-tested `reports/20261025-shadow-fresh-analysis.md`, which shows pump-chain SHORT t=-6.38 and pump-chain LONG t=-7.77 (both significantly negative). The mining report's PM-Trail "100% WR" is by-design circular (same report admits this). **Do NOT build new signals from the mining report without own-conclusions re-verification.** The trustworthy signal-level finding is squeeze_cross SHORT (t=2.01) from the Oct 25 analysis — but its shadow edge is thin (+0.011% avg net last 24h) and fire rate absurd (~65/hr), so any live re-test needs throttle design first. **[SUPERSEDED 2026-10-25 16:55 by Daily Orchestrator: sqx- SHORT edge REFUTED — net t=+1.02 p=0.31 (not significant), gross t=+12.54 (pre-fee artifact), last-72h t=−2.73. Do not treat as trustworthy.]**
 - **Severity: LOW** — bb-bounce-v3-long's habitat is self-contradictory by construction (lower-BB dip entry gated on non-negative 30m momentum). Even if un-disabled it would fire ~never. Worth a one-line note if anyone proposes re-enabling it.
 - **Severity: INFO** — shadow_trades.db now 21,302 rows (7,430 shadow_signals_runner-sourced). sqx- half2 degradation from the Oct 22 readout still unresolved (prior 24h avg -0.034% vs last 24h +0.011% — sign flip, not clearly recovered). Re-readout still due ~Oct 29.
 
@@ -1186,7 +1186,39 @@
 ### Cumulative (today, sessions on Oct 22+25): 10/10 (100%)
 ### Next candidates (priority order)
 1. Stage A/C re-readout — L1 analysis — MED — ~Oct 29 when rs-s-broken/bb-squeeze- half2 resolves and sqx- trend clarifies
-2. Throttled sqx- re-test design — L2 design (docs only) — MED-HIGH — only verified shadow edge (t=2.01); needs fire-rate cap spec before any CEO constants-review-queue proposal; vacation freeze blocks implementation
+2. ~~Throttled sqx- re-test design~~ — **REFUTED this session** — see Daily Orchestrator block below
 3. RR engine U2-U4 — L2-3 — HIGH — still needs CEO sequencing
 4. Own-conclusions re-verification of mining-report patterns — L1-2 analysis — MED — block bad signal builds; only if someone proposes acting on that report
-5. 15m/1h/4h candle retention — L1 — LOW — disk 83%, one bad day from 85% trigger
+5. 15m/1h/4h candle retention — L1 — LOW — disk 83%, one bad day from 85% trigger (NOT price_history — real lever, see orchestrator note)
+
+---
+
+## Daily Orchestrator Session — 2026-10-25 16:55 UTC
+
+**Context:** pipeline LIVE, GREEN (24h 13T 10W 76.9% +$0.60, 1 open BTC bracketed). All strategic GOs CEO-gated (Esc #17, BE-at-arm, CONF_FLOOR, TAT, Oct-27 cluster) — not touched. Implemented 1 L1 refutation (analysis-only, zero config/live change).
+
+### Implemented (1 × L1 — refutation, no code change)
+
+1. **(L1) squeeze_cross SHORT edge REFUTED — candidate #2 killed with evidence.** The prior session's "only verified shadow edge (t=2.01)" does not survive independent measurement. Recomputed from `brain/shadow_trades.db` (gate_passed only, `net_pnl_pct`, scipy `ttest_1samp`):
+   - **Full window (n=3,091, Oct 22→25 only — NOT the 18d the report header implies):** net avg **+0.0124%, t=+1.02, p=0.31** — **NOT significant.** Report claimed t=2.01/p<0.05 — not reproducible.
+   - **Gross vs net decomposition:** gross avg +0.152%, **t=+12.54** (highly significant pre-fee) → fees (0.14%/trade) erase the edge entirely. The "edge" is a **pre-fee artifact.**
+   - **Out-of-sample reversal:** last-72h net **t=−2.73 (p=0.0065)**, last-24h **t=−3.61** — significantly NEGATIVE. Edge decayed and flipped within days.
+   - **Action:** throttled sqx- re-test design (candidate #2) **withdrawn from the queue.** Do NOT build a throttle spec or route a constants-review-queue proposal on this signal. A live re-test would be re-introducing a fee-eaten, non-significant, recently-reversed edge. Re-open only if a fresh ≥7d net-positive significant window appears (recheck with the Stage A/C re-readout ~Oct 29).
+
+### Verifications (no code change)
+- **Standing verify #141 CONFIRMED:** BTC trade #16395 (opened 15:47:32Z, after the 15:15Z source-stamp deadline) carries `_signal_metadata.source = "continuum-trend+"`. Source stamp is live and populating. Unblocks bb-bounce solo-vs-confluence attribution analysis.
+- **Hotset ground-truth (sideways):** `/var/www/hermes/data/hotset.json` is currently `hotset: []` (cycle 10082, fresh mtime 16:53). auto_1hr's "0 tokens since 05:56 — still monitor" is consistent with current state; CURRENT.md's "CLEARED 15:33" was true at 15:42 but hotset has since gone empty again — it is **flapping**, not stably cleared. Empty hotset in a quiet market is likely normal compaction behavior (no strong signals survive scoring), not a bug — no action without evidence of a scoring defect.
+- **Disk prune correctly DEFERRED (not an orchestrator miss):** price_collector.py:850 prunes candles_5m/1m/15m/1h/4h (candles.db) but NOT `price_history` (signals_hermes.db, 15.3M rows). Prior orchestrator run set a standing decision: prune price_history only when disk >85% (currently 83%), AND trading_log:6513 notes it "needs retention plan before any prune (bug_hunter, not approved)". Both conditions unmet → correctly deferred, not executed. The upgrade_audit's candle-retention candidate (#5) aims at the wrong target (15m/1h/4h ≤300MB); the real lever is price_history, gated on the 85% trigger.
+
+### Sideways findings
+- **Severity: INFO** — the Oct-25 shadow-fresh-analysis report's header date-range ("Oct 7-25, 18 days") is misleading for per-signal rows: squeeze_cross SHORT data actually spans Oct 22→25 only (~3.7d). The 18d range is the whole-corpus span, not per-signal. Worth a one-line caveat if the report is reused.
+- **Severity: INFO** — `hermes-daily-orchestrator.service` runs `run_orchestrator.sh` (opencode prompt pipeline, TimeoutStartSec=1800). No PG-for-SQLite query bug observed in the current unit/script (prior timeout note in error_alerts.md appears stale/resolved by the 1200s health-monitor timeout fix pattern).
+
+### Success rate this session: 1/1 implemented (100%)
+### Cumulative (today, sessions on Oct 22+25): 11/11 (100%)
+### Next candidates (priority order)
+1. Stage A/C re-readout — L1 analysis — MED — ~Oct 29; **re-check sqx- net significance here** (refuted this session)
+2. RR engine U2-U4 — L2-3 — HIGH — still needs CEO sequencing
+3. Own-conclusions re-verification of mining-report patterns — L1-2 analysis — MED — only if someone proposes acting on that report
+4. price_history 30d retention plan — L1 (design) — LOW — draft the plan + bug_hunter review NOW so it's ready when disk crosses 85%; execution stays gated on the trigger
+5. 15m/1h/4h candle retention — CANCELLED as mis-targeted (real lever is price_history, #4)

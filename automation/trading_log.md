@@ -15476,3 +15476,30 @@ Final set: ['BTC', 'ME', 'PUMP']
 - 24h GREEN at 76.9% WR (13T); 7d still -$0.41
 - pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
 - hotset.json 0 tokens since 05:56 (audit #134 SIDeways flag) — still monitor
+
+## 2026-10-25 17:05 UTC Daily Orchestrator Run
+
+**Pipeline:** GREEN — 24h 13T 10W 76.9% `+0.60`, 1 open BTC #16395 bracketed, 0 errors, disk 83%.
+**Config changes:** 0 (hermes_constants.py untouched). **Trade actions:** 0.
+
+**IMPLEMENTED (1 × L1 — refutation, zero code/config):**
+- **squeeze_cross SHORT shadow edge REFUTED.** Upgrade queue's candidate #2 ("only verified
+  shadow edge t=2.01") fails independent measurement (scipy ttest_1samp, gate_passed,
+  net_pnl_pct, brain/shadow_trades.db): full-window n=3,091 net t=+1.02 **p=0.31 (NOT
+  significant)**; gross t=+12.54 (fees 0.14%/trade erase the edge = pre-fee artifact);
+  last-72h net t=−2.73 p=0.0065 (significantly negative). Candidate #2 WITHDRAWN from
+  upgrade queue. Do not build throttle spec / route constants-review proposal on it.
+  Recheck with Stage A/C re-readout ~Oct 29. Evidence: automation/upgrade_audit.md.
+
+**VERIFICATIONS (no change):**
+- Standing verify #141 CONFIRMED: BTC #16395 (15:47Z) has `_signal_metadata.source=
+  'continuum-trend+'` — source stamp live, unblocks bb-bounce solo-vs-confluence.
+- Hotset flapping: 16:33 = 2 tokens (cycle 10062) → 16:53 = [] (cycle 10082). Empty in
+  quiet market = normal compaction, not a bug. No action without scoring-defect evidence.
+- Disk prune correctly DEFERRED (standing decision intact): >85% trigger + retention plan +
+  bug_hunter review all unmet. Candle-retention candidate mis-targeted; real lever =
+  price_history (15.3M rows). New candidate: draft retention plan now, execute on trigger.
+
+**CEO stack untouched** (all CEO-gated, not re-measured): CONF_FLOOR fk, Oct-27 cluster
+(waiver expiry / mid-band / [35,45) / pump-chain- PROMOTE / contrarian PROMOTE / pump-chain+
+HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already live).

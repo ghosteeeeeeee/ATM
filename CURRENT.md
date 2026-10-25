@@ -1,8 +1,15 @@
-# Current State — brain_auditor #143 2026-10-25 16:55 UTC
-**Last Updated: 2026-10-25 16:55 UTC**
-**Updated by: brain_auditor #143. Prior: #142 15:42 (preserved in git history).**
+# Current State — daily_orchestrator 2026-10-25 17:05 UTC
+**Last Updated: 2026-10-25 17:05 UTC**
+**Updated by: daily_orchestrator. Prior: brain_auditor #143 16:55 (preserved below + git history).**
 
-## HEADLINE — 0 config changes (nothing passed bars), 1 analysis ship + 1 doc-drift fix
+## HEADLINE — 1 ship (sqx- edge REFUTED), 0 config changes, pipeline GREEN
+squeeze_cross SHORT shadow edge **REFUTED** — upgrade queue's "only verified edge (t=2.01)"
+is a pre-fee artifact: net t=+1.02 p=0.31 (not significant), gross t=+12.54 (fees erase it),
+last-72h t=−2.73 (significantly negative). Candidate #2 (throttled sqx- re-test design)
+WITHDRAWN from upgrade queue. Evidence: automation/upgrade_audit.md (Daily Orchestrator
+Session 16:55). Pipeline 24h 13T 10W 76.9% +$0.60 GREEN, 1 open BTC bracketed, 0 errors.
+Standing verify #141 (source stamp) independently CONFIRMED (BTC #16395 has `source=
+'continuum-trend+'`) — agrees with #143.
 **DRIFT FIXED: CEO queue item "post-arm floor D=0.20 GO" was STALE** — that floor is
 ALREADY LIVE: UGB-PT enforced on every non-PM-armed trade at +0.40 (CEO GO Oct 24, ship
 #130) and PM-managed armed trades trail at D=0.20 (verified live: `[TRAIL] HYPER floor=0.65
@@ -56,7 +63,7 @@ already-short. Valid refs: #61 p=0.116, #84 fwd t=-0.04.
   `_signal_metadata.source='continuum-trend+'` (bb-bounce solo-vs-confluence unblocked).
 - #142 [TRAIL] trade_id: activation lines carry trade_id (PURR 16393 / AVAX 16394), floors
   sane positive dist=0.20. #135 spider tiers WORKING (no zero/negative floors).
-- #134 hotset MONITOR stays CLEARED — fresh 16:33 with 2 tokens (cycle 10062).
+- #134 hotset MONITOR stays CLEARED — fresh 16:33 with 2 tokens (cycle 10062). **[daily_orchestrator 17:05: re-checked 16:53 → `hotset: []` cycle 10082 — hotset is FLAPPING (tokens↔empty), not stably cleared. Empty 20 cycles later is likely normal quiet-market compaction, not a bug; no action without scoring-defect evidence.]**
 - Gate census **0 LEAK** (ALLOW 10 / WAIVER 19 / PATH-EXEMPT 16 / PRE-RULE 56).
 - UGB-PT live fire today: HYPE #16383 `ugb_pt +0.16`.
 - Kill flags: AI_TRADER/VB+/HMACD±/OVERSOLD/DOJI all False; PUMP_CHAIN_V5_SHORT True (design).
@@ -70,11 +77,23 @@ already-short. Valid refs: #61 p=0.116, #84 fwd t=-0.04.
   same-day → **benign, no bug**. Watchdog's open question closed.
 - Shadow 2/5 usable (contrarian join live, main shadow book); oscillator frozen; wyckoff
   (304) / floor (1861) fresh but pending outcome join; rr orphaned (Oct 4).
+  **[daily_orchestrator: sqx- edge REFUTED this run — remove sqx- from any "usable shadow
+  edge" shortlist; see HEADLINE.]**
+- Disk 83% (< 85% trigger). price_history (15.3M rows) unpruned = real lever; candles
+  already pruned by price_collector. Standing call: prune only at >85% AND after retention
+  plan + bug_hunter. **New next-candidate: draft price_history 30d retention plan NOW so
+  it's ready when trigger hits** (execution stays gated).
 
 ## CEO QUEUE
 1. **CONF_FLOOR fk ruling** — fkA 22.2% > 20% bar, held.
 2. **Oct 27 cluster**: waiver expiry + mid-band re-measure + [35,45) waiver re-measure +
-   pump-chain- PROMOTE (flip 64.1% n=344).
+   pump-chain- PROMOTE (flip 64.1% n=344). *[summarizer also lists contrarian PROMOTE +
+   pump-chain+ HIGH/NORMAL regime gate for Oct 27 — CEO-gated, not orchestrator.]**
 3. ~~Post-arm floor D=0.20 GO~~ **CLOSED this run — already live (UGB-PT + PM trail),
    residual tightening 0.30→0.20 = `+0.12`/30d noise → MONITOR.**
 Escalation #17: **CLOSED (superseded by live UGB-PT)** — stop listing as awaiting GO.
+
+## NEXT STEPS (orchestrator, non-CEO)
+1. Stage A/C re-readout ~Oct 29 — **re-check sqx- net significance here** (refuted this run).
+2. Draft price_history 30d retention plan + route to bug_hunter (design only; execution
+   gated on disk >85%). Cancel the mis-targeted 15m/1h/4h candle-retention candidate.
