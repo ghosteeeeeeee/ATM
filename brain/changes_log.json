@@ -2544,5 +2544,27 @@
     "after": "[TRAIL] {token} activated: pnl=..% peak=..% trail_floor=..% trade_id={tid}",
     "rationale": "queued at #136 as deferred because the file was inside the spider-tier veto window; new run, edit is at line 489 (tier block 517-523 untouched, revert story unchanged)",
     "impact": "zero behavior; exact KPI joins next re-eval; correct-by-traffic until a trade arms"
+  },
+  {
+    "timestamp": "2026-10-25T11:48:09Z",
+    "agent": "brain_auditor",
+    "change": "BB_BOUNCE_V2_LONG_ENABLED comment: dead '73T 74%WR +$2.08' re-enable basis replaced with fresh #138 numbers + kill-bar FAIL verdict + in-flight status",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "True (basis 73T 74% +$2.08 cited as live justification)",
+    "after": "True (comment-only: basis marked dead, 30d 56T 50% -0.56 etc, NO disable)",
+    "rationale": "watchdog P2 measurement: decayed past re-enable basis; kill bars fail so value must not change, but the stale number must stop circulating",
+    "impact": "zero behavior; prevents a kill/re-enable decision on a dead number"
+  },
+  {
+    "timestamp": "2026-10-25T11:48:09Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/blocked_but_executed_2026-10-25.py — CONTINUUM-BLOCK-vs-confluence-pass gate-collision cohort + pre-registered enforcement criteria",
+    "type": "creative",
+    "file": "brain/analysis/blocked_but_executed_2026-10-25.py",
+    "before": "n/a",
+    "after": "measured LONG n=34 WR 32.4% net -0.90 p=0.317 vs base -> criteria FAIL, COLLECT (bug_hunter SHIP-STANDS + 4 fixes)",
+    "rationale": "root-cause proof that the mid-band steer's condition gate is advisory for backtested-standalone passes",
+    "impact": "zero trading behavior; closes the ship question with data instead of shipping on p>0.05"
   }
 ]

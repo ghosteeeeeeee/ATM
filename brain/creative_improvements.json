@@ -8351,5 +8351,23 @@
     "category": "regime gate",
     "status": "rejected_with_data",
     "risk": "closed — do not re-propose"
+  },
+  {
+    "date": "2026-10-25T11:48:09Z",
+    "idea": "ESCALATION #17 CLOSED AS SUPERSEDED — UGB-PT (CEO GO, run #130) already IS the universal post-arm floor",
+    "rationale": "UGB-PT enforces peak-giveback D=0.30 on every armed trade NOT in PM trail-state (position_manager:3912-3927) — that is exactly the PM-exempt/bypass cohort #136 asked a new CEO GO for. Live proof: HYPE #16383 hl_copy_trader (bypass signal) closed ugb_pt +0.16 today; PURR #16393 r2v2-long3 shadow-fired 11:08; neither in trail_state. Coverage: PM-managed armed -> PM trail D=0.20; all other armed+0.40 -> UGB-PT D=0.30 = universal.",
+    "expected_impact": "the +$2.25-2.37/30d recovery is ALREADY LIVE as of Oct 25 — no new ship; residual = tighten UGB_PT_DISTANCE_PCT 0.30->0.20 (scoped bypass: +2.368 vs +2.247/30d, delta +$0.12 = noise, both pass bars) -> MONITOR not change",
+    "category": "exit ownership",
+    "status": "closed-superseded",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T11:48:09Z",
+    "idea": "BLOCKED-but-EXECUTED cohort measured + PRE-REGISTERED (script shipped: brain/analysis/blocked_but_executed_2026-10-25.py, selfcheck PASS)",
+    "rationale": "Root cause found: _btc_mom_ok_for_bypass only gates the NEUTRAL blocks (compactor 2949/3040/3067); the backtested-standalone confluence pass ignores it. Cohort: 113 block->EXEC events in log, 42 matched closed trades.",
+    "expected_impact": "LONG n=39 14W 35.9% net -1.23 (period Oct 11-25) vs base 14d LONG 37.9% -> binom p=0.469 = cohort is NOT worse than base. fkA 16.3% pass, halves pass, p FAIL -> PRE-REGISTERED CRITERIA NOT MET: no enforcement. Re-eval at n>=50. Do not ship on p>0.05.",
+    "category": "gate integrity",
+    "status": "measured-collect",
+    "risk": "n/a"
   }
 ]

@@ -2991,7 +2991,7 @@ BB_BOUNCE_SHORT_KILL_WR = 60.0    # Kill trigger: WR < 60% over 30+ trades → a
 BB_BOUNCE_V2_SHORT_ENABLED = True   # V2 short signal — improved velocity, momentum, volatility filters
 BB_BOUNCE_V2_SHORT_KILL_WR = 60.0   # Kill trigger: WR < 60% over 30+ trades
 BB_BOUNCE_LONG_ENABLED = False    # CEO KILLED 2026-09-02 — 17T/24h 52.9% WR -$0.36. CEO_PROTECTED+NEVER_REENABLE conflict resolved. NEVER_REENABLE.
-BB_BOUNCE_V2_LONG_ENABLED = True   # CEO RE-ENABLED 2026-09-22 — signal_reporter killed Sep 11 (4T/24h 25%WR) but30d shows73T 74%WR +$2.08. Short-term variance, not systemic. NEVER_REENABLE=False.
+BB_BOUNCE_V2_LONG_ENABLED = True   # CEO RE-ENABLED 2026-09-22 on '30d 73T 74%WR +$2.08' — THAT BASIS IS DEAD (does not reproduce in any window; #138 2026-10-25 fresh: 30d 56T 28W 50% -$0.56 | 14d 34T -$1.01 | 7d 18T -$0.55, 7d 16/18 in meta_rsi 45-64 = mid-band bleed already covered by the standing steer; NORMAL -$0.50/38T + EXTREME -$0.37/10T vs FLAT+HIGH +$0.31/8T). KILL BARS FAIL (would kill 28/56 = 50% of 30d winners) -> NO disable. IN FLIGHT: compactor co-signal stamp before the bypass-removal lever can be measured. NEVER_REENABLE=False.
 
 # bb_bounce_v2_long parameters (calibrated from SHORT winner patterns)
 BB_BOUNCE_V2_BB_PERIOD = 20
