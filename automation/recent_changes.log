@@ -5242,3 +5242,5 @@ BY: auto_1hr
 BY: auto_1hr
 BY: auto_1hr
 - [2026-10-25 18:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '$0.00' (DOGE bb-bounce-v2-long+ trail_arm_timeout -0.19%) | 24h 16T 11W 68.8% '+$0.64' (GREEN) | size-reduce 1.0x (file absent = truth) | kill: none (0%WR n>=3 not met; 1T last hour) | atr_sl_hit 0/16=0% under 40% | no neg streak (08/11/15/17 all +, 18 ~0) | 3 open BTC/KAS/ETH | No constants change -> no signal_versions entry
+- [2026-10-25 19:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '-$0.04' (KAS bb-squeeze+ trail_arm_timeout -1.02%) | 24h 17T 11W 64.7% '+$0.60' (GREEN) | 7d 126T 44.4% '-$0.41' — size-reduce 1.0x (file absent = truth) | kill: none (1T last hour; worst 24h bb-bounce-v2-long+ 5T 1W not 0%) | atr_sl_hit 0/17=0% under 40% | no neg streak (15/17 +, 18 single -, 19 empty) | entry quality good (winner MAE max 0.574%) | 2 open BTC/ETH bracketed | No constants change -> no signal_versions entry
+BY: auto_1hr
