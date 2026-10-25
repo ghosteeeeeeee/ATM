@@ -1,203 +1,130 @@
 {
-  "timestamp": "2026-10-25T09:45:00Z",
-  "run": "brain_auditor #136",
+  "timestamp": "2026-10-25T10:40:43Z",
+  "run": 137,
   "session_brain_stats": {
     "queries": [
-      "bb-bounce standalone bypass disable decision",
-      "volume-buildup short losing",
-      "trail floor ship ceo"
+      "signal performance winrate regime",
+      "new signal idea improvement strategy",
+      "loss money bleeding losing"
     ],
-    "note": "bb-bounce queries return only the Oct-06 v3 bypass-removal decision; no session ever closed the v2 item; trail-floor sessions confirm CEO ship-order precedent for v6 exit-stack path"
+    "top_hits": "exit-system-is-the-leak consensus (0.99 cluster), signal-lab build ideas, R:R exit tuning — nothing new vs shipped work; no unimplemented idea with evidence surfaced",
+    "verdict": "session brain adds no new actionable item this run (dup-heavy standing issue unchanged)"
   },
   "trade_summary_24h": {
-    "trades": 14,
-    "wins": 10,
-    "wr": 71.4,
-    "pnl_usdt": 0.72,
-    "long": "9T 6W +0.41",
-    "short": "5T 4W +0.31",
-    "7d": "123T 54W 43.9% -0.57",
-    "14d": "327T 124W 37.9% -3.52",
-    "30d": "689T 302W 43.8% -2.10",
-    "7d_armed": "62T 45W 72.6% +3.32 vs unarmed 57T 5W 8.8% -4.09",
-    "14d_armed": "157T 110W +9.17 vs unarmed 163T 10W -12.89",
-    "7d_exits": "PM-trail 43T 38W +2.59 vs chop/stop HML 15T 0W -1.89 + atr_sl 26T 0W -1.43 + stale 3T -0.64 + hard_sl 4T -0.36 (48T 0W -4.32)",
-    "open": 0,
-    "readiness": "0 open = CORRECT: chop/bear (BTC below 1m EMA300, LOW vol, 15m/4h SHORT_BIAS vs phase RECOVERY disagreement), watchdog 0 steers"
+    "24h": "14T 10W 71.4% +$0.72 GREEN (LONG 9T 6W +0.41 / SHORT 5T 4W +0.31)",
+    "7d": "123T 54W 43.9% -$0.57",
+    "30d": "689T 302W 43.8% -$2.10",
+    "armed_14d": "mfe>=0.40: 157T 110W +$9.17 vs unarmed 163T 10W -$12.89 (7 NULL mfe)",
+    "exit_families_14d": "TRAIL 111T 98W +$9.24 | HML 68T 0W -$6.60 | other 148T 26W -$6.16",
+    "exit_families_7d": "PM-trail 43T 38W +$2.59 vs stop-family (HML 15 + atr_sl 26 + stale 3 + hard_sl 4) 48T 0W -$4.32",
+    "24h_losers": [
+      "SAGA bb-bounce-v2-long+ trail_arm_timeout -$0.05",
+      "ICP r2v2-long3 hard_max_loss -$0.10",
+      "HBAR bb-bounce-v2-long+ trail_arm_timeout -$0.01",
+      "CHIP volume-buildup- profit-monster-trail -$0.06"
+    ],
+    "open_trades": 0
   },
   "shadow_analysis": {
-    "contrarian": "RE-RAN fresh: pump-chain- flip-WR 64.0% n=339 (OOS 64.0%) STANDS; btc-pump-rider+ 25.0% = do NOT flip; total 536 joinable",
-    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1), actual_outcome null 24598/24598 — pre-live evidence only",
-    "wyckoff": "PENDING outcome join (298 rows, no outcome column)",
-    "floor_admit": "PENDING — 638ep join COLLECT Nov-15",
-    "rr_shadow": "ORPHANED — no producer script, 21d stale, do not cite",
-    "shadow_trader_report": "20208 signals / 19587 closed; gate justification CONFLUENCE-EXPIRY blocked 10272 would_win 48% avg -0.12; exit A/B independently reproduces trail-or-nothing: pm_trail +2781.52 vs hard_max -4395.10, cut_loser -71.51, rr_engine -715.18",
-    "overall": "1/5 raw files answerable (contrarian only) + shadow_trader aggregate useful; 2 pending joins, 1 frozen, 1 orphaned"
+    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1); 24,598 rows as JSONL (json.load crashes), actual_outcome null on 24,598/24,598 -> no live question answerable",
+    "contrarian": "OUTCOME JOIN RE-RAN this run: 808 raw / 536 joinable; pump-chain- flip-WR 64.0% n=339 STANDS (Oct-27 PROMOTE); btc-pump-rider+ 25.0% = do NOT flip; overall 49.6%",
+    "wyckoff": "304 rows, no outcome column -> pending join, not answerable",
+    "floor_admit": "JOIN SHIPPED #132 (analysis/floor_admit_outcome_join.py, --selfcheck PASS this run): 644 episodes, floor_only 48.2% vs always_admit 38.2% Fisher p=0.126, n>=200 PASS, 30d same-sign unreachable until 2026-11-15 -> COLLECT",
+    "rr_shadow": "ORPHANED — no producer script, mtime 21.4d stale -> do not cite",
+    "shadow_trader_report": "20,404 signals / 19,691 closed. Gates: CONFLUENCE-EXPIRY blocked 10,310 would_win 48% avg -0.12 (healthy), BTC-CRASH 31% -0.36, EXEC-BLOCK 7% -0.51. Exit A/B: pm_trail +2,803 vs hard_max -4,407, rr_engine -722",
+    "flip_test": "pump-chain-v6 LONG n=389 flip-to-SHORT +0.151% better (info only, pre-registered family work is on pump-chain- SHORT); v6 SHORT original better by +0.418%",
+    "overall": "1 of 5 raw shadow files answerable by outcome-join (contrarian) + 1 structural join live (floor_admit COLLECT). oscillator frozen, wyckoff pending join, rr orphaned = noise. contrarian is the only shadow source driving a dated decision (Oct-27)."
   },
-  "drift_findings": [
-    "STANDALONE_BYPASS fires are NOT reliably in signals_hermes_runtime.signals: SAGA trade #16391 (bb-bounce-v2-long+ 2026-10-25 07:15) has NO signal row while HBAR #16386 does; co-signal base rate measured 0.8% across all 123 7d trades (needs to be high for confluence to be reconstructable) -> offline confluence/bypass-removal counterfactuals are NOT measurable with current instrumentation (INSTRUMENTATION GAP, blocks the standing bb-bounce bypass-removal lever)",
-    "bb-bounce-v2-long+ standing auditor item (since 2026-10-18) STILL OPEN: 7d 18T -0.55 / 14d 34T -1.01 / 30d 56T -0.56, arm 22-27%, in STANDALONE_BYPASS. Every offline lever closed: MFE-CUT REJECTED (#134 fk_cohort 23.5%), deep-dive #75 (only stall-exit levers), arm-sweep 'No data', bypass-removal blocked by the instrumentation gap above"
-  ],
-  "recurring_problems": [
-    "escalation #17 exit-ladder/peak-trail — MEASUREMENT NOW COMPLETE after 37 escalations (legs 1+2+final bypass piece); no longer measurement-blocked, only CEO-GO-blocked",
-    "Sunday 03:00 Self-healing test: FAIL (Oct 11 / 18 / 25) 3rd occurrence, still never triaged — no trading impact"
-  ],
-  "missing_implementations": [
-    "post-arm trail floor D=0.20 for PROFIT_MONSTER_BYPASS engines (pump-exit/rr_engine/hl_fill_monitor/volbo_atr) — measured this run, bars PASS at 14d and 30d, no code applies any floor to these 41 fills/30d",
-    "[TRAIL-MISS] live detector absent (offline KPI script exists at brain/analysis/pm_activation_coverage_2026-10-25.py)"
-  ],
-  "escalation_17_final_piece": {
-    "cohort": "PROFIT_MONSTER_BYPASS signal AND non-PM exit (scoped: non-EXTREME, no volume-), 1m close-through arm at +0.40, pnl_usdt both sides, fee-neutral delta",
-    "script": "brain/analysis/trail_distance_oos_2026-10-25.py --scoped --cohort bypass (selfcheck PASS before and after the cohort extension)",
-    "30d": {
-      "n": 94,
-      "armed": 46,
-      "fills": 41,
-      "net": 2.368,
-      "halves": [
-        0.796,
-        1.572
-      ],
-      "t": 2.446,
-      "p": 0.019,
-      "fk_zeroed": 0.0,
-      "bars": "ALL 5 PASS"
-    },
-    "14d": {
-      "fills": 29,
-      "net": 1.323,
-      "halves": [
-        1.275,
-        0.048
-      ],
-      "t": 2.142,
-      "p": 0.041,
-      "fk_zeroed": 0.0,
-      "bars": "ALL 5 PASS"
-    },
-    "7d": {
-      "fills": 12,
-      "net": 0.048,
-      "halves": [
-        0.476,
-        -0.427
-      ],
-      "p": 0.906,
-      "bars": "n FAIL + halves FAIL — small-sample noise, reported not buried"
-    },
-    "D_sensitivity_30d": {
-      "0.10": 2.441,
-      "0.20": 2.368,
-      "0.30": 2.247,
-      "0.50": 1.59
-    },
-    "D_verdict": "0.10/0.20/0.30 ALL pass every bar at 14d+30d -> result is NOT knife-edge on the leash; house primary stays D=0.20 (pre-registered), 0.10 info only (post-hoc switch = the pattern trap)",
-    "controls": {
-      "pm_exit_cohort_30d": "n=172 fills=137 NET +0.276 p=0.66 halves FAIL -> PM tiers already optimal, NO PM constant change (NOTE: 11 bypass-signal trades exited on PM trail are inside this cohort — engine-based label, 4.7% of cohort, disclosed)",
-      "pm_elig_30d": "CORRECTED (bug_hunter M1 NULL-signal fix): n=98 fills=14 NET +1.269 but fk_zeroed 50.0% + n=14 FAIL -> collect, not shippable (pre-fix n=101/+1.281/fk33% superseded)"
-    },
-    "conclusion": "escalation #17 MEASUREMENT COMPLETE: post-arm giveback edge = (a) bypass engines with no floor +$2.368/30d PASS and (b) PM already correct +0.276 -> CEO ask = universal post-arm floor D=0.20 via v6 exit-stack path, PM constants untouched"
-  },
-  "pm_activation_coverage_kpi": {
-    "pre_reg": "#135, eval bar n>=20",
-    "method": "PM-eligible 30d trades (signal not in PROFIT_MONSTER_BYPASS_SIGNALS), armed = any 1m CLOSE >= entry*1.004, covered = [TRAIL] activated line for that token inside [open, close] in profit_monster.log (covers Sep 23->now, 240 lines)",
-    "result": {
-      "armed": 229,
-      "covered": 216,
-      "coverage_pct": 94.3,
-      "uncovered": 13,
-      "uncovered_pnl": -1.19
-    },
-    "uncovered_dwell": "2.7m to 755m (median ~70m) — NOT a 60s poll race; 3/14 are bb-bounce-v2-long+ (WLFI/NEO/POLYX), exits mostly atr_sl_hit/hard_sl/hard_max_loss",
-    "verdict": "uncovered n=13 < 20 eval bar -> COLLECT (re-eval at uncovered n>=20). Hypothesis refined: ownership/eligibility gap, NOT poll cadence (dwells 2.7-755m) — the #135 '13 of 15 PM-eligible leaks' observation is THIS cohort. Corrected post-bug_hunter: NULL-signal rows removed from the denominator (230->229, 14->13 uncovered, coverage 93.9->94.3%)."
+  "watchdog_triage": {
+    "steers": "0 steers, 0 open, portfolio good -> no position action",
+    "regime": "THAWING: regime_5m aggregate flipped 113 SHORT -> 0 SHORT (09:30->10:15), BTC still under 1m EMA300 (566 closes, gap -0.16%), vol LOW, 15m+4h scanners SHORT_BIAS -> sources disagree = chop",
+    "pattern_2_answered": "NULL meta_rsi LONG 'worst band 16.7% n=12' = STALE COHORT, root cause ALREADY SHIPPED as brain.py entry-metadata backfill (#117, 2026-10-24). Verified: 0 trades opened after 2026-10-24 carry NULL rsi_14; backfill marker present on 2/2 fills that needed it; the 12 rows are Oct 18-23 (10/12 = BTC ai-trader-manual/pending = CEO-domain). Watchdog recommendation #5 CLOSED — no new code owed.",
+    "mid_band_steer": "condition (meta_rsi 45-65 LONG block while BTC 1m < EMA300) still holds, stats borderline z~1.99 confounded — not escalated, correct per watchdog's own note",
+    "structural_non_participation": "100 blocked / 3 pending — short-gate loosening review due today was already run and CLOSED (#129: SLOPE-FILTER +0.98 fails bar; #76 pre-reg candidates all fail)"
   },
   "losing_trade_autopsy_48h": {
-    "method": "brain/analysis/recovery_replay.py 48 (adverse-first anchor, selfcheck PASS run this session)",
-    "n": 13,
-    "never_adverse": 3,
-    "recovered_after_adverse": 5,
-    "never_traded_back": 5,
-    "never_cohort": "ALT -0.17 / CC -0.15 / ZRO -0.11 volume-buildup- shorts (structural never-recover class, 17.5% cohort), BTC ai-trader-pending -0.08, PUMP r2v2 -0.01",
-    "verdict": "wrong-side REFUTED 60th consecutive run (#61 opposite-side p=0.116, #84 fwd-return t=-0.04 stand); 0 new patterns; winning side = flat"
+    "method": "brain/analysis/recovery_replay.py adverse-first, --selfcheck PASS (NOT the vacuous open-anchored replay)",
+    "24h": "n=4 = 2 never-adverse / 2 recovered / 0 NEVER",
+    "48h": "n=13 = 3 never-adverse / 5 recovered / 5 NEVER",
+    "never_cohort": "ALT -$0.17 / CC -$0.15 / ZRO -$0.11 volume-buildup- SHORTs (structural never-recover class) + BTC pending -$0.08 + PUMP r2v2 -$0.01 — all tiny",
+    "verdict": "WRONG-SIDE REFUTED 61st consecutive run (valid refs: #61 opposite-side p=0.116, #84 fwd-4h t=-0.04). 0 new patterns. Winning side = flat.",
+    "chop_vs_trend": "24h losers all unarmed or trail-timeout: ICP hard_max_loss never reached +0.40 (chop entry), SAGA/HBAR trail_arm_timeout = armed-but-stalled, CHIP EXTREME short exited on trail. None are wrong-side of a trending move."
   },
   "signal_quality_deep_dive": {
-    "new_targets": 0,
-    "detail": "sub-50% WR n>=15 14d: bb-bounce-v2-long+ 34T 41.2% -1.01 (in flight, every offline lever closed or blocked), ai-trader+ disabled, doji killed Oct 16, pump-chain+ 46T 28.3% -0.43 (kill MET-by-letter but 30d +1.84 NO-KILL + no_signal_enable_disable -> CEO), pump-chain- 35T 22.9% -0.30 (Oct-27 contrarian PROMOTE)",
-    "watchdog_entry_quality_steers": "mid-band LONG 45-65 skip already measured and REJECTED (#128 dampen 30d sign flip) — not re-proposed; SHORT supply dead zone CLOSED #129"
+    "targets": "0 NEW sub-50% WR n>=15 14d — list identical to #136",
+    "list": [
+      "bb-bounce-v2-long+ 34T 41.2% -$1.01 (in flight, every offline lever closed/blocked)",
+      "ai-trader+ 23T (disabled)",
+      "doji-bottom-long 16T (killed Oct 16)",
+      "pump-chain+ 46T 28.3% -$0.43 (kill MET-by-letter, CEO NO-KILL 30d +1.84)",
+      "pump-chain- 35T 22.9% -$0.30 (Oct-27 contrarian PROMOTE)",
+      "ai-trader-pending 16T (CEO-domain)",
+      "ai-trader-manual 15T 46.7% +0.34 positive CEO-domain"
+    ],
+    "arm_rate_note": "14d arm-rate (mfe>=0.40) leaders of the bleed: ai-trader-pending 18.8% / doji 31.3% / pump-chain+ 39.1% / bb-bounce 44.1% — pump-chain- 65.7% and volume-buildup- 66.7% arm normally (their bleed is exit-side, not chop-side)"
   },
+  "drift_findings": [
+    "CLOSED: watchdog rec #5 (which entry path skips _signal_metadata) — root-caused and shipped as #117 backfill 2026-10-24; 0 NULL rsi_14 opens post-ship; the flagged 12-trade band is a pre-ship window",
+    "CLOSED: recurring Sunday 03:00 'Self-healing test: FAIL' — triaged TODAY by health_monitor commit 83f99f71 (dispatcher/dispatcher.py absent since Sep 1, hermes-better-coder.service disabled -> SKIP branch). Verify the SKIP prints at the next Sunday 03:00 run (Nov 1)",
+    "OPEN: STANDALONE_BYPASS fires not reliably in signals_hermes_runtime.signals (#136 side-find) — blocks the bb-bounce bypass-removal counterfactual; needs a compactor shadow stamp of co-signal chains"
+  ],
+  "recurring_problems": [
+    "Trend/chop law unchanged: 14d TRAIL 111T 98W +$9.24 vs HML 68T 0W -$6.60; 7d stop-family 48T 0W -$4.32 — the entire bleed sits before trail arm (unarmed 163T -$12.89)",
+    "vacation_mode.json still true (shadow_first + no_signal_enable_disable active; constants_change_review_queue live since T directive 2026-10-23 18:35)",
+    "session_brain dup-heavy (unchanged, ideation only)"
+  ],
+  "missing_implementations": [
+    "UNIVERSAL POST-ARM TRAIL FLOOR D=0.20 for PM-exempt engines — escalation #17 measurement COMPLETE (#136 bypass +2.368/30d p=0.019 all bars); ship vehicle = shadow line first per automatic-implementation; awaiting CEO GO",
+    "CONF_FLOOR bare-only — held on CEO fk definition ruling",
+    "compactor co-signal chain stamp (prereq for bb-bounce bypass-removal lever)"
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-25T09:45:00Z",
-      "idea": "UNIVERSAL POST-ARM TRAIL FLOOR (D=0.20) for PM-exempt engines — ship vehicle: shadow line first per automatic-implementation",
-      "rationale": "Escalation #17 final piece: bypass cohort armed trades have NO post-arm floor at all (by design) and that single cohort owns +$2.368/30d of giveback with p=0.019, both 15d halves positive, fk_zeroed 0.0%; PM's own cohort is already optimal (+0.276, p=0.66) so nothing CEO-protected needs to change",
-      "expected_impact": "+$2.2..2.4/30d recovered on 41 fills/30d; D-insensitive 0.10-0.30 so no knife edge",
-      "category": "exit ownership",
-      "status": "suggested",
-      "risk": "low (shadow first, one constant, PM untouched)"
+      "date": "2026-10-25T10:40:43Z",
+      "idea": "[TRAIL] activated log line now carries trade_id (SHIPPED this run)",
+      "rationale": "pm_activation_coverage KPI matched on token+window only = <=0.4pp over-credit from 1 overlapping same-token armed pair (disclosed #136); one field on one line closes it for the uncovered-n>=20 re-eval",
+      "expected_impact": "exact KPI joins, zero behavior",
+      "category": "observability",
+      "status": "shipped",
+      "risk": "low"
     },
     {
-      "date": "2026-10-25T09:45:00Z",
-      "idea": "pm_activation_coverage as a standing weekly KPI (zero new code — script exists, selfcheck PASS)",
-      "rationale": "93.9% of armed PM-eligible trades show an activation line; the 14 uncovered (6.1%, -$1.10, dwells 3-756m) are a persistent ownership gap that a 60s poll cadence change would NOT fix — track it so the cohort is visible before it hits n>=20",
-      "expected_impact": "detects trail-ownership leaks early; re-eval bar = uncovered n>=20",
-      "category": "observability",
-      "status": "suggested",
-      "risk": "none"
+      "date": "2026-10-25T10:40:43Z",
+      "idea": "EMA300 >=100-close transition gate (reclaim -> LONG / lose -> SHORT readiness) — MEASURED THEN REJECTED-WITH-DATA",
+      "rationale": "30d BTC 1m continuum_states: 100 reclaims + 87 loses = ~6 events/day (p50 streak 6, p90 122 — the >=100 threshold does not isolate rare events). fwd4h: reclaim mean -0.054% (46/100 pos), lose mean -0.096% (35/87 pos) = NO forward edge; our own post-event trades: reclaim-LONG n=253 44.3% +1.73, lose-SHORT n=97 46.4% +0.03 = wash. Consistent with #61 (ema300_position bands rejected, p>0.05 every window).",
+      "expected_impact": "none — would add a gate that fires 6x/day on a non-predictive state",
+      "category": "regime gate",
+      "status": "rejected_with_data",
+      "risk": "closed — do not re-propose"
     }
   ],
   "config_changes_applied": [],
-  "changes_from_last_run": [
-    {
-      "run": "#135",
-      "change": "spider PM_TRAIL_TIERS thresholds 0.015/0.030 -> 1.5/3.0 + guard",
-      "status": "VERIFIED",
-      "evidence": "code + percent-conversion + guard present in profit_monster.py:511-530; first post-fix [TRAIL] line 08:55:11 HYPER floor +0.65 (peak 0.85 - 0.20) = sane, floor ABOVE entry; spider path itself DORMANT since 05:29 (pre-fix) -> correct-by-traffic; negative floors last seen in pre-fix era; selfcheck + all other analysis selfchecks PASS; git clean"
-    },
-    {
-      "run": "#134",
-      "change": "bug_hunter close-bound + MFE-window + fk-denominator fixes",
-      "status": "VERIFIED",
-      "evidence": "be_at_arm_replay --selfcheck PASS, mfe_cut_bb_bounce_oos --selfcheck PASS"
-    }
+  "ship_this_run": [
+    "scripts/profit_monster.py:489 [TRAIL] activated log += trade_id={tid} (zero-behavior, py_compile PASS, legacy+new line parse self-check PASS, diff confined to lines 486-494 — spider-tier veto block 517-523 untouched so its one-line revert story is unchanged)"
   ],
+  "changes_from_last_run": {
+    "#135 spider PM_TRAIL_TIERS percent fix": "VERIFIED — post-fix activations sane (08:55 HYPER floor +0.65 above entry; today's BTC PM_floor +0.5666 live line), no negative-floor lines since the fix, tier block byte-unchanged by this run's diff",
+    "#136 trail_distance_oos --cohort": "selfcheck PASS re-run this run (units rule + cohort labels)",
+    "#136 pm_activation_coverage": "selfcheck PASS re-run this run (trail-line parse + PM eligibility + close-arm rule)",
+    "#134 be_at_arm_replay": "selfcheck PASS re-run this run",
+    "#132 floor_admit_outcome_join": "selfcheck PASS re-run, now 644 episodes (n>=200 bar PASS, 30d same-sign due Nov-15)",
+    "health_monitor Sunday self-healing fix (83f99f71, not mine)": "verified in tree — SKIP branch for absent dispatcher; confirm at next Sunday run",
+    "#130 UGB-PT enforcement": "correct-by-traffic (no new fire)",
+    "protection": "hermes_constants.py git diff EMPTY, CEO_PROTECTED_FLAGS 13/13, SIGNAL_REGISTRY 86 signals bb_bounce present, size-reduce file absent = 1.0x, session lock absent, 0 new uncaught Tracebacks 2026-10-25 (only the pre-fix 03:00 self-healing one)"
+  },
+  "sanity": {
+    "session_lock": "absent -> config changes permitted",
+    "vacation_rules": "shadow_first ON, no_signal_enable_disable ON, constants_change_review_queue live (no constant needed this run)",
+    "max_changes": "1 ship (log-only), 0 trading constants — within budget",
+    "units_rule": "all counterfactuals in pnl_usdt; no pnl_pct-vs-price-move mixing this run"
+  },
   "next_actions": [
-    "CEO GO: universal post-arm trail floor D=0.20 (evidence complete across all three cohorts; PM constants untouched; v6 exit-stack path)",
-    "CEO stack unchanged: spider-tier veto window, pump-chain+ NO-KILL + CONF_FLOOR fkA 41.7% ruling, Oct-27 contrarian PROMOTE + coin_regime n>=50 + mid-band dampen re-measure",
-    "PM activation-coverage KPI re-eval at uncovered n>=20 (now 14)",
-    "Triage recurring Sunday 03:00 Self-healing test FAIL (3rd occurrence)",
-    "bb-bounce-v2-long+ stays in flight: blocked offline by signals-table instrumentation gap — needs a compactor shadow stamp of co-signal chains before the bypass-removal lever can be measured",
-    "Nov-15 floor_admit 30d same-sign; disk >85% price_history retention; hotset 0-token re-check Oct 26"
-  ],
-  "sanity": "constants git diff EMPTY · CEO_PROTECTED_FLAGS 13/13 (incl SIGNAL_REGISTRY 86 signals, bb_bounce present) · size-reduce file absent = 1.0x · 0 new uncaught Tracebacks 2026-10-25 (only recurring Sunday self-healing) · 2 analysis selfchecks + extended trail selfcheck PASS · session lock absent (write mode legal)",
-  "bug_hunter_136": {
-    "result": "NO HIGH findings; both selfchecks PASS; cohort partition verified exhaustive (94+172+101=367=scoped 30d total) and non-overlapping; both scripts read-only; reported numbers independently reproduced",
-    "fixed": [
-      {
-        "sev": "MEDIUM",
-        "issue": "NULL-signal trades misclassified PM-eligible (live PM SQL `NOT (signal LIKE ...)` never matches NULL)",
-        "fix": "_cohort_of returns 'no_signal'; pm_eligible(None)=False; selfcheck asserts added; pm_elig 30d n 101->98, coverage 230->229 armed"
-      },
-      {
-        "sev": "LOW",
-        "issue": "startswith('profit-monster') misses 'profit_monster' underscore variant (33 trades, all Aug — latent)",
-        "fix": "normalize -/_ before match + selfcheck assert"
-      }
-    ],
-    "documented_not_fixed": [
-      {
-        "sev": "MEDIUM",
-        "issue": "pm cohort contains 11 bypass-signal trades that exited on PM trail (engine-based labels intentional) — disclosed in controls"
-      },
-      {
-        "sev": "MEDIUM-LOW",
-        "issue": "coverage matched on token+window: 1 overlapping BTC pair/30d can be credited by one line -> coverage overstated <=0.4pp until [TRAIL] line carries trade_id",
-        "fix_queued": "one-line log field in profit_monster.py deferred (not touching the CEO-veto-window file twice in one run)"
-      },
-      {
-        "sev": "LOW",
-        "issue": "arm window includes candle containing open/close (4/230 edge arms) — looser than trail OOS convention",
-        "fix": "documented in module docstring"
-      }
-    ]
-  }
+    "CEO GO: universal post-arm trail floor D=0.20 for PM-exempt engines (shadow-line ship vehicle, escalation #17 evidence complete)",
+    "CEO veto window on the spider tier fix (one-line revert at profit_monster.py:517-523)",
+    "Oct-27: contrarian pump-chain- PROMOTE (flip 64.0% n=339 OOS-verified) + coin_regime n>=50 + mid-band dampen re-measure",
+    "PM activation-coverage re-eval at uncovered n>=20 (now 13) — use the new trade_id field for exact joins",
+    "Verify Sunday 03:00 audit prints 'Self-healing test: SKIP' on Nov 1 (health_monitor fix)",
+    "Nov-15: floor_admit 30d same-sign (644ep)",
+    "bb-bounce-v2-long+ stays in flight: needs compactor co-signal stamp before the bypass-removal lever can be measured"
+  ]
 }

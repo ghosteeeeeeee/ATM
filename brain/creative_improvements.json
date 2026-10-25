@@ -8333,5 +8333,23 @@
     "category": "observability",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-25T10:40:43Z",
+    "idea": "[TRAIL] activated log line now carries trade_id (SHIPPED this run)",
+    "rationale": "pm_activation_coverage KPI matched on token+window only = <=0.4pp over-credit from 1 overlapping same-token armed pair (disclosed #136); one field on one line closes it for the uncovered-n>=20 re-eval",
+    "expected_impact": "exact KPI joins, zero behavior",
+    "category": "observability",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T10:40:43Z",
+    "idea": "EMA300 >=100-close transition gate (reclaim -> LONG / lose -> SHORT readiness) — MEASURED THEN REJECTED-WITH-DATA",
+    "rationale": "30d BTC 1m continuum_states: 100 reclaims + 87 loses = ~6 events/day (p50 streak 6, p90 122 — the >=100 threshold does not isolate rare events). fwd4h: reclaim mean -0.054% (46/100 pos), lose mean -0.096% (35/87 pos) = NO forward edge; our own post-event trades: reclaim-LONG n=253 44.3% +1.73, lose-SHORT n=97 46.4% +0.03 = wash. Consistent with #61 (ema300_position bands rejected, p>0.05 every window).",
+    "expected_impact": "none — would add a gate that fires 6x/day on a non-predictive state",
+    "category": "regime gate",
+    "status": "rejected_with_data",
+    "risk": "closed — do not re-propose"
   }
 ]

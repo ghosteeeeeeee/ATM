@@ -2533,5 +2533,16 @@
     "after": "pm_elig n=98 fills 14 NET +1.269 fk 50% (COLLECT unchanged); coverage armed 229 / uncovered 13 / 94.3%; bypass headline +2.368 UNCHANGED",
     "rationale": "live profit_monster SQL `AND NOT (signal LIKE ...)` never matches NULL — the analysis must mirror it or over-count PM eligibility",
     "impact": "corrects denominators on a COLLECT-tier KPI and a failing control; zero trading behavior"
+  },
+  {
+    "timestamp": "2026-10-25T10:40:43Z",
+    "agent": "brain_auditor",
+    "change": "[TRAIL] activated log line now carries trade_id — closes the pm_activation_coverage token-window over-credit disclosure (<=0.4pp) for the uncovered-n>=20 re-eval",
+    "type": "creative",
+    "file": "scripts/profit_monster.py",
+    "before": "[TRAIL] {token} activated: pnl=..% peak=..% trail_floor=..%",
+    "after": "[TRAIL] {token} activated: pnl=..% peak=..% trail_floor=..% trade_id={tid}",
+    "rationale": "queued at #136 as deferred because the file was inside the spider-tier veto window; new run, edit is at line 489 (tier block 517-523 untouched, revert story unchanged)",
+    "impact": "zero behavior; exact KPI joins next re-eval; correct-by-traffic until a trade arms"
   }
 ]

@@ -486,8 +486,12 @@ def run_trail(positions, dry_run):
                         "peak_time": now,
                         "token": pos["token"],
                     }
+                    # trade_id field (brain_auditor #137): KPI joins matched on
+                    # token+window only — <=0.4pp over-credit from 1 overlapping
+                    # same-token armed pair (pm_activation_coverage disclosure).
                     log(f"  [TRAIL] {pos['token']} activated: pnl={pnl:.2f}% "
-                        f"peak={pnl:.2f}% trail_floor={pnl - _trail_distance_for_peak(pnl):.2f}%")
+                        f"peak={pnl:.2f}% trail_floor={pnl - _trail_distance_for_peak(pnl):.2f}% "
+                        f"trade_id={tid}")
 
     _save_trail_state(state)
     ts_file.write_text(json.dumps({"ts": time.time()}))
