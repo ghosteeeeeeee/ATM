@@ -26,6 +26,7 @@
 | **NET PnL (all)** | **-2,166.3%** |
 | **NET PnL (gate-passed)** | **-781.0%** |
 | AVG NET PnL | -0.090% ± 0.718% |
+| Naive t-statistic | -11.70 |
 | **Cluster-robust t** | **-10.75** (2,703 clusters) |
 | WIN RATE | 58.2% |
 
@@ -35,10 +36,10 @@
 
 ## 2. Direction Analysis (NET, Gate-Passed)
 
-| Direction | N | WR% | Net Total | Avg | t_cluster | MFE/MAE |
-|-----------|-----|-----|-----------|-----|-----------|---------|
-| SHORT | 5,421 | **62.6%** | **-255.4%** | -0.047% | **-7.03** | 1.48 |
-| LONG | 3,281 | 50.9% | **-525.7%** | -0.160% | **-9.24** | 1.25 |
+| Direction | N | WR% | Net Total | Avg | t_naive | t_cluster | MFE/MAE |
+|-----------|-----|-----|-----------|-----|---------|-----------|---------|
+| SHORT | 5,421 | **62.6%** | **-255.4%** | -0.047% | -7.30 | **-7.03** | 1.48 |
+| LONG | 3,281 | 50.9% | **-525.7%** | -0.160% | -9.55 | **-9.24** | 1.25 |
 
 **Both directions lose net.** SHORT loses less (-255.4% vs -525.7%), but it's still losing (t_cluster=-7.03). LONG is losing badly (t_cluster=-9.24).
 
@@ -140,6 +141,8 @@
 
 **ALL gates are HELPING** (blocking losing trades). CONFLUENCE-EXPIRY is the biggest helper (t_cluster=-12.59 LONG, -7.09 SHORT).
 
+*Note: Gate table shows n>=30 rows only. EXEC-BLOCK (16 rows) and SKIP (1 row) omitted. Total gate-blocked = 11,596.*
+
 ---
 
 ## 7. Risk-Reward Analysis
@@ -205,10 +208,13 @@
 - **Outcomes:** `net_pnl_pct` (gross - fee - slippage = net)
 - **MFE/MAE:** Rebuilt with hold-window logic (entry = candle open, exit = hold period end)
 - **Gate-passed only:** Excludes gate-blocked counterfactuals (57.1% of trades)
-- **Cluster-robust statistics:** Groups by timestamp, calculates mean per cluster, then t-test on cluster means
+- **Naive t-statistic:** Standard t-test assuming independent observations: `t = mean / (std / sqrt(n))`
+- **Cluster-robust t-statistic:** Groups by timestamp (signal cluster), calculates mean per cluster, then t-test on cluster means. Accounts for correlation within clusters (multiple trades at same timestamp are not independent).
 - **Significance:** |t_cluster| > 2.0 = significant (p<0.05)
 - **Fees:** 0.14%/trade (0.04% fee + 0.10% slippage)
 - **Limitations:** Single exit engine (ATR) for first_exit, gate-passed period is only 6 days (Oct 20-25)
+
+**Naive vs Cluster-Robust:** The naive t-statistic assumes each trade is independent. In reality, multiple trades at the same timestamp (signal cluster) are correlated. The cluster-robust t-statistic accounts for this correlation, producing a more conservative (less significant) result. For the headline: naive t=-11.70 vs cluster t=-10.75 (2,703 clusters).
 
 ---
 
