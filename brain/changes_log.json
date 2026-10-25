@@ -2566,5 +2566,27 @@
     "after": "measured LONG n=34 WR 32.4% net -0.90 p=0.317 vs base -> criteria FAIL, COLLECT (bug_hunter SHIP-STANDS + 4 fixes)",
     "rationale": "root-cause proof that the mid-band steer's condition gate is advisory for backtested-standalone passes",
     "impact": "zero trading behavior; closes the ship question with data instead of shipping on p>0.05"
+  },
+  {
+    "timestamp": "2026-10-25T12:53:09Z",
+    "agent": "brain_auditor",
+    "change": "ema300_duration unit fix: EMA300-pin advisory condition+label in ai_trader_precheck (ticks*TICK_INTERVAL/60, threshold now true 60 minutes) + [TRADER] EMA label in continuum_trader + ContinuumState comment",
+    "type": "bugfix",
+    "file": "scripts/ai_trader_precheck.py,scripts/continuum_trader.py,scripts/continuum_engine.py",
+    "before": "raw 30s-tick count compared to 60 (=30 min) and printed as '{n}m'",
+    "after": "minutes = ticks*30/60; advisory fires at >60 MINUTES per documented intent",
+    "rationale": "watchdog-assigned display bug; verified BTC 1m continuum row spacing median 30s since 2026-09-04, dur*0.5==(ts-last_cross_ts)/60; zero trading behavior (advisory passed=True always)",
+    "impact": "correct advisory timing/labeling for EMA300-pin manual prechecks"
+  },
+  {
+    "timestamp": "2026-10-25T12:53:09Z",
+    "agent": "brain_auditor",
+    "change": "trade_watchdog_prompt.md: (1) measured-refuted steer block — mid-band LONG x BTC-below-EMA300 retracted (steer's cell is profitable +1.42/30d; bleed is in AT/ABOVE; both variants FAIL bars); (2) Chop-Bleed Share KPI section with verified SQL + calibrated thresholds",
+    "type": "prompt",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "steer standing >=6 cycles unexecuted, no chop-bleed metric",
+    "after": "refutation table + re-measure Oct 27; KPI SQL verified returning 85.6 (14d)",
+    "rationale": "the steer keys the wrong cell and would cost money; the chop question needed a number",
+    "impact": "stops re-issuing a money-losing steer; gives the watchdog a calibrated entry-quality metric"
   }
 ]

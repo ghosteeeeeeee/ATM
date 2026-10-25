@@ -14,6 +14,7 @@ import sys, os, json, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import *
+from continuum_constants import TICK_INTERVAL
 
 
 def _get_candles_db():
@@ -420,12 +421,16 @@ def precheck(coin, direction, conf=None):
     # zero edge while BTC pins on EMA300 (AT + duration>60m = unresolved chop).
     # Death-zone advisory covers the RSI number; this adds the WHY (market state).
     # passed=True always — advisory only, zero behavior.
+    # UNIT FIX (brain_auditor 2026-10-25): ema300_duration counts TICK_INTERVAL (30s)
+    # state rows, NOT minutes (continuum_api.py:46 "2880 ticks at 30s intervals";
+    # verified: BTC 1m row spacing median 30s since 2026-09-04, dur*0.5 == (ts-last_cross_ts)/60).
+    # Comparing the raw count to 60 fired the "60m" advisory at 30m. Threshold = 60 MINUTES.
     if cont is not None:
         _c = cont.get('current', {})
-        if (_c.get('ema300_position') == 'AT'
-                and (_c.get('ema300_duration') or 0) > 60):
+        _pin_min = (_c.get('ema300_duration') or 0) * TICK_INTERVAL / 60.0
+        if (_c.get('ema300_position') == 'AT' and _pin_min > 60):
             check('EMA300 pin advisory', True,
-                  f"BTC AT EMA300 {_c.get('ema300_duration')}m — chop pin, "
+                  f"BTC AT EMA300 {_pin_min:.0f}m — chop pin, "
                   f"mid-band entries have no edge — wait for resolution")
 
     # 5. Price data check — use ANY candle (including developing) for freshness

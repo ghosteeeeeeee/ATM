@@ -520,7 +520,7 @@ class ContinuumTrader:
                   f"Phase:{state.entry_phase} | "
                   f"Sustained:{state.sustained_high_score_count}/30 | "
                   f"Pos:{pos_count}/{MAX_CONTINUUM_POSITIONS} | "
-                  f"EMA:{state.ema300_position}({state.ema300_duration}m) | "
+                  f"EMA:{state.ema300_position}({state.ema300_duration * TICK_INTERVAL // 60}m) | "
                   f"Z:{state.zscore_tier}({state.zscore_val:+.2f}) | "
                   f"Vol:{state.volume_regime}({state.volume_ratio_val:.1f}x) | "
                   f"LinReg:{state.linreg_slope_state}({state.linreg_direction}) | "

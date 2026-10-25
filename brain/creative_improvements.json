@@ -8369,5 +8369,26 @@
     "category": "gate integrity",
     "status": "measured-collect",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-25T12:53:09Z",
+    "run": 139,
+    "idea": "CHOP-BLEED SHARE standing KPI (share of gross loss from trades that never reached +0.40% trail activation)",
+    "rationale": "86% of 14d losing dollars (-13.21 of -15.44) come from entries with no momentum; stable 84.1/85.6/80.6% across 7/14/30d. The mission question 'are we entering in chop?' had no number attached.",
+    "expected_impact": "no direct PnL; gives the watchdog a pre-registered threshold (>=92% = entry-quality problem, <=70% = exit/round-trip problem) so effort is routed to the right lever",
+    "category": "measurement",
+    "status": "shipped",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T12:53:09Z",
+    "run": 139,
+    "idea": "entry-feature arm-predictor gate (predict trail-arming at entry to dampen likely-non-armers)",
+    "rationale": "unarmed cohort is -12.60/14d; if arm probability were predictable we could size/flat it",
+    "expected_impact": "n/a — REFUTED-WITH-DATA",
+    "result": "momentum_state='falling' alone hit p=0.005 (60.2% vs 43.0% arm) but is CONFOUNDED: within LONG p=0.70/0.49/0.73 (no effect), aggregate driven by SHORT+falling where mix is 48/54 pump-chain-family (pump-chain- arms 65.7% alone), and falling-SHORT arms 70.4% yet WR only 38.9%. speed_percentile p=0.14-0.69, volume_spike p=0.30-0.70, z_score p=0.14-0.97, rsi_14 p=0.18-0.94. n=328 with metadata.",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "n/a"
   }
 ]

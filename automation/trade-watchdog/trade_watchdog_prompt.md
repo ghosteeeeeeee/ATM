@@ -251,6 +251,45 @@ without a retraction in between.
 minutes later). It was free *this time* — which is precisely why the retraction rule must
 exist before the first time it isn't.
 
+### Measured-refuted steer patterns (brain_auditor #139, 2026-10-25) — do NOT re-issue
+
+**"Keep LONG entries out of meta_rsi 45-64 while BTC 1m holds below continuum EMA300"**
+(stood ≥6 cycles unexecuted) — **measured the wrong cell. Do not re-issue.**
+Evidence: `brain/analysis/midband_ema300_cond_2026-10-25.py` (`--selfcheck` PASS; the band
+totals reproduce P1 exactly — 7d 46T `-1.33`, 30d 244T `-0.31` — so the join and RSI band
+are sound):
+
+| cell | 7d | 14d | 30d |
+|---|---|---|---|
+| band+**BELOW** EMA300 = the steer's blocked set | **+0.03** (4T 50%) | **+0.01** (15T 53%) | **+1.42** (42T 54.8%) |
+| band+**AT/ABOVE** EMA300 = the steer's kept set | **-1.36** (42T) | **-2.72** (95T) | **-1.73** (202T) |
+
+Blocking the steer's own cell would have **cost** money in every window (save < 0), so the
+condition keys the profitable side. The bleed sits entirely in AT/ABOVE. **Both** variants
+FAIL house bars — BELOW: `save_pos` FAIL; AT/ABOVE: fkA 44.4/38.4/40.7% FAIL, binom
+p=0.35/0.30/0.67 FAIL — so there is **no** enforceable compound block either way. The
+blanket mid-band steer stays advisory-only; re-measure 2026-10-27.
+
+### Chop-Bleed Share KPI (MANDATORY — added 2026-10-25, brain_auditor #139)
+
+The system's north-star question is "are we entering in chop?" — measure it directly as the
+share of GROSS LOSS that comes from trades which never reached trail-activation (+0.40% MFE):
+
+```sql
+SELECT ROUND(100.0 * ABS(COALESCE(SUM(pnl_usdt) FILTER (WHERE pnl_usdt<0 AND mfe_pct<0.40),0))
+             / NULLIF(ABS(COALESCE(SUM(pnl_usdt) FILTER (WHERE pnl_usdt<0),0)),0),1)
+FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '14 days';
+```
+
+**Baseline (measured 2026-10-25):** 7d **84.1%** (49T `-$4.28` of `-$5.09`) / 14d **85.6%**
+(148T `-$13.21` of `-$15.44`) / 30d **80.6%** (260T `-$28.23` of `-$35.01`) — stable.
+
+- **≥92%** = entry quality deteriorating (nearly all loss from never-armed entries) → push
+  entry-quality filters, not exit tweaks.
+- **≤70%** = the bleed moved into the round-trip cohort (reached +0.40% then gave it back) →
+  that is an **exit**-ownership problem, route to UGB-PT / trail distance, not to entry gates.
+- Quote the window with the number. Never compare a 7d share to the 30d baseline.
+
 ### Regime Flip-Rate KPI (MANDATORY — added 2026-10-23, brain_auditor #86)
 
 Before writing any direction-flavored steer ("stay short", "bias flipped long"), read the

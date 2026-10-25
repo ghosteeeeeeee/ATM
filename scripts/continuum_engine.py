@@ -421,7 +421,7 @@ class ContinuumState:
     
     # Classified states
     ema300_position: str = 'AT'
-    ema300_duration: int = 0  # minutes above/below
+    ema300_duration: int = 0  # TICKS in current state (TICK_INTERVAL=30s each), NOT minutes — consumers must convert
     zscore_tier: str = 'NEUTRAL'
     volume_regime: str = 'NORMAL'
     velocity_state: str = 'SLOW'
