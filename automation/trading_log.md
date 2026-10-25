@@ -15436,3 +15436,23 @@ Final set: ['BTC', 'ME', 'PUMP']
 - 24h GREEN at 73.3% WR (15T); 7d still -$0.43
 - pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
 - hotset.json 0 tokens since 05:56 (audit #134 SIDeways flag) — still monitor
+
+## 2026-10-25 15:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.02 (WR: 100%) | 24h: 13T 10W 76.9% `+$0.60` (GREEN) | 7d 122T 45.1% `-$0.41` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade last hour: AVAX bb-squeeze+ LONG profit-monster-trail +0.80%; 0 open trades
+- atr_sl_hit 0/13 = 0% (<40%) — dominant close = profit-monster-trail (7T +$0.43)
+- No signal with 0%WR n>=3 in last hour (n=1); 24h worst = bb-bounce-v2-long+ 2T 0W -$0.06 (n<3, kill bar not met)
+- No negative-hour streak: 03 +, 05 single -, 06/07 empty, 08 +, 09/10 empty, 11 +, 12-14 empty, 15 +
+- Frequency 1/hr — not overtrading
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN at 76.9% WR (13T); 7d still -$0.41
+- pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
+- hotset.json 0 tokens since 05:56 (audit #134 SIDeways flag) — still monitor
