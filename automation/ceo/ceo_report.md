@@ -441,3 +441,9 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Recommendation: CEO still owes openclaw-gateway choice (npm restore vs disable) — carried, no action this run.
 
 **Proactive (Q11, coins in accumulation):** 15/112 symbols in wyckoff accumulation. LONG setups: BCH (setup 58.2, pred 50.8), WLFI (52.3/44.1), PURR (49.4/38.5), GMX (47.5/46.1), HEMI (46.5/46.6), kLUNC (44.6/43.2), USUAL (35.9/47.0). Rest NEUTRAL setups (FOGO/DOT/BIGTIME/AVNT/LTC/SEI/APT/AIXBT). Scores fresh (ts current); BCH/HEMI/AVNT snapshots older — monitor staleness. No phase-transition signal exists yet for these; deep-run candidate only.
+
+## CEO Status — 20261025T112652Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 15T +0.81 73.3% | 7d 124T -0.48 44.4%
+### Findings: clean — DB verified fresh (15T/73.3%/+0.81 24h GREEN, 0 open = correct flat book in chop); error_alerts show only carried items (Sunday 03:00 self-healing now SKIP-triaged, openclaw non-Hermes crash-loop, hotset 0-tokens = confidence gate working). Rotating Q (new signals this week): 0 new signal ships in kanban — all work is audit/analysis on existing signals; bb-bounce-v2-long+ remains in-flight not new.
+### Recommendation: CEO still owes rulings from stack: universal post-arm trail floor D=0.20 GO + pump-chain+ NO-KILL (queued 6+ runs); no new action this tick.
