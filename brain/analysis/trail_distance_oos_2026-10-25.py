@@ -123,7 +123,12 @@ def run(days_list=(7, 14, 30), dists=DEFAULT_DISTS, scoped=False, arm_on='high')
                     t = mu / ((var_ / len(ds)) ** 0.5) if var_ > 0 else 0.0
                 else:
                     t = 0.0
-                var[d] = dict(fills=v['fills'], net=round(v['net'], 3),
+                try:
+                    from scipy import stats
+                    pval = round(float(2 * stats.t.sf(abs(t), len(ds) - 1)), 4) if len(ds) > 1 else 1.0
+                except Exception:
+                    pval = None
+                var[d] = dict(fills=v['fills'], net=round(v['net'], 3), p=pval,
                               save=round(v['save'], 3), harm=round(v['harm'], 3),
                               saved_losers=v['saved_l'], harmed_winners=v['harmed_w'],
                               zeroed_winners=v['zeroed_w'],
@@ -287,9 +292,11 @@ if __name__ == '__main__':
             verdict.append('net>0' if m['net'] > 0 else 'net FAIL')
             verdict.append('halves>0' if (m['old_half'] > 0 and m['new_half'] > 0) else 'halves FAIL')
             verdict.append('fk<20' if m['fk_zeroed_pct'] < 20 else 'fk FAIL')
+            if m.get('p') is not None:
+                verdict.append('p<0.05' if m['p'] < 0.05 else 'p FAIL')
             print(f"   D={dist*100:.2f}%  fills={m['fills']:3d} NET {m['net']:+.3f} "
                   f"(save {m['save']:+.3f} / harm -{m['harm']:.3f}) "
                   f"savedL={m['saved_losers']} zeroedW={m['zeroed_winners']} dmgW={m['harmed_winners']} "
                   f"fk_zeroed={m['fk_zeroed_pct']}% (HOUSE <20%) fk_delta={m['fk_armed_pct']}%  "
                   f"halves old {m['old_half']:+.3f} new {m['new_half']:+.3f} "
-                  f"t={m['t']}  [{' | '.join(verdict)}]")
+                  f"t={m['t']} p={m.get('p')}  [{' | '.join(verdict)}]")

@@ -522,8 +522,12 @@ def run(dry_run=False):
             (1.5,  0.3),   # 1.5%–3.0%: 0.30% trail
             (3.0,  0.5),   # 3.0%+: 0.50% trail
         ]
-        assert min(t[0] for t in PM_TRAIL_TIERS[1:]) > 1.0, \
-            "spider PM_TRAIL_TIERS thresholds must be percent, not decimal"
+        # Tripwire only — never raise: an exception here stops ALL profit-monster
+        # exits (tiers included) for this fire. A decimal threshold (0.015) matches
+        # every percent peak and pins the loosest tier, so the floor sits below entry.
+        if any(t[0] < 1.0 for t in PM_TRAIL_TIERS[1:]):
+            log("SPIDER PM_TRAIL_TIERS thresholds are not in percent — trail floor will sit below entry",
+                "ERROR")
 
     log(f"Firing — group {ab_group}" + (" [DRY RUN]" if effective_dry_run else "") + (" [SPIDER]" if spider_active else ""))
 

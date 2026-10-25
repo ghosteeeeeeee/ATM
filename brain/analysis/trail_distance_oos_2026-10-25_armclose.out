@@ -1,0 +1,320 @@
+{
+ "7": {
+  "n": 74,
+  "no_candles": 1,
+  "armed": 42,
+  "winners": 34,
+  "armed_winners": 32,
+  "variants": {
+   "0.002": {
+    "fills": 38,
+    "net": 0.189,
+    "p": 0.7105,
+    "save": 1.11,
+    "harm": 0.922,
+    "saved_losers": 9,
+    "harmed_winners": 14,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 43.8,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 0.433,
+    "new_half": -0.244,
+    "t": 0.374
+   },
+   "0.003": {
+    "fills": 31,
+    "net": 0.117,
+    "p": 0.8011,
+    "save": 0.866,
+    "harm": 0.749,
+    "saved_losers": 9,
+    "harmed_winners": 10,
+    "zeroed_winners": 1,
+    "fk_armed_pct": 31.2,
+    "fk_zeroed_pct": 3.1,
+    "old_half": 0.311,
+    "new_half": -0.194,
+    "t": 0.254
+   },
+   "0.005": {
+    "fills": 20,
+    "net": -0.042,
+    "p": 0.926,
+    "save": 0.639,
+    "harm": 0.681,
+    "saved_losers": 8,
+    "harmed_winners": 8,
+    "zeroed_winners": 3,
+    "fk_armed_pct": 25.0,
+    "fk_zeroed_pct": 9.4,
+    "old_half": 0.262,
+    "new_half": -0.304,
+    "t": -0.094
+   },
+   "0.008": {
+    "fills": 13,
+    "net": 0.102,
+    "p": 0.7281,
+    "save": 0.434,
+    "harm": 0.332,
+    "saved_losers": 7,
+    "harmed_winners": 3,
+    "zeroed_winners": 1,
+    "fk_armed_pct": 9.4,
+    "fk_zeroed_pct": 3.1,
+    "old_half": 0.243,
+    "new_half": -0.14,
+    "t": 0.356
+   },
+   "0.012": {
+    "fills": 7,
+    "net": 0.123,
+    "p": 0.1859,
+    "save": 0.162,
+    "harm": 0.04,
+    "saved_losers": 2,
+    "harmed_winners": 0,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 0.0,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 0.061,
+    "new_half": 0.062,
+    "t": 1.493
+   },
+   "0.016": {
+    "fills": 2,
+    "net": -0.041,
+    "p": 0.096,
+    "save": 0.0,
+    "harm": 0.041,
+    "saved_losers": 0,
+    "harmed_winners": 0,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 0.0,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 0.0,
+    "new_half": -0.041,
+    "t": -6.581
+   }
+  }
+ },
+ "14": {
+  "n": 154,
+  "no_candles": 1,
+  "armed": 84,
+  "winners": 66,
+  "armed_winners": 61,
+  "variants": {
+   "0.002": {
+    "fills": 80,
+    "net": 2.246,
+    "p": 0.008,
+    "save": 3.467,
+    "harm": 1.221,
+    "saved_losers": 19,
+    "harmed_winners": 21,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 34.4,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 2.057,
+    "new_half": 0.189,
+    "t": 2.72
+   },
+   "0.003": {
+    "fills": 69,
+    "net": 2.015,
+    "p": 0.0067,
+    "save": 2.838,
+    "harm": 0.823,
+    "saved_losers": 19,
+    "harmed_winners": 18,
+    "zeroed_winners": 1,
+    "fk_armed_pct": 29.5,
+    "fk_zeroed_pct": 1.6,
+    "old_half": 1.898,
+    "new_half": 0.117,
+    "t": 2.796
+   },
+   "0.005": {
+    "fills": 43,
+    "net": 1.511,
+    "p": 0.029,
+    "save": 2.237,
+    "harm": 0.726,
+    "saved_losers": 17,
+    "harmed_winners": 10,
+    "zeroed_winners": 4,
+    "fk_armed_pct": 16.4,
+    "fk_zeroed_pct": 6.6,
+    "old_half": 1.553,
+    "new_half": -0.042,
+    "t": 2.261
+   },
+   "0.008": {
+    "fills": 32,
+    "net": 1.168,
+    "p": 0.0283,
+    "save": 1.633,
+    "harm": 0.465,
+    "saved_losers": 15,
+    "harmed_winners": 7,
+    "zeroed_winners": 2,
+    "fk_armed_pct": 11.5,
+    "fk_zeroed_pct": 3.3,
+    "old_half": 1.066,
+    "new_half": 0.102,
+    "t": 2.3
+   },
+   "0.012": {
+    "fills": 20,
+    "net": 0.386,
+    "p": 0.1471,
+    "save": 0.606,
+    "harm": 0.22,
+    "saved_losers": 9,
+    "harmed_winners": 3,
+    "zeroed_winners": 1,
+    "fk_armed_pct": 4.9,
+    "fk_zeroed_pct": 1.6,
+    "old_half": 0.263,
+    "new_half": 0.123,
+    "t": 1.511
+   },
+   "0.016": {
+    "fills": 8,
+    "net": -0.012,
+    "p": 0.9487,
+    "save": 0.159,
+    "harm": 0.172,
+    "saved_losers": 3,
+    "harmed_winners": 1,
+    "zeroed_winners": 0,
+    "fk_armed_pct": 1.6,
+    "fk_zeroed_pct": 0.0,
+    "old_half": 0.028,
+    "new_half": -0.041,
+    "t": -0.067
+   }
+  }
+ },
+ "30": {
+  "n": 367,
+  "no_candles": 5,
+  "armed": 207,
+  "winners": 175,
+  "armed_winners": 167,
+  "variants": {
+   "0.002": {
+    "fills": 185,
+    "net": 3.92,
+    "p": 0.0016,
+    "save": 6.97,
+    "harm": 3.05,
+    "saved_losers": 33,
+    "harmed_winners": 60,
+    "zeroed_winners": 2,
+    "fk_armed_pct": 35.9,
+    "fk_zeroed_pct": 1.2,
+    "old_half": 1.289,
+    "new_half": 2.631,
+    "t": 3.196
+   },
+   "0.003": {
+    "fills": 140,
+    "net": 3.119,
+    "p": 0.0061,
+    "save": 5.481,
+    "harm": 2.362,
+    "saved_losers": 33,
+    "harmed_winners": 41,
+    "zeroed_winners": 4,
+    "fk_armed_pct": 24.6,
+    "fk_zeroed_pct": 2.4,
+    "old_half": 0.881,
+    "new_half": 2.237,
+    "t": 2.788
+   },
+   "0.005": {
+    "fills": 82,
+    "net": 2.121,
+    "p": 0.0422,
+    "save": 3.798,
+    "harm": 1.678,
+    "saved_losers": 30,
+    "harmed_winners": 25,
+    "zeroed_winners": 6,
+    "fk_armed_pct": 15.0,
+    "fk_zeroed_pct": 3.6,
+    "old_half": 0.472,
+    "new_half": 1.649,
+    "t": 2.064
+   },
+   "0.008": {
+    "fills": 46,
+    "net": 1.669,
+    "p": 0.0099,
+    "save": 2.426,
+    "harm": 0.757,
+    "saved_losers": 22,
+    "harmed_winners": 13,
+    "zeroed_winners": 4,
+    "fk_armed_pct": 7.8,
+    "fk_zeroed_pct": 2.4,
+    "old_half": 0.357,
+    "new_half": 1.312,
+    "t": 2.695
+   },
+   "0.012": {
+    "fills": 30,
+    "net": 0.439,
+    "p": 0.2163,
+    "save": 0.913,
+    "harm": 0.474,
+    "saved_losers": 14,
+    "harmed_winners": 6,
+    "zeroed_winners": 3,
+    "fk_armed_pct": 3.6,
+    "fk_zeroed_pct": 1.8,
+    "old_half": -0.001,
+    "new_half": 0.44,
+    "t": 1.264
+   },
+   "0.016": {
+    "fills": 14,
+    "net": -0.334,
+    "p": 0.2039,
+    "save": 0.181,
+    "harm": 0.515,
+    "saved_losers": 5,
+    "harmed_winners": 4,
+    "zeroed_winners": 2,
+    "fk_armed_pct": 2.4,
+    "fk_zeroed_pct": 1.2,
+    "old_half": -0.322,
+    "new_half": -0.012,
+    "t": -1.338
+   }
+  }
+ }
+}
+=== 7d n=74 no_candles=1 armed=42 armed_W=32 winners=34
+   D=0.20%  fills= 38 NET +0.189 (save +1.110 / harm -0.922) savedL=9 zeroedW=0 dmgW=14 fk_zeroed=0.0% (HOUSE <20%) fk_delta=43.8%  halves old +0.433 new -0.244 t=0.374 p=0.7105  [n>=20 | net>0 | halves FAIL | fk<20 | p FAIL]
+   D=0.30%  fills= 31 NET +0.117 (save +0.866 / harm -0.749) savedL=9 zeroedW=1 dmgW=10 fk_zeroed=3.1% (HOUSE <20%) fk_delta=31.2%  halves old +0.311 new -0.194 t=0.254 p=0.8011  [n>=20 | net>0 | halves FAIL | fk<20 | p FAIL]
+   D=0.50%  fills= 20 NET -0.042 (save +0.639 / harm -0.681) savedL=8 zeroedW=3 dmgW=8 fk_zeroed=9.4% (HOUSE <20%) fk_delta=25.0%  halves old +0.262 new -0.304 t=-0.094 p=0.926  [n>=20 | net FAIL | halves FAIL | fk<20 | p FAIL]
+   D=0.80%  fills= 13 NET +0.102 (save +0.434 / harm -0.332) savedL=7 zeroedW=1 dmgW=3 fk_zeroed=3.1% (HOUSE <20%) fk_delta=9.4%  halves old +0.243 new -0.140 t=0.356 p=0.7281  [n FAIL | net>0 | halves FAIL | fk<20 | p FAIL]
+   D=1.20%  fills=  7 NET +0.123 (save +0.162 / harm -0.040) savedL=2 zeroedW=0 dmgW=0 fk_zeroed=0.0% (HOUSE <20%) fk_delta=0.0%  halves old +0.061 new +0.062 t=1.493 p=0.1859  [n FAIL | net>0 | halves>0 | fk<20 | p FAIL]
+   D=1.60%  fills=  2 NET -0.041 (save +0.000 / harm -0.041) savedL=0 zeroedW=0 dmgW=0 fk_zeroed=0.0% (HOUSE <20%) fk_delta=0.0%  halves old +0.000 new -0.041 t=-6.581 p=0.096  [n FAIL | net FAIL | halves FAIL | fk<20 | p FAIL]
+=== 14d n=154 no_candles=1 armed=84 armed_W=61 winners=66
+   D=0.20%  fills= 80 NET +2.246 (save +3.467 / harm -1.221) savedL=19 zeroedW=0 dmgW=21 fk_zeroed=0.0% (HOUSE <20%) fk_delta=34.4%  halves old +2.057 new +0.189 t=2.72 p=0.008  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.30%  fills= 69 NET +2.015 (save +2.838 / harm -0.823) savedL=19 zeroedW=1 dmgW=18 fk_zeroed=1.6% (HOUSE <20%) fk_delta=29.5%  halves old +1.898 new +0.117 t=2.796 p=0.0067  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.50%  fills= 43 NET +1.511 (save +2.237 / harm -0.726) savedL=17 zeroedW=4 dmgW=10 fk_zeroed=6.6% (HOUSE <20%) fk_delta=16.4%  halves old +1.553 new -0.042 t=2.261 p=0.029  [n>=20 | net>0 | halves FAIL | fk<20 | p<0.05]
+   D=0.80%  fills= 32 NET +1.168 (save +1.633 / harm -0.465) savedL=15 zeroedW=2 dmgW=7 fk_zeroed=3.3% (HOUSE <20%) fk_delta=11.5%  halves old +1.066 new +0.102 t=2.3 p=0.0283  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=1.20%  fills= 20 NET +0.386 (save +0.606 / harm -0.220) savedL=9 zeroedW=1 dmgW=3 fk_zeroed=1.6% (HOUSE <20%) fk_delta=4.9%  halves old +0.263 new +0.123 t=1.511 p=0.1471  [n>=20 | net>0 | halves>0 | fk<20 | p FAIL]
+   D=1.60%  fills=  8 NET -0.012 (save +0.159 / harm -0.172) savedL=3 zeroedW=0 dmgW=1 fk_zeroed=0.0% (HOUSE <20%) fk_delta=1.6%  halves old +0.028 new -0.041 t=-0.067 p=0.9487  [n FAIL | net FAIL | halves FAIL | fk<20 | p FAIL]
+=== 30d n=367 no_candles=5 armed=207 armed_W=167 winners=175
+   D=0.20%  fills=185 NET +3.920 (save +6.970 / harm -3.050) savedL=33 zeroedW=2 dmgW=60 fk_zeroed=1.2% (HOUSE <20%) fk_delta=35.9%  halves old +1.289 new +2.631 t=3.196 p=0.0016  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.30%  fills=140 NET +3.119 (save +5.481 / harm -2.362) savedL=33 zeroedW=4 dmgW=41 fk_zeroed=2.4% (HOUSE <20%) fk_delta=24.6%  halves old +0.881 new +2.237 t=2.788 p=0.0061  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.50%  fills= 82 NET +2.121 (save +3.798 / harm -1.678) savedL=30 zeroedW=6 dmgW=25 fk_zeroed=3.6% (HOUSE <20%) fk_delta=15.0%  halves old +0.472 new +1.649 t=2.064 p=0.0422  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.80%  fills= 46 NET +1.669 (save +2.426 / harm -0.757) savedL=22 zeroedW=4 dmgW=13 fk_zeroed=2.4% (HOUSE <20%) fk_delta=7.8%  halves old +0.357 new +1.312 t=2.695 p=0.0099  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=1.20%  fills= 30 NET +0.439 (save +0.913 / harm -0.474) savedL=14 zeroedW=3 dmgW=6 fk_zeroed=1.8% (HOUSE <20%) fk_delta=3.6%  halves old -0.001 new +0.440 t=1.264 p=0.2163  [n>=20 | net>0 | halves FAIL | fk<20 | p FAIL]
+   D=1.60%  fills= 14 NET -0.334 (save +0.181 / harm -0.515) savedL=5 zeroedW=2 dmgW=4 fk_zeroed=1.2% (HOUSE <20%) fk_delta=2.4%  halves old -0.322 new -0.012 t=-1.338 p=0.2039  [n FAIL | net FAIL | halves FAIL | fk<20 | p FAIL]
