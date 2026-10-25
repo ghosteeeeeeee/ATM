@@ -1,134 +1,224 @@
 {
-  "timestamp": "2026-10-25T02:37:00Z",
-  "run": 131,
+  "timestamp": "2026-10-25T03:42:16Z",
+  "run": 132,
   "session_brain_stats": {
-    "queries": 3,
-    "top_hits": "signal performance/winrate regime; new signal idea improvement strategy; UGB giveback protector",
-    "note": "session_brain loads and returns hits (HF warning benign); no new unimplemented idea surfaced beyond queued Oct-27 stack"
+    "queries": [
+      "signal performance winrate regime",
+      "new signal idea improvement strategy",
+      "loss money bleeding losing"
+    ],
+    "top_hits": [
+      "trend following signal / wider exits / signal failure (0.991) — 'the exit system is the #1 profit leak' reappears across 5 sessions",
+      "pump-chain-short (0.852) — 'add filters to improve the winrate first, backtest'",
+      "MFE trailling / R:R exits (0.856) — relaxing one condition at a time for frequency"
+    ],
+    "recurring": "exit-system leak is the single most repeated session topic (5+ sessions, same text block); already owned by TAT-C / MFE-CUT / UGB-PT stack"
   },
   "trade_summary_24h": {
-    "trades": 10,
+    "n": 10,
     "wins": 8,
     "wr": 80.0,
-    "pnl": 0.72,
-    "status": "GREEN",
-    "losers": [
-      "HBAR bb-bounce-v2-long+ trail_arm_timeout -0.010",
-      "CHIP volume-buildup- profit-monster-trail -0.060"
-    ],
-    "d_7d": {
-      "trades": 126,
-      "wr": 42.1,
-      "pnl": -0.84,
-      "LONG": "87T 41.4% -1.11",
-      "SHORT": "39T 43.6% +0.27"
+    "pnl_usdt": 0.72,
+    "state": "GREEN",
+    "by_signal": "pump-chain+ 2T/+0.06, volume-buildup- 2T/+0.19, bb-squeeze+ +0.04, ai-trader-pending 2T/+0.16, hl_copy +0.16 (ugb_pt), continuum+ +0.12, bb-bounce-v2-long+ 1T/-0.01",
+    "losses_48h": 13
+  },
+  "book": {
+    "7d": {
+      "n": 125,
+      "wr": 41.6,
+      "pnl": -0.87,
+      "long": "86T wr 40.7 -1.14",
+      "short": "39T wr 43.6 +0.27"
     },
-    "d_14d": {
-      "trades": 327,
-      "wr": 37.6,
-      "pnl": -3.01,
-      "armed": "160T 70.0% +9.85",
-      "unarmed": "163T 6.1% -12.90"
+    "14d": {
+      "n": 324,
+      "wr": 38.0,
+      "pnl": -2.67,
+      "armed": "135T 78.5% +9.88",
+      "unarmed": "189T 9.0% -12.55",
+      "pm_trail": "77T 70W +5.01",
+      "hard_max_loss": "67T 0W -6.50",
+      "atr_sl_hit": "77T 1W -5.46",
+      "chop_stop_total": "-11.96 on 144T"
     },
-    "mandate_fresh_14d": "profit-monster-trail 77T 90.9% +5.01 vs hard_max_loss 69T 0% -6.66 + atr_sl_hit 78T 1.3% -5.64",
-    "exits_7d": "PM-trail 40T 87.5% +2.43 | hard_max_loss 14T 0% -1.79 | atr_sl_hit 29T 0% -1.63"
+    "7d_exits": "profit-monster-trail 40T 35W +2.43 vs hard_max_loss 14T 0W -1.79 + atr_sl_hit 29T 0W -1.63 (43 chop/SL, 0 wins, -3.42)"
   },
   "shadow_analysis": {
-    "contrarian": "RE-RAN fresh: 807 rows / 535 joinable. pump-chain- flip-WR 63.9% (n=338) = Oct-27 PROMOTE stands; btc-pump-rider+ 25.0% (n=196) flip REFUTED; total 49.5%.",
-    "oscillator": "FROZEN by design — JSONL 24,598 rows (json.load crashes; masquerade), actual_outcome null, mtime Oct 1. Pre-live evidence only.",
-    "wyckoff": "300 rows, no outcome column, still being written (mtime 02:29) — pending outcome join, not answerable.",
-    "floor_admit": "1,787 rows, fields = confidence/floor bookkeeping only, no outcome column (mtime 01:15) — pending pre-registered join.",
-    "rr_shadow": "ORPHANED — mtime Oct 4, no producer in repo. Do not cite.",
-    "shadow_trader_report": "19,250 signals / 18,613 closed. Gate justification: CONFLUENCE-EXPIRY blocked 10033 would_win 48% avg -0.12; EXEC-BLOCK 15 would_win 7%. Wrong-side table flags hl_copy_trader LONG n=33 MFE 0.96 / MAE -2.34 (MFE/MAE -0.41) and volume-breakout-long+ n=219 (killed). analyze-hml run: peak-buyers + wrong-side tables read, no new live action.",
-    "overall": "2/5 useful: contrarian (live outcome join) + UGB (now live enforcement + new forward ledger). oscillator frozen / wyckoff+floor pending joins / rr orphaned."
+    "oscillator": "FROZEN BY DESIGN since Oct 1 (OSCILLATOR_MULT_ENABLED=True stops writes; actual_outcome null on all rows) — not re-read",
+    "contrarian": "RE-RAN this run: 807 rows / 535 joinable; pump-chain- flip-WR 63.9% (n=338) — Oct-27 PROMOTE stands; btc-pump-rider+ 25% = flip REFUTED; total 49.5% n=535",
+    "wyckoff": "298 rows, no outcome column — unanswerable until join ships",
+    "floor_admit": "JOIN SHIPPED THIS RUN — analysis/floor_admit_outcome_join.py --selfcheck PASS. 1787 raw rows -> 765 5m buckets -> 702 episodes after the 10-min merge. floor_only 634 ep = 300W/322L/12SHALLOW = 48.2% WR (±0.40% hit, 30x5m) vs always_admit 68 ep 38.2%, Fisher p=0.1260. Q2 pp-conditional floor: pp<0.10 113/238=47.3% vs pp>=0.10 187/384=49.3%, Fisher p=0.8046 = NO separation -> the third CEO floor option buys no quality. Verdict COLLECT (30d same-sign bar unreachable before 2026-11-15).",
+    "rr_shadow": "ORPHANED — no producer script, mtime 21d stale, not cited",
+    "shadow_trader": "--report 19,390 signals / 18,794 closed. EXIT A/B: pm_trail n=7021 +2653.99 vs hard_max n=4470 -4222.22. --analyze-hml: peak-buyers table pump-chain- 2703T avg -0.112% with MFE +3.492% (giveback +3.604), ichimoku- 1760T -0.116%; wrong-side table hl_copy_trader n=33 MFE/MAE -0.41.",
+    "overall": "3 of 5 shadow sources now answerable (contrarian + floor_admit + UGB-PT forward ledger); oscillator frozen-by-design, wyckoff pending join, rr orphaned"
   },
-  "drift_findings": [],
+  "drift_findings": [
+    {
+      "severity": "MED",
+      "finding": "WATCHDOG RE-FLAGS ALREADY-KILLED SIGNAL FAMILIES AS NEW PATTERNS",
+      "evidence": "2026-10-25 03:14 cycle pattern_alerts #3 flagged oversold-bounce+ (5T 0W), volume-breakout-long+ (5T 0W), doji-bottom-long (17T 6W -0.74) as 'flag for brain-auditor, no action here'",
+      "reality": "all three master flags already False — OVERSOLD_BOUNCE_ENABLED=False killed 2026-10-13, breakout-long killed 2026-09-17, DOJI_BOTTOM_ENABLED=False re-killed 2026-10-16; 0 trades in 7d for all three (max close times 2026-10-13 / 2026-10-13 / 2026-10-16)",
+      "impact": "wastes an auditor cycle and risks re-proposing shipped work (auditor prompt bans that); every 14d/30d window keeps pre-kill history",
+      "fix": "SHIPPED — dead-signal check added to automation/trade-watchdog/trade_watchdog_prompt.md Step 3 Pattern Detection"
+    },
+    {
+      "severity": "LOW",
+      "finding": "escalation #17 still printed as open (77th consecutive) — closed 2026-10-17 by exit-ladder-tat-grid verdict per #107",
+      "impact": "noise",
+      "fix": "no change — re-scoped version (reached-arm ratchet gap) remains the live question"
+    },
+    {
+      "severity": "LOW",
+      "finding": "session_brain dup-heavy 16th run",
+      "impact": "ideation only",
+      "fix": "none"
+    }
+  ],
   "recurring_problems": [
-    "7d LONG bleed -1.11 (87T) vs SHORT +0.27 (39T) — allocation, not direction: covered by mid-band 45-65 work (sweet-spot BOOST reverted #122, dampen REJECTED #128, re-measure Oct 27). No new lever this run.",
-    "Chop exits own the bleed: 7d hard_max_loss+atr_sl_hit = 43T 0 wins -3.42 vs PM-trail 40T 87.5% +2.43 (mandate confirmed fresh)."
+    "LONG book is the entire 7d bleed (86T -1.14 vs SHORT 39T +0.27) — measured again; every directional gate proposed for it has failed bars (#128 dampen sign-flip, #129 short-gate, #122 block fk 38-55%)",
+    "chop/stop exits 14d: HML+atr_sl = 144T 1W -11.96 against PM-trail 77T 70W +5.01 — the arm gap, unchanged; owned by the TAT/UGB/CONF_FLOOR stack",
+    "mid-RSI (45-65) LONG into short-breadth tape = the recurring loss shape in watchdog findings 5 and 8"
   ],
   "missing_implementations": [
-    "CONF_FLOOR=30 — held on CEO fk ruling (fkA 41.7% FAIL / fkB 20.0%); dampen alternative DEAD (base==HL_MIN no-op, #129).",
-    "pump-chain+ kill — criteria MET-by-letter 14d but NO-KILL recommended (30d +1.84); CEO GO queued (6th run).",
-    "UGB-BE enforcement — still pending; PT subsumes giveback path, BE only matters for gap-through-PT.",
-    "Escalation #17 (77th): exit-ladder/BE-at-arm candle OOS — still blocks family-scoped MFE-CUT (bb-bounce) + pump-exit round-trip counterfactual."
+    {
+      "item": "floor_admit outcome join (pre-registered #126)",
+      "status": "SHIPPED THIS RUN"
+    },
+    {
+      "item": "wyckoff outcome join (298 rows, no outcome column)",
+      "status": "OPEN — piggyback the same harness when a wyckoff entry-price field exists"
+    },
+    {
+      "item": "family-scoped MFE-CUT for bb-bounce-v2-long+",
+      "status": "BLOCKED on escalation #17 candle OOS (77th print)"
+    },
+    {
+      "item": "escalation #17 exit-ladder / BE-at-arm candle OOS",
+      "status": "STILL NOT COMMISSIONED — blocks pump-exit round-trip counterfactual"
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-25T02:37:00Z",
-      "idea": "UGB-PT forward-return ledger (shipped brain/analysis/ugb_pt_forward.py, selfcheck PASS)",
-      "rationale": "Yesterday's UGB-PT enforcement (#130) had a save-side retrospective but no standing harm-side check. Every future fire now measures fwd 15/30/60m price-move vs exit price (price-move %, never pnl_pct). Subagent review applied before commit: direction-signed deltas (SHORT fires would have inverted harm math), ts-targeted bar lookup (was positional off-by-one +1-2min), closed-bar-only guard, mode=ro sqlite, selfcheck now asserts horizon-set against elapsed time.",
-      "expected_impact": "validates or kills the giveback protector with data before UGB-BE is stacked on it",
-      "category": "exit quality",
-      "status": "shipped",
+      "date": "2026-10-25T03:42:16Z",
+      "idea": "pump-chain SHORT TAT variant-C (extend the LONG stall-cut to the short side)",
+      "rationale": "pump-chain- arm-rate is 25.7% 14d / 20.0% 30d with 26 unarmed trades bleeding -1.54 (14d) / -2.89 (30d) — looks like an uncaptured chop class, and the TAT branch at position_manager.py:3735 is gated `if direction == 'LONG'`",
+      "measurement": "30d candle replay via the TAT harness (--dir SHORT --sigs pump-chain --t 45): FIRED=36, NET -$6.51/30d, saves +$0.42 / costs -$6.93, fk 23/37 = 62.2% of cohort winners",
+      "expected_impact": "NEGATIVE",
+      "category": "exit engine",
+      "status": "REJECTED-WITH-DATA",
+      "risk": "high (would have killed ACE +2.39%, LTC +2.73%, DYDX +4.00%, CFX +3.02% winners)",
+      "lesson": "SHORT pump-chain winners go red early then spike — the LONG-side stall rule does not transfer across direction"
+    },
+    {
+      "date": "2026-10-25T03:42:16Z",
+      "idea": "flip pump-chain+ LONG TAT from BASE (live_pnl < 0.40) to VARIANT-C (live_pnl < 0)",
+      "rationale": "the LIVE gate uses the base condition; the pre-registered fk bar is <=20% of cohort winners and the standing doctrine after #93 is 'SHIP VARIANT-C ONLY, never base'",
+      "measurement": "30d candle replay at T=45: BASE 35 fires net +$1.34 fk 7/34 = 20.6% (FAILS bar by 0.6pp, sign p=0.0019) | VARIANT-C 21 fires net +$0.80 fk 0/34 = 0.0% (ALL bars pass: n>=15, net>0, fk<=20%, sign p=0.0072). T=60/90 probes: n<15, fails bar. bb-squeeze base re-measured at T=60 = 22 fires +$1.06 fk 12.2% PASSES — leave bb-squeeze alone.",
+      "tradeoff": "gives up +$0.54/30d of net to stop truncating 7 winners/30d (base-only fires convert 7 would-be losers into small wins AND clip 7 winners early, e.g. CC +1.56% cut at +0.25%)",
+      "expected_impact": "winner-kill rate 20.6% -> 0.0%; net -$0.54/30d",
+      "category": "exit engine",
+      "status": "measured, held for CEO — neither config dominates (PnL favors base, fk bar favors variant); pre-registered for a CEO ruling rather than auditor-direct change",
       "risk": "low"
     },
     {
-      "date": "2026-10-25T02:37:00Z",
-      "idea": "Arm-rate-by-signal chop KPI (zero code, 14d n>=15)",
-      "rationale": "Mandate question 1 measured: doji 35.3% / pump-chain+ 39.1% / ai-trader+ 41.7% / bb-bounce 45.5% arm rates = chop-entry signals (first 3 killed/disabled); volume-buildup- 72.7% arm + 68.2% WR = trend signal. Standing rule: n>=15 AND arm%<40 AND PnL<0 = entry-quality candidate; currently only pump-chain+ qualifies and CONF_FLOOR/kill queue already owns it.",
-      "expected_impact": "catches new chop signals before they bleed 20 trades",
+      "date": "2026-10-25T03:42:16Z",
+      "idea": "pp-conditional penalty floor (block pp<0.10, keep pp>=0.10) — the third CEO floor option",
+      "rationale": "decider_run.py:3775 already logs the counterfactual; never had an outcome join",
+      "measurement": "floor_admit_outcome_join Q2: pp<0.10 cohort 113/238 = 47.5% vs pp>=0.10 187/384 = 48.7%, Fisher p=0.8046 — NO separation",
+      "expected_impact": "zero — blocks trades that perform the same as the ones it keeps",
       "category": "entry sniper",
-      "status": "suggested",
+      "status": "measured, do not adopt",
       "risk": "low"
     }
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    {
+      "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+      "change": "added DEAD-SIGNAL CHECK under Step 3 Pattern Detection: grep *_ENABLED + 7d traffic before flagging a family; report 'already killed <date> — stale window, NO action' when dead",
+      "type": "prompt (zero trading behavior)",
+      "revert": "delete the added block"
+    },
+    {
+      "file": "analysis/tat_variant_c_candle_oos_2026-10-24.py",
+      "change": "added probe CLI (--t/--dir/--sigs/--lp-max) with defaults = the shipped bb-bounce/ai-trader+ scope; --selfcheck still asserts the default scope",
+      "type": "analysis tooling (zero trading behavior)",
+      "revert": "git checkout the file"
+    }
+  ],
   "changes_from_last_run": [
     {
+      "run": 131,
+      "change": "ugb_pt_forward.py forward-return ledger",
+      "verdict": "STILL n=1 — no new UGB-PT fire since HYPE #16383; ledger values unchanged (fwd15 +0.129 / fwd30 +0.142 / fwd60 +0.168 pp), --selfcheck PASS. Criteria unchanged: evaluate at n>=20."
+    },
+    {
       "run": 130,
-      "change": "UGB-PT enforcement live (unarmed giveback peak-trail exit)",
-      "verdict": "WORKING — first live fire HYPE #16383 02:18:17 exit 76.561 = peak 1.11% - 0.30% giveback, +0.80% cash / +3.97% @5x / +$0.16; log line 'UGB-PT EXIT HYPE LONG +0.80% [fav=+1.11% giveback 0.30%]'; family hl_copy_trader previously 0W/4L 7d. BTC #16385 correctly EXCLUDED (PM trail state armed peak 0.8114). First ledger datapoint: fwd15 +0.129% (hold would have beaten exit by 0.13pp, n=1, 15m window)."
+      "change": "UGB-PT enforcement live",
+      "verdict": "STILL LIVE, 1 fire total, 0 new fires this window; kill switches present; BTC #16385 correctly excluded (PM trail armed, peak 81007.5)."
     },
     {
-      "run": 129,
-      "change": "0 config (Oct-25 eval batch 5/6)",
-      "verdict": "no changes to verify"
+      "run": 127,
+      "change": "ARM-BE shadow arm-state module->DB",
+      "verdict": "source present (_arm_be_shadow_logged dedup at position_manager.py:154, peak read from trades.highest_price via :2070); no fires this window — correct-by-traffic (only 1 armed open trade, BTC, which is excluded by design)."
     },
     {
-      "run": 128,
-      "change": "0 config (2 creative logged)",
-      "verdict": "no changes to verify"
+      "run": 122,
+      "change": "LONG_RSI_SWEET_SPOT_BOOST 10 -> 0",
+      "verdict": "STILL 0 (hermes_constants.py:998), no drift."
+    },
+    {
+      "run": 123,
+      "change": "contrarian_outcome_join.py",
+      "verdict": "RE-RAN clean: 535 joinable, pump-chain- flip 63.9% n=338 — Oct-27 PROMOTE unchanged."
+    },
+    {
+      "run": 117,
+      "change": "TAT variant-C enforcement for bb-bounce/ai-trader+",
+      "verdict": "FLAG True (constants:1744), enforcement block present at position_manager.py:3791 with its own dedup set, runs before the shadow branch. 0 fires this window (correct-by-traffic: no in-scope LONG held >=55m with pnl<0)."
     }
   ],
   "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py adverse-first (selfcheck PASS) — NOT the vacuous open-anchored replay",
-    "window_48h": {
-      "n": 13,
-      "never_adverse": 3,
-      "recovered_after_adverse": 5,
-      "never_traded_back": 5
-    },
-    "never_cohort": [
-      "ALT vb- SHORT -0.17",
-      "CC vb- SHORT -0.15",
-      "ZRO vb- SHORT -0.11",
-      "BTC ai-trader-pending SHORT -0.08",
-      "PUMP r2v2-long9 -0.01"
-    ],
-    "verdict": "WRONG-SIDE REFUTED 55th consecutive run — independent standing evidence #61 opposite-side p=0.116, #84 forward-return t=-0.04. 5/13 NEVER = 38% vs 14d baseline 17.5% (n=13, monitor only; 3/5 are the Oct-23 volume-buildup- waiver class already gated).",
-    "winning_side": "flat — chop entries that never armed; volume-buildup- family itself still 14d 22T 68.2% +0.58"
+    "method": "brain/analysis/recovery_replay.py adverse-first anchor (open-anchored replay stays VACUOUS — vacuity assert this run: 179/188 = 95.2% pass on candle 1 alone)",
+    "window_48h": "n=13 losers = 3 never-adverse / 5 recovered-after-adverse / 5 NEVER traded back within -0.2% of entry",
+    "never_list": "ALT -0.17 volume-buildup- SHORT hard_max_loss | CC -0.15 volume-buildup- SHORT stale_exit | ZRO -0.11 volume-buildup- SHORT hard_max_loss | BTC -0.08 ai-trader-pending SHORT manual_sl_hit | PUMP -0.01 r2v2-long9 LONG profit-monster-trail",
+    "verdict": "WRONG-SIDE REFUTED 56th consecutive run (#61 opposite-side-signal p=0.116, #84 forward-return census t=-0.04)",
+    "shape": "3 of 5 NEVER are the same volume-buildup- SHORT class (ALT/CC/ZRO) already covered by the lapsed [35,45) waiver; PUMP is a trail giveback of -0.01 (noise)",
+    "winning_side_note": "14d NEVER census = 29/188 = 15.4% structural never-recover cohort (was 17.5%) — owned by re-enter-on-recovery (Oct 25 CEO stack)"
   },
   "signal_deep_dive": {
-    "new_targets": "none — 7d sub-50% n>=10: pump-chain+ LONG 14T 14.3% -0.85 (kill MET-by-letter, NO-KILL stands, CEO) and bb-bounce-v2-long+ 18T 44.4% -0.59 (TAT-C live + family MFE-CUT pre-registered, needs esc#17)",
-    "arm_rate_14d_n15": "doji 35.3% (killed) | pump-chain+ 39.1% | ai-trader+ 41.7% (disabled) | bb-bounce 45.5% | pump-chain- 65.7% | volume-buildup- 72.7%"
+    "new_targets": "0 — every 14d sub-50% n>=10 family is already owned: ai-trader+ (disabled via AI_TRADER_ENABLED), bb-bounce-v2-long+ (TAT-C live), doji-bottom-long (killed Oct 16), pump-chain+ (CONF_FLOOR pending CEO, 30d +1.84 NO-KILL), pump-chain- (30d +0.08 flat), ai-trader-pending (CEO trades)",
+    "watchdog_pattern3_checked": "oversold-bounce+ / volume-breakout-long+ / doji-bottom-long = ALL ALREADY KILLED, 0 trades/7d — see drift_findings[0]",
+    "arm_rate_kpi_14d": "doji 41.2 / ai-trader+ 30.4 / pump-chain- 25.7 / ai-trader-pending 12.5 vs volume-buildup- 72.7 / bb-squeeze+ 80.0 / r2v2-long3 64.3",
+    "arm_rate_not_a_gate": "family arm-rate does NOT predict family PnL — 30d pump-chain+ arm 42.3% is +1.84 while volume-breakout-long+ arm 9.1% is +0.82; arm-rate used as a family prior REJECTED-WITH-DATA (measured this run)",
+    "family_14d_positive": "volume-buildup- 22T +0.58 | r2v2-long3 14T +0.48 | ai-trader-manual 15T +0.34 | bb-squeeze+ 10T +0.28",
+    "family_14d_negative": "ai-trader+ 23T -0.98 | bb-bounce-v2-long+ 33T -0.96 | doji 17T -0.74 | pump-chain+ 46T -0.43 | pump-chain- 35T -0.30"
   },
   "watchdog_steer_triage": [
-    "profit_lock HYPE SL->BE: MOOT — UGB-PT closed it 02:18 at +0.80% (better level than breakeven)",
-    "profit_lock BTC SL 79972->80292: NO ACTION by brain_auditor — PM trail armed (floor ~+0.61% = ~80783 > BE) binds before the exchange stop; exchange stop is gap backstop and PM ratchets it upward as peak rises. Manual stop moves = executor/CEO domain (precedent #84).",
-    "cluster 2-long vs breadth SHORT_BIAS: no third long (watchdog), BTC-specific reads all support the hold",
-    "opportunity ZORA SHORT 45-55 RSI skip: n=8 priced, band rule correctly blocks a 25% WR band — no change"
+    {
+      "steer": "YELLOW profit_lock — BTC #16385 exchange SL 79992.926 -> 80292 (breakeven) while 1m holds EMA300",
+      "verdict": "CONDITION STILL HOLDS — PG 03:40Z: price 80900.5 = +0.758% over entry, peak 81007.5, PM trail armed (floor ~80845 at 0.20% dist), exchange SL already ratcheted 79992 -> 80035.41. Trail floor binds first and would exit ~+0.68%; moving the exchange stop to entry would make the hard cap 0% instead of -0.32% cash. NOT EXECUTED — manual stop placement on a live position is executor/CEO domain (same ruling #131); the trail engine is doing the job. Report to CEO, do not self-execute."
+    },
+    {
+      "steer": "RESOLV SHORT pick fails precheck / AI_TRADER_ENABLED=False",
+      "verdict": "watchlist-only, no action (confirmed AI_TRADER_ENABLED=False at constants:3300)"
+    },
+    {
+      "steer": "14d zero-win long families flagged for brain-auditor",
+      "verdict": "ANSWERED — all three already killed, 0 trades/7d; prompt fix shipped (drift_findings[0])"
+    },
+    {
+      "steer": "7d LONG 86T -1.11 vs SHORT 39T +0.27 (2.2x more of the losing side)",
+      "verdict": "RE-VERIFIED (7d now 86T -1.14 vs 39T +0.27). No new gate: every directional proposal has failed its bar — block 45-60 fk 38-55% (#122), mid-band size-dampen 30d sign-flip (#128), short-gate net +0.98 fails the >+$1.00 bar (#129), coin_regime COLLECT only (#129). Continuing to COLLECT."
+    }
   ],
   "next_actions": [
-    "CEO: pump-chain+ GO/NO-GO (recommend NO-KILL) + CONF_FLOOR fk ruling (dampen dead) + UGB-BE GO (PT subsumes giveback path)",
+    "CEO: pump-chain TAT BASE-vs-VARIANT-C ruling (measured, neither config dominates: base +$1.34/fk 20.6% vs variant +$0.80/fk 0.0%, both n>=15 sign p<0.01) — queued, not applied",
+    "CEO: pump-chain+ GO/NO-GO (NO-KILL, 30d +1.84) + CONF_FLOOR fk ruling (fkA 41.7% FAIL, dampen structurally dead)",
+    "CEO: BTC #16385 breakeven exchange SL steer — 7 cycles unexecuted, condition still true, trail floor binds first",
+    "Nov 15: floor_admit join 30d same-sign bar (n>=200 PASS today, p=0.1260 floor-vs-always, p=0.8046 pp_cond)",
     "Oct 27: contrarian pump-chain- PROMOTE 63.9% + coin_regime re-measure + mid-band dampen re-measure",
-    "Watch UGB-PT ledger — first fire mild harm datapoint (+0.129% fwd15); evaluate at n>=20",
-    "Escalation #17 (77th): exit-ladder/BE-at-arm candle OOS — blocks MFE-CUT family scope + pump-exit counterfactual"
-  ],
-  "health": {
-    "constants_git_diff": "EMPTY",
-    "size_reduce": "file absent = 1.0x",
-    "tracebacks": "4 total in pipeline.log, newest Oct 11, 0 today",
-    "session_lock": "absent"
-  }
+    "Escalation #17 (78th): exit-ladder / BE-at-arm candle OOS — still blocks family-scoped MFE-CUT + pump-exit counterfactual",
+    "wyckoff outcome join — same harness, needs an entry-price field in wyckoff_shadow.jsonl"
+  ]
 }

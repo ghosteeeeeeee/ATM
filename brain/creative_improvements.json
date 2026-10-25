@@ -8179,5 +8179,42 @@
     "risk": "low",
     "agent": "brain_auditor",
     "run": 131
+  },
+  {
+    "date": "2026-10-25T03:42:31Z",
+    "idea": "pump-chain SHORT TAT variant-C (extend the LONG stall-cut to shorts)",
+    "rationale": "pump-chain- arm-rate 25.7% 14d / 20.0% 30d, 26 unarmed trades bleeding -1.54 (14d) / -2.89 (30d)",
+    "measurement": "30d candle replay --dir SHORT --sigs pump-chain --t 45: 36 fires, NET -$6.51, saves +0.42 / costs -6.93, fk 23/37 = 62.2%",
+    "expected_impact": "NEGATIVE — would have killed ACE +2.39%, LTC +2.73%, DYDX +4.00%, CFX +3.02%",
+    "category": "exit engine",
+    "status": "REJECTED-WITH-DATA",
+    "risk": "high",
+    "agent": "brain_auditor",
+    "run": 132,
+    "lesson": "SHORT pump-chain winners go red early then spike — LONG-side stall rule does not transfer across direction"
+  },
+  {
+    "date": "2026-10-25T03:42:31Z",
+    "idea": "pump-chain+ LONG TAT: BASE (lp<0.40) -> VARIANT-C (lp<0)",
+    "rationale": "live gate runs BASE; pre-registered bar is fk<=20% of cohort winners and #93 doctrine is variant-C only",
+    "measurement": "30d T=45: BASE 35 fires +$1.34 fk 7/34=20.6% FAIL | VARIANT 21 fires +$0.80 fk 0/34=0.0% PASS; sign p 0.0019 / 0.0072. T=60/90 n<15. bb-squeeze base at T=60 = 22 fires +$1.06 fk 12.2% PASS (leave alone)",
+    "expected_impact": "winner-kill 20.6% -> 0%, net -$0.54/30d",
+    "category": "exit engine",
+    "status": "held for CEO ruling (neither config dominates)",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 132
+  },
+  {
+    "date": "2026-10-25T03:42:31Z",
+    "idea": "pp-conditional penalty floor (0.3 when pp<0.10, else 0.5) — third CEO floor option",
+    "rationale": "counterfactual already logged at decider_run.py:3775, never had outcomes",
+    "measurement": "floor_admit join Q2: pp<0.10 113/238=47.3% vs pp>=0.10 187/384=49.3%, Fisher p=0.8046 — no separation",
+    "expected_impact": "zero — blocks trades performing the same as those kept",
+    "category": "entry sniper",
+    "status": "measured, do not adopt",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 132
   }
 ]

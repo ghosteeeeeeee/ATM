@@ -2401,5 +2401,60 @@
     "after": "signed by direction, bar selected by target ts, only finished bars, mode=ro, selfcheck asserts horizon set",
     "rationale": "subagent review: SHORT fires would have inverted harm math; positional index off-by-one +1-2min",
     "impact": "zero live behavior; first datapoint corrected +0.195% -> +0.129%"
+  },
+  {
+    "timestamp": "2026-10-25T03:42:31Z",
+    "agent": "brain_auditor",
+    "change": "trade_watchdog_prompt.md: DEAD-SIGNAL CHECK added to Step 3 Pattern Detection (grep *_ENABLED + 7d traffic before flagging a family; report 'already killed <date> — stale window, NO action')",
+    "type": "tweak",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "Pattern Detection had 5 items, no enable-flag check",
+    "after": "6th item + sub-section with grep recipe and the 2026-10-25 example (oversold-bounce+/volume-breakout-long+/doji-bottom-long all already killed)",
+    "rationale": "all 3 'new' 14d zero-win families the watchdog flagged this cycle were already disabled with 0 trades/7d — re-flagging shipped work wastes a cycle and risks a duplicate kill",
+    "impact": "zero trading behavior; watchdog stops re-reporting dead signals"
+  },
+  {
+    "timestamp": "2026-10-25T03:42:31Z",
+    "agent": "brain_auditor",
+    "change": "tat_variant_c_candle_oos_2026-10-24.py: probe CLI --t/--dir/--sigs/--lp-max, defaults unchanged (bb-bounce/ai-trader+ LONG T=55 lp<0)",
+    "type": "creative",
+    "file": "analysis/tat_variant_c_candle_oos_2026-10-24.py",
+    "before": "hardcoded scope + direction='LONG' + condition lp<0",
+    "after": "same defaults, overridable via argv; --selfcheck still asserts default scope and passes",
+    "rationale": "re-verify other TAT cohorts (pump-chain LONG/SHORT, bb-squeeze) with the same pre-registered bars instead of writing a second script",
+    "impact": "zero trading behavior; produced the pump-chain SHORT reject + pump-chain LONG base-vs-variant measurement"
+  },
+  {
+    "timestamp": "2026-10-25T03:42:31Z",
+    "agent": "brain_auditor",
+    "change": "NEW analysis/floor_admit_outcome_join.py (outcome join for floor_admit_shadow.jsonl)",
+    "type": "creative",
+    "file": "analysis/floor_admit_outcome_join.py",
+    "before": "1787 rows, no outcome column — shadow source unanswerable",
+    "after": "5m-episode dedup -> 765 episodes classified WIN/LOSS/SHALLOW at ±0.40%/30x5m; 3 cohorts + Q1/Q2 Fisher + per-source; --selfcheck PASS (dedup, cohort disjointness, pp_cond equivalence, MIN_EXEC_CONFIDENCE drift guard)",
+    "rationale": "pre-registered at #126; unblocks 1 of 5 shadow sources (2/5 -> 3/5 useful)",
+    "impact": "zero trading behavior; first read floor_only 48.5% (n=691) vs always_admit 37.8% p=0.0869, pp_cond p=0.6348"
+  },
+  {
+    "timestamp": "2026-10-25T03:51:36Z",
+    "agent": "brain_auditor",
+    "change": "Code-review fixes on the #132 ships: (1) HIGH floor_admit both-crossed tie-break was direction-blind (WINNER if close>=entry regardless of direction) — 8 of 9 SHORT episodes were flipped; (2) MED dedup split live signals across 5m bucket edges — added EPISODE_GAP_S=600 merge (765 -> 702 episodes, Fisher p 0.0869 -> 0.1260); (3) MED selfcheck had a tautological units guard and never exercised classify_from_entry — replaced with a synthetic in-memory candle fixture asserting LONG/SHORT fav-adv signs, both tie-break directions and SHALLOW; (4) LOW tat selfcheck now pins defaults so `--selfcheck --lp-max 0.40` cannot certify BASE under default assertions; (5) LOW null-ts sort key crash guard; (6) LOW hardcoded 30d verdict replaced with a date-driven bar.",
+    "type": "creative",
+    "file": "analysis/floor_admit_outcome_join.py + analysis/tat_variant_c_candle_oos_2026-10-24.py",
+    "before": "floor_only 691 ep 48.5% p=0.0869 / pp_cond p=0.6348; selfcheck PASS on a broken tie-break",
+    "after": "floor_only 634 ep 48.2% p=0.1260 / pp_cond p=0.8046; both selfchecks PASS and the tat default-pin assert demonstrably fails when probes are passed",
+    "rationale": "mandatory subagent review found 1 HIGH + 2 MED + 3 LOW; the HIGH moved published numbers and the MED made the Fisher anti-conservative",
+    "impact": "zero trading behavior; published floor_admit figures corrected in CURRENT.md / kanban / audit_recommendations"
+  },
+  {
+    "timestamp": "2026-10-25T03:58:58Z",
+    "agent": "brain_auditor",
+    "change": "bug_hunter round 2 on the #132 fixes: all 6 prior fixes VERIFIED (tie-break both directions, EPISODE_GAP_S merge semantics runtime-probed, synthetic fixture catches injected mutations, tat default-pin exits 1 on probes, null-ts guard, date-driven 30d bar). New LOWs fixed: floor_admit --selfcheck now pure (run(write=False), verified OUT mtime unchanged), tolerant per-line shadow loader (bad lines skipped+counted), direction validation (never guess SHORT), atomic OUT write via os.replace, ARM_PCT bracket fixture on both sides (0.35 must stay SHALLOW, 0.45 must ARM), SHADOW_START derived from the shadow's own first row instead of a constant; tat harness psycopg2 conn + candles sqlite now closed in finally blocks.",
+    "type": "creative",
+    "file": "analysis/floor_admit_outcome_join.py + analysis/tat_variant_c_candle_oos_2026-10-24.py",
+    "before": "selfcheck mutated the OUT json; one corrupt shadow line aborted the run; cdb/conn leaked on exception paths",
+    "after": "floor_admit --selfcheck PASS exit 0 and does not touch OUT (mtime identical); tat --selfcheck PASS exit 0; tat --selfcheck --lp-max 0.40 exit 1 as designed; numbers unchanged (634/48.2%/p=0.1260, pp_cond p=0.8046)",
+    "rationale": "mandatory bug_hunter verification is always the last step; every remaining finding was LOW, all cheap ones fixed, the theoretical tat cohort double-count left unfixed (0 such trades in the 30d window, documented)",
+    "impact": "zero trading behavior"
   }
 ]

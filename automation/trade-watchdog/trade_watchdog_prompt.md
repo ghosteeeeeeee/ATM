@@ -126,6 +126,28 @@ The automated checks catch the obvious stuff. YOUR job is the deeper analysis:
 4. **Are we entering at bad RSI levels?** (e.g., shorting oversold, longing overbought)
 5. **For each losing trade: what was the WINNING side?** (direction, timing, conditions)
 
+#### ⚠️ DEAD-SIGNAL CHECK — do this BEFORE flagging a family (brain_auditor #132, 2026-10-25)
+
+A 14d/30d window keeps counting trades from signals that are **already disabled**, so it
+re-reports shipped work as a "new pattern". Before you flag a signal family as losing or
+"brain-auditor territory", check it:
+
+```bash
+grep -n "<FAMILY>.*ENABLED" /root/.hermes/scripts/hermes_constants.py   # master flag False?
+# and count its recent traffic — 0 trades in 7d means every row in your 14d window is pre-kill
+```
+
+- Flag `False` or **0 trades in 7d** → report as `already killed <date> — stale window, NO action`,
+  and do **not** list it under recommendations or as brain-auditor work.
+- Still enabled with live traffic → flag it normally.
+
+**2026-10-25 example (why this rule exists):** all three "newly verified 14d zero-win long
+families" flagged that cycle were already dead — `oversold-bounce+` (killed 2026-10-13),
+`volume-breakout-long+` (killed 2026-09-17), `doji-bottom-long` (re-killed 2026-10-16) —
+**0 trades in the last 7d for all three.** The pattern was real, the action had already been
+taken, and re-printing it costs the auditor a cycle and risks a duplicate kill proposal
+(the auditor prompt explicitly bans re-proposing shipped work).
+
 ## Step 4: Query Session Brain for Context
 
 Search for similar past situations:
