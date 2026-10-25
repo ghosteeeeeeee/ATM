@@ -73,7 +73,8 @@ names = [u['name'] for u in r.json()['universe'] if not u.get('isDelisted')]
 print('live HL active universe:', len(names))
 "
 # Compare to what price_collector's SKIP_TOKENS removes from that
-python3 -c "from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST; print('SKIP_TOKENS:', len(SHORT_BLACKLIST | LONG_BLACKLIST))"
+# (intersection since run #144: only both-sides-blocked coins are unstored)
+python3 -c "from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, BROAD_MARKET_TOKENS; print('SKIP_TOKENS:', len((SHORT_BLACKLIST & LONG_BLACKLIST) - BROAD_MARKET_TOKENS))"
 # Result: live_HL - SKIP_TOKENS ≈ actual prices.json token count
 ```
 
