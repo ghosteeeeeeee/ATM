@@ -8270,5 +8270,23 @@
     "category": "regime habitat",
     "status": "rejected-with-data",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-25T07:15:00Z",
+    "idea": "Extend SHORT_MIDBAND_RSI_MAX 55->60 (close the '55-60 ungated' gap the 06:44 watchdog names)",
+    "rationale": "Watchdog P1: SHORT meta_rsi 45-60 = 31T 16.1% WR -1.300, Fisher p=0.0026 — but that pools 45-55 which is ALREADY blocked live (SHORT_MIDBAND_BLOCK_ENABLED since 2026-10-16). The INCREMENTAL band is 55-60 only.",
+    "expected_impact": "REJECTED-WITH-DATA (n<20 + not significant + economically null): 55-60 SHORT = 14d 6T 1W 16.7% -0.100 / 30d 15T 5W 33.3% -0.020 / 7d 2T 0W -0.080. Fisher 55-60 vs >=60 p=0.9946/0.9451/1.0000 — not significant at ANY window. fk would be 0.8-1.7% (passes) but the save is $0.02-0.10/30d = noise. Monitor to n>=20; do not ship.",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T07:15:00Z",
+    "idea": "Remove the pump-chain exemption from SHORT_MIDBAND (constants:1014 'pump-chain not in source')",
+    "rationale": "The exemption is justified in-file by '14d 16T 4W +$0.42 = only profitable pocket in band'. Re-measured now: pump-chain SHORT 45-55 = 14d 20T 4W 20.0% -0.710 — the supporting number has gone negative.",
+    "expected_impact": "REJECTED-WITH-DATA (OOS sign flip): 7d 8T 2W 25% -0.180 | 14d 20T 4W 20% -0.710 | 30d 40T 15W 37.5% **+0.640** — in-band is BETTER than outside at 30d (outside 61T 32.8% -0.400). Fisher p=0.76/0.83/0.39, never significant. 14d-only negative = exactly the decaying-window pattern the rules ban shipping. fk 3.3-5.0% would pass, but there is no edge to capture. The in-file justification string is now STALE — correct the comment only (zero behavior), do not remove the exemption.",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "low"
   }
 ]

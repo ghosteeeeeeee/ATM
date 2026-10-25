@@ -1011,7 +1011,7 @@ LONG_MIDBAND_NON_EXTREME_BLOCK = True  # brain_auditor 2026-10-11 — EXTREME ex
 # ── SHORT mid-band death band: block SHORT when meta RSI 45-55 (non-pump-chain) ──
 # Meta-RSI sourced (DRIFT-E-safe), live fallback — mirrors LONG_MIDBAND pattern.
 # Non-pump-chain 45-55: 14d 9T 0W -$0.89 | 7d 8T 0W -$0.76 | 48h 0W (watchdog pattern alert).
-# pump-chain exempt: 14d 16T 4W +$0.42 (only profitable pocket in band; own PUMP_CHAIN_SHORT_RSI_MIN governs).
+# pump-chain exempt (own PUMP_CHAIN_SHORT_RSI_MIN governs). RE-MEASURED 2026-10-25 run #134: 45-55 pump-chain SHORT now 14d 20T 4W -0.71 / 30d 40T 15W +0.64 — OOS sign flip, p=0.39-0.83, exemption NOT removed (no significant edge either way). The old '16T 4W +0.42' figure is STALE — do not cite it.
 # Zero winners killed in blocked cohort across all three windows. Deployed at exec-time choke
 # point (decider_run.py) so STANDALONE_BYPASS signals (grind-breakout- etc.) are covered too.
 SHORT_MIDBAND_RSI_MIN = 45

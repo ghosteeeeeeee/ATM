@@ -2489,5 +2489,16 @@
     "after": "bounds clipped to close_ts / t_cut; fk printed as fk_armed|fk_cohort (house bar) + fk_all (diluted); all published numbers re-derived",
     "rationale": "the independent auditor catches fatal flaws — one false PASS was about to be published",
     "impact": "corrected verdicts, zero live behavior change"
+  },
+  {
+    "timestamp": "2026-10-25T07:15:00Z",
+    "agent": "brain_auditor",
+    "change": "hermes_constants.py comment-only: stale pump-chain SHORT_MIDBAND exemption justification (14d 16T 4W +0.42) replaced with the 2026-10-25 re-measurement (14d -0.71 / 30d +0.64, OOS sign flip, exemption NOT removed). ZERO value change — git diff is 1 comment line.",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "pump-chain exempt: 14d 16T 4W +$0.42 (only profitable pocket in band)",
+    "after": "pump-chain exempt (own gate governs); RE-MEASURED 2026-10-25: 14d -0.71 / 30d +0.64, OOS sign flip, not removed",
+    "rationale": "the justification string no longer matches the data; next reader would trust a stale number",
+    "impact": "zero behavior — no constant value touched"
   }
 ]
