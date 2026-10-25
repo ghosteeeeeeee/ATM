@@ -752,13 +752,25 @@ class SessionBrain:
         # Embed query
         query_vec = self.embedder.embed_one(query_text)
         
-        # Search
-        results = self.vector_store.search(query_vec, top_k=top_k * 2)
-        
+        # Search — 4x headroom so text-dedup below can still fill top_k
+        results = self.vector_store.search(query_vec, top_k=top_k * 4)
+
         # Enrich with metadata
         # BUG 3 fix: vec0 returns L2 distance (lower = better)
         # min_score is a MAX distance threshold, not min similarity
+        #
+        # RETRIEVAL DEDUP — brain_auditor #147, 2026-10-25.
+        # Root data: 294,753 of 404,091 chunk rows (73%) are duplicate `text`
+        # under a *different* session_id (38,167 shared texts; DSH forks/copies
+        # sessions). Near-identical vectors land adjacent, so query() returned
+        # the same record under 6 different titles for 8 runs straight.
+        # Dedup lives here (the single retrieval path all callers route
+        # through), not in ingest — ingest already does per-session
+        # delete+reinsert, so skipping shared text there would punch holes when
+        # the *other* holder of that text is re-ingested.
+        # Verify: python3 scripts/session_brain.py --selfcheck
         enriched = []
+        seen_text = set()
         for chunk_id, distance in results:
             if min_score > 0 and distance > min_score:
                 continue
@@ -769,6 +781,9 @@ class SessionBrain:
                 (chunk_id,)
             ).fetchone()
             if row:
+                if row[1] in seen_text:
+                    continue
+                seen_text.add(row[1])
                 enriched.append({
                     "session_id": row[0],
                     "text": row[1][:500],
@@ -779,7 +794,7 @@ class SessionBrain:
                 })
             if len(enriched) >= top_k:
                 break
-        
+
         return enriched
     
     def stats(self) -> Dict:
@@ -888,6 +903,8 @@ def main():
     group.add_argument("--rebuild-index", action="store_true", help="Rebuild FAISS index from existing DB chunks")
     group.add_argument("--query", type=str, help="Semantic search query")
     group.add_argument("--stats", action="store_true", help="Show brain statistics")
+    group.add_argument("--selfcheck", action="store_true",
+                       help="Assert query() returns unique texts (dedup regression check)")
     parser.add_argument("--main-only", action="store_true",
                         help="Only ingest main (human) sessions, skip subagents")
     parser.add_argument("--top-k", type=int, default=10, help="Number of results for query")
@@ -896,6 +913,25 @@ def main():
     args = parser.parse_args()
     brain = SessionBrain()
     
+    if args.selfcheck:
+        # Runs the real query path; fails if any two results share a text.
+        probes = ["signal performance winrate regime",
+                  "loss money bleeding losing",
+                  "new signal idea improvement strategy"]
+        ok = True
+        for q in probes:
+            res = brain.query(q, top_k=6)
+            texts = [r["text"] for r in res]
+            uniq = len(set(texts))
+            filled = len(res)
+            print(f"[selfcheck] q={q!r} results={filled} unique={uniq}/{len(texts)}")
+            if uniq != len(texts):
+                ok = False
+            if filled < 6:
+                print(f"  WARN: only {filled}/6 after dedup (candidate window exhausted)")
+        print("SELF-CHECK PASS: query() returns unique texts" if ok
+              else "SELF-CHECK FAIL: duplicate texts returned")
+        sys.exit(0 if ok else 1)
     if args.ingest:
         brain.ingest(incremental=False, main_only=args.main_only)
     elif args.update:
