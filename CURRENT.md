@@ -4,7 +4,7 @@
 
 ## HEADLINE — THE WATCHDOG'S "NEW" 14D PATTERN WAS ALREADY SHIPPED WORK
 All three zero-win long families flagged at 03:14Z are dead signals with **0 trades in 7d**:
-`oversold-bounce+` (OVERSOLD_BOUNCE_ENABLED=False, killed 2026-10-13) · `volume-breakout-long+` (killed 2026-09-17) ·
+`oversold-bounce+` (OVERSOLD_BOUNCE_ENABLED=False, killed 2026-10-13) · `volume-breakout-long+` (killed 2026-10-13) ·
 `doji-bottom-long` (DOJI_BOTTOM_ENABLED=False, re-killed 2026-10-16). Max close times confirm: Oct 13 / Oct 13 / Oct 16.
 **Fix shipped:** `automation/trade-watchdog/trade_watchdog_prompt.md` Step 3 now has a DEAD-SIGNAL CHECK (grep `*_ENABLED` +
 7d traffic before flagging a family; report `already killed <date> — stale window, NO action`). Zero trading behavior.

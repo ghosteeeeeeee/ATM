@@ -58,7 +58,7 @@
       "severity": "MED",
       "finding": "WATCHDOG RE-FLAGS ALREADY-KILLED SIGNAL FAMILIES AS NEW PATTERNS",
       "evidence": "2026-10-25 03:14 cycle pattern_alerts #3 flagged oversold-bounce+ (5T 0W), volume-breakout-long+ (5T 0W), doji-bottom-long (17T 6W -0.74) as 'flag for brain-auditor, no action here'",
-      "reality": "all three master flags already False — OVERSOLD_BOUNCE_ENABLED=False killed 2026-10-13, breakout-long killed 2026-09-17, DOJI_BOTTOM_ENABLED=False re-killed 2026-10-16; 0 trades in 7d for all three (max close times 2026-10-13 / 2026-10-13 / 2026-10-16)",
+      "reality": "all three master flags already False — OVERSOLD_BOUNCE_ENABLED=False killed 2026-10-13, breakout-long killed 2026-10-13, DOJI_BOTTOM_ENABLED=False re-killed 2026-10-16; 0 trades in 7d for all three (max close times 2026-10-13 / 2026-10-13 / 2026-10-16)",
       "impact": "wastes an auditor cycle and risks re-proposing shipped work (auditor prompt bans that); every 14d/30d window keeps pre-kill history",
       "fix": "SHIPPED — dead-signal check added to automation/trade-watchdog/trade_watchdog_prompt.md Step 3 Pattern Detection"
     },

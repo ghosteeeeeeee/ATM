@@ -143,7 +143,7 @@ grep -n "<FAMILY>.*ENABLED" /root/.hermes/scripts/hermes_constants.py   # master
 
 **2026-10-25 example (why this rule exists):** all three "newly verified 14d zero-win long
 families" flagged that cycle were already dead — `oversold-bounce+` (killed 2026-10-13),
-`volume-breakout-long+` (killed 2026-09-17), `doji-bottom-long` (re-killed 2026-10-16) —
+`volume-breakout-long+` (killed 2026-10-13), `doji-bottom-long` (re-killed 2026-10-16) —
 **0 trades in the last 7d for all three.** The pattern was real, the action had already been
 taken, and re-printing it costs the auditor a cycle and risks a duplicate kill proposal
 (the auditor prompt explicitly bans re-proposing shipped work).
