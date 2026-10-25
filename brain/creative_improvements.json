@@ -8462,5 +8462,25 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-25T16:52:02Z",
+    "idea": "PRE-ENTRY DISPLACEMENT GATE (require >=0.15% dir-adjusted move in the 5 1m candles before open_time) — MEASURED THEN REJECTED-WITH-DATA",
+    "rationale": "Mandate hypothesis: trend entries move first, chop entries don't. 14d: no-disp 153T 34.6% '-3.59' vs >0.15 103T 38.8% '-0.15' but Fisher p=0.510; 30d p=0.533; old-half dead (32.9 vs 33.3); family-confounded (doji/bb-bounce no-disp BETTER, bb-squeeze disp better). Units: price-move % vs pnl_usdt (no leverage landmine). Window: 6 candles strictly ts<open_time, no open-bar contamination, 327/327 and 691/691 matched.",
+    "expected_impact": "NONE — filter would kill 42.7% (14d) / 42.4% (30d) of winners (bar <20%) destroying +4.37/+12.14 pnl_usdt, and p>0.05 both windows",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "high",
+    "script": "brain/analysis/pre_entry_displacement_2026-10-25.py",
+    "note": "First cut had a MIS-PARAMETRIZED Fisher (reported p=0.106); independent brute-force cross-check caught it, function rewritten with FISHER_SELFCHECK assertions (0.5101/1.0/0.001093) — verdict unchanged (reject), numbers now honest"
+  },
+  {
+    "date": "2026-10-25T16:52:02Z",
+    "idea": "CONTRARIAN FLIP-POOL NARROWED TO pump-chain- ONLY (zero code)",
+    "rationale": "Fresh outcome join (541/813 rows): pump-chain- flip-WR 64.1% n=344 = the only candidate; btc-pump-rider+ flip-WR 25.0% n=196 = flipping LOSES 75% of the time -> excluded with data; hmacd_mtf-+ n=1 dead. Overall pool 49.8% = flip is NOT a generic edge, it is family-specific.",
+    "expected_impact": "Prevents a bad flip proposal on btc-pump-rider+ (n=196, largest flip-risk in pool); Oct 27 PROMOTE recheck evaluates pump-chain- only",
+    "category": "direction",
+    "status": "suggested",
+    "risk": "none"
   }
 ]
