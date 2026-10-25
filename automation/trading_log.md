@@ -15190,3 +15190,23 @@ Final set: ['BTC', 'ME', 'PUMP']
 - 24h GREEN at 80% WR but low volume (10T); 7d still ~-$1.02
 - Signal flow low + hotset 0-token fallback (chronic)
 - pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 03:30 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 10T 8W 80.0% `+$0.72` (GREEN) | 7d 125T 41.6% `-$0.87` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades closed last hour — nothing to diagnose
+- atr_sl_hit 0/10 = 0% (<40%) — dominant close = profit-monster-trail (4T +$0.35)
+- No 0%WR signal with 3+ trades in 24h (no signal has n>=3 at all this window)
+- No negative-hour streak: 22:00 -$0.01 (scratch), 00:00 +$0.09, 02:00 +$0.16
+- Frequency fine — 10T/24h, far under 20/hr overtrading bar
+- 2 open: BTC continuum+ LONG +0.79%, ICP r2v2-long3 LONG -0.06%
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN at 80% WR but low volume (10T); 7d still -$0.87
+- pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising

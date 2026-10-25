@@ -421,3 +421,15 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 24h 9T +0.82 77.8% | 7d 123T -0.98 40.7%
 ### Findings: clean — services active, errors only disk/hotset-cooldown already auto-fixed; 7d still negative (-0.98) but improving vs prior runs (-2.77 → -0.98)
 ### Recommendation: pump-chain- family is the 7d PnL leader (+0.31 combo / +0.25 bare SHORT) despite 33% WR — snapshot its params as a candidate regime-specialist (proactive Q: best signal). None else.
+
+## CEO Status — 20261024T232651Z
+### Health: pipeline=active guardian=active open_pos=3
+### Numbers: 24h 9T +0.73 66.7% | 7d 124T -1.07 41.1%
+### Findings: Rotating Q (regime memory stale?) = YES STALE — signal_regime_memory.json last written 2026-10-11, 13d old (>7d bar). Hotset 0-token WARN persists (market-condition, all candidates gated). Otherwise clean: 0 Tracebacks, disk 82%, sizes normal.
+### Recommendation: Refresh signal_regime_memory.json from DB (7d+ stale; pre-registered refresh criteria in prior audits) — weekly deep run, no change made here.
+
+## CEO Status — 20261025T032652Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 10T +0.72 80.0% | 7d 125T -0.87 41.6%
+### Findings: Clean — both core services active, 24h green, 7d still slight red. Rotating Q ("new signals this week?" via 25 mod 14=11): 0 new signals developed this week — kanban shows only analysis/ledger ships (UGB-PT forward, arm-rate KPI), no signal builds. Hotset empty warnings continue (gates working as designed on RSI-74+ pump, market-condition). Side find: openclaw-gateway crash-looping 114 restarts/10min (non-Hermes, missing npm module).
+### Recommendation: CEO to either reinstall openclaw or disable openclaw-gateway to stop restart noise; delegate 1 new signal build to signal_analyst for next week's count.

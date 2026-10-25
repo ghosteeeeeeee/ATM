@@ -1243,8 +1243,17 @@ def close_events():
                 
                 # Compute actual MFE/MAE from price data (bug_hunter fix)
                 # MFE = max favorable excursion, MAE = max adverse excursion
-                highs = [h for ts, o, h, l, c in candles]
-                lows = [l for ts, o, h, l, c in candles]
+                # FIX 2026-10-22: Only use candles during the ACTUAL HOLD PERIOD,
+                # not the full 24h window. Previously MFE/MAE measured the token's
+                # next-day price action, not the trade's excursion during hold.
+                entry_ts_val = candles[0][0]
+                exit_ts_val = first_result.get('exit_ts', entry_ts_val + 86400)
+                hold_candles = [c for c in candles if entry_ts_val <= c[0] <= exit_ts_val]
+                if not hold_candles:
+                    hold_candles = candles  # fallback to full window
+                
+                highs = [h for ts, o, h, l, c in hold_candles]
+                lows = [l for ts, o, h, l, c in hold_candles]
                 if d == 'LONG':
                     mfe = (max(highs) / entry_price - 1) * 100
                     mae = (min(lows) / entry_price - 1) * 100
