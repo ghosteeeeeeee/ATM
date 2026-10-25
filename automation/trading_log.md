@@ -15503,3 +15503,24 @@ Final set: ['BTC', 'ME', 'PUMP']
 **CEO stack untouched** (all CEO-gated, not re-measured): CONF_FLOOR fk, Oct-27 cluster
 (waiver expiry / mid-band / [35,45) / pump-chain- PROMOTE / contrarian PROMOTE / pump-chain+
 HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already live).
+
+## 2026-10-25 17:29 UTC Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $0.04 (WR: 50.0%) | 24h: 15T 11W 73.3% `+$0.64` (GREEN) | 7d 124T 45.2% `-$0.37` | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 2 trades last hour (PENDLE bb-bounce-v2-long+: ugb_pt -$0.02 / profit-monster-trail +$0.06)
+- atr_sl_hit 0/15 = 0% (<40%) — dominant close = profit-monster-trail (8T +$0.49)
+- Kill check: no signal with 0%WR n>=3 last hour (only bb-bounce-v2-long+ 2T 1W1L); 24h worst bb-bounce-v2-long+ 4T 1W -$0.02 (not 0%, n<kill)
+- No negative-hour streak: 11:00 +, 15:00 +, 17:00 + (all non-negative)
+- Frequency 2/hr — not overtrading
+- Entry quality: winners with MAE data max 0.574%, 3/4 under 0.5%
+- Open: 2 (BTC continuum-trend+ SL 79899/TP 81846, DOGE bb-bounce-v2-long+)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN 73.3% WR; 7d still -$0.37
+- pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising

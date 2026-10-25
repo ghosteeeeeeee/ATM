@@ -5238,3 +5238,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-25 16:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 13T 10W 76.9% '+$0.60' (GREEN) | 7d 122T 45.1% '-$0.41' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; worst bb-bounce-v2-long+ 2T 0W n<3) | atr_sl_hit 0/13=0% under 40% | no neg streak (05:00 single -, 08/11/15 +) | 1 open BTC continuum-trend+ with SL/TP set | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-25 17:29 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L '+$0.04' (PENDLE bb-bounce-v2-long+ ugb_pt -0.65% / profit-monster-trail +2.47%) | 24h 15T 11W 73.3% '+$0.64' (GREEN) | 7d 124T 45.2% '-$0.37' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 last hour; worst 24h bb-bounce-v2-long+ 4T 1W n<kill) | atr_sl_hit 0/15=0% under 40% | entry quality good (winner MAE max 0.574%) | no neg streak (11/15/17 all +) | 2 open BTC+DOGE bracketed | No constants change -> no signal_versions entry
+BY: auto_1hr
