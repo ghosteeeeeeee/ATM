@@ -2456,5 +2456,38 @@
     "after": "floor_admit --selfcheck PASS exit 0 and does not touch OUT (mtime identical); tat --selfcheck PASS exit 0; tat --selfcheck --lp-max 0.40 exit 1 as designed; numbers unchanged (634/48.2%/p=0.1260, pp_cond p=0.8046)",
     "rationale": "mandatory bug_hunter verification is always the last step; every remaining finding was LOW, all cheap ones fixed, the theoretical tat cohort double-count left unfixed (0 such trades in the 30d window, documented)",
     "impact": "zero trading behavior"
+  },
+  {
+    "timestamp": "2026-10-25T06:52:00Z",
+    "agent": "brain_auditor",
+    "change": "Escalation #17 leg 1 MEASURED: BE-at-arm candle OOS (pre-reg #785) — all 3 Oct-17 bars met on pre-registered scope (armed-rate 59%, fk 4.0%/17.6% both 15d halves, non-EXTREME 30d net +2.20). Created brain/analysis/be_at_arm_replay_2026-10-25.py + --be-thr sweep + selfcheck extension.",
+    "type": "creative",
+    "file": "brain/analysis/be_at_arm_replay_2026-10-25.py",
+    "before": "escalation #17 escalated 78x, script existed but never run",
+    "after": "run + split-sample OOS + activation-gate sweep; gate variant REJECTED-WITH-DATA (net halves)",
+    "rationale": "exit ladder was the unmeasured #1 lever on the chop/stop cohort",
+    "impact": "CEO GO ask armed with fresh numbers; no live behavior change"
+  },
+  {
+    "timestamp": "2026-10-25T06:53:00Z",
+    "agent": "brain_auditor",
+    "change": "Family-scoped MFE-CUT candle OOS for bb-bounce-v2-long+ (pre-reg #837 blocker) + saved/killed counter reporting fix",
+    "type": "creative",
+    "file": "brain/analysis/mfe_cut_bb_bounce_oos_2026-10-25.py",
+    "before": "pre-registered, never run",
+    "after": "30d fired=9 fk 14.3% NET +0.14 — bars pass mechanically, edge $0.005/trade -> NO SHIP; counters now only count real saves/killers",
+    "rationale": "close dangling pre-registration with an honest no-ship",
+    "impact": "zero live behavior change"
+  },
+  {
+    "timestamp": "2026-10-25T07:05:00Z",
+    "agent": "brain_auditor",
+    "change": "bug_hunter fixes on the two #134 analysis ships: be_at_arm candle upper bound close_ts+60 -> close_ts (post-close candle invented touches) + fk denominator armed-winner; mfe_cut MFE window t_cut+60 -> t_cut + fk denominator cohort-winner + delta-based save/harm; selfchecks extended (post-close, post-cut, SHORT). MFE-CUT verdict flipped 14.3% pass -> 23.5% FAIL; BE-at-arm strengthened (7d 20.6% FAIL -> 17.6% PASS, 30d +2.20 -> +2.14).",
+    "type": "creative",
+    "file": "brain/analysis/be_at_arm_replay_2026-10-25.py + brain/analysis/mfe_cut_bb_bounce_oos_2026-10-25.py",
+    "before": "window bounds admitted candles after the trade/cut; fk divided by all window winners",
+    "after": "bounds clipped to close_ts / t_cut; fk printed as fk_armed|fk_cohort (house bar) + fk_all (diluted); all published numbers re-derived",
+    "rationale": "the independent auditor catches fatal flaws — one false PASS was about to be published",
+    "impact": "corrected verdicts, zero live behavior change"
   }
 ]

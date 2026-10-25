@@ -8225,5 +8225,50 @@
     "category": "entry sniper",
     "status": "rejected-with-data",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-25T06:50:00Z",
+    "idea": "BE-at-arm activation gate above arm — MEASURED, REJECTED-WITH-DATA (parent policy PASSES all bars)",
+    "rationale": "BE-at-arm passed pre-reg bars — check whether a higher activation gate buys fk headroom without losing the save.",
+    "expected_impact": "MEASURED (post-fix), REJECTED-WITH-DATA: non-EXTREME close-variant 30d NET +2.14 (gate 0.40 = arm) -> +1.18 (0.60) -> +0.56 (0.80) -> +0.63 (1.00); fk_armed 9.4% -> 2.9%. Arm-level already passes every bar including 7d (17.6%), so the gate buys no bar and costs ~45% of the edge. Keep BE at arm-level as pre-registered.",
+    "category": "exit quality",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T06:50:00Z",
+    "idea": "Family-scoped MFE-CUT candle OOS for bb-bounce-v2-long+ (pre-reg #837 blocker) — MEASURED, BAR FAIL",
+    "rationale": "Trade-level shadow numbers were selection-on-outcome; this is the candle replay of the actual code condition (open at T=55m AND MFE<0.20% -> exit at 1m close).",
+    "expected_impact": "30d: cohort 33 (open at T with candles), cohort_W 17, fired 9, saved 4 (+0.31 delta), killed 4 (-0.18), NET +0.14, fk_cohort 23.5% > 20% BAR -> REJECTED-WITH-DATA. 14d NET +0.18 fk 0% (n=2 fires), 7d NET +0.10 fk 0% (n=1). Even setting the bar aside the edge is $0.005/trade. NOTE: the pre-fix run divided by ALL window winners and read fk 14.3% = false PASS; the house bar is cohort winners.",
+    "category": "exit quality",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T06:50:00Z",
+    "idea": "ARMED-TRAIL-DISTANCE candle OOS (escalation #17 leg 2, pre-registered)",
+    "rationale": "BE-at-arm only pays when price round-trips all the way through entry. The PM trail stop sits at peak-1.20% while UGB-PT already uses peak-0.30% for the UNARMED half — the armed half has the wider, asymmetric leash. Round-trip giveback ledger ceiling is +$8.28/14d vs BE-at-arm's +$2.14/30d, so most of the giveback never reaches entry.",
+    "expected_impact": "Unknown until swept; single variable (trail distance D after arm), pnl_usdt basis both sides, house bar fk<20% + net>0 in both 15d halves + non-EXTREME scope.",
+    "category": "exit quality",
+    "status": "pre-registered",
+    "risk": "medium (touches the profit engine — shadow first, CEO GO before live)"
+  },
+  {
+    "date": "2026-10-25T06:50:00Z",
+    "idea": "Arm-rate-by-signal chop KPI — MEASURED (extends #131)",
+    "rationale": "14d n>=15 arm% (mfe/trailing_activated): volume-buildup- 72.7% arm +68.2% WR (trend signal) | r2v2-long3 60.0% +53.3% | pump-chain+ 58.7% +28.3% | bb-bounce-v2-long+ 48.5% +42.4% | doji 37.5% (killed) | ai-trader+ 30.4% (killed) | pump-chain- 25.7% +22.9% -0.30 | ai-trader-pending 12.5% +25.0%. Standing rule n>=15 AND arm<40% AND PnL<0 flags exactly ONE live family: pump-chain- SHORT.",
+    "expected_impact": "Independent second axis on the Oct-27 contrarian PROMOTE: low arm% (chop entry) and 63.9% flip-WR (wrong direction) are the same claim from two methods. No config change — Oct-27 ruling owns it.",
+    "category": "measurement",
+    "status": "measured",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T06:50:00Z",
+    "idea": "Habitat dampen re-measure (Oct-25 due date, pre-reg #671)",
+    "rationale": "Criteria were p<0.05 AND fk<20% AND save>$1/14d, all three failing Oct-22 (p=0.0945, fk 21.6%).",
+    "expected_impact": "RE-STILL-REJECTED: 14d non-RANGING fc<50 108T 29.6% -2.40 vs fc>=50 123T 39.0% -1.07 -> Fisher p=0.0025 PASSES (was 0.0945), but fk 32/122 = 26.2% FAILS and 0.80x save = $0.48/14d FAILS. 30d passes all three (fk 11.3%, p<0.0001, save $0.49 — save still <$1) but 7d fk 30.8% -> window-unstable. Dampen also remains a structural no-op while DEFAULT_TRADE_SIZE_USDT == HL_MIN_NOTIONAL_USDT (size-lever rule #8145). BOOST still needs CEO GO + measurement vehicle.",
+    "category": "regime habitat",
+    "status": "rejected-with-data",
+    "risk": "low"
   }
 ]

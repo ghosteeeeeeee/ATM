@@ -1916,3 +1916,26 @@
 - **AUTO-FIX**: none needed — pipeline live (02:46:00 rc=0), 0 Tracebacks/60min in pipeline, 0 failed systemd units, no DB lock contention (candles.db quick_check OK), no missed timers, disk 82% (<85%), prices fresh (22.5s), 0 phantom trades, vacation pause NOT active.
 - **INFO (resolved)**: two Tracebacks at 02:34:16 / 02:35:24 from `run_brain_auditor.sh` were transient and already self-healed by audit run #131 — `brain/analysis/ugb_pt_forward.py` was fixed + `--selfcheck PASS` and committed in `f523d5f9`; direct re-run confirms PASS. No action left.
 - **INFO**: Pipeline healthy — LIVE run 02:46 rc=0, position_manager rc=0 (1 open | 0 closed). 53 signals/hr. Portfolio: 1 open (BTC LONG trade_id=16385, +0.82%, bracketed SL 79992.93 / TP 81509.07) | 3 closed today +$0.25 (signal_outcomes) / 10 closed today +18.27% (pipeline). Exit reasons 24h: profit-monster-trail 4 (+$0.31), trail_arm_timeout 2 (-$0.01), ugb_pt 1 (+$0.16), manual_trail_hit 1 (+$0.03), atr_trail_hit 1 (+$0.05), HL_CLOSED 1 (+$0.12). 0 phantom trades. Regime 5m SHORT_BIAS (12L/65S/51N of 128 @02:30). Speeds 128/241 (53.1%) ≥50th pct. Prices fresh (22.5s, 435 tokens ≤5min). Disk 82% (<85%). Vacation pause: not active.
+
+## Error Alerts — 2026-10-25 05:55 UTC
+- **WARN** (1x): `hermes-auto-1hr.service` start timed out at 05:37 (`opencode` build hung, killed by systemd after 10min). **AUTO-FIX**: `systemctl reset-failed hermes-auto-1hr.service` — timer fires again 06:27. Recurrence → raise timeout in unit via `systemctl edit`.
+- **WARN** (25x/30min, ongoing): `[hotset] fallback DB query returned 0 tokens` — hotset.json has only 1 token (written 05:53). Signal-mix/gate issue, no auto-fix (carried from 2026-10-24 20:44 findings).
+- **WARN** (ongoing, non-Hermes): `openclaw-gateway.service` crash-loop NRestarts=116,943 (was 114,672 @02:46). Still needs CEO choice: npm restore or disable unit.
+- **AUTO-FIX**: reset-failed on hermes-auto-1hr. Otherwise clean — pipeline live (05:48 run rc=0), 0 Tracebacks/30min, all core timers active, prices fresh (14.8s, 87 tokens ≤5min), disk 82% (<85%), 0 phantom trades, vacation pause NOT active.
+- **INFO**: Pipeline healthy — 62 signals/hr, 0 open | 5 closed today +$0.22 | 12 closed 24h +$0.64 (signal_outcomes). Exit reasons 24h: profit-monster-trail 5 (+$0.39), trail_arm_timeout 2 (−$0.01), ugb_pt 1 (+$0.16), manual_trail_hit 1 (+$0.03), hard_max_loss 1 (−$0.10), atr_trail_hit 1 (+$0.05), HL_CLOSED 1 (+$0.12). Regime 5m SHORT_BIAS (8L/52S/62N of 122 @05:45). Speeds 128/241 (53.1%) ≥50th pct. Watchdog 05:48 cleaned 5 stale locks.
+
+## Error Alerts — 2026-10-25 06:27 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (3538s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (3538s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (3481s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (3481s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (3422s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (3422s left, N failures)`
+
+## Error Alerts — 2026-10-25 06:46 UTC
+- **WARN** (1216/1414 cycles = 86% past 24h): `[HOT-SET] hotset.json is empty — no signals survived compaction` / `No signals above 40% confidence — skipping execution`. Root cause verified by manual compactor run: candidates are dominated by single-type `ichimoku_short` (428/24h) which is **never** standalone-bypassed (CEO design 2026-10-20: ichimoku LONG only) and regime is SHORT_BIAS so NEUTRAL-relax doesn't apply → CONFLUENCE-GATE-BLOCK. Matches OpenMemory 2026-10-19 finding: gates eating signals from market-regime/signal-mix shift, **not a bug**. Trades still opening intermittently (11 in 24h, last 03:25 r2v2-long3; bb-squeeze+ at 03:20 passed via bypass).
+- **AUTO-FIX**: none needed — all core timers active and firing (pipeline 06:46 rc=0, price-collector +17s, 1m-candle +4s, watchdog, signal-compactor), 0 Tracebacks/30min, candles.db lock held only by transient signals_runner.py (10s runtime, normal), disk 82% (<85%), prices fresh (65s, 87 tokens ≤10min), 0 phantom trades, vacation pause NOT active.
+- **INFO**: Pipeline healthy — 63 signals/hr, 0 open | 5 closed today +$0.22, 80% WR | 12 closed 24h (portfolio +16.37%). Regime 5m SHORT_BIAS (2L/104S/20N of 126 @06:30). Speeds 128/241 (53.1%) ≥50th pct.
+- **INFO (data quality)**: previous 06:27 alert entry has token names/timestamps redacted into `TOK`/`TS` placeholders — mangled, not diagnostic. Likely a bad redaction regex in that run.
+- **CARRIED**: `openclaw-gateway.service` crash-loop (non-Hermes, NRestarts>116k) still awaiting CEO choice: npm restore vs disable.

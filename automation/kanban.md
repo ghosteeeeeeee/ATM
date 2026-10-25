@@ -117,3 +117,6 @@
 
 ## TEAM UPDATES
 - [2026-10-24 14:44 UTC] health_monitor: Auto-fixed journal bloat — vacuumed 310M→114M (freed 196M). Disk now 85%. No pipeline/service restarts needed: vacation pause absent, all 3 core timers firing, prices fresh (10.7s), 0 tracebacks, 127 signals/h, 1 open position. WARN remains: disk 85% (needs CEO-approved cleanup of /usr 32G etc).
+
+## TEAM UPDATES
+- [2026-10-25 05:55 UTC] health_monitor: Auto-fixed `hermes-auto-1hr.service` failed state (start timeout 05:37 — opencode build hung >10min) via `systemctl reset-failed`; next run 06:27 fires normally. No pipeline restarts needed: vacation pause absent, all 3 core timers firing, prices fresh (14.8s), 0 tracebacks/30min, 62 signals/h, 0 open | 5 closed today +$0.22. ONGOING WARNs: hotset fallback 0-tokens 25x/30min (hotset now only 1 token), openclaw-gateway crash-loop NRestarts=116,943 (non-Hermes, CEO choice pending from 02:46 alert).

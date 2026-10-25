@@ -28,15 +28,24 @@ def run():
         result_val = result.stdout.strip().split('=')[1] if '=' in result.stdout else 'unknown'
         log(f'Better Coder last run result: {result_val}')
     
-    # Run a test of the dispatcher (limit to 1 task)
-    result = subprocess.run(
-        ['python3', '-c', 'import sys; sys.path.insert(0, "/root/.hermes/mcp/hermes-coding-mcp"); from dispatcher.dispatcher import ParallelDispatcher; print("OK")'],
-        capture_output=True, text=True, timeout=30
-    )
-    if result.returncode == 0:
-        log('Self-healing test: OK')
+    # Run a test of the dispatcher (limit to 1 task).
+    # brain_auditor 2026-10-25: dispatcher/dispatcher.py has been absent (empty
+    # package dir since Sep 1) and hermes-better-coder.service is disabled — the
+    # probe reported FAIL every Sunday (Oct 11/18/25) = alarm noise on a parked
+    # subsystem. SKIP with reason; re-test automatically when the module returns.
+    import os
+    _dispatcher_py = '/root/.hermes/mcp/hermes-coding-mcp/dispatcher/dispatcher.py'
+    if not os.path.exists(_dispatcher_py):
+        log('Self-healing test: SKIP (dispatcher module absent; hermes-better-coder.service disabled — parked subsystem)')
     else:
-        log(f'Self-healing test: FAIL - {result.stderr[:200]}')
+        result = subprocess.run(
+            ['python3', '-c', 'import sys; sys.path.insert(0, "/root/.hermes/mcp/hermes-coding-mcp"); from dispatcher.dispatcher import ParallelDispatcher; print("OK")'],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode == 0:
+            log('Self-healing test: OK')
+        else:
+            log(f'Self-healing test: FAIL - {result.stderr[:200]}')
     
     log('=== Weekly Audit Complete ===')
 

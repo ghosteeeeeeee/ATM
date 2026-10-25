@@ -1,91 +1,138 @@
 {
-  "timestamp": "2026-10-25T05:05:54Z",
-  "run": 133,
+  "timestamp": "2026-10-25T06:50:00Z",
+  "run": 134,
   "session_brain_stats": {
     "queries": 3,
-    "top_hits": "signal performance / new signal ideas / bleeding losses; exit system remains the #1 profit leak theme (recurring 3+ sessions)"
+    "top_topics": [
+      "signal performance winrate regime",
+      "new signal idea improvement strategy",
+      "loss money bleeding losing"
+    ],
+    "insight": "Recurring: 'exit system is the #1 profit leak' dominates session recall — consistent with measured armed/unarmed split (14d ARMED 157T 70.1% +9.17 vs UNARMED 162T 6.2% -12.84). Trend-following/new-signal requests keep surfacing; no unimplemented signal idea cleared bars."
   },
   "trade_summary_24h": {
-    "trades": 11,
+    "n": 12,
     "wins": 9,
-    "wr": 81.8,
-    "pnl": 0.8,
+    "wr": 75.0,
+    "pnl_usdt": 0.7,
     "status": "GREEN",
-    "7d": "125T 53W 42.4% -0.73",
-    "14d_armed": "159T 70.4% +10.03",
-    "14d_unarmed": "161T 6.2% -12.74",
-    "14d_exits": "HML 67T 0W -6.50 | atr_sl 77T 1W -5.46 | PM-trail 78T 71W +5.09 | atr_trail 27T 21W +4.18"
+    "7d": {
+      "n": 123,
+      "wins": 52,
+      "wr": 42.3,
+      "pnl_usdt": -0.74
+    },
+    "14d": {
+      "n": 324,
+      "wins": 122,
+      "wr": 37.7,
+      "pnl_usdt": -3.55
+    },
+    "30d": {
+      "n": 686,
+      "wins": 300,
+      "wr": 43.7,
+      "pnl_usdt": -2.13
+    },
+    "14d_arm_split_mfe_basis": {
+      "armed_mfe_ge_0.40": "157T 70.1% +9.17",
+      "unarmed": "162T 6.2% -12.84"
+    },
+    "7d_exits_chop_cohort": "hard_max_loss 15T 0W -1.89 | atr_sl_hit 27T 0W -1.48 | stale_exit 3T 0W -0.64 | hard_sl 4T 0W -0.36 = 49T 0W -4.37; profit-monster-trail 41T 36W +2.51 is the whole profit engine",
+    "14d_arm_split_note": "mfe_pct>=0.40 basis (trailing_activated boolean gives a different count — always name the basis)"
   },
   "shadow_analysis": {
-    "oscillator": "FROZEN BY DESIGN (JSONL, actual_outcome null) — not queried",
-    "contrarian": "re-ran join: 535 joinable, pump-chain- flip-WR 63.9% n=338 = Oct-27 PROMOTE stands; btc-pump-rider+ 25.0%",
-    "wyckoff": "PENDING outcome join — no answerable question yet",
-    "floor_admit": "#132 join selfcheck PASS fresh (n=636): floor_only 48.2% vs always_admit 38.2% Fisher p=0.126, pp-conditional p=0.805 — COLLECT to Nov-15",
-    "rr_shadow": "ORPHANED 21d — do not cite",
-    "report": "19602 signals / 19007 closed; gates net-positive (CONFLUENCE-EXPIRY would_win 48%); hard_max 4517T 0% WR -4267 shadow = chop class confirmed at scale",
-    "overall": "3/5 useful (contrarian live, floor_admit newly joined, oscillator frozen, wyckoff pending, rr orphaned)"
+    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1; actual_outcome null 24,598/24,598; JSONL not JSON). Pre-live evidence only — no outcome question answerable.",
+    "contrarian": "RE-RUN this run: 535 decided, pump-chain- flip-WR 63.9% n=338 (OOS post-Oct18 64.0%). Oct-27 PROMOTE stands. btc-pump-rider+ 25.0% n=196 = fade is WRONG for that family.",
+    "wyckoff": "Still no outcome join — not answerable. shadow_trader's own wyckoff- row (n=18, 88.9%) is a different, shadow-trader-internal source.",
+    "floor_admit": "Outcome join running + selfcheck PASS: 638ep, admit+win 48.2% vs 38.2%, p=0.126. n>=200 bar PASS, 30d same-sign bar unreachable until 2026-11-15 -> COLLECT.",
+    "rr_shadow": "ORPHANED (no producer, 21d stale) — do not cite.",
+    "overall": "3/5 usable: contrarian (decision-ready), floor_admit (collecting to Nov-15), oscillator (pre-live evidence). wyckoff + rr_shadow unusable."
   },
   "drift_findings": [
-    "watchdog 'ATR structurally incapable' claim (ICP 0.14%) does NOT generalize — 30d entry_atr_pct <0.15% bucket 89T 53.9% WR arm 52.8%: REFUTED",
-    "watchdog bb-bounce coin-regime pre-filter: entry_slope_4h/entry_trend/entry_regime_4h coverage 1/55 = no columns to build on; coin_regime stamp is the correct vehicle (COLLECT)",
-    "#61 pre-registered rsi_drift severity gate: measured, INVERTED, closed (see creative)"
+    "Escalation #17 leg 1 was 78x escalated and never measured — SCRIPT EXISTED BUT UNRUN at session open (be_at_arm_replay_2026-10-25.py, mtime 06:04). Ran it: pre-reg bars MET. Escalation now measured, not just escalated.",
+    "Oct-17 verdict (arm-breakeven-stop) said 'deployment = shadow collector then v6 exit-stack + CEO GO'. Shadow shipped 2026-10-18, root-cause fixed #127, still 0 fires — see changes_from_last_run. No drift on the decision itself; drift was in nobody running the pre-registered re-measurement.",
+    "bug_hunter on the two new scripts: HIGH mfe_cut MFE window included the 1m candle AFTER the T=55m cut (inflated MFE -> under-counted fires); HIGH be_at_arm candle bound close_ts+60 admitted the candle entirely after the exit (invented touches/saves). Both fixed, selfchecks extended so each would now fail, all numbers re-derived."
   ],
   "recurring_problems": [
-    "round-trip / chop-stop bleed: HML+atr_sl 144T 1W -11.96/14d — escalation #17 (35th) exit-ladder candle OOS still uncommissioned",
-    "pump-chain+ bleed 7d 14T 2W -0.85 — standing CEO stack (bare kill MET but 30d +1.85 NO-KILL; CONF_FLOOR fkA 41.7% FAIL; TAT BASE vs VARIANT-C pending)"
+    "Chop/stop cohort (HML+atr_sl+stale+hard_sl) 7d 49T 0W -4.37 vs profit-monster-trail 41T 36W +2.51 — the trend/chop law, unchanged. Escalation #17 (exit-ladder) partially answered this run by the BE-at-arm leg.",
+    "pump-chain+ bleed 7d: standing CEO stack, no new lever passed bars this run.",
+    "Round-trip giveback ceiling +$8.28/14d (pump-chain+ +2.61 / pump-chain- +1.51) — BE-at-arm captures +2.20/30d of it on non-EXTREME scope; rest needs the armed-trail-distance OOS (pre-registered this run)."
   ],
   "missing_implementations": [
-    "exit-ladder / peak-trail candle OOS (escalation #17)"
+    "exit-ladder / armed-trail-distance candle OOS (escalation #17 leg 2) — BE-at-arm done, trail-distance sweep not yet built",
+    "wyckoff_shadow outcome join (sibling to floor_admit/contrarian joins)"
   ],
   "creative_improvements": [
     {
-      "idea": "rsi_drift severity gate CLOSED-WITH-DATA (inverted)",
-      "rationale": "|drift|>=10 post-Oct-21-stamp: 10T 100% WR +0.83; |drift|>=8: 12T 91.7%; blocking high-drift = fk ~100% — violates pre-registered would-block WR<30% criterion",
+      "date": "2026-10-25T06:50:00Z",
+      "idea": "BE-at-arm activation gate above arm — MEASURED, REJECTED-WITH-DATA (parent policy PASSES all bars)",
+      "rationale": "BE-at-arm passed pre-reg bars — check whether a higher activation gate buys fk headroom without losing the save.",
+      "expected_impact": "MEASURED (post-fix), REJECTED-WITH-DATA: non-EXTREME close-variant 30d NET +2.14 (gate 0.40 = arm) -> +1.18 (0.60) -> +0.56 (0.80) -> +0.63 (1.00); fk_armed 9.4% -> 2.9%. Arm-level already passes every bar including 7d (17.6%), so the gate buys no bar and costs ~45% of the edge. Keep BE at arm-level as pre-registered.",
+      "category": "exit quality",
       "status": "rejected-with-data",
-      "category": "entry sniper",
-      "risk": "n/a"
+      "risk": "low"
     },
     {
-      "idea": "low-ATR entry block REFUTED",
-      "rationale": "30d <0.15% atr_pct: 89T 53.9% WR -0.21 arm 52.8%; non-monotone across buckets; ICP anecdote only",
+      "date": "2026-10-25T06:50:00Z",
+      "idea": "Family-scoped MFE-CUT candle OOS for bb-bounce-v2-long+ (pre-reg #837 blocker) — MEASURED, BAR FAIL",
+      "rationale": "Trade-level shadow numbers were selection-on-outcome; this is the candle replay of the actual code condition (open at T=55m AND MFE<0.20% -> exit at 1m close).",
+      "expected_impact": "30d: cohort 33 (open at T with candles), cohort_W 17, fired 9, saved 4 (+0.31 delta), killed 4 (-0.18), NET +0.14, fk_cohort 23.5% > 20% BAR -> REJECTED-WITH-DATA. 14d NET +0.18 fk 0% (n=2 fires), 7d NET +0.10 fk 0% (n=1). Even setting the bar aside the edge is $0.005/trade. NOTE: the pre-fix run divided by ALL window winners and read fk 14.3% = false PASS; the house bar is cohort winners.",
+      "category": "exit quality",
       "status": "rejected-with-data",
-      "category": "entry sniper",
-      "risk": "n/a"
+      "risk": "low"
     },
     {
-      "idea": "ATR 0.30-0.50% band block REJECTED",
-      "rationale": "30d 201T 39.3% -4.84 stable both halves BUT fk 79/304≈26%>20% bar, LONG -3.89 vs SHORT -0.95, decomposes to known bleed signals (pump-chain+/ai-trader+), last-3d +0.18 sign flip",
-      "status": "rejected-with-data",
-      "category": "entry sniper",
-      "risk": "n/a"
+      "date": "2026-10-25T06:50:00Z",
+      "idea": "ARMED-TRAIL-DISTANCE candle OOS (escalation #17 leg 2, pre-registered)",
+      "rationale": "BE-at-arm only pays when price round-trips all the way through entry. The PM trail stop sits at peak-1.20% while UGB-PT already uses peak-0.30% for the UNARMED half — the armed half has the wider, asymmetric leash. Round-trip giveback ledger ceiling is +$8.28/14d vs BE-at-arm's +$2.14/30d, so most of the giveback never reaches entry.",
+      "expected_impact": "Unknown until swept; single variable (trail distance D after arm), pnl_usdt basis both sides, house bar fk<20% + net>0 in both 15d halves + non-EXTREME scope.",
+      "category": "exit quality",
+      "status": "pre-registered",
+      "risk": "medium (touches the profit engine — shadow first, CEO GO before live)"
     },
     {
-      "idea": "coin_regime COUNTER gate re-eval at COUNTER n>=50",
-      "rationale": "fresh n=80: ALIGNED 46T 54.3% +0.95 vs COUNTER 34T 41.2% -0.42 Fisher p=0.267 — direction consistent, not significant",
-      "status": "collecting",
-      "category": "regime",
+      "date": "2026-10-25T06:50:00Z",
+      "idea": "Arm-rate-by-signal chop KPI — MEASURED (extends #131)",
+      "rationale": "14d n>=15 arm% (mfe/trailing_activated): volume-buildup- 72.7% arm +68.2% WR (trend signal) | r2v2-long3 60.0% +53.3% | pump-chain+ 58.7% +28.3% | bb-bounce-v2-long+ 48.5% +42.4% | doji 37.5% (killed) | ai-trader+ 30.4% (killed) | pump-chain- 25.7% +22.9% -0.30 | ai-trader-pending 12.5% +25.0%. Standing rule n>=15 AND arm<40% AND PnL<0 flags exactly ONE live family: pump-chain- SHORT.",
+      "expected_impact": "Independent second axis on the Oct-27 contrarian PROMOTE: low arm% (chop entry) and 63.9% flip-WR (wrong direction) are the same claim from two methods. No config change — Oct-27 ruling owns it.",
+      "category": "measurement",
+      "status": "measured",
+      "risk": "none"
+    },
+    {
+      "date": "2026-10-25T06:50:00Z",
+      "idea": "Habitat dampen re-measure (Oct-25 due date, pre-reg #671)",
+      "rationale": "Criteria were p<0.05 AND fk<20% AND save>$1/14d, all three failing Oct-22 (p=0.0945, fk 21.6%).",
+      "expected_impact": "RE-STILL-REJECTED: 14d non-RANGING fc<50 108T 29.6% -2.40 vs fc>=50 123T 39.0% -1.07 -> Fisher p=0.0025 PASSES (was 0.0945), but fk 32/122 = 26.2% FAILS and 0.80x save = $0.48/14d FAILS. 30d passes all three (fk 11.3%, p<0.0001, save $0.49 — save still <$1) but 7d fk 30.8% -> window-unstable. Dampen also remains a structural no-op while DEFAULT_TRADE_SIZE_USDT == HL_MIN_NOTIONAL_USDT (size-lever rule #8145). BOOST still needs CEO GO + measurement vehicle.",
+      "category": "regime habitat",
+      "status": "rejected-with-data",
       "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    "#132 floor_admit_outcome_join.py --selfcheck PASS fresh (n=636, verdict COLLECT unchanged) — WORKING",
-    "#132 TAT probe CLI --t/--dir/--sigs runs, defaults unchanged — WORKING",
-    "#132 watchdog DEAD-SIGNAL CHECK present at trade_watchdog_prompt.md:129 — WORKING",
-    "#131/#130 UGB-PT: 1 fire total, selfcheck PASS, 0 new fires — correct-by-traffic",
-    "#127 ARM-BE DB source: 0 fires correct-by-traffic",
-    "#122 LONG_RSI_SWEET_SPOT_BOOST=0: intact",
-    "protected 13/13 (constants empty git diff) | size-reduce file absent=1.0x | 0 Tracebacks 2026-10-25"
+    "#132 floor_admit_outcome_join.py --selfcheck PASS fresh (638ep, COLLECT to Nov-15) — WORKING",
+    "#132 TAT probe CLI / watchdog DEAD-SIGNAL CHECK — WORKING (present at trade_watchdog_prompt.md:129)",
+    "#133 rsi_drift/low-ATR/ATR-band all closed — no re-open, still rejected",
+    "#131/#130 UGB-PT: 491 would-fire logs, 1 fire live, selfcheck PASS — WORKING",
+    "#127 ARM-BE DB-state fix: 0 fires since 22:50 Oct-24, BUT so is sibling UGB-BE (0 fires in same window) and 0 open positions for most of it — 'correct-by-traffic' is UNPROVEN, it is 'no eligible traffic'. First real test needs an armed trade that round-trips.",
+    "protected: hermes_constants.py git diff vs HEAD EMPTY | size-reduce file absent = 1.0x | 0 Tracebacks logged 2026-10-25",
+    "THIS RUN bug_hunter fixes: be_at_arm close-bound + armed-winner fk denominator, mfe_cut t_cut-bound + cohort-winner fk + delta-based save/harm — both selfchecks extended (post-close candle, post-cut candle, SHORT direction) and PASS; all published numbers re-derived"
   ],
   "watchdog_triage": [
-    "ICP #16389 LONG urgent exit steer: condition AS WRITTEN now FALSE (5m R2 0.493>0.30) BUT slope is negative (2h -0.46%, 15m r2 0.11, 1h r2 0.01) — thesis (dead coin, no trail path, -0.36%, SL 2.613) stands; executor/CEO domain, reported not self-executed (#131 precedent)",
-    "pump-chain+ 7d bleed steer: standing CEO stack, no new lever passed bars this run",
-    "bb-bounce coin-selection steer: no entry columns (1/55 coverage) — coin_regime COLLECT is the vehicle"
+    "P1 direction-misalignment (7d LONG 85T 41%WR -1.07 vs SHORT 38T 45%WR +0.33 while 91/122 tokens SHORT_BIAS): ACKNOWLEDGED, NO ACTION. Short-gate CLOSED #129 (SLOPE-FILTER +0.98 fails bar), counter-regime penalty REJECTED #608, time blocks BANNED. Correct lever already exists and is pre-registered: contrarian pump-chain- flip (Oct 27).",
+    "P3 pump-chain+ 14T 2W -0.85: standing CEO stack (bare kill MET but 30d +1.85 NO-KILL; CONF_FLOOR fkA 41.7% FAIL; TAT BASE vs VARIANT-C held). No new lever passed bars.",
+    "P3 bb-bounce-v2-long+ 17T 8W -0.50: candle OOS this run — family-scoped MFE-CUT bars pass mechanically (fk 14.3%, fired 9, net +0.14/30d) but the edge is $0.005/trade -> NO SHIP. Watch, not act.",
+    "ICP #16389 r2v2-long3 CLOSED hard_max_loss -4.58% at 05:46 — executor steer self-resolved; autopsy shows it as the sole 2h loser, never_adverse within 30m window per corrected replay (reported as-is, not used as wrong-side evidence).",
+    "HOTSET SIDEWAYS: hotset.json has written 0 tokens every minute since 05:56 (was 1); health monitor WARN '0 tokens 25x/30min'. hermes-trades-api falls back to DB query and signals still execute (12 trades/24h) -> MONITOR, not a fault. Worth one look at the compaction gate if it stays 0 for >24h."
   ],
   "next_actions": [
-    "CEO stack unchanged: pump-chain+ TAT BASE-vs-VARIANT-C + CONF_FLOOR fk ruling + BTC BE-SL executor steer",
-    "Oct-27: contrarian pump-chain- PROMOTE (63.9%) + coin_regime re-measure (COUNTER n>=50) + mid-band dampen re-measure",
-    "Escalation #17 (35th): exit-ladder / peak-trail candle OOS — owns 144T/1W/-11.96 14d chop-stop cohort",
-    "Nov-15: floor_admit 30d same-sign bar"
-  ]
+    "CEO GO ASK: BE-at-arm (pre-reg #785) — ALL FOUR Oct-17 bars met on the pre-registered scope AFTER bug fixes: armed-rate 59.0%, fk_armed 9.4% (30d) / 15.6% (14d) / 17.6% (7d) all <20%, split halves OLD +1.04 fk 4.0% / NEW +1.10 fk 16.7%, non-EXTREME 30d NET +$2.14 close-variant. Ship path per Oct-17 verdict = v6 exit-stack + CEO GO; ARM-BE shadow stays on.",
+    "Escalation #17 leg 2 (armed-trail-distance candle OOS) — now the only unmeasured piece of the exit ladder; pre-registered this run.",
+    "Oct 27: contrarian pump-chain- PROMOTE (63.9% n=338, OOS 64.0%) + arm-rate corroboration (25.7% arm, n=35) + coin_regime n>=50 re-measure + mid-band dampen re-measure",
+    "Nov 15: floor_admit 30d same-sign bar",
+    "MFE-CUT bb-bounce: CLOSED as REJECTED-WITH-DATA (fk_cohort 23.5% > 20% bar, NET +0.14/30d) — do not re-propose without a redesign that clears the bar"
+  ],
+  "headline_correction": "MID-RUN BUG-HUNTER FIX: two HIGH window-boundary bugs (post-close candle in be_at_arm, post-cut candle feeding MFE in mfe_cut) + the fk denominator (all-winners vs policy-cohort winners) were corrected and every number below RE-DERIVED. MFE-CUT verdict FLIPPED from bar-pass to bar-FAIL."
 }
