@@ -1,88 +1,91 @@
 {
-  "timestamp": "2026-10-24T23:35:07Z",
-  "run": 128,
+  "timestamp": "2026-10-25T00:40:00Z",
+  "run": 129,
   "session_brain_stats": {
-    "queries": 2,
-    "note": "dup-heavy ideation only; no new decisions surfaced"
+    "queries": 3,
+    "note": "pump-chain kill / hl_copy gating / UGB enforcement — no new decisions, confirms standing CEO stack"
   },
   "trade_summary_24h": {
-    "closed": "8T 5W 62.5% +0.39 (query 23:10Z; auto_1hr 23:28 saw 9T 6W +0.73 after 1 more close)",
-    "7d": "124T 51W 41.1% -1.07 (SHORT 39T 17W +0.27 vs LONG 85T 34W -1.34)",
-    "14d": "327T 122W 37.3% -3.14",
-    "open_at_write": "3 LONG all rip: HYPE #16383 +0.85% (proof-or-exit 23:22Z passed, proof-looking = above entry, watchdog 00:14 adjudicates), BTC #16385 +0.59% SL ratcheted 79525->79620->79824, HYPER #16387 +0.91% (floor-pinned SL)",
-    "mandate_14d": "trail family 135T 106W 78.5% +9.93 vs hard_max_loss 69T 0W -6.66 + atr_sl_hit 78T 1W -5.64 | armed 135T +9.93 vs unarmed 192T 16W -13.07"
+    "closed": "8T 6W 75.0% +0.52 (00:31Z)",
+    "7d": "125T 41.6% -1.02",
+    "14d": "326T 37.4% -3.15",
+    "mandate_14d": "armed 135T 78.5% +9.90 vs unarmed 191T 8.4% -13.05 | profit-monster-trail 77T 90.9% +5.03 vs hard_max_loss 69T 0W -6.66 + atr_sl_hit 78T 1.3% -5.64",
+    "open_at_write": "3 LONG (watchdog 00:14): ENS bb-squeeze+ +0.24, BTC continuum+ +0.58 (meta_rsi 5.48), HYPE hl_copy +0.82 — cluster steer = 3/3 long vs 4h SHORT_BIAS, hold while BTC 1m above EMA300"
   },
   "shadow_analysis": {
-    "contrarian": "RE-RAN live (join shipped #123): 535 joinable, 0 no-data. pump-chain- flip-WR 63.9% n=338 = Oct 27 PROMOTE stands; btc-pump-rider+ flip 25.0% n=196 = flip REFUTED (original side better, but original only 2 live trades 30d -0.16 -> not promotable either); hmacd_mtf n=1.",
-    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1, JSONL not JSON, actual_outcome null all rows) - pre-live evidence only",
-    "wyckoff": "298 rows, 0 outcome fields - pending join, unanswerable",
-    "floor_admit": "1782 rows (90.5% admit), 0 outcome fields - pending join (pre-registered #126, piggyback contrarian join)",
-    "rr_shadow": "ORPHANED 21d, no producer script - do not cite",
-    "arm_be": "Collector fixed #127: selfcheck PASS, 0 fires since 22:50Z = correct-by-traffic (armed trades HYPE/BTC/HYPER all still above entry); UGB sibling live (HYPE 22:21-22:22 fires)",
-    "overall": "2/5 useful (contrarian + UGB), ARM-BE fixed and collecting, floor/wyckoff pending joins"
+    "contrarian": "join live; pc- flip 63.9% n=338 stands = Oct 27 PROMOTE (re-verified #128); raw jsonl classification field unreliable — use join script only",
+    "oscillator": "FROZEN BY DESIGN — skipped",
+    "wyckoff": "pending outcome join — unanswerable",
+    "floor_admit": "1782+ rows, pending outcome join (pre-registered #126)",
+    "rr_shadow": "ORPHANED — do not cite",
+    "hml_shadow": "OCT-25 EVAL DONE — KEEP actual HML. Shadow collector structurally cannot answer (trade closes at actual -0.8% before shadow -1.5% diverges; live_pnl lines only on trades still open). Evidence against widening: (1) SL sweep replay n=940 monotonic tighter-better (0.5% avg -0.136% vs 1.5% avg -0.453%); (2) HML MAE depth 67/69 <=1.0% (widening gives room) BUT never-recover cohort 17.5% (#85) goes deeper at -1.5%; (3) candle OOS still escalation #17. Enforcement of shadow threshold: NO.",
+    "mfe_cut": "OCT-25 EVAL DONE — universal flip stays BLOCKED (already OOS-failed Oct 17: 517 fires, 14.5% false-kill rate on 30d winners as recorded 40.2%... per code comment: 145 false-kills = 40.2% of 30d winners, net cost ~$9.90/30d). Live shadow re-measured: 18 distinct trades fired, naive trades-level counterfactual +19.82pp = the same selection-on-outcome class already refuted. Redesign path = family-scoped (see creative).",
+    "short_gate": "OCT-25 REVIEW DONE — CLOSED. Pre-reg criteria (SHORT, n>=50, net would_pnl>+$1.00, 30d OOS same sign, blocked WR<30%): only SLOPE-FILTER positive at +$0.98 = fails >+$1.00 by $0.02; every other SHORT gate net NEGATIVE (gates saving money: SHORT-CONTINUUM -9.35, CONFLUENCE -4.75, SHORT-RSI-HARD-FLOOR -2.29...). No loosening. Scoreboard criteria remain satisfied as a closure.",
+    "overall": "2/5 useful (contrarian + UGB); HML/MFE-CUT/short-gate Oct-25 questions now answered from existing data; floor/wyckoff joins still pending"
+  },
+  "oct25_eval_batch": {
+    "short_gate_loosening": "CLOSED — no gate passes criteria",
+    "mfe_cut": "universal BLOCKED (OOS fail stands); family-scoped redesign pre-registered",
+    "hml_shadow": "KEEP actual; do not enforce -1.5% ATR floor",
+    "coin_regime": "ALIGNED 44T 52.3% +0.75 vs COUNTER 33T 39.4% -0.50; LONGxCOUNTER 24T 37.5% -0.74 — n>=20 but WR 37.5%>30% bar => COLLECT (recheck Oct 27)",
+    "re_enter_on_recovery": "still offline awaiting CEO (vehicle alongside escalation #17)",
+    "pump_exit_counterfactual": "still blocked on escalation #17 candle OOS"
   },
   "drift_findings": [
-    "WATCHDOG prose 'entries at extremes only: LONG <35' rests on tiny n: 7d 5T +0.17 / 14d 14T 5W -0.45 / 30d 37T 19W -0.32 - the bucket is NEGATIVE at 14d and 30d. Recommendation #5 from watchdog 23:20 cycle is small-n noise; no action taken (editing prompt on noise = same sin).",
-    "EMA300 steer RESOLVED: watchdog deep-analysis predicted first touch ~60min from gap 171->131; actual: dipped +84 at 23:18 then RE-WIDENED to +262 at 23:33 (vol_ratio 0.041->1.26, accel positive, consec_below 0, 644 consec_above). 3-long book hold condition secure.",
-    "HYPE proof-or-exit deadline 23:22Z passed with HYPE +0.85% (above entry = proof-looking); watchdog owns adjudication at next cycle (~00:14Z)."
+    "CONF_FLOOR conf<30 SIZE-DAMPEN 0.25x alternative (#124) KILLED-WITH-DATA: DEFAULT_TRADE_SIZE_USDT=11 == HL_MIN_NOTIONAL_USDT=11, and decider_run.py re-caps _trade_size=max(_trade_size, HL_MIN) after multipliers at BOTH compose sites (:836 delayed, :2452 main) => any <1.0 size mult is a STRUCTURAL NO-OP at current base. CEO options narrow to: (a) hard CONF_FLOOR accept fkA 41.7%, (b) do nothing, (c) raise base size so dampen is meaningful. Do NOT re-propose dampens while base==HL_MIN.",
+    "pump-chain+ kill criteria STILL MET by letter (14d 46T 28.3% -0.43; n>=20, PnL<0, WR<30%) but 30d +1.84 reverses positive and no_signal_enable_disable blocks auditor kill — NO-KILL recommendation stands (5th consecutive run), CEO GO/NO-GO still queued"
   ],
   "recurring_problems": [
-    "pump-chain+ kill GO/NO-GO (5th run): 14d 45T 12W 26.7% -0.48 MET-by-letter but 30d +1.79 -> NO-KILL recommendation stands; blocked by no_signal_enable_disable anyway",
-    "CONF_FLOOR fkA 41.7% FAIL / fkB 20.0% -> CEO fk ruling OR conf<30 size-dampen 0.25x (HYPER #16387 live demo at conf 25.5)",
-    "Escalation #17 (74th): exit-ladder/BE-at-arm candle OOS not commissioned - recovery ceiling +8.28/14d ranked by signal (#126)"
+    "pump-chain+ kill GO/NO-GO (6th run) — recommend NO-KILL (30d +1.84)",
+    "CONF_FLOOR fk ruling (fkA 41.7% FAIL / fkB 20.0%) — dampen alternative now dead, ruling is the only path",
+    "Escalation #17 (75th): exit-ladder/BE-at-arm candle OOS — still blocks UGB-PT/UGB-BE enforcement (+85.48pp/+34.85pp measured, code says CEO GO) and pump-exit counterfactual",
+    "hl_copy_trader gating (watchdog queue): 14d 10T 30% -0.09 / 30d 12T 25% -0.24 — n<20 bar, MONITOR, no kill"
   ],
   "missing_implementations": [
-    "floor_admit + wyckoff outcome joins (pre-registered, piggyback contrarian join script)",
-    "atr_sl_hit/round-trip recovery vehicle (Oct 25 eval batch)"
+    "floor_admit + wyckoff outcome joins (pre-registered, piggyback contrarian join)",
+    "family-scoped stall timeout vehicle (bb-bounce-v2-long+ candidate, pre-registered this run — needs candle OOS per escalation #17)"
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-24T23:35:07Z",
-      "idea": "LONG mid-band (meta_rsi 45-60) size-dampen 0.5x - MEASURED, REJECTED-WITH-DATA at 30d, pre-registered re-measure",
-      "rationale": "Largest real-n LONG bucket: 7d n=48 -1.50 (save +0.75), 14d n=97 -1.97 (save +0.99), but 30d n=195 +0.71 -> dampen COSTS -0.36 = sign flip = temporal instability (same class that killed sweet-spot demote #62). Size dampen has fkA=0 by construction (winners still trade at half size), unlike the block rejected in #122 (fk 38-55%).",
-      "expected_impact": "+0.99/14d if recent regime persists; -0.36/30d if mean-reverts",
-      "category": "position sizing",
-      "status": "rejected-with-data + pre-registered",
-      "risk": "low",
-      "lock": "ship only if 30d window negative AND n>=50 at re-measure Oct 27"
+      "date": "2026-10-25T00:40:00Z",
+      "idea": "Family-scoped MFE-CUT redesign: bb-bounce-v2-long+ stall-cut at T>=55m if MFE<0.20% (aligns with TAT-C window)",
+      "rationale": "Oct 17 verdict explicitly required family-scoped timeouts after universal cut failed OOS (40.2% winner false-kill). Trade-level shadow: bb-bounce-v2-long+ = 5/18 fired trades, ALL losers, 0 winners in fired set, naive would-save +8.92pp leveraged (units: pnl_pct vs live both leveraged-%). Family scope avoids the cross-signal winner-kill that failed OOS.",
+      "expected_impact": "up to +8.9pp/14d leveraged if candle OOS confirms; fk target <20%",
+      "category": "exit engine",
+      "status": "pre-registered (needs escalation #17 candle OOS before any ship)",
+      "risk": "medium"
     },
     {
-      "date": "2026-10-24T23:35:07Z",
-      "idea": "RSI-bucket entry steering needs an n>=50-per-cell bar before watchdog prose can cite it as a rule",
-      "rationale": "Watchdog's extremes-only recommendation uses cells of 4-25 trades; LONG <35 flips +0.17 (7d) -> -0.45 (14d) -> -0.32 (30d). SHORT 60+ 7d 8T +0.44 also n<20. Only 45-60 LONG has real n (97T/195T) and it flips at 30d.",
-      "expected_impact": "Prevents live entries steered by noise; no code change",
-      "category": "meta/guardrail",
-      "status": "pre-registered",
+      "date": "2026-10-25T00:40:00Z",
+      "idea": "SIZE-LEVER AVAILABILITY RULE (meta): no size-dampen candidate may be pre-registered or shipped while DEFAULT_TRADE_SIZE_USDT == HL_MIN_NOTIONAL_USDT",
+      "rationale": "Every dampen <1.0 is re-floored to $11 by the HL_MIN cap at both size-compose sites — shipping one would be a fake fix that logs nothing and saves nothing. Recorded so future runs stop proposing the same dead lever.",
+      "expected_impact": "prevents wasted eval cycles",
+      "category": "process",
+      "status": "logged",
       "risk": "none"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    "#127 ARM-BE shadow fix: VERIFIED - selfcheck PASS (9/9 truth table, _arm_be_shadow_armed removed), 0 fires post-ship correct-by-traffic, UGB sibling logging live, ARM_BE_SHADOW_ENABLED=True",
-    "#127 push_gh redact: VERIFIED - token printed as token[:4]+'***' only",
-    "#122 sweet-spot BOOST: VERIFIED LONG_RSI_SWEET_SPOT_BOOST=0 at :998",
-    "#117 TAT-C: VERIFIED enforcement code live + first fire proven (HBAR 22:38 -0.01)",
-    "#123 contrarian join: RE-RAN clean (535 joinable)"
+    "#127 ARM-BE DB-state fix: 0 fires since ship = correct-by-traffic (no armed round-trip closes since 22:40Z fix; HBAR 16386 closed 22:38 pre-fix) PASS",
+    "#127 push_gh token redact: line 34 prints token[:4]*** PASS",
+    "#122 LONG_RSI_SWEET_SPOT_BOOST=0 verified in constants PASS",
+    "#128: 0 changes (nothing to verify)",
+    "TAT-C (BB_BOUNCE_TRAIL_ARM_TIMEOUT variant-C) flag True, HBAR first-fire already proven #127"
   ],
-  "next_actions": [
-    "CEO: pump-chain+ kill GO/NO-GO (recommend NO-KILL), CONF_FLOOR fk ruling OR conf<30 size-dampen 0.25x",
-    "Oct 25 eval batch (HML-SHADOW, MFE-CUT, UGB, BE-at-arm replay, re-enter-on-recovery, floor-join)",
-    "Oct 27 contrarian PROMOTE (pc- 63.9%/64.0%) + waiver items + mid-band dampen re-measure",
-    "Escalation #17 (74th): exit-ladder/BE-at-arm candle OOS commission",
-    "Watchdog 00:14Z: adjudicate HYPE proof-or-exit (deadline passed, HYPE +0.85%)"
-  ],
-  "autopsy": {
-    "method": "recovery_replay.py adverse-first, selfcheck PASS",
-    "window": "48h",
+  "losing_autopsy_48h": {
     "n": 14,
     "never_adverse": 3,
-    "recovered": 6,
-    "never": 5,
-    "never_list": "ALT vb- SHORT -0.17, CC vb- SHORT -0.15, ZRO vb- SHORT -0.11 (all waiver-band class correctly re-blocked), BTC manual pending -0.08, PUMP r2v2 -0.01",
-    "verdict": "wrong-side REFUTED 53rd consecutive run (#61 p=0.116, #84 t=-0.04 stand); winning side = flat"
+    "recovered_after_adverse": 6,
+    "never_traded_back": 5,
+    "never_cohort": "ALT/CC/ZRO volume-buildup- shorts (waiver-band re-block class), BTC pending manual_sl, PUMP r2v2-long9 tiny",
+    "wrong_side": "REFUTED 54th consecutive (#61 p=0.116, #84 t=-0.04 stand)",
+    "method": "brain/analysis/recovery_replay.py adverse-first"
   },
-  "mandate_check": {
-    "trail_vs_chop": "trail 135T 78.5% +9.93 vs chop/stop 147T ~1% -12.30",
-    "hotset": "n/a"
-  }
+  "next_actions": [
+    "CEO: pump-chain+ kill GO/NO-GO (recommend NO-KILL) + CONF_FLOOR fk ruling (dampen alternative dead) + UGB-BE/UGB-PT enforcement GO (unarmed-half only per code comment)",
+    "Oct 27: contrarian pc- PROMOTE (63.9%/64.0%) + coin_regime COUNTER re-measure + mid-band dampen re-measure + waiver items",
+    "Commission escalation #17 candle OOS (unblocks family-scoped MFE-CUT + UGB enforcement evidence chain)",
+    "Watchdog holds: 3-long cluster exit rules unchanged (EMA300 condition); HYPE SL lock on hl_copy loser family"
+  ]
 }

@@ -8130,5 +8130,23 @@
     "category": "meta/guardrail",
     "status": "pre-registered",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-25T00:40:00Z",
+    "idea": "Family-scoped MFE-CUT redesign: bb-bounce-v2-long+ stall-cut at T>=55m if MFE<0.20% (aligns with TAT-C window)",
+    "rationale": "Oct 17 verdict explicitly required family-scoped timeouts after universal cut failed OOS (40.2% winner false-kill). Trade-level shadow: bb-bounce-v2-long+ = 5/18 fired trades, ALL losers, 0 winners in fired set, naive would-save +8.92pp leveraged (units: pnl_pct vs live both leveraged-%). Family scope avoids the cross-signal winner-kill that failed OOS.",
+    "expected_impact": "up to +8.9pp/14d leveraged if candle OOS confirms; fk target <20%",
+    "category": "exit engine",
+    "status": "pre-registered (needs escalation #17 candle OOS before any ship)",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-25T00:40:00Z",
+    "idea": "SIZE-LEVER AVAILABILITY RULE (meta): no size-dampen candidate may be pre-registered or shipped while DEFAULT_TRADE_SIZE_USDT == HL_MIN_NOTIONAL_USDT",
+    "rationale": "Every dampen <1.0 is re-floored to $11 by the HL_MIN cap at both size-compose sites — shipping one would be a fake fix that logs nothing and saves nothing. Recorded so future runs stop proposing the same dead lever.",
+    "expected_impact": "prevents wasted eval cycles",
+    "category": "process",
+    "status": "logged",
+    "risk": "none"
   }
 ]
