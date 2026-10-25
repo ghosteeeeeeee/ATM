@@ -18,7 +18,12 @@ def run():
     ]
     for svc, desc in services_to_check:
         result = subprocess.run(['systemctl', 'is-active', svc], capture_output=True, text=True)
-        status = 'OK' if result.returncode == 0 else f'FAIL({result.stdout.strip()})'
+        if result.returncode == 0:
+            status = 'OK'
+        else:
+            # disabled units are parked on purpose — SKIP, not FAIL (health_monitor 2026-10-25)
+            en = subprocess.run(['systemctl', 'is-enabled', svc], capture_output=True, text=True)
+            status = 'SKIP(disabled, parked)' if en.stdout.strip() == 'disabled' else f'FAIL({result.stdout.strip()})'
         log(f'{desc} ({svc}): {status}')
     
     # Check if Better Coder dispatcher ran recently
