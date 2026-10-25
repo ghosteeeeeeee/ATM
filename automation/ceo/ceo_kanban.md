@@ -1295,3 +1295,4 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-25 09:29 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L `+$0.06` (HYPER volume-buildup- SHORT profit-monster-trail +1.53%) | 24h 14T 10W 71.4% `+$0.72` (GREEN) | 7d 123T 43.9% `-$0.57` — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3; worst bb-bounce-v2-long+ 2T 0W n<3) | atr_sl_hit 0/14=0% under 40% | entry quality good (winners MAE max 0.574%) | no neg streak (05:00 single -, 06/07 empty, 08/09 +) | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-25 10:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 14T 10W 71.4% '+$0.72' (GREEN) | 7d 123T 43.9% '-$0.57' | size-reduce 1.0x (file absent = truth) | kill: none (worst 24h bb-bounce-v2-long+ 2T 0W n<3) | atr_sl_hit 0/14=0% | no neg streak | 0 open
