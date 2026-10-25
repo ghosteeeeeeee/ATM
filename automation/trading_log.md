@@ -15587,3 +15587,23 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 - 24h WR dropped 64.7% → 56.3%; 7d still -$0.50
 - Negative-hour streak at 2/3 — if 20:00 closes negative, check market regime and consider size reduction
 - pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 21:28 UTC Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 | 24h: 16T 9W 56.3% +$0.27 (GREEN) | 7d 127T 44.1% -$0.50 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour (quiet) — 20:00 empty, breaks the 2-consecutive-negative-hour watch (17 +, 18 -, 19 -)
+- atr_sl_hit 1/16 = 6% (<40%) — dominant close = profit-monster-trail (7T +$0.37)
+- Kill check: 0T last hour; 24h worst bb-bounce-v2-long+ 5T 1W 20% WR -$0.02 (not 0% WR, n<3 last hour)
+- No 3+ negative-hour streak (streak reset by empty hour) — no size reduction needed
+- Frequency 0/hr — not overtrading
+- 1 open BTC continuum-trend+ LONG bracketed (-0.25%)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR 56.3% (was 64.7%), 7d still -$0.50
+- pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
