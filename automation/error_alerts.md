@@ -1959,3 +1959,9 @@
 ## Error Alerts — 2026-10-25 12:27 UTC
 - **REPEATED** (9x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-25 13:45 UTC
+- **INFO**: Core healthy — vacation pause absent, pipeline LIVE rc=0 (last run 13:43), 4/4 core timers firing (pipeline, price-collector, 1m-candle, watchdog), 0 tracebacks/30m, 56 signals/h, prices 39s fresh (435 tokens ≤5min), 0 phantom trades, disk 83% (<85).
+- **WARN (1x, filter by design)**: `TRADE FAILED: CC SHORT` 13:41 — `EXEC-RSI-DETECT-FLOOR` blocked (detect RSI 24.7 < 35 knife), signal 1688566 marked FAILED, no rollback. Same class as ZRO SHORT 08:55 — not a bug.
+- **INFO**: hotset fallback 0 tokens (28x/30m) — known monitored issue (confidence≥70 gate), unchanged since 09:46.
+- **AUTO-FIXES**: none needed.
