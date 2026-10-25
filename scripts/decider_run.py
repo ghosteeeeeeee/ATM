@@ -3793,6 +3793,15 @@ def run(dry_run=False):
                 except Exception as _e:
                     log(f"  ⚠️ [FLOOR-SHADOW-WRITE-FAIL] {token} {direction}: {_e}")  # shadow must never break execution
         # CEO Fix 1: re-check AFTER penalty multiplication (initial filter at :3227 used raw conf)
+        # DRIFT/HAZARD brain_auditor 2026-10-25 (#146) — this is NOT the final cutoff:
+        # three reductions run after it and their result is what brain.py stores as
+        # trades.confidence — WRONG_SIDE_PENALTY :4308, CTX-GATE WARN :4811 (-20 typical),
+        # LOSERS_CONF_PENALTY :4856 (-50). 14d: 58/58 trades stored below 40 were >=40
+        # here (avg divergence +18.2), gate-time conf<30 over 30d = 0/649 while
+        # stored conf<30 = 56. Any confidence floor calibrated on `trades.confidence`
+        # (see brain/fk_definitions.md) MUST be enforced AFTER :4856 or it is a
+        # structural no-op. _signal_metadata.final_confidence = this site's value.
+        # Reproduce: python3 brain/analysis/conf_field_semantics_2026-10-25.py --selfcheck
         if confidence is not None and confidence < MIN_EXEC_CONFIDENCE:
             log(f'  🚫 [PENALTY-BLOCK] {token} {direction} BLOCKED — exec_conf {confidence:.1f}% < {MIN_EXEC_CONFIDENCE}% after penalty product')
             if sig_id:

@@ -1976,3 +1976,9 @@
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`
+
+## Error Alerts — 2026-10-25 19:46 UTC
+- **INFO**: Core healthy — vacation pause absent, pipeline firing (last run 19:46:00), core timers active (pipeline/price-collector/1m-candle/watchdog), 0 tracebacks/30m, 48 signals/h, prices 50s fresh (565 tokens ≤5min), 1 open trade (BTC LONG 15:47), 15 closed today (+0.25 USDT, 60% WR), 0 phantom trades, disk 83% (<85).
+- **WARN (chronic, 100% of watchdog runs ≥24h)**: `signals: WARNING — only 2-4 signals in last 5 min (min 20)` — `pipeline_watchdog.py:37 SIGNAL_COUNT_MIN=20` expects 240/h; actual rate 30-70/h steady for ≥7 days (42/h a week ago, 48/h now). Threshold/stale comment ("normal ~6/min"), not a production drop. Needs CEO decision — safety threshold not modified unilaterally.
+- **WARN (chronic, every run)**: watchdog cleans 5-6 stale locks each pass (`pipeline_heartbeat.lock`, `guardian_closing.lock`, `hotset_json.lock`, `signal_compactor_critical.lock`, `hotset_last_updated.lock`) — self-healing, no pipeline impact, but producers aren't cleaning up on release.
+- **AUTO-FIXES**: none needed — no crashed services, no DB locks, no missed timers, no stale prices.

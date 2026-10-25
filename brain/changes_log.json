@@ -2654,5 +2654,60 @@
     "after": "SKIP_TOKENS = (SHORT_BLACKLIST & LONG_BLACKLIST) - BROAD_MARKET_TOKENS (89 tokens; both-sides-blocked coins still unstored)",
     "rationale": "price_age gates (5-10min max) read latest_prices; skipping price storage for direction-blacklisted coins silently gated legal entries and served 29%-off stale prices to consumers (PENDLE row 1.5324 vs real 1.99). Direction blacklists remain enforced at compactor/decider block level.",
     "impact": "Restores price feed for 40 partially-tradeable coins; live-verified next timer cycle (87->113 fresh rows, PENDLE 0.3min); hermes_constants untouched"
+  },
+  {
+    "timestamp": "2026-10-25T18:58:06Z",
+    "agent": "brain_auditor",
+    "change": "cell-stats freshness-guard pre-reg eval COMPLETED and adjudicated HOLD — cf script extended with stale_boost_pnl + hard-block fk + verdict block (fk 16.1/8.9/3.6% <20 bar, OOS same-sign -0.43/-0.56, but Fisher p~1.0 + $0.56/30d = noise; #116 shadow-evidence requirement unmet) — NO trading-constant change",
+    "type": "creative",
+    "file": "brain/analysis/cell_stats_freshness_cf_2026-10-24.py",
+    "before": "fk_upper only (no pnl, no verdict block, dead stale_boost_pnl variable)",
+    "after": "adds stale_boost_pnl / hard_blocked_* / fk_hard_pct + verdict{fk<20, oos_same_sign, suppress_is_profitable}; --selfcheck asserts new fields",
+    "rationale": "Oct-25 pre-registered eval item; result must be on the record so it is never re-proposed as untested",
+    "impact": "0 behavior (analysis only); guard stays unshipped"
+  },
+  {
+    "timestamp": "2026-10-25T18:58:06Z",
+    "agent": "brain_auditor",
+    "change": "watchdog prompt DEAD-FLAG CHECK section added (HL_COPY_TRADING_ENABLED = wallet-copy engine disabled by design; live path HL_COPY_SIGNAL_*)",
+    "type": "doc",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "dead-signal check only — watchdog flagged HL_COPY_TRADING_ENABLED as \"wire it or delete it\"",
+    "after": "dead-FLAG check: =False with a =True sibling emitter is \"disabled by design ... NO action\"",
+    "rationale": "wiring that flag would have DISABLED live copy trading; stop the recurring false sideways find",
+    "impact": "0 behavior (prompt only)"
+  },
+  {
+    "timestamp": "2026-10-25T19:52:00Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/conf_field_semantics_2026-10-25.py — measures trades.confidence (post-penalty) vs gate-time confidence divergence, the CONF_FLOOR enforcement-site no-op hazard, and the confidence-scale drift; --selfcheck PASS",
+    "type": "creative",
+    "file": "brain/analysis/conf_field_semantics_2026-10-25.py",
+    "before": "did not exist",
+    "after": "script + selfcheck reproducing LEAK=58/58, gate<30=0/649 vs stored<30=56, p50 95.0->51.8",
+    "rationale": "confidence floors were about to be calibrated against the wrong column",
+    "impact": "zero behavior; makes the hazard reproducible"
+  },
+  {
+    "timestamp": "2026-10-25T19:52:00Z",
+    "agent": "brain_auditor",
+    "change": "brain/fk_definitions.md + CONFIDENCE FIELD SEMANTICS section — pins which column each fk table measures, the three post-gate reductions, and the blocked-count self-check requirement for CONF_FLOOR",
+    "type": "doc",
+    "file": "brain/fk_definitions.md",
+    "before": "page did not distinguish trades.confidence from gate-time confidence",
+    "after": "field table + no-op warning + scale-drift note",
+    "rationale": "CEO fk ruling would otherwise ship a floor that blocks 0 of the measured cohort",
+    "impact": "ruling now carries the enforcement-site requirement"
+  },
+  {
+    "timestamp": "2026-10-25T19:52:00Z",
+    "agent": "brain_auditor",
+    "change": "decider_run.py:3796 comment block — documents that MIN_EXEC_CONFIDENCE is NOT the final cutoff (3 reductions run after it) and that any confidence floor calibrated on trades.confidence must be enforced after :4856",
+    "type": "creative",
+    "file": "scripts/decider_run.py",
+    "before": "comment at :4298 claimed MIN_EXEC 'handles the final cutoff'",
+    "after": "hazard documented at the gate site with reproduction command",
+    "rationale": "next implementer of CONF_FLOOR reads this site first",
+    "impact": "zero behavior; py_compile PASS"
   }
 ]

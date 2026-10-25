@@ -8501,5 +8501,61 @@
     "category": "data integrity",
     "status": "shipped",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-25T18:58:06Z",
+    "idea": "TAT-C LIVE FK TRIPWIRE (pre-registered, zero code)",
+    "rationale": "First 3 live variant-C fires: HBAR went on to +0.89%/4h after the cut (false kill), SAGA -0.96% after (correct save), DOGE flat (correct). fk reading 1/3=33% vs the <=20% candle-OOS bar at n=3 = not evaluable but wrong-direction.",
+    "expected_impact": "caps the shipped lever's downside at a one-flag revert (BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED False)",
+    "category": "exit quality",
+    "status": "pre-registered",
+    "risk": "low",
+    "trigger": "n>=10 fires attributed via exit_conditions LIKE '%TAT variant-C%' AND share reaching +0.40% within 4h post-exit > 20%"
+  },
+  {
+    "date": "2026-10-25T18:58:06Z",
+    "idea": "hl_copy_trader LONG quality floor watch (zero code)",
+    "rationale": "shadow WRONG-SIDE ranks hl_copy_trader LONG worst by MFE/MAE (-0.42: MFE 0.915 vs MAE -2.199, n=35); real 14d 11T 36.4% +0.07 (below 50% bar, n<15). Family carries open #16400 with the tightest stop in the book.",
+    "expected_impact": "if 14d reaches n>=15 still <45% WR with PnL<0 -> propose HL_COPY_SIGNAL_MIN_CONFIDENCE 60->75 with fk check",
+    "category": "entry sniper",
+    "status": "watchlist",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T18:58:06Z",
+    "idea": "SHIPPED (doc): watchdog DEAD-FLAG CHECK — an =False flag with a =True sibling emitter is 'disabled by design', not dead wiring",
+    "rationale": "Watchdog spent a cycle on HL_COPY_TRADING_ENABLED ('wire it or delete it'); wiring it into the signal path would DISABLE copy trading (live path = HL_COPY_SIGNAL_* all True, CEO 2026-10-08).",
+    "expected_impact": "kills a class of false sideways finds and prevents an accidental signal disable",
+    "category": "process",
+    "status": "shipped",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T19:52:00Z",
+    "idea": "CONFIDENCE FIELD SEMANTICS — pin which column means what + require blocked-count self-check on any confidence floor",
+    "rationale": "trades.confidence is POST-penalty (avg +18.18 above gate-time); _signal_metadata.final_confidence is the value MIN_EXEC_CONFIDENCE compares at decider_run.py:3796. Every fk table in brain/fk_definitions.md is measured on the post-penalty column while the natural enforcement site reads the gate-time column: 14d LEAK 58/58 stored<40 were >=40 at the gate; 30d gate-time conf<30 = 0/649 vs stored conf<30 = 56.",
+    "expected_impact": "prevents a CONF_FLOOR=30 ship that would block 0 of the 56 measured trades (structural no-op, same class as the #129 size-dampen no-op)",
+    "category": "gate integrity",
+    "status": "shipped",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-25T19:52:00Z",
+    "idea": "CONFIDENCE-SCALE DRIFT KPI (weekly, zero code until adopted)",
+    "rationale": "gate-time confidence p50 95.0 -> 51.8 and <50 binding share 12.5% -> 49.4% in one week (cell_stats _cell_mult 2026-10-14 + CONF-CALIB clamp 2026-10-15). Half the book now sits under thresholds calibrated when the median was 95. This run rejected a pump-chain+ conf>=70 floor (naive Fisher p=0.0073) purely because it straddled this change.",
+    "expected_impact": "catches the next scale change before a confidence-keyed constant silently changes meaning",
+    "criteria": "publish weekly gate-time p10/p50/p90 + share below MIN_EXEC_CONFIDENCE(40)/WRONG_SIDE_SKIP_THRESHOLD(50)/RS_DECIDER_CONF_FLOOR(60)/CONF_FLOOR(30); escalate when any binding share moves >10pp week-over-week",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-25T19:52:00Z",
+    "idea": "POST-PENALTY RE-CHECK OPTION — ordering of MIN_EXEC_CONFIDENCE decided with data, not by trusting the :4298 comment",
+    "rationale": "the comment says MIN_EXEC is the final cutoff; three reductions run after it (:4308 wrong-side, :4811 CTX-GATE WARN -20, :4856 LOSERS -50). Moving the check after :4856 matches documented intent, but measured on stored confidence a 40 floor has fkA 30.6% (FAIL) and 14d p=0.296 (FAIL).",
+    "expected_impact": "zero at threshold 40 — recorded so the ordering question gets an fk-passing threshold or stays as-is",
+    "category": "gate integrity",
+    "status": "measurement only, rejected as a ship at threshold 40",
+    "risk": "medium if shipped without fk"
   }
 ]

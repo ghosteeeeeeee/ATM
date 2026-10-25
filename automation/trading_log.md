@@ -15565,3 +15565,25 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 **Open Questions:**
 - 24h GREEN but WR dipped 68.8% → 64.7%; 7d still -$0.41
 - pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 20:29 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.09 (WR: 0.0%) | 24h: 16T 9W 56.3% +$0.27 (GREEN) | 7d 127T 44.1% -$0.50 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade last hour: ETH hl_copy_trader LONG atr_sl_hit -2.10% (-$0.09)
+- atr_sl_hit 1/16 = 6% (<40%) — dominant close = profit-monster-trail (7T +$0.37); tpsl/position_manager ATR-vs-hard-loss distinction deployed (position_manager.py:545-580)
+- Kill check: no signal with 0%WR n>=3 last hour; 24h worst bb-bounce-v2-long+ 5T 1W 20%WR -$0.02 (not 0%, n<20 regime bar)
+- No 3+ negative-hour streak: 17 +, 18 -, 19 - = 2 consecutive (watch next hour)
+- Frequency 1/hr — not overtrading
+- Entry quality: 24h winners MAE max 0.203% (both <0.5%)
+- 1 open BTC continuum-trend+ bracketed SL 80151/TP 81846
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h WR dropped 64.7% → 56.3%; 7d still -$0.50
+- Negative-hour streak at 2/3 — if 20:00 closes negative, check market regime and consider size reduction
+- pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising

@@ -148,6 +148,22 @@ families" flagged that cycle were already dead — `oversold-bounce+` (killed 20
 taken, and re-printing it costs the auditor a cycle and risks a duplicate kill proposal
 (the auditor prompt explicitly bans re-proposing shipped work).
 
+#### ⚠️ DEAD-FLAG CHECK — `False` does not mean "broken wiring" (brain_auditor #145, 2026-10-25)
+
+Before reporting a `*_ENABLED = False` flag as "dead flag — wire it up or delete it", check
+whether a **sibling flag is the live emitter** for the same feature:
+
+- `HL_COPY_TRADING_ENABLED = False` (hermes_constants.py:3854) is the **wallet-copy engine**
+  (polls other traders' fills — disabled since Aug 2026, "until tested"). The copy-trading
+  **signals** run on `HL_COPY_SIGNAL_ENABLED` / `HL_COPY_SIGNAL_PLUS_ENABLED` /
+  `HL_COPY_SIGNAL_MINUS_ENABLED`, all `True`, CEO re-enabled 2026-10-08. Wiring
+  `HL_COPY_TRADING_ENABLED` into the signal path would **disable** copy trading, not fix it.
+  Flagged as a sideways find on 2026-10-25 18:15 and answered — do not re-flag.
+
+Rule: an `= False` flag whose sibling family is `True` and emitting traffic is a
+**deliberately disabled subsystem**, not dead wiring. Report it as
+`disabled by design <date> — sibling <FLAG> is the live path, NO action`.
+
 ## Step 4: Query Session Brain for Context
 
 Search for similar past situations:

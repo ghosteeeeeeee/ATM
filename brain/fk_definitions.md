@@ -114,3 +114,39 @@ Drift trajectory of fkA-scope across #83 → #104: 16.7% → 19.0% → 20.0% →
 **Verdict unchanged but strengthened:** still HELD on the CEO fk-definition ruling. Under the standing recommendation (**fkA-literal + 14d**) it still passes at 3.1% with a +$1.88/14d save. Under fkA-family or fkA-scope on 14d it now fails outright. Do not ship without an explicit ruling — the boundary case is gone, this is now a real disagreement between definitions.
 
 **Also added this run (run #104 creative): CONF_FILTER-enforce (option B) is structurally fk-infeasible.** [70,95) covers only 54/349 = 15% of the 14d book, so "block outside" blocks 84% of trades by construction: fkA-literal 56.2% (14d) / 67.7% (30d). Both legs fail independently (leg_lo save +4.50 fk 56.2%; leg_hi save +0.81 fk 24.2% at 14d). Floor frontier: 14d last fk-passing floor = conf<45 (+2.07, 15.6%) and it is **dominated** by conf<30 (+2.14, 10.2%, 7 fewer winners killed) → CONF_FLOOR=30 is the efficient point on 14d; 30d conf<55 passes (18.0%) but fails 14d (41.4%) → window disagreement, no ship. in-window [70,95) is the keep-set at every window (+0.13 / +0.95 / +2.44) so the window is right, the enforcement scope is not. **Recommendation: rule on A and C only; drop B from the net-vs-fk framing.**
+
+---
+
+## ⚠️ CONFIDENCE FIELD SEMANTICS — which column the fk table is actually measured on
+**(added run #146, 2026-10-25 19:5x UTC — blocks a structural no-op, zero code)**
+
+`confidence` in every fk table on this page is **`trades.confidence`**, which is the
+**post-penalty** value. It is NOT the value the `MIN_EXEC_CONFIDENCE` gate sees.
+
+| field | meaning | where set |
+|-------|---------|-----------|
+| `_signal_metadata.final_confidence` | **gate-time** confidence (what `:3796` compares to `MIN_EXEC_CONFIDENCE`) | signal_compactor / hotset, pre-decider reductions |
+| `trades.confidence` | **post-penalty exec** confidence — the fk table's column | brain.py `record_trade`, after `execute_trade()` |
+
+Three reductions run **after** the gate (decider_run.py, `run()`):
+`:4308` WRONG_SIDE_PENALTY (−10) · `:4811` CTX-GATE WARN (−20 typical, 760 log lines) ·
+`:4856` LOSERS_CONF_PENALTY (−50).
+
+**Measured (14d, n=294):** 58/58 trades stored below 40 were **≥40 at the gate**
+(LEAK = every sub-40 stored trade); avg divergence **+18.18**.
+**Measured (30d, n=649):** gate-time `conf<30` = **0**, stored `conf<30` = **56**.
+
+### Consequence for the pending CONF_FLOOR ruling
+Implementing `if confidence < 30: block` **at `:3796`** would block **0 of the 56**
+trades every fk number on this page was computed on → **structural no-op**, the same
+class as the #129 size-dampen no-op. Enforcement must sit **after `:4856`** (or gate on
+`trades.confidence` semantics explicitly), and ship-time self-check must assert
+`blocked_count == 56 @30d / == 33 @14d`, not just "the floor constant exists".
+
+### Scale drift (same finding, second axis)
+`_signal_metadata.final_confidence` p50 moved **95.0 → 51.8** across the CONF-CALIB clamp
+(2026-10-15 03:41), with gate-time `<50` share moving **12.5% → 49.4%**. Drivers: cell_stats
+`_cell_mult` wiring (2026-10-14) + the clamp. Any confidence-keyed constant calibrated
+before 2026-10-14 is on the old scale.
+
+Reproduce: `python3 brain/analysis/conf_field_semantics_2026-10-25.py --selfcheck`
