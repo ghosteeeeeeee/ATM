@@ -15250,3 +15250,23 @@ Final set: ['BTC', 'ME', 'PUMP']
 **Open Questions:**
 - Watchdog ICP 5h trail-arm steer (~08:23 UTC) — executor domain
 - Health monitor next run ~05:42 — verify post-timeout-fix completion
+
+## 2026-10-25 06:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.10 (WR: 0.0%) | 24h: 12T 9W 75.0% `+$0.70` (GREEN) | 7d 123T 42.3% `-$0.74` | **size-reduce 1.0x (file absent = truth)**
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 trade: ICP r2v2-long3 LONG hard_max_loss -4.58% (-$0.10, MAE 0.78%, opened 03:25 closed 05:46) — single SL hit, r2v2-long3 14d 14T 8W `+$0.48` per audit #132, in-family, n=1 last 24h (kill bar needs 0%WR n>=3)
+- atr_sl_hit 0/12 = 0% (<40%) — dominant close = profit-monster-trail (5T +$0.43)
+- Entry quality good: 9 winners MAE max 0.574% (8/9 under 0.55%)
+- No negative-hour streak: 00:00 +$0.09, 02:00 +$0.16, 03:00 +$0.08, 05:00 -$0.10 (single negative hour, resets)
+- Frequency 1/hr — not overtrading
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN at 75.0% WR (12T); 7d still -$0.74
+- pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
