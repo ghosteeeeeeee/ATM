@@ -8453,5 +8453,14 @@
     "category": "exit engine",
     "status": "collected",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-25T15:41:56Z",
+    "idea": "Solo-bypass conversion watchlist: hh-hl+/breakout-pullback+/ema300-breakthrough- gate-blocked counterfactuals",
+    "rationale": "In STANDALONE_BYPASS, emit into shadow (16/12/9 closed rows, avg +0.65/+0.31/+0.46) but 0 live trades in 60d; 14/11/9 rows gate_blocked (CTX-GATE Layer-B SKIPPED 8 hh-hl+ avg +2.05 — by design when BTC flat; CONFLUENCE-EXPIRY rest). Is Layer-B/confluence costing us on these sources?",
+    "expected_impact": "COLLECT: promote to signal-lab conversion audit at >=20 closed gate_blocked rows AND WR>=55% AND avg net>+0.20; recheck 2026-10-28 (hh-hl+ 14, breakout-pullback+ 11 now — all n<20, no change)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

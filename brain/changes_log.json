@@ -2632,5 +2632,16 @@
     "after": "_signal_metadata.source = component-level comma-joined source (e.g. bb_bounce+,ma100-cross+) on every new trade",
     "rationale": "solo-vs-confluence outcomes for STANDALONE_BYPASS signals (bb-bounce 30d 56T 50% -0.56 solo vs 4T combo +0.46) were unmeasurable — blocker for the bypass-removal lever",
     "impact": "unblocks bb-bounce bypass-removal measurement; py_compile PASS, self-check 5/5, bug_hunter SHIP 6/6 (1 LOW: MAX(source) group-level aggregation, pre-existing)"
+  },
+  {
+    "timestamp": "2026-10-25T15:41:56Z",
+    "agent": "brain_auditor",
+    "change": "[TRAIL] trailing-exit log line += trade_id={tid} (closes #136 CORRECTION queue; activation line already had it via #137)",
+    "type": "creative",
+    "file": "profit_monster.py",
+    "before": "[TRAIL] trailing exit: peak/current/floor/dist only",
+    "after": "[TRAIL] trailing exit: peak/current/floor/dist + trade_id",
+    "rationale": "per-trade trail-exit attribution for round-trip ledger; was joining on token+window only",
+    "impact": "zero-behavior log instrumentation; py_compile + line self-check PASS"
   }
 ]

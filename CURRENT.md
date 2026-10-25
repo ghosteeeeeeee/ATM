@@ -1,91 +1,58 @@
-# Current State — brain_auditor #141 2026-10-25 15:15 UTC
-**Last Updated: 2026-10-25 15:15 UTC**
-**Updated by: brain_auditor #141. Prior: #140 14:00 (preserved in git history).**
+# Current State — brain_auditor #142 2026-10-25 15:42 UTC
+**Last Updated: 2026-10-25 15:42 UTC**
+**Updated by: brain_auditor #142. Prior: #141 15:15 (preserved in git history).**
 
-## HEADLINE — WATCHDOG HANDOFF ANSWERED: pump-chain+ EXTREME mid-band block REJECTED-WITH-DATA
-The 14:14 cycle routed PATTERN 3 ("audit pump-chain EXTREME-LONG mid-band cell") here.
-Result of the counterfactual block (EXTREME × meta_rsi 50-61):
+## HEADLINE — 1 ship (instrumentation), 0 config changes (nothing passed bars)
+`profit_monster.py` `[TRAIL] trailing exit` log line now carries `trade_id={tid}` — closes
+the #136 CORRECTION queue item (activation line already had trade_id via #137). Trail-exit
+attribution was joining on token+window only. py_compile + line self-check PASS.
+hermes_constants.py EMPTY git diff. CEO_PROTECTED flags present (SIGNALS_REGISTRY verified
+in signals/__init__), LIVE_TRADING_ENABLED True, AI_TRADER_ENABLED False.
 
-| window | blocked n | WR | pnl if blocked |
-|---|---|---|---|
-| 30d | 21 | 7W | **+$1.00** → blocking LOSES money |
-| 14d | 12 | 3W | +$0.10 (same sign) |
-| conf≥30 subset 30d | 14 | 5W | +$1.40 |
+## SLOPE-FILTER SHORT-GATE LOOSENING — pre-reg review due Oct 25: RE-CONFIRMED CLOSED
+Criteria (locked #76): SHORT ∧ n>=50 ∧ net would_pnl > +$1.00 ∧ OOS same sign ∧ blocked WR<30%.
+Actual: n=225, **net +$0.98 < +$1.00 FAIL**, blocked-WR 3.1% ok, OOS same sign but DECAYING
+(older-15d +$0.76 → last-15d +$0.22). Matches #129 close. No loosening; not re-proposed.
 
-The 7d `-0.76` (12T) is a **window artifact** — the same block is positive in both wider
-windows. V4/V5 confirmed killed (False/NEVER_REENABLE), V6 master on, HIGH block holding
-(only pre-ship HIGH trades in window). **Actual bleed = conf<30**: bare pc+ LONG conf<30 =
-26T 6W `-1.29` (identical cohort at 14d and 30d) → that is the pre-registered CONF_FLOOR
-target; fkA 6/27 = **22.2% still >20%** → hard floor stays held for the CEO fk ruling, and
-the conf<30 size-dampen 0.25x alternative (fkA=0 by construction) remains queued.
-**No new gate, no constants change (EMPTY git diff).**
-
-## SHIPPED — component co-signal `source` stamp (closes #138 "in flight")
-`decider_run.py +12L`: at trade open, `_exec_meta['source']` now carries the
-component-level confluence string the COSIG-GATE sees (e.g. `bb_bounce+,ma100-cross+`).
-Trades only ever had signal names in `trades.signal`, so solo-vs-confluence outcomes for
-STANDALONE_BYPASS signals were unmeasurable — this was the standing blocker for the
-bb-bounce bypass-removal lever (30d: solo 56T 50% `-0.56` vs combo 4T 4W `+0.46`, n=4).
-py_compile PASS, self-check 5/5, **bug_hunter SHIP 6/6** (1 LOW: MAX(source) is
-group-level not row-level — pre-existing aggregation quirk, analysis must know).
-**VERIFY: first trade opened after 15:15Z must show `_signal_metadata.source` in PG.**
-
-## GATE INTEGRITY (standing check) — 0 LEAKS
-`gate_leak_census.py --selfcheck PASS`, `--days 7`: ALLOW 10 | WAIVER 19 |
-PATH-EXEMPT 8 | PRE-RULE 0 | **LEAK 0**. Waiver active → expires **2026-10-27T00:00Z**.
-
-## LOSING AUTOPSY 48h — WRONG-SIDE REFUTED 65th CONSECUTIVE RUN
-Adverse-first `recovery_replay.py` (selfcheck PASS): **n=9 = 2 never-adverse / 4
-recovered-after-adverse / 3 NEVER** (ALT vb- `-0.17`, BTC pending `-0.08`, PUMP r2v2
-`-0.01` — all immaterial). 0 new patterns. Winning side = flat.
-Valid refs: #61 p=0.116, #84 fwd-return t=-0.04.
+## LOSING AUTOPSY 48h — WRONG-SIDE REFUTED 66th CONSECUTIVE RUN
+Adverse-first `recovery_replay.py` (selfcheck PASS): n=5 = 2 never-adverse / 2
+recovered-after-adverse / **1 NEVER** (BTC pending manual_sl_hit `-0.08`, immaterial).
+Winning side for the 5 losers: flat or already-short (SAGA/HBAR mid-band longs never armed,
+ICP RSI 72.7 chase). Valid refs: #61 p=0.116, #84 fwd t=-0.04.
 
 ## MANDATE — CHOP vs TREND (fresh)
-- **7d: trail family 53T 46W 86.8% `+3.60` vs chop exits 58T 2W `-4.74`**
-- **14d: trail family 118T 104W 88.1% `+10.03` vs chop exits 186T 6W `-14.83`**
-- armed 7d `+3.25` / unarmed `-3.97`; armed 14d `+9.17` / unarmed `-12.89`
-- 7d exits: HML 14T 0W `-1.80` (100% never armed) · atr_sl 25T 0W `-1.40` (68% never armed)
-  · profit-monster-trail 44T 39W `+2.68`
-- round-trips: 14d 42T `-2.23` / 30d 96T `-6.78` → post-arm floor D=0.20 (CEO GO) still
-  the single largest measured recovery path
+- 7d: armed (mfe>=0.40) 61T 72.1% `+3.25` vs never-armed 61T 18.0% `-3.66`
+- 7d exits: profit-monster-trail 45T 88.9% `+2.70` · hard_max_loss 14T 0W `-1.80`
+  · atr_sl_hit 25T 0W `-1.40` · stale_exit 3T 0W `-0.64`
+- 14d: armed 155T 69.7% `+8.52` vs unarmed 172T 9.3% `-12.58`
+- 24h 13T 10W 76.9% `+0.60` GREEN · 7d 122T 45.1% `-0.41` · 30d 691T `-1.99`
 
-## CREATIVE (2 measured rejections + 1 ship)
-1. **Lower-arm rescue CLOSED-WITH-DATA** — HML MFE ceiling: 14d only 4/68 (5.9%) ever
-   reached MFE 0.30, 13/68 (19%) reached 0.20; 30d 24/155 / 41/155. A lower
-   PM_TRAIL_ACTIVATE can touch ≤6% of the chop cohort → chop is entry-quality, not
-   exit-timing. Do not re-propose.
-2. **Universal TAT gap COLLECT** — 30d uncovered LONG HML ≥45m: n=19 `-2.17` but 5T are
-   killed signals → live n=14 `-1.46` across 12 signals. Below bars → re-measure at
-   n≥30 or pnl ≤ -3.00.
-3. **Source stamp shipped** (top).
+## CREATIVE (2)
+1. **Solo-bypass conversion watchlist (zero code, COLLECT)** — hh-hl+ / breakout-pullback+ /
+   ema300-breakthrough- are in STANDALONE_BYPASS, emit shadow trades (16/12/9 closed, avg
+   `+0.65`/`+0.31`/`+0.46`, WR 50/75/55.6) but **0 live trades in 60d**. 14/11/9 rows
+   gate_blocked — CTX-GATE Layer-B SKIPPED 8 hh-hl+ rows avg `+2.05` (by design when BTC
+   flat), CONFLUENCE-EXPIRY the rest. All n<20 → promote to signal-lab conversion audit at
+   >=20 closed blocked rows ∧ WR>=55 ∧ avg>+0.20. Recheck Oct 28.
+2. **[TRAIL] exit trade_id** shipped (top).
 
-## SHADOW (mandate 2b) — 2/5 answerable
-- contrarian outcome-join re-ran live (812 rows / 540 joinable): **pump-chain- flip
-  **64.1% n=343 STANDS** → Oct 27 PROMOTE; btc-pump-rider+ 25% do NOT flip; overall 49.8%
-- shadow_trader report: 20,940 signals / 20,271 closed; best gate EXEC-BLOCK (7% would_win)
-- oscillator frozen / wyckoff 304 + floor_admit 1,829 pending join / rr orphaned
+## STANDING VERIFIES
+- #141 source stamp: **0 trades opened after 15:15Z** — correct-by-traffic, first
+  post-15:15Z trade must show `_signal_metadata.source` (unblocks bb-bounce solo-vs-confluence).
+- #134 hotset MONITOR **CLEARED** — fresh 15:33 with tokens (was 0 tokens 05:56-15:33).
+- Gate census 0 LEAK (#141 15:15), waiver expires **2026-10-27T00:00Z**.
+- ai-trader-pending hourly BTC trades with AI_TRADER_ENABLED=False = trade_watchdog.py:1405
+  autopilot bracket path (NOT the disabled ai_trader_signal path) — not a leak; watchdog
+  prose "closed channel informational only" is imprecise (executor path live by design).
+- Shadow 3/5 usable: contrarian 812 rows join LIVE (pc- flip 64% n=339 stands Oct 27;
+  flip-test pump-chain-v6 LONG n=388 → SHORT better +0.206% avg = same direction);
+  oscillator frozen-by-design; wyckoff/floor pending join; rr orphaned.
 
-## LAST-RUN VERIFY (#140/#139/#135) — all PASS
-Rule 4 (WITHDRAWN) **observed working**: the 14:14 cycle's pattern_alerts now carry
-"MEASURED-REFUTED … Do NOT re-issue as actionable" — the #139→#140 re-affirmation did not
-recur. gate_leak_census ✓ · floor still 45 ✓ · ema300_duration fix present ✓ · spider
-trail tiers ✓ · constants EMPTY diff · kill flags ✓ · size-reduce file absent = 1.0x ·
-0 Tracebacks Oct 25 (log's 5 all Oct 11) · session lock absent.
-
-## STATE
-24h **15T 11W 73.3% `+0.81` GREEN** (last close 11:08Z) | 48h 28T 19W `+1.20` | 7d 121T
-44.6% `-0.43` (LONG `-0.85` / SHORT `+0.42`) | 14d 328T `-3.43` | 30d 690T `-2.01`.
-**0 open = CORRECT** on the unresolved BTC pin (AT EMA300 ~80406 for 112+ min, vol LOW,
-velocity SLOW — the exact environment where never-armed chop entries breed). EXTREME 7d
-`-0.78` is pump-chain concentration, not a regime gate (30d pc+ EXTREME LONG positive).
-Vacation mode still on (review-queue constraints active); waiver expires Oct 27;
-size 1.0x.
-
-**Readiness:** flat until 1m closes sustain above/below EMA300 for 15-30m; then align
-entries to that side; mid-band = no trade; trail-family signals first.
-
-**Next:** Oct 27 contrarian PROMOTE + waiver re-measure [35,45) + midband re-measure +
-coin_regime (n=85) · first post-ship trade = `source` stamp verification · bb-bounce
-solo-vs-confluence once n≥20 · CEO GO queue unchanged (post-arm floor D=0.20, fk ruling)
-· Nov 1 self-healing SKIP · Nov 15 floor_admit · session_brain rebuild (5th) ·
-`gate_leak_census.py` each run.
+## CEO QUEUE (unchanged, not re-measured)
+1. **Post-arm floor D=0.20 GO** — bypass cohort 30d `+2.368` p=0.019, all bars #136;
+   trail-0.20 head-to-head `+3.925`/30d vs BE-at-arm `+2.140` (#135).
+2. **CONF_FLOOR fk ruling** — fkA 22.2% > 20% bar, held.
+3. **Oct 27 cluster**: waiver expiry + mid-band re-measure + [35,45) waiver re-measure +
+   pump-chain- PROMOTE.
+Escalation #17: measurement COMPLETE (#134/#135/#136) — awaiting CEO GO; stop escalating
+as unmeasured.

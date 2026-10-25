@@ -458,7 +458,7 @@ def run_trail(positions, dry_run):
             # Now exits at trail_floor, letting R:R improve.
             if pnl <= trail_floor:
                 log(f"  [TRAIL] {pos['token']} trailing exit: peak={trail['peak_pnl']:.2f}% "
-                    f"current={pnl:.2f}% floor={trail_floor:.2f}% dist={trail_dist:.2f}%")
+                    f"current={pnl:.2f}% floor={trail_floor:.2f}% dist={trail_dist:.2f}% trade_id={tid}")
                 ok = close_position(pos["id"], pos["token"], pos["direction"],
                                     pnl, pos["current_price"], dry_run, "trail")
                 if ok:
