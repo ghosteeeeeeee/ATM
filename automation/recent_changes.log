@@ -5227,3 +5227,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-25 11:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L `+$0.09` (PURR r2v2-long3 profit-monster-trail +2.35%) | 24h 15T 11W 73.3% `+$0.81` (GREEN) | 7d 124T 44.4% `-$0.48` — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3; worst bb-bounce-v2-long+ 2T 0W n<3) | atr_sl_hit 0/15=0% under 40% | no neg streak (05:00 single -, 06/07 empty, 08/11 +) | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-25 12:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 15T 11W 73.3% `+$0.81` (GREEN) | 7d 123T 44.7% `-$0.45` — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; worst bb-bounce-v2-long+ 2T 0W n<3) | atr_sl_hit 0/15=0% under 40% | no neg streak (05:00 single -, 06/07 empty, 08/09 +, 10 empty, 11 +, 12 empty) | 0 open | No constants change -> no signal_versions entry
+BY: auto_1hr
