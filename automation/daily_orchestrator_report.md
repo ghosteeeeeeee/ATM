@@ -1,44 +1,36 @@
-# Daily Orchestrator Report — 2026-10-24
+# Daily Orchestrator Report — 2026-10-25 05:10 UTC
 
-**Mode:** implementation-only; constants_change_review_queue + vacation_mode constraints honored (nothing qualified)
-**Run:** ~04:55 UTC
-
-## Pipeline Status
-- **LIVE**, size 1.0x (marker auto-cleared 2026-10-23 22:57Z), waiver gate live since 00:00Z (flip1 expired, 0 trades since = correct-by-traffic)
-- **24h:** 20T 9W 45.0% −$0.08 | **7d:** 120T 40.0% −$1.17 | **14d:** 341T 36.4% −$4.57
-- **0 open** — flat, correct: BTC at EMA300 chop-pin (~80970), 15m+4h SHORT_BIAS, vol LOW, flip-rate ≥p95
-- Portfolio: +9.79% (dashboard). Health: OK — 0 errors/tracebacks 12h, all timers firing, prices fresh, protected flags 13/13, constants git CLEAN
+**Pipeline status:** GREEN. 0 Tracebacks in 24h. All timers active. Kill switch intact. Disk 82% (below >85% trigger).
+**24h:** 11T 9W 81.8% +$0.80 (+20.88% portfolio-pct) | **7d:** 125T 44.0% −$0.73 | **Open:** 1 — ICP LONG r2v2-long3 −0.33% (bracketed).
 
 ## Team Activity (24h)
-- **health_monitor:** all green; disk 85% borderline WARN advice (evaluated below); watchdog transient self-healed; 0 auto-fixes
-- **auto_1hr:** 12h consecutive NO CONFIG CHANGE (correct — quiet hours, no 0%WR n≥3 signals, no streaks); size-reduce auto-clear verified
-- **signal_reporter:** quiet — no kills, no boosts, no inversions. Watch: bb-bounce-v2 LONG (0/2, n too small); volume-buildup SHORT 10T 60% −$0.04 near-breakeven, not a kill
-- **brain_auditor #112/#113:** post-lapse checkpoint PASS 2nd run; hotset-starvation REFUTED with census (avg −0.171% fwd on blocked candidates, gates correctly sort noise); steer-001 vb- retraction holds 16th run; wrong-side refuted 42nd consecutive run; 0 config changes
-- **blacklist_tester:** experiment closed (77 tokens, 0 KEEP — blacklist is symptom filter, not bottleneck); batch 6 correctly skipped
-- **watchdog:** starvation escalation refined (pending-pool depth + 5min expiry)
+- **health_monitor:** all-green 03:43 run; 04:42 run KILLED BY systemd timeout (see implemented #3). Minor finds: counting-window mismatch (fixed), stale unit refs, legacy price-fetcher.timer (fixed).
+- **auto_1hr:** 6 consecutive no-change cycles — no signal hit kill/boost criteria, no param drift.
+- **signal_reporter:** quiet cycle (max 2 trades/signal, kill/boost untestable); 0 inversions — all-time inversion hits traced to FLIP mechanism disabled 2026-08-01, resolved.
+- **blacklist_tester:** experiment closed (77 tokens, 0 KEEP — blacklist is symptom filter, not bottleneck).
+- **watchdog:** WARNING — ICP stale-thesis steer (5h trail-arm window, executor domain); recommends brain_auditor regime-gate review for pump-chain+ and bb-bounce-v2-long+ (routed, not orchestrator's call — both CEO/auditor-owned).
+- **brain_auditor #132:** watchdog dead-signal-check prompt fix; floor_admit outcome join shipped (COLLECT to Nov 15); pump-chain TAT BASE-vs-VARIANT-C measured, HELD FOR CEO; pp-conditional floor MEASURED-DEAD.
 
-## Implemented Today
-1. **(L1) Zero-fire shadow key diagnostic** — queued next-candidate from upgrade_audit. Ran existing `scripts/shadow_zero_fire_diag.py`: **10 keys checked, 0 broken** (import/mapping errors). hmacd_mtf-+, bb-bounce-v3-long, open-skies+ are detector-quiet, not code-broken. Candidate closed. No code change needed.
+## Implemented Today (4 tasks, 4 first-attempt)
+1. **(L2 hygiene) Zero-fire shadow key diagnostic** — upgrade_audit next-candidate #2. Ran `shadow_zero_fire_diag.py` on bb-bounce-v3-long / hmacd_mtf-+ / open-skies+: **0 broken** (all import+mapping+detector-run OK, status=empty). hmacd/open-skies concerns stale — both ARE firing (277/27 shadow fires, latest today 04:20/03:30). bb-bounce-v3-long detector-quiet, not code-broken. Candidate closed.
+2. **(L1 bugfix) "closed today" mislabel** — `run_pipeline.py:289` and `trading-checklist.py:204` printed rolling-24h counts as "closed today", causing the health monitor's recurring counting-window false alarm (PG calendar-day 4 vs log 11). Labels now read "closed 24h". py_compile PASS; verified live on the 05:04:17 pipeline run.
+3. **(L1 bugfix) health-monitor 04:42 timeout** — first failure in ≥7d: opencode agent stalled at model cold-start (3 concurrent opencode agents, 850MB swap peak) and hit `TimeoutStartSec=600`. Fix: unit 600→1200s + `timeout 1100` wrapper in run_health_monitor.sh (same pattern as upgrade_implementer). daemon-reload PASS. Zero trading behavior.
+4. **(L1 hygiene) legacy price-fetcher.timer disabled** — enabled-but-dead unit whose backing service doesn't exist (superseded by hermes-price-collector). `systemctl disable` done, is-enabled=disabled. hermes-price-collector/1m-candle/pipeline/watchdog timers verified active.
 
 ## Evaluated, No Action (with reason)
-- **Disk 85% (17G free):** retention trigger is ">85%" per prior decision — currently AT 85%, not over. candles_1m 30d prune already live (price_collector). 15m/1h/4h (~1.4M rows) stay untouched per standing "long-horizon alt data" decision. Revisit on next WARN crossing.
-- **atr_sl_hit (#1 7d bleed, 83T armed=0/83):** candle-vs-poll arming gap — escalation #17; BE-at-arm 1m replay vehicle scheduled Oct 25. Not orchestrator's to build (audit-owned).
-- **CONF_FLOOR / TAT variant-C / fk ruling / vacation_mode off / RR engine U2-U4 / sqx- throttled re-test:** all CEO-gated. Implementing them would violate the orchestrator charter (no strategic decisions, no parameter changes without CEO approval). Stack unchanged for CEO.
-- **Signal kills/boosts:** none met criteria (kill: WR<30% + n≥5 + PnL<−$0.10; boost: WR>55% + n≥5 + PnL>$0.05). No regime-based blocks needed — no signal loses in ALL regimes with sufficient n.
+- **Candle retention (upgrade_audit next-candidate #5):** disk 82%, BELOW the >85% trigger — deferred per standing decision. **But the audit is aiming at the wrong target:** 15m/1h/4h candles total ~1.4M rows (≤300MB); the real hogs are coin_tracker.db 3.3G, session_brain.db 1.5G, and **price_history 15.3M rows / 95 days / zero prune found in price_collector.py** (~161K rows/day, ~12MB/day growth). First lever when disk crosses 85%: price_history 30d retention (~700MB+), not candle-15m/1h/4h.
+- **pump-chain+ / bb-bounce-v2-long+ regime gates (watchdog rec):** requires regime-performance analysis + CEO approval; both already in auditor queue / CEO stack. Orchestrator charter forbids signal enable/disable decisions.
+- **CEO stack:** CONF_FLOOR fk ruling, pump-chain TAT BASE-vs-VARIANT-C, UGB-BE enforcement, Oct-27 contrarian PROMOTE, Nov-15 floor_admit bar — all CEO-gated, untouched.
+- **Signal kills/boosts:** none met criteria (max 2 trades/signal in 24h window).
 
 ## Critical Issues
-- None. Kill switch, blacklist, pipeline, timers, locks all healthy. 0 Tracebacks in 12h.
-
-## CURRENT.md
-- Fresh (updated 2026-10-24 04:40 UTC by brain_auditor #113, <1h old). No staleness, no orchestrator edits made — no new decisions from this run to add.
+- None. Kill switch, pipeline, locks, DBs healthy.
 
 ## Next Steps
-1. **CEO stack (unchanged, blocking most work):** fk ruling → CONF_FLOOR bare + confidence-tail package | TAT variant-C GO | vacation_mode off (20th run of drift) | flip#2 decoupled
-2. **Oct 25 eval batch (audit-owned):** BE-at-arm 1m replay (escalation #17), MFE-CUT, HML-SHADOW, habitat, re-enter, UGB, short-gate, first CONF-FILTER-SHADOW read
-3. **Next orchestrator run:** re-check disk vs >85% trigger; re-run zero-fire diag only if new shadow keys registered
+1. **CEO stack (unchanged, blocking):** fk ruling → CONF_FLOOR | TAT BASE-vs-VARIANT-C ruling | UGB-BE | Oct-27 contrarian PROMOTE | Nov-15 floor_admit bar
+2. **Oct 25 eval batch (audit-owned):** BE-at-arm 1m replay (escalation #17, 78th), MFE-CUT, habitat, re-enter, short-gate
+3. **Watchdog ICP steer:** 5h trail-arm condition (~08:23 UTC) — executor domain, reported not self-executed
+4. **Next orchestrator run:** disk vs >85% trigger (use price_history lever if crossed); re-verify health-monitor completes post-timeout-fix; zero-fire diag only if new shadow keys registered
 
 ## Quality Metrics
-- Tasks completed: 1 (zero-fire diagnostic)
-- First-attempt success: 100%
-- Critical issues found: 0
-- Note: quiet cycle by design — nearly all queued levers are CEO-gated or audit-owned. No busywork invented.
+- Tasks completed: 4 | First-attempt success: 100% | Retries: 0 | Critical issues found: 1 (health-monitor timeout, fixed same-run)

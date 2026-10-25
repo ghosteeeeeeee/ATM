@@ -15231,3 +15231,22 @@ Final set: ['BTC', 'ME', 'PUMP']
 **Open Questions:**
 - 24h GREEN at 81.8% WR but low volume (11T); 7d still -$0.73
 - pump-chain+ kill criteria still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-25 05:10 UTC Daily Orchestrator
+
+**Trades:** 24h: 11T 9W 81.8% `+$0.80` (GREEN) | 7d: 125T 44.0% `-$0.73` | 1 open: ICP r2v2-long3 LONG -0.33% bracketed
+
+**Implemented (4/4 first-attempt):**
+1. Zero-fire shadow key diagnostic (upgrade_audit #2 closed) — 0 broken keys; bb-bounce-v3-long detector-quiet; hmacd/open-skies stale concern (both firing today)
+2. "closed today" → "closed 24h" label fix in run_pipeline.py:289 + trading-checklist.py:204 — recurring health-monitor counting-window false alarm root-caused (rolling-24h query mislabeled as calendar-day); verified live 05:04:17
+3. health-monitor 04:42 timeout fix — TimeoutStartSec 600→1200 + timeout 1100 wrapper (opencode cold-start stall under 3 concurrent agents + swap); first failure in ≥7d
+4. Legacy price-fetcher.timer disabled (enabled-but-dead, service nonexistent, superseded by hermes-price-collector)
+
+**No Action:**
+- Candle retention deferred (disk 82%, below >85% trigger) — but audit target WRONG: 15m/1h/4h candles ≤300MB; real hogs coin_tracker.db 3.3G + session_brain.db 1.5G + price_history 15.3M rows/95d NO PRUNE (~12MB/day). First lever at 85%: price_history 30d retention
+- pump-chain+ / bb-bounce-v2-long+ regime gates: auditor/CEO-owned, not orchestrator's call
+- No signal kills/boosts (max 2 trades/signal); no constants changes; hermes_constants.py untouched
+
+**Open Questions:**
+- Watchdog ICP 5h trail-arm steer (~08:23 UTC) — executor domain
+- Health monitor next run ~05:42 — verify post-timeout-fix completion
