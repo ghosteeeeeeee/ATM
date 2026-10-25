@@ -31,6 +31,8 @@ Self-check: python3 brain/analysis/trail_distance_oos_2026-10-25.py --selfcheck
 import sys, json, sqlite3, argparse, datetime as dt
 import psycopg2
 
+sys.path.insert(0, '/root/.hermes/scripts')
+
 ARM_DEFAULT = 0.0040
 DEFAULT_DISTS = (0.002, 0.003, 0.005, 0.008, 0.012, 0.016)  # 0.20 / 0.30 / 0.50 / 0.80 / 1.20 / 1.60 %
 
@@ -55,7 +57,35 @@ def pnl_from(amount, entry, exitp, direction):
     return float(amount) * frac
 
 
-def run(days_list=(7, 14, 30), dists=DEFAULT_DISTS, scoped=False, arm_on='high'):
+_PM_BYPASS = None
+
+
+def _cohort_of(sig, exitr):
+    """Escalation #17 decomposition cohorts (#135):
+    pm        -> exit engine IS profit-monster-trail (engine-based, so a bypass
+                 signal that still exited on PM trail counts as 'pm' — 11 such
+                 trades in 30d, e.g. ai-trader+/trend-ride+; noted, not a bug)
+    bypass    -> signal exempt from PM by design (PROFIT_MONSTER_BYPASS_SIGNALS,
+                 matched the same way profit_monster.py does: `s in signal`)
+                 AND exits on some other engine
+    pm_elig   -> PM-eligible signal that still exited on a non-PM engine
+    no_signal -> NULL signal: live PM SQL is `AND NOT (signal LIKE ...)`, and
+                 NOT NULL is NULL -> PM never manages these (bug_hunter #136 M1)
+    """
+    global _PM_BYPASS
+    if _PM_BYPASS is None:
+        from hermes_constants import PROFIT_MONSTER_BYPASS_SIGNALS as _P
+        _PM_BYPASS = tuple(_P)
+    if not sig:
+        return 'no_signal'
+    if (exitr or '').replace('_', '-').startswith('profit-monster'):
+        return 'pm'
+    if any(s in sig for s in _PM_BYPASS):
+        return 'bypass'
+    return 'pm_elig'
+
+
+def run(days_list=(7, 14, 30), dists=DEFAULT_DISTS, scoped=False, arm_on='high', cohort=None):
     pg = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres')
     candles = sqlite3.connect('/root/.hermes/data/candles.db')
     out = {}
@@ -70,6 +100,8 @@ def run(days_list=(7, 14, 30), dists=DEFAULT_DISTS, scoped=False, arm_on='high')
             if scoped:
                 trades = [t for t in trades
                           if (t[11] or '') != 'EXTREME' and 'volume-' not in (t[10] or '').lower()]
+            if cohort and cohort != 'all':
+                trades = [t for t in trades if _cohort_of(t[10], t[7]) == cohort]
             mid = cutoff + (now - cutoff) / 2
             n = len(trades)
             missing = armed_n = armed_winners = winners = 0
@@ -263,9 +295,16 @@ def selfcheck():
     assert med < 0.005 and frac_ok >= 0.90, f"pnl_from mismatch med={med:.4f} frac_ok={frac_ok}"
     assert med_wrong > 3 * med, f"units guard weak: lev-scaled med={med_wrong:.4f} vs {med:.4f}"
     con.close()
+    # cohort labels (bug_hunter #136: NULL-signal 3-valued logic + underscore exit_reason)
+    assert _cohort_of(None, 'atr_sl_hit') == 'no_signal'
+    assert _cohort_of('', 'hard_sl') == 'no_signal'
+    assert _cohort_of('r2v2-long3', 'profit_monster_trail') == 'pm'      # underscore variant
+    assert _cohort_of('ai-trader+', 'profit-monster-trail') == 'pm'       # engine-first, documented
+    assert _cohort_of('hl_copy_trader', 'atr_sl_hit') == 'bypass'
+    assert _cohort_of('r2v2-long3', 'atr_sl_hit') == 'pm_elig'
     print(f"selfcheck PASS: arm gate + close-through trail sweep + never-armed + post-close "
           f"excluded + SHORT + units rule (med_err {med:.4f}, {frac_ok:.0%} rows <0.02, "
-          f"lev-scaled rejected med {med_wrong:.4f})")
+          f"lev-scaled rejected med {med_wrong:.4f}) + cohort labels (NULL/underscore/engine-first)")
 
 
 if __name__ == '__main__':
@@ -275,13 +314,19 @@ if __name__ == '__main__':
     ap.add_argument('--scoped', action='store_true',
                     help='non-EXTREME + exclude volume- (same scope as the 2026-10-17 ARM-BE verdict)')
     ap.add_argument('--dists', type=str, default=None, help='comma list in %% e.g. 0.2,0.3,1.2')
+    ap.add_argument('--cohort', type=str, default='all',
+                    choices=('all', 'pm', 'bypass', 'pm_elig'),
+                    help='escalation #17 sub-cohort (pm=pilot trail exit, bypass=PM-exempt '
+                         'signal on another engine, pm_elig=PM-eligible but non-PM exit)')
     a = ap.parse_args()
     if a.selfcheck:
         selfcheck()
         sys.exit(0)
     dists = tuple(float(x) / 100.0 for x in a.dists.split(',')) if a.dists else DEFAULT_DISTS
-    res = run(scoped=a.scoped, dists=dists, arm_on='close' if a.arm_close else 'high')
+    res = run(scoped=a.scoped, dists=dists, arm_on='close' if a.arm_close else 'high',
+              cohort=a.cohort)
     print(json.dumps(res, indent=1, default=str))
+    print(f"### cohort={a.cohort} scoped={a.scoped} arm_on={'close' if a.arm_close else 'high'}")
     for d, r in sorted(res.items()):
         aw = r['armed_winners']
         print(f"=== {d}d n={r['n']} no_candles={r['no_candles']} armed={r['armed']} armed_W={aw} "

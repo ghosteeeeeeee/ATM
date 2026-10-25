@@ -1,0 +1,36 @@
+##### COHORT bypass
+### cohort=bypass scoped=True arm_on=high
+=== 7d n=32 no_candles=1 armed=15 armed_W=9 winners=9
+   D=0.20%  fills= 12 NET +0.048 (save +0.519 / harm -0.471) savedL=6 zeroedW=0 dmgW=5 fk_zeroed=0.0% (HOUSE <20%) fk_delta=55.6%  halves old +0.476 new -0.427 t=0.12 p=0.9064  [n FAIL | net>0 | halves FAIL | fk<20 | p FAIL]
+=== 14d n=71 no_candles=1 armed=33 armed_W=20 winners=22
+   D=0.20%  fills= 29 NET +1.323 (save +1.841 / harm -0.518) savedL=11 zeroedW=0 dmgW=7 fk_zeroed=0.0% (HOUSE <20%) fk_delta=35.0%  halves old +1.275 new +0.048 t=2.142 p=0.041  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+=== 30d n=94 no_candles=1 armed=46 armed_W=25 winners=27
+   D=0.20%  fills= 41 NET +2.368 (save +3.421 / harm -1.052) savedL=19 zeroedW=0 dmgW=11 fk_zeroed=0.0% (HOUSE <20%) fk_delta=44.0%  halves old +0.796 new +1.572 t=2.446 p=0.019  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+##### COHORT pm_elig
+### cohort=pm_elig scoped=True arm_on=high
+=== 7d n=16 no_candles=0 armed=4 armed_W=1 winners=1
+   D=0.20%  fills=  4 NET +0.356 (save +0.365 / harm -0.010) savedL=3 zeroedW=0 dmgW=1 fk_zeroed=0.0% (HOUSE <20%) fk_delta=100.0%  halves old +0.076 new +0.279 t=2.336 p=0.1016  [n FAIL | net>0 | halves>0 | fk<20 | p FAIL]
+=== 14d n=38 no_candles=0 armed=11 armed_W=2 winners=2
+   D=0.20%  fills= 11 NET +1.013 (save +1.023 / harm -0.010) savedL=8 zeroedW=0 dmgW=1 fk_zeroed=0.0% (HOUSE <20%) fk_delta=50.0%  halves old +0.657 new +0.356 t=3.463 p=0.0061  [n FAIL | net>0 | halves>0 | fk<20 | p<0.05]
+=== 30d n=101 no_candles=4 armed=15 armed_W=3 winners=3
+   D=0.20%  fills= 15 NET +1.281 (save +1.371 / harm -0.090) savedL=11 zeroedW=1 dmgW=2 fk_zeroed=33.3% (HOUSE <20%) fk_delta=66.7%  halves old +0.199 new +1.082 t=3.704 p=0.0024  [n FAIL | net>0 | halves>0 | fk FAIL | p<0.05]
+##### COHORT pm
+### cohort=pm scoped=True arm_on=high
+=== 7d n=26 no_candles=0 armed=26 armed_W=24 winners=24
+   D=0.20%  fills= 25 NET -0.267 (save +0.250 / harm -0.517) savedL=1 zeroedW=0 dmgW=11 fk_zeroed=0.0% (HOUSE <20%) fk_delta=45.8%  halves old -0.157 new -0.110 t=-1.129 p=0.2703  [n>=20 | net FAIL | halves FAIL | fk<20 | p FAIL]
+=== 14d n=45 no_candles=0 armed=45 armed_W=42 winners=42
+   D=0.20%  fills= 44 NET -0.516 (save +0.402 / harm -0.919) savedL=2 zeroedW=0 dmgW=19 fk_zeroed=0.0% (HOUSE <20%) fk_delta=45.2%  halves old -0.249 new -0.267 t=-1.471 p=0.1485  [n>=20 | net FAIL | halves FAIL | fk<20 | p FAIL]
+=== 30d n=172 no_candles=0 armed=155 armed_W=143 winners=145
+   D=0.20%  fills=137 NET +0.276 (save +2.442 / harm -2.166) savedL=8 zeroedW=2 dmgW=53 fk_zeroed=1.4% (HOUSE <20%) fk_delta=37.1%  halves old +0.791 new -0.515 t=0.446 p=0.656  [n>=20 | net>0 | halves FAIL | fk<20 | p FAIL]
+=== 7d n=32 no_candles=1 armed=15 armed_W=9 winners=9
+   D=0.10%  fills= 13 NET +0.027 (save +0.481 / harm -0.454) savedL=6 zeroedW=0 dmgW=6 fk_zeroed=0.0% (HOUSE <20%) fk_delta=66.7%  halves old +0.423 new -0.397 t=0.067 p=0.9474  [n FAIL | net>0 | halves FAIL | fk<20 | p FAIL]
+   D=0.30%  fills= 11 NET +0.049 (save +0.467 / harm -0.419) savedL=6 zeroedW=0 dmgW=4 fk_zeroed=0.0% (HOUSE <20%) fk_delta=44.4%  halves old +0.414 new -0.365 t=0.127 p=0.9015  [n FAIL | net>0 | halves FAIL | fk<20 | p FAIL]
+   D=0.50%  fills=  9 NET -0.100 (save +0.366 / harm -0.466) savedL=5 zeroedW=0 dmgW=3 fk_zeroed=0.0% (HOUSE <20%) fk_delta=33.3%  halves old +0.292 new -0.392 t=-0.251 p=0.808  [n FAIL | net FAIL | halves FAIL | fk<20 | p FAIL]
+=== 14d n=71 no_candles=1 armed=33 armed_W=20 winners=22
+   D=0.10%  fills= 30 NET +1.381 (save +1.868 / harm -0.487) savedL=11 zeroedW=0 dmgW=8 fk_zeroed=0.0% (HOUSE <20%) fk_delta=40.0%  halves old +1.354 new +0.027 t=2.202 p=0.0357  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.30%  fills= 28 NET +1.318 (save +1.742 / harm -0.424) savedL=11 zeroedW=0 dmgW=7 fk_zeroed=0.0% (HOUSE <20%) fk_delta=35.0%  halves old +1.269 new +0.049 t=2.222 p=0.0349  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.50%  fills= 24 NET +1.009 (save +1.476 / harm -0.466) savedL=10 zeroedW=0 dmgW=3 fk_zeroed=0.0% (HOUSE <20%) fk_delta=15.0%  halves old +1.110 new -0.100 t=1.759 p=0.0919  [n>=20 | net>0 | halves FAIL | fk<20 | p FAIL]
+=== 30d n=94 no_candles=1 armed=46 armed_W=25 winners=27
+   D=0.10%  fills= 43 NET +2.441 (save +3.490 / harm -1.049) savedL=19 zeroedW=0 dmgW=11 fk_zeroed=0.0% (HOUSE <20%) fk_delta=44.0%  halves old +0.811 new +1.630 t=2.473 p=0.0175  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.30%  fills= 40 NET +2.247 (save +3.246 / harm -0.998) savedL=19 zeroedW=0 dmgW=11 fk_zeroed=0.0% (HOUSE <20%) fk_delta=44.0%  halves old +0.681 new +1.566 t=2.361 p=0.0233  [n>=20 | net>0 | halves>0 | fk<20 | p<0.05]
+   D=0.50%  fills= 36 NET +1.590 (save +2.715 / harm -1.126) savedL=18 zeroedW=0 dmgW=7 fk_zeroed=0.0% (HOUSE <20%) fk_delta=28.0%  halves old +0.393 new +1.197 t=1.696 p=0.0989  [n>=20 | net>0 | halves>0 | fk<20 | p FAIL]

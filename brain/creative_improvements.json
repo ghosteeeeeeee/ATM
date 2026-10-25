@@ -8315,5 +8315,23 @@
     "category": "re-entry",
     "status": "rejected-with-data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-25T09:45:00Z",
+    "idea": "UNIVERSAL POST-ARM TRAIL FLOOR (D=0.20) for PM-exempt engines — ship vehicle = shadow line first (automatic-implementation)",
+    "rationale": "Escalation #17 final piece measured this run: bypass cohort (41 fills/30d) has NO post-arm floor by design and owns +$2.368/30d of giveback — 30d halves +0.796/+1.572, t=2.446 p=0.019, fk_zeroed 0.0% = ALL 5 house bars; 14d +1.323 p=0.041 also passes; D 0.10/0.20/0.30 all pass (not knife-edge). PM's own cohort net +0.276 p=0.66 = already optimal, so NO CEO-protected constant changes.",
+    "expected_impact": "+$2.2-2.4/30d recovered; one new floor for pump-exit/rr_engine/hl_fill_monitor/volbo_atr trades",
+    "category": "exit ownership",
+    "status": "suggested",
+    "risk": "low (shadow first, PM untouched, revert = remove shadow flag)"
+  },
+  {
+    "date": "2026-10-25T09:45:00Z",
+    "idea": "pm_activation_coverage as a standing weekly KPI (zero new code — brain/analysis/pm_activation_coverage_2026-10-25.py, selfcheck PASS)",
+    "rationale": "Pre-registered #135 eval executed: 230 armed PM-eligible trades/30d, 216 covered (93.9%), 14 uncovered (-$1.10) with dwells 2.7m-755m = ownership/eligibility gap, NOT a 60s poll race (kills the cadence-fix hypothesis). uncovered n=14 < 20 bar -> COLLECT.",
+    "expected_impact": "early warning on trail-ownership leaks; re-eval at uncovered n>=20",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "none"
   }
 ]
