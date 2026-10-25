@@ -1,141 +1,134 @@
 {
-  "timestamp": "2026-10-25T01:46:58Z",
-  "run": 130,
+  "timestamp": "2026-10-25T02:37:00Z",
+  "run": 131,
   "session_brain_stats": {
-    "note": "session brain query skipped — prior runs #124-129 covered drift/recurring; focus on UGB-PT ship"
+    "queries": 3,
+    "top_hits": "signal performance/winrate regime; new signal idea improvement strategy; UGB giveback protector",
+    "note": "session_brain loads and returns hits (HF warning benign); no new unimplemented idea surfaced beyond queued Oct-27 stack"
   },
   "trade_summary_24h": {
-    "trades": 9,
-    "wins": 7,
-    "pnl": 0.56,
-    "note": "GREEN"
-  },
-  "trade_summary_7d": {
-    "trades": 125,
-    "wins": 52,
-    "pnl": -1.0,
-    "exit_reasons": [
-      {
-        "exit": "hard_max_loss",
-        "n": 14,
-        "w": 0,
-        "pnl": -1.79
-      },
-      {
-        "exit": "atr_sl_hit",
-        "n": 29,
-        "w": 0,
-        "pnl": -1.63
-      },
-      {
-        "exit": "stale_exit",
-        "n": 3,
-        "w": 0,
-        "pnl": -0.64
-      },
-      {
-        "exit": "hard_sl",
-        "n": 5,
-        "w": 0,
-        "pnl": -0.41
-      },
-      {
-        "exit": "trail_arm_timeout",
-        "n": 9,
-        "w": 2,
-        "pnl": -0.26
-      },
-      {
-        "exit": "cut_loser",
-        "n": 1,
-        "w": 0,
-        "pnl": -0.12
-      },
-      {
-        "exit": "cut-loser-CL-T1",
-        "n": 1,
-        "w": 0,
-        "pnl": -0.11
-      },
-      {
-        "exit": "manual_sl_hit",
-        "n": 1,
-        "w": 0,
-        "pnl": -0.08
-      }
-    ]
+    "trades": 10,
+    "wins": 8,
+    "wr": 80.0,
+    "pnl": 0.72,
+    "status": "GREEN",
+    "losers": [
+      "HBAR bb-bounce-v2-long+ trail_arm_timeout -0.010",
+      "CHIP volume-buildup- profit-monster-trail -0.060"
+    ],
+    "d_7d": {
+      "trades": 126,
+      "wr": 42.1,
+      "pnl": -0.84,
+      "LONG": "87T 41.4% -1.11",
+      "SHORT": "39T 43.6% +0.27"
+    },
+    "d_14d": {
+      "trades": 327,
+      "wr": 37.6,
+      "pnl": -3.01,
+      "armed": "160T 70.0% +9.85",
+      "unarmed": "163T 6.1% -12.90"
+    },
+    "mandate_fresh_14d": "profit-monster-trail 77T 90.9% +5.01 vs hard_max_loss 69T 0% -6.66 + atr_sl_hit 78T 1.3% -5.64",
+    "exits_7d": "PM-trail 40T 87.5% +2.43 | hard_max_loss 14T 0% -1.79 | atr_sl_hit 29T 0% -1.63"
   },
   "shadow_analysis": {
-    "contrarian": "807 rows, outcome join live. pump-chain- flip-WR 63.9% (n=338) — Oct-27 PROMOTE stands. btc-pump-rider+ flip only 25% — do not flip. Overall flip 49.5% (n=535).",
-    "oscillator": "FROZEN BY DESIGN (OSCILLATOR_MULT_ENABLED=True since Oct 1). 24,598 rows all actual_outcome=null. Pre-live evidence only.",
-    "wyckoff": "298 rows, 0 with outcome — pending join, not answerable.",
-    "floor_admit": "1787 rows, 0 with outcome — pending join, not answerable.",
-    "rr_shadow": "ORPHANED (no producer, 21d stale) — do not cite.",
-    "ugb": "NEW: enforcement live run #130. Shadow would-fires observed 01:30-01:33 on HYPE #16383 (live 0.67-0.69 vs trigger 0.7078).",
-    "overall": "1/5 useful (contrarian only) + UGB now enforced. oscillator/wyckoff/floor/rr not answerable."
+    "contrarian": "RE-RAN fresh: 807 rows / 535 joinable. pump-chain- flip-WR 63.9% (n=338) = Oct-27 PROMOTE stands; btc-pump-rider+ 25.0% (n=196) flip REFUTED; total 49.5%.",
+    "oscillator": "FROZEN by design — JSONL 24,598 rows (json.load crashes; masquerade), actual_outcome null, mtime Oct 1. Pre-live evidence only.",
+    "wyckoff": "300 rows, no outcome column, still being written (mtime 02:29) — pending outcome join, not answerable.",
+    "floor_admit": "1,787 rows, fields = confidence/floor bookkeeping only, no outcome column (mtime 01:15) — pending pre-registered join.",
+    "rr_shadow": "ORPHANED — mtime Oct 4, no producer in repo. Do not cite.",
+    "shadow_trader_report": "19,250 signals / 18,613 closed. Gate justification: CONFLUENCE-EXPIRY blocked 10033 would_win 48% avg -0.12; EXEC-BLOCK 15 would_win 7%. Wrong-side table flags hl_copy_trader LONG n=33 MFE 0.96 / MAE -2.34 (MFE/MAE -0.41) and volume-breakout-long+ n=219 (killed). analyze-hml run: peak-buyers + wrong-side tables read, no new live action.",
+    "overall": "2/5 useful: contrarian (live outcome join) + UGB (now live enforcement + new forward ledger). oscillator frozen / wyckoff+floor pending joins / rr orphaned."
   },
   "drift_findings": [],
   "recurring_problems": [
-    "UGB enforcement pending since 2026-10-22 (EXT #44) — SHIPPED this run (CEO GO was in stack)",
-    "hl_copy_trader exit quality — bypass list shields from profit_monster, family 30d 3W/12T -0.20 — logged as creative improvement, needs fill-monitor audit"
+    "7d LONG bleed -1.11 (87T) vs SHORT +0.27 (39T) — allocation, not direction: covered by mid-band 45-65 work (sweet-spot BOOST reverted #122, dampen REJECTED #128, re-measure Oct 27). No new lever this run.",
+    "Chop exits own the bleed: 7d hard_max_loss+atr_sl_hit = 43T 0 wins -3.42 vs PM-trail 40T 87.5% +2.43 (mandate confirmed fresh)."
   ],
   "missing_implementations": [
-    "Escalation #17 (75th): exit-ladder / BE-at-arm candle OOS — still not commissioned, blocks family-scoped MFE-CUT"
+    "CONF_FLOOR=30 — held on CEO fk ruling (fkA 41.7% FAIL / fkB 20.0%); dampen alternative DEAD (base==HL_MIN no-op, #129).",
+    "pump-chain+ kill — criteria MET-by-letter 14d but NO-KILL recommended (30d +1.84); CEO GO queued (6th run).",
+    "UGB-BE enforcement — still pending; PT subsumes giveback path, BE only matters for gap-through-PT.",
+    "Escalation #17 (77th): exit-ladder/BE-at-arm candle OOS — still blocks family-scoped MFE-CUT (bb-bounce) + pump-exit round-trip counterfactual."
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-25T01:46:58Z",
-      "idea": "hl_copy_trader exit-quality audit: bypass list shields copy trades from profit_monster but family 30d 3W/12T -0.20, avg hold 118m. Measure hl_fill_monitor effectiveness; if weak, remove from PROFIT_MONSTER_BYPASS_SIGNALS.",
-      "rationale": "Watchdog flagged HYPE MFE +1.16% given back with no manager. UGB-PT now backstops unarmed giveback, but root question is whether fill monitor delivers exits at all.",
-      "expected_impact": "Recover giveback bleed on copy trades (-$0.20/30d current)",
+      "date": "2026-10-25T02:37:00Z",
+      "idea": "UGB-PT forward-return ledger (shipped brain/analysis/ugb_pt_forward.py, selfcheck PASS)",
+      "rationale": "Yesterday's UGB-PT enforcement (#130) had a save-side retrospective but no standing harm-side check. Every future fire now measures fwd 15/30/60m price-move vs exit price (price-move %, never pnl_pct). Subagent review applied before commit: direction-signed deltas (SHORT fires would have inverted harm math), ts-targeted bar lookup (was positional off-by-one +1-2min), closed-bar-only guard, mode=ro sqlite, selfcheck now asserts horizon-set against elapsed time.",
+      "expected_impact": "validates or kills the giveback protector with data before UGB-BE is stacked on it",
       "category": "exit quality",
-      "status": "suggested",
-      "risk": "medium — fill monitor interaction unknown"
-    }
-  ],
-  "config_changes_applied": [
+      "status": "shipped",
+      "risk": "low"
+    },
     {
-      "change": "UGB-PT enforcement LIVE (unarmed-half)",
-      "file": "scripts/position_manager.py",
-      "flag": "UGB_PT_ENFORCE = True",
-      "evidence": "30d candle OOS n=179 unarmed +85.48pp sign-p 0.00000, positive all 3 split halves, ex-top3 +78.85pp; CEO GO 2026-10-24",
-      "guard": "profit_monster trail-state (NOT trades.trailing_activated — bug_hunter HIGH: DB col is close-time-only)",
-      "kill_switch": "UGB_PT_ENFORCE=False or ARM_BE_SHADOW_ENABLED=False",
-      "bug_hunter": "1 HIGH fixed (unarmed guard used wrong signal), 1 MEDIUM fixed (exit_detail label live= -> pnl=), comments updated"
+      "date": "2026-10-25T02:37:00Z",
+      "idea": "Arm-rate-by-signal chop KPI (zero code, 14d n>=15)",
+      "rationale": "Mandate question 1 measured: doji 35.3% / pump-chain+ 39.1% / ai-trader+ 41.7% / bb-bounce 45.5% arm rates = chop-entry signals (first 3 killed/disabled); volume-buildup- 72.7% arm + 68.2% WR = trend signal. Standing rule: n>=15 AND arm%<40 AND PnL<0 = entry-quality candidate; currently only pump-chain+ qualifies and CONF_FLOOR/kill queue already owns it.",
+      "expected_impact": "catches new chop signals before they bleed 20 trades",
+      "category": "entry sniper",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
     {
+      "run": 130,
+      "change": "UGB-PT enforcement live (unarmed giveback peak-trail exit)",
+      "verdict": "WORKING — first live fire HYPE #16383 02:18:17 exit 76.561 = peak 1.11% - 0.30% giveback, +0.80% cash / +3.97% @5x / +$0.16; log line 'UGB-PT EXIT HYPE LONG +0.80% [fav=+1.11% giveback 0.30%]'; family hl_copy_trader previously 0W/4L 7d. BTC #16385 correctly EXCLUDED (PM trail state armed peak 0.8114). First ledger datapoint: fwd15 +0.129% (hold would have beaten exit by 0.13pp, n=1, 15m window)."
+    },
+    {
       "run": 129,
-      "change": "conf<30 dampen alternative killed (structural no-op)",
-      "status": "verified — no-op confirmed, base==HL_MIN"
+      "change": "0 config (Oct-25 eval batch 5/6)",
+      "verdict": "no changes to verify"
     },
     {
       "run": 128,
-      "change": "mid-band 45-60 size-dampen rejected",
-      "status": "held — recheck Oct 27"
-    },
-    {
-      "run": 127,
-      "change": "ARM-BE DB-state fix",
-      "status": "PASS — 0 fires correct-by-traffic"
-    },
-    {
-      "run": 126,
-      "change": "contrarian outcome join shipped",
-      "status": "PASS — re-ran: pc- 63.9% stands"
-    },
-    {
-      "run": 122,
-      "change": "LONG_RSI_SWEET_SPOT_BOOST 10->0",
-      "status": "monitor — 5T 4W +0.32 since revert, small n"
+      "change": "0 config (2 creative logged)",
+      "verdict": "no changes to verify"
     }
   ],
+  "losing_trade_autopsy": {
+    "method": "brain/analysis/recovery_replay.py adverse-first (selfcheck PASS) — NOT the vacuous open-anchored replay",
+    "window_48h": {
+      "n": 13,
+      "never_adverse": 3,
+      "recovered_after_adverse": 5,
+      "never_traded_back": 5
+    },
+    "never_cohort": [
+      "ALT vb- SHORT -0.17",
+      "CC vb- SHORT -0.15",
+      "ZRO vb- SHORT -0.11",
+      "BTC ai-trader-pending SHORT -0.08",
+      "PUMP r2v2-long9 -0.01"
+    ],
+    "verdict": "WRONG-SIDE REFUTED 55th consecutive run — independent standing evidence #61 opposite-side p=0.116, #84 forward-return t=-0.04. 5/13 NEVER = 38% vs 14d baseline 17.5% (n=13, monitor only; 3/5 are the Oct-23 volume-buildup- waiver class already gated).",
+    "winning_side": "flat — chop entries that never armed; volume-buildup- family itself still 14d 22T 68.2% +0.58"
+  },
+  "signal_deep_dive": {
+    "new_targets": "none — 7d sub-50% n>=10: pump-chain+ LONG 14T 14.3% -0.85 (kill MET-by-letter, NO-KILL stands, CEO) and bb-bounce-v2-long+ 18T 44.4% -0.59 (TAT-C live + family MFE-CUT pre-registered, needs esc#17)",
+    "arm_rate_14d_n15": "doji 35.3% (killed) | pump-chain+ 39.1% | ai-trader+ 41.7% (disabled) | bb-bounce 45.5% | pump-chain- 65.7% | volume-buildup- 72.7%"
+  },
+  "watchdog_steer_triage": [
+    "profit_lock HYPE SL->BE: MOOT — UGB-PT closed it 02:18 at +0.80% (better level than breakeven)",
+    "profit_lock BTC SL 79972->80292: NO ACTION by brain_auditor — PM trail armed (floor ~+0.61% = ~80783 > BE) binds before the exchange stop; exchange stop is gap backstop and PM ratchets it upward as peak rises. Manual stop moves = executor/CEO domain (precedent #84).",
+    "cluster 2-long vs breadth SHORT_BIAS: no third long (watchdog), BTC-specific reads all support the hold",
+    "opportunity ZORA SHORT 45-55 RSI skip: n=8 priced, band rule correctly blocks a 25% WR band — no change"
+  ],
   "next_actions": [
-    "Watch UGB-PT first live fire — HYPE trigger 0.7078 (unarmed), BTC armed-excluded",
-    "Oct-27: contrarian pc- PROMOTE 63.9% + coin_regime re-measure + mid-band dampen re-measure",
-    "CEO: pump-chain+ kill (recommend NO-KILL, 30d +1.85) + CONF_FLOOR fk ruling (fkA 41.7% FAIL)",
-    "Escalation #17: commission exit-ladder candle OOS (75th)",
-    "Verify LONG_RSI_SWEET_SPOT_BOOST revert at n>=20"
-  ]
+    "CEO: pump-chain+ GO/NO-GO (recommend NO-KILL) + CONF_FLOOR fk ruling (dampen dead) + UGB-BE GO (PT subsumes giveback path)",
+    "Oct 27: contrarian pump-chain- PROMOTE 63.9% + coin_regime re-measure + mid-band dampen re-measure",
+    "Watch UGB-PT ledger — first fire mild harm datapoint (+0.129% fwd15); evaluate at n>=20",
+    "Escalation #17 (77th): exit-ladder/BE-at-arm candle OOS — blocks MFE-CUT family scope + pump-exit counterfactual"
+  ],
+  "health": {
+    "constants_git_diff": "EMPTY",
+    "size_reduce": "file absent = 1.0x",
+    "tracebacks": "4 total in pipeline.log, newest Oct 11, 0 today",
+    "session_lock": "absent"
+  }
 }

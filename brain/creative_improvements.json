@@ -8157,5 +8157,27 @@
     "category": "exit quality",
     "status": "suggested",
     "risk": "medium — fill monitor interaction unknown, measure before changing bypass list"
+  },
+  {
+    "date": "2026-10-25T02:37:00Z",
+    "idea": "UGB-PT forward-return ledger (shipped brain/analysis/ugb_pt_forward.py, selfcheck PASS)",
+    "rationale": "Yesterday's UGB-PT enforcement (#130) had a save-side retrospective but no standing harm-side check. Every future fire now measures fwd 15/30/60m price-move vs exit price (price-move %, never pnl_pct).",
+    "expected_impact": "validates or kills the giveback protector with data before UGB-BE is stacked on it",
+    "category": "exit quality",
+    "status": "shipped",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 131
+  },
+  {
+    "date": "2026-10-25T02:37:00Z",
+    "idea": "Arm-rate-by-signal chop KPI (zero code, 14d n>=15)",
+    "rationale": "Mandate question 1 measured: doji 35.3% / pump-chain+ 39.1% / ai-trader+ 41.7% / bb-bounce 45.5% arm rates = chop-entry signals (first 3 killed/disabled); volume-buildup- 72.7% arm + 68.2% WR = trend signal. Standing rule: n>=15 AND arm%<40 AND PnL<0 = entry-quality candidate; currently only pump-chain+ qualifies and CONF_FLOOR/kill queue already owns it.",
+    "expected_impact": "catches new chop signals before they bleed 20 trades",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 131
   }
 ]

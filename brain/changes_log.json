@@ -2379,5 +2379,27 @@
     "after": "UGB-PT closes live on unarmed-half giveback; UGB-BE stays shadow; ARM_BE_SHADOW_ENABLED gates both (kill switch)",
     "rationale": "30d candle OOS n=179 unarmed +85.48pp sign-p 0.00000, positive all 3 split halves. CEO GO 2026-10-24. Live demo: HYPE #16383 fav +1.01% unarmed, would lock profit on 25% WR family. BTC #16385 armed in PM trail state -> correctly excluded.",
     "impact": "Closes unarmed trades giving back from peak+0.40% to peak-0.30%; expected +85pp/30d on unarmed cohort; armed half excluded (measured harm -0.43pp)"
+  },
+  {
+    "timestamp": "2026-10-25T02:37:00Z",
+    "agent": "brain_auditor",
+    "change": "UGB-PT forward-return ledger script (zero-behavior eval for #130 ship)",
+    "type": "creative",
+    "file": "brain/analysis/ugb_pt_forward.py",
+    "before": "no standing harm-side check for ugb_pt exits",
+    "after": "offline script + --selfcheck; fwd 15/30/60m price-move vs exit; criteria pre-registered (n>=20, net fwd30<=0 AND harm<40%)",
+    "rationale": "validate giveback protector with data before stacking UGB-BE",
+    "impact": "evaluation vehicle only, zero live behavior"
+  },
+  {
+    "timestamp": "2026-10-25T02:44:00Z",
+    "agent": "brain_auditor",
+    "change": "ugb_pt_forward.py review fixes (direction-sign, ts-targeted bars, closed-bar guard, ro sqlite, selfcheck)",
+    "type": "creative",
+    "file": "brain/analysis/ugb_pt_forward.py",
+    "before": "direction-blind deltas / positional bar index / no is_closed guard / rw sqlite connect",
+    "after": "signed by direction, bar selected by target ts, only finished bars, mode=ro, selfcheck asserts horizon set",
+    "rationale": "subagent review: SHORT fires would have inverted harm math; positional index off-by-one +1-2min",
+    "impact": "zero live behavior; first datapoint corrected +0.195% -> +0.129%"
   }
 ]
