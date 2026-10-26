@@ -85,6 +85,11 @@ def run():
     try:
 
         def live_pnl_at(token, entry, t_min, open_time):
+            # direction-aware (FIX 2026-10-26 brain_auditor #153): live_pnl is the
+            # TRADE's unleveraged pnl, so a SHORT gains when price FALLS. The old
+            # always-(close-entry)/entry returned the LONG-equivalent for --dir SHORT,
+            # inverting the variant-C condition (it cut shorts that were in PROFIT).
+            # Mirror of exit_ladder_tat_grid_2026-10-17.py:58-60.
             target = int(to_dt(open_time).timestamp()) + t_min * 60
             r = cdb.execute(
                 "SELECT close FROM candles_1m WHERE token=? AND ts<=? ORDER BY ts DESC LIMIT 1",
@@ -92,7 +97,8 @@ def run():
             ).fetchone()
             if r is None:
                 return None
-            return (r[0] - float(entry)) / float(entry) * 100.0
+            pct = (r[0] - float(entry)) / float(entry) * 100.0
+            return -pct if SCOPE_DIR == "SHORT" else pct
 
         summary = {}
         for name, sig in COHORTS:
@@ -170,6 +176,10 @@ def selfcheck():
     # sign: benefit positive means firing helped
     cf, actual = -0.019, -0.140
     assert cf - actual > 0, "cutting a deeper loss must be a benefit"
+    # instrument guard (#153): a --dir SHORT probe must use trade-signed pnl, else the
+    # variant-C condition cuts shorts that are IN PROFIT (inverted test).
+    assert 'return -pct if SCOPE_DIR == "SHORT" else pct' in open(__file__).read(), \
+        "direction-aware live_pnl sign flip missing — SHORT probes are inverted"
     # live wiring: enforcement must be importable, gated, and have its own dedup set so
     # a prior non-negative shadow sighting cannot suppress a later negative cut.
     import re

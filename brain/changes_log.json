@@ -2808,5 +2808,27 @@
     "after": "git add -A then git restore --staged scripts/hermes_constants.py when it is in the changed set, with a loud print",
     "rationale": "Root-cause fix: hermes-daily-commit.timer stages ALL files at 07:15, so an unlogged constants edit between agent runs would be auto-committed and become permanent. This is how a rejected change can silently become HEAD. Constants changes must be deliberate + logged by the agent that makes them.",
     "impact": "Rogue/unlogged hermes_constants.py edits can no longer ride into the daily auto-commit; py_compile PASS, 5-case predicate self-check PASS"
+  },
+  {
+    "timestamp": "2026-10-26T03:45:32Z",
+    "agent": "brain_auditor",
+    "change": "tat_variant_c_candle_oos live_pnl_at made direction-aware for --dir SHORT",
+    "type": "tweak",
+    "file": "analysis/tat_variant_c_candle_oos_2026-10-24.py",
+    "before": "return (close-entry)/entry*100 for every direction (LONG-signed)",
+    "after": "pct computed once, negated when SCOPE_DIR=='SHORT'; selfcheck asserts the flip line",
+    "rationale": "Instrument bug: a --dir SHORT probe fired on shorts IN PROFIT, inverting the variant-C test. Mirrors exit_ladder_tat_grid_2026-10-17.py:58-60.",
+    "impact": "Zero live-trading behavior. Corrects SHORT TAT verdicts; --selfcheck PASS reproduces prior LONG numbers exactly."
+  },
+  {
+    "timestamp": "2026-10-26T03:45:32Z",
+    "agent": "brain_auditor",
+    "change": ".git/hooks/commit-msg sanitizer for $-expansion corruption",
+    "type": "tweak",
+    "file": ".git/hooks/commit-msg (new, local/untracked)",
+    "before": "no hook — 47/2000 commit subjects corrupted as -/usr/bin/bash.NN",
+    "after": "sed repairs [+-]/usr/bin/bash.NN and [+-]/bin/bash.NN -> [+-]$0.NN with a stderr notice; clean messages untouched",
+    "rationale": "Root-cause guard for the AGENTS.md BASH QUOTING RULE at the single commit path. Prevents the 07:15 daily sweep and every agent commit from writing more corrupted subjects.",
+    "impact": "Audit trail preserved going forward; git history deliberately NOT rewritten (no force-push). 3-case self-test PASS."
   }
 ]

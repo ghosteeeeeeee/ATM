@@ -8722,5 +8722,41 @@
     "category": "data hygiene",
     "status": "measured-logged",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-26T03:45:32Z",
+    "idea": "DIRECTION-AWARE candle OOS instrument — fix --dir SHORT sign inversion in tat_variant_c_candle_oos",
+    "rationale": "The harness accepted --dir SHORT but always computed (close-entry)/entry, so a SHORT probe fired when the short was IN PROFIT (cutting winners). exit_ladder_tat_grid_2026-10-17.py:58-60 already flips the sign; this was the same bug class in the newer harness. My own first SHORT numbers this run (net -$6.51 to -$7.06) were inverted and are retracted.",
+    "expected_impact": "Corrects every future --dir SHORT probe; the corrected answer (T=60 net +$0.10/30d) still rejects SHORT TAT, but now for the right reason",
+    "category": "instrument integrity",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T03:45:32Z",
+    "idea": "commit-msg sanitizer for $-expansion corruption in commit subjects",
+    "rationale": "47 of the last 2000 commit subjects are corrupted ('3T -/usr/bin/bash.11' = -$0.11 unquoted in bash); latest was 2 hours ago (4386032f). The auditor reads git history as the change log, so this silently degrades the audit trail. Two renderings exist (/usr/bin/bash. 93x, /bin/bash. 3x) plus 84 in-file instances. Enforcement does not exist anywhere — AGENTS.md only states the rule.",
+    "expected_impact": "Zero future corrupted subjects; history left alone (no force-push)",
+    "category": "audit-trail hygiene",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T03:45:32Z",
+    "idea": "COST-RECONCILE the short-supply question (why two instruments disagreed)",
+    "rationale": "expiry_shadow says expired SHORT 14d excess_4h +0.0795% (t=+4.22, n=8685 = would win) while shadow_trades net_pnl_pct on the same blocked shorts is -0.0798% (t=-7.77 = would lose). Measured fee 0.04 + slippage 0.10 = 0.1400% round-trip (gross-net = 0.1400 exactly, n=10815) > 0.0795% edge. Both instruments were right: the edge is real but BELOW COST.",
+    "expected_impact": "Closes a standing ambiguity without a config change; gives a numeric ship bar for the Oct-31 re-measure",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T03:45:32Z",
+    "idea": "SHORT trail-arm-timeout (the coverage gap: 42 SHORT unarmed / 14d / -$3.22 with zero TAT coverage because all three TAT gates sit behind `if direction == 'LONG'`)",
+    "rationale": "Position_manager.py:3735 gates every arm-timeout on direction=='LONG', so SHORT stalls ride to hard_max_loss/atr_sl (14d: 13T HML + 19T atr_sl on the SHORT unarmed cohort). Tested properly after the sign fix.",
+    "expected_impact": "NIL — REJECTED: 30d candle OOS T=30/45/60 net -$0.62/-$0.21/+$0.10. Logged so nobody re-derives the coverage gap as an obvious win.",
+    "category": "exit engine",
+    "status": "rejected-with-data",
+    "risk": "low"
   }
 ]
