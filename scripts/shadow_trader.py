@@ -66,6 +66,16 @@ SHADOW_TRIAL_MIN_TRADES = 200         # Min trades per direction for review
 SHADOW_TRIAL_MIN_WR = 55.0            # Min WR to justify wider stops
 SHADOW_TRIAL_REVIEW_DAYS = 7          # Days before review
 
+# ── Shadow Trial: Extended Time Exits (CEO verdict 2026-10-26) ────────────────
+# CEO Q3: "Extend time-based exits as shadow experiment."
+# Peak p50 219m vs soft-trail 2h implies exits ~100min before median peak.
+# Test: extend trail_arm_timeout and universal_hold to let winners run longer.
+SHADOW_TIME_TRIAL_ENABLED = True      # Master switch for extended time exit trial
+SHADOW_TIME_TRIAL_ARM_TIMEOUT_MULT = 2.0   # 2x current timeout (60min→120min, 45min→90min)
+SHADOW_TIME_TRIAL_UNIVERSAL_HOLD_EXTRA_MIN = 240  # +4h extra hold (480min→720min)
+SHADOW_TIME_TRIAL_MIN_TRADES = 100    # Min trades for review
+SHADOW_TIME_TRIAL_MIN_WR_IMPROVEMENT = 5.0  # Min WR improvement to justify (pp)
+
 # Pump Exit constants (hermes_constants.py:4403-4407)
 PUMP_EXIT_TRAIL_MULT = 3.0     # ATR multiplier for trailing stop
 PUMP_EXIT_MOMENTUM_VEL = -0.5  # 5m velocity threshold for momentum exit
@@ -141,6 +151,7 @@ def get_db():
             exit_pump_exit_json JSON,
             exit_ride_it_json JSON,
             exit_wider_sl_json JSON,  -- Shadow trial: wider SL for LONG (CUT_LOSER -6, ATR_SL_MAX 4.0)
+            exit_extended_time_json JSON,  -- Shadow trial: extended time exits (2x arm timeout, +4h universal hold)
             first_exit_engine TEXT,
             first_exit_price REAL,
             first_exit_pnl_pct REAL,
@@ -192,6 +203,10 @@ def get_db():
         pass  # column already exists
     try:
         conn.execute("ALTER TABLE shadow_trades ADD COLUMN exit_wider_sl_json JSON")
+    except sqlite3.OperationalError:
+        pass  # column already exists
+    try:
+        conn.execute("ALTER TABLE shadow_trades ADD COLUMN exit_extended_time_json JSON")
     except sqlite3.OperationalError:
         pass  # column already exists
     
@@ -649,6 +664,74 @@ def _simulate_atr_sl_tp_wider(entry_price, direction, candles, atr_pct, leverage
     return {'fired': False, 'exit_type': 'no_exit', 'exit_price': last_close,
             'exit_ts': candles[-1][0], 'pnl_pct': pnl,
             'hold_minutes': (candles[-1][0] - candles[0][0]) / 60}
+
+
+def _simulate_extended_time(entry_price, direction, candles, source, atr_pct=None):
+    """Simulate extended time exits (CEO Q3 trial 2026-10-26).
+
+    Tests longer timeouts for time-based exits:
+    - trail_arm_timeout: 2x current (60min→120min, 45min→90min)
+    - universal_hold: +4h extra (480min→720min)
+
+    Uses the SAME logic as the original engines but with extended timeouts.
+    Returns the exit that would fire first under extended time limits.
+    """
+    if not candles:
+        return None
+
+    entry_ts = candles[0][0]
+
+    # Determine extended timeouts
+    bare = (source or '').rstrip('+-')
+    if 'bb-squeeze' in bare:
+        arm_timeout_min = BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN * SHADOW_TIME_TRIAL_ARM_TIMEOUT_MULT
+    elif 'pump-chain' in bare:
+        arm_timeout_min = PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN * SHADOW_TIME_TRIAL_ARM_TIMEOUT_MULT
+    else:
+        arm_timeout_min = 60 * SHADOW_TIME_TRIAL_ARM_TIMEOUT_MULT  # default 60min → 120min
+
+    # Universal hold: extended
+    ride_it_substrings = ('ride_it', 'trend-ride', 'trend_ride', 'volume-breakout', 'volume_breakout', 'mover-')
+    if any(sub in bare for sub in ride_it_substrings):
+        universal_hold_min = RIDE_IT_MAX_HOLD_MIN
+    else:
+        universal_hold_min = UNIVERSAL_MAX_HOLD_MIN + SHADOW_TIME_TRIAL_UNIVERSAL_HOLD_EXTRA_MIN
+
+    # Simulate trail_arm_timeout with extended timeout
+    # Trail activates at PM_TRAIL_ACTIVATE_PCT (0.40%)
+    trail_activated = False
+    arm_exit = None
+
+    for ts, o, h, l, c in candles:
+        current_pnl = (c / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / c - 1) * 100
+
+        # Check trail activation
+        if current_pnl >= PM_TRAIL_ACTIVATE_PCT * 100:
+            trail_activated = True
+
+        # Check arm timeout (extended)
+        hold_min = (ts - entry_ts) / 60
+        if not trail_activated and hold_min >= arm_timeout_min:
+            arm_exit = {'fired': True, 'exit_type': 'ext_arm_timeout', 'exit_price': c,
+                       'exit_ts': ts, 'pnl_pct': current_pnl, 'hold_minutes': hold_min}
+            break
+
+        # Check universal hold (extended)
+        if hold_min >= universal_hold_min:
+            arm_exit = {'fired': True, 'exit_type': 'ext_universal_hold', 'exit_price': c,
+                       'exit_ts': ts, 'pnl_pct': current_pnl, 'hold_minutes': hold_min}
+            break
+
+    if arm_exit:
+        return arm_exit
+
+    # No time-based exit fired — hold to end
+    last_close = candles[-1][4]
+    pnl = (last_close / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / last_close - 1) * 100
+    return {'fired': False, 'exit_type': 'no_time_exit', 'exit_price': last_close,
+            'exit_ts': candles[-1][0], 'pnl_pct': pnl,
+            'hold_minutes': (candles[-1][0] - entry_ts) / 60,
+            'arm_timeout_min': arm_timeout_min, 'universal_hold_min': universal_hold_min}
 
 
 def _simulate_pm_trail(entry_price, direction, candles, source, vol_regime):
@@ -1212,6 +1295,11 @@ def close_events():
             if SHADOW_TRIAL_ENABLED and d == SHADOW_TRIAL_DIRECTION:
                 wider_sl_result = _simulate_atr_sl_tp_wider(entry_price, d, candles, atr_pct, leverage)
             
+            # Shadow trial: extended time exits (CEO verdict 2026-10-26)
+            extended_time_result = None
+            if SHADOW_TIME_TRIAL_ENABLED:
+                extended_time_result = _simulate_extended_time(entry_price, d, candles, src, atr_pct)
+            
             # Determine first exit to fire (deterministic tie-break per spec §4.0)
             # Loss-side precedence: HML → Cut Loser Hard → Cut Loser T2 → Cut Loser T1 → ATR SL → Speed Stale → Trail Arm → Universal
             # Profit-side precedence: ATR TP → PM Trail → Speed Stale Winner
@@ -1272,7 +1360,7 @@ def close_events():
                         exit_cut_loser_json=?, exit_speed_stale_json=?, exit_universal_hold_json=?,
                         exit_trail_arm_timeout_json=?, exit_rr_engine_json=?,
                         exit_pump_exit_json=?, exit_ride_it_json=?,
-                        exit_wider_sl_json=?,
+                        exit_wider_sl_json=?, exit_extended_time_json=?,
                         first_exit_engine=?, first_exit_price=?, first_exit_pnl_pct=?,
                         first_exit_hold_minutes=?, first_exit_reason=?,
                         gross_pnl_pct=?, net_pnl_pct=?,
@@ -1285,6 +1373,7 @@ def close_events():
                       json.dumps(results.get('trail_arm_timeout')), json.dumps(results.get('rr_engine')),
                       json.dumps(results.get('pump_exit')), json.dumps(results.get('ride_it')),
                       json.dumps(wider_sl_result) if wider_sl_result is not None else None,
+                      json.dumps(extended_time_result) if extended_time_result is not None else None,
                       first_engine, first_result['exit_price'], gross_pnl,
                       first_result['hold_minutes'], first_result['exit_type'],
                       gross_pnl, net_pnl, mfe, mae, sid))
@@ -2352,6 +2441,107 @@ def report_wider_sl():
         conn.close()
 
 
+def report_extended_time():
+    """Report current vs extended time exits (CEO Q3 trial 2026-10-26)."""
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        
+        log("\n" + "=" * 60)
+        log("EXTENDED TIME EXIT SHADOW TRIAL REPORT")
+        log("=" * 60)
+        log(f"ARM TIMEOUT: {SHADOW_TIME_TRIAL_ARM_TIMEOUT_MULT}x current ({BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN}min→{BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN*SHADOW_TIME_TRIAL_ARM_TIMEOUT_MULT}min, {PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN}min→{PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN*SHADOW_TIME_TRIAL_ARM_TIMEOUT_MULT}min)")
+        log(f"UNIVERSAL HOLD: +{SHADOW_TIME_TRIAL_UNIVERSAL_HOLD_EXTRA_MIN}min extra ({UNIVERSAL_MAX_HOLD_MIN}min→{UNIVERSAL_MAX_HOLD_MIN + SHADOW_TIME_TRIAL_UNIVERSAL_HOLD_EXTRA_MIN}min)")
+        log("=" * 60)
+        
+        # Count signals with extended time simulation
+        cur.execute("""
+            SELECT COUNT(*) FROM shadow_trades 
+            WHERE closed=1 AND exit_extended_time_json IS NOT NULL
+        """)
+        n = cur.fetchone()[0]
+        log(f"\nSignals with extended time simulation: {n}")
+        
+        if n == 0:
+            log("No data yet — run --close to generate simulations.")
+            return
+        
+        # Current vs extended comparison
+        log("\n--- CURRENT vs EXTENDED TIME (all signals) ---")
+        cur.execute("""
+            SELECT 
+                COUNT(*) as n,
+                ROUND(100.0*SUM(CASE WHEN first_exit_pnl_pct > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as cur_wr,
+                ROUND(SUM(first_exit_pnl_pct),1) as cur_total,
+                ROUND(AVG(first_exit_pnl_pct),3) as cur_avg,
+                ROUND(100.0*SUM(CASE WHEN json_extract(exit_extended_time_json, '$.pnl_pct') > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as ext_wr,
+                ROUND(SUM(json_extract(exit_extended_time_json, '$.pnl_pct')),1) as ext_total,
+                ROUND(AVG(json_extract(exit_extended_time_json, '$.pnl_pct')),3) as ext_avg
+            FROM shadow_trades 
+            WHERE closed=1 AND exit_extended_time_json IS NOT NULL
+              AND json_extract(exit_extended_time_json, '$.pnl_pct') IS NOT NULL
+        """)
+        row = cur.fetchone()
+        if row and row[0] > 0:
+            n, cur_wr, cur_total, cur_avg, ext_wr, ext_total, ext_avg = row
+            log(f"  Metric                         Current        Extended      Delta")
+            log(f"  {'-'*60}")
+            log(f"  Trades                              {n:>6}          {n:>6}           +0")
+            log(f"  Win Rate                         {cur_wr:>6.1f}%        {ext_wr:>6.1f}%        {ext_wr - cur_wr:>+6.1f}%")
+            log(f"  Total PnL                       {cur_total:>+8.1f}%      {ext_total:>+8.1f}%      {ext_total - cur_total:>+8.1f}%")
+            log(f"  Avg PnL                          {cur_avg:>+7.3f}%      {ext_avg:>+7.3f}%      {ext_avg - cur_avg:>+7.3f}%")
+        
+        # Evidence threshold
+        log("\n--- EVIDENCE THRESHOLD ---")
+        log(f"  Required: WR improvement >= {SHADOW_TIME_TRIAL_MIN_WR_IMPROVEMENT}pp with >= {SHADOW_TIME_TRIAL_MIN_TRADES} trades")
+        if row and row[0] >= SHADOW_TIME_TRIAL_MIN_TRADES:
+            wr_improvement = ext_wr - cur_wr
+            log(f"  Extended: WR improvement = {wr_improvement:+.1f}pp, trades = {n}")
+            if wr_improvement >= SHADOW_TIME_TRIAL_MIN_WR_IMPROVEMENT:
+                log(f"  ✅ THRESHOLD MET — WR improved {wr_improvement:+.1f}pp")
+            else:
+                log(f"  ❌ THRESHOLD NOT MET — WR improvement {wr_improvement:+.1f}pp < {SHADOW_TIME_TRIAL_MIN_WR_IMPROVEMENT}pp")
+        else:
+            log(f"  ⏳ Collecting data: {n}/{SHADOW_TIME_TRIAL_MIN_TRADES} trades")
+        
+        # Exit type breakdown
+        log("\n--- EXTENDED TIME EXIT TYPES ---")
+        cur.execute("""
+            SELECT json_extract(exit_extended_time_json, '$.exit_type') as ext_type,
+                   COUNT(*) as n,
+                   ROUND(100.0*SUM(CASE WHEN json_extract(exit_extended_time_json, '$.pnl_pct') > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
+                   ROUND(AVG(json_extract(exit_extended_time_json, '$.pnl_pct')),3) as avg_pnl
+            FROM shadow_trades 
+            WHERE closed=1 AND exit_extended_time_json IS NOT NULL
+              AND json_extract(exit_extended_time_json, '$.pnl_pct') IS NOT NULL
+            GROUP BY ext_type
+            ORDER BY n DESC
+        """)
+        for r in cur.fetchall():
+            log(f"  {r[0]:<25} n={r[1]:>5}  WR={r[2]:>5.1f}%  Avg={r[3]:+.3f}%")
+        
+        # Direction breakdown
+        log("\n--- BY DIRECTION ---")
+        cur.execute("""
+            SELECT direction,
+                   COUNT(*) as n,
+                   ROUND(100.0*SUM(CASE WHEN first_exit_pnl_pct > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as cur_wr,
+                   ROUND(100.0*SUM(CASE WHEN json_extract(exit_extended_time_json, '$.pnl_pct') > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as ext_wr,
+                   ROUND(SUM(first_exit_pnl_pct),1) as cur_total,
+                   ROUND(SUM(json_extract(exit_extended_time_json, '$.pnl_pct')),1) as ext_total
+            FROM shadow_trades 
+            WHERE closed=1 AND exit_extended_time_json IS NOT NULL
+              AND json_extract(exit_extended_time_json, '$.pnl_pct') IS NOT NULL
+            GROUP BY direction
+        """)
+        for r in cur.fetchall():
+            log(f"  {r[0]:>6}: n={r[1]:>5}  WR: {r[2]:.1f}% → {r[3]:.1f}% ({r[3]-r[2]:+.1f}pp)  Total: {r[4]:+.1f}% → {r[5]:+.1f}% ({r[5]-r[4]:+.1f}%)")
+        
+        log("\n" + "=" * 60)
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description='Shadow-Mode Paper Trading System')
     ap.add_argument('--record', action='store_true', help='Snapshot ALL signals')
@@ -2372,12 +2562,13 @@ def main():
     ap.add_argument('--sweep-hml', action='store_true', help='Sweep HML thresholds')
     ap.add_argument('--sweep-sl', action='store_true', help='Sweep SL levels')
     ap.add_argument('--report-wider', action='store_true', help='Compare current vs wider SL (shadow trial)')
+    ap.add_argument('--report-time', action='store_true', help='Compare current vs extended time exits (shadow trial)')
     args = ap.parse_args()
     
     run_all = not (args.record or args.close or args.report or args.reclose or 
                    args.purge or args.analyze_hml or args.flip_test or 
                    args.analyze_exits or args.analyze_hold or args.sweep_arm or 
-                   args.sweep_hml or args.sweep_sl or args.report_wider)
+                   args.sweep_hml or args.sweep_sl or args.report_wider or args.report_time)
     
     if run_all or args.record:
         record()
@@ -2403,6 +2594,8 @@ def main():
         sweep_sl_levels(args.sweep_signal, args.sweep_dir)
     if args.report_wider:
         report_wider_sl()
+    if args.report_time:
+        report_extended_time()
     if args.purge:
         purge()
     
