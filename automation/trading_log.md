@@ -16180,3 +16180,22 @@ Detail: CAKE bb-bounce-v2-long+ LONG trail_arm_timeout '-$0.03' (-0.82%)
 **Open Questions:**
 - 24h -$0.92 / 7d -$1.02 still red; pump-chain+ worst 24h signal (-$0.36, 7T 57% WR: big losers) — profitable in EXTREME regime, no action
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28, n=3 0W 24h now)
+
+## 2026-10-26 23:28 UTC Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (no closes) | 24h: 29T 14W 48.3% '-$0.84' | 7d 141T 44.7% '-$1.02' | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 2/29 = 6.9% (<40%); dominant closes = profit-monster-trail (8T +$0.29), ugb_pt (8T +$0.14)
+- Kill check: bb-bounce-v2-long+ 3T 0W 24h already flagged for CEO (13:28, all-regime 14d loss) — no duplicate; pump-chain- n=2 <3; others n=1
+- Streak: 22 -0.03, 23 empty → 0 consecutive negative hours
+- Frequency 0/hr — not overtrading
+- 2 open bracketed: ZORA volume-buildup- SHORT, AERO breakout-pullback-/warrior-sr-confirm- SHORT
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.84 / 7d -$1.02 still red
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28); habitat ledger #170 shows 87% of 30d habitat blocked
