@@ -2764,5 +2764,27 @@
     "after": "measures 1.5x 5m entry-vol gate on pump-chain+ 30d",
     "rationale": "creative mandate #150; naive hypothesis refuted, inverse chase-block pre-registered",
     "impact": "measurement only, no trading behavior change"
+  },
+  {
+    "timestamp": "2026-10-26T01:40:47Z",
+    "agent": "brain_auditor",
+    "change": "brain/fk_definitions.md — CONF_FLOOR CORRECTION section: #150 fkB label error (claimed 12.6% comfortable, actual 16/55=29.1% FAIL); fresh fk table 14d/30d; ship-time pins updated 55@14d/56@30d",
+    "type": "doc",
+    "file": "brain/fk_definitions.md",
+    "before": "no #151 section; last numbers pinned at 32T/4W era (fkB 12.5%)",
+    "after": "correction section with actual fkB 29.1%/20.5%/28.6% FAIL and CEO-waiver requirement",
+    "rationale": "CEO queue text was based on a mislabeled fkA-literal value; sanity bar actually crosses 20% — ruling stakes corrected",
+    "impact": "zero trading behavior; CEO CONF_FLOOR ruling now includes explicit fkB waive/reject"
+  },
+  {
+    "timestamp": "2026-10-26T01:40:47Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/postarm_giveback_census_2026-10-26.py — PM-exempt reached-arm->stop-exit baseline for D=0.20 validation; --selfcheck PASS; 14d 25T -1.35 / 49% giveback share locked",
+    "type": "creative",
+    "file": "brain/analysis/postarm_giveback_census_2026-10-26.py",
+    "before": "n/a (new analysis script, zero live behavior)",
+    "after": "ships with --selfcheck and pre-registered post-ship bars",
+    "rationale": "creative mandate #151; validates pending D=0.20 CEO GO with before/after measurement",
+    "impact": "zero live behavior; measurement vehicle"
   }
 ]

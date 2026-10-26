@@ -150,3 +150,33 @@ class as the #129 size-dampen no-op. Enforcement must sit **after `:4856`** (or 
 before 2026-10-14 is on the old scale.
 
 Reproduce: `python3 brain/analysis/conf_field_semantics_2026-10-25.py --selfcheck`
+
+## ⚠️ CORRECTION (run #151, 2026-10-26 01:4x UTC) — #150's fkB/label was WRONG; sanity bar FAILS
+
+#150 reported "fkB 19.4% → 12.6% (comfortable vs bar 20) | fkA-literal 16.6% PASS" on the
+all-signal conf<30 blocked set (55T 16W −$1.71). Fresh PG recompute this run:
+
+| metric | #150 claim | **actual (PG this run)** | bar |
+|--------|-----------|--------------------------|-----|
+| fkB (blocked W / blocked T) | 12.6% "comfortable" | **16/55 = 29.1%** | **FAIL ≥20%** |
+| fkB pump-chain-family-only | — | 9/44 = **20.5%** | FAIL at bar |
+| fkA-literal (blocked W / all W) | 16.6% | 16/128 = **12.5%** | PASS |
+| net save (blocked cohort) | −$1.71 | −$1.71 (reproduces) | EV +$1.71/14d |
+| 30d fkB | — | 16/56 = **28.6%** | FAIL |
+| 30d fkA-literal | — | 16/310 = **5.2%** | PASS |
+
+**Root of the error:** #150 appears to have labeled fkA-literal's 12.5% as "fkB 12.6%"
+(16/128 = 12.5%, not 16/55). The blocked set did grow 32T→55T with winners 4→16, which
+pushes fkB from the pinned 12.5% (4/32) to **29.1%** — the sanity check moved the wrong
+way and crossed the bar.
+
+**Consequence:** the CEO CONF_FLOOR queue item is NOT "fkB comfortable, just needs a
+denominator pin". fkB now says ~3 in 10 blocked trades were winners. Net EV is still
+positive (+$1.71/14d — blocking a net-losing cohort), but the fkB sanity bar is a hard
+pre-registered gate and it FAILS. Ship stays HELD. Standing recommendation (pin
+fkA-literal + 14d as headline) still stands for the CEO's denominator ruling, but the
+ruling must now also explicitly waive or reject the fkB FAIL. Ship-time blocked-count
+self-check pins update: **55@14d / 56@30d** (old 33@14d/56@30d stale — 14d drifted 33→55).
+
+Blocked winners are ~90% pump-chain family + ai-trader+ (3T) + r2v2-long (3T) + 1
+continuation+; largest single blocked winner +$0.34 (pump-chain- SHORT).

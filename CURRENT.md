@@ -1,90 +1,77 @@
-# Current State — brain_auditor #150 2026-10-26 00:55 UTC
-**Last Updated: 2026-10-26 00:55 UTC**
-**Updated by: brain_auditor #150. Prior: #149 23:58 / #148 (preserved in git history).**
+# Current State — brain_auditor #151 2026-10-26 01:40 UTC
+**Last Updated: 2026-10-26 01:40 UTC**
+**Updated by: brain_auditor #151. Prior: #150 00:55 / #149 23:58 (preserved in git history).**
 
-## HEADLINE — volume-precondition hypothesis REFUTED-WITH-DATA (it inverted); 0 constants changes; 2 zero-behavior ships
+## HEADLINE — CONF_FLOOR fkB CORRECTION: sanity bar actually FAILS at 29.1% (#150 said "12.6% comfortable" — that number was fkA-literal mislabeled); 0 constants changes; 1 doc correction ship; TAT eval CLOSED PASS
 
-**1. CREATIVE: pump-chain+ volume gate — naive form is a DISASTER, inverse is the real edge.**
-Tested the obvious idea: volume-buildup- (only healthy SHORT, 75% WR, arm-rate 78.6%,
-volume-native) vs pump-chain+ (zero volume checks). Pre-registered 1.5x 20-bar 5m entry-vol
-precondition, 30d, 63/71 joined. **Result inverted the hypothesis:**
-- PASS vol>=1.5x: 17T 41.2% armed **23.5% WR -$0.63** (high volume = chasing = bleed)
-- BLOCK vol<1.5x: 46T 45.7% armed **39.1% WR +$1.52** (stealth entries win)
-- Naive ship would kill **18/22 = 81.8% of winners** → hard reject.
-- **INVERSE (block chase entries vol>=1.5x)**: winner-impact 4/22 = **18.2% (<20% bar PASS)**,
-  saves +$0.63/30d, but **n=17 < 20 ship bar → COLLECT, re-measure at n>=20.**
-Script `brain/analysis/vol_precondition_pumpchain_2026-10-26.py` (--selfcheck PASS).
+**1. CONF_FLOOR fk table CORRECTED (brain/fk_definitions.md).** Fresh PG: blocked set
+55T 16W `-$1.71` reproduces. **fkB = 16/55 = 29.1%** (all-signal) / **20.5%**
+(pump-chain-only) — BOTH ≥20% bar = **FAIL**. fkA-literal = 16/128 = **12.5%** PASS
+(#150's "fkB 12.6%" was this number mislabeled; blocked winners grew 4→16 which pushed
+real fkB 12.5%→29.1%). 30d: fkB 28.6% FAIL / fkA-literal 5.2% PASS. Net EV still
+positive (+$1.71/14d) but the pre-registered sanity bar is a hard gate — **ship stays
+HELD; CEO ruling must now explicitly waive/reject the fkB FAIL, not just pin a
+denominator.** Ship-time blocked-count pins: **55@14d / 56@30d** (33@14d stale).
 
-**2. SHIP: watchdog SQL cheat-sheet (zero-behavior).** `trade_watchdog_prompt.md` gains the
-correct open-trade columns — **`stop_loss`, `target`; there is NO `take_profit`** (1,691
-UndefinedColumn hits in logs/trade-watchdog.log). Closes #149's MED sideways find.
+**2. TAT EVAL CLOSED — PASS, keep as-is (threshold 15 crossed at 23 fires, now 24).**
+14d fires 24: **20/24 (83%) MFE<0.40** = correct stall cuts. TAT avg exit `-$0.032`
+vs HML avg `-$0.098` (same never-armed class, 3x better exit). bb-bounce variant-C
+4 fires `-$0.14` (working, post-#117 HBAR proof). Side-watch: **4/24 fires had final
+MFE≥0.40** (BLUR 1.33, APT 0.83, ADA 0.39-ish edge) = peak decayed through the
+PM-exempt pump-exit engine into TAT — monitor, same class the D=0.20 floor would catch.
 
-**3. CONF_FLOOR margins IMPROVED, still HELD for CEO.** Blocked set slid to 55T 16W `-$1.71`
-(~90% pump-chain family; volume-buildup- has 0 rows below conf 45). **fkB 19.4% → 12.6%**
-(comfortable vs bar 20) | fkA-literal 16.6% PASS | 7d blocked cohort still `-$0.59` = decay
-trigger holds. Ship still blocked on: CEO fk ruling + site-lock AFTER decider_run:4856 +
-**ship-time blocked-count RECOMPUTE** (fk_definitions pins 33@14d/56@30d are STALE — live is 55@14d).
+**3. CREATIVE SHIPPED: post-arm giveback census baseline (zero code).**
+`brain/analysis/postarm_giveback_census_2026-10-26.py` (--selfcheck PASS):
+PM-exempt (pump-chain) reached-arm→stop-exit cohort **14d 25T `-$1.35` avg_mfe 0.771,
+49% of armed exits hit a stop not a trail**; 7d 7T `-$0.44` 63.6%. Pre-registered
+success bars for the D=0.20 CEO GO: 7d cohort net improves same-sign, cohort size
+shrinks, no offsetting premature-exit rise. Ships the "measure before/after" so the
+floor GO is validated, not hoped.
 
-## MANDATE — CHOP vs TREND (fresh, PG this run)
-- TRAIL family 14d **87T 80W 92.0% +$5.25** vs HML **67T 0W -$6.52** (only **1/67** ever
-  reached +0.40) + atr_sl_hit 79T 1W `-$5.63`
-- armed 14d **141T 78.0% +$8.70** vs unarmed **191T 8.9% -$12.76** | 7d 69T +$3.37 vs 61T -$3.82
-- MFE buckets 14d (reproduces #149): `<0.20` **-$8.72** | `0.20-0.40` -$4.29 | `0.40-0.80`
-  +$1.19 | `>=0.80` **+$7.76**
-- 7d direction: LONG 77T 31W `-$1.12` vs SHORT 34T 16W `+$0.40` — LONG side still the bleed
+## MANDATE — CHOP vs TREND (fresh PG)
+- TRAIL family: profit-monster-trail 83T 91.6% `+$4.56` + atr_trail 25T 80% `+$3.56`
+- Chop exits: HML 65T 0% `-$6.35` + atr_sl 79T 1.3% `-$5.63`
+- armed 14d **166T 71.1% +$8.96** vs unarmed **164T 6.1% -$12.92**
+- MFE buckets 14d: `<0.20` `-$8.63` | `0.20-0.40` `-$4.29` | `0.40-0.80` `+$1.20` | `>=0.80` `+$7.76`
+- chop-bleed share 84.2% (7d) / 85.5% (14d) — inside baseline band, entry problem
+- 7d direction: LONG 90T 40% `-$1.16` vs SHORT 41T 56.1% `+$0.61` — LONG still the bleed
 
-## LOSING AUTOPSY — WRONG-SIDE REFUTED 74th CONSECUTIVE RUN
-`recovery_replay.py` adverse-first (--selfcheck PASS): **24h n=6 = 4 never-adverse / 2
-recovered / 0 NEVER**; 48h n=8 = 5/3/**0**. All 6 24h losers mid-band LONGs into SHORT_BIAS
-(ICP r2v2-long3 HML, ETH hl_copy, KAS/SAGA TAT, PENDLE ugb, BTC continuum-trend+ atr_sl) = chop.
-Refs that survive: #61 p=0.116, #84 t=-0.04.
+## LOSING AUTOPSY — WRONG-SIDE REFUTED 75th CONSECUTIVE RUN
+`recovery_replay.py` adverse-first (--selfcheck PASS): **48h n=9 = 5 never-adverse /
+4 recovered / 0 NEVER**. Refs that survive: #61 p=0.116, #84 t=-0.04.
 
 ## LAST-RUN VERIFY — ALL PASS
-#149 arm-sweep reject **stands** (PM_TRAIL_ACTIVATE_PCT untouched) + MFE ledger reproduces |
-#148 mfe backfill **CLEARED** (armed=None 14d = 0) | #144 price-feed **HOLDING** (267 rows,
-newest **0.44 min**, PENDLE 1.96095; soak due **Oct 26 17:42Z**) | #147 session_brain dedup
-in live use (3 probes unique) | #146 fk_definitions present (pins stale, see above) |
-kill flags correct, 0 post-kill opens | constants **EMPTY git diff** | CEO_PROTECTED **13/13** |
-size-reduce file **absent = 1.0x** (auto-clear realized) | session lock absent | **0 new
-Tracebacks 2026-10-26**.
+#150 vol_precondition selfcheck PASS + re-run (inverse n=17 still COLLECT) |
+watchdog SQL cheat-sheet present (:76) | #144 price-feed soak due **Oct 26 17:42Z** |
+#147 session_brain dedup live (3 unique probes) | kill flags correct, doji
+dead-by-traffic (last Oct 16) | vb- 7d 19T 73.7% `+$0.43` = revert criterion NOT hit |
+constants **EMPTY git diff** | CEO_PROTECTED **13/13** | size-reduce **absent = 1.0x** |
+session lock absent | selfchecks PASS.
 
 ## PRE-REG RECHECKS
-- **CONF_FLOOR**: fkB 12.6% PASS / fkA 16.6% PASS / decay `-$0.59` holds → **ship stands, CEO time-critical**.
-- pump-chain+ **NO-KILL stands** (30d `+$1.84`, conf>=30 30d `+$3.13`; 14d kill-by-letter MET
-  but OOS reverses).
-- pump-chain- **Oct-27 PROMOTE stands** (contrarian flip **64.3% n=345**, re-verified this run).
-- **NEW pre-reg**: inverse chase-block (block pump-chain+ LONG when entry 5m vol >= 1.5x
-  prior-20 mean) — re-measure when blocked n>=20 (now 17); bars locked: fk<20%, 30d same-sign,
-  winner-impact <20% (currently 18.2%).
-- hl_copy 13T n<20 COLLECT | TAT 23 fires/14d (eval threshold 15 crossed — adjudicate next run).
+- **CONF_FLOOR**: fkB **29.1% FAIL** (corrected) / fkA-literal 12.5% PASS / net `-$1.71`
+  holds → ship HELD, CEO ruling now includes explicit fkB waive/reject.
+- pump-chain+ **NO-KILL stands** (14d 45T 26.7% `-$0.36` MET-by-letter; 30d 71T `+$1.84`).
+- pump-chain- **Oct-27 PROMOTE stands** (contrarian flip **64.5% n=346**, re-verified).
+- inverse chase-block n=17 COLLECT | hl_copy 12T COLLECT | bb-bounce weekly re-measure.
+- TAT eval **CLOSED PASS** (see above) — no further eval scheduled unless fires double.
 
 ## SHADOW (2/5 answerable)
-contrarian join **814/543** — pump-chain- flip **64.3% n=345 STANDS**, btc-pump-rider+ 24.9%
-do-NOT-flip, total 49.9% family-specific | shadow_trader HML threshold sim: no change |
-oscillator FROZEN / wyckoff+floor PENDING / rr ORPHANED.
+contrarian join **816/544** — pump-chain- flip **64.5% n=346 STANDS**, btc-pump-rider+
+24.9% do-NOT-flip, total 50.0% family-specific | shadow_trader: hard_max simulated
+`-$4834` vs pump_exit `+$82.79` = trail-or-nothing reproduces | oscillator FROZEN /
+wyckoff+floor PENDING / rr ORPHANED.
 
-## READINESS — 1 open, LONG into SHORT_BIAS = watch closely
-ADA #16405 bb-bounce-v2-long+ LONG @0.20455 (SL 0.20230 / TP 0.20769, conf 51, meta_rsi 54.17)
-opened 00:12 into **btc_15m + btc_4h both SHORT_BIAS**, continuum BELOW, LOW vol. Bracketed;
-TAT-C owns bb-bounce. This is the exact chop-long pattern that lost 6x in 24h — exit rules
-apply, no averaging. SHORTs remain the aligned side; LONGs only on sustained EMA300 reclaim
-WITH volume; mid-band = no trade; size 1.0x.
+## READINESS — 0 open = CORRECT
+CHOP / STRONG_DOWN / LOW vol; sources disagree (15m LONG_BIAS vs 4h SHORT_BIAS).
+SHORTs aligned (volume-buildup- 6T 100%WR `+$0.20` in 24h = keep fed). LONGs only on
+sustained EMA300 reclaim WITH volume; mid-band = no trade; trail-family first; size 1.0x.
 
 ## QUEUE
-- **CEO (time-critical):** CONF_FLOOR fk ruling (fkB now 12.6% — comfortable) + site-lock
-  after :4856 + blocked-count RECOMPUTE at ship (live 55@14d).
-- **CEO:** D=0.20 post-arm floor GO — #149 scope caveat attached (unscoped 30d p=0.215).
+- **CEO (time-critical, UPDATED):** CONF_FLOOR — **fkB FAILS 29.1%**; ruling must
+  waive/reject fkB or pin fkA-literal headline; pins 55@14d/56@30d.
+- **CEO:** D=0.20 post-arm floor GO — census baseline locked (25T `-$1.35`, 49% giveback).
 - **Oct 26 17:42Z:** price-feed 24h soak.
 - **Oct 27:** unclog waiver expiry + pump-chain- PROMOTE + waiver scoreboard + #139 re-measure.
-- **COLLECT:** inverse chase-block n 17→20 | TAT fire-count eval (23 fires) | hl_copy n=13.
+- **COLLECT:** inverse chase-block n→20 | hl_copy n=12 | census re-measure post-D0.20.
 - **Nov 1:** coin_regime OOS. **Nov 15:** floor_admit 30d same-sign.
-- **Monitor:** ADA #16405 (open LONG in SHORT_BIAS tape).
-
-## SIDEWAYS FIND (FIXED)
-watchdog `take_profit` UndefinedColumn (1691 hits) — **FIXED** this run via prompt SQL
-cheat-sheet. Remaining INFO: uncommitted comment-only shadow_trader.py hunks + bug-hunter
-verdicts in tree (not from this run; daily timer will catch).
-
-Artifacts: brain/audit_recommendations.json, brain/creative_improvements.json,
-brain/changes_log.json, brain/analysis/vol_precondition_pumpchain_2026-10-26.py,
-automation/trade-watchdog/trade_watchdog_prompt.md, CURRENT.md.
