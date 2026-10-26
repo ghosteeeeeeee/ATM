@@ -5288,3 +5288,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-26 17:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, last close 15:15) | 24h 28T 13W 46.4% '-$0.59' (RED) | 7d 136T 44.9% '-$0.62' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h bb-bounce-v2-long+ 3T 0W flagged for CEO already) | atr_sl_hit 4/28=14.3% under 40% | neg streak 2h (14 '-0.31', 15 '-0.10'), 16 empty, not yet 3 | frequency 0/hr | 3 open all bracketed | entry quality OK (winner MAE max 0.525%) | No constants change -> no signal_versions entry
 BY: auto_1hr
+BY: auto_1hr
+- [2026-10-26 19:29 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '-$0.11' (RENDER r2v2-long5 hard_sl -0.95%) | 24h 30T 14W 46.7% '-$0.99' (REDDEST today) | 7d 139T 44.6% '-$1.02' — size-reduce 1.0x (file absent = truth) | kill: none (1T last hour; 24h 0%WR signals all n=2<3) | atr_sl_hit 4/30=13.3% under 40% | neg streak 1h (17 +0.04, 18 -0.48), not yet 3 | frequency 1/hr | 0 open | No constants change -> no signal_versions entry

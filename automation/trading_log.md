@@ -16093,3 +16093,25 @@ Detail: BLUR pump-chain+ hard_max_loss -$0.31 (-4.19%) / ALT pump-chain+ trail_a
 **Open Questions:**
 - pump-chain+ worst 24h signal (-$0.36, 7T 4W) — 3 big losers (BLUR -4.19%, GRASS/CC hard_sl earlier) but profitable in EXTREME regime; watch, no action
 - 24h -$0.92 new reddest of day; 7d -$0.95
+
+## 2026-10-26 19:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.11 (WR: 0.0%) | 24h: 30T 14W 46.7% -$0.99 | 7d 139T 44.6% -$1.02 | **size-reduce: file absent → 1.0x**
+
+Detail: RENDER r2v2-long5 hard_sl -$0.11 (-0.95%)
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 4/30 = 13.3% (<40%); dominant closes = profit-monster-trail (8T +$0.28) and ugb_pt (8T +$0.14)
+- Kill check: 0%WR 24h signals hl_copy_trader/pump-chain-/bb-bounce-v2-long+ all n=2 (<3); bb-bounce-v2-long+ already flagged for CEO (14d all-regime loss)
+- Streak: 14 -0.31, 15 -0.10, 16 empty, 17 +0.04, 18 -0.48 → 1 consecutive negative hour, trigger at 3 not fired
+- Frequency 1/hr — not overtrading
+- hard_max_loss still worst close reason (4T -$0.69) — expected 3-5% account loss at leverage, not a bug
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.99 / 7d -$1.02 both reddest of day — pump-chain+ still worst 24h signal (-$0.36, 7T 57% WR: big losers); profitable in EXTREME regime, no action
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
