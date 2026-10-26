@@ -15918,3 +15918,23 @@ Final set: []
 **Open Questions:**
 - 24h -$0.13 (redder than -$0.08 last hour, from 07h losses rolling in), 7d -$0.26 improving
 - bb-bounce-v2-long+ still 20% WR (5T) over 24h — watch, no kill trigger
+
+## 2026-10-26 12:28 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet — last close 11:02)
+**PnL:** $0.00 (last hour) | 24h: 20T 11W 55.0% -$0.13 | 7d 126T 44.4% -$0.26 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour — no kill/streak/frequency triggers possible
+- atr_sl_hit 3/20 = 15.0% (<40%) — dominant close = profit-monster-trail (7T +$0.23)
+- Kill check: no signal with 0% WR n≥3 last hour (0T); worst 24h bb-bounce-v2-long+ 5T 1W 20% -$0.05 (not kill criteria)
+- No 3+ negative-hour streak (01 -, 02 +, 03 -, 05 +, 07 -, 11 +)
+- Frequency 0/hr — not overtrading
+- 4 open trades all bracketed: ETH hl_copy_trader LONG SL 2325.42/TP 2367.49, LTC volume-buildup- SHORT SL 57.62/TP 55.70, PURR r2v2-long3 LONG SL 0.09893/TP 0.10127, BLUR pump-chain+ LONG SL 0.007354/TP 0.007601
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.13, 7d -$0.26 — red drift persists but 7d improving from -$0.80
+- bb-bounce-v2-long+ still 20% WR (5T) over 24h — watch, no kill trigger

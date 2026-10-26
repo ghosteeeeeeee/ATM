@@ -5277,3 +5277,5 @@ BY: auto_1hr
 BY: auto_1hr
 BY: auto_1hr
 - [2026-10-26 11:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L '+$0.04' (BTC continuum-osc+ ugb_pt +1.65%) | 24h 20T 11W 55.0% '-$0.13' (RED) | 7d 126T 44.4% '-$0.26' — size-reduce 1.0x (file absent = truth) | kill: none (1T last hour; worst 24h bb-bounce-v2-long+ 5T 1W not 0%) | atr_sl_hit 3/20=15% under 40% | no neg streak (05 +, 07 -, 08-10 empty, 11 +) | frequency 1/hr | 2 open bracketed ETH hl_copy_trader / LTC volume-buildup- | No constants change -> no signal_versions entry
+BY: auto_1hr
+- [2026-10-26 12:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, last close 11:02) | 24h 20T 11W 55.0% '-$0.13' (RED) | 7d 126T 44.4% '-$0.26' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; worst 24h bb-bounce-v2-long+ 5T 1W 20%WR not 0%) | atr_sl_hit 3/20=15% under 40% | no neg streak (01 -, 02 +, 03 -, 05 +, 07 -, 11 +) | frequency 0/hr | 4 open all bracketed ETH/LTC/PURR/BLUR | No constants change -> no signal_versions entry
