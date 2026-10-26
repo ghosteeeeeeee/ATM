@@ -1,5 +1,11 @@
 # Error Alerts — 2026-10-07 09:48 UTC (health_monitor)
 
+## Error Alerts — 2026-10-26 08:47 UTC (health_monitor)
+- **WARN** (1x): `hermes-daily-orchestrator.service` failed at 05:21 (systemd start timeout, killed by TERM after ~23 min; was mid-analysis on price_history retention plan, wrote plan file before kill). Non-critical 24h autonomous improvement agent. **AUTO-FIX**: `systemctl reset-failed` so the next timer run (today 16:51 UTC) isn't blocked. If it recurs, raise `TimeoutStartSec`.
+- **WARN** (recurring): Disk 84% used (93G/118G, 19G free). No uncompressed `*.log` >7d to gzip (already 15 .gz files). Growth drivers unchanged from 2026-10-23 analysis. No safe auto-fix — DB prune = CEO decision. Approaching 85% warn threshold.
+- **INFO**: Pipeline healthy — LIVE run 08:43:05 rc=0, position_manager active, 0 Tracebacks/CRASH in 30min. Timers 4/4 active (price-collector, 1m-candle, pipeline, watchdog). 84 signals/hr. Portfolio: 1 open | 8 closed today | -0.14 USDT | WR 50% (PG). 0 phantom trades (`atr_sl_hit` <0.01% = 0). Regime 5m SHORT_BIAS (4L/53S/66N of 123 @08:30). Speeds 128/241 (53.1%) ≥50th pct (avg 73.5). Prices fresh (26s). hl-sync-guardian: active. Vacation pause: not active.
+- **INFO**: Side findings unchanged — `hermes-atr-sl-updater.timer` ghost entry (DEFUNCT unit, disabled); `signals_hermes_runtime.db` unbounded; `decisions` table dormant (expected — ai_decider defunct).
+
 ## Error Alerts — 2026-10-23 21:47 UTC (health_monitor)
 - **WARN** (ongoing, 11,829+ cycles): `hotset.json is empty — no signals survived compaction` — 19 signals in last hour (all conf ≥70, max 88) but 0 admitted. Reproducible root cause this cycle (cycle 11829): (1) ALT LONG passes confluence (2 unique types) then **RR HARD BLOCKED R:R=0.51 < 0.55** — TP via CANDLE at +1.24% vs SL 2.43% in EXTREME regime; (2) STX LONG **CONFLUENCE-GATE-BLOCK** single-type not in standalone bypass. Compactor only sees 1-2 combo_keys in its 5-min top-10 window, so both blocks empty the hotset. Not a crash — gate/RR tuning decision for CEO, no auto-fix applied (same finding flagged 16:44 and in trading_log.md).
 - **WARN** (recurring): Disk 85% used (101.4G/126.2G raw = 80.3%; df reports 85% of usable space after ext4 reserved blocks, 18G free). No uncompressed `*.log` >7d to gzip (0 files; 15 already .gz). Growth drivers: `/root/.hermes/data` 7.9G (coin_tracker 3.3G, session_brain 1.5G+92M WAL, candles 1.2G), `/root/.local` 12G, `/root/.cache` 3.5G, `/usr` 32G. No safe auto-fix — DB prune = CEO decision.
@@ -2021,3 +2027,11 @@
 - **[WARN]** (1x): Disk usage 84% on / (threshold 85%). 
 - **AUTO-FIX**: journalctl vacuumed to 200M, freed 485MB archived journals. Largest app logs: pipeline.log 321M, signal-compactor.log 126M — rotate/truncate those next pass if usage climbs again.
 - No other issues: pipeline running every 1m, prices fresh (12.6s), 105 signals/hr, 0 crashes, 0 phantom trades. "[BTC-CRASH]" log lines are the BTC-level SHORT-block guard working as designed, not crashes.
+
+## Error Alerts — 2026-10-26 07:27 UTC
+- **REPEATED** (8x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-26 11:45 UTC
+- **[WARN]** (1x): Watchdog: only 9 signals in last 5 min (min 20 threshold); 77 signals/hr vs 240/hr implied target. Market is neutral-heavy (86/129 NEUTRAL, SHORT_BIAS regime) — likely fewer setups, not a pipeline fault. Pipeline cycles healthy, all timers firing.
+- **AUTO-FIX**: journal vacuum to 200M (freed 97.4M, disk 84% — under 85% threshold). No crashes, no phantom trades, prices fresh (74s), 2 open trades (ETH LONG, LTC SHORT).
