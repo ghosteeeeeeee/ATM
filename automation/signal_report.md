@@ -1,48 +1,52 @@
 # Signal Performance Report
-**Generated:** 2026-10-25 21:34 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-26 04:00 UTC | **Period:** Last 6h | 24h — all numbers DB-verified (brain PostgreSQL, queried this run)
 
-**Volume context:** 6h = 5 closed trades (-$0.09), 24h = 16 closed trades (+$0.27), 72h = 46 (+$0.86). Low sample sizes this cycle.
+## KILLED (executed)
 
----
-
-## KILLED (executed):
+None — no signal met all three kill bars (WR<30% + n≥5 + PnL<-$0.10, 24h).
 
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | No kills — no signal met all kill criteria (WR<30% AND PnL<-$0.10 AND 5+ trades, 24h) |
+| — | — | — | — | — | — |
 
-## BOOSTED (executed):
+**Closest candidate — bb-bounce-v2-long+ LONG** (24h 5T 20.0% -$0.09): PnL bar missed by $0.01 (requires < -$0.10). Audit #138 (2026-10-25) fresh no-kill verdict stands ("would kill 28/56 = 30d winners"); co-signal stamp (#141, decider_run.py:5193) just landed — solo-vs-confluence measurement for the STANDALONE_BYPASS cohort needs data. Regime check: 30d NORMAL 42T 42.9% -$0.54 | EXTREME 10T 40% -$0.37 | HIGH 5T 80% +$0.19 | FLAT 3T 100% +$0.12. All 7d trades (21/21) were NORMAL — a NORMAL 0.0 block would halt 100% of recent flow = de facto kill and would starve the #138 measurement, so NOT added (the 2026-10-01 removal of exactly this key also stands). EXTREME 0.0 block verified effective: **0 EXTREME trades since 2026-10-17**.
+
+## BOOSTED (executed)
+
+None — sole boost candidate already carries an active boost.
 
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | No boosts — no signal met all boost criteria (WR>55% AND PnL>$0.05 AND 5+ trades, 24h) |
+| volume-buildup- | SHORT | 100.0% | +$0.20 | 6 (24h) | ALREADY BOOSTED — no change |
 
-## LOSERS (watch list):
+Boost bars met (100% WR ≥55% ✓, +$0.20 >$0.05 ✓, 5 tokens: ACE/ANIME/CAKE/DOT/HYPER ✓) but boost is already live: static 1.2 (since 2026-10-24) + auto combo weight **1.27** in `data/combo_weights.json` — `_get_source_weight()` checks auto weights first, so effective weight is 1.27. Re-boosting every 6h run would compound unboundedly; `self_learner.py` owns the auto file. 14d: 28T 75.0% +$0.78.
 
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 20.0% | -$0.02 | 5 (24h) | WATCH — fails kill bar (PnL -$0.02 > -$0.10). 72h: 14.3% WR, -$0.27. All-time regime split: FLAT 100% (4T), HIGH 55.6% (18T), NORMAL 45.7% (46T), EXTREME 46.2% (13T) — wins in FLAT/HIGH, so blanket kill inappropriate per regime check. Matches audit #138 finding (kill bars fail on 30d/14d/7d). Next cycle: kill if 24h PnL drops below -$0.10 |
-| r2v2-long3 | LONG | 50.0% | -$0.01 | 2 (24h) | WATCH — sample too small |
-| hl_copy_trader | LONG | 50.0% | +$0.07 | 2 (24h) | WATCH — 6h -$0.09 (atr_sl_hit), monitor |
-
-## WINNERS:
+## LOSERS (watch list)
 
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 100.0% | +$0.05 | 1 (24h) | OK — below sample threshold |
-| continuum+ | LONG | 100.0% | +$0.08 | 1 (24h) | OK — below sample threshold |
-| volume-buildup- | SHORT | 100.0% | +$0.08 | 2 (24h) | OK — 72h: 64.3% WR, +$0.23 (14T). Below 5T boost bar, recheck next cycle |
-| bb-squeeze+ | LONG | 66.7% | +$0.02 | 3 (24h) | OK — 72h: 66.7% WR, +$0.12 (6T). Below 5T 24h boost bar, recheck next cycle |
+| bb-bounce-v2-long+ | LONG | 20.0% | -$0.09 | 5 (24h) | WATCH — kill PnL bar missed by $0.01; #138 no-kill fresh (yesterday); co-signal measurement in flight |
+| pump-chain+ | LONG | 16.7% | -$0.76 | 12 (7d) | STANDING — kill bars met on 7d but CEO-approval-blocked (audit #124); 0T/24h. Not re-raised (hourly-log convention) |
+| r2v2-long3 | LONG | 50.0% | -$0.17 | 10 (7d) | WATCH — 24h 2T 50% -$0.01 |
+| ai-trader-pending | LONG | 12.5% | -$0.04 | 8 (7d) | WATCH — small absolute, FLAT 4T +0.04 offsets NORMAL 4T -0.08 |
 
-## ISSUES:
+## WINNERS
 
-- **No direction inversions** in last 24h — signal/direction labels consistent.
-- **Low trade volume** (16 closed trades/24h) — most signals below sample thresholds; conclusions this cycle are necessarily tentative.
-- **bb-bounce-v2-long+** remains the primary watch item: 3 consecutive sub-30% WR days but PnL losses are tiny (trail_arm_timeout exits mostly breakeven/small). Do NOT blanket-kill — regime data shows FLAT/HIGH winners; regime-based blocking only if it degrades further.
-- No kill/boost actions executed this cycle — no git commits, no hermes_constants.py edits.
+| Signal | Dir | WR | PnL | Trades | Status |
+|--------|-----|-----|-----|--------|--------|
+| volume-buildup- | SHORT | 100.0% | +$0.20 | 6 (24h) | ACTIVE — boost 1.27 live; 14d 28T 75% +$0.78 |
+| bb-squeeze+ | LONG | 62.5% | +$0.32 | 8 (7d) | OK — 24h only 2T 50% -$0.02 (noise) |
+| continuum-osc- | SHORT | 100.0% | +$0.01 | 1 (24h) | n=1, no signal |
+| continuum-trend- | SHORT | 100.0% | +$0.03 | 1 (24h) | n=1, no signal |
 
----
-*Report auto-generated. Next report: ~6h from now.*
+**24h system total:** 21 closed trades, 11W/10L (52.4%), -$0.19. **6h:** 7 trades, volume-buildup- only group ≥2.
+
+## ISSUES
+
+- **Signal inversions (24h): 0** — clean, all signals respect direction labels.
+- **Prior report (2026-10-26 03:31) PnL column used percent-sums, not USDT** (e.g. "+2.02" for volume-buildup-; actual is +$0.20). Corrected here — every number in this report comes from a live DB query this run.
+- **Side finding:** static `SIGNAL_SOURCE_WEIGHTS` boosts in `signal_compactor.py` are inert for the 62 sources present in `combo_weights.json` (auto weights checked first). E.g. `volume-breakout-long+` static 1.4 "BOOSTED" vs active auto 0.5. By design ("auto-tuned takes priority"), but static comments overstate effective weights — worth a comment cleanup, no behavior change.
+- pump-chain+ kill remains CEO-approval-blocked (audit #124) — standing item, not re-raising.
 
 ---
 
@@ -62,3 +66,7 @@
 | 2026-10-22 | 2d78f19 | Daily trading system update (2026-10-22) |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
+
+---
+
+*Report auto-generated by signal_reporter. Next report: ~6h from now.*

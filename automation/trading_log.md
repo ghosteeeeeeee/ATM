@@ -15733,3 +15733,19 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 **Open Questions:**
 - 24h PnL slipped to -$0.11 (first slightly-red 24h window since +$0.00) — watch next hour; 7d -$0.66
 - pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-26 04:00 UTC — signal_reporter (6h run)
+
+**Query:** Fresh brain DB query (6h + 24h windows, USDT). 6h: 7 closed. 24h: 21 closed, 11W -$0.19.
+
+**Kills executed:** None. Only kill-bar candidate: `bb-bounce-v2-long+` LONG 5T 20%WR -$0.09 — PnL bar missed by $0.01 (needs <-$0.10). Audit #138 (10-25) no-kill verdict stands; co-signal stamp (#141) just landed, solo-vs-confluence measurement needs data. Regime check: 30d NORMAL 42T 42.9% -$0.54 vs FLAT+HIGH 8T +$0.31 — NORMAL block NOT added: all 7d trades (21/21) were NORMAL, blocking = de facto kill + starves #138 measurement (2026-10-01 key removal also stands). EXTREME 0.0 block verified working: 0 EXTREME trades since 10-17.
+
+**Boosts executed:** None. `volume-buildup-` SHORT meets all boost bars (6T 100%WR +$0.20, 5 tokens ACE/ANIME/CAKE/DOT/HYPER, 14d 28T 75% +$0.78) but boost already live: static 1.2 + auto combo weight 1.27 (auto checked first in `_get_source_weight`). No double-boost.
+
+**Verification:** 24h kill-bar scan (WR<30 + n≥5) returns only bb-bounce-v2-long+; pump-chain+ LONG still 0T/24h (7d 12T 16.7% -$0.76 kill standing = CEO-blocked per audit #124, not re-raised). bb-bounce EXTREME regime block (volatility_gate_v2, 10-16) confirmed effective post-commit.
+
+**Watch list:** bb-bounce-v2-long+ (kill PnL bar -$0.01 short, #138 in-flight), pump-chain+ (CEO-blocked), r2v2-long3 (7d 10T 50% -$0.17), ai-trader-pending (7d 8T 12.5% -$0.04).
+
+**No inversions (0 found). No flags changed. No constants changed. Report: automation/signal_report.md**
+
+**Side finding:** signal_compactor static SIGNAL_SOURCE_WEIGHTS entries for sources in combo_weights.json (62 keys) are inert — auto weights take priority (e.g. volume-breakout-long+ static 1.4 vs active auto 0.5). By design; static comments overstate effective weights, comment cleanup only.
