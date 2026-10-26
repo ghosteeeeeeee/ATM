@@ -2035,3 +2035,30 @@
 ## Error Alerts — 2026-10-26 11:45 UTC
 - **[WARN]** (1x): Watchdog: only 9 signals in last 5 min (min 20 threshold); 77 signals/hr vs 240/hr implied target. Market is neutral-heavy (86/129 NEUTRAL, SHORT_BIAS regime) — likely fewer setups, not a pipeline fault. Pipeline cycles healthy, all timers firing.
 - **AUTO-FIX**: journal vacuum to 200M (freed 97.4M, disk 84% — under 85% threshold). No crashes, no phantom trades, prices fresh (74s), 2 open trades (ETH LONG, LTC SHORT).
+
+## Error Alerts — 2026-10-26 13:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (3532s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (3478s left, N failures)`
+
+## Error Alerts — 2026-10-26 14:27 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (2816s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (2816s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (2759s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (2759s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (2701s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (2637s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (2637s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] IO TOK BLOCKED — TOK in cooldown (2580s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: IO TOK in hotset failure cooldown — TOK in cooldown (2580s left, N failures)`
+- **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+
+## Error Alerts — 2026-10-26 14:46 UTC
+- **[WARN]** (1x): `hermes-atr-sl-updater.timer` = not-found (unit file missing, never had journal entries; ATR SL logic runs inside pipeline scripts instead)
+- **AUTO-FIX**: `systemctl daemon-reload` attempted — stale entry persists but is harmless/inactive; unit cannot be restarted as it does not exist. Functionality verified covered elsewhere.
+- **[WATCH]**: disk 84% (94G/118G) — 1 point from WARN threshold, largest log pipeline.log 329M
