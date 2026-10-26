@@ -8942,5 +8942,32 @@
     "category": "entry sniper",
     "status": "rejected",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-10-26T10:55:00Z",
+    "idea": "REJECTED: block same-direction re-entry <=120m/<=720m after a same-coin loss",
+    "rationale": "30d exploratory same_after_loss 45T 28.9% -$0.88 vs same_after_win 46.1% ctrl. 120m cell fails all 5 bars (n=15, p=0.231, 7d+14d sign flip, fk 33.3%); 720m cell p=0.041 vs Bonferroni 0.025, 7d sign flips, fk 28.9%.",
+    "expected_impact": "none - never shipped",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-26T10:55:00Z",
+    "idea": "Dedup-aware shadow KPI + re-derive the TAT pre-registered 15-fire bar",
+    "rationale": "pipeline.log double-stamps 313,149 lines (7.0% of file, ~45% of shadow-fire events) so raw grep -c over-counts fires ~1.8x.",
+    "expected_impact": "TAT bar re-derived deduped = 16 in-scope unique trades >= 15 -> HOLDS, no rollback; rule documented for all future log-count KPIs",
+    "category": "verification",
+    "status": "shipped",
+    "risk": "zero"
+  },
+  {
+    "date": "2026-10-26T10:55:00Z",
+    "idea": "UGB-PT coverage ledger - giveback escape converting the arm-gap cohort",
+    "rationale": "51 trades/14d closed mfe>=0.40 & losing; UGB-PT (CEO GO Oct 25) exits at giveback-to-peak-0.30%. Unique exits: HYPE +0.80 / PENDLE -0.01 / BTC +0.10 / ENA +0.39 / GRASS +0.05.",
+    "expected_impact": "continues converting the ARM-GAP bleed that GC unblocked 08:45 today",
+    "category": "exit",
+    "status": "monitor",
+    "risk": "low"
   }
 ]
