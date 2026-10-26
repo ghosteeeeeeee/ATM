@@ -2830,5 +2830,27 @@
     "after": "sed repairs [+-]/usr/bin/bash.NN and [+-]/bin/bash.NN -> [+-]$0.NN with a stderr notice; clean messages untouched",
     "rationale": "Root-cause guard for the AGENTS.md BASH QUOTING RULE at the single commit path. Prevents the 07:15 daily sweep and every agent commit from writing more corrupted subjects.",
     "impact": "Audit trail preserved going forward; git history deliberately NOT rewritten (no force-push). 3-case self-test PASS."
+  },
+  {
+    "timestamp": "2026-10-26T04:48:27Z",
+    "agent": "brain_auditor",
+    "change": "waiver_scoreboard_2026-10-23.py window derived from vacation_mode.json (granted_by + expires); stale 'expires 2026-10-24' docstring replaced; report prints window source + expiry",
+    "type": "tweak",
+    "file": "brain/analysis/waiver_scoreboard_2026-10-23.py",
+    "before": "WAIVER_GRANT hardcoded 2026-10-22 14:42, docstring claimed expiry 2026-10-24T00:00Z -> reported SUPERSET cohort 22T 16W/6L +0.46 (wrong cohort for the Oct 27 ruling)",
+    "after": "window from data/vacation_mode.json rules.unclog_waiver (grant 2026-10-24 15:40, expires 2026-10-27T00:00Z), fail-soft legacy fallback with source printed -> 10T 8W/2L +0.10, 0 open",
+    "rationale": "T re-armed the waiver Oct 24 15:40; the scoreboard would have handed the CEO a wrong cohort 19h before expiry",
+    "impact": "read-only analysis script; zero live-trading behavior. py_compile PASS, --selfcheck PASS (was FAILING)"
+  },
+  {
+    "timestamp": "2026-10-26T04:48:27Z",
+    "agent": "brain_auditor",
+    "change": "waiver_scoreboard --selfcheck display-rounding tolerance (+0.05) + knife-side assertion + window-source/expiry assertions",
+    "type": "tweak",
+    "file": "brain/analysis/waiver_scoreboard_2026-10-23.py",
+    "before": "assert a[2] < SHORT_RSI_HARD_FLOOR -> FAILED 'BTC gate RSI 45.0 not sub-floor' on #16408",
+    "after": "assert a[2] < FLOOR + 0.05 (ponytail: %.1f display; legacy lines are 1dp forever) and assert a[2] >= 35 - 0.05; assert window_source == vacation_mode.json and waiver_expire is not None",
+    "rationale": "decider_run renders RSI at %.1f so a true 44.995 prints '45.0 < 45' — gate correct, line unverifiable; selfcheck must tolerate what the log cannot carry",
+    "impact": "read-only; decider_run log format deliberately NOT churned (cosmetic, hot live path, buys nothing the tolerance does not)"
   }
 ]
