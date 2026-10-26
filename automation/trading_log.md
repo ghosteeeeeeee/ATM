@@ -16070,3 +16070,26 @@ Final set: []
 **Also shipped:** run_pipeline.py portfolio log line sums pnl_usdt (was SUM(pnl_pct) = fake -13.67% where truth -$0.55).
 
 py_compile OK · peak_reanchor --selfcheck 19/19 PASS.
+
+## 2026-10-26 18:30 UTC Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses) — all pump-chain+ LONG
+**PnL:** -$0.33 (WR: 33.3%) | 24h: 30T 14W 46.7% -$0.92 | 7d 139T 44.6% -$0.95 | **size-reduce: file absent → 1.0x**
+
+Detail: BLUR pump-chain+ hard_max_loss -$0.31 (-4.19%) / ALT pump-chain+ trail_arm_timeout -$0.06 (-1.54%) / INJ pump-chain+ ugb_pt +$0.04 (+1.92%)
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 4/30 = 13.3% (<40%); dominant close = profit-monster-trail (8T +$0.28) and ugb_pt (8T +$0.14)
+- Kill check: no 0%WR n≥3 last hour (pump-chain+ 3T 1W2L=33%); 24h hl_copy_trader/pump-chain-/bb-bounce-v2-long+ all 0W but n=2; bb-bounce-v2-long+ already flagged for CEO
+- pump-chain+ 14d wins in EXTREME (+$0.05, n=38) → regime policy keeps it alive (HIGH n=9 -$0.50, NORMAL n=2 -$0.03 — not all-regime loss, below n≥20 bar)
+- Streak: 14 -0.31, 15 -0.10, 16 empty, 17 +0.04, 18 -0.37 → streak reset by 17, current = 1 negative hour, trigger at 3 not fired
+- Frequency 3/hr — not overtrading
+- hard_max_loss 4T -$0.69 worst close reason = expected 3-5% account loss at leverage, not a bug
+- 1 open RENDER bracketed (SL 1.724 / TP 1.783)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- pump-chain+ worst 24h signal (-$0.36, 7T 4W) — 3 big losers (BLUR -4.19%, GRASS/CC hard_sl earlier) but profitable in EXTREME regime; watch, no action
+- 24h -$0.92 new reddest of day; 7d -$0.95
