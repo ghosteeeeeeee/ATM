@@ -2000,3 +2000,11 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3543s left, N failures)`
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING — MOMENTUM`
 - **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-10-26 01:27 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-26 03:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`

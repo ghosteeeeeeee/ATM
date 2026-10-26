@@ -15749,3 +15749,24 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 **No inversions (0 found). No flags changed. No constants changed. Report: automation/signal_report.md**
 
 **Side finding:** signal_compactor static SIGNAL_SOURCE_WEIGHTS entries for sources in combo_weights.json (62 keys) are inert — auto weights take priority (e.g. volume-breakout-long+ static 1.4 vs active auto 0.5). By design; static comments overstate effective weights, comment cleanup only.
+
+## 2026-10-26 04:28 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet — last close 03:05)
+**PnL:** $0.00 (last hour) | 24h: 21T 11W 52.4% -$0.19 | 7d 132T 43.9% -$0.75 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour — no kill/streak/frequency triggers possible
+- atr_sl_hit 3/21 = 14.3% (<40%) — dominant close = profit-monster-trail (10T +$0.40)
+- Kill check: no signal with 0% WR n≥3 last hour; worst 24h bb-bounce-v2-long+ 5T 1W 20% -$0.09 (not kill criteria, same as #138 in-flight)
+- No 3+ negative-hour streak (23 +, 00 empty, 01 -, 02 +, 03 -, 04 empty)
+- Frequency 0/hr — not overtrading
+- Entry quality: 24h winners max MAE 0.313% (<0.5% — good; BTC MAE NULL)
+- 0 open trades — all flat
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h slipped to -$0.19 (21T), 7d -$0.75 — quiet hour but red drift continues
+- pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
