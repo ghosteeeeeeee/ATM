@@ -16003,3 +16003,23 @@ Final set: []
 - bb-bounce-v2-long+ loses ALL regimes 14d n=38 — CEO review still pending (flagged 13:28)
 - volume-buildup- 9T 5W 55% WR but -$0.15 net — losses larger than winners, worth MFE/MAE review if trend continues
 - If hour 15 closes negative it's a 3-hour streak → then check regime and consider size cut
+
+## 2026-10-26 16:29 UTC Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses) — last close 15:15 UTC
+**PnL:** $0.00 (WR: n/a) | 24h: 30T 14W 46.7% -$0.55 | 7d 136T 44.9% -$0.62 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Quiet hour, 0 closes, 0 open trades — flat
+- atr_sl_hit 4/30 = 13.3% (<40%) — dominant close = profit-monster-trail (9T +$0.34)
+- Kill check: no signal with 0% WR n≥3 last hour (0 trades); 24h also none (empty set)
+- Streak: 14 -$0.31, 15 -$0.08 = 2 consecutive negatives, 16 empty — trigger at 3 not fired
+- Frequency 0/hr — not overtrading
+- Entry quality: 24h winner MAE max 0.525% (continuum-osc+), mae populated 26/30
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ still loses ALL regimes 14d n=38 (EXTREME 9T 33.3% -$0.43 / NORMAL 29T 37.9% -$0.69) — CEO review still pending (flagged 13:28)
+- 24h -$0.55 reddest of day; 7d -$0.62 — no new hour contributed this run
