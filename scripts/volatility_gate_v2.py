@@ -409,6 +409,8 @@ SIGNAL_TYPE_OVERRIDES = {
     ('NORMAL', 'pump-chain'): 0.5,               # PENALIZED — bare form fallback
     ('NORMAL', 'bb-bounce-v3-long'): 0.0,        # BLOCKED 2026-10-04 signal_reporter — NORMAL 15T 46.7%WR -$0.43. Wins HIGH 5T 60%WR +$0.08. Overrides family Bollinger NORMAL=1.3 boost (wrong for v3).
     ('NORMAL', 'bb_bounce_v3_long'): 0.0,        # underscore form (signal_type in signals DB)
+    ('NORMAL', 'bb-bounce-v2-long+'): 0.0,       # BLOCKED 2026-10-26 signal_reporter — NORMAL is the only live bleed channel: 30d 43T 41.9%WR -$0.55 / 14d 29T 37.9% -$0.69 / 7d 18T 33.3% -$0.37 (negative in all 3 nested windows; 14d WR binomial p=0.13 — PnL consistency, not WR significance, is the basis). Winning regimes kept: HIGH 30d 5T 80%WR +$0.19, FLAT 3T 100% +$0.12 → regime issue, not signal issue (BB_BOUNCE_V2_LONG_ENABLED stays True). EXTREME already 0.0 (10-16). RE-ADDED: key removed 2026-10-01 as wrong-variant penalizer; now a deliberate full-regime block per playbook. Revert: delete both lines.
+    ('NORMAL', 'bb_bounce_v2_long'): 0.0,        # underscore/signal_type form
     ('NORMAL', 'mtf-regime-trend-'): 0.0,        # BLOCKED CEO 2026-10-06 — NORMAL 30d 2T 50%WR -$0.25; 7d overall SHORT bleeding. Habitat kept in HIGH.
     ('NORMAL', 'mtf_regime_trend_short'): 0.0,   # underscore form
     ('NORMAL', 'trend-ride'): 0.0,               # BLOCKED 2026-10-06 signal_reporter — backtest NORMAL 79T 45.6%WR -$1.38 no edge; 24h 7T 42.9%WR -$0.18. EXTREME habitat kept (58.6%WR +$5.69).

@@ -1,61 +1,49 @@
 # Signal Performance Report
-**Generated:** 2026-10-26 15:35 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-26 21:45 UTC | **Period:** Last 6h + 24h
 
 ## KILLED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no signal met all kill criteria |
+| — | — | — | — | — | none — no signal met all kill criteria (WR<30% n≥5 + PnL<-$0.10 + active>24h) |
+
+## REGIME-BLOCKED (executed)
+| Signal | Dir | WR | PnL | Trades | Action |
+|--------|-----|-----|-----|--------|--------|
+| bb-bounce-v2-long+ | LONG | 37.9% | -0.69 | 29 (14d) | **NORMAL → 0.0** in `volatility_gate_v2.py` SIGNAL_TYPE_OVERRIDES (both hyphen + underscore forms). NORMAL is the only live bleed channel: 30d 43T 41.9% -$0.55 / 14d 29T 37.9% -$0.69 / 7d 18T 33.3% -$0.37 — negative in all 3 nested windows (14d WR binomial p=0.13; basis is PnL consistency, not WR significance). Winning regimes kept per playbook: HIGH 30d 5T 80%WR +$0.19, FLAT 3T 100% +$0.12. EXTREME already blocked (10-16). `BB_BOUNCE_V2_LONG_ENABLED` stays **True** — no blanket kill (24h kill bars fail: n=2, -$0.09). FAMILY_MAP Bollinger entry already present. Verified by import test: NORMAL mult=0.0, HIGH/FLAT unaffected. Pipeline restarted to load new gate. |
 
 ## BOOSTED (executed)
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | none — no signal met all boost criteria (5+ trades) |
+| — | — | — | — | — | none — boost bar (WR>55% + n≥5 + PnL>+$0.05) not met: pump-chain+ and volume-buildup- both WR>55% but net negative |
 
 ## LOSERS (watch list)
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-buildup- | SHORT | 55.6% | -0.15 | 9 | WATCH — WR fine; two `hard_max_loss` (-0.12, -0.17) drove the day. Lifetime: HIGH 85.7%/+0.47, NORMAL 64.7%/+0.08, EXTREME 55.6%/-0.04 → wins in all regimes, no kill |
-| bb-bounce-v2-long+ | LONG | 20.0% | -0.05 | 5 | WATCH — WR<30% ✓ but PnL -0.05 > -0.10 threshold ✗. Lifetime (since 09-10): NORMAL 41.3%/-0.76, EXTREME 41.7%/-0.61, HIGH 52.9%/-0.07 → tuning candidate, not blanket-kill (HIGH ≥50%) |
-| pump-chain+ | LONG | 75.0% | -0.03 | 4 | WATCH — high WR, small net loss |
-| hl_copy_trader | LONG | 0.0% | -0.16 | 2 | WATCH — n=2, too small |
-| pump-chain- | SHORT | 0.0% | -0.12 | 2 | WATCH — n=2, too small |
+| pump-chain+ | LONG | 57.1% | -0.36 | 7 (24h) | WATCH — all 7 in EXTREME (4W/3L); WR fine, R:R tail bleeding. Lifetime EXTREME habitat +$3.65/118T, 7d EXTREME -$0.65/15T (p≈0.31, not significant). NORMAL=0.0 + HIGH blocked already live. No change |
+| volume-buildup- | SHORT | 60.0% | -0.12 | 10 (24h) | WATCH — WR fine; two `hard_max_loss` tails drove the day. Wins in all 3 regimes lifetime (HIGH 85.7%, NORMAL 77.8%→64.7%, EXTREME). Confidence already boosted 1.27 (prior run). No change |
+| pump-chain- | SHORT | 0.0% | -0.12 | 2 (24h) | WATCH — n=2 below bar; EXTREME already 0.0, NORMAL 1.2 boost |
+| hl_copy_trader | LONG | 0.0% | -0.16 | 2 (24h) | WATCH — n=2 too small |
+| bb-bounce-v2-long+ | LONG | 0.0% | -0.09 | 2 (24h) | Handled above — NORMAL regime-block executed this cycle |
+| hh-hl-,warrior-sr-confirm- | SHORT | 0.0% | -0.09 | 1 (24h) | WATCH — n=1 too small |
 
 ## WINNERS
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| r2v2-long3 | LONG | 100% | +0.09 | 2 | Healthy — n<5, not boostable yet |
+| r2v2-long3 | LONG | 100% | +0.09 | 2 (24h) | Healthy — n<5, not boostable yet |
 | continuum-osc+ | LONG | 100% | +0.04 | 1 | Healthy |
 | continuum-trend- | SHORT | 100% | +0.03 | 1 | Healthy |
 | continuum-osc- | SHORT | 100% | +0.01 | 1 | Healthy |
 
 ### 6h snapshot (n≥2)
-- volume-buildup- SHORT: 5 trades, 20% WR, -0.27
-- pump-chain+ LONG: 2 trades, 50% WR, -0.08
-- r2v2-long3 LONG: 2 trades, 100% WR, +0.09
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain+ | LONG | 3 | 33.3% | -0.33 |
 
 ## ISSUES
-- **No direction inversions in 24h** — signal labels match directions.
-- **volume-buildup-** hit `hard_max_loss` twice within 35 min (13:54 and 14:14 UTC) — exit-system, not signal, is the loss driver.
-- **bb-bounce-v2-long+** is the structural concern: ~-1.3 lifetime PnL, below-50% WR in NORMAL and EXTREME regimes. Candidate for regime multipliers in `volatility_gate_v2.py` next cycle — needs sample-checked backtest first per THE PATTERN rules.
-- Quiet day overall: only 11 closed trades in 24h; sample sizes too small for kills/boosts.
+- **No inversions found** (0 direction mismatches in 24h).
+- Resolves auto_1hr 13:28 flag ("bb-bounce-v2-long+ loses ALL regimes 14d n=38 — CEO review recommended"): kill bars still fail (24h n=2, -$0.09) and HIGH/FLAT win, so per playbook this is a regime-block, not a kill — NORMAL 0.0 shipped instead of awaiting a blanket-kill decision.
+- Thin trade volume overall (12 closed trades ≥24h window with n≥2 groups) — most signals below statistical thresholds; no boost/kill actions available this cycle.
 
 ---
 
-## PARAM CHANGE LOG (last 7 days)
-
-| Date | Commit | Change |
-|------|--------|--------|
-| 2026-10-26 | c7da007 | brain_auditor: audit run #157 — daily-commit guard fixed (po... |
-| 2026-10-25 | f6a7ed8 | brain_auditor: audit run #138 — escalation #17 closed as sup... |
-| 2026-10-25 | f86261f | brain_auditor: #134 addendum — watchdog 06:44 UTC P1 rejected-wi... |
-| 2026-10-24 | f96aa8a | brain_auditor: AUDIT RUN #122 — LONG_RSI_SWEET_SPOT_BOOST 10... |
-| 2026-10-24 | c10b227 | scripts: UNCLOG-2 — 4 CEO-approved flips (consult 20261024T1... |
-| 2026-10-24 | 186ff1c | watchdog: 14:20 UTC cycle — BTC broke EMA300 pin DOWN (knife... |
-| 2026-10-24 | 9482523 | logs: hourly analysis 2026-10-24 12:28 — no change, quiet ho... |
-| 2026-10-24 | 7553d4e | brain_auditor: AUDIT RUN #114 (2026-10-24) — entry_regime_4h... |
-| 2026-10-23 | c4edf08 | exit-system: breakeven lock for CEO trades — SL→entry at +0.... |
-| 2026-10-23 | 10d6898 | Daily trading system update (2026-10-23) |
-
-*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
-
-*Report auto-generated. Next report: ~6h from now.*
+*Report auto-generated by signal_reporter. Next report: ~6h from now.*
