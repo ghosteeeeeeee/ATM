@@ -15712,3 +15712,24 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 **Open Questions:**
 - 24h PnL round-tripped to $0.00 (was +$0.16), 7d -$0.55
 - pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-26 03:28 UTC Hourly Analysis
+
+**Trades:** 3 closed (1 wins, 2 losses)
+**PnL:** $-0.11 (WR: 33.3%) | 24h: 22T 12W 54.5% -$0.11 (SLIGHTLY RED) | 7d 134T 44.8% -$0.66 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 3 trades last hour: BTC continuum-trend- profit-monster-trail +$0.03, IO pump-chain- atr_sl_hit -$0.05 (-1.25%), ICP hh-hl-,warrior-sr-confirm- hard_max_loss -$0.09 (-4.16% account ≈ 1% price move at 4x — expected)
+- atr_sl_hit 3/22 = 13.6% (<40%) — dominant close = profit-monster-trail (11T +$0.48)
+- Kill check: no 0% WR signal with n≥3 last hour (all n=1); worst 24h bb-bounce-v2-long+ 5T 1W 20% -$0.09 (not kill criteria)
+- No 3+ negative-hour streak (01 -, 02 +, 03 -)
+- Frequency 3/hr — not overtrading
+- Entry quality: 24h winners max MAE 0.313% (<0.5% — good); pump-chain- confidence 29.5 (pre-reg CONF_FLOOR fk evidence point, already tracked)
+- No open trades — all flat
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h PnL slipped to -$0.11 (first slightly-red 24h window since +$0.00) — watch next hour; 7d -$0.66
+- pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
