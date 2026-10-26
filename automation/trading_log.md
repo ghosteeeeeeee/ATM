@@ -16023,3 +16023,12 @@ Final set: []
 **Open Questions:**
 - bb-bounce-v2-long+ still loses ALL regimes 14d n=38 (EXTREME 9T 33.3% -$0.43 / NORMAL 29T 37.9% -$0.69) — CEO review still pending (flagged 13:28)
 - 24h -$0.55 reddest of day; 7d -$0.62 — no new hour contributed this run
+
+## 2026-10-26 16:39 UTC — Upgrade Implementer: price_history retention plan bug_hunter verdict
+
+**Plan:** `plans/price_history_retention_30d.md` (drafted 04:59 by daily-orchestrator) — the pending "candidate #4" from the 2026-10-25 sessions.
+**Verdict: APPROVE-WITH-CHANGES** — review-only session, zero live-code/DB changes.
+
+- Verified plan claims independently: timestamp=INT, idx_ph_ts (batch delete index-driven), freelist=0, 300970 pages×4096=1.23GB, >30d=11,859,705 rows (74.3%), no triggers/FKs, max trade duration 1d16h ≪ 30d (MFE/MAE safe), legacy migration one-shot (no re-insert risk), all live readers within ≤24h/4h/LIMIT windows.
+- 4 findings folded into the plan: **F1** gzip export of >30d rows before delete (~100MB, NOT full .backup — that would trip the 85% disk trigger); **F2** VACUUM stop-list expanded to also stop signal-compactor/1m-candle/pump-flow timers + busy_timeout=180000 (baseline "database is locked" = 0 in 7d); **F3** runnable delete loop added (price_collector.py:857-868 pattern, 15–40 min expected); **F4** census gaps documented (candle_predictor full-series EMA seed shift cosmetic; offline backtests; permanent loss of >30d 1m-resolution data — price_history is the only store holding it).
+- **Plan is now execution-ready; still gated on disk ≥85% (currently 84%).** Do NOT run before trigger.

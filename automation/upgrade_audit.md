@@ -1222,3 +1222,48 @@
 3. Own-conclusions re-verification of mining-report patterns — L1-2 analysis — MED — only if someone proposes acting on that report
 4. price_history 30d retention plan — L1 (design) — LOW — draft the plan + bug_hunter review NOW so it's ready when disk crosses 85%; execution stays gated on the trigger
 5. 15m/1h/4h candle retention — CANCELLED as mis-targeted (real lever is price_history, #4)
+
+---
+
+## Upgrade Implementer Session — 2026-10-26 16:39 UTC
+
+**Context:** pipeline LIVE, disk **84%** (1G below the 85% prune trigger), vacation-mode constants review queue still active. No new plan files since 2026-10-25 16:55 except `price_history_retention_30d.md` (drafted 04:59 today by the daily orchestrator = prior session's next-candidate #4). Subagent launch unavailable this session → bug_hunter review performed inline (read-only).
+
+### Plan evaluations (recent-20 re-scan, deltas vs 2026-10-25 sessions)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| price_history_retention_30d | L1 (review) | MED | ✅ REVIEWED THIS SESSION — APPROVE-WITH-CHANGES, F1–F4 folded in | See below; execution still gated on disk ≥85% |
+| autonomous-btc-loop-spec | L4 | HIGH | ✅ PHASE 0 SHADOW LIVE (prior) | Day 4 of ≥7d soak; too early for phase gate |
+| shadow-mode-paper-trading-spec-v1 | L3 | HIGH | ✅ IMPLEMENTED (prior) | Unchanged |
+| limit-order-capability | L2 | MED | ✅ PHASE 1 (prior) | Phases 2-4 deferred |
+| vol-regime-relative-thresholds / short-rsi-habitat / contrarian-engine / temporal-confluence / regime-recalibration / 2026-10-13_rr-engine U2-U4 | L2-3 | MED-HIGH | ⏳ CEO-gated | Untouched (vacation review queue active) |
+| signal-starvation-fix-2026-10-12 | L2-3 | MED-HIGH | PARTIAL | Unclog waiver shipped by prior session; RR floor/BB dead-zone CEO-gated |
+| grind-breakout-v2-coin-tracker-integration | L3 | LOW | ⏸️ DEFERRED (by plan) | Unchanged |
+| bug-hunt-master-plan (BUG-036/037/044/056/064) | — | HIGH | ⏳ T/CEO-gated | 4 open bugs re-confirmed this session — none auto-fixable (037/044/064 live-money path, 056 constants-protected) |
+| Stage A/C re-readout | L1 | MED | ⏳ due ~Oct 29 | Not yet time |
+| mining-report own-conclusions re-verification | L1-2 | MED | ⏳ conditional | Only if someone proposes acting on that report |
+
+### Implemented this session (1 × L1 — review/analysis only, zero live change)
+
+1. **(L1) price_history 30d retention plan — mandatory bug_hunter review completed, verdict APPROVE-WITH-CHANGES.**
+   - Verified independently (read-only): timestamp=INT, `idx_ph_ts` present (batch subquery index-driven), freelist=0, page_count 300970×4096 = 1.23GB, **>30d = 11,859,705 rows (74.3%)**, ≤30d = 4,088,398, no triggers/views/FKs on price_history, **max closed-trade duration = 1d16h ≪ 30d** (hl-sync/position_manager MFE-MAE open→close reads safe), legacy DB migration one-shot idempotent (`_meta migration_done`, signal_schema.py:85) → no re-insert-after-prune risk, all live readers traced to ≤24h/4h/LIMIT-based windows (decider LIMIT 700, compactor LIMIT 400, trades-api full-series = chart-only, get_price_history LIMIT 25000/24h default).
+   - **4 findings folded into the plan file (now execution-ready):**
+     - **F1 (MED):** export >30d rows to gzip (~100MB) before delete — the only rollback path; explicitly NOT a full `.backup` (1.2GB would trip the 85% disk trigger we're guarding against).
+     - **F2 (MED):** VACUUM stop-list expanded from 2 → 5 timers (adds `hermes-signal-compactor`, `hermes-1m-candle`, `hermes-pump-flow`) + `PRAGMA busy_timeout=180000`; baseline "database is locked" count = 0 in 7d, verify stays 0 after run.
+     - **F3 (LOW):** original snippet had no runnable loop (one-shot DELETE of 11.9M rows in a single txn) → replaced with the exact price_collector.py:857-868 500k-batch loop; runtime estimate 15–40 min, do not interrupt.
+     - **F4 (LOW):** census gaps documented — candle_predictor.build_ohlcv full-series read (cosmetic EMA/MACD seed shift), ema20_50 `lookback_days=30` boundary, unbounded backtest `--days`, historical analysis targets, and the **permanent loss of >30d 1m-resolution data** (price_history is the only store holding it; candles_1m also 30d, 15m/1h/4h retain 90d).
+   - **Status:** plan APPROVED-WITH-CHANGES, **execution gated on disk ≥85% (currently 84%) — do not run yet.** Verdict recorded in plan file + trading_log.md.
+
+### Sideways findings
+- **Severity: LOW** — plan file's original step-1 comment claimed "Record verdict in trading_log.md" but the 85% gate means the review had to happen NOW anyway (review is not gated, execution is) — done, no drift.
+- **Severity: INFO** — 73 hermes timers active; only 5 touch signals_hermes.db at sub-minute cadence (F2 list). `grep -ac "database is locked" logs/pipeline.log` = 0 (7d baseline) — worth re-checking after the prune runs.
+
+### Success rate this session: 1/1 implemented (100%)
+### Cumulative (Oct 22+25+26 sessions): 12/12 (100%)
+### Next candidates (priority order)
+1. Stage A/C re-readout — L1 analysis — MED — ~Oct 29 (re-check sqx- net significance; rs-s-broken/bb-squeeze- half2 resolution)
+2. price_history prune EXECUTION — L1 ops — MED — only when disk ≥85% (plan ready, review done); pair with coin_tracker.db VACUUM (240MB) + candles.db VACUUM (150MB) in the same window
+3. RR engine U2-U4 — L2-3 — HIGH — still needs CEO sequencing
+4. Own-conclusions re-verification of mining-report patterns — L1-2 — MED — only if someone proposes acting on that report
+5. 4 open bugs (037/044/064 live-money, 056 constants) — T/CEO-gated — not actionable by this role
