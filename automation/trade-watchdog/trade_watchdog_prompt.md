@@ -73,6 +73,24 @@ ORDER BY close_time DESC;
 
 If `meta_rsi` disagrees with a stored column, **meta_rsi wins**. Do not generate "overbought chase" or "oversold short" steers from `entry_rsi_14`.
 
+### ⚠️ SQL COLUMN CHEAT-SHEET — `trades` table (added 2026-10-26, brain_auditor #150)
+
+There is **no `take_profit` column**. Using it raises `UndefinedColumn` and wastes a cycle
+(1,691 log hits as of 2026-10-26). Correct names for open-trade queries:
+
+```sql
+-- open trades (correct columns)
+SELECT id, token, direction, open_time, entry_price,
+       stop_loss,      -- NOT take_profit
+       target,         -- NOT take_profit
+       leverage, confidence, volatility_regime
+FROM trades WHERE status='open';
+```
+
+Other frequently used columns: `pnl_usdt`, `pnl_pct`, `exit_reason`, `close_time`,
+`mfe_pct`, `mae_pct`, `trailing_activated`, `signal`. If a query fails on a missing
+column, check `information_schema.columns` before retrying — do not guess synonyms.
+
 ## Step 2: Read Additional Market Context
 
 ```bash

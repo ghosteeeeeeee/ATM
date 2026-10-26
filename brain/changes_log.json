@@ -2742,5 +2742,27 @@
     "after": "ships with --selfcheck (5 assertions) and --verdict (locked ship bar); exit code 2 = rejected",
     "rationale": "mandated creative item: test whether the near-arm giveback cohort (0.30<=mfe<0.40, all-window negative) is rescued by a lower arm line, without shipping on a recent-half artifact",
     "impact": "no trading-constant change; closes the lower-arm question with data and surfaces a scope caveat on the pending D=0.20 GO ask"
+  },
+  {
+    "timestamp": "2026-10-26T00:40:47Z",
+    "agent": "brain_auditor",
+    "change": "watchdog prompt SQL cheat-sheet: correct columns stop_loss/target (no take_profit) — fixes 1691-hit UndefinedColumn class",
+    "type": "doc",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "no column cheat-sheet; agent invented take_profit",
+    "after": "SQL COLUMN CHEAT-SHEET section with correct open-trade SELECT",
+    "rationale": "live waste: trade-watchdog.log 1691 take_profit UndefinedColumn hits",
+    "impact": "zero live behavior; stops wasted watchdog cycles"
+  },
+  {
+    "timestamp": "2026-10-26T00:40:47Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/vol_precondition_pumpchain_2026-10-26.py — volume-precondition counterfactual (selfcheck PASS)",
+    "type": "creative",
+    "file": "brain/analysis/vol_precondition_pumpchain_2026-10-26.py",
+    "before": "n/a (new script)",
+    "after": "measures 1.5x 5m entry-vol gate on pump-chain+ 30d",
+    "rationale": "creative mandate #150; naive hypothesis refuted, inverse chase-block pre-registered",
+    "impact": "measurement only, no trading behavior change"
   }
 ]

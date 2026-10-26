@@ -8658,5 +8658,16 @@
     "category": "governance",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-26T00:40:47Z",
+    "run": 150,
+    "idea": "pump-chain+ volume precondition: naive REFUTED (high-vol=chase=bleed); inverse chase-block pre-registered n>=20",
+    "rationale": "winner study: volume-buildup- arms 78.6% vs pump-chain ~58%; tested 1.5x 5m entry vol gate",
+    "expected_impact": "inverse would save +$0.63/30d at 18.2% winner-impact — below noise until n>=20",
+    "category": "entry sniper",
+    "status": "measured-rejected + inverse-collect",
+    "risk": "low",
+    "script": "brain/analysis/vol_precondition_pumpchain_2026-10-26.py"
   }
 ]
