@@ -16032,3 +16032,23 @@ Final set: []
 - Verified plan claims independently: timestamp=INT, idx_ph_ts (batch delete index-driven), freelist=0, 300970 pages×4096=1.23GB, >30d=11,859,705 rows (74.3%), no triggers/FKs, max trade duration 1d16h ≪ 30d (MFE/MAE safe), legacy migration one-shot (no re-insert risk), all live readers within ≤24h/4h/LIMIT windows.
 - 4 findings folded into the plan: **F1** gzip export of >30d rows before delete (~100MB, NOT full .backup — that would trip the 85% disk trigger); **F2** VACUUM stop-list expanded to also stop signal-compactor/1m-candle/pump-flow timers + busy_timeout=180000 (baseline "database is locked" = 0 in 7d); **F3** runnable delete loop added (price_collector.py:857-868 pattern, 15–40 min expected); **F4** census gaps documented (candle_predictor full-series EMA seed shift cosmetic; offline backtests; permanent loss of >30d 1m-resolution data — price_history is the only store holding it).
 - **Plan is now execution-ready; still gated on disk ≥85% (currently 84%).** Do NOT run before trigger.
+
+## 2026-10-26 17:29 UTC Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses) — last close 15:15 UTC
+**PnL:** $0.00 (WR: n/a) | 24h: 28T 13W 46.4% -$0.59 | 7d 136T 44.9% -$0.62 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Quiet hour, 0 closes, 3 open all bracketed (RENDER r2-trend-long5, ALT/INJ pump-chain+)
+- atr_sl_hit 4/28 = 14.3% (<40%) — dominant close = profit-monster-trail (8T +$0.28)
+- Kill check: no signal with 0% WR n≥3 last hour (0T); 24h bb-bounce-v2-long+ 3T 0W but already flagged for CEO (14d all-regime loss)
+- Streak: 14 -0.31, 15 -0.10 = 2 consecutive negatives, 16 empty — trigger at 3 not fired
+- Frequency 0/hr — not overtrading
+- Entry quality: 24h winner MAE max 0.525% (populated 9/13)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ still loses ALL regimes 14d n=38 — CEO review pending (flagged 13:28)
+- 24h -$0.59 reddest of day; 7d -$0.62
