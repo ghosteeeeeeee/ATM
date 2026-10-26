@@ -2067,3 +2067,12 @@
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+AT, allowing despite TOK filter`
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-26 19:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-26 19:44 UTC
+- **[WARN]**: disk 85% used (94G used, 18G free, 118G total) — crossed WARN threshold since 14:46 (84%). Top consumers: data/ 8.0G (coin_tracker.db 3.3G, session_brain.db 1.5G, signals_hermes.db 1.2G, candles.db 1.2G), logs/ 756M (pipeline.log 334M), journal 284M. No logs >7d to gzip (rotation working).
+- **AUTO-FIX**: none safe/applicable — no stale logs to compress, DBs are live. Recommend CEO-run cleanup of coin_tracker.db / session_brain.db growth path.
+- **[INFO]**: `hermes-atr-sl-updater.timer` still not-found (known harmless, carried from 14:46 report).
+- **[INFO]**: USUAL SHORT trade FAILED at 19:41 — RSI knife floor filter (29.9 < 35) blocked it; working as designed, not a crash.
