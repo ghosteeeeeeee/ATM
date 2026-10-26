@@ -15770,3 +15770,24 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 **Open Questions:**
 - 24h slipped to -$0.19 (21T), 7d -$0.75 — quiet hour but red drift continues
 - pump-chain+ kill criterion still MET but blocked on CEO approval (audit #124) — not re-raising
+
+## 2026-10-26 05:29 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet — last close 03:47)
+**PnL:** $0.00 (last hour) | 24h: 21T 11W 52.4% -$0.19 | 7d 131T 43.5% -$0.80 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour — no kill/streak/frequency triggers possible
+- atr_sl_hit 3/21 = 14.3% (<40%) — dominant close = profit-monster-trail (10T +$0.40)
+- Kill check: no signal with 0% WR n≥3 last hour; worst 24h bb-bounce-v2-long+ 5T 1W 20% -$0.09 (not kill criteria, #138 in-flight)
+- No 3+ negative-hour streak (23 +, 00 empty, 01 -, 02 +, 03 -, 04/05 empty)
+- Frequency 0/hr — not overtrading
+- Entry quality: 24h winners max MAE 0.313% (<0.5% — good)
+- 2 open trades bracketed: ENA pump-chain+ LONG (conf 23.0), BTC continuum-osc+ LONG (conf 49.5)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.19 (21T), 7d slipped to -$0.80 — red drift continues, quiet hours aren't recovering it
+- ENA pump-chain+ opened at conf 23.0 while its 7d kill criterion stands CEO-blocked (audit #124) — pre-reg CONF_FLOOR evidence point, already tracked
