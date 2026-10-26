@@ -1,75 +1,87 @@
 {
-  "timestamp": "2026-10-26T19:51:02.200840+00:00",
-  "run": 167,
-  "session_brain_stats": {
-    "queries": 2,
-    "top_hits": [
-      "pump-chain-long cooldown chop",
-      "rsi gate SHORT_RSI_FLOOR collision"
-    ]
-  },
+  "timestamp": "2026-10-26T20:38:33Z",
+  "run": 168,
+  "session_lock": "absent (config changes permitted)",
   "trade_summary_24h": {
-    "trades": 29,
-    "wins": 14,
-    "wr": 48.3,
-    "pnl": -0.9,
-    "open": 1,
-    "open_detail": "DOT SHORT volume-buildup- conf=45 bracketed SL 1.0309 TP 0.9857"
+    "closes_since_last_audit_1951": 0,
+    "24h": "29T 14W 48.3% -$0.90 (RED)",
+    "7d": "139T 44.6% -$1.02",
+    "open": "1 DOT SHORT volume-buildup- (0.6h, meta_rsi 36.36, regime-aligned)",
+    "armed_7d": "74T 74.3% +$3.63 vs unarmed 65T 10.8% -$4.65",
+    "trail_family_7d": "profit-monster-trail 48T 89.6% +$2.83 | hard_max_loss 17T 0% -$2.39 | atr_sl_hit 22T 0% -$1.33"
   },
   "shadow_analysis": {
-    "contrarian": "pc- flip 64.7% n=348 p<1e-4 both OOS halves; rider control do-NOT-flip; 2026-10-27T17:12Z PROMOTE holds, not shipped early",
-    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED=True); 0/24598 actual_outcome",
-    "wyckoff": "331 rows PENDING outcome join (Nov 15)",
-    "floor_admit": "2070+ rows PENDING outcome join (Nov 15)",
-    "rr_shadow": "ORPHANED (no producer, 21d stale)",
-    "chase_ratio_shadow": "REVIEWED EARLY (due Oct 27): 51 fires since Oct 14, 16 matched trades, 6 trail-family winners would be false-blocked, net -$0.21 if enforced -> KEEP SHADOW, enforce bar FAIL",
-    "overall": "contrarian is the only ship-eligible source; chase-ratio reviewed and stays shadow; floor_admit/wyckoff joins Nov 15 = biggest queued ROI"
+    "contrarian": "894 rows (grew from 807 on Oct-24), all LOSER-classified flip candidates; pc- flip 64.7% n=348 p<1e-4 both OOS halves (#167 verified) — PROMOTE holds, formal re-verify 2026-10-27T17:12Z, NOT shipped early per pre-registration",
+    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED=True since Oct 1) — pre-live evidence only, 0 rows answerable",
+    "wyckoff": "337 rows (+39 since Oct-24), PENDING JOIN — no outcome column, not answerable",
+    "floor_admit": "2157 rows (+379 since Oct-24), PENDING JOIN — 91% admit, no outcome column",
+    "rr_shadow": "ORPHANED (no producer, 21d stale) — do not cite",
+    "shadow_trader_report": "25855 signals / 25013 closed; gates avoid would-be losses at 34-51% win rates; worst live shadow sources: pump-chain+ 29.5% n=1009, volume-breakout-long+ 29.0% n=469 (killed live), pump-chain-v6+ 31.7% n=650",
+    "overall": "2/6 sources answerable (contrarian + live metadata join). Contrarian is the actionable one; floor/wyckoff joins still queued."
   },
-  "drift_findings": [],
+  "losing_trade_autopsy": {
+    "method": "recovery_replay.py adverse-first, selfcheck PASS (vacuity 187/196), run with 336h arg",
+    "14d": "196 losers = 37 never-adverse / 130 recovered-after-adverse / 29 NEVER (14.8% structural)",
+    "wrong_side_refutation": "92nd consecutive run refuted. Surviving refs: #61 p=0.116, #84 t=-0.04",
+    "24h_clusters": "(a) pump-chain+ LONG chases fading pumps meta_rsi 56-69 MFE<0.45 (BLUR/ALT/GRASS/RENDER) — existing RSI_MAX=70 + gap guards cover; n too sparse (10/48 have rsi_exec) to measure new band. (b) volume-buildup- SHORT sub-45 losers (LTC/DYDX/ICP) — VERIFIED AGAINST FULL BAND MAP: rsi_exec<40 is the BEST band (10T 70% WR +$0.04); floor-45 counterfactual REJECTED (would block 9 winners +$0.54 to save -$0.13 = net -$0.41)",
+    "new_patterns": 0
+  },
+  "signal_deep_dive_bb_bounce_v2_long": {
+    "status": "14d 38T 36.8% -$1.12 — worst live signal; loses ALL regimes (EXTREME -0.43, NORMAL -0.69)",
+    "mechanics": "42.1% arm-rate (MFE>=0.40); armed-and-trailed 15/16 = 93.8% WR; unarmed 22T 0 real wins — pure chop signature",
+    "conf_floor_counterfactual": "REJECTED — floor 50/55/60/65 all leave kept cohort net NEGATIVE (-$0.70/-$0.70/-$0.46/-$0.41). Conf cannot separate winners from losers because losers look identical at entry (coin simply doesn't move). NEW EVIDENCE closes the conf route definitively.",
+    "kill_bars": "FAIL (would kill 50% of 30d winners) — no disable",
+    "bypass_removal": "rejected-with-data 2026-10-26 13:50 (bypass signals arm MORE, 54.6% vs 43.2%)",
+    "defenses_live": "TAT variant-C (age>=55m lp<0), V2 exec recheck (vel/mom), RSI 35-60, BB width, gap guards, vol gate",
+    "verdict": "auditor levers EXHAUSTED — every measurable route fails its bar. CANDIDATE FOR CEO DECISION: keep for confluence value vs disable for -$0.08/day bleed. No auditor change shipped."
+  },
+  "drift_findings": [
+    "watchdog steer 'skip sub-45 shorts' contradicts its own 7d band map for volume-buildup- (rsi_exec<40 = 70% WR best band). Steer derived from 24h loser cluster = selection-on-outcome. Flagged as steer-quality item; no code change needed (steers are advisory)."
+  ],
   "recurring_problems": [
-    "pump-chain+ conf<35 = 34T 11W 32.4% -$1.02 (30d) vs conf>=50 = 47T 20W 42.6% +$2.62; conf=29.5 dominates — CONF_FLOOR fkB still CEO-pending, enforcement site after decider_run.py:4856",
-    "unarmed mfe<0.40 trades = 61T 4.9% -$4.81 (7d) vs armed 74T 74.3% +$3.63 — chop-entry problem unchanged"
+    "chop-bleed 7d 86.1% stable (55T -$4.97 of -$5.77) — entry-side, not exit; armed/unarmed split unchanged",
+    "bb-bounce-v2-long+ bleeding for 3+ weeks with all defenses live — no remaining auditor lever",
+    "pump-chain+ metadata sparsity: only 10/48 14d trades have rsi_exec key — band analysis underpowered"
   ],
   "missing_implementations": [
-    "CONF_FLOOR fkB enforcement (CEO domain)",
-    "hard-stop reentry 4-8h cooldown (PROPOSED_TO_CEO #166, evidence complete)",
-    "floor_admit + wyckoff outcome joins (Nov 15)"
+    "floor_admit + wyckoff outcome joins (queued, pre-registered, growing: 2157/337 rows)",
+    "momentum time-stop blind (locked bars, due 2026-10-30)",
+    "short-supply t_CR>=2 (due 2026-10-31)"
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-26T19:51:02.200840+00:00",
-      "idea": "CHASE_RATIO_SHADOW enforce review completed early — KEEP SHADOW",
-      "rationale": "51 unique fires Oct 14-26; 16 trades opened within 2m of a fire; blocking them would save $0.69 (10 losers) but kill $0.90 (6 trail-family winners incl ARB +0.28 atr_trail, ALT +0.47 trail_sl). Net -$0.21. Pre-registered bar: 0 trail-winner false-blocks — FAIL.",
-      "expected_impact": "n/a — no change; shadow continues to Oct 27 formal date then closed as FAIL",
-      "category": "gate evaluation",
-      "status": "rejected-with-data",
+      "date": "2026-10-26T20:38:33Z",
+      "idea": "Steer calibration rule: band-based watchdog steers must cite the full band map, not the 24h loser cluster",
+      "rationale": "This run: 'skip sub-45 shorts' steer contradicted the 7d band map it sat next to (sub-45 volume-buildup- = best band 70% WR). 24h loser clusters are selection-on-outcome — you only see a band through its losers. Same fatal flaw class as 2026-10-08 attempt #2.",
+      "expected_impact": "prevents directionally-wrong steers from anchoring future audits and auto-trader context",
+      "category": "process",
+      "status": "suggested",
       "risk": "low"
     },
     {
-      "date": "2026-10-26T19:51:02.200840+00:00",
-      "idea": "Historical mfe phantom backfill DRY-RUN: 5/10 IMX/ASTER/ME stored-vs-candle mismatches are UNDERSTATES not inflations; 0 inflation phantoms in 40-row wider scan; only known offender class is pre-Oct-25 entry-delta (fixed live by #165 reanchor)",
-      "rationale": "candles_1m cross-check: stored mfe < real mfe on ME/IMX rows (0.591 vs 0.844 etc) = conservative, harmless to armed KPI. Wider scan stored-real > 0.15% = 0 rows. Blanket backfill NOT warranted.",
-      "expected_impact": "0 rows changed; closes #165 queue item 'mfe backfill dry-run'",
-      "category": "data quality",
-      "status": "completed-no-action",
-      "risk": "none"
+      "date": "2026-10-26T20:38:33Z",
+      "idea": "bb-bounce-v2-long+ CEO decision packet: keep (confluence/stamp value, -$0.08/day) vs disable (kill bars fail but bleed is persistent 3+ weeks)",
+      "rationale": "Fresh evidence this run: conf floor useless at every level (kept cohort negative 50/55/60/65), kill bars fail (50% winner loss), bypass-removal rejected. Auditor out of levers. Decision is values-tradeoff, not data-gap.",
+      "expected_impact": "resolves the #1 live bleed signal either way; if disabled, +$0.08/day recovered; if kept, silence on future flags",
+      "category": "ceo decision",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    "#166 brain.py reason='loss' fix: VERIFIED in source (:60); end-to-end live proof pending first brain-closed loss since 18:55 (PM/guardian paths already write reason=loss — log-proven 18:09/18:18)",
-    "#165 phantom-MFE reanchor: guardian still live (PID from 17:56:35), GC canary 0 post-ship skips, dry-run above confirms no historical inflation",
-    "#164 exit-ladder 0/6 PASS: selfcheck 5/5 still PASS; no re-proposals",
-    "#162 pm_armed_at: 1/1 rows stamped (USUAL #16418)",
-    "#160 cluster_t + arm_gap_baseline: both selfcheck PASS"
+    "#167 loss-cooldown fix (reason brain->loss): VERIFIED in brain.py:39-60 — reason='loss' now, ladder live",
+    "#167 chase-ratio enforce FAIL: stays shadow, formal close Oct 27 — no action needed this run",
+    "#167 mfe phantom backfill dry-run: 0 rows changed, blanket backfill not warranted — confirmed no follow-up needed",
+    "#167 waiver lapse mechanism: verified flip1_active True->False, UNCLOG-EXPIRED path present — lapse at 00:00Z tonight is automatic, verify next run"
   ],
   "next_actions": [
-    "2026-10-27T00:00Z waiver LAPSE verify (c3=price-move; mechanism verified: flip1_active True->False at expiry, UNCLOG-EXPIRED path present in decider/compactor/brain/precheck)",
+    "2026-10-27T00:00Z+ waiver LAPSE verify: flip1_active()==False, [35,45) SHORT blocks resume, UNCLOG-EXPIRED logged",
     "2026-10-27T17:12Z pc- PROMOTE formal re-verify (classifier-vs-live-exit caveat MANDATORY; do NOT ship early)",
-    "2026-10-27 CHASE_RATIO formal date: close as FAIL per early review (keep shadow until then)",
+    "2026-10-27 CHASE_RATIO formal date: close as FAIL per early review #167",
     "2026-10-30 momentum time-stop blind (bars locked + MFE<0.15 attribution)",
+    "2026-10-30 exit-ladder arm-timeout candle OOS (escalation #17)",
     "2026-10-31 short-supply t_CR>=2",
-    "Nov 1 coin_regime OOS; Nov 15 floor_admit+wyckoff joins",
-    "CEO: CONF_FLOOR fkB · hard-stop reentry · MEDs F1/F2/F3 · ARM-BE-STOP · escalation #17 · 02:19:30 constants writer · LOSERS EMPTY"
+    "CEO: bb-bounce-v2-long+ keep-vs-disable decision (packet in this audit)"
   ]
 }

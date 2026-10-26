@@ -9210,5 +9210,23 @@
     "category": "data quality",
     "status": "completed-no-action",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-26T20:38:33Z",
+    "idea": "Steer calibration rule: band-based watchdog steers must cite the full band map, not the 24h loser cluster",
+    "rationale": "This run: 'skip sub-45 shorts' steer contradicted the 7d band map it sat next to (sub-45 volume-buildup- = best band 70% WR). 24h loser clusters are selection-on-outcome — you only see a band through its losers. Same fatal flaw class as 2026-10-08 attempt #2.",
+    "expected_impact": "prevents directionally-wrong steers from anchoring future audits and auto-trader context",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T20:38:33Z",
+    "idea": "bb-bounce-v2-long+ CEO decision packet: keep (confluence/stamp value, -$0.08/day) vs disable (kill bars fail but bleed is persistent 3+ weeks)",
+    "rationale": "Fresh evidence this run: conf floor useless at every level (kept cohort negative 50/55/60/65), kill bars fail (50% winner loss), bypass-removal rejected. Auditor out of levers. Decision is values-tradeoff, not data-gap.",
+    "expected_impact": "resolves the #1 live bleed signal either way; if disabled, +$0.08/day recovered; if kept, silence on future flags",
+    "category": "ceo decision",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
