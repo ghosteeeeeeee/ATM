@@ -15791,3 +15791,29 @@ HIGH-NORMAL regime gate). Escalation #17 CLOSED per #143 (post-arm floor already
 **Open Questions:**
 - 24h -$0.19 (21T), 7d slipped to -$0.80 — red drift continues, quiet hours aren't recovering it
 - ENA pump-chain+ opened at conf 23.0 while its 7d kill criterion stands CEO-blocked (audit #124) — pre-reg CONF_FLOOR evidence point, already tracked
+
+## LOSERS Update — 2026-10-26 06:05 UTC
+- REMOVE PUMP (insufficient data)
+- REMOVE ME (insufficient data)
+
+Final set: []
+
+## 2026-10-26 06:29 UTC Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $+0.05 (WR: 100%) | 24h: 22T 13W 59.1% -$0.04 | 7d 133T 44.4% -$0.75 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Both wins pump-chain+ LONG ugb_pt (GRASS +0.33%, ENA +1.57%) — green hour
+- atr_sl_hit 3/22 = 13.6% (<40%) — dominant close = profit-monster-trail (10T +$0.40)
+- Kill check: no signal with 0% WR n≥3 last hour; pump-chain+ 2/2 wins; worst 24h bb-bounce-v2-long+ 5T 1W 20% (not kill criteria)
+- No 3+ negative-hour streak (23 +, 01 -, 02 +, 03 -, 05 +, 06 +)
+- Frequency 2/hr — not overtrading
+- Entry quality: 24h winner max MAE 0.477% (<0.5% — good)
+- 1 open BTC continuum-osc+ LONG bracketed SL 79286/TP 81274
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d still -$0.75 (44.4% WR) — red drift persists, 24h now near-flat
