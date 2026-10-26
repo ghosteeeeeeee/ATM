@@ -1,52 +1,48 @@
 # Signal Performance Report
-**Generated:** 2026-10-26 04:00 UTC | **Period:** Last 6h | 24h — all numbers DB-verified (brain PostgreSQL, queried this run)
+**Generated:** 2026-10-26 09:33 UTC | **Period:** Last 6h + 24h
 
-## KILLED (executed)
+## 6h Performance
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| pump-chain+ | LONG | 2 | 100.0% | +0.05 |
 
-None — no signal met all three kill bars (WR<30% + n≥5 + PnL<-$0.10, 24h).
+## 24h Performance
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| bb-bounce-v2-long+ | LONG | 5 | 20.0% | -0.05 |
+| volume-buildup- | SHORT | 4 | 100.0% | +0.12 |
 
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | — |
+---
 
-**Closest candidate — bb-bounce-v2-long+ LONG** (24h 5T 20.0% -$0.09): PnL bar missed by $0.01 (requires < -$0.10). Audit #138 (2026-10-25) fresh no-kill verdict stands ("would kill 28/56 = 30d winners"); co-signal stamp (#141, decider_run.py:5193) just landed — solo-vs-confluence measurement for the STANDALONE_BYPASS cohort needs data. Regime check: 30d NORMAL 42T 42.9% -$0.54 | EXTREME 10T 40% -$0.37 | HIGH 5T 80% +$0.19 | FLAT 3T 100% +$0.12. All 7d trades (21/21) were NORMAL — a NORMAL 0.0 block would halt 100% of recent flow = de facto kill and would starve the #138 measurement, so NOT added (the 2026-10-01 removal of exactly this key also stands). EXTREME 0.0 block verified effective: **0 EXTREME trades since 2026-10-17**.
+## KILLED (executed):
+None — no signal met all three kill criteria (WR<30% + 5 trades, PnL<-$0.10, active >24h).
 
-## BOOSTED (executed)
+## BOOSTED (executed):
+None — no signal met all three boost criteria (WR>55% + 5 trades, PnL>$0.05, multi-token).
 
-None — sole boost candidate already carries an active boost.
-
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| volume-buildup- | SHORT | 100.0% | +$0.20 | 6 (24h) | ALREADY BOOSTED — no change |
-
-Boost bars met (100% WR ≥55% ✓, +$0.20 >$0.05 ✓, 5 tokens: ACE/ANIME/CAKE/DOT/HYPER ✓) but boost is already live: static 1.2 (since 2026-10-24) + auto combo weight **1.27** in `data/combo_weights.json` — `_get_source_weight()` checks auto weights first, so effective weight is 1.27. Re-boosting every 6h run would compound unboundedly; `self_learner.py` owns the auto file. 14d: 28T 75.0% +$0.78.
-
-## LOSERS (watch list)
-
+## LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 20.0% | -$0.09 | 5 (24h) | WATCH — kill PnL bar missed by $0.01; #138 no-kill fresh (yesterday); co-signal measurement in flight |
-| pump-chain+ | LONG | 16.7% | -$0.76 | 12 (7d) | STANDING — kill bars met on 7d but CEO-approval-blocked (audit #124); 0T/24h. Not re-raised (hourly-log convention) |
-| r2v2-long3 | LONG | 50.0% | -$0.17 | 10 (7d) | WATCH — 24h 2T 50% -$0.01 |
-| ai-trader-pending | LONG | 12.5% | -$0.04 | 8 (7d) | WATCH — small absolute, FLAT 4T +0.04 offsets NORMAL 4T -0.08 |
+| bb-bounce-v2-long+ | LONG | 20.0% | -0.05 | 5 | WATCH — fails PnL threshold (-0.05 > -0.10); regime check: NORMAL only, 20% WR. Kill if PnL drops below -0.10 next cycle |
+| hl_copy_trader | LONG | 0.0% | -0.09 | 1 | WATCH — n too small |
+| hh-hl-,warrior-sr-confirm- | SHORT | 0.0% | -0.09 | 1 | WATCH — n too small |
+| continuum-trend+ | LONG | 0.0% | -0.08 | 1 | WATCH — n too small |
 
-## WINNERS
-
+## WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-buildup- | SHORT | 100.0% | +$0.20 | 6 (24h) | ACTIVE — boost 1.27 live; 14d 28T 75% +$0.78 |
-| bb-squeeze+ | LONG | 62.5% | +$0.32 | 8 (7d) | OK — 24h only 2T 50% -$0.02 (noise) |
-| continuum-osc- | SHORT | 100.0% | +$0.01 | 1 (24h) | n=1, no signal |
-| continuum-trend- | SHORT | 100.0% | +$0.03 | 1 (24h) | n=1, no signal |
+| volume-buildup- | SHORT | 100.0% | +0.12 | 4 | WATCH for boost — 1 short of 5-trade threshold |
+| pump-chain+ | LONG | 100.0% | +0.05 | 2 (6h) | ENABLED |
+| r2v2-long3 | LONG | 100.0% | +0.09 | 1 | ENABLED |
+| continuum-osc- | SHORT | 100.0% | +0.01 | 1 | ENABLED |
 
-**24h system total:** 21 closed trades, 11W/10L (52.4%), -$0.19. **6h:** 7 trades, volume-buildup- only group ≥2.
+## ISSUES:
+- **No inversions found** (0 direction mismatches in 24h).
+- Low trade volume overall (11 closed trades/24h) — most signals below statistical thresholds; no actions taken this cycle.
 
-## ISSUES
+---
 
-- **Signal inversions (24h): 0** — clean, all signals respect direction labels.
-- **Prior report (2026-10-26 03:31) PnL column used percent-sums, not USDT** (e.g. "+2.02" for volume-buildup-; actual is +$0.20). Corrected here — every number in this report comes from a live DB query this run.
-- **Side finding:** static `SIGNAL_SOURCE_WEIGHTS` boosts in `signal_compactor.py` are inert for the 62 sources present in `combo_weights.json` (auto weights checked first). E.g. `volume-breakout-long+` static 1.4 "BOOSTED" vs active auto 0.5. By design ("auto-tuned takes priority"), but static comments overstate effective weights — worth a comment cleanup, no behavior change.
-- pump-chain+ kill remains CEO-approval-blocked (audit #124) — standing item, not re-raising.
+*Report auto-generated. Next report: ~6h from now.*
 
 ---
 
@@ -54,6 +50,7 @@ Boost bars met (100% WR ≥55% ✓, +$0.20 >$0.05 ✓, 5 tokens: ACE/ANIME/CAKE/
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-10-26 | c7da007 | brain_auditor: audit run #157 — daily-commit guard fixed (po... |
 | 2026-10-25 | f6a7ed8 | brain_auditor: audit run #138 — escalation #17 closed as sup... |
 | 2026-10-25 | f86261f | brain_auditor: #134 addendum — watchdog 06:44 P1 rejected-wi... |
 | 2026-10-24 | f96aa8a | brain_auditor: AUDIT RUN #122 — LONG_RSI_SWEET_SPOT_BOOST 10... |
@@ -63,10 +60,5 @@ Boost bars met (100% WR ≥55% ✓, +$0.20 >$0.05 ✓, 5 tokens: ACE/ANIME/CAKE/
 | 2026-10-24 | 7553d4e | brain_auditor: AUDIT RUN #114 (2026-10-24) — entry_regime_4h... |
 | 2026-10-23 | c4edf08 | exit-system: breakeven lock for CEO trades — SL→entry at +0.... |
 | 2026-10-23 | 10d6898 | Daily trading system update (2026-10-23) |
-| 2026-10-22 | 2d78f19 | Daily trading system update (2026-10-22) |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
-
----
-
-*Report auto-generated by signal_reporter. Next report: ~6h from now.*
