@@ -8695,5 +8695,32 @@
     "category": "entry sniper",
     "status": "closed-pass",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-26T02:37:05Z",
+    "idea": "ROGUE-CONSTANTS GUARD — exclude hermes_constants.py from the daily git add -A sweep + daily diff-canary line in brain_auditor",
+    "rationale": "A backdated, uncommitted edit removing pump-chain from PROFIT_MONSTER_BYPASS_SIGNALS sat in the working tree 02:19-02:35 today. It is the exact change the CEO reverted on 2026-10-05 and that independent verification rejected (trading_log:4511). The 07:15 daily commit would have auto-landed it as HEAD with no changes_log entry. Two prior runs reported \"constants EMPTY git diff\" correctly — the edit landed between runs.",
+    "expected_impact": "Prevents silent permanent drift of trading-critical constants; failure mode is a visible GUARD print instead of a silent commit",
+    "category": "systems guard",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T02:37:05Z",
+    "idea": "PRE-REGISTER live IO #16407 (pump-chain- SHORT, confidence 29.50) as a CONF_FLOOR fk data point",
+    "rationale": "The open IO short is confidence 29.50 = the exact conf<30 cohort CONF_FLOOR=30 would block (pump-chain family, rsi_exec 48.24 = floor PASS). Prior live counter-example CFX #16373 conf 26.50 closed +1.31%, so the blocked cohort is not uniformly bad. Record this trade outcome next run so the CEO fkB ruling (currently FAIL 29.1%) sees a second live instance instead of only backtest.",
+    "expected_impact": "Improves the evidence quality of the time-critical CEO CONF_FLOOR ruling; zero code",
+    "category": "decision evidence",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T02:37:05Z",
+    "idea": "DEAD-COLUMN CENSUS — predicted_return / actual_return / entry_fear_greed / entry_timing carry no information",
+    "rationale": "Measured 30d closed trades: predicted_return populated 689/703 but ALL 689 values are 0.0000 (uniq=1); actual_return 0/703; entry_fear_greed 0/703; entry_timing 0/703. Only signal_momentum_state is live (397/703, and momentum-state analysis already failed the 7-check battery 2026-10-08). Logged so no future audit runs a calibration study on a column of zeros.",
+    "expected_impact": "Prevents a wasted analysis cycle; zero code",
+    "category": "data hygiene",
+    "status": "measured-logged",
+    "risk": "none"
   }
 ]

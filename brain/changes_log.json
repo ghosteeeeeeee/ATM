@@ -2786,5 +2786,27 @@
     "after": "ships with --selfcheck and pre-registered post-ship bars",
     "rationale": "creative mandate #151; validates pending D=0.20 CEO GO with before/after measurement",
     "impact": "zero live behavior; measurement vehicle"
+  },
+  {
+    "timestamp": "2026-10-26T02:37:05Z",
+    "agent": "brain_auditor",
+    "change": "REVERTED rogue uncommitted edit to PROFIT_MONSTER_BYPASS_SIGNALS (pump-chain family removed)",
+    "type": "kill",
+    "file": "scripts/hermes_constants.py",
+    "before": "'pump-chain', 'pump-chain+', 'pump-chain-',  # pump-exit manages trailing, not PM Trail",
+    "after": "restored to HEAD (f6a7ed8b) — same line, git diff EMPTY",
+    "rationale": "Edit appeared in working tree at 2026-10-26 02:19:30 UTC, uncommitted and unlogged, 39min before audit #152. Byte-identical to the 2026-10-05 freeze violation the CEO reverted (kanban 2026-10-05 17:55), carrying a backdated comment \"REMOVED 2026-10-05\". The claim was independently verified NOT supported (trading_log.md:4511: pump_exit 9T +0.94 8W / TRAIL 8T +1.52 8W vs HARD_MAX 14T -1.96 0W = bleed is stops, not the profit engine). Fresh 30d: pump-chain exits profit-taking family atr_trail 27T 85.2% +6.73 / trail_sl 8T 100% +1.33 / pump_exit_dead_money 11T 90.9% +1.02 vs bleed hard_max_loss 50T 0% -5.77 + atr_sl_hit 37T 0% -2.68. Re-assignment would also change cut_loser.py scope (same list). Validated remedy for the pump-chain giveback is the D=0.20 post-arm floor (#135/#136, CEO GO pending), not engine reassignment.",
+    "impact": "Restores verified exit-engine routing for the pump-chain family before the 07:15 daily auto-commit could silently land it"
+  },
+  {
+    "timestamp": "2026-10-26T02:37:05Z",
+    "agent": "brain_auditor",
+    "change": "daily_git_commit.py GUARD — hermes_constants.py excluded from git add -A sweep",
+    "type": "tweak",
+    "file": "scripts/daily_git_commit.py",
+    "before": "run('git add -A') unconditionally",
+    "after": "git add -A then git restore --staged scripts/hermes_constants.py when it is in the changed set, with a loud print",
+    "rationale": "Root-cause fix: hermes-daily-commit.timer stages ALL files at 07:15, so an unlogged constants edit between agent runs would be auto-committed and become permanent. This is how a rejected change can silently become HEAD. Constants changes must be deliberate + logged by the agent that makes them.",
+    "impact": "Rogue/unlogged hermes_constants.py edits can no longer ride into the daily auto-commit; py_compile PASS, 5-case predicate self-check PASS"
   }
 ]

@@ -102,6 +102,18 @@ def main():
     run('git add -A')
     print("Staged all changes")
 
+    # GUARD: an unlogged hermes_constants.py edit must never ride into an auto-commit.
+    # Rogue edits landed between agent runs twice: 2026-10-05 (freeze violation, CEO
+    # reverted) and 2026-10-26 02:19 (same PROFIT_MONSTER_BYPASS pump-chain removal,
+    # backdated comment, caught by brain_auditor before this timer fired at 07:15).
+    # Constants changes are committed deliberately by the agent that makes them,
+    # with a brain/changes_log.json entry — not silently by the daily sweep.
+    if any(f == 'scripts/hermes_constants.py' for _, f in files):
+        run('git restore --staged scripts/hermes_constants.py')
+        print("GUARD: scripts/hermes_constants.py NOT staged — commit constants changes "
+              "deliberately with a brain/changes_log.json entry "
+              "(revert with: git checkout -- scripts/hermes_constants.py)")
+
     # Commit
     stdout, rc = run(f'git commit -m "{message}"')
     if rc == 0:

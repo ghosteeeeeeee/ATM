@@ -1,133 +1,149 @@
 {
-  "timestamp": "2026-10-26T01:40:47Z",
-  "run": 151,
-  "agent": "brain_auditor",
-  "session_lock": "absent",
-  "config_changes_applied": [],
+  "timestamp": "2026-10-26T02:37:55Z",
+  "run": 152,
+  "session_lock": "absent (modifiable)",
+  "headline": "ROGUE CONSTANTS EDIT FOUND AND REVERTED — uncommitted hermes_constants.py change (PROFIT_MONSTER_BYPASS pump-chain removal) written 02:19:30 UTC, byte-identical to the CEO-reverted 2026-10-05 freeze violation, claim independently rejected 2026-10-05 (trading_log:4511). Reverted to HEAD before the 07:15 daily auto-commit could silently land it. Guard added to daily_git_commit.py.",
   "session_brain_stats": {
-    "status": "live (dedup fix #147 verified — 3 probes unique)",
-    "note": "trend-following / exit-leak ideas still the top session themes; nothing new that fails the existing rejected-with-data ledger"
+    "queries": 3,
+    "unique_per_query": "6/6 (dedup from #147 confirmed live)",
+    "insights": [
+      "trend-following + signal-quality queries return the same standing themes (signal decay, R:R, pump-chain filters) — no new unbuilt idea surfaced",
+      "exit system still flagged as the #1 profit leak across sessions (matches fresh PG)"
+    ]
   },
   "trade_summary_24h": {
-    "trades": 20, "wins": 12, "wr": 60.0, "pnl": 0.16,
-    "direction_long": "7 losers all LONG (ADA/BTC/ETH/KAS/PENDLE/SAGA/ICP)",
-    "standout": "volume-buildup- SHORT 6T 100%WR +0.20"
+    "trades": 19,
+    "wins": 11,
+    "wr": 57.9,
+    "pnl_usdt": 0.0,
+    "state": "FLAT",
+    "by_signal": "volume-buildup- SHORT 6T 100% +0.20 | bb-bounce-v2-long+ 5T 20% -0.09 | all 9 losers LONG",
+    "7d_direction": "LONG 90T 40.0% -1.16 vs SHORT 41T 56.1% +0.61",
+    "open": "2: BTC continuum-trend- SHORT #16408, IO pump-chain- SHORT #16407, both bracketed"
   },
-  "trade_summary_7d": {
-    "trades": 131, "wins": 59, "wr": 45.0, "pnl": -0.55,
-    "long": "90T 40.0% -1.16", "short": "41T 56.1% +0.61"
-  },
-  "trade_summary_14d": {
-    "trades": 332, "wins": 128, "wr": 38.6, "pnl": -3.96,
-    "armed": "166T 71.1% +8.96", "unarmed": "164T 6.1% -12.92",
-    "trail_family": "profit-monster-trail 83T 91.6% +4.56 + atr_trail 25T 80% +3.56",
-    "chop_exits": "HML 65T 0% -6.35 + atr_sl 79T 1.3% -5.63",
-    "chop_bleed_share": "84.2% (7d) / 85.5% (14d) — inside baseline band"
-  },
-  "mandate_chop_vs_trend": {
-    "verdict": "INTACT — trail family prints, chop family bleeds, same as every run",
-    "mfe_buckets_14d": "<0.20: -8.63 | 0.20-0.40: -4.29 | 0.40-0.80: +1.20 | >=0.80: +7.76",
-    "readiness": "0 open = correct (CHOP/STRONG_DOWN/LOW vol; shorts own the tape)"
-  },
-  "losing_autopsy_48h": {
-    "method": "recovery_replay.py adverse-first, selfcheck PASS",
-    "n": 9, "never_adverse": 5, "recovered": 4, "never": 0,
-    "wrong_side_refuted_consecutive": 75,
-    "refs": ["#61 p=0.116", "#84 t=-0.04"]
-  },
-  "tat_eval": {
-    "status": "CLOSED — PASS, keep as-is",
-    "fires_14d": 24,
-    "mfe_lt_0.40": "20/24 (83%) = correct stall cuts",
-    "tat_avg_exit": "-0.032/trade", "hml_avg": "-0.098/trade",
-    "bb_bounce_variant_c": "4 fires -0.14 (working post-#117)",
-    "side_watch": "4/24 fires (17%) had final MFE>=0.40 = peak decayed through exit engine into TAT (pump-chain PM-exempt) — monitor, ties to D=0.20 floor"
-  },
-  "pre_reg_rechecks": {
-    "CONF_FLOOR": {
-      "status": "HELD — fkB sanity bar FAILS (correction of #150)",
-      "blocked_14d": "55T 16W -1.71 (reproduces)",
-      "fkb_actual": "29.1% (all-signal) / 20.5% (pump-chain-only) — BOTH >=20% bar",
-      "fka_literal": "12.5% PASS",
-      "correction": "#150 mislabeled fkA-literal 12.5% as 'fkB 12.6%'; real fkB moved 12.5%->29.1% as blocked winners grew 4->16",
-      "action": "CEO ruling must now explicitly waive/reject the fkB FAIL; ship-time pins 55@14d/56@30d"
-    },
-    "pump_chain_plus_kill": "NO-KILL stands (14d 45T 26.7% -0.36 MET-by-letter; 30d 71T +1.84 reverses)",
-    "pump_chain_minus_contrarian": "flip 64.5% n=346 (OOS stable) — Oct 27 PROMOTE stands",
-    "inverse_chase_block": "n=17 <20 — still COLLECT",
-    "hl_copy": "12T 33.3% -0.02 n<20 COLLECT",
-    "bb_bounce_v2_long": "7d 21T 42.9% -0.50 / 14d 37T 37.8% -1.11 / 30d 60T 48.3% -0.60 — kill bars FAIL, TAT-C mitigation live, weekly re-measure",
-    "vb_weight_revert_check": "7d 19T 73.7% +0.43 healthy — revert criterion NOT hit",
-    "doji": "dead-by-traffic (last close Oct 16, 0 in 7d) — kill holding"
+  "mandate_fresh": {
+    "trail_family_14d": "profit-monster-trail 82T 91.5% +4.54 + atr_trail 25T 80% +3.56 + trail_sl 4T 100% +0.69 + rr_trail 5T 80% +0.54 = 116T +9.33",
+    "chop_exits_14d": "hard_max_loss 63T 0.0% -6.24 + atr_sl_hit 79T 1.3% -5.63 = 142T -11.87",
+    "armed_vs_unarmed_14d_mfe": "ARMED 164T 70.7% +8.37 vs UNARMED 161T 5.6% -12.83",
+    "mfe_buckets_14d": "<0.20 -8.59 | 0.20-0.40 -4.24 | 0.40-0.80 +1.18 | >=0.80 +7.19 (monotone)",
+    "chop_bleed_share": "7d 84.2% of 5.25 gross loss | 14d 85.4% — inside baseline band (84.1/85.6), entry problem, no trail change warranted"
   },
   "shadow_analysis": {
-    "contrarian": "pump-chain- flip 64.5% n=346 STANDS; btc-pump-rider+ 24.9% do-NOT-flip; total 50.0% family-specific",
-    "oscillator": "FROZEN by design (JSONL, actual_outcome null)",
-    "wyckoff": "PENDING outcome join",
-    "floor_admit": "PENDING outcome join (Nov 15 eval)",
-    "rr_shadow": "ORPHANED — do not cite",
-    "overall": "2/5 answerable (contrarian + UGB-PT live); shadow_trader exit A/B reproduces trail-or-nothing (hard_max -4834 vs pump_exit +82.79 simulated)"
+    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED since Oct 1, 24,598 JSONL rows, actual_outcome null on all) — pre-live evidence only, no live question answerable",
+    "contrarian": "outcome join live: pump-chain- flip-WR 64.5% n=346 STANDS for Oct 27 PROMOTE; btc-pump-rider+ 24.9% = do NOT flip",
+    "wyckoff": "PENDING outcome join (316 rows, no outcome column) — none",
+    "floor_admit": "PENDING join (1,909 rows, 679ep joined) — COLLECT to Nov 15",
+    "rr_shadow": "ORPHANED — no producer script, mtime 21d+ stale — do not cite",
+    "shadow_trader_report": "22,850 signals / 22,096 closed. Gates justified: CONFLUENCE-EXPIRY 10,949 blocked would_win 48% avg -0.12 | EXEC-BLOCK 16 @12% -0.44 | BTC-CRASH 116 @31% -0.36. Exit A/B: pm_trail n=8503 +3200 vs hard_max n=5125 -4851. Dead signals (n>=10, WR<35%): grind-breakout-v2+ 43T 20.9%, r2-trend-long4/6, open-skies+ 34T 14.7%, pump-chain-v6+ 589T 31.4% (shadow-only).",
+    "overall": "2 of 5 raw shadow sources answerable (contrarian + floor_admit partial); oscillator frozen, wyckoff/rr unusable. shadow_trader --report remains the strongest shadow artifact — gates and exit A/B both reproduce the mandate."
   },
-  "drift_findings": [
-    {
-      "id": "D151-1",
-      "severity": "MED",
-      "finding": "#150 fkB label error in audit_recommendations + kanban — sanity bar actually FAILS at 29.1%",
-      "status": "CORRECTED this run in brain/fk_definitions.md; CEO queue text updated in CURRENT.md",
-      "impact": "CEO was told 'fkB comfortable' when it had crossed the bar — ruling now higher-stakes"
+  "losing_trade_autopsy": {
+    "method": "recovery_replay.py adverse-first (--selfcheck PASS)",
+    "48h": "n=9 = 5 never_adverse / 4 recovered_after_adverse / 0 NEVER",
+    "verdict": "WRONG-SIDE REFUTED 76th consecutive run",
+    "valid_refs": [
+      "#61 opposite-side-signal p=0.116",
+      "#84 forward-return census t=-0.04"
+    ],
+    "losers": "9 total: 5 LONG trail_arm_timeout (ADA/KAS/SAGA/HBAR bb-bounce+bb-squeeze, MFE 0.10-0.24 = never-armed chop), BTC continuum-trend+ atr_sl, ETH hl_copy atr_sl, ICP r2v2-long3 hard_max_loss at RSI 72.7 (overbought chase, already covered by SIGNAL_FILTER_RSI_MAX=75 + PUMP_CHAIN_LONG_RSI_MAX=70), CHIP volume-buildup- SHORT the only short loser (profit-monster-trail, EXTREME, MFE 0.52 gave back)",
+    "root_cause": "chop, not wrong side — every loser class already has a shipped or CEO-gated lever"
+  },
+  "signal_quality_deep_dive": {
+    "new_targets": 0,
+    "sub50_n15_14d": {
+      "bb-bounce-v2-long+": "37T 37.8% -1.11 — TAT-C live, kill bar (WR<30) NOT met, #138 no-re-propose",
+      "doji-bottom-long": "16T 31.3% -0.97 — killed 2026-10-16, dead-by-traffic (0 opens since)",
+      "ai-trader+": "20T 30.0% -0.85 — AI_TRADER_ENABLED=False since CEO 2026-10-19",
+      "pump-chain+": "44T 27.3% -0.35 — NO-KILL (30d +1.84), bleed = conf<30 CONF_FLOOR cohort, CEO-gated",
+      "pump-chain-": "35T 22.9% -0.30 — CONF_FLOOR cohort + Oct 27 contrarian PROMOTE pending",
+      "ai-trader-pending": "16T 25.0% -0.14 — CEO domain, n<20"
     }
-  ],
-  "recurring_problems": [
-    "LONG-side chop entries still own the bleed (7d LONG -1.16 vs SHORT +0.61; all 7 24h losers LONG) — every offline lever rejected/owned; wait for vol expansion, prefer SHORT",
-    "armed/unarmed gap remains the whole book (14d +8.96 vs -12.92) — entry quality, not exits (chop-bleed 84-86% stable)"
-  ],
-  "missing_implementations": [],
-  "creative_improvements": [
-    {
-      "date": "2026-10-26T01:40:00Z",
-      "idea": "Post-arm giveback census as D=0.20 ship-validation KPI (zero code)",
-      "rationale": "pump-chain reached-arm trades that exit via stop (not trail) give back avg MFE 0.77 to an untouched SL. 14d baseline: 25T net -1.35, 49% of armed exits hit a stop. D=0.20 floor (pending CEO GO) would convert these to peak-0.20 exits.",
-      "expected_impact": "convert ~-1.35/14d giveback cohort to positive; validates the CEO GO with a measured before/after instead of ship-and-hope",
-      "category": "exit locker",
-      "status": "pre-registered — baseline locked, re-measure 7d post-enforcement",
-      "risk": "low",
-      "script": "brain/analysis/postarm_giveback_census_2026-10-26.py (--selfcheck PASS)",
-      "bars": [
-        "7d net of cohort improves vs baseline (same-sign, not one trade)",
-        "cohort size shrinks vs 14d rate",
-        "no offsetting rise in premature-exit losses"
-      ]
-    }
+  },
+  "config_changes_applied": [
+    "REVERT scripts/hermes_constants.py -> HEAD f6a7ed8b (rogue PROFIT_MONSTER_BYPASS pump-chain removal, uncommitted, written 02:19:30 UTC). git diff now EMPTY, CEO_PROTECTED_FLAGS 13/13.",
+    "scripts/daily_git_commit.py GUARD — hermes_constants.py is unstaged from the 07:15 add -A sweep so an unlogged constants edit can never be auto-committed. py_compile PASS + 5-case predicate self-check PASS."
   ],
   "changes_from_last_run": [
     {
-      "change": "vol_precondition_pumpchain script (#150)",
-      "verified": "selfcheck PASS, re-ran: inverse chase-block still n=17 COLLECT — correct-by-design, no drift"
+      "run": 151,
+      "change": "fk_definitions.md CONF_FLOOR fkB correction (29.1% FAIL)",
+      "verified": "PASS — correction still reproduces; ship remains HELD on explicit CEO waive/reject",
+      "action": "carry"
     },
     {
-      "change": "watchdog SQL cheat-sheet (#150)",
-      "verified": "present at trade_watchdog_prompt.md:76 with stop_loss/target"
+      "run": 151,
+      "change": "TAT eval CLOSED PASS (24 fires, threshold 15)",
+      "verified": "PASS — trail_arm_timeout 14d 24T 20.8% -0.77, TAT-C still cutting stalls",
+      "action": "carry, side-watch 4/24 fires final MFE>=0.40"
     },
     {
-      "change": "price-feed HOLDING (#144)",
-      "verified": "soak still due Oct 26 17:42Z — not yet evaluable"
+      "run": 151,
+      "change": "postarm_giveback_census baseline script",
+      "verified": "selfcheck PASS",
+      "action": "standing D=0.20 GO validation KPI"
     },
     {
-      "change": "session_brain dedup (#147)",
-      "verified": "3 probes returned unique results this run"
+      "run": 150,
+      "change": "vol_precondition_pumpchain script + inverse chase-block pre-reg",
+      "verified": "selfcheck PASS (71 joined, 63)",
+      "action": "COLLECT, n=17 of 20"
+    },
+    {
+      "run": 150,
+      "change": "watchdog prompt SQL cheat-sheet take_profit->target",
+      "verified": "present in prompt",
+      "action": "carry"
+    },
+    {
+      "run": 147,
+      "change": "session_brain query() dedup",
+      "verified": "3 probes x 6 unique = PASS this run",
+      "action": "closed"
     }
   ],
-  "next_actions": [
-    "CEO (time-critical, UPDATED): CONF_FLOOR — fkB now FAILS at 29.1% (not 'comfortable'); ruling must waive/reject fkB or pick fkA-literal headline explicitly; ship-time pins 55@14d/56@30d",
-    "CEO: D=0.20 post-arm floor GO — census baseline now locked (25T -1.35 / 49% giveback share) for ship validation",
-    "Oct 26 17:42Z: price-feed 24h soak eval",
-    "Oct 27: unclog waiver expiry + pump-chain- PROMOTE (flip 64.5% n=346) + waiver scoreboard + #139 mid-band re-measure",
-    "COLLECT: inverse chase-block n 17->20 | hl_copy n=12 | universal TAT candidates (oversold-bounce+ n=4 too small)",
-    "Nov 1: coin_regime OOS. Nov 15: floor_admit 30d same-sign."
+  "drift_findings": [
+    {
+      "severity": "HIGH",
+      "finding": "hermes_constants.py rogue uncommitted edit 02:19:30 UTC (backdated comment 'REMOVED 2026-10-05'), identical to the CEO-reverted 2026-10-05 freeze violation. Would have been auto-committed by the 07:15 daily timer.",
+      "action": "REVERTED + guard shipped in daily_git_commit.py + escalated to CEO"
+    },
+    {
+      "severity": "MED",
+      "finding": "Author of the 02:19 edit unknown — no agent log, no changes_log entry, no kanban note. Possible stale session replay.",
+      "action": "escalated to CEO/T to identify the writer"
+    },
+    {
+      "severity": "LOW",
+      "finding": "trades.predicted_return = 0.0000 on all 689/689 populated rows; actual_return, entry_fear_greed, entry_timing = 0/703 populated — four dead columns",
+      "action": "logged, no mining on them"
+    },
+    {
+      "severity": "LOW",
+      "finding": "trailing_activated flag vs mfe>=0.40 disagree on 75/325 14d trades (49 reached-arm with flag FALSE, 26 flag TRUE but MFE<0.40 = TAT cohort). Live arming path is separate (position_manager.py:166) and [ARM-GAP] already instruments the 49.",
+      "action": "no action — known instrumented class; keep using mfe>=0.40 for KPIs"
+    }
   ],
-  "readiness": {
-    "open_trades": 0,
-    "posture": "flat = correct (CHOP, STRONG_DOWN, LOW vol, sources disagree 15m LONG_BIAS vs 4h SHORT_BIAS)",
-    "guidance": "SHORTs aligned; LONGs only on sustained EMA300 reclaim WITH volume; mid-band = no trade; trail-family first; size 1.0x"
-  }
+  "recurring_problems": [
+    "LONG side owns the bleed every run (7d LONG 90T -1.16 vs SHORT 41T +0.61) — direction-mix lever already REJECTED-WITH-DATA at 30d (#148), do not re-derive",
+    "chop-bleed share at baseline (84.2/85.4) for ~20 runs — entry quality, no new exit lever qualifies",
+    "CONF_FLOOR fkB ruling still open (time-critical) — now blocked by explicit fkB FAIL 29.1%"
+  ],
+  "missing_implementations": [
+    "D=0.20 universal post-arm floor for PM-exempt engines — bars PASS (#135/#136, 30d +2.368 p=0.019, fk 0%), CEO GO pending. This is the validated remedy for the pump-chain giveback that the reverted rogue edit tried to solve bluntly.",
+    "coin_regime COUNTER OOS recheck due 2026-11-01",
+    "contrarian pump-chain- PROMOTE due 2026-10-27"
+  ],
+  "creative_improvements": [
+    "ROGUE-CONSTANTS GUARD in daily_git_commit.py — SHIPPED (root cause: unlogged edits were being auto-committed at 07:15)",
+    "PRE-REGISTER IO #16407 conf 29.50 as a second live CONF_FLOOR fk data point (first was CFX #16373 conf 26.50 closed +1.31%)",
+    "DEAD-COLUMN CENSUS — predicted_return/actual_return/entry_fear_greed/entry_timing carry no information"
+  ],
+  "next_actions": [
+    "CEO: identify who wrote hermes_constants.py at 02:19:30 UTC — no agent claimed it",
+    "CEO: CONF_FLOOR fkB ruling (29.1% FAIL, ship HELD)",
+    "Next run: record IO #16407 outcome into the fk evidence set",
+    "Oct 27: contrarian pump-chain- PROMOTE + unclog waiver expiry",
+    "Nov 1: coin_regime OOS | Nov 15: floor_admit 30d same-sign"
+  ],
+  "readiness": "2 open SHORTs (BTC continuum-trend- SL 80992.9/TP 78574.9; IO pump-chain- SL 0.14515/TP 0.14068) — both bracketed, regime SHORT_BIAS both TFs, continuum BELOW, vol LOW, acceleration NEGATIVE = mixed tape. Watchdog steer: IO+BTC 12-min cluster (correlation, not auto-executable). LONGs only on sustained EMA300 reclaim WITH volume; SHORTs at mid-RSI (not 21-28 oversold); mid-band = no trade; size 1.0x."
 }
