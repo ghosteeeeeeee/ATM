@@ -1220,9 +1220,11 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 sl_price = round(entry_px * (1 - sl_pct), 8)
                 tp_price = round(entry_px * (1 + tp_pct), 8)
 
-            # Find paper trade for this token
+            # Find paper trade for this token (peaks folded in: no second round-trip,
+            # which would also abort this transaction on a blip)
             cur.execute("""
-                SELECT id, entry_price, direction, stop_loss, target, leverage, amount_usdt
+                SELECT id, entry_price, direction, stop_loss, target, leverage, amount_usdt,
+                       highest_price, lowest_price
                 FROM trades
                 WHERE token=%s AND status = 'open' AND exchange = 'Hyperliquid'
                 LIMIT 1
@@ -1231,7 +1233,7 @@ def reconcile_hype_to_paper(hl_pos, prices):
 
             if row:
                 # RULE 3: HL is truth — update paper trade with HL data
-                trade_id, paper_entry, paper_direction, paper_sl, paper_tp, paper_lev, paper_amt = row
+                trade_id, paper_entry, paper_direction, paper_sl, paper_tp, paper_lev, paper_amt, paper_high, paper_low = row
                 needs_update = False
                 update_fields = []
                 update_values = []
@@ -1248,6 +1250,25 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     update_fields.append("entry_price = %s")
                     update_values.append(entry_px)
                     log(f'  🔄 {coin} entry: ${paper_entry:.4f} → ${entry_px:.4f}')
+                    # Peak re-anchor (same root cause as position_manager._reanchor_seed_peak):
+                    # highest/lowest were seeded from creation-time entry_price, so rewriting
+                    # entry alone leaves the delta as a phantom favorable peak (entry correction
+                    # read as MFE) and peak-based exits can fire on entry disagreement alone.
+                    # Only moves a peak that is still the untouched creation seed.
+                    # Both columns checked (not direction-picked): a side correction in the
+                    # same UPDATE would make the old direction's column the wrong pick, and
+                    # both columns are seeded from the same creation entry.
+                    try:
+                        from position_manager import _reanchor_seed_peak
+                        for _pk, _raw in (('highest_price', paper_high), ('lowest_price', paper_low)):
+                            _seed = float(_raw or 0)
+                            _new = _reanchor_seed_peak(paper_entry, entry_px, _seed)
+                            if _new:
+                                update_fields.append(f"{_pk} = %s")
+                                update_values.append(_new)
+                                log(f'  🔁 {coin} peak re-anchor: {_pk} {_seed} → {_new} (moves with entry)')
+                    except Exception as _pk_err:
+                        log(f'  ⚠️ {coin} peak re-anchor skipped: {_pk_err}', 'WARN')
                 # Always sync hl_entry_price from HL — this is the authoritative fill price
                 # and is used for PnL. Even if entry_price is unchanged, this may be stale
                 # from a previous position and needs correcting.
@@ -2886,10 +2907,35 @@ def close_orphan_paper_trades(hl_pos, prices):
                                 if conn4:
                                     cur4 = conn4.cursor()
                                     try:
+                                        # Peak re-anchor: this writeback rewrites entry_price,
+                                        # so a brain-seeded peak must move with it or the delta
+                                        # becomes a phantom favorable MFE (same class as
+                                        # position_manager._reanchor_seed_peak — finding #1
+                                        # of the 2026-10-26 bug_hunter audit).
                                         cur4.execute("""
-                                            UPDATE trades SET entry_price = %s, hl_entry_price = %s
+                                            SELECT entry_price, highest_price, lowest_price
+                                            FROM trades WHERE id=%s AND status='open'
+                                        """, (int(trade_id_str),))
+                                        _pk_row4 = cur4.fetchone()
+                                        _pk_set, _pk_vals = '', []
+                                        if _pk_row4 and _pk_row4[0] and float(_pk_row4[0]) > 0:
+                                            try:
+                                                from position_manager import _reanchor_seed_peak
+                                                for _pk, _raw in (('highest_price', _pk_row4[1]),
+                                                                  ('lowest_price', _pk_row4[2])):
+                                                    _seed = float(_raw or 0)
+                                                    _new = _reanchor_seed_peak(float(_pk_row4[0]),
+                                                                               float(fill_price), _seed)
+                                                    if _new:
+                                                        _pk_set += f", {_pk} = %s"
+                                                        _pk_vals.append(_new)
+                                                        log(f'  🔁 {ht} peak re-anchor: {_pk} {_seed} → {_new} (mirror fill)')
+                                            except Exception as _pk_err4:
+                                                log(f'  ⚠️ {ht} peak re-anchor skipped: {_pk_err4}', 'WARN')
+                                        cur4.execute(f"""
+                                            UPDATE trades SET entry_price = %s, hl_entry_price = %s{_pk_set}
                                             WHERE id = %s AND status = 'open'
-                                        """, (fill_price, fill_price, int(trade_id_str)))
+                                        """, [fill_price, fill_price] + _pk_vals + [int(trade_id_str)])
                                         conn4.commit()
                                     except Exception:
                                         pass

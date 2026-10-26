@@ -16052,3 +16052,21 @@ Final set: []
 **Open Questions:**
 - bb-bounce-v2-long+ still loses ALL regimes 14d n=38 — CEO review pending (flagged 13:28)
 - 24h -$0.59 reddest of day; 7d -$0.62
+
+## 2026-10-26 17:45 UTC — brain_auditor: peak re-anchor ADOPTED+FIXED (phantom MFE)
+
+**Bug class:** brain.py seeds highest_price/lowest_price from creation-time entry; position_manager/hl-sync-guardian then rewrite entry_price to HL truth, leaving the seed — the two-entry delta reads as a phantom favorable peak, so UGB-PT / trail activation (+0.40%) can fire on entry disagreement alone. Evidence: ETH #16421 ugb_pt exit 1.45s after open (seed 2301.98 vs HL 2312.60 = phantom +0.459%); contaminates mfe_pct (IMX #16165 mfe 14.646, BTC #16384 0.545).
+
+**Provenance:** code written 17:01-17:03 by an unlogged session (no trading_log/kanban/changes_log entry, uncommitted). brain_auditor #165 adopted it: ran selfcheck (18 PASS), bug_hunter audit (SHIP-WITH-FIXES), applied 3 MED fixes, committing.
+
+**bug_hunter fixes applied:**
+- MED1: guardian copy-mirror fill writeback (:2910) now re-anchors seeds (was same bug class, unfixed)
+- MED2: guardian daemon restart after commit (started Oct 23, predates the fix)
+- folded peak columns into the original reconcile SELECT (removes extra round-trip + tx-abort failure point)
+- both peaks re-anchored (not direction-picked) — kills the stale-column pick on side-correction cycles
+- LOW#5 orphan-dup close path: ACCEPTED data-quality-only (closed same cycle, no exit risk)
+- MED3 historical mfe: backfill PRE-REGISTERED next run (pattern-match census noisy: ~3 rows mfe>=0.40 in 30d; confirmed offenders IMX/ASTER/ME old)
+
+**Also shipped:** run_pipeline.py portfolio log line sums pnl_usdt (was SUM(pnl_pct) = fake -13.67% where truth -$0.55).
+
+py_compile OK · peak_reanchor --selfcheck 19/19 PASS.

@@ -279,14 +279,14 @@ def main():
         import psycopg2
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM trades WHERE server='Hermes' AND status='open'")
-        open_c = cur.fetchone()[0]
-        cur.execute("SELECT COUNT(*), COALESCE(SUM(pnl_pct),0) FROM trades WHERE server='Hermes' AND status='closed' AND close_time > NOW() - INTERVAL '24 hours'")
+        # USDT, not SUM(pnl_pct): summing per-trade percentages is not a portfolio
+        # return and printed -13.67% where truth was -$0.55 (flagged INFO for days).
+        cur.execute("SELECT COUNT(*), COALESCE(SUM(pnl_usdt),0) FROM trades WHERE server='Hermes' AND status='closed' AND close_time > NOW() - INTERVAL '24 hours'")
         closed_today, closed_pnl = cur.fetchone()
-        cur.execute("SELECT COUNT(*), COALESCE(SUM(pnl_pct),0) FROM trades WHERE server='Hermes' AND status='open'")
+        cur.execute("SELECT COUNT(*), COALESCE(SUM(pnl_usdt),0) FROM trades WHERE server='Hermes' AND status='open'")
         open_c, open_pnl = cur.fetchone()
         total_pnl = closed_pnl + open_pnl
-        log(f'Portfolio: {open_c} open | {closed_today} closed 24h | {total_pnl:+.2f}% PnL')
+        log(f'Portfolio: {open_c} open | {closed_today} closed 24h | {float(total_pnl):+.2f} USDT PnL')
     except:
         pass
 

@@ -2419,6 +2419,32 @@ def get_trade_params(direction: str, price: float, max_leverage: int = MAX_LEVER
 
 # ─── Position Management ──────────────────────────────────────────────────────
 
+def _reanchor_seed_peak(entry, ep, seed):
+    """Return a corrected peak, or None when no re-anchor is due.
+
+    brain.py seeds highest_price/lowest_price from creation-time hl_entry_price.
+    This loop rewrites entry_price to HL's own entry_px when they disagree, but
+    the seed is left behind — so the delta between the two entry records reads as
+    a phantom favorable peak (entry correction counted as MFE) and peak-based
+    exits (UGB-PT) fire on entry-price disagreement alone.
+    ETH #16421 (2026-10-26 14:12:30): creation entry/seed 2301.98 vs HL entry
+    2312.60 -> fav=+0.46% -> UGB-PT exit 1.45s after open.
+    Re-anchors ONLY while the peak is still the untouched creation seed, so a
+    genuine post-open favorable move is never erased.
+    """
+    try:
+        entry = float(entry); ep = float(ep); seed = float(seed)
+    except (TypeError, ValueError):
+        return None
+    if entry <= 0 or ep <= 0 or seed <= 0:
+        return None
+    if abs(ep - entry) <= entry * 0.001:          # no material entry correction
+        return None
+    if abs(seed - entry) > entry * 1e-9:           # peak already moved: real MFE
+        return None
+    return ep
+
+
 def refresh_current_prices(server: str = SERVER_NAME):
     """
     Fetch live prices from Hyperliquid, update pnl_pct in brain DB for open positions.
@@ -2579,19 +2605,35 @@ def refresh_current_prices(server: str = SERVER_NAME):
                     # hl_entry here ensures PnL is consistent with what HL reports.
                     # If hl_entry is 0 (edge case), fall back to DB entry.
                     _ep = hl_entry if hl_entry > 0 else entry
+                    # Peak re-anchor: entry_price is about to be rewritten to HL truth,
+                    # so a creation-seed peak must move with it (see _reanchor_seed_peak).
+                    _seed_pk = ('highest_price' if direction == 'LONG'
+                                else 'lowest_price' if direction == 'SHORT' else None)
+                    _seed_new = (_reanchor_seed_peak(entry, _ep, pos.get(_seed_pk))
+                                 if _seed_pk else None)
                     pnl_pct = compute_live_pnl(_ep, cur_price, direction)   # pnl_utils
                     pos['pnl_pct'] = pnl_pct
                     pos['pnl_usdt'] = hl_unrealized if hl_unrealized else 0
                     pos['entry_price'] = _ep  # fix in-memory entry to match HL
+                    if _seed_new:
+                        log(f"  [PeakReanchor] {token} {direction} trade={trade_id} "
+                            f"entry {entry} -> {_ep}, {_seed_pk} {pos.get(_seed_pk)} -> {_seed_new} "
+                            f"(creation seed moved with entry; phantom-MFE gap closed)")
+                        pos[_seed_pk] = _seed_new
                     updated += 1
                     if db_cur:
                         try:
-                            db_cur.execute("""
-                                UPDATE trades
-                                SET current_price = %s, pnl_pct = %s, pnl_usdt = %s,
-                                    entry_price = %s, updated_at = NOW()
-                                WHERE id = %s AND status = 'open'
-                            """, (cur_price, pnl_pct, pos['pnl_usdt'], _ep, trade_id))
+                            # Single statement so entry and seed can never diverge
+                            # (a partial apply would leave the phantom peak for good).
+                            _set_cols = ("current_price = %s, pnl_pct = %s, pnl_usdt = %s, "
+                                         "entry_price = %s")
+                            _set_args = [cur_price, pnl_pct, pos['pnl_usdt'], _ep]
+                            if _seed_new:
+                                _set_cols += ", " + _seed_pk + " = %s"
+                                _set_args.append(_seed_new)
+                            db_cur.execute(
+                                "UPDATE trades SET " + _set_cols + ", updated_at = NOW() "
+                                "WHERE id = %s AND status = 'open'", _set_args + [trade_id])
                         except Exception:
                             pass
             else:

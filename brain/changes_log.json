@@ -3031,5 +3031,16 @@
     "after": "Corrected: pump-chain- arm rate is 64.9% (24/37 mfe>=0.40) not 24.3% (9/37); 14d totals 165 vs 142. ugb_pt exits with mfe 0.459 read FALSE; trail_arm_timeout reads TRUE with no arm",
     "rationale": "wrong arm definition routed pump-chain- to the CHOP/momentum-gate lever when it is a WRONG-SIDE signal — the contrarian direction evidence is the matching lever",
     "impact": "0 trading behavior; corrects a published KPI and prevents a wrong-lever proposal"
+  },
+  {
+    "timestamp": "2026-10-26T17:45:00Z",
+    "agent": "brain_auditor",
+    "change": "ADOPTED+FIXED peak re-anchor (phantom MFE on entry rewrite): position_manager._reanchor_seed_peak + guardian reconcile/mirror call sites, bug_hunter SHIP-WITH-FIXES applied (MED1 mirror path, MED2 guardian restart, folded SELECT kills tx-abort point, both-column re-anchor kills direction-pick flaw). Also run_pipeline portfolio log now sums pnl_usdt not pnl_pct.",
+    "type": "tweak",
+    "file": "scripts/position_manager.py + scripts/hl-sync-guardian.py + scripts/run_pipeline.py",
+    "before": "entry_price rewritten to HL truth while highest/lowest stayed at creation seed -> entry-delta read as phantom favorable peak -> UGB-PT/trail arm could fire on entry disagreement alone (ETH #16421 ugb_pt exit 1.45s after open)",
+    "after": "seed peak re-anchored with entry IFF still untouched creation seed; single UPDATE; both peaks checked; mirror writeback path covered",
+    "rationale": "auto_1hr FLAG 14:28 ETH vol ugb_pt closed in 2s target-placement suspect = phantom MFE class; fix written 17:03 unlogged/uncommitted by unknown session, verified by bug_hunter this run, MED fixes applied by brain_auditor",
+    "impact": "stops phantom-MFE premature exits; historical mfe_pct contamination remains (pattern-match ~3 rows mfe>=0.40 in 30d, backfill pre-registered); guardian restarted post-commit"
   }
 ]
