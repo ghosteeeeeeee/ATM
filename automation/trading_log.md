@@ -15836,3 +15836,24 @@ Final set: []
 
 **Open Questions:**
 - 24h -$0.04 (near flat), 7d -$0.79 — red drift persists
+
+## 2026-10-26 08:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.01 (WR: 0.0%) | 24h: 21T 12W 57.1% -$0.02 | 7d 129T 44.2% -$0.68 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 1 loss: CAKE bb-bounce-v2-long+ trail_arm_timeout -$0.01 (-0.29% account) — small timeout exit, not a signal-logic issue
+- atr_sl_hit 3/21 = 14.3% (<40%) — dominant close = profit-monster-trail (9T +$0.38)
+- Kill check: no signal with 0% WR n≥3 last hour (only 1 trade total); worst 24h bb-bounce-v2-long+ 5T 1W 20% -$0.05 (not kill criteria)
+- No 3+ negative-hour streak (01 -, 02 +, 03 -, 05 +, 07 -; 04/06 empty)
+- Frequency 1/hr — not overtrading
+- Entry quality: 24h winner MAE max 0.477% (<0.5% — good)
+- 1 open BTC continuum-osc+ LONG bracketed SL 79576/TP 81275
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.02 (near flat), 7d -$0.68 — red drift persists
+- bb-bounce-v2-long+ still 20% WR (5T) over 24h — watch but no kill trigger
