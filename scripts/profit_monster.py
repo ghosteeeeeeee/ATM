@@ -116,6 +116,15 @@ def get_all_open_positions():
                     f"{sorted(ceo_tokens & {str(r[1]).upper() for r in rows})} — "
                     f"manual_exit_manager owns those exits")
                 rows = kept
+        # ── trail-state GC (brain_auditor #158) ──────────────────────────────
+        # `rows` IS the managed-open set (open minus PROFIT_MONSTER_BYPASS minus
+        # CEO-tranche). See _gc_trail_state for why orphans are dangerous.
+        # This success path only — the DB-error path returns [] above and must
+        # never wipe a healthy file.
+        try:
+            _gc_trail_state([str(r[0]) for r in rows])
+        except Exception as _gc_err:
+            log(f"trail-state GC error: {_gc_err}", "WARN")
         return [
             {"id": r[0], "token": r[1], "direction": r[2], "entry_price": float(r[3]),
              "current_price": float(r[4]), "pnl_pct": float(r[5]), "opened_at": r[6],
@@ -383,6 +392,45 @@ def _load_trail_state():
 def _save_trail_state(state):
     _TRAIL_STATE_FILE.write_text(json.dumps(state, indent=2))
 
+
+def _gc_trail_state(kept_ids, state_file=None):
+    """Drop trail-state keys whose trade_id is not in kept_ids. Returns dropped.
+
+    Keys are only ever deleted on a PM trail exit (`del state[tid]` in
+    run_trail), so every other exit path — atr_sl_hit, hard_max_loss, ugb_pt,
+    trail_arm_timeout, rr_engine — orphans its key permanently. A signal PM
+    briefly saw and then bypassed (2026-10-26 02:19 rogue constants edit,
+    reverted 02:40) leaves a key PM can never reach again. Four consumers read
+    membership as "profit_monster is actively handling this trade":
+      * position_manager UGB-PT enforce -> skips the post-arm floor
+        (IO #16407: 8 UGB-PT would-fire cycles skipped 02:48-03:04, closed
+         atr_sl_hit -0.45% price-move = -1.25% stored pnl_pct (lev 3) instead
+         of first-fire floor live +0.44%)
+      * cut_loser.close_position -> stands down on the whole TOKEN
+        (6 logged skips: BABY 10-15, SYRUP 10-21, CC x3 10-23 — all then hit
+         -3.09 / -3.95 / -4.02% leveraged = -$0.53)
+      * hl_fill_monitor copy-exit -> calls cut_loser's same token check, continues
+      * sniper_exit:707 skip + :908 tier1 exclusion (winner never booked)
+    Set-difference against the managed-open set is the whole rule.
+    ponytail: no per-key status query; upgrade to a DB-verified purge only if
+    the managed-open set ever stops being authoritative.
+    """
+    f = Path(state_file) if state_file else _TRAIL_STATE_FILE
+    try:
+        state = json.loads(f.read_text())
+    except Exception:
+        return 0
+    kept = {str(i) for i in kept_ids}
+    orphans = [k for k in state if k not in kept]
+    if not orphans:
+        return 0
+    for k in orphans:
+        del state[k]
+    f.write_text(json.dumps(state, indent=2))
+    log(f"  [PM] trail-state GC: dropped {len(orphans)} orphaned entries, "
+        f"{len(state)} live")
+    return len(orphans)
+
 def _trail_distance_for_peak(peak_pnl_pct):
     """Return trail distance for current peak profit using tier system.
     Tiers loosen as profit grows — last matching tier wins (highest applicable)."""
@@ -594,8 +642,44 @@ def run(dry_run=False):
         log(f"Total closed: {total} (T1={t1_closed}, T2={t2_closed})")
 
 
+def _selfcheck() -> bool:
+    """trail-state GC: orphan keys die, live keys survive, unreadable file is a no-op."""
+    import tempfile
+    ok = True
+
+    def check(name, cond):
+        nonlocal ok
+        print(f"  {'PASS' if cond else 'FAIL'} {name}")
+        ok = ok and bool(cond)
+
+    with tempfile.TemporaryDirectory() as d:
+        f = str(Path(d) / "ts.json")
+        Path(f).write_text(json.dumps({"111": {"token": "A"}, "222": {"token": "B"}}))
+        # live keys survive; orphans drop
+        dropped = _gc_trail_state(["222"], f)
+        check("orphans dropped, live kept", dropped == 1
+              and set(json.loads(Path(f).read_text())) == {"222"})
+        # empty managed set clears everything (bypassed/CEO-only book)
+        check("empty managed set clears", _gc_trail_state([], f) == 1
+              and json.loads(Path(f).read_text()) == {})
+        # empty state, non-empty kept -> no-op, no write
+        check("empty state no-op", _gc_trail_state(["999"], f) == 0)
+        # unreadable file -> 0, no crash
+        Path(f).write_text("{not json")
+        check("unreadable file no-op", _gc_trail_state(["1"], f) == 0)
+        # non-str ids are normalised
+        Path(f).write_text(json.dumps({"222": {}}))
+        check("int ids normalised", _gc_trail_state([222], f) == 0)
+    return ok
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Profit Monster — Two-tier take-profit")
     parser.add_argument("--dry-run", action="store_true", help="Preview without executing")
+    parser.add_argument("--selfcheck", action="store_true", help="trail-state GC self-test")
     args = parser.parse_args()
+    if args.selfcheck:
+        good = _selfcheck()
+        print(f"SELF-CHECK {'PASS' if good else 'FAIL'}")
+        raise SystemExit(0 if good else 1)
     run(dry_run=args.dry_run)
