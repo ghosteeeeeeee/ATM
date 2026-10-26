@@ -15981,3 +15981,25 @@ Final set: []
 - ETH volume-buildup- ugb_pt opened 14:12:30 and closed 14:12:32 (2 seconds) at +0.02% — instant exit, likely target already at/near entry; worth checking if ugb_pt target placement is degenerate for that entry, but PnL-neutral
 - 24h -$0.19 (reddest since 04:00's -$0.19, driven by DYDX/ICP hard_max_loss -$0.21), 7d -$0.28 still improving from -$0.80
 - bb-bounce-v2-long+ still loses ALL regimes 14d n=38 — CEO review still pending from 13:28 flag
+
+## 2026-10-26 15:29 UTC Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** -$0.34 (WR: 0.0%) | 24h: 30T 14W 46.7% -$0.55 | 7d 136T 44.9% -$0.62 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: LTC volume-buildup- hard_max_loss -$0.17 (-3.82%), CC pump-chain- hard_sl -$0.07 (-0.63%), GRASS pump-chain+ hard_sl -$0.10 (-0.92%)
+- atr_sl_hit 4/30 = 13.3% (<40%) — dominant close = profit-monster-trail (9T +$0.34)
+- Kill check: no signal with 0% WR n≥3 last hour (3T split across 3 signals); worst 24h hl_copy_trader 0%W and pump-chain- 0%W but both n=2 (<3)
+- No 3+ negative-hour streak yet (13 +0.02, 14 -0.31, 15 -0.10 in progress — 2 consecutive, trigger at 3)
+- Frequency 3/hr — not overtrading
+- Entry quality: winner mae_pct NULL for all 24h winners (column unpopulated this window — MAE check unavailable)
+- 0 open trades — all flat
+
+**Open Questions:**
+- 24h -$0.55 is reddest of the day (driven by 14:00 hour -$0.31: DYDX hard_max_loss + SYRUP/ETH losses); 7d -$0.62
+- bb-bounce-v2-long+ loses ALL regimes 14d n=38 — CEO review still pending (flagged 13:28)
+- volume-buildup- 9T 5W 55% WR but -$0.15 net — losses larger than winners, worth MFE/MAE review if trend continues
+- If hour 15 closes negative it's a 3-hour streak → then check regime and consider size cut
