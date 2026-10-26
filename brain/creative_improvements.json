@@ -9014,5 +9014,108 @@
     "category": "regime gate",
     "status": "re_rejected",
     "risk": "would block the historically profitable regime"
+  },
+  {
+    "date": "2026-10-26T12:55:00Z",
+    "idea": "PRE-REG CORRECTION (pre-data): re-base the run-#160 ARM-GAP bar to the UGB-PT-enforce era (close_time >= 2026-10-25 02:18:17) and gate the read on n>=30 reached-arm closes",
+    "rationale": "34/35 (34T -$1.66) of the locked 14d baseline closed BEFORE the enforcement that closes this cohort. PRE 34/147=23.1% -$1.66 vs POST 1/17=5.9% -$0.05 with 6/7 post-deploy mfe>=0.40 non-trail exits caught by ugb_pt (+$0.10). The locked bar ('post-GC rate < 32.1%') passes on deployment alone, so it cannot separate cause (a) stale trail-state from (b) exit order. Logged before any post-GC data exists (n=1 close since the GC).",
+    "expected_impact": "the ARM-GAP read returns a valid yes/false instead of a false confirmation of the #158 GC",
+    "category": "pre-registration hygiene",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T12:55:00Z",
+    "idea": "Arm-rate KPIs must be sourced from '[TRAIL] <tok> activated' log lines (or a future pm_armed stamp) — never from trades.trailing_activated",
+    "rationale": "PG trigger trades_set_trailing_activated() sets TRUE iff exit_reason ILIKE '%trail%': it records HOW a trade exited, not WHETHER the trail armed. 14d 0 counterexamples of the invariant; 25/25 trail_arm_timeout exits stored as armed; 0/35 ARM-GAP cohort rows can be TRUE given its own exit set (predicate redundant); IO #16407 logged a PM arm at 02:27:04 yet stored False because it exited atr_sl_hit. The run-#160 arm_rate_ledger therefore ranks signals by exit mixture (pump-chain- '25.0% lowest live arm rate' is not an arm rate).",
+    "expected_impact": "prevents future arm-rate ledgers and arm-dampen candidates from being built on an exit-reason column",
+    "category": "measurement instrument",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T12:55:00Z",
+    "idea": "UGB-PT enforcement-efficacy watch (pre-registered, n>=30): reached-arm giveback-to-stop rate pre- vs post-enforce",
+    "rationale": "PRE 34/147 = 23.1% (-$1.66) vs POST 1/17 = 5.9% (-$0.05), 6 ugb_pt exits +$0.10 since 2026-10-25 02:18:17. Directionally the CEO-GO'd floor works, but 17 reached-arm closes is too few to claim it; re-read at n>=30.",
+    "expected_impact": "gives the 'does UGB-PT work' answer the ARM-GAP bar was meant to give",
+    "category": "exit engine",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T12:55:00Z",
+    "idea": "REJECTED-WITH-DATA: remove/loosen the UGB-PT trail-state exclusion so armed trades can also take the giveback floor",
+    "rationale": "IO #16407 looked like an open exclusion bug (4 shadow fires, 0 enforce, stop exit) but #158 already root-caused it to the 02:19-02:40 rogue PROFIT_MONSTER_BYPASS orphan and shipped the GC (canary 0 skips since 08:45:55). Whole exclusion set: 22 unique would-fires, 7 enforced, 15 blocked, blocked net +$0.90 over 15T with only 2 stop-outs (-$0.12).",
+    "expected_impact": "nil — logged so the IO case is never re-derived as an open bug; removing the exclusion would put a +$0.90 cohort back under a floor it does not need",
+    "category": "exit engine",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T13:50:00Z",
+    "idea": "REJECTED-WITH-DATA: hard LONG block while BTC sits AT/BELOW EMA300 (watchdog P1 direction-misallocation steer)",
+    "rationale": "7d LONG 84T 41.7% -$0.73 vs SHORT 44T 54.5% +$0.50 looks like misallocation but Fisher two-sided p=0.193 (n adequate, NOT significant). Direction x armed decomposition (14d) kills the mechanism: LONG ARMED 98T 76.5% +$5.55 (our single best cohort) vs SHORT ARMED 66T 62.1% +$2.85; the bleed is the UNARMED half (LONG unarmed 122T 5.7% -$9.66 vs SHORT unarmed 39T 5.1% -$3.13) because LONGs simply go unarmed more often (55% vs 37%). Signal-mix check: 32 of the 84 7d LONGs (-$0.60 of -$0.73 = 82%) are bb-bounce/doji/ai-trader/hl_copy = killed, disabled or already queued; all other LONGs 52T -$0.13 = wash. A hard LONG block would kill the +$5.55 armed cohort to chase a p=0.19 residual, and fails the review-queue bars (no n>=15 shadow counterfactual).",
+    "expected_impact": "none (not shipped); documents why direction is a proxy for arming, not a lever — entry-quality gates already queued target the actual bleed",
+    "category": "direction gate",
+    "status": "rejected_with_data",
+    "risk": "would block the profitable armed LONG cohort"
+  },
+  {
+    "date": "2026-10-26T13:50:00Z",
+    "idea": "REJECTED-WITH-DATA: STANDALONE_BYPASS (1-source) signals enter more chop than confluence signals",
+    "rationale": "Hypothesis was that bypassing the 2-source confluence requirement admits chop entries. Measured 14d on mfe_pct-known closes: STANDALONE_BYPASS family 205T arm-rate 54.6% pnl -$2.12 vs requires-confluence 118T arm-rate 43.2% pnl -$2.13 — bypass signals ARM MORE OFTEN and net the same. The naive \"confluence = better entries\" assumption runs backwards here; signal mix confounds it (pump-chain+/volume-buildup- are both bypass and are the healthiest families).",
+    "expected_impact": "none (not shipped); closes the route before someone proposes tightening CONFLUENCE_REQUIRED on it",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T13:50:00Z",
+    "idea": "SHIPPED: pm_armed_at durable arm stamp in profit_monster (zero behavior) — arm-rate KPIs read from PG, not log lines or exit reasons",
+    "rationale": "run #161 proved trades.trailing_activated is an exit-reason flag (25/25 trail_arm_timeout stored armed; IO #16407 arm line ignored) and that [TRAIL] log lines rotate/compress. Single jsonb || UPDATE at activation; failure WARNs and never blocks the trail; --selfcheck now 11 checks incl. live-DB round-trip that ROLLS BACK.",
+    "expected_impact": "arm-rate-by-signal becomes a one-query KPI; removes the recurring \"which column is arming\" caveat from every future ledger",
+    "category": "measurement instrument",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T13:50:00Z",
+    "idea": "PRE-REGISTER: hl_copy_trader family kill criteria (recheck on first 30d read with n>=20)",
+    "rationale": "30d 14T 28.6% -$0.20, 14d 12T 25.0% -$0.18, 7d 5T 20% -$0.10 — consistently sub-50% but under the n>=20 bar. Exits dominated by atr_sl_hit (8/12 14d, avg MFE 0.319) = entries that stall then stop, both directions (LONG 6 / SHORT 3), so no direction-scoped fix. Watchdog queue already names the family.",
+    "expected_impact": "when 30d n reaches 20, the standard kill test (n>=20 AND PnL<0 AND WR<30%) runs automatically instead of being re-derived by hand each run; until then monitor only",
+    "category": "kill pre-registration",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T14:55:00Z",
+    "idea": "REJECTED-WITH-DATA: cluster risk limiter (A: same signal family 2nd+ open within 15m; B: any 2nd+ open in the book within 15m)",
+    "rationale": "Carried 5x as 'suggested — needs backtest' since 2026-10-03 (#207/#214/#246/#252/#256) and never measured; the watchdog fired steer-001 (DYDX+LTC, same signal, 20min) this cycle. Measured on 7/14/30d with bars written before the groups were read.",
+    "expected_impact": "NONE - blocking cluster members would have LOST money. Bug_hunter-verified final read: family arm 30d blocked n=104 WR 46.2% vs anchor 43.8%, net -0.94, delta_after_fee -0.23, Fisher p=0.7088, 7d blocked +0.01 (sign 1/3) -> 2/5 bars = REJECT. Book arm 30d blocked n=244 WR 43.4% vs 44.5%, p=0.4208, winner-impact 33.3% >20% -> 3/5 bars = REJECT.",
+    "category": "portfolio risk",
+    "status": "rejected_with_data",
+    "risk": "low",
+    "file": "brain/analysis/cluster_risk_limiter_2026-10-26.py",
+    "sample_size": "103 / 243 blocked at 30d",
+    "would_block_winners": "15.1% (A) / 33.3% (B) of 30d winners",
+    "bug_hunter": "SHIP-WITH-FIXES: fixed (1) win_impact 0.0 falsy-default in B3, (2) missing anchor-drift guard in --selfcheck, (3) fisher_left mid-range pin; fisher_left cross-validated against scipy.stats.fisher_exact and brute-force hypergeometric; 30d cohort independently re-queried and matched."
+  },
+  {
+    "date": "2026-10-26T14:55:00Z",
+    "idea": "PRE-REG AMENDMENT (pre-data, tightening): the 2026-10-30 scoped momentum time-stop blind run must show its saving attributable to the MFE<0.15 cohort",
+    "rationale": "Fresh MFE ladder, 3 windows all monotone: MFE<0.15 = 14d 81T -7.50 of -15.35 gross (48.9%) and 30d 155T -18.21 of -35.68 (51.0%). The 0.15-0.40 bands are each -1.5 to -2.7 at 30d and contain recovering grinders. Without this attribution bar the run could pass by cutting trades that would have recovered, which is the amputate-the-runner failure mode the PM trail already rejected once.",
+    "expected_impact": "Makes an in-flight test harder to game; does not change its locked B1-B6 bars (tightening a bar pre-data is always allowed, moving it post-data is not).",
+    "category": "exit quality",
+    "status": "pre_registered_tightening",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T14:55:00Z",
+    "idea": "REJECTED PRE-EMPTIVELY: 'pump-chain- reaches arm but the trail fails to convert it' (would have implied a pump-chain- trail fix)",
+    "rationale": "14d looked broken: pump-chain- armed 24T WR 33.3% with mean giveback 0.638 and all 13 armed losers exiting at stop, never at trail - the only n>=10 signal with sub-50% armed WR. 30d OOS reverses: armed 60T 48.3% net +2.64. Window-dependent, so no trail-side claim survives; the only live levers for pump-chain- remain CONF_FLOOR and the 2026-10-27 PROMOTE slot.",
+    "expected_impact": "0 - prevents a future run proposing a trail change on a 14d-only artifact (the #85 pattern).",
+    "category": "exit mechanism",
+    "status": "rejected_with_data",
+    "risk": "low"
   }
 ]

@@ -2976,5 +2976,38 @@
     "after": "_gc_trail_state() set-diff on success path only (DB-error path skips GC); selfcheck 5/5 PASS; 0 Tracebacks post-GC",
     "rationale": "orphan keys read as PM ownership by 4 consumers (position_manager UGB-PT, cut_loser token check, hl_fill_monitor, sniper_exit) -> exits blocked on dead keys",
     "impact": "unblocks cut_loser/UGB-PT/sniper on orphaned tokens; monitor: cut_loser PM-skips must stay 0 post-GC (canary)"
+  },
+  {
+    "timestamp": "2026-10-26T12:55:00Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/arm_gap_baseline_2026-10-26.py (--selfcheck PASS): reads the live PG trailing_activated trigger, proves it is an exit-reason flag, and splits the #160 ARM-GAP baseline by UGB-PT enforce deployment (2026-10-25 02:18:17)",
+    "type": "creative",
+    "file": "brain/analysis/arm_gap_baseline_2026-10-26.py",
+    "before": "run-#160 ARM-GAP bar locked against a 34/35 pre-deployment baseline and an arm-rate ledger built on an exit-reason column",
+    "after": "bar re-based to the enforce era with an n>=30 gate; arm-rate semantics documented (arming = [TRAIL] activated log lines)",
+    "rationale": "the locked bar would have passed on deployment alone and could not separate its two named causes; the arm-rate KPI mislabels exit mixture as arming",
+    "impact": "zero trading behavior; prevents a false confirmation of the #158 GC and a false arm-rate ranking"
+  },
+  {
+    "timestamp": "2026-10-26T13:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Durable PM-arm stamp: profit_monster writes pm_armed_at into trades._signal_metadata at trail activation (single jsonb UPDATE, WARN-wrapped); --selfcheck extended to 11 checks incl. DB round-trip rolled back",
+    "type": "creative",
+    "file": "scripts/profit_monster.py",
+    "before": "arm state only in [TRAIL] activated log lines (rotate/compress) and trades.trailing_activated (exit-reason flag: 25/25 trail_arm_timeout read as armed, IO #16407 arm reads as unarmed)",
+    "after": "_signal_metadata.pm_armed_at = UTC timestamp at activation; NULL/absent = PM trail never armed; query: (_signal_metadata ->> 'pm_armed_at') IS NOT NULL",
+    "rationale": "run #161 headlined that arm-rate KPIs were ranking exit mixtures, not arming, and named the pm_armed stamp as the durable fix queued behind nothing but time",
+    "impact": "zero trading behavior; future arm-rate ledgers become queryable from PG without log parsing (verify first live stamp after next arm)"
+  },
+  {
+    "timestamp": "2026-10-26T14:55:00Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/cluster_risk_limiter_2026-10-26.py (--selfcheck PASS): pre-registered 5-bar test of the 5x-suggested cluster risk limiter, both arms REJECTED-WITH-DATA",
+    "type": "creative",
+    "file": "brain/analysis/cluster_risk_limiter_2026-10-26.py",
+    "before": "idea carried 'suggested — needs backtest' since 2026-10-03, never measured",
+    "after": "measured 7/14/30d, bug_hunter SHIP-WITH-FIXES applied (3 edits, bars unchanged); family arm 2/5 bars PASS, book arm 3/5 bars PASS - both REJECT-WITH-DATA; watchdog steer-001 cluster class ruled informational",
+    "rationale": "watchdog was actively steering on a cluster risk class with no evidence either way",
+    "impact": "0 config change; closes a 5-run-old open suggestion and stops future cluster-steer chase; --selfcheck now has 3 assertions (family/book split, anchor drift, fisher extremes+mid)"
   }
 ]

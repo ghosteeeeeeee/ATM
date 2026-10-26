@@ -441,6 +441,35 @@ def _trail_distance_for_peak(peak_pnl_pct):
     return dist
 
 
+# ── Durable PM-arm stamp (brain_auditor #162, zero behavior) ─────────────────
+# trades.trailing_activated is an EXIT-REASON flag (PG trigger: exit_reason
+# ILIKE '%trail%'), so it answers "how did it exit", not "did PM trail manage it"
+# — 25/25 trail_arm_timeout rows read as armed, stop-exits read as unarmed.
+# The [TRAIL] activated log lines answer it correctly but rotate/compress.
+# Single atomic UPDATE into _signal_metadata; failure never blocks the trail.
+_PM_ARMED_SQL = """
+    UPDATE trades
+    SET _signal_metadata = COALESCE(_signal_metadata, '{}'::jsonb)
+        || jsonb_build_object('pm_armed_at',
+            to_char(NOW() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'))
+    WHERE id = %s
+"""
+
+
+def _stamp_pm_armed(trade_id):
+    """Stamp pm_armed_at into the trade's _signal_metadata. Commits on success."""
+    import psycopg2
+    from _secrets import BRAIN_PASSWORD, BRAIN_HOST
+    conn = psycopg2.connect(host=BRAIN_HOST, dbname="brain", user="postgres",
+                            password=BRAIN_PASSWORD, connect_timeout=10)
+    try:
+        with conn.cursor() as cur:
+            cur.execute(_PM_ARMED_SQL, (int(trade_id),))
+        conn.commit()
+    finally:
+        conn.close()
+
+
 def run_trail(positions, dry_run):
     """Trailing profit tier: mark trades in profit, trail peak, exit on weakness.
 
@@ -540,6 +569,10 @@ def run_trail(positions, dry_run):
                     log(f"  [TRAIL] {pos['token']} activated: pnl={pnl:.2f}% "
                         f"peak={pnl:.2f}% trail_floor={pnl - _trail_distance_for_peak(pnl):.2f}% "
                         f"trade_id={tid}")
+                    try:
+                        _stamp_pm_armed(tid)
+                    except Exception as e:
+                        log(f"  [TRAIL] pm_armed_at stamp failed trade_id={tid}: {e}", "WARN")
 
     _save_trail_state(state)
     ts_file.write_text(json.dumps({"ts": time.time()}))
@@ -643,7 +676,7 @@ def run(dry_run=False):
 
 
 def _selfcheck() -> bool:
-    """trail-state GC: orphan keys die, live keys survive, unreadable file is a no-op."""
+    """trail-state GC (orphans die, live keys survive) + pm_armed_at stamp round-trip."""
     import tempfile
     ok = True
 
@@ -670,6 +703,58 @@ def _selfcheck() -> bool:
         # non-str ids are normalised
         Path(f).write_text(json.dumps({"222": {}}))
         check("int ids normalised", _gc_trail_state([222], f) == 0)
+
+    # pm_armed_at stamp: round-trips on populated + empty metadata, keeps prior
+    # keys, no-ops on missing id — all inside one transaction that ROLLS BACK.
+    try:
+        import psycopg2
+        from _secrets import BRAIN_PASSWORD, BRAIN_HOST
+        conn = psycopg2.connect(host=BRAIN_HOST, dbname="brain", user="postgres",
+                                password=BRAIN_PASSWORD, connect_timeout=10)
+    except Exception as e:
+        print(f"  SKIP pm_armed stamp (DB unreachable: {e})")
+        return ok
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, _signal_metadata FROM trades "
+                        "WHERE _signal_metadata IS NOT NULL ORDER BY id DESC LIMIT 1")
+            row_a = cur.fetchone()
+            cur.execute("SELECT id FROM trades ORDER BY id DESC LIMIT 1")
+            row_b = cur.fetchone()
+            check("stamp fixtures found", row_a is not None and row_b is not None)
+            if row_a is not None:
+                # psycopg2 decodes jsonb -> dict
+                before = row_a[1] if isinstance(row_a[1], dict) else json.loads(row_a[1])
+                cur.execute(_PM_ARMED_SQL, (row_a[0],))
+                check("UPDATE matched", cur.rowcount == 1)
+                cur.execute("SELECT _signal_metadata FROM trades WHERE id=%s", (row_a[0],))
+                after = cur.fetchone()[0]
+                if not isinstance(after, dict):
+                    after = json.loads(after)
+                # all pre-existing keys must survive (stamp may overwrite itself)
+                check("prior keys preserved",
+                      all(after.get(k) == v for k, v in before.items()))
+                check("pm_armed_at stamped", bool(after.get("pm_armed_at")))
+            if row_b is not None:
+                # NULL metadata path: COALESCE must build an object, not NULL
+                cur.execute("UPDATE trades SET _signal_metadata=NULL WHERE id=%s", (row_b[0],))
+                cur.execute(_PM_ARMED_SQL, (row_b[0],))
+                cur.execute("SELECT _signal_metadata FROM trades WHERE id=%s", (row_b[0],))
+                after_b = cur.fetchone()[0]
+                if not isinstance(after_b, dict):
+                    after_b = json.loads(after_b)
+                check("NULL metadata -> object with stamp", bool(after_b.get("pm_armed_at")))
+            cur.execute(_PM_ARMED_SQL, (-1,))
+            check("missing id is a no-op", cur.rowcount == 0)
+    except Exception as e:
+        print(f"  FAIL pm_armed stamp ({e})")
+        ok = False
+    finally:
+        try:
+            conn.rollback()   # never persist the selfcheck writes
+            conn.close()
+        except Exception:
+            pass
     return ok
 
 
