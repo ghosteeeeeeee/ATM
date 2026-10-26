@@ -22,10 +22,14 @@ deferred after the SL sweep.
 - Extremes from the **union of candles_1m + candles_5m** (candles.db) — handles partial
   windows with gaps.
 - fav_at_exit from trade prices; fav_after = best entry-based favorable level among
-  candles **starting at/after** exit (straddle candle excluded → conservative).
+  candles **starting at/after** exit (the exit-minute straddle candle is included by
+  code — audit's strict variant showed 0 classification flips either way).
 - *Bigger move followed* (v2) = fav_after ≥ max(fav_at_exit, 0) + T.
-- 96/100 analyzed (DOT/BLUR/INJ/ALT skipped: 20–50% candle coverage), median window
-  coverage 100%, 1 trade at 51% (RENDER).
+- 96/100 analyzed. **Amended per own-conclusions audit:** the 4 skipped (DOT/BLUR/INJ/ALT)
+  were **not data gaps** — they were the 4 NEWEST trades whose 8h windows had not finished
+  elapsing at run time (candle counts = elapsed window minutes, minute-exact). ~10 more
+  partial-window trades were silently INCLUDED (only RENDER flagged). Findings hold on the
+  auditor's CLEAN n=88 fully-elapsed cohort (73% at T=0.3).
 - HML cap in price terms = 4% account / leverage (CUT_LOSER_PNL = −4%).
 
 ## 1. Exit-reason census (n=96)
@@ -66,8 +70,8 @@ Cohort MFE ≥0.8% in 8h: **n=64** (40 with MFE ≥1.5%).
 | Requirement | Value |
 |---|---|
 | MAE before the peak (p50 / p75 / p90) | **0.57% / 1.17% / 1.62%** price (max 4.76%) |
-| Actual per-trade SLs (p50 / p75) | 0.73% / 2.30% — effective stop = min(SL, HML) |
-| What kills first today (5x → HML = 0.8% price) | own SL 24/64 · HML 13/64 · survivable only **36/64** |
+| Actual per-trade SLs (p50 / p75) | 0.73% / 2.30% — **exit-time snapshot: stop_loss is trailing-rewritten during the trade (63/65 atr_managed)**, not necessarily the stop in force pre-peak |
+| What kills first today (5x → HML = 0.8% price) | **AMENDED per audit:** raw counts SL 24/64 · HML 13/64 **overlap 9–10 (partition never computed; true SL-first ≈19, HML-first ≈8)** · survivable **36–51 of 64** (36 with exit-snapshot stops; 51 with initial 1.5% stops: SL-first 0, HML-first 14) |
 | Max leverage keeping HML (−4% acct) intact | p50 MAE → **≤7x** · p75 → **≤3.4x** · p90 → **≤2.5x** |
 | Peak timing | p50 **~4.6h** after open, p75 ~6.7h (vs soft-trail 2h, max-hold 1–2h — time exits structurally can't reach an 8h peak) |
 
@@ -94,18 +98,42 @@ Cohort MFE ≥0.8% in 8h: **n=64** (40 with MFE ≥1.5%).
 
 ## Verification appendix (THE PATTERN checklist)
 
-- **Reproducible:** 3 full runs identical (only ALT's live candle count drifts 235→238 —
-  live collector appending).
+- **Reproducible:** 3 full runs identical **given the same cohort — determinism, not
+  stability**: the cohort is re-selected via NOW() each run, so trades age in/out between
+  runs (ALT's "candle drift" 235→238 was its still-elapsing window, per audit).
 - **Independent spot checks** (separate raw-SQL code path): BTC ugb_pt fav_after 0.95 vs
   0.97 ✓ · ZRO MAE_to_peak 4.76 ✓ · DYDX 1.97 ✓ · WLD 10.07 and GRASS 12.50 reconcile
-  arithmetically (entry-base = cap + exit-base; both 480/480 candles — moves are real).
+  arithmetically (entry-base = cap + exit-base; both 480/480 candles — moves are real;
+  auditor re-verified 0 gaps, peaks hours after exit).
 - **Self-audit caught a definition bug** (v1 counted stopped-out losers on trivial ticks);
   v1 numbers discarded, v2 used throughout.
 - **Split-half:** 34/47 vs 36/47 — present in both halves. No formal p-value claimed:
   "exit before the 8h max" is near-tautological; the load-bearing stats are magnitudes
   and the loser-continuation tail.
-- **Caveats:** closed trades only (open-position survivorship); 4/100 skipped for data;
-  RENDER window 51%; fav/MFE gross of fees; scenario 4b exits at peak → upper bound;
-  cohort conditioned on MFE≥0.8% (T's premise — outcome-selection if treated as policy).
-- **Independent audit:** own-conclusions subagent tasked to recompute from scratch and
-  issue AGREE/DISAGREE/PARTIAL — verdict saved under `brain/verdicts/`.
+- **Caveats:** closed trades only (open-position survivorship); mixed windows (see amended
+  method note — 4 unfinished + ~10 truncated, only RENDER flagged); fav/MFE gross of fees;
+  scenario 4b exits at peak → upper bound (auditor: also assumes an entirely different exit
+  rule than PM-trail, gross-vs-net mixed); cohort conditioned on MFE≥0.8% (T's premise —
+  outcome-selection if treated as policy); **foregone p90 tail is unstable at n≈70
+  (4.08 vs audit's 3.64 — single-trade rank flip; median/p75/max stable)**.
+
+## Independent audit (own-conclusions skill) — COMPLETED
+
+- **Verdict file:** `brain/verdicts/20261026-mfe-mae-8h-own-conclusions.md`
+- **Auditor's own code:** `analysis/audit_own_mfe_mae.py` (from scratch, 3 cohort variants:
+  FULL n=99 / MATCHED / CLEAN n=88 fully-elapsed; second code path raw-SQL spot checks)
+- **Result: AGREE on 7 claims (2,3,5,7,8,10,11), PARTIAL on 4 (1,4,6,9), DISAGREE: none.**
+  Headline reproduces: 73–74% bigger-move-after-exit; loser-tail tiers 26/23/18/10 exact;
+  GRASS/WLD outliers real on 480/480 gap-free candles; leverage math exact against live
+  HML=−4%/lev; amount_usdt confirmed notional (median residual $0.002); scenario reproduces
+  (+9.52/24 vs +9.61/23; 15/15 and 6/6 stops exact).
+- **Amendments applied to this report (as demanded):** claim-1 framing (recency ≠ data
+  loss) and claim-6 SL attribution (trailing-rewritten stops; overlapping kill sets;
+  survivable quoted as **36–51**, not 36). p90 instability and determinism-vs-stability
+  noted above.
+- **New ticket from audit:** **BUG-065** — `HML_VOL_ATR_MULT` EXTREME-regime vol-floor in
+  `position_manager.py:3747-3759` is dead code (capped to the account limit, then
+  re-compared to itself → the widening can never fire), while
+  `hermes_constants.py:736`'s comment still promises it. No impact on this report's math.
+- **Bottom line upheld:** the coupled CUT_LOSER + wider-SL shadow-trial recommendation
+  stands.

@@ -1204,6 +1204,25 @@
       "found_by": "bug-hunter verification round 2026-10-11",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-065",
+      "title": "HML_VOL_ATR_MULT vol-floor is dead code \u2014 EXTREME-regime HML widening can never fire, while constants comment still promises it",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "scripts/position_manager.py",
+        "scripts/hermes_constants.py"
+      ],
+      "symptom": "position_manager.py:3747-3759: _hml_vol_floor = -HML_VOL_ATR_MULT*ATR is first clamped to the account cap (CUT_LOSER_PNL_HERMES/lev) whenever it is wider, then tested `if _hml_vol_floor < HARD_MAX_LOSS_PCT` \u2014 HARD_MAX_LOSS_PCT is initialized to that same account cap, so after clamping the condition is equality and never true; the non-widening path also never assigns. The block is unreachable in every branch. hermes_constants.py:736 comment still claims 'EXTREME ATR 1.5% -> thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%' \u2014 that widening has been impossible since the 2026-10-10 account-limit cap. Related: HML remains the #1 bleed class (11/96 exits in last-100 audit, all losses).",
+      "root_cause": "2026-10-10 deliberate account-limit cap made the vol-floor assignment structurally unreachable; the dead branch and the stale constants comment were left in place (stale-comment class, same as 2026-10-22 findings). Note position_manager:3735 comment even calls it 'same bug class as the vol floor (capped Oct 10)' \u2014 known-cap, unaware-dead-code.",
+      "fix": "Decide policy: (A) accept 'account limit governs everywhere' -> delete the unreachable block and correct HML_VOL_ATR_MULT comment to say inert; or (B) if EXTREME widening is still wanted, it is a CUT_LOSER-coupled risk-budget change -> CEO shadow trial (ties into the deferred CUT_LOSER+ATR_SL coupled trial). Do NOT silently re-widen past CUT_LOSER.",
+      "verified_by": "own-conclusions audit ce5a78d3 (2026-10-26) + manual code read of position_manager.py:3747-3759 by main session; arithmetic: clamp-then-compare-to-same-value",
+      "date_found": "2026-10-26",
+      "date_fixed": null,
+      "found_by": "own-conclusions",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
