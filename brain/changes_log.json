@@ -3009,5 +3009,27 @@
     "after": "measured 7/14/30d, bug_hunter SHIP-WITH-FIXES applied (3 edits, bars unchanged); family arm 2/5 bars PASS, book arm 3/5 bars PASS - both REJECT-WITH-DATA; watchdog steer-001 cluster class ruled informational",
     "rationale": "watchdog was actively steering on a cluster risk class with no evidence either way",
     "impact": "0 config change; closes a 5-run-old open suggestion and stops future cluster-steer chase; --selfcheck now has 3 assertions (family/book split, anchor drift, fisher extremes+mid)"
+  },
+  {
+    "timestamp": "2026-10-26T15:45:00Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/exit_ladder_oos_2026-10-26.py — escalation #17 next slice: arm-timeout candle OOS for the 6 families the Oct-17 grid never covered, with a median-open-time OOS leg and 5 bars locked in the docstring before any result was read",
+    "type": "creative",
+    "file": "brain/analysis/exit_ladder_oos_2026-10-26.py",
+    "before": "exit_ladder_tat_grid_2026-10-17.py covered only pump-chain-/bb-squeeze/pump-chain+ and had no OOS leg; escalation #17 stayed owed",
+    "after": "--selfcheck PASS (4 assertions). 1 PASS / 5 FAIL: bb-squeeze T=55 net +1.10 fk 12.0% halves +0.08/+1.02 but live 60m nets +1.07 => delta +0.03/30d = noise; bb-bounce-v2 fk 26.5-61.8% all T; volume-buildup- net negative all T; r2v2-long3 fk 25%; hl-copy n<20",
+    "rationale": "Mandate: exit early in chop. Needed a pre-registered, OOS-verified answer for the families that still have no arm-timeout, instead of another escalation ping",
+    "impact": "0 config change; REJECT-WITH-DATA closes the new-arm-timeout and widen-bb-bounce-TAT alternatives for these 6 families"
+  },
+  {
+    "timestamp": "2026-10-26T15:45:00Z",
+    "agent": "brain_auditor",
+    "change": "DRIFT FIX appended to brain/creative_improvements.json: retire trailing_activated as the arm-rate measure, use mfe_pct >= PM_TRAIL_ACTIVATE_PCT (0.40)",
+    "type": "tweak",
+    "file": "brain/creative_improvements.json",
+    "before": "Oct-25 arm-rate-by-signal KPI (status=measured) counted arming from trailing_activated, an exit-reason flag: pump-chain- read 25.7% arm",
+    "after": "Corrected: pump-chain- arm rate is 64.9% (24/37 mfe>=0.40) not 24.3% (9/37); 14d totals 165 vs 142. ugb_pt exits with mfe 0.459 read FALSE; trail_arm_timeout reads TRUE with no arm",
+    "rationale": "wrong arm definition routed pump-chain- to the CHOP/momentum-gate lever when it is a WRONG-SIDE signal — the contrarian direction evidence is the matching lever",
+    "impact": "0 trading behavior; corrects a published KPI and prevents a wrong-lever proposal"
   }
 ]

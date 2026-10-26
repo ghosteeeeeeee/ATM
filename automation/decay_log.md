@@ -2008,3 +2008,8 @@
 [2026-10-26 09:31 UTC]   🟡 WARNING: bb-bounce-v2-long+: 5 trades, 20.0% WR, PnL=-0.52
 [2026-10-26 09:31 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-26 09:31 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-26 15:31 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-26 15:31 UTC]   🟡 WARNING: bb-bounce-v2-long+: 5 trades, 20.0% WR, PnL=-0.52
+[2026-10-26 15:31 UTC]   🟢 OK: volume-buildup-: 9 trades, 66.7% WR, PnL=-0.53
+[2026-10-26 15:31 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-26 15:31 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

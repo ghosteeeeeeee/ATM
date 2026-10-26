@@ -9117,5 +9117,50 @@
     "category": "exit mechanism",
     "status": "rejected_with_data",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-26T15:45:00Z",
+    "idea": "Two-axis chop-vs-wrong-side routing matrix (mfe>=0.40 arm-rate x WR) as the standing lever-selector",
+    "rationale": "The mandate has two distinct failure modes and they need opposite levers. With the CORRECTED arm definition, 14d/30d n>=15: CHOP cohort (never arms -> momentum gate) = doji 31.3%, ai-trader-pending 18.8%. WRONG-SIDE cohort (arms, still loses -> direction/exit) = pump-chain- 64.9% arm / 21.6% WR, bb-bounce-v2 42.1/36.8, pump-chain+ 41.3/32.6. Healthy = volume-buildup- 69.7/66.7, r2v2-long3 47.1/58.8. This also explains the 5 entry-feature nulls: cohorts differ by SIGNAL IDENTITY, not by admission-time continuous features.",
+    "expected_impact": "stops wrong-lever proposals (a momentum gate on pump-chain- would target the wrong 35%); zero code, standing KPI",
+    "category": "diagnosis framework",
+    "status": "measured this run",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T15:45:00Z",
+    "idea": "Contrarian pump-chain- flip — fee-adjusted EV + live-exit-path caveat for the Oct-27 ruling",
+    "rationale": "All pre-registered legs PASS: paired p<1e-4, orig control 36.5% vs flip 64.7% (n=348), OOS both halves (p=0.0033 / p<1e-4), both scorer tables, counter-control btc-pump-rider+ correctly do-not-flip (73.4% vs 25.3%) so it is not a global drift artifact. Fee-adjusted EV under the symmetric +/-0.40% classifier = 0.647*(0.40-0.05) - 0.353*(0.40+0.05) = +0.0676% per event before any live-signal scarcity. MISSING LEG: the 64.7% is measured under a fixed touch classifier, not under live trail/ATR-SL exits — the Oct-27 decision must say so, or ship a live-gate-aware shadow line first (automatic-implementation shadow->enforce).",
+    "expected_impact": "swings the worst live SHORT cohort (37T/14d 21.6% WR -0.42) from negative to positive if the edge survives live exits",
+    "category": "direction flip",
+    "status": "ready-for-ceo — auto-fire 2026-10-27T17:12Z, do not ship early",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-26T15:45:00Z",
+    "idea": "DRIFT FIX: retire `trailing_activated` as an arm-rate measure; use mfe_pct >= PM_TRAIL_ACTIVATE_PCT",
+    "rationale": "trailing_activated is an exit-reason flag (ugb_pt exits with mfe 0.459 read FALSE; trail_arm_timeout reads TRUE with no arm). It undercounts arming 142 vs 165 overall and 9 vs 24 for pump-chain-. The Oct-25 KPI built on it misdiagnosed pump-chain- as chop.",
+    "expected_impact": "corrects an already-published 'measured' KPI; prevents a momentum-gate proposal aimed at a wrong-side signal",
+    "category": "instrumentation",
+    "status": "corrected",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T15:45:00Z",
+    "idea": "EXIT-LADDER CANDLE OOS — escalation #17 next slice: 6 uncovered families tested, 5 REJECT-WITH-DATA",
+    "rationale": "brain/analysis/exit_ladder_oos_2026-10-26.py (--selfcheck PASS, 5 assertions), bars locked pre-data on ALIVE denominators (n>=20 held to age T, fired>=5, fk<=20% of alive winners, net>0, OOS same-sign). Result: 0 PASS / 6 FAIL-or-skip. bb-bounce-v2 alive fk 52.9-87.0% at every T; volume-buildup- alive n<20 and net negative at every T; r2v2-long3 alive n<20; hl-copy n<20; bb-squeeze alive fk 46.2-66.7% where alive>=20. SELF-AUDIT CAUGHT a false PASS: the first cut inherited the Oct-17 grid's whole-cohort denominators, under which bb-squeeze T=55 read PASS (fk 12.0%, net +1.10) — a trade closed before age T can never be fired on, so counting it as a possible FK victim dilutes fk%. Alive-only = 46.2% = FAIL. Both printed side by side; verdict uses ALIVE.",
+    "expected_impact": "no ship; permanently closes the 'new arm-timeout' and 'widen bb-bounce / tighten bb-squeeze TAT' alternatives for these 6 families, and documents the denominator trap so the Oct-17 grid's PASS conventions are not reused unexamined",
+    "category": "exit engine",
+    "status": "rejected-with-data (instrument shipped)",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T15:45:00Z",
+    "idea": "GATE LOOSENING scoreboard #2 (30d, pre-registered #76 criteria) — 0 of 22 SHORT gates pass",
+    "rationale": "brain/gate_shadow.db 30d resolved: every gate net-negative for the trader = net-positive for the house (largest saves SHORT-CONTINUUM -9.04, CONFLUENCE-GATE-BLOCK -4.83, PUMP-CHAIN-SHORT-HIGH -4.45). Nearest candidate SLOPE-FILTER SHORT net +$0.98 vs the +$1.00 bar (misses $0.02), OOS +0.76/+0.22, WR 2.9%.",
+    "expected_impact": "no ship; stops short-supply loosening proposals until a gate actually clears",
+    "category": "gate",
+    "status": "rejected-with-data",
+    "risk": "none"
   }
 ]

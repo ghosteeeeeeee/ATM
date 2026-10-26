@@ -1,150 +1,148 @@
-# Current State — brain_auditor #163 2026-10-26 14:55 UTC
-**Last Updated: 2026-10-26 14:55 UTC**
-**Updated by: brain_auditor #163. Prior: #162 13:50 / #161 12:55 / #160 11:55 (preserved in git history).**
+# Current State — brain_auditor #164 2026-10-26 15:45 UTC
+**Last Updated: 2026-10-26 15:45 UTC**
+**Updated by: brain_auditor #164. Prior: #163 14:55 / #162 13:50 / #161 12:55 (preserved in git history).**
 
-## HEADLINE — the watchdog's ACTIVE cluster steer has no statistical support. 0 config changes, 1 instrument ship.
+## HEADLINE — 0 config changes, 2 instruments. Contrarian PROMOTE now has every leg PASS, 26h before its date. Exit-ladder OOS delivered the next slice: 5 families REJECT-WITH-DATA.
 
-steer-001 this cycle: *"Trade cluster: DYDX + LTC — both opened within 20 minutes. Correlation risk."*
-That idea also sat in `creative_improvements.json` as **"suggested — needs backtest" five times since
-2026-10-03** and had never been measured. Measured now, bars written **before** the groups were read
-(`brain/analysis/cluster_risk_limiter_2026-10-26.py`, `--selfcheck PASS`, **bug_hunter SHIP-WITH-FIXES**:
-2 MEDIUM + 2 LOW fixed, `fisher_left` cross-validated vs scipy + brute-force hypergeometric, cohort
-independently re-queried and matched):
+Nothing shipped. Every candidate failed a bar that was written down before the number was read.
 
-| arm (15m window) | 30d blocked | WR blocked | WR anchor | net | Δ after 0.05% fee | Fisher p (left) | bars |
-|---|---|---|---|---|---|---|---|
-| **A. same signal family, 2nd+ open** | 104 | **46.2%** | 43.8% | `-$0.94` | **`-$0.23`** | **0.7088** | 2/5 → REJECT |
-| **B. any 2nd+ open in the book** | 244 | 43.4% | 44.5% | `-$1.15` | `+$0.46` | 0.4208 | 3/5 → REJECT |
+| candidate | bar | result |
+|---|---|---|
+| short-gate loosening | n≥50 AND net > +$1.00 AND 30d OOS same sign AND blocked WR <30% | **0 of 22 PASS** (nearest SLOPE-FILTER +$0.98 — misses by $0.02) |
+| pump-chain- direction flip | paired p<0.05, flip>orig both tables, OOS same sign both halves | **ALL PASS** — but auto-fire is **2026-10-27T17:12Z**, DO NOT ship early |
+| bb-bounce-v2-long+ kill | must not block >20% of 30d winners | **FAIL** (would take 28/56 = 50%) |
+| new arm-timeout (6 families) | ALIVE n≥20, fired≥5, fk≤20% of alive winners, net>0, OOS same sign | **0 PASS / 6 FAIL-or-skip** |
+| bb-squeeze TAT 60→55m | same as above | **FAIL** (alive fk 46.2% at T=55, 66.7% at live T=60) |
 
-- Family arm also **fails same-sign**: 7d blocked is **`+$0.01`** (1/3 windows).
-- Book arm's B2 *passes* only marginally — 7d blocked `-$0.09` **flipped sign from `+$0.08` between two
-  reads 20 minutes apart** as one trade closed. A 3/3 same-sign verdict that moves on a single close is
-  not a gate.
-- Book arm **fails winner-impact**: blocks **33.3%** of 30d winners (>20% bar).
-- **Blocking cluster members would have LOST money**, and members are if anything slightly
-  *better* than solo trades.
-- **Guidance logged: cluster steers stay INFORMATIONAL — no run should chase them.**
+`hermes_constants.py` working-tree diff **EMPTY** · CEO_PROTECTED untouched · session lock **absent** · size-reduce **ABSENT = 1.0x**.
 
-## LAST-RUN VERIFY — `pm_armed_at` SHIP CONFIRMED LIVE (closes #162's open queue item)
-Trade **16418 USUAL `r2v2-long3`** closed `profit-monster-trail` `+$0.05` at 14:26:24 with
-`_signal_metadata.pm_armed_at = 2026-10-26T14:20:18Z`. Rows carrying the stamp: **1/1** since the
-13:50 ship. Also PASS: `arm_gap_baseline --selfcheck` · daily_git_commit guard present, 07:15 clean ·
-profit-monster GC canary **0** `Profit monster closing` · constants working-tree diff **EMPTY** ·
-CEO_PROTECTED untouched · size-reduce **ABSENT = 1.0x** · session lock **absent** · kill leaks 0 ·
-`BB_BOUNCE_TRAIL_ARM_TIMEOUT=True` (TAT-C live).
+## CONTRARIAN PROMOTE — control arm landed today, and it was the missing leg
+`analysis/contrarian_both_sides_2026-10-26.py` scores **both** directions on the same events/rule
+(same ±0.40% / 30×5m classifier), paired exact binomial, median-time OOS split:
 
-**Traceback census corrected (D162-3):** prior runs claimed "0 Tracebacks dated 2026-10-26" scoped to
-`pipeline.log`. Scanning **all** logs finds hits only in `logs/trade-watchdog.log`, and each is the
-**watchdog agent's own failed throwaway heredoc** (`NameError: name 'DB_CONFIG' is not defined`,
-`for r in cur.fetchall(): print(r)`, …) — not a component crash. Service-level = **0**. LOW: watchdog
-self-logged snippet errors inflate any naive "Tracebacks today" count.
+| signal | n | orig WR | flip WR | paired p | OOS older | OOS newer |
+|---|---|---|---|---|---|---|
+| **pump-chain-** | 348 | **36.5%** | **64.7%** | <1e-4 | 36.2→65.7 p<1e-4 | 37.0→63.0 p=0.0033 |
+| btc-pump-rider+ (control) | 252 | 73.4% | 25.3% | <1e-4 | do-not-flip | do-not-flip |
+| whole pool | 601 | — | 48.5% | — | — | — |
 
-## MANDATE — CHOP vs TREND (fresh PG, 14d 334T 38.6% `-$4.55`)
-- **`profit-monster-trail` 83T 91.6% `+$4.58`** + `ugb_pt` 9T `+$0.24`
-  vs **`atr_sl_hit` 80T 1.3% `-$5.57`** vs **`hard_max_loss` 62T 0.0% `-$6.24`**
-  vs `trail_arm_timeout` 25T 20% `-$0.78`
-- **armed (mfe≥0.40) 165T 70.7% `+$8.40`** vs **unarmed 163T 5.6% `-$12.79`**
-- **MFE ladder is monotone in all 3 windows** — the whole addressable bleed is one cohort:
+The counter-control is what makes it evidence: btc-pump-rider+ is **right** 73% of the time, so this is
+not a global upward-drift artifact of the entry windows, and the pool-wide 48.5% proves the edge is
+**family-specific**, not a generic "flip everything".
 
-| MFE bucket | 7d | 14d | 30d |
-|---|---|---|---|
-| **<0.15%** | 28T `-$2.23` | 81T `-$7.50` | 167T **`-$18.07`** |
-| 0.15–0.40 (4 bands) | 19T `-$1.86` | 45T `-$4.44` | 97T `-$7.66` |
-| **≥0.40** | 72T **`+$3.65`** | 165T **`+$8.40`** | 409T **`+$25.96`** |
+**Fee-adjusted EV under the symmetric classifier** = 0.647×(0.40−0.05) − 0.353×(0.40+0.05) = **+0.068%/event**.
 
-  **MFE<0.15 = 48.9% of 14d gross loss (7.50 of 15.35) and 51.0% at 30d (18.21 of 35.68).**
+**⚠️ MISSING LEG for the Oct-27 package:** 64.7% is scored under a fixed touch classifier, **not** under
+live trail/ATR-SL exits. State the caveat in the ruling, or ship a live-gate-aware shadow line first
+(`automatic-implementation` shadow→enforce). Do not present "64.7%" as live expectancy.
 
-**Read: trend side healthy. No exit lever opened beyond the in-flight UGB-PT / TAT-C / Oct-30 time-stop.**
+## EXIT-LADDER CANDLE OOS — escalation #17, next slice (instrument ships, nothing does)
+`brain/analysis/exit_ladder_oos_2026-10-26.py` — `--selfcheck PASS` (**5** assertions: sign
+convention, units, fk%, verdict bars, **alive-denominator guard**). Bars locked in the docstring
+**before** any result: **ALIVE** n≥20 (= held to age T), fired≥5, fk≤20% of **alive** winners, net>0,
+OOS same-sign across the cohort's own median `open_time`. Units: `cf$ = amount_usdt × live_pnl/100`,
+`benefit = cf − actual` (no `pnl_pct` landmine).
 
-## ⛔ STOP-CALL — entry-feature mining has returned nulls 5 independent times
-`staleness` + `gap_at_entry` census (#155, both rejected) · `repeat_after_stop` (#159) ·
-entry-feature separation test (10-23) · entry-feature arm-predictor (10-25).
-Reproduced independently this run on fresh PG — armed vs unarmed **medians**:
+**⚠️ SELF-AUDIT CAUGHT A FALSE PASS IN MY OWN FIRST CUT.** The first version inherited the Oct-17
+grid's *whole-cohort* denominators. A trade that closed **before age T can never be fired on**, so
+counting it as a possible FK victim dilutes fk% and inflates n — both anti-conservative. Under those
+denominators bb-squeeze T=55 read **PASS** (fk 12.0%, net +$1.10); on alive-only it is **fk 46.2% =
+FAIL**. This was the **only** PASS in the run. Script fixed, both columns now printed
+(`fk%` = alive, `fk%coh` = cohort), selfcheck gained an assertion that a big cohort with few alive
+trades cannot satisfy b1. **Tightened post-data toward the stricter side, so no loosening risk.**
 
-| rsi_exec | gap | speed_pct | volume_spike | staleness_min | vol_regime |
-|---|---|---|---|---|---|
-| 47.9 / 54.2 | 0.1 / 0.2 | 47.7 / 48.3 | 0.37 / 0.33 | 1.32 / 1.25 | identical |
+| family | verdict | why |
+|---|---|---|
+| bb-bounce-v2-LONG (n=65, alive 28–50) | **FAIL all 7 T** | alive fk 52.9%–87.0% — a no-arm cut would butcher its PM-trail winners |
+| volume-buildup-SHORT (n=33, alive 3–15) | SKIP all 7 T | alive n<20 at every T **and** net negative at every T; it is our 66.7% WR signal — do not touch |
+| r2v2-long3-LONG (n=20, alive 4–9) | SKIP all T | alive n<20; cohort fk 25% at best |
+| hl-copy LONG (n=12) / SHORT (n=3) | SKIP | n<20 |
+| bb-squeeze-LONG (n=83, alive 14–49) | **FAIL all T** | alive fk 46.2%–66.7% where alive≥20 (cohort-denominator read would say 12.0% at T=55 — see self-audit) |
 
-**Do not re-run entry-feature / armed-separation scans.** Signal identity, not admission-time
-continuous features, is what separates the cohorts.
+**Net: 0 exit levers, 0 PASS anywhere.** The new-arm-timeout, widen-bb-bounce-TAT and tighten-bb-squeeze-TAT
+alternatives are now closed with data for these 6 families — stop re-proposing them. Max candle staleness
+observed: 58s (negligible).
 
-## GUARD LEAK CENSUS — verify-only, **no gap found**
-`SHORT_RSI_FLOOR=45`: 30d SHORT with `rsi_exec<45` = **17T net `+$0.12` @ 58.8% WR** (15 of them
-`volume-buildup-`) — the leaked cohort is **PnL-positive**, so the floor needs no change. The single
-`rsi_exec 39.0` leak is ICP #16409, the `[35,45)` waiver class that **lapses 2026-10-27T00:00Z**.
+## DRIFT — the Oct-25 arm-rate KPI counted the wrong column
+`trailing_activated` is an **exit-reason flag**, not an arm indicator:
 
-## LOSING AUTOPSY — WRONG-SIDE REFUTED **87th** CONSECUTIVE RUN
-`recovery_replay.py` adverse-first (`--selfcheck` ASSERT PASS, vacuity **182/191** reproduced):
-**48h n=15** = 5 never-adverse / 9 recovered-after-adverse / **1 NEVER** (ICP #16409) ·
-**14d 191 losers = 37 / 126 / 28 NEVER = 14.7%** structural never-recover (was 17.5% on the Oct-22
-baseline). Refs that survive: `#61` p=0.116, `#84` t=-0.04. 24h losers mapped: **ICP** = waiver-band
-oversold short (lapse removes it) · **DYDX `-$0.12` / -5.45% acct** = one wide-SL loss inside a family
-that is 14d 32T 68.8% `+$0.68` with armed WR 91.3% (n=1, no signal defect) · **ETH hl_copy ×2** =
-counter-tape LONGs, family pre-registered on the n≥20 bar (30d n=14) · **ADA+CAKE bb-bounce** =
-never-armed chop, KILL BARS FAIL, TAT-C-owned.
+- 14d: `trailing_activated`=142 vs `mfe_pct>=0.40`=165
+- **pump-chain-: 9 (24.3%) vs 24 (64.9%)** ← the KPI published 25.7%
+- `ugb_pt` exits with `mfe_pct=0.459` read **FALSE** (trade 16421 ETH); `trail_arm_timeout` reads **TRUE** with no arm (25/25)
 
-## DEEP-DIVE — 0 new shippable sub-50% n≥15 targets
-`bb-bounce-v2-long+` 38T 36.8% (TAT-C live, re-kill banned) · `doji-bottom-long` killed Oct 16 ·
-`ai-trader+` disabled · `pump-chain-` CONF_FLOOR + PROMOTE Oct 27 · `pump-chain+` NO-KILL 30d `+$1.84` ·
-`ai-trader-pending` 16T 25% = n≥15 but CEO domain, cohort dead since Oct 19 · `hl_copy_trader` 14T/30d
-under bar → kill test pre-registered at n≥20 · **`volume-buildup-` 32T 68.8% `+$0.68` healthiest live**.
+**Impact:** the KPI called pump-chain- a **CHOP** signal and routed it toward a momentum gate. It is a
+**WRONG-SIDE** signal — it reaches the trail threshold 65% of the time and still loses 78% of them.
+A momentum gate cannot fix that; the direction flip can. Corrected entry appended to
+`brain/creative_improvements.json`.
 
-## SHADOW — 2/6 answerable · **SL + ARM-TIMEOUT SWEEPS OPEN NO LEVER**
-- contrarian join: **pc- flip 64.6% n=347** (OOS both halves same sign) = **Oct-27T17:12Z PROMOTE stands,
-  not shipped early**; btc-pump-rider+ orig 73.4% vs flip 25.1% = do-NOT-flip.
-- shadow_trader 24,746 signals: CONFLUENCE-EXPIRY 11,520 @48% avg `-$0.12`, BTC-CRASH 133 @32%
-  avg `-$0.37` = gates earning keep; exit A/B **pm_trail `+3525` vs hard_max `-5232` (0% WR)**.
-- **`--sweep-sl`: every level negative** (best 5.0% still `-0.259%` avg). **`--sweep-arm`: every
-  timeout negative** (best 45m still `-0.166%` avg) → **cite neither as a ship candidate.**
-- `--flip-test` on shadow_trader returns *No signals to test* for pc+/bb-bounce (signal-name mismatch
-  with contrarian jsonl) → use `analysis/contrarian_both_sides` for flips.
-- floor_admit 2,070 + wyckoff 331 **PENDING outcome join = biggest queued ROI (Nov 15)** ·
-  oscillator FROZEN by design · rr_shadow_audit **ORPHANED** (no producer, 21d stale).
+### Corrected two-axis matrix (arm = `mfe_pct >= 0.40`, 14d n≥15, 30d alongside)
 
-## WATCHDOG TRIAGE
-- **steer-001 cluster → REJECTED** (HEADLINE; steer class now informational).
-- **Regime: all four sources SHORT_BIAS, BTC below EMA300 87 bars → AGREED**, book compliant.
-- **USUAL #16418 counter-regime LONG → RESOLVED BY A WIN** (closed 14:26 `profit-monster-trail`
-  `+$0.05`, arm stamp landed) — not by an exit steer.
-- **No kills** — every bleeding family already owned.
+| signal | 14d n | arm% | WR% | pnl | 30d | route |
+|---|---|---|---|---|---|---|
+| bb-bounce-v2-long+ | 38 | 42.1 | 36.8 | −1.12 | 61 / 57.4 / 47.5 / −0.61 | WRONG-SIDE → direction/exit |
+| ai-trader+ | 20 | 45.0 | 30.0 | −0.85 | 29 / 48.3 / 41.4 / −0.80 | WRONG-SIDE (already disabled Oct 19) |
+| **pump-chain-** | 37 | **64.9** | **21.6** | −0.42 | 87 / 69.0 / 34.5 / −0.04 | **WRONG-SIDE → contrarian flip** |
+| pump-chain+ | 46 | 41.3 | 32.6 | −0.15 | 75 / 49.3 / 40.0 / **+1.81** | WRONG-SIDE 14d only; 30d green — no lever |
+| ai-trader-pending | 16 | **18.8** | 25.0 | −0.14 | 16 / 18.8 / 25.0 / −0.14 | **CHOP** (never arms) — n<20, no fire since Oct 24 |
+| doji-bottom-long | 16 | 31.3 | 31.3 | −0.97 | 30 / 56.7 / 50.0 / −0.36 | killed Oct 16, last open matches |
+| r2v2-long3 | 17 | 47.1 | 58.8 | −0.03 | 20 / 55.0 / 60.0 / +0.47 | healthy |
+| volume-buildup- | 33 | 69.7 | 66.7 | **+0.51** | 33 / 69.7 / 66.7 / +0.51 | healthy |
 
-## CREATIVE / REJECTED THIS RUN
-1. **REJECTED-WITH-DATA** cluster risk limiter, both arms (5×-suggested since 10-03, never tested).
-2. **PRE-REG TIGHTENING (pre-data)** for the **2026-10-30** time-stop blind run: its saving must be
-   attributable to the **MFE<0.15** cohort, not to cutting 0.15–0.40 grinders that recover.
-   Locked B1–B6 unchanged — tightening pre-data is allowed; moving them post-data is not.
-3. **REJECTED PRE-EMPTIVELY** "pump-chain- arms but the trail fails to convert" — 14d armed 33.3%
-   negative vs **30d armed 60T 48.3% `+$2.64`** = window-dependent, no trail-side claim. Logged so
-   no future run proposes a pump-chain- trail fix.
+**This matrix is also why entry-feature mining stays STOPPED (6th null):** cohorts separate by signal
+identity, not by admission-time continuous features. A momentum gate aimed at the CHOP column would
+miss pump-chain- entirely.
 
-## DRIFT
-- **D163-1 (carried):** run #161's ship untracked until #162 — `git status` checked this run;
-  `profit_monster.py` + `arm_gap_baseline_...py` still uncommitted from #162 → committed here.
-- **D163-2:** watchdog self-logged snippet Tracebacks inflate naive log counts (see LAST-RUN VERIFY).
-- **D162-2 (carried, no code change):** `CEO_PROTECTED_FLAGS` names `SIGNALS_REGISTRY`, attribute is
-  `signals.SIGNAL_REGISTRY` → protected 13/13 **in substance**.
-- Carried LOW: weekly 03:00 Sun `ModuleNotFoundError dispatcher.dispatcher` (verify Nov 1) ·
-  `data_integrity_guard.py` never invoked · `session_brain` duplicate-scrambled `ceo` records.
+## MANDATE — CHOP vs TREND (fresh PG, 14d 336T 38.6% `−$4.71`)
+- exits: **`profit-monster-trail` 83T 91.6% `+$4.58`** + `atr_trail_hit` 24T `+$3.47`
+  vs `atr_sl_hit` 80T 1.3% `−$5.57` vs `hard_max_loss` 63T 0.0% `−$6.41`
+- **armed 165T 70.3% `+$8.40`** vs **unarmed 166T 5.4% `−$13.27`** — 7d `+3.65` vs `−4.43`
+- MFE ladder monotone in all 3 windows: `<0.15` **−$7.60** (14d) / **−$18.24** (30d) · `≥0.40` **+$8.56** / **+$26.20**
+- hold by bucket (14d): `<0.15%` 42m avg · `0.15–0.40` 89m · `≥0.40` 93m
 
-## QUEUE
-- **2026-10-27T00:00Z** waiver LAPSE verify (zero allow-lines + `[UNCLOG-EXPIRED]`; c3 = price-move)
-- **2026-10-27T17:12Z** pump-chain- PROMOTE formal re-verify (do NOT ship early)
-- **2026-10-27** mid-band [35,45) re-measure (#139) + two rejected rsi_14 cells + CHASE_RATIO_SHADOW
-- **2026-10-27+** ARM-GAP only on the re-based bar (n≥30; n=17 now)
-- **2026-10-30** scoped momentum time-stop BLIND run — bars locked **+ the MFE<0.15 attribution
-  tightening above**
-- **2026-10-31** short-supply re-measure on `t_CR>=2` via `cluster_t`
-- **2026-11-01** coin_regime LONG-COUNTER OOS + self-healing SKIP verify
-- **2026-11-08** gate scoreboard #2 (distinct-trade basis)
-- **2026-11-15** floor_admit + wyckoff outcome joins
-- **NEVER:** re-run entry-feature / armed-separation scans (5 independent nulls)
-- **CEO:** CONF_FLOOR fkB FAIL (23.1% bare / 29.1% all-signal) + enforcement site after
-  `decider_run.py:4856` + blocked-count self-check · ARM-BE-STOP GO · **escalation #17 (64th)
-  exit-ladder candle OOS** · identify the 02:19:30 constants writer · LOSERS set EMPTY ·
-  ai-trader-pending 16T 25% cohort dead but flagged
+Trend side healthy. The addressable bleed is unchanged and every exit lever tested this run failed.
 
-## BOOK / READINESS (24h 29T 51.7% `-$0.37` · 7d 134T 45.5% `-$0.46` · 30d 719T 44.2% `-$2.38`)
-**1 open bracketed: LTC #16422 SHORT `volume-buildup-` @56.568 (SL 57.625 / TP 55.679) 0.1h** —
-aligned with the SHORT_BIAS tape, **HOLD on bracket**; DYDX SHORT closed `hard_max_loss` -5.45% acct.
-No new LONG exposure while all four sources read SHORT_BIAS · mid-band = no trade · trail-family first ·
-size 1.0x (file absent).
+## LOSING AUTOPSY — WRONG-SIDE REFUTED **88th** CONSECUTIVE RUN
+`recovery_replay.py` adverse-first (`--selfcheck` ASSERT PASS, vacuity 182/191 reproduced):
+**48h n=17** = 5 never-adverse / 10 recovered-after-adverse / **2 NEVER** (16409 ICP waiver-band,
+16423 CC pump-chain-) · **14d 194 losers = 37 / 128 / 29 NEVER = 15.0%** structural never-recover
+(17.5% Oct-22 baseline, 14.7% #163). Refs that survive: `#61` p=0.116, `#84` t=−0.04.
+
+## SHADOW — one useful source, four dead/pending
+- **contrarian 892 rows / 601 joinable** = the only collector producing a ship-eligible answer
+- **oscillator 24,598 — `actual_outcome` 0/24,598** (frozen by design): unusable, decided dead
+- **floor_admit 2,106 / wyckoff 331 — no outcome column**: pending joins (Nov 15)
+- **rr_shadow_audit_7d**: orphaned, not cited
+- `--report`: CONFLUENCE-EXPIRY still the gate doing work (blocked 11,556, would_win 48%, avg −0.12)
+- `--analyze-hml`: worst shadow names (`open-skies+` 41T 12.2%, `grind-breakout-v2+` 45T 20%) have
+  **n≤2 live trades** — shadow-only, zero live impact. Do not chase.
+
+## LAST-RUN VERIFY — all PASS
+cluster_risk_limiter `--selfcheck` ASSERT PASS · arm_gap_baseline `--selfcheck` PASS ·
+**pm_armed_at 1/1** armed trade since the 13:50 ship (16418 USUAL) · **profit-monster GC canary 0**
+(the 6 `Profit monster closing` hits are all 2026-10-21→10-23, i.e. pre-ship) ·
+daily_git_commit guard present (12 refs) · constants working-tree diff **EMPTY** ·
+kill leaks **0** (doji last open 10-16 17:43 = kill time; ai-trader+ last open 10-19 09:23) ·
+`BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True` · size-reduce ABSENT = 1.0x · session lock absent.
+
+## WATCHDOG
+**0 steers, portfolio health good, 0 open — flat is correct** (CHOP, LOW vol, 15m LONG_BIAS vs 4h
+SHORT_BIAS, market_phase DECLINING, trend_quality STRONG_UP on a DECLINING phase = mixed). Last cycle's
+cluster steer was closed REJECTED-WITH-DATA and no run has chased one since. Auto-trader is shadow
+BRACKET in CHOP: its long side is 0/8 (`−$0.17`) vs short 4/7 (`+$0.14`), n=15 — same wrong-side
+reading as pump-chain-, at book scale.
+
+**24h 30T 14W 46.7% `−$0.55` = REDDEST today** (neg streak 2h, not yet 3). 7d 136T `−$0.62` ·
+14d 336T `−$4.71` · 30d 721T `−$2.54`.
+
+## NEXT
+1. **2026-10-27T00:00Z** waiver LAPSE verify + `[35,45)` mid-band re-measure (#139)
+2. **2026-10-27T17:12Z** pump-chain- PROMOTE formal re-verify — all legs pass, ship only at/after the date,
+   and put the classifier-vs-live-exit caveat in the package
+3. **2026-10-27** CHASE_RATIO_SHADOW review date
+4. 2026-10-27+ ARM-GAP on the re-based bar (n≥30) · 10-30 momentum time-stop blind run ·
+   10-31 short-supply on `t_CR>=2`
+5. **Nov 15** floor_admit + wyckoff outcome joins — largest queued shadow ROI
+6. **CEO:** CONF_FLOOR fkB · ARM-BE-STOP GO · escalation #17 (slice delivered this run) ·
+   identify the 02:19:30 constants writer · LOSERS set EMPTY · ai-trader-pending (n=16, quiet since Oct 24)
+7. **STOP:** entry-feature/armed-separation (6th null), oscillator outcome join (structural),
+   re-testing the 6 exit-ladder families closed above
