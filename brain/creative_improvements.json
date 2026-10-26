@@ -9266,5 +9266,23 @@
     "category": "promotion-guard",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-26T23:42:00Z",
+    "idea": "Pre-register conf-stratified arm-timeout for pump-chain+ LONG: conf<30 timeout 60m->30m",
+    "rationale": "conf<30 = 32T 28.1% -1.69 with 8T trail_arm_timeout -0.58 (no-momentum bleed); conf70+ pays 62.5%. Shadow sweep-arm has no data for pump-chain keys — needs live counterfactual before ship.",
+    "expected_impact": "save ~0.30-0.50/14d if timeout halves conf<30 trail_arm_timeout bleed without cutting late armers",
+    "category": "exit quality",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-26T23:42:00Z",
+    "idea": "Peak-buyer giveback governor (shadow): partial-TP at 50% MFE for giveback>1.0% cohort",
+    "rationale": "shadow_trader HML: open-skies+ giveback 1.476%, pump-chain- SHORT giveback 1.143% — signals spike then crash; MFE captured but outcome negative.",
+    "expected_impact": "TBD — needs exit-engine A/B on live shadow before any ship",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

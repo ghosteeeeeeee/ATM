@@ -2076,3 +2076,13 @@
 - **AUTO-FIX**: none safe/applicable — no stale logs to compress, DBs are live. Recommend CEO-run cleanup of coin_tracker.db / session_brain.db growth path.
 - **[INFO]**: `hermes-atr-sl-updater.timer` still not-found (known harmless, carried from 14:46 report).
 - **[INFO]**: USUAL SHORT trade FAILED at 19:41 — RSI knife floor filter (29.9 < 35) blocked it; working as designed, not a crash.
+
+## Error Alerts — 2026-10-26 21:44 UTC
+- **[WARN]**: disk 85% used (94G/118G, 18G free) — persists since 19:44. Top consumers unchanged: data/ 8.0G (coin_tracker.db 3.3G, session_brain.db 1.5G, signals_hermes.db 1.2G, candles.db 1.2G), logs/ 756M (pipeline.log 336M live), journal 309M.
+- **AUTO-FIX**: none safe — no logs >7d to gzip, DBs live. Needs CEO-run cleanup of coin_tracker.db growth path.
+- **[INFO]**: all other checks clean — pipeline rc=0, 0 tracebacks/60m, prices 41s stale, 49 signals/1h, 0 phantom trades, 1 open trade, all key timers active, not paused.
+
+## Error Alerts — 2026-10-26 22:45 UTC
+- **[WARN]**: disk 85% used (94G/118G, 18G free) — persists since 19:44. Top consumers unchanged: data/ 8.0G, logs/ 761M (pipeline.log 337M live). No logs >7d to gzip.
+- **AUTO-FIX**: none safe/applicable — no stale logs, DBs live. Needs CEO-run cleanup of coin_tracker.db growth path (already flagged 19:44/21:44).
+- **[INFO]**: all other checks clean — pipeline active, 0 errors/30m, 34 signals/1h, 0 phantom trades (24h), prices 42s stale, 0 open trades, regime LONG_BIAS, all key timers firing, `hermes-atr-sl-updater.timer` not-found (known DEFUNCT, harmless), not paused.
