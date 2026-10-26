@@ -2965,5 +2965,16 @@
     "after": "remainder compare scoped to the LOSERS assignment only; blank lines elsewhere still reject; staging state irrelevant",
     "rationale": "bug_hunter #157 HIGH — the guard's own requirement (a) was still defeatable",
     "impact": "unlogged constants edits genuinely blocked; sanctioned LOSERS rewrite (live file verified True) still commits"
+  },
+  {
+    "timestamp": "2026-10-26T09:52:14Z",
+    "agent": "brain_auditor",
+    "change": "profit_monster trail-state GC: drop orphaned trade_id keys each run (set-diff vs managed-open set); live run dropped 29 orphans; docstring numbers corrected (IO 8 UGB cycles not 4)",
+    "type": "tweak",
+    "file": "scripts/profit_monster.py",
+    "before": "keys deleted only on PM trail exit -> permanent orphans; 6 cut_loser skips (-$0.53), IO #16407 8 UGB-PT cycles skipped (close -0.45% price-move instead of +0.44% floor)",
+    "after": "_gc_trail_state() set-diff on success path only (DB-error path skips GC); selfcheck 5/5 PASS; 0 Tracebacks post-GC",
+    "rationale": "orphan keys read as PM ownership by 4 consumers (position_manager UGB-PT, cut_loser token check, hl_fill_monitor, sniper_exit) -> exits blocked on dead keys",
+    "impact": "unblocks cut_loser/UGB-PT/sniper on orphaned tokens; monitor: cut_loser PM-skips must stay 0 post-GC (canary)"
   }
 ]

@@ -8924,5 +8924,23 @@
     "category": "infra",
     "status": "shipped",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-26T09:53:05Z",
+    "idea": "POST-GC ORPHAN-SKIP CANARY (zero code)",
+    "rationale": "GC log line = instrument; any cut_loser 'Profit monster closing' skip post 08:45:55 must have matching PM [TRAIL] exit within 60s or it's a new orphan class. Baseline 6 skips/8d pre-GC.",
+    "expected_impact": "immediate regression detection for the -$0.53/8d + IO-class bleed",
+    "category": "debug/audit",
+    "status": "monitoring",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T09:53:05Z",
+    "idea": "REJECTED: watchdog best cells (SHORT rsi<40, LONG rsi>=65) as gates",
+    "rationale": "SHORT<40 7d +0.53 p=0.033 -> 30d -0.30 sign flip; LONG>=65 7d +0.54 -> 30d +0.00 wash. Both fail OOS same-sign at 30d.",
+    "expected_impact": "two noise gates never shipped",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
   }
 ]
