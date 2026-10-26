@@ -706,7 +706,8 @@ def _simulate_extended_time(entry_price, direction, candles, source, atr_pct=Non
         current_pnl = (c / entry_price - 1) * 100 if direction == 'LONG' else (entry_price / c - 1) * 100
 
         # Check trail activation
-        if current_pnl >= PM_TRAIL_ACTIVATE_PCT * 100:
+        # NOTE: PM_TRAIL_ACTIVATE_PCT = 0.40 (already in percent, not decimal)
+        if current_pnl >= PM_TRAIL_ACTIVATE_PCT:
             trail_activated = True
 
         # Check arm timeout (extended)
