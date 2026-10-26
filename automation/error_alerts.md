@@ -2086,3 +2086,11 @@
 - **[WARN]**: disk 85% used (94G/118G, 18G free) — persists since 19:44. Top consumers unchanged: data/ 8.0G, logs/ 761M (pipeline.log 337M live). No logs >7d to gzip.
 - **AUTO-FIX**: none safe/applicable — no stale logs, DBs live. Needs CEO-run cleanup of coin_tracker.db growth path (already flagged 19:44/21:44).
 - **[INFO]**: all other checks clean — pipeline active, 0 errors/30m, 34 signals/1h, 0 phantom trades (24h), prices 42s stale, 0 open trades, regime LONG_BIAS, all key timers firing, `hermes-atr-sl-updater.timer` not-found (known DEFUNCT, harmless), not paused.
+
+## Error Alerts — 2026-10-26 23:46 UTC
+- **[WARN]**: disk 85% used (94G/118G, 18G free) — persists since 14:46. Top consumers: data/ 8.0G (coin_tracker.db 3.3G, session_brain.db 1.5G), logs/ 764M (pipeline.log 338M live), journal was 349M.
+- **AUTO-FIX**: journal vacuum to 200M freed 196M. No logs >7d to gzip; DBs live. Still needs CEO-run cleanup of coin_tracker.db growth path (flagged 14:46/19:44/21:44/22:45).
+- **[INFO]**: watchdog WARNING at 23:44 — 0 signals in last 5m (78 in last 60m; lull, not a failure) + auto-cleaned 5 stale locks. Normal watchdog behavior.
+- **[INFO]**: 2 TRADE FAILED (LINK SHORT 23:17, POL SHORT 23:20) — RSI knife floor execution filter (7.8/28.2 < 35). Signals marked FAILED, no trade opened — working as designed.
+- **[INFO]**: `hermes-atr-sl-updater.timer` not-found ghost (known DEFUNCT, harmless).
+- **[INFO]**: all else clean — not paused, pipeline active (0 tracebacks/30m), 78 signals/1h, 1 open trade (ZORA SHORT 23:05), 27 closed today (44.4% WR, -1.05 USDT), 0 phantom/24h, prices newest 61s, regime SHORT_BIAS, all key timers firing.
