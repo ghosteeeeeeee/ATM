@@ -2062,3 +2062,8 @@
 - **[WARN]** (1x): `hermes-atr-sl-updater.timer` = not-found (unit file missing, never had journal entries; ATR SL logic runs inside pipeline scripts instead)
 - **AUTO-FIX**: `systemctl daemon-reload` attempted — stale entry persists but is harmless/inactive; unit cannot be restarted as it does not exist. Functionality verified covered elsewhere.
 - **[WATCH]**: disk 84% (94G/118G) — 1 point from WARN threshold, largest log pipeline.log 329M
+
+## Error Alerts — 2026-10-26 18:27 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+AT, allowing despite TOK filter`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`

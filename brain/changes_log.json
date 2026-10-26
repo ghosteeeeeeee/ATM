@@ -3042,5 +3042,16 @@
     "after": "seed peak re-anchored with entry IFF still untouched creation seed; single UPDATE; both peaks checked; mirror writeback path covered",
     "rationale": "auto_1hr FLAG 14:28 ETH vol ugb_pt closed in 2s target-placement suspect = phantom MFE class; fix written 17:03 unlogged/uncommitted by unknown session, verified by bug_hunter this run, MED fixes applied by brain_auditor",
     "impact": "stops phantom-MFE premature exits; historical mfe_pct contamination remains (pattern-match ~3 rows mfe>=0.40 in 30d, backfill pre-registered); guardian restarted post-commit"
+  },
+  {
+    "timestamp": "2026-10-26T18:55:00Z",
+    "agent": "brain_auditor",
+    "change": "FIXED dead loss-cooldown ladder: brain._record_loss_cooldown wrote reason=\"brain\" but signal_schema._is_loss_cooldown_active only honors (\"loss\",\"guardian\") — brain-closed losses recorded cooldowns the decider could never see. Aligned to canonical reason=\"loss\".",
+    "type": "bugfix",
+    "file": "scripts/brain.py",
+    "before": "reason: 'brain' (invisible to checker)",
+    "after": "reason: 'loss' (visible to _is_loss_cooldown_active / get_cooldown / decider_run:4287)",
+    "rationale": "Root-cause wiring bug in live entry-gate machinery. position_manager/hl-sync-guardian/pipeline all write \"loss\"/\"guardian\"; brain was the only writer whose entries were silently ignored. Any loss closed via brain.close_trade before pipeline/guardian sync = dead cooldown = immediate re-entry allowed.",
+    "impact": "Restores designed 20min→90min escalating re-entry cooldown on brain-closed losses. Verified 4-check self-test (write→check→dedup→cleanup); bug_hunter verdict SHIP (10 findings, 3 pre-existing MEDs ticketed separately: pm double-streak-call, guardian FileLock name mismatch, set_cooldown clobbering loss entries)."
   }
 ]

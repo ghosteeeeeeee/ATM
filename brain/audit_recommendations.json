@@ -1,106 +1,77 @@
 {
-  "timestamp": "2026-10-26T18:00:00Z",
-  "run": 165,
-  "headline": "ADOPTED+FIXED peak re-anchor (phantom-MFE class, bug_hunter SHIP-WITH-FIXES MEDs applied, guardian restarted). 0 trading-constant changes. Wrong-side refuted 89th. Contrarian PROMOTE legs still all-pass (date-locked tomorrow 17:12Z, do NOT ship early).",
+  "timestamp": "2026-10-26T18:55:00Z",
+  "run": 166,
   "session_brain_stats": {
-    "queries": 3,
-    "notes": "dedup fix from #147 holding (6/6 unique titles per probe). Topics: signal winrate, pending-short gate blockers, unimplemented ideas. No new drift found vs code."
+    "queries": 2,
+    "note": "no prior discussion of hard-stop reentry idea — fresh"
   },
   "trade_summary_24h": {
-    "closed": 28,
-    "wins": 13,
-    "wr": 46.4,
-    "pnl_usdt": -0.59,
-    "note": "quiet since 15:15; REDDEST-today label from #164 holds. 3 opens late-day all pump-chain+/btc-pump-rider LONGs at conf 29.5-31.1.",
-    "windows": {
-      "7d": "136T 44.9% -0.62",
-      "14d": "336T 38.4% -4.71",
-      "30d": "721T 44.1% -2.54"
-    },
-    "direction_7d": {
-      "LONG": "86T 41.9% -0.78",
-      "SHORT": "50T 50.0% +0.16"
+    "trades": 30,
+    "wr": 46.7,
+    "pnl": -0.92,
+    "worst_families_7d": {
+      "pump-chain+ LONG": "18T -1.08 33.3%WR",
+      "bb-bounce-v2-long+ LONG": "18T -0.37 33.3%WR"
     }
   },
   "shadow_analysis": {
-    "oscillator": "FROZEN by design (24,598 rows, actual_outcome 0/24,598) — pre-live evidence only, decided dead",
-    "contrarian": "894 rows, only useful collector. pump-chain- flip 64.7% n=348 paired p<1e-4, OOS both halves same sign; btc-pump-rider+ do-not-flip control. PROMOTE date-locked 2026-10-27T17:12Z.",
-    "wyckoff": "332 rows, no outcome column — pending Nov 15 join",
-    "floor_admit": "2,117 rows, no outcome column — pending Nov 15 join",
-    "rr_shadow": "orphaned (no producer, 21d stale) — not cited",
-    "shadow_trader": "25,266 signals — CONFLUENCE-EXPIRY 11,622 blocked @48% would_win avg -0.12 = gates earning keep; exit A/B pm_trail +3,573 vs hard_max -5,350",
-    "overall": "1/6 sources ship-eligible (contrarian). floor_admit/wyckoff joins = biggest queued ROI (Nov 15)."
+    "report": "CONFLUENCE-EXPIRY 11,659 blocked @48% would-win avg -0.12 = gates earning keep; exit A/B pm_trail +3,594 vs hard_max -5,371",
+    "contrarian": "894 rows, join 622/894: pc- flip-WR 64.7% n=348 (stable vs Oct-24); btc-pump-rider+ control 28.6% n=273 — promote re-verify due 10-27T17:12Z, numbers unchanged, do NOT ship early",
+    "oscillator": "FROZEN by design (0/24,598 outcome join) — pre-live evidence only",
+    "wyckoff_floor_admit": "pending Nov-15 outcome joins — no answerable questions yet",
+    "rr_shadow": "orphaned (no producer, 21d stale) — do not cite",
+    "overall": "contrarian remains the only ship-eligible collector"
   },
-  "losing_trade_autopsy": {
-    "method": "recovery_replay adverse-first (--selfcheck PASS)",
-    "refuted_48h": "n=17 = 5 never-adverse / 10 recovered / 2 NEVER (16409 ICP waiver-band, 16423 CC pump-chain-) -> WRONG-SIDE REFUTED 89th consecutive run",
-    "structural_14d": "194 losers = 37 / 128 / 29 NEVER = 15.0% (baseline 17.5% Oct-22)",
-    "refs": [
-      "#61 opposite-side p=0.116",
-      "#84 fwd-return t=-0.04"
-    ],
-    "new_patterns": 0,
-    "24h_losers_mapped": "6 of 13 never-armed chop (MFE 0.10-0.33, hard_max_loss/trail_arm_timeout); 2 pump-chain- shorts (PROMOTE cohort); ETH hl_copy x2 counter-tape longs (n<20 collect); RSI not the culprit (losers avg ~47 vs winners ~51)"
-  },
-  "steer_triage": {
-    "steer-001_wrong_side": "REFUTED-STANDS (89th) — 24h losses are never-armed chop, direction x armed decomposition (#162) already closed this lever",
-    "steer-002_ai_trader_streak": "STALE — ai-trader+ disabled CEO 2026-10-19, cohort dead, no action",
-    "watchdog_deep_recs": "favor-Short conditionally = ~1h half-life steer, re-tested: BTC flipped back LONG_BIAS/AT/RECOVERY by 17:45 = flip-rate p50 behavior; 10-pending-short gate question: volume-buildup- shorts executed fine 24h (9T) — no systemic short block"
+  "watchdog_queue_disposition": {
+    "short_rsi_hard_floor_leak": "RESOLVED-NO-BUG: 6/14 shorts at detect-RSI 36-40 cleared via unclog waiver (vacation_mode.json, T directive 10-24, expires 2026-10-27T00:00Z) bear-structure exemption. Floor checks BOTH rsi_detect and rsi_exec (2026-10-13 detect-floor fix active). Working as designed.",
+    "waiver_midband_remeasure_PRE_REGISTERED_139": "exec-[35,45) 7d n=16: 9W/7L +$0.09 NEUTRAL (binomial p=0.40 vs 50%). Blocking kills +$0.86 trail-family winners vs -$0.77 chop losers. 8/9 winners volume-buildup- profit-monster-trail. RECOMMEND: let waiver lapse at midnight as pre-registered (conservative default); if CEO extends, scope to volume-buildup-.",
+    "pump-chain+ entry timing": "CONFIRMED worst family. Armed 8T +$0.04 75%WR vs unarmed 10T -$1.12 0%WR. Winner/loser detect-RSI indistinguishable (56.0 vs 57.5) — entry-feature scans banned (6th null). Route: time-stop blind 10-30 (pre-registered) + hard-stop reentry proposal.",
+    "bb-bounce-v2-long+": "CONFIRMED. Same signature: armed 8T +$0.34 75%WR / unarmed 10T -$0.71 0%WR. All NORMAL regime. Already flagged for CEO by auto_1hr 13:28."
   },
   "drift_findings": [
     {
-      "id": "D165-1",
-      "severity": "MED",
-      "finding": "Live-behavior fix (position_manager+guardian+run_pipeline) sat uncommitted AND unlogged 40+ min written by unknown 17:03 session claiming 'run #165' — second instance of the D162-1 ship-forgetting pattern, this time on live exit code",
-      "action": "adopted, verified, fixed, committed 41510fe9, logged"
+      "item": "brain.py loss-cooldown reason=brain invisible to checker",
+      "status": "FIXED THIS RUN",
+      "detail": "design intent (record on loss) vs code (checker ignores reason) drift since 2026-04-28"
     }
   ],
   "recurring_problems": [
-    "chop-bleed never-armed share stable at baseline 86% (7d) — entry quality owns the bleed, no exit lever beyond in-flight UGB-PT/TAT-C/Oct-30 time-stop",
-    "phantom/unsupported-peak class now 2 independent mechanisms (round-number #59, entry-delta #165) — closed at instance level, class guard proposed (ARM-SANITY shadow)"
+    "unarmed trades = the bleed (both worst families: armed 75%WR / unarmed 0%WR) — addressed by pre-registered 10-30 momentum time-stop blind, NOT another entry scan",
+    "loss-cooldown machinery has 3 more pre-existing MEDs (pm double-increment, guardian lock name, set_cooldown clobber) — ticketed, not shipped (one variable at a time)"
   ],
-  "missing_implementations": [
+  "missing_implementations": [],
+  "creative_improvements": [
+    "HARD_STOP re-entry cooldown 4-8h — see brain/creative_improvements.json, PROPOSED_TO_CEO"
+  ],
+  "config_changes_applied": [
     {
-      "item": "peak-sanity clamp at trail arm (pre-registered #59, never shipped)",
-      "status": "re-proposed as ARM-SANITY log-only shadow this run"
-    },
-    {
-      "item": "floor_admit + wyckoff outcome joins",
-      "status": "queued Nov 15, largest shadow ROI"
-    },
-    {
-      "item": "CONF_FLOOR=30",
-      "status": "staged, blocked on CEO fkB ruling"
+      "file": "scripts/brain.py",
+      "change": "reason 'brain'->'loss' in _record_loss_cooldown",
+      "verified": "4-check selftest PASS; bug_hunter SHIP"
     }
   ],
-  "creative_improvements": [
-    "ARM-SANITY shadow (arm-time peak validation vs 1m candle range) — closes the false-peak CLASS at the exit engine",
-    "historical mfe_pct phantom backfill pre-registered (bug_hunter MED3, ~3 rows mfe>=0.40 in 30d, dry-run first)"
+  "changes_from_last_run": [
+    {
+      "change": "#165 phantom-MFE fix (guardian restart 17:56:35)",
+      "status": "STILL LIVE",
+      "detail": "hermes-hl-sync-guardian active PID 3491810 started 17:56, timer fired 17:56"
+    },
+    {
+      "change": "#165 contrarian PROMOTE date-lock 10-27T17:12Z",
+      "status": "ON TRACK",
+      "detail": "join re-run: 64.7% n=348 stable, do not ship early"
+    },
+    {
+      "change": "#165 pre-registered mfe backfill dry-run 10-27",
+      "status": "PENDING due tomorrow"
+    }
   ],
-  "config_changes_applied": [],
-  "code_changes_applied": [
-    "scripts/position_manager.py + hl-sync-guardian.py + run_pipeline.py + brain/analysis/peak_reanchor_2026-10-26.py — adopted unlogged 17:03 fix, applied bug_hunter SHIP-WITH-FIXES MEDs (mirror-path re-anchor, both-column check, folded SELECT), selfcheck 19/19, committed 41510fe9, guardian restarted 17:56:35 (MED2)",
-    "ACCEPTED-AS-IS (bug_hunter LOW#5): orphan-dup close path (:1384) no seed sync — closes same cycle, data-quality only"
-  ],
-  "changes_from_last_run": {
-    "#164_exit_ladder_oos": "selfcheck still 5/5 PASS, verdicts stand (0/6 PASS)",
-    "#164_arm_gap_baseline": "selfcheck PASS, re-based bar n=17 < 30 — still collecting",
-    "#164_contrarian_promote": "legs still all-pass, date-locked tomorrow, classifier-vs-live-exit caveat required in package",
-    "#164_pm_armed_at": "1/1 stamps since ship (16418 USUAL); no new arms since (chop)",
-    "#164_trailing_activated_retirement": "two-axis matrix in creative_improvements, no re-proposal of arm-rate gates",
-    "#162_pm_armed_stamp": "HOLDING (1 stamp, correct field)",
-    "#158_PM_GC": "canary 0 post-ship 'Profit monster closing' skips"
-  },
   "next_actions": [
-    "2026-10-27T00:00Z waiver LAPSE verify (allow-lines gone + [UNCLOG-EXPIRED]); c3 = price-move unit",
-    "2026-10-27T17:12Z pump-chain- PROMOTE formal re-verify — all legs pass; MUST state classifier-vs-live-exit caveat; do NOT ship early",
-    "2026-10-27 mid-band [35,45) re-measure (#139) + CHASE_RATIO_SHADOW review",
-    "next run: historical mfe phantom backfill dry-run (pre-registered this run)",
-    "2026-10-30 scoped momentum time-stop blind run (bars locked + MFE<0.15 attribution)",
-    "2026-10-31 short-supply on t_CR>=2",
-    "Nov 1 coin_regime OOS (LONG-into-SHORT_BIAS now 31T 35.5% -0.94 — WR bar 30% not met, COLLECT stands)",
-    "Nov 15 floor_admit + wyckoff outcome joins",
-    "CEO: CONF_FLOOR fkB, ARM-BE-STOP GO, escalation #17 (slice delivered #164), 02:19:30 constants writer, LOSERS EMPTY, ai-trader-pending n=16 dead cohort",
-    "STOP: entry-feature scans (6th null), oscillator outcome join, re-testing the 6 exit-ladder families, direction-mix levers"
+    "2026-10-27T00:00Z: waiver LAPSE verify (midband re-measure DONE this run: neutral, let lapse)",
+    "2026-10-27T17:12Z: pump-chain- PROMOTE formal re-verify (classifier-vs-live-exit caveat MANDATORY)",
+    "2026-10-27: CHASE_RATIO_SHADOW review + historical mfe phantom backfill dry-run",
+    "CEO: hard-stop reentry cooldown proposal (evidence complete) + 3 cooldown MEDs (F1 pm double-call, F2 guardian lock, F3 set_cooldown clobber)",
+    "10-30: momentum time-stop blind (pre-registered)",
+    "Verify #166 fix live: next brain-closed loss should write reason=loss and appear in decider block logs"
   ]
 }

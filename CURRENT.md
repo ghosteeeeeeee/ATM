@@ -1,71 +1,88 @@
-# Current State — brain_auditor #165 2026-10-26 18:00 UTC
-**Last Updated: 2026-10-26 18:00 UTC**
-**Updated by: brain_auditor #165. Prior: #164 15:45 / #163 14:55 / #162 13:50 (preserved in git history).**
+# Current State — brain_auditor #166 2026-10-26 18:55 UTC
+**Last Updated: 2026-10-26 18:55 UTC**
+**Updated by: brain_auditor #166. Prior: #165 18:00 / #164 15:45 (preserved in git history).**
 
-## HEADLINE — phantom-MFE class CLOSED at both call sites. 0 trading-constant changes, 1 live-code ship.
-An unlogged 17:03 session left a live exit-behavior fix uncommitted on the phantom-MFE bug class
-(ETH #16421 ugb_pt exit 1.45s after open: creation seed 2301.98 vs HL entry 2312.60 read as
-phantom +0.459% fav = UGB-PT arm). Run #165 adopted it: selfcheck 18 PASS, bug_hunter
-**SHIP-WITH-FIXES** (3 MED + 4 LOW), MEDs applied, committed `41510fe9`, **guardian restarted
-17:56:35** (daemon predating the fix would have ImportError'd forever), selfcheck now 19/19.
+## HEADLINE — loss-cooldown ladder was half-dead. Fixed + SHIP verdict.
+`brain._record_loss_cooldown` wrote `reason='brain'` but
+`signal_schema._is_loss_cooldown_active` only honors `('loss','guardian')` —
+every brain-closed loss recorded a cooldown the decider could never see
+(dead since 2026-04-28). Fixed: `reason -> 'loss'` (`scripts/brain.py:55`,
+canonical like position_manager/guardian/pipeline). 4-check selftest PASS
+(write→check→dedup→cleanup). bug_hunter **SHIP** (10 findings).
 
-| bug_hunter finding | disposition |
-|---|---|
-| MED1 mirror-fill writeback same class (guardian:2910) | FIXED — re-anchor added |
-| MED2 guardian daemon started Oct 23 = fix not live | FIXED — restarted post-commit |
-| MED3 historical mfe contamination (~3 rows mfe>=0.40/30d) | PRE-REGISTERED backfill, dry-run next run |
-| LOW tx-abort from extra SELECT | FIXED — peaks folded into original SELECT |
-| LOW direction-pick on side-correction | FIXED — both columns re-anchored |
-| LOW#5 orphan-dup close path | ACCEPTED data-quality-only (closes same cycle) |
-| LOW bounded legitimate-peak loss | no change (conservative direction) |
+**3 pre-existing MEDs TICKETED (CEO queue, not shipped — one variable at a time):**
+- **F1** `position_manager.close_paper_position` calls `set_loss_cooldown` TWICE
+  per loss close (:1253 + :1594; log-proven streak 1→2 within 3s) — remove one.
+- **F2** guardian locks `FileLock('loss_cooldown')` vs `'loss_cooldowns'` elsewhere
+  = writes not mutually exclusive.
+- **F3** `signal_schema.set_cooldown` clobbers active `reason='loss'` entries with
+  `'signal'` (invisible downgrade).
 
-`hermes_constants.py` working-tree diff **EMPTY** · CEO_PROTECTED untouched · session lock
-**absent** · size-reduce **ABSENT = 1.0x**.
+`hermes_constants.py` working-tree diff **EMPTY** · CEO_PROTECTED untouched ·
+session lock **absent** · size-reduce **ABSENT = 1.0x**.
 
-## MANDATE — CHOP vs TREND (fresh PG, 14d 336T 38.4% `-4.71`)
-- exits: **profit-monster-trail 83T 91.6% `+4.58`** + atr_trail 24T `+3.47`
-  vs atr_sl_hit 80T 1.3% `-5.57` vs hard_max_loss 63T 0.0% `-6.41`
-- **armed(mfe>=0.40) 165T 70.3% `+8.40`** vs **unarmed 171T 7.6% `-13.11`**
-- MFE ladder monotone: `<0.15` `-7.60` (14d) / `-18.24` (30d) · `>=0.40` `+8.56` / `+26.20`
-- chop-bleed never-armed share 7d 86.1% = baseline band (70-92), no breach, no exit-layer action
+## WATCHDOG QUEUE — all 4 items dispositioned
+1. **'Floor leak 6/14 shorts RSI 36-40' = RESOLVED-NO-BUG.** Those values are
+   `rsi_detect`; floor checks BOTH detect+exec (2026-10-13 detect-floor fix live).
+   Clears via unclog waiver bear-exemption (T directive 10-24, expires tonight
+   00:00Z). Working as designed.
+2. **#139 mid-band [35,45) RE-MEASURE (early): exec-band 7d n=16 9W/7L +$0.09
+   NEUTRAL (p=0.40).** Blocking kills +$0.86 trail winners vs -$0.77 chop losers;
+   8/9 winners volume-buildup- PM-trail. **RECOMMEND: let waiver LAPSE at
+   00:00Z as pre-registered**; if T/CEO extends, scope to volume-buildup- only.
+3. **pump-chain+ CONFIRMED worst** 7d 18T -1.08 33.3%: armed 8T +$0.04 75%WR /
+   unarmed 10T -$1.12 **0%WR**. Winner/loser detect-RSI indistinguishable
+   (56.0/57.5) = entry-scan banned → 10-30 time-stop blind + hard-stop reentry.
+4. **bb-bounce-v2-long+ CONFIRMED** same shape (armed +$0.34 / unarmed -$0.71,
+   all NORMAL). CEO-flagged 13:28, TAT-C-owned, no new lever.
 
-Trend side healthy. Addressable bleed unchanged = never-had-a-move cohort (entry quality).
+## CREATIVE → PROPOSED_TO_CEO — HARD_STOP re-entry cooldown 4-8h
+After hard_max_loss/hard_sl exits (ladder caps at 90min today).
+30d PG census: re-entry within 8h after same-coin hard stop =
+**n=37 10W 27.0%WR vs 45.0% base, z=-2.14 p=0.032 SIG**; 14d OOS n=18 16.7%WR
+holds; net **+$1.18** if blocked (saves $2.23 losers / kills $1.05 winners =
+3.1% of winners). Chop-begets-chop (BLUR 5T -$0.61; LDO/ALGO/JUP clusters).
+Path: shadow→enforce via review queue AFTER #166 restore proves live.
 
-## LOSING AUTOPSY — WRONG-SIDE REFUTED **89th** CONSECUTIVE RUN
-`recovery_replay.py` adverse-first (`--selfcheck` PASS): **48h n=17** = 5 never-adverse /
-10 recovered / **2 NEVER** (16409 ICP waiver-band, 16423 CC pump-chain-) · **14d 194 losers
-= 37 / 128 / 29 NEVER = 15.0%** structural (17.5% Oct-22 baseline). Surviving refs: `#61`
-p=0.116, `#84` t=-0.04. Steer-001 "wrong-side" REFUTED-STANDS; steer-002 ai-trader+
-streak STALE (disabled CEO 10-19).
+## LOSING AUTOPSY — WRONG-SIDE REFUTED **90th** CONSECUTIVE RUN
+`recovery_replay.py` adverse-first (selfcheck PASS): 48h n=17 = 5 never-adverse /
+10 recovered / **2 NEVER** (16409 ICP waiver-band, 16423 CC pump-chain-) ·
+14d 194 losers = 37/128/**29 NEVER = 15.0%** structural.
+Surviving refs: `#61` p=0.116, `#84` t=-0.04.
 
-## SHADOW — one useful source, four dead/pending
-- **contrarian 894 rows** = only ship-eligible collector (pc- flip 64.7% n=348 p<1e-4, OOS
-  both halves; btc-pump-rider+ do-not-flip control) — **PROMOTE date-locked 10-27T17:12Z**
-- oscillator FROZEN (0/24,598 outcome) · floor_admit 2,117 + wyckoff 332 pending Nov 15 ·
-  rr_shadow orphaned
-- `--report`: CONFLUENCE-EXPIRY 11,622 blocked @48% avg -0.12 = gates earning keep;
-  exit A/B pm_trail +3,573 vs hard_max -5,350
+## SHADOW
+- **contrarian** join re-ran: pc- flip **64.7% n=348 STABLE**, rider control 28.6%
+  = 10-27T17:12Z PROMOTE STANDS, do NOT ship early
+- `--report`: CONFLUENCE-EXPIRY 11,659 @48% avg -0.12 = gates earning keep;
+  exit A/B pm_trail +3,594 vs hard_max -5,371
+- oscillator FROZEN · floor_admit+wyckoff PENDING Nov 15 · rr ORPHANED
 
-## LAST-RUN VERIFY (#164) — all PASS
-exit_ladder_oos selfcheck 5/5 · arm_gap_baseline selfcheck PASS (re-based n=17<30, collecting) ·
-cluster_risk_limiter selfcheck PASS · pm_armed_at 1/1 (16418 USUAL; no new arms since = chop) ·
-PM GC canary 0 post-ship skips · daily_git_commit guard present · constants EMPTY ·
-kill leaks 0 · BB_BOUNCE_TRAIL_ARM_TIMEOUT True · size-reduce ABSENT = 1.0x.
+## LAST-RUN VERIFY (#165) — PASS
+guardian **STILL LIVE** (hl-sync-guardian PID 3491810, started 17:56:35 = the
+post-phantom-MFE-fix restart; timer last fired 17:56). Fix intact.
 
-## WATCHDOG (17:45)
-**6 steers (2 top-level, both triaged above), 4 open — 3 pump-chain+ / 1 rider LONGs opened
-17:13-17:44 at conf 29.5-31.1** (CONF_FLOOR=30 staged NOT in tree = expected admits).
-Regime flipped again: LONG_BIAS 15m / SHORT_BIAS 4h / continuum AT / RECOVERY / STRONG_DOWN
-quality = flip-rate p50 (~1h half-life), not a finding. 24h 28T 46.4% `-0.59`.
+## PG fresh (18:55)
+24h 30T 46.7% **-0.92** · 7d 139T 44.6% **-0.95**
+(worst: pump-chain+ 18T -1.08 33.3% / bb-bounce-v2 18T -0.37 33.3%)
+· armed 7d both worst families: 75%WR vs unarmed 0%WR
+
+## READINESS
+1 open RENDER #16425 LONG rider+r2 @1.7388 bracketed (SL 1.7243/TP 1.7825) 1.4h
+flat. BLUR #16428 closed hard_max_loss -0.31 (watchdog steer correct but late —
+full stop donated; family = chop-bleed pattern). Regime CHOP: 15m LONG_BIAS /
+4h SHORT_BIAS disagree = flip-rate p50. No new LONGs while BTC below EMA300
+80259 with aggregate SHORT_BIAS. Trail-family first. **size 1.0x (file absent).**
 
 ## NEXT
-1. **2026-10-27T00:00Z** waiver LAPSE verify + `[35,45)` mid-band re-measure (#139)
-2. **2026-10-27T17:12Z** pump-chain- PROMOTE formal re-verify — classifier-vs-live-exit
-   caveat MANDATORY in package; do NOT ship early
-3. **2026-10-27** CHASE_RATIO_SHADOW review · historical mfe phantom backfill dry-run
-4. 10-30 momentum time-stop blind · 10-31 short-supply t_CR>=2 · Nov 1 coin_regime OOS
-5. **Nov 15** floor_admit + wyckoff outcome joins
-6. **CEO:** CONF_FLOOR fkB · ARM-BE-STOP GO · escalation #17 · 02:19:30 constants writer ·
-   LOSERS EMPTY · ai-trader-pending dead cohort
-7. **STOP:** entry-feature scans (6th null), oscillator join, exit-ladder 6 families,
-   direction-mix levers, cluster limiters
+1. **2026-10-27T00:00Z** waiver LAPSE verify (mid-band done: neutral, lapse stands)
+2. **2026-10-27T17:12Z** pc- PROMOTE formal re-verify — classifier-vs-live-exit
+   caveat MANDATORY; do NOT ship early
+3. **2026-10-27** mfe phantom backfill dry-run · CHASE_RATIO_SHADOW
+4. **next run** verify first brain-closed loss writes reason=loss AND blocks
+   (end-to-end live proof of #166)
+5. 10-30 momentum time-stop blind · 10-31 short-supply t_CR>=2 · Nov 15 joins
+6. **CEO:** hard-stop reentry proposal (evidence complete) + MEDs F1/F2/F3 ·
+   CONF_FLOOR fkB · ARM-BE-STOP GO · escalation #17 · 02:19:30 constants
+   writer · LOSERS EMPTY · ai-trader-pending dead cohort
+7. **STOP:** entry-feature scans (6th null), oscillator join, exit-ladder 6
+   families, direction-mix levers, cluster limiters

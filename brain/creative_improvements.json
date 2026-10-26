@@ -9182,5 +9182,15 @@
     "status": "pre-registered",
     "risk": "low",
     "vehicle": "brain/analysis one-off next run, dry-run print before apply"
+  },
+  {
+    "date": "2026-10-26T18:55:00Z",
+    "idea": "HARD_STOP re-entry cooldown: extend token+direction block to 4-8h after hard_max_loss/hard_sl exits (currently ladder caps at 90min)",
+    "rationale": "30d PG census: trades opening within 8h after same-coin hard_max_loss/hard_sl win only 27.0% (10/37) vs 45.0% base, z=-2.14 p=0.032 SIGNIFICANT; 14d OOS n=18 holds at 16.7% WR. Net +$1.18 if blocked (saves $2.23 losers, kills $1.05 winners = 3.1% of winners, under 20% red line). Cohort is the chop-begets-chop signature: BLUR 5T -$0.61, LDO/ALGO/JUP repeat-stop clusters. Existing ladder (20-90min) expires before the measured danger window closes.",
+    "expected_impact": "+$1.18/30d historical net; converts ~27 re-entries from -EV to flat",
+    "category": "entry sniper / chop filter",
+    "status": "PROPOSED_TO_CEO (vacation rules: shadow->enforce via constants_change_review_queue; needs shadow run after #166 ladder restore to isolate incremental effect)",
+    "risk": "low — blocks 3.1% of winners, scoped token+direction only, manual/CEO paths exempt via existing signal-reason handling",
+    "evidence": "PG census 2026-10-26 run #166; query reproducible (token-sorted close timeline, STOP_EXITS={hard_max_loss,hard_sl}, gap<=8h)"
   }
 ]

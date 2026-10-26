@@ -52,7 +52,12 @@ def _record_loss_cooldown(token: str, direction: str) -> None:
         streak = 1
     hours = min(LOSS_COOLDOWN_BASE * (2 ** (streak - 1)), LOSS_COOLDOWN_MAX)
     expiry = _time.time() + (hours * 3600)
-    data[key] = {'expires': expiry, 'streak': streak, 'hours': hours, 'reason': 'brain'}
+    # FIX brain_auditor #166 2026-10-26: reason was 'brain' but
+    # signal_schema._is_loss_cooldown_active only honors ('loss','guardian') —
+    # brain-written cooldowns were invisible to the decider (dead ladder).
+    # Canonical writers (position_manager, hl-sync-guardian, pipeline) use
+    # 'loss'/'guardian'; align brain with them.
+    data[key] = {'expires': expiry, 'streak': streak, 'hours': hours, 'reason': 'loss'}
     _save_cooldowns(data)
     print(f"[brain.close_trade] LOSS COOLDOWN: {token} {direction} streak={streak} blocked for {hours:.1f}h")
 
