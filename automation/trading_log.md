@@ -16135,3 +16135,48 @@ Detail: RENDER r2v2-long5 hard_sl -$0.11 (-0.95%)
 **Open Questions:**
 - 24h -$0.90 / 7d -$1.02 still red; pump-chain+ worst 24h signal (-$0.36, 7T 4W) — profitable in EXTREME regime, no action
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+
+## 2026-10-26 21:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.03 (WR: 100%) | 24h: 30T 15W 50.0% '-$0.87' | 7d 140T 44.3% '-$0.99' | **size-reduce: file absent → 1.0x**
+
+Detail: DOT volume-buildup- SHORT profit-monster-trail +$0.03 (+1.19%)
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 3/30 = 10.0% (<40%); dominant closes = profit-monster-trail (9T +$0.31) and ugb_pt (8T +$0.14)
+- Kill check: 0%WR 24h signals pump-chain-(n=2)/bb-bounce-v2-long+(n=2) both <3; bb-bounce-v2-long+ already flagged for CEO (14d all-regime loss)
+- Streak: 18 -0.48, 19 empty, 20 +0.03 → streak broken, 0 consecutive negative hours
+- Frequency 1/hr — not overtrading
+- hard_max_loss still worst close reason (4T -$0.69) — expected 3-5% account loss at leverage, not a bug
+- 1 open CAKE bb-bounce-v2-long+ bracketed (SL 2.0964 / TP 2.1602)
+- Winner MAE max 0.594% (INJ pump-chain+) — entry quality OK
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.87 / 7d -$0.99 still red; pump-chain+ worst 24h signal (-$0.36, 7T 57% WR: big losers) — profitable in EXTREME regime, no action
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28); CAKE open trade on this signal
+
+## 2026-10-26 22:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** '-$0.03' (WR: 0.0%) | 24h: 30T 14W 46.7% '-$0.92' | 7d 141T 44.7% '-$1.02' | **size-reduce: file absent → 1.0x**
+
+Detail: CAKE bb-bounce-v2-long+ LONG trail_arm_timeout '-$0.03' (-0.82%)
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 3/30 = 10.0% (<40%); dominant closes = profit-monster-trail (8T +$0.29) and ugb_pt (8T +$0.14)
+- Kill check: bb-bounce-v2-long+ now 3T 0W 24h (meets n≥3 0%WR bar) but 14d all-regime loss already flagged for CEO (pending since 13:28) — no duplicate flag, no kill without CEO approval; pump-chain- n=2 <3
+- Streak: 20 +0.03, 22 -0.03 → 1 consecutive negative hour, trigger at 3 not fired
+- Frequency 1/hr — not overtrading
+- hard_max_loss still worst close reason (4T -$0.69) — expected 3-5% account loss at leverage, not a bug
+- 0 open trades
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.92 / 7d -$1.02 still red; pump-chain+ worst 24h signal (-$0.36, 7T 57% WR: big losers) — profitable in EXTREME regime, no action
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28, n=3 0W 24h now)
