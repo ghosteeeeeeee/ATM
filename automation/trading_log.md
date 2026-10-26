@@ -15857,3 +15857,23 @@ Final set: []
 **Open Questions:**
 - 24h -$0.02 (near flat), 7d -$0.68 — red drift persists
 - bb-bounce-v2-long+ still 20% WR (5T) over 24h — watch but no kill trigger
+
+## 2026-10-26 09:28 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet — last close 07:xx)
+**PnL:** $0.00 (last hour) | 24h: 20T 12W 60.0% -$0.08 | 7d 129T 43.8% -$0.68 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0 trades last hour — no kill/streak/frequency triggers possible
+- atr_sl_hit 3/20 = 15.0% (<40%) — dominant close = profit-monster-trail (8T +$0.32)
+- Kill check: no signal with 0% WR n≥3 last hour (0T); worst 24h bb-bounce-v2-long+ 5T 1W 20% -$0.05 (not kill criteria)
+- No 3+ negative-hour streak (03 -, 04 empty, 05 +, 06 empty, 07 -)
+- Frequency 0/hr — not overtrading
+- 1 open BTC continuum-osc+ LONG bracketed SL 79576/TP 81275
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.08 (drifted slightly red from -$0.02), 7d -$0.68 — red drift persists
+- bb-bounce-v2-long+ still 20% WR (5T) over 24h — watch, no kill trigger
