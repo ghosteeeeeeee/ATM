@@ -9162,5 +9162,25 @@
     "category": "gate",
     "status": "rejected-with-data",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-26T17:50:00Z",
+    "idea": "ARM-SANITY shadow: at profit_monster trail activation, cross-check highest/lowest against last 1m candle range; unsupported peak -> log ARM-SANITY-SKIP, do not arm",
+    "rationale": "Second independent false-peak instance this month: #59 round-number WLD/ZRO (empty price_history window), #165 entry-delta ETH 16421/BTC 16384/IMX 16165 (phantom seed). Seed fixes close the instances; a single arm-time validation closes the CLASS at the exit engine as defense-in-depth. Pre-registered #59 peak-sanity clamp never shipped.",
+    "expected_impact": "blocks phantom arms (3 confirmed in 30d mfe>=0.40 cohort); zero impact on real arms (peak must be tick-supported)",
+    "category": "exit engine guard",
+    "status": "suggested",
+    "risk": "low",
+    "vehicle": "log-only shadow first (automatic-implementation), then CEO GO for enforce"
+  },
+  {
+    "date": "2026-10-26T17:50:00Z",
+    "idea": "Historical mfe_pct phantom backfill (bug_hunter MED3): recompute mfe for closed rows whose peak equals the erased creation seed; confirm-from-price_history else zero the phantom delta",
+    "rationale": "522-pattern-match lower bound, ~3 rows mfe>=0.40 in last 30d (IMX 16165 mfe 14.646, ASTER 14656 43.78, ME 14200 47.35 confirmed). Pollutes the mfe>=0.40 armed KPI. Pattern match is noisy — backfill must confirm via price_history per row, not blanket-SQL.",
+    "expected_impact": "cleans ~3-20 rows of arm-KPI contamination; zero trading behavior",
+    "category": "data hygiene",
+    "status": "pre-registered",
+    "risk": "low",
+    "vehicle": "brain/analysis one-off next run, dry-run print before apply"
   }
 ]
