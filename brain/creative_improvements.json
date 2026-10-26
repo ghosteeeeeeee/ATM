@@ -8887,5 +8887,42 @@
     "status": "shipped",
     "risk": "low",
     "artifact": "scripts/daily_git_commit.py constants_diff_is_losers_only()"
+  },
+  {
+    "date": "2026-10-26T07:50:46Z",
+    "idea": "Contrarian PROMOTE control arm: score ORIGINAL direction on the same events (same +/-0.40/0.40 30x5m rule) + paired exact binomial + median-time OOS split",
+    "rationale": "pre-registered bar read 'flip-WR 64.6%' with no original-direction number beside it; without a control arm 64.6% could equal 64.6% = no edge",
+    "expected_impact": "makes the Oct-27 PROMOTE decision decidable instead of one-armed",
+    "result": "pump-chain- orig 36.6% vs flip 64.6% n=347, discordant 218/121, p<0.0001, both halves same sign (34.7->66.8 older, 39.0->61.7 newer); btc-pump-rider+ orig 73.4% vs flip 25.1% = do-not-flip",
+    "category": "entry sniper",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T07:50:46Z",
+    "idea": "Waiver-lapse impact split by rsi_exec band: does the hottest family depend on the sub-45 exemption?",
+    "rationale": "11 of 14 sub-45 SHORT opens in 3d are volume-buildup- — lapsing the waiver must not cut the only live edge",
+    "result": "7d volume-buildup- >=45 6T 83.3% +0.42 vs <45 13T 69.2% +0.01 = waiver band contributes zero net; 14d all-Shorts <45 15T 66.7% +0.26 (n<20 below bar)",
+    "category": "entry sniper",
+    "status": "measured_supports_lapse",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T07:50:46Z",
+    "idea": "chop-coverage ownership ledger on the NEVER-ARMED denominator (not just hard_max_loss exits)",
+    "rationale": "86% of gross loss sits in never-armed trades across many exit reasons; #90's ledger used the HML exit only",
+    "result": "owned 57.0% of -13.22/14d (killed 21.0 + disabled 8.2 + CONF_FLOOR 13.7 + MFE-CUT 14.1), residual -5.68/69T with no cell n>=20 -> gap closes only via CONF_FLOOR ship",
+    "category": "entry sniper",
+    "status": "logged_standing_kpi",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T07:50:46Z",
+    "idea": "daily_git_commit guard: decide BEFORE git add -A, predicate reads git diff HEAD, message drops constants it will not commit, 4-case selfcheck",
+    "rationale": "#156's exception ran after staging so git diff was always empty -> exception never passed -> 07:15 live test unstaged the legit LOSERS rewrite while the commit message claimed it",
+    "result": "selfcheck 4/4 + live pre/post-stage verification on the real repo",
+    "category": "infra",
+    "status": "shipped",
+    "risk": "low"
   }
 ]

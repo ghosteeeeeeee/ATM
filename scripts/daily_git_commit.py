@@ -14,33 +14,141 @@ from datetime import datetime, timezone
 HERMES = '/root/.hermes'
 
 
-def constants_diff_is_losers_only():
-    """True iff every non-blank changed line in scripts/hermes_constants.py belongs
-    to the LOSERS set literal (the losers_tracker daily rewrite). Any other hunk —
-    a flag, a threshold, a comment elsewhere in the file — returns False so the
-    guard keeps it out of the auto-commit."""
-    stdout, _ = run('git diff -- scripts/hermes_constants.py')
-    changed = []
-    for line in stdout.splitlines():
-        if line.startswith(('+++', '---', 'diff ', 'index ', '@@')):
+def strip_losers_block(text):
+    """Return `text` with the single `LOSERS = ...` assignment removed — plus any blank
+    lines immediately following it, because the sanctioned losers_tracker rewrite also
+    rewrites that gap (the live file has one extra newline there and a strict remainder
+    compare rejected the legit diff). Every other ALL_CAPS set in this file
+    (LOSERS_LONG, SHORT_BLACKLIST, ...) is left untouched."""
+    out = []
+    lines = text.splitlines(keepends=True)
+    i = 0
+    while i < len(lines):
+        if re.match(r'^LOSERS\s*=', lines[i]):
+            if lines[i].rstrip('\r\n').endswith('{'):
+                i += 1
+                while i < len(lines) and lines[i].strip() != '}':
+                    i += 1
+                i += 1  # consume the closing brace too
+            else:
+                i += 1  # single-line assignment
+            while i < len(lines) and lines[i].strip() == '':
+                i += 1  # blank lines the rewrite owns
             continue
-        if line[:1] in ('+', '-') and line[1:].strip():
-            changed.append(line[1:])
-    if not changed:
+        out.append(lines[i])
+        i += 1
+    return ''.join(out)
+
+
+def constants_diff_is_losers_only(cwd=None):
+    """True iff HEAD and the working tree differ ONLY inside the `LOSERS = ...` assignment
+    (the losers_tracker daily rewrite).
+
+    Location-aware by construction: everything except that assignment is stripped from
+    both versions and the remainders must be byte-identical, so a flag, a threshold, a
+    comment, or a member-add to ANY other set in the file rejects it. The earlier
+    line-text heuristic accepted `+    'ETH'` inside SHORT_BLACKLIST because 'ETH' looks
+    like a set member (bug_hunter #157 HIGH). Reads `git show HEAD:` + the worktree file
+    (never `git diff`), so the answer does not depend on what happens to be staged —
+    the #156 exception failed because it ran after `git add -A`."""
+    res = subprocess.run('git show HEAD:scripts/hermes_constants.py', shell=True,
+                         cwd=cwd or HERMES, capture_output=True, text=True, timeout=60)
+    if res.returncode != 0:
+        return False  # not in HEAD -> cannot be the sanctioned daily rewrite
+    try:
+        with open(os.path.join(cwd or HERMES, 'scripts', 'hermes_constants.py')) as f:
+            cur = f.read()
+    except OSError:
         return False
-    for raw in changed:
-        residue = re.sub(r'LOSERS\s*=\s.*', '', raw)   # the assignment line itself
-        residue = re.sub(r"[{}'\s,]", '', residue)      # braces/quotes/commas/space
-        if residue and not re.fullmatch(r'[A-Z0-9_]+', residue):
-            return False
-    return True
+    if res.stdout == cur:
+        return False  # nothing actually changed
+    return strip_losers_block(res.stdout) == strip_losers_block(cur)
 
 
 def run(cmd, cwd=None):
     """Run a shell command and return output."""
     result = subprocess.run(cmd, shell=True, cwd=cwd or HERMES,
-                           capture_output=True, text=True, timeout=60)
+                            capture_output=True, text=True, timeout=60)
     return result.stdout.strip(), result.returncode
+
+
+def selfcheck():
+    """4-case predicate check in a throwaway git repo (incl. the staged case that
+    broke the #156 exception on its 07:15 live test)."""
+    import shutil
+    import tempfile
+    tmp = tempfile.mkdtemp(prefix='dgc_')
+    try:
+        def g(cmd):
+            out, rc = run(cmd, cwd=tmp)
+            assert rc == 0, f'{cmd} -> {out}'
+        g('git init -q')
+        g('git config user.email t@t')
+        g('git config user.name t')
+        os.makedirs(os.path.join(tmp, 'scripts'), exist_ok=True)
+        path = os.path.join(tmp, 'scripts', 'hermes_constants.py')
+        with open(path, 'w') as f:
+            f.write("LOSERS = {\n    'ME',\n    'PUMP'\n}\nFOO = 1\n"
+                    "SHORT_BLACKLIST = {\n    'AAA',\n}\n")
+        g('git add -A')
+        g('git commit -qm init')
+        # 1. LOSERS-block-only, unstaged -> pass
+        with open(path, 'w') as f:
+            f.write("LOSERS = set()\nFOO = 1\n"
+                    "SHORT_BLACKLIST = {\n    'AAA',\n}\n")
+        assert constants_diff_is_losers_only(tmp) is True, 'case1 LOSERS-only unstaged'
+        # 2. same diff AFTER git add -A -> still pass (the #157 regression)
+        g('git add -A')
+        assert constants_diff_is_losers_only(tmp) is True, 'case2 LOSERS-only staged'
+        # 3. rogue non-LOSERS hunk, staged -> reject
+        with open(path, 'w') as f:
+            f.write("LOSERS = set()\nFOO = 2\n"
+                    "SHORT_BLACKLIST = {\n    'AAA',\n}\n")
+        g('git add -A')
+        assert constants_diff_is_losers_only(tmp) is False, 'case3 rogue flag staged'
+        # 4. comment-only edit elsewhere, staged -> reject
+        g('git checkout -q -- .')
+        with open(path, 'w') as f:
+            f.write("LOSERS = {\n    'ME',\n    'PUMP'\n}\nFOO = 1  # touched\n"
+                    "SHORT_BLACKLIST = {\n    'AAA',\n}\n")
+        g('git add -A')
+        assert constants_diff_is_losers_only(tmp) is False, 'case4 comment-only staged'
+        # 5. member-add to ANOTHER all-caps set (the #157 HIGH bypass) -> reject
+        g('git checkout -q -- .')
+        with open(path, 'w') as f:
+            f.write("LOSERS = {\n    'ME',\n    'PUMP'\n}\nFOO = 1\n"
+                    "SHORT_BLACKLIST = {\n    'AAA',\n    'ETH',\n}\n")
+        g('git add -A')
+        assert constants_diff_is_losers_only(tmp) is False, 'case5 blacklist member add'
+        # 6. LOSERS rewrite PLUS a blacklist add in the same diff (piggyback) -> reject
+        g('git checkout -q -- .')
+        with open(path, 'w') as f:
+            f.write("LOSERS = set()\nFOO = 1\n"
+                    "SHORT_BLACKLIST = {\n    'AAA',\n    'ETH',\n}\n")
+        g('git add -A')
+        assert constants_diff_is_losers_only(tmp) is False, 'case6 piggyback hunk'
+        # 7. byte-identical file -> reject (nothing changed)
+        g('git checkout -q -- .')
+        assert constants_diff_is_losers_only(tmp) is False, 'case7 unchanged'
+        # 8. the real losers_tracker shape: rewrite + the blank line it owns after the
+        #    block -> must still pass (this is the live file today)
+        with open(path, 'w') as f:
+            f.write("LOSERS = set()\n\nFOO = 1\n"
+                    "SHORT_BLACKLIST = {\n    'AAA',\n}\n")
+        g('git add -A')
+        assert constants_diff_is_losers_only(tmp) is True, 'case8 rewrite + owned blank line'
+        # 9. blank-line-only change FAR from the block -> reject (whitespace elsewhere
+        #    is not the sanctioned rewrite's business)
+        g('git checkout -q -- .')
+        with open(path, 'w') as f:
+            f.write("LOSERS = {\n    'ME',\n    'PUMP'\n}\nFOO = 1\n"
+                    "SHORT_BLACKLIST = {\n    'AAA',\n}\n\n\n")
+        g('git add -A')
+        assert constants_diff_is_losers_only(tmp) is False, 'case9 stray blank lines at EOF'
+        print('SELF-CHECK PASS (9/9: LOSERS-only unstaged/staged, rogue, comment, '
+              'blacklist member, piggyback, unchanged, owned blank line, stray blank lines)')
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def get_changed_files():
@@ -115,6 +223,31 @@ def main():
 
     print(f"Found {len(files)} changed files")
 
+    # GUARD: an unlogged hermes_constants.py edit must never ride into an auto-commit.
+    # Rogue edits landed between agent runs twice: 2026-10-05 (freeze violation, CEO
+    # reverted) and 2026-10-26 02:19 (same PROFIT_MONSTER_BYPASS pump-chain removal,
+    # backdated comment, caught by brain_auditor before this timer fired at 07:15).
+    # Constants changes are committed deliberately by the agent that makes them,
+    # with a brain/changes_log.json entry — not silently by the daily sweep.
+    # EXCEPTION (brain_auditor #156): scripts/losers_tracker.py owns the LOSERS
+    # block and rewrites it daily at 06:05 (systemd hermes-losers-tracker). Only a
+    # LOSERS-block-only diff passes; any other hunk is unstaged and reported.
+    # brain_auditor #157 FIX: the decision is taken BEFORE `git add -A` and the
+    # predicate reads `git diff HEAD`. As first shipped it ran AFTER staging, so
+    # `git diff` was always empty -> `changed == []` -> False -> the exception could
+    # never pass and the 07:15 live test unstaged the legit LOSERS rewrite (the
+    # commit message still claimed it). Deciding first also keeps the message honest.
+    constants_in_files = any(f == 'scripts/hermes_constants.py' for _, f in files)
+    keep_constants = constants_in_files and constants_diff_is_losers_only()
+    if constants_in_files and not keep_constants:
+        files = [f for f in files if f[1] != 'scripts/hermes_constants.py']
+        if not files:
+            print("Only an unlogged hermes_constants.py change present — nothing to commit.")
+            print("GUARD: scripts/hermes_constants.py NOT staged — commit constants changes "
+                  "deliberately with a brain/changes_log.json entry "
+                  "(revert with: git checkout -- scripts/hermes_constants.py)")
+            return
+
     # Categorize
     categories = categorize_changes(files)
 
@@ -125,26 +258,28 @@ def main():
     run('git add -A')
     print("Staged all changes")
 
-    # GUARD: an unlogged hermes_constants.py edit must never ride into an auto-commit.
-    # Rogue edits landed between agent runs twice: 2026-10-05 (freeze violation, CEO
-    # reverted) and 2026-10-26 02:19 (same PROFIT_MONSTER_BYPASS pump-chain removal,
-    # backdated comment, caught by brain_auditor before this timer fired at 07:15).
-    # Constants changes are committed deliberately by the agent that makes them,
-    # with a brain/changes_log.json entry — not silently by the daily sweep.
-    # EXCEPTION (brain_auditor #156): scripts/losers_tracker.py owns the LOSERS
-    # block and rewrites it daily at 06:05 (systemd hermes-losers-tracker). Without
-    # this, every legitimate daily rewrite sat uncommitted — git drift + a false
-    # "rogue edit" alarm on the next audit. Only a LOSERS-block-only diff passes;
-    # any other hunk in the file is still unstaged and reported.
-    if any(f == 'scripts/hermes_constants.py' for _, f in files):
-        if constants_diff_is_losers_only():
-            print("GUARD: hermes_constants.py diff is LOSERS-block-only "
-                  "(losers_tracker daily rewrite) — staged deliberately")
-        else:
-            run('git restore --staged scripts/hermes_constants.py')
-            print("GUARD: scripts/hermes_constants.py NOT staged — commit constants changes "
-                  "deliberately with a brain/changes_log.json entry "
-                  "(revert with: git checkout -- scripts/hermes_constants.py)")
+    # TOCTOU re-check: the decision above was taken from a pre-staging snapshot. If the
+    # file changed in the window, the staged content is not what was vetted and the
+    # commit message (already built) would claim the wrong thing — abort instead.
+    if keep_constants and not constants_diff_is_losers_only():
+        print("GUARD: scripts/hermes_constants.py changed between the LOSERS-only decision "
+              "and staging — ABORTING commit (re-run; do not let an unvetted constants "
+              "edit land with a message that describes the earlier diff).")
+        return
+
+    if constants_in_files and not keep_constants:
+        _, rc_restore = run('git restore --staged scripts/hermes_constants.py')
+        if rc_restore != 0:
+            # Never claim "NOT staged" while it still is — that is the lie this guard exists to prevent.
+            print("GUARD: FAILED to unstage scripts/hermes_constants.py — ABORTING commit. "
+                  "Unstage manually: git restore --staged scripts/hermes_constants.py")
+            return
+        print("GUARD: scripts/hermes_constants.py NOT staged — commit constants changes "
+              "deliberately with a brain/changes_log.json entry "
+              "(revert with: git checkout -- scripts/hermes_constants.py)")
+    elif keep_constants:
+        print("GUARD: hermes_constants.py diff is LOSERS-block-only "
+              "(losers_tracker daily rewrite) — staged deliberately")
 
     # Commit
     stdout, rc = run(f'git commit -m "{message}"')
@@ -167,4 +302,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if '--selfcheck' in sys.argv:
+        selfcheck()
+    else:
+        main()

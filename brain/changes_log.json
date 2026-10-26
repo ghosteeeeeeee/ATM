@@ -2921,5 +2921,49 @@
     "rationale": "scripts/losers_tracker.py owns this block (systemd hermes-losers-tracker, daily 06:05); log shows 7->2->1->3->0 tokens over Oct 22-26. NOT a rogue edit. Direction-blind LOSERS hard-block is therefore currently INERT.",
     "impact": "ME/PUMP no longer get the LOSERS hard-block/conf penalty. Impact small (HARD-BLOCK gate 42 blocks/22d, 4 distinct follow-on trades). Flagged for CEO: the LOSERS set flaps daily — do not count it as a live safety layer.",
     "note": "Constants change NOT made by brain_auditor; recorded here for the audit trail and so the daily guard exception is attributable."
+  },
+  {
+    "timestamp": "2026-10-26T07:50:46Z",
+    "agent": "brain_auditor",
+    "change": "daily_git_commit guard exception fixed: decision moved before git add -A, predicate reads git diff HEAD, commit message no longer claims constants it will not commit, added --selfcheck (4 cases)",
+    "type": "tweak",
+    "file": "scripts/daily_git_commit.py",
+    "before": "constants_diff_is_losers_only() called after git add -A reading `git diff` (always empty post-stage) -> False -> always unstaged; message still listed hermes_constants.py (fc7d21b1)",
+    "after": "guard decided pre-staging with `git diff HEAD`, message filtered when constants dropped, --selfcheck PASS 4/4",
+    "rationale": "07:15 UTC live test of the #156 exception FAILED; without fix the LOSERS rewrite stays uncommitted forever and every audit re-raises a false rogue-edit alarm",
+    "impact": "sanctioned losers_tracker rewrite commits cleanly; unlogged constants edits still blocked"
+  },
+  {
+    "timestamp": "2026-10-26T07:50:46Z",
+    "agent": "brain_auditor",
+    "change": "NEW analysis/contrarian_both_sides_2026-10-26.py — original-direction control arm + paired exact binomial + OOS halves for the Oct-27 contrarian PROMOTE",
+    "type": "creative",
+    "file": "analysis/contrarian_both_sides_2026-10-26.py",
+    "before": "contrarian_outcome_join.py scored only the contrarian direction (one-armed bar)",
+    "after": "both directions scored on identical events/rule; pump-chain- orig 36.6% vs flip 64.6% p<0.0001 both halves; btc-pump-rider+ do-not-flip confirmed",
+    "rationale": "decision-ready evidence for the pre-registered 2026-10-27T17:12Z PROMOTE",
+    "impact": "no live behavior; read-only instrument"
+  },
+  {
+    "timestamp": "2026-10-26T07:50:46Z",
+    "agent": "brain_auditor",
+    "change": "committed the sanctioned losers_tracker 06:05 rewrite LOSERS {'ME','PUMP'} -> set() (attribution already logged 06:53 this day)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "LOSERS = {'ME','PUMP'} (uncommitted since 06:05)",
+    "after": "LOSERS = set()",
+    "rationale": "clear the drift the broken guard left behind; value itself is the automated daily rewrite, not an agent decision",
+    "impact": "LOSERS set is EMPTY = direction-blind hard-block currently inert (do not count as a safety layer) — CEO already informed #156"
+  },
+  {
+    "timestamp": "2026-10-26T08:05:45Z",
+    "agent": "brain_auditor",
+    "change": "daily_git_commit guard predicate rewritten location-aware after bug_hunter HIGH (strip LOSERS assignment+owned blanks from HEAD and worktree, compare remainders) + restore-rc abort + TOCTOU re-check + selfcheck 9/9",
+    "type": "tweak",
+    "file": "scripts/daily_git_commit.py",
+    "before": "line-text heuristic: any ALL_CAPS-set member line passed (SHORT_BLACKLIST +ETH accepted), piggyback hunk accepted",
+    "after": "remainder compare scoped to the LOSERS assignment only; blank lines elsewhere still reject; staging state irrelevant",
+    "rationale": "bug_hunter #157 HIGH — the guard's own requirement (a) was still defeatable",
+    "impact": "unlogged constants edits genuinely blocked; sanctioned LOSERS rewrite (live file verified True) still commits"
   }
 ]
