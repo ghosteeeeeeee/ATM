@@ -15959,3 +15959,25 @@ Final set: []
 **Open Questions:**
 - bb-bounce-v2-long+ loses in ALL regimes over 14d (EXTREME 9T 33.3% -$0.43 / NORMAL 29T 37.9% -$0.69, n=38 ≥20) — meets regime-kill evidence bar but trigger (0% WR n≥3 last hour) not fired this hour; recommend CEO review
 - 24h -$0.14, 7d -$0.23 — red drift continues, magnitude shrinking
+
+## 2026-10-26 14:28 UTC Hourly Analysis
+
+**Trades:** 5 closed (2 wins, 3 losses)
+**PnL:** -$0.05 (WR: 40.0%) | 24h: 28T 15W 53.6% -$0.19 | 7d 133T 45.9% -$0.28 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: USUAL r2v2-long3 profit-monster-trail +$0.05 (+1.42%), LTC volume-buildup- profit-monster-trail +$0.04 (+0.82%), ETH volume-buildup- ugb_pt $0.00 (+0.02%), SYRUP volume-buildup- ugb_pt -$0.02 (-0.29%), DYDX volume-buildup- hard_max_loss -$0.12 (-5.45% account)
+- atr_sl_hit 4/28 = 14.3% (<40%) — dominant close = profit-monster-trail (10T +$0.36)
+- Kill check: no signal with 0% WR n≥3 last hour (volume-buildup- 4T 1W 25% — not 0%; r2v2-long3 1T win); worst 24h bb-bounce-v2-long+ 5T 1W 20% -$0.05 (not kill criteria) and hl_copy_trader 2T 0W (n=2 <3)
+- No 3+ negative-hour streak (11 +, 12 -, 13 +, 14 -0.05)
+- Frequency 5/hr — not overtrading
+- Entry quality: 24h winner MAE max 0.525% (~0.5%, acceptable)
+- 1 open bracketed: LTC volume-buildup- SHORT SL 57.674/TP 55.679
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- ETH volume-buildup- ugb_pt opened 14:12:30 and closed 14:12:32 (2 seconds) at +0.02% — instant exit, likely target already at/near entry; worth checking if ugb_pt target placement is degenerate for that entry, but PnL-neutral
+- 24h -$0.19 (reddest since 04:00's -$0.19, driven by DYDX/ICP hard_max_loss -$0.21), 7d -$0.28 still improving from -$0.80
+- bb-bounce-v2-long+ still loses ALL regimes 14d n=38 — CEO review still pending from 13:28 flag
