@@ -16115,3 +16115,23 @@ Detail: RENDER r2v2-long5 hard_sl -$0.11 (-0.95%)
 **Open Questions:**
 - 24h -$0.99 / 7d -$1.02 both reddest of day — pump-chain+ still worst 24h signal (-$0.36, 7T 57% WR: big losers); profitable in EXTREME regime, no action
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+
+## 2026-10-26 20:29 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet)
+**PnL:** $0.00 (WR: n/a) | 24h: 29T 14W 48.3% '-$0.90' | 7d 139T 44.6% '-$1.02' | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 3/29 = 10.3% (<40%); dominant closes = profit-monster-trail (8T +$0.28) and ugb_pt (8T +$0.14)
+- Kill check: no 0%WR n≥3 (0T last hour); 24h pump-chain-/bb-bounce-v2-long+/hl_copy_trader all 0W but n≤2; bb-bounce-v2-long+ already flagged for CEO
+- Streak: 17 +0.04, 18 -0.48 → 1 consecutive negative hour, trigger at 3 not fired
+- Frequency 0/hr — not overtrading
+- hard_max_loss still worst close reason (4T -$0.69) — expected 3-5% account loss at leverage, not a bug
+- 1 open DOT volume-buildup- SHORT bracketed (SL 1.0309 / TP 0.9857)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.90 / 7d -$1.02 still red; pump-chain+ worst 24h signal (-$0.36, 7T 4W) — profitable in EXTREME regime, no action
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
