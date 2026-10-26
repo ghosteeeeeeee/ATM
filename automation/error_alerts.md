@@ -2013,3 +2013,11 @@
 - **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+AT, allowing despite TOK filter`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] BIGTIME TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] BIGTIME TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-26 06:27 UTC
+- **REPEATED** (14x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-26 06:45 UTC
+- **[WARN]** (1x): Disk usage 84% on / (threshold 85%). 
+- **AUTO-FIX**: journalctl vacuumed to 200M, freed 485MB archived journals. Largest app logs: pipeline.log 321M, signal-compactor.log 126M — rotate/truncate those next pass if usage climbs again.
+- No other issues: pipeline running every 1m, prices fresh (12.6s), 105 signals/hr, 0 crashes, 0 phantom trades. "[BTC-CRASH]" log lines are the BTC-level SHORT-block guard working as designed, not crashes.
