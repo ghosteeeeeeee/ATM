@@ -10,13 +10,19 @@ actually fire and close afterwards? What would the result have been?
 Modes (default runs all three in sequence):
   --record   parse new pipeline.log lines since last offset -> gate_shadow events
   --close    close events older than 24h via signal_outcomes counterfactual join
-  --report   aggregate per-gate shadow WR (feeds brain_auditor kanban proposal)
+  --report   aggregate per-gate follow-on trade outcomes (DISTINCT-trade basis)
 
 Output DB: brain/gate_shadow.db (SQLite, own file — never touches runtime DB).
-Weekly report target: per gate, shadow WR by band -> relax >=55% (n>=15),
-keep/tightle <=35% (CEO gate-tuner rule from execution plan Part 3/T4).
+Semantics (2026-10-26 #156): an event resolves to the first REAL Hermes trade on
+the same token+direction within 24h after the block. Those trades are already in
+the live book, so the PnL column is an indicator of how the blocked token
+subsequently traded — NOT avoided or foregone money. Each trade is counted at
+most once per gate (pre-fix: 4,182 events -> 380 trades, 11x multi-count, 23x
+PnL inflation, per-gate sign flips; the auto "PROPOSE RELAX" line was an
+artifact of that). Gate changes still need CEO criteria (n>=50, OOS same-sign).
 
 Usage: python3 scripts/gate_shadow.py [--record] [--close] [--report] [--since-hours 6]
+       --since-hours limits --record only; --report is all-time by design.
 """
 import sys
 import os
@@ -77,6 +83,14 @@ def get_db():
     conn.execute("""
         CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)
     """)
+    # FIX 2026-10-26 (brain_auditor #156): would_pnl was attributed to a
+    # follow-on LIVE trade but no trade id was stored, so one real trade could
+    # back many events (measured 4,182 events -> 380 trades = 11.0x) and report()
+    # summed the same dollars repeatedly (23x inflation, sign flips per gate).
+    try:
+        conn.execute("ALTER TABLE events ADD COLUMN trade_id INTEGER")
+    except sqlite3.OperationalError:
+        pass  # column exists
     return conn
 
 
@@ -184,11 +198,34 @@ def close_events():
         pg = psycopg2.connect(**BRAIN_DB_DICT)
         pg_cur = pg.cursor()
         n_closed = n_trade = 0
+        # BACKFILL (2026-10-26 #156): resolve trade ids for rows closed before
+        # trade_id existed, otherwise report() silently drops the whole history.
+        # One-shot (meta flag) so each run does not rescan unresolved history.
+        cur.execute("SELECT value FROM meta WHERE key='trade_id_backfilled'")
+        if cur.fetchone() is None:
+            cur.execute("SELECT id, token, direction, blocked_at FROM events "
+                        "WHERE closed=1 AND would_trade=1 AND trade_id IS NULL")
+            for eid, token, direction, blocked_at in cur.fetchall():
+                pg_cur.execute("""
+                    SELECT id FROM trades
+                    WHERE token = %s AND direction = %s AND status='closed'
+                      AND open_time >= %s::timestamptz
+                      AND open_time < (%s::timestamptz + interval '24 hours')
+                      AND pnl_usdt IS NOT NULL
+                    ORDER BY open_time LIMIT 1
+                """, (token, direction, blocked_at, blocked_at))
+                _r = pg_cur.fetchone()
+                if _r:
+                    cur.execute("UPDATE events SET trade_id=? WHERE id=?", (_r[0], eid))
+            cur.execute("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+                        ('trade_id_backfilled', datetime.now(timezone.utc).isoformat()))
+            conn.commit()
         for eid, token, direction, blocked_at in pending:
-            # would-be counterfactual: first closed trade on token+direction
-            # opening within 24h AFTER the block
+            # would-be outcome: first closed trade on token+direction opening
+            # within 24h AFTER the block. trade_id stored so report() can count
+            # each real trade once (2026-10-26 #156 — was 11x multi-counted).
             pg_cur.execute("""
-                SELECT signal, pnl_usdt FROM trades
+                SELECT id, signal, pnl_usdt FROM trades
                 WHERE token = %s AND direction = %s AND status='closed'
                   AND open_time >= %s::timestamptz
                   AND open_time < (%s::timestamptz + interval '24 hours')
@@ -197,12 +234,12 @@ def close_events():
             """, (token, direction, blocked_at, blocked_at))
             row = pg_cur.fetchone()
             if row:
-                sig, pnl = row
+                tid, sig, pnl = row
                 cur.execute(
                     "UPDATE events SET closed=1, would_trade=1, would_win=?, "
-                    "would_pnl=?, outcome_signal=?, closed_at=? WHERE id=?",
+                    "would_pnl=?, outcome_signal=?, closed_at=?, trade_id=? WHERE id=?",
                     (1 if (pnl or 0) > 0 else 0, float(pnl or 0), sig,
-                     datetime.now(timezone.utc).isoformat(), eid))
+                     datetime.now(timezone.utc).isoformat(), tid, eid))
                 n_trade += 1
             else:
                 cur.execute(
@@ -219,50 +256,68 @@ def close_events():
 
 
 def report():
-    """Per-gate shadow aggregation for brain_auditor/kanban."""
+    """Per-gate aggregation — DISTINCT-trade basis (fix 2026-10-26, #156).
+
+    Semantics: an event resolves to the first REAL Hermes trade on the same
+    token+direction opening within 24h after the block. That trade is already in
+    the live book, so its PnL here is NEITHER avoided NOR foregone money — it is
+    an indicator of how the blocked token subsequently traded. Before this fix
+    the report summed one event per block, so a single real trade could be added
+    many times (measured 4,182 events -> 380 trades = 11.0x, 23x PnL inflation,
+    per-gate sign flips). Every number below counts each referenced trade at
+    most once per gate.
+    """
     conn = get_db()
     try:
         cur = conn.cursor()
-        rows = cur.execute("""
-            SELECT gate,
-                   COUNT(*) as blocks,
-                   SUM(CASE WHEN closed=1 THEN 1 ELSE 0 END) as closed_n,
-                   SUM(CASE WHEN would_trade=1 THEN 1 ELSE 0 END) as traded_n,
-                   SUM(CASE WHEN would_trade=1 AND would_win=1 THEN 1 ELSE 0 END) as wins,
-                   ROUND(SUM(CASE WHEN would_trade=1 THEN COALESCE(would_pnl,0) ELSE 0 END), 2) as pnl
-            FROM events GROUP BY gate ORDER BY blocks DESC
-        """).fetchall()
+        rows = cur.execute(
+            "SELECT gate, closed, would_trade, would_win, would_pnl, trade_id "
+            "FROM events").fetchall()
         if not rows:
             log('report: no events yet')
             return
-        log('─── GATE SHADOW REPORT (would-be outcomes of blocked trades) ───')
-        log(f'{"gate":28} {"blocks":>6} {"closed":>6} {"traded":>6} {"wins":>5} {"wr":>6} {"pnl":>8}')
+        agg, orphan = {}, 0
+        for gate, closed, wt, win, pnl, tid in rows:
+            a = agg.setdefault(gate, {'blocks': 0, 'closed': 0, 'trades': {}})
+            a['blocks'] += 1
+            a['closed'] += 1 if closed else 0
+            if wt:
+                if tid:
+                    a['trades'][tid] = (1 if win else 0, float(pnl or 0))
+                else:
+                    orphan += 1
+        log('─── GATE SHADOW REPORT (follow-on trade outcomes of blocked tokens) ───')
+        log('  NOTE: follow-on trades are LIVE trades already in the book — PnL below is')
+        log('        NOT avoided/foregone money; distinct-trade basis (each trade once).')
+        if orphan:
+            log(f'  {orphan} resolved events have no trade_id (excluded — run --close to backfill)')
+        log(f'{"gate":28} {"blocks":>6} {"closed":>6} {"trades":>6} {"wins":>5} {"wr":>6} {"pnl":>8}')
         proposals = []
-        for gate, blocks, closed_n, traded_n, wins, pnl in rows:
-            # FIX 2026-10-04 (bug-hunter F3): display n/a when no would-be trades —
-            # 0.0 pct WR for zero outcomes is the same misleading class the t5
-            # report just fixed (no outcome is not a loss).
-            wr = (wins / traded_n * 100) if traded_n else None
+        for gate, a in sorted(agg.items(), key=lambda kv: -kv[1]['blocks']):
+            trades = a['trades']
+            n = len(trades)
+            wins = sum(w for w, _ in trades.values())
+            pnl = round(sum(p for _, p in trades.values()), 2)
+            wr = (wins / n * 100) if n else None
             wr_s = f'{wr:5.1f}%' if wr is not None else '  n/a '
             flag = ''
-            if traded_n >= 15:
-                # FIX 2026-10-10 (T): relax proposals require BOTH high WR AND
-                # positive PnL — WR alone qualified LONG-NEUTRAL (56.5% WR but
-                # blocked trades net -$0.48: relaxing would let losing trades in).
-                # A relax case means the gate is COSTING money, i.e. blocked
-                # trades would have net-made money.
+            if n >= 15:
+                # token-state watch only: blocked tokens' NEXT real trade won
+                # >=55% and netted positive. Not a counterfactual — CEO gate
+                # criteria (n>=50, OOS same-sign) still apply before any change.
                 if wr is not None and wr >= 55 and pnl > 0:
-                    flag = ' ← PROPOSE RELAX (WR>=55, n>=15, blocked net POSITIVE)'
-                    proposals.append((gate, wr, traded_n, 'relax'))
+                    flag = ' ← WATCH-RELAX (follow-on WR>=55, distinct n>=15)'
+                    proposals.append((gate, wr, n))
                 elif pnl < 0:
-                    flag = ' ← gate working (blocked trades net negative)'
+                    flag = ' ← blocked tokens went on to LOSE'
                 elif wr is not None and wr <= 35:
-                    flag = ' ← gate working (shadow WR<=35)'
-            log(f'{gate:28} {blocks:6} {closed_n:6} {traded_n:6} {wins:5} {wr_s} {pnl:+8.2f}{flag}')
+                    flag = ' ← blocked tokens went on to LOSE (WR<=35)'
+            log(f'{gate:28} {a["blocks"]:6d} {a["closed"]:6d} {n:6d} {wins:5d} {wr_s} {pnl:+8.2f}{flag}')
         if proposals:
-            log('KANBAN PROPOSALS: ' + '; '.join(f'{g} relax (wr={w:.0f}%,n={n})' for g, w, n, _ in proposals))
+            log('KANBAN WATCH (not a proposal — see semantics above): '
+                + '; '.join(f'{g} follow-on wr={w:.0f}%,n={n}' for g, w, n in proposals))
         else:
-            log('no relax/tighten proposals this run (need n>=15 traded outcomes per gate)')
+            log('no WATCH-RELAX candidates this run (need distinct n>=15 follow-on trades per gate)')
     finally:
         conn.close()
 

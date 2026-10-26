@@ -8847,5 +8847,45 @@
     "category": "measurement hygiene",
     "status": "suggested — apply in future ledger refreshes",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-26T06:52:45Z",
+    "idea": "gate_shadow distinct-trade re-basing (tooling integrity, not a trading change)",
+    "rationale": "4,182 resolved events mapped to only 380 distinct live trades (11.0x); the would_pnl of an event is the actual PnL of the next real trade on that token+direction within 24h — money already in the book, counted repeatedly. Per-gate signs FLIP between bases (LONG-NEUTRAL +2.40 -> -0.94).",
+    "expected_impact": "Removes a false RELAX proposal from the kanban every run; re-bases the Nov 8 gate scoreboard before it is read. No trading behavior changed.",
+    "category": "measurement integrity",
+    "status": "shipped",
+    "risk": "low",
+    "artifact": "brain/analysis/gate_shadow_dedup_2026-10-26.py (--selfcheck PASS) + scripts/gate_shadow.py"
+  },
+  {
+    "date": "2026-10-26T06:52:45Z",
+    "idea": "momentum time-stop: exit if best 1m close is still <0.20% in our favor at 20 minutes",
+    "rationale": "14d never-armed losers = 147T -$13.20 of -$15.34 gross; densest cell = never-armed AND 15-45m hold = 60T 6.7% -$5.56; hard_max_loss exits at avg 30.1m with avg MFE 0.098% (the stop fires after momentum already failed).",
+    "expected_impact": "MEASURED and REJECTED: best cell +$2.19/14d (fee-adj +$1.46, p=0.0023, both halves positive) but 42.9% of actual winners zeroed vs the 20% house bar -> would destroy winners. Logged so it is never re-proposed unmeasured.",
+    "category": "entry/exit quality",
+    "status": "rejected_with_data",
+    "risk": "high",
+    "artifact": "brain/analysis/momentum_time_stop_2026-10-26.py (--selfcheck PASS, pnl identity mean abs err 0.0067 USDT)"
+  },
+  {
+    "date": "2026-10-26T06:52:45Z",
+    "idea": "PRE-REGISTERED: momentum time-stop scoped to the two never-armed bleed owners only (pump-chain+ / bb-bounce-v2-long+ = 45 of 147 never-armed losers)",
+    "rationale": "The 42.9% winner-destruction came from all signals mixed; the bleed owners are the two families with arm rates 40.0%/43.2%, where slow starters are far less often winners. Scoped test avoids cutting volume-buildup- (78.6% arm, our only edge family).",
+    "expected_impact": "untested — REQUIRES BLIND RUN",
+    "category": "entry quality",
+    "status": "pre_registered_for_2026-10-30",
+    "risk": "medium",
+    "artifact": "bars locked NOW, run on Oct 30 without reading results first: B1' n_eligible>=60, B2 delta>+$1.00, B3 p<0.05, B4 halves same sign, B5 winner-zeroed<20%, B6 fee-adj delta>+$1.00. NOT RUN this run (peeking would void the pre-registration)."
+  },
+  {
+    "date": "2026-10-26T06:52:45Z",
+    "idea": "daily-git-commit guard: stage hermes_constants.py only when the pending diff is LOSERS-block-only",
+    "rationale": "The #152 blanket unstage also blocked losers_tracker's legitimate 06:05 daily rewrite (LOSERS 2->0), leaving git permanently drifted and making every future audit flag a false rogue edit — plus `git checkout -- hermes_constants.py` would silently revert the live file.",
+    "expected_impact": "Keeps the anti-rogue protection (any other hunk still unstaged) while ending the false-alarm/drift cycle. 4 test cases pass.",
+    "category": "process",
+    "status": "shipped",
+    "risk": "low",
+    "artifact": "scripts/daily_git_commit.py constants_diff_is_losers_only()"
   }
 ]

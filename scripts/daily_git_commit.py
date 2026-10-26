@@ -6,11 +6,34 @@ Runs every 24 hours via systemd timer. Commits all modified/new files
 with a descriptive message based on what changed.
 """
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
 
 HERMES = '/root/.hermes'
+
+
+def constants_diff_is_losers_only():
+    """True iff every non-blank changed line in scripts/hermes_constants.py belongs
+    to the LOSERS set literal (the losers_tracker daily rewrite). Any other hunk —
+    a flag, a threshold, a comment elsewhere in the file — returns False so the
+    guard keeps it out of the auto-commit."""
+    stdout, _ = run('git diff -- scripts/hermes_constants.py')
+    changed = []
+    for line in stdout.splitlines():
+        if line.startswith(('+++', '---', 'diff ', 'index ', '@@')):
+            continue
+        if line[:1] in ('+', '-') and line[1:].strip():
+            changed.append(line[1:])
+    if not changed:
+        return False
+    for raw in changed:
+        residue = re.sub(r'LOSERS\s*=\s.*', '', raw)   # the assignment line itself
+        residue = re.sub(r"[{}'\s,]", '', residue)      # braces/quotes/commas/space
+        if residue and not re.fullmatch(r'[A-Z0-9_]+', residue):
+            return False
+    return True
 
 
 def run(cmd, cwd=None):
@@ -108,11 +131,20 @@ def main():
     # backdated comment, caught by brain_auditor before this timer fired at 07:15).
     # Constants changes are committed deliberately by the agent that makes them,
     # with a brain/changes_log.json entry — not silently by the daily sweep.
+    # EXCEPTION (brain_auditor #156): scripts/losers_tracker.py owns the LOSERS
+    # block and rewrites it daily at 06:05 (systemd hermes-losers-tracker). Without
+    # this, every legitimate daily rewrite sat uncommitted — git drift + a false
+    # "rogue edit" alarm on the next audit. Only a LOSERS-block-only diff passes;
+    # any other hunk in the file is still unstaged and reported.
     if any(f == 'scripts/hermes_constants.py' for _, f in files):
-        run('git restore --staged scripts/hermes_constants.py')
-        print("GUARD: scripts/hermes_constants.py NOT staged — commit constants changes "
-              "deliberately with a brain/changes_log.json entry "
-              "(revert with: git checkout -- scripts/hermes_constants.py)")
+        if constants_diff_is_losers_only():
+            print("GUARD: hermes_constants.py diff is LOSERS-block-only "
+                  "(losers_tracker daily rewrite) — staged deliberately")
+        else:
+            run('git restore --staged scripts/hermes_constants.py')
+            print("GUARD: scripts/hermes_constants.py NOT staged — commit constants changes "
+                  "deliberately with a brain/changes_log.json entry "
+                  "(revert with: git checkout -- scripts/hermes_constants.py)")
 
     # Commit
     stdout, rc = run(f'git commit -m "{message}"')

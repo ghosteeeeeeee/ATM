@@ -2863,5 +2863,63 @@
     "after": "tables + --selfcheck (both flip legs + best-bucket assertion + coverage print)",
     "rationale": "log rejected-with-data candidates so neither is re-derived from a single window; mandate reproducibility",
     "impact": "zero live behavior"
+  },
+  {
+    "timestamp": "2026-10-26T06:53:05Z",
+    "agent": "brain_auditor",
+    "change": "gate_shadow.py: store follow-on trade_id on close (new column + one-shot backfill) and aggregate --report on DISTINCT trades with corrected labels; auto 'PROPOSE RELAX' relabelled 'WATCH (not a proposal)'",
+    "type": "tweak",
+    "file": "scripts/gate_shadow.py",
+    "before": "report summed would_pnl once per event (4,182 events -> 380 distinct live trades = 11.0x, 23x PnL inflation, per-gate sign flips) and emitted 'PROPOSE RELAX (WR>=55, n>=15, blocked net POSITIVE)'",
+    "after": "report counts each referenced trade once per gate; banner states follow-on trades are already in the live book (not avoided/foregone); LONG-RSI-BLOCK proposal withdrawn (distinct 8 trades 50% $0.00)",
+    "rationale": "The counterfactual PnL was money we already realized, multi-counted; every relax/keep decision derived from it (incl. the standing kanban line and the Nov 8 gate scoreboard) was unquantified.",
+    "impact": "No trading behavior change. Stops false relax proposals. Nov 8 gate scoreboard must be read on the new basis.",
+    "evidence": "brain/analysis/gate_shadow_dedup_2026-10-26.py --selfcheck PASS"
+  },
+  {
+    "timestamp": "2026-10-26T06:53:05Z",
+    "agent": "brain_auditor",
+    "change": "daily_git_commit.py guard: stage hermes_constants.py when the pending diff is LOSERS-block-only (losers_tracker daily rewrite); unstage anything else",
+    "type": "tweak",
+    "file": "scripts/daily_git_commit.py",
+    "before": "blanket 'git restore --staged scripts/hermes_constants.py' for ANY constants diff",
+    "after": "constants_diff_is_losers_only() gates the exception — LOSERS-only diff staged, all other hunks still unstaged + warned",
+    "rationale": "The #152 guard also blocked losers_tracker's legitimate 06:05 rewrite (LOSERS 2->0), producing permanent git drift, false 'rogue edit' alarms, and a git-checkout hazard on the live file.",
+    "impact": "Anti-rogue protection preserved (tested: PROFIT_MONSTER_BYPASS edit -> False, comment-only -> False, LOSERS shape -> True).",
+    "evidence": "4-case harness + real working-tree diff"
+  },
+  {
+    "timestamp": "2026-10-26T06:53:05Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/gate_shadow_dedup_2026-10-26.py",
+    "type": "creative",
+    "file": "brain/analysis/gate_shadow_dedup_2026-10-26.py",
+    "before": "n/a",
+    "after": "--selfcheck PASS: 4,182 events -> 380 trades, 11.0x dup, report -$77.66 vs distinct -$3.35, 380/380 referenced trades found in the live book",
+    "rationale": "Independent re-derivation of the gate counterfactual so the gate report's semantics are provable, not asserted.",
+    "impact": "Evidence for the gate_shadow fix; DRIFT-G closed."
+  },
+  {
+    "timestamp": "2026-10-26T06:53:05Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/momentum_time_stop_2026-10-26.py (8-cell grid, 6 pre-registered bars)",
+    "type": "creative",
+    "file": "brain/analysis/momentum_time_stop_2026-10-26.py",
+    "before": "n/a",
+    "after": "0/8 cells pass. Best T=20m/THR=0.20%: delta +$2.19/14d, fee-adj +$1.46, p=0.0023, halves +1.13/+1.06, but 42.9% of winners zeroed (>20% bar). --selfcheck PASS (pnl identity err 0.0067 USDT, cell reproducible).",
+    "rationale": "Tests the mandate 'exit early in chop' against the densest bleed cell (never-armed 15-45m = 60T -$5.56).",
+    "impact": "REJECTED-WITH-DATA. Scoped variant pre-registered for Oct 30 (blind run)."
+  },
+  {
+    "timestamp": "2026-10-26T06:53:05Z",
+    "agent": "losers_tracker (automated 06:05 UTC, logged by brain_auditor)",
+    "change": "hermes_constants.py LOSERS: {'ME','PUMP'} -> set() — daily rewrite removed both for 'insufficient data'",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "LOSERS = {\n    'ME',\n    'PUMP'\n}",
+    "after": "LOSERS = set()",
+    "rationale": "scripts/losers_tracker.py owns this block (systemd hermes-losers-tracker, daily 06:05); log shows 7->2->1->3->0 tokens over Oct 22-26. NOT a rogue edit. Direction-blind LOSERS hard-block is therefore currently INERT.",
+    "impact": "ME/PUMP no longer get the LOSERS hard-block/conf penalty. Impact small (HARD-BLOCK gate 42 blocks/22d, 4 distinct follow-on trades). Flagged for CEO: the LOSERS set flaps daily — do not count it as a live safety layer.",
+    "note": "Constants change NOT made by brain_auditor; recorded here for the audit trail and so the daily guard exception is attributable."
   }
 ]
