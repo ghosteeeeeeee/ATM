@@ -15938,3 +15938,24 @@ Final set: []
 **Open Questions:**
 - 24h -$0.13, 7d -$0.26 — red drift persists but 7d improving from -$0.80
 - bb-bounce-v2-long+ still 20% WR (5T) over 24h — watch, no kill trigger
+
+## 2026-10-26 13:28 UTC Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 losses)
+**PnL:** -$0.01 (WR: 66.7%) | 24h: 23T 13W 56.5% -$0.14 | 7d 128T 46.1% -$0.23 | **size-reduce: file absent → 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: PURR r2v2-long3 profit-monster-trail +$0.04 (+1.03%), BLUR pump-chain+ ugb_pt +$0.02 (+0.49%), ETH hl_copy_trader atr_sl_hit -$0.07 (-1.61%)
+- atr_sl_hit 4/23 = 17.4% (<40%) — dominant close = profit-monster-trail (8T +$0.27)
+- Kill check: no signal with 0% WR n≥3 last hour (3T split across 3 signals); worst 24h bb-bounce-v2-long+ 5T 1W 20% -$0.05 (not kill criteria)
+- No 3+ negative-hour streak (05 +, 07 -, 11 +, 12 -0.01)
+- Frequency 3/hr — not overtrading
+- Entry quality: 24h winner MAE max 0.525% (~0.5%, acceptable)
+- 3 open all bracketed: SYRUP volume-buildup- SL 0.18092/TP 0.17311, USUAL r2v2-long3 SL 0.01039/TP 0.01071, LTC volume-buildup- SL 57.08/TP 55.70
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- bb-bounce-v2-long+ loses in ALL regimes over 14d (EXTREME 9T 33.3% -$0.43 / NORMAL 29T 37.9% -$0.69, n=38 ≥20) — meets regime-kill evidence bar but trigger (0% WR n≥3 last hour) not fired this hour; recommend CEO review
+- 24h -$0.14, 7d -$0.23 — red drift continues, magnitude shrinking
