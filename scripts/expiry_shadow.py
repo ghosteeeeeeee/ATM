@@ -21,6 +21,19 @@ Modes (default runs all in sequence):
              positive forward edge?
 
 Output DB: brain/expiry_shadow.db (own file — never touches runtime DB).
+
+STATISTICS WARNING (brain_auditor run #160, 2026-10-26) — one row per signal
+EVENT, and events repeat over the same ~79-102 tokens per 14-30d cohort.
+Event-level t-stats are therefore PSEUDO-REPLICATED and overstated ~2-3x
+(measured: SKIPPED SHORT 14d naive t=+6.64 vs cluster-robust t=+2.13;
+EXPIRED LONG 14d naive t=-3.24 vs CR t=-1.37). No cohort reaches
+|t_CR|>=2 at BOTH 14d and 30d (SKIPPED SHORT is +2.13 at 14d but only
++1.72 at 30d), i.e. no gate/expiry effect holds across both windows once
+tokens are treated as the independent unit. Use
+brain/analysis/cluster_t.py `cluster_t(values, clusters)` (selfcheck PASS)
+for any significance claim off this DB; naive t is fine for point estimates
+only. Run #76/#153 gate-saves and short-supply t figures used the naive
+column and should not be re-cited as evidence.
 """
 import sys
 import os
