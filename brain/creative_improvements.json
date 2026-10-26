@@ -8969,5 +8969,50 @@
     "category": "exit",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-26T11:55:00Z",
+    "idea": "CLUSTER-ROBUST t for event-level shadow instruments — brain/analysis/cluster_t.py shipped",
+    "rationale": "expiry_shadow/gate_shadow emit one row per signal EVENT over only 79-102 distinct tokens; naive t overstates 2-3x. Measured CR1 on excess_4h: SKIPPED SHORT 14d +6.64 -> +2.13, 30d +4.81 -> +1.72; EXPIRED LONG 14d -3.24 -> -1.37, 30d -2.77 -> -1.15. No cohort reaches |t|>=2 at BOTH windows, so both #76's 'gates save +$65 (t=-3.00)' and #153's 'short-supply below cost (t=+4.22)' were invalid.",
+    "expected_impact": "blocks future false-positive gate ships; every shadow significance claim now uses the token as the independent unit",
+    "category": "measurement instrument",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T11:55:00Z",
+    "idea": "PRE-REG CORRECTION (pre-data): 2026-10-31 short-supply bar restated as excess_4h>+0.05% AND t_CR>=2 (cluster_t) AND LONG same-sign negative AND excess>0.14% cost",
+    "rationale": "as originally written ('t>=2') the bar is satisfiable by pseudo-replication. Current SKIPPED SHORT 30d = +0.2269 (clears both the +0.05 and 0.14 cost bars) but t_CR=+1.72 -> FAILS the corrected bar. Logging before Oct 31 keeps the correction pre-data.",
+    "expected_impact": "Oct-31 review returns a valid verdict instead of a false positive",
+    "category": "pre-registration hygiene",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T11:55:00Z",
+    "idea": "ARM-GAP RE-MEASURE after #158 trail-state GC (reached-arm trades exiting on a stop)",
+    "rationale": "14d mfe>=0.40 AND trailing_activated=False AND exit in (atr_sl_hit/hard_sl/manual_sl_hit) = 35T net -$1.71 at 2.9% WR, avg MFE 0.774 (pump-chain 25T -$1.22 / non-pump 10T -$0.49); 30d 67T -$1.18. Two competing causes: (a) stale profit_monster trail-state keys made UGB-PT exclude these trades (position_manager.py:3917) — #158 GC live 2026-10-26 08:45:55; (b) EXIT ORDER — ATR TP/SL is section 1 with `continue` (position_manager.py:3269) and precedes UGB-PT at 7b (3881), so a fast giveback closes at the stop before the floor is evaluated. BAR (locked now): post-GC 7d cohort rate below the 14d baseline 35/109=32.1% of reached-arm closes, with NO rise in premature ugb_pt/trail exits -> (a) confirmed; if it stays >=32% -> (b) ordering is root cause and the fix is a reorder, not a new floor.",
+    "expected_impact": "recover part of -$1.71/14d giveback, or close the question with data",
+    "category": "exit system",
+    "status": "pre_registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T11:55:00Z",
+    "idea": "REJECTED: bb_position / z_score entry filter to predict trail-arm failure",
+    "rationale": "pooled 30d separates armed from unarmed (bb_position p=0.0035, z_score p=0.0060) but ONLY because armed trades skew LONG (253 vs 61) and LONGs structurally score higher on both. Stratified: LONG 30d p=0.747/0.875, SHORT 30d p=0.324; 14d LONG p=0.0074 flips to 30d p=0.747. Simpson's paradox — the exact confound check from THE PATTERN.",
+    "expected_impact": "none (not shipped); would have blocked ~50% of winners on a confound",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-26T11:55:00Z",
+    "idea": "RE-REJECTED: block EXTREME volatility regime trades",
+    "rationale": "7d EXTREME -$0.56 / 14d EXTREME -$2.54 look blockable, but 30d EXTREME +$0.64 vs non-EXTREME -$2.86 and 60d EXTREME +$2.38 vs non-EXTREME -$10.33 — EXTREME is the BETTER 60d regime. Window noise. Independently confirms #153.",
+    "expected_impact": "none (not shipped)",
+    "category": "regime gate",
+    "status": "re_rejected",
+    "risk": "would block the historically profitable regime"
   }
 ]
