@@ -9192,5 +9192,23 @@
     "status": "PROPOSED_TO_CEO (vacation rules: shadow->enforce via constants_change_review_queue; needs shadow run after #166 ladder restore to isolate incremental effect)",
     "risk": "low — blocks 3.1% of winners, scoped token+direction only, manual/CEO paths exempt via existing signal-reason handling",
     "evidence": "PG census 2026-10-26 run #166; query reproducible (token-sorted close timeline, STOP_EXITS={hard_max_loss,hard_sl}, gap<=8h)"
+  },
+  {
+    "date": "2026-10-26T19:51:15.960752+00:00",
+    "run": 167,
+    "idea": "CHASE_RATIO_SHADOW enforce review completed early — KEEP SHADOW (FAIL enforce bar)",
+    "rationale": "51 unique fires Oct 14-26; 16 trades within 2m; would save $0.69 / kill $0.90 trail winners = net -$0.21; 6 trail-family false-blocks vs 0-bar",
+    "category": "gate evaluation",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-26T19:51:15.960752+00:00",
+    "run": 167,
+    "idea": "mfe phantom backfill dry-run: 0 inflation phantoms in 40-row wider scan; 5/10 named-token mismatches are understates; blanket backfill NOT warranted",
+    "rationale": "candles_1m cross-check stored-vs-real; only known offender class is pre-Oct-25 entry-delta fixed live by #165 reanchor",
+    "category": "data quality",
+    "status": "completed-no-action",
+    "risk": "none"
   }
 ]
