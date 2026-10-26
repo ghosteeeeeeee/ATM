@@ -9248,5 +9248,23 @@
     "category": "ledger",
     "status": "rejected-with-data",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-26T22:38:02Z",
+    "idea": "HABITAT LEDGER — zero-code standing KPI: for every ENABLED signal with 30d n>=10, compute % of 30d trades in (regime, signal) cells where SIGNAL_TYPE_OVERRIDES==0.0. Surface >=80% as PSEUDO-KILLED",
+    "rationale": "Regime blocks accumulate silently (37 zero-cells now). Flags say ENABLED=True while live habitat is gone — CEO sees a different book than the flags claim. Found bb-bounce 87% + pc- 85% on first run",
+    "expected_impact": "zero behavior change; drift visibility. Add to auto_1hr or audit checklist when it proves useful 2+ runs",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T22:38:02Z",
+    "idea": "Oct 27 contrarian PROMOTE pre-registration amendment: report NORMAL-scoped pc- flip-WR alongside the 64.7% headline",
+    "rationale": "pc- EXTREME habitat blocked since Oct 16; 85% of 30d pc- trades were EXTREME. The 64.7% n=348 includes blocked-habitat history; forward live cohort is NORMAL-only (12T 30d +0.45). Ship decision needs the live-habitat number",
+    "expected_impact": "prevents promoting on a number the live book cannot realize",
+    "category": "promotion-guard",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

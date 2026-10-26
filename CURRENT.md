@@ -1,90 +1,83 @@
-# Current State — brain_auditor #169 2026-10-26 21:45 UTC
-**Last Updated: 2026-10-26 21:45 UTC**
-**Updated by: brain_auditor #169. Prior: #168 20:40 (preserved in git history).**
+# Current State — brain_auditor #170 2026-10-26 22:45 UTC
+**Last Updated: 2026-10-26 22:45 UTC**
+**Updated by: brain_auditor #170. Prior: #169 21:45 (preserved in git history).**
 
-## HEADLINE — bb-bounce arm-threshold lever REJECTED (0/22 unarmed winners every MFE
-band). Contrarian flip edge is SIGNAL-SELECTIVE (pc- 64.7% vs btc-pump-rider+ 28.6%
-flipped-worse) — Oct 27 PROMOTE must be pc--scoped, never blanket. 0 config changes
-(correct: nothing passed bars, no_signal_enable_disable=True).
+## HEADLINE — Habitat ledger (new standing KPI, zero code): 2 signals are
+PSEUDO-KILLED by regime overrides while flags stay True — bb-bounce-v2-long+ 87%
+of 30d habitat blocked (signal_reporter NORMAL-block 21:43 verified live) and
+pump-chain- 85% (EXTREME blocked, NORMAL-only live). 0 config changes (correct:
+nothing passed bars; no_signal_enable_disable honored). Waiver lapses ~00:00Z.
 
-**bb-bounce-v2-long+ (CEO packet, third exhausted route):** conf-floor rejected #168;
-arm-threshold tested this run — unarmed MFE band map: <0.10 8T -$0.93 / 0.10-0.20
-8T -$0.43 / 0.20-0.30 2T -$0.18 / 0.30-0.40 4T -$0.34 = **0/22 winners at EVERY
-band**. The coin does not move; no threshold rescues the cohort. Auditor levers now
-FULLY EXHAUSTED (conf-floor + arm-threshold + bypass-removal all rejected-with-data).
-CEO keep-vs-disable GO/NO-GO needed. Live test: CAKE #16430 open (3rd attempt today
-after ADA + CAKE#16413 both trail_arm_timeout losses).
+**bb-bounce-v2-long+ (CEO packet COMPLETE):** 3rd live demo failed — CAKE #16430
+trail_arm_timeout MFE 0.359 (never armed), ADA + CAKE#16413 earlier today, all
+NORMAL regime. signal_reporter shipped NORMAL block (commit 5395c3a8) at 21:43 —
+verified in volatility_gate_v2.py:412, correct-by-traffic (0 opens since). NORMAL
+block forfeits 11T +0.63 to save 19T -1.35 = net +0.72/14d. With EXTREME already
+blocked, live habitat is HIGH/FLAT-only = 0 trades in 14d. Every auditor lever
+rejected-with-data; keep-vs-disable GO still CEO (flag stays True per rules).
 
-**Contrarian outcome-join refreshed (canonical analysis/contrarian_outcome_join.py):**
-894 shadow rows / 622 decided: pump-chain- flip-WR **64.7% n=348** (OOS holds) vs
-btc-pump-rider+ **28.6%** (flipping WORSE — anti-correlated). Total 48.7% is Simpson's
-paradox. PROMOTE formal re-verify Oct 27T17:12Z — pre-register **pc--scoped variant**
-as the ship candidate. NOT shipped early.
+**Waiver-class SHORT deaths root-caused (no action — lapse handles it):**
+LTC #16422 detect RSI 37.33 → exec 51.18 (drift 13.85) and DYDX #16420 37.94 →
+44.92 both entered via the [35,45) exemption band; SHORT-MIDBAND reads
+detect-first (decider_run.py:2265) so exec drift into the death zone passed.
+Tonight's 00:00Z lapse (HARD_FLOOR=45 at detect) closes the class automatically.
 
-`hermes_constants.py` working-tree diff **EMPTY** · CEO_PROTECTED 13/13 · session lock
-**absent** · size-reduce **ABSENT = 1.0x** · 0 trading-constant changes ·
-vacation no_signal_enable_disable=true · unclog waiver expires **2026-10-27T00:00Z (~2.3h)**.
+`hermes_constants.py` working-tree diff **EMPTY** · CEO_PROTECTED 13/13 · session
+lock **absent** · size-reduce **ABSENT = 1.0x** · 0 trading-constant changes ·
+vacation no_signal_enable_disable=true · unclog waiver expires **2026-10-27T00:00Z**.
 
-## LOSING AUTOPSY — WRONG-SIDE REFUTED **93rd** CONSECUTIVE RUN
-`recovery_replay.py 24` adverse-first (selfcheck PASS):
-24h 14 losers = 1 never-adverse / 11 recovered / **2 NEVER**:
-- ICP #16409 SHORT rsi_exec 39.0 = [35,45) waiver-band class — **blocked automatically
-  post-lapse tonight** (SHORT_RSI_HARD_FLOOR=45 constants:956 verified live)
-- CC #16423 pump-chain- SHORT rsi_exec 46.95 = midband carve-out legal
-  (decider_run.py:2265 excludes 'pump-chain' from SHORT_MIDBAND block; standing
-  in-band evidence +$0.45 #96) — n=1, documented, no action
-DOT SHORT steer resolved **WIN** (+1.19% profit-monster-trail) — trail did the work,
-exit condition never fired. All 24h winners trailed; zero losers reached trailed exit.
+## LOSING AUTOPSY — WRONG-SIDE REFUTED **94th** CONSECUTIVE RUN
+`recovery_replay.py` adverse-first (selfcheck PASS): 48h n=21 losers =
+6 never-adverse / 13 recovered-after-adverse / **2 NEVER**:
+- ICP #16409 SHORT rsi 39.0 = waiver-band class — **blocked post-lapse tonight**
+- CC #16423 pump-chain- SHORT rsi 46.95 = midband carve-out legal (n=1, documented)
+24h 15 losers: 7 LONG chase entries (RSI 55-69 buying strength that faded) +
+SHORTs in the 45-55 death/whipsaw band — the mirror-image pattern unchanged.
 
-## MANDATE FRESH (PG 21:30)
-**7d armed(mfe>=0.40):** 74T 74.3% +$3.63 vs unarmed 66T 12.1% **-$4.62**
-**7d exits:** profit-monster-trail 49T 89.8% +$2.86 | hard_max_loss 17T 0% -$2.39
-| atr_sl_hit 22T 0% -$1.33 | trail_arm_timeout 14T 14.3% -$0.42
-**7d chop-exits (HML/atr_sl/hard_sl) never-armed share: 37/46 = 80.4%** → entry-side
-problem confirmed; no exit lever.
+## MANDATE FRESH (PG 22:35)
+**7d armed(mfe>=0.40):** 74T 74.3% +$3.63 vs unarmed 62T 4.8% **-$4.84**
+**14d armed:** 166T 69.9% +$8.36 vs unarmed 165T 5.5% **-$13.35**
+**14d exits:** profit-monster-trail 84T 91.7% +$4.61 | hard_max_loss 61T 0% -$6.37
+| atr_sl_hit 80T 1.3% -$5.57 | trail_arm_timeout 25T 16% -$0.87
+**7d direction:** LONG 91T 40.7% -$1.25 / SHORT 50T 52.0% +$0.23 — chop tape,
+continuum BELOW, sources flipped overnight to LONG_BIAS (advisory: no fresh LONGs
+until reclaim holds with volume).
 
 ## SHADOW 2/6 ANSWERABLE
-- contrarian 894 rows / join 622: pc- 64.7% holds; **scope-selective** (headline)
-- floor_admit 2158 / wyckoff 337: PENDING Nov 15 join
-- oscillator FROZEN by design · rr ORPHANED — dead
-- shadow_trader report 21:32: CONFLUENCE-EXPIRY biggest block (11781 @ 48% would-win);
-  pm_trail exit engine dominant
+- contrarian 894/622: **pc- 64.7% n=348 holds**, rider 28.6% flipped-worse —
+  signal-selective. NEW: pc- 85% habitat regime-blocked → Oct 27 PROMOTE verify
+  must add NORMAL-scoped flip-WR (pre-registered this run)
+- shadow_trader 26146: CONFLUENCE-EXPIRY 11837 @48% (gates justified); pm_trail
+  exit engine dominant (+3687.76 shadow vs hard_max -5535.92)
+- floor_admit 2158 / wyckoff 337 PENDING Nov 15 · oscillator FROZEN · rr ORPHANED
 
 ## LAST-RUN VERIFY — ALL PASS
-- #167 brain.py loss-reason bugfix: e2e STILL PENDING (0 brain-closed losses since
-  18:55 — quiet market, not a bug)
-- #166 pm_armed_at stamp: 1 adoption (works, needs activations to accrue)
-- #152 daily-commit constants guard: LIVE (selfcheck 9/9); no rogue constants commits
-  today; 02:19:30 writer did not reappear
-- #168 levers: conf-floor + RSI-floor rejections re-confirmed with fresh numbers
-- protected 13/13 · constants EMPTY · 0 new Tracebacks (pipeline last Oct 11)
-- kill flags 7/7 correct · session lock absent
+- #169 pm_armed_at stamp LIVE (profit_monster.py:453, 1 adoption)
+- #169 contrarian scope caveat re-verified fresh
+- #167 brain.py loss-cooldown: code present, e2e correct-by-traffic
+- #152 daily-commit constants guard LIVE (4-case selfcheck), no rogue commits
+- #151 CONF_FLOOR held: fkB re-confirmed FAIL (all-signal 16/55=29.1%, bare 9/32=28.1%)
+- kill flags correct (VB+/VB-/HMACD_MTF±/OVERSOLD False) · protected 13/13 ·
+  constants EMPTY · 0 new Tracebacks (last Oct 11) · session lock absent
 
-## PG fresh (21:30)
-24h 30T 15W 50.0% **-$0.87** · 7d 140T 45.0% **-$0.99** · 14d 338T 38.5% -$5.00
+## PG fresh (22:35)
+24h 30T 14W 46.7% **-$0.92** · 7d 141T 44.7% **-$1.02** · 14d 337T 38.6% -$4.80
 
 ## READINESS
-1 open CAKE #16430 bb-bounce-v2-long+ LONG @2.1283 bracketed (SL 2.1032 / TP 2.1602),
-live +0.024% — HOLD bracket; live demo for CEO keep-vs-disable question.
-Regime: SHORT_BIAS 15m / LONG_BIAS 4h (cite source), continuum BELOW, LOW vol, CALM.
-Watchdog 21:15: 0 steers, portfolio good. No new LONGs while aggregate SHORT_BIAS;
-mid-band = no trade (waiver lapses tonight); trail-family first; size 1.0x.
+0 open — flat correct. Regime: chop, continuum BELOW (BTC ~79964 vs EMA300 80109),
+aggregate flipped SHORT→LONG_BIAS 21:45, trend_quality STRONG_DOWN, LOW vol.
+No fresh LONGs until 1m reclaims EMA300 with volume; SHORTs on bounce into
+RSI 55-65 only (skip 45-55); mid-band = no trade; trail-family first; size 1.0x.
+bb-bounce effectively dormant (HIGH/FLAT-only) — do not treat flag True as live.
 
-## WAIVER — expires 2026-10-27T00:00Z (~2.3h)
-Let LAPSE as pre-registered. Gate constants verified live (HARD_FLOOR=45). Post-lapse
-ICP-class [35,45) shorts blocked automatically. Verify next run: flip1_active()==False,
-UNCLOG-EXPIRED logged, 0 new band opens.
+## WAIVER — expires 2026-10-27T00:00Z (~1.5h)
+Let LAPSE as pre-registered. flip1_active()==True verified this run. Post-lapse
+verify: flip1_active()==False, [UNCLOG-EXPIRED] logged, 0 new [35,45) band opens.
 
 ## NEXT
-1. **2026-10-27T00:00Z+** waiver LAPSE verify
-2. **2026-10-27T17:12Z** contrarian PROMOTE re-verify — **pc--scoped variant** (caveat
-   MANDATORY; blanket REJECTED this run with data)
-3. **2026-10-27** CHASE_RATIO close as FAIL per #167
-4. brain-closed loss e2e when next loss closes
-5. CAKE #16430 monitor
-6. **CEO:** bb-bounce keep-vs-disable (packet COMPLETE: 3 routes exhausted) ·
-   contrarian PROMOTE scope (pc--only recommended) · CONF_FLOOR fkB · hard-stop
-   reentry · MEDs F1/F2/F3 · ARM-BE-STOP GO · escalation #17 · LOSERS EMPTY
-7. **STOP:** entry-feature scans, oscillator join, exit-ladder families, direction-mix
-   levers, cluster limiters, chase-ratio enforce, bb-bounce conf/bypass/arm-threshold
-   (closed), volume-buildup- RSI floor (closed), blanket contrarian promote (closed)
+1. **2026-10-27T00:00Z+** waiver LAPSE verify (flip1 False + 0 band opens)
+2. **2026-10-27T17:12Z** contrarian PROMOTE re-verify — pc--scoped + NORMAL-scoped
+   flip-WR report (pre-registered #170)
+3. **CEO:** bb-bounce keep-vs-disable (packet complete — effective habitat gone)
+   + CONF_FLOOR fk-definition/fkB FAIL ruling
+4. Habitat ledger: carry 2 more audit runs, then decide auto_1hr automation
