@@ -2852,5 +2852,16 @@
     "after": "assert a[2] < FLOOR + 0.05 (ponytail: %.1f display; legacy lines are 1dp forever) and assert a[2] >= 35 - 0.05; assert window_source == vacation_mode.json and waiver_expire is not None",
     "rationale": "decider_run renders RSI at %.1f so a true 44.995 prints '45.0 < 45' — gate correct, line unverifiable; selfcheck must tolerate what the log cannot carry",
     "impact": "read-only; decider_run log format deliberately NOT churned (cosmetic, hot live path, buys nothing the tolerance does not)"
+  },
+  {
+    "timestamp": "2026-10-26T05:50:59Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/staleness_gap_census_2026-10-26.py — staleness_minutes + gap_at_entry entry-quality census; both axes REJECTED-with-data (staleness flat/no-edge, gap OOS sign flip); bug_hunter round2 SHIP",
+    "type": "creative",
+    "file": "brain/analysis/staleness_gap_census_2026-10-26.py",
+    "before": "n/a (new analysis instrument)",
+    "after": "tables + --selfcheck (both flip legs + best-bucket assertion + coverage print)",
+    "rationale": "log rejected-with-data candidates so neither is re-derived from a single window; mandate reproducibility",
+    "impact": "zero live behavior"
   }
 ]

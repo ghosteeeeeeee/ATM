@@ -8803,5 +8803,49 @@
     "risk": "none",
     "agent": "brain_auditor",
     "run": 154
+  },
+  {
+    "date": "2026-10-26T05:40:54Z",
+    "agent": "brain_auditor",
+    "run": 155,
+    "idea": "PRE-REGISTERED narrow waiver contingency EXECUTED 1 DAY EARLY — bar FAILS, lapse confirmed",
+    "rationale": "#154 pre-registered: volume-buildup- SHORT [35,45) bear-only ships only if n>=15 AND WR>=60% AND net>+$0.30 AND no single price-move loss>1% AND 30d same-sign. Measured now: n=17 PASS, WR 70.6% PASS, net +$0.07 (30d full cell) / +$0.20 (exempt-attributable subset) = BOTH fail the net bar.",
+    "expected_impact": "Oct 27T00:00Z waiver LAPSE decision is ready with data today — no blank-combo renewal, no last-minute scramble. Narrow contingency does NOT fire.",
+    "category": "decision readiness",
+    "status": "measured — bar not met",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T05:40:54Z",
+    "agent": "brain_auditor",
+    "run": 155,
+    "idea": "STALENESS + GAP AT ENTRY census from _signal_metadata (two candidate entry-quality axes killed with data)",
+    "rationale": "staleness_minutes (signal->open latency, stamped live by decider_run _exec_meta, 12/12 recent populated) shows NO edge: 30d <2m 398T 44.2% -$3.94 vs 5-15m 94T 47.9% +$2.15 = the STALE cohort is the BEST bucket (flat, no lever; consistent with the 2026-10-04 removal of the hard staleness block). gap_at_entry (chase) FLIPS OOS: 7d >=0.5% 33T 27.3% -$0.92 but 30d 235T 46.4% +$2.55 = best bucket — a 7d read would have shipped a universal MAX_ENTRY_GAP that loses money.",
+    "expected_impact": "Both logged rejected-with-data via brain/analysis/staleness_gap_census_2026-10-26.py (--selfcheck PASS) so they are never re-derived from a single window.",
+    "category": "entry quality",
+    "status": "rejected-with-data (shipped script)",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T05:40:54Z",
+    "agent": "brain_auditor",
+    "run": 155,
+    "idea": "DEAD-INSTRUMENT CENSUS +2: trades.signal_created_at (0 populated since 2026-09-09) and scripts/data_integrity_guard.py (never invoked by any timer/runner; its check #2 is a perpetual-HIGH 'missing signal_created_at' that would be 100% true noise)",
+    "rationale": "Extend #152's dead-column census. Staleness itself is NOT lost — metadata staleness_minutes is live — so the fix is NOT to revive the column, it's to stop counting a dead guard as coverage.",
+    "expected_impact": "Prevents future audits from reporting 'signal_created_at missing' as a new finding (3rd-party would flag it every run); no code, zero behavior.",
+    "category": "data infrastructure",
+    "status": "logged",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-26T05:40:54Z",
+    "agent": "brain_auditor",
+    "run": 155,
+    "idea": "ROUND-TRIP LEDGER denominator standardization — report NET and GROSS both",
+    "rationale": "#78's 'round-trips = 70% of the 14d bleed' divided by NET bleed (-4.16 at the time). Fresh: 43T -$2.12 = 46.6% of NET -$4.55 but only 13.8% of GROSS loss $15.34. Same cohort, two very different shares — the giveback cohort has SHRUNK as a share of gross. Standing KPI must pin the denominator or the number drifts.",
+    "expected_impact": "Removes a recurring misread (round-trip share sounds like it shrank 5x, gross actually grew).",
+    "category": "measurement hygiene",
+    "status": "suggested — apply in future ledger refreshes",
+    "risk": "none"
   }
 ]
