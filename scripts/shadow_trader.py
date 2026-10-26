@@ -156,6 +156,8 @@ def get_db():
             excess_30m REAL,
             excess_1h REAL,
             excess_4h REAL,
+            -- mfe_4h/mae_4h are DEAD COLUMNS (100% NULL, never written to)
+            -- Kept for schema compatibility; actual MFE/MAE is in mfe_pct/mae_pct
             mfe_4h REAL,
             mae_4h REAL,
             mfe_pct REAL,
@@ -1243,9 +1245,11 @@ def close_events():
                 
                 # Compute actual MFE/MAE from price data (bug_hunter fix)
                 # MFE = max favorable excursion, MAE = max adverse excursion
-                # FIX 2026-10-22: Only use candles during the ACTUAL HOLD PERIOD,
+                # FIX 2026-10-25: Only use candles during the ACTUAL HOLD PERIOD,
                 # not the full 24h window. Previously MFE/MAE measured the token's
                 # next-day price action, not the trade's excursion during hold.
+                # NOTE: This fix landed 2026-10-25 03:28:19 UTC (commit 0cde9c91).
+                # Rows created before this date have MFE/MAE measured over 24h window.
                 entry_ts_val = candles[0][0]
                 exit_ts_val = first_result.get('exit_ts', entry_ts_val + 86400)
                 hold_candles = [c for c in candles if entry_ts_val <= c[0] <= exit_ts_val]

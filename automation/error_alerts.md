@@ -1982,3 +1982,21 @@
 - **WARN (chronic, 100% of watchdog runs ≥24h)**: `signals: WARNING — only 2-4 signals in last 5 min (min 20)` — `pipeline_watchdog.py:37 SIGNAL_COUNT_MIN=20` expects 240/h; actual rate 30-70/h steady for ≥7 days (42/h a week ago, 48/h now). Threshold/stale comment ("normal ~6/min"), not a production drop. Needs CEO decision — safety threshold not modified unilaterally.
 - **WARN (chronic, every run)**: watchdog cleans 5-6 stale locks each pass (`pipeline_heartbeat.lock`, `guardian_closing.lock`, `hotset_json.lock`, `signal_compactor_critical.lock`, `hotset_last_updated.lock`) — self-healing, no pipeline impact, but producers aren't cleaning up on release.
 - **AUTO-FIXES**: none needed — no crashed services, no DB locks, no missed timers, no stale prices.
+
+## Error Alerts — 2026-10-25 23:47 UTC
+- **INFO**: Core healthy — vacation pause absent, pipeline active (last run 23:44, rc=0), core timers active (pipeline/price-collector/1m-candle/watchdog), 0 tracebacks/30m, 0 DB-lock errors, 72 signals/h, prices 30s fresh, 2 open trades (ANIME/CAKE SHORT), 18 closed today (+0.27 USDT, 61% WR), 0 phantom trades, disk 84% (<85).
+- **WARN (chronic, every watchdog run)**: `signals: WARNING — only 5-7 signals in last 5 min (min 20)` — threshold mismatch, documented 19:46, needs CEO decision. Not a production drop.
+- **WARN (chronic)**: watchdog cleaned 5-7 stale locks this pass — producers not releasing on exit; self-healing, no pipeline impact.
+- **WARN (5x/h)**: `TRADE FAILED` — GMX 2x (midband RSI 50.4 / knife detect 28.6), ETC 2x (midband death band 46.7), PURR 1x (knife 9.0). All execution-time filter blocks, signals marked FAILED cleanly, no rollback loop. By design, but ETC SHORT regenerated + failed in consecutive runs (1689323→1689324) — repeated signal churn worth watching.
+- **INFO**: `hermes-atr-sl-updater.timer` shows as not-found ghost in `list-timers` (unit files renamed `*-DEFUNCT`, disabled). Stale reference only, harmless.
+- **AUTO-FIXES**: none needed — no crashed services, no DB locks, no missed timers, no stale prices, no log cleanup required (0 files >7d).
+
+## Error Alerts — 2026-10-26 00:27 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK mid-band death band: N.N in N-N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3543s left, N failures)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

@@ -1995,3 +1995,7 @@
 [2026-10-25 09:31 UTC] No signals with sufficient trades in 24h window
 [2026-10-25 15:31 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-10-25 15:31 UTC] No signals with sufficient trades in 24h window
+[2026-10-25 21:31 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-25 21:31 UTC]   🟡 WARNING: bb-bounce-v2-long+: 5 trades, 20.0% WR, PnL=-0.26
+[2026-10-25 21:31 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-25 21:31 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
