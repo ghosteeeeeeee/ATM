@@ -9228,5 +9228,25 @@
     "category": "ceo decision",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-26T21:45:00Z",
+    "run": 169,
+    "idea": "Contrarian flip SIGNAL-SCOPED promote: pc- flip-WR 64.7% n=348 both OOS halves vs btc-pump-rider+ 28.6% flipped = WORSE. Blanket promote would import 273 anti-flipped trades; total 48.7% hides the split (Simpson's paradox). Pre-register pc--only variant for Oct 27T17:12Z PROMOTE re-verify.",
+    "rationale": "Outcome-join refreshed 21:40Z: 622/894 decided, edge concentrates entirely in pump-chain-.",
+    "expected_impact": "Capture pc- 64.7% edge without btc-pump-rider+ drag",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low (shadow-only until CEO GO)"
+  },
+  {
+    "date": "2026-10-26T21:45:00Z",
+    "run": 169,
+    "idea": "bb-bounce-v2-long+ arm-threshold lever CLOSED-WITH-DATA: unarmed MFE band map <0.10 8T 0W / 0.10-0.20 8T 0W / 0.20-0.30 2T 0W / 0.30-0.40 4T 0W = 0/22 winners at every band. Lowering PM_TRAIL_ACTIVATE cannot rescue the cohort — coin does not move. Third exhausted route (after conf-floor #168, bypass-removal 13:50) added to CEO keep-vs-disable packet.",
+    "rationale": "Preempts future arm-threshold proposals; strengthens CEO disable case.",
+    "expected_impact": "n/a — route closed",
+    "category": "ledger",
+    "status": "rejected-with-data",
+    "risk": "none"
   }
 ]
