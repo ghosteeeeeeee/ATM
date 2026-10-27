@@ -506,3 +506,7 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-26 16:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, last close 15:15) | 24h 30T 14W 46.7% '-$0.55' (reddest today) | 7d 136T 44.9% '-$0.62' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h no 0%WR n>=3) | atr_sl_hit 4/30=13.3% under 40% | neg streak 2h (14 -0.31, 15 -0.08), 16 empty, not yet 3 | frequency 0/hr | 0 open | FLAG pending: bb-bounce-v2-long+ loses ALL regimes 14d n=38 (EXTREME 9T 33.3% -$0.43 / NORMAL 29T 37.9% -$0.69) — CEO review still open | No constants change -> no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-27 03:28 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L '+$0.14' | 24h 28T 12W 42.9% '-$0.76' (improving) | 7d '-$1.01' — size-reduce 1.0x | kill: none | atr_sl_hit 3.6% | freq 2/hr | bb-bounce-v2-long+ CEO review still pending
+BY: auto_1hr
