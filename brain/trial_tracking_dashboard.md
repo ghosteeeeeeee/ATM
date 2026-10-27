@@ -16,25 +16,25 @@
 | **Deadline** | 7d / 200 trades review |
 | **Constants** | CUT_LOSER=-6.00, ATR_SL_MAX=4.0, LONG only |
 | **Current Data** | 3,007 rows with `exit_wider_sl_json` |
-| **Current Result** | WR 39.7% → 30.9% (−8.8pp), PnL −242.6% → −561.4% |
+| **Current Result** | WR 40.1% → 32.7% (−7.4pp), PnL −289.9% → −605.1% |
 | **Threshold** | WR ≥ 55% with ≥ 200 trades |
-| **Status** | ❌ THRESHOLD NOT MET (31.0% < 55.0%) |
+| **Status** | ❌ THRESHOLD NOT MET (32.7% < 55.0%) |
 | **Caveat** | ATR_SL_MAX=4.0 is inert (trail band supersedes cap); effectively testing only CUT_LOSER −6.00 |
 | **Action** | CEO decision needed: keep collecting, adjust, or kill |
 
 ### 2. Extended Time Exits Trial (CEO Q3)
 | Field | Value |
 |-------|-------|
-| **Status** | 🟢 COLLECTING — Early positive signal |
+| **Status** | 🔴 FAILING threshold |
 | **Started** | 2026-10-26 |
 | **Deadline** | 100 trades review |
 | **Constants** | 2x arm timeout (60→120min, 45→90min), +4h universal hold (480→720min) |
 | **Current Data** | 3,168 rows with `exit_extended_time_json` |
-| **Current Result** | PnL +18.4% → +49.9% (+31.5%), WR 89.1% → 85.5% (−3.6pp) |
+| **Current Result** | PnL −154.2% → −638.3% (−484.1%), WR 54.3% → 37.4% (−16.9pp) |
 | **Threshold** | WR improvement ≥ 5.0pp with ≥ 100 trades |
-| **Status** | ⏳ Collecting (need 100 trades) |
+| **Status** | ❌ THRESHOLD NOT MET (−16.9pp < 5.0pp) |
 | **Caveat** | Comparison is apples-to-oranges (full stack vs time-only sim) |
-| **Action** | Continue collecting; review at 100 trades |
+| **Action** | CEO decision needed: keep collecting, adjust, or kill |
 
 ### 3. CONTRARIAN-LIVE (pump-chain- flip)
 | Field | Value |
@@ -159,19 +159,20 @@ cat automation/ceo/shadow_disposition_report.md
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Wider SL WR | 31.0% | ≥55% | ❌ |
+| Wider SL WR | 32.7% | ≥55% | ❌ |
 | Extended Time trades | 3,168 | ≥100 | ✅ |
-| Extended Time PnL delta | +31.5% | >0 | ✅ |
+| Extended Time WR delta | −16.9pp | ≥+5pp | ❌ |
 | CONTRARIAN-LIVE real trades | 0 | ≥1 | ⏳ |
 | Coupled SL data | collecting | Nov 3 | ⏳ |
-| CONFLUENCE-EXPIRY blocked | 12,518 | keep | ✅ |
+| CONFLUENCE-EXPIRY blocked | 12,793 | keep | ✅ |
 
 ---
 
 ## Next Actions
 
-1. **CEO decision on Wider SL trial** — threshold not met, ATR_SL_MAX inert
-2. **Monitor Extended Time trial** — early positive signal, review at 100 trades
+1. **CEO decision on Wider SL trial** — threshold not met (32.7% vs 55%), ATR_SL_MAX inert
+2. **CEO decision on Extended Time trial** — threshold not met (−16.9pp vs +5pp), apples-to-oranges comparison
 3. **Watch for first CONTRARIAN-LIVE real trade** — 0 so far
-4. **Nov 3 batch** — coupled SL disposition, midband eval, Z-FLIP, shadow_disposition weekly
-5. **CEO queue** — CONF_FLOOR fkB, bb-bounce TAT flip, MFE-CUT enforcement
+4. **Nov 3 batch** — coupled SL disposition, midband eval, Z-FLIP, shadow_disposition weekly, rr-engine-shadow, chase-ratio, relative-regime
+5. **Nov 10 batch** — gate-shadow, expiry-t5-shadow, mfe-cut-arm-be, ichimoku-dampen-flooradmit
+6. **CEO queue** — CONF_FLOOR fkB, bb-bounce TAT flip, MFE-CUT enforcement
