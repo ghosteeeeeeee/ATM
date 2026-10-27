@@ -1,8 +1,13 @@
 [Unit]
-Description=Hermes Shadow Disposition Timer — Mondays 08:15 UTC (after 07:15 daily commit)
+Description=Hermes Shadow Disposition Timer — daily 08:15 UTC (after 07:15 daily commit)
 
 [Timer]
-OnCalendar=Mon *-*-* 08:15:00
+# brain_auditor 2026-10-27 run #190: was Mon-only. The registry's own contract is
+# day-scale — 8 of 13 open entries carry 2026-11-03 deadlines and every packet
+# promises a 24h CEO clock — so a weekly runner could only honor them by firing
+# the default ~6 days after the deadline (Mon 08:15 runs: Nov 2 warns, Nov 9 acts).
+# Daily keeps the same 08:15 slot; state dedupe means packets still issue once.
+OnCalendar=*-*-* 08:15:00
 Persistent=true
 
 [Install]

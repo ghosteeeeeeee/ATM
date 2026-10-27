@@ -52,6 +52,66 @@ echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [START] Trade Watchdog" >> "$LOG_FILE"
 cd /root/.hermes
 python3 scripts/trade_watchdog.py >> "$LOG_FILE" 2>&1
 
+# Step 1.5: Decide whether the LLM deep-analysis pass is worth running.
+# The deterministic step above already emits every steer. Historically 44% of
+# cycles (78/178) had zero open trades yet still burned a full agent session.
+# CEO 2026-10-27: skip the agent when open_count < WATCHDOG_LLM_MIN_OPEN_TRADES.
+# Safety valve: if the last agent analysis is older than WATCHDOG_LLM_STALE_HOURS
+# we run anyway, so a flat system still gets periodic portfolio-level review.
+# FAIL-OPEN: any error reading constants/config → run the agent (old behavior).
+RUN_AGENT=1
+SKIP_REASON=""
+eval "$(python3 - <<'PYEOF'
+import json, os, sys
+from datetime import datetime, timezone
+sys.path.insert(0, '/root/.hermes/scripts')
+try:
+    from hermes_constants import WATCHDOG_LLM_MIN_OPEN_TRADES, WATCHDOG_LLM_STALE_HOURS
+    recs_path = '/root/.hermes/data/watchdog_recommendations.json'
+    open_count = None
+    agent_age_h = None
+    if os.path.exists(recs_path):
+        with open(recs_path) as f:
+            recs = json.load(f)
+        open_count = recs.get('open_count')
+        ts = recs.get('agent_timestamp')
+        if ts:
+            try:
+                dt = datetime.fromisoformat(ts.replace('Z', '+00:00'))
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                agent_age_h = (datetime.now(timezone.utc) - dt).total_seconds() / 3600
+            except Exception:
+                agent_age_h = None
+    if open_count is None:
+        # No data → fail-open, run the agent
+        print('RUN_AGENT=1')
+        print("SKIP_REASON=''")
+    elif int(open_count) >= int(WATCHDOG_LLM_MIN_OPEN_TRADES):
+        print('RUN_AGENT=1')
+        print("SKIP_REASON=''")
+    elif agent_age_h is not None and agent_age_h >= float(WATCHDOG_LLM_STALE_HOURS):
+        # Flat, but agent analysis is stale → keep periodic review alive
+        print('RUN_AGENT=1')
+        print("SKIP_REASON=''" )
+    else:
+        print('RUN_AGENT=0')
+        print(f"SKIP_REASON='open_count={open_count} < {WATCHDOG_LLM_MIN_OPEN_TRADES} and last agent analysis "
+              f"{'unknown' if agent_age_h is None else f'{agent_age_h:.1f}h'} < {WATCHDOG_LLM_STALE_HOURS}h'")
+except Exception as _e:
+    # Fail-open: never let a config/parse error silence the watchdog
+    print('RUN_AGENT=1')
+    print(f"SKIP_REASON=''")
+    print(f'# gate eval failed (fail-open): {_e}', file=sys.stderr)
+PYEOF
+)" || RUN_AGENT=1
+
+if [ "$RUN_AGENT" != "1" ]; then
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [SKIP-LLM] Agent pass skipped — ${SKIP_REASON}. Deterministic steers still emitted." >> "$LOG_FILE"
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [DONE] Trade Watchdog (deterministic only)" >> "$LOG_FILE"
+    exit 0
+fi
+
 # Step 2: Run opencode agent for deep analysis (with timeout)
 if cat "$PROMPT_FILE" | timeout 480 "$OPENCODE" run --port 4099 > "$AGENT_OUTPUT" 2>>"$LOG_FILE"; then
     echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [OK] Opencode agent completed" >> "$LOG_FILE"

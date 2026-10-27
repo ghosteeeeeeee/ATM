@@ -1,5 +1,5 @@
 [Unit]
-Description=Hermes Shadow Disposition — weekly reckoning (deadline/default packets for shadow streams + escalations)
+Description=Hermes Shadow Disposition — daily reckoning (deadline/default packets for shadow streams + escalations)
 After=network-online.target
 Wants=network-online.target
 

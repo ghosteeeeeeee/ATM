@@ -16,6 +16,18 @@ default_action}. This runner:
                              anywhere in the stream string vetoes the rule.
   4. done entries         -> verifies their action stuck (timers disabled, flags
                              off) and reports regressions (deduped per finding)
+  5. threshold_eval       -> OPTIONAL per-entry evaluator name (entries carry
+                             {threshold_eval: <key>} -> THRESHOLD_EVALS). Runs the
+                             entry's pre-registered numeric trip condition
+                             ("revert if X") BEFORE the deadline does, so a trial
+                             that turns bad reverts on the breach instead of
+                             waiting for deadline day. Missing/unknown eval name
+                             is reported and skipped — the deadline path still
+                             applies, so a wiring gap can never kill the entry.
+                             brain_auditor 2026-10-27 run #190: before this, the
+                             coupled-SL trial's two live trip conditions
+                             (7d-PnL / worst-HML-exit) had NO code path at all —
+                             same defect class as the Oct-24 waiver lapse (#102).
 
 Robustness contract (code review 2026-10-27 MED-4/5/6/7, LOW-1/5):
   - dedupe keys are applied ONLY after a successful kanban append (a failed
@@ -28,7 +40,8 @@ Robustness contract (code review 2026-10-27 MED-4/5/6/7, LOW-1/5):
 
 Output: automation/ceo/shadow_disposition_report.md (fresh each run) + bounded,
 deduped kanban appends (state: data/shadow_disposition_state.json).
-Schedule: hermes-shadow-disposition.timer (Mon 08:15 UTC weekly).
+Schedule: hermes-shadow-disposition.timer (daily 08:15 UTC — was weekly;
+  day-scale registry deadlines need a day-scale runner, brain_auditor #190 2026-10-27).
 """
 import json
 import os
@@ -174,6 +187,81 @@ def parse_deadline(dl):
         return None
 
 
+# ── threshold evaluators ─────────────────────────────────────────────────────
+def _registry_limits(threshold_text):
+    """(pnl_limit, hml_limit) pulled OUT of the free-text threshold string so the
+    registry stays the single source of truth — no duplicated magic numbers here.
+    None on unparsable. Never raises."""
+    m_pnl = re.search(r'PnL\s*<\s*(-?\d+(?:\.\d+)?)', threshold_text)
+    m_hml = re.search(r'worse than\s+(-?\d+(?:\.\d+)?)%', threshold_text)
+    return (float(m_pnl.group(1)) if m_pnl else None,
+            float(m_hml.group(1)) if m_hml else None)
+
+
+def trial_metrics(started):
+    """Postgres read for a trial entry: (trial_pnl, n_closed, worst_hml_pct,
+    n_hml, rolling_7d_pnl). Cursor closed in finally; psycopg2 imported lazily so
+    a missing driver degrades to a reported entry error, not a dead weekly run."""
+    import psycopg2
+    conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres')
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT COALESCE(SUM(pnl_usdt),0)::float, COUNT(*) FROM trades "
+                    "WHERE status='closed' AND close_time >= %s", (started,))
+        trial_pnl, n = cur.fetchone()
+        cur.execute("SELECT COALESCE(MIN(pnl_pct),0)::float, COUNT(*) FROM trades "
+                    "WHERE status='closed' AND exit_reason='hard_max_loss' "
+                    "AND close_time >= %s", (started,))
+        worst_hml, n_hml = cur.fetchone()
+        cur.execute("SELECT COALESCE(SUM(pnl_usdt),0)::float FROM trades "
+                    "WHERE status='closed' AND close_time > NOW() - INTERVAL '7 days'")
+        rolling = cur.fetchone()[0]
+        cur.close()
+        return float(trial_pnl), int(n), float(worst_hml), int(n_hml), float(rolling)
+    finally:
+        conn.close()
+
+
+def evaluate_trial_threshold(threshold_text, started, metrics):
+    """Pure decision: (breached, detail).
+
+    Only ATTRIBUTABLE-to-trial numbers can breach. The registry's 'rolling 7d' is
+    reported as context but deliberately does NOT trip the guard on its own:
+    for the first 7 trial-days that window still contains pre-trial closes, so
+    tripping on it would demand a revert for bleed the trial did not cause.
+    Started is date-only in the registry, so same-day pre-start closes are
+    included in trial_pnl (immaterial vs a -2.50 limit, documented here).
+    """
+    pnl_limit, hml_limit = _registry_limits(threshold_text)
+    if pnl_limit is None and hml_limit is None:
+        return False, 'threshold not parseable (no numeric limit) — deadline path still applies'
+    trial_pnl, n, worst_hml, n_hml, rolling = metrics
+    hits = []
+    if pnl_limit is not None and trial_pnl < pnl_limit:
+        hits.append(f'trial PnL {trial_pnl:+.2f} < {pnl_limit}')
+    if hml_limit is not None and n_hml and worst_hml < hml_limit:
+        hits.append(f'worst HML exit {worst_hml:+.2f}% < {hml_limit}%')
+    detail = (f'trial since {started}: PnL {trial_pnl:+.2f} over {n} closes (limit {pnl_limit}), '
+              f'worst HML {worst_hml:+.2f}% over {n_hml} exits (limit {hml_limit}), '
+              f'rolling7d {rolling:+.2f} context-only')
+    if hits:
+        return True, detail + ' -> BREACH: ' + '; '.join(hits)
+    return False, detail
+
+
+def _eval_trial_revert_guard(e):
+    started = str(e.get('started') or e.get('deadline') or '')[:10]
+    if len(started) < 10:
+        return False, 'no usable started/deadline date — cannot attribute PnL'
+    return evaluate_trial_threshold(str(e.get('threshold', '')), started + ' 00:00:00',
+                                    trial_metrics(started + ' 00:00:00'))
+
+
+THRESHOLD_EVALS = {
+    'trial_revert_guard': _eval_trial_revert_guard,
+}
+
+
 def main():
     reg = _load(REGISTRY, None)
     if not reg or 'entries' not in reg:
@@ -256,6 +344,36 @@ def main():
                     f'{e.get("default_action", "KILL")}. 24h CEO clock.')
                 report.append(f'  -> ZERO-EVENT RULE HIT for {eid} (auto-KILL ticket issued once)')
 
+            # ── pre-registered threshold trip (before deadline) ──────────────
+            ev_name = e.get('threshold_eval')
+            if ev_name:
+                ev = THRESHOLD_EVALS.get(ev_name)
+                if ev is None:
+                    entry_errors += 1
+                    report.append(f'  -> UNKNOWN threshold_eval {ev_name!r} '
+                                  f'(deadline path still applies)')
+                else:
+                    try:
+                        breached, detail = ev(e)
+                    except Exception as ex:
+                        entry_errors += 1
+                        report.append(f'  -> threshold_eval {ev_name} error: '
+                                      f'{type(ex).__name__}: {ex} (deadline path still applies)')
+                    else:
+                        report.append(f'  -> threshold: '
+                                      f'{"BREACHED" if breached else "not breached"} | {detail}')
+                        if not breached:
+                            st.pop('threshold_fired', None)   # re-arm for a later breach
+                        elif not st.get('threshold_fired'):
+                            # append-success-only recording (review MED-4 contract)
+                            pending_state.append((eid, 'threshold_fired', now_iso))
+                            problems += 1
+                            kanban_lines.append(
+                                f'- [{now_iso}] shadow-disposition: 🚨 THRESHOLD BREACHED {eid} — '
+                                f'{detail}. Default action: '
+                                f'{e.get("default_action", "(registry missing default_action)")}. '
+                                f'24h CEO clock to revert or override with evidence.')
+
             # ── deadline handling ──────────────────────────────────────────
             dl = e.get('deadline')
             if not dl:
@@ -331,8 +449,58 @@ def main():
     return 0
 
 
+def selfcheck():
+    """One runnable check for the threshold guard — fixtures first (no DB needed),
+    then the live read, then the wiring assert that catches the #102-class bug
+    (code present but the registry never names it)."""
+    ok = True
+
+    def chk(cond, name):
+        nonlocal ok
+        print(('PASS  ' if cond else 'FAIL  ') + name, flush=True)
+        ok = ok and bool(cond)
+
+    th = ('revert if rolling 7d trial PnL < -2.50 OR any single hard_max_loss exit '
+          'worse than -6.5% account')
+    chk(_registry_limits(th) == (-2.5, -6.5), 'registry threshold parses -> (-2.5, -6.5)')
+    chk(_registry_limits('no numbers here') == (None, None), 'unparsable -> (None, None)')
+
+    b, d = evaluate_trial_threshold(th, 'x', (-2.60, 9, -4.80, 0, -0.47))
+    chk(b and 'trial PnL -2.60 < -2.5' in d, 'trial-PnL breach detected')
+    b, d = evaluate_trial_threshold(th, 'x', (0.62, 17, -7.10, 3, -0.47))
+    chk(b and 'worst HML exit -7.10% < -6.5' in d, 'worst-HML breach detected')
+    b, d = evaluate_trial_threshold(th, 'x', (0.62, 17, -4.83, 1, -0.47))
+    chk(not b, 'healthy trial -> no breach')
+    b, d = evaluate_trial_threshold('garbage', 'x', (0.62, 17, -4.83, 1, -0.47))
+    chk(not b, 'unparsable threshold -> no false packet')
+    b, d = evaluate_trial_threshold(th, 'x', (0.62, 17, -4.83, 1, -3.50))
+    chk(not b, 'rolling7d under limit alone does NOT breach (pre-trial attribution)')
+    b, d = evaluate_trial_threshold(th, 'x', (0.62, 17, 0.0, 0, -0.47))
+    chk(not b, 'zero HML exits -> HML limb cannot breach on COALESCE(0)')
+
+    reg = _load(REGISTRY, None) or {}
+    ent = next((x for x in reg.get('entries', [])
+                if isinstance(x, dict) and x.get('id') == 'trial-coupled-cutsloser-sl'), None)
+    chk(ent is not None and ent.get('threshold_eval') in THRESHOLD_EVALS,
+        'registry wiring: trial-coupled-cutsloser-sl names a known threshold_eval')
+
+    try:
+        m = trial_metrics('2026-10-27 00:00:00')
+        chk(len(m) == 5 and all(isinstance(x, (int, float)) for x in m),
+            f'live metrics well-formed {m}')
+        b, d = evaluate_trial_threshold(th, '2026-10-27 00:00:00', m)
+        print(f'        live: {d} | breached={b}', flush=True)
+    except Exception as ex:
+        chk(False, f'live metrics read failed: {type(ex).__name__}: {ex}')
+
+    print('SELFCHECK ' + ('PASS' if ok else 'FAIL'), flush=True)
+    return 0 if ok else 1
+
+
 if __name__ == '__main__':
     try:
+        if '--selfcheck' in sys.argv:
+            sys.exit(selfcheck())
         sys.exit(main())
     except Exception as e:
         print(f'[shadow-disposition] FATAL (weekly timer must not die silently): {e}',

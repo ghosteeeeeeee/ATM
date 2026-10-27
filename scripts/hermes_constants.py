@@ -3323,6 +3323,17 @@ SHADOW_BYPASS_ENABLED = True  # Master switch for shadow bypass registry
 SHADOW_SIGNALS_RUNNER_ENABLED = True  # Master switch for shadow signals runner
 SHADOW_SIGNALS_RUNNER_STAGES = ('A', 'C')  # Which stages to run (B already fires)
 
+# ── Trade Watchdog LLM gate ───────────────────────────────────────────────────
+# run_watchdog.sh runs the deterministic trade_watchdog.py FIRST (always), then
+# spawns the opencode deep-analysis agent. That agent was firing UNCONDITIONALLY
+# even when there were no open trades to watch — 44% of cycles (78/178) had
+# open_count==0, each burning a full session (~69k tokens). CEO 2026-10-27
+# approved gating Step 2 on open_count. Deterministic steers still emit every
+# cycle regardless; this only skips the LLM prose pass.
+# Set to 0 to restore the old always-run behavior.
+WATCHDOG_LLM_MIN_OPEN_TRADES = 1     # skip agent when open_count < this
+WATCHDOG_LLM_STALE_HOURS = 6         # safety valve: always run if last agent analysis older than this (keeps a flat system under periodic review)
+
 # ── AI Trader Signal ──────────────────────────────────────────────────────────
 # The trade-watchdog opencode agent runs every 30 min with full market context.
 # Every hour, if < max positions, it picks ONE coin and writes to ai_trader_state.json.
