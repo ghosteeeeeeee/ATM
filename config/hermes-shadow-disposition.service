@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes Shadow Disposition — weekly reckoning (deadline/default packets for shadow streams + escalations)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/shadow_disposition.py
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env
+TimeoutStartSec=300

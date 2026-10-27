@@ -1,0 +1,4 @@
+#!/bin/sh
+# stale-comment linter — SHADOW-RECKONING Q2 mechanism (2026-10-27). Warn-only by design;
+# use `python3 scripts/stale_comment_linter.py --strict` in CI to block.
+exec python3 "$(git rev-parse --show-toplevel)/scripts/stale_comment_linter.py" || true

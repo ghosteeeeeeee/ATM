@@ -692,7 +692,7 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
 ATR_SL_MIN             = 0.015   # 1.5% floor — CEO Oct 16: widened from 1.3%. WLD SL was -0.30% from entry (way below min).
-ATR_SL_MAX             = 0.025  # 2.5% cap — widened from 2.0% to accommodate 1.5% min with ATR scaling.
+ATR_SL_MAX             = 0.04  # 4.0% cap — COUPLED TRIAL 2026-10-27 (SHADOW-RECKONING #2, CEO consult 20261027T024741Z + T sign-off): widened 2.5→4.0 TOGETHER with CUT_LOSER_PNL −4→−6 (SL-sweep 2026-10-22 deferred item; MFE/MAE n=64: MAE-to-peak p90=1.62% needs room + HML ≥1.2%@5x; shadow wider_sl rows=2,574). MUST match ATR_SL_MAX_INIT. Revert criteria pre-registered in data/shadow_disposition.json (trial:7d-PnL<−$2.50 OR HML exit <−6.5% acct OR deadline 2026-11-03). Prior: 2.5% (widened from 2.0 Oct 16).
 ATR_SL_MIN_EXTREME     = 0.015  # 1.5% floor for EXTREME regime — matches ATR_SL_MIN
 ATR_TP_MIN             = 0.015   # 1.5% floor — match ATR_SL_MIN
 ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
@@ -727,12 +727,12 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 ATR_SL_MIN_INIT    = 0.015  # 1.5% — CEO Oct 16: MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.025  # 2.5% — CEO Oct 16: MUST match ATR_SL_MAX
+ATR_SL_MAX_INIT    = 0.04  # 4.0% — COUPLED TRIAL 2026-10-27 (must match ATR_SL_MAX; see its comment for revert criteria)
 SL_PCT_FALLBACK    = 0.015  # 1.5% if ATR unavailable (matched to ATR_SL_MIN)
 TP_PCT_FALLBACK    = 0.075  # 7.5% fallback target (3:1 R:R with 2.5% SL)
 STOP_LOSS_DEFAULT  = 0.015  # 1.5% hard fallback (matched to ATR_SL_MIN)
 SL_PCT_MIN        = 0.015  # 1.5% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
-CUT_LOSER_PNL     = -4.00  # close trade at -4.00% ACCOUNT PnL — CEO Oct 15: widened -3.00→-4.00. Gives trail more room to work before hard kill.
+CUT_LOSER_PNL     = -6.00  # close trade at -6.00% ACCOUNT PnL — COUPLED TRIAL 2026-10-27 (SHADOW-RECKONING #2, CEO 20261027T024741Z + T sign-off): widened −4→−6 TOGETHER with ATR_SL_MAX 2.5→4% (SL-sweep deferred coupled change). Rationale: HML price cap = CUT_LOSER/lev → at 5x was −0.8% price, below MFE/MAE MAE-to-peak p75 (1.17%) for MFE≥0.8% trades (n=64) → killed 13-14/64 before the move; −6 @5x = −1.2% price covers p75. Shadow wider_sl simulation already has 2,574 rows. REVERT to −4.00 per data/shadow_disposition.json trial entry (7d trial PnL < −$2.50 OR any HML exit < −6.5% acct OR deadline 2026-11-03). Prior: −4.00 (CEO Oct 15, −3→−4).
 HML_VOL_ATR_MULT  = 0.5   # brain_auditor 2026-10-08 — HML price-threshold = -0.5×ATR when ATR provides more room than CUT_LOSER_PNL/lev. Trail arms at +0.40% (PM_TRAIL_ACTIVATE) but HML killed at -0.30% price @lev5 — trail never got room in EXTREME. 7d HML 66T -$8.72 #1 bleed, 56/66 had MFE>0, median hold 61min. Example: EXTREME ATR 1.5% → thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%. NORMAL/FLAT ATR low → account threshold unchanged. HML only fires on losers — cannot block winners.
 HML_TRAIL_MIN_GAP_PCT = 0.20  # UNUSED as of CEO 2026-10-12 — D3 trail-floor block REMOVED from position_manager (only fired at lev>=4 and widened HML past CUT_LOSER account limit; same bug class as vol floor capped Oct 10). Value kept for history. DO NOT re-add a trail floor that exceeds CUT_LOSER_PNL/lev.
 
@@ -3641,6 +3641,18 @@ SIGNAL_INVERSION_MAP = {
     # 'inv-accel-300-' — 66 trades, 23% WR — worst signal, but invert→LONG is catching falling knife
 }
 
+# ── Contrarian LIVE — SHADOW-RECKONING disposition #1 (CEO consult 20261027T024741Z) ──
+# T sign-off 2026-10-27 (session answer to shadow-reckoning go). Scope: prefix fade only.
+# Evidence: contrarian shadow 894 events; pump-chain- fade OOS 64.7% n=348 (independent
+# auditor + CEO run #170 re-confirmed); contrarian_monitor PROMOTE bar = 55% WR over
+# ≥14d span; 30d classification table (contrarian_shadow.py) has pump-chain- as LOSER
+# (43.2% WR, −$0.57/111T). Applied inside decider_run._apply_inversion step 0 (same
+# call sites + downstream gate validation as the live dynamic-inversion path).
+# DO NOT add 'btc-pump-rider+' — its flip cohort measured 28.6% (flipped-WORSE), stays shadow.
+# Revert: set CONTRARIAN_LIVE_ENABLED = False (registered: data/shadow_disposition.json).
+CONTRARIAN_LIVE_ENABLED = True
+CONTRARIAN_LIVE_PREFIXES = {'pump-chain-'}
+
 # ── Dynamic Signal Inversion (WR-based auto-invert) ────────────────────────────
 # Automatically inverts signals whose 24h win-rate drops below threshold.
 # Complementary to SIGNAL_INVERSION_MAP (static overrides).
@@ -4224,7 +4236,7 @@ SIGNAL_CONFLUENCE_MAX_PRICE_AGE        = 10     # skip tokens with price data ol
 # Spec: plans/temporal-confluence-spec.md
 # Pattern: automatic-implementation (shadow→enforce rollout)
 # CEO approved 2026-10-13: shadow mode first, 48h counterfactual, then enforce.
-TEMPORAL_CONFLUENCE_ENABLED  = True   # module active
+TEMPORAL_CONFLUENCE_ENABLED  = False  # KILLED 2026-10-27 SHADOW-RECKONING #12 (CEO consult 20261027T024741Z): stream never reached its threshold — 9 events / 5 outcomes ALL-TIME (report: "INSUFFICIENT n<15"), soak-forever default. Timer hermes-tc-shadow.timer also disabled 2026-10-27. Re-enable only with a fresh threshold that is actually reachable + CEO label (registry: data/shadow_disposition.json entry tc). Prior: True (module active)
 TEMPORAL_CONFLUENCE_SHADOW   = True   # shadow mode: log but don't bypass (flip False to enforce)
 TEMPORAL_CONFLUENCE_WINDOW_MIN = 30   # minutes to count fires
 TEMPORAL_CONFLUENCE_MIN_FIRES = 3     # fires needed to qualify for bypass

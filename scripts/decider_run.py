@@ -135,8 +135,35 @@ def _should_dynamic_invert(source):
     return False
 
 
+def _contrarian_live_hit(source):
+    """True when source contains an EXACT contracted name from CONTRARIAN_LIVE_PREFIXES
+    (comma-combo aware). Exact-part match, NOT startswith: 'pump-chain-v6-' is a
+    separate family outside the approved OOS evidence and must NOT flip
+    (scope-smoke-tested 2026-10-27). Fails safe (False) on constants errors."""
+    try:
+        from hermes_constants import CONTRARIAN_LIVE_ENABLED, CONTRARIAN_LIVE_PREFIXES
+        if not CONTRARIAN_LIVE_ENABLED or not source:
+            return False
+        parts = {p.strip() for p in str(source).split(',')}
+        return bool(parts & set(CONTRARIAN_LIVE_PREFIXES))
+    except Exception:
+        return False
+
+
 def _apply_inversion(direction, source, token=''):
     """Apply static + dynamic signal inversion. Returns (new_direction, was_flipped)."""
+    # 0) Contrarian LIVE — SHADOW-RECKONING #1 (CEO consult 20261027T024741Z, T
+    #    sign-off 2026-10-27): unconditional scoped fade when the source CONTAINS
+    #    'pump-chain-' (fade OOS 64.7% n=348). Runs at the SAME call sites as
+    #    static/dynamic inversion, so downstream decider gates (z-flip, context
+    #    gate, exec floors) validate the NEW direction.
+    #    Revert: CONTRARIAN_LIVE_ENABLED = False.
+    if _contrarian_live_hit(source):
+        flipped = 'SHORT' if direction == 'LONG' else 'LONG'
+        log(f'  [CONTRARIAN-LIVE] {token} {source}: {direction} → {flipped} '
+            f'(scoped fade, CEO 2026-10-27)')
+        return flipped, True
+
     # 1) Static map (explicit overrides)
     if SIGNAL_INVERSION_ENABLED:
         for prefix, should_invert in SIGNAL_INVERSION_MAP.items():
@@ -3648,6 +3675,10 @@ def run(dry_run=False):
             _cs_sig = _s.get('source', '') or ''
             _cs_cls = _cs_classify(_cs_sig)
             if _cs_cls == 'LOSER':
+                # SHADOW-RECKONING #1: sources trading their fade LIVE must not also
+                # record "would-contrarian" events — the counterfactual is now the real trade.
+                if _contrarian_live_hit(_cs_sig):
+                    continue
                 _cs_log(
                     token=_s.get('token', '?'),
                     signal_name=_cs_sig,

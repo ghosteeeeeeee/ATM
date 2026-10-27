@@ -1,0 +1,9 @@
+[Unit]
+Description=Hermes Shadow Disposition Timer — Mondays 08:15 UTC (after 07:15 daily commit)
+
+[Timer]
+OnCalendar=Mon *-*-* 08:15:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
