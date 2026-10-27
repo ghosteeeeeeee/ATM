@@ -9518,5 +9518,14 @@
     "category": "regime",
     "status": "measured-no-change",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T14:00:03Z",
+    "idea": "UNARMED-BLEED LEADERBOARD (zero-code standing KPI): rank live signals by 14d unarmed (mfe<0.40) PnL each run; pre-register trigger: any live signal with unarmed bleed > $1.50 AND arm-rate <50% gets entry-quality deep-dive next run",
+    "rationale": "Current leaders: pump-chain+ -$2.02 (arm 47.6%), bb-bounce-v2-long+ -$1.85 (arm 40.5%), volume-buildup- -$1.08 (arm 66.7% — bleed despite good arm rate = different failure mode). Ranks exactly which signals fire into chop; both >$1.50 leaders already owned (pc+ NO-KILL on 30d total, bbbv2 CEO pending) so trigger adds next-in-queue visibility without re-proposing shipped work.",
+    "expected_impact": "Early warning for the next chop-entering signal before it hits sub-50% WR headline; zero code, one SQL per run",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

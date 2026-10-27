@@ -2115,3 +2115,9 @@
 
 ## Error Alerts — 2026-10-27 08:28 UTC
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-27 12:28 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] USELESS TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] USELESS TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] GRIFFAIN TOK BLOCKED — WARNING — BTC_LEVEL`
