@@ -9346,5 +9346,13 @@
     "status": "pre-registered",
     "risk": "low",
     "ship_bar": "30d same-sign AND p<0.05 AND kills <20% of winners — locked before data"
+  },
+  {
+    "date": "2026-10-27T05:36:00Z",
+    "idea": "VOLUME-SPIKE INVERSION measured HELD (pump-chain+ only): 30d losers vs 0.514 vs winners 0.310 t=-2.13; thr0.5 save +$1.13 killW 17.6% but fisher p=0.21 FAIL — not shippable. Family generality REFUTED (pc- t=+0.33, vb- t=0.14, bb-bounce t=+1.09, all t=-0.52). volume_spike gate-readable (decider_run:3738/:5154).",
+    "category": "entry sniper",
+    "status": "measured-hold",
+    "risk": "low",
+    "rationale": "#175 pre-reg bar: 30d same-sign AND p<0.05 AND killW<20% — distribution passes, filter-level Fisher fails; one variable at a time, pc+ kill queue is CEO-owned first"
   }
 ]

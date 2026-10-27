@@ -1,61 +1,49 @@
-# Current State — brain_auditor #175 2026-10-27 04:45 UTC
-**Last Updated: 2026-10-27 04:45 UTC**
-**Updated by: brain_auditor #175. Prior: #174 02:50 (preserved in git history).**
+# Current State — brain_auditor #176 2026-10-27 05:36 UTC
+**Last Updated: 2026-10-27 05:36 UTC**
+**Updated by: brain_auditor #176. Prior: #175 04:45 (preserved in git history).**
 
-## HEADLINE — 0 config changes (constants EMPTY git diff, session lock absent,
-no_signal_enable_disable honored), 0 ships, 0 trade actions.
-**WATCHDOG STEERS ADJUDICATED x2: (1) oversold shorts = RESOLVED (waiver lapse
-re-verified: 0 band opens since 00:00, floor blocking every cycle, only 1 short
-total since midnight rsi>=45); (2) pump-chain+ regime-alignment gate = MEASURED
-& REJECT (14d btc_trend_bias<0.3 CF kills 7/17 winners = 41% > 20% bar;
-momentum_score CF wrong-direction z=-1.19; 30d +1.73 NO-KILL stands).**
-Wrong-side REFUTED 99th consecutive. Deep-dive: 0 new sub-50% n>=15 targets.
+## HEADLINE — 0 config changes (session lock absent, constants EMPTY git diff,
+nothing passed bars), 0 ships, 0 trade actions.
+**VOLUME-SPIKE INVERSION (#175 pre-reg) MEASURED -> HOLD.** pump-chain+ 30d n=87:
+losers mean volume_spike 0.514 vs winners 0.310 (t=-2.13, direction holds).
+thr>=0.5 blocks 17L saves +$1.13 kills 17.6% winners BUT filter-level fisher
+p=0.21 FAILS significance -> not shippable. Family generality REFUTED: pc- t=+0.33
+/ vb- t=+0.14 / bb-bounce t=+1.09 / all-signal t=-0.52 = pc+-ONLY, never propose
+universal. volume_spike gate-readable (decider_run:3738/:5154) if CEO wants it
+after pc+ GO/NO-GO.
 
-## WAIVER LAPSE — STILL HOLDING (re-verified)
-flip1 expired · 0 shorts rsi_exec<45 since 00:00 · 1 short total since 00:00 ·
-floor blocks XPL 41.1 / BTC 35.6 every cycle. Waiver cohort closed 13T 46.2% -$0.39.
+Wrong-side REFUTED 100th consecutive. Deep-dive: 0 new sub-50% n>=15 targets.
 
-## MANDATE FRESH (PG 04:40)
-24h 30T 46.7% -0.70 | 7d 146T 45.9% -0.87 | 14d 340T 39.4% -4.26
-armed (mfe>=0.40) 7d 80T 76.3% +4.03 vs unarmed 62T 4.8% -4.94
-14d armed 170T 71.2% +8.75 vs unarmed 165T 6.1% -13.05
-7d exits: trail_family 59T 88.1% +3.63 | hard_max_loss 16T 0% -2.31
-**breakeven WR 49.9% vs actual 45.9% (gap 4.0pp, improved from 10.9pp)**
+## MANDATE FRESH (PG 05:36)
+24h 29T 44.8% -0.74 | 7d 145T 46.2% -0.56 | 14d 339T 39.5% -4.16 | 30d 735T 44.2% -2.92
+armed (mfe>=0.40) 14d 170T 71.2% +8.75 vs unarmed 169T 7.7% -12.91
+trail family 14d 119T 89.9% +9.43 vs chop_stop 160T 0.6% -13.90
+**mandate intact — trends win, chop loses**
 
-## SHADOW 2/6 ANSWERABLE (both used)
+## SHADOW 3/6 ANSWERABLE (all used)
 contrarian join FRESH 622 — pc- flip 64.7% n=348 STABLE (PROMOTE pending CEO),
-btc-pump-rider+ 28.6% do-NOT-flip | shadow_trader 27,034 — gates justified
-(CONFLUENCE-EXPIRY 12,025@48%), pm_trail A/B +3853 | oscillator FROZEN 610h /
-floor 2182 + wyckoff 342 PENDING JOIN / rr ORPHANED
+btc-pump-rider+ 28.6% do-NOT-flip | shadow_trader 27,167 — gates justified
+(CONFLUENCE-EXPIRY 12,058@48%) | oscillator FROZEN / floor 2182 + wyckoff 342
+PENDING JOIN / rr ORPHANED
 
 ## LOSING AUTOPSY 48h (adverse-first, selfcheck PASS)
-23 losers = 6 never-adverse / 14 recovered / **3 NEVER (AERO/ICP/CC — ALL
-waiver-band shorts rsi 36.8-40.2 = class blocked by lapse)** → wrong-side REFUTED 99th
+23 losers = 6 never-adverse / 14 recovered / **3 NEVER (AERO+ICP warrior-sr
+combos n=1 each, CC pump-chain- owned by PROMOTE)** -> wrong-side REFUTED 100th
 (#61 p=0.116, #84 t=-0.04).
 
-## CREATIVE x1 (pre-registered)
-VOLUME-SPIKE INVERSION: pump-chain+ 30d losers enter volume_spike 0.459 vs
-winners 0.316 (z=-1.58 p≈0.11) — chasing the pump = wrong side. momentum/RSI/
-speed all NO discrimination (|z|<1.2). Ship bar locked: 30d same-sign AND
-p<0.05 AND kills <20% of winners.
-
-## DEEP-DIVE: 0 new sub-50% n>=15 targets
-All owned: bb-bounce 39T CEO packet | pump-chain- 37T CONF_FLOOR+PROMOTE |
-pump-chain+ 46T NO-KILL (30d +1.73) | doji/ai-trader+ killed-disabled historical |
-ai-trader-pending CEO | hl_copy COLLECT.
-
-## LAST-RUN VERIFY #174 — ALL PASS
-BTC #16435 manual_close -0.05 correct (EMA300 invalidation) | waiver lapse
-re-confirmed | REENTRY KPI refresh p=0.605 STILL FAILS (MONITOR stands) |
-BREAKEVEN refresh 49.9% | loss-cooldown live | constants EMPTY | recovery selfcheck PASS.
+## LAST-RUN VERIFY #175 — ALL PASS
+waiver lapse holding (1 short since 00:00 = AIXBT rsi_exec 57.43 >=45) |
+recovery selfcheck PASS | constants EMPTY | doji post-kill 0 |
+pm_armed_at 5 stamps latest ENA 04:13 (#161 WORKING) |
+loss-cooldown reason='loss' code present (#166, 0 active = 20min expiry) |
+contrarian join WORKING.
 
 ## OPEN / READINESS
-ENA LONG #16439 warrior-sr-confirm+ +0.38% 0.4h bracketed (SL 0.20757/TP 0.21283)
-— PM manages. Regime: chop-pin LEAN_BEAR, STRONG_DOWN, 15m SHORT_BIAS vs 4h
-LONG_BIAS disagree — no fresh LONGs until EMA300 reclaim WITH volume; shorts =
-high-RSI fade cell only; mid-band no trade. size 1.0x (file absent). Waiver
-LAPSED, floor active. Escalation #17 stays CLOSED.
+0 open — flat correct. Regime mixed: 15m+4h LONG_BIAS vs continuum BELOW +
+market_phase DECLINING + vol LOW — no fresh entries until one side holds with
+volume. size 1.0x (file absent). Waiver LAPSED, floor active.
 
 ## CEO PENDING (unchanged)
-CONF_FLOOR fkB · pc-PROMOTE 64.7% n=348 · #166 reentry (p=0.605 data only) ·
-bb-bounce keep-vs-disable · TAT flip.
+CONF_FLOOR fkB · pc-PROMOTE 64.7% n=348 · bb-bounce keep-vs-disable · TAT flip ·
+volume-spike pc+ HOLD (measured, filter Fisher fails — revisit only if pc+ ruling
+opens the door and n>=100)
