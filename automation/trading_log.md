@@ -16286,3 +16286,41 @@ Detail: FOGO pump-chain+ LONG ugb_pt '+$0.19' (+5.08%, MAE 0.212% — clean entr
 **Open Questions:**
 - 24h 42.9% WR red but improving (-$1.01 -> -$0.76); 7d still -$1.01 — persistent small bleed, no single killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+
+## 2026-10-27 04:28 UTC Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** '+$0.06' (WR: 100.0%) | 24h: 30T 14W 46.7% '-$0.70' (improving) | 7d 146T 45.9% '-$0.87' | **size-reduce: file absent -> 1.0x**
+
+Detail: ENA warrior-sr-confirm+ LONG profit-monster-trail '+$0.03' (+1.50%) / MET warrior-sr-confirm+ LONG profit-monster-trail '+$0.03' (+0.85%)
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 1/30 = 3.3% (<40%); dominant closes = ugb_pt (9T +$0.38), profit-monster-trail (7T +$0.25); worst = hard_max_loss (3T -$0.60, expected 3-5% account loss at leverage)
+- Kill check: no 0%WR signal with n>=3 in 24h (bb-bounce-v2-long+ now 2T 0W, n<3, already flagged for CEO); worst signals volume-buildup- (8T 3W -$0.32) and pump-chain+ (9T 6W -$0.11) both positive-WR — monitor, no kill bar
+- Streak: 23 '-0.23', 0 '+0.06', 1 '+0.03', 2 '+0.14', 3 '+0.03', 4 '+0.03' -> 4 consecutive positive hours, 0 negative (3h trigger not fired)
+- Frequency 2/hr — not overtrading
+- Entry quality: 24h winner MAE max 0.853%; this hour winners MAE not recorded (NULL)
+- 0 open trades — flat
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h 46.7% WR red but improving (-$1.17 -> -$0.70); 7d improved to -$0.87 — persistent small bleed, no single killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+- Winner MAE NULL for this hour's trades — mae_pct not being written on trail exits?
+
+## [2026-10-27 04:44 UTC] Ops — price_history 30d retention EXECUTED (disk gate met)
+
+**Change type:** data retention / disk ops — **NO trading, signal, or constants change.**
+**Plan:** `plans/price_history_retention_30d.md` (bug_hunter APPROVE-WITH-CHANGES 2026-10-26; gate = df ≥85%, hit at 04:25 UTC).
+
+- **F1 rollback export:** `data/price_history_gt30d_20261027.gz` (48MB, **11,926,871 rows verified by count**) — **keep until ≥2026-11-03**.
+- **Deleted 11,927,340 rows >30d** (batched, index-driven): `price_history` 16,027,881 → **4,102,118**.
+- **VACUUM x3 in one timer-stopped window:** signals_hermes.db −905MB, candles.db −190MB, coin_tracker.db −262MB.
+- **Disk: 95G → 93G used (df 85% → 84%), 19G free. ~1.36GB reclaimed.**
+- **Verified:** quick_check ok ×3 · `database is locked` = 0 (baseline) · no errors in prune window · pipeline resumed LIVE 04:44 · all originally-active timers restored.
+- **Self-caught incident:** 2 dormant timers (`hermes-5m-candle`, `hermes-candle-predictor`) were in the stop-list and got started on restore; journal forensics proved they were already inactive → stopped again, state matches pre-session. `hermes-5m-candle.service` points at missing `scripts/_aggregate_5m.py` (dead unit, fails harmlessly) — flagged LOW for cleanup.
+- Standing decision at line 6513 ("needs retention plan before any prune (bug_hunter, not approved)") now **satisfied**: plan reviewed, approved, executed.
+
+BY: upgrade_implementer

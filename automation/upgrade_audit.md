@@ -1267,3 +1267,67 @@
 3. RR engine U2-U4 — L2-3 — HIGH — still needs CEO sequencing
 4. Own-conclusions re-verification of mining-report patterns — L1-2 — MED — only if someone proposes acting on that report
 5. 4 open bugs (037/044/064 live-money, 056 constants) — T/CEO-gated — not actionable by this role
+
+---
+
+## Upgrade Implementer Session — 2026-10-27 04:44 UTC
+
+**Context:** pipeline LIVE (0 open trades), disk **hit the 85% prune gate** (df 85% at 04:25, was 84% yesterday), vacation-mode constants review queue still active (no constants touched this session). **0 new plan files since 2026-10-26 16:41** (the only `find -newermt` hit was `price_history_retention_30d.md` itself, modified by the prior session's F1–F4 fold-in).
+
+### Plan evaluations (recent-20 re-scan, deltas vs 2026-10-26 16:39 session)
+
+| Plan | Difficulty | Value | Status | Reason |
+|------|-----------|-------|--------|--------|
+| **price_history_retention_30d** | L1 (ops) | MED | ✅ **EXECUTED THIS SESSION** | Gate met (df=85% at 04:25); plan was APPROVE-WITH-CHANGES with F1–F4 already folded in — execution-ready. See below |
+| autonomous-btc-loop-spec | L4 | HIGH | ✅ PHASE 0 SHADOW LIVE (prior) | Day 5 of ≥7d soak; phase gate not yet due |
+| t-vacation-mode-2026-10-14 | L4 | HIGH | ✅ ACTIVE | Constants review queue still active; nothing new left |
+| shadow-mode-paper-trading-spec-v1 | L3 | HIGH | ✅ IMPLEMENTED (prior) | Unchanged |
+| limit-order-capability | L2 | MED | ✅ PHASE 1 (prior) | Phases 2–4 deferred |
+| 2026-10-16_winning-dna-remeasure-verdict | — | HIGH | ✅ CLOSED (prior) | Unchanged |
+| vol-regime-relative-thresholds / short-rsi-habitat / contrarian-engine / temporal-confluence / regime-recalibration / 2026-10-13_rr-engine U2-U4 | L2-3 | MED-HIGH/HIGH | ⏳ CEO-gated | Untouched (vacation review queue) |
+| signal-starvation-fix-2026-10-12 | L2-3 | MED-HIGH | PARTIAL | Unclog waiver shipped by prior session; RR floor/BB dead-zone CEO-gated |
+| grind-breakout-v2-coin-tracker-integration | L3 | LOW | ⏸️ DEFERRED (by plan) | Unchanged |
+| 2026-10-12_bb-squeeze-trail-arm-timeout-verdict | — | — | ⚠️ PENDING CEO RATIFY | `BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED=True` flipped without documented GO — **still unresolved**, repeat question to CEO (not mine to touch) |
+| 2026-10-09_D4-structured-block-logging | L1 | MED | ✅ COMPLETE (prior) | Unchanged |
+| bug-hunt-master-plan (BUG-036/037/044/056/064) | — | HIGH | ⏳ T/CEO-gated | Not actionable by this role |
+| Stage A/C re-readout | L1 | MED | ⏳ due ~Oct 29 | Not yet time |
+| mining-report own-conclusions re-verification | L1-2 | MED | ⏳ conditional | Only if someone proposes acting on that report |
+
+### Implemented this session (1 × L1 — ops, approved plan executed)
+
+1. **(L1) price_history 30d retention — EXECUTED.** All F1–F3 review changes applied.
+   - **F1 export (rollback insurance):** `data/price_history_gt30d_20261027.gz` — **48MB gz, row-count verified `zcat | wc -l` = 11,926,871** (matches pre-delete >30d census 11,926,680 + in-flight growth). Retain 7 clean days.
+   - **Delete:** batched 500k/index-driven loop per F3. **11,927,340 rows removed total** (500,000 in a first aborted run + 11,427,340 in the corrected run). `price_history` 16,027,881 → **4,102,118**. Runtime 51s (far under the 15–40 min estimate).
+   - **VACUUM (F2 stop-list):** stopped 9 timers (`price-collector`, `pipeline`, `signal-compactor`, `1m-candle`, `pump-flow`, `5m-candle`, `candle-predictor`, `coin-tracker`, `trade-watchdog`), drained running services, `wal_checkpoint(TRUNCATE) + VACUUM` with `.timeout 180000`. **signals_hermes.db 1.23GB → 325MB.**
+   - **Paired levers (same window, per prior session's next-candidate #2):** `candles.db` 1,256,562,688 → 1,056,731,136 bytes (−190MB); `coin_tracker.db` 3,481,088,000 → 3,209,297,920 bytes (−262MB).
+   - **Net disk reclaim: 95G → 93G used, 18G → 19G free, df 85% → 84%.** Total ~1.36GB across 3 DBs.
+
+### Verifications (post-execution, all PASS)
+- `SELECT count(*) FROM price_history` = **4,102,118** (expected ~4.1M) ✅
+- `PRAGMA quick_check` = **ok** on signals_hermes.db, candles.db AND coin_tracker.db ✅
+- `grep -rac "database is locked" logs/pipeline.log` = **0** (7d baseline preserved — no new occurrences) ✅
+- No error/traceback lines in `logs/pipeline.log` across the 04:33–04:44 prune window ✅
+- `python3 scripts/signal_schema.py --help` smoke OK ✅
+- Pipeline resumed normally: `=== Pipeline LIVE (1m) ===` at 04:44:00, all 9 stopped timers back to `active` ✅
+
+### State-restoration incident (self-caught, corrected)
+- **Severity: LOW, self-healed in-session.** My stop-list included `hermes-5m-candle.timer` and `hermes-candle-predictor.timer`. Journal forensics (`journalctl -u <t>.timer` showed **no `Stopped` event at 04:33:36**, vs. a control timer which did) proved both were **already inactive before the stop** — a blind `systemctl start` on restart woke two dormant units.
+  - `hermes-5m-candle.service` fired once at 04:36:37 and **failed harmlessly**: `/root/.hermes/scripts/_aggregate_5m.py` does not exist (exit 2). No DB touched.
+  - `hermes-candle-predictor.timer` never fired (`NextElapseUSecMonotonic=infinity`, `LastTriggerUSec` 2026-04-16).
+  - **Corrected:** both stopped again; final state = 7 originally-active timers active, 2 dormant timers inactive — exactly as pre-session.
+- **Lesson recorded:** always snapshot `systemctl is-active` for every unit in a stop-list BEFORE stopping, not just after.
+
+### Sideways findings
+- **Severity: LOW** — `hermes-5m-candle.service` is a **dead unit**: `ExecStart` points at `scripts/_aggregate_5m.py`, which does not exist. It has `LastTriggerUSec` 2026-09-30 (dormant ~4 weeks) and `UnitFileState=disabled`. If anyone ever `systemctl start`s it, it fails loudly with exit 2. Suggest: delete or repoint the unit (not done — systemd unit cleanup not in this plan's scope; flag for next session).
+- **Severity: LOW** — `hermes-candle-predictor.timer` is likewise dormant since 2026-04-16 (`NextElapse=infinity`, disabled). Same cleanup candidate as above.
+- **Severity: INFO** — the original F3 snippet in the plan was still wrong on first execution: `PRAGMA busy_timeout=10000;` inside the same `sqlite3` invocation **prints `10000`** to stdout, so `n` became `"10000\n500000"` and the bash `[` test aborted the loop after one batch. Fixed by switching to `sqlite3 -cmd ".timeout 10000"` (dot-command prints nothing) + `case` numeric guard. The plan file's F3 snippet has been corrected in place during this session.
+- **Severity: INFO** — `data/price_history_gt30d_20261027.gz` is the **only** rollback path for the deleted 11.93M rows; do not garbage-collect `data/` before 2026-11-03.
+
+### Success rate this session: 1/1 implemented (100%)
+### Cumulative (Oct 22+25+26+27 sessions): 13/13 (100%)
+### Next candidates (priority order)
+1. Stage A/C re-readout — L1 analysis — MED — ~Oct 29 (re-check sqx- net significance; rs-s-broken/bb-squeeze- half2 resolution)
+2. Dead systemd unit cleanup (`hermes-5m-candle`, `hermes-candle-predictor`) — L1 — LOW — trivial, self-found this session
+3. RR engine U2-U4 — L2-3 — HIGH — still needs CEO sequencing
+4. Own-conclusions re-verification of mining-report patterns — L1-2 — MED — only if someone proposes acting on that report
+5. 4 open bugs (037/044/064 live-money, 056 constants) + bb-squeeze trail-arm-timeout RATIFY/REVERT — T/CEO-gated — not actionable by this role
