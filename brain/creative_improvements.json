@@ -9491,5 +9491,32 @@
     "category": "measurement",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T12:46:00Z",
+    "idea": "Chop-bleed route-reopen watch (zero-code): if 7d chop-bleed <70% for 2 consecutive runs, reopen #90 exit-stack routes (TAT scope / UGB-PT extension) gated on <=70%",
+    "rationale": "chop-bleed fell 85.2% -> 78.3% (7d) / 76.1% (14d); routes pre-closed at >70%, now within 8.3pp",
+    "expected_impact": "reopens measured exit-lever eval only when chop share justifies",
+    "category": "exit engine",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T12:46:00Z",
+    "idea": "Shadow dead-signal gate-health ledger (standing KPI): cross-check shadow worst n>=10 sources vs live enablement + real-book counts each run",
+    "rationale": "run #183: 16 worst shadow sources, live-enabled ones have 0-2 real trades/14d = gates starving raw-bad edges; prevents false kill proposals from shadow-only bleed",
+    "expected_impact": "stops re-flagging shadow-only bleed as live",
+    "category": "shadow analysis",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T12:46:00Z",
+    "idea": "CONTINUUM-BULL short-block micro-validation: since 12:00Z BTC +0.4% — shorts denied this cycle (ETC/XPL/WLD/PUMP/ETH/KAS/BTC) would have lost; block credit logged",
+    "rationale": "scanner disagreement (15m SHORT_BIAS vs continuum ABOVE/LEAN_BULL) resolved up; evidence to keep block during disagreement",
+    "expected_impact": "supports keeping continuum block active",
+    "category": "regime",
+    "status": "measured-no-change",
+    "risk": "low"
   }
 ]
