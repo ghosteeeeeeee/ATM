@@ -520,3 +520,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-27 13:29 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L '+$0.11' (DOT r2v2-long3 + continuation+ profit-monster-trail +1.34%/+1.07%) | 24h 27T 12W 44.4% '-$0.67' | 7d 142T 48.6% '-$0.33' (improving) — size-reduce 1.0x (file absent = truth) | kill: none (last-hour n=2 both wins; 24h 0%WR signals all n<3, worst n>=3 positive-WR) | atr_sl_hit 0/27=0% under 40% | no neg streak (12:00 +0.11) | freq 2/hr | 1 open bracketed DOT | No constants change -> no signal_versions entry
 BY: auto_1hr
+BY: auto_1hr
+- [2026-10-27 20:30 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L '+$0.01' (WCT volume-buildup- SHORT profit-monster-trail +0.27%) | 24h 21T 14W 66.7% '+$0.39' GREEN | 7d 141T 51.1% '-$0.41' — size-reduce 1.0x (file absent = truth) | kill: none (last-hour n=1 win; 24h n>=3 all positive-WR) | atr_sl_hit 1/21=4.8% under 40% | no neg streak (4 positive hours, 18:00 quiet) | frequency 1/hr | 0 open flat | No constants change -> no signal_versions entry

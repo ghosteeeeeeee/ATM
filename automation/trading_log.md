@@ -16625,3 +16625,24 @@ BY: upgrade_implementer
 - 24h now '+$0.38' (65% WR) best of the day; 7d '-$0.42' improving — no killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day)
 - ARM-RATE TRIPWIRE flag with CEO (run 2, brain_auditor 15:55) — advisory only, no auto-config
+
+## 2026-10-27 20:30 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.01 (WR: 100%) | 24h: 21T 14W 66.7% '+$0.39' (green) | 7d 141T 72W 51.1% '-$0.41' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- WCT volume-buildup- SHORT closed profit-monster-trail +0.27% — winner
+- atr_sl_hit 1/21 = 4.8% (<40%) — SL not too tight; dominant closes = profit-monster-trail (9T +$0.50), ugb_pt (4T +$0.30); trail_arm_timeout 3T '-$0.08' still the only persistent small bleed — monitor
+- Kill check: last-hour n=1 (win); 24h n>=3 signals all positive-WR (bb-squeeze+ 5T 60% '+$0.37', volume-buildup- 4T 75% '-$0.04' but WR healthy, pump-chain+ 3T 100% '+$0.28') — monitor only
+- Streak: 19:00 '+$0.04', 17:00 '+$0.02', 16:00 '+$0.16', 15:00 '+$0.22' — 4 positive hours (18:00 quiet); not a negative streak
+- Frequency 1/hr — not overtrading
+- 0 open trades — flat
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '+$0.39' (66.7% WR) best of day; 7d '-$0.41' improving — no killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day)
+- ARM-RATE TRIPWIRE flag with CEO (run 2, brain_auditor 15:55) — advisory only, no auto-config
