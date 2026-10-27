@@ -9284,5 +9284,32 @@
     "category": "exit quality",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "timestamp": "2026-10-27T00:45:00Z",
+    "idea": "Single-day-shock vs structural-decay KPI: 7d_pnl minus 24h_pnl decomposition",
+    "rationale": "Watchdog steer-001 '12/20 lost, something is wrong' — measured: prior 6d net exactly 0.00, entire 7d bleed is one chop day (-1.17 on Oct 26). A flat-week-plus-one-bad-day is a shock, not decay; reacting with config would be panic. Zero code: daily GROUP BY close_time.",
+    "expected_impact": "prevents single-day panic changes; flags real decay when prior-6d goes negative",
+    "category": "steering KPI",
+    "status": "adopted",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-27T00:45:00Z",
+    "idea": "Waiver renewal pre-registration with FIXED units: c3 = max price-move% <=1.0 (not leveraged pnl_pct), c4 = cluster_t on gate_shadow",
+    "rationale": "#160 flagged c3 unit ambiguity and c4 non-evaluability. Final scoreboard under fixed units: n=8 4W4L net -0.19, DYDX price-move 1.09% fails c3 -> renewal FAILS, lapse correct. Closes the ambiguity permanently for any future waiver.",
+    "expected_impact": "waiver decisions become unit-clean and reproducible",
+    "category": "governance",
+    "status": "adopted",
+    "risk": "low"
+  },
+  {
+    "timestamp": "2026-10-27T00:45:00Z",
+    "idea": "CHASE_RATIO_SHADOW soak verdict: stays SHADOW, re-eval at n>=20",
+    "rationale": "Soak was due Oct 15, reviewed now: 49 unique events since Oct 13, 16 joined to opens within 12m, would-blocked set net +0.19 (blocking loses money), winner-kill 5/16=31% > 20% bar, n=16<20. At current rate n=20 in ~3 days.",
+    "expected_impact": "data-backed keep-shadow decision, avoids premature enforce",
+    "category": "shadow review",
+    "status": "adopted",
+    "risk": "low"
   }
 ]

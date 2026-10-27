@@ -1,63 +1,71 @@
-# Current State — brain_auditor #171 2026-10-26 23:45 UTC
-**Last Updated: 2026-10-26 23:45 UTC**
-**Updated by: brain_auditor #171. Prior: #170 22:38 (preserved in git history).**
+# Current State — brain_auditor #172 2026-10-27 00:45 UTC
+**Last Updated: 2026-10-27 00:45 UTC**
+**Updated by: brain_auditor #172. Prior: #171 23:45 (preserved in git history).**
 
-## HEADLINE — 0 config changes (constants EMPTY git diff, CEO_PROTECTED intact, session
-lock absent). Both standing routes CLOSED WITH DATA, no lever passed bars. **Waiver
-lapses ~00:00Z (~15min) — next run MUST verify 0 exemption-band [35,45) SHORT opens +
-flip1 False + HARD_FLOOR blocks detect<45.** Wrong-side REFUTED 95th consecutive.
+## HEADLINE — 0 config constants (EMPTY git diff, CEO_PROTECTED intact, session lock
+absent, review-queue bars unmet). **All three Oct-27 due-items DISCHARGED with data:**
+(1) **Waiver LAPSE verified live** — flip1_state=(False,'expired'), 0 opens since
+00:00Z, BIGTIME SHORT RSI 43.75 BLOCKED at approval 00:29 = pre-waiver behavior
+restored. Final scoreboard FIXED UNITS: exec-band 8 opens 4W4L **net -0.19**, worst
+price-move 1.09% (DYDX) > 1% bar -> c1 PASS / c2 PASS / **c3 FAIL** -> **renewal
+FAILS, lapse was correct**. (2) **#139 midband_ema300_cond re-measure DONE** — same
+verdict OOS 7/14/30d (band+BELOW +0.04/-0.04/+1.34 profitable, AT/ABOVE carries
+bleed, both variants FAIL bars) -> WITHDRAWN stands, do not re-issue. (3)
+**CHASE_RATIO soak reviewed** (was due Oct 15): 49 events/16 joined, would-blocked
+net **+0.19** (blocking loses), fk 5/16=31%>20%, n<20 -> **stays SHADOW**, re-eval
+n>=20. Wrong-side REFUTED 96th consecutive.
 
-## STANDING ROUTES CLOSED
-**pump-chain+ LONG (7d 18T 33.3% -1.08):** conf monotonicity CONFIRMED 14d — conf<30
-32T 28.1% **-1.69** (winners +0.50) vs conf70+ 8T 62.5% **+1.54**. CONF-FLOOR=30
-**REJECT**: kills 9/15=60% of 14d winners (>20% bar), 14d==30d identical (no true OOS),
-7d subset n=14 binom_p=0.212 FAIL. RSI_MIN=55 **REJECT**: 30d OOS sign-flip — blocks
-25T 10W net **+0.82** blocked = would LOSE. Habitat EXTREME-only (HIGH block holding,
-only pre-Oct21 HIGH trades). MONITOR until 30d band has pre-14d data.
+## WATCHDOG STEER-001 ANSWERED (12/20 lost, "something is wrong")
+**Measured: prior 6d net = exactly 0.00 (10-20..10-25: -0.26/-0.91/+0.34/+0.12/
++0.39/+0.32), entire 7d bleed (-1.17) = 2026-10-26 alone = SINGLE-DAY CHOP SHOCK,
+not structural decay.** Composition: pump-chain+ unarmed chop longs -0.47 (BLUR
+-0.31/GRASS -0.10/ALT -0.06; unarmed 10T 0%WR per #166) + waiver-band oversold
+shorts -0.26 (DYDX/AERO/SYRUP exec<45 — **class now structurally blocked by the
+lapse**) + misc. Both sources have standing levers (CONF_FLOOR CEO / NO-KILL 30d
++1.49 / lapse) — no new lever qualifies. NEW KPI adopted: 7d-minus-24h
+decomposition = shock vs decay discriminator.
 
-**Chase-short measurement (watchdog ask):** DONE. 7d chase(<45) 24T 58.3% +0.05
-avg 0.002 vs bounce(55-64) 9T 55.6% +0.24 avg **0.027** (13x). 14d death-zone 45-54
-25T 16% -1.20 binom_p=0.0005; 30d 53T -0.48 p=0.0027 — REAL persistent. Supports
-HARD_FLOOR=45 + tonight's lapse. No new gate needed.
+## MANDATE FRESH (PG 00:35)
+**armed(mfe>=0.40):** 7d 78T 75.6% +3.78 vs unarmed 63T 6.3% **-4.95** | 14d 170T
+70.6% +8.51 vs 168T 6.0% **-13.51**
+**14d exits:** pm-trail 84T 91.7% +4.61 | hard_max_loss 61T 0% **-6.37** (only 1/61
+reached +0.40) | atr_sl_hit 79T 1.3% -5.54 | trail_arm_timeout 25T -0.87
+**14d:** 338T 38.5% -5.00 | LONG 222T -4.21 / SHORT 116T -0.79 | 24h 28T 11W 39.3% -1.17
 
-## LEVERS EVALUATED (all REJECT)
-- pump-chain+ conf_floor=30 → 60% winner-kill, no OOS
-- pump-chain+ RSI_MIN=55 → 30d OOS +0.82 blocked (would lose)
-- SHORT dual-band detect-OR-exec 45-55 → leak cohort 30d 6T 4W **+0.08** winning; lapse
-  closes death-class at source; would block cool-from-overbought winners (WLD/NEO)
-- LONG 45-59 blanket → 30d 191T net -0.20 w/ +9.26 winner PnL at risk
+## SHADOW 2/6 ANSWERABLE (both used)
+contrarian 894/622 joinable — **pc- flip 64.7% n=348 STABLE** (PROMOTE formal
+17:12Z today), rider 28.6% do-NOT-flip | shadow_trader 26,402 — gates justified
+(CONFLUENCE-EXPIRY 11,908@48% avg -0.12), exit A/B pm_trail +3,763 vs hard_max
+-5,597 | oscillator FROZEN / floor_admit 2,165 + wyckoff 337 PENDING Nov 15 /
+rr ORPHANED.
 
-## LOSING AUTOPSY 48h (recovery_replay adverse-first, selfcheck PASS)
-21 losers = 5 never-adverse / 13 recovered-after-adverse / **3 NEVER**:
-AERO #16432 cut-loser -0.12 (NEW, closed 23:39 — weakest-position steer executed) |
-ICP #16409 waiver-band | CC #16423 pump-chain- carve-out n=1.
+## LOSING AUTOPSY 24h (recovery_replay adverse-first, selfcheck PASS)
+16 losers = 1 never-adverse / 12 recovered / **3 NEVER** (AERO cut-loser steer
+executed correctly | ICP waiver-band = class removed by lapse | CC pump-chain-
+carve-out n=1) = 18.75% structural, matches 17.5% baseline. Wrong-side REFUTED
+96th run (#61 p=0.116, #84 t=-0.04).
 
-## MANDATE FRESH (PG 23:40)
-**7d armed(mfe>=0.40):** 74T 74.3% +$3.63 vs unarmed 62T 4.8% **-$4.84**
-**14d armed:** 166T 69.9% +$8.36 vs unarmed 164T 5.5% **-$13.32**
-**14d exits:** profit-monster-trail 84T 91.7% +$4.61 | hard_max_loss 61T 0% -$6.37 |
-atr_sl_hit 79T 1.3% -$5.54 | trail_arm_timeout 25T 16% -$0.87
-**14d direction:** LONG 222T 37.8% -$4.21 / SHORT 114T 40.4% -$0.56 (chop tape, LONG bleeds)
+## DEEP-DIVE: 0 new sub-50% n>=15 targets
+All 6 owned: bb-bounce 39T TAT-C+NORMAL-block | doji 16T killed | ai-trader+ 20T
+disabled | pump-chain- 37T CONF_FLOOR+PROMOTE | pump-chain+ 46T NO-KILL/30d +1.49 |
+ai-trader-pending 16T CEO.
 
-## SHADOW 2/6 ANSWERABLE
-contrarian 894 (pc- flip-WR 64.7% n=348 holds) · shadow_trader 26276 (CONFLUENCE-EXPIRY
-11871 @48% gates justified; pm_trail exit dominant; HML worst pump-chain-v6+ LONG 659T
-31.4% -0.202%; peak-buyers open-skies+ giveback 1.476%, pump-chain- SHORT 1.143%).
-sweep-arm no data for pump-chain keys. floor_admit 2165 / wyckoff 337 PENDING Nov 15.
-
-## LAST-RUN VERIFY — ALL PASS
-#169 pm_armed_at LIVE (profit_monster.py:453, 2 stamps/24h) · #169 contrarian caveat
-re-verified · #167 brain.py loss-cooldown code present · #152 daily-commit guard (no
-rogue commits) · kill flags correct · NORMAL block bb-bounce-v2-long+ (vol_gate:412)
-live 0 opens since · constants EMPTY git diff · CEO_PROTECTED intact · 0 Tracebacks.
+## LAST-RUN VERIFY #171 — ALL PASS
+pm_armed_at 2 stamps (DOT, USUAL) · brain loss-cooldown reason=loss writes live
+(Oct 26 18:18/22:23) · daily-commit selfcheck 9/9 · NORMAL block bb-bounce live
+(commit 5395c3a8 21:45, 0 opens since) · contrarian 64.7% n=348 · constants EMPTY
+· CEO_PROTECTED intact · 0 Tracebacks Oct 26-27 · recovery_replay selfcheck PASS ·
+mfe NULL 1/14d, backfill timer 00:20Z healthy · kill flags correct.
 
 ## OPEN / READINESS
-ZORA SHORT meta_rsi 60.87 best-cell hold · AERO closed 23:39 cut-loser -0.12.
-Regime bear-leaning chop SHORT_BIAS continuum BELOW LOW-vol. No fresh LONGs until
-reclaim+volume. SHORT bounce RSI 55-65 only. size 1.0x (file absent). vacation
-no_signal_enable_disable=true. **Waiver lapses 2026-10-27T00:00Z — verify next run.**
+BANANA LONG #16433 bb-squeeze+ @3.3641 SL 3.3325 / TP 3.4146, meta_rsi 57.9,
+ALIGNED (LONG_BIAS both TFs, trend STRONG_UP, continuum AT) — hold on precommitted
+levels. Regime: churn tape (22 flips/24h = normal band), LONG_BIAS fresh flip,
+volume LOW. NO fresh chase entries (1m RSI 75-98 = chasing). SHORTs only bounce
+cell 55-64 while tape SHORT-leaning; knife <35 dead. size 1.0x (file absent).
+Waiver LAPSED. vacation no_signal_enable_disable=true.
 
 ## CEO PENDING
-bb-bounce keep-vs-disable (packet complete, habitat gone) + CONF_FLOOR fkB FAIL ruling.
-Escalation #17 not re-issued. Creative: conf-stratified arm-timeout PRE-REGISTERED +
-peak-buyer giveback governor suggested.
+CONF_FLOOR fkB ruling · bb-bounce keep-vs-disable · hard-stop reentry cooldown
+(evidence complete #166) · TAT flip (11 trail_arm_timeout since 16344: 5 base-scope
++ 6 bb-bounce TAT-C) · pc- PROMOTE 17:12Z · escalation #17 not re-issued.
