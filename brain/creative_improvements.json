@@ -9455,5 +9455,23 @@
     "category": "watchdog KPI",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T10:45:00Z",
+    "idea": "UGB-PT vs ATR-SL race leak pre-register (armed-then-atr_sl post-10-25 n=1; act at n>=5)",
+    "rationale": "37 leaks pre-enforce -2.16/30d; UGB-PT cut class 97%, residual = fast reversal punching through peak-0.30 between 120s polls",
+    "expected_impact": "prevents silent regression of #130",
+    "category": "exit sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T10:45:00Z",
+    "idea": "r2v2-long3 monitor (7d 11T 54.5% WR -$0.13, armed +0.24/unarmed -0.37; 30d +0.47)",
+    "rationale": "n=11 < 20 bar, 30d positive = window noise, same arm-gap pattern",
+    "expected_impact": "none — watch only",
+    "category": "monitor",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
