@@ -1,136 +1,76 @@
 {
-  "timestamp": "2026-10-27T00:45:00Z",
-  "run": 172,
-  "session_lock": false,
-  "headline": "Oct-27 due-items all discharged: waiver LAPSE verified live (flip1=(False,'expired'), BIGTIME RSI 43.75 blocked 00:29, 0 band opens since 00:00Z); final waiver scoreboard with FIXED units = renewal FAILS (exec-band 8 opens 4W4L net -0.19, worst price-move 1.09% > 1% bar); #139 midband_ema300_cond re-measure SAME verdict OOS (refutation stands); CHASE_RATIO soak reviewed (16 joined, net +0.19 if blocked, fk 31% -> stays SHADOW). 0 config changes. Watchdog steer-001 answered: entire 7d bleed = today's single chop day (prior 6d net 0.00). Wrong-side REFUTED 96th consecutive.",
+  "timestamp": "2026-10-27T01:45:00Z",
+  "run": 173,
   "session_brain_stats": {
-    "queries": 2,
-    "note": "session_brain working (6/6 unique titles), topics: signal winrate/ideas"
+    "queries_run": 3,
+    "top_insights": [
+      "brain-rag: hard_max_loss is structural exit bleed — entry ownership not exit fixable (standing)",
+      "trend-following signal spec discussed (signal-lab) — inventory already covers via continuum-trend+",
+      "pump-chain-short deeper filters discussed — CONF_FLOOR/RSI_MIN both REJECTED run #171"
+    ]
   },
   "trade_summary_24h": {
-    "closes": 28,
+    "trades": 28,
     "wins": 11,
     "wr": 39.3,
-    "pnl": -1.17,
-    "by_signal_top_bleed": [
-      "pump-chain+ LONG 7T 57.1% -0.36",
+    "pnl_usdt": -1.04,
+    "armed_7d": "79T 75.9% +3.84",
+    "unarmed_7d": "63T 4.8% -5.02",
+    "armed_14d": "171T 70.8% +8.57",
+    "unarmed_14d": "168T 6.0% -13.41",
+    "worst_signals_24h": [
       "volume-buildup- SHORT 7T 28.6% -0.35",
-      "bb-bounce-v2-long+ 3T 0% -0.12"
+      "pump-chain+ LONG 8T 62.5% -0.30"
     ],
-    "watchdog_steer_001": "12/20 lost 35% WR -1.03 — CONFIRMED as single chop day, see decomposition"
-  },
-  "trade_summary_7d": {
-    "closes": 141,
-    "wins": 63,
-    "wr": 44.7,
-    "pnl": -1.17,
-    "daily": {
-      "10-20": -0.26,
-      "10-21": -0.91,
-      "10-22": 0.34,
-      "10-23": 0.12,
-      "10-24": 0.39,
-      "10-25": 0.32,
-      "10-26": -1.17
-    },
-    "prior_6d_net": 0.0,
-    "finding": "ENTIRE 7d bleed is 2026-10-26 = single-day shock, not structural decay"
-  },
-  "trade_summary_14d": {
-    "closes": 338,
-    "wins": 130,
-    "wr": 38.5,
-    "pnl": -5.0
-  },
-  "mandate_fresh": {
-    "armed_7d": "78T 75.6% +3.78 vs unarmed 63T 6.3% -4.95",
-    "armed_14d": "170T 70.6% +8.51 vs unarmed 168T 6.0% -13.51",
-    "exits_14d": "profit-monster-trail 84T 91.7% +4.61 | hard_max_loss 61T 0% -6.37 | atr_sl_hit 79T 1.3% -5.54 | trail_arm_timeout 25T 16% -0.87",
-    "hml_reach_14d": "hard_max_loss 61T, only 1 reached +0.40 (1.6%)",
-    "direction_14d": "LONG 222T 37.8% -4.21 / SHORT 116T 39.7% -0.79"
-  },
-  "standing_routes": {
-    "pump_chain_plus": "NO-KILL reconfirmed (7d 18T -1.08 / 14d 46T -0.36 / 30d 85T +1.49); CONF_FLOOR still CEO-gated (fkB FAIL)",
-    "midband_ema300_steer": "RE-MEASURE DUE TODAY DONE — same verdict OOS 7/14/30d: band+BELOW profitable (+0.04/-0.04/+1.34), band+AT/ABOVE carries bleed, both variants FAIL house bars -> WITHDRAWN stands",
-    "pc_promote": "formal due 17:12Z; early re-verify 64.7% n=348 STABLE (outcome join fresh this run)"
-  },
-  "waiver_status": {
-    "state": "LAPSED 2026-10-27T00:00:00Z — verified live",
-    "proof": [
-      "waiver_expiry.flip1_state() = (False,'expired')",
-      "0 trades opened since 00:00Z",
-      "BIGTIME SHORT RSI 43.75 blocked at approval 00:29 (band [35,45) blocks again)"
-    ],
-    "final_scoreboard_fixed_units": "exec-band [35,45) SHORT opens during waiver (Oct 24 15:40 - Oct 27 00:00): n=8, 4W/4L, net -0.19; price-move winners +0.51/+0.49/+0.14/+0.29, losers -0.83/-0.10/-1.09/-1.03; c3 restated in price-move% FAILS (DYDX 1.09% > 1%)",
-    "verdict": "renewal pre-registered criteria: c1 n>=5 PASS, c2 WR>=40% PASS (50%), c3 max price-move loss <=1% FAIL, c4 not evaluable -> LAPSE CORRECT, do not renew"
+    "open": "BTC LONG #16435 continuum-trend+ flat (rsi 53.2, no pm_armed_at yet) | AIXBT SHORT #16436 volume-buildup- +0.04 ARMED (pm_armed_at 01:26:50Z, detect 72.7 high-RSI fade cell)"
   },
   "shadow_analysis": {
-    "contrarian": "join RE-RAN 894 rows/622 joinable — pump-chain- flip 64.7% n=348 STABLE (Oct 27 PROMOTE ready), btc-pump-rider+ 28.6% do-NOT-flip, total 48.7% = family-specific",
-    "shadow_trader": "26,402 signals — gates justified (CONFLUENCE-EXPIRY 11,908 blocked @48% avg -0.12, BTC-CRASH 143 @36% -0.28); exit A/B pm_trail +3,763 vs hard_max -5,597",
-    "oscillator": "FROZEN by design (24,598, actual_outcome null) — no live question answerable",
-    "wyckoff": "337 rows PENDING join Nov 15",
-    "floor_admit": "2,165 rows PENDING join Nov 15",
+    "contrarian": "894 rows / 622 joinable — pc- flip-WR 64.7% n=348 STABLE (PROMOTE pending CEO) | btc-pump-rider+ 28.6% n=273 do-NOT-flip | total 48.7% — signal-selective confirmed fresh",
+    "shadow_trader": "26,520 signals — gates justified: CONFLUENCE-EXPIRY 11,941 @48% avg -0.12, BTC-CRASH 143 @36% | exit A/B pm_trail +3,780 dominant vs hard_max -5,622 | HML sweep: no family n>=20 passes arm-timeout bars",
+    "oscillator": "FROZEN by design 25.3d (OSCILLATOR_MULT_ENABLED) — pre-live evidence only, JSONL not JSON array",
+    "wyckoff": "340 rows PENDING outcome join (Nov 15)",
+    "floor_admit": "2,179 rows PENDING outcome join (Nov 15)",
     "rr_shadow": "ORPHANED — do not cite",
-    "overall": "2/6 answerable and both used; rest pending/frozen/orphaned"
-  },
-  "losing_autopsy_24h": {
-    "method": "recovery_replay adverse-first, selfcheck PASS",
-    "n": 16,
-    "never_adverse": 1,
-    "recovered": 12,
-    "never": 3,
-    "never_list": [
-      "AERO #16432 cut-loser -0.12 (steer executed correctly)",
-      "ICP #16409 waiver-band -0.09 (class removed by lapse)",
-      "CC #16423 pump-chain- carve-out -0.07 (n=1)"
-    ],
-    "verdict": "wrong-side REFUTED 96th consecutive run (#61 p=0.116, #84 t=-0.04); 3/16 = 18.75% structural never-recover, consistent with 17.5% baseline"
+    "exit_ladder_oos": "ESCALATION #17 SLICE RUN — NO FAMILY PASSES (all SKIP-n<20 or FAIL). volume-buildup-SHORT / r2v2-long3 / hl-copy / bb-squeeze arm-timeout variants: no new ships",
+    "overall": "2/6 answerable, both used. contrarian + shadow_trader generate real signal; others pending/frozen/orphaned"
   },
   "drift_findings": [],
   "recurring_problems": [
-    "unarmed-chop bleed persists (14d unarmed 168T 6.0% -13.51) — all levers CEO-gated or refuted"
+    "Chop-bleed / never-armed entries: 7d 86.6%, 14d 86.3% — standing entry-quality state, not new deterioration (watchdog verified)",
+    "Detect-first midband gates (SHORT 45-55, LONG 60-70) let exec RSI drift INTO death band — quantified this run, n too small to close hole"
   ],
   "missing_implementations": [],
   "creative_improvements": [
-    "single-day-shock vs structural-decay KPI (7d-minus-24h decomposition) — today prior-6d=0.00 proves shock",
-    "waiver renewal pre-registration with fixed units (price-move% + cluster_t) — c3 unit ambiguity closed",
-    "CHASE_RATIO soak verdict: stays SHADOW, re-eval at n>=20 (16 joined now, fk 31%>20%, net +0.19 if blocked)"
+    {
+      "date": "2026-10-27T01:45:00Z",
+      "idea": "DRIFT-ACROSS-BAND KPI (zero-code, pre-registered monitor): count trades where detect RSI is outside a death band but exec RSI lands inside it (SHORT non-pump 45-55; LONG non-EXTREME non-squeeze 60-70). Measured 14d=30d (fresh cohort): SHORT 7T net -0.03 (57.1% WR, 4 armed, would block 4 winners +0.25 to save -0.28 = net +0.03 DO-NOT-SHIP) | LONG 5T net -0.48 (20% WR, n=5). Both n<20.",
+      "rationale": "SHORT_MIDBAND (decider_run.py:2265) and LONG_MIDBAND (signal_compactor.py:4332) are detect-first by DRIFT-E design. Drifted trades are a distinct population — LTC/DOT exec-in-band shorts WON, so closing the hole blind would kill winners. Pre-register: ship exec-side secondary check ONLY if cohort reaches n>=20 AND net < -0.50 AND winner-kill <20%.",
+      "expected_impact": "Avoids a wrong fix; catches a real hole if it bleeds",
+      "category": "entry sniper",
+      "status": "monitor",
+      "risk": "low",
+      "re_eval_at": "n>=20 cohort"
+    }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    "#171 pm_armed_at stamps LIVE (2 in DB: DOT, USUAL) PASS",
-    "#171 brain.py loss-cooldown reason=loss LIVE (writes Oct 26 18:18/22:23) PASS",
-    "#171 daily-commit guard selfcheck 9/9 PASS",
-    "#171 NORMAL block bb-bounce live (commit 5395c3a8 21:45, 0 opens since — CAKE 21:27 pre-block) PASS",
-    "#171 contrarian caveat re-verified 64.7% n=348 PASS",
-    "#171 constants EMPTY git diff / CEO_PROTECTED intact / 0 Tracebacks Oct 26-27 PASS"
-  ],
-  "due_items_oct27": {
-    "waiver_lapse_verify": "DONE — see waiver_status",
-    "midband_remeasure_139": "DONE — refutation stands (same verdict all windows)",
-    "pc_promote_1712Z": "early re-verify done (64.7% n=348); formal decision 17:12Z",
-    "chase_ratio_shadow_review": "DONE — 49 events/16 joined, net +0.19 blocked, fk 31%, n<20 -> stays SHADOW",
-    "mfe_backfill": "healthy — 1 NULL/14d, 0/24h, timer fired 00:20Z"
-  },
-  "open_trades": [
-    {
-      "id": 16433,
-      "coin": "BANANA",
-      "dir": "LONG",
-      "signal": "bb-squeeze+",
-      "entry": 3.3641,
-      "sl": 3.3325,
-      "tp": 3.4146,
-      "meta_rsi": 57.9,
-      "status": "aligned (LONG_BIAS both TFs, STRONG_UP), bracketed, +0.02 at 00:15"
-    }
+    "#172 waiver lapse RE-VERIFIED: 0 detect<45 SHORT opens since 00:00Z (BIGTIME-class blocked)",
+    "#172 final scoreboard stands: renewal FAILS, lapse correct",
+    "#172 #139 midband re-measure: WITHDRAWN stands, not re-issued",
+    "#171 CHASE_RATIO soak: stays SHADOW (n=16<20)",
+    "#170 pm_armed_at: LIVE — 2 stamps/3d, AIXBT open trade stamped 01:26:50Z",
+    "#170 loss-cooldown reason=loss: code present (brain.py:56-63), 0 reason=loss entries currently in file (all 59 reason=signal) — path not exercised last 3d, correct-by-traffic not re-confirmable this run",
+    "kill flags correct (VOLUME_BREAKOUT_MINUS=False, AI_TRADER=False, 0 killed-signal opens/7d)",
+    "constants git diff EMPTY, CEO_PROTECTED 13/13, session lock absent",
+    "0 real Tracebacks Oct 26-27 (pipeline Oct 25 lines = synthetic self-healing test; signal-compactor.err stale Oct 24)",
+    "recovery_replay --selfcheck PASS"
   ],
   "next_actions": [
-    "pc- PROMOTE formal decision 17:12Z (evidence stable)",
-    "CEO: CONF_FLOOR fkB ruling, bb-bounce keep-vs-disable, hard-stop reentry cooldown (evidence complete #166), TAT flip",
-    "watch: BANANA hold to precommitted SL/TP; no fresh chase entries (RSI 75-98)",
-    "CHASE_RATIO re-eval at n>=20",
-    "Nov 1: coin_regime OOS; Nov 15: floor_admit/wyckoff joins"
-  ],
-  "escalation": "not re-issued (per #171)"
+    "CEO: CONF_FLOOR fkB ruling",
+    "CEO: bb-bounce keep-vs-disable (packet complete, NORMAL-block live, 0 opens since)",
+    "CEO: pc- PROMOTE (64.7% n=348 stable OOS)",
+    "CEO: hard-stop reentry cooldown (evidence #166) + TAT flip",
+    "Next run: re-check drift-across-band cohort size; verify AIXBT SHORT exits via trail (armed)",
+    "Escalation #17: exit-ladder slice CLOSED this run (no pass) — next escalation candidate = none queued"
+  ]
 }
