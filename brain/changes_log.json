@@ -3075,5 +3075,16 @@
     "after": "direction-split measured with house-bar checklist: long_into_shortbias COLLECT with pre-registered re-measure, short_into_longbias REFUTED",
     "rationale": "Oct-27 scheduled eval; direction split separates the two counter-tales the aggregate was smearing",
     "impact": "closes eval, pre-registers the only live entry candidate passing n/save/fk bars"
+  },
+  {
+    "timestamp": "2026-10-27T14:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Chop-bleed KPI dual-measure clarification line in trade_watchdog_prompt.md (retracts #184 math-bug false positive)",
+    "type": "doc",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "KPI defined as dollar share; no note distinguishing it from count share",
+    "after": "Added bullet: % is dollar share, count share is different and always lower, dividing counts is not a math bug, state which measure used",
+    "rationale": "#184 flagged a math bug that was a dollar-vs-count misread; prompt line prevents recurrence and a bogus fix to correct code",
+    "impact": "zero-behavior doc; protects the watchdog KPI from a future incorrect \"fix\""
   }
 ]

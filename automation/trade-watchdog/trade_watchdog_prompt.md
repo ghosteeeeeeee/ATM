@@ -331,6 +331,11 @@ FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '14 days';
 - **≤70%** = the bleed moved into the round-trip cohort (reached +0.40% then gave it back) →
   that is an **exit**-ownership problem, route to UGB-PT / trail distance, not to entry gates.
 - Quote the window with the number. Never compare a 7d share to the 30d baseline.
+- **Two measures, do not mix them (brain_auditor #185):** the % above is the **dollar** share
+  (`sum_loss(mfe<0.40)/sum_all_loss`). The trade **count** share (`n_losers(mfe<0.40)/n_losers`)
+  is a different number and is always lower (e.g. 7d 2026-10-27: dollar 89.5% vs count 79.1%).
+  When quoting "X% (NT of MT trades ...)", the % is the dollar share — dividing the counts does
+  NOT reproduce it and is not a math bug. State which measure you used.
 
 ### Regime Flip-Rate KPI (MANDATORY — added 2026-10-23, brain_auditor #86)
 

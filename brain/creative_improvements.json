@@ -9527,5 +9527,32 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T14:45:00Z",
+    "idea": "DUAL CHOP-BLEED MEASURE PIN (shipped as prompt line): dollar-share is the official KPI, count-share is a separate always-lower number; state which measure when quoting",
+    "rationale": "#184 misread dollar-share (89.3%=4.76/5.33) vs count-share (53/68=77.9%) as a math bug and wrote 'fix owed' against correct code — one prompt line kills the misread class permanently",
+    "expected_impact": "prevents a future bogus fix to the watchdog chop-bleed KPI",
+    "category": "drift prevention",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T14:45:00Z",
+    "idea": "TRIPWIRE ESCALATION PATH pre-register: if LONG arm-rate tripwire (#180) trips run-2, report to CEO WITH unarmed-bleed leaderboard context — NO auto-config fires",
+    "rationale": "both tripwire-trigger signals (pc+ -$1.90/arm 48.8%, bbbv2 -$1.85/arm 40.5%) are already owned by standing levers; pre-registering the no-auto-action path prevents a tripped wire from becoming a panic change",
+    "expected_impact": "tripwire stays informational; no destabilizing change on trip",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T14:45:00Z",
+    "idea": "UNARMED-BLEED LEADERBOARD first collection: leaders pc+ -$1.90 (arm 48.8%) and bbbv2 -$1.85 (arm 40.5%) both cross trigger (>$1.50 AND arm<50%) — both already owned; next-in-queue vb- -$1.05 (arm 66.7%, below trigger); 0 NEW targets",
+    "rationale": "first run of the #184 standing KPI confirms ownership coverage, adds visibility without re-proposing shipped work",
+    "expected_impact": "standing early-warning working as designed",
+    "category": "entry sniper",
+    "status": "collected",
+    "risk": "low"
   }
 ]

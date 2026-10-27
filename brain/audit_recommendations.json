@@ -1,165 +1,210 @@
 {
-  "timestamp": "2026-10-27T14:00:03Z",
-  "run": 184,
+  "timestamp": "2026-10-27T14:45:00Z",
+  "run": 185,
   "session_brain_stats": {
-    "queries_run": 3,
-    "queries": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "candle aware arming poll gap trail arm fix"
-    ],
-    "note": "results noisy/dup-heavy (16th run flag); no new actionable insight beyond standing dispositions"
+    "queries": 2,
+    "note": "dup-heavy ideation results only, no new signal; scores 0.96-1.05 weak relevance (known drift)"
   },
   "trade_summary_24h": {
-    "n": 25,
-    "wins": 11,
-    "wr": 44.0,
-    "pnl_usdt": -0.69,
+    "n": 23,
+    "wins": 10,
+    "wr": 43.5,
+    "pnl_usdt": -0.83,
     "7d": {
-      "n": 140,
-      "wins": 69,
-      "wr": 49.3,
-      "pnl_usdt": -0.24
+      "n": 139,
+      "wins": 67,
+      "wr": 48.2,
+      "pnl_usdt": -1.1
     },
-    "7d_armed": {
-      "n": 75,
-      "pnl_usdt": 4.11
-    },
-    "7d_unarmed": {
-      "n": 58,
-      "pnl_usdt": -4.54
+    "14d": {
+      "n": 308,
+      "wr": 40.9,
+      "pnl_usdt": -3.9
     },
     "today_utc": {
-      "n": 11,
-      "wins": 8,
-      "pnl_usdt": 0.39
+      "n": 12,
+      "pnl_usdt": 0.18
     },
+    "7d_armed": {
+      "n": 73,
+      "wr": 79.5,
+      "pnl_usdt": 3.46
+    },
+    "7d_unarmed": {
+      "n": 66,
+      "wr": 13.6,
+      "pnl_usdt": -4.56
+    },
+    "7d_trail_family": {
+      "n": 59,
+      "wr": 88.1,
+      "pnl_usdt": 3.26
+    },
+    "7d_hard_max_loss": {
+      "n": 15,
+      "wr": 0.0,
+      "pnl_usdt": -2.0
+    },
+    "14d_trail_family": {
+      "n": 110,
+      "wr": 89.1,
+      "pnl_usdt": 8.05
+    },
+    "14d_hard_max_loss": {
+      "n": 42,
+      "wr": 0.0,
+      "pnl_usdt": -4.79
+    },
+    "long_arm_rate_7d": 49.5,
+    "short_arm_rate_7d": 58.7,
+    "chop_bleed_dollar_7d": 89.5,
+    "chop_bleed_count_7d": 79.1,
+    "breakeven_wr_needed_7d": 55.6,
     "open": [
-      {
-        "id": 16444,
-        "coin": "DOT",
-        "direction": "LONG",
-        "signal": "continuation+",
-        "pnl_pct": -0.59,
-        "sl": 0.9787
-      },
       {
         "id": 16445,
         "coin": "BTC",
         "direction": "LONG",
         "signal": "continuum-osc+",
-        "pnl_pct": -0.41,
-        "sl": 79117.17
+        "entry": 80322.0,
+        "sl": 79371.47,
+        "pnl_pct": -0.12,
+        "opened": "13:39Z",
+        "mfe_pct": 0.04,
+        "disposition": "HOLD — 1m 18 consecutive closes above continuum EMA300 (+0.26%), exit condition NOT met; MFE-CUT shadow would-fire (shadow-only, CEO enforcement pending)"
       }
     ]
   },
   "shadow_analysis": {
-    "contrarian": "join fresh 651 — pc- flip 64.6% n=350 STABLE = NO-GO stands for 17:12Z formal (do NOT ship early); btc-pump-rider+ 26% do-not-flip",
-    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED=True, actual_outcome null 24598/24598) — pre-live evidence only",
-    "wyckoff": "342 rows, PENDING outcome join (Nov 15)",
-    "floor_admit": "2224 rows fresh (last ts 13:36Z), PENDING outcome join (Nov 15)",
-    "rr_shadow": "ORPHANED — no producer script, 21d stale, do not cite",
-    "shadow_trader": "28,421 signals — CONFLUENCE-EXPIRY 12,376 blocked @48% would-win = gates justified; exit A/B pm_trail +4033 dominant vs hard_max -5983",
+    "contrarian": "join fresh 923/651 — pc- flip 64.6% n=350 STABLE = NO-GO stands for 17:12Z formal (do NOT act early, 2.3h away); btc-pump-rider+ 26.0% do-not-flip",
+    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED=True, actual_outcome null) — pre-live evidence only",
+    "wyckoff": "342 rows PENDING outcome join (Nov 15)",
+    "floor_admit": "2224 rows PENDING outcome join (Nov 15)",
+    "rr_shadow": "ORPHANED — no producer script, do not cite",
+    "shadow_trader": "28,540 signals — CONFLUENCE-EXPIRY 12,409 blocked @48% would-win = gates justified; exit A/B pm_trail +4073 dominant vs hard_max -6022",
     "overall": "2/6 answerable (contrarian + shadow_trader); both confirm standing verdicts"
   },
   "drift_findings": [
-    "WATCHDOG MATH BUG (MED): deep_analysis claims chop-bleed 89.3% '(53T of 68T)' but 53/68=77.9%; independent mfe<0.40 measure = 51/66=77.3%. Percentage inconsistent with its own fraction — route-reopen pre-reg uses the independent measure (77.3%, not tripped).",
-    "No code/session drift: every standing disposition from #180-#183 re-verified in code/data this run."
+    "RETRACTION of #184 side-find 'WATCHDOG MATH BUG (MED)' — FALSE POSITIVE. The 89.3% chop-bleed is the DOLLAR share of gross loss (4.76/5.33=89.3%) exactly as the prompt KPI defines it ('share of GROSS LOSS'); the '(53T of 68T)' parenthetical is trade-count context (77.9% count-share), a different measure. Fresh reproduction: 7d dollar 89.5% (52T -$4.88 of 67T -$5.45), count 79.1%. Both correct under own definitions. No fix owed — and the number comes from the deep-analysis agent via the prompt SQL, not from trade_watchdog.py code (grep: zero chop-bleed calc in that file). #185 shipped a prompt clarification line to prevent recurrence.",
+    "route-reopen pre-reg (#183) PINNED to the official dollar-share KPI this run: 7d 89.5% / 14d 85.8% — nowhere near the <70% x2 trigger (count-share 79.1%/76.2% also nowhere near).",
+    "No code/session drift otherwise: every standing disposition from #180-#184 re-verified in code/data."
   ],
   "recurring_problems": [
-    "Unarmed (MFE<0.40) entries own the entire bleed: 7d unarmed 58T -$4.54 vs armed 75T +$4.11 — 10th consecutive run confirming entry-quality ownership (not exits).",
-    "LONG arm-rate persistently below SHORT (51.1% vs 58.7% 7d) — LONGs enter chop more often; tripwire from #180 NOT tripped this run (needs LONG<50% x2 consecutive)."
+    "Unarmed (never-armed) entries remain the entire bleed: 7d unarmed 66T 13.6% -$4.56 vs armed 73T 79.5% +$3.46 — 11th consecutive run owning this.",
+    "Waiver-era oversold shorts (AERO/ICP/CC) are the entire 48h NEVER cohort — class already closed by the 00:00Z lapse, no new lever."
   ],
   "missing_implementations": [
-    "pc- PROMOTE formal NO-GO due 17:12Z today — queued, do NOT act early (flip 64.6% n=350 stable, live-exit contradiction from #178 stands)",
-    "floor_admit + wyckoff outcome joins — Nov 15",
-    "coin_regime direction re-measure — Nov 4+"
+    "CONF_FLOOR (fkB, RAW pin) — CEO-gated, held",
+    "bb-bounce-v2-long+ keep-vs-disable — CEO packet complete, auditor levers exhausted (#168-#169)",
+    "TAT variant-C GO — CEO-gated (bar met #93)",
+    "hard-stop reentry cooldown — evidence complete (#166), CEO",
+    "MFE-CUT enforcement — shadow firing live on BTC #16445 right now, CEO Oct-25 queue item"
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-27T14:00:03Z",
-      "idea": "UNARMED-BLEED LEADERBOARD (zero-code standing KPI): rank live signals by 14d unarmed (mfe<0.40) PnL each run; pre-register trigger: any live signal with unarmed bleed > $1.50 AND arm-rate <50% gets entry-quality deep-dive next run",
-      "rationale": "Current leaders: pump-chain+ -$2.02 (arm 47.6%), bb-bounce-v2-long+ -$1.85 (arm 40.5%), volume-buildup- -$1.08 (arm 66.7% — bleed despite good arm rate = different failure mode). Ranks exactly which signals fire into chop; both >$1.50 leaders already owned (pc+ NO-KILL on 30d total, bbbv2 CEO pending) so trigger adds next-in-queue visibility without re-proposing shipped work.",
-      "expected_impact": "Early warning for the next chop-entering signal before it hits sub-50% WR headline; zero code, one SQL per run",
+      "date": "2026-10-27T14:45:00Z",
+      "idea": "DUAL CHOP-BLEED MEASURE PIN (shipped as prompt line): dollar-share is the official KPI, count-share is a separate always-lower number; state which when quoting",
+      "rationale": "#184 misread dollar-share vs count-share as a math bug and wrote 'fix owed' against correct code — one prompt line kills the misread class permanently",
+      "expected_impact": "prevents a future bogus fix to the watchdog KPI",
+      "category": "drift prevention",
+      "status": "shipped",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-27T14:45:00Z",
+      "idea": "TRIPIPWIRE ESCALATION PATH pre-register: if LONG arm-rate tripwire (#180) trips run-2, report to CEO WITH unarmed-bleed leaderboard context (pc+ -$1.90/arm 48.8% and bbbv2 -$1.85/arm 40.5% both already owned) — NO auto-config fires",
+      "rationale": "both tripwire-trigger signals are already owned by standing levers; the trip is an early-warning flag, not a new lever request — pre-registering the no-auto-action path prevents a tripped wire from becoming a panic change",
+      "expected_impact": "tripwire stays informational; no destabilizing change on trip",
       "category": "entry sniper",
       "status": "pre-registered",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-27T14:45:00Z",
+      "idea": "UNARMED-BLEED LEADERBOARD first collection (from #184 pre-reg): leaders pc+ -$1.90 (arm 48.8%) and bbbv2 -$1.85 (arm 40.5%) both cross trigger (>$1.50 AND arm<50%) — both already owned; next-in-queue vb- -$1.05 (arm 66.7%, below trigger, different failure mode); 0 NEW targets",
+      "rationale": "first run of the standing KPI confirms ownership coverage, adds visibility without re-proposing shipped work",
+      "expected_impact": "standing early-warning working as designed",
+      "category": "entry sniper",
+      "status": "collected",
       "risk": "low"
     }
   ],
   "config_changes_applied": [],
+  "ships": [
+    "trade_watchdog_prompt.md: dual chop-bleed measure clarification line (zero-behavior doc)"
+  ],
   "changes_from_last_run": [
     {
+      "change": "#184 side-find 'WATCHDOG MATH BUG (MED)'",
+      "result": "RETRACTED as false positive — dollar-share vs count-share misread; prompt line shipped"
+    },
+    {
       "change": "#183 chop-bleed route-reopen pre-reg (<70% x2 runs)",
-      "result": "NOT TRIPPED — 77.3% this run (was 78.3%)"
+      "result": "NOT TRIPPED — dollar 89.5% this run (was 77.3% on count measure; both pinned now, both >70%)"
     },
     {
       "change": "#180 LONG arm-rate tripwire (LONG<50% AND SHORT>55% x2 runs)",
-      "result": "NOT TRIPPED — LONG 51.1% >=50 (was 50.5%, improved); SHORT 58.7% >55 condition met but LONG leg fails"
+      "result": "RUN 1 OF 2 TRIPPED — LONG 49.5% <50 (first time, was 51.1%) AND SHORT 58.7% >55; next run decides"
     },
     {
       "change": "#181 UGB-PT vs ATR-SL race leak (act at n>=5)",
-      "result": "n=1 unchanged (IO #16407 Oct 26); trigger not met"
+      "result": "n=1 unchanged (IO #16407 Oct 26, mfe>=0.40+atr_sl post Oct-25); trigger not met"
     },
     {
-      "change": "#183 CONTINUUM-BULL short-block credit",
-      "result": "still earning — continuum ABOVE, shorts gated; 1 post-lapse short (AIXBT RSI 72.7) won +0.03 outside band"
+      "change": "#184 unarmed-bleed leaderboard first collection",
+      "result": "COLLECTED — both trigger signals already owned (pc+ NO-KILL, bbbv2 CEO), 0 new targets"
+    },
+    {
+      "change": "pc- NO-GO for 17:12Z formal",
+      "result": "STANDS — flip 64.6% n=350 STABLE, do NOT act early (2.3h away)"
     },
     {
       "change": "waiver lapse (00:00Z Oct 27)",
-      "result": "HOLDING — 0 band opens since lapse (AIXBT detect RSI 72.7 not in [35,45))"
+      "result": "HOLDING — 0 band opens since lapse; only short = AIXBT #16436 rsi_exec 57.43 compliant"
     },
     {
-      "change": "all kills/disables",
-      "result": "HOLDING — AI_TRADER F, VB+ F, HMACD_MTF± F, DOJI_BOTTOM F, BB_BOUNCE F, BB_BOUNCE_V2_LONG T (CEO-pending correct)"
+      "change": "all kills/disables + bbbv2 NORMAL-block",
+      "result": "HOLDING — kill flags verified; 0 bbbv2 opens since NORMAL-block commit"
     }
   ],
   "losing_trade_autopsy": {
     "window": "48h",
     "method": "recovery_replay.py adverse-first (selfcheck PASS)",
-    "n": 22,
+    "n": 23,
     "never_adverse": 5,
-    "recovered_after_adverse": 14,
+    "recovered_after_adverse": 15,
     "never_traded_back": 3,
     "never_cohort": [
       "AERO SHORT cut-loser -0.12",
       "ICP SHORT hard_max_loss -0.09",
       "CC SHORT hard_sl -0.07"
     ],
-    "verdict": "WRONG-SIDE REFUTED 108th consecutive run (#61 p=0.116, #84 t=-0.04); NEVER cohort = same waiver-era shorts, class already closed by lapse"
+    "verdict": "WRONG-SIDE REFUTED 109th consecutive run (#61 p=0.116, #84 t=-0.04); NEVER cohort = same waiver-era shorts, class already closed by lapse"
   },
   "deep_dive": {
     "new_targets": 0,
-    "sub50_14d_nge10": "all owned/queued: pump-chain- (17:12Z formal), hl_copy n=10<20 COLLECT, ai-trader-pending CEO, bb-bounce CEO pending, pump-chain+ NO-KILL 30d +1.73, ai-trader+/doji already disabled/killed, ai-trader-manual CEO",
-    "watch": "bb-squeeze+ 14d 14T 57.1% +0.24 — above bar, arm-rate 42.9% noted but n<15 for arm KPI trigger"
+    "sub50_14d_nge15": "bb-bounce-v2-long+ 37T 35.1% (CEO pending) | ai-trader+ 17T 35.3% (disabled) | pump-chain- 26T 15.4% (PROMOTE formal 17:12Z) | pump-chain+ 41T 36.6% (NO-KILL 30d +1.74)",
+    "watch": "bb-squeeze+ 14d 14T 57.1% +0.24 above bar, arm-rate 42.9% noted, n<15"
   },
   "watchdog_triage": [
     {
-      "steer": "Hold DOT LONG #16444 (EMA300 condition)",
-      "disposition": "ACCEPTED report-only — 2 opens now (DOT #16444 + BTC LONG #16445 opened 13:39), both bracketed, hold while BTC 1m above EMA300; no trade action needed from auditor"
+      "steer": "steers=[] this cycle",
+      "disposition": "NO ACTION — deep_analysis prose is a preserved 13:20 snapshot (still describes DOT open; DOT closed 14:02) = known preserve mechanism, not a bug"
     },
     {
-      "steer": "Chop-bleed entry-quality push",
-      "disposition": "STANDING — owns the mission; independent measure 77.3% (watchdog's 89.3% is miscalculated, see drift_findings)"
-    },
-    {
-      "steer": "Suspend volume-buildup-/pump-chain- SHORT while aggregate LONG_BIAS",
-      "disposition": "REJECTED-WITH-DATA — 7d shorts net POSITIVE (all 46T +0.07; vb- 27T +0.11; pc- 4T +0.18); 24h short losses were waiver-era (pre-lapse Oct 26), class already closed by 00:00Z lapse; BTC 15m flip rate 27/24h = p95 unstable so direction-flavored standing gates re-key wrongly; SHORT_CONTINUUM_FILTER already gates shorts when score>60 (current ABOVE)"
-    },
-    {
-      "steer": "BTC 15m flip rate p95 unstable",
-      "disposition": "INFO — reinforces rejection of standing direction gates; re-key conditions every cycle"
+      "steer": "chop-bleed entry-quality push (standing)",
+      "disposition": "STANDING — owns the mission; dollar-share 89.5% 7d, entry-quality owned"
     }
   ],
-  "last_run_verify_183": "ALL PASS — session lock absent | constants diff EMPTY | kill flags 7/7 correct | size-reduce absent=1.0x | Tracebacks 5 all Oct 11 (0 new) | recovery_replay selfcheck PASS | gate_leak_census selfcheck PASS | waiver 0 band opens post-lapse | pm_armed_at 8 stamps/7d | tripwire re-eval NOT TRIPPED | UGB race n=1<5",
-  "readiness": "2 open LONGs (DOT continuation+ / BTC continuum-osc+), both bracketed — HOLD while BTC 1m holds above continuum EMA300; exit if 1m closes below EMA300 for 15-30m or SL hit. Regime: btc_15m LONG_BIAS vs btc_4h SHORT_BIAS (cite sources), continuum ABOVE, vol LOW, wyckoff MARKUP. Trail-family first on new entries; mid-band no added exposure; size 1.0x (file absent).",
+  "last_run_verify_184": "ALL PASS — session lock absent | constants EMPTY git diff | CEO_PROTECTED 13/13 keys present | kill flags correct (AI_TRADER F, VB+ F, DOJI F, BB_BOUNCE F, BB_BOUNCE_V2_LONG T=CEO-pending) | size-reduce absent=1.0x | Tracebacks 5 total all Oct 11 (0 new) | recovery_replay selfcheck PASS | gate_leak_census selfcheck PASS | waiver 0 band opens post-lapse | bbbv2 NORMAL-block 0 opens since | pm_armed_at 8 stamps/7d | CONF-FILTER-SHADOW 128 lines today (live) | HML-SHADOW + MFE-CUT firing on open BTC #16445 | contrarian join reproduces 64.6% n=350",
+  "readiness": "1 open BTC LONG #16445 continuum-osc+ @80322 bracketed SL 79371 (ratcheted), -0.12%, MFE 0.04 never armed — HOLD: 1m 18 consecutive closes above continuum EMA300 (+0.26%), precommitted exit (15-30m close below EMA300) NOT met. DOT #16444 closed 14:02 atr_sl_hit -$0.21 (mfe 0.23 never armed, mae 0.98 = SL did its job). Regime: btc_15m LONG_BIAS vs btc_4h SHORT_BIAS, continuum ABOVE, vol NORMAL. LONG arm-rate tripwire run-1 tripped — flag CEO next run if run-2 holds. No fresh mid-band entries; trail-family first; size 1.0x.",
   "queue": [
-    "17:12Z TODAY: pc- formal NO-GO (do NOT act early)",
-    "next run: LONG arm-rate tripwire re-eval (51.1%, needs <50% x2)",
-    "next run: unarmed-bleed leaderboard KPI first collection (creative this run)",
+    "17:12Z TODAY: pc- formal NO-GO (do NOT act early; flip 64.6% n=350 STABLE)",
+    "next run: LONG arm-rate tripwire RUN 2 DECIDES (49.5% <50 this run) — if tripped: CEO flag with leaderboard context, NO auto-config",
     "Nov 1: self-healing SKIP guard re-probe",
     "Nov 3: vb- WR recovery check (pre-reg #183)",
     "Nov 4+: coin_regime direction re-measure",
     "Nov 15: floor_admit + wyckoff outcome joins",
-    "CEO: CONF_FLOOR fkB + bb-bounce keep-vs-disable + TAT flip"
+    "CEO: CONF_FLOOR fkB + bb-bounce keep-vs-disable + TAT flip + MFE-CUT enforcement"
   ]
 }
