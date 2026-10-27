@@ -933,7 +933,14 @@ CHASE_EXEMPT_GAP_MAX = 8.0           # gap limit when exemption applies (was 2.0
 # atr_trail_hit) and net counterfactual NEGATIVE (blocked set net +$0.29 →
 # enforcing would COST $0.29). Only the ≥14d leg passed. Zero behavior change:
 # the gate was log-only the whole time. Re-arm as shadow only if redefined.
-CHASE_RATIO_SHADOW = False
+# ⚠️ INVERTED-FLIP FIX 2026-10-27 21:55 (main session, BUG-068): #188 set this
+# flag to False believing it preserved log-only — but decider_run:5320 treats
+# False as LIVE BLOCK (`tag = 'BLOCK' if not CHASE_RATIO_SHADOW`). The "revert"
+# silently switched the gate ON: 10 live [CHASE-RATIO-BLOCK] kills of FOGO LONG
+# (conf 133, setup n=170 WR=44%) 19:50→21:55 and 0 fills system-wide since
+# 19:50. Restored to True = the log-only state #188's own analysis concluded
+# ("enforcing would COST $0.29"). Semantics: True=SHADOW(log), False=BLOCK.
+CHASE_RATIO_SHADOW = True
 CHASE_RATIO_MIN_MOVE15 = 0.30        # % direction-signed 15m move must reach this
 CHASE_RATIO_MAX = 0.70               # block if |move5m| / |move15m| > this
 

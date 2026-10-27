@@ -1262,6 +1262,25 @@
       "related_bugs": [
         "BUG-065"
       ]
+    },
+    {
+      "id": "BUG-068",
+      "title": "brain_auditor #188 inverted CHASE_RATIO_SHADOW (True->False) \u2014 claimed 'zero behavior change' but False = live block; killed FOGO LONG x10 (conf 133), 0 fills system-wide 19:50-21:55",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/hermes_constants.py",
+        "scripts/decider_run.py"
+      ],
+      "symptom": "Commit 56bd9e8d (2026-10-27 19:50) set CHASE_RATIO_SHADOW=False with comment 'Zero behavior change: the gate was log-only the whole time'. Semantics at decider_run.py:5320 are `tag = 'BLOCK' if not CHASE_RATIO_SHADOW else 'SHADOW'` \u2014 False turns the gate LIVE. 10 consecutive [CHASE-RATIO-BLOCK] kills of FOGO LONG (conf 133, setup n=170 WR=44%, last gate before brain) and 0 fills system-wide between 19:50 and the fix at 21:55. #188's own analysis says enforcing would COST $0.29 (criteria failed: 9 trail-winner blocks, negative counterfactual) \u2014 i.e. intended end-state was log-only=True.",
+      "root_cause": "flag semantics inverted in the auditor's head: it 'reverted' an enforcement it believed existed, but the pre-state was already shadow(True); setting False ENABLED the gate while the comment claimed no behavior change",
+      "fix": "CHASE_RATIO_SHADOW restored to True with dated correction comment (BUG-068 block in hermes_constants.py); semantics documented inline: True=SHADOW(log), False=BLOCK. Suggest: any future flag flip must quote the consumer line proving the direction.",
+      "verified_by": "main session: git log -S showed True->False at 56bd9e8d; decider_run:5320 semantics; 10 block lines 19:50-21:55; 0 fills since 19:50; fresh import prints True",
+      "date_found": "2026-10-27",
+      "date_fixed": "2026-10-27",
+      "found_by": "main-session",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
