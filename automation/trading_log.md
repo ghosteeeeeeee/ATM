@@ -16199,3 +16199,24 @@ Detail: CAKE bb-bounce-v2-long+ LONG trail_arm_timeout '-$0.03' (-0.82%)
 **Open Questions:**
 - 24h -$0.84 / 7d -$1.02 still red
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28); habitat ledger #170 shows 87% of 30d habitat blocked
+
+## 2026-10-27 00:28 UTC Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** '-$0.23' (WR: 0.0%) | 24h: 28T 11W 39.3% '-$1.17' | 7d 141T 44.7% '-$1.17' | **size-reduce: file absent → 1.0x**
+
+Detail: ZORA volume-buildup- SHORT cut-loser-CL-T1 '-$0.11' (-2.93%) / AERO breakout-pullback-+warrior-sr-confirm- SHORT cut-loser-CL-T1 '-$0.12' (-3.10%) — both bracketed, both cut by CL-T1, no bracket failures
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 2/28 = 7.1% (<40%); dominant closes = ugb_pt (8T +$0.14), profit-monster-trail (5T +$0.19); worst = hard_max_loss (4T -$0.69, expected 3-5% account loss at leverage)
+- Kill check: bb-bounce-v2-long+ 3T 0W 24h meets bar but 14d all-regime loss already flagged for CEO (13:28, packet complete, habitat 87% blocked) — no duplicate flag, no kill without CEO approval; pump-chain- n=2 <3; others n=1
+- Streak: 22 -0.03, 23 -0.23 → 2 consecutive negative hours, trigger at 3 not fired
+- Frequency 2/hr — not overtrading
+- 1 open bracketed: BANANA bb-squeeze+ LONG (SL 3.3325 / TP 3.4146)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h -$1.17 / 7d -$1.17 red; volume-buildup- worst 24h (-$0.35, 7T 29% WR) — worth monitoring but n<kill bar
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28); waiver lapse ~00:00Z — next run verify 0 band opens (audit #171)
