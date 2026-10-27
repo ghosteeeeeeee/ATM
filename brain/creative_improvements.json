@@ -9665,5 +9665,31 @@
     "status": "measured-monitor",
     "risk": "low",
     "review": "bug_hunter subagent review: 1 HIGH off-by-one fixed mid-run; token-case/sign/lookahead/leak clean; selfcheck PASS post-fix"
+  },
+  {
+    "date": "2026-10-27T22:50:00Z",
+    "idea": "CHASE-MOVE coverage-vs-edge measurement (run #190, analysis only)",
+    "rationale": "Chop-bleed steer expects entry gates to move 92.5% KPI. Measured #188 soak coverage: entry_price vs last closed 5m close, 14d n=301.",
+    "findings": "fires on 10/141 unarmed losers (7.1%, saves $1.00) + 5/130 winners (costs $0.32) = net +$0.68/14d; unarmed move p75=+0.098% = bleed is NO-move chop not chase; thr sweep 0.20/0.30/0.40/0.50 monotonic.",
+    "implication": "Pre-register Nov 10 flip review: judge gate on own counterfactual (z=-3.49), NOT on KPI movement — 7% coverage cannot move a 92% dollar-share KPI.",
+    "status": "measured",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T22:50:00Z",
+    "idea": "Impulse floor REJECTED-WITH-DATA (block direction-signed 15m move < 0.15%, from creative #4433)",
+    "rationale": "No-momentum entries cannot arm trail = dead side of enterable window; CHASE-RATIO/MOVE cover the chase side.",
+    "findings": "14d BLOCKED n=154 WR45.5% -$2.29 vs KEPT n=147 WR40.8% -$0.55 — blocked WR HIGHER than kept; kills 70/130 winners (54% >> 20% bar); bins non-monotonic ([-0.15,0) 54.5% best, [0.15,0.30) 34.0% worst = opposite of theory); shallow -$0.015/trade.",
+    "verdict": "FAILS all house bars. Logged so no future run re-proposes a blanket impulse floor.",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-10-27T22:50:00Z",
+    "idea": "Metadata-only no-momentum census as next chop-bleed lever (pre-registered)",
+    "rationale": "Candle-based candidates failed (impulse) or under-cover (CHASE-MOVE 7%). _signal_metadata already carries detect-time features: momentum_state, momentum_score, volume_spike, speed_percentile, rsi_drift — zero join cost, stamped at detect = no lookahead.",
+    "plan": "30d unarmed losers vs armed winners, each metadata feature as single-variable block; ship bar = 30d same-sign AND p<0.05 AND winner-kill <20% AND n>=20/cell AND not already in constants (search first). One variable at a time.",
+    "status": "pre-registered",
+    "risk": "low (measurement only)"
   }
 ]

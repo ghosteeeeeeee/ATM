@@ -1,131 +1,137 @@
 {
-  "timestamp": "2026-10-27T20:43:41Z",
-  "run": 189,
+  "timestamp": "2026-10-27T22:50:00Z",
+  "run": "brain_auditor #190",
   "session_brain_stats": {
-    "queries": 3,
-    "top_topics": [
-      "chop entry quality momentum filter",
-      "new signal idea improvement strategy",
-      "losing money bleeding losing"
-    ],
-    "note": "no new unimplemented ideas surfaced beyond owned items"
+    "queries_run": 3,
+    "top_topics": ["wrong-side trading philosophy", "entry quality / chop filters", "signal improvement not implemented"],
+    "new_actionable_insights": "none — recurring topics all already dispositioned in prior runs"
   },
   "trade_summary_24h": {
-    "trades": 21,
-    "wr": 66.7,
-    "pnl_usdt": 0.39,
-    "today": "17T 76.5% +0.62 GREEN",
-    "7d": "141T 51.1% -0.41",
-    "14d": "303T 42.9% -2.88",
-    "30d": "737T 44.5% -3.40",
-    "armed_7d": "81T 84.0% +4.26",
-    "unarmed_7d": "60T 6.7% -4.67",
-    "trail14": "126T 88.1% +8.95 (incl ugb_pt)",
-    "chop14": "149T 3.4% -11.63",
-    "chop_bleed": {
-      "7d": "92.5% dollar (52/64)",
-      "14d": "86.7%",
-      "30d": "81.4%"
-    }
+    "trades": 19, "wins": 13, "wr_pct": 68.4, "pnl_usdt": 0.39, "state": "GREEN (6th+ green window)",
+    "today": {"trades": 17, "wins": 13, "pnl_usdt": 0.62},
+    "d7": {"trades": 139, "wins": 71, "wr_pct": 51.1, "pnl_usdt": -0.47},
+    "d14": {"trades": 301, "wins": 130, "pnl_usdt": -2.84},
+    "d30": {"trades": 735, "wins": 328, "pnl_usdt": -3.31},
+    "armed_7d": {"trades": 81, "wr_pct": 84.0, "pnl_usdt": 4.26},
+    "unarmed_7d": {"trades": 58, "wr_pct": 5.2, "pnl_usdt": -4.73},
+    "chop_bleed_dollar_share": {"d7": "92.5% ($4.81/$5.20)", "d14": "87.4%", "d30": "81.6%"},
+    "trail_vs_chop_14d": "armed/trail 186T 67.2% +$7.50 vs unarmed/chop 114T 4.4% -$10.34"
   },
   "shadow_analysis": {
-    "oscillator": "FROZEN+ARCHIVED 2026-10-27 (fossil 24,598 rows, actual_outcome null) — pre-live evidence only",
-    "contrarian": "join fresh 2026-10-27T18:31Z, 651 decided, flip_wr 46.7%; pump-chain- flip would-win 64.6% (226/350) STABLE — flip LIVE 15:27Z (CONTRARIAN-LIVE logs firing, 0 closed flip trades yet); btc-pump-rider+ 26% do-not-flip",
-    "wyckoff": "345 rows, PENDING outcome join Nov 15 — no answer",
-    "floor_admit": "join shipped 10-25: floor_only 664 @47.9% vs always_admit 73 @38.4%, fisher p=0.138 directional not significant; raw still writing (2,263 rows 20:20Z)",
-    "rr_shadow": "ORPHANED (mtime 10-04, no producer) — do not cite",
-    "shadow_trader": "29,527 signals / 28,781 closed; CONFLUENCE-EXPIRY 12,629 @48% justify; CTX-GATE 1,138 @49%; exit A/B pm_trail +4,207 vs hard_max -6,130 vs rr_engine -1,419",
-    "overall": "3/6 answerable (contrarian live+joined, floor joined, shadow_trader); oscillator fossil, wyckoff pending, rr orphaned"
+    "oscillator": "FROZEN — archived as data/archive/oscillator_shadow.json.fossil-20261027; no live answer",
+    "contrarian": "join 2026-10-27T18:31Z: 651 decided, flip WR 46.7%; pump-chain- 64.6% n=350 STABLE (flip LIVE 15:27Z, 0 closed flip trades yet); btc-pump-rider+ 26.0% do-not-flip. NOTE: no systemd timer for outcome join — it is agent-run, so 18:31Z staleness is expected, not a failure",
+    "wyckoff": "345 rows PENDING outcome join (Nov 15)",
+    "floor_admit": "join 2026-10-25: floor_only 47.9% (n=664) vs always_admit 38.4% (n=73), fisher p=0.138 directional not significant; verdict COLLECT",
+    "rr_shadow": "ORPHANED (mtime 24d, no producer) — do not cite",
+    "shadow_trader": "29,827 signals / 29,103 closed. Gates: CONFLUENCE-EXPIRY 12,684 @48%, CTX-GATE 1,161 @48%, BTC-CRASH 151 @34% — justified. Exit A/B: pm_trail +$4,249 dominant vs hard_max -$6,155 vs rr_engine -$1,451 = trail-or-nothing reconfirmed",
+    "overall": "3/6 answerable (contrarian, floor, shadow_trader) — all three used this run"
   },
-  "drift_findings": [],
-  "recurring_problems": [
+  "drift_findings": [
     {
-      "item": "chop-bleed KPI 92.5% 3rd consecutive cycle >=92% gate",
-      "status": "response = CHASE-MOVE shadow gate shipped #188 (soak to 2026-11-10); 0 fires yet (0 entries since ship)"
+      "severity": "RESOLVED-BY-MAIN-SESSION",
+      "finding": "CURRENT.md #189 recorded 'CHASE_RATIO_SHADOW=False (revert held)' as PASS — that state was a LIVE BLOCK (BUG-068). Main session restored True at 21:52-21:55 (commit f96a1e2c). Current: True = log-only, correct.",
+      "impact": "Accidental live CHASE-RATIO block killed FOGO LONG 10 cycles 21:45-21:49 (10 log lines first-ever BLOCK tags); FOGO counterfactual 21:45->22:40 = -0.31% -> block cost $0 (lucky, not designed). '0 fills system-wide 19:50-21:55' attribution only FOGO-evidenced; quiet market (0-1T/hr) is a confounder.",
+      "action": "CURRENT.md corrected this run. Adopted main-session rule: flag flips must quote the consumer line (decider_run:5320) proving direction BEFORE setting."
     },
     {
-      "item": "armed-but-giveback: 14d armed losers 37T -1.77 avg mfe 1.21, atr_sl_hit 21T -1.25",
-      "status": "OWNED — escalation #17 D=0.20 post-arm trail floor verdict PASS, CEO GO pending; ATR_SL_MIN_ACCEL floor = CEO-protected, do not re-propose"
-    }
+      "severity": "MED-SIDE-FIND",
+      "finding": "Uncommitted parallel work in working tree: scripts/shadow_disposition.py (+170 lines threshold_eval) + config/hermes-shadow-disposition.{service,timer} weekly->daily, docstring labeled 'brain_auditor 2026-10-27 run #190' with code-review notes. No kanban #190 entry existed before mine.",
+      "action": "NOT touched, NOT committed (would sweep another session's in-flight work). Reconcile next run: if still uncommitted at #191, ask main session whether to land it."
+    },
+    {"severity": "LOW", "finding": "signals.log (373MB) contains 0 CHASE-* lines because decider log() writes to logs/pipeline.log (hermes_log.FP) — signals.log is a dead alias for these tags. Grep pipeline.log for gate lines."},
+    {"severity": "LOW-INFO", "finding": "entry_regime_4h 0/713 and trades.regime 674/674 NEUTRAL (from #189) still open — zero-variance split axes, audit_gate_unfreeze prints empty tables."}
+  ],
+  "recurring_problems": [
+    "chop-bleed KPI >=92% for 4th cycle (age=7) — entry quality, brain_auditor owned. This run's answer: shipped levers cannot move it (see creative #1 coverage measurement); no candidate filter passed bars (see creative #2 rejection). Honest status: KPI will likely stay hot; next lever = metadata-only no-momentum census (creative #3).",
+    "armed vs unarmed split stable: 84% vs 5% WR — the whole book is an arming problem, unchanged narrative, no new lever this run."
   ],
   "missing_implementations": [
-    {
-      "item": "wyckoff_shadow outcome join",
-      "due": "Nov 15"
-    }
+    "contrarian/floor outcome joins have no systemd timer (agent-run only) — join staleness will keep confusing run reports until a timer exists. Proposed: hermes-outcome-join.timer, NOT shipped this run.",
+    "wyckoff outcome join still unbuilt (Nov 15 pending)."
   ],
   "creative_improvements": [
     {
-      "idea": "Arm-timeout forward test (brain/analysis/arm_timeout_forward_2026-10-27.py, selfcheck PASS)",
-      "verdict": "pre-reg bar (>=40% at BOTH 14d and 30d) NOT met -> MONITOR, no timeout change this run",
-      "pre_registered": "re-measure pc+ when 14d cuts n>=20 AND arm60>=45% -> then full trail-sim counterfactual before any 45->60m change",
-      "category": "exit timing defensive check",
-      "status": "measured-monitor",
-      "risk": "low",
-      "findings": "7d 36.8% / 14d 31.0% / 30d 40.5% would arm within 60m of the cut (candle-close-strict horizon after bug_hunter off-by-one fix: ts+60<=horizon; pre-fix 14d 34.5% / 30d 42.9%). Family split: bb-bounce TAT-C cuts VALIDATED (1/7 = 14% forward-arm, <25% bar); pump-chain+ 45m timeout hot (30d 10/21 arm60, 10/21 arm30; 14d 5/13) but cut cohort NOT bleeding (30d exits +0.30).",
-      "review": "bug_hunter subagent review: 1 HIGH off-by-one fixed mid-run (candle close admitted past horizon), token-case/sign/lookahead/leak checks clean; selfcheck PASS post-fix"
+      "date": "2026-10-27T22:50:00Z",
+      "idea": "CHASE-MOVE coverage-vs-edge measurement (shipped as analysis, no code change)",
+      "rationale": "Chop-bleed steer expects entry-quality gates to move the 92.5% KPI. Measured what the #188 soak actually covers: entry_price vs last closed 5m close, 14d all 301 trades.",
+      "findings": "Gate fires on 10/141 unarmed losers (7.1%, saves $1.00) and 5/130 winners (costs $0.32) = net +$0.68/14d. Threshold sweep 0.20/0.30/0.40/0.50 monotonic tradeoff. Unarmed move p75=+0.098% = bleed is mostly NO-move chop, not chase.",
+      "implication": "Pre-register for Nov 10 flip review: judge CHASE-MOVE on its own counterfactual (z=-3.49 edge), NOT on chop-bleed KPI movement — 7% coverage cannot move a 92% dollar-share KPI.",
+      "status": "measured",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-27T22:50:00Z",
+      "idea": "Impulse floor REJECTED-WITH-DATA: block entries when direction-signed 15m move < 0.15% (idea from creative_improvements #4433 'impulse gate')",
+      "rationale": "Theory: no-momentum entries cannot arm trail -> the dead side of the enterable window (CHASE-RATIO/CHASE-MOVE cover the chase side).",
+      "findings": "14d: BLOCKED n=154 WR 45.5% pnl -$2.29 vs KEPT n=147 WR 40.8% pnl -$0.55 — blocked cohort has HIGHER WR than kept. Kills 70/130 winners = 54% >> 20% winner-kill bar. Bins non-monotonic ([-0.15,0) = 54.5% WR best bin, [0.15,0.30) = 34.0% WR worst — opposite of theory). Shallow -$0.015/trade.",
+      "verdict": "FAILS all house bars (winner-kill, monotonicity, effect size). Logged so no future run re-proposes a blanket impulse floor.",
+      "status": "rejected",
+      "risk": "n/a"
+    },
+    {
+      "date": "2026-10-27T22:50:00Z",
+      "idea": "Metadata-only no-momentum census (zero candle joins) as the next chop-bleed entry-quality lever",
+      "rationale": "Candle-based candidates failed (impulse) or under-cover (CHASE-MOVE 7%). But _signal_metadata already carries detection-time features: momentum_state, momentum_score, volume_spike, speed_percentile, momentum_state — zero join cost, no lookahead (all stamped at detect).",
+      "plan": "Pre-registered: for 30d unarmed losers vs armed winners, test each metadata feature as a single-variable block; ship bar = 30d same-sign AND p<0.05 AND winner-kill <20% AND n>=20 per cell AND not already covered by an existing filter (search constants first). One variable at a time.",
+      "status": "pre-registered",
+      "risk": "low (measurement only)"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "run": 188,
-      "change": "CHASE_RATIO_SHADOW True->False (pre-reg revert)",
-      "verified": "PASS — constant = False, 0 new CHASE-RATIO lines"
+      "run": "#189",
+      "change": "arm_timeout_forward_2026-10-27.py shipped (analysis only, no behavior)",
+      "status": "NOT re-run this run (no edits since; --selfcheck PASS last run). Still MONITOR."
     },
     {
-      "run": 188,
-      "change": "CHASE_MOVE_SHADOW=True / MAX_PCT=0.30 shadow gate in decider_run.py",
-      "verified": "PASS — code present (decider_run.py:5330-5377), py_compile OK, module-level sqlite3/time/log resolvable in run() scope (NameError would have been swallowed by the try/except — checked via AST), pre_entry_momentum selfcheck PASS; 0 [CHASE-MOVE-SHADOW] lines = correct-by-traffic (0 trades opened since 19:47Z ship)"
+      "run": "#188",
+      "change": "CHASE_RATIO_SHADOW True->False ('revert')",
+      "status": "REGRESSION (BUG-068) — False = LIVE BLOCK not log-only. Caught by main session, restored True 21:55. Cost: $0 (FOGO -0.31% counterfactual). Process fix adopted: quote consumer line before flag flips."
     },
     {
-      "run": 188,
-      "change": "RSI 45-55 dead-band REJECTED-WITH-DATA",
-      "verified": "PASS — not re-proposed this run"
-    },
-    {
-      "run": 187,
-      "change": "MFE backfill + arm-rate denominator amendment",
-      "verified": "PASS — 7d mfe NULL 1/141; chop-bleed reproduces 92.5%"
+      "run": "#188",
+      "change": "CHASE_MOVE_SHADOW=True / CHASE_MOVE_MAX_PCT=0.30 shipped",
+      "status": "LIVE SHADOW, 0 fires — now verified against actual traffic (1 trade opened post-fix, gate evaluated, no fire; candles_5m fresh 22:30). Coverage measured this run: 7% of bleed (creative #1). Flip review 2026-11-10."
     }
   ],
-  "watchdog_steer_disposition": [
-    "chop-bleed 92.5% 3rd cycle -> entry-quality: CHASE-MOVE soak is the shipped response (#188); this run adds the defensive exit check (arm-timeout forward test) as MONITOR",
-    "pump-chain+ advisory 19T -0.41 7d -> re-measured 30d 88T 39.8% +1.77 -> NO-KILL stands",
-    "CHIP LONG pick -> AI_TRADER_ENABLED=False, watchlist only, no action"
-  ],
-  "tripwires": [
-    {
-      "name": "LONG arm-rate gap (#180)",
-      "state": "NOT TRIPPED — 7d LONG arm 56.4% (53/94), SHORT 59.6% (28/47)"
-    },
-    {
-      "name": "chop-bleed route-reopen (#183)",
-      "state": "NOT TRIPPED — needs <70% x2 runs, now 92.5%"
-    }
-  ],
-  "losing_autopsy": {
-    "method": "recovery_replay.py adverse-first, selfcheck PASS",
-    "window_48h": "n=20 = 3 never-adverse / 14 recovered-after-adverse / 3 NEVER (AERO -0.12 cut-loser, ICP -0.09, CC -0.07 — all waiver-era shorts, class closed 00:00Z)",
-    "verdict": "WRONG-SIDE REFUTED 114th consecutive run (#61 p=0.116, #84 t=-0.04)"
+  "autopsy": {
+    "method": "brain/analysis/recovery_replay.py adverse-first (selfcheck ASSERT PASS this run)",
+    "d48": "n=20 = 3 never-adverse / 14 recovered-after-adverse / 3 NEVER (AERO, ICP, CC — waiver-era shorts, class closed) -> WRONG-SIDE REFUTED 115th consecutive run (#61 p=0.116, #84 t=-0.04)",
+    "d14_context": "n=161 = 35 never-adverse / 101 recovered / 25 NEVER (15.5% structural never-recover, consistent with 17.5% baseline)"
   },
-  "signal_deep_dive": {
-    "targets_14d_sub50_n15": [
-      "bb-bounce-v2-long+ 37T 35.1% -1.11 — OWNED (TAT-C live, MFE-CUT fk-FAIL, kill = CEO)",
-      "ai-trader+ 17T 35.3% -0.68 — OWNED (AI_TRADER_ENABLED=False, 0 opens since)",
-      "pump-chain- 21T 14.3% -0.10 — OWNED (contrarian flip LIVE today 15:27Z)",
-      "pump-chain+ 40T 40.0% -0.09 — OWNED (NO-KILL 30d +1.77, CONF_FLOOR CEO)"
-    ],
-    "new_targets": 0
+  "deep_dive": {
+    "new_targets": 0,
+    "detail": "7d n>=5 negative families all OWNED: pump-chain+ 18T -$0.41 (NO-KILL 30d +1.77, CONF_FLOOR CEO), bb-bounce-v2-long+ 18T -$0.36 (TAT-C+MFE-CUT live, kill=CEO), continuation+ 6T -$0.34 (n<10 COLLECT), ai-trader-pending 6T (AI_TRADER off), continuum-trend+ 5T (open BTC trade is this family)."
   },
-  "last_run_verify_188": "ALL PASS (constants diff EMPTY via git status, CEO_PROTECTED 13/13, session lock absent, size-reduce absent=1.0x, gate_leak_census selfcheck PASS, recovery_replay selfcheck PASS, kill flags correct, Tracebacks 5 all Oct-11 0 new, waiver 0 SHORT opens today)",
-  "readiness": "0 open flat = CORRECT. Regime sources disagree (15m NEUTRAL vs 4h SHORT_BIAS, continuum ABOVE EMA300 STRONG_UP, vol LOW, wyckoff DISTRIBUTION/CALM). No fresh mid-band entries; structure-qualified only; trail-family first; size 1.0x.",
+  "tripwires": {
+    "arm_rate": "NOT TRIPPED — 7d LONG 57.6% (92T) / SHORT 59.6% (47T), both above bars",
+    "chop_bleed_route_reopen": "NOT TRIPPED — 92.5% (needs <70% x2 runs)",
+    "stable_rsi_straddle": "n=1 <15 COLLECT",
+    "ugb_vs_atr_race": "14d ugb_pt 14T — race-leak pre-reg n>=5 not yet at threshold"
+  },
+  "last_run_verify_189": {
+    "session_lock": "absent OK",
+    "constants_git_diff": "EMPTY OK",
+    "ceo_protected": "13/13 byte-identical vs HEAD OK",
+    "size_reduce": "absent = 1.0x OK",
+    "tracebacks": "5 total in pipeline.log, latest Oct-25 self-healing test noise — 0 new OK",
+    "recovery_replay_selfcheck": "ASSERT PASS OK",
+    "kill_flags": "no flag changes this run; auto_1hr 22:30 confirms none needed",
+    "note": "#189's 'CHASE_RATIO_SHADOW=False PASS' line was WRONG-STATE — corrected in CURRENT.md this run (drift finding)."
+  },
+  "readiness": {
+    "open": "1: BTC LONG #16450 continuum-trend+ @80950 opened 21:54:38 (first fill post-BUG-068-fix), SL 80007 TP 82164, meta_rsi 30.9, ~flat",
+    "watchdog": "HOLD — thesis intact (1m above EMA300 since 10:44); invalidation = sustained 15-30m close below EMA300, not 4h SHORT_BIAS label",
+    "regime": "15m LONG_BIAS vs 4h SHORT_BIAS (split), continuum ABOVE, vol LOW, auto_trader CHOP",
+    "guidance": "Hold #16450 to its condition; structure-qualified entries only; trail-family first; size 1.0x; no mid-band adds"
+  },
   "next_actions": [
-    "WATCH: [CHASE-MOVE-SHADOW] fires in pipeline.log; flip review 2026-11-10 (>=14d soak, 0 trail-winner blocks, net counterfactual positive)",
-    "MONITOR: arm_timeout_forward re-eval — pump-chain+ cuts n>=20@14d AND arm60>=45% before any timeout change",
-    "WATCH: contrarian pc- flip first closed trades (flip live 15:27Z, n=0 so far)",
-    "CEO queue unchanged: CONF_FLOOR fk definition pin + raw-confidence column pin; 1m vs 5m RSI tf-authority; D=0.20 post-arm floor GO; bb-bounce keep-vs-disable; TAT flip",
-    "Nov 1: self-healing SKIP verify + coin_regime re-measure; Nov 3: coupled-SL trial disposition; Nov 15: floor/wyckoff joins",
-    "wyckoff outcome join still unbuilt (345 rows unused)"
+    "Nov 10: CHASE-MOVE flip review — judge on own counterfactual not KPI (pre-reg this run)",
+    "Next run: reconcile uncommitted shadow_disposition threshold_eval work (MED side-find)",
+    "Run metadata no-momentum census (creative #3) when candle joins are unavailable",
+    "WATCH: first closed contrarian pc- flip trades (flip live 15:27Z, 0 closed)",
+    "Nov 1 self-healing SKIP + coin_regime / Nov 3 coupled-SL disposition / Nov 15 floor+wyckoff joins",
+    "CEO: CONF_FLOOR fk pin + tf-authority + D=0.20 GO + bb-bounce keep-vs-disable + TAT flip"
   ]
 }

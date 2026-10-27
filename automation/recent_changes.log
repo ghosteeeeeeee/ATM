@@ -5349,3 +5349,5 @@ BY: brain_auditor
 BY: auto_1hr
 - [2026-10-27 22:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 19T 13W 68.4% '+$0.39' GREEN | 7d 139T 50.4% '-$0.47' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h n>=3 all positive-WR) | atr_sl_hit 1/19=5.3% under 40% | no neg streak (19:00 +0.04, 17:00 +0.02, 16:00 +0.16) | frequency 0/hr | 1 open bracketed BTC continuum-trend+ | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-27 22:46 UTC] brain_auditor: AUDIT RUN #190 — 0 config changes (constants EMPTY, protected 13/13, session lock absent) — HEADLINE: CHASE-MOVE coverage measured (7% of 14d unarmed bleed, net '+0.68') + BUG-068 verified fixed (FOGO counterfactual '-0.31%' = $0 cost) + impulse floor REJECTED-WITH-DATA (kills 54% of winners) — 24h 19T 68.4% '+0.39' GREEN | 7d 139T 51.1% '-0.47' | armed 7d 81T 84.0% '+4.26' vs unarmed 58T '-4.73' | wrong-side REFUTED 115th | 1 open BTC #16450 HOLD
+BY: brain_auditor
