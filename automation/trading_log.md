@@ -16501,3 +16501,23 @@ BY: upgrade_implementer
 **Open Questions:**
 - 24h 44.4% WR red ('-$0.67'), 7d '-$0.33' — bleed shrinking, no single killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day session)
+
+## 2026-10-27 14:29 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.21 (WR: 0%) | 24h: 23T 10W 43.5% '-$0.83' | 7d 139T 67W 48.2% '-$1.10' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last close: DOT continuation+ LONG atr_sl_hit -$0.21 (-4.83%) — single loss, expected account loss at leverage from hard SL
+- atr_sl_hit 1/23 = 4.3% (<40%) — SL not too tight
+- Kill check: no 0%WR signal with n>=3 last hour (n=1); 24h n>=3 signals all positive-WR (volume-buildup- 4T 50% '-$0.22', pump-chain+ 6T 50% '-$0.18', bb-squeeze+ 3T 33% '-$0.01') — monitor only
+- Streak: 14:00 '-$0.21', 13:00 quiet, 12:00 '+$0.11', 11:00 '-$0.01' — no 3 consecutive negative hours
+- Frequency 1/hr — not overtrading
+- 1 open bracketed LONG: BTC continuum-osc+ (SL 79117.17 / TP 81526.83) — explicit levels present
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h 43.5% WR red ('-$0.83'), 7d '-$1.10' — bleed widened slightly, no single killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day)
