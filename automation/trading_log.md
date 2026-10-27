@@ -16604,3 +16604,24 @@ BY: upgrade_implementer
 - 24h PnL flipped GREEN '+$0.24' (60% WR) from '-$0.11' at 17:28; 7d '-$0.45' improving — no killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day)
 - ARM-RATE TRIPWIRE flag with CEO (run 2, brain_auditor 15:55) — advisory only, no auto-config
+
+## 2026-10-27 19:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.03 (WR: 100%) | 24h: 20T 13W 65.0% '+$0.38' (green) | 7d 140T 71W 50.7% '-$0.42' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- ENA pump-chain+ LONG closed ugb_pt +1.26% — winner, clean entry (24h winners avg MAE 0.28%, 10/13 under 0.5%)
+- atr_sl_hit 1/20 = 5% (<40%) — SL not too tight; dominant closes = profit-monster-trail (8T +$0.49), ugb_pt (4T +$0.30); trail_arm_timeout 3T '-$0.08' still the only persistent small bleed — monitor
+- Kill check: last-hour n=1 (win); 24h n>=3 signals all positive-WR (bb-squeeze+ 5T 60% '+$0.37', pump-chain+ 3T 100% '+$0.28', volume-buildup- 3T 66.7% '-$0.05' but WR healthy) — monitor only
+- Streak: 19:00 '+$0.03', 17:00 '+$0.02', 16:00 '+$0.16' — 4 consecutive positive hours (18:00 quiet)
+- Frequency 1/hr — not overtrading
+- 1 open bracketed SHORT: WCT volume-buildup- (SL 0.03705814 / TP 0.03548678) — explicit levels present
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h now '+$0.38' (65% WR) best of the day; 7d '-$0.42' improving — no killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day)
+- ARM-RATE TRIPWIRE flag with CEO (run 2, brain_auditor 15:55) — advisory only, no auto-config
