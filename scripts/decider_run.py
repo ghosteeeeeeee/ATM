@@ -5328,6 +5328,56 @@ def run(dry_run=False):
         except Exception as _cr_e:
             log(f'  [CHASE-RATIO] err {token}: {_cr_e}')
 
+        # ── CHASE-MOVE shadow gate (brain_auditor 2026-10-27, run #188) ────
+        # Direction-signed % price has already travelled past the last completed
+        # 5m close BEFORE we enter. >0.3% = the move happened before we arrived
+        # (30d 60T 23.3%WR -$3.31, z=-3.49; 4.3% of winners; novel vs SPIKE +
+        # CHASE_RATIO). Log-only until soak review 2026-11-10 (CEO D2).
+        try:
+            from hermes_constants import CHASE_MOVE_SHADOW, CHASE_MOVE_MAX_PCT
+            _cm_now = int(time.time())
+            _cm_conn = sqlite3.connect(CANDLES_DB, timeout=5)
+            try:
+                _cm_last5 = _cm_conn.execute(
+                    "SELECT close FROM candles_5m WHERE token=? AND is_closed=1 AND ts<? "
+                    "ORDER BY ts DESC LIMIT 1", (token, _cm_now)).fetchone()
+                if _cm_last5 is None:
+                    _cm_last5 = _cm_conn.execute(
+                        "SELECT close FROM candles_5m WHERE token=? AND is_closed=1 AND ts<? "
+                        "ORDER BY ts DESC LIMIT 1", (token.upper(), _cm_now)).fetchone()
+                _cm_px = _cm_conn.execute(
+                    "SELECT close FROM candles_1m WHERE token=? AND is_closed=1 "
+                    "ORDER BY ts DESC LIMIT 1", (token,)).fetchone()
+                if _cm_px is None:
+                    _cm_px = _cm_conn.execute(
+                        "SELECT close FROM candles_1m WHERE token=? AND is_closed=1 "
+                        "ORDER BY ts DESC LIMIT 1", (token.upper(),)).fetchone()
+            finally:
+                _cm_conn.close()
+            # live price preferred: a chase move completes inside one 1m bar, so a
+            # stale 1m close under-reads it. get_current_price is cached.
+            try:
+                _cm_live = get_current_price(token)
+                if _cm_live:
+                    _cm_px = (_cm_live,)
+            except Exception:
+                pass
+            if _cm_last5 and _cm_px and float(_cm_last5[0]) > 0:
+                _cm_sgn = 1 if direction.upper() == 'LONG' else -1
+                _cm_move = _cm_sgn * (float(_cm_px[0]) - float(_cm_last5[0])) / float(_cm_last5[0]) * 100
+                if _cm_move >= CHASE_MOVE_MAX_PCT:
+                    _cm_tag = 'SHADOW' if CHASE_MOVE_SHADOW else 'BLOCK'
+                    log(f'  [CHASE-MOVE-{_cm_tag}] {token} {direction} move={_cm_move:.3f}% '
+                        f'>= {CHASE_MOVE_MAX_PCT}% past last 5m close')
+                    if not CHASE_MOVE_SHADOW:
+                        if sig_id:
+                            release_signal_claim(sig_id, 'SKIPPED',
+                                reason='post-claim block: CHASE-MOVE entry already extended')
+                        skipped += 1
+                        continue
+        except Exception as _cm_e:
+            log(f'  [CHASE-MOVE] err {token}: {_cm_e}')
+
         # ── pump-chain+ MAX_ENTRY_GAP filter: block chasing entries ──────────
         # 14d: gap>1.5% pump-chain+ LONG = 6T 33.3%WR -$0.43. Blocks 4 losers,2 marginal winners.
         # FIX 2026-10-11: bull structure override — gap relaxed to 3.0% when BTC score>80+STRONG_POS.

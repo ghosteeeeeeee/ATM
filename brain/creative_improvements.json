@@ -9626,5 +9626,32 @@
     "category": "monitoring",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T19:46:54Z",
+    "idea": "CHASE-MOVE shadow gate: block (shadow) entries already >=0.3% past the last completed 5m close in the trade direction",
+    "rationale": "the move already happened before we arrived. 30d 61T 23.0%WR -$3.31 vs rest 46.7% (z=-3.49); 14d z=-2.09; 7d same sign; 4.3% of winners blocked; within-EXTREME z=-2.62 / within-NORMAL z=-2.37 / excl pump-chain- z=-2.50 (not a confound); novel vs SPIKE+CHASE_RATIO = 33T 24.2% -$1.56 with 2.5% winners blocked",
+    "expected_impact": "+$3.31/30d counterfactual if enforced; 14d shadow soak first",
+    "category": "entry sniper",
+    "status": "SHIPPED-SHADOW",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T19:46:54Z",
+    "idea": "Per-signal contrarian flip registry instead of blanket flip",
+    "rationale": "flip WR is 64.5% on pump-chain- but 26.0% on btc-pump-rider+ — an average (46.7%) hides both tails. Registry keyed by signal source, each with its own n>=20 / p<0.05 bar",
+    "expected_impact": "keeps the one profitable flip, prevents the negative one",
+    "category": "direction",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T19:46:54Z",
+    "idea": "CONF_FLOOR fk-definition ledger: pin the fk definition IN WRITING before, not after, the ship decision",
+    "rationale": "the same blocked set passes fkA-literal (16.2%) and fails fkA-family (60.9%) — the definition choice IS the decision, and it drifted 4x in one week",
+    "expected_impact": "removes the recurring re-litigation",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

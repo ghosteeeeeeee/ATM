@@ -130,11 +130,11 @@ python3 scripts/shadow_trader.py --sweep-arm --sweep-signal <signal_type> --swee
 
 | Source | Rows | Status | Answerable question |
 |---|---|---|---|
-| contrarian_shadow.jsonl | 807 | ✅ USEFUL — outcome join live (`analysis/contrarian_outcome_join.py`) | flip would-win % (pump-chain- 63.9%, OOS 64.0%) |
+| contrarian_shadow.jsonl | 923 | ✅ USEFUL — outcome join live (`analysis/contrarian_outcome_join.py`, writes `data/contrarian_outcome_join.json`, last 2026-10-27T18:31Z) — **the jsonl `classification` column is a STATIC 30d label (all 923 = LOSER, `outcome`/`would_win` null); do NOT read it as an outcome.** Outcomes live only in the join file. | flip would-win % (overall 46.7% n=651; pump-chain- 64.5% n=350; btc-pump-rider+ 26.0% n=300 → per-signal, never blanket) |
 | oscillator_shadow.json | 24,598 | 🧊 FROZEN + **ARCHIVED 2026-10-27 → data/archive/oscillator_shadow.json.fossil-20261027** — `OSCILLATOR_MULT_ENABLED=True` since Oct 1 stops writes; `actual_outcome` null on 24,598/24,598. **JSONL, not JSON array** (`json.load` crashes) | none — pre-live evidence only; use the live metadata join + weekly KPI |
-| floor_admit_shadow.jsonl | 1,778 | ⏳ PENDING JOIN — 91% admit, no outcome column | none until outcome join ships (pre-registered) |
-| wyckoff_shadow.jsonl | 298 | ⏳ PENDING JOIN — no outcome column | none until join ships |
-| rr_shadow_audit_7d.json | dict (replayed 110 / no_candles 91) | ☠️ ORPHANED — no producer script in repo, mtime 21d stale | none — do not cite as a live source |
+| floor_admit_shadow.jsonl | 2,257 | ✅ JOIN SHIPPED 2026-10-25 (`analysis/floor_admit_outcome_join.py` → `data/floor_admit_outcome_join.json`) — **was listed PENDING until run #188 found it**. floor_only 664 decided 47.9% vs always_admit 73 decided 38.4%, fisher p=0.138 (directional, not significant); blocked cohort n=0 | does floor admit beat always-admit? (directionally yes, p=0.138 not yet) |
+| wyckoff_shadow.jsonl | 345 | ⏳ PENDING JOIN — no outcome column | none until join ships |
+| rr_shadow_audit_7d.json | dict (replayed 110 / no_candles 91) | ☠️ ORPHANED — no producer script in repo, mtime 24d stale | none — do not cite as a live source |
 
 ### Shadow Data Sources (raw files):
 
@@ -152,22 +152,21 @@ print(f"Oscillator shadow: {len(osc)} entries")
 # Check: are the would_be_multipliers helping or hurting?
 # Cross-reference with actual_outcome to see if shadow predictions were correct
 
-# 2. Contrarian shadow (806 entries) — what if we flipped direction?
+# 2. Contrarian shadow — CAUTION: `classification` is a STATIC 30d label, all rows
+#    read 'LOSER'. It is NOT an outcome and counting it tells you nothing.
+#    Real outcomes: json.load('/root/.hermes/data/contrarian_outcome_join.json')
+#    → {total, flip_wr, by_signal} (runs every 15 min, timestamp in file).
 with open('/root/.hermes/data/contrarian_shadow.jsonl') as f:
     contrarian = [json.loads(line) for line in f]
-# Fields: token, signal, original_direction, contrarian_direction, 
-#         entry_price, confidence, classification (WINNER/LOSER)
-print(f"Contrarian shadow: {len(contrarian)} entries")
-# Check: how many LOSER signals would have been WINNERS if flipped?
-losers = [c for c in contrarian if c.get('classification') == 'LOSER']
-print(f"  Losers that would flip: {len(losers)}")
+print(f"Contrarian shadow (raw, static label only): {len(contrarian)} entries")
 
-# 3. Wyckoff shadow (289 entries) — Wyckoff signal predictions
+# 3. Wyckoff shadow — PENDING JOIN, no outcome column (345 entries)
 with open('/root/.hermes/data/wyckoff_shadow.jsonl') as f:
     wyckoff = [json.loads(line) for line in f]
 print(f"Wyckoff shadow: {len(wyckoff)} entries")
 
-# 4. Floor admit shadow (1717 entries)
+# 4. Floor admit shadow (2257 entries) — outcome join SHIPPED 2026-10-25:
+#    json.load('/root/.hermes/data/floor_admit_outcome_join.json') → cohorts + fisher_p
 with open('/root/.hermes/data/floor_admit_shadow.jsonl') as f:
     floor = [json.loads(line) for line in f]
 print(f"Floor admit shadow: {len(floor)} entries")

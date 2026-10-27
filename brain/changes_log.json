@@ -3119,5 +3119,27 @@
     "after": "formal_pc_no_go dispositioned, run #187 recorded, artifacts committed",
     "rationale": "17:12Z pre-reg date passed; queue carried both NO-GO language and a live CONTRARIAN_LIVE flag simultaneously — resolves the contradiction",
     "impact": "governance clarity only, zero trading behavior change"
+  },
+  {
+    "timestamp": "2026-10-27T19:46:54Z",
+    "agent": "brain_auditor",
+    "type": "kill",
+    "change": "CHASE_RATIO_SHADOW True -> False (pre-registered revert trip: 9 trail-winner blocks + negative counterfactual on full shadow window n=26)",
+    "file": "hermes_constants.py",
+    "before": "True",
+    "after": "False",
+    "rationale": "flip criteria failed: revert-if-any-trail-winner fired 9x, net counterfactual -$0.29 to enforce",
+    "impact": "zero behavior change (gate was log-only)"
+  },
+  {
+    "timestamp": "2026-10-27T19:46:54Z",
+    "agent": "brain_auditor",
+    "type": "creative",
+    "change": "NEW CHASE_MOVE_SHADOW=True / CHASE_MOVE_MAX_PCT=0.30 + [CHASE-MOVE-SHADOW] log-only gate in decider_run.py",
+    "file": "hermes_constants.py + decider_run.py",
+    "before": "n/a",
+    "after": "shadow gate added",
+    "rationale": "chop-bleed 92.5% entry-quality steer; 30d 61T 23.0%WR -$3.31 vs rest 46.7% z=-3.49, 4.3% winners blocked, confounders controlled, novel vs SPIKE+CHASE_RATIO",
+    "impact": "zero behavior now; candidate +$3.31/30d if enforced after 14d shadow (earliest 2026-11-10)"
   }
 ]

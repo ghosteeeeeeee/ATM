@@ -927,9 +927,34 @@ CHASE_EXEMPT_GAP_MAX = 8.0           # gap limit when exemption applies (was 2.0
 # direction agrees with backtest but window too short vs standard.
 # Flip criteria: ≥14d shadow + 0 trail-winner blocks + net counterfactual
 # positive. Revert if any trail winner appears in shadow logs.
-CHASE_RATIO_SHADOW = True
+# REVERTED 2026-10-27 brain_auditor run #188 — all three criteria failed on the
+# full shadow window (opens >= 2026-10-13, n=26 counterfactual blocks): 9
+# TRAIL-WINNER blocks (revert trip, incl. 5 profit-monster-trail + 2
+# atr_trail_hit) and net counterfactual NEGATIVE (blocked set net +$0.29 →
+# enforcing would COST $0.29). Only the ≥14d leg passed. Zero behavior change:
+# the gate was log-only the whole time. Re-arm as shadow only if redefined.
+CHASE_RATIO_SHADOW = False
 CHASE_RATIO_MIN_MOVE15 = 0.30        # % direction-signed 15m move must reach this
 CHASE_RATIO_MAX = 0.70               # block if |move5m| / |move15m| > this
+
+# ── Chase-Move Shadow Gate (brain_auditor 2026-10-27, run #188) ─────────────
+# The CHASE gap/z gate is LONG-only and gap-anchored (2.0%); CHASE_RATIO above
+# failed its revert bar. This is a third, orthogonal measure: how far price has
+# ALREADY travelled in the trade direction since the last completed 5m close,
+# at decision time. "The move already happened before we arrived."
+# 30d (n=728, script brain/analysis/pre_entry_momentum_2026-10-27.py, selfcheck PASS):
+#   a5>0.3% = 60T 23.3%WR -$3.31 vs rest 46.7% -$0.18 (z=-3.49, p<0.001)
+#   14d 23T 21.7% z=-2.09 | 7d 9T 44.4% same sign (n=9, weak)
+#   winners blocked 14/326 = 4.3% (<20% bar)
+#   confounders controlled: within-EXTREME z=-2.62, within-NORMAL z=-2.37,
+#   excl pump-chain- z=-2.50 → NOT a regime or signal-mix artifact
+#   threshold stable 0.2→0.5% (save 3.36/3.31/2.31/1.57, winner-block 10.4/4.3/2.1/0.9)
+#   NOVEL after removing SPIKE+CHASE_RATIO overlap: 33T 24.2% -$1.56, 8/326=2.5% winners
+# SHADOW first per CEO D2 (new gates: 14d shadow before enforce). Earliest
+# flip review 2026-11-10. Flip criteria: ≥14d shadow ∧ 0 trail-winner blocks ∧
+# net counterfactual positive. Revert if any trail winner appears.
+CHASE_MOVE_SHADOW = True
+CHASE_MOVE_MAX_PCT = 0.30            # % direction-signed move past last 5m close
 
 # ── Global Spike Filter ────────────────────────────────────────────────────
 # Block SHORT entries after recent bullish 5m candle (spike → consolidation → bad SHORT)
