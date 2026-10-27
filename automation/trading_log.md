@@ -16220,3 +16220,25 @@ Detail: ZORA volume-buildup- SHORT cut-loser-CL-T1 '-$0.11' (-2.93%) / AERO brea
 **Open Questions:**
 - 24h -$1.17 / 7d -$1.17 red; volume-buildup- worst 24h (-$0.35, 7T 29% WR) — worth monitoring but n<kill bar
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28); waiver lapse ~00:00Z — next run verify 0 band opens (audit #171)
+
+## 2026-10-27 01:28 UTC Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** '+$0.06' (WR: 50.0%) | 24h: 28T 11W 39.3% '-$1.04' | 7d 142T 44.4% '-$1.18' | **size-reduce: file absent -> 1.0x**
+
+Detail: FOGO pump-chain+ LONG ugb_pt '+$0.06' (+1.63%, MAE 0.000% — clean entry) / BANANA bb-squeeze+ LONG trail_arm_timeout '$0.00' (-0.03%, held 61min, MFE 0.285 never armed)
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 2/28 = 7.1% (<40%); dominant closes = ugb_pt (8T +$0.19), profit-monster-trail (5T +$0.19); worst = hard_max_loss (4T -$0.69, expected 3-5% account loss at leverage)
+- Kill check: no 0%WR signal with n>=3 in 24h (empty set); bb-bounce-v2-long+ now 2T 0W, below bar; pump-chain- n=2 <3 — no kill action
+- Streak: 22 '-0.03', 23 '-0.23', 0 '+0.06' -> broken, 0 consecutive negative hours (3h trigger not fired)
+- Frequency 2/hr — not overtrading
+- Entry quality: this-hour winner MAE 0.000%; 24h winner MAE max 0.853%
+- 2 open bracketed: BTC continuum-trend+ LONG (46.9min), AIXBT volume-buildup- SHORT (16.2min)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h 39.3% WR red but n=28; volume-buildup- worst (7T 2W '-$0.35'), pump-chain+ 8T 5W net '-$0.30' (big losers) — monitor, no kill bar met
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)

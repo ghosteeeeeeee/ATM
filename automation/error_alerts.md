@@ -2094,3 +2094,6 @@
 - **[INFO]**: 2 TRADE FAILED (LINK SHORT 23:17, POL SHORT 23:20) — RSI knife floor execution filter (7.8/28.2 < 35). Signals marked FAILED, no trade opened — working as designed.
 - **[INFO]**: `hermes-atr-sl-updater.timer` not-found ghost (known DEFUNCT, harmless).
 - **[INFO]**: all else clean — not paused, pipeline active (0 tracebacks/30m), 78 signals/1h, 1 open trade (ZORA SHORT 23:05), 27 closed today (44.4% WR, -1.05 USDT), 0 phantom/24h, prices newest 61s, regime SHORT_BIAS, all key timers firing.
+
+## Error Alerts — 2026-10-27 01:28 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
