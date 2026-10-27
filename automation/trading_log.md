@@ -16521,3 +16521,23 @@ BY: upgrade_implementer
 **Open Questions:**
 - 24h 43.5% WR red ('-$0.83'), 7d '-$1.10' — bleed widened slightly, no single killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day)
+
+## 2026-10-27 15:30 UTC Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: 0%) | 24h: 20T 10W 50.0% '-$0.49' | 7d 137T 67W 48.9% '-$0.97' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Quiet hour (0 closes); 24h WR recovered to 50.0% and PnL improved to '-$0.49' vs '-$0.83' at 14:29
+- atr_sl_hit 1/20 = 5% (<40%) — SL not too tight; dominant closes = profit-monster-trail (7T +$0.27), ugb_pt (3T +$0.29); worst = hard_max_loss (1T '-$0.31', expected at leverage); trail_arm_timeout 4T '-$0.14' small but persistent — monitor
+- Kill check: no 0%WR signal with n>=3 (0 trades last hour); 24h n>=3 signals all positive-WR (pump-chain+ 5T 60% '-$0.08', volume-buildup- 3T 66.7% '-$0.05', bb-squeeze+ 3T 33% '-$0.01') — monitor only
+- Streak: 14:00 '-$0.21', 13:00 quiet, 12:00 '+$0.11', 11:00 '-$0.01' — no 3 consecutive negative hours
+- Frequency 0/hr — not overtrading
+- 1 open bracketed LONG: BTC continuum-osc+ (SL 79660.96 / TP 81526.83) — explicit levels present
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d '-$0.97' still red but 24h improving; no single killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day)
