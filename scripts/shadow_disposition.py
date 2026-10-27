@@ -73,7 +73,9 @@ def _save(path, obj):
 
 def stream_source_paths(entry):
     """All brain/*.db|data/*.json[l] paths mentioned in the stream string."""
-    return re.findall(r'(?:brain|data)/[\w./-]+\.(?:db|json|jsonl)', entry.get('stream', ''))
+    # bug_hunter MED-3: alternation order matters — 'json' before 'jsonl' made every
+    # *.jsonl path resolve to *.json (permanent "missing" -> false auto-KILL after 14d).
+    return re.findall(r'(?:brain|data)/[\w./-]+\.(?:db|jsonl|json)', entry.get('stream', ''))
 
 
 def stream_livenesses(entry):
@@ -179,10 +181,18 @@ def main():
         return 1
     state = _load(STATE, {})
     now_iso = NOW.isoformat()
+    # bug_hunter MED-1: a stray non-dict entry crashed the header genexpr and the
+    # loop's e.get BEFORE the per-entry try — one bad JSON value killed the whole
+    # weekly run. Filter at load, report the skip, and keep eid assignment inside
+    # the try (eid pre-set so the except can still name the entry).
+    raw_entries = reg.get('entries') or []
+    entries = [e for e in raw_entries if isinstance(e, dict)]
+    n_nondict = len(raw_entries) - len(entries)
     report = [
         f'# Shadow disposition report — {now_iso}',
-        f"registry: {len(reg['entries'])} entries "
-        f"(open={sum(1 for e in reg['entries'] if e.get('status') == 'open')})",
+        f"registry: {len(entries)} entries "
+        f"(open={sum(1 for e in entries if e.get('status') == 'open')})"
+        + (f" | SKIPPED non-dict entries: {n_nondict}" if n_nondict else ''),
         ''
     ]
     kanban_lines = []
@@ -192,10 +202,11 @@ def main():
     problems = 0
     entry_errors = 0
 
-    for e in reg['entries']:
-        eid = e.get('id', '?')
-        st = state.setdefault(eid, {})
+    for e in entries:
+        eid = '?'
         try:
+            eid = e.get('id', '?')
+            st = state.setdefault(eid, {})
             status = e.get('status', 'open')
 
             # ── verify DONE actions stuck (regression check) ───────────────
@@ -218,7 +229,10 @@ def main():
                 if reg_sigs:
                     sig = ','.join(sorted(reg_sigs))
                     if st.get('regression_fired_for') != sig:   # dedupe (LOW-1)
-                        st['regression_fired_for'] = sig
+                        # bug_hunter MED-2: queue via pending_state — recorded only
+                        # after a successful kanban append (else the packet is
+                        # deduped away forever while the report claims otherwise)
+                        pending_state.append((eid, 'regression_fired_for', sig))
                         problems += 1
                         kanban_lines.append(
                             f'- [{now_iso}] shadow-disposition: ⚠️ REGRESSION {eid} — '
@@ -232,7 +246,8 @@ def main():
             zero_event, detail = zero_event_decision(lives, st, now_iso)
             report.append(f'- OPEN {eid}: deadline={e.get("deadline", "?")} | {detail}')
             if zero_event and not st.get('zerokill_fired'):
-                st['zerokill_fired'] = now_iso
+                # bug_hunter MED-2: queue via pending_state (append-success-only)
+                pending_state.append((eid, 'zerokill_fired', now_iso))
                 problems += 1
                 kanban_lines.append(
                     f'- [{now_iso}] shadow-disposition: 🔪 AUTO-KILL TICKET {eid} — '

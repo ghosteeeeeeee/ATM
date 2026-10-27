@@ -72,7 +72,7 @@ MAX_LEVERAGE = 5               # fallback cap
 SHADOW_TRIAL_ENABLED = True           # Master switch (see supersession note above)
 SHADOW_TRIAL_CUT_LOSER = -6.00        # Wider CUT_LOSER (was -4.00)
 SHADOW_TRIAL_ATR_SL_MAX = 4.0         # Wider ATR_SL_MAX (was 2.5)
-SHADOW_TRIAL_DIRECTION = 'LONG'       # LONG only (SHORT stays at -4.00)
+SHADOW_TRIAL_DIRECTION = 'LONG'       # arm is LONG-scoped; SHORT rides the LIVE value (-6.00 since 2026-10-27 trial)
 SHADOW_TRIAL_MIN_TRADES = 200         # Min trades per direction for review
 SHADOW_TRIAL_MIN_WR = 55.0            # Min WR to justify wider stops
 SHADOW_TRIAL_REVIEW_DAYS = 7          # Days before review
@@ -1207,7 +1207,7 @@ def _simulate_rr_engine(entry_price, direction, candles, atr_pct):
     # bug_hunter fix: remove TP (live RR engine doesn't have TP, it uses structural S/R)
     sl_pct = atr_pct * 0.8  # Tighter than ATR default (1.0x)
     # Apply floors/caps like live ATR engine
-    sl_pct = max(ATR_SL_MIN_ACCEL, min(sl_pct, ATR_SL_MAX))  # Floor 0.3%, cap 2.5%
+    sl_pct = max(ATR_SL_MIN_ACCEL, min(sl_pct, ATR_SL_MAX))  # Floor 0.3%, cap 4.0% (live ATR_SL_MAX since 2026-10-27 trial)
     
     sl_price = entry_price * (1 - sl_pct/100) if direction == 'LONG' else entry_price * (1 + sl_pct/100)
     # No TP — live RR engine exits on structural S/R break, not fixed TP

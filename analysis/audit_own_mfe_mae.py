@@ -444,7 +444,7 @@ def main():
     kill_counts('sl_init', 'mae_pk_last')
 
     # ── claim 7: leverage math ──
-    print("\n  HML max-leverage (4% acct / MAE price%):")
+    print(f"\n  HML max-leverage ({CUT_LOSER_ACCT_PCT:g}% acct / MAE price%):")
     for p in (0.5, 0.75, 0.9):
         m = q(mae_f, p)
         print(f"     MAE@p{int(p*100)}={m:.2f}% -> max lev {CUT_LOSER_ACCT_PCT/m:.1f}x")
