@@ -16417,3 +16417,8 @@ BY: upgrade_implementer
 **Open Questions:**
 - 24h 44.4% WR red (-$0.74), 7d -$0.51 — persistent small bleed, no single killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+
+## Signal Reporter — 6h run
+- No kills, no boosts. Thin volume (12 signals/24h).
+- Watch: volume-buildup- SHORT 37.5% WR -$0.32; pump-chain+ LONG 57% WR but -$0.16 net.
+- No inversions.

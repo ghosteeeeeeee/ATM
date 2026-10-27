@@ -9437,5 +9437,23 @@
     "category": "guardrail",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T09:45:00Z",
+    "idea": "btc_regime x direction census — LONG BULL_TREND is the worst LONG cell (30d 181T 44.2% -2.57) but block REJECTED: fk 44.2% >> 20% bar, effect shallow (-0.014/trade), partially signal-mix (pc+ 32T 31.3%, bb-bounce 18T 27.8%) yet rest-of-book also -0.94/131T",
+    "rationale": "Counter-intuitive: LONGs lose MOST in BULL_TREND, best in RANGING (+0.88/89T) — 'trend is friend' fails on this axis; measured so no future run re-proposes naively",
+    "expected_impact": "none shipped — informational",
+    "category": "regime census",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T09:45:00Z",
+    "idea": "LONG arm-rate tripwire (zero-code KPI): flag to CEO when 7d LONG arm-rate <50% while SHORT >55% for 2 consecutive runs",
+    "rationale": "Quantifies the LONG chop-entry problem from a second angle (arm-rate, not pnl); current 14d 45.2% vs 59.0% already qualifies — advisory flag only, no gate",
+    "expected_impact": "early warning on LONG entry quality",
+    "category": "watchdog KPI",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

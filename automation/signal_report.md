@@ -1,29 +1,30 @@
 === Signal Performance Report ===
-Period: Last 6h | 24h (generated 2026-10-27)
+Period: Last 6h | 24h
 
 KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No kill candidates |
+| — | — | — | — | — | none — no kill candidates |
 
 BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | — | — | — | — | No boost candidates |
+| — | — | — | — | — | none — no boost candidates |
 
 LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| volume-buildup- | SHORT | 37.5% | -$0.32 | 8 | WATCH — HIGH regime protects it (all-time 10T 80%WR +$0.42). NORMAL 22T 54.5%WR -$0.13, EXTREME 9T 55.6%WR -$0.04. No blanket kill. 24h loss spread thin across regimes (HIGH -$0.17, NORMAL -$0.13, EXTREME -$0.02). |
-| pump-chain+ | LONG | 66.7% | -$0.11 | 9 | WATCH — all 9 trades EXTREME. Wins small (ugb_pt $0.01-$0.19), losses large (BLUR hard_max_loss -$0.31, GRASS hard_sl -$0.10). Classic small-win/large-loss profile. Not a kill (WR > 55%). |
+| volume-buildup- | SHORT | 37.5% | -$0.32 | 8 | WATCH — WR above 30% kill line; regime split HIGH 50% (2/4), NORMAL 33% (1/3); no regime ≥55% so no regime block, not bad enough for kill |
+| pump-chain+ | LONG | 57.1% | -$0.16 | 7 | WATCH — good WR but net negative (losses larger than wins); below 5-trade boost bar for PnL |
 
 WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| pump-chain+ | LONG | 100% | +$0.25 | 2 | 6h only, sub-sample of 24h set |
-| pump-chain+ | LONG | 66.7% | -$0.11 | 9 | 24h — high WR, negative PnL (loss asymmetry) |
+| warrior-sr-confirm+ | LONG | 100% | +$0.06 | 2 | OK — needs 5+ trades for boost |
+| r2v2-long3 | LONG | 100% | +$0.09 | 2 | OK — needs 5+ trades for boost |
+| continuum-osc+ | LONG | 100% | +$0.04 | 1 | OK — sample too small |
 
 ISSUES:
-- No direction inversions found (checked long-signal/SHORT and short-signal/LONG last 24h — zero results).
-- Low trade volume overall: only 2 signals met the >=2 (6h) / >=3 (24h) trade thresholds. Quiet period.
-- volume-buildup- HIGH regime had 4 trades in 24h with -$0.17 despite all-time 80% WR — small sample, not actionable.
+- No direction inversions found (0 in last 24h).
+- Very low trade volume overall (12 signals touched in 24h) — below thresholds for action on everything except watch-list items.
+- pump-chain+ has 57% WR but negative PnL — inspect R:R / SL-TP sizing, not a signal-kill issue.

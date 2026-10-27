@@ -1,125 +1,107 @@
 {
-  "timestamp": "2026-10-27T08:44:43Z",
-  "run": 179,
+  "timestamp": "2026-10-27T09:45:00Z",
+  "run": 180,
   "session_brain_stats": {
-    "queries": [
-      "pump-chain promote flip contrarian",
-      "waiver rsi 35 45 band short",
-      "mid-band long block re-measure"
+    "queries": 3,
+    "top": [
+      "signal performance winrate regime",
+      "volume-buildup short rsi",
+      "new signal idea improvement strategy"
     ],
-    "note": "session_brain dup-heavy issue persists (8th run flagged); used for ideation only"
+    "note": "no new actionable ideas surfaced; existing signal-lab/trend-following threads already owned"
   },
   "trade_summary_24h": {
     "trades": 27,
     "wins": 12,
     "wr": 44.4,
     "pnl": -0.74,
-    "worst": "BLUR pump-chain+ LONG -0.31 hard_max_loss; LTC/DYDX volume-buildup- shorts rsi 37.x (pre-lapse band cell)",
-    "winners_note": "FOGO pump-chain+ double ugb_pt +0.19/+0.06; volume-buildup- 7d now 27T 63.0% +0.11"
-  },
-  "mandate_fresh": {
-    "24h": "27T 12W 44.4% -0.74",
-    "7d": "143T 67W 46.9% -0.51 | armed 75T +3.18 vs unarmed 68T -3.69",
-    "14d": "330T 131W 39.7% -3.95 | armed 142T +8.46 vs unarmed 188T -12.41 | pm_trail 83T 92.8% +4.60 vs HML 53T 0% -5.65",
-    "30d": "735T 325W 44.2% -2.92",
-    "chop_bleed_share": "7d 85.6% / 14d 86.2% = baseline (thresholds 92/70)",
-    "verdict": "mandate intact — trend side wins, chop side loses"
-  },
-  "headline": "ALL FOUR OCT-27 SCHEDULED EVALS DISPOSITIONED. 0 config changes (vacation review queue honored, session lock absent, constants EMPTY git diff), 1 zero-behavior ship (coin_regime direction-split script).",
-  "oct27_evals": {
-    "waiver_expiry_35_45": {
-      "status": "LAPSE HOLDING + NO RENEWAL",
-      "evidence": "flip1_active=False (expired); 0 [35,45) opens post-00:00Z; 1 compliant short AIXBT rsi_14=45.00/exec 57.43; band cohort negative all windows 7d -0.11 / 14d -0.26 / 30d -0.82 (rsi_14, n=24/53/71)",
-      "verdict": "block stands; do not renew waiver. Re-measure only on SHORT starvation (0 SHORT opens/48h under SHORT_BIAS majority) or at stamps-age"
+    "7d": {
+      "trades": 143,
+      "wr": 46.9,
+      "pnl": -0.51
     },
-    "midband_remeasure": {
-      "status": "REFUTATION STANDS",
-      "evidence": "band+BELOW (steer's blocked set) profitable 7d +0.10 / 14d +0.02 / 30d +1.40; band+AT/ABOVE carries bleed -1.12/-3.08/-2.34; BLOCK-BELOW save<0 all windows; BLOCK-AT/ABOVE fkA 39-40% + p>0.14 all windows",
-      "verdict": "no enforceable block either way; mid-band steer stays advisory"
+    "14d": {
+      "trades": 328,
+      "wr": 39.3,
+      "pnl": -4.73
     },
-    "coin_regime_direction_split": {
-      "status": "NEW SCRIPT SHIPPED + COLLECT/REFUSE",
-      "long_into_shortbias": "n=33 W=12 -0.94, save +0.94, fk 14.3%, p=0.1262 -> only p fails at 14d/30d BUT no halves/OOS possible (stamps <30d, 14d==30d) and bb-bounce owns 45% of bleed (14T -0.42) -> COLLECT, RE-MEASURE Nov 4+ when older half exists AND p<0.05 AND fk stays <20%",
-      "short_into_longbias": "n=15 W=7 +0.08 -> blocking LOSES money, p=0.75 -> REFUTED (watchdog's oversold-short-into-long-bias anecdote does not hold at n=15)",
-      "aligned_vs_counter": "ALIGNED 83T +0.50 vs COUNTER 48T -0.86, p=0.1465 -> COLLECT stands (n>=50 met both, significance fails)"
-    },
-    "pc_promote_formal": {
-      "status": "RECOMMEND NO-GO (formal 17:12Z)",
-      "evidence": "fresh contrarian join 895/623: touch-classifier flip 64.8% n=349 (was 64.4% n=348, stable, p=4.6e-08, OOS 66.1/62.6%) BUT #178 live-exit contradiction stands: 10-engine full-mix flip WORSE avg -0.183% vs -0.130% paired t=-1.88; real PG book n=5 flip -0.095% worse",
-      "verdict": "do NOT ship direction flip; if CEO wants the edge: pre-register +/-0.40 bracket-exit variant as a new experiment"
-    }
+    "armed_7d": "80T 76.3% +4.03 vs unarmed 59T 5.1% -4.58 (4T null-mfe +0.04)",
+    "armed_14d": "164T 70.7% +7.95 vs unarmed 159T 6.3% -12.72",
+    "exits_7d": "pm_trail 52T 90.4% +2.95 | atr_sl_hit 20T 0% -1.25 | HML 15T 0% -2.00 | trail_arm_timeout 16T 12.5% -0.45",
+    "chop_bleed_share": "85.6% (7d) / 86.1% (14d) / 81.2% (30d) — stable, entry-quality at gates",
+    "direction_7d": "LONG 92T 44.6% -0.50 | SHORT 51T 51.0% -0.01"
   },
   "shadow_analysis": {
-    "contrarian": "895 entries / 623 joinable fresh — pc- flip 64.8% n=349 STABLE, btc-pump-rider+ 28.6% do-not-flip, total 48.8% = family-specific",
-    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED since Oct 1) — JSONL 24,598 rows 0 outcomes, not answerable",
-    "wyckoff": "342 rows pending outcome join (Nov 15)",
-    "floor_admit": "2,185 rows pending outcome join (Nov 15)",
-    "rr_shadow": "ORPHANED — no producer, do not cite",
-    "shadow_trader": "27,575 signals / 26,926 closed — CONFLUENCE-EXPIRY 12,192 blocked @48% would_win avg -0.12 (gates justified); exit A/B pm_trail +3,955 vs hard_max -5,809 = trail-or-nothing confirmed",
+    "contrarian": "896 entries / 623 joinable fresh — pc- flip 64.8% n=349 STABLE (p=4.6e-08, OOS 66.1/62.6), btc-pump-rider+ 28.6% do-not-flip, total 48.8% family-specific; formal NO-GO already on file for 17:12Z (live-exit contradiction #178)",
+    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED since Oct 1, actual_outcome null) — pre-live evidence only",
+    "wyckoff": "PENDING outcome join (Nov 15)",
+    "floor_admit": "PENDING outcome join (Nov 15)",
+    "rr_shadow": "ORPHANED — no producer, 21d stale, do not cite",
+    "shadow_trader": "27,743 signals — CONFLUENCE-EXPIRY 12,218@48% gates justified; exit A/B pm_trail +3971 vs hard_max -5862",
     "overall": "2/6 answerable (contrarian + shadow_trader), both used"
   },
-  "losing_autopsy_48h": {
-    "method": "recovery_replay adverse-first, selfcheck PASS",
-    "n": 21,
-    "never_adverse": 5,
-    "recovered": 13,
-    "never": 3,
-    "never_list": "AERO SHORT -0.12 (pre-lapse band edge), ICP SHORT -0.09 (waiver-class), CC SHORT -0.07 (pump-chain-)",
-    "verdict": "WRONG-SIDE REFUTED 103rd consecutive run (#61 p=0.116, #84 t=-0.04); structural never ~14% at baseline"
-  },
   "drift_findings": [
-    "session_brain duplicate-text records — 8th run flagged, rebuild still owed (MED)",
-    "vacation_mode.json still true — constants_change_review_queue active, honored this run (no change passed bars)"
+    "Watchdog deep-analysis 'best cells' DO NOT REPROCE at larger n: LONG meta_rsi<35 '83.3% n=6' -> 14d 14T 42.9% -0.25 / 30d 38T 55.3% -0.08; SHORT 65-75 '100% n=5' -> 14d 9T 77.8% +0.46 / 30d (55-75) 49T 51.0% +0.34 = small-n noise, do NOT trade those cells as edge",
+    "Watchdog route #3 (vb- oversold-short RSI band) already CLOSED by #177 — re-confirmed this run: blocked 14d==30d 22T 63.6% -0.15, fk 63.6% >> 20% bar, save 0.86 < 1.00 bar -> stays REJECTED",
+    "meta_rsi does not exist as a metadata key — it is rsi_14 (trade_watchdog.py:247 maps it); any analyst query must use rsi_14"
   ],
   "recurring_problems": [
-    "unarmed bleed persists: 14d unarmed 188T -12.41 vs armed 142T +8.46 — entry-quality ownership stays at gates (chop-bleed 86% baseline)",
-    "pump-chain+ 7d 18T -0.44 and bb-bounce 7d 18T -0.36 continue as the two live bleed families — both owned (NO-KILL/CEO)"
+    "chop-bleed share stable 85-86% (never-armed share of gross loss) — entry-quality at gates, no new lever opened",
+    "LONG arm-rate gap: 14d LONG 45.2% armed vs SHORT 59.0%; LONG unarmed -8.90 vs SHORT -3.67 — LONGs enter chop more often"
   ],
   "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-10-27T08:44:43Z",
-      "run": 179,
-      "agent": "brain_auditor",
-      "idea": "coin_regime direction-split eval SHIPPED (brain/analysis/coin_regime_direction_2026-10-27.py, --selfcheck PASS): LONG->coin SHORT_BIAS = COLLECT candidate (n=33 -0.94, save +0.94, fk 14.3%, p=0.1262, re-measure Nov 4+); SHORT->coin LONG_BIAS = REFUTED (blocking loses +0.08)",
-      "rationale": "Oct-27 pre-reg item (#141/#133 coin_regime n>=50) measured with full house-bar checklist; direction split separates the two counter-tales that the aggregate ALIGNED/COUNTER (p=0.147) was smearing together",
-      "expected_impact": "closes an Oct-27 eval; pre-registers the only live entry-side candidate that passes n/save/fk bars",
-      "category": "entry sniper",
-      "status": "measured-collect",
+      "date": "2026-10-27T09:45:00Z",
+      "idea": "btc_regime x direction census — LONG BULL_TREND is the worst LONG cell (30d 181T 44.2% -2.57) but block REJECTED: fk 44.2% >> 20% bar, effect shallow (-0.014/trade), partially signal-mix (pc+ 32T 31.3%, bb-bounce 18T 27.8%) yet rest-of-book also -0.94/131T",
+      "rationale": "Counter-intuitive: LONGs lose MOST in BULL_TREND, best in RANGING (+0.88/89T) — 'trend is friend' fails on this axis; measured so no future run re-proposes naively",
+      "expected_impact": "none shipped — informational",
+      "category": "regime census",
+      "status": "rejected-with-data",
       "risk": "low"
     },
     {
-      "date": "2026-10-27T08:44:43Z",
-      "run": 179,
-      "agent": "brain_auditor",
-      "idea": "SHORT-starvation tripwire for the [35,45) block (zero code): if 0 SHORT opens for 48h while 15m SHORT_BIAS is majority, re-open the waiver-renewal review",
-      "rationale": "the band block is now live and slightly negative (correct to keep), but the unclog waiver existed because shorts were starved — need a symmetric early-warning on the opposite failure mode",
-      "expected_impact": "prevents silent short-side starvation; monitor-only",
-      "category": "guardrail",
-      "status": "pre-registered",
+      "date": "2026-10-27T09:45:00Z",
+      "idea": "LONG arm-rate tripwire (zero-code KPI): flag to CEO when 7d LONG arm-rate <50% while SHORT >55% for 2 consecutive runs",
+      "rationale": "Quantifies the LONG chop-entry problem from a second angle (arm-rate, not pnl); current 14d 45.2% vs 59.0% already qualifies — advisory flag only, no gate",
+      "expected_impact": "early warning on LONG entry quality",
+      "category": "watchdog KPI",
+      "status": "suggested",
       "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": {
-    "verify_178": "ALL PASS — constants EMPTY git diff; session lock absent; pm_armed_at 5 stamps (ENA 04:13 latest); gate_leak_census --selfcheck PASS; kill flags: 0 killed-family closes 7d; size-reduce absent=1.0x; 0 Tracebacks Oct 26-27 (5 total all Oct 11 historical); waiver flip1=False expired, 0 band opens post-lapse",
-    "verify_176_177": "loss-cooldown fix present (brain.py:60 reason='loss' dict literal, signal_schema._is_loss_cooldown_active:3878); peak re-anchor present (position_manager._reanchor_seed_peak + hl-sync-guardian 4 refs); BTC #16435 closed correctly at 02:43 per precommitted EMA300 invalidation"
+    "verify_179": "ALL PASS — coin_regime_direction_2026-10-27.py --selfcheck PASS + re-run reproduces COLLECT (p=0.1262 FAIL) | constants EMPTY git diff | CEO_PROTECTED 13/13 | session lock absent | waiver flip1=False expired + 0 band opens since 00:00Z | kill flags: doji-bottom False, vb+ False, vb- False, oversold False, hmacd False, AI_TRADER False | size-reduce absent=1.0x | Tracebacks 5 total all Oct 11 (0 new) | pm_armed_at 5 stamps | gate_leak_census --selfcheck PASS",
+    "verify_178_177": "carried PASS per #179; spot-checked this run"
   },
-  "deep_dive": {
-    "sub50_n15_14d": "bb-bounce 38T 36.8% (CEO keep-vs-disable) | doji 16T (killed, pre-kill closes) | ai-trader+ 17T (disabled) | pc- 37T 21.6% (CONF_FLOOR+PROMOTE-NO-GO) | pc+ 45T 35.6% +0.22 (NO-KILL)",
-    "new_targets": 0
+  "scheduled_evals_due_2026_10_27": {
+    "long_rsi_14_55_65_death_cell": "RE-MEASURED: 7d 22T 31.8% -0.79 | 14d 55T 38.2% -1.65 | 30d 156T 49.4% +1.01 (SIGN-FLIP positive) -> window-instability = stays advisory-only, NO enforceable block (was already measured-refuted)",
+    "midband_ema300": "done by #179 — refutation stands",
+    "coin_regime_direction": "done by #179 — COLLECT Nov 4+",
+    "pc_promote_1712Z": "NO-GO rec on file (#178/#179), formal checkpoint 17:12Z today, no action until then"
   },
+  "losing_autopsy": {
+    "window": "48h",
+    "n": 21,
+    "never_adverse": 5,
+    "recovered": 13,
+    "never": 3,
+    "never_list": [
+      "AERO SHORT cut-loser -0.12",
+      "ICP SHORT hard_max_loss -0.09 (waiver-class)",
+      "CC SHORT hard_sl -0.07"
+    ],
+    "verdict": "wrong-side REFUTED 104th consecutive run (#61 p=0.116, #84 t=-0.04); no new closes since #179 so cohort identical; winning side = flat"
+  },
+  "deep_dive": "0 new sub-50% n>=10 targets — pump-chain+ LONG 18T 44.4% -0.44 (NO-KILL standing), bb-bounce-v2-long+ 18T 33.3% -0.36 (CEO keep-vs-disable pending); every other bleed owned/killed/disabled",
   "next_actions": [
-    "17:12Z pc- PROMOTE formal — RECOMMEND NO-GO (live-exit contradiction); bracket-exit variant only if CEO wants the edge",
-    "Nov 4+: coin_regime LONG->SHORT_BIAS re-measure (older half + p<0.05 + fk<20%)",
-    "Nov 15: floor_admit + wyckoff outcome joins",
-    "brain-closed loss e2e — wait for first brain.close_trade loss (correct-by-traffic)",
-    "rsi drift monitor to n>=100 (now 81); CHASE_RATIO n>=20 joined (now 18)",
-    "CEO stack: CONF_FLOOR fkB · pc- PROMOTE NO-GO · bb-bounce keep-vs-disable · TAT flip · hard-stop reentry · MEDs F1/F2/F3"
+    "17:12Z pc- PROMOTE formal — RECOMMEND NO-GO already on file (no early ship)",
+    "Nov 4+ coin_regime LONG->SHORT_BIAS re-measure (p<0.05 + fk<20% + older half)",
+    "Nov 15 floor_admit + wyckoff outcome joins",
+    "rsi drift monitor to n>=100 (81 now); CHASE_RATIO n>=20 joined (18 now)",
+    "CEO stack unchanged: CONF_FLOOR fkB · pc- PROMOTE NO-GO · bb-bounce keep-vs-disable · TAT flip · hard-stop reentry",
+    "SHORT starvation tripwire (#179): 0 SHORT opens/48h under SHORT_BIAS -> reopen waiver review"
   ],
-  "readiness": {
-    "open": 0,
-    "regime": "watchdog 08:15: btc_15m LONG_BIAS / btc_4h NEUTRAL / continuum AT EMA300 / vol LOW / zscore POS / wyckoff ACCUMULATION / trend_quality STRONG_UP — mixed, no confirmed tape",
-    "stance": "flat correct; LONGs only on sustained 15-30m reclaim WITH volume; SHORT high-RSI fade only (55-65); mid-band no trade; size 1.0x; trail-family first"
-  }
+  "readiness": "0 open = flat correct on unresolved EMA300 chop pin (STRONG_DOWN trend_quality + RECOVERY phase + LEAN_BULL linreg = conflicting labels); no fresh entries until 1m sustains one side 15-30m with volume; mid-band no trade; trail-family first; size 1.0x"
 }

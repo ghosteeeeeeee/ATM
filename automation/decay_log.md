@@ -2023,3 +2023,8 @@
 [2026-10-27 03:31 UTC]   🟢 OK: pump-chain+: 9 trades, 66.7% WR, PnL=0.38
 [2026-10-27 03:31 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-27 03:31 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-27 09:31 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-27 09:31 UTC]   🟢 OK: volume-buildup-: 8 trades, 50.0% WR, PnL=-2.33
+[2026-10-27 09:31 UTC]   🟢 OK: pump-chain+: 7 trades, 57.1% WR, PnL=-0.04
+[2026-10-27 09:31 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-27 09:31 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
