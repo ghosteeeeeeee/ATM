@@ -1,0 +1,11 @@
+[Unit]
+Description=Hermes CTX-Gate Rules Shadow Tracker — counterfactual agreement report
+# CEO 2026-10-27 item 4 (automatic-implementation skill Phase 2/4). The
+# deterministic context-gate rules run in SHADOW beside the LLM and never touch
+# the live decision. This tracker reads the agreement rows and writes the
+# enforce/relax/reject recommendation. Standalone — zero code in the trading path.
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/ctx_gate_shadow.py --report
+TimeoutStartSec=120

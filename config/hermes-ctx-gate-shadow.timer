@@ -1,0 +1,11 @@
+[Unit]
+Description=Hermes CTX-Gate Rules Shadow Tracker Timer — daily report
+# CEO 2026-10-27 item 4 (automatic-implementation skill). Daily report of the
+# rules-vs-LLM agreement so the CEO has data to decide enforce/relax/reject.
+# The shadow itself collects on every pipeline gate call; this only reports.
+[Timer]
+OnCalendar=*-*-* 09:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

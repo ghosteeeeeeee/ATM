@@ -883,6 +883,23 @@ CONTEXT_GATE_CACHE_TTL = 300         # seconds to cache LLM decision for same to
 CONTEXT_GATE_LLM_TIMEOUT = 35        # seconds before LLM call times out
 CONTEXT_GATE_FAIL_OPEN = True        # if LLM fails, allow trade (don't block good setups)
 
+# ── Context Gate: deterministic rules replacing the LLM (SHADOW FIRST) ────────
+# CEO 2026-10-27 item 4: llm_context_gate() spawns a full `opencode run` agent
+# SYNCHRONOUSLY in the trade hot-path (timeout=35s) just to return one word.
+# All-time verdicts: 75 NAY / 5 WARN / 0 GO (FLIP disabled 2026-08-01). Every
+# criterion in its prompt (speed %, z-score, live RSI, hebbian WR) is already
+# computed by the rule gate, so the LLM is an expensive if-statement in the
+# money path.
+# SHADOW-FIRST (automatic-implementation skill): the deterministic rules run
+# BESIDE the LLM, log their verdict as CTX-RULES-SHADOW, and change NOTHING.
+# The LLM still decides. After >=7 days we measure verdict agreement, then CEO
+# decides enforce/relax/reject. NEVER flip to enforcement without that data.
+# CONTEXT_GATE_RULES_ENFORCED stays True=shadow; set False ONLY with CEO sign-off
+# + >=7d agreement data (see brain/ctx_gate_shadow.db --report).
+CONTEXT_GATE_RULES_ENABLED = True    # deterministic rules module active
+CONTEXT_GATE_RULES_SHADOW = True     # SHADOW: log-only. False = rules decide (CEO ONLY)
+CONTEXT_GATE_RULES_MIN_HEB_N = 5     # mirror of HEBBIAN_AUTO_MIN_N — skip when hebbian too thin
+
 # ── Global Signal Filters (FIX 2026-07-31) ────────────────────────────────────
 # Applied to ALL signals at context gate. Based on winning trade analysis:
 # Winners: speed>50%, momentum>25, RSI 30-70, z-score neutral

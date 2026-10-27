@@ -44,6 +44,7 @@ from hermes_constants import (
      CONTEXT_GATE_Z_RANGING, CONTEXT_GATE_RANGING_SPEED,
      CONTEXT_GATE_SPEED_CONFIRM, CONTEXT_GATE_CACHE_TTL,
      CONTEXT_GATE_LLM_TIMEOUT, CONTEXT_GATE_FAIL_OPEN,
+     CONTEXT_GATE_RULES_ENABLED, CONTEXT_GATE_RULES_SHADOW,
     SIGNAL_FILTER_ENABLED, SIGNAL_FILTER_SPEED_MIN, SIGNAL_FILTER_NEUTRAL_SPEED_MIN, SPEED_MIN_THRESHOLD_LONG, SIGNAL_FILTER_MOMENTUM_MIN,
     SIGNAL_FILTER_RSI_MIN, SIGNAL_FILTER_RSI_MAX,
     SIGNAL_FILTER_Z_MIN, SIGNAL_FILTER_Z_MAX,
@@ -1647,6 +1648,160 @@ Reply only GO, WARN, NAY, or FLIP:"""
             return ('GO', None)  # fail-open: don't block good setups
         return ('SKIP', 'LLM failed, fail-closed')
 
+# ── Context Gate: deterministic rules (SHADOW, CEO 2026-10-27 item 4) ─────────
+# A literal port of the LLM prompt's numeric criteria. Runs BESIDE the LLM and
+# logs as CTX-RULES-SHADOW — it changes NOTHING while CONTEXT_GATE_RULES_SHADOW
+# is True. The LLM still decides; we measure verdict agreement over >=7 days,
+# then CEO decides enforce/relax/reject.
+#
+# Design note (from the CEO consult): the LLM's real job is NAYing trades the
+# rule gate already passed, and its DEFAULT rule is "if uncertain → NAY". A pure
+# literal port will not reproduce that uncertainty-NAY, so the DEFAULT clause is
+# encoded explicitly below (DEFAULT_NAY_UNCERTAIN) and its disagreement with the
+# LLM is exactly what the shadow period measures.
+def _ctx_rules_shadow(token, direction, source, ctx, rsi, heb, _cont_str=''):
+    """Deterministic verdict mirroring the LLM prompt. Returns (verdict, reason).
+
+    Pure function of already-computed signals — no I/O, no subprocess, no latency.
+    Order matches the prompt: NAY (hard block) checked before GO/WARN because a
+    hard block should win over a soft pass.
+    """
+    speed = ctx.get('speed')
+    z = ctx.get('z_score')
+    mom = ctx.get('momentum')
+    # hebbian: (wr_est, n, weight, ...) — mirrors heb_section construction
+    heb_wr = heb[0] if heb and len(heb) > 0 else None
+    heb_n = heb[1] if heb and len(heb) > 1 else 0
+
+    def _num(v):
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    speed, z, mom, rsi = _num(speed), _num(z), _num(mom), _num(rsi)
+    heb_wr_pct = (heb_wr * 100) if isinstance(heb_wr, (int, float)) else None
+
+    # ── NAY (hard block) — prompt order ───────────────────────────────────
+    # - Historical WR < 30% with 5+ trades for this setup
+    if heb_wr_pct is not None and heb_n >= 5 and heb_wr_pct < 30:
+        return ('NAY', f'hebbian WR {heb_wr_pct:.0f}% < 30 with n={heb_n}')
+    # - Z-score extreme AND speed low: |z| > 1.5 AND speed < 30
+    if z is not None and speed is not None and abs(z) > 1.5 and speed < 30:
+        return ('NAY', f'|z|={abs(z):.2f} > 1.5 and speed={speed:.0f} < 30')
+    # - LONG with z > 1.5 AND speed < 40
+    if direction == 'LONG' and z is not None and speed is not None and z > 1.5 and speed < 40:
+        return ('NAY', f'LONG overbought: z={z:.2f} > 1.5, speed={speed:.0f} < 40')
+    # - SHORT with live RSI < 40 (oversold — bounce risk)
+    if direction == 'SHORT' and rsi is not None and rsi < 40:
+        return ('NAY', f'SHORT oversold: live RSI {rsi:.1f} < 40 (bounce risk)')
+    # - SHORT with z < -1.5 AND speed < 40 AND live RSI < 40 (true falling knife)
+    if (direction == 'SHORT' and z is not None and speed is not None and rsi is not None
+            and z < -1.5 and speed < 40 and rsi < 40):
+        return ('NAY', f'SHORT falling knife: z={z:.2f}, speed={speed:.0f}, RSI={rsi:.1f}')
+
+    # ── GO (strong confidence) — prompt order ─────────────────────────────
+    # - Speed > 70% AND z confirms direction (LONG: z < -0.5, SHORT: z > 0.5)
+    if speed is not None and z is not None and speed > 70:
+        if (direction == 'LONG' and z < -0.5) or (direction == 'SHORT' and z > 0.5):
+            return ('GO', f'speed {speed:.0f} > 70 and z={z:.2f} confirms {direction}')
+
+    # ── WARN (cautious) ───────────────────────────────────────────────────
+    # - Speed 20-70% (moderate momentum)
+    if speed is not None and 20 <= speed <= 70:
+        return ('WARN', f'moderate momentum: speed={speed:.0f}% (20-70)')
+    # - Z-score is neutral (-0.5 to 0.5)
+    if z is not None and -0.5 <= z <= 0.5:
+        return ('WARN', f'neutral z={z:.2f} (-0.5..0.5)')
+    # - Hebbian WR 30-50% with limited data
+    if heb_wr_pct is not None and 30 <= heb_wr_pct <= 50:
+        return ('WARN', f'hebbian WR {heb_wr_pct:.0f}% (30-50), n={heb_n}')
+
+    # ── DEFAULT (prompt): uncertain → NAY unless bear continuation ────────
+    # - If uncertain AND BTC has bear structure AND live RSI >= 40: GO
+    bear = isinstance(_cont_str, str) and 'BEAR' in _cont_str.upper()
+    if bear and rsi is not None and rsi >= 40:
+        return ('GO', f'uncertain but bear continuation (RSI {rsi:.1f} >= 40)')
+    # - If uncertain otherwise: NAY (better to miss a trade than lose money)
+    return ('NAY', 'default: uncertain — better to miss than lose (prompt DEFAULT)')
+
+
+def ctx_gate_rules_shadow_call(token, direction, source, ctx, rsi, heb, _cont_str=''):
+    """Log-only shadow wrapper. NEVER changes the verdict while shadow is on.
+
+    In enforcement mode (CONTEXT_GATE_RULES_SHADOW=False, CEO-only) this returns
+    the rules verdict for the caller to apply. In shadow mode it stashes the
+    verdict in _pending_shadow (for the agreement row the caller writes after the
+    LLM answers) and returns None — the LLM keeps deciding.
+    """
+    try:
+        if not CONTEXT_GATE_RULES_ENABLED:
+            return None
+        verdict, reason = _ctx_rules_shadow(token, direction, source, ctx, rsi, heb, _cont_str)
+        if not CONTEXT_GATE_RULES_SHADOW:
+            # ENFORCEMENT (CEO sign-off only) — caller applies this verdict
+            return (verdict, reason)
+        # SHADOW — log only, stash for agreement, do not return a decision
+        log(f'  [CTX-RULES-SHADOW] {token} {direction}: {verdict} — {reason}')
+        _pending_shadow['key'] = f'{token}|{direction}|{source}'
+        _pending_shadow['verdict'] = verdict
+        return None
+    except Exception as e:
+        # Shadow must never break the money path
+        log(f'  [CTX-RULES-SHADOW] {token}: rules error (shadow skipped): {e}')
+        _pending_shadow['key'] = _pending_shadow['verdict'] = None
+        return None
+
+
+_CTX_SHADOW_DB = '/root/.hermes/brain/ctx_gate_shadow.db'
+
+# Pending rules verdict awaiting the LLM's answer so we can record agreement.
+# Single-slot: the gate is synchronous, one signal at a time, so a slot (not a
+# dict) is correct and leak-free.
+_pending_shadow = {'key': None, 'verdict': None}
+
+
+def _ctx_rules_shadow_agree(token, direction, source, llm_verdict):
+    """Record rules-vs-LLM agreement for one signal. Shadow mode only.
+
+    NAY vs GO are the decisions that matter (block vs allow). WARN is advisory on
+    both sides, so a WARN involved on either leg counts as agreement-by-default —
+    we only flag real disagreements (one side NAY, the other GO/WARN).
+    """
+    try:
+        import sqlite3 as _sq
+        from datetime import datetime as _dt, timezone as _tz
+        rules_v = _pending_shadow['verdict']
+        _pending_shadow['key'] = _pending_shadow['verdict'] = None
+        if rules_v is None:
+            return
+        # Normalize: NAY vs GO/WARN = disagreement; anything else = agreement
+        rules_nay = (rules_v == 'NAY')
+        llm_nay = (llm_verdict == 'NAY')
+        agree = 1 if rules_nay == llm_nay else 0
+        _conn = _sq.connect(_CTX_SHADOW_DB, timeout=5)
+        try:
+            _c = _conn.cursor()
+            _c.execute("""
+                CREATE TABLE IF NOT EXISTS shadow_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ts TEXT, token TEXT, direction TEXT, source TEXT,
+                    rules_verdict TEXT, llm_verdict TEXT, agree INTEGER, reason TEXT
+                )""")
+            _c.execute(
+                "INSERT INTO shadow_events (ts, token, direction, source, rules_verdict, llm_verdict, agree) "
+                "VALUES (?,?,?,?,?,?,?)",
+                (_dt.now(_tz.utc).isoformat(), token, direction, source,
+                 rules_v, llm_verdict, agree))
+            _conn.commit()
+        finally:
+            _conn.close()
+        if not agree:
+            log(f'  [CTX-RULES-SHADOW] DISAGREE {token} {direction}: rules={rules_v} vs LLM={llm_verdict}')
+    except Exception as e:
+        log(f'  [CTX-RULES-SHADOW] agree-log failed: {e}')
+
+
 class SetupStats(NamedTuple):
     """Historical stats for similar setups. Field names prevent tuple-shape bugs."""
     n: int
@@ -2122,7 +2277,21 @@ def context_gate(token, direction, source, sig):
         if _exit_quality and _exit_quality.get('profit_n', 0) > 0 and _exit_quality.get('sl_n', 0) == 0:
             log(f'  [CTX-GATE] {token}: skip LLM — exit_quality profit dominant (profit={_exit_quality["profit_n"]}, sl={_exit_quality["sl_n"]})')
             return ('GO', None, 0)
+    # SHADOW (CEO 2026-10-27 item 4): compute deterministic verdict BESIDE the
+    # LLM. In shadow mode this returns None and changes nothing — the LLM still
+    # decides. We hold the rules verdict to record agreement AFTER the LLM call.
+    _shadow_rules = ctx_gate_rules_shadow_call(
+        token, direction, source, ctx,
+        rsi=_ctx_gate_get_rsi(token), heb=heb,
+        _cont_str=(ctx.get('market', {}) or {}).get('btc_continuum', '') or '')
+
     verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
+
+    # Record shadow agreement (shadow mode only; in enforcement _shadow_rules is
+    # the applied verdict and the LLM is bypassed entirely — no agreement row).
+    if CONTEXT_GATE_RULES_SHADOW and _shadow_rules is None:
+        _ctx_rules_shadow_agree(token, direction, source, verdict)
+
     if verdict == 'WARN':
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')
         return ('WARN', f'LLM advisory: {LLM_CONFIDENCE_PENALTY} confidence penalty', LLM_CONFIDENCE_PENALTY)
