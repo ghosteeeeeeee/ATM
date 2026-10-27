@@ -1,29 +1,24 @@
 {
-  "timestamp": "2026-10-27T02:45:07.245315+00:00",
-  "steers": [
-    {
-      "severity": "urgent",
-      "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -1.02 USDT. Something is wrong.",
-      "auto_executable": false,
-      "id": "steer-001"
-    }
-  ],
-  "portfolio_health": "critical",
+  "timestamp": "2026-10-27T03:45:07.727019+00:00",
+  "steers": [],
+  "portfolio_health": "good",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
-    "trend_quality": "STRONG_DOWN"
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 1
+  "open_count": 0,
+  "deep_analysis": "Flat book (0 open) in a SHORT-tape market: aggregate 39 SHORT_BIAS / 4 LONG_BIAS / 86 neutral, BTC 15m SHORT_BIAS, BTC continuum AT EMA300 (223m pin), linreg LEAN_BEAR, market_phase DECLINING, volume LOW, velocity SLOW. BTC 4h still LONG_BIAS \u2014 the 15m/4h split plus the AT-EMA300 pin is why entries keep dying: mid-band chop with no follow-through. Flip rate agg=19, BTC=24 per 24h \u2014 p50/p75 standing churn, NOT anomalous (p95=26). Any direction-flavored steer must stay condition-based and re-tested next cycle.\n\n24h loss anatomy (14 closed losers, all hard_max_loss / hard_sl / trail_arm_timeout / cut-loser): two distinct wrong-side patterns. (1) LONGs entered into the SHORT tape \u2014 BLUR pump-chain+ LONG lost -$0.31 with MFE 0.04% (never armed, EXTREME vol chop entry); RENDER/GRASS/ALT/CAKE LONGS similarly died in sub-0.44% MFE. Winning side = stand aside or SHORT; we were buying into DECLINING/LEAN_BEAR. (2) SHORTs entered OVERSOLD \u2014 LTC meta_rsi 37.3, DYDX 37.9, AERO 36.8 all hard_max_loss / cut-loser. meta_rsi (not entry_rsi_14) confirms sub-40 entries. SHORT_RSI_HARD_FLOOR=45 should have blocked these; either the floor was bypassed or RSI drifted between detect and fill. Winning side on those = no short at oversold (BANANA-short lesson, repeated). DOT SHORT at meta_rsi 36.4 was the exception that won (+1.19%) \u2014 one lucky catch does not validate oversold shorts.\n\nChop-bleed KPI: 7d 85.8%, 14d 85.7% \u2014 pinned at the ~86% baseline. Entry quality (never-armed trades) remains the bleed owner; this is NOT an exit/trail problem. Route stays on entry-quality filters, not UGB-PT tweaks. Quote 7d window against 14d baseline \u2014 stable, no deterioration signal.\n\n7d live-family check (dead-signal rule applied \u2014 all still enabled with traffic, none are pre-kill stale windows): pump-chain+ 20T 8W 40%WR net -$0.83 (worst); bb-bounce-v2-long+ 18T 6W 33% net -$0.36; r2v2-long3 11T 6W net -$0.13. volume-buildup- 27T 17W net +$0.11 \u2014 family healthy overall; the 24h volume-buildup- losses were the oversold-short subset, not the family. doji-bottom-long and volume-breakout-long+ appear in the longer window with 0 recent trades \u2014 already killed previously, stale window, NO action. Pump-chain+ and bb-bounce-v2-long+ are enabled, emitting, and net-negative in chop \u2014 that is brain-auditor territory for any parameter change; watchdog only flags, does not retune.\n\nPending signal queue is misaligned with the tape: ETC/SUSHI/AR/MET LONGs sitting at meta_rsi 80-100 (SUSHI at 100) against a SHORT_BIAS aggregate \u2014 chasing overbought longs into LEAN_BEAR. APT/AIXBT/CRV SHORTs at 77-84 are directionally correct for this regime but sit near band ceiling. If any pending long fills without a fresh regime check, expect the pump-chain+ chop-entry pattern to repeat.\n\nAI Trader pick this cycle: USELESS SHORT (conf 78, price 0.15053, rsi_at_pick 56.7). Precheck PASS: ATR 2.38%, RR grade B (R:R 2.38), RSI center of SHORT band, clean losers/penalty. Written to /root/.hermes/data/ai_trader_state.json. WATCHLIST ONLY \u2014 AI_TRADER_ENABLED=False (CEO disabled 2026-10-19); will NOT execute. Prior LINK SHORT pick (02:53) superseded \u2014 stale >45min, not rejected.",
+  "agent_timestamp": "2026-10-27T03:49:09.986261+00:00",
+  "regime_context": "SHORT tape, chop-pinned: aggregate 39S/4L/86N SHORT_BIAS (source: 15m_regime scanner, 2026-10-27 03:45). BTC 1m continuum AT EMA300 for 223m (price 79895 vs ema300 79999), zscore NEUTRAL, linreg_direction LEAN_BEAR, market_phase DECLINING, trend_quality STRONG_UP (4h holdover). BTC 4h regime LONG_BIAS vs 15m SHORT_BIAS \u2014 sources disagree; state which source any direction call comes from. Volatility LOW, volume LOW, velocity SLOW, acceleration NEGATIVE. Flip rate agg 19 / BTC 24 per 24h = normal standing churn (p50=19-20, p95=26). Practical read: no clean trend to ride on BTC; alt shorts in SHORT_BIAS tokens are the only regime-aligned side, but RR/RSI gates are blocking most of them (COMP penalty, GRASS oversold 28, AIXBT 84.6). Flat is an acceptable stance until BTC resolves the EMA300 pin (wait for 1m to hold clearly above or below before directional re-entry).",
+  "pattern_alerts": "VERIFIED (PostgreSQL, meta_rsi, last 24h, n=14 losers):\n\nPATTERN A \u2014 Oversold SHORT entries (n=3: LTC meta_rsi 37.3 -$0.17 hard_max_loss, DYDX 37.9 -$0.12 hard_max_loss, AERO 36.8 -$0.12 cut-loser). All MFE<=0.23%, never armed trail. Winning side: LONG bounce or no trade \u2014 shorting into RSI<40 is catching the knife's bounce. Why we weren't on it: signals fired below SHORT_RSI_HARD_FLOOR=45; gate bypass or detect-to-fill RSI drift needs one-cycle verification. BANANA-short lesson (entry RSI 10 = wrong condition, not timing) repeated 3x.\n\nPATTERN B \u2014 LONG pump-chain into SHORT tape (n=5: BLUR -$0.31 MFE 0.04%, ALT -$0.06 MFE 0.44% trail_arm_timeout, GRASS -$0.10 MFE 0.33%, RENDER -$0.11, CAKE -$0.03/-0.01 trail_arm_timeout). Aggregate was SHORT_BIAS all day. Winning side: SHORT the pumps or stand aside. pump-chain+ 7d: 20T 8W 40%WR net -$0.83 \u2014 family is the top net loser among enabled emitters.\n\nKPIs: chop-bleed 7d 85.8% / 14d 85.7% (baseline 85.6% 14d measured 2026-10-25) \u2014 stable, entry-quality owned. Flip rate agg 19 / BTC 24 per 24h \u2014 not anomalous.\n\nDead-signal check applied: doji-bottom-long / volume-breakout-long+ \u2014 already killed (2026-10-13/16), 0 trades in window, NO action. All families flagged above are enabled with live traffic."
 }

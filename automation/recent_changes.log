@@ -5308,3 +5308,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-27 03:28 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L '+$0.14' (FOGO pump-chain+ ugb_pt +5.08% MAE 0.212% / BTC continuum-trend+ manual_close -2.19%) | 24h 28T 12W 42.9% '-$0.76' (improving) | 7d 145T 44.8% '-$1.01' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 in 24h, empty set) | atr_sl_hit 1/28=3.6% under 40% | no neg streak (23 '-0.23', 0/1/2 positive) | frequency 2/hr | 1 open bracketed MET LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
+BY: auto_1hr
+- [2026-10-27 04:28 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L '+$0.06' (ENA/MET warrior-sr-confirm+ profit-monster-trail +1.50%/+0.85%) | 24h 30T 14W 46.7% '-$0.70' (improving) | 7d 146T 45.9% '-$0.87' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 in 24h; bb-bounce-v2-long+ n=2 already flagged for CEO) | atr_sl_hit 1/30=3.3% under 40% | no neg streak (4 consecutive positive hours 0-4) | frequency 2/hr | 0 open | No constants change -> no signal_versions entry

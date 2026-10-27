@@ -1,144 +1,131 @@
 {
-  "timestamp": "2026-10-27T02:50:00Z",
-  "run": 174,
+  "timestamp": "2026-10-27T04:45:00Z",
+  "run": 175,
   "session_brain_stats": {
-    "queries": 3,
-    "status": "functional",
-    "top_hits": [
-      "signal winrate regime",
-      "new signal ideas",
-      "loss bleeding"
-    ]
+    "queries": [
+      "pump-chain regime alignment",
+      "oversold short rsi floor drift",
+      "bb-bounce disable keep",
+      "missing implementations",
+      "recurring chop entry"
+    ],
+    "note": "session_brain loaded OK; top hits consistent with prior runs — no new unimplemented ideas surfaced"
   },
   "trade_summary_24h": {
-    "trades": 30,
-    "wins": 12,
-    "wr": 40.0,
-    "pnl_usdt": -1.06,
-    "by_exit_family_7d": {
-      "trail_family": "71T 85.9% +4.51",
-      "hard_max_loss": "17T 0% -2.39",
-      "atr_sl_hit": "20T 0% -1.25",
-      "other": "35T 8.6% -2.02"
-    },
-    "breakeven_wr_needed_7d": 55.3,
-    "actual_wr_7d": 44.4,
-    "armed_7d": "79T 75.9% +3.84",
-    "unarmed_7d": "65T 6.2% -5.04",
-    "armed_14d": "171T 70.8% +8.57",
-    "unarmed_14d": "168T 6.5% -13.26"
+    "n": 30,
+    "wr": 46.7,
+    "pnl": -0.7,
+    "n7d": 146,
+    "wr7d": 45.9,
+    "pnl7d": -0.87,
+    "n14d": 340,
+    "wr14d": 39.4,
+    "pnl14d": -4.26,
+    "armed7d": "80T 76.3% +4.03",
+    "unarmed7d": "62T 4.8% -4.94",
+    "armed14d": "170T 71.2% +8.75",
+    "unarmed14d": "165T 6.1% -13.05",
+    "trail_family_7d": "59T 88.1% +3.63",
+    "hml_7d": "16T 0% -2.31",
+    "breakeven_wr_7d": 49.9,
+    "actual_wr_7d": 45.9,
+    "size_reduce": "1.0x (file absent)"
   },
   "shadow_analysis": {
-    "oscillator": "FROZEN by design (25,598 rows, actual_outcome null) — not answerable, pre-live evidence only",
-    "contrarian": "894 entries / 622 joinable. pump-chain- flip-WR 64.7% n=348 STABLE (OOS 64.0%) — PROMOTE pending CEO. btc-pump-rider+ do-NOT-flip 28.6%. Total 48.7% signal-selective.",
-    "wyckoff": "340 rows PENDING outcome join (Nov 15) — not answerable",
-    "floor_admit": "2,179 rows PENDING outcome join — not answerable",
-    "rr_shadow": "ORPHANED (no producer, mtime 21d) — do not cite",
-    "shadow_trader": "26,710 signals. Gates justified: CONFLUENCE-EXPIRY 11,966@48%, CTX-GATE 1,040@51%. Exit A/B: pm_trail +3,805 dominant vs hard_max -5,661. HML sweep: no n>=20 pass. MFE-CUT shadow FIRING on BTC #16435 (would-cut at 118m live=-0.51 mfe=+0.06) — collecting.",
-    "overall": "2/6 answerable sources both used; oscillator/floor/wyckoff/rr blocked by design or orphanage"
+    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED since Oct 1; mtime 610h) — no new rows, pre-live evidence only",
+    "contrarian": "outcome join FRESH: 622 joinable — pump-chain- flip 64.7% n=348 STABLE OOS (PROMOTE pending CEO); btc-pump-rider+ 28.6% do-NOT-flip; total 48.7%",
+    "wyckoff": "342 rows, PENDING JOIN (no outcome column) — not answerable",
+    "floor_admit": "2182 rows, PENDING JOIN — not answerable until outcome join ships",
+    "rr_shadow": "ORPHANED (no producer, stale 21d+) — do not cite",
+    "shadow_trader": "27,034 signals / 26,315 closed — gates justified: CONFLUENCE-EXPIRY 12,025 blocked @48% would-win, CTX-GATE 1,042 @51%, BTC-CRASH 143 @36%; pm_trail dominant exit A/B (+3853)",
+    "overall": "2/6 answerable and both used (contrarian + shadow_trader). floor/wyckoff joins still the highest-value pending work."
   },
-  "trade_actions": [
+  "watchdog_steer_adjudication": [
     {
-      "action": "CLOSED BTC LONG #16435 at 79916 (entry 80267, -0.44% price, pnl -$0.05, exit_reason=manual_close)",
-      "reason": "Precommitted invalidation MET: continuum ema300_position=BELOW for 99 consecutive minutes (cross 01:53 UTC, threshold 15-30min), LEAN_BEAR + STRONG_DOWN, MFE only +0.06 never armed, MFE-CUT shadow would-fire. Cut before SL 79353 (-1.14%) path. Saved ~$0.08 vs SL.",
-      "verification": "HL fill avgPx 79916, paper+brain synced, loss-cooldown wrote reason='loss' streak=1 (Oct 26 bugfix FIRST REAL FIRE)"
+      "steer": "3 shorts entered oversold (LTC/DYDX/AERO meta_rsi 36.8-37.9) despite SHORT_RSI_HARD_FLOOR=45",
+      "status": "RESOLVED — root-caused run #170 (detect-to-fill drift + [35,45) exemption band, SHORT-MIDBAND detect-first at decider_run.py:2265). Waiver lapsed 00:00Z as T-directive. VERIFIED this run: 0 shorts with rsi_exec<45 since 00:00, 1 short total since 00:00, floor blocking every cycle (XPL 41.1, BTC 35.6). Waiver cohort closed 13T 46.2% -$0.39.",
+      "action": "none — structural close already in place"
+    },
+    {
+      "steer": "5 LONG pump-chain entries died in SHORT tape — consider regime-alignment gate (7d 20T 40% -$0.83)",
+      "status": "MEASURED & REJECT — 14d CF on btc_trend_bias: thr<0.3 blocks 23T -$0.66 but kills 7/17 winners (41% winner-kill > 20% bar); thr<0.0 blocks +0.14 (blocks winners). momentum_score CF REJECT (winners mean 22.8 vs losers 25.8, z=-1.19 wrong-direction). volume_spike inversion z=-1.58 p≈0.11 = MONITOR only. 30d pump-chain+ LONG +1.73 stands (NO-KILL, #170/#171 re-confirmed).",
+      "action": "no gate; volume-spike inversion pre-registered as creative #175"
     }
   ],
-  "waiver_lapse": {
-    "state": "flip1_state=(False,'expired')",
-    "band_opens_since_00:00": 0,
-    "floor_blocks_active": "SHORT-RSI-HARD-FLOOR firing every cycle (XPL 41.1, BTC 35.6, SUPER/ICP/CFX knife <35)",
-    "cohort_now_blocked": "13T waiver-band shorts during waiver = 46.2% WR -$0.39 — structurally closed",
-    "note": "Lapse itself resolved the oversold-short component of steer-001 without new config"
+  "trade_actions": [
+    "NONE this run. 1 open: ENA LONG warrior-sr-confirm+ #16439 +0.38% 0.4h bracketed (SL 0.20757 / TP 0.21283) — PM manages."
+  ],
+  "waiver_lapse": "VERIFIED — flip1 expired, 0 band opens since 00:00Z, SHORT_RSI_HARD_FLOOR blocking, 1 short total since midnight (rsi>=45). Steer-001 oversold-half structurally closed.",
+  "losing_autopsy_24h": {
+    "method": "recovery_replay.py adverse-first (selfcheck PASS)",
+    "window": "48h n=23 losers",
+    "never_adverse": 6,
+    "recovered_after_adverse": 14,
+    "never_traded_back": 3,
+    "never_list": "AERO SHORT breakout-pullback- -$0.12 / ICP SHORT hh-hl- -$0.09 / CC SHORT pump-chain- -$0.07 — ALL waiver-band shorts rsi 36.8-40.2, class now blocked by floor",
+    "verdict": "wrong-side REFUTED 99th consecutive (#61 opposite-side p=0.116, #84 fwd-return t=-0.04). 24h n=14 losers."
   },
   "drift_findings": [
     {
-      "severity": "MED",
-      "finding": "WATCHDOG GAP: steers=[] at 02:15 while BTC #16435 invalidation (its own deep-analysis condition) was already met at ~02:08 (15min after 01:53 cross). Steer-validity prompt covers retraction but not condition-met→emit. Auditor executed the cut at 02:43.",
-      "fix": "Add to trade_watchdog_prompt.md: when a stated invalidation on an open trade becomes true, emit an exit steer with condition+timestamp",
-      "status": "proposed"
+      "severity": "LOW",
+      "finding": "#174 watchdog gap (condition-met→emit) — prompt fix still pending, not re-blocked"
     },
     {
       "severity": "LOW",
-      "finding": "FOGO #16437 raw conf 23.5 (final_confidence 43.5 = raw+20) confirms CONF_FLOOR column pin is load-bearing: gate reading metadata would NOT block this trade",
-      "status": "monitor"
-    },
-    {
-      "severity": "LOW",
-      "finding": "session_brain functional this run (prior dup-heavy note stands but queries return usable hits)",
-      "status": "monitor"
+      "finding": "pm_armed_at adoption 5/146 in 7d — stamp live but slow; mfe_pct>=0.40 remains the arm-measure of record (both agree directionally)"
     }
   ],
   "recurring_problems": [
-    "chop-bleed KPI 7d 86.6% / 14d 86.3% — standing entry-quality state, below 92% emergency line, owned by queued CONF_FLOOR/MFE-CUT"
+    "unarmed bleed: 7d 62T 4.8% WR -4.94 vs armed 80T 76.3% +4.03 — entry quality (chop) remains the dominant bleed, consistent 10+ runs",
+    "bb-bounce-v2-long+ 14d 39T 35.9% -1.15 — CEO keep-vs-disable packet complete, awaiting ruling"
   ],
   "missing_implementations": [
-    "CONF_FLOOR=30 bare-only — blocked 32T 4W -1.81/14d, all fk defs <20% except disputed fkA-scope 20.0%; SHIP BLOCKED on CEO fkB ruling + RAW column pin; FOGO conf 23.5 opened live this run",
-    "pc-PROMOTE — contrarian flip 64.7% n=348 stable; CEO pending",
-    "hard-stop reentry cooldown #166 — fresh evidence this run (see creative)",
-    "TAT flip — CEO pending (11 trail_arm_timeout)"
+    "floor_admit + wyckoff outcome joins (pre-registered Nov 15) — only path to making those 2 shadow sources answerable",
+    "CEO rulings still pending: CONF_FLOOR fkB, pc-PROMOTE 64.7% n=348, #166 reentry cooldown, bb-bounce keep-vs-disable, TAT flip"
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-27T02:50:00Z",
-      "idea": "REENTRY-AFTER-WIN KPI: same-token reentry within 4h after a WINNING close — 14d 33T 33.3% WR -$0.99 vs non-reentry 273T 39.9% -$2.87 (reentries = 19% of volume, 36% of bleed). Binomial p=0.312 FAILS significance → MONITOR. Supports CEO #166 reentry cooldown with fresh numbers. Pre-reg ship bar: 30d same-sign AND n>=20 AND p<0.05 AND survives EXTREME-regime exclusion (after-WIN by regime: NORMAL -0.86 / EXTREME -0.34 / FLAT +0.21).",
-      "rationale": "Bleed concentrated NORMAL+EXTREME; scattered across signals (max n=4) = not one signal's bug",
+      "date": "2026-10-27T04:45:00Z",
+      "idea": "VOLUME-SPIKE INVERSION — pump-chain+ LONG: 30d losers enter on HIGHER volume_spike (mean 0.459) than winners (0.316), z=-1.58 p≈0.11 — chasing the pump = wrong side",
+      "rationale": "Counterintuitive and actionable if it holds: high spike at entry means we arrive AFTER the move. Momentum_score/speed/RSI all show NO discrimination (|z|<1.2) — volume_spike is the only candidate field with signal.",
+      "expected_impact": "if it survives: entry-quality filter that kills late-chase entries without touching quiet-trend winners",
       "category": "entry sniper",
       "status": "pre-registered",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-27T02:50:00Z",
-      "idea": "BREAKEVEN-WR KPI (zero-code): 7d needs 55.3% WR to breakeven, actual 44.4% — gap quantified as payoff asymmetry (avg trail win +0.077 vs HML loss -0.141 = 2.3:1 adverse). Standing metric: closes only when arm-rate rises or HML frequency drops.",
-      "rationale": "Reframes 'every trade should be a winner' as an auditable number",
-      "category": "kpi",
-      "status": "suggested",
-      "risk": "low"
+      "risk": "low",
+      "ship_bar": "30d same-sign AND p<0.05 AND kills <20% of winners — locked before data"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    "#173: 0 config, escalation #17 closed (stays closed), drift-across-band KPI pre-reg (still n<20, MONITOR)",
-    "Oct 26 loss-cooldown bugfix: RE-CONFIRMED LIVE — first real reason='loss' write (BTC:LONG streak=1 0.3h) this run",
-    "Oct 26 peak re-anchor: AIXBT pm_armed_at stamped (per #173); FOGO not yet armed — n/a",
-    "Waiver lapse (T-directive expiry): VERIFIED LIVE — flip1 expired, 0 band opens, floor blocks active"
+    "#174 BTC #16435 manual_close -0.05: CORRECT (EMA300 invalidation precommitted, cut before SL path) — verified exit_reason=manual_close",
+    "#174 waiver lapse verify: RE-CONFIRMED (0 band opens, floor active)",
+    "#174 REENTRY-AFTER-WIN KPI: refresh 14d n=34 35.3% -0.80 vs non 306T 39.9% -3.46, z=-0.518 p=0.605 STILL FAILS — MONITOR stands, supports CEO #166 with fresh numbers",
+    "#174 BREAKEVEN-WR: refresh 49.9% vs actual 45.9% (gap 4.0pp, improved from 10.9pp at 02:45 as avg_loss normalized)",
+    "Oct 26 loss-cooldown bugfix: still live (first reason=loss write #16435 confirmed #174)",
+    "constants: EMPTY git diff, CEO_PROTECTED untouched, session lock absent"
   ],
-  "deep_dive_14d_sub50_n15": [
-    "bb-bounce-v2-long+ 39T 35.9% -1.15 — owned (packet complete, CEO keep-vs-disable)",
-    "doji-bottom-long 16T 31.3% — killed",
-    "ai-trader+ 19T 31.6% — disabled",
-    "pump-chain- 37T 21.6% — owned (CONF_FLOOR+PROMOTE)",
-    "pump-chain+ 47T 34.0% -0.30 / 30d +1.55 — NO-KILL stands",
-    "ai-trader-pending 16T 25.0% — CEO domain",
-    "hl_copy 11T 27.3% — n<15 COLLECT"
-  ],
-  "losing_autopsy_24h": {
-    "method": "recovery_replay adverse-first, selfcheck PASS",
-    "losers": 15,
-    "never_adverse": 1,
-    "recovered_after_adverse": 11,
-    "never_traded_back": 3,
-    "never_list": [
-      "AERO SHORT rsi 36.8 cut-loser (waiver era)",
-      "ICP SHORT rsi 40.0 hard_max_loss (waiver era)",
-      "CC SHORT rsi 40.2 hard_sl (waiver era)"
-    ],
-    "structural_pct": 20.0,
-    "baseline_pct": 17.5,
-    "verdict": "wrong-side REFUTED 98th consecutive (#61 p=0.116, #84 t=-0.04); 3 NEVER all waiver-band shorts — cohort now blocked by lapse"
+  "deep_dive_14d_sub50_n15": {
+    "new_targets": 0,
+    "owned": [
+      "pump-chain- 37T 21.6% -0.42 → CONF_FLOOR staged + pc-PROMOTE CEO",
+      "ai-trader-pending 16T 25.0% -0.14 → CEO domain",
+      "doji-bottom-long 16T 31.3% → killed Oct 16, last close Oct 16 (historical in window)",
+      "ai-trader+ 18T 33.3% → disabled, last close Oct 19 (historical)",
+      "pump-chain+ 46T 34.8% +0.12 → NO-KILL (30d +1.73), regime CF REJECT this run",
+      "bb-bounce-v2-long+ 39T 35.9% -1.15 → CEO packet complete"
+    ]
   },
   "mandate_fresh": {
-    "trail_vs_hml_14d": "pm-trail 84T 91.7% +4.61 vs hard_max_loss 60T 0% -6.27 (prior 89T/+5.14 vs 56T/-8.17 in brief = STALE)",
-    "chop_bleed": "7d 86.6% (56T of gross loss never armed +0.40% MFE), 14d 86.3%"
+    "arm_measure": "mfe_pct >= 0.40 (corrected; trailing_activated retired #170)",
+    "note": "7d armed 76.3% +4.03 vs unarmed 4.8% -4.94 — trend-following edge intact; chop entries own the bleed"
   },
   "next_actions": [
-    "CEO: fkB ruling → CONF_FLOOR=30 bare-only with RAW confidence pin + blocked==32 selfcheck (FOGO 23.5 live evidence)",
-    "CEO: pc-PROMOTE decision (64.7% n=348 OOS-stable)",
-    "CEO: #166 reentry cooldown — now has fresh 14d data (33T after-WIN -$0.99)",
-    "CEO: bb-bounce keep-vs-disable (packet complete) · TAT flip",
-    "Watchdog prompt: add condition-met→emit-exit-steer rule (drift finding)",
-    "FOGO #16437 hold: SL ratcheted 0.003322 (in profit), EXTREME regime, conf 23.5 cohort — watch, PM trail manages",
-    "Escalation #17 CLOSED — stays closed"
+    "CEO: CONF_FLOOR fkB ruling (FOGO 23.5 live evidence)",
+    "CEO: pc-PROMOTE 64.7% n=348 OOS-stable",
+    "CEO: #166 reentry cooldown (14d p=0.605 still fails bar — data only)",
+    "CEO: bb-bounce keep-vs-disable · TAT flip",
+    "Next run: confirm volume-spike inversion at next sample bump; verify waiver floor still 0 band opens",
+    "Escalation #17 stays CLOSED"
   ],
-  "readiness": "1 open: FOGO LONG #16437 pump-chain+ @0.003305, SL 0.003322 (above entry = locked), TP 0.003388, up ~+0.6%, EXTREME — let PM/SL manage. BTC flat after invalidation cut. Regime: chop-pin LEAN_BEAR, STRONG_DOWN, 1m BELOW EMA300 — no fresh LONGs until reclaim WITH volume; shorts only high-RSI fade cell (volume-buildup rsi>=65 now 5/5 +$0.47). size 1.0x (file absent). Waiver LAPSED, floor active."
+  "readiness": "1 open ENA LONG bracketed +0.38%. Regime chop-pin LEAN_BEAR / STRONG_DOWN / 15m SHORT_BIAS vs 4h LONG_BIAS disagree — no fresh LONGs until EMA300 reclaim WITH volume; shorts high-RSI fade cell only; mid-band no trade. size 1.0x. Waiver lapsed, floor active."
 }

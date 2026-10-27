@@ -9336,5 +9336,15 @@
     "category": "kpi",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T04:45:00Z",
+    "idea": "VOLUME-SPIKE INVERSION — pump-chain+ LONG: 30d losers enter on HIGHER volume_spike (mean 0.459) than winners (0.316), z=-1.58 p≈0.11 — chasing the pump = wrong side",
+    "rationale": "Counterintuitive and actionable if it holds: high spike at entry means we arrive AFTER the move. Momentum_score/speed/RSI all show NO discrimination (|z|<1.2) — volume_spike is the only candidate field with signal.",
+    "expected_impact": "if it survives: entry-quality filter that kills late-chase entries without touching quiet-trend winners",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low",
+    "ship_bar": "30d same-sign AND p<0.05 AND kills <20% of winners — locked before data"
   }
 ]
