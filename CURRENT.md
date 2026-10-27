@@ -1,60 +1,56 @@
-# Current State — brain_auditor #177 2026-10-27 06:50 UTC
-**Last Updated: 2026-10-27 06:50 UTC**
-**Updated by: brain_auditor #177. Prior: #176 05:36 (preserved in git history).**
+# Current State — brain_auditor #178 2026-10-27 07:55 UTC
+**Last Updated: 2026-10-27 07:55 UTC**
+**Updated by: brain_auditor #178. Prior: #177 06:50 (preserved in git history).**
 
 ## HEADLINE — 0 config changes (session lock absent, constants EMPTY git diff,
 nothing passed bars), 0 ships, 0 trade actions.
-**PRE-REG #60 DRIFT→LOSERS STUDY EXECUTED (n=81) → HYPOTHESIS REFUTED.**
-|rsi drift|>=10 = 26T 69.2% +0.64 vs <10 = 55T 49.1% -0.61 (fisher p=0.1002,
-direction OPPOSITE — big drift = market moving = better outcomes, not losses).
-Inverse flat-RSI gate (|drift|<5): p=0.0259 significant BUT fk 37.8% (17/45
-winners) >> 20% bar AND confounded (bb-bounce 62.5% / pc+ 58.3% of their trades
-are small-drift) → NOT SHIPPABLE. Monitor to n>=100 rsi_exec rows.
+**PC- PROMOTE LIVE-EXIT CONTRADICTION — recommend NO-GO at 17:12Z formal.**
+The mandatory caveat line was shipped as measurement: 10-engine full-mix flip
+(earliest-exit precedence) on shadow book n=3013 = FLIP WORSE avg -0.183% vs
+-0.130% paired t=-1.88; real PG book n=51 flip -0.095% worse (t=-0.39 ns, WR
+higher 45.1 vs 25.5); event-aligned n=67 +0.090% (t=0.82 ns). Touch classifier
+(pre-reg primary) still 64.4% n=348 p=4.6e-08, OOS 66.1/62.6%, NORMAL-era
+(post-Oct16) 62.7% n=177 — ALL touch legs pass, but the edge does NOT survive
+real exits. If CEO wants the edge: pre-register ±0.40 bracket-exit variant
+(new experiment), do NOT ship the direction flip.
+**CHASE_RATIO formal Oct-27 close: FAIL-enforce** — 54 fires / 18 joined,
+would-blocked net +$0.28 (blocking loses), 7 trail winners killed → stays
+SHADOW zero-behavior, final re-eval n>=20.
 
-**Two more pre-reg routes CLOSED with data:** VB- strength-band recheck HARD
-FAIL (fk 58%, save $0.15 << $1.00, 14d==30d no traffic) — watchdog's vb-
-oversold-SHORT cell route dead. pc+ 66-70 gate n=15@30d HIT but net POSITIVE
-+0.10/30d → NO-GO, chase-band tighten lever closed.
-
-Wrong-side REFUTED 101st consecutive. Deep-dive: 0 new sub-50% n>=15 targets.
-
-## MANDATE FRESH (PG 06:45)
-24h 28T 42.9% -0.75 | 7d 144T 46.5% -0.54 | 14d 338T 39.3% -4.20 | 30d 735T 44.2% -2.92
-armed 7d 80T 76.3% +4.03 vs unarmed 64T 9.4% -4.57
-armed 14d 169T 71.0% +8.71 vs unarmed 169T 7.7% -12.91
-trail family 14d 127T 88.2% +9.24 vs chop_stop 180T 2.8% -13.77
-**mandate intact — trends win, chop loses**
+## MANDATE FRESH (PG 07:35)
+24h 28T 42.9% -0.75 | 7d 144T 46.5% -0.54 | armed 7d 80T 76.3% +4.03 vs
+unarmed 64T 9.4% -4.57 | armed 14d 168T 71.4% +8.79 vs unarmed 167T 7.8% -12.86
+| exits 7d pm_trail 52T 90.4% +2.95 vs HML 15T 0% -2.00 — mandate intact
 
 ## SHADOW 3/6 ANSWERABLE (all used)
-contrarian join FRESH 622 — pc- flip 64.7% n=348 STABLE (PROMOTE pending CEO),
-rider 28.6% do-NOT-flip | shadow_trader 27,296 — gates justified
-(CONFLUENCE-EXPIRY 12,092@48%) | oscillator FROZEN / floor 2185 + wyckoff 342
-PENDING JOIN / rr ORPHANED
+contrarian 895/623 join fresh — pc- 64.4% n=348 STABLE + NEW live-exit line
+(contradiction above) | shadow_trader 27,460 CONFLUENCE-EXPIRY 12,131@48% |
+oscillator FROZEN / floor 2185 + wyckoff 342 PENDING Nov 15 / rr ORPHANED
 
 ## LOSING AUTOPSY 48h (adverse-first, selfcheck PASS)
-22 losers = 5 never-adverse / 14 recovered / **3 NEVER (AERO+ICP warrior-sr,
-CC pump-chain- owned by PROMOTE)** -> wrong-side REFUTED 101st
-(#61 p=0.116, #84 t=-0.04). 14d census 192 = 39/124/29 (15.1% structural).
+22 losers = 5 never-adverse / 14 recovered / 3 NEVER (AERO band-edge pre-lapse,
+ICP waiver-class blocked post-lapse, CC owned by PROMOTE) → wrong-side REFUTED
+102nd (#61 p=0.116, #84 t=-0.04). Structural 13.6% ~ baseline.
 
-## LAST-RUN VERIFY #176 — ALL PASS
-waiver lapse holding (0 SHORT<45 opens since 00:00; only AIXBT rsi_exec 57.43) |
-recovery selfcheck ASSERT PASS | constants EMPTY | doji post-kill 0 |
-pm_armed_at latest ENA 04:13 (#161 WORKING) | loss-cooldown reason='loss' code
-present | contrarian join WORKING | volume-spike n=87<100 hold stands
-(recomputed fisher p=0.2124 matches #176).
+## LAST-RUN VERIFY #177 — ALL PASS
+waiver lapse holding (flip1=(False,'expired'); 1 short since 00:00 = AIXBT
+rsi_exec 57.43 compliant) | recovery ASSERT PASS | constants EMPTY | session
+lock absent | pm_armed_at 5 stamps (ENA 04:13) | brain reason='loss' present
+(:60 dict literal) | 0 Tracebacks Oct 26-27 (historical 11/17/18/25 only) |
+doji/ai-trader+ post-kill 'opens' = kill-boundary rows NOT leaks |
+size-reduce absent=1.0x | kill flags correct (volume-breakout/oversold 0).
 
 ## OPEN / READINESS
-0 open — flat correct. Regime: 15m+4h LONG_BIAS vs continuum AT EMA300 pin,
-vol LOW, volume LOW, market_phase CALM/MARKUP — soft-long vacuum, no confirmed
-trend. No fresh LONGs until reclaim+volume; SHORT band-edge cells blocked by
-floor/ceiling; size 1.0x (file absent). Waiver LAPSED, floor active.
+0 open — flat correct. Regime: 15m SHORT_BIAS vs 4h LONG_BIAS, continuum AT
+EMA300 pin, vol NORMAL, zscore STRONG_NEG, wyckoff ACCUMULATION, RECOVERY —
+mixed soft, no confirmed trend. No fresh LONGs until reclaim+volume; SHORT
+high-RSI fade only (55-65); mid-band no trade (waiver lapsed); size 1.0x.
 
-## TELEMETRY NOTE (this run)
-rsi_exec coverage 81/93 since Oct 21 (87%); 8 trades miss both rsi keys
-(5 ai-trader-pending pre-#117, 3 bb-bounce w/o rsi). Analysis-only gap — gates
-read live values. avg |rsi_14 − rsi_exec| = 7.63 pts, 32% drift >10 — large
-disagreement, but NOT loss-predictive (study above).
+## DEEP-DIVE
+0 new sub-50% n>=15 targets (bb-bounce CEO | doji boundary-only | ai-trader+
+disabled | pc- CONF_FLOOR+PROMOTE-now-NO-GO | ai-pending CEO | pc+ NO-KILL).
 
-## CEO PENDING (unchanged)
-CONF_FLOOR fkB · pc-PROMOTE 64.7% n=348 · bb-bounce keep-vs-disable · TAT flip
-(volume-spike pc+ HOLD until n>=100)
+## CEO PENDING
+CONF_FLOOR fkB · pc-PROMOTE **NO-GO rec this run** (live-exit data) ·
+bb-bounce keep-vs-disable · TAT flip · hard-stop reentry · MEDs F1/F2/F3.
+Escalation #17 stays CLOSED. Brain-closed loss e2e still pending (traffic).

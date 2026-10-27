@@ -9381,5 +9381,39 @@
     "category": "verification",
     "status": "closed-no-go",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T07:58:58Z",
+    "run": 178,
+    "agent": "brain_auditor",
+    "idea": "Live-exit-aware contrarian flip line (10-engine full mix, earliest-exit precedence) — measured the PROMOTE caveat for real",
+    "rationale": "Pre-reg caveat required touch-classifier OR live-gate-aware line; built the latter on shadow book (n=3013) + real PG book (n=51) + event-aligned subset (n=67)",
+    "expected_impact": "Prevents shipping a direction flip that loses more under real exits",
+    "category": "promotion-guard",
+    "status": "shipped-analysis",
+    "risk": "low",
+    "result": "NO-GO: shadow full-mix flip avg -0.183% vs orig -0.130% paired t=-1.88; real book flip -0.095% worse t=-0.39 ns (WR higher 45.1 vs 25.5); event-aligned +0.090% t=0.82 ns — touch 64.4% edge does NOT survive live exits"
+  },
+  {
+    "date": "2026-10-27T07:58:58Z",
+    "run": 178,
+    "agent": "brain_auditor",
+    "idea": "Bracket-exit reframe: ±0.40% TP/SL bracket realizes what the touch classifier measures; current ATR/HML/trail exits do not",
+    "rationale": "Touch says +0.40-before--0.40 happens 64.4% but live ATR SL <0.40 stops early and trail/horizon gives back; #164 pre-computed symmetric-bracket EV +0.068/event fee-adjusted",
+    "expected_impact": "If CEO wants the touch edge: pre-register bracket-exit variant as NEW experiment, not the direction flip",
+    "category": "exit mechanism",
+    "status": "suggested",
+    "risk": "medium (needs shadow-first)"
+  },
+  {
+    "date": "2026-10-27T07:58:58Z",
+    "run": 178,
+    "agent": "brain_auditor",
+    "idea": "CHASE_RATIO_SHADOW formal Oct-27 close: FAIL-enforce, route no-edge — stays shadow zero-behavior",
+    "rationale": "54 unique fires Oct 14-27 / 18 joined to opens within 12m; would-blocked set net +$0.28 (blocking LOSES money); 7 trail-family winners killed (ARB +0.28 atr_trail, ALT +0.47 trail_sl, CAKE/ETH/PUMP/PENDLE/FOGO/AIXBT pm-trail); n=18 < 20 bar also missed",
+    "expected_impact": "Closes the pre-registered date with data; final re-eval at n>=20 joined (~3 days)",
+    "category": "gate review",
+    "status": "closed-no-edge",
+    "risk": "none"
   }
 ]
