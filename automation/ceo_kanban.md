@@ -514,3 +514,7 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-27 04:28 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L '+$0.06' (ENA/MET warrior-sr-confirm+ trail wins) | 24h 30T 14W 46.7% '-$0.70' (improving) | 7d '-$0.87' — size-reduce 1.0x | kill: none | atr_sl_hit 3.3% | freq 2/hr | 4 consecutive positive hours | bb-bounce-v2-long+ CEO review still pending
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-27 11:29 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L '+$0.04' (SUSHI bb-squeeze+ trail win) | 24h 27T 12W 44.4% '-$0.74' | 7d 142T 47.2% '-$0.64' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 in 24h, worst n>=3 positive-WR) | atr_sl_hit 1/27=3.7% under 40% | no neg streak (11:00 positive, 00-04 positive) | frequency 1/hr | 2 open bracketed (SUPER, DOT) | No constants change -> no signal_versions entry
+BY: auto_1hr

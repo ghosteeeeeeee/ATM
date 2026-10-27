@@ -16441,3 +16441,23 @@ BY: upgrade_implementer
 **Open Questions:**
 - 24h 44.4% WR red (-$0.74), 7d -$0.68 — persistent small bleed, no single killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+
+## 2026-10-27 11:29 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.04 (WR: 100%) | 24h: 27T 12W 44.4% '-$0.74' | 7d 142T 67W 47.2% '-$0.64' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last close: SUSHI bb-squeeze+ LONG profit-monster-trail +$0.04 (+1.11%) — clean trail win
+- atr_sl_hit 1/27 = 3.7% (<40%); dominant closes = profit-monster-trail (8T +$0.29), ugb_pt (6T +$0.29); worst = hard_max_loss (3T '-$0.60', expected at leverage)
+- Kill check: no 0%WR signal with n>=3 in 24h — worst n>=3 signals positive-WR (volume-buildup- 8T 3W '-$0.32', pump-chain+ 7T 4W '-$0.16'); single-loss signals all n=1
+- Streak: 11:00 '+$0.04', prior hours 00-04 all positive, no 3h negative trigger
+- Frequency 1/hr — not overtrading
+- 2 open bracketed LONGs: SUPER bb-squeeze+ (SL 0.175958 / TP 0.180244), DOT r2v2-long3 (SL 0.980175 / TP 1.004590) — both have explicit levels
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h 44.4% WR red ('-$0.74'), 7d '-$0.64' — persistent small bleed, no single killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
