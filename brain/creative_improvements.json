@@ -9581,5 +9581,50 @@
     "category": "entry sniper",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T17:06:34Z",
+    "idea": "Arm-rate tripwire NULL-handling amendment + early-backfill-before-measure protocol",
+    "rationale": "#148 pre-registered upgrade-if-KPI-flips; tripwire flipped on NULL-as-unarmed artifact (8 Oct-27 brain-CLI closes); repaired data LONG 54.3-55.4% never <50%",
+    "expected_impact": "prevents false CEO flags; measure arm KPIs only after backfill or on NOT-NULL denominator",
+    "category": "measurement integrity",
+    "status": "applied",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T17:06:34Z",
+    "idea": "Signal-level arm-rate filter: block 14d n>=15 signals with arm-rate <40%",
+    "rationale": "evaluated: only ai-trader-pending qualifies (18.8% n=16) — CEO-domain, saves $0.14 << $1.00 bar; next-lowest bb-squeeze 43.8% is net-positive +0.62",
+    "expected_impact": "none — REJECTED-WITH-DATA so it is never re-derived from the arm-rate table",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T17:48:00Z",
+    "idea": "Formal-checkpoint SUPERSEDED rule: when a pre-registered auto-fire PROMOTE is shipped by CEO authority BEFORE its auto-fire date, the checkpoint resolves to SUPERSEDED-BY-CEO (bar still measured and recorded), not NO-GO — prevents 'do not act early' language from contradicting a live flag",
+    "rationale": "17:12Z pc- PROMOTE had auditor NO-GO (#179 live-exit contradiction) but CEO+T shipped CONTRARIAN_LIVE at 15:27Z via SHADOW-RECKONING; #186 still carried 'formal NO-GO STANDS' 28 min AFTER the ship — two truths in the queue at once",
+    "expected_impact": "kills future disposition ambiguity on pre-reg dates; zero code",
+    "category": "governance",
+    "status": "applied",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T17:48:00Z",
+    "idea": "Arm-steer manager-awareness: trade_watchdog arm-level steers should name the ACTUAL exit manager for the signal — 'trail manages' only true for non-bypassed signals; for PROFIT_MONSTER_BYPASS families (continuum-osc, pump-chain, hh-hl, …) the arm reference belongs to UGB-PT + ATR-SL ratchet",
+    "rationale": "SIDE-FIND this run: steer for #16445 said 'if it arms, trail manages' — verified impossible (continuum-osc in bypass list, get_all_open_positions 0 vs 1). Arm condition itself still valid (UGB-PT reads PM_TRAIL_ACTIVATE_PCT), but the steer names the wrong manager; CEO could wait for a trail that will never fire",
+    "expected_impact": "corrects steer language for ~15 bypassed signal families; zero behavior change (doc/prompt only)",
+    "category": "measurement integrity",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T17:48:00Z",
+    "idea": "CONTRARIAN-LIVE real-vs-smoke fire counter (zero code): distinguish TOK smoke-test [CONTRARIAN-LIVE] lines from real inversions in the 11-03 disposition check — 23 lines today are all smoke (0 pc- trades opened since 15:27Z ship)",
+    "rationale": "conversion metric registered in shadow_disposition notes compares [CONTRARIAN-LIVE] vs [Z-FLIP] counts; if smoke lines pollute the numerator the conversion reading is wrong on day one",
+    "expected_impact": "clean live test reading for the pc- flip at Nov 3 disposition",
+    "category": "monitoring",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

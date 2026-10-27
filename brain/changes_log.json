@@ -3086,5 +3086,38 @@
     "after": "Added bullet: % is dollar share, count share is different and always lower, dividing counts is not a math bug, state which measure used",
     "rationale": "#184 flagged a math bug that was a dollar-vs-count misread; prompt line prevents recurrence and a bogus fix to correct code",
     "impact": "zero-behavior doc; protects the watchdog KPI from a future incorrect \"fix\""
+  },
+  {
+    "timestamp": "2026-10-27T17:06:34Z",
+    "agent": "brain_auditor",
+    "change": "Ran cell_stats.backfill_mfe_mae(days=7) EARLY — repaired 8 NULL mfe_pct/mae_pct rows (Oct 27 brain-CLI closes) before nightly 00:20 timer; arm-rate KPIs now computed on repaired data",
+    "type": "tweak",
+    "file": "data (trades.mfe_pct via scripts/cell_stats.py backfill)",
+    "before": "8 closed trades 2026-10-27 with mfe_pct NULL (pm_trail x7 + manual_close x1) — counted as unarmed by tripwire",
+    "after": "0 NULL mfe in 7d window; LONG arm 48.9% -> 55.4%, run-2 window 47.8% -> 54.3%",
+    "rationale": "#148 documented brain.py trade close never writes mfe + nightly backfill; KPI flipped on the blind spot (its own upgrade criterion); data-only idempotent repair, same as tonight timer",
+    "impact": "ARM-RATE TRIPWIRE run-2 CEO FLAG RETRACTED — LONG leg never validly <50%; no trading behavior change"
+  },
+  {
+    "timestamp": "2026-10-27T17:06:34Z",
+    "agent": "brain_auditor",
+    "change": "ARM-RATE TRIPWIRE pre-reg amended: denominator = mfe_pct IS NOT NULL (or measure post-00:20 backfill); BOTH-LEG condition re-evaluated on repaired data = NOT TRIPPED",
+    "type": "tweak",
+    "file": "brain/audit_recommendations.json (tripwire_run3_corrected) + CURRENT.md",
+    "before": "pre-reg #180/#185: arm rate over all closed trades, NULL mfe counted as unarmed",
+    "after": "NULL mfe excluded from denominator; run-1/2/3 all LONG >=54.3% -> no trip, run-2 CEO flag retracted",
+    "rationale": "NULL means measurement-missing not measured-and-failed; #148 pre-registered this exact upgrade trigger",
+    "impact": "removes false CEO flag; leaderboard context (pc+/bbbv2 owned) unaffected"
+  },
+  {
+    "timestamp": "2026-10-27T17:48:00Z",
+    "agent": "brain_auditor",
+    "change": "Run #187: completed interrupted 17:06 run — 17:12Z pc- formal checkpoint DISPOSITIONED SUPERSEDED-BY-CEO (bar 64.6% n=350 met, but CONTRARIAN_LIVE already shipped 15:27Z by CEO+T); artifacts committed (audit_recommendations, creative, CURRENT, kanban). 0 trading-config changes.",
+    "type": "doc",
+    "file": "brain/audit_recommendations.json + CURRENT.md + automation/ceo/ceo_kanban.md",
+    "before": "formal_pc_no_go=PENDING_17_12Z, uncommitted 17:06 artifacts, CURRENT.md still #186",
+    "after": "formal_pc_no_go dispositioned, run #187 recorded, artifacts committed",
+    "rationale": "17:12Z pre-reg date passed; queue carried both NO-GO language and a live CONTRARIAN_LIVE flag simultaneously — resolves the contradiction",
+    "impact": "governance clarity only, zero trading behavior change"
   }
 ]

@@ -1,213 +1,162 @@
 {
-  "timestamp": "2026-10-27T15:47:48Z",
-  "run": 186,
+  "timestamp": "2026-10-27T17:48:00Z",
+  "run": 187,
   "session_lock": "absent",
   "config_changes_applied": [],
-  "headline": "TRIPWIRE RUN 2 TRIPPED (mfe>=0.40: LONG 48.4%<50 AND SHORT 58.7%>55) -> CEO FLAG with leaderboard context, NO auto-config (pre-registered #180/#185). Chop-bleed route-reopen NOT tripped (official never-armed dollar share 92.7% / count 81.5%, both >70%). SHADOW-RECKONING round (98e9dc9b, 15:27Z, CEO+T) landed mid-window: CONTRARIAN_LIVE pc- flip + coupled SL trial (-6/0.04) + 5 kills + oscillator fossil archived.",
-  "tripwire_run2": {
-    "definition": "mfe_pct >= 0.40 (arm KPI, peak_reanchor/arm_gap_baseline)",
-    "long_arm_rate_7d": 48.4,
-    "short_arm_rate_7d": 58.7,
-    "long_n": 91,
+  "headline": "RUN #187 — completed the interrupted 17:06Z run (tripwire retraction artifacts were written but uncommitted; kanban/CURRENT never updated). 17:12Z pc- formal checkpoint DISPOSITIONED: bar MET (64.6% n=350) but decision SUPERSEDED — CEO+T already shipped CONTRARIAN_LIVE at 15:27Z; 0 real pc- fade trades since ship (smoke-tests only). ARM-RATE TRIPWIRE RETRACTION CONFIRMED on repaired data: 7d LONG arm 55.4% (51/92) / SHORT 60.9% (28/46), 0 NULL mfe — LONG never validly <50% on any run, no CEO flag owed. Chop-bleed route-reopen NOT tripped (92.5% dollar / 81.3% count, needs <70%x2). 0 trading-config changes (constants EMPTY, CEO_PROTECTED 13/13, session lock absent). SIDE-FIND (MED): watchdog arm-steer language wrong for PROFIT_MONSTER_BYPASS signals — 'if it arms, trail manages' cannot be true for continuum-osc+ #16445 ('continuum-osc' is in BYPASS list; PM trail never arms, UGB-PT+ATR-SL ratchet manage; verified get_all_open_positions returns 0 with bypass vs 1 without). Arm condition itself MET (price 80681 > 80644, live +0.45%), SL ratcheted 79827, HOLD.",
+  "tripwire_run3_corrected": {
+    "definition": "mfe_pct >= 0.40 among mfe_pct IS NOT NULL (pre-reg amended this run)",
+    "long_arm_rate_7d": 55.4,
+    "short_arm_rate_7d": 60.9,
+    "long_n": 92,
     "short_n": 46,
-    "verdict": "BOTH LEGS HOLD -> TRIPPED RUN 2 -> CEO FLAG, no auto-config",
-    "run1_values": {
-      "long": 49.5,
-      "short": 58.7
+    "verdict": "LONG leg 55.4% NOT <50 -> TRIPWIRE NOT TRIPPED -> run-2 CEO FLAG RETRACTED",
+    "raw_before_repair": {
+      "long": 48.9,
+      "short": 58.7,
+      "note": "NULL-as-unarmed artifact"
     },
-    "leaderboard_context": {
-      "trigger": "unarmed 14d pnl < -$1.50 AND arm-rate < 50%",
-      "crossing": [
-        {
-          "signal": "pump-chain+",
-          "unarmed": -1.9,
-          "arm": 48.8,
-          "owner": "NO-KILL 30d +1.85 / CONF_FLOOR"
-        },
-        {
-          "signal": "bb-bounce-v2-long+",
-          "unarmed": -1.85,
-          "arm": 40.5,
-          "owner": "TAT variant-C + MFE-CUT + CEO pending"
-        }
-      ],
-      "new_targets": 0
+    "run1_repaired": {
+      "long": 54.3,
+      "short": 64.7
     },
-    "long_arm_decomposition": "diffuse small-n (bb-squeeze 30% n=10, warrior-sr 25% n=4, continuum-trend 40% n=5) + owned bbbv2 44.4% n=18; pc+ actually 55.6% arm this window",
-    "short_arm_driver": "volume-buildup- 27T arm 63.0% (healthy biggest SHORT family)"
+    "run2_repaired": {
+      "long": 54.3,
+      "short": 60.9
+    },
+    "repair": "cell_stats.backfill_mfe_mae(days=7) run early 17:04Z, 8 rows, 0 NULL remain 7d; next timer 2026-10-28 00:20Z",
+    "leaderboard_context_still_valid": "pc+ unarmed -$1.90/arm 48.8% and bbbv2 -$1.85/arm 40.5% unaffected (none of the 8 NULLs belong to those signals) — both already owned, 0 new targets either way"
   },
   "chop_bleed_route_reopen": {
     "kpi": "never-armed (mfe<0.40) share of gross loss",
-    "dollar_7d": 92.7,
-    "count_7d": 81.5,
+    "dollar_7d": 92.5,
+    "count_7d": 81.2,
     "dollar_14d": 86.4,
     "count_14d": 76.6,
-    "verdict": "NOT TRIPPED (needs <70% x2 runs); share ROSE from 89.5% at #185"
+    "verdict": "NOT TRIPPED (needs <70% x2 runs); unchanged by repair (only NULL loser was BTC #16435, backfilled mfe 0.063% stays unarmed)"
   },
   "session_brain_stats": {
-    "queries_run": 3,
-    "top_hits": "trend following / pump-chain-short / btc pump filter",
-    "note": "dup-heavy known issue; no new actionable insight"
+    "selfcheck": "PASS 5/5 unique (re-run this run)",
+    "probes": "signal performance / new signal idea / loss bleeding — all returned unique results",
+    "dup_drift": "resolved since #147 fix"
   },
   "trade_summary_24h": {
-    "trades": 20,
-    "wins": 10,
-    "wr": 43.5,
-    "pnl": -0.49
+    "n": 21,
+    "wr": 52.4,
+    "pnl": -0.15,
+    "note": "near-breakeven; today separately GREEN 14T 71.4% +0.56"
   },
   "trade_summary_7d": {
-    "trades": 137,
-    "wins": 67,
-    "wr": 48.9,
-    "pnl": -0.97,
-    "armed": "71T 58W +3.59",
-    "unarmed": "66T 9W -4.56"
+    "n": 138,
+    "wr": 50.0,
+    "pnl": -0.47,
+    "armed": "79T 83.5% +4.21",
+    "unarmed": "59T 5.1% -4.68",
+    "arm_long": 55.4,
+    "arm_short": 60.9,
+    "chop_bleed_dollar": 92.5,
+    "chop_bleed_count": 81.3,
+    "null_mfe": 0
   },
   "trade_summary_14d": {
-    "trades": 304,
-    "wins": 126,
-    "pnl": -3.64,
-    "trail_family": "86T 80W +5.28",
-    "hml": "40T 0W -4.65"
+    "n": 303,
+    "wr": 42.2,
+    "pnl": -3.08,
+    "armed": "161T 73.3% +8.21",
+    "unarmed": "142T 7.0% -11.29",
+    "trail_family": "pm_trail 85T 92.9% +4.83 | atr_trail 19T 73.7% +2.23 | trail_sl 3T 100% +0.83",
+    "hml": "40T 0% -4.65",
+    "atr_sl_hit": "70T 1.4% -4.94"
   },
   "today": {
-    "trades": 12,
-    "wins": 8,
-    "pnl": 0.18
+    "n": 14,
+    "wr": 71.4,
+    "pnl": 0.56
   },
   "shadow_analysis": {
-    "contrarian": "outcome join RAN: 923 rows / 651 joinable; pump-chain- flip 64.6% n=350 EXACT reproduce = 17:12Z formal NO-GO STANDS (do not act early); btc-pump-rider+ 26.0% do-NOT-flip; overall flip 46.7% n=651",
-    "oscillator": "FILE GONE — archived to data/archive/oscillator_shadow.json.fossil-20261027 by SHADOW-RECKONING 98e9dc9b; OSCILLATOR_SHADOW_LOG constant still points at old path (harmless: OSCILLATOR_MULT_ENABLED stops writes); pre-live evidence only per status table",
-    "wyckoff": "344 rows, PENDING outcome join (Nov 15)",
-    "floor_admit": "2,231 rows, PENDING outcome join (Nov 15)",
-    "rr_shadow": "ORPHANED (mtime stale, no producer) — do not cite",
-    "shadow_trader": "28,712 signals / 27,940 closed; CONFLUENCE-EXPIRY 12,455 blocked @48% avg -0.12 = justified; exit A/B pm_trail +4,086 vs hard_max -6,051 = trail-or-nothing reproduces",
-    "overall": "2/6 answerable (contrarian + shadow_trader); oscillator fossilized; floor/wyckoff pending; rr orphaned"
+    "contrarian": "outcome join re-RAN 16:56Z: 923 rows / 651 joinable; pump-chain- flip 64.6% n=350 EXACT reproduce; btc-pump-rider+ 26.0% do-NOT-flip; overall 46.7% n=651. Formal 17:12Z checkpoint dispositioned SUPERSEDED-BY-CEO (flip live since 15:27Z).",
+    "oscillator": "FROZEN + ARCHIVED 2026-10-27 (fossil at data/archive/oscillator_shadow.json.fossil-20261027) — pre-live evidence only",
+    "wyckoff": "345 rows PENDING outcome join (deadline 2026-11-03, shadow_disposition wyckoff-shadow: KILL default if no join)",
+    "floor_admit": "2,239 rows PENDING outcome join (Nov 15 same-sign bar)",
+    "rr_shadow": "ORPHANED — no producer script, mtime 21d stale; KILL registered 11-03",
+    "shadow_trader": "29,057 signals — CONFLUENCE-EXPIRY 12,518 blocked @48% avg -0.12 justified; exit A/B pm_trail +4,141 vs hard_max -6,081; trail_arm_timeout -91.75 = TAT-C cohort",
+    "overall": "2/6 answerable (contrarian + shadow_trader); both reproduce. oscillator archived, floor+wyckoff pending join, rr orphaned."
   },
   "drift_findings": [
-    {
-      "severity": "LOW",
-      "finding": "STABLE #16446 gate-vs-stamp RSI straddle: ctx-gate live 1m read 74.7 (<75 pass) while metadata rsi_exec stamped 80.25; trade entered 15:31 at detect 57.75 / bb_position 1.55 / ztier extreme_high. Cohort rsi_exec>75 LONG = 5T/30d 3W +0.07 = breakeven, n<20 monitor (class #80 source fragmentation). Gate worked as coded (RSI genuinely crossed 76.1->74.7 between 15:30:20 block and 15:31:20 pass) — no fail-open.",
-      "action": "monitor"
-    },
-    {
-      "severity": "LOW",
-      "finding": "oscillator_shadow.json path in OSCILLATOR_SHADOW_LOG now dead (fossil archived today). No writer (MULT disabled), no reader crash observed.",
-      "action": "note"
-    },
-    {
-      "severity": "INFO",
-      "finding": "pipeline.log Tracebacks = 5 total, latest is 2026-10-25 self-healing (not 'all Oct 11' as #185 stated). No new Tracebacks today.",
-      "action": "correction"
-    }
+    "ARM-RATE TRIPWIRE pre-reg measured on unrepaired mfe data runs 1-3 -> RETRACTED + definition amended (17:06 run, re-verified)",
+    "mfe_pct NULL blind spot (#148) recurred Oct 27 as predicted — any same-day arm KPI blind until 00:20 backfill",
+    "SIDE-FIND (MED, NEW): watchdog arm-steer says 'if it arms, trail manages' but continuum-osc+ is PROFIT_MONSTER_BYPASS — PM trail never manages it; UGB-PT + ATR-SL ratchet do (get_all_open_positions returns 0 with bypass vs 1 without). Arm condition still valid as exit trigger (UGB-PT references PM_TRAIL_ACTIVATE_PCT); steer language should name the actual manager for bypassed signals",
+    "session_brain dup-heavy (selfcheck passing — monitoring)",
+    "trades.regime zero-variance NEUTRAL (continuing, low)"
   ],
   "recurring_problems": [
-    "unarmed bleed (never reached +0.40%) owns 92.7% of 7d gross loss — same entry-quality story, now 110th consecutive wrong-side refutation",
-    "leaderboard crossers pc+/bbbv2 both owned — tripwire restates owned problems, 0 new targets"
+    "unarmed/chop entry bleed owns 92.5% of 7d gross loss (stable, owned by CONF_FLOOR/TAT/MFE-CUT stack pending CEO)",
+    "LONG meta_rsi 45-60 band 7d 48T 43.8% -0.57 advisory (compound steer stays measured-refuted)"
   ],
   "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-10-27T15:47:48Z",
-      "idea": "COUPLED-SL TRIAL KEEP-CRITERIA MIRROR — shadow_disposition trial entry has revert (failure) criteria only; pre-register the positive KEEP test: trial succeeds if 7d PnL >= -$2.50 AND HML-exit share of losers does NOT rise vs Oct 20-26 baseline (15/65 = 23.1% count, $2.00/$5.32 = 37.6% dollar) AND avg loss magnitude of HML exits does not deepen (wider stop must convert exits, not just enlarge them)",
-      "rationale": "a trial that only defines failure gets reverted by default or kept by inertia; mirror criterion makes the Nov 3 disposition a two-sided read",
-      "expected_impact": "cleaner Nov-3 GO/REVERT on the -6/0.04 trial",
-      "category": "exit engine",
-      "status": "suggested",
+      "date": "2026-10-27T17:05:48Z",
+      "idea": "Arm-rate tripwire NULL-handling amendment + early-backfill-before-measure protocol",
+      "rationale": "#148 pre-registered 'upgrade only if a KPI flips on it' — the tripwire flipped on the NULL-as-unarmed artifact; repaired data shows LONG never <50%",
+      "expected_impact": "prevents false CEO flags; zero code (tripwire is audit procedure)",
+      "category": "measurement integrity",
+      "status": "applied",
       "risk": "low"
     },
     {
-      "date": "2026-10-27T15:47:48Z",
-      "idea": "TRIPWIRE-OWNED-RESTATED resolution rule: when arm-rate tripwire trips but every leaderboard crosser is already owned and no NEW signal crosses, the flag resolves to 'restatement of owned problems' — no further investigation debt",
-      "rationale": "run-2 decomposition shows the LONG dip = diffuse n<15 cells + owned bbbv2; without this rule each trip re-runs the same leaderboard analysis",
-      "expected_impact": "kills recurring analysis debt on future trips",
-      "category": "drift prevention",
-      "status": "pre-registered",
-      "risk": "low"
-    },
-    {
-      "date": "2026-10-27T15:47:48Z",
-      "idea": "STABLE rsi straddle monitor: count LONG opens where metadata rsi_exec and ctx-gate live-1m RSI fall on OPPOSITE sides of LONG_RSI_CEILING=75 — ship a census only if n>=15/30d",
-      "rationale": "5T/30d currently, breakeven — below sample bar, monitor not change",
-      "expected_impact": "quantifies #80 fragmentation at the threshold",
+      "date": "2026-10-27T17:05:48Z",
+      "idea": "Signal-level arm-rate filter (block 14d n>=15 signals with arm<40%)",
+      "rationale": "evaluated this run: only candidate ai-trader-pending (18.8% arm, n=16) — CEO-domain anyway, saves $0.14/14d << $1.00 bar; all other n>=15 signals arm>=40.5%",
+      "expected_impact": "none — REJECTED-WITH-DATA, logged so it is never re-derived",
       "category": "entry sniper",
-      "status": "monitor",
+      "status": "rejected",
       "risk": "low"
     }
   ],
   "changes_from_last_run": [
-    {
-      "change": "#185 doc ship (dual-measure chop-bleed prompt line)",
-      "result": "PRESENT at prompt line 337 — works"
-    },
-    {
-      "change": "#180/#185 arm-rate tripwire run-2",
-      "result": "EXECUTED this run — TRIPPED (48.4/58.7) -> CEO flag filed, no auto-config"
-    },
-    {
-      "change": "#184 retraction (math-bug false positive)",
-      "result": "HOLDING — no one re-added a 'fix' to correct code"
-    },
-    {
-      "change": "unarmed-bleed leaderboard first collection",
-      "result": "REPRODUCES exactly (pc+ -1.90/48.8, bbbv2 -1.85/40.5), 0 new targets"
-    }
+    "#186 tripwire RUN-2 CEO FLAG: RETRACTED (17:06 run) — measurement artifact (8 NULL mfe from brain-CLI closes counted as unarmed); backfill ran early, 0 NULL mfe now; RE-VERIFIED this run: LONG 55.4% / SHORT 60.9% on repaired data — no CEO flag owed",
+    "#186 shadow pc- 64.6% n=350: REPRODUCED 3rd time (16:56Z join); formal 17:12Z checkpoint DISPOSITIONED this run (SUPERSEDED-BY-CEO)",
+    "#186 STABLE rsi-straddle monitor: CLOSED — #16446 closed +0.22 profit-monster-trail (armed mfe 2.23%), #16447 closed +0.16 trail_sl; cohort still 5T/30d n<15",
+    "#186 chop-bleed 92.7%: now 92.5% dollar (stable, NOT tripped — needs <70%x2)",
+    "#186 verify items: ALL RE-CHECKED PASS — lock absent | constants EMPTY | CEO_PROTECTED 13/13 | size-reduce absent=1.0x | kill flags 8/8 correct (AI_TRADER F, VB± F, HMACD-MTF± F, DOJI_BOTTOM F, OVERSOLD_BOUNCE F, TEMPORAL_CONFLUENCE F) | Tracebacks 5 all Oct-11/12, 0 new | recovery_replay selfcheck PASS | gate_leak_census selfcheck PASS | session_brain selfcheck PASS 5/5 | flip1_active=True + 0 sub-45 SHORT opens since 03:00Z re-arm | 0 post-kill family opens since Oct 25 | HML-SHADOW + MFE-CUT firing on #16445 (live_pnl +0.44%)",
+    "UGB race: armed-then-atr_sl post-10-25 still n=1 (IO -0.05) — tripwire n>=5 not reached",
+    "TAT-C: 6 attributed fires since Oct 24 (HBAR -0.01 / SAGA -0.05 / DOGE 0.00 / ADA -0.08 / CAKE -0.01 / CAKE -0.03 = -0.18) — tripwire n>=10 not reached"
   ],
-  "last_run_verify": {
-    "session_lock": "absent PASS",
-    "constants_git_diff": "EMPTY PASS",
-    "ceo_protected": "untouched PASS",
-    "size_reduce": "absent = 1.0x PASS",
-    "kill_flags": "correct (AI_TRADER F, VB+ F, VB- F, HMACD± F, OVERSOLD F, DOJI F) PASS",
-    "tracebacks": "5 total, latest Oct-25 self-healing, 0 new today PASS",
-    "recovery_replay_selfcheck": "PASS (vacuity assert 161/167=96.4%)",
-    "gate_leak_census_selfcheck": "PASS",
-    "waiver_lapse": "0 sub-45 SHORT opens since Oct-27 00:00 PASS",
-    "conf_filter_shadow": "1,049 lines total, firing PASS",
-    "hml_mfecut_shadows": "firing on BTC #16445 (live_pnl +0.304% at 15:44) PASS",
-    "contrarian_reproduce": "64.6% n=350 EXACT PASS"
-  },
-  "losing_autopsy": {
-    "method": "recovery_replay adverse-first, selfcheck PASS",
+  "losing_trade_autopsy": {
+    "method": "recovery_replay adverse-first, selfcheck PASS (re-run this run)",
     "window_48h": {
-      "n": 23,
+      "n": 22,
       "never_adverse": 5,
-      "recovered": 15,
+      "recovered": 14,
       "never": 3,
-      "never_list": [
-        "AERO #16432 cut-loser SHORT",
-        "ICP #16409 hard_max_loss SHORT",
-        "CC #16423 hard_sl SHORT"
-      ]
+      "never_list": "AERO #16432, ICP #16409, CC #16423 — all waiver-era shorts, class closed"
     },
-    "window_14d": {
-      "n": 167,
-      "never_adverse": 35,
-      "recovered": 107,
-      "never": 25,
-      "structural_pct": 15.0
-    },
-    "verdict": "WRONG-SIDE REFUTED 110th consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "notes": "all 3 48h NEVERs are waiver-era SHORTs (class closed 00:00Z); 24h losers all tiny (max -$0.31 BLUR pump-chain+ HML EXTREME mfe 0.04)"
+    "verdict": "WRONG-SIDE REFUTED 112th consecutive run (#61 p=0.116, #84 t=-0.04)",
+    "new_patterns": 0
   },
-  "signal_deep_dive": {
-    "sub50_n14_14d": [
-      "bb-bounce-v2-long+ 37T 35.1% -1.11 (OWNED: TAT-C live + MFE-CUT + CEO)",
-      "ai-trader+ 17T 35.3% -0.68 (disabled)",
-      "pump-chain- 24T 16.7% -0.26 (CONTRARIAN_LIVE flip live 15:27 + 17:12Z formal)",
-      "pump-chain+ 41T 36.6% -0.20 (NO-KILL 30d +1.85, CONF_FLOOR CEO)",
-      "ai-trader-pending 16T 25.0% -0.14 (CEO domain)"
+  "signal_quality_deep_dive": {
+    "sub50_14d_n15": [
+      "bb-bounce-v2-long+ 37T 35.1% -1.11 — OWNED (TAT-C + MFE-CUT + CEO)",
+      "ai-trader+ 17T 35.3% -0.68 — disabled",
+      "pump-chain- 23T 17.4% -0.16 — CONTRARIAN_LIVE flip live (arm 69.6% healthy)",
+      "pump-chain+ 39T 38.5% -0.12 — NO-KILL standing (30d positive), CONF_FLOOR target"
     ],
-    "new_targets": 0
+    "new_targets": 0,
+    "entry_feature_split": "pump-chain+ losers enter at higher RSI than winners (64.5 vs 58.2) = chasing overbought; pump-chain- losers enter HIGHER RSI than winners (47.6 vs 36.9) = shorting into strength — consistent with flip thesis; both owned, no new filter qualified"
   },
-  "readiness": "2 open: BTC #16445 LONG continuum-osc+ @80322 bracketed SL 79661 ratcheted, +0.03, HML/MFE-CUT shadows firing — HOLD (precommitted exit not met). STABLE #16446 LONG bb-squeeze+ @0.026706 opened 15:31 bracketed SL 0.02639/TP 0.027126, -0.02 — gate-passed on RSI cross-under (live 74.7), monitor as first ceiling-cross-under case; trail-arm-timeout owner. Regime: btc_15m LONG_BIAS vs btc_4h SHORT_BIAS, continuum ABOVE, vol NORMAL, wyckoff MARKUP. NO fresh mid-band entries; trail-family first; size 1.0x. **17:12Z pc- formal NO-GO — do NOT act early (contrarian 64.6% n=350 holds).**",
+  "formal_pc_no_go": "DISPOSITIONED 17:45Z (run #187): SUPERSEDED-BY-CEO. Pre-reg bar MET — contrarian outcome join re-RAN 16:56Z: pump-chain- flip 64.6% n=350 (226W/124L) exact reproduce, 14d span reached 17:12Z; btc-pump-rider+ 26.0% n=300 do-NOT-flip confirmed. Auditor #179 recommendation was NO-GO on the pre-registered PROMOTE path (live-exit contradiction #178: 10-engine full-mix flip worse -0.183% vs -0.130%, paired t=-1.88). DECISION ALREADY EXECUTED: CONTRARIAN_LIVE_ENABLED=True shipped 15:27Z commit 98e9dc9b via SHADOW-RECKONING (CEO consult 20261027T024741Z + T sign-off), exact-part scope 'pump-chain-' only, revert flag registered in data/shadow_disposition.json (flip-contrarian-pc, status=done). Formal checkpoint therefore resolves to SUPERSEDED, not NO-GO — CEO authority accepted the touch-rule OOS evidence over the live-exit caveat. LIVE-TRAFFIC STATUS: 0 pc- trades opened since ship; the 8 [CONTRARIAN-LIVE] log lines at 16:17:29Z are TOK smoke-test cases (7-case scope smoke per commit), NOT real inversions. Monitoring registered in shadow_disposition notes: [CONTRARIAN-LIVE] vs [Z-FLIP] conversion for pump-chain- at the 2026-11-03 disposition run; first REAL fade trade is the live test. Z-FLIP guard (decider ~:4470) may skip steep-dump fades — if conversion ~0 by 11-03, escalate for scoped Z-FLIP interaction decision.",
+  "readiness": {
+    "open": "BTC #16445 LONG continuum-osc+ @80322, price 80681 (+0.45%), arm level 80644 TRADED THROUGH (condition met) — HOLD; SL ratcheted 79827 (ATR k=0.5), UGB-PT arms at +0.40% reference, PM trail bypassed BY DESIGN (continuum-osc in PROFIT_MONSTER_BYPASS_SIGNALS); 1m above EMA300 ~80228; HML/MFE-CUT shadows firing",
+    "regime": "btc_15m LONG_BIAS vs btc_4h SHORT_BIAS (cite source — they disagree), continuum ABOVE EMA300 660min, vol LOW, wyckoff MARKUP, auto-trader CHOP",
+    "policy": "1 open 1/6 slots bracketed size 1.0x; no fresh mid-band entries; trail-family first (UGB-PT for bypassed signals); size 1.0x"
+  },
   "next_actions": [
-    "CEO: arm-rate tripwire RUN-2 FLAG — LONG 48.4% / SHORT 58.7% (mfe>=0.40, 91L/46S) with leaderboard context (pc+ and bbbv2 both already owned, 0 new targets); NO auto-config per pre-reg",
-    "17:12Z: pc- contrarian PROMOTE formal NO-GO check (bar holds as of this run)",
-    "Nov 3: coupled-SL trial disposition (revert criteria + new KEEP-criteria mirror creative)",
-    "Nov 1: coin_regime OOS; self-healing SKIP verify",
-    "Nov 15: floor_admit + wyckoff outcome joins",
-    "Monitor: STABLE rsi straddle census (n=5/30d, needs 15); STABLE #16446 as ceiling-cross-under first case",
-    "CEO standing: CONF_FLOOR fkB ruling, bb-bounce, TAT flip, MFE-CUT enforcement"
+    "Tonight 00:20Z cell-stats backfill — expect 0 rows (8 repaired early this afternoon)",
+    "First REAL pc- fade trade = CONTRARIAN_LIVE live test (0 real inversions so far; 16:17Z TOK lines are smoke tests)",
+    "Nov 1 self-healing SKIP verify + coin_regime",
+    "Nov 3 coupled-SL trial disposition (+ KEEP-criteria mirror) + shadow_disposition weekly run (13 open entries) + Z-FLIP conversion check for pc-",
+    "Nov 15 floor/wyckoff joins",
+    "CEO queue: CONF_FLOOR fkB + bb-bounce keep-vs-disable + TAT flip + MFE-CUT enforcement (tripwire flag RETRACTED — removed from queue)"
   ]
 }
