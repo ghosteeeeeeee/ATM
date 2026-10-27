@@ -518,3 +518,5 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-27 11:29 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L '+$0.04' (SUSHI bb-squeeze+ trail win) | 24h 27T 12W 44.4% '-$0.74' | 7d 142T 47.2% '-$0.64' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 in 24h, worst n>=3 positive-WR) | atr_sl_hit 1/27=3.7% under 40% | no neg streak (11:00 positive, 00-04 positive) | frequency 1/hr | 2 open bracketed (SUPER, DOT) | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-27 13:29 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L '+$0.11' (DOT r2v2-long3 + continuation+ profit-monster-trail +1.34%/+1.07%) | 24h 27T 12W 44.4% '-$0.67' | 7d 142T 48.6% '-$0.33' (improving) — size-reduce 1.0x (file absent = truth) | kill: none (last-hour n=2 both wins; 24h 0%WR signals all n<3, worst n>=3 positive-WR) | atr_sl_hit 0/27=0% under 40% | no neg streak (12:00 +0.11) | freq 2/hr | 1 open bracketed DOT | No constants change -> no signal_versions entry
+BY: auto_1hr

@@ -16481,3 +16481,23 @@ BY: upgrade_implementer
 **Open Questions:**
 - 24h 42.9% WR red ('-$0.79'), 7d '-$0.61' — persistent small bleed, no single killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+
+## 2026-10-27 13:29 UTC Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.11 (WR: 100%) | 24h: 27T 12W 44.4% '-$0.67' | 7d 142T 69W 48.6% '-$0.33' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Both closes: DOT LONG profit-monster-trail (r2v2-long3 +$0.06/+1.34%, continuation+ +$0.05/+1.07%) — clean trail wins; MAE/MFE columns NULL for these rows so adverse excursion unverified
+- atr_sl_hit 0/27 = 0% (<40%); dominant closes = profit-monster-trail (9T +$0.36), ugb_pt (5T +$0.27); worst = hard_max_loss (3T '-$0.60', expected at leverage)
+- Kill check: no 0%WR signal with n>=3 in last hour (n=2, both wins); 24h worst n>=3 signals positive-WR (volume-buildup- 8T 3W '-$0.32', pump-chain+ 6T 3W '-$0.18', bb-squeeze+ 3T 1W '-$0.01') — monitor only
+- Streak: 12:00 '+$0.11', 11:00 '-$0.01' — no 3h negative trigger
+- Frequency 2/hr — not overtrading
+- 1 open bracketed LONG: DOT continuation+ (SL 0.978288 / TP 1.009381) — explicit levels present
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h 44.4% WR red ('-$0.67'), 7d '-$0.33' — bleed shrinking, no single killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28 prior day session)
