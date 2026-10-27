@@ -60,6 +60,41 @@ Answer these:
 3. **Signal quality**: Which signals are losing money?
 4. **Trade frequency**: Overtrading or over-filtered?
 
+### 3b. Signal Inversion Check (PORTED from signal-reporter 2026-10-27)
+
+The LLM signal-reporter was retired (a deterministic
+`signal_performance_report.timer` already writes `signal_report.md` every 6h).
+Its two DECISION rules — which the deterministic report does not act on — now
+live here. Run this every hour:
+
+```python
+# Direction mismatches — a signal named *long* that fired SHORT (or vice versa)
+# is a CRITICAL bug, not a bad trade.
+cur.execute("""
+    SELECT token, signal, direction, exit_reason, ROUND(pnl_usdt,2) AS pnl
+    FROM trades
+    WHERE close_time > %s
+      AND ((signal LIKE '%%long%%' AND direction = 'SHORT')
+        OR (signal LIKE '%%short%%' AND direction = 'LONG'))
+    ORDER BY close_time DESC LIMIT 10
+""", (h24,))
+```
+
+If any rows return → **CRITICAL**: a signal is wired to the wrong direction.
+Find it in `scripts/signals/`, fix the direction logic, and log to the CEO
+kanban. Do NOT silently flip the trades.
+
+### 3c. Boost Candidates (PORTED from signal-reporter 2026-10-27)
+
+**Boost only if ALL are true (24h):**
+- WR > 55% with 5+ trades
+- Net PnL > $0.05
+- Consistent across multiple tokens (not one lucky coin)
+
+Boost by raising the confidence weight in `signal_compactor.py` or adding to
+hot-set priority. Log the change + numbers to `trading_log.md`. One boost max
+per hour (same stability rule as kills).
+
 ## Step 4: Fix Issues
 
 ### If atr_sl_hit is >40% of all closes:
@@ -174,6 +209,10 @@ PostgreSQL treats `"double quotes"` as column identifiers, NOT string literals. 
 - `pnl_usdt`, `pnl_pct` (PnL columns)
 - `entry_price`, `exit_price`, `stop_loss`, `target`
 - `amount_usdt` (position size)
+
+**Two more gotchas (PORTED from signal-reporter 2026-10-27 — hard-won, do not lose):**
+- Signal metadata JSON column is **`_signal_metadata`** (leading underscore) — NOT `signal_metadata`. Wrong name → `column "signal_metadata" does not exist`. Example: `_signal_metadata->>'source'`, `(_signal_metadata->>'rsi_14')::numeric`.
+- RSI from metadata is `(_signal_metadata::json->>'rsi_14')::float` — the `entry_rsi_14` column is unreliable (median error ~13 points). Prefer `meta_rsi` semantics.
 
 If a query fails with `UndefinedColumn`, check column names against this list before retrying.
 
