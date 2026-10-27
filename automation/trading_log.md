@@ -16242,3 +16242,25 @@ Detail: FOGO pump-chain+ LONG ugb_pt '+$0.06' (+1.63%, MAE 0.000% — clean entr
 **Open Questions:**
 - 24h 39.3% WR red but n=28; volume-buildup- worst (7T 2W '-$0.35'), pump-chain+ 8T 5W net '-$0.30' (big losers) — monitor, no kill bar met
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+
+## 2026-10-27 02:29 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** '+$0.03' (WR: 100.0%) | 24h: 29T 12W 41.4% '-$1.01' | 7d 143T 44.8% '-$1.15' | **size-reduce: file absent -> 1.0x**
+
+Detail: AIXBT volume-buildup- SHORT profit-monster-trail '+$0.03' (+0.78%)
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 2/29 = 6.9% (<40%); dominant closes = ugb_pt (8T +$0.19), profit-monster-trail (6T +$0.22); worst = hard_max_loss (4T -$0.69, expected 3-5% account loss at leverage)
+- Kill check: no 0%WR signal with n>=3 in 24h (empty set); worst signals volume-buildup- (8T 3W -$0.32) and pump-chain+ (8T 5W -$0.30) both positive-WR — monitor, no kill bar
+- Streak: 22 '-0.03', 23 '-0.23', 0 '+0.06', 1 '+0.03' -> broken, 0 consecutive negative hours (3h trigger not fired)
+- Frequency 1/hr — not overtrading
+- Entry quality: 24h winner MAE max 0.853%
+- 2 open bracketed: FOGO pump-chain+ LONG, BTC continuum-trend+ LONG
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h 41.4% WR red (n=29); 7d still -$1.15 — persistent small bleed, no single killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
