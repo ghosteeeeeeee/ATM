@@ -83,8 +83,8 @@ try:
                 agent_age_h = (datetime.now(timezone.utc) - dt).total_seconds() / 3600
             except Exception:
                 agent_age_h = None
-    if open_count is None:
-        # No data → fail-open, run the agent
+    if open_count is None or int(open_count) < 0:
+        # No data, or nonsense (negative is impossible from len()) → fail-open
         print('RUN_AGENT=1')
         print("SKIP_REASON=''")
     elif int(open_count) >= int(WATCHDOG_LLM_MIN_OPEN_TRADES):
