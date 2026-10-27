@@ -1,0 +1,11 @@
+[Unit]
+Description=Hermes Checkpoint Watch Timer — every 15 min (intraday checkpoint resolution)
+# CEO 2026-10-27 item 2 companion (d): gives intraday (15-min) resolution to
+# time-boxed checkpoints while brain-auditor runs at 4h. Zero-LLM.
+[Timer]
+OnBootSec=30min
+OnUnitActiveSec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

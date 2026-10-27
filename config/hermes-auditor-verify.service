@@ -1,0 +1,12 @@
+[Unit]
+Description=Hermes Auditor Verify — deterministic regression checks (companion to brain-auditor 4h)
+# CEO 2026-10-27 item 2 companion (c). The brain-auditor's per-run LAST-RUN VERIFY
+# was the regression detector; dropping the auditor to 4h would throttle it 4x.
+# This runs the same invariants deterministically every hour with no LLM (~300ms):
+# constants diff, CEO_PROTECTED_FLAGS count, kill-flag regressions, new Tracebacks,
+# session lock, size-reduce, pause marker. Alerts appended on WARN/CRITICAL only.
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/auditor_verify.py
+TimeoutStartSec=300

@@ -1,0 +1,13 @@
+[Unit]
+Description=Hermes Checkpoint Watch — surface due/overdue time-boxed checkpoints (zero-LLM)
+# CEO 2026-10-27 item 2 companion (d). Intraday time-boxed checkpoints (e.g.
+# "17:12Z pc- formal NO-GO") were free-text in the brain-auditor's queue line.
+# With the auditor at 4h they could sit unread until the window closed. This
+# watcher reads data/checkpoint_registry.json and surfaces DUE/OVERDUE entries to
+# ceo_kanban.md + error_alerts.md — no LLM session, ~100ms. State-transition
+# dedupe means each checkpoint is surfaced once (plus one DUE->OVERDUE escalation).
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/checkpoint_watch.py
+TimeoutStartSec=120

@@ -1,0 +1,18 @@
+[Unit]
+Description=Hermes Brain Auditor Timer — every 4 hours at :30
+# CEO 2026-10-27 item 2: hourly -> 4h. Brain-auditor was the #2 cost
+# ($16.61/30d, 619 sessions, ~104k tokens + 2.19M cache-read each) and most
+# runs re-refuted the same KPIs. COMPANION CHANGES (required by CEO or the
+# cadence change silently breaks semantics):
+#   - hermes-auditor-verify.timer (hourly) — deterministic LAST-RUN VERIFY
+#     equivalent, so the regression detector is not throttled to 4h
+#   - Tripwires re-registered with explicit TIME windows instead of
+#     "N consecutive runs" (which would silently become 4x windows)
+#   - Time-boxed checkpoints (e.g. 17:12Z formal) get their own one-shot timer
+# See scripts/auditor_verify.py.
+[Timer]
+OnCalendar=*-*-* 00/4:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

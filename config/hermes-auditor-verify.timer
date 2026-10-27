@@ -1,0 +1,12 @@
+[Unit]
+Description=Hermes Auditor Verify Timer — hourly regression checks
+# CEO 2026-10-27 item 2 companion (c): keeps the regression detector hourly
+# while brain-auditor itself drops to 4h. Offsets from the auditor's :30 slot
+# so the two never contend.
+[Timer]
+OnBootSec=25min
+OnUnitActiveSec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
