@@ -16461,3 +16461,23 @@ BY: upgrade_implementer
 **Open Questions:**
 - 24h 44.4% WR red ('-$0.74'), 7d '-$0.64' — persistent small bleed, no single killable signal
 - bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
+
+## 2026-10-27 12:28 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.05 (WR: 0%) | 24h: 28T 12W 42.9% '-$0.79' | 7d 141T 67W 47.5% '-$0.61' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last close: SUPER bb-squeeze+ LONG trail_arm_timeout -$0.05 (-1.30%) — trail never armed, single loss, n=1
+- atr_sl_hit 1/28 = 3.6% (<40%); dominant closes = profit-monster-trail (8T +$0.29), ugb_pt (6T +$0.29); worst = hard_max_loss (3T '-$0.60', expected at leverage)
+- Kill check: no 0%WR signal with n>=3 in last hour (n=1); 24h worst n>=3 signals positive-WR (volume-buildup- 8T 3W '-$0.32', pump-chain+ 7T 4W '-$0.16') — monitor only
+- Streak: 11:00 hour '-$0.01' (2T 1W1L), prior closes 00-04 positive -> no 3h negative trigger
+- Frequency 1/hr — not overtrading
+- 1 open bracketed LONG: DOT r2v2-long3 (SL 0.980175 / TP 1.006274) — explicit levels present
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h 42.9% WR red ('-$0.79'), 7d '-$0.61' — persistent small bleed, no single killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
