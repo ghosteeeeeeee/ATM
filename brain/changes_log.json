@@ -3053,5 +3053,16 @@
     "after": "reason: 'loss' (visible to _is_loss_cooldown_active / get_cooldown / decider_run:4287)",
     "rationale": "Root-cause wiring bug in live entry-gate machinery. position_manager/hl-sync-guardian/pipeline all write \"loss\"/\"guardian\"; brain was the only writer whose entries were silently ignored. Any loss closed via brain.close_trade before pipeline/guardian sync = dead cooldown = immediate re-entry allowed.",
     "impact": "Restores designed 20min→90min escalating re-entry cooldown on brain-closed losses. Verified 4-check self-test (write→check→dedup→cleanup); bug_hunter verdict SHIP (10 findings, 3 pre-existing MEDs ticketed separately: pm double-streak-call, guardian FileLock name mismatch, set_cooldown clobbering loss entries)."
+  },
+  {
+    "timestamp": "2026-10-27T02:50:00Z",
+    "agent": "brain_auditor",
+    "change": "CLOSED BTC LONG #16435 at 79916 (-$0.05) — precommitted EMA300 invalidation met (99min below vs 15-30min threshold), cut before SL path; 0 constants changes",
+    "type": "trade",
+    "file": "trades:16435",
+    "before": "open @80267, MFE +0.06 never armed, live -0.38%, 99min below EMA300",
+    "after": "closed manual_close 79916, pnl -$0.05, loss-cooldown reason=loss streak=1",
+    "rationale": "Watchdog deep-analysis stated invalidation 1m closes below EMA300 15-30min; condition objectively met at 02:08 (cross 01:53), executed02:43. Mandate: exit early in chop.",
+    "impact": "Saved ~$0.08 vs SL 79353 path; avoided holding a never-armed chop entry through STRONG_DOWN tape"
   }
 ]

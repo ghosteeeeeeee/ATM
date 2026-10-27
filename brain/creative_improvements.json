@@ -9320,5 +9320,21 @@
     "category": "entry sniper",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T02:50:00Z",
+    "idea": "REENTRY-AFTER-WIN KPI: same-token reentry within 4h after a WINNING close — 14d 33T 33.3% WR -$0.99 vs non-reentry 273T 39.9% -$2.87 (reentries = 19% of volume, 36% of bleed). Binomial p=0.312 FAILS significance → MONITOR. Supports CEO #166 reentry cooldown with fresh numbers. Pre-reg ship bar: 30d same-sign AND n>=20 AND p<0.05 AND survives EXTREME-regime exclusion (after-WIN by regime: NORMAL -0.86 / EXTREME -0.34 / FLAT +0.21).",
+    "rationale": "Bleed concentrated NORMAL+EXTREME; scattered across signals (max n=4) = not one signal's bug",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T02:50:00Z",
+    "idea": "BREAKEVEN-WR KPI (zero-code): 7d needs 55.3% WR to breakeven, actual 44.4% — gap quantified as payoff asymmetry (avg trail win +0.077 vs HML loss -0.141 = 2.3:1 adverse). Standing metric: closes only when arm-rate rises or HML frequency drops.",
+    "rationale": "Reframes 'every trade should be a winner' as an auditable number",
+    "category": "kpi",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

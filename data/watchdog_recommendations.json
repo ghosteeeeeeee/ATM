@@ -1,24 +1,29 @@
 {
-  "timestamp": "2026-10-27T02:15:07.159028+00:00",
-  "steers": [],
-  "portfolio_health": "good",
+  "timestamp": "2026-10-27T02:45:07.245315+00:00",
+  "steers": [
+    {
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 30% over last 20 trades. Total PnL: -1.02 USDT. Something is wrong.",
+      "auto_executable": false,
+      "id": "steer-001"
+    }
+  ],
+  "portfolio_health": "critical",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "AT",
-    "volatility": "NORMAL",
+    "continuum": "BELOW",
+    "volatility": "LOW",
     "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.5,
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.75,
     "wyckoff_phase": "ACCUMULATION",
     "market_phase": "CALM",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 1,
-  "deep_analysis": "PORTFOLIO: 2 open (BTC LONG #16435, AIXBT SHORT #16436), flat PnL. 24h closed: 28T, WR 39%, net -$1.04 (SHORTS 12T 25%WR -$0.65 / LONGS 16T 50%WR -$0.39). Chop-bleed KPI: 7d 86.6% (56T $5.15 of $5.95 gross loss never armed +0.40% MFE); 14d 86.3%. Above the 85.6% baseline but far below the 92% entry-deterioration line \u2014 this is the standing entry-quality state, NOT a new deterioration and NOT an exit-ownership shift (that needs <=70%). \n\nREGIME: sources disagree \u2014 continuum 1m ABOVE EMA300 for ~136min (LEAN_BULL, STRONG_UP, state_score 81) and 4h LONG_BIAS vs 15m aggregate SHORT_BIAS (41S/15L/68N) and BTC 15m NEUTRAL. Precheck reports BTC 'AT EMA300 chop-pin 74m'. Flip rate 21 agg / 24 BTC per 24h \u2014 inside the normal band (p50 20, p95 26), NOT anomalous. Volatility LOW, volume LOW, velocity SLOW: quiet consolidation pin, not a trend tape. No blanket direction steer justified; conditions only. \n\nOPEN TRADES \u2014 both thesis-valid, hold with conditions: (1) BTC LONG continuum-trend+ @80267, meta_rsi 53.2: aligned with 1m-above-EMA300 tape (2.3h). SL 79353 (-1.14%), TP 81471 (+1.5%). Invalidation: 1m closes below continuum EMA300 (~80121) for 15-30min. (2) AIXBT SHORT volume-buildup- @0.018394, meta_rsi 72.7, +0.08%: fading a hot pump \u2014 the HIGH-RSI short cell is the measured winner: volume-buildup SHORT meta_rsi>=65 over 14d = 4/4 100% WR, +$0.44, avg MFE 1.23%. Current +0.08%. Invalidation: 1m RSI holds >70 and price accepts above SL 0.018785. \n\nWRONG-SIDE AUTOPSY (24h hard_max_loss cluster): DYDX SHORT -5.45% (meta_rsi 37.9, MFE 0.23), LTC SHORT -3.82% (37.3, MFE 0.10), BLUR LONG -4.19% (57.9, MFE 0.04). All entered AFTER the move had happened and never armed trail. The oversold shorts (LTC/DYDX rsi~37): the dump was over \u2014 shorting oversold handed the trade to the bounce. WINNING side = the early trail shorts that caught the dump in progress (DOT #16429 +1.19%, LTC #16415 +0.82% at the SAME RSI band) or standing aside. 7d oversold shorts (meta_rsi<45) overall: 25T -$0.07, WR 56%, but 5 hard_max_loss tails \u2014 small wins, big misses, negative asymmetry. BLUR LONG mid-band 57.9 pump-chain+ into the pin: MFE 0.04, never moved \u2014 winning side was the short or nothing. \n\nWHAT'S WORKING: every 24h winner reached +0.40% MFE and exited via trail family (ugb_pt / profit-monster-trail / manual_trail): MFE range 0.38-0.85. continuum-trend+ 75% WR (8T), volume-buildup- 65.7% WR (35T +$0.43). The system still wins when trades arm; it bleeds on entries that never reach the trail. \n\nAI TRADER: no pick this cycle. Only NEAR SHORT cleared precheck, but with death-zone RSI 51.7 advisory + RR grade D (0.66) + chop-pin \u2014 exactly the mid-band chop entry that feeds the 86% never-armed bleed. AI_TRADER_ENABLED=False (CEO 2026-10-19) so watchlist-only regardless; not worth the line.",
-  "agent_timestamp": "2026-10-27T01:22:15.805603+00:00",
-  "regime_context": "Chop-pin with bullish undertone, sources split: continuum 1m ABOVE EMA300 (136min, LEAN_BULL, STRONG_UP, zscore POS, state 81) + 4h LONG_BIAS vs 15m aggregate SHORT_BIAS + BTC 15m NEUTRAL. Precheck: BTC AT EMA300 74m pin. Flip rate 21 agg / 24 BTC per 24h \u2014 normal (p50 20, p95 26), NOT unusually unstable; <6 (real trend tape) has not occurred. LOW volatility + LOW volume + SLOW velocity = consolidation. Meaning for positions: mid-band entries have no measured edge in pins (both the 45-64 band variants failed house bars per brain_auditor #139); trend-family signals (continuum-trend+) that align with the 1m EMA300 tape are the only clean longs; HIGH-RSI fade shorts on alt pumps (AIXBT cell) remain the clean shorts. State the source whenever quoting direction \u2014 the regimes disagree by design in this pin.",
-  "pattern_alerts": "VERIFIED (PostgreSQL, n stated per cell): (1) Never-armed chop entries own the bleed \u2014 7d chop-bleed share 86.6% (56T $5.15 of $5.95), 14d 86.3%. Stable vs baseline (84.1/85.6 measured 2026-10-25). Not >=92% so no emergency new entry gate; not <=70% so NOT an exit/trail-distance problem. (2) Oversold shorts (SHORT, meta_rsi<45) 7d: 25T -$0.07, WR 56%, 5 hard_max_loss. Negative asymmetry \u2014 winners small (avg armed MFE ~0.5), losers -3 to -5%. WINNING side: early shorts that caught the dump in-flight (same RSI, earlier in the move: DOT #16429, LTC #16415 both trail-winners) or LONG after dump exhausts. Why we weren't on it: signals fired AFTER the dump completed \u2014 volume-buildup- rear-fired into oversold. (3) volume-buildup SHORT meta_rsi>=65 14d: 4/4 100% WR +$0.44 avg MFE 1.23 \u2014 the HIGH-RSI fade cell is where this signal actually wins (AIXBT open trade sits here). (4) Overbought longs (LONG meta_rsi>68) 7d: 14T +$0.32, WR 64.3% \u2014 momentum longs at high RSI are NOT the bleed; the mid-band longs (50-68) into pins are (BLUR 57.9 MFE 0.04). (5) 24h hard_max_loss trio (DYDX/LTC shorts rsi~37, BLUR long 57.9) all share MFE<0.25 \u2014 entered after the move, never armed. Same failure mode as the 52/56 historical chop trades. NO dead-signal families flagged: volume-buildup, pump-chain, continuum-trend all enabled with live 7d traffic."
+  "open_count": 1
 }
