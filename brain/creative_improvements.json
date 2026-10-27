@@ -9554,5 +9554,32 @@
     "category": "entry sniper",
     "status": "collected",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T15:47:48Z",
+    "idea": "COUPLED-SL TRIAL KEEP-CRITERIA MIRROR — shadow_disposition trial entry has revert (failure) criteria only; pre-register the positive KEEP test: trial succeeds if 7d PnL >= -$2.50 AND HML-exit share of losers does NOT rise vs Oct 20-26 baseline (15/65 = 23.1% count, $2.00/$5.32 = 37.6% dollar) AND avg loss magnitude of HML exits does not deepen (wider stop must convert exits, not just enlarge them)",
+    "rationale": "a trial that only defines failure gets reverted by default or kept by inertia; mirror criterion makes the Nov 3 disposition a two-sided read",
+    "expected_impact": "cleaner Nov-3 GO/REVERT on the -6/0.04 trial",
+    "category": "exit engine",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T15:47:48Z",
+    "idea": "TRIPWIRE-OWNED-RESTATED resolution rule: when arm-rate tripwire trips but every leaderboard crosser is already owned and no NEW signal crosses, the flag resolves to 'restatement of owned problems' — no further investigation debt",
+    "rationale": "run-2 decomposition shows the LONG dip = diffuse n<15 cells + owned bbbv2; without this rule each trip re-runs the same leaderboard analysis",
+    "expected_impact": "kills recurring analysis debt on future trips",
+    "category": "drift prevention",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T15:47:48Z",
+    "idea": "STABLE rsi straddle monitor: count LONG opens where metadata rsi_exec and ctx-gate live-1m RSI fall on OPPOSITE sides of LONG_RSI_CEILING=75 — ship a census only if n>=15/30d",
+    "rationale": "5T/30d currently, breakeven — below sample bar, monitor not change",
+    "expected_impact": "quantifies #80 fragmentation at the threshold",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
   }
 ]
