@@ -9653,5 +9653,17 @@
     "category": "process",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T20:43:41Z",
+    "idea": "Arm-timeout forward test (post-cut would-arm census) — brain/analysis/arm_timeout_forward_2026-10-27.py --selfcheck PASS",
+    "rationale": "checks the defensive side of chop-bleed: are 45/55/60m stall cuts landing BEFORE momentum? Forward 1m replay from close_time (no lookahead).",
+    "findings": "7d 36.8% / 14d 31.0% / 30d 40.5% would arm within 60m of the cut (candle-close-strict horizon after bug_hunter off-by-one fix; pre-fix 34.5/42.9). Family split: bb-bounce TAT-C cuts VALIDATED (1/7 = 14% forward-arm, <25% bar); pump-chain+ 45m timeout hot (30d 10/21 arm60, 14d 5/13) but cut cohort NOT bleeding (30d exits +0.30).",
+    "verdict": "pre-reg bar (>=40% at BOTH 14d and 30d) NOT met -> MONITOR, no timeout change this run",
+    "pre_registered": "re-measure when pump-chain+ 14d cuts n>=20 AND arm60>=45%; only then build full trail-sim counterfactual before proposing 45->60m",
+    "category": "exit timing (defensive check, not a tweak)",
+    "status": "measured-monitor",
+    "risk": "low",
+    "review": "bug_hunter subagent review: 1 HIGH off-by-one fixed mid-run; token-case/sign/lookahead/leak clean; selfcheck PASS post-fix"
   }
 ]
