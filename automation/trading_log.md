@@ -16422,3 +16422,22 @@ BY: upgrade_implementer
 - No kills, no boosts. Thin volume (12 signals/24h).
 - Watch: volume-buildup- SHORT 37.5% WR -$0.32; pump-chain+ LONG 57% WR but -$0.16 net.
 - No inversions.
+
+## 2026-10-27 10:30 UTC Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: n/a) | 24h: 27T 12W 44.4% '-$0.74' | 7d 141T 66W 46.8% '-$0.68' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- atr_sl_hit 1/27 = 3.7% (<40%); dominant closes = ugb_pt (7T +$0.33), profit-monster-trail (7T +$0.25); worst = hard_max_loss (3T -$0.60, expected at leverage)
+- Kill check: no 0%WR signal with n>=3 in 24h — worst n>=3 signals positive-WR (volume-buildup- 8T 3W -$0.32, pump-chain+ 7T 4W -$0.16) — monitor, no kill bar; bb-bounce-v2-long+ n=1 already flagged for CEO
+- Streak: 2 '+0.14', 3 '+0.03', 4 '+0.03', hours 5-9 no closes -> last closes all positive, 3h negative trigger not fired
+- Frequency 0/hr — not overtrading
+- 0 open trades — flat
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h 44.4% WR red (-$0.74), 7d -$0.68 — persistent small bleed, no single killable signal
+- bb-bounce-v2-long+ CEO kill review still pending (flagged 13:28)
