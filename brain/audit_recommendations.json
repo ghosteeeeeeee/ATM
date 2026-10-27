@@ -1,79 +1,96 @@
 {
-  "timestamp": "2026-10-27T05:36:00Z",
-  "run": 176,
-  "session_brain_stats": {"queries": 3, "note": "session_brain loads and returns results (dup-heavy, ideation only)"},
-  "trade_summary_24h": {"trades": 29, "wins": 13, "wr": 44.8, "pnl": -0.74, "open": 0},
+  "timestamp": "2026-10-27T06:50:00Z",
+  "run": 177,
+  "session_brain_stats": {
+    "queries": 3,
+    "top_hits": "pump-chain-short filter backtest; trend-following signal idea; RSI filter volume-breakout — all dup-heavy ideation (18th run flagged)"
+  },
+  "trade_summary_24h": {
+    "trades": 28,
+    "wr": 42.9,
+    "pnl": -0.75,
+    "7d": "144T 46.5% -0.54",
+    "14d": "338T 39.3% -4.20",
+    "30d": "735T 44.2% -2.92"
+  },
   "mandate_fresh": {
-    "7d": {"n": 145, "wr": 46.2, "pnl": -0.56},
-    "14d": {"n": 339, "wr": 39.5, "pnl": -4.16},
-    "30d": {"n": 735, "wr": 44.2, "pnl": -2.92},
-    "armed_14d": {"n": 170, "wr": 71.2, "pnl": 8.75},
-    "unarmed_14d": {"n": 169, "wr": 7.7, "pnl": -12.91},
-    "trail_family_14d": {"n": 119, "wr": 89.9, "pnl": 9.43},
-    "chop_stop_14d": {"n": 160, "wr": 0.6, "pnl": -13.90}
+    "armed_7d": "80T 76.3% +4.03 vs unarmed 64T 9.4% -4.57",
+    "armed_14d": "169T 71.0% +8.71 vs unarmed 169T 7.7% -12.91",
+    "trail_family_14d": "127T 88.2% +9.24 vs chop_stop 180T 2.8% -13.77",
+    "direction_7d": "LONG 92T 44.6% -0.50 | SHORT 52T 50.0% -0.04",
+    "exits_7d": "pm_trail 52T 90.4% +2.95 | HML 15T 0% -2.00 | atr_sl 20T 0% -1.25 | arm_timeout 16T 12.5% -0.45"
   },
+  "headline": "PRE-REG #60 DRIFT->LOSERS STUDY EXECUTED at n=81 -> HYPOTHESIS REFUTED: |drift|>=10 = 26T 69.2% +0.64 vs <10 = 55T 49.1% -0.61 (two-sided fisher p=0.1002, direction OPPOSITE to 'drift predicts losses'). Inverse flat-RSI gate (|drift|<5): 40T 42.5% -0.58 vs >=5 41T 68.3% +0.61, fisher p=0.0259 SIGNIFICANT but fk 37.8% (17/45 winners) >> 20% bar AND confounded (bb-bounce 62.5% / pump-chain+ 58.3% of their trades are small-drift) -> NOT SHIPPABLE, monitor to n>=100. Also: VB- strength-band pre-reg RECHECK HARD FAIL (fk 58% = 14/24 wins blocked, save $0.15 << $1.00 bar, 14d==30d no new traffic) -> route CLOSED; pc+ 66-70 pre-reg gate n=15@30d HIT but net POSITIVE +0.10/30d 40%WR -> NO-GO, lever CLOSED. 0 config changes.",
   "shadow_analysis": {
-    "contrarian": "join re-ran fresh: 622 joinable, pc- flip 64.7% n=348 STABLE (Oct-27 PROMOTE stands), btc-pump-rider+ 28.6% do-NOT-flip",
-    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED=True), no outcome column",
-    "wyckoff": "342 rows PENDING outcome join",
-    "floor_admit": "2182 rows PENDING outcome join",
-    "rr_shadow": "ORPHANED (no producer, stale)",
-    "shadow_trader": "27,167 signals; gates justified (CONFLUENCE-EXPIRY 12,058 blocked @48% would-win, avg -0.12); exit A/B pm_trail +3872 vs hard_max -5767",
-    "overall": "3/6 answerable (contrarian + shadow_trader report + pm trail A/B)"
+    "contrarian": "join re-ran fresh 622/894 — pump-chain- flip 64.7% n=348 STABLE (PROMOTE pending CEO), btc-pump-rider+ 28.6% do-NOT-flip, overall 48.7%",
+    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED since Oct 1, JSONL, no outcome) — do not cite",
+    "wyckoff": "342 rows fresh, no outcome column — PENDING JOIN",
+    "floor_admit": "2185 rows fresh, no outcome column — PENDING JOIN",
+    "rr_shadow": "ORPHANED — no producer, stale — do not cite",
+    "shadow_trader": "27,296 signals — CONFLUENCE-EXPIRY 12,092@48% gates justified; pm_trail dominant exit (+3892)",
+    "overall": "3/6 answerable, all used"
   },
-  "headline": "VOLUME-SPIKE INVERSION (#175 pre-reg) MEASURED -> HOLD: pump-chain+ specific confirmed (30d n=87, losers mean vs 0.514 vs winners 0.310, t=-2.13) but filter-level Fisher FAILS (thr>=0.5: blocked 17L/6W, fisher p=0.21, save +$1.13, killW 17.6%) -> not shippable. Family generality REFUTED: pump-chain- t=+0.33, volume-buildup- t=+0.14, bb-bounce t=+1.09, all-signal t=-0.52 -> inversion is pump-chain+ ONLY, never re-propose as universal. volume_spike IS gate-readable (decider_run.py:3738 hotset merge, :5154 exec_meta) so the lever exists if CEO wants it after pc+ GO/NO-GO.",
   "drift_findings": [
-    "loss-cooldown fix (#166) code verified present (brain.py:60 reason='loss'); 0 active reason=loss/guardian entries = base 20min expiry (last loss BTC 02:50), not a bug",
-    "doji-bottom-long 16T 31.3% in 14d sub-50% list is HISTORICAL (last open Oct 16 17:43 = kill time, 0 post-kill opens)",
-    "session_brain still dup-heavy (ideation only, 17th run)"
+    "rsi_exec coverage 81/93 (87%) since Oct 21 19:00; 8 trades miss BOTH rsi_14+rsi_exec (5 ai-trader-pending pre-#117 backfill, 3 bb-bounce w/o any rsi key) — analysis-only gap, gates read live values not metadata; monitor next pending fill",
+    "rsi_14 vs rsi_exec avg |diff| 7.63 pts, 26/81 (32%) drift >10 — detect/exec disagreement is large but does NOT predict losses (study above)",
+    "session_brain still dup-heavy (18th run)"
   ],
-  "recurring_problems": ["unarmed bleed (14d -12.91) unchanged — owned by CONF_FLOOR/TAT/MFE-CUT CEO stack", "escalation #17 stays CLOSED per Oct-17 verdict"],
-  "missing_implementations": ["CONF_FLOOR fkB ruling", "pc- PROMOTE 64.7% n=348", "bb-bounce keep-vs-disable", "TAT flip"],
+  "recurring_problems": [
+    "unarmed/chop bleed (14d -12.91) unchanged — owned by CONF_FLOOR/TAT/MFE-CUT CEO stack",
+    "escalation #17 stays CLOSED (run #173)",
+    "LONG 45-55 band 14d 58T 34.5% -2.14 (all windows negative) but composition = bb-bounce 20T + ai-trader 7T + doji 4T (all owned/killed/CEO) — blanket band block would collide with CEO bb-bounce ruling and fk ~21% — NOT shippable independently"
+  ],
+  "missing_implementations": [
+    "CONF_FLOOR fkB ruling",
+    "pc- PROMOTE 64.7% n=348",
+    "bb-bounce keep-vs-disable",
+    "TAT flip"
+  ],
   "creative_improvements": [
     {
-      "date": "2026-10-27T05:36:00Z",
-      "idea": "VOLUME-SPIKE INVERSION measured and HELD — pump-chain+ entry volume_spike losers 0.514 vs winners 0.310 (t=-2.13, 30d n=87); thr>=0.5 blocks 17L saves +$1.13 kills 17.6% winners BUT fisher p=0.21 fails",
-      "rationale": "#175 pre-registered: chasing the pump = wrong side on pc+; bar was 30d same-sign AND p<0.05 AND killW<20%",
-      "expected_impact": "+$1.13/30d if ever shipped at thr 0.5 (small); distribution diff real but filter does not separate",
-      "category": "entry sniper",
-      "status": "measured-hold",
+      "date": "2026-10-27T06:50:00Z",
+      "idea": "DRIFT->LOSERS PRE-REG #60 EXECUTED -> REFUTED (n=81): big drift = better outcomes (p=0.1002, opposite sign); flat-RSI inverse gate p=0.0259 significant but fk 37.8% + bb-bounce/pc+ confound -> not shippable; monitor n>=100",
+      "rationale": "zero-behavior stamp from #60 finally had n>=30 (81)",
+      "expected_impact": "0 config; closes the drift-as-loss-predictor route; RSI-flat stays a chop *descriptor* not a gate",
+      "category": "verification",
+      "status": "measured-reject",
       "risk": "low"
     },
     {
-      "date": "2026-10-27T05:36:00Z",
-      "idea": "CHASE-INVERSION FAMILY TEST REFUTED generality — only pump-chain+ shows losers chasing more volume; pc- t=+0.33 (winners chase MORE), vb- t=0.14, bb-bounce t=+1.09, all-signal t=-0.52",
-      "rationale": "prevents ever proposing volume_spike as a universal gate (would kill winners on other families)",
-      "expected_impact": "0 config; closes a wrong-lever route",
-      "category": "entry sniper",
-      "status": "measured-reject-universal",
+      "date": "2026-10-27T06:50:00Z",
+      "idea": "VB- STRENGTH-BAND pre-reg recheck -> HARD FAIL, route CLOSED: 30d blocked(<55) 22T 63.6% -0.15 vs kept 14T 71.4% +0.61; fk 58% (14/24 wins) > 20% bar, save $0.15 << $1.00 bar, 14d==30d (no new traffic)",
+      "rationale": "Oct 23 pre-reg ship criteria: n>=20 AND fk<20% AND save>$1.00 AND 30d same-sign — fails 3 of 4",
+      "expected_impact": "0 config; prevents re-proposing the watchdog's vb- oversold-SHORT cell",
+      "category": "kill-with-data",
+      "status": "rejected",
+      "risk": "low"
+    },
+    {
+      "date": "2026-10-27T06:50:00Z",
+      "idea": "pc+ 66-70 RSI_MAX pre-reg gate -> NO-GO, lever CLOSED: n=15@30d HIT the gate but band net POSITIVE (+0.10/30d, 40% WR; 14d 10T 20% +0.08) — ship criteria required net negative",
+      "rationale": "Oct 15 pre-reg: 'if still 0-2 winners and net negative, ship RSI_MAX=66' — data says keep open",
+      "expected_impact": "0 config; closes the chase-band tighten route",
+      "category": "verification",
+      "status": "closed-no-go",
       "risk": "low"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
-    "#175: 0 config — nothing to verify beyond standing items (waiver lapse holding: 1 short since 00:00 AIXBT rsi_exec 57.43 >=45 compliant; recovery selfcheck PASS; constants EMPTY; session lock absent) — ALL PASS",
-    "#166 loss-cooldown: code present, absence of entries explained by 20min base expiry",
-    "#161 pm_armed_at: 5 live stamps, latest ENA 2026-10-27T04:13 — WORKING",
-    "#123 contrarian join: re-ran fresh 622, pc- 64.7% stable — WORKING"
+    "#176: 0 config — verify: waiver lapse holding (0 SHORT<45 opens since 00:00; only AIXBT rsi_exec 57.43) PASS | recovery selfcheck ASSERT PASS | constants EMPTY git diff | doji post-kill 0 | pm_armed_at latest ENA 04:13 WORKING | loss-cooldown code reason='loss' present | contrarian join WORKING (fresh 622) | volume-spike n=87 still <100 re-measure gate, hold stands (recomputed fisher p=0.2124 matches #176) — ALL PASS",
+    "#174 BTC #16435 manual_close: closed pre-emptively, correct-by-traffic (0 open now)"
   ],
-  "losing_autopsy_48h": {
-    "n": 23,
-    "never_adverse": 6,
-    "recovered": 14,
-    "never": 3,
-    "never_list": ["AERO breakout-pullback-,warrior-sr- SHORT -0.12 (n=1 combo)", "ICP hh-hl-,warrior-sr- SHORT -0.09 (n=1 combo)", "CC pump-chain- SHORT -0.07 (owned by PROMOTE/CONF_FLOOR)"],
-    "verdict": "wrong-side REFUTED 100th consecutive run (#61 p=0.116, #84 t=-0.04)"
-  },
+  "losing_autopsy_48h": "22 losers = 5 never-adverse / 14 recovered / 3 NEVER (AERO+ICP warrior-sr combos, CC pump-chain- owned by PROMOTE) -> wrong-side REFUTED 101st consecutive (#61 p=0.116, #84 t=-0.04). 14d census: 192 = 39/124/29 NEVER (15.1% structural, baseline ~17.5%)",
   "deep_dive": {
     "new_targets": 0,
-    "owned": ["bb-bounce-v2-long+ 39T 35.9% -1.15 CEO packet", "doji 16T historical post-kill=0", "ai-trader+ disabled", "pump-chain- 37T 21.6% CONF_FLOOR+PROMOTE", "pump-chain+ 45T 35.6% +0.22 NO-KILL", "ai-trader-pending CEO", "hl_copy COLLECT"]
+    "sub50_n15_14d": "bb-bounce-v2-long+ 39T 35.9% -1.15 CEO | doji 16T historical 0 post-kill | ai-trader+ 18T disabled | pump-chain- 37T 21.6% CONF_FLOOR+PROMOTE | pump-chain+ 45T 35.6% +0.22 NO-KILL",
+    "watchdog_triage": "steers=[] flat book correct; band-edge steer (SHORT<45 / LONG>65 no-entry) consistent with data but LONG 45-55 bleed is owned (see recurring); pc+ low-volume cell = volume-spike HOLD (n=87<100)"
   },
-  "watchdog_triage": {"steers": 0, "open": 0, "regime": "15m+4h LONG_BIAS, continuum BELOW, vol LOW, market_phase DECLINING, trend_quality STRONG_UP — mixed; flat is correct"},
   "next_actions": [
-    "CEO: CONF_FLOOR fkB ruling",
+    "CEO: CONF_FLOOR fkB",
     "CEO: pc- PROMOTE 64.7% n=348",
     "CEO: bb-bounce keep-vs-disable",
     "CEO: TAT flip",
-    "Next run: re-measure volume-spike pc+ if new n>=100; monitor 7d turn-green streak (24h -0.74, 7d -0.56 both improving)"
+    "Next run: volume-spike pc+ re-measure at n>=100 (now 87); drift study re-run at n>=100 rsi_exec; verify rsi_14 backfill on next ai-trader-pending fill"
   ]
 }

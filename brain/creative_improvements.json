@@ -9354,5 +9354,32 @@
     "status": "measured-hold",
     "risk": "low",
     "rationale": "#175 pre-reg bar: 30d same-sign AND p<0.05 AND killW<20% — distribution passes, filter-level Fisher fails; one variable at a time, pc+ kill queue is CEO-owned first"
+  },
+  {
+    "date": "2026-10-27T06:50:00Z",
+    "idea": "DRIFT->LOSERS PRE-REG #60 EXECUTED -> REFUTED (n=81): big drift = better outcomes (p=0.1002, opposite sign); flat-RSI inverse gate p=0.0259 significant but fk 37.8% + bb-bounce/pc+ confound -> not shippable; monitor n>=100",
+    "rationale": "zero-behavior stamp from #60 finally had n>=30 (81)",
+    "expected_impact": "0 config; closes the drift-as-loss-predictor route; RSI-flat stays a chop *descriptor* not a gate",
+    "category": "verification",
+    "status": "measured-reject",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T06:50:00Z",
+    "idea": "VB- STRENGTH-BAND pre-reg recheck -> HARD FAIL, route CLOSED: 30d blocked(<55) 22T 63.6% -0.15 vs kept 14T 71.4% +0.61; fk 58% (14/24 wins) > 20% bar, save $0.15 << $1.00 bar, 14d==30d (no new traffic)",
+    "rationale": "Oct 23 pre-reg ship criteria: n>=20 AND fk<20% AND save>$1.00 AND 30d same-sign — fails 3 of 4",
+    "expected_impact": "0 config; prevents re-proposing the watchdog's vb- oversold-SHORT cell",
+    "category": "kill-with-data",
+    "status": "rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T06:50:00Z",
+    "idea": "pc+ 66-70 RSI_MAX pre-reg gate -> NO-GO, lever CLOSED: n=15@30d HIT the gate but band net POSITIVE (+0.10/30d, 40% WR; 14d 10T 20% +0.08) — ship criteria required net negative",
+    "rationale": "Oct 15 pre-reg: 'if still 0-2 winners and net negative, ship RSI_MAX=66' — data says keep open",
+    "expected_impact": "0 config; closes the chase-band tighten route",
+    "category": "verification",
+    "status": "closed-no-go",
+    "risk": "low"
   }
 ]
