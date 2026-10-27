@@ -34,12 +34,17 @@ SHADOW_DB = os.path.join(os.path.dirname(HERMES_DATA), 'brain', 'shadow_trades.d
 RUNTIME_DB = os.path.join(HERMES_DATA, 'signals_hermes_runtime.db')
 CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
 
-# Constants (from hermes_constants.py, verified in spec v1.3 Appendix B)
-CUT_LOSER_PNL = -4.00          # account %
+# Constants (mirroring hermes_constants.py — review MED-2 2026-10-27: these were
+# hardcoded -4.00/2.5 and diverged from position_manager the moment the SHADOW-RECKONING
+# coupled trial moved the live values; a shadow baseline that does not mirror LIVE
+# misstates every join. NOTE: units here are PERCENT; hermes_constants ATR_SL_* are
+# fractions (0.04 == 4.0%).
+from hermes_constants import CUT_LOSER_PNL as _HC_CUT_LOSER, ATR_SL_MAX as _HC_ATR_SL_MAX
+CUT_LOSER_PNL = _HC_CUT_LOSER              # account % (live: -6.00 since 2026-10-27 trial)
 TRAILING_DISTANCE_PCT = 1.20   # ATR SL trail distance from peak
 ATR_SL_MIN_INIT = 1.5          # initial floor
 ATR_SL_MIN_ACCEL = 0.30        # established floor
-ATR_SL_MAX = 2.5               # cap
+ATR_SL_MAX = abs(_HC_ATR_SL_MAX) * 100.0  # price % cap (live: 4.0 since 2026-10-27 trial)
 PM_TRAIL_ACTIVATE_PCT = 0.40   # 0.40% activation
 PM_TRAIL_TIERS = [(0.0, 0.20), (1.5, 0.50), (3.0, 0.80), (5.0, 1.20)]  # (peak_profit_pct, trail_dist_pct)
 PM_TRAIL_MIN_HOLD = 2          # min candles after activation
@@ -55,10 +60,16 @@ PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45
 MAX_LEVERAGE = 5               # fallback cap
 
 # ── Shadow Trial: Wider SL for LONG signals (CEO verdict 2026-10-21) ──────────
+# ⚠️ SUPERSEDED-BUT-KEPT (SHADOW-RECKONING 2026-10-27, review MED-2): LIVE adopted
+#    CUT_LOSER -6.00 + ATR_SL_MAX 4.0% for BOTH directions as the coupled trial
+#    (registry: data/shadow_disposition.json trial-coupled-cutsloser-sl). While the
+#    live trial runs, the arm below equals the baseline for LONG -> columns are
+#    duplicate evidence; if the 11-03 default REVERTS live to -4.00/2.5, this arm
+#    becomes the revert-simulation. Do not treat as a pending live trial.
 # CEO: "Shadow rollout of CUT_LOSER -6.00 + ATR_SL_MAX 4.0, LONG only;
 #       SHORT untouched; size unchanged; 7d/200T review."
 # Evidence threshold: shadow LONGs must hit >=55% WR over >=200 trades.
-SHADOW_TRIAL_ENABLED = True           # Master switch for wider SL shadow trial
+SHADOW_TRIAL_ENABLED = True           # Master switch (see supersession note above)
 SHADOW_TRIAL_CUT_LOSER = -6.00        # Wider CUT_LOSER (was -4.00)
 SHADOW_TRIAL_ATR_SL_MAX = 4.0         # Wider ATR_SL_MAX (was 2.5)
 SHADOW_TRIAL_DIRECTION = 'LONG'       # LONG only (SHORT stays at -4.00)

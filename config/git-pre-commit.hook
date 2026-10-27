@@ -1,4 +1,8 @@
 #!/bin/sh
-# stale-comment linter — SHADOW-RECKONING Q2 mechanism (2026-10-27). Warn-only by design;
-# use `python3 scripts/stale_comment_linter.py --strict` in CI to block.
-exec python3 "$(git rev-parse --show-toplevel)/scripts/stale_comment_linter.py" || true
+# stale-comment linter — SHADOW-RECKONING Q2 mechanism (2026-10-27).
+# Warn-only by design: NO `exec` (review LOW-2: `exec cmd || true` never
+# evaluates `|| true`, so a linter crash would BLOCK commits). Hard exit 0.
+root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+[ -f "$root/scripts/stale_comment_linter.py" ] || exit 0
+python3 "$root/scripts/stale_comment_linter.py" || true
+exit 0

@@ -131,7 +131,7 @@ python3 scripts/shadow_trader.py --sweep-arm --sweep-signal <signal_type> --swee
 | Source | Rows | Status | Answerable question |
 |---|---|---|---|
 | contrarian_shadow.jsonl | 807 | ✅ USEFUL — outcome join live (`analysis/contrarian_outcome_join.py`) | flip would-win % (pump-chain- 63.9%, OOS 64.0%) |
-| oscillator_shadow.json | 24,598 | 🧊 FROZEN BY DESIGN — `OSCILLATOR_MULT_ENABLED=True` since Oct 1 stops writes; `actual_outcome` null on 24,598/24,598. **JSONL, not JSON array** (`json.load` crashes) | none — pre-live evidence only; use the live metadata join + weekly KPI |
+| oscillator_shadow.json | 24,598 | 🧊 FROZEN + **ARCHIVED 2026-10-27 → data/archive/oscillator_shadow.json.fossil-20261027** — `OSCILLATOR_MULT_ENABLED=True` since Oct 1 stops writes; `actual_outcome` null on 24,598/24,598. **JSONL, not JSON array** (`json.load` crashes) | none — pre-live evidence only; use the live metadata join + weekly KPI |
 | floor_admit_shadow.jsonl | 1,778 | ⏳ PENDING JOIN — 91% admit, no outcome column | none until outcome join ships (pre-registered) |
 | wyckoff_shadow.jsonl | 298 | ⏳ PENDING JOIN — no outcome column | none until join ships |
 | rr_shadow_audit_7d.json | dict (replayed 110 / no_candles 91) | ☠️ ORPHANED — no producer script in repo, mtime 21d stale | none — do not cite as a live source |
@@ -141,9 +141,11 @@ python3 scripts/shadow_trader.py --sweep-arm --sweep-signal <signal_type> --swee
 ```python
 import json
 
-# 1. Oscillator shadow (7.4MB, 24K+ entries) — what multiplier WOULD have been applied
-with open('/root/.hermes/data/oscillator_shadow.json') as f:
-    osc = json.load(f)
+# 1. Oscillator shadow (7.4MB, 24K+ entries) — ARCHIVED 2026-10-27 (SHADOW-RECKONING:
+#    live path OSCILLATOR_MULT_ENABLED=True since Oct 1, no writer; fossil moved out of
+#    data/ so inventory counts stop lying). It is JSONL — json.load() would crash.
+with open('/root/.hermes/data/archive/oscillator_shadow.json.fossil-20261027') as f:
+    osc = [json.loads(line) for line in f if line.strip()]
 # Fields: token, direction, signal, confidence_before, confidence_after, 
 #         wave_phase, score_zone, would_be_multiplier, actual_outcome
 print(f"Oscillator shadow: {len(osc)} entries")

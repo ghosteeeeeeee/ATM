@@ -1223,6 +1223,45 @@
       "found_by": "own-conclusions",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-066",
+      "title": "position_manager._compute_dynamic_sl references undefined `atr_distance` (latent NameError)",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "scripts/position_manager.py"
+      ],
+      "symptom": "_compute_dynamic_sl (~line 1956) reads an undefined `atr_distance` (and `trade` inside a swallowed try) \u2014 any future caller raises NameError. Currently unreachable (grep: only the def). Found by code review of SHADOW-RECKONING commit.",
+      "root_cause": "function left half-migrated during an earlier SL refactor",
+      "fix": "delete the dead function or complete it with real ATR inputs + a test; either way make it reachable or remove",
+      "verified_by": "code review 329547e5 (2026-10-27), grep evidence",
+      "date_found": "2026-10-27",
+      "date_fixed": null,
+      "found_by": "code-review",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-067",
+      "title": "hl_sync_guardian.py + hl-sync-guardian.py duplicate modules hardcode CUT_LOSER_THRESHOLD=-3.0, independent of CUT_LOSER_PNL (now -6.00)",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "scripts/hl_sync_guardian.py",
+        "scripts/hl-sync-guardian.py"
+      ],
+      "symptom": "Both copies (underscore vs hyphen) hardcode CUT_LOSER_THRESHOLD=-3.0 at ~:286 while live CUT_LOSER_PNL=-6.00 (2026-10-27 coupled trial). Guardian closes can disagree with position_manager HML by 2x account-%; the duplicate pair must be kept in sync by hand. Review 329547e5 P2.",
+      "root_cause": "copy-paste module duplication + hardcoded constant instead of import",
+      "fix": "single canonical module importing CUT_LOSER_PNL from hermes_constants; delete the duplicate (check service ExecStart for which name is live first)",
+      "verified_by": "code review 329547e5 (2026-10-27)",
+      "date_found": "2026-10-27",
+      "date_fixed": null,
+      "found_by": "code-review",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-065"
+      ]
     }
   ],
   "schema": {

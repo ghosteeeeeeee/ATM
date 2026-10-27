@@ -129,7 +129,12 @@ def main():
         print(f'stale_comment_linter: cannot read constants: {e}')
         return 0 if not strict else 1
     vals = parse_constants(const_text)
-    warnings = rule_r1(const_text, vals) + rule_r2(const_text, vals) + rule_r3()
+    try:
+        warnings = rule_r1(const_text, vals) + rule_r2(const_text, vals) + rule_r3()
+    except Exception as e:
+        # review LOW-2: a linter crash must never block a commit via the hook
+        print(f'stale_comment_linter: internal error (treated as {0 if not strict else 1}): {e}')
+        return 1 if strict else 0
     if not warnings:
         print('stale_comment_linter: clean')
         return 0

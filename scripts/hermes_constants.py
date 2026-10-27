@@ -695,7 +695,7 @@ ATR_SL_MIN             = 0.015   # 1.5% floor — CEO Oct 16: widened from 1.3%.
 ATR_SL_MAX             = 0.04  # 4.0% cap — COUPLED TRIAL 2026-10-27 (SHADOW-RECKONING #2, CEO consult 20261027T024741Z + T sign-off): widened 2.5→4.0 TOGETHER with CUT_LOSER_PNL −4→−6 (SL-sweep 2026-10-22 deferred item; MFE/MAE n=64: MAE-to-peak p90=1.62% needs room + HML ≥1.2%@5x; shadow wider_sl rows=2,574). MUST match ATR_SL_MAX_INIT. Revert criteria pre-registered in data/shadow_disposition.json (trial:7d-PnL<−$2.50 OR HML exit <−6.5% acct OR deadline 2026-11-03). Prior: 2.5% (widened from 2.0 Oct 16).
 ATR_SL_MIN_EXTREME     = 0.015  # 1.5% floor for EXTREME regime — matches ATR_SL_MIN
 ATR_TP_MIN             = 0.015   # 1.5% floor — match ATR_SL_MIN
-ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (2.5%). Trailing handles profit-taking.
+ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (now 4.0% since 2026-10-27 trial — R:R at cap degrades to ~0.5:1; PM_TRAIL handles profit-taking). Trailing handles profit-taking.
 ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-09-29: widened from 1.5x. SHORT R:R 0.59:1 (avg_win $0.088 vs avg_loss $0.149). Only 0.9% of 7d trades hit TP — unreachable at 1.5x. 2.0x gives SHORT winners room to reach 4% TP before PM_TRAIL. PM_TRAIL handles most exits.
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
@@ -729,7 +729,7 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 ATR_SL_MIN_INIT    = 0.015  # 1.5% — CEO Oct 16: MUST match ATR_SL_MIN
 ATR_SL_MAX_INIT    = 0.04  # 4.0% — COUPLED TRIAL 2026-10-27 (must match ATR_SL_MAX; see its comment for revert criteria)
 SL_PCT_FALLBACK    = 0.015  # 1.5% if ATR unavailable (matched to ATR_SL_MIN)
-TP_PCT_FALLBACK    = 0.075  # 7.5% fallback target (3:1 R:R with 2.5% SL)
+TP_PCT_FALLBACK    = 0.075  # 7.5% fallback target (was 3:1 with 2.5% SL; since the 2026-10-27 4.0% cap it is ~1.9:1 — PM_TRAIL/ATR_TP paths govern real exits)
 STOP_LOSS_DEFAULT  = 0.015  # 1.5% hard fallback (matched to ATR_SL_MIN)
 SL_PCT_MIN        = 0.015  # 1.5% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
 CUT_LOSER_PNL     = -6.00  # close trade at -6.00% ACCOUNT PnL — COUPLED TRIAL 2026-10-27 (SHADOW-RECKONING #2, CEO 20261027T024741Z + T sign-off): widened −4→−6 TOGETHER with ATR_SL_MAX 2.5→4% (SL-sweep deferred coupled change). Rationale: HML price cap = CUT_LOSER/lev → at 5x was −0.8% price, below MFE/MAE MAE-to-peak p75 (1.17%) for MFE≥0.8% trades (n=64) → killed 13-14/64 before the move; −6 @5x = −1.2% price covers p75. Shadow wider_sl simulation already has 2,574 rows. REVERT to −4.00 per data/shadow_disposition.json trial entry (7d trial PnL < −$2.50 OR any HML exit < −6.5% acct OR deadline 2026-11-03). Prior: −4.00 (CEO Oct 15, −3→−4).

@@ -18,7 +18,9 @@ Definitions (explicit, so numbers are reproducible):
                  (T = threshold; swept 0.2/0.3/0.5%).
   MAE_to_peak  = max adverse from open up to the candle of MFE_8h's peak —
                  the drawdown you must survive if you ride to the big MFE.
-  HML cap      = 4% account / leverage  (CUT_LOSER_PNL=-4% -> price-term cap).
+  HML cap      = CUT_LOSER_PNL account% / leverage  (price-term cap; imported live
+                 from hermes_constants — was 4% when the 2026-10-26 report was
+                 produced, 6% since the 2026-10-27 coupled trial).
 
 Data: brain PG (trades) + data/candles.db (candles_1m, fallback candles_5m).
 Deterministic; no network; read-only.
@@ -38,7 +40,8 @@ from _secrets import BRAIN_DB_DICT  # noqa: E402
 
 N = 100
 WINDOW_S = 8 * 3600
-CUT_LOSER_PNL_PCT = 4.0   # % account loss -> hard_max_loss trigger (hermes_constants)
+from hermes_constants import CUT_LOSER_PNL  # live value — do NOT hardcode (review MED-1: hardcoding froze 4.0 after the 10-27 trial moved it to 6.0)
+CUT_LOSER_PNL_PCT = abs(CUT_LOSER_PNL)   # % account loss -> hard_max_loss trigger
 BIG_MFE_SWEEP = (0.5, 0.8, 1.0, 1.5)     # % price
 EARLY_SWEEP = (0.2, 0.3, 0.5)            # % price post-exit continuation
 
@@ -274,8 +277,8 @@ def main():
               f"{mae_pk[-1]:>7.2f} {over_sl:>4d}/{len(coh):<3d} {over_hml:>4d}/{len(coh):<3d} "
               f"{med_exit:>10s}")
 
-    # Leverage math: to survive MAE with HML(4% acct) intact, max lev = 4 / MAE%
-    print("\n  HML survival math (CUT_LOSER 4% account / MAE price%):")
+    # Leverage math: to survive MAE with HML(cut_loser% acct) intact, max lev = cut_loser / MAE%
+    print(f"\n  HML survival math (CUT_LOSER {CUT_LOSER_PNL_PCT:g}% account / MAE price%):")
     for thr in (0.8, 1.0, 1.5):
         coh = [r for r in res if r['mfe'] >= thr / 100.0]
         if not coh:

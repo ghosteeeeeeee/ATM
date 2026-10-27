@@ -47,7 +47,8 @@ from _secrets import BRAIN_DB_DICT  # noqa: E402
 
 WIN_S = 8 * 3600
 N_TRADES = 100
-CUT_LOSER_ACCT_PCT = 4.0          # hermes_constants.CUT_LOSER_PNL (abs)
+from hermes_constants import CUT_LOSER_PNL  # live value (review MED-1 2026-10-27: was hardcoded 4.0, stale after coupled trial)
+CUT_LOSER_ACCT_PCT = abs(CUT_LOSER_PNL)          # % account
 COV_MIN = 0.50
 
 
