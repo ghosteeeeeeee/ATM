@@ -9473,5 +9473,23 @@
     "category": "monitor",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-27T11:36:50Z",
+    "idea": "REJECTED-WITH-DATA: block mid-band LONG (meta_rsi 45-64) when volume_spike<1.0",
+    "rationale": "7d 43T 37.2% -$1.37 vs vol>=1.0 7T 57.1% +$0.27; 30d 219T 45.7% -$0.50 vs 49T 57.1% +$0.40 — BUT 14d OOS sign-flip (vol>=1.0 = -$0.16), fk = ~100/128 = 78% of mid-band winners killed (>>20% bar), save shallow +$0.50/30d. FAILS fk + OOS + shallow. Logged so no future run re-proposes.",
+    "expected_impact": "n/a — rejected",
+    "category": "entry sniper",
+    "status": "rejected",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T11:36:50Z",
+    "idea": "PRE-REGISTER: vb- WR recovery check after unclog-waiver lapse (due Nov 3)",
+    "rationale": "24h vb- 8T 37.5% -$0.32 = oversold-short cohort (LTC 37.3 / DYDX 37.9 entry_rsi) that entered WHILE waiver active (lapsed 00:00Z Oct 27). 7d vb- still 27T 63% +$0.11 healthy. Since lapse: 0 band opens, 0 floor violations. Tripwire: if vb- 7d WR still <50% by Nov 3 with 0 band opens, floor-45 is NOT the root cause → reopen chase-short investigation.",
+    "expected_impact": "zero-code monitor; distinguishes waiver-coincidence vs real floor effect",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
