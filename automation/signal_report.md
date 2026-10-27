@@ -1,33 +1,41 @@
-=== Signal Performance Report ===
-Period: Last 6h | 24h (generated 2026-10-27 15:32 UTC)
+# Signal Performance Report
+**Generated:** 2026-10-27 (run) | **Period:** Last 6h + 24h
 
-Totals: 6h = 5 trades, -$0.11 | 24h = 20 trades, -$0.49
-
-KILLED (executed):
+## KILLED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | - | - | - | - | No signal met kill criteria (WR<30%, 5+ trades, PnL<-$0.10) |
+| — | — | — | — | — | None met kill criteria (24h) |
 
-BOOSTED (executed):
+## BOOSTED (executed):
 | Signal | Dir | WR | PnL | Trades | Action |
 |--------|-----|-----|-----|--------|--------|
-| (none) | - | - | - | - | No signal met boost criteria (WR>55%, 5+ trades, PnL>$0.05) |
+| — | — | — | — | — | None met boost criteria (bb-squeeze+ failed multi-token: 5T all hyperliquid; also DEPRIORITIZED 2026-10-10 on 14d zero-edge data) |
 
-LOSERS (watch list):
+## LOSERS (watch list):
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| continuation+ | LONG | 50.0% | -$0.16 | 2 (6h) | Watch — below trade threshold |
-| bb-squeeze+ | LONG | 33.3% | -$0.01 | 3 | Watch — WR low but tiny loss, needs 10+ trades to tune |
-| pump-chain+ | LONG | 60.0% | -$0.08 | 5 | Watch — good WR, negative PnL (small avg losses) |
-| volume-buildup- | SHORT | 66.7% | -$0.05 | 3 | Watch — good WR, slightly negative PnL |
+| bb-bounce-v2-long+ | LONG | 33.3% (7d) | -0.36 (7d) | 18 (7d) / 1 (24h) | WATCH — chronic 7d loser, 24h volume too low to kill |
+| continuation+ | LONG | 50.0% | -0.16 | 2 | WATCH — 24h sample too small |
+| volume-buildup- | SHORT | 66.7% | -0.07 | 3 | WATCH — WR fine, slight negative PnL (R:R) |
+| pump-chain+ | LONG | 47.4% (7d) | -0.41 (7d) | 19 (7d) / 3 (24h) | WATCH — 7d chronic, but 24h at 100% WR +0.28 (recovering) |
 
-WINNERS:
+## WINNERS:
 | Signal | Dir | WR | PnL | Trades | Status |
 |--------|-----|-----|-----|--------|--------|
-| r2v2-long3 | LONG | 100.0% | +$0.06 | 1 | Positive |
-| warrior-sr-confirm+ | LONG | 100.0% | +$0.06 | 2 | Positive |
+| bb-squeeze+ | LONG | 60.0% | +0.37 | 5 | KEEP — single token, no boost (multi-token rule) |
+| pump-chain+ | LONG | 100.0% | +0.28 | 3 | KEEP |
+| warrior-sr-confirm+ | LONG | 100.0% | +0.06 | 2 | KEEP |
+| continuum-osc+ | LONG | 100.0% | +0.02 | 1 | KEEP |
 
-ISSUES:
-- No inversions found in last 24h (0 direction mismatches).
-- Low volume period: only 20 closed trades in 24h — below sample thresholds for confident kill/boost decisions.
-- Net system PnL negative (-$0.49 / 24h) but driven by spread across many signals, none individually qualifying for kill.
+## 6h Performance:
+| Signal | Dir | Trades | WR | PnL |
+|--------|-----|--------|-----|-----|
+| bb-squeeze+ | LONG | 2 | 100.0% | +0.38 |
+
+## ISSUES:
+- No signal inversions in 24h (long/short name vs direction check clean).
+- Low trade volume overall: 20 closed trades in 24h, 2 in 6h — sample sizes below action thresholds.
+- Note: ad-hoc "name/direction mismatch" query using `signal LIKE '%-%'` produces false positives on hyphenated names (bb-bounce-v2-long+); authoritative check is long/short substring only — that returned zero.
+
+---
+*No kills, no boosts this cycle. Next report: ~6h.*
