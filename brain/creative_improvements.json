@@ -9415,5 +9415,27 @@
     "category": "gate review",
     "status": "closed-no-edge",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-27T08:44:43Z",
+    "run": 179,
+    "agent": "brain_auditor",
+    "idea": "coin_regime direction-split eval SHIPPED (brain/analysis/coin_regime_direction_2026-10-27.py, --selfcheck PASS): LONG->coin SHORT_BIAS = COLLECT candidate (n=33 -0.94, save +0.94, fk 14.3%, p=0.1262, re-measure Nov 4+); SHORT->coin LONG_BIAS = REFUTED (blocking loses +0.08)",
+    "rationale": "Oct-27 pre-reg item (#141/#133 coin_regime n>=50) measured with full house-bar checklist; direction split separates the two counter-tales that the aggregate ALIGNED/COUNTER (p=0.147) was smearing together",
+    "expected_impact": "closes an Oct-27 eval; pre-registers the only live entry-side candidate that passes n/save/fk bars",
+    "category": "entry sniper",
+    "status": "measured-collect",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-27T08:44:43Z",
+    "run": 179,
+    "agent": "brain_auditor",
+    "idea": "SHORT-starvation tripwire for the [35,45) block (zero code): if 0 SHORT opens for 48h while 15m SHORT_BIAS is majority, re-open the waiver-renewal review",
+    "rationale": "the band block is now live and slightly negative (correct to keep), but the unclog waiver existed because shorts were starved — need a symmetric early-warning on the opposite failure mode",
+    "expected_impact": "prevents silent short-side starvation; monitor-only",
+    "category": "guardrail",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

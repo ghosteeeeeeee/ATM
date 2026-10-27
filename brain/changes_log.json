@@ -3064,5 +3064,16 @@
     "after": "closed manual_close 79916, pnl -$0.05, loss-cooldown reason=loss streak=1",
     "rationale": "Watchdog deep-analysis stated invalidation 1m closes below EMA300 15-30min; condition objectively met at 02:08 (cross 01:53), executed02:43. Mandate: exit early in chop.",
     "impact": "Saved ~$0.08 vs SL 79353 path; avoided holding a never-armed chop entry through STRONG_DOWN tape"
+  },
+  {
+    "timestamp": "2026-10-27T08:45:00Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/coin_regime_direction_2026-10-27.py (--selfcheck PASS): Oct-27 pre-reg coin_regime direction-split — LONG->SHORT_BIAS COLLECT (p=0.1262 fails, re-measure Nov 4+), SHORT->LONG_BIAS REFUTED (blocking loses). Closes Oct-27 coin_regime eval; zero trading behavior.",
+    "type": "creative",
+    "file": "brain/analysis/coin_regime_direction_2026-10-27.py",
+    "before": "coin_regime eval pending Oct 27 (aggregate ALIGNED/COUNTER p=0.147 COLLECT only)",
+    "after": "direction-split measured with house-bar checklist: long_into_shortbias COLLECT with pre-registered re-measure, short_into_longbias REFUTED",
+    "rationale": "Oct-27 scheduled eval; direction split separates the two counter-tales the aggregate was smearing",
+    "impact": "closes eval, pre-registers the only live entry candidate passing n/save/fk bars"
   }
 ]
