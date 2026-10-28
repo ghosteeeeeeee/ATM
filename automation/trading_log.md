@@ -16813,3 +16813,49 @@ BY: upgrade_implementer
 - 24h flipped RED '-$0.17' (was '+$0.07' at 03:30) — atr_sl_hit cluster (4T '-$0.65') driving the red
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 05:30 UTC Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (no closes) | 24h: 16T 10W 62.5% '-$0.17' (RED) | 7d 136T 72W 52.9% '-$0.47' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 0T last hour — kill check moot; no 24h signal n>=3 at 0% WR (worst: hh-hl+ n=1)
+- bb-squeeze+ boost (0.8→0.9) landed last hour — no second boost (1/hr cap)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 4/16 = 25% (<40%) — SL not too tight; dominant closes = profit-monster-trail (5T '+$0.38')
+- 3h negative streak (02:00-04:00) broke this hour (0 closes); regime not NEUTRAL (NORMAL/EXTREME/HIGH on recent closes) → no size cut
+- Frequency 0/hr — not overtrading
+- 1 open: BTC continuum-trend+ LONG flat (opened 21:54, ~8h stale — auditor checkpoint due 05:54Z)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.17' — atr_sl_hit cluster (4T '-$0.65') the driver
+- bb-bounce-v2-long+ CEO kill review still pending (14d 34T 35.3% '-$1.04')
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 06:30 UTC Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.07 (WR: 0.0%) | 24h: 18T 10W 55.6% '-$0.24' (RED) | 7d 138T 72W 52.2% '-$0.54' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal n>=3 at 0% WR (worst n=1 hh-hl+; continuation+/volume-buildup-/warrior-sr-confirm+ each 1W1L)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/18 = 27.8% (<40%) — SL not too tight; dominant closes = profit-monster-trail (5T '+$0.38')
+- Boost: bb-squeeze+ meets criteria (5T 60% '+$0.25' across STABLE+SUSHI) but already boosted 0.8->0.9 last hour — 1/hr cap holds
+- 4 consecutive negative hourly buckets (02:00 '-0.32', 03:00 '-0.11', 04:00 '-0.07', 05:00 '-0.07') — size-reduce rule fires only if regime NEUTRAL; actual regime NORMAL/EXTREME → size lever N/A
+- Entry quality: winners MAE mostly <0.5% (DOT continuation 0.02, SUSHI 0.10, CHIP 0.17, ENA 0.19, WCT 0.22, STABLE 0.26) — entries fine
+- Frequency 2/hr — under overtrading threshold (20)
+- 1 open: BABY volume-buildup- SHORT EXTREME (opened 06:07, fresh)
+
+**Open Questions:**
+- 24h deepened RED '-$0.17'→'-$0.24' — atr_sl_hit cluster (5T '-$0.71') still the driver
+- bb-squeeze+ took a KAS loser (-3.14%, MAE 0.93 — worst MAE among its 5T) the hour after the boost; 1T noise, not a boost reversal
+- NEAR warrior-sr-confirm+ closed with NULL mae_pct/mfe_pct — minor metadata gap, worth a data-quality check if it recurs
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
