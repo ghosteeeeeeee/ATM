@@ -155,9 +155,15 @@ _arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire
 _ugb_be_logged = set()         # trade_ids that have logged a UGB-BE would-fire (unarmed giveback)
 _ugb_pt_logged = set()         # trade_ids that have logged a UGB-PT would-fire (unarmed giveback)
 
-# EXT #44 peak-trail distance (0.3% off the running peak). Lives here, not in
+# EXT #44 peak-trail distance (off the running peak). Lives here, not in
 # hermes_constants, so vacation rule no_constants_change keeps a zero git diff.
-UGB_PT_DISTANCE_PCT = 0.30
+# WIDENED 0.30 -> 0.45 on 2026-10-28 — CEO label (excuses-audit consult
+# 20261028) + T direct sign-off. Evidence: last-100 winners forewent $5.84 vs
+# MFE while realizing $3.66 (PM-trail $4.07 of it, but PM constants are
+# CEO_PROTECTED); giveback exits fire only in profit, so the loser path
+# (HML / ATR SL / CUT_LOSER) is untouched by construction. Revert: 0.30
+# (registered: data/shadow_disposition.json entry ugb-pt-045, deadline 11-03).
+UGB_PT_DISTANCE_PCT = 0.45
 # UGB-PT ENFORCEMENT (CEO GO 2026-10-24, brain_auditor run #130 2026-10-25).
 # Unarmed half only: reached +0.40% favorable, PM trail never armed, live gives
 # back to peak-0.30% -> exit at market. 30d candle OOS n=179 unarmed +85.48pp
@@ -1364,11 +1370,12 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
                     try:
                         _ag_mfe_p, _ag_entry = float(_ag_row['mfe_price'] or 0), float(_ag_row['entry_price'] or 0)
                         if _ag_mfe_p > 0 and _ag_entry > 0:
+                            _ag_d = UGB_PT_DISTANCE_PCT / 100.0  # was hardcoded 0.3% — tracks the live constant (widened 0.45 2026-10-28)
                             if str(direction).upper() == 'LONG':
-                                _ag_cf = (_ag_mfe_p * 0.997 / _ag_entry - 1) * 100
+                                _ag_cf = (_ag_mfe_p * (1 - _ag_d) / _ag_entry - 1) * 100
                             else:
-                                _ag_cf = (1 - _ag_mfe_p * 1.003 / _ag_entry) * 100
-                            _ag_pt = f" peakTrail@0.3%={_ag_cf:+.2f}%"
+                                _ag_cf = (1 - _ag_mfe_p * (1 + _ag_d) / _ag_entry) * 100
+                            _ag_pt = f" peakTrail@{UGB_PT_DISTANCE_PCT:.2f}%={_ag_cf:+.2f}%"
                     except Exception:
                         pass
                     log(f"  [ARM-GAP] {token} {direction} MFE={float(mfe_pct_val):.2f}% trail=FALSE exit={reason} pnl={float(pnl_pct):+.2f}%{_ag_pt} trade={trade_id}")
@@ -3926,7 +3933,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # +0.40% favorable (PM_TRAIL_ACTIVATE) and the PM trail never armed.
         # 30d candle walk, n=179 unarmed: ACTUAL -7.24pp |
         #   UGB-BE  (exit at entry on round trip)  +27.61pp = +34.85pp, sign-p 0.00000
-        #   UGB-PT  (trail 0.3% off running peak)  +78.24pp = +85.48pp, sign-p 0.00000
+        #   UGB-PT  (trail 0.3% off running peak)  +78.24pp = +85.48pp, sign-p 0.00000  [backtest D=0.30; live D=0.45 since 2026-10-28 — widen was NOT re-backtested at 0.45, watch entry registered]
         # positive in all 3 split halves (last7d +21.84 / d8-14 +22.59 / d15-21 +13.19
         # for PT); worst single trade -8.24pp, ex-top3 still +78.85pp (no outlier carry).
         # MEASURED HARM on the armed half (BE -0.43pp on trailing_activated=TRUE) ->
