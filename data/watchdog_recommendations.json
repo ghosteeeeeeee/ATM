@@ -1,59 +1,24 @@
 {
-  "timestamp": "2026-10-28T19:10:59.125442+00:00",
-  "steers": [
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: CAKE + DOGE",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-001"
-    }
-  ],
+  "timestamp": "2026-10-28T20:11:00.185254+00:00",
+  "steers": [],
   "portfolio_health": "good",
   "regime": {
     "btc_15m": "LONG_BIAS",
     "btc_4h": "NEUTRAL",
     "continuum": "ABOVE",
-    "volatility": "NORMAL",
-    "zscore_tier": "POS",
+    "volatility": "LOW",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
     "acceleration_state": "NEGATIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "MARKUP",
+    "volume_regime": "LOW",
+    "linreg_alignment": 1.0,
+    "wyckoff_phase": "UNKNOWN",
     "market_phase": "CALM",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 2,
-  "deep_analysis": "MARKET: BTC holds above continuum EMA300 (~80777) for 154min, Wyckoff MARKUP, trend_quality STRONG_UP, aggregate 90L/3S LONG_BIAS. Sources agree (15m regime LONG_BIAS, continuum ABOVE, auto-trader's own chop detector says CHOP \u2014 shadow only, 28.6% WR n=21, no action). Regime flips/24h: aggregate 22, BTC 13 \u2014 p75/p50 standing state, not anomalous. LONGs are the right side of this tape.\n\nOPEN BOOK: 2 bb-squeeze+ longs, both regime-aligned, both ~35min old, both flat (+0.05% CAKE, +0.21% DOGE). Neither thesis broken. DOGE entered at meta_rsi 68.4 (top of band \u2014 high-entry long; 65+ longs are +0.15 / 59%WR over 7d so not a kill, but not a template to size up). CAKE at meta_rsi 62.1 sits in the 55-64 mid band (7d: 20T, 45%WR, -$0.39) \u2014 historically the bleed band \u2014 but mid-band blocks are measured-refuted and advisory-only, no steer issued on that basis. bb-squeeze+ itself is healthy: 14d 22T 68.2%WR +$0.67, trail-activated 18/22, avg MFE 0.82%.\n\n24H SCORECARD: 25T, 48%WR, -$0.89. Winners are the trail family doing its job \u2014 KAS/TURBO/GOAT/MINA/ICP bb-squeeze+ longs all +1.1 to +1.5% via profit-monster-trail. Losers are the wrong side: HBAR SHORT volume-buildup- at meta_rsi 38.5 (-5.25%, shorting oversold inside a bull tape \u2014 winning side was LONG), BABY SHORT -5.34% (MAE 1.98% = squeezed), DOT SHORT -5.65%, FOGO SHORT -3.53%. Four of the five biggest 24h bleeds are volume-buildup- shorts fighting aggregate LONG_BIAS.\n\nCHOP-BLEED KPI (dollar share, 7d): 91.4% (44 arm-losers of 51 losers; -$ loss from never-armed vs total loss), null_mfe=1, vs baseline 84.1%. Same-day arm rate 16.0% official (4/25) with 8 NULL mfe_pct (arm_of_nonnull 23.5%) \u2014 self-healing via nightly backfill, quoted with NULL count per #194. 7d LONG arm rate 48.7% (76T) \u2014 below the 50% tripwire. Reading: entry quality is deteriorating; the bleed is entries that never reach +0.40%, not exits giving back armed profit. Route is entry-quality work (brain_auditor), not trail/UGB tweaks. Two measures stated: dollar share 91.4% is NOT count share (44/51=86.3%).",
-  "regime_context": "LONG_BIAS (aggregate 90L/3S, 15m regime LONG_BIAS, continuum ABOVE EMA300 154min, linreg LEAN_BULL, Wyckoff MARKUP, CALM). BTC 4h NEUTRAL. Auto-trader shadow labels CHOP \u2014 disagreeing source, shadow-only stats negative, no conflict with live longs. Direction-flavored steers below carry condition=retest next cycle; flips/24h 22agg/13btc is normal churn, a true <6 flip tape has not occurred since Oct 2. Both open longs are aligned; no short-bias steer is warranted while 1m holds above EMA300.",
-  "pattern_alerts": "PATTERN 1 \u2014 volume-buildup- SHORT family bleeding and ACCELERATING (live, VOLUME_BUILDUP_MINUS_ENABLED=True, 34 trades/7d so not a dead-signal window). 7d: 34T, 58.8%WR, -$0.47. 3d: 19T, -$0.78 \u2014 worse per-trade than 7d. Asymmetry: wins +0.3 to +1.8%, losses -2.9 to -5.7% (HBAR -5.25 RSI38.5, BABY -5.34 MAE1.98, DOT -5.65, DYDX -5.45, ALT -4.61, ZRO -4.88). Winning side on the big losers: LONG (or no trade) \u2014 several entries are shorts at oversold/mid RSI inside an aggregate LONG_BIAS tape. Why we weren't on the winning side: the family keeps emitting shorts whenever volume builds, with no aggregate-regime counterweight. ACTION: brain_auditor territory (family/route review) \u2014 watchdog does not change signal params.\n\nPATTERN 2 \u2014 bb-bounce-v2-long+ still enabled and losing (BB_BOUNCE_V2_LONG_ENABLED=True, 10T/7d so live traffic). 7d: 10T, 1W (10%WR), -$0.39. 3d: 3T, -$0.12. Constant header already says the CEO re-enable basis ('30d 73T 74%WR') is dead. Winning side on the POLYX loser: short/none (RSI metadata NULL on that row). ACTION: brain_auditor kill/re-tune review \u2014 not dead-signal (enabled + traffic), not watchdog params.\n\nPATTERN 3 \u2014 not a pattern: doji-bottom-long shows -$0.51 in the watchdog signal_performance window but 0 trades/7d \u2014 already killed 2026-10-16, stale window, NO action. pump-chain- 7d 3T +$0.22 \u2014 no flag. bb-squeeze+ (both open trades) is the opposite pattern: 18/22 trail-armed, positive \u2014 this is how we win; protect it from chop entries, don't touch its params.\n\nPATTERN 4 \u2014 meta_rsi 7d map (truth source, not entry_rsi_14): LONG <35 80%WR +$0.51 (best), LONG 55-64 45%WR -$0.39 (bleed band), LONG 65+ 59%WR +$0.15 (chase band not fatal), SHORT 65+ 100%WR +$0.31 (n=6), SHORT 55-64 45%WR -$0.25. No new enforceable cell claim \u2014 mid-band EMA300 steer remains WITHDRAWN per measured-refuted #139; re-measure 2026-10-27 was due, not run this cycle.",
-  "additional_steers": [
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "CAKE+DOGE long pair \u2014 keep while BTC 1m holds continuum EMA300",
-      "detail": "Both bb-squeeze+ longs, same-minute open, flat PnL, regime-aligned (aggregate LONG_BIAS). HOLD both while BTC 1m closes hold above continuum EMA300 (~80777). If 1m closes below EMA300 for 15-30m AND either trade is still under +0.40% MFE (trail not armed), early-exit that leg rather than ride a chop SL \u2014 7d chop-bleed is 91.4% of dollar loss. Correlation: one BTC dump hits both; do not add a third correlated alt long while this pair is open and unarmed.",
-      "condition": "BTC 1m vs continuum EMA300 ~80777; trail-armed status (+0.40% MFE)",
-      "auto_executable": false
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Entry-quality tripwire: 7d LONG arm rate 48.7% (<50) + chop-bleed 91.4%",
-      "detail": "7d LONG closes arm at 48.7% (76T) \u2014 below the 50% tripwire. Dollar chop-bleed 91.4% (44/51 losers never reached +0.40%), 1pt under the 92% deterioration line; same-day arm 16.0% (4/25, 8 NULL mfe \u2014 nightly backfill will lift it). This is an ENTRY-quality problem, not exit ownership. Watchdog cannot change params: route to brain_auditor for entry-gate work. Do NOT respond with trail-distance or UGB tweaks.",
-      "condition": "re-measure 7d window next cycle; if \u226592% for 2 consecutive cycles, escalate urgent to CEO",
-      "auto_executable": false
-    },
-    {
-      "severity": "info",
-      "category": "opportunity",
-      "title": "Trail family is the winning playbook \u2014 lean into it when picking",
-      "detail": "All five 24h winners \u2265+1% exited via profit-monster-trail on longs (bb-squeeze+ KAS/TURBO/GOAT/MINA/ICP). 14d bb-squeeze+ trail-armed 18/22. Any manual or watchlist pick should prefer trail-compatible trending setups over mean-reversion shorts while aggregate stays LONG_BIAS.",
-      "condition": "aggregate regime = LONG_BIAS (re-test each cycle)",
-      "auto_executable": false
-    }
-  ],
-  "agent_timestamp": "2026-10-28T19:17:50.741757+00:00"
+  "open_count": 1,
+  "deep_analysis": "TRADE WATCHDOG \u2014 GOOD\n\nOpen: 1 (STABLE LONG, opened 20:10Z). Regime LONG_BIAS (aggregate 89L/0S at 20:00Z, BTC 15m LONG_BIAS, continuum ABOVE EMA300 274min, trend STRONG_UP). Flip rates 20agg/13btc per 24h = normal churn (p50 band; a <6 true-trend tape has not occurred since Oct 2, a \u226526 anomaly not present). Sources aligned; auto-trader shadow labels CHOP (disagreeing source, shadow-only, negative long score \u2014 no live conflict).\n\nOpen trade STABLE LONG 16509: just opened, meta_rsi 61.16, SL -1.11%, TP +1.51%. Signal bb-squeeze+ is the winner family \u2014 7d 20T 15W +$0.65, arm-rate 40%, STABLE 30d 2T/2W +$0.38. Would re-open fresh today: yes. HOLD, no stop action at 0.0%.\n\n24h book: 12 losers, 11 never armed (MFE <+0.40%). The bleed is shorts fighting the tape: HBAR SHORT volume-buildup- entered at meta_rsi 38.46 (oversold short) \u2192 -5.25% stale_exit; BABY/FOGO/DOT SHORTs at RSI 55-60 \u2192 -3.5 to -5.6%. Winning side on every big loss was LONG or no-trade. We were on the wrong side, not at the wrong time.\n\nAI trader: ADA LONG pick written 20:12Z (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute). Precheck PASS: R:R 1.31 C, RSI 62.7, +0.96%/30m momentum, regime-aligned. Supersedes PUMP 19:17Z.\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning] Skip volume-buildup- (and mean-reversion) SHORTs while aggregate 15m holds LONG_BIAS (condition retested 20:00Z: still 89L/0S; age=2 cycles unexecuted). 7d 34T -$0.47 with live traffic. HBAR oversold short (RSI 38.46) was the signature loss \u2014 shorting oversold inside a long tape is the wrong side.\n\ud83d\udfe1 [warning] Chop-bleed 7d dollar share 91.4% (1pt under the 92% tripwire); same-day arm rate 14.8% (4/27 closes armed) \u2014 same-day tripwire <50 breached, leading indicator. NULL-mfe losers 1/window (negligible, self-healing nightly). Entry-quality problem \u2192 brain-auditor, not exit tweaks.\n\ud83d\udfe2 [info] STABLE LONG 16509 HOLD \u2014 thesis intact, bb-squeeze+ family healthy, regime-aligned. No action.",
+  "agent_timestamp": "2026-10-28T20:14:19.636652+00:00",
+  "regime_context": "LONG_BIAS and stable: aggregate 15m 89L/0S (20:00Z), BTC 15m LONG_BIAS, continuum ABOVE EMA300 for 274min, linreg alignment 1.0, trend_quality STRONG_UP. BTC 4h NEUTRAL \u2014 no macro headwind. Flip rate 20agg/13btc per 24h sits at the normal p50 band (not an anomaly either direction; true <6 trend tape not seen since Oct 2). Auto-trader shadow regime=CHOP with long score -10 disagrees \u2014 shadow-only, stats flat (n=22, WR 31.8%, +$0.005), not a live-trading source. Direction-flavored steers carry condition=retest next cycle per retraction rule. Both long-bias sources and continuum aligned, so regime-aligned LONGs are the correct side; volume-buildup- SHORTs are counter-tape.",
+  "pattern_alerts": "PATTERN 1 \u2014 volume-buildup- SHORT family bleeding, ACCELERATING, still live (VOLUME_BUILDUP_MINUS_ENABLED, 34T/7d so not a dead-signal window). 7d: 34T, 20W (58.8%), -$0.47. 24h alone: 4 losers -$0.69 (HBAR -5.25 RSI38.46 oversold, BABY -5.34, DOT -5.65, FOGO -3.53). Asymmetry: wins ~+0.9 to +1.8%, losses -3.5 to -5.7%. Winning side on all four big losers: LONG or no-trade \u2014 entries are shorts at mid/oversold RSI inside an aggregate LONG_BIAS tape (89L/0S). Why we weren't on the winning side: family emits shorts whenever volume builds with no aggregate-regime counterweight. ACTION: brain-auditor family/route review (age=2 cycles flagged, unexecuted). Watchdog does not change signal params.\n\nPATTERN 2 \u2014 bb-bounce-v2-long+ still enabled and losing (BB_BOUNCE_V2_LONG_ENABLED=True, 10T/7d live traffic). 7d: 10T, 1W (10%), -$0.39. Winning side on the loss: short/none. CEO re-enable basis (30d 73T 74%WR) is dead per prior analysis. ACTION: brain-auditor kill/re-tune review (age=2 cycles, unexecuted).\n\nPATTERN 3 \u2014 dead-signal check clean: doji-bottom-long shows -$0.51 in the watchdog signal_performance window but 0T/7d \u2014 already killed 2026-10-16, stale window, NO action. pump-chain- 7d 3T +$0.22 \u2014 not flagged.\n\nPATTERN 4 \u2014 bb-squeeze+ is the counter-pattern and how we win: 7d 20T 15W +$0.65, arm-rate 40%, open STABLE trade rides it. Protect from chop entries; do not touch params.\n\nKPI SNAPSHOT \u2014 chop-bleed dollar share: 7d 91.4% (1pt under 92% tripwire), 14d 88.0%, 30d 82.0%. NULL-mfe losers 1/window (negligible). Same-day arm rate 14.8% (4/27) \u2014 same-day tripwire <50 breached; early warning that the 7d share will press the 92% tripwire. Measure used: dollar share sum_loss(mfe<0.40)/sum_all_loss. Route to brain-auditor as entry-quality (coin follow-through at entry), not exit tweaks. Mid-band EMA300 steer remains WITHDRAWN per measured-refuted #139 (re-measure was due 2026-10-27, not run this cycle \u2014 brain-auditor debt)."
 }
