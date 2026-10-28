@@ -1773,9 +1773,11 @@ def _ctx_rules_shadow_agree(token, direction, source, llm_verdict, llm_reason=No
     signal (token|direction|source). Ordering already prevents misattribution,
     but the check makes it an invariant rather than an accident (review #2).
 
-    NAY vs GO are the decisions that matter (block vs allow). WARN is advisory on
-    both sides, so a WARN involved on either leg counts as agreement-by-default —
-    we only flag real disagreements (one side NAY, the other GO/WARN).
+    Scoring: NAY vs GO are the decisions that matter (block vs allow), so the
+    comparison is purely "did each side say NAY?" — rules_nay == llm_nay. That
+    means WARN on either side counts as "not NAY": rules=NAY vs llm=WARN scores
+    agree=0 (a real disagreement — the rules would block a trade the LLM let
+    through). Both sides WARN, or WARN vs GO, score agree=1 (neither blocks).
 
     Two cases are recorded with agree=NULL and EXCLUDED from the ratio, because
     neither is a real LLM judgment:

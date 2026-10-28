@@ -540,7 +540,14 @@ new = {
 }
 if not any(e.get('id') == new['id'] for e in reg if isinstance(e, dict)):
     reg.append(new)
-    json.dump(reg, open(path, 'w'), indent=2)
+    # Atomic write (tmp + os.replace): a crash mid-dump would corrupt the
+    # registry and checkpoint_watch would silently no-op until the next good
+    # write — the exact failure this mandate exists to fix. The watcher itself
+    # writes atomically; the writer must too.
+    tmp = path + '.tmp'
+    with open(tmp, 'w') as f:
+        json.dump(reg, f, indent=2)
+    os.replace(tmp, path)
     print(f"registered checkpoint {new['id']} due {new['due_at']}")
 PY
 ```
