@@ -5353,3 +5353,5 @@ BY: auto_1hr
 BY: brain_auditor
 - [2026-10-27 23:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 19T 13W 68.4% '+$0.39' GREEN | 7d 138T 51.4% '-$0.33' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h n>=3 all positive-WR) | atr_sl_hit 1/19=5.3% under 40% | no neg streak (19:00 +0.04, 17:00 +0.02, 16:00 +0.16) | frequency 0/hr | 1 open bracketed BTC continuum-trend+ | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-28 00:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 17T 13W 76.5% '+$0.62' GREEN | 7d 136T 51.5% '-$0.38' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h n>=3 all positive-WR) | atr_sl_hit 1/17=5.9% under 40% | inversion 0 mismatches | no neg streak (19:00 +0.04 only active hour) | frequency 0/hr | 2 open bracketed BTC LONG + DOT SHORT | No constants change -> no signal_versions entry
+BY: auto_1hr
