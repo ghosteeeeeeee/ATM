@@ -5377,3 +5377,5 @@ BY: brain_auditor
 BY: auto_1hr
 - [2026-10-28 10:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 24T 50% '-$0.54' RED | 7d 135T 51.9% '-$0.72' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d positive in NORMAL/HIGH) | atr_sl_hit 5/24=20.8% under 40% | inversion 0 mismatches | boost: bb-squeeze+ same numbers as 09:35 (0 new closes), churn, hold 0.9 | neg streak stalled (0 closes) | frequency 0/hr | 2 open BTC pending LONG + MINA bb-squeeze+ LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
+BY: auto_1hr
+- [2026-10-28 11:31 UTC] auto_1hr: BOOST bb-squeeze+ weight 0.9->1.0 (signal_compactor.py) — 24h 7T 71.4% '+$0.29' multi-token (STABLE+ICP+PENGU+MINA), 7d 15T 66.7% '+$0.45'; held >65% post-0.9 boost as pre-registered | 1T last hour MINA win +$0.04 | 24h 24T 50% '-$0.54' RED | 7d 136T '-$0.68' — size-reduce 1.0x | kill: none | atr_sl_hit 5/24=20.8% under 40% | inversion 0 mismatches | frequency 1/hr | 1 open BTC pending LONG | signal_versions bb-squeeze+ v2

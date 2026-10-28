@@ -16948,3 +16948,23 @@ BY: upgrade_implementer
 - 24h still RED '-$0.54' — atr_sl_hit cluster (5T '-$0.71') remains the driver
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 11:31 Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.04 (WR: 100%) | 24h: 24T 12W 50.0% '-$0.54' (RED) | 7d 136T 71W '-$0.68' | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. BOOST bb-squeeze+ conf weight 0.9→1.0 (signal_compactor.py:627) — 24h 7T 71.4% '+$0.29' multi-token (STABLE×2, ICP, PENGU, MINA), 7d 15T 66.7% '+$0.45'. Held >65% post-0.9 boost as pre-registered at 09:35. signal_versions bb-squeeze+ v2 logged.
+
+**No Change Needed:**
+- Kill check: no signal n>=3 at 0% WR last hour; volume-buildup- still 4T 25% '-$0.45' 24h but 14d positive in NORMAL/HIGH — regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/24 = 20.8% (<40%) — SL not too tight; dominant closes = profit-monster-trail (6T '+$0.41') + ugb_pt (6T '+$0.10')
+- Frequency 1/hr — under overtrading threshold
+- 1 open: BTC ai-trader-pending LONG (opened 08:45)
+
+**Open Questions:**
+- 24h still RED '-$0.54' — atr_sl_hit cluster (5T '-$0.71') remains the driver
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only

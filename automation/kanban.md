@@ -123,3 +123,6 @@
 
 ## TEAM UPDATES
 - [2026-10-25 08:55 UTC] health_monitor: Auto-fixed 2 dead tuner timers — `hermes-ma-cross-5m-tuner` (stale ExecStart path from signal migration + missing PYTHONPATH + DATA_DIR pointing at scripts/data graveyard + unreachable 120s freshness guard on 5m candles) and `hermes-zscore-momentum-tuner` (never fired since 2026-10-18 boot, OnBootSec race left Trigger: n/a). Verified by run: 104 + 82 tokens tuned, both timers re-armed (next 24h / 4h). Core healthy: vacation pause absent, all 3 core timers firing, 0 tracebacks/30min, 55 signals/h, prices fresh 66s, 0 phantom, disk 82%. CEO NOTE: ma_cross_5m signal family disabled in constants (WR=19%) — tuner could be renamed -DEFUNCT instead of maintained.
+
+## TEAM UPDATES
+- [2026-10-28 11:32 UTC] auto_1hr: BOOST bb-squeeze+ weight 0.9→1.0 (signal_compactor.py:627, signal_versions v2) — 24h 7T 71.4% +$0.29 multi-token (STABLE×2, ICP, PENGU, MINA), 7d 15T 66.7% +$0.45; held >65% post-0.9 boost as pre-registered at 09:35 run. 1T last hour (MINA trail win +$0.04). 24h 24T 50% −$0.54 RED, 7d 136T −$0.68. Size-reduce 1.0x (file absent). Kill: none (volume-buildup- 14d positive in NORMAL/HIGH). atr_sl_hit 20.8%. Inversion 0. 1 open BTC pending LONG.
