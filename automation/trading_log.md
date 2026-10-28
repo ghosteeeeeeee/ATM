@@ -17101,3 +17101,29 @@ BY: upgrade_implementer
 - 24h still RED '-$0.92' but stalled (no new losses this hour; drag remains atr_sl_hit 4T '-$0.50' + cut-loser-CL-T1 3T '-$0.44')
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 18:50 Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** $+0.03 (WR: 66.7%) | 24h: 25T 12W 48.0% '-$0.91' RED | 7d 128T 68W 52.4% '-$0.62' | **size-reduce: file absent -> 1.0x**
+
+Winners: TURBO bb-squeeze+ profit-monster-trail +1.46%, GOAT bb-squeeze+ profit-monster-trail +1.29%
+Loser: SOL grind-breakout-v2+ atr_sl_hit -2.99%
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal n>=3 at 0% WR last hour; volume-buildup- 24h 7T 42.9% '-$0.58' but 14d positive in NORMAL/HIGH — regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/25 = 20.0% (<40%) — SL not too tight; dominant closes = profit-monster-trail (8T '+$0.32') + ugb_pt (5T '+$0.08')
+- Boost: bb-squeeze+ 6T 83.3% '+$0.06' 6-token meets criteria but already at 1.0 ceiling (boosted 09->1.0 at 11:31 today) — no headroom; pump-chain+ 4T 50% fails n>=5
+- Neg streak: 15:00 hour was the only negative bucket (0 closes 16-17h, +$0.03 this hour) — not 3+ consecutive negative hours
+- Frequency 3/hr — well under overtrading threshold
+- 3 open trades: DOGE/KAS/CAKE bb-squeeze+ LONG (all at 0.00 unrealized)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.91' — drag remains atr_sl_hit (5T '-$0.57') + cut-loser-CL-T1 (3T '-$0.44')
+- bb-squeeze+ at weight ceiling with 3 open LONGs — if it keeps winning, next lever is hot-set priority, not weight
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
