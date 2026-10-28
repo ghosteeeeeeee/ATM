@@ -2150,3 +2150,9 @@
 
 ## Error Alerts — 2026-10-28 03:28 UTC
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-28 05:54 UTC
+- **[WARN]** (checkpoint_watch): **DUE** `btc-16450-8h-stale` (due 2026-10-28T05:54:00+00:00): BTC #16450 LONG crosses 8h at 05:54Z with no MFE>0.40% — exit IF still flat AND 1m holding below continuum EMA300 (watchdog stale steer). Retract on 1m reclaim holding 15-30m.
+
+## Error Alerts — 2026-10-28 06:39 UTC
+- **[WARN]** (checkpoint_watch): **OVERDUE** `btc-16450-8h-stale` (due 2026-10-28T05:54:00+00:00): BTC #16450 LONG crosses 8h at 05:54Z with no MFE>0.40% — exit IF still flat AND 1m holding below continuum EMA300 (watchdog stale steer). Retract on 1m reclaim holding 15-30m.
