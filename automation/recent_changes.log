@@ -5389,3 +5389,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-28 16:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 23T 11W 47.8% '-$0.92' RED (window roll, 2 wins aged out, no new losses) | 7d 127T 52% '-$0.80' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d HIGH 69.2%) | atr_sl_hit 4/23=17.4% under 40% | inversion 0 mismatches | boost: none (no n>=5 WR>55% net>0 candidates) | neg streak none (0 closes) | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-28 17:45 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 23T 11W 47.8% '-$0.92' RED unchanged (no new closes) | 7d 126T 52.4% '-$0.69' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d positive in NORMAL/HIGH) | atr_sl_hit 4/23=17.4% under 40% | inversion 0 mismatches | boost: none (no n>=5 WR>55% net>0 candidates; bb-squeeze+ 4T 75% '-$0.04' fails) | neg streak stalled (0 closes 2 hours running) | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
+BY: auto_1hr
