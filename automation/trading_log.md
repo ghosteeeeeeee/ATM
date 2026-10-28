@@ -16903,3 +16903,26 @@ BY: upgrade_implementer
 - 24h still RED '-$0.44' — atr_sl_hit cluster (5T '-$0.71') still the driver; BABY cut-loser (-5.34%) deepened it
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 09:35 UTC Hourly Analysis
+
+**Trades:** 5 closed (2 wins, 2 losses, 1 flat)
+**PnL:** $-0.10 (WR: 40.0%) | 24h: 24T 12W 50.0% '-$0.54' (RED) | 7d 141T 72W 51.1% '-$0.91' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal n>=3 at 0% WR last hour; 24h worst volume-buildup- 4T 1W 25% '-$0.45' but 14d 40T 62.5% '+$0.01' with wins in NORMAL (64.7%) and HIGH (69.2%) — only EXTREME mildly negative (10T 50% '-$0.24'), below regime-kill evidence bar
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/24 = 20.8% (<40%) — SL not too tight; dominant closes = ugb_pt (6T '+$0.10') + profit-monster-trail (6T '+$0.41')
+- Boost: bb-squeeze+ post-boost validation clean — 2T since 04:30 weight raise both wins (ICP +1.48%, PENGU +0.58%), 24h now 7T 71.4% '+$0.29' multi-token (STABLE+SUSHI+ICP+PENGU). Meets criteria numerically but same-day second bump = churn; 7d WR still borderline. Hold at 0.9, re-evaluate if 24h holds >65% into next run
+- Neg streak: hourly buckets 03:06 and 08:09 all negative but aggregate regime LONG_BIAS (not NEUTRAL), size lever N/A per rule
+- Frequency 5/hr — under overtrading threshold
+- 1 open: BTC ai-trader-pending LONG bracketed (SL 81240 / TP 82450, opened 08:45)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h deepened RED '-$0.44'→'-$0.54' — FOGO volume-buildup- SHORT cut-loser (-3.53%) was shorting into FOGO LONG_BIAS conf 92 regime; 1 trade, but worth watching if vb- shorts keep fading strong long-bias tokens
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+- brain_auditor #193 follow-up MED: trades.pnl_pct has 2 unit conventions (5.9% unlevered rows) — analytics should use pnl_usdt until write-path pinned (auditor-owned, not auto_1hr)
