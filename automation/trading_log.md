@@ -17057,3 +17057,25 @@ BY: upgrade_implementer
 - 24h still RED '-$0.54' — atr_sl_hit cluster (4T '-$0.50') + cut-loser-CL-T1 (3T '-$0.44') remain the drivers
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 16:42 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: N/A) | 24h: 23T 11W 47.8% '-$0.92' (RED, window rolled — 2 winning trades aged out of 24h window since 15:41) | 7d 127T 66W 52.0% '-$0.80' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0 closes last hour; no 24h signal n>=3 at 0% WR. volume-buildup- 24h 7T 42.9% '-$0.58' but 14d HIGH 13T 69.2% '+$0.17' — wins in a regime, regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 4/23 = 17.4% (<40%) — SL not too tight; dominant closes = profit-monster-trail (6T '+$0.22') + ugb_pt (6T '+$0.10')
+- Boost: no candidates (no signal n>=5 with WR>55% and net>0 in 24h; bb-squeeze+ 4T 75% '-$0.04' fails n>=5 and net>0)
+- Neg streak: 15:41 hour was 1L, this hour 0 closes — not 3+ consecutive negative hours
+- Frequency 0/hr — under overtrading threshold
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED deepened '-$0.54'->'-$0.92' purely from window roll (profitable trades aged out), not new losses
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
