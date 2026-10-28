@@ -93,7 +93,20 @@ def check_price_freshness():
             conn.close()
         if not max_ts:
             return ('WARN', 'price_history empty — no prices at all')
-        age = time.time() - max_ts
+        # timestamp may be epoch REAL or TEXT (ISO) depending on writer. A TypeError
+        # here used to fall through to "OK — check skipped", which silently
+        # DISABLED the staleness check (review #8). Handle both, and report the
+        # check as skipped-as-WARN rather than falsely-OK when we can't parse.
+        try:
+            if isinstance(max_ts, (int, float)):
+                age = time.time() - float(max_ts)
+            else:
+                dt = datetime.fromisoformat(str(max_ts).replace('Z', '+00:00'))
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                age = (datetime.now(timezone.utc) - dt).total_seconds()
+        except (TypeError, ValueError) as e:
+            return ('WARN', f'price timestamp unparseable ({type(max_ts).__name__}): {e} — staleness check not runnable')
         if age > PRICE_STALE_WARN_SEC:
             return ('WARN', f'prices stale {age:.0f}s (>{PRICE_STALE_WARN_SEC}s), {n_tokens} tokens')
         if n_tokens < PRICE_TOKEN_MIN:

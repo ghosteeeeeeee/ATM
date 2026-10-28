@@ -61,7 +61,14 @@ python3 scripts/trade_watchdog.py >> "$LOG_FILE" 2>&1
 # FAIL-OPEN: any error reading constants/config → run the agent (old behavior).
 RUN_AGENT=1
 SKIP_REASON=""
-eval "$(python3 - <<'PYEOF'
+# Gate decision written to a FILE and read with `read` — NOT eval'd. The old
+# `eval "$(python3 ...)"` form was only injection-safe by accident (open_count
+# had to pass int() before reaching the f-string); any future edit printing a raw
+# value would have opened shell injection from the agent-written JSON. Reading
+# plain lines never interprets shell metacharacters (review #3).
+GATE_OUT="$(mktemp /tmp/watchdog_gate.XXXXXX)"
+trap 'rm -f "$GATE_OUT"' EXIT
+python3 - <<'PYEOF' > "$GATE_OUT"
 import json, os, sys
 from datetime import datetime, timezone
 sys.path.insert(0, '/root/.hermes/scripts')
@@ -83,28 +90,36 @@ try:
                 agent_age_h = (datetime.now(timezone.utc) - dt).total_seconds() / 3600
             except Exception:
                 agent_age_h = None
-    if open_count is None or int(open_count) < 0:
-        # No data, or nonsense (negative is impossible from len()) → fail-open
-        print('RUN_AGENT=1')
-        print("SKIP_REASON=''")
+    run, reason = 1, ''
+    if open_count is None or not isinstance(open_count, (int, float)) or int(open_count) < 0:
+        # No data, non-numeric, or nonsense (negative impossible from len())
+        # -> fail-open, run the agent
+        run, reason = 1, ''
     elif int(open_count) >= int(WATCHDOG_LLM_MIN_OPEN_TRADES):
-        print('RUN_AGENT=1')
-        print("SKIP_REASON=''")
+        run, reason = 1, ''
     elif agent_age_h is not None and agent_age_h >= float(WATCHDOG_LLM_STALE_HOURS):
-        # Flat, but agent analysis is stale → keep periodic review alive
-        print('RUN_AGENT=1')
-        print("SKIP_REASON=''" )
+        # Flat, but agent analysis is stale -> keep periodic review alive
+        run, reason = 1, ''
     else:
-        print('RUN_AGENT=0')
-        print(f"SKIP_REASON='open_count={open_count} < {WATCHDOG_LLM_MIN_OPEN_TRADES} and last agent analysis "
-              f"{'unknown' if agent_age_h is None else f'{agent_age_h:.1f}h'} < {WATCHDOG_LLM_STALE_HOURS}h'")
+        age = 'unknown' if agent_age_h is None else f'{agent_age_h:.1f}h'
+        run = 0
+        reason = f'open_count={int(open_count)} < {WATCHDOG_LLM_MIN_OPEN_TRADES} and last agent analysis {age} < {WATCHDOG_LLM_STALE_HOURS}h'
+    print(run)
+    print(reason)
 except Exception as _e:
     # Fail-open: never let a config/parse error silence the watchdog
-    print('RUN_AGENT=1')
-    print(f"SKIP_REASON=''")
-    print(f'# gate eval failed (fail-open): {_e}', file=sys.stderr)
+    print(1)
+    print('')
+    print(f'gate eval failed (fail-open): {_e}', file=sys.stderr)
 PYEOF
-)" || RUN_AGENT=1
+# Line 1 = 0/1, line 2 = human-readable reason. `read` never shell-interprets.
+if IFS= read -r _gate_line < "$GATE_OUT" && [[ "$_gate_line" =~ ^[01]$ ]]; then
+    RUN_AGENT="$_gate_line"
+else
+    RUN_AGENT=1   # unreadable output -> fail-open
+fi
+SKIP_REASON="$(sed -n '2p' "$GATE_OUT")"
+rm -f "$GATE_OUT"
 
 if [ "$RUN_AGENT" != "1" ]; then
     echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [SKIP-LLM] Agent pass skipped — ${SKIP_REASON}. Deterministic steers still emitted." >> "$LOG_FILE"

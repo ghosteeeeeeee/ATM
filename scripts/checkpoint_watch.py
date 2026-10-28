@@ -107,10 +107,17 @@ def scan(report_only=False):
             continue
         if e.get('status') not in ('pending', 'surfaced'):
             continue
+        # Per-entry fault isolation: one malformed entry (bad grace_min, bad
+        # status type) must NOT crash the scan for every OTHER checkpoint
+        # (review #6). A registry entry can be written by an LLM agent.
+        try:
+            grace_raw = e.get('grace_min', DEFAULT_GRACE_MIN)
+            grace = timedelta(minutes=int(grace_raw))
+        except (TypeError, ValueError):
+            grace = timedelta(minutes=DEFAULT_GRACE_MIN)
         due = parse_due(e.get('due_at'))
         if due is None:
             continue
-        grace = timedelta(minutes=int(e.get('grace_min', DEFAULT_GRACE_MIN)))
         eid = e.get('id', '?')
         desc = e.get('desc', '')
 

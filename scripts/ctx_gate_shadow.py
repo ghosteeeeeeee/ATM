@@ -68,12 +68,20 @@ def _rows(since_hours=None):
 
 def report(since_hours=None):
     rows = _rows(since_hours)
-    n = len(rows)
-    if n == 0:
+    if not rows:
         log('no shadow rows yet — shadow not collecting (is CONTEXT_GATE_RULES_SHADOW on, and has the pipeline run?)')
         return
 
-    agree = sum(1 for r in rows if r[6] == 1)
+    # NULL agree = LLM hard-failed (SKIP). Not a real verdict on either side —
+    # exclude from the agreement ratio or it inflates agreement (review #7).
+    scored = [r for r in rows if r[6] is not None]
+    skipped = len(rows) - len(scored)
+    n = len(scored)
+    if n == 0:
+        log(f'{len(rows)} rows but all are SKIP (LLM fail-closed) — no verdicts to score yet')
+        return
+
+    agree = sum(1 for r in scored if r[6] == 1)
     rate = agree / n if n else 0.0
 
     # Verdict distribution both sides
@@ -84,14 +92,14 @@ def report(since_hours=None):
         llm_dist[r[5]] = llm_dist.get(r[5], 0) + 1
 
     log('─── CTX-GATE RULES SHADOW REPORT ───')
-    log(f'n={n}  agreement={rate*100:.1f}% ({agree}/{n})')
+    log(f'n={n} scored  agreement={rate*100:.1f}% ({agree}/{n})' + (f'  [{skipped} SKIP rows excluded]' if skipped else ''))
     log(f'rules verdicts: {rules_dist}')
     log(f'LLM verdicts:   {llm_dist}')
 
     # The decision that matters: does rules-NAY match LLM-NAY?
-    both_nay = sum(1 for r in rows if r[4] == 'NAY' and r[5] == 'NAY')
-    llm_nay = sum(1 for r in rows if r[5] == 'NAY')
-    rules_nay = sum(1 for r in rows if r[4] == 'NAY')
+    both_nay = sum(1 for r in scored if r[4] == 'NAY' and r[5] == 'NAY')
+    llm_nay = sum(1 for r in scored if r[5] == 'NAY')
+    rules_nay = sum(1 for r in scored if r[4] == 'NAY')
     log(f'NAY agreement: LLM NAY {llm_nay}, rules NAY {rules_nay}, both {both_nay}')
 
     if n < MIN_N:

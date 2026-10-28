@@ -1764,21 +1764,38 @@ _pending_shadow = {'key': None, 'verdict': None}
 def _ctx_rules_shadow_agree(token, direction, source, llm_verdict):
     """Record rules-vs-LLM agreement for one signal. Shadow mode only.
 
+    Key-match guard: the pending verdict is only used if it was stashed by THIS
+    signal (token|direction|source). Ordering already prevents misattribution,
+    but the check makes it an invariant rather than an accident (review #2).
+
     NAY vs GO are the decisions that matter (block vs allow). WARN is advisory on
     both sides, so a WARN involved on either leg counts as agreement-by-default —
     we only flag real disagreements (one side NAY, the other GO/WARN).
+
+    SKIP (the fail-closed LLM path) is neither a NAY nor a GO-side answer, so it
+    is recorded but EXCLUDED from the agreement math — otherwise it would be
+    counted as GO-side and inflate agreement (review #7).
     """
     try:
         import sqlite3 as _sq
         from datetime import datetime as _dt, timezone as _tz
+        want_key = f'{token}|{direction}|{source}'
         rules_v = _pending_shadow['verdict']
+        got_key = _pending_shadow['key']
         _pending_shadow['key'] = _pending_shadow['verdict'] = None
         if rules_v is None:
             return
-        # Normalize: NAY vs GO/WARN = disagreement; anything else = agreement
-        rules_nay = (rules_v == 'NAY')
-        llm_nay = (llm_verdict == 'NAY')
-        agree = 1 if rules_nay == llm_nay else 0
+        if got_key != want_key:
+            log(f'  [CTX-RULES-SHADOW] pending key mismatch (got {got_key}, want {want_key}) — dropping stale verdict')
+            return
+        # SKIP = LLM hard-failed (fail-closed). Not a real verdict — record row
+        # with agree=NULL so the report excludes it from the agreement ratio.
+        if llm_verdict == 'SKIP':
+            agree = None
+        else:
+            rules_nay = (rules_v == 'NAY')
+            llm_nay = (llm_verdict == 'NAY')
+            agree = 1 if rules_nay == llm_nay else 0
         _conn = _sq.connect(_CTX_SHADOW_DB, timeout=5)
         try:
             _c = _conn.cursor()
@@ -1796,7 +1813,7 @@ def _ctx_rules_shadow_agree(token, direction, source, llm_verdict):
             _conn.commit()
         finally:
             _conn.close()
-        if not agree:
+        if agree == 0:
             log(f'  [CTX-RULES-SHADOW] DISAGREE {token} {direction}: rules={rules_v} vs LLM={llm_verdict}')
     except Exception as e:
         log(f'  [CTX-RULES-SHADOW] agree-log failed: {e}')
@@ -2278,19 +2295,27 @@ def context_gate(token, direction, source, sig):
             log(f'  [CTX-GATE] {token}: skip LLM — exit_quality profit dominant (profit={_exit_quality["profit_n"]}, sl={_exit_quality["sl_n"]})')
             return ('GO', None, 0)
     # SHADOW (CEO 2026-10-27 item 4): compute deterministic verdict BESIDE the
-    # LLM. In shadow mode this returns None and changes nothing — the LLM still
-    # decides. We hold the rules verdict to record agreement AFTER the LLM call.
+    # LLM. In shadow mode (CONTEXT_GATE_RULES_SHADOW=True) this returns None and
+    # changes nothing — the LLM still decides, and we record agreement below.
+    # In ENFORCEMENT mode (CONTEXT_GATE_RULES_SHADOW=False, CEO sign-off only)
+    # it returns the (verdict, reason) tuple and the LLM is BYPASSED entirely.
     _shadow_rules = ctx_gate_rules_shadow_call(
         token, direction, source, ctx,
         rsi=_ctx_gate_get_rsi(token), heb=heb,
         _cont_str=(ctx.get('market', {}) or {}).get('btc_continuum', '') or '')
 
-    verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
-
-    # Record shadow agreement (shadow mode only; in enforcement _shadow_rules is
-    # the applied verdict and the LLM is bypassed entirely — no agreement row).
-    if CONTEXT_GATE_RULES_SHADOW and _shadow_rules is None:
-        _ctx_rules_shadow_agree(token, direction, source, verdict)
+    if _shadow_rules is not None:
+        # ENFORCEMENT MODE — rules decide, LLM subprocess never runs.
+        # (Non-None only when CONTEXT_GATE_RULES_SHADOW=False; in shadow the
+        # wrapper returns None, so this branch is unreachable while shadowed.)
+        verdict, reason = _shadow_rules
+        log(f'  [CTX-RULES-ENFORCE] {token} {direction}: {verdict} — {reason}')
+    else:
+        # SHADOW MODE — LLM decides; pair its verdict with the rules verdict
+        # for the agreement measurement that drives the enforce/relax/reject call.
+        verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
+        if CONTEXT_GATE_RULES_SHADOW:
+            _ctx_rules_shadow_agree(token, direction, source, verdict)
 
     if verdict == 'WARN':
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')

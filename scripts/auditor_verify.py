@@ -69,12 +69,20 @@ def _run_git(args):
 
 
 def check_constants_diff():
-    """hermes_constants.py should have no uncommitted diff (nobody edited live)."""
+    """hermes_constants.py working-tree state — INFO, not a page.
+
+    Was a WARN, but editing constants is ROUTINE (auto_1hr, brain_auditor both do
+    it legitimately) and the daily commit only lands 07:15 UTC — so a WARN here
+    fired hourly for up to 24h after any normal edit (review finding #4).
+    Real protection against a BAD constant change is check_protected_flags +
+    check_kill_flags (they assert VALUES, which is what matters). This stays as an
+    audit breadcrumb only.
+    """
     rc, out = _run_git(['status', '--porcelain', 'scripts/hermes_constants.py'])
     if rc != 0:
         return ('INFO', f'git status unavailable: {out[:80]}')
     if out:
-        return ('WARN', f'hermes_constants.py has UNCOMMITTED changes: {out[:100]}')
+        return ('INFO', f'constants have uncommitted edits (normal pre-commit): {out[:80]}')
     return ('OK', 'constants clean (no uncommitted diff)')
 
 
@@ -82,15 +90,18 @@ def check_protected_flags():
     """CEO_PROTECTED_FLAGS present and full count."""
     try:
         import hermes_constants as hc
-        flags = getattr(hc, 'CEO_PROTECTED_FLAGS', None)
-        if flags is None:
-            return ('CRITICAL', 'CEO_PROTECTED_FLAGS missing from hermes_constants')
-        n = len(flags)
-        if n < PROTECTED_MIN_COUNT:
-            return ('CRITICAL', f'CEO_PROTECTED_FLAGS has {n} keys (< {PROTECTED_MIN_COUNT}) — protection gutted')
-        return ('OK', f'CEO_PROTECTED_FLAGS {n}/{PROTECTED_MIN_COUNT}+ intact')
     except Exception as e:
-        return ('CRITICAL', f'failed to import hermes_constants: {e}')
+        # WARN not CRITICAL: a transient import failure usually means another
+        # agent is mid-edit (file half-written). It self-heals next run —
+        # paging CRITICAL for that spams alerts (review #5).
+        return ('WARN', f'hermes_constants import failed (mid-edit?): {e}')
+    flags = getattr(hc, 'CEO_PROTECTED_FLAGS', None)
+    if flags is None:
+        return ('CRITICAL', 'CEO_PROTECTED_FLAGS missing from hermes_constants')
+    n = len(flags)
+    if n < PROTECTED_MIN_COUNT:
+        return ('CRITICAL', f'CEO_PROTECTED_FLAGS has {n} keys (< {PROTECTED_MIN_COUNT}) — protection gutted')
+    return ('OK', f'CEO_PROTECTED_FLAGS {n}/{PROTECTED_MIN_COUNT}+ intact')
 
 
 def check_kill_flags():
@@ -98,15 +109,23 @@ def check_kill_flags():
     try:
         import hermes_constants as hc
     except Exception as e:
-        return ('CRITICAL', f'import failed: {e}')
+        # WARN not CRITICAL — same mid-edit reasoning as check_protected_flags.
+        return ('WARN', f'hermes_constants import failed (mid-edit?): {e}')
     regressions = []
+    missing = []
     for name, expected in KILL_FLAGS:
-        actual = getattr(hc, name, None)
+        if not hasattr(hc, name):
+            # Renamed/removed flag is not a live regression — don't page CRITICAL
+            # on a None that never existed (review #5).
+            missing.append(name)
+            continue
+        actual = getattr(hc, name)
         if actual != expected:
             regressions.append(f'{name}={actual} (expected {expected})')
     if regressions:
         return ('CRITICAL', f'kill-flag regression: {", ".join(regressions)}')
-    return ('OK', f'{len(KILL_FLAGS)} kill flags correct')
+    note = f' ({len(missing)} flags renamed/absent: {", ".join(missing)})' if missing else ''
+    return ('OK', f'{len(KILL_FLAGS) - len(missing)} kill flags correct{note}')
 
 
 def check_new_tracebacks():
