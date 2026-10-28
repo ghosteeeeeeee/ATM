@@ -17013,3 +17013,47 @@ BY: upgrade_implementer
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
 - Note: recent_changes.log 12:05 entry has unquoted-$ bash corruption (`-/usr/bin/bash.06`) — historical, not rewriting
+
+## 2026-10-28 14:43 Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.07 (WR: 100%) | 24h: 24T 13W 54.2% '-$0.31' (RED, improving) | 7d 131T 68W 52.7% '-$0.54' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal n>=3 at 0% WR last hour; volume-buildup- 6T 50% '-$0.35' 24h but 14d HIGH 13T 69.2% '+$0.17' (NORMAL 15T 60% '-$0.12', EXTREME 11T 54.5% '-$0.21') — wins in a regime, regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 4/24 = 16.7% (<40%) — SL not too tight; dominant closes = profit-monster-trail (7T '+$0.44') + ugb_pt (6T '+$0.10')
+- Boost: bb-squeeze+ 6T 83.3% '+$0.34' multi-token (STABLE, MINA, ICP, PENGU, KAS) meets criteria but already at weight 1.0 (boosted 0.9->1.0 at 11:31) — ceiling reached, hold
+- Neg streak: not 3+ consecutive negative hours (this hour 2W/0L win)
+- Frequency 2/hr — under overtrading threshold
+- 1 open: HBAR volume-buildup- SHORT (-0.23%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.31' but improving (was '-$0.59' at 13:10) — atr_sl_hit cluster (4T '-$0.50') remains the drag
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 15:41 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.23 (WR: 0.0%) | 24h: 25T 13W 52.0% '-$0.54' (RED) | 7d 127T 66W 52.0% '-$0.80' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 1 close last hour (HBAR volume-buildup- SHORT stale_exit -5.25%); no signal n>=3 at 0% WR last hour; volume-buildup- 24h 7T 42.9% '-$0.58' but 14d positive in NORMAL/HIGH (regime-kill bar not met, verified prior runs)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 4/25 = 16.0% (<40%) — SL not too tight; dominant closes = profit-monster-trail (7T '+$0.44') + ugb_pt (6T '+$0.10')
+- Boost: bb-squeeze+ 6T 83.3% '+$0.34' meets criteria but already at weight 1.0 ceiling (boosted 0.9->1.0 at 11:31) — hold
+- Neg streak: 14:43 hour was +$0.07 (2W), this hour 1L — not 3+ consecutive negative hours
+- Frequency 1/hr — under overtrading threshold
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.54' — atr_sl_hit cluster (4T '-$0.50') + cut-loser-CL-T1 (3T '-$0.44') remain the drivers
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
