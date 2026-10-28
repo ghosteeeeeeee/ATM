@@ -5439,6 +5439,41 @@ def run(dry_run=False):
                 _exec_meta['source'] = _cs_src
         except Exception:
             pass
+        # brain_auditor #191: stamp BTC tape state at exec (zero-behavior).
+        # Run #191 census: 14 detect-stamped fields all FAIL to separate
+        # armed(MFE>=0.40) from unarmed (best p=0.119, all fk>29%); yet every
+        # live steer runs on "1m above/below EMA300" — the one variable the
+        # audit trail never recorded. Read-only from continuum.db (same row
+        # the CHASE composite already reads). Enables the tape-state arm
+        # census once n accumulates; no gate reads these keys.
+        try:
+            _btc_tape_conn = sqlite3.connect(
+                os.path.join(HERMES_DATA, 'continuum.db'), timeout=3)
+            try:
+                _btc_tape_row = _btc_tape_conn.execute(
+                    "SELECT price, ema300, ema300_position, ema300_duration, "
+                    "consecutive_above, consecutive_below, trend_quality, ts "
+                    "FROM continuum_states WHERE token='BTC' AND timeframe='1m' "
+                    "ORDER BY ts DESC LIMIT 1"
+                ).fetchone()
+            finally:
+                _btc_tape_conn.close()
+            if _btc_tape_row and _btc_tape_row[7] and (time.time() - _btc_tape_row[7]) < 600:
+                _bt_price, _bt_ema = _btc_tape_row[0], _btc_tape_row[1]
+                if _bt_ema and _bt_price is not None:
+                    _exec_meta['btc_ema300_dist_pct'] = round(
+                        (float(_bt_price) - float(_bt_ema)) / float(_bt_ema) * 100, 4)
+                _exec_meta['btc_ema300_position'] = _btc_tape_row[2]
+                _exec_meta['btc_ema300_duration'] = _btc_tape_row[3]
+                # streak only meaningful while strictly ABOVE/BELOW; 'AT' is the
+                # dominant live state and would otherwise record below=0 as a streak.
+                if _btc_tape_row[2] == 'ABOVE':
+                    _exec_meta['btc_ema300_streak'] = _btc_tape_row[4]
+                elif _btc_tape_row[2] == 'BELOW':
+                    _exec_meta['btc_ema300_streak'] = _btc_tape_row[5]
+                _exec_meta['btc_trend_quality'] = _btc_tape_row[6]
+        except Exception:
+            pass
 
         # ── CHASE COMPOSITE filter: block LONG chasing extended moves ─────
         # 7d: z>2.5 OR gap>1.0% LONG = 15T 20%WR -$1.25. Non-chase: 96T 53.1%WR +$1.28.

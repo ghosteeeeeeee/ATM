@@ -3141,5 +3141,16 @@
     "after": "shadow gate added",
     "rationale": "chop-bleed 92.5% entry-quality steer; 30d 61T 23.0%WR -$3.31 vs rest 46.7% z=-3.49, 4.3% winners blocked, confounders controlled, novel vs SPIKE+CHASE_RATIO",
     "impact": "zero behavior now; candidate +$3.31/30d if enforced after 14d shadow (earliest 2026-11-10)"
+  },
+  {
+    "timestamp": "2026-10-28T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "BTC tape-state stamp: btc_ema300_dist_pct / position / duration / streak / trend_quality added to _signal_metadata at exec (zero-behavior, read-only continuum.db)",
+    "type": "creative",
+    "file": "scripts/decider_run.py",
+    "before": "no BTC EMA300 fields in _signal_metadata — the variable every steer runs on was unrecorded per-trade",
+    "after": "5 btc_ema300_*/btc_trend_quality keys stamped when continuum row <600s old; no gate reads them",
+    "rationale": "Run #191 census: 14 detect-stamped fields all fail to separate armed from unarmed (best p=0.119, fk>29%). Route change: record the one high-signal variable absent from the audit trail so the tape-state arm census becomes possible.",
+    "impact": "Enables detect-time entry-quality re-test once n>=100; zero trading behavior change"
   }
 ]
