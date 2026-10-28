@@ -17127,3 +17127,28 @@ Loser: SOL grind-breakout-v2+ atr_sl_hit -2.99%
 - bb-squeeze+ at weight ceiling with 3 open LONGs — if it keeps winning, next lever is hot-set priority, not weight
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 19:41 Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** $+0.10 (WR: 100%) | 24h: 26T 13W 50.0% '-$0.85' RED | 7d 126T 70W 55.6% '-$0.23' | **size-reduce: file absent -> 1.0x**
+
+Winners: KAS bb-squeeze+ profit-monster-trail +1.47%, DOGE bb-squeeze+ trail_arm_timeout +1.47%, CAKE bb-squeeze+ trail_arm_timeout +0.63%
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal n>=3 at 0% WR last hour; volume-buildup- 24h 6T 33.3% '-$0.59' but 14d HIGH 69.2% '+$0.17' (wins in a regime) — regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/26 = 19.2% (<40%) — SL not too tight; dominant closes = profit-monster-trail (8T '+$0.36') + atr_sl_hit (5T '-$0.57')
+- Boost: bb-squeeze+ 9T 88.9% '+$0.16' meets criteria but already at 1.0 ceiling (boosted 11:31 today) — no headroom; pump-chain+ 3T fails n>=5
+- Neg streak: 18:50 hour +$0.03, this hour +$0.10 — two consecutive positive hours, not negative
+- Frequency 3/hr — under overtrading threshold
+- 1 open: HYPER r2v2-long3 LONG (0.00 unrealized)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.85' — drag remains atr_sl_hit (5T '-$0.57') + cut-loser-CL-T1 (3T '-$0.44')
+- volume-buildup- NORMAL 14d '-$0.49' (n=15, WR 53.3%) — weak but HIGH regime positive; no action per policy
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
