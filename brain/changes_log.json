@@ -3152,5 +3152,27 @@
     "after": "5 btc_ema300_*/btc_trend_quality keys stamped when continuum row <600s old; no gate reads them",
     "rationale": "Run #191 census: 14 detect-stamped fields all fail to separate armed from unarmed (best p=0.119, fk>29%). Route change: record the one high-signal variable absent from the audit trail so the tape-state arm census becomes possible.",
     "impact": "Enables detect-time entry-quality re-test once n>=100; zero trading behavior change"
+  },
+  {
+    "timestamp": "2026-10-28T05:00:00Z",
+    "agent": "brain_auditor",
+    "change": "NEW brain/analysis/tape_state_arm_census_2026-10-28.py — pre-registered 10-test BTC-tape-state arm census backfilled from continuum.db (78d) instead of waiting for n>=100 stamped; 0/10 pass, route REJECTED-WITH-DATA",
+    "type": "creative",
+    "file": "brain/analysis/tape_state_arm_census_2026-10-28.py",
+    "before": "file did not exist; #191 deferred the question to n>=100 stamped trades (~2 weeks)",
+    "after": "executed now at n=728 (30d), selfcheck PASS, bug_hunter 1 MED + 6 LOW all fixed, verdict re-verified 0/10",
+    "rationale": "Closes #191's named next lever with 7x the data using the exact live stamp rule; zero trading behavior",
+    "impact": "detect-time entry-quality route now closed on 3 independent axes (#96/#190/#192); next-lever bar re-anchored off those fields"
+  },
+  {
+    "timestamp": "2026-10-28T05:00:00Z",
+    "agent": "brain_auditor",
+    "change": "REGISTERED intraday checkpoint btc-16450-8h-stale in data/checkpoint_registry.json due 2026-10-28T05:54Z",
+    "type": "doc",
+    "file": "data/checkpoint_registry.json",
+    "before": "file did not exist",
+    "after": "1 pending entry, grace 45m",
+    "rationale": "Mandate: intraday checkpoints must be registered or the 4h auditor cadence misses the window",
+    "impact": "05:54Z BTC #16450 8h-stale exit condition will be surfaced by checkpoint_watch"
   }
 ]

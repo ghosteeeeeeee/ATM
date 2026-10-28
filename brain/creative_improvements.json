@@ -9709,5 +9709,32 @@
     "category": "entry sniper",
     "status": "rejected",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-28T05:00:00Z",
+    "idea": "COUPLED-SL TRIAL VALIDITY FIX — add CL_TIER1_MAX_PCT to the Oct-27 coupled set (-1.00 -> -1.25), or stop describing CUT_LOSER_PNL as widened",
+    "rationale": "The trial widened CUT_LOSER_PNL -4 -> -6 so HML sits at -1.200% price @5x (design target MAE-to-peak p75 = 1.17%). But CL_TIER1_MAX_PCT = -1.00% cuts at -1.00% price and runs every 2-4 min, so T1 now binds FIRST: live HML-SHADOW shows actual moved -0.800% (10,999 pre-trial lines) -> -1.200% (1,877 post), and 7/7 cut-loser-CL-T1 exits in 21d closed at -0.950..-1.110% price (avg -1.012). PRE-trial hard_max_loss averaged -0.907% = HML bound before T1; POST-trial 13h = 0 HML / 1 T1 / 3 atr_sl_hit. The hierarchy inverted. On 2026-11-03 the CUT_LOSER half will read ~no-effect because it is structurally unreachable.",
+    "expected_impact": "Makes the Nov-3 verdict attributable instead of a false negative; if Proposal A ships, HML -1.20% becomes reachable and the trial measures what it was designed to measure. Frequency: T1 binds 0.33x/day (7 exits/21d).",
+    "category": "exit engine / trial validity",
+    "status": "proposed — lodged in constants_change_review_queue (propose -> CEO auto-approve), NOT applied: changing a 3rd param mid-trial would itself destroy attribution",
+    "risk": "low — 0 trading behavior this run; the change is time-boxed to the Nov-3 disposition with a single shared revert"
+  },
+  {
+    "date": "2026-10-28T05:00:00Z",
+    "idea": "ENTRY-ROUTE-CLOSED resolution rule (extends #186's tripwire-owned-restated rule)",
+    "rationale": "Three independent censuses now say detect-time entry prediction is impossible: #96 admission features, #190 14 stamped metadata fields (Bonferroni 0.0036, nothing survives), #192 BTC tape state (0/10, this run). Every future run re-derives 'find a field that separates armed from unarmed'. Without a standing rule that is permanent analysis debt.",
+    "expected_impact": "Kills recurring duplicate work; forces new entry-gate proposals onto genuinely untested fields or onto the exit/sizing axis where the remaining lever space actually is.",
+    "category": "process / meta",
+    "status": "pre-registered — rule written into brain/audit_recommendations.json next_lever_bar",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-28T05:00:00Z",
+    "idea": "Contrarian-flip conversion KPI definition: exclude smoke tokens + annotate the LOSERS_LONG collision before the 11-03 disposition reads it",
+    "rationale": "CONTRARIAN-LIVE has 29 log lines but only 3 PRODUCTION events (GOAT x1, HBAR x2) — 26 are TESTCOIN/SMOKE/TOK/TKN ship-time smoke. 0 conversions in 13h is base-rate expected (pc- fires ~1.2/day), but 2 of 3 production events are HBAR which sits in LOSERS_LONG = the flip's own target direction carries a confidence/size penalty. The registered 11-03 watch says 'if conversion ~0, escalate'; measured naively it will read ~0 forever and fire a false escalation.",
+    "expected_impact": "Prevents a false-negative escalation on a CEO-signed live change; makes the 11-03 conversion number actually mean something.",
+    "category": "measurement",
+    "status": "suggested — zero code, applies at the 11-03 shadow_disposition run",
+    "risk": "none"
   }
 ]

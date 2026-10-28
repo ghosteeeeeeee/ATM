@@ -1,105 +1,142 @@
-# Current State — brain_auditor #191 2026-10-28 00:50 UTC
-**Last Updated: 2026-10-28 00:50 UTC**
-**Updated by: brain_auditor #191. Prior: #190 22:50 (preserved in git history).**
+# Current State — brain_auditor #192 2026-10-28 05:00 UTC
+**Last Updated: 2026-10-28 05:00 UTC**
+**Updated by: brain_auditor #192. Prior: #191 00:50 (preserved in git history).**
 
-## HEADLINE — 1 zero-behavior ship (BTC tape-state stamp), 0 trading-constant changes
-(hermes_constants.py diff 0 lines vs HEAD; CEO_PROTECTED byte-identical; session lock absent;
-size-reduce absent = 1.0x). **THE PRE-REGISTERED METADATA NO-MOMENTUM CENSUS IS EXECUTED AND
-REJECTED-WITH-DATA — there is NO detect-time metadata separator for arming.**
+## HEADLINE — #191's named next lever EXECUTED EARLY and REJECTED; entry-quality route now closed on 3 axes
+0 trading-constant changes (`constants_change_review_queue` active per T 2026-10-23 — propose → CEO
+auto-approve, auditor-direct is not the channel; hermes_constants.py EMPTY git diff; CEO_PROTECTED
+13/13; session lock absent; size-reduce file absent = 1.0x). 1 zero-behavior ship, 0 trade actions.
 
-### 1. Metadata no-momentum census (run #190's named next lever) — REJECTED
-30d n=727, 14 stamped fields vs ARMED(mfe>=0.40):
-- `momentum_state` trending vs flat: armed 59.9% vs 57.3%, **p=0.55**
-- `momentum_score` / `volume_spike` / `speed_percentile` / `price_acceleration` terciles:
-  **FLAT armed% 54-62% in every bin**; best gate p=0.119 with **fk=66.7%**
-- structure (`bb_position`/`z_score`/`macd_hist`/`gap_at_entry`): p=0.44-0.82
-  (note: bb_position and z_score are rank-identical — ONE test, not two)
-- `staleness_minutes`: **OPPOSITE direction** (stale arms more) p=0.15 → reject
-- source-count single-vs-multi: p=0.87 → reject
-- `wave_phase` accelerating n=297 = LOWEST arm 55.2%, worst pnl -3.32, but fk would be 38%
-- `rsi_drift` gradient (high 71% WR) = n=30/cell, p=0.25, coverage **91/727** with stamped rows
-  pre-selected better (+0.36 vs -3.75) → COLLECT only
-- **Bonferroni bar 0.0036 — nothing survives.**
+### 1. TAPE-STATE ARM CENSUS — REJECTED-WITH-DATA (0/10)
+`brain/analysis/tape_state_arm_census_2026-10-28.py` (--selfcheck **ASSERT PASS**).
+Backfilled BTC 1m tape state from `data/continuum.db` (**78 consecutive days, 0 complete days <1000
+rows**) at every historical `open_time` using the **exact live stamp rule** (decider_run.py:5456-5474,
+age<600s) → **n=728 at 30d** instead of waiting ~2 weeks for n>=100 stamped.
+10 **pre-declared** tests, Bonferroni 0.05/10 = 0.005, bar = 30d same-sign ∧ p<0.05 ∧ Bonferroni ∧
+fk<20% ∧ n>=20/cell: **0/10 pass.**
+- T6 SHORT pos==BELOW p=0.0246 → fails Bonferroni 5x **and** 7d sign flips (+/-/-)
+- T7 trend bear-vs-bull p=0.0398, same-sign 7/14/30d → **fk 62.6%** (blocking the low-arm cell kills
+  62.6% of all winners) — real, ungatable
+- **bug_hunter round: 1 MED + 6 LOW, ALL FIXED** (docstring coverage claim, TICK_INTERVAL imported
+  from continuum_constants, staleness `>=600` to match live `<600`, dead `cell(pred)` param, T9/T10
+  complements require `dist not null`, selfcheck unit guard bound to the imported constant) →
+  **verdict STANDS, re-run reproduces 0/10 exactly.**
 
-With #96 (admission feature split), #190 (chase-move 7% coverage, impulse floor rejected):
-**the detect-time entry-quality route is comprehensively measured-negative.** The 92.4% chop-bleed
-is not predictable from what we stamp.
+**With #96 (admission features), #190 (14 detect-time metadata fields) and #192 (BTC tape state) the
+detect-time ENTRY-QUALITY route is closed on three independent axes. The 91.5% chop-bleed is not
+predictable from anything observable at entry.**
 
-### 2. ROUTE CHANGE SHIPPED — BTC tape-state stamp (zero-behavior)
-`btc_ema300_dist_pct`, `btc_ema300_position`, `btc_ema300_duration`, `btc_ema300_streak`,
-`btc_trend_quality` now written into `_signal_metadata` at exec (appended after the `source`
-stamp in decider_run.py). Read-only SELECT from `continuum.db` — the same BTC 1m row the CHASE
-composite already reads; stale rows (>600s) skipped.
-- **No gate reads these keys. Zero trading behavior.**
-- py_compile PASS; live self-check PASS (`pos=AT dur=1673 streak=0 dist=-0.0529% trend=UP age=21s`).
-- Loads next decider cycle (subprocess per minute — no restart needed).
-- **Why:** every live steer and exit rule keys on "1m above/below EMA300", yet the audit trail
-  never recorded it per-trade. The most-used live variable was unobservable in SQL.
+### 2. COUPLED-SL TRIAL HIERARCHY INVERTED (time-critical for 2026-11-03)
+The Oct-27 trial moved HML to **-1.200% price @5x** (design target MAE p75 = 1.17%) but
+`CL_TIER1_MAX_PCT = -1.00` cuts at **-1.00% price** every 2-4 min → **T1 now binds first.**
+- HML-SHADOW live: `actual=-0.800%` pre-trial (**10,999** lines) → `actual=-1.200%` post (**1,877**)
+- **7/7 cut-loser-CL-T1 exits in 21d** closed at **-0.950 … -1.110%** price, avg **-1.012%**
+- PRE-trial hard_max_loss **37 exits avg -0.907%** (HML bound first) · POST-trial 13h = **0 HML /
+  1 T1 / 3 atr_sl_hit avg -1.283%**
+→ On Nov 3 the CUT_LOSER half reads ~no-effect (structurally unreachable) and either renews on PnL or
+reverts to -4.00 — **reverting restores the old hierarchy and undoes the fix; either way the verdict
+is not attributable.**
+**Lodged in the review queue:** **Proposal A (preferred)** add `CL_TIER1_MAX_PCT -1.00 → -1.25` to the
+coupled set at Nov-3 so HML -1.20 becomes reachable, revert all three together · **Proposal B** leave
+T1 and stop describing CUT_LOSER as widened · **do NOT do both.**
+n=7 T1 exits **FAILS the queue's n>=15 bar for an EDGE change** — filed as a **trial-validity /
+measurement fix**, mechanism confidence HIGH, frequency MEDIUM.
 
-### ⚠️ Next-lever bar (locked, same as #190)
-Tape-state arm census at **n>=100 stamped trades**: ship only on 30d same-sign AND p<0.05 AND
-winner-kill <20% AND n>=20/cell AND not-already-in-constants. One variable at a time.
+### Next-lever bar (CHANGED THIS RUN)
+Any future entry-gate proposal must use a field **outside** {#96 admission features, #190's 14 metadata
+fields, #192 BTC tape state} or it is duplicate of closed work. Remaining bar unchanged: 30d same-sign
+AND p<0.05 AND Bonferroni AND winner-kill <20% AND n>=20/cell AND not-already-in-constants.
 
-### Watchdog steers dispositioned
-| Steer | Action |
-|---|---|
-| chop-bleed 92.2% ≥92% gate → brain_auditor, age=10 | **ANSWERED** (census negative + tape stamp shipped). age now 11. |
-| vb- SHORT mid/low RSI loss cluster → test SHORT_RSI_MIN raise | **REJECTED-WITH-DATA**: 14d 35-45 band 22T `-0.15` = flat not bleed; rsi≥50 filter blocks **14 of 25 winners = fk 56%** ≫ 20% bar |
-| BTC LONG #16450 exit condition AT trigger (15× 1m closes below EMA300) | **FLAGGED NOT EXECUTED** — CEO/autopilot domain, auditor reports only |
-| DOT SHORT #16451 HOLD | **NO ACTION** — agree, right side, trail arms at +0.40% MFE |
-
-### Last-run verify #190 — PASS (one reconciliation)
-session lock absent ✓ · constants diff 0 ✓ · protected byte-identical ✓ · size-reduce absent=1.0x ✓ ·
-5 Tracebacks all Oct-11 self-heal noise, none new ✓ · recovery selfcheck PASS ✓ · kill flags unchanged ✓ ·
-**#190's "uncommitted shadow_disposition.py" RECONCILED — it is in HEAD (3d43a364 + follow-ups), tree clean.**
-
-### Mandate numbers (fresh PG self-query, 2026-10-28 00:35Z)
+### Mandate numbers (fresh PG, 2026-10-28 04:59Z)
 | Metric | Value |
 |---|---|
-| 24h | **17T 76.5% `+0.62` GREEN** |
-| 7d | 135T 51.9% `-0.37` |
-| armed 7d | **80T 85.0% `+4.19`** vs unarmed 55T 3.6% `-4.56` |
-| 14d armed vs chop | 158T 74.7% `+7.97` vs 138T 7.2% `-11.03` |
-| chop-bleed (dollar) | 7d **92.4%** (61 losers, 50 never armed) — age=11 |
-| trail vs chop 7d | pm_trail 55T 92.7% `+3.06` · hard_max_loss 14T 0% `-1.88` · atr_sl_hit 16T 0% `-1.16` |
-| arm-rate tripwire | LONG 58.0 / SHORT 61.7 — **NOT tripped** |
+| 24h | **16T 62.5% `-0.17`** (6 losers, ALL never armed) |
+| 7d | **136T 52.9% `-0.47`** |
+| 14d | **295T 43.4% `-3.43`** |
+| armed 7d | **80T 85.0% `+4.28`** vs unarmed 56T 3.6% `-4.75` |
+| armed 14d | **154T 76.0% `+7.92`** vs unarmed 141T 7.8% `-11.35` |
+| chop-bleed | 7d **91.5%** dollar (49/60) **age=11 — still UNDER the 92% gate** · 14d 86.2% |
+| arm-rate tripwire | LONG **57.1** (n=91) / SHORT **62.2** (n=45) — **NOT tripped** |
+| 7d exits | pm_trail 55T 51W `+3.06` · ugb_pt 16T 13W `+0.63` vs hard_max_loss 14T 0W `-1.88` · atr_sl_hit 16T 0W `-1.32` |
 
 ### Losing autopsy (corrected method)
-`recovery_replay.py --selfcheck` **ASSERT PASS**. **14d n=160 = 35 never-adverse / 100 recovered /
-25 NEVER (15.6% structural)** → **WRONG-SIDE REFUTED 116th consecutive run** (#61 p=0.116,
-#84 t=-0.04). 48h NEVER: BLUR pump-chain+ `-0.31`, SYRUP continuation+ `-0.23`. No new pattern.
+`recovery_replay.py --selfcheck` **ASSERT PASS**, vacuity assert 155/160.
+**48h n=20 = 2 never-adverse / 15 recovered / 3 NEVER** (PURR `-0.19`, AERO `-0.12`, CC `-0.07`) ·
+**14d n=160 = 35 / 100 / 25 (15.6% structural)** → **WRONG-SIDE REFUTED 117th consecutive run**
+(#61 p=0.116, #84 t=-0.04). No new pattern.
 
 ### Signal deep-dive — 0 new actionable n>=15 sub-50% targets
-Arm-rate by family 30d: all ≥48% except `ai-trader-pending` 18.8% (n=16, CEO-domain/disabled) —
-**no chop signal qualifies for action.** `volume-buildup-` 70.3% arm = trend signal, keep.
-All negatives owned: pc+ NO-KILL · bbbv2 TAT+MFE-CUT · pc- flip live · continuation+ n=6 COLLECT.
+bb-bounce 34T 35.3% (TAT-C + MFE-CUT + CEO) · ai-trader+ disabled · **pc- 17T 11.8% FLIPPED Oct 27** ·
+ai-trader-pending CEO · pc+ 41T 41.5% NO-KILL/CONF_FLOOR.
+Healthy: volume-buildup- 38T 65.8% `+0.34` arm 68.4% · bb-squeeze 17T 58.8% `+0.50` · r2v2-long3 16T 62.5%.
+
+### Re-measures this run
+- **arm-timeout pre-reg (#189):** overall 14d 31.0% (bar needs >=40% at BOTH 14d+30d) → **MONITOR holds**;
+  pc+ 14d **n=13 <20** → pre-reg NOT met, **no 45→60m proposal**.
+- **momentum time-stop (#156):** re-run **0/8 again** (best cell T=20m/THR=0.20 delta `+2.01` p=0.0044
+  but winner-kill **56.7%** vs 20% bar). **Oct-30 SCOPED blind run NOT touched.**
+- **midband × EMA300 (#139/#172):** SAME verdict OOS 7/14/30d — band+BELOW `+0.10/-0.08/+0.57`,
+  band+AT/ABOVE `-0.99/-3.31/-2.30`, both variants FAIL → **WITHDRAWN stands.**
+
+### Last-run verify #191 — ALL PASS
+session lock absent · constants EMPTY · protected 13/13 · size-reduce absent=1.0x ·
+**btc_ema300 stamp 5/5 post-ship opens (first = PURR #16452 02:06Z; #16450/#16451 correctly None)** ·
+Tracebacks 5 total latest Oct-25 self-healing, 0 new · recovery_replay selfcheck PASS ·
+kill flags as recorded · contrarian reproduces 64.5% n=350 ·
+**session_brain 6/6 unique titles — dup-heavy drift NOT observed this run.**
+**CHASE_MOVE_SHADOW first live fire 03:03:21 KAS (move 0.673%, 8s before open) → KAS closed -0.12 =
+live counterfactual +$0.12, n=1** (flip review still 2026-11-10).
+
+### Watchdog steers 6/6 dispositioned
+chop-bleed 91.5% age=11 → **answered** (route closed, headline) · BTC #16450 exit condition →
+**FLAGGED NOT EXECUTED** (CEO/autopilot; live 04:59 = price **AT** the line -0.0034%, STRONG_DOWN,
+condition NOT met) · **8h-stale → CHECKPOINT REGISTERED `btc-16450-8h-stale` due 05:54Z grace 45m** ·
+5× pending RSI<28 SHORTs → knife rule correct, no action · shadow auto-trader BTC SHORT → mode=shadow
+phase 0, no action · paid-extremes rec → re-measured, advisory only (`eval-midband-long-4564` Nov 3).
 
 ### Shadow 3/6 answerable (all used)
-- **shadow_trader** 30,129 signals: CONFLUENCE-EXPIRY 12,746@48% justified; exit A/B
-  **pm_trail `+4,288`** vs hard_max `-6,182` vs rr_engine `-1,475` vs cut_loser `-322` (0% WR)
-  → trail-or-nothing confirmed again.
-- **contrarian** join 2026-10-27T18:31Z: 651 decided, flip 46.7%; pc- 64.6% n=350 flip already
-  LIVE (do not re-propose); rider 26% do-not-flip.
-- **floor_admit** join 10-25: floor 47.9% vs always 38.4%, fisher p=0.138 COLLECT.
-- oscillator = FROZEN fossil / wyckoff 345 PENDING / rr ORPHANED — none cited.
+- **shadow_trader** 30,670 signals: gates justified (CONFLUENCE-EXPIRY 12,861 @48% avg `-0.12`);
+  exit A/B **pm_trail `+4,368`** vs cut_loser `-426` (0% WR) vs hard_max `-6,245` (0% WR) vs
+  rr_engine `-1,525` → **trail-or-nothing** confirmed again.
+- **contrarian** join 10-27T18:31Z: 651 decided, flip 46.7%; pc- **64.5% n=350 ALREADY LIVE**;
+  rider 26.0% do-not-flip. **Conversion: 3 PRODUCTION events (GOAT×1, HBAR×2) vs 26 smoke, 0 in 13h
+  = base-rate expected — but 2/3 are HBAR which sits in `LOSERS_LONG` (the flip's own target direction
+  carries a losers-penalty) → metric definition flagged for the 11-03 disposition.**
+- **floor_admit** 10-25: floor 47.9% vs always 38.4%, fisher p=0.138 **COLLECT** (Nov 15).
+- oscillator FROZEN fossil / wyckoff 345 PENDING / rr ORPHANED — none cited.
 
-### READINESS: 2 open
-- **BTC #16450 LONG** continuum-trend+ @80950, SL 80409, TP 82164, `-0.21%`, rsi 30.9 —
-  **watchdog exit condition AT trigger** (15× 1m closes below EMA300 80817, trend flipped
-  STRONG_DOWN). Exit on failed reclaim; retract only on 1m holding above 10+ min.
-- **DOT #16451 SHORT** volume-buildup- @0.99991, SL 1.022, TP 0.9799, flat, rsi 57.1 —
-  outside the 35-45 loss cluster, family net positive, HOLD.
-- Regime: 15m/4h LONG_BIAS vs 1m tape STRONG_DOWN (**sources disagree — name one**), vol LOW,
-  wyckoff ACCUMULATION. **No fresh money until the 1m/15m disagreement settles.**
-- Size 1.0x (marker absent).
+### Drift / side-finds
+- **LOW** — AGENTS says the contrarian join runs every 15 min; systemd shows
+  `hermes-contrarian-monitor.timer` fires **HOURLY at :00** (file 10h stale). Cadence doc vs timer: T/CEO pick.
+- **LOW** — `vacation_mode.json` still true (21st+ run); review queue honored this run (0 auditor-direct changes).
+- **INFO** — `rsi_drift` log lines 0 this window (COLLECT field, monitor).
+- **INFO** — auto_1hr boosted bb-squeeze+ compactor weight 0.8→0.9 at 04:30; **verified COMMITTED
+  (e9565d9e), tree clean** — recorded so the auditor trail carries a scoring change made outside this run.
+
+### READINESS: 1 open
+- **BTC #16450 LONG** continuum-trend+ @80950, SL 80463.8 / TP 82164.25, lev 5, age 6.6h, ~0.00,
+  meta_rsi 30.89, **NEVER ARMED**. continuum EMA300 live ≈ **80960**.
+- Regime: BTC 1m **AT** EMA300 (`-0.0034%`, duration 380 ticks), trend_quality **STRONG_DOWN**,
+  wyckoff UNKNOWN, linreg NEUTRAL · 15m/4h **LONG_BIAS** vs tape AT the line · vol LOW · volume LOW ·
+  velocity SLOW · auto_trader **CHOP ×6** · flips 26/24h = **p95**.
+- **No fresh entries while sources disagree.** Line = 80960: **15-30 consecutive 1m closes below →
+  exit; a reclaim that HOLDS 15-30m with volume → retract.** Trail-family first, size 1.0x.
 
 ### Queue
-1. Verify first post-ship open carries `btc_ema300_*` (**#192**).
-2. Tape-state arm census at n≥100 (bar locked above).
-3. C3 SUSTAINED-TAPE SENTINEL — 30d Fisher p<0.05 same-sign → conditional waiver proposal (#107).
-4. 2026-11-10: MFE-CUT shadow disposition · CHASE-MOVE review (own edge z=-3.49, NOT KPI).
-5. 2026-11-03: escalation #17 packet (shadow_disposition), rr-engine-shadow, relative-regime.
+1. **2026-10-28 05:54Z** — checkpoint `btc-16450-8h-stale` (exit if still flat AND line held below).
+2. **2026-10-30** — SCOPED momentum time-stop **BLIND** run (pc+/bb-bounce only, B1' n>=60 + B2-B6
+   pre-registered in #156). **Do not peek first.**
+3. **2026-11-03** — coupled-SL trial disposition (**Proposal A / B above**) · shadow_disposition batch
+   (escalation #17, rr-engine, relative-regime, wyckoff, shadow-trader-bypass, chase-ratio,
+   eval-midband-long-4564) · contrarian conversion KPI definition.
+4. **2026-11-04+** — coin_regime direction-split re-measure (#179).
+5. **2026-11-10** — CHASE-MOVE flip review · gate_shadow · MFE-CUT · expiry-t5.
+6. **2026-11-15** — floor_admit same-sign · wyckoff outcome join.
+7. **CEO** — CONF_FLOOR fk-definition pin · tf-authority 1m vs 5m RSI · bb-bounce keep-vs-disable ·
+   TAT variant-C flip · MFE-CUT enforcement.
+8. **RE-ANCHOR the chop-bleed 92% escalation gate** — its target (entry-quality filters) is now
+   measured-closed, so a breach has no valid destination.
 
 Artifacts: `brain/audit_recommendations.json`, `brain/creative_improvements.json`,
-`brain/changes_log.json`, `brain/analysis/metadata_momentum_census_2026-10-28.py` (--selfcheck PASS),
-`scripts/decider_run.py`, CURRENT.md.
+`brain/changes_log.json`, `brain/analysis/tape_state_arm_census_2026-10-28.py` (--selfcheck PASS),
+`data/checkpoint_registry.json`, CURRENT.md.
