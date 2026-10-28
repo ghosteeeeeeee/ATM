@@ -16881,3 +16881,25 @@ BY: upgrade_implementer
 - 24h deepened RED '-$0.24'→'-$0.44' — BABY cut-loser (-5.34%) + prior atr_sl_hit cluster; 7d also deepened '-$0.54'→'-$0.74'
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 08:29 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 19T 10W 52.6% '-$0.44' (RED) | 7d 137T 71W 51.8% '-$0.77' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0 closes last hour; 24h worst volume-buildup- 3T 1W 33% still positive WR, no signal n>=3 at 0% WR
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/19 = 26.3% (<40%) — SL not too tight; dominant closes = profit-monster-trail (5T '+$0.38')
+- Boost: bb-squeeze+ 5T 60% '+$0.25' meets criteria but identical numbers since 04:30 boost — no new data, churn, skip
+- 5 consecutive negative hourly buckets (02:00-06:00) but current hour 0 closes (streak stalled); regime NORMAL/EXTREME/HIGH not NEUTRAL, size lever N/A
+- Frequency 0/hr — under overtrading threshold
+- 2 open: FOGO volume-buildup- SHORT (-0.62%, opened 07:22), ICP bb-squeeze+ LONG (+0.20%, opened 08:03, fresh)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.44' — atr_sl_hit cluster (5T '-$0.71') still the driver; BABY cut-loser (-5.34%) deepened it
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
