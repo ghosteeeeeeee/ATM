@@ -16859,3 +16859,25 @@ BY: upgrade_implementer
 - NEAR warrior-sr-confirm+ closed with NULL mae_pct/mfe_pct — minor metadata gap, worth a data-quality check if it recurs
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 07:30 UTC Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** $-0.20 (WR: 0.0%) | 24h: 19T 10W 52.6% '-$0.44' (RED) | 7d 139T 72W 51.8% '-$0.74' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no signal n>=3 at 0% WR last hour (only 1 close); 24h worst volume-buildup- 3T 1W 33% still positive WR, hh-hl+ n=1
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/19 = 26.3% (<40%) — SL not too tight; dominant closes = profit-monster-trail (5T '+$0.38')
+- Boost: bb-squeeze+ (5T 60% +$0.25) meets criteria but identical numbers to the 0.8->0.9 boost at 04:30 — no new data, second consecutive boost = churn, skip
+- 5 consecutive negative hours (02:00-06:00) — size-reduce rule fires only if regime NEUTRAL; 12h actual = NORMAL/EXTREME/HIGH, size lever N/A
+- Frequency 1/hr — under overtrading threshold
+- 1 open: FOGO volume-buildup- SHORT opened 07:22 (fresh)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h deepened RED '-$0.24'→'-$0.44' — BABY cut-loser (-5.34%) + prior atr_sl_hit cluster; 7d also deepened '-$0.54'→'-$0.74'
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
