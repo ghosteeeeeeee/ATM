@@ -3174,5 +3174,27 @@
     "after": "1 pending entry, grace 45m",
     "rationale": "Mandate: intraday checkpoints must be registered or the 4h auditor cadence misses the window",
     "impact": "05:54Z BTC #16450 8h-stale exit condition will be surfaced by checkpoint_watch"
+  },
+  {
+    "timestamp": "2026-10-28T08:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Backfilled 3 NULL mfe_pct/mae_pct rows on recently closed trades via cell_stats.backfill_mfe_mae(days=2)",
+    "type": "tweak",
+    "file": "data/brain_trades.db (PG trades table)",
+    "before": "3 rows with mfe_pct NULL inside 7d window (BABY #16458, NEAR #16454 + 1) — excluded from chop-bleed numerator while kept in denominator",
+    "after": "0 NULL mfe_pct in 7d window",
+    "rationale": "NULL mfe silently understates the official chop-bleed KPI (NULL-inclusive variant read 93.9% vs official 88.1% = 5.8pt swing) and distorts armed/unarmed ledgers",
+    "impact": "KPI + armed/unarmed ledgers now denominator-complete"
+  },
+  {
+    "timestamp": "2026-10-28T08:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Dispositioned intraday checkpoint btc-16450-8h-stale -> status done",
+    "type": "doc",
+    "file": "data/checkpoint_registry.json",
+    "before": "status=surfaced, last_state=OVERDUE (due 05:54Z)",
+    "after": "status=done (trade self-closed 05:55:24Z UNIVERSAL_MAX_HOLD)",
+    "rationale": "BTC #16450 closed on its own exit rule before disposition; condition moot",
+    "impact": "checkpoint_watch stops reporting it"
   }
 ]

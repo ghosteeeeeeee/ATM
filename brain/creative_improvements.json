@@ -9736,5 +9736,32 @@
     "category": "measurement",
     "status": "suggested — zero code, applies at the 11-03 shadow_disposition run",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-28T08:45:00Z",
+    "idea": "UNITS GUARD as a mandatory pre-ship check for every shadow/log-based counterfactual",
+    "rationale": "This run paired `live_pnl` (compute_live_pnl = UNLEVERED raw price return, pnl_utils.py:46-67) with PG `pnl_pct` (LEVERAGED) and got MFE-CUT = -33.98pp / t=-3.16 / p=0.0035 — a ship-grade number. Corrected to unlevered/USD basis: -2.07pp, mean -0.063pp, **p=0.35, -$0.23 over 33 trades = noise**. Same landmine documented at run #119 (atr_sl_hit hold-longer: +$145pp -> +$0.19) and in analysis/tat_variant_c_candle_oos_2026-10-24.py. Struck twice in 4 days.",
+    "expected_impact": "Prevents a false-positive ship; costs one line in the pre-ship checklist: \"state the unit of both sides — if one is live_pnl/compute_live_pnl, divide the PG side by leverage (or use pnl_usdt)\"",
+    "category": "method / verification",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-28T08:45:00Z",
+    "idea": "Family-scoped MFE-CUT pre-registration (the redesign the code itself demands) + economic-relevance bar",
+    "rationale": "position_manager.py:3849-3855 says verbatim 'Redesign required: signal-family-scoped timeouts, not a universal cut'. Fresh 9d log read (33 closed fires) gives the split: cut-better families = bb-bounce-v2-long+ 6/8 (-1.43pp), ai-trader-pending 4/4 (-1.12pp), continuum-trend+ 4/5 (-0.91pp); cut-worse = volume-buildup- 0/3 (+0.74pp), continuum-osc+/continuum+/r2v2-long4 (+0.57..+0.66pp each). BUT every cell n<=8 and the TOTAL opportunity is $0.23 over 9d -> statistically AND economically dead as a universal cut.",
+    "expected_impact": "No live change. Pre-register: (a) family split collected until any cell n>=20 AND net USD >= +$2.00/14d; (b) add \"net USD opportunity >= $2.00/14d\" to the mfe-cut-arm-be threshold in shadow_disposition.json so a p-positive / $-dead lever cannot be flipped. Recommendation for the 2026-11-10 disposition: default KILL stands unless a family clears both bars.",
+    "category": "exit stack",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-28T08:45:00Z",
+    "idea": "Pin the NULL-mfe count next to the chop-bleed KPI (mirrors #185's dual-measure pin)",
+    "rationale": "The official chop-bleed SQL (trade_watchdog_prompt.md:321) filters `pnl_usdt<0 AND mfe_pct<0.40` in the numerator but `pnl_usdt<0` in the denominator — NULL mfe rows are dropped from the numerator only, so a NULL-heavy window LOWERS the reported share. Measured today before backfill: NULL-inclusive 93.9% vs official 88.1% = 5.8pt swing on the same 7d window. 3 NULL rows backfilled this run, but the backfill is manual/asynchronous and the same trap produced the #184 'math bug' false alarm.",
+    "expected_impact": "One added line in the KPI block: \"also print COUNT(*) FILTER (WHERE pnl_usdt<0 AND mfe_pct IS NULL) — if >0, quote the share as a lower bound\". Removes a recurring false-escalation/false-retraction cycle.",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
