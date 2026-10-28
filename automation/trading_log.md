@@ -16791,3 +16791,25 @@ BY: upgrade_implementer
 - 24h '+$0.07' green but down from '+$0.21' at 02:30 — profit-monster-trail carrying the day
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only, no auto-config
+
+## 2026-10-28 04:30 UTC Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses)
+**PnL:** $-0.18 (WR: 50.0%) | 24h: 16T 10W 62.5% '-$0.17' (RED) | 7d 136T 72W 52.9% '-$0.47' | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. Boosted bb-squeeze+ confidence weight 0.8→0.9 in signal_compactor.py — 24h 5T 60% WR '+$0.25' wins across STABLE+SUSHI; 14d 17T 58.8% '+$0.50'. Deprioritization reason (69T zero edge) no longer holds. Modest boost, not full 1.0 reversal (7d WR 53.8% borderline). Logged bb-squeeze+ v1 to signal_versions.json.
+
+**No Change Needed:**
+- Kill check: no signal n>=3 at 0% WR (hh-hl+ n=1 only)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 4/16 = 25% (<40%) — SL not too tight; dominant closes = profit-monster-trail (5T '+$0.38')
+- Frequency 4/hr — under overtrading threshold (20)
+- Winners low adverse excursion: CHIP +1.13%, SOL +0.49% (ugb_pt exits); losers NEAR -4.92% (cut-loser), KAS -3.14% (atr_sl_hit)
+- 1 open bracketed: BTC continuum-trend+ LONG flat
+
+**Open Questions:**
+- 3 consecutive negative hours (02:00 '-0.32', 03:00 '-0.11', 04:00 '-0.07') — triggers the size-reduce review rule; not acted this hour (one change/hour limit, boost took priority). Check regime + consider size cut next hour if streak continues
+- 24h flipped RED '-$0.17' (was '+$0.07' at 03:30) — atr_sl_hit cluster (4T '-$0.65') driving the red
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only

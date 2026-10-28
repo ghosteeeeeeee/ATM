@@ -5360,3 +5360,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-28 03:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 14T 71.4% '+$0.07' GREEN | 7d 133T 52.6% '-$0.34' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h n>=3 all positive-WR) | atr_sl_hit 3/14=21.4% under 40% | inversion 0 mismatches | boost: none (max signal n=4 < 5) | frequency 0/hr | 4 open bracketed KAS+NEAR+SOL+BTC LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-28 04:30 UTC] auto_1hr: BOOST bb-squeeze+ weight 0.8->0.9 (signal_compactor.py) — 24h 5T 60% +$0.25 across STABLE+SUSHI, 14d 17T 58.8% +$0.50; deprioritization reason no longer holds | 4T last hour 2W2L -$0.18 | 24h 16T 62.5% -$0.17 RED | 7d 136T 52.9% -$0.47 — size-reduce 1.0x | kill: none | atr_sl_hit 25% | inversion 0 | 3 consecutive neg hours (watch, no size change this hour) | signal_versions bb-squeeze+ v1 logged
+BY: auto_1hr

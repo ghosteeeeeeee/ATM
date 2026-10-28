@@ -1,41 +1,69 @@
 # Signal Performance Report
-**Generated:** 2026-10-27 (run) | **Period:** Last 6h + 24h
+**Generated:** 2026-10-28 03:31 UTC | **Period:** Last 6h + 24h
 
-## KILLED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None met kill criteria (24h) |
-
-## BOOSTED (executed):
-| Signal | Dir | WR | PnL | Trades | Action |
-|--------|-----|-----|-----|--------|--------|
-| — | — | — | — | — | None met boost criteria (bb-squeeze+ failed multi-token: 5T all hyperliquid; also DEPRIORITIZED 2026-10-10 on 14d zero-edge data) |
-
-## LOSERS (watch list):
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb-bounce-v2-long+ | LONG | 33.3% (7d) | -0.36 (7d) | 18 (7d) / 1 (24h) | WATCH — chronic 7d loser, 24h volume too low to kill |
-| continuation+ | LONG | 50.0% | -0.16 | 2 | WATCH — 24h sample too small |
-| volume-buildup- | SHORT | 66.7% | -0.07 | 3 | WATCH — WR fine, slight negative PnL (R:R) |
-| pump-chain+ | LONG | 47.4% (7d) | -0.41 (7d) | 19 (7d) / 3 (24h) | WATCH — 7d chronic, but 24h at 100% WR +0.28 (recovering) |
-
-## WINNERS:
-| Signal | Dir | WR | PnL | Trades | Status |
-|--------|-----|-----|-----|--------|--------|
-| bb-squeeze+ | LONG | 60.0% | +0.37 | 5 | KEEP — single token, no boost (multi-token rule) |
-| pump-chain+ | LONG | 100.0% | +0.28 | 3 | KEEP |
-| warrior-sr-confirm+ | LONG | 100.0% | +0.06 | 2 | KEEP |
-| continuum-osc+ | LONG | 100.0% | +0.02 | 1 | KEEP |
-
-## 6h Performance:
-| Signal | Dir | Trades | WR | PnL |
-|--------|-----|--------|-----|-----|
-| bb-squeeze+ | LONG | 2 | 100.0% | +0.38 |
-
-## ISSUES:
-- No signal inversions in 24h (long/short name vs direction check clean).
-- Low trade volume overall: 20 closed trades in 24h, 2 in 6h — sample sizes below action thresholds.
-- Note: ad-hoc "name/direction mismatch" query using `signal LIKE '%-%'` produces false positives on hyphenated names (bb-bounce-v2-long+); authoritative check is long/short substring only — that returned zero.
+## Overall Stats
+- **Total trades (all time):** 3,376 | **WR:** 50.8% | **PnL:** -97.48%
+- **Date range:** 2026-07-29 → 2026-10-28
 
 ---
-*No kills, no boosts this cycle. Next report: ~6h.*
+
+## WINNERS (WR > 55%, PnL > 0)
+
+None found.
+
+---
+
+## LOSERS (WR < 30%, PnL < -2%)
+
+None found.
+
+---
+
+## MARGINAL (30-50% WR)
+
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| volume-buildup- | SHORT | 2 | 50.0% | -1.10 | ENABLED | Needs more data |
+| continuation+ | LONG | 2 | 50.0% | -0.70 | ENABLED | Needs more data |
+
+---
+
+## DISABLED BUT GOOD (candidates for re-enabling)
+
+None found. Top performers are already enabled.
+
+---
+
+## SIGNAL INVERSIONS (24h)
+
+**No inversions found.** All signals respect their direction labels.
+
+---
+
+## RECOMMENDATIONS
+
+1. **[WATCH] volume-buildup- SHORT** — WR=50.0%, PnL=-1.10% over 2 trades. Monitor next cycle.
+2. **[WATCH] continuation+ LONG** — WR=50.0%, PnL=-0.70% over 2 trades. Monitor next cycle.
+
+---
+
+*Report auto-generated. Next report: ~6h from now.*
+
+---
+
+## PARAM CHANGE LOG (last 7 days)
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-10-27 | 14ddb5c | ctx-gate: deterministic rules conversion IN SHADOW (CEO 2026... |
+| 2026-10-27 | 3d43a36 | watchdog: gate LLM agent on open_count (CEO 2026-10-27 item ... |
+| 2026-10-27 | f96a1e2 | fix: BUG-068 — brain_auditor #188 inverted CHASE_RATIO_SHADO... |
+| 2026-10-27 | 56bd9e8 | brain_auditor: Audit run #188 — CHASE_RATIO reverted on its ... |
+| 2026-10-27 | f1d8ca0 | scripts: SHADOW-RECKONING review-fix round (329547e5) — 7 ME... |
+| 2026-10-27 | 98e9dc9 | scripts: SHADOW-RECKONING round (CEO consult 20261027T024741... |
+| 2026-10-26 | c7da007 | brain_auditor: audit run #157 — daily-commit guard fixed (po... |
+| 2026-10-25 | f6a7ed8 | brain_auditor: audit run #138 — escalation #17 closed as sup... |
+| 2026-10-25 | f86261f | brain_auditor: #134 addendum — watchdog 06:44 P1 rejected-wi... |
+| 2026-10-24 | f96aa8a | brain_auditor: AUDIT RUN #122 — LONG_RSI_SWEET_SPOT_BOOST 10... |
+
+*Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

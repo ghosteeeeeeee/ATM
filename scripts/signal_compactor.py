@@ -624,7 +624,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
     ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.4,  # RE-APPLIED 2026-10-06 00:38Z brain_auditor post-freeze (queue #6). Was 1.3 (reverted freeze b960ffe8). Fresh evidence: 7d 18T 77.8%WR +$0.77 (NORMAL 9T 66.7% +$0.50, HIGH 5T 80% +$0.10, FLAT 4T 100% +$0.17). Boosts winner, blocks nothing.
     ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 0.5,  # DISABLED 2026-10-10 signal_reporter — 14d 19T -$0.33 52.6%WR. Weight lowered pending re-enable.
-    ('bollinger_squeeze_long', 'bb-squeeze+'): 0.8,  # DEPRIORITIZED 2026-10-10 — 14d 69T -$0.05 60.9%WR +0.02%avg. Massive trade count, zero edge. Lowered 1.0→0.8 to reduce capital allocation. 17 hard_max_loss at avg RSI 74.1 (overbought chase).
+    ('bollinger_squeeze_long', 'bb-squeeze+'): 0.9,  # BOOSTED 0.8→0.9 2026-10-28 auto_1hr — 24h 5T 60% +$0.25 (wins STABLE+SUSHI), 14d 17T 58.8% +$0.50. Deprioritization reason (69T zero edge) no longer holds: trade count down, edge positive. Modest boost, not full 1.0 reversal (7d WR 53.8% borderline).
     ('pump-chain', 'pump-chain+'): 1.4,  # BOOSTED 1.2→1.4 2026-10-10 — 14d 25T 56%WR +$2.27 +2.91%avg. BEST signal by total PnL. Was 1.2 (boosted 10-03).
     ('pump-chain-v6', 'pump-chain-v6+'): 1.0,  # V6 LONG — validated gate (spec rev1, double-audited). Self-learner tunes after 5+ trades.
     ('pump-chain-v6', 'pump-chain-v6-'): 1.0,  # V6 SHORT — monitoring bet; same base weight
