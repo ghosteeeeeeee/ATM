@@ -16748,3 +16748,25 @@ BY: upgrade_implementer
 - 24h '+$0.56' (80% WR) green; 7d '-$0.25' improving — no killable signal
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only, no auto-config
+
+## 2026-10-28 02:30 UTC Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.32 (WR: 0.0%) | 24h: 16T 11W 68.8% '+$0.21' (green) | 7d 134T 70W 52.2% '-$0.47' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- 2T both atr_sl_hit (PURR hh-hl+ LONG -5.02%, DOT volume-buildup- SHORT -5.65%); atr_sl_hit 3/16 = 18.8% (<40%) — SL not too tight
+- Kill check: no signal n>=3 at 0% WR last hour (hh-hl+ n=1 only)
+- Signal inversion check: 0 mismatches (24h)
+- No 3h negative streak — only 2 active hours in window (19:00 '+0.04', 02:00 '-0.32')
+- Frequency 2/hr — under overtrading threshold (20)
+- Boost: none — top signal bb-squeeze+ 4T 75% '+0.37' has n=4 < 5
+- 3 open bracketed: NEAR + SOL warrior-sr-confirm+ LONG, BTC continuum-trend+ LONG
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '+$0.21' green but down from '+$0.56' at 01:30 — two consecutive atr_sl_hit closes worth watching if trend continues
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
