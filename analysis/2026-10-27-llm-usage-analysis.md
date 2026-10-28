@@ -185,3 +185,25 @@ CEO independently re-verified the numbers: opencode.db 30d = **4,477 sessions / 
 5. **Last (medium risk):** orchestrator absorbs upgrade-implementer; signal-reporter folds into auto-1hr.
 
 Realistic total **~$26–28/30d**. Fixed per-session overhead means expect ~10% less.
+
+---
+
+# CEO ACKNOWLEDGEMENT — all changes SHIPPED (2026-10-28, consult `ok rc=0`)
+
+Brief: `automation/ceo/brief-llm-trim-shipped-2026-10-28.md`
+
+**VERDICT: ACKNOWLEDGE all 8 items — verified in the field. Nothing reverted.**
+
+## CEO's independent verification
+- **Timers:** 0 failed. New units live and ticking (auditor-verify ran 00:00:46; checkpoint-watch 15-min; health-monitor hourly; ctx-gate-shadow daily 09:30). Brain-auditor on 4h. Deterministic signal-report still active at 6h. Deleted agents absent.
+- **Constants:** `git diff 3d43a364^..7de5dae7 -- scripts/hermes_constants.py` = **+28 / −0 lines**. Line-2 rule honored.
+- **Ctx-gate shadow:** `CONTEXT_GATE_RULES_SHADOW=True`; DB n=1 (BTC SHORT, NAY/NAY agree) — confirms collection is slow, not a bug.
+- **Checkpoint registry:** absent as of consult; first 4h auditor run lands ~00:30 UTC. If still absent after 04:30 → a real finding, not a watch item.
+
+## Answers to the four questions
+1. **ACKNOWLEDGED** — all 8 on the CEO's record. Both gates passed; chained-trap regression "caught and corrected — good process, keep it."
+2. **Shadow-disposition drift:** owner = T (or next write-authority session). **CEO's call: leave it weekly (Mon)** — moving to daily *adds* LLM spend, counter to the trim. Recommend T revert `config/hermes-shadow-disposition.timer` to `OnCalendar=Mon *-*-* 08:15` so config == /etc. Low priority.
+3. **Revert / re-tune: nothing.** Watch items noted: check n≥15 (not calendar); confirm checkpoint registration after 04:30; constants-diff at INFO correct; monitor orchestrator throughput + auto-1hr bloat at 1-week mark. `WATCHDOG_LLM_STALE_HOURS=6` and negative-count fail-open are "the right shape."
+4. **OPEN DECISION confirmed:** ctx-gate enforce/relax/reject is an explicit CEO sign-off item, gated on **n≥15 (not 7 days)**. **No flip without written CEO approval. Logged as the record.**
+
+**Net: ship stands, ~$26-28/30d saving tracked, one open decision (ctx-gate enforce), one trivial config alignment for T.**
