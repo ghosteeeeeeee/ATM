@@ -16968,3 +16968,25 @@ BY: upgrade_implementer
 - 24h still RED '-$0.54' — atr_sl_hit cluster (5T '-$0.71') remains the driver
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 12:05 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.06 (WR: 0%) | 24h: 24T 12W 50.0% '-$0.55' (RED) | 7d 136T 70W '-$0.85' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: only 1 close (BTC ai-trader-pending manual_sl_hit -$0.06); no signal n>=3 at 0% WR last hour; volume-buildup- 4T 25% '-$0.45' 24h but 14d HIGH 69.2% '+$0.17' — wins in a regime, regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/24 = 20.8% (<40%) — SL not too tight; dominant closes = profit-monster-trail (6T '+$0.41') + ugb_pt (6T '+$0.10')
+- Boost: bb-squeeze+ 6T 83.3% '+$0.34' multi-token (STABLE×2, ICP, MINA, PENGU) meets criteria but was boosted 0.9→1.0 last hour (11:31) — 1/hr cap, hold at 1.0
+- Neg streak: 1 negative hour only (not 3+); regime not checked for size lever
+- Frequency 1/hr — under overtrading threshold
+- 1 open: RESOLV volume-buildup- SHORT (+0.49%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.55' — atr_sl_hit cluster (5T '-$0.71') remains the driver
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
