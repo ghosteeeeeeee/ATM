@@ -17227,3 +17227,26 @@ Loser: FOGO pump-chain+ LONG trail_arm_timeout -2.80%
 - bb-squeeze+ at weight ceiling — next lever is hot-set priority, not weight
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 23:41 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: N/A) | 24h: 29T 15W 51.7% '-$0.83' RED | 7d 129T 72W 55.8% '-$0.21' near flat | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T last hour; no signal n>=3 at 0% WR; volume-buildup- 24h 6T 33.3% '-$0.59' but 14d HIGH 69.2% positive — regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/29 = 17.2% (<40%) — SL not too tight; dominant close = profit-monster-trail (9T '+$0.47')
+- Boost: bb-squeeze+ 10T 90.0% '+$0.17' 9-token meets criteria but already at 1.0 ceiling (boosted 11:31 today) — no headroom; no other n>=5 WR>55% net>0 candidates
+- Neg streak: 1 negative hour only (prior streak was positive) — not 3 consecutive
+- Frequency 0/hr — under overtrading threshold
+- 2 open: LTC + VIRTUAL warrior-sr-confirm+ LONG (-0.71%, -0.34% unrealized)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.83' — drag remains atr_sl_hit (5T '-$0.57') + cut-loser-CL-T1 (3T '-$0.44'); 7d nearly flat '-$0.21'
+- bb-squeeze+ at weight ceiling — next lever if it keeps winning is hot-set priority, not weight
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
