@@ -2234,3 +2234,16 @@
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1258s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1197s left, N failures)`
 - **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1197s left, N failures)`
+
+## Error Alerts — 2026-10-28 14:40 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (297s left, N failures)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (297s left, N failures)`
+
+## Error Alerts — 2026-10-28 15:40 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TOK decider_run: AttributeError: 'str' object has no attribute 'get'`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run`
+
+## Error Alerts — 2026-10-28 19:40 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.8s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`

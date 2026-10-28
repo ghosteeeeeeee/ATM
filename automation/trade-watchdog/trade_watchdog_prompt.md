@@ -336,6 +336,17 @@ FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '14 days';
   is a different number and is always lower (e.g. 7d 2026-10-27: dollar 89.5% vs count 79.1%).
   When quoting "X% (NT of MT trades ...)", the % is the dollar share — dividing the counts does
   NOT reproduce it and is not a math bug. State which measure you used.
+- **Quote two companions with every reading (brain_auditor #194, implements #193 creative #3):**
+  1. **NULL-`mfe_pct` loser count** in the same window. NULL rows drop out of the *numerator*
+     only (the SQL's `mfe_pct<0.40` is NULL-false) but stay in the denominator, so a NULL-heavy
+     window drags the share DOWN and a backfill pushes it UP on identical trades — measured 2026-10-28:
+     same 7d window read 93.9% NULL-inclusive vs 88.1% official = **5.8pt swing**. If you don't pin
+     the count, a backfill looks like a math bug (#184) or a real breach looks like one.
+     NULLs are **self-healing**: `cell_stats.backfill_mfe_mae(days=7)` runs nightly at 00:20Z
+     (brain.py `close_trade` — used by profit_monster/cut_loser — never writes `mfe_pct`).
+  2. **Same-day arm rate** (`% of today's closes with mfe >= 0.40`), beside the 7d one. It leads
+     chop-bleed: 2026-10-28 same-day arm **20% (3/15)** preceded the 7d share reaching 91.7%.
+     The 7d LONG arm rate is the tripwire (`<50`); the daily number is the early warning.
 
 ### Regime Flip-Rate KPI (MANDATORY — added 2026-10-23, brain_auditor #86)
 

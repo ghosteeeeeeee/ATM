@@ -9763,5 +9763,43 @@
     "category": "measurement",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-28T16:50:00Z",
+    "idea": "RE-ROUTE the chop-bleed >=92% escalation arm to a CEO-GATED SIZE proposal (0.75x) instead of 'push entry-quality filters'",
+    "rationale": "7d official chop-bleed is 91.7% and climbing (84.1% 10-25 -> 88.1% #193 -> 91.7% #194), so the arm will fire. Its text routes to entry-quality filters, but that detect-time route is measured-closed on three independent axes (#96 admission features, #190 metadata fields, #192 tape-state census 0/10). Exits are not the problem (shadow exit A/B pm_trail +4,562 vs hard_max -6,402; 7d armed +3.70 vs unarmed -4.55). Remaining lever on never-armed bleed = size per never-armed entry.",
+    "expected_impact": "Turns a dead-end trigger into an actionable one; at 7d gross loss 5.06 a 0.75x cut on never-armed entries saves on the order of 1.1 per window (to be measured on the real breach cohort)",
+    "category": "risk sizing",
+    "status": "suggested",
+    "risk": "low — CEO-gated, reversible via existing size-reduce file, no code today"
+  },
+  {
+    "date": "2026-10-28T16:50:00Z",
+    "idea": "PER-SIGNAL ARM-RATE ENTRY AXIS (pre-registered trigger) — the axis none of the three closed entry routes tested",
+    "rationale": "#96/#190/#192 all keyed detect-time market features; none keyed the signal's OWN recent arm history. 14d arm% with n>=15: ai-trader-pending 17.6%, bb-bounce 40.6%, ai-trader+ 46.7%, pump-chain+ 50.0%, bb-squeeze+ 50.0%, pump-chain- 60.0%, volume-buildup- 61.1% — and the never-armed bleed sits in exactly the low-arm families (pump-chain+ 18T -1.84, bb-bounce 18T -1.66, volume-buildup- 13T -1.68 of 14d never-armed losers).",
+    "expected_impact": "Confidence DAMPEN (never a block) for a live signal at arm% <50 / n>=15 / net negative; today every candidate is owned, disabled or CEO-domain so nothing ships",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "trigger": "live signal AND 14d n>=15 AND arm%<50 AND net PnL<0 AND p<0.05 AND blocks <20% of 14d winners",
+    "risk": "low — dampen not block, single variable, triggers on data"
+  },
+  {
+    "date": "2026-10-28T16:50:00Z",
+    "idea": "Pair every chop-bleed reading with the NULL-mfe loser count AND the same-day arm rate",
+    "rationale": "Same 7d window reads 93.9% NULL-inclusive vs 88.1% official = 5.8pt swing from backfill state alone (#184 false-math-bug cycle). Same-day arm rate 2026-10-28 = 20% (3/15) leads the 91.7% share — a >=92% breach is forecastable about a day ahead with a number we already compute.",
+    "expected_impact": "Kills the false-math class; gives the escalation gate a leading indicator",
+    "category": "instrumentation",
+    "status": "shipped",
+    "risk": "none — reporting only",
+    "shipped_in": "automation/trade-watchdog/trade_watchdog_prompt.md Chop-Bleed KPI section"
+  },
+  {
+    "date": "2026-10-28",
+    "idea": "SAME-DAY ARM-RATE CONFLUENCE DAMPENER — when same-day arm% <20% with n>=15 closed, raise NEW-entry confluence bar from 1+ to 2+ sources for the remainder of the UTC day (auto-reset at midnight)",
+    "rationale": "Same-day arm rate 14.8% (4/27) is the leading indicator of chop (10-26: 46.4% arm -> -1.17 day). Size dampener is 74% inert at HL floor ($3.15/$4.25 never-armed loss sits at amount<=11.5). Confluence dampener reduces chop ENTRY COUNT without touching size and without time-blocking. Not a time gate — a measured market-behavior condition. HBAR autopsy confirms: vol_spike=0.04 dead-tape entry lost, USELESS vol_spike=0.72 same-family same-regime won 19min earlier — volume confirmation is the differentiator.",
+    "expected_impact": "On a 14.8% arm day, would have blocked ~50% of 23 never-armed entries (~$0.35 of $0.74 bleed) while preserving trail-family entries that arm",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium — needs pipeline code change; pre-register: only fires when same-day n>=15 AND arm%<20 AND fk <20% of same-day winners"
   }
 ]

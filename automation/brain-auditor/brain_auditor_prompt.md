@@ -124,13 +124,23 @@ python3 scripts/shadow_trader.py --flip-test --flip-signal <signal_type>
 python3 scripts/shadow_trader.py --sweep-arm --sweep-signal <signal_type> --sweep-dir <direction>
 ```
 
+**Refresh the contrarian outcome join FIRST (MANDATE, run #194).** `analysis/contrarian_outcome_join.py`
+has **NO systemd producer** — nothing schedules it, so the file only updates when an agent remembers to
+run it (it went 22h stale across runs #192/#193 and `contrarian_monitor.py` is a *different* script).
+The join is the only place contrarian flip-WR lives (the jsonl `classification` is a static label), so a
+stale join silently poisons the pc-/rider flip numbers. It takes seconds — run it unconditionally:
+
+```bash
+python3 /root/.hermes/analysis/contrarian_outcome_join.py
+```
+
 **Full skill reference:** `/root/.hermes/skills/shared/shadow-mode-analysis/SKILL.md`
 
 ### Shadow Source Status (verified 2026-10-24, run #126 — read BEFORE analyzing)
 
 | Source | Rows | Status | Answerable question |
 |---|---|---|---|
-| contrarian_shadow.jsonl | 923 | ✅ USEFUL — outcome join live (`analysis/contrarian_outcome_join.py`, writes `data/contrarian_outcome_join.json`, last 2026-10-27T18:31Z) — **the jsonl `classification` column is a STATIC 30d label (all 923 = LOSER, `outcome`/`would_win` null); do NOT read it as an outcome.** Outcomes live only in the join file. | flip would-win % (overall 46.7% n=651; pump-chain- 64.5% n=350; btc-pump-rider+ 26.0% n=300 → per-signal, never blanket) |
+| contrarian_shadow.jsonl | 999 (923 at 2026-10-24) | ✅ USEFUL — outcome join via `analysis/contrarian_outcome_join.py` → `data/contrarian_outcome_join.json`. **NO systemd producer — run it yourself every run** (it sat 22h stale over #192/#193; the hourly `hermes-contrarian-monitor.timer` runs `contrarian_monitor.py`, a different script). **the jsonl `classification` column is a STATIC 30d label (all rows = LOSER, `outcome`/`would_win` null); do NOT read it as an outcome.** Outcomes live only in the join file. | flip would-win % (2026-10-28 16:31Z: overall 46.6% n=725; pump-chain- 64.6% n=350 LIVE; btc-pump-rider+ 29.9% n=374 → per-signal, never blanket) |
 | oscillator_shadow.json | 24,598 | 🧊 FROZEN + **ARCHIVED 2026-10-27 → data/archive/oscillator_shadow.json.fossil-20261027** — `OSCILLATOR_MULT_ENABLED=True` since Oct 1 stops writes; `actual_outcome` null on 24,598/24,598. **JSONL, not JSON array** (`json.load` crashes) | none — pre-live evidence only; use the live metadata join + weekly KPI |
 | floor_admit_shadow.jsonl | 2,257 | ✅ JOIN SHIPPED 2026-10-25 (`analysis/floor_admit_outcome_join.py` → `data/floor_admit_outcome_join.json`) — **was listed PENDING until run #188 found it**. floor_only 664 decided 47.9% vs always_admit 73 decided 38.4%, fisher p=0.138 (directional, not significant); blocked cohort n=0 | does floor admit beat always-admit? (directionally yes, p=0.138 not yet) |
 | wyckoff_shadow.jsonl | 345 | ⏳ PENDING JOIN — no outcome column | none until join ships |
@@ -155,7 +165,8 @@ print(f"Oscillator shadow: {len(osc)} entries")
 # 2. Contrarian shadow — CAUTION: `classification` is a STATIC 30d label, all rows
 #    read 'LOSER'. It is NOT an outcome and counting it tells you nothing.
 #    Real outcomes: json.load('/root/.hermes/data/contrarian_outcome_join.json')
-#    → {total, flip_wr, by_signal} (runs every 15 min, timestamp in file).
+#    → {total, flip_wr, by_signal} (NO timer runs it — re-run it yourself each run,
+#    see "Refresh the contrarian outcome join FIRST" above; check `timestamp` in file).
 with open('/root/.hermes/data/contrarian_shadow.jsonl') as f:
     contrarian = [json.loads(line) for line in f]
 print(f"Contrarian shadow (raw, static label only): {len(contrarian)} entries")

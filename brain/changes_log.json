@@ -3196,5 +3196,27 @@
     "after": "status=done (trade self-closed 05:55:24Z UNIVERSAL_MAX_HOLD)",
     "rationale": "BTC #16450 closed on its own exit rule before disposition; condition moot",
     "impact": "checkpoint_watch stops reporting it"
+  },
+  {
+    "timestamp": "2026-10-28T16:50:00Z",
+    "agent": "brain_auditor",
+    "change": "brain_auditor_prompt.md Step 2b: MANDATE unconditional run of analysis/contrarian_outcome_join.py each audit run + corrected the false 'runs every 15 min' claim (no systemd producer exists; hourly hermes-contrarian-monitor runs a different script) + shadow-source table row refreshed (999 rows, fresh flip numbers)",
+    "type": "tweak",
+    "file": "automation/brain-auditor/brain_auditor_prompt.md",
+    "before": "comment said join 'runs every 15 min'; table said 'outcome join live' with a 10-27T18:31Z timestamp",
+    "after": "Step 2b mandates the refresh; comment and table state NO producer and carry 2026-10-28 16:31Z numbers (pc- 64.6% n=350, rider 29.9% n=374)",
+    "rationale": "join went 22h stale across runs #192/#193 and both quoted it as current; flip-WR is the only place contrarian outcomes live",
+    "impact": "zero trading behavior; keeps the live pc- fade and the 11-03 KPI on a current book"
+  },
+  {
+    "timestamp": "2026-10-28T16:50:00Z",
+    "agent": "brain_auditor",
+    "change": "trade_watchdog_prompt.md Chop-Bleed KPI: require NULL-mfe loser count + same-day arm rate beside every reading (implements run #193 creative #3)",
+    "type": "doc",
+    "file": "automation/trade-watchdog/trade_watchdog_prompt.md",
+    "before": "KPI section documented dollar vs count measure only",
+    "after": "added the two companions with the measured 5.8pt NULL swing, the 00:20Z nightly self-heal note, and the 2026-10-28 20% same-day arm example",
+    "rationale": "a backfill moves the share 5.8pt on identical trades (false-math-bug class #184); daily arm% leads chop-bleed by ~1 day",
+    "impact": "zero trading behavior; reporting only"
   }
 ]
