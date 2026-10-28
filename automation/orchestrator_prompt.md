@@ -141,8 +141,10 @@ journalctl -u hermes-health-monitor.service --since "24 hours ago" --no-pager | 
 # Auto-1hr changes
 journalctl -u hermes-auto-1hr.service --since "24 hours ago" --no-pager | grep -E "Summary|Changes|CRITICAL" | tail -20
 
-# Signal performance
-journalctl -u hermes-signal-reporter.service --since "24 hours ago" --no-pager | tail -20
+# Signal performance (deterministic reporter writes this file every 6h;
+# the LLM hermes-signal-reporter.service was retired 2026-10-27 — do NOT grep
+# for it, the unit no longer exists)
+cat /root/.hermes/automation/signal_report.md | tail -40
 
 # Blacklist trials
 cat /root/.hermes/automation/blacklist_test_log.md
@@ -217,9 +219,9 @@ PIPELINE STATUS:
 - Current: X open
 
 TEAM ACTIVITY (from TEAM UPDATES in kanban):
-- signal_reporter: [what it did]
-- health_monitor: [what it did]
-- auto_1hr: [what it did]
+- auto_1hr: [what it did — this now includes the boost + inversion checks folded in from the retired signal-reporter]
+- health_monitor: [what it did — deterministic, anomaly-only; no entry means no WARN]
+- brain_auditor: [what it did]
 
 IMPLEMENTED TODAY:
 1. [Change] — [result]

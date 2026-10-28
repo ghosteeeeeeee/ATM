@@ -44,7 +44,18 @@ scrub() {
 
 # Create lock
 echo "$$" > "$LOCK_FILE"
-trap 'rm -f "$LOCK_FILE"; scrub' EXIT
+# SINGLE EXIT trap handling everything. Bash keeps only the LAST EXIT trap set —
+# an earlier version set a second trap for the gate temp file, which REPLACED
+# this one and silently killed both the BUG-036 secret scrub (the documented
+# root-cause fix for secrets re-accumulating in the watchdog log) and lock
+# cleanup (bug_hunter HIGH finding). Always CHAIN here; never add a second
+# `trap ... EXIT` below this point — extend this one instead.
+_cleanup() {
+    rm -f "${GATE_OUT:-}"
+    rm -f "$LOCK_FILE"
+    scrub
+}
+trap '_cleanup' EXIT
 
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [START] Trade Watchdog" >> "$LOG_FILE"
 
@@ -66,8 +77,9 @@ SKIP_REASON=""
 # had to pass int() before reaching the f-string); any future edit printing a raw
 # value would have opened shell injection from the agent-written JSON. Reading
 # plain lines never interprets shell metacharacters (review #3).
+# The temp file is cleaned by the CHAINED _cleanup trap above — do NOT set a
+# second EXIT trap here (that would replace it).
 GATE_OUT="$(mktemp /tmp/watchdog_gate.XXXXXX)"
-trap 'rm -f "$GATE_OUT"' EXIT
 python3 - <<'PYEOF' > "$GATE_OUT"
 import json, os, sys
 from datetime import datetime, timezone

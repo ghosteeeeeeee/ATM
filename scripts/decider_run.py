@@ -1645,7 +1645,12 @@ Reply only GO, WARN, NAY, or FLIP:"""
     except Exception as e:
         log(f'  ⚠️ [CTX-GATE] LLM failed for {token}: {e}')
         if CONTEXT_GATE_FAIL_OPEN:
-            return ('GO', None)  # fail-open: don't block good setups
+            # Fail-open: allow the trade (unchanged live behavior), but mark the
+            # reason so the SHADOW agreement recorder can tell this apart from a
+            # genuine LLM 'GO'. Otherwise an LLM outage during shadow would be
+            # scored as a real verdict and bias the agreement ratio — potentially
+            # flipping a correct rules port into a wrong REJECT (bug_hunter #5).
+            return ('GO', f'LLM_FAIL_OPEN: {e}')
         return ('SKIP', 'LLM failed, fail-closed')
 
 # ── Context Gate: deterministic rules (SHADOW, CEO 2026-10-27 item 4) ─────────
@@ -1761,7 +1766,7 @@ _CTX_SHADOW_DB = '/root/.hermes/brain/ctx_gate_shadow.db'
 _pending_shadow = {'key': None, 'verdict': None}
 
 
-def _ctx_rules_shadow_agree(token, direction, source, llm_verdict):
+def _ctx_rules_shadow_agree(token, direction, source, llm_verdict, llm_reason=None):
     """Record rules-vs-LLM agreement for one signal. Shadow mode only.
 
     Key-match guard: the pending verdict is only used if it was stashed by THIS
@@ -1772,9 +1777,14 @@ def _ctx_rules_shadow_agree(token, direction, source, llm_verdict):
     both sides, so a WARN involved on either leg counts as agreement-by-default —
     we only flag real disagreements (one side NAY, the other GO/WARN).
 
-    SKIP (the fail-closed LLM path) is neither a NAY nor a GO-side answer, so it
-    is recorded but EXCLUDED from the agreement math — otherwise it would be
-    counted as GO-side and inflate agreement (review #7).
+    Two cases are recorded with agree=NULL and EXCLUDED from the ratio, because
+    neither is a real LLM judgment:
+      * SKIP  — LLM hard-failed on the fail-closed path (review #7).
+      * reason starting LLM_FAIL_OPEN — the LLM errored and we let the trade
+        through; the 'GO' is synthetic, not a verdict. Under the live
+        CONTEXT_GATE_FAIL_OPEN=True this is the COMMON failure mode, and scoring
+        it as a real GO would bias agreement downward during outages — possibly
+        flipping a correct rules port into a wrong REJECT (bug_hunter #5).
     """
     try:
         import sqlite3 as _sq
@@ -1788,9 +1798,10 @@ def _ctx_rules_shadow_agree(token, direction, source, llm_verdict):
         if got_key != want_key:
             log(f'  [CTX-RULES-SHADOW] pending key mismatch (got {got_key}, want {want_key}) — dropping stale verdict')
             return
-        # SKIP = LLM hard-failed (fail-closed). Not a real verdict — record row
-        # with agree=NULL so the report excludes it from the agreement ratio.
-        if llm_verdict == 'SKIP':
+        # Synthetic/absent verdict → record with agree=NULL, exclude from ratio.
+        synthetic = (llm_verdict == 'SKIP') or (
+            isinstance(llm_reason, str) and llm_reason.startswith('LLM_FAIL_OPEN'))
+        if synthetic:
             agree = None
         else:
             rules_nay = (rules_v == 'NAY')
@@ -2315,7 +2326,9 @@ def context_gate(token, direction, source, sig):
         # for the agreement measurement that drives the enforce/relax/reject call.
         verdict, reason = llm_context_gate(token, direction, source, sig, ctx, setup=setup, heb=heb)
         if CONTEXT_GATE_RULES_SHADOW:
-            _ctx_rules_shadow_agree(token, direction, source, verdict)
+            # reason carries the LLM_FAIL_OPEN sentinel when the LLM errored —
+            # agree=NULL for those rows so an outage can't skew the ratio.
+            _ctx_rules_shadow_agree(token, direction, source, verdict, reason)
 
     if verdict == 'WARN':
         log(f'  [CTX-GATE] {token}: LLM WARN → confidence penalty -{LLM_CONFIDENCE_PENALTY}')

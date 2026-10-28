@@ -514,6 +514,42 @@ cat > brain/audit_recommendations.json << 'EOF'
 EOF
 ```
 
+### Register Intraday Time-Boxed Checkpoints (MANDATE — 2026-10-27)
+
+When your queue contains a checkpoint that must be evaluated at a SPECIFIC
+intraday time (e.g. "17:12Z pc- formal NO-GO", "18:00Z arm-rate re-measure"),
+you MUST register it so `scripts/checkpoint_watch.py` can surface it. The
+auditor now runs every 4h, so an intraday checkpoint left only in your prose
+queue can sit unread until its window closes (the 17:12Z case).
+
+```bash
+python3 - <<'PY'
+import json, os
+path = '/root/.hermes/data/checkpoint_registry.json'
+reg = []
+if os.path.exists(path):
+    reg = json.load(open(path))
+# One entry per NEW checkpoint (match on id to avoid duplicates)
+new = {
+    "id": "pc-formal-1712",          # short unique id
+    "desc": "pc- formal NO-GO (contrarian join reproduce)",
+    "due_at": "2026-10-27T17:12:00+00:00",  # ISO, UTC
+    "status": "pending",             # pending -> surfaced -> done
+    "grace_min": 60,                 # minutes past due before OVERDUE
+    "created_by": "brain_auditor #NNN"
+}
+if not any(e.get('id') == new['id'] for e in reg if isinstance(e, dict)):
+    reg.append(new)
+    json.dump(reg, open(path, 'w'), indent=2)
+    print(f"registered checkpoint {new['id']} due {new['due_at']}")
+PY
+```
+
+Rules: only intraday (same-day) checkpoints — day-scale deadlines belong in
+`data/shadow_disposition.json` (its own daily runner). When you DISPOSITION a
+checkpoint yourself, set its `status` to `done` so the watcher stops reporting
+it. A checkpoint registered but never surfaced means the watcher is not running.
+
 ### Track Your Changes (EVERY RUN):
 ```python
 # Check what you changed last run
