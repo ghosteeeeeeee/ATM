@@ -16990,3 +16990,26 @@ BY: upgrade_implementer
 - 24h still RED '-$0.55' — atr_sl_hit cluster (5T '-$0.71') remains the driver
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-28 13:10 Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.07 (WR: 100%) | 24h: 23T 11W 47.8% '-$0.59' (RED) | 7d 133T 68W 51.1% '-$0.98' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: only 1 close (RESOLV volume-buildup- profit-monster-trail +1.77%); no signal n>=3 at 0% WR last hour; volume-buildup- 5T 40% '-$0.38' 24h but 14d positive in NORMAL/HIGH — regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/23 = 21.7% (<40%) — SL not too tight; dominant closes = ugb_pt (6T '+$0.10') + profit-monster-trail (5T '+$0.37')
+- Boost: bb-squeeze+ 6T 83.3% '+$0.34' multi-token (STABLE, ICP, KAS, MINA, PENGU) meets criteria but boosted 0.9→1.0 last hour (11:31) — 1/hr cap, hold at 1.0
+- Neg streak: 12:05 was -1h only, this hour is a win — not 3+ consecutive negative hours
+- Frequency 1/hr — under overtrading threshold
+- 0 open trades (quiet)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.59' — atr_sl_hit cluster (5T '-$0.71') remains the driver
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+- Note: recent_changes.log 12:05 entry has unquoted-$ bash corruption (`-/usr/bin/bash.06`) — historical, not rewriting

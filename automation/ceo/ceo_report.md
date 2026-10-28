@@ -546,3 +546,15 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Numbers: 24h 14T +0.07 71.4% | 7d 133T -0.34 52.6%
 ### Findings: Rotating Q (confluence-blocked signals): pipeline log shows confluence currently PASSING shorts (volume-buildup-/pump-chain- via NEUTRAL-relax/standalone) — not starving. 4 open positions all LONG (BTC #16450 flat, 2x warrior-sr, bb-squeeze -0.29%). Alerts: routine BTC_LEVEL blocks + one CASHCAT override; no new Tracebacks.
 ### Recommendation: none — 24h green at 71.4% WR; watch 7d stay below zero before any action.
+
+## CEO Status — 20261028T072659Z
+### Health: pipeline=inactive (normal between 1-min timer ticks; last run 07:27Z rc=0) guardian=active open_pos=1
+### Numbers: 24h 19T -0.44 52.6% | 7d 139T -0.74 51.8%
+### Findings: checkpoint `btc-16450-8h-stale` OVERDUE since 05:54Z — BTC #16450 LONG (continuum-trend+, never armed, ~flat) sitting unmanaged past its 8h exit rule; error_alerts confirms escalation at 06:39Z. Proactive Q (28%14=0, PnL): 7d -0.74 is the unarmed-chop bleed pattern already owned (armed 80T +4.28 vs unarmed 56T -4.75 per CURRENT.md) — no new problem.
+### Recommendation: Execute or retract the overdue btc-16450 checkpoint this tick (exit if 1m still below EMA300, retract if reclaim holds) — it is CEO/autopilot domain and is now 90+ min overdue.
+
+## CEO Status — 20261028T112659Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 24T -0.54 50.0% | 7d 136T -0.68 52.2%
+### Findings: Rotating Q (coin_tracker signals this week): 0 trades with any coin_tracker/wyckoff/accumulation signal in 7d; 23 distinct signals fired, none from coin_tracker. System remains near-breakeven (7d -0.68 over 136T). Recent errors: only routine BLOCKED warnings (MOMENTUM/BTC_LEVEL gates working as designed), no new tracebacks.
+### Recommendation: Delegate coin_tracker outcome-join / phase-transition signal build to signal_analyst (Nov 15 floor_admit+wyckoff join already queued — pull it forward if capacity allows).
