@@ -16926,3 +16926,25 @@ BY: upgrade_implementer
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
 - brain_auditor #193 follow-up MED: trades.pnl_pct has 2 unit conventions (5.9% unlevered rows) — analytics should use pnl_usdt until write-path pinned (auditor-owned, not auto_1hr)
+
+## 2026-10-28 10:29 Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 24T 12W 50.0% '-$0.54' (RED) | 7d 135T 70W 51.9% '-$0.72' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0 closes last hour; 24h worst volume-buildup- 4T 25% '-$0.45' but 14d positive in NORMAL (64.7%) and HIGH (69.2%) — regime-kill bar not met (checked 09:35)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 5/24 = 20.8% (<40%) — SL not too tight; dominant closes = ugb_pt (6T '+$0.10') + profit-monster-trail (6T '+$0.41')
+- Boost: bb-squeeze+ 7T 71.4% '+$0.29' meets criteria but identical numbers to 09:35 check (0 new closes) — second same-day bump = churn, hold at 0.9
+- Neg streak: 0 closes this hour, streak stalled; regime LONG_BIAS not NEUTRAL, size lever N/A
+- Frequency 0/hr — under overtrading threshold
+- 2 open: BTC ai-trader-pending LONG (-0.15%), MINA bb-squeeze+ LONG (+0.09%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.54' — atr_sl_hit cluster (5T '-$0.71') remains the driver
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
