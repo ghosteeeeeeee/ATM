@@ -1752,6 +1752,10 @@ def _score_signal(token, direction, conf, source, signal_type,
         # Log notable reputation decisions
         if _rep_result['mult'] < 0.5:
             log(f"  🚫 [REP] {token}+{source}+{direction}: low reputation {_rep_result['mult']:.3f}x ({_rep_hos['reason']})")
+            # Reason-lie fix (claim-then-starve investigation 20261029): decay killers
+            # leave no gate name — stamp it so the sweep's COALESCE keeps the truth
+            # (later gates overwrite; last writer wins).
+            _tombstone_pending(token, direction, 'rep-low-reputation')
         elif _rep_result['mult'] >= 1.5:
             log(f"  🏆 [REP] {token}+{source}+{direction}: high reputation {_rep_result['mult']:.3f}x")
 
@@ -1915,6 +1919,12 @@ def _score_signal(token, direction, conf, source, signal_type,
                     token, direction, _rr_price, signal_type=signal_type)
                 if rr_mult != 1.0:
                     log(f"  🎯 [RR-ENGINE] {token} {direction}: {rr_reason} → mult={rr_mult:.2f}")
+                    if rr_mult == 0.0 and not RR_ENGINE_CONF_SHADOW:
+                        # Reason-lie fix (claim-then-starve investigation 20261029):
+                        # multiplier kills never wrote a gate name, so the 10-min sweep
+                        # stamped 'compaction_stale_10min' over the true cause. Last
+                        # tombstone wins (same helper as approval sites).
+                        _tombstone_pending(token, direction, 'rr-engine-hard-block')
                 # Store RAW rr_mult for dynamic RSI ceiling (before shadow override)
                 _rr_mult_tracker[(token.upper(), direction.upper())] = rr_mult
                 if RR_ENGINE_CONF_SHADOW:
