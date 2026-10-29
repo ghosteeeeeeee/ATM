@@ -584,6 +584,27 @@ except:
     pass
 ```
 
+## AMPLIFY — weekly offense mandate (CEO consult 20261029T173906Z, T sign-off 2026-10-29)
+
+Defense (kills/refusals/dispositions) has five owners; offense had ZERO — this section
+is the fix. EVERY weekly run MUST end with the AMPLIFY step, after the kill analysis:
+
+1. **Rank 30d winner cells** (PG closed trades, n>=10, net>0; also n>=5 cells for
+   early signals — label them) — signal × volatility_regime × direction.
+2. **Emit >=1 proposal per run** into `data/shadow_disposition.json` (kind: "amplify")
+   with threshold + deadline + measurement. Allowed proposal types:
+   (a) param-widen counterfactual on a validated cell (units guard mandatory — the
+   #193 landmine has struck twice),
+   (b) winner-cell notional mult change (WINNER_CELLS_VALIDATED in hermes_constants),
+   (c) clone-hunt: mine signals/gate_shadow against the winner profile for setups
+   that were BLOCKED (confluence/ctx/regime) and counterfactual-walk candles.
+3. **Flip-KPI (pre-registered at audit #86, now with a floor): >=1 shadow->live
+   conversion per week**, reported in the CEO status consult. A run that proposes
+   nothing must say why in the kanban (e.g., "no cell cleared the bar this week").
+4. Existing in-flight offense entries to service (do not duplicate):
+   fade-ctx-exempt (11-10), winner-cell-size-125 (11-10), bb-squeeze-hml-entry-profile
+   (11-17), eval-midband-long-4564 (11-03).
+
 ### Log to kanban:
 ```markdown
 ## TEAM UPDATES

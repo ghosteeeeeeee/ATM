@@ -151,6 +151,75 @@ def _contrarian_live_hit(source):
         return False
 
 
+# ── OFFENSE (CEO consult 20261029T173906Z, T sign-off 2026-10-29) ─────────────
+# Fade gate-exemption (shadow-first) + winner-cell sizing. Evidence + bars live in
+# hermes_constants (OFFENSE block): CTX-misalignment + LONG knife killed 82% of the
+# 39 live fade flips; fade OOS 64.6% n=350. _FADE_CTX is set per-candidate right
+# after _apply_inversion in BOTH entry paths (main + delayed) so it can never leak
+# across candidates (single mutable holder — no global-rebind needed).
+_FADE_CTX = {'on': False}
+
+
+def _fade_exempt_allowed(gate_label, token, direction, extra=''):
+    """Shadow/enforce gate for CONTRARIAN-LIVE fade entries.
+
+    SHADOW (default, CONTRARIAN_CTX_EXEMPT_SHADOW=True): logs WOULD-FILL, caller
+    STILL blocks — zero behavior change while the 7d bar accumulates (>=15 fade
+    fills & >= +$1.00, deadline 2026-11-10).
+    ENFORCE (CONTRARIAN_CTX_EXEMPT_ENFORCE=False until the flip): returns True —
+    caller falls through and the entry proceeds. knife<35 doctrine stays global:
+    the knife leg gets HALF-SIZE only (FADE_EXEMPT_KNIFE_SIZE_MULT), never a band
+    bypass — the half-size plumbing ships with the enforce flip, not before.
+    Non-faded entries always get False. Fails safe on constants errors."""
+    if not _FADE_CTX['on']:
+        return False
+    try:
+        from hermes_constants import CONTRARIAN_CTX_EXEMPT_SHADOW, CONTRARIAN_CTX_EXEMPT_ENFORCE
+    except Exception:
+        return False
+    try:
+        if CONTRARIAN_CTX_EXEMPT_ENFORCE:
+            log(f'  👻 [FADE-EXEMPT] {token} {direction}: {gate_label} exempted '
+                f'(fade OOS 64.6% n=350){extra}')
+            return True
+        if CONTRARIAN_CTX_EXEMPT_SHADOW:
+            log(f'  👻 [FADE-EXEMPT-SHADOW] {token} {direction}: WOULD-FILL past {gate_label} '
+                f'(fade OOS 64.6%){extra} — enforcement pending 7d bar (>=15 fills & >=+$1.00, deadline 11-10)')
+    except Exception:
+        pass
+    return False
+
+
+def _get_winner_cell_size_mult(token, source, direction):
+    """Winner-cell notional multiplier (CEO consult 20261029T173906Z, T 'proceed').
+
+    1.25x (WINNER_CELL_SIZE_MULT, cap WINNER_CELL_SIZE_MULT_CAP) when the signal
+    substring + live volatility regime match a validated WINNER_CELLS_VALIDATED
+    cell. Regime via volatility_gate_v2.get_atr_pct + classify_volatility — the
+    same source the gates use (no second regime definition). Fails safe -> 1.0.
+    Caller keeps the HL_MIN_NOTIONAL floor AFTER this multiplier (units guard)."""
+    try:
+        from hermes_constants import (WINNER_CELLS_VALIDATED, WINNER_CELL_SIZE_MULT,
+                                      WINNER_CELL_SIZE_MULT_CAP)
+        if not WINNER_CELLS_VALIDATED or WINNER_CELL_SIZE_MULT <= 1.0:
+            return 1.0
+        try:
+            from volatility_gate_v2 import get_atr_pct, classify_volatility
+            _wc_regime = classify_volatility(get_atr_pct(token))
+        except Exception:
+            return 1.0
+        _wc_src = str(source or '')
+        for _sig, _reg in WINNER_CELLS_VALIDATED:
+            if _sig in _wc_src and _wc_regime == _reg:
+                _wc_mult = min(WINNER_CELL_SIZE_MULT, WINNER_CELL_SIZE_MULT_CAP)
+                log(f'  🎯 [WINNER-CELL-SIZE] {token} {direction}: {_sig} in {_reg} cell '
+                    f'-> x{_wc_mult:.2f} (cap {WINNER_CELL_SIZE_MULT_CAP:.2f})')
+                return _wc_mult
+        return 1.0
+    except Exception:
+        return 1.0
+
+
 def _apply_inversion(direction, source, token=''):
     """Apply static + dynamic signal inversion. Returns (new_direction, was_flipped)."""
     # 0) Contrarian LIVE — SHADOW-RECKONING #1 (CEO consult 20261027T024741Z, T
@@ -766,6 +835,8 @@ def process_delayed_entries(paper=False):
         # ── Signal Inversion (static + dynamic) for delayed entries ───────
         direction, _ = _apply_inversion(direction, source, token)
         entry['direction'] = direction
+        # OFFENSE (CEO 20261029): delayed-entry path marks fade entries too
+        _FADE_CTX['on'] = bool(_contrarian_live_hit(source))
 
         # ── Dead-Hours Filter for delayed entries ────────────────────────
         if DEAD_HOURS_ENABLED:
@@ -858,11 +929,14 @@ def process_delayed_entries(paper=False):
 
         _base_size = _get_dynamic_position_size()
         _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
+        # OFFENSE (CEO 20261029): winner-cell 1.25x on validated cells (HL_MIN floor below)
+        _trade_size *= _get_winner_cell_size_mult(token, source, direction)
         # FIX 2026-10-12 (code review R775): this delayed-entry path was MISSING the
         # HL_MIN cap that the main execution path has (see ~line 2202). AMPLITUDE_SIZE_MULT
         # includes 0.5 (CHAOTIC), so $11 x 1.0 x 0.5 = $5.50 — brain.py's add_trade gate
         # then hard-rejects with "amount_usdt < HL_MIN". Same "penalty becomes kill" class
         # as the Hall of Shame bug. Cap after multipliers, matching the main path.
+        # (Winner-cell mult applies BEFORE this floor — units guard, audit #193.)
         _trade_size = max(_trade_size, HL_MIN_NOTIONAL_USDT)
 
         # ── RACE CONDITION FIX: Write marker BEFORE brain.py subprocess ────
@@ -1388,12 +1462,16 @@ def rule_based_context_gate(token, direction, source, sig):
             if _long_ceiling > 0 and _live_rsi_long > _long_ceiling:
                 return ('SKIP', f'LONG RSI ceiling: LIVE RSI {_live_rsi_long:.1f} > {_long_ceiling} (overbought — chasing extended move)', 0)
             if LONG_RSI_FLOOR > 0 and _live_rsi_long < LONG_RSI_FLOOR:
-                return ('SKIP', f'LONG RSI floor: LIVE RSI {_live_rsi_long:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)', 0)
+                if not _fade_exempt_allowed('LONG-RSI-FLOOR(live-knife)', token, direction,
+                                            extra=' [enforce: HALF-SIZE per FADE_EXEMPT_KNIFE_SIZE_MULT]'):
+                    return ('SKIP', f'LONG RSI floor: LIVE RSI {_live_rsi_long:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)', 0)
         if _detect_rsi_long is not None:
             if _long_ceiling > 0 and _detect_rsi_long > _long_ceiling:
                 return ('SKIP', f'LONG RSI ceiling: DETECT RSI {_detect_rsi_long:.1f} > {_long_ceiling} (detected overbought — chasing extended move)', 0)
             if LONG_RSI_FLOOR > 0 and _detect_rsi_long < LONG_RSI_FLOOR:
-                return ('SKIP', f'LONG RSI floor: DETECT RSI {_detect_rsi_long:.1f} < {LONG_RSI_FLOOR} (detected oversold — falling knife)', 0)
+                if not _fade_exempt_allowed('LONG-RSI-FLOOR(detect-knife)', token, direction,
+                                            extra=' [enforce: HALF-SIZE per FADE_EXEMPT_KNIFE_SIZE_MULT]'):
+                    return ('SKIP', f'LONG RSI floor: DETECT RSI {_detect_rsi_long:.1f} < {LONG_RSI_FLOOR} (detected oversold — falling knife)', 0)
 
     # 1c. Z-Score + Acceleration alignment (surfing.md quadrants)
     # Hard block: misaligned direction = low WR (CEO backtested)
@@ -1401,9 +1479,11 @@ def rule_based_context_gate(token, direction, source, sig):
     # Misaligned: LONG z<0 + accel<0 (24.7%), SHORT z>0 + accel>0 (23.8%)
     if ZSCORE_ACCEL_ENABLED and z_score is not None and accel is not None:
         if direction == 'LONG' and z_score < -ZSCORE_ACCEL_Z_THRESHOLD and accel < -ZSCORE_ACCEL_ACCEL_THRESHOLD:
-            return ('SKIP', f'misaligned LONG: z={z_score:.2f} accel={accel:+.4f} (collapsing, wrong for LONG)', 0)
+            if not _fade_exempt_allowed('Z-ACCEL-MISALIGNED', token, direction):
+                return ('SKIP', f'misaligned LONG: z={z_score:.2f} accel={accel:+.4f} (collapsing, wrong for LONG)', 0)
         if direction == 'SHORT' and z_score > ZSCORE_ACCEL_Z_THRESHOLD and accel > ZSCORE_ACCEL_ACCEL_THRESHOLD:
-            return ('SKIP', f'misaligned SHORT: z={z_score:.2f} accel={accel:+.4f} (rising, wrong for SHORT)', 0)
+            if not _fade_exempt_allowed('Z-ACCEL-MISALIGNED', token, direction):
+                return ('SKIP', f'misaligned SHORT: z={z_score:.2f} accel={accel:+.4f} (rising, wrong for SHORT)', 0)
 
     # 2. Clear setup: z + speed both strong → GO (no LLM needed)
     # But only if price history is fresh (< 5 min old)
@@ -2491,8 +2571,10 @@ def execute_trade(token, direction, price, confidence, source,
                     return False, f'RSI floor: {_exec_rsi:.1f} < {_exec_soft_floor}'
                 log(f'  ✅ [EXEC-RSI-FLOOR-BEAR] {token} {source}: RSI {_exec_rsi:.1f} < {_exec_soft_floor} allowed at execution (soft floor) — BTC bearish structure')
             if direction.upper() == 'LONG' and LONG_RSI_FLOOR > 0 and _exec_rsi < LONG_RSI_FLOOR:
-                log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
-                return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
+                if not _fade_exempt_allowed('EXEC-RSI-LONG-FLOOR', token, direction,
+                                            extra=' [enforce: HALF-SIZE per FADE_EXEMPT_KNIFE_SIZE_MULT]'):
+                    log(f'  🚫 [EXEC-RSI-FLOOR] {token} LONG BLOCKED — RSI {_exec_rsi:.1f} < {LONG_RSI_FLOOR} at execution time')
+                    return False, f'RSI floor: {_exec_rsi:.1f} < {LONG_RSI_FLOOR}'
             # brain_auditor 2026-10-16: SHORT mid-band death band 45-55 — mirror of LONG_MIDBAND.
             # Non-pump-chain 14d 9T 0W -$0.89; 7d 8T 0W -$0.76; 48h 0W (watchdog pattern alert).
             # pump-chain exempt: 14d 16T 4W +$0.42 (only profitable pocket in band).
@@ -2685,6 +2767,8 @@ def execute_trade(token, direction, price, confidence, source,
 
     _base_size = _get_dynamic_position_size()
     _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
+    # OFFENSE (CEO 20261029): winner-cell 1.25x on validated cells (HL_MIN floor below)
+    _trade_size *= _get_winner_cell_size_mult(token, source, direction)
     # FIX 2026-09-06: Cap at HL_MIN after multipliers — amplitude/fav mults can reduce below minimum
     _trade_size = max(_trade_size, HL_MIN_NOTIONAL_USDT)
 
@@ -4733,6 +4817,9 @@ def run(dry_run=False):
         # ── Signal Inversion (static + dynamic, BEFORE context gate) ─────
         direction, _flipped = _apply_inversion(direction, source, token)
         flipped_direction = direction if _flipped else None
+        # OFFENSE (CEO 20261029): mark this candidate as a contrarian fade entry
+        # (re-set every iteration — _FADE_CTX can never leak across candidates)
+        _FADE_CTX['on'] = bool(_flipped and _contrarian_live_hit(source))
 
         # ── Z-Score Freshness Check (CRITICAL: prevent stale signal execution) ──
         # If z-score direction has flipped since signal generation, skip the trade.

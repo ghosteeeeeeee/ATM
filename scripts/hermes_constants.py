@@ -1063,6 +1063,41 @@ CHASE_RATIO_MAX = 0.70               # block if |move5m| / |move15m| > this
 # rules.unclog_waiver.scope. Classifier: decider_run._is_policy_refusal().
 HOTSET_FAIL_COUNT_POLICY_REFUSALS = False
 
+# ── OFFENSE (CEO consult 20261029T173906Z "offense stall", T sign-off 2026-10-29
+# "Do what you need to... proceed") ─────────────────────────────────────────────
+# Contrarian-fade gate exemption: kill-table of all 39 unique fade flips since
+# 10-27 → CTX-GATE z/accel-misalignment 19 (49%) + LONG knife floor 13 (33%) =
+# 82% die to the two gates that are STRUCTURALLY anti-fade (the dump that fires
+# pump-chain- is exactly what makes the faded LONG look "collapsing"). Fade OOS
+# 64.6% (226/350 shadow outcome-join). SHADOW FIRST: decider._fade_exempt_allowed()
+# logs WOULD-FILL while ENFORCE=False (zero behavior change). Flip ENFORCE=True
+# only after the PRE-REGISTERED bar: >=15 fade fills AND fade net >= +$1.00 over
+# 7d (deadline 2026-11-10 — must land BEFORE the pump-chain- family disposition).
+# knife<35 doctrine stays GLOBAL: the knife leg is HALF-SIZE only
+# (FADE_EXEMPT_KNIFE_SIZE_MULT, CONTRARIAN_ZONE_POSITION_SIZE_MULT precedent),
+# never a band bypass. Revert: ENFORCE=False (logging resumes, zero behavior).
+CONTRARIAN_CTX_EXEMPT_SHADOW = True
+CONTRARIAN_CTX_EXEMPT_ENFORCE = False
+FADE_EXEMPT_KNIFE_SIZE_MULT = 0.5    # enforce-phase half-size for RSI<35 fades
+
+# Winner-cell notional (same consult; T sign-off "proceed" — money sizing was the
+# one item explicitly requiring him): validated cells only, from 14d PG cells with
+# n>=5 and positive net (CEO re-verified): bb-squeeze+ NORMAL 29T 69.0% +$0.63 |
+# volume-buildout- HIGH 14T 71.4% +$0.21 | r2v2-long3 NORMAL 5T 80% +$0.19 |
+# pump-chain+ EXTREME 34T 41.2% +$0.02. 1.25x notional, hard cap 1.5x; measurement:
+# 14d tagged-cell net delta >= +$1.00 (deadline 2026-11-10); revert:
+# WINNER_CELL_SIZE_MULT = 1.0. Units guard (audit #193 landmine): the multiplier
+# applies to notional AFTER dynamic sizing and BEFORE the HL_MIN_NOTIONAL floor —
+# a size can never be pushed below minimum.
+WINNER_CELL_SIZE_MULT = 1.25
+WINNER_CELL_SIZE_MULT_CAP = 1.5
+WINNER_CELLS_VALIDATED = {
+    ('bb-squeeze+', 'NORMAL'),
+    ('volume-buildout-', 'HIGH'),
+    ('r2v2-long3', 'NORMAL'),
+    ('pump-chain+', 'EXTREME'),
+}
+
 # ── Chase-Move Shadow Gate (brain_auditor 2026-10-27, run #188) ─────────────
 # The CHASE gap/z gate is LONG-only and gap-anchored (2.0%); CHASE_RATIO above
 # failed its revert bar. This is a third, orthogonal measure: how far price has
