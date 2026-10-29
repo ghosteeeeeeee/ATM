@@ -277,7 +277,9 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Proven performers — high WR + profitable + decent sample.
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
-FAVORITES_LONG = set()
+FAVORITES_LONG = {
+    'BTC'
+}
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
 }
@@ -871,9 +873,64 @@ INVERSE_ACCEL_300_CAUTION_PHASES = set()  # all phases allowed
 # ── Context Gate ───────────────────────────────────────────────────────────────
 # Two-layer gate before trade execution: rule-based (free) → LLM-based (quota).
 # Only fires when signal has passed ALL other filters (dead-hours, phase, position).
+# ── LLM model: SINGLE SOURCE OF TRUTH ──────────────────────────────────────────
+# T directive 2026-10-29: mimo-v2.5 was deprecated (HTTP 410 ModelDeprecated) and
+# the whole automation fleet started failing. Centralized so the model is set in
+# exactly ONE place:
+#
+#     /root/.config/opencode/opencode.jsonc   "model": "<provider>/<model>"
+#
+# That file is opencode's default-model config. Every bare `opencode run` in the
+# fleet already inherits it (watchdog, orchestrator, ceo×4, brain-auditor,
+# auto-1hr, blacklist-tester, health-monitor, ...) — verified: injecting the key
+# there flipped all bare runs from mimo-v2.5 → mimo-v2.6-flash with no other
+# change. CONTEXT_GATE_LLM_MODEL below DERIVES from the same key so the context
+# gate's explicit `-m` flag can never drift from the fleet default again.
+#
+# TO CHANGE THE MODEL FLEET-WIDE: edit the "model" key in that jsonc. Nothing
+# else needs changing. The hardcoded value here is a LAST-RESORT fallback for
+# when that file is missing/unreadable — it is NOT the primary source, so do not
+# edit it when switching models.
+_OP_ENCODE_MODEL_FILE = '/root/.config/opencode/opencode.jsonc'
+_OP_ENCODE_MODEL_FALLBACK = 'opencode-go/mimo-v2.6-flash'
+
+
+def _load_fleet_llm_model():
+    """Read the canonical model id from opencode's config (single source of truth).
+
+    Tries strict JSON first, then a JSONC-aware regex (the shipped config has a
+    trailing comma + allows comments). Never raises — falls back to the constant
+    above so the context gate always has a usable provider/model string.
+    """
+    import json as _json
+    import re as _re
+    try:
+        with open(_OP_ENCODE_MODEL_FILE, 'r', encoding='utf-8') as _f:
+            _raw = _f.read()
+    except Exception:
+        return _OP_ENCODE_MODEL_FALLBACK
+    # 1) strict JSON (config with no comments/trailing commas)
+    try:
+        _m = _json.loads(_raw).get('model')
+        if isinstance(_m, str) and _m:
+            return _m
+    except Exception:
+        pass
+    # 2) JSONC: match the top-level "model" key. Anchored to line start + exactly
+    #    2-space indent (this file's top level) so a nested provider-level "model"
+    #    can't be mistaken for the fleet default.
+    try:
+        _m = _re.search(r'^  "model"\s*:\s*"([^"]+)"', _raw, _re.MULTILINE)
+        if _m:
+            return _m.group(1)
+    except Exception:
+        pass
+    return _OP_ENCODE_MODEL_FALLBACK
+
+
 CONTEXT_GATE_ENABLED = True          # master switch
 CONTEXT_GATE_LLM_ENABLED = True      # LLM fallback (rule-based always runs first)
-CONTEXT_GATE_LLM_MODEL = 'opencode-go/mimo-v2.5'  # model for context gate LLM calls (switched from minimax/MiniMax-M3 2026-08-10)
+CONTEXT_GATE_LLM_MODEL = _load_fleet_llm_model()  # derived from opencode config (single source) — mimo-v2.5 deprecated 410, was hardcoded here
 CONTEXT_GATE_SPEED_MIN = 20          # below this → SKIP (no wave)
 CONTEXT_GATE_Z_COUNTER_TREND = 1.5   # z-score contradicting signal + low speed → SKIP
 CONTEXT_GATE_Z_RANGING = 0.5         # |z| below this = ranging
