@@ -526,3 +526,7 @@ BY: auto_1hr
 - [2026-10-27 22:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 19T 13W 68.4% '+$0.39' GREEN | 7d 139T 50.4% '-$0.47' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h n>=3 all positive-WR) | atr_sl_hit 1/19=5.3% under 40% | no neg streak (19:00 +0.04, 17:00 +0.02, 16:00 +0.16) | frequency 0/hr | 1 open bracketed BTC continuum-trend+ (SL 80053 / TP 82164) | No constants change -> no signal_versions entry
 - [2026-10-27 23:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 19T 13W 68.4% '+$0.39' GREEN | 7d 138T 51.4% '-$0.33' (improving) — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h n>=3 all positive-WR) | atr_sl_hit 1/19=5.3% under 40% | no neg streak (19:00 +0.04, 17:00 +0.02, 16:00 +0.16) | frequency 0/hr | 1 open bracketed BTC continuum-trend+ | No constants change -> no signal_versions entry
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-10-29 17:45] auto_1hr: NO CONFIG CHANGE — 3T last hour 0W3L $-0.15 (COMP/WLFI bb-squeeze+ trail_arm_timeout, BLUR pump-chain+ ugb_pt) | 24h 26T 65.4% $-0.22 RED | 7d 144T 56.3% $-0.69 — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR) | atr_sl_hit 3/26=11.5% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 10T 80% +$0.11 10 tokens at 1.0 ceiling, hold | neg streak 1h only | frequency 3/hr | 0 open — why: no trigger met any action rule
+BY: auto_1hr

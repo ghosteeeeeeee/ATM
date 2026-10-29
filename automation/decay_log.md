@@ -2057,3 +2057,12 @@
 [2026-10-29 02:45 UTC]   🟢 OK: bb-squeeze+: 10 trades, 90.0% WR, PnL=1.73
 [2026-10-29 02:45 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-29 02:45 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-29 08:45 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-29 08:45 UTC]   🟢 OK: volume-buildup-: 5 trades, 40.0% WR, PnL=-2.36
+[2026-10-29 08:45 UTC]   🟢 OK: bb-squeeze+: 8 trades, 100.0% WR, PnL=2.42
+[2026-10-29 08:45 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-29 08:45 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-29 14:45 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-29 14:45 UTC]   🟢 OK: bb-squeeze+: 7 trades, 100.0% WR, PnL=2.04
+[2026-10-29 14:45 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-29 14:45 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

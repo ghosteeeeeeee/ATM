@@ -17534,3 +17534,46 @@ Quiet hour — 0 closes, 0 open positions.
 - volume-buildup- NORMAL regime n=16 losing — recheck when n>=20
 - 24h still RED '-$0.13' despite 71.4% WR — atr_sl_hit losers (-$0.45) outweigh trail wins
 - bb-bounce-v2-long+ CEO kill review still pending
+
+## [2026-10-29 16:45] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** +$0.06 (WR: 100%) | 24h: 23T 17W 73.9% '$-0.07' RED | 7d 141T 81W 57.4% '$-0.54' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no n>=3 0%-WR signal last hour (each signal 1 win); volume-buildup- 24h 2T 50% '$-0.10' — kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 3/23 = 13.0% (<40%) — SL not too tight; dominant close = profit-monster-trail (10T '+$0.44')
+- Boost: bb-squeeze+ 9T 100.0% '+$0.25' across 9 tokens (TURBO/GOAT/KAS/DOGE/CAKE/STABLE/POL/ETC/BANANA) meets criteria but weight already at 1.0 ceiling — no headroom
+- Neg streak: hourly PnL 14h -$0.07, 15h -$0.12, 16h +$0.06 — only 2 consecutive negative hours, not 3
+- Frequency 2/hr — under overtrading threshold
+- 3 open: WLFI bb-squeeze+ LONG, COMP bb-squeeze+ LONG, BLUR pump-chain+ LONG
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still RED '-$0.07' despite 73.9% WR — atr_sl_hit losers (-$0.45) outweigh trail wins
+- 7d RED '-$0.54' — watch, but no single actionable signal (worst continuum-osc- n=1)
+
+## [2026-10-29 17:45] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** $-0.15 (WR: 0%) | 24h: 26T 65.4% '$-0.22' RED | 7d 144T 56.3% '$-0.69' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no n>=3 0%-WR signal last hour (each signal 1 loss); volume-buildup- 24h 2T 50% — kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 3/26 = 11.5% (<40%) — SL not too tight; dominant close = profit-monster-trail (10T '+$0.44')
+- Boost: bb-squeeze+ 10T 80.0% '+$0.11' across 10 tokens meets criteria but weight already at 1.0 ceiling — no headroom
+- Neg streak: hourly 16h +$0.05, 17h -$0.14 — only 1 consecutive negative hour, not 3
+- Frequency 3/hr — under overtrading threshold
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.22' despite 65.4% WR — atr_sl_hit losers (-$0.45) + trail_arm_timeout (-$0.14) outweigh trail wins
+- 7d RED '-$0.69' — watch, but no single actionable signal (worst continuum-osc- n=1)
+- bb-squeeze+ 1.0 treated as ceiling per prior runs though coil-trigger has 1.4 — revisit only with CEO approval

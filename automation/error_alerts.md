@@ -2272,3 +2272,32 @@
 
 ## Error Alerts — 2026-10-29 06:41 UTC
 - **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-10-29 07:41 UTC
+- **REPEATED** (11x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (11x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK mid-band death band: N.N in N-N`
+- **REPEATED** (10x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK mid-band death band: N.N in N-N`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK knife floor: N.N < N`
+
+## Error Alerts — 2026-10-29 10:41 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK hard floor (detect): N.N < N`
+
+## Error Alerts — 2026-10-29 12:41 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-29 13:41 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] USELESS TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-10-29 14:41 UTC
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.2s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.1s (rc=N)`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.3s (rc=N)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.5s (rc=N)`
+
+## Error Alerts — 2026-10-29 16:41 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   decider_run: TOK in N.9s (rc=N)`
+
+## Error Alerts — 2026-10-29 17:41 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
