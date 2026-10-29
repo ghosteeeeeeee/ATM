@@ -206,6 +206,7 @@ REGIME_SIGNALS = {
         'mtf-regime-trend+', 'mtf-regime-trend-',  # multi-timeframe regime trend — added 2026-10-04: sync with v1 EXTREME
         'r2v2-long', 'r2v2-long3',  # R² trend v2 — added 2026-10-09: LDO LONG blocked in EXTREME
         'hmacd-mtf', 'hmacd_mtf', 'hmacd_mtf-+', 'hmacd-mtf-+',  # multi-timeframe MACD — added 2026-10-09
+        'btc-pump-rider+',  # BTC breakout → alt lagging LONG — added 2026-10-29: 10 signals blocked by storm gate, ATR 1.5-1.9% is routine now
         'volume_breakout+', 'volume_breakout-',  # volume-confirmed breakout — wins in EXTREME (67% WR)
         'volume-breakout-long+',  # volume-confirmed breakout LONG (hyphen variant) — added 2026-10-09: sync with v1
         'volume-breakout-short-', 'volume_breakout_short',  # volume-confirmed breakout SHORT — added 2026-10-09: BANANA SHORT blocked
