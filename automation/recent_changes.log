@@ -5417,3 +5417,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-29 08:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 22T 59.1% '$-0.35' RED | size-reduce 1.0x (file absent = truth) | kill: none (0T last hour) | atr_sl_hit 2/22=9.1% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 8T 100% '+$0.26' at 1.0 ceiling, hold | neg streak 1h only | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-10-29 13:41 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L +$0.10 (CHIP pump-chain+ ugb_pt +2.80%) | 24h 18T 72.2% '$-0.14' RED improving | 7d 133T 56.4% '$-0.45' — size-reduce 1.0x (file absent = truth) | kill: none (1T win; volume-buildup- 14d HIGH positive) | atr_sl_hit 2/18=11.1% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 7T 100% '+$0.22' 7 tokens at 1.0 ceiling, hold | neg streak none | frequency 1/hr | 2 open BTC continuum-osc- SHORT / YGG volume-buildup- SHORT | No constants change -> no signal_versions entry
+BY: auto_1hr

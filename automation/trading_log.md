@@ -17470,3 +17470,24 @@ Quiet hour — 0 closes, 0 open positions.
 - volume-buildup- still worst 24h signal '$-0.40' (5T 40%) but 14d HIGH positive — regime-kill bar not met
 - pump-chain+ 24h 0W3L '$-0.11' — small n, watch
 - bb-bounce-v2-long+ CEO kill review still pending
+
+## 2026-10-29 13:41 UTC Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** +$0.10 (WR: 100.0%) | 24h: 18T 13W 72.2% '$-0.14' RED improving | 7d 133T 75W 56.4% '$-0.45' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 1T last hour (win) — no n>=3 0%-WR signal to evaluate; volume-buildup- 3T 33% '-$0.34' worst 24h but 14d HIGH positive — regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/18 = 11.1% (<40%) — SL not too tight; dominant close = profit-monster-trail (8T '+$0.36', WR 100%)
+- Boost: bb-squeeze+ 7T 100.0% '+$0.22' across 7 tokens meets criteria but at 1.0 ceiling — no headroom
+- Neg streak: none (hourly: +$0.10, +$0.03) — not 3 consecutive negative hours
+- Frequency 1/hr — under overtrading threshold
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- 24h 3T 33% '$-0.34' worst signal — 14d HIGH positive; watch with open YGG SHORT
+- pump-chain+ 24h 2T 50% '$0.00' flat — CHIP ugb_pt +2.80% win recovered earlier loss
+- bb-bounce-v2-long+ CEO kill review still pending
