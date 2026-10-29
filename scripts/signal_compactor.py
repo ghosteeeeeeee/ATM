@@ -2324,20 +2324,26 @@ def _tombstone_pending(tok, dirn, gate, dry=False, src_contains=None):
         log(f"  ⚠️ tombstone failed for {tok} {dirn} ({gate}): {_tbe}", 'WARN')
 
 
-def _fade_effective_source(source):
+def _fade_effective_source(source, regime=None):
     """RC1 effective-source rule (CEO-APPROVED-TO-FLIP, consult 20261029T1930Z).
 
     For contrarian-live fade sources (exact contracted parts, same predicate as
     decider._contrarian_live_hit — replicated locally to avoid importing the
     heavy decider module), return the POST-FADE ('+'-form) source so
     direction-keyed approval gates judge the direction that will actually
-    trade. Non-fade sources are returned unchanged. Evidence: fade EXTREME
-    OOS 67.3% n=226 (split 5434f9ac) vs the ('EXTREME','pump-chain-'):0.0
-    override keyed on the stored '-' sign; the bleed it targeted is the SHORT
-    side (28.4% WR live) which fades never trade. Keep HIGH hard block."""
+    trade. BOUNDED TO EXTREME when a regime is passed (review LOW-1): the
+    label's evidence is EXTREME-specific (fade EXTREME OOS 67.3% n=226, split
+    5434f9ac), and mapping in NORMAL would have INTRODUCED a new block
+    ('NORMAL','pump-chain+')=0.0 vs the stored '-' form's 1.2 pass — an
+    unlabeled kill. NORMAL fades keep pre-RC1 behavior until the CEO rules on
+    that regime. Non-fade sources are returned unchanged. Keep HIGH hard block.
+    Floor-site callers pass no regime (directional skip is label-wide: fades
+    trade LONG post-flip)."""
     try:
         from hermes_constants import CONTRARIAN_LIVE_ENABLED, CONTRARIAN_LIVE_PREFIXES
         if not CONTRARIAN_LIVE_ENABLED or not source:
+            return source
+        if regime is not None and regime != 'EXTREME':
             return source
         parts = [p.strip() for p in str(source).split(',')]
         if not (set(parts) & set(CONTRARIAN_LIVE_PREFIXES)):
@@ -3560,7 +3566,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # on the POST-FADE source form for contrarian-live entries — the
                     # stored '-' sign keyed a 0.0 that killed the profitable direction
                     # (fade-LONG EXTREME 67.3% n=226) along with the bleeding SHORT.
-                    _bypass_eff_src = _fade_effective_source(source)
+                    _bypass_eff_src = _fade_effective_source(source, regime=_vol_regime)  # EXTREME-bounded (review LOW-1)
                     _bypass_sig_mult = _get_signal_type_mult(_bypass_eff_src, _vol_regime, source=_bypass_eff_src or '')
                     if _bypass_sig_mult == 0.0:
                         log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction} BLOCKED — bypass denied, vol gate override=0.0 for '{source}' in {_vol_regime}"
