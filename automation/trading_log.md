@@ -17491,3 +17491,46 @@ Quiet hour — 0 closes, 0 open positions.
 - volume-buildup- 24h 3T 33% '$-0.34' worst signal — 14d HIGH positive; watch with open YGG SHORT
 - pump-chain+ 24h 2T 50% '$0.00' flat — CHIP ugb_pt +2.80% win recovered earlier loss
 - bb-bounce-v2-long+ CEO kill review still pending
+
+## 2026-10-29 14:43 UTC Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** -$0.06 (WR: 66.7%) | 24h: 20T 14W 70.0% '$-0.23' RED | 7d 137T 78W 56.9% '$-0.47' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 3T last hour, no n>=3 0%-WR signal (continuum-osc- 1T loss); volume-buildup- 24h 3T 33% '$-0.33' worst but 14d HIGH positive — regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 3/20 = 15.0% (<40%) — SL not too tight; dominant close = profit-monster-trail (8T '+$0.38')
+- Boost: bb-squeeze+ 7T 100.0% '+$0.22' meets criteria but at 1.0 ceiling — no headroom
+- Neg streak: only this hour -$0.06 (prior hours +$0.03, +$0.14) — not 3 consecutive negative hours
+- Frequency 3/hr — under overtrading threshold
+- 2 open: ETC bb-squeeze+ LONG, GRASS continuation+/pump-chain+ LONG
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- still worst 24h signal '$-0.33' (3T 33%) but 14d HIGH positive — regime-kill bar not met
+- BTC continuum-osc- SHORT atr_sl_hit -7.32% — single loss, n=1
+
+## [2026-10-29 15:42] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** +$0.01 (WR: 66.7%) | 24h: 21T 15W 71.4% '$-0.13' RED | 7d 139T 56.8% '$-0.60' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no n>=3 0%-WR signal last hour; volume-buildup- 14d: NORMAL 50% '$-0.63' (n=16), HIGH 71.4% '+$0.21' — wins in a regime, kill bar not met (needs all-regime loss n>=20)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 3/21 = 14.3% (<40%) — SL not too tight; dominant close = profit-monster-trail (8T '+$0.38', WR 100%)
+- Boost: bb-squeeze+ 8T 100.0% '+$0.25' across 8 tokens meets criteria but at 1.0 ceiling — no headroom
+- Neg streak: this hour +$0.01, prior +$0.06-ish — not 3 consecutive negative hours
+- Frequency 3/hr — under overtrading threshold
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- NORMAL regime n=16 losing — recheck when n>=20
+- 24h still RED '-$0.13' despite 71.4% WR — atr_sl_hit losers (-$0.45) outweigh trail wins
+- bb-bounce-v2-long+ CEO kill review still pending
