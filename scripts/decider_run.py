@@ -833,10 +833,12 @@ def process_delayed_entries(paper=False):
             log(f"  [DEBUG-HOTSET] open-skies: token={token} dir={direction} source={source} "
                 f"confidence={entry.get('confidence')} price={entry.get('price')}")
         # ── Signal Inversion (static + dynamic) for delayed entries ───────
-        direction, _ = _apply_inversion(direction, source, token)
+        direction, _flipped_delayed = _apply_inversion(direction, source, token)
         entry['direction'] = direction
-        # OFFENSE (CEO 20261029): delayed-entry path marks fade entries too
-        _FADE_CTX['on'] = bool(_contrarian_live_hit(source))
+        # OFFENSE (CEO 20261029): delayed-entry path marks fade entries too —
+        # mirror the main loop's formula (code review LOW-1: capture _flipped so
+        # an enforce-flip wired into this path cannot exempt non-flipped entries)
+        _FADE_CTX['on'] = bool(_flipped_delayed and _contrarian_live_hit(source))
 
         # ── Dead-Hours Filter for delayed entries ────────────────────────
         if DEAD_HOURS_ENABLED:
