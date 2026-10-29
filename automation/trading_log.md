@@ -17370,3 +17370,27 @@ Quiet hour — 0 closes, 1 open (NXPC volume-buildup- SHORT).
 - 24h improved '$-0.63' → '$-0.45' (losses aging out + no new losses)
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-29 05:44 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.14 (WR: 0.0%) | 24h: 26T 14W 53.8% '$-0.59' RED | 7d 131T 73W 55.7% '$-0.47' | **size-reduce: file absent -> 1.0x**
+
+1 close: NXPC volume-buildup- SHORT cut-loser-CL-T1 -$0.14 (-3.65%). 0 open positions.
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 1T last hour (n<3 trigger not met); volume-buildup- 24h 6T 33.3% '$-0.60' worst signal but 14d HIGH 13T 69.2% '+$0.17' positive — wins in HIGH, regime-kill bar not met; NORMAL 16T 50% '$-0.63' + EXTREME 11T 54.5% '$-0.21' negative — flagging below
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 3/26 = 11.5% (<40%) — SL not too tight; dominant close = profit-monster-trail (10T '+$0.48')
+- Boost: bb-squeeze+ 9T 100.0% '+$0.29' meets criteria but already at 1.0 ceiling — no headroom
+- Neg streak: 1h only (prior hours 0 closes) — not 3 consecutive negative hours
+- Frequency 1/hr — under overtrading threshold
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- NORMAL regime 14d: 16T 50% '$-0.63' bleed — worth blocking NORMAL via volatility_gate_v2.py if 24h stays negative; EXTREME was CEO-enabled (UNCLOG flip #2, 2026-10-22) so needs CEO approval to reverse
+- pump-chain+ 14d HIGH 6T 16.7% '$-0.50' — small n, watch
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
