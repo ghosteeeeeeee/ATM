@@ -1098,6 +1098,31 @@ WINNER_CELLS_VALIDATED = {
     ('pump-chain+', 'EXTREME'),
 }
 
+# ── STORM CONFLUENCE WAIVER (CEO consult 20261029T2130Z "storm-starvation", T
+# proceed 2026-10-29) — SHADOW FIRST ─────────────────────────────────────────
+# Gate-interaction starvation proven on the 10-29 dump: family blocks ban the
+# second sources, confluence then starves single-type shorts in exactly the
+# storms where those families cannot fire. CEO replay (honest RSI>=35 cohort,
+# first-fire-per-token, walk-to-21:06 at $11 notional): 13 blocked shorts =
+# +$8.31 (12W1L), 13/13 touched +0.40% (CONFL 7/+$5.72, HIGH 5/+$2.59) —
+# material vs -$/31 24h PnL. The 25 RSI<35 siblings were correctly knife-killed
+# at exec and are NOT counted (no double-count).
+# Waiver: single-type SHORT passes confluence only when ALL of (i)-(iii):
+#   (i)  BTC 1h move <= STORM_BTC_1H_MOVE_PCT (storm regime, regime-scoped);
+#   (ii) token RSI(14,5m) >= STORM_MIN_RSI (knife<35 doctrine stays GLOBAL);
+#   (iii) same-token+direction sibling carried an approval-gate block within
+#        STORM_SIBLING_WINDOW_MIN (the banned family signal IS the second source).
+# SHADOW default: log [STORM-CONFL-WAIVER-SHADOW] would-pass, still blocks.
+# Enforce flip: ENFORCE=True + bar >=3 consecutive storms with live evidence
+# from the auto_1hr storm-readiness packets (deadline 2026-11-12).
+# Revert: SHADOW=False (logging stops, zero behavior). HIGH-block carve-out
+# REJECTED by CEO (14d 20%WR data beats one dump; revisit at >=3 storm-packets).
+STORM_CONFLUENCE_WAIVER_SHADOW = True
+STORM_CONFLUENCE_WAIVER_ENFORCE = False
+STORM_BTC_1H_MOVE_PCT = -1.5
+STORM_MIN_RSI = 35
+STORM_SIBLING_WINDOW_MIN = 30
+
 # ── Chase-Move Shadow Gate (brain_auditor 2026-10-27, run #188) ─────────────
 # The CHASE gap/z gate is LONG-only and gap-anchored (2.0%); CHASE_RATIO above
 # failed its revert bar. This is a third, orthogonal measure: how far price has

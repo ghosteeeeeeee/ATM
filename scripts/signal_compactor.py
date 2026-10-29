@@ -2355,6 +2355,65 @@ def _fade_effective_source(source, regime=None):
         return source
 
 
+def _storm_confluence_would_pass(token, direction):
+    """STORM waiver conditions (CEO consult 20261029T2130Z, T proceed 2026-10-29).
+
+    All three must hold — (i) BTC 1h close-to-close move <= STORM_BTC_1H_MOVE_PCT,
+    (ii) token RSI(14,5m) >= STORM_MIN_RSI (knife doctrine preserved), (iii) a
+    same-token+direction sibling carried an approval-gate block within
+    STORM_SIBLING_WINDOW_MIN (the banned family signal IS the second source).
+    Fails safe (False) on any error/missing data. Read-only."""
+    try:
+        from hermes_constants import (STORM_BTC_1H_MOVE_PCT, STORM_MIN_RSI,
+                                      STORM_SIBLING_WINDOW_MIN)
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
+        try:
+            btc_rows = conn.execute(
+                "SELECT close FROM candles_1h WHERE token='BTC' AND is_closed=1 "
+                "ORDER BY ts DESC LIMIT 2").fetchall()
+        finally:
+            conn.close()
+        if len(btc_rows) < 2 or not btc_rows[1][0]:
+            return False
+        _btc_1h = (btc_rows[0][0] - btc_rows[1][0]) / btc_rows[1][0] * 100
+        if _btc_1h > STORM_BTC_1H_MOVE_PCT:   # e.g. -0.9 > -1.5 -> not stormy enough
+            return False
+        conn = sqlite3.connect(CANDLES_DB, timeout=5)
+        try:
+            r5 = conn.execute("SELECT close FROM candles_5m WHERE token=? AND is_closed=1 "
+                              "ORDER BY ts DESC LIMIT 15", (token,)).fetchall()
+            if len(r5) < 15:
+                r5 = conn.execute("SELECT close FROM candles_5m WHERE token=? AND is_closed=1 "
+                                  "ORDER BY ts DESC LIMIT 15", (token.upper(),)).fetchall()
+        finally:
+            conn.close()
+        if len(r5) < 15:
+            return False
+        _closes = [r[0] for r in r5][::-1]
+        _g = _l = 0.0
+        for _a, _b in zip(_closes[:-1], _closes[1:]):
+            _d = _b - _a
+            _g += max(_d, 0.0)
+            _l += max(-_d, 0.0)
+        if _l <= 0:
+            return False
+        _rsi = 100.0 - 100.0 / (1.0 + _g / _l)
+        if _rsi < STORM_MIN_RSI:
+            return False
+        conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes_runtime.db'), timeout=5)
+        try:
+            _sib = conn.execute(
+                "SELECT COUNT(*) FROM signals WHERE token=? AND direction=? "
+                "AND decision_reason LIKE 'blocked@approval%' "
+                "AND created_at > datetime('now', ?)",
+                (token, direction, f'-{STORM_SIBLING_WINDOW_MIN} minutes')).fetchone()
+        finally:
+            conn.close()
+        return bool(_sib and _sib[0] > 0)
+    except Exception:
+        return False
+
+
 def run_compaction(dry=False, verbose=False, purge_executed=False):
     """
     Returns {'hotset': [...], 'compaction_cycle': N, 'approved': N, 'rejected': N}
@@ -3520,6 +3579,24 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         gate_msg = f'temporal confluence ({_tc_count} fires in {TEMPORAL_CONFLUENCE_WINDOW_MIN}min)'
                         except ImportError:
                             pass
+                        # ── STORM CONFLUENCE WAIVER (CEO 20261029T2130Z, T proceed) ──
+                        # Single-type SHORT + storm conditions (BTC 1h <= -1.5%, RSI>=35,
+                        # sibling approval-blocked <=30min) -> would-pass. SHADOW logs,
+                        # still blocks; enforce flip rides the >=3-storm bar (11-12).
+                        if not pass_gate and direction == 'SHORT':
+                            try:
+                                from hermes_constants import (STORM_CONFLUENCE_WAIVER_SHADOW,
+                                                              STORM_CONFLUENCE_WAIVER_ENFORCE)
+                                if _storm_confluence_would_pass(token, direction):
+                                    if STORM_CONFLUENCE_WAIVER_ENFORCE:
+                                        pass_gate = True
+                                        gate_msg = 'storm waiver (BTC 1h<=-1.5%, RSI>=35, sibling gate-blocked<=30min)'
+                                    elif STORM_CONFLUENCE_WAIVER_SHADOW:
+                                        log(f"  🌩️ [STORM-CONFL-WAIVER-SHADOW] {token} {direction}: WOULD-PASS "
+                                            f"single-type confluence (storm conditions met) — enforcement pending "
+                                            f">=3-storm bar, deadline 11-12")
+                            except ImportError:
+                                pass
                         if not pass_gate and not gate_msg:
                             gate_msg = f'single-type not in standalone bypass (regime={_regime})'
                 # ── Confluence Signal Bypass ──────────────────────────────────────

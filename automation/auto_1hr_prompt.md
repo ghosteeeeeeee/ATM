@@ -216,6 +216,19 @@ PostgreSQL treats `"double quotes"` as column identifiers, NOT string literals. 
 
 If a query fails with `UndefinedColumn`, check column names against this list before retrying.
 
+## STORM-READINESS PACKET (CEO consult 20261029T2130Z, T proceed — MANDATORY when BTC 1h |move| >= 1.5%)
+
+T's standing ask: "be ready for the next pump or dump. learn something!!!" — this makes it automatic.
+Every run, first compute BTC 1h close-to-close move from `data/candles.db` (`candles_1h`, token='BTC', `is_closed=1`, last two rows). **If |move| < 1.5%: skip this section (note "no storm").**
+
+When |btc_1h| >= 1.5:
+1. **Blocked-direction census (last 2h):** from `/root/.hermes/data/signals_hermes_runtime.db`,
+   `SELECT token, direction, signal_type, decision_reason FROM signals WHERE created_at > datetime('now','-2 hours') AND decision='EXPIRED'` — group by `decision_reason` (tombstones carry real gate names now). Classes: confluence single-type, pump-chain-short-high, short-rsi-hard-floor, oversold-knife, compaction_stale_10min.
+2. **Counterfactual replay (honest cohort):** keep only rows with signal-metadata RSI >= 35 (`_signal_metadata` json field `rsi_14` — note the underscore prefix) — RSI<35 siblings would die at the exec knife anyway (do NOT count them, no double-count). Dedupe first-fire-per-token. For each, walk `data/candles.db` `candles_5m` from the signal `price` to now: `ret = (price - close)/price*100` for SHORT; `$ = 11 * ret/100`. Also touch-rule (low <= price*0.996 within 30x5m).
+3. **Emit the packet (log + kanban, one table):**
+   `🌩️ [STORM-READINESS] BTC 1h {btc_1h:+.2f}% | blocked {n} ({gate counts}) | true-starvation {k} RSI>=35 | counterfactual ${x:+.2f} (touch {t}/{k}) | waiver: SHADOW={STORM_CONFLUENCE_WAIVER_SHADOW} ENFORCE={STORM_CONFLUENCE_WAIVER_ENFORCE}`
+4. **Bar tracking:** the `storm-confl-waiver` enforce flip needs **>=3 consecutive storms** with positive counterfactual (deadline 2026-11-12, registry entry). Each packet is one auditable entry — append a dated line to the kanban so "3 consecutive" is countable.
+
 ## Key File Paths
 - Trades: PostgreSQL at `/var/run/postgresql/brain`
 - Constants: `scripts/hermes_constants.py`
