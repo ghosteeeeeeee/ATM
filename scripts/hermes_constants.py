@@ -1093,7 +1093,7 @@ WINNER_CELL_SIZE_MULT = 1.25
 WINNER_CELL_SIZE_MULT_CAP = 1.5
 WINNER_CELLS_VALIDATED = {
     ('bb-squeeze+', 'NORMAL'),
-    ('volume-buildout-', 'HIGH'),
+    ('volume-buildup-', 'HIGH'),   # bug_hunter 2026-10-29: was 'volume-buildout-' (transcription typo — 0 rows ever; real signal + exact cell stats 14T/71.4%/+$0.21 confirmed on 'volume-buildup-')
     ('r2v2-long3', 'NORMAL'),
     ('pump-chain+', 'EXTREME'),
 }
