@@ -1281,6 +1281,24 @@
       "found_by": "main-session",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-069",
+      "title": "contrarian shadow writer stores entry_price=0 silently (decider_run.py:4016 'price or get_current_price() or 0') \u2014 208/558 (37.3%) of pump-chain- evidence rows dropped by every downstream outcome join",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "37.3% of the fade OOS evidence base is silently lost (all 10-13->10-17 rows); outcome joins skip entry_price=0 rows. Proxy-entry backfill is BIASED (proven: proxy drops EXTREME WR 67.3%->53.1%, 28.3% of outcomes flip \u2014 late entry after the bounce systematically hurts a LONG fade). Any future shadow join inherits the hole.",
+      "root_cause": "fallback chain ends in 'or 0' instead of skipping the write when no price is available",
+      "fix": "skip the shadow write when price is falsy (or retry get_current_price once and log a WARN); backfill policy for historical rows = leave missing (proxy is biased), note in join scripts",
+      "verified_by": "fade regime-split analysis 5434f9ac (2026-10-29) \u2014 coverage analysis + bias proof",
+      "date_found": "2026-10-29",
+      "date_fixed": null,
+      "found_by": "analysis-subagent",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
