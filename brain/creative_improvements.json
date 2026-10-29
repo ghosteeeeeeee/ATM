@@ -9846,5 +9846,23 @@
     "category": "telemetry",
     "status": "shipped",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-29T16:45:00Z",
+    "idea": "bb_position zone distribution as signal health KPI (zero-code standing metric)",
+    "rationale": "bb-squeeze+ fires 100% UPPER (75% WR). MIDDLE zone bleeds -$4.89/30d but is confounded (pump-chain+ p=0.826). Track per-signal zone distribution: signals drifting toward MIDDLE are losing their edge. Zero code — SQL query each run.",
+    "expected_impact": "Early warning for chop-signal drift",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-29T16:45:00Z",
+    "idea": "bb-squeeze+ DNA extraction: BB-width percentile compression gate",
+    "rationale": "bb-squeeze+ is the only consistently positive signal (27T 74.1% +$0.77/14d). Its edge = enter AFTER BB compression, not during expansion. Other signals chase expansion. A universal 'BB width bottom 30% of 7d range' filter could block chase entries. Needs BB-width backtest before shipping.",
+    "expected_impact": "Potentially cut chop entries across all signals",
+    "category": "entry sniper",
+    "status": "pre-registered (needs backtest)",
+    "risk": "medium"
   }
 ]
