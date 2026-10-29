@@ -639,6 +639,15 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     except Exception:
         pass
 
+    # brain_auditor #197: stamp final size_mult into _signal_metadata (zero behavior —
+    # no gate reads it; base size drifts with account balance so amount-forensics on
+    # exact multiples like 22.10=2.0x cannot reconstruct Hall-of-Fame boosts later)
+    try:
+        if isinstance(signal_metadata, dict):
+            signal_metadata['size_mult'] = round(float(_size_mult), 4)
+    except Exception:
+        pass
+
     # Compute pre-computed size and pass to mirror_open
     from hyperliquid_exchange import _get_trade_size_usdt as _get_hl_base_size
     _base_size = _get_hl_base_size()

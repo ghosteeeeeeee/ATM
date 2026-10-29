@@ -9828,5 +9828,23 @@
     "category": "telemetry",
     "status": "shipped (zero trading behavior)",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-29T04:55:00Z",
+    "idea": "HALL-OF-FAME 2.0x SIZE BOOST = chop EV amplifier sized on mean-reverting past-WR — pre-registered staleness audit (do NOT ship yet)",
+    "rationale": "Only 2.0x size source = HoF branch of _get_favorite_size_mult. amount>=20 cohort 14d: 35T 25.7% -3.58 arm 28.6% ret -0.462%/notional vs base 253T 48.2% +0.11 arm 54.5% (Fisher p=0.0176) — owns >100% of 14d net bleed. BUT 30d p=0.646 NOT significant and halves sign-flip (days15-30 +0.52 vs days1-14 -3.58) -> regime-dependent amplifier; boost scales cohort EV x2 without flipping sign.",
+    "expected_impact": "If 30d return-on-notional stays significantly negative with same-sign halves: HoF 2.0->1.2 saves ~+1.4/14d (2x blanket 0.75x), zero selection change. Default KILL if bars fail at next 30d read.",
+    "category": "size/conviction",
+    "status": "pre-registered",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-10-29T04:55:00Z",
+    "idea": "size_mult stamp at open into _signal_metadata (brain.py) — cohort attribution without amount forensics",
+    "rationale": "base size = 7% of withdrawable, drifts with balance so exact-multiple inference (22.10=2.0x) breaks silently",
+    "expected_impact": "zero trading behavior; future size audits query instead of reconstruct",
+    "category": "telemetry",
+    "status": "shipped",
+    "risk": "low"
   }
 ]

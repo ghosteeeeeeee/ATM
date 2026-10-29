@@ -3240,5 +3240,27 @@
     "after": "PID 1062534 at 2026-10-29 00:59:25Z, active",
     "rationale": "bug_hunter MED: long-running daemon imports brain lazily and caches it",
     "impact": "copy-exit close family routes through the fixed path"
+  },
+  {
+    "timestamp": "2026-10-29T04:55:00Z",
+    "agent": "brain_auditor",
+    "change": "stamp signal_metadata['size_mult'] = round(_size_mult,4) before trades INSERT (guarded isinstance dict + try/except; no gate reads the key)",
+    "type": "tweak (zero trading behavior)",
+    "file": "scripts/brain.py",
+    "before": "size multiplier only stdout-printed; HoF 2.0x cohorts reconstructable only via exact amount multiples (fragile - base drifts with balance)",
+    "after": "size_mult persisted per trade in _signal_metadata",
+    "rationale": "make Hall-of-Fame/favorite/cluster sizing permanently auditable; enables the pre-registered HoF-2x audit",
+    "impact": "0 trading behavior; py_compile PASS; branch self-test PASS; hl-copy service restarted 04:49:46Z to drop cached module"
+  },
+  {
+    "timestamp": "2026-10-29T04:55:00Z",
+    "agent": "brain_auditor",
+    "change": "restarted hermes-hl-copy.service (drop cached pre-stamp brain module)",
+    "type": "ops",
+    "file": "systemd hermes-hl-copy.service",
+    "before": "running since before stamp edit",
+    "after": "active, started 2026-10-29 04:49:46 UTC",
+    "rationale": "long-running daemon imports brain module once (same MED as run #196)",
+    "impact": "hl_copy open path picks up size_mult stamp"
   }
 ]
