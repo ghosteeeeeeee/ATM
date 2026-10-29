@@ -17577,3 +17577,88 @@ Quiet hour — 0 closes, 0 open positions.
 - 24h RED '-$0.22' despite 65.4% WR — atr_sl_hit losers (-$0.45) + trail_arm_timeout (-$0.14) outweigh trail wins
 - 7d RED '-$0.69' — watch, but no single actionable signal (worst continuum-osc- n=1)
 - bb-squeeze+ 1.0 treated as ceiling per prior runs though coil-trigger has 1.4 — revisit only with CEO approval
+
+## [2026-10-29 18:42] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A) | 24h: 23T 15W 65.2% '$-0.25' RED | 7d 143T 80W 55.9% '$-0.77' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0 trades last hour — no n>=3 0%-WR signal; volume-buildup- 24h 2T 50% '$-0.10' — kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/23 = 8.7% (<40%) — SL not too tight; dominant close = profit-monster-trail (8T '+$0.34')
+- Boost: bb-squeeze+ 8T 75.0% '+$0.01' across 8 tokens — fails Net PnL > $0.05 bar (+$0.01); also at 1.0 weight ceiling — no change
+- Neg streak: 14h -$0.07, 15h -$0.12, 16h +$0.05, 17h -$0.14, 18h 0 closes — never 3 consecutive negative hours
+- Frequency 0/hr — under overtrading threshold
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.25' despite 65.2% WR — atr_sl_hit (-$0.38) + stale_exit (-$0.15) + cut-loser (-$0.14) + continuum-osc- single trade (-$0.25) outweigh trail wins
+- 7d RED '-$0.77' — drift continues; no single actionable signal (worst n=1 trades)
+
+## [2026-10-29 19:43] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A) | 24h: 20T 12W 60.0% '$-0.35' RED | 7d ~143T ~56% '$-0.77' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0 trades last hour — no n>=3 0%-WR signal; volume-buildup- 24h 2T 50% '$-0.10' — kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/20 = 10% (<40%) — SL not too tight; dominant close = profit-monster-trail (7T '+$0.29')
+- Boost: bb-squeeze+ 5T 60.0% '$-0.09' fails Net PnL > $0.05; pump-chain+ 4T 50% — fails WR bar; r2v2-long3 2T 100% '+$0.16' — n<5. No boost.
+- Neg streak: 14h -$0.07, 15h -$0.12, 16h +$0.05 (broke), 17h -$0.14, 18h 0 closes — never 3 consecutive negative hours
+- Frequency 0/hr — under overtrading threshold
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.35' at 60% WR — atr_sl_hit (-$0.38) + trail_arm_timeout (-$0.19) + stale_exit (-$0.15) + cut-loser (-$0.14) outweigh trail wins (+$0.29) and ugb_pt (+$0.22)
+- 7d RED '~-$0.77' — drift continues; no single actionable signal (worst continuum-osc- n=1)
+
+## [2026-10-29 20:45] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.15 (WR: 100.0%) | 24h: 20T 12W 60.0% '$-0.31' RED | 7d 143T 80W 55.9% '$-0.70' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 1T last hour = win (CRV volume-buildup- profit-monster-trail +$0.15); no n>=3 0%-WR signal; volume-buildup- 24h 3T 66.7% '+$0.05' — kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/20 = 10% (<40%) — SL not too tight; dominant close = profit-monster-trail (7T '+$0.33')
+- Boost: volume-buildup- 3T 66.7% '+$0.05' fails n>=5 AND Net PnL > $0.05 (equal, not greater); bb-squeeze+ 5T 60% '$-0.09' fails net; pump-chain+ 4T 50% fails WR. No boost.
+- Neg streak: 14h -$0.07, 15h -$0.12, 16h +$0.05 (broke), 17h -$0.14, 18-19h no closes, 20h +$0.15 — never 3 consecutive negative hours
+- Frequency 1/hr — under overtrading threshold
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.31' at 60% WR — atr_sl_hit (-$0.38) + trail_arm_timeout (-$0.19) + stale_exit (-$0.15) + cut-loser (-$0.14) outweigh trail wins (+$0.33) and ugb_pt (+$0.22)
+- 7d RED '-$0.70' — drift continues; no single actionable signal (worst n>=2: warrior-sr-confirm+ 3T '$-0.10')
+
+## [2026-10-29 21:45] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 0 losses — 1 flat)
+**PnL:** $0.00 (WR: 0% flat) | 24h: 20T 11W 55.0% '$-0.32' RED | 7d 144T 80W 55.6% '$-0.70' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 1T last hour = flat (COMP r2v2-long3 ugb_pt $0.00/-0.19%); no n>=3 0%-WR signal; continuum-osc- 24h 1T 0% '$-0.25' — n=1, kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/20 = 10% (<40%) — SL not too tight; dominant close = profit-monster-trail (7T '+$0.33'); worst = atr_sl_hit (2T '$-0.38')
+- Boost: no candidate meets all bars — pump-chain+ 4T 50% fails WR; volume-buildup- 3T 66.7% '+$0.05' fails n>=5 and >$0.05; bb-squeeze+ 4T 50% fails WR
+- Neg streak: 17h -$0.14, 18-19h no closes, 20h +$0.15 (broke), 21h $0.00 — never 3 consecutive negative hours
+- Frequency 1/hr — under overtrading threshold
+- 0 open trades
+- Storm readiness: BTC 1h +0.07% (<1.5%) — no storm, section skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.32' at 55% WR — atr_sl_hit (-$0.38) + trail_arm_timeout (-$0.20) + stale_exit (-$0.15) + cut-loser (-$0.14) outweigh trail wins (+$0.33) and ugb_pt (+$0.22)
+- 7d RED '-$0.70' — drift continues; no single actionable signal (worst n>=2: bb-squeeze+ 4T '$-0.10', warrior-sr-confirm+ 3T '$-0.10')
