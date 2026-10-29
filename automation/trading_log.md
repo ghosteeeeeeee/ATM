@@ -17684,3 +17684,25 @@ Quiet hour — 0 closes, 0 open positions.
 **Open Questions:**
 - 24h RED '-$0.22' at 57.9% WR (improving from -$0.32) — atr_sl_hit (-$0.38) still the largest single-reason drag
 - 7d RED '-$0.70' — drift continues; no single actionable signal
+
+## [2026-10-29 23:45] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 | 24h: 19T 11W 57.9% '$-0.22' RED | 7d 144T 80W 55.6% '$-0.70' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T last hour (quiet); no n>=3 0%-WR signal (worst: continuum-osc- n=1 '$-0.25'; bb-squeeze+ 4T 50% '$-0.10')
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/19 = 10.5% (<40%) — SL not too tight; dominant close = profit-monster-trail (7T '+$0.33'), worst = atr_sl_hit (2T '$-0.38')
+- Boost: no candidate meets all bars — max n=4 (bb-squeeze+ fails WR 50%; volume-buildup- 3T and pump-chain+ 3T fail n>=5)
+- Neg streak: 20h +$0.15, 21h $0.00, 22h $0.00 — never 3 consecutive negative hours
+- Frequency 0/hr — under overtrading threshold
+- 0 open trades
+- Storm readiness: BTC 1h -0.77% (<1.5%) — no storm, section skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.22' at 57.9% WR — atr_sl_hit (-$0.38) + stale_exit (-$0.15) + cut-loser (-$0.14) + trail_arm_timeout (-$0.10) outweigh trail wins (+$0.33) and ugb_pt (+$0.22)
+- 7d RED '-$0.70' — drift continues; no single actionable signal
