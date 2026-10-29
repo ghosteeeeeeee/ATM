@@ -898,34 +898,64 @@ _OP_ENCODE_MODEL_FALLBACK = 'opencode-go/mimo-v2.6-flash'
 def _load_fleet_llm_model():
     """Read the canonical model id from opencode's config (single source of truth).
 
-    Tries strict JSON first, then a JSONC-aware regex (the shipped config has a
-    trailing comma + allows comments). Never raises — falls back to the constant
-    above so the context gate always has a usable provider/model string.
+    Never raises — always returns a usable provider/model string. Three layers,
+    each strictly safer than a regex-only parse:
+
+      1. strict JSON parse (handles a well-formed config, any indent),
+      2. JSONC sanitize then parse — strip full-line // comments and trailing
+         commas, then json.loads. json.loads is INDENT-INDEPENDENT (so a
+         4-space/tab reformat can't silently break us — bug_hunter #2) and
+         root.get('model') reads only the TOP-LEVEL key (so a nested
+         provider-level "model" can't be mistaken for the fleet default),
+      3. fallback constant, WITH a one-line stderr warning so a broken/missing
+         config is VISIBLE rather than silently drifting the gate (bug_hunter
+         #2/#3: drift matters because the context gate is fail-open).
+
+    The returned value is format-validated as provider/model on the parse paths;
+    anything malformed falls through to the fallback (bug_hunter #3).
     """
     import json as _json
     import re as _re
+    # provider/model — letters, digits, dot, dash, underscore on each side.
+    _FMT = _re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$')
+
+    def _sanitize(s):
+        # Full-line // comments only (a URL like http:// is mid-string, not ^//).
+        s = _re.sub(r'^\s*//.*$', '', s, flags=_re.MULTILINE)
+        # Trailing commas before } or ]. Safe: a comma inside a string literal is
+        # always followed by a quote, not a brace/bracket.
+        s = _re.sub(r',(\s*[}\]])', r'\1', s)
+        return s
+
+    def _try(s):
+        try:
+            v = _json.loads(s).get('model')
+        except Exception:
+            return None
+        if isinstance(v, str) and _FMT.match(v):
+            return v
+        # present-but-malformed (whitespace-only / provider-less) → None → fallback
+        return None
+
     try:
         with open(_OP_ENCODE_MODEL_FILE, 'r', encoding='utf-8') as _f:
             _raw = _f.read()
     except Exception:
+        import sys as _sys
+        print(f'[hermes_constants] LLM model config unreadable ({_OP_ENCODE_MODEL_FILE}) '
+              f'— using fallback {_OP_ENCODE_MODEL_FALLBACK}', file=_sys.stderr)
         return _OP_ENCODE_MODEL_FALLBACK
-    # 1) strict JSON (config with no comments/trailing commas)
-    try:
-        _m = _json.loads(_raw).get('model')
-        if isinstance(_m, str) and _m:
-            return _m
-    except Exception:
-        pass
-    # 2) JSONC: match the top-level "model" key. Anchored to line start + exactly
-    #    2-space indent (this file's top level) so a nested provider-level "model"
-    #    can't be mistaken for the fleet default.
-    try:
-        _m = _re.search(r'^  "model"\s*:\s*"([^"]+)"', _raw, _re.MULTILINE)
-        if _m:
-            return _m.group(1)
-    except Exception:
-        pass
-    return _OP_ENCODE_MODEL_FALLBACK
+
+    v = _try(_raw)
+    if v is None:
+        v = _try(_sanitize(_raw))
+    if v is None:
+        import sys as _sys
+        print(f'[hermes_constants] no valid top-level "model" in {_OP_ENCODE_MODEL_FILE} '
+              f'— using fallback {_OP_ENCODE_MODEL_FALLBACK} (fix the config so the '
+              f'gate does not silently drift)', file=_sys.stderr)
+        return _OP_ENCODE_MODEL_FALLBACK
+    return v
 
 
 CONTEXT_GATE_ENABLED = True          # master switch
