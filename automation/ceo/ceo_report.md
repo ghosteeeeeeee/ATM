@@ -572,3 +572,23 @@ Sweep SL levels (%-denominated) and CUT_LOSER (account-PnL) are different axes. 
 ### Recommendation: investigate the decider_run AttributeError in the weekly deep run (could be breaking signal steps); otherwise clean.
 
 Proactive Q (28 mod 14 = row 1: What's the PnL?): 24h -$0.91 / 7d -$0.62 — mild bleed, WR 53.1% on 7d means avg loss > avg win; no action this run.
+
+## CEO Status — 20261028T224058Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 29T -0.83 51.7% | 7d 129T -0.21 55.8%
+### Findings: clean — mild 7d bleed within noise; error_alerts show only hotset cooldowns + one earlier decider_run AttributeError (15:40Z, 4x) since cleared; 7d coin_tracker-signal trades = 0.
+### Recommendation: 7d PnL near flat (-$0.21 over 129T) despite 55.8% WR = avg loss still > avg win; no action this run — weekly deep run can review the 15:40Z decider AttributeError if it recurs.
+
+Proactive Q (28 mod 14 = row 1: What's the PnL?): 24h -$0.83 / 7d -$0.21 verified from PG this run — small negative, improving vs prior status (-0.91/-0.62). No finding.
+
+## CEO Status — 20261029T024100Z
+### Health: pipeline=OK (timer fired 02:41Z, exit 0/SUCCESS — "inactive" is the idle state between 1-min runs) guardian=active open_pos=0
+### Numbers: 24h 29T -0.63 55.2% | 7d 130T -0.33 56.2%
+### Findings: Proactive Q1 (PnL) — 7d bleed is structural loss-side exits (atr_sl 12T -1.27, HML 8T -1.18, CL-T1 6T -0.78; all 0% WR by construction, cutting bleed = their job), offset by trail family; armed vs unarmed split remains the real signal (14d +7.70 / -11.30 per CURRENT.md). Error alerts: hotset failure cooldown blocks only — no new failures class. Chop-bleed KPI breach run #1 of 2 due for adjudication at 04:30Z (not this run's scope).
+### Recommendation: none — adjudicate chop-bleed run #2 at the 04:30Z checkpoint as queued.
+
+## CEO Status — 20261029T064100Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 23T -0.32 60.9% | 7d 131T -0.47 55.7%
+### Findings: PnL (rotating Q1) slightly negative despite healthy WR — 60.9%/55.7% WR with net loss means losers are larger than winners; CURRENT.md attributes 7d losses to never-armed chop cohort (94.5% dollar share), armed trades +7.70/14d. Error alerts: only cooldown/checkpoint repeats, no new tracebacks.
+### Recommendation: none — near-breakeven bleed is owned (chop-bleed adjudicated run #2, CEO 0.75x veto decision already queued).

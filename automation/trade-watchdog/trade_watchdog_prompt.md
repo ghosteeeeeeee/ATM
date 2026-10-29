@@ -342,11 +342,16 @@ FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '14 days';
      window drags the share DOWN and a backfill pushes it UP on identical trades — measured 2026-10-28:
      same 7d window read 93.9% NULL-inclusive vs 88.1% official = **5.8pt swing**. If you don't pin
      the count, a backfill looks like a math bug (#184) or a real breach looks like one.
-     NULLs are **self-healing**: `cell_stats.backfill_mfe_mae(days=7)` runs nightly at 00:20Z
-     (brain.py `close_trade` — used by profit_monster/cut_loser — never writes `mfe_pct`).
-  2. **Same-day arm rate** (`% of today's closes with mfe >= 0.40`), beside the 7d one. It leads
-     chop-bleed: 2026-10-28 same-day arm **20% (3/15)** preceded the 7d share reaching 91.7%.
-     The 7d LONG arm rate is the tripwire (`<50`); the daily number is the early warning.
+      NULLs are **self-healing**: `cell_stats.backfill_mfe_mae(days=7)` runs nightly at 00:20Z.
+      Since 2026-10-29 brain.py `close_trade` ALSO stamps `mfe_pct`/`mae_pct` at close (commit
+      e830e207) — new rows should no longer be NULL; a NULL on a post-01:00Z close is a bug, not
+      a backfill lag.
+   2. **Same-day arm rate** (`% of today's closes with mfe >= 0.40`), beside the 7d one — as a
+      same-state companion reading, NOT a forecast. brain_auditor #196 measured it LAGGING:
+      intra-day first-5-close arm% vs rest-of-day per-trade PnL r=-0.135 t=-0.69 (n=28d);
+      day-over-day arm%D vs PnL(D+1) r=+0.174 p~0.39 (n=27) → do not treat a low same-day arm
+      rate as an early warning of a chop-bleed breach and do not build gates on it.
+      The 7d LONG arm rate remains the tripwire (`<50`).
 
 ### Regime Flip-Rate KPI (MANDATORY — added 2026-10-23, brain_auditor #86)
 

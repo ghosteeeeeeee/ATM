@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-10-28 20:45 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-29 02:45 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,401 | **WR:** 50.9% | **PnL:** -99.64%
-- **Date range:** 2026-07-29 → 2026-10-28
+- **Total trades (all time):** 3,405 | **WR:** 50.9% | **PnL:** -101.44%
+- **Date range:** 2026-07-29 → 2026-10-29
 
 ---
 
@@ -11,7 +11,7 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| bb-squeeze+ | LONG | 5 | 100.0% | +1.90 | 9 | 88.9% | +1.65 | ENABLED |
+| bb-squeeze+ | LONG | — | —% | — | 10 | 90.0% | +1.73 | ENABLED |
 
 ---
 
@@ -25,9 +25,8 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| volume-buildup- | SHORT | 6 | 33.3% | -3.91 | ENABLED | Borderline |
-| warrior-sr-confirm+ | LONG | 2 | 50.0% | -0.92 | ENABLED | Needs more data |
-| pump-chain+ | LONG | 3 | 33.3% | +0.29 | ❓ | Needs more data |
+| volume-buildup- | SHORT | 5 | 40.0% | -2.78 | ENABLED | Borderline |
+| warrior-sr-confirm+ | LONG | 4 | 50.0% | -1.87 | ENABLED | Needs more data |
 
 ---
 
@@ -45,10 +44,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] volume-buildup- SHORT** — WR=33.3%, PnL=-3.91% over 6 trades. Monitor next cycle.
-2. **[WATCH] warrior-sr-confirm+ LONG** — WR=50.0%, PnL=-0.92% over 2 trades. Monitor next cycle.
-3. **[WATCH] pump-chain+ LONG** — WR=33.3%, PnL=+0.29% over 3 trades. Monitor next cycle.
-4. **[KEEP] 1 winning combos** — bb-squeeze+. LONG side dominant.
+1. **[WATCH] volume-buildup- SHORT** — WR=40.0%, PnL=-2.78% over 5 trades. Monitor next cycle.
+2. **[WATCH] warrior-sr-confirm+ LONG** — WR=50.0%, PnL=-1.87% over 4 trades. Monitor next cycle.
+3. **[KEEP] 1 winning combos** — bb-squeeze+. LONG side dominant.
 
 ---
 
