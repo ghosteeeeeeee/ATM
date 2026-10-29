@@ -2324,6 +2324,31 @@ def _tombstone_pending(tok, dirn, gate, dry=False, src_contains=None):
         log(f"  ⚠️ tombstone failed for {tok} {dirn} ({gate}): {_tbe}", 'WARN')
 
 
+def _fade_effective_source(source):
+    """RC1 effective-source rule (CEO-APPROVED-TO-FLIP, consult 20261029T1930Z).
+
+    For contrarian-live fade sources (exact contracted parts, same predicate as
+    decider._contrarian_live_hit — replicated locally to avoid importing the
+    heavy decider module), return the POST-FADE ('+'-form) source so
+    direction-keyed approval gates judge the direction that will actually
+    trade. Non-fade sources are returned unchanged. Evidence: fade EXTREME
+    OOS 67.3% n=226 (split 5434f9ac) vs the ('EXTREME','pump-chain-'):0.0
+    override keyed on the stored '-' sign; the bleed it targeted is the SHORT
+    side (28.4% WR live) which fades never trade. Keep HIGH hard block."""
+    try:
+        from hermes_constants import CONTRARIAN_LIVE_ENABLED, CONTRARIAN_LIVE_PREFIXES
+        if not CONTRARIAN_LIVE_ENABLED or not source:
+            return source
+        parts = [p.strip() for p in str(source).split(',')]
+        if not (set(parts) & set(CONTRARIAN_LIVE_PREFIXES)):
+            return source
+        return ','.join(
+            (p[:-1] + '+') if p in CONTRARIAN_LIVE_PREFIXES and p.endswith('-') else p
+            for p in parts)
+    except Exception:
+        return source
+
+
 def run_compaction(dry=False, verbose=False, purge_executed=False):
     """
     Returns {'hotset': [...], 'compaction_cycle': N, 'approved': N, 'rejected': N}
@@ -3531,12 +3556,21 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             if pass_gate and unique_signal_types == 1:
                 try:
                     from volatility_gate_v2 import _get_signal_type_mult
-                    _bypass_sig_mult = _get_signal_type_mult(source, _vol_regime, source=source or '')
+                    # RC1 (CEO-APPROVED-TO-FLIP 20261029T1930Z): evaluate the override
+                    # on the POST-FADE source form for contrarian-live entries — the
+                    # stored '-' sign keyed a 0.0 that killed the profitable direction
+                    # (fade-LONG EXTREME 67.3% n=226) along with the bleeding SHORT.
+                    _bypass_eff_src = _fade_effective_source(source)
+                    _bypass_sig_mult = _get_signal_type_mult(_bypass_eff_src, _vol_regime, source=_bypass_eff_src or '')
                     if _bypass_sig_mult == 0.0:
-                        log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction} BLOCKED — bypass denied, vol gate override=0.0 for '{source}' in {_vol_regime}")
+                        log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction} BLOCKED — bypass denied, vol gate override=0.0 for '{source}' in {_vol_regime}"
+                            + (f" (post-fade '{_bypass_eff_src}' also 0.0)" if _bypass_eff_src != source else ""))
                         _tombstone_pending(token, direction, 'vol-gate-override-0.0', dry,
                                            src_contains=source)
                         continue
+                    if _bypass_eff_src != source:
+                        log(f"  🎭 [FADE-EFFECTIVE-SOURCE] {token} {direction}: vol-gate override evaluated "
+                            f"'{_bypass_eff_src}' (post-fade LONG form) instead of stored '{source}' — RC1 CEO-approved")
                 except Exception:
                     pass  # fail-open
 
@@ -4168,7 +4202,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             continue
                 except Exception:
                     pass  # non-fatal — fail-open on MAXXED check
-            if direction == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0:
+            # RC1 (CEO-APPROVED-TO-FLIP 20261029T1930Z): fades trade LONG post-flip —
+            # SHORT floors must not judge them (_fade_effective_source == source = not a fade).
+            if direction == 'SHORT' and SHORT_RSI_HARD_FLOOR > 0 and _fade_effective_source(source) == source:
                 # CEO UNCLOG flip #1: import hoisted ABOVE the try below — a failure inside
                 # the non-fatal try would be swallowed and fail-OPEN (signal approved despite
                 # RSI<45). Knife check must not depend on code the outer except can eat.
@@ -4243,7 +4279,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             _conn_rsh.close()
                         except Exception:
                             pass
-            if direction == 'SHORT' and SHORT_RSI_FLOOR > 0:
+            if direction == 'SHORT' and SHORT_RSI_FLOOR > 0 and _fade_effective_source(source) == source:  # RC1: fades trade LONG post-flip
                 _conn_rsf = None
                 try:
                     _conn_rsf = sqlite3.connect(CANDLES_DB, timeout=5)

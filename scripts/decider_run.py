@@ -2135,8 +2135,17 @@ def context_gate(token, direction, source, sig):
             vol_regime = _v2_info.get('regime')
         if _v2_verdict == 'SKIP':
             _v2_reason = _v2_info if isinstance(_v2_info, str) else str(_v2_info)
-            log(f'  [VOL-GATE-v2] {token}: SKIP — {_v2_reason}')
-            return ('SKIP', f'volatility gate v2: {_v2_reason}', 0)
+            # RC1 BINDING (CEO consult 20261029T1930Z): without this wrap the approval
+            # unlock is NULL — the post-fade LONG dies here at exec (direction-blind
+            # should_trade_v2, combined mult 0.0 for the stored '-' form). SHADOW under
+            # the existing 7d bar (would-fill log, still blocks); the single enforce
+            # flip (with half-size knife leg) exempts. Verified live-in-one-row: BIGTIME
+            # #16457 only filled because the v6 sibling key shadows the 0.0 in dict order.
+            if _fade_exempt_allowed('VOL-GATE-V2-REGIME', token, direction):
+                pass  # enforce mode: fall through — entry proceeds to remaining gates
+            else:
+                log(f'  [VOL-GATE-v2] {token}: SKIP — {_v2_reason}')
+                return ('SKIP', f'volatility gate v2: {_v2_reason}', 0)
         atr_str = f'{atr_pct:.4f}%' if atr_pct is not None else 'N/A'
         _v2_mult = _v2_info.get('combined_mult') if isinstance(_v2_info, dict) else None
         log(f'  [VOL-GATE-v2] {token}: ATR={atr_str} regime={vol_regime} mult={_v2_mult}')
