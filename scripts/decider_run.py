@@ -3631,6 +3631,32 @@ def _run_hot_set():
     # READ-ONLY: never writes APPROVED — signal_compactor.py is sole approval authority.
     return 0
 
+# Exec-precheck refusal family (CEO consult 20261029T0300, T sign-off): deterministic
+# local checks at decider :2393-2571 (knife/hard/soft RSI floors, midband, ceilings,
+# MAXXED vol, stale/RSI-exception fail-closed) + brain-side rejects containing
+# 'BANANA lesson' / 'extreme oversold'. NOT infrastructure failures.
+_POLICY_REFUSAL_MARKERS = (
+    'RSI knife floor', 'RSI hard floor', 'RSI floor', 'SHORT mid-band',
+    'RSI ceiling', 'RSI hard ceiling', 'MAXXED vol', 'stale candles',
+    'RSI check exception', 'BANANA lesson', 'extreme oversold',
+)
+
+
+def _is_policy_refusal(msg: str) -> bool:
+    """True when a trade-failed msg is an exec-policy refusal (no cooldown credit).
+
+    COO-APPROVED-TO-FLIP 2026-10-29 (see HOTSET_FAIL_COUNT_POLICY_REFUSALS): these
+    refusals clear when RSI/conditions recover — recording them fed the 2-fails→1h
+    cooldown and locked tokens out exactly when the band reopened (WLFI refused at
+    28.7 then skipped at 46.1; BTC SHORT 2 knife refusals 02:59-03:02 -> locked).
+    Substring match so brain-side reject texts classify too. Infra failures
+    (brain/HL API, notional, position-exists, timeout, websocket) contain none of
+    these markers and MUST keep counting (BUG-049 backstop)."""
+    if not msg:
+        return False
+    return any(p in str(msg) for p in _POLICY_REFUSAL_MARKERS)
+
+
 def _record_hotset_failure(token: str, direction: str, failures: dict):
     """Record a failed trade for back-to-back cooldown tracking.
 
@@ -5811,12 +5837,27 @@ def run(dry_run=False):
                 # 10x in a row was retried every cycle with no cooldown. This is the
                 # mechanism that turns "signal NOT rolled back" into an actual backstop
                 # instead of an unbounded retry (see BLUR 2026-10-08, 64 failures/4d).
+                # COO-APPROVED-TO-FLIP 2026-10-29 (CEO consult 20261029T0300 + T sign-off):
+                # exec-POLICY refusals no longer credit that cooldown (flag
+                # HOTSET_FAIL_COUNT_POLICY_REFUSALS=False) — they clear with conditions and
+                # were poisoning the cooldown mid-dump (WLFI/BTC/STX/BABY knife cases).
+                # Infra failures still record (BUG-049 backstop intact). Revert: flag True.
+                _is_pol_refusal = False
                 try:
-                    _record_hotset_failure(token, direction, failures)
-                    log(f'  📉 hotset failure recorded: {token} {direction} '
-                        f'(count={failures.get(token, {}).get(direction, {}).get("count", "?")})')
-                except Exception as _hf_e:
-                    log(f'  ⚠️ failed to record hotset failure for {token} {direction}: {_hf_e}', 'WARN')
+                    from hermes_constants import HOTSET_FAIL_COUNT_POLICY_REFUSALS
+                    _is_pol_refusal = (not HOTSET_FAIL_COUNT_POLICY_REFUSALS) and _is_policy_refusal(msg)
+                except Exception:
+                    _is_pol_refusal = False  # flag/import problem -> legacy behavior (counts)
+                if _is_pol_refusal:
+                    log(f'  ℹ️ hotset failure NOT recorded (exec-policy refusal, no cooldown): '
+                        f'{token} {direction} — {msg}')
+                else:
+                    try:
+                        _record_hotset_failure(token, direction, failures)
+                        log(f'  📉 hotset failure recorded: {token} {direction} '
+                            f'(count={failures.get(token, {}).get(direction, {}).get("count", "?")})')
+                    except Exception as _hf_e:
+                        log(f'  ⚠️ failed to record hotset failure for {token} {direction}: {_hf_e}', 'WARN')
             else:
                 # [FIX-BUG1] sig_id=None (legacy hot-set without signal_id):
                 # Try token+direction fallback rollback so signal isn't stuck permanently.

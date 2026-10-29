@@ -961,6 +961,21 @@ CHASE_RATIO_SHADOW = True
 CHASE_RATIO_MIN_MOVE15 = 0.30        # % direction-signed 15m move must reach this
 CHASE_RATIO_MAX = 0.70               # block if |move5m| / |move15m| > this
 
+# ── Cooldown recording of EXEC-POLICY refusals (CEO consult 20261029T0300, T sign-off) ──
+# COO-APPROVED-TO-FLIP 2026-10-29: exec-precheck refusals (knife/hard/floor/midband/
+# ceiling/MAXXED/stale-failclosed — the decider :2393-2571 return-False family, plus
+# brain-side BANANA/extreme-oversold rejects) are DETERMINISTIC local checks that clear
+# when conditions change. Counting them fed the 2-fails→1h hotset cooldown and locked
+# tokens out exactly when RSI recovered: 2026-10-29 WLFI refused at RSI 28.7 (knife)
+# then SKIPPED 18min while admissible at 46.1; BTC SHORT took 2 knife refusals
+# 02:59-03:02 (detect 83.6 → exec 31.6 post-crash) and locked from 03:02; STX/BABY
+# likewise. Genuine infrastructure failures (brain/HL API, notional, position-exists,
+# timeout) MUST still count — that is the BUG-049 backstop (BLUR-class retry loops).
+# Semantics: False = policy refusals NOT recorded (cooldown immune to them).
+# Revert: set True (records them as before). Waiver line: vacation_mode.json
+# rules.unclog_waiver.scope. Classifier: decider_run._is_policy_refusal().
+HOTSET_FAIL_COUNT_POLICY_REFUSALS = False
+
 # ── Chase-Move Shadow Gate (brain_auditor 2026-10-27, run #188) ─────────────
 # The CHASE gap/z gate is LONG-only and gap-anchored (2.0%); CHASE_RATIO above
 # failed its revert bar. This is a third, orthogonal measure: how far price has

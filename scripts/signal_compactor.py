@@ -2277,6 +2277,26 @@ def _get_opposing_penalty(db_path: str, token: str, direction: str) -> float:
                 pass
 
 # ── Main compaction ────────────────────────────────────────────────────────────
+def _tombstone_pending(c, tok, dirn, gate):
+    """Tombstone fix (CEO consult 20261029T0300, T sign-off — cheap audit).
+
+    Approval-loop blocks left rows PENDING with NO decision_reason, so the 10-min
+    sweep stamped every one 'compaction_stale_10min' — a starvation lie (the
+    2026-10-29 "53 SHORTS expired" diagnosis). Write the gate name at the continue
+    site instead; the sweep PRESERVES existing reasons (CASE/COALESCE) and the
+    APPROVED upsert clears them (decision_reason=NULL). Row stays PENDING — retry
+    semantics unchanged (a gate that clears next cycle still approves, reason NULLed).
+    Silent + non-fatal: tombstoning must never break compaction.
+    """
+    try:
+        c.execute(
+            "UPDATE signals SET decision_reason = ?, updated_at = CURRENT_TIMESTAMP "
+            "WHERE token = ? AND direction = ? AND decision = 'PENDING' AND executed = 0",
+            (f'blocked@approval: {gate}', str(tok), str(dirn)))
+    except Exception:
+        pass
+
+
 def run_compaction(dry=False, verbose=False, purge_executed=False):
     """
     Returns {'hotset': [...], 'compaction_cycle': N, 'approved': N, 'rejected': N}
@@ -2303,7 +2323,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             UPDATE signals
             SET decision = 'EXPIRED',
                 executed = 1,
-                decision_reason = 'compaction_stale_10min',
+                decision_reason = CASE
+                    WHEN decision_reason IS NULL OR decision_reason = ''
+                    THEN 'compaction_stale_10min'
+                    ELSE decision_reason || ' | expired>10min never-approved'
+                END,
                 updated_at = CURRENT_TIMESTAMP
             WHERE decision = 'PENDING'
               AND executed = 0
@@ -3221,6 +3245,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     from hermes_constants import PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED
                     if PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED and _vol_regime == 'HIGH':
                         log(f"  🚫 [PUMP-CHAIN-SHORT-HIGH] {token} SHORT blocked — HIGH vol, no pump-chain- SHORT edge (20%WR)")
+                        _tombstone_pending(c, token, direction, 'pump-chain-short-high')
                         continue
                 except ImportError:
                     pass
@@ -3260,6 +3285,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         from hermes_constants import OVERSOLD_SHORT_RSI_MAX
                         if _rsi_val_s < OVERSOLD_SHORT_RSI_MAX:
                             log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)")
+                            _tombstone_pending(c, token, direction, 'pump-chain-rsi-knife')
                             continue
                         # Bearish override: when BTC is bearish, allow SHORT even if RSI < min
                         _pcs_bearish_override = False
@@ -3288,6 +3314,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  ✅ [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT bypass — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} but BTC bearish (oversold = continuation)")
                         else:
                             log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT)")
+                            _tombstone_pending(c, token, direction, 'pump-chain-rsi-min')
                             continue
                 except ImportError:
                     pass
@@ -3459,6 +3486,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # block line — gate census must never depend on substring-grep
                 # archaeology again (v1 audit dropped 36% of block volume).
                 log(f"  🔒 [CONFLUENCE-GATE-BLOCK] {token} {direction} BLOCKED — {gate_msg}")
+                _tombstone_pending(c, token, direction, f'confluence: {gate_msg}')
                 continue
 
             # ── DRIFT-A enforcement (2026-10-06): bypass must respect vol-gate 0.0 ──
@@ -3476,6 +3504,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _bypass_sig_mult = _get_signal_type_mult(source, _vol_regime, source=source or '')
                     if _bypass_sig_mult == 0.0:
                         log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction} BLOCKED — bypass denied, vol gate override=0.0 for '{source}' in {_vol_regime}")
+                        _tombstone_pending(c, token, direction, 'vol-gate-override-0.0')
                         continue
                 except Exception:
                     pass  # fail-open
@@ -4104,6 +4133,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  🔥 [MAXXED] {tkn} {direction}: ATR%={_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (maxxed-out tier)")
                         if MAXXED_BLOCK_ENABLED:
                             log(f"  🚫 [MAXXED-BLOCK] {tkn} {direction} blocked at approval — ATR% {_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (explosive vol, bad both directions)")
+                            _tombstone_pending(c, tkn, direction, 'maxxed-vol')
                             continue
                 except Exception:
                     pass  # non-fatal — fail-open on MAXXED check
@@ -4172,6 +4202,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.2f} < {SHORT_RSI_HARD_FLOOR} but BTC bearish (oversold = continuation)")
                                 else:
                                     log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.2f} < {SHORT_RSI_HARD_FLOOR} (exec-time floor would reject anyway)")
+                                    _tombstone_pending(c, tkn, direction, 'short-rsi-hard-floor')
                                     continue
                 except Exception:
                     pass  # non-fatal
@@ -4207,6 +4238,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 from hermes_constants import OVERSOLD_SHORT_RSI_MAX
                                 if _rsf_rsi < OVERSOLD_SHORT_RSI_MAX:
                                     log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)")
+                                    _tombstone_pending(c, tkn, direction, 'short-rsi-floor-knife')
                                     continue
                                 # Bearish override: when BTC is bearish, oversold = continuation
                                 # T directive 2026-10-08: restore override — 118 SHORT signals expired during dump
@@ -4236,6 +4268,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     log(f"  ✅ [SHORT-RSI-FLOOR] {tkn}: SHORT bypass — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} but BTC bearish (oversold = continuation)")
                                 else:
                                     log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold)")
+                                    _tombstone_pending(c, tkn, direction, 'short-rsi-floor')
                                     continue
                 except Exception:
                     pass  # non-fatal
@@ -4280,6 +4313,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     # bear allow AT THIS SITE ONLY; [35,45) bear allowance lives
                                     # in the hard-floor blocks above.
                                     log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention — no bearish override ever)")
+                                    _tombstone_pending(c, tkn, direction, 'oversold-knife')
                                     continue
                     finally:
                         if _conn_os:
@@ -5611,6 +5645,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     c.execute("""
                         UPDATE signals
                         SET decision = 'APPROVED',
+                            decision_reason = NULL,  -- tombstone fix: clear blocked@approval on approve
                             source = ?,
                             survival_rounds = ?,
                             hot_cycle_count = COALESCE(hot_cycle_count, 0) + 1,
