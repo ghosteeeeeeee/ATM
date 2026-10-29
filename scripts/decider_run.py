@@ -2960,7 +2960,18 @@ def execute_trade(token, direction, price, confidence, source,
             _err = (result.stderr or '').strip()
             _err_tail = '\n'.join(_err.splitlines()[-4:]) if _err else '(empty)'
             log(f'  [brain.py] ❌ FAILED rc={result.returncode}: stderr_tail={_err_tail[-600:]}')
-            return False, _err[-200:] or f'brain.py rc={result.returncode}'
+            # COO-SCOPE (code review 20acb9a4 MED): brain prints policy rejects to
+            # STDOUT ("REJECTED ... BANANA lesson / extreme oversold") then exits 1;
+            # stderr is empty -> old msg was just 'brain.py rc=1' and
+            # _is_policy_refusal never saw the markers, so brain-layer knife
+            # rejections kept crediting the 2-fails cooldown (the WLFI pattern via
+            # the brain layer). Fold the stdout tail in — classification stays
+            # narrow because it is marker-gated, so conf-1s/blacklist/delisted
+            # texts (no markers) still count as legacy/infra.
+            _out = (result.stdout or '').strip()
+            _out_tail = _out[-160:] if _out else ''
+            _msg = ' | '.join(x for x in (_out_tail, _err[-120:]) if x) or f'brain.py rc={result.returncode}'
+            return False, _msg
     except Exception as e:
         return False, str(e)[:80]
 

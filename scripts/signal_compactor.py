@@ -2277,7 +2277,7 @@ def _get_opposing_penalty(db_path: str, token: str, direction: str) -> float:
                 pass
 
 # ── Main compaction ────────────────────────────────────────────────────────────
-def _tombstone_pending(c, tok, dirn, gate):
+def _tombstone_pending(tok, dirn, gate, dry=False, src_contains=None):
     """Tombstone fix (CEO consult 20261029T0300, T sign-off — cheap audit).
 
     Approval-loop blocks left rows PENDING with NO decision_reason, so the 10-min
@@ -2286,15 +2286,42 @@ def _tombstone_pending(c, tok, dirn, gate):
     site instead; the sweep PRESERVES existing reasons (CASE/COALESCE) and the
     APPROVED upsert clears them (decision_reason=NULL). Row stays PENDING — retry
     semantics unchanged (a gate that clears next cycle still approves, reason NULLed).
-    Silent + non-fatal: tombstoning must never break compaction.
+
+    OWNS ITS CONNECTION (code review 20acb9a4 HIGH): run_compaction's main cursor
+    `c` is closed mid-function (conn.close after Step 4) and its last commit
+    predates the loops — writes through `c` either rolled back (early sites) or
+    raised on a closed cursor and were silently swallowed (late sites). Own
+    connect+commit+close mirrors _sh_conn/_upsert_conn precedent. `dry` guard:
+    without it dry-runs would start persisting. WARN on failure — the old bare
+    except:pass is exactly what hid the HIGH from everyone.
+    src_contains: narrow source-scoped gates (pump-chain/vol-override) so a
+    sibling combo of the same token+direction with a different source does not
+    inherit a gate that never applied to it.
     """
+    if dry:
+        return
     try:
-        c.execute(
-            "UPDATE signals SET decision_reason = ?, updated_at = CURRENT_TIMESTAMP "
-            "WHERE token = ? AND direction = ? AND decision = 'PENDING' AND executed = 0",
-            (f'blocked@approval: {gate}', str(tok), str(dirn)))
-    except Exception:
-        pass
+        _tc = sqlite3.connect(RUNTIME_DB, timeout=5)
+        try:
+            terms = [src_contains] if isinstance(src_contains, str) else list(src_contains or [])
+            if terms:
+                _where = ' AND (' + ' OR '.join(["source LIKE '%' || ? || '%'" for _ in terms]) + ')'
+                _tc.execute(
+                    "UPDATE signals SET decision_reason = ?, updated_at = CURRENT_TIMESTAMP "
+                    "WHERE token = ? AND direction = ? AND decision = 'PENDING' "
+                    "AND executed = 0" + _where,
+                    (f'blocked@approval: {gate}', str(tok), str(dirn),
+                     *[str(t) for t in terms]))
+            else:
+                _tc.execute(
+                    "UPDATE signals SET decision_reason = ?, updated_at = CURRENT_TIMESTAMP "
+                    "WHERE token = ? AND direction = ? AND decision = 'PENDING' AND executed = 0",
+                    (f'blocked@approval: {gate}', str(tok), str(dirn)))
+            _tc.commit()
+        finally:
+            _tc.close()
+    except Exception as _tbe:
+        log(f"  ⚠️ tombstone failed for {tok} {dirn} ({gate}): {_tbe}", 'WARN')
 
 
 def run_compaction(dry=False, verbose=False, purge_executed=False):
@@ -2335,7 +2362,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         """)
         expired_count = c.rowcount
         if expired_count > 0:
-            log(f"Expired {expired_count} stale PENDING signals (>5 min old)")
+            log(f"Expired {expired_count} stale PENDING signals (>10 min old)")
         conn.commit()
 
         # NEW MODEL (2026-04-26): Group by combo_key instead of token+direction.
@@ -3245,7 +3272,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     from hermes_constants import PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED
                     if PUMP_CHAIN_SHORT_HIGH_BLOCK_ENABLED and _vol_regime == 'HIGH':
                         log(f"  🚫 [PUMP-CHAIN-SHORT-HIGH] {token} SHORT blocked — HIGH vol, no pump-chain- SHORT edge (20%WR)")
-                        _tombstone_pending(c, token, direction, 'pump-chain-short-high')
+                        _tombstone_pending(token, direction, 'pump-chain-short-high', dry,
+                                           src_contains=['pump-chain', 'pump_chain'])
                         continue
                 except ImportError:
                     pass
@@ -3285,7 +3313,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         from hermes_constants import OVERSOLD_SHORT_RSI_MAX
                         if _rsi_val_s < OVERSOLD_SHORT_RSI_MAX:
                             log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)")
-                            _tombstone_pending(c, token, direction, 'pump-chain-rsi-knife')
+                            _tombstone_pending(token, direction, 'pump-chain-rsi-knife', dry,
+                                               src_contains=['pump-chain', 'pump_chain'])
                             continue
                         # Bearish override: when BTC is bearish, allow SHORT even if RSI < min
                         _pcs_bearish_override = False
@@ -3314,7 +3343,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  ✅ [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT bypass — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} but BTC bearish (oversold = continuation)")
                         else:
                             log(f"  🚫 [PUMP-CHAIN-SHORT-RSI-MIN] {token} SHORT blocked — RSI={_rsi_val_s:.1f} < {PUMP_CHAIN_SHORT_RSI_MIN} (oversold SHORT)")
-                            _tombstone_pending(c, token, direction, 'pump-chain-rsi-min')
+                            _tombstone_pending(token, direction, 'pump-chain-rsi-min', dry,
+                                               src_contains=['pump-chain', 'pump_chain'])
                             continue
                 except ImportError:
                     pass
@@ -3486,7 +3516,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # block line — gate census must never depend on substring-grep
                 # archaeology again (v1 audit dropped 36% of block volume).
                 log(f"  🔒 [CONFLUENCE-GATE-BLOCK] {token} {direction} BLOCKED — {gate_msg}")
-                _tombstone_pending(c, token, direction, f'confluence: {gate_msg}')
+                _tombstone_pending(token, direction, f'confluence: {gate_msg}', dry)
                 continue
 
             # ── DRIFT-A enforcement (2026-10-06): bypass must respect vol-gate 0.0 ──
@@ -3504,7 +3534,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _bypass_sig_mult = _get_signal_type_mult(source, _vol_regime, source=source or '')
                     if _bypass_sig_mult == 0.0:
                         log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction} BLOCKED — bypass denied, vol gate override=0.0 for '{source}' in {_vol_regime}")
-                        _tombstone_pending(c, token, direction, 'vol-gate-override-0.0')
+                        _tombstone_pending(token, direction, 'vol-gate-override-0.0', dry,
+                                           src_contains=source)
                         continue
                 except Exception:
                     pass  # fail-open
@@ -4133,7 +4164,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  🔥 [MAXXED] {tkn} {direction}: ATR%={_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (maxxed-out tier)")
                         if MAXXED_BLOCK_ENABLED:
                             log(f"  🚫 [MAXXED-BLOCK] {tkn} {direction} blocked at approval — ATR% {_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (explosive vol, bad both directions)")
-                            _tombstone_pending(c, tkn, direction, 'maxxed-vol')
+                            _tombstone_pending(tkn, direction, 'maxxed-vol', dry)
                             continue
                 except Exception:
                     pass  # non-fatal — fail-open on MAXXED check
@@ -4202,7 +4233,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.2f} < {SHORT_RSI_HARD_FLOOR} but BTC bearish (oversold = continuation)")
                                 else:
                                     log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.2f} < {SHORT_RSI_HARD_FLOOR} (exec-time floor would reject anyway)")
-                                    _tombstone_pending(c, tkn, direction, 'short-rsi-hard-floor')
+                                    _tombstone_pending(tkn, direction, 'short-rsi-hard-floor', dry)
                                     continue
                 except Exception:
                     pass  # non-fatal
@@ -4238,7 +4269,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 from hermes_constants import OVERSOLD_SHORT_RSI_MAX
                                 if _rsf_rsi < OVERSOLD_SHORT_RSI_MAX:
                                     log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)")
-                                    _tombstone_pending(c, tkn, direction, 'short-rsi-floor-knife')
+                                    _tombstone_pending(tkn, direction, 'short-rsi-floor-knife', dry)
                                     continue
                                 # Bearish override: when BTC is bearish, oversold = continuation
                                 # T directive 2026-10-08: restore override — 118 SHORT signals expired during dump
@@ -4268,7 +4299,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     log(f"  ✅ [SHORT-RSI-FLOOR] {tkn}: SHORT bypass — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} but BTC bearish (oversold = continuation)")
                                 else:
                                     log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold)")
-                                    _tombstone_pending(c, tkn, direction, 'short-rsi-floor')
+                                    _tombstone_pending(tkn, direction, 'short-rsi-floor', dry)
                                     continue
                 except Exception:
                     pass  # non-fatal
@@ -4313,7 +4344,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     # bear allow AT THIS SITE ONLY; [35,45) bear allowance lives
                                     # in the hard-floor blocks above.
                                     log(f"  🚫 [OVERSOLD-SHORT] {tkn}: SHORT blocked — 1m RSI {_os_rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (BANANA repeat prevention — no bearish override ever)")
-                                    _tombstone_pending(c, tkn, direction, 'oversold-knife')
+                                    _tombstone_pending(tkn, direction, 'oversold-knife', dry)
                                     continue
                     finally:
                         if _conn_os:
@@ -5625,9 +5656,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     continue
                             except ImportError:
                                 log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — ichimoku import failed")
+                                _tombstone_pending(tok, d, 'pending-approve-single-source(ichimoku-importfail)', dry)
                                 continue
                         else:
                             log(f"  🔒 [PENDING-APPROVE-BLOCK] {tok}:{d} single-source blocked from APPROVE — src='{source}' parts={len(src_parts)} — need 2+ for confluence")
+                            _tombstone_pending(tok, d, 'pending-approve-single-source(need-2+)', dry)
                             continue
                     elif not CONFLUENCE_REQUIRED and len(src_parts) < 2:
                         log(f"  ➡️  [PENDING-APPROVE-ALLOW] {tok}:{d} single-source allowed (CONFLUENCE_REQUIRED=False) — src='{source}'")
