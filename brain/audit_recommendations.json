@@ -1,123 +1,236 @@
 {
-    "timestamp": "2026-10-28T20:45:00Z",
-    "run": 195,
-    "session_brain_stats": {
-        "queries_run": 3,
-        "top_insights": "chop detector / risk-budget / signal failure threads consistent with prior runs; no new missing implementations surfaced"
+  "timestamp": "2026-10-29T01:05:00Z",
+  "run": 196,
+  "session_brain_stats": {
+    "queries": 3,
+    "note": "volume-buildup R:R / chop-bleed entry / new-signal ideation; no un-implemented idea found that passed bars; ideation hits all reference already-shipped or already-refuted work"
+  },
+  "trade_summary_24h": {
+    "trades": 29,
+    "wr": 51.7,
+    "pnl_usdt": -0.83,
+    "7d": {
+      "trades": 129,
+      "wr": 55.8,
+      "pnl": -0.21
     },
-    "trade_summary_24h": {
-        "trades": 27,
-        "wr": 51.9,
-        "pnl": -0.74,
-        "status": "RED",
-        "7d": "127T 55.9% -0.12",
-        "14d": "290T 44.5% -3.64",
-        "armed_7d": "66T 87.9% +3.71",
-        "unarmed_7d": "52T 9.6% -4.14"
+    "14d": {
+      "trades": 289,
+      "wr": 45.0,
+      "pnl": -3.6
     },
-    "chop_bleed_kpi": {
-        "7d_dollar_share": 91.4,
-        "7d_never_armed_loss": 4.25,
-        "7d_all_loss": 4.65,
-        "14d": 88.0,
-        "30d": 82.0,
-        "null_mfe_7d": 1,
-        "same_day_arm_rate_20261028": 14.8,
-        "same_day_armed": 4,
-        "same_day_closed": 27,
-        "long_arm_7d": 52.1,
-        "tripwire_status": "UNDER 92% gate; same-day arm 14.8% is leading indicator; one never-armed loser flips it",
-        "size_lever_finding": "74% of 7d never-armed loss ($3.15/$4.25) sits at HL floor (amount<=11.5) where size cuts are NO-OPs; 0.75x proposal captures only ~$0.28"
+    "30d": {
+      "trades": 748,
+      "wr": 44.7,
+      "pnl": -4.6
     },
-    "shadow_analysis": {
-        "contrarian": "join refreshed 20:30Z: overall flip 47.6% n=744; pc- 64.6% n=350 LIVE (monotone); btc-pump-rider+ 32.5% do-NOT-flip",
-        "shadow_trader": "32,790 signals; exit A/B pm_trail +4649 vs hard_max -6429 (0% WR) / rr -1708 / cut_loser -716 -> trail-or-nothing",
-        "oscillator": "fossil (archived 10-27)",
-        "wyckoff": "PENDING JOIN (11-15)",
-        "floor_admit": "p=0.138 COLLECT (11-15)",
-        "rr_shadow": "orphaned — no producer",
-        "overall": "2/6 useful (contrarian + shadow_trader); ARM-BE fixed; oscillator/floor/wyckoff/rr not answerable"
+    "by_signal_7d_nge5": {
+      "volume-buildup- SHORT": "34T 58.8% -0.47",
+      "bb-bounce-v2-long+ LONG": "10T 10.0% -0.39 (OWNED: TAT/CEO)",
+      "pump-chain+ LONG": "17T 58.8% -0.16 (NO-KILL/CONF_FLOOR)",
+      "bb-squeeze+ LONG": "21T 76.2% +0.66 (weight 1.0 since 10-28 11:31Z)",
+      "r2v2-long3 LONG": "6T 83.3% +0.25"
     },
-    "watchdog_steer_triage": [
-        {
-            "steer": "Skip volume-buildup- SHORTs while aggregate holds LONG_BIAS (age=2)",
-            "verdict": "ANSWERED WITH DATA — REJECTED as config change",
-            "evidence": "0 BULL-regime vb- SHORT trades in 14d (btc_regime stamp coverage 39/39): the steer is already implemented by the signal not firing. The bleed is in BEAR_TREND (n=25, 52% WR, -0.43) and TRANSITIONING (n=8, 87.5% +0.19). All proposed filters fail Fisher: rsi<45 p=0.74 14d / p=1.0 30d; vol_spike<0.15 p=0.71; tape position n=5 (stamp too new). Every regime cell n<20. Per #179 direction fix p=0.75 blocking-LOSES."
-        },
-        {
-            "steer": "Chop-bleed 91.4% $ share routed to brain-auditor",
-            "verdict": "MEASURED — under gate, size lever weak, creative logged",
-            "evidence": "7d 91.4% (4.25/4.65), 14d 88.0%, same-day arm 14.8% leading. Size dampener mostly inert at HL floor (74% of loss). Creative improvement logged: same-day arm-rate confluence dampener (not size)."
-        },
-        {
-            "steer": "STABLE LONG HOLD — bb-squeeze+ healthy",
-            "verdict": "CONFIRMED — 7d 20T 75% +0.65, weight-1.0 boost 5T 100% +0.20 since 11:31Z, hold bracket intact"
-        }
-    ],
-    "losing_trade_autopsy": {
-        "method": "recovery_replay adverse-first, selfcheck PASS",
-        "48h": "n=18 = 4 never-adverse / 12 recovered / 2 NEVER",
-        "never": "PURR #16452 hh-hl+ LONG (fresh, mfe 0.048) + AERO #16432 waiver-era (class closed 10-27)",
-        "verdict": "WRONG-SIDE REFUTED 120th consecutive run (#61 p=0.116, #84 t=-0.04)",
-        "hb_ar_detail": "HBAR #16469 vb- SHORT rsi_14=38.46 vol_spike=0.04 (dead tape) mfe=0.013 never armed -> stale_exit -0.23; USELESS #16468 winner 19min earlier same family same regime vol_spike=0.72 (real volume) -> profit-monster-trail. Difference = volume confirmation, not direction."
+    "armed_unarmed_14d": {
+      "armed": "148T 78.4% +7.70",
+      "unarmed": "140T 10.0% -11.30 (1 NULL)"
     },
-    "signal_deep_dive": {
-        "new_targets": 0,
-        "sub50_n15": "bb-bounce-v2-long+ 32T 34.4% (OWNED: TAT+CEO), ai-trader+ 15T 40% (disabled), pump-chain+ 38T 36.8% (NO-KILL: 30d +1.79, CONF_FLOOR pending), ai-trader-pending 17T 23.5% (CEO-domain)",
-        "per_signal_arm_rate_axis": "pre-registered #194 trigger tested: candidates ai-trader+ p=0.79, ai-trader-pending p=0.08, bb-bounce p=0.26, pump-chain+ p=0.48 — NONE pass p<0.05, trigger correctly did NOT fire",
-        "bb_squeeze_plus": "weight-1.0 boost (auto_1hr 11:31Z): 5T 100% +0.20 since — working, hold at ceiling"
+    "exit_families_14d": {
+      "profit-monster-trail": "86T 93.0% +4.55",
+      "atr_trail_hit": "12T 75.0% +1.50",
+      "ugb_pt": "18T 77.8% +0.63",
+      "atr_sl_hit": "60T 1.7% -4.59",
+      "hard_max_loss": "30T 0.0% -3.83",
+      "stale_exit": "5T 0.0% -1.00",
+      "cut-loser-CL-T1": "7T 0.0% -0.89"
     },
-    "drift_findings": [
-        {"severity": "LOW", "finding": "Tape-state stamp miss 1/26: BTC #16463 ai-trader-pending 08:45:40 (manual/pending path may bypass decider_run)"},
-        {"severity": "INFO", "finding": "vacation_mode.json still true (24th+ run, review queue honored)"},
-        {"severity": "INFO", "finding": "hl-copy.err.log 28.4MB / signal-compactor.err.log 5.8MB unrotated"}
-    ],
-    "last_run_verify_194": {
-        "contrarian_join": "REFRESHED this run (was the mandate) — fresh at 20:30Z",
-        "tape_state_stamp": "25/26 since 02:00Z — HOLD (miss = BTC #16463 pending path)",
-        "coupled_sl_trial": "n=32 since 10-27 15:00: hard_max_loss 0 (was 14 pre), atr_sl_hit 5 (-0.57), rolling 7d -0.12 not < -2.50 -> trial continues, Proposal A/B due 11-03",
-        "bb_squeeze_weight_1_0": "5T 100% +0.20 since boost — working",
-        "null_mfe_pin": "1 in 7d — pin working",
-        "checkpoint_registry": "0 pending",
-        "constants_diff": "EMPTY",
-        "session_lock": "absent",
-        "size_reduce": "absent = 1.0x",
-        "tracebacks": "0 new (2 total, both 2026-10-11)"
+    "arm_rate_by_day": {
+      "10-25": 68.4,
+      "10-26": 46.4,
+      "10-27": 76.5,
+      "10-28": 41.4,
+      "10-29(partial)": 0.0
     },
-    "creative_improvements": [
-        {
-            "date": "2026-10-28",
-            "idea": "SAME-DAY ARM-RATE CONFLUENCE DAMPENER — when same-day arm% <20% with n>=15 closed, raise NEW-entry confluence bar from 1+ to 2+ sources for the remainder of the UTC day (auto-reset)",
-            "rationale": "Same-day arm rate 14.8% (4/27) is the leading indicator of chop (10-26: 46.4% arm -> -1.17 day). Size dampener is 74% inert at HL floor (measured this run). Confluence dampener reduces chop ENTRY COUNT without touching size and without time-blocking. Not a time gate — a measured market-behavior condition.",
-            "expected_impact": "On a 14.8% arm day like today, would have blocked ~50% of the 23 never-armed entries (~$0.35 of $0.74 bleed) while preserving trail-family entries that arm",
-            "category": "entry sniper",
-            "status": "suggested",
-            "risk": "medium — needs pipeline code change (confluence check reads same-day arm rate); pre-register: only fires when same-day n>=15 AND arm%<20 AND blocks <20% of same-day winners (fk check)",
-            "config_change": false
-        }
-    ],
-    "config_changes_applied": [],
-    "changes_from_last_run": [
-        "#194: contrarian join mandate — EXECUTED this run (fresh 20:30Z)",
-        "#194: NULL-mfe pin — HOLDING (1 in 7d)",
-        "#194: tape-state stamp — HOLDING (25/26)",
-        "#194: coupled-SL trial — CONTINUING (n=32, hard_max_loss 0)",
-        "#194: creative #1 (0.75x size on breach) — CORRECTED this run: size lever 74% inert at HL floor; replaced with confluence dampener idea"
-    ],
-    "next_actions": [
-        "20:30Z+ next run: chop-bleed re-measure (if >=92% AND same-day arm <20%, escalate confluence dampener to CEO)",
-        "bb-squeeze+ weight-1.0 effect: monitor closes (5T 100% so far)",
-        "coupled-SL trial: n toward Proposal A/B disposition (due 11-03)",
-        "contrarian join freshness: re-run if >4h stale",
-        "2026-10-30: scoped momentum time-stop BLIND run",
-        "2026-11-03: coupled-SL disposition + shadow batch + Z-FLIP",
-        "2026-11-10: CHASE-MOVE flip + MFE-CUT disposition (units guard first)",
-        "2026-11-15: floor_admit same-sign + wyckoff",
-        "CEO queue: CONF_FLOOR fk pin, tf-authority, bb-bounce, TAT flip, MFE-CUT, chop-bleed confluence dampener (new)"
-    ],
-    "readiness": {
-        "open": "1 STABLE LONG bb-squeeze+ @0.027357 SL 0.027054 conf 100 — HOLD, bracket intact, family healthy",
-        "regime": "15m LONG_BIAS / 4h NEUTRAL / continuum ABOVE / vol LOW / trend STRONG_UP / accel NEGATIVE",
-        "stance": "LONGs aligned with tape OK (bb-squeeze+ first); no counter-trend SHORTs; no fresh entries until accel turns positive or volume confirms; size 1.0x"
+    "arm_rate_7d_by_direction": {
+      "LONG": "44/82 = 53.7%",
+      "SHORT": "30/48 = 62.5%"
     }
+  },
+  "chop_bleed_kpi": {
+    "7d": "94.3% dollar (4.48 of 4.75; 46 of 52 losers; 0 NULL mfe) = BREACH of >=92% gate, run #1 of 2",
+    "14d": "89.2%",
+    "30d": "82.3%",
+    "watchdog_0011Z_read": "91.6% (4.35/4.75, 45/52, 1 NULL) — pre-backfill; nightly 00:20Z backfill resolved the NULL to never-armed, which is what moved it over the gate",
+    "tripwire_state": {
+      "ge92_escalation": "BREACHED (1st consecutive run; next run decides per #194 pre-registration)",
+      "route_reopen_lt70": "NOT tripped (94.3%)",
+      "arm_rate_LONG_lt50": "NOT tripped (53.7% post-backfill; the 46.9% 'OPEN' the watchdog printed at 00:11Z was a pre-backfill artifact — ROOT-CAUSED and fixed this run, see config_changes_applied)"
+    }
+  },
+  "watchdog_steers": {
+    "count": 0,
+    "health": "good",
+    "routed_to_brain_auditor": [
+      "chop-bleed 91.6% owner=entry-gates age=4 cycles — ANSWERED: detect-time entry-quality route already closed on 3 axes (#96/#190/#192); size lever 74% inert at HL floor (#195); this run additionally REFUTES the throttle/leading-indicator premise (see creative_improvements #1) — remaining levers are the queued MFE-CUT (Nov 10), coupled-SL (Nov 3), TAT variant-C + CONF_FLOOR (CEO)",
+      "volume-buildup- R:R / loss-size question — ANSWERED with decomposition (see shadow_analysis.vb_decomposition): not a payout-structure bug, it is the unarmed half"
+    ],
+    "steer_actions": "none (0 condition steers; LTC retract already superseded by its 00:32Z trail close)"
+  },
+  "shadow_analysis": {
+    "contrarian": "REFRESHED 01:00Z (mandate): 1016 entries / 744 joinable / overall flip 47.6% n=742 · pump-chain- 64.6% n=350 LIVE fade (monotone 64.1->64.6) · btc-pump-rider+ 32.5% n=393 rising but do-NOT-flip · hmacd_mtf-+ n=1",
+    "oscillator": "FROZEN + archived (data/archive/oscillator_shadow.json.fossil-20261027) — not used",
+    "wyckoff": "345 rows, outcome join still PENDING (due 11-15)",
+    "floor_admit": "join live, floor_only 47.9% vs always_admit 38.4%, Fisher p=0.138 — COLLECT, due 11-15",
+    "rr_shadow": "ORPHANED (no producer, mtime 24d) — not cited",
+    "shadow_trader": {
+      "signals": 33434,
+      "closed": 32673,
+      "gates": "CONFLUENCE-EXPIRY 13,354 blocked @48% WR avg -0.12 · CTX-GATE 1,362 @48% -0.14 · UNKNOWN 604 @38% -0.23 · BTC-CRASH 170 @34% -0.29 = gates justified",
+      "exit_ab": "pm_trail +4,713 (n=12,734, 100%) vs hard_max -6,514 (0%) · rr_engine -1,741 · cut_loser -800 (0%) · trail_arm_timeout -98 → TRAIL-OR-NOTHING again",
+      "sl_sweep": "every SL level negative: 0.50% -> 17.4% WR / -0.255 avg, >=15% (no stop) -> 44.6% / -0.227. No usable stop optimum — the trail, not the stop level, is the lever (consistent with the coupled-SL trial + escalation #17)",
+      "hml_analyze": "CUT_LOSER -6.0% @lev5 now cuts 12 of 2,667 (0.45%) vs 956 at -4.0% → the CUT_LOSER half of the coupled trial has essentially no traffic (confirms #192's hierarchy-inversion); est PnL -0.937 vs -0.934 = widening costs nothing in sim → feeds Nov-3 Proposal A/B",
+      "dead_signal_lists": "worst = r2-trend-long5 12T 8.3%, tl-bounce+2 20T 10%, open-skies+ 118T 17.8% (open-skies+ KILLED 2026-09-17, NEVER_REENABLE — shadow rows are pre-kill, not a live target); wrong-side = spike_exhaustion_short- MFE/MAE -0.39"
+    },
+    "vb_decomposition": {
+      "question": "watchdog: volume-buildup- 7d 34T/20W/58.8% WR/-$0.47 with losses 2.1x wins = R:R / loss-size question",
+      "14d": "39T, 23W/16L, -0.53",
+      "armed": "24T 91.7% +1.24 (avg +0.053)",
+      "unarmed": "15T 6.7% -1.77 (avg -0.118)",
+      "loss_exit_mix": "hard_max_loss 5T -0.70 · cut-loser-CL-T1 4T -0.55 · stale_exit 2T -0.38 · atr_sl_hit 2T -0.16 · ugb_pt 2T -0.02",
+      "break_even_wr_needed": "66.9% (loss avg -0.117 vs win avg +0.053) vs actual 58.8%",
+      "verdict": "SAME CLASS AS THE WHOLE SYSTEM — the bleed is the unarmed half, not a payout-structure defect. Every candidate filter already fails: by-regime cells all n<20 (#195), direction fix p=0.75 (#179), rsi<45 p=0.74/30d p=1.0 (#195). NO CHANGE. Owned by the queued entry/exit stack.",
+      "confidence": "HIGH"
+    },
+    "useful_sources": "2/6 answerable: contrarian + shadow_trader (+ floor/wyckoff pending, oscillator fossil, rr orphaned)"
+  },
+  "losing_trade_autopsy": {
+    "method": "brain/analysis/recovery_replay.py, adverse-first anchor, --selfcheck PASS",
+    "48h": "n=16 = 3 never-adverse / 12 recovered-after-adverse / 1 NEVER (PURR #16452 hh-hl+ LONG atr_sl_hit -0.19, mfe 0.048)",
+    "verdict": "WRONG-SIDE REFUTED 121st consecutive run (#61 opposite-side p=0.116, #84 forward-return t=-0.04)",
+    "14d_structural": "17.5% never-traded-back cohort still owned by re-enter-on-recovery (Oct 25 queue)"
+  },
+  "drift_findings": [
+    {
+      "severity": "MED",
+      "finding": "#194/#195 called the same-day arm rate a LEADING indicator ('a breach is forecastable ~1 day ahead') — measured this run, it does not lead (see creative_improvements #1). The claim should be struck from the escalation text so a lagging measure is not acted on as a forecast.",
+      "status": "flagged for prompt edit next run"
+    },
+    {
+      "severity": "LOW",
+      "finding": "watchdog pattern_alerts arm-rate tripwire was computed pre-backfill (46.9% 'OPEN') while the chop-bleed KPI it sits next to was measured post-backfill — same reading, two data states, opposite conclusions",
+      "status": "root-caused at source by this run's ship"
+    },
+    {
+      "severity": "LOW",
+      "finding": "vacation_mode.json still true (review-queue honored, constants_change_review_queue active)",
+      "status": "carried"
+    },
+    {
+      "severity": "INFO",
+      "finding": "LTC #16511 closed 00:32:43Z with mfe_pct NULL — pre-dates this run's fix by 3 minutes; tonight's backfill repairs it (proof the nightly net still works)"
+    }
+  ],
+  "recurring_problems": [
+    "chop-bleed >=92% gate — now BREACHED at 94.3% (1st consecutive)",
+    "entry-quality route closed on 3 independent axes, levers all queued with dates (Nov 3 coupled-SL, Nov 10 MFE-CUT/CHASE-MOVE, Nov 15 floor/wyckoff, Oct 30 scoped time-stop blind run)",
+    "units landmine / backfill-state KPI sensitivity — mitigated this run by writing mfe at source"
+  ],
+  "missing_implementations": [],
+  "creative_improvements": [
+    {
+      "id": "C1",
+      "status": "REJECTED-WITH-DATA",
+      "idea": "Same-day arm-rate throttle / confluence dampener (raise the entry bar when arm% is low) — the #195 logged creative and the #194 'forecastable ~1 day ahead' claim",
+      "measure": "intra-day: first-5-close arm% vs rest-of-day per-trade PnL r=-0.135 t=-0.69 n=28d (cold days -0.006/trade vs hot -0.002) · day-over-day: arm%D vs per-trade PnL(D+1) r=+0.174 t=0.88 p~0.39 n=27 pairs (cold->next -0.000, hot->next +0.004)",
+      "note": "first cut used SUM of rest-of-day PnL and showed a misleading r=-0.353; corrected for trades-per-day confound → null",
+      "verdict": "arm-rate is a LAGGING measure of the same entry-quality problem, not a forecast. Do NOT build any throttle on it.",
+      "risk": "n/a"
+    },
+    {
+      "id": "C2",
+      "status": "PRE-REGISTERED (CEO_PROTECTED — needs CEO ruling + candle replay)",
+      "idea": "EARLY-ARM ladder: PM_TRAIL_ACTIVATE_PCT 0.40% -> test 0.30/0.35 tiers so near-miss trades lock a small win instead of riding back to a -1% stop",
+      "evidence_30d_mfe_buckets": "<0.10 144T 2.1% -16.56 | 0.10-0.20 67T 4.5% -5.76 | 0.20-0.30 52T 5.8% -4.82 | 0.30-0.40 58T 17.2% -3.49 | 0.40-0.60 131T 63.4% -0.16 | >=0.60 288T 80.2% +26.11 — everything below +0.40% MFE owns -30.63 of gross loss; the 0.30-0.40 band came within a dime of arming and still lost 83%",
+      "pre_registered_bar": "1m candle replay, first touch of tier -> trail 0.20% from then on; ship only if (a) net USD >= +$2.00/14d, (b) fk <20% of the >=0.60 cohort winners (they own +26.11 — earlier arm must not shake them out), (c) 30d same sign",
+      "risk": "MED — earlier arm = more shakeout exits; PM_TRAIL_ACTIVATE_PCT is CEO_PROTECTED ('MUST BE 0.40% ... DO NOT CHANGE', 2026-09-06), TRAILING_ACTIVATION_PCT must move with it",
+      "status_note": "measurement only, ZERO config change this run"
+    },
+    {
+      "id": "C3",
+      "status": "SHIPPED (zero trading behavior)",
+      "idea": "Real-time MFE/MAE telemetry from this run's brain.py fix — same-day arm-rate and chop-bleed become complete intra-day instead of lagging the nightly 00:20Z backfill",
+      "next": "after one night of closes, confirm 0 new NULL mfe rows; then the watchdog's NULL-mfe pin can stay as a tripwire but should stop being able to swing the KPI"
+    }
+  ],
+  "config_changes_applied": [
+    {
+      "type": "tweak (zero trading behavior)",
+      "file": "scripts/brain.py",
+      "change": "close UPDATE now stamps mfe_pct/mae_pct (direction-aware, highest_price/lowest_price, ROUND 4, guard entry/extremes>0 AND direction IN ('LONG','SHORT'), COALESCE-preserving) — byte-identical to cell_stats.backfill_mfe_mae",
+      "before": "NULL until nightly 00:20Z backfill (up to 24h window)",
+      "after": "written at close, in the same single UPDATE that sets status='closed'",
+      "rationale": "watchdog arm-rate tripwire read 46.9% 'OPEN' pre-backfill vs 53.7% actual post-backfill on 2026-10-29; chop-bleed 91.6->94.3 on backfill state alone — KPIs that gate escalation must not depend on whether the nightly job has run",
+      "verification": "selfcheck ALL PASS (formula identity vs backfill, temp-table round-trip with hand-computed LONG/SHORT, single-statement); live-schema probe rowcount=1 then ROLLBACK row unchanged; bug_hunter subagent VERDICT=SHIP (0 HIGH, 1 MED acted, 1 LOW acted)",
+      "impact": "zero trading behavior: no live gate reads trades.mfe_pct; git diff scripts/hermes_constants.py = 0 lines; CEO_PROTECTED 13/13"
+    },
+    {
+      "type": "ops",
+      "file": "systemd hermes-hl-copy.service",
+      "change": "restarted (bug_hunter MED: long-running daemon caches the old brain module on first copy-exit close)",
+      "before": "PID 3624 up since 2026-10-28 14:36Z",
+      "after": "PID 1062534 started 2026-10-29 00:59:25Z, ActiveState=active",
+      "impact": "copy-exit close family now routes through the fixed close path"
+    },
+    {
+      "type": "ops",
+      "file": "data/contrarian_outcome_join.json",
+      "change": "contrarian outcome join re-run (Step 2b mandate)",
+      "before": "stale since #195 20:30Z",
+      "after": "fresh 01:00Z, 744 joinable"
+    }
+  ],
+  "changes_from_last_run": [
+    "#195 creative (confluence dampener on same-day arm%) — MEASURED AND REFUTED this run (C1) → do not build",
+    "#194 creative #1 (0.75x size proposal on 2 consecutive >=92% breaches) — ARMED: this run is breach run #1; #195 measured 74% of never-armed dollars sit at the HL floor where size cuts are NO-OP, so on run #2 present BOTH facts to CEO instead of escalating blind",
+    "#194 Step-2b contrarian mandate — HELD (ran unconditionally, fresh)",
+    "#194 watchdog prompt NULL-mfe pin — HELD and now backed by a source-level fix",
+    "bb-squeeze+ weight 1.0 (11:31Z 10-28) — EFFECT VISIBLE AND POSITIVE: 10-28 10T 90.0% +0.17 (7d 21T 76.2% +0.66); no closes 10-29 yet",
+    "#192 BTC tape-state stamp — traffic check deferred to next run (no new opens this window)"
+  ],
+  "tripwires": {
+    "chop_bleed_ge92": "BREACHED 94.3% — run #1 of 2; next run decides the #194 escalation",
+    "arm_rate_LONG_lt50": "NOT tripped (53.7%)",
+    "route_reopen_lt70_x2": "NOT tripped",
+    "coupled_SL_revert": "NOT met (7d -0.21 vs -2.50); Proposal A/B due Nov 3 — HML sim this run shows CUT_LOSER -6% cuts only 12/2667 = trial still not testing its own hypothesis",
+    "CHASE_MOVE_flip": "shadow only, review 2026-11-10",
+    "MFE_CUT_default_KILL": "2026-11-10, units guard first"
+  },
+  "next_actions": [
+    "NEXT RUN: re-measure chop-bleed with the pinned SQL — if >=92% again = breach run #2 → present the #194 0.75x size proposal TOGETHER with #195's 74%-inert measurement for CEO ratify/veto (do not escalate blind)",
+    "NEXT RUN: confirm 0 new NULL mfe_pct rows after this fix + the 10-29 backfill (proof the source fix works end to end)",
+    "NEXT RUN: check BTC tape-state stamp coverage on the first new open since 02:06Z",
+    "Oct 30: scoped time-stop BLIND run (do not peek)",
+    "Nov 3: coupled-SL disposition (Proposal A/B) + shadow_disposition batch + contrarian conversion KPI definition",
+    "Nov 10: CHASE-MOVE flip + MFE-CUT disposition (default KILL, units guard first)",
+    "Nov 15: floor_admit + wyckoff outcome joins",
+    "CEO: C2 early-arm ladder ruling (protected flag, needs candle replay) · CONF_FLOOR fk pin · TAT variant-C flip · tf-authority 1m-vs-5m · bb-bounce"
+  ],
+  "readiness": {
+    "open": "1 — VIRTUAL #16512 LONG warrior-sr-confirm+ @0.62877, SL 0.6213038 / TP 0.6413454, lev 5, age 1.7h, -0.91%. family: warrior-sr-confirm+ 4T/7d (small n, watch only)",
+    "closed_this_window": "LTC #16511 profit-monster-trail +0.01 at 00:32:43Z",
+    "regime": "btc_15m SHORT_BIAS vs btc_4h LONG_BIAS (sources disagree — cite which) · continuum AT · vol LOW · trend STRONG_UP · flip rate normal",
+    "rule": "bias conflict -> NO fresh directional entries; LONGs only on a pullback-to-structure that reclaims EMA300 and HOLDS 15-30m WITH volume; SHORTs only under EMA300 with 4h aligned; trail-family first; size 1.0x (size-reduce file absent)"
+  },
+  "verification": {
+    "session_lock": "absent",
+    "constants_git_diff_lines": 0,
+    "ceo_protected_flags": "13/13",
+    "size_reduce_file": "absent = 1.0x",
+    "checkpoint_registry": "0 pending (a new one registered this run)",
+    "new_tracebacks": "0 (pipeline.log 5 total last Oct-11; profit_monster/cut_loser last Oct-17)",
+    "recovery_replay_selfcheck": "PASS",
+    "mfe_write_selfcheck": "ALL PASS",
+    "contrarian_join": "fresh 01:00Z",
+    "bug_hunter": "SHIP verdict (subagent, this run)"
+  }
 }

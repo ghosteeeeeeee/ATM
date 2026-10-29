@@ -3218,5 +3218,27 @@
     "after": "added the two companions with the measured 5.8pt NULL swing, the 00:20Z nightly self-heal note, and the 2026-10-28 20% same-day arm example",
     "rationale": "a backfill moves the share 5.8pt on identical trades (false-math-bug class #184); daily arm% leads chop-bleed by ~1 day",
     "impact": "zero trading behavior; reporting only"
+  },
+  {
+    "timestamp": "2026-10-29T01:03:26Z",
+    "agent": "brain_auditor",
+    "change": "brain.py close UPDATE stamps mfe_pct/mae_pct at close (direction-aware, highest/lowest price, ROUND 4, guard entry/extremes>0 AND direction IN ('LONG','SHORT'), COALESCE-preserving) — byte-identical to cell_stats.backfill_mfe_mae",
+    "type": "tweak",
+    "file": "scripts/brain.py",
+    "before": "NULL until nightly 00:20Z backfill (up to 24h window; watchdog arm-rate tripwire read 46.9% OPEN pre-backfill vs 53.7% actual)",
+    "after": "written in the same single UPDATE that sets status='closed'",
+    "rationale": "escalation-gating KPIs must not depend on backfill state; root cause fixed where every brain-CLI close routes through",
+    "impact": "zero trading behavior (no live gate reads trades.mfe_pct); selfcheck ALL PASS; bug_hunter SHIP; verified live-schema probe + ROLLBACK"
+  },
+  {
+    "timestamp": "2026-10-29T01:03:26Z",
+    "agent": "brain_auditor",
+    "change": "restarted hermes-hl-copy.service to drop the cached pre-fix brain module",
+    "type": "ops",
+    "file": "systemd hermes-hl-copy.service",
+    "before": "PID 3624 up since 2026-10-28 14:36Z",
+    "after": "PID 1062534 at 2026-10-29 00:59:25Z, active",
+    "rationale": "bug_hunter MED: long-running daemon imports brain lazily and caches it",
+    "impact": "copy-exit close family routes through the fixed path"
   }
 ]

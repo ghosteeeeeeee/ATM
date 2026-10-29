@@ -9801,5 +9801,32 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "medium — needs pipeline code change; pre-register: only fires when same-day n>=15 AND arm%<20 AND fk <20% of same-day winners"
+  },
+  {
+    "date": "2026-10-29T01:03:26Z",
+    "idea": "REJECTED-WITH-DATA: same-day arm-rate throttle / confluence dampener (raise entry bar when arm% low) — refutes #195 creative and #194's 'breach forecastable ~1 day ahead'",
+    "rationale": "intra-day: first-5-close arm% vs rest-of-day per-trade PnL r=-0.135 t=-0.69 n=28d (cold -0.006/trade vs hot -0.002). day-over-day: arm%D vs PnL(D+1) r=+0.174 t=0.88 p~0.39 n=27 (cold->next -0.000, hot->next +0.004). First cut showed r=-0.353 but that was trades-per-day confounded (SUM not per-trade) — corrected to null.",
+    "expected_impact": "none — prevents building a gate on a lagging measure",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-29T01:03:26Z",
+    "idea": "EARLY-ARM ladder pre-registration: test PM_TRAIL_ACTIVATE_PCT 0.40 -> 0.35/0.30 so near-miss trades lock a small win instead of riding to a -1% stop",
+    "rationale": "30d MFE census: <0.10 144T 2.1%WR -16.56 | 0.10-0.20 67T 4.5% -5.76 | 0.20-0.30 52T 5.8% -4.82 | 0.30-0.40 58T 17.2% -3.49 | 0.40-0.60 131T 63.4% -0.16 | >=0.60 288T 80.2% +26.11. Everything under +0.40% MFE owns -30.63 gross; the 0.30-0.40 band came within a dime of arming and still lost 83%.",
+    "expected_impact": "convert a share of the 0.30-0.40 cohort's -3.49 without touching the >=0.60 cohort that owns +26.11",
+    "category": "exit / arm mechanism",
+    "status": "pre-registered (CEO_PROTECTED flag — needs CEO ruling + 1m candle replay)",
+    "risk": "medium — earlier arm = more shakeout exits; bar = net >= +$2.00/14d AND fk<20% of >=0.60 winners AND 30d same sign"
+  },
+  {
+    "date": "2026-10-29T01:03:26Z",
+    "idea": "Real-time MFE/MAE telemetry (brain.py close now stamps it) — same-day arm-rate and chop-bleed KPIs become complete intra-day instead of lagging the 00:20Z backfill",
+    "rationale": "watchdog printed LONG arm 46.9% 'tripwire OPEN' at 00:11Z and 53.7% actual seconds after backfill; chop-bleed 91.6->94.3 on the same event",
+    "expected_impact": "KPI state no longer depends on whether the nightly job ran; tripwires stop false-tripping on backfill state",
+    "category": "telemetry",
+    "status": "shipped (zero trading behavior)",
+    "risk": "low"
   }
 ]
