@@ -17447,3 +17447,26 @@ Quiet hour — 0 closes, 0 open positions.
 - volume-buildup- 24h 5T 40% '$-0.40' worst signal — 14d HIGH positive (69.2% '+$0.17'), NORMAL bleed ('$-0.63'), EXTREME slight negative ('$-0.21'); regime-kill bar not met (wins in HIGH)
 - pump-chain+ 24h 3T 0% '$-0.11' — small n, 14d still positive; watch
 - bb-bounce-v2-long+ CEO kill review still pending
+
+## 2026-10-29 08:42 UTC Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A) | 24h: 22T 13W 59.1% '$-0.35' RED | **size-reduce: file absent -> 1.0x**
+
+Quiet hour — 0 closes, 0 open positions.
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T last hour — no n>=3 0%-WR signal to evaluate
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/22 = 9.1% (<40%) — SL not too tight; dominant close = profit-monster-trail (9T '+$0.45')
+- Boost: bb-squeeze+ 8T 100.0% '+$0.26' meets criteria but at 1.0 ceiling — no headroom
+- Neg streak: hour -1 was '-$0.14' (1 close), current hour empty — not 3 consecutive negative hours
+- Frequency 0/hr — under overtrading threshold
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- still worst 24h signal '$-0.40' (5T 40%) but 14d HIGH positive — regime-kill bar not met
+- pump-chain+ 24h 0W3L '$-0.11' — small n, watch
+- bb-bounce-v2-long+ CEO kill review still pending
