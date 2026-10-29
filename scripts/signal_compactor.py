@@ -2369,46 +2369,55 @@ def _storm_confluence_would_pass(token, direction):
     """STORM waiver conditions (CEO consult 20261029T2130Z, T proceed 2026-10-29).
 
     All three must hold — (i) BTC 1h close-to-close move <= STORM_BTC_1H_MOVE_PCT,
-    (ii) token RSI(14,5m) >= STORM_MIN_RSI (knife doctrine preserved), (iii) a
-    same-token+direction sibling carried an approval-gate block within
+    (ii) token RSI >= STORM_MIN_RSI via rsi_utils.compute_rsi_1m (the SAME
+    authority as the exec knife floor — a waiver pass can never be a knife reject),
+    (iii) a same-token+direction sibling carried an approval-gate block within
     STORM_SIBLING_WINDOW_MIN (the banned family signal IS the second source).
+
+    Review fixes 2026-10-29 (code review 9671bf67, pre-enforce):
+    (HIGH→SOLVED with a better fix than buckets) `is_closed`-hour predicates are
+    blind during the storm (tick-agg flips ~1h late; seeder marks in-progress
+    hours; bucket-by-ts still lags a full hour BY CONSTRUCTION — a completed hour
+    cannot contain the crash happening now; replay showed 0/71 or −0.20% during
+    the actual dump). (i) now uses a ROLLING 60-minute close-to-close on BTC 1m
+    candles (fresh every ~30s): crosses −1.5% within minutes of the crash heart
+    (replayed: −1.23% at 21:30, −1.35% at 21:15, ≈−3% at the 21:05 low) — honors
+    "BTC 1h move" literally while seeing it WHILE it happens.
+    (MEDIUM) (ii) was a third RSI disagreeing with BOTH the knife and the +$8.31
+    evidence cohort — now delegated to the knife's own helper (k-token hole thus
+    matches the knife's fail-open exactly: no waiver where the knife can't judge).
+    (MEDIUM) sub-condition DEBUG lines on storm-days + never-silent exceptions
+    (the shadow line was never observed end-to-end — suspected candles.db lock
+    during price_collector's WAL checkpoint; storms are exactly when it contends).
     Fails safe (False) on any error/missing data. Read-only."""
+    _dbg = ''
     try:
         from hermes_constants import (STORM_BTC_1H_MOVE_PCT, STORM_MIN_RSI,
-                                      STORM_SIBLING_WINDOW_MIN)
+                                      STORM_SIBLING_WINDOW_MIN, STORM_CONFLUENCE_WAIVER_SHADOW)
         conn = sqlite3.connect(CANDLES_DB, timeout=5)
         try:
-            btc_rows = conn.execute(
-                "SELECT close FROM candles_1h WHERE token='BTC' AND is_closed=1 "
-                "ORDER BY ts DESC LIMIT 2").fetchall()
+            _now_i = int(time.time())
+            _last = conn.execute(
+                "SELECT close FROM candles_1m WHERE token='BTC' AND ts<=? "
+                "ORDER BY ts DESC LIMIT 1", (_now_i,)).fetchone()
+            _past = conn.execute(
+                "SELECT close FROM candles_1m WHERE token='BTC' AND ts<=? "
+                "ORDER BY ts DESC LIMIT 1", (_now_i - 3600,)).fetchone()
         finally:
             conn.close()
-        if len(btc_rows) < 2 or not btc_rows[1][0]:
+        if not _last or not _past or not _past[0]:
             return False
-        _btc_1h = (btc_rows[0][0] - btc_rows[1][0]) / btc_rows[1][0] * 100
+        _btc_1h = (_last[0] - _past[0]) / _past[0] * 100
+        _dbg = f'btc-roll60m={_btc_1h:+.2f}'
         if _btc_1h > STORM_BTC_1H_MOVE_PCT:   # e.g. -0.9 > -1.5 -> not stormy enough
+            if STORM_CONFLUENCE_WAIVER_SHADOW and _btc_1h <= STORM_BTC_1H_MOVE_PCT + 1.5:
+                log(f"  [STORM-CONFL-DEBUG] {token} {direction}: {_dbg} "
+                    f"(not stormy enough, need <= {STORM_BTC_1H_MOVE_PCT})")
             return False
-        conn = sqlite3.connect(CANDLES_DB, timeout=5)
-        try:
-            r5 = conn.execute("SELECT close FROM candles_5m WHERE token=? AND is_closed=1 "
-                              "ORDER BY ts DESC LIMIT 15", (token,)).fetchall()
-            if len(r5) < 15:
-                r5 = conn.execute("SELECT close FROM candles_5m WHERE token=? AND is_closed=1 "
-                                  "ORDER BY ts DESC LIMIT 15", (token.upper(),)).fetchall()
-        finally:
-            conn.close()
-        if len(r5) < 15:
-            return False
-        _closes = [r[0] for r in r5][::-1]
-        _g = _l = 0.0
-        for _a, _b in zip(_closes[:-1], _closes[1:]):
-            _d = _b - _a
-            _g += max(_d, 0.0)
-            _l += max(-_d, 0.0)
-        if _l <= 0:
-            return False
-        _rsi = 100.0 - 100.0 / (1.0 + _g / _l)
-        if _rsi < STORM_MIN_RSI:
+        from rsi_utils import compute_rsi_1m
+        _rsi = compute_rsi_1m(token)   # knife authority (k-tokens fail-open None, same as knife)
+        _dbg += f' rsi={_rsi if _rsi is None else round(_rsi, 1)}'
+        if _rsi is None or _rsi < STORM_MIN_RSI:
             return False
         conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes_runtime.db'), timeout=5)
         try:
@@ -2419,8 +2428,14 @@ def _storm_confluence_would_pass(token, direction):
                 (token, direction, f'-{STORM_SIBLING_WINDOW_MIN} minutes')).fetchone()
         finally:
             conn.close()
-        return bool(_sib and _sib[0] > 0)
-    except Exception:
+        _n_sib = _sib[0] if _sib else 0
+        _dbg += f' sib={_n_sib}'
+        if _n_sib <= 0:
+            return False
+        log(f"  ✅ [STORM-CONFL-DEBUG] {token} {direction}: {_dbg} -> ALL-3 PASS")
+        return True
+    except Exception as e:
+        log(f"  ⚠️ [STORM-CONFL-ERROR] {token} {direction}: {e} ({_dbg}) — fail-safe False", 'WARN')
         return False
 
 

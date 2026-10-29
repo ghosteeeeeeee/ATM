@@ -219,7 +219,7 @@ If a query fails with `UndefinedColumn`, check column names against this list be
 ## STORM-READINESS PACKET (CEO consult 20261029T2130Z, T proceed — MANDATORY when BTC 1h |move| >= 1.5%)
 
 T's standing ask: "be ready for the next pump or dump. learn something!!!" — this makes it automatic.
-Every run, first compute BTC 1h close-to-close move from `data/candles.db` (`candles_1h`, token='BTC', `is_closed=1`, last two rows). **If |move| < 1.5%: skip this section (note "no storm").**
+Every run, first compute BTC **rolling 60-minute** close-to-close from `data/candles.db` (`candles_1m`, token='BTC'): latest close vs the close at `ts <= now-3600` — **NOT `is_closed` hour candles** (code review 9671bf67: hour-close flags lie both ways — tick-agg flips ~1h late, seeder marks in-progress hours, and completed buckets by definition cannot contain the crash happening now; the rolling method sees the storm within minutes, same as `_storm_confluence_would_pass`). **If |move| < 1.5%: skip this section (note "no storm").**
 
 When |btc_1h| >= 1.5:
 1. **Blocked-direction census (last 2h):** from `/root/.hermes/data/signals_hermes_runtime.db`,
