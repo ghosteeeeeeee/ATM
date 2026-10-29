@@ -1054,6 +1054,18 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     # profit_monster and any other caller using brain.py close_trade() would get
     # NULL exit_reason in the trades table, making exit attribution impossible.
     # Fix: write exit_reason = close_reason_val so both columns are always set.
+    #
+    # brain_auditor #196 (2026-10-29): also stamp mfe_pct/mae_pct at close.
+    # Every brain-CLI-routed close (profit-monster, cut_loser, guardian, hl_fill)
+    # left them NULL until cell_stats.backfill_mfe_mae ran nightly (00:20Z) —
+    # up to a 24h NULL window during which arm-rate KPIs count trail winners as
+    # unarmed (measured: watchdog read LONG arm 46.9% "tripwire OPEN" at 00:11Z
+    # pre-backfill vs 53.7% actual 9s after backfill). Formula is byte-identical
+    # to cell_stats.backfill_mfe_mae (same highest_price/lowest_price source), so
+    # values the nightly job would have written are written now instead — no new
+    # fabrication risk (PRICE_SANITY guards the peak upstream). COALESCE keeps any
+    # value another writer already stamped. Self-check:
+    # brain/analysis/mfe_write_at_close_2026-10-29.py --selfcheck
     cur.execute("""
         UPDATE trades SET
             exit_price    = %s,
@@ -1066,7 +1078,21 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             close_reason  = %s,
             exit_reason   = %s,
             exit_conditions = COALESCE(%s, exit_conditions),
-            notes         = COALESCE(%s, '')
+            notes         = COALESCE(%s, ''),
+            mfe_pct       = COALESCE(mfe_pct, CASE
+                              WHEN entry_price > 0 AND highest_price > 0 AND lowest_price > 0
+                                AND direction IN ('LONG','SHORT') THEN
+                                CASE direction WHEN 'LONG'
+                                  THEN ROUND(((highest_price - entry_price) / entry_price * 100)::numeric, 4)
+                                  ELSE ROUND(((entry_price - lowest_price) / entry_price * 100)::numeric, 4) END
+                              END),
+            mae_pct       = COALESCE(mae_pct, CASE
+                              WHEN entry_price > 0 AND highest_price > 0 AND lowest_price > 0
+                                AND direction IN ('LONG','SHORT') THEN
+                                CASE direction WHEN 'LONG'
+                                  THEN ROUND(((entry_price - lowest_price) / entry_price * 100)::numeric, 4)
+                                  ELSE ROUND(((highest_price - entry_price) / entry_price * 100)::numeric, 4) END
+                              END)
         WHERE id = %s AND status = 'open'
     """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, close_reason_val, close_reason_val, exit_conditions, notes, trade_id))
 
