@@ -17394,3 +17394,33 @@ Quiet hour — 0 closes, 1 open (NXPC volume-buildup- SHORT).
 - pump-chain+ 14d HIGH 6T 16.7% '$-0.50' — small n, watch
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## FAVORITES Update — 2026-10-29 06:00 UTC
+- Regime: LONG_BIAS
+- PROMOTE BTC (WR=58.8%, AvgPnL=0.30%, Trades=17)
+
+Final set: ['BTC']
+
+## 2026-10-29 06:42 Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A) | 24h: 23T 14W 60.9% '$-0.32' RED (improving) | 7d 131T 73W 55.7% '$-0.47' | **size-reduce: file absent -> 1.0x**
+
+Quiet hour — 0 closes, 0 open positions.
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T last hour — no n>=3 0%-WR signal to evaluate
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/23 = 8.7% (<40%) — SL not too tight; dominant close = profit-monster-trail (10T '+$0.48', WR 100%)
+- Boost: bb-squeeze+ 9T 100.0% '+$0.29' meets criteria but at 1.0 ceiling — no headroom
+- Neg streak: hour -1 was '-$0.14' (1 close), hours -0/-2 empty — not 3 consecutive negative hours
+- Frequency 0/hr — under overtrading threshold
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h improving '$-0.45' → '$-0.32' (WR up to 60.9%)
+- pump-chain+ 24h 0W3L '$-0.11' — small n, 14d still positive overall; watch
+- volume-buildup- still worst 24h signal '$-0.40' but 14d HIGH positive — regime-kill bar not met
+- bb-bounce-v2-long+ CEO kill review still pending
