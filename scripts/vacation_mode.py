@@ -35,7 +35,11 @@ def enable(reason='T on vacation'):
         'vacation_mode': True,
         'reason': reason,
         'enabled_at': datetime.now(timezone.utc).isoformat(),
-        'daily_growth_target': 0.01,  # 1% per day
+        # 0.3% per day — T authoritative 2026-10-29 ("daily goal should be 0.3%
+        # changed from 1%"). CEO had reset it to 0.3% on 2026-10-22 (pair-anatomy
+        # brief) but the file + this default kept 1% — canon fixed here so the next
+        # enable() cannot regenerate the stale 1% (it clobbered a live edit once).
+        'daily_growth_target': 0.003,
         'rules': {
             'shadow_first': True,        # All new gates ship shadow-only
             'no_enforcement_flips': True, # No shadow→enforce transitions
@@ -49,17 +53,19 @@ def enable(reason='T on vacation'):
     # Re-enable must not clobber hand-added rules — rules.unclog_waiver.expires is now a
     # load-bearing timestamp read by waiver_expiry.flip1_active(); dropping it would lapse
     # the CEO unclog band early and silently (brain_auditor #102). Read BEFORE overwriting.
+    # constants_change_review_queue (T directive 2026-10-23) preserved the same way.
     try:
         with open(SWITCH_PATH) as f:
             _prev_rules = json.load(f).get('rules') or {}
-        if 'unclog_waiver' in _prev_rules:
-            config['rules']['unclog_waiver'] = _prev_rules['unclog_waiver']
+        for _keep in ('unclog_waiver', 'constants_change_review_queue'):
+            if _keep in _prev_rules:
+                config['rules'][_keep] = _prev_rules[_keep]
     except Exception:
         pass
     with open(SWITCH_PATH, 'w') as f:
         json.dump(config, f, indent=2)
     print(f"✅ Vacation mode ENABLED: {reason}")
-    print(f"   Daily growth target: 1%")
+    print(f"   Daily growth target: 0.3%")
     print(f"   Shadow-first: ON | No enforcement flips: ON")
     print(f"   Constants frozen: ON | Guardrails: ON")
     return config
