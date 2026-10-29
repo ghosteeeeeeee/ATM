@@ -17275,3 +17275,28 @@ Winner: LTC warrior-sr-confirm+ LONG profit-monster-trail +0.59%
 - bb-squeeze+ at weight ceiling — next lever is hot-set priority, not weight
 - bb-bounce-v2-long+ CEO kill review still pending
 - ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
+
+## 2026-10-29 01:42 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** '$-0.13' (WR: 0.0%) | 24h: 31T 16W 51.6% '$-0.95' RED | 7d 131T 73W 55.7% '$-0.33' | **size-reduce: file absent -> 1.0x**
+
+Loser: VIRTUAL warrior-sr-confirm+ LONG atr_sl_hit -5.75% (open 23:16, closed 01:11)
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 1T last hour (loss); no signal n>=3 at 0% WR; volume-buildup- 24h 6T 33.3% '$-0.59' but 14d HIGH 69.2% positive — regime-kill bar not met
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 6/31 = 19.4% (<40%) — SL not too tight; dominant close = profit-monster-trail (10T '+$0.48')
+- Boost: bb-squeeze+ 10T 90.0% '+$0.17' 9-token meets criteria but already at 1.0 ceiling (boosted 11:31) — no headroom
+- Neg streak: 1 negative hour only (prior hour was +$0.01) — not 3 consecutive
+- Frequency 1/hr — under overtrading threshold
+- 0 open positions
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h deepened to '$-0.95' — drag now atr_sl_hit (6T '$-0.70') + cut-loser-CL-T1 (3T '$-0.44')
+- bb-squeeze+ at weight ceiling — next lever if it keeps winning is hot-set priority, not weight
+- bb-bounce-v2-long+ CEO kill review still pending
+- ARM-RATE TRIPWIRE flag with CEO (brain_auditor #186/#189) — advisory only
