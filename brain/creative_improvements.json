@@ -9864,5 +9864,32 @@
     "category": "entry sniper",
     "status": "pre-registered (needs backtest)",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-29T20:42:24Z",
+    "idea": "WINNER-CELL-SIZE traffic-verification KPI",
+    "rationale": "1.25x winner-cell size mult shipped today by main-session; 0 fires yet (correct-by-traffic). Wait for first validated-cell open and verify notional scales post-HL_MIN floor.",
+    "expected_impact": "closes wiring question with traffic evidence, zero code",
+    "category": "verify",
+    "status": "suggested",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-29T20:42:24Z",
+    "idea": "bb-squeeze+ Oct flow-collapse root cause CLOSED",
+    "rationale": "57T/wk (Sep28) → 4T (Oct12) coincides with BB_SQUEEZE_LONG_RSI 60-65 window tightening (Oct 11). Post-Oct-8: 100% NORMAL regime, 27T +0.80. The hml-profile side-find 'identify what changed Oct 7' is answered: intentional entry-quality filter.",
+    "expected_impact": "closes open side-find; no action needed",
+    "category": "analysis",
+    "status": "done",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-29T20:42:24Z",
+    "idea": "pump-chain- NORMAL SHORT amplify cell REJECTED-WITH-DATA",
+    "rationale": "30d 12T 33.3% +0.45 qualifies n>=10 net>0, but RC1 fade rewire shipped today (34 FADE-EFFECTIVE-SOURCE lines 19:21Z) — direction semantics mid-transition, edge may be artifact. Re-evaluate after 11-10 fade bar.",
+    "expected_impact": "avoids amplifying transition noise",
+    "category": "amplify",
+    "status": "rejected",
+    "risk": "none"
   }
 ]
