@@ -17754,3 +17754,25 @@ Quiet hour — 0 closes, 0 open positions.
 **Open Questions:**
 - 24h RED '$-0.09' at 61.1% WR — improving; drag = trail_arm_timeout (-$0.10) + cut-loser (-$0.14) + stale_exit (-$0.15) vs trail wins (+$0.33)
 - 7d RED '$-0.73' — drift continues; no single actionable signal
+
+## [2026-10-30 02:45] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $+0.78 (WR: 100%) | 24h: 20T 13W 65.0% '$+0.69' GREEN | 7d 145T 82W 56.6% '$+0.05' GREEN | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 2T last hour (BTC continuum-trend- trail +$0.03, CRV grind-breakout- rr_engine_trail_hit +$0.75); no n>=3 0%-WR signal (worst: bb-squeeze+ 4T 50% '$-0.10')
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 1/20 = 5.0% (<40%) — SL not tight; dominant close = profit-monster-trail (8T '+$0.36'), worst = atr_sl_hit (1T '$-0.25')
+- Boost: no candidate meets all bars — pump-chain+ 3T 66.7% '+$0.22' and volume-buildup- 3T 66.7% '+$0.05' fail n>=5; bb-squeeze+ 4T 50% fails WR
+- Neg streak: last hour +$0.78 (2/2 wins) — never 3 consecutive negative hours
+- Frequency 2/hr — under overtrading threshold
+- 2 open: AVNT volume-buildup- SHORT, BTC continuum-trend- SHORT
+- Storm readiness: window-min -0.70% / at-run +0.47% (<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '$+0.69' at 65.0% WR — first green 24h in days; 7d also turned green '$+0.05'
+- Watch whether the reversal holds another 24h before any tuning
