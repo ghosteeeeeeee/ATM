@@ -17706,3 +17706,29 @@ Quiet hour — 0 closes, 0 open positions.
 **Open Questions:**
 - 24h RED '-$0.22' at 57.9% WR — atr_sl_hit (-$0.38) + stale_exit (-$0.15) + cut-loser (-$0.14) + trail_arm_timeout (-$0.10) outweigh trail wins (+$0.33) and ugb_pt (+$0.22)
 - 7d RED '-$0.70' — drift continues; no single actionable signal
+
+## [2026-10-30 00:44] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 | 24h: 18T 10W 55.6% '$-0.23' RED | 7d 143T 79W 55.2% '$-0.77' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T last hour (quiet); no n>=3 0%-WR signal (worst: bb-squeeze+ 4T 50% '$-0.10', warrior-sr-confirm+ 2T 50% '$-0.11')
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/18 = 11.1% (<40%) — SL not too tight; dominant close = profit-monster-trail (6T '+$0.32'), worst = atr_sl_hit (2T '$-0.38')
+- Boost: no candidate meets all bars — volume-buildup- 3T 66.7% '+$0.05' and pump-chain+ 3T 66.7% '+$0.22' fail n>=5; bb-squeeze+ 4T 50% fails WR
+- Neg streak: 20h +$0.15, 21h $0.00, then no closes — never 3 consecutive negative hours
+- Frequency 0/hr — under overtrading threshold
+- 0 open trades
+- **STORM (BTC 1h -1.87% >= 1.5%):**
+  - 🌩️ [STORM-READINESS] BTC 1h -1.87% | blocked 81 (compaction_stale_10min 30, confluence single-type 19, short-rsi-hard-floor 17, rep-low-reputation 7, oversold-knife 6, pump-chain-short-high 1, rr-engine-hard-block 1) | true-starvation 28 RSI>=35 | counterfactual $+19.58 (touch 25/28) | waiver: SHADOW=True ENFORCE=False
+  - Counterfactual detail: 27/28 starvation shorts were positive (GRASS +$2.04, WLD +$1.43, APT +$1.32...); only PURR LONG -$0.24
+  - Dominant gate: confluence single-type block in SHORT_BIAS regime (19 signals, mostly ichimoku_short) — storm-confl-waiver SHADOW=True already collecting; ENFORCE flip needs >=3 consecutive storms w/ positive counterfactual + CEO approval → **storm packet #1 of 3, no flip**
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '$-0.23' at 55.6% WR — atr_sl_hit (-$0.38) + stale_exit (-$0.15) + cut-loser (-$0.14) outweigh trail wins (+$0.32) and ugb_pt (+$0.22)
+- 7d RED '$-0.77' — drift continues; no single actionable signal
+- Storm #1 counterfactual +$19.58 is large — if storms 2 and 3 are also positive, ENFORCE flip becomes eligible by 2026-11-12
