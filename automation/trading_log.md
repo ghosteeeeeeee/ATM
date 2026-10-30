@@ -17842,3 +17842,15 @@ Quiet hour — 0 closes, 0 open positions.
 **Open Questions:**
 - 24h GREEN '$+0.72' at 62.6% WR — reversal holding; 7d still RED '$-0.21'
 - Two ai-trader-manual LONGs open (BTC, ENS) — CEO trades, monitor
+
+## FAVORITES Update — 2026-10-30 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE BTC (WR=55.0%, PnL=$-0.19, 1 consecutive bad days, regime=LONG_BIAS)
+- PROMOTE CAKE (WR=60.0%, AvgPnL=0.25%, Trades=5)
+
+Final set: ['CAKE']
+
+## LOSERS Update — 2026-10-30 06:05 UTC
+- ADD GRASS (WR=40.0%, PnL=$-0.26, low_wr (40.0%))
+
+Final set: ['GRASS']

@@ -51,6 +51,7 @@ REGIME_SIGNALS = {
         'accel-300', 'accel-300-',
         'slow-grind-',
         'hl_copy_trader',
+        'jup_yolo_mirrored', 'jup_yolo_long', 'jup_yolo_short',  # YOLO leaderboard mirror — CEO 2026-10-09: follow proven +2000% uPnL traders in ALL vol regimes; ATR trailing SL manages risk
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',
         'return_exhaustion_long',
         'spike_exhaustion_short', 'spike_exhaustion_short-',
@@ -95,6 +96,7 @@ REGIME_SIGNALS = {
         'mover', 'mover+', 'mover-',
         'ct-hot', 'ct-hot+', 'ct-hot-',
         'hl_copy_trader',
+        'jup_yolo_mirrored', 'jup_yolo_long', 'jup_yolo_short',  # YOLO leaderboard mirror — CEO 2026-10-09: follow proven +2000% uPnL traders in ALL vol regimes; ATR trailing SL manages risk
         'continuation', 'continuation+',
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',
         'return_exhaustion_long',
@@ -156,6 +158,7 @@ REGIME_SIGNALS = {
         'mover', 'mover+', 'mover-',
         'ct-hot', 'ct-hot+', 'ct-hot-',
         'hl_copy_trader',
+        'jup_yolo_mirrored', 'jup_yolo_long', 'jup_yolo_short',  # YOLO leaderboard mirror — CEO 2026-10-09: follow proven +2000% uPnL traders in ALL vol regimes; ATR trailing SL manages risk
         'stop_hunt_reversal_long', 'stop_hunt_reversal_long+',
         'return_exhaustion_long',
         'spike_exhaustion_short', 'spike_exhaustion_short-',
@@ -186,6 +189,7 @@ REGIME_SIGNALS = {
         'wave_catcher', 'wave_catcher+', 'wave_catcher-',
         'ct-hot', 'ct-hot+', 'ct-hot-',
         'hl_copy_trader',
+        'jup_yolo_mirrored', 'jup_yolo_long', 'jup_yolo_short',  # YOLO leaderboard mirror — CEO 2026-10-09: follow proven +2000% uPnL traders in ALL vol regimes; ATR trailing SL manages risk
         'liq-hunt', 'liq-hunt+', 'liq-hunt-',
         'tl_break', 'tl_break_long', 'tl_break_short',
         'confluence+', 'confluence-',

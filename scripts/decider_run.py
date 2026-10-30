@@ -4133,8 +4133,8 @@ def run(dry_run=False):
         # Old penalty history poisons new qualified signals.
         source_for_penalty = sig.get('source', '')
         _pp = sig.get('penalty_product')
-        if 'hl_copy' in (source_for_penalty or ''):
-            _pp = None  # bypass penalty for quality-filtered copy signals
+        if 'hl_copy' in (source_for_penalty or '') or 'jup_yolo' in (source_for_penalty or ''):
+            _pp = None  # bypass penalty: quality-filtered copy + leaderboard mirror (proven uPnL conviction)
         if _pp is not None and confidence is not None:
             _raw_conf = confidence
             from hermes_constants import PENALTY_MULT_FLOOR as _pen_floor  # CEO 2026-10-13: 0.3→0.5

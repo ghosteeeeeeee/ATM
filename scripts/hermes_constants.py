@@ -278,7 +278,7 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
-    'BTC'
+    'CAKE'
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
@@ -308,7 +308,10 @@ LOSERS_SHORT = {
 }
 # Legacy combined set — DIRECTION-BLIND in decider (HARD-BLOCK + conf penalty).
 # BTC removed 2026-10-24 → LOSERS_LONG (see above). ME/PUMP left per CEO scope.
-LOSERS = set()
+LOSERS = {
+    'GRASS'
+}
+
 
 
 

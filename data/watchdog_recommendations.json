@@ -1,55 +1,22 @@
 {
-  "timestamp": "2026-10-30T05:41:18.252650+00:00",
-  "steers": [
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ADA + BTC",
-      "detail": "Both opened within 19 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ADA + ENS",
-      "detail": "Both opened within 20 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + ENS",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
-      "auto_executable": false,
-      "id": "steer-004"
-    }
-  ],
-  "portfolio_health": "warning",
+  "timestamp": "2026-10-30T06:11:18.509156+00:00",
+  "steers": [],
+  "portfolio_health": "good",
   "regime": {
     "btc_15m": "LONG_BIAS",
     "btc_4h": "NEUTRAL",
     "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "FLAT",
     "volume_regime": "LOW",
-    "linreg_alignment": 1.0,
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "market_phase": "CALM",
+    "trend_quality": "UP"
   },
-  "open_count": 3,
+  "open_count": 0,
   "deep_analysis": "MARKET: BTC 1m at 78,673 vs EMA300 78,008 (+0.85% above, held above for hours), 15m aggregate LONG_BIAS 90/3/30 of 123 tokens, regimes.BTC LONG_BIAS (conf 59.2), continuum ABOVE, trend_quality STRONG_UP \u2014 but volatility and volume are LOW, so this is a slow grind, not an explosive trend. Flip rate 16 aggregate / 16 BTC per 24h (normal p50 band ~19-20, no churn anomaly) and both direction sources agree LONG_BIAS. We are LONG-only 3/3, so we are on the right side of the tape.\n\nOPEN TRADES (all three opened within 20 minutes, all LONG, +0.05 unrealized):\n1) ENS #16539 LONG @4.8095, meta_rsi 85.71 (EXTREME chase), confidence 75, now 4.8325 (+0.48%), 30m +0.46%. Stop sits at 4.8123 \u2014 ABOVE entry (+0.06%), so downside is already locked at a small profit and TP 4.882 (+1.5%) is the only open question. Would I open fresh at 85.7? No \u2014 this is a top-of-band chase and the worst RSI entry class we have \u2014 but the position is effectively a free ride, so the answer is HOLD, not exit. ENS 15m regime LONG_BIAS conf 92.8 \u2192 aligned. Verify the stop: a LONG stop above entry is either an intentional breakeven move or a fat-finger, and it should be confirmed on the exchange (steer below).\n2) BTC #16538 LONG @78575, meta_rsi 66.14, stop = entry (breakeven at open), TP 79020 (+0.56%). Risk-free, aligned with the tape we spent all day shorting and losing on. Would open fresh: yes. Note the TP is only +0.56% \u2014 fine while the stop is at entry, but this trade cannot pay for a bad week; let the trail work rather than banking 0.5%.\n3) ADA #16537 LONG @0.19376, meta_rsi 66.67, confidence 41.6 (lowest of the three), volatility EXTREME, now 0.19462 (+0.44%) with 1h MFE already 0.54% \u2014 trail threshold (+0.40%) has been reached, trailing_activated still False in PG. SL -0.69% / TP +2.2% (R:R ~3.2). ADA 15m LONG_BIAS conf 93.2 \u2192 aligned. 30m momentum is flat (-0.01%), so the coin is grinding, not pumping. Would open fresh: marginal yes on regime, no on confidence 41.6 \u2014 treat it as the one position that can still lose real money (steer below).\n\nWRONG-SIDE AUDIT (7 losses / -$0.75 in 24h): two of the seven were BTC SHORTs fired into an above-EMA300 tape \u2014 #16533 continuum-trend- at meta_rsi 62.6 (-5.31%) and #16518 continuum-osc- at meta_rsi 67.2 (-7.32%) \u2014 while every winning SHORT of the day was entered after a deep pullback: CRV 42.9 (+33.9%), CRV 35.8 (+6.9%), YGG 36.4 (+1.1%), BTC 35.2 (+1.0%). The WINNING side was either long the tape or short only into oversold; we were on the wrong side by shorting strength during an uptrend. Four of the seven were LONGs at meta_rsi 70-75 that never armed (COMP mfe -0.00, GRASS mfe 0.03, WLFI mfe 0.28) and exited via trail_arm_timeout/stale_exit \u2014 the chase band bleeding exactly as the chop-bleed KPI says it does. The seventh (BLUR, rsi 53.9) reached mfe 1.35% and gave it back through ugb_pt \u2014 the only exit-ownership loss of the day.\n\nCHOP-BLEED KPI (dollar share, quoted with both companions): 7d 94.8% (52 of 60 losers had mfe<0.40; 0 NULL mfe_pct) vs 14d 90.5% (118/146) and 30d 84.0% (284/368). Same-day arm rate companion 85.7% (6 of 7). 7d LONG arm rate 56.8% (54/95) \u2014 tripwire <50 not tripped. 7d exit breakdown: atr_sl_hit 13T/0W/-$1.52, hard_max_loss 8T/0W/-$1.18, cut-loser-CL-T1 8T/0W/-$1.10, trail_arm_timeout 22T/7W/-$0.48 versus profit-monster-trail 55T/53W/+$2.95. 94.8% is above the 92% line = entry-quality deterioration, which routes to entry-quality filters (brain-auditor), not exit tweaks. Standing, age=2 cycles unexecuted.\n\nCORRECTION TO LAST CYCLE'S BAND CLAIM: the previous cycle wrote that \"center band 45-60 remains the preferred entry zone.\" Fresh 7d meta_rsi band measurement run this cycle does not support it \u2014 LONG 45-59 is the WORST long cell (n=42, 20W 47.6%, -$0.56) while LONG <45 is the best (n=11, 8W, +$0.48), LONG 60-69 +$0.12 (n=20), LONG 70+ -$0.15 (n=18); SHORT <45 is the best short cell (n=32, 20W, +$0.77) and SHORT 45-69 is the bleed (-$0.74 over 14T). The precheck tool independently prints the same direction (\"RSI 45-55 death zone, 7d 15-22%WR\"). n is small per cell and no p-value was computed, so this is an observation, NOT a proven pattern \u2014 and signal-parameter changes are the brain auditor's job regardless. Practical read: the one thing both the data and the death-zone advisory agree on is that mid-band is not where the money is this week; the money is in trend-aligned extremes.\n\nPOSITIONING: 3/3 long in a LONG_BIAS tape = aligned, but all three opened within 20 minutes and all three are directionally the same bet \u2014 one BTC dump hits all of them. The cluster steers (001-004) remain valid, with one material mitigation the automated engine does not see: ENS's stop is above entry and BTC's stop is at entry, so only ADA can lose real money (-0.69% price, ~-3.5% at 5x). Max portfolio downside is roughly ADA's stop plus slippage, not three full stops. Capital efficiency is healthy (3 positions on a fresh tape, hot_set empty); the opportunity cost is the EXTREME-regime runners we are not in (SOPH +15.4%, PROVE +7.3% blacklisted, SUPER +6.6%, RUNE +5.4%, ARB +4.5% over 16 candles) \u2014 all of which the RR engine grades C/D, so not chasing them is defensible.\n\nPENDING-SIGNAL HYGIENE: signals.json currently holds 3 PENDING LONGs \u2014 COMP at RSI 90, GRASS at RSI 80.05, BLUR at RSI 68. COMP is the one to watch: we lost -4.34% on COMP LONG 13h ago (#16526), COMP's own 15m regime is SHORT_BIAS conf 85.5, and RSI 90 is far above SIGNAL_FILTER_RSI_MAX=72, so the RSI gate should block it before it fills. If a COMP long at RSI 90 ever reaches the books, the gate is broken \u2014 that is a bug report, not a trade.\n\nAUTO-TRADER: shadow, MANAGE_ONLY, regime CHOP with long score -10 / short -30, one armed short trigger 2.6% below price (age 210m) \u2014 a breakdown-fade order, harmless in shadow. Its own scorecard is 34.5% WR over n=29 with longs 25% WR (-$0.09) and shorts 46.2% WR (+$0.17), i.e. its shadow book agrees with the tape: shorting strength pays, longing in CHOP does not.\n\nAI TRADER: PICK (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute): USELESS LONG, conf 68, price 0.13609, rsi_at_pick 59.5. Precheck PASS (ATR 5.63%, RR 2.11 grade D but clears the 0.70 hard floor, 30d WR gate ok, not blacklisted / not in losers or penalty, price age 5min). Regime: 15m LONG_BIAS conf 95, +4.26% over 16 candles, BTC 1m above EMA300 \u2192 aligned. Caveats: EXTREME volatility regime, RSI 59.5 is upper-mid band (and mid band is this week's worst long cell), RR score 43 <50 is shadow-blocked by the rr-engine, and firing would make the book 4/4 long. Invalidation: BTC 1m loses EMA300 ~78,008 for 10m+, RSI drift >15pts at fire time, or USELESS 30m momentum turns negative. Previous pick INJ (2026-10-29 14:19) was not rejected \u2014 no rejected_at \u2014 it simply aged out.\n\nRETRACTIONS / NO-ACTIONS THIS CYCLE: the measured-refuted steer \"keep LONG entries out of meta_rsi 45-64 while BTC 1m below EMA300\" is NOT re-issued (brain_auditor #139 measured the blocked cell as the profitable one). bb-bounce-v2-long+ (7d 10T 1W -$0.39) is NOT re-proposed for a kill \u2014 #138 measured kill bars FAIL and the bypass-removal lever is in flight; watch, auditor owns it, age=2 cycles. volume-buildup- (7d 37T 22W -$0.44, VOLUME_BUILDUP_MINUS_ENABLED=True, live traffic) stands as a size/R:R-asymmetry look for the auditor, age=2 cycles \u2014 not a disable. pump-chain+ 7d 23T 13W -$0.08 is breakeven, no action. Brain search endpoint returned no results this cycle (empty response) \u2014 no cross-session context available.",
   "agent_timestamp": "2026-10-30T05:48:46.255215+00:00",
   "regime_context": "Sources stated separately because they can disagree: 15m regime scanner aggregate = LONG_BIAS (90 long / 3 short / 30 neutral of 123 tokens, dumped 05:30 UTC); regimes.BTC = LONG_BIAS (conf 59.2); btc_15m = LONG_BIAS; btc_4h = NEUTRAL; continuum = BTC 1m ABOVE EMA300 (price 78,673 vs 78,008, +0.85%), linreg_15m positive, trend_quality STRONG_UP. Flip rate 16 aggregate / 16 BTC per 24h over 96 dumps \u2014 inside the normal p50 band (~19-20), so NOT an instability flag (the p95 anomaly line is 26). Both direction sources currently agree LONG_BIAS, so no source conflict to disclose.\n\nMeaning for positions: LONGs are aligned; a SHORT is counter-trend until BTC 1m closes back below EMA300 ~78,008 for 10m+. Volatility LOW / volume LOW (volume_ratio 0.34) means a slow grind \u2014 which is the regime where armed trails win (7d profit-monster-trail 55T 53W +$2.95) and fresh chase entries die (94.8% of loss from never-armed trades). Continuum's market_phase label reads DECLINING / wyckoff UNKNOWN, which is stale versus the live 1m tape \u2014 use the live EMA300 position as the tie-break, and state that source when writing any direction-flavored steer.",

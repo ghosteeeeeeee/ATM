@@ -72,6 +72,8 @@ SIGNAL_OVERRIDES = {
     'hl_copy_plus': 'MEAN_REVERSION',       # CEO 2026-10-09: pro trader copy — quality-filtered (75%+ WR), not momentum
     'hl_copy_minus': 'MEAN_REVERSION',      # CEO 2026-10-09: pro trader copy — quality-filtered (75%+ WR), not momentum
     'hl_copy_trader': 'MEAN_REVERSION',     # CEO 2026-10-09: pro trader copy — quality-filtered (75%+ WR), not momentum
+    'jup_yolo_long': 'MEAN_REVERSION',      # CEO 2026-10-09: leaderboard mirror — proven +2000% uPnL conviction, not momentum-chasing
+    'jup_yolo_short': 'MEAN_REVERSION',     # CEO 2026-10-09: leaderboard mirror — same
     'bb_bounce_v2_long': 'MEAN_REVERSION',
     'bb_bounce_long': 'MEAN_REVERSION',
     'bb_bounce_short': 'MEAN_REVERSION',

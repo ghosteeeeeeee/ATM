@@ -22,9 +22,11 @@ from paths import HERMES_DATA
 
 YOLO_POSITIONS_URL = "https://jup.ag/yolo/api/watch/positions"
 STATE_FILE = os.path.join(HERMES_DATA, 'jup_yolo_state.json')
+LEADERBOARD_FILE = os.path.join(HERMES_DATA, 'jup_yolo_leaderboard.json')
 
-# Leaderboard wallets (verified prefix/suffix match 2026-10-09)
-# Scores = leaderboard uPnL% at capture time — used for signal confidence
+# Static seed — verified prefix/suffix match 2026-10-09. Used only when the
+# live leaderboard file (written by jup_yolo_leaderboard.py every 30 min) is
+# missing or stale. Prefer load_wallets() over touching this directly.
 JUP_YOLO_WALLETS = {
     # rank: (wallet, label, upnl_pct)
     "9tRBvY5zotGawm9CPitxX1gsmQS9uhNJdiQeiSZG5VA6": ("9tRB", 4264),
@@ -41,6 +43,25 @@ JUP_YOLO_WALLETS = {
     "FSG4XbDyJWJKVuvmwMbyypTh4Cqnoc8xR4gTr3ViNuLc": ("FSG4", 2045),
     "AyvQ9wnZLPYEq9CKHmZAUAuNf6qQGsZyfy3MqNKE5Spd": ("AyvQ", 588),
 }
+
+LEADERBOARD_STALE_SEC = 2 * 3600  # fall back to seed if file older than 2h
+
+
+def load_wallets() -> dict:
+    """Return {wallet: (label, upnl_pct)} — LIVE leaderboard file if fresh, else seed.
+
+    CEO 2026-10-09: leaderboard must be scanned regularly, not a one-shot list.
+    jup_yolo_leaderboard.py refreshes LEADERBOARD_FILE every 30 min.
+    """
+    try:
+        with open(LEADERBOARD_FILE) as f:
+            lb = json.load(f)
+        if time.time() - lb.get('updated', 0) < LEADERBOARD_STALE_SEC and lb.get('wallets'):
+            return {w: tuple(v) for w, v in lb['wallets'].items()}
+        print("[jup_yolo] ⚠️ leaderboard file stale (>2h) — using seed wallets")
+    except (FileNotFoundError, json.JSONDecodeError, OSError, KeyError):
+        pass
+    return dict(JUP_YOLO_WALLETS)
 
 # Coins we can trade on Hyperliquid (YOLO market -> HL market)
 # FIX (bug_hunter M1): ZEC removed — blacklisted BOTH directions in
@@ -99,6 +120,15 @@ def save_state(state: dict):
     # insertion order like the old list(set) did (which evicted live ids).
     entries = state.get('seen_ids', [])
     entries = [list(_norm_seen_entry(e)) for e in entries]
+    # dedupe by pid (keep newest ts) — re-mirror path can append a second
+    # (pid, ts) tuple for the same position before the next save
+    dedup = {}
+    for pid, ts in entries:
+        if pid in dedup:
+            dedup[pid] = max(dedup[pid], ts)
+        else:
+            dedup[pid] = ts
+    entries = [[pid, ts] for pid, ts in dedup.items()]
     entries.sort(key=lambda e: e[1])
     state['seen_ids'] = entries[-500:]
     tmp = STATE_FILE + '.tmp'
@@ -189,6 +219,34 @@ def emit_signal(coin: str, direction: str, wallet: str, upnl_pct: int,
 
 
 MAX_EMIT_ATTEMPTS = 5  # retry blocked/priceless positions before permanent skip
+REEMIT_AFTER_SEC = 900  # 15 min — held positions re-mirror if their signal died
+
+
+def _live_signal_exists(token: str, direction: str) -> bool:
+    """True if a jup_yolo signal for token+direction is still live (PENDING/APPROVED).
+
+    Used so a held position whose signal died at an exec gate (SKIPPED/EXPIRED)
+    gets re-mirrored every REEMIT_AFTER_SEC — a one-shot emit meant transient
+    gate kills (vol storm, max positions) silenced the position permanently.
+    """
+    try:
+        import sqlite3
+        from paths import RUNTIME_DB
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        try:
+            row = conn.execute("""
+                SELECT 1 FROM signals
+                WHERE source = 'jup_yolo_mirrored'
+                  AND token = ? AND direction = ?
+                  AND decision IN ('PENDING','APPROVED')
+                  AND created_at > datetime('now', '-30 minutes')
+                LIMIT 1
+            """, (token.upper(), direction.upper())).fetchone()
+            return row is not None
+        finally:
+            conn.close()
+    except Exception:
+        return False  # fail-open: allow re-mirror if DB unreadable
 
 
 def monitor_once() -> int:
@@ -213,6 +271,9 @@ def monitor_once() -> int:
     attempts = state.get('attempts', {})
     now_ts = int(time.time())
 
+    # LIVE wallet list — refreshed by jup_yolo_leaderboard.py every 30 min
+    wallets = load_wallets()
+
     # PRIMARY: positions feed — leaderboard wallets are high-x holders
     try:
         data = _fetch(YOLO_POSITIONS_URL)
@@ -223,20 +284,35 @@ def monitor_once() -> int:
     positions = data.get('positions', [])
     new_signals = 0
 
+    # PRUNE: positions that closed since last poll — free their id so a
+    # re-open (fresh id) mirrors again. Without this, a wallet that opens
+    # → closes → re-opens is permanently silent after its first position.
+    live_pids = set()
+    for p in positions:
+        _pid = p.get('id', '')
+        if isinstance(_pid, (list, dict)):   # FIX: multileg id can be a list
+            _pid = json.dumps(_pid, sort_keys=True)
+        if _pid:
+            live_pids.add(str(_pid))
+    seen_list = [e for e in seen_list if e[0] in live_pids]
+    seen = {e[0] for e in seen_list}
+    seen_ts = {e[0]: e[1] for e in seen_list}  # pid -> first-emit epoch
+
     for p in positions:
         try:
             owner = p.get('owner', '')
             market = p.get('market', '')
             side = p.get('side', '')
             pid = p.get('id', '')
+            # FIX (unhashable type: 'list'): coerce non-str ids (multileg
+            # positions return a list) before any set/dict membership test.
+            if isinstance(pid, (list, dict)):
+                pid = json.dumps(pid, sort_keys=True)
+            pid = str(pid) if pid else ''
+            if not pid:
+                continue
 
-            if owner not in JUP_YOLO_WALLETS:
-                continue
-            if pid in seen:
-                continue
-            if market not in TRADEABLE_MARKETS:
-                # not mirrorable — never retry (e.g. removed market)
-                seen_list.append((pid, now_ts))
+            if owner not in wallets:
                 continue
 
             # explicit side parse: unknown side is SKIPPED (never default to SHORT)
@@ -248,13 +324,32 @@ def monitor_once() -> int:
                 print(f"[jup_yolo] ⚠️ unknown side '{side}' for {market} — skipping")
                 continue
 
-            label, upnl_pct = JUP_YOLO_WALLETS[owner]
+            if pid in seen:
+                # RE-EMIT: held position whose signal died at an exec gate
+                # (SKIPPED/EXPIRED) — retry every REEMIT_AFTER_SEC. Without this,
+                # a transient vol-storm/max-positions kill silenced the position
+                # permanently even though the leaderboard trader still holds it.
+                age = now_ts - seen_ts.get(pid, 0)
+                if age < REEMIT_AFTER_SEC:
+                    continue
+                if _live_signal_exists(market, direction):
+                    continue  # signal alive (PENDING/APPROVED) — let it work
+                # dead signal + aged → fall through to emit again, refresh ts
+                print(f"[jup_yolo] 🔄 re-mirror {market} {direction} "
+                      f"(attempt age {age//60}m, previous signal dead)")
+
+            if market not in TRADEABLE_MARKETS:
+                # not mirrorable — never retry (e.g. removed market)
+                seen_list.append((pid, now_ts))
+                continue
+
+            label, upnl_pct = wallets[owner]
             leverage = int(p.get('leverage', 0) or 0)
             margin = float(p.get('margin', 0) or 0) / 1_000_000
 
             if emit_signal(market, direction, owner, upnl_pct, leverage, margin):
                 new_signals += 1
-                seen_list.append((pid, now_ts))
+                seen_list.append((pid, now_ts))   # duplicate-append is pruned/normalized on save
                 attempts.pop(pid, None)
             else:
                 # transient failure — bounded retry
@@ -277,8 +372,9 @@ def monitor_once() -> int:
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'list':
-        print("=== Tracked JUP YOLO Leaderboard Wallets ===")
-        for w, (label, upnl) in sorted(JUP_YOLO_WALLETS.items(), key=lambda x: -x[1][1]):
+        wl = load_wallets()
+        print(f"=== Tracked JUP YOLO Leaderboard Wallets ({len(wl)}) ===")
+        for w, (label, upnl) in sorted(wl.items(), key=lambda x: -x[1][1]):
             print(f"  {label}… {w}  (+{upnl}%)")
         return
 
@@ -290,7 +386,8 @@ def main():
         # timeout=5: if another run holds the lock, skip fast (timer would
         # otherwise queue 60s behind interval and add latency to a 60s cycle)
         with FileLock('jup_yolo', timeout=5, interval=1):
-            print(f"[jup_yolo] Monitoring {len(JUP_YOLO_WALLETS)} leaderboard wallets...")
+            wl = load_wallets()
+            print(f"[jup_yolo] Monitoring {len(wl)} leaderboard wallets...")
             sigs = monitor_once()
             print(f"[jup_yolo] Emitted {sigs} signals")
     except Exception as e:
