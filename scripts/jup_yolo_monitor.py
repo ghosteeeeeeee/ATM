@@ -59,7 +59,7 @@ def load_wallets(quiet: bool = False) -> dict:
     """Return {wallet: {label, pnl, wr, trades, volume, rank, source}}.
 
     LIVE leaderboard file (refreshed every 10 min by jup_yolo_leaderboard.py
-    from the all-time realized-PnL API) if fresh; else seed fallback.
+    from the 3-window all/7d/24h realized-PnL API) if fresh; else seed fallback.
     Freshness is printed EVERY mirror cycle so staleness is visible in the
     log without grep archaeology (CEO hawk-tracking requirement).
     """
@@ -238,12 +238,17 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
     pnl_bonus = min(8, max(0, pnl / 1000))
     # leverage conviction: 1000x → +3
     lev_bonus = min(3, leverage / 333)
-    # hotness: on today's 24h board → +2, on 7d board → +1 (CEO 2026-10-30:
-    # recent-window presence = actively printing money right now)
+    # hotness: TOP-30 on today's 24h board → +2, top-30 on 7d → +1.
+    # FIX (bug_hunter NEW-2): enrichment covers the full fetched top-100, so
+    # without the rank<=HOT_RANK_MAX gate a wallet at 7d#84 still got +1 —
+    # "hot" must mean top-30 (matches the TRACK_TOP_RECENT_N selection slice).
+    HOT_RANK_MAX = 30
     hot_bonus = 0
-    if stats.get('rank_24h') is not None:
+    r24 = stats.get('rank_24h')
+    r7 = stats.get('rank_7d')
+    if isinstance(r24, int) and 0 < r24 <= HOT_RANK_MAX:
         hot_bonus = 2
-    elif stats.get('rank_7d') is not None:
+    elif isinstance(r7, int) and 0 < r7 <= HOT_RANK_MAX:
         hot_bonus = 1
     confidence = min(88, max(50, base_conf + wr_bonus + pnl_bonus + lev_bonus + hot_bonus))
 

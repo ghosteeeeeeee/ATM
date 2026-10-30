@@ -7,7 +7,7 @@ PRIMARY: https://yolo-api.jup.ag/leaderboard?sort=pnl&window=all&limit=100
   (CEO 2026-10-30: the /yolo/leaderboard page ?period=all&category=pnl board.)
 
 SECONDARY: sidebar Top uPnL scrape on the trading page (Playwright) — merges
-  any additional current-session wallets not present in the all-time API.
+  any additional current-session wallets not present in any API window.
 
 Writes /root/.hermes/data/jup_yolo_leaderboard.json — consumed every 60s by
 jup_yolo_monitor.py. Timer: jup-yolo-leaderboard.timer (10 min, Persistent).
@@ -127,26 +127,30 @@ def fetch_leaderboards_all_windows() -> tuple:
             else:
                 # recent window: enrich existing or create recent-only entry
                 if w not in by_wallet:
+                    # FIX (bug_hunter NEW-1): adopt base ONCE, at creation.
+                    # Old code re-adopted on every window (checked rank is None,
+                    # which stays true forever) → 24h silently overwrote the 7d
+                    # base for 21 dual-board wallets (e.g. $689 → $198,
+                    # 3.5x understated), and suppressed their 🔥7d marker.
+                    # TRACK_WINDOWS order = (all, 7d, 24h) → base = first
+                    # recent window seen (7d); later windows stay in pnl_24h etc.
                     by_wallet[w] = {
                         "wallet": w, "label": w[:4],
-                        "pnl": 0.0, "wr": None, "trades": None,
-                        "volume": None, "rank": None,
-                        "source": "api", "windows": [],
+                        "pnl": r["pnl"], "wr": r["wr"],
+                        "trades": r["trades"], "volume": r["volume"],
+                        "rank": None,
+                        "source": "api", "windows": [win],
+                        "base_from": win,
                     }
                 e = by_wallet[w]
+                # per-window store (always — even for the just-created entry,
+                # so pnl_7d/rank_7d are recorded alongside the adopted base)
                 e[f"pnl_{win}"] = r["pnl"]
                 e[f"wr_{win}"] = r["wr"]
                 e[f"trades_{win}"] = r["trades"]
                 e[f"rank_{win}"] = r["rank"]
                 if win not in e.get("windows", []):
                     e.setdefault("windows", []).append(win)
-                # recent-only wallets: adopt recent pnl as base so selection/
-                # display have something honest to show
-                if e.get("rank") is None:
-                    e["pnl"] = r["pnl"]
-                    e["wr"] = r["wr"]
-                    e["trades"] = r["trades"]
-                    e["volume"] = r["volume"]
 
     api_ok = bool(fetched)
     print(f"[lb] API windows: {fetched}")
@@ -259,12 +263,18 @@ def select_tracked(entries: list) -> dict:
     all_entries = list(by_wallet.values())
     selected_wallets = set()
 
-    # all-time money leaders
-    ranked_all = sorted(all_entries, key=lambda x: -(x.get('pnl') or 0))
+    # all-time money leaders — ONLY true all-time board members.
+    # FIX (bug_hunter check-2): recent-only entries carry an adopted base pnl
+    # that competed in this slice and silently displaced real all-time wallets
+    # (2 lost today, incl. seed wallet CJN3 at rank#50/$549). Recent-only
+    # wallets enter selection through their own board slice below.
+    ranked_all = sorted((e for e in all_entries if e.get('rank') is not None),
+                        key=lambda x: -(x.get('pnl') or 0))
     for e in ranked_all[:TRACK_TOP_N]:
         selected_wallets.add(e['wallet'])
 
-    # hot traders from 7d and 24h boards
+    # hot traders from 7d and 24h boards (top TRACK_TOP_RECENT_N per window —
+    # this is where recent-only wallets get selected)
     for win in ('7d', '24h'):
         key = f'pnl_{win}'
         ranked_win = sorted((e for e in all_entries if e.get(key) is not None),
@@ -279,6 +289,12 @@ def select_tracked(entries: list) -> dict:
         if (wr is not None and trades is not None
                 and wr >= QUALITY_MIN_WR and trades >= QUALITY_MIN_TRADES
                 and (e.get('pnl') or 0) >= QUALITY_MIN_PNL):
+            selected_wallets.add(e['wallet'])
+
+    # sidebar-only session wallets: always tracked — they hold CURRENT positions
+    # on the feed we poll (API-collided wallets already tracked via source='api')
+    for e in all_entries:
+        if e.get('source') == 'sidebar':
             selected_wallets.add(e['wallet'])
 
     out = {}
