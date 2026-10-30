@@ -18222,3 +18222,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - 24h net '-$0.03' and 7d deepened to '-$0.54' — jup_yolo_mirrored (26T '-$0.61') + volume-buildup- (15T '-$0.28') are the two drags despite 57-67% WR (losses bigger than wins, R:R issue not WR issue)
 - r2v2-long3 2T 0% '-$0.13' 24h, ai-trader-manual 3T 0% '-$0.04' — n too small to act
+
+## [2026-10-30 23:55] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $+0.17 (WR: 59.7% 24h) | 24h 62T 37W '+$0.14' GREEN | 7d 183T '-$0.75' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 24h winners MAE avg 0.23%, 33/37 <0.5% — clean; both last-hour closes jup_yolo_mirrored profit-monster-trail (HYPE +$0.15/+3.68%, SOL +$0.02/+0.90%)
+- Kill check: no 0%-WR signal with n>=3 last hour (only jup_yolo_mirrored 2W0L) — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/62 = 12.9% (<40%) — dominant close = profit-monster-trail (32T '+$1.52'); worst avg = stale_exit (2T '-$0.195')
+- Boost: pump-chain+ meets 24h bars (6T 4W '+$0.20' across 6 tokens: ADA/ALGO/CAKE/DOT wins, AVAX/FARTCOIN flat/loss) BUT 14d red in BOTH regimes (EXTREME 48.5% '-$0.21', HIGH 16.7% '-$0.50') + already at 1.4 weight ceiling — HOLD; volume-buildup- 15T '-$0.28' fails net bar; jup_yolo_mirrored 28T '-$0.44' fails
+- Neg streak: 16-19h 4 red → 20h +0.11 broke; 21h -0.11, 22h +0.01, 23h +0.17 → current streak 0 red (<3); 48h regime EXTREME 48T '+$0.89' dominant (not NEUTRAL) → no size cut
+- Frequency 2/hr — under 20/hr
+- 3 open: BTC continuum-trend+ LONG (+0.43%), ETH hl_copy_trader LONG (+0.15%), SOL jup_yolo_mirrored LONG (+0.40%)
+- Storm readiness: **window-min +0.12% / at-run +0.42%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d deepened RED '-$0.75' from '-$0.54' two hours ago — jup_yolo_mirrored 28T '-$0.44' + volume-buildup- 15T '-$0.28' still the two drags (R:R issue: 57-60% WR but losses > wins)
+- r2v2-long3 2T 0% '-$0.13' 24h, ai-trader-manual 3T 0% '-$0.04' — n too small to act (ai-trader-manual is CEO manual trades, not a signal kill candidate)
