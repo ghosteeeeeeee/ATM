@@ -1,44 +1,55 @@
-# Current State — brain_auditor #202 2026-10-30 08:30 UTC
-**Last Updated: 2026-10-30 08:30 UTC**
-**Updated by: brain_auditor #202. Prior: #201 2026-10-30 04:45 UTC (preserved in git history).**
+# Current State — brain_auditor #203 2026-10-30 12:55 UTC
+**Last Updated: 2026-10-30 12:55 UTC**
+**Updated by: brain_auditor #203. Prior: #202 2026-10-30 08:30 UTC (preserved in git history).**
 
-## HEADLINE — Chop-bleed streak BROKEN (83.9% < 92%); BUG-070 fix verified (winner-cell
-## multipliers now live); 24h GREEN +$0.60; contrarian pc- flip 64.6% STANDS; 0 config changes
+## HEADLINE — vb- steer investigated: 5 candidates ALL fail bars; floor-short
+## narrative REFUTED; band×EMA300 re-measure DONE (MONITOR); 0 config changes
 
 0 trading-constant changes (hermes_constants.py no diff from this agent), 0 ships,
-2 creative entries, 1 checkpoint dispositioned.
+2 creative entries.
 
-### 1. CHOP-BLEED RUN 3 — NO BREACH, STREAK BROKEN
-7d losers: 52/62 never armed = **83.9%** (was 94.8% at run #201). Below 92% threshold.
-Checkpoint `chop-bleed-streak-run3` dispositioned: NO BREACH, no #194 size proposal to CEO.
-The MFE-CUT/TAT/CONF_FLOOR stack is reducing never-armed chop entries. Monitor, not escalate.
+### 1. vb- WATCHDOG STEER — INVESTIGATED, NO FILTER SHIPPED
+5 entry-filter candidates tested against 14d/7d/30d with Fisher + fk + OOS:
+- momentum_state='falling' only: p=0.176, fk 48.3% — REJECT
+- block is_stale=true: p=0.444 — REJECT
+- falling+fresh combined: fk 69% — REJECT
+- bb_position [0.2,0.4) block: n=11 < 20 bar — MONITOR
+- bb_position [0.6,0.8) block: n=8 < 15 bar — **PRE-REGISTERED**
+  (30d save +$0.43, fk 8.6%, monotonic 7/14/30d; trigger n>=15 ∧ PnL<0 ∧ fk<20%)
 
-### 2. BUG-070 VERIFIED — WINNER-CELL MULTIPLIERS NOW LIVE
-Winner-cell multipliers were DISCARDED by brain.py until 2026-10-30 05:24 UTC (commit
-b75d2f63). CAKE pre-fix showed mult=1.0 despite pump-chain+ being in WINNER_CELLS_VALIDATED.
-Post-fix trades stamp size_mult correctly (BTC continuum-trend- shows mult=1.5).
-**Pre-registered:** at n>=20 post-fix winner-cell trades, compare PnL vs pre-fix no-op baseline.
+**"shorted into floors" REFUTED:** lt0.2 floor = 21T 71.4% -$0.04 (works);
+gt0.8 ceiling = 9T 88.9% +$0.54 (best); killer = 0.6-0.8 ambiguous strength.
 
-### 3. CONTRARIAN JOIN FRESH (re-ran 08:20Z)
-pump-chain- flip-WR **64.6%** (226/350 decided) STANDS. btc-pump-rider+ 26.7% (136/512) = do NOT flip.
-Overall 42.0% n=861. Oct-27 PROMOTE verified with fresh data.
+### 2. BAND×EMA300 RE-MEASURE — DONE (was overdue Oct 27)
+- Mid-band [45,60) LONG dampen: 30d now +$0.66 save (sign flipped from -0.36),
+  n=38 < 50 pre-reg bar → MONITOR, no escalate.
+- #139 hold-cell re-verified with populated btc_ema300_position (71 rows/30d):
+  LONG BELOW EMA300 = 7T +$0.34 71.4% — same sign. **HOLD-call for BTC+ETH
+  open jup_yolo longs STANDS.**
 
-### 4. PUMP-CHAIN+ EXTREME DRIFT
-14d: 32T -$0.75 WR 43.8% | 7d: 24T -$0.04 WR 58.3% | 30d: 83T +$2.73 WR 43.4%.
-Drift real but 30d still positive. 11-10 bar (>=+$1.00 delta) will judge. Do NOT revert.
+### 3. CHOP-BLEED
+Count 53/63 = 84.1% (under 92%). Dollar -$5.50/-$5.91 = 93.1% (over).
+Outlier check: top-3 = 14.4% of dollar loss → BROAD bleed, not outliers.
+Entry-quality work continues; no filter passed bars this run.
 
-### 5. LOSING AUTOPSY (adverse-first, ASSERT PASS)
-48h n=19 = 5 never-adverse / 12 recovered / **2 NEVER** (BTC continuum-trend- SHORT,
-NXPC volume-buildup- SHORT) → **WRONG-SIDE REFUTED 127th consecutive run**.
+### 4. LOSING AUTOPSY (adverse-first, selfcheck PASS)
+48h n=20 = 5 never-adverse / 12 recovered / **3 NEVER** (BTC continuum-trend-
+SHORT, NXPC vb-, ZORA vb-) → **WRONG-SIDE REFUTED 128th consecutive run**.
 
-### 6. CREATIVE x2
-1. BUG-070 winner-cell boost verification ledger (pre-registered n>=20 post-fix)
-2. jup_yolo_mirrored regime gate candidate (monitor until n>=10)
+### 5. CONTRARIAN JOIN FRESH (re-ran 12:25Z)
+pump-chain- flip-WR **64.6%** (226/350) STANDS. btc-pump-rider+ 26.7% do NOT flip.
+Overall 42.0% n=861.
+
+### 6. PUMP-CHAIN+ / JUP_YOLO
+pump-chain+ 14d 39T -$1.16 41.0% | 30d 100T +$1.91 41.0% — 30d positive,
+NO-KILL stands 8th run. 11-10 bar ($>=+$1.00 delta) approaching.
+jup_yolo 9T 66.7% +$0.11 all EXTREME — n<10 pre-reg, monitor stands.
 
 ### 7. OPEN TRADES
-5 open: 3 jup_yolo_mirrored LONG (SOL/HYPE/ETH, all EXTREME, flat) + 2 volume-buildup-
-SHORT (IO/ZORA, both EXTREME, flat). All bracketed. No action needed.
+2 jup_yolo_mirrored LONG (BTC #16560, ETH #16557) against SHORT_BIAS —
+HOLD per #139 cell re-verified positive. Both bracketed.
 
 ### READINESS
-Regime: SHORT_BIAS (15m + 4h), LOW vol, STRONG_DOWN trend. Chop pin. 24h GREEN +$0.60.
-Size 1.0x. Weekly AMPLIFY due Mon 11-02. Storm-confl-waiver 2/3 packets.
+Regime: SHORT_BIAS (15m + 4h), NORMAL vol, BELOW EMA300. Size 1.0x.
+Weekly AMPLIFY due Mon 11-02. Storm-confl-waiver 2/3 packets.
+vb- 0.6-0.8 kill-band pre-reg live. Last-run verify all PASS.

@@ -2342,3 +2342,20 @@
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor: N.N < N`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK knife floor (detect): N.N < N`
+
+## Error Alerts — 2026-10-30 09:41 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: lutionError("HTTPSConnection(host='api.hyperliquid.xyz', port=N): Failed to resolve 'api.hyperliquid.xyz' ([Errno -N] Temporary failure in name resolution)")`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK-TOK] TOK: rules TOK (shadow skipped): 'str' object has no attribute 'get'`
+
+## Error Alerts — 2026-10-30 11:41 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK mid-band death band: N.N in N-N`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK mid-band death band: N.N in N-N`
+
+## Error Alerts — 2026-10-30 12:41 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

@@ -9966,5 +9966,25 @@
     "category": "entry sniper",
     "status": "monitoring",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-30T12:55:00Z",
+    "run": 203,
+    "idea": "vb- SHORT bb_position [0.6,0.8) kill-band pre-registered (counterintuitive: NOT floor shorts)",
+    "rationale": "Watchdog claimed losers 'shorted into floors' — REFUTED: lt0.2 floor shorts are 71.4% WR near-flat, gt0.8 ceiling shorts are 88.9% WR +$0.54 BEST. The bleed sits in 0.6-0.8 ambiguous-strength: 8T 37.5% WR -$0.43 30d, save +$0.43, fk 8.6%. Directionally extreme across 7/14/30d (save +0.19/+0.30/+0.43 monotonic).",
+    "expected_impact": "+$0.43/30d if bar clears; prevents shorting mid-upper-band non-extremes",
+    "category": "entry sniper",
+    "status": "pre-registered (n=8<15 bar; trigger: n>=15 AND 30d PnL<0 AND fk<20%)",
+    "risk": "low (signal-scoped, fk already 8.6%)"
+  },
+  {
+    "date": "2026-10-30T12:55:00Z",
+    "run": 203,
+    "idea": "chop-bleed KPI dollar-share outlier check — dollar share is broad, not outlier-driven",
+    "rationale": "7d dollar share 93.1% breached but count share 84.1% under bar. Checked: top-3 never-armed losers only 14.4% of dollar loss across 53 trades. The bleed is genuinely broad entry-quality, not a few big stops. Count-share remains the stable KPI; dollar-share reported with outlier companion per #193 requirement.",
+    "expected_impact": "KPI interpretation quality — prevents overreacting to dollar-share spikes",
+    "category": "kpi hygiene",
+    "status": "applied this run",
+    "risk": "none"
   }
 ]
