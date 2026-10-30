@@ -4126,6 +4126,19 @@ JUP_YOLO_CLUSTER_ENABLED = True       # master switch for YOLO cluster bonus
 JUP_YOLO_CLUSTER_BONUS_PER_TRADER = 3  # +3 confidence per additional wallet beyond the first
 JUP_YOLO_CLUSTER_MAX_BONUS = 15        # cap (matches HL_COPY cap — prevents overconfidence)
 
+# ── JUP YOLO Mirror Freshness Gate ────────────────────────────────────────────
+# CEO 2026-10-30: "older than 5-10 mins is useless" — mirror only FRESH pro
+# entries. Steady-state opens from tracked wallets are caught by the 60s poll
+# at age ~1min; the stale paths are (a) wallets newly added to the leaderboard
+# mid-hold, (b) state re-seeds, (c) delayed retries. Entering hours after the
+# pro is chasing, not copying.
+# 600s covers the 10-min leaderboard refresh latency for newly-tracked wallets;
+# tighten to 300 (5 min) for stricter entries — one line.
+JUP_YOLO_MAX_MIRROR_AGE_SEC = 600     # skip mirrors of positions older than 10 min at emit
+JUP_YOLO_REEMIT_AFTER_SEC = 180       # retry a gate-killed signal every 3 min (must fit
+                                      # inside the freshness window: 3 retries by 9 min)
+
+
 # ── Copy Trader Exit Correlation & Weighting ─────────────────────────────────
 COPY_TRADE_EXIT_ENABLED = True          # master switch for trader exit correlation
 COPY_TRADE_EXIT_TIMEOUT_MIN = 120       # fallback to normal exit after 2 hours

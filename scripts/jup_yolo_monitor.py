@@ -338,7 +338,16 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
 
 
 MAX_EMIT_ATTEMPTS = 5  # retry blocked/priceless positions before permanent skip
-REEMIT_AFTER_SEC = 900  # 15 min — held positions re-mirror if their signal died
+try:
+    from hermes_constants import (
+        JUP_YOLO_MAX_MIRROR_AGE_SEC, JUP_YOLO_REEMIT_AFTER_SEC)
+except Exception:
+    # fallback must match hermes_constants defaults (see CLUSTER import fix:
+    # catch Exception, not just ImportError — a broken constants file must
+    # degrade loudly upstream, never silently re-enable stale mirrors)
+    JUP_YOLO_MAX_MIRROR_AGE_SEC = 600
+    JUP_YOLO_REEMIT_AFTER_SEC = 180
+REEMIT_AFTER_SEC = JUP_YOLO_REEMIT_AFTER_SEC  # 3 min — retry inside the freshness window
 
 
 def _live_signal_exists(token: str, direction: str) -> bool:
@@ -416,6 +425,9 @@ def monitor_once() -> int:
     seen_list = [e for e in seen_list if e[0] in live_pids]
     seen = {e[0] for e in seen_list}
     seen_ts = {e[0]: e[1] for e in seen_list}  # pid -> first-emit epoch
+    # attempts bookkeeping only matters for LIVE positions — prune closed
+    # pids so failed/stale entries can't accumulate unbounded in state
+    attempts = {k: v for k, v in attempts.items() if k in live_pids}
 
     # CLUSTER MAP (CEO 2026-10-30): unique tracked wallets holding each
     # coin+direction in the live feed. A new/dead signal whose (market, dir)
@@ -477,9 +489,9 @@ def monitor_once() -> int:
                 continue
 
             # FIX (bug_hunter): non-tradeable markets checked BEFORE the
-            # re-mirror branch — previously ZEC re-mirrored loudly every 15 min
-            # with no action line after it (log said "re-mirror" then did
-            # nothing), burning the re-mirror cadence for a dead path.
+            # re-mirror branch — previously ZEC re-mirrored loudly every cycle
+            # interval with no action line after it (log said "re-mirror" then
+            # did nothing), burning the re-mirror cadence for a dead path.
             if market not in TRADEABLE_MARKETS:
                 # not mirrorable — never retry (e.g. blacklisted/removed market)
                 if pid not in seen:
@@ -488,17 +500,50 @@ def monitor_once() -> int:
 
             if pid in seen:
                 # RE-EMIT: held position whose signal died at an exec gate
-                # (SKIPPED/EXPIRED) — retry every REEMIT_AFTER_SEC. Without this,
-                # a transient vol-storm/max-positions kill silenced the position
-                # permanently even though the leaderboard trader still holds it.
+                # (SKIPPED/EXPIRED) — retry every REEMIT_AFTER_SEC (3 min, must
+                # fit inside the freshness gate). Without this, a transient
+                # vol-storm kill silenced the position even though the trader
+                # still holds it.
                 age = now_ts - seen_ts.get(pid, 0)
                 if age < REEMIT_AFTER_SEC:
+                    continue
+                # permanent give-up: bounded retries exhausted OR stale-blocked
+                # (attempts pinned to MAX by the freshness gate). Without this
+                # guard "giving up" was a lie — it re-mirrored forever every
+                # REEMIT interval. (attempts popped on success.)
+                if attempts.get(pid, 0) >= MAX_EMIT_ATTEMPTS:
                     continue
                 if _live_signal_exists(market, direction):
                     continue  # signal alive (PENDING/APPROVED) — let it work
                 # dead signal + aged → fall through to emit again, refresh ts
                 print(f"[jup_yolo] 🔄 re-mirror {market} {direction} "
                       f"(attempt age {age//60}m, previous signal dead)")
+
+            # ── FRESHNESS GATE (CEO 2026-10-30): "older than 5-10 mins is
+            # useless" — we copy the ENTRY, not the ride. Covers first-emit AND
+            # re-mirror fall-through. Steady-state tracked-wallet opens arrive
+            # at age ~1min (60s poll); stale paths are newly-tracked wallets
+            # mid-hold, state re-seeds, and late retries.
+            _ea_raw = p.get('executedAt') or 0
+            try:
+                exec_at = int(_ea_raw)
+            except (TypeError, ValueError):
+                exec_at = 0
+            if exec_at > 0:
+                pos_age = now_ts - exec_at
+                if pos_age > JUP_YOLO_MAX_MIRROR_AGE_SEC:
+                    print(f"[jup_yolo] ⏰ STALE SKIP {market} {direction} "
+                          f"— pro opened {pos_age // 60}m ago "
+                          f"(> {JUP_YOLO_MAX_MIRROR_AGE_SEC // 60}m gate), not chasing")
+                    if pid not in seen:
+                        seen_list.append((pid, now_ts))
+                    # pin attempts → terminal: re-mirror guard goes silent
+                    attempts[pid] = MAX_EMIT_ATTEMPTS
+                    continue
+            else:
+                # no executedAt in feed (unexpected — API always sends it):
+                # fail-open so a feed format change can't silently kill mirrors
+                print(f"[jup_yolo] ⚠️ {market} {direction} — no executedAt, treating as fresh")
 
             stats = wallets[owner]   # {label, pnl, wr, trades, rank, source}
             leverage = int(p.get('leverage', 0) or 0)
