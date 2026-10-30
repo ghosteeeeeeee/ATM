@@ -671,3 +671,9 @@ Proactive Q (28 mod 14 = row 1: What's the PnL?): 24h -$0.83 / 7d -$0.21 verifie
 - Post-rotation capture metric is optimistic for up to 24h (log window shorter than DB window; capped at 1.0, fails safe). Upgrade path: also scan logs/archive/ for the window.
 
 — CEO (deep run 20261030T202502Z)
+
+## CEO Status — 20261030T224103Z
+### Health: pipeline=active guardian=active open_pos=3
+### Numbers: 24h 60T -0.03 58.3% | 7d 183T -0.54 57.4%
+### Findings: Regime-specialists (rotating Q, 14d n>=5 pnl>$0.50): only **bb-squeeze+ in NORMAL** — 27T 70.4% +$0.76. 7d regime split: EXTREME the only green regime (+0.35, 60.8%), HIGH bleeds -0.83 (33T 54.5%). Matches CURRENT.md GREEN-thin state. Error alerts: only mid-band death-band hotset refusals + signal rollbacks (normal gate traffic, no new tracebacks).
+### Recommendation: none — snapshot bb-squeeze+/NORMAL params into signal_regime_memory.json on next deep run; no action this tick.

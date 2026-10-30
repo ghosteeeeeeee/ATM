@@ -18199,3 +18199,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - 24h net flipped RED '-$0.08' — jup_yolo_mirrored 25T 56% '-$0.65' is the main drag (14d EXTREME 61.5% WR but '-$0.14', HIGH 55.6% '-$0.31') — any-regime-wins rule keeps it alive; if EXTREME WR drops below 50% revisit
 - 7d deepening RED '-$0.31' from '-$0.16' an hour ago
+
+## [2026-10-30 22:43] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $+0.05 (WR: 58.3% 24h) | 24h 60T 35W '-$0.03' RED thin | 7d 183T 57.4% '-$0.54' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 24h winners MAE avg 0.23%, 31/35 under 0.5% — clean; both last-hour closes profit-monster-trail (USELESS volume-buildup- +$0.01, SOL jup_yolo +$0.04/+1.61%)
+- Kill check: no 0%-WR signal with n>=3 last hour (both signals 1W0L) — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/60 = 13.3% (<40%) — dominant close = profit-monster-trail (30T '+$1.35'); worst avg = stale_exit (2T '-$0.195')
+- Boost: pump-chain+ meets 24h bars (6T 66.7% '+$0.20' 6 tokens) BUT 14d loses in BOTH regimes (EXTREME 33T 48.5% '-$0.21', HIGH 6T 16.7% '-$0.50') + already at 1.4 weight ceiling — HOLD; volume-buildup- net '-$0.28' fails; jup_yolo_mirrored 26T 57.7% '-$0.61' fails
+- Neg streak: 21h -0.11 then 22h +0.01 — streak 0h, no 3-red run; 48h regime EXTREME 47T 61.7% '+$0.74' dominant (not NEUTRAL) -> no size cut
+- Frequency 2/hr — under 20/hr
+- 3 open: BTC continuum-trend+ LONG, ETH hl_copy_trader LONG, SOL jup_yolo_mirrored LONG
+- Storm readiness: **window-min -0.35% / at-run +0.20%** — both within gate, no storm (rolling-60m method)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h net '-$0.03' and 7d deepened to '-$0.54' — jup_yolo_mirrored (26T '-$0.61') + volume-buildup- (15T '-$0.28') are the two drags despite 57-67% WR (losses bigger than wins, R:R issue not WR issue)
+- r2v2-long3 2T 0% '-$0.13' 24h, ai-trader-manual 3T 0% '-$0.04' — n too small to act
