@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-10-30T22:41:25.593988+00:00",
+  "timestamp": "2026-10-30T23:11:25.753395+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
+      "title": "Portfolio heavily long (4 trades)",
+      "detail": "4 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
       "id": "steer-001"
     }
@@ -14,16 +14,16 @@
   "regime": {
     "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "AT",
-    "volatility": "LOW",
-    "zscore_tier": "POS",
+    "continuum": "ABOVE",
+    "volatility": "NORMAL",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
     "acceleration_state": "NEGATIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 0.75,
+    "wyckoff_phase": "MARKUP",
     "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 3
+  "open_count": 4
 }

@@ -1353,8 +1353,16 @@ def rule_based_context_gate(token, direction, source, sig):
         # rejected whatever the compactor let through ("no bearish override") — approval→exec
         # contradiction that could never survive execution.
         # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12: 40-45 band = 19T 63.2%WR +$0.48.
-        from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN, OVERSOLD_SHORT_RSI_MAX
-        _hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_HARD_FLOOR
+        from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN, OVERSOLD_SHORT_RSI_MAX, SHORT_RSI_HARD_FLOOR_JUP_YOLO
+        # CEO 2026-10-30 Option D: jup_yolo_mirrored → floor 35 (carve-out like
+        # pump-chain). Late-mirror timing enters dumps when detection-RSI already
+        # <45; knife (<35) stays global — jup below 35 still blocked.
+        if 'pump-chain' in (source or ''):
+            _hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
+        elif 'jup_yolo' in (source or ''):
+            _hard_floor = SHORT_RSI_HARD_FLOOR_JUP_YOLO
+        else:
+            _hard_floor = SHORT_RSI_HARD_FLOOR
         _floor_bear_cache = {}
         def _floor_bear_ok():
             if 'v' not in _floor_bear_cache:
@@ -2541,8 +2549,16 @@ def execute_trade(token, direction, price, confidence, source,
             # "no bearish override" and rejected whatever the compactor's own override let
             # through — the approval→exec contradiction (morning rec #3) that killed YGG
             # (detect 23.5 / live 49.5) and every dump-window short.
-            from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN, OVERSOLD_SHORT_RSI_MAX
-            _exec_hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_HARD_FLOOR
+            from hermes_constants import SHORT_RSI_HARD_FLOOR_PUMP_CHAIN, OVERSOLD_SHORT_RSI_MAX, SHORT_RSI_HARD_FLOOR_JUP_YOLO
+            # CEO 2026-10-30 Option D: exec-time mirror of the approval carve-out —
+            # without this, compactor approves (floor 35) and exec rejects (floor 45)
+            # → the exact approval→exec zombie D exists to prevent.
+            if 'pump-chain' in (source or ''):
+                _exec_hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
+            elif 'jup_yolo' in (source or ''):
+                _exec_hard_floor = SHORT_RSI_HARD_FLOOR_JUP_YOLO
+            else:
+                _exec_hard_floor = SHORT_RSI_HARD_FLOOR
             _exec_bear_cache = {}
             def _exec_bear_ok():
                 if 'v' not in _exec_bear_cache:
@@ -3439,11 +3455,13 @@ def _run_hot_set():
                     _btc_accel_blocked = False  # block expired
 
             # SAFETY: blacklist filter (defense-in-depth — hotset.json should already be clean)
-            if direction == 'SHORT' and token in SHORT_BLACKLIST:
-                log(f'  🚫 [HOT-SET] {token} SHORT BLOCKED — in SHORT_BLACKLIST')
-                continue
-            if direction == 'LONG' and token in LONG_BLACKLIST:
-                log(f'  🚫 [HOT-SET] {token} LONG BLOCKED — in LONG_BLACKLIST')
+            # CEO 2026-10-30 Option D: central helper with source — hotset entries
+            # carry source, so jup_yolo_mirrored gets its SHORT_BLACKLIST exemption
+            # here too (a signal-layer-only exemption would zombie at this gate).
+            from directional_block import is_directional_blocked, directional_block_reason
+            if is_directional_blocked(token, direction, hot_sig.get('source', '')):
+                _db_reason = directional_block_reason(token, direction)
+                log(f'  🚫 [HOT-SET] {token} {direction} BLOCKED — in {_db_reason}')
                 continue
 
             # Defense-in-depth. is_solana_only tokens can't be traded

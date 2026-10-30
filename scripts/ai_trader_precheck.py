@@ -126,9 +126,11 @@ def btc_long_trend(token):
 
 
 
-def precheck(coin, direction, conf=None):
+def precheck(coin, direction, conf=None, source=None):
     """Check if a coin+direction would pass the RR engine and other gates.
-    conf: the confidence value the pick will use (needed for SHORT regime gate)."""
+    conf: the confidence value the pick will use (needed for SHORT regime gate).
+    source: signal source string (CEO 2026-10-30 Option D — jup_yolo_mirrored
+    gets the SHORT_BLACKLIST exemption; None = no exemption, old behavior)."""
     results = {
         'coin': coin,
         'direction': direction,
@@ -161,10 +163,11 @@ def precheck(coin, direction, conf=None):
         pass
 
     # 0. Blacklist check — first gate, cheapest to check
+    # CEO 2026-10-30 Option D: central helper with source (advisory precheck —
+    # passes source when caller has it; None keeps the historical block).
     try:
-        from hermes_constants import LONG_BLACKLIST, SHORT_BLACKLIST
-        blacklist = LONG_BLACKLIST if direction == 'LONG' else SHORT_BLACKLIST
-        if token in blacklist:
+        from directional_block import is_directional_blocked
+        if is_directional_blocked(token, direction, source):
             check('Not blacklisted', False, f'{token} is in {direction} blacklist')
             return results  # early exit — no point checking further
         else:
@@ -487,7 +490,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     if len(sys.argv) < 3:
-        print("Usage: python3 ai_trader_precheck.py COIN DIRECTION [CONF]")
+        print("Usage: python3 ai_trader_precheck.py COIN DIRECTION [CONF] [SOURCE]")
         print("Example: python3 ai_trader_precheck.py W SHORT")
         print("         python3 ai_trader_precheck.py GOAT SHORT 85")
         sys.exit(1)
@@ -498,8 +501,9 @@ if __name__ == '__main__':
     # (conf>=75 in NORMAL/HIGH vol) can evaluate instead of always failing with
     # "conf unknown". precheck() already accepted conf — __main__ never passed it.
     conf = float(sys.argv[3]) if len(sys.argv) >= 4 else None
+    source = sys.argv[4] if len(sys.argv) >= 5 else None
 
-    result = precheck(coin, direction, conf=conf)
+    result = precheck(coin, direction, conf=conf, source=source)
 
     print(f"\n=== AI Trader Pre-check: {coin} {direction} ===")
     for c in result['checks']:

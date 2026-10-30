@@ -747,14 +747,18 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         confidence = MAX_CONFIDENCE
 
     # ── Directional blacklist guard — block at source ──────────────────────
-    # Import lazily to avoid circular deps
+    # CEO 2026-10-30 Option D: routed through the central helper so the
+    # jup_yolo_mirrored source exemption (SHORT_BLACKLIST only) can never
+    # disagree with the other five check sites — a signal-layer-only
+    # exemption here would create zombie signals (approved then blocked
+    # at execution). Import lazily to avoid circular deps (unchanged).
     try:
-        from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST, SIGNAL_SOURCE_BLACKLIST
-        if direction.upper() == 'SHORT' and token.upper() in SHORT_BLACKLIST:
-            print(f'  DEBUG add_signal BLOCKED: {token} {direction} SHORT_BLACKLIST', flush=True)
-            return None  # Silently skip SHORT-blocklisted tokens
-        if direction.upper() == 'LONG' and token.upper() in LONG_BLACKLIST:
-            return None  # Silently skip LONG-blocklisted tokens
+        from hermes_constants import SIGNAL_SOURCE_BLACKLIST
+        from directional_block import is_directional_blocked, directional_block_reason
+        if is_directional_blocked(token, direction, source):
+            _db_reason = directional_block_reason(token, direction)
+            print(f'  DEBUG add_signal BLOCKED: {token} {direction} {_db_reason}', flush=True)
+            return None  # Silently skip blocklisted tokens (unless source-exempt)
         # Check source field (e.g. 'hzscore,pct-hermes+') not signal_type (e.g. 'percentile_rank')
         # Use exact match to avoid substring blocking (e.g. 'vel-hermes' must NOT block 'vel-hermes+')
         if source in SIGNAL_SOURCE_BLACKLIST:

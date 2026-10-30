@@ -345,16 +345,56 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
 MAX_EMIT_ATTEMPTS = 5  # retry blocked/priceless positions before permanent skip
 try:
     from hermes_constants import (
-        JUP_YOLO_MAX_MIRROR_AGE_SEC, JUP_YOLO_REEMIT_AFTER_SEC)
+        JUP_YOLO_MAX_MIRROR_AGE_SEC, JUP_YOLO_REEMIT_AFTER_SEC,
+        JUP_YOLO_MAX_OPEN_SHORTS, JUP_YOLO_SHORT_LIFT_CLOSED)
 except Exception as _fe:
     # FIX (bug_hunter F2): was SILENT — a renamed/missing gate constant would
     # silently widen the gate back to 600/180 after a CEO tightening (exactly
     # what the old comment vowed never to do). Loud every process start.
-    print(f"[jup_yolo] ⚠️ freshness constants unavailable "
-          f"({type(_fe).__name__}: {_fe}) — using fallback 600/180")
+    print(f"[jup_yolo] ⚠️ freshness/guardrail constants unavailable "
+          f"({type(_fe).__name__}: {_fe}) — using fallback 600/180/2/20")
     JUP_YOLO_MAX_MIRROR_AGE_SEC = 600
     JUP_YOLO_REEMIT_AFTER_SEC = 180
+    JUP_YOLO_MAX_OPEN_SHORTS = 2
+    JUP_YOLO_SHORT_LIFT_CLOSED = 20
 REEMIT_AFTER_SEC = JUP_YOLO_REEMIT_AFTER_SEC  # 3 min — retry inside the freshness window
+
+
+def _jup_short_counts() -> tuple:
+    """(closed, open) counts of jup_yolo SHORT trades in PostgreSQL.
+
+    CEO Option D guardrail (amended for the HL $11 minimum notional):
+    half-size was illegal ($5.50 never fills; perp PnL is notional-based so
+    leverage cuts don't reduce risk) — cap concurrent exposure instead.
+    Fail-open on DB error: 0 closed / 0 open (cap non-binding) + loud warn.
+    """
+    try:
+        from _secrets import BRAIN_DB_DICT
+        import psycopg2
+        cfg = BRAIN_DB_DICT.copy()
+        cfg.setdefault('port', 5432)
+        cfg['connect_timeout'] = 5
+        # FIX: connect(**cfg) — positional dict is treated as a DSN by psycopg2
+        # ("Expected bytes or unicode string, got dict") which killed the cap
+        # check on its first live run and silently disabled the guardrail.
+        pg = psycopg2.connect(**cfg)
+        pg.autocommit = True
+        try:
+            cur = pg.cursor()
+            cur.execute("""
+                SELECT SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END),
+                       SUM(CASE WHEN status = 'open'  THEN 1 ELSE 0 END)
+                FROM trades
+                WHERE signal LIKE '%%jup_yolo%%' AND direction = 'SHORT'
+            """)
+            _c, _o = cur.fetchone()
+            cur.close()
+            return (int(_c or 0), int(_o or 0))
+        finally:
+            pg.close()
+    except Exception as e:
+        print(f"[jup_yolo] ⚠️ SHORT cap check failed ({type(e).__name__}: {e}) — fail-open (cap off)")
+        return (0, 0)
 
 
 def _live_signal_exists(token: str, direction: str) -> bool:
@@ -556,6 +596,24 @@ def monitor_once() -> int:
                 # sends it): fail-open so a feed format change can't silently
                 # kill mirrors. Bounded by the give-up attempts budget.
                 print(f"[jup_yolo] ⚠️ {market} {direction} — no executedAt, treating as fresh")
+
+            # ── SHORT CONCURRENCY CAP (CEO Option D, amended for HL $11 min) ──
+            # Half-size SHORTs were illegal (below HL minimum notional / perp PnL
+            # is notional-based) — cap concurrent exposure instead: max
+            # JUP_YOLO_MAX_OPEN_SHORTS open mirrored SHORTs until
+            # JUP_YOLO_SHORT_LIFT_CLOSED have closed. Placed BEFORE the
+            # re-mirror print (no 'log-then-nothing') and before emit.
+            # Slot-wait: not marked seen, no attempt burned — retried every
+            # 60s; if it never fits a slot inside the freshness window the
+            # staleness gate retires it (by design — entry must be fresh).
+            if direction == 'SHORT':
+                _closed_s, _open_s = _jup_short_counts()
+                if _closed_s < JUP_YOLO_SHORT_LIFT_CLOSED and _open_s >= JUP_YOLO_MAX_OPEN_SHORTS:
+                    if pid not in seen:
+                        print(f"[jup_yolo] ⏸️ SHORT-CAP {market} — {_open_s} open "
+                              f"(cap {JUP_YOLO_MAX_OPEN_SHORTS})/{_closed_s} closed "
+                              f"of {JUP_YOLO_SHORT_LIFT_CLOSED} — waiting for a slot")
+                    continue
 
             # FIX (bug_hunter F3): re-mirror notice printed only AFTER the gate
             # passes — previously '🔄 re-mirror …' was followed immediately by

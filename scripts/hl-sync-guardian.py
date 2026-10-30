@@ -2737,7 +2737,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         conn2 = get_db_connection()
         cur2 = conn2.cursor()
         cur2.execute("""
-            SELECT id, token, direction, entry_price, leverage, amount_usdt
+            SELECT id, token, direction, entry_price, leverage, amount_usdt, signal
             FROM trades
             WHERE status = 'open' AND paper = true AND exchange = 'Hyperliquid'
         """)
@@ -2751,7 +2751,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         # Pass 1: handle already-copied trades (verify HL registration)
         # ─────────────────────────────────────────────────────────────────────────
         for row in all_paper_trades:
-            trade_id, token, direction, entry, lev, amount = row
+            trade_id, token, direction, entry, lev, amount, trade_sig = row
             trade_id_str = str(trade_id)
 
             if trade_id_str not in copied_ids:
@@ -2792,7 +2792,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         batch_eligible = []   # [(trade_id, token, direction, lev_int, curr_price)]
 
         for row in all_paper_trades:
-            trade_id, token, direction, entry, lev, amount = row
+            trade_id, token, direction, entry, lev, amount, trade_sig = row
             trade_id_str = str(trade_id)
 
             if trade_id_str in copied_ids:
@@ -2822,8 +2822,10 @@ def close_orphan_paper_trades(hl_pos, prices):
                 conn_s.close()
             except Exception:
                 in_hot = False
-            blocked = (direction.upper() == 'SHORT' and ht.upper() in SHORT_BLACKLIST) or \
-                      (direction.upper() == 'LONG' and ht.upper() in LONG_BLACKLIST)
+            # CEO 2026-10-30 Option D: central helper — jup_yolo_mirrored exempt
+            # from SHORT_BLACKLIST only; trade.signal carries the source.
+            from directional_block import is_directional_blocked
+            blocked = is_directional_blocked(ht, direction, trade_sig)
             if not in_hot:
                 log(f'  {token}: NOT in hot-set — paper only, live mirror blocked', 'WARN')
                 # BUG FIX (2026-04-26): Do NOT increment hype_count here.
@@ -3687,18 +3689,20 @@ def _sweep_blocklist_trades(prices):
     try:
         cur = conn.cursor()
         cur.execute("""
-            SELECT id, token, direction, entry_price, leverage
+            SELECT id, token, direction, entry_price, leverage, signal
             FROM trades
             WHERE status = 'open'
               AND paper = TRUE
               AND exchange = 'Hyperliquid'
         """)
-        for (trade_id, token, direction, entry_px, lev) in cur.fetchall():
+        for (trade_id, token, direction, entry_px, lev, trade_sig) in cur.fetchall():
             ht = token.upper()
+            # CEO 2026-10-30 Option D: central helper with source
+            from directional_block import is_directional_blocked
+            if not is_directional_blocked(ht, direction, trade_sig):
+                continue
             blocked_short = direction.upper() == 'SHORT' and ht in SHORT_BLACKLIST
             blocked_long = direction.upper() == 'LONG' and ht in LONG_BLACKLIST
-            if not (blocked_short or blocked_long):
-                continue
 
             # Determine direction-appropriate close reason
             reason = 'HOTSET_BLOCKED_S' if blocked_short else 'HOTSET_BLOCKED_L'

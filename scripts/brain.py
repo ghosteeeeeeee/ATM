@@ -389,7 +389,15 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # CLOSED (block), mirroring the decider helper.
     if direction == 'SHORT':
         try:
-            from hermes_constants import SHORT_RSI_HARD_FLOOR, OVERSOLD_SHORT_RSI_MAX
+            from hermes_constants import (SHORT_RSI_HARD_FLOOR, SHORT_RSI_HARD_FLOOR_JUP_YOLO,
+                                          OVERSOLD_SHORT_RSI_MAX)
+            # CEO 2026-10-30 Option D: jup_yolo_mirrored gets floor 35 (carve-out,
+            # same shape as pump-chain) — floor 45 here would create the
+            # approval→brain zombie the decider carve-out exists to prevent.
+            # Knife (< OVERSOLD_SHORT_RSI_MAX=35) stays GLOBAL: below 35
+            # is still rejected on this path (BANANA).
+            _floor = (SHORT_RSI_HARD_FLOOR_JUP_YOLO
+                      if 'jup_yolo' in (signal or '') else SHORT_RSI_HARD_FLOOR)
             _rsi_chk = signal_rsi_14
             if _rsi_chk is None and signal_metadata:
                 if isinstance(signal_metadata, str):
@@ -400,7 +408,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                         signal_metadata = None
                 if isinstance(signal_metadata, dict):
                     _rsi_chk = signal_metadata.get('rsi_14', signal_metadata.get('rsi'))
-            if _rsi_chk is not None and float(_rsi_chk) < SHORT_RSI_HARD_FLOOR:
+            if _rsi_chk is not None and float(_rsi_chk) < _floor:
                 _rsi_chk = float(_rsi_chk)
                 if _rsi_chk < OVERSOLD_SHORT_RSI_MAX:
                     print(f"[brain.py] ❌ REJECTED: {token} {direction} — SHORT RSI {_rsi_chk} < knife {OVERSOLD_SHORT_RSI_MAX} (BANANA lesson — no bearish override ever)")
@@ -429,9 +437,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                 except Exception:
                     _bear_exempt = False  # fail-closed: no bear data → block
                 if not _bear_exempt:
-                    print(f"[brain.py] ❌ REJECTED: {token} {direction} — SHORT RSI {_rsi_chk} < HARD_FLOOR {SHORT_RSI_HARD_FLOOR} (extreme oversold)")
+                    print(f"[brain.py] ❌ REJECTED: {token} {direction} — SHORT RSI {_rsi_chk} < HARD_FLOOR {_floor} (extreme oversold)")
                     return None
-                print(f"[brain.py] ✅ UNCLOG: {token} {direction} — SHORT RSI {_rsi_chk} < {SHORT_RSI_HARD_FLOOR} allowed — BTC bearish structure (oversold = continuation)")
+                print(f"[brain.py] ✅ UNCLOG: {token} {direction} — SHORT RSI {_rsi_chk} < {_floor} allowed — BTC bearish structure (oversold = continuation)")
         except Exception:
             pass  # non-fatal — other gates still apply
 
@@ -522,10 +530,11 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     hype_token = hype_coin(token)
 
     # Blacklist check
-    from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
-    if (direction == 'SHORT' and hype_token in SHORT_BLACKLIST) or \
-       (direction == 'LONG'  and hype_token in LONG_BLACKLIST):
-        bl = 'SHORT_BLACKLIST' if direction == 'SHORT' else 'LONG_BLACKLIST'
+    # CEO 2026-10-30 Option D: central helper — jup_yolo_mirrored exempt from
+    # SHORT_BLACKLIST only; `signal` carries the source string.
+    from directional_block import is_directional_blocked, directional_block_reason
+    if is_directional_blocked(hype_token, direction, signal):
+        bl = directional_block_reason(hype_token, direction)
         print(f"[brain.py] ❌ REJECTED: {token} {direction} — blocked by {bl}")
         return None
 

@@ -1168,6 +1168,12 @@ SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocke
 # and decider bearish-structure overrides allowed RSI<25 SHORT through. 14d: RSI<25 SHORT = 12T 25%WR
 # -$0.89; 0 real winners (3 scratches +$0.01 each). BANANA lesson: oversold = bounce risk even in downtrend.
 SHORT_RSI_HARD_FLOOR = 45      # REVERTED 35→45 2026-10-18 brain_auditor: pre-registered trigger HIT (same as SHORT_RSI_FLOOR) — 7d band 29T 16L gross $1.08 > $1.00. Aligns with SHORT_RSI_FLOOR=45. RSI<45 SHORT blocked (BANANA lesson: oversold = bounce). Prior: CEO 2026-10-13 RECALIBRATION 45→35.
+# CEO 2026-10-30 Option D: source-scoped carve-out — jup_yolo_mirrored SHORT uses
+# floor 35 (same shape as SHORT_RSI_HARD_FLOOR_PUMP_CHAIN). Late-mirror timing means
+# detection-RSI is already <45 by the time we enter a dump — floor 45 blocked 35/109
+# SHORT mirror deaths at approval. OVERSOLD_SHORT_RSI_MAX=35 knife guard stays GLOBAL
+# (BANANA lesson unchanged): jup_yolo SHORTs below 35 are still dead.
+SHORT_RSI_HARD_FLOOR_JUP_YOLO = 35  # CEO Option D 2026-10-30 — jup_yolo_mirrored source only
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
 # Blanket 45 floor cuts off this band. Pump-chain gets a lower floor. Revert if 7d n>=5 WR<45% or PnL<-$0.50.
 # REVERTED 2026-10-21 brain_auditor: trigger HIT — 7d n=5 w=1 (20% WR) | 14d n=17 w=4 (23.5%) net +$0.04 | 30d 41.2% WR +$0.29.
@@ -4125,6 +4131,16 @@ HL_COPY_CLUSTER_SIZE_MULT = 0.25    # +25% position size per additional trader (
 JUP_YOLO_CLUSTER_ENABLED = True       # master switch for YOLO cluster bonus
 JUP_YOLO_CLUSTER_BONUS_PER_TRADER = 3  # +3 confidence per additional wallet beyond the first
 JUP_YOLO_CLUSTER_MAX_BONUS = 15        # cap (matches HL_COPY cap — prevents overconfidence)
+
+# ── JUP YOLO SHORT Guardrail (CEO Option D, amended 2026-10-30) ───────────────
+# Original guardrail was half-size SHORTs ($11→$5.50) — INVALID: HL minimum
+# notional is $11 (HL_MIN_NOTIONAL_USDT), a $5.50 order never fills, and perp
+# PnL is notional-based so leverage changes don't cut risk at fixed notional.
+# Amended by T: cap concurrent exposure instead — max 2 open mirrored SHORTs
+# until JUP_YOLO_SHORT_LIFT_CLOSED SHORTs have closed, then the cap lifts and
+# performance is re-evaluated vs the LONG baseline.
+JUP_YOLO_MAX_OPEN_SHORTS = 2      # concurrent open jup_yolo SHORT trades allowed
+JUP_YOLO_SHORT_LIFT_CLOSED = 20   # lift the cap after this many SHORTs closed
 
 # ── JUP YOLO Mirror Freshness Gate ────────────────────────────────────────────
 # CEO 2026-10-30: "older than 5-10 mins is useless" — mirror only FRESH pro

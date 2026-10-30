@@ -4346,7 +4346,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # CEO UNCLOG flip #1: import hoisted ABOVE the try below — a failure inside
                 # the non-fatal try would be swallowed and fail-OPEN (signal approved despite
                 # RSI<45). Knife check must not depend on code the outer except can eat.
-                from hermes_constants import OVERSOLD_SHORT_RSI_MAX
+                from hermes_constants import OVERSOLD_SHORT_RSI_MAX, SHORT_RSI_HARD_FLOOR_JUP_YOLO
+                # CEO 2026-10-30 Option D: source floor select — jup_yolo_mirrored
+                # uses 35 here or the approval layer blocks what exec would have
+                # taken (approval→exec contradiction = zombie). Hoisted with the
+                # knife import for the same fail-OPEN reason. Knife (<35) unchanged.
+                _rsh_floor = (SHORT_RSI_HARD_FLOOR_JUP_YOLO if 'jup_yolo' in (source or '')
+                              else SHORT_RSI_HARD_FLOOR)
                 _conn_rsh = None
                 try:
                     _conn_rsh = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -4365,7 +4371,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _rsh_al = sum(_rsh_losses) / 14
                         if _rsh_al > 0:
                             _rsh_rsi = 100 - (100 / (1 + _rsh_ag / _rsh_al))
-                            if _rsh_rsi < SHORT_RSI_HARD_FLOOR:
+                            if _rsh_rsi < _rsh_floor:  # Option D: source floor (jup=35, else global)
                                 # CEO UNCLOG flip #1 — consult 20261022T144234Z, T directive
                                 # 2026-10-22 14:39 UTC: BTC-bear structure exemption, mirror of the
                                 # pump-chain/soft/oversold overrides below (linreg LEAN_BEAR/BEAR,
@@ -4404,9 +4410,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     except Exception:
                                         _rsh_bear_override = False
                                 if _rsh_bear_override:
-                                    log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.2f} < {SHORT_RSI_HARD_FLOOR} but BTC bearish (oversold = continuation)")
+                                    log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.2f} < {_rsh_floor} but BTC bearish (oversold = continuation)")
                                 else:
-                                    log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.2f} < {SHORT_RSI_HARD_FLOOR} (exec-time floor would reject anyway)")
+                                    log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.2f} < {_rsh_floor} (exec-time floor would reject anyway)")
                                     _tombstone_pending(tkn, direction, 'short-rsi-hard-floor', dry)
                                     continue
                 except Exception:
