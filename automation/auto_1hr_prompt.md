@@ -216,18 +216,18 @@ PostgreSQL treats `"double quotes"` as column identifiers, NOT string literals. 
 
 If a query fails with `UndefinedColumn`, check column names against this list before retrying.
 
-## STORM-READINESS PACKET (CEO consult 20261029T2130Z, T proceed — MANDATORY when BTC 1h |move| >= 1.5%)
+## STORM-READINESS PACKET (CEO consult 20261029T2130Z, T proceed — MANDATORY when the storm gate fires: window-min <= −1.5% OR |at-run| >= 1.5% — pump OR dump)
 
 T's standing ask: "be ready for the next pump or dump. learn something!!!" — this makes it automatic.
 Every run, first compute BTC **rolling 60-minute** close-to-close from `data/candles.db` (`candles_1m`, token='BTC'): latest close vs the close at `ts <= now-3600` — **NOT `is_closed` hour candles** (code review 9671bf67: hour-close flags lie both ways — tick-agg flips ~1h late, seeder marks in-progress hours, and completed buckets by definition cannot contain the crash happening now; the rolling method sees the storm within minutes, same as `_storm_confluence_would_pass`).
-**WINDOW-PEAK RULE (CEO fix (b) 20261030T0030Z): judge on the MIN rolling-60m sampled every 5 min over the prior 60 minutes (`now, now-300, …, now-3600`), NOT the single run-time instant** — a storm that starts and recovers between hourly runs must still packet (yesterday's armed minutes 20:41–21:14 ended before the 21:45 run: instant-sample said +0.42 "no storm", window-peak says −2.95 → packet). Report BOTH numbers in the packet: `window-min {m:+.2f}% / at-run {r:+.2f}%`. **If window-min > −1.5%: skip this section (note "no storm").**
+**WINDOW-PEAK RULE (CEO fix (b) 20261030T0030Z): judge on the MIN rolling-60m sampled every 5 min over the prior 60 minutes (`now, now-300, …, now-3600`), NOT the single run-time instant** — a storm that starts and recovers between hourly runs must still packet (yesterday's armed minutes 20:41–21:14 ended before the 21:45 run: instant-sample said +0.42 "no storm", window-peak says −2.95 → packet). Report BOTH numbers in the packet: `window-min {m:+.2f}% / at-run {r:+.2f}%`. **THE STORM GATE IS AUTHORITATIVE (review F1): run steps 1–4 when `window-min <= −1.5` (dump, even if recovered — the motivating 10-29 case) OR `|at-run| >= 1.5` (fresh pump/dump at run time); otherwise skip (note "no storm").** The old instant-only gate is superseded — do NOT AND the two rules (it would skip recovered dumps and all pumps).
 
-When |btc_1h| >= 1.5:
+When the storm gate fires (window-min <= −1.5 OR |at-run| >= 1.5):
 1. **Blocked-direction census (last 2h):** from `/root/.hermes/data/signals_hermes_runtime.db`,
    `SELECT token, direction, signal_type, decision_reason FROM signals WHERE created_at > datetime('now','-2 hours') AND decision='EXPIRED'` — group by `decision_reason` (tombstones carry real gate names now). Classes: confluence single-type, pump-chain-short-high, short-rsi-hard-floor, oversold-knife, compaction_stale_10min.
 2. **Counterfactual replay (honest cohort):** keep only rows with signal-metadata RSI >= 35 (`_signal_metadata` json field `rsi_14` — note the underscore prefix) — RSI<35 siblings would die at the exec knife anyway (do NOT count them, no double-count). Dedupe first-fire-per-token. For each, walk `data/candles.db` `candles_5m` from the signal `price` to now: `ret = (price - close)/price*100` for SHORT; `$ = 11 * ret/100`. Also touch-rule (low <= price*0.996 within 30x5m).
 3. **Emit the packet (log + kanban, one table):**
-   `🌩️ [STORM-READINESS] BTC 1h {btc_1h:+.2f}% | blocked {n} ({gate counts}) | true-starvation {k} RSI>=35 | counterfactual ${x:+.2f} (touch {t}/{k}) | waiver: SHADOW={STORM_CONFLUENCE_WAIVER_SHADOW} ENFORCE={STORM_CONFLUENCE_WAIVER_ENFORCE}`
+   `🌩️ [STORM-READINESS] window-min {m:+.2f}% / at-run {r:+.2f}% | blocked {n} ({gate counts}) | true-starvation {k} RSI>=35 | counterfactual ${x:+.2f} (touch {t}/{k}) | waiver: SHADOW={STORM_CONFLUENCE_WAIVER_SHADOW} ENFORCE={STORM_CONFLUENCE_WAIVER_ENFORCE}` (review F2: BOTH numbers are part of the template, not optional prose)
 4. **Bar tracking:** the `storm-confl-waiver` enforce flip needs **>=3 consecutive storms** with positive counterfactual (deadline 2026-11-12, registry entry). Each packet is one auditable entry — append a dated line to the kanban so "3 consecutive" is countable.
 
 ## Key File Paths
