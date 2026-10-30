@@ -238,7 +238,14 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
     pnl_bonus = min(8, max(0, pnl / 1000))
     # leverage conviction: 1000x → +3
     lev_bonus = min(3, leverage / 333)
-    confidence = min(88, max(50, base_conf + wr_bonus + pnl_bonus + lev_bonus))
+    # hotness: on today's 24h board → +2, on 7d board → +1 (CEO 2026-10-30:
+    # recent-window presence = actively printing money right now)
+    hot_bonus = 0
+    if stats.get('rank_24h') is not None:
+        hot_bonus = 2
+    elif stats.get('rank_7d') is not None:
+        hot_bonus = 1
+    confidence = min(88, max(50, base_conf + wr_bonus + pnl_bonus + lev_bonus + hot_bonus))
 
     signal_type = 'jup_yolo_long' if direction == 'LONG' else 'jup_yolo_short'
 
@@ -258,11 +265,17 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
             'jup_win_rate': stats.get('wr'),
             'jup_trades': stats.get('trades'),
             'jup_rank': stats.get('rank'),
+            'jup_pnl_24h': stats.get('pnl_24h'),       # recent-window board stats
+            'jup_pnl_7d': stats.get('pnl_7d'),
+            'jup_rank_24h': stats.get('rank_24h'),
+            'jup_rank_7d': stats.get('rank_7d'),
+            'jup_hot_window': ('24h' if stats.get('rank_24h') is not None
+                               else '7d' if stats.get('rank_7d') is not None else None),
             'jup_leverage': leverage,
             'jup_margin_usd': margin_usd,
             'jup_market': coin,
             'jup_side': direction,
-            'mirror_source': 'jup_ag_yolo_leaderboard_alltime_pnl',
+            'mirror_source': 'jup_ag_yolo_leaderboard_3window',
         },
     )
     if sig_id is None:
@@ -272,9 +285,11 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
               f"(add_signal returned None — will retry next cycle)")
         return False
 
+    hot = stats.get('rank_24h') or stats.get('rank_7d')
+    hot_s = f" hot#{hot}" if hot else ""
     print(f"[jup_yolo] 🪞 MIRRORED {wallet[:4]} {coin} {direction} "
           f"({leverage}x, ${pnl:,.0f} pnl, wr={wr if wr is not None else '?'}"
-          f"{'*' if wr is not None else ''}) conf={confidence:.0f} sig_id={sig_id}")
+          f"{'*' if wr is not None else ''}{hot_s}) conf={confidence:.0f} sig_id={sig_id}")
     return True
 
 
@@ -433,7 +448,10 @@ def monitor_once() -> int:
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'list':
         wl = load_wallets(quiet=True)
+        n24 = sum(1 for s in wl.values() if s.get('rank_24h') is not None)
+        n7 = sum(1 for s in wl.values() if s.get('rank_7d') is not None)
         print(f"=== Tracked JUP YOLO Leaderboard Wallets ({len(wl)}) ===")
+        print(f"    boards: {n24} on 24h, {n7} on 7d, all-time ranks shown as rank#")
         for w, s in sorted(wl.items(), key=lambda x: -(x[1].get('pnl') or 0)):
             pnl = s.get('pnl')
             wr = s.get('wr')
@@ -445,7 +463,13 @@ def main():
                     else "wr=?")
             tr_s = f"{tr} trades" if tr is not None else "trades=?"
             rk_s = f"rank#{rk} " if rk else ""
-            print(f"  {rk_s}{s.get('label','?')}… {w}  {pnl_s} {wr_s} {tr_s} [{s.get('source','?')}]")
+            # recent-board hotness marker (24h wins over 7d)
+            hot_s = ""
+            if s.get('rank_24h') is not None:
+                hot_s = f" 🔥24h#{s['rank_24h']} +${(s.get('pnl_24h') or 0):,.0f}"
+            elif s.get('rank_7d') is not None:
+                hot_s = f" 🔥7d#{s['rank_7d']} +${(s.get('pnl_7d') or 0):,.0f}"
+            print(f"  {rk_s}{s.get('label','?')}… {w}  {pnl_s} {wr_s} {tr_s}{hot_s} [{s.get('source','?')}]")
         return
 
     # FIX (bug_hunter M4): runs on its own 60s systemd timer (not behind the

@@ -25,13 +25,19 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA
 
 LEADERBOARD_FILE = os.path.join(HERMES_DATA, 'jup_yolo_leaderboard.json')
-LEADERBOARD_API = "https://yolo-api.jup.ag/leaderboard?sort=pnl&window=all&limit=100"
+# API windows: all-time + 7d + 24h (CEO 2026-10-30: track hot traders too,
+# not just all-time money leaders — a wallet crushing it TODAY shows up on
+# the 24h board long before it climbs the all-time list)
+LEADERBOARD_API = "https://yolo-api.jup.ag/leaderboard?sort=pnl&window={window}&limit=100"
+TRACK_WINDOWS = ("all", "7d", "24h")
 SIDEBAR_URL = "https://jup.ag/yolo/?market=BTC&mode=classic"
 POSITIONS_URL = "https://jup.ag/yolo/api/watch/positions"
 TRADES_URL = "https://yolo-api.jup.ag/trades?limit=100"
 
 # Track the top N by realized all-time PnL — these are the money leaders
 TRACK_TOP_N = 50
+# Hot traders: top N on the 7d and 24h boards (currently active wallets)
+TRACK_TOP_RECENT_N = 30
 # Plus any consistency players deeper in the list (skilled, lower volume)
 QUALITY_MIN_WR = 0.60
 QUALITY_MIN_TRADES = 20
@@ -61,29 +67,90 @@ def _fetch(url, timeout=15):
         return json.loads(resp.read())
 
 
-def fetch_leaderboard_api() -> list:
-    """PRIMARY: all-time realized-PnL board with FULL addresses + stats."""
-    data = _fetch(LEADERBOARD_API)
-    leaders = data.get('leaders', [])
+def fetch_window(window: str) -> list:
+    """Fetch one leaderboard window (all/7d/24h). Returns raw leader rows."""
+    data = _fetch(LEADERBOARD_API.format(window=window))
     out = []
-    for l in leaders:
+    for l in data.get('leaders', []):
         owner = l.get('owner', '')
         if not owner:
             continue
-        pnl = float(l.get('pnl', 0) or 0)
-        wr = float(l.get('winRate', 0) or 0)
-        trades = int(l.get('trades', 0) or 0)
         out.append({
+            "window": window,
             "wallet": owner,
-            "label": owner[:4],
             "rank": int(l.get('rank', 0) or 0),
-            "pnl": pnl,
-            "wr": round(wr, 4),
-            "trades": trades,
+            "pnl": float(l.get('pnl', 0) or 0),
+            "wr": round(float(l.get('winRate', 0) or 0), 4),
+            "trades": int(l.get('trades', 0) or 0),
             "volume": float(l.get('volume', 0) or 0),
-            "source": "api",
         })
     return out
+
+
+def fetch_leaderboards_all_windows() -> tuple:
+    """Fetch all three windows and merge into per-wallet stats.
+
+    Base keys (pnl/wr/trades/rank/volume) = all-time for back-compat with
+    monitor confidence math; recent windows stored as pnl_7d/pnl_24h/etc.
+
+    Returns (entries, api_ok) where entries are merged wallet dicts.
+    """
+    by_wallet = {}
+    fetched = {}
+    for win in TRACK_WINDOWS:
+        try:
+            rows = fetch_window(win)
+            fetched[win] = len(rows)
+        except Exception as e:
+            print(f"[lb] ⚠️ window={win} failed: {e}")
+            continue
+        for r in rows:
+            w = r["wallet"]
+            if win == "all":
+                # base = all-time stats (back-compat shape: pnl/wr/trades/rank/volume)
+                entry = {
+                    "wallet": w,
+                    "label": w[:4],
+                    "pnl": r["pnl"],
+                    "wr": r["wr"],
+                    "trades": r["trades"],
+                    "volume": r["volume"],
+                    "rank": r["rank"],
+                    "source": "api",
+                    "windows": [win],
+                }
+                # first-wins on repeated all-time rows
+                by_wallet.setdefault(w, entry)
+                by_wallet[w].setdefault("windows", [])
+                if win not in by_wallet[w]["windows"]:
+                    by_wallet[w]["windows"].append(win)
+            else:
+                # recent window: enrich existing or create recent-only entry
+                if w not in by_wallet:
+                    by_wallet[w] = {
+                        "wallet": w, "label": w[:4],
+                        "pnl": 0.0, "wr": None, "trades": None,
+                        "volume": None, "rank": None,
+                        "source": "api", "windows": [],
+                    }
+                e = by_wallet[w]
+                e[f"pnl_{win}"] = r["pnl"]
+                e[f"wr_{win}"] = r["wr"]
+                e[f"trades_{win}"] = r["trades"]
+                e[f"rank_{win}"] = r["rank"]
+                if win not in e.get("windows", []):
+                    e.setdefault("windows", []).append(win)
+                # recent-only wallets: adopt recent pnl as base so selection/
+                # display have something honest to show
+                if e.get("rank") is None:
+                    e["pnl"] = r["pnl"]
+                    e["wr"] = r["wr"]
+                    e["trades"] = r["trades"]
+                    e["volume"] = r["volume"]
+
+    api_ok = bool(fetched)
+    print(f"[lb] API windows: {fetched}")
+    return list(by_wallet.values()), api_ok
 
 
 def scrape_sidebar_labels() -> list:
@@ -170,34 +237,54 @@ def resolve_sidebar_labels(rows: list) -> list:
 
 
 def select_tracked(entries: list) -> dict:
-    """Track top TRACK_TOP_N by realized PnL + consistency players (high WR).
+    """Track top TRACK_TOP_N all-time + top TRACK_TOP_RECENT_N per recent window
+    + consistency players (high WR).
 
-    Returns {wallet: {label, pnl, wr, trades, volume, rank, source}}.
+    CEO 2026-10-30: also track 24h/7d hot boards — a wallet printing money
+    TODAY gets mirrored long before it climbs the all-time list.
+
+    Returns {wallet: {label, pnl, wr, trades, volume, rank, session_rank,
+                      pnl_7d, pnl_24h, wr_7d, wr_24h, rank_7d, rank_24h,
+                      windows, source}}.
     """
-    # de-dupe by wallet — API entry wins (has full stats)
+    # de-dupe by wallet — entries are already merged per-wallet by
+    # fetch_leaderboards_all_windows(); sidebar rows are separate wallets
+    # (their 'api' counterparts, if any, arrive merged and win on collision)
     by_wallet = {}
     for e in entries:
         w = e['wallet']
-        if w not in by_wallet or e['source'] == 'api':
+        if w not in by_wallet or e.get('source') == 'api':
             by_wallet[w] = e
 
-    # sort by realized PnL descending
-    ranked = sorted(by_wallet.values(), key=lambda x: -(x.get('pnl') or 0))
-    selected = ranked[:TRACK_TOP_N]
+    all_entries = list(by_wallet.values())
+    selected_wallets = set()
 
-    # consistency players deeper in the list
-    selected_wallets = {e['wallet'] for e in selected}
-    for e in ranked[TRACK_TOP_N:]:
+    # all-time money leaders
+    ranked_all = sorted(all_entries, key=lambda x: -(x.get('pnl') or 0))
+    for e in ranked_all[:TRACK_TOP_N]:
+        selected_wallets.add(e['wallet'])
+
+    # hot traders from 7d and 24h boards
+    for win in ('7d', '24h'):
+        key = f'pnl_{win}'
+        ranked_win = sorted((e for e in all_entries if e.get(key) is not None),
+                            key=lambda x: -(x.get(key) or 0))
+        for e in ranked_win[:TRACK_TOP_RECENT_N]:
+            selected_wallets.add(e['wallet'])
+
+    # consistency players deeper in the all-time list
+    for e in ranked_all[TRACK_TOP_N:]:
         wr = e.get('wr')
         trades = e.get('trades')
         if (wr is not None and trades is not None
                 and wr >= QUALITY_MIN_WR and trades >= QUALITY_MIN_TRADES
                 and (e.get('pnl') or 0) >= QUALITY_MIN_PNL):
-            selected.append(e)
             selected_wallets.add(e['wallet'])
 
     out = {}
-    for e in selected:
+    for e in all_entries:
+        if e['wallet'] not in selected_wallets:
+            continue
         out[e['wallet']] = {
             "label": e.get('label', e['wallet'][:4]),
             "pnl": round(e.get('pnl') or 0, 2),
@@ -206,6 +293,14 @@ def select_tracked(entries: list) -> dict:
             "volume": e.get('volume'),
             "rank": e.get('rank'),
             "session_rank": e.get('session_rank'),  # sidebar Top-uPnL rank (not all-time)
+            # per-window (recent) stats — present only if wallet is on that board
+            "pnl_7d": round(e['pnl_7d'], 2) if e.get('pnl_7d') is not None else None,
+            "pnl_24h": round(e['pnl_24h'], 2) if e.get('pnl_24h') is not None else None,
+            "wr_7d": e.get('wr_7d'),
+            "wr_24h": e.get('wr_24h'),
+            "rank_7d": e.get('rank_7d'),
+            "rank_24h": e.get('rank_24h'),
+            "windows": e.get('windows', []),
             "source": e.get('source', '?'),
         }
     return out
@@ -218,10 +313,12 @@ def main():
     entries = []
     api_ok = False
     try:
-        api_entries = fetch_leaderboard_api()
+        # all three windows: all-time + 7d + 24h (errors per-window, not fatal)
+        api_entries, api_ok = fetch_leaderboards_all_windows()
         entries.extend(api_entries)
-        api_ok = bool(api_entries)
-        print(f"[lb] API: {len(api_entries)} leaders (all-time realized PnL)")
+        n_recent = len({e['wallet'] for e in api_entries
+                        if e.get('pnl_7d') is not None or e.get('pnl_24h') is not None})
+        print(f"[lb] API: {len(api_entries)} wallets merged ({n_recent} on a recent board)")
     except Exception as e:
         print(f"[lb] ⚠️ leaderboard API failed: {e}")
 
