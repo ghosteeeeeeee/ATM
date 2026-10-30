@@ -17943,3 +17943,27 @@ Final set: ['GRASS']
 **Open Questions:**
 - volume-buildup- 14d net -$0.36 despite 24h green — if 7d stays negative through weekend, consider regime-gate (needs CEO) or weight reduce (non-locked)
 - 24h GREEN '+$0.61' at 61.1% WR; 7d still RED '-$0.19'
+
+## [2026-10-30 10:42] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $+0.04 (WR: 60.5% 24h) | 24h 38T 23W 60.5% '+$0.65' GREEN | 7d 159T 56.0% '-$0.15' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: HYPE jup_yolo winner +5.99% acct (profit-monster-trail); IO volume-buildup- SHORT loss -$0.10 atr_sl_hit (-2.59%) — single isolated SL, not a pattern
+- Kill check: no n>=3 0%-WR signal last hour (volume-buildup- 0W1L n=1 only)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 4/38 = 10.5% (<40%) — SL not tight; dominant close = profit-monster-trail (16T '+$0.71'); worst avg = atr_sl_hit (4T '-$0.14')
+- Boost: pump-chain+ 6T 66.7% '+$0.27' 6 tokens meets 24h bars BUT 14d 37T 40.5% '-$1.10' RED + already at 1.4 ceiling — HOLD. volume-buildup- 9T 77.8% '+$0.21' 9 tokens meets 24h bars BUT 14d 48T 60.4% net '-$0.52' + already boosted 1.0→1.2 — HOLD (no 2nd boost on 14d-negative signal)
+- volume-buildup- 14d regime split: NORMAL 15T 46.7% '-$0.69' vs HIGH 14T 71.4% '+$0.21' / EXTREME 19T 63.2% '-$0.04' — NORMAL underperformance tracked as open question (regime-gate needs CEO)
+- Neg streak: 08h -0.02, 09h +0.06, 10h +0.04 — not 3 consecutive negative
+- Frequency 2/hr — under overtrading threshold (20/hr)
+- 4 open: ETH/SOL jup_yolo_mirrored LONG, ALGO pump-chain+ LONG (SL=entry, watch), LINK volume-buildup- SHORT
+- Storm readiness: window-min -0.55% / at-run -0.06% (|x|<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- NORMAL-regime bleed ('-$0.69' 14d) — if 7d stays negative through weekend, push CEO on NORMAL volatility_gate multiplier=0
+- 24h GREEN '+$0.65' at 60.5% WR; 7d still RED '-$0.15'
