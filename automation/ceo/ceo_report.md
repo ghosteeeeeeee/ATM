@@ -610,3 +610,9 @@ Proactive Q (28 mod 14 = row 1: What's the PnL?): 24h -$0.83 / 7d -$0.21 verifie
 ### Numbers: 24h 19T -0.22 57.9% | 7d 144T -0.70 55.6%
 ### Findings: Rotating Q (regime): 4h scanner fresh 22:41Z — aggregate LONG_BIAS but 96/105 tokens NEUTRAL (6 long / 3 short) = neutral-dominated chop; error_alerts 22:41Z shows a 7x cluster of signal rollbacks (mark_signal_executed=0, hotset knife-floor refusals) — execution refusals, no Tracebacks, no trades opened.
 ### Recommendation: one-line — weekly deep run should confirm the 7x signal-rollback/hotset-refusal cluster is knife-floor config working as intended, not a failed-execution bug.
+
+## CEO Status — 20261030T064100Z
+### Health: pipeline=active guardian=active open_pos=3 (2x jup_yolo_mirrored LONG +0.08/+0.16, 1x ai-trader-manual BTC LONG -0.06)
+### Numbers: 24h 27T +0.77 63.0% | 7d 151T -0.16 55.6%
+### Findings (regime-specialists): bb-squeeze+ is a NORMAL-regime specialist — 23T 69.6% +0.41 (7d); volume-buildup- SHORT is HIGH/EXTREME-specialist — HIGH 13T 69.2% +0.13 / EXTREME 13T 61.5% 0.00 vs NORMAL 11T 45.5% -0.57 (14d confirms: NORMAL 16T -0.63 vs HIGH 14T +0.21). pump-chain+ EXTREME positive 7d (+0.11, 60.9%) but negative 14d (-0.60) — too unstable to gate. System-level: 7d flat (-0.16) after 24h rebound (+0.77).
+### Recommendation: Deep run should evaluate gating volume-buildup- SHORT entries in NORMAL regime (consistent bleed across 7d/14d windows; n=11-16 per cell, needs OOS check before any flag change).

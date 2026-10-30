@@ -48,13 +48,20 @@ LEADERBOARD_STALE_SEC = 2 * 3600  # fall back to seed if file older than 2h
 LEADERBOARD_WARN_SEC = 20 * 60    # warn loudly if older than 2x the 10min refresh
 
 
-def load_wallets() -> dict:
-    """Return {wallet: (label, upnl_pct)} — LIVE leaderboard file if fresh, else seed.
+def _seed_as_stats() -> dict:
+    """Convert legacy seed tuples (label, upnl_pct) to the rich stats dict shape."""
+    return {w: {"label": lbl, "pnl": None, "wr": None, "trades": None,
+                "volume": None, "rank": None, "source": "seed"}
+            for w, (lbl, _u) in JUP_YOLO_WALLETS.items()}
 
-    CEO 2026-10-09: leaderboard must be scanned regularly, not a one-shot list.
-    jup_yolo_leaderboard.py refreshes LEADERBOARD_FILE every 10 min
-    (jup-yolo-leaderboard.timer). Freshness is printed EVERY mirror cycle so
-    staleness is visible in the log without grep archaeology.
+
+def load_wallets(quiet: bool = False) -> dict:
+    """Return {wallet: {label, pnl, wr, trades, volume, rank, source}}.
+
+    LIVE leaderboard file (refreshed every 10 min by jup_yolo_leaderboard.py
+    from the all-time realized-PnL API) if fresh; else seed fallback.
+    Freshness is printed EVERY mirror cycle so staleness is visible in the
+    log without grep archaeology (CEO hawk-tracking requirement).
     """
     try:
         with open(LEADERBOARD_FILE) as f:
@@ -63,17 +70,27 @@ def load_wallets() -> dict:
         age_min = age_sec / 60
         n = len(lb.get('wallets', {}))
         marker = 'fresh' if age_sec < LEADERBOARD_WARN_SEC else '⚠️ STALE'
-        print(f"[jup_yolo] 📋 leaderboard {marker}: {age_min:.0f}min old, {n} wallets, "
-              f"seed={lb.get('used_seed')}, rows={lb.get('row_count', '?')}")
-        if age_sec > LEADERBOARD_WARN_SEC:
+        if not quiet:
+            print(f"[jup_yolo] 📋 leaderboard {marker}: {age_min:.0f}min old, {n} wallets, "
+              f"seed={lb.get('used_seed')}, api={lb.get('api_ok')}, rows={lb.get('row_count', '?')}")
+        if age_sec > LEADERBOARD_WARN_SEC and not quiet:
             print(f"[jup_yolo] ⚠️ leaderboard STALE >{LEADERBOARD_WARN_SEC//60}min — "
                   f"check jup-yolo-leaderboard.timer + logs/jup_yolo_lb.err.log")
         if age_sec < LEADERBOARD_STALE_SEC and lb.get('wallets'):
-            return {w: tuple(v) for w, v in lb['wallets'].items()}
+            out = {}
+            for w, v in lb['wallets'].items():
+                if isinstance(v, dict):
+                    out[w] = v
+                else:
+                    # legacy tuple format (label, upnl_pct) → stats dict
+                    out[w] = {"label": v[0], "pnl": None, "wr": None,
+                              "trades": None, "volume": None, "rank": None,
+                              "source": "legacy"}
+            return out
         print("[jup_yolo] ⚠️ leaderboard file stale (>2h) — using seed wallets")
     except (FileNotFoundError, json.JSONDecodeError, OSError, KeyError) as e:
         print(f"[jup_yolo] ⚠️ leaderboard file unreadable ({e}) — using seed wallets")
-    return dict(JUP_YOLO_WALLETS)
+    return _seed_as_stats()
 
 # Coins we can trade on Hyperliquid (YOLO market -> HL market)
 # FIX (bug_hunter M1): ZEC removed — blacklisted BOTH directions in
@@ -173,9 +190,16 @@ def get_hl_price(coin: str) -> float:
         return 0.0
 
 
-def emit_signal(coin: str, direction: str, wallet: str, upnl_pct: int,
+def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
                 leverage: int, margin_usd: float) -> bool:
     """Write a mirrored signal to the Hermes pipeline via add_signal().
+
+    stats: {label, pnl, wr, trades, volume, rank, source} from the live
+    all-time realized-PnL leaderboard (seed fallback has pnl/wr=None).
+
+    Confidence now driven by REALIZED skill, not sidebar uPnL%:
+      base 70 + win-rate bonus (-10..+16) + PnL bonus (0..8) + leverage (0..3)
+      capped at 88 (add_signal MAX — computing higher was dead code, bug L6).
 
     FIX (bug_hunter M2): returns add_signal()'s actual result — a blocked
     signal (blacklist, floor, trend) must NOT be marked as seen, or it is
@@ -188,13 +212,16 @@ def emit_signal(coin: str, direction: str, wallet: str, upnl_pct: int,
         print(f"[jup_yolo] SKIP {coin} — no price available")
         return False
 
-    # Confidence from leaderboard rank + leverage conviction
-    # FIX (bug_hunter L6): cap at 88 — add_signal's MAX_CONFIDENCE=88 always
-    # wins; computing 95 was dead code that misrepresented stored value.
     base_conf = 70
-    upnl_bonus = min(15, upnl_pct / 150)        # up to +15 for 2250%+
-    lev_bonus = min(3, leverage / 333)            # up to +3 for 1000x
-    confidence = min(88, base_conf + upnl_bonus + lev_bonus)
+    # win rate: 0.20 → -8, 0.50 → 0, 0.78 → +11.2
+    wr = stats.get('wr')
+    wr_bonus = (wr - 0.50) * 40 if isinstance(wr, (int, float)) else 0
+    # realized pnl: $1k → +1, $8k+ → +8 (capped)
+    pnl = stats.get('pnl') or 0
+    pnl_bonus = min(8, max(0, pnl / 1000))
+    # leverage conviction: 1000x → +3
+    lev_bonus = min(3, leverage / 333)
+    confidence = min(88, max(50, base_conf + wr_bonus + pnl_bonus + lev_bonus))
 
     signal_type = 'jup_yolo_long' if direction == 'LONG' else 'jup_yolo_short'
 
@@ -209,13 +236,16 @@ def emit_signal(coin: str, direction: str, wallet: str, upnl_pct: int,
         timeframe='5m',
         signal_metadata={
             'jup_wallet': wallet,
-            'jup_wallet_short': wallet[:4],
-            'jup_upnl_pct': upnl_pct,
+            'jup_wallet_short': stats.get('label', wallet[:4]),
+            'jup_realized_pnl': stats.get('pnl'),
+            'jup_win_rate': stats.get('wr'),
+            'jup_trades': stats.get('trades'),
+            'jup_rank': stats.get('rank'),
             'jup_leverage': leverage,
             'jup_margin_usd': margin_usd,
             'jup_market': coin,
             'jup_side': direction,
-            'mirror_source': 'jup_ag_yolo_leaderboard',
+            'mirror_source': 'jup_ag_yolo_leaderboard_alltime_pnl',
         },
     )
     if sig_id is None:
@@ -226,7 +256,8 @@ def emit_signal(coin: str, direction: str, wallet: str, upnl_pct: int,
         return False
 
     print(f"[jup_yolo] 🪞 MIRRORED {wallet[:4]} {coin} {direction} "
-          f"({leverage}x, upnl {upnl_pct}%) conf={confidence:.0f} sig_id={sig_id}")
+          f"({leverage}x, ${pnl:,.0f} pnl, wr={wr if wr is not None else '?'}"
+          f"{'*' if wr is not None else ''}) conf={confidence:.0f} sig_id={sig_id}")
     return True
 
 
@@ -355,11 +386,11 @@ def monitor_once() -> int:
                 seen_list.append((pid, now_ts))
                 continue
 
-            label, upnl_pct = wallets[owner]
+            stats = wallets[owner]   # {label, pnl, wr, trades, rank, source}
             leverage = int(p.get('leverage', 0) or 0)
             margin = float(p.get('margin', 0) or 0) / 1_000_000
 
-            if emit_signal(market, direction, owner, upnl_pct, leverage, margin):
+            if emit_signal(market, direction, owner, stats, leverage, margin):
                 new_signals += 1
                 seen_list.append((pid, now_ts))   # duplicate-append is pruned/normalized on save
                 attempts.pop(pid, None)
@@ -384,10 +415,18 @@ def monitor_once() -> int:
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'list':
-        wl = load_wallets()
+        wl = load_wallets(quiet=True)
         print(f"=== Tracked JUP YOLO Leaderboard Wallets ({len(wl)}) ===")
-        for w, (label, upnl) in sorted(wl.items(), key=lambda x: -x[1][1]):
-            print(f"  {label}… {w}  (+{upnl}%)")
+        for w, s in sorted(wl.items(), key=lambda x: -(x[1].get('pnl') or 0)):
+            pnl = s.get('pnl')
+            wr = s.get('wr')
+            tr = s.get('trades')
+            rk = s.get('rank')
+            pnl_s = f"${pnl:,.0f}" if pnl is not None else "$?"
+            wr_s = f"wr={wr:.0%}" if isinstance(wr, (int, float)) else "wr=?"
+            tr_s = f"{tr} trades" if tr is not None else "trades=?"
+            rk_s = f"rank#{rk} " if rk else ""
+            print(f"  {rk_s}{s.get('label','?')}… {w}  {pnl_s} {wr_s} {tr_s} [{s.get('source','?')}]")
         return
 
     # FIX (bug_hunter M4): runs on its own 60s systemd timer (not behind the
@@ -398,7 +437,8 @@ def main():
         # timeout=5: if another run holds the lock, skip fast (timer would
         # otherwise queue 60s behind interval and add latency to a 60s cycle)
         with FileLock('jup_yolo', timeout=5, interval=1):
-            wl = load_wallets()
+            # quiet — monitor_once prints the freshness line itself (once per cycle)
+            wl = load_wallets(quiet=True)
             print(f"[jup_yolo] Monitoring {len(wl)} leaderboard wallets...")
             sigs = monitor_once()
             print(f"[jup_yolo] Emitted {sigs} signals")

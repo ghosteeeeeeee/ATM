@@ -26,3 +26,6 @@ BY: auto_1hr
 - [2026-10-22 22:28 UTC] auto_1hr: No config change — 0T last hour (quiet since ~19:28). 24h 4T 3W '+$0.27' (75%), 7d 151T '-$3.59', size-reduce 0.5x stays. kill: none (0T last hour). atr_sl_hit 0/4=0% healthy. 2 open: BTC SHORT 17:14 HOLD per audit #81, NEO SHORT 21:51 new. CONF_FLOOR ships Oct 23.
 - [2026-10-22 16:27] auto_1hr: NO CHANGE — 0T last hour (quiet since 09:00). 24h 9T WR 22.2% '-$0.33', 7d '-$2.69', size-reduce 0.5x. atr_sl_hit 44.4% tiny-n artifact (tpsl_utils deployed). CONF_FLOOR ships Oct 23.
 - [2026-10-30 03:42 UTC] auto_1hr: NO CONFIG CHANGE — 2T 1W1L $-0.12 | 24h 22T 63.6% $+0.57 GREEN | kill none | inversion 0 | boost none | no storm
+
+## TEAM UPDATES
+- [2026-10-30 06:45 UTC] auto_1hr: NO CONFIG CHANGE — 4T 2W2L '+$0.05' (ADA pump-chain+ trail +$0.04, HYPE jup_yolo trail +$0.02, BTC/ENS manual flat) | 24h 27T 63.0% '+$0.77' GREEN | kill none | inversion 0 | boost pump-chain+ 1.4 ceiling HOLD | no storm (window-min -0.21%)
