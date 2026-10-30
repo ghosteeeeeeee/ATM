@@ -3508,7 +3508,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         except Exception:
                             pass
                         if _pc_bull_override and _rsi_val <= 85:
-                            log(f"  ✅ [PUMP-CHAIN-RSI-OVERRIDE] {token} LONG — RSI={_rsi_val:.1f} >= {PUMP_CHAIN_LONG_RSI_MAX} but BTC bull (score>80 STRONG_POS), allowed up to 85")
+                            # Replay 20261030 (CEO label #3 → NEGATIVE/done): the "up to 85"
+                            # claim was a lie — the ceiling re-killed those rows every cycle
+                            # (DOT 10x 'allowed' then killed). Replay: [75,80) = 3T 0% −$0.47 →
+                            # LONG-RSI-CEILING owns 75+; override's lawful band = 70→ceiling.
+                            # Log text fixed; behavior unchanged.
+                            log(f"  ✅ [PUMP-CHAIN-RSI-OVERRIDE] {token} LONG — RSI={_rsi_val:.1f} >= {PUMP_CHAIN_LONG_RSI_MAX} but BTC bull (score>80 STRONG_POS) — admitted past {PUMP_CHAIN_LONG_RSI_MAX}; LONG-RSI-CEILING still governs the upper bound")
                         else:
                             log(f"  🚫 [PUMP-CHAIN-RSI-MAX] {token} LONG blocked — RSI={_rsi_val:.1f} >= {PUMP_CHAIN_LONG_RSI_MAX} (overbought chase, 23.5%WR at RSI>=70/14d)")
                             _tombstone_pending(token, direction, 'pump-chain-rsi-max-long', dry)  # CEO label 20261030: census stops lying

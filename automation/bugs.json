@@ -1320,6 +1320,27 @@
         "BUG-068",
         "BUG-071"
       ]
+    },
+    {
+      "id": "BUG-071",
+      "title": "losers_tracker adds direction-SCATTERED losers to the direction-BLIND legacy LOSERS set \u2014 GRASS added 2026-10-30 (30d LONG 14T 50% WR +$0.24, 30d SHORT 3T; added on a 7d LONG dip 5T -$0.26) \u2014 blocks BOTH directions (HARD-BLOCK + conf penalty) = the one-sided-bleed BTC-class incident repeating via the daily timer",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "scripts/losers_tracker.py",
+        "scripts/hermes_constants.py"
+      ],
+      "symptom": "Uncommitted working-tree write: LOSERS set() -> {'GRASS'} (tracker runs on timer, daily-commit picks it up). GRASS profile: 30d LONG 50% WR +$0.24 (not a long-loser), 30d SHORT n=3 -$0.01, 7d LONG 5 -$0.26 -> aggregate thresholds fire while per-direction evidence does not. Direction-blind legacy entry zeroes GRASS conf BOTH sides at HARD-BLOCK. The UNCLOG-2 #1 guard (:251) only skips tokens ALREADY in LOSERS_LONG/SHORT \u2014 the tracker has NO path to add directionally (those sets are hand-managed), so every qualifying token lands blind.",
+      "root_cause": "add-loop writes only the legacy set; no direction-aware destination",
+      "fix": "Label needed (CEO): (a) add-loop computes per-direction stats and writes LOSERS_LONG/LOSERS_SHORT (blind legacy only when BOTH sides qualify), or (b) require both-directions evidence before legacy add. Until labeled: daily review of tracker diffs before commit.",
+      "verified_by": "main-session: git diff (uncommitted), GRASS directional SQL, add-loop source :236-283",
+      "date_found": "2026-10-30",
+      "date_fixed": null,
+      "found_by": "main-session (working-tree watch)",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-066"
+      ]
     }
   ],
   "schema": {
