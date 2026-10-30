@@ -3385,6 +3385,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     from hermes_constants import PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED
                     if PUMP_CHAIN_LONG_HIGH_BLOCK_ENABLED and _vol_regime == 'HIGH':
                         log(f"  🚫 [PUMP-CHAIN-HIGH] {token} LONG blocked — HIGH vol regime, no pump-chain+ LONG edge (35.7%WR)")
+                        _tombstone_pending(token, direction, 'pump-chain-long-high', dry)  # CEO label 20261030
                         continue
                 except ImportError:
                     pass
@@ -3480,6 +3481,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _rsi_val = row[8] if len(row) > 8 else None
                     if _rsi_val is not None and _rsi_val < PUMP_CHAIN_LONG_RSI_MIN:
                         log(f"  🚫 [PUMP-CHAIN-RSI-MIN] {token} LONG blocked — RSI={_rsi_val:.1f} < {PUMP_CHAIN_LONG_RSI_MIN} (oversold, 0% WR in 14d)")
+                        _tombstone_pending(token, direction, 'pump-chain-rsi-min-long', dry)  # CEO label 20261030
                         continue
                     if _rsi_val is not None and _rsi_val >= PUMP_CHAIN_LONG_RSI_MAX:
                         # FIX 2026-10-11: bull structure override — during confirmed bull
@@ -3508,6 +3510,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  ✅ [PUMP-CHAIN-RSI-OVERRIDE] {token} LONG — RSI={_rsi_val:.1f} >= {PUMP_CHAIN_LONG_RSI_MAX} but BTC bull (score>80 STRONG_POS), allowed up to 85")
                         else:
                             log(f"  🚫 [PUMP-CHAIN-RSI-MAX] {token} LONG blocked — RSI={_rsi_val:.1f} >= {PUMP_CHAIN_LONG_RSI_MAX} (overbought chase, 23.5%WR at RSI>=70/14d)")
+                            _tombstone_pending(token, direction, 'pump-chain-rsi-max-long', dry)  # CEO label 20261030: census stops lying
                             continue
                 except ImportError:
                     pass
@@ -4526,6 +4529,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     _lrf_rsi = compute_rsi(tkn, tf='5m', max_age_s=900)
                     if _lrf_rsi is not None and _lrf_rsi < LONG_RSI_FLOOR:
                         log(f"  🚫 [LONG-RSI-FLOOR] {tkn}: LONG blocked — RSI {_lrf_rsi:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)")
+                        _tombstone_pending(tkn, direction, 'long-rsi-floor', dry)  # CEO label 20261030
                         continue
                 except Exception:
                     pass  # non-fatal
@@ -4580,6 +4584,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _lmb_vreg = _classify_volatility(_lmb_atr) if _lmb_atr is not None else 'NORMAL'
                         if _lmb_vreg != 'EXTREME':
                             log(f"  🚫 [LONG-MIDBAND] {tkn}: LONG blocked — RSI {float(_lmb_rsi):.1f} in {LONG_MIDBAND_RSI_MIN}-{LONG_MIDBAND_RSI_MAX} + {_lmb_vreg} vol (chop death zone; EXTREME only; meta-source)")
+                            _tombstone_pending(tkn, direction, 'long-midband', dry)  # CEO label 20261030
                             continue
                 except Exception:
                     pass  # non-fatal
@@ -4605,6 +4610,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _lhb_vreg = _classify_volatility(_lhb_atr) if _lhb_atr is not None else 'NORMAL'
                         if _lhb_vreg == 'HIGH':
                             log(f"  🚫 [LONG-HIGH-70] {tkn}: LONG blocked — RSI {float(_lhb_rsi):.1f} > {LONG_HIGH_OVERBOUGHT_RSI_MIN} + HIGH vol (exhaustion chase; meta-source)")
+                            _tombstone_pending(tkn, direction, 'long-high-70', dry)  # CEO label 20261030
                             continue
                 except Exception:
                     pass  # non-fatal
@@ -4728,6 +4734,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  ✅ [LONG-RSI-CEILING] {tkn}: LONG bypass — RSI {float(_lrc_rsi):.1f} > {_dynamic_ceiling} but BTC bullish (overbought = momentum)")
                         else:
                             log(f"  🚫 [LONG-RSI-CEILING] {tkn}: LONG blocked — RSI {float(_lrc_rsi):.1f} > {_dynamic_ceiling} (overbought — pullback risk, rr_mult={_rr_m:.2f}, meta-source)")
+                            _tombstone_pending(tkn, direction, 'long-rsi-ceiling', dry)  # CEO label 20261030
                             continue
                 except Exception:
                     pass  # non-fatal
@@ -4839,6 +4846,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     log(f"  🚫 [SPIKE-FILTER] {tkn}: LONG blocked — RSI {_rsi_l:.1f} > {_spike_rsi_ceiling}")
                                     _skip_long = True
                     if _skip_long:
+                        _tombstone_pending(tkn, direction, 'spike-filter-long', dry)  # CEO label 20261030
                         continue
                 except Exception:
                     pass
