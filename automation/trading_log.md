@@ -17732,3 +17732,25 @@ Quiet hour — 0 closes, 0 open positions.
 - 24h RED '$-0.23' at 55.6% WR — atr_sl_hit (-$0.38) + stale_exit (-$0.15) + cut-loser (-$0.14) outweigh trail wins (+$0.32) and ugb_pt (+$0.22)
 - 7d RED '$-0.77' — drift continues; no single actionable signal
 - Storm #1 counterfactual +$19.58 is large — if storms 2 and 3 are also positive, ENFORCE flip becomes eligible by 2026-11-12
+
+## [2026-10-30 01:45] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $+0.01 (WR: 100%) | 24h: 18T 11W 61.1% '$-0.09' RED improving | 7d 143T 80W 55.9% '$-0.73' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 1T last hour (BTC continuum-trend- SHORT trail win); no n>=3 0%-WR signal (worst: bb-squeeze+ 4T 50% '$-0.10')
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 1/18 = 5.6% (<40%) — SL not tight; dominant close = profit-monster-trail (7T '+$0.33'), worst = atr_sl_hit (1T '$-0.25')
+- Boost: no candidate meets all bars — pump-chain+ 3T 66.7% '+$0.22' and volume-buildup- 3T 66.7% '+$0.05' fail n>=5; bb-squeeze+ 4T 50% fails WR
+- Neg streak: broke at +$0.01 this hour — never 3 consecutive negative hours
+- Frequency 1/hr — under overtrading threshold
+- 0 open trades
+- Storm readiness: BTC 1h +0.37% (<1.5%) — no storm, section skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '$-0.09' at 61.1% WR — improving; drag = trail_arm_timeout (-$0.10) + cut-loser (-$0.14) + stale_exit (-$0.15) vs trail wins (+$0.33)
+- 7d RED '$-0.73' — drift continues; no single actionable signal
