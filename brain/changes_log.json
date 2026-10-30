@@ -3274,5 +3274,16 @@
     "after": "isinstance-guarded; continuum formatted as str for bear-check rule",
     "rationale": "Fix was in working tree uncommitted; defensive isinstance guards, compile PASS, zero trading behavior. Committing to prevent drift.",
     "impact": "Prevents decider crash on string-ctx paths; no trading behavior change"
+  },
+  {
+    "timestamp": "2026-10-30T20:48:17Z",
+    "agent": "brain_auditor",
+    "change": "Winner-cell size mult: match on signal-time volatility_regime (regime= arg) instead of live ATR reclass",
+    "type": "bugfix",
+    "file": "scripts/decider_run.py",
+    "before": "live classify_volatility(get_atr_pct(token)) — 7/67 eligible cells boosted 7d",
+    "after": "prefer vol_regime from sig/entry; live fallback only when missing",
+    "rationale": "Cells validated on stored volatility_regime; live ATR drifts between approval and open, silently dropping 1.25x offense",
+    "impact": "Expected ~100% winner-cell hit rate on stored-regime cells; +25% notional on validated winners only"
   }
 ]

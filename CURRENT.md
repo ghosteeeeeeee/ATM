@@ -1,44 +1,36 @@
-# Current State — brain_auditor #204 2026-10-30 16:45 UTC
-**Last Updated: 2026-10-30 16:45 UTC**
-**Updated by: brain_auditor #204. Prior: #203 2026-10-30 12:55 UTC (preserved in git history).**
+# Current State — brain_auditor #205 2026-10-30 20:50 UTC
+**Last Updated: 2026-10-30 20:50 UTC**
+**Updated by: brain_auditor #205. Prior: #204 2026-10-30 16:45 UTC (preserved in git history).**
 
-## HEADLINE — jup_yolo day-1 autopsy: arm-timeout KILLED with data (delta $0.00), 129th wrong-side refutation, 0 config changes
+## HEADLINE — Winner-cell offense was a dud (10% hit rate); regime basis fixed. Chop-bleed filters fail bars honestly.
 
-24h 51T +$0.45 56.9% GREEN | 7d 173T +$0.27 59.0% GREEN | 14d 299T -$2.74 48.8%
-atr_sl_hit 14d 53T -$4.50 1.9% WR = #1 bleed (hard_max -$2.82 #2). trail +$6.94/78.7% holds.
+24h 55T +$0.27 56.4% GREEN thin | 7d 178T -$0.11 | 14d 299T -$2.74
+Never-armed losers 7d: 61T -$6.62 = 95.1% dollar share (chop-bleed KPI BREACH, entry-quality)
 
-### 1. JUP_YOLO DAY-1 AUTOPSY (freshness gate shipped today, 21T live)
-- Net -$0.23/21T. Trail-arm rate 70% (14/20 close-armed) = trend-signal profile.
-- 6/7 losers NEVER armed: MFE 0.08-0.33, MAE 0.58-1.12 — chop mirrors, dump <30m.
-- **arm-timeout counterfactual cf30/45/60 = $+0.00 delta → KILLED.** Losses complete
-  before any timeout can fire; ATR SL/cut-loser already exits them. Not an exit bug.
-- entry-filter scan: rsi [50,56) 6T 33% vs outside +$0.17 — n=6 INSUFFICIENT.
-  is_stale=true 3T net +$0.08 → freshness gate working as designed.
-- Verdict: n=21 < ship bar. MONITOR. No filter.
+### 1. WINNER-CELL 1.25x BUG (SHIPPED)
+- 67 stored-regime winner-cell trades / 7d, only 7 boosted (amount>12).
+- Root: `_get_winner_cell_size_mult` reclassed live ATR at open; cells validated on **stored** volatility_regime. ATR walks mid-window → miss.
+- Fix: prefer `regime=` (sig/entry volatility_regime); live classify fallback only. execute_trade(vol_regime=...), delayed-entry entry.get('volatility_regime').
+- Unit-verified: vb- HIGH→1.25, pc+ EXTREME→1.25, mismatch→1.0.
+- Measure: [WINNER-CELL-SIZE] regime_src=sig + amount≈13.9 on next cell opens. 14d tagged-cell net delta bar +$1.00 (same as winner-cell-size-125).
 
-### 2. CONTRARIAN JOIN REFRESHED 16:31Z (mandate)
-pump-chain- flip 64.6% (226/350) STAYS LIVE-FLIP. btc-pump-rider+ 27.5% do NOT flip.
-Overall 41.0% n=955. Per-signal rule holds.
+### 2. CHOP-BLEED ENTRY QUALITY — filters fail bars (NO SHIP)
+- SHORT dead-gap [-0.5,0.2) ex-pc: t=-0.76 p>0.05; would kill 48% winners.
+- LONG weak gap [0.10,0.30): same fail.
+- vb- shallow gap>-0.5: directional 14d -$0.75 but block kills 48% winners → PRE-REG dampen 0.75x, bar n>=20 shallow losers + 30d sign.
+- first-5m adverse kill REFUTED: net -$2.26 (armed winners dip first).
 
-### 3. LOSING AUTOPSY (adverse-first, selfcheck PASS) — 129th consecutive refutation
-48h n=24 = 7 never-adverse / 13 recovered / **4 NEVER (16.7%)** → wrong-side REFUTED.
+### 3. SHORT RSI FLOOR STANDING ITEM — MEASURED
+7d rsi_14 35-45 SHORT 36T +$0.69 (best) / 14d +$0.22 / 30d -$0.50 n=88. OOS sign flip → floor stays 45.
 
-### 4. CREATIVE (3 logged)
-- KILL: jup_yolo arm-timeout (tested, rejected).
-- PRE-REG: inverse-conviction mirror — pro jup_leverage>=800: 10T 50% -$0.33 vs
-  <800: 9T 67% -$0.07 (chasing loud pro = late). Bar: n>=40 AND sign AND fk<25%.
-- SHADOW-OK: first-5m momentum-deficit collector (targets atr_sl_hit -$4.50 bleed).
+### 4. SHADOW
+Contrarian join 20:30Z: overall 41.1% n=956; pc- 64.6% LIVE-FLIP stands; rider 27.6% no.
+floor_admit 48.1% vs 44.0%. Wyckoff join still pending. shadow_trader hard_max -$7188 confirms chop class.
 
-### 5. PRE-REG PROGRESS (run #203 carryover)
-vb- bb_position [0.6,0.8): 7d n=5 net -$0.30 40% (bar n>=15) — accumulating.
-bandxEMA300 MONITOR +$0.66 no escalate. #139 HOLD for LONG-below-EMA300 STANDS.
-
-### 6. OPEN
-#16572 BTC jup_yolo LONG 63m mfe 0.28% UNARMED — watch (never-armed cohort is the
-loser class; exit engines own it). #16576/#16577 r2v2-long3 (PONS no candle data).
-24h red cell: jup_yolo LONG 19T -$0.40 (only n>=5 red).
+### 5. OPEN
+#16588 SOL jup LONG, #16587 BTC continuum-trend+ LONG, #16585 HYPE jup LONG. Size 1.0x.
+AMPLIFY: regime-basis fix IS the winner-cell traffic service; no new validated cell this run.
+Weekly AMPLIFY due Mon 11-02.
 
 ### READINESS
-Regime: 15m LONG_BIAS / 4h SHORT_BIAS, LOW vol, CALM, trend_quality STRONG_DOWN.
-Size 1.0x. Weekly AMPLIFY due Mon 11-02 (Friday skip logged: no cell clears bar).
-Storm-confl-waiver 2/3 packets. vb- 0.6-0.8 band pre-reg live. Last-run verify PASS.
+Watch for WINNER-CELL-SIZE regime_src=sig lines + notional ~13.9. Next weekly: re-measure SHORT 35-45 at 30d.

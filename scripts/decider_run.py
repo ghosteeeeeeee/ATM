@@ -190,30 +190,39 @@ def _fade_exempt_allowed(gate_label, token, direction, extra=''):
     return False
 
 
-def _get_winner_cell_size_mult(token, source, direction):
+def _get_winner_cell_size_mult(token, source, direction, regime=None):
     """Winner-cell notional multiplier (CEO consult 20261029T173906Z, T 'proceed').
 
     1.25x (WINNER_CELL_SIZE_MULT, cap WINNER_CELL_SIZE_MULT_CAP) when the signal
-    substring + live volatility regime match a validated WINNER_CELLS_VALIDATED
-    cell. Regime via volatility_gate_v2.get_atr_pct + classify_volatility — the
-    same source the gates use (no second regime definition). Fails safe -> 1.0.
+    substring + volatility regime match a validated WINNER_CELLS_VALIDATED cell.
+
+    Regime source (brain_auditor #205 fix 2026-10-30): prefer the SIGNAL-TIME
+    regime (vol-gate classify at approval) when the caller passes `regime=`.
+    Live reclass via get_atr_pct drifts between approval and open (ATR walks
+    mid-window) — 7d: only 7/67 stored-regime winner-cell trades got the boost
+    (60 at base $11.10) because live often said HIGH/EXTREME when the cell was
+    NORMAL. Cells were VALIDATED on the trade's stored volatility_regime, so
+    sizing must use the same basis. Live classify is fallback only (delayed
+    entries / missing regime). Fails safe -> 1.0.
     Caller keeps the HL_MIN_NOTIONAL floor AFTER this multiplier (units guard)."""
     try:
         from hermes_constants import (WINNER_CELLS_VALIDATED, WINNER_CELL_SIZE_MULT,
                                       WINNER_CELL_SIZE_MULT_CAP)
         if not WINNER_CELLS_VALIDATED or WINNER_CELL_SIZE_MULT <= 1.0:
             return 1.0
-        try:
-            from volatility_gate_v2 import get_atr_pct, classify_volatility
-            _wc_regime = classify_volatility(get_atr_pct(token))
-        except Exception:
-            return 1.0
+        _wc_regime = regime
+        if not _wc_regime:
+            try:
+                from volatility_gate_v2 import get_atr_pct, classify_volatility
+                _wc_regime = classify_volatility(get_atr_pct(token))
+            except Exception:
+                return 1.0
         _wc_src = str(source or '')
         for _sig, _reg in WINNER_CELLS_VALIDATED:
             if _sig in _wc_src and _wc_regime == _reg:
                 _wc_mult = min(WINNER_CELL_SIZE_MULT, WINNER_CELL_SIZE_MULT_CAP)
                 log(f'  🎯 [WINNER-CELL-SIZE] {token} {direction}: {_sig} in {_reg} cell '
-                    f'-> x{_wc_mult:.2f} (cap {WINNER_CELL_SIZE_MULT_CAP:.2f})')
+                    f'-> x{_wc_mult:.2f} (cap {WINNER_CELL_SIZE_MULT_CAP:.2f}, regime_src={"sig" if regime else "live"})')
                 return _wc_mult
         return 1.0
     except Exception:
@@ -932,7 +941,10 @@ def process_delayed_entries(paper=False):
         _base_size = _get_dynamic_position_size()
         _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
         # OFFENSE (CEO 20261029): winner-cell 1.25x on validated cells (HL_MIN floor below)
-        _trade_size *= _get_winner_cell_size_mult(token, source, direction)
+        # #205: prefer signal-time regime stored on the delayed entry, else live reclass.
+        _trade_size *= _get_winner_cell_size_mult(
+            token, source, direction,
+            regime=entry.get('volatility_regime'))
         # FIX 2026-10-12 (code review R775): this delayed-entry path was MISSING the
         # HL_MIN cap that the main execution path has (see ~line 2202). AMPLITUDE_SIZE_MULT
         # includes 0.5 (CHAOTIC), so $11 x 1.0 x 0.5 = $5.50 — brain.py's add_trade gate
@@ -2460,7 +2472,8 @@ def execute_trade(token, direction, price, confidence, source,
                   signal_z_score_tier=None, signal_decision=None,
                   test_sl_variant=None, test_timing_variant=None,
                   test_trailing_variant=None,
-                  signal_metadata=None):  # JSON dict of all signal values for future-proof capture
+                  signal_metadata=None,  # JSON dict of all signal values for future-proof capture
+                  vol_regime=None):  # signal-time volatility regime (winner-cell match basis)
     """Execute a trade via brain.py. Returns (success, trade_id_or_msg)."""
     # CONF-CALIB 2026-10-15 brain_auditor: confidence stacks past 100 via
     # hebbian+sentiment+hot+rr boosts (7d: 42/195 trades, pump-chain avg 188,
@@ -2788,7 +2801,9 @@ def execute_trade(token, direction, price, confidence, source,
     _base_size = _get_dynamic_position_size()
     _trade_size = _base_size * _get_favorite_size_mult(token, direction) * _get_amplitude_size_mult(token)
     # OFFENSE (CEO 20261029): winner-cell 1.25x on validated cells (HL_MIN floor below)
-    _trade_size *= _get_winner_cell_size_mult(token, source, direction)
+    # brain_auditor #205: pass signal-time vol_regime (not live reclass) so the
+    # cell matches the basis it was validated on.
+    _trade_size *= _get_winner_cell_size_mult(token, source, direction, regime=vol_regime)
     # FIX 2026-09-06: Cap at HL_MIN after multipliers — amplitude/fav mults can reduce below minimum
     _trade_size = max(_trade_size, HL_MIN_NOTIONAL_USDT)
 
@@ -5856,6 +5871,7 @@ def run(dry_run=False):
             trailing_phase2_dist=trailing_phase2,
             experiment=experiment, variant_id=ab.get('sl_variant', ''), test_name='sl-distance-test',
             live_trading=not paper, flipped=bool(flipped_direction), regime=_regime,
+            vol_regime=sig.get('volatility_regime'),  # winner-cell match basis (#205)
             # Signal indicator fields — hotset top-level first, then _exec_meta
             # (signal_metadata) fallback. DRIFT-009: dedicated columns were 100% NULL
             # because sig dict lacks top-level rsi/z_score keys; data lives in metadata.

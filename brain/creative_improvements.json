@@ -10017,5 +10017,30 @@
     "status": "suggested",
     "risk": "zero (shadow)",
     "run": 204
+  },
+  {
+    "date": "2026-10-30T20:48:17Z",
+    "idea": "PRE-REG: volume-buildup- SHORT size dampen 0.75x when gap_at_entry > -0.5 (shallow extension)",
+    "rationale": "14d: shallow 32T -$0.75 / deep 20T +$0.01; never-armed cohort dominated by shallow. Block fails 48% winner-kill bar; dampen keeps winners.",
+    "expected_impact": "cut ~25% of shallow-gap vb- bleed without blocking",
+    "category": "entry sniper / sizing",
+    "status": "pre-registered",
+    "risk": "low",
+    "bar": "n>=20 shallow losers AND 30d same direction AND fk<25% of dampened winners"
+  },
+  {
+    "date": "2026-10-30T20:48:17Z",
+    "idea": "REJECTED: first-5m adverse-move kill (< -0.20% fav)",
+    "rationale": "7d counterfactual net -$2.26 (kills recovering armed winners)",
+    "status": "rejected_with_data",
+    "category": "exit"
+  },
+  {
+    "date": "2026-10-30T20:48:17Z",
+    "idea": "SHIPPED: winner-cell regime basis = signal-time volatility_regime",
+    "rationale": "offense was firing on 10% of eligible cells due to live ATR drift",
+    "status": "applied_this_run",
+    "category": "amplify / offense",
+    "risk": "low — same mult, correct basis"
   }
 ]
