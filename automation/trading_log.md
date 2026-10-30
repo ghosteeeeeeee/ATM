@@ -18060,3 +18060,27 @@ Final set: ['GRASS']
 **Open Questions:**
 - jup_yolo_mirrored 24h '-$0.46' still worst net signal despite 4W hour — if 7d stays negative and HIGH/NORMAL regime n accumulates, block those regimes via volatility_gate_v2 (wins EXTREME, no full kill)
 - 7d just flipped GREEN '+$0.37' — first green 7d in days; keep watching
+
+## [2026-10-30 16:47] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss)
+**PnL:** $-0.08 (WR: 58.0% 24h) | 24h 50T 29W 58.0% '+$0.47' GREEN | 7d 172T 59.3% '+$0.29' GREEN | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 3/4 winners (SOL/HYPE/ETH jup_yolo_mirrored profit-monster-trail +0.76/+1.22/+1.35% acct); single loss ZORA volume-buildup- cut-loser-CL-T1 -4.50% — normal leverage-scale loss, not an entry bug
+- Kill check: no n>=3 0%-WR signal last hour — no regime query triggered
+- Signal inversion check: 0 mismatches (24h); jup_yolo_mirrored mixed LONG/SHORT is by design (leaderboard mirror, not a *long/*short named signal)
+- atr_sl_hit 6/50 = 12.0% (<40%) — dominant close = profit-monster-trail (25T '+$1.35'); worst avg = stale_exit (1T '-$0.28')
+- Boost: pump-chain+ 5T 60% '+$0.13' 5 tokens meets 24h bars BUT 14d '-$1.16' + already at 1.4 ceiling (10-10) HOLD; volume-buildup- 13T '+$0.01' fails net>$0.05 bar
+- Neg streak: 13h -0.44, 14h -0.04, 15h +0.28, 16h -0.08 — no 3 consecutive red
+- Frequency 4/hr — under overtrading threshold (20/hr)
+- 3 open: PONS/GMX r2v2-long3, BTC jup_yolo_mirrored LONG
+- Storm readiness: **window-min +0.00% / at-run +0.09%** — no storm
+- **Method fix (query only, no code):** first storm computation used minutes=300/3600 instead of seconds → falsely showed -4.76%/-4.33% (60-hour span vs 60h-old base). Correct units = seconds (now-300 … now-3600). Nearly emitted a false storm packet — verify sample spacing = 5 min before trusting window-min
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored 24h worst net '-$0.37' (20T 60.0%) — watch; if 7d stays red and HIGH/NORMAL regime n accumulates, block those regimes via volatility_gate_v2 (wins in EXTREME → no full kill)
+- BTC flat all hour (77.4k–77.7k) after multi-day slide from ~81k — no storm per gate, but monitor for fresh 60m dump
