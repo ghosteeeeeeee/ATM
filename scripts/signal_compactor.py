@@ -2549,10 +2549,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 block_reason = ''
                 dir_upper = (direction or '').upper()
                 source_parts_raw = [p.strip() for p in (source or '').split(',') if p.strip()]
-                if dir_upper == 'SHORT' and token in SHORT_BLACKLIST:
-                    block_reason = 'SHORT_BLACKLIST'
-                elif dir_upper == 'LONG' and token in LONG_BLACKLIST:
-                    block_reason = 'LONG_BLACKLIST'
+                # bug_hunter 2026-10-31: routed through the central helper — the
+                # dashboard label must agree with the actual gates (Option D
+                # jup_yolo_mirrored SHORT exemption).
+                from directional_block import is_directional_blocked, directional_block_reason
+                if is_directional_blocked(token, direction, source):
+                    block_reason = directional_block_reason(token, direction)
                 elif any(is_component_disabled(p) for p in source_parts_raw):
                     block_reason = 'DISABLED_COMPONENT'
                 elif len(source_parts_raw) < 2 and not any(
@@ -2581,9 +2583,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         signals = []
         for row in rows:
             token, direction, stype, conf, source, created = row[0], row[1], row[2], row[3], row[4], row[5]
-            if direction.upper() == 'SHORT' and token in SHORT_BLACKLIST:
-                continue
-            if direction.upper() == 'LONG' and token in LONG_BLACKLIST:
+            # bug_hunter 2026-10-31: central helper — Option D jup_yolo_mirrored
+            # SHORT exemption was missing HERE (commit 0c2f7a46 patched signal_schema
+            # but not the compactor), so every exempted SOL SHORT died at compaction
+            # one cycle after add_signal admitted it.
+            from directional_block import is_directional_blocked
+            if is_directional_blocked(token, direction, source):
                 continue
             if is_solana_only(token):
                 continue
@@ -4203,11 +4208,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             direction = entry['direction']
             src = entry.get('source', '')
 
-            if direction == 'SHORT' and tkn in SHORT_BLACKLIST:
-                log(f"  🚫 [HOTSET-FILTER] {tkn}: SHORT blocked — SHORT_BLACKLIST")
-                continue
-            if direction == 'LONG' and tkn in LONG_BLACKLIST:
-                log(f"  🚫 [HOTSET-FILTER] {tkn}: LONG blocked — LONG_BLACKLIST")
+            # bug_hunter 2026-10-31: central helper (Option D jup_yolo_mirrored
+            # SHORT exemption — src carries the source).
+            from directional_block import is_directional_blocked, directional_block_reason
+            if is_directional_blocked(tkn, direction, src):
+                log(f"  🚫 [HOTSET-FILTER] {tkn}: {direction} blocked — {directional_block_reason(tkn, direction)}")
                 continue
             if is_solana_only(tkn):
                 log(f"  🚫 [HOTSET-FILTER] {tkn}: blocked — Solana-only")
@@ -5571,9 +5576,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 if tok.upper() not in entered_tokens:
                     # Safety checks before rescue
                     _rescue_ok = True
-                    if direc.upper() == 'SHORT' and tok.upper() in SHORT_BLACKLIST:
-                        _rescue_ok = False
-                    if direc.upper() == 'LONG' and tok.upper() in LONG_BLACKLIST:
+                    # bug_hunter 2026-10-31: central helper (row[4] = merged source)
+                    from directional_block import is_directional_blocked
+                    _lr_row = loser.get('row') or ()
+                    _lr_src = _lr_row[4] if len(_lr_row) > 4 else ''
+                    if is_directional_blocked(tok, direc, _lr_src):
                         _rescue_ok = False
                     if is_delisted(tok.upper()):
                         _rescue_ok = False
@@ -5744,11 +5751,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # FIX (2026-08-07): When a token is added to SHORT/LONG_BLACKLIST,
             # existing PENDING signals for that token are never purged — add_signal()
             # only blocks NEW writes. This catches stale entries for blacklisted tokens.
-            cur = c.execute("SELECT id, token, direction FROM signals WHERE decision IN ('PENDING','APPROVED') AND executed=0")
+            cur = c.execute("SELECT id, token, direction, source FROM signals WHERE decision IN ('PENDING','APPROVED') AND executed=0")
             expired_token_ids = []
-            for row_id, tok, direc in cur.fetchall():
-                blocked = (direc.upper() == 'SHORT' and tok.upper() in SHORT_BLACKLIST) or \
-                          (direc.upper() == 'LONG' and tok.upper() in LONG_BLACKLIST)
+            # bug_hunter 2026-10-31: central helper — this site was tombstoning
+            # Option D's exempted jup_yolo_mirrored SHORT signals ('expired: token
+            # on LONG/SHORT blacklist') one cycle after add_signal admitted them.
+            from directional_block import is_directional_blocked
+            for row_id, tok, direc, _sig_src in cur.fetchall():
+                blocked = is_directional_blocked(tok, direc, _sig_src)
                 if blocked:
                     c.execute("""
                         UPDATE signals
@@ -6373,9 +6383,9 @@ def _filter_safe_prev_hotset(prev_hotset):
             if not _tvs_preserve_override or not _can_override_cooldown(tok, direction):
                 continue
         src = entry.get('source', '')
-        if direction == 'SHORT' and tok in SHORT_BLACKLIST:
-            continue
-        if direction == 'LONG' and tok in LONG_BLACKLIST:
+        # bug_hunter 2026-10-31: central helper (Option D jup_yolo_mirrored SHORT exemption)
+        from directional_block import is_directional_blocked
+        if is_directional_blocked(tok, direction, src):
             continue
         if is_solana_only(tok):
             continue
