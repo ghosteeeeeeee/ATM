@@ -18130,3 +18130,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - jup_yolo_mirrored 24h 22T 54.5% '-$0.59' worst net; 14d regimes ALL red (EXTREME 11T -0.11, HIGH 8T -0.35, NORMAL 3T -0.13) — first signal losing across every regime; n=14<20 so kill bar not met, but if 14d n reaches 20 with all-regime red, write kill recommendation to CEO kanban
 - 7d flipped back to RED '-$0.07' (was '+$0.16' at 17:43) — 24h still green but thinning; watch
+
+## [2026-10-30 19:52] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $+0.01 (WR: 56.4% 24h) | 24h 55T 31W 56.4% '+$0.27' GREEN | 7d 178T 57.3% '-$0.11' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: sole close GOAT volume-buildup- SHORT profit-monster-trail +0.20% acct — no adverse-excursion concern
+- Kill check: no signal with 0% WR and n>=3 last hour (only 1 close) — regime query not triggered
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 7/55 = 12.7% (<40%) — dominant close = profit-monster-trail (27T '+$1.34'); worst avg = stale_exit (2T '-$0.195')
+- Boost: pump-chain+ 6T 66.7% '+$0.20' 6 tokens meets 24h bars BUT 14d 40T 42.5% '-$0.95' + at 1.4 ceiling HOLD; volume-buildup- 14T 71.4% but net '+$0.02' fails >$0.05 bar; jup_yolo_mirrored 22T 54.5% '-$0.59' fails WR/PnL
+- Neg streak: 16h -0.21, 17h -0.07, 18h -0.16, 19h +0.01 — streak broke
+- Frequency 1/hr — far under 20/hr
+- 4 open: SOL/BTC/HYPE jup_yolo_mirrored LONG, MON volume-buildup- SHORT
+- Storm readiness: **window-min -0.79% / at-run -0.11%** — both within gate, no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored 24h 22T 54.5% '-$0.59' worst net; 14d all-regime red, n=14<20 kill bar — revisit if n reaches 20
+- 7d still RED '-$0.11' after flipping; 24h thin green '+$0.27'
