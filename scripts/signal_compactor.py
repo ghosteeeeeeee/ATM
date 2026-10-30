@@ -3585,7 +3585,10 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pass_gate = True
                         gate_msg = f'NEUTRAL-relax: standalone part ({source})'
                     else:
-                        gate_msg = f'single-type not in standalone bypass (regime={_regime})'
+                        # bug_hunter pre-flight LOW: preserve the storm-waiver's gate_msg
+                        # at enforce (otherwise the PASS line prints the block reason)
+                        if not pass_gate and not gate_msg:
+                            gate_msg = f'single-type not in standalone bypass (regime={_regime})'
             else:
                 # ── Accel-300 Standalone Bypass ───────────────────────────────────
                 # Strong standalone accel-300 (no RS co-signal needed) — fire on
@@ -3655,7 +3658,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pass_gate = True
                         gate_msg = f'backtested standalone ({source})'
                     else:
-                        gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
+                        # bug_hunter pre-flight LOW: preserve the storm-waiver's gate_msg at enforce
+                        if not pass_gate and not gate_msg:
+                            gate_msg = f'only {unique_signal_types} unique types {{{source}}} — need 2+'
 
             # CRITICAL DEBUG: log EVERY combo before gate decision — no exceptions
             log(f"  🔎 [CONFLUENCE-DEBUG] {token} {direction}: source='{source}' parts={source_parts} count={source_count} unique_types={unique_signal_types} -> {'PASS' if pass_gate else 'BLOCK'}")
