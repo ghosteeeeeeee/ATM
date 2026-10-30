@@ -25,7 +25,7 @@ STATE_FILE = os.path.join(HERMES_DATA, 'jup_yolo_state.json')
 LEADERBOARD_FILE = os.path.join(HERMES_DATA, 'jup_yolo_leaderboard.json')
 
 # Static seed — verified prefix/suffix match 2026-10-09. Used only when the
-# live leaderboard file (written by jup_yolo_leaderboard.py every 30 min) is
+# live leaderboard file (written by jup_yolo_leaderboard.py every 10 min) is
 # missing or stale. Prefer load_wallets() over touching this directly.
 JUP_YOLO_WALLETS = {
     # rank: (wallet, label, upnl_pct)
@@ -77,18 +77,33 @@ def load_wallets(quiet: bool = False) -> dict:
             print(f"[jup_yolo] ⚠️ leaderboard STALE >{LEADERBOARD_WARN_SEC//60}min — "
                   f"check jup-yolo-leaderboard.timer + logs/jup_yolo_lb.err.log")
         if age_sec < LEADERBOARD_STALE_SEC and lb.get('wallets'):
+            raw = lb['wallets']
+            # FIX (bug_hunter MED-2): non-dict file must fall back, not propagate —
+            # load_wallets() sits outside monitor_once's try, and an AttributeError
+            # would land in main()'s broad except → monitor silently skips every
+            # 60s while appearing alive.
+            if not isinstance(raw, dict):
+                raise TypeError(f"wallets is {type(raw).__name__}, expected dict")
             out = {}
-            for w, v in lb['wallets'].items():
+            for w, v in raw.items():
                 if isinstance(v, dict):
                     out[w] = v
-                else:
+                elif isinstance(v, (list, tuple)) and len(v) >= 2:
                     # legacy tuple format (label, upnl_pct) → stats dict
                     out[w] = {"label": v[0], "pnl": None, "wr": None,
                               "trades": None, "volume": None, "rank": None,
                               "source": "legacy"}
-            return out
+                else:
+                    # corrupt per-entry value → skip entry, keep the rest
+                    continue
+            if out:
+                return out
+            raise ValueError("wallets dict contained no usable entries")
         print("[jup_yolo] ⚠️ leaderboard file stale (>2h) — using seed wallets")
-    except (FileNotFoundError, json.JSONDecodeError, OSError, KeyError) as e:
+    # FIX (bug_hunter MED-2): AttributeError/TypeError included — a corrupt or
+    # future-format file must degrade to seed, never crash the cycle silently.
+    except (FileNotFoundError, json.JSONDecodeError, OSError, KeyError,
+            AttributeError, TypeError, ValueError) as e:
         print(f"[jup_yolo] ⚠️ leaderboard file unreadable ({e}) — using seed wallets")
     return _seed_as_stats()
 
@@ -198,7 +213,7 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
     all-time realized-PnL leaderboard (seed fallback has pnl/wr=None).
 
     Confidence now driven by REALIZED skill, not sidebar uPnL%:
-      base 70 + win-rate bonus (-10..+16) + PnL bonus (0..8) + leverage (0..3)
+      base 70 + win-rate bonus (-20..+20) + PnL bonus (0..8) + leverage (0..3)
       capped at 88 (add_signal MAX — computing higher was dead code, bug L6).
 
     FIX (bug_hunter M2): returns add_signal()'s actual result — a blocked
@@ -215,7 +230,9 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
     base_conf = 70
     # win rate: 0.20 → -8, 0.50 → 0, 0.78 → +11.2
     wr = stats.get('wr')
-    wr_bonus = (wr - 0.50) * 40 if isinstance(wr, (int, float)) else 0
+    wr_bonus = ((wr - 0.50) * 40
+                if isinstance(wr, (int, float)) and not isinstance(wr, bool)
+                else 0)
     # realized pnl: $1k → +1, $8k+ → +8 (capped)
     pnl = stats.get('pnl') or 0
     pnl_bonus = min(8, max(0, pnl / 1000))
@@ -314,7 +331,7 @@ def monitor_once() -> int:
     attempts = state.get('attempts', {})
     now_ts = int(time.time())
 
-    # LIVE wallet list — refreshed by jup_yolo_leaderboard.py every 30 min
+    # LIVE wallet list — refreshed by jup_yolo_leaderboard.py every 10 min
     wallets = load_wallets()
 
     # PRIMARY: positions feed — leaderboard wallets are high-x holders
@@ -423,7 +440,9 @@ def main():
             tr = s.get('trades')
             rk = s.get('rank')
             pnl_s = f"${pnl:,.0f}" if pnl is not None else "$?"
-            wr_s = f"wr={wr:.0%}" if isinstance(wr, (int, float)) else "wr=?"
+            wr_s = (f"wr={wr:.0%}"
+                    if isinstance(wr, (int, float)) and not isinstance(wr, bool)
+                    else "wr=?")
             tr_s = f"{tr} trades" if tr is not None else "trades=?"
             rk_s = f"rank#{rk} " if rk else ""
             print(f"  {rk_s}{s.get('label','?')}… {w}  {pnl_s} {wr_s} {tr_s} [{s.get('source','?')}]")

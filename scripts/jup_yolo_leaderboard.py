@@ -149,9 +149,16 @@ def resolve_sidebar_labels(rows: list) -> list:
         hits = [a for a in addrs if a.startswith(r['prefix']) and a.endswith(r['suffix'])]
         if hits:
             resolved.append({
-                "wallet": hits[0],
+                # FIX (bug_hunter LOW-5): sorted() — hits is a set; [0] on a set
+                # iteration is nondeterministic across processes (hash randomization)
+                # when 2+ addresses share the same 4+4 prefix/suffix.
+                "wallet": sorted(hits)[0],
                 "label": r['prefix'],
-                "rank": r['rank'],
+                # FIX (bug_hunter LOW-4): sidebar rank is SESSION uPnL rank, not
+                # all-time realized rank — conflating them made the list show two
+                # "rank#8"s and put misleading values in jup_rank metadata.
+                "rank": None,
+                "session_rank": r['rank'],
                 "pnl": r['pnl'],
                 "wr": None,           # sidebar has no win rate
                 "trades": None,
@@ -198,6 +205,7 @@ def select_tracked(entries: list) -> dict:
             "trades": e.get('trades'),
             "volume": e.get('volume'),
             "rank": e.get('rank'),
+            "session_rank": e.get('session_rank'),  # sidebar Top-uPnL rank (not all-time)
             "source": e.get('source', '?'),
         }
     return out
@@ -250,7 +258,10 @@ def main():
     os.replace(tmp, LEADERBOARD_FILE)
 
     top3 = sorted(wallets.items(), key=lambda x: -(x[1].get('pnl') or 0))[:3]
-    topstr = ', '.join(f"{v['label']}(${v['pnl']:,.0f})" for _, v in top3)
+    # FIX (bug_hunter MED-1): seed wallets have pnl=None — formatting None
+    # crashed the seed-fallback path with TypeError after the file was written,
+    # failing the systemd unit exactly when all sources are already down.
+    topstr = ', '.join(f"{v['label']}(${(v.get('pnl') or 0):,.0f})" for _, v in top3)
     print(f"[lb] ✅ {len(wallets)} wallets tracked (seed={used_seed}, api={api_ok}) "
           f"in {time.time()-started:.0f}s → top: {topstr}")
 
