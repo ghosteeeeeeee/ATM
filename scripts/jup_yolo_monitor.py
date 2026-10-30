@@ -206,21 +206,37 @@ def get_hl_price(coin: str) -> float:
 
 
 def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
-                leverage: int, margin_usd: float) -> bool:
+                leverage: int, margin_usd: float, cluster_size: int = 1) -> bool:
     """Write a mirrored signal to the Hermes pipeline via add_signal().
 
     stats: {label, pnl, wr, trades, volume, rank, source} from the live
-    all-time realized-PnL leaderboard (seed fallback has pnl/wr=None).
+    3-window realized-PnL leaderboard (seed fallback has pnl/wr=None).
 
-    Confidence now driven by REALIZED skill, not sidebar uPnL%:
-      base 70 + win-rate bonus (-20..+20) + PnL bonus (0..8) + leverage (0..3)
-      capped at 88 (add_signal MAX — computing higher was dead code, bug L6).
+    Confidence driven by REALIZED skill, not sidebar uPnL%:
+      base 70 + win-rate (-20..+20) + PnL (0..8) + leverage (0..3)
+      + hot top-30 (0..2) + CLUSTER (0..15), floor 50 cap 88.
+
+    Cluster (CEO 2026-10-30): cluster_size = unique tracked wallets holding
+    this coin+direction in the live feed. 2 wallets → +3, 3 → +6, capped at
+    JUP_YOLO_CLUSTER_MAX_BONUS. Multiple positions by the SAME wallet
+    (S1NF bot) count once — it's trader confluence, not order count.
 
     FIX (bug_hunter M2): returns add_signal()'s actual result — a blocked
     signal (blacklist, floor, trend) must NOT be marked as seen, or it is
     permanently suppressed and never retried.
     """
     from signal_schema import add_signal
+
+    try:
+        from hermes_constants import (
+            JUP_YOLO_CLUSTER_ENABLED,
+            JUP_YOLO_CLUSTER_BONUS_PER_TRADER,
+            JUP_YOLO_CLUSTER_MAX_BONUS,
+        )
+    except ImportError:
+        JUP_YOLO_CLUSTER_ENABLED = True
+        JUP_YOLO_CLUSTER_BONUS_PER_TRADER = 3
+        JUP_YOLO_CLUSTER_MAX_BONUS = 15
 
     price = get_hl_price(coin)
     if price <= 0:
@@ -250,7 +266,15 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
         hot_bonus = 2
     elif isinstance(r7, int) and 0 < r7 <= HOT_RANK_MAX:
         hot_bonus = 1
-    confidence = min(88, max(50, base_conf + wr_bonus + pnl_bonus + lev_bonus + hot_bonus))
+    # CLUSTER: 2 wallets → +3, 3 → +6 ... capped (CEO 2026-10-30 rank higher
+    # when multiple pros hold the same position in one check cycle)
+    cluster_bonus = 0
+    if (JUP_YOLO_CLUSTER_ENABLED and isinstance(cluster_size, int)
+            and cluster_size >= 2):
+        cluster_bonus = min(JUP_YOLO_CLUSTER_MAX_BONUS,
+                            (cluster_size - 1) * JUP_YOLO_CLUSTER_BONUS_PER_TRADER)
+    confidence = min(88, max(50, base_conf + wr_bonus + pnl_bonus + lev_bonus
+                             + hot_bonus + cluster_bonus))
 
     signal_type = 'jup_yolo_long' if direction == 'LONG' else 'jup_yolo_short'
 
@@ -280,6 +304,9 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
             'jup_margin_usd': margin_usd,
             'jup_market': coin,
             'jup_side': direction,
+            # cluster confluence (CEO 2026-10-30)
+            'jup_cluster_size': cluster_size,
+            'jup_cluster_bonus': cluster_bonus,
             'mirror_source': 'jup_ag_yolo_leaderboard_3window',
         },
     )
@@ -290,11 +317,16 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
               f"(add_signal returned None — will retry next cycle)")
         return False
 
+    if cluster_bonus:
+        print(f"[jup_yolo] 🔥 CLUSTER: {coin} {direction} — {cluster_size} pros "
+              f"hold it (+{cluster_bonus} conf)")
     hot = stats.get('rank_24h') or stats.get('rank_7d')
     hot_s = f" hot#{hot}" if hot else ""
+    clu_s = f" 🔥×{cluster_size}" if cluster_bonus else ""
     print(f"[jup_yolo] 🪞 MIRRORED {wallet[:4]} {coin} {direction} "
           f"({leverage}x, ${pnl:,.0f} pnl, wr={wr if wr is not None else '?'}"
-          f"{'*' if wr is not None else ''}{hot_s}) conf={confidence:.0f} sig_id={sig_id}")
+          f"{'*' if wr is not None else ''}{hot_s}{clu_s}) "
+          f"conf={confidence:.0f} sig_id={sig_id}")
     return True
 
 
@@ -378,6 +410,28 @@ def monitor_once() -> int:
     seen = {e[0] for e in seen_list}
     seen_ts = {e[0]: e[1] for e in seen_list}  # pid -> first-emit epoch
 
+    # CLUSTER MAP (CEO 2026-10-30): unique tracked wallets holding each
+    # coin+direction in the live feed. A new/dead signal whose (market, dir)
+    # has 2+ wallets (incl. itself) is a cluster — ranked higher at emit.
+    # UNIQUE wallets: the S1NF bot holding SOL x3 counts once. Computed
+    # feed-wide (not cycle-local) so opens straddling the 60s boundary still
+    # cluster — "2-3 pros in the same position" is confluence regardless of
+    # which 60s window each opened in.
+    cluster_map = {}
+    for p in positions:
+        _c = p.get('owner', '')
+        _m = p.get('market', '')
+        _s = p.get('side', '')
+        if _c not in wallets or _m not in TRADEABLE_MARKETS:
+            continue
+        if _s == 'long':
+            _d = 'LONG'
+        elif _s == 'short':
+            _d = 'SHORT'
+        else:
+            continue
+        cluster_map.setdefault((_m, _d), set()).add(_c)
+
     for p in positions:
         try:
             owner = p.get('owner', '')
@@ -426,8 +480,10 @@ def monitor_once() -> int:
             stats = wallets[owner]   # {label, pnl, wr, trades, rank, source}
             leverage = int(p.get('leverage', 0) or 0)
             margin = float(p.get('margin', 0) or 0) / 1_000_000
+            cluster_size = len(cluster_map.get((market, direction), ()))
 
-            if emit_signal(market, direction, owner, stats, leverage, margin):
+            if emit_signal(market, direction, owner, stats, leverage, margin,
+                           cluster_size=cluster_size):
                 new_signals += 1
                 seen_list.append((pid, now_ts))   # duplicate-append is pruned/normalized on save
                 attempts.pop(pid, None)

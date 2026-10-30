@@ -4118,6 +4118,14 @@ HL_COPY_CLUSTER_BONUS_PER_TRADER = 3  # +3 confidence per additional trader in c
 HL_COPY_CLUSTER_MAX_BONUS = 15       # cap cluster bonus at +15 (prevents overconfidence)
 HL_COPY_CLUSTER_SIZE_MULT = 0.25    # +25% position size per additional trader (e.g., 3 traders → 1.5x)
 
+# ── JUP YOLO Mirror Cluster Bonus ─────────────────────────────────────────────
+# CEO 2026-10-30: when 2+ tracked leaderboard wallets hold the same
+# coin+direction in one check cycle, rank the mirror signal higher.
+# Counted on UNIQUE wallets (S1NF bot holding SOL x3 counts once).
+JUP_YOLO_CLUSTER_ENABLED = True       # master switch for YOLO cluster bonus
+JUP_YOLO_CLUSTER_BONUS_PER_TRADER = 3  # +3 confidence per additional wallet beyond the first
+JUP_YOLO_CLUSTER_MAX_BONUS = 15        # cap (matches HL_COPY cap — prevents overconfidence)
+
 # ── Copy Trader Exit Correlation & Weighting ─────────────────────────────────
 COPY_TRADE_EXIT_ENABLED = True          # master switch for trader exit correlation
 COPY_TRADE_EXIT_TIMEOUT_MIN = 120       # fallback to normal exit after 2 hours

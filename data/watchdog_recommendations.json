@@ -1,29 +1,13 @@
 {
-  "timestamp": "2026-10-30T07:41:18.937653+00:00",
+  "timestamp": "2026-10-30T08:11:19.318303+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: BANANA + SAGA",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
+      "title": "Trade cluster: ZORA + IO",
+      "detail": "Both opened within 18 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BANANA + NXPC",
-      "detail": "Both opened within 1 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: SAGA + NXPC",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -31,23 +15,23 @@
       "title": "Portfolio heavily short (3 trades)",
       "detail": "3 short positions. One BTC pump hits all of them.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-002"
     }
   ],
-  "portfolio_health": "warning",
+  "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "ABOVE",
-    "volatility": "NORMAL",
+    "continuum": "BELOW",
+    "volatility": "LOW",
     "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "ACCUMULATION",
+    "acceleration_state": "NEGATIVE",
+    "volume_regime": "LOW",
+    "linreg_alignment": 1.0,
+    "wyckoff_phase": "MARKDOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 4
+  "open_count": 3
 }
