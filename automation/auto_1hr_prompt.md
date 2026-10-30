@@ -219,7 +219,8 @@ If a query fails with `UndefinedColumn`, check column names against this list be
 ## STORM-READINESS PACKET (CEO consult 20261029T2130Z, T proceed — MANDATORY when BTC 1h |move| >= 1.5%)
 
 T's standing ask: "be ready for the next pump or dump. learn something!!!" — this makes it automatic.
-Every run, first compute BTC **rolling 60-minute** close-to-close from `data/candles.db` (`candles_1m`, token='BTC'): latest close vs the close at `ts <= now-3600` — **NOT `is_closed` hour candles** (code review 9671bf67: hour-close flags lie both ways — tick-agg flips ~1h late, seeder marks in-progress hours, and completed buckets by definition cannot contain the crash happening now; the rolling method sees the storm within minutes, same as `_storm_confluence_would_pass`). **If |move| < 1.5%: skip this section (note "no storm").**
+Every run, first compute BTC **rolling 60-minute** close-to-close from `data/candles.db` (`candles_1m`, token='BTC'): latest close vs the close at `ts <= now-3600` — **NOT `is_closed` hour candles** (code review 9671bf67: hour-close flags lie both ways — tick-agg flips ~1h late, seeder marks in-progress hours, and completed buckets by definition cannot contain the crash happening now; the rolling method sees the storm within minutes, same as `_storm_confluence_would_pass`).
+**WINDOW-PEAK RULE (CEO fix (b) 20261030T0030Z): judge on the MIN rolling-60m sampled every 5 min over the prior 60 minutes (`now, now-300, …, now-3600`), NOT the single run-time instant** — a storm that starts and recovers between hourly runs must still packet (yesterday's armed minutes 20:41–21:14 ended before the 21:45 run: instant-sample said +0.42 "no storm", window-peak says −2.95 → packet). Report BOTH numbers in the packet: `window-min {m:+.2f}% / at-run {r:+.2f}%`. **If window-min > −1.5%: skip this section (note "no storm").**
 
 When |btc_1h| >= 1.5:
 1. **Blocked-direction census (last 2h):** from `/root/.hermes/data/signals_hermes_runtime.db`,

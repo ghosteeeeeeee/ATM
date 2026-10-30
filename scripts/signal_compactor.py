@@ -2406,6 +2406,8 @@ def _storm_confluence_would_pass(token, direction):
         finally:
             conn.close()
         if not _last or not _past or not _past[0]:
+            if STORM_CONFLUENCE_WAIVER_SHADOW:
+                log(f"  [STORM-CONFL-DEBUG] {token} {direction}: FAIL(i btc-data-missing) — {_dbg or 'no 1m rows'}")
             return False
         _btc_1h = (_last[0] - _past[0]) / _past[0] * 100
         _dbg = f'btc-roll60m={_btc_1h:+.2f}'
@@ -2418,6 +2420,10 @@ def _storm_confluence_would_pass(token, direction):
         _rsi = compute_rsi_1m(token)   # knife authority (k-tokens fail-open None, same as knife)
         _dbg += f' rsi={_rsi if _rsi is None else round(_rsi, 1)}'
         if _rsi is None or _rsi < STORM_MIN_RSI:
+            # CEO fix (a) 20261030T0030Z: every mid-condition exit logs under shadow —
+            # "0 would-pass" must be falsifiable (armed-window context: (i) already passed).
+            if STORM_CONFLUENCE_WAIVER_SHADOW:
+                log(f"  [STORM-CONFL-DEBUG] {token} {direction}: FAIL(ii rsi<{STORM_MIN_RSI} or None) — {_dbg}")
             return False
         conn = sqlite3.connect(os.path.join(HERMES_DATA, 'signals_hermes_runtime.db'), timeout=5)
         try:
@@ -2431,6 +2437,8 @@ def _storm_confluence_would_pass(token, direction):
         _n_sib = _sib[0] if _sib else 0
         _dbg += f' sib={_n_sib}'
         if _n_sib <= 0:
+            if STORM_CONFLUENCE_WAIVER_SHADOW:
+                log(f"  [STORM-CONFL-DEBUG] {token} {direction}: FAIL(iii no sibling<=30min) — {_dbg}")
             return False
         log(f"  ✅ [STORM-CONFL-DEBUG] {token} {direction}: {_dbg} -> ALL-3 PASS")
         return True
@@ -3513,6 +3521,29 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         continue
                 except ImportError:
                     pass
+            # ── STORM CONFLUENCE WAIVER — HOISTED ABOVE THE NEUTRAL-RELAX SPLIT
+            # (CEO consult 20261030T0030Z reachability fix (c), T 'All three'):
+            # the block previously sat inside the `elif _neutral_relax:` else — but
+            # regime_4h falls back to NEUTRAL on NULL/missing momentum_cache rows
+            # (MNT/MERL NULL, HBAR/BLUR NEUTRAL), so every armed-window blockee took
+            # that branch and NEVER reached the waiver (only WLD did, via its stale
+            # SHORT_BIAS row). Hoisting makes the waiver reachable for all singles;
+            # if it passes, pass_gate=True survives the chain (gate_msg may be
+            # overwritten cosmetically by later branches — harmless).
+            if not pass_gate and direction == 'SHORT' and unique_signal_types == 1:
+                try:
+                    from hermes_constants import (STORM_CONFLUENCE_WAIVER_SHADOW,
+                                                  STORM_CONFLUENCE_WAIVER_ENFORCE)
+                    if _storm_confluence_would_pass(token, direction):
+                        if STORM_CONFLUENCE_WAIVER_ENFORCE:
+                            pass_gate = True
+                            gate_msg = 'storm waiver (rolling-60m<=-1.5%, RSI>=35, sibling gate-blocked<=30min)'
+                        elif STORM_CONFLUENCE_WAIVER_SHADOW:
+                            log(f"  🌩️ [STORM-CONFL-WAIVER-SHADOW] {token} {direction}: WOULD-PASS "
+                                f"single-type confluence (storm conditions met) — enforcement pending "
+                                f">=3-storm bar, deadline 11-12")
+                except ImportError:
+                    pass
             if not CONFLUENCE_REQUIRED:
                 # CONFLUENCE_REQUIRED=False: allow single-source signals
                 pass_gate = True
@@ -3604,24 +3635,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         gate_msg = f'temporal confluence ({_tc_count} fires in {TEMPORAL_CONFLUENCE_WINDOW_MIN}min)'
                         except ImportError:
                             pass
-                        # ── STORM CONFLUENCE WAIVER (CEO 20261029T2130Z, T proceed) ──
-                        # Single-type SHORT + storm conditions (BTC 1h <= -1.5%, RSI>=35,
-                        # sibling approval-blocked <=30min) -> would-pass. SHADOW logs,
-                        # still blocks; enforce flip rides the >=3-storm bar (11-12).
-                        if not pass_gate and direction == 'SHORT':
-                            try:
-                                from hermes_constants import (STORM_CONFLUENCE_WAIVER_SHADOW,
-                                                              STORM_CONFLUENCE_WAIVER_ENFORCE)
-                                if _storm_confluence_would_pass(token, direction):
-                                    if STORM_CONFLUENCE_WAIVER_ENFORCE:
-                                        pass_gate = True
-                                        gate_msg = 'storm waiver (BTC 1h<=-1.5%, RSI>=35, sibling gate-blocked<=30min)'
-                                    elif STORM_CONFLUENCE_WAIVER_SHADOW:
-                                        log(f"  🌩️ [STORM-CONFL-WAIVER-SHADOW] {token} {direction}: WOULD-PASS "
-                                            f"single-type confluence (storm conditions met) — enforcement pending "
-                                            f">=3-storm bar, deadline 11-12")
-                            except ImportError:
-                                pass
+                        # (storm-waiver block HOISTED above the neutral-relax split —
+                        # CEO 20261030T0030Z fix (c): NEUTRAL/NULL-fallback tokens
+                        # never reached it from inside this else)
                         if not pass_gate and not gate_msg:
                             gate_msg = f'single-type not in standalone bypass (regime={_regime})'
                 # ── Confluence Signal Bypass ──────────────────────────────────────
