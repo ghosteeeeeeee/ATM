@@ -18014,3 +18014,26 @@ Final set: ['GRASS']
 - jup_yolo_mirrored 24h worst net signal '-$0.31' (11T 54.5%) — watch; if 7d stays negative, candidate for confidence-weight reduce (non-locked)
 - volume-buildup- 14d NORMAL-regime bleed persists — if 7d stays negative, push CEO on NORMAL volatility_gate multiplier=0
 - 24h GREEN '+$0.34' at 58.7% WR (cooled from +0.83); 7d still RED '-$0.14'
+
+## [2026-10-30 14:48] Hourly Analysis
+
+**Trades:** 3 closed (1 win/flat, 2 losses)
+**PnL:** $-0.37 (WR: 54.3% 24h) | 24h 46T 25W 54.3% '+$0.13' GREEN thinning | 7d 168T 56.5% '-$0.37' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: only win SOL jup_yolo +0.21% acct; losses HYPE jup_yolo cut-loser-CL-T1 -6.18% and BTC jup_yolo atr_sl_hit -5.24% — both normal acct-scale losses at leverage, not entry bugs
+- Kill check TRIGGERED: jup_yolo_mirrored 3T 0% last hour → regime policy query (14d): EXTREME 10T 60.0% '-$0.14', HIGH 3T 0.0% '-$0.42', NORMAL 1T 0.0% '-$0.12' — wins in EXTREME → keep alive; HIGH n=3/NORMAL n=1 too thin to block; total n=14 < 20 kill bar → no kill, no gate block
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 6/46 = 13.0% (<40%) — dominant close = profit-monster-trail (20T '+$0.96')
+- Boost: volume-buildup- 12T 75% '+$0.18' 10 tokens meets 24h bars BUT 14d '-$0.52' + already 1.0→1.2 HOLD; pump-chain+ 6T 66.7% '+$0.26' meets bars BUT 14d '-$1.16' + 1.4 ceiling HOLD
+- Neg streak: 13h -0.44, 14h -0.25 — 2 consecutive red, under 3h threshold
+- Frequency 3/hr — under overtrading threshold (20/hr)
+- 3 open: HYPER pump-chain- LONG, ETH/BTC jup_yolo LONG
+- Storm readiness: window-min -0.91% / at-run +0.20% (gate needs <= -1.5 or |at-run| >= 1.5) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored deteriorating: 24h 14T 42.9% '-$0.68' (worst signal), 7d 14T '-$0.68' — if 7d stays red AND HIGH/NORMAL regimes accumulate n, block HIGH+NORMAL via volatility_gate_v2 (wins EXTREME so no full kill)
+- 24h GREEN '+$0.13' but cooling fast (was +0.34 at 13:47); 7d RED '-$0.37'
