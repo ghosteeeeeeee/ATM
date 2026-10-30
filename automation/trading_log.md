@@ -17820,3 +17820,25 @@ Quiet hour — 0 closes, 0 open positions.
 **Open Questions:**
 - 24h GREEN '$+0.58' at 62.5% WR — holding; 7d still RED '$-0.21'
 - pump-chain+ at 1.4: revisit if 14d window stays green (next boost needs 14d-scale evidence, not 24h)
+
+## [2026-10-30 05:44] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 | 24h: 23T 15W 62.6% '$+0.72' GREEN | 7d 147T 82W 55.8% '$-0.21' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 0T last hour; no n>=3 0%-WR signal in window (continuum-trend- 3T 66.7% but -$0.14 — not 0% WR)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 1/23 = 4.3% (<40%) — SL not tight; dominant close = profit-monster-trail (9T '+$0.42')
+- Boost: volume-buildup- 3T 100% '+$0.25' fails n>=5; pump-chain+ 5T 60% '+$0.23' already at 1.4 ceiling — HOLD
+- Neg streak: 0 closes this hour (24h still GREEN)
+- Frequency 0/hr — under overtrading threshold
+- 3 open: ADA pump-chain+ LONG, BTC ai-trader-manual LONG, ENS ai-trader-manual LONG
+- Storm readiness: window-min +0.10% / at-run +0.47% (<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '$+0.72' at 62.6% WR — reversal holding; 7d still RED '$-0.21'
+- Two ai-trader-manual LONGs open (BTC, ENS) — CEO trades, monitor
