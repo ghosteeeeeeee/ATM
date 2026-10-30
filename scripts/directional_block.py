@@ -22,7 +22,14 @@ Guards the OTHER gates unchanged (this helper is not involved in):
 
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 
-JUP_YOLO_SRC = 'jup_yolo_mirrored'
+# FIX (bug_hunter N2): match the whole 'jup_yolo' namespace, not just the
+# full 'jup_yolo_mirrored' source string. The RSI-floor carve-outs match
+# 'jup_yolo' (prefix) — if signal_type ('jup_yolo_short') ever flows as the
+# source (decider's `signal_type or source` path), the full-string check
+# would give floor-exemption WITHOUT blacklist-exemption → approved-then-
+# blocked zombie churn, the exact failure Option D exists to prevent.
+# The namespace is ours alone; nothing else starts with 'jup_yolo'.
+JUP_YOLO_NS = 'jup_yolo'
 
 
 def is_directional_blocked(token, direction, source=None) -> bool:
@@ -39,7 +46,7 @@ def is_directional_blocked(token, direction, source=None) -> bool:
     src = str(source or '')
     if dire == 'SHORT':
         if tok in SHORT_BLACKLIST:
-            return JUP_YOLO_SRC not in src
+            return JUP_YOLO_NS not in src
     elif dire == 'LONG':
         if tok in LONG_BLACKLIST:
             return True

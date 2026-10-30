@@ -24,7 +24,9 @@ from position_manager import (get_position_count, is_position_open, enforce_max_
                               is_wrong_side_risky)
 from signal_schema import _is_loss_cooldown_active
 from hermes_constants import (
-    SHORT_BLACKLIST, LONG_BLACKLIST, MAX_OPEN_POSITIONS, HOTSET_ENABLED,
+    # FIX (bug_hunter N4): SHORT_BLACKLIST/LONG_BLACKLIST removed — all
+    # directional checks route through directional_block since Option D.
+    MAX_OPEN_POSITIONS, HOTSET_ENABLED,
     PUMP_CATCHER_MAX_STALENESS_MIN, PUMP_SL_PCT, PUMP_TP_PCT,
     RS_DECIDER_MIN_TOUCHES, RS_DECIDER_ZBONUS_TOUCHES, RS_DECIDER_ZBONUS_ZSCORE,
     RS_DECIDER_CONF_PENALTY, RS_DECIDER_CONF_FLOOR,
