@@ -18153,3 +18153,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - jup_yolo_mirrored 24h 22T 54.5% '-$0.59' worst net; 14d all-regime red, n=14<20 kill bar — revisit if n reaches 20
 - 7d still RED '-$0.11' after flipping; 24h thin green '+$0.27'
+
+## [2026-10-30 20:45] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** $-0.05 (WR: 56.1% 24h) | 24h 57T 32W '+$0.07' GREEN very thin | 7d 181T 57.5% '-$0.16' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 24h winners MAE avg 0.24%, 28/32 under 0.5%; last-hour winners BTC/SOL jup_yolo_mirrored MAE 0.20/0.23% — clean entries. MON volume-buildup- hard_max_loss MAE 1.11% = normal ~1.4% price cap at leverage
+- Kill check: no n>=3 0%-WR signal last hour (volume-buildup- 0W1L n=1) — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 7/57 = 12.3% (<40%) — dominant close = profit-monster-trail (28T '+$1.30'); worst avg = stale_exit (2T '-$0.195')
+- Boost: only pump-chain+ meets 24h bars (6T 66.7% '+$0.20' 6 tokens) BUT 14d 41T ~41.5% '-$1.10' (EXTREME 35T 45.7% '-$0.60', HIGH 6T 16.7% '-$0.50') + already at 1.4 weight ceiling — HOLD, boosting would chase 24h noise over a red 14d
+- Neg streak: 16h -0.21, 17h -0.07, 18h -0.16, 19h -0.15 (4 red) then 20h +0.11 — streak BROKE; regime 48h EXTREME 45T (not NEUTRAL) → no size cut anyway
+- Frequency 3/hr — under 20/hr
+- 3 open: HYPE jup_yolo_mirrored LONG, BTC continuum-trend+ LONG, SOL jup_yolo_mirrored LONG
+- Storm readiness: **window-min -0.14% / at-run +0.50%** — no storm (both within gate)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored 14d now 24T 58.3% '-$0.48': EXTREME wins (12T 66.7% '+$0.03'), HIGH 9T 55.6% '-$0.31', NORMAL 4T 50% '-$0.06' — no longer all-regime red, EXTREME green → keep alive per any-regime-wins rule; HIGH/NORMAL cells thin (n=9/4), watch
+- 24h net thinned to '+$0.07' while 7d stays RED '-$0.16' — one bad hour flips 24h red
