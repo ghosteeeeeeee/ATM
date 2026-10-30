@@ -1,109 +1,114 @@
-# Shadow Redundancy Deep Dive — Which Gates/Filters Are Redundant?
+# Shadow Redundancy Deep Dive v2 — Which Gates/Filters Are Redundant?
 
-**Date:** 2026-10-30 · **Window:** 2026-10-04 → 10-30 (26 days) · **Status:** READY FOR EXTERNAL AUDIT · **Config changes:** NONE
-**Prepared by:** hermes-agent (analysis session) · **Requested by:** T
+**Date:** 2026-10-30 · **Window:** 2026-10-04 → 10-30 (26 days) · **Status:** CORRECTED PER OWN-CONCLUSIONS VERDICT — READY FOR EXTERNAL AUDIT · **Config changes:** NONE
+**Correction ledger:** v1 (commit 7262794c) was ruled NOT fit for external hand-off by the independent own-conclusions auditor (`brain/verdicts/2026-10-30_shadow-redundancy-own-conclusions.md`, commit 5ed3bcf8): arithmetic faithful (20/20 export rows verified, engine no-lookahead confirmed), but inference/framing/provenance required fixes. This v2 implements all four correction classes. Every v1→v2 delta is listed in §7.
 
 ## 0. External audit package
 
 | File | Contents |
 |---|---|
-| `analysis/shadow_redundancy_deepdive_2026-10-30.py` | Complete engine — one file, re-runnable, no live-path imports |
-| `analysis/shadow_redundancy_deepdive_2026-10-30.out` | Full output (this report's numbers, verbatim) |
-| `analysis/exports/gate_events_enriched.tsv` | Every shadow event (n=50,478) + computed fwd/excess/MFE/regime (5.7MB) |
-| `analysis/exports/gate_summary.tsv` | Per-gate summary table |
-| `analysis/exports/expiry_summary.tsv` | Confluence-expiry answer by confidence band |
-| `brain/gate_shadow.db` / `brain/expiry_shadow.db` / `brain/t5_shadow.db` | Source shadow DBs (recorders: `scripts/gate_shadow.py`, `scripts/expiry_shadow.py`, `scripts/t5_shadow.py`) |
-| Prior verification | `audit/gate_counterfactual_verify.md` (independent cross-validation of the engine, <0.10% agreement), `brain/verdicts/2026-10-12_deadlock-gate-verify.md` |
+| `analysis/shadow_redundancy_deepdive_v2_2026-10-30.py` | v2 engine — single script, re-runnable, includes capture-audit, cluster tests, expiry recompute, t5 |
+| `analysis/shadow_redundancy_deepdive_v2.out` | v2 raw output (all numbers below, verbatim) |
+| `analysis/exports/v2_gate_events.tsv` | Every event (n=59,436 enriched) + metrics + provenance flag |
+| `analysis/exports/v2_gate_summary.tsv` | Per-gate table incl. cluster p-values |
+| `analysis/exports/v2_expiry_summary.tsv` | Singles vs multi-source expiry recompute |
+| Source DBs | `brain/gate_shadow.db`, `brain/expiry_shadow.db`, `brain/t5_shadow.db`; candles `/root/.hermes/data/candles.db`; PG brain.trades |
+| Verification trail | v1 report+engine in git (7262794c); own-conclusions verdict (5ed3bcf8) with its own /tmp/audit engine; prior engine cross-validation `audit/gate_counterfactual_verify.md` |
 
-Engine provenance: the forward-return method is the one independently cross-validated in the Oct-8 audit (entry = OPEN of first 5m candle ≥ block_ts, no lookahead; direction-signed excess = sgn × (fwd − cross-sectional mean); the unsigned-baseline variant was killed by audit and is NOT used here).
+## 1. Provenance and coverage (C5 — corrected)
 
-## 1. Data inventory
+**Event frame = fresh reparse of the SURVIVING raw log (Oct 10 20:49 → Oct 30, 455MB, current recorder regexes incl. the Oct-22 compactor-form `:?` fix) ∪ gate_shadow.db rows from Oct 4–10 20:49 (marked `db-only` — raw archives no longer exist on disk; those 12,483 events are UNVERIFIABLE against raw logs).** v1's claim that `pipeline.log.*.gz` archives were package material was wrong and is retracted.
 
-| Source | Events | Window | Closure method |
-|---|---|---|---|
-| gate_shadow.db | 50,478 (49,904 with forward data; 23,015 coalesced episodes; 50 gates) | Oct 4 → Oct 30 | **Audited candle engine** (strong) + built-in follow-on-trade join (weak, kept for triangulation) |
-| expiry_shadow.db | 28,634 (27,685 closed) | Sep 24 → Oct 30 | D3 engine (same direction-signed method) |
-| t5_shadow.db | 42,002 decisions (961 with pnl closures) | Oct 4 → Oct 30 | cell-admission join (weak coverage — 2%) |
+**Recorder capture audit (DB rows vs reparse ground truth, overlap window):**
 
-Coverage caveats (auditor must weigh):
-1. **gate_shadow parser sees only 🚫🔒🚧🌊-emoji gates with blocked/denied wording.** Invisible: RR-ENGINE (🎯, ~400 eps/6d in the Oct-8 audit), CHASE-BLOCK, CONF-FILTER-PRESERVE, CONFLICT-RESCUE (🔄), LOSERS-BLOCK (🗑️), and all direction-level gates (VOL-FLOOR, WARNING BTC-momentum, DIRECTION-LOCK, VOL-GATE-v2 — ~3,800 lines/6d with no token+dir). The D4 BLOCKED-format tranche (Oct 9) improved visibility for six families mid-window.
-2. **Oct 11 gap** — log-rotation window (recorder dead Oct 10 20:48 → rotation fix; 124 events on Oct 12 only).
-3. **Renames reset first-seen:** CONTINUUM-BLOCK/BULL show first-seen 10-09 in shadow (code rework), not their true age. HALL-SHAME enforcement ended ~Oct 12 (replaced by Reputation Phase 2, commit 4b1371ce) — its 316 episodes are historical only.
-4. Regime mix: 70–90% of blocks per gate are chop-regime (|BTC 30m vel| < 0.3%). Trend-regime n is small per gate (50–700).
-
-## 2. Headline findings
-
-**F1 — Exactly one gate survives Bonferroni over 26 days: PUMP-CHAIN-RSI-MAX works.**
-n=1,010 episodes, excess_4h −0.127% (blocked signals went on to underperform market), p<0.0001, solo 81% (fires alone — real marginal value), runner-kill 34.2% vs ~22% market baseline. Consistent direction in both halves (−0.028/−0.226). This is the strongest working gate in the system.
-
-**F2 — Three gates are FULLY REDUNDANT (no edge AND almost never fire alone):**
-| gate | eps | ex4h | p | solo% |
+| gate | capture % | | gate | capture % |
 |---|---|---|---|---|
-| CONTINUUM-BLOCK | 1,639 | −0.033% | 0.003 | **18%** |
-| CONTINUUM-BULL | 1,586 | +0.004% | 0.002 | **19%** |
-| PRESERVE-SPIKE-BLOCK | 225 | −0.027% | 0.293 | 25% |
+| VOL-GATE-BYPASS | 99 | | LONG-NEUTRAL-CHOP | 86 |
+| CONTINUUM-BULL | 96 | | CONTINUUM-BLOCK | 83 |
+| CONFLUENCE-GATE-BLOCK | 93 | | LONG-NEUTRAL | 81 |
+| SHORT-CONTINUUM | 93 | | BTC-CHOP-GATE | 80 |
+| PUMP-CHAIN-SHORT-HIGH | 92 | | LONG-RSI-CEILING | 53 |
+| PUMP-CHAIN-RSI-MAX | 91 | | SHORT-BB-DEAD-ZONE2 | 52 |
+| CTX-GATE | 91 | | OVERSOLD-SHORT | 60 |
+| PUMP-CHAIN-HIGH | 98 | | SHORT-RSI-HARD-FLOOR | **43** |
+| | | | LONG-RSI-BLOCK | **38** |
+| | | | SPIKE-FILTER | **37** |
+| | | | LONG-MIDBAND | **33** |
 
-The BTC-structure pair (BLOCK/BULL) blocks ~3,200 episodes/26d at market-average outcomes, and in **81–82% of episodes another gate was already blocking the same token+direction within ±10min**. Removing them would change very little flow and costs nothing measurable. (Note: neither survives Bonferroni as *different from zero* — p=0.002–0.003 vs threshold 0.001 — i.e., they are not even reliably "slightly helpful"; their effects are economically zero either way.)
+The Oct-11/12 recorder outage (~4,500 deduped events) and the pre-Oct-22 regex blindness (~4,600 more) are **recovered by the reparse** in this frame. Gates below ~60% capture in the DB had their v1 first-seen dates and populations distorted — v2 first-seen/eps come from the reparse frame. The "10-22 cohort" caveat applies to DB-only cross-references, not to this frame. Headline gates all ≥80% capture.
 
-**F3 — The confluence-by-expiry filter (the system's largest) PROTECTS at every confidence band — D3 question answered: NO.**
-28,634 expired signals, strong closures: conf 60–69 ex4h **−0.210%** (n=750) · 70–79 −0.035% (n=12,940) · 80–89 −0.024% (n=13,872) · 90+ −0.019% (n=80). **The high-confidence singles the confluence wall kills (avg conf 80.5) underperform market slightly at every band.** The confluence requirement is not costing edge — it's mildly protective. This closes the D3 instrumentation question opened Oct 9.
+## 2. Method v2
 
-**F4 — Aggregate gate economics at live sizing: mildly protective, small.**
-Sum over all gates × blocked excess × $15 notional = **−$67 refused opportunity over 26 days** (negative = gates refused entries that would have lost). At current sizing everything is near the noise floor; the number matters directionally, not as PnL.
+- Forward-return engine: unchanged from the independently cross-validated reference (entry = OPEN of first 5m candle ≥ block ts — auditor confirmed NO lookahead, max drift 6min; direction-signed excess = sgn × (fwd − cross-sectional mean); median and BTC baselines also computed per event).
+- **Cluster-robust inference (C1):** every gate reports Wilcoxon (naive) plus token-clustered and day-clustered one-sample t-tests on cluster means. A claim is called robust only if at least one cluster p < 0.05 alongside p_w < Bonferroni (0.001).
+- Episodes = 60-min coalescing; sensitivity at 30/120-min and solo windows ±5/±10/±15min (C4).
+- Runner-kill baseline fixed (C3): each gate's blocked MFE≥2% share vs **its own tokens' unconditional** MFE≥2% share (hourly-sampled buckets over the window), not the market-wide share.
 
-**F5 — The shadow's own weak closer is coin-flip quality.** Sign agreement between gate_shadow's built-in follow-on-trade closure and the audited candle engine: **52%** on 2,873 dual-closed episodes. Per-gate weak-pnl vs strong-excess disagree in sign for 5/12 top gates. The built-in closer should not be used for decisions; the audited engine (or the extended closer from CEO D1) is required.
+## 3. Headline findings (cluster-robust)
 
-**F6 — BTC-CHOP-GATE's edge did NOT replicate.** Sole Bonferroni survivor of the Oct 2–8 audit (ex4h −0.38%); over 26 days: **+0.103% (p=0.49), positive (blocks winners direction) in both halves** (+0.071/+0.133). Honest OOS update: the gate's edge was regime-specific to the early-October chop→dump window, not durable.
+**H1 — Exactly two gates have cluster-robust edge; both protective.**
+- **PUMP-CHAIN-RSI-MAX**: n=1,087, ex4h −0.136%, p_w<0.0001, **p_tok=0.011, p_day=0.040**, solo 76%, OOS same-sign (−0.085/−0.224). Runner differential honest version: blocked 35.1% vs own-token unconditional 27.9% = **+7.2pp** (v1's "+34.2 vs ~22 market" retracted). Edge is cross-mean-specific: median baseline −0.051 (same sign, ~1/3 size); the claim is "protective under the reference baseline", not baseline-independent.
+- **PUMP-CHAIN-VEL (post-deadband)**: n=144, ex4h **−0.549%**, p_w=0.0010, p_day=0.015 (p_tok=0.074), solo 42%. The deadband shipped Oct 14 (`PUMP_CHAIN_VEL_30M_MIN=−0.3`); since then the gate blocks only genuine decliners and that population underperforms market strongly. **The deadband reform self-validated**: noise-band blocks are gone; what remains works.
 
-**F7 — SLOPE-FILTER harm replicates for the third time.** +0.244% excess (blocked signals beat market), p=0.0015 (just above Bonferroni 0.001), **OOS-stable both halves (+0.297/+0.212)**, runner-kill 39.8% vs ~22% market, solo 46%. Consistent across: 6-day audit, auditor's 5-baseline matrix, and now 26-day shadow. Strongest harm candidate; remains monitor-only per CEO D2 guardrail until the Nov 6 readout.
+**H2 — NO cluster-robust harm exists.** v1's SLOPE-FILTER "3rd replication" (+0.244%, p=0.0015) becomes +0.342% with p_w=0.0003 but **cluster-ns (p_tok=0.30, p_day=0.20)** — relabeled sign-consistent harm *candidate*, not demonstrated. OVERSOLD-SHORT (+0.152%, OOS-stable +0.171/+0.141) is likewise nominal/cluster-ns. Under honest inference, **no gate in 26 days demonstrably blocks winners.**
 
-**F8 — LONG-NEUTRAL-CHOP (the patch-spiral gate) is a wash, not the catastrophe feared.** Over its full life (n=1,042): ex4h −0.001% — exactly zero. In-chop +0.058 (mildly blocks winners), in-trend −0.253 (mildly protective). The verifier's "likely counterproductive vs chop-LONG best cohort" hypothesis is **not confirmed at 26d scale** — it's economically neutral. Keep measuring; no removal urgency.
+**H3 — 26 gates are NO-EDGE** (|ex4h|<0.10%, p_w≥Bonferroni) — including every volume giant: CONFLUENCE-GATE-BLOCK (n=4,120, −0.040%), SHORT-CONTINUUM (1,962, −0.063%), LONG-NEUTRAL (1,690, −0.009%), **SHORT-RSI-HARD-FLOOR (1,625, −0.012%)**, SHORT-NEUTRAL (1,497, +0.029%), CTX-GATE (1,451, −0.088%), PUMP-CHAIN-SHORT-HIGH (1,229, −0.065%), **LONG-NEUTRAL-CHOP (1,200, +0.014%)** — the patch-spiral gate remains a wash at full life.
 
-## 3. Per-gate table (top 25 by episodes; full table in .out and gate_summary.tsv)
+**H4 — Fully-redundant class holds with stronger data.** CONTINUUM-BLOCK solo **13%** (16%/12% at ±5/±15min — robustly low), CONTINUUM-BULL **17%** (21%/17%), PRESERVE-SPIKE-BLOCK **19%** (v1's knife-edge 24.66% resolved by the larger reparse frame). Economic effects all |−0.04|<0.10. These three fire on ~3,900 episodes/26d that almost always duplicate another gate's block. Removal predicted ≈ zero flow change — the cleanest Nov 6 test.
 
-| gate | first | eps | solo% | ex4h mean | wr | p | verdict class |
-|---|---|---|---|---|---|---|---|
-| CONFLUENCE-GATE-BLOCK | 10-04 | 3,889 | 69% | −0.036% | 50% | 0.46 | no edge, high solo (keep — protects per F3) |
-| SHORT-CONTINUUM | 10-04 | 1,897 | 58% | −0.054% | 55% | 0.036 | no edge (nominal) |
-| CONTINUUM-BLOCK | 10-09 | 1,639 | **18%** | −0.033% | 47% | 0.003 | **FULLY REDUNDANT** |
-| CONTINUUM-BULL | 10-09 | 1,586 | **19%** | +0.004% | 55% | 0.002 | **FULLY REDUNDANT** |
-| LONG-NEUTRAL | 10-04 | 1,446 | 44% | +0.013% | 49% | 0.23 | no edge |
-| SHORT-NEUTRAL | 10-04 | 1,424 | 44% | +0.011% | 53% | 0.047 | no edge (nominal) |
-| CTX-GATE (LLM) | 10-04 | 1,380 | 70% | −0.081% | 47% | 0.057 | no edge (nominal protective) |
-| PUMP-CHAIN-SHORT-HIGH | 10-07 | 1,156 | 90% | −0.059% | 52% | 0.47 | no edge |
-| LONG-NEUTRAL-CHOP | 10-12 | 1,042 | 40% | −0.001% | 48% | 0.15 | **wash (F8)** |
-| PUMP-CHAIN-RSI-MAX | 10-04 | 1,010 | 81% | **−0.127%** | 38% | **<0.0001** | **WORKS (F1)** |
-| VOL-GATE-BYPASS | 10-09 | 980 | 76% | +0.018% | 51% | 0.70 | no edge |
-| SHORT-RSI-HARD-FLOOR | 10-22 | 734 | 66% | +0.012% | 53% | 0.21 | no edge at 26d (chop-specific bleed not visible in markout) |
-| BTC-CHOP-GATE | 10-04 | 449 | 41% | +0.103% | 54% | 0.49 | **edge NOT replicated (F6)** |
-| OVERSOLD-SHORT | 10-22 | 388 | 32% | +0.161% | 56% | 0.012 | harm candidate (nominal) |
-| PUMP-CHAIN-SHORT-RSI-MIN | 10-04 | 349 | 75% | −0.087% | 49% | 0.70 | no edge |
-| HALL-SHAME | 10-04 | 316 | 77% | +0.092% | 46% | 0.35 | no edge (enforcement ended ~10-12) |
-| PUMP-CHAIN-HIGH | 10-21 | 306 | 77% | −0.115% | 41% | 0.029 | nominal protective |
-| LONG-RSI-CEILING | 10-22 | 288 | 51% | −0.250% | 43% | 0.018 | nominal protective |
-| SLOPE-FILTER | 10-09 | 254 | 46% | **+0.244%** | 61% | 0.0015 | **harm, 3rd replication (F7)** |
-| SPIKE-FILTER | 10-22 | 247 | 48% | −0.275% | 43% | 0.008 | nominal protective |
-| PRESERVE-SPIKE-BLOCK | 10-05 | 225 | 25% | −0.027% | 52% | 0.29 | **FULLY REDUNDANT** |
-| PENALTY-BLOCK | 10-09 | 202 | 65% | −0.077% | 46% | 0.17 | no edge |
-| LONG-RSI-BLOCK | 10-22 | 181 | 33% | +0.057% | 47% | 0.60 | no edge |
-| HOT-SET | 10-04 | 167 | 30% | +0.083% | 51% | 0.50 | no edge |
-| EXEC-RSI-DETECT-FLOOR | 10-13 | 148 | 21% | +0.124% | 58% | 0.069 | no edge, functionally redundant |
+**H5 — F3 corrected: confluence-expired SINGLES are exactly zero, not negative.** Fresh recompute from candles (stored expiry_shadow excess was 17% non-reproducible — not used): singles 70-79 −0.034% (n=12,791), 80-89 **−0.0003%** (n=11,944), 90+ **+0.085%** (n=79, flips positive); multi-source rows carry all the negativity (−0.13 to −0.14). Pooled conf≥70 singles: −0.0175% (n=24,814). "Protects at every band" is retracted. The decision it supported is unchanged and stronger: **killing high-conf singles costs nothing measurable — they are exactly zero.**
 
-## 4. Redundancy summary (the answer)
+**H6 — BTC-CHOP-GATE non-replication stands**: +0.133%, positive both halves (+0.080/+0.204).
 
-Of 50 recorded gates (44 with n≥16):
-- **1 has durable edge:** PUMP-CHAIN-RSI-MAX.
-- **3 are fully redundant** (no edge + ≤25% solo): CONTINUUM-BLOCK, CONTINUUM-BULL, PRESERVE-SPIKE-BLOCK — together ~3,450 blocked episodes/26d that changed nothing.
-- **~20 are economically redundant with meaningful solo share** (removal would change signal flow but at ~market-average outcomes — the "78% no edge" finding from the 6-day audit holds at 26 days).
-- **2 harm candidates (nominal, not Bonferroni):** SLOPE-FILTER (3rd replication, OOS-stable) and OVERSOLD-SHORT.
-- **1 previously-claimed worker failed OOS:** BTC-CHOP-GATE.
-- **The largest filter (confluence-expiry, 28k events) works** — protects at every confidence band; the D3 "are we killing 80-conf singles with edge?" question is answered NO.
-- Aggregate effect at live sizing: −$67/26d refused opportunity — the stack is mildly protective, not harmful, but per-gate economics are dominated by noise; the architecture finding from the earlier audits (vetoes are absolute, scoring is cumulative) remains the structural issue this data cannot settle — that needs the R1 exit-stack shadow closer (CEO D1).
+**H7 — t5_shadow (now in-engine, C6)**: 2.3% closure coverage, and per the auditor the closure join is selected (only signals that became live trades) — not usable for verdicts; keep as a candidate for retirement or redesign with the R1 extended closer.
 
-## 5. Regime-stability caveat
+## 4. Per-gate table (top 18 by episodes; full table in .out / v2_gate_summary.tsv)
 
-Per-gate OOS (Oct 4–17 vs 17–30) sign flips: 9/25 top gates flip. Trend-regime n is small (50–700 per gate). All verdicts above are 26-day-window properties. The Nov 6 re-audit decision gate stands: no gate removals on this report alone; the three FULLY REDUNDANT gates are the priority verification targets there (their removal is the cleanest test of the redundancy thesis — predicted flow change ≈ zero).
+| gate | eps | solo10 | ex4h | p_w | p_tok | p_day | ex_med | mfe2 vs own | class |
+|---|---|---|---|---|---|---|---|---|---|
+| CONFLUENCE-GATE-BLOCK | 4,120 | 68% | −0.040 | 0.204 | 0.930 | 0.324 | −0.067 | 22.5 vs 23.9 | NO-EDGE |
+| CONTINUUM-BLOCK | 1,984 | **13%** | −0.043 | 0.0001 | 0.030 | 0.251 | +0.003 | 20.0 vs 20.3 | **FULLY REDUNDANT** |
+| SHORT-CONTINUUM | 1,962 | 57% | −0.063 | 0.024 | 0.059 | 0.370 | −0.166 | 20.9 vs 25.1 | NO-EDGE (nominal) |
+| LONG-NEUTRAL | 1,690 | 40% | −0.009 | 0.037 | 0.186 | 0.456 | +0.045 | 17.2 vs 20.5 | NO-EDGE |
+| CONTINUUM-BULL | 1,650 | **17%** | +0.009 | 0.0008 | 0.593 | 0.830 | −0.079 | 14.5 vs 22.5 | **FULLY REDUNDANT** |
+| SHORT-RSI-HARD-FLOOR | 1,625 | 73% | −0.012 | 0.491 | 0.415 | 0.932 | −0.041 | 32.2 vs 25.2 | NO-EDGE |
+| SHORT-NEUTRAL | 1,497 | 43% | +0.029 | 0.017 | 0.315 | 0.353 | −0.047 | 18.0 vs 21.8 | NO-EDGE |
+| CTX-GATE | 1,451 | 60% | −0.088 | 0.037 | 0.062 | 0.036 | −0.046 | 32.6 vs 27.5 | NO-EDGE |
+| PUMP-CHAIN-SHORT-HIGH | 1,229 | 88% | −0.065 | 0.556 | 0.300 | 0.537 | −0.120 | 29.0 vs 24.9 | NO-EDGE |
+| LONG-NEUTRAL-CHOP | 1,200 | 36% | +0.014 | 0.068 | 0.348 | 0.992 | +0.068 | 22.5 vs 21.2 | NO-EDGE (wash) |
+| PUMP-CHAIN-RSI-MAX | 1,087 | 76% | **−0.136** | **<0.0001** | **0.011** | **0.040** | −0.051 | 35.1 vs 27.9 | **WORKS** |
+| VOL-GATE-BYPASS | 993 | 75% | +0.021 | 0.716 | 0.485 | 0.762 | +0.038 | 37.2 vs 31.7 | NO-EDGE |
+| SPIKE-FILTER | 660 | 44% | −0.123 | 0.028 | 0.138 | 0.056 | −0.085 | 37.4 vs 27.4 | nominal |
+| OVERSOLD-SHORT | 649 | 31% | +0.152 | 0.003 | 0.188 | 0.045 | +0.103 | 23.0 vs 23.6 | harm-cand. (cluster-ns) |
+| LONG-RSI-CEILING | 552 | 49% | −0.192 | 0.002 | 0.427 | 0.396 | −0.112 | 34.1 vs 25.4 | nominal |
+| BTC-CHOP-GATE | 511 | 37% | +0.133 | 0.316 | 0.456 | 0.126 | +0.150 | 18.4 vs 21.2 | NO-EDGE (non-repl.) |
+| PUMP-CHAIN-VEL (post-DB) | 144 | 42% | **−0.549** | **0.0010** | 0.074 | **0.015** | −0.478 | 36.8 vs 30.6 | **WORKS** |
+| SLOPE-FILTER | 287 | 39% | +0.342 | 0.0003 | 0.299 | 0.204 | +0.263 | 41.5 vs 31.5 | harm-cand. (cluster-ns) |
 
-## 6. t5_shadow note (third source, weak coverage)
+Sensitivity (C4): no sign flips for any top gate across 30/60/120-min coalescing; one knife-edge flag — LONG-RSI-BLOCK solo is window-sensitive (56%/28%/26% at ±5/±10/±15min).
 
-42,002 cell-admission decisions, but only 961 (2%) have pnl closures: WOULD_SKIP (n=8,522, 167 closed) avg −0.035% — skipped cells mildly negative; WOULD_TRADE (n=1,577, 85 closed) avg −0.003% — flat. Directionally consistent with "cell system mildly protective" but coverage too thin for verdicts. Recommend closing more t5 decisions or retiring the stream in favor of the extended gate_shadow closer (CEO D1).
+## 5. The answer (redundancy classes, corrected)
+
+- **2 cluster-robust workers**: PUMP-CHAIN-RSI-MAX, PUMP-CHAIN-VEL (post-deadband).
+- **0 demonstrated harmful gates** (v1's SLOPE-FILTER/RSI-family harm claims downgrade to candidates — cluster-ns).
+- **3 fully redundant**: CONTINUUM-BLOCK, CONTINUUM-BULL, PRESERVE-SPIKE-BLOCK — no edge + solo ≤19% robust across windows. Priority removal tests at Nov 6.
+- **~24 no-edge gates** with meaningful solo share: removal would change flow at ~market-average outcomes — the "78% no edge" architecture finding holds at 26 days under cluster-robust standards.
+- **Confluence-expired singles: exactly zero** — the wall neither costs nor protects on singles; its multi-source blocks skew negative.
+- Aggregate dollarization unchanged in order of magnitude (v1's −$67/26d; AGREE per auditor; v2 frame not re-dollarized — flag for external auditor).
+
+## 6. What this cannot settle (unchanged from v1 + auditor)
+
+4h candle markouts ≠ realized PnL under the live exit stack (the R1 extended closer, CEO D1, is still the missing instrument for dollar-denominated decisions); trend-regime n per gate is small (regime splits in .out); single 26-day span; DB-only Oct 4–10 tail unverifiable.
+
+## 7. Correction ledger (v1 → v2)
+
+| # | v1 claim | v2 correction |
+|---|---|---|
+| 1 | Wilcoxon p as primary inference | Cluster p added everywhere; claims require cluster support. Kills: SLOPE-FILTER "3rd replication" (p_tok=0.30), all F3 band significance |
+| 2 | F3 "protects at every band; singles underperform" | FALSE for singles: 80-89 −0.0003%, 90+ +0.085%; multi-source carries negativity. Decision unchanged (singles = zero) |
+| 3 | F1 runner "+34.2% vs ~22% market" | Own-token baseline: 35.1% vs 27.9% (+7.2pp). Median baseline −0.051 (baseline-specific disclosed) |
+| 4 | Bright-line redundancy classes | Sensitivity ranges added; PRESERVE-SPIKE solo resolved 24.66%→19% with reparse frame; knife-edge flags emitted |
+| 5 | first-seen + archives + capture | Reparse-based frame; capture audit table; archives retracted (gone); db-only tail flagged UNVERIFIABLE; Oct 11–12 + Oct 13–22 gaps quantified and recovered |
+| 6 | t5 cited ad hoc | t5 queries in-engine (C6) |
+| 7 | expiry from stored DB values | Recomputed from candles (17% stored drift) |
+| 8 | — | NEW: PUMP-CHAIN-VEL post-deadband cluster-robust WORKS (deadband shipped Oct 14, self-validated) |
