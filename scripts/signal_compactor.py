@@ -3216,6 +3216,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types) + {'BTC ABOVE EMA300' if _btc_in_trend else 'coin momentum'}, allowed")
                     else:
                         log(f"  🚫 [LONG-NEUTRAL-CHOP] {token} LONG blocked — confluence but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend)")
+                        _tombstone_pending(token, direction, 'long-neutral-chop', dry)  # FIX-A (autopsy 20261030): last-lying gate
                         continue
                 else:
                     # Continuum score exception (2026-10-01): 60≤score<80 + mean-reversion only
@@ -4933,6 +4934,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🔍 [PUMP-CHAIN-VEL-CHECK] {tkn}: vel_30m={_vel_30m:+.3f}%")
                         if _vel_30m < PUMP_CHAIN_VEL_30M_MIN:
                             log(f"  🚫 [PUMP-CHAIN-VEL] {tkn}: LONG blocked — 30m vel={_vel_30m:+.3f}% < {PUMP_CHAIN_VEL_30M_MIN}% (token declining)")
+                            _tombstone_pending(tkn, direction, 'pump-chain-vel', dry)  # FIX-A (autopsy 20261030): last-lying gate
                             continue
                 except Exception:
                     pass  # non-fatal
