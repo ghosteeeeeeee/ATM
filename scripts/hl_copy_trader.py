@@ -147,14 +147,9 @@ def run_once():
     else:
         print("  No new pipeline signals")
 
-    # Step 2b: JUP YOLO leaderboard mirror — follow Solana top winners
-    print("\n[2b/8] Mirroring JUP YOLO leaderboard...")
-    try:
-        from jup_yolo_monitor import monitor_once as jup_monitor
-        yolo_sigs = jup_monitor()
-        print(f"  🪞 {yolo_sigs} YOLO mirror signal(s)")
-    except Exception as e:
-        print(f"  JUP YOLO monitor error: {e}")
+    # NOTE: JUP YOLO mirror runs on its OWN 60s timer (jup-yolo-mirror.timer),
+    # not here — this daemon's cycle takes ~22min behind the bulk scan, which
+    # is far too slow for 1000x YOLO positions (bug_hunter M4).
 
     # Step 3: Check for pro trader signals
     print("\n[3/7] Checking for pro trader signals...")

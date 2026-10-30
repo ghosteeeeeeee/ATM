@@ -6310,6 +6310,16 @@ def _filter_safe_prev_hotset(prev_hotset):
         sp_debug = [p.strip() for p in (src or '').split(',') if p.strip()]
         debug_msg = f"  🔍 [PRESERVE-CHECK] {tok}:{direction} src='{src}' parts={sp_debug} count={len(sp_debug)}"
 
+        # FIX (bug_hunter H1/H2, scoped to mirrors): jup_yolo entries are NEVER
+        # preserved. The mirror refreshes every 60s — a carried-forward entry is
+        # pure staleness risk: preserved → PRESERVE-APPROVED-UPSERT → decider
+        # re-attempts EXEC every cycle on a gate-skipped row (row never re-approved
+        # because UPSERT's decision='APPROVED' SELECT misses SKIPPED → clones).
+        # A fresh mirror signal replaces it next cycle, so preservation has no value here.
+        if 'jup_yolo' in (src or ''):
+            log(f"  🪞 [PRESERVE-EXCLUDE] {tok}:{direction} — jup_yolo mirror never preserved (staleness guard)")
+            continue
+
         # Cooldown check: skip tokens in loss cooldown (guardian loss cooldown only)
         # Do NOT use get_cooldown() here — it checks ALL PostgreSQL cooldowns,
         # including per-signal-generator cooldowns that would block valid multi-source
