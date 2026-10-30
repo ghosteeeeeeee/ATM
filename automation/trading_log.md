@@ -17798,3 +17798,25 @@ Quiet hour — 0 closes, 0 open positions.
 **Open Questions:**
 - 24h GREEN '$+0.57' at 63.6% WR — reversal holding; 7d still RED '$-0.22'
 - BTC continuum-trend- cut-loser -5.31% account loss on one trade — monitor, single sample
+
+## [2026-10-30 04:43] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $+0.01 (WR: 50%) | 24h: 24T 15W 62.5% '$+0.58' GREEN | 7d 147T 82W 55.8% '$-0.21' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 2T last hour (CAKE pump-chain+ trail_arm_timeout +$0.03, FARTCOIN pump-chain+ ugb_pt -$0.02); no n>=3 0%-WR signal last hour (continuum-osc- 1T -$0.25 is n=1)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 1/24 = 4.2% (<40%) — SL not tight; dominant close = profit-monster-trail (9T '+$0.42'); worst = atr_sl_hit (1T '$-0.25')
+- Boost: pump-chain+ 5T 60% '+$0.23' 5 tokens meets all bars BUT already at 1.4 (boosted 10-10 on 14d 25T evidence) — second boost on n=5/24h sample = noise-chasing, HOLD; volume-buildup- 4T 75% fails n>=5
+- Neg streak: last hour +$0.01 — never 3 consecutive negative hours
+- Frequency 2/hr — under overtrading threshold
+- 0 open trades
+- Storm readiness: window-min +0.39% / at-run +0.39% (<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '$+0.58' at 62.5% WR — holding; 7d still RED '$-0.21'
+- pump-chain+ at 1.4: revisit if 14d window stays green (next boost needs 14d-scale evidence, not 24h)
