@@ -18107,3 +18107,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - r2v2-long3 24h 3T 0W '-$0.13' — if it hits 3+ trades in a single hour at 0% again, run regime kill query; currently NORMAL regime wins (80%) so no block
 - jup_yolo_mirrored still 24h worst net '-$0.37' (20T 60%); HIGH regime 14d 7T 57% '-$0.24' — if HIGH n grows with red, block HIGH via volatility_gate_v2 (EXTREME wins 66.7%)
+
+## [2026-10-30 18:50] Hourly Analysis
+
+**Trades:** 5 closed (1 win, 4 losses)
+**PnL:** $-0.23 (WR: 55.6% 24h) | 24h 54T 30W 55.6% '+$0.26' GREEN thin | 7d 179T 57.5% '-$0.07' RED flipped | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: only winner DOT pump-chain+ ugb_pt +1.23% acct; losses = BTC jup_yolo atr_sl_hit -4.70%, SOL jup_yolo stale_exit -4.86%, ALT hard_sl -0.64% — all normal leverage-scale, no extreme-adverse entries
+- Kill check: no n>=3 0%-WR signal last hour (jup_yolo 2T 0% n=2<3) — regime query not triggered
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 7/54 = 13.0% (<40%) — dominant close = profit-monster-trail (26T '+$1.33'); worst avg = stale_exit (2T '-$0.195')
+- Boost: pump-chain+ 6T 66.7% '+$0.20' 6 tokens meets all 24h bars BUT 14d '-$1.16' + already at 1.4 ceiling (10-10) HOLD; volume-buildup- 13T 69.2% net '+$0.01' fails >$0.05 bar
+- Neg streak: 16h -0.21, 17h -0.07, 18h -0.16 = 3 red hours BUT regime is EXTREME (not NEUTRAL; 48h: EXTREME 44T/HIGH 16/NORMAL 16) → no size reduction per rule
+- Frequency 5/hr — under 20/hr
+- 1 open: GOAT volume-buildup- SHORT
+- Storm readiness: **window-min -0.66% / at-run -0.66%** — no storm (both within gate)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored 24h 22T 54.5% '-$0.59' worst net; 14d regimes ALL red (EXTREME 11T -0.11, HIGH 8T -0.35, NORMAL 3T -0.13) — first signal losing across every regime; n=14<20 so kill bar not met, but if 14d n reaches 20 with all-regime red, write kill recommendation to CEO kanban
+- 7d flipped back to RED '-$0.07' (was '+$0.16' at 17:43) — 24h still green but thinning; watch
