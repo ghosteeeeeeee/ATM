@@ -9891,5 +9891,42 @@
     "category": "amplify",
     "status": "rejected",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-30T00:39:44Z",
+    "idea": "SCOPED momentum time-stop BLIND RUN (pre-reg 2026-10-26, executed 2026-10-30) = REJECTED-WITH-DATA",
+    "rationale": "Scope locked Oct 26: pump-chain+ / bb-bounce-v2-long+ only (66 of 293 14d trades). Bars locked: B1' n_elig>=60, B2 delta>+$1.00, B3 p<0.05, B4 halves same sign, B5 z%<20, B6 fee-adj>+$1.00. Primary cell T=20/THR=0.20: elig=48 (<60), delta=+$0.72 (<1.00), z%=33.3 (>20), fee-adj=+$0.60 (<1.00) = 4 bars fail. Best cell T=10/0.20: delta=+$0.90 still below bar, z%=80. MFE-attribution amendment PASSES directionally (mfe<0.15 carries +0.66 of +0.72 = 92%) but magnitude bars kill it. Both unscoped (#156) and scoped versions now REJECTED — do not re-propose without new evidence.",
+    "expected_impact": "None — test closed. The never-armed bleed remains owned by MFE-CUT/TAT/CONF_FLOOR stack.",
+    "category": "exit quality",
+    "status": "rejected_with_data (blind run complete)",
+    "risk": "closed",
+    "artifact": "brain/analysis/momentum_time_stop_2026-10-26.py (scoped via signal filter, pre-registered bars applied)"
+  },
+  {
+    "date": "2026-10-30T00:39:44Z",
+    "idea": "FLAT-regime SHORT block REJECTED-WITH-DATA (continuum-osc- BTC loser follow-up)",
+    "rationale": "BTC continuum-osc- SHORT atr_sl_hit -0.25 in FLAT was the largest 24h loser. Cohort check: ALL SHORT in FLAT 30d = 8T 50% -0.27, Fisher p=0.714 vs rest, would kill 4 winners (2.2% fk), save only +0.27. n=8 << 20 minimum. Noise, not a pattern.",
+    "expected_impact": "None — not shipping. Monitor to n>=20.",
+    "category": "entry quality",
+    "status": "rejected_with_data",
+    "risk": "closed"
+  },
+  {
+    "date": "2026-10-30T00:39:44Z",
+    "idea": "WINNER-CELL-SIZE traffic-verification CLOSED (run #200): 0 validated-cell opens since 18:27Z ship = correct-by-traffic",
+    "rationale": "The 4 bb-squeeze+ NORMAL trades (ETC/BANANA/WLFI/COMP Oct 29 14:41-16:16) pre-date commit f1fa4ee6 at 18:27:24Z. Post-ship opens: CRV volume-buildup- EXTREME (correct no-match, validated cell is HIGH) + COMP r2v2-long3 HIGH (correct no-match, validated cell is NORMAL). Match logic smoke-tested: bb-squeeze+ NORMAL and bb-squeeze+,ichimoku+ NORMAL both MATCH; volume-buildup- EXTREME correctly no-match. First-fire verify remains pending actual validated-cell traffic.",
+    "expected_impact": "Confidence in ship correctness; first real traffic still the KPI.",
+    "category": "offense",
+    "status": "done (correct-by-traffic)",
+    "risk": "closed"
+  },
+  {
+    "date": "2026-10-30T00:39:44Z",
+    "idea": "Chop-bleed paired-metric (share + absolute $) for watchdog KPI",
+    "rationale": "92% share tripwire oscillates because the denominator is small in quiet weeks (single armed loser BTC -0.25 moves share ~4pp). This run: share 95.0% but absolute unarmed_neg only -5.29. Recommend watchdog report BOTH share and absolute so CEO sees if a breach is structural or a small-denominator artifact. Zero trading behavior.",
+    "expected_impact": "Better CEO signal-to-noise on the 0.75x veto decision.",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

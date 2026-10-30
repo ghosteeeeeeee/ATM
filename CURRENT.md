@@ -1,84 +1,84 @@
-# Current State — brain_auditor #199 2026-10-29 20:45 UTC
-**Last Updated: 2026-10-29 20:45 UTC**
-**Updated by: brain_auditor #199. Prior: #198 2026-10-29 16:45 (preserved in git history).**
+# Current State — brain_auditor #200 2026-10-30 00:45 UTC
+**Last Updated: 2026-10-30 00:45 UTC**
+**Updated by: brain_auditor #200. Prior: #199 2026-10-29 20:45 UTC (preserved in git history).**
 
-## HEADLINE — chop-bleed improved BELOW line (95.0%→91.9%); size_mult stamp verified in
-## production; WINNER-CELL-SIZE correct-by-traffic (0 fires); pump-chain+ EXTREME cell 14d drift FLAG
+## HEADLINE — Oct 30 scoped momentum-time-stop BLIND RUN executed: REJECTED-WITH-DATA (0/8
+## cells pass); chop-bleed RE-BREACHED 95.0%; WINNER-CELL-SIZE traffic check CLOSED
+## (correct-by-traffic); pump-chain+ EXTREME 14d drift worsened to -0.88
 
-0 config changes (vacation review queue honored, session lock absent,
-`hermes_constants.py` EMPTY git diff vs HEAD, CEO_PROTECTED 13/13, size-reduce file
-absent = 1.0x), **0 ships, 0 trade actions, 3 creative ideas.**
+0 config changes (session lock absent, `hermes_constants.py` EMPTY git diff vs HEAD,
+CEO_PROTECTED 13/13, size-reduce file absent = 1.0x), **0 ships, 0 trade actions,
+4 creative entries (1 blind-run verdict).**
 
-### 1. LAST-RUN VERIFY #198 — all PASS
-| Item | Result |
-|---|---|
-| size_mult stamp at open | **PASS** — BTC #16518 carries 1.5; CRV (new open) carries 1.0; stamp working |
-| mfe_write_at_close | **PASS** — 1 NULL mfe_pct in 7d window |
-| bb-squeeze+ weight 1.0 | **PASS** — 14d 30T 70% +0.64 positive, at ceiling, hold |
-| contrarian join mandate | **EXECUTED** fresh 20:30Z — 863 joinable, flip 42.0%; pc− 64.6% n=350 LIVE; rider 26.7% do-NOT-flip |
-| floor admit join | **FRESH** 04:42Z — floor 48.1% vs always 44.0%, Fisher p=0.477 → COLLECT |
-| #194 0.75x veto | **STILL PENDING CEO but tripwire CLEARED** — chop-bleed 91.9% now below 92% line |
-| recovery_replay selfcheck | ASSERT PASS |
-| constants / lock / size-reduce | EMPTY diff / absent / absent = 1.0x |
+### 1. PRE-REG BLIND RUN 2026-10-30 — SCOPED MOMENTUM TIME-STOP = REJECTED
+Scope locked Oct 26: pump-chain+ / bb-bounce-v2-long+ only (66 of 293 14d trades).
+Bars locked Oct 26: B1' n_elig>=60 · B2 delta>+$1.00 · B3 p<0.05 · B4 halves same sign ·
+B5 z%<20 · B6 fee-adj>+$1.00 + MFE<0.15 attribution amendment.
+Primary cell T=20/THR=0.20: **elig=48 FAIL · delta=+$0.72 FAIL · p=0.0103 PASS ·
+halves PASS · z%=33.3 FAIL · fee-adj=+$0.60 FAIL = 4 bars fail.** Best cell T=10/0.20
+delta=+$0.90 still under bar, z%=80. MFE attribution directionally passes (mfe<0.15
+carries +0.66 of +0.72 = 92%) but magnitude kills it. **0/8 grid cells pass.
+Both unscoped (#156) and scoped versions closed — do not re-propose.**
 
-### 2. CHOP-BLEED IMPROVED BELOW LINE
-7d: unarmed dollar bleed −5.12 of total negative −5.57 = **91.9%** (was 95.0% at #198 = 3rd
-breach). Now below the 92% tripwire. The #194 0.75x size proposal no longer fires.
-CEO can stand down or keep it queued. Root cause unchanged: never-armed chop entries
-(14d unarmed 141T 11.3% −11.37 vs armed 153T 79.1% +7.46) — owned by MFE-CUT/TAT/CONF_FLOOR stack.
+### 2. CHOP-BLEED RE-BREACHED 95.0% (7d, mfe>=0.40 proxy)
+unarmed -5.29 of total negative -5.57 = **95.0%** (was 91.9% at #199 = below line for
+one run only). Run 1 of a potential new >=92% streak. #194 0.75x size proposal remains
+CEO-queued (tripwire not yet met for emergency escalation — needs consecutive breaches).
+Root cause unchanged: never-armed chop entries (14d unarmed 140T 11.4% -11.16 vs armed
+153T 78.4% +7.00) — owned by MFE-CUT/TAT/CONF_FLOOR stack.
 
-### 3. WINNER-CELL-SIZE — 0 FIRES = CORRECT-BY-TRAFFIC
-1.25x winner-cell mult shipped today (main-session, T sign-off). Code path verified
-(decider_run.py:193, applied :935/:2782). 0 log fires since ship — only 1 open (CRV
-volume-buildup− SHORT EXTREME) and EXTREME is NOT the validated cell (HIGH is).
-Traffic-verification KPI registered; no code change. First validated-cell open must show
-scaled notional post-HL_MIN floor.
+### 3. WINNER-CELL-SIZE TRAFFIC CHECK CLOSED — CORRECT-BY-TRAFFIC
+The 4 bb-squeeze+ NORMAL trades (ETC/BANANA/WLFI/COMP, Oct 29 14:41-16:16) pre-date
+commit f1fa4ee6 at **18:27:24Z** — they do not count as traffic. Post-ship opens:
+CRV volume-buildup- EXTREME (correct no-match, validated cell is HIGH) + COMP r2v2-long3
+HIGH (correct no-match, validated cell is NORMAL). Match logic smoke-tested:
+bb-squeeze+ NORMAL and bb-squeeze+,ichimoku+ NORMAL both MATCH; volume-buildup- EXTREME
+correctly no-match. **First-fire verify remains pending actual validated-cell traffic.**
 
-### 4. ⚠️ FLAG (MED): pump-chain+ EXTREME winner cell 14d DRIFT
-In WINNER_CELLS_VALIDATED and receiving 1.25x. 30d still +2.68 (74T 42.5%) but **14d
-drifted to −0.39 (32T 40.6%)**. Pre-registered 11-10 bar (≥+$1.00 delta) will judge.
-T sign-off stands — do NOT revert unilaterally. Monitor to bar.
+### 4. ⚠️ FLAG (MED): pump-chain+ EXTREME winner cell 14d drift WORSENED
+14d now **-0.88 (30T 40.0% WR)** — was -0.39 at #199, -0.73 measured fresh this run.
+30d still +2.68 (80T 42.5%). Receiving 1.25x via WINNER_CELLS_VALIDATED. Pre-registered
+11-10 bar (>=+$1.00 delta) will judge. T sign-off stands — do NOT revert unilaterally.
 
 ### 5. LOSING AUTOPSY (adverse-first, ASSERT PASS)
-48h n=20 = 4 never-adverse / 14 recovered / **2 NEVER** (PURR hh-hl+ atr_sl_hit −0.19,
-NXPC volume-buildup− cut-loser −0.14) → **WRONG-SIDE REFUTED 124th consecutive run**
-(#61 p=0.116, #84 t=−0.04). All 24h losers map to known families (TAT cuts, never-armed
-chop, overbought chase n=1 GRASS RSI 72.6). 0 new patterns.
+48h n=20 = 4 never-adverse / 14 recovered / **2 NEVER** (PURR hh-hl+ atr_sl_hit -0.19,
+NXPC volume-buildup- cut-loser -0.14) → **WRONG-SIDE REFUTED 125th consecutive run**
+(#61 p=0.116, #84 t=-0.04). Largest 24h loser BTC continuum-osc- SHORT atr_sl_hit -0.25
+in FLAT — FLAT-SHORT block counterfactual REJECTED (30d n=8, Fisher p=0.714, save +0.27).
 
-### 6. DEEP-DIVE: 0 NEW sub-50% n≥15 targets
-bbbv2+ 31T 35.5% −0.99 OWNED (TAT-C live + CEO packet + NORMAL habitat block) ·
-pump-chain+ 37T 37.8% −0.74 OWNED (CONF_FLOOR + NO-KILL, 30d EXTREME cell +2.68).
+### 6. DEEP-DIVE: 0 NEW sub-50% n>=15 targets
+bbbv2+ 7d 10T 10% -0.39 OWNED (TAT-C live + CEO packet + NORMAL habitat block) ·
+volume-buildup- 7d 36T 58.3% -0.50 (HIGH cell positive, NORMAL weaker — no new lever) ·
+bb-squeeze+ weekly flow RECOVERING: week of Oct 26 = 20T 75% +0.45 (best since Oct 11
+RSI filter; the 1.25x winner-cell will amplify a recovering signal).
 
-### 7. CREATIVE x3
-1. **WINNER-CELL-SIZE traffic-verification KPI** (zero-code, suggested)
-2. **bb-squeeze+ Oct flow-collapse ROOT CAUSE CLOSED** — 57T/wk→4T coincides with
-   BB_SQUEEZE_LONG_RSI 60-65 window (Oct 11). Post-Oct-8: 100% NORMAL 27T +0.80.
-   The hml-profile side-find "what changed Oct 7" is answered: intentional filter.
-3. **pump-chain− NORMAL SHORT amplify cell REJECTED-WITH-DATA** — 30d 12T +0.45 qualifies
-   but RC1 fade rewire shipped today; re-evaluate after 11-10 fade bar.
+### 7. CREATIVE x4
+1. Scoped momentum-time-stop blind verdict (REJECTED, above)
+2. FLAT-SHORT block REJECTED-WITH-DATA (n=8, p=0.714)
+3. WINNER-CELL-SIZE traffic-verification CLOSED
+4. Chop-bleed paired-metric (share + absolute $) for watchdog KPI — suggested
 
-## PG FRESH (20:35 UTC)
-24h **19T 57.9% −0.46** · 7d 143T 55.9% −0.70 · 14d 296T 46.6% −3.90
-· trail 14d **123T 76.4% +3.76** vs chop 86T 1.2% −8.29
-· armed 14d **153T 79.1% +7.46** vs unarmed **141T 11.3% −11.37**
-· armed 7d 79T 88.6% +4.27 vs unarmed 62T 12.9% −5.13
-· chop-bleed 7d **91.9%** (below 92% line)
+## PG FRESH (00:40 UTC)
+24h **18T 55.6% -0.23** · 7d 143T 55.2% -0.77 · 14d 293T 46.4% -4.16
+· trail 14d **113T 89.4% +5.66** vs chop 93T 1.1% -9.17 vs arm_timeout 30T 26.7% -0.91
+· armed 14d **153T 78.4% +7.00** vs unarmed **140T 11.4% -11.16**
+· armed 7d 81T 87.7% +4.36 vs unarmed 62T 12.9% -5.13
+· chop-bleed 7d **95.0%** (RE-BREACHED above 92% line)
 
-## READINESS — 1 open, HOLD BRACKET
-**CRV volume-buildup− SHORT EXTREME @0.3224 +0.03** bracketed, size_mult=1.0 (EXTREME
-≠ validated HIGH cell). Regime: btc_15m LONG_BIAS vs btc_4h SHORT_BIAS (disagree) →
-**hold on bracket, no fresh discretionary directional entries**; trail-family first;
+## READINESS — 0 open, FLAT IS CORRECT
+No open trades. Regime: btc_15m SHORT_BIAS vs btc_4h LONG_BIAS (disagree) →
+**hold on discretionary directional entries**; trail-family first when entries resume;
 size 1.0x.
 
 ## QUEUE
-**Next run**: WINNER-CELL-SIZE first-fire verify · CRV bracket watch · chop-bleed re-read
-(now below line) · **CEO**: 0.75x stand-down? · pump-chain+ EXTREME 14d drift ·
-C2 early-arm ladder · CONF_FLOOR fk pin · TAT variant-C verify ·
-**2026-10-30** scoped momentum time-stop BLIND ·
+**Next run**: WINNER-CELL-SIZE first-fire verify (await validated-cell traffic) ·
+chop-bleed re-read (re-breached — watch streak) · **CEO**: 0.75x stand-down or escalate? ·
+pump-chain+ EXTREME 14d drift · C2 early-arm ladder · CONF_FLOOR fk pin ·
+TAT variant-C verify · wyckoff outcome join (owed) ·
 **2026-11-02** first weekly AMPLIFY run (registry amplify-weekly-mandate) ·
-**2026-11-03** coupled-SL A/B + shadow batch + escalation-17 ·
+**2026-11-03** coupled-SL A/B + shadow batch + escalation-17 + eval-midband ·
 **2026-11-10** CHASE-MOVE flip + MFE-CUT + fade bar + winner-cell-size bar ·
-**2026-11-15** floor_admit 30d bar + wyckoff join.
+**2026-11-15** floor_admit 30d bar.
 
 Artifacts: brain/audit_recommendations.json, brain/creative_improvements.json,
 CURRENT.md.

@@ -1,20 +1,10 @@
 {
-  "timestamp": "2026-10-29T17:41:13.049213+00:00",
+  "timestamp": "2026-10-30T00:11:15.870458+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
     "btc_15m": "SHORT_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "ABOVE",
-    "volatility": "LOW",
-    "zscore_tier": "NEG",
-    "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "btc_4h": "LONG_BIAS"
   },
   "open_count": 0
 }
