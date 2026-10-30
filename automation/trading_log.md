@@ -17854,3 +17854,25 @@ Final set: ['CAKE']
 - ADD GRASS (WR=40.0%, PnL=$-0.26, low_wr (40.0%))
 
 Final set: ['GRASS']
+
+## [2026-10-30 06:45] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses)
+**PnL:** $+0.05 (WR: 63.0% 24h) | 24h 27T 17W 63.0% '$+0.77' GREEN | 7d 151T 55.6% '-$0.16' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no n>=3 0%-WR signal last hour (continuum-trend- 3T 66.7% -$0.14 and bb-squeeze+ 4T 50% -$0.10 — negative PnL but positive WR, not kill candidates)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 1/27 = 3.7% (<40%) — SL not tight; dominant close = profit-monster-trail (10T '+$0.44'); worst = atr_sl_hit (1T '-$0.25')
+- Boost: pump-chain+ 6T 66.7% '+$0.27' 6 tokens meets bars BUT already at 1.4 ceiling (boosted 10-10) — HOLD; volume-buildup- 3T fails n>=5
+- Neg streak: 24h GREEN '+$0.77', last 6h 5/6 hours non-negative — no streak
+- Frequency 4/hr — under overtrading threshold (20/hr)
+- 3 open: SOL/HYPE jup_yolo_mirrored LONG (flat), BTC ai-trader-manual LONG (flat, re-opened after manual_sl_hit)
+- Storm readiness: window-min -0.21% / at-run -0.15% (|x|<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '+$0.77' at 63% WR holding; 7d still RED '-$0.16'
+- BTC manual trade hit manual_sl_hit then re-opened LONG at 78596 — CEO trade, monitor
