@@ -45,22 +45,34 @@ JUP_YOLO_WALLETS = {
 }
 
 LEADERBOARD_STALE_SEC = 2 * 3600  # fall back to seed if file older than 2h
+LEADERBOARD_WARN_SEC = 20 * 60    # warn loudly if older than 2x the 10min refresh
 
 
 def load_wallets() -> dict:
     """Return {wallet: (label, upnl_pct)} — LIVE leaderboard file if fresh, else seed.
 
     CEO 2026-10-09: leaderboard must be scanned regularly, not a one-shot list.
-    jup_yolo_leaderboard.py refreshes LEADERBOARD_FILE every 30 min.
+    jup_yolo_leaderboard.py refreshes LEADERBOARD_FILE every 10 min
+    (jup-yolo-leaderboard.timer). Freshness is printed EVERY mirror cycle so
+    staleness is visible in the log without grep archaeology.
     """
     try:
         with open(LEADERBOARD_FILE) as f:
             lb = json.load(f)
-        if time.time() - lb.get('updated', 0) < LEADERBOARD_STALE_SEC and lb.get('wallets'):
+        age_sec = time.time() - lb.get('updated', 0)
+        age_min = age_sec / 60
+        n = len(lb.get('wallets', {}))
+        marker = 'fresh' if age_sec < LEADERBOARD_WARN_SEC else '⚠️ STALE'
+        print(f"[jup_yolo] 📋 leaderboard {marker}: {age_min:.0f}min old, {n} wallets, "
+              f"seed={lb.get('used_seed')}, rows={lb.get('row_count', '?')}")
+        if age_sec > LEADERBOARD_WARN_SEC:
+            print(f"[jup_yolo] ⚠️ leaderboard STALE >{LEADERBOARD_WARN_SEC//60}min — "
+                  f"check jup-yolo-leaderboard.timer + logs/jup_yolo_lb.err.log")
+        if age_sec < LEADERBOARD_STALE_SEC and lb.get('wallets'):
             return {w: tuple(v) for w, v in lb['wallets'].items()}
         print("[jup_yolo] ⚠️ leaderboard file stale (>2h) — using seed wallets")
-    except (FileNotFoundError, json.JSONDecodeError, OSError, KeyError):
-        pass
+    except (FileNotFoundError, json.JSONDecodeError, OSError, KeyError) as e:
+        print(f"[jup_yolo] ⚠️ leaderboard file unreadable ({e}) — using seed wallets")
     return dict(JUP_YOLO_WALLETS)
 
 # Coins we can trade on Hyperliquid (YOLO market -> HL market)
