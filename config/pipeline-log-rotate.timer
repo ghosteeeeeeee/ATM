@@ -1,0 +1,10 @@
+[Unit]
+Description=Hermes Pipeline Log Rotate — daily (200MB cap, 30d gz retention)
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=45min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

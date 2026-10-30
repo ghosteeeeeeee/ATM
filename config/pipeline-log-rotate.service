@@ -1,0 +1,15 @@
+[Unit]
+Description=Hermes Pipeline Log Rotate — rotate pipeline.log at 200MB, retain 30d gz archives
+# D4a (CEO 2026-10-30): pipeline.log hit 455MB with no rotator anywhere; archives
+# were deleted once already, losing the Oct 4-10 audit window permanently.
+# Renames into logs/archive/ + gzips; flushes gate_shadow --record first so no
+# gate-block line is lost from brain/gate_shadow.db at the rotation boundary.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/log_rotate_pipeline.py
+WorkingDirectory=/root/.hermes
+StandardOutput=journal
+StandardError=journal
+EnvironmentFile=/root/.hermes/.env
+TimeoutStartSec=600

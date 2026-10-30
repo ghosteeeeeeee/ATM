@@ -2,11 +2,17 @@
 """
 t5_shadow.py — Trade Learning System P4: T5 decision-time trainer, SHADOW MODE.
 
+DECISION-LOG-ONLY as of 2026-10-30 (CEO D5, ruling 20261030T202502Z): the
+would-be outcome join (--close: would_win/would_pnl/closed_at) is RETIRED —
+coverage was 2.3% AND selected-biased (only catches signals that became live
+trades), so the would_pnl column is misleading for verdicts. Redesign of
+closure waits for the R1 extended closer (not yet built). --close is now a
+no-op; existing would_* rows are kept for history but never written again.
+
 For every new signal, looks up its context cell (source/signal_type x direction x
 current vol regime) in the T2 cell store, applies the selection rule, and logs
-what the learned layer WOULD do — without blocking anything. After closes, joins
-would-be outcomes from the brain DB so the 7d shadow-WR vs live-WR comparison
-(the P4 gate for P5) can be published.
+what the learned layer WOULD do — without blocking anything. Kept for
+signal-side analysis (decision distribution vs live execution).
 
 Decision rule v1 (execution plan T5, simplified for shadow):
   admitted cell (n>=15) & wr_blended >= 0.60  -> WOULD_TRADE  (positive edge)
@@ -214,58 +220,17 @@ def decide(since_min):
 
 
 def close_events():
-    """Join closed trades to shadow decisions (token+direction, within window)."""
-    import psycopg2
-    from _secrets import BRAIN_DB_DICT
-    conn = get_db()
-    pg = None
-    try:
-        cur = conn.cursor()
-        pending = cur.execute(
-            "SELECT id, token, direction, created_at FROM decisions WHERE closed=0 "
-            "AND created_at < ?",
-            # FIX 2026-10-04 (bug-hunter HIGH): decisions.created_at is SPACE-format
-            # ('YYYY-MM-DD HH:MM:SS', from signals.created_at) — isoformat 'T' cutoff
-            # compares space(0x20) < 'T'(0x54) so EVERY same-day row matched: the
-            # 65-min age gate was bypassed and all decisions closed premature with
-            # NULL outcomes, destroying the P4 gate metric. Same class as the
-            # decide-mode fix; mirror its strftime format exactly.
-            ((datetime.now(timezone.utc) - timedelta(minutes=TRADE_WINDOW_MIN + 5)).strftime('%Y-%m-%d %H:%M:%S'),)
-        ).fetchall()
-        if not pending:
-            log('close: 0 pending decisions')
-            return 0
-        pg = psycopg2.connect(**BRAIN_DB_DICT)
-        pg_cur = pg.cursor()
-        n_closed = n_trade = 0
-        for did, token, direction, created_at in pending:
-            pg_cur.execute("""
-                SELECT pnl_usdt FROM trades
-                WHERE token=%s AND direction=%s AND status='closed'
-                  AND open_time >= %s::timestamptz
-                  AND open_time < (%s::timestamptz + interval '%s minutes')
-                  AND pnl_usdt IS NOT NULL
-                ORDER BY open_time LIMIT 1
-            """, (token, direction, created_at, created_at, TRADE_WINDOW_MIN))
-            row = pg_cur.fetchone()
-            if row:
-                pnl = float(row[0] or 0)
-                cur.execute(
-                    "UPDATE decisions SET closed=1, would_win=?, would_pnl=?, closed_at=? WHERE id=?",
-                    (1 if pnl > 0 else 0, pnl, datetime.now(timezone.utc).isoformat(), did))
-                n_trade += 1
-            else:
-                cur.execute(
-                    "UPDATE decisions SET closed=1, closed_at=? WHERE id=?",
-                    (datetime.now(timezone.utc).isoformat(), did))
-            n_closed += 1
-        conn.commit()
-        log(f'close: {n_closed}/{len(pending)} decisions closed, {n_trade} had follow-on trades')
-        return n_closed
-    finally:
-        conn.close()
-        if pg:
-            pg.close()
+    """RETIRED 2026-10-30 per CEO D5 (20261030T202502Z) — no-op.
+
+    The would-be outcome join was selected-biased (2.3% coverage: only caught
+    signals that became live trades), so would_win/would_pnl were misleading
+    for verdicts. Redesign waits for the R1 extended closer (not yet built).
+    Would_* columns stay in the schema (historical rows kept, never written
+    again). --close kept as a harmless no-op so existing timers keep working.
+    """
+    log('close: retired 2026-10-30 per CEO D5 — closure join selected-biased '
+        '(2.3% coverage); redesign under R1 extended closer')
+    return 0
 
 
 def report():

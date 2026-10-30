@@ -634,3 +634,40 @@ Proactive Q (28 mod 14 = row 1: What's the PnL?): 24h -$0.83 / 7d -$0.21 verifie
 ### Numbers: 24h 54T +0.26 55.6% | 7d 179T -0.07 57.5%
 ### Findings: clean — 7d PnL ~flat despite 57.5% WR (small avg win); error_alerts show routine exec-policy refusals + signal rollbacks, no new Tracebacks; rotating Q (best signal): bb-squeeze+ LONG 22T +0.46 72.7% (n=1 grind-breakout- SHORT tops PnL but n<5), auto_1hr already boosted its compactor weight 0.8→0.9.
 ### Recommendation: none
+
+## CEO Deep Run — 20261030T202502Z
+
+**Brief:** Shadow Redundancy Deep Dive v2 (corrected, external-audit ready) — decisions D1–D6. **Config changes: 0 trading constants.** hermes_constants.py untouched; CEO_PROTECTED_FLAGS intact; no live loosening; Nov 6 re-audit gate stands.
+
+### Decision
+| Item | Ruling |
+|------|--------|
+| D1 | **GO** — ratify Nov 6 removal-test queue (CONTINUUM-BLOCK, CONTINUUM-BULL, PRESERVE-SPIKE-BLOCK). **NAY** on earlier shadow-first pilot (would confirm a predicted null past Nov 6; Nov 6 re-audit is the designed instrument). No removal ships before sign-off. |
+| D2 | **GO** — PUMP-CHAIN-VEL deadband (Oct-14 ship, D4 of Oct-12 package) recorded as **validated reform** in brain/gate_registry.md (evidence: n=144, ex4h −0.549%, p_day=0.015, OOS-stable). |
+| D3 | **GO/CONFIRM monitor-only** — SLOPE-FILTER (+0.342%, p_tok=0.30) and OVERSOLD-SHORT (+0.152%, p_tok=0.19) are cluster-ns harm CANDIDATES; no gate change before Nov 6; graduate to re-audit with 40+ days. Recorded in registry. |
+| D4 | **GO (a)+(b)** — durable pipeline.log retention shipped (was: no rotator anywhere, archives gone, Oct 4–10 tail permanently unverifiable) + gate_shadow capture-rate health metric shipped (alert <90%/24h + recorder-silent-6h; was: capture gaps silent for days, twice). |
+| D5 | **GO** — t5_shadow would_pnl join RETIRED (2.3% closure coverage AND join-selected = verdict-unusable); decision log kept for signal-side analysis; redesign marker left for R1 extended closer. |
+| D6 | **GO** — v2 package confirmed fit for external hand-off as-is (correction ledger documents every v1→v2 delta; own-conclusions verdict gated v1). |
+
+### Evidence (parent-verified this session, not from the brief)
+- Headline numbers re-derived directly from `analysis/exports/v2_gate_summary.tsv`: PUMP-CHAIN-RSI-MAX n=1,087 ex4h −0.1357 p_tok=0.0108 p_day=0.0396 solo 76.4% (WORKS); PUMP-CHAIN-VEL n=144 ex4h −0.5493 p_day=0.0147 (WORKS); CONTINUUM-BLOCK/BULL/PRESERVE-SPIKE solo 13.0/17.2/19.2% (FULLY REDUNDANT); SLOPE-FILTER p_tok=0.299 / OVERSOLD-SHORT p_tok=0.188 (cluster-ns); zero demonstrated harmful gates; 26 no-edge gates incl. CONFLUENCE-GATE-BLOCK n=4,120 −0.040 and LONG-NEUTRAL-CHOP n=1,200 +0.014 (wash).
+- Retention gap confirmed on disk: 455MB live pipeline.log, zero archives, zero rotator.
+- Live baselines (PG brain, self-queried): 24h 58T +$0.22 56.9% WR · 7d 181T −$0.16 57.5% WR.
+- Checkpoint: `automation/ceo/checkpoints/20261030T202502Z-decision.md`.
+
+### Work items dispatched (fresh single-goal subagents)
+1. **result-1 (D4 observability)** — `scripts/log_rotate_pipeline.py` (200MB rename+gzip → logs/archive/, 30d prune, gate_shadow flush-before-rotate, --selftest PASS) + `config/pipeline-log-rotate.{service,timer}` (daily timer ACTIVE, installed via workspace installer) ; live 456MB log rotated once during ship (41MB gz, integrity verified, appends resumed); `scripts/gate_shadow_health.py` (24h capture ratio vs log ground truth, WARN <90% or recorder-silent-6h, 6h-deduped error_alerts.md write) wired into `scripts/pipeline_watchdog.py` via existing hermes-watchdog.timer. Result: `automation/ceo/checkpoints/20261030T202502Z-result-1.md`.
+2. **result-2 (D5 t5_shadow)** — `scripts/t5_shadow.py`: `--close` join deleted → no-op with retirement message (verified: would_pnl non-null 974 before == 974 after, zero writes; --decide intact; timer left in place, harmless). Result: `automation/ceo/checkpoints/20261030T202502Z-result-2.md`.
+
+### Metric checkpoint (measure in 7d, by 2026-11-06)
+- gate_shadow capture ratio daily ≥0.90 (`python3 scripts/gate_shadow_health.py`) — first 24h after rotation undercounts log side (fresh log window; fails SAFE optimistic, then truthful).
+- logs/archive/ accumulates gzip archives; no pipeline.log exceeds 200MB for more than ~1d.
+- t5_shadow would_pnl non-null count frozen at 974 while decisions keep accruing.
+- Live PnL/WR no step-change vs baseline (24h +$0.22/56.9%, 7d −$0.16/57.5% at ship) — all shipped work is zero trading-path.
+- Nov 6 re-audit consumes the removal queue + monitor-only candidates with ≥40d data.
+
+### Sideways finds
+- Same unbounded-log class: `15m_regime.log` (108MB) and `signal-compactor.log` (187MB) — extend rotation script to a file list at next touch (D4c candidate, no action this run).
+- Post-rotation capture metric is optimistic for up to 24h (log window shorter than DB window; capped at 1.0, fails safe). Upgrade path: also scan logs/archive/ for the window.
+
+— CEO (deep run 20261030T202502Z)

@@ -25,7 +25,7 @@
 | LONG-NEUTRAL-CHOP | 2026-10-11 04:15 | live-n (blocked-cohort unmeasured at ship) | — | 2026-10-12 | **Attacks best cohort** (chop-LONG +$3.28 / WR 53.7%). R1 shadow first-target. Remove Nov 6 if blocked cohort wins |
 | SHORT-RSI-HARD-FLOOR | 2026-10-12 00:33 (v1); value history: 45→35 (CEO 10-13) → **45 reverted 10-18** | trade-level | chop&lt;45: WR 36% −$4.56 (30d); trend side ≈ neutral | 2026-10-18 | **Stays for chop** (D6). PUMP_CHAIN sub-floor also 45 (reverted 10-21). Bear-structure relax = proposal only |
 | PENALTY-BLOCK | 2026-10-06 | trade-level | 1.2k lines / 6d | 2026-10-09 | Penalty-gated execution fix; live in decider_run |
-| PUMP-CHAIN-VEL (deadband −0.3%) | filter pre-Aug; deadband 2026-10-12 (D4) | bug-fix class | SHORT side deadband since Aug 16; LONG side founding claim falsified (AIXBT +4.59% at vel −0.21%) | 2026-10-12 | Both sides now −0.3% measurement floor, not edge claim |
+| PUMP-CHAIN-VEL (deadband −0.3%) | filter pre-Aug; deadband 2026-10-12 (D4) | shadow (validated reform) | POST-DEADBAND n=144 eps, ex4h −0.549%, p_day=0.015, OOS-stable (v2 deep dive) | 2026-10-30 | **Deadband self-validated** (CEO D2, 2026-10-30): remaining blocks are genuine decliners that underperform market strongly. Evidence: analysis/2026-10-30_shadow-redundancy-deepdive.md |
 | CONFLUENCE-GATE | long-standing | shadow | conf 80-89 ex4h −0.27% n=301 (expiry_shadow early) | 2026-10-09 | Highest-frequency block (~473/6h). Do NOT weaken (only gate proven helping per shadow-registry header) |
 | BTC-CHOP-GATE | ~2026-10-04 (metric redefined 30m→5m slope) | counterfactual | 14 lines / 6h (D4) | 2026-10-09 | Threshold 0.05 (post b5006cd8 ratify) |
 | HALL-SHAME (30d WR floor) | long-standing | trade-level | — | 2026-10-12 | Momentum exemption = proposal only (signal-starvation P1), not shipped |
@@ -39,6 +39,25 @@ Per CEO D2: any gate added after 2026-10-12 must accrue **14d shadow** before tr
 |------|-----------|-------------------|--------|
 | pump-chain+ LONG HIGH block | 2026-10-21 03:38 | 2026-11-04 | Collecting (commit c9092aea — committed 2026-10-21 03:37:59 UTC; registry had wrong day, fixed brain_auditor #76) |
 | CHASE_RATIO_SHADOW (comment corrected 14d/Oct 27) | pre-2026-10-12 | 2026-10-27 | True, thresholds unchanged |
+
+## Nov 6 removal-test queue (ratified 2026-10-30, CEO deep run 20261030T202502Z)
+
+26d cluster-robust evidence (v2 shadow redundancy deep dive, analysis/2026-10-30_shadow-redundancy-deepdive.md): no economic edge AND another gate almost always blocks the same token+direction anyway. Removal predicted ≈ zero flow change. **No removal ships before the Nov 6 re-audit + CEO sign-off.**
+
+| Gate | eps (26d) | solo10 | ex4h | Note |
+|------|-----------|--------|------|------|
+| CONTINUUM-BLOCK | 1,984 | 13% | −0.043 | Fully redundant; robustly low solo across ±5/±10/±15min |
+| CONTINUUM-BULL | 1,650 | 17% | +0.009 | Fully redundant (registry row above) |
+| PRESERVE-SPIKE-BLOCK | 271 | 19% | +0.067 | Fully redundant; solo resolved 24.66%→19% with reparse frame |
+
+## Monitor-only harm candidates (no gate change before Nov 6)
+
+Cluster-ns under the Oct-9 claim-hygiene standard — sign-consistent but not demonstrated. Graduate to the Nov 6 re-audit with 40+ days (CEO D3, 2026-10-30).
+
+| Gate | eps (26d) | ex4h | p_w | p_tok | Note |
+|------|-----------|------|-----|-------|------|
+| SLOPE-FILTER | 287 | +0.342% | 0.0003 | 0.30 | Harm candidate only |
+| OVERSOLD-SHORT | 649 | +0.152% | 0.003 | 0.19 | OOS-stable (+0.171/+0.141), cluster-ns |
 
 ## Rules for editors
 

@@ -313,6 +313,18 @@ def check_db_connections():
     return result
 
 
+def check_gate_shadow_capture():
+    """D4b (CEO 2026-10-30): gate_shadow recorder capture-rate vs pipeline.log
+    ground truth. WARNs on ratio <0.90 or recorder silent while gate lines
+    exist. gate_shadow_health also appends to error_alerts.md itself
+    (6h-deduped); the returned status flows into the normal alerts.json path."""
+    try:
+        import gate_shadow_health
+        return gate_shadow_health.check()
+    except Exception as e:
+        return {'status': 'warning', 'message': f'gate_shadow health check error: {e}'}
+
+
 def main():
     log('Running pipeline health checks...')
 
@@ -325,6 +337,7 @@ def main():
         'syntax': check_syntax_errors(),
         'locks': check_stale_locks(),
         'db': check_db_connections(),
+        'gate_shadow': check_gate_shadow_capture(),
     }
 
     # Determine overall status
