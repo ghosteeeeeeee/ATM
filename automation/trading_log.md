@@ -18037,3 +18037,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - jup_yolo_mirrored deteriorating: 24h 14T 42.9% '-$0.68' (worst signal), 7d 14T '-$0.68' — if 7d stays red AND HIGH/NORMAL regimes accumulate n, block HIGH+NORMAL via volatility_gate_v2 (wins EXTREME so no full kill)
 - 24h GREEN '+$0.13' but cooling fast (was +0.34 at 13:47); 7d RED '-$0.37'
+
+## [2026-10-30 15:50] Hourly Analysis
+
+**Trades:** 5 closed (5 wins, 0 losses)
+**PnL:** $+0.49 (WR: 58.3% 24h) | 24h 48T 28W 58.3% '+$0.61' GREEN recovering | 7d 168T 58.9% '+$0.37' GREEN (flipped from -0.37) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: all 5 winners, MAE avg 0.21% — 4/5 under 0.5% adverse (BTC 0.001, ETH 0.061, HYPE 0.129, HYPER 0.235, SOL 0.612) — clean entries
+- Kill check: no n>=3 0%-WR signal last hour (5/5 wins); jup_yolo_mirrored 24h 17T 52.9% '-$0.46' worst net but just went 4W this hour + 14d 55.6% — watch, no trigger
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 6/48 = 12.5% (<40%) — dominant close = profit-monster-trail (24T '+$1.32'); worst avg = stale_exit (1T '-$0.28')
+- Boost: volume-buildup- 12T 75% '+$0.18' 10 tokens meets 24h bars BUT 14d 49T 61.2% '-$0.42' + already 1.0→1.2 HOLD; pump-chain+ meets bars BUT 14d 39T 41.0% '-$1.16' + 1.4 ceiling HOLD
+- Neg streak: 13h -0.44, 14h -0.04, 15h +0.28 — broke (green)
+- Frequency 5/hr — under overtrading threshold (20/hr)
+- 2 open: SOL/BTC jup_yolo_mirrored LONG
+- Storm readiness: window-min +0.03% / at-run +0.64% (|x|<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored 24h '-$0.46' still worst net signal despite 4W hour — if 7d stays negative and HIGH/NORMAL regime n accumulates, block those regimes via volatility_gate_v2 (wins EXTREME, no full kill)
+- 7d just flipped GREEN '+$0.37' — first green 7d in days; keep watching
