@@ -17990,3 +17990,27 @@ Final set: ['GRASS']
 **Open Questions:**
 - volume-buildup- 14d net '-$0.52' persists despite 24h green — if 7d stays negative through weekend, push CEO on NORMAL volatility_gate multiplier=0
 - 24h GREEN '+$0.83' at 62.8% WR; 7d nearly flat '-$0.04'
+
+## [2026-10-30 13:47] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses)
+**PnL:** $-0.32 (WR: 58.7% 24h) | 24h 46T 27W 58.7% '+$0.34' GREEN (cooled from +0.83) | 7d 166T 57.3% '-$0.14' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 2 winners ZORA/BANANA volume-buildup- SHORT profit-monster-trail +1.03%/+1.44%; losses SOL jup_yolo atr_sl_hit -5.93% and ETH jup_yolo stale_exit -6.25% — both jup_yolo_mirrored LONG, isolated pair not a kill pattern
+- Kill check: no n>=3 0%-WR signal last hour (jup_yolo 11T 24h at 54.5% WR, not 0%)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 6/46 = 13.0% (<40%) — SL not tight; dominant close = profit-monster-trail (21T '+$1.05'); worst avg = stale_exit (2T '-$0.43')
+- Boost: volume-buildup- 13T 76.9% '+$0.22' 11 tokens meets 24h bars BUT 14d net '-$0.52' + already boosted 1.0→1.2 — HOLD. pump-chain+ 6T 66.7% '+$0.26' meets bars BUT 14d 41.0% '-$1.16' + 1.4 ceiling — HOLD
+- Neg streak: 09h +0.06, 10h +0.07, 11h +0.11, 13h -0.32 — single red hour, no 3-consecutive
+- Frequency 4/hr — under overtrading threshold (20/hr)
+- 2 open: HYPE/BTC jup_yolo_mirrored LONG
+- Storm readiness: window-min -0.42% / at-run -0.34% (|x|<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored 24h worst net signal '-$0.31' (11T 54.5%) — watch; if 7d stays negative, candidate for confidence-weight reduce (non-locked)
+- volume-buildup- 14d NORMAL-regime bleed persists — if 7d stays negative, push CEO on NORMAL volatility_gate multiplier=0
+- 24h GREEN '+$0.34' at 58.7% WR (cooled from +0.83); 7d still RED '-$0.14'
