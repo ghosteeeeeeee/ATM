@@ -1,90 +1,98 @@
 {
-  "timestamp": "2026-10-30T04:46:34Z",
-  "run": "#201",
-  "session_lock": "absent — free to act",
-  "trade_summary_24h": {
-    "trades": 23,
-    "wins": 14,
-    "wr": 60.9,
-    "pnl": 0.55,
-    "note": "GREEN. CRV grind-breakout- +0.75 (rr_engine_trail, RSI 42.9) = mid-band fade template. Watchdog deep-analysis pattern confirmed in live book."
-  },
-  "trade_summary_7d": {
-    "trades": 145,
-    "wr": 55.9,
-    "pnl": -0.22,
-    "trail_family": "81T 79.0% +3.78 (profit-monster-trail 55T 96.4% +2.95 + ugb_pt 23T 69.6% +0.83 + rr_engine_trail 2T 100% +1.09)",
-    "chop_exits": "21T 0.0% -2.70 (atr_sl 13T -1.52 + hard_max 8T -1.18)",
-    "armed_vs_unarmed_14d": "armed 153T 78.4% +7.00 vs unarmed 140T 11.4% -11.16"
-  },
-  "chop_bleed_kpi": {
-    "7d_dollar_share": "94.8% (52/60 losers never armed, -5.44 of -5.74)",
-    "status": "ABOVE 92% tripwire — run 2 of potential new streak (#200 was run 1 at 95.0%)",
-    "root_cause": "never-armed chop entries — owned by MFE-CUT/TAT/CONF_FLOOR stack, not a new lever",
-    "action": "monitor; #194 0.75x size proposal remains CEO-queued with VETO recommendation (plain-marker form structurally inert, #196/#195)"
-  },
-  "shadow_analysis": {
-    "contrarian": "join RE-RAN 04:30Z — pump-chain- flip 64.6% (226/350 decided) STANDS; btc-pump-rider+ 26.7% (136/510) = do NOT flip; overall 42.0% n=861. Oct-27 PROMOTE verified.",
-    "oscillator": "FROZEN+ARCHIVED — no action",
-    "wyckoff": "PENDING JOIN — no outcome column",
-    "floor_admit": "JOIN SHIPPED — floor_only 47.9% vs always_admit 38.4%, fisher p=0.138 COLLECT",
-    "rr_shadow": "ORPHANED — do not cite",
-    "shadow_trader": "37808 signals; exit A/B trail-or-nothing HOLDS (pm_trail +5780 vs hard_max -6897). CONFLUENCE-EXPIRY blocked 13873 at 48% would-win = largest gate."
-  },
-  "losing_autopsy_48h": {
-    "n": 18,
-    "never_adverse": 4,
-    "recovered": 12,
-    "never": 2,
-    "never_list": "BTC continuum-trend- SHORT cut-loser -0.18; NXPC volume-buildup- SHORT cut-loser -0.14",
-    "verdict": "WRONG-SIDE REFUTED 126th consecutive run (#61 p=0.116, #84 t=-0.04 stand)"
-  },
-  "rsi_band_analysis_14d": {
-    "finding": "Watchdog 'overbought longs >=70 bleed' is PARTIALLY WRONG at 14d: 65-75 LONG = 43T +0.44 55.8% (POSITIVE, bb-squeeze+ drives it 17T +0.43). Real bleed = 45-55 LONG 62T -2.30 37.1%.",
-    "block_counterfactual_45_55_long": "7d Fisher p=0.62 FAIL; 30d p=0.34 FAIL; halves sign-flip (old +1.11, new -2.29) — ALREADY OWNED by eval-midband-long-4564 (self_learner, deadline 11-03). Do NOT re-propose.",
-    "money_band": "35-45 SHORT 40T 55.0% +0.59 — mid-band fade shorts, confirmed template (CRV/YGG).",
-    "action": "0 config changes — nothing passes significance bars"
-  },
-  "drift_findings": [
-    "pump-chain+ EXTREME 14d drift WORSENED to -0.88 (31T 38.7%) — was -0.39 at #199. 30d still +2.58. Already at 1.25x via WINNER_CELLS_VALIDATED. T sign-off stands — do NOT revert. 11-10 bar (>=+$1.00 delta) will judge.",
-    "Uncommitted decider_run.py fix found in working tree (ctx.get AttributeError guard, string-ctx crash class F3-1) — COMMITTED this run. Author unknown (not in changes_log); fix is defensive isinstance guards, compile PASS, zero trading behavior.",
-    "bb-squeeze candidate files auto-regenerated 03:20Z (backtest stat refresh only) — swept into same commit."
-  ],
-  "changes_from_last_run": {
-    "#200_momentum_time_stop": "REJECTED-WITH-DATA stands (0/8 cells). Both unscoped and scoped versions closed — do not re-propose.",
-    "#200_winner_cell_traffic": "CORRECT-BY-TRAFFIC verified — post-ship opens correctly no-matched (CRV vb- EXTREME, COMP r2v2-long3 HIGH). First-fire verify still pending actual validated-cell traffic.",
-    "#197_mfe_mae_stamp": "VERIFIED — 7d closed 146/146 with mfe_pct+mae_pct (100% coverage). size_mult stamp 22/23 in 24h.",
-    "#196_chop_bleed_checkpoint": "Dispositioned — breach #2 presented, VETO on plain-marker form. Still CEO-queued.",
-    "#136_bypass_headline": "BYPASS still passes all bars — CEO GO settled (universal post-arm floor D=0.20)."
-  },
-  "config_changes_applied": [
-    "COMMITTED: scripts/decider_run.py — ctx.get AttributeError guard (isinstance checks on market/btc_continuum) + continuum dict→str formatting for _cont_str. Defensive fix, zero trading behavior. Plus bb-squeeze candidate backtest stat refresh.",
-    "0 trading-constant changes (hermes_constants.py EMPTY diff vs HEAD, CEO_PROTECTED untouched)"
-  ],
-  "creative_improvements": [
-    {
-      "idea": "Clone-hunt: gate_shadow blocked setups matching bb-squeeze+ NORMAL winner profile (recovering 75% WR week of Oct 26)",
-      "rationale": "bb-squeeze+ NORMAL is the strongest recovering winner cell (20T 75% +0.45 this week, 14d 30T 70% +0.64). CONFLUENCE-EXPIRY blocks 13873 signals at 48% would-win — some blocked setups likely match this profile. Mining them = free offense without config risk.",
-      "expected_impact": "Identify 1-3 blocked signal combos worth a shadow stamp",
-      "category": "clone-hunt",
-      "status": "proposed",
-      "risk": "low",
-      "threshold": "If >=5 blocked setups match profile and counterfactual-walk candles show net>+$1.00 with fk<20%, propose co-signal chain shadow stamp"
+    "timestamp": "2026-10-30T08:30:00Z",
+    "run": 202,
+    "session_lock": "absent",
+    "trade_summary_24h": {
+        "trades": 33,
+        "win_rate": 60.6,
+        "pnl_usdt": 0.60,
+        "status": "GREEN"
     },
-    {
-      "idea": "pump-chain+ EXTREME auto-revert trigger at 11-10 deadline",
-      "rationale": "14d drift worsened -0.39→-0.88 while receiving 1.25x. Pre-register: if 14d delta still negative at 11-10 disposition, auto-revert the 1.25x for this cell (T sign-off required but trigger removes discretion).",
-      "expected_impact": "Prevents amplifying a decaying cell into the ground",
-      "category": "risk-control",
-      "status": "suggested",
-      "risk": "low"
-    }
-  ],
-  "next_actions": [
-    "Monitor chop-bleed tripwire — run 3 of streak next run; if >=92% again, present #194 0.75x WITH fresh #195 inertness measurement",
-    "CAKE pump-chain+ LONG open (entry RSI 70.83 EXTREME) — overbought long pattern, SL 1.871 TP 1.932, monitor trail arm",
-    "bb-squeeze+ first-fire verify still pending validated-cell traffic",
-    "eval-midband-long-4564 due 11-03 (self_learner owns)",
-    "AMPLIFY weekly: all n>=10 validated cells already at 1.25x; clone-hunt proposal above = this week's offense"
-  ]
+    "trade_summary_7d": {
+        "trades": 154,
+        "win_rate": 55.8,
+        "pnl_usdt": -0.20
+    },
+    "chop_bleed_run3": {
+        "measured": "83.9% (52/62 losers never armed, -5.42 of -5.83)",
+        "threshold": ">=92%",
+        "breached": false,
+        "streak_status": "BROKEN",
+        "checkpoint_dispositioned": "chop-bleed-streak-run3 -> done, NO BREACH",
+        "note": "Was 94.8% at run #201. Stack (MFE-CUT/TAT/CONF_FLOOR) reducing never-armed chop entries. No #194 size proposal needed."
+    },
+    "mandate_trail_vs_chop_14d": {
+        "armed": "157T 79.0% +$7.78",
+        "unarmed": "141T 11.3% -$11.27",
+        "trail_family": "profit-monster-trail 97T 93.8% +$4.96 vs hard_max_loss 27T 0% -$3.54",
+        "verdict": "TREND FOLLOWING EDGE INTACT"
+    },
+    "contrarian_join": {
+        "re_run": true,
+        "joinable": 863,
+        "pump_chain_minus_flip_wr": "64.6% (226/350)",
+        "btc_pump_rider_plus_flip_wr": "26.7% (136/512)",
+        "overall_flip_wr": "42.0% (362/861)",
+        "verdict": "Oct-27 PROMOTE STANDS. pc- fade is live and working. rider+ flip REFUTED."
+    },
+    "bug_070_verification": {
+        "fix_landed": "2026-10-30 05:24 UTC (commit b75d2f63)",
+        "finding": "Winner-cell multipliers were DISCARDED by brain.py before fix. CAKE pre-fix showed mult=1.0 despite pump-chain+ being in WINNER_CELLS_VALIDATED. Post-fix trades stamp size_mult correctly (BTC continuum-trend- shows mult=1.5).",
+        "impact": "1.25x winner-cell boost was a NO-OP until today. Now live. Needs n>=20 post-fix winner-cell trades to verify effect.",
+        "pre_register": "At n>=20 winner-cell trades post-fix: compare PnL vs pre-fix no-op baseline. If boost hurts, revert WINNER_CELLS_VALIDATED to empty."
+    },
+    "pump_chain_plus_extreme_drift": {
+        "14d": "32T -$0.75 WR 43.8%",
+        "7d": "24T -$0.04 WR 58.3%",
+        "30d": "83T +$2.73 WR 43.4%",
+        "since_oct26": "21T -$0.03",
+        "verdict": "Drift real but 30d still positive. 11-10 bar (>=+$1.00 delta) will judge. Do NOT revert unilaterally."
+    },
+    "open_trades": {
+        "count": 5,
+        "jup_yolo_mirrored": "3 LONG (SOL/HYPE/ETH) all EXTREME, all flat, 0-0.4h. New system, monitor.",
+        "volume_buildup_minus": "2 SHORT (IO/ZORA) both EXTREME, flat, 0.5-0.8h.",
+        "note": "All bracketed. All flat. No action needed."
+    },
+    "losing_autopsy_48h": {
+        "total_losers": 19,
+        "never_adverse": 5,
+        "recovered_after_adverse": 12,
+        "never_traded_back": 2,
+        "never_traded_back_detail": "BTC continuum-trend- SHORT cut-loser -0.18, NXPC volume-buildup- SHORT cut-loser -0.14",
+        "wrong_side_verdict": "REFUTED 127th consecutive run (#61 p=0.116, #84 t=-0.04 stand)"
+    },
+    "shadow_analysis": {
+        "contrarian": "USEFUL — flip-WR 64.6% pc-, 26.7% rider+. Join fresh (863 joinable).",
+        "oscillator": "FROZEN — archived 2026-10-27, no live data.",
+        "floor_admit": "JOIN SHIPPED — directional yes p=0.138 not yet significant.",
+        "wyckoff": "PENDING JOIN — 345 rows, no outcome column.",
+        "rr_shadow": "ORPHANED — no producer script.",
+        "overall": "2/5 useful (contrarian + UGB). Shadow trader report: CONFLUENCE-EXPIRY blocks 13935 at 48% would-win."
+    },
+    "config_changes_applied": [],
+    "changes_from_last_run": [
+        {
+            "change": "decider_run.py ctx.get AttributeError guard (commit 7f3c6c4a)",
+            "status": "VERIFIED — compiles, no regressions in 4h since commit"
+        },
+        {
+            "change": "brain.py size_mult stamping (commit earlier)",
+            "status": "VERIFIED — mult values appearing in _signal_metadata"
+        }
+    ],
+    "in_flight_offense": {
+        "fade_ctx_exempt": "11-10 pending",
+        "winner_cell_size_125": "11-10 pending — NOW UNBLOCKED by BUG-070 fix",
+        "bb_squeeze_hml_entry_profile": "done, NO-CHANGE",
+        "eval_midband_long_4564": "11-03 pending",
+        "note": "Weekly AMPLIFY due Mon 11-02. This is intraday run — full AMPLIFY not required."
+    },
+    "next_actions": [
+        "Monitor jup_yolo_mirrored: 3 open LONGs in EXTREME. Pre-register: n>=10 AND WR<40% AND PnL<0 -> propose regime gate.",
+        "BUG-070 verification: at n>=20 post-fix winner-cell trades, compare PnL vs pre-fix baseline.",
+        "pump-chain+ EXTREME 11-10 bar approaching — 30d still +$2.73, will judge.",
+        "Storm-confl-waiver: 2/3 packets, one more positive storm flips enforce bar (~11-01).",
+        "Weekly AMPLIFY due Mon 11-02 — rank winner cells, emit >=1 proposal."
+    ]
 }

@@ -9948,5 +9948,23 @@
     "category": "risk-control",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-30T08:30:00Z",
+    "idea": "BUG-070 winner-cell boost verification ledger — pre-register n>=20 post-fix winner-cell trades comparison",
+    "rationale": "Winner-cell multipliers were DISCARDED by brain.py until 2026-10-30 05:24 UTC (commit b75d2f63). The 1.25x boost on validated cells was a no-op. Now live. Need to verify it actually helps before trusting it.",
+    "expected_impact": "If boost works: +10-20% PnL on winner-cell trades. If it hurts: revert WINNER_CELLS_VALIDATED to empty.",
+    "category": "verification",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-30T08:30:00Z",
+    "idea": "jup_yolo_mirrored regime gate candidate — monitor until n>=10",
+    "rationale": "New mirror-trading system (CEO 2026-10-09). 3 closed trades: 33% WR, -$0.19. All 3 open are EXTREME regime. Too small to act on but pattern值得关注. Pre-register trigger for regime gate.",
+    "expected_impact": "If EXTREME is the problem: block EXTREME regime for jup_yolo_mirrored, preserve other regimes.",
+    "category": "entry sniper",
+    "status": "monitoring",
+    "risk": "low"
   }
 ]
