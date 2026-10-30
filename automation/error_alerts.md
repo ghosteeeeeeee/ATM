@@ -2376,3 +2376,7 @@
 
 ## Error Alerts — 2026-10-30 16:41 UTC
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-10-30 17:41 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: [brain.py] TOK is_live_trading_enabled(is_manual=False) = True`

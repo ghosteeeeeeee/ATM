@@ -29,3 +29,6 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-10-30 06:45 UTC] auto_1hr: NO CONFIG CHANGE — 4T 2W2L '+$0.05' (ADA pump-chain+ trail +$0.04, HYPE jup_yolo trail +$0.02, BTC/ENS manual flat) | 24h 27T 63.0% '+$0.77' GREEN | kill none | inversion 0 | boost pump-chain+ 1.4 ceiling HOLD | no storm (window-min -0.21%)
+
+## TEAM UPDATES
+- [2026-10-30 17:43 UTC] auto_1hr: NO CONFIG CHANGE — 2T 0W2L '-$0.13' | 24h 49T 59.2% '+$0.49' GREEN | 7d 174T '+$0.16' GREEN | kill none | inversion 0 | boost none | no storm (window-min -0.51% / at-run -0.15%)

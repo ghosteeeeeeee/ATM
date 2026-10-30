@@ -18084,3 +18084,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - jup_yolo_mirrored 24h worst net '-$0.37' (20T 60.0%) — watch; if 7d stays red and HIGH/NORMAL regime n accumulates, block those regimes via volatility_gate_v2 (wins in EXTREME → no full kill)
 - BTC flat all hour (77.4k–77.7k) after multi-day slide from ~81k — no storm per gate, but monitor for fresh 60m dump
+
+## [2026-10-30 17:43] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.13 (WR: 59.2% 24h) | 24h 49T 29W 59.2% '+$0.49' GREEN | 7d 174T 58.6% '+$0.16' GREEN | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: losses were r2v2-long3 PONS cut-loser -2.92% acct (normal leverage-scale loss) and GMX trail -0.41% — no extreme-adverse entries
+- Kill check: r2v2-long3 2T 0% last hour (n=2 < 3 trigger); 24h 3T 0% '-$0.13' — 14d regime shows NORMAL 5T 80% '+$0.19' wins and EXTREME 12T 50% → wins a regime, would never full-kill anyway. WATCH
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 6/49 = 12.2% (<40%) — dominant close = profit-monster-trail (26T '+$1.33'); worst avg = stale_exit (1T '-$0.28')
+- Boost: volume-buildup- 13T 69.2% meets n+WR but net '+$0.01' < $0.05 bar FAIL; jup_yolo 20T 60% but '-$0.37' FAIL; no other n>=5 signal
+- Neg streak: 14h -0.04, 15h +0.28, 16h -0.21 — no 3 consecutive red
+- Frequency 2/hr — far under 20/hr
+- 3 open: ALT pump-chain- LONG, SOL/BTC jup_yolo_mirrored LONG
+- Storm readiness: window-min -0.51% / at-run -0.15% (both within gate) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- r2v2-long3 24h 3T 0W '-$0.13' — if it hits 3+ trades in a single hour at 0% again, run regime kill query; currently NORMAL regime wins (80%) so no block
+- jup_yolo_mirrored still 24h worst net '-$0.37' (20T 60%); HIGH regime 14d 7T 57% '-$0.24' — if HIGH n grows with red, block HIGH via volatility_gate_v2 (EXTREME wins 66.7%)
