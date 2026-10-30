@@ -17967,3 +17967,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - volume-buildup- NORMAL-regime bleed ('-$0.69' 14d) — if 7d stays negative through weekend, push CEO on NORMAL volatility_gate multiplier=0
 - 24h GREEN '+$0.65' at 60.5% WR; 7d still RED '-$0.15'
+
+## [2026-10-30 11:45] Hourly Analysis
+
+**Trades:** 5 closed (4 wins, 1 loss)
+**PnL:** $+0.18 (WR: 62.8% 24h) | 24h 43T 27W 62.8% '+$0.83' GREEN | 7d 162T 56.8% '-$0.04' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 4 winners all profit-monster-trail/ugb_pt, positive acct moves +1.21% to +3.63%; single loss LINK volume-buildup- SHORT cut-loser-CL-T1 -5.32% — isolated
+- Kill check: no n>=3 0%-WR signal last hour
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 4/43 = 9.3% (<40%) — SL not tight; dominant close = profit-monster-trail (19T '+$0.93')
+- Boost: pump-chain+ 7T 71.4% '+$0.36' 7 tokens meets 24h bars BUT 14d 39T 41.0% '-$1.16' RED + already at 1.4 ceiling — HOLD. volume-buildup- 10T 70% '+$0.08' 10 tokens meets 24h bars BUT 14d net '-$0.52' + already 1.0→1.2 — HOLD
+- Neg streak: 09h +0.06, 10h +0.07, 11h +0.15 — green, no streak
+- Frequency 5/hr — under overtrading threshold (20/hr)
+- 3 open: INJ volume-buildup- SHORT, ETH/SOL jup_yolo_mirrored LONG
+- Storm readiness: window-min -0.21% / at-run -0.21% (|x|<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- 14d net '-$0.52' persists despite 24h green — if 7d stays negative through weekend, push CEO on NORMAL volatility_gate multiplier=0
+- 24h GREEN '+$0.83' at 62.8% WR; 7d nearly flat '-$0.04'
