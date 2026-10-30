@@ -624,9 +624,11 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     if signal_metadata and isinstance(signal_metadata, dict):
         _cluster_size = int(signal_metadata.get('cluster_size', 1) or 1)
     _size_mult = 1.0
+    _cluster_mult = 1.0   # brain-owned input only (kept separate — see BUG-070 honored path)
     if _cluster_size > 1:
         from hermes_constants import HL_COPY_CLUSTER_SIZE_MULT
         _size_mult = 1.0 + (_cluster_size - 1) * HL_COPY_CLUSTER_SIZE_MULT
+        _cluster_mult = _size_mult
         print(f"[brain.py] 📊 Cluster bonus: {_cluster_size} traders → size_mult={_size_mult:.2f}")
 
     # Apply favorites/losers multiplier (direction-specific)
@@ -664,7 +666,20 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                 _base_size = _base_size * _sr.get('size_multiplier', 0.3)
     except Exception:
         pass
-    _precomputed_size = _base_size * _size_mult
+    # BUG-070 FIX (2026-10-30, main-session): HONOR the caller's size argument.
+    # Previously brain DISCARDED amount_usdt and rebuilt base×(cluster×favorite),
+    # silently killing every decider-side multiplier — the CEO-labeled winner-cell
+    # 1.25x logged 'x1.25' while HL received $11.11 (CAKE #16535: decider arg
+    # 12.375, actual 11.1097), amplitude likewise. The decider has already applied
+    # dynamic base + size-reduce + favorite + amplitude + winner-cell + HL_MIN
+    # floor; manual-trade skill says AMOUNT *is* the size. Apply only the cluster
+    # bonus (brain's own metadata input). Fallback (no/short arg) keeps legacy math.
+    if amount_usdt and float(amount_usdt) >= HL_MIN_NOTIONAL_USDT:
+        _precomputed_size = float(amount_usdt) * _cluster_mult
+        print(f"[brain.py] ⚖️ size honored from arg: ${float(amount_usdt):.2f} × cluster {_cluster_mult:.2f} "
+              f"→ ${_precomputed_size:.2f} (was: discarded, base×mults)")
+    else:
+        _precomputed_size = _base_size * _size_mult
     # FIX 2026-10-12 (code review RISK 1): this chain bypasses every cap in
     # decider_run (they cap _trade_size, not this override) and relies solely on
     # mirror_open's epsilon gate. Any future multiplier added to _size_mult would

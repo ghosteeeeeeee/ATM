@@ -1299,6 +1299,27 @@
       "found_by": "analysis-subagent",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-070",
+      "title": "brain.py discarded the caller's amount_usdt \u2014 rebuilt base\u00d7(cluster\u00d7favorite), silently killing ALL decider-side size multipliers (winner-cell 1.25x logged 'x1.25' while HL got $11.11; amplitude same)",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/brain.py"
+      ],
+      "symptom": "Decider computes _trade_size = base \u00d7 size-reduce \u00d7 favorite \u00d7 amplitude \u00d7 winner-cell(CEO-labeled 1.25x) \u00d7 zone-adjust, floored at HL_MIN, passes it as `trade add ... AMOUNT` \u2014 brain used the arg only for a precheck + fallback, then `_precomputed_size = _base_size * _size_mult` rebuilt from fresh HL base \u00d7 (cluster \u00d7 favorite). Evidence: CAKE #16535 decider arg 12.375 \u2192 brain mirror_open size_usdt 11.1097 \u2192 DB amount_usdt 11.10 while log said 'x1.25' (2026-10-30 03:48); manual BTC #16538 got 11.79 instead of the skill-specified 11.10. Same class as BUG-068: log claims success, behavior differs.",
+      "root_cause": "brain reclaims sizing authority near HL (historical: size-reduce fix 10-21, RISK-1 cap 10-12) but the amount arg was never wired into _precomputed_size",
+      "fix": "Honor the arg when >= HL_MIN: _precomputed_size = amount_usdt \u00d7 cluster_only (_cluster_mult kept separate from favorite \u2014 favorite/amplitude/winner-cell already in the caller's number; manual skill contract says AMOUNT IS the size). Legacy fallback (no/short arg) unchanged. HL_MIN floor after both paths.",
+      "verified_by": "py_compile + structure read; live verification = next pipeline fill must print '\u2696\ufe0f size honored from arg' and DB amount == decider arg \u00d7 cluster; review+bug_hunter launched",
+      "date_found": "2026-10-30",
+      "date_fixed": "2026-10-30",
+      "found_by": "main-session (tracing T's 'take some longs' manual open)",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-068",
+        "BUG-071"
+      ]
     }
   ],
   "schema": {
