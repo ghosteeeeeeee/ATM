@@ -17898,3 +17898,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - 3 concurrent volume-buildup- SHORTs opened same minute (07:22) — correlated cluster, watch if dump reverses
 - 24h GREEN '+$0.63' at 63% WR holding; 7d still RED '-$0.30'
+
+## [2026-10-30 08:45] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss)
+**PnL:** $+0.03 (WR: 60.6% 24h) | 24h 33T 20W 60.6% '+$0.60' GREEN | 7d 154T '-$0.20' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 3 winners MAE 0.29/0.38/0.74% — SAGA/BANANA low adverse (<0.5%), NXPC 0.74% still trailed to +0.50%; SOL loss MAE 0.83% (atr_sl_hit -4.29% acct, expected at leverage)
+- Kill check: no n>=3 0%-WR signal last hour (volume-buildup- 3/3 wins; jup_yolo_mirrored 1L only)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 3/33 = 9.1% (<40%) — SL not tight; dominant close = profit-monster-trail (13T '+$0.51'); worst = atr_sl_hit (3T '-$0.46')
+- Boost: volume-buildup- meets 24h bars (6T 100%WR '+$0.32' 6 tokens) BUT 14d 46T 63%WR net '-$0.35' and already boosted 1.0→1.2 — HOLD, no 2nd boost on a 14d-negative signal off a thin 24h window
+- Neg streak: hourly 06h -0.01, 07h -0.17, 08h +0.03 — broke, no 3 consecutive negative
+- Frequency 4/hr — under overtrading threshold (20/hr)
+- 5 open: SOL/HYPE/ETH jup_yolo LONG, IO/ZORA volume-buildup- SHORT (cluster watch continues from 07:22 group)
+- Storm readiness: window-min -0.67% / at-run -0.18% (|x|<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- 24h perfect but 14d net -$0.35 — recent green may be regime luck; if 7d stays negative through weekend, consider regime-gate or weight reduce (needs CEO for kill; weight reduce is non-locked)
+- 24h GREEN '+$0.60' at 60.6% WR; 7d still RED '-$0.20'

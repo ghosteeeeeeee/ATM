@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-30T08:11:19.318303+00:00",
+  "timestamp": "2026-10-30T08:41:19.554610+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -12,26 +12,90 @@
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Portfolio heavily short (3 trades)",
-      "detail": "3 short positions. One BTC pump hits all of them.",
+      "title": "Trade cluster: ZORA + ETH",
+      "detail": "Both opened within 19 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: ZORA + HYPE",
+      "detail": "Both opened within 28 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: IO + ETH",
+      "detail": "Both opened within 1 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-004"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: IO + HYPE",
+      "detail": "Both opened within 10 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-005"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: IO + SOL",
+      "detail": "Both opened within 25 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-006"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: ETH + HYPE",
+      "detail": "Both opened within 9 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-007"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: ETH + SOL",
+      "detail": "Both opened within 24 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-008"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: HYPE + SOL",
+      "detail": "Both opened within 15 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-009"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Portfolio heavily long (3 trades)",
+      "detail": "3 long positions. One BTC dump hits all of them.",
+      "auto_executable": false,
+      "id": "steer-010"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "warning",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "FLAT",
     "volume_regime": "LOW",
-    "linreg_alignment": 1.0,
+    "linreg_alignment": 0.75,
     "wyckoff_phase": "MARKDOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 3
+  "open_count": 5
 }

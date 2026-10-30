@@ -2503,6 +2503,56 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         source_parts = sorted(p.strip() for p in _source_clean.split(',') if p.strip())
         combo_key = f"{token.upper()}:{direction.upper()}:{','.join(source_parts)}"
 
+        # FIX (bug_hunter 2026-10-30, MED): resolve the merge-vs-unique-index
+        # boundary race before INSERTing.
+        #   idx_sig_combo_pending = UNIQUE(combo_key) WHERE PENDING AND executed=0
+        #   covers ALL PENDING rows, but the merge SELECT above is gated to a
+        #   5-min window. A same-combo PENDING row older than 5 min is therefore
+        #   INVISIBLE to merge yet still occupies the index → INSERT raises
+        #   'UNIQUE constraint failed: signals.combo_key' → add_signal returns
+        #   None → callers burn bounded retries and can go silent (134× logged
+        #   on the jup mirror alone; hits every signal type).
+        #   The 5-min gate is intentional (see merge comment: a signal that
+        #   expires after 5 min must not contribute to a fresh one) — so the
+        #   correct resolution is to EXPIRE the stale row (same lifecycle the
+        #   compactor applies at staleness=0) and INSERT fresh.
+        #   Reachability: reaching INSERT at all means the merge SELECT found
+        #   no same-token+direction PENDING within 5 min, so a colliding combo
+        #   row is >5 min old UNLESS a concurrent add_signal inserted it
+        #   between our SELECT and INSERT — that race returns None and the
+        #   caller's next attempt merges normally.
+        c.execute('''
+            SELECT id, created_at FROM signals
+            WHERE combo_key = ? AND decision = 'PENDING' AND executed = 0
+            LIMIT 1
+        ''', (combo_key,))
+        _stale_row = c.fetchone()
+        if _stale_row:
+            _stale_id, _stale_created = _stale_row[0], _stale_row[1]
+            _age_s = None
+            try:
+                import datetime as _dt
+                _now = _dt.datetime.utcnow()
+                _created = _dt.datetime.strptime(str(_stale_created), '%Y-%m-%d %H:%M:%S')
+                _age_s = (_now - _created).total_seconds()
+            except Exception:
+                _age_s = None  # unparseable → treat as stale (unblock)
+            if _age_s is None or _age_s > 300:
+                c.execute('''
+                    UPDATE signals
+                    SET decision = 'EXPIRED',
+                        decision_reason = 'combo_key stale: >5min merge window lapsed, superseded by fresh signal',
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ? AND decision = 'PENDING' AND executed = 0
+                ''', (_stale_id,))
+                # fall through to INSERT below
+            else:
+                # concurrent-insert race: row <5min old, merge SELECT missed it
+                # by microseconds — next caller attempt will merge it normally
+                conn.close()
+                print(f'add_signal: concurrent PENDING race on {combo_key} — caller should retry')
+                return None
+
         c.execute('''
             INSERT INTO signals
             (token, direction, signal_type, source, signal_types, confidence, value, price,

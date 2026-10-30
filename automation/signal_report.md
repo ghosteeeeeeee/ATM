@@ -1,15 +1,18 @@
 # Signal Performance Report
-**Generated:** 2026-10-30 02:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-30 08:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,425 | **WR:** 50.9% | **PnL:** -94.20%
+- **Total trades (all time):** 3,439 | **WR:** 50.9% | **PnL:** -95.55%
 - **Date range:** 2026-07-29 → 2026-10-30
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-None found.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| volume-buildup- | SHORT | 4 | 100.0% | +1.11 | 6 | 100.0% | +2.64 | ENABLED |
+| pump-chain+ | LONG | 3 | 66.7% | +0.46 | 6 | 66.7% | +2.49 | ❓ |
 
 ---
 
@@ -23,6 +26,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
+| jup_yolo_mirrored | LONG | 3 | 33.3% | -1.57 | ❓ | Needs more data |
 | bb-squeeze+ | LONG | 4 | 50.0% | -0.86 | ENABLED | Needs more data |
 
 ---
@@ -41,7 +45,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] bb-squeeze+ LONG** — WR=50.0%, PnL=-0.86% over 4 trades. Monitor next cycle.
+1. **[WATCH] jup_yolo_mirrored LONG** — WR=33.3%, PnL=-1.57% over 3 trades. Monitor next cycle.
+2. **[WATCH] bb-squeeze+ LONG** — WR=50.0%, PnL=-0.86% over 4 trades. Monitor next cycle.
+3. **[KEEP] 2 winning combos** — volume-buildup-, pump-chain+. LONG side dominant.
 
 ---
 
@@ -53,6 +59,9 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-10-30 | 5cd1b0f | feat: YOLO mirror cluster bonus — rank higher when 2-3 pros ... |
+| 2026-10-30 | 0daefbb | feat: live leaderboard scraping + full gate clearance — FIRS... |
+| 2026-10-30 | 7f9c680 | feat: Jupiter YOLO leaderboard mirror — follow Solana top wi... |
 | 2026-10-29 | 8196007 | scripts: STORM round (CEO-APPROVE modify 20261029T2130Z, T '... |
 | 2026-10-29 | de2fa6a | scripts: bug_hunter MEDIUM — winner cell 'volume-buildout-' ... |
 | 2026-10-29 | f1fa4ee | scripts: OFFENSE round (CEO consult 20261029T173906Z, T 'pro... |
@@ -60,8 +69,5 @@ None found. Top performers are already enabled.
 | 2026-10-29 | a0989ec | llm: centralize model to ONE place — opencode config (mimo-v... |
 | 2026-10-29 | 2ef737d | scripts: 'where are the shorts' round (CEO consult 20261029T... |
 | 2026-10-27 | 14ddb5c | ctx-gate: deterministic rules conversion IN SHADOW (CEO 2026... |
-| 2026-10-27 | 3d43a36 | watchdog: gate LLM agent on open_count (CEO 2026-10-27 item ... |
-| 2026-10-27 | f96a1e2 | fix: BUG-068 — brain_auditor #188 inverted CHASE_RATIO_SHADO... |
-| 2026-10-27 | 56bd9e8 | brain_auditor: Audit run #188 — CHASE_RATIO reverted on its ... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

@@ -233,7 +233,14 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
             JUP_YOLO_CLUSTER_BONUS_PER_TRADER,
             JUP_YOLO_CLUSTER_MAX_BONUS,
         )
-    except ImportError:
+    # FIX (bug_hunter): ImportError-only caught nothing else — a broken
+    # hermes_constants (SyntaxError/RuntimeError) escaped into monitor_once's
+    # per-position handler as a misleading 'position parse error' and silently
+    # halted ALL mirroring every cycle. Catch Exception: degrade to fallback
+    # with a loud, correctly-attributed warning.
+    except Exception as _e:
+        print(f"[jup_yolo] ⚠️ cluster constants unavailable "
+              f"({type(_e).__name__}: {_e}) — using fallback 3/15")
         JUP_YOLO_CLUSTER_ENABLED = True
         JUP_YOLO_CLUSTER_BONUS_PER_TRADER = 3
         JUP_YOLO_CLUSTER_MAX_BONUS = 15
@@ -419,18 +426,29 @@ def monitor_once() -> int:
     # which 60s window each opened in.
     cluster_map = {}
     for p in positions:
-        _c = p.get('owner', '')
-        _m = p.get('market', '')
-        _s = p.get('side', '')
-        if _c not in wallets or _m not in TRADEABLE_MARKETS:
+        # FIX (bug_hunter): this loop sat OUTSIDE any per-position try —
+        # an unhashable owner/market (list/dict) raised TypeError here,
+        # aborted monitor_once before save_state, and (per L3 history)
+        # caused batch re-fires. One bad record must degrade to "not
+        # clustered", never kill the cycle.
+        try:
+            _c = p.get('owner', '')
+            _m = p.get('market', '')
+            _s = p.get('side', '')
+            if not (isinstance(_c, str) and isinstance(_m, str)):
+                continue
+            if _c not in wallets or _m not in TRADEABLE_MARKETS:
+                continue
+            if _s == 'long':
+                _d = 'LONG'
+            elif _s == 'short':
+                _d = 'SHORT'
+            else:
+                continue
+            cluster_map.setdefault((_m, _d), set()).add(_c)
+        except Exception as _ce:
+            print(f"[jup_yolo] cluster-map record skipped: {type(_ce).__name__}: {_ce}")
             continue
-        if _s == 'long':
-            _d = 'LONG'
-        elif _s == 'short':
-            _d = 'SHORT'
-        else:
-            continue
-        cluster_map.setdefault((_m, _d), set()).add(_c)
 
     for p in positions:
         try:
@@ -458,6 +476,16 @@ def monitor_once() -> int:
                 print(f"[jup_yolo] ⚠️ unknown side '{side}' for {market} — skipping")
                 continue
 
+            # FIX (bug_hunter): non-tradeable markets checked BEFORE the
+            # re-mirror branch — previously ZEC re-mirrored loudly every 15 min
+            # with no action line after it (log said "re-mirror" then did
+            # nothing), burning the re-mirror cadence for a dead path.
+            if market not in TRADEABLE_MARKETS:
+                # not mirrorable — never retry (e.g. blacklisted/removed market)
+                if pid not in seen:
+                    seen_list.append((pid, now_ts))
+                continue
+
             if pid in seen:
                 # RE-EMIT: held position whose signal died at an exec gate
                 # (SKIPPED/EXPIRED) — retry every REEMIT_AFTER_SEC. Without this,
@@ -471,11 +499,6 @@ def monitor_once() -> int:
                 # dead signal + aged → fall through to emit again, refresh ts
                 print(f"[jup_yolo] 🔄 re-mirror {market} {direction} "
                       f"(attempt age {age//60}m, previous signal dead)")
-
-            if market not in TRADEABLE_MARKETS:
-                # not mirrorable — never retry (e.g. removed market)
-                seen_list.append((pid, now_ts))
-                continue
 
             stats = wallets[owner]   # {label, pnl, wr, trades, rank, source}
             leverage = int(p.get('leverage', 0) or 0)
