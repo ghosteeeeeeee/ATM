@@ -2369,3 +2369,10 @@
 - **REPEATED** (7x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK knife floor: N.N < N`
 - **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor: N.N < N`
+
+## Error Alerts — 2026-10-30 15:41 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK mid-band death band: N.N in N-N`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK mid-band death band: N.N in N-N`
+
+## Error Alerts — 2026-10-30 16:41 UTC
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`

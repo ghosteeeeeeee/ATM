@@ -1,29 +1,13 @@
 {
-  "timestamp": "2026-10-30T15:11:22.225255+00:00",
+  "timestamp": "2026-10-30T16:41:22.941323+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: BTC + SOL",
-      "detail": "Both opened within 6 minutes. Correlation risk.",
+      "title": "Trade cluster: GMX + PONS",
+      "detail": "Both opened within 1 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + HYPE",
-      "detail": "Both opened within 28 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: SOL + HYPE",
-      "detail": "Both opened within 22 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -31,23 +15,27 @@
       "title": "Portfolio heavily long (3 trades)",
       "detail": "3 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
-      "id": "steer-004"
+      "id": "steer-002"
     }
   ],
-  "portfolio_health": "warning",
+  "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "ABOVE",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 3
+  "open_count": 3,
+  "deep_analysis": "Portfolio is 3-for-3 LONG (BTC 16572, PONS 16577, SOL 16578 \u2014 GMX 16576 exited -0.14% profit-monster-trail at 16:44Z before this cycle) while every slow regime source points down: btc_15m SHORT_BIAS, btc_4h SHORT_BIAS, trend_quality STRONG_DOWN, 15m aggregate 4L/31S/88N = SHORT_BIAS (16:32Z). Zero short exposure. The 15m flip rate is aggregate 20 flips/24h (p50=20, normal churn) and BTC 24 flips/24h (below the p95=26 anomaly bar), so snapshot direction is cheap prose right now \u2014 the sources themselves disagree: aggregate SHORT_BIAS, BTC scanner NEUTRAL, continuum AT EMA300. Direction steers below are condition-keyed, not standing.\n\nPer-trade thesis check: (1) PONS LONG entered 16:21 at meta_rsi 71.3 while the coin's own 15m regime was already SHORT_BIAS conf 84.3 with -2.19%/16c and coin_tracker trend=BEAR \u2014 we bought an overbought rip inside an active downtrend; the winning side was SHORT (or no trade), and r2v2-long3 at meta_rsi 65+ is 8T/5W/-0.09 over 14d (positive WR, negative dollars = giveback entries). Would not open fresh. (2) SOL LONG entered 16:42 at meta_rsi 50.0 \u2014 7d jup_yolo LONG in the 50-59 band is 7T 2W -0.53, the weakest band; dip-buys below 50 are the winners (<40: 5T 4W +0.22, 40-49: 5T 4W +0.14). (3) BTC LONG entered 15:41 at meta_rsi 35.0 \u2014 that is the one entry on the right side of the data (best band above) against a NEUTRAL BTC with continuum AT; SL 76729 (-0.97%), TP 78732 (+1.62%), hold it.\n\nChop-bleed KPI (dollar share of gross loss from trades that never reached +0.40% MFE): 7d 94.8% (0/63 losers NULL mfe), 14d 90.9% (0/142), 30d 84.5% (0/380) \u2014 versus the 2026-10-25 baseline of 84.1/85.6/80.6. The 7d reading is above the 92% breach line: nearly all current loss comes from entries that never armed, i.e. entry quality is deteriorating, not exits. Same-day arm rate 68.9% (45 closes today) is the companion reading only \u2014 brain_auditor #196 showed it does not forecast next-day PnL. Action side is entry gates (brain auditor), not trail/exit tweaks.\n\nShadow auto-trader scorecard independently agrees with the direction story: longs 4W/17T 23.5% -0.129, shorts 6W/13T 46.2% +0.168, all in CHOP. Exit-reason mix 7d: profit-monster-trail +3.83 (72T, 70 armed) is the entire profit engine; atr_sl_hit -2.10 (18T), cut-loser -1.54 (10T), hard_max_loss -0.79 (5T, 0 armed) are the chop-entry bleed. GMX shows the r2v2-long3 pattern live: entered 69.2 RSI, mfe only 0.14, exited flat-negative \u2014 never armed.",
+  "regime_context": "Sources (16:32Z): 15m aggregate SHORT_BIAS (long_bias 4 / short_bias 31 / neutral 88); 15m BTC scanner NEUTRAL (conf 42.9); btc_15m and btc_4h SHORT_BIAS; continuum AT EMA300; volatility LOW, market_phase CALM, velocity SLOW, acceleration POSITIVE, volume LOW, trend_quality STRONG_DOWN. Flip rates last 24h: aggregate 20 (p50=20, normal), BTC 24 (below p95=26 anomaly bar; <6 real-trend tape has not occurred since Oct 2). Mean-reverting chop tape: direction states survive ~1h, which is exactly why 94.8% of 7d loss comes from entries that never armed. Meaning for positions: 3/3 longs are against the aggregate and the 4h trend but with BTC sitting AT continuum EMA300 \u2014 longs are only valid if BTC 1m closes hold back above EMA300; below it for 15-30m, the long book is on the wrong side of every slow source at once.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, run this cycle):\n1. Chop-bleed dollar share 7d 94.8% (63 losers, 0 NULL mfe) vs baseline 84.1% measured 2026-10-25 \u2014 above the 92% entry-quality breach line; 14d 90.9%, 30d 84.5%. Same-day arm 68.9% (n=45, companion only). Entry-quality problem \u2192 route to brain auditor entry gates, NOT exit/trail changes.\n2. jup_yolo_mirrored LONG by meta_rsi band, 7d: <40 \u2192 5T 4W +0.22 | 40-49 \u2192 5T 4W +0.14 | 50-59 \u2192 7T 2W -0.53 | 60+ \u2192 3T 2W -0.09. The winning side was the sub-50 dip-buy; the 50-59 entries (ETH 53.3 -6.25%, SOL 52.8 -5.93%, BTC 51.0 -5.24%, HYPE 54.8 -5.04% all last 24h) bought mid-band in chop while the trend sources said down. Advisory context only \u2014 note the measured-refuted steer (meta_rsi 45-64 block) is WITHDRAWN and is NOT being re-proposed; blanket mid-band gating stays advisory, re-measure was due 2026-10-27.\n3. volume-buildup- SHORT 14d: 50T 30W -0.59, still VOLUME_BUILDUP_MINUS_ENABLED=True with live 7d traffic (42T -0.24). By band: meta_rsi <40 oversold \u2192 21T 13W -0.32 (worst \u2014 shorts into oversold, LINK 35.3 -5.32%, ZORA 40.6 -4.50%); 40-44 \u2192 12T -0.16; 55+ \u2192 17T -0.11. Winning side: SHORT the overbold (BANANA meta_rsi 100 +1.44%) not the collapsed. Flag for brain auditor \u2014 enabled family, live traffic, verified bleed.\n4. r2v2-long3 at meta_rsi 65+ 14d: 8T 5W -0.09 \u2014 positive WR, negative dollars. PONS (71.3) and GMX (69.2) both entered this cell this hour; GMX exited -0.14% never-armed. Live family (R2_TREND_V2_LONG_ENABLED=True), entry cell worth auditing, no kill proposed.\n5. DEAD-SIGNAL CHECKS (no action): doji-bottom-long 7d n=0 \u2014 already killed 2026-10-16, stale 14d window. pump-chain+ 14d -1.01 but 7d n=29 +0.41 \u2014 recovered, do NOT re-flag. HL_COPY_TRADING_ENABLED=False \u2014 disabled by design 2026-08, sibling HL_COPY_SIGNAL_* True and emitting; wallet-copy flag is not dead wiring (answered 2026-10-25).",
+  "agent_timestamp": "2026-10-30T16:47:56.792671+00:00"
 }

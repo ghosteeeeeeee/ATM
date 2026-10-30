@@ -9986,5 +9986,36 @@
     "category": "kpi hygiene",
     "status": "applied this run",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-30T16:46:33Z",
+    "idea": "KILL: jup_yolo arm-timeout (30/45/60m) — counterfactual delta $0.00",
+    "rationale": "Never-armed losers reach full damage (MAE 0.58-1.12%) inside 30m; existing ATR SL/cut-loser exits them first. Timeout fires after loss is done.",
+    "expected_impact": "none — rejected",
+    "category": "exit engine",
+    "status": "rejected_tested",
+    "risk": "n/a",
+    "run": 204
+  },
+  {
+    "date": "2026-10-30T16:46:33Z",
+    "idea": "Inverse-conviction mirror: consider demoting mirrors of pro positions with jup_leverage>=800 (10x)",
+    "rationale": "Day-1: jl>=800 10T 50% -$0.33 vs jl<800 9T 67% -$0.07. Chasing the loudest pro = late. Pre-register: ship only if n>=40 keeps inverted sign AND fk<25%.",
+    "expected_impact": "block ~half of day-1 chop mirrors, preserve trail winners",
+    "category": "entry sniper",
+    "status": "pre_registered",
+    "risk": "medium",
+    "bar": "n>=40 AND sign holds AND fk<25%",
+    "run": 204
+  },
+  {
+    "date": "2026-10-30T16:46:33Z",
+    "idea": "First-5m momentum-deficit collector on all entries (shadow, zero risk)",
+    "rationale": "atr_sl_hit -$4.50/53T: losers exit-time MFE<0.35/MAE>0.4 vs winners MFE>0.5. Exit-time gap is known; entry-time correlate unknown. Log first-5m price delta + volume delta per open, join after close, test predictive power for atr_sl_hit.",
+    "expected_impact": "enables a real entry filter if 5m deficit predicts atr_sl",
+    "category": "data collection",
+    "status": "suggested",
+    "risk": "zero (shadow)",
+    "run": 204
   }
 ]

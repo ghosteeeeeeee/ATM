@@ -1,141 +1,97 @@
 {
-  "timestamp": "2026-10-30T12:55:00Z",
-  "run": 203,
-  "session_lock": false,
-  "headline": "vb- watchdog steer investigated: 5 entry-filter candidates ALL fail bars; floor-short narrative REFUTED (lt0.2=71%WR flat, killer is 0.6-0.8 band); bandxEMA300 re-measure DONE (sign flipped +0.66, n=38<50 MONITOR); autopsy 48h wrong-side REFUTED 128th; 0 config changes",
-  "trade_summary_24h": {
-    "n": 43,
-    "pnl": 0.76,
-    "wr": 60.5,
-    "status": "GREEN"
-  },
-  "trade_summary_7d": {
-    "n": 162,
-    "pnl": 0.18,
-    "wr": 57.4,
-    "status": "barely green"
-  },
-  "trade_summary_14d": {
-    "n": 297,
-    "pnl": -2.94,
-    "wr": 47.8,
-    "status": "RED"
-  },
-  "chop_bleed": {
-    "7d_count_share": "53/63 = 84.1% (under 92% bar)",
-    "7d_dollar_share": "-$5.50 of -$5.91 = 93.1% (OVER 92% bar)",
-    "outlier_check": "top-3 never-armed losers only 14.4% of dollar loss — broad bleed, NOT outlier-driven",
-    "verdict": "count-share under bar, dollar-share breached; entry-quality work continues; no filter passed bars this run"
-  },
-  "volume_buildup_short_watchdog_steer": {
-    "status": "INVESTIGATED — 5 candidates tested, ALL rejected/monitor",
-    "candidates": [
-      {
-        "name": "momentum_state=falling only",
-        "14d": "15W/6L +0.03 vs block 14W/12L -0.53",
-        "p": 0.176,
-        "fk": "48.3%",
-        "verdict": "REJECT — fk over 20% bar"
-      },
-      {
-        "name": "block is_stale=true",
-        "14d": "stale 11W/8L -0.46",
-        "p": 0.444,
-        "verdict": "REJECT — n.s."
-      },
-      {
-        "name": "falling+fresh combined",
-        "p": 0.379,
-        "fk": "69%",
-        "verdict": "REJECT — fk way over"
-      },
-      {
-        "name": "block bb_position [0.2,0.4)",
-        "14d": "5W/6L -0.32, save +0.32",
-        "n": 11,
-        "verdict": "MONITOR — fails n>=20 bar"
-      },
-      {
-        "name": "block bb_position [0.6,0.8)",
-        "30d": "3W/5L -0.43, save +0.43, fk 8.6%",
-        "n": 8,
-        "verdict": "PRE-REGISTERED — n=8<15, directionally extreme"
-      }
+  "timestamp": "2026-10-30T16:46:33Z",
+  "run": 204,
+  "session_brain_stats": {
+    "queries": [
+      "jup_yolo_mirrored mirror freshness gate",
+      "mirror cluster stale signal delay"
     ],
-    "floor_narrative_refuted": "lt0.2 floor = 21T 71.4% WR -$0.04 (near-flat, works); gt0.8 ceiling = 9T 88.9% +$0.54 (BEST); killer is 0.6-0.8 ambiguous-strength band 8T 37.5% -$0.43"
+    "top_insight": "freshness gate (<=10min pro age) shipped today commit 7ce94432; cluster bonus 5cd1b0fa; jup_yolo is day-1 live with real money"
   },
-  "band_ema300_remeasure": {
-    "status": "DONE (was overdue since Oct 27)",
-    "midband_45_60_dampen": "30d now +$0.66 save (sign flipped from -0.36), n=38 < 50 pre-reg bar — MONITOR, no escalate (needs 30d-negative AND n>=50; neither met)",
-    "hold_cell_139": "LONG below EMA300 (btc_ema300_position now populated 71 rows/30d): 7T +$0.34 71.4% — same sign as #139. HOLD-call for BTC+ETH open longs STANDS"
-  },
-  "contrarian_join": {
-    "timestamp": "2026-10-30T12:25Z",
-    "pc_flip_wr": "64.6% n=350 STANDS",
-    "btc_rider_flip": "26.7% do NOT flip",
-    "overall": "42.0% n=861"
-  },
-  "pump_chain_plus_drift": {
-    "14d": "39T -$1.16 41.0%",
-    "30d": "100T +$1.91 41.0%",
-    "verdict": "30d still positive — NO-KILL stands (8th run); 11-10 bar ($>=+1.00 delta) approaching"
-  },
-  "jup_yolo": {
-    "14d": "9T 66.7% +$0.11 all EXTREME",
-    "verdict": "n<10 pre-reg bar — monitor stands"
-  },
-  "losing_autopsy_48h": {
-    "n": 20,
-    "never_adverse": 5,
-    "recovered": 12,
-    "never": 3,
-    "wrong_side": "REFUTED 128th consecutive",
-    "never_trades": [
-      "BTC continuum-trend- SHORT -0.18",
-      "NXPC vb- SHORT -0.14",
-      "ZORA vb- SHORT -0.05"
-    ]
-  },
-  "mandate_trail_vs_chop_14d": {
-    "armed": "157T 80.3% +$8.09",
-    "unarmed": "140T 11.4% -$11.03",
-    "profit_monster_trail": "100T 94% +$5.22",
-    "hard_max_loss": "24T 0% -$3.14"
+  "trade_summary_24h": {
+    "total": "51T +$0.45 56.9% GREEN",
+    "7d": "173T +$0.27 59.0% GREEN (flipped green 10-30 02:45, holding)",
+    "14d": "299T -$2.74 48.8%",
+    "losing_cell_nge5": "jup_yolo_mirrored LONG 19T -$0.40 57.9% — only n>=5 red cell",
+    "atr_sl_hit_14d": "53T -$4.50 1.9% WR — #1 dollar bleed (wider than hard_max -$2.82)"
   },
   "shadow_analysis": {
-    "contrarian": "USEFUL — join fresh, pc- flip 64.6% STANDS",
-    "floor_admit": "join shipped (2026-10-29), floor_only 48.1% WR",
-    "oscillator": "frozen by design",
-    "wyckoff": "pending join",
-    "rr_shadow": "orphaned",
-    "overall": "2/5 useful"
+    "contrarian": "JOIN REFRESHED 16:31Z (mandate). Overall flip 41.0% n=955. pump-chain- 226W/124L = 64.6% n=350 STAYS LIVE-FLIP. btc-pump-rider+ 166W/438L = 27.5% — do NOT flip (per-signal rule holds).",
+    "oscillator": "archived fossil, N/A",
+    "wyckoff": "345 rows still PENDING join",
+    "floor_admit": "join shipped, directional p=0.138, no new data action",
+    "rr_shadow": "orphaned, do not cite",
+    "arm_sweep": "shadow_trader --sweep-arm has no jup_yolo rows (mirror signal not a gate-shadow source) — ran direct candle counterfactual instead",
+    "overall": "contrarian join is the only live-useful shadow source this run; refresh keeps pc- flip numbers honest"
   },
-  "last_run_verify": {
-    "bug_070": "VERIFIED — size_mult stamping live (BTC continuum-trend- mult=1.5)",
-    "ctx_get_guard": "VERIFIED — compiles, no regressions",
-    "constants_diff": "EMPTY",
-    "tracebacks": "5 total, last Oct 11, none new",
-    "session_lock": "absent",
-    "size_reduce": "absent = 1.0x"
+  "losing_trade_autopsy": {
+    "method": "adverse-first recovery_replay + jup_yolo candle-level arm timing (1m closes vs +0.40% arm)",
+    "recovery_48h": "24 losers = 7 never-adverse / 13 recovered-after-adverse / 4 NEVER (16.7%) → WRONG-SIDE REFUTED 129th consecutive run",
+    "jup_yolo_day1": {
+      "n": 21,
+      "net": "-$0.23",
+      "trail_arm_rate": "14/20 close-armed = 70% (trend-signal profile)",
+      "winners": "11 profit-monster-trail +$0.65, avg MFE 0.71 MAE 0.27",
+      "losers": "6 never-armed -$0.87 (MFE 0.08-0.33, MAE 0.58-1.12) + 1 armed-gave-back -$0.10",
+      "arm_timeout_counterfactual": "cf30/cf45/cf60 all delta $+0.00 — never-armed losers dump inside 30m, ATR SL/cut-loser already exits them; TIMEOUT CANNOT SAVE. Idea killed with data.",
+      "entry_filter_scan": "rsi mid-band [50,56) 6T -$0.43 33% vs outside 15T +$0.17 — n=6 INSUFFICIENT, watch only. bb_position no separation. is_stale=true 3T net +$0.08 (freshness gate working)."
+    },
+    "exit_family_14d": "trail +$6.94/78.7% (150T) vs hard_max -$2.82/0% (22T) vs atr_sl_hit -$4.50/1.9% (53T) — thesis intact, atr_sl is now the #1 bleed"
   },
-  "open_trades": "2 jup_yolo LONG (BTC #16560, ETH #16557) against SHORT_BIAS — HOLD per #139 cell re-verified positive",
-  "config_changes_applied": [],
-  "changes_from_last_run": [
+  "drift_findings": [
+    "jup_yolo day-1 bleed (-$0.40 24h) is consistent with thesis: 6/7 losers never armed = chop mirrors; freshness gate alone doesn't fix pro-context chop",
+    "pro-leverage recorded (jup_leverage 500/600/1000) but unused — jl>=800 10T -$0.33 50% vs jl<800 9T -$0.07 67% (inverse conviction, n=19 below bar)"
+  ],
+  "recurring_problems": [
+    "atr_sl_hit bleed: 53T -$4.50 14d, NORMAL regime worst (23T -$1.56 0% MFE 0.23) — every cell n<20, cannot ship per sample rules",
+    "jup_yolo LONG fires 19x/24h against 4h SHORT_BIAS — but LONG-below-EMA300 cell (#139) stays positive; HOLD-call stands, do not blanket-block"
+  ],
+  "missing_implementations": [
+    "no arm-timeout for jup_yolo — TESTED THIS RUN, zero delta, correctly NOT implemented",
+    "jup_leverage conviction sizing — untested at scale, needs n>=40"
+  ],
+  "creative_improvements": [
     {
-      "change": "BUG-070 winner-cell multipliers (b75d2f63)",
-      "status": "VERIFIED LIVE — mult stamped in metadata"
+      "date": "2026-10-30T16:46:33Z",
+      "idea": "KILL: jup_yolo arm-timeout (30/45/60m) — counterfactual delta $0.00",
+      "rationale": "Never-armed losers reach full damage (MAE 0.58-1.12%) inside 30m; existing ATR SL/cut-loser exits them first. Timeout fires after loss is done.",
+      "expected_impact": "none — rejected",
+      "category": "exit engine",
+      "status": "rejected_tested",
+      "risk": "n/a"
     },
     {
-      "change": "decider_run ctx.get guard (7f3c6c4a)",
-      "status": "VERIFIED — compiles, 0 regressions"
+      "date": "2026-10-30T16:46:33Z",
+      "idea": "Inverse-conviction mirror: consider demoting mirrors of pro positions with jup_leverage>=800 (10x)",
+      "rationale": "Day-1: jl>=800 10T 50% -$0.33 vs jl<800 9T 67% -$0.07. Chasing the loudest pro = late. Pre-register: ship only if n>=40 keeps inverted sign AND fk<25%.",
+      "expected_impact": "block ~half of day-1 chop mirrors, preserve trail winners",
+      "category": "entry sniper",
+      "status": "pre_registered",
+      "risk": "medium",
+      "bar": "n>=40 AND sign holds AND fk<25%"
+    },
+    {
+      "date": "2026-10-30T16:46:33Z",
+      "idea": "First-5m momentum-deficit collector on all entries (shadow, zero risk)",
+      "rationale": "atr_sl_hit -$4.50/53T: losers exit-time MFE<0.35/MAE>0.4 vs winners MFE>0.5. Exit-time gap is known; entry-time correlate unknown. Log first-5m price delta + volume delta per open, join after close, test predictive power for atr_sl_hit.",
+      "expected_impact": "enables a real entry filter if 5m deficit predicts atr_sl",
+      "category": "data collection",
+      "status": "suggested",
+      "risk": "zero (shadow)"
     }
   ],
+  "config_changes_applied": [],
+  "changes_from_last_run": {
+    "run_203": "0 config changes; vb- [0.6,0.8) band pre-reg live — 7d now n=5 net -$0.30, 40% WR, still accumulating toward n>=15 bar; bandxEMA300 MONITOR sign flipped +$0.66 no escalate; chop-bleed count-share re-measure pending next weekly",
+    "verdict": "no-change runs leave nothing to revert; pre-reg bands progressing"
+  },
+  "amplify_friday_skip": "weekly AMPLIFY mandate is Mon 11-02 (disposition entry amplify-weekly-mandate, deadline 11-03). This Friday run: no cell clears amplify bar — jup_yolo jl>=800 n=19<40, atr_sl cells n<20, vb- band n=5<15. Logged why per flip-KPI rule.",
+  "open_trades": "#16572 BTC jup_yolo LONG 63m mfe 0.28% UNARMED (watch: unarmed>60m enters never-armed-loser cohort), #16576 GMX + #16577 PONS r2v2-long3 (PONS no candle coverage)",
   "next_actions": [
-    "vb- 0.6-0.8 kill-band pre-reg: n>=15 AND 30d PnL<0 AND fk<20% -> propose block",
-    "mid-band dampen monitor: re-measure when n>=50 (currently 38)",
-    "pump-chain+ 11-10 bar ($>=+1.00 delta between 30d and 14d) — judge then",
-    "jup_yolo n>=10 pre-reg stands",
-    "Weekly AMPLIFY due Mon 11-02 — rank winner cells, emit >=1 proposal",
-    "Storm-confl-waiver 2/3 packets — one more positive storm flips enforce bar ~11-01"
+    "next run: re-check #16572 arm status; if still unarmed at 90m note as cohort member (exit engines own the trade)",
+    "re-measure jl>=800 cohort (target n>=40 by ~11-01)",
+    "first-5m momentum collector: implement if captain accepts (shadow, zero risk)",
+    "Mon 11-02: weekly AMPLIFY run — must emit >=1 proposal or why-not",
+    "wyckoff_shadow join still PENDING (345 rows idle)"
   ]
 }
