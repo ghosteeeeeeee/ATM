@@ -206,7 +206,8 @@ def get_hl_price(coin: str) -> float:
 
 
 def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
-                leverage: int, margin_usd: float, cluster_size: int = 1) -> bool:
+                leverage: int, margin_usd: float, cluster_size: int = 1,
+                pid: str = '') -> bool:
     """Write a mirrored signal to the Hermes pipeline via add_signal().
 
     stats: {label, pnl, wr, trades, volume, rank, source} from the live
@@ -320,7 +321,11 @@ def emit_signal(coin: str, direction: str, wallet: str, stats: dict,
     if sig_id is None:
         # add_signal returned None = some gate blocked it (blacklist etc.)
         # Do NOT print MIRRORED — caller must not mark this position seen.
-        print(f"[jup_yolo] ⛔ BLOCKED {wallet[:4]} {coin} {direction} "
+        # FIX (bug_hunter F4): pid makes per-position attempt accounting
+        # auditable in prod logs (was wallet-only — 27 blocks were
+        # unattributable to positions).
+        _pid_s = f" pid={pid[:8]}" if pid else ""
+        print(f"[jup_yolo] ⛔ BLOCKED {wallet[:4]} {coin} {direction}{_pid_s} "
               f"(add_signal returned None — will retry next cycle)")
         return False
 
@@ -341,10 +346,12 @@ MAX_EMIT_ATTEMPTS = 5  # retry blocked/priceless positions before permanent skip
 try:
     from hermes_constants import (
         JUP_YOLO_MAX_MIRROR_AGE_SEC, JUP_YOLO_REEMIT_AFTER_SEC)
-except Exception:
-    # fallback must match hermes_constants defaults (see CLUSTER import fix:
-    # catch Exception, not just ImportError — a broken constants file must
-    # degrade loudly upstream, never silently re-enable stale mirrors)
+except Exception as _fe:
+    # FIX (bug_hunter F2): was SILENT — a renamed/missing gate constant would
+    # silently widen the gate back to 600/180 after a CEO tightening (exactly
+    # what the old comment vowed never to do). Loud every process start.
+    print(f"[jup_yolo] ⚠️ freshness constants unavailable "
+          f"({type(_fe).__name__}: {_fe}) — using fallback 600/180")
     JUP_YOLO_MAX_MIRROR_AGE_SEC = 600
     JUP_YOLO_REEMIT_AFTER_SEC = 180
 REEMIT_AFTER_SEC = JUP_YOLO_REEMIT_AFTER_SEC  # 3 min — retry inside the freshness window
@@ -498,6 +505,7 @@ def monitor_once() -> int:
                     seen_list.append((pid, now_ts))
                 continue
 
+            _is_remirror = False
             if pid in seen:
                 # RE-EMIT: held position whose signal died at an exec gate
                 # (SKIPPED/EXPIRED) — retry every REEMIT_AFTER_SEC (3 min, must
@@ -515,9 +523,8 @@ def monitor_once() -> int:
                     continue
                 if _live_signal_exists(market, direction):
                     continue  # signal alive (PENDING/APPROVED) — let it work
-                # dead signal + aged → fall through to emit again, refresh ts
-                print(f"[jup_yolo] 🔄 re-mirror {market} {direction} "
-                      f"(attempt age {age//60}m, previous signal dead)")
+                # dead signal + aged → falls through gate; print AFTER it passes
+                _is_remirror = True
 
             # ── FRESHNESS GATE (CEO 2026-10-30): "older than 5-10 mins is
             # useless" — we copy the ENTRY, not the ride. Covers first-emit AND
@@ -526,7 +533,11 @@ def monitor_once() -> int:
             # mid-hold, state re-seeds, and late retries.
             _ea_raw = p.get('executedAt') or 0
             try:
-                exec_at = int(_ea_raw)
+                # FIX (bug_hunter F5): float() first — a fractional-second
+                # executedAt format would int()-fail → fail-open → gate silently
+                # disabled for every position. int('1793320358.5') raises;
+                # int(float(...)) handles both formats.
+                exec_at = int(float(_ea_raw))
             except (TypeError, ValueError):
                 exec_at = 0
             if exec_at > 0:
@@ -541,9 +552,18 @@ def monitor_once() -> int:
                     attempts[pid] = MAX_EMIT_ATTEMPTS
                     continue
             else:
-                # no executedAt in feed (unexpected — API always sends it):
-                # fail-open so a feed format change can't silently kill mirrors
+                # no/unparsable executedAt in feed (unexpected — API always
+                # sends it): fail-open so a feed format change can't silently
+                # kill mirrors. Bounded by the give-up attempts budget.
                 print(f"[jup_yolo] ⚠️ {market} {direction} — no executedAt, treating as fresh")
+
+            # FIX (bug_hunter F3): re-mirror notice printed only AFTER the gate
+            # passes — previously '🔄 re-mirror …' was followed immediately by
+            # '⏰ STALE SKIP …' (the same log-then-do-nothing pattern the
+            # ZEC fix removed).
+            if _is_remirror:
+                print(f"[jup_yolo] 🔄 re-mirror {market} {direction} "
+                      f"(attempt age {age//60}m, previous signal dead)")
 
             stats = wallets[owner]   # {label, pnl, wr, trades, rank, source}
             leverage = int(p.get('leverage', 0) or 0)
@@ -551,7 +571,7 @@ def monitor_once() -> int:
             cluster_size = len(cluster_map.get((market, direction), ()))
 
             if emit_signal(market, direction, owner, stats, leverage, margin,
-                           cluster_size=cluster_size):
+                           cluster_size=cluster_size, pid=pid):
                 new_signals += 1
                 seen_list.append((pid, now_ts))   # duplicate-append is pruned/normalized on save
                 attempts.pop(pid, None)
@@ -559,9 +579,18 @@ def monitor_once() -> int:
                 # transient failure — bounded retry
                 n = attempts.get(pid, 0) + 1
                 if n >= MAX_EMIT_ATTEMPTS:
-                    print(f"[jup_yolo] giving up on {pid[:24]}... after {n} attempts")
+                    print(f"[jup_yolo] giving up on {pid[:8]}...{pid[-4:]} after {n} attempts")
                     seen_list.append((pid, now_ts))
-                    attempts.pop(pid, None)
+                    # FIX (bug_hunter F1, tightened by harness): attempts must
+                    # be PINNED TO n (=MAX). Merely not popping left it at
+                    # MAX-1 — below the re-mirror guard's `>= MAX` test — so
+                    # give-up still reopened every REEMIT interval (harness
+                    # measured 7 emits/12 cycles instead of 5-then-silent).
+                    # Popping (original) was the documented "giving up is a
+                    # lie"; pinning makes give-up terminal for ALL fail paths
+                    # (blacklist, fail-open missing executedAt, floor blocks).
+                    # Success path still pops → fresh budget for a real re-emit.
+                    attempts[pid] = n
                 else:
                     attempts[pid] = n
         except Exception as e:

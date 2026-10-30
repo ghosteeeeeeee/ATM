@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-10-30 08:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-30 14:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,439 | **WR:** 50.9% | **PnL:** -95.55%
+- **Total trades (all time):** 3,459 | **WR:** 51.0% | **PnL:** -97.78%
 - **Date range:** 2026-07-29 → 2026-10-30
 
 ---
@@ -11,8 +11,8 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| volume-buildup- | SHORT | 4 | 100.0% | +1.11 | 6 | 100.0% | +2.64 | ENABLED |
-| pump-chain+ | LONG | 3 | 66.7% | +0.46 | 6 | 66.7% | +2.49 | ❓ |
+| volume-buildup- | SHORT | 7 | 57.1% | -0.95 | 12 | 75.0% | +1.33 | ENABLED |
+| pump-chain+ | LONG | — | —% | — | 5 | 60.0% | +1.12 | ❓ |
 
 ---
 
@@ -26,8 +26,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| jup_yolo_mirrored | LONG | 3 | 33.3% | -1.57 | ❓ | Needs more data |
-| bb-squeeze+ | LONG | 4 | 50.0% | -0.86 | ENABLED | Needs more data |
+| bb-squeeze+ | LONG | 3 | 33.3% | -0.92 | ENABLED | Needs more data |
 
 ---
 
@@ -45,9 +44,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] jup_yolo_mirrored LONG** — WR=33.3%, PnL=-1.57% over 3 trades. Monitor next cycle.
-2. **[WATCH] bb-squeeze+ LONG** — WR=50.0%, PnL=-0.86% over 4 trades. Monitor next cycle.
-3. **[KEEP] 2 winning combos** — volume-buildup-, pump-chain+. LONG side dominant.
+1. **[WATCH] bb-squeeze+ LONG** — WR=33.3%, PnL=-0.92% over 3 trades. Monitor next cycle.
+2. **[KEEP] 2 winning combos** — volume-buildup-, pump-chain+. LONG side dominant.
 
 ---
 
@@ -59,6 +57,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-10-30 | 7ce9443 | feat: freshness gate — mirror only pro entries ≤10min old |
 | 2026-10-30 | 5cd1b0f | feat: YOLO mirror cluster bonus — rank higher when 2-3 pros ... |
 | 2026-10-30 | 0daefbb | feat: live leaderboard scraping + full gate clearance — FIRS... |
 | 2026-10-30 | 7f9c680 | feat: Jupiter YOLO leaderboard mirror — follow Solana top wi... |
@@ -68,6 +67,5 @@ None found. Top performers are already enabled.
 | 2026-10-29 | bcf2406 | harden LLM model resolver (bug_hunter SHIP-WITH-FIXES findin... |
 | 2026-10-29 | a0989ec | llm: centralize model to ONE place — opencode config (mimo-v... |
 | 2026-10-29 | 2ef737d | scripts: 'where are the shorts' round (CEO consult 20261029T... |
-| 2026-10-27 | 14ddb5c | ctx-gate: deterministic rules conversion IN SHADOW (CEO 2026... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

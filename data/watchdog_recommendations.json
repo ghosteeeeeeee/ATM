@@ -1,21 +1,29 @@
 {
-  "timestamp": "2026-10-30T14:41:22.205798+00:00",
+  "timestamp": "2026-10-30T15:11:22.225255+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: HYPER + ETH",
-      "detail": "Both opened within 21 minutes. Correlation risk.",
+      "title": "Trade cluster: BTC + SOL",
+      "detail": "Both opened within 6 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: ETH + BTC",
-      "detail": "Both opened within 25 minutes. Correlation risk.",
+      "title": "Trade cluster: BTC + HYPE",
+      "detail": "Both opened within 28 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: SOL + HYPE",
+      "detail": "Both opened within 22 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -23,23 +31,23 @@
       "title": "Portfolio heavily long (3 trades)",
       "detail": "3 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-004"
     }
   ],
   "portfolio_health": "warning",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.75,
-    "wyckoff_phase": "MARKDOWN",
+    "wyckoff_phase": "UNKNOWN",
     "market_phase": "DECLINING",
-    "trend_quality": "UP"
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 3
 }

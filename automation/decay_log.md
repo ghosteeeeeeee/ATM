@@ -2077,3 +2077,9 @@
 [2026-10-30 08:46 UTC]   🟢 OK: volume-buildup-: 6 trades, 100.0% WR, PnL=2.64
 [2026-10-30 08:46 UTC] Done. Rapid-disabled 0 signals.
 [2026-10-30 08:46 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-10-30 14:46 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-10-30 14:46 UTC]   🟢 OK: jup_yolo_mirrored: 15 trades, 53.3% WR, PnL=-3.58
+[2026-10-30 14:46 UTC]   🟢 OK: pump-chain+: 5 trades, 60.0% WR, PnL=1.12
+[2026-10-30 14:46 UTC]   🟢 OK: volume-buildup-: 12 trades, 75.0% WR, PnL=1.33
+[2026-10-30 14:46 UTC] Done. Rapid-disabled 0 signals.
+[2026-10-30 14:46 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
