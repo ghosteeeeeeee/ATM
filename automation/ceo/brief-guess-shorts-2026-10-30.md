@@ -61,3 +61,25 @@ contact with nightly dumps. No comfort.**
 ## Guardrails
 READ-ONLY round; T's "proceed" pattern applies post-verdict. Plain answer to T first:
 the count, then why, then what changes.
+
+---
+
+## CONTINUATION NOTE (previous run TIMED OUT at 1800s mid-investigation — budget extended to 2700s)
+
+Your prior run established (verified in logs — do NOT redo):
+- WLD SHORT singles blocked at confluence EVERY minute 23:26-23:35 with storm-debug
+  lines ("not stormy", btc-roll60m −0.25..−0.56) + CONTINUUM-OVERRIDE passes.
+- HBAR SHORT 00:01-00:04: BTC-CHOP-3H ✅ + CONTINUUM-OVERRIDE ✅ + SHORT-NEUTRAL-BYPASS ✅
+  → then 🔒 CONFLUENCE-GATE-BLOCK single-type (regime=SHORT_BIAS) — **and HBAR's cycles
+  show NO [STORM-CONFL-DEBUG] line at all while WLD's did** — the puzzle you were on.
+  Determine why (placement/branch/skip) — it decides whether the waiver was even
+  REACHABLE in the armed window; this is Q1's crux.
+- Tombstone write timing: reasons written pre-expiry (all 466 blocked@approval rows are
+  EXPIRED but updated_at = block-minute+10min sweep pattern); BLUR 00:28, MNT 00:25,
+  HBAR 01:00 single-type rows exist INSIDE/adjacent the armed window 00:18-00:38.
+- 4h regime scanner = NEUTRAL (the _neutral_relax branch context).
+- ROLLING ARMED TWICE (verified): 20:58-21:08 (−2.51%) and **00:18-00:38 (−1.99/−2.17/−1.55%)**
+  — yet ZERO [WAIVER-SHADOW] and ZERO packets ever.
+
+Solve the HBAR-no-debug puzzle FIRST, then deliver the full verdict (Q1-Q6) with the
+fix labels. Print your final answer by ~minute 35.
