@@ -1,86 +1,90 @@
 {
-  "timestamp": "2026-10-30T00:39:44Z",
-  "run": 200,
-  "session_lock": "absent (config changes allowed)",
-  "config_changes_applied": [],
+  "timestamp": "2026-10-30T04:46:34Z",
+  "run": "#201",
+  "session_lock": "absent — free to act",
   "trade_summary_24h": {
-    "trades": 18,
-    "wr": 55.6,
-    "pnl": -0.23
+    "trades": 23,
+    "wins": 14,
+    "wr": 60.9,
+    "pnl": 0.55,
+    "note": "GREEN. CRV grind-breakout- +0.75 (rr_engine_trail, RSI 42.9) = mid-band fade template. Watchdog deep-analysis pattern confirmed in live book."
   },
   "trade_summary_7d": {
-    "trades": 143,
-    "wr": 55.2,
-    "pnl": -0.77
+    "trades": 145,
+    "wr": 55.9,
+    "pnl": -0.22,
+    "trail_family": "81T 79.0% +3.78 (profit-monster-trail 55T 96.4% +2.95 + ugb_pt 23T 69.6% +0.83 + rr_engine_trail 2T 100% +1.09)",
+    "chop_exits": "21T 0.0% -2.70 (atr_sl 13T -1.52 + hard_max 8T -1.18)",
+    "armed_vs_unarmed_14d": "armed 153T 78.4% +7.00 vs unarmed 140T 11.4% -11.16"
   },
-  "trade_summary_14d": {
-    "trades": 293,
-    "wr": 46.4,
-    "pnl": -4.16
-  },
-  "mandate_fresh": {
-    "contrarian_join": "EXECUTED 00:30Z — 863 joinable, flip 42.0%; pc- 64.6% n=350 LIVE; rider+ 26.7% do-NOT-flip",
-    "chop_bleed_7d": "95.0% (mfe>=0.40 proxy, unarmed -5.29 of -5.57) — RE-BREACHED above 92% line after #199 91.9% dip; run 1 of potential streak; #194 0.75x still CEO-queued",
-    "armed_14d": "153T 78.4% +7.00 vs unarmed 140T 11.4% -11.16 (MFE>=0.40 proxy)",
-    "armed_7d": "81T 87.7% +4.36 vs unarmed 62T 12.9% -5.13",
-    "trail_vs_chop_14d": "trail_family 113T 89.4% +5.66 vs chop_family 93T 1.1% -9.17 vs arm_timeout 30T 26.7% -0.91"
+  "chop_bleed_kpi": {
+    "7d_dollar_share": "94.8% (52/60 losers never armed, -5.44 of -5.74)",
+    "status": "ABOVE 92% tripwire — run 2 of potential new streak (#200 was run 1 at 95.0%)",
+    "root_cause": "never-armed chop entries — owned by MFE-CUT/TAT/CONF_FLOOR stack, not a new lever",
+    "action": "monitor; #194 0.75x size proposal remains CEO-queued with VETO recommendation (plain-marker form structurally inert, #196/#195)"
   },
   "shadow_analysis": {
-    "contrarian": "FRESH 00:30Z — overall 42.0% n=861; pc- 64.6% n=350 LIVE STANDS; rider+ 26.7% do-NOT-flip STANDS",
-    "floor_admit": "join 20h old (04:42Z Oct 29) — floor 48.1% vs always 44.0% p=0.477 COLLECT; no producer timer (known gap)",
-    "wyckoff": "375 rows (+30), PENDING JOIN — no outcome column",
-    "oscillator": "FROZEN+ARCHIVED 24,598 rows fossil — none",
-    "rr_shadow": "ORPHANED — none",
-    "overall": "2/5 usable (contrarian fresh, floor stale-but-collect). Wyckoff join still owed before 11-03 bar."
-  },
-  "pre_reg_blind_run_2026-10-30": {
-    "test": "scoped momentum time-stop (pump-chain+ / bb-bounce-v2*)",
-    "bars": "B1' n>=60, B2 delta>+$1.00, B3 p<0.05, B4 halves, B5 z%<20, B6 fee-adj>+$1.00 + MFE<0.15 attribution",
-    "primary_cell_T20_THR020": "elig=48 FAIL, delta=+$0.72 FAIL, p=0.0103 PASS, halves PASS, z%=33.3 FAIL, fee-adj=+$0.60 FAIL",
-    "mfe_attribution": "mfe<0.15 carries +0.66 of +0.72 (92%) — attribution passes directionally",
-    "verdict": "REJECTED-WITH-DATA — 0/8 grid cells pass all bars. Both unscoped (#156) and scoped versions closed. Do not re-propose."
-  },
-  "last_run_verify_199": {
-    "size_mult_stamp": "PASS — 16/16 post-ship trades carry size_mult; COMP/CRV/BLUR all 1.0 correctly",
-    "mfe_write_at_close": "PASS — 0 NULL mfe_pct in 7d window (143/143 stamped)",
-    "contrarian_join_mandate": "EXECUTED fresh 00:30Z",
-    "recovery_replay_selfcheck": "ASSERT PASS",
-    "winner_cell_first_fire": "CLOSED — 0 validated-cell opens since 18:27Z ship (pre-ship bb-squeeze+ trades do not count); match logic smoke-tested correct",
-    "constants_lock_size_reduce": "EMPTY diff / absent / absent = 1.0x",
-    "ceo_protected": "13/13"
+    "contrarian": "join RE-RAN 04:30Z — pump-chain- flip 64.6% (226/350 decided) STANDS; btc-pump-rider+ 26.7% (136/510) = do NOT flip; overall 42.0% n=861. Oct-27 PROMOTE verified.",
+    "oscillator": "FROZEN+ARCHIVED — no action",
+    "wyckoff": "PENDING JOIN — no outcome column",
+    "floor_admit": "JOIN SHIPPED — floor_only 47.9% vs always_admit 38.4%, fisher p=0.138 COLLECT",
+    "rr_shadow": "ORPHANED — do not cite",
+    "shadow_trader": "37808 signals; exit A/B trail-or-nothing HOLDS (pm_trail +5780 vs hard_max -6897). CONFLUENCE-EXPIRY blocked 13873 at 48% would-win = largest gate."
   },
   "losing_autopsy_48h": {
-    "n": 20,
+    "n": 18,
     "never_adverse": 4,
-    "recovered": 14,
+    "recovered": 12,
     "never": 2,
-    "never_list": "PURR hh-hl+ atr_sl_hit -0.19; NXPC volume-buildup- cut-loser -0.14",
-    "verdict": "WRONG-SIDE REFUTED 125th consecutive run (#61 p=0.116, #84 t=-0.04)"
+    "never_list": "BTC continuum-trend- SHORT cut-loser -0.18; NXPC volume-buildup- SHORT cut-loser -0.14",
+    "verdict": "WRONG-SIDE REFUTED 126th consecutive run (#61 p=0.116, #84 t=-0.04 stand)"
   },
-  "deep_dive": {
-    "new_sub50_targets": 0,
-    "notes": "bbbv2+ 7d 10T 10% -0.39 OWNED (TAT-C) · volume-buildup- 7d 36T 58.3% -0.50 = HIGH cell positive / NORMAL weaker, no new lever · pump-chain+ EXTREME 14d drift WORSENED to -0.88 (was -0.39 at #199), 30d +2.68, 11-10 bar stands"
+  "rsi_band_analysis_14d": {
+    "finding": "Watchdog 'overbought longs >=70 bleed' is PARTIALLY WRONG at 14d: 65-75 LONG = 43T +0.44 55.8% (POSITIVE, bb-squeeze+ drives it 17T +0.43). Real bleed = 45-55 LONG 62T -2.30 37.1%.",
+    "block_counterfactual_45_55_long": "7d Fisher p=0.62 FAIL; 30d p=0.34 FAIL; halves sign-flip (old +1.11, new -2.29) — ALREADY OWNED by eval-midband-long-4564 (self_learner, deadline 11-03). Do NOT re-propose.",
+    "money_band": "35-45 SHORT 40T 55.0% +0.59 — mid-band fade shorts, confirmed template (CRV/YGG).",
+    "action": "0 config changes — nothing passes significance bars"
   },
-  "flags": [
-    "MED: pump-chain+ EXTREME winner cell 14d drift worsened -0.39 -> -0.88 (30T 40% WR). Receiving 1.25x. Pre-registered 11-10 bar (>=+$1.00 delta) judges. T sign-off stands — no unilateral revert.",
-    "INFO: chop-bleed re-breached 95.0% (7d) — 1st run of potential new streak. #194 0.75x remains CEO-queued.",
-    "INFO: r2v2-long3 NORMAL validated cell is thin (6T 30d) — note for 11-10 winner-cell-size bar."
+  "drift_findings": [
+    "pump-chain+ EXTREME 14d drift WORSENED to -0.88 (31T 38.7%) — was -0.39 at #199. 30d still +2.58. Already at 1.25x via WINNER_CELLS_VALIDATED. T sign-off stands — do NOT revert. 11-10 bar (>=+$1.00 delta) will judge.",
+    "Uncommitted decider_run.py fix found in working tree (ctx.get AttributeError guard, string-ctx crash class F3-1) — COMMITTED this run. Author unknown (not in changes_log); fix is defensive isinstance guards, compile PASS, zero trading behavior.",
+    "bb-squeeze candidate files auto-regenerated 03:20Z (backtest stat refresh only) — swept into same commit."
   ],
-  "changes_from_last_run": "#199 had 0 config changes — standing verifies all PASS (see last_run_verify_199)",
+  "changes_from_last_run": {
+    "#200_momentum_time_stop": "REJECTED-WITH-DATA stands (0/8 cells). Both unscoped and scoped versions closed — do not re-propose.",
+    "#200_winner_cell_traffic": "CORRECT-BY-TRAFFIC verified — post-ship opens correctly no-matched (CRV vb- EXTREME, COMP r2v2-long3 HIGH). First-fire verify still pending actual validated-cell traffic.",
+    "#197_mfe_mae_stamp": "VERIFIED — 7d closed 146/146 with mfe_pct+mae_pct (100% coverage). size_mult stamp 22/23 in 24h.",
+    "#196_chop_bleed_checkpoint": "Dispositioned — breach #2 presented, VETO on plain-marker form. Still CEO-queued.",
+    "#136_bypass_headline": "BYPASS still passes all bars — CEO GO settled (universal post-arm floor D=0.20)."
+  },
+  "config_changes_applied": [
+    "COMMITTED: scripts/decider_run.py — ctx.get AttributeError guard (isinstance checks on market/btc_continuum) + continuum dict→str formatting for _cont_str. Defensive fix, zero trading behavior. Plus bb-squeeze candidate backtest stat refresh.",
+    "0 trading-constant changes (hermes_constants.py EMPTY diff vs HEAD, CEO_PROTECTED untouched)"
+  ],
+  "creative_improvements": [
+    {
+      "idea": "Clone-hunt: gate_shadow blocked setups matching bb-squeeze+ NORMAL winner profile (recovering 75% WR week of Oct 26)",
+      "rationale": "bb-squeeze+ NORMAL is the strongest recovering winner cell (20T 75% +0.45 this week, 14d 30T 70% +0.64). CONFLUENCE-EXPIRY blocks 13873 signals at 48% would-win — some blocked setups likely match this profile. Mining them = free offense without config risk.",
+      "expected_impact": "Identify 1-3 blocked signal combos worth a shadow stamp",
+      "category": "clone-hunt",
+      "status": "proposed",
+      "risk": "low",
+      "threshold": "If >=5 blocked setups match profile and counterfactual-walk candles show net>+$1.00 with fk<20%, propose co-signal chain shadow stamp"
+    },
+    {
+      "idea": "pump-chain+ EXTREME auto-revert trigger at 11-10 deadline",
+      "rationale": "14d drift worsened -0.39→-0.88 while receiving 1.25x. Pre-register: if 14d delta still negative at 11-10 disposition, auto-revert the 1.25x for this cell (T sign-off required but trigger removes discretion).",
+      "expected_impact": "Prevents amplifying a decaying cell into the ground",
+      "category": "risk-control",
+      "status": "suggested",
+      "risk": "low"
+    }
+  ],
   "next_actions": [
-    "WINNER-CELL-SIZE first-fire verify (await validated-cell traffic)",
-    "CEO: 0.75x stand-down decision (chop-bleed re-breached)",
-    "pump-chain+ EXTREME 14d drift monitor to 11-10 bar",
-    "C2 early-arm ladder · CONF_FLOOR fk pin · TAT variant-C verify",
-    "wyckoff outcome join (owed before 11-03)",
-    "2026-11-02 first weekly AMPLIFY run",
-    "2026-11-03 coupled-SL A/B + shadow batch + escalation-17 + eval-midband",
-    "2026-11-10 CHASE-MOVE flip + MFE-CUT + fade bar + winner-cell-size bar"
-  ],
-  "open_trade_readiness": {
-    "open_count": 0,
-    "regime": "btc_15m SHORT_BIAS vs btc_4h LONG_BIAS (disagree) — hold on discretionary directional entries",
-    "size": "1.0x (size-reduce file absent = truth)",
-    "note": "0 open = flat is correct while regimes disagree; trail-family first when entries resume"
-  }
+    "Monitor chop-bleed tripwire — run 3 of streak next run; if >=92% again, present #194 0.75x WITH fresh #195 inertness measurement",
+    "CAKE pump-chain+ LONG open (entry RSI 70.83 EXTREME) — overbought long pattern, SL 1.871 TP 1.932, monitor trail arm",
+    "bb-squeeze+ first-fire verify still pending validated-cell traffic",
+    "eval-midband-long-4564 due 11-03 (self_learner owns)",
+    "AMPLIFY weekly: all n>=10 validated cells already at 1.25x; clone-hunt proposal above = this week's offense"
+  ]
 }

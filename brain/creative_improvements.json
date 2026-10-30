@@ -9928,5 +9928,25 @@
     "category": "monitoring",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-30T04:46:52Z",
+    "run": "#201",
+    "idea": "Clone-hunt: gate_shadow blocked setups matching bb-squeeze+ NORMAL winner profile",
+    "rationale": "bb-squeeze+ NORMAL recovering 75% WR this week; CONFLUENCE-EXPIRY blocks 13873 at 48% would-win — some blocked setups likely match profile. Free offense, no config risk.",
+    "expected_impact": "Identify 1-3 blocked signal combos worth a shadow stamp",
+    "category": "clone-hunt",
+    "status": "proposed",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-30T04:46:52Z",
+    "run": "#201",
+    "idea": "pump-chain+ EXTREME auto-revert trigger at 11-10 deadline",
+    "rationale": "14d drift -0.39→-0.88 while receiving 1.25x. Pre-register auto-revert if still negative at disposition.",
+    "expected_impact": "Prevents amplifying decaying cell",
+    "category": "risk-control",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

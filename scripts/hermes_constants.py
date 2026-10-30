@@ -3372,6 +3372,7 @@ STANDALONE_BYPASS_SIGNALS = (
     'breakout-pullback', 'breakout-pullback+', 'breakout-pullback-',  # breakout + pullback confirmation — standalone bypass (2026-09-25)
     'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal from trade-watchdog — full market context, standalone bypass
     'hl_copy_trader', 'hl-copy-trader',  # CEO 2026-10-09: pro trader copy signal — quality filter (75%+ WR, $10k+ PnL) already applied
+    'jup_yolo_long', 'jup_yolo_short', 'jup_yolo_mirrored',  # CEO 2026-10-09: JUP YOLO leaderboard mirror — proven +4000% uPnL conviction
     # 'ichimoku' REMOVED from tuple 2026-10-20 bug_hunter — direction-agnostic membership
     # loosened SHORT too. Now handled by direction-aware gate in signal_compactor.py
     # that consults ICHIMOKU_LONG_BYPASS_ENABLED (so auto-revert actually works).

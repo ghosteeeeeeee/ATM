@@ -139,13 +139,22 @@ def run_once():
         print("  All up to date")
 
     # Step 2: Generate pipeline signals (BEFORE bulk scan — uses fresh fills)
-    print("\n[2/7] Generating pipeline signals...")
+    print("\n[2/8] Generating pipeline signals...")
     pipeline_signals = run_hl_copy_signal()
 
     if pipeline_signals:
         print(f"  📊 {len(pipeline_signals)} signal(s) written to pipeline")
     else:
         print("  No new pipeline signals")
+
+    # Step 2b: JUP YOLO leaderboard mirror — follow Solana top winners
+    print("\n[2b/8] Mirroring JUP YOLO leaderboard...")
+    try:
+        from jup_yolo_monitor import monitor_once as jup_monitor
+        yolo_sigs = jup_monitor()
+        print(f"  🪞 {yolo_sigs} YOLO mirror signal(s)")
+    except Exception as e:
+        print(f"  JUP YOLO monitor error: {e}")
 
     # Step 3: Check for pro trader signals
     print("\n[3/7] Checking for pro trader signals...")

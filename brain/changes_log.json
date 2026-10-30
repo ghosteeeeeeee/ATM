@@ -3262,5 +3262,17 @@
     "after": "active, started 2026-10-29 04:49:46 UTC",
     "rationale": "long-running daemon imports brain module once (same MED as run #196)",
     "impact": "hl_copy open path picks up size_mult stamp"
+  },
+  {
+    "timestamp": "2026-10-30T04:46:52Z",
+    "agent": "brain_auditor",
+    "run": "#201",
+    "change": "Committed uncommitted decider_run.py fix: ctx.get AttributeError guard (isinstance checks on market/btc_continuum) + continuum dict→str for _cont_str. Zero trading behavior. Plus bb-squeeze candidate backtest stat refresh (auto-regen 03:20Z).",
+    "type": "bugfix",
+    "file": "scripts/decider_run.py",
+    "before": "unguarded ctx.get('market') raised AttributeError when ctx was string (F3-1 crash class)",
+    "after": "isinstance-guarded; continuum formatted as str for bear-check rule",
+    "rationale": "Fix was in working tree uncommitted; defensive isinstance guards, compile PASS, zero trading behavior. Committing to prevent drift.",
+    "impact": "Prevents decider crash on string-ctx paths; no trading behavior change"
   }
 ]
