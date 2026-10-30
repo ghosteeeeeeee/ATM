@@ -17776,3 +17776,25 @@ Quiet hour — 0 closes, 0 open positions.
 **Open Questions:**
 - 24h GREEN '$+0.69' at 65.0% WR — first green 24h in days; 7d also turned green '$+0.05'
 - Watch whether the reversal holds another 24h before any tuning
+
+## [2026-10-30 03:42] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $-0.12 (WR: 50%) | 24h: 22T 14W 63.6% '$+0.57' GREEN | 7d 145T 81W 55.9% '$-0.22' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: 2T last hour (BTC continuum-trend- cut-loser-CL-T1 $-0.18, AVNT volume-buildup- profit-monster-trail +$0.06); no n>=3 0%-WR signal (worst: bb-squeeze+ 4T 50% '$-0.10')
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 1/22 = 4.5% (<40%) — SL not tight; dominant close = profit-monster-trail (9T '+$0.42'), worst = atr_sl_hit (1T '$-0.25')
+- Boost: no candidate meets all bars — volume-buildup- 4T 75% '+$0.11' 4 tokens fails n>=5; pump-chain+ 3T 66.7% '+$0.22' fails n>=5
+- Neg streak: last hour -$0.12 (1 consecutive negative hour only, not 3)
+- Frequency 2/hr — under overtrading threshold
+- 0 open trades
+- Storm readiness: window-min +0.41% / at-run +0.64% (<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '$+0.57' at 63.6% WR — reversal holding; 7d still RED '$-0.22'
+- BTC continuum-trend- cut-loser -5.31% account loss on one trade — monitor, single sample
