@@ -17876,3 +17876,25 @@ Final set: ['GRASS']
 **Open Questions:**
 - 24h GREEN '+$0.77' at 63% WR holding; 7d still RED '-$0.16'
 - BTC manual trade hit manual_sl_hit then re-opened LONG at 78596 — CEO trade, monitor
+
+## [2026-10-30 07:45] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.14 (WR: 63.0% 24h) | 24h 29T 17W 63.0% '+$0.63' GREEN | 7d 153T 55.6% '-$0.30' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no n>=3 0%-WR signal last hour (HYPE jup_yolo atr_sl_hit -$0.11, BTC manual -$0.03; ai-trader-manual 3T 0% is CEO trades, not a signal kill candidate)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 2/29 = 6.9% (<40%) — SL not tight; dominant close = profit-monster-trail (10T '+$0.44'); both atr_sl_hit trades were -5%/-0.99% account moves (expected at leverage)
+- Boost: pump-chain+ 6T 66.7% '+$0.27' across 7 tokens meets all bars BUT already at 1.4 ceiling (boosted 10-10) — HOLD; volume-buildup- 3T 100% '+$0.25' fails n>=5
+- Neg streak: 2h soft (-$0.01, -$0.11) but not 3 consecutive negative hours; 24h still GREEN '+$0.63'
+- Frequency 2/hr — under overtrading threshold
+- 4 open: NXPC/SAGA/BANANA volume-buildup- SHORT x3, SOL jup_yolo_mirrored LONG
+- Storm readiness: window-min -0.40% / at-run -0.28% (|x|<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 3 concurrent volume-buildup- SHORTs opened same minute (07:22) — correlated cluster, watch if dump reverses
+- 24h GREEN '+$0.63' at 63% WR holding; 7d still RED '-$0.30'
