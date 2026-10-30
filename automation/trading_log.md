@@ -17921,3 +17921,25 @@ Final set: ['GRASS']
 **Open Questions:**
 - volume-buildup- 24h perfect but 14d net -$0.35 — recent green may be regime luck; if 7d stays negative through weekend, consider regime-gate or weight reduce (needs CEO for kill; weight reduce is non-locked)
 - 24h GREEN '+$0.60' at 60.6% WR; 7d still RED '-$0.20'
+
+## [2026-10-30 09:45] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** $+0.01 (WR: 61.1% 24h) | 24h 36T 22W 61.1% '+$0.61' GREEN | 7d 157T 56.1% '-$0.19' | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Kill check: no n>=3 0%-WR signal last hour (ZORA volume-buildup- ugb_pt -$0.05 only; ai-trader-manual 3T 0% = CEO trades)
+- Signal inversion check: 0 mismatches (24h)
+- atr_sl_hit 3/36 = 8.3% (<40%) — SL not tight; dominant close = profit-monster-trail (15T '+$0.57')
+- Boost: volume-buildup- 8T 87.5% '+$0.31' 8 tokens meets 24h bars BUT 14d 48T 62.5% net '-$0.36' and already boosted 1.0→1.2 — HOLD, no 2nd boost on 14d-negative signal; pump-chain+ at 1.4 ceiling
+- Neg streak: hourly 07h -0.14, 08h +0.03, 09h +0.01 — not 3 consecutive negative
+- Frequency 3/hr — under overtrading threshold (20/hr)
+- 4 open: HYPE/SOL/ETH jup_yolo_mirrored LONG, IO volume-buildup- SHORT
+- Storm readiness: window-min -0.45% / at-run -0.38% (|x|<1.5%) — no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- volume-buildup- 14d net -$0.36 despite 24h green — if 7d stays negative through weekend, consider regime-gate (needs CEO) or weight reduce (non-locked)
+- 24h GREEN '+$0.61' at 61.1% WR; 7d still RED '-$0.19'
