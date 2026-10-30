@@ -2403,10 +2403,19 @@ def context_gate(token, direction, source, sig):
     # changes nothing — the LLM still decides, and we record agreement below.
     # In ENFORCEMENT mode (CONTEXT_GATE_RULES_SHADOW=False, CEO sign-off only)
     # it returns the (verdict, reason) tuple and the LLM is BYPASSED entirely.
+    # FIX 2026-10-30: rule_based_context_gate returns STRING on most AMBIGUOUS
+    # paths (same class as F3-1, cf. llm_context_gate:1599 guard) — unguarded
+    # ctx.get('market') here raised AttributeError and killed the whole decider
+    # run mid-loop 16x on Oct 29 14:34-16:03 (remaining signals unprocessed).
+    # Also format continuum as str: _ctx_rules_shadow:1809 bear check needs
+    # isinstance(_cont_str, str) + 'BEAR' — the raw dict made that rule dead.
+    _ctx_mkt = ctx.get('market') if isinstance(ctx, dict) else {}
+    _pc = _ctx_mkt.get('btc_continuum') if isinstance(_ctx_mkt, dict) else None
     _shadow_rules = ctx_gate_rules_shadow_call(
         token, direction, source, ctx,
         rsi=_ctx_gate_get_rsi(token), heb=heb,
-        _cont_str=(ctx.get('market', {}) or {}).get('btc_continuum', '') or '')
+        _cont_str=(f"{_pc.get('phase', '?')}+{_pc.get('linreg', '?')}+{_pc.get('ema', '?')}"
+                   if isinstance(_pc, dict) else ''))
 
     if _shadow_rules is not None:
         # ENFORCEMENT MODE — rules decide, LLM subprocess never runs.
