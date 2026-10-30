@@ -1341,6 +1341,24 @@
       "related_bugs": [
         "BUG-066"
       ]
+    },
+    {
+      "id": "BUG-072",
+      "title": "ichimoku_cloud signals write a >=26h-STALE price into signals.price (search_end = n-26 on 1h bars, ichimoku_cloud.py:180) \u2014 median +1.94% off market, p90 +6.39%; any price-anchored counterfactual on this family fakes 89.1% WR (caught by the ichimoku study 2026-10-30)",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "files": [
+        "scripts/signals/ichimoku_cloud.py"
+      ],
+      "symptom": "2,425 solo ichimoku-short rows carry a price that was already a day old at fire time; 89% of rows above market at signal ts. Poisoned one of my own replay families' methodology \u2014 study re-anchored at market close. Other families checked fresh-ish: pump-chain 0.18% median dev, r2v2 0.18%, bb-squeeze 0.21%, continuum 0.05% (mild, below touch-scale materiality).",
+      "root_cause": "price taken from the lookback close array indexed at n-26 (chikou confirmation design) instead of the live close at fire time",
+      "fix": "store live close at fire time (last closed candle) for the price field; keep the chikou index for logic only. Until fixed: NEVER anchor counterfactuals on ichimoku-family signals.price.",
+      "verified_by": "signal_analyst study (86f6bf13) + main-session freshness table across families (2026-10-30)",
+      "date_found": "2026-10-30",
+      "date_fixed": null,
+      "found_by": "signal_analyst",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
