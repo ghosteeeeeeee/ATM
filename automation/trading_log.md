@@ -18484,3 +18484,26 @@ Final set: []
 **Open Questions:**
 - 24h RED '-$0.68' / 7d '-$0.89' at ~57% WR — structural R:R imbalance persists (losses ~2x avg win); kill/boost rules don't reach it
 - jup_yolo_mirrored HIGH n=19 (one short of the n>=20 regime-kill bar) — run regime query next hour
+
+## [2026-10-31 11:42] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: 55.6% 24h) | 24h 54T 30W '-$0.86' RED | 7d 200T 57.0% '-$0.89' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes (quiet hour) — 4 open all near flat (GMX pump-chain- +1.07%, FIL pump-chain- +0.22%, HYPE jup_yolo +0.05%, IOTA bb-squeeze- -0.18%)
+- Kill check: 0 closes last hour, no n>=3 0%-WR — regime query not triggered; jup_yolo_mirrored 14d HIGH still n=19 (<20 bar), wins EXTREME 62.5%/HIGH 63.2% by WR
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 10/54 = 18.5% (<40%); dominant close = profit-monster-trail (28T '+$1.51'); worst avg = stale_exit (2T '-$0.39')
+- Boost: none qualify — 0 closes last hour; 24h volume-buildup- 9T 77.8% but '-$0.08' fail net; jup_yolo 31T 54.8% '-$0.91' fail net
+- Neg streak: 08h '-0.30', 09h '-0.07', 10h '+0.16', 11h 0T — streak broken, never 3 consecutive red ending now
+- Frequency 0/hr — under 20/hr
+- Entry quality: winners 24h MAE avg 0.189%, 27/30 <0.5% — entries fine; R:R still the drag (24h avg win '+$0.050' vs avg loss '-$0.132')
+- Storm readiness: **window-min -0.12% / at-run +0.00%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.86' (55.6% WR) / 7d '-$0.89' — structural R:R imbalance persists; kill/boost rules don't reach it
+- jup_yolo_mirrored HIGH n=19 (one short of regime-kill bar) — run regime query next hour

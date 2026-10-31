@@ -2410,3 +2410,34 @@
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK hard floor (detect): N.N < N`
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor (detect): N.N < N`
+
+## Error Alerts — 2026-10-31 07:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+- **[WARN]** (health_monitor): `logs`: compressed 6 old logs, freed 0.0MB (disk 85%)
+
+## Error Alerts — 2026-10-31 08:41 UTC
+- **NEW** (1x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-10-31 08:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-10-31 09:41 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   [TOK-TOK] TOK: skip TOK — hebbian n=N < N (insufficient data, TOK-open)`
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-10-31 09:51 UTC
+- **[WARN]** (checkpoint_watch): **DUE** `btc-16599-8h-stale` (due 2026-10-31T09:37:00+00:00): BTC #16599 continuum-osc+ LONG crosses 8h at 09:37Z — exit IF still open AND unrealized MFE <+0.40% AND 1m below continuum EMA300 for 60m+ (watchdog 07:18Z stale steer + regime condition).
+
+## Error Alerts — 2026-10-31 09:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-10-31 10:41 UTC
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **NEW** (2x): `Oct N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK ceiling: N.N > N`
+
+## Error Alerts — 2026-10-31 10:51 UTC
+- **[WARN]** (checkpoint_watch): **OVERDUE** `btc-16599-8h-stale` (due 2026-10-31T09:37:00+00:00): BTC #16599 continuum-osc+ LONG crosses 8h at 09:37Z — exit IF still open AND unrealized MFE <+0.40% AND 1m below continuum EMA300 for 60m+ (watchdog 07:18Z stale steer + regime condition).
+
+## Error Alerts — 2026-10-31 10:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
