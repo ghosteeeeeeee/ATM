@@ -3959,7 +3959,8 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                         _st_conn = get_db_connection()
                         _st_cur = _st_conn.cursor()
                         _st_cur.execute(
-                            "SELECT id, signal FROM trades WHERE token=%s AND status='open' "
+                            "SELECT id, signal, stop_loss FROM trades "
+                            "WHERE token=%s AND status='open' "
                             "ORDER BY id DESC LIMIT 1", (coin.upper(),))
                         _st_row = _st_cur.fetchone()
                     finally:
@@ -3971,8 +3972,14 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                                 pass
                     if _st_row and _st_row[1]:
                         from tpsl_utils import stop_tighten_sl as _st_hook
+                        # bug_hunter L1: pass the real current SL (was hardcoded
+                        # 0.0 -> payload dist_current always None / sl_cur=none)
+                        try:
+                            _st_cur_sl = float(_st_row[2]) if _st_row[2] else 0.0
+                        except (TypeError, ValueError):
+                            _st_cur_sl = 0.0
                         fresh_sl, _st_payload = _st_hook(
-                            _st_row[1], entry_px, fresh_sl, current_sl=0.0,
+                            _st_row[1], entry_px, fresh_sl, current_sl=_st_cur_sl,
                             token=coin, direction=direction,
                             trade_id=_st_row[0], site='guardian_selfclose')
             except Exception as _st_e:

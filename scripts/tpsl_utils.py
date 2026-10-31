@@ -1021,14 +1021,15 @@ from hermes_constants import (
     STOP_TIGHTEN_SHADOW, STOP_TIGHTEN_ENFORCE,
 )
 
-# Dedup: one [STOP-TIGHTEN-SHADOW] line per (trade/token, site, UTC hour).
-# The hour bucket (not the SL value) is what bounds the set and the line rate:
-# position_manager/decider are fresh processes each pipeline minute, but
-# hl-sync-guardian is a LONG-RUNNING daemon that re-places its self-close SL
-# every 60s — without the bucket an in-scope guardian position would emit
-# ~1,440 lines/day and grow _STOP_TIGHTEN_LOGGED forever (bug_hunter delta
-# review MUST-FIX). Hourly sampling keeps the counterfactual stream alive at
-# <=24 lines/site/trade/day; analysis joins by trade id, not by line count.
+# Dedup: one [STOP-TIGHTEN-SHADOW] line per (trade/token, site, UTC hour) WITHIN
+# a process. The hour bucket bounds the LONG-RUNNING guardian (without it an
+# in-scope position would emit ~1,440 lines/day — bug_hunter delta-review
+# MUST-FIX), but position_manager/decider are fresh processes each pipeline
+# minute, so at THOSE sites the set resets every run: real bound there is the
+# execution cadence (~1-2 lines/trade/min), NOT 24/day (bug_hunter M2, 2026-10-31
+# — do not cite <=24/day for pm/decider). Analysis joins by DISTINCT trade id,
+# never by line count; the eval additionally filters site + entry-vs-PG match
+# (see registry stop-tighten-enforce-eval).
 import time as _st_time
 _STOP_TIGHTEN_LOGGED = set()
 
