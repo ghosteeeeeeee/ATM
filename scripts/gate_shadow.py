@@ -28,7 +28,21 @@ for continuity but are SECONDARY: those trades are already in the live book, so
 their PnL is an indicator of how the blocked token subsequently traded — NOT
 avoided or foregone money. Each trade counted at most once per gate (#156:
 pre-fix 4,182 events -> 380 trades, 11x multi-count, 23x PnL inflation).
-Gate changes still need CEO criteria (n>=50, OOS same-sign).
+Gate changes still need CEO criteria (tok_n>=50 distinct token|direction pairs,
+OOS same-sign).
+
+STATISTICS WARNING (brain_auditor #160 class, mirrored from expiry_shadow.py) —
+one row per block EVENT, and events repeat over the same tokens: the 10-min
+dedupe still yields OVERLAPPING 4h fwd windows that the raw basis counts as
+independent evidence (measured 2026-10-31: 53,421 fwd rows across only ~200
+distinct token|direction pairs — BTC LONG alone x1,605). Event/per-row figures
+are therefore PSEUDO-REPLICATED and overstated; the independent unit is
+token|direction (tok_n), not the row. --report prints tok_n beside every fwd_n,
+only flags COSTLY/protective at tok_n>=50 (row-n alone never flags), and prints
+a deduped non-overlapping-window NET next to the raw NET. Use
+brain/analysis/cluster_t.py `cluster_t(values, clusters)` (selfcheck PASS) for
+any significance claim off this DB; naive per-row averages are point estimates
+only.
 
 Usage: python3 scripts/gate_shadow.py [--record] [--close] [--fwd] [--report] [--since-hours 6]
        --since-hours limits --record only; --report/--fwd are all-time by design.
@@ -52,6 +66,12 @@ OFFSET_FILE = os.path.join(HERMES_DATA, 'gate_shadow_offset.txt')
 CLOSE_AFTER_HOURS = 24
 FWD_AFTER_HOURS = 4.5  # need +4h forward horizon + slack (same as expiry_shadow)
 NOTIONAL_WINDOW_DAYS = 30  # trailing window for the live avg-notional $-eq basis
+# 4h fwd horizon expressed once: 48 x 5m candles (the same 48-candle rule as
+# expiry_shadow._fwd_metrics) and its wall-clock size in seconds. Used both by
+# the fwd engine and by close_fwd's "has the horizon matured yet?" test and by
+# report()'s non-overlapping-window dedupe.
+FWD_HORIZON_CANDLES = 48
+FWD_HORIZON_SECS = FWD_HORIZON_CANDLES * 300  # 300s = 5m candle interval
 
 # Block-line patterns seen in pipeline.log (2026-10-04 verified):
 #   🚫 [GATE-NAME] TOKEN DIRECTION blocked — reason
@@ -81,6 +101,37 @@ def log(msg):
     print(f'[{ts}] [gate_shadow] {msg}', flush=True)
 
 
+def _pin_pg_utc(pg, where):
+    """FIX 2026-10-31 (code-review #5): PG trades.open_time is `timestamp
+    without time zone`, so every `open_time >= %s::timestamptz` window edge in
+    this script resolved the timestamptz through the SESSION TimeZone — the
+    same block could fall inside or outside the window depending on where the
+    session ran. Pin the session (transaction-local, no DDL) to UTC and PROVE
+    it with SHOW timezone on both sides of the SET, so the log records what the
+    window edges were actually measured against.
+
+    Note: `SET LOCAL TimeZone 'UTC'` is a SYNTAX ERROR in PostgreSQL ('TimeZone'
+    parses as a generic var_name, which needs TO/=); the accepted form is
+    `SET LOCAL TIME ZONE 'UTC'` (verified against PG 16.15). A failed SET also
+    aborts the surrounding transaction, so any failure is followed by a
+    rollback before the caller's own queries run.
+    """
+    cur = pg.cursor()
+    try:
+        cur.execute("SHOW timezone")
+        before = cur.fetchone()[0]
+        cur.execute("SET LOCAL TIME ZONE 'UTC'")  # holds for this txn (psycopg2 default)
+        cur.execute("SHOW timezone")
+        after = cur.fetchone()[0]
+        log(f'pg timezone [{where}]: {before} -> {after} (SET LOCAL TIME ZONE UTC)')
+    except Exception as e:
+        try:
+            pg.rollback()  # clear the aborted transaction a bad SET leaves behind
+        except Exception:
+            pass
+        log(f'pg timezone [{where}] NOT pinned ({e}) — open_time window edges may drift')
+
+
 def get_db():
     os.makedirs(os.path.dirname(SHADOW_DB), exist_ok=True)
     conn = sqlite3.connect(SHADOW_DB)
@@ -107,11 +158,16 @@ def get_db():
     # FWD JOIN (2026-10-31 deep-dive KEEP-label): fwd_4h = expiry-style
     # direction-signed fwd return (see close_fwd); fwd_done marks the attempt so
     # tokens without candle history are skipped instead of rescanned hourly.
-    for col in ('fwd_4h REAL', 'fwd_done INTEGER'):
-        try:
-            conn.execute(f"ALTER TABLE events ADD COLUMN {col}")
-        except sqlite3.OperationalError:
-            pass  # column exists
+    # FIX 2026-10-31 (code-review #12): two literal ALTERs instead of one f-string
+    # over a hardcoded tuple — same shape as the trade_id ALTER above.
+    try:
+        conn.execute("ALTER TABLE events ADD COLUMN fwd_4h REAL")
+    except sqlite3.OperationalError:
+        pass  # column exists
+    try:
+        conn.execute("ALTER TABLE events ADD COLUMN fwd_done INTEGER")
+    except sqlite3.OperationalError:
+        pass  # column exists
     return conn
 
 
@@ -218,6 +274,7 @@ def close_events():
             return 0
         pg = psycopg2.connect(**BRAIN_DB_DICT)
         pg_cur = pg.cursor()
+        _pin_pg_utc(pg, 'close')  # open_time (timestamp w/o tz) window edges
         n_closed = n_trade = 0
         # BACKFILL (2026-10-26 #156): resolve trade ids for rows closed before
         # trade_id existed, otherwise report() silently drops the whole history.
@@ -245,6 +302,9 @@ def close_events():
             # would-be outcome: first closed trade on token+direction opening
             # within 24h AFTER the block. trade_id stored so report() can count
             # each real trade once (2026-10-26 #156 — was 11x multi-counted).
+            # open_time is `timestamp without time zone`, so the ::timestamptz
+            # edges below resolve in the SESSION zone — pinned to UTC by
+            # _pin_pg_utc above (FIX 2026-10-31 code-review #5).
             pg_cur.execute("""
                 SELECT id, signal, pnl_usdt FROM trades
                 WHERE token = %s AND direction = %s AND status='closed'
@@ -281,13 +341,16 @@ _fwd_cache = {}
 
 
 def _load_fwd_candles(token):
+    # FIX 2026-10-31 (code-review #8): key the cache by the SAME normalized form
+    # the query uses (token.upper()), or 'btc' and 'BTC' cached separate series.
+    token = token.upper()
     if token in _fwd_cache:
         return _fwd_cache[token]
     conn = sqlite3.connect(CANDLES_DB, timeout=10)
     try:
         rows = conn.execute(
             "SELECT ts, open, close FROM candles_5m"
-            " WHERE token=? AND is_closed=1 ORDER BY ts", (token.upper(),)).fetchall()
+            " WHERE token=? AND is_closed=1 ORDER BY ts", (token,)).fetchall()
     finally:
         conn.close()
     _fwd_cache[token] = rows
@@ -307,21 +370,29 @@ def _fwd_4h(rows, entry_ts, direction):
         else:
             hi = mid
     i = lo
-    if i + 48 >= len(rows):
+    if i + FWD_HORIZON_CANDLES >= len(rows):
         return None
     o = rows[i][1]
+    if not o:
+        # FIX 2026-10-31 (code-review #7): zero/absurd open cannot form a
+        # return — guard the rows[i+48][2] / o division instead of raising.
+        return None
     sgn = 1 if direction == 'LONG' else -1
-    return sgn * (rows[i + 48][2] / o - 1.0) * 100.0
+    return sgn * (rows[i + FWD_HORIZON_CANDLES][2] / o - 1.0) * 100.0
 
 
 def close_fwd():
     """Backfill fwd_4h (expiry-style fwd-return join) for events >4.5h old.
 
     This is the PRIMARY outcome join (registry gate-shadow KEEP-with-switch):
-    covers ~100% of events vs the trade-join's ~13%. fwd_done=1 marks the
-    attempt; fwd_4h stays NULL only when the token has no candle history or the
-    +4h horizon has not happened yet (those events are retried never — the
-    horizon gap is at the corpus tail only).
+    covers ~100% of events vs the trade-join's ~13%. fwd_done=1 marks a
+    SETTLED attempt: either fwd_4h was computed, or the token has no candle
+    history at all (zero rows), or blocked_at is unparsable (can never mature).
+    FIX 2026-10-31 (code-review #2 HIGH): rows whose +4h horizon has NOT
+    matured yet (candle series ends before entry_ts + FWD_HORIZON_SECS) are no
+    longer stamped done — they stay pending so the next hourly run computes
+    them. The old unconditional stamp lost 37 done-NULL rows (12 of them
+    computable a few hours later, ~-11.4pp of NET).
     """
     conn = get_db()
     try:
@@ -332,31 +403,56 @@ def close_fwd():
         pending = cur.execute(
             "SELECT id, token, direction, blocked_at FROM events "
             "WHERE fwd_done IS NOT 1 AND blocked_at < ?", (cutoff,)).fetchall()
-        n_ok = n_nodata = 0
+        n_ok = n_nodata = n_retry = n_badparse = 0
+        n_since_commit = 0  # FIX 2026-10-31 (code-review #3 NIT): commit in-flight
         for eid, token, direction, blocked_at in pending:
             try:
                 b_dt = datetime.fromisoformat(blocked_at)
                 entry_ts = calendar.timegm(b_dt.utctimetuple())
             except (ValueError, TypeError):
+                # FIX 2026-10-31 (code-review #9 NIT): count+log instead of a
+                # silent stamp — an unparsable blocked_at can never mature, so
+                # it IS settled, but the loss must be visible in the log.
+                n_badparse += 1
                 cur.execute("UPDATE events SET fwd_done=1 WHERE id=?", (eid,))
+                n_since_commit += 1
                 continue
             rows = _load_fwd_candles(token)
             fm = _fwd_4h(rows, entry_ts, direction) if rows else None
-            if fm is None:
-                n_nodata += 1
-                cur.execute("UPDATE events SET fwd_done=1 WHERE id=?", (eid,))
-            else:
+            if fm is not None:
                 cur.execute("UPDATE events SET fwd_4h=?, fwd_done=1 WHERE id=?",
                             (fm, eid))
                 n_ok += 1
+            elif not rows:
+                # zero candle rows = the token has no history at all: settle it
+                # so it is not rescanned every hour.
+                n_nodata += 1
+                cur.execute("UPDATE events SET fwd_done=1 WHERE id=?", (eid,))
+            else:
+                # FIX 2026-10-31 (code-review #2 HIGH): candle rows exist but the
+                # series ends before the +4h horizon — the horizon has not
+                # matured (candles still arriving; gaps may still be backfilled).
+                # Leave PENDING for the next hourly retry; stamping here is what
+                # permanently lost the 12 computable done-NULL rows.
+                n_retry += 1
+                continue
+            n_since_commit += 1
+            if n_since_commit >= 500:
+                conn.commit()
+                n_since_commit = 0
         conn.commit()
         tot, done, ok = cur.execute(
             "SELECT COUNT(*), SUM(CASE WHEN fwd_done=1 THEN 1 ELSE 0 END), "
             "SUM(CASE WHEN fwd_4h IS NOT NULL THEN 1 ELSE 0 END) FROM events"
         ).fetchone()
-        log(f'fwd: {len(pending)} backfilled, {n_ok} with fwd_4h'
-            f' ({n_nodata} lacking candle horizon); coverage {ok or 0}/{tot}'
-            f' events ({(ok or 0)/tot*100 if tot else 0:.1f}%, attempted {done or 0})')
+        still = cur.execute(
+            "SELECT COUNT(*) FROM events WHERE fwd_done IS NOT 1").fetchone()[0]
+        log(f'fwd: {len(pending)} eligible, {n_ok} with fwd_4h'
+            f' ({n_nodata} no-history settled, {n_retry} horizon-not-matured left'
+            f' pending for retry, {n_badparse} unparsable blocked_at settled);'
+            f' coverage {ok or 0}/{tot} events'
+            f' ({(ok or 0)/tot*100 if tot else 0:.1f}%, attempted {done or 0},'
+            f' pending {still})')
         return n_ok
     finally:
         conn.close()
@@ -372,6 +468,11 @@ def _avg_notional():
         pg = psycopg2.connect(**BRAIN_DB_DICT)
         try:
             cur = pg.cursor()
+            # open_time is `timestamp without time zone`; `open_time >= now() -
+            # make_interval(...)` resolves now() through the SESSION zone, so a
+            # non-UTC session shifts the 30d window edge. Pin to UTC
+            # (FIX 2026-10-31 code-review #5) before measuring.
+            _pin_pg_utc(pg, 'notional')
             cur.execute(
                 "SELECT ROUND(AVG(amount_usdt)::numeric, 2), COUNT(*) FROM trades "
                 "WHERE status='closed' AND amount_usdt IS NOT NULL "
@@ -398,6 +499,12 @@ def report():
     horizon — direction-signed in the blocked direction's would-be direction, so
     negative fwd_4h = the blocked direction would have LOST = gate protective.
     $-eq converts pp at the LIVE avg notional (trailing 30d PG amount_usdt).
+    The FWD numbers are a PER-BLOCK OVERLAPPING-WINDOW basis (one row per block
+    EVENT over repeated tokens — module docstring STATISTICS WARNING, #160
+    class): tok_n (distinct token|direction) is the independent unit, COSTLY /
+    protective flags require tok_n>=50 rather than row-n, every gate in the DB
+    is listed (zero-coverage gates print a hole row), and a deduped
+    non-overlapping-window NET is printed beside the raw NET.
 
     SECONDARY — trade-join semantics (#156): an event resolves to the first REAL
     Hermes trade on the same token+direction opening within 24h after the block.
@@ -418,28 +525,40 @@ def report():
         # ── FWD BASIS (LEAD) ───────────────────────────────────────────────────
         log('─── GATE SHADOW REPORT — FWD-BASIS (LEAD): expiry-style fwd-return join ───')
         fwd_rows = cur.execute(
-            "SELECT gate, direction, fwd_4h FROM events WHERE fwd_4h IS NOT NULL"
+            "SELECT gate, token, direction, blocked_at, fwd_4h FROM events"
+            " WHERE fwd_4h IS NOT NULL"
         ).fetchall()
         if not fwd_rows:
             log('  no fwd_4h rows yet — run --fwd to backfill the forward-return join')
         else:
             notional = _avg_notional()
+            # FIX 2026-10-31 (code-review #4 LOW): seed every gate that has ANY
+            # block, so a gate with zero fwd coverage prints an explicit hole
+            # row instead of silently vanishing from this table.
             blocks_by_gate = dict(cur.execute(
                 "SELECT gate, COUNT(*) FROM events GROUP BY 1").fetchall())
+            gagg = {g: {'n': 0, 'nL': 0, 'nS': 0, 'toks': set(),
+                        'pp': 0.0, 'ppL': 0.0, 'ppS': 0.0}
+                    for g in blocks_by_gate}
             n_cov = len(fwd_rows)
-            gagg = {}
-            for gate, d, f4 in fwd_rows:
-                a = gagg.setdefault(gate, {'n': 0, 'nL': 0, 'nS': 0,
+            n_other_dir = 0  # FIX 2026-10-31 (code-review #6 NIT): no silent else
+            for gate, tok, d, blocked_at, f4 in fwd_rows:
+                a = gagg.setdefault(gate, {'n': 0, 'nL': 0, 'nS': 0, 'toks': set(),
                                            'pp': 0.0, 'ppL': 0.0, 'ppS': 0.0})
                 a['n'] += 1
                 a['pp'] += f4
+                # independent unit = token|direction, NOT the row (#160 class)
+                a['toks'].add(f'{tok}|{d}')
                 if d == 'LONG':
                     a['nL'] += 1
                     a['ppL'] += f4
-                else:
+                elif d == 'SHORT':
                     a['nS'] += 1
                     a['ppS'] += f4
+                else:
+                    n_other_dir += 1
             net_pp = sum(a['pp'] for a in gagg.values())
+            n_pairs = len({t for a in gagg.values() for t in a['toks']})
             nL = sum(a['nL'] for a in gagg.values())
             ppL = sum(a['ppL'] for a in gagg.values())
             nS = sum(a['nS'] for a in gagg.values())
@@ -448,34 +567,98 @@ def report():
             log('    first closed 5m candle at/after block; sgn=+1 LONG / -1 SHORT blocked dir):')
             log('    NEGATIVE = blocked direction would have LOST = gate protective.')
             log(f'  coverage: {n_cov}/{tot} events ({n_cov / tot * 100:.1f}%)')
+            # FIX 2026-10-31 (code-review #1c): pseudo-replication warning —
+            # same class and wording as expiry_shadow.py's brain_auditor #160
+            # STATISTICS WARNING (one row per EVENT over repeated tokens).
+            log('  ⚠ PSEUDO-REPLICATED (brain_auditor run #160 class, same warning as'
+                ' expiry_shadow): one row per block EVENT, and events repeat over the'
+                f' same {n_pairs} token|direction pairs — overlapping 4h windows from the'
+                ' 10-min dedupe are counted as independent evidence, so every per-row /'
+                ' per-gate figure below is PSEUDO-REPLICATED and overstated.')
+            log('    The independent unit is token|direction (the tok_n column), not the'
+                ' row; flags below require tok_n>=50 distinct pairs. Use'
+                ' brain/analysis/cluster_t.py cluster_t(values, clusters) (selfcheck PASS)'
+                ' for any significance claim off this DB; naive per-row averages are point'
+                ' estimates only.')
             eq_s = (f'  ${net_pp / 100 * notional:+,.2f}-eq @ ${notional:.2f} live avg notional'
-                    if notional else '')
-            log(f'  NET: {net_pp:+,.1f}pp total, avg {net_pp / n_cov:+.3f}%/event{eq_s}')
+                    if notional is not None else '')
+            # FIX 2026-10-31 (code-review #1d): label the raw NET for what it is
+            # (per-block, overlapping windows), then print the deduped
+            # non-overlapping-window NET right beside it (per token|direction, only
+            # the first block of each >=4h-spaced window — greedy, blocked_at order).
+            log(f'  NET (per-block overlapping-window basis): {net_pp:+,.1f}pp total,'
+                f' avg {net_pp / n_cov:+.3f}%/event{eq_s}')
+            seen_last, dd_n, dd_pp = {}, 0, 0.0
+            for _gate, _tok, _d, _ba, _f4 in sorted(fwd_rows, key=lambda r: r[3]):
+                try:
+                    _et = datetime.fromisoformat(_ba).timestamp()
+                except (ValueError, TypeError):
+                    continue
+                _key = f'{_tok}|{_d}'
+                if _key in seen_last and _et - seen_last[_key] < FWD_HORIZON_SECS:
+                    continue  # overlaps the window already taken for this pair
+                seen_last[_key] = _et
+                dd_n += 1
+                dd_pp += _f4
+            dd_eq = f'  ${dd_pp / 100 * notional:+,.2f}-eq' if notional is not None else ''
+            log(f'  DEDUPED (non-overlapping >=4h windows, 1st block per'
+                f' token|direction): n={dd_n:6d} NET: {dd_pp:+,.1f}pp,'
+                f' avg {(dd_pp / dd_n if dd_n else 0.0):+.3f}%/event{dd_eq}')
             if nL:
-                eql = f'  ${ppL / 100 * notional:+,.2f}-eq' if notional else ''
+                eql = f'  ${ppL / 100 * notional:+,.2f}-eq' if notional is not None else ''
                 log(f'    LONG  blocks n={nL:6d} avg {ppL / nL:+.3f}%'
-                    f' {"(protective)" if ppL < 0 else "(costly)"}{eql}')
+                    f' {"(protective)" if ppL < 0 else "(costly)" if ppL > 0 else "(neutral)"}{eql}')
             if nS:
-                eqs = f'  ${ppS / 100 * notional:+,.2f}-eq' if notional else ''
+                eqs = f'  ${ppS / 100 * notional:+,.2f}-eq' if notional is not None else ''
                 log(f'    SHORT blocks n={nS:6d} avg {ppS / nS:+.3f}%'
-                    f' {"(protective)" if ppS < 0 else "(costly)"}{eqs}')
-            hdr = f'{"gate":28} {"blocks":>6} {"fwd_n":>6} {"avg%":>8} {"net_pp":>10}'
-            if notional:
+                    f' {"(protective)" if ppS < 0 else "(costly)" if ppS > 0 else "(neutral)"}{eqs}')
+            if n_other_dir:
+                # FIX 2026-10-31 (code-review #6 NIT): the split used to swallow
+                # anything non-LONG into the SHORT bucket — count what is left.
+                log(f'  ⚠ {n_other_dir} fwd rows had a direction outside LONG/SHORT'
+                    ' (excluded from the split above)')
+            hdr = (f'{"gate":28} {"blocks":>6} {"fwd_n":>6} {"tok_n":>6} {"avg%":>8}'
+                   f' {"net_pp":>10}')
+            if notional is not None:
                 hdr += f' {"net_$-eq":>9}'
             log(hdr)
-            for gate, a in sorted(gagg.items(), key=lambda kv: -kv[1]['pp']):
+            # zero-fwd-coverage gates sort last (nothing to rank pp on)
+            for gate, a in sorted(gagg.items(),
+                                  key=lambda kv: (kv[1]['n'] == 0, -kv[1]['pp'])):
+                if a['n'] == 0:
+                    # FIX 2026-10-31 (code-review #4 LOW): coverage holes are
+                    # printed, not hidden.
+                    hole = (f'{gate:28} {blocks_by_gate.get(gate, 0):6d} {0:6d}'
+                            f' {0:6d} {"n/a":>8} {"n/a":>10}')
+                    if notional is not None:
+                        hole += f' {"n/a":>9}'
+                    log(hole + ' ← NO FWD COVERAGE (zero fwd_4h rows)')
+                    continue
                 avg = a['pp'] / a['n']
+                tok_n = len(a['toks'])
                 flag = ''
-                if a['n'] >= 50:
-                    flag = (' ← COSTLY (blocked dir would have won, n>=50)' if avg > 0
-                            else ' ← protective')
+                # FIX 2026-10-31 (code-review #1b): the COSTLY/protective flag is
+                # gated on DISTINCT token|direction pairs (tok_n>=50), never on
+                # raw row-n — row-n is pseudo-replicated (one BTC LONG block
+                # window can contribute 1,605 overlapping rows).
+                if tok_n >= 50:
+                    # FIX 2026-10-31 (code-review #10 NIT): avg exactly 0.0 used
+                    # to fall into the protective branch — test avg<0 instead.
+                    if avg > 0:
+                        flag = ' ← COSTLY (blocked dir would have won, tok_n>=50)'
+                    elif avg < 0:
+                        flag = ' ← protective'
+                    else:
+                        flag = ' ← neutral (avg exactly 0)'
                 line = (f'{gate:28} {blocks_by_gate.get(gate, a["n"]):6d} {a["n"]:6d}'
-                        f' {avg:+8.3f} {a["pp"]:+10.1f}')
-                if notional:
+                        f' {tok_n:6d} {avg:+8.3f} {a["pp"]:+10.1f}')
+                if notional is not None:
                     line += f' {a["pp"] / 100 * notional:+9.2f}'
                 log(line + flag)
-            log('  (per-gate sorted by net_pp desc = costliest blocks first;'
-                ' CEO criteria n>=50 + OOS same-sign apply to any gate change)')
+            log('  (per-gate sorted by net_pp desc = costliest blocks first; each row is'
+                ' a per-block overlapping-window sum — tok_n is the distinct'
+                ' token|direction count behind it and flags need tok_n>=50, not raw'
+                ' fwd_n; CEO criteria tok_n>=50 + OOS same-sign apply to any gate change)')
         # ── TRADE-JOIN BASIS (SECONDARY, continuity) ───────────────────────────
         rows = cur.execute(
             "SELECT gate, closed, would_trade, would_win, would_pnl, trade_id "
