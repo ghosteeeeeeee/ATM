@@ -3285,5 +3285,16 @@
     "after": "prefer vol_regime from sig/entry; live fallback only when missing",
     "rationale": "Cells validated on stored volatility_regime; live ATR drifts between approval and open, silently dropping 1.25x offense",
     "impact": "Expected ~100% winner-cell hit rate on stored-regime cells; +25% notional on validated winners only"
+  },
+  {
+    "timestamp": "2026-10-31T04:55:00Z",
+    "agent": "brain_auditor",
+    "change": "New zero-behavior analysis script brain/analysis/jup_band_cell_inertness_2026-10-31.py (--selfcheck PASS): locks jup LONG rsi band baseline pre-11-07 + winner-cell x amplitude inertness census",
+    "type": "creative",
+    "file": "brain/analysis/jup_band_cell_inertness_2026-10-31.py",
+    "before": "n/a (new file)",
+    "after": "n/a (new file)",
+    "rationale": "pre-register jup band before its 11-07 eval; quantify HIGH_AMP cell inertness for CEO sizing report",
+    "impact": "zero trading behavior; enables valid OOS read at 11-07"
   }
 ]

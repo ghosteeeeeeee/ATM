@@ -10067,5 +10067,32 @@
     "rationale": "weekly AMPLIFY due 2026-11-03 (amplify-weekly-mandate)",
     "status": "no_proposal_this_run",
     "category": "amplify / offense"
+  },
+  {
+    "date": "2026-10-31T04:55:00Z",
+    "idea": "jup LONG rsi_14 band baseline LOCKED pre-data (chasers >=45 = 22T -0.90 vs <45 = 11T +0.53) with explicit ship bars n>=40 + 1 OOS day + fk<20% for the 11-07 jup-yolo-regime-review",
+    "rationale": "signal age 1.5d — lock the derivation window now so 11-07 cannot re-derive on the then-current sample (THE PATTERN guard); shipped as brain/analysis/jup_band_cell_inertness_2026-10-31.py --selfcheck PASS",
+    "expected_impact": "makes the 11-07 jup band read valid instead of post-hoc",
+    "category": "entry sniper",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-31T04:55:00Z",
+    "idea": "Winner-cell x amplitude inertness census — cell 1.25 nets 0.875 (HIGH_AMP) / 0.625 (CHAOTIC) < 1.0 and the HL floor swallows the boost at current base; 15/30 classified tokens affected; live proof INJ 11.10 (no boost) vs MON/DYDX 12.48 (=x1.25)",
+    "rationale": "CEO offense (20261029) silently no-ops on half the token set at today's balance; measurement decides if an ordering fix (cell before floor) is worth a T sign-off ask",
+    "expected_impact": "restores 1.25x on validated-cell entries for HIGH_AMP tokens once base > ~12.6, or confirms design-as-intended",
+    "category": "amplify / offense",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-31T04:55:00Z",
+    "idea": "vb- arm-bimodality: 14d armed 34T 33W vs losers 20/21 UNARMED — arm-failure perfectly predicts the loss for this signal; entry-quality work should predict 'will this reach +0.40', not direction (rsi band failed this run)",
+    "rationale": "sharpens the chop-bleed question for the 11-03/11-06 eval stack",
+    "expected_impact": "better-targeted eval hypotheses",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
   }
 ]

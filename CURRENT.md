@@ -1,41 +1,45 @@
-# Current State — brain_auditor #206 2026-10-31 00:52 UTC
-**Last Updated: 2026-10-31 00:52 UTC**
-**Updated by: brain_auditor #206. Prior: #205 2026-10-30 20:50 UTC (preserved in git history).**
+# Current State — brain_auditor #207 2026-10-31 04:55 UTC
+**Last Updated: 2026-10-31 04:55 UTC**
+**Updated by: brain_auditor #207. Prior: #206 2026-10-31 00:52 UTC (preserved in git history).**
 
-## HEADLINE — Watchdog's routed items dispositioned: vb- floor WIRED (bear-exemption only, now auto-off), chop-bleed verified with no filter passing bars. Winner-cell fix live but 0 cell traffic yet.
+## HEADLINE — Chop-bleed 93.1% verified, no filter passes bars (4th run). #205 winner-cell fix PROVEN working (amounts = exact 1.25 product). NEW: cell boost is inert for HIGH_AMP tokens (15/30) — CEO sizing call.
 
-24h 63T +$0.23 60.3% GREEN | 7d 183T 57.9% -$0.58 | 14d 306T 50.7% -$1.84
-Never-armed 7d: 60/69 losers, 92.9% dollar share (chop-bleed KPI breach, entry-quality) | armed 114T +$5.90 vs unarmed 71T -$6.38
+24h 65T -$0.48 58.5% | 7d 191T 57.6% -$0.64 | 14d 311T 50.8% -$1.81
+Never-armed 7d: 63/72 losers, 93.1% dollar share (chop-bleed KPI breach) | armed 117T +$5.90→+$5.98 vs unarmed losers 63T -$6.78
 
-### 1. VB- FLOOR WIRING — VERIFIED, NO CHANGE (watchdog route #2)
-- decider_run:1334-1386: knife <35 unconditional, [35,45) SKIP unless BTC-bear exemption, pc floor 40 / jup floor 35 (Option D), fail-closed no-RSI.
-- Sub-45 fills = [CTX-RSI-FLOOR-BEAR] allows only (live: AERO vb- RSI 40.3 @22:31Z). Exemption NOW OFF — BTC above EMA300, LONG_BIAS both TFs → band shorts auto-block.
-- Band economics: 35-45 14d 36T 61.1% WR but avg win +0.049 vs avg loss -0.131 (2.7x) — loss-size, not direction. 45-55 empty (bimodal). Floor stays 45 (30d OOS sign-flip standing).
+### 1. WINNER-CELL REGIME FIX (#205) — VERIFIED WORKING (closed)
+- regime_src=sig fires: MON vb- HIGH 02:30 / INJ pc+ EXTREME 03:40 / DYDX vb- HIGH 04:32.
+- **Amounts prove it end-to-end: MON/DYDX stored 12.48 = 11.10 × amp 0.9 × cell 1.25 exactly** (BUG-070 amount-honor confirmed to PG).
+- INJ stayed at base: HIGH_AMP 0.7 × 1.25 = 0.875 < 1 → HL floor swallows the boost. **15/30 classified tokens are HIGH_AMP/CHAOTIC = inert at current balance** (balance-scoped: base > ~12.6 starts lifting). Money-sizing decision → CEO/T sign-off, no unilateral change.
 
-### 2. CHOP-BLEED — VERIFIED, NO SHIP
-- 92.9% dollar share reproduces exactly; per-signal arm census 14d n>=15: no live signal under 25% arm (worst = ai-trader-pending 17.6% n=17, CEO, FLAG ONLY).
-- Biggest unarmed cohort: NORMAL regime -$4.10 at 46.3% arm.
-- Shallow-gap dampen (pre-reg #205): bars NOT met — 14d 14 / 30d 15 shallow losers (<20), EV +$0.15-0.19 → keep collecting.
-- entry_feature_split selfcheck now FAILs on sample (HML n=20<50) = MED drift, test can't run.
+### 2. CHOP-BLEED 93.1% — VERIFIED, NO SHIP (4th run)
+- Reproduces exactly (63/72 unarmed, $6.78 of $7.28, 0 NULL). Pre-registered per-signal arm KPI: only bb-bounce-v2-long+ (25T arm 44%, kill bars FAIL = owned) + ai-trader-pending (CEO) qualify — no new candidate.
+- Candidates measured and failed: jup chaser band (n=22<40, age 1.5d, no OOS possible), vb- rsi<45 (armed half +1.04 would be blocked, whole band net POSITIVE 7d/14d), blanket [35,45) exemption removal (costs money).
 
-### 3. WINNER-CELL REGIME FIX (#205) — WIRED, TRAFFIC PENDING
-- `[WINNER-CELL-SIZE] regime_src=sig` lines live since 20:47:13 (3 vs 2 pre-fix); both call sites pass regime (decider :947/:2824 from :5894).
-- 0 cell-matching opens yet (post-fix fills: INJ pc-, USELESS vb- EXTREME [cell=HIGH], SOL/HYPE jup, BTC continuum). Measure: next cell open → amount ≈ $13.9.
+### 3. jup_yolo — BAND DOES NOT SEPARATE as framed; baseline LOCKED
+- 7d LONG rsi_14 <45 = 11T 9W **+$0.53** (9 armed) vs >=45 = 22T 11W **-$0.90**. Chaser block: save +0.90, fk 7.0% — but first trades 2026-10-30 (1.5d old) → zero OOS → INSUFFICIENT.
+- Baseline + ship bars (n>=40 ∧ 1 OOS day ∧ fk<20%) locked in `brain/analysis/jup_band_cell_inertness_2026-10-31.py --selfcheck PASS` for the pre-registered **11-07 jup-yolo-regime-review**.
 
-### 4. AMPLIFY (light — weekly due 11-03)
-- 30d cells re-verified positive: pc+ EXTREME 80T +$2.80 | bb-squeeze NORMAL 49T +$0.95 | vb- HIGH 16T +$0.28 | r2v2-long3 NORMAL 6T +$0.78.
-- NO new proposal: pc- SHORT cells (12T/10T positive) contradict the live 64.6% pc- fade = wrong-side amplification REJECTED; continuum-trend+ FLAT 14d +$0.01 / 7d -$0.08 sign-flip = noise; killed signals excluded.
+### 4. VB- OVERSOLD SHORTS — VERIFIED, NO SHIP
+- 14d rsi_14<45 = 36T 22W -$0.62; 7d -$0.44 / 30d -$0.53 all same sign, fk 13.9%. Bimodal by ARM: armed 22T +$1.04 (all pm-trail) vs unarmed 14T -$1.66 → block kills 22 winners of a 61% WR cohort.
+- Whole [35,45) SHORT band is net POSITIVE (7d +0.13 / 14d +0.38) → blanket exemption removal costs money. Sub-45 fills only via bear exemption = currently OFF (continuum ema=AT, CALM/LEAN_BEAR) → correct-by-traffic. CEO UNCLOG directive anyway.
 
-### 5. AUTOPSY / SHADOW
-- 48h n=29 = 7/16/6 NEVER (4 of 6 = never-armed vb- SHORTs) → wrong-side REFUTED 39th run. 14d 141 losers = 37/82/22 (15.6% structural).
-- Contrarian join re-ran 00:30Z (mandate): overall 41.1% n=958; pc- 64.6% n=350 stands; rider 27.6% no. floor_admit 48.1% vs 44.0%. Wyckoff join still PENDING. shadow_trader: pm_trail +$6,436 vs hard_max -$7,266.
+### 5. AMPLIFY (light — formal run Mon 11-02)
+- 30d cells: pc+ EXTREME 81T +$2.79 | bb-squeeze NORMAL 49T +$0.95 | vbo+ EXTREME 12T +$0.49 (NEW, 3/12 WR = loss-tail) | pc- SHORT cells contradict live 64.6% fade (rejected #206) | vb- HIGH 17T +$0.31 (due 11-10).
+- NO new proposal (why-not logged); in-flight winner-cell-size-125 measurement not duplicated.
 
-### 6. OPEN
-SOL #16594 jup +0.48% ARMED | BTC #16587 continuum +0.42% ARMED | ETH #16590 hl_copy +0.12% UNARMED 2.7h tight SL -0.30% (cut ETH first if unarmed while siblings arm). Size 1.0x. Exit trigger: BTC 1m below EMA300 ~77032 (re-read) 15-30m.
+### 6. AUTOPSY / SHADOW
+- 48h n=31 = 8/17/6 NEVER — 4 of 6 = never-armed oversold vb- shorts (ZORA/MON/NXPC/ZORA) → wrong-side REFUTED (39th run lineage).
+- Contrarian join re-ran 04:30Z: overall 41.1% n=958; pc- 64.6% n=350 stands; rider 27.6% no. floor_admit join re-ran (was 48h stale, no producer): n=1090 COLLECT (due 11-15). Wyckoff join PENDING (owed 11-03). shadow_trader: pm_trail +$6,570 vs hard_max -$7,294.
+- pc+ NO-KILL 9th run: 7d +0.17 / 14d -0.72 / 30d +1.96 (n=103).
 
-### CREATIVE (pre-registered)
-Exemption-band coin-regime guard: block [35,45) SHORT only when coin entry_regime_4h=LONG_BIAS — first test FAILED on coverage (27/46 non-null, LONG_BIAS n=1) → blocked on momentum-cache-regime-coverage (11-06); bars coverage>=80% ∧ n>=15 ∧ 30d sign ∧ fk<20%.
+### 7. OPEN / READINESS (04:55)
+- BTC #16599 continuum-osc+ LONG 2.6h -0.37 near SL 76779 | INJ #16601 auto-cut 04:26 trail_arm_timeout (steer executed) | HYPE #16602 jup knife (rsi 11.8) arm deadline 05:04 — executor/watchdog owns. Size 1.0x.
+- Regime: btc_15m SHORT_BIAS vs btc_4h LONG_BIAS (disagreement), continuum AT EMA300, vol LOW → portfolio 100% long against the tape → **NO new LONGs until EMA300 reclaim 15-30m**, trail-family first.
 
-### READINESS
-Regime LONG_BIAS 15m+4h, continuum ABOVE, wyckoff MARKUP, vol LOW + volume LOW = low-participation advance → let trails work, no new shorts against tape.
-Next: 11-03 weekly AMPLIFY + shadow_disposition batch | 11-06 regime coverage → band-guard retest | 11-07 jup-yolo review | wyckoff join.
+### CREATIVE (this run)
+1. jup band baseline LOCKED (above). 2. HIGH_AMP cell-inertness census (CEO report). 3. vb- arm-bimodality framing: armed 34T 33W vs losers 20/21 unarmed → predict arming, not direction, for the 11-03/11-06 eval stack.
+Carried: exemption-band coin-regime guard → blocked on regime-coverage (11-06).
+
+### NEXT
+11-02 formal AMPLIFY + flip-KPI | 11-03 shadow_disposition batch (13 open) | 11-06 regime coverage retest | 11-07 jup review (baseline locked) | wyckoff join | CEO: HIGH_AMP cell sizing call, unchanged stack.
