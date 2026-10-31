@@ -2997,18 +2997,28 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             # Clear engine SL/TP ONCE: levels were set at open (decider ATR) —
             # guardian enforces trades.stop_loss/target against live HL positions
             # within ~60s (bug_hunter HIGH). NULL/0 → its breach checks skip.
-            if (pos.get('stop_loss') or pos.get('target')) and db_cur:
+            if pos.get('stop_loss') or pos.get('target'):
+                # FIX (bug_hunter re-verify BUG-1): the original used `db_cur`
+                # — a function-local first bound ~340 lines BELOW this guard
+                # (RR block) → UnboundLocalError crash of position_manager on
+                # the first T1 trade with levels (and no commit → guardian
+                # leak persisted anyway). Dedicated short-lived connection,
+                # commit before close, mirrors the RR-block pattern.
                 try:
-                    db_cur.execute(
-                        "UPDATE trades SET stop_loss = NULL, target = NULL "
-                        "WHERE id = %s AND status = 'open'", (trade_id,))
-                    try:
-                        pos['stop_loss'] = None
-                        pos['target'] = None
-                    except Exception:
-                        pass
-                    log(f"  [XMIRROR] {token} {direction}: engine SL/TP cleared — "
-                        f"exact mirror rides pro's exit (catastrophic floor only)")
+                    _xmf_conn = get_db_connection()
+                    if _xmf_conn is not None:
+                        try:
+                            _xmf_cur = get_cursor(_xmf_conn)
+                            _xmf_cur.execute(
+                                "UPDATE trades SET stop_loss = NULL, target = NULL "
+                                "WHERE id = %s AND status = 'open'", (trade_id,))
+                            _xmf_conn.commit()
+                            pos['stop_loss'] = None
+                            pos['target'] = None
+                            log(f"  [XMIRROR] {token} {direction}: engine SL/TP cleared — "
+                                f"exact mirror rides pro's exit (catastrophic floor only)")
+                        finally:
+                            _xmf_conn.close()
                 except Exception as _xmf_e:
                     log(f"  [XMIRROR] {token}: SL/TP clear failed — {_xmf_e}", "WARN")
             if live_pnl <= _xmf_pct:

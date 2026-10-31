@@ -332,15 +332,27 @@ def get_positions_for_mae_guard():
                                 password=BRAIN_PASSWORD, connect_timeout=10)
         try:
             cur = conn.cursor()
-            cur.execute("""
+            # FIX (bug_hunter re-verify BUG-2): this path had NO bypass
+            # clauses — unlike get_losing_positions — so the MAE guard could
+            # HL-close hl_copy (incl. T1 exact-mirror) LONG trades while the
+            # sibling list protected them. Same PROFIT_MONSTER_BYPASS_SIGNALS
+            # treatment as get_losing_positions (hl_copy_trader covered).
+            bypass_clauses = ""
+            params = []
+            if PROFIT_MONSTER_BYPASS_SIGNALS:
+                or_parts = ["signal LIKE %s"] * len(PROFIT_MONSTER_BYPASS_SIGNALS)
+                bypass_clauses = "AND NOT (" + " OR ".join(or_parts) + ")"
+                params = [f"%{s}%" for s in PROFIT_MONSTER_BYPASS_SIGNALS]
+            cur.execute(f"""
                 SELECT id, token, direction, entry_price, current_price, highest_price,
                        pnl_pct, open_time
                 FROM trades
                 WHERE server = 'Hermes' AND status = 'open'
                   AND entry_price > 0 AND current_price > 0
                   AND direction = 'LONG'
+                  {bypass_clauses}
                 ORDER BY open_time DESC
-            """)
+            """, params)
             rows = cur.fetchall()
             # CEO-tranche token guard — MAE path (bug_hunter F-1 HIGH): this
             # list ran BEFORE the guarded list and could HL-close a pipeline

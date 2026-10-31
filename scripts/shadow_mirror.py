@@ -90,11 +90,18 @@ def _mean_signed_slip_pct(wallets, window_start, conn_fills):
     except Exception:
         return slips
     per_wallet = defaultdict(list)
+    _seen_entries = set()
     for w, coin, side, px, t_ms in rows:
         if len(per_wallet[w]) >= SHADOW_ENTRY_MAX_FILLS:
             continue
         if _bad_coin(coin) or not px or not t_ms:
             continue
+        # bug_hunter LOW: source has duplicate fill rows — dedupe here too or
+        # the slip mean over-weights duplicated entries (compute_shadow does).
+        _ekey = (w, coin, side, px, t_ms)
+        if _ekey in _seen_entries:
+            continue
+        _seen_entries.add(_ekey)
         per_wallet[w].append((coin, side, float(px), int(t_ms)))
     if not per_wallet:
         return slips
@@ -261,8 +268,13 @@ def _write_outputs(shadow: dict) -> None:
         'updated': shadow['updated'],
         'window_days': shadow['window_days'],
         'wallets': shadow['wallets'],
+        # bug_hunter MED: carried (zero-fill) rows keep OLD pnl values for
+        # hysteresis — ranking them would let a 10-day-stale wallet top the
+        # board above fresh T1s. Carried rows stay in 'wallets' (tier state)
+        # but never enter the leaderboard ranking.
         'leaderboard': sorted(
-            ({'wallet': w, **s} for w, s in shadow['wallets'].items()),
+            ({'wallet': w, **s} for w, s in shadow['wallets'].items()
+             if not s.get('carried_no_fills')),
             key=lambda x: -x['pnl_after_latency'])[:100],
         'thresholds': {
             'T1': {'n': T1_MIN_SHADOW_N, 'wr': T1_MIN_SHADOW_WR,

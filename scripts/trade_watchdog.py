@@ -1745,20 +1745,46 @@ def execute_safe_actions(steers, watchdog_mode):
             # paper=TRUE only) = DB/exchange divergence + a third actor on a
             # CEO stop (bug_hunter 2026-10-22 #3). Skip managed signals.
             _skip_ceo_stop = False
+            _skip_xmirror = False
             if trade_id:
                 try:
                     import manual_exit_manager as _mxmw
                     _conn_ms = get_db()
                     if _conn_ms:
                         _cur_ms = _conn_ms.cursor()
-                        _cur_ms.execute("SELECT signal FROM trades WHERE id=%s", (trade_id,))
+                        _cur_ms.execute("SELECT signal, _signal_metadata FROM trades WHERE id=%s", (trade_id,))
                         _row_ms = _cur_ms.fetchone()
                         _cur_ms.close()
                         _conn_ms.close()
                         if _row_ms and _mxmw.is_managed_signal(_row_ms[0]):
                             _skip_ceo_stop = True
+                        # T1 EXACT MIRROR (bug_hunter MED): autopilot must not
+                        # place HL stops on a trade whose pro exit governs —
+                        # the mirror guard NULLs levels, which made the +2%
+                        # breakeven branch fire MORE often (current_sl==0).
+                        if _row_ms:
+                            try:
+                                from trust_tiers import is_exact_mirror_trade as _tw_ixm
+                                if _tw_ixm({'signal': _row_ms[0],
+                                            '_signal_metadata': _row_ms[1]}):
+                                    _skip_xmirror = True
+                            except Exception:
+                                pass
                 except Exception:
                     pass
+            if _skip_xmirror:
+                log(f"AUTO-EXEC: SKIP {symbol} stop move — T1 exact mirror "
+                    f"(pro's exit governs, catastrophic floor only)", "INFO")
+                executed.append({
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "type": "move_stop",
+                    "symbol": symbol,
+                    "new_stop": new_stop,
+                    "reason": "skipped: T1 exact mirror trade",
+                    "auto_executed": False,
+                    "hl_result": "skipped"
+                })
+                continue
             if _skip_ceo_stop:
                 log(f"AUTO-EXEC: SKIP {symbol} stop move — CEO trade "
                     f"(manual_exit_manager owns its stop)", "INFO")
