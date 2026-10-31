@@ -18676,3 +18676,28 @@ Final set: []
 **Open Questions:**
 - 24h flipped GREEN '+$0.08' (56.3% WR) after days red — 7d still '-$0.86'; confirm trend next runs
 - jup_yolo_mirrored 14d '-$0.47' vs 24h '+$0.12' — if net stays positive 2 more runs, revisit boost with 3d window
+
+## [2026-10-31 19:44] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 0 losses, flat)
+**PnL:** $0.00 (WR: 54.2% 24h) | 24h 48T 26W '+$0.07' GREEN | 7d 217T 121W '-$0.86' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored mfe_exit $0.00/+0.05% (1 close — quiet)
+- Kill check: 1 close total, no n>=3 0%-WR — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 9/48 = 18.8% (<40%); dominant close = profit-monster-trail (20T '+$1.33'); worst avg = hard_max_loss (3T '-$0.147')
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' across 7 tokens but ex-GMX '-$0.11' — GMX '+$0.54' = 125% of net, consistency fails); HOLD jup_yolo_mirrored (25T 68% '+$0.12' 24h bars met but 14d 47T '-$0.47' out-of-sample fails); volume-buildup- 6T '-$0.29' fail net
+- Neg streak: 16h -0.14, 17h -0.04, 18h +0.01, 19h 0.00 — never 3 red
+- Frequency 1/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.175%, 24/26 <0.5% — entries fine; R:R still the drag (atr_sl_hit avg '-$0.126' vs trail avg '+$0.067')
+- 2 open: BTC continuum+ -0.01%, SOL jup_yolo SHORT -0.33%
+- Storm readiness: **window-min -0.19% / at-run -0.12%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h still GREEN '+$0.07' (54.2% WR), 7d '-$0.86' — structural R:R imbalance persists
+- pump-chain- GMX outlier still masks ex-GMX losses — hold until ex-GMX turns positive
+- jup_yolo_mirrored 14d '-$0.47' vs 24h '+$0.12' — needs more green runs before boost
