@@ -18435,3 +18435,27 @@ Final set: []
 **Open Questions:**
 - 24h RED deepening '-$0.72' and 7d '-$0.98' despite 58.3% WR — same structural R:R imbalance (wins small, losses ~2x); jup_yolo_mirrored 14d remains the biggest loser but wins in enough regimes to block regime-kill
 - Both losses this hour were jup_yolo_mirrored LONG atr_sl_hit on HYPE/SOL — watch next hour; if n>=3 0%-WR recurs, run regime query
+
+## [2026-10-31 09:43] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.01 (WR: 56.9% 24h) | 24h 58T 33W '-$0.74' RED | 7d 197T 56.9% '-$0.99' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BTC continuum-osc+ LONG UNIVERSAL_MAX_HOLD '-$0.01'/-0.50% — max-hold timeout on a flat trade, not a signal failure
+- Kill check: only 1 close last hour, no signal with n>=3 0%-WR — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 11/58 = 19.0% (<40%); dominant close = profit-monster-trail (31T '+$1.72'); worst avg = stale_exit (2T '-$0.39')
+- Boost: none qualify — volume-buildup- 11T 63.6% but '-$0.31' fail net bar; jup_yolo_mirrored 34T 58.8% but '-$0.70' fail net bar; others n<5
+- Neg streak: 08h '-0.30', 09h '-0.01' = 2 red hours (<3) + regime EXTREME not NEUTRAL anyway
+- Frequency 1/hr — under 20/hr
+- Entry quality: winners 24h MAE avg 0.181%, 30/33 <0.5% — entries fine
+- 2 open: HYPE jup_yolo LONG -0.32%, ENA pump-chain+ LONG -0.53%
+- Storm readiness: **window-min -0.04% / at-run +0.17%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.74' / 7d '-$0.99' persists at ~57% WR — structural R:R imbalance (avg win '+$0.055' vs avg loss '-$0.133' per close, ~1:2.4); kill/boost rules don't reach it
+- jup_yolo_mirrored loses in ALL 3 regimes 14d (EXTREME -0.05, HIGH -0.54, NORMAL -0.14) but HIGH n=18 < 20 per-regime bar — recheck when HIGH n>=20
