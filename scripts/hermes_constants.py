@@ -4158,6 +4158,23 @@ HL_COPY_SHORT_LIFT_CLOSED = 20       # concurrent hl_copy SHORTs until 20 closed
 HL_COPY_SHORT_GUARDRAIL_START = '2026-10-31 00:00:00'
 HL_COPY_MAX_EMIT_ATTEMPTS = 5        # bounded retries per fill (jup-style)
 
+# ── Copy Trader TRUST TIERS (T directive 2026-10-31) ─────────────────────────
+# "sort of shadow mode the traders, compile our own leaderboard, the top top
+# traders we mirror exactly — we have to find traders we trust." Trust comes
+# from OUR shadow replay (their fills through OUR rules: sizing, latency,
+# market filter), never their self-reported stats (sample claimed-vs-fill gap:
+# one wallet claims 75%+ but shows 49% BTC / 48% ETH WR on its actual fills).
+COPY_TRUST_TIERS_ENABLED = True     # master switch (False = all T2, old behavior)
+T3_SHADOW_ONLY = True               # T3 wallets: no real signals, shadow only
+T1_MIN_SHADOW_N = 20                # promote to EXACT MIRROR: min shadow trades
+T1_MIN_SHADOW_WR = 0.65             # min shadow win rate (our rules)
+T1_MIN_SHADOW_PNL_USD = 5.0         # positive at OUR sizing (11.0 notional)
+T1_DEMOTE_BAD_DAYS = 3              # hysteresis: N consecutive failing recalcs
+T1_MAX_STALE_DAYS = 14              # demote T1 with no fills for 2 weeks
+SHADOW_WINDOW_DAYS = 30             # replay window for leaderboard/trust
+SHADOW_LATENCY_SEC = 60             # our realistic entry delay after their fill
+SHADOW_ENTRY_MAX_FILLS = 200        # latency-adjusted candle lookups per wallet cap
+
 # ── JUP YOLO Mirror Freshness Gate ────────────────────────────────────────────
 # CEO 2026-10-30: "older than 5-10 mins is useless" — mirror only FRESH pro
 # entries. Steady-state opens from tracked wallets are caught by the 60s poll

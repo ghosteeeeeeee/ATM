@@ -482,6 +482,31 @@ def run_hl_copy_signal():
                       f"of {HL_COPY_SHORT_LIFT_CLOSED} — waiting for a slot")
                 continue
 
+        # ── TRUST TIERS (T directive 2026-10-31) ─────────────────────────────
+        # T3 (insufficient shadow evidence) → NO real signal — shadow ledger
+        # (shadow_mirror.py) already records what we'd have done. T1 (shadow-
+        # proven top-top) → stamp trust_tier into metadata so position_manager
+        # skips OUR exit engines for this trade (their exits are ours; only the
+        # catastrophic floor remains). Unknown wallets / stale trust file → T2,
+        # the old behavior (fail-safe: never fail into T1, never fail into T3).
+        _wallet_for_tier = trade.get('wallet', '')
+        try:
+            from trust_tiers import tier_for_wallet
+            _tier = tier_for_wallet(_wallet_for_tier)
+        except Exception as _te:
+            print(f"[hl_signal] ⚠️ trust tier lookup failed ({_te}) — T2 (old behavior)")
+            _tier = 'T2'
+        if _tier == 'T3':
+            print(f"[hl_signal] 🔒 T3 (shadow-only) {_wallet_for_tier[:10]}… "
+                  f"{trade['coin']} {trade['side']} — no real signal")
+            continue
+        if _tier == 'T1':
+            signal['meta'] = dict(signal.get('meta') or {})
+            signal['meta']['trust_tier'] = 'T1'
+        elif isinstance(signal.get('meta'), dict):
+            signal['meta'] = dict(signal['meta'])
+            signal['meta']['trust_tier'] = _tier
+
         # Write to pipeline — success advances the monotonic cursor; failure
         # burns one attempt (give-up terminal at HL_COPY_MAX_EMIT_ATTEMPTS)
         _sid = write_signal_to_pipeline(signal)

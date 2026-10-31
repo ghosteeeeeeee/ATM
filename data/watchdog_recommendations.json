@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-31T02:11:27.116137+00:00",
+  "timestamp": "2026-10-31T02:41:27.395639+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -30,8 +30,8 @@
     "volume_regime": "LOW",
     "linreg_alignment": 0.0,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "market_phase": "DECLINING",
+    "trend_quality": "UP"
   },
-  "open_count": 4
+  "open_count": 5
 }

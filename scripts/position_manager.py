@@ -343,7 +343,8 @@ def get_open_positions(server: str = SERVER_NAME) -> List[Dict]:
                    open_time, close_time, status, signal, confidence,
                    leverage, paper, sl_distance, sl_group,
                    trailing_activation, trailing_distance, trailing_phase2_dist,
-                   highest_price, lowest_price, volatility_regime
+                   highest_price, lowest_price, volatility_regime,
+                   _signal_metadata
             FROM trades
             WHERE status = 'open'
               AND server = %s
@@ -2939,6 +2940,32 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             live_pnl = compute_live_pnl(entry, cur, direction)   # pnl_utils
         else:
             live_pnl = pnl_pct
+
+        # ── T1 EXACT MIRROR (trust tiers — T directive 2026-10-31) ──────────
+        # Shadow-proven top-top traders: THEIR exits are our exits.
+        # check_trader_exits closes us when the pro fully exits; our exit
+        # engines (0b SL zones, RR trail, ATR, wave turn, MACD, cascade,
+        # cut-loser, stale, soft trigger) are skipped for this trade so we
+        # ride exactly what they ride. ONLY the catastrophic floor remains —
+        # same math as the HARD MAX-LOSS safety net below (account loss
+        # CUT_LOSER_PNL_HERMES ÷ leverage → price %) so we never ride their
+        # liquidation. T2 trades unchanged; tier comes from trade metadata
+        # (trust_tiers.is_exact_mirror_trade — missing/stale tier never
+        # reaches here, it reads as non-T1).
+        try:
+            from trust_tiers import is_exact_mirror_trade as _is_xmirror
+            _exact_mirror = _is_xmirror(pos)
+        except Exception:
+            _exact_mirror = False  # fail-safe: engines stay ON (old behavior)
+        if _exact_mirror:
+            _xmf_lev = max(float(pos.get('leverage') or 1), 1.0)
+            _xmf_pct = CUT_LOSER_PNL_HERMES / _xmf_lev
+            if live_pnl <= _xmf_pct:
+                close_paper_position(trade_id, 'hard_max_loss',
+                    exit_detail=(f'exact-mirror catastrophic floor: '
+                                 f'pnl={live_pnl:.2f}% <= {_xmf_pct:.2f}%'))
+                closed_count += 1
+            continue  # hold while they hold — engine exits skipped
 
         # ── 0b. SL Zone Exit Check — tighten trail near death zones ────────────
         # If price is approaching a known SL zone, tighten trailing to protect profit.

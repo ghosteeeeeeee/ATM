@@ -510,13 +510,38 @@ def check_trader_exits(new_fills: list):
         if not perf:
             continue
 
-        # Prevent race with profit_monster/cut_loser
+        # T1 EXACT MIRROR: our engines don't manage this trade (position_manager
+        # skips them for T1) — deferring to profit_monster here would CONSUME the
+        # fill event permanently (it's only 'new' this cycle) and leave the mirror
+        # trade open after the pro exited. Their exit always wins for T1.
+        _t1 = False
         try:
-            from cut_loser import is_token_being_closed_by_profit_monster
-            if is_token_being_closed_by_profit_monster(coin):
-                continue
-        except ImportError:
-            pass
+            from trust_tiers import is_exact_mirror_trade as _ixm
+            from _secrets import BRAIN_DB_DICT
+            import psycopg2 as _pg
+            _cfg = BRAIN_DB_DICT.copy(); _cfg.setdefault('port', 5432)
+            _cfg['connect_timeout'] = 5
+            _pgc = _pg.connect(**_cfg)
+            try:
+                _cur = _pgc.cursor()
+                _cur.execute("SELECT signal, _signal_metadata FROM trades WHERE id = %s",
+                             (perf['trade_id'],))
+                _row = _cur.fetchone()
+                _cur.close()
+            finally:
+                _pgc.close()
+            if _row:
+                _t1 = _ixm({'signal': _row[0], '_signal_metadata': _row[1]})
+        except Exception:
+            _t1 = False  # fail-safe: old defer behavior
+        if not _t1:
+            # Prevent race with profit_monster/cut_loser (T2 trades only)
+            try:
+                from cut_loser import is_token_being_closed_by_profit_monster
+                if is_token_being_closed_by_profit_monster(coin):
+                    continue
+            except ImportError:
+                pass
 
         # Get current market price
         current_price = get_current_price(coin)
