@@ -4180,9 +4180,11 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # First touch closes: for peaks below ~0.67% this threshold sits ABOVE
         # PM trail's fixed 0.20% distance (fires first); above it PM trail still
         # wins the race — so no bypass-list changes, the layers just compete.
-        # Requires fav > 0 strictly (never-positive trades stay with the floor
-        # exits; threshold would otherwise be <= breakeven). Unknown peak
-        # (no high/low data) fails open — never close on missing data.
+        # Requires peak >= MFE_EXIT_ARM_PCT (0.40% — the no-arm run churned
+        # 38s-5min fee-negative closes on micro-peaks, T: "isn't exactly what
+        # we were looking for") so never-positive and blip trades stay with
+        # the floor exits. Unknown peak (no high/low data) fails open — never
+        # close on missing data.
         # INDEPENDENTLY AUDITED (brain/verdicts/2026-10-31_mfe-exit-sim-
         # independent-verify.md): engine verified 288/288 + 3/3 hand-checks;
         # direction robust (+17…+36 vs floor stack across intra-bar

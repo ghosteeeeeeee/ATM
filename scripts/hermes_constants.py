@@ -2018,26 +2018,27 @@ MFE_CUT_SHADOW_MFE_MAX = 0.20  # live_pnl % below this at T => would-fire
 # shadows use).
 # The giveback threshold is always strictly positive, but the FILL is not
 # guaranteed to be: on a fast move through the threshold between two 5m bars
-# the exit fills at the next bar's open, below entry (sim: 10/45 mfe exits
-# were small losers — still far above the floor, which fires first when the
-# bar's low reaches it). Never-positive trades are left to the floor exits
-# entirely (fav > 0 required to engage).
+# the exit fills at the next bar's open, below entry. Never-positive trades
+# are left to the floor exits entirely (peak >= MFE_EXIT_ARM_PCT required).
 # Scope: MFE_EXIT_SIGNALS substring match (N2 namespace rule — matches
 # 'jup_yolo_mirrored' and merged variants). Ships enabled per T directive
 # 2026-10-31 ("make a new exit, mfe-exit"); revert = MFE_EXIT_ENABLED False.
 MFE_EXIT_ENABLED = True        # Revert: set False.
 MFE_EXIT_GIVEBACK_PCT = 0.30   # fraction of peak favorable to give back (30%)
-MFE_EXIT_ARM_PCT = 0.0         # 0.0 = literal spec (any positive MFE engages).
-                               # AUDITED frozen-45 cohort (verdict: brain/
-                               # verdicts/2026-10-31_mfe-exit-sim-independent-
-                               # verify.md): no-arm +30.27 vs arm-0.40 +27.10
-                               # gross — no-arm wins AND is T's literal spec.
-                               # Raise to 0.004 if live fee-economics disagree
-                               # (bug_hunter M1: fires with peak < ~0.13% are
-                               # fee-negative; judge after ~20 live fires).
-                               # Re-measure protocol + caveats in that verdict
-                               # file — headline is vs pm_actual (+42, p=0.135,
-                               # n=45 NOT significant), never vs the bg stack.
+MFE_EXIT_ARM_PCT = 0.004       # ARMED 0.40% price — SHIPPED after the no-arm
+                               # run churned (T: "isn't exactly what we were
+                               # looking for"): 5 live closes 19:59-20:58 with
+                               # holds of 38s-5min, all ±$0.01 and fee-negative
+                               # (fees.net_pnl -0.006/-0.018), 3 micro-loss
+                               # closes driving repeated loss-cooldown blocks.
+                               # Arm = PM_TRAIL_ACTIVATE_PCT: threshold >=
+                               # +0.28% price (+1.4% lev @5x) > 0.09% fee round
+                               # trip, so blips never engage; trades develop.
+                               # Sim frozen-45: no-arm +30.27 / arm +27.10 —
+                               # the no-arm edge WAS the churn (floor-hitters
+                               # turned scratches), not bigger winners.
+                               # Re-measure protocol + p/CI caveats:
+                               # brain/verdicts/2026-10-31_mfe-exit-sim-independent-verify.md
 MFE_EXIT_SIGNALS = ('jup_yolo',)  # substring scope — mirror book first
 # ARM-BE-STOP SHADOW — armed-then-breakeven exit collector (brain_auditor 2026-10-18).
 # Verdict PASS 2026-10-17 (brain/verdicts/2026-10-17_arm-breakeven-stop.md):
