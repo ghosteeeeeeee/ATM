@@ -10157,5 +10157,32 @@
     "category": "method guard",
     "status": "logged",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-31T16:55:00Z",
+    "idea": "CLOSED: shadow-vs-live WR fidelity eval (#209 pre-reg) — BAR FAIL, shadow gate stats now labeled LOWER-BOUND",
+    "rationale": "14d 5 matched families (both n>=20), |delta|<10pp only 2 (vb- +6.1, pc+ +2.4) vs bar 3+; bb-squeeze +25.5pp, jup +15.3pp, bb-bounce -14.6pp inverted",
+    "expected_impact": "gate would_win read as lower-bound of live-basis would-win for positive-edge families (shadow makes gates look more protective than live); re-eval when 3+ families within 10pp",
+    "category": "measurement integrity",
+    "status": "applied_this_run (label)",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-31T16:55:00Z",
+    "idea": "bear-exemption stability precondition (waiver scope — CEO/T)",
+    "rationale": "[35,45) SHORT band exemption keys on latest BTC linreg row age<600s, but linreg flipped BULL/BEAR/NEUTRAL ~6x in 3.5h (13:04-16:29) — exemption fires on flip noise, not sustained structure",
+    "expected_impact": "N-consecutive-bear-rows (e.g. 3 rows = 15m) would structure-key the exemption; band cohort currently 23T 65.2% +0.26 so NO urgency",
+    "category": "entry sniper / waiver",
+    "status": "suggested_watch (collect; renewal decision 11-03)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-31T16:55:00Z",
+    "idea": "waiver renewal packet (11-03) delivered early: band [35,45) since re-grant 23T 65.2% +0.26 / since 10-22 47T 59.6% +0.15 / gate census LEAK 0 (WAIVER 54 adjudicated) / KAS+SOL executions verified working-as-designed",
+    "rationale": "renewal decision belongs to CEO/T with fresh numbers, not discovered at expiry",
+    "expected_impact": "renew-or-lapse decided on data 3 days ahead",
+    "category": "governance",
+    "status": "delivered",
+    "risk": "none"
   }
 ]

@@ -1,67 +1,47 @@
-# Current State — brain_auditor #209 2026-10-31 12:50 UTC
-**Last Updated: 2026-10-31 12:50 UTC**
-**Updated by: brain_auditor #209. Prior: #208 2026-10-31 09:05 UTC (preserved in git history).**
+# Current State — brain_auditor #210 2026-10-31 16:55 UTC
+**Last Updated: 2026-10-31 16:55 UTC**
+**Updated by: brain_auditor #210. Prior: #209 2026-10-31 12:50 UTC (preserved in git history).**
 
-## HEADLINE — 0 config changes (6th run, nothing passed bars). Two AMPLIFY proposals emitted. Chop-bleed 93.6% closed from the signal axis: every live signal wins only when it arms.
+## HEADLINE — 0 config changes (7th run, nothing passed bars). Shadow-vs-live fidelity eval CLOSED → shadow gate stats labeled LOWER-BOUND. Watchdog P3 "oversold shorts" resolved as NOT-A-LEAK (active waiver, verified working).
 
-24h 55T 56.4% -$0.71 | 7d 203T 57.1% -$0.78 | 14d 324T 50.9% -$1.94
-Never-armed 7d: **68 of 77 losers, 93.6% DOLLAR share** (-$7.36 of -$7.86, 0 NULL) = **7th window >=92%**
+24h 48T 52.1% -$0.22 | 7d 208T 56.3% -$0.83 | 14d 332T 50.6% -$1.76 | 30d 776T 46.6% -$3.21
+Chop-bleed: 7d **94.7%** / 14d 90.2% / 30d 85.8% = **7th window ≥92%** (0 NULL mfe)
+Armed vs unarmed 7d: 122T 88.5% **+$6.91** vs 86T 10.5% **-$7.74**
 
-### 1. NEW AXIS — per-signal armed vs unarmed (14d, n>=15): every signal is the same signal
-| signal | armed (n, pnl) | unarmed (n, pnl) |
-|---|---|---|
-| bb-squeeze+ | 13, **+1.13** (100% WR) | 15, -0.37 |
-| jup_yolo_mirrored | 26, **+1.29** (88.5%) | 14, -1.91 (7.1%) |
-| volume-buildup- | 35, **+1.75** (94.3%) | 20, -2.39 (5.0%) |
-| pump-chain+ | 23, **+0.74** (69.6%) | 17, -1.37 (5.9%) |
-| r2v2-long3 | 10, **+0.51** (90.0%) | 7, -0.50 |
-| bb-bounce-v2-long+ | 11, **+0.46** (81.8%) | 14, -1.18 (0%) |
-| ai-trader-pending | 3, +0.27 | 14, -0.47 (7.1%) |
+### 1. FIDELITY EVAL CLOSED (#209 pre-reg) — BAR FAIL
+14d, 5 matched families (both n≥20), |Δ|<10pp on only **2** (vb- +6.1, pc+ +2.4) vs bar 3+.
+bb-squeeze +25.5pp (sh 43.5 vs live 69.0) · jup +15.3 · bb-bounce -14.6 inverted.
+**Verdict: label shadow gate `would_win` figures LOWER-BOUND** — shadow book understates live WR for every positive-edge family, so gates may look more protective in shadow than live. Confounders: shadow composition (all emissions incl. duplicates), live n 17-57. Re-eval only if 3+ families within 10pp.
 
-Arm% by signal 14d: ai-trader-pending 17.6 · bb-bounce 44.0 · bb-squeeze 46.4 · pump-chain+ 57.5 · vb- 63.6 · jup 65.0.
-**There is no "which signal" question left — only "will it arm".** Entry-feature mining stays stop-called (#163, 5 nulls); this cut confirms the same wall from the signal axis. Exit levers refuted #208 (both sweeps all-negative, not re-swept).
+### 2. WATCHDOG TRIAGE
+- **P1 chop-bleed 94.7%** — reproduced, entry-quality route stands, no filter clears bars (7th run). Coin-regime band idea still starved: `entry_regime_4h` stamp = **0/96** SHORT 14d in PG (momentum-cache-regime-coverage due 11-06).
+- **P2 jup R:R** — reproduced (7d LONG 42T 59.5% -$0.66; avg win +2.32% vs avg loss -4.73% leveraged; breakeven 67.4%). OWNED: stop-asymmetry-highwr (11-14) + jup-yolo-regime-review (11-07) + conf-filter jup leg (11-10). Not duplicated. HYPE cluster 5T -$0.94/24h never-armed.
+- **P3 KAS/SOL shorts = NOT A GATE LEAK** — [EXEC-RSI-FLOOR-BEAR] under the T-re-granted unclog waiver (expires **2026-11-03**, flip1_state active); BTC linreg verified LEAN_BEAR at 14:19. Band [35,45) since re-grant **23T 65.2% +$0.26** / since 10-22 47T +$0.15 = paying rent. Gate census selfcheck PASS (LEAK 0, WAIVER 54). WATCH: exemption keys on a flip-flopping 1m linreg (~6 flips/3.5h) — stability-precondition idea logged (CEO/T scope). **Renewal packet for 11-03 delivered early.**
+- **Clusters HOLD** — trim condition unmet (BTC AT/ABOVE EMA300, score_long 30). KAS leg closed cut-loser -$0.14 16:27. COMP tight-stop steer = executor domain, reported only.
 
-### 2. AMPLIFY — 2 proposals registered (`data/shadow_disposition.json`)
-- **(b) `amplify-winner-cell-mult-150`** — `WINNER_CELL_SIZE_MULT 1.25 → 1.50` (= existing `WINNER_CELL_SIZE_MULT_CAP`, **zero code**). Cells 156T/30d **+$4.83**; bb-squeeze+ NORMAL +0.46/+0.76/+0.95 across 7/14/30d at 68-70% WR; expected ≈ **+$0.97/30d (estimate)**. Guard: revert if winner-cell-set 7d net < 0 or any cell 7d < -$0.50 twice. Deadline **11-14**, owner **CEO label + T sign-off** (money-sizing — not applied).
-- **(c) `amplify-jup-short-walk`** — counterfactual-walk the **194 blocked jup_yolo SHORT** signals. Emission is symmetric (194 short / 222 long rows, both born 10-30) but execution is **1 SHORT vs 39 LONG** trades/30d. Deadline **11-14** (zero OOS days before 11-13).
-- **KILLED WITH DATA:** bb-squeeze+ blocked-clone-hunt → 329 deduped blocked rows **51.7% WR, -32.45pp** (NORMAL 34T 41.2% -3.06pp) = gates correctly reject; do not re-propose.
-- **METHOD TRAP caught:** filtering shadow `exit_json` on `fired==true` = 100% WR / +184pp by construction (trail engine fires only on winners). Logged so it is never reused.
-- Flip-KPI: no new shadow→live conversion this run (formal weekly Mon 11-02).
+### 3. SHADOW (3/6 answerable, all used)
+- **contrarian join re-ran 16:30Z**: 958 joinable, overall **41.1%**; **pc- 64.6% n=350 LIVE**; rider 27.6% do-NOT-flip.
+- **floor_admit join re-ran 16:33Z**: n=1126 n-bar PASS, 30d same-sign NOT YET → COLLECT 11-15.
+- shadow_trader 44,575: CONFLUENCE-EXPIRY 14,336 @48% · CTX 1,815 @50% · exit A/B pm_trail +6,793 vs hard_max -7,547 = trail-or-nothing.
+- wyckoff join owed 11-03 · oscillator archived · rr orphaned.
 
-### 3. NEW EVAL PRE-REGISTERED — shadow-vs-live WR fidelity
-shadow non-blocked WR runs **11-24pp below live WR** for every positive-edge family (bb-squeeze 39.0 vs 63.4 · jup 40.7 vs 60.0 · vb- 49.6 vs 65.1 · pump-chain+ 28.8 vs 42.7 · r2v2 47.2 vs 60.0) and at parity only for negative-edge sources. Gate `would_win` figures are therefore either **conservative** or **pessimistically biased**. Bar: |delta| < 10pp on 3+ matched families, else label shadow gate stats as lower-bound.
+### 4. FADE PRE-SERVICE (11-03 item done early)
+[CONTRARIAN-LIVE] **23 fires / [Z-FLIP] 0 skips** (log window 10-30 20:39+) → conversion healthy, "conversion ~0" escalate-condition NOT triggered. pc- fade since 10-27: **9T 55.6% +$0.46** (today 5T +$0.44); COMP #16624 = live fade leg. Caveat: log rotated 10-30 20:39 — window the 11-03 counts.
 
-### 4. WATCHDOG TRIAGE
-- **P1 chop-bleed 93.6%** — reproduced exactly, entry-quality route re-verified on the new axis, no filter passes bars (6th run).
-- **P2 "we mirror only the long leg" = FALSE (MED prose drift)** — `jup_yolo_monitor.py:572-578` parses `side` long/short explicitly; short suppression is `compaction_stale` 91/194 + RSI floors + **SOL SHORT_BLACKLIST 1081 hits**. RR asymmetry itself is real: 14d avg loss **-4.43%** vs avg win **+2.29%** (1.94x, leveraged `pnl_pct`).
-- **Option D `SHORT_RSI_HARD_FLOOR_JUP_YOLO=35` VERIFIED WIRED** (compactor:4360, decider:1366, `is_giant_source`; logs print `< 35` for HYPER/PURR vs `< 45` for IMX/APT/GMT). The 17 stored-`rsi_14`>=35 blocks are detect-vs-approval RSI timing — **no leak**.
-- **Cluster steer HOLD** — 15m+4h LONG_BIAS, continuum ABOVE, trim condition (1m < EMA300 60m+ AND `score_long <= 0`) unmet.
-- **GMX profit-lock ALREADY SATISFIED** — live SL **8.0094** = +1.74% above entry 7.8723 and above the steer's own 7.95 target (steer text stale at 7.8745). No action.
+### 5. LAST-RUN VERIFY
+- #209 AMPLIFY proposals both present (mult-150, jup-short-walk) — not duplicated; 30d winner-cell screen re-run: **0 new cells** (newcomers net14≤0/sign-flip).
+- #208 trial revert **WORKING**: ATR_SL_MAX 0.025 / _INIT 0.025 / CUT_LOSER -4.00 live; post-revert 15T 46.7% +$0.38 vs trial 142T -$0.59. **CEO override window closes 2026-11-01 08:55Z.**
+- winner-cell 1.25 live (1.50 NOT applied = correct), BLUR #16626 amount 12.48 confirms boost. HYPE size_mult 2.0 still on new entries (#16625, 19.90) = money-sizing carried **5th run** (CEO/T).
 
-### 5. LAST-RUN VERIFY #208
-- **Trial revert WORKING AS INTENDED, too early (n=7):** since 08:45Z → 4 `trail_arm_timeout` -$0.03, 2 `profit-monster-trail` +$0.25, 1 `UNIVERSAL_MAX_HOLD` -$0.01, **ZERO `hard_max_loss` and ZERO `cut-loser`** post-revert. CEO override window closes **2026-11-01 08:55Z**.
-- **Winner-cell regime fix VERIFIED:** IOTA #16614 `bb-squeeze+` NORMAL amount **12.48** (12.4875 = 11.10 × 0.9 × 1.25, cent-truncated); DYDX #16603 / MON #16600 vb- HIGH 12.48; EXTREME vb- stays 11.10.
-- vb- HIGH clone-hunt (#208) still pending **11-07** — not duplicated.
-- Checkpoint `btc-16599-8h-stale` → **done** (trade closed 09:38:30Z `UNIVERSAL_MAX_HOLD` -$0.01, 7.97h, never armed).
+### 6. AUTOPSY / GATE INTEGRITY
+- **48h adverse-first (selfcheck PASS): n=37 = 10 never-adverse / 21 recovered / 6 NEVER (16.2% vs 17.5% baseline)** → WRONG-SIDE REFUTED **66th consecutive run** (#61 p=0.116, #84 t=-0.04).
+- gate_leak_census selfcheck PASS: ALLOW 28 | WAIVER 54 | PATH-EXEMPT 10 | PRE-RULE 4 | **LEAK 0**.
 
-### 6. AUTOPSY / SHADOW
-- **Autopsy 48h adverse-first (selfcheck PASS): n=36 = 11 never-adverse / 19 recovered / 6 NEVER (16.7%)** → WRONG-SIDE REFUTED (consecutive; refs #61 p=0.116, #84 t=-0.04). NEVER = HYPE jup LONG, BTC continuum-trend- SHORT, ZORA vb- ×2, MON vb-, ALT pc-.
-- **Contrarian join re-ran 12:41Z (mandate):** 958 joinable, overall **41.1%**; **pc- 64.6% n=350 LIVE**; btc-pump-rider+ **27.6%** do-NOT-flip.
-- **floor_admit join re-ran 12:41Z:** floor_only 1108 @49.9% vs always_admit 144 @45.8%, blocked n=0; n-bar PASS, 30d same-sign **NOT YET** → COLLECT **11-15**.
-- **shadow_trader 43,770:** gates CONFLUENCE-EXPIRY 14297 @48% · CTX-GATE 1804 @50% · BTC-CRASH 244 @43% · EXEC-BLOCK 281 @54%; exit A/B **pm_trail +6,725 vs hard_max -7,443** = trail-or-nothing.
-- 3/6 answerable: contrarian + floor_admit + shadow_trader. wyckoff join owed **11-03** · oscillator archived · rr orphaned.
+### 7. SIDE-FINDS
+- **MED**: stop-asymmetry-highwr registry stream names `volume-buildout-` (0 rows ever in PG) — TYPO NOTE appended to its `notes` this run; intended signal = `volume-buildup-` (70 rows).
+- LOW: `entry_regime_4h` 0/96 stamp in PG; LOW: pipeline.log rotated at 10-30 20:39 (loses flip's first 3 days); INFO: uncommitted WIP `gate_shadow.py` + 2 bollinger candidates = deep-dive lane, untouched.
 
-### 7. DRIFT / SIDE-FINDS
-- MED: watchdog P2 prose contradicted by code (mirror both legs) → prompt/prose fix, no code.
-- LOW: `_signal_metadata.regime_src` logged but never persisted (15/15 NULL) — keep using the 12.48 arithmetic for forensics.
-- INFO: `signals_hermes_runtime.db` spans 10-17..10-31 but `jup_yolo_*` rows start 10-30 → date-label every jup window, never quote 7d/14d/30d for it.
+### 8. READINESS (16:55)
+**5 open — 4 LONG + 1 SHORT:** BTC `continuum-osc+` -0.04% (11:51) · COMP `pump-chain-` fade +0.26% (15:59) · HYPE `jup_yolo_mirrored` +0.44% **size_mult 2.0** (15:59, CEO standing) · BLUR `pump-chain+` flat (16:21, cell boost 12.48) · SOL `jup_yolo_mirrored` SHORT -0.39% (waiver band, SL 96.497). Trim condition unmet → HOLD clusters; no new mid-band entries; trail-family first; size 1.0x (HYPE 2.0x CEO standing).
 
-### 8. READINESS (12:50)
-**4 open, ALL LONG:** GMX `pump-chain-` **+2.80%** (SL 8.0094 risk-free, locked +1.74%) · BTC `continuum-osc+` +0.13% (11:51, ABOVE EMA300) · HYPER `pump-chain-` +0.16% (12:26) · **HYPE `jup_yolo_mirrored` +0.02% `size_mult 2.0` (12:36 — CEO sizing, carried 4th run)**. IOTA #16614 closed 12:30 `trail_arm_timeout` $0.00.
-Regime: btc_15m **LONG_BIAS** / btc_4h **LONG_BIAS**, continuum **ABOVE**, trend_quality STRONG_UP, vol LOW, volume LOW → let trails work, hold per trim condition, no fresh shorts against the tape. Size **1.0x** (size_reduce file absent = truth).
-
-### 9. QUEUE
-- next run: chop-bleed re-measure + confirm 0 `hard_max_loss`/`cut-loser` post-revert.
-- **11-02** formal AMPLIFY + flip-KPI · **11-03** shadow_disposition batch + wyckoff join · **11-06** regime coverage retest · **11-07** jup band review + vb- HIGH clone-hunt · **11-10** CHASE-MOVE/MFE-CUT · **11-14** amplify pair · **11-15** floor 30d bar.
-- **CEO:** winner-cell 1.5x ruling · trial-revert override (closes 11-01 08:55Z) · HYPE 2.0 size into jup family · unchanged stack (TAT scope, CONF_FLOOR fk, tf-authority, bb-bounce).
-- Escalation **#17** (aged, closed 10-17 for exit-ladder; do not re-print stale variants).
+**Queue:** **11-01 08:55Z trial-revert override closes** → 11-02/03 formal weekly AMPLIFY + waiver renewal (packet delivered) + z-flip conversion (windowed) + 11-03 batch (eval-midband / escalation-17 / ugb-pt-045 / wyckoff join) → 11-06 regime coverage → 11-07 jup-yolo-regime-review + vb- clone-hunt → 11-10 fade-ctx / winner-cell-125 / conf-filter jup → 11-14 stop-asymmetry + mult-150 + jup-short-walk. CEO/T: HYPE size 2.0 carried, CONF_FLOOR fkB, escalation-17.

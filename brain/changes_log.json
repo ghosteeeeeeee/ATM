@@ -3319,5 +3319,16 @@
     "after": "+2 amplify entries (status open, deadline 11-14); checkpoint status=done",
     "rationale": "AMPLIFY mandate (>=1 offense proposal/run); trade #16599 already closed 09:38Z so the 8h line was evaluated",
     "impact": "no trading behavior change — proposals only, 0 config changes this run"
+  },
+  {
+    "timestamp": "2026-10-31T16:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Registry typo note on stop-asymmetry-highwr: stream names volume-buildout- (0 PG rows), intended = volume-buildup- (70 rows)",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "no typo note",
+    "after": "TYPO NOTE 2026-10-31 run #210 appended to notes (additive, no disposition/threshold touched)",
+    "rationale": "same transcription class as winner-cell-size-125 fix; study owner must target volume-buildup-",
+    "impact": "zero trading behavior — registry metadata only"
   }
 ]
