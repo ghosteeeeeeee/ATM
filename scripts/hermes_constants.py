@@ -308,9 +308,8 @@ LOSERS_SHORT = {
 }
 # Legacy combined set — DIRECTION-BLIND in decider (HARD-BLOCK + conf penalty).
 # BTC removed 2026-10-24 → LOSERS_LONG (see above). ME/PUMP left per CEO scope.
-LOSERS = {
-    'GRASS'
-}
+LOSERS = set()
+
 
 
 
