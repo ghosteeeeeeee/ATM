@@ -1,16 +1,16 @@
-# Shadow disposition report — 2026-10-30T08:15:00.124013+00:00
-registry: 35 entries (open=23)
+# Shadow disposition report — 2026-10-31T08:15:00.076902+00:00
+registry: 37 entries (open=24)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - OPEN trial-coupled-cutsloser-sl: deadline=2026-11-03T00:00:00Z | (no parseable source)
-  -> threshold: not breached | trial since 2026-10-27 00:00:00: PnL +0.13 over 82 closes (limit -2.5), worst HML +0.00% over 0 exits (limit -6.5), rolling7d -0.31 context-only
+  -> threshold: BREACHED | trial since 2026-10-27 00:00:00: PnL -0.29 over 140 closes (limit -2.5), worst HML -7.10% over 1 exits (limit -6.5), rolling7d -0.68 context-only -> BREACH: worst HML exit -7.10% < -6.5%
 - OPEN eval-midband-long-4564: deadline=2026-11-03T00:00:00Z | (no parseable source)
-- OPEN gate-shadow: deadline=2026-11-10T00:00:00Z | brain/gate_shadow.db: 48968 rows, 0.0d
-- OPEN shadow-trader-bypass: deadline=2026-11-03T00:00:00Z | brain/shadow_trades.db: 38417 rows, 0.0d
-- OPEN expiry-t5-shadow: deadline=2026-11-10T00:00:00Z | brain/expiry_shadow.db: 27585 rows, 0.0d | brain/t5_shadow.db: 40673 rows, 0.0d
+- OPEN gate-shadow: deadline=2026-11-10T00:00:00Z | brain/gate_shadow.db: 52454 rows, 0.0d
+- OPEN shadow-trader-bypass: deadline=2026-11-03T00:00:00Z | brain/shadow_trades.db: 43024 rows, 0.0d
+- OPEN expiry-t5-shadow: deadline=2026-11-10T00:00:00Z | brain/expiry_shadow.db: 29672 rows, 0.0d | brain/t5_shadow.db: 43224 rows, 0.0d
 - OPEN mfe-cut-arm-be: deadline=2026-11-10T00:00:00Z | (no parseable source)
-- OPEN relative-regime: deadline=2026-11-03T00:00:00Z | data/relative_regime_shadow.json: 0 rows, 8.7d
-- OPEN rr-engine-shadow: deadline=2026-11-03T00:00:00Z | data/rr_shadow_audit_7d.json: 1655 rows, 26.3d
+- OPEN relative-regime: deadline=2026-11-03T00:00:00Z | data/relative_regime_shadow.json: 0 rows, 9.7d
+- OPEN rr-engine-shadow: deadline=2026-11-03T00:00:00Z | data/rr_shadow_audit_7d.json: 1655 rows, 27.3d
 - OPEN chase-ratio: deadline=2026-11-03T00:00:00Z | (no parseable source)
 - OPEN ichimoku-dampen-flooradmit: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - OPEN volmom-volbreak: deadline=2026-11-07T00:00:00Z | (no parseable source)
@@ -37,3 +37,5 @@ registry: 35 entries (open=23)
 - OPEN momentum-cache-regime-coverage: deadline=2026-11-06T00:00:00Z | (no parseable source)
 - DONE pump-detect-ceiling-mismatch: NO-CHANGE — replay NEGATIVE, both options dead, caps stand (2026-10-30)
 - DONE override-vs-ceiling-contradiction: RESOLVED by replay: ceiling owns 75+ (band dead 3T 0% −$0.47); override claim-text fixed, behavior unchanged (2026-10-30)
+- DONE ichimoku-short-solo-counterfactual: DEAD — spam correctly neutered; no bypass (2026-10-30)
+- OPEN jup-yolo-regime-review: deadline=2026-11-07T00:00:00Z | (no parseable source)

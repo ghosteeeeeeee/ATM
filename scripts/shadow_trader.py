@@ -40,11 +40,11 @@ CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
 # misstates every join. NOTE: units here are PERCENT; hermes_constants ATR_SL_* are
 # fractions (0.04 == 4.0%).
 from hermes_constants import CUT_LOSER_PNL as _HC_CUT_LOSER, ATR_SL_MAX as _HC_ATR_SL_MAX
-CUT_LOSER_PNL = _HC_CUT_LOSER              # account % (live: -6.00 since 2026-10-27 trial)
+CUT_LOSER_PNL = _HC_CUT_LOSER              # account % (live: -4.00 — coupled trial REVERTED 2026-10-31)
 TRAILING_DISTANCE_PCT = 1.20   # ATR SL trail distance from peak
 ATR_SL_MIN_INIT = 1.5          # initial floor
 ATR_SL_MIN_ACCEL = 0.30        # established floor
-ATR_SL_MAX = abs(_HC_ATR_SL_MAX) * 100.0  # price % cap (live: 4.0 since 2026-10-27 trial)
+ATR_SL_MAX = abs(_HC_ATR_SL_MAX) * 100.0  # price % cap (live: 2.5 — coupled trial REVERTED 2026-10-31)
 PM_TRAIL_ACTIVATE_PCT = 0.40   # 0.40% activation
 PM_TRAIL_TIERS = [(0.0, 0.20), (1.5, 0.50), (3.0, 0.80), (5.0, 1.20)]  # (peak_profit_pct, trail_dist_pct)
 PM_TRAIL_MIN_HOLD = 2          # min candles after activation
@@ -64,15 +64,17 @@ MAX_LEVERAGE = 5               # fallback cap
 #    CUT_LOSER -6.00 + ATR_SL_MAX 4.0% for BOTH directions as the coupled trial
 #    (registry: data/shadow_disposition.json trial-coupled-cutsloser-sl). While the
 #    live trial runs, the arm below equals the baseline for LONG -> columns are
-#    duplicate evidence; if the 11-03 default REVERTS live to -4.00/2.5, this arm
-#    becomes the revert-simulation. Do not treat as a pending live trial.
+#    duplicate evidence. LIVE WAS REVERTED to -4.00/2.5 on 2026-10-31 (brain_auditor
+#    #208, pre-registered guard fired: HML exit -7.10% acct), so the arm below is
+#    NOW the revert-simulation — the wider arm we can compare against. Not a pending
+#    live trial. To re-run the trial, change live constants (not these).
 # CEO: "Shadow rollout of CUT_LOSER -6.00 + ATR_SL_MAX 4.0, LONG only;
 #       SHORT untouched; size unchanged; 7d/200T review."
 # Evidence threshold: shadow LONGs must hit >=55% WR over >=200 trades.
 SHADOW_TRIAL_ENABLED = True           # Master switch (see supersession note above)
 SHADOW_TRIAL_CUT_LOSER = -6.00        # Wider CUT_LOSER (was -4.00)
 SHADOW_TRIAL_ATR_SL_MAX = 4.0         # Wider ATR_SL_MAX (was 2.5)
-SHADOW_TRIAL_DIRECTION = 'LONG'       # arm is LONG-scoped; SHORT rides the LIVE value (-6.00 since 2026-10-27 trial)
+SHADOW_TRIAL_DIRECTION = 'LONG'       # arm is LONG-scoped; SHORT rides the LIVE value (-4.00 since the 2026-10-31 trial revert)
 SHADOW_TRIAL_MIN_TRADES = 200         # Min trades per direction for review
 SHADOW_TRIAL_MIN_WR = 55.0            # Min WR to justify wider stops
 SHADOW_TRIAL_REVIEW_DAYS = 7          # Days before review

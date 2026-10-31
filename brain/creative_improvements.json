@@ -10094,5 +10094,32 @@
     "category": "entry sniper",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-10-31T08:50:43Z",
+    "idea": "Coupled-trial revert re-arms a free A/B: shadow LONGs now run -6.00/4.0 while live runs -4.00/2.5",
+    "rationale": "SHADOW_TRIAL_ENABLED=True and the arm was byte-equal to live during the trial (duplicate evidence). Post-revert it is a genuine wider-vs-live counterfactual with zero new code.",
+    "expected_impact": "read at SHADOW_TRIAL_MIN_TRADES=200 LONG closes: wider-arm WR vs live WR decides whether a re-trial is ever proposed again",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-31T08:50:43Z",
+    "idea": "Next trial guard must be aggregate, not single-outlier",
+    "rationale": "one -7.10% exit out of 142 closes flipped a trial whose own rationale accepted -8.1% excursions",
+    "expected_impact": "prevents paying a trial's cost and then judging it on 1 trade",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-31T08:50:43Z",
+    "idea": "HYPE carries size_mult 2.0 into the most-negative signal family",
+    "rationale": "jup_yolo LONG 7d is negative on every token (SOL/HYPE/ETH/BTC); HYPE avg notional 17.83-19.90 vs 11.10 baseline (16 trades at size_mult 2.0 = avg $20.35)",
+    "expected_impact": "money-sizing call, NOT unilaterally changed (per #207: sizing = CEO/T)",
+    "category": "sizing",
+    "status": "escalated-to-CEO",
+    "risk": "medium"
   }
 ]

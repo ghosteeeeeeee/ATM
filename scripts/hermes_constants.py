@@ -696,10 +696,10 @@ RS_SOURCE_PREFIX     = 'rs'  # signal source prefix for logging
 # Analysis: SL width barely matters when trailing+breakeven is active.
 # Best combo: SL=0.8%, TP=1.5%, trail_act=0.25%, trail_dist=0.20% → +11.25% PnL, 57% WR
 ATR_SL_MIN             = 0.015   # 1.5% floor — CEO Oct 16: widened from 1.3%. WLD SL was -0.30% from entry (way below min).
-ATR_SL_MAX             = 0.04  # 4.0% cap — COUPLED TRIAL 2026-10-27 (SHADOW-RECKONING #2, CEO consult 20261027T024741Z + T sign-off): widened 2.5→4.0 TOGETHER with CUT_LOSER_PNL −4→−6 (SL-sweep 2026-10-22 deferred item; MFE/MAE n=64: MAE-to-peak p90=1.62% needs room + HML ≥1.2%@5x; shadow wider_sl rows=2,574). MUST match ATR_SL_MAX_INIT. Revert criteria pre-registered in data/shadow_disposition.json (trial:7d-PnL<−$2.50 OR HML exit <−6.5% acct OR deadline 2026-11-03). Prior: 2.5% (widened from 2.0 Oct 16).
+ATR_SL_MAX             = 0.025  # 2.5% cap — REVERTED 2026-10-31 brain_auditor #208 from the 2026-10-27 coupled trial (4.0). Trigger: pre-registered guard in data/shadow_disposition.json fired — single HML exit −7.10% acct < −6.5% limit (MON #16586). Leg evidence is thin on its own: only 1/142 trial trades had an SL wider than 2.5% (CRV #16532, a winner) so this leg is near-inert; it reverts because the trial was authorized as a pair. MUST match ATR_SL_MAX_INIT. CEO override window 24h from the kanban ticket. Prior trial: 4.0% (2026-10-27), before that 2.5% (widened from 2.0 Oct 16).
 ATR_SL_MIN_EXTREME     = 0.015  # 1.5% floor for EXTREME regime — matches ATR_SL_MIN
 ATR_TP_MIN             = 0.015   # 1.5% floor — match ATR_SL_MIN
-ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (now 4.0% since 2026-10-27 trial — R:R at cap degrades to ~0.5:1; PM_TRAIL handles profit-taking). Trailing handles profit-taking.
+ATR_TP_MAX             = 0.020   # 2.00% cap — widened 2026-08-07 (was 1.5%) to maintain R:R with wider SL (SL cap back to 2.5% after the 2026-10-31 trial revert — R:R at cap ~0.8:1). PM_TRAIL handles profit-taking.
 ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-09-29: widened from 1.5x. SHORT R:R 0.59:1 (avg_win $0.088 vs avg_loss $0.149). Only 0.9% of 7d trades hit TP — unreachable at 1.5x. 2.0x gives SHORT winners room to reach 4% TP before PM_TRAIL. PM_TRAIL handles most exits.
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
@@ -731,12 +731,12 @@ ATR_TP_MIN_ACCEL   = 0.005   # 0.50% floor — still capture quick wins
 
 # Initial entry SL/TP — get_trade_params (fallback when no ATR available)
 ATR_SL_MIN_INIT    = 0.015  # 1.5% — CEO Oct 16: MUST match ATR_SL_MIN
-ATR_SL_MAX_INIT    = 0.04  # 4.0% — COUPLED TRIAL 2026-10-27 (must match ATR_SL_MAX; see its comment for revert criteria)
-SL_PCT_FALLBACK    = 0.015  # 1.5% if ATR unavailable (matched to ATR_SL_MIN)
+ATR_SL_MAX_INIT    = 0.025  # 2.5% — REVERTED 2026-10-31 with ATR_SL_MAX (brain_auditor #208, coupled-trial default_action; see ATR_SL_MAX comment)
+SL_PCT_FALLBACK    = 0.015  # 1.5% if ATR unavailable (matched to ATR_SL_MIN) — the '~1.9:1' note applied only to the 2026-10-27..2026-10-31 4.0% trial window
 TP_PCT_FALLBACK    = 0.075  # 7.5% fallback target (was 3:1 with 2.5% SL; since the 2026-10-27 4.0% cap it is ~1.9:1 — PM_TRAIL/ATR_TP paths govern real exits)
 STOP_LOSS_DEFAULT  = 0.015  # 1.5% hard fallback (matched to ATR_SL_MIN)
 SL_PCT_MIN        = 0.015  # 1.5% minimum SL for any trade (hard floor, matched to ATR_SL_MIN)
-CUT_LOSER_PNL     = -6.00  # close trade at -6.00% ACCOUNT PnL — COUPLED TRIAL 2026-10-27 (SHADOW-RECKONING #2, CEO 20261027T024741Z + T sign-off): widened −4→−6 TOGETHER with ATR_SL_MAX 2.5→4% (SL-sweep deferred coupled change). Rationale: HML price cap = CUT_LOSER/lev → at 5x was −0.8% price, below MFE/MAE MAE-to-peak p75 (1.17%) for MFE≥0.8% trades (n=64) → killed 13-14/64 before the move; −6 @5x = −1.2% price covers p75. Shadow wider_sl simulation already has 2,574 rows. REVERT to −4.00 per data/shadow_disposition.json trial entry (7d trial PnL < −$2.50 OR any HML exit < −6.5% acct OR deadline 2026-11-03). Prior: −4.00 (CEO Oct 15, −3→−4).
+CUT_LOSER_PNL     = -4.00  # close trade at -4.00% ACCOUNT PnL — REVERTED 2026-10-31 brain_auditor #208 from the 2026-10-27 coupled trial (−6.00). Executes the pre-registered default_action in data/shadow_disposition.json (trial-coupled-cutsloser-sl): guard fired on the HML clause (MON #16586 −7.10% acct < −6.5% limit) AND the attributable PnL clause is negative — 4d/142 closes actual −$0.59 vs simulated old-params +$0.05..+$0.47 (slippage band; central −$0.64), 26 dipped trades vs only ~$0.30 of speculative rescue benefit. Prior trial −6.00 (2026-10-27, CEO consult 20261027T024741Z + T sign-off); before that −4.00 (CEO Oct 15, −3→−4). CEO override window 24h from the kanban ticket.
 HML_VOL_ATR_MULT  = 0.5   # brain_auditor 2026-10-08 — HML price-threshold = -0.5×ATR when ATR provides more room than CUT_LOSER_PNL/lev. Trail arms at +0.40% (PM_TRAIL_ACTIVATE) but HML killed at -0.30% price @lev5 — trail never got room in EXTREME. 7d HML 66T -$8.72 #1 bleed, 56/66 had MFE>0, median hold 61min. Example: EXTREME ATR 1.5% → thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%. NORMAL/FLAT ATR low → account threshold unchanged. HML only fires on losers — cannot block winners.
 HML_TRAIL_MIN_GAP_PCT = 0.20  # UNUSED as of CEO 2026-10-12 — D3 trail-floor block REMOVED from position_manager (only fired at lev>=4 and widened HML past CUT_LOSER account limit; same bug class as vol floor capped Oct 10). Value kept for history. DO NOT re-add a trail floor that exceeds CUT_LOSER_PNL/lev.
 
