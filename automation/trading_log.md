@@ -18268,3 +18268,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - jup_yolo_mirrored still 24h worst net '-$0.30' at 63.3% WR (losses > wins, R:R) but 14d EXTREME wins '+$0.10' 66.7% — any-regime-wins keeps alive
 - 7d still RED '-$0.48' though improved from '-$0.75' three hours ago
+
+## [2026-10-31 01:45] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $+0.05 (WR: 61.5% 24h) | 24h 65T 40W '+$0.37' GREEN | 7d 186T 58.1% '-$0.43' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 24h winners MAE avg 0.22%, 36/40 <0.5% — clean; last-hour close SOL jup_yolo_mirrored profit-monster-trail +$0.05/+2.29%
+- Kill check: no 0%-WR signal with n>=3 last hour (only 1 close) — regime query not triggered (r2v2-long3 2T 0% n=2<3; ai-trader-manual is CEO manual trades)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/65 = 12.3% (<40%) — dominant close = profit-monster-trail (35T '+$1.75'); worst avg = stale_exit (2T '-$0.195')
+- Boost: pump-chain+ meets 24h bars (6T 4W '+$0.20') BUT 14d red in BOTH regimes (EXTREME 48.5% '-$0.21', HIGH 16.7% '-$0.50') + 1.4 weight ceiling — HOLD; volume-buildup- 15T '-$0.28' fails net bar; jup_yolo_mirrored 31T '-$0.25' fails
+- Neg streak: 21h -0.11 then 22h +0.01, 23h +0.17, 00h +0.19, 01h +0.05 → 0 red (<3); regime EXTREME not NEUTRAL → no size cut
+- Frequency 1/hr — under 20/hr
+- 4 open: BTC continuum-osc+ LONG (-0.12%), SOL jup_yolo_mirrored LONG (+0.16%), HYPE jup_yolo_mirrored LONG (-0.77%), ETH hl_copy_trader LONG (+0.20%)
+- Storm readiness: **window-min +0.03% / at-run +0.03%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still RED '-$0.43' — jup_yolo_mirrored 31T '-$0.25' + volume-buildup- 15T '-$0.28' remain the two drags (R:R issue, not WR)
+- HYPE jup_yolo open at -0.77% — watching
