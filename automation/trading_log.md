@@ -18628,3 +18628,27 @@ Final set: []
 **Open Questions:**
 - 24h WR dipped to 51.1% ('-0.25') while 7d holds 56.3% ('-0.83') — watch if EXTREME (14d 35.7% WR) keeps dragging
 - volume-buildup- 7d 43T 60.5% but '-1.07' — biggest 7d loser, R:R driven; rules don't reach it
+
+## [2026-10-31 17:44] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 2 losses)
+**PnL:** $-0.04 (WR: 53.1% 24h) | 24h 49T 26W '-$0.16' RED | 7d 212T 119W '-$0.87' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: ICP pump-chain- atr_sl_hit '-$0.04'/-1.83%, BLUR pump-chain+ atr_sl_hit '-$0.05'/-1.24%, HYPE jup_yolo_mirrored profit-monster-trail '+$0.02'/+0.56%, COMP pump-chain- trail_arm_timeout '+$0.03'/+1.40%
+- Kill check: each signal n<=2 last hour, no n>=3 0%-WR — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 10/49 = 20.4% (<40%); dominant close = profit-monster-trail (20T '+$1.24'); worst avg = hard_max_loss (3T '-$0.147')
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' across 7 tokens meets bars but ex-GMX '-$0.11' — GMX '+$0.54' = 125% of net, consistency fails); others fail: volume-buildup- 7T '-$0.28', jup_yolo 24T 62.5% '-$0.24', pump-chain+ 5T 20% WR
+- Neg streak: 16h '-0.14', 17h '-0.04' — 2 red, not 3
+- Frequency 4/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.184%, 24/26 <0.5% — entries fine; R:R still the drag (atr_sl_hit avg '-$0.124' vs trail avg '+$0.062')
+- 3 open: HYPE jup_yolo +0.65%, BTC continuum+ +0.05%, SOL jup_yolo -0.44%
+- Storm readiness: **window-min -0.04% / at-run +0.06%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.16' (53.1% WR) / 7d '-$0.87' — structural R:R imbalance persists; kill/boost rules don't reach it
+- pump-chain- GMX outlier still masks ex-GMX losses — hold until ex-GMX turns positive
