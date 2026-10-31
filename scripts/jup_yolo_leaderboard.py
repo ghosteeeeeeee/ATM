@@ -356,6 +356,47 @@ def main():
         used_seed = True
         print(f"[lb] ⚠️ ALL sources failed — using {len(SEED_WALLETS)} seed wallets")
 
+    # ── CEO giants-light fixes 3+4: sticky wallets + first_seen tenure ──────
+    # Fix 3: sidebar label resolution needs the wallet to be in the LIVE
+    # positions feed — once a tracked trader CLOSES their positions (like every
+    # snapshot winner the user watched profit), their label can't resolve on the
+    # next 10-min scrape and they silently fall off the tracked list (observed:
+    # Dohj + 4mYM lost mid-session). Keep previously-tracked wallets alive for
+    # TRACKY_STICKY_TTL_SEC after their first_seen; API-sourced wallets
+    # re-resolve regardless, so this only rescues the churn class.
+    # first_seen powers freshness policy (b) in the monitor: a wallet tracked
+    # BEFORE a position opened gets the 60-min window (our latency, not a
+    # stale entry); a wallet first seen mid-hold keeps the strict 10-min gate.
+    TRACKY_STICKY_TTL_SEC = 24 * 3600
+    prev_wallets = {}
+    if not used_seed and os.path.exists(LEADERBOARD_FILE):
+        try:
+            with open(LEADERBOARD_FILE) as _pf:
+                prev_wallets = json.load(_pf).get('wallets') or {}
+        except (json.JSONDecodeError, OSError, KeyError, AttributeError):
+            prev_wallets = {}
+    now_i = int(time.time())
+    for _w, _s in wallets.items():
+        _prev = prev_wallets.get(_w)
+        _fs = _prev.get('first_seen') if isinstance(_prev, dict) else None
+        _s['first_seen'] = int(_fs) if _fs else now_i
+    sticky_added = 0
+    for _w, _prev in prev_wallets.items():
+        if _w in wallets or not isinstance(_prev, dict):
+            continue
+        _fs = int(_prev.get('first_seen') or 0)
+        if 0 < now_i - _fs <= TRACKY_STICKY_TTL_SEC:
+            _prev = dict(_prev)
+            _prev['sticky'] = True
+            wallets[_w] = _prev
+            sticky_added += 1
+    if len(wallets) > 200:  # hard bound under pathological churn
+        wallets = dict(sorted(wallets.items(),
+                              key=lambda kv: -(kv[1].get('first_seen') or 0))[:200])
+    if sticky_added:
+        print(f"[lb] 📌 sticky: +{sticky_added} recently-tracked wallets kept "
+              f"despite selection churn (24h TTL)")
+
     out = {
         "updated": int(time.time()),
         "used_seed": used_seed,

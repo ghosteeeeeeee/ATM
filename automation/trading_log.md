@@ -18245,3 +18245,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - 7d deepened RED '-$0.75' from '-$0.54' two hours ago — jup_yolo_mirrored 28T '-$0.44' + volume-buildup- 15T '-$0.28' still the two drags (R:R issue: 57-60% WR but losses > wins)
 - r2v2-long3 2T 0% '-$0.13' 24h, ai-trader-manual 3T 0% '-$0.04' — n too small to act (ai-trader-manual is CEO manual trades, not a signal kill candidate)
+
+## [2026-10-31 00:43] Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** $+0.19 (WR: 61.5% 24h) | 24h 65T 40W '+$0.33' GREEN | 7d 185T 58.4% '-$0.48' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Entry quality: 24h winners MAE avg 0.22%, 36/40 under 0.5% — clean; all 3 last-hour closes profit-monster-trail (BTC continuum-trend+ +$0.05/+2.23%, SOL jup_yolo +$0.05/+2.32%, HYPE jup_yolo +$0.09/+2.30%)
+- Kill check: no 0%-WR signal with n>=3 last hour — regime query not triggered (r2v2-long3 2T 0% n=2<3; ai-trader-manual is CEO manual trades, not a kill candidate)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/65 = 12.3% (<40%) — dominant close = profit-monster-trail (35T '+$1.71'); worst avg = stale_exit (2T '-$0.195')
+- Boost: pump-chain+ meets 24h bars (6T 4W 66.7% '+$0.20' across 6 tokens ADA/ALGO/CAKE/DOT wins, AVAX/FARTCOIN flat/loss) BUT 14d red in BOTH regimes (EXTREME 32T 50.0% '-$0.06', HIGH 6T 16.7% '-$0.50') + already at 1.4 weight ceiling — HOLD; volume-buildup- 15T '-$0.28' fails net bar; jup_yolo_mirrored 30T '-$0.30' fails
+- Neg streak: 23h +0.17, 00h +0.19 → 0 red (<3); 48h regime EXTREME dominant (not NEUTRAL) -> no size cut
+- Frequency 3/hr — under 20/hr
+- 3 open: ETH hl_copy_trader LONG, HYPE jup_yolo_mirrored LONG, SOL jup_yolo_mirrored LONG
+- Storm readiness: **window-min +0.05% / at-run +0.18%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored still 24h worst net '-$0.30' at 63.3% WR (losses > wins, R:R) but 14d EXTREME wins '+$0.10' 66.7% — any-regime-wins keeps alive
+- 7d still RED '-$0.48' though improved from '-$0.75' three hours ago

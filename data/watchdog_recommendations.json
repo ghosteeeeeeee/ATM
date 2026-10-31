@@ -1,13 +1,21 @@
 {
-  "timestamp": "2026-10-30T23:11:25.753395+00:00",
+  "timestamp": "2026-10-31T00:41:26.492528+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Portfolio heavily long (4 trades)",
-      "detail": "4 long positions. One BTC dump hits all of them.",
+      "title": "Trade cluster: HYPE + SOL",
+      "detail": "Both opened within 5 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Portfolio heavily long (3 trades)",
+      "detail": "3 long positions. One BTC dump hits all of them.",
+      "auto_executable": false,
+      "id": "steer-002"
     }
   ],
   "portfolio_health": "good",
@@ -15,15 +23,19 @@
     "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "ABOVE",
-    "volatility": "NORMAL",
-    "zscore_tier": "STRONG_POS",
+    "volatility": "LOW",
+    "zscore_tier": "POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "MARKUP",
+    "acceleration_state": "POSITIVE",
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "DISTRIBUTION",
     "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 4
+  "open_count": 3,
+  "deep_analysis": "AI trader pick: skipped \u2014 last pick (PUMP LONG, watchlist-only) written 25 min ago, inside the 45-min once-per-hour gate. `AI_TRADER_ENABLED=False` stands.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 3 (3 long, 0 short)\nUnrealized PnL: +0.13 USDT\nRegime: LONG_BIAS (15m+4h, aggregate 86/5/129) | Continuum: ABOVE EMA300 (77300 vs 77032, 132min) | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning/cluster] steer-001 re-tested, condition holds: 3/3 longs correlated majors. Exit condition: if BTC 1m closes below continuum EMA300 ~77032 for 15-30m, cut weakest leg (ETH) first. age=2 cycles unexecuted.\n\ud83d\udfe1 [warning/health] CHOP-BLEED breach, 2nd cycle: 7d dollar share 92.9% \u2265 92 (60/69 losers never armed, NULL mfe=0, count share 87.0%); 7d LONG arm 60.2% above <50 tripwire \u2192 entry-quality work to brain_auditor, not exits.\n\ud83d\udfe1 [warning/stale-ish] ETH 16590 laggard: +0.12% at 2.7h, tightest SL (-0.30%), while SOL/BTC armed trail (+0.48%/+0.42%). Prior \"exit ETH first if it fails to arm while siblings arm\" condition has materialized \u2014 age=2 cycles.\n\ud83d\udfe2 [info/profit_lock] SOL +0.48% and BTC +0.42% crossed trail-arm edge \u2014 let trail work while BTC 1m holds above EMA300.\n\ud83d\udfe2 [info/opportunity] No new AI pick \u2014 last pick (PUMP LONG, watchlist-only) 25 min old; AI_TRADER_ENABLED=False.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe open book is on the right side of every regime source \u2014 no urgent exits. SOL/BTC armed the trail family (86.5% WR \u2014 this is how we win); ETH hasn't. The bleed is upstream: 92.9% of 7d gross loss is from entries that never reached +0.40% MFE \u2014 chop entries, 60 of 69 losers. Last 5 closes were all green trail exits; the trail family works, the entries that never arm don't. Verified pattern: all 5 volume-buildup- short losers in 24h entered at meta_rsi <45 (35.3\u201344.4) \u2014 shorting oversold into bounces (BANANA repeating). Winning side on those coins was LONG/flat (ZORA now LONG_BIAS conf 93.5 after our -4.5% short). Band-edge entries (RSI >69 long / <45 short) took 8 of 21 losers; mid-band armed trades carried the wins. Flip rate normal (agg 20/24h, BTC 24/24h \u2014 standing state).\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Exit ETH 16590 first if it still hasn't armed trail by next cycle while SOL/BTC hold \u2014 its stop (-0.30%) is inside LOW-vol noise and the signal family (hl_copy_trader) is weak (7d 1/3).\n2. Route chop-bleed 92.9% breach + 5 sub-45 meta_rsi short fills to brain_auditor as ENTRY-QUALITY work (meta_rsi path; volume-buildup- floor wiring) \u2014 not exit tweaks.\n3. Watch BTC 1m vs continuum EMA300 (~77032, re-read next cycle) \u2014 the one condition separating aligned from fighting-trend for all 3 longs.\n4. Leave SOL/BTC to the trail while the condition holds; no new shorts against the LONG_BIAS tape.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nMerged `deep_analysis` / `regime_context` / `pattern_alerts` into `/root/.hermes/data/watchdog_recommendations.json` (steers untouched); OpenMemory stored.\n",
+  "agent_timestamp": "2026-10-31T00:18:09.407464+00:00",
+  "regime_context": "Sources stated explicitly: regime_5m aggregate LONG_BIAS (86 long / 5 short / 38 neutral of 129, ts 00:00); BTC 15m LONG_BIAS conf 63 r2=0.90 slope +0.039%; BTC 4h LONG_BIAS; continuum BTC 1m ABOVE EMA300 (price 77300 vs EMA300 77032 at 00:11, 132 consecutive min above, crossed 23:45), linreg LEAN_BULL, trend_quality UP, wyckoff MARKUP, market_phase CALM. Volatility LOW, volume regime LOW, velocity SLOW, acceleration POSITIVE (was NEGATIVE last cycle \u2014 flipped). Flip rate agg 20/24h, BTC 24/24h = normal standing state. All direction sources currently AGREE on long.\n\nMeaning for positions: all 3 longs sit on the aligned side of every source \u2014 nothing here says exit. The tension is unchanged from last cycle: trend UP with volume LOW is a low-participation advance that drifts until volume shows and then resolves sharply; ETH's -0.30% stop is ~1x ATR noise in this tape. The single condition separating aligned from fighting-trend remains BTC 1m closes vs continuum EMA300 (~77032 now, re-read next cycle \u2014 do not reuse this number). Acceleration turned POSITIVE this cycle, mildly strengthening the hold case for SOL/BTC.",
+  "pattern_alerts": "VERIFIED from PostgreSQL, queried 2026-10-31 00:1x UTC (meta_rsi path, NOT entry_rsi_14):\n\n1. CHOP-BLEED BREACH (2nd consecutive cycle) \u2014 7d dollar share 92.9% >= 92 tripwire (60/69 losers never armed; NULL mfe=0; count share 87.0% \u2014 dollar share is the measure quoted). 14d 89.4%. 7d LONG arm rate 60.2% (128T, 77 armed) \u2014 ABOVE the <50 tripwire, so route as entry-quality size/selection work, not an arming-collapse emergency. Winning side: trades that armed and hit profit-monster-trail (last 5 closes all green trail exits). Why we weren't on it: entries fired in LOW-volume chop before structure confirmed, ATR stops sat inside noise (atr_sl_hit x8, stale_exit x2 in 24h jup_yolo losers). ACTION: brain_auditor entry-quality window, meta_rsi path.\n\n2. volume-buildup- SHORT (LIVE \u2014 VOLUME_BUILDUP_MINUS_ENABLED=True, 41T/7d, 25W, -$0.74; dead-signal check: live traffic, flagged normally): 15 shorts in 24h, net -$0.28; 5 losers ALL with meta_rsi <45 (35.3-44.4) \u2014 shorting oversold into bounces. Winning side = LONG or flat on the same coins (ZORA: our -4.5% short, now regime LONG_BIAS conf 93.5). Why weren't we on it: fills below SHORT_RSI_HARD_FLOOR=45 \u2014 needs brain_auditor floor-wiring verification against the meta_rsi path. LONG sibling already KILLED 2026-10-14 \u2014 no action on + side.\n\n3. jup_yolo_mirrored LONGS (LIVE, 28T/7d, 17W 60.7%, -$0.44): 11 of 21 24h losers; 10 of 11 never armed (MFE <0.40); exits atr_sl_hit x8, stale_exit x2. Same coins' winners (SOL/BTC/HYPE) were trail-armed entries \u2014 same direction, better tape. Family net-negative despite 60%+ WR = loss size on chop entries, not direction error. Monitor; do not re-report as new.\n\n4. Band-edge entries: 8/21 24h losers at meta_rsi >69 long (PONS 71.3, GMX 69.2) or <45 short. Winners clustered mid-band (45-60). Matches prior death-zone measurements.\n\n5. bb-bounce-v2-long+ 8T/7d 12.5% WR \u2014 KNOWN, basis-dead since #138, in-flight compactor measurement, kill bars fail. NO new action (do not re-propose)."
 }

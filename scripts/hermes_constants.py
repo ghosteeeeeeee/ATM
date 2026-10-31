@@ -4154,6 +4154,17 @@ JUP_YOLO_MAX_MIRROR_AGE_SEC = 600     # skip mirrors of positions older than 10 
 JUP_YOLO_REEMIT_AFTER_SEC = 180       # retry a gate-killed signal every 3 min (must fit
                                       # inside the freshness window: 3 retries by 9 min)
 
+# CEO giants-light verdict 2026-10-30 (policy (b)):
+# A wallet ALREADY TRACKED when the position opened gets the extended window —
+# we were watching them enter and missed it only to OUR pipeline latency
+# (poll cadence, scrape refresh, compaction). Newly-tracked wallets first seen
+# mid-hold keep JUP_YOLO_MAX_MIRROR_AGE_STRICT below (they're strangers riding
+# an old hold — the stale-entry problem the gate was built to kill).
+JUP_YOLO_MAX_MIRROR_AGE_TRACKED_SEC = 3600   # tracked-at-open window: 60 min
+TRACK_AT_OPEN_TOLERANCE_SEC = 120             # scrape-latency slop: position opened
+                                              # ≤120s before first_seen still counts
+                                              # as "we were watching"
+
 
 # ── Copy Trader Exit Correlation & Weighting ─────────────────────────────────
 COPY_TRADE_EXIT_ENABLED = True          # master switch for trader exit correlation

@@ -1,112 +1,108 @@
 {
-  "timestamp": "2026-10-30T20:48:17Z",
-  "run": 205,
-  "headline": "Winner-cell 1.25x was intermittent (7/67) because live ATR reclass drifted from signal-time regime — fixed to prefer sig regime. Chop-bleed 95.1% entry-quality: gap/RSI filters fail bars; first-5m kill REFUTED (would net -$2.26). SHORT RSI floor 35-45 measured: 7d +$0.69 n=36 but 30d -$0.50 n=88 — OOS sign flip, NO ACTION.",
+  "timestamp": "2026-10-31T00:52:00Z",
+  "run": 206,
+  "session_brain_stats": {
+    "queries_run": 3,
+    "note": "dup-heavy 16th run — chop/loser/optimizer queries return overlapping compaction fragments; usable insight: chop-filter wiring complaints recur but all tested gates already dispositioned",
+    "usable_insights": 0
+  },
   "trade_summary_24h": {
-    "net": "+$0.27",
-    "n": 55,
-    "wr": 56.4,
-    "worst": "jup_yolo_mirrored LONG 23T -$0.51 (56.5%WR, fat losses vs wins)",
-    "best_exit": "profit-monster-trail 7d +$3.88/95.9%WR",
-    "bleed": "atr_sl_hit 7d -$2.21 19T 0%WR; never-armed 61T -$6.62 = 95.1% dollar share"
+    "trades": 63,
+    "pnl_usdt": 0.23,
+    "win_rate": 60.3,
+    "d_7d": {"trades": 183, "pnl_usdt": -0.58, "win_rate": 57.9},
+    "d_14d": {"trades": 306, "pnl_usdt": -1.84, "win_rate": 50.7},
+    "open": {"count": 3, "unrealized": 0.09, "all": "LONG"}
   },
-  "regime": {
-    "btc_15m": "LONG_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "vol": "LOW",
-    "phase": "CALM",
-    "trend_quality": "STRONG_UP (watchdog) / deep STRONG_DOWN",
-    "chop_bleed_kpi": "95.1% 7d BREACH age>=2 (routed to auditor)"
-  },
-  "standing_item_short_rsi_floor": {
-    "action": "MEASURED, NO CHANGE",
-    "rsi_14_7d_short_35_45": "36T +$0.69 63.9%WR (best band)",
-    "rsi_14_14d": "45T +$0.22 57.8%",
-    "rsi_14_30d": "88T -$0.50 47.7%",
-    "verdict": "OOS sign flip 7/14d positive vs 30d negative — does NOT clear re-lower bar. Floor stays 45. Note: these are detection-time rsi_14; meta_rsi key absent from 7d metadata (watchdog aliases meta_rsi:=rsi_14)."
-  },
-  "chop_bleed_entry_quality": {
-    "gap_filters_tested": "LONG weak[0.10,0.30) and SHORT dead[-0.5,0.2) ex-pump-chain: directional but t=-0.76 p>0.05 14d, and would kill 45-48% of winners — FAIL ship bars",
-    "volume_buildup_gap": "gap>-0.5 SHORT 14d 32T -$0.75 vs gap<=-0.5 20T +$0.01; hard-block kills 15/31=48% winners — REJECT block, PRE-REG dampen",
-    "first_5m_momentum_deficit_kill": "REFUTED: fav_move<-0.20% at 5m would cut 13 NEVER -$1.63 but also 16 ARMED +$0.63 = net -$2.26 opportunity cost. Winners dip first."
-  },
-  "winner_cell_bug": {
-    "finding": "67 stored-regime winner-cell trades 7d, only 7 boosted>12 (10%). Live classify_volatility(get_atr_pct) drifts vs signal-time volatility_regime (cells validated on stored).",
-    "fix": "decider_run._get_winner_cell_size_mult(token,source,direction,regime=None) prefers signal-time regime; execute_trade(vol_regime=...); delayed-entry uses entry['volatility_regime'].",
-    "verification": "unit: HIGH->1.25 for vb-, EXTREME->1.25 for pc+, regime mismatch->1.0. BANANA live fallback still 1.0 (live now NORMAL).",
-    "expected": "winner-cell traffic 10%->~100% on stored-regime cells; +25% notional on validated winners only."
+  "watchdog_triage": {
+    "steer_001_cluster": "ADVISORY STANDS — 3 correlated longs but every regime source agrees LONG (15m+4h LONG_BIAS, continuum ABOVE EMA300 since 23:45, wyckoff MARKUP, trend_quality UP). SOL #16594 +0.48% and BTC #16587 +0.42% armed trail; ETH #16590 +0.12% unarmed at 2.7h with tightest SL -0.30%. Exit condition unchanged: BTC 1m below continuum EMA300 (~77032 @00:11, re-read) 15-30m -> cut ETH first. Trade action = CEO domain, report only.",
+    "chop_bleed_92_9": "VERIFIED FRESH from PG: 7d never-armed dollar share 92.9% (60/69 losers, unarmed 71T -$6.38 vs armed 114T +$5.90). Per-signal arm census 14d n>=15: NO live signal has arm rate <25% (worst = ai-trader-pending 17.6% n=17, CEO domain). Biggest single unarmed cohort = NORMAL regime (-$4.10, arm 46.3%). All entry filters re-tested this run and still fail bars -> NO SHIP, monitor.",
+    "volume_buildup_floor_wiring": "VERIFIED WIRED — decider_run.py:1334-1386 applies SHORT hard floor to ALL SHORTs: knife RSI<35 unconditional block (OVERSOLD_SHORT_RSI_MAX), [35,45) SKIP unless BTC-bearish structure exemption (_floor_bear_ok), signal carve-outs pump-chain 40 / jup_yolo 35 (CEO Option D 2026-10-30), fail-closed when live+detect both None. Sub-45 fills pass ONLY via [CTX-RSI-FLOOR-BEAR] — live proof: AERO vb- LIVE RSI 40.3 allowed 2026-10-30 22:31Z. Exemption is regime-conditional: BTC reclaimed EMA300 (ABOVE, LONG_BIAS both TFs) -> exemption OFF now -> sub-45 shorts auto-block. NO CHANGE.",
+    "band_edge_claim": "PARTIAL: vb- 14d by rsi_14 = 35-45: 36T 61.1% WR -$0.62 (avg win +0.049 vs avg loss -0.131 = 2.7x asymmetry) | 45-55: 0T (bimodal fire) | 55-60: 6T -$0.27 | 60+: 11T +$0.16. Band loses on loss-size, not hit rate. Standing measurement: 7d/14d 35-45 SHORT positive, 30d -$0.50 OOS sign-flip -> floor stays 45."
   },
   "shadow_analysis": {
-    "contrarian": "join refreshed 20:30Z: overall flip-WR 41.1% n=956; pump-chain- 64.6% STAYS LIVE-FLIP; btc-pump-rider+ 27.6% do NOT flip",
-    "floor_admit": "floor_only 48.1% vs always_admit 44.0% (join 10-29; raw 3028 rows)",
-    "wyckoff": "404 rows still no outcome join",
-    "oscillator": "ARCHIVED fossil — not cited",
-    "shadow_trader": "gate just: CONFLUENCE-EXPIRY 48%WR avg -0.12 protective; trail_arm_timeout -107 total (noise); hard_max -7188 = chop class confirmed"
+    "contrarian": "join RE-RAN unconditionally 00:30Z (mandate): 958 joinable, overall flip-WR 41.1%; pump-chain- 64.6% n=350 LIVE fade STANDS (exact reproduce); btc-pump-rider+ 27.6% n=607 no-flip. 2 new rows since #205.",
+    "floor_admit": "join current 2026-10-29: floor_only 48.1% (n=900 decided) vs always_admit 44.0% (n=109) — directional win for floor admit, blocked cohort n=0.",
+    "wyckoff": "408 rows (grew from 345), outcome join STILL PENDING — recurring, owner next actions.",
+    "oscillator": "archived fossil 2026-10-27, frozen, no live answerable question.",
+    "rr_shadow": "orphaned (mtime 24d), do not cite.",
+    "shadow_trader": "report fresh 00:36Z: exit A/B pm_trail +$6,436 (n=16548, 100% WR) vs hard_max -$7,266 / cut_loser -$1,993 / rr_engine -$2,200 — trail-vs-chop confirmation unchanged. Top source grind-breakout- 92.3% avg +1.56 (n=26).",
+    "overall": "contrarian (with manual join) + floor_admit + shadow_trader = USEFUL; wyckoff pending; oscillator/rr dead. Only manual-join streams count."
+  },
+  "last_run_changes_verify": {
+    "winner_cell_regime_basis_fix_205": "WIRED AND LIVE — [WINNER-CELL-SIZE] regime_src=sig lines observed 2026-10-30 20:47:13 (GOAT vb- HIGH, AVAX pc+ EXTREME, SOL bb-squeeze+ NORMAL — pre-fix run at 20:44 had only 2 live-src lines); both call sites pass regime (decider_run:947 delayed entry entry.get('volatility_regime'), :2824 execute_trade vol_regime from :5894). TRAFFIC PENDING: 0 cell-matching trades have OPENED since the fix (post-fix opens: INJ pc-, USELESS vb- EXTREME [cell=HIGH], SOL/HYPE jup, BTC continuum — none match) so amount~=13.9 measure not yet observable. Status: awaiting first cell open.",
+    "vb_shallow_gap_dampen_prereg_205": "BAR NOT MET — 14d shallow(gap>-0.5) 33T 19W -$0.74 = 14 losers < 20 bar; 30d 39T 24W -$0.61 = 15 losers < 20 bar; same-sign negative both windows but max EV of a 0.75x dampen = +$0.15-0.19 = noise. Keep collecting, do not ship.",
+    "contrarian_pc_live_flip": "STANDS 64.6% n=350 exact reproduce (fresh join this run).",
+    "jup_freshness_gate": "not re-measured this run (owner jup-yolo-regime-review due 11-07)."
+  },
+  "losing_trade_autopsy": {
+    "method": "brain/analysis/recovery_replay.py adverse-first anchor, --selfcheck exit=0 PASS",
+    "window_48h": {"losers": 29, "never_adverse": 7, "recovered_after_adverse": 16, "never_traded_back": 6, "never_list": "BTC continuum-trend- -0.18 | ZORA vb- -0.17 | MON vb- -0.16 | NXPC vb- -0.14 | ALT pc- -0.07 | ZORA vb- -0.05"},
+    "window_14d": {"losers": 141, "never_adverse": 37, "recovered": 82, "never_traded_back": 22, "structural_pct": 15.6},
+    "verdict": "WRONG-SIDE REFUTED 39th consecutive run (#61 p=0.116 opposite-side-signal, #84 forward-return t=-0.04). 4 of 6 48h NEVER are the never-armed vb- SHORT class — wrong-side on those = chop entries that never moved 0.2% in our favor, owned by entry-quality not direction.",
+    "loser_count_trend": "14d losers fell 206 (Oct 22 census) -> 141 = book improving as kills/waiver/TAT stack landed."
   },
   "drift_findings": [
-    "BUG-070 brain honors amount_usdt — VERIFIED shipped; residual miss was regime reclass (this run's fix)",
-    "jup freshness gate is_stale=true 3T +$0.08 vs false 22T -$0.42 — working",
-    "meta_rsi key never stamped; all band analytics use rsi_14 alias — naming drift only, not data loss"
+    "MED: entry_feature_split --selfcheck now FAILs on sample size (HML n=20 < 50 bar) — HML exits shrank, the entry-feature separator test cannot run its own selfcheck; not a code bug, test window needs revisit at next HML sample recovery",
+    "LOW: meta_rsi key still never stamped; all band analytics use rsi_14 alias (naming drift only, known)",
+    "LOW: signal-compactor.err.log contains historical IndentationError/ImportError/SPEED_HOTSET_THRESHOLD noise (last write Oct 30 09:17) — current file py_compile OK and systemd unit exits success every minute; log is misleading if read as live",
+    "LOW: session_brain dup-heavy 16th run",
+    "LOW: wyckoff outcome join still pending (recurring since Oct)"
   ],
   "recurring_problems": [
-    "chop-bleed never-armed dollar share ~95% 7d — entry quality, not exit",
-    "jup_yolo LONG net-negative at 56% WR — loss size > win size (MAE 0.83 vs 0.28)"
+    "chop-bleed never-armed dollar share >=92% for 2+ cycles — entry quality, all tested filters fail bars (this run: shallow-gap dampen n-fail)",
+    "jup_yolo_mirrored net-negative at 60-63% WR — loss size on unarmed entries, owner jup-yolo-regime-review 11-07",
+    "coverage: entry_regime_4h only 161/307 (52%) 14d — blocks coin-level band guards from being testable (owner momentum-cache-regime-coverage 11-06)"
   ],
   "missing_implementations": [
-    "first-5m momentum-deficit collector — one-shot analysis done, kill REJECTED; optional shadow dampen not shipped (low EV after kill refutation)",
-    "wyckoff outcome join still pending"
+    "wyckoff outcome join (owner Nov-15 disposition)",
+    "coin-regime guard for exemption-band SHORTs — blocked on entry_regime_4h coverage, pre-registered this run"
   ],
   "creative_improvements": [
     {
-      "date": "2026-10-30T20:48:17Z",
-      "idea": "PRE-REG: volume-buildup- SHORT size dampen 0.75x when gap_at_entry > -0.5 (shallow extension)",
-      "rationale": "14d: shallow 32T -$0.75 / deep 20T +$0.01; never-armed cohort dominated by shallow. Block fails 48% winner-kill bar; dampen keeps winners.",
-      "expected_impact": "cut ~25% of shallow-gap vb- bleed without blocking",
-      "category": "entry sniper / sizing",
-      "status": "pre-registered",
-      "risk": "low",
-      "bar": "n>=20 shallow losers AND 30d same direction AND fk<25% of dampened winners"
+      "date": "2026-10-31T00:52:00Z",
+      "idea": "PRE-REG: block [35,45) SHORT only when the COIN's own entry_regime_4h = LONG_BIAS (BTC-bear exemption is BTC-level; ZORA bled shorting into coin LONG_BIAS conf 93.5)",
+      "rationale": "first test this run: 14d band shorts with non-null coin regime = 27/46 only; LONG_BIAS cell n=1 (+0.16), NEUTRAL +0.49, SHORT_BIAS -0.05 — no signal at current coverage",
+      "expected_impact": "would target the waiver-band bleed class without touching mid-band winners",
+      "category": "entry sniper",
+      "status": "pre-registered_insufficient_data",
+      "risk": "low — block never fires until coverage proven",
+      "bar": "entry_regime_4h coverage >=80% AND n>=15 non-null band shorts AND 30d same sign AND fk<20%",
+      "blocked_on": "momentum-cache-regime-coverage (due 2026-11-06)"
     },
     {
-      "date": "2026-10-30T20:48:17Z",
-      "idea": "REJECTED: first-5m adverse-move kill (< -0.20% fav)",
-      "rationale": "7d counterfactual net -$2.26 (kills recovering armed winners)",
-      "status": "rejected_with_data",
-      "category": "exit"
+      "date": "2026-10-31T00:52:00Z",
+      "idea": "REJECTED: vb- shallow-gap (gap_at_entry > -0.5) size dampen 0.75x (pre-reg from #205)",
+      "rationale": "14d 14 shallow losers / 30d 15 — both < 20 bar; same-sign negative but max EV +$0.15-0.19 = noise even if bars were met",
+      "status": "bar_not_met_keep_collecting",
+      "category": "sizing"
     },
     {
-      "date": "2026-10-30T20:48:17Z",
-      "idea": "SHIPPED: winner-cell regime basis = signal-time volatility_regime",
-      "rationale": "offense was firing on 10% of eligible cells due to live ATR drift",
-      "status": "applied_this_run",
-      "category": "amplify / offense",
-      "risk": "low — same mult, correct basis"
+      "date": "2026-10-31T00:52:00Z",
+      "idea": "AMPLIFY screen: 30d winner-cell ranking — no new cell cleared the bar (see amplify_screen_30d)",
+      "rationale": "only new live-signal cells are pc- SHORT (contradicts live pc- fade 64.6% — wrong-side amplification) and continuum-trend+ FLAT (14d +0.01, 7d -0.08 sign-flip = noise); killed/disabled signals excluded",
+      "status": "no_proposal_this_run",
+      "category": "amplify / offense"
     }
   ],
-  "config_changes_applied": [
-    {
-      "file": "scripts/decider_run.py",
-      "change": "_get_winner_cell_size_mult prefers signal-time regime; execute_trade(vol_regime=); delayed-entry entry.get('volatility_regime')",
-      "type": "bugfix",
-      "rationale": "winner-cell 1.25x matched on live ATR reclass; only 7/67 eligible trades boosted in 7d",
-      "revert": "drop regime= args / restore live-only classify"
-    }
-  ],
-  "changes_from_last_run": [
-    "jup arm-timeout KILL — confirmed $0.00 delta, stays killed",
-    "freshness gate is_stale — true 3T +$0.08, working as designed",
-    "vb- bb_position pre-reg [0.6,0.8) — still accumulating",
-    "contrarian pc- live flip — stands 64.6%"
-  ],
-  "amplify": {
-    "status": "service existing entries; this run SHIPPED regime-basis fix for winner-cell-size-125 (the actual blocker).",
-    "proposal": "winner-cell-traffic-regime-fix (this change) — measure 14d tagged-cell net delta; bar same as winner-cell-size-125 (>=+$1.00)",
-    "no_new_cell": "no new WINNER_CELLS_VALIDATED cell cleared bar this run (bb-squeeze NORMAL / pc+ EXTREME already on 1.25x)"
+  "amplify_screen_30d": {
+    "existing_cells_reverified": "pc+ EXTREME LONG 80T +2.80 | bb-squeeze+ NORMAL LONG 49T +0.95 | r2v2-long3 NORMAL LONG 6T +0.78 | vb- HIGH SHORT 16T +0.28 — all positive, cells stay",
+    "new_candidates_rejected": "pc- NORMAL SHORT 12T +0.45 and pc- EXTREME SHORT 10T +0.30 → REJECTED: amplifying pc- SHORT sizes up the exact side the live 64.6% fade says is wrong; continuum-trend+ FLAT LONG 14d 6T +0.01 / 7d -0.08 sign-flip → noise; volume-breakout-long+ EXTREME 12T +0.49 = killed signal; doji/ai-trader = killed/disabled",
+    "weekly_note": "full weekly AMPLIFY step (>=1 proposal into shadow_disposition.json) due at the run servicing amplify-weekly-mandate deadline 2026-11-03"
   },
+  "config_changes_applied": [],
+  "changes_from_last_run": [
+    "#205 winner-cell regime-basis fix: LIVE (regime_src=sig lines), 0 qualifying cell opens yet — measure still pending",
+    "#205 vb- shallow-gap dampen pre-reg: bars NOT met (14/15 losers < 20) — stays pre-registered",
+    "contrarian pc- live flip: stands 64.6% n=350 exact reproduce"
+  ],
   "next_actions": [
-    "watch: winner-cell [WINNER-CELL-SIZE] regime_src=sig lines + amount_usdt ~13.9 on next NORMAL/HIGH/EXTREME cell opens",
-    "disposition trial-coupled-cutsloser-sl + eval-midband at 2026-11-03",
+    "watch: first cell-matching open after 2026-10-30 20:47 -> amount_usdt ~= 13.9 with [WINNER-CELL-SIZE] regime_src=sig (GOAT/AVAX/SOL signals already evaluate; opens were deduped by existing positions)",
+    "2026-11-03: full weekly AMPLIFY step + shadow_disposition weekly batch (trial-coupled-cutsloser-sl, eval-midband, escalation-17, ugb-pt-045, relative-regime, rr-engine, chase-ratio, wyckoff all due)",
+    "2026-11-06: momentum-cache-regime-coverage -> then re-test exemption-band coin-regime guard (pre-reg above)",
+    "2026-11-07: jup-yolo-regime-review disposition (jup unarmed bleed -$1.17/14d)",
     "wyckoff outcome join still PENDING",
-    "re-measure SHORT RSI 35-45 at next weekly (needs 30d window positive to reconsider floor)"
+    "re-measure SHORT rsi_14 35-45 at next weekly (needs 30d positive to reconsider floor)",
+    "ai-trader-pending 17T 23.5% WR arm 17.6% — CEO domain, flag only (n<20)"
   ]
 }

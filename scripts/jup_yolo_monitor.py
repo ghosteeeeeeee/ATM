@@ -346,17 +346,20 @@ MAX_EMIT_ATTEMPTS = 5  # retry blocked/priceless positions before permanent skip
 try:
     from hermes_constants import (
         JUP_YOLO_MAX_MIRROR_AGE_SEC, JUP_YOLO_REEMIT_AFTER_SEC,
-        JUP_YOLO_MAX_OPEN_SHORTS, JUP_YOLO_SHORT_LIFT_CLOSED)
+        JUP_YOLO_MAX_OPEN_SHORTS, JUP_YOLO_SHORT_LIFT_CLOSED,
+        JUP_YOLO_MAX_MIRROR_AGE_TRACKED_SEC, TRACK_AT_OPEN_TOLERANCE_SEC)
 except Exception as _fe:
     # FIX (bug_hunter F2): was SILENT — a renamed/missing gate constant would
     # silently widen the gate back to 600/180 after a CEO tightening (exactly
     # what the old comment vowed never to do). Loud every process start.
     print(f"[jup_yolo] ⚠️ freshness/guardrail constants unavailable "
-          f"({type(_fe).__name__}: {_fe}) — using fallback 600/180/2/20")
+          f"({type(_fe).__name__}: {_fe}) — using fallback 600/3600/180/2/20")
     JUP_YOLO_MAX_MIRROR_AGE_SEC = 600
     JUP_YOLO_REEMIT_AFTER_SEC = 180
     JUP_YOLO_MAX_OPEN_SHORTS = 2
     JUP_YOLO_SHORT_LIFT_CLOSED = 20
+    JUP_YOLO_MAX_MIRROR_AGE_TRACKED_SEC = 3600
+    TRACK_AT_OPEN_TOLERANCE_SEC = 120
 REEMIT_AFTER_SEC = JUP_YOLO_REEMIT_AFTER_SEC  # 3 min — retry inside the freshness window
 
 
@@ -397,13 +400,25 @@ def _jup_short_counts() -> tuple:
         return (0, 0)
 
 
-def _live_signal_exists(token: str, direction: str) -> bool:
-    """True if a jup_yolo signal for token+direction is still live (PENDING/APPROVED).
+def _jup_last_signal_state(token: str, direction: str) -> tuple:
+    """Classify the most recent jup_yolo signal for token+direction (30 min).
 
-    Used so a held position whose signal died at an exec gate (SKIPPED/EXPIRED)
-    gets re-mirrored every REEMIT_AFTER_SEC — a one-shot emit meant transient
-    gate kills (vol storm, max positions) silenced the position permanently.
+    Returns (state, reason):
+      ('LIVE', None)          — PENDING/APPROVED exists: let it work
+      ('APPROVAL_DEAD', r)    — died BEFORE approval (blocked@approval /
+                                compaction_stale / combo_key stale / expired
+                                unapproved): re-emitting only restarts the
+                                approval clock and the same deterministic gate
+                                kills it again — this was the 17×/3h churn
+                                (CEO giants-light verdict: give up).
+      ('EXEC_DEAD', r)        — died AT an exec-stage gate (SKIPPED: vol storm,
+                                max positions, hotset, ctx) or hotset turnover:
+                                transient → re-mirror allowed (original design).
+      ('NONE', None)          — no recent signal / DB error (fail-open = old
+                                behavior: re-mirror allowed).
     """
+    _APPROVAL_MARKERS = ('blocked@approval', 'compaction_stale',
+                         'combo_key stale', 'never-approved', 'expired: token on')
     try:
         import sqlite3
         from paths import RUNTIME_DB
@@ -417,11 +432,28 @@ def _live_signal_exists(token: str, direction: str) -> bool:
                   AND created_at > datetime('now', '-30 minutes')
                 LIMIT 1
             """, (token.upper(), direction.upper())).fetchone()
-            return row is not None
+            if row:
+                return ('LIVE', None)
+            dead = conn.execute("""
+                SELECT decision, COALESCE(decision_reason, '')
+                FROM signals
+                WHERE source = 'jup_yolo_mirrored'
+                  AND token = ? AND direction = ?
+                  AND created_at > datetime('now', '-30 minutes')
+                ORDER BY id DESC LIMIT 1
+            """, (token.upper(), direction.upper())).fetchone()
+            if not dead:
+                return ('NONE', None)
+            decision, reason = dead[0], dead[1]
+            if decision == 'SKIPPED':
+                return ('EXEC_DEAD', reason)
+            if decision == 'EXPIRED' and any(m in reason for m in _APPROVAL_MARKERS):
+                return ('APPROVAL_DEAD', reason)
+            return ('EXEC_DEAD', reason)
         finally:
             conn.close()
     except Exception:
-        return False  # fail-open: allow re-mirror if DB unreadable
+        return ('NONE', None)  # fail-open: re-mirror allowed (pre-change behavior)
 
 
 def monitor_once() -> int:
@@ -472,6 +504,11 @@ def monitor_once() -> int:
     seen_list = [e for e in seen_list if e[0] in live_pids]
     seen = {e[0] for e in seen_list}
     seen_ts = {e[0]: e[1] for e in seen_list}  # pid -> first-emit epoch
+    # CEO giants-light dedupe: ONE emit per (market,direction) per cycle —
+    # cluster wallets each emitted the same combo_key; duplicates reset the
+    # approval clock via signal_schema's stale-row expiry (a driver of the
+    # 17×/3h churn). First successful emit covers the whole cluster.
+    emitted_combos = set()
     # attempts bookkeeping only matters for LIVE positions — prune closed
     # pids so failed/stale entries can't accumulate unbounded in state
     attempts = {k: v for k, v in attempts.items() if k in live_pids}
@@ -547,30 +584,43 @@ def monitor_once() -> int:
 
             _is_remirror = False
             if pid in seen:
-                # RE-EMIT: held position whose signal died at an exec gate
-                # (SKIPPED/EXPIRED) — retry every REEMIT_AFTER_SEC (3 min, must
-                # fit inside the freshness gate). Without this, a transient
-                # vol-storm kill silenced the position even though the trader
-                # still holds it.
+                # RE-EMIT: held position whose signal died — but ONLY when the
+                # death was at an EXEC-stage gate (vol storm, max positions,
+                # hotset turnover): transient, retryable (original design).
                 age = now_ts - seen_ts.get(pid, 0)
                 if age < REEMIT_AFTER_SEC:
                     continue
                 # permanent give-up: bounded retries exhausted OR stale-blocked
-                # (attempts pinned to MAX by the freshness gate). Without this
-                # guard "giving up" was a lie — it re-mirrored forever every
-                # REEMIT interval. (attempts popped on success.)
+                # (attempts pinned to MAX). Give-up is terminal.
                 if attempts.get(pid, 0) >= MAX_EMIT_ATTEMPTS:
                     continue
-                if _live_signal_exists(market, direction):
+                # CEO giants-light verdict: classify WHY the last signal died.
+                # APPROVAL-side deaths (rep/midband/rr/compaction/combo-stale)
+                # must NOT re-emit — re-emitting restarts the approval clock and
+                # the same deterministic gate kills it again (the 17×/3h churn
+                # that reset every row's clock and let NONE survive 2 cycles).
+                _state, _reason = _jup_last_signal_state(market, direction)
+                if _state == 'LIVE':
                     continue  # signal alive (PENDING/APPROVED) — let it work
-                # dead signal + aged → falls through gate; print AFTER it passes
+                if _state == 'APPROVAL_DEAD':
+                    if attempts.get(pid, 0) == 0:
+                        print(f"[jup_yolo] ⛑️ APPROVAL-DEAD {market} {direction} — "
+                              f"{(_reason or '')[:70]} (no re-mirror, permanent)")
+                    attempts[pid] = MAX_EMIT_ATTEMPTS
+                    continue
+                # EXEC_DEAD / NONE → falls through gate; print AFTER it passes
                 _is_remirror = True
 
             # ── FRESHNESS GATE (CEO 2026-10-30): "older than 5-10 mins is
             # useless" — we copy the ENTRY, not the ride. Covers first-emit AND
             # re-mirror fall-through. Steady-state tracked-wallet opens arrive
-            # at age ~1min (60s poll); stale paths are newly-tracked wallets
-            # mid-hold, state re-seeds, and late retries.
+            # at age ~1min (60s poll).
+            # POLICY (b) — CEO giants-light verdict: a wallet that was ALREADY
+            # TRACKED when the position opened gets the extended window
+            # (JUP_YOLO_MAX_MIRROR_AGE_TRACKED_SEC) — we were watching them
+            # enter and missed it only to OUR pipeline latency; a newly-tracked
+            # wallet first seen mid-hold keeps the strict 10-min window.
+            # first_seen=0/absent (legacy state) → strict window.
             _ea_raw = p.get('executedAt') or 0
             try:
                 # FIX (bug_hunter F5): float() first — a fractional-second
@@ -582,10 +632,20 @@ def monitor_once() -> int:
                 exec_at = 0
             if exec_at > 0:
                 pos_age = now_ts - exec_at
-                if pos_age > JUP_YOLO_MAX_MIRROR_AGE_SEC:
-                    print(f"[jup_yolo] ⏰ STALE SKIP {market} {direction} "
-                          f"— pro opened {pos_age // 60}m ago "
-                          f"(> {JUP_YOLO_MAX_MIRROR_AGE_SEC // 60}m gate), not chasing")
+                _wl_stats = wallets.get(owner) or {}
+                _tracked_since = int(_wl_stats.get('first_seen') or 0)
+                if _tracked_since > 0 and exec_at >= (_tracked_since - TRACK_AT_OPEN_TOLERANCE_SEC):
+                    _max_age = JUP_YOLO_MAX_MIRROR_AGE_TRACKED_SEC
+                    _win_lbl = 'tracked-at-open'
+                else:
+                    _max_age = JUP_YOLO_MAX_MIRROR_AGE_SEC
+                    _win_lbl = 'newly-tracked'
+                if pos_age > _max_age:
+                    # FIX (bug_hunter/census): STALE SKIP had no wallet label —
+                    # 157 lines/day unattributable to any trader.
+                    print(f"[jup_yolo] ⏰ STALE SKIP {_wl_stats.get('label', owner[:4])} "
+                          f"{market} {direction} pid={pid[:8]} — pro opened "
+                          f"{pos_age // 60}m ago (> {_max_age // 60}m {_win_lbl} gate), not chasing")
                     if pid not in seen:
                         seen_list.append((pid, now_ts))
                     # pin attempts → terminal: re-mirror guard goes silent
@@ -623,6 +683,15 @@ def monitor_once() -> int:
                 print(f"[jup_yolo] 🔄 re-mirror {market} {direction} "
                       f"(attempt age {age//60}m, previous signal dead)")
 
+            # dedupe: another wallet's position already emitted this combo
+            # this cycle — the cluster is covered; mark this pid and move on.
+            if (market, direction) in emitted_combos:
+                if pid not in seen:
+                    print(f"[jup_yolo] ⏭️ {market} {direction} — combo already "
+                          f"mirrored this cycle (cluster covered by teammate)")
+                    seen_list.append((pid, now_ts))
+                continue
+
             stats = wallets[owner]   # {label, pnl, wr, trades, rank, source}
             leverage = int(p.get('leverage', 0) or 0)
             margin = float(p.get('margin', 0) or 0) / 1_000_000
@@ -631,13 +700,17 @@ def monitor_once() -> int:
             if emit_signal(market, direction, owner, stats, leverage, margin,
                            cluster_size=cluster_size, pid=pid):
                 new_signals += 1
+                emitted_combos.add((market, direction))
                 seen_list.append((pid, now_ts))   # duplicate-append is pruned/normalized on save
                 attempts.pop(pid, None)
             else:
                 # transient failure — bounded retry
                 n = attempts.get(pid, 0) + 1
                 if n >= MAX_EMIT_ATTEMPTS:
-                    print(f"[jup_yolo] giving up on {pid[:8]}...{pid[-4:]} after {n} attempts")
+                    # FIX (bug_hunter/census): give-up line gains wallet label —
+                    # pid-only lines were unattributable in prod log review.
+                    print(f"[jup_yolo] giving up {stats.get('label', owner[:4])} "
+                          f"pid={pid[:8]}...{pid[-4:]} after {n} attempts")
                     seen_list.append((pid, now_ts))
                     # FIX (bug_hunter F1, tightened by harness): attempts must
                     # be PINNED TO n (=MAX). Merely not popping left it at

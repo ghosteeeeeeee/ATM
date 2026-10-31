@@ -458,6 +458,20 @@ def get_combined_multiplier(coin, signal, direction):
     if not REP_ENABLED:
         return {'mult': 1.0, 'combo': None, 'coin': None, 'signal': None,
                 'shadow': False, 'hos': None, 'hos_applied': False}
+    # CEO verdict 2026-10-30 (giants-light consult): jup_yolo namespace EXEMPT.
+    # Reputation was the #1 execution blocker — deterministic death at
+    # signal_compactor (conf 88 × REP_HOS_BLOCK_MULT 0.3 = 26.4 < 50 floor)
+    # killed 14 mirror signals/6h, dominated by BTC coin_shame. The mirror
+    # applies its OWN quality filters upstream (all-time+7d+24h leaderboard,
+    # freshness gate, cluster requirement) — coin-level reputation
+    # double-punishes traders we already vetted. Namespace check matches
+    # 'jup_yolo_mirrored' and any 'jup_yolo_*' variant (directional_block
+    # uses the same namespace convention). Both rep entry points carry the
+    # source via `signal`.
+    if signal and 'jup_yolo' in str(signal):
+        return {'mult': 1.0, 'combo': None, 'coin': None,
+                'signal': 'jup_yolo_exempt', 'shadow': REP_SHADOW_MODE,
+                'hos': None, 'hos_applied': False}
 
     combo = get_combo_reputation(coin, signal, direction)
     coin_rep = get_coin_reputation(coin, direction)
@@ -501,6 +515,13 @@ def should_block(coin, signal, direction):
 
     if not coin or not direction:
         return {'blocked': False, 'mult': 1.0, 'reason': 'missing_input'}
+
+    # CEO verdict 2026-10-30 (giants-light): jup_yolo namespace EXEMPT —
+    # paired with get_combined_multiplier's carve-out (same namespace check,
+    # same rationale: mirror quality-filters upstream, reputation is a
+    # deterministic floor-death downstream).
+    if signal and 'jup_yolo' in str(signal):
+        return {'blocked': False, 'mult': 1.0, 'reason': 'jup_yolo_exempt'}
 
     _load_combo_data()
 
