@@ -379,12 +379,18 @@ def main():
     for _w, _s in wallets.items():
         _prev = prev_wallets.get(_w)
         _fs = _prev.get('first_seen') if isinstance(_prev, dict) else None
-        _s['first_seen'] = int(_fs) if _fs else now_i
+        try:
+            _s['first_seen'] = int(_fs) if _fs else now_i
+        except (TypeError, ValueError):
+            _s['first_seen'] = now_i  # corrupted hand-edit → reset, don't crash scrape
     sticky_added = 0
     for _w, _prev in prev_wallets.items():
         if _w in wallets or not isinstance(_prev, dict):
             continue
-        _fs = int(_prev.get('first_seen') or 0)
+        try:
+            _fs = int(_prev.get('first_seen') or 0)
+        except (TypeError, ValueError):
+            continue  # corrupted → drop from sticky consideration, keep scraping
         if 0 < now_i - _fs <= TRACKY_STICKY_TTL_SEC:
             _prev = dict(_prev)
             _prev['sticky'] = True

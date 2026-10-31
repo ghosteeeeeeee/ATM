@@ -389,6 +389,7 @@ def _jup_short_counts() -> tuple:
                        SUM(CASE WHEN status = 'open'  THEN 1 ELSE 0 END)
                 FROM trades
                 WHERE signal LIKE '%%jup_yolo%%' AND direction = 'SHORT'
+                  AND paper = FALSE
             """)
             _c, _o = cur.fetchone()
             cur.close()
@@ -426,7 +427,7 @@ def _jup_last_signal_state(token: str, direction: str) -> tuple:
         try:
             row = conn.execute("""
                 SELECT 1 FROM signals
-                WHERE source = 'jup_yolo_mirrored'
+                WHERE source LIKE '%jup_yolo_mirrored%'
                   AND token = ? AND direction = ?
                   AND decision IN ('PENDING','APPROVED')
                   AND created_at > datetime('now', '-30 minutes')
@@ -437,7 +438,7 @@ def _jup_last_signal_state(token: str, direction: str) -> tuple:
             dead = conn.execute("""
                 SELECT decision, COALESCE(decision_reason, '')
                 FROM signals
-                WHERE source = 'jup_yolo_mirrored'
+                WHERE source LIKE '%jup_yolo_mirrored%'
                   AND token = ? AND direction = ?
                   AND created_at > datetime('now', '-30 minutes')
                 ORDER BY id DESC LIMIT 1
@@ -445,6 +446,11 @@ def _jup_last_signal_state(token: str, direction: str) -> tuple:
             if not dead:
                 return ('NONE', None)
             decision, reason = dead[0], dead[1]
+            if decision == 'EXECUTED':
+                # our trade is/was in flight — this is NOT a kill to retry;
+                # re-mirroring a held position with an executed signal just
+                # spam-opens duplicate-signal noise (bug_hunter 3a)
+                return ('LIVE', None)
             if decision == 'SKIPPED':
                 return ('EXEC_DEAD', reason)
             if decision == 'EXPIRED' and any(m in reason for m in _APPROVAL_MARKERS):
