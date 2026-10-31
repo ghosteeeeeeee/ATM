@@ -702,3 +702,46 @@ Proactive Q (28 mod 14 = row 1: What's the PnL?): 24h -$0.83 / 7d -$0.21 verifie
 ### Findings: disk 85% used WARN firing every hour (health_monitor); no Tracebacks, no new signal errors.
 ### Rotating Q (31 mod 14 = 3 → Which signal is best?): bb-squeeze+ 7d 23T +0.46 69.6% (pump-chain- 6T +0.32, pump-chain+ 26T +0.25 57.7%) — best is healthy, no tuning warranted.
 ### Recommendation: prune logs/old audit artifacts — disk at 85% will trip the critical threshold soon.
+
+## VOLUME-BUILDUP LONG FIX DECISION — 2026-10-31
+
+**Context:** volume-buildup+ (LONG) is broken: 5T 1W 4L (20% WR) -$0.21. SHORT side is near breakeven (-$0.49 on 65T). Autopsy of 5 LONG trades shows 3 mechanical failure modes: RSI extremes (POL 85, MON 25), falling momentum/wave (3/5), and negligible MFE (<0.25% on all 4 losers).
+
+### Q1: Approve the 4 LONG-side fixes? — **APPROVE**
+
+| Fix | From | To | Rationale |
+|-----|------|----|-----------|
+| RSI range | MAX 75 (no min) | **40–70** | POL at RSI 85 = chasing top (MFE 0.0%). MON at RSI 25 = falling knife. Mechanical sanity checks — n=5 doesn't matter for "don't long RSI 85." |
+| Momentum state | no check | **block falling** | 3/5 losers had momentum_state=falling. Volume + falling price = accumulation before drop. Same pattern flagged in atr_spike.py:173. |
+| Wave phase | no check | **block falling** | 2/5 had wave_phase=falling. Same failure mode. `_enrich_indicators` provides this (pump_chain_v6.py, vol_momentum.py already use it). |
+| MIN_PRICE_CHANGE_PCT | 0.3% | **1.0%** | All 4 losers had MFE < 0.25%. Volume without price follow-through = noise, not accumulation. 1.0% confirms the move is real. |
+
+**These are mechanical sanity checks, not pattern claims.** The bar for "don't long RSI 85" is not statistical significance — it's entry hygiene. Same for "don't long a falling knife." n=5 is irrelevant to these rules.
+
+**Implementability:** volume_buildup.py currently has no momentum/wave check. Add `_enrich_indicators` import (pattern: pump_chain_v6.py:31, vol_momentum.py:37) and gate LONG on momentum_state/wave_phase. Constants go in hermes_constants.py per convention.
+
+**Net effect on observed trades:** all 5 would be blocked (WCT blocked by momentum=falling, HYPE by RSI 76.6, POL by RSI 85, ETC by momentum+wave falling, MON by RSI 25+momentum+wave). LONG side goes quiet until genuinely good setups appear. That's correct — the signal was -$0.21 on LONG.
+
+### Q2: Disable VOLUME_BUILDUP_PLUS_ENABLED until more data? — **REJECT**
+
+The 4 fixes are surgical: they define WHAT to avoid while allowing good LONGs in the future (RSI 40–70, momentum rising/flat, wave not falling, price move >1%). Disabling is a blunt instrument that loses the signal entirely. With fixes, LONG stays armed and fires only when conditions are actually good. Prefer surgical over off.
+
+### Q3: Remap volume-buildup- SHORT to different exit config? — **HOLD (no change now)**
+
+SHORT exits are working as designed: profit-monster-trail captures wins (+$2.39, 98% WR), hard_max_loss/cut-loser catches real losers (-$2.38). Net -$0.49 on 65T is within noise at 63% WR. This is a bimodal distribution (trail win or hard stop) — normal for sustained-volume momentum signals.
+
+Changing exit config without more data risks: loosening stops → losers run further; tightening stops → winners cut before trailing. Neither justified by current data. **Revisit if hard_max_loss bleed exceeds trailing profit at n>100 SHORT trades.**
+
+### Summary
+
+| Question | Decision |
+|----------|----------|
+| Q1: 4 LONG fixes | **APPROVE** — mechanical sanity checks, not pattern claims |
+| Q2: Disable PLUS_ENABLED | **REJECT** — surgical fixes > blunt disable |
+| Q3: Remap SHORT exits | **HOLD** — exits working as designed, revisit at n>100 |
+
+**Action items:**
+1. Add `_enrich_indicators` import to volume_buildup.py; gate LONG on momentum_state not falling, wave_phase not falling
+2. Add constants: `VOLUME_BUILDUP_LONG_RSI_MIN = 40`, change `VOLUME_BUILDUP_RSI_MAX = 70` (was 75), `VOLUME_BUILDUP_MIN_PRICE_CHANGE_PCT = 1.0` (was 0.3)
+3. SHORT side: no change, monitor hard_max_loss bleed trend
+4. Restart pipeline after committing (signal changes need reload)
