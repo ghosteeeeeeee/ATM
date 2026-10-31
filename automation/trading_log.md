@@ -18360,3 +18360,32 @@ Final set: ['GRASS']
 **Open Questions:**
 - 7d RED '-$0.64' — two drags unchanged (R:R issue, not WR: 57.6% WR but avg loss > avg win)
 - 2 red hours (03h, 04h) interrupted by a 0-trade hour — if next hours close red, re-check streak rule
+
+## LOSERS Update — 2026-10-31 06:05 UTC
+- REMOVE GRASS (insufficient data)
+
+Final set: []
+
+## [2026-10-31 06:43] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $-0.15 (WR: 58.1% 24h) | 24h 62T 36W '-$0.71' RED | 7d 193T 57.5% '-$0.79' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored atr_sl_hit '-$0.21'/-5.17%, DYDX volume-buildup- profit-monster-trail '+$0.06'/+2.46% — 1 loss 1 win, no pattern
+- Kill check: no signal with n>=3 last hour (2T only) — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 11/62 = 17.7% (<40%) — dominant close = profit-monster-trail (34T '+$1.73'); worst avg = stale_exit (2T '-$0.195')
+- Boost: pump-chain+ 24h 4T '<$0.14' fails 5+ trade bar; volume-buildup- 16T '-$0.25' and jup_yolo_mirrored 33T '-$0.71' fail net bar — none qualify
+- Neg streak: 03h '-$0.20', 04h '-$0.01', 05h '-$0.15' = 3 consecutive red hours BUT latest regime HIGH (not NEUTRAL) -> no size cut per rule
+- Entry quality winners MAE avg 0.22%, 32/36 <0.5% — entries fine, R:R is the drag (14d: jup_yolo_mirrored '-$0.69', volume-buildup- '-$0.64', pump-chain+ '-$0.57', bb-bounce-v2-long+ '-$0.72')
+- Frequency 2/hr — under 20/hr
+- 3 open: HYPE jup_yolo LONG +0.33%, SOL jup_yolo LONG +0.05%, BTC continuum-osc+ LONG -0.32%
+- Storm readiness: **window-min +0.01% / at-run +0.05%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 3 consecutive red hours (03-05h) — regime HIGH not NEUTRAL blocks size cut; if regime flips NEUTRAL while red continues, revisit
+- 7d RED deepening '-$0.79' — R:R imbalance persists: 24h avg win +0.051 vs avg loss -0.125 per close
