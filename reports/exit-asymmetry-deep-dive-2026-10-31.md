@@ -8,9 +8,13 @@
 
 ## Executive Summary
 
-**The system loses −$0.26 net over 30d from an asymmetric exit structure.** Profitable exits (trail-based) generate +$34.31 across 340 trades. Loss exits bleed −$34.57 across 439 trades. The single biggest bleed is `hard_max_loss` (148T, 0% WR, −$17.95) — stop losses are too wide, letting losers run to −3.75% avg while winners never dip more than 0.23% avg.
+**The system loses −$3.21 net over 30d from an asymmetric exit structure** (auditor-corrected: winners +$34.13, losers −$37.34). The single biggest bleed is `hard_max_loss` (148T, 0% WR, −$17.95) — stop losses are too wide, letting losers run to −3.75% avg while winners never dip more than 0.23% avg.
 
 **The core asymmetry:** Winners show MAE of 0.23%, losers show MAE of 0.58%. Winners show MFE of 1.11%, losers show MFE of 0.33%. The entry correctly identifies direction 46.7% of the time, but the exit lets losses run 2.7x further than winners gain.
+
+**Auditor-corrected SL simulation:** A 0.35% MAE-based SL would cut 296 losers + 79 winners, spare 283 winners + 113 losers, netting **~+$8.5 improvement per 30d** before fees/slippage. This strengthens the case for a shadow-mode trial (was incorrectly framed as ambivalent in draft).
+
+**Auditor correction:** profit-monster-trail is **90.8% WR** (271T, 25 losers), not 100% — the "100%" was a winner-only slice artifact. atr_trail_hit is 81.6% WR (38T), not 100%.
 
 ---
 
@@ -26,22 +30,24 @@
 | hard_sl | 21 | 0% | −$2.23 | −0.78% | +0.35% | +0.56% |
 | trail_arm_timeout | 47 | 31.9% | −$1.00 | −0.55% | +0.26% | +0.37% |
 | Other (8 types) | 21 | 0–41% | −$1.33 | — | — | — |
-| **Subtotal** | **370** | **~5%** | **−$34.57** | | | |
+| **Loss exits total** | **439** | **~4%** | **−$37.34** | | | |
 
 ### Profit Exits (the engine)
 
-| Exit | Count | WR | PnL | Avg PnL% | Avg MFE | Avg MAE |
-|------|-------|-----|------|----------|---------|---------|
-| profit-monster-trail | **246** | **100%** | **+$15.74** | +1.99% | +0.80% | +0.23% |
-| atr_trail_hit | 31 | 100% | +$7.51 | +7.76% | +2.96% | +0.21% |
-| hard_tp | 4 | 100% | +$1.78 | +5.78% | +1.23% | +0.18% |
-| trail_sl | 8 | 100% | +$1.76 | +4.41% | +3.60% | +0.33% |
-| ugb_pt | 21 | 100% | +$1.75 | +2.39% | +1.08% | +0.22% |
-| stale_exit (wins) | 7 | 100% | +$1.46 | +5.34% | +1.55% | +0.15% |
-| Other (11 types) | 23 | 100% | +$4.31 | — | — | — |
-| **Subtotal** | **340** | **100%** | **+$34.31** | | | |
+*Note: "100% WR" below is the winner-only slice — auditor correction: profit-monster-trail overall is 271T at 90.8% WR (+$15.29, 25 losers), atr_trail_hit overall is 38T at 81.6% WR.*
 
-**Net: +$34.31 − $34.57 = −$0.26**
+| Exit | Count | WR* | PnL | Avg PnL% | Avg MFE | Avg MAE |
+|------|-------|-----|------|----------|---------|---------|
+| profit-monster-trail (wins) | 246 | 100%* | +$15.74 | +1.99% | +0.80% | +0.23% |
+| atr_trail_hit (wins) | 31 | 100%* | +$7.51 | +7.76% | +2.96% | +0.21% |
+| hard_tp (wins) | 4 | 100%* | +$1.78 | +5.78% | +1.23% | +0.18% |
+| trail_sl (wins) | 8 | 100%* | +$1.76 | +4.41% | +3.60% | +0.33% |
+| ugb_pt (wins) | 21 | 100%* | +$1.75 | +2.39% | +1.08% | +0.22% |
+| Other profit exits | 37 | 100%* | +$5.59 | — | — | — |
+| **Winners total** | **364** | — | **+$34.13** | | | |
+
+**Auditor-corrected net: +$34.13 (winners) − $37.34 (losers) = −$3.21**
+*(Draft incorrectly stated −$0.26 by mixing winner-only subtotals with exit-group subtotals that didn't sum to 779.)*
 
 ---
 
@@ -77,11 +83,14 @@
 - **Losers cluster at high MAE:** 238/415 (57.3%) dip more than 0.50%
 - **Overlap zone:** 0.25–0.50% has 97 losers AND 77 winners — the ambiguous zone
 
-**A SL at 0.35% would:**
-- Cut: 33+41+~50 = ~124 losers (30% of all losers) at avg −1.2% instead of −2.69%
-- Spare: 141+98+~40 = ~279 winners (76.6% of all winners)
-- But also cut: ~40 winners in the 0.25–0.35% MAE zone
-- **Overlap exists** — no clean separation (auditor confirmed for volume-buildup: max winner MAE = 0.76%)
+**Auditor-corrected SL simulation at 0.35% MAE:**
+*(Draft inverted the logic — corrected below.)*
+- **A 0.35% MAE stop cuts trades that reach MAE ≥ 0.35%:** that's **296 losers + 79 winners**
+- **Spared:** 283 winners (MAE < 0.35%) + 113 losers
+- **Net effect: ~+$8.5 improvement per 30d** before fees/slippage (spared trades +$23.03 vs cut trades −$17.63 simulated vs −$26.34 actual)
+- **Overlap exists** — 79 winners also cut (auditor confirmed max winner MAE = 0.76% system-wide)
+- **Caveats:** MAE is under-recorded (15/28 volume-buildup losers have MAE < actual adverse move), fees/slippage not modeled, in-sample
+- **Recommendation: shadow-mode trial via automatic-implementation rollout** — the corrected simulation strengthens, not weakens, the case
 
 ---
 
@@ -128,8 +137,7 @@
 | pump-chain- | 65 | 30.8% | +$0.46 | +1.14% | +0.36% | **3.15** |
 | continuum-trend+ | 13 | 61.5% | +$0.23 | +0.51% | +0.25% | **2.04** |
 
-**Pattern: Profitable signals have MFE/MAE ≥ 1.5. Losing signals have MFE/MAE ≤ 1.3.**
-This is a useful diagnostic — signals where favorable excursion doesn't exceed adverse excursion by at least 1.5x are structurally unprofitable regardless of WR.
+**Pattern (auditor-softened):** The named signals support the pattern, but it is **not universal** — counterexamples exist (continuum_engine is profitable at MFE/MAE 0.08; hl_copy_trader is losing at 2.00) and several ratios rest on n=5–8 in-sample. MFE/MAE is a **useful diagnostic signal** for backtest triage, not a proven deployment gate. Would need out-of-sample validation before gating deployments on it.
 
 ---
 
@@ -167,10 +175,11 @@ This is a useful diagnostic — signals where favorable excursion doesn't exceed
 | volume-breakout-long+ | 36 | 42% | −$0.01 | +1.42% | +1.22% |
 | volume-breakout-short- | 4 | 0% | −$0.47 | +0.09% | +0.79% |
 
-### Signal History
-- volume-buildup total signals: 1,445 (Oct 11–31)
-- Decision: EXPIRED 1,443, PENDING 2
-- Executed to trades: 70 (4.8% execution rate)
+### Signal History (auditor-corrected)
+- volume_buildup_short signals: 1,445 (Oct 17–31, SHORT only)
+- Decision: EXPIRED 1,445, PENDING 0
+- Executed to trades: 65 short + 5 long from other signals → same-window conversion ~4.5%
+- Note: draft mixed short-only signal window with 30d both-direction trade count
 
 ---
 
@@ -193,7 +202,13 @@ This is a useful diagnostic — signals where favorable excursion doesn't exceed
 ### Cause 4: MFE/MAE ratio predicts signal viability
 - Signals with MFE/MAE < 1.0 are structurally losing (hmacd_mtf 0.59, volume-buildup+ 0.56, trend-ride+ 0.58)
 - Signals with MFE/MAE > 2.0 are structurally winning (pump-chain+ 3.07, pump-chain- 3.15, continuum-trend+ 2.04)
-- **Fix:** Use MFE/MAE as a signal quality filter in backtesting before deployment
+- **Fix:** Use MFE/MAE as a backtest triage diagnostic (auditor note: not a proven gate — counterexamples exist, needs out-of-sample validation)
+
+### Cause 5 (NEW, auditor): HIGH regime is the worst regime
+- HIGH: 175T, 53.7% WR, **−$3.20** (worst PnL despite majority win rate)
+- EXTREME: 307T, best PnL **+$0.76**
+- **Inverts the volume-buildup-specific regime story** (which showed HIGH as best for that signal alone)
+- System-wide regime dependency warrants a dedicated deep dive
 
 ---
 
@@ -203,11 +218,13 @@ This is a useful diagnostic — signals where favorable excursion doesn't exceed
 
 | # | Action | Expected Impact | Risk |
 |---|--------|----------------|------|
-| 1 | **Tighten hard_max_loss SL** from ~2.0% to 0.5–0.75% | Cuts 148T bleed from −$17.95 to ~−$5 | Overlap zone: some winners cut early |
-| 2 | **Evaluate atr_sl_hit** — 117T at 0.9% WR | Second biggest bleed source | May reduce winners that need ATR room |
-| 3 | **Reduce trail activation delay** for trail_arm_timeout | 47T at 31.9% WR → potentially breakeven | Earlier trail = smaller wins |
-| 4 | **Add MFE/MAE screen** to signal backtest pipeline | Kill signals with MFE/MAE < 1.0 before deployment | Prevents future bad signal deployment |
+| 1 | **Shadow-mode trial: 0.35% MAE stop** via automatic-implementation | Auditor-corrected: **~+$8.5/30d improvement** before fees | 79 winners cut; MAE under-recording; in-sample |
+| 2 | **Tighten hard_max_loss SL** from ~2.0% to 0.5–0.75% | Cuts 148T bleed from −$17.95 to ~−$5 | Overlap zone: some winners cut early |
+| 3 | **Evaluate atr_sl_hit** — 117T at 0.9% WR | Second biggest bleed source | May reduce winners that need ATR room |
+| 4 | **Reduce trail activation delay** for trail_arm_timeout | 47T at 31.9% WR → potentially breakeven | Earlier trail = smaller wins |
 | 5 | **Disable volume-buildup LONG** (5T 20% WR) | Stops −$0.21 bleed | None (tiny sample, clearly broken) |
+| 6 | **Investigate HIGH regime bleed** (−$3.20 system-wide) | Unknown until studied | New finding — needs deep dive |
+| 7 | **Add MFE/MAE diagnostic** to backtest triage | Flags suspect signals pre-deployment | Not a hard gate — needs OOS validation |
 
 ### volume-buildup Specific
 
@@ -222,18 +239,34 @@ This is a useful diagnostic — signals where favorable excursion doesn't exceed
 
 ## 10. What the CEO Needs to Decide
 
-1. **Approve SL tightening** (system-wide or per-signal)? The overlap zone means some winners get cut — need to decide acceptable rate.
-2. **Approve MFE/MAE screen** as deployment gate? Would have prevented hmacd_mtf (0.59), volume-buildup+ (0.56), trend-ride+ (0.58) from going live.
+1. **Approve shadow-mode 0.35% MAE stop trial?** Auditor-corrected simulation: ~+$8.5/30d improvement before fees. Deploy via automatic-implementation (shadow→enforce rollout).
+2. **Approve SL tightening** for hard_max_loss (−$17.95/148T) and atr_sl_hit (−$9.79/117T)?
 3. **Approve volume-buildup LONG disable**? 5T 20% WR is clear.
-4. **Priority**: SL tightening (system-wide −$17.95 bleed) vs volume-buildup fixes (−$0.70 bleed)?
+4. **Priority**: System-wide SL fixes (−$3.21 net bleed) vs volume-buildup fixes (−$0.70 bleed)?
+5. **Commission HIGH regime deep dive**? System-wide HIGH = −$3.20 despite 53.7% WR (auditor new finding).
 
 ---
 
 ## Verification Status
 
-- **Own-conclusions audit:** APPROVE WITH CHANGES — descriptive stats verified exact; prescriptive "0.50% SL" claim overstated (max winner MAE = 0.76%, overlap exists, breakeven = 19.4% not 26%)
-- **Auditor corrections applied** to this report
+**Two independent audits, both APPROVE WITH CHANGES, corrections applied:**
+
+1. **Volume-buildup specific audit** (`brain/verdicts/2026-10-31-volume-buildup-exit-asymmetry-own-conclusions.md`):
+   - Descriptive stats exact
+   - "0.50% SL safe" overstated (max winner MAE = 0.76%, breakeven = 19.4% not 26%)
+   - MAE unreliable (15/28 losers under-recorded)
+   - Regime: only HIGH profitable for this signal (18T 78%WR)
+
+2. **System-wide audit** (`brain/verdicts/2026-10-31-exit-asymmetry-system-wide-own-conclusions.md`, commit e4dd7435):
+   - 6/10 claims verified exact
+   - **Claim 5 corrected:** net is −$3.21 not −$0.26 (12x worse)
+   - **Claim 8 corrected:** SL simulation was inverted → actual effect +$8.5/30d (strengthens case)
+   - "100% WR" profit exits = winner-only artifact (PMT is 90.8% WR overall)
+   - Claim 10 corrected: 1,445 signals Oct 17–31 SHORT only
+   - MFE/MAE gate softened: counterexamples exist, needs OOS
+   - **New finding:** HIGH regime worst system-wide (−$3.20)
+
 - **All numbers from live SQL queries** — no estimates
 
 *Report compiled 2026-10-31 from PostgreSQL brain DB (779 trades) + signal_outcomes shadow data (SQLite).*
-*Independent verification: brain/verdicts/2026-10-31-volume-buildup-exit-asymmetry-own-conclusions.md*
+*Audits: brain/verdicts/2026-10-31-volume-buildup-exit-asymmetry-own-conclusions.md + brain/verdicts/2026-10-31-exit-asymmetry-system-wide-own-conclusions.md*
