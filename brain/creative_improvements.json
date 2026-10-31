@@ -10121,5 +10121,41 @@
     "category": "sizing",
     "status": "escalated-to-CEO",
     "risk": "medium"
+  },
+  {
+    "date": "2026-10-31T12:59:02Z",
+    "idea": "AMPLIFY (b): WINNER_CELL_SIZE_MULT 1.25 -> 1.50 (== existing WINNER_CELL_SIZE_MULT_CAP, zero code)",
+    "rationale": "4 validated cells = 156T/30d +4.83 pnl_usdt; bb-squeeze+ NORMAL positive 7d +0.46 / 14d +0.76 / 30d +0.95 at 68-70% WR; CAP already 1.5 in hermes_constants:1095 so only the constant moves",
+    "expected_impact": "~ +$0.97/30d on cell EV (20% of +4.83 — ESTIMATE); units guard pnl_usdt only; auto-revert if winner-cell-set 7d net < 0",
+    "category": "offense / winner-cell sizing",
+    "status": "proposed (shadow_disposition id amplify-winner-cell-mult-150, deadline 2026-11-14, owner CEO label + T sign-off)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-31T12:59:02Z",
+    "idea": "AMPLIFY (c): counterfactual-walk the 194 blocked jup_yolo_mirrored SHORT signals",
+    "rationale": "emission symmetric (194 short vs 222 long rows) but execution 1 SHORT vs 39 LONG trades/30d; short leg dies on compaction_stale 47% + RSI floors + SOL SHORT_BLACKLIST (1081 hits); 24h SHORT tape 77.8% WR; Option D floor 35 verified wired so the blocks are not a bug",
+    "expected_impact": "unknown — no OOS days exist before 2026-11-13",
+    "category": "offense / clone-hunt",
+    "status": "proposed (id amplify-jup-short-walk, deadline 2026-11-14)",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-31T12:59:02Z",
+    "idea": "EVAL pre-register: shadow-vs-live WR fidelity divergence (11-24pp)",
+    "rationale": "shadow non-blocked WR runs below live WR for every positive-edge family (bb-squeeze 39.0 vs 63.4, jup 40.7 vs 60.0, vb- 49.6 vs 65.1, pump-chain+ 28.8 vs 42.7) and at parity only for negative-edge sources — so gate would_win figures are either conservative or pessimistically biased",
+    "expected_impact": "decides whether CONFLUENCE-EXPIRY 48% / CTX-GATE 50% gate justifications can be read at face value",
+    "category": "measurement integrity",
+    "status": "pre-registered",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-31T12:59:02Z",
+    "idea": "METHOD TRAP: filtering shadow exit_json on fired==true",
+    "rationale": "the trail engine only fires on winners, so that filter yields 100% WR (+184pp) by construction; caught mid-run on the bb-squeeze blocked set and discarded",
+    "expected_impact": "prevents a false ship",
+    "category": "method guard",
+    "status": "logged",
+    "risk": "none"
   }
 ]

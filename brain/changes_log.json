@@ -3308,5 +3308,16 @@
     "after": "CUT_LOSER_PNL=-4.00; ATR_SL_MAX=ATR_SL_MAX_INIT=0.025 (pre-trial values)",
     "rationale": "shadow_disposition guard trial-coupled-cutsloser-sl BREACHED at 08:15Z: worst HML exit -7.10% acct (MON #16586) < -6.5% limit; default_action = revert both. Attributable evidence: 4d/142 closes actual -$0.59 vs simulated old-params +$0.05..+$0.47 (slippage band, central -$0.64 trial cost); 26 trades dipped past the old -4%/lev cut, only ~16 winners ever reached a 0.8% excursion and 0 show a post-peak dip to that level (max speculative rescue ~$0.30). ATR_SL_MAX leg near-inert: 1/142 trades had SL>2.5% (CRV #16532, a winner) — reverted because the trial was authorized as a pair.",
     "impact": "Tightens hard loss bound back to -4% account; deep losers stop ~0.6-1.3% of notional earlier. CEO override window 24h."
+  },
+  {
+    "timestamp": "2026-10-31T12:59:02Z",
+    "agent": "brain_auditor",
+    "change": "AMPLIFY proposals registered in data/shadow_disposition.json: amplify-winner-cell-mult-150 (WINNER_CELL_SIZE_MULT 1.25->1.50, in-cap) + amplify-jup-short-walk (blocked SHORT leg walk); checkpoint btc-16599-8h-stale dispositioned done",
+    "type": "creative",
+    "file": "data/shadow_disposition.json + data/checkpoint_registry.json",
+    "before": "2 amplify entries absent; checkpoint status=surfaced",
+    "after": "+2 amplify entries (status open, deadline 11-14); checkpoint status=done",
+    "rationale": "AMPLIFY mandate (>=1 offense proposal/run); trade #16599 already closed 09:38Z so the 8h line was evaluated",
+    "impact": "no trading behavior change — proposals only, 0 config changes this run"
   }
 ]
