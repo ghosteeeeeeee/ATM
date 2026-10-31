@@ -18725,3 +18725,28 @@ Final set: []
 **Open Questions:**
 - 24h GREEN '+$0.13' but WR 50.0% — profits concentrated in profit-monster-trail (18T '+$1.22') vs atr_sl_hit (9T '-$1.13'); structural R:R imbalance persists
 - 7d '-$1.09' still deep red — watch if 24h green holds next runs
+
+## [2026-10-31 21:43] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** -$0.01 (WR: 49.0% 24h) | 24h 49T 24W '+$0.27' GREEN | 7d 221T 120W '-$1.10' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored LONG mfe_exit '-$0.01'/-0.18% (1 close — quiet)
+- Kill check: 1 close total, no n>=3 0%-WR last hour (24h pump-chain+ 3T 0% '-$0.12' is n=3 across 3 tokens but 0 last-hour closes; regime query not triggered)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/49 = 16.3% (<40%); dominant close = profit-monster-trail (18T '+$1.22'); worst avg = cut-loser-CL-T1 (2T '-$0.135') / hard_max_loss (2T '-$0.140')
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' across 7 tokens but ex-GMX '-$0.11', GMX '+$0.54' = 125% of net — consistency fails); HOLD jup_yolo_mirrored (27T 59.3% '+$0.18' meets WR+net bars but only 2 tokens HYPE/SOL + 14d 52T '-$0.47' out-of-sample fails); volume-buildup- 5T '-$0.13' fail net
+- Neg streak: 15h +0.12, 16h -0.14, 17h -0.04, 18h +0.01, 19h +0.03, 20h -0.03 — never 3 consecutive red
+- Frequency 1/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.170%, 22/24 <0.5% — entries fine; R:R still the drag (atr_sl_hit 8T '-$0.96' vs trail 18T '+$1.22')
+- 0 open trades
+- Storm readiness: **window-min -0.22% / at-run -0.10%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '+$0.27' at only 49.0% WR — profits concentrated in profit-monster-trail/ugb_pt; 7d '-$1.10' still deep red
+- pump-chain- GMX outlier still masks ex-GMX losses — hold until ex-GMX turns positive
+- jup_yolo_mirrored 14d '-$0.47' and 2-token concentration — needs multi-token consistency before boost
