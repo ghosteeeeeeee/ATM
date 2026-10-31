@@ -10042,5 +10042,30 @@
     "status": "applied_this_run",
     "category": "amplify / offense",
     "risk": "low — same mult, correct basis"
+  },
+  {
+    "date": "2026-10-31T00:52:00Z",
+    "idea": "PRE-REG: block [35,45) SHORT only when coin entry_regime_4h = LONG_BIAS (BTC-bear exemption is BTC-level only)",
+    "rationale": "ZORA-style losses: shorted into coin LONG_BIAS conf 93.5. First test this run: coverage only 27/46 non-null, LONG_BIAS cell n=1 -> insufficient data",
+    "expected_impact": "target waiver-band bleed without touching mid-band winners",
+    "category": "entry sniper",
+    "status": "pre-registered_insufficient_data",
+    "risk": "low",
+    "bar": "entry_regime_4h coverage >=80% AND n>=15 non-null band shorts AND 30d same sign AND fk<20%",
+    "blocked_on": "momentum-cache-regime-coverage due 2026-11-06"
+  },
+  {
+    "date": "2026-10-31T00:52:00Z",
+    "idea": "REJECTED: vb- shallow-gap (gap_at_entry>-0.5) size dampen 0.75x (pre-reg #205)",
+    "rationale": "14d 14 shallow losers / 30d 15 — both < 20 bar; max EV +$0.15-0.19 noise even if met",
+    "status": "bar_not_met_keep_collecting",
+    "category": "sizing"
+  },
+  {
+    "date": "2026-10-31T00:52:00Z",
+    "idea": "AMPLIFY 30d cell screen: no new proposal — pc- SHORT cells contradict live 64.6% fade; continuum-trend+ FLAT 14d +0.01/7d -0.08 sign-flip = noise; killed signals excluded",
+    "rationale": "weekly AMPLIFY due 2026-11-03 (amplify-weekly-mandate)",
+    "status": "no_proposal_this_run",
+    "category": "amplify / offense"
   }
 ]
