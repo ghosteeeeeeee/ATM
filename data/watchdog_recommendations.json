@@ -1,29 +1,63 @@
 {
-  "timestamp": "2026-10-31T14:11:32.130631+00:00",
+  "timestamp": "2026-10-31T14:41:32.402018+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
+      "title": "Trade cluster: HYPE + SAND",
+      "detail": "Both opened within 19 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: HYPE + KAS",
+      "detail": "Both opened within 20 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: SAND + KAS",
+      "detail": "Both opened within 1 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: SAND + SOL",
+      "detail": "Both opened within 12 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-004"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: KAS + SOL",
+      "detail": "Both opened within 11 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-005"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Portfolio heavily short (3 trades)",
+      "detail": "3 short positions. One BTC pump hits all of them.",
+      "auto_executable": false,
+      "id": "steer-006"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "warning",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS"
   },
-  "open_count": 3,
+  "open_count": 5,
   "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 3 (3 long, 0 short)\nUnrealized PnL: +0.42 USDT\nRegime: CHOP-pin | sources disagree: 15m log 14:00=SHORT_BIAS, regime_5m 14:15=NEUTRAL (24/26/79), continuum=AT-EMA300/LEAN_BULL, 4h=LONG_BIAS\nFlip rate: aggregate 17/24h, BTC 15/24h \u2014 normal band (p50 20), no anomaly\nVolatility: HYPE HIGH, GMX/BTC NORMAL\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent/health] 7d chop-bleed DOLLAR share = 93.9% (0 NULL mfe; 14d 90.1 / 30d 85.7) \u226592% BREACH. Companions: 7d arm 59.5% (122/205), same-day arm 50.0% (12/24). Nearly all loss = entries that never armed \u2192 entry-quality, exit tweaks won't move it.\n\ud83d\udd34 [urgent/regime] HYPE LONG #16618 opened 13:59 into HYPE 15m SHORT_BIAS conf 83.4 / -1.69% (16c), HIGH vol \u2014 6th HYPE long after 5 losses / 0 wins (-$0.94) in 24h, none armed. Exit if price closes below entry 86.93 while HYPE 15m stays SHORT_BIAS (conf \u226570); SL 85.96 stands otherwise.\n\ud83d\udfe1 [profit_lock] GMX #16611 +4.97%: raise SL 8.176 \u2192 8.22 (locks +4.42%) while GMX 15m stays LONG_BIAS conf \u226580 and price holds >8.20. TP 8.3168 only 0.65% above 8.263 \u2014 take on touch, don't round-trip. (Prior steer to 8.15: executed/superseded.)\n\ud83d\udfe1 [regime] BTC LONG #16615 age=2 cycles unexecuted, condition RE-TESTED 14:15 = NOT met: longest 1m-below-EMA300 run in last 60m \u224826 min (<30m), current run ~2 min, aggregate now NEUTRAL. Exit trigger re-armed, not urgent; SL 77092 stands.\n\ud83d\udfe2 [info] Prior steer \"favor SHORT while aggregate=SHORT_BIAS\" RETRACTED \u2014 aggregate rewrote NEUTRAL at 14:15; superseded by the HYPE coin-level condition.\n\ud83d\udfe2 [info] PICK FOGO SHORT conf=75 rsi 49.8 (24 min old, <45 min \u2192 no new pick this cycle) \u2014 watchlist only, AI_TRADER_ENABLED=False, will NOT execute.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe winning side of the last 24h on HYPE was SHORT and we bought it a 6th time. 5 losers / 0 wins / -$0.94, every one with mfe \u22640.41 \u2014 the trail family never armed, so this is entry direction, not exit. GMX is the only right-side position (coin LONG_BIAS 91.6, +5.6%/6h, SL already +3.86% locked) but the remaining bet is 1:0.6 against a TP 0.65% away. BTC is unresolved, not wrong \u2014 pinning AT EMA300 for 454 min in a ranging NEUTRAL 15m; it wins only on an up-resolution. Sector: LONG 44T -$0.14 vs SHORT 7T -$0.19 (24h), shadow longs 23.5% WR vs shorts 46.2% \u2014 we're carrying all the volume on the weaker side. jup_yolo_mirrored 7d = 41T / 58.5% WR / -$0.81 \u2192 hit rate isn't the bug, loss size 3-5x win size is.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Exit HYPE #16618 if 5m closes stay below 86.93 while HYPE 15m = SHORT_BIAS; do not add HYPE longs until the coin flips.\n2. Raise GMX #16611 stop to 8.22; take TP 8.3168 on touch.\n3. Route jup_yolo_mirrored (41T/7d, -$0.81, losses 3-5x wins) + HYPE 0-for-5 to brain auditor as entry-quality/sizing \u2014 enabled and live, not a dead window.\n4. Treat the 93.9% chop-bleed as the headline KPI: push entry-quality gates, not trail/exit changes.\n5. No new pick this cycle (FOGO SHORT stands, watchlist only); leave the slot empty until BTC resolves the 77500 pin or HYPE flips long-bias.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nMerged into `watchdog_recommendations.json` \u2014 `steers` untouched (1 automated steer preserved); added `deep_analysis`, `regime_context`, `pattern_alerts`, `steer_retractions`, `agent_timestamp`.\n\nNo secrets read or printed; no re-run of `trade_watchdog.py`, no time-of-day blocks, no signal params changed.\n",
   "agent_timestamp": "2026-10-31T14:18:53.069504+00:00",
   "regime_context": "SOURCES DISAGREE \u2014 name them before acting on any direction word. (1) 15m_regime.log last dump 14:00 = aggregate SHORT_BIAS (36 short / 10 long), BTC regime NEUTRAL. (2) regime_5m.json rewritten 14:15 = aggregate NEUTRAL (26 short / 24 long / 79 neutral) \u2014 the SHORT_BIAS read from the 14:11 watchdog snapshot is one cycle stale. (3) continuum 1m BTC: price AT EMA300 (77484 vs 77500), position AT for 454 consecutive minutes, LEAN_BULL, trend_quality UP, CALM, wyckoff ACCUMULATION. (4) btc_4h = LONG_BIAS. Net read: CHOP-pin, not a trend \u2014 auto_trader agrees (regime CHOP, scores 15/15, decision MANAGE_ONLY for the last 5 cycles).\n\nFlip rate: aggregate 17/24h, BTC 15/24h \u2014 inside the normal band (rolling p50 20, p95 26; p25 16). NOT an anomaly, do not report churn as a finding. The informative tail would be <6 (a real trend tape) and it has not occurred since Oct 2 \u2014 it is not happening now.\n\nPosition vs regime: 3/3 LONG. In a chop-pin that is survivable only because the stops are real; the one position that is regime-misaligned on its OWN coin is HYPE (coin SHORT_BIAS conf 83.4 while we are long). GMX is the only coin-level alignment we hold (LONG_BIAS conf 91.6).",
-  "pattern_alerts": "P1 \u2014 HYPE jup_yolo_mirrored LONG, 24h: n=5, 0 wins / 5 losses, -$0.94, avg -$0.19, exit reasons 4x atr_sl_hit + 1x hard_max_loss, mfe_pct 0.34/0.21/0.12/0.17/0.13 \u2014 NONE reached +0.40% trail. WINNING SIDE: SHORT (HYPE 15m SHORT_BIAS conf 83.4, -1.69% over 16 candles). WHY WE WEREN'T ON IT: the mirror source emits longs and the RSI at entry (11.8-75.0, median 55.7) sat mid-band, so no RSI gate objected to buying a falling coin. Status: signal LIVE and enabled (41 trades in 7d) \u2014 not a dead window, so this is an entry-quality item for the brain auditor, not a kill.\n\nP2 \u2014 jup_yolo_mirrored total, 7d: n=41, 24W (58.5%) but -$0.81 aggregate. A 58.5% WR book that loses money means loss size > win size \u2014 HYPE/SOL losses run 3-5x the wins (-0.19/-0.22/-0.21/-0.15/-0.17 vs +0.05/+0.07/+0.10/+0.15). The asymmetry, not the hit rate, is the bug. Route to brain auditor for sizing/stop-distance review on this family.\n\nP3 \u2014 Chop-bleed dollar share: 7d 93.9% (>=92% tripwire BREACHED), 14d 90.1%, 30d 85.7%. 0 NULL mfe_pct losers in the 7d window (so no backfill distortion). Companions: 7d arm rate 59.5% (122/205, tripwire <50 not tripped), same-day arm rate 50.0% (12/24). Measure used = DOLLAR share (sum of loss from mfe<0.40 / all loss), not count share. Read: nearly every dollar lost this week came from entries that never armed \u2014 this is an ENTRY-quality breach, so exit/trail tweaks will not move it.\n\nP4 \u2014 bb-bounce-v2-long+ 7d: n=8, 1W, -$0.14, enabled live. ALREADY ADJUDICATED by brain_auditor #138 (kill bars fail, 7d mid-band bleed covered by standing steer, compactor co-signal in flight) \u2014 NO new action, do not re-propose a kill.\n\nP5 \u2014 volume-buildup- (SHORT path, VOLUME_BUILDUP_MINUS_ENABLED=True, live): 7d n=43, 27W, -$0.65. High hit rate but net negative = winners smaller than losers on the short side; 24h it split 2W/2L (-$0.16 MON, -$0.17 ZORA vs +$0.06 DYDX, +$0.03 MON). Monitor \u2014 if still negative at the next weekly audit, hand to brain auditor with the R:R asymmetry, not a disable.\n\nDEAD-SIGNAL CHECKS RUN: jup_yolo_mirrored 41 trades/7d (live), volume-buildup- 43/7d (live), bb-bounce-v2-long+ 8/7d (live, already adjudicated). No flagged family with 0 trades in 7d was raised this cycle.",
-  "steer_retractions": [
-    "RETRACTED \u2014 'favor SHORT/stand-aside setups over new LONGs while 15m aggregate = SHORT_BIAS' (condition reversed: regime_5m aggregate rewritten NEUTRAL 24/26/79 at 14:15; superseded by coin-level condition on HYPE only)",
-    "SUPERSEDED \u2014 'GMX raise SL 8.1042 -> 8.15' (executed: DB stop_loss now 8.176, locks +3.86%; new level 8.22 below)",
-    "RETESTED age=2 cycles \u2014 'exit BTC LONG if 1m holds below EMA300 ~77495 for 30m while aggregate = SHORT_BIAS': NOT met at 14:15. Longest sustained below-run in the last 60m was ~26 min (< 30m threshold), current below-run only ~2 min, price 77484 vs EMA300 77500 oscillating AT the line, and aggregate is now NEUTRAL not SHORT_BIAS. Condition stands re-armed, not urgent."
-  ],
-  "agent_cycle": "trade-watchdog deep analysis 2026-10-31 14:15Z"
+  "pattern_alerts": "P1 \u2014 HYPE jup_yolo_mirrored LONG, 24h: n=5, 0 wins / 5 losses, -$0.94, avg -$0.19, exit reasons 4x atr_sl_hit + 1x hard_max_loss, mfe_pct 0.34/0.21/0.12/0.17/0.13 \u2014 NONE reached +0.40% trail. WINNING SIDE: SHORT (HYPE 15m SHORT_BIAS conf 83.4, -1.69% over 16 candles). WHY WE WEREN'T ON IT: the mirror source emits longs and the RSI at entry (11.8-75.0, median 55.7) sat mid-band, so no RSI gate objected to buying a falling coin. Status: signal LIVE and enabled (41 trades in 7d) \u2014 not a dead window, so this is an entry-quality item for the brain auditor, not a kill.\n\nP2 \u2014 jup_yolo_mirrored total, 7d: n=41, 24W (58.5%) but -$0.81 aggregate. A 58.5% WR book that loses money means loss size > win size \u2014 HYPE/SOL losses run 3-5x the wins (-0.19/-0.22/-0.21/-0.15/-0.17 vs +0.05/+0.07/+0.10/+0.15). The asymmetry, not the hit rate, is the bug. Route to brain auditor for sizing/stop-distance review on this family.\n\nP3 \u2014 Chop-bleed dollar share: 7d 93.9% (>=92% tripwire BREACHED), 14d 90.1%, 30d 85.7%. 0 NULL mfe_pct losers in the 7d window (so no backfill distortion). Companions: 7d arm rate 59.5% (122/205, tripwire <50 not tripped), same-day arm rate 50.0% (12/24). Measure used = DOLLAR share (sum of loss from mfe<0.40 / all loss), not count share. Read: nearly every dollar lost this week came from entries that never armed \u2014 this is an ENTRY-quality breach, so exit/trail tweaks will not move it.\n\nP4 \u2014 bb-bounce-v2-long+ 7d: n=8, 1W, -$0.14, enabled live. ALREADY ADJUDICATED by brain_auditor #138 (kill bars fail, 7d mid-band bleed covered by standing steer, compactor co-signal in flight) \u2014 NO new action, do not re-propose a kill.\n\nP5 \u2014 volume-buildup- (SHORT path, VOLUME_BUILDUP_MINUS_ENABLED=True, live): 7d n=43, 27W, -$0.65. High hit rate but net negative = winners smaller than losers on the short side; 24h it split 2W/2L (-$0.16 MON, -$0.17 ZORA vs +$0.06 DYDX, +$0.03 MON). Monitor \u2014 if still negative at the next weekly audit, hand to brain auditor with the R:R asymmetry, not a disable.\n\nDEAD-SIGNAL CHECKS RUN: jup_yolo_mirrored 41 trades/7d (live), volume-buildup- 43/7d (live), bb-bounce-v2-long+ 8/7d (live, already adjudicated). No flagged family with 0 trades in 7d was raised this cycle."
 }

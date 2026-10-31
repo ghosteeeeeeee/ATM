@@ -18556,3 +18556,27 @@ Final set: []
 **Open Questions:**
 - 24h RED '-$0.70' (54.7% WR) / 7d '-$1.09' — structural R:R imbalance persists (losses ~2x avg win); kill/boost rules don't reach it
 - jup_yolo_mirrored HIGH 14d '-$0.48' at 61.9% WR — R:R driven, watch trend
+
+## [2026-10-31 14:42] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $+0.54 (WR: 58.8% 24h) | 24h 51T 30W '+$0.21' GREEN | 7d 206T 56.8% '-$0.55' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: GMX pump-chain- LONG ugb_pt '+$0.54'/+14.47% (open 10:33 close 14:33) — single big winner flips 24h GREEN
+- Kill check: only 1 close last hour, no n>=3 0%-WR — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/51 = 15.7% (<40%); dominant close = profit-monster-trail (25T '+$1.47'); worst avg = hard_max_loss (2T '-$0.175')
+- Boost: none qualify — pump-chain- 4T 75.0% '+$0.44' but n=4 <5 bar; jup_yolo_mirrored 27T 66.7% '-$0.13' fail net; volume-buildup- 6T 66.7% '-$0.22' fail net; pump-chain+ 4T 25% fail WR
+- Neg streak: broken (13h '-0.32', 14h '+0.54') — never 3 consecutive red
+- Frequency 1/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.200%, 27/30 <0.5% — entries fine
+- 5 open: SAND/KAS volume-buildup- shorts green/flat, BTC/HYPE/SOL red small
+- Storm readiness: **window-min -0.08% / at-run -0.05%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flipped GREEN '+$0.21' on the GMX ugb_pt win — 7d still '-$0.55'; watch whether green holds without the outlier
+- pump-chain- one trade short of boost bar (n=5) — recheck next hour if it fires

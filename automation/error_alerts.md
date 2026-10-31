@@ -2459,3 +2459,6 @@
 
 ## Error Alerts — 2026-10-31 13:56 UTC
 - **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-10-31 14:41 UTC
+- **REPEATED** (6x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
