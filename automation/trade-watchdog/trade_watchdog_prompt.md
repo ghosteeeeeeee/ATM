@@ -64,7 +64,7 @@ The PostgreSQL column `trades.entry_rsi_14` is written LATE from a different tim
 When analyzing losses/open trades for RSI quality:
 ```sql
 SELECT token, signal, direction, pnl_usdt, exit_reason,
-       (_signal_metadata::json->>'rsi_14')::float AS meta_rsi  -- NOT entry_rsi_14
+       (_signal_metadata::json->>'rsi_14')::float AS meta_rsi  -- NOT entry_rsi_14; when ROUND()'ing any float8 expr cast ::numeric first — round(double precision, integer) does not exist
 FROM trades
 WHERE status='closed' AND pnl_usdt < 0
   AND close_time > NOW() - INTERVAL '24 hours'
@@ -318,7 +318,7 @@ The system's north-star question is "are we entering in chop?" — measure it di
 share of GROSS LOSS that comes from trades which never reached trail-activation (+0.40% MFE):
 
 ```sql
-SELECT ROUND(100.0 * ABS(COALESCE(SUM(pnl_usdt) FILTER (WHERE pnl_usdt<0 AND mfe_pct<0.40),0))
+SELECT ROUND((100.0 * ABS(COALESCE(SUM(pnl_usdt) FILTER (WHERE pnl_usdt<0 AND mfe_pct<0.40),0))
              / NULLIF(ABS(COALESCE(SUM(pnl_usdt) FILTER (WHERE pnl_usdt<0),0)),0),1)
 FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '14 days';
 ```
