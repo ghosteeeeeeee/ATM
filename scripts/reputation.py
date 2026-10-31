@@ -468,9 +468,10 @@ def get_combined_multiplier(coin, signal, direction):
     # 'jup_yolo_mirrored' and any 'jup_yolo_*' variant (directional_block
     # uses the same namespace convention). Both rep entry points carry the
     # source via `signal`.
-    if signal and 'jup_yolo' in str(signal):
+    from directional_block import is_giant_source
+    if is_giant_source(signal):
         return {'mult': 1.0, 'combo': None, 'coin': None,
-                'signal': 'jup_yolo_exempt', 'shadow': REP_SHADOW_MODE,
+                'signal': 'giant_exempt', 'shadow': REP_SHADOW_MODE,
                 'hos': None, 'hos_applied': False}
 
     combo = get_combo_reputation(coin, signal, direction)
@@ -520,8 +521,9 @@ def should_block(coin, signal, direction):
     # paired with get_combined_multiplier's carve-out (same namespace check,
     # same rationale: mirror quality-filters upstream, reputation is a
     # deterministic floor-death downstream).
-    if signal and 'jup_yolo' in str(signal):
-        return {'blocked': False, 'mult': 1.0, 'reason': 'jup_yolo_exempt'}
+    from directional_block import is_giant_source
+    if is_giant_source(signal):
+        return {'blocked': False, 'mult': 1.0, 'reason': 'giant_exempt'}
 
     _load_combo_data()
 

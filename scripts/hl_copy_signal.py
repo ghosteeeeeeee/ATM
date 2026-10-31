@@ -248,10 +248,13 @@ def get_recent_pro_trades(minutes: int = None) -> list:
         conn.close()
 
 def write_signal_to_pipeline(signal: dict):
-    """Write signal to the signals database via add_signal() for pipeline processing."""
+    """Write signal to the signals database via add_signal() for pipeline processing.
+
+    Returns sig_id (None on gate-block) so the caller can track emits per fill.
+    """
     from signal_schema import add_signal
     
-    add_signal(
+    return add_signal(
         token=signal['coin'],
         direction=signal['direction'],
         signal_type=signal['signal_type'],
@@ -301,6 +304,67 @@ def _get_open_hl_tokens() -> set:
     return tokens
 
 
+_HL_STATE_FILE = os.path.join(HERMES_DATA, 'hl_copy_signal_state.json')
+
+
+def _emit_state_load() -> dict:
+    """Last EMITTED fill time per 'COIN:SIDE' — one emit per fill, ever.
+
+    T giants-light 2026-10-31: the old per-batch `seen` set never persisted,
+    so the SAME fill was re-emitted every 30s poll for up to the 360-min
+    lookback — 19/30 hl_copy signals in 48h died 'compaction_stale_10min'
+    because duplicate rows kept resetting the approval clock. A newer fill
+    (higher time) by the same pro re-opens the gate; the old one never repeats.
+    """
+    try:
+        with open(_HL_STATE_FILE) as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except (FileNotFoundError, json.JSONDecodeError, OSError, ValueError):
+        return {}
+
+
+def _emit_state_save(state: dict) -> None:
+    try:
+        with open(_HL_STATE_FILE, 'w') as f:
+            json.dump(state, f)
+    except OSError as e:
+        print(f"[hl_signal] ⚠️ emit-state save failed ({e}) — will retry next cycle")
+
+
+def _hl_short_counts() -> tuple:
+    """(closed, open) counts of hl_copy SHORT trades — Option-D-style guardrail
+    (symmetric with jup: HL $11 min notional made half-size illegal, so cap
+    concurrent exposure). Fail-open on DB error (cap off) + warn."""
+    try:
+        from _secrets import BRAIN_DB_DICT
+        import psycopg2
+        cfg = BRAIN_DB_DICT.copy()
+        cfg.setdefault('port', 5432)
+        cfg['connect_timeout'] = 5
+        pg = psycopg2.connect(**cfg)
+        pg.autocommit = True
+        try:
+            cur = pg.cursor()
+            from hermes_constants import HL_COPY_SHORT_GUARDRAIL_START
+            cur.execute("""
+                SELECT SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END),
+                       SUM(CASE WHEN status = 'open'  THEN 1 ELSE 0 END)
+                FROM trades
+                WHERE signal LIKE '%%hl_copy%%' AND direction = 'SHORT'
+                  AND paper = FALSE
+                  AND open_time >= %s
+            """, (HL_COPY_SHORT_GUARDRAIL_START,))
+            _c, _o = cur.fetchone()
+            cur.close()
+            return (int(_c or 0), int(_o or 0))
+        finally:
+            pg.close()
+    except Exception as e:
+        print(f"[hl_signal] ⚠️ SHORT cap check failed ({type(e).__name__}: {e}) — fail-open (cap off)")
+        return (0, 0)
+
+
 def run_hl_copy_signal():
     """Main function: detect pro trades and generate pipeline signals."""
     if not HL_COPY_SIGNAL_ENABLED:
@@ -310,6 +374,7 @@ def run_hl_copy_signal():
 
     # Defense-in-depth: skip signals for tokens already open
     open_tokens = _get_open_hl_tokens()
+    _emit_state = _emit_state_load()
 
     # Cluster filter: minimum traders required to fire signal
     try:
@@ -363,8 +428,46 @@ def run_hl_copy_signal():
         except ImportError:
             pass
 
-        # Write to pipeline
-        write_signal_to_pipeline(signal)
+        # ── Giants-light gates (T 2026-10-31) ───────────────────────────────
+        # Freshness: a fill must be ≤HL_COPY_MAX_FILL_AGE_SEC old at detection.
+        # Normal path is ~1min (30s poll); this cuts the 6h backfill that any
+        # daemon restart/downtime otherwise replays as stale entries.
+        try:
+            from hermes_constants import (HL_COPY_MAX_FILL_AGE_SEC,
+                                          HL_COPY_MAX_OPEN_SHORTS,
+                                          HL_COPY_SHORT_LIFT_CLOSED)
+        except Exception:
+            HL_COPY_MAX_FILL_AGE_SEC = 600
+            HL_COPY_MAX_OPEN_SHORTS = 2
+            HL_COPY_SHORT_LIFT_CLOSED = 20
+        _fill_time = int(trade.get('time') or 0)
+        if _fill_time > 0 and (time.time() - _fill_time) > HL_COPY_MAX_FILL_AGE_SEC:
+            print(f"[hl_signal] ⏰ STALE SKIP {trade['coin']} {trade['side']} — "
+                  f"fill {(time.time() - _fill_time) // 60}m old "
+                  f"(> {HL_COPY_MAX_FILL_AGE_SEC // 60}m gate)")
+            continue
+
+        # One-emit-per-fill: monotonic dedupe against persisted state
+        _state_key = f"{trade['coin'].upper()}:{trade['side'].upper()}"
+        _last_emitted = _emit_state.get(_state_key, 0)
+        if _fill_time > 0 and _fill_time <= _last_emitted:
+            continue  # same fill already emitted (silently — this fired every 30s)
+
+        # SHORT concurrency guardrail (symmetric with jup Option D)
+        if signal['direction'] == 'SHORT':
+            _cs, _os = _hl_short_counts()
+            if _cs < HL_COPY_SHORT_LIFT_CLOSED and _os >= HL_COPY_MAX_OPEN_SHORTS:
+                print(f"[hl_signal] ⏸️ SHORT-CAP {trade['coin']} — {_os} open "
+                      f"(cap {HL_COPY_MAX_OPEN_SHORTS})/{_cs} closed "
+                      f"of {HL_COPY_SHORT_LIFT_CLOSED} — waiting for a slot")
+                continue
+
+        # Write to pipeline — track ONLY on success (a blocked add_signal
+        # leaves the gate open so the same fill may retry within freshness)
+        _sid = write_signal_to_pipeline(signal)
+        if _sid is not None and _fill_time > 0:
+            _emit_state[_state_key] = _fill_time
+            _emit_state_save(_emit_state)
         signals.append(signal)
 
         print(f"[hl_signal] {trade['coin']} {trade['side']} | "

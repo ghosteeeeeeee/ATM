@@ -11,7 +11,7 @@ exemption can never disagree with itself.
 
 Rules:
   - direction == 'SHORT' and token in SHORT_BLACKLIST:
-        blocked UNLESS source contains 'jup_yolo_mirrored'
+        blocked UNLESS source is a giant namespace (jup_yolo/hl_copy)
   - direction == 'LONG' and token in LONG_BLACKLIST:
         blocked (Option D exempts the SHORT list ONLY)
   - otherwise not blocked.
@@ -22,14 +22,25 @@ Guards the OTHER gates unchanged (this helper is not involved in):
 
 from hermes_constants import SHORT_BLACKLIST, LONG_BLACKLIST
 
-# FIX (bug_hunter N2): match the whole 'jup_yolo' namespace, not just the
-# full 'jup_yolo_mirrored' source string. The RSI-floor carve-outs match
-# 'jup_yolo' (prefix) — if signal_type ('jup_yolo_short') ever flows as the
-# source (decider's `signal_type or source` path), the full-string check
-# would give floor-exemption WITHOUT blacklist-exemption → approved-then-
-# blocked zombie churn, the exact failure Option D exists to prevent.
-# The namespace is ours alone; nothing else starts with 'jup_yolo'.
-JUP_YOLO_NS = 'jup_yolo'
+# FIX (bug_hunter N2): match whole NAMESPACES, not full source strings. The
+# RSI-floor carve-outs match 'jup_yolo' (prefix) — if signal_type
+# ('jup_yolo_short') ever flows as the source (decider's `signal_type or
+# source` path), a full-string check would give floor-exemption WITHOUT
+# blacklist-exemption → approved-then-blocked zombie churn.
+# 'hl_copy' added by T 2026-10-31 (giants-light expansion): same rationale,
+# same gates, qualified-trader filter upstream (75% WR / $10k PnL).
+GIANT_NS = ('jup_yolo', 'hl_copy')
+
+
+def is_giant_source(source=None) -> bool:
+    """True when the source is one of OUR pro-tracker namespaces.
+
+    Single choke point for the giants-light exemptions: directional blacklist
+    (SHORT list only), reputation multiplier, and RSI hard floors all key off
+    this so the namespaces can never disagree across gates.
+    """
+    s = str(source or '')
+    return any(ns in s for ns in GIANT_NS)
 
 
 def is_directional_blocked(token, direction, source=None) -> bool:
@@ -46,7 +57,7 @@ def is_directional_blocked(token, direction, source=None) -> bool:
     src = str(source or '')
     if dire == 'SHORT':
         if tok in SHORT_BLACKLIST:
-            return JUP_YOLO_NS not in src
+            return not is_giant_source(src)
     elif dire == 'LONG':
         if tok in LONG_BLACKLIST:
             return True

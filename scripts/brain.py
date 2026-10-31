@@ -396,8 +396,9 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
             # approval→brain zombie the decider carve-out exists to prevent.
             # Knife (< OVERSOLD_SHORT_RSI_MAX=35) stays GLOBAL: below 35
             # is still rejected on this path (BANANA).
+            from directional_block import is_giant_source
             _floor = (SHORT_RSI_HARD_FLOOR_JUP_YOLO
-                      if 'jup_yolo' in (signal or '') else SHORT_RSI_HARD_FLOOR)
+                      if is_giant_source(signal) else SHORT_RSI_HARD_FLOOR)
             _rsi_chk = signal_rsi_14
             if _rsi_chk is None and signal_metadata:
                 if isinstance(signal_metadata, str):

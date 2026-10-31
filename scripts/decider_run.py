@@ -1359,9 +1359,10 @@ def rule_based_context_gate(token, direction, source, sig):
         # CEO 2026-10-30 Option D: jup_yolo_mirrored → floor 35 (carve-out like
         # pump-chain). Late-mirror timing enters dumps when detection-RSI already
         # <45; knife (<35) stays global — jup below 35 still blocked.
+        from directional_block import is_giant_source
         if 'pump-chain' in (source or ''):
             _hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
-        elif 'jup_yolo' in (source or ''):
+        elif is_giant_source(source):
             _hard_floor = SHORT_RSI_HARD_FLOOR_JUP_YOLO
         else:
             _hard_floor = SHORT_RSI_HARD_FLOOR
@@ -2555,9 +2556,10 @@ def execute_trade(token, direction, price, confidence, source,
             # CEO 2026-10-30 Option D: exec-time mirror of the approval carve-out —
             # without this, compactor approves (floor 35) and exec rejects (floor 45)
             # → the exact approval→exec zombie D exists to prevent.
+            from directional_block import is_giant_source
             if 'pump-chain' in (source or ''):
                 _exec_hard_floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
-            elif 'jup_yolo' in (source or ''):
+            elif is_giant_source(source):
                 _exec_hard_floor = SHORT_RSI_HARD_FLOOR_JUP_YOLO
             else:
                 _exec_hard_floor = SHORT_RSI_HARD_FLOOR

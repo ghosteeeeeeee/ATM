@@ -4356,7 +4356,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # uses 35 here or the approval layer blocks what exec would have
                 # taken (approval→exec contradiction = zombie). Hoisted with the
                 # knife import for the same fail-OPEN reason. Knife (<35) unchanged.
-                _rsh_floor = (SHORT_RSI_HARD_FLOOR_JUP_YOLO if 'jup_yolo' in (source or '')
+                from directional_block import is_giant_source
+                _rsh_floor = (SHORT_RSI_HARD_FLOOR_JUP_YOLO if is_giant_source(source)
                               else SHORT_RSI_HARD_FLOOR)
                 _conn_rsh = None
                 try:

@@ -4142,6 +4142,21 @@ JUP_YOLO_CLUSTER_MAX_BONUS = 15        # cap (matches HL_COPY cap — prevents o
 JUP_YOLO_MAX_OPEN_SHORTS = 2      # concurrent open jup_yolo SHORT trades allowed
 JUP_YOLO_SHORT_LIFT_CLOSED = 20   # lift the cap after this many SHORTs closed
 
+# ── HL Copy Trader — giants-light expansion (T directive 2026-10-31) ─────────
+# Same patterns as the JUP mirror: hl_copy signals were 30/30 EXPIRED in 48h
+# (19× compaction_stale churn from per-batch-only dedupe re-emitting the SAME
+# fill every 30s poll for up to the 360-min lookback). One emit per fill, ever.
+HL_COPY_MAX_FILL_AGE_SEC = 600       # freshness: fill must be ≤10min old at
+                                      # detection (30s poll path is ~1min; the
+                                      # gate cuts 6h post-downtime backfill)
+HL_COPY_MAX_OPEN_SHORTS = 2          # symmetric Option-D guardrail: max
+HL_COPY_SHORT_LIFT_CLOSED = 20       # concurrent hl_copy SHORTs until 20 closed
+# Guardrail counts closed SHORTs SINCE the expansion — the 21 historical
+# closed shorts predate the qualified-trader filter, freshness gate, and
+# churn fix; letting them "lift" the cap on day one would make it a no-op
+# for exactly the re-opened path it exists to watch.
+HL_COPY_SHORT_GUARDRAIL_START = '2026-10-31 00:00:00'
+
 # ── JUP YOLO Mirror Freshness Gate ────────────────────────────────────────────
 # CEO 2026-10-30: "older than 5-10 mins is useless" — mirror only FRESH pro
 # entries. Steady-state opens from tracked wallets are caught by the 60s poll
