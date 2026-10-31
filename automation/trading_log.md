@@ -18652,3 +18652,27 @@ Final set: []
 **Open Questions:**
 - 24h RED '-$0.16' (53.1% WR) / 7d '-$0.87' — structural R:R imbalance persists; kill/boost rules don't reach it
 - pump-chain- GMX outlier still masks ex-GMX losses — hold until ex-GMX turns positive
+
+## [2026-10-31 18:43] Hourly Analysis
+
+**Trades:** 4 closed (2 wins, 1 loss, 1 flat)
+**PnL:** $0.01 (WR: 56.3% 24h) | 24h 48T 27W '+$0.08' GREEN | 7d 216T 121W '-$0.86' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: ACE bb-squeeze+ cut-loser-CL-T1 '-$0.13'/-3.03%, HYPE jup_yolo profit-monster-trail '+$0.10'/+2.55%, HYPE jup_yolo mfe_exit '+$0.04'/+1.28%, HYPE continuation+jup_yolo mfe_exit '$0.00'
+- Kill check: each signal n<=2 last hour, no n>=3 0%-WR — regime query not triggered (pump-chain+ 24h 3T 0% but 0 closes last hour)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 9/48 = 18.8% (<40%); dominant close = profit-monster-trail (21T '+$1.34'); worst avg = hard_max_loss (3T '-$0.147')
+- Boost HOLD jup_yolo_mirrored: 24h bars met (24T 70.8% '+$0.12', BTC/SOL/HYPE all positive) BUT out-of-sample fails — 14d 46T 63% '-$0.47', 10-30 alone '-$0.44'; HYPE = 16/24 trades. 24h turnaround not yet structural. pump-chain- HOLD (ex-GMX 6T 50% '-$0.11', GMX still 125% of net)
+- Neg streak: 16h '-0.14', 17h '-0.04', 18h '+0.01' — never 3 red
+- Frequency 4/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.181%, 25/27 <0.5% — entries fine
+- 2 open: BTC continuum-osc+ +0.10%, SOL jup_yolo SHORT -0.47%
+- Storm readiness: **window-min -0.09% / at-run +0.00%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flipped GREEN '+$0.08' (56.3% WR) after days red — 7d still '-$0.86'; confirm trend next runs
+- jup_yolo_mirrored 14d '-$0.47' vs 24h '+$0.12' — if net stays positive 2 more runs, revisit boost with 3d window
