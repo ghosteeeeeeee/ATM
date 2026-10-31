@@ -18532,3 +18532,27 @@ Final set: []
 **Open Questions:**
 - 24h RED '-$0.70' (56.4% WR) / 7d '-$0.77' — structural R:R imbalance persists (losses ~2.2x avg win); kill/boost rules don't reach it
 - jup_yolo_mirrored HIGH n=20 now meets the regime bar but PnL '-0.29' despite 65% WR — R:R driven, not a WR problem; watch HIGH pnl trend
+
+## [2026-10-31 13:45] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.32 (WR: 54.7% 24h) | 24h 53T 29W '-$0.70' RED | 7d 205T 56.6% '-$1.09' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored hard_max_loss '-$0.19'/-4.58% (RSI 55.7 entry, open 12:36 close 13:10 — expected 1% price move at leverage, not a bug), HYPER pump-chain- atr_sl_hit '-$0.13'/-3.47% (RSI 50.0)
+- Kill check: each signal n=1 last hour, no n>=3 0%-WR — regime query not triggered; jup_yolo 14d recheck EXTREME 16T 62.5% '-0.05', HIGH 21T 61.9% '-0.48', NORMAL 5T 40% '-0.14' — wins EXTREME/HIGH by WR -> keep alive (NORMAL n=5 too small)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 9/53 = 17.0% (<40%); dominant close = profit-monster-trail (26T '+$1.47'); worst avg = cut-loser-CL-T1 (3T '-$0.177')
+- Boost: none qualify — all n>=3 signals net-negative 24h (jup_yolo_mirrored 30T 60% '-$0.50', volume-buildup- 6T 66.7% '-$0.22', pump-chain+ 4T 25% '-$0.01'); only green is combo 'pump-chain-,pump-chain-v6-' 3T '+$0.08' (n<5)
+- Neg streak: 10h '+0.16', 11h '+0.12', 12h '+0.00', 13h '-0.32' — 1 red, never 3 consecutive
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.203%, 26/29 <0.5% — entries fine; R:R still the drag (avg win '+$0.060' vs avg loss '-$0.122', ~1:2.0)
+- 2 open: GMX pump-chain- +4.05%, BTC continuum-osc+ -0.12%
+- Storm readiness: **window-min -0.08% / at-run -0.14%** — both within gate, no storm (rolling-60m, 7 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.70' (54.7% WR) / 7d '-$1.09' — structural R:R imbalance persists (losses ~2x avg win); kill/boost rules don't reach it
+- jup_yolo_mirrored HIGH 14d '-$0.48' at 61.9% WR — R:R driven, watch trend
