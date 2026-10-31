@@ -1046,7 +1046,7 @@ CHASE_EXEMPT_GAP_MAX = 8.0           # gap limit when exemption applies (was 2.0
 # (conf 133, setup n=170 WR=44%) 19:50→21:55 and 0 fills system-wide since
 # 19:50. Restored to True = the log-only state #188's own analysis concluded
 # ("enforcing would COST $0.29"). Semantics: True=SHADOW(log), False=BLOCK.
-CHASE_RATIO_SHADOW = True
+CHASE_RATIO_SHADOW = True  # KILLED 2026-10-31 at consumption (decider: inert, no log/no block) — enforce counterfactual COSTS $1.27/17d (audit 9e6368df); flag kept True as history, do NOT flip (False = ENFORCE)
 CHASE_RATIO_MIN_MOVE15 = 0.30        # % direction-signed 15m move must reach this
 CHASE_RATIO_MAX = 0.70               # block if |move5m| / |move15m| > this
 
@@ -1141,7 +1141,7 @@ STORM_SIBLING_WINDOW_MIN = 30
 # SHADOW first per CEO D2 (new gates: 14d shadow before enforce). Earliest
 # flip review 2026-11-10. Flip criteria: ≥14d shadow ∧ 0 trail-winner blocks ∧
 # net counterfactual positive. Revert if any trail winner appears.
-CHASE_MOVE_SHADOW = True
+CHASE_MOVE_SHADOW = True  # KILLED 2026-10-31 at consumption (decider: inert) — enforce COSTS $0.41, 9 trail-winner bars tripped; signal-time edge does not survive exec-time conditioning (audit 9e6368df). Do NOT flip (False = BLOCK)
 CHASE_MOVE_MAX_PCT = 0.30            # % direction-signed move past last 5m close
 
 # ── Global Spike Filter ────────────────────────────────────────────────────
@@ -3615,8 +3615,8 @@ COUNTER_FLIP_ENABLED     = False   # controlled by counter_flip_signal.py indepe
 # wyckoff.py — detects Wyckoff accumulation springs (LONG) and distribution
 # upthrusts (SHORT) using volume and price structure analysis on 5m candles.
 WYCKOFF_ENABLED = False   # CEO 2026-08-05 — 0% WR (48h). DISABLED.
-WYCKOFF_PLUS_ENABLED = True     # wyckoff+ LONG (accumulation spring)
-WYCKOFF_MINUS_ENABLED = True    # wyckoff- SHORT (distribution upthrust)
+WYCKOFF_PLUS_ENABLED = False    # KILLED 2026-10-31 (registry wyckoff-shadow default: zero tagged lines 14d, Oct-15 co-source premise failed; audit 9e6368df auto-KILL). NOTE: registry text said 'SHADOW_MODE=False' — that would have gone LIVE (wyckoff.py:552 falls to add_signal when shadow off); PLUS/MINUS False kills at :514 BEFORE shadow/live — polarity corrected.
+WYCKOFF_MINUS_ENABLED = False   # KILLED 2026-10-31 (see WYCKOFF_PLUS_ENABLED note)
 # CEO Sep 9 ruling, formalized 2026-10-13 (daily_orchestrator): co-source pairing
 # undelivered past Oct 11 EOD → wyckoff shadow-only until a validated volume/rs
 # co-source exists. Fires log to data/wyckoff_shadow.jsonl, never enter the live

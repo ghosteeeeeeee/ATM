@@ -5742,14 +5742,13 @@ def run(dry_run=False):
                 if abs(_cr_m15) >= CHASE_RATIO_MIN_MOVE15:
                     _cr_ratio = abs(_cr_m5) / abs(_cr_m15)
                     if _cr_ratio > CHASE_RATIO_MAX:
-                        _cr_tag = 'BLOCK' if not CHASE_RATIO_SHADOW else 'SHADOW'
-                        log(f'  [CHASE-RATIO-{_cr_tag}] {token} {direction} '
-                            f'm5={_cr_m5:.3f}% m15={_cr_m15:.3f}% ratio={_cr_ratio:.2f}')
-                        if not CHASE_RATIO_SHADOW:
-                            if sig_id:
-                                release_signal_claim(sig_id, 'SKIPPED', reason='post-claim block: CHASE-RATIO chase candle')
-                            skipped += 1
-                            continue
+                        # CHASE-RATIO KILLED (registry default executed 2026-10-31, audit
+                        # 9e6368df): enforce counterfactual COSTS $1.27/17d — n=38 joined,
+                        # 18 trail-winner blocks vs bar=0, both split-halves negative
+                        # (+$0.21 / +$1.06) — matches #188's own revert on 46% larger n.
+                        # Gate inert: NO log, NO block. (Flag left True as history;
+                        # flipping it would ENFORCE — the BUG-068 inversion class.)
+                        pass
         except Exception as _cr_e:
             log(f'  [CHASE-RATIO] err {token}: {_cr_e}')
 
@@ -5791,15 +5790,15 @@ def run(dry_run=False):
                 _cm_sgn = 1 if direction.upper() == 'LONG' else -1
                 _cm_move = _cm_sgn * (float(_cm_px[0]) - float(_cm_last5[0])) / float(_cm_last5[0]) * 100
                 if _cm_move >= CHASE_MOVE_MAX_PCT:
-                    _cm_tag = 'SHADOW' if CHASE_MOVE_SHADOW else 'BLOCK'
-                    log(f'  [CHASE-MOVE-{_cm_tag}] {token} {direction} move={_cm_move:.3f}% '
-                        f'>= {CHASE_MOVE_MAX_PCT}% past last 5m close')
-                    if not CHASE_MOVE_SHADOW:
-                        if sig_id:
-                            release_signal_claim(sig_id, 'SKIPPED',
-                                reason='post-claim block: CHASE-MOVE entry already extended')
-                        skipped += 1
-                        continue
+                    # CHASE-MOVE KILLED (registry entry created with this execution,
+                    # 2026-10-31; audit 9e6368df): enforce counterfactual COSTS $0.41 —
+                    # n=15, 9 trail-winner blocks (bar=0 = revert trip). KEY INSIGHT: the
+                    # 30d signal-time edge (-$3.31, z=-3.49) does NOT transfer to exec-time
+                    # — exec shadows only see trades that survived every upstream gate, so
+                    # the blocked set is winners (signal-time edge != exec-time edge).
+                    # Gate inert: NO log, NO block. (Flag stays True as history; flipping
+                    # it would BLOCK — the BUG-068 inversion class.)
+                    pass
         except Exception as _cm_e:
             log(f'  [CHASE-MOVE] err {token}: {_cm_e}')
 

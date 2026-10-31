@@ -1379,6 +1379,24 @@
       "found_by": "exit deep-dive",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-074",
+      "title": "CTX-RULES-SHADOW stream broken: 'str' object has no attribute 'get' on every evaluation (28 lines, all errors) \u2014 the shadow never collects data",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "[CTX-RULES-SHADOW] rules error: 'str' object has no attribute 'get' (BTC/ZEN) \u2014 sig passed as str where dict expected; CONTEXT_GATE_RULES_SHADOW never exercises.",
+      "root_cause": "shadow path passes the rule-set or sig as str instead of dict",
+      "fix": "fix the type mismatch or KILL the stream (zero value while broken)",
+      "verified_by": "log-flags audit 9e6368df",
+      "date_found": "2026-10-31",
+      "date_fixed": null,
+      "found_by": "log-flags audit",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
