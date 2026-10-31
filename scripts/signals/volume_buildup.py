@@ -22,7 +22,7 @@ Family: Volume (pairs with Momentum/Pattern for confluence)
 import sys, os, sqlite3
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from signal_schema import add_signal, price_age_minutes, get_cooldown, set_cooldown
+from signal_schema import add_signal, price_age_minutes, get_cooldown, set_cooldown, _enrich_indicators
 from paths import HERMES_DATA
 
 from hermes_constants import (
@@ -34,6 +34,7 @@ from hermes_constants import (
     VOLUME_BUILDUP_VOL_MULT,
     VOLUME_BUILDUP_VOL_AVG_PERIOD,
     VOLUME_BUILDUP_RSI_MAX,
+    VOLUME_BUILDUP_LONG_RSI_MIN,
     VOLUME_BUILDUP_RSI_MIN,
     VOLUME_BUILDUP_RSI_PERIOD,
     VOLUME_BUILDUP_MIN_PRICE_CHANGE_PCT,
@@ -150,8 +151,20 @@ def detect(token):
 
     if direction == 'LONG' and current_rsi > VOLUME_BUILDUP_RSI_MAX:
         return None
+    if direction == 'LONG' and current_rsi < VOLUME_BUILDUP_LONG_RSI_MIN:
+        return None
     if direction == 'SHORT' and current_rsi < VOLUME_BUILDUP_RSI_MIN:
         return None
+
+    # ── Condition 4: LONG momentum/wave gate (CEO 2026-10-31) ─────────────
+    # Volume + falling price = accumulation before drop, not before rally.
+    # 3/5 losing LONGs had momentum_state=falling, 2/5 wave_phase=falling.
+    if direction == 'LONG':
+        enriched = _enrich_indicators(token) or {}
+        if enriched.get('momentum_state') == 'falling':
+            return None
+        if enriched.get('wave_phase') == 'falling':
+            return None
 
     # ── Confidence ──────────────────────────────────────────────────────────
     confidence = VOLUME_BUILDUP_CONF_BASE

@@ -2861,10 +2861,11 @@ VOLUME_BUILDUP_COOLDOWN_MINUTES = 15      # per token+direction cooldown (was 2h
 VOLUME_BUILDUP_BARS = 4                   # number of consecutive bars that must be above avg volume
 VOLUME_BUILDUP_VOL_MULT = 1.2             # avg volume must be >= this × average (lowered from 1.5 — gradual buildup has 1.2-1.3x avg with spikes)
 VOLUME_BUILDUP_VOL_AVG_PERIOD = 20        # bars for average volume
-VOLUME_BUILDUP_RSI_MAX = 75               # LONG: RSI must be below this (not overbought)
+VOLUME_BUILDUP_RSI_MAX = 70               # LONG: RSI must be below this (CEO 2026-10-31: lowered 75→70, POL entered at RSI 85 with MFE 0.0%)
+VOLUME_BUILDUP_LONG_RSI_MIN = 40          # LONG: RSI must be above this (CEO 2026-10-31: MON entered at RSI 25 = falling knife)
 VOLUME_BUILDUP_RSI_MIN = 30               # SHORT: RSI must be above this (not oversold)
 VOLUME_BUILDUP_RSI_PERIOD = 14            # RSI period
-VOLUME_BUILDUP_MIN_PRICE_CHANGE_PCT = 0.3 # min % price move over the N bars to confirm direction (lowered from 1.5 — accumulation phase has small moves)
+VOLUME_BUILDUP_MIN_PRICE_CHANGE_PCT = 1.0 # min % price move over N bars to confirm direction (CEO 2026-10-31: raised 0.3→1.0, all 4 losers had MFE < 0.25%)
 VOLUME_BUILDUP_CONF_BASE = 75             # base confidence
 VOLUME_BUILDUP_CONF_FLOOR = 50            # min confidence
 VOLUME_BUILDUP_CONF_CAP = 88              # max confidence (system ceiling)
