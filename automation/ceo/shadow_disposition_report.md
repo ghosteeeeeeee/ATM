@@ -1,23 +1,22 @@
-# Shadow disposition report — 2026-10-31T08:15:00.076902+00:00
-registry: 37 entries (open=24)
+# Shadow disposition report — 2026-10-31T18:57:41.858245+00:00
+registry: 51 entries (open=27)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
-- OPEN trial-coupled-cutsloser-sl: deadline=2026-11-03T00:00:00Z | (no parseable source)
-  -> threshold: BREACHED | trial since 2026-10-27 00:00:00: PnL -0.29 over 140 closes (limit -2.5), worst HML -7.10% over 1 exits (limit -6.5), rolling7d -0.68 context-only -> BREACH: worst HML exit -7.10% < -6.5%
+- DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
 - OPEN eval-midband-long-4564: deadline=2026-11-03T00:00:00Z | (no parseable source)
-- OPEN gate-shadow: deadline=2026-11-10T00:00:00Z | brain/gate_shadow.db: 52454 rows, 0.0d
-- OPEN shadow-trader-bypass: deadline=2026-11-03T00:00:00Z | brain/shadow_trades.db: 43024 rows, 0.0d
-- OPEN expiry-t5-shadow: deadline=2026-11-10T00:00:00Z | brain/expiry_shadow.db: 29672 rows, 0.0d | brain/t5_shadow.db: 43224 rows, 0.0d
+- DONE gate-shadow: KEEP — join-switch SHIPPED 2026-10-31 (fwd-return report leading) (2026-10-31)
+- DONE shadow-trader-bypass: KILL — question answered, kills validated (no FLIP) (2026-10-31)
+- DONE expiry-t5-shadow: SPLIT: KEEP expiry (fwd97.1% = threshold met, LONG protective -0.185%/ev) / KILL t5 (collector stopped) (2026-10-31)
 - OPEN mfe-cut-arm-be: deadline=2026-11-10T00:00:00Z | (no parseable source)
-- OPEN relative-regime: deadline=2026-11-03T00:00:00Z | data/relative_regime_shadow.json: 0 rows, 9.7d
-- OPEN rr-engine-shadow: deadline=2026-11-03T00:00:00Z | data/rr_shadow_audit_7d.json: 1655 rows, 27.3d
-- OPEN chase-ratio: deadline=2026-11-03T00:00:00Z | (no parseable source)
+- DONE relative-regime: KILL — dead collector (counterfactual never existed) (2026-10-31)
+- DONE rr-engine-shadow: KILL — stale collector, stop citing as evidence (2026-10-31)
+- DONE chase-ratio: KILL — executed at consumption (gate inert) (2026-10-31)
 - OPEN ichimoku-dampen-flooradmit: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - OPEN volmom-volbreak: deadline=2026-11-07T00:00:00Z | (no parseable source)
 - DONE tc-temporal-confluence: KILL (2026-10-27)
 - DONE mom-filter-shadow: KILL (2026-10-27)
 - DONE acceleration-threshold: KILL (2026-10-27)
-- OPEN wyckoff-shadow: deadline=2026-11-03T00:00:00Z | (no parseable source)
+- DONE wyckoff-shadow: KILL — PLUS/MINUS flags False (polarity corrected) (2026-10-31)
 - DONE ai-trader-extreme-shadow: KILL (2026-10-27)
 - DONE oscillator-shadow: FLIPPED_DONE (2026-10-27)
 - DONE bb-tat-shadow: FLIPPED_DONE (2026-10-27)
@@ -39,3 +38,17 @@ registry: 37 entries (open=24)
 - DONE override-vs-ceiling-contradiction: RESOLVED by replay: ceiling owns 75+ (band dead 3T 0% −$0.47); override claim-text fixed, behavior unchanged (2026-10-30)
 - DONE ichimoku-short-solo-counterfactual: DEAD — spam correctly neutered; no bypass (2026-10-30)
 - OPEN jup-yolo-regime-review: deadline=2026-11-07T00:00:00Z | (no parseable source)
+- OPEN amplify-winner-cell-mult-150: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN amplify-jup-short-walk: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN atrtrail-clip-12: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN reentry-study: deadline=2026-11-21T00:00:00Z | (no parseable source)
+- DONE chase-move-shadow: KILL (2026-10-31)
+- OPEN conf-filter-parity-split: deadline=2026-11-10T00:00:00Z | (no parseable source)
+- OPEN ichimoku-bypass-lowjoin-ticket: deadline=2026-11-05T00:00:00Z | (no parseable source)
+- DONE stop-asymmetry-highwr: SHIP-TO-SHADOW — SL at 1.0% price passes bar on both signals (WR not down); shadow-first spec delivered, NO live change (2026-10-31)
+- DONE short-relax-shadow-study: AGGREGATE UNATTRIBUTABLE — accept base rates (2026-10-31)
+- OPEN pump-chain-plus-weight-kill-review: deadline=2026-11-13T00:00:00Z | (no parseable source)
+- OPEN trial-wider-sl: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 45047 rows, 0.0d
+- OPEN trial-extended-time: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 45047 rows, 0.0d
+- OPEN watch-contrarian-live: deadline=2026-11-03T00:00:00Z | (no parseable source)
+- OPEN gate-shadow-capture-coverage-fix: deadline=2026-11-06T00:00:00Z | brain/gate_shadow.db: 54328 rows, 0.0d

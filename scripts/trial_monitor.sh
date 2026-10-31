@@ -39,5 +39,7 @@ sqlite3 /root/.hermes/brain/shadow_trades.db \
 
 echo ""
 echo "=========================================="
-echo "DASHBOARD: brain/trial_tracking_dashboard.md"
+echo "CANONICAL VIEW: automation/ceo/control_tower.md"
+echo "(hand dashboard brain/trial_tracking_dashboard.md: content dated 2026-10-27,"
+echo " archived 2026-10-31; trials now live in data/shadow_disposition.json as kind=trial/watch)"
 echo "=========================================="

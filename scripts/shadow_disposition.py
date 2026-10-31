@@ -29,6 +29,20 @@ default_action}. This runner:
                              (7d-PnL / worst-HML-exit) had NO code path at all —
                              same defect class as the Oct-24 waiver lapse (#102).
 
+  6. control tower        -> automation/ceo/control_tower.md, rewritten EVERY run:
+                             OVERDUE / DUE<=24h / <=7d / 8-14d / later, running
+                             trials with live n-vs-bar (progress_eval hooks),
+                             full date-ordered calendar, done collapsed. CEO
+                             APPROVE 2026-10-31 (brief-control-tower): the single
+                             centralized spot for shadows + trials + calendar.
+                             Regenerated-only — hand edits are overwritten (the
+                             hand dashboard brain/trial_tracking_dashboard.md
+                             rotted precisely because it lacked this rule).
+  7. weekly LOOKAHEAD     -> once per ISO week, one kanban packet listing every
+                             item due <=7d with owner + tower freshness — the
+                             calendar-drives-action layer that warns BEFORE the
+                             daily 24h packet and the deadline default.
+
 Robustness contract (code review 2026-10-27 MED-4/5/6/7, LOW-1/5):
   - dedupe keys are applied ONLY after a successful kanban append (a failed
     append must never swallow the packet);
@@ -58,6 +72,7 @@ REGISTRY = os.path.join(HERMES_DATA, 'shadow_disposition.json')
 STATE = os.path.join(HERMES_DATA, 'shadow_disposition_state.json')
 KANBAN = '/root/.hermes/automation/ceo/ceo_kanban.md'
 REPORT = '/root/.hermes/automation/ceo/shadow_disposition_report.md'
+CONTROL_TOWER = '/root/.hermes/automation/ceo/control_tower.md'
 REPO = '/root/.hermes'
 ZERO_EVENT_DAYS = 14
 
@@ -78,7 +93,9 @@ def _load(path, default):
 
 
 def _save(path, obj):
-    tmp = path + '.tmp'
+    # review MED-4: pid-unique tmp so overlapping runs can't interleave into
+    # one fixed path and atomically publish a corrupted file.
+    tmp = f'{path}.{os.getpid()}.tmp'
     with open(tmp, 'w') as f:
         json.dump(obj, f, indent=1)
     os.replace(tmp, path)
@@ -262,6 +279,140 @@ THRESHOLD_EVALS = {
 }
 
 
+# ── progress evaluators (control-tower n-vs-bar; CEO build 2026-10-31) ────────
+# Mirror of the THRESHOLD_EVALS registration pattern: entries carry
+# {progress_eval: <key>} -> PROGRESS_EVALS. Each takes the entry (so bar targets
+# are parsed from the registry text — no duplicated magic numbers here) and
+# returns {'now','target','unit','met'} or {'error': str}. NEVER raises: a broken
+# hook degrades to a rendered "unavailable" line, so the tower always renders and
+# the deadline path is untouched (same contract as threshold_eval).
+
+def _run_trial_report(flag):
+    """Combined stdout+stderr of shadow_trader.py <flag>. Raises on nonzero rc or
+    empty output (crash/format drift) so the caller renders a degraded line
+    instead of parsing a partial traceback as authoritative (review LOW-6)."""
+    r = subprocess.run(
+        [sys.executable, os.path.join(REPO, 'scripts', 'shadow_trader.py'), flag],
+        capture_output=True, text=True, timeout=150)
+    out = (r.stdout or '') + (r.stderr or '')
+    if r.returncode != 0:
+        raise RuntimeError(f'{flag} rc={r.returncode}: {out.strip()[-200:]}')
+    if not out.strip():
+        raise RuntimeError(f'shadow_trader.py {flag} produced no output (rc={r.returncode})')
+    return out
+
+
+def _progress_wider_sl(e):
+    """Wider-SL trial. The bar has TWO limbs (WR >= t AND trades >= n_target);
+    both are parsed from the report's own 'Required:' line so shadow_trader
+    stays the single source of truth. Collecting state (n below bar) and any
+    unverifiable n-limb degrade to CONSERVATIVE 'not met' — a false OK would
+    contradict the bar (review MED-3)."""
+    try:
+        out = _run_trial_report('--report-wider')
+    except Exception as ex:
+        return {'error': f'{type(ex).__name__}: {ex}'}
+    req = re.search(r'Required:\s*WR\s*>=\s*(-?\d+(?:\.\d+)?)%\s*'
+                    r'with\s*>=\s*(\d+)\s*trades', out)
+    wr_m = re.search(r'Wider:\s*WR\s*=\s*(-?\d+(?:\.\d+)?)%,\s*trades\s*=\s*(\d+)',
+                     out)
+    if req and wr_m:
+        v, n = float(wr_m.group(1)), int(wr_m.group(2))
+        t, n_target = float(req.group(1)), int(req.group(2))
+        collecting = 'COLLECTING DATA' in out
+        met = (not collecting) and v >= t and n >= n_target
+        unit = (f'% WR wider-arm, n={n}/{n_target}'
+                + (' [COLLECTING]' if collecting else ''))
+        return {'now': v, 'target': t, 'unit': unit, 'met': met}
+    # verdict/Win-Rate fallbacks: n limb cannot be verified -> conservative
+    m = re.search(r'WR\s+(-?\d+(?:\.\d+)?)%\s*[<>]=?\s*(\d+(?:\.\d+)?)%', out)
+    if m:
+        return {'now': float(m.group(1)), 'target': float(m.group(2)),
+                'unit': '% WR wider-arm [n-limb unverified]', 'met': False}
+    m = re.search(r'Win Rate\s+(-?\d+(?:\.\d+)?)%\s+(-?\d+(?:\.\d+)?)%', out)
+    if m:
+        m2 = re.search(r'WR\s*>=\s*(-?\d+(?:\.\d+)?)', str(e.get('threshold', '')))
+        if m2:
+            return {'now': float(m.group(2)), 'target': float(m2.group(1)),
+                    'unit': '% WR wider-arm [n-limb unverified]', 'met': False}
+    return {'error': 'report format drift: no parseable WR/bar lines'}
+
+
+# bug_hunter NEW-1: shadow_trader emits '{:+.1f}pp' — a sign is ALWAYS printed,
+# so without \+? a POSITIVE improvement ('+4.9pp') parses as format drift exactly
+# when the trial starts working (fails safe, but hides the decision-critical number).
+_RE_TIME_EXT = re.compile(
+    r'Extended:\s*WR improvement\s*=\s*\+?(-?\d+(?:\.\d+)?)pp,\s*trades\s*=\s*(\d+)')
+
+
+def _progress_extended_time(e):
+    """Extended-time-exits trial — same two-limb bar rule as wider_sl: the
+    report's 'Required:' line carries BOTH the improvement target and the n
+    floor; collecting state renders explicitly (review MED-3)."""
+    try:
+        out = _run_trial_report('--report-time')
+    except Exception as ex:
+        return {'error': f'{type(ex).__name__}: {ex}'}
+    req = re.search(r'Required:\s*WR improvement\s*>=\s*\+?(-?\d+(?:\.\d+)?)pp\s*'
+                    r'with\s*>=\s*(\d+)\s*trades', out)
+    ext = _RE_TIME_EXT.search(out)
+    if req and ext:
+        v, n = float(ext.group(1)), int(ext.group(2))
+        t, n_target = float(req.group(1)), int(req.group(2))
+        collecting = 'Collecting data:' in out
+        met = (not collecting) and v >= t and n >= n_target
+        unit = (f'pp WR-improvement, n={n}/{n_target}'
+                + (' [COLLECTING]' if collecting else ''))
+        return {'now': v, 'target': t, 'unit': unit, 'met': met}
+    if req and 'Collecting data:' in out:
+        mc = re.search(r'Collecting data:\s*(\d+)/(\d+)', out)
+        if mc:
+            return {'now': int(mc.group(1)), 'target': int(mc.group(2)),
+                    'unit': 'trades collected [COLLECTING]', 'met': False}
+    return {'error': 'report format drift: no parseable improvement/bar lines'}
+
+
+def _progress_contrarian_live(e):
+    """CONTRARIAN-LIVE watch: count REAL fade trades = pump-chain- LONG opens
+    since the watch started — PostgreSQL is authoritative (review HIGH-1: the
+    original hook grepped logs/decider*.log, which does not exist; a log-grep
+    replacement would still be wrong because only ~11 of 170 filtered log lines
+    ever opened a trade — approved != executed, and logs rotate out)."""
+    try:
+        started = str(e.get('started') or '')[:10]
+        if len(started) < 10:
+            return {'error': 'no usable started date on entry'}
+        import psycopg2
+        conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
+                                user='postgres')
+        try:
+            cur = conn.cursor()
+            # hyphen anchors pc- (pump-chain+ / -v6+ are the PLUS LONG family,
+            # NOT fades — verified: 19 pc+ LONG vs 11 fade opens since 10-27)
+            cur.execute("SELECT COUNT(*) FROM trades "
+                        "WHERE signal LIKE 'pump-chain-%%' "
+                        "AND signal NOT LIKE '%%+%%' AND direction='LONG' "
+                        "AND open_time >= %s", (started,))
+            v = int(cur.fetchone()[0])
+            cur.close()
+        finally:
+            conn.close()
+    except Exception as ex:
+        return {'error': f'{type(ex).__name__}: {ex}'}
+    m = re.search(r'>=\s*(\d+)\s*REAL', str(e.get('threshold', '')))
+    t = int(m.group(1)) if m else 1                  # 'first real trade' semantics
+    return {'now': v, 'target': t,
+            'unit': 'real fade trades (pc- LONG opens since started)',
+            'met': v >= t}
+
+
+PROGRESS_EVALS = {
+    'wider_sl': _progress_wider_sl,
+    'extended_time': _progress_extended_time,
+    'contrarian_live': _progress_contrarian_live,
+}
+
+
 def main():
     reg = _load(REGISTRY, None)
     if not reg or 'entries' not in reg:
@@ -410,6 +561,41 @@ def main():
             report.append(f'- ERROR {eid}: {type(ex).__name__}: {ex} (entry skipped, '
                           f'run continues)')
 
+    # ── weekly LOOKAHEAD packet (calendar-drives-action layer 1/3; CEO 2026-10-31)
+    # One packet per ISO week listing every open item due <=7d with its owner —
+    # warns BEFORE the daily 24h packet (layer 2) and the deadline default
+    # (layer 3), so every date gets three independent chances to be seen. Dedupe
+    # key lives under the reserved '_tower' state id and follows the same
+    # append-success-only contract as every other packet.
+    try:
+        tower_st = state.setdefault('_tower', {})
+        iso = NOW.isocalendar()
+        week_key = f'{iso.year}-W{iso.week:02d}'
+        if tower_st.get('lookahead_fired_for') != week_key:
+            up = []
+            for e in entries:
+                if e.get('status') != 'open':
+                    continue
+                d = parse_deadline(e.get('deadline'))
+                if d is not None and timedelta(0) <= (d - NOW) <= timedelta(days=7):
+                    up.append((d, e))
+            up.sort(key=lambda x: x[0])
+            items = ', '.join(
+                f"{e.get('id', '?')} ({d.strftime('%m-%d')}, "
+                f"{str(e.get('owner', '?'))[:28]})"
+                for d, e in up) or 'none due in 7d'
+            pending_state.append(('_tower', 'lookahead_fired_for', week_key))
+            problems += 1
+            kanban_lines.append(
+                f'- [{now_iso}] shadow-disposition: 📅 LOOKAHEAD {week_key} — '
+                f'{len(up)} item(s) due <=7d: {items}. '
+                f'Full view: automation/ceo/control_tower.md')
+    except Exception as ex:
+        entry_errors += 1
+        report.append(f'- LOOKAHEAD packet error: {type(ex).__name__}: {ex} '
+                      f'(daily packets unaffected)')
+
+
     # ── emit ────────────────────────────────────────────────────────────────
     append_ok = True
     if kanban_lines:
@@ -443,10 +629,208 @@ def main():
     except Exception as e:
         log(f'WARN: report write failed: {e}')
 
+    # control tower: rendered LAST so it carries the run's final problem/error
+    # counts; a tower failure must never fail the run (packets already emitted).
+    try:
+        _render_control_tower(entries, now_iso, problems, entry_errors)
+        log(f'control tower -> {CONTROL_TOWER}')
+    except Exception as e:
+        log(f'WARN: control tower render failed: {e}')
+
     for line in report:
         print(line)
     log(f'done — {problems} action(s) issued, {entry_errors} entry error(s)')
     return 0
+
+
+# ── control tower (CEO APPROVE 2026-10-31, brief-control-tower) ──────────────
+def _fmt_progress(e, run=True):
+    """Progress line for an entry, or None when it has no progress_eval.
+    NEVER raises — unknown key / evaluator error / malformed output all degrade
+    to a rendered string (the tower must always render)."""
+    name = e.get('progress_eval')
+    if not name:
+        return None
+    if not run:
+        return 'progress: (skipped in selfcheck)'
+    fn = PROGRESS_EVALS.get(name)
+    if fn is None:
+        return f'progress: UNKNOWN eval {name!r} (deadline path unaffected)'
+    try:
+        d = fn(e)
+    except Exception as ex:
+        return f'progress: unavailable ({type(ex).__name__}: {ex})'
+    if not isinstance(d, dict):
+        return 'progress: evaluator returned non-dict'
+    if 'error' in d:
+        return f"progress: unavailable ({d['error']})"
+    try:
+        mark = 'OK' if d.get('met') else 'NOT MET'
+        return (f"progress: {d['now']} vs >={d['target']} "
+                f"{d.get('unit', '')} — {mark}")
+    except Exception:
+        return 'progress: malformed evaluator output'
+
+
+def _build_control_tower(entries, now_iso, problems, entry_errors,
+                         prev_tower_mtime=None, reg_mtime=None, run_progress=True):
+    """Pure builder -> tower markdown string (selfcheck calls this without disk
+    writes and without subprocess progress hooks)."""
+    stale = prev_tower_mtime is not None and \
+        (NOW.timestamp() - prev_tower_mtime) > 26 * 3600
+
+    opens = [e for e in entries if e.get('status') == 'open']
+    dones = [e for e in entries if e.get('status') == 'done']
+
+    def _dl(e):
+        return parse_deadline(e.get('deadline'))
+
+    dated, undated = [], []
+    for e in opens:
+        d = _dl(e)
+        (dated if d is not None else undated).append((d, e))
+    dated.sort(key=lambda x: x[0])
+
+    # review MED-2: memoize progress per build — entries render in BOTH their
+    # date bucket and the trials section; without this each hook could run
+    # twice (worst case 720s vs the service's 300s TimeoutStartSec).
+    prog_cache = {}
+
+    def _fmt_cached(e):
+        key = e.get('id') or id(e)
+        if key not in prog_cache:
+            prog_cache[key] = _fmt_progress(e, run=run_progress)
+        return prog_cache[key]
+
+    def _bucket(lo, hi):
+        return [(d, e) for d, e in dated if lo < d <= hi]
+
+    overdue = [(d, e) for d, e in dated if d <= NOW]
+    due24 = _bucket(NOW, NOW + timedelta(hours=24))
+    due7 = _bucket(NOW + timedelta(hours=24), NOW + timedelta(days=7))
+    due14 = _bucket(NOW + timedelta(days=7), NOW + timedelta(days=14))
+    later = [(d, e) for d, e in dated if d > NOW + timedelta(days=14)]
+
+    def _entry_block(d, e):
+        days = (d.date() - NOW.date()).days
+        tag = ('TODAY' if days == 0
+               else f'T-{days}' if days > 0 else f'OVERDUE {-days}d')
+        bar = str(e.get('bar') or e.get('threshold') or '—')
+        bar = re.sub(r'^bar:\s*', '', bar)   # entries may self-prefix "bar: "
+        if len(bar) > 120:
+            bar = bar[:117] + '...'
+        prog = _fmt_cached(e) or 'progress: —'
+        dflt = str(e.get('default_action') or '—')
+        if len(dflt) > 120:
+            dflt = dflt[:117] + '...'
+        return (f"- {d.strftime('%Y-%m-%d')} [{tag}] `{e.get('id', '?')}` "
+                f"(owner: {e.get('owner', '?')})\n"
+                f"  - bar: {bar}\n"
+                f"  - {prog}\n"
+                f"  - if silent: {dflt}")
+
+    lines = [
+        '# CONTROL TOWER — shadows, trials, decision calendar',
+        f'generated {now_iso} by scripts/shadow_disposition.py (daily 08:15) — '
+        f'REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)',
+    ]
+    if stale:
+        prev_s = (datetime.fromtimestamp(prev_tower_mtime, timezone.utc)
+                  .isoformat(timespec='seconds') if prev_tower_mtime else 'NEVER')
+        lines.append(
+            f'> ⚠️ **STALE** — last render {prev_s} (>26h ago): the daily timer '
+            f'likely missed a cycle. Re-run `python3 scripts/shadow_disposition.py` '
+            f'before trusting the dates below.')
+    lines.append(f'{len(opens)} open / {len(dones)} done / '
+                 f'{len(entries)} registry entries')
+    lines.append('')
+
+    def _section(title, pairs):
+        if not pairs:
+            return
+        lines.append(f'## {title} ({len(pairs)})')
+        for d, e in pairs:
+            lines.append(_entry_block(d, e))
+        lines.append('')
+
+    _section('🔴 OVERDUE — default packet issued; override needs decision + '
+             'evidence within 24h', overdue)
+    _section('🟠 DUE ≤24h', due24)
+    _section('🟡 DUE ≤7d', due7)
+    _section('📅 DUE 8–14d', due14)
+    _section('LATER (>14d)', later)
+
+    trials = [e for e in opens if e.get('kind') in ('trial', 'watch')]
+    if trials:
+        lines.append(f'## ⚗️ RUNNING TRIALS ({len(trials)})')
+        for e in sorted(trials, key=lambda x: str(x.get('deadline') or '9999')):
+            d = _dl(e)
+            dstr = d.strftime('%Y-%m-%d') if d else 'undated'
+            bar = str(e.get('bar') or e.get('threshold') or '—')
+            bar = re.sub(r'^bar:\s*', '', bar)   # entries may self-prefix "bar: "
+            if len(bar) > 120:
+                bar = bar[:117] + '...'
+            lines.append(f"- `{e.get('id', '?')}` — due {dstr} | "
+                         f"owner: {e.get('owner', '?')}")
+            lines.append(f"  - bar: {bar}")
+            lines.append(f"  - {_fmt_cached(e) or 'progress: —'}")
+        lines.append('')
+
+    if dated:
+        lines.append('## 📅 CALENDAR — every dated open item, date-ordered')
+        by_date = {}
+        for d, e in dated:
+            by_date.setdefault(d.date(), []).append(e.get('id', '?'))
+        for dt in sorted(by_date):
+            delta = (dt - NOW.date()).days
+            tag = ('TODAY' if delta == 0
+                   else f'T-{delta}' if delta > 0 else f'OVERDUE {-delta}d')
+            lines.append(f"- {dt.isoformat()} [{tag}]: "
+                         f"{', '.join(by_date[dt])}")
+        lines.append('')
+
+    if undated:
+        lines.append(f'## ⚠️ OPEN WITHOUT DEADLINE ({len(undated)}) — '
+                     f'add one or they never fire a packet')
+        for e in undated:
+            bar = str(e.get('threshold') or '—')
+            lines.append(f"- `{e.get('id', '?')}` (owner: {e.get('owner', '?')}) "
+                         f"— {bar[:120]}")
+        lines.append('')
+
+    if dones:
+        lines.append(f'## ✅ DONE / REVERTED ({len(dones)})')
+        lines.append(', '.join(str(e.get('id', '?')) for e in dones))
+        lines.append('')
+
+    def _ts(t):
+        return (datetime.fromtimestamp(t, timezone.utc).isoformat(timespec='seconds')
+                if t else 'never')
+
+    lines.append('---')
+    lines.append(f'freshness: {"STALE" if stale else "FRESH"} | '
+                 f'registry mtime: {_ts(reg_mtime)} | '
+                 f'prev tower render: {_ts(prev_tower_mtime)} | '
+                 f'last run: {problems} packet(s), {entry_errors} entry error(s)')
+    return '\n'.join(lines) + '\n'
+
+
+def _render_control_tower(entries, now_iso, problems, entry_errors):
+    """Build + atomically write the tower (tmp+replace, same as _save)."""
+    try:
+        prev = os.path.getmtime(CONTROL_TOWER)
+    except OSError:
+        prev = None
+    try:
+        reg_m = os.path.getmtime(REGISTRY)
+    except OSError:
+        reg_m = None
+    text = _build_control_tower(entries, now_iso, problems, entry_errors,
+                                prev_tower_mtime=prev, reg_mtime=reg_m)
+    tmp = f'{CONTROL_TOWER}.{os.getpid()}.tmp'   # review MED-4: pid-unique path
+    with open(tmp, 'w') as f:
+        f.write(text)
+    os.replace(tmp, CONTROL_TOWER)
 
 
 def selfcheck():
@@ -492,6 +876,49 @@ def selfcheck():
         print(f'        live: {d} | breached={b}', flush=True)
     except Exception as ex:
         chk(False, f'live metrics read failed: {type(ex).__name__}: {ex}')
+
+    # control-tower wiring (CEO build 2026-10-31) — the #102 class: code
+    # present but the registry names a typo'd/unknown key would silently
+    # render no progress forever.
+    bad_pe = [x.get('id') for x in reg.get('entries', [])
+              if isinstance(x, dict) and x.get('status') == 'open'
+              and x.get('progress_eval')
+              and x.get('progress_eval') not in PROGRESS_EVALS]
+    chk(not bad_pe, f'all open progress_eval keys known (bad={bad_pe})')
+    chk(set(PROGRESS_EVALS) >= {'wider_sl', 'extended_time', 'contrarian_live'},
+        'progress evals registered: wider_sl, extended_time, contrarian_live')
+    chk('_tower' not in {x.get('id') for x in reg.get('entries', [])
+                         if isinstance(x, dict)},
+        "reserved state key '_tower' is not used as a registry id (review LOW-5)")
+    m = _RE_TIME_EXT.search('  Extended: WR improvement = +4.9pp, trades = 17079')
+    chk(m is not None and m.group(1) == '4.9' and m.group(2) == '17079',
+        'extended-time parses POSITIVE improvement +4.9pp (bug_hunter NEW-1)')
+    m = _RE_TIME_EXT.search('  Extended: WR improvement = -15.6pp, trades = 17079')
+    chk(m is not None and m.group(1) == '-15.6',
+        'extended-time still parses negative improvement')
+    # tower builder smoke: pure function, no disk, no subprocess hooks
+    try:
+        txt = _build_control_tower(
+            [x for x in reg.get('entries', []) if isinstance(x, dict)],
+            NOW.isoformat(), 0, 0, prev_tower_mtime=NOW.timestamp(),
+            reg_mtime=NOW.timestamp(), run_progress=False)
+        chk('# CONTROL TOWER' in txt and '## 📅 CALENDAR' in txt
+            and 'do not hand-edit' in txt.splitlines()[1],
+            'tower builder produces header + calendar (selfcheck path)')
+        chk('STALE' not in txt.splitlines()[2:5], 'fresh prev-mtime -> no STALE banner')
+        txt_first = _build_control_tower(
+            [x for x in reg.get('entries', []) if isinstance(x, dict)],
+            NOW.isoformat(), 0, 0, prev_tower_mtime=None,
+            reg_mtime=NOW.timestamp(), run_progress=False)
+        chk('⚠️ **STALE**' not in txt_first,
+            'first render (prev=None) -> no STALE banner (fresh by definition)')
+        txt_stale = _build_control_tower(
+            [x for x in reg.get('entries', []) if isinstance(x, dict)],
+            NOW.isoformat(), 0, 0, prev_tower_mtime=NOW.timestamp() - 30 * 3600,
+            reg_mtime=NOW.timestamp(), run_progress=False)
+        chk('⚠️ **STALE**' in txt_stale, 'stale prev-mtime -> STALE banner in header')
+    except Exception as ex:
+        chk(False, f'tower builder raised: {type(ex).__name__}: {ex}')
 
     print('SELFCHECK ' + ('PASS' if ok else 'FAIL'), flush=True)
     return 0 if ok else 1

@@ -1,0 +1,166 @@
+events in corpus: 53736
+events with full fwd4h coverage @ t0/t+10m/t+30m: 52962 (98.6%)
+no candles for token: 25 events, tokens={'TESTTOKEN': 1, 'ZZZTEST': 1, 'ZZZRT': 1, 'LIT': 22}
+insufficient forward window: 749 events, tokens={'GRASS': 13, 'ETH': 23, 'ETC': 12, 'COMP': 11, 'AVAX': 11, 'ALGO': 13, 'ADA': 11, 'ARB': 12, 'USUAL': 4, 'KAS': 9, 'BLUR': 10, 'SOL': 70, 'BTC': 80, 'CAKE': 16, 'HYPE': 75, 'BABY': 15, 'PURR': 5, 'PROVE': 2, 'INJ': 16, 'HBAR': 4, 'IMX': 16, 'ATOM': 14, 'PENDLE': 2, 'PUMP': 4, 'MNT': 14, 'XTEN': 6, 'BIGTIME': 9, 'LDO': 17, 'DYDX': 9, 'GOAT': 16, 'FOGO': 10, 'AVNT': 6, 'GMT': 12, 'CHIP': 10, 'APT': 9, 'ICP': 3, 'ZEN': 10, 'WLD': 10, 'SEI': 10, 'NEAR': 6, 'JUP': 6, 'CRV': 11, 'AERO': 9, 'CELO': 6, 'IOTA': 6, 'GMX': 12, 'CASHCAT': 4, 'FIL': 10, 'ENA': 4, 'DOGE': 6, 'CC': 8, 'HYPER': 10, 'BANANA': 4, 'POPCAT': 4, 'WLFI': 4, 'ENS': 11, 'POLYX': 3, 'WCT': 2, 'ANIME': 7, 'BCH': 3, 'SAND': 1, 'IO': 2, 'AR': 1, 'AIXBT': 2, 'SPX': 3, 'TURBO': 2, 'BSV': 1, 'YGG': 2}
+deduped (gate|token|direction|UTC-day, keep earliest): 13426
+
+===== AGGREGATE (raw event basis, fwd4h in blocked direction) =====
+SHORT  n_raw= 32648 mean=+0.0575% t_naive=+4.60 t_tokCR=+2.00 t_dayCR=+0.55 sum=+1876.5 $-eq=+251.64
+LONG   n_raw= 20314 mean=-0.1952% t_naive=-11.77 t_tokCR=-4.55 t_dayCR=-1.53 sum=-3965.2 $-eq=-531.74
+===== AGGREGATE (deduped gate|token|dir|day basis) =====
+SHORT  n_ded=  6922 mean=+0.0219% t_naive=+0.80 t_tokCR=+0.59 t_dayCR=+0.20 sum=+151.6 $-eq=+20.33
+LONG   n_ded=  6504 mean=-0.1854% t_naive=-6.50 t_tokCR=-5.16 t_dayCR=-1.32 sum=-1205.7 $-eq=-161.68
+
+===== PER-GATE =====
+gate                       dir     nraw  nded  meanDed%   tDed   tTok   tDay    $eqRaw   $eqDed   posD    t10%    t30%  LOOmin LOOneg
+-------------------------------------------------------------------------------------------------------------------------------------
+BB-SQUEEZE-EXTREME         LONG      15    12   -0.6295  -0.95  -0.94  -0.76     -1.24    -1.01 4/8     -0.399  +0.044  -1.149      8
+BTC-CHOP-GATE              SHORT    206   108   -0.1959  -1.13  -1.15  -0.77     -3.33    -2.84 13/24    -0.197  -0.132  -0.314     24
+BTC-CHOP-GATE              LONG     617   276   -0.2690  -1.82  -1.70  -1.30    -18.75    -9.96 13/26    -0.303  -0.342  -0.395     26
+CHOP                       SHORT    141    97   +0.2146  +1.10  +1.03  +1.17     +3.20    +2.79 13/21    +0.185  +0.157  +0.093      0
+CHOP                       LONG      58    36   -0.5478  -3.05  -2.91  -2.99     -3.64    -2.64 3/16    -0.649  -0.752  -0.612     16
+CONFLUENCE-GATE-BLOCK      SHORT   8747   962   +0.0288  +0.41  +0.41  +0.18    +25.90    +3.72 15/27    +0.031  +0.009  -0.042      4
+CONFLUENCE-GATE-BLOCK      LONG    2364   714   -0.2000  -2.39  -2.63  -1.44    -56.45   -19.15 12/27    -0.225  -0.305  -0.261     27
+CONTINUUM-BLOCK            LONG    4022  1061   -0.1838  -2.92  -2.83  -0.88   -135.32   -26.15 9/22    -0.196  -0.215  -0.293     22
+CONTINUUM-BULL             SHORT   3970   710   -0.0542  -0.72  -0.75  -0.39    -23.99    -5.16 11/21    -0.068  +0.005  -0.109     19
+CTX-GATE                   SHORT    608   362   +0.1479  +1.10  +0.86  +0.75    +16.40    +7.18 13/26    +0.155  +0.091  +0.013      0
+CTX-GATE                   LONG    1253   589   -0.2868  -3.08  -3.37  -1.79    -79.26   -22.66 9/26    -0.328  -0.300  -0.371     26
+EXEC-BLOCK                 SHORT     75    21   +0.5379  +1.35  +1.27  +1.29     +1.90    +1.51 9/13    +0.630  +0.647  +0.145      0
+EXEC-BLOCK                 LONG     171    77   -0.5709  -2.86  -2.89  -2.28    -11.40    -5.89 4/17    -0.675  -0.538  -0.699     17
+EXEC-RSI-CEILING           SHORT      4     4   +1.6899  +1.31  +1.31  +1.31     +0.91    +0.91 2/4     +1.483  +0.960  +0.550      0
+EXEC-RSI-CEILING           LONG      13    13   -0.8128  -2.96  -2.82  -4.43     -1.42    -1.42 1/7     -1.012  -1.271  -0.956      7
+EXEC-RSI-DETECT-FLOOR      SHORT    154   137   +0.0579  +0.37  +0.38  +0.39     +1.42    +1.06 8/19    +0.115  -0.016  -0.033      2
+EXEC-RSI-FLOOR             SHORT      4     3   +1.6350  +0.84    n/a    n/a     +0.53    +0.66 1/3     +1.402  +0.159  -0.298      1
+EXEC-RSI-FLOOR             LONG       2     2   -1.1306  -1.04    n/a    n/a     -0.30    -0.30 0/2     -1.089  -0.947  -2.221      2
+EXEC-RSI-HARD-FLOOR        SHORT    131   102   +0.0878  +0.40  +0.45  +0.28     +5.48    +1.20 9/24    +0.050  +0.027  -0.207      1
+HALL-SHAME                 SHORT    305    39   -0.0055  -0.01  -0.02  -0.01    -11.02    -0.03 3/7     +0.063  -0.097  -0.749      3
+HALL-SHAME                 LONG     392    58   -0.2072  -0.82  -1.51  -0.98    +20.67    -1.61 3/7     -0.241  -0.238  -0.326      7
+HARD-BLOCK                 SHORT     26    12   +0.4686  +0.63  +0.55  +0.63     +3.81    +0.75 2/5     +0.673  +0.828  -0.152      1
+HARD-BLOCK                 LONG      16    13   -0.2832  -0.45  -0.74  -0.33     -0.48    -0.49 3/8     +0.008  -0.035  -1.024      7
+HOT-SET                    SHORT    158   112   +0.1364  +0.68  +0.75  +0.54     +3.37    +2.05 11/24    +0.210  +0.213  -0.066      1
+HOT-SET                    LONG      76    41   -0.4687  -0.99  -1.20  -0.88     -1.21    -2.58 7/19    -0.449  -0.262  -0.687     19
+LONG-HIGH-70               LONG     229   115   -0.1516  -0.81  -0.83  -0.89     -5.38    -2.34 3/9     -0.137  -0.240  -0.285      9
+LONG-MIDBAND               LONG     245    97   -0.3006  -1.69  -1.68  -1.82     -5.58    -3.91 4/10    -0.229  -0.237  -0.389     10
+LONG-NEUTRAL               LONG    3249   950   -0.3240  -4.66  -5.44  -1.71   -163.57   -41.28 11/27    -0.323  -0.316  -0.380     27
+LONG-NEUTRAL-CHOP          LONG    2170   674   -0.1423  -1.67  -1.73  -0.55    -14.55   -12.86 6/20    -0.131  -0.105  -0.308     20
+LONG-RSI-BLOCK             LONG     290   145   -0.3361  -1.59  -1.61  -0.85    -10.73    -6.54 5/10    -0.445  -0.502  -0.489      9
+LONG-RSI-CEILING           LONG     564   201   -0.0880  -0.51  -0.46  -0.24    -15.38    -2.37 3/10    -0.135  -0.101  -0.450      9
+LONG-RSI-FLOOR             LONG      13     9   +0.5586  +0.65  +0.62  +0.59     +1.04    +0.67 4/6     +0.518  +0.235  +0.006      0
+MAXXED-BLOCK               SHORT     85    12   +2.1123  +1.72  +1.27  +2.46    +32.82    +3.40 7/9     +1.006  +1.500  +1.713      0
+MAXXED-BLOCK               LONG      78    13   -2.4965  -1.75  -2.84  -2.04    -44.92    -4.35 5/10    -2.766  -3.476  -2.987     10
+OVERSOLD-SHORT             SHORT    697   290   -0.0754  -0.59  -0.59  -0.28     -6.63    -2.93 4/10    -0.081  -0.064  -0.283      9
+PENALTY-BLOCK              SHORT     49    30   -1.9397  -2.70  -2.53  -5.63     -9.12    -7.80 0/3     -1.874  -1.689  -2.546      3
+PENALTY-BLOCK              LONG     233   100   +0.3288  +1.69  +1.73  +0.76    +17.74    +4.41 3/4     +0.302  +0.387  -0.027      1
+PRESERVE-SPIKE-BLOCK       SHORT    238   187   +0.1226  +0.66  +0.74  +0.40     +4.71    +3.07 16/25    +0.096  +0.001  -0.118      1
+PUMP-CHAIN-HIGH            LONG     808   198   +0.1310  +1.08  +1.22  +0.64     +2.33    +3.48 5/11    +0.153  +0.247  +0.029      0
+PUMP-CHAIN-RISE1M-SHORT    SHORT     38    25   +0.2734  +0.96  +0.95  +0.80     +0.83    +0.92 5/9     +0.398  +0.485  +0.057      0
+PUMP-CHAIN-RSI-MAX         LONG    2178   534   +0.0616  +0.56  +0.59  +0.28    +10.43    +4.41 9/26    +0.045  +0.131  -0.074      2
+PUMP-CHAIN-RSI-MIN         LONG     111    57   -0.0122  -0.04  -0.04  -0.08     +2.40    -0.09 7/15    -0.051  -0.214  -0.113      8
+PUMP-CHAIN-SHORT-HIGH      SHORT   3195   532   +0.0181  +0.18  +0.21  +0.09    +72.71    +1.29 13/24    +0.014  -0.007  -0.064      7
+PUMP-CHAIN-SHORT-RSI-MIN   SHORT    774   142   +0.0900  +0.48  +0.56  +0.41     +3.50    +1.71 3/6     +0.104  +0.152  -0.095      1
+PUMP-CHAIN-VEL             LONG      88    46   +0.3422  +0.78  +0.91  +0.99     -0.79    +2.11 6/10    +0.334  +0.524  +0.034      0
+PUMP-CHAIN-VEL-SHORT       SHORT     45    24   -0.7006  -0.80  -0.96  -0.73     -4.26    -2.25 4/8     -0.523  -0.694  -1.288      7
+SHORT-BB-DEAD-ZONE         SHORT     98    42   +0.2311  +0.72  +0.70  +0.65     +1.09    +1.30 5/10    +0.360  +0.342  -0.051      1
+SHORT-BB-DEAD-ZONE2        SHORT    263   123   -0.0731  -0.31  -0.34  -0.25     -1.41    -1.21 4/10    -0.038  -0.014  -0.311      7
+SHORT-CONTINUUM            SHORT   4467   986   +0.0541  +0.79  +0.83  +0.31    +23.31    +7.16 12/24    +0.047  +0.109  -0.010      1
+SHORT-MIDBAND              SHORT     57    50   +0.1519  +0.57  +0.65  +0.39     +0.66    +1.02 9/14    +0.076  +0.125  -0.113      1
+SHORT-NEUTRAL              SHORT   3310   673   +0.1467  +1.95  +2.07  +1.33    +42.54   +13.24 16/26    +0.135  +0.153  +0.083      0
+SHORT-REGIME-GATE          SHORT    293   100   +0.1139  +0.61  +0.60  +0.49     +8.43    +1.53 11/25    +0.087  +0.200  -0.027      1
+SHORT-RSI-CEILING          SHORT    123    63   +0.3230  +1.58  +1.51  +1.76     +3.43    +2.73 6/10    +0.242  +0.103  +0.245      0
+SHORT-RSI-FLOOR            SHORT     35    17   -0.7604  -1.40  -1.40    n/a     -2.56    -1.73 1/2     -0.807  -1.078  -0.810      1
+SHORT-RSI-HARD-FLOOR       SHORT   1797   472   -0.2129  -2.11  -2.01  -0.89    -39.77   -13.47 6/10    -0.235  -0.277  -0.284      9
+SLOPE-FILTER               SHORT    382   209   -0.1160  -0.48  -0.66  -0.34     +2.27    -3.25 11/20    -0.067  -0.087  -0.234     19
+SPIKE-FILTER               SHORT    165    96   -0.1278  -0.43  -0.54  -0.33     -7.96    -1.65 4/10    -0.185  -0.116  -0.415      9
+SPIKE-FILTER               LONG     297   123   -0.5553  -2.07  -1.86  -1.43    -20.65    -9.16 2/9     -0.539  -0.325  -0.963      9
+V2-RECHECK                 LONG      10     9   -0.6635  -1.56  -1.56  -1.36     -0.75    -0.80 2/7     -0.504  -0.639  -0.987      7
+VEL-FILTER                 SHORT     12     8   -0.1586  -0.16  -0.18  -0.20     -0.38    -0.17 3/6     +0.034  +0.016  -0.761      3
+VOL-GATE-BYPASS            SHORT   1996   172   +0.1572  +0.76  +0.89  +0.42   +102.87    +3.62 8/14    +0.267  +0.347  -0.116      1
+VOL-GATE-BYPASS            LONG     735   333   +0.0510  +0.29  +0.29  +0.26     +9.32    +2.28 10/20    +0.105  +0.052  -0.026      5
+VOLBREAK-HIGH              LONG      17     8   -1.3762  -3.05  -3.05    n/a     -3.91    -1.48 0/1     -1.406  -1.202    +nan      0
+
+===== ATTRIBUTION (SHORT, raw-event $-eq basis) =====
+  VOL-GATE-BYPASS            n=  1996 $-eq=  +102.87  share= +40.9%  cum=  +102.87
+  PUMP-CHAIN-SHORT-HIGH      n=  3195 $-eq=   +72.71  share= +28.9%  cum=  +175.58
+  SHORT-NEUTRAL              n=  3310 $-eq=   +42.54  share= +16.9%  cum=  +218.12
+  MAXXED-BLOCK               n=    85 $-eq=   +32.82  share= +13.0%  cum=  +250.94
+  CONFLUENCE-GATE-BLOCK      n=  8747 $-eq=   +25.90  share= +10.3%  cum=  +276.84
+  SHORT-CONTINUUM            n=  4467 $-eq=   +23.31  share=  +9.3%  cum=  +300.15
+  CTX-GATE                   n=   608 $-eq=   +16.40  share=  +6.5%  cum=  +316.55
+  SHORT-REGIME-GATE          n=   293 $-eq=    +8.43  share=  +3.3%  cum=  +324.98
+  EXEC-RSI-HARD-FLOOR        n=   131 $-eq=    +5.48  share=  +2.2%  cum=  +330.46
+  PRESERVE-SPIKE-BLOCK       n=   238 $-eq=    +4.71  share=  +1.9%  cum=  +335.16
+  HARD-BLOCK                 n=    26 $-eq=    +3.81  share=  +1.5%  cum=  +338.97
+  PUMP-CHAIN-SHORT-RSI-MIN   n=   774 $-eq=    +3.50  share=  +1.4%  cum=  +342.47
+  SHORT-RSI-CEILING          n=   123 $-eq=    +3.43  share=  +1.4%  cum=  +345.90
+  HOT-SET                    n=   158 $-eq=    +3.37  share=  +1.3%  cum=  +349.27
+  CHOP                       n=   141 $-eq=    +3.20  share=  +1.3%  cum=  +352.47
+  SUM all SHORT gates               $-eq=  +251.64
+
+===== TOP-3 by $-eq: full LOO day profile =====
+  VOL-GATE-BYPASS: 14 days
+     2026-10-16 n=  15 daymean= +1.170% LOO_mean= +0.060%
+     2026-10-17 n=   6 daymean= -1.145% LOO_mean= +0.204%
+     2026-10-18 n=  10 daymean= +0.158% LOO_mean= +0.157%
+     2026-10-19 n=  11 daymean= +0.454% LOO_mean= +0.137%
+     2026-10-20 n=  16 daymean= -2.041% LOO_mean= +0.383%
+     2026-10-21 n=  15 daymean= -0.084% LOO_mean= +0.180%
+     2026-10-22 n=  13 daymean= +3.502% LOO_mean= -0.116%
+     2026-10-23 n=  11 daymean= -1.151% LOO_mean= +0.247%
+     2026-10-24 n=  14 daymean= -0.198% LOO_mean= +0.189%
+     2026-10-25 n=   9 daymean= +0.348% LOO_mean= +0.147%
+     2026-10-26 n=  13 daymean= +0.520% LOO_mean= +0.127%
+     2026-10-27 n=  12 daymean= +0.010% LOO_mean= +0.168%
+     2026-10-28 n=  12 daymean= -0.321% LOO_mean= +0.193%
+     2026-10-29 n=  15 daymean= +0.495% LOO_mean= +0.125%
+  PUMP-CHAIN-SHORT-HIGH: 24 days
+     2026-10-07 n=  29 daymean= -0.243% LOO_mean= +0.033%
+     2026-10-08 n=  30 daymean= +0.934% LOO_mean= -0.037%
+     2026-10-09 n=  20 daymean= -0.890% LOO_mean= +0.054%
+     2026-10-10 n=  20 daymean= -3.341% LOO_mean= +0.149%
+     2026-10-12 n=  11 daymean= +0.707% LOO_mean= +0.004%
+     2026-10-13 n=  17 daymean= -0.459% LOO_mean= +0.034%
+     2026-10-14 n=  30 daymean= +0.943% LOO_mean= -0.037%
+     2026-10-15 n=  21 daymean= +1.058% LOO_mean= -0.025%
+     2026-10-16 n=  24 daymean= +0.042% LOO_mean= +0.017%
+     2026-10-17 n=  14 daymean= -1.105% LOO_mean= +0.048%
+     2026-10-18 n=  21 daymean= +0.456% LOO_mean= +0.000%
+     2026-10-19 n=  19 daymean= +0.744% LOO_mean= -0.009%
+     2026-10-20 n=  28 daymean= -0.608% LOO_mean= +0.053%
+     2026-10-21 n=  23 daymean= +0.143% LOO_mean= +0.012%
+     2026-10-22 n=  26 daymean= +1.619% LOO_mean= -0.064%
+     2026-10-23 n=  24 daymean= -0.469% LOO_mean= +0.041%
+     2026-10-24 n=  23 daymean= +0.318% LOO_mean= +0.005%
+     2026-10-25 n=  13 daymean= +0.761% LOO_mean= -0.000%
+     2026-10-26 n=  20 daymean= -0.700% LOO_mean= +0.046%
+     2026-10-27 n=  20 daymean= -0.054% LOO_mean= +0.021%
+     2026-10-28 n=  18 daymean= +0.163% LOO_mean= +0.013%
+     2026-10-29 n=  30 daymean= -0.213% LOO_mean= +0.032%
+     2026-10-30 n=  25 daymean= -0.632% LOO_mean= +0.050%
+     2026-10-31 n=  26 daymean= +0.523% LOO_mean= -0.008%
+  SHORT-NEUTRAL: 26 days
+     2026-10-04 n=  24 daymean= -0.659% LOO_mean= +0.177%
+     2026-10-05 n=  26 daymean= +0.257% LOO_mean= +0.142%
+     2026-10-06 n=  35 daymean= +0.171% LOO_mean= +0.145%
+     2026-10-07 n=  14 daymean= +0.750% LOO_mean= +0.134%
+     2026-10-08 n=  49 daymean= +0.415% LOO_mean= +0.126%
+     2026-10-09 n=  37 daymean= -0.562% LOO_mean= +0.188%
+     2026-10-10 n=  23 daymean= -0.279% LOO_mean= +0.162%
+     2026-10-13 n=  26 daymean= -0.795% LOO_mean= +0.185%
+     2026-10-14 n=  29 daymean= +0.853% LOO_mean= +0.115%
+     2026-10-15 n=   8 daymean= -0.644% LOO_mean= +0.156%
+     2026-10-16 n=  23 daymean= -0.020% LOO_mean= +0.153%
+     2026-10-17 n=  12 daymean= +0.434% LOO_mean= +0.141%
+     2026-10-18 n=  22 daymean= +2.043% LOO_mean= +0.083%
+     2026-10-19 n=  17 daymean= +0.210% LOO_mean= +0.145%
+     2026-10-20 n=  34 daymean= -0.225% LOO_mean= +0.166%
+     2026-10-21 n=  12 daymean= +0.177% LOO_mean= +0.146%
+     2026-10-22 n=   3 daymean= +0.681% LOO_mean= +0.144%
+     2026-10-23 n=  19 daymean= -0.253% LOO_mean= +0.158%
+     2026-10-24 n=  19 daymean= +0.528% LOO_mean= +0.136%
+     2026-10-25 n=  50 daymean= +0.080% LOO_mean= +0.152%
+     2026-10-26 n=  43 daymean= +0.078% LOO_mean= +0.151%
+     2026-10-27 n=  48 daymean= +0.515% LOO_mean= +0.118%
+     2026-10-28 n=  37 daymean= +0.346% LOO_mean= +0.135%
+     2026-10-29 n=  21 daymean= +0.684% LOO_mean= +0.129%
+     2026-10-30 n=  22 daymean= -0.547% LOO_mean= +0.170%
+     2026-10-31 n=  20 daymean= -0.148% LOO_mean= +0.156%

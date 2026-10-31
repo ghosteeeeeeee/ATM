@@ -55,8 +55,14 @@ After making changes, report:
 
 ## Step 0: Read Team Updates (MANDATORY)
 
+**FIRST: `cat automation/ceo/control_tower.md`** — the centralized view of every
+shadow gate, running trial, and decision deadline. Act on 🔴 OVERDUE and 🟠 DUE
+≤24h items before anything else (their registry defaults fire silently otherwise).
+The file is regenerated daily at 08:15 — never hand-edit it.
+
 Before anything else, read what the team did:
 ```bash
+cat automation/ceo/control_tower.md  # shadows + trials + calendar (READ FIRST)
 head -20 automation/ceo/ceo_kanban.md  # TEAM UPDATES section
 cat automation/error_alerts.md | tail -20  # Any alerts
 ```
