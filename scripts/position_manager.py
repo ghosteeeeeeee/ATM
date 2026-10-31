@@ -4119,8 +4119,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         # always empty for PROFIT_MONSTER_BYPASS_SIGNALS.
                         if UGB_PT_ENFORCE:
                             from profit_monster import _load_trail_state
-                            from hermes_constants import PROFIT_MONSTER_BYPASS_SIGNALS
-                            _is_bypassed = any(_s in _pos_signal for _s in PROFIT_MONSTER_BYPASS_SIGNALS)
+                            from hermes_constants import PROFIT_MONSTER_BYPASS_SIGNALS, PM_TRAIL_BYPASS_SIGNALS
+                            # NULL signal: PM's SQL NOT LIKE excludes NULLs → trail
+                            # never arms → same bug class. Treat empty as bypassed.
+                            # PM_TRAIL_BYPASS signals: run_trail actively deletes them
+                            # from trail state → always empty → same bug class.
+                            _is_bypassed = (not _pos_signal) or \
+                                any(_s in _pos_signal for _s in PROFIT_MONSTER_BYPASS_SIGNALS) or \
+                                any(_s in _pos_signal for _s in PM_TRAIL_BYPASS_SIGNALS)
                             if not _is_bypassed and str(trade_id) not in _load_trail_state():
                                 close_paper_position(trade_id, "ugb_pt",
                                     exit_detail=f"ugb_pt fav={_ugb_fav:+.2f}%,pnl={live_pnl:+.2f}%,trail=FALSE,peak={UGB_PT_DISTANCE_PCT:.2f}%")
