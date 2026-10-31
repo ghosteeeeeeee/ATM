@@ -3673,6 +3673,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             close_paper_position(trade_id, "cut_loser", exit_detail=f"cut_loser_pct={live_pnl:+.2f}%")
             closed_count += 1
             log(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
+            # bug_hunter 2026-10-31: every other close site in this loop
+            # continues. Falling through let stale/time/peak/UGB-PT/MFE-EXIT
+            # re-close the SAME trade in this iteration: the row update dedups,
+            # but close_paper_position runs set_loss_cooldown() BEFORE the
+            # status-guarded UPDATE -> double streak increments (2h->4h->8h
+            # escalates at 2x), inflated closed_count, and bogus would-fire
+            # lines in the shadow eval sets (DISTINCT-id based).
+            continue
 
         # ── 6. SPEED: Stale winner/loser exit ─────────────────────────────────
         # SPEED FEATURE: closes positions that are in profit but flat (stale winner)
