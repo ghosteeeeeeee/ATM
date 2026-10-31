@@ -25,7 +25,12 @@ import time
 from paths import HERMES_DATA
 
 TRUST_FILE = os.path.join(HERMES_DATA, 'copy_trust.json')
-_TRUST_STALE_SEC = 6 * 3600          # older than this → ignore tiers (T2 default)
+_TRUST_STALE_SEC = 20 * 3600         # older than this → ignore tiers (T2 default).
+                                      # FIX: was 6h vs a once-daily 04:30 refresh — every day
+                                      # from ~10:30 the whole board silently fell back to T2
+                                      # (observed: T1 wallet 0x3ff54fd2's 09:38 signal stamped
+                                      # T1, its 11:28 signal T2). Refresh is now 4×/day and the
+                                      # window tolerates one missed cycle.
 
 _cache = {'ts': 0.0, 'map': None}
 
