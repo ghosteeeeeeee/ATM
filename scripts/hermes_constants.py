@@ -4141,6 +4141,25 @@ JUP_YOLO_CLUSTER_MAX_BONUS = 15        # cap (matches HL_COPY cap — prevents o
 JUP_YOLO_MAX_OPEN_SHORTS = 2      # concurrent open jup_yolo SHORT trades allowed
 JUP_YOLO_SHORT_LIFT_CLOSED = 20   # lift the cap after this many SHORTs closed
 
+# ── JUP YOLO exit shadows (CEO verdict 2026-10-31, mirror-exit-asymmetry) ───
+# Verdict: #1 ship-now REJECTED (counterfactual: -0.50% HML saves ~+$0.69 but
+# preempts 5 winners ≈ -$0.79 → net ~-$0.10 against the CURRENT baseline —
+# CUT_LOSER reverted -6.00→-4.00 same day, HML already at -0.80% @lev5, so
+# the loss side was NOT left unaddressed). SHADOW ONLY: log would-fire for
+# source=jup_yolo*, pre-registered eval at JUP_YOLO_SHADOW_EVAL_N=40 closed
+# trades, enforce ONLY if counterfactual net-positive vs -4.00 baseline.
+# Sample note: -0.65 looked optimal at n=42 (+~$0.43) but ±2 dip events flip
+# the sign — not shippable without the eval.
+JUP_YOLO_HML_SHADOW_THRESHOLDS = (-0.65, -0.50)  # price-% would-fire marks
+# #2 APPROVED (automatic-implementation shadow): trail arm/distance scaled to
+# ATR — counters the fixed-arm finding (0.40% arm vs 1.24% HYPE ATR; 0.20%
+# distance = 0.16×ATR noise-kicked winners at avg +0.48%). PM_TRAIL_ACTIVATE/
+# DISTANCE are CEO_PROTECTED_FLAGS ('DO NOT CHANGE') — these entries are
+# shadow-only carve-out data, NOT a trail-param change.
+JUP_YOLO_TRAIL_SHADOW_ARM_ATR_MULT = 1.0  # counterfactual arm = 1.0×ATR
+JUP_YOLO_TRAIL_SHADOW_DIST_ATR_MULT = 1.0  # counterfactual distance = 1.0×ATR
+JUP_YOLO_SHADOW_EVAL_N = 40                # pre-registered eval window
+
 # ── HL Copy Trader — giants-light expansion (T directive 2026-10-31) ─────────
 # Same patterns as the JUP mirror: hl_copy signals were 30/30 EXPIRED in 48h
 # (19× compaction_stale churn from per-batch-only dedupe re-emitting the SAME

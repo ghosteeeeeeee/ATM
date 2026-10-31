@@ -75,8 +75,20 @@ def log_fills_batch(fills: list):
     
     conn = get_db()
     try:
+        # FIX (stat-pull + shadow engine): source had 63,189 exact-duplicate
+        # rows (10.6% of trader_fills) — INSERT OR IGNORE was a no-op against
+        # an autoincrement PK, and the API fills list itself can contain
+        # repeated entries. Dedupe in-flight AND enforce at the table level
+        # (unique index, created in _dedupe_trader_fills migration).
+        _seen_batch = set()
         for fill in fills:
             try:
+                _bk = (fill.get('wallet'), fill.get('coin'), fill.get('side'),
+                       fill.get('px'), fill.get('sz'), fill.get('time'),
+                       fill.get('closed_pnl'), fill.get('is_open'))
+                if _bk in _seen_batch:
+                    continue
+                _seen_batch.add(_bk)
                 conn.execute("""
                     INSERT OR IGNORE INTO trader_fills 
                     (wallet, coin, side, px, sz, time, closed_pnl, is_open)
@@ -96,6 +108,49 @@ def log_fills_batch(fills: list):
         conn.commit()
     finally:
         conn.close()
+
+_DEDUPE_DONE = {'state': 'no'}
+
+
+def _dedupe_trader_fills() -> None:
+    """One-time-per-process migration: purge exact-duplicate rows, then a
+    unique index so INSERT OR IGNORE actually ignores future duplicates
+    (key includes closed_pnl — exact-row identity, cannot collide with a
+    genuinely distinct fill)."""
+    if _DEDUPE_DONE['state'] != 'no':
+        return
+    _DEDUPE_DONE['state'] = 'yes'
+    conn = None
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("""
+            DELETE FROM trader_fills WHERE id NOT IN (
+                SELECT MIN(id) FROM trader_fills
+                GROUP BY wallet, coin, side, px, sz, time, closed_pnl, is_open
+            )
+        """)
+        removed = cur.rowcount if cur.rowcount and cur.rowcount > 0 else 0
+        cur.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS ux_trader_fills_logical
+            ON trader_fills (wallet, coin, side, px, sz, time, closed_pnl, is_open)
+        """)
+        conn.commit()
+        if removed:
+            print(f"[hl_fill] deduped {removed} duplicate fill rows + unique index")
+    except Exception as e:
+        print(f"[hl_fill] dedupe migration failed (will retry next process): {e}")
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+    finally:
+        if conn is not None:
+            conn.close()
+
+
+_dedupe_trader_fills()
+
 
 def update_positions(wallet: str):
     """Update current positions for a wallet."""

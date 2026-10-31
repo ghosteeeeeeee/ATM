@@ -1769,9 +1769,16 @@ def execute_safe_actions(steers, watchdog_mode):
                                             '_signal_metadata': _row_ms[1]}):
                                     _skip_xmirror = True
                             except Exception:
-                                pass
+                                # can't verify tier → don't act on HL (fail-closed)
+                                _skip_xmirror = True
+                        else:
+                            # no row → can't rule out an exact-mirror trade
+                            _skip_xmirror = True
                 except Exception:
-                    pass
+                    # DB/verify failure: fail-CLOSED — acting blind with HL
+                    # stops is worse than skipping one adjustment (bug_hunter
+                    # round-3 LOW: old fail-open could stop a mirror trade)
+                    _skip_xmirror = True
             if _skip_xmirror:
                 log(f"AUTO-EXEC: SKIP {symbol} stop move — T1 exact mirror "
                     f"(pro's exit governs, catastrophic floor only)", "INFO")

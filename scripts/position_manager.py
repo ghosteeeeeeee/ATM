@@ -3852,6 +3852,60 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             if _hml_vol_floor < HARD_MAX_LOSS_PCT:
                 HARD_MAX_LOSS_PCT = _hml_vol_floor
         # ponytail: self-check — lev5 CUT_LOSER -0.30 → D3 floor -0.60; EXTREME ATR 1.5 → -0.75; NORMAL ATR 0.3 → -0.60
+        # JUP HML shadow (CEO verdict 2026-10-31 #1: SHADOW ONLY, ship-now
+        # rejected). Would-fire marks for mirror trades at -0.65/-0.50 price
+        # against the CURRENT -4.00 CUT_LOSER baseline. Eval: DISTINCT id on
+        # `[JUP-SHADOW-HML]` lines (fresh process per pipeline minute logs
+        # every poll below threshold — same basis as UGB-BE's 504 lines).
+        try:
+            if 'jup_yolo' in (_pos_signal or '').lower():
+                from hermes_constants import JUP_YOLO_HML_SHADOW_THRESHOLDS as _jhs_ts
+                _jhs_fired = ' '.join(
+                    f"{abs(t):.2f}={'Y' if live_pnl <= t else 'n'}" for t in _jhs_ts)
+                log(f"  [JUP-SHADOW-HML] id={trade_id} {token} {direction} "
+                    f"live={live_pnl:+.3f}% act_thresh={HARD_MAX_LOSS_PCT:+.2f}% "
+                    f"would={_jhs_fired}")
+        except Exception:
+            pass
+
+        # JUP trail shadow (CEO verdict 2026-10-31 #2: APPROVED via
+        # automatic-implementation — ship OFF). Counterfactual: arm at
+        # JUP_YOLO_TRAIL_SHADOW_ARM_ATR_MULT×ATR instead of the fixed
+        # PM_TRAIL_ACTIVATE_PCT, plus a scaled-distance mark. PM_TRAIL_* are
+        # CEO_PROTECTED_FLAGS — this logs only; the fixed arm stays live.
+        # Eval: `[JUP-SHADOW-TRAIL]` DISTINCT id, take max fav; compare
+        # would-armed vs actual exits at JUP_YOLO_SHADOW_EVAL_N trades.
+        try:
+            if 'jup_yolo' in (_pos_signal or '').lower():
+                from hermes_constants import (JUP_YOLO_TRAIL_SHADOW_ARM_ATR_MULT as _jts_am,
+                                              JUP_YOLO_TRAIL_SHADOW_DIST_ATR_MULT as _jts_dm,
+                                              # PM_TRAIL_DISTANCE_PCT is NOT a module-level
+                                              # name here (only ACTIVATE is imported) — the
+                                              # bare except below hid a NameError and the
+                                              # whole shadow never logged.
+                                              PM_TRAIL_DISTANCE_PCT)
+                from volatility_gate_v2 import get_atr_pct as _jts_atr
+                _jts_a = _jts_atr(token)
+                _jts_en = float(pos.get('entry_price') or 0)
+                _jts_hi = float(pos.get('highest_price') or 0)
+                _jts_lo = float(pos.get('lowest_price') or 0)
+                if _jts_a and _jts_a > 0 and _jts_en > 0:
+                    if direction == 'LONG':
+                        _jts_fav = (_jts_hi / _jts_en - 1.0) * 100
+                    else:
+                        _jts_fav = (1.0 - _jts_lo / _jts_en) * 100 if _jts_lo else 0.0
+                    _jts_arm = float(_jts_a) * float(_jts_am)
+                    _jts_dist = float(_jts_a) * float(_jts_dm)
+                    log(f"  [JUP-SHADOW-TRAIL] id={trade_id} {token} {direction} "
+                        f"live={live_pnl:+.3f}% fav={_jts_fav:+.3f}% atr={_jts_a:.3f} "
+                        f"arm_act={PM_TRAIL_ACTIVATE_PCT * 100:.2f} arm_scd={_jts_arm:.3f} "
+                        f"armed_scd={'Y' if _jts_fav >= _jts_arm else 'n'} "
+                        f"dist_act={PM_TRAIL_DISTANCE_PCT * 100:.2f} dist_scd={_jts_dist:.3f}")
+        except Exception as _jts_e:
+            # NEVER bare-pass a shadow again — this exact swallow hid the
+            # NameError above for a full day-equivalent of passes.
+            log(f"  [JUP-SHADOW-TRAIL] error for {token}: {type(_jts_e).__name__}: {_jts_e}")
+
         if live_pnl <= HARD_MAX_LOSS_PCT:
             # P0: canonical label 'hard_max_loss' — pnl detail moved to exit_detail.
             # (Old f-string produced ~25 fragmented per-trade labels like

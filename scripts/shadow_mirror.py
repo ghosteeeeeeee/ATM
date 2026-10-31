@@ -83,7 +83,7 @@ def _mean_signed_slip_pct(wallets, window_start, conn_fills):
             return slips
         qmarks = ','.join('?' * len(cand))
         rows = conn_fills.execute(f"""
-            SELECT wallet, coin, side, px, time FROM trader_fills
+            SELECT wallet, coin, side, px, sz, time FROM trader_fills
             WHERE is_open = 1 AND time >= ? AND wallet IN ({qmarks})
             ORDER BY time DESC
         """, (window_start, *cand)).fetchall()
@@ -91,14 +91,17 @@ def _mean_signed_slip_pct(wallets, window_start, conn_fills):
         return slips
     per_wallet = defaultdict(list)
     _seen_entries = set()
-    for w, coin, side, px, t_ms in rows:
+    for w, coin, side, px, sz, t_ms in rows:
         if len(per_wallet[w]) >= SHADOW_ENTRY_MAX_FILLS:
             continue
         if _bad_coin(coin) or not px or not t_ms:
             continue
         # bug_hunter LOW: source has duplicate fill rows — dedupe here too or
         # the slip mean over-weights duplicated entries (compute_shadow does).
-        _ekey = (w, coin, side, px, t_ms)
+        # Key includes sz — aligned with compute_shadow's key (asymmetric keys
+        # could collapse a same-px same-ms different-size pair for slip but
+        # not for stats).
+        _ekey = (w, coin, side, px, sz, t_ms)
         if _ekey in _seen_entries:
             continue
         _seen_entries.add(_ekey)
