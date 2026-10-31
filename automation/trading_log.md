@@ -18773,3 +18773,28 @@ Final set: []
 **Open Questions:**
 - 24h GREEN '+$0.22' at only 46.8% WR — all profit from profit-monster-trail/ugb_pt; 7d '-$1.09' still deep red
 - pump-chain+ 0% WR (3T 24h) below n=3 last-hour kill trigger — watch next hour; if it fires again, run regime query
+
+## [2026-10-31 23:44] Hourly Analysis
+
+**Trades:** 2 closed (1 wins, 1 losses)
+**PnL:** $0.03 (WR: 44.7% 24h) | 24h 47T 21W '+$0.08' GREEN | 7d 222T 121W '-$1.06' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored SHORT profit-monster-trail '+$0.05'/+2.10%, ME bb-squeeze+ LONG trail_arm_timeout '-$0.02'/-0.59%
+- Kill check: no n>=3 0%-WR last hour (24h pump-chain+ 3T 0% '-$0.12' has 0 last-hour closes — regime query not triggered; bb-squeeze+ n=1)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/47 = 17.0% (<40%); dominant close = profit-monster-trail (15T '+$1.05'); worst avg = hard_max_loss (2T '-$0.140'), cut-loser-CL-T1 (2T '-$0.135')
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' 7 tokens but ex-GMX '-$0.11' vs GMX '+$0.54' = 125% of net — consistency fails); jup_yolo_mirrored 25T 56% net '+$0.02' < $0.05 bar; volume-buildup- 4T '-$0.14' fail net
+- Neg streak: 16h -0.14, 17h -0.04 then 18h +0.01, 19h +0.03 — never 3 consecutive red (22h +0.05, 23h -0.02)
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.158%, 19/21 <0.5% — entries fine; R:R still the drag (atr_sl_hit 8T '-$0.96' vs trail 15T '+$1.05')
+- 4 open (HYPE jup -0.39%, ETH jup -0.24%, SOL jup short +0.17%, ETC bb-bounce -0.05%)
+- Storm readiness: **window-min +0.00% / at-run +0.00%** — both within gate, no storm (rolling-60m, 13 samples, BTC 77532 flat)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '+$0.08' at only 44.7% WR — profits concentrated in profit-monster-trail/ugb_pt; 7d '-$1.06' still deep red
+- brain_auditor #211 fee model: gross '+$0.08'/24h ≈ '-$0.5x' net after ~$0.69/24h fees — all KPIs in this log are gross
+- pump-chain+ 14d 42T 40.5% '-$0.83' — kill bar (0% WR n>=3 last hour) not met, watching

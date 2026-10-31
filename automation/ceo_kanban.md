@@ -532,3 +532,4 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-10-29 17:45] auto_1hr: NO CONFIG CHANGE — 3T last hour 0W3L $-0.15 (COMP/WLFI bb-squeeze+ trail_arm_timeout, BLUR pump-chain+ ugb_pt) | 24h 26T 65.4% $-0.22 RED | 7d 144T 56.3% $-0.69 — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR) | atr_sl_hit 3/26=11.5% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 10T 80% +$0.11 10 tokens at 1.0 ceiling, hold | neg streak 1h only | frequency 3/hr | 0 open — why: no trigger met any action rule
 BY: auto_1hr
+- [2026-10-31 23:44 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L '+$0.03' | 24h 47T 44.7% '+$0.08' GREEN | 7d 222T '-$1.06' RED — size-reduce 1.0x | kill: none (no n>=3 0%-WR last hour) | atr_sl_hit 17.0% | inversion 0 | boost HOLD (pump-chain- GMX-masked, jup_yolo net<$0.05) | no storm (window-min +0.00% / at-run +0.00%) — why: no trigger met any action rule
