@@ -18389,3 +18389,25 @@ Final set: []
 **Open Questions:**
 - 3 consecutive red hours (03-05h) — regime HIGH not NEUTRAL blocks size cut; if regime flips NEUTRAL while red continues, revisit
 - 7d RED deepening '-$0.79' — R:R imbalance persists: 24h avg win +0.051 vs avg loss -0.125 per close
+
+## [2026-10-31 07:42] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.12 (WR: 61.3% 24h) | 24h 62T 38W '-$0.45' RED | 7d 194T 57.7% '-$0.68' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored LONG profit-monster-trail x2 '+$0.05'/+1.27%, '+$0.07'/+1.81% — clean trail wins
+- Kill check: no signal with n>=3 0%-WR last hour (2T only) — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 10/62 = 16.1% (<40%); dominant close = profit-monster-trail (36T '+$1.85'); worst avg = stale_exit (2T '-$0.39')
+- Boost: none qualify — jup_yolo_mirrored 34T 61.8% but '-$0.48' fail net bar; volume-buildup- 16T 68.8% but '-$0.25' fail net bar; pump-chain+ 4T <5 trades
+- Neg streak: 03h '-0.20', 04h '-0.01', 05h '-0.15' then 07h '+0.12' -> streak BROKEN; regime EXTREME not NEUTRAL anyway
+- Frequency 2/hr — under 20/hr
+- 3 open: HYPE jup_yolo LONG -0.40%, SOL jup_yolo LONG -0.36%, BTC continuum-osc+ LONG -0.26%
+- Storm readiness: **window-min +0.00% / at-run +0.04%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.45' persists despite 61.3% WR — R:R imbalance (avg win '+$0.057' vs avg loss '-$0.125', ~1:2.2). 7d '-$0.68' same shape. Structural, not fixable by kill/boost rules this hour
