@@ -2042,6 +2042,17 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
     # Deduplicate tokens — one ATR fetch per unique token
     tokens_seen: Dict[str, Optional[float]] = {}
     for pos in open_positions:
+        # T1 EXACT MIRROR: engine SL/TP must never be persisted for exact-
+        # mirror trades — hl-sync-guardian enforces trades.stop_loss/target
+        # against live HL positions (~60s), which would give T1 trades engine
+        # ATR exits within a minute (bug_hunter HIGH). Their exits are ours;
+        # guardian's breach check skips NULL/0 levels.
+        try:
+            from trust_tiers import is_exact_mirror_trade as _atr_ixm
+            if _atr_ixm(pos):
+                continue
+        except Exception:
+            pass  # fail-safe: old behavior
         token = str(pos.get('token', '')).upper()
         if token and token not in tokens_seen:
             atr = _force_fresh_atr(token)
@@ -2051,6 +2062,12 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
     momentum_by_token: Dict[str, Any] = {}
     speed_by_token: Dict[str, float] = {}
     for pos in open_positions:
+        try:
+            from trust_tiers import is_exact_mirror_trade as _atr_ixm2
+            if _atr_ixm2(pos):
+                continue
+        except Exception:
+            pass
         token = str(pos.get('token', '')).upper()
         if token and token not in momentum_by_token:
             # ponytail: signal_gen removed — momentum_stats defaults to None
@@ -2097,6 +2114,15 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         # (bug_hunter 2026-10-22: filter now uses is_managed_signal so the
         # ai-trader-auto tag is covered before auto_trader leaves shadow.)
         _sig_chk = str(pos.get('signal', '') or '')
+        # T1 EXACT MIRROR: same ownership rule as CEO manual trades — ATR level
+        # management is for engine-managed trades only; guardian enforces these
+        # levels against live HL positions (bug_hunter HIGH).
+        try:
+            from trust_tiers import is_exact_mirror_trade as _upd_ixm
+            if _upd_ixm(pos):
+                continue
+        except Exception:
+            pass  # fail-safe: old behavior
         import manual_exit_manager as _mxm_atr
         if _mxm_atr.is_managed_signal(_sig_chk):
             continue
@@ -2788,6 +2814,14 @@ def _apply_weather_vane_shield(positions: List[Dict]) -> int:
             pos_dir = str(pos.get('direction', '')).upper()
             if pos_dir != direction:
                 continue
+            # T1 EXACT MIRROR: shield must not force-close or retighten a
+            # trade whose pro is still holding (bug_hunter 2026-10-31).
+            try:
+                from trust_tiers import is_exact_mirror_trade as _wv_ixm
+                if _wv_ixm(pos):
+                    continue
+            except Exception:
+                pass  # fail-safe: old behavior
             if WEATHER_VANE_SHIELD_LOSING_ONLY:
                 pnl = float(pos.get('pnl_pct') or 0)
                 if pnl >= 0:
@@ -2960,6 +2994,23 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         if _exact_mirror:
             _xmf_lev = max(float(pos.get('leverage') or 1), 1.0)
             _xmf_pct = CUT_LOSER_PNL_HERMES / _xmf_lev
+            # Clear engine SL/TP ONCE: levels were set at open (decider ATR) —
+            # guardian enforces trades.stop_loss/target against live HL positions
+            # within ~60s (bug_hunter HIGH). NULL/0 → its breach checks skip.
+            if (pos.get('stop_loss') or pos.get('target')) and db_cur:
+                try:
+                    db_cur.execute(
+                        "UPDATE trades SET stop_loss = NULL, target = NULL "
+                        "WHERE id = %s AND status = 'open'", (trade_id,))
+                    try:
+                        pos['stop_loss'] = None
+                        pos['target'] = None
+                    except Exception:
+                        pass
+                    log(f"  [XMIRROR] {token} {direction}: engine SL/TP cleared — "
+                        f"exact mirror rides pro's exit (catastrophic floor only)")
+                except Exception as _xmf_e:
+                    log(f"  [XMIRROR] {token}: SL/TP clear failed — {_xmf_e}", "WARN")
             if live_pnl <= _xmf_pct:
                 close_paper_position(trade_id, 'hard_max_loss',
                     exit_detail=(f'exact-mirror catastrophic floor: '

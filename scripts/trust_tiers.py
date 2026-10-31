@@ -47,7 +47,12 @@ def _load_trust_map() -> dict:
             if now - float(data.get('updated') or 0) <= _TRUST_STALE_SEC:
                 wallets = data.get('wallets') or {}
                 if isinstance(wallets, dict):
-                    out = {str(w).lower(): str(v.get('tier') or 'T2')
+                    def _norm_tier(v):
+                        # bug_hunter LOW: uppercase + whitelist — a stray 't3'
+                        # would otherwise slip past both == 'T3' and == 'T1'
+                        t = str(v.get('tier') or 'T2').upper()
+                        return t if t in ('T1', 'T2', 'T3') else 'T2'
+                    out = {str(w).lower(): _norm_tier(v)
                            for w, v in wallets.items()
                            if isinstance(v, dict)}
     except (FileNotFoundError, json.JSONDecodeError, OSError, ValueError, TypeError, AttributeError, KeyError):

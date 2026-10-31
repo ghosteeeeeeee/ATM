@@ -625,6 +625,42 @@ def sync_trader_performance():
         to_update = [(r[0], r[1], r[2], r[3], r[4]) for r in all_closed
                      if r[0] in open_ids]
 
+        # Case 3 (bug_hunter MED, observed live: 69-day-old 'open' row 14143):
+        # perf rows whose brain trade no longer EXISTS at all are invisible to
+        # Case 1/2 (PG no longer returns them) — stuck 'open' forever, causing
+        # a PG connect + failed close_trade on every future full exit of that
+        # wallet+coin. Close them explicitly.
+        missing_ids = []
+        if open_ids:
+            try:
+                _pg2 = _pg.connect(**DB_CONFIG)
+                _pg2.autocommit = True
+                _cur2 = _pg2.cursor()
+                _cur2.execute("SELECT id FROM trades WHERE id = ANY(%s)",
+                              (sorted(open_ids),))
+                _exists = {r[0] for r in _cur2.fetchall()}
+                _cur2.close()
+                _pg2.close()
+                missing_ids = sorted(set(open_ids) - _exists)
+            except Exception as _me:
+                missing_ids = []
+                print(f"[sync_perf] Case3 existence check failed: {_me}")
+        if missing_ids:
+            _conn_m = get_db()
+            try:
+                for _tid in missing_ids:
+                    _conn_m.execute("""
+                        UPDATE trader_performance
+                        SET status='closed_breakeven',
+                            close_reason='trade_missing_sync',
+                            closed_at=?
+                        WHERE trade_id=? AND status='open'
+                    """, (int(time.time()), _tid))
+                _conn_m.commit()
+                print(f"[sync_perf] closed {len(missing_ids)} perf rows with missing brain trades")
+            finally:
+                _conn_m.close()
+
         if not orphans and not to_update:
             return 0
 

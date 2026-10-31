@@ -114,8 +114,13 @@ def _mean_signed_slip_pct(wallets, window_start, conn_fills):
                     if not row or not row[0]:
                         continue
                     slip_pct = (float(row[0]) - their_px) / their_px * 100.0
-                    # normalize to "worse for us" = positive
-                    if side == 'B':   # their short entry — us paying less is better
+                    # normalize to "worse for us" = positive.
+                    # FIX (bug_hunter): 'B' = LONG (hl_copy_signal: direction =
+                    # 'LONG' if side == 'B'). Raw is already worse-positive for
+                    # LONG (pay more when price rose by our +60s). The old flip
+                    # INVERTED longs and left shorts raw → sign cancellation on
+                    # mixed-side wallets (measured 19x under-penalty).
+                    if side != 'B':  # SHORT entry: selling later on a dip = worse
                         slip_pct = -slip_pct
                     vals.append(slip_pct)
                 except Exception:
@@ -230,6 +235,25 @@ def _assign_tiers(shadow: dict) -> None:
         else:
             s['tier'] = 'T3'
             s['bad_days'] = 0
+
+    # bug_hunter LOW: a prev-T1 wallet with ZERO fills in the window vanished
+    # from the new file → instant T2, bypassing the 3-day hysteresis (and up
+    # to 16 days early vs T1_MAX_STALE_DAYS=14). Carry absent prev entries
+    # forward through the same hysteresis rule so demotion stays consistent.
+    for w, p in prev.items():
+        if w in shadow['wallets'] or not isinstance(p, dict):
+            continue
+        prev_tier = str(p.get('tier') or 'T2').upper()
+        prev_bad = int(p.get('bad_days') or 0)
+        carried = dict(p)
+        if prev_tier == 'T1':
+            carried['bad_days'] = prev_bad + 1
+            carried['tier'] = 'T1' if carried['bad_days'] < T1_DEMOTE_BAD_DAYS else 'T2'
+        else:
+            carried['tier'] = prev_tier if prev_tier in ('T1', 'T2', 'T3') else 'T2'
+            carried['bad_days'] = prev_bad
+        carried['carried_no_fills'] = True
+        shadow['wallets'][w] = carried
 
 
 def _write_outputs(shadow: dict) -> None:

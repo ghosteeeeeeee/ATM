@@ -2395,7 +2395,8 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 pass
         c.execute('''
             SELECT id, source, signal_types, confidence,
-                   z_score, z_score_tier, rsi_14, macd_value, macd_signal, macd_hist
+                   z_score, z_score_tier, rsi_14, macd_value, macd_signal, macd_hist,
+                   signal_metadata
             FROM signals
             WHERE token=? AND direction=? AND executed=0 AND decision='PENDING'
               AND created_at > datetime('now', '-5 minutes')
@@ -2407,6 +2408,22 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             existing_z = existing[4]; existing_z_tier = existing[5]
             existing_rsi = existing[6]; existing_macd = existing[7]
             existing_sig = existing[8]; existing_hist = existing[9]
+            _existing_meta_raw = existing[10] if len(existing) > 10 else None
+            # FIX (bug_hunter 2026-10-31): merge old ∪ new metadata — the old
+            # UPDATE overwrote with ONLY the newest signal's metadata, silently
+            # killing trust_tier (exact-mirror guard) and trader_wallet on
+            # cross-source merges (live evidence: signal #1698171
+            # 'hl_copy_trader,jup_yolo_mirrored' had trader_wallet=None).
+            _old_meta = {}
+            if isinstance(_existing_meta_raw, dict):
+                _old_meta = _existing_meta_raw
+            elif isinstance(_existing_meta_raw, str) and _existing_meta_raw:
+                try:
+                    _om = json.loads(_existing_meta_raw)
+                    if isinstance(_om, dict):
+                        _old_meta = _om
+                except (ValueError, TypeError):
+                    _old_meta = {}
 
             # Build merged sources
             old_srcs = set(existing_source.split(',')) if existing_source else set()
@@ -2486,7 +2503,11 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                   macd_value, macd_signal, macd_hist,
                   momentum_state,
                   merged_combo_key,
-                  json.dumps(metadata, default=str) if metadata else '{}',
+                  # old ∪ new: newest wins on shared keys, old fills gaps —
+                  # never drop trust_tier/trader_wallet from the surviving row
+                  json.dumps({**_old_meta,
+                              **(metadata if isinstance(metadata, dict) else {})},
+                             default=str) if (metadata or _old_meta) else '{}',
                   sig_id))
             conn.commit()
             conn.close()

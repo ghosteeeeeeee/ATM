@@ -499,6 +499,11 @@ def run_hl_copy_signal():
         if _tier == 'T3':
             print(f"[hl_signal] 🔒 T3 (shadow-only) {_wallet_for_tier[:10]}… "
                   f"{trade['coin']} {trade['side']} — no real signal")
+            # park the fill (bug_hunter LOW: without state, this print repeats
+            # every 30s until the fill ages out of freshness ~20 lines/fill)
+            if _fill_time > 0:
+                _emit_state[_state_key] = {'ft': _fill_time, 'cur': 0, 'att': 0}
+                _emit_state_save(_emit_state)
             continue
         if _tier == 'T1':
             signal['meta'] = dict(signal.get('meta') or {})

@@ -1816,14 +1816,23 @@ def sync_pnl_from_hype(prices):
 
         # Update each open trade with HL's PnL data
         cur.execute("""
-            SELECT id, token, amount_usdt, leverage, entry_price, direction
+            SELECT id, token, amount_usdt, leverage, entry_price, direction,
+                   signal, _signal_metadata
             FROM trades
             WHERE status='open' AND exchange='Hyperliquid'
         """)
 
         updated = 0
         for row in cur.fetchall():
-            trade_id, token, amount, lev, entry, direction = row
+            trade_id, token, amount, lev, entry, direction, _sig_str, _sig_meta = row
+            # T1 EXACT MIRROR: rotation + guardian cut-loser are OUR exits —
+            # the pro's exit (check_trader_exits) or the catastrophic floor
+            # govern exact-mirror trades (bug_hunter 2026-10-31).
+            try:
+                from trust_tiers import is_exact_mirror_trade as _g_ixm
+                _t1_xm = _g_ixm({'signal': _sig_str, '_signal_metadata': _sig_meta})
+            except Exception:
+                _t1_xm = False  # fail-safe: old behavior
             if token in hl_pos:
                 pos_data = hl_pos[token]
                 # FIX (2026-06-13): Defensive float extraction for unrealizedPnl.
@@ -1889,7 +1898,7 @@ def sync_pnl_from_hype(prices):
                 # → close stale trade, let ai_decider refill from hot-set.
                 # Runs after pnl update; skipped for trades already being cut (<-5%).
                 # [DEFUNCT-2026-04-17] flip moved to position_manager CASCADE_FLIP.
-                if pnl_pct > CUT_LOSER_THRESHOLD and pnl_pct < 0.5 and STALE_ROTATION_ENABLED:
+                if (not _t1_xm) and pnl_pct > CUT_LOSER_THRESHOLD and pnl_pct < 0.5 and STALE_ROTATION_ENABLED:
                     # Only rotate trades that are flat or slightly negative (-3% to +0.5%)
                     # Don't rotate trades in profit — let profit_monster handle those
                     _check_stale_rotation(
@@ -1907,7 +1916,7 @@ def sync_pnl_from_hype(prices):
                 # BUG-28: no retry on failure. Fix: retry once, then alert.
                 # NOTE: CUT_LOSER_THRESHOLD moved to module scope (line 74) — was causing
                 # UnboundLocalError when used at line 904 before local def at line 931.
-                if pnl_pct <= CUT_LOSER_THRESHOLD:
+                if (not _t1_xm) and pnl_pct <= CUT_LOSER_THRESHOLD:
                         log(f'  [CUT-LOSER] {token} PnL={pnl_pct:.2f}% <= {CUT_LOSER_THRESHOLD}% — closing', 'FAIL')
                         # CONTINUUM EXEMPTION: Never close BTC (continuum manages it)
                         if token.upper() == 'BTC':
@@ -2737,7 +2746,8 @@ def close_orphan_paper_trades(hl_pos, prices):
         conn2 = get_db_connection()
         cur2 = conn2.cursor()
         cur2.execute("""
-            SELECT id, token, direction, entry_price, leverage, amount_usdt, signal
+            SELECT id, token, direction, entry_price, leverage, amount_usdt, signal,
+                   _signal_metadata
             FROM trades
             WHERE status = 'open' AND paper = true AND exchange = 'Hyperliquid'
         """)
@@ -2751,7 +2761,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         # Pass 1: handle already-copied trades (verify HL registration)
         # ─────────────────────────────────────────────────────────────────────────
         for row in all_paper_trades:
-            trade_id, token, direction, entry, lev, amount, trade_sig = row
+            trade_id, token, direction, entry, lev, amount, trade_sig, trade_meta = row
             trade_id_str = str(trade_id)
 
             if trade_id_str not in copied_ids:
@@ -2792,7 +2802,7 @@ def close_orphan_paper_trades(hl_pos, prices):
         batch_eligible = []   # [(trade_id, token, direction, lev_int, curr_price)]
 
         for row in all_paper_trades:
-            trade_id, token, direction, entry, lev, amount, trade_sig = row
+            trade_id, token, direction, entry, lev, amount, trade_sig, trade_meta = row
             trade_id_str = str(trade_id)
 
             if trade_id_str in copied_ids:
@@ -2832,6 +2842,19 @@ def close_orphan_paper_trades(hl_pos, prices):
                 # This trade never consumed an HL slot (it was closed before the batch
                 # reservation step). Incrementing hype_count would overcount open slots,
                 # causing legitimate trades to be rejected as "at max positions."
+                # T1 EXACT MIRROR: don't rotate out a trade the pro still
+                # holds just because it fell off the hotset — keep the paper
+                # trade open, still no live mirror (no hot = no slot).
+                _t1_nh = False
+                try:
+                    from trust_tiers import is_exact_mirror_trade as _nh_ixm
+                    _t1_nh = _nh_ixm({'signal': trade_sig, '_signal_metadata': trade_meta})
+                except Exception:
+                    _t1_nh = False
+                if _t1_nh:
+                    log(f'  {token}: T1 exact mirror — NOT_HOTSET sweep skipped '
+                        f'(hold while pro holds)', 'WARN')
+                    continue
                 _close_paper_trade_db(trade_id, token, curr_price, 'NOT_HOTSET')
                 closed_count += 1
                 continue
