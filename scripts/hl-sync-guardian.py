@@ -3949,8 +3949,9 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             try:
                 from hermes_constants import STOP_TIGHTEN_MAX_PRICE_PCT as _st_cap
                 _st_dist = abs(fresh_sl - entry_px) / entry_px * 100.0 if entry_px > 0 else 0.0
-                _st_loss_side = ((direction == 'LONG' and fresh_sl < entry_px)
-                                 or (direction == 'SHORT' and fresh_sl > entry_px))
+                _st_dir = (direction or '').upper()   # mirror the helper's normalization
+                _st_loss_side = ((_st_dir == 'LONG' and fresh_sl < entry_px)
+                                 or (_st_dir == 'SHORT' and fresh_sl > entry_px))
                 if _st_dist > _st_cap and _st_loss_side:
                     _st_conn = None
                     _st_cur = None

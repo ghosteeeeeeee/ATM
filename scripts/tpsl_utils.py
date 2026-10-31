@@ -1021,10 +1021,15 @@ from hermes_constants import (
     STOP_TIGHTEN_SHADOW, STOP_TIGHTEN_ENFORCE,
 )
 
-# Per-process dedup: one [STOP-TIGHTEN-SHADOW] line per (trade/token key, SL
-# value, site). Mirrors the neighboring shadow collectors' per-process sets
-# (position_manager _hml_shadow_logged etc. — pipeline steps are fresh
-# processes each minute, so this dedups within a cycle only).
+# Dedup: one [STOP-TIGHTEN-SHADOW] line per (trade/token, site, UTC hour).
+# The hour bucket (not the SL value) is what bounds the set and the line rate:
+# position_manager/decider are fresh processes each pipeline minute, but
+# hl-sync-guardian is a LONG-RUNNING daemon that re-places its self-close SL
+# every 60s — without the bucket an in-scope guardian position would emit
+# ~1,440 lines/day and grow _STOP_TIGHTEN_LOGGED forever (bug_hunter delta
+# review MUST-FIX). Hourly sampling keeps the counterfactual stream alive at
+# <=24 lines/site/trade/day; analysis joins by trade id, not by line count.
+import time as _st_time
 _STOP_TIGHTEN_LOGGED = set()
 
 
@@ -1075,8 +1080,9 @@ def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
         # DIRECTION IS REQUIRED: with direction='' the loss side and the
         # profit-lock side are indistinguishable (prop<entry is LONG's loss but
         # SHORT's profit-lock), so an unknown direction never engages — safe
-        # no-op instead of a coin-flip (bug_hunter LOW-2). All 4/5 call sites
-        # always pass LONG/SHORT today.
+        # no-op instead of a coin-flip (bug_hunter LOW-2). Every call site
+        # (decider_open, decider_slfix x2, pm_collect_atr, scw_open,
+        # guardian_selfclose) always passes LONG/SHORT today.
         dirn = (direction or '').upper()
         if dirn not in ('LONG', 'SHORT'):
             return proposed_sl, None
@@ -1119,7 +1125,7 @@ def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
         # carries enforce=True so the bar audit stays fed.
         if STOP_TIGHTEN_SHADOW:
             key = (trade_id if trade_id is not None else f"{token}|{dirn}",
-                   round(prop, 8), site)
+                   site, int(_st_time.time() // 3600))
             if key not in _STOP_TIGHTEN_LOGGED:
                 _STOP_TIGHTEN_LOGGED.add(key)
                 # sl_cur=none (not 0.000000) when no current SL exists yet
