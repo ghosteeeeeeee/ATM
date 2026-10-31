@@ -4112,9 +4112,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         # armed half measured harm. Trail state from profit_monster
                         # (live arming signal); trades.trailing_activated is
                         # close-time-only and always False while open (bug_hunter HIGH).
+                        # FIX (2026-10-31): skip bypassed signals — PM Trail never arms
+                        # on them by design, so "trail state empty" is expected, not a
+                        # giveback signal. UGB-PT was firing on pump-chain+/- (pump-exit
+                        # correctly trailing) because profit_monster trail state is
+                        # always empty for PROFIT_MONSTER_BYPASS_SIGNALS.
                         if UGB_PT_ENFORCE:
                             from profit_monster import _load_trail_state
-                            if str(trade_id) not in _load_trail_state():
+                            from hermes_constants import PROFIT_MONSTER_BYPASS_SIGNALS
+                            _is_bypassed = any(_s in _pos_signal for _s in PROFIT_MONSTER_BYPASS_SIGNALS)
+                            if not _is_bypassed and str(trade_id) not in _load_trail_state():
                                 close_paper_position(trade_id, "ugb_pt",
                                     exit_detail=f"ugb_pt fav={_ugb_fav:+.2f}%,pnl={live_pnl:+.2f}%,trail=FALSE,peak={UGB_PT_DISTANCE_PCT:.2f}%")
                                 closed_count += 1
