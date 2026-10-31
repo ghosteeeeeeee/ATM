@@ -22,8 +22,19 @@ entry), so replaying them bakes exit-state into entry-state. v3 reconstructs
 entry-time levels via the system's own tpsl_utils functions (verified
 invariant: ATR>0.015% → SL 2.50% / TP 2.00% because tier thresholds are
 fraction-unit vs percent-unit — that's how the system actually behaves).
-This is ANALYSIS ONLY — no live behavior changes; any winning exit ships as
-shadow via automatic-implementation first.
+
+v4 (T 2026-10-31): MFE-giveback exit variants (replay_layers walk). Peak-
+tracking profit layer over static floors; compares the literal spec (30%
+giveback from any positive MFE) vs the armed variant (same +0.40% arm as
+PM trail), plus a pm-trail WALKER (pmwalk) validated against pm_actual so
+the walker itself is trusted before reading mfe rows. Background stack for
+every walker: tightest floor (HML CUT_LOSER/lev vs ATR SL) + ATR TP + 12h
+timeout — identical across variants, so deltas isolate the profit layer.
+Intra-bar order: static floor first (v3 pessimism), then profit layer
+(first-touch price; pessimistic same-bar tie vs TP), peak updated last
+(thresholds use prior-bar peak — standard trail-sim practice).
+This is ANALYSIS ONLY — no live behavior changes; the shipped exit was
+sim-checked first and is scoped by MFE_EXIT_SIGNALS.
 """
 import json
 import os
@@ -37,6 +48,8 @@ from paths import *
 from hermes_constants import (
     JUP_EXIT_SIM_MAX_HOLD_H, JUP_EXIT_SIM_RR, JUP_EXIT_SIM_TIMEFRAME,
     ATR_SL_MIN_INIT, CUT_LOSER_PNL,
+    MFE_EXIT_GIVEBACK_PCT, MFE_EXIT_ARM_PCT,
+    PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT,
 )
 from tpsl_utils import compute_atr_sl_pct, compute_atr_tp_pct
 
@@ -82,7 +95,13 @@ def load_candles(token, t0, t1):
     try:
         cur = conn.execute(
             "SELECT ts, open, high, low, close FROM candles_5m "
-            "WHERE token=? AND is_closed=1 AND ts>=? AND ts<? ORDER BY ts",
+            "WHERE token=? AND is_closed=1 AND ts>=? AND ts<? "
+            # COMPLETE-BARS ONLY (auditor F-1, 2026-10-31): price_collector
+            # writes the DEVELOPING 5m bar with is_closed=1 (legacy DEFAULT-1
+            # semantics, price_collector.py L178/196), so is_closed alone lets
+            # partial bars into timeout/ride rows and the table drifts between
+            # runs. ts+300 <= now guarantees the window has fully elapsed.
+            "AND ts + 300 <= strftime('%s','now') ORDER BY ts",
             (token, t0, t1))
         rows = cur.fetchall()
     finally:
@@ -115,6 +134,84 @@ def replay(entry, direction, sl, tp, candles, entry_ts, horizon_ts,
     return None, None
 
 
+def replay_layers(entry, direction, candles, entry_ts, horizon_ts, layers,
+                  floor_px, tp_px):
+    """Walk candles with a peak-tracking profit layer over static floors.
+
+    layers: list of (name, mode, arm_pct_price); mode 'mfe' → threshold_fav =
+    peak_fav × (1 − MFE_EXIT_GIVEBACK_PCT), mode 'pm' → peak_fav − trail dist
+    (arms at PM_TRAIL_ACTIVATE). Eligibility for 'mfe': peak_fav ≥ arm AND
+    peak_fav > 0 (arm 0.0 = literal spec: any positive MFE). First touch wins:
+    LONG exits at the HIGHEST eligible threshold (price falls through it
+    first), SHORT at the LOWEST.
+
+    Intra-bar order (documented, conservative): (1) static floor — pessimistic
+    tie-break, same convention as replay(); (2) profit layer at first-touch
+    price (gap-at-open → open price), pessimistic same-bar tie vs TP;
+    (3) TP ceiling; peak updated LAST so thresholds use prior-bar peak.
+    Returns (exit_price, exit_ts, tag) or (None, None, None).
+    """
+    long_ = direction == 'LONG'
+    peak_fav = 0.0
+    giveback = float(MFE_EXIT_GIVEBACK_PCT)
+    pm_arm = float(PM_TRAIL_ACTIVATE_PCT) * 100.0   # 0.40% price
+    pm_dist = float(PM_TRAIL_DISTANCE_PCT) * 100.0  # 0.20% price
+    for ts, o, h, l, c in candles:
+        if ts < entry_ts:
+            continue
+        if ts > horizon_ts:
+            break
+        # ── profit threshold from PRIOR-bar peak ──
+        t_px, t_tag = None, None
+        if peak_fav > 0:
+            pick = None
+            for name, mode, arm in layers:
+                if mode == 'mfe':
+                    if peak_fav < arm:
+                        continue
+                    tf = peak_fav * (1.0 - giveback)
+                else:  # 'pm'
+                    if peak_fav < pm_arm:
+                        continue
+                    tf = peak_fav - pm_dist
+                if tf <= 0:
+                    continue
+                px = entry * (1 + tf / 100.0) if long_ else entry * (1 - tf / 100.0)
+                if pick is None:
+                    pick = (px, name)
+                elif long_ and px > pick[0]:
+                    pick = (px, name)
+                elif (not long_) and px < pick[0]:
+                    pick = (px, name)
+            if pick:
+                t_px, t_tag = pick
+        # (1) static floor — pessimistic tie-break (v3 convention)
+        if (l <= floor_px) if long_ else (h >= floor_px):
+            return floor_px, ts, 'floor'
+        # (2) profit layer: gap-at-open or first touch within the bar
+        if t_px is not None:
+            at_open = (o <= t_px) if long_ else (o >= t_px)
+            touched = (l <= t_px) if long_ else (h >= t_px)
+            if at_open or touched:
+                xp = o if at_open else t_px
+                tp_touched = (h >= tp_px) if long_ else (l <= tp_px)
+                if tp_touched and ((tp_px < xp) if long_ else (tp_px > xp)):
+                    return tp_px, ts, 'atr_tp'  # pessimistic tie: TP is worse
+                return xp, ts, t_tag
+        # (3) TP ceiling
+        if (h >= tp_px) if long_ else (l <= tp_px):
+            return tp_px, ts, 'atr_tp'
+        # update peak AFTER exit checks
+        fav = ((h / entry) - 1.0) * 100.0 if long_ else (1.0 - (l / entry)) * 100.0
+        if fav > peak_fav:
+            peak_fav = fav
+    # timeout: last close within horizon
+    last = [r for r in candles if entry_ts <= r[0] <= horizon_ts]
+    if last:
+        return last[-1][4], last[-1][0], 'timeout'
+    return None, None, None
+
+
 def price_pnl_pct(direction, entry, exit_px):
     if long_p(direction):
         return (exit_px / entry - 1.0) * 100.0
@@ -140,7 +237,10 @@ def main():
     # per-strategy accumulator
     stats = {k: {'n': 0, 'w': 0, 'l': 0, 'pnl': [], 'hold': [], 'timeout': 0}
              for k in ('pm_actual', 'pm_trail', 'atr_cfg',
-                       'rr2_cfg', 'rr3_cfg', 'rr2_hml', 'rr3_hml', 'ride')}
+                       'rr2_cfg', 'rr3_cfg', 'rr2_hml', 'rr3_hml', 'ride',
+                       'bg', 'mfe30', 'mfe30a040', 'pmwalk',
+                       'pm_mfe30', 'pm_mfe30a')}
+    tags = defaultdict(lambda: defaultdict(int))  # walker strategy -> exit tag
 
     for t in trades:
         en, entry = t['id'], float(t['entry'])
@@ -184,9 +284,12 @@ def main():
         tp_cfg = entry * (1 + _tp_cfg_pct) if long_p(t['dir']) else entry * (1 - _tp_cfg_pct)
         risk_cfg = entry * _sl_cfg_pct          # price units (dollars)
         # HML account-cap risk: CUT_LOSER_PNL (account %) / leverage = price %
-        # PRICE-UNIT risk: 4% account / lev = 0.8% of entry in dollars
+        # PRICE-UNIT risk: e.g. 4% account / lev 5 = 0.8% of entry in dollars
         risk_hml = entry * (abs(CUT_LOSER_PNL) / 100.0) / max(float(t['lev'] or 1), 1.0)
-        assert abs(risk_hml - entry * 0.008) < entry * 0.001,             f'hml risk must be 0.8% of entry: {risk_hml} vs {entry * 0.008}'
+        # Unit canary (bug_hunter L4 fix): was assert == entry*0.008, which
+        # hard-crashed on any non-5x trade or CUT_LOSER change. Range check
+        # catches fraction-vs-percent unit flips without pinning values.
+        assert 0.001 < abs(CUT_LOSER_PNL) / 100.0 < 0.20,             f'CUT_LOSER_PNL must be account percent (e.g. -4.00), got {CUT_LOSER_PNL}'
 
         def _run(key, sl_px, tp_px):
             xp, xt = replay(entry, t['dir'], sl_px, tp_px, candles,
@@ -229,13 +332,54 @@ def main():
                 s['pnl'].append(pnl)
                 s['hold'].append(JUP_EXIT_SIM_MAX_HOLD_H)
 
+        # ── v4: MFE-giveback variants + pm-trail walker (T 2026-10-31) ──────
+        # background stack identical for every walker: tightest floor
+        # (HML CUT_LOSER/lev vs ATR SL, price fraction) + ATR TP + 12h timeout.
+        hml_frac = abs(CUT_LOSER_PNL) / 100.0 / max(float(t['lev'] or 1), 1.0)
+        floor_frac = min(hml_frac, _sl_cfg_pct)
+        if long_p(t['dir']):
+            floor_px = entry * (1 - floor_frac)
+        else:
+            floor_px = entry * (1 + floor_frac)
+        # A/B arms are LITERAL (auditor M3): deriving them from the shipped
+        # MFE_EXIT_ARM_PCT made mfe30a040/pm_mfe30a silently duplicate the
+        # no-arm rows once the constant was set to 0.0 — the label lied.
+        # Shipped config is printed with the report; re-arm A/B only via these
+        # literals, never via the constant.
+        ARM_NONE, ARM_040 = 0.0, 0.40
+        _pm_layer = ('pm_trail', 'pm', 0.0)
+        for key, layers in (
+            ('bg', []),
+            ('mfe30', [('mfe_exit', 'mfe', ARM_NONE)]),      # literal spec: any +MFE
+            ('mfe30a040', [('mfe_exit', 'mfe', ARM_040)]),   # armed variant
+            ('pmwalk', [_pm_layer]),
+            ('pm_mfe30', [_pm_layer, ('mfe_exit', 'mfe', ARM_NONE)]),
+            ('pm_mfe30a', [_pm_layer, ('mfe_exit', 'mfe', ARM_040)]),
+        ):
+            xp, xt, tag = replay_layers(entry, t['dir'], candles, open_ts,
+                                        horizon_ts, layers, floor_px, tp_cfg)
+            if xp is None:
+                skipped.setdefault(key, []).append(en)
+                continue
+            pnl = price_pnl_pct(t['dir'], entry, xp) * float(t['lev'] or 1)
+            hold = (xt - open_ts) / 3600.0
+            s = stats[key]
+            s['n'] += 1
+            s['w'] += 1 if pnl > 0.05 else 0
+            s['l'] += 1 if pnl < -0.05 else 0
+            s['pnl'].append(pnl)
+            s['hold'].append(hold)
+            s['timeout'] += 1 if (xt >= horizon_ts - SEC_5M) else 0
+            tags[key][tag] += 1
+
     # ── report
     print(f"\n{'strategy':<12} {'n':>3} {'W':>3} {'L':>3} {'WR%':>5} "
           f"{'net%':>8} {'avg%':>7} {'med%':>7} {'avgHold':>8} {'timeout':>7}")
     print('-' * 82)
     report = {}
     for key in ('pm_actual', 'pm_trail', 'atr_cfg',
-                'rr2_cfg', 'rr3_cfg', 'rr2_hml', 'rr3_hml', 'ride'):
+                'rr2_cfg', 'rr3_cfg', 'rr2_hml', 'rr3_hml', 'ride',
+                'bg', 'mfe30', 'mfe30a040', 'pmwalk', 'pm_mfe30', 'pm_mfe30a'):
         s = stats[key]
         n = s['n']
         if not n:
@@ -256,6 +400,32 @@ def main():
     print(f"\nskipped: atr={len(skipped['atr'])} rr={len(skipped['rr'])} "
           f"no-candles={len(skipped['candles'])} (missing sl/tp columns)")
 
+    # horizon maturity (auditor F-4): timeout/ride rows from trades whose 12h
+    # window is still running WILL move as bars accrue — full re-measure
+    # protocol: brain/verdicts/2026-10-31_mfe-exit-sim-independent-verify.md
+    import time as _time
+    _now = int(_time.time())
+    _pending = [t['id'] for t in trades
+                if int(t['open_t'].timestamp()) + HORIZON_S > _now]
+    if _pending:
+        print(f"\n⚠ {len(_pending)} trade(s) with 12h horizon still running "
+              f"(ids {_pending[:8]}{'...' if len(_pending) > 8 else ''}) — "
+              "timeout/ride rows unstable until they elapse.")
+    print(f"shipped config: MFE_EXIT_GIVEBACK_PCT={MFE_EXIT_GIVEBACK_PCT:.0%} "
+          f"MFE_EXIT_ARM_PCT={MFE_EXIT_ARM_PCT} "
+          f"(A/B rows use ARM_NONE/ARM_040 literals, not the constant)")
+
+    # why each walker closed — attribution matters more than the net here
+    print("\nwalker exit-tag breakdown:")
+    for key in ('bg', 'mfe30', 'mfe30a040', 'pmwalk', 'pm_mfe30', 'pm_mfe30a'):
+        if tags.get(key):
+            parts = ', '.join(f"{k}={v}" for k, v in sorted(tags[key].items()))
+            print(f"  {key:<10} {parts}")
+    if 'pmwalk' in report and 'pm_actual' in report:
+        print(f"\nwalker validation: pmwalk net {report['pmwalk']['net_pct']:+.2f} "
+              f"vs pm_actual {report['pm_actual']['net_pct']:+.2f} "
+              f"(pm_actual = real DB closes incl. exits the walker does not model)")
+
     # per-token net for pm_actual (context for which exits suit which token)
     print("\nper-token pm_actual net (price %):")
     by_tok = defaultdict(lambda: [0, 0.0])
@@ -269,7 +439,8 @@ def main():
     with open(os.path.join(HERMES_DATA, 'jup_exit_sim.json'), 'w') as f:
         json.dump(report, f, indent=2)
     print(f"\nreport -> {HERMES_DATA}/jup_exit_sim.json")
-    print("ANALYSIS ONLY — no live exit changes; winner ships as shadow first.")
+    print("ANALYSIS ONLY — exit code lives in position_manager, gated by "
+          "MFE_EXIT_* constants; this script never touches live behavior.")
 
 
 if __name__ == '__main__':

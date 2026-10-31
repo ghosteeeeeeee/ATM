@@ -122,6 +122,7 @@ from hermes_constants import (
     PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED, PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN,
     BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED, BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW, BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN,
     MFE_CUT_SHADOW_ENABLED, MFE_CUT_SHADOW_MIN, MFE_CUT_SHADOW_MFE_MAX,
+    MFE_EXIT_ENABLED, MFE_EXIT_GIVEBACK_PCT, MFE_EXIT_ARM_PCT, MFE_EXIT_SIGNALS,
     PM_TRAIL_ACTIVATE_PCT,
     ARM_BE_SHADOW_ENABLED,
 )
@@ -3673,6 +3674,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             close_paper_position(trade_id, "cut_loser", exit_detail=f"cut_loser_pct={live_pnl:+.2f}%")
             closed_count += 1
             log(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
+            # bug_hunter 2026-10-31: every other close site in this loop
+            # continues. Falling through let stale/time/peak/UGB-PT/MFE-EXIT
+            # re-close the SAME trade in this iteration: the row update dedups,
+            # but close_paper_position runs set_loss_cooldown() BEFORE the
+            # status-guarded UPDATE → double streak increments (2h→4h→8h
+            # escalates at 2x), inflated closed_count, and bogus would-fire
+            # lines in the shadow eval sets (DISTINCT-id based).
+            continue
 
         # ── 6. SPEED: Stale winner/loser exit ─────────────────────────────────
         # SPEED FEATURE: closes positions that are in profit but flat (stale winner)
@@ -4138,6 +4147,59 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         log(f"  [SHADOW] UGB-BE would-fire {token} {direction} live={live_pnl:+.2f}% fav={_ugb_fav:+.2f}% [round trip to entry] trade={trade_id} sig={_pos_signal}")
             except Exception as e:
                 log(f"  [SHADOW] UGB error for {token}: {e}")
+
+        # ── 7c. MFE-GIVEBACK EXIT (T 2026-10-31) ──────────────────────────────
+        # Close when price gives back MFE_EXIT_GIVEBACK_PCT of the peak
+        # favorable move: threshold_fav = peak_fav × (1 − giveback) → exit at
+        # 70% of peak. Proportional sibling of UGB-PT (fixed 0.45% giveback
+        # since 2026-10-28 — mfe threshold wins below peak 1.5%, UGB above).
+        # First touch closes: for peaks below ~0.67% this threshold sits ABOVE
+        # PM trail's fixed 0.20% distance (fires first); above it PM trail still
+        # wins the race — so no bypass-list changes, the layers just compete.
+        # Requires fav > 0 strictly (never-positive trades stay with the floor
+        # exits; threshold would otherwise be <= breakeven). Unknown peak
+        # (no high/low data) fails open — never close on missing data.
+        # INDEPENDENTLY AUDITED (brain/verdicts/2026-10-31_mfe-exit-sim-
+        # independent-verify.md): engine verified 288/288 + 3/3 hand-checks;
+        # direction robust (+17…+36 vs floor stack across intra-bar
+        # conventions), but +42 vs actual closes on the frozen 45T cohort is
+        # NOT significant (p=0.135) and net-of-fees CI includes 0 — magnitude
+        # unproven, direction positive. Re-measure protocol in the verdict.
+        # Scope = MFE_EXIT_SIGNALS (mirror book). Revert = MFE_EXIT_ENABLED
+        # False (hermes_constants).
+        if MFE_EXIT_ENABLED and not is_ceo_trade:
+            try:
+                _mfe_sig_l = (_pos_signal or '').lower()
+                if any(_s in _mfe_sig_l for _s in MFE_EXIT_SIGNALS):
+                    _mfe_en = float(pos.get('entry_price') or 0) or 0
+                    _mfe_hi = float(pos.get('highest_price') or 0) or 0
+                    _mfe_lo = float(pos.get('lowest_price') or 0) or 0
+                    _mfe_fav = None
+                    if _mfe_en > 0:
+                        if direction == 'LONG' and _mfe_hi > 0:
+                            _mfe_fav = (_mfe_hi / _mfe_en - 1.0) * 100
+                        elif direction == 'SHORT' and _mfe_lo > 0:
+                            _mfe_fav = (1.0 - _mfe_lo / _mfe_en) * 100
+                    _mfe_arm = float(MFE_EXIT_ARM_PCT) * 100.0
+                    if (_mfe_fav is not None and _mfe_fav > 0
+                            and _mfe_fav >= _mfe_arm):
+                        _mfe_thr = _mfe_fav * (1.0 - float(MFE_EXIT_GIVEBACK_PCT))
+                        if live_pnl <= _mfe_thr:
+                            close_paper_position(
+                                trade_id, "mfe_exit",
+                                exit_detail=(f"mfe_giveback={MFE_EXIT_GIVEBACK_PCT:.0%},"
+                                             f"peak={_mfe_fav:+.2f}%,"
+                                             f"thr={_mfe_thr:+.2f}%,"
+                                             f"now={live_pnl:+.2f}%"))
+                            closed_count += 1
+                            log(f"  MFE-EXIT {token} {direction} {live_pnl:+.2f}% "
+                                f"[peak={_mfe_fav:+.2f}% give back "
+                                f"{MFE_EXIT_GIVEBACK_PCT:.0%} → {_mfe_thr:+.2f}%] "
+                                f"trade={trade_id} sig={_pos_signal}")
+                            continue
+            except Exception as e:
+                # logged, never swallowed — same rule as the JUP shadows
+                log(f"  MFE-EXIT error for {token}: {type(e).__name__}: {e}")
 
         # ── 8. TIME-BASED EXIT (slow bleed / gave-it-all-back) ──────────────────
         # Catches two patterns:

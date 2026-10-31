@@ -1977,6 +1977,36 @@ BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN = 55
 MFE_CUT_SHADOW_ENABLED = True  # Revert: set False.
 MFE_CUT_SHADOW_MIN = 45        # minutes hold before stall check
 MFE_CUT_SHADOW_MFE_MAX = 0.20  # live_pnl % below this at T => would-fire
+# ── MFE-GIVEBACK EXIT (T 2026-10-31) ─────────────────────────────────────────
+# Close the trade when price gives back MFE_EXIT_GIVEBACK_PCT of its peak
+# favorable move (MFE). Proportional sibling of UGB-PT (fixed 0.45% giveback
+# since 2026-10-28): threshold_fav = peak_fav × (1 − GIVEBACK), i.e. exit at
+# 70% of peak. Works for both directions (peak = highest_price LONG /
+# lowest_price SHORT, same tracked extremes the MFE-CUT / ARM-BE / UGB
+# shadows use).
+# The giveback threshold is always strictly positive, but the FILL is not
+# guaranteed to be: on a fast move through the threshold between two 5m bars
+# the exit fills at the next bar's open, below entry (sim: 10/45 mfe exits
+# were small losers — still far above the floor, which fires first when the
+# bar's low reaches it). Never-positive trades are left to the floor exits
+# entirely (fav > 0 required to engage).
+# Scope: MFE_EXIT_SIGNALS substring match (N2 namespace rule — matches
+# 'jup_yolo_mirrored' and merged variants). Ships enabled per T directive
+# 2026-10-31 ("make a new exit, mfe-exit"); revert = MFE_EXIT_ENABLED False.
+MFE_EXIT_ENABLED = True        # Revert: set False.
+MFE_EXIT_GIVEBACK_PCT = 0.30   # fraction of peak favorable to give back (30%)
+MFE_EXIT_ARM_PCT = 0.0         # 0.0 = literal spec (any positive MFE engages).
+                               # AUDITED frozen-45 cohort (verdict: brain/
+                               # verdicts/2026-10-31_mfe-exit-sim-independent-
+                               # verify.md): no-arm +30.27 vs arm-0.40 +27.10
+                               # gross — no-arm wins AND is T's literal spec.
+                               # Raise to 0.004 if live fee-economics disagree
+                               # (bug_hunter M1: fires with peak < ~0.13% are
+                               # fee-negative; judge after ~20 live fires).
+                               # Re-measure protocol + caveats in that verdict
+                               # file — headline is vs pm_actual (+42, p=0.135,
+                               # n=45 NOT significant), never vs the bg stack.
+MFE_EXIT_SIGNALS = ('jup_yolo',)  # substring scope — mirror book first
 # ARM-BE-STOP SHADOW — armed-then-breakeven exit collector (brain_auditor 2026-10-18).
 # Verdict PASS 2026-10-17 (brain/verdicts/2026-10-17_arm-breakeven-stop.md):
 # 30d candle OOS, UNIVERSE fk 16.5% net +$5.94; non-EXTREME fk 9.7% net +$3.46;
