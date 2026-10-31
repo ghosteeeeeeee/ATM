@@ -1,15 +1,18 @@
 # Signal Performance Report
-**Generated:** 2026-10-31 14:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-10-31 20:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,509 | **WR:** 51.1% | **PnL:** -96.64%
+- **Total trades (all time):** 3,528 | **WR:** 51.2% | **PnL:** -98.33%
 - **Date range:** 2026-07-29 → 2026-10-31
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-None found.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| pump-chain- | LONG | 3 | 66.7% | -0.08 | 7 | 71.4% | +3.83 | ❓ |
+| jup_yolo_mirrored | LONG | 9 | 100.0% | +1.94 | 26 | 73.1% | +0.52 | ❓ |
 
 ---
 
@@ -39,6 +42,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
+1. **[KEEP] 2 winning combos** — pump-chain-, jup_yolo_mirrored. LONG side dominant.
 
 ---
 
@@ -50,15 +54,15 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-10-31 | aaec17c | feat: CEO trust-tiers day-1 verdicts 1+2 — soft-floor giant ... |
+| 2026-10-31 | 268ea89 | fix: bug_hunter round-4 — dashboard field contract (HIGH), p... |
+| 2026-10-31 | e56e794 | scripts: mfe-exit — 30% MFE-giveback exit for mirror book (T... |
+| 2026-10-31 | 290eb6b | signal: volume-buildup LONG fixes (CEO approved) — RSI 40-70... |
+| 2026-10-31 | 59f3cd4 | scripts: JUP exit simulator — pm-trail vs rr vs atr vs ride ... |
+| 2026-10-31 | 0ef09d5 | scripts: log-flags audit kills — CHASE-RATIO + CHASE-MOVE ma... |
+| 2026-10-31 | f29d3c1 | feat: CEO exit-asymmetry verdict — dual shadows (ship-off), ... |
 | 2026-10-31 | db81c0c | config: brain_auditor #208 — coupled-trial REVERT (CUT_LOSER... |
 | 2026-10-31 | e5009ce | Daily trading system update (2026-10-31) |
 | 2026-10-31 | 507bcdd | feat: trust tiers — shadow engine, own leaderboard, exact-mi... |
-| 2026-10-31 | 5118465 | fix: bug_hunter hl_copy expansion audit — dead freshness gat... |
-| 2026-10-31 | 112f591 | feat: giants-light expansion to hl_copy_trader (T directive) |
-| 2026-10-31 | e28245f | feat: giants-light verdict — 4 fixes so we're IN when the pr... |
-| 2026-10-30 | 0c2f7a4 | feat: Option D — source-scoped SHORT gates for jup_yolo_mirr... |
-| 2026-10-30 | 7ce9443 | feat: freshness gate — mirror only pro entries ≤10min old |
-| 2026-10-30 | 5cd1b0f | feat: YOLO mirror cluster bonus — rank higher when 2-3 pros ... |
-| 2026-10-30 | 0daefbb | feat: live leaderboard scraping + full gate clearance — FIRS... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

@@ -10184,5 +10184,32 @@
     "category": "governance",
     "status": "delivered",
     "risk": "none"
+  },
+  {
+    "date": "2026-10-31T21:05:00Z",
+    "idea": "Fee-complete close path + net-basis KPI numbers",
+    "rationale": "fees JSON only written by position_manager closes — column-based net KPIs exit-path-biased; all GREEN headlines were gross",
+    "expected_impact": "honest net: 24h -0.56 / 7d -3.69 / 30d -12.91; net-basis judgment for amplify proposals",
+    "category": "measurement integrity",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-10-31T21:05:00Z",
+    "idea": "mfe_exit fire-count tracker toward pre-registered 20-fire fee judge",
+    "rationale": "constants pre-register judge at ~20 live fires; currently 7 fires, 5/7 with peak <0.13% (fee-negative band per bug_hunter M1)",
+    "expected_impact": "feeds pre-registered judge; MFE_EXIT_ARM_PCT stays 0.0 (no change)",
+    "category": "exit quality",
+    "status": "monitoring",
+    "risk": "none"
+  },
+  {
+    "date": "2026-10-31T21:05:00Z",
+    "idea": "chop-bleed tripwire tier-2: 10 consecutive >=92% windows -> mandatory CEO consult with pre-registered shortlist",
+    "rationale": "tier-1 per-run routing produced 0 clearing filters across 7 windows",
+    "expected_impact": "process only, zero code",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

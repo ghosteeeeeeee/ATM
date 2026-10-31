@@ -1090,7 +1090,8 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     # Fix: write exit_reason = close_reason_val so both columns are always set.
     #
     # brain_auditor #196 (2026-10-29): also stamp mfe_pct/mae_pct at close.
-    # Every brain-CLI-routed close (profit-monster, cut_loser, guardian, hl_fill)
+    # Every brain-CLI-routed close (profit-monster, cut_loser, hl_fill —
+    # corrected 2026-10-31 #211: guardian does NOT route through this function)
     # left them NULL until cell_stats.backfill_mfe_mae ran nightly (00:20Z) —
     # up to a 24h NULL window during which arm-rate KPIs count trail winners as
     # unarmed (measured: watchdog read LONG arm 46.9% "tripwire OPEN" at 00:11Z
@@ -1100,6 +1101,33 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     # fabrication risk (PRICE_SANITY guards the peak upstream). COALESCE keeps any
     # value another writer already stamped. Self-check:
     # brain/analysis/mfe_write_at_close_2026-10-29.py --selfcheck
+    #
+    # brain_auditor #211 (2026-10-31): also stamp fees JSON at close — same
+    # #196 class. This path left fees NULL on every brain-CLI close (measured
+    # 7d: 0/86 profit-monster-trail, 0/13 cut-loser-CL-T1, 0/4 hard_sl rows had
+    # fee records while 100% of position_manager closes did) so the fees column
+    # was EXIT-PATH-biased — any net-of-fees KPI summed from it charged fees on
+    # losers but never on the trail winners that pay them too. Callers here:
+    # profit_monster, cut_loser, sniper_exit, hl_fill (guardian does NOT route
+    # through this function — it closes via hl_sync_guardian's own UPDATE).
+    # Fee model is byte-identical to pnl_utils.compute_close_pnl (0.045% x 2
+    # sides on calc_notional). net = stored pnl - fee verified correct for the
+    # HL-ground-truth branch too: 30d empirical, hype_pnl_usdt matches price
+    # gross on 190 decisive rows vs gross-fee on 12 (#211 audit) — HL fills
+    # closedPnl behaves gross here, so subtracting is not a double-charge.
+    # Non-fatal: on any error fees stays NULL, close proceeds.
+    _fees_json = None
+    try:
+        _fee_side = round(abs(float(calc_notional or 0)) * 0.00045, 6)
+        _fee_total = round(_fee_side * 2, 6)
+        _fees_json = json.dumps({
+            'entry_fee': _fee_side,
+            'exit_fee': _fee_side,
+            'fee_total': _fee_total,
+            'net_pnl': round(float(hype_pnl_usdt or 0) - _fee_total, 6),
+        })
+    except Exception:
+        _fees_json = None
     cur.execute("""
         UPDATE trades SET
             exit_price    = %s,
@@ -1113,6 +1141,7 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
             exit_reason   = %s,
             exit_conditions = COALESCE(%s, exit_conditions),
             notes         = COALESCE(%s, ''),
+            fees          = COALESCE(fees, %s),
             mfe_pct       = COALESCE(mfe_pct, CASE
                               WHEN entry_price > 0 AND highest_price > 0 AND lowest_price > 0
                                 AND direction IN ('LONG','SHORT') THEN
@@ -1128,7 +1157,7 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
                                   ELSE ROUND(((highest_price - entry_price) / entry_price * 100)::numeric, 4) END
                               END)
         WHERE id = %s AND status = 'open'
-    """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, close_reason_val, close_reason_val, exit_conditions, notes, trade_id))
+    """, (final_exit, hype_pnl_usdt, hype_pnl_pct, hype_pnl_usdt, hype_pnl_pct, close_reason_val, close_reason_val, exit_conditions, notes, _fees_json, trade_id))
 
     # FIX (2026-10-08, BUG-027): the UPDATE above has `WHERE status='open'` — if the
     # trade was already closed by another exit engine (profit-monster runs as its own

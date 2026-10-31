@@ -1397,6 +1397,26 @@
       "found_by": "log-flags audit",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-075",
+      "title": "trades.fees never written by brain.py close path \u2014 fee column exit-path-biased",
+      "severity": "MED",
+      "status": "FIXED",
+      "files": [
+        "scripts/brain.py"
+      ],
+      "symptom": "fees JSON (entry_fee/exit_fee/fee_total/net_pnl) present on 100% of position_manager closes but 0% of brain-CLI closes: 7d 0/86 profit-monster-trail, 0/13 cut-loser-CL-T1, 0/4 hard_sl had fee records. Any net-of-fees KPI summed from the column charged fees on losers and never on trail winners.",
+      "root_cause": "brain.py _close_trade_impl UPDATE (the close path for profit_monster/cut_loser/sniper_exit/hl_fill) simply had no fees= column; only position_manager.py:1332 wrote it. Same class as BUG-42/BUG-027/#196 mfe NULLs.",
+      "fix": "brain.py #211: compute _fees_json (0.045% x 2 sides on calc_notional, net_pnl = stored pnl - fee_total, non-fatal try/except) + fees = COALESCE(fees, %s) in the close UPDATE (11/11 params). Data-only, ZERO trading behavior.",
+      "verified_by": "py_compile PASS; AST placeholder/param count 11=11; subagent review NO BLOCKERS; bug_hunter PASS (hand-walked tuple alignment, no stray %, no fees reads in decision path, schema 4 keys identical old/new); HL double-subtract MED refuted by data (30d hype~gross 190:12)",
+      "date_found": "2026-10-31",
+      "date_fixed": "2026-10-31",
+      "found_by": "brain_auditor #211",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-073"
+      ]
     }
   ],
   "schema": {

@@ -3330,5 +3330,16 @@
     "after": "TYPO NOTE 2026-10-31 run #210 appended to notes (additive, no disposition/threshold touched)",
     "rationale": "same transcription class as winner-cell-size-125 fix; study owner must target volume-buildup-",
     "impact": "zero trading behavior — registry metadata only"
+  },
+  {
+    "timestamp": "2026-10-31T21:05:00Z",
+    "agent": "brain_auditor",
+    "change": "brain.py _close_trade_impl: stamp fees JSON (COALESCE) at close — fee model 0.045%x2 sides on calc_notional, net_pnl = stored pnl - fee_total; non-fatal try/except; also corrected #196 comment guardian claim",
+    "type": "bugfix",
+    "file": "scripts/brain.py",
+    "before": "fees NULL on all brain-CLI closes (0/86 profit-monster-trail, 0/13 cut-loser, 0/4 hard_sl 7d) — fee KPIs exit-path-biased",
+    "after": "fees stamped on brain-CLI closes; COALESCE preserves position_manager stamps; py_compile PASS, 11/11 placeholders, subagent review NO BLOCKERS, hype-gross refutation 190:12",
+    "rationale": "fee column was structurally biased (losers had fees, trail winners did not) — net-of-fees KPIs and amplify net thresholds need complete capture (BUG-073 companion)",
+    "impact": "data-only, ZERO trading behavior; next-run verify = fees fill on first trail close"
   }
 ]
