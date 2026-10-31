@@ -372,25 +372,42 @@ def is_trader_full_exit(wallet: str, coin: str) -> bool:
 
 
 def get_current_price(coin: str) -> float | None:
-    """Get current price from candles DB or prices cache."""
+    """Get current price from candles DB (1m, freshest) or prices cache.
+
+    FIX (2026-10-31, full-mirror investigation): this function had NEVER
+    worked — (1) it SELECTed FROM `candles`, a table that doesn't exist in
+    CANDLES_DB (only candles_1m/5m/15m/1h/4h), so the query always raised;
+    (2) the prices.json fallback assumed {'BTC': {'price': ..}} but the file
+    is flat {'prices': {'BTC': 77370.0, ..}}, so .get(coin, {}).get('price')
+    returned 0. Every check_trader_exits attempt skipped with 'no price
+    available' (15/15 logged) — zero trader_exit closes in 127 closed copy
+    trades. Exit mirroring was dead at the price lookup.
+    """
     try:
         import sqlite3
         conn = sqlite3.connect(CANDLES_DB, timeout=5)
-        row = conn.execute("""
-            SELECT close FROM candles
-            WHERE token = ? ORDER BY ts DESC LIMIT 1
-        """, (coin.upper(),)).fetchone()
-        conn.close()
-        if row:
+        try:
+            row = conn.execute("""
+                SELECT close FROM candles_1m
+                WHERE token = ? ORDER BY ts DESC LIMIT 1
+            """, (coin.upper(),)).fetchone()
+        finally:
+            conn.close()
+        if row and row[0]:
             return float(row[0])
     except Exception:
         pass
 
-    # Fallback: prices.json cache
+    # Fallback: prices.json cache — flat {'prices': {'BTC': 77370.0, ...}}
     try:
         with open(PRICES_FILE) as f:
             prices = json.load(f)
-        return float(prices.get(coin.upper(), {}).get('price', 0))
+        _prices_map = prices.get('prices') or {}
+        val = _prices_map.get(coin.upper())
+        if isinstance(val, dict):
+            val = val.get('price', 0)
+        v = float(val or 0)
+        return v if v > 0 else None
     except Exception:
         return None
 
