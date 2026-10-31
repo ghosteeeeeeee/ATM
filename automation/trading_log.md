@@ -18750,3 +18750,26 @@ Final set: []
 - 24h GREEN '+$0.27' at only 49.0% WR — profits concentrated in profit-monster-trail/ugb_pt; 7d '-$1.10' still deep red
 - pump-chain- GMX outlier still masks ex-GMX losses — hold until ex-GMX turns positive
 - jup_yolo_mirrored 14d '-$0.47' and 2-token concentration — needs multi-token consistency before boost
+
+## [2026-10-31 22:43] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: 46.8% 24h) | 24h 47T 22W '+$0.22' GREEN | 7d 220T 120W '-$1.09' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes; 4 open (ME bb-squeeze+ -0.30%, HYPE jup_yolo -0.47%, ETH jup_yolo -0.06%, SOL jup_yolo SHORT +0.07%)
+- Kill check: no n>=3 0%-WR closes last hour (24h pump-chain+ 3T 0% '-$0.12' has 0 last-hour closes — regime query not triggered)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/47 = 17.0% (<40%); dominant close = profit-monster-trail (16T '+$1.17'); worst avg = hard_max_loss (2T '-$0.140'), cut-loser-CL-T1 (2T '-$0.135')
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' but ex-GMX '-$0.11', GMX '+$0.54' masks; 14d 12T '+$0.56' also GMX-driven); HOLD jup_yolo_mirrored (26T 57.7% '+$0.14' bars met but only 2 tokens HYPE/SOL + 14d 52T '-$0.47' out-of-sample fails)
+- Neg streak: 15h +0.09, 16h -0.14, 17h -0.04, 18h +0.01, 19h +0.03, 20h -0.03, 21-22h 0T — never 3 consecutive red
+- Frequency 0/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.166%, 20/22 <0.5% — entries fine; R:R still the drag (atr_sl_hit 8T '-$0.96' vs trail 16T '+$1.17')
+- Storm readiness: **window-min -0.08% / at-run +0.00%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '+$0.22' at only 46.8% WR — all profit from profit-monster-trail/ugb_pt; 7d '-$1.09' still deep red
+- pump-chain+ 0% WR (3T 24h) below n=3 last-hour kill trigger — watch next hour; if it fires again, run regime query
