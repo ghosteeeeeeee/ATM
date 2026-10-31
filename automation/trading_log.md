@@ -18459,3 +18459,28 @@ Final set: []
 **Open Questions:**
 - 24h RED '-$0.74' / 7d '-$0.99' persists at ~57% WR — structural R:R imbalance (avg win '+$0.055' vs avg loss '-$0.133' per close, ~1:2.4); kill/boost rules don't reach it
 - jup_yolo_mirrored loses in ALL 3 regimes 14d (EXTREME -0.05, HIGH -0.54, NORMAL -0.14) but HIGH n=18 < 20 per-regime bar — recheck when HIGH n>=20
+
+## [2026-10-31 10:44] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** $+0.10 (WR: 57.6% 24h) | 24h 59T 34W '-$0.68' RED | 7d 200T 57.0% '-$0.89' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored profit-monster-trail '+$0.15'/+3.83%, HBAR pump-chain- trail_arm_timeout '+$0.01'/+0.50%, ENA pump-chain+ trail_arm_timeout '-$0.06'/-2.86% — net green hour
+- Kill check: no signal with n>=3 and 0% WR last hour (each signal n=1) — regime query not triggered
+- jup_yolo_mirrored 14d regime: EXTREME 16T 62.5% '-0.05', HIGH 19T 63.2% '-0.39', NORMAL 5T 40% '-0.14' — HIGH n=19 still <20 bar, wins by WR in EXTREME/HIGH → keep alive, recheck next hour
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 10/59 = 16.9% (<40%); dominant close = profit-monster-trail (31T '+$1.73'); worst avg = stale_exit (2T '-$0.195')
+- Boost: none qualify — volume-buildup- 10T 70.0% but '-$0.21' fail net; jup_yolo_mirrored 34T 58.8% but '-$0.69' fail net; pump-chain+ 5T 40% fail WR
+- Neg streak: 08h '-0.30', 09h '-0.07', 10h '+0.16' — streak broken at 10h, never reached 3
+- Frequency 3/hr — under 20/hr
+- Entry quality: winners 24h MAE avg 0.178%, 31/34 <0.5% — entries fine; R:R still the drag (avg win '+$0.061' vs avg loss '-$0.125', ~1:2.0)
+- 1 open: GMX pump-chain- LONG +0.08%
+- Storm readiness: **window-min +0.01% / at-run +0.06%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.68' / 7d '-$0.89' at ~57% WR — structural R:R imbalance persists (losses ~2x avg win); kill/boost rules don't reach it
+- jup_yolo_mirrored HIGH n=19 (one short of the n>=20 regime-kill bar) — run regime query next hour
