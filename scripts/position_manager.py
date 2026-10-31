@@ -3865,8 +3865,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 log(f"  [JUP-SHADOW-HML] id={trade_id} {token} {direction} "
                     f"live={live_pnl:+.3f}% act_thresh={HARD_MAX_LOSS_PCT:+.2f}% "
                     f"would={_jhs_fired}")
-        except Exception:
-            pass
+        except Exception as _jhs_e:
+            # bug_hunter audit: this was still a bare pass — the exact swallow
+            # that hid the trail block's NameError. Never hide a shadow death.
+            log(f"  [JUP-SHADOW-HML] error for {token}: {type(_jhs_e).__name__}: {_jhs_e}")
 
         # JUP trail shadow (CEO verdict 2026-10-31 #2: APPROVED via
         # automatic-implementation — ship OFF). Counterfactual: arm at
@@ -3889,7 +3891,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 _jts_en = float(pos.get('entry_price') or 0)
                 _jts_hi = float(pos.get('highest_price') or 0)
                 _jts_lo = float(pos.get('lowest_price') or 0)
-                if _jts_a and _jts_a > 0 and _jts_en > 0:
+                # _jts_hi > 0 guard (bug_hunter): a LONG whose HL data never
+                # fetched would log fav=-100% every poll — misleading eval data.
+                if (_jts_a and _jts_a > 0 and _jts_en > 0
+                        and ((_jts_hi > 0) if direction == 'LONG' else True)):
                     if direction == 'LONG':
                         _jts_fav = (_jts_hi / _jts_en - 1.0) * 100
                     else:
