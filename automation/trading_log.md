@@ -18701,3 +18701,27 @@ Final set: []
 - 24h still GREEN '+$0.07' (54.2% WR), 7d '-$0.86' — structural R:R imbalance persists
 - pump-chain- GMX outlier still masks ex-GMX losses — hold until ex-GMX turns positive
 - jup_yolo_mirrored 14d '-$0.47' vs 24h '+$0.12' — needs more green runs before boost
+
+## [2026-10-31 20:42] Hourly Analysis
+
+**Trades:** 5 closed (1 win, 2 losses, 2 flat)
+**PnL:** $0.01 (WR: 50.0% 24h) | 24h 50T '+$0.13' GREEN | 7d 220T '-$1.09' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored mfe_exit $0.00, HYPE jup_yolo_mirrored 2x mfe_exit '-$0.01' x2 / '+$0.03', BTC continuum-osc+ UNIVERSAL_MAX_HOLD $0.00
+- Kill check: no signal n>=3 with 0% WR last hour (pump-chain+ 24h 3T 0% '-$0.12', bb-squeeze+ 2T 0% — all n<3)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 9/50 = 18.0% (<40%); dominant close = profit-monster-trail (18T '+$1.22'); worst avg = hard_max_loss (2T '-$0.140')
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' but ex-GMX '-$0.09', GMX masks); jup_yolo_mirrored 27T 59.3% but net '+$0.02' < $0.05 bar and 14d fails
+- Neg streak: 16h -0.14, 17h -0.04, 18h +0.01, 19h +0.03, 20h -0.02 — never 3 red
+- Frequency 5/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.165%, 23/25 <0.5% — entries fine
+- No open trades
+- Storm readiness: **window-min -0.05% / at-run +0.00%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN '+$0.13' but WR 50.0% — profits concentrated in profit-monster-trail (18T '+$1.22') vs atr_sl_hit (9T '-$1.13'); structural R:R imbalance persists
+- 7d '-$1.09' still deep red — watch if 24h green holds next runs
