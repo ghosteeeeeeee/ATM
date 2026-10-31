@@ -1758,6 +1758,15 @@ def execute_safe_actions(steers, watchdog_mode):
                 try:
                     import manual_exit_manager as _mxmw
                     _conn_ms = get_db()
+                    if not _conn_ms:
+                        # FIX (bug_hunter round-5 MED-LOW): get_db() SWALLOWS
+                        # connect errors and returns None — the old
+                        # `if _conn_ms:` silently skipped verification, letting
+                        # the steer proceed to replace_sl BLIND during a PG
+                        # outage (their harness F1: replace_sl called 1x).
+                        # Raise → routes to the existing fail-closed except
+                        # (reason 'verify failed (DB error)').
+                        raise RuntimeError('get_db() returned None — PG unreachable')
                     if _conn_ms:
                         _cur_ms = _conn_ms.cursor()
                         _cur_ms.execute("SELECT signal, _signal_metadata FROM trades WHERE id=%s", (trade_id,))
