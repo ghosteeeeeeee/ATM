@@ -675,11 +675,17 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # CEO 2026-10-09: jup_yolo mirror — top leaderboard wallets (+4000% uPnL) conviction
             # overrides our EMA trend read. They see something we don't; never fade a proven winner.
             _jup_yolo_exempt = signal_type and 'jup_yolo' in signal_type.lower()
-            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt and not _ai_trader_exempt and not _jup_yolo_exempt:
+            # BUG-HUNTER 2026-10-31: hl_copy got the blacklist/rep/floor carve-
+            # outs (giants-light expansion) but was left out of the trend and
+            # regime chains — an hl_copy SHORT in BULLISH trend was blocked at
+            # add_signal while the identical jup signal passed. Same rationale
+            # (pro wallets see something we don't; never fade a proven winner).
+            _hl_copy_exempt = signal_type and 'hl_copy' in signal_type.lower()
+            if trend_dir == 'BULLISH' and direction.upper() == 'SHORT' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt and not _ai_trader_exempt and not _jup_yolo_exempt and not _hl_copy_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
-            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt and not _ai_trader_exempt and not _jup_yolo_exempt:
+            if trend_dir == 'BEARISH' and direction.upper() == 'LONG' and not _choch_exempt and not _ct_hot_exempt and not _hzscore_exempt and not _reversion_exempt and not _pump_chain_exempt and not _ai_trader_exempt and not _jup_yolo_exempt and not _hl_copy_exempt:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} signal_type="{signal_type}" '
                       f'trend={trend_dir} [trend_filter]', flush=True)
                 return None
@@ -687,7 +693,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             # ── 5m+15m Regime Confirmation (for SHORT) ────────────────────────
             # Only block SHORT if BOTH 5m AND 15m confirm BULLISH
             # This prevents SHORT in strong uptrends while allowing in weak/mixed
-            if direction.upper() == 'SHORT' and not _choch_exempt and not _hzscore_exempt and not _jup_yolo_exempt:
+            if direction.upper() == 'SHORT' and not _choch_exempt and not _hzscore_exempt and not _jup_yolo_exempt and not _hl_copy_exempt:
                 try:
                     import sqlite3 as _sqlite3
                     from paths import CANDLES_DB

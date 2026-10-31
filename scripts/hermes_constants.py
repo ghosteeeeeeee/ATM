@@ -4156,6 +4156,7 @@ HL_COPY_SHORT_LIFT_CLOSED = 20       # concurrent hl_copy SHORTs until 20 closed
 # churn fix; letting them "lift" the cap on day one would make it a no-op
 # for exactly the re-opened path it exists to watch.
 HL_COPY_SHORT_GUARDRAIL_START = '2026-10-31 00:00:00'
+HL_COPY_MAX_EMIT_ATTEMPTS = 5        # bounded retries per fill (jup-style)
 
 # ── JUP YOLO Mirror Freshness Gate ────────────────────────────────────────────
 # CEO 2026-10-30: "older than 5-10 mins is useless" — mirror only FRESH pro

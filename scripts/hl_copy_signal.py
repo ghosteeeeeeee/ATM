@@ -435,23 +435,43 @@ def run_hl_copy_signal():
         try:
             from hermes_constants import (HL_COPY_MAX_FILL_AGE_SEC,
                                           HL_COPY_MAX_OPEN_SHORTS,
-                                          HL_COPY_SHORT_LIFT_CLOSED)
+                                          HL_COPY_SHORT_LIFT_CLOSED,
+                                          HL_COPY_MAX_EMIT_ATTEMPTS)
         except Exception:
             HL_COPY_MAX_FILL_AGE_SEC = 600
             HL_COPY_MAX_OPEN_SHORTS = 2
             HL_COPY_SHORT_LIFT_CLOSED = 20
+            HL_COPY_MAX_EMIT_ATTEMPTS = 5
+        # FIX (bug_hunter): trader_fills.time is MILLISECONDS — raw compare
+        # against time.time() is seconds − ms ≈ −1.79e12, never >600, so the
+        # freshness gate was dead code (post-downtime backfill + ~720 retry
+        # attempts/6h both went unfiltered). State file didn't exist yet, so
+        # no ms→sec migration needed.
         _fill_time = int(trade.get('time') or 0)
+        if _fill_time > 10_000_000_000:  # ms epoch → seconds (fills are ms)
+            _fill_time //= 1000
         if _fill_time > 0 and (time.time() - _fill_time) > HL_COPY_MAX_FILL_AGE_SEC:
             print(f"[hl_signal] ⏰ STALE SKIP {trade['coin']} {trade['side']} — "
                   f"fill {(time.time() - _fill_time) // 60}m old "
                   f"(> {HL_COPY_MAX_FILL_AGE_SEC // 60}m gate)")
             continue
 
-        # One-emit-per-fill: monotonic dedupe against persisted state
+        # One-emit-per-fill: monotonic dedupe against persisted state + a
+        # jup-style BOUNDED attempt budget per fill (bug_hunter 6: blocked
+        # add_signal retried every 30s; with freshness fixed that's ~20 tries
+        # in 10min, but attempts bound makes give-up explicit and restart-safe).
+        # State per key: {"ft": last SUCCESS fill_ts, "cur": fill being
+        # retried, "att": attempts used} — legacy int values = success ts.
         _state_key = f"{trade['coin'].upper()}:{trade['side'].upper()}"
-        _last_emitted = _emit_state.get(_state_key, 0)
+        _st_raw = _emit_state.get(_state_key)
+        _st = _st_raw if isinstance(_st_raw, dict) else {'ft': int(_st_raw or 0), 'cur': 0, 'att': 0}
+        _last_emitted = int(_st.get('ft', 0) or 0)
         if _fill_time > 0 and _fill_time <= _last_emitted:
             continue  # same fill already emitted (silently — this fired every 30s)
+        if _st.get('cur') == _fill_time and _st.get('att', 0) >= HL_COPY_MAX_EMIT_ATTEMPTS:
+            continue  # give-up terminal for this fill
+        if _st.get('cur') != _fill_time:
+            _st['cur'], _st['att'] = _fill_time, 0  # new fill → fresh budget
 
         # SHORT concurrency guardrail (symmetric with jup Option D)
         if signal['direction'] == 'SHORT':
@@ -462,12 +482,20 @@ def run_hl_copy_signal():
                       f"of {HL_COPY_SHORT_LIFT_CLOSED} — waiting for a slot")
                 continue
 
-        # Write to pipeline — track ONLY on success (a blocked add_signal
-        # leaves the gate open so the same fill may retry within freshness)
+        # Write to pipeline — success advances the monotonic cursor; failure
+        # burns one attempt (give-up terminal at HL_COPY_MAX_EMIT_ATTEMPTS)
         _sid = write_signal_to_pipeline(signal)
-        if _sid is not None and _fill_time > 0:
-            _emit_state[_state_key] = _fill_time
+        if _sid is not None:
+            _emit_state[_state_key] = {'ft': _fill_time, 'cur': 0, 'att': 0}
             _emit_state_save(_emit_state)
+        else:
+            _st['att'] = int(_st.get('att', 0)) + 1
+            if _st['att'] >= HL_COPY_MAX_EMIT_ATTEMPTS:
+                print(f"[hl_signal] giving up {trade['coin']} {trade['side']} "
+                      f"fill_ts={_fill_time} after {_st['att']} attempts")
+            _emit_state[_state_key] = _st
+            _emit_state_save(_emit_state)
+            continue  # not a signal — don't append to signals
         signals.append(signal)
 
         print(f"[hl_signal] {trade['coin']} {trade['side']} | "
