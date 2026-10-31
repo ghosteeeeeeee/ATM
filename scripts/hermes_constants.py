@@ -4160,6 +4160,14 @@ JUP_YOLO_TRAIL_SHADOW_ARM_ATR_MULT = 1.0  # counterfactual arm = 1.0×ATR
 JUP_YOLO_TRAIL_SHADOW_DIST_ATR_MULT = 1.0  # counterfactual distance = 1.0×ATR
 JUP_YOLO_SHADOW_EVAL_N = 40                # pre-registered eval window
 
+# ── JUP exit simulation (T 2026-10-31: "pm-trail vs rr-exits vs atr-sl") ─────
+# Replay closed mirror trades on 5m OHLC: which exit style suits pro moves?
+# pm-trail shakes out on sideways; analysis (NOT a live change — any exit
+# swap ships as shadow first per automatic-implementation).
+JUP_EXIT_SIM_MAX_HOLD_H = 12      # horizon if TP/SL never hit (timeout close)
+JUP_EXIT_SIM_RR = (2.0, 3.0)      # R:R multiples of the trade's own SL risk
+JUP_EXIT_SIM_TIMEFRAME = '5m'     # replay candle size (5m covers every trade)
+
 # ── HL Copy Trader — giants-light expansion (T directive 2026-10-31) ─────────
 # Same patterns as the JUP mirror: hl_copy signals were 30/30 EXPIRED in 48h
 # (19× compaction_stale churn from per-batch-only dedupe re-emitting the SAME

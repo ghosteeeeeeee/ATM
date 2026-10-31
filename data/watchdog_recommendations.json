@@ -1,55 +1,12 @@
 {
-  "timestamp": "2026-10-31T16:41:32.963532+00:00",
-  "steers": [
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: COMP + HYPE",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-001"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: COMP + BLUR",
-      "detail": "Both opened within 22 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: HYPE + BLUR",
-      "detail": "Both opened within 22 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Portfolio heavily long (4 trades)",
-      "detail": "4 long positions. One BTC dump hits all of them.",
-      "auto_executable": false,
-      "id": "steer-004"
-    }
-  ],
-  "portfolio_health": "warning",
+  "timestamp": "2026-10-31T17:11:33.574960+00:00",
+  "steers": [],
+  "portfolio_health": "good",
   "regime": {
     "btc_15m": "LONG_BIAS",
-    "btc_4h": "LONG_BIAS",
-    "continuum": "AT",
-    "volatility": "NORMAL",
-    "zscore_tier": "NEUTRAL",
-    "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.25,
-    "wyckoff_phase": "DISTRIBUTION",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "btc_4h": "LONG_BIAS"
   },
-  "open_count": 5,
+  "open_count": 3,
   "deep_analysis": "5 open trades, ~flat PnL, but the portfolio is split across the wrong side of the tape: 2 shorts (KAS #16620 -0.77%, SOL #16621 -0.40%) were both entered at meta_rsi ~35.5 \u2014 below SHORT_RSI_HARD_FLOOR=45 \u2014 while the 15m aggregate regime is LONG_BIAS (104 long / 2 short / 23 neutral of 129 tokens, regime_5m 16:00 UTC). KAS specifically is a LONG_BIAS coin (conf 87.6, +0.71% over 16 candles) \u2014 we shorted a coin that is rising. The winning side on both trades right now is LONG / flat; we are on the wrong side, not the wrong time.\n\nThe 3 longs (BTC #16615 +0.01%, COMP #16624 +0.17%, HYPE #16625 +0.00%) are regime-aligned: continuum 16:12 UTC has BTC AT EMA300 (138 min), LEAN_BULL, STRONG_UP, zscore STRONG_POS, ACCUMULATION. No trade is open 8h+ (max 4.3h) and none is up 2%+ (max +0.17%), so no breakeven/trailing steers are due this cycle. COMP's stop is only 0.30% away while its 5m ATR is under 0.30% per candle \u2014 one candle of noise can tag it; consider widening to ~0.6% or accepting an early noise stop.\n\nThe dominant problem is entry quality, not exits. Chop-bleed (7d dollar share of loss from trades that never reached +0.40% MFE) = 94.6% ($-7.77 of $-8.21, 79 losers, 0 NULL mfe) vs the >=92% deterioration trip; 14d 90.1%, 30d 85.7% \u2014 all ~10 points above the 2026-10-25 baseline. Same-day arm rate 51.7% (15/29). All 18 losers in the last 24h closed with mfe < 0.40: essentially nobody armed. Per the KPI contract this routes to ENTRY-quality filters (brain_auditor), not trail/exit tuning.\n\nSecond pattern: jup_yolo_mirrored is structurally R:R-inverted \u2014 7d 44T, 61.4% WR, avg win +2.32% vs avg loss -4.73% (breakeven WR = 67.1%), net $-0.49; HYPE alone 21T 14W $-0.15, and it is the signal on both open HYPE trades and the open SOL short. It is LIVE (HL copy signal flags True, 43T/7d traffic) \u2014 not a dead-signal artifact. System-wide 7d: 117W avg +2.07% vs 79L avg -3.13% -> breakeven WR 60.2% vs actual 59.7% -> $-0.69 net: we are one point of WR away from flat, and the loss is concentrated in never-armed entries.",
   "agent_timestamp": "2026-10-31T16:19:24.608515+00:00",
   "regime_context": "Sources (state the source, they disagree):\n- regime_5m aggregate (16:00 UTC): LONG_BIAS \u2014 104 long / 2 short / 23 neutral of 129 tokens. BTC token entry: NEUTRAL (ranging, r2 0.186).\n- watchdog regime_summary (16:11 UTC): btc_15m LONG_BIAS, btc_4h LONG_BIAS, volatility NORMAL, wyckoff ACCUMULATION, trend_quality STRONG_UP.\n- continuum BTC 1m (16:12 UTC): AT EMA300 (138 min since cross at ~15:03), linreg LEAN_BULL, zscore STRONG_POS, trend_quality STRONG_UP, wyckoff ACCUMULATION.\n- auto_trader (16:11 UTC): regime CHOP, score_long 30 / score_short -20, decision MANAGE_ONLY (shadow n=30, longs 23.5% WR -$0.13 vs shorts 46.2% WR +$0.17).\n\nFlip rate last 24h (15m_regime.log): aggregate 19 flips, BTC 12 flips \u2014 both inside the normal band (p50 ~19-20, p95 26); no churn anomaly, so all direction steers this cycle are condition-keyed and re-tested next cycle, not trend claims.\n\nMeaning for positions: longs are with the tape; the 2 shorts are against it. BTC sitting AT EMA300 is a chop pin \u2014 mid-band entries have no edge until 1m resolves above or below; this is exactly the environment where the 94.6% chop-bleed comes from. Long-bias breadth (104/129) says the money is being made on the long side today.",
