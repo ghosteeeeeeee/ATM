@@ -18507,3 +18507,28 @@ Final set: []
 **Open Questions:**
 - 24h RED '-$0.86' (55.6% WR) / 7d '-$0.89' — structural R:R imbalance persists; kill/boost rules don't reach it
 - jup_yolo_mirrored HIGH n=19 (one short of regime-kill bar) — run regime query next hour
+
+## [2026-10-31 12:45] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 flat)
+**PnL:** $+0.12 (WR: 56.4% 24h) | 24h 55T 31W '-$0.70' RED | 7d 203T 57.1% '-$0.77' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored profit-monster-trail '+$0.10'/+2.50%, FIL pump-chain- trail_arm_timeout '+$0.02'/+0.73%, IOTA bb-squeeze+ trail_arm_timeout '$0.00'/-0.09% — net green hour
+- Kill check: no n>=3 0%-WR last hour (each signal n=1) — regime query not triggered
+- jup_yolo_mirrored 14d regime RECHECK (HIGH crossed n>=20): EXTREME 16T 62.5% '-0.05', HIGH 20T 65.0% '-0.29', NORMAL 5T 40% '-0.14' — wins EXTREME/HIGH by WR → keep alive (kill policy: loses ALL regimes not met); NORMAL n=5 too small to block
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 9/55 = 16.4% (<40%); dominant close = profit-monster-trail (28T '+$1.57'); worst avg = stale_exit (2T '-$0.195')
+- Boost: none qualify — volume-buildup- 8T 75.0% but '-$0.12' fail net; jup_yolo_mirrored 31T 58.1% but '-$0.73' fail net; pump-chain+ 4T 25% fail WR
+- Neg streak: 10h '+0.16', 11h '+0.12', 12h '+0.00' — no 3 consecutive red
+- Frequency 3/hr — under 20/hr
+- Entry quality: winners 24h MAE avg 0.196%, 28/31 <0.5% — entries fine; R:R still the drag (avg win '+$0.059' vs avg loss '-$0.127', ~1:2.2)
+- 4 open all green: GMX pump-chain- +2.97%, HYPER pump-chain- +0.14%, HYPE jup_yolo +0.10%, BTC continuum-osc+ +0.03%
+- Storm readiness: **window-min +0.00% / at-run +0.12%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.70' (56.4% WR) / 7d '-$0.77' — structural R:R imbalance persists (losses ~2.2x avg win); kill/boost rules don't reach it
+- jup_yolo_mirrored HIGH n=20 now meets the regime bar but PnL '-0.29' despite 65% WR — R:R driven, not a WR problem; watch HIGH pnl trend
