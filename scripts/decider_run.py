@@ -2809,6 +2809,20 @@ def execute_trade(token, direction, price, confidence, source,
         sl = price * 1.01
         log(f'  [WARN] SL sanity check triggered for SHORT {token}, reset to 1%')
 
+    # ── STOP-TIGHTEN SHADOW (exec-time node, Lane-2 rule) ─────────────────────
+    # Initial ATR SL placement at trade OPEN — clamp check runs here, at the
+    # placement point, NOT at signal detection (price = live entry above).
+    # ENFORCE=False => log-only; stop_tighten_sl returns `sl` unchanged.
+    # Fully guarded: a hook/logging failure can never break trade execution.
+    if sl and sl > 0:
+        try:
+            from tpsl_utils import stop_tighten_sl as _st_hook
+            sl, _st_payload = _st_hook(
+                source, price, sl, current_sl=0.0, token=token,
+                direction=direction, trade_id=None, site='decider_open')
+        except Exception as _st_e:
+            log(f'  [STOP-TIGHTEN-SHADOW] hook error {token}: {type(_st_e).__name__}: {_st_e}')
+
     # Build experiment JSON for brain.py
     import json as _json
     exp_json = None
@@ -5937,6 +5951,17 @@ def run(dry_run=False):
                             # FIX (2026-10-16): changed >= to > — breakeven (SL==entry) is LEGAL
                             # and should not be reset (bug_hunter BUG-3)
                             _new_sl = round(_actual * (1 - ATR_SL_MIN_INIT), 8)
+                            # STOP-TIGHTEN SHADOW (exec-time re-placement, Lane-2):
+                            # clamp check at the replacement point. ENFORCE=False =>
+                            # log-only; returns _new_sl unchanged. Guarded.
+                            try:
+                                from tpsl_utils import stop_tighten_sl as _st_hook
+                                _new_sl, _st_payload = _st_hook(
+                                    source, _actual, _new_sl, current_sl=_sl_val,
+                                    token=token, direction=_dir, trade_id=_tid,
+                                    site='decider_slfix')
+                            except Exception as _st_e:
+                                log(f'  [STOP-TIGHTEN-SHADOW] hook error {token}: {type(_st_e).__name__}: {_st_e}')
                             _cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s", (_new_sl, _tid))
                             _pg.commit()
                             log(f'  [SL-FIX] {token} LONG: SL was {_sl_val:.6f} (above entry {_actual:.6f}), fixed to {_new_sl:.6f}')
@@ -5944,6 +5969,17 @@ def run(dry_run=False):
                             # SL below entry for SHORT — wrong side, fix it
                             # FIX (2026-10-16): changed <= to < — breakeven (SL==entry) is LEGAL
                             _new_sl = round(_actual * (1 + ATR_SL_MIN_INIT), 8)
+                            # STOP-TIGHTEN SHADOW (exec-time re-placement, Lane-2):
+                            # clamp check at the replacement point. ENFORCE=False =>
+                            # log-only; returns _new_sl unchanged. Guarded.
+                            try:
+                                from tpsl_utils import stop_tighten_sl as _st_hook
+                                _new_sl, _st_payload = _st_hook(
+                                    source, _actual, _new_sl, current_sl=_sl_val,
+                                    token=token, direction=_dir, trade_id=_tid,
+                                    site='decider_slfix')
+                            except Exception as _st_e:
+                                log(f'  [STOP-TIGHTEN-SHADOW] hook error {token}: {type(_st_e).__name__}: {_st_e}')
                             _cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s", (_new_sl, _tid))
                             _pg.commit()
                             log(f'  [SL-FIX] {token} SHORT: SL was {_sl_val:.6f} (below entry {_actual:.6f}), fixed to {_new_sl:.6f}')

@@ -3935,6 +3935,47 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             else:
                 fresh_sl = curr * (1 + sl_pct)
                 fresh_tp = curr * (1 - tp_pct)
+            # ── STOP-TIGHTEN SHADOW (exec-time node, Lane-2 rule) ──────────────
+            # Self-close ATR SL RE-PLACEMENT for unprotectable coins — guardian
+            # is the LIVE successor of the deprecated self_close_watcher (merged
+            # 2026-04-23), i.e. the real scw_open node. Clamp check runs at the
+            # exact upsert point, every cycle, against HL entry (registry: % of
+            # price from ENTRY). Source is unknown at this layer (HL-keyed by
+            # coin), so it is resolved from the open trade ONLY when the clamp
+            # could apply (distance > cap AND loss side) — no query otherwise.
+            # ENFORCE=False => log-only; the helper returns fresh_sl unchanged
+            # => _upsert_self_close stores exactly what it stored before (inert).
+            # Guarded: lookup/hook failure never blocks placement or breach check.
+            try:
+                from hermes_constants import STOP_TIGHTEN_MAX_PRICE_PCT as _st_cap
+                _st_dist = abs(fresh_sl - entry_px) / entry_px * 100.0 if entry_px > 0 else 0.0
+                _st_loss_side = ((direction == 'LONG' and fresh_sl < entry_px)
+                                 or (direction == 'SHORT' and fresh_sl > entry_px))
+                if _st_dist > _st_cap and _st_loss_side:
+                    _st_conn = None
+                    _st_cur = None
+                    try:
+                        _st_conn = get_db_connection()
+                        _st_cur = _st_conn.cursor()
+                        _st_cur.execute(
+                            "SELECT id, signal FROM trades WHERE token=%s AND status='open' "
+                            "ORDER BY id DESC LIMIT 1", (coin.upper(),))
+                        _st_row = _st_cur.fetchone()
+                    finally:
+                        for _st_obj in (_st_cur, _st_conn):
+                            try:
+                                if _st_obj:
+                                    _st_obj.close()
+                            except Exception:
+                                pass
+                    if _st_row and _st_row[1]:
+                        from tpsl_utils import stop_tighten_sl as _st_hook
+                        fresh_sl, _st_payload = _st_hook(
+                            _st_row[1], entry_px, fresh_sl, current_sl=0.0,
+                            token=coin, direction=direction,
+                            trade_id=_st_row[0], site='guardian_selfclose')
+            except Exception as _st_e:
+                log(f"  [STOP-TIGHTEN-SHADOW] hook error {coin}: {type(_st_e).__name__}: {_st_e}", 'WARN')
             _upsert_self_close(coin, direction, sz, entry_px, fresh_sl, fresh_tp)
 
             # ── Breach check (uses FRESH values) ───────────────────────────────────

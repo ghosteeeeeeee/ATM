@@ -2468,3 +2468,11 @@
 
 ## Error Alerts — 2026-10-31 15:56 UTC
 - **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-10-31 18:41 UTC
+- **REPEATED** (5x): `Oct N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: [brain.py] TOK is_live_trading_enabled(is_manual=False) = True`

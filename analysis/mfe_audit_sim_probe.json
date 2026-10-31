@@ -1,0 +1,2886 @@
+{
+ "per_trade_walkers": {
+  "16540": [
+   {
+    "layers": [],
+    "exit_px": 97.18624,
+    "exit_ts": 1793346600,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 98.16,
+    "exit_ts": 1793341500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 98.16,
+    "exit_ts": 1793341500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 98.21405999999999,
+    "exit_ts": 1793341800,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 98.16,
+    "exit_ts": 1793341500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 98.16,
+    "exit_ts": 1793341500,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16541": [
+   {
+    "layers": [],
+    "exit_px": 92.39984,
+    "exit_ts": 1793345400,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 93.61749999999999,
+    "exit_ts": 1793341500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 93.61749999999999,
+    "exit_ts": 1793341500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 93.63371000000001,
+    "exit_ts": 1793341500,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 93.63371000000001,
+    "exit_ts": 1793341500,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 93.63371000000001,
+    "exit_ts": 1793341500,
+    "tag": "pm_trail"
+   }
+  ],
+  "16542": [
+   {
+    "layers": [],
+    "exit_px": 92.76489600000001,
+    "exit_ts": 1793345400,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 93.82,
+    "exit_ts": 1793342400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 93.82,
+    "exit_ts": 1793342400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 93.82,
+    "exit_ts": 1793342400,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 93.82,
+    "exit_ts": 1793342400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 93.82,
+    "exit_ts": 1793342400,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16549": [
+   {
+    "layers": [],
+    "exit_px": 2210.176,
+    "exit_ts": 1793368200,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 2233.4320000000002,
+    "exit_ts": 1793348400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 2233.4320000000002,
+    "exit_ts": 1793348400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 2239.4939999999997,
+    "exit_ts": 1793356500,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 2233.4320000000002,
+    "exit_ts": 1793348400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 2233.4320000000002,
+    "exit_ts": 1793348400,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16550": [
+   {
+    "layers": [],
+    "exit_px": 93.41159999999999,
+    "exit_ts": 1793357700,
+    "tag": "atr_tp"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 91.78999999999999,
+    "exit_ts": 1793349300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 91.78999999999999,
+    "exit_ts": 1793349300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 91.80684,
+    "exit_ts": 1793350500,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 91.78999999999999,
+    "exit_ts": 1793349300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 91.78999999999999,
+    "exit_ts": 1793349300,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16551": [
+   {
+    "layers": [],
+    "exit_px": 96.34899200000001,
+    "exit_ts": 1793354700,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 97.16,
+    "exit_ts": 1793349900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 97.16,
+    "exit_ts": 1793349900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 97.41574800000001,
+    "exit_ts": 1793350500,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 97.16,
+    "exit_ts": 1793349900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 97.16,
+    "exit_ts": 1793349900,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16553": [
+   {
+    "layers": [],
+    "exit_px": 90.972352,
+    "exit_ts": 1793353500,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 90.972352,
+    "exit_ts": 1793353500,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 90.972352,
+    "exit_ts": 1793353500,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 90.972352,
+    "exit_ts": 1793353500,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 90.972352,
+    "exit_ts": 1793353500,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 90.972352,
+    "exit_ts": 1793353500,
+    "tag": "floor"
+   }
+  ],
+  "16556": [
+   {
+    "layers": [],
+    "exit_px": 92.008992,
+    "exit_ts": 1793361300,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 93.2193,
+    "exit_ts": 1793358000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 93.2193,
+    "exit_ts": 1793358000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 93.234498,
+    "exit_ts": 1793358000,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 93.234498,
+    "exit_ts": 1793358000,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 93.234498,
+    "exit_ts": 1793358000,
+    "tag": "pm_trail"
+   }
+  ],
+  "16557": [
+   {
+    "layers": [],
+    "exit_px": 2229.3216,
+    "exit_ts": 1793364000,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 2247.09,
+    "exit_ts": 1793358300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 2247.09,
+    "exit_ts": 1793358300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 2229.3216,
+    "exit_ts": 1793364000,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 2247.09,
+    "exit_ts": 1793358300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 2247.09,
+    "exit_ts": 1793358300,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16558": [
+   {
+    "layers": [],
+    "exit_px": 92.02784,
+    "exit_ts": 1793361000,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 93.099,
+    "exit_ts": 1793359200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 93.099,
+    "exit_ts": 1793359200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 93.05445999999999,
+    "exit_ts": 1793359200,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 93.099,
+    "exit_ts": 1793359200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 93.099,
+    "exit_ts": 1793359200,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16560": [
+   {
+    "layers": [],
+    "exit_px": 76800.64,
+    "exit_ts": 1793367900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 77535.43000000001,
+    "exit_ts": 1793362500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 77535.43000000001,
+    "exit_ts": 1793362500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 76800.64,
+    "exit_ts": 1793367900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 77535.43000000001,
+    "exit_ts": 1793362500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 77535.43000000001,
+    "exit_ts": 1793362500,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16563": [
+   {
+    "layers": [],
+    "exit_px": 95.83712,
+    "exit_ts": 1793367000,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 96.62,
+    "exit_ts": 1793364000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 96.62,
+    "exit_ts": 1793364000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 95.83712,
+    "exit_ts": 1793367000,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 96.62,
+    "exit_ts": 1793364000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 96.62,
+    "exit_ts": 1793364000,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16564": [
+   {
+    "layers": [],
+    "exit_px": 91.03088,
+    "exit_ts": 1793367900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 91.03088,
+    "exit_ts": 1793367900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 91.03088,
+    "exit_ts": 1793367900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 91.03088,
+    "exit_ts": 1793367900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 91.03088,
+    "exit_ts": 1793367900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 91.03088,
+    "exit_ts": 1793367900,
+    "tag": "floor"
+   }
+  ],
+  "16566": [
+   {
+    "layers": [],
+    "exit_px": 2260.1160000000004,
+    "exit_ts": 1793373300,
+    "tag": "atr_tp"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 2221.092,
+    "exit_ts": 1793370000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 2221.092,
+    "exit_ts": 1793370000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 2220.05,
+    "exit_ts": 1793370300,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 2221.092,
+    "exit_ts": 1793370000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 2221.092,
+    "exit_ts": 1793370000,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16567": [
+   {
+    "layers": [],
+    "exit_px": 93.682496,
+    "exit_ts": 1793386200,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.74040000000001,
+    "exit_ts": 1793370000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.74040000000001,
+    "exit_ts": 1793370000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 94.68112400000001,
+    "exit_ts": 1793370000,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.74040000000001,
+    "exit_ts": 1793370000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.74040000000001,
+    "exit_ts": 1793370000,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16568": [
+   {
+    "layers": [],
+    "exit_px": 77463.29,
+    "exit_ts": 1793414100,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 77000.01,
+    "exit_ts": 1793371500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 77000.01,
+    "exit_ts": 1793371500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 77140.16799999999,
+    "exit_ts": 1793372100,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 77000.01,
+    "exit_ts": 1793371500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 77000.01,
+    "exit_ts": 1793371500,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16569": [
+   {
+    "layers": [],
+    "exit_px": 94.129888,
+    "exit_ts": 1793384400,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 95.01,
+    "exit_ts": 1793371800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 95.01,
+    "exit_ts": 1793371800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 95.290222,
+    "exit_ts": 1793373000,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 95.01,
+    "exit_ts": 1793371800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 95.01,
+    "exit_ts": 1793371800,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16570": [
+   {
+    "layers": [],
+    "exit_px": 92.07248,
+    "exit_ts": 1793375100,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 92.99,
+    "exit_ts": 1793373300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 92.99,
+    "exit_ts": 1793373300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 92.99,
+    "exit_ts": 1793373300,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 92.99,
+    "exit_ts": 1793373300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 92.99,
+    "exit_ts": 1793373300,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16571": [
+   {
+    "layers": [],
+    "exit_px": 94.0168,
+    "exit_ts": 1793384700,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.72,
+    "exit_ts": 1793374800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.72,
+    "exit_ts": 1793374800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 94.99045000000001,
+    "exit_ts": 1793376600,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.72,
+    "exit_ts": 1793374800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.72,
+    "exit_ts": 1793374800,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16572": [
+   {
+    "layers": [],
+    "exit_px": 76860.16,
+    "exit_ts": 1793385000,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 77517.499,
+    "exit_ts": 1793375400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 77517.499,
+    "exit_ts": 1793375400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 76860.16,
+    "exit_ts": 1793385000,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 77517.499,
+    "exit_ts": 1793375400,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 77517.499,
+    "exit_ts": 1793375400,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16573": [
+   {
+    "layers": [],
+    "exit_px": 2247.3360000000002,
+    "exit_ts": 1793382000,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 2227.42,
+    "exit_ts": 1793376000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 2227.42,
+    "exit_ts": 1793376000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 2222.65,
+    "exit_ts": 1793376300,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 2227.42,
+    "exit_ts": 1793376000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 2227.42,
+    "exit_ts": 1793376000,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16575": [
+   {
+    "layers": [],
+    "exit_px": 90.98326399999999,
+    "exit_ts": 1793379900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 91.76,
+    "exit_ts": 1793377200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 91.76,
+    "exit_ts": 1793377200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 91.966566,
+    "exit_ts": 1793378100,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 91.76,
+    "exit_ts": 1793377200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 91.76,
+    "exit_ts": 1793377200,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16578": [
+   {
+    "layers": [],
+    "exit_px": 94.246944,
+    "exit_ts": 1793382600,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.8,
+    "exit_ts": 1793379000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.8,
+    "exit_ts": 1793379000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 94.246944,
+    "exit_ts": 1793382600,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.8,
+    "exit_ts": 1793379000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.8,
+    "exit_ts": 1793379000,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16583": [
+   {
+    "layers": [],
+    "exit_px": 96.1656,
+    "exit_ts": 1793403000,
+    "tag": "atr_tp"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.48999999999998,
+    "exit_ts": 1793388300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.48999999999998,
+    "exit_ts": 1793388300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 94.80144,
+    "exit_ts": 1793390100,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.48999999999998,
+    "exit_ts": 1793388300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.48999999999998,
+    "exit_ts": 1793388300,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16584": [
+   {
+    "layers": [],
+    "exit_px": 77450.01,
+    "exit_ts": 1793430900,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 76598.07,
+    "exit_ts": 1793388300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 76598.07,
+    "exit_ts": 1793388300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 76954.0,
+    "exit_ts": 1793390700,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 76598.07,
+    "exit_ts": 1793388300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 76598.07,
+    "exit_ts": 1793388300,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16585": [
+   {
+    "layers": [],
+    "exit_px": 89.70656000000001,
+    "exit_ts": 1793396100,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 90.42,
+    "exit_ts": 1793389200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 90.42,
+    "exit_ts": 1793389200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 90.69913999999999,
+    "exit_ts": 1793390100,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 90.42,
+    "exit_ts": 1793389200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 90.42,
+    "exit_ts": 1793389200,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16588": [
+   {
+    "layers": [],
+    "exit_px": 96.89796000000001,
+    "exit_ts": 1793407800,
+    "tag": "atr_tp"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.93,
+    "exit_ts": 1793391900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 94.93,
+    "exit_ts": 1793391900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 95.35000400000001,
+    "exit_ts": 1793394300,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.93,
+    "exit_ts": 1793391900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 94.93,
+    "exit_ts": 1793391900,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16592": [
+   {
+    "layers": [],
+    "exit_px": 95.84,
+    "exit_ts": 1793442300,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 95.87440000000001,
+    "exit_ts": 1793399700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 95.87440000000001,
+    "exit_ts": 1793399700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 95.89888400000001,
+    "exit_ts": 1793402400,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 95.87440000000001,
+    "exit_ts": 1793399700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 95.87440000000001,
+    "exit_ts": 1793399700,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16593": [
+   {
+    "layers": [],
+    "exit_px": 88.57409279999999,
+    "exit_ts": 1793421600,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 89.24,
+    "exit_ts": 1793402100,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 89.24,
+    "exit_ts": 1793402100,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 89.90142320000001,
+    "exit_ts": 1793403300,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 89.24,
+    "exit_ts": 1793402100,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 89.24,
+    "exit_ts": 1793402100,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16594": [
+   {
+    "layers": [],
+    "exit_px": 95.84,
+    "exit_ts": 1793445600,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 96.20790000000001,
+    "exit_ts": 1793403600,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 96.20790000000001,
+    "exit_ts": 1793403600,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 96.358434,
+    "exit_ts": 1793406600,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 96.20790000000001,
+    "exit_ts": 1793403600,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 96.20790000000001,
+    "exit_ts": 1793403600,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16595": [
+   {
+    "layers": [],
+    "exit_px": 88.82110080000001,
+    "exit_ts": 1793421300,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 89.97322000000001,
+    "exit_ts": 1793406300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 89.97322000000001,
+    "exit_ts": 1793406300,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 89.9809252,
+    "exit_ts": 1793406300,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 89.9809252,
+    "exit_ts": 1793406300,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 89.9809252,
+    "exit_ts": 1793406300,
+    "tag": "pm_trail"
+   }
+  ],
+  "16596": [
+   {
+    "layers": [],
+    "exit_px": 89.22940799999999,
+    "exit_ts": 1793409900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 89.92,
+    "exit_ts": 1793407200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 89.92,
+    "exit_ts": 1793407200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 89.22940799999999,
+    "exit_ts": 1793409900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 89.92,
+    "exit_ts": 1793407200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 89.92,
+    "exit_ts": 1793407200,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16597": [
+   {
+    "layers": [],
+    "exit_px": 95.433376,
+    "exit_ts": 1793435100,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 96.81689999999999,
+    "exit_ts": 1793409000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 96.81689999999999,
+    "exit_ts": 1793409000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 96.837594,
+    "exit_ts": 1793408700,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 96.837594,
+    "exit_ts": 1793408700,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 96.837594,
+    "exit_ts": 1793408700,
+    "tag": "pm_trail"
+   }
+  ],
+  "16598": [
+   {
+    "layers": [],
+    "exit_px": 95.957152,
+    "exit_ts": 1793421300,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 96.68,
+    "exit_ts": 1793409900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 96.68,
+    "exit_ts": 1793409900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 95.957152,
+    "exit_ts": 1793421300,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 96.68,
+    "exit_ts": 1793409900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 96.68,
+    "exit_ts": 1793409900,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16602": [
+   {
+    "layers": [],
+    "exit_px": 88.50623999999999,
+    "exit_ts": 1793421600,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 89.395,
+    "exit_ts": 1793419800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 89.395,
+    "exit_ts": 1793419800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 88.50623999999999,
+    "exit_ts": 1793421600,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 89.395,
+    "exit_ts": 1793419800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 89.395,
+    "exit_ts": 1793419800,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16604": [
+   {
+    "layers": [],
+    "exit_px": 96.09,
+    "exit_ts": 1793464500,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 95.66,
+    "exit_ts": 1793421900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 95.66,
+    "exit_ts": 1793421900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 96.108182,
+    "exit_ts": 1793426700,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 95.66,
+    "exit_ts": 1793421900,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 95.66,
+    "exit_ts": 1793421900,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16605": [
+   {
+    "layers": [],
+    "exit_px": 87.379328,
+    "exit_ts": 1793434500,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.6832,
+    "exit_ts": 1793430000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.6832,
+    "exit_ts": 1793430000,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 88.763832,
+    "exit_ts": 1793429700,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.763832,
+    "exit_ts": 1793429700,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.763832,
+    "exit_ts": 1793429700,
+    "tag": "pm_trail"
+   }
+  ],
+  "16606": [
+   {
+    "layers": [],
+    "exit_px": 87.445792,
+    "exit_ts": 1793434500,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.54929999999999,
+    "exit_ts": 1793431200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.54929999999999,
+    "exit_ts": 1793431200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 88.54369799999999,
+    "exit_ts": 1793431200,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.54929999999999,
+    "exit_ts": 1793431200,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.54929999999999,
+    "exit_ts": 1793431200,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16607": [
+   {
+    "layers": [],
+    "exit_px": 87.72851200000001,
+    "exit_ts": 1793434200,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.58,
+    "exit_ts": 1793431800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.58,
+    "exit_ts": 1793431800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 87.72851200000001,
+    "exit_ts": 1793434200,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.58,
+    "exit_ts": 1793431800,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.58,
+    "exit_ts": 1793431800,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16609": [
+   {
+    "layers": [],
+    "exit_px": 86.68691199999999,
+    "exit_ts": 1793455500,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.37,
+    "exit_ts": 1793438700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.37,
+    "exit_ts": 1793438700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 88.05522800000001,
+    "exit_ts": 1793442900,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.37,
+    "exit_ts": 1793438700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.37,
+    "exit_ts": 1793438700,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16612": [
+   {
+    "layers": [],
+    "exit_px": 87.188864,
+    "exit_ts": 1793447700,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.91,
+    "exit_ts": 1793444100,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.91,
+    "exit_ts": 1793444100,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 88.29,
+    "exit_ts": 1793447100,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.91,
+    "exit_ts": 1793444100,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.91,
+    "exit_ts": 1793444100,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16617": [
+   {
+    "layers": [],
+    "exit_px": 87.636256,
+    "exit_ts": 1793451900,
+    "tag": "floor"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.47,
+    "exit_ts": 1793450700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.47,
+    "exit_ts": 1793450700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 88.47,
+    "exit_ts": 1793450700,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.47,
+    "exit_ts": 1793450700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.47,
+    "exit_ts": 1793450700,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16618": [
+   {
+    "layers": [],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 86.85,
+    "exit_ts": 1793455500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 86.85,
+    "exit_ts": 1793455500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 87.36614800000001,
+    "exit_ts": 1793460000,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 86.85,
+    "exit_ts": 1793455500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 86.85,
+    "exit_ts": 1793455500,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16623": [
+   {
+    "layers": [],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.8817,
+    "exit_ts": 1793461500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.8817,
+    "exit_ts": 1793461500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 87.965442,
+    "exit_ts": 1793461500,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.965442,
+    "exit_ts": 1793461500,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.965442,
+    "exit_ts": 1793461500,
+    "tag": "pm_trail"
+   }
+  ],
+  "16625": [
+   {
+    "layers": [],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.67810000000001,
+    "exit_ts": 1793462700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.67810000000001,
+    "exit_ts": 1793462700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 87.835026,
+    "exit_ts": 1793465100,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.67810000000001,
+    "exit_ts": 1793462700,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.67810000000001,
+    "exit_ts": 1793462700,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16627": [
+   {
+    "layers": [],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.4075,
+    "exit_ts": 1793466600,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.4075,
+    "exit_ts": 1793466600,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 87.60529,
+    "exit_ts": 1793467200,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.4075,
+    "exit_ts": 1793466600,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.4075,
+    "exit_ts": 1793466600,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16629": [
+   {
+    "layers": [],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.91,
+    "exit_ts": 1793470500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 87.91,
+    "exit_ts": 1793470500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 88.11,
+    "exit_ts": 1793470800,
+    "tag": "pm_trail"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.91,
+    "exit_ts": 1793470500,
+    "tag": "mfe_exit"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 87.91,
+    "exit_ts": 1793470500,
+    "tag": "mfe_exit"
+   }
+  ],
+  "16630": [
+   {
+    "layers": [],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "mfe_exit"
+    ],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "pm_trail"
+    ],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   },
+   {
+    "layers": [
+     "pm_trail",
+     "mfe_exit"
+    ],
+    "exit_px": 88.17,
+    "exit_ts": 1793470800,
+    "tag": "timeout"
+   }
+  ]
+ },
+ "trades": {
+  "16540": {
+   "actual_pnl": -4.287,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 97.97,
+   "lev": 5.0,
+   "open_ts": 1793340990,
+   "close_ts": 1793346808,
+   "reason": "atr_sl_hit"
+  },
+  "16541": {
+   "actual_pnl": 1.0575,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 93.145,
+   "lev": 5.0,
+   "open_ts": 1793341106,
+   "close_ts": 1793341628,
+   "reason": "profit-monster-trail"
+  },
+  "16542": {
+   "actual_pnl": -5.0421,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 93.513,
+   "lev": 5.0,
+   "open_ts": 1793341971,
+   "close_ts": 1793345607,
+   "reason": "atr_sl_hit"
+  },
+  "16549": {
+   "actual_pnl": 3.1194,
+   "token": "ETH",
+   "dir": "LONG",
+   "entry": 2228.0,
+   "lev": 5.0,
+   "open_ts": 1793347932,
+   "close_ts": 1793357265,
+   "reason": "profit-monster-trail"
+  },
+  "16550": {
+   "actual_pnl": 0.6606,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 91.58,
+   "lev": 5.0,
+   "open_ts": 1793348449,
+   "close_ts": 1793351163,
+   "reason": "profit-monster-trail"
+  },
+  "16551": {
+   "actual_pnl": -3.3101,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 97.126,
+   "lev": 5.0,
+   "open_ts": 1793349349,
+   "close_ts": 1793360849,
+   "reason": "atr_sl_hit"
+  },
+  "16553": {
+   "actual_pnl": 5.9865,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 91.706,
+   "lev": 5.0,
+   "open_ts": 1793351623,
+   "close_ts": 1793356723,
+   "reason": "profit-monster-trail"
+  },
+  "16556": {
+   "actual_pnl": 2.4205,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 92.751,
+   "lev": 5.0,
+   "open_ts": 1793357567,
+   "close_ts": 1793358413,
+   "reason": "profit-monster-trail"
+  },
+  "16557": {
+   "actual_pnl": -6.2519,
+   "token": "ETH",
+   "dir": "LONG",
+   "entry": 2247.3,
+   "lev": 5.0,
+   "open_ts": 1793357756,
+   "close_ts": 1793367147,
+   "reason": "stale_exit"
+  },
+  "16558": {
+   "actual_pnl": 1.2073,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 92.77,
+   "lev": 5.0,
+   "open_ts": 1793358885,
+   "close_ts": 1793359562,
+   "reason": "profit-monster-trail"
+  },
+  "16560": {
+   "actual_pnl": -5.2377,
+   "token": "BTC",
+   "dir": "LONG",
+   "entry": 77420.0,
+   "lev": 5.0,
+   "open_ts": 1793361898,
+   "close_ts": 1793368351,
+   "reason": "atr_sl_hit"
+  },
+  "16563": {
+   "actual_pnl": -5.9259,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 96.61,
+   "lev": 5.0,
+   "open_ts": 1793363506,
+   "close_ts": 1793367207,
+   "reason": "atr_sl_hit"
+  },
+  "16564": {
+   "actual_pnl": -6.1843,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 91.765,
+   "lev": 5.0,
+   "open_ts": 1793367582,
+   "close_ts": 1793369342,
+   "reason": "cut-loser-CL-T1"
+  },
+  "16566": {
+   "actual_pnl": 3.3848,
+   "token": "ETH",
+   "dir": "LONG",
+   "entry": 2215.8,
+   "lev": 5.0,
+   "open_ts": 1793369616,
+   "close_ts": 1793371453,
+   "reason": "profit-monster-trail"
+  },
+  "16567": {
+   "actual_pnl": 0.2065,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 94.438,
+   "lev": 5.0,
+   "open_ts": 1793369671,
+   "close_ts": 1793370307,
+   "reason": "profit-monster-trail"
+  },
+  "16568": {
+   "actual_pnl": 4.4331,
+   "token": "BTC",
+   "dir": "LONG",
+   "entry": 76921.0,
+   "lev": 5.0,
+   "open_ts": 1793371131,
+   "close_ts": 1793373992,
+   "reason": "profit-monster-trail"
+  },
+  "16569": {
+   "actual_pnl": 1.7169,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 94.889,
+   "lev": 5.0,
+   "open_ts": 1793371477,
+   "close_ts": 1793373147,
+   "reason": "profit-monster-trail"
+  },
+  "16570": {
+   "actual_pnl": 3.4908,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 92.815,
+   "lev": 5.0,
+   "open_ts": 1793372827,
+   "close_ts": 1793373931,
+   "reason": "profit-monster-trail"
+  },
+  "16571": {
+   "actual_pnl": 1.2187,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 94.775,
+   "lev": 5.0,
+   "open_ts": 1793374366,
+   "close_ts": 1793377313,
+   "reason": "profit-monster-trail"
+  },
+  "16572": {
+   "actual_pnl": -4.7044,
+   "token": "BTC",
+   "dir": "LONG",
+   "entry": 77480.0,
+   "lev": 5.0,
+   "open_ts": 1793374915,
+   "close_ts": 1793385271,
+   "reason": "atr_sl_hit"
+  },
+  "16573": {
+   "actual_pnl": 1.3456,
+   "token": "ETH",
+   "dir": "SHORT",
+   "entry": 2229.5,
+   "lev": 5.0,
+   "open_ts": 1793375497,
+   "close_ts": 1793376226,
+   "reason": "profit-monster-trail"
+  },
+  "16575": {
+   "actual_pnl": 0.7632,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 91.717,
+   "lev": 5.0,
+   "open_ts": 1793376708,
+   "close_ts": 1793378339,
+   "reason": "profit-monster-trail"
+  },
+  "16578": {
+   "actual_pnl": -4.8575,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 95.007,
+   "lev": 5.0,
+   "open_ts": 1793378573,
+   "close_ts": 1793384499,
+   "reason": "stale_exit"
+  },
+  "16583": {
+   "actual_pnl": 1.8986,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 94.28,
+   "lev": 5.0,
+   "open_ts": 1793387763,
+   "close_ts": 1793390432,
+   "reason": "profit-monster-trail"
+  },
+  "16584": {
+   "actual_pnl": 3.2153,
+   "token": "BTC",
+   "dir": "LONG",
+   "entry": 76509.0,
+   "lev": 5.0,
+   "open_ts": 1793387777,
+   "close_ts": 1793390735,
+   "reason": "profit-monster-trail"
+  },
+  "16585": {
+   "actual_pnl": -4.3017,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 90.43,
+   "lev": 5.0,
+   "open_ts": 1793388473,
+   "close_ts": 1793395227,
+   "reason": "atr_sl_hit"
+  },
+  "16588": {
+   "actual_pnl": 1.6053,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 94.998,
+   "lev": 5.0,
+   "open_ts": 1793391464,
+   "close_ts": 1793397136,
+   "reason": "profit-monster-trail"
+  },
+  "16592": {
+   "actual_pnl": 0.9,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 95.558,
+   "lev": 5.0,
+   "open_ts": 1793399198,
+   "close_ts": 1793402516,
+   "reason": "profit-monster-trail"
+  },
+  "16593": {
+   "actual_pnl": 3.6824,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 89.2884,
+   "lev": 5.0,
+   "open_ts": 1793401724,
+   "close_ts": 1793403602,
+   "reason": "profit-monster-trail"
+  },
+  "16594": {
+   "actual_pnl": 2.323,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 95.783,
+   "lev": 5.0,
+   "open_ts": 1793402565,
+   "close_ts": 1793406868,
+   "reason": "profit-monster-trail"
+  },
+  "16595": {
+   "actual_pnl": 2.2985,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 89.5374,
+   "lev": 5.0,
+   "open_ts": 1793405860,
+   "close_ts": 1793406626,
+   "reason": "profit-monster-trail"
+  },
+  "16596": {
+   "actual_pnl": -3.7132,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 89.949,
+   "lev": 5.0,
+   "open_ts": 1793406717,
+   "close_ts": 1793416236,
+   "reason": "atr_sl_hit"
+  },
+  "16597": {
+   "actual_pnl": 2.2868,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 96.203,
+   "lev": 5.0,
+   "open_ts": 1793407013,
+   "close_ts": 1793409281,
+   "reason": "profit-monster-trail"
+  },
+  "16598": {
+   "actual_pnl": -3.4115,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 96.731,
+   "lev": 5.0,
+   "open_ts": 1793409354,
+   "close_ts": 1793418866,
+   "reason": "atr_sl_hit"
+  },
+  "16602": {
+   "actual_pnl": -5.167,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 89.22,
+   "lev": 5.0,
+   "open_ts": 1793419480,
+   "close_ts": 1793425885,
+   "reason": "atr_sl_hit"
+  },
+  "16604": {
+   "actual_pnl": -3.3469,
+   "token": "SOL",
+   "dir": "LONG",
+   "entry": 95.909,
+   "lev": 5.0,
+   "open_ts": 1793421348,
+   "close_ts": 1793435550,
+   "reason": "atr_sl_hit"
+  },
+  "16605": {
+   "actual_pnl": 1.8051,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 88.084,
+   "lev": 5.0,
+   "open_ts": 1793428365,
+   "close_ts": 1793430112,
+   "reason": "profit-monster-trail"
+  },
+  "16606": {
+   "actual_pnl": 1.2705,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 88.151,
+   "lev": 5.0,
+   "open_ts": 1793430707,
+   "close_ts": 1793431262,
+   "reason": "profit-monster-trail"
+  },
+  "16607": {
+   "actual_pnl": -5.3994,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 88.436,
+   "lev": 5.0,
+   "open_ts": 1793431362,
+   "close_ts": 1793434587,
+   "reason": "atr_sl_hit"
+  },
+  "16609": {
+   "actual_pnl": 3.8278,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 87.386,
+   "lev": 5.0,
+   "open_ts": 1793438139,
+   "close_ts": 1793442996,
+   "reason": "profit-monster-trail"
+  },
+  "16612": {
+   "actual_pnl": 2.5031,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 87.892,
+   "lev": 5.0,
+   "open_ts": 1793443604,
+   "close_ts": 1793447413,
+   "reason": "profit-monster-trail"
+  },
+  "16617": {
+   "actual_pnl": -4.5844,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 88.343,
+   "lev": 5.0,
+   "open_ts": 1793450203,
+   "close_ts": 1793452229,
+   "reason": "hard_max_loss"
+  },
+  "16618": {
+   "actual_pnl": 1.4323,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 86.926,
+   "lev": 5.0,
+   "open_ts": 1793455172,
+   "close_ts": 1793460228,
+   "reason": "profit-monster-trail"
+  },
+  "16623": {
+   "actual_pnl": 2.9045,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 87.279,
+   "lev": 5.0,
+   "open_ts": 1793460525,
+   "close_ts": 1793461800,
+   "reason": "profit-monster-trail"
+  },
+  "16625": {
+   "actual_pnl": 0.5576,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 87.487,
+   "lev": 5.0,
+   "open_ts": 1793462388,
+   "close_ts": 1793465300,
+   "reason": "profit-monster-trail"
+  },
+  "16627": {
+   "actual_pnl": 2.5528,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 87.355,
+   "lev": 5.0,
+   "open_ts": 1793466171,
+   "close_ts": 1793470132,
+   "reason": "profit-monster-trail"
+  },
+  "16629": {
+   "actual_pnl": 1.2848,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 87.759,
+   "lev": 5.0,
+   "open_ts": 1793470195,
+   "close_ts": 1793470528,
+   "reason": "mfe_exit"
+  },
+  "16630": {
+   "actual_pnl": 0.0398,
+   "token": "HYPE",
+   "dir": "LONG",
+   "entry": 88.032,
+   "lev": 5.0,
+   "open_ts": 1793470621,
+   "close_ts": 1793470769,
+   "reason": "mfe_exit"
+  }
+ }
+}

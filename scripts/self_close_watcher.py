@@ -252,6 +252,56 @@ def check_and_close():
             # ATR_PCT_FALLBACK, and all MIN/MAX clamping internally.
             sl_price = compute_atr_sl_price(coin, direction, entry_px, current_px)
             tp_price = compute_atr_tp_price(coin, direction, entry_px, current_px)
+            # ── STOP-TIGHTEN SHADOW (exec-time node, Lane-2 rule) ──────────────
+            # First self-close ATR SL placement. Source is unknown at this layer
+            # (HL-keyed by coin), so it is resolved from the open trade ONLY when
+            # the clamp would actually apply (distance > cap) — keeps the check
+            # cheap. ENFORCE=False => log-only; helper returns sl_price unchanged
+            # => upsert below stores exactly what it stored before (inert).
+            # Fully guarded: lookup/hook failure never blocks self-close setup.
+            # NOTE: this module logs via `logging` (self_close_watcher.log), but
+            # the [STOP-TIGHTEN-SHADOW] line goes to pipeline.log via the same
+            # hermes_log mechanism the other SL sites use (tag is the join key);
+            # hook ERRORS below also route to hermes_log so they join the same
+            # stream, with log.info as fallback.
+            try:
+                from hermes_constants import STOP_TIGHTEN_MAX_PRICE_PCT as _st_cap
+                # Pre-gate mirrors the helper (cheap, no DB query unless it can
+                # possibly fire): distance over cap AND loss-side only — a
+                # profit-lock SL is never a clamp candidate.
+                _st_dist = abs(sl_price - entry_px) / entry_px * 100.0 if entry_px > 0 else 0.0
+                _st_loss_side = ((direction == 'LONG' and sl_price < entry_px)
+                                 or (direction == 'SHORT' and sl_price > entry_px))
+                if _st_dist > _st_cap and _st_loss_side:
+                    _st_conn = None
+                    _st_cur = None
+                    try:
+                        _st_conn = db_connect()
+                        _st_cur = _st_conn.cursor()
+                        _st_cur.execute(
+                            "SELECT signal FROM trades WHERE token=%s AND status='open' "
+                            "ORDER BY id DESC LIMIT 1", (coin.upper(),))
+                        _st_row = _st_cur.fetchone()
+                    finally:
+                        for _st_obj in (_st_cur, _st_conn):
+                            try:
+                                if _st_obj:
+                                    _st_obj.close()
+                            except Exception:
+                                pass
+                    if _st_row and _st_row[0]:
+                        from tpsl_utils import stop_tighten_sl as _st_hook
+                        sl_price, _st_payload = _st_hook(
+                            _st_row[0], entry_px, sl_price, current_sl=0.0,
+                            token=coin, direction=direction, trade_id=None,
+                            site='scw_open')
+            except Exception as _st_e:
+                _st_msg = f"  [STOP-TIGHTEN-SHADOW] hook error {coin}: {type(_st_e).__name__}: {_st_e}"
+                try:
+                    from hermes_log import log as _hlog   # join key = pipeline.log
+                    _hlog(_st_msg)
+                except Exception:
+                    log.info(_st_msg)
             # Store for future runs
             upsert_self_close(coin, direction, sz, entry_px, sl_price, tp_price)
             log.info(f"  {coin}: no prior record, computed SL={sl_price:.6f} TP={tp_price:.6f}")

@@ -1,0 +1,156 @@
+cohort n = 48
+
+=== aggregates, my own replay (n=48) ===
+strategy       n   W   L   WR%     net%
+pm_actual     48  31  16    66    -8.33
+             tags: {'atr_sl_hit': 12, 'profit-monster-trail': 30, 'stale_exit': 2, 'cut-loser-CL-T1': 1, 'hard_max_loss': 1, 'mfe_exit': 2}
+bg            48  15  33    31   -55.66
+             tags: {'floor': 33, 'atr_tp': 4, 'timeout': 11}
+mfe30         48  35  12    74   +32.21
+             tags: {'mfe_exit': 45, 'floor': 2, 'timeout': 1}
+mfe30a040     48  37  11    77   +31.59
+             tags: {'mfe_exit': 36, 'floor': 11, 'timeout': 1}
+pmwalk        48  37  11    77   +31.34
+             tags: {'pm_trail': 36, 'floor': 11, 'timeout': 1}
+pm_mfe30      48  35  12    74   +33.47
+             tags: {'mfe_exit': 39, 'pm_trail': 6, 'floor': 2, 'timeout': 1}
+pm_mfe30a     48  37  11    77   +33.06
+             tags: {'mfe_exit': 23, 'pm_trail': 13, 'floor': 11, 'timeout': 1}
+
+=== brute-force: which dropped pair best matches the claim? ===
+needed delta from dropped trades: {'pm_actual': -3.87, 'bg': -12.37, 'mfe30': -2.58, 'mfe30a040': -4.41, 'pmwalk': -4.97, 'pm_mfe30': -2.58, 'pm_mfe30a': -4.41}
+best pair = 16564,16570  rms-err=2.010
+   pm_actual    dropped-sum=   -2.69 needed=   -3.87
+   bg           dropped-sum=   -8.00 needed=  -12.37
+   mfe30        dropped-sum=   -3.06 needed=   -2.58
+   mfe30a040    dropped-sum=   -3.06 needed=   -4.41
+   pmwalk       dropped-sum=   -3.06 needed=   -4.97
+   pm_mfe30     dropped-sum=   -3.06 needed=   -2.58
+   pm_mfe30a    dropped-sum=   -3.06 needed=   -4.41
+
+=== per-trade ===
+    id tok   dir        entry lev   actual |         bg      mfe30  mfe30a040     pmwalk   pm_mfe30  pm_mfe30a
+ 16540 SOL   LONG     97.9700   5    -4.29 |      -4.00      +0.97      +1.57      +1.25      +0.97      +1.57
+ 16541 HYPE  LONG     93.1450   5    +1.06 |      -4.00      +2.54      +2.54      +2.62      +2.62      +2.62
+ 16542 HYPE  LONG     93.5130   5    -5.04 |      -4.00      +1.64      +1.64      +1.64      +1.64      +1.64
+ 16549 ETH   LONG   2228.0000   5    +3.12 |      -4.00      +1.22      +2.51      +2.58      +1.22      +2.58
+ 16550 HYPE  LONG     91.5800   5    +0.66 |     +10.00      +1.15      +1.57      +1.24      +1.15      +1.57
+ 16551 SOL   LONG     97.1260   5    -3.31 |      -4.00      +0.18      +1.74      +1.49      +0.18      +1.74
+ 16553 HYPE  LONG     91.7060   5    +5.99 |      -4.00      -4.00      -4.00      -4.00      -4.00      -4.00
+ 16556 HYPE  LONG     92.7510   5    +2.42 |      -4.00      +2.52      +2.52      +2.61      +2.61      +2.61
+ 16557 ETH   LONG   2247.3000   5    -6.25 |      -4.00      -0.05      -4.00      -4.00      -0.05      -4.00
+ 16558 HYPE  LONG     92.7700   5    +1.21 |      -4.00      +1.77      +1.77      +1.53      +1.77      +1.77
+ 16560 BTC   LONG  77420.0000   5    -5.24 |      -4.00      +0.75      -4.00      -4.00      +0.75      -4.00
+ 16563 SOL   LONG     96.6100   5    -5.93 |      -4.00      +0.05      -4.00      -4.00      +0.05      -4.00
+ 16564 HYPE  LONG     91.7650   5    -6.18 |      -4.00      -4.00      -4.00      -4.00      -4.00      -4.00
+ 16566 ETH   LONG   2215.8000   5    +3.38 |     +10.00      +1.19      +0.96      +0.96      +1.19      +0.96
+ 16567 SOL   LONG     94.4380   5    +0.21 |      -4.00      +1.60      +1.60      +1.29      +1.60      +1.60
+ 16568 BTC   LONG  76921.0000   5    +4.43 |      +3.52      +0.51      +1.50      +1.42      +0.51      +1.50
+ 16569 SOL   LONG     94.8890   5    +1.72 |      -4.00      +0.64      +2.18      +2.11      +0.64      +2.18
+ 16570 HYPE  LONG     92.8150   5    +3.49 |      -4.00      +0.94      +0.94      +0.94      +0.94      +0.94
+ 16571 SOL   LONG     94.7750   5    +1.22 |      -4.00      -0.29      +1.29      +1.14      -0.29      +1.29
+ 16572 BTC   LONG  77480.0000   5    -4.70 |      -4.00      +0.24      -4.00      -4.00      +0.24      -4.00
+ 16573 ETH   SHORT  2229.5000   5    +1.35 |      -4.00      +0.47      +1.54      +1.54      +0.47      +1.54
+ 16575 HYPE  LONG     91.7170   5    +0.76 |      -4.00      +0.23      +1.65      +1.36      +0.23      +1.65
+ 16578 SOL   LONG     95.0070   5    -4.86 |      -4.00      -1.09      -4.00      -4.00      -1.09      -4.00
+ 16583 SOL   LONG     94.2800   5    +1.90 |     +10.00      +1.11      +2.64      +2.77      +1.11      +2.77
+ 16584 BTC   LONG  76509.0000   5    +3.22 |      +6.15      +0.58      +2.91      +2.91      +0.58      +2.91
+ 16585 HYPE  LONG     90.4300   5    -4.30 |      -4.00      -0.06      +1.74      +1.49      -0.06      +1.74
+ 16588 SOL   LONG     94.9980   5    +1.61 |     +10.00      -0.36      +2.00      +1.85      -0.36      +2.00
+ 16592 SOL   LONG     95.5580   5    +0.90 |      +1.48      +1.66      +1.66      +1.78      +1.66      +1.66
+ 16593 HYPE  LONG     89.2884   5    +3.68 |      -4.00      -0.27      +3.93      +3.43      -0.27      +3.43
+ 16594 SOL   LONG     95.7830   5    +2.32 |      +0.30      +2.22      +2.22      +3.00      +2.22      +2.22
+ 16595 HYPE  LONG     89.5374   5    +2.30 |      -4.00      +2.43      +2.43      +2.48      +2.48      +2.48
+ 16596 HYPE  LONG     89.9490   5    -3.71 |      -4.00      -0.16      -4.00      -4.00      -0.16      -4.00
+ 16597 SOL   LONG     96.2030   5    +2.29 |      -4.00      +3.19      +3.19      +3.30      +3.30      +3.30
+ 16598 SOL   LONG     96.7310   5    -3.41 |      -4.00      -0.26      -4.00      -4.00      -0.26      -4.00
+ 16602 HYPE  LONG     89.2200   5    -5.17 |      -4.00      +0.98      -4.00      -4.00      +0.98      -4.00
+ 16604 SOL   LONG     95.9090   5    -3.35 |      +0.94      -1.30      +1.43      +1.04      -1.30      +1.43
+ 16605 HYPE  LONG     88.0840   5    +1.81 |      -4.00      +3.40      +3.40      +3.86      +3.86      +3.86
+ 16606 HYPE  LONG     88.1510   5    +1.27 |      -4.00      +2.26      +2.26      +2.23      +2.26      +2.26
+ 16607 HYPE  LONG     88.4360   5    -5.40 |      -4.00      +0.81      -4.00      -4.00      +0.81      -4.00
+ 16609 HYPE  LONG     87.3860   5    +3.83 |      -4.00      -0.09      +3.38      +3.83      -0.09      +3.83
+ 16612 HYPE  LONG     87.8920   5    +2.50 |      -4.00      +0.10      +2.26      +2.26      +0.10      +2.26
+ 16617 HYPE  LONG     88.3430   5    -4.58 |      -4.00      +0.72      +0.72      +0.72      +0.72      +0.72
+ 16618 HYPE  LONG     86.9260   5    +1.43 |      +7.16      -0.44      +2.47      +2.53      -0.44      +2.53
+ 16623 HYPE  LONG     87.2790   5    +2.90 |      +5.10      +3.45      +3.45      +3.93      +3.93      +3.93
+ 16625 HYPE  LONG     87.4870   5    +0.56 |      +3.90      +1.09      +1.49      +1.99      +1.09      +1.49
+ 16627 HYPE  LONG     87.3550   5    +2.55 |      +4.66      +0.30      +1.70      +1.43      +0.30      +1.70
+ 16629 HYPE  LONG     87.7590   5    +1.28 |      +2.34      +0.86      +2.00      +2.00      +0.86      +2.00
+ 16630 HYPE  LONG     88.0320   5    +0.04 |      +0.78      +0.78      +0.78      +0.78      +0.78      +0.78
+
+trades whose 12h horizon has NOT fully elapsed yet: 12 -> [16605, 16606, 16607, 16609, 16612, 16617, 16618, 16623, 16625, 16627, 16629, 16630]
+bg timeouts on non-elapsed trades: [16618, 16623, 16625, 16627, 16629, 16630]
+mfe30 timeouts: [16630]
+
+=== statistics (n=48) ===
+sign test mfe30 vs bg : +33/-12 ties=3 two-sided p=0.0025
+sign test mfe30 vs pm_actual: +29/-19 ties=0 two-sided p=0.1934
+bootstrap 95% CI for mfe30 NET : [+11.71, +51.26] (point +32.21)
+bootstrap 95% CI for mfe30-bg  : [+20.08, +150.30] (point +87.87)
+bootstrap 95% CI for mfe30-actual: [-6.31, +86.84] (point +40.54)
+sum bg=-55.66  sum actual=-8.33  sum mfe30=+32.21
+fee/trade (acct %) = 0.45 ; 47 trades -> +21.60
+  net of fees bg           -77.26
+  net of fees mfe30        +10.61
+  net of fees pm_actual    -29.93
+
+=== sensitivity: mfe30 under alternate conventions ===
+  claim (entry bar skipped, prior peak, floor first) net= +32.21 WR= 74% tags={'mfe_exit': 45, 'floor': 2, 'timeout': 1}
+  entry bar INCLUDED                                 net= +26.55 WR= 79% tags={'mfe_exit': 48}
+  peak from CURRENT bar                              net= +17.07 WR= 79% tags={'mfe_exit': 47, 'floor': 1}
+  profit layer checked BEFORE floor                  net= +35.59 WR= 74% tags={'mfe_exit': 46, 'floor': 1, 'timeout': 1}
+  all three                                          net= +22.10 WR= 79% tags={'mfe_exit': 48}
+  bg claim                                            net= -55.66 WR= 31%
+  bg entry bar INCLUDED                               net= -55.66 WR= 31%
+
+=== mfe_exit trades (to hand-check) ===
+  id=16540 SOL LONG entry=97.97 exit=98.160000 pnl_lev=+0.9697 ts=1793341500
+  id=16541 HYPE LONG entry=93.145 exit=93.617500 pnl_lev=+2.5364 ts=1793341500
+  id=16542 HYPE LONG entry=93.513 exit=93.820000 pnl_lev=+1.6415 ts=1793342400
+  id=16549 ETH LONG entry=2228.0 exit=2233.432000 pnl_lev=+1.2190 ts=1793348400
+  id=16550 HYPE LONG entry=91.58 exit=91.790000 pnl_lev=+1.1465 ts=1793349300
+  id=16551 SOL LONG entry=97.126 exit=97.160000 pnl_lev=+0.1750 ts=1793349900
+  id=16556 HYPE LONG entry=92.751 exit=93.219300 pnl_lev=+2.5245 ts=1793358000
+  id=16557 ETH LONG entry=2247.3 exit=2247.090000 pnl_lev=-0.0467 ts=1793358300
+  id=16558 HYPE LONG entry=92.77 exit=93.099000 pnl_lev=+1.7732 ts=1793359200
+  id=16560 BTC LONG entry=77420.0 exit=77535.430000 pnl_lev=+0.7455 ts=1793362500
+  id=16563 SOL LONG entry=96.61 exit=96.620000 pnl_lev=+0.0518 ts=1793364000
+  id=16566 ETH LONG entry=2215.8 exit=2221.092000 pnl_lev=+1.1942 ts=1793370000
+  id=16567 SOL LONG entry=94.438 exit=94.740400 pnl_lev=+1.6011 ts=1793370000
+  id=16568 BTC LONG entry=76921.0 exit=77000.010000 pnl_lev=+0.5136 ts=1793371500
+  id=16569 SOL LONG entry=94.889 exit=95.010000 pnl_lev=+0.6376 ts=1793371800
+  id=16570 HYPE LONG entry=92.815 exit=92.990000 pnl_lev=+0.9427 ts=1793373300
+  id=16571 SOL LONG entry=94.775 exit=94.720000 pnl_lev=-0.2902 ts=1793374800
+  id=16572 BTC LONG entry=77480.0 exit=77517.499000 pnl_lev=+0.2420 ts=1793375400
+  id=16573 ETH SHORT entry=2229.5 exit=2227.420000 pnl_lev=+0.4665 ts=1793376000
+  id=16575 HYPE LONG entry=91.717 exit=91.760000 pnl_lev=+0.2344 ts=1793377200
+  id=16578 SOL LONG entry=95.007 exit=94.800000 pnl_lev=-1.0894 ts=1793379000
+  id=16583 SOL LONG entry=94.28 exit=94.490000 pnl_lev=+1.1137 ts=1793388300
+  id=16584 BTC LONG entry=76509.0 exit=76598.070000 pnl_lev=+0.5821 ts=1793388300
+  id=16585 HYPE LONG entry=90.43 exit=90.420000 pnl_lev=-0.0553 ts=1793389200
+  id=16588 SOL LONG entry=94.998 exit=94.930000 pnl_lev=-0.3579 ts=1793391900
+  id=16592 SOL LONG entry=95.558 exit=95.874400 pnl_lev=+1.6555 ts=1793399700
+  id=16593 HYPE LONG entry=89.2884 exit=89.240000 pnl_lev=-0.2710 ts=1793402100
+  id=16594 SOL LONG entry=95.783 exit=96.207900 pnl_lev=+2.2180 ts=1793403600
+  id=16595 HYPE LONG entry=89.5374 exit=89.973220 pnl_lev=+2.4337 ts=1793406300
+  id=16596 HYPE LONG entry=89.949 exit=89.920000 pnl_lev=-0.1612 ts=1793407200
+  id=16597 SOL LONG entry=96.203 exit=96.816900 pnl_lev=+3.1906 ts=1793409000
+  id=16598 SOL LONG entry=96.731 exit=96.680000 pnl_lev=-0.2636 ts=1793409900
+  id=16602 HYPE LONG entry=89.22 exit=89.395000 pnl_lev=+0.9807 ts=1793419800
+  id=16604 SOL LONG entry=95.909 exit=95.660000 pnl_lev=-1.2981 ts=1793421900
+  id=16605 HYPE LONG entry=88.084 exit=88.683200 pnl_lev=+3.4013 ts=1793430000
+  id=16606 HYPE LONG entry=88.151 exit=88.549300 pnl_lev=+2.2592 ts=1793431200
+  id=16607 HYPE LONG entry=88.436 exit=88.580000 pnl_lev=+0.8141 ts=1793431800
+  id=16609 HYPE LONG entry=87.386 exit=87.370000 pnl_lev=-0.0915 ts=1793438700
+  id=16612 HYPE LONG entry=87.892 exit=87.910000 pnl_lev=+0.1024 ts=1793444100
+  id=16617 HYPE LONG entry=88.343 exit=88.470000 pnl_lev=+0.7188 ts=1793450700
+  id=16618 HYPE LONG entry=86.926 exit=86.850000 pnl_lev=-0.4372 ts=1793455500
+  id=16623 HYPE LONG entry=87.279 exit=87.881700 pnl_lev=+3.4527 ts=1793461500
+  id=16625 HYPE LONG entry=87.487 exit=87.678100 pnl_lev=+1.0922 ts=1793462700
+  id=16627 HYPE LONG entry=87.355 exit=87.407500 pnl_lev=+0.3005 ts=1793466600
+  id=16629 HYPE LONG entry=87.759 exit=87.910000 pnl_lev=+0.8603 ts=1793470500
+
+=== floor trades under mfe30 ===
+  id=16553 HYPE LONG entry=91.706 exit=90.972352 pnl_lev=-4.0000 ts=1793353500
+  id=16564 HYPE LONG entry=91.765 exit=91.030880 pnl_lev=-4.0000 ts=1793367900

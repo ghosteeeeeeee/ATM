@@ -65,7 +65,8 @@ def build():
             cur.execute("""
                 SELECT id, token, direction, status, pnl_pct, pnl_usdt,
                        open_time, close_time, close_reason, confidence,
-                       _signal_metadata, amount_usdt, volatility_regime
+                       _signal_metadata, amount_usdt, volatility_regime,
+                       entry_price, mfe_pct, mae_pct
                 FROM trades
                 WHERE signal LIKE '%%hl_copy%%'
                 ORDER BY id ASC
@@ -77,8 +78,19 @@ def build():
         # ---- normalize rows ----
         trades = []
         for r in rows:
-            meta = r[10] if isinstance(r[10], dict) else (
-                json.loads(r[10]) if r[10] else {})
+            # FIX (bug_hunter LOW 7): one malformed metadata row aborted the
+            # whole build every cycle (empty dashboard) — guard per row.
+            if isinstance(r[10], dict):
+                meta = r[10]
+            elif r[10]:
+                try:
+                    meta = json.loads(r[10])
+                    if not isinstance(meta, dict):
+                        meta = {}
+                except (ValueError, TypeError):
+                    meta = {}
+            else:
+                meta = {}
             hold_h = 0.0
             if r[6] and r[7]:
                 try:
@@ -96,6 +108,13 @@ def build():
                 'amount_usdt': _f(r[11], 11.0),
                 'volatility_regime': r[12] or 'unknown',
                 'hold_h': hold_h,
+                # FIX (bug_hunter HIGH): field contract — html reads these
+                # exact names at copy_trader.html:278-283; missing any of
+                # them threw in loadData's try/catch and killed EVERY table.
+                'entry': _f(r[13]),
+                'mfe_pct': _f(r[14]),
+                'mae_pct': _f(r[15]),
+                'hold_hours': round(hold_h, 2),
             })
 
         closed = [t for t in trades if t['status'] == 'closed']
@@ -226,9 +245,16 @@ def build():
                                  timeout=5)
             hc.row_factory = sqlite3.Row
             for r in hc.execute(
-                    "SELECT wallet, copy_wr, copy_pnl, copy_trades FROM traders "
-                    "WHERE wallet IS NOT NULL"):
-                pro[r['wallet'].lower()] = dict(r)
+                    "SELECT wallet, score, pattern, account_value, copy_wins, "
+                    "copy_trades, copy_pnl FROM traders WHERE wallet IS NOT NULL"):
+                d = dict(r)
+                ct = int(d.get('copy_trades') or 0)
+                # FIX (bug_hunter MED): old query selected nonexistent
+                # traders.copy_wr → IndexError every run → inner except
+                # swallowed → pro stats ALWAYS 0 ('Pro HYPE WR 0% (0 trades)').
+                d['copy_wr'] = (round((d.get('copy_wins') or 0) / ct * 100)
+                                if ct else 0)
+                pro[d['wallet'].lower()] = d
             hc.close()
         except Exception:
             pro = {}
@@ -246,10 +272,11 @@ def build():
                 'total_volume': round(sum(b['usdt']), 2),
                 'copy_wr': p.get('copy_wr') or 0,
                 'pro_hype_pnl': p.get('copy_pnl') or 0,
-                'pro_hype_wr': 0,
-                'pro_hype_trades': p.get('copy_trades') or 0,
+                'pro_hype_wr': p.get('copy_wr') or 0,
+                'pro_hype_trades': int(p.get('copy_trades') or 0),
                 'pro_avg_position': 0,
-                'score': 0, 'pattern': '',
+                'score': p.get('score') or 0,
+                'pattern': p.get('pattern') or '',
             }
 
         # ---- TIER leaderboard (trust system) ----
@@ -258,12 +285,19 @@ def build():
                 tf = json.load(f)
             for e in (tf.get('leaderboard') or [])[:50]:
                 wl = out['by_wallet'].get(e.get('wallet'), {})
+                _p = pro.get(str(e.get('wallet') or '').lower(), {})
+                # FIX (bug_hunter HIGH): html leaderboard render reads
+                # account_value.toFixed / score / pattern at :155-167 —
+                # undefined threw on row 1 and killed every table on the page.
                 out['leaderboard'].append({
                     'wallet': e.get('wallet'),
                     'tier': e.get('tier', 'T2'),
                     'wr': round(_f(e.get('wr')) * 100),
                     'pnl': _f(e.get('pnl_after_latency')),
                     'trades': int(_f(e.get('n'))),
+                    'score': _f(_p.get('score')),
+                    'account_value': _f(_p.get('account_value')),
+                    'pattern': _p.get('pattern') or '',
                     'copy_wr': wl.get('wr', 0),
                     'copy_trades': len(wl.get('trades', [])),
                     'their_pnl': _f(e.get('pnl_their_size')),
@@ -279,14 +313,20 @@ def build():
 
     try:
         os.makedirs(WWW_DATA, exist_ok=True)
+        if not out['summary']:
+            # FIX (bug_hunter MED): PG outage used to write an empty payload
+            # with rc=0 → systemd green, dashboard blank, no signal — the
+            # exact 'exit 0 masks failure' class as the original zero-byte bug.
+            out['error'] = 'summary build failed — see copy-trader-api logs'
         with open(OUT, 'w') as f:
             json.dump(out, f, default=str)
         print(f"[copy_trader_api] wrote {OUT} "
-              f"({len(out['trades'])} trades, {len(out['leaderboard'])} leaderboard)")
+              f"({len(out['trades'])} trades, {len(out['leaderboard'])} leaderboard"
+              f"{', ERROR' if out.get('error') else ''})")
     except OSError as e:
         print(f"[copy_trader_api] write failed: {e}")
         return 1
-    return 0
+    return 1 if out.get('error') else 0
 
 
 if __name__ == '__main__':

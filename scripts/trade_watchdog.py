@@ -1746,6 +1746,14 @@ def execute_safe_actions(steers, watchdog_mode):
             # CEO stop (bug_hunter 2026-10-22 #3). Skip managed signals.
             _skip_ceo_stop = False
             _skip_xmirror = False
+            _skip_reason = ''
+            if not trade_id:
+                # FIX (bug_hunter LOW 5): a steer without trade_id bypassed
+                # the entire verification guard and moved HL stops blind —
+                # the one remaining fail-open. Can't verify the trade →
+                # don't act on it.
+                _skip_xmirror = True
+                _skip_reason = 'no trade_id — cannot verify trade'
             if trade_id:
                 try:
                     import manual_exit_manager as _mxmw
@@ -1768,26 +1776,33 @@ def execute_safe_actions(steers, watchdog_mode):
                                 if _tw_ixm({'signal': _row_ms[0],
                                             '_signal_metadata': _row_ms[1]}):
                                     _skip_xmirror = True
+                                    _skip_reason = ("T1 exact mirror — pro exit governs")
                             except Exception:
                                 # can't verify tier → don't act on HL (fail-closed)
                                 _skip_xmirror = True
+                                _skip_reason = 'tier unverifiable (verify error)'
                         else:
                             # no row → can't rule out an exact-mirror trade
                             _skip_xmirror = True
+                            _skip_reason = 'trade row missing (cannot verify)'
                 except Exception:
                     # DB/verify failure: fail-CLOSED — acting blind with HL
                     # stops is worse than skipping one adjustment (bug_hunter
                     # round-3 LOW: old fail-open could stop a mirror trade)
                     _skip_xmirror = True
-            if _skip_xmirror:
-                log(f"AUTO-EXEC: SKIP {symbol} stop move — T1 exact mirror "
-                    f"(pro's exit governs, catastrophic floor only)", "INFO")
+                    _skip_reason = 'verify failed (DB error)'
+            # FIX (bug_hunter LOW 6): attribution — the CEO branch wins when
+            # BOTH flags are set (previously a CEO skip was logged/audited as
+            # 'T1 exact mirror'). Outcomes are identical skips; labels now
+            # match reality via the precise _skip_reason.
+            if not _skip_ceo_stop and _skip_xmirror:
+                log(f"AUTO-EXEC: SKIP {symbol} stop move — {_skip_reason}", "INFO")
                 executed.append({
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "type": "move_stop",
                     "symbol": symbol,
                     "new_stop": new_stop,
-                    "reason": "skipped: T1 exact mirror trade",
+                    "reason": f"skipped: {_skip_reason}",
                     "auto_executed": False,
                     "hl_result": "skipped"
                 })

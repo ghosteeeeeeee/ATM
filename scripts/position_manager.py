@@ -2275,13 +2275,37 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         # Also force-write if TPSL flagged the current_sl as wrong-sided
         is_force = result.get('_force_write', False)
         if needs_sl or needs_tp or sl_stale or tp_stale or is_init_to_accel or is_force:
+            # ── STOP-TIGHTEN SHADOW (exec-time node, Lane-2 rule) ──────────────
+            # Clamp check AT the exact ATR SL placement/replacement point (this
+            # update dict is what _persist_atr_levels + the HL push will write —
+            # initial placement, ratchet re-placement and TP-only re-persists all
+            # flow through here), so the logged counterfactual is the SL we would
+            # actually clamp. NOT signal-time. ENFORCE=False => log-only, the
+            # helper returns the proposed SL unchanged (identity).
+            # Guarded: a hook/logging failure never breaks the ATR update.
+            # ENFORCE-PHASE CHECKLIST (zero impact today — identity return):
+            # hl_needs_sl above is computed from the PRE-clamp new_sl; when
+            # STOP_TIGHTEN_ENFORCE ever flips True, recompute the HL delta gate
+            # against the clamped value before pushing orders.
+            _st_base_sl = result['_atr_computed_new_sl'] if is_init_to_accel else new_sl
+            _st_sl = _st_base_sl
+            try:
+                from tpsl_utils import stop_tighten_sl as _st_hook
+                _st_sl, _st_payload = _st_hook(
+                    _sig_chk, _entry, _st_base_sl, current_sl=current_sl,
+                    token=token, direction=direction, trade_id=trade_id,
+                    site='pm_collect_atr')
+            except Exception as _st_e:
+                _st_sl = _st_base_sl
+                log(f"  [STOP-TIGHTEN-SHADOW] hook error id={trade_id} {token}: "
+                    f"{type(_st_e).__name__}: {_st_e}")
             updates.append({
                 'trade_id': trade_id,
                 'token': token,
                 'direction': direction,
                 'entry_price': entry_price,
                 'old_sl': current_sl,
-                'new_sl': result['_atr_computed_new_sl'] if is_init_to_accel else new_sl,
+                'new_sl': _st_sl,
                 'old_tp': current_tp,
                 'new_tp': new_tp,
                 'needs_sl': hl_needs_sl or is_force,  # force HL push too if wrong-sided

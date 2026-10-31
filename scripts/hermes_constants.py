@@ -704,6 +704,32 @@ ATR_TP_K_MULT          = 2.0    # TP = 2.0x SL — CEO 2026-09-29: widened from 
 # Only push SL/TP to HL when delta exceeds this threshold
 ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 
+# ── STOP-TIGHTEN GATE (registry: data/shadow_disposition.json → stop-asymmetry-highwr) ──
+# ADD-ONLY block (2026-10-31) — no existing value changed; new inert constants
+# added under the established STORM_*/CHASE_* block pattern (the header rule
+# covers EXISTING values; adding a new block is the sanctioned pattern).
+# Study (2026-10-31): on the two highest-WR signals (jup_yolo_mirrored 58.5%,
+# volume-buildup- 60.7%) the inverted 2:1 R:R lives on the STOP SIDE. A
+# backstop stop at 1.0% price from entry, clamped at EVERY ATR SL
+# placement/replacement, recovers +$2.74/30d (jup) and +$0.84/30d (vb-) with
+# gross WR exactly unchanged (zero winners touch 1.0%; at X=1.0% every
+# would-stopped trade was a loser).
+# THIS PHASE IS SHADOW-ONLY — ZERO live behavior change. Log-only detection at
+# the EXEC-TIME node (helper: tpsl_utils.stop_tighten_sl, called at each ATR
+# SL placement/replacement site — Lane-2 node rule, NOT signal-time).
+# POLARITY: ENFORCE=False => log-only shadow (inert); True => clamp live
+#   (bar-gated, CEO label required). SHADOW=True => shadow collector running.
+#   NEVER make SHADOW=False the shadow state.
+# BAR (pre-registered, recorded NOT enforced now): 14d shadow-joined n>=20 per
+#   signal AND net delta >= +$0.15/30d @$13.40 AND gross WR not down vs live.
+# REVERT: STOP_TIGHTEN_MAX_PRICE_PCT = 2.5 (== ATR_SL_MAX) restores status-quo
+#   behavior for the two sources — the cap becomes a no-op.
+STOP_TIGHTEN_MAX_PRICE_PCT = 1.0   # % price distance from entry — backstop cap; enforce phase clamps abs(SL-entry)/entry*100 <= this
+STOP_TIGHTEN_SOURCES = ('jup_yolo_mirrored', 'volume-buildup-')  # scope: exact source match ONLY (registry spec tuple)
+STOP_TIGHTEN_SHADOW = True         # shadow collector on (log lines only)
+# polarity: ENFORCE=False => log-only shadow; True => clamp live (bar-gated, CEO label required)
+STOP_TIGHTEN_ENFORCE = False       # THIS PHASE: False = shadow-only/inert (no live effect)
+
 # ── Price sanity (brain_auditor 2026-10-21) ─────────────────────────────────
 # A single bad HL mid poll used to become a PERMANENT peak: it feeds
 # highest_price -> peak_price -> trail arm -> SL ratchet, so the fabricated

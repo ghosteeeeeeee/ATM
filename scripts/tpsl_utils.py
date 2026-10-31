@@ -993,3 +993,156 @@ def compute_fallback_tp(current_price: float, direction: str) -> float:
     if direction == 'LONG':
         return current_price * (1 + ATR_TP_MIN)
     return current_price * (1 - ATR_TP_MIN)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# STOP-TIGHTEN SHADOW GATE — registry entry stop-asymmetry-highwr
+# (data/shadow_disposition.json). One shared clamp-check helper; every ATR SL
+# placement/replacement site calls THIS — no copy-pasted clamp logic anywhere.
+#
+# NODE DECLARATION (Lane-2 rule): EXEC-TIME. The check runs at the exact point
+# an ATR SL is placed/replaced (decider open, decider SL-FIX,
+# position_manager._collect_atr_updates write, self-close first placement) —
+# NOT at signal detection — so the logged counterfactual reflects the SL we
+# would actually clamp.
+#
+# POLARITY: STOP_TIGHTEN_ENFORCE=False => log-only shadow, ZERO live effect
+#   (identity return: sl_to_use == proposed_sl by construction).
+#   True => clamp live — only after the pre-registered bar (14d shadow-joined
+#   n>=20/signal AND net delta >= +$0.15/30d @$13.40 AND gross WR not down)
+#   AND a CEO label. STOP_TIGHTEN_SHADOW=True means the collector is running.
+#   NEVER make SHADOW=False the shadow state.
+# REVERT: STOP_TIGHTEN_MAX_PRICE_PCT = 2.5 (== ATR_SL_MAX) restores status-quo
+#   behavior for the two scoped sources (cap becomes a no-op).
+# ════════════════════════════════════════════════════════════════════════════
+
+from hermes_constants import (
+    STOP_TIGHTEN_MAX_PRICE_PCT, STOP_TIGHTEN_SOURCES,
+    STOP_TIGHTEN_SHADOW, STOP_TIGHTEN_ENFORCE,
+)
+
+# Per-process dedup: one [STOP-TIGHTEN-SHADOW] line per (trade/token key, SL
+# value, site). Mirrors the neighboring shadow collectors' per-process sets
+# (position_manager _hml_shadow_logged etc. — pipeline steps are fresh
+# processes each minute, so this dedups within a cycle only).
+_STOP_TIGHTEN_LOGGED = set()
+
+
+def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
+                    token='', direction='', trade_id=None, site='placement'):
+    """STOP-TIGHTEN clamp check (shadow gate for stop-asymmetry-highwr).
+
+    Shared by ALL ATR SL placement/replacement call sites.
+
+    Returns (sl_to_use, payload):
+      * sl_to_use  — identical to proposed_sl whenever STOP_TIGHTEN_ENFORCE is
+        False (shadow phase writes NOTHING). Only an ENFORCE=True run returns
+        the clamped would-be SL, and only then does the caller's write differ.
+      * payload    — None when out of scope / not a clamp candidate, otherwise
+        the would-be values for logging & next-run joins:
+        {source, token, direction, trade_id, site, entry, current_sl,
+         proposed_sl, would_be_sl, dist_before_pct, dist_after_pct,
+         dist_current_pct, would_later_stop}.
+
+    Side effects when ENFORCE is False: at most one [STOP-TIGHTEN-SHADOW] log
+    line when STOP_TIGHTEN_SHADOW is True (guarded twice — a logging failure
+    can never break trade execution). No DB writes, no file writes, no state
+    mutation apart from the in-process dedup set.
+    """
+    try:
+        # Scope: ONLY the two registry sources (exact match — the spec tuple).
+        if source not in STOP_TIGHTEN_SOURCES:
+            return proposed_sl, None
+
+        entry = float(entry_price or 0)
+        prop = float(proposed_sl or 0)
+        if entry <= 0 or prop <= 0:
+            return proposed_sl, None
+
+        cap = float(STOP_TIGHTEN_MAX_PRICE_PCT)
+        dist_prop = abs(prop - entry) / entry * 100.0
+        if dist_prop <= cap + 1e-9:
+            # Already within the backstop (already-tighter SLs untouched) —
+            # also catches breakeven/profit-lock values at 0 distance. The
+            # 1e-9 absorbs float noise at the boundary (e.g. 1.0-0.99 =>
+            # 1.0000000000000009%) so an SL exactly at the cap never logs.
+            return proposed_sl, None
+
+        # LOSS-side only: a profit-lock SL on the far side of entry (LONG SL
+        # above entry / SHORT SL below) must never be clamped back toward the
+        # loss — same rule the PHANTOM-WRITE guard uses. Distance alone would
+        # be wrong there, so require the stop to sit on the loss side.
+        # DIRECTION IS REQUIRED: with direction='' the loss side and the
+        # profit-lock side are indistinguishable (prop<entry is LONG's loss but
+        # SHORT's profit-lock), so an unknown direction never engages — safe
+        # no-op instead of a coin-flip (bug_hunter LOW-2). All 4/5 call sites
+        # always pass LONG/SHORT today.
+        dirn = (direction or '').upper()
+        if dirn not in ('LONG', 'SHORT'):
+            return proposed_sl, None
+        if dirn == 'LONG' and prop >= entry:
+            return proposed_sl, None
+        if dirn == 'SHORT' and prop <= entry:
+            return proposed_sl, None
+
+        sign = -1.0 if dirn == 'LONG' else 1.0
+        would_be = round(entry * (1.0 + sign * cap / 100.0), 8)  # 8dp = every SL writer's convention
+        # No-op clamp guard: only engage when the clamp would actually tighten
+        # the stop (float-boundary safety; a non-tightening "clamp" is noise).
+        if (dirn == 'LONG' and would_be <= prop) or (dirn == 'SHORT' and would_be >= prop):
+            return proposed_sl, None
+
+        cur = 0.0
+        try:
+            cur = float(current_sl or 0)
+        except Exception:
+            cur = 0.0
+        dist_cur = abs(cur - entry) / entry * 100.0 if cur > 0 else None
+
+        payload = {
+            'source': source, 'token': token, 'direction': dirn,
+            'trade_id': trade_id, 'site': site,
+            'entry': entry, 'current_sl': cur,
+            'proposed_sl': prop, 'would_be_sl': would_be,
+            'dist_before_pct': dist_prop, 'dist_after_pct': cap,
+            'dist_current_pct': dist_cur,
+            # Whether the position would LATER stop at the clamped level is
+            # next-run data (joined from the trade's exit); the clamp decision
+            # itself is logged now.
+            'would_later_stop': 'next-run',
+        }
+
+        # Shadow log line — one per clamped-would-be event (deduped per
+        # process), guarded so logging can never break trade execution.
+        # Gated on SHADOW only: SHADOW=True = collector running (log-only while
+        # ENFORCE=False); if ENFORCE ever flips True the line keeps firing and
+        # carries enforce=True so the bar audit stays fed.
+        if STOP_TIGHTEN_SHADOW:
+            key = (trade_id if trade_id is not None else f"{token}|{dirn}",
+                   round(prop, 8), site)
+            if key not in _STOP_TIGHTEN_LOGGED:
+                _STOP_TIGHTEN_LOGGED.add(key)
+                # sl_cur=none (not 0.000000) when no current SL exists yet
+                # (first placement) — 0 would read as a breakeven stop.
+                _scur = f"{cur:.6f}" if cur > 0 else "none"
+                log(f"  [STOP-TIGHTEN-SHADOW] id={trade_id} {token} {dirn} "
+                    f"src={source} site={site} entry={entry:.6f} "
+                    f"sl_cur={_scur} sl_prop={prop:.6f} "
+                    f"sl_wouldbe={would_be:.6f} dist_before={dist_prop:.3f}% "
+                    f"dist_after={cap:.3f}% cap={cap}% "
+                    f"enforce={STOP_TIGHTEN_ENFORCE} "
+                    f"would_later_stop=next-run-data")
+
+        if STOP_TIGHTEN_ENFORCE:
+            # Future enforce phase only (bar + CEO label). Already-tighter SLs
+            # never reach this branch: they pass the dist_prop <= cap exit above.
+            return would_be, payload
+        return proposed_sl, payload
+    except Exception as _st_err:
+        # Guard errors: log and continue — never propagate into trade exec.
+        try:
+            log(f"  [STOP-TIGHTEN-SHADOW] helper error src={source} {token}: "
+                f"{type(_st_err).__name__}: {_st_err}")
+        except Exception:
+            pass
+        return proposed_sl, None
