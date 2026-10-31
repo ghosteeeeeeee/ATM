@@ -365,6 +365,37 @@ def _hl_short_counts() -> tuple:
         return (0, 0)
 
 
+def _pure_staleness_death(coin: str, side: str) -> bool:
+    """True when the MOST RECENT hl_copy signal for coin+side (within the
+    10-min freshness window) died PURELY to compaction staleness.
+
+    CEO verdict 2026-10-31 (trust-tiers day-1, option B): staleness-class
+    deaths are accidents of cadence (row never survived 2 compaction cycles)
+    — T1 fills get ONE bounded re-emission. Gate-deaths (blocked@approval /
+    knife / floor / chop / rr — reason has extra text) are real rejections
+    and stay terminal; exact-reason match keeps them out.
+    """
+    try:
+        import sqlite3
+        from paths import RUNTIME_DB
+        conn = sqlite3.connect(RUNTIME_DB, timeout=5)
+        try:
+            row = conn.execute("""
+                SELECT decision, COALESCE(decision_reason, '')
+                FROM signals
+                WHERE source LIKE '%%hl_copy%%' AND token = ? AND direction = ?
+                  AND created_at > datetime('now', '-10 minutes')
+                ORDER BY id DESC LIMIT 1
+            """, (str(coin).upper(), str(side).upper())).fetchone()
+        finally:
+            conn.close()
+        if not row:
+            return False
+        return row[0] == 'EXPIRED' and row[1].strip() == 'compaction_stale_10min'
+    except Exception:
+        return False  # fail-safe: no re-emission on DB trouble
+
+
 def run_hl_copy_signal():
     """Main function: detect pro trades and generate pipeline signals."""
     if not HL_COPY_SIGNAL_ENABLED:
@@ -466,8 +497,31 @@ def run_hl_copy_signal():
         _st_raw = _emit_state.get(_state_key)
         _st = _st_raw if isinstance(_st_raw, dict) else {'ft': int(_st_raw or 0), 'cur': 0, 'att': 0}
         _last_emitted = int(_st.get('ft', 0) or 0)
+        _is_reemit = False
         if _fill_time > 0 and _fill_time <= _last_emitted:
-            continue  # same fill already emitted (silently — this fired every 30s)
+            # CEO verdict 2026-10-31 (option B): ONE bounded re-emission for
+            # T1 fills whose signal died PURELY to compaction staleness —
+            # #1699534 (T1 ETH SHORT) is the poster case. Gate-deaths stay
+            # terminal (reopening those reopens churn), non-T1 stay
+            # one-emit-per-fill, and the freshness gate below still bounds
+            # the whole thing to <=10min from the fill. 'reemit' persists in
+            # state → at most one successful re-emission per fill ever.
+            if not _st.get('reemit'):
+                try:
+                    from trust_tiers import tier_for_wallet as _t4r
+                    _reemit_tier = _t4r(trade.get('wallet', ''))
+                except Exception:
+                    _reemit_tier = 'T2'
+                if _reemit_tier == 'T1' and _pure_staleness_death(
+                        trade['coin'], signal['direction']):
+                    _is_reemit = True
+                    print(f"[hl_signal] ♻️ T1 staleness re-emit {trade['coin']} "
+                          f"{signal['direction']} (one bounded retry — prior "
+                          f"signal died compaction_stale_10min)")
+                else:
+                    continue  # same fill already emitted — no retry left
+            else:
+                continue  # the one re-emission already used
         if _st.get('cur') == _fill_time and _st.get('att', 0) >= HL_COPY_MAX_EMIT_ATTEMPTS:
             continue  # give-up terminal for this fill
         if _st.get('cur') != _fill_time:
@@ -516,7 +570,10 @@ def run_hl_copy_signal():
         # burns one attempt (give-up terminal at HL_COPY_MAX_EMIT_ATTEMPTS)
         _sid = write_signal_to_pipeline(signal)
         if _sid is not None:
-            _emit_state[_state_key] = {'ft': _fill_time, 'cur': 0, 'att': 0}
+            _saved = {'ft': _fill_time, 'cur': 0, 'att': 0}
+            if _is_reemit:
+                _saved['reemit'] = 1  # persists the ONE-re-emission bound
+            _emit_state[_state_key] = _saved
             _emit_state_save(_emit_state)
         else:
             _st['att'] = int(_st.get('att', 0)) + 1

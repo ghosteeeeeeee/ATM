@@ -1199,6 +1199,12 @@ SHORT_RSI_HARD_FLOOR = 45      # REVERTED 35→45 2026-10-18 brain_auditor: pre-
 # SHORT mirror deaths at approval. OVERSOLD_SHORT_RSI_MAX=35 knife guard stays GLOBAL
 # (BANANA lesson unchanged): jup_yolo SHORTs below 35 are still dead.
 SHORT_RSI_HARD_FLOOR_JUP_YOLO = 35  # CEO Option D 2026-10-30 — jup_yolo_mirrored source only
+# CEO verdict 2026-10-31 (trust-tiers day-1 consult): the SOFT floor had no
+# giant branch — the exact approval→exec contradiction Option D exists to
+# prevent, inverted: hard floor let RSI 35-45 through, soft floor re-killed
+# it (#1699082 T2 BTC SHORT RSI 42.1). Carve soft floor for giants too.
+# Knife <35 (OVERSOLD_SHORT_RSI_MAX) stays GLOBAL ahead of this band.
+SHORT_RSI_FLOOR_JUP_YOLO = 35        # giants namespace (jup_yolo/hl_copy)
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
 # Blanket 45 floor cuts off this band. Pump-chain gets a lower floor. Revert if 7d n>=5 WR<45% or PnL<-$0.50.
 # REVERTED 2026-10-21 brain_auditor: trigger HIT — 7d n=5 w=1 (20% WR) | 14d n=17 w=4 (23.5%) net +$0.04 | 30d 41.2% WR +$0.29.

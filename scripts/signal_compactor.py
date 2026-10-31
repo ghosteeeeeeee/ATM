@@ -4430,6 +4430,15 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         except Exception:
                             pass
             if direction == 'SHORT' and SHORT_RSI_FLOOR > 0 and _fade_effective_source(source) == source:  # RC1: fades trade LONG post-flip
+                # CEO verdict 2026-10-31: giant soft-floor carve (mirror of the
+                # hard-floor carve — hard let 35-45 through, soft re-killed it:
+                # the approval→exec contradiction inverted). Hoisted with the
+                # knife import for the same fail-OPEN reason. Knife <35 below
+                # stays global and fires first.
+                from directional_block import is_giant_source as _rsf_giant
+                from hermes_constants import SHORT_RSI_FLOOR_JUP_YOLO
+                _rsf_floor = (SHORT_RSI_FLOOR_JUP_YOLO if _rsf_giant(source)
+                              else SHORT_RSI_FLOOR)
                 _conn_rsf = None
                 try:
                     _conn_rsf = sqlite3.connect(CANDLES_DB, timeout=5)
@@ -4448,7 +4457,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         _rsf_al = sum(_rsf_losses) / 14
                         if _rsf_al > 0:
                             _rsf_rsi = 100 - (100 / (1 + _rsf_ag / _rsf_al))
-                            if _rsf_rsi < SHORT_RSI_FLOOR:
+                            if _rsf_rsi < _rsf_floor:
                                 # CEO UNCLOG flip #1 (consult 20261022T144234Z): knife
                                 # (< OVERSOLD_SHORT_RSI_MAX) dead on EVERY path — the bear
                                 # override below only ever applies to [35, floor).
@@ -4482,9 +4491,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 except Exception:
                                     pass
                                 if _rsf_bearish_override:
-                                    log(f"  ✅ [SHORT-RSI-FLOOR] {tkn}: SHORT bypass — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} but BTC bearish (oversold = continuation)")
+                                    log(f"  ✅ [SHORT-RSI-FLOOR] {tkn}: SHORT bypass — RSI {_rsf_rsi:.1f} < {_rsf_floor} but BTC bearish (oversold = continuation)")
                                 else:
-                                    log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {SHORT_RSI_FLOOR} (extreme oversold)")
+                                    log(f"  🚫 [SHORT-RSI-FLOOR] {tkn}: SHORT blocked — RSI {_rsf_rsi:.1f} < {_rsf_floor} (extreme oversold)")
                                     _tombstone_pending(tkn, direction, 'short-rsi-floor', dry)
                                     continue
                 except Exception:

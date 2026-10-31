@@ -90,7 +90,13 @@ fill permanently (freshness window means no other chance). **Options:**
 ## Constraints noted
 - All gate changes route through central helpers (directional_block /
   is_giant_source) — 12+ sites keep namespaces consistent.
-- Bug_hunter is the final step on every change (4 rounds completed; round 5
-  verifying the latest fixes is in flight — verdict will be reported).
+- Bug_hunter completed FIVE rounds — round 5 verdict: all 8 fixes VERIFIED
+  (node render harness ×2, contract 0 fails, rc-mask 3-state, 8-scenario
+  skip harness, daemon mtime proof, zero regressions). Its residual finding
+  (get_db() None → blind stop-move on PG outage, MED-LOW) was fixed and
+  harness-proven: PG-outage → skip with 'verify failed (DB error)',
+  healthy control → moves normally. LOW leftovers on record: 37MB
+  LOCK-WAIT err.log (needs rotation/throttle), by_regime dead div + html
+  deploy drift (live copy older than repo copy).
 - Protected flags: you already authorized the giant-namespace carve-outs;
   item 4 touches T1 thresholds in hermes_constants (needs your explicit OK).

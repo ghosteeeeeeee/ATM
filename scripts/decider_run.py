@@ -1418,8 +1418,16 @@ def rule_based_context_gate(token, direction, source, sig):
         # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12.
         # CEO UNCLOG flip #1: same knife/bear pattern as the hard floor above — with both floors
         # at 45 this block would instantly re-kill every signal the hard-floor exemption let pass.
-        from hermes_constants import SHORT_RSI_FLOOR_PUMP_CHAIN
-        _soft_floor = SHORT_RSI_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_FLOOR
+        from hermes_constants import SHORT_RSI_FLOOR_PUMP_CHAIN, SHORT_RSI_FLOOR_JUP_YOLO
+        from directional_block import is_giant_source
+        # CEO verdict 2026-10-31: giant soft-floor branch (was the missing
+        # half of Option D — hard floor carved, soft floor still 45).
+        if 'pump-chain' in (source or ''):
+            _soft_floor = SHORT_RSI_FLOOR_PUMP_CHAIN
+        elif is_giant_source(source):
+            _soft_floor = SHORT_RSI_FLOOR_JUP_YOLO
+        else:
+            _soft_floor = SHORT_RSI_FLOOR
         if _live_rsi_floor is not None and _live_rsi_floor < _soft_floor:
             if _live_rsi_floor < OVERSOLD_SHORT_RSI_MAX:
                 return ('SKIP', f'{_sig_label}: LIVE RSI {_live_rsi_floor:.1f} < {OVERSOLD_SHORT_RSI_MAX} (knife — BANANA lesson, no bearish override ever)', 0)
@@ -2611,8 +2619,17 @@ def execute_trade(token, direction, price, confidence, source,
             # 7d SHORT meta RSI<40: 13T 31%WR -$0.77; pump-chain- RSI<40: 3T 0%WR -$0.38.
             # Live-signal winner impact: 0 — the 4 RSI<40 winners were accel-300-/mtf-regime-trend- (disabled/killed).
             # pump-chain SHORT gets lower floor (40 vs 45) — own-conclusions 2026-10-12.
-            from hermes_constants import SHORT_RSI_FLOOR_PUMP_CHAIN
-            _exec_soft_floor = SHORT_RSI_FLOOR_PUMP_CHAIN if 'pump-chain' in (source or '') else SHORT_RSI_FLOOR
+            from hermes_constants import SHORT_RSI_FLOOR_PUMP_CHAIN, SHORT_RSI_FLOOR_JUP_YOLO
+            from directional_block import is_giant_source
+            # CEO verdict 2026-10-31: giant soft-floor branch at exec time —
+            # without it, compactor approves (35) and exec re-kills (45) =
+            # the approval→exec contradiction Option D exists to prevent.
+            if 'pump-chain' in (source or ''):
+                _exec_soft_floor = SHORT_RSI_FLOOR_PUMP_CHAIN
+            elif is_giant_source(source):
+                _exec_soft_floor = SHORT_RSI_FLOOR_JUP_YOLO
+            else:
+                _exec_soft_floor = SHORT_RSI_FLOOR
             if direction.upper() == 'SHORT' and _exec_soft_floor > 0 and _exec_rsi < _exec_soft_floor:
                 # CEO UNCLOG flip #1: knife dead / bear-exempt band — with soft==hard==45 this
                 # block would otherwise instantly re-kill what the hard-floor exemption passed.
