@@ -514,16 +514,19 @@ def run_hl_copy_signal():
                     _reemit_tier = 'T2'
                 if _reemit_tier == 'T1' and _pure_staleness_death(
                         trade['coin'], signal['direction']):
-                    _is_reemit = True
-                    print(f"[hl_signal] ♻️ T1 staleness re-emit {trade['coin']} "
-                          f"{signal['direction']} (one bounded retry — prior "
-                          f"signal died compaction_stale_10min)")
+                    _is_reemit = True  # print moved AFTER the give-up check
                 else:
                     continue  # same fill already emitted — no retry left
             else:
                 continue  # the one re-emission already used
         if _st.get('cur') == _fill_time and _st.get('att', 0) >= HL_COPY_MAX_EMIT_ATTEMPTS:
             continue  # give-up terminal for this fill
+        if _is_reemit:
+            # AFTER give-up check (bug_hunter LOW): printing from the cursor
+            # branch repeated ♻️ every 30s on fills already at att=5.
+            print(f"[hl_signal] ♻️ T1 staleness re-emit {trade['coin']} "
+                  f"{signal['direction']} (one bounded retry — prior "
+                  f"signal died compaction_stale_10min)")
         if _st.get('cur') != _fill_time:
             _st['cur'], _st['att'] = _fill_time, 0  # new fill → fresh budget
 

@@ -4436,9 +4436,18 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 # knife import for the same fail-OPEN reason. Knife <35 below
                 # stays global and fires first.
                 from directional_block import is_giant_source as _rsf_giant
-                from hermes_constants import SHORT_RSI_FLOOR_JUP_YOLO
-                _rsf_floor = (SHORT_RSI_FLOOR_JUP_YOLO if _rsf_giant(source)
-                              else SHORT_RSI_FLOOR)
+                from hermes_constants import (SHORT_RSI_FLOOR_JUP_YOLO,
+                                              SHORT_RSI_FLOOR_PUMP_CHAIN)
+                # pump-chain first (same precedence as decider ctx/exec —
+                # bug_hunter LOW: no pc carve here was a latent inverted
+                # contradiction IF the pc carve is ever re-lowered; today
+                # pc==45==global so this branch is behavior-neutral)
+                if 'pump-chain' in (source or ''):
+                    _rsf_floor = SHORT_RSI_FLOOR_PUMP_CHAIN
+                elif _rsf_giant(source):
+                    _rsf_floor = SHORT_RSI_FLOOR_JUP_YOLO
+                else:
+                    _rsf_floor = SHORT_RSI_FLOOR
                 _conn_rsf = None
                 try:
                     _conn_rsf = sqlite3.connect(CANDLES_DB, timeout=5)
