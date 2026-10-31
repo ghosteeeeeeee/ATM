@@ -745,3 +745,55 @@ Changing exit config without more data risks: loosening stops → losers run fur
 2. Add constants: `VOLUME_BUILDUP_LONG_RSI_MIN = 40`, change `VOLUME_BUILDUP_RSI_MAX = 70` (was 75), `VOLUME_BUILDUP_MIN_PRICE_CHANGE_PCT = 1.0` (was 0.3)
 3. SHORT side: no change, monitor hard_max_loss bleed trend
 4. Restart pipeline after committing (signal changes need reload)
+
+## EXIT ASYMMETRY DECISIONS — 2026-10-31
+
+**Source:** `reports/exit-asymmetry-deep-dive-2026-10-31.md` — 779 trades / 30d, net −$3.21. Dual own-conclusions audits (volume-buildup + system-wide), both APPROVE WITH CHANGES, all corrections applied. Auditor-corrected SL sim: 0.35% MAE stop ≈ +$8.5/30d before fees.
+
+### Q1: Shadow-mode 0.35% MAE stop trial — **GO**
+
+- Strongest lever in the report: winners MAE 0.23% vs losers MAE 0.58% is a clean structural separation. The corrected sim (+$8.5/30d) strengthens the case; caveats (MAE under-recorded, fees unmodeled, in-sample) are exactly what a shadow trial resolves.
+- Ship via **automatic-implementation**: shadow mode first, collect counterfactual on every trade, enforce only after review with realized numbers. No live stop change in this decision.
+- Scope: system-wide initial stop, **not** volume-buildup-specific. Covers the hard_max_loss and atr_sl_hit bleed families (both would have been cut earlier by a 0.35% MAE stop).
+- Metrics for enforce review: realized counterfactual PnL, winners-cut count (sim said 79/30d — verify), fee-adjusted net, per-regime split.
+- Enforce review at **7d or 200 closed trades**, whichever later.
+- Note: the sim cut 79 winners — if the shadow shows winners-cut materially above that, tighten before enforce.
+
+### Q2: hard_max_loss SL tightening — **GO (via Q1, not a standalone live change today)**
+
+- −$17.95 / 148T / 0% WR is the #1 bleed — real and worth fixing.
+- But do NOT ship a standalone SL tightening today. The Q1 MAE stop subsumes it: hard_max_loss at ~2.0% avg fires far later than 0.35% MAE. Shipping both confounds attribution — shadow can't tell you which change earned its keep.
+- Path: Q1 shadow collects data → enforce Q1 → re-measure hard_max_loss residual bleed → tighten the constant only if it still bleeds post-enforce.
+- Same logic for atr_sl_hit (−$9.79 / 117T / 0.9% WR): second bleed, also subsumed by the MAE stop. No separate ATR multiplier change now; re-measure post-enforce.
+
+### Q3: volume-buildup LONG disable — **NO-GO (already decided today)**
+
+- The VOLUME-BUILDUP LONG FIX DECISION earlier today (see section above) rejected disable in favor of 4 surgical entry fixes (RSI 40–70, block falling momentum/wave, price move ≥1.0%). That ruling stands.
+- This deep dive adds no new evidence against it (5T 20% WR is the same tiny sample). No change.
+
+### Q4: Priority — **system-wide**
+
+- System-wide net −$3.21/30d with two bleed families totaling −$27.74 (hard_max_loss + atr_sl_hit) dwarfs volume-buildup's −$0.70. The volume-buildup LONG side is already handled (Q3); SHORT side is near-breakeven and working per today's earlier decision.
+- Sequence: **Q1 shadow ships first** (highest expected value, zero live risk) → Q2 re-measure after enforce → Q3 surgical fixes ship in parallel (already approved, independent file) → Q5 deep dive rides alongside.
+
+### Q5: HIGH regime deep dive — **GO (commission)**
+
+- Auditor's new finding is material: HIGH regime is the worst regime system-wide (−$3.20 despite 53.7% WR) and **inverts** the volume-buildup-specific regime story (HIGH was best for that one signal). A regime that wins majority of trades yet loses money is a structural exit problem, not an entry problem — same family as this deep dive.
+- Commission as a standalone deep dive, sequenced **after Q1 shadow ships** (don't want two SL experiments running changes concurrently; the deep dive is read-only analysis so it can run in parallel with shadow data collection).
+- Deliverable: same standard — own-conclusions audit before any recommendation ships. Focus: per-signal breakdown within HIGH, exit-type breakdown within HIGH, and whether HIGH bleed is the same hard_max_loss/atr_sl_hit pattern or something distinct.
+
+### Execution order
+
+1. **Q1** — build + ship 0.35% MAE stop in shadow mode via automatic-implementation (system-wide)
+2. **Q3** — ship the 4 volume-buildup LONG entry fixes (already approved earlier today; independent of Q1)
+3. **Q5** — dispatch HIGH regime deep dive (read-only, parallel)
+4. **Q2** — re-measure hard_max_loss / atr_sl_hit residual bleed after Q1 enforce review; tighten only if still bleeding
+5. Revisit trail_arm_timeout (−$1.00, 47T) only after Q1 data lands — small, likely partially subsumed
+
+### Constraints (standing)
+
+- No live stop/SL constant changes until Q1 shadow enforce review. hermes_constants.py untouched by this decision block.
+- Q1 enforce requires: realized shadow counterfactual (not the sim), fee-adjusted net > 0, winners-cut within tolerance of the 79/30d estimate.
+- All recommendations from Q5 require own-conclusions audit before any flag/gate change.
+
+— CEO, 2026-10-31 (exit-asymmetry decision block)
