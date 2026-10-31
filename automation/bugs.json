@@ -1359,6 +1359,26 @@
       "found_by": "signal_analyst",
       "git_commit": null,
       "related_bugs": []
+    },
+    {
+      "id": "BUG-073",
+      "title": "Analysis layer quotes pnl_usdt as GROSS of fees \u2014 true 30d is -$9.21 not -$3.16 (recorded fees $6.05/437 of 771 closed); every WR/payoff/counterfactual number quoted upstream to T/CEO omits fee drag",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "analysis/",
+        "automation/ceo/",
+        "reports/"
+      ],
+      "symptom": "Exit deep-dive discovered fees live in a separate JSON (spot-check #16596: gross -$0.15 vs net -$0.172). All prior analyses (MFE reports, consult grounding, status verdicts) used pnl_usdt gross. At current volume fees ~= 2x the headline gap -> materially changes breakeven WR math (payoff 0.52 gross -> worse net).",
+      "root_cause": "pnl_usdt written gross at close; fee fields separate; no analysis helper joins them",
+      "fix": "analysis convention: quote net (join fees) + label gross explicitly; add a shared helper in analysis/ so future reports cannot silently drop fees. Re-baseline the key headline numbers for the next status consult (payoff ratio, breakeven WR, 30d net).",
+      "verified_by": "exit deep-dive c2bfc632 (fee spot-checks + sum)",
+      "date_found": "2026-10-31",
+      "date_fixed": null,
+      "found_by": "exit deep-dive",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
