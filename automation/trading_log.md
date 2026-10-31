@@ -18314,3 +18314,26 @@ Final set: ['GRASS']
 **Open Questions:**
 - 7d still RED '-$0.43' — jup_yolo_mirrored 31T '-$0.25' + volume-buildup- 15T '-$0.28' remain the two drags (R:R: losses up to -6%+ vs wins ~+2%)
 - 24h just flipped RED purely on window roll-off — first real closes this hour will tell if weakness is fresh
+
+## [2026-10-31 04:42] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.09 (WR: 57.8% 24h) | 24h 64T 37W '-$0.51' RED | 7d 191T 57.6% '-$0.64' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: INJ pump-chain+ trail_arm_timeout '-$0.01'/-0.35%, SOL jup_yolo_mirrored atr_sl_hit '-$0.08'/-3.41% — both small, no pattern
+- Kill check: no 0%-WR signal with n>=3 last hour (jup_yolo 1T, pump-chain+ 1T) — regime query not triggered; jup_yolo 14d wins in ALL regimes by WR (EXTREME 62.5%, HIGH 64.3%, NORMAL 50%) despite negative net — any-regime-wins keeps alive, per-regime n<20
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 10/64 = 15.6% (<40%) — dominant close = profit-monster-trail (34T '+$1.69'); worst avg = stale_exit (2T '-$0.195')
+- Boost: pump-chain+ meets 24h bars (5T 3W '+$0.18', wins across ADA/ALGO/DOT) BUT 14d red both regimes + 1.4 weight ceiling — HOLD; volume-buildup- 15T '-$0.31' and jup_yolo 33T '-$0.48' fail net bar
+- Neg streak: 03h '-$0.20', 04h '-$0.01' = 2 red hours (<3) + regime EXTREME not NEUTRAL → no size cut
+- Frequency 2/hr — under 20/hr
+- 4 open: BTC continuum-osc+ LONG (-0.48%), HYPE jup_yolo LONG (-0.47%), DYDX volume-buildup- SHORT (+0.21%), SOL jup_yolo LONG (-0.17%)
+- Storm readiness: **window-min -0.13% / at-run -0.06%** — both within gate, no storm (rolling-60m, 13 samples)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d deepening RED '-$0.64' — jup_yolo 33T '-$0.48' + volume-buildup- 15T '-$0.31' remain the drags (R:R: losses ~-3 to -7% vs wins ~+2%)
+- 2 consecutive red hours (03h, 04h) — one more red hour triggers the 3-hour negative-streak check next run
