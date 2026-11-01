@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-10-31T18:57:41.858245+00:00
-registry: 51 entries (open=27)
+# Shadow disposition report — 2026-11-01T08:15:00.148924+00:00
+registry: 54 entries (open=30)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -48,7 +48,10 @@ registry: 51 entries (open=27)
 - DONE stop-asymmetry-highwr: SHIP-TO-SHADOW — SL at 1.0% price passes bar on both signals (WR not down); shadow-first spec delivered, NO live change (2026-10-31)
 - DONE short-relax-shadow-study: AGGREGATE UNATTRIBUTABLE — accept base rates (2026-10-31)
 - OPEN pump-chain-plus-weight-kill-review: deadline=2026-11-13T00:00:00Z | (no parseable source)
-- OPEN trial-wider-sl: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 45047 rows, 0.0d
-- OPEN trial-extended-time: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 45047 rows, 0.0d
+- OPEN trial-wider-sl: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 47038 rows, 0.0d
+- OPEN trial-extended-time: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 47038 rows, 0.0d
 - OPEN watch-contrarian-live: deadline=2026-11-03T00:00:00Z | (no parseable source)
-- OPEN gate-shadow-capture-coverage-fix: deadline=2026-11-06T00:00:00Z | brain/gate_shadow.db: 54328 rows, 0.0d
+- OPEN gate-shadow-capture-coverage-fix: deadline=2026-11-06T00:00:00Z | brain/gate_shadow.db: 56115 rows, 0.0d
+- OPEN candle-collector-coverage-audit: deadline=2026-11-06T00:00:00Z | data/candles.db: 10457610 rows, 0.0d
+- OPEN stop-tighten-enforce-eval: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN amplify-grind-breakout-deploy: deadline=2026-11-14T00:00:00Z | (no parseable source)
