@@ -10211,5 +10211,36 @@
     "category": "process",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-01T00:50:00Z",
+    "run": 212,
+    "idea": "Switch official KPIs to FEE-NET (brain.py now stamps fees)",
+    "rationale": "24h GROSS -0.01 reads ~flat; NET -0.66 is the truth. auto_1hr/watchdog still headline gross.",
+    "expected_impact": "truthful GREEN/RED; prevents fee-blind ships",
+    "category": "reporting",
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-11-01T00:41:44.925762+00:00"
+  },
+  {
+    "date": "2026-11-01T00:50:00Z",
+    "run": 212,
+    "idea": "HYPE 2.0x size on fee-negative jup mirror — CEO fee-aware review",
+    "rationale": "HYPE avg notional $18.78 vs $11.10 base; jup HYPE 7d GROSS +0.01 NET ~-0.48. Size amplifies fee burn on a wash signal.",
+    "expected_impact": "save ~$0.20-0.30/7d if mult reduced; or confirm standing with fee math attached",
+    "category": "sizing",
+    "status": "escalated",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-01T00:50:00Z",
+    "run": 212,
+    "idea": "grind-breakout- clone-hunt AMPLIFY (shadow #1 source, live 2T/30d)",
+    "rationale": "shadow_trader 92.3% WR n=26 avg +1.56 top source; enabled but barely deploys — likely CONFLUENCE-EXPIRY friction",
+    "expected_impact": "if blocked set net-positive, deploy-widen = new offense leg",
+    "category": "amplify",
+    "status": "registered",
+    "risk": "medium"
   }
 ]

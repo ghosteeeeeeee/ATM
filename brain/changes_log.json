@@ -3341,5 +3341,27 @@
     "after": "fees stamped on brain-CLI closes; COALESCE preserves position_manager stamps; py_compile PASS, 11/11 placeholders, subagent review NO BLOCKERS, hype-gross refutation 190:12",
     "rationale": "fee column was structurally biased (losers had fees, trail winners did not) — net-of-fees KPIs and amplify net thresholds need complete capture (BUG-073 companion)",
     "impact": "data-only, ZERO trading behavior; next-run verify = fees fill on first trail close"
+  },
+  {
+    "timestamp": "2026-11-01T00:50:00Z",
+    "agent": "brain_auditor",
+    "type": "tweak",
+    "change": "shadow_disposition: refresh watch-contrarian-live evidence (11T +0.45 live fade) + add amplify-grind-breakout-deploy entry",
+    "file": "data/shadow_disposition.json",
+    "before": "watch evidence stale (0T concern), no grind-breakout entry",
+    "after": "evidence=11T +0.45 WR 54.5% extend rec 11-10; new amplify entry due 11-14",
+    "rationale": "contrarian fade is working live; grind-breakout under-deployment is the top shadow source with zero live footprint",
+    "impact": "offense loop gains a candidate; watch default (extend-if-0T) correctly NOT triggered"
+  },
+  {
+    "timestamp": "2026-11-01T00:50:00Z",
+    "agent": "brain_auditor",
+    "type": "tweak",
+    "change": "Register intraday checkpoint trial-revert-override-close-0855",
+    "file": "data/checkpoint_registry.json",
+    "before": "no checkpoint",
+    "after": "pending due 2026-11-01T08:55Z grace 90m",
+    "rationale": "#211 queue item: CEO override window on trial-revert closes 08:55Z; auditor runs 4h cadence would miss it in prose",
+    "impact": "checkpoint_watch surfaces it at the right time"
   }
 ]

@@ -2476,3 +2476,7 @@
 - **REPEATED** (4x): `Oct N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
 - **REPEATED** (3x): `Oct N N:N:N python3[TOK]: TS   TS   → TOK: [brain.py] TOK is_live_trading_enabled(is_manual=False) = True`
+
+## Error Alerts — 2026-11-01 00:41 UTC
+- **REPEATED** (42x): `Nov N N:N:N python3[TOK]: [coin_tracker] Done: N coins processed, N skipped, N errors`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   [TS] [shadow_signals_runner] TOK: N recorded, N skipped, N empty, N filtered, N errors`
