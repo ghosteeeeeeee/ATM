@@ -18870,3 +18870,26 @@ Final set: []
 **Open Questions:**
 - 24h gross flipped to '-$0.02' (break-even); per brain_auditor #212 fee-NET KPIs are ~'-$0.66' 24h — this log still headlines gross
 - pump-chain+ 14d 41T '-$0.85' — weakest 14d signal; still watching (kill bar n>=3 last-hour 0% not met)
+
+## [2026-11-01 03:42] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: 44.2% 24h) | 24h 43T 19W '+$0.10' gross | 7d 222T 121W '-$1.17' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes; 3 open (ETH jup LONG +0.15%, SOL jup SHORT -0.33%, HYPE continuation/jup LONG -0.32%)
+- Kill check: no last-hour closes so no n>=3 0%-WR trigger; 24h bb-squeeze+ 3T 0% '-$0.15' and pump-chain+ 3T 0% '-$0.12' both 0 last-hour closes — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 7/43 = 16.3% (<40%); dominant close = profit-monster-trail (12T '+$0.88'), drag = atr_sl_hit 7T '-$0.81'
+- Boost HOLD pump-chain- (GMX '+$0.54' vs ex-GMX '-$0.11' = consistency fails) + jup_yolo_mirrored (23T 57% '+$0.09' but HYPE '+$0.16' masks ex-HYPE '-$0.07', 14d 55T '-$0.31' out-of-sample fails)
+- Neg streak: 22h +0.05, 23h -0.02, 01h +0.14 — never 3 consecutive red
+- Frequency 0/hr — under 20/hr
+- Entry quality: winners avg +2.39% account (min +0.50%), losers -1.85% avg — R:R near 1.3:1, WR 44.2% is the drag
+- Storm readiness: **window-min -0.05% / at-run +0.20%** — both within gate, no storm (rolling-60m, 13 samples, BTC 77858)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h gross '+$0.10' but fee-NET per brain_auditor #212 ~'-$0.60'; log still headlines gross
+- bb-squeeze+ and pump-chain+ both 3T 0% 24h — if either gets n>=3 last-hour closes, regime query fires
