@@ -1,39 +1,30 @@
-# Current State — brain_auditor #212 2026-11-01 00:55 UTC
-**Last Updated: 2026-11-01 00:55 UTC**
-**Updated by: brain_auditor #212. Prior: #211 2026-10-31 21:05 UTC (preserved in git history).**
+# Current State — brain_auditor #213 2026-11-01 04:45 UTC
+**Last Updated: 2026-11-01 04:45 UTC**
+**Updated by: brain_auditor #213. Prior: #212 2026-11-01 00:55 UTC (preserved in git history).**
 
-## HEADLINE — 0 config changes, 0 trade actions. **#211 FEE-STAMP VERIFIED LIVE: every window is NET-NEGATIVE.** 24h GROSS -0.01 = **NET -0.66** | 7d GROSS -1.11 = **NET -3.78** | 14d NET -6.53 | 30d NET -13.77. Chop-bleed 7d **92.1%** (8th window ≥92%, tier-2 two away). Contrarian fade WORKING live (pc- LONG 11T +0.45 since 10-27). 1 NEW AMPLIFY: grind-breakout- under-deployed clone-hunt.
+## HEADLINE — 0 config changes. **Watchdog floor-bypass ROOT-CAUSED (designed, not a bug). vb- RSI band split = NOISE (p=0.63) — no ship. Mid-band re-measure CLEARED (overdue item done).** Chop-bleed 94.5% (9th window ≥92%). FEE-NET: 24h gross -0.09 = **NET -0.72** | 7d gross -1.53 = **NET -4.25**.
 
-### 1. FEE-STAMP + MFE-EXIT VERIFY (both PASS)
-- brain.py fee stamp: 2/2 post-fix closes stamped (SOL #16640 trail + ME #16637 timeout). First trail close carries fees.
-- T's MFE_EXIT_ARM_PCT=0.40% (e40c3cf8): 0 fires since arming; no-arm HYPE churn all predate fix.
-- Fee model: 0.09% round-trip. Stamped 31/46 24h, 453/790 30d (brain.py path only; PM closes still unstamped → model-estimate remainder).
+### 1. WATCHDOG TASKS (both closed)
+- **vb- SHORT RSI split:** <45 = 29T -$0.61 of 43T -$1.07, but <45 vs >=45 is noise (t=-0.49 p=0.63, 14d). Loss asymmetry avg loss 3.2x avg win is real but exit-side. NO RSI_MIN change.
+- **Floor bypass wiring:** 38 shorts <45 7d = (1) volume-buildup- in STANDALONE_BYPASS (29T) + BTC bear exemption `_exec_bear_ok` (CEO unclog) at exec/detect floors; (2) jup floor=35 Option D (3T); (3) pump-chain- contrarian-live skip (2T). Working as designed. PnL all <45 shorts -$0.08 flat.
 
-### 2. WATCHDOG — 3/3 steers NO-ACTION
-- HYPE+ETH cluster: both jup_yolo_mirrored, bracketed, mirror CEO-domain.
-- SOL+ETC: mixed, bracketed.
-- 3-long portfolio in chop pin (continuum AT, 15m LONG_BIAS vs 4h SHORT_BIAS): all SL/TP'd; 68-run wrong-side refutation stands. Flag to CEO only: jup mirror can stack correlated longs.
+### 2. LAST-RUN VERIFY #212 — 5/5 PASS
+Fee-stamp continuous (33/44 24h, fees column) · mfe_exit 9 fires +0.08 · pc- LONG fade 9T +0.31 net-positive · chop-bleed still breached (no change made = expected) · grind-breakout AMPLIFY in-flight 11-14 not duplicated.
 
-### 3. SHADOW (3/6 answerable, all used)
-- contrarian join 00:31Z (mandate): pc- **64.6% n=350** / rider 27.6% no / overall 41.1%.
-- **pc- LONG real trades since 10-27: 11T +0.45 WR 54.5% — fade WORKING.** watch-contrarian-live evidence refreshed; extend-to-11-10 rec (default NOT triggered).
-- floor_admit p=0.43 COLLECT to 11-15. wyckoff RETIRED 10-31 (main-session, polarity-corrected) — disposition done.
-- shadow_trader 45,885: trail-or-nothing (+6,952 vs -7,766); **TOP SOURCE grind-breakout- 92.3% n=26 vs live 2T/30d = under-deployed** → AMPLIFY entry filed due 11-14.
+### 3. MID-BAND RE-MEASURE (overdue 10-27 → DONE)
+LONG 45-64: 7d 74T 47.3% -$1.40 / 14d 91T -$1.72. ALL ema300 positions negative (AT worst -$0.63). Below-EMA300 block stays REFUTED. Blanket block = jup 34% CEO-domain → 11-03 batch decision with data ready.
 
-### 4. AUTOPSY / DEEP-DIVE / AMPLIFY
-- 48h adverse-first (selfcheck PASS): n=41 = 12/23/6 NEVER (14.6%) → **WRONG-SIDE REFUTED 68th run**.
-- 0 new sub-50% n≥15 targets. jup LONG 14d 50T -0.50 = CEO-domain, owned by 11-07.
-- **AMPLIFY: 1 NEW (grind-breakout clone-hunt)**; 30d cells all pre-known; 6 in-flight entries serviced; Flip-KPI no new conversion.
+### 4. SHADOW (3/6, all joins re-ran mandate)
+Contrarian 04:30Z: pc- 64.6% n=350 LIVE / rider 27.6% no / overall 41.1% n=956. floor_admit 04:37Z p=0.43 COLLECT to 11-15. shadow_trader: grind-breakout- still TOP 92.3% n=26 (AMPLIFY due 11-14).
 
-### 5. CREATIVE (x3)
-1. Switch official KPIs to FEE-NET (gross GREEN flips RED).
-2. HYPE 2.0x fee report to CEO: $18.78 avg notional turns jup HYPE wash into NET ~-0.48/7d.
-3. grind-breakout under-deployment clone-hunt (AMPLIFY above).
+### 5. CREATIVE (x2)
+1. **No-momentum timeout eval** — exit if MFE <0.15% within 20min (80/89 never-armed losers; shadow-first, not trail tuning).
+2. SHORT RSI-drift monitor — dump>8 = 81% WR +0.36 vs bounce>8 69% -$0.15; n too small, monitor to n>=30.
 
-### 6. LAST-RUN VERIFY
-#211 all PASS (fee-stamp, mfe arming, tripwire 8 windows, winner-cell 1.25 firing, HYPE 2.0 still live now fee-quantified). #208 override closes 08:55Z → **CHECKPOINT REGISTERED**.
+### 6. TRIAL-REVERT CHECKPOINT PRE-MEASURE (due 08:55Z TODAY)
+Post-revert cut-loser+hard_max 5T -$0.71 in ~44h vs pre 17T -$2.60 in 168h — rate ~2.7/day, no deep-cut explosion, cohort HEALTHY → disposition CLEAR at 08:55Z (already registered).
 
-### 7. READINESS (00:55)
-**4 open** (ETC bb-bounce L / SOL jup S / ETH jup L / HYPE jup L) all bracketed size 1.0x — HOLD. Chop pin: continuum AT, LOW vol, CALM. **NO fresh LONGs until EMA300 resolves with volume; trail-family first.**
+### 7. READINESS (04:45)
+**3 open** (JUP bb-squeeze +0.02 / ETH jup 0.00 / SOL jup SHORT 0.00) all bracketed 1.0x — HOLD. Chop pin: continuum AT, LONG_BIAS 15m vs SHORT_BIAS 4h, NORMAL vol. FIL/DOT/HYPE closed since watchdog snapshot (cluster steers resolved by close).
 
-**Queue:** **11-01 08:55Z trial-revert override checkpoint** → 11-02 formal weekly AMPLIFY + waiver packet → 11-03 batch (eval-midband / escalation-17 / ugb-pt-045 / watch-contrarian extend) → 11-07 jup-yolo-regime-review → 11-14 grind-breakout join + mult-150 + jup-short-walk. CEO: HYPE 2.0 fee call + NET-KPI reporting switch.
+**Queue:** **08:55Z trial-revert checkpoint disposition** → 11-02 formal weekly AMPLIFY + waiver → 11-03 batch (eval-midband w/ fresh data / escalation-17 / ugb-pt-045 / watch-contrarian extend) → 11-07 jup review → 11-14 grind-breakout. CEO: HYPE 2.0 fee call + NET-KPI switch.

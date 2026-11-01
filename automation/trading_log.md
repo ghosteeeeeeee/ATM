@@ -18893,3 +18893,26 @@ Final set: []
 **Open Questions:**
 - 24h gross '+$0.10' but fee-NET per brain_auditor #212 ~'-$0.60'; log still headlines gross
 - bb-squeeze+ and pump-chain+ both 3T 0% 24h — if either gets n>=3 last-hour closes, regime query fires
+
+## [2026-11-01 04:44] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** $-0.28 (WR: 0% last hour; 24h 44T 19W '-$0.09' gross) | 7d 224T 120W '-$1.53' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 3 losses — FIL pump-chain- atr_sl_hit '-$0.03'/-1.43%, DOT pump-chain- atr_sl_hit '-$0.09'/-2.14%, HYPE continuation+,jup_yolo_mirrored hard_max_loss '-$0.16'/-4.00% (open 1:54, held ~2h)
+- Kill check: pump-chain- 2 last-hour closes 0% but n<3; bb-squeeze+ 3T 0% 24h has 0 last-hour closes (JUP still open +0.16%) — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/44 = 18.2% (<40%); dominant close = profit-monster-trail (12T '+$0.88'); drag = atr_sl_hit 8T '-$0.85'
+- Boost HOLD: jup_yolo_mirrored 22T 59.1% '+$0.17' bars met but HYPE 20T '$0.00' dominates (ETH '+$0.04'/SOL '-$0.03' = not multi-token consistent); pump-chain- 9T 44.4% WR fails
+- Neg streak: 01h +0.14, 03h '-$0.16', 04h '-$0.12' — 2 consecutive red, not 3
+- Frequency 3/hr — under 20/hr
+- Storm readiness: **window-min -0.01% / at-run +0.00%** — both within gate, no storm (rolling-60m, 13 samples, BTC 77850)
+- 3 open (SOL jup SHORT -0.01%, ETH jup LONG -0.02%, JUP bb-squeeze+ LONG +0.16%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- HYPE hard_max_loss -4.00% account — largest single loss this hour; 24h hard_max_loss 3T '-$0.44' — worth watching if it clusters
+- pump-chain- now 2 consecutive last-hour losses; 24h still '+$0.31' net — hold, but if n>=3 at 0% next hour the regime query fires

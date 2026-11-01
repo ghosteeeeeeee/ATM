@@ -10245,5 +10245,27 @@
     "status": "boosted",
     "risk": "medium",
     "boosted_at": "2026-11-01T00:42:27.281711+00:00"
+  },
+  {
+    "date": "2026-11-01T04:43:04Z",
+    "idea": "No-momentum timeout eval: exit if MFE < 0.15% within 20min of open (never-armed chop cohort)",
+    "rationale": "80/89 7d losers never reached +0.40% arm; avg never-armed hold clusters 20-60min via atr_sl_hit/cut-loser. Captain directive: exit early in chop. Distinct from trail/UGB tuning (fixed-time no-momentum cut, not trail params).",
+    "expected_impact": "If backtest confirms: cut never-armed bleed before full SL. Shadow-first via position_manager timer variant.",
+    "category": "exit-early-chop",
+    "status": "suggested",
+    "risk": "medium — needs 14d backtest before shadow; must not kill slow-trend winners (trail family 86.5% WR long holds)",
+    "measurement": "shadow_trader --analyze-exits timer variant; bar: never-armed loss dollars -30% without killing armed winners",
+    "run": 213
+  },
+  {
+    "date": "2026-11-01T04:43:04Z",
+    "idea": "SHORT detect→exec RSI-drift monitor (dump>8 vs bounce>8)",
+    "rationale": "14d SHORT dump>8 (RSI fell further detect→exec): 16T 81.3% WR +0.36. bounce>8: 13T 69.2% WR -$0.15. stable: 45T 51% -$0.32. Late-bounce shorts look like the bad side but n=13-16 too small to ship.",
+    "expected_impact": "If holds at n>=30: block SHORT when exec-detect drift > +8 (bounce already started)",
+    "category": "entry-sniper",
+    "status": "monitor",
+    "risk": "low — monitor only",
+    "measurement": "re-measure at 30d or when bounce>8 cohort reaches n>=30",
+    "run": 213
   }
 ]

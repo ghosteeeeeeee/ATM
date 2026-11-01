@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-10-31 20:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-01 02:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,528 | **WR:** 51.2% | **PnL:** -98.33%
-- **Date range:** 2026-07-29 → 2026-10-31
+- **Total trades (all time):** 3,534 | **WR:** 51.2% | **PnL:** -97.07%
+- **Date range:** 2026-07-29 → 2026-11-01
 
 ---
 
@@ -11,8 +11,7 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| pump-chain- | LONG | 3 | 66.7% | -0.08 | 7 | 71.4% | +3.83 | ❓ |
-| jup_yolo_mirrored | LONG | 9 | 100.0% | +1.94 | 26 | 73.1% | +0.52 | ❓ |
+| pump-chain- | LONG | — | —% | — | 7 | 71.4% | +3.83 | ❓ |
 
 ---
 
@@ -24,7 +23,9 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-None found.
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| volume-buildup- | SHORT | 4 | 50.0% | -1.11 | ENABLED | Needs more data |
 
 ---
 
@@ -42,7 +43,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[KEEP] 2 winning combos** — pump-chain-, jup_yolo_mirrored. LONG side dominant.
+1. **[WATCH] volume-buildup- SHORT** — WR=50.0%, PnL=-1.11% over 4 trades. Monitor next cycle.
+2. **[KEEP] 1 winning combos** — pump-chain-. LONG side dominant.
 
 ---
 
@@ -54,6 +56,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-10-31 | e40c3cf | scripts: mfe-exit armed at 0.40% — no-arm run churned fee-ne... |
 | 2026-10-31 | aaec17c | feat: CEO trust-tiers day-1 verdicts 1+2 — soft-floor giant ... |
 | 2026-10-31 | 268ea89 | fix: bug_hunter round-4 — dashboard field contract (HIGH), p... |
 | 2026-10-31 | e56e794 | scripts: mfe-exit — 30% MFE-giveback exit for mirror book (T... |
@@ -63,6 +66,5 @@ None found. Top performers are already enabled.
 | 2026-10-31 | f29d3c1 | feat: CEO exit-asymmetry verdict — dual shadows (ship-off), ... |
 | 2026-10-31 | db81c0c | config: brain_auditor #208 — coupled-trial REVERT (CUT_LOSER... |
 | 2026-10-31 | e5009ce | Daily trading system update (2026-10-31) |
-| 2026-10-31 | 507bcdd | feat: trust tiers — shadow engine, own leaderboard, exact-mi... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

@@ -3363,5 +3363,16 @@
     "after": "pending due 2026-11-01T08:55Z grace 90m",
     "rationale": "#211 queue item: CEO override window on trial-revert closes 08:55Z; auditor runs 4h cadence would miss it in prose",
     "impact": "checkpoint_watch surfaces it at the right time"
+  },
+  {
+    "timestamp": "2026-11-01T04:44:13Z",
+    "agent": "brain_auditor",
+    "change": "Audit #213: 0 trading-constant changes. Registry updates: eval-midband re-measure data, watch-contrarian evidence refresh, trial-revert checkpoint pre-measure (healthy). Root-caused vb- floor bypass (STANDALONE_BYPASS + bear exemption = designed). vb- RSI band split NOISE (p=0.63) — no ship.",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json + brain/audit_recommendations.json",
+    "before": "midband eval stale since 10-27; contrarian evidence from #212",
+    "after": "re-measured 7d/14d midband; pc- LONG 9T +0.31 refreshed; checkpoint pre-measured",
+    "rationale": "Watchdog auditor tasks + overdue midband re-measure + mandated shadow joins",
+    "impact": "No live-behavior change; 11-03 batch has fresh data; wiring explanation closes watchdog floor-bypass item"
   }
 ]

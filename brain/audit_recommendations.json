@@ -1,151 +1,152 @@
 {
-  "timestamp": "2026-11-01T00:50:00Z",
-  "run": 212,
+  "timestamp": "2026-11-01T04:43:04Z",
+  "run": 213,
   "session_brain_stats": {
     "queries": 3,
-    "note": "jup_yolo/chop-pin/mfe_exit topics; useful for context only"
+    "note": "volume-buildup floor, chop-bleed, mid-band — prior decisions confirmed, no new drift"
   },
   "trade_summary_24h": {
-    "n": 46,
-    "gross_usdt": -0.01,
-    "fee_stamped": 0.43,
-    "fee_model_unfilled": 0.22,
-    "net_usdt": -0.66,
-    "wr_pct": 43.5,
-    "note": "FEE-STAMP FIX VERIFIED: 2/2 post-#211 closes carry fees JSON incl first profit-monster-trail (SOL #16640). Official KPI now NET.",
-    "windows": {
-      "24h": {
-        "n": 46,
-        "gross": -0.01,
-        "net": -0.66,
-        "wr": 43.5
-      },
-      "7d": {
-        "n": 221,
-        "gross": -1.11,
-        "net": -3.78,
-        "wr": 54.3
-      },
-      "14d": {
-        "n": 346,
-        "gross": -2.13,
-        "net": -6.53,
-        "wr": 49.7
-      },
-      "30d": {
-        "n": 790,
-        "gross": -3.49,
-        "net": -13.77,
-        "wr": 46.2
-      }
-    },
-    "armed_7d": {
-      "n": "split in PG",
-      "note": "7d losers 86T -8.61, never-armed 71T -7.93 = 92.1% chop-bleed (8th window >=92%, tier-2 needs 10)"
-    }
+    "trades": 44,
+    "gross_pnl": -0.09,
+    "fee_est": 0.63,
+    "net_pnl": -0.72,
+    "wr": 43.5,
+    "worst_signals": "volume-buildup- SHORT 3T -0.17; continuation+jup 2T -0.16; bb-squeeze+ 3T -0.15 (24h small-n, 7d bb-squeeze+ now +0.27)",
+    "7d_gross": -1.53,
+    "7d_net": -4.25,
+    "7d_trades": 224
   },
   "shadow_analysis": {
-    "contrarian": "join re-ran 00:31Z (mandate): 958 joinable, overall 41.1%; pc- 64.6% n=350 LIVE; rider 27.6% do-NOT-flip. pc- LONG real trades since 10-27: 11T +0.45 WR 54.5% — fade WORKING on live book.",
-    "floor_admit": "join 10-31 16:34Z: floor_only 49.7% n=1126 vs always_admit 45.9% n=146 fisher p=0.43 — directional yes, not significant, COLLECT to 11-15",
-    "wyckoff": "RETIRED 10-31 by main-session (T shadow mining, polarity-corrected kill PLUS/MINUS False). jsonl archived. disposition done. NOT pending.",
-    "oscillator": "fossil archived 10-27, dead",
-    "rr_shadow": "orphaned, stale",
-    "shadow_trader": "45,885 signals: CONFLUENCE-EXPIRY 14,410 @48% lower-bound · CTX 1,835 @50% · exit A/B pm_trail +6,952 vs hard_max -7,766 = trail-or-nothing · TOP SOURCE grind-breakout- 26T 92.3% avg +1.56 (live only 2T/30d = under-deployed, AMPLIFY entry filed)",
-    "overall": "3/6 answerable, all used. Contrarian still the only ship-eligible stream."
+    "contrarian": "join re-ran 04:30Z mandate: overall flip-WR 41.1% n=956; pc- 64.6% n=350 LIVE; rider 27.6% no. pc- LONG real 9T +0.31 WR 44.4% since 10-27 — still net-positive, slightly cooled from #212's 11T +0.45",
+    "floor_admit": "join re-ran 04:37Z: floor 49.6% vs always 45.9%, fisher_p=0.43 — COLLECT to 11-15 (30d bar unreachable until then)",
+    "oscillator": "ARCHIVED fossil — not cited",
+    "wyckoff": "RETIRED 10-31 by main-session — not pending",
+    "shadow_trader": "45,885; trail-or-nothing +6,952 vs hard_max -7,867; TOP SOURCE grind-breakout- 92.3% n=26 (AMPLIFY in-flight due 11-14); CONFLUENCE-EXPIRY 14,452 @47% would-win — gates working",
+    "rr_shadow": "ORPHANED — not cited",
+    "overall": "3/6 answerable, all used"
   },
+  "watchdog_tasks": [
+    {
+      "task": "volume-buildup- SHORT cell-split by meta_rsi band",
+      "finding": "7d 43T 60.5% WR -$1.07. Band split (rsi_detect): <45 = 29T 62.1% -$0.61; 45-60 = 7T -$0.24; 60-72 = 2T -$0.24; 72+ = 5T 80% +$0.02. Loss asymmetry: avg win +0.039 vs avg loss -0.123 (3.2x). Arm rate 60.5%. BUT <45 vs >=45 is STATISTICAL NOISE: t=-0.49 p=0.63 (14d).",
+      "action": "NO SHIP — RSI_MIN 30→45 would block a net-negative band but the band-vs-rest difference is noise. Monitor; jup_yolo review 11-07 owns the bigger never-armed loser (-2.16 7d).",
+      "confidence": "HIGH on noise verdict"
+    },
+    {
+      "task": "38/57 shorts at rsi<45 despite SHORT_RSI_HARD_FLOOR=45 — which emitter bypasses",
+      "finding": "ROOT CAUSE: (1) volume-buildup- is in STANDALONE_BYPASS_SIGNALS (29/38 trades) — skips compactor floor; exec/detect floors in decider_run.py ALLOW via BTC bear-structure exemption (_exec_bear_ok, CEO unclog flip #1). 16/29 were BEAR_TREND. (2) jup_yolo_mirrored floor=35 by design (CEO Option D, 3T). (3) pump-chain- contrarian-live skip (_fade_effective_source maps to + so floor site skips; 2T, NORMAL regime keeps SHORT pre-flip).",
+      "action": "WIRING WORKING AS DESIGNED — not a bug. Bear exemption is the intentional door. PnL of all <45 shorts 7d: -$0.08 flat. Document only.",
+      "confidence": "HIGH"
+    }
+  ],
   "drift_findings": [
-    "wyckoff-shadow disposition correctly done (not drift — retirement verified)",
-    "vacation_mode.json still true but no_constants_change now FALSE (T updated rules); constants diff still EMPTY",
-    "auto_1hr still reports GROSS as primary — should switch to NET now that fees stamp (see creative #1)"
+    {
+      "item": "MFE_EXIT_ARM_PCT=0.40% arming (#211/#212)",
+      "status": "PASS — 9 mfe_exit closes since 10-31, net +$0.08, 0 negative-churn pattern",
+      "action": "none"
+    },
+    {
+      "item": "Fee stamp (brain.py #211)",
+      "status": "PASS — fees column stamped 8/12 last-12h closes, 33/44 24h (75%). Continuous operation confirmed.",
+      "action": "none"
+    },
+    {
+      "item": "pc- contrarian fade live (#208/#212)",
+      "status": "PASS — 9T +0.31 net-positive since 10-27; extend-to-11-10 rec stands (default NOT auto-triggered)",
+      "action": "watch-contrarian-live evidence refresh"
+    },
+    {
+      "item": "Trial-revert CUT_LOSER -6→-4 (10-31 08:45)",
+      "status": "PRE-MEASURE for 08:55Z checkpoint: post-revert cut-loser+hard_max 5T -$0.71 in ~44h vs pre 17T -$2.60 in 168h — rate ~2.7/day vs 2.4/day, no deep-cut explosion, cohort HEALTHY. Disposition CLEAR at 08:55Z.",
+      "action": "checkpoint already registered (trial-revert-override-close-0855)"
+    }
   ],
   "recurring_problems": [
-    "chop-bleed 92.1% 7d = 8th consecutive >=92% window; never-armed losers own 92.1% of loser dollars; entry-quality route stands, no new filter clears bars",
-    "jup_yolo_mirrored LONG: 14d 50T -0.50 net with arm 56% — trail winners +1.94/30T vs atr_sl deaths -1.57/12T; CEO-domain, owned by 11-07 regime review",
-    "HYPE elevated notional ($18.78 avg vs $11.10 base) turns jup HYPE wash-gross (+0.01/7d) into NET ~-0.48/7d via fees — CEO 2.0x standing needs fee-aware review"
+    "Chop-bleed KPI: 94.5% dollar share 7d (80/89 losers never-armed, -$8.40 of -$8.89, 0 NULL mfe) — 9th consecutive window ≥92%. ENTRY-quality systemic. Top never-armed: jup_yolo -2.16 (CEO 11-07), vb- -2.09, pump-chain+ -0.59, bb-squeeze+ -0.50.",
+    "Loss asymmetry across losing signals: vb- avg loss 3.2x avg win. Exit-reason mix never-armed: atr_sl_hit 26T -$3.09, cut-loser 13T -$1.92 — entries that never had momentum.",
+    "Official KPIs NET-negative every window: 24h NET -0.72 | 7d NET -4.25 (gross -1.53 + fees 2.72)"
   ],
   "missing_implementations": [
-    "grind-breakout- deployment gap: shadow #1 source, enabled, barely trades — diagnose gate friction (AMPLIFY entry amplify-grind-breakout-deploy filed, due 11-14)",
-    "NET-based KPI reporting in auto_1hr/watchdog (fees now stamp on brain.py closes)"
+    "NET-KPI reporting switch — auto_1hr still headlines GROSS (creative #212, CEO decision pending)",
+    "HYPE 2.0x notional fee report — avg notional $18.78 vs $11.10 base turns HYPE jup wash NET-negative (CEO call pending)"
   ],
   "creative_improvements": [
     {
-      "idea": "Switch official KPIs to FEE-NET now that brain.py stamps fees",
-      "impact": "24h GREEN +0.13 gross (yesterday) would read RED -0.66 net — truth in reporting",
-      "category": "reporting",
-      "status": "suggested"
+      "date": "2026-11-01T04:43:04Z",
+      "idea": "No-momentum timeout eval: exit if MFE < 0.15% within 20min of open (never-armed chop cohort)",
+      "rationale": "80/89 7d losers never reached +0.40% arm; avg never-armed hold clusters 20-60min via atr_sl_hit/cut-loser. Captain directive: exit early in chop. Distinct from trail/UGB tuning (fixed-time no-momentum cut, not trail params).",
+      "expected_impact": "If backtest confirms: cut never-armed bleed before full SL. Shadow-first via position_manager timer variant.",
+      "category": "exit-early-chop",
+      "status": "suggested",
+      "risk": "medium — needs 14d backtest before shadow; must not kill slow-trend winners (trail family 86.5% WR long holds)",
+      "measurement": "shadow_trader --analyze-exits timer variant; bar: never-armed loss dollars -30% without killing armed winners"
     },
     {
-      "idea": "HYPE size-fee report to CEO: 2.0x standing on a fee-negative signal",
-      "impact": "jup HYPE 7d NET ~-0.48; CEO call whether mult survives fee reality",
-      "category": "sizing",
-      "status": "escalated"
-    },
-    {
-      "idea": "grind-breakout- clone-hunt AMPLIFY (under-deployed 92% WR shadow source)",
-      "impact": "if gate friction confirmed with net-positive blocked set, deploy-widen proposal",
-      "category": "amplify",
-      "status": "registered"
+      "date": "2026-11-01T04:43:04Z",
+      "idea": "SHORT detect→exec RSI-drift monitor (dump>8 vs bounce>8)",
+      "rationale": "14d SHORT dump>8 (RSI fell further detect→exec): 16T 81.3% WR +0.36. bounce>8: 13T 69.2% WR -$0.15. stable: 45T 51% -$0.32. Late-bounce shorts look like the bad side but n=13-16 too small to ship.",
+      "expected_impact": "If holds at n>=30: block SHORT when exec-detect drift > +8 (bounce already started)",
+      "category": "entry-sniper",
+      "status": "monitor",
+      "risk": "low — monitor only",
+      "measurement": "re-measure at 30d or when bounce>8 cohort reaches n>=30"
     }
   ],
-  "config_changes_applied": [
-    "shadow_disposition.json: watch-contrarian-live evidence refreshed (11T +0.45 live fade, extend rec to 11-10)",
-    "shadow_disposition.json: new entry amplify-grind-breakout-deploy (kind=amplify, due 11-14)",
-    "checkpoint_registry.json: trial-revert-override-close-0855 registered (due 08:55Z today)"
-  ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "#211 brain.py fee-stamp (BUG-075)",
-      "verified": "PASS — 2/2 post-fix closes have fees JSON; first trail close SOL #16640 stamped"
+      "item": "#212 fee-stamp verify",
+      "result": "PASS — continuous stamping 75% 24h"
     },
     {
-      "change": "#211 mfe_exit armed at 0.40% (T commit e40c3cf8)",
-      "verified": "PASS — 0 mfe_exit fires since arming; the 3 no-arm HYPE -0.01 churns all predate the fix"
+      "item": "#212 mfe_exit arming",
+      "result": "PASS — 9 fires +0.08"
     },
     {
-      "change": "#211 chop-bleed tripwire tier-2",
-      "verified": "92.1% 7d = 8th window; 2 more to CEO consult"
+      "item": "#212 contrarian pc- fade",
+      "result": "PASS — 9T +0.31 net-positive"
     },
     {
-      "change": "#211 winner-cell 1.25 live",
-      "verified": "PASS — 12 WINNER-CELL-SIZE fires in 2d, amounts correct"
+      "item": "#212 chop-bleed tripwire",
+      "result": "STILL BREACHED 94.5% (9th window) — no config change made so expected"
     },
     {
-      "change": "#211 HYPE size_mult 2.0 carried",
-      "verified": "STILL LIVE (avg $18.78) — now quantified fee-negative, CEO report filed"
+      "item": "#212 grind-breakout AMPLIFY",
+      "result": "in-flight due 11-14 — not duplicated"
     },
     {
-      "change": "#208 trial-revert override",
-      "verified": "closes 08:55Z today — checkpoint registered"
+      "item": "#212 trial-revert checkpoint",
+      "result": "pre-measured healthy; disposition at 08:55Z"
     }
   ],
   "next_actions": [
-    "08:55Z: disposition trial-revert override checkpoint",
-    "11-02: formal weekly AMPLIFY (>=1 proposal or why-not) + waiver renewal packet",
-    "11-03 batch: eval-midband-long-4564, escalation-17, ugb-pt-045, watch-contrarian-live (extend rec), disposition-cadence-revert",
-    "11-07: jup-yolo-regime-review (baseline locked)",
-    "11-14: amplify-grind-breakout-deploy join",
-    "CEO: HYPE 2.0x fee-aware sizing call; NET-KPI reporting switch for auto_1hr"
+    "08:55Z today: disposition trial-revert-override-close-0855 (pre-measure says CLEAR)",
+    "11-02: formal weekly AMPLIFY + waiver packet",
+    "11-03 batch: eval-midband-long-4564 (re-measure data ready — see below), escalation-17, ugb-pt-045, watch-contrarian extend, disposition-cadence-revert, amplify-weekly-mandate",
+    "11-07: jup-yolo-regime-review (owns jup never-armed -2.16)",
+    "11-14: grind-breakout join + mult-150 + jup-short-walk",
+    "CEO: HYPE 2.0 fee call + NET-KPI reporting switch"
   ],
-  "watchdog_triage": {
-    "steer-001": "HYPE+ETH cluster — both jup_yolo_mirrored, bracketed, NO-ACTION (mirror CEO-domain)",
-    "steer-002": "SOL+ETC cluster — mixed signals, bracketed, NO-ACTION",
-    "steer-003": "3-long portfolio in chop pin (continuum AT, 4h SHORT_BIAS) — NO-ACTION per 68-run wrong-side refutation + all bracketed; flag jup mirror correlation stacking to CEO",
-    "health": "warning — 4 open (3L/1S), all bracketed size 1.0x"
+  "midband_remeasure_20261101": {
+    "note": "OVERDUE eval (due 10-27) re-measured — clears the queue item",
+    "7d_LONG_45_64": "74T 47.3% -$1.40; by ema300: AT 29T -$0.63 / ABOVE 18T -$0.27 / BELOW 15T -$0.22 / None 23T -$0.25 — ALL positions negative",
+    "14d": "91T 48.4% -$1.72",
+    "verdict": "Prior 'block 45-64 below EMA300' steer stays MEASURED-REFUTED (BELOW is not the worst cell; AT is). Blanket 45-64 block would save ~$1.40/7d but jup_yolo_mirrored is 25/74 (34%) = CEO-domain. No ship; data ready for 11-03 batch decision.",
+    "signal_mix": "jup 25T -$0.87 (CEO), warrior-sr+ 7T 71%WR -$0.14, pump-chain+ 13T -$0.08, bb-bounce-v2 6T 16.7% -$0.14"
   },
-  "wrong_side_autopsy": {
-    "method": "recovery_replay adverse-first, selfcheck PASS",
-    "48h": "n=41 = 12 never-adverse / 23 recovered / 6 NEVER (14.6% vs 17.5% baseline)",
-    "verdict": "WRONG-SIDE REFUTED 68th consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "never_class": "HYPE jup LONG, BTC continuum-trend- SHORT, ZORA vb- SHORT x2, MON vb- SHORT, ALT pc long — structural never-recover cohort, known"
+  "fee_net_kpi": {
+    "24h": {
+      "gross": -0.09,
+      "net": -0.72
+    },
+    "7d": {
+      "gross": -1.53,
+      "net": -4.25
+    }
   },
-  "deep_dive": {
-    "sub_50_n15_14d": "0 new — bb-bounce-v2-long+ 25T 36% (OWNED TAT/MFE-CUT/NORMAL-gate), pump-chain+ 41T 41.5% (NO-KILL 30d +1.96, CONF_FLOOR), ai-trader-pending 17T 23.5% (CEO)",
-    "jup_yolo_mirrored": "14d LONG 50T -0.50 arm 56% — not a kill candidate (net too small, CEO-domain mirror), owned by 11-07 review"
-  },
-  "amplify": {
-    "screen": "30d winner cells n>=10: pc+ EXTREME 83T +2.68 (validated) | bb-squeeze NORMAL 52T +0.80 (validated) | vb- HIGH 18T +0.37 (validated, 1.25x live) | pc- NORMAL SHORT 12T +0.45 (OOS-unstable, rejected #211) | vbo+ EXTREME (killed signal, pre-kill trades) | pc-,v6 EXTREME SHORT 10T +0.30 (small)",
-    "new_proposal": "amplify-grind-breakout-deploy (clone-hunt: shadow #1 source under-deployed)",
-    "in_flight": "fade-ctx-exempt 11-10, winner-cell-size-125 11-10, bb-squeeze-hml-entry-profile 11-17, eval-midband-long-4564 11-03, mult-150 11-14, jup-short-walk 11-14",
-    "flip_kpi": "no new conversion this run; in-flight: watch-contrarian-live (11T realized, extend rec), storm-waiver 11-12"
+  "readiness": {
+    "open": "3 (JUP bb-squeeze +0.02 / ETH jup 0.00 / SOL jup SHORT 0.00) all bracketed size 1.0x — HOLD",
+    "regime": "continuum AT, btc_15m LONG_BIAS vs btc_4h SHORT_BIAS, NORMAL vol, STRONG_DOWN trend_quality — chop pin persists",
+    "note": "FIL/DOT/HYPE closed since watchdog snapshot; cluster steers resolved by close"
   }
 }

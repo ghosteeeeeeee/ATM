@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-01T00:45:00Z",
+  "updated": "2026-11-01T04:44:13Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -53,7 +53,13 @@
       "threshold": "fresh SCOPED out-of-sample eval (regime/direction split, n>=15 per cell, p-value + split-halves) delivered to kanban",
       "default_action": "no change; escalation packet re-issued with EVAL-OVERDUE label",
       "owner": "self_learner",
-      "notes": "commissioned by CEO 20261027T024741Z; enforcement of any resulting flag = T/waiver"
+      "notes": "commissioned by CEO 20261027T024741Z; enforcement of any resulting flag = T/waiver",
+      "remeasure_20261101": {
+        "7d": "74T 47.3% WR -$1.40; ema300 split ALL negative (AT -0.63 / ABOVE -0.27 / BELOW -0.22)",
+        "14d": "91T 48.4% -$1.72",
+        "verdict": "below-EMA300 block stays REFUTED (BELOW not worst cell). Blanket 45-64 = jup 34% CEO-domain. No ship. Data ready for 11-03 batch.",
+        "measured_at": "2026-11-01T04:44:13Z"
+      }
     },
     {
       "id": "gate-shadow",
@@ -681,7 +687,12 @@
       "default_action": "report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREFIXES (CEO) — do NOT leave it drifting unwatched",
       "owner": "main-session",
       "evidence": "pc- LONG live since 2026-10-27 flip: 7T +0.43 WR 57.1% (pump-chain-) + 4T +0.02 combo = 11T +0.45 WR 54.5%. Trades ARE flowing (was 0T concern). Shadow join 11-01 00:31Z: pc- flip-WR 64.6% n=350 unchanged. Default (extend if 0T) NOT triggered — watch is working. Recommendation: extend to 11-10 for n>=20 bar before any monitor/promote decision.",
-      "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed)."
+      "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed).",
+      "evidence_20261101": {
+        "pc_long_since_1027": "9T +0.31 WR 44.4% (cooled from 11T +0.45)",
+        "shadow_join": "pc- flip-WR 64.6% n=350 (re-ran 04:30Z)",
+        "measured_at": "2026-11-01T04:44:13Z"
+      }
     },
     {
       "id": "gate-shadow-capture-coverage-fix",
@@ -736,7 +747,8 @@
       "default_action": "NO CHANGE — log why-not in kanban (do not force-deploy a thin live cohort)",
       "owner": "brain_auditor",
       "created_at": "2026-11-01T00:45:00Z",
-      "evidence": "shadow_trader --report 2026-11-01T00:33Z: grind-breakout- n=26 WR 92.3% avg_pnl +1.56 (top of SIGNAL QUALITY BY SOURCE). Live PG 30d: 2T +0.63. Enabled flags True. Most likely friction = CONFLUENCE-EXPIRY (14,410 blocked @47% lower-bound) — verify in join."
+      "evidence": "shadow_trader --report 2026-11-01T00:33Z: grind-breakout- n=26 WR 92.3% avg_pnl +1.56 (top of SIGNAL QUALITY BY SOURCE). Live PG 30d: 2T +0.63. Enabled flags True. Most likely friction = CONFLUENCE-EXPIRY (14,410 blocked @47% lower-bound) — verify in join.",
+      "note_20261101": "interim: shadow still TOP SOURCE 92.3% n=26; live 2T/30d; due 11-14 not duplicated"
     }
   ]
 }
