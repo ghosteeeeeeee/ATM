@@ -3901,7 +3901,6 @@ CHANGE: none - no kill/size/overtrade/negative-streak trigger met
 DEPLOYED: volume-breakout boost 1.25 confirmed live (pipeline restarted 23:10:59 UTC + compactor timer runs fresh)
 WATCH: hard_max_loss family 10T -$1.53 sole loss concentration | pnl_pct nonsense (CRV -476%) | signal_version.py still missing
 BY: auto_1hr
-BY: auto_1hr
 2026-10-04 00:11 UTC auto_1hr: NO CONFIG CHANGE - hourly audit
 DB-verified: 2T last hour (1W 1L -$0.19) | 24h 34T ~65%WR +$1.20 atr_sl_hit 0% | open 1 (ENS bb-bounce-v3)
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met
@@ -4003,7 +4002,6 @@ DB-verified: 3T last hour ALL WINS GMT+IMX pump-chain+ pump_exit_dead_money +$0.
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: bb-bounce-v3-long+ 10T -$0.56 worst (ETC combo just trail-won) | hard_max_loss family 11T -$1.74 | freeze until Oct 6
 BY: auto_1hr
-BY: auto_1hr
 DB-verified: 2T last hour BOTH WINS SAGA+USELESS bb-squeeze+ profit-monster-trail +$0.07 | 24h 34T ~flat atr_sl_hit 1/34=2.9% not dominant | open 4 flat
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: bb-bounce-v3-long+ 9T -$0.42 worst (has wins) | hard_max_loss family 10T -$1.73 | freeze until Oct 6
@@ -4022,7 +4020,6 @@ BY: auto_1hr
 DB-verified: 2T last hour HYPE bb-bounce-v2-long+ trail +$0.04 (1.64% WIN) + ARB btc-pump-rider+ trail -$0.01 (-0.32% loss) | 24h 36T 21W 15L ~-$0.14 atr_sl_hit 1/36=2.8% not dominant | open 3 bb-squeeze+ LDO/TURBO/ZORA
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: bb-bounce-v3-long+ 8T -$0.46 worst (has wins) | hard_max_loss family 9T -$1.49 | 0cb0784b regime-block awaiting CEO ratify/revert
-BY: auto_1hr
 BY: auto_1hr
 DB-verified: 4T last hour 2W 2L -$0.10 MET mtf-regime-trend- +$0.05 + LDO bb-squeeze+ +$0.13 WINS | TURBO/ZORA bb-squeeze+ hard_max_loss -$0.16/-$0.12 | 24h 37T 22W 15L -$0.48 59.5%WR atr_sl_hit 1/37=2.7% not dominant | open 3 HYPE/SAGA/HBAR
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 1) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
@@ -4043,7 +4040,6 @@ DB-verified: 1T last hour RESOLV bb-squeeze+ LONG profit-monster-trail +$0.02 (+
 CHANGE: none - no kill/size/overtrade/negative-streak trigger met (neg streak max 2 06-07, hour 05 gap) + freeze b960ffe8 until Oct 6 00:38 blocks trading config anyway
 WATCH: hard_max_loss family 14T -$2.32 sole 24h loss concentration (losers MFE 0.125% = entries never worked, post-freeze stop review) | bb-squeeze+ 19T 52.6%WR -$0.60 (has wins, just closed winner) | bb-bounce-v3-long+ 7T 42.9%WR -$0.42 | 0cb0784b awaiting CEO
 BY: auto_1hr
-BY: auto_1hr
 DB-verified: 2T last hour INJ bb-squeeze+ LONG hard_max_loss -$0.25 (-5.67%) + WLD bb-squeeze+ LONG trail +$0.09 (+4.15%) net -$0.16 | 24h 37T 21W 15L 1 flat -$1.05 56.8%WR atr_sl_hit 1/37=2.7% not dominant | open 1 HBAR pump-chain- SHORT +0.17%
 CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. NEG-STREAK TRIGGER MET (06-08 = 3 consecutive negative hours with closes) but regime mixed not cleanly NEUTRAL + freeze blocks size change.
 WATCH: hard_max_loss family 12T -$2.21 sole 24h loss concentration (bb-squeeze+ subset 5T 0W -$0.89) | bb-squeeze+ 17T 10W -$0.45 has wins | bb-bounce-v3-long+ 7T 3W -$0.42 | 0cb0784b awaiting CEO
@@ -4062,7 +4058,6 @@ BY: auto_1hr
 DB-verified: 0T last hour (quiet) | 24h 36T 22W 13L 1flat -$0.60 61.1%WR atr_sl_hit 0/36=0% not dominant | open 2 ETH/ZORA | neg streak still broken (11h +$0.06 after 06-09)
 CHANGE: none - 0 closes = no triggers + freeze b960ffe8 until Oct 6 00:38 blocks trading config
 WATCH: hard_max_loss 11T -$1.95 sole 24h loss concentration (MFE 0.15% = entries never worked) | R:R inversion +$0.055 vs -$0.177 | 0cb0784b RATIFIED | post-freeze queue unchanged
-BY: auto_1hr
 BY: auto_1hr
 DB-verified: 5T last hour (3W 1L 1flat) +$0.01 | LDO doji-bottom-long trail +$0.12, ETH bb-bounce-v2-long+ trail +$0.02, BANANA bb-squeeze+ trail +$0.02, SOL btc-pump-rider+ cut-loser-MAE-GUARD -$0.15, BTC continuum_engine ORPHAN_PAPER $0 | 24h 42T 25W 15L 2flat -$0.34 59.5%WR atr_sl_hit 0/42=0% not dominant | open 0 | neg streak BROKEN (15h +$0.01 after 13/14 negative)
 CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill (no 3+T signal last hour), no overtrade, no streak.
@@ -4086,7 +4081,6 @@ BY: auto_1hr
 DB-verified: 0T last hour (quiet, last close 16:23 UTC) | 24h 32T 18W 12L 2flat -$0.64 56.3%WR atr_sl_hit 0/32=0% not dominant | open 3 LONG flat MERL/CRV/TURBO | neg streak NOT triggered (last 3 trade-bearing hours +0.06/+0.12/+0.11) | freeze b960ffe8 until Oct 6 00:38 (~3.4h remaining)
 CHANGE: none - freeze blocks trading config. No kill (0T last hour; 24h 0%-WR all <3T), no overtrade (0/hr), no streak.
 WATCH: hard_max_loss 7T -$1.18 sole 24h loss concentration (post-freeze entry review — MFE audit shows entries never worked) | mtf-regime-trend- 4T 1W 3L -$0.48 queue#6 | btc-pump-rider+ 2T 0W -$0.16 below threshold | ⚠️ freeze violation candidate 45da8fcf trendline_bounce_long.py confidence boost @21:10 during freeze — CEO RATIFY/REVERT | signal_versions.json pump-chain- non-dict corruption minor | post-freeze queue unchanged
-BY: auto_1hr
 BY: auto_1hr
 DB-verified: 2T last hour BLUR trend-ride+ +$0.05 trail / CRV mover+ -$0.14 hard_max_loss | 24h ~33T 19W 13L -$0.73 ~58%WR atr_sl_hit 0/33=0% not dominant | hard_max_loss 8T -$1.32 sole loss concentration | open 3 LONG IO/MERL/TURBO | no 3h neg streak (22h -, 16h +, 15h +)
 CHANGE: none - freeze b960ffe8 until Oct 6 00:38 blocks trading config. No kill (last hour both signals <3T), no overtrade (2/hr), no streak.
@@ -4244,7 +4238,6 @@ BY: auto_1hr
   RETRACT: prior "LTC stop_loss inverted" flag — current row SL>entry for SHORT is correct structure
   WATCH: hard_max_loss 56% of closes queue#2 leverage-aware | regime_state table missing | low trade volume 0-1T/hr
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-07 02:12 UTC] auto_1hr: NO CHANGE — analysis only
   DB-verified: 2T last hour both wins (APT pump-chain- SHORT trail_sl +$0.53, LTC pump-chain- SHORT atr_trail_hit +$0.61) | 24h 10T 6W +$0.95 | pump-chain- 5T 3W +$0.85 | atr_sl_hit 1/10=10% (tpsl fix stable) | hard_max_loss 4T -$0.61 sole 24h bleed queue#2 | hourly 21:00 -$0.12 then 02:00 +$1.14 (streak inactive) | open 0
   Kill: none (0T/last-hour losers; 24h 0%-WR all ≤1T)
@@ -4261,7 +4254,6 @@ BY: auto_1hr
   Kill: none (0T last hour; 24h 0%-WR only bb-squeeze+ 1T)
   Overtrade: 0/hr | atr_sl_hit 0%
   WATCH: low volume 0-2T/hr ~11h | hard_max_loss queue#2 leverage-aware | mover kill effect next window
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-07 05:12 UTC] auto_1hr: NO CHANGE — analysis only
   DB-verified: 0T last hour | 0 open | 7 opens/24h last at 01:00 | 24h 9T 6W +$1.06 WR 66.7% | pump-chain- 5T 3W +$0.85 | atr_sl_hit 0/9=0% (tpsl fix stable) | hard_max_loss 3T -$0.50 sole bleed 33% of closes (under threshold) | hourly 02:00 +$1.14 (streak inactive) | pipeline healthy, no signals >50% conf
@@ -4341,7 +4333,6 @@ BY: auto_1hr
   ⚠️ CEO must RATIFY/REVERT — philosophy conflict (CEO re-enabled 09-22; vol-gate RE-ENABLED today)
   WATCH: hard_max_loss 61.5% queue#2 | pump-chain- SHORT 9T 2W keep-alive | conf>100 scale bug (sideways) | DOT open trade drain
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-07 20:14 UTC] auto_1hr: BUGFIX signal_compactor.py:1505 SyntaxError — position_manager unblocked
   DB-verified: 0T last hour | 1 open DOT pump-chain+ LONG 81min +0.29% | 24h 12T 2W +$0.37 WR 16.7% | pump-chain- 9T 2W +$0.64 | pump-chain+ 3T 0W -$0.27 (CEO RE-ENABLED today, do not re-kill) | atr_sl_hit 0/12=0% (tpsl stable) | hard_max_loss 8T = 67% (queue#2 open) | regime LONG_BIAS
   ROOT CAUSE: commit 6ba423ce TREND-ALIGN inserted `_bearish_structure = ...` between if-block and elif → SyntaxError line 1505. position_manager imports signal_compactor → FATAL rc=1 every cycle 20:04-20:12. DOT had NO exit management (SL/TP/trail dead) for ~10min.
@@ -4375,7 +4366,6 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-08 06:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 10T 2W +$0.30 WR 20.0% | pump-chain- 5T 0W -$0.35 (7d +$0.17 not kill-eligible) | pump-chain+ 4T 2W +$0.81 (7d 15T 9W +$1.83) | v5 1T 0W | atr_sl_hit 0/10=0% (tpsl stable) | hard_max_loss 6T=60% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active, live_trading=true
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-08 07:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 10T 2W +$0.40 WR 20.0% | 7d 200T +$1.17 | pump-chain- 5T 0W -$0.35 (7d +$0.17 not kill-eligible) | pump-chain+ 4T 2W +$0.81 (7d 15T 9W +$1.83) | v5 1T 0W (7d not kill-eligible) | atr_sl_hit 0/10=0% (tpsl stable) | hard_max_loss 6T=60% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active, live_trading=true, D3 HML_TRAIL_MIN_GAP_PCT=0.20 deployed
 [2026-10-08 07:37 UTC] brain_auditor: 0 trading config + exit_time trigger/backfill 5618; watchdog RSI steers disproved (meta-RSI); HML fixes directionally working; hold until Oct 9/10 evals — brain_auditor
 [2026-10-08 08:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 0 open | 24h 10T 2W +$0.40 WR 20.0% | pump-chain- 5T 0W -$0.35 (7d +$0.17 not kill-eligible) | pump-chain+ 4T 2W +$0.81 | v5 1T 0W | atr_sl_hit 0/10=0% (tpsl stable) | hard_max_loss 6T=60% queue#2 open | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline active, live_trading=true, D3 HML_TRAIL_MIN_GAP_PCT=0.20 deployed
@@ -4388,13 +4378,11 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-08 12:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet ~11h) | 0 open | 24h 7T 2W +$0.67 WR 28.6% | pump-chain+ 3T 2W +$0.95 | pump-chain- 3T 0W −$0.22 (7d +$0.34 not kill-eligible) | v5 1T 0W | atr_sl_hit 0/7=0% (tpsl stable) | hard_max_loss 3T=42.9% (hold per brain_auditor until Oct 9/10) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline timers active, live_trading=true, regime=SHORT_BIAS
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-08 13:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet ~12h) | 0 open | 24h 6T 2W +$0.67 WR 33.3% | pump-chain+ 3T 2W +$0.95 | pump-chain- 2T 0W −$0.22 (7d +$0.34 not kill-eligible) | v5 1T 0W | atr_sl_hit 0/6=0% (tpsl stable) | hard_max_loss 3T=50% (hold per brain_auditor until Oct 9/10) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline timers all fresh, live_trading=true, kill JSON=true | Note: signal-analyst PASSed GMT LONG bb-squeeze+ conf=60 at 13:12 but no trade executed — watching for pass-without-execute pattern
 [2026-10-08 14:12 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (quiet streak broken, ~13h) | IMX pump-chain- SHORT hard_max_loss −$0.23 | 1 open: GRASS LONG pump-chain+,v5 $11.10 | 24h 5T 2W +$0.66 | atr_sl_hit 0/5=0% (tpsl stable) | hard_max_loss 3/5=60% (hold per brain_auditor until Oct 9/10) | Kill: none (1T) | Overtrade 1/hr | Streak inactive | Pipeline timers fresh, live_trading=true, kill JSON=true
 [2026-10-08 15:14 UTC] auto_1hr: NO CONFIG CHANGE — 4T last hour 0W −$0.48 (all LONGs, SHORT_BIAS regime) | 0 open | 24h 9T 3W +$0.18 | pump-chain+ 4T 2W +$0.84 (7d 16T 9W +$1.72 not kill-eligible) | v5 solo 1T 0W | atr_sl_hit 0/9=0% (tpsl stable) | hard_max_loss 5/9=55.6% (hold per brain_auditor Oct 9/10) | Kill: none eligible | Overtrade 4/hr | Streak: 2 neg hrs w/ gap, not 3 consecutive | GRASS MFE 1.13%→pump_exit_momentum gave back profit (flag for trail review) | BLUR $22.10 size 2x normal on loser | Pipeline active, live_trading=true
 BY: auto_1hr
 [2026-10-08 16:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 9T 3W +$0.18 WR 33.3% | hard_max_loss 5/9=55.6% (hold per brain_auditor Oct 9/10) | atr_sl_hit 0% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline timers fresh, live_trading=true, kill JSON=true
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-08 17:12 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour | 0 open | 24h 9T 2W +$0.18 WR 22.2% | hard_max_loss 5/9=55.6% (hold per brain_auditor Oct 9/10) | atr_sl_hit 0% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline timers fresh, live_trading=true, kill JSON=true
 [2026-10-08 18:13 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet ~3h) | 0 open | 24h 9T 2W +$0.18 WR 22.2% | hard_max_loss 5/9=55.6% (hold brain_auditor Oct 9/10) | atr_sl_hit 0% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | Pipeline timers fresh, live_trading=true, kill JSON=true
@@ -4415,10 +4403,8 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-09 03:12] auto_1hr: NO CONFIG CHANGE — 1T last hour ALT pump-chain+v6 combo LONG hard_max_loss −$0.12 | 0 open | 24h 12T 4W −$0.34 WR 33.3% | hard_max_loss 6/12=50% (hold brain_auditor Oct 9/10 eval) | atr_sl_hit 0% (tpsl stable) | Kill: none (1T, no 0%WR 3+T signal) | Overtrade 1/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-09 04:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet resumed) | 0 open | 24h 12T 4W −$0.34 WR 33.3% | hard_max_loss 6/12=50% (hold brain_auditor Oct 9/10 eval) | atr_sl_hit 0% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 [2026-10-09 05:13] auto_1hr: NO CONFIG CHANGE — 1T last hour GRASS ai-trader+ LONG profit-monster-trail +$0.09 | 0 open | 24h 13T 5W −$0.25 WR 38.5% | hard_max_loss 6/13=46.2% (hold brain_auditor Oct 9/10) | atr_sl_hit 0% (tpsl stable) | Kill: none (1T, winning) | Overtrade 1/hr | Streak inactive (+0.09) | timers fresh, live_trading=true
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-09 06:15] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 0 open | 24h 13T 5W −$0.25 WR 38.5% | hard_max_loss 6/13=46.2% (hold brain_auditor Oct 9/10) | atr_sl_hit 0% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
@@ -4439,7 +4425,6 @@ BY: auto_1hr
 [2026-10-09 16:12] auto_1hr: NO CONFIG CHANGE — 1T last hour JUP pump-chain+ atr_sl_hit −$0.04 | 1 open ETH continuation+ (SL/TP OK) | 24h 18T ~6W ≈−0.12 | hard_max_loss 7/18=38.9% (hold brain_auditor eval) | atr_sl_hit 11.1% (tpsl stable) | Kill: none | Overtrade 1/hr | Streak inactive | timers fresh, live_trading=true
 [2026-10-09 17:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 3 open CC pump-chain+/LDO pump-chain-/ETH continuation+ (all sized SL/TP OK) | 24h 18T 7W +$0.04 WR 38.9% | hard_max_loss 7/18=38.9% (hold brain_auditor eval) | atr_sl_hit 11.1% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive (14:00 +0.13 broke it) | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-09 18:12] auto_1hr: NO CONFIG CHANGE — 2T last hour ALGO pump-chain-v6- combo SHORT atr_sl_hit −$0.02 + LDO pump-chain- SHORT atr_sl_hit −$0.07 | 2 open ETH continuation+/CC pump-chain+ (SL/TP OK) | 24h 20T 8W −$0.05 WR 40% | hard_max_loss 7/20=35% (hold brain_auditor eval) | atr_sl_hit 20% (tpsl stable) | Kill: none | Overtrade 2/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-09 19:12] auto_1hr: NO CONFIG CHANGE — 2T last hour CC pump-chain+ stale_exit +$0.17 + ETH continuation+ atr_sl_hit −$0.09 | 0 open | 24h 21T 8W ≈−$0.45 | hard_max_loss 33% (hold brain_auditor eval) | atr_sl_hit 23.8% (tpsl stable) | Kill: none | Overtrade 2/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
@@ -4449,7 +4434,6 @@ BY: auto_1hr
 [2026-10-09 22:12] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet but 1 open BABY volume-breakout-long+ SL/TP OK) | 24h 16T 6W ≈−0.46 WR 38% | hard_max_loss 31.3% (hold brain_auditor) | atr_sl_hit 31.3% (tpsl stable) | Kill: none (0T) | Overtrade 0/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-09 23:12] auto_1hr: NO CONFIG CHANGE — 2T last hour BABY volume-breakout-long+ stale_exit +$0.30 + W hmacd_mtf- SHORT atr_sl_hit −$0.14 | 4 open (ZEN/SEI/YGG vol-breakout, CAKE hmacd — all sized OK) | 24h 18T 7W ≈−$0.30 WR 39% | hard_max_loss 27.8% (hold brain_auditor) | atr_sl_hit 33.3% (tpsl stable) | Kill: none | Overtrade 2/hr | Streak inactive | timers fresh, live_trading=true, kill JSON=true
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-10 00:13] auto_1hr: NO CONFIG CHANGE — 2T last hour CAKE hmacd_mtf-+ profit-monster-trail +$0.03 + SYRUP ai-trader+ profit-monster-trail +$0.02 | 3 open ZEN/SEI/YGG vol-breakout cluster (sized OK) | 24h 20T 7W -$0.25 WR 35% | hard_max_loss 25% -$0.58 (hold brain_auditor) | atr_sl_hit 30% (tpsl stable) | Kill: none (2W) | Overtrade 2/hr | Streak inactive (positive hour) | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
@@ -4486,10 +4470,8 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-10 21:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 32T 15W −$0.23 WR 47% | hard_max_loss 25% −$1.04 (hold brain_auditor) | atr_sl_hit 12.5% (tpsl stable) | kill: none (0T) | overtrade 0/hr | streak broken (hour 20 empty) | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-10 22:13] auto_1hr: NO CONFIG CHANGE — 1T last hour L APT pump-chain+ atr_sl −$0.06 | 2 open | 24h 33T 15W −$0.29 WR 46% | hard_max_loss 24% −$1.04 (hold brain_auditor) | atr_sl_hit 15% (tpsl stable) | kill: none qualifying | overtrade 1/hr | streak broken (hour -2 empty); regime SHORT_BIAS | timers fresh, live_trading=true
 [2026-10-10 23:14] auto_1hr: NO CONFIG CHANGE — 1T last hour L GOAT doji atr_sl −$0.02 | 1 open ETH hmacd 2× size $22.10 | 24h 32T 14W −$0.47 WR 44% | hard_max_loss 25% −$1.04 (hold brain_auditor) | atr_sl_hit 15.6% (tpsl stable) | kill: none qualifying (vol-breakout 0T last hour, CEO re-enabled 12:25) | overtrade 1/hr | streak 2 neg hrs not 3; regime SHORT_BIAS | timers fresh, live_trading=true
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-11 00:12] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L net +$0.06 (AIXBT doji trail +$0.08 / ETH hmacd MAX_HOLD −$0.02) | 0 open | 24h 32T 13W −$0.46 WR 41% | hard_max_loss 25% −$1.04 (hold brain_auditor) | atr_sl_hit 15.6% (tpsl stable) | kill: none qualifying (vol-breakout 0T last hour, CEO re-enabled) | overtrade 2/hr | streak broken (hour 23 pos) | timers fresh, live_trading=true
 BY: auto_1hr
@@ -4514,7 +4496,6 @@ BY: auto_1hr
 [2026-10-11 13:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 7h), 0 open | 24h 21T 8W +$0.21 WR 38% | hard_max_loss 24% -$0.41 (hold brain_auditor) | atr_sl_hit 19% (tpsl stable) | kill: none qualifying (0T last hour; vol-breakout-long+ 2T 0W CEO-owned) | overtrade 0/hr | streak pos 05/06 then empty | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-11 14:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 8h), 0 open | 24h 20T 8W +$0.22 WR 40% | hard_max_loss 25% -$0.41 (hold brain_auditor) | atr_sl_hit 20% (tpsl stable) | kill: none qualifying (0T last hour; vol-breakout-long+ 2T 0W CEO-owned) | overtrade 0/hr | streak pos 05/06 then empty | timers fresh, live_trading=true, kill JSON=true
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-11 15:13] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L SYRUP r2v2-long3 +$0.59 / ARB bb-bounce +$0.06 (both profit-monster-trail) | 0 open | 24h 22T 9W +$0.87 WR 41% | hard_max_loss 24% (hold brain_auditor) | atr_sl_hit 19% (tpsl stable) | kill: none qualifying (vol-breakout-long+ 2T 0W CEO-owned) | overtrade 2/hr | streak broke after 8h quiet | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
@@ -4541,7 +4522,6 @@ BY: auto_1hr
 [2026-10-12 04:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 2 open BTC continuum + ETH hl_copy | 24h 17T 10W +$1.88 | hard_max_loss 29% (hold brain_auditor) | atr_sl_hit 0% (tpsl stable) | kill: none qualifying | overtrade 0/hr | streak no 3-neg | live_trading=true, kill JSON=true
 [2026-10-12 05:14] auto_1hr: NO CONFIG CHANGE — 1T last hour GRASS pump-chain+ atr_sl_hit −$0.18 | 3 open (BTC continuum flat 3h, ETH hl_copy +$0.15, SUPER r2v2 +$0.06) | 24h 18T 10W +$1.70 | hard_max_loss 28% (hold brain_auditor) | atr_sl_hit 5.6% (tpsl stable) | kill: none qualifying (1T last hour) | overtrade 1/hr | streak no 3-neg | live_trading=true, kill JSON=true
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-12 06:14] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W +$0.11 (ETH hl_copy trail +$0.09 MAE 0.36%, SUPER r2v2 trail +$0.02) | 1 open BTC continuum flat 4h | 24h 18T 12W +$1.81 | hard_max_loss 28% (hold brain_auditor) | atr_sl_hit 5.3% (tpsl stable) | kill: none qualifying | overtrade 2/hr | streak no 3-neg | timers fresh, live_trading=true, kill JSON=true
 BY: auto_1hr
 [2026-10-12 07:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 3 open BTC continuum 5h flat + HYPE volume-buildup + DOT bb-squeeze | 24h 18T 10W +$0.95 | hard_max_loss 28% (hold brain_auditor) | atr_sl_hit 5.6% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak no 3-neg | timers fresh, live_trading=true, kill JSON=true
@@ -4561,7 +4541,6 @@ BY: auto_1hr
 [2026-10-12 15:13] auto_1hr: NO CONFIG CHANGE — 1T last hour BTC continuum flat close (~12.5h hold) | 0 open | 24h 21T 9W +$0.10 (42.9%) | hard_max_loss 38% (hold brain_auditor) | atr_sl_hit 4.8% (tpsl stable) | kill: none qualifying | overtrade 1/hr | streak not 3-neg | live_trading=true, kill JSON=true
 [2026-10-12 16:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 7 of 8h) | 0 open | 24h 21T 9W +$0.10 (42.9%) | hard_max_loss 38% (hold brain_auditor) | atr_sl_hit 4.8% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
 BY: auto_1hr
-BY: auto_1hr
 [2026-10-12 17:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 7 of 8h) | 0 open | 24h 21T 9W +$0.10 (42.9%) | hard_max_loss 38% (hold brain_auditor) | atr_sl_hit 4.8% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
 [2026-10-12 18:14] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 8 of 9h) | 0 open | 24h 19T 8W +$0.09 (42.1%) | hard_max_loss 42% (hold brain_auditor) | atr_sl_hit 5.3% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
 [2026-10-12 19:13] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet 9 of 10h) | 0 open | 24h 17T 8W +$0.17 (47.1%) | hard_max_loss 41% (hold brain_auditor) | atr_sl_hit 5.9% (tpsl stable) | kill: none qualifying (0T last hour) | overtrade 0/hr | streak not 3-neg | live_trading=true, kill JSON=true
@@ -4579,7 +4558,6 @@ BY: auto_1hr
 [2026-10-13 01:15] auto_1hr: KILL oversold-bounce+ (OVERSOLD_BOUNCE_ENABLED=False) — 4 consecutive hard_max_loss (XPL/NEAR/APT/PUMP), 0/4 24h −$0.39, standing escalation "next red = kill" met; bear-flip regime, LONG mean-reversion = BANANA reverse; v1 logged; one-shot pipeline picks up constant on next cron tick
 BY: auto_1hr
 [2026-10-13 02:15] auto_1hr: NO CONFIG CHANGE — 1T last hour CFX ai-trader+ hard_max_loss (−$0.12) | 1 open BABY pump-chain+ | 24h 22T 8W −$0.83 | kill: none qualifying (ai-trader+ 1T 0W last hour, rule needs 3+) | hard_max_loss 40.9% (hold brain_auditor) | atr_sl_hit 9.1% (tpsl stable) | overtrade 1/hr | streak not 3-neg | live_trading=true, kill JSON=true
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 03:13] auto_1hr: NO CONFIG CHANGE — 1T last hour BABY pump-chain+ hard_max_loss (−$0.24) | 0 open | 24h 17T 4W −$1.11 (window shed wins + BABY) | kill: none qualifying (pump-chain+ 1T 0W last hour, rule needs 3+) | hard_max_loss 53% (hold brain_auditor) | atr_sl_hit 11.8% (tpsl stable) | overtrade 1/hr | streak not 3-consecutive-neg | live_trading=true, kill JSON=true
 [2026-10-13 05:13] auto_1hr: NO CONFIG CHANGE — 1T last hour ALT pump-chain+ trail_sl (+$0.01) | 4 open (3 in profit) | 24h 19T 6W −$1.19 (31.6%) | kill: none qualifying (1T 1W last hour) | hard_max_loss 47% (hold brain_auditor) | atr_sl_hit 5.3% (tpsl stable) | overtrade 1/hr | streak not 3-neg (04h +$0.01) | live_trading=true, kill JSON=true
@@ -4602,7 +4580,6 @@ BY: auto_1hr
 [2026-10-13 08:15] auto_1hr: NO CONFIG CHANGE — 3T last hour (BTC continuum-trend+ trail +$0.04, ENS hmacd_mtf-+ trail +$0.02, CRV volume-breakout-long+ hard_max_loss −$0.08) | 5 open (2 profit, 3 red) | 24h 21T 5W −$1.12 (23.8%) | kill: none qualifying (max 1T 0W per signal last hour, needs 3+) | hard_max_loss 47.6% (hold, 4 fixes in soak per brain_auditor) | atr_sl_hit 14.3% (tpsl stable) | overtrade 3/hr | streak not 3-neg (06h $0.00 breaks) | live_trading=true, kill JSON=true
 [2026-10-13 09:13] auto_1hr: NO CONFIG CHANGE — 5T last hour +$0.60 (LDO pump-chain+ trail +$0.68, ETH hl_copy_trader trail +$0.10, 3 hard_max_loss × −$0.06) | 4 open (3 pump-chain- SHORTs in profit, BANANA LONG red) | 24h 25T 7W −$0.48 (28.0%, improving from −$1.12/23.8%) | kill: none qualifying (max 1T 0W per signal last hour, needs 3+) | pump-chain+ flipped 24h positive 7T 3W +$0.23 — RSI_MAX+trail-arm soak working | hard_max_loss 48% (hold, 4 fixes in soak) | atr_sl_hit 12% (tpsl stable) | overtrade 5/hr | streak 2-neg not 3 | live_trading=true, kill JSON=true
 [2026-10-13 10:13] auto_1hr: NO CONFIG CHANGE — 5T last hour −$0.06 (2 pump-chain- trail wins +$0.22, IMX/SEI doji-bottom hard_max_loss, BANANA hmacd stale −$0.11) | 3 open (2 pump-chain- SHORTs profit) | 24h 29T 9W −$0.42 (31.0%, improving) | kill: none qualifying (doji-bottom-long 2T 0W last hour, needs 3+) | hard_max_loss 44.8% (hold, 4 fixes in soak) | atr_sl_hit 10.3% (tpsl stable) | overtrade 5/hr | streak broken (09h +$0.57) | live_trading=true, kill JSON=true
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-13 11:18] auto_1hr: KILLED doji-bottom-long (DOJI_BOTTOM_ENABLED=False, signal_versions v1) — 0/4 24h −$0.37 all losers (SEI/IMX/TURBO hard_max_loss, ME atr_sl_hit −3.12%), same profile as oversold-bounce+ kill this morning | 2T last hour both doji losses −$0.18 | 24h 30T 9W −$0.50 (30.0%) | 3 open (2 pump-chain- SHORTs +2%, BANANA doji −0.73% pre-kill position continues) | hard_max_loss 46.7% (hold soak) | atr_sl_hit 10% (tpsl stable) | overtrade 2/hr | streak 1-neg | live_trading=true
 BY: auto_1hr
@@ -4691,7 +4668,6 @@ BY: auto_1hr
 BY: auto_1hr
 
 [2026-10-15 01:14] auto_1hr: NO CONFIG CHANGE — 0T last hour, 2 open (MNT ai-trader+, ICP bb-bounce-v2+) | 24h 33T 13W −$0.21 (~39%) | kill: none (0T this hour) | volume-buildup+ remains killed (pre-kill only) | volume-breakout-short- 2T 0W (needs 3+) | atr_sl_hit 27.3% (tpsl stable) | overtrade 0/hr | streak reset by quiet hr | live_trading=true, kill JSON=true
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-15 02:15] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W −$0.13 (ICP bb-bounce-v2+ hard_max_loss, MNT ai-trader+ atr_sl_hit) | 24h 33T 11W −$0.38 (33%) | kill: none (ai-trader+ 2T 0W, needs 3+T) | volume-buildup+ remains killed | atr_sl_hit 27.3% (tpsl stable) | overtrade 2/hr | streak 3-neg but −$0.20 total (noise) | 0 open | ⚠️ kill JSON=false since 01:40 (live trading OFF, not by auto_1hr) | live_trading constant=true
 BY: auto_1hr
@@ -4817,7 +4793,6 @@ BY: brain_auditor
 BY: auto_1hr
 [2026-10-18 05:27] auto_1hr: NO CONFIG CHANGE — 2T 1W $0.00 last hour (SUPER ai-trader+ rr_engine_trail_hit +$0.05 +1.41%; HYPE hl_copy_trader hard_sl -$0.05) | 24h 8T 5W +$0.36 (62.5%) | 7d 202T 72W -$1.86 (35.6%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T; ai-trader+ 2T 1W -$0.10) | atr_sl_hit 12.5% (healthy, tpsl deployed) | 1 open: BANANA LONG bb-bounce-v2-long+ $11.10 | No constants change → no signal_versions entry
 BY: auto_1hr
-BY: brain_auditor
 [2026-10-18 05:41] brain_auditor: 1 infra bugfix (trade_watchdog _SIGNAL_FLAG_MAP +11 killed signals, 14-case assert PASS), 0 trading config — soak #10 | 24h 8T 5W +$0.36 | 7d 202T 35.6% −$1.86 | BANANA TAT shadow first live counterfactual (would-exit 55m ~−0.4%) | generator-gating CLOSED (pump-chain+ EXTREME +$2.14/14d = habitat, no gap) | hl_copy shorts monitor | TAT flip criteria pre-registered | escalation #14 exit-ladder candle OOS | Protected flags INTACT
 [2026-10-18 06:28] auto_1hr: NO CONFIG CHANGE — 1T 0W -$0.09 last hour (BANANA bb-bounce-v2-long+ atr_sl_hit, -2.24%) | 24h 9T 5W +$0.27 (55.6%) | 7d 202T 71W -$2.18 (35.1%) — size-reduce 30% stays | kill: none (hl_copy_trader 2T 0W under 3T) | atr_sl_hit 22.2% (healthy, tpsl deployed) | 0 open | No constants change → no signal_versions entry
 BY: auto_1hr
@@ -4844,7 +4819,6 @@ BY: auto_1hr
 
 [2026-10-18 14:39] brain_auditor: 0 config changes — soak #15 | 24h 15T 6W +$0.08 healed | 7d 207T 34.3% −$3.00 | steers: 001 aged-out, 002 structural, 003 rejected (14d +$1.65), 004 monitor→Oct 19 | SHORT floor revert HOLDING | EXTREME 0.85 early-positive (3d −$0.05) | armed-reverse cohort 29T −$1.67 quantified | creative: post-arm trail tightening (needs candle-OOS) | escalation #15 exit-ladder candle OOS | Protected 13/13 INTACT
 BY: brain_auditor
-BY: auto_1hr
 [2026-10-18 15:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 15T 6W +$0.08 (40%) | 7d 205T 69W −$3.65 (33.7%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W under 3T) | atr_sl_hit 26.7% (healthy, tpsl deployed) | 0 open | no 3-neg-hour streak | No constants change → no signal_versions entry
 BY: auto_1hr
 [2026-10-18 16:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 15T 6W +$0.08 (40%) | 7d 205T 69W −$3.65 (33.7%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ 2T 0W and hl_copy_trader 2T 0W under 3T) | atr_sl_hit 26.7% (healthy) | 0 open | no 3-neg-hour streak | No constants change → no signal_versions entry
@@ -4864,7 +4838,6 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-18 23:44] brain_auditor: 1 comment-hygiene fix (bypass bb-bounce-v2-long stale justification 73T/74%% → reproducible 51T/49.0%% −0.36; tuple untouched) | 24h 14T 5W −0.30 | 7d 201T 33.3%% −3.66 | size-reduce 0.3x stays | regime FLIP to LONG_BIAS, ME LONG open correctly template'd RSI 56.1 | 5 filter candidates REJECTED on stats (45-55 block t=-0.33, gap 0.2-0.5 OOS fail, gap<-0.5 kills 28%% winners, pump-chain- kill rule not met +0.05, conf floor CEO-deliberate) | escalation #15 CONFIRMED-CLOSED (MFE-CUT candle OOS FAIL / ARM-BE-STOP PASS / TAT=shadow path) | creative: gap-asymmetry rejected (7d sign-flip), ai-trader+ universal 0.85 demote pre-registered | Protected 13/13 INTACT
 BY: brain_auditor
-BY: auto_1hr
 [2026-10-19 00:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-manual LONG atr_tp_hit +$0.05) | 24h 14T 5W -$0.30 (35.7%) | 7d 202T 68W -$3.61 (33.7%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ and hl_copy_trader both 2T 0W, under 3T) | atr_sl_hit 35.7% (healthy, tpsl deployed) | 2 open (ME LONG, BTC continuum LONG) | no 3-neg-hour streak | No constants change → no signal_versions entry
 BY: auto_1hr
 [2026-10-19 01:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC continuum-trend+ LONG profit-monster-trail +$0.03) | 24h 15T 6W -$0.27 (40%) | 7d 201T 69W -$3.41 (34.3%) — size-reduce 30% stays | kill: none (bb-bounce-v2-long+ and hl_copy_trader both 2T 0W, under 3T) | atr_sl_hit 33.3% (healthy, tpsl deployed) | 2 open (BTC LONG, ME LONG) | no 3-neg-hour streak | No constants change → no signal_versions entry
@@ -4880,10 +4853,8 @@ BY: brain_auditor
 [2026-10-19 05:35] brain_auditor: 0 config changes — soak #16 (45min follow-up) | 24h 13T 6W −0.12 healed | 7d 195T 33.8%% −3.79 | precheck CONF fix VERIFIED PASS | steers: 001 VERIFIED (BTC EMA300 squeeze + chop longs + PUMP armed-reverse), all covered by existing defenses | atr_sl MFE paradox 3d: 14d 29T −1.67 24/29 EXTREME | creative: EXTREME post-arm BE-ratchet shadow PRE-REGISTERED → Oct 23 stack, BTC SHORT EMA300 watch n=7 monitor | infra: trail_activated not in trade metadata | escalation: self_learner candle-OOS still missing | Protected 13/13 INTACT
 [2026-10-19 06:29] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 12T 5W -$0.12 | 7d 195T 66W -$3.79 (33.8%) — size-reduce 0.3x stays | kill: none (pump-chain+ 2T 0W under 3T) | atr_sl_hit 25% (healthy, tpsl deployed) | 4 open (LDO, LTC, GRASS, ME) | last 4 active hours all positive | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: brain_auditor
 [2026-10-19 07:44] brain_auditor: 1 bugfix (vacation_guardrail.py:279 precedence — parenthesized size-reduce auto-clear OR, latent hard-pause swallow), 0 trading-param changes — soak #18 | 24h 12T 7W +0.09 (58.3% HEALED) | 7d 195T 33.8% −3.76 | size-reduce lifts Oct 20 at today pace (aging artifact, escalated staged-lift) | BTC add-long fired #16283 | 5 losers all known cohorts zero new patterns | protected 13/13 INTACT
 [2026-10-19 08:30] auto_1hr: NO CONFIG CHANGE — 4T last hour (1W 3L, -$0.12: LDO/BTC/LTC atr_sl_hit at accel floors ~0.3% price, GRASS trail +$0.05) | 24h 15T 8W -$0.02 (53.3%) | 7d 197T 67W -$3.79 (34.0%) — size-reduce 0.3x stays | kill: none (ai-trader-pending 2T 0W under 3T) | atr_sl_hit 40% at threshold, tpsl fix verified deployed | 1 open (DOGE ai-trader+ LONG) | no 3-neg-hour streak | No constants change → no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-19 09:27] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 14T 8W -$0.02 (57.1%) | 7d 197T 67W -$3.79 (34.0%) — size-reduce 0.3x stays | kill: none (ai-trader-pending 2T 0W under 3T) | atr_sl_hit 36% healthy, tpsl deployed | 3 open (DOGE, LTC, ARB) | no 3-neg-hour streak | No constants change → no signal_versions entry
 BY: auto_1hr
@@ -4903,7 +4874,6 @@ BY: auto_1hr
 [2026-10-19 16:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, 0 open) | 24h 16T 8W -$0.34 (50.0%) | 7d 200T 68W -$4.09 (34.0%) — size-reduce 0.3x stays | kill: none (ai-trader-pending 2T 0W under 3T) | atr_sl_hit 37.5% under 40%, tpsl deployed | 4th consecutive quiet hour | No constants change -> no signal_versions entry
 BY: auto_1hr
 [2026-10-19 17:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, 0 open) | 24h 16T 8W -$0.34 (50.0%) | 7d 200T 68W -$4.09 (34.0%) — size-reduce 0.3x stays | kill: none (ai-trader-pending 2T 0W under 3T) | atr_sl_hit 37.5% under 40%, tpsl deployed | no neg-hour streak | 5th consecutive quiet hour | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 [2026-10-19 18:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, 0 open) | 24h 16T 8W -$0.34 (50.0%) | 7d 200T 68W -$4.09 (34.0%) — size-reduce 0.3x stays | kill: none (ai-trader-pending 24h 2T 0W under 3T) | atr_sl_hit 37.5% under 40%, tpsl deployed | no neg-hour streak | 6th consecutive quiet hour | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -4934,7 +4904,6 @@ BY: auto_1hr
 - [2026-10-20 06:42 UTC] brain_auditor: BUGFIX ai_trader_signal.py dual-path state load (HERMES_DATA + www fallback, freshest wins) — SAND pick limbo prevention; zero live behavior (AI_TRADER disabled); watchdog prompt PATH WARNING; py_compile+functional PASS
 - [2026-10-20 07:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 16T 3W -$1.00 (18.8%) | 7d 191T 66W -$3.53 (34.6%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ / ai-trader+ 0W/3T 24h monitor line) | atr_sl_hit 50% closed as non-issue per 05:00 verdict | no neg-hour streak | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-20 08:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (ALT pump-chain- SHORT rr_engine_resistance_break -$0.03 -0.87%) | 24h 13T 2W -$0.91 (15.4%) | 7d 189T 64W -$3.56 (33.9%) — size-reduce 0.3x stays | kill: none (under 3T/hr; pump-chain+ 3T 0W 24h monitor line) | atr_sl_hit 38.5% under 40% | no neg-hour streak | 1 open: BTC pending flat | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-20 09:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 13T 2W -$0.91 (15.4%) | 7d 185T 62W -$4.22 (33.5%) — size-reduce 0.3x stays | kill: none (0T last hour) | atr_sl_hit 7d 30.8% under 40% | no neg-hour streak | 3 open: BTC pending flat + ALT/IO pump-chain- shorts green | No constants change -> no signal_versions entry
@@ -4956,7 +4925,6 @@ BY: auto_1hr
 - [2026-10-20 16:35] auto_1hr: NO CONFIG CHANGE — 1T last hour (PUMP r2v2-long3 LONG hard_max_loss -$0.12 -5.41%) | 24h 20T 4W -$0.26 (20.0%) | 7d 168T 59W -$2.79 (35.1%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (r2v2-long3 1T only) | atr_sl_hit signal-only 35.7% under 40% | no neg-hour streak (watch 17:00) | 1 open BTC flat | No constants change -> no signal_versions entry
 [2026-10-20 16:47 UTC] brain_auditor: AUDIT RUN #40 — 1 infra (ARM-GAP close-time log MFE>=0.40 trail=FALSE pnl<0, zero-behavior) | btc_regime backfill REFUTES BTC-align lever (TRANSITIONING=chop $2.88/30d bleed; RANGING=only profit) | coin_regime n=10/20 directionally perfect | pump-chain± kills rejected | TAT scope fix verified | 24h 20% -$0.26 shallow, 7d 35.1% -$2.79, size-reduce 0.5x
 BY: brain_auditor
-BY: auto_1hr
 - [2026-10-20 17:35] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 4W -$0.26 (20.0%) | 7d 165T 59W -$2.61 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (0T) | atr_sl_hit 40% raw / ~35% signal-only, tpsl deployed | no neg-hour streak | 1 open BTC +0.42% | No constants change -> no signal_versions entry
 - [2026-10-20 18:35] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 4W -$0.26 (20.0%) | 7d 162T 58W -$2.47 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (0T) | atr_sl_hit 40% raw / 35.7% signal-only, tpsl deployed | no neg-hour streak | 1 open BTC +0.14% | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -4975,11 +4943,9 @@ BY: auto_1hr
 BY: brain_auditor
 - [2026-10-21 00:35] auto_1hr: NO CONFIG CHANGE — 2T last hour (BTC continuum-osc+ UNIVERSAL_MAX_HOLD +$0.09 +3.73%, APT pump-chain+ trail_arm_timeout -$0.04 -1.70%) | 24h 22T 6W -$0.17 (27.3%) | 7d 161T 58W -$2.68 (36.0%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0W/4T 24h but 1T last hour, 7d verified profitable) | atr_sl_hit 22.7% under 40% | no neg-hour streak | 3 open | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-21 01:30] auto_1hr: NO CONFIG CHANGE — 3T last hour (all loss: CFX/BLUR pump-chain+ trail_arm_timeout, COMP r2v2-long3 trail) | 24h 22T 6W -$0.17 (27.3%) | 7d 159T 57W -$2.73 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0W/6T 24h but 2T last hour, 7d +$0.16) | atr_sl_hit 22.7% under 40% | no neg-hour streak | 1 open BTC SHORT | No constants change -> no signal_versions entry
 [2026-10-21 01:37 UTC] brain_auditor: AUDIT RUN #47 — 0 config changes (vacation soak) | BTC SHORT #16317 HOLD (precheck FAIL reported) | pump-chain± kills rejected 6th | HML re-entry cooldown REJECTED-WITH-DATA (net -$0.16) | near-miss arm band pre-registered | 24h 20.8% -$0.37 shallow, 7d 35.8% -$2.73, size-reduce 0.5x
 BY: brain_auditor
-BY: auto_1hr
 - [2026-10-21 02:30] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-pending SHORT atr_sl_hit -$0.10 -2.13%) | 24h 23T 6W -$0.27 (26.1%) | 7d 159T 57W -$2.87 (35.8%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (pump-chain+ 0T last hour, 7d +$0.16) | atr_sl_hit 26.1% under 40% | no neg-hour streak | 0 open | No constants change -> no signal_versions entry
 - [2026-10-21 03:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (COMP pump-chain- SHORT atr_sl_hit -$0.13 -5.71%) | 24h 26T 5W -$0.60 (19.2%) | 7d 159T 56W -$2.97 (35.2%) — size-reduce 0.3x stays (PnL <-$2) | kill: none (1T) | atr_sl_hit 26.9% under 40% | no 3h neg streak | 2 open (CRV +0.18%, BTC -0.04%) | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -4991,10 +4957,8 @@ BY: auto_1hr
 BY: brain_auditor
 - [2026-10-21 06:35] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 24T 5W -$0.24 (20.8%) | 7d 154T 56W -$2.66 (36.4%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (0T) | atr_sl_hit 33.3% under 40% | 3h neg streak 01-03 but size already reduced | 2 open (BTC SHORT, DOGE LONG) | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: brain_auditor
 - [2026-10-21 06:45 UTC] brain_auditor: AUDIT RUN #49 — 0 config changes (vacation soak) | ARM-GAP confirmed LARGEST bleed 45T -$3.19 14d | bare-path demote shadow REJECTED-WITH-DATA (net -$0.16) | pump-chain- kill recheck Oct 22 | 24h 20.8% -$0.24 shallow, 7d 35.2% -$2.96, size-reduce 0.5x
 - [2026-10-21 07:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, no closes since 03:xx) | 24h 24T 5W -$0.24 (20.8%) | 7d 153T 56W -$2.64 (36.6%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (0T) | atr_sl_hit 33.3% under 40% | neg streak 01-03 broken by empty hours | 2 open (BTC SHORT, DOGE LONG +0.56%) | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-21 08:20] auto_1hr: NO CONFIG CHANGE — 2T last hour (1W DOGE trail +$0.08, 1L BTC pending SHORT atr_sl_hit -$0.05) | 24h 25T 6W -$0.18 (24.0%) | 7d 152T 55W -$2.70 (36.2%) — size-reduce 0.3x stays (PnL < -$2) | kill: none (max 1T/signal) | atr_sl_hit 9/25=36.0% under 40% | no neg-hour streak | regime LONG_BIAS (not NEUTRAL) | 2 open (both LONG, aligned) | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -5005,7 +4969,6 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-21 12:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (SYRUP warrior-sr-confirm+ trail +$0.11 +1.43%) | 24h 29T 9W -$0.31 (31.0%) | 7d 153T 55W -$2.78 (35.9%) — size-reduce 0.3x stays | kill: none (1T) | atr_sl_hit 31.0% under 40% | no neg streak | 3 open all LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: brain_auditor
 - [2026-10-21 12:38 UTC] brain_auditor: AUDIT RUN #55 — 0 config changes (vacation soak) | 24h 29T 31.0% -$0.31 shallow, 7d 153T 35.9% -$2.78 | TRAIL +$3.74 vs UNARMED -$6.29 | coin_regime n=28 MET | hmacd kill-criteria pre-registered | pump-chain- kill DEFER Oct 22 | size-reduce 0.3x
 - [2026-10-21 13:30] auto_1hr: NO CONFIG CHANGE — 4T last hour 3W/1L +$0.20 (all profit-monster-trail) | 24h 32T 37.5% +$0.06 (green) | 7d 155T 36.8% -$2.46 — size-reduce 0.3x stays | kill: none (0T for 0%WR candidates) | atr_sl_hit 25.0% under 40% | no neg streak | 3 open all LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -5014,7 +4977,6 @@ BY: auto_1hr
 [2026-10-21 15:40 UTC] brain_auditor: AUDIT RUN #58 — 0 config changes (vacation soak) | pump-chain- kill DEFER Oct 22 (bare 30d OOS -1.15 n=116, combo +0.26) | WLD MFE anomaly flagged | post-arm breakeven ratchet re-registered (blocked on esc #17) | 24h 40% -0.71 shallow, since #57 +0.03, size-reduce 0.3x
 - [2026-10-21 16:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 34T 41.2% -$0.59 | 7d 162T 37.0% -$2.92 — size-reduce 0.3x stays | kill: none (0T; pump-chain+ 6T 0%WR but 0T last hour, DEFER Oct 22) | atr_sl_hit 17.6% under 40% | neg streak 2h (14:00,15:00) not 3 | 1 open BTC LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: brain_auditor
 [2026-10-21 16:39 UTC] brain_auditor: AUDIT RUN #59 — 0 config changes (vacation soak) | WLD MFE root-caused: false round-peak 0.60 → false trail arm → premature atr_trail_hit (bug_hunter P1; ZRO #16310 same class) | peak-sanity shadow pre-registered | pump-chain- kill recheck still MET Oct 22 | 24h 41.2% -0.59 shallow, 7d 37.0% -2.92, size-reduce 0.5x
 - [2026-10-21 17:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (STX r2v2-long4 LONG hard_max_loss -$0.11 -4.90%) | 24h 35T 14W -$0.70 (40.0%) | 7d 159T 59W -$2.87 (37.1%) — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ 6T 0%WR + ai-trader-pending 3T 0%WR both 0T last hour; pump-chain recheck pre-reg Oct 22) | atr_sl_hit 6/35=17.1% under 40% | neg streak broken by empty 16:00 | 4 open | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -5025,7 +4987,6 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-21 20:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 41T 36.6% -$1.03 | 7d 164T 36.0% -$3.48 — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending both 0T last hour; recheck pre-reg Oct 22) | atr_sl_hit 10/41=24.4% under 40% | no neg streak (empty hour breaks) | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: brain_auditor
 - [2026-10-21 20:56 UTC] brain_auditor: AUDIT RUN #61 — 0 config changes (vacation soak) | watchdog wrong-side REFUTED: opposite-side signal audit 15.4% losers vs 6.9% winners p=0.116, 85% had no opposing setup = chop not wrong-side | LONGxCALM gate REJECTED (p=0.069/0.128/0.139 all >0.05, fk 22.9%) | ema300-pin gate REJECTED (all 3 positions lose) | STANDALONE_BYPASS chop exemption = CEO 2026-10-01 decree NOT drift | rsi_drift stamp LIVE (POL drift 8.14) + ARM-GAP LIVE (SOL logged 100%) | 24h 41T 36.6% '-$1.03', 7d 164T 36.0% '-$3.48', armed '+$3.48' vs unarmed '-$7.00', size-reduce 0.5x | pump-chain- kill recheck Oct 22 (still MET 37T '-$0.57'), CONF_FLOOR=30 net '+$1.34' ships Oct 23 | creative x3 (opposite-side audit measured, rsi_drift criteria locked, arm-rate dampen pre-reg)
 - [2026-10-21 21:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 40T 35.0% '-$1.09' | 7d 162T 35.8% '-$3.46' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending both 0T last hour; recheck pre-reg Oct 22) | atr_sl_hit 10/40=25.0% under 40% | no neg streak (empty 20:00/21:00 breaks) | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -5040,7 +5001,6 @@ BY: auto_1hr
 BY: auto_1hr
 [2026-10-22 00:37 UTC] brain_auditor: AUDIT RUN #65 — 0 config changes (vacation soak) | watchdog 65+ band handoff REJECTED (14d/30d OOS negative) | pump-chain- kill CANCELLED reconfirmed | CONF_FLOOR=30 pre-ship VERIFIED net '+$1.61' fk 6.3% ships Oct 23 | 24h 35T 37.1% '-$0.99', 7d 160T 36.3% '-$3.39', armed '+$3.48' vs unarmed '-$6.87', size-reduce 0.5x
 BY: brain_auditor
-BY: auto_1hr
 - [2026-10-22 01:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, 00/01 empty) | 24h 33T 39.4% '-$0.87' | 7d 159T 36.5% '-$3.35' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending both 0T last hour; pump-chain- recheck date reached: EXTREME +$0.75 wins, HIGH/NORMAL lose — blanket kill dead, audit #63 CANCEL stands, CONF_FLOOR ships Oct 23) | atr_sl_hit 10/33=30.3% under 40% | no neg streak (empty hours) | 0 open | No constants change -> no signal_versions entry
 - [2026-10-22 02:28] auto_1hr: NO CONFIG CHANGE — 1T last hour (flat $0.00) | 24h 33T 39.4% '-$0.77' | 7d 159T 36.5% '-$3.26' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending 0 losing T last hour; pump-chain- CANCELLED audit #63, CONF_FLOOR ships Oct 23) | atr_sl_hit 9/33=27.3% under 40% | no neg streak (flat+empty) | 0 open | No constants change -> no signal_versions entry
 BY: brain_auditor
@@ -5048,7 +5008,6 @@ BY: brain_auditor
 - [2026-10-22 03:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (03 empty) | 24h 32T 40.6% '-$0.64' | 7d 159T 36.5% '-$3.26' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ / ai-trader-pending both 0T last hour; pump-chain- CANCELLED audit #63, CONF_FLOOR ships Oct 23) | atr_sl_hit 8/32=25.0% under 40% | no neg streak (empty hour) | 0 open | No constants change -> no signal_versions entry
 - [2026-10-22 04:00 UTC] brain_auditor: AUDIT RUN #68 — 1 bugfix (HML-SHADOW unit fix ATR_SL_MIN fraction->percent + once-per-trade dedup; 0 lines logged since Oct 18 ship, zero live behavior), 0 config changes | pump-chain- kill recheck DUE TODAY: CANCEL confirmed, auto_1hr's 'EXTREME +$0.75' is family-wide scope not bare (bare 14d '-$0.57', conf>=30 residual '-$0.04' = wash) | watchdog wrong-side steer REFUTED with 1m path check: 13/18 24h losers recovered within 30m, 1 clear wrong-side | hold-through-stop policy REJECTED-WITH-DATA after catching account%-vs-price% unit mix (real delta $'-0.20' to $'-2.18'/14d, OOS sign-flips) | 4 candidates rejected on p>0.05 / direction-confound / OOS flip | creative pre-registered: leverage x HML (p=0.0047 HML rate, p=0.0091 arm rate) folds into HML-SHADOW eval Oct 25 | 24h 31T 13W 41.9% '-$0.59', 7d 158T 36.7% '-$3.14', size-reduce 0.5x, 0 open, protected 13/13
 BY: brain_auditor
-BY: auto_1hr
 - [2026-10-22 04:27] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 31T 41.9% '-$0.59' | 7d 158T 36.7% '-$3.14' — size-reduce 0.5x stays (file truth) | kill: none (ai-trader-pending 3T 0%WR 24h but 0T last hour; pump-chain- CANCELLED audit #63, CONF_FLOOR ships Oct 23) | atr_sl_hit 7/31=22.6% under 40% | no neg streak (empty hour) | 0 open | No constants change -> no signal_versions entry
 BY: brain_auditor
 - [2026-10-22 04:51 UTC] brain_auditor: AUDIT RUN #69 — 1 drift-doc (BTC_REGIME_ALIGN review delivered, flag UNCHANGED OFF), 0 constants changes (vacation no_constants_change) | NEW VERIFIED PATTERN: BTC-regime habitat RANGING-class only profitable regime (7d 22T 72.7% '+$0.41', 14d 75T 53.3% '+$0.58', 30d 163T 56.4% '+$1.68', Fisher p<=0.0005 all windows, 5/5 weeks, within-family) — only survivor of 20-test Bonferroni sweep | dampen lever FAILS bars (p=0.0945, fk 21.6%) pre-registered re-measure Oct 25 | BTC_REGIME_ALIGN KEEP OFF (trigger class p=0.90 no edge, worst cell BULL_TREND LONG '-$2.55'/30d) | CONF_FLOOR=30 re-verified ships Oct 23 | wrong-side steer REFUTED 5th run | 24h 31T 41.9% '-$0.59', 7d 158T 36.7% '-$3.14', size-reduce 0.5x, protected 13/13
@@ -5060,11 +5019,9 @@ BY: brain_auditor
 BY: auto_1hr
 - [2026-10-22 07:27] auto_1hr: NO CONFIG CHANGE — 0T last hour (07 empty) | 24h 31T 41.9% '-$0.59' | 7d 158T 36.7% '-$3.14' — size-reduce 0.5x stays (file truth) | kill: none (ai-trader-pending 3T 0%WR 24h but 0T last hour; pump-chain+ 2T 0%WR 0T last hour; pump-chain- CANCELLED audit #63, CONF_FLOOR ships Oct 23) | atr_sl_hit 7/31=22.6% under 40% | no neg streak (empty hour) | 1 open BTC pending SHORT (SL 83050/TP 81800) | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-22 08:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (last close 01:00, 7h quiet) | 24h 29T 41.4% '-$0.62' | 7d 158T 36.7% '-$3.14' — size-reduce 0.5x stays (file truth) | kill: none (ai-trader-pending 2T 0%WR 24h but 0T last hour; pump-chain+ 2T 0%WR 0T last hour; pump-chain- CANCELLED audit #63, CONF_FLOOR ships Oct 23) | atr_sl_hit 6/29=20.7% under 40% | no neg streak (no trades since 01:00) | 1 open BTC pending SHORT | No constants change -> no signal_versions entry
 - [2026-10-22 09:27] auto_1hr: NO CONFIG CHANGE — 1T last hour (+$0.11 win: BTC ai-trader-pending SHORT manual_tp_hit) | 24h 29T 41.4% '-$0.55' | 7d 159T 37.1% '-$3.03' — size-reduce 0.5x stays (file truth) | kill: none (ai-trader-pending 3T 33.3% +$0.08 24h now positive; pump-chain+ 2T 0%WR but 0T last hour; pump-chain- CANCELLED audit #63) | atr_sl_hit 6/29=20.7% under 40% | no neg streak (positive hour) | 0 open (BTC pending closed at TP) | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: brain_auditor
 - [2026-10-22 10:00 UTC] brain_auditor: AUDIT RUN #73 — 1 infra ship (HML-SHADOW += live_pnl, zero-behavior), 0 config changes (vacation honored) | HEADLINE CONF_FLOOR=30 scope defect: family-wide fkA 6/29=20.7% FAILS <20% bar, bare-only passes both defs (16.7%/12.5%) net '+$1.81' and spares 40% of v6-combo winners → ship BARE-ONLY Oct 23 or CEO fk-definition ruling | volume_spike>=2.0 REJECTED-WITH-DATA (p=0.31/0.33, non-monotonic bands) | losing autopsy 16T: 16/16 recovered <=30m, 0 wrong-side (7th refutation) | 24h 29T 41.4% '-$0.55', 7d 159T 37.1% '-$3.03', 30d 720T '-$7.09', armed 131T 77.9% '+$9.05' vs unarmed 224T 10.7% '-$13.92', size-reduce 0.5x, 0 open, protected 13/13 | creative: add-at-arm measured '+$10.66'/14d but sign-flips at +0.60% fill → pre-registered only
 - [2026-10-22 10:28] auto_1hr: NO CONFIG CHANGE — 0T last hour | 24h 23T 43.5% '-$0.36' | 7d 159T 37.1% '-$3.03' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ 2T 0%WR 24h but 0T last hour; pump-chain- 1T 0%WR 0T last hour; CONF_FLOOR ships Oct 23) | atr_sl_hit 5/23=21.7% under 40% | no neg streak (empty hour) | 0 open | No constants change -> no signal_versions entry
 - [2026-10-22 11:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (last close 09:00) | 24h 23T 43.5% '-$0.36' | 7d 159T 37.1% '-$3.03' — size-reduce 0.5x stays (file truth) | kill: none (pump-chain+ 2T 0%WR 24h but 0T last hour; r2v2-long4 2T 0%WR 0T last hour; CONF_FLOOR ships Oct 23) | atr_sl_hit 5/23=21.7% under 40% | no neg streak (empty hour) | 0 open | No constants change -> no signal_versions entry
@@ -5149,7 +5106,6 @@ BY: auto_1hr
 - [2026-10-24 01:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 22T 11W 50.0% `+$0.07` | 7d 121T 40.5% `-$1.16` — size-reduce 1.0x (file absent, cleared 22:57Z) | kill: none (no trades) | atr_sl_hit 1/22=4.5% under 40% | no neg streak (prior green + empty hour) | 0 open | waiver gate live clean | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-24 02:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 22T 11W 50.0% `+$0.07` | 7d 120T 40.0% `-$1.17` — size-reduce 1.0x (file absent, cleared 22:57Z) | kill: none (no trades) | atr_sl_hit 1/22=4.5% under 40% | no neg streak (prior green + empty hour) | 0 open | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-24 03:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 21T 10W 47.6% '-$0.05' | 7d 120T 40.0% '-$1.17' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 1/21=4.8% under 40% | no neg streak (empty hour resets) | 0 open | No constants change -> no signal_versions entry
 - [2026-10-24 04:28] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 9W 45.0% '-$0.08' | 7d 120T 40.0% '-$1.17' — size-reduce 1.0x (file absent = truth) | kill: none (no trades) | atr_sl_hit 1/20=5.0% under 40% | no neg streak (empty hour resets) | 0 open | No constants change -> no signal_versions entry
@@ -5240,7 +5196,6 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-25 17:29 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L '+$0.04' (PENDLE bb-bounce-v2-long+ ugb_pt -0.65% / profit-monster-trail +2.47%) | 24h 15T 11W 73.3% '+$0.64' (GREEN) | 7d 124T 45.2% '-$0.37' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 last hour; worst 24h bb-bounce-v2-long+ 4T 1W n<kill) | atr_sl_hit 0/15=0% under 40% | entry quality good (winner MAE max 0.574%) | no neg streak (11/15/17 all +) | 2 open BTC+DOGE bracketed | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-25 18:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '$0.00' (DOGE bb-bounce-v2-long+ trail_arm_timeout -0.19%) | 24h 16T 11W 68.8% '+$0.64' (GREEN) | size-reduce 1.0x (file absent = truth) | kill: none (0%WR n>=3 not met; 1T last hour) | atr_sl_hit 0/16=0% under 40% | no neg streak (08/11/15/17 all +, 18 ~0) | 3 open BTC/KAS/ETH | No constants change -> no signal_versions entry
 - [2026-10-25 19:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '-$0.04' (KAS bb-squeeze+ trail_arm_timeout -1.02%) | 24h 17T 11W 64.7% '+$0.60' (GREEN) | 7d 126T 44.4% '-$0.41' — size-reduce 1.0x (file absent = truth) | kill: none (1T last hour; worst 24h bb-bounce-v2-long+ 5T 1W not 0%) | atr_sl_hit 0/17=0% under 40% | no neg streak (15/17 +, 18 single -, 19 empty) | entry quality good (winner MAE max 0.574%) | 2 open BTC/ETH bracketed | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -5254,7 +5209,6 @@ BY: auto_1hr
 - [2026-10-25 23:29 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '-$0.07' (BTC continuum-trend+ atr_sl_hit -3.01% account) | 24h 17T 10W 58.8% '+$0.22' (GREEN) | 7d 128T 44.5% '-$0.50' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 last hour; worst 24h bb-bounce-v2-long+ 4T 1W not 0%) | atr_sl_hit 2/17=11.8% under 40% | no neg streak (20/21 empty, 22 +, 23 -) | 1 open DOT SHORT bracketed SL/TP | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-26 00:29 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 3W0L '+$0.10' (all volume-buildup- SHORT profit-monster-trail: CAKE +0.86% ANIME +0.42% DOT +2.43%) | 24h 19T 12W 63.2% '+$0.27' (GREEN) | 7d 130T 45.4% '-$0.45' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 last hour; worst bb-bounce-v2-long+ 4T 1W 25%WR not 0%) | atr_sl_hit 2/19=10.5% under 40% | no neg streak (18 -, 19 -, 20/21 empty, 22 +, 23 +) | 1 open ADA bb-bounce-v2-long+ | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-26 01:30 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L '-$0.07' (ADA bb-bounce-v2-long+ trail_arm_timeout -3.57% / BTC continuum-osc- ugb_pt +0.66%) | 24h 20T 12W 60.0% '+$0.16' (GREEN) | 7d 131T 45.0% '-$0.55' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 last hour; worst 24h bb-bounce-v2-long+ 5T 1W 20%WR not 0%) | atr_sl_hit 2/20=10% under 40% | no neg streak (18 -, 19 -, 20/21 empty, 22 +, 23 +, 01 -) | 0 open trades | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -5275,7 +5229,6 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-26 10:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 11W 55.0% '-$0.08' (SLIGHTLY RED) | 7d 126T 44.4% '-$0.56' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; worst 24h bb-bounce-v2-long+ 5T 1W 20%WR not 0%) | atr_sl_hit 3/20=15% under 40% | no neg streak (05 +, 07 -) | entry quality good (winner MAE max 0.477%) | 1 open BTC continuum-osc+ bracketed SL 79580.93/TP 81274.60 | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-26 11:28 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L '+$0.04' (BTC continuum-osc+ ugb_pt +1.65%) | 24h 20T 11W 55.0% '-$0.13' (RED) | 7d 126T 44.4% '-$0.26' — size-reduce 1.0x (file absent = truth) | kill: none (1T last hour; worst 24h bb-bounce-v2-long+ 5T 1W not 0%) | atr_sl_hit 3/20=15% under 40% | no neg streak (05 +, 07 -, 08-10 empty, 11 +) | frequency 1/hr | 2 open bracketed ETH hl_copy_trader / LTC volume-buildup- | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-26 12:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, last close 11:02) | 24h 20T 11W 55.0% '-$0.13' (RED) | 7d 126T 44.4% '-$0.26' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; worst 24h bb-bounce-v2-long+ 5T 1W 20%WR not 0%) | atr_sl_hit 3/20=15% under 40% | no neg streak (01 -, 02 +, 03 -, 05 +, 07 -, 11 +) | frequency 0/hr | 4 open all bracketed ETH/LTC/PURR/BLUR | No constants change -> no signal_versions entry
@@ -5287,7 +5240,6 @@ BY: auto_1hr
 - [2026-10-26 16:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, last close 15:15) | 24h 30T 14W 46.7% '-$0.55' (REDDEST today) | 7d 136T 44.9% '-$0.62' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h no 0%WR n>=3) | atr_sl_hit 4/30=13.3% under 40% | neg streak 2h (14 '-0.31', 15 '-0.08'), 16 empty, not yet 3 | frequency 0/hr | 0 open | entry quality OK (winner MAE max 0.525%) | FLAG pending: bb-bounce-v2-long+ loses ALL regimes 14d n=38 (EXTREME -0.43 / NORMAL -0.69) | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-26 17:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet, last close 15:15) | 24h 28T 13W 46.4% '-$0.59' (RED) | 7d 136T 44.9% '-$0.62' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h bb-bounce-v2-long+ 3T 0W flagged for CEO already) | atr_sl_hit 4/28=14.3% under 40% | neg streak 2h (14 '-0.31', 15 '-0.10'), 16 empty, not yet 3 | frequency 0/hr | 3 open all bracketed | entry quality OK (winner MAE max 0.525%) | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-26 19:29 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '-$0.11' (RENDER r2v2-long5 hard_sl -0.95%) | 24h 30T 14W 46.7% '-$0.99' (REDDEST today) | 7d 139T 44.6% '-$1.02' — size-reduce 1.0x (file absent = truth) | kill: none (1T last hour; 24h 0%WR signals all n=2<3) | atr_sl_hit 4/30=13.3% under 40% | neg streak 1h (17 +0.04, 18 -0.48), not yet 3 | frequency 1/hr | 0 open | No constants change -> no signal_versions entry
 - [2026-10-26 20:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 29T 14W 48.3% '-$0.90' (RED) | 7d 139T 44.6% '-$1.02' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h 0%WR signals all n<3) | atr_sl_hit 3/29=10.3% under 40% | neg streak 1h (17 +0.04, 18 -0.48), not yet 3 | frequency 0/hr | 1 open DOT volume-buildup- bracketed SL 1.0309/TP 0.9857 | No constants change -> no signal_versions entry
@@ -5305,13 +5257,10 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-27 02:29 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L '+$0.03' (AIXBT vol-buildup- profit-monster-trail +0.78%) | 24h 29T 12W 41.4% '-$1.01' (improving) | 7d 143T 44.8% '-$1.15' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 in 24h, empty set; worst vol-buildup-/pump-chain+ both positive-WR) | atr_sl_hit 2/29=6.9% under 40% | neg streak broken (23 '-0.23', 0 '+0.06') | frequency 1/hr | 2 open bracketed FOGO LONG / BTC LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-27 03:28 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L '+$0.14' (FOGO pump-chain+ ugb_pt +5.08% MAE 0.212% / BTC continuum-trend+ manual_close -2.19%) | 24h 28T 12W 42.9% '-$0.76' (improving) | 7d 145T 44.8% '-$1.01' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 in 24h, empty set) | atr_sl_hit 1/28=3.6% under 40% | no neg streak (23 '-0.23', 0/1/2 positive) | frequency 2/hr | 1 open bracketed MET LONG | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-27 04:28 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L '+$0.06' (ENA/MET warrior-sr-confirm+ profit-monster-trail +1.50%/+0.85%) | 24h 30T 14W 46.7% '-$0.70' (improving) | 7d 146T 45.9% '-$0.87' — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 in 24h; bb-bounce-v2-long+ n=2 already flagged for CEO) | atr_sl_hit 1/30=3.3% under 40% | no neg streak (4 consecutive positive hours 0-4) | frequency 2/hr | 0 open | No constants change -> no signal_versions entry
 - [2026-10-27 05:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 30T 14W 46.7% '-$0.70' | 7d 145T 46.2% '-$0.56' (improving) — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; 24h 0%WR signals all n<3) | atr_sl_hit 1/30=3.3% under 40% | no neg streak (5 consecutive positive hours 0-4) | frequency 0/hr | 0 open flat | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-27 06:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 28T 12W 42.9% '-$0.75' | 7d 144T '-$0.54' (improving) — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; no 0%WR n>=3 in 24h, worst n>=3 signals positive-WR) | atr_sl_hit 1/28=3.6% under 40% | no neg streak (5 consecutive positive hours 0-4) | frequency 0/hr | 0 open flat | No constants change -> no signal_versions entry
 - [2026-10-27 07:28 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 28T 12W 42.9% '-$0.75' | 7d 144T '-$0.54' (improving) — size-reduce 1.0x (file absent = truth) | kill: none (no 0%WR n>=3 in 24h, worst n>=3 positive-WR) | atr_sl_hit 1/28=3.6% under 40% | no neg streak (5 consecutive positive hours 0-4) | frequency 0/hr | 0 open flat | No constants change -> no signal_versions entry
@@ -5364,7 +5313,6 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-28 05:02 UTC] brain_auditor: AUDIT RUN #192 — 0 config changes (constants_change_review_queue honored, constants EMPTY, protected 13/13), 1 zero-behavior ship (tape_state_arm_census_2026-10-28 --selfcheck PASS, bug_hunter 1 MED + 6 LOW all fixed), 0 trade actions. HEADLINE: #191 next lever tape-state arm census EXECUTED EARLY via continuum.db backfill (n=728/30d, exact live stamp rule) -> 0/10 pre-declared tests pass -> REJECTED; entry-quality route now closed on 3 axes (#96/#190/#192). SECOND: coupled-SL trial hierarchy INVERTED — CL_TIER1 -1.00% price now binds before HML -1.200% (HML-SHADOW -0.800% pre 10,999 lines -> -1.200% post 1,877; 7/7 T1 exits 21d avg -1.012%; pre HML 37 exits avg -0.907% vs post 0 HML) -> Nov-3 verdict not attributable; Proposal A/B lodged in review queue. autopsy 48h 2/15/3 wrong-side REFUTED 117th | deep-dive 0 new targets | shadow 3/6 used (pm_trail '+4,368' vs hard_max '-6,245') | checkpoint btc-16450-8h-stale registered due 05:54Z | 24h 16T 62.5% '-0.17' | 7d 136T 52.9% '-0.47' | armed 7d '+4.28' vs unarmed '-4.75' | chop-bleed 91.5% age=11 under gate | tripwire LONG 57.1/SHORT 62.2 NOT tripped | 1 open BTC #16450 flat never-armed
 BY: brain_auditor
-BY: auto_1hr
 - [2026-10-28 05:30 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 16T 62.5% '-$0.17' RED | 7d 136T 52.9% '-$0.47' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; no 24h signal n>=3 at 0% WR) | atr_sl_hit 4/16=25% under 40% | inversion 0 mismatches | boost: none (bb-squeeze+ already boosted last hour, 1/hr cap) | neg streak 02:00-04:00 broke this hour (0 closes); regime NORMAL/EXTREME/HIGH not NEUTRAL, no size cut | frequency 0/hr | 1 open BTC continuum-trend+ flat ~8h stale | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-28 06:30 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W2L -$0.07 (BIGTIME pump-chain- atr_sl_hit -1.57%, BTC continuum-trend+ UNIVERSAL_MAX_HOLD -0.41%) | 24h 18T 55.6% -$0.24 RED | 7d 138T 52.2% -$0.54 — size-reduce 1.0x (file absent = truth) | kill: none (no signal n>=3 at 0% WR) | atr_sl_hit 5/18=27.8% under 40% | inversion 0 mismatches | boost: none (bb-squeeze+ meets criteria but boosted last hour, 1/hr cap) | neg streak 4h (02:00-05:00) but regime NORMAL/EXTREME not NEUTRAL, size lever N/A | frequency 2/hr | 1 open BABY volume-buildup- SHORT fresh | No constants change -> no signal_versions entry
@@ -5376,7 +5324,6 @@ BY: brain_auditor
 - [2026-10-28 09:35 UTC] auto_1hr: NO CONFIG CHANGE — 5T last hour 2W2L1flat -$0.10 (ICP bb-squeeze+ +1.48% trail, PENGU bb-squeeze+ +0.58% ugb_pt, FOGO volume-buildup- cut-loser -3.53%) | 24h 24T 50% -$0.54 RED | 7d 141T 51.1% -$0.91 — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 at 0% WR; volume-buildup- 14d positive in NORMAL/HIGH) | atr_sl_hit 5/24=20.8% under 40% | inversion 0 mismatches | boost: bb-squeeze+ post-boost 2/2 wins but same-day second bump = churn, hold 0.9 | neg buckets 03-06+08-09 but regime LONG_BIAS not NEUTRAL, size lever N/A | frequency 5/hr | 1 open BTC ai-trader-pending bracketed | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-28 10:29 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 24T 50% '-$0.54' RED | 7d 135T 51.9% '-$0.72' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d positive in NORMAL/HIGH) | atr_sl_hit 5/24=20.8% under 40% | inversion 0 mismatches | boost: bb-squeeze+ same numbers as 09:35 (0 new closes), churn, hold 0.9 | neg streak stalled (0 closes) | frequency 0/hr | 2 open BTC pending LONG + MINA bb-squeeze+ LONG | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-28 11:31 UTC] auto_1hr: BOOST bb-squeeze+ weight 0.9->1.0 (signal_compactor.py) — 24h 7T 71.4% '+$0.29' multi-token (STABLE+ICP+PENGU+MINA), 7d 15T 66.7% '+$0.45'; held >65% post-0.9 boost as pre-registered | 1T last hour MINA win +$0.04 | 24h 24T 50% '-$0.54' RED | 7d 136T '-$0.68' — size-reduce 1.0x | kill: none | atr_sl_hit 5/24=20.8% under 40% | inversion 0 mismatches | frequency 1/hr | 1 open BTC pending LONG | signal_versions bb-squeeze+ v2
 BY: auto_1hr
@@ -5390,7 +5337,6 @@ BY: auto_1hr
 - [2026-10-28 16:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 23T 11W 47.8% '-$0.92' RED (window roll, 2 wins aged out, no new losses) | 7d 127T 52% '-$0.80' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d HIGH 69.2%) | atr_sl_hit 4/23=17.4% under 40% | inversion 0 mismatches | boost: none (no n>=5 WR>55% net>0 candidates) | neg streak none (0 closes) | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-28 17:45 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 23T 11W 47.8% '-$0.92' RED unchanged (no new closes) | 7d 126T 52.4% '-$0.69' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d positive in NORMAL/HIGH) | atr_sl_hit 4/23=17.4% under 40% | inversion 0 mismatches | boost: none (no n>=5 WR>55% net>0 candidates; bb-squeeze+ 4T 75% '-$0.04' fails) | neg streak stalled (0 closes 2 hours running) | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-28 18:50 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 2W1L +$0.03 (TURBO bb-squeeze+ trail +1.46%, GOAT bb-squeeze+ trail +1.29%, SOL grind-breakout-v2+ atr_sl_hit -2.99%) | 24h 25T 48% '-$0.91' RED | 7d 128T 52.4% '-$0.62' — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 at 0% WR; volume-buildup- 14d positive in NORMAL/HIGH) | atr_sl_hit 5/25=20% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 6T 83.3% +$0.06 meets criteria but at 1.0 ceiling (boosted 11:31), hold | neg streak none (this hour net positive) | frequency 3/hr | 3 open DOGE/KAS/CAKE bb-squeeze+ LONG | No constants change -> no signal_versions entry
 - [2026-10-28 19:41 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 3W0L +$0.10 (KAS bb-squeeze+ trail +1.47%, DOGE trail_arm_timeout +1.47%, CAKE trail_arm_timeout +0.63%) | 24h 26T 50% '-$0.85' RED | 7d 126T 55.6% '-$0.23' — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 at 0% WR; volume-buildup- 14d HIGH 69.2%) | atr_sl_hit 5/26=19.2% under 40% | inversion 0 mismatches | boost: bb-squeeze+ at 1.0 ceiling, hold | neg streak none (2nd positive hour) | frequency 3/hr | 1 open HYPER r2v2-long3 LONG | No constants change -> no signal_versions entry
@@ -5406,11 +5352,9 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-29 01:42 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L '$-0.13' (VIRTUAL warrior-sr-confirm+ LONG atr_sl_hit -5.75%) | 24h 31T 51.6% '$-0.95' RED | 7d 131T 55.7% '$-0.33' — size-reduce 1.0x (file absent = truth) | kill: none (1T last hour; volume-buildup- 14d HIGH 69.2%) | atr_sl_hit 6/31=19.4% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 10T 90% '+$0.17' at 1.0 ceiling, hold | neg streak 1h only | frequency 1/hr | 0 open | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-29 02:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 29T 55.2% '$-0.63' RED (window roll: 2 losses aged out) | 7d 130T 56.2% '$-0.33' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d HIGH 69.2% positive) | atr_sl_hit 4/29=13.8% under 40% | inversion 0 mismatches | boost: bb-squeeze+ at 1.0 ceiling, hold | neg streak none (0 closes) | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
 - [2026-10-29 03:45 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 29T 55.2% '$-0.63' RED | 7d 130T 56.2% '$-0.33' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d HIGH 69.2% positive) | atr_sl_hit 4/29=13.8% under 40% | inversion 0 mismatches | boost: bb-squeeze+ at 1.0 ceiling, hold | neg streak none (0 closes) | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
 - [2026-10-29 04:45 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 25T 56.0% '$-0.45' RED | 7d 130T 56.2% '$-0.33' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour; volume-buildup- 14d HIGH 69.2% positive) | atr_sl_hit 3/25=12% under 40% | inversion 0 mismatches | boost: bb-squeeze+ at 1.0 ceiling, hold | neg streak none (0 closes) | frequency 0/hr | 1 open NXPC volume-buildup- SHORT | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-29 06:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 23T 60.9% '$-0.32' RED improving | 7d 131T 55.7% '$-0.47' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour) | atr_sl_hit 2/23=8.7% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 9T 100% '+$0.29' at 1.0 ceiling, hold | neg streak none | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
 - [2026-10-29 07:45 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 23T 60.9% '$-0.32' RED | 7d 131T 55.7% '$-0.47' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour) | atr_sl_hit 2/23=8.7% under 40% | inversion 0 mismatches | boost: bb-squeeze+ at 1.0 ceiling, hold | neg streak none | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
@@ -5419,13 +5363,11 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-29 13:41 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 1W0L +$0.10 (CHIP pump-chain+ ugb_pt +2.80%) | 24h 18T 72.2% '$-0.14' RED improving | 7d 133T 56.4% '$-0.45' — size-reduce 1.0x (file absent = truth) | kill: none (1T win; volume-buildup- 14d HIGH positive) | atr_sl_hit 2/18=11.1% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 7T 100% '+$0.22' 7 tokens at 1.0 ceiling, hold | neg streak none | frequency 1/hr | 2 open BTC continuum-osc- SHORT / YGG volume-buildup- SHORT | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-29 14:43 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 2W1L '$-0.06' (CASHCAT pump-chain+ ugb_pt +3.86%, BTC continuum-osc- atr_sl_hit -7.32%, GRASS r2v2-long3 trail +1.47%) | 24h 20T 70.0% '$-0.23' RED | 7d 137T 56.9% '$-0.47' — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR; volume-buildup- 14d HIGH positive) | atr_sl_hit 3/20=15% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 7T 100% '+$0.22' at 1.0 ceiling, hold | neg streak 1h only | frequency 3/hr | 2 open ETC bb-squeeze+ LONG / GRASS pump-chain+ LONG | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-29 15:42 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 2W1L +$0.01 (ETC bb-squeeze+ trail_arm_timeout +1.49%, CASHCAT pump-chain+ ugb_pt +3.50%, GRASS continuation+ stale_exit -3.94%) | 24h 21T 71.4% '$-0.13' RED | 7d 139T 56.8% '$-0.60' — size-reduce 1.0x (file absent = truth) | kill: none (volume-buildup- 14d NORMAL 50% n=16, HIGH 71.4% — wins in a regime) | atr_sl_hit 3/21=14.3% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 8T 100% '+$0.25' 8 tokens at 1.0 ceiling, hold | neg streak none | frequency 3/hr | 0 open | No constants change -> no signal_versions entry
 - [2026-10-29 16:45 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L +$0.06 (BANANA bb-squeeze+ trail +0.37%, FIL r2v2-long6 trail +2.09%) | 24h 23T 73.9% '$-0.07' RED | 7d 141T 57.4% '$-0.54' — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR) | atr_sl_hit 3/23=13% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 9T 100% '+$0.25' 9 tokens at 1.0 ceiling, hold | neg streak 2h only (broke at +$0.06) | frequency 2/hr | 3 open WLFI/COMP bb-squeeze+ LONG, BLUR pump-chain+ LONG | No constants change -> no signal_versions entry
 - [2026-10-29 17:45 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 0W3L '$-0.15' (COMP/WLFI bb-squeeze+ trail_arm_timeout, BLUR pump-chain+ ugb_pt) | 24h 26T 65.4% '$-0.22' RED | 7d 144T 56.3% '$-0.69' — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR) | atr_sl_hit 3/26=11.5% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 10T 80% '+$0.11' 10 tokens at 1.0 ceiling, hold | neg streak 1h only | frequency 3/hr | 0 open | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-29 18:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 23T 65.2% '$-0.25' RED | 7d 143T 55.9% '$-0.77' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour) | atr_sl_hit 2/23=8.7% under 40% | inversion 0 mismatches | boost: bb-squeeze+ 8T 75% '+$0.01' fails >$0.05 bar + 1.0 ceiling, hold | neg streak none (0 closes) | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
 - [2026-10-29 19:43 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 20T 60% '$-0.35' RED | 7d ~56% '$-0.77' — size-reduce 1.0x (file absent = truth) | kill: none (0T last hour) | atr_sl_hit 2/20=10% under 40% | inversion 0 mismatches | boost: none meet all bars (bb-squeeze+ net -$0.09 fails >$0.05) | neg streak none (16h broke) | frequency 0/hr | 0 open | No constants change -> no signal_versions entry
@@ -5454,7 +5396,6 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-30 11:45 UTC] auto_1hr: NO CONFIG CHANGE — 5T last hour 4W1L "+$0.18" (HYPE 2x jup_yolo trail +$0.15, ETH jup_yolo trail +$0.07, ALGO pump-chain+ ugb_pt +$0.09, LINK volume-buildup- cut-loser-CL-T1 -$0.13) | 24h 43T 62.8% "+$0.83" GREEN | 7d 162T 56.8% "-$0.04" — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR) | atr_sl_hit 4/43=9.3% under 40% | inversion 0 mismatches | boost: pump-chain+ meets 24h bars but 14d 41.0% "-$1.16" + 1.4 ceiling HOLD; volume-buildup- meets 24h bars but 14d "-$0.52" + already 1.0→1.2 HOLD | neg streak none (09h +0.06, 10h +0.07, 11h +0.15) | frequency 5/hr | 3 open (INJ volume-buildup- SHORT, ETH/SOL jup_yolo LONG) | no storm (window-min -0.21% / at-run -0.21%) | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-10-30 13:47 UTC] auto_1hr: NO CONFIG CHANGE — 4T last hour 2W2L '-$0.32' (BANANA volume-buildup- trail +$0.06, ZORA volume-buildup- trail +$0.04, SOL jup_yolo atr_sl_hit '-$0.14', ETH jup_yolo stale_exit '-$0.28') | 24h 46T 58.7% '+$0.34' GREEN cooling | 7d 166T 57.3% '-$0.14' — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR) | atr_sl_hit 6/46=13.0% under 40% | inversion 0 mismatches | boost: volume-buildup- meets 24h bars but 14d '-$0.52' + already 1.0→1.2 HOLD; pump-chain+ 14d '-$1.16' + 1.4 ceiling HOLD | neg streak none (single red 13h) | frequency 4/hr | 2 open (HYPE/BTC jup_yolo LONG) | no storm (window-min -0.42% / at-run -0.34%) | watch: jup_yolo_mirrored 24h worst net '-$0.31' 11T 54.5% | No constants change -> no signal_versions entry
 - [2026-10-30 14:48 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 1W2L "-$0.37" (SOL jup_yolo trail $0.00/+0.21%, HYPE jup_yolo cut-loser "-$0.25", BTC jup_yolo atr_sl_hit "-$0.12") | 24h 46T 54.3% "+$0.13" GREEN thinning | 7d 168T 56.5% "-$0.37" — size-reduce 1.0x (file absent = truth) | kill: jup_yolo 3T 0% last hour TRIGGERED regime query -> EXTREME 10T 60% wins, HIGH n=3/NORMAL n=1 too thin, 14d n=14<20 -> keep alive, no block | atr_sl_hit 6/46=13.0% under 40% | inversion 0 mismatches | boost: volume-buildup- meets bars but 14d "-$0.52" + already 1.2 HOLD; pump-chain+ 14d "-$1.16" + 1.4 ceiling HOLD | neg streak 2h (13h -0.44, 14h -0.25) under 3h | frequency 3/hr | 3 open (HYPER pump-chain-, ETH/BTC jup_yolo) | no storm (window-min -0.91% / at-run +0.20%) | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -5468,7 +5409,6 @@ BY: auto_1hr
 - [2026-10-30 20:45 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 2W1L "-$0.05" (BTC jup_yolo_mirrored trail "+$0.07"/+3.22%, SOL jup_yolo_mirrored trail "+$0.04"/+1.90%, MON volume-buildup- hard_max_loss "-$0.16"/-7.10%) | 24h 57T 56.1% "+$0.07" GREEN very thin | 7d 181T 57.5% "-$0.16" RED — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR) | atr_sl_hit 7/57=12.3% under 40% | inversion 0 mismatches | boost: pump-chain+ meets 24h bars (6T 66.7% "+$0.20" 6 tokens) but 14d 41T ~41.5% "-$1.10" + 1.4 weight ceiling HOLD | neg streak broke (20h +0.11 after 4 red 16-19h; regime EXTREME not NEUTRAL) | entry quality winners MAE avg 0.24%, 28/32 <0.5% | frequency 3/hr | 3 open (HYPE/SOL jup_yolo, BTC continuum-trend+) | no storm (window-min -0.14% / at-run +0.50%) | jup_yolo_mirrored 14d EXTREME now wins +0.03 -> not all-regime-red, keep alive | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-10-30 21:50 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L "-$0.15" (INJ pump-chain- ugb_pt "+$0.02", HYPE jup_yolo_mirrored atr_sl_hit "-$0.17"/-4.30%) | 24h 58T 56.9% "-$0.08" RED flipped | 7d 183T 57.4% "-$0.31" RED — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR; r2v2-long3 n=2<3) | atr_sl_hit 8/58=13.8% under 40% | inversion 0 mismatches | boost: pump-chain+ meets 24h bars (6T 66.7% "+$0.20" 6 tokens) but 14d ~41% "-$1.1x" + 1.4 ceiling HOLD; others fail net bar | neg streak 1h (20h +0.11 broke 4-red) + regime EXTREME not NEUTRAL | entry quality winners MAE avg 0.23%, 29/33 <0.5% | frequency 2/hr | 3 open (BTC continuum+, SOL jup_yolo, ETH hl_copy) | no storm (window-min -0.40% / at-run -0.28%) | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-30 22:43 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 2W0L "+$0.05" (USELESS volume-buildup- trail +$0.01, SOL jup_yolo_mirrored trail +$0.04/+1.61%) | 24h 60T 58.3% "-$0.03" RED thin | 7d 183T 57.4% "-$0.54" RED — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR) | atr_sl_hit 8/60=13.3% under 40% | inversion 0 mismatches | boost: pump-chain+ meets 24h bars (6T 66.7% "+$0.20" 6 tokens) but 14d red in BOTH regimes (EXTREME 48.5% "-$0.21", HIGH 16.7% "-$0.50") + 1.4 ceiling HOLD; others fail net bar | neg streak none (21h -0.11, 22h +0.01) + regime EXTREME not NEUTRAL | entry quality winners MAE avg 0.23%, 31/35 <0.5% | frequency 2/hr | 3 open (BTC continuum+, ETH hl_copy, SOL jup_yolo) | no storm (window-min -0.35% / at-run +0.20%) | No constants change -> no signal_versions entry
 BY: auto_1hr
@@ -5488,7 +5428,6 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-10-31 08:43 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 0W2L '-$0.30' (SOL jup_yolo_mirrored atr_sl_hit '-$0.08'/-3.35%, HYPE jup_yolo_mirrored atr_sl_hit '-$0.22'/-5.40%) | 24h 60T 58.3% '-$0.72' RED | 7d 196T 57.1% '-$0.98' RED — size-reduce 1.0x (file absent = truth) | kill: none (jup_yolo_mirrored 2T last hour, n<3) | atr_sl_hit 11/60=18.3% under 40% | inversion 0 mismatches | boost: none qualify (jup_yolo 35T 60% '-$0.68' fail net; volume-buildup- '-$0.32' fail net; pump-chain n<5) | neg streak 1h (08h '-0.30' after 07h '+0.12') + regime EXTREME not NEUTRAL | entry quality winners MAE avg 0.187%, 32/35 <0.5% | frequency 2/hr | 1 open (BTC continuum+ -0.34%) | no storm (window-min -0.22% / at-run -0.06%) | No constants change -> no signal_versions entry
 - [2026-10-31 09:43 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour 0W1L "-$0.01" (BTC continuum-osc+ UNIVERSAL_MAX_HOLD "-$0.01"/-0.50%) | 24h 58T 56.9% "-$0.74" RED | 7d 197T 56.9% "-$0.99" RED — size-reduce 1.0x (file absent = truth) | kill: none (1 close, no n>=3) | atr_sl_hit 11/58=19.0% under 40% | inversion 0 mismatches | boost: none qualify (volume-buildup- 11T 63.6% but "-$0.31" fail net; jup_yolo_mirrored 34T 58.8% but "-$0.70" fail net) | neg streak 2h (08h -0.30, 09h -0.01) + regime EXTREME not NEUTRAL | entry quality winners MAE avg 0.181% 30/33 <0.5% | frequency 1/hr | 2 open (HYPE jup_yolo -0.32%, ENA pump-chain+ -0.53%) | no storm (window-min -0.04% / at-run +0.17%) | No constants change -> no signal_versions entry
-BY: auto_1hr
 BY: auto_1hr
 - [2026-10-31 10:44 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 2W1L '+$0.10' (HYPE jup_yolo_mirrored trail '+$0.15'/+3.83%, HBAR pump-chain- trail_arm_timeout '+$0.01', ENA pump-chain+ trail_arm_timeout '-$0.06'/-2.86%) | 24h 59T 57.6% '-$0.68' RED | 7d 200T 57.0% '-$0.89' RED — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR last hour; jup_yolo 14d HIGH 19T 63.2% n<20 bar, wins EXTREME/HIGH by WR) | atr_sl_hit 10/59=16.9% under 40% | inversion 0 mismatches | boost: none qualify (volume-buildup- 10T 70% but '-$0.21' fail net; jup_yolo 34T 58.8% but '-$0.69' fail net; pump-chain+ 5T 40% fail WR) | neg streak broken (10h '+0.16' after 08h -0.30, 09h -0.07) | entry quality winners MAE avg 0.178%, 31/34 <0.5% | frequency 3/hr | 1 open (GMX pump-chain- +0.08%) | no storm (window-min +0.01% / at-run +0.06%) | No constants change -> no signal_versions entry
 - [2026-10-31 11:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour 0W0L '$0.00' (quiet) | 24h 54T 55.6% '-$0.86' RED | 7d 200T 57.0% '-$0.89' RED — size-reduce 1.0x (file absent = truth) | kill: none (0 closes) | atr_sl_hit 10/54=18.5% under 40% | inversion 0 mismatches | boost: none qualify (volume-buildup- 9T 77.8% but '-$0.08' fail net; jup_yolo 31T '-$0.91' fail net) | neg streak broken (10h '+0.16', 11h 0T) | entry quality winners MAE avg 0.189% 27/30 <0.5% | frequency 0/hr | 4 open (GMX +1.07%, FIL +0.22%, HYPE +0.05%, IOTA -0.18%) | no storm (window-min -0.12% / at-run +0.00%) | No constants change -> no signal_versions entry
@@ -5519,7 +5458,6 @@ BY: auto_1hr
 - [2026-11-01 01:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 43T 39.5% '-$0.16' RED | 7d 220T '-$1.15' RED — size-reduce 1.0x (file absent = truth) | kill: none (0 last-hour closes; bb-squeeze+ 3T 0% and pump-chain+ 3T 0% 24h have 0 last-hour closes) | atr_sl_hit 8/43=18.6% under 40% | inversion 0 mismatches | boost HOLD pump-chain- (ex-GMX '-$0.11' GMX masks) + jup_yolo_mirrored (22T 50% '-$0.17' fail) | neg streak none (never 3 red) | frequency 0/hr | 4 open bracketed | no storm (window-min -0.01% / at-run +0.13%) | No constants change -> no signal_versions entry
 - [2026-11-01 02:43 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 3W0L '+$0.14' (ETH jup mfe_exit '+$0.04'/+1.68%, HYPE jup trail '+$0.07'/+1.84%, ETC bb-bounce+ trail '+$0.03'/+1.46%) | 24h 46T 43.5% '-$0.02' gross | 7d 222T '-$1.17' — size-reduce 1.0x (file absent = truth) | kill: none (bb-squeeze+ 3T 0% and pump-chain+ 3T 0% 24h both 0 last-hour closes) | atr_sl_hit 8/46=17.4% under 40% | inversion 0 mismatches | boost HOLD pump-chain- (GMX '+0.54' vs ex-GMX '-0.11') + jup_yolo_mirrored ('-0.06' fail net) | neg streak none (01h +0.14 green) | frequency 3/hr | winners MAE 0.205% 17/20 <0.5% | 3 open | no storm (window-min -0.12% / at-run -0.07%) | No constants change -> no signal_versions entry
 BY: auto_1hr
-BY: auto_1hr
 - [2026-11-01 03:42 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 43T 44.2% '+$0.10' gross | 7d 222T '-$1.17' — size-reduce 1.0x (file absent = truth) | kill: none (0 last-hour closes; bb-squeeze+ 3T 0% and pump-chain+ 3T 0% 24h both 0 last-hour closes) | atr_sl_hit 7/43=16.3% under 40% | inversion 0 mismatches | boost HOLD pump-chain- (GMX '+0.54' vs ex-GMX '-0.11') + jup_yolo_mirrored (HYPE '+0.16' masks ex-HYPE '-0.07', 14d '-0.31') | neg streak none (never 3 red) | frequency 0/hr | 3 open | no storm (window-min -0.05% / at-run +0.20%) | No constants change -> no signal_versions entry
 BY: auto_1hr
 - [2026-11-01 04:44 UTC] auto_1hr: NO CONFIG CHANGE — 3T last hour 0W3L '-$0.28' (FIL pump-chain- atr_sl '-$0.03'/-1.43%, DOT pump-chain- atr_sl '-$0.09'/-2.14%, HYPE jup/continuation hard_max_loss '-$0.16'/-4.00%) | 24h 44T 43.2% '-$0.09' gross | 7d 224T '-$1.53' — size-reduce 1.0x (file absent = truth) | kill: none (pump-chain- 2 last-hour losses n<3; bb-squeeze+ 0 last-hour closes) | atr_sl_hit 8/44=18.2% under 40% | inversion 0 mismatches | boost HOLD jup_yolo_mirrored (HYPE 20T $0.00 masks, multi-token fails) + pump-chain- (44.4% WR fails) | neg streak 2 red (03h -0.16, 04h -0.12, not 3) | frequency 3/hr | 3 open | no storm (window-min -0.01% / at-run +0.00%) | No constants change -> no signal_versions entry
@@ -5545,3 +5483,4 @@ BY: auto_1hr
 - [2026-11-01 15:45 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 47T 46.8% '-$0.20' gross | 7d 239T '-$1.61' RED — size-reduce 1.0x (file absent = truth) | kill: none (0 last-hour closes) | atr_sl_hit 7/47=14.9% under 40% | inversion 0 mismatches | boost HOLD jup_yolo_mirrored (58.8% '+$0.38' passes bars but HYPE 71% of trades/68% of PnL + SOL 33% WR multi-token fails) | neg streak not 3 (11h/12h -0.10, 13h +0.09, 14h +0.02 green) | frequency 0/hr | winners MAE 0.185% 20/22 <0.5% | 5 open | no storm (window-min -0.03% / at-run +0.03%) | No constants change -> no signal_versions entry
 - [2026-11-01 16:45 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour 1W1L '+$0.04' (CASHCAT warrior-sr-confirm+ trail '+0.13'/+3.49%, FIL continuation+ hard_max_loss '-0.09'/-4.03%) | 24h 46T 47.8% '-$0.14' gross | 7d 241T '-$1.57' RED — size-reduce 1.0x (file absent = truth) | kill: none (no n>=3 0%-WR last hour) | atr_sl_hit 7/46=15.2% under 40% | inversion 0 mismatches | boost HOLD jup_yolo_mirrored (56.3% '+0.26' passes bars but HYPE 69% of trades + SOL 33% WR multi-token fails) | neg streak not 3 (16h +0.04 green) | frequency 2/hr | winners MAE 0.198% 20/22 <0.5% | 3 open | no storm (window-min -0.11% / at-run +0.01%) | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-11-01 17:43 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour (quiet) | 24h 42T 47.6% '-$0.10' gross | 7d 239T '-$1.61' RED — size-reduce 1.0x (file absent = truth) | kill: none (0 last-hour closes; 24h n>=3 losers pump-chain-/bb-squeeze+ none 0% WR) | atr_sl_hit 5/42=11.9% under 40% (dominant close profit-monster-trail 13T '+$0.81') | inversion 0 mismatches | boost HOLD jup_yolo_mirrored (53.3% fails >55 bar, HYPE 80% of trades at 41.7% WR multi-token fails) | neg streak not 3 (16h +0.04 green) | frequency 0/hr | winners MAE 0.205% 18/20 <0.5% | 3 open | no storm (window-min -0.01% / at-run -0.01%) | No constants change -> no signal_versions entry
