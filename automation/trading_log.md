@@ -18798,3 +18798,51 @@ Final set: []
 - 24h GREEN '+$0.08' at only 44.7% WR — profits concentrated in profit-monster-trail/ugb_pt; 7d '-$1.06' still deep red
 - brain_auditor #211 fee model: gross '+$0.08'/24h ≈ '-$0.5x' net after ~$0.69/24h fees — all KPIs in this log are gross
 - pump-chain+ 14d 42T 40.5% '-$0.83' — kill bar (0% WR n>=3 last hour) not met, watching
+
+## [2026-11-01 00:42] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: 40.9% 24h) | 24h 44T 18W '-$0.11' RED | 7d 221T 120W '-$1.11' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes; 4 open (ETC bb-bounce LONG +0.05%, SOL jup SHORT -0.12%, ETH jup LONG -0.04%, HYPE jup LONG +0.12% — all bracketed)
+- Kill check: no last-hour closes so no n>=3 0%-WR trigger; 24h pump-chain+ 3T 0% '-$0.12' and bb-squeeze+ 3T 0% '-$0.15' both still watching (0 last-hour closes)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/44 = 18.2% (<40%); dominant close = profit-monster-trail (12T '+$0.86'); worst avg = hard_max_loss (2T '-$0.140'), cut-loser-CL-T1 (2T '-$0.135')
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' but ex-GMX '-$0.11' vs GMX '+$0.54' masks per prior runs); jup_yolo_mirrored 23T 52.2% '-$0.12' fails WR+net
+- Neg streak: 17h -0.04, 18h +0.01, 19h +0.03, 20h -0.03, 22h +0.05, 23h -0.02 — never 3 consecutive red; 00h 0T
+- Frequency 0/hr — under 20/hr
+- Entry quality: 24h winners 13/18 with move <0.5% — entries fine; R:R still the drag (atr_sl_hit 8T '-$0.96' vs trail 12T '+$0.86')
+- Storm readiness: **window-min -0.17% / at-run +0.14%** — both within gate, no storm (rolling-60m, 13 samples, BTC 77643)
+- brain_auditor #212 fee note: KPIs here are gross; fee-net 24h ~'-$0.66'
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flipped RED '-$0.11' at 40.9% WR — 0-trade hour let old losses age out; profits still concentrated in profit-monster-trail/ugb_pt
+- pump-chain+ and bb-squeeze+ both 3T 0% 24h — if either gets n>=3 last-hour closes next run, regime query fires
+
+## [2026-11-01 01:42] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR: 39.5% 24h) | 24h 43T 17W '-$0.16' RED | 7d 220T 119W '-$1.15' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes; 4 open bracketed (HYPE jup +0.34%, ETH jup +0.41%, ETC bb-bounce +0.39%, SOL jup short -0.25%)
+- Kill check: no last-hour closes so no n>=3 0%-WR trigger; 24h bb-squeeze+ 3T 0% '-$0.15' and pump-chain+ 3T 0% '-$0.12' both 0 last-hour closes — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/43 = 18.6% (<40%); dominant close = profit-monster-trail (11T '+$0.81'); worst avg = hard_max_loss (2T '-$0.140'), cut-loser-CL-T1 (2T '-$0.135')
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' 7 tokens but ex-GMX '-$0.11' vs GMX '+$0.54' = GMX masks net — consistency fails); jup_yolo_mirrored 22T 50% '-$0.17' fails WR+net
+- Neg streak: 18h +0.01, 19h +0.03, 20h -0.03, 22h +0.05, 23h -0.02, 00h/01h 0T — never 3 consecutive red
+- Frequency 0/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.169%, 15/17 <0.5% — entries fine; R:R still the drag (atr_sl_hit 8T '-$0.96' vs trail 11T '+$0.81')
+- Storm readiness: **window-min -0.01% / at-run +0.13%** — both within gate, no storm (rolling-60m, 13 samples, BTC 77747)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED '-$0.16' at 39.5% WR with profits concentrated in profit-monster-trail/ugb_pt; 7d '-$1.15'
+- brain_auditor #212: official KPIs are fee-NET — 24h net ~'-$0.8', 7d net ~'-$3.8'; this log headlines gross
+- bb-squeeze+ and pump-chain+ both 3T 0% 24h — if either gets n>=3 last-hour closes, regime query fires
