@@ -10267,5 +10267,32 @@
     "risk": "low — monitor only",
     "measurement": "re-measure at 30d or when bounce>8 cohort reaches n>=30",
     "run": 213
+  },
+  {
+    "date": "2026-11-01T12:50:46Z",
+    "idea": "TAT jup/vb candle-OOS pre-registration — bars locked BEFORE shadow data accumulates",
+    "rationale": "#214 shipped family-scoped TAT shadow (jup 90m / vb- 45m). Pump-chain TAT OOS lesson: trades-level overstates, fk was 36.8%. Lock bars now: (1) n>=15 DISTINCT trade_id fires, (2) fk = never-armed winners with hold>=T / all never-armed winners <20%, (3) net USD saved >= +$2.00/14d on pnl_usdt basis with units guard (price_move = pnl_usdt/amount_usdt*100), (4) candle-level OOS on 1m data not trades-level, (5) eval filters sig= exact (volume-buildup- not +). Current fk floor: 1 jup + 1 vb never-armed winner at 14d hold>=T (tiny). Enforce only with CEO GO.",
+    "expected_impact": "Addresses ~53% of 7d never-armed bleed (35T -$4.58 of 85T -$8.69) if OOS passes; blocks enforce if it fails",
+    "category": "exit sniper / coverage",
+    "status": "pre-registered",
+    "risk": "low (shadow only until OOS + CEO)"
+  },
+  {
+    "date": "2026-11-01T12:50:46Z",
+    "idea": "Pin fees-column type in units guard: trades.fees is TEXT holding JSON {entry_fee, exit_fee, fee_total, net_pnl}, not numeric",
+    "rationale": "This run hit three SQL failures casting fees to numeric. Correct extraction: fees::json->>'fee_total'::numeric, fallback amount_usdt*0.0009. Any future FEE-NET / amplify-net query must use this or it breaks/misreads. 7d stamped 136/236 (57.6%) — model still fills the majority gap.",
+    "expected_impact": "Prevents the next units-class bug in fee-aware KPIs; documents stamp-rate reality",
+    "category": "data-quality / units guard",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-01T12:50:46Z",
+    "idea": "pm_trail fee-stamp gap: 24h profit-monster-trail 8/12 stamped (67%) — 4 trail closes still NULL fees post-#211 fix",
+    "rationale": "#211 shipped brain.py COALESCE stamp; #212 verified 2/2 then. Now 24h overall 42/48 (87.5%) but pm_trail only 8/12. Possible residual path (hl_sync_guardian own UPDATE was already flagged #211, or close path outside brain.py). Monitor next run; if still <100% at trail, trace the unstamped trade_ids.",
+    "expected_impact": "Closes remaining fee-blind closes; NET KPIs currently rely on 0.09% model for ~40% of closes",
+    "category": "data-quality",
+    "status": "monitor",
+    "risk": "low"
   }
 ]

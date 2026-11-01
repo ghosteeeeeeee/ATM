@@ -4046,7 +4046,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             if JUP_TRAIL_ARM_TIMEOUT_SHADOW and 'jup_yolo' in _jvb_sig_l:
                 _jvb_min = JUP_TRAIL_ARM_TIMEOUT_MIN
                 _jvb_fam = 'jup'
-            elif VB_TRAIL_ARM_TIMEOUT_SHADOW and 'volume-buildup' in _jvb_sig_l:
+            elif VB_TRAIL_ARM_TIMEOUT_SHADOW and 'volume-buildup-' in _jvb_sig_l:
                 _jvb_min = VB_TRAIL_ARM_TIMEOUT_MIN
                 _jvb_fam = 'vb-'
             if _jvb_min is not None:

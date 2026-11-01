@@ -3374,5 +3374,27 @@
     "after": "re-measured 7d/14d midband; pc- LONG 9T +0.31 refreshed; checkpoint pre-measured",
     "rationale": "Watchdog auditor tasks + overdue midband re-measure + mandated shadow joins",
     "impact": "No live-behavior change; 11-03 batch has fresh data; wiring explanation closes watchdog floor-bypass item"
+  },
+  {
+    "timestamp": "2026-11-01T09:00:07Z",
+    "agent": "brain_auditor",
+    "change": "#214 TAT SHADOW ship: JUP_TRAIL_ARM_TIMEOUT_SHADOW/MIN=90 + VB_TRAIL_ARM_TIMEOUT_SHADOW/MIN=45 in hermes_constants.py; position_manager.py section 7b-shadow3 logs [SHADOW] TAT would-fire for jup_yolo/vb- never-armed stalls (zero behavior, dedup set _jup_tat_shadow_logged)",
+    "type": "shadow",
+    "file": "hermes_constants.py + position_manager.py",
+    "before": "jup_yolo + volume-buildup- owned ~53% of 7d never-armed bleed with 0 TAT coverage",
+    "after": "shadow would-fire logging live; candle-OOS before any enforce",
+    "rationale": "Coverage gap: only bb-squeeze/pump-chain/bb-bounce had TAT. jup 19T -2.49 + vb- 16T -2.09 never-armed 7d. 90m jup / 45m vb- from armed-winner avg-hold vs loser-cluster timing.",
+    "impact": "Shadow collect only; first fires 09:01Z on ETH #16644 + HYPE #16662; 0 errors; fk floor 1 never-armed winner per family at 14d hold>=T"
+  },
+  {
+    "timestamp": "2026-11-01T12:50:46Z",
+    "agent": "brain_auditor",
+    "change": "#214 bug_hunter MED fix: VB shadow signal match tightened volume-buildup -> volume-buildup- (was also matching volume-buildup+ 5T/30d)",
+    "type": "shadow",
+    "file": "position_manager.py",
+    "before": "'volume-buildup' in sig",
+    "after": "'volume-buildup-' in sig",
+    "rationale": "bug_hunter PASS verdict MED: substring over-match pollutes would-fire set with vb+; sig= filterable but tighten at source",
+    "impact": "Zero behavior; shadow eval set now exact-family"
   }
 ]
