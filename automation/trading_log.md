@@ -18939,3 +18939,26 @@ Final set: []
 
 **Open Questions:**
 - 24h gross '-$0.08'; per brain_auditor #212 fee-NET is worse (~-$0.66 24h) — log still headlines gross
+
+## [2026-11-01 06:43] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $-0.04 (WR: 50% last hour; 24h 45T 21W '+$0.03' gross) | 7d 226T 122W '-$1.46' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BABY pump-chain- atr_sl_hit '-$0.05'/-1.43%, GOAT pump-chain- trail_arm_timeout '+$0.01'/+0.24%
+- Kill check: pump-chain- 2 last-hour closes (1W1L) n<3; bb-squeeze+ 4T 25% 24h 0 last-hour closes; pump-chain+ 2T 0% 24h 0 last-hour closes — regime query not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/45 = 17.8% (<40%); dominant close = profit-monster-trail (11T '+$0.82'); drag = atr_sl_hit 8T '-$0.69'
+- Boost HOLD: jup_yolo_mirrored 21T 61.9% '+$0.38' but HYPE 17T '+$0.37' dominates (ETH '+$0.04'/SOL '-$0.03' = not multi-token consistent); pump-chain- 11T 45.5% WR fails
+- Neg streak: 05h +0.01, 06h -0.05 — 1 red, not 3
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.234%, 16/20 <0.5%
+- Storm readiness: **window-min -0.06% / at-run +0.18%** — both within gate, no storm (rolling-60m, 13 samples, BTC 77942)
+- 4 open (CAKE warrior-sr-confirm+ LONG, HYPE jup LONG, ETH jup LONG, SOL jup SHORT)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h gross '+$0.03'; per brain_auditor #212 fee-NET is worse (~-$0.63) — log still headlines gross
