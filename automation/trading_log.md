@@ -18846,3 +18846,27 @@ Final set: []
 - 24h RED '-$0.16' at 39.5% WR with profits concentrated in profit-monster-trail/ugb_pt; 7d '-$1.15'
 - brain_auditor #212: official KPIs are fee-NET — 24h net ~'-$0.8', 7d net ~'-$3.8'; this log headlines gross
 - bb-squeeze+ and pump-chain+ both 3T 0% 24h — if either gets n>=3 last-hour closes, regime query fires
+
+## [2026-11-01 02:43] Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** $0.14 (WR: 100% last hour; 24h 46T 20W '-$0.02' gross) | 7d 222T 121W '-$1.17' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: all 3 winners — ETH jup_yolo_mirrored mfe_exit '+$0.04'/+1.68%, HYPE jup profit-monster-trail '+$0.07'/+1.84%, ETC bb-bounce+ profit-monster-trail '+$0.03'/+1.46%
+- Kill check: no signal had 3+ last-hour closes at 0% WR; bb-squeeze+ (3T 0% 24h) and pump-chain+ (3T 0% 24h) had 0 last-hour closes — regime query not triggered; bb-squeeze+ 14d 31T '+$0.62' net positive anyway
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/46 = 17.4% (<40%); dominant close = profit-monster-trail (13T '+$0.91'); drag = atr_sl_hit 8T '-$0.96'
+- Boost HOLD pump-chain- (7T 57.1% '+$0.43' but GMX '+$0.54' vs ex-GMX '-$0.11' = consistency fails); jup_yolo_mirrored 24T 54.2% '-$0.06' fails net PnL bar
+- Neg streak: 20h -0.03, 22h +0.05, 23h -0.02, 01h +0.14 — never 3 consecutive red; last hour green
+- Frequency 3/hr — under 20/hr
+- Entry quality: 24h winners MAE avg 0.205%, 17/20 <0.5% — entries fine
+- Storm readiness: **window-min -0.12% / at-run -0.07%** — both within gate, no storm (rolling-60m, 13 samples, BTC 77706)
+- 3 open (SOL jup SHORT +0.15%, HYPE continuation LONG -0.47%, ETH jup LONG -0.12%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h gross flipped to '-$0.02' (break-even); per brain_auditor #212 fee-NET KPIs are ~'-$0.66' 24h — this log still headlines gross
+- pump-chain+ 14d 41T '-$0.85' — weakest 14d signal; still watching (kill bar n>=3 last-hour 0% not met)

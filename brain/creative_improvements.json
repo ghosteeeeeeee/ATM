@@ -10128,8 +10128,9 @@
     "rationale": "4 validated cells = 156T/30d +4.83 pnl_usdt; bb-squeeze+ NORMAL positive 7d +0.46 / 14d +0.76 / 30d +0.95 at 68-70% WR; CAP already 1.5 in hermes_constants:1095 so only the constant moves",
     "expected_impact": "~ +$0.97/30d on cell EV (20% of +4.83 — ESTIMATE); units guard pnl_usdt only; auto-revert if winner-cell-set 7d net < 0",
     "category": "offense / winner-cell sizing",
-    "status": "proposed (shadow_disposition id amplify-winner-cell-mult-150, deadline 2026-11-14, owner CEO label + T sign-off)",
-    "risk": "low"
+    "status": "boosted",
+    "risk": "low",
+    "boosted_at": "2026-11-01T00:43:13.896904+00:00"
   },
   {
     "date": "2026-10-31T12:59:02Z",
@@ -10146,8 +10147,9 @@
     "rationale": "shadow non-blocked WR runs below live WR for every positive-edge family (bb-squeeze 39.0 vs 63.4, jup 40.7 vs 60.0, vb- 49.6 vs 65.1, pump-chain+ 28.8 vs 42.7) and at parity only for negative-edge sources — so gate would_win figures are either conservative or pessimistically biased",
     "expected_impact": "decides whether CONFLUENCE-EXPIRY 48% / CTX-GATE 50% gate justifications can be read at face value",
     "category": "measurement integrity",
-    "status": "pre-registered",
-    "risk": "none"
+    "status": "boosted",
+    "risk": "none",
+    "boosted_at": "2026-11-01T00:43:46.212046+00:00"
   },
   {
     "date": "2026-10-31T12:59:02Z",
@@ -10240,7 +10242,8 @@
     "rationale": "shadow_trader 92.3% WR n=26 avg +1.56 top source; enabled but barely deploys — likely CONFLUENCE-EXPIRY friction",
     "expected_impact": "if blocked set net-positive, deploy-widen = new offense leg",
     "category": "amplify",
-    "status": "registered",
-    "risk": "medium"
+    "status": "boosted",
+    "risk": "medium",
+    "boosted_at": "2026-11-01T00:42:27.281711+00:00"
   }
 ]

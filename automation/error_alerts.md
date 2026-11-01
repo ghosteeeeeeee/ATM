@@ -2480,3 +2480,10 @@
 ## Error Alerts — 2026-11-01 00:41 UTC
 - **REPEATED** (42x): `Nov N N:N:N python3[TOK]: [coin_tracker] Done: N coins processed, N skipped, N errors`
 - **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   [TS] [shadow_signals_runner] TOK: N recorded, N skipped, N empty, N filtered, N errors`
+
+## Error Alerts — 2026-11-01 02:41 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK ceiling: N.N > N`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
