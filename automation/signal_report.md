@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-01 02:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-01 08:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,534 | **WR:** 51.2% | **PnL:** -97.07%
+- **Total trades (all time):** 3,546 | **WR:** 51.1% | **PnL:** -99.63%
 - **Date range:** 2026-07-29 → 2026-11-01
 
 ---
@@ -11,7 +11,7 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| pump-chain- | LONG | — | —% | — | 7 | 71.4% | +3.83 | ❓ |
+| jup_yolo_mirrored | LONG | — | —% | — | 16 | 81.2% | +2.15 | ❓ |
 
 ---
 
@@ -25,7 +25,8 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| volume-buildup- | SHORT | 4 | 50.0% | -1.11 | ENABLED | Needs more data |
+| volume-buildup- | SHORT | 3 | 33.3% | -1.19 | ENABLED | Needs more data |
+| pump-chain- | LONG | 14 | 50.0% | +2.10 | ❓ | Borderline |
 
 ---
 
@@ -43,8 +44,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] volume-buildup- SHORT** — WR=50.0%, PnL=-1.11% over 4 trades. Monitor next cycle.
-2. **[KEEP] 1 winning combos** — pump-chain-. LONG side dominant.
+1. **[WATCH] volume-buildup- SHORT** — WR=33.3%, PnL=-1.19% over 3 trades. Monitor next cycle.
+2. **[WATCH] pump-chain- LONG** — WR=50.0%, PnL=+2.10% over 14 trades. Monitor next cycle.
+3. **[KEEP] 1 winning combos** — jup_yolo_mirrored. LONG side dominant.
 
 ---
 

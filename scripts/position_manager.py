@@ -121,6 +121,8 @@ from hermes_constants import (
     BB_SQUEEZE_TRAIL_ARM_TIMEOUT_ENABLED, BB_SQUEEZE_TRAIL_ARM_TIMEOUT_MIN,
     PUMP_CHAIN_TRAIL_ARM_TIMEOUT_ENABLED, PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN,
     BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED, BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW, BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN,
+    JUP_TRAIL_ARM_TIMEOUT_SHADOW, JUP_TRAIL_ARM_TIMEOUT_MIN,
+    VB_TRAIL_ARM_TIMEOUT_SHADOW, VB_TRAIL_ARM_TIMEOUT_MIN,
     MFE_CUT_SHADOW_ENABLED, MFE_CUT_SHADOW_MIN, MFE_CUT_SHADOW_MFE_MAX,
     MFE_EXIT_ENABLED, MFE_EXIT_GIVEBACK_PCT, MFE_EXIT_ARM_PCT, MFE_EXIT_SIGNALS,
     PM_TRAIL_ACTIVATE_PCT,
@@ -150,6 +152,7 @@ MAX_POSITIONS = MAX_OPEN_POSITIONS
 # Shadow collectors — once-per-trade log dedup (module-level, resets on PM restart)
 _bb_bounce_shadow_logged = set()
 _bb_bounce_tat_enforced = set()
+_jup_tat_shadow_logged = set()   # trade_ids logged for jup/vb- TAT shadow (dedup per process)
 _mfe_cut_shadow_logged = set()
 _hml_shadow_logged = set()     # trade_ids that have logged an HML-SHADOW line
 _arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire (dedup per process; analysis joins by trade_id)
@@ -4031,6 +4034,39 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                                 log(f"  [SHADOW] TRAIL-ARM would-fire {token} {direction} {live_pnl:+.2f}% [{_bbs_age_m:.0f}m < arm {_bbs_arm_pct:.2f}%] trade={trade_id} sig={_pos_signal}")
                 except Exception as e:
                     log(f"  [SHADOW] BB-BOUNCE TRAIL-ARM error for {token}: {e}")
+
+        # ── 7b-shadow3. TAT SHADOW — jup_yolo + volume-buildup (zero behavior) ──
+        # brain_auditor #214 2026-11-01: coverage gap — these families own ~50% of
+        # the 7d never-armed bleed (jup 24T -$2.23 / vb- 17T -$2.05) with 0 TAT coverage.
+        # Shadow only — logs would-fires for candle OOS before any enforce.
+        if JUP_TRAIL_ARM_TIMEOUT_SHADOW or VB_TRAIL_ARM_TIMEOUT_SHADOW:
+            _jvb_sig_l = (_pos_signal or '').lower()
+            _jvb_min = None
+            _jvb_fam = None
+            if JUP_TRAIL_ARM_TIMEOUT_SHADOW and 'jup_yolo' in _jvb_sig_l:
+                _jvb_min = JUP_TRAIL_ARM_TIMEOUT_MIN
+                _jvb_fam = 'jup'
+            elif VB_TRAIL_ARM_TIMEOUT_SHADOW and 'volume-buildup' in _jvb_sig_l:
+                _jvb_min = VB_TRAIL_ARM_TIMEOUT_MIN
+                _jvb_fam = 'vb-'
+            if _jvb_min is not None:
+                try:
+                    _jvb_ot = pos.get('open_time') or open_time
+                    if _jvb_ot:
+                        if isinstance(_jvb_ot, str):
+                            _jvb_dt = datetime.fromisoformat(_jvb_ot.replace('Z', '+00:00'))
+                        else:
+                            _jvb_dt = _jvb_ot
+                        if _jvb_dt.tzinfo is None:
+                            _jvb_dt = _jvb_dt.replace(tzinfo=timezone.utc)
+                        _jvb_age_m = (datetime.now(timezone.utc) - _jvb_dt).total_seconds() / 60
+                        _jvb_arm_pct = PM_TRAIL_ACTIVATE_PCT * 100
+                        if (_jvb_age_m >= _jvb_min and live_pnl < _jvb_arm_pct
+                                and trade_id not in _jup_tat_shadow_logged):
+                            _jup_tat_shadow_logged.add(trade_id)
+                            log(f"  [SHADOW] TAT would-fire {token} {direction} {live_pnl:+.2f}% [{_jvb_fam} {_jvb_age_m:.0f}m >= {_jvb_min}m < arm {_jvb_arm_pct:.2f}%] trade={trade_id} sig={_pos_signal}")
+                except Exception as e:
+                    log(f"  [SHADOW] JUP/VB TAT error for {token}: {e}")
 
         # ── 7b-shadow2. MFE-CUT SHADOW — cut-if-stall@45m (zero behavior) ───────
         # brain_auditor 2026-10-17. Logs would-fires only; never closes.

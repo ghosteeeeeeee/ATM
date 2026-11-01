@@ -2503,3 +2503,9 @@
 ## Error Alerts — 2026-11-01 08:41 UTC
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
 - **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-01 11:41 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-11-01 11:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)

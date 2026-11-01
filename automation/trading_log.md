@@ -19080,3 +19080,27 @@ Final set: []
 **Open Questions:**
 - 24h gross '+$0.10'; fee-NET still negative per brain_auditor #212 — log headlines gross
 - 24h n>=3 losers: volume-buildup- 3T '-$0.18', bb-squeeze+ 4T '-$0.14', continuation+jup 2T '-$0.16' — watch, none 0% WR with n>=3
+
+## [2026-11-01 12:43] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a last hour; 24h 48T 21W '-$0.02' gross) | 7d 236T 126W '-$1.60' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes (quiet)
+- Kill check: 0 last-hour closes — regime query not triggered (no signal with 0% WR n>=3 last hour)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/48 = 16.7% (<40%); dominant close = profit-monster-trail 12T '+$0.77'; drag = hard_max_loss 5T '-$0.71' + atr_sl_hit 8T '-$0.48'
+- Boost HOLD: jup_yolo_mirrored 19T 57.9% '+$0.25' passes WR+net BUT HYPE 14/19 = 74% of trades, SOL 33% WR — multi-token consistency fails; pump-chain- 15T 33.3% fails WR bar (GMX '+0.54' single-trade masks ex-GMX '+0.13'... ex-GMX = 0.17-0.54 = '-0.37')
+- Neg streak: not 3 (09h +0.24, 10h +0.03 green; 11h -0.10 single red)
+- Frequency 0/hr — under 20/hr
+- Entry quality: 24h winners MAE ~0.21%, most <0.5% (prior hours)
+- Storm readiness: **window-min -0.29% / at-run -0.09%** — both within gate, no storm (rolling-60m, 13 samples, BTC 77898)
+- 3 open (FIL warrior+ L +0.04%, HYPE jup L +0.17%, ZRO volume-buildup- S -0.52%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h gross '-$0.02'; fee-NET still negative per brain_auditor #212 — log headlines gross
+- 24h n>=3 losers: volume-buildup- 3T '-$0.18', bb-squeeze+ 3T '-$0.14' — watch, neither 0% WR

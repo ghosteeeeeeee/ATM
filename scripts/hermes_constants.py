@@ -1993,6 +1993,19 @@ PUMP_CHAIN_TRAIL_ARM_TIMEOUT_MIN = 45  # pump-chain grinds shorter than bb-squee
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED = True  # variant-C enforcement (age>=55m AND live_pnl<0). Revert: set False.
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_SHADOW = True  # Revert: set False.
 BB_BOUNCE_TRAIL_ARM_TIMEOUT_MIN = 55
+# TAT SHADOW — jup_yolo + volume-buildup- (brain_auditor #214 2026-11-01).
+# Coverage gap: these two families own ~50% of the 7d never-armed bleed
+# (jup_yolo 24T -$2.23 avg_hold 110m / vb- 17T -$2.05 avg_hold 63m, 0 TAT exits)
+# with ZERO trail-arm-timeout coverage (only bb-squeeze/pump-chain/bb-bounce have it).
+# 45m catches 20 vb- never-armed losers -$2.66; 90m for jup (armed avg hold 59m,
+# 45m would fire on many eventual winners — 90m sits between arm-avg and the
+# 99-237m loser cluster). Shadow only — logs would-fires for candle OOS before
+# any enforce (pump-chain TAT OOS lesson: trades-level overstates, fk was 36.8%).
+# Revert: set both False.
+JUP_TRAIL_ARM_TIMEOUT_SHADOW = True   # Revert: set False.
+JUP_TRAIL_ARM_TIMEOUT_MIN = 90        # jup armed winners avg hold 59m; losers bleed to 237m
+VB_TRAIL_ARM_TIMEOUT_SHADOW = True    # Revert: set False.
+VB_TRAIL_ARM_TIMEOUT_MIN = 45         # vb- armed winners avg hold 34m; catches DOT 152m/IO 141m/KAS 128m
 # MFE-CUT SHADOW — cut-if-stall progressive exit (brain_auditor 2026-10-17).
 # ⚠️ CANDLE-LEVEL OOS VERDICT 2026-10-17 ~11:00 UTC: FLIP PATH BLOCKED.
 # Prior trades-level counterfactual (54T avoid -$7.46, fk 3T) was selection-on-outcome:
