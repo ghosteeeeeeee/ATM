@@ -1,25 +1,24 @@
 {
-  "timestamp": "2026-11-01T20:11:44.667627+00:00",
+  "timestamp": "2026-11-01T20:41:45.141198+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "continuum": "AT",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "FLAT",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
   "open_count": 1,
   "deep_analysis": "1 open trade: ETH LONG #16665 (jup_yolo_mirrored), 7.1h, -0.27%, entry 2263.7, SL 2250.07 (0.34% below current 2257.65), TP 2297.66, meta_rsi 55.7. Market: aggregate 15m SHORT_BIAS (69 short / 2 long / 58 neutral), BTC 1m BELOW continuum EMA300 for ~17h, linreg LEAN_BEAR, trend_quality STRONG_DOWN (continuum 20:13) \u2014 note watchdog.json still shows STRONG_UP from an earlier snapshot; continuum wins. ETH flat last 1h (+0.04%) at 2257-2259. Fresh-open test: would NOT open this long today \u2014 counter-trend entry in bear structure with SL only 0.34% away; any BTC wick stops it out. Winning side on this tape: SHORTs at mid/high RSI (SOL SHORT +1.95% @ meta_rsi 57.9, BLUR SHORT +1.26% @ 66.7) and mid-band LONGs that reach trail (profit-monster-trail winners CASHCAT/CAKE/MINA/FIL @ 50-65). The losing side for 24h is pump-chain LONGs entered at meta_rsi 22-40 (oversold chasing in a bear tape) \u2014 8 of 17 losers. Chop-bleed KPI: 7d dollar share 94.9% (>=92% entry-quality tripwire), 14d 91.0%, 30d 86.8%, NULL-mfe losers 7d=0, same-day arm 39.4% (n=33), 7d LONG arm 51.1% (n=180, above the 50 tripwire). The 7d >=92% reading says nearly all gross loss is entries that never reached +0.40% MFE \u2014 entry quality, not exits. Regime flips/24h: aggregate 22 (p75, standing normal), BTC 8 (low-churn tail but above the <6 real-trend threshold). Sources disagree: regime_5m BTC=NEUTRAL vs aggregate SHORT_BIAS vs continuum LEAN_BEAR \u2014 direction steers cite the source explicitly.",
+  "agent_timestamp": "2026-11-01T20:19:13.296298+00:00",
   "regime_context": "Regime (20:00-20:13 UTC): 15m aggregate SHORT_BIAS (69/2/69 tokens). BTC 15m/4h watchdog fields SHORT_BIAS; regimes.BTC 15m NEUTRAL; continuum BTC 1m BELOW EMA300 (1035 min), LEAN_BEAR, STRONG_DOWN, LOW volume, FLAT velocity, ACCUMULATION wyckoff. Flip rates: aggregate 22/24h, BTC 8/24h \u2014 no unusually unstable flag (>=26), not a clean trend tape (<6). Practical read: soft-bear chop. Alts biased short. Our only position (ETH LONG) is the wrong side of that bias; the auto-trader shadow is also long-starved (long score -35 vs short +25, bracket only).",
-  "pattern_alerts": "VERIFIED (PostgreSQL, close_time windows, meta_rsi from _signal_metadata \u2014 not entry_rsi_14):\n1. Chop-bleed share 7d = 94.9% dollar share of gross loss from never-armed (mfe<0.40) entries \u2014 breaches the >=92% entry-quality tripwire. Companions: 14d 91.0%, 30d 86.8%; NULL-mfe 7d losers=0; same-day arm 39.4% (n=33). Action class: entry-quality (brain-auditor), not exit tweaks.\n2. 24h losers (n=17): 15 LONG / 2 SHORT. pump-chain- LONGs dominate (GMX/ACE/IO/CRV/DYDX/BABY/FIL/DOT) at meta_rsi 22-40 \u2014 oversold longs in SHORT_BIAS tape. hard_max_loss cluster: FIL continuation+ (-4.03%), ZRO volume-buildup- SHORT @ 36.8 (shorting oversold), PUMP hh-hl+ (-4.31%). WINNING side yesterday: SHORTs at meta_rsi 57-80 and LONGs that armed trail at mid-band 50-65. We keep entering longs at the bottom of the band where trail never arms.\n3. volume-buildup- still ENABLED (hermes_constants.py:2933) with live traffic: 43 trades 7d, -$1.20 total. NOT a dead-signal \u2014 flag normally to brain-auditor.\n4. continuation+ live: 7 trades 7d, -$0.54. Small n but net-negative; monitor, not yet an auditor item alone.\n5. 7d LONG arm rate 51.1% (n=180) \u2014 above the <50 tripwire; SHORT arm 58.3% (n=60).",
-  "steer_notes": "RETRACTED \u2014 none this cycle (no prior standing steers in watchdog.json steers[]).",
-  "agent_timestamp": "2026-11-01T20:19:13.296298+00:00"
+  "pattern_alerts": "VERIFIED (PostgreSQL, close_time windows, meta_rsi from _signal_metadata \u2014 not entry_rsi_14):\n1. Chop-bleed share 7d = 94.9% dollar share of gross loss from never-armed (mfe<0.40) entries \u2014 breaches the >=92% entry-quality tripwire. Companions: 14d 91.0%, 30d 86.8%; NULL-mfe 7d losers=0; same-day arm 39.4% (n=33). Action class: entry-quality (brain-auditor), not exit tweaks.\n2. 24h losers (n=17): 15 LONG / 2 SHORT. pump-chain- LONGs dominate (GMX/ACE/IO/CRV/DYDX/BABY/FIL/DOT) at meta_rsi 22-40 \u2014 oversold longs in SHORT_BIAS tape. hard_max_loss cluster: FIL continuation+ (-4.03%), ZRO volume-buildup- SHORT @ 36.8 (shorting oversold), PUMP hh-hl+ (-4.31%). WINNING side yesterday: SHORTs at meta_rsi 57-80 and LONGs that armed trail at mid-band 50-65. We keep entering longs at the bottom of the band where trail never arms.\n3. volume-buildup- still ENABLED (hermes_constants.py:2933) with live traffic: 43 trades 7d, -$1.20 total. NOT a dead-signal \u2014 flag normally to brain-auditor.\n4. continuation+ live: 7 trades 7d, -$0.54. Small n but net-negative; monitor, not yet an auditor item alone.\n5. 7d LONG arm rate 51.1% (n=180) \u2014 above the <50 tripwire; SHORT arm 58.3% (n=60)."
 }
