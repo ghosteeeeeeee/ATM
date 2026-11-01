@@ -2487,3 +2487,15 @@
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK ceiling: N.N > N`
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK ceiling: N.N > N`
+
+## Error Alerts — 2026-11-01 05:41 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=(empty)`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: [brain.py] TOK is_live_trading_enabled(is_manual=False) = True`
+
+## Error Alerts — 2026-11-01 06:41 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK knife floor (detect): N.N < N`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
