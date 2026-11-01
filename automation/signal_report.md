@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-01 08:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-01 14:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,546 | **WR:** 51.1% | **PnL:** -99.63%
+- **Total trades (all time):** 3,558 | **WR:** 51.2% | **PnL:** -99.04%
 - **Date range:** 2026-07-29 → 2026-11-01
 
 ---
@@ -11,7 +11,7 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| jup_yolo_mirrored | LONG | — | —% | — | 16 | 81.2% | +2.15 | ❓ |
+| jup_yolo_mirrored | LONG | 2 | 100.0% | +0.65 | 15 | 86.7% | +2.44 | ❓ |
 
 ---
 
@@ -25,8 +25,8 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| volume-buildup- | SHORT | 3 | 33.3% | -1.19 | ENABLED | Needs more data |
-| pump-chain- | LONG | 14 | 50.0% | +2.10 | ❓ | Borderline |
+| pump-chain- | LONG | 13 | 38.5% | -1.80 | ❓ | Borderline |
+| bb-squeeze+ | LONG | 4 | 50.0% | -0.90 | ENABLED | Needs more data |
 
 ---
 
@@ -44,8 +44,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] volume-buildup- SHORT** — WR=33.3%, PnL=-1.19% over 3 trades. Monitor next cycle.
-2. **[WATCH] pump-chain- LONG** — WR=50.0%, PnL=+2.10% over 14 trades. Monitor next cycle.
+1. **[WATCH] pump-chain- LONG** — WR=38.5%, PnL=-1.80% over 13 trades. Monitor next cycle.
+2. **[WATCH] bb-squeeze+ LONG** — WR=50.0%, PnL=-0.90% over 4 trades. Monitor next cycle.
 3. **[KEEP] 1 winning combos** — jup_yolo_mirrored. LONG side dominant.
 
 ---
@@ -58,6 +58,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-01 | 109c8f7 | auto_1hr: hourly analysis 2026-11-01 12:43 — no change (0T l... |
 | 2026-10-31 | e40c3cf | scripts: mfe-exit armed at 0.40% — no-arm run churned fee-ne... |
 | 2026-10-31 | aaec17c | feat: CEO trust-tiers day-1 verdicts 1+2 — soft-floor giant ... |
 | 2026-10-31 | 268ea89 | fix: bug_hunter round-4 — dashboard field contract (HIGH), p... |
@@ -67,6 +68,5 @@ None found. Top performers are already enabled.
 | 2026-10-31 | 0ef09d5 | scripts: log-flags audit kills — CHASE-RATIO + CHASE-MOVE ma... |
 | 2026-10-31 | f29d3c1 | feat: CEO exit-asymmetry verdict — dual shadows (ship-off), ... |
 | 2026-10-31 | db81c0c | config: brain_auditor #208 — coupled-trial REVERT (CUT_LOSER... |
-| 2026-10-31 | e5009ce | Daily trading system update (2026-10-31) |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

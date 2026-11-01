@@ -3396,5 +3396,27 @@
     "after": "'volume-buildup-' in sig",
     "rationale": "bug_hunter PASS verdict MED: substring over-match pollutes would-fire set with vb+; sig= filterable but tighten at source",
     "impact": "Zero behavior; shadow eval set now exact-family"
+  },
+  {
+    "timestamp": "2026-11-01T17:00:01Z",
+    "agent": "brain_auditor",
+    "change": "Register intraday checkpoint hype-16662-umhold-1801 (verify UM_HOLD closes never-armed HYPE at 18:01Z)",
+    "type": "tweak",
+    "file": "data/checkpoint_registry.json",
+    "before": "not registered",
+    "after": "pending due 18:01Z grace 30m",
+    "rationale": "watchdog hour-5 clause fired 3 cycles unexecuted; UM_HOLD self-fires at 8h — verify not double-manage",
+    "impact": "verification only, zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-01T17:00:01Z",
+    "agent": "brain_auditor",
+    "change": "Refresh watch-contrarian-live evidence (22T +0.07 cooled) + append pc+ EXTREME half-split monitor note to winner-cell-size-125",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "evidence_20261101 at 9T +0.31",
+    "after": "evidence_20261101_1630 at 22T +0.07 + conversion counts; pc+ note",
+    "rationale": "mandate evidence freshness for 11-03/11-10 dispositions",
+    "impact": "decision-support only, zero trading behavior"
   }
 ]

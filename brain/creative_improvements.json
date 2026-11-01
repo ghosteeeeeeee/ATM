@@ -10294,5 +10294,32 @@
     "category": "data-quality",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-01T17:00:01Z",
+    "idea": "Portfolio stuck-brake (block new opens while >=2 open trades never armed past 90m)",
+    "rationale": "MEASURED, NOT SHIPPED — 30d blocked n=38 mean -0.026 vs allowed -0.0055, welch p=0.218 (not significant); saves +0.99/30d gross but under bar. Re-test at n>=60 blocked.",
+    "category": "measurement",
+    "status": "logged",
+    "risk": "none",
+    "agent": "brain_auditor #215"
+  },
+  {
+    "date": "2026-11-01T17:00:01Z",
+    "idea": "Close #214 pm_trail stamp-gap monitor",
+    "rationale": "RESOLVED — both unstamped pm_trail rows (16625/16627) closed BEFORE the 10-31 21:05 brain.py fix; 0 unstamped closes since fix. Stop monitoring.",
+    "category": "measurement",
+    "status": "logged",
+    "risk": "none",
+    "agent": "brain_auditor #215"
+  },
+  {
+    "date": "2026-11-01T17:00:01Z",
+    "idea": "Pre-register pc+ EXTREME cell-drop condition for 11-10 winner-cell review",
+    "rationale": "recent15d -0.18 (35T) vs prior15 +2.86 (48T), p=0.121 not significant — monitor note appended to winner-cell-size-125; if still negative at 11-10, propose cell drop (not now).",
+    "category": "measurement",
+    "status": "logged",
+    "risk": "none",
+    "agent": "brain_auditor #215"
   }
 ]
