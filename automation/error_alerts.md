@@ -2521,3 +2521,15 @@
 
 ## Error Alerts — 2026-11-01 15:56 UTC
 - **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-01 17:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-01 18:06 UTC
+- **[WARN]** (checkpoint_watch): **DUE** `hype-16662-umhold-1801` (due 2026-11-01T18:01:00+00:00): HYPE #16662 jup LONG crosses UNIVERSAL_MAX_HOLD 8h at 18:01Z (opened 10:01Z, never armed, TAT would-fire since ~11:31Z) — verify UM_HOLD closed it; if still open, exit (watchdog hour-5 clause fired 3 cycles ago).
+
+## Error Alerts — 2026-11-01 18:36 UTC
+- **[WARN]** (checkpoint_watch): **OVERDUE** `hype-16662-umhold-1801` (due 2026-11-01T18:01:00+00:00): HYPE #16662 jup LONG crosses UNIVERSAL_MAX_HOLD 8h at 18:01Z (opened 10:01Z, never armed, TAT would-fire since ~11:31Z) — verify UM_HOLD closed it; if still open, exit (watchdog hour-5 clause fired 3 cycles ago).
+
+## Error Alerts — 2026-11-01 18:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)

@@ -1,29 +1,20 @@
 {
-  "timestamp": "2026-11-01T16:41:43.169037+00:00",
-  "steers": [
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ETH + SOL",
-      "detail": "Both opened within 5 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-001"
-    }
-  ],
+  "timestamp": "2026-11-01T19:41:44.673229+00:00",
+  "steers": [],
   "portfolio_health": "good",
   "regime": {
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
+    "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.0,
+    "linreg_alignment": 0.75,
     "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 3
+  "open_count": 1
 }
