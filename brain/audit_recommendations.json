@@ -1,150 +1,116 @@
 {
-  "timestamp": "2026-11-01T17:00:01Z",
-  "run": 215,
-  "session_lock": "absent",
-  "config_changes_applied": [],
+  "timestamp": "2026-11-01T20:40:00Z",
+  "run": 216,
   "session_brain_stats": {
-    "queries": 4,
-    "top_hits": [
-      "exit asymmetry deep-dive (delivered 10-31)",
-      "trend following signal (owned)",
-      "compaction_stale BTC block"
-    ],
-    "new_insights": 0
+    "queries": 3,
+    "note": "low-signal older echoes; no new drift vs code found"
   },
   "trade_summary_24h": {
-    "trades": 46,
-    "wr": 47.8,
-    "gross_pnl": -0.14,
-    "net_pnl_model": -0.73,
-    "stamped": 43,
-    "arm_rate": 32.6,
-    "by_signal_top_losers": "pump-chain- LONG 12T -0.24 33.3% | continuation+jup combo 2T -0.16 | hh-hl+ 1T -0.10",
-    "by_signal_top_winners": "jup_yolo LONG 13T +0.21 61.5% | warrior+ 3T +0.33 100%"
+    "n": 37,
+    "wr": 51.4,
+    "gross": -0.11,
+    "fees": 0.44,
+    "net": -0.55,
+    "null_fees": 0,
+    "top_losers": "pc- LONG 12T -0.26 (33.3%WR contrarian-flip cohort); HYPE/ FIL/ PUMP hard_max_loss cluster",
+    "open": "ETH #16665 jup_yolo_mirrored LONG 7.5h -0.24% never-armed, UM_HOLD 21:03Z (checkpoint registered)"
   },
-  "fee_net": {
-    "24h": {
-      "gross": -0.14,
-      "net": -0.73
-    },
+  "windows": {
     "7d": {
-      "gross": -1.57,
-      "net": -4.49
+      "n": 240,
+      "wr": 54.2,
+      "gross": -1.47,
+      "net": -3.23
     },
     "14d": {
-      "gross": -1.98,
-      "net": -6.41
+      "n": 367,
+      "wr": 50.7,
+      "gross": -1.97,
+      "net": -4.71
     },
     "30d": {
-      "gross": -5.0,
-      "net": -15.06
-    },
-    "note": "stamped actual + 0.09% model on unstamped; fees column TEXT-JSON"
+      "n": 771,
+      "wr": 45.7,
+      "gross": -4.27,
+      "net": -10.79
+    }
   },
-  "chop_bleed": {
-    "7d_pct": 94.8,
-    "losers_never_armed": "87/96",
-    "dollar": "-8.88 of -9.37",
-    "consecutive_windows_ge_92": 11,
-    "tier2_consult": "pending CEO (#214)",
-    "armed_split_7d": "armed 127T 88.2% +6.94 vs unarmed 114T 14.9% -8.51"
+  "chop_mandate": {
+    "chop_bleed_7d": "94.9% (86/94 losers never-armed, -8.42 of gross loss) — streak continues >=92%",
+    "chop_bleed_14d": "91.0%",
+    "chop_bleed_30d": "86.8%",
+    "armed_7d": "127T 89.0% +6.95",
+    "unarmed_7d": "113T 15.0% -8.42",
+    "armed_14d": "196T 83.7% +10.55",
+    "unarmed_14d": "171T 12.9% -12.52",
+    "trail_vs_chop_7d": "pm_trail 91T 97.8% +4.81 + ugb_pt 29T 69% +1.48 vs atr_sl 33T 0% -3.55 + cut_loser 13T 0% -1.92 + hard_max 12T 0% -1.75"
   },
   "shadow_analysis": {
-    "contrarian": "join re-ran 16:30Z (mandate): overall flip-WR 41.1% n=958; pc- 64.6% n=350 LIVE; rider 27.6% NO-FLIP. Live fade 22T +0.07 WR 40.9% (cooled from +0.45; today 10T -0.23 = day noise). Conversion healthy: 64 CONTRARIAN-LIVE fires / 0 Z-FLIP skips.",
-    "floor_admit": "join 04:37Z: floor_only 1144 decided 49.6% vs always_admit 146 45.9% — directional, COLLECT 11-15 stands.",
-    "wyckoff": "RETIRED 10-31 (polarity-corrected kill, disposition done).",
-    "oscillator": "ARCHIVED 10-27 fossil — pre-live only.",
-    "rr_shadow": "ORPHANED (no producer) — do not cite.",
-    "tat_jup_vb": "LIVE since 09:01Z: 975 [SHADOW] TAT would-fire lines, 4 DISTINCT trades (16644/16662/16665/16667), 0 errors. OOS bar n>=15 distinct = 4/15. All 3 open trades currently would-fire (HYPE 389m, ETH 207m, SOL 202m).",
-    "shadow_trader": "48k+ rows: exit A/B pm_trail +7191 vs hard_max -8185 (trail-or-nothing); CONFLUENCE-EXPIRY 14,548 @47%; grind-breakout- 92.3% n=26 top source (amplify in-flight 11-14).",
-    "overall": "contrarian + TAT + shadow_trader useful; oscillator/wyckoff/rr dead."
+    "contrarian": "join RE-RAN 20:34Z: 958 joinable, overall flip 41.1%; pc- 64.6% n=350 LIVE stands; btc-pump-rider+ 27.6% do-NOT-flip",
+    "floor_admit": "join 04:37Z fresh: floor_only 49.6% (n=1121 decided) vs always_admit 45.9% (n=146), blocked n=0 — COLLECT to 11-15",
+    "shadow_trader": "gates justified (CONFLUENCE-EXPIRY 14,599 @47% avg -0.12); exit A/B trail-or-nothing (pm_trail +7,279 vs hard_max -8,286); grind-breakout- 92.3% top source",
+    "TAT_shadow": "1750 log lines / 4 distinct trades (jup 90m, vb- 45m) — collecting toward 15-fire OOS bar; ETH #16665 live would-fire since 442m",
+    "oscillator": "frozen+archived",
+    "wyckoff": "pending join",
+    "rr": "orphaned",
+    "overall": "3/6 answerable, all used"
   },
   "autopsy_48h": {
-    "method": "recovery_replay adverse-first (selfcheck PASS)",
-    "n": 38,
+    "n": 33,
     "never_adverse": 10,
-    "recovered": 24,
-    "never": 4,
-    "never_pct": 10.5,
-    "baseline_14d": 17.5,
-    "verdict": "WRONG-SIDE REFUTED 69th consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "never_list": [
-      "HYPE jup LONG",
-      "MON vb- SHORT",
-      "ALT pc- LONG",
-      "BABY pc- LONG — all never-armed structural class"
-    ]
+    "recovered": 21,
+    "never": 2,
+    "never_list": "HYPE #16602 -0.21, BABY #16649 -0.05 (both immaterial)",
+    "verdict": "WRONG-SIDE REFUTED 70th consecutive run (#61 p=0.116, #84 t=-0.04)"
   },
   "drift_findings": [],
   "recurring_problems": [
-    "chop-bleed never-armed dollar share >=92% for 11 consecutive windows — entry-quality route CLOSED, TAT OOS is the active lever (4/15)",
-    "pc- fade cooling: 22T +0.07 (from +0.45) — not killable yet (net>0), 11-03 disposition owns"
+    "chop-bleed >=92% streak continues (12th window) — entry quality, owned by TAT/CONF_FLOOR/entry stack; 0.75x plain-marker stays VETO (EV ~+$0.06/day, #196)",
+    "jup_yolo LONG unarmed bleed #1 (18T -2.33/7d) — TAT shadow (90m) is the active lever, 4/15 fires",
+    "vb- unarmed bleed #2 (17T -2.19/7d) — TAT shadow (45m) active"
   ],
   "missing_implementations": [],
   "creative_improvements": [
     {
-      "idea": "Portfolio stuck-brake (block new opens while >=2 open trades never armed past 90m)",
-      "result": "MEASURED, NOT SHIPPED — 30d blocked n=38 mean -0.026 vs allowed -0.0055, welch p=0.218 (not significant); saves +0.99/30d gross but under bar. Re-test at n>=60 blocked."
+      "idea": "jup LONG regime-split monitor pre-registered",
+      "detail": "jup LONG in trend regimes (BEAR_TREND 18T -0.71 + BULL_TREND 16T -0.56 = 34T -1.27) vs RANGING/TRANSITIONING/flat (25T +0.60) — n<20 per cell, re-measure at jup review 11-07; no ship",
+      "status": "monitor"
     },
     {
-      "idea": "Close #214 pm_trail stamp-gap monitor",
-      "result": "RESOLVED — both unstamped pm_trail rows (16625/16627) closed BEFORE the 10-31 21:05 brain.py fix; 0 unstamped closes since fix. Stop monitoring."
-    },
-    {
-      "idea": "Pre-register pc+ EXTREME cell-drop condition for 11-10 winner-cell review",
-      "result": "recent15d -0.18 (35T) vs prior15 +2.86 (48T), p=0.121 not significant — monitor note appended to winner-cell-size-125; if still negative at 11-10, propose cell drop (not now)."
+      "idea": "system-wide regime-direction census noted",
+      "detail": "30d LONG BULL_TREND 191T 45.0% -2.76 and SHORT BEAR_TREND 94T 35.1% -1.69 = chasing-after-move signature; blanket gates previously rejected (collisions); watch only",
+      "status": "monitor"
     }
   ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
-    {
-      "item": "TAT shadow jup/vb (#214)",
-      "status": "PASS — live, 975 lines, 4 distinct trades, 0 errors, MED match-tighten present"
-    },
-    {
-      "item": "fee-stamp brain.py (#211/#214)",
-      "status": "PASS — 0 unstamped closes since 10-31 21:05 fix"
-    },
-    {
-      "item": "chop-bleed tier-2 consult (#214)",
-      "status": "STILL BREACHED 94.8% (11th window) — CEO ACK pending"
-    },
-    {
-      "item": "winner-cell 1.25x",
-      "status": "PASS — 12.48 amounts firing on validated cells"
-    },
-    {
-      "item": "HYPE size 2.0x",
-      "status": "PASS — open #16662 amount 19.90"
-    },
-    {
-      "item": "mfe_exit arming (T)",
-      "status": "TRACKING — 9 fires / +0.08 total, judge at 20"
-    },
-    {
-      "item": "trial-revert override",
-      "status": "CLOSED CLEAR (checkpoint done)"
-    }
-  ],
-  "deep_dive": {
-    "new_sub50_targets_n15": 0,
-    "note": "14d sub-50: pc+ LONG owned (weight-kill 11-13), bbbv2 owned, pc- LONG net +0.20 NO-KILL. 7d: only pc- LONG 17T 41.2% +0.20."
-  },
-  "watchdog_triage": [
-    "HYPE 16662 hour-5 exit: UM_HOLD fires 18:01Z anyway — checkpoint hype-16662-umhold-1801 registered (verify, do not double-manage mirror trade)",
-    "SOL 16667 short steer: condition STILL HOLDS (BTC 1m 78073-78123 all above EMA300 ~78030) — flagged to CEO, mirror trade not manually closed",
-    "3-long cluster in chop: HOLD, no new correlated longs (standing)",
-    "chop-bleed 94.8% → entry-quality route closed, TAT OOS active"
+    "#215 fee-stamp: 0 null fees in 24h closes — PASS (7d/14d nulls are pre-fix history)",
+    "#215 chop-bleed 11th window: still 94.9% >=92% — streak continues, no config lever clears bars",
+    "#215 TAT OOS 4/15: now 4 distinct trades (ETH live) — COLLECT",
+    "#215 HYPE #16662 checkpoint: UM_HOLD self-closed 18:02:28Z at 0.00 — CLEAR, registry marked done",
+    "#214 TAT shadow flags live, logging works (duplicate-line cosmetic noted)",
+    "#211 self-healing Sunday: 03:00 now logs SKIP (dispatcher parked), 0 Tracebacks in pipeline.log — Nov-1 verify done"
   ],
   "amplify_light": {
+    "winner_cells_30d_n10_net0": [
+      "pc+ EXTREME LONG 83T +2.68 (VALIDATED)",
+      "bb-squeeze+ NORMAL LONG 51T +0.90 (VALIDATED)",
+      "pc- NORMAL SHORT 11T +0.58 (OOS-unstable, #211 why-not)",
+      "vb- HIGH SHORT 19T +0.42 (VALIDATED)",
+      "pc-,v6- EXTREME SHORT 10T +0.30 (tiny)",
+      "pc- NORMAL LONG 19T +0.17 (contrarian-flip cohort, tiny)"
+    ],
     "new_proposals": 0,
-    "why_not": "30d n>=10 net>0 cells all pre-known/validated (pc+ EXTREME cooling p=0.121, bb-squeeze NORMAL, vb- HIGH, pc- cells contradict fade); formal weekly runs tomorrow 11-02 with >=1 proposal bar. In-flight serviced: fade-ctx-exempt 11-10, winner-cell-size-125 11-10 (pc+ note appended), bb-squeeze-hml done, eval-midband 11-03, grind-breakout 11-14, mult-150 11-14, jup-short-walk 11-14.",
-    "flip_kpi": "no new shadow->live conversion this run (in-flight: watch-contrarian 11-03, storm-waiver 11-12)"
+    "why": "all n>=10 net>0 cells already VALIDATED or previously why-not'd; formal weekly AMPLIFY run 11-02/03 with >=1 proposal bar",
+    "flip_kpi": "no new shadow->live conversion this run; in-flight: watch-contrarian extend 11-03, storm-waiver 11-12"
   },
   "next_actions": [
-    "18:01Z: disposition hype-16662-umhold-1801 checkpoint",
-    "11-02: formal weekly AMPLIFY (>=1 proposal bar) + waiver packet",
-    "11-03 batch: eval-midband / escalation-17 / ugb-pt-045 / watch-contrarian extend / Z-FLIP conversion counts",
-    "TAT OOS accumulate to n>=15 distinct",
-    "CEO: tier-2 ACK + TAT-OOS ratify · HYPE 2.0 fee · NET-KPI switch · SOL mirror exit call"
+    "21:05Z: ETH #16665 UM_HOLD checkpoint",
+    "11-02/03: formal weekly AMPLIFY + waiver packet",
+    "11-03: batch (eval-midband / esc-17 / ugb-pt-045 / watch-contrarian extend)",
+    "11-06: regime coverage",
+    "11-07: jup regime-split re-measure (new monitor)",
+    "11-10: winner-cell review + pc+ EXTREME cell-drop condition",
+    "11-15: floor_admit same-sign"
   ]
 }

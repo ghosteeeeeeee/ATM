@@ -3418,5 +3418,16 @@
     "after": "evidence_20261101_1630 at 22T +0.07 + conversion counts; pc+ note",
     "rationale": "mandate evidence freshness for 11-03/11-10 dispositions",
     "impact": "decision-support only, zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-01T20:40:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #216: 0 trading-constant changes. Registry: closed hype-16662-umhold-1801 (UM_HOLD self-close verified), registered eth-16665-umhold-2103. Refreshed contrarian join (pc- 64.6% n=350 stands).",
+    "type": "tweak",
+    "file": "data/checkpoint_registry.json",
+    "before": "hype checkpoint status=surfaced",
+    "after": "status=done + ETH checkpoint pending",
+    "rationale": "checkpoint dispositioning mandate",
+    "impact": "process only"
   }
 ]

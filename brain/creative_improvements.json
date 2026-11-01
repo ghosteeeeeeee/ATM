@@ -10321,5 +10321,25 @@
     "status": "logged",
     "risk": "none",
     "agent": "brain_auditor #215"
+  },
+  {
+    "date": "2026-11-01T20:40:00Z",
+    "run": 216,
+    "idea": "jup LONG regime-split monitor (trend-regime bleed vs ranging/transitioning profit)",
+    "rationale": "jup LONG 34T in BEAR/BULL_TREND -1.27 vs 25T RANGING/TRANSITIONING/flat +0.60; today's ETH LONG #16665 is exactly the bear-trend counter-trend entry class the watchdog flags. n<20 per cell — monitor to 11-07 jup review.",
+    "expected_impact": "if holds at n>=20: dampen/block jup LONG in trend regimes could cut ~40% of the #1 unarmed bleed family",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-01T20:40:00Z",
+    "run": 216,
+    "idea": "system regime-direction census (LONG-in-BULL_TREND and SHORT-in-BEAR_TREND both net-negative 30d)",
+    "rationale": "191T LONG BULL_TREND 45% -2.76 and 94T SHORT BEAR_TREND 35.1% -1.69 = chasing-after-move signature across the whole book. Blanket gates previously rejected for collisions; logged as standing watch, revisit if either cell crosses |net|>5.",
+    "expected_impact": "info only",
+    "category": "research",
+    "status": "monitor",
+    "risk": "low"
   }
 ]
