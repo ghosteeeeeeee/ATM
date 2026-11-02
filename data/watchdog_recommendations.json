@@ -1,53 +1,37 @@
 {
-  "timestamp": "2026-11-02T15:41:53.289130+00:00",
+  "timestamp": "2026-11-02T16:11:53.477520+00:00",
   "steers": [
     {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + ETH",
-      "detail": "Both opened within 3 minutes. Correlation risk.",
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 14/20 recent trades lost",
+      "detail": "Win rate 30% over last 20 trades. Total PnL: -1.07 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + HYPE",
-      "detail": "Both opened within 19 minutes. Correlation risk.",
+      "category": "health",
+      "title": "Signal 'jup_yolo_mirrored' losing streak: 3 consecutive losses",
+      "detail": "Net -0.76 USDT over last 20 trades (window losses: -1.16). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: ETH + HYPE",
-      "detail": "Both opened within 16 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
-      "auto_executable": false,
-      "id": "steer-004"
     }
   ],
-  "portfolio_health": "warning",
+  "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "NEUTRAL",
     "btc_4h": "SHORT_BIAS",
     "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "NEG",
+    "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.25,
-    "wyckoff_phase": "UNKNOWN",
+    "linreg_alignment": 1.0,
+    "wyckoff_phase": "DISTRIBUTION",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 3
+  "open_count": 0
 }

@@ -297,7 +297,10 @@ def bulk_scan_all_traders() -> dict:
                 _pc = json.load(f)
             prev = {k: v for k, v in _pc.items() if not k.startswith('_')}
             cursor = int(_pc.get('_meta', {}).get('cursor', 0) or 0)
-    except (json.JSONDecodeError, OSError, TypeError, ValueError):
+    except (json.JSONDecodeError, OSError, TypeError, ValueError, AttributeError):
+        # AttributeError = valid JSON but not an object (None/list/str/int)
+        # at _pc.items() — bug_hunter round-final: freshness guard covered
+        # this but the merge block didn't → bulk scan wedged every cycle.
         prev, cursor = {}, 0
     N = len(all_traders)
     if N == 0:

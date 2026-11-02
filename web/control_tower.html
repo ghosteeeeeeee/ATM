@@ -44,6 +44,30 @@ details { margin-top:8px; } summary { cursor:pointer; color:var(--dim); font-siz
 .done-list { color:var(--dim); font-size:11px; margin-top:6px; line-height:1.7; word-break:break-word; }
 #updated { color:var(--dim); font-size:11px; margin-top:14px; border-top:1px solid var(--border); padding-top:8px; }
 .err { color:var(--red); padding:14px; border:1px solid var(--red); border-radius:6px; }
+/* ── month calendar view ── */
+.calwrap { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:10px; }
+.calhead { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.caltitle { color:var(--accent); font-weight:bold; letter-spacing:1px; }
+.calnav { display:flex; gap:6px; }
+.calnav button { background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:2px 10px; cursor:pointer; font-family:inherit; font-size:12px; }
+.calnav button:hover { border-color:var(--accent); color:var(--accent); }
+.calgrid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+.caldow { color:var(--dim); font-size:10px; text-transform:uppercase; text-align:center; padding-bottom:2px; }
+.cell { min-height:76px; background:var(--bg); border:1px solid var(--border); border-radius:5px; padding:4px 5px; position:relative; }
+.cell.empty { background:transparent; border-color:transparent; }
+.cell .dnum { color:var(--dim); font-size:11px; font-weight:bold; }
+.cell.has .dnum { color:var(--text); }
+.cell.today { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+.cell.today .dnum { color:var(--accent); }
+.cell.od  { border-left:3px solid var(--red); background:rgba(239,83,80,.07); }
+.cell.d1  { border-left:3px solid var(--orange); background:rgba(255,152,0,.07); }
+.cell.d7  { border-left:3px solid var(--yellow); background:rgba(253,216,53,.06); }
+.cell.later { border-left:3px solid var(--accent); }
+.chips { margin-top:4px; display:flex; flex-direction:column; gap:2px; }
+.chip { font-size:9.5px; line-height:1.3; color:var(--text); background:var(--card); border:1px solid var(--border); border-radius:3px; padding:1px 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cell.od .chip { border-color:var(--red); color:#f5b7b5; }
+.cell.d1 .chip { border-color:var(--orange); color:#ffd9a0; }
+.chip.more { color:var(--dim); border-style:dashed; }
 </style>
 </head>
 <body>
@@ -77,6 +101,58 @@ function itemHtml(e){
   </div>`;
 }
 let currentSec = '';
+/* ── month calendar view (T request 2026-11-02): pure client-side render of
+   the feed's calendar[] rows; offset persists across 30s polls so nav works. */
+let calOffset = 0, calData = [];
+const MONTH_NAMES = ['January','February','March','April','May','June','July',
+                     'August','September','October','November','December'];
+const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function pad2(n){ return n<10 ? '0'+n : ''+n; }
+function calNav(dir){ calOffset = (dir===0) ? 0 : calOffset+dir; const b=document.getElementById('calbox'); if (b) b.innerHTML = monthGrid(); }
+function monthGrid(){
+  const now = new Date();
+  const base = new Date(now.getFullYear(), now.getMonth()+calOffset, 1);
+  const y = base.getFullYear(), m = base.getMonth();
+  const byDate = {};
+  for (const r of calData) byDate[r.date] = r;
+  const firstDow = new Date(y, m, 1).getDay();          // 0=Sun
+  const daysIn = new Date(y, m+1, 0).getDate();
+  const todayStr = now.getFullYear()+'-'+pad2(now.getMonth()+1)+'-'+pad2(now.getDate());
+  let cells = DOW.map(x=>`<div class="caldow">${x}</div>`).join('');
+  for (let i=0;i<firstDow;i++) cells += '<div class="cell empty"></div>';
+  for (let day=1; day<=daysIn; day++){
+    const ds = y+'-'+pad2(m+1)+'-'+pad2(day);
+    const r = byDate[ds];
+    const dl = r ? r.days_left : null;
+    let cls = 'cell';
+    if (r){
+      cls += ' has';
+      if (dl < 0) cls += ' od';
+      else if (dl <= 1) cls += ' d1';                    // due today/24h
+      else if (dl <= 7) cls += ' d7';
+      else cls += ' later';
+    }
+    if (ds === todayStr) cls += ' today';
+    let chips = '';
+    if (r){
+      const show = r.ids.slice(0, 5);
+      chips = '<div class="chips">'
+        + show.map(x=>`<div class="chip" title="${esc(x)}">${esc(x)}</div>`).join('')
+        + (r.ids.length>5 ? `<div class="chip more">+${r.ids.length-5} more</div>` : '')
+        + '</div>';
+    }
+    const tag = r ? ` · ${esc(r.tag)}` : '';
+    cells += `<div class="${cls}"><span class="dnum">${day}${tag}</span>${chips}</div>`;
+  }
+  const nav = `<div class="calnav">
+      <button onclick="calNav(-1)" title="previous month">‹</button>
+      <button onclick="calNav(0)" title="back to current month">today</button>
+      <button onclick="calNav(1)" title="next month">›</button></div>`;
+  const legend = `<div class="sub" style="color:var(--dim);font-size:10px;margin-top:6px">
+      red = overdue · orange = ≤24h · yellow = ≤7d · blue = later · items per day from the live registry</div>`;
+  return `<div class="calhead"><span class="caltitle">📅 ${MONTH_NAMES[m]} ${y}</span>${nav}</div>
+    <div class="calgrid">${cells}</div>${legend}`;
+}
 function render(d){
   const c = d.counts||{};
   const staleJson = (Date.now() - Date.parse(d.generated_at)) > 10*60*1000;
@@ -93,6 +169,9 @@ function render(d){
   </div>`;
   if (d.error) h += `<div class="err">feed error: ${esc(d.error)}</div>`;
   if (d.tower_stale) h += `<div class="err">daily tower render &gt;26h old — the 08:15 timer may have missed a cycle</div>`;
+
+  calData = d.calendar || [];
+  h += `<h2>📅 CALENDAR VIEW</h2><div class="calwrap" id="calbox">${monthGrid()}</div>`;
 
   const S = d.sections||{};
   for (const [key, title] of SEC_META){
