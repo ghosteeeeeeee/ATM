@@ -333,23 +333,57 @@ def main():
     if new_events:
         events = new_events + events
         events = events[:TOPDOG_EVENT_RETAIN]
-    # retro-clean sub-$50 backlog (parse filter only covers new events)
+    # retro-clean sub-$50 backlog (parse filter only covers new events) —
+    # fail-open on an unparseable margin (same rule as the row parser: never
+    # hide data we couldn't measure; a bare float() here used to ValueError
+    # and kill the whole run on one corrupt event)
     events = [e for e in events
-              if e.get('margin') is None
-              or float(e.get('margin')) >= TOPDOG_MIN_MARGIN_USD]
+              if (mv := _f(e.get('margin'), None)) is None
+              or mv >= TOPDOG_MIN_MARGIN_USD]
+    # drop events from wallets no longer on the list (T 2026-11-02: removal
+    # must also clean the visible feed — stale rows from removed wallets
+    # read as bugs). State keeps them (48h prune governs `seen`).
+    events = [e for e in events
+              if isinstance(e, dict) and e.get('wallet') in wallets]
     out['events'] = events
     out['new_events'] = len(new_events)
 
     _atomic_write(OUT, out)
     _atomic_write(STATE_FILE, {'seen': seen, 'events': events})
     _sync_page(PAGE_SRC, PAGE_DST, 'watchlist_api')
-    print(f"[watchlist_api] wallets={len(wallets)} scored={len(scored)} "
-          f"positions={len(rows)} clusters={len(clusters)} "
+    print(f"[watchlist_api] wallets={len(wallets)} stats={len(stats_addrs)} "
+          f"scored={len(scored)} positions={len(rows)} clusters={len(clusters)} "
           f"new_events={len(new_events)} last_trade={len(last_trade)} "
           f"errors={len(out['errors'])} -> {OUT}")
     for e in out['errors']:
         print(f"[watchlist_api] ! {e}", file=sys.stderr)
 
 
+def _fatal_payload(msg):
+    """Full-shape error payload so the page renders 'feed DOWN' + the crash
+    reason instead of freezing on a stale file that still claims api_ok=True
+    (topdog/copy_trader zero-byte lesson — without this a single corrupt
+    state file made every 60s run exit 1 with the old payload untouched)."""
+    return {
+        'updated': int(time.time()), 'api_ok': False, 'errors': [msg],
+        'watchlist_n': 0, 'tiers': [], 'coins': {}, 'clusters': [],
+        'events': [], 'new_events': 0, 'dust_filtered': 0,
+        'scored_n': 0, 'live_n': 0,
+        'min_margin_usd': TOPDOG_MIN_MARGIN_USD,
+        'min_trades': TOPDOG_MIN_TRADES, 'tier_pct': TOPDOG_TIER_PCT,
+    }
+
+
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        traceback.print_exc()
+        msg = f'watchlist_api crash: {type(e).__name__}: {e}'
+        print(f'[watchlist_api] !! {msg}', file=sys.stderr)
+        try:
+            _atomic_write(OUT, _fatal_payload(msg))
+        except Exception as we:
+            print(f'[watchlist_api] !! fallback write failed: {we}',
+                  file=sys.stderr)
+        sys.exit(1)
