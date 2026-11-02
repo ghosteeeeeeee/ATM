@@ -19612,3 +19612,27 @@ Final set: ['BLUR']
 **Open Questions:**
 - 24h net '-0.06' flat, 7d '-1.50' RED — profit engine (trail 12T +0.83) offset by hard_max_loss 8T -0.98, same structure as prior runs
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 10:42] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** '-$0.11' (WR 0% hour; 24h 34T 55.9% '-$0.28' | 7d 250T 54.0% '-$1.61' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 2 closes red — IOTA pump-chain- trail_arm_timeout '-0.02'/-0.59%, SOL jup_yolo_mirrored hard_max_loss '-0.09'/-4.17%
+- Kill check: no signal reached n>=3 last hour (n=1 each). 24h n>=3 losers: continuation+ 3T 33.3% '-0.16', pump-chain- 5T 40.0% '-0.10', bb-squeeze+ 3T 33.3% '-0.09', jup_yolo_mirrored 16T 62.5% '-0.03' — none at 0% WR, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/34 = 5.9% (<40%); dominant close = profit-monster-trail 11T '+0.75'; drag = hard_max_loss 9T '-1.07'
+- Boost HOLD: candidate query (n>=5, WR>55%, net>$0.05) returned empty
+- Neg streak: 10h '-0.11' red but 09h 0 closes and 08h '+0.18' green → no 3-consecutive red, regime/size check not triggered. Sizing 1.0x (file absent = truth)
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.283%, 15/19 <0.5%
+- Storm readiness: **window-min -0.45% / at-run -0.14%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 0
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-0.28' slipped from '-0.06' at 09:45 (hard_max_loss 9T '-1.07' now the drag); 7d '-1.61' RED — same trail-vs-hard_max_loss structure, watchers stand
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
