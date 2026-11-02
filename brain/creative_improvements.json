@@ -10341,5 +10341,23 @@
     "category": "research",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-02T04:50:00Z",
+    "idea": "pc-fade by-token/by-regime flip-WR cell split (amplify-pc-fade-cell-split)",
+    "rationale": "Contrarian join is signal-level only: pump-chain- 64.6% n=350 LIVE, but we cannot see if the edge concentrates in cells >=70% (size-up) or hides <55% cells (demote). rider+ 32.3% n=653 is the negative control.",
+    "expected_impact": "Identify fade cells eligible for notional mult up (units guard pnl_usdt) or exclusion; verdict at 11-09 weekly",
+    "category": "amplify",
+    "status": "proposed",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-02T04:50:00Z",
+    "idea": "LONG entries meta_rsi>=70 across vol regimes — measured then REFUTED",
+    "rationale": "Open JUP/AVAX LONGs at rsi 72-74 prompted the check: 30d rsi>=70 LONGs = HIGH -0.49/20T, EXTREME -0.07/30T, NORMAL +0.02/27T vs base HIGH -3.47/141T. Overbought longs are NOT worse than base within regime — no filter ship.",
+    "expected_impact": "none (closes the idea with data before it becomes a proposal)",
+    "category": "entry sniper",
+    "status": "measured-refuted",
+    "risk": "none"
   }
 ]

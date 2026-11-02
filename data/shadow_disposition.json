@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-01T04:44:13Z",
+  "updated": "2026-11-02T04:50:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -353,8 +353,8 @@
       "id": "amplify-weekly-mandate",
       "stream": "brain_auditor AMPLIFY section: weekly winner-amplification loop",
       "kind": "meta",
-      "disposition": "WATCH",
-      "status": "open",
+      "disposition": "MET 2026-11-02 (Monday weekly run): 30d winner-cell screen re-run (6 cells n>=10 net>0 — 4 VALIDATED, 2 OOS why-not'd), new proposal amplify-pc-fade-cell-split emitted, why-nots documented in kanban. Flip-KPI: 0 new conversions this run; in-flight watch-contrarian-live (11-03), storm-waiver (11-12).",
+      "status": "done",
       "started": "2026-10-29",
       "deadline": "2026-11-03T00:00:00Z",
       "evidence": "CEO 20261029: offense had zero owners (parameter tuner dead since 2026-08-26; auto_1hr boost lane bricked at its 1.0 ceiling 10-28). AMPLIFY mandate added to brain_auditor prompt (rank winner cells, >=1 proposal/week, flip-KPI >=1 shadow->live conversion/week).",
@@ -753,8 +753,22 @@
       "default_action": "NO CHANGE — log why-not in kanban (do not force-deploy a thin live cohort)",
       "owner": "brain_auditor",
       "created_at": "2026-11-01T00:45:00Z",
-      "evidence": "shadow_trader --report 2026-11-01T00:33Z: grind-breakout- n=26 WR 92.3% avg_pnl +1.56 (top of SIGNAL QUALITY BY SOURCE). Live PG 30d: 2T +0.63. Enabled flags True. Most likely friction = CONFLUENCE-EXPIRY (14,410 blocked @47% lower-bound) — verify in join.",
+      "evidence": "shadow_trader --report 2026-11-01T00:33Z: grind-breakout- n=26 WR 92.3% avg_pnl +1.56 (top of SIGNAL QUALITY BY SOURCE). Live PG 30d: 2T +0.63. Enabled flags True. Most likely friction = CONFLUENCE-EXPIRY (14,410 blocked @47% lower-bound) — verify in join. | FRICTION 14d refresh 2026-11-02: signals_hermes_runtime grind_breakout_* = 190 rows, 118 compaction_stale_10min + 28 blocked@approval (short-rsi-hard-floor 10, long-rsi-ceiling 6, long-midband 3, rr-engine-hard-block 3, long-high-70 2, spike-filter-long 2, maxxed-vol 1, oversold-knife 1) + 6 fell-out-of-hotset; named approval gates enumerated (bar still needs blocked-set would_pnl > +$1.00/14d — shadow join required).",
       "note_20261101": "interim: shadow still TOP SOURCE 92.3% n=26; live 2T/30d; due 11-14 not duplicated"
+    },
+    {
+      "id": "amplify-pc-fade-cell-split",
+      "stream": "pump-chain- contrarian fade: by-token/by-regime flip-WR cell split (join is signal-level only)",
+      "kind": "amplify",
+      "proposal_type": "(a) param-widen counterfactual on validated cell + (c) cell mining",
+      "status": "open",
+      "created": "2026-11-02T04:50:00Z",
+      "deadline": "2026-11-09T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run",
+      "evidence": "Contrarian join 2026-11-02T04:30Z: pump-chain- flip-WR 64.6% n=350 (LIVE fade since 10-27; live fade cohort 9T 55.6% +0.46). Join emits signal-level only — no token/regime split exists, so we cannot see whether the edge concentrates in cells >=70% (size-up) or hides cells <55% (demote). btc-pump-rider+ 32.3% n=653 = negative control, do-NOT-flip stands.",
+      "threshold": "Extend analysis/contrarian_outcome_join.py to emit by-token and by-BTC-regime flip-WR for pump-chain-. Ship bar: cell flip-WR >=70% AND n>=30 AND split-half same-sign -> propose fade notional mult up for that cell (units guard: pnl_usdt vs pnl_usdt); cell <55% n>=30 -> propose fade exclusion. Fisher vs 64.6% base reported.",
+      "measurement": "join output gains by_token/by_regime + fisher_p; verdict at next weekly run 2026-11-09",
+      "default_action": "NO CHANGE if no cell clears bars"
     }
   ]
 }

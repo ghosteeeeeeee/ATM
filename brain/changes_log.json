@@ -3429,5 +3429,27 @@
     "after": "status=done + ETH checkpoint pending",
     "rationale": "checkpoint dispositioning mandate",
     "impact": "process only"
+  },
+  {
+    "timestamp": "2026-11-02T04:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #217: 0 trading-constant changes. AMPLIFY weekly: registered amplify-pc-fade-cell-split, marked amplify-weekly-mandate MET, refreshed grind-breakout friction evidence (14d gate enumeration).",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "54 entries, weekly-mandate open",
+    "after": "55 entries, +amplify-pc-fade-cell-split, weekly-mandate done",
+    "rationale": "Formal weekly AMPLIFY mandate (Mon 11-02): >=1 proposal per run; 0.0-override audit and solo-bypass recheck both why-not with data",
+    "impact": "pc-fade cell split verdict due 11-09; no trading behavior changed"
+  },
+  {
+    "timestamp": "2026-11-02T04:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #217: wrote brain/audit_recommendations.json + appended 2 creative entries (pc-fade cell-split proposed; rsi>=70 LONG measured-refuted).",
+    "type": "creative",
+    "file": "brain/audit_recommendations.json",
+    "before": "run #216 artifacts",
+    "after": "run #217 artifacts",
+    "rationale": "Mandate: audit output + >=1 creative idea per run",
+    "impact": "reporting only"
   }
 ]
