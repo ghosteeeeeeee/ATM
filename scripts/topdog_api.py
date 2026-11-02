@@ -111,35 +111,40 @@ def _atomic_write(path, obj):
     os.replace(tmp, path)
 
 
-def _sync_page():
-    """Keep the served page byte-identical to web/topdogs.html.
+def _sync_page(src_path=None, dst_path=None, tag='topdog_api'):
+    """Keep the served page byte-identical to its web/ source.
 
     Nothing else re-copies web/ -> /var/www (the daily commit only commits),
     and the repo source is mode 600 — a plain `cp` therefore produces a 600
     served file that nginx (www-data) cannot read -> 403. Best-effort: a
     page-sync problem must never fail the data run.
+
+    Defaults preserve the original topdogs behavior; watchlist_api passes
+    its own src/dst (shared helper — the two dashboards cannot drift).
     """
+    src_path = src_path or PAGE_SRC
+    dst_path = dst_path or PAGE_DST
     try:
-        with open(PAGE_SRC, 'rb') as f:
+        with open(src_path, 'rb') as f:
             src = f.read()
         try:
-            with open(PAGE_DST, 'rb') as f:
+            with open(dst_path, 'rb') as f:
                 cur = f.read()
-            same_mode = (os.stat(PAGE_DST).st_mode & 0o777) == 0o644
+            same_mode = (os.stat(dst_path).st_mode & 0o777) == 0o644
         except OSError:
             cur, same_mode = None, False
         if cur == src and same_mode:
             return
-        tmp = PAGE_DST + '.tmp'
+        tmp = dst_path + '.tmp'
         with open(tmp, 'wb') as f:
             f.write(src)
             f.flush()
             os.fsync(f.fileno())
         os.chmod(tmp, 0o644)
-        os.replace(tmp, PAGE_DST)
-        print(f'[topdog_api] page synced -> {PAGE_DST}')
+        os.replace(tmp, dst_path)
+        print(f'[{tag}] page synced -> {dst_path}')
     except OSError as e:
-        print(f'[topdog_api] ! page sync failed: {e}', file=sys.stderr)
+        print(f'[{tag}] ! page sync failed: {e}', file=sys.stderr)
 
 
 def compute_tier(wallets):

@@ -1,0 +1,16 @@
+[Unit]
+Description=Watchlist write API (127.0.0.1:3463) — add/remove wallets from the page
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/watchlist_server.py
+WorkingDirectory=/root/.hermes/scripts
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

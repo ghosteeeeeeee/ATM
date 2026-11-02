@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watchlist — custom traders</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: monospace; background: #0a0a0f; color: #e0e0e0; padding: 20px; font-size: 0.85em; }
+    h1 { color: #00ff88; font-size: 1.4em; margin-bottom: 6px; border-bottom: 1px solid #00ff8833; padding-bottom: 10px; }
+    h1 .subtitle { color: #666; font-size: 0.6em; font-weight: normal; margin-left: 15px; }
+    h2 { color: #4488ff; font-size: 1em; margin: 22px 0 10px; border-left: 3px solid #4488ff; padding-left: 8px; }
+    #status { color: #666; font-size: 0.75em; margin-bottom: 12px; }
+    #status .ok { color: #00ff88; } #status .warn { color: #ffaa00; } #status .bad { color: #ff4444; }
+    button { background: #1a1a2e; color: #00ff88; border: 1px solid #00ff8855; padding: 6px 12px;
+             border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 0.85em; }
+    button:hover { background: #00ff8822; }
+    button.on { background: #00ff8833; }
+    button.danger { color: #ff4444; border-color: #ff444455; }
+    button.danger:hover { background: #ff444422; }
+    /* wallet manager */
+    .manage { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+    .manage input { background: #14141c; border: 1px solid #333; color: #e0e0e0; padding: 7px 10px;
+                    border-radius: 4px; font-family: monospace; font-size: 0.85em; }
+    .manage input:focus { outline: none; border-color: #00ff8866; }
+    #addrInput { width: 380px; }
+    #labelInput { width: 120px; }
+    #wlError { color: #ff4444; font-size: 0.75em; min-height: 1em; margin-bottom: 6px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+    .wl-chip { background: #1a1a2e; border: 1px solid #333; border-radius: 4px;
+               padding: 4px 8px; font-size: 0.78em; display: flex; gap: 7px; align-items: center; }
+    .wl-chip .addr { color: #888; }
+    .wl-chip .x { color: #ff4444; cursor: pointer; font-weight: bold; padding: 0 3px; }
+    .wl-chip .x:hover { color: #ff7777; }
+    /* clusters folded into coin boxes */
+    .net-pill { font-size: 0.62em; font-weight: normal; padding: 3px 9px; border-radius: 10px; margin-left: auto; }
+    .net-pill.net-long { background: #00ff8822; color: #00ff88; border: 1px solid #00ff8866; }
+    .net-pill.net-short { background: #ff444422; color: #ff4444; border: 1px solid #ff444466; }
+    .net-pill.net-even { background: #333; color: #999; border: 1px solid #555; }
+    /* coin grid */
+    .coin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
+    .coin-card { background: #14141c; border: 1px solid #222; border-radius: 6px; padding: 12px 14px; }
+    .coin-card.clustered { border-color: #ffaa0077; }
+    .coin-name { font-size: 1.15em; font-weight: bold; color: #4488ff; display: flex; justify-content: space-between; align-items: center; }
+    .cluster-badge { background: #ffaa0033; color: #ffaa00; font-size: 0.68em; padding: 2px 7px; border-radius: 3px; font-weight: normal; }
+    .counts { display: flex; gap: 18px; margin: 10px 0 8px; }
+    .count-block .c-label { color: #666; font-size: 0.68em; text-transform: uppercase; letter-spacing: 1px; }
+    .count-block .c-val { font-size: 1.7em; font-weight: bold; }
+    .count-block .c-val small { font-size: 0.5em; color: #666; font-weight: normal; }
+    .c-long { color: #00ff88; } .c-short { color: #ff4444; }
+    .c-tier-long { color: #00ff88; } .c-tier-short { color: #ff4444; }
+    .members { border-top: 1px solid #222; padding-top: 7px; display: flex; flex-wrap: wrap; gap: 5px; }
+    .chip { background: #1a1a2e; border-radius: 3px; padding: 2px 7px; font-size: 0.75em; white-space: nowrap; }
+    .chip.long { border-left: 3px solid #00ff88; }
+    .chip.short { border-left: 3px solid #ff4444; }
+    .chip .star { color: #ffaa00; }
+    .chip .lev { color: #888; }
+    /* tables */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+    th { background: #1a1a2e; color: #00ff88; padding: 7px 9px; text-align: left; border-bottom: 2px solid #00ff88; font-size: 0.75em; white-space: nowrap; }
+    td { padding: 6px 9px; border-bottom: 1px solid #1a1a2e; white-space: nowrap; }
+    tr:hover { background: #1a1a2e; }
+    .win { color: #00ff88; } .loss { color: #ff4444; } .neutral { color: #888; }
+    .long { color: #00ff88; } .short { color: #ff4444; }
+    .tier-star { color: #ffaa00; }
+    .pos-chip { background: #1a1a2e; padding: 1px 6px; border-radius: 3px; font-size: 0.75em; margin-right: 4px; }
+    .cov { font-size: 0.8em; letter-spacing: 1px; }
+    /* events */
+    .event { display: flex; gap: 10px; align-items: center; padding: 6px 9px; border-bottom: 1px solid #1a1a2e; }
+    .event.fresh { background: #00ff8811; border-left: 3px solid #00ff88; }
+    .event .t { color: #666; font-size: 0.8em; min-width: 62px; }
+    .event .who { min-width: 60px; color: #ddd; }
+    .badge { font-size: 0.68em; padding: 1px 6px; border-radius: 3px; margin-left: 4px; }
+    .badge.tier { background: #ffaa0033; color: #ffaa00; }
+    .badge.cluster { background: #ff444433; color: #ff6666; }
+    /* toast */
+    #toasts { position: fixed; top: 14px; right: 14px; z-index: 99; display: flex; flex-direction: column; gap: 8px; }
+    .toast { background: #14141c; border: 1px solid #00ff88; border-radius: 6px; padding: 10px 14px;
+             min-width: 280px; box-shadow: 0 4px 18px #000a; animation: slidein .25s; }
+    .toast.tier { border-color: #ffaa00; }
+    .toast.cluster { border-color: #ff4444; }
+    .toast .tt { font-weight: bold; color: #fff; }
+    .toast .ts { color: #888; font-size: 0.8em; margin-top: 3px; }
+    @keyframes slidein { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .section-note { color: #666; font-size: 0.72em; margin: -4px 0 8px; }
+    #emptyState { background: #14141c; border: 1px dashed #333; border-radius: 6px;
+                  padding: 26px; text-align: center; color: #888; }
+  </style>
+</head>
+<body>
+  <h1>🎯 WATCHLIST <span class="subtitle">your custom addresses — same engine as top-dogs: coin boxes, net bias, clusters, live feed</span></h1>
+  <div id="status">loading…</div>
+
+  <div class="manage">
+    <input id="addrInput" placeholder="Solana address (base58, 32-44 chars)" spellcheck="false"
+           onkeydown="if(event.key==='Enter')addWallet()">
+    <input id="labelInput" placeholder="label (optional)" maxlength="24"
+           onkeydown="if(event.key==='Enter')addWallet()">
+    <button onclick="addWallet()">＋ Add wallet</button>
+    <button id="alertBtn" onclick="enableAlerts()">🔔 Enable instant alerts</button>
+  </div>
+  <div id="wlError"></div>
+  <div class="chips" id="chips">–</div>
+  <div class="section-note" style="margin-bottom:14px">positions update every 60s (page polls 15s) · stats appear when the wallet is in a YOLO top-100 board · live positions require the wallet to be in jup's watch feed · last-trade activity comes from the global trades feed</div>
+
+  <div id="emptyState" style="display:none">No wallets yet — paste a Solana address above to start tracking.</div>
+
+  <div id="mainSections" style="display:none">
+    <h2>🪙 Coin boxes — net bias, clusters, holders</h2>
+    <div class="section-note">one box per coin: <b>net bias</b> = your wallets' longs − shorts; 🔥 = side has a cluster (2+ of your wallets); big numbers = <span class="tier-star">top-scored</span> among your list, small = all</div>
+    <div class="coin-grid" id="coins">–</div>
+
+    <h2>🏆 Trader stats <span class="section-note" style="display:inline" id="tierNote"></span></h2>
+    <div class="section-note">score = composite pnl+winrate+volume percentile among your scored wallets · coverage: 📊 stats 📍 live position 🕐 recent trade</div>
+    <div style="overflow-x:auto">
+      <table id="tierTable">
+        <thead><tr>
+          <th>#</th><th>Trader</th><th>Score</th><th>PnL $</th><th>7d $</th><th>24h $</th>
+          <th>WR</th><th>Trades</th><th>Volume $</th><th>Last activity</th>
+          <th>Holding now</th><th>Cov</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h2>⚡ New positions <span class="section-note" style="display:inline">(newest first — ⭐ = top-scored, 🔥 = landed in a cluster)</span></h2>
+    <div id="events">–</div>
+  </div>
+
+  <div id="toasts"></div>
+
+<script>
+const API = '/data/watchlist.json';
+const WL  = '/api/watchlist/';
+const MAJORS = ['BTC', 'ETH', 'SOL', 'HYPE'];
+let alertsOn = false, audioCtx = null;
+let seenEids = null;
+let seenClusters = null;
+let lastPayloadTs = 0;
+
+function fmtUsd(v, dp=0) {
+  if (v === null || v === undefined) return '–';
+  const n = Number(v);
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(1) + 'k';
+  return n.toFixed(dp);
+}
+function fmtPnl(v) { const n = Number(v) || 0; return (n >= 0 ? '+' : '') + fmtUsd(n); }
+function pnlCls(v) { return (Number(v) || 0) >= 0 ? 'win' : 'loss'; }
+function ttime(ts) { return new Date(ts * 1000).toLocaleTimeString([], {hour12:false}); }
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ── wallet manager (write API) ── */
+async function wlPost(body) {
+  const r = await fetch(WL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify(body) });
+  const d = await r.json();
+  if (!d.ok) throw new Error(d.error || ('HTTP ' + r.status));
+  return d;
+}
+async function loadChips() {
+  try {
+    const r = await fetch(WL + '?t=' + Date.now(), { cache: 'no-store' });
+    const d = await r.json();
+    const entries = Object.entries(d.wallets || {});
+    document.getElementById('chips').innerHTML = entries.map(([addr, v]) =>
+      `<span class="wl-chip">${v.label ? `<b>${esc(v.label)}</b>` : ''}
+        <span class="addr">${esc(addr.slice(0, 6))}…${esc(addr.slice(-4))}</span>
+        <span class="x" title="remove" onclick="removeWallet('${esc(addr)}')">✕</span></span>`
+    ).join('') || '<span class="section-note">none yet</span>';
+  } catch (e) {
+    document.getElementById('chips').innerHTML =
+      `<span class="section-note" style="color:#ff4444">list unavailable: ${esc(e)}</span>`;
+  }
+}
+async function addWallet() {
+  const addr = document.getElementById('addrInput').value.trim();
+  const label = document.getElementById('labelInput').value.trim();
+  const err = document.getElementById('wlError');
+  err.textContent = '';
+  if (!addr) return;
+  try {
+    const d = await wlPost({ action: 'add', address: addr, label });
+    document.getElementById('addrInput').value = '';
+    document.getElementById('labelInput').value = '';
+    toast('tier', d.already ? 'Already on the list' : '✅ Wallet added',
+          addr.slice(0, 8) + '…');
+    await loadChips();
+    // first wallet: flip the empty state immediately (payload lands ≤60s)
+    if (document.getElementById('mainSections').style.display === 'none')
+      document.getElementById('mainSections').style.display = '';
+  } catch (e) { err.textContent = e.message; }
+}
+async function removeWallet(addr) {
+  const err = document.getElementById('wlError');
+  err.textContent = '';
+  try {
+    await wlPost({ action: 'remove', address: addr });
+    await loadChips();
+  } catch (e) { err.textContent = e.message; }
+}
+
+async function enableAlerts() {
+  alertsOn = true;
+  document.getElementById('alertBtn').classList.add('on');
+  document.getElementById('alertBtn').textContent = '🔔 Alerts ON';
+  try { if (Notification.permission === 'default') await Notification.requestPermission(); } catch (e) {}
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    await audioCtx.resume();
+    beep();
+  } catch (e) {}
+}
+
+function beep() {
+  if (!audioCtx) return;
+  try {
+    [880, 1320].forEach((f, i) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      const t0 = audioCtx.currentTime + i * 0.14;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.13);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t0); o.stop(t0 + 0.15);
+    });
+  } catch (e) {}
+}
+
+function toast(cls, title, sub) {
+  const box = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast ' + cls;
+  el.innerHTML = `<div class="tt">${esc(title)}</div><div class="ts">${esc(sub)}</div>`;
+  box.prepend(el);
+  while (box.children.length > 5) box.lastChild.remove();
+  setTimeout(() => el.remove(), 9000);
+  if (alertsOn) {
+    beep();
+    try {
+      if (Notification.permission === 'granted')
+        new Notification(title, { body: sub, tag: 'watchlist-' + title });
+    } catch (e) {}
+  }
+}
+
+function alertEvent(ev) {
+  if (ev.tier) {
+    const side = ev.side.toUpperCase();
+    toast('tier', `⭐ WATCH ${ev.label} ${side} ${ev.market}`,
+          `${ev.leverage}× · $${fmtUsd(ev.margin)} · cluster ×${ev.cluster}`);
+  }
+}
+
+function render(d) {
+  const age = Math.round((Date.now() / 1000) - d.updated);
+  const ageCls = age < 180 ? 'ok' : (age < 600 ? 'warn' : 'bad');
+  const feedTxt = !d.api_ok ? 'DOWN' : (ageCls === 'bad' ? 'STALE' : 'live');
+  const feedCls = (d.api_ok && ageCls !== 'bad') ? 'ok' : 'bad';
+  document.getElementById('status').innerHTML =
+    `<span class="${feedCls}">● feed ${feedTxt}</span>` +
+    ` · data updated ${age}s ago <span class="${ageCls}">(${ageCls})</span>` +
+    ` · ${d.watchlist_n} wallet(s) · ${d.scored_n ?? 0} with stats · ${d.live_n ?? 0} holding now` +
+    ` · ${d.clusters.length} cluster(s)` +
+    (d.dust_filtered ? ` · dust &lt;$${d.min_margin_usd ?? '?'} filtered: ${d.dust_filtered}` : '') +
+    ` · errors: ${d.errors.length ? '<span class="bad">' + d.errors.map(esc).join('; ') + '</span>' : 'none'}`;
+
+  const empty = !d.watchlist_n;
+  document.getElementById('emptyState').style.display = empty ? '' : 'none';
+  document.getElementById('mainSections').style.display = empty ? 'none' : '';
+  if (empty) return;
+
+  // coins — majors first, then by headcount
+  const names = Object.keys(d.coins);
+  names.sort((a, b) => {
+    const ia = MAJORS.indexOf(a), ib = MAJORS.indexOf(b);
+    const ka = (ia === -1 ? 99 : ia), kb = (ib === -1 ? 99 : ib);
+    if (ka !== kb) return ka - kb;
+    const na = d.coins[a].all_long + d.coins[a].all_short;
+    const nb = d.coins[b].all_long + d.coins[b].all_short;
+    return nb - na;
+  });
+  document.getElementById('coins').innerHTML = names.map(n => {
+    const c = d.coins[n];
+    const clustered = c.cluster_long || c.cluster_short;
+    const net = c.all_long - c.all_short;
+    const netCls = net > 0 ? 'net-long' : (net < 0 ? 'net-short' : 'net-even');
+    const netTxt = net > 0 ? `NET LONG +${net}` : (net < 0 ? `NET SHORT ${Math.abs(net)}` : 'EVEN');
+    const members = (c.members || []).slice().sort((a, b) => (b.tier - a.tier) || (b.score || 0) - (a.score || 0));
+    return `<div class="coin-card ${clustered ? 'clustered' : ''}">
+      <div class="coin-name">${esc(n)}
+        <span class="net-pill ${netCls}">${netTxt}</span>
+        ${c.cluster_long ? `<span class="cluster-badge">🔥 LONG ×${c.all_long}</span>` : ''}
+        ${c.cluster_short ? `<span class="cluster-badge">🔥 SHORT ×${c.all_short}</span>` : ''}
+      </div>
+      <div class="counts">
+        <div class="count-block"><div class="c-label">Top-scored</div>
+          <div class="c-val"><span class="c-tier-long">${c.tier_long}</span> <small>L</small> /
+             <span class="c-tier-short">${c.tier_short}</span> <small>S</small></div></div>
+        <div class="count-block"><div class="c-label">All your wallets</div>
+          <div class="c-val"><span class="c-long">${c.all_long}</span> <small>L</small> /
+             <span class="c-short">${c.all_short}</span> <small>S</small></div></div>
+      </div>
+      <div class="members">${members.map(m =>
+        `<span class="chip ${m.side}">${m.tier ? '<span class="star">⭐</span>' : ''}${esc(m.label)}
+         <span class="lev">${m.leverage}×$${fmtUsd(m.margin)}</span></span>`).join('') || '<span class="section-note">flat</span>'}
+      </div>
+    </div>`;
+  }).join('');
+
+  // trader table
+  document.getElementById('tierNote').textContent =
+    `— ${d.scored_n ?? 0} of ${d.watchlist_n} have leaderboard stats (top ${(d.tier_pct*100).toFixed(0)}% of scored ⭐)`;
+  const tb = document.querySelector('#tierTable tbody');
+  tb.innerHTML = (d.tiers || []).map((t, i) => {
+    const pos = (t.positions || []).map(p =>
+      `<span class="pos-chip ${p.side}">${p.side === 'long' ? 'L' : 'S'} ${esc(p.market)} ${p.leverage}×$${fmtUsd(p.margin)}</span>`).join('')
+      || '<span class="neutral">–</span>';
+    const lt = t.last_trade;
+    const last = lt ? `${ttime(lt.ts)} <span class="neutral">${esc(lt.market || '')} ${esc((lt.side || '').toUpperCase())} ${esc(lt.kind || '')}</span>` : '<span class="neutral">–</span>';
+    const cov = (t.coverage || []).map(c =>
+      c === 'stats' ? '📊' : (c === 'live' ? '📍' : (c === 'activity' ? '🕐' : ''))).join('') || '–';
+    return `<tr>
+      <td>${i + 1}</td>
+      <td>${t.tier ? '<span class="tier-star">⭐</span> ' : ''}${esc(t.label)}
+          <span class="neutral" style="font-size:0.75em">${esc(t.wallet.slice(0, 6))}…${esc(t.wallet.slice(-4))}</span></td>
+      <td>${t.score ?? '–'}</td>
+      <td class="${pnlCls(t.pnl)}">${t.pnl != null ? fmtPnl(t.pnl) : '–'}</td>
+      <td class="${pnlCls(t.pnl_7d)}">${t.pnl_7d != null ? fmtPnl(t.pnl_7d) : '–'}</td>
+      <td class="${pnlCls(t.pnl_24h)}">${t.pnl_24h != null ? fmtPnl(t.pnl_24h) : '–'}</td>
+      <td>${t.wr != null ? ((t.wr || 0) * 100).toFixed(1) + '%' : '–'}</td>
+      <td>${t.trades ?? '–'}</td>
+      <td>${t.volume != null ? fmtUsd(t.volume) : '–'}</td>
+      <td>${last}</td>
+      <td>${pos}</td>
+      <td class="cov">${cov}</td>
+    </tr>`;
+  }).join('');
+
+  // events
+  const evs = (d.events || []).slice(0, 40);
+  document.getElementById('events').innerHTML = evs.map(ev => {
+    const isNew = freshEids.has(ev.eid);
+    return `<div class="event ${isNew ? 'fresh' : ''}">
+      <span class="t">${ttime(ev.ts)}</span>
+      <span class="who">${esc(ev.label)}</span>
+      <span class="${ev.side}">${ev.side.toUpperCase()}</span>
+      <b>${esc(ev.market)}</b>
+      <span class="neutral">${ev.leverage}× · $${fmtUsd(ev.margin)}</span>
+      ${ev.tier ? '<span class="badge tier">⭐ top-scored</span>' : ''}
+      ${ev.cluster >= 2 ? `<span class="badge cluster">🔥 ×${ev.cluster}</span>` : ''}
+    </div>`;
+  }).join('') || '<span class="section-note">no events yet</span>';
+}
+
+let freshEids = new Set(), freshClusterKeys = new Set();
+
+async function load() {
+  try {
+    const resp = await fetch(API + '?t=' + Date.now(), { cache: 'no-store' });
+    const d = await resp.json();
+    if (!d || d.updated === lastPayloadTs) { updateAgeOnly(d); return; }
+    if (d.updated < lastPayloadTs) return;  // out-of-order response
+    lastPayloadTs = d.updated;
+    const first = seenEids === null;
+    freshEids = new Set();
+    freshClusterKeys = new Set();
+    if (first) {
+      seenEids = new Set((d.events || []).map(e => e.eid));
+      seenClusters = new Map((d.clusters || []).map(c => {
+        const k = c.market + '|' + c.side;
+        return [k, { lastLive: Date.now(), goneSince: null }];
+      }));
+    } else {
+      (d.events || []).forEach(ev => {
+        if (!seenEids.has(ev.eid)) {
+          seenEids.add(ev.eid); freshEids.add(ev.eid);
+          alertEvent(ev);
+        }
+      });
+      const nowMs = Date.now();
+      const liveSet = new Set();
+      (d.clusters || []).forEach(c => {
+        const key = c.market + '|' + c.side;
+        liveSet.add(key);
+        const rec = seenClusters.get(key);
+        const title = `🔥 NEW CLUSTER ${c.side.toUpperCase()} ${c.market} ×${c.wallets}`;
+        const sub = `${c.tier_wallets} top-scored · ${c.labels.join(' ')}`;
+        if (!rec) {
+          seenClusters.set(key, { lastLive: nowMs, goneSince: null });
+          freshClusterKeys.add(key);
+          toast('cluster', title, sub);
+        } else if (rec.goneSince !== null) {
+          if (nowMs - rec.goneSince >= 300000) {
+            freshClusterKeys.add(key);
+            toast('cluster', title, sub);
+          }
+          rec.goneSince = null;
+        }
+        rec && (rec.lastLive = nowMs);
+      });
+      seenClusters.forEach((rec, key) => {
+        if (!liveSet.has(key) && rec.goneSince === null) rec.goneSince = nowMs;
+      });
+      seenEids = new Set((d.events || []).map(e => e.eid));
+    }
+    render(d);
+  } catch (e) {
+    document.getElementById('status').innerHTML = '<span class="bad">fetch failed: ' + esc(e) + '</span>';
+  }
+}
+
+function updateAgeOnly(d) {
+  if (!d || !d.updated) return;
+  const el = document.getElementById('status');
+  const age = Math.round((Date.now() / 1000) - d.updated);
+  el.innerHTML = el.innerHTML.replace(/data updated -?\d+s ago/, 'data updated ' + age + 's ago');
+}
+
+loadChips();
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>

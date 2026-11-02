@@ -1,0 +1,11 @@
+[Unit]
+Description=Watchlist dashboard data — custom wallet list, live YOLO positions
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes/scripts
+ExecStart=/usr/bin/python3 watchlist_api.py
+StandardOutput=append:/root/.hermes/logs/watchlist_api.log
+StandardError=append:/root/.hermes/logs/watchlist_api.err.log
+Environment=PYTHONUNBUFFERED=1

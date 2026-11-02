@@ -4234,6 +4234,22 @@ TOPDOG_EVENT_RETAIN = 500      # new-position events kept in topdogs.json
                                 # (feed churns 20+/min — 200 rotated in ~7min)
 TOPDOG_STATE_TTL_SEC = 172800  # prune seen-position state after 48h
 
+# ── Watchlist dashboard (T 2026-11-02) — custom addresses to follow ───────────
+# /watchlist.html + scripts/watchlist_api.py (60s timer) + scripts/
+# watchlist_server.py (127.0.0.1:3463 write API — add/remove from the page).
+# Same engine as the topdog tracker (coin boxes, net bias, clusters, events,
+# $50 margin floor) scoped to the user's own list in data/watchlist.json.
+# Stats join from the leaderboard file — jup exposes NO per-wallet endpoint,
+# so a custom address gets pnl/wr/volume only if it sits in a yolo top-100
+# window; live positions only when the wallet is in jup's watch feed;
+# last-activity fallback comes from the global trades feed.
+WATCHLIST_MAX_WALLETS = 50      # hard cap enforced by the write server
+WATCHLIST_TRADES_LIMIT = 1000   # single global-trades page for the last-
+                                # activity fallback (probed 2026-11-02: the
+                                # feed's cursor only accepts `after` — it tails
+                                # forward, backward paging 400s — so one big
+                                # page: 1000 trades ≈ last ~30min of activity)
+
 # ── JUP YOLO SHORT Guardrail (CEO Option D, amended 2026-10-30) ───────────────
 # Original guardrail was half-size SHORTs ($11→$5.50) — INVALID: HL minimum
 # notional is $11 (HL_MIN_NOTIONAL_USDT), a $5.50 order never fills, and perp
