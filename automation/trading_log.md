@@ -19931,3 +19931,28 @@ Final set: ['BLUR']
 - 3h red streak under HIGH regime — watching; if streak extends and regime flips NEUTRAL, consider size cut
 - 24h '-0.86' RED, 7d '-1.83' — structure: hard_max_loss 11T '-1.47' vs trail+mfe '+1.30'
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 23:43] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** '$0.00' (WR n/a hour; 24h 39T 51.3% '-$0.90' | 7d 252T 54.4% '-$1.71' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: quiet, 0 closes (23:00–23:43 UTC)
+- Kill check: 24h n>=3 signals: jup_yolo_mirrored 27T 55.6% '-0.57', pump-chain- 3T 33.3% '0.00' — neither 0% WR, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/39 = 10.3% (<40%); drag = hard_max_loss 11T '-1.47', trail+mfe '+1.26' — no tpsl_utils alert
+- Boost HOLD: candidate query (n>=5, WR>55%, net>0.05) returned empty — jup_yolo 55.6% but net '-0.57' fails
+- Neg streak: 20h '-0.19', 21h '-0.08', 22h '-0.16' = 3 consecutive red hours — latest regime = **HIGH** (not NEUTRAL) → no size reduction; size-reduce file absent (1.0x) is truth
+- Frequency 0/hr — well under 20
+- Entry quality: 24h winners avg MAE 0.313%, 12/20 <0.5%
+- Storm readiness: **window-min -0.10% / at-run +0.04%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 5 (ETH LONG, BTC SHORT, FIL pump-chain- LONG-fade, SOL LONG, HYPE LONG)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-0.90' RED, 7d '-1.71' — structure: hard_max_loss 11T '-1.47' vs trail+mfe '+1.26'
+- 3h red streak under HIGH regime — watching; if regime flips NEUTRAL, consider size cut
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
