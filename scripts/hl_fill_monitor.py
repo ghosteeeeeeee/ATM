@@ -236,8 +236,10 @@ def get_all_active_traders() -> list:
     """Get ALL active traders (no limit) for bulk scans."""
     conn = get_db()
     try:
+        # ORDER BY wallet = stable round-robin cursor (score DESC shifts
+        # between runs → cursor slices would skip/dup traders)
         traders = conn.execute(
-            "SELECT wallet, score FROM traders WHERE active = 1 ORDER BY score DESC"
+            "SELECT wallet, score FROM traders WHERE active = 1 ORDER BY wallet"
         ).fetchall()
         return [{'wallet': t['wallet'], 'score': t['score']} for t in traders]
     finally:
@@ -269,52 +271,67 @@ def bulk_scan_all_traders() -> dict:
         cached = {}
 
     all_traders = get_all_active_traders()
-    print(f"[bulk_scan] Scanning {len(all_traders)} traders (1s delay between calls)...")
 
-    result = {'_meta': {'last_scan': time.time(), 'trader_count': len(all_traders)}}
+    # ── CEO verdict #3 pacing fix (trigger met 2026-11-02: cycle median 69min,
+    # max 520min — the old code scanned ALL traders × 2 /info calls × the 2s
+    # GLOBAL info_rate gate ≈ 89min/cycle, hogging the gate for every other
+    # service too). Now: bounded batch with a persisted round-robin cursor,
+    # MERGED with the previous file so unscanned wallets keep their data.
+    # Also dropped the redundant 1s sleep (the 2s gate already paces each
+    # call) and the positions fetch (clearinghouseState — the scan file has
+    # ZERO consumers; only the daemon's progress print reads it).
+    try:
+        from hermes_constants import HL_COPY_BULK_SCAN_MAX_PER_CYCLE as _MAX
+    except Exception:
+        _MAX = 60
+    prev = {}
+    cursor = 0
+    try:
+        if os.path.exists(BULK_SCAN_FILE):
+            with open(BULK_SCAN_FILE) as f:
+                _pc = json.load(f)
+            prev = {k: v for k, v in _pc.items() if not k.startswith('_')}
+            cursor = int(_pc.get('_meta', {}).get('cursor', 0) or 0)
+    except (json.JSONDecodeError, OSError, TypeError, ValueError):
+        prev, cursor = {}, 0
+    if cursor >= len(all_traders):
+        cursor = 0  # wrap → full coverage over ceil(N/_MAX) cycles
+    batch = all_traders[cursor:cursor + _MAX]
+    new_cursor = (cursor + _MAX) % max(len(all_traders), 1)
+
+    print(f"[bulk_scan] Scanning batch {len(batch)}/{len(all_traders)} "
+          f"traders (offset {cursor}, gate-paced ~{len(batch)*2*2}s max)...")
+
+    result = dict(prev)
     errors = 0
 
-    for i, trader in enumerate(all_traders):
+    for i, trader in enumerate(batch):
         wallet = trader['wallet']
 
-        # Get fills
+        # Get fills (positions fetch dropped — see verdict #3)
         fills = _hl_info({"type": "userFills", "user": wallet})
         if fills is None:
             errors += 1
-            time.sleep(BULK_SCAN_DELAY)
             continue
-
-        # Get positions
-        positions = _hl_info({"type": "clearinghouseState", "user": wallet})
-        pos_list = []
-        if positions and isinstance(positions, dict):
-            for p in positions.get('assetPositions', []):
-                pos = p.get('position', {})
-                sz = float(pos.get('szi', 0))
-                if sz != 0:
-                    pos_list.append({
-                        'coin': pos.get('coin', ''),
-                        'size': sz,
-                        'entry': float(pos.get('entryPx', 0)),
-                        'upl': float(pos.get('unrealizedPnl', 0)),
-                    })
 
         result[wallet] = {
             'score': trader['score'],
             'recent_fills': fills[:10] if fills else [],  # last 10 fills
-            'positions': pos_list,
+            'positions': [],  # dropped redundant /info call (no consumers)
         }
 
-        # Rate limit: 1s between calls
-        time.sleep(BULK_SCAN_DELAY)
+        # no sleep here — _hl_info's 2s global gate IS the pacing (the old
+        # 1s delay on top doubled per-trader cost for nothing)
 
-        # Progress every 50 traders
-        if (i + 1) % 50 == 0:
-            print(f"[bulk_scan] Progress: {i + 1}/{len(all_traders)} traders scanned")
+        # Progress every 25 traders
+        if (i + 1) % 25 == 0:
+            print(f"[bulk_scan] Progress: {i + 1}/{len(batch)} batch traders")
 
     # Save atomically
-    result['_meta']['last_scan'] = time.time()
-    result['_meta']['errors'] = errors
+    result['_meta'] = {'last_scan': time.time(), 'errors': errors,
+                       'cursor': new_cursor,
+                       'trader_count': len(all_traders),
+                       'batch_size': len(batch)}
     tmp = BULK_SCAN_FILE + '.tmp'
     try:
         with open(tmp, 'w') as f:
@@ -323,7 +340,8 @@ def bulk_scan_all_traders() -> dict:
     except Exception as e:
         print(f"[bulk_scan] Error saving: {e}")
 
-    print(f"[bulk_scan] Done: {len(all_traders)} traders, {errors} errors")
+    print(f"[bulk_scan] Done: batch {len(batch)} scanned, cursor→{new_cursor}, "
+          f"{errors} errors")
     return result
 
 

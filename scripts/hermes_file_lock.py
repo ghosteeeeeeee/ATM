@@ -76,10 +76,20 @@ class FileLock:
                         f"Lock [{self.lockname}] timed out after {self.timeout}s "
                         f"(holder: {self._read_holder()})"
                     )
-                # Log lock contention
+                # Log lock contention — THROTTLED (CEO verdict #3 2026-11-02):
+                # the old print-every-retry grew hl-copy.err.log to 41MB
+                # (10,630 [LOCK-WAIT] lines in the last 500KB alone) and buried
+                # real errors. First wait per lock per process prints; after
+                # that at most once per 60s with a cumulative wait time.
                 _wait_start = time.time()
                 time.sleep(self.interval)
-                print(f'  [LOCK-WAIT] {self.lockname}: waited {time.time()-_wait_start:.1f}s, retrying', file=_sys.stderr, flush=True)
+                _lw = getattr(self, '_lw_last', None)
+                _now = time.time()
+                if _lw is None or (_now - _lw) >= 60.0:
+                    self._lw_last = _now
+                    _held = getattr(self, '_lw_total', 0.0) + (time.time() - _wait_start)
+                    self._lw_total = _held
+                    print(f'  [LOCK-WAIT] {self.lockname}: waited {_held:.1f}s total, retrying (throttled: 1 line/60s)', file=_sys.stderr, flush=True)
 
     def __exit__(self, *args):
         if self.fd is None:

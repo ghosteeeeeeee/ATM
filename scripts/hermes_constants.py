@@ -278,7 +278,8 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
-    'CAKE'
+    'CAKE',
+    'ETH'
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
@@ -308,7 +309,10 @@ LOSERS_SHORT = {
 }
 # Legacy combined set — DIRECTION-BLIND in decider (HARD-BLOCK + conf penalty).
 # BTC removed 2026-10-24 → LOSERS_LONG (see above). ME/PUMP left per CEO scope.
-LOSERS = set()
+LOSERS = {
+    'BLUR'
+}
+
 
 
 
@@ -4260,6 +4264,15 @@ HL_COPY_SHORT_LIFT_CLOSED = 20       # concurrent hl_copy SHORTs until 20 closed
 # for exactly the re-opened path it exists to watch.
 HL_COPY_SHORT_GUARDRAIL_START = '2026-10-31 00:00:00'
 HL_COPY_MAX_EMIT_ATTEMPTS = 5        # bounded retries per fill (jup-style)
+
+# ── HL copy pacing (CEO verdict 2026-10-31 #3 — AUTHORIZED on pace trigger) ───
+# Trigger met 2026-11-02: post-restart cycle median 69min (bar 60), max 520min.
+# Root cause: bulk scan = ALL 1,333 traders × 2 /info calls × the 2s GLOBAL
+# info_rate gate ≈ 89min per cycle (docstring still said 268 traders), hogging
+# the cross-process gate for every other service too. Cap the batch; drop the
+# redundant 1s delay (the 2s gate already paces) and the positions call (the
+# scan file has ZERO consumers — only a progress print reads it).
+HL_COPY_BULK_SCAN_MAX_PER_CYCLE = 60   # traders per cycle (~4min gate hog)
 
 # ── Copy Trader TRUST TIERS (T directive 2026-10-31) ─────────────────────────
 # "sort of shadow mode the traders, compile our own leaderboard, the top top
