@@ -101,7 +101,7 @@
   </div>
   <div id="wlError"></div>
   <div class="chips" id="chips">–</div>
-  <div class="section-note" style="margin-bottom:14px">positions update every 60s (page polls 15s) · stats appear when the wallet is in a YOLO top-100 board · live positions require the wallet to be in jup's watch feed · last-trade activity comes from the global trades feed</div>
+  <div class="section-note" style="margin-bottom:14px">add/remove refreshes the stats panel within seconds · otherwise data refreshes every 60s · stats appear when the wallet is in a YOLO top-100 board · live positions require the wallet to be in jup's watch feed · last-trade activity comes from the global trades feed</div>
 
   <div id="emptyState" style="display:none">No wallets yet — paste a Solana address above to start tracking.</div>
 
@@ -137,6 +137,9 @@ let alertsOn = false, audioCtx = null;
 let seenEids = null;
 let seenClusters = null;
 let lastPayloadTs = 0;
+let fastUntil = 0;   // ms epoch — after add/remove, poll every 2s
+                     // (server refreshes the payload inline; this is
+                     //  the backstop if that refresh failed)
 
 function fmtUsd(v, dp=0) {
   if (v === null || v === undefined) return '–';
@@ -189,6 +192,8 @@ async function addWallet() {
     toast('tier', d.already ? 'Already on the list' : '✅ Wallet added',
           addr.slice(0, 8) + '…');
     await loadChips();
+    fastUntil = Date.now() + 45000;   // panel must catch up within seconds
+    load();
     // first wallet: flip the empty state immediately (payload lands ≤60s)
     if (document.getElementById('mainSections').style.display === 'none')
       document.getElementById('mainSections').style.display = '';
@@ -200,6 +205,8 @@ async function removeWallet(addr) {
   try {
     await wlPost({ action: 'remove', address: addr });
     await loadChips();
+    fastUntil = Date.now() + 45000;
+    load();
   } catch (e) { err.textContent = e.message; }
 }
 
@@ -411,6 +418,10 @@ async function load() {
     render(d);
   } catch (e) {
     document.getElementById('status').innerHTML = '<span class="bad">fetch failed: ' + esc(e) + '</span>';
+  } finally {
+    // every path (fresh, unchanged, out-of-order, error) reschedules:
+    // 2s while a mutation is catching up, 15s otherwise
+    setTimeout(load, Date.now() < fastUntil ? 2000 : 15000);
   }
 }
 
@@ -422,8 +433,7 @@ function updateAgeOnly(d) {
 }
 
 loadChips();
-load();
-setInterval(load, 15000);
+load();   // self-scheduling (see finally above)
 </script>
 </body>
 </html>

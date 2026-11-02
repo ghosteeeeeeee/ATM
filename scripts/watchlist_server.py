@@ -69,6 +69,28 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print(f"[watchlist_server] {self.address_string()} {fmt % args}")
 
+    def _refresh_payload(self):
+        """Run the api inline after every mutation so the page's stats panel
+        updates in ~2-4s instead of waiting up to 60s for the timer.
+
+        T 2026-11-02: "add/remove is not working" — the chips (direct server
+        GET) moved instantly while the coin boxes/stats table lagged a full
+        timer cycle, so a removed wallet still sat in the table for a minute.
+        Best-effort: a refresh failure never fails the mutation itself.
+        """
+        try:
+            import subprocess
+            here = os.path.dirname(os.path.abspath(__file__))
+            r = subprocess.run(
+                [sys.executable, os.path.join(here, 'watchlist_api.py')],
+                cwd=here, timeout=25, capture_output=True, text=True)
+            if r.returncode != 0:
+                print(f"[watchlist_server] api refresh rc={r.returncode}: "
+                      f"{(r.stderr or '')[-300:]}", file=sys.stderr)
+        except Exception as e:
+            print(f"[watchlist_server] api refresh error: "
+                  f"{type(e).__name__}: {e}", file=sys.stderr)
+
     def do_GET(self):
         path = urlparse(self.path).path
         if path == '/health':
@@ -113,6 +135,7 @@ class Handler(BaseHTTPRequestHandler):
                 _write_state(wallets)
                 print(f"[watchlist_server] ADD {addr[:8]}… "
                       f"label={label!r} n={len(wallets)}")
+                self._refresh_payload()
                 return self._send(200, {'ok': True, 'n': len(wallets)})
             if action == 'remove':
                 wallets = _read_state()
@@ -122,6 +145,7 @@ class Handler(BaseHTTPRequestHandler):
                 _write_state(wallets)
                 print(f"[watchlist_server] REMOVE {addr[:8]}… "
                       f"n={len(wallets)}")
+                self._refresh_payload()
                 return self._send(200, {'ok': True, 'n': len(wallets)})
             return self._send(400, {'ok': False,
                                     'error': 'action must be add|remove'})
