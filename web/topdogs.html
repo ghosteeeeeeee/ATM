@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top-Dog Tracker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: monospace; background: #0a0a0f; color: #e0e0e0; padding: 20px; font-size: 0.85em; }
+    h1 { color: #00ff88; font-size: 1.4em; margin-bottom: 6px; border-bottom: 1px solid #00ff8833; padding-bottom: 10px; }
+    h1 .subtitle { color: #666; font-size: 0.6em; font-weight: normal; margin-left: 15px; }
+    h2 { color: #4488ff; font-size: 1em; margin: 22px 0 10px; border-left: 3px solid #4488ff; padding-left: 8px; }
+    #status { color: #666; font-size: 0.75em; margin-bottom: 12px; }
+    #status .ok { color: #00ff88; } #status .warn { color: #ffaa00; } #status .bad { color: #ff4444; }
+    button { background: #1a1a2e; color: #00ff88; border: 1px solid #00ff8855; padding: 6px 12px;
+             border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 0.85em; }
+    button:hover { background: #00ff8822; }
+    button.on { background: #00ff8833; }
+    /* clusters */
+    .cluster-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+    .cluster-card { background: #1a1a2e; border-radius: 6px; padding: 10px 16px; min-width: 190px;
+                    border: 1px solid #ffaa0066; position: relative; }
+    .cluster-card.hot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { border-color: #ffaa0066; } 50% { border-color: #ffaa00; } }
+    .cluster-card .cc-title { font-size: 1.25em; font-weight: bold; }
+    .cluster-card .cc-sub { color: #888; font-size: 0.78em; margin-top: 3px; }
+    .cluster-card .cc-labels { color: #bbb; font-size: 0.75em; margin-top: 5px; word-break: break-all; }
+    /* coin grid */
+    .coin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
+    .coin-card { background: #14141c; border: 1px solid #222; border-radius: 6px; padding: 12px 14px; }
+    .coin-card.clustered { border-color: #ffaa0077; }
+    .coin-name { font-size: 1.15em; font-weight: bold; color: #4488ff; display: flex; justify-content: space-between; align-items: center; }
+    .cluster-badge { background: #ffaa0033; color: #ffaa00; font-size: 0.68em; padding: 2px 7px; border-radius: 3px; font-weight: normal; }
+    .counts { display: flex; gap: 18px; margin: 10px 0 8px; }
+    .count-block .c-label { color: #666; font-size: 0.68em; text-transform: uppercase; letter-spacing: 1px; }
+    .count-block .c-val { font-size: 1.7em; font-weight: bold; }
+    .count-block .c-val small { font-size: 0.5em; color: #666; font-weight: normal; }
+    .c-long { color: #00ff88; } .c-short { color: #ff4444; }
+    .c-tier-long { color: #00ff88; } .c-tier-short { color: #ff4444; }
+    .members { border-top: 1px solid #222; padding-top: 7px; display: flex; flex-wrap: wrap; gap: 5px; }
+    .chip { background: #1a1a2e; border-radius: 3px; padding: 2px 7px; font-size: 0.75em; white-space: nowrap; }
+    .chip.long { border-left: 3px solid #00ff88; }
+    .chip.short { border-left: 3px solid #ff4444; }
+    .chip .star { color: #ffaa00; }
+    .chip .lev { color: #888; }
+    /* tables */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+    th { background: #1a1a2e; color: #00ff88; padding: 7px 9px; text-align: left; border-bottom: 2px solid #00ff88; font-size: 0.75em; white-space: nowrap; }
+    td { padding: 6px 9px; border-bottom: 1px solid #1a1a2e; white-space: nowrap; }
+    tr:hover { background: #1a1a2e; }
+    .win { color: #00ff88; } .loss { color: #ff4444; } .neutral { color: #888; }
+    .long { color: #00ff88; } .short { color: #ff4444; }
+    .tier-star { color: #ffaa00; }
+    .pos-chip { background: #1a1a2e; padding: 1px 6px; border-radius: 3px; font-size: 0.75em; margin-right: 4px; }
+    /* events */
+    .event { display: flex; gap: 10px; align-items: center; padding: 6px 9px; border-bottom: 1px solid #1a1a2e; }
+    .event.fresh { background: #00ff8811; border-left: 3px solid #00ff88; }
+    .event .t { color: #666; font-size: 0.8em; min-width: 62px; }
+    .event .who { min-width: 60px; color: #ddd; }
+    .badge { font-size: 0.68em; padding: 1px 6px; border-radius: 3px; margin-left: 4px; }
+    .badge.tier { background: #ffaa0033; color: #ffaa00; }
+    .badge.tracked { background: #4488ff33; color: #4488ff; }
+    .badge.cluster { background: #ff444433; color: #ff6666; }
+    /* toast */
+    #toasts { position: fixed; top: 14px; right: 14px; z-index: 99; display: flex; flex-direction: column; gap: 8px; }
+    .toast { background: #14141c; border: 1px solid #00ff88; border-radius: 6px; padding: 10px 14px;
+             min-width: 280px; box-shadow: 0 4px 18px #000a; animation: slidein .25s; }
+    .toast.tier { border-color: #ffaa00; }
+    .toast.cluster { border-color: #ff4444; }
+    .toast .tt { font-weight: bold; color: #fff; }
+    .toast .ts { color: #888; font-size: 0.8em; margin-top: 3px; }
+    @keyframes slidein { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .section-note { color: #666; font-size: 0.72em; margin: -4px 0 8px; }
+  </style>
+</head>
+<body>
+  <h1>🐾 TOP-DOG TRACKER <span class="subtitle">JUP YOLO leaderboard — top tier focus, live positions, clusters</span></h1>
+  <div id="status">loading…</div>
+  <div style="margin-bottom:14px">
+    <button id="alertBtn" onclick="enableAlerts()">🔔 Enable instant alerts</button>
+    <span class="section-note" style="display:inline; margin-left:8px">toasts + sound + desktop notification on new top-dog positions &amp; cluster formations (page polls every 15s; data refreshes every 60s)</span>
+  </div>
+
+  <h2>🔥 Clusters now <span class="section-note" style="display:inline">(same coin+side, 2+ traders)</span></h2>
+  <div class="cluster-row" id="clusters">–</div>
+
+  <h2>🪙 Positions by coin</h2>
+  <div class="section-note">big numbers = <span class="tier-star">top-tier</span> traders (top 10% by pnl+winrate+volume); small = all watched traders (tracked = on our leaderboard list)</div>
+  <div class="coin-grid" id="coins">–</div>
+
+  <h2>🏆 Top-tier trader stats <span class="section-note" style="display:inline" id="tierNote"></span></h2>
+  <div style="overflow-x:auto">
+    <table id="tierTable">
+      <thead><tr>
+        <th>#</th><th>Trader</th><th>Score</th><th>PnL $</th><th>7d $</th><th>24h $</th>
+        <th>WR</th><th>WR 7d</th><th>Trades</th><th>Volume $</th><th>Holding now</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>⚡ New positions <span class="section-note" style="display:inline">(newest first — ⭐ = top-tier, 🔥 = landed in a cluster)</span></h2>
+  <div id="events">–</div>
+
+  <div id="toasts"></div>
+
+<script>
+const API = '/data/topdogs.json';
+const MAJORS = ['BTC', 'ETH', 'SOL', 'HYPE'];
+let alertsOn = false, audioCtx = null;
+let seenEids = null;          // set on first payload — only POST-load events alert
+let seenClusters = null;      // cluster keys (market|side) on first payload
+let lastPayloadTs = 0;
+
+function fmtUsd(v, dp=0) {
+  if (v === null || v === undefined) return '–';
+  const n = Number(v);
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(1) + 'k';
+  return n.toFixed(dp);
+}
+function fmtPnl(v) { const n = Number(v) || 0; return (n >= 0 ? '+' : '') + fmtUsd(n); }
+function pnlCls(v) { return (Number(v) || 0) >= 0 ? 'win' : 'loss'; }
+function ttime(ts) { return new Date(ts * 1000).toLocaleTimeString([], {hour12:false}); }
+
+async function enableAlerts() {
+  alertsOn = true;
+  document.getElementById('alertBtn').classList.add('on');
+  document.getElementById('alertBtn').textContent = '🔔 Alerts ON';
+  try { if (Notification.permission === 'default') await Notification.requestPermission(); } catch (e) {}
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    await audioCtx.resume();
+    beep();
+  } catch (e) {}
+}
+
+function beep() {
+  if (!audioCtx) return;
+  try {
+    [880, 1320].forEach((f, i) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      const t0 = audioCtx.currentTime + i * 0.14;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.13);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t0); o.stop(t0 + 0.15);
+    });
+  } catch (e) {}
+}
+
+function toast(cls, title, sub) {
+  const box = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast ' + cls;
+  el.innerHTML = `<div class="tt">${title}</div><div class="ts">${sub}</div>`;
+  box.prepend(el);
+  while (box.children.length > 5) box.lastChild.remove();
+  setTimeout(() => el.remove(), 9000);
+  if (alertsOn) {
+    beep();
+    try {
+      if (Notification.permission === 'granted')
+        new Notification(title, { body: sub, tag: 'topdog-' + title });
+    } catch (e) {}
+  }
+}
+
+function alertEvent(ev) {
+  // Per-position toasts only for the actual top tier — cluster news is
+  // delivered once per FORMATION (load()), not per member event: the feed
+  // churns 20+ positions/min and most land inside an existing cluster.
+  if (ev.tier) {
+    const side = ev.side.toUpperCase();
+    toast('tier', `⭐ TOP-DOG ${ev.label} ${side} ${ev.market}`,
+          `${ev.leverage}× · $${fmtUsd(ev.margin)} · cluster ×${ev.cluster}`);
+  }
+}
+
+function render(d) {
+  // status
+  const age = Math.round((Date.now() / 1000) - d.updated);
+  const ageCls = age < 180 ? 'ok' : (age < 600 ? 'warn' : 'bad');
+  document.getElementById('status').innerHTML =
+    `<span class="${d.api_ok ? 'ok' : 'bad'}">● feed ${d.api_ok ? 'live' : 'DOWN'}</span>` +
+    ` · data updated ${age}s ago <span class="${ageCls}">(${ageCls})</span>` +
+    ` · ${d.wallets_n} tracked wallets · top-tier = ${d.tier_n} (top ${(d.tier_pct*100).toFixed(0)}%)` +
+    ` · ${d.clusters.length} cluster(s) · errors: ${d.errors.length ? '<span class="bad">' + d.errors.join('; ') + '</span>' : 'none'}`;
+
+  // clusters
+  const cbox = document.getElementById('clusters');
+  if (!d.clusters.length) { cbox.innerHTML = '<span class="section-note">none right now</span>'; }
+  else {
+    cbox.innerHTML = d.clusters.map(c => {
+      const key = c.market + '|' + c.side;
+      const isNew = freshClusterKeys.has(key);
+      const sideCls = c.side === 'long' ? 'c-long' : 'c-short';
+      return `<div class="cluster-card ${isNew ? 'hot' : ''}">
+        <div class="cc-title ${sideCls}">${c.side.toUpperCase()} ${c.market} ×${c.wallets}</div>
+        <div class="cc-sub">${c.tier_wallets} top-tier · ${c.tracked} tracked · $${fmtUsd(c.notional)} notional</div>
+        <div class="cc-labels">${c.labels.join(' ')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // coins — majors first, then by headcount
+  const names = Object.keys(d.coins);
+  names.sort((a, b) => {
+    const ia = MAJORS.indexOf(a), ib = MAJORS.indexOf(b);
+    const ka = (ia === -1 ? 99 : ia), kb = (ib === -1 ? 99 : ib);
+    if (ka !== kb) return ka - kb;
+    const na = d.coins[a].all_long + d.coins[a].all_short;
+    const nb = d.coins[b].all_long + d.coins[b].all_short;
+    return nb - na;
+  });
+  document.getElementById('coins').innerHTML = names.map(n => {
+    const c = d.coins[n];
+    const clustered = c.cluster_long || c.cluster_short;
+    const members = (c.members || []).slice().sort((a, b) => (b.tier - a.tier) || (b.tracked - a.tracked) || (b.score || 0) - (a.score || 0));
+    return `<div class="coin-card ${clustered ? 'clustered' : ''}">
+      <div class="coin-name">${n}
+        ${c.cluster_long ? `<span class="cluster-badge">🔥 LONG ×${c.all_long}</span>` : ''}
+        ${c.cluster_short ? `<span class="cluster-badge">🔥 SHORT ×${c.all_short}</span>` : ''}
+      </div>
+      <div class="counts">
+        <div class="count-block"><div class="c-label">Top-tier</div>
+          <div class="c-val"><span class="c-tier-long">${c.tier_long}</span> <small>L</small> /
+             <span class="c-tier-short">${c.tier_short}</span> <small>S</small></div></div>
+        <div class="count-block"><div class="c-label">All watched</div>
+          <div class="c-val"><span class="c-long">${c.all_long}</span> <small>L</small> /
+             <span class="c-short">${c.all_short}</span> <small>S</small></div></div>
+      </div>
+      <div class="members">${members.map(m =>
+        `<span class="chip ${m.side}">${m.tier ? '<span class="star">⭐</span>' : ''}${m.label}${m.tracked && !m.tier ? '·' : ''}
+         <span class="lev">${m.leverage}×$${fmtUsd(m.margin)}</span></span>`).join('') || '<span class="section-note">flat</span>'}
+      </div>
+    </div>`;
+  }).join('');
+
+  // tier table
+  document.getElementById('tierNote').textContent =
+    `— top ${(d.tier_pct*100).toFixed(0)}% by composite pnl + winrate + volume (size proxy)`;
+  const tb = document.querySelector('#tierTable tbody');
+  tb.innerHTML = (d.tiers || []).map((t, i) => {
+    const pos = (t.positions || []).map(p =>
+      `<span class="pos-chip ${p.side}">${p.side === 'long' ? 'L' : 'S'} ${p.market} ${p.leverage}×$${fmtUsd(p.margin)}</span>`).join('')
+      || '<span class="neutral">–</span>';
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><span class="tier-star">⭐</span> ${t.label} <span class="neutral" style="font-size:0.75em">#${t.rank ?? '–'}</span></td>
+      <td>${t.score}</td>
+      <td class="${pnlCls(t.pnl)}">${fmtPnl(t.pnl)}</td>
+      <td class="${pnlCls(t.pnl_7d)}">${t.pnl_7d != null ? fmtPnl(t.pnl_7d) : '–'}</td>
+      <td class="${pnlCls(t.pnl_24h)}">${t.pnl_24h != null ? fmtPnl(t.pnl_24h) : '–'}</td>
+      <td>${((t.wr || 0) * 100).toFixed(1)}%</td>
+      <td>${t.wr_7d != null ? ((t.wr_7d) * 100).toFixed(1) + '%' : '–'}</td>
+      <td>${t.trades ?? '–'}</td>
+      <td>${fmtUsd(t.volume)}</td>
+      <td>${pos}</td>
+    </tr>`;
+  }).join('');
+
+  // events
+  const evs = (d.events || []).slice(0, 40);
+  document.getElementById('events').innerHTML = evs.map(ev => {
+    const isNew = freshEids.has(ev.eid);
+    return `<div class="event ${isNew ? 'fresh' : ''}">
+      <span class="t">${ttime(ev.ts)}</span>
+      <span class="who">${ev.label}</span>
+      <span class="${ev.side}">${ev.side.toUpperCase()}</span>
+      <b>${ev.market}</b>
+      <span class="neutral">${ev.leverage}× · $${fmtUsd(ev.margin)}</span>
+      ${ev.tier ? '<span class="badge tier">⭐ top-tier</span>' : ''}
+      ${ev.tracked ? '<span class="badge tracked">tracked</span>' : ''}
+      ${ev.cluster >= 2 ? `<span class="badge cluster">🔥 ×${ev.cluster}</span>` : ''}
+    </div>`;
+  }).join('') || '<span class="section-note">no events yet</span>';
+}
+
+let freshEids = new Set(), freshClusterKeys = new Set();
+
+async function load() {
+  try {
+    const resp = await fetch(API + '?t=' + Date.now(), { cache: 'no-store' });
+    const d = await resp.json();
+    if (!d || d.updated === lastPayloadTs) { updateAgeOnly(d); return; }
+    lastPayloadTs = d.updated;
+    const first = seenEids === null;
+    freshEids = new Set();
+    freshClusterKeys = new Set();
+    if (first) {
+      // first payload: seed state — history never alerts, only POST-load arrivals
+      seenEids = new Set((d.events || []).map(e => e.eid));
+      seenClusters = new Map((d.clusters || []).map(c => {
+        const k = c.market + '|' + c.side;
+        return [k, { lastLive: Date.now(), goneSince: null }];
+      }));
+    } else {
+      (d.events || []).forEach(ev => {
+        if (!seenEids.has(ev.eid)) {
+          seenEids.add(ev.eid); freshEids.add(ev.eid);
+          alertEvent(ev);
+        }
+      });
+      // cluster formation toasts: brand-new key, or reformed after being
+      // gone >= 5min (flicker guard — the feed churns fast)
+      const nowMs = Date.now();
+      const liveSet = new Set();
+      (d.clusters || []).forEach(c => {
+        const key = c.market + '|' + c.side;
+        liveSet.add(key);
+        const rec = seenClusters.get(key);
+        const title = `🔥 NEW CLUSTER ${c.side.toUpperCase()} ${c.market} ×${c.wallets}`;
+        const sub = `${c.tier_wallets} top-tier · ${c.labels.join(' ')}`;
+        if (!rec) {
+          seenClusters.set(key, { lastLive: nowMs, goneSince: null });
+          freshClusterKeys.add(key);
+          toast('cluster', title, sub);
+        } else if (rec.goneSince !== null) {
+          if (nowMs - rec.goneSince >= 300000) {
+            freshClusterKeys.add(key);
+            toast('cluster', title, sub);
+          }
+          rec.goneSince = null;
+        }
+        rec && (rec.lastLive = nowMs);
+      });
+      seenClusters.forEach((rec, key) => {
+        if (!liveSet.has(key) && rec.goneSince === null) rec.goneSince = nowMs;
+      });
+    }
+    render(d);
+  } catch (e) {
+    document.getElementById('status').innerHTML = '<span class="bad">fetch failed: ' + e + '</span>';
+  }
+}
+
+function updateAgeOnly(d) {
+  if (!d || !d.updated) return;
+  const el = document.getElementById('status');
+  const age = Math.round((Date.now() / 1000) - d.updated);
+  el.innerHTML = el.innerHTML.replace(/data updated \d+s ago/, 'data updated ' + age + 's ago');
+}
+
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>

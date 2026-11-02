@@ -4212,6 +4212,20 @@ JUP_YOLO_CLUSTER_ENABLED = True       # master switch for YOLO cluster bonus
 JUP_YOLO_CLUSTER_BONUS_PER_TRADER = 3  # +3 confidence per additional wallet beyond the first
 JUP_YOLO_CLUSTER_MAX_BONUS = 15        # cap (matches HL_COPY cap — prevents overconfidence)
 
+# ── Top-Dog Tracker dashboard (T 2026-11-01) ──────────────────────────────────
+# /topdogs.html + scripts/topdog_api.py (60s timer): per-coin long/short counts
+# of TOP traders, top-trader stats, instant new-position alerts, and same-
+# position CLUSTER highlighting (the mirror's 2+ wallets per coin+side).
+# Tier = top TOPDOG_TIER_PCT by composite percentile of pnl + winrate +
+# volume (size proxy — yolo leaderboard exposes no equity field), among
+# wallets with >= TOPDOG_MIN_TRADES trades.
+TOPDOG_TIER_PCT = 0.10         # focus on the top 10% (T: "top 5-10%")
+TOPDOG_MIN_TRADES = 10         # trades needed to qualify for the tier
+TOPDOG_CLUSTER_MIN = 2         # unique tracked wallets per coin+side = cluster
+TOPDOG_EVENT_RETAIN = 500      # new-position events kept in topdogs.json
+                                # (feed churns 20+/min — 200 rotated in ~7min)
+TOPDOG_STATE_TTL_SEC = 172800  # prune seen-position state after 48h
+
 # ── JUP YOLO SHORT Guardrail (CEO Option D, amended 2026-10-30) ───────────────
 # Original guardrail was half-size SHORTs ($11→$5.50) — INVALID: HL minimum
 # notional is $11 (HL_MIN_NOTIONAL_USDT), a $5.50 order never fills, and perp

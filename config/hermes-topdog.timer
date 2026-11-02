@@ -1,0 +1,11 @@
+[Unit]
+Description=Top-Dog tracker API every 60s — instant top-dog position + cluster alerts
+
+[Timer]
+# YOLO positions live minutes; 60s poll + 15s page poll ≈ worst-case 75s alert latency
+OnBootSec=60
+OnUnitActiveSec=60
+AccuracySec=10
+
+[Install]
+WantedBy=timers.target

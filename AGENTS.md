@@ -261,6 +261,7 @@ All dashboards served by nginx on port 54321.
 | Trades | `/trades.html` | `trades.json` | 1min |
 | Signals | `/signals.html` | `signals.json` | 1min |
 | Copy Trader | `/copy_trader.html` | `copy_trader.json` | 1min |
+| Top Dogs | `/topdogs.html` | `topdogs.json` (topdog_api.py) | 60s (page polls 15s) |
 | Coin Tracker | `/coin_tracker.html` | `coin_tracker_data.json` | 5min |
 | Pump Flow | `/pump_flow.html` | `pump_flow_data.json` | 2min |
 

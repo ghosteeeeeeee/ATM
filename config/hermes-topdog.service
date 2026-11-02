@@ -1,0 +1,11 @@
+[Unit]
+Description=Top-Dog tracker dashboard data — live YOLO positions + tier stats
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes/scripts
+ExecStart=/usr/bin/python3 topdog_api.py
+StandardOutput=append:/root/.hermes/logs/topdog_api.log
+StandardError=append:/root/.hermes/logs/topdog_api.err.log
+Environment=PYTHONUNBUFFERED=1
