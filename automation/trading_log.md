@@ -19482,3 +19482,26 @@ Final set: []
 **Open Questions:**
 - 24h just turned GREEN ('+$0.19' at 64.3% WR) after a long red stretch; 7d still '-$1.15'. Watch whether the green holds before any boost
 - pump-chain- NORMAL-habitat boost `('NORMAL','pump-chain-'): 1.2` in volatility_gate_v2.py was set on 2026-10-08 evidence (64.3%WR) — now 14d 38.5% WR. Candidate to drop 1.2->1.0, but gate file is outside my editable scope (hermes_constants.py / scripts/signals/*.py) and max-1-change rule => flagging for next session / CEO
+
+## [2026-11-02 05:47] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** '-$0.22' (WR 0% hour; 24h 44T 59.1% '-$0.04' ~flat) | 7d 247T 54.7% '-$1.41' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 3 closes all red — SOL continuation+ hard_max_loss '-0.09'/-4.02%, AVAX bb-squeeze+ trail_arm_timeout '-0.05'/-2.04%, JUP bb-squeeze+ trail_arm_timeout '-0.08'/-3.23%
+- Kill check: NO signal reached n>=3 last hour (bb-squeeze+ 2T, continuation+ 1T) — kill policy does not fire. 24h n>=3 losers unchanged: pump-chain- 12T 41.7% '-0.19' (14d NORMAL-only live regime WR>0, keeps alive), continuation+ 3T 33.3% '-0.16', bb-squeeze+ 3T 33.3% '-0.09' (both n=3 at 33%, not 0%)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/44 = 11.4% (<40%); dominant close = profit-monster-trail 15T '+$0.89'; drag = hard_max_loss 7T '-$0.88'
+- Boost HOLD: jup_yolo_mirrored 16T 68.8% net '+$0.09' passes WR/n/net but multi-token fails — HYPE 7T 42.9% '-0.28' largest sub-cohort (SOL +0.25, BTC +0.08, ETH +0.04); warrior-sr-confirm+ 3T 100% fails n>=5
+- Neg streak: 2 (04h '-0.03', 05h '-0.22'... 05h = '-0.09') — not 3
+- Frequency 3/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.244%, 22/26 <0.5%
+- Storm readiness: **window-min -0.53% / at-run -0.16%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h back to '~flat' '-$0.04' at 59.1% WR — profit engine (profit-monster-trail '+0.89') offset by hard_max_loss '-0.88'; fee-NET still negative per brain_auditor
+- 2 red hours in a row (04h, 05h) — watch for 3rd before size action
