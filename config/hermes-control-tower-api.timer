@@ -1,0 +1,10 @@
+[Unit]
+Description=Hermes Control Tower Timer — refresh feed every 60s (page polls every 30s)
+
+[Timer]
+OnBootSec=30sec
+OnUnitActiveSec=60sec
+Persistent=true
+
+[Install]
+WantedBy=timers.target

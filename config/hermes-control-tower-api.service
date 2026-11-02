@@ -1,0 +1,9 @@
+[Unit]
+Description=Hermes Control Tower API — JSON feed for the control tower dashboard (registry-derived calendar, live)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/control_tower_api.py
+WorkingDirectory=/root/.hermes/scripts
+StandardOutput=journal
+StandardError=journal
