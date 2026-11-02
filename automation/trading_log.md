@@ -19540,3 +19540,27 @@ Final set: ['BLUR']
 - 3 red hours in a row but each tiny ('-0.03'/'-0.09'/'-0.17'); 24h still ~flat. Watch 07h — 4th red hour would warrant a closer look even in SHORT_BIAS
 - Open flag from 04:45 stands: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed (64.3% -> 40.0% WR over 24h/14d 38.5%) — file outside auto_1hr scope, needs CEO/session action
 - 7d deepening: '-$1.59' (was '-$1.41' at 05:47)
+
+## [2026-11-02 07:45] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** '-$0.10' (WR 0% hour; 24h 43T 58.1% '-$0.27' | 7d 248T 54.0% '-$1.69' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 1 close red — SOL jup_yolo_mirrored LONG hard_max_loss '-0.10'/-4.27%
+- Kill check: NO signal reached n>=3 last hour (n=1) — kill policy does not fire. 24h n>=3 losers: pump-chain- 10T 40.0% '-0.15' (14d NORMAL-only live regime WR>0, keeps alive), continuation+ 3T 33.3% '-0.16', bb-squeeze+ 3T 33.3% '-0.09', warrior-sr-confirm+ 3T 100% '+0.33' — none at 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/43 = 9.3% (<40%); dominant close = profit-monster-trail 15T '+$0.89'; drag = hard_max_loss 9T '-$1.15' (widening from 8T '-$1.05')
+- Boost HOLD: 0 candidates pass the gate (query n>=5 & net>$0.05 returned empty) — jup_yolo_mirrored 17T 64.7% net '-0.18', HYPE sub-cohort worst; warrior-sr-confirm+ 3T 100% fails n>=5
+- Neg streak = 3 (04h '-0.03', 05h '-0.09', 06h '-0.27'; 07h 0 closes so far) → regime checked **SHORT_BIAS**, not NEUTRAL → no size-reduce action. Sizing stays 1.0x (file absent = truth)
+- Frequency 1/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.400%, 21/25 <0.5% (mild worsening vs 0.246% prior run, still majority clean)
+- Storm readiness: **window-min -0.13% / at-run -0.13%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open trades: 0
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h net deepened '-0.17' -> '-0.27'; 7d '-1.69' (was '-1.59'). Single drag: hard_max_loss 9T '-1.15' vs profit-monster-trail 15T '+0.89' — profits engine healthy, losers slightly bigger than winners avg
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
