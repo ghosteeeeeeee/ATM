@@ -79,12 +79,21 @@ class Handler(BaseHTTPRequestHandler):
 
     def _send(self, code, obj):
         body = json.dumps(obj).encode()
-        self.send_response(code)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        self.send_header('Content-Length', str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.send_response(code)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Cache-Control',
+                             'no-cache, no-store, must-revalidate')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        except OSError as e:
+            # client gone mid-response (aborted fetch, navigation, nginx
+            # timeout) — log it once instead of letting it escape as a
+            # socketserver traceback (and, inside _apply, of a SECOND send
+            # attempt on an already-dead socket)
+            print(f"[watchlist_server] response {code} not delivered "
+                  f"({type(e).__name__}: {e})", file=sys.stderr)
 
     def log_message(self, fmt, *args):
         print(f"[watchlist_server] {self.address_string()} {fmt % args}")
