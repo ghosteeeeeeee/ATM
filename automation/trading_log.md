@@ -19685,3 +19685,28 @@ Final set: ['BLUR']
 - 7d '-1.82' deepening (was '-1.65' at 11:42); structure unchanged: profit-monster-trail '+0.75' vs hard_max_loss '-1.14' — watchers stand
 - HYPE jup_yolo_mirrored sub-cohort 8T 37.5% '-0.36' — largest drag inside an otherwise positive signal (SOL +0.12, BTC +0.08), not a kill candidate
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 13:48] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** '-$0.11' (WR 50% hour; 24h 34T 52.9% '-$0.47' | 7d 248T 53.2% '-$1.96' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored mfe_exit '+0.08'/+1.85%, ETH jup_yolo_mirrored hard_max_loss '-0.19'/-4.19%
+- Kill check: no signal reached n>=3 last hour (n=1 each). 24h n>=3 losers: jup_yolo_mirrored 19T 57.9% '-0.32', continuation+ 3T 33.3% '-0.16', pump-chain- 6T 33.3% '-0.11' — none at 0% WR, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/34 = 5.9% (<40%); dominant drag = hard_max_loss 9T '-1.24'; trail 9T '+0.66', mfe_exit 6T '+0.34'
+- Boost HOLD: candidate query (n>=5, WR>55%, net>$0.05, multi-token) returned empty
+- Neg streak: 10h '-0.11' red, 11h 0 closes (breaks streak), 12h '-0.19', 13h '-0.11' → 2 consecutive, not 3, no regime/size check
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.270%, 14/18 <0.5%
+- Storm readiness: **window-min -0.54% / at-run +0.53%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 2 (SOL jup_yolo LONG, BTC continuum+,jup_yolo LONG)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-0.47' and 7d '-1.96' RED — structure unchanged: hard_max_loss 9T '-1.24' vs trail+mfe '+1.00'; watchers stand
+- HYPE jup_yolo_mirrored sub-cohort 9T 44.4% '-0.28' — largest drag inside signal (SOL +0.06, BTC +0.08), not a kill candidate
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
