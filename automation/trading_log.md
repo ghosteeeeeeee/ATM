@@ -19459,3 +19459,26 @@ Final set: []
 **Open Questions:**
 - 24h gross '-$0.35' at 55% WR — losses concentrated in hard_max_loss '-$0.95' (7T); fee-NET still negative per brain_auditor
 - 24h n>=3 loser pump-chain- 14T 35.7% '-$0.31' — regime-block via volatility_gate_v2 path needs CEO
+
+## [2026-11-02 04:45] Hourly Analysis
+
+**Trades:** 5 closed (5 wins, 0 losses)
+**PnL:** '+$0.26' (100% WR hour; 24h 42T 64.3% '+$0.19' GREEN) | 7d 245T 55.5% '-$1.15' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 5 closes all wins — HYPE jup_yolo_mirrored mfe_exit '+0.10'/+2.35%, POL r2v2-long6 trail '+0.03', TURBO r2v2-long5 trail '+0.03', BTC jup_yolo_mirrored mfe_exit '+0.04', SOL continuation+,jup_yolo_mirrored trail '+0.06'
+- Kill check: NO signal reached n>=3 last hour — kill policy does not fire. 24h only n>=3 loser is pump-chain- 12T 41.7% '-$0.19'; 14d regime split NORMAL 26T 38.5% '+$0.25' (only live regime — EXTREME/HIGH already 0.0-blocked, 0 trades there in 14d) -> wins in its live regime, keep alive
+- Signal inversion: 0 LIKE-based mismatches (24h). Investigated source='pump-chain-' direction='LONG' (21T/14d) — NOT a wiring bug: `decider_run.py:235` contrarian/static inversion flips direction and keeps the original source tag (logged `[CONTRARIAN-LIVE]`/`[INVERT]`). 14d flipped-LONG pump-chain- net '+$0.12'. No action
+- atr_sl_hit 0/5 last hour, 5/42 = 11.9% 24h (<40%); dominant close = profit-monster-trail 15T '+$0.89'; drag = hard_max_loss 6T '-$0.79'
+- Boost HOLD: jup_yolo_mirrored 16T 68.8% net '+$0.09' passes WR/n/net but multi-token fails — HYPE 7T 42.9% '-$0.28' is the largest sub-cohort (SOL +0.31, BTC +0.08, ETH +0.04); warrior-sr-confirm+ 3T 100% '+$0.33' fails n>=5
+- Neg streak: not 3 — green 23h +0.04, 00h +0.10, 01h +0.18, 02h 0 closes, 03h +0.16, 04h +0.10
+- Frequency 5/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.255%, 22/27 <0.5%
+- Storm readiness: **window-min -0.26% / at-run -0.19%** — both within gate, no storm (rolling-60m, 7 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h just turned GREEN ('+$0.19' at 64.3% WR) after a long red stretch; 7d still '-$1.15'. Watch whether the green holds before any boost
+- pump-chain- NORMAL-habitat boost `('NORMAL','pump-chain-'): 1.2` in volatility_gate_v2.py was set on 2026-10-08 evidence (64.3%WR) — now 14d 38.5% WR. Candidate to drop 1.2->1.0, but gate file is outside my editable scope (hermes_constants.py / scripts/signals/*.py) and max-1-change rule => flagging for next session / CEO
