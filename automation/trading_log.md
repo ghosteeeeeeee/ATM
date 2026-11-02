@@ -19808,3 +19808,52 @@ Final set: ['BLUR']
 - 24h '-0.76' RED, 7d '-1.78' — structure unchanged: hard_max_loss 9T '-1.25' vs trail+mfe '+1.14'; watchers stand
 - HYPE jup_yolo_mirrored sub-cohort 11T 45.5% '-0.22' — largest drag inside signal (ETH 3T 33.3% '-0.32' worse WR), not a kill candidate
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 18:45] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** '-$0.14' (WR 50% hour; 24h 38T 50.0% '-$0.94' | 7d 247T 54.3% '-$1.48' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BTC jup_yolo_mirrored SHORT mfe_exit +0.04/+1.76%, ETH jup_yolo_mirrored LONG hard_max_loss -0.18/-5.49%
+- atr_sl_hit 5/38 = 13.2% 24h (<40%; drag = hard_max_loss 10T '-1.43', trail+mfe '+1.14') — no tpsl_utils alert
+- Kill check: no signal n>=3 at 0% WR last hour (n=1 each). 24h n>=3 losers: jup_yolo_mirrored 24T 54.2% '-0.64', pump-chain- 6T 33.3% '-0.11' — neither 0%, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- Boost HOLD: candidate query (n>=5, WR>55%, net>0.05) returned empty
+- Neg streak: 16h -0.17 red then 17h +0.05 / 18h +0.04 green — streak 1, not 3, no regime/size check
+- Frequency 2/hr — under 20
+- Entry quality: 24h winners avg MAE 0.296%, 13/19 <0.5%
+- Storm readiness: **window-min -0.80% / at-run -0.10%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 2 (ETH LONG -0.21%, BTC SHORT +0.05%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flat-red '-0.94' at exactly 50% WR, 7d '-1.48' — structure: hard_max_loss 10T '-1.43' vs trail+mfe '+1.14'; watchers stand
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 19:43] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** '+$0.08' (WR 100% hour; 24h 38T 52.6% '-$0.83' | 7d 249T 54.6% '-$1.40' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored SHORT profit-monster-trail '+0.04'/+1.08%, HYPE jup_yolo_mirrored SHORT mfe_exit '+0.04'/+1.77%
+- Kill check: no signal n>=3 at 0% WR last hour (2 wins). 24h n>=3 losers: jup_yolo_mirrored 26T 57.7% '-0.56', pump-chain- 4T 25.0% '-0.08' — neither 0%, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/38 = 10.5% (<40%); drag = hard_max_loss 10T '-1.43'; trail 10T '+0.80', mfe 8T '+0.42'
+- Boost HOLD: candidate query (n>=5, WR>55%, net>0.05) returned empty
+- Neg streak: 18h/19h green ('+0.04','+0.08') — not 3, no regime/size check
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.287%, 14/20 <0.5%
+- Storm readiness: **window-min -0.20% / at-run -0.20%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 3 (HYPE SHORT +0.20%, BTC SHORT +0.24%, ETH LONG -0.61%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-0.83' RED, 7d '-1.40' — structure unchanged: hard_max_loss 10T '-1.43' vs trail+mfe '+1.22'; watchers stand
+- jup_yolo_mirrored 26T 57.7% WR but net '-0.56' — wins small, hard_max_loss losses big; same structure as prior days
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
