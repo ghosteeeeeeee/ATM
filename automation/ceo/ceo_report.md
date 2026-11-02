@@ -839,3 +839,21 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 40T -0.07 47.5% | 7d 239T -1.53 54.0%
 ### Findings: Proactive Q (day-of-month 1 mod 14 = "What's the PnL?"): PnL flat-slightly-negative both windows (-$0.07 24h, -$1.53 7d) — consistent with known chop-bleed, no new anomaly. Side-watch: HYPE #16662 UM_HOLD checkpoint OVERDUE since 18:01Z (alert 18:36) — verify position closed; disk 85% warnings persist.
 ### Recommendation: Executor verify HYPE #16662 UM_HOLD exit; disk cleanup + NET-KPI switch at 11-02 weekly.
+
+## CEO Status — 20261101T224108Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 39T -0.50 51.3% | 7d 243T -1.89 53.5%
+### Findings: Rotating Q (new signals this week): 0 new signals shipped — grind-breakout AMPLIFY is a deploy proposal (due 11-14), TAT jup/vb was constants on existing signals; both auditor and deep-dives kept finding 0 new n>=15 targets. Side: disk 85% WARN; checkpoint `eth-16665-umhold-2103` OVERDUE since 21:05Z (ETH #16665 UM_HOLD verify — confirm closed).
+### Recommendation: Weekly run should delegate one new-signal brief to signal_analyst (gap: NEUTRAL-regime / uncorrelated edge); disk cleanup + UM_HOLD checkpoint disposition on next deep run.
+
+## CEO Status — 20261102T024109Z
+### Health: pipeline=active guardian=active open_pos=5
+### Numbers: 24h 40T -0.35 55.0% | 7d 243T -1.52 54.3%
+### Findings: Rotating Q (worst signal 7d): volume-buildup- SHORT 39T -1.32 53.8% — negative PnL at >50% WR = loss bigger than win, not a construction artifact; known band, already gated. Disk 85% WARN in error_alerts (recurring). control_tower.md empty.
+### Recommendation: none — worst signal is already under active gates; check disk growth before it hits 90%.
+
+## CEO Status — 20261102T064109Z
+### Health: pipeline=active (timer 1m; is-active reads inactive between ticks = normal) guardian=active open_pos=1
+### Numbers: 24h 43T -0.17 58.1% | 7d 247T -1.59 54.3%
+### Findings: disk 86% (WARN x4, health_monitor); alerts show hotset knife-rule rejections only — no errors; proactive (best signal 7d): bb-squeeze+ LONG 26T +0.21 61.5%, warrior-sr-confirm+ 10T +0.19 80.0% — healthy leaders, no action
+### Recommendation: disk cleanup before 90% (log rotation / old analysis artifacts) — one line, defer to weekly deep run

@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-11-01 14:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-02 02:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,558 | **WR:** 51.2% | **PnL:** -99.04%
-- **Date range:** 2026-07-29 → 2026-11-01
+- **Total trades (all time):** 3,574 | **WR:** 51.3% | **PnL:** -97.84%
+- **Date range:** 2026-07-29 → 2026-11-02
 
 ---
 
@@ -11,7 +11,7 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| jup_yolo_mirrored | LONG | 2 | 100.0% | +0.65 | 15 | 86.7% | +2.44 | ❓ |
+| jup_yolo_mirrored | LONG | 7 | 85.7% | +1.84 | 11 | 81.8% | +1.68 | ❓ |
 
 ---
 
@@ -25,8 +25,10 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| pump-chain- | LONG | 13 | 38.5% | -1.80 | ❓ | Borderline |
-| bb-squeeze+ | LONG | 4 | 50.0% | -0.90 | ENABLED | Needs more data |
+| pump-chain- | LONG | 14 | 35.7% | -2.44 | ❓ | Borderline |
+| continuation+ | LONG | 2 | 50.0% | -0.70 | ENABLED | Needs more data |
+| jup_yolo_mirrored | SHORT | 3 | 33.3% | -0.44 | ❓ | Needs more data |
+| volume-buildup- | SHORT | 2 | 50.0% | -0.16 | ENABLED | Needs more data |
 
 ---
 
@@ -44,9 +46,11 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] pump-chain- LONG** — WR=38.5%, PnL=-1.80% over 13 trades. Monitor next cycle.
-2. **[WATCH] bb-squeeze+ LONG** — WR=50.0%, PnL=-0.90% over 4 trades. Monitor next cycle.
-3. **[KEEP] 1 winning combos** — jup_yolo_mirrored. LONG side dominant.
+1. **[WATCH] pump-chain- LONG** — WR=35.7%, PnL=-2.44% over 14 trades. Monitor next cycle.
+2. **[WATCH] continuation+ LONG** — WR=50.0%, PnL=-0.70% over 2 trades. Monitor next cycle.
+3. **[WATCH] jup_yolo_mirrored SHORT** — WR=33.3%, PnL=-0.44% over 3 trades. Monitor next cycle.
+4. **[WATCH] volume-buildup- SHORT** — WR=50.0%, PnL=-0.16% over 2 trades. Monitor next cycle.
+5. **[KEEP] 1 winning combos** — jup_yolo_mirrored. LONG side dominant.
 
 ---
 

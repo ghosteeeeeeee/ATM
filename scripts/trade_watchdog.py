@@ -223,7 +223,8 @@ def collect_open_trades():
                    amount_usdt, signal, _signal_metadata,
                    pnl_usdt, leverage, stop_loss, target,
                    regime, close_time, exit_price,
-                   current_price, mfe_pct, mae_pct
+                   current_price, mfe_pct, mae_pct,
+                   highest_price, lowest_price
             FROM trades
             WHERE close_time IS NULL
               AND (exit_price IS NULL OR exit_price = 0)

@@ -2543,3 +2543,118 @@
 - **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK knife floor: N.N < N`
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor: N.N < N`
+
+## Error Alerts — 2026-11-01 20:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-01 21:06 UTC
+- **[WARN]** (checkpoint_watch): **DUE** `eth-16665-umhold-2103` (due 2026-11-01T21:05:00+00:00): ETH #16665 jup LONG crosses UNIVERSAL_MAX_HOLD 8h at 21:03Z (opened 13:03Z, TAT shadow would-fire since ~11:33Z) — verify UM_HOLD closed it; if still open, exit. Light verify only: UM_HOLD proven working today on HYPE #16662.
+
+## Error Alerts — 2026-11-01 21:36 UTC
+- **[WARN]** (checkpoint_watch): **OVERDUE** `eth-16665-umhold-2103` (due 2026-11-01T21:05:00+00:00): ETH #16665 jup LONG crosses UNIVERSAL_MAX_HOLD 8h at 21:03Z (opened 13:03Z, TAT shadow would-fire since ~11:33Z) — verify UM_HOLD closed it; if still open, exit. Light verify only: UM_HOLD proven working today on HYPE #16662.
+
+## Error Alerts — 2026-11-01 21:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-01 22:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-01 23:41 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+AT, allowing despite TOK filter`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: al=N.N, total_sz=N.N, fill_px=N.N`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3504s left, N failures)`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK hard floor: N.N < N`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3140s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3140s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3084s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3084s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (3025s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3025s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2963s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2963s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2906s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2906s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (2845s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (2845s left, N failures)`
+
+## Error Alerts — 2026-11-01 23:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-02 00:41 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1943s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1943s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1885s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1885s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1824s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1824s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1765s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1765s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1704s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1704s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1643s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1643s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1582s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1582s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1523s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1523s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1462s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1462s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1402s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1402s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1338s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1338s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1281s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1281s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1220s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1220s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1161s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1161s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (1102s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (1102s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (683s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (683s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (615s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (615s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (560s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (560s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (323s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (323s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚫 [TOK-TOK] TOK TOK BLOCKED — TOK in cooldown (261s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (261s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-11-02 00:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-02 01:41 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-11-02 01:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-02 02:41 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-02 02:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-02 03:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-02 04:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-02 05:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-02 06:41 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — [brain.py] ❌ REJECTED: TOK TOK — TOK TOK N.N < knife N (TOK lesson — no bearish overrid`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: [brain.py] ❌ REJECTED: TOK TOK — TOK TOK N.N < knife N (TOK lesson — no bearish override ever)`
+
+## Error Alerts — 2026-11-02 06:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
