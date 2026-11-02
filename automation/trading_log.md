@@ -19881,3 +19881,28 @@ Final set: ['BLUR']
 **Open Questions:**
 - 24h flat-red '-1.06' at exactly 50% WR, 7d '-1.63' — structure: hard_max_loss 11T '-1.52' vs trail+mfe '+1.22'; watchers stand
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 21:47] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** '+$0.08' (WR 100% hour; 24h 40T 52.5% '-$0.83' | 7d 252T 54.4% '-$1.58' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored LONG profit-monster-trail '+0.04'/+1.05%, SOL jup_yolo_mirrored SHORT profit-monster-trail '+0.04'/+1.09%
+- Kill check: no signal n>=3 at 0% WR last hour (2 wins). 24h n>=3 losers: jup_yolo_mirrored 27T 59.3% '-0.42', pump-chain- 4T 25.0% '-0.08' — neither 0%, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h LIKE long/short check). FIL 'pump-chain-' LONG is the sanctioned CONTRARIAN_LIVE scoped fade (CONTRARIAN_LIVE_PREFIXES={'pump-chain-'}, CEO 2026-10-27) — runtime signal direction=SHORT, exec flipped to LONG by design; 14d fade: 23 LONG 9W vs 5 SHORT 1W. Not a bug
+- atr_sl_hit 5/40 = 12.5% (<40%); drag = hard_max_loss 10T '-1.36'; trail 12T '+0.88', mfe 8T '+0.42'
+- Boost HOLD: candidate query (n>=5, WR>55%, net>0.05) returned empty — jup_yolo 59.3% but net '-0.42' fails
+- Neg streak: 20h '-0.19' red then 21h '+0.04' green — streak 0, not 3, no regime/size check
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.301%, 13/21 <0.5%
+- Storm readiness: **window-min -0.18% / at-run +0.05%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 4 (ETH LONG, BTC SHORT, FIL pump-chain- LONG-fade, HYPE SHORT)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-0.83' RED, 7d '-1.58' — structure unchanged: hard_max_loss 10T '-1.36' vs trail+mfe '+1.30'; watchers stand
+- jup_yolo_mirrored 27T 59.3% WR but net '-0.42' — wins small, hard_max_loss losses big; same structure as prior days
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
