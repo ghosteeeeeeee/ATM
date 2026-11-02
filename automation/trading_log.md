@@ -19759,3 +19759,27 @@ Final set: ['BLUR']
 - 24h '-0.53' and 7d '-1.59' RED — structure unchanged: hard_max_loss 10T '-1.34' vs trail+mfe '+1.04'; watchers stand
 - HYPE jup_yolo_mirrored sub-cohort 9T 44.4% '-0.28' — largest drag inside signal (SOL 8T 62.5% 0.00), not a kill candidate
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 16:45] Hourly Analysis
+
+**Trades:** 3 closed (0 wins, 3 losses)
+**PnL:** '-$0.42' (WR 0% hour; 24h 37T 48.6% '-$0.99' | 7d 248T 53.6% '-$2.01' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: all 3 atr_sl_hit — HYPE jup_yolo_mirrored -0.17/-4.13%, BTC continuum+,jup_yolo -0.11/-4.66%, ETH jup_yolo -0.14/-4.24% (cluster of LONG SL hits, not one signal)
+- atr_sl_hit 5/37 = 13.5% 24h (<40% threshold; last-hour 3/3 is a cluster but 24h window governs) — no tpsl_utils alert
+- Kill check: no signal n>=3 at 0% WR last hour (n=1 each). 24h n>=3: jup_yolo_mirrored 23T 52.2% '-0.69', pump-chain- 6T 33.3% '-0.11' — regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- Boost HOLD: jup_yolo_mirrored raw passes n=23/52.2% but net -0.69 and multi-token fails (HYPE 10T 40% -0.45, ETH 3T 33% -0.32, SOL 8T 62.5% 0.00, BTC only positive); pump-chain net negative — no boost
+- Neg streak: 15h -0.35, 16h -0.17 = 2 consecutive (14h +0.02 green) — not 3, no regime/size check
+- Frequency 3/hr — under 20
+- Entry quality: 24h winners avg MAE 0.304%, 13/18 <0.5%
+- Storm readiness: **window-min -0.91% / at-run -0.53%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 2 (HYPE SHORT -0.11%, ETH LONG +0.08%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h dipped below 50% WR (48.6%, '-$0.99') and 7d '-$2.01' — structure still hard_max_loss 9T '-1.25' vs trail+mfe '+0.91'; watchers stand
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
