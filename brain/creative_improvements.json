@@ -10359,5 +10359,32 @@
     "category": "entry sniper",
     "status": "measured-refuted",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-02T17:00:00Z",
+    "idea": "STOP_TIGHTEN probe retune 1.00% -> 0.80% (ENFORCE stays False) — registered as amplify-stop-tighten-probe-080",
+    "rationale": "Read-1 proved the shipped 1.00% cap binds on 0/35 log-joined trades (max adverse 0.864%) so the collector is inert for the rest of its own 14d window. 0.80% is the measured binding region (10/35 join; jup 14d 23/32 losers reach 0.80% exit-move vs 0/49 winners at mae>=0.80).",
+    "expected_impact": "turns 12 dead shadow days into a decidable 11-14 read; zero live effect (ENFORCE=False)",
+    "category": "exit sniper",
+    "status": "proposed",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-02T17:00:00Z",
+    "idea": "GRASS pump-chain- fade cell to n>=60 before any notional decision (measured near-miss)",
+    "rationale": "Only cell in the whole contrarian join clearing BOTH >=70% flip-WR and n>=30 (75.7% n=37, split-half 77.8/73.7 same-sign) — but Fisher p=0.093 vs rest, bootstrap CI [62.2,89.2] includes the 64.6% base, and token heterogeneity chi2 p=0.375 says the split is noise.",
+    "expected_impact": "if it survives to n>=60 with p<0.05, a per-token fade mult becomes eligible; until then NO CHANGE",
+    "category": "amplify",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-02T17:00:00Z",
+    "idea": "REJECTED: jup hot-wallet filter (jup_pnl_7d>=1000) and jup HIGH-vol regime gate",
+    "rationale": "Both looked like the answer to steer-002. hot-wallet 34T 47.1% -1.10 vs 18T 72.2% +0.58 but p=0.141, fk 55.2%, threshold sweep unstable (p>=0.588 at T=500/1500/2000). HIGH-vol block kills 20/49 jup winners (fk 41%).",
+    "expected_impact": "none — logged so neither is re-proposed from the same anecdote",
+    "category": "entry sniper",
+    "status": "measured-refuted",
+    "risk": "none"
   }
 ]

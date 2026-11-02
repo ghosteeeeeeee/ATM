@@ -1,98 +1,218 @@
 {
-  "timestamp": "2026-11-02T04:50:00Z",
-  "run": 217,
+  "timestamp": "2026-11-02T17:00:00Z",
+  "run": 218,
+  "session_lock": "absent (checked /tmp/hermes-session-active.lock — not present)",
   "session_brain_stats": {
-    "queries_run": ["signal performance winrate regime", "new signal idea improvement strategy", "loss money bleeding losing"],
-    "top_hits": ["signal decay - guitar tuning", "exit asymmetry", "trend following signal", "btc expansion filter"],
-    "note": "no new actionable insights beyond standing owned items"
+    "queries": [
+      "jup_yolo_mirrored performance losses",
+      "stop asymmetry jup_yolo entry quality",
+      "signal losing streak wrong side"
+    ],
+    "top_hits": [
+      "copy_trader yolo: HYPE jup_yolo_mirrored accumulating hard_max_loss -4.58% clusters (recurring since 10-31)",
+      "ceo: jup_yolo_mirrored = brand-new auto-mirror family (a34a68bf), 17 LONG fills day one",
+      "stop-asymmetry study delivered: inverted R:R is stop-side, SL at 1.0% price passed bar -> SHIP-TO-SHADOW",
+      "wave_catcher: signals firing in wrong market conditions; hard_max_loss = bad entry not broken signal"
+    ],
+    "note": "session_brain dup-heavy 16th consecutive run (ideation only, not used for decisions)"
   },
   "trade_summary_24h": {
-    "trades": 42,
-    "win_rate": 64.3,
-    "gross_pnl": 0.19,
-    "fee_total": 0.49,
-    "net_pnl": -0.30,
-    "null_fees": 0,
-    "by_signal_loser_clusters": "pc- LONG 12T -0.19 (41.7%), jup SHORT 3T -0.12 (33.3%); winners jup_yolo LONG 13T +0.21 (76.9%), warrior-sr-confirm+ 3T +0.33 (100%)"
-  },
-  "windows": {
-    "7d": {"trades": 245, "wr": 55.5, "gross": -1.15, "net": -3.04, "null_fees": 93, "note": "nulls are pre-#211 fee-stamp history only"},
-    "14d": {"trades": 377, "wr": 51.5, "gross": -1.90, "net": -4.79},
-    "30d": {"trades": 779, "wr": 46.1, "gross": -5.51, "net": -12.13, "null_fees": 295}
-  },
-  "chop_mandate": {
-    "trail_family_7d": "94T 97.9% +5.90",
-    "chop_family_7d": "66T 0.0% -8.53",
-    "trail_family_14d": "146T 94.5% +9.31",
-    "chop_family_14d": "116T 0.0% -13.09",
-    "never_armed_share_of_7d_gross_loss": "86/93 losers, -8.95/-9.37 = 95.5% (13th consecutive window >=92%)",
-    "armed_split_7d": "trail exits 141T 82.3% +6.06 vs other 104T 19.2% -7.21"
-  },
-  "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py adverse-first, selfcheck PASS",
-    "window_48h": {"n": 32, "never_adverse": 9, "recovered": 19, "never_traded_back": 4},
-    "never_list": ["HYPE jup LONG -0.21", "HYPE jup LONG -0.17", "HYPE jup SHORT -0.16", "BABY pc- LONG -0.05"],
-    "verdict": "WRONG-SIDE REFUTED 71st consecutive run (#61 p=0.116, #84 t=-0.04)"
-  },
-  "shadow_analysis": {
-    "contrarian": "join re-ran 04:30Z (mandate): 1004 joinable, overall flip-WR 43.5%; pump-chain- 64.6% n=350 LIVE stands; btc-pump-rider+ 32.3% n=653 do-NOT-flip; hmacd dead n=1",
-    "tat_shadow": "jup/vb TAT would-fires = 7 distinct trades / 15-fire OOS bar (log lines 1940, per-minute re-log cosmetic); bb-bounce TAT shadow 1 distinct; collecting",
-    "floor_admit": "join re-ran 04:33Z: floor_only 49.7% n=1198 vs always_admit 44.9% n=159, blocked n=0; n bar PASS, 30d same-sign not reachable until 2026-10-16+30d -> COLLECT 11-15",
-    "shadow_trader": "gates justified (CONFLUENCE-EXPIRY 14695 @47% would_win, CTX-GATE 1862 @51%); exit A/B trail-or-nothing (pm_trail +7450 vs hard_max -8477); grind-breakout- still #1 source 92.3%",
-    "oscillator": "dead (archived fossil)",
-    "wyckoff": "dead (killed 10-31, join moot)",
-    "rr_shadow": "orphaned (mtime 24d+)",
-    "overall": "4/6 answerable-ish (contrarian, tat, floor, shadow_trader); oscillator/wyckoff/rr dead"
-  },
-  "drift_findings": [],
-  "recurring_problems": [
-    "chop-bleed 13th consecutive >=92% window (95.5%) — entry-quality stack + TAT shadows own it; 0.75x plain-marker stays VETO",
-    "jup/vb unarmed bleed: jup unarmed 29T 17.2% -2.52 / vb- unarmed 18T 5.6% -2.15 (7d) — TAT-90/45 shadows collecting to 15-fire bar"
-  ],
-  "missing_implementations": [
-    "contrarian join has no by-token/by-regime split — amplify-pc-fade-cell-split proposal registered 2026-11-02"
-  ],
-  "creative_improvements": [
-    {"idea": "pc-fade by-token/by-regime cell split (amplify-pc-fade-cell-split)", "status": "proposed", "category": "amplify"},
-    {"idea": "LONG entries meta_rsi>=70 by vol regime — measured REFUTED (HIGH -0.49/20T vs base -3.47/141T = overbought longs not worse than base; no filter)", "status": "measured-refuted", "category": "entry sniper"}
-  ],
-  "config_changes_applied": [],
-  "changes_from_last_run": [
-    {"item": "#216 fee-stamp verify", "result": "PASS — 0 null fees 24h across all exit reasons"},
-    {"item": "#216 TAT shadow ship (#214 flags)", "result": "WORKING — 7 distinct would-fires, per-minute re-log cosmetic only"},
-    {"item": "#216 ETH #16665 UM_HOLD checkpoint", "result": "CLEAR — self-closed 21:04Z at +0.01 via UNIVERSAL_MAX_HOLD; registry already done"},
-    {"item": "chop-bleed streak", "result": "REPRODUCED — 13th window 95.5%"},
-    {"item": "contrarian join freshness", "result": "RE-RAN 04:30Z, pc- 64.6% n=350 stands"}
-  ],
-  "amplify_weekly": {
-    "run": "formal weekly 2026-11-02 (Monday)",
-    "winner_cell_screen_30d": [
-      "pump-chain+ EXTREME LONG 79T +1.49 — VALIDATED",
-      "bb-squeeze+ NORMAL LONG 51T +0.90 — VALIDATED",
-      "pump-chain- NORMAL SHORT 11T +0.58 — why-not (7d sign-flip -0.07, 14d WR 20%)",
-      "volume-buildup- HIGH SHORT 19T +0.42 — VALIDATED",
-      "pump-chain-,pump-chain-v6- EXTREME SHORT 10T +0.30 — why-not (14d -0.19 sign-flip)",
-      "pump-chain- NORMAL LONG 21T +0.12 — why-not (stale, no trades in 14d)"
+    "closed": 37,
+    "wr": 48.6,
+    "pnl_usdt": -0.99,
+    "last20_wr": 30.0,
+    "last20_note": "matches watchdog steer-001 (6W/14L)",
+    "by_signal_top_losers": [
+      "jup_yolo_mirrored LONG 20T 55.0% -0.41",
+      "jup_yolo_mirrored SHORT 5T 40.0% -0.33",
+      "bb-squeeze+ LONG 2T 0% -0.13",
+      "pump-chain- LONG 6T 33.3% -0.11"
     ],
-    "new_proposal": "amplify-pc-fade-cell-split (type a+c) — registered in data/shadow_disposition.json",
-    "why_not_others": "0.0 vol-gate overrides audited (17 cells): all empty or net-negative in PG — no stale override blocking a validated cell; solo-bypass conversion recheck due 10-28: hh-hl+ shadow WR 41.4%, ema300-breakthrough- 50% — both FAIL the 55% bar; mult changes already in flight (1.25 live, 1.50 pending)",
-    "flip_kpi": "0 new shadow->live conversions this run; in-flight watch-contrarian-live (11-03), storm-waiver (11-12)"
+    "d7": {
+      "n": 248,
+      "wr": 53.6,
+      "pnl_usdt": -2.01
+    },
+    "d14": {
+      "n": 384,
+      "wr": 50.5,
+      "pnl_usdt": -2.63
+    },
+    "d7_exits": {
+      "profit-monster-trail": "91T 97.8% +5.06",
+      "ugb_pt": "22T 68.2% +1.38",
+      "atr_sl_hit": "34T 0.0% -3.85",
+      "hard_max_loss": "18T 0.0% -2.62",
+      "cut-loser-CL-T1": "13T 0.0% -1.92"
+    },
+    "d7_armed_vs_unarmed": {
+      "armed_trail_family": "131T 88.5% +7.81",
+      "unarmed": "117T 14.5% -9.82"
+    }
   },
   "watchdog_triage": {
-    "steers": "3 cluster steers (JUP+AVAX+SOL all LONG within 6min) + portfolio-heavy-long — ADVISORY, all bracketed 1.0x, HOLD",
-    "regime": "btc_15m LONG_BIAS / btc_4h SHORT_BIAS / continuum ABOVE (flipped from BELOW ~17h) / vol LOW / wyckoff MARKUP / trend UP",
-    "note": "JUP meta_rsi 73.7 and AVAX 72.0 at entry (overbought LONGs, LOW vol so LONG_HIGH_OVERBOUGHT_BLOCK correctly silent); SOL continuation+ at rsi 21.9"
+    "steer-001": "ANSWERED WITH ZERO CONFIG — 14/20 = last-20 window is 6W/14L; 12 of the 18 24h losers are jup_yolo_mirrored (or continuum+,jup_yolo_mirrored) exiting hard_max_loss/atr_sl_hit at -0.79..-0.92% price (-4.0..-4.7% acct). Root cause = chop entries that never arm (see chop-bleed), not a broken exit. Every jup regime/direction/confidence cell I tested failed significance or fk (see rejected_patterns).",
+    "steer-002": "jup_yolo_mirrored 3-loss streak CONFIRMED but signal-level kill NOT MET: 7d 87T 54.0% -1.13 = 35% of flow, 56% of the 7d loss, born 10-30 (4 days old). Owner = jup-yolo-regime-review (deadline 11-07). Fresh tests this run: regime gate REJECTED (HIGH block kills 20/49 winners, fk 41%), hot-wallet (jup_pnl_7d>=1000) filter REJECTED (p=0.141, fk 55.2%, threshold sweep unstable), rank<=15 filter n=12 <20. NO CHANGE.",
+    "portfolio_health": "critical — 0 open trades, correct (flat) under STRONG_DOWN / SHORT_BIAS / DISTRIBUTION / vol LOW"
   },
+  "chop_bleed": {
+    "d7_dollar_share_pct": 98.6,
+    "d7_chop_losers": 92,
+    "d7_total_losers": 100,
+    "streak": "14th consecutive window >=92%",
+    "mandate": "trail family 131T 88.5% +7.81 vs unarmed 117T 14.5% -9.82 (7d). Every dollar of the 7d loss is a never-armed entry."
+  },
+  "losing_trade_autopsy": {
+    "method": "brain/analysis/recovery_replay.py adverse-first (--selfcheck ASSERT PASS; open-anchored test re-confirmed VACUOUS 163/171=95.3%)",
+    "h48": {
+      "n": 37,
+      "never_adverse": 8,
+      "recovered": 25,
+      "never_traded_back": 4,
+      "NEVER": [
+        "ETH SHORT jup_yolo_mirrored -0.19",
+        "HYPE LONG jup_yolo_mirrored -0.17",
+        "HYPE SHORT jup_yolo_mirrored -0.16",
+        "BABY LONG pump-chain- -0.05"
+      ]
+    },
+    "d14": {
+      "n": 171,
+      "never_adverse": 42,
+      "recovered": 105,
+      "never_traded_back": 24,
+      "structural_pct": 14.0
+    },
+    "verdict": "WRONG-SIDE REFUTED 72nd consecutive run (on corrected + independent evidence: #61 opposite-side p=0.116, #84 forward-return t=-0.04). 3 of 4 48h NEVER are jup hard_max_loss — the unarmed-chop class, owned by the queued exit/arm stack.",
+    "structural_class": "24/171 = 14.0% never recover; owned by re-enter-on-recovery (queued), not by a direction flip"
+  },
+  "shadow_analysis": {
+    "contrarian": "JOIN REFRESHED THIS RUN 16:53Z (mandated, no systemd producer). Overall flip-WR 43.8% n=1011. pump-chain- 64.6% n=350 (LIVE fade), btc-pump-rider+ 32.9% n=662 (do-NOT). By-token/by-BTC-tape sections already shipped (65b23de8 14:55Z). Cell split dispositioned NO CHANGE: GRASS n=37 75.7% clears magnitude bars but Fisher p=0.093/0.119, bootstrap CI [62.2,89.2] includes base, chi2 heterogeneity p=0.375 = uniform.",
+    "oscillator": "FROZEN+ARCHIVED (data/archive/oscillator_shadow.json.fossil-20261027) — no live question answerable, not queried",
+    "wyckoff": "PENDING JOIN, 345 rows, no outcome column — still none",
+    "floor_admit": "join fresh 04:33Z today: floor_only 1198 decided 49.7% vs always_admit 156 decided 44.9%; blocked cohort n=0; COLLECT to 11-15 (directional, p=0.138 at last full read)",
+    "rr_shadow": "rr_shadow_audit_7d.json ORPHANED (no producer, mtime 24d) — not cited",
+    "stop_tighten": "READ-1 DELIVERED THIS RUN — see drift_findings. Collector live since 10-31; 406 log lines, 44 distinct jup ids + 4 vb ids.",
+    "mfe_cut": "5625 [SHADOW] MFE-CUT lines in pipeline.log, firing live (BTC #16700 135m would-fire). KEEP open to 11-10.",
+    "tat_trail_arm": "81 [SHADOW] TRAIL-ARM would-fire lines, last 11-01 01:48. JUP_TRAIL_ARM_TIMEOUT is SHADOW-only (no ENABLED sibling) — variant-C enforcement exists for bb-bounce only.",
+    "shadow_trader_report": "52,765 signals / 51,818 closed. Top source grind-breakout- n=26 WR 92.3% avg +1.56 (live 2T/30d = amplify-grind-breakout-deploy, due 11-14). Gate justification: CONFLUENCE-EXPIRY 14,815 blocked @47%.",
+    "overall": "Useful: contrarian join (refreshed), floor_admit, stop_tighten (now read), shadow_trader, MFE-CUT. Noise/dead: oscillator (archived), wyckoff (no join), rr_shadow (orphaned)."
+  },
+  "drift_findings": [
+    {
+      "id": "D1",
+      "severity": "HIGH",
+      "finding": "STOP_TIGHTEN_MAX_PRICE_PCT=1.00 is INERT — 0/35 log-joined trades reach 1.00% adverse (max 0.864%); the exit system stops these trades at ~0.85% (hard_max_loss/atr_sl). The collector produces zero information for the remaining 12 days of its own 14d window.",
+      "action": "partial read recorded in stop-tighten-enforce-eval; amplify-stop-tighten-probe-080 registered (probe -> 0.80, ENFORCE stays False, needs CEO/T label)"
+    },
+    {
+      "id": "D2",
+      "severity": "MED",
+      "finding": "amplify-pc-fade-cell-split was registered on a STALE premise — the join already emitted by-token/by-BTC-tape (commit 65b23de8, 14:55Z, ~5h after registration)",
+      "action": "dispositioned NO CHANGE with full stats same run; do not re-register"
+    },
+    {
+      "id": "D3",
+      "severity": "MED",
+      "finding": "JUP_TRAIL_ARM_TIMEOUT (variant-C for the #1 signal by flow) is SHADOW-only — JUP_TRAIL_ARM_TIMEOUT_SHADOW=True with no ENABLED sibling, while BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True is enforced. 31% of 7d flow has no arm-timeout backstop.",
+      "action": "report to CEO — enforcement is a CEO label, not an auditor change; evidence: jup 14d atr_sl_hit 15T -1.99 + hard_max_loss 11T -1.68 = -3.67 of the -1.13 net (offset by trail +2.71)"
+    },
+    {
+      "id": "D4",
+      "severity": "LOW",
+      "finding": "CONF-FILTER-SHADOW logs conf=257.42 / final_confidence up to 384.7 (31/244 trades >100) — sig.get('confidence') is None on the standalone path so it falls back to the UNCAPPED composite. Outcome unaffected (any >95 blocks either way) but the log line is unreadable.",
+      "action": "cosmetic; no change"
+    },
+    {
+      "id": "D5",
+      "severity": "LOW",
+      "finding": "session_brain dup-heavy 16th consecutive run",
+      "action": "ideation only, not used"
+    },
+    {
+      "id": "D6",
+      "severity": "INFO",
+      "finding": "entry_regime_4h is NOT a trades.metadata key at all (top keys are btc_regime / coin_regime / btc_trend_quality) — the CURRENT.md queue line 'entry_regime_4h 0/14d' is measuring a non-existent field",
+      "action": "correct the queue line; use _signal_metadata->>'coin_regime' / 'btc_regime'"
+    }
+  ],
+  "rejected_patterns": [
+    {
+      "idea": "jup hot-wallet filter (jup_pnl_7d >= 1000)",
+      "data": "34T 47.1% -1.10 vs 18T 72.2% +0.58",
+      "why_not": "Fisher p=0.141; fk = 16/29 = 55.2% (>20% bar); threshold sweep T=500/1500/2000 all p>=0.588 — unstable. REJECTED-WITH-DATA"
+    },
+    {
+      "idea": "jup regime gate (block LONG in HIGH vol)",
+      "data": "HIGH LONG 36T 55.6% -0.43",
+      "why_not": "fk = 20/49 = 41% of jup winners; NORMAL/EXTREME/FLAT all in-line. REJECTED-WITH-DATA"
+    },
+    {
+      "idea": "jup rank<=15 mirror-only filter",
+      "data": "rank<=15 12T 66.7% -0.09 vs rank>15 70T 52.9% -1.02",
+      "why_not": "n=12 < 20 minimum. MONITOR"
+    },
+    {
+      "idea": "stop-tighten enforce at shipped X=1.00%",
+      "data": "log-joined n=35, delta $0.00/14d",
+      "why_not": "bar +$0.15/30d FAILS; probe inert. KEEP SHADOW"
+    },
+    {
+      "idea": "pump-chain- NORMAL 1.2 boost removal (auto_1hr flag)",
+      "data": "30d NORMAL SHORT 11T +0.58 / LONG 23T +0.09 — net POSITIVE both legs; comment's 64.3% WR justification is stale (now 16-39% WR)",
+      "why_not": "cell is net positive, removing a boost reduces flow on a positive cell; WR decay alone is not a kill bar. MONITOR — re-check at 11-13 pc+ / pc- checkpoint"
+    }
+  ],
+  "creative_improvements": [
+    {
+      "idea": "STOP_TIGHTEN probe retune 1.00 -> 0.80 (shadow-only, zero live effect)",
+      "rationale": "at 1.00 the clamp binds on 0/35 joined trades = an inert collector burning its own eval window; 0.80 is the measured binding region (10/35 join) with 0/49 jup winners at mae>=0.80 vs 23/32 losers at 0.80 exit-move",
+      "expected_impact": "converts 12 dead days of shadow into a decidable read at 11-14",
+      "category": "exit sniper",
+      "status": "registered as amplify-stop-tighten-probe-080",
+      "risk": "low"
+    },
+    {
+      "idea": "GRASS pc- fade cell watch (n 37 -> 60)",
+      "rationale": "only cell anywhere clearing both >=70% flip-WR and n>=30 (75.7%); fails significance today (p=0.093) and global heterogeneity says uniform (p=0.375) — but split-half is same-sign 77.8/73.7",
+      "expected_impact": "if it holds to n>=60 with p<0.05, a per-token fade notional mult becomes eligible",
+      "category": "amplify",
+      "status": "monitor",
+      "risk": "low"
+    }
+  ],
+  "config_changes_applied": [],
+  "config_change_note": "0 trading-constant changes. Every candidate failed the significance/fk/OOS bars (see rejected_patterns). hermes_constants.py untouched; CEO_PROTECTED_FLAGS 13/13; git working tree clean at start of run.",
+  "changes_from_last_run": [
+    {
+      "run": 217,
+      "change": "registered amplify-pc-fade-cell-split (pc-fade by-token/by-regime cell split)",
+      "checked": "JOIN EXTENSION ALREADY EXISTED (65b23de8 14:55Z); ran the ship bar anyway -> NO CELL CLEARS (GRASS p=0.093, chi2 p=0.375). Dispositioned done/NO CHANGE. Proposal closed 14h early with data."
+    },
+    {
+      "run": 217,
+      "change": "REFUTED-WITH-DATA: LONG meta_rsi>=70 by vol",
+      "checked": "still no filter — not re-proposed"
+    },
+    {
+      "run": 216,
+      "change": "closed hype-16662-umhold-1801 checkpoint (UM_HOLD self-close)",
+      "checked": "UM_HOLD backstop still firing (self-closes proven); 6 UNIVERSAL_MAX_HOLD exits in 7d"
+    },
+    {
+      "run": 214,
+      "change": "JUP/VB_TRAIL_ARM_TIMEOUT_SHADOW shipped",
+      "checked": "JUP shadow live (44 distinct ids in stop-tighten log is separate; TAT would-fire 81 lines, last 11-01). VB_TRAIL_ARM_TIMEOUT shadow source match tightened to 'volume-buildup-' — still only 4 distinct ids logged"
+    }
+  ],
   "next_actions": [
-    "TAT jup/vb shadow: collect to 15 distinct fires, then candle OOS (units guard)",
-    "2026-11-03 batch: waiver renewal + eval-midband + esc-17 + ugb-pt-045 + watch-contrarian extend",
-    "2026-11-06 momentum-cache regime coverage (entry_regime_4h still 0/14d stamp)",
-    "2026-11-07 jup regime-split re-measure",
-    "2026-11-09 pc-fade cell-split verdict (amplify-pc-fade-cell-split)",
-    "2026-11-10 winner-cell review + fade-ctx-exempt",
-    "2026-11-13 pc+ weight kill-review checkpoint",
-    "2026-11-14 stop-asymmetry / grind-breakout / atrtrail-clip-12",
-    "2026-11-15 floor_admit 30d same-sign bar",
-    "CEO: tier-2 ACK + TAT-OOS ratify · HYPE 2.0 fee · NET-KPI switch"
+    "11-03 batch: eval-midband-long-4564 (EVAL-OVERDUE default), escalation-17 DISPOSE (auto-close stale if no answer), ugb-pt-045 FLIP/REVERT check, watch-contrarian-live disposition (extend-to-11-10 recommendation stands), waiver renewal",
+    "11-04..11-07: jup-yolo-regime-review verdict (11-07); trial-wider-sl + trial-extended-time defaults fire 11-07 unless CEO overrides",
+    "11-09: weekly AMPLIFY (amplify-pc-fade-cell-split already closed this run — new cell needed)",
+    "11-10: winner-cell-size-125 read (4 cells, pump-chain+ EXTREME drifted), conf-filter-parity-split, mfe-cut-arm-be",
+    "11-13: pump-chain-plus-weight-kill-review 14d checkpoint; pc+ kill-review",
+    "11-14: stop-tighten-enforce-eval full read + amplify-stop-tighten-probe-080 bar; atrtrail-clip-12; amplify-jup-short-walk; amplify-grind-breakout-deploy",
+    "11-15: floor_admit bar",
+    "CEO now: JUP_TRAIL_ARM_TIMEOUT enforce label (D3) — 31% of flow has no arm-timeout backstop while bb-bounce does"
   ]
 }

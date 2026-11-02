@@ -869,3 +869,15 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 34T -0.45 52.9% | 7d 246T -1.85 53.7%
 ### Findings: Worst 7d signal (n>=5): volume-buildup- SHORT 35T -1.22 (WR 57.1 — loss-size issue, not entry); disk 86% WARN repeated; 5 decision items due 11-03 (escalation-17, ugb-pt-045, disposition-cadence-revert, eval-midband, watch-contrarian)
 ### Recommendation: Monitor disk (86%); no trading changes — 11-03 disposition batch will handle due items
+
+## CEO Status — 20261102T184110Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 38T -0.94 50.0% | 7d 247T -1.48 54.3%
+### Findings: Rotating Q (worst signal 7d, n>=5): volume-buildup- SHORT 34T -1.05 58.8% WR and jup_yolo_mirrored LONG 74T -0.99 58.1% — both WR-positive (losses = size/exit asymmetry, not entries); vb- has cleared NO-KILL bars in prior audits, do not re-propose. Disk 86% WARN repeated; 1 open position HOLD.
+### Recommendation: none — disk at 86% worth a cleanup pass in the weekly deep run.
+
+## CEO Status — 20261102T224111Z
+### Health: pipeline=active guardian=active open_pos=4
+### Numbers: 24h 40T -0.86 52.5% | 7d 253T -1.83 54.2%
+### Findings: Worst 7d signal = jup_yolo_mirrored LONG (76T, -1.11, WR 57.9% — PnL-negative at >50% WR = loss-size asymmetry, CEO-domain, owned by 11-07 review); disk 87% WARN in error_alerts; 5 control-tower items due ≤24h (all Nov 3: eval-midband, escalation-17, ugb-pt-045).
+### Recommendation: Watch disk (87%, next alert threshold); Nov-3 batch items already queued — no action this run.

@@ -19906,3 +19906,28 @@ Final set: ['BLUR']
 - 24h '-0.83' RED, 7d '-1.58' — structure unchanged: hard_max_loss 10T '-1.36' vs trail+mfe '+1.30'; watchers stand
 - jup_yolo_mirrored 27T 59.3% WR but net '-0.42' — wins small, hard_max_loss losses big; same structure as prior days
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 22:43] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** '-$0.28' (WR 0% hour; 24h 40T 52.5% '-$0.86' | 7d 253T 54.2% '-$1.83' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: both HYPE jup_yolo_mirrored hard_max_loss (LONG -0.16/-4.02%, SHORT -0.12/-5.21%)
+- Kill check: last-hour jup_yolo_mirrored n=2 at 0% (< n>=3 threshold). 24h n>=3: jup_yolo_mirrored 28T 57.1% '-0.53', pump-chain- 3T 33.3% '0.00' — neither 0% WR, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/40 = 10% 24h (<40%; drag = hard_max_loss 11T '-1.47', trail+mfe '+1.30') — no tpsl_utils alert
+- Boost HOLD: candidate query (n>=5, WR>55%, net>0.05) returned empty — jup_yolo 57.1% but net '-0.53' fails
+- Neg streak: 20h '-0.19', 21h '-0.08', 22h '-0.16' = 3 consecutive red hours — rule says check regime: latest volatility_regime = **HIGH** (not NEUTRAL) → no size reduction; size-reduce file absent (1.0x) is truth
+- Frequency 2/hr — under 20
+- Entry quality: 24h winners avg MAE 0.301%, 13/21 <0.5%
+- Storm readiness: **window-min -0.18% / at-run -0.18%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 4 (SOL LONG -0.38%, FIL pump-chain- LONG-fade +0.94%, BTC SHORT +0.17%, ETH LONG -0.15%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 3h red streak under HIGH regime — watching; if streak extends and regime flips NEUTRAL, consider size cut
+- 24h '-0.86' RED, 7d '-1.83' — structure: hard_max_loss 11T '-1.47' vs trail+mfe '+1.30'
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action

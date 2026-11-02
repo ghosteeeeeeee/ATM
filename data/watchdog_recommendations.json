@@ -1,37 +1,37 @@
 {
-  "timestamp": "2026-11-02T16:11:53.477520+00:00",
+  "timestamp": "2026-11-02T22:41:56.188173+00:00",
   "steers": [
     {
-      "severity": "urgent",
-      "category": "health",
-      "title": "Losing streak: 14/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -1.07 USDT. Something is wrong.",
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: ETH + BTC",
+      "detail": "Both opened within 3 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "health",
-      "title": "Signal 'jup_yolo_mirrored' losing streak: 3 consecutive losses",
-      "detail": "Net -0.76 USDT over last 20 trades (window losses: -1.16). Consider disabling or tuning this signal.",
+      "category": "cluster",
+      "title": "Portfolio heavily long (3 trades)",
+      "detail": "3 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
       "id": "steer-002"
     }
   ],
-  "portfolio_health": "critical",
+  "portfolio_health": "good",
   "regime": {
-    "btc_15m": "NEUTRAL",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "FLAT",
     "volume_regime": "LOW",
-    "linreg_alignment": 1.0,
-    "wyckoff_phase": "DISTRIBUTION",
+    "linreg_alignment": 0.0,
+    "wyckoff_phase": "MARKUP",
     "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 0
+  "open_count": 4
 }
