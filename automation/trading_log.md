@@ -19588,3 +19588,27 @@ Final set: ['BLUR']
 - 24h flat '-0.08' (WR 60.5%) vs 7d '-1.68' — profit engine (trail 14T +0.84) still offset by hard_max_loss 8T -0.98; watchers from prior runs stand
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
 - Sidebar: scripts/hermes_constants.py has uncommitted favorites_updater.py edits (FAVORITES_LONG +ETH, LOSERS +BLUR) — auto-updater output, left untouched
+
+## [2026-11-02 09:45] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** '+$0.18' (WR 100% hour; 24h 34T 61.8% '-$0.06' flat | 7d 248T 54.4% '-$1.50' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 1 close green — HYPE jup_yolo_mirrored LONG profit-monster-trail '+0.18'/+4.25%
+- Kill check: NO signal reached n>=3 last hour (n=1). 24h n>=3 losers: continuation+ 3T 33.3% '-0.16', bb-squeeze+ 3T 33.3% '-0.09', pump-chain- 5T 60.0% '-0.05' — none at 0% WR, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/34 = 5.9% (<40%); dominant close = profit-monster-trail 12T '+$0.83'; drag = hard_max_loss 8T '-$0.98'
+- Boost HOLD: jup_yolo_mirrored passes raw gate (16T 68.8% net '+0.14') but HYPE sub-cohort 8T 50.0% '-0.10' is the largest sub-cohort and negative → fails multi-token consistency. warrior-sr-confirm+ n<5
+- Neg streak broken: 04h/05h/06h red (3) but 07h 0 closes and 08h '+0.18' green → no 3-consecutive red now, regime/size check not triggered. Sizing 1.0x (file absent = truth)
+- Frequency 1/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.267%, 17/21 <0.5%
+- Storm readiness: **window-min -0.33% / at-run -0.33%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 1 (SOL jup_yolo_mirrored LONG -0.52%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h net '-0.06' flat, 7d '-1.50' RED — profit engine (trail 12T +0.83) offset by hard_max_loss 8T -0.98, same structure as prior runs
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
