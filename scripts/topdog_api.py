@@ -55,16 +55,19 @@ PAGE_DST = os.path.join(os.path.dirname(WWW_DATA), 'topdogs.html')
 
 def _f(v, d=0.0):
     try:
-        return float(v)
-    except (TypeError, ValueError):
+        x = float(v)
+    except (TypeError, ValueError, OverflowError):
         return d
+    # reject NaN/inf: they poison tier math, int() conversions (crash), and
+    # json.dump would emit the invalid `NaN` token that JS JSON.parse rejects
+    return x if math.isfinite(x) else d
 
 
 def _usd(raw):
     """positions feed raw units: 6-decimal fixed point (200000000 -> $200).
 
     Accepts str/int/float (the feed has used both str and numeric JSON);
-    bool and anything non-numeric -> None (rendered as '–' downstream).
+    bool and anything non-numeric/non-finite -> None (rendered as '–').
     """
     try:
         if isinstance(raw, bool):
@@ -73,9 +76,11 @@ def _usd(raw):
             val = float(raw)
         else:
             val = float(str(raw).strip())
-        return round(val / 1_000_000.0, 2)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
+    if not math.isfinite(val):
+        return None
+    return round(val / 1_000_000.0, 2)
 
 
 def _pid(p):
@@ -97,10 +102,44 @@ def _load_json(path, default):
 def _atomic_write(path, obj):
     tmp = path + '.tmp'
     with open(tmp, 'w') as f:
-        json.dump(obj, f, default=str)
+        # allow_nan=False: a stray NaN/inf anywhere in the aggregate would
+        # otherwise be serialized as the invalid `NaN` token → the page's
+        # JSON.parse rejects the whole file until the next run overwrites it
+        json.dump(obj, f, default=str, allow_nan=False)
         f.flush()
         os.fsync(f.fileno())
     os.replace(tmp, path)
+
+
+def _sync_page():
+    """Keep the served page byte-identical to web/topdogs.html.
+
+    Nothing else re-copies web/ -> /var/www (the daily commit only commits),
+    and the repo source is mode 600 — a plain `cp` therefore produces a 600
+    served file that nginx (www-data) cannot read -> 403. Best-effort: a
+    page-sync problem must never fail the data run.
+    """
+    try:
+        with open(PAGE_SRC, 'rb') as f:
+            src = f.read()
+        try:
+            with open(PAGE_DST, 'rb') as f:
+                cur = f.read()
+            same_mode = (os.stat(PAGE_DST).st_mode & 0o777) == 0o644
+        except OSError:
+            cur, same_mode = None, False
+        if cur == src and same_mode:
+            return
+        tmp = PAGE_DST + '.tmp'
+        with open(tmp, 'wb') as f:
+            f.write(src)
+            f.flush()
+            os.fsync(f.fileno())
+        os.chmod(tmp, 0o644)
+        os.replace(tmp, PAGE_DST)
+        print(f'[topdog_api] page synced -> {PAGE_DST}')
+    except OSError as e:
+        print(f'[topdog_api] ! page sync failed: {e}', file=sys.stderr)
 
 
 def compute_tier(wallets):
@@ -313,9 +352,14 @@ def main():
             seen[r['pid']] = now
     else:
         for r in rows:
-            if r['pid'] in seen:
-                continue
+            is_new = r['pid'] not in seen
+            # refresh last-seen every cycle: the TTL must measure ABSENCE,
+            # not age-since-first-seen — otherwise a position open >TTL that
+            # misses one feed cycle (fetch blip / empty list) gets pruned
+            # and instantly re-alerts when it reappears with the same id
             seen[r['pid']] = now
+            if not is_new:
+                continue
             owners = owners_ms[(r['market'], r['side'])]
             ev = {
                 'eid': r['pid'], 'ts': now,
@@ -338,6 +382,7 @@ def main():
 
     _atomic_write(OUT, out)
     _atomic_write(STATE_FILE, {'seen': seen, 'events': events})
+    _sync_page()
     print(f"[topdog_api] wallets={len(wallets)} tier={len(tier_set)} "
           f"positions={len(rows)} clusters={len(clusters)} "
           f"new_events={len(new_events)} errors={len(out['errors'])} -> {OUT}")
@@ -345,5 +390,30 @@ def main():
         print(f"[topdog_api] ! {e}")
 
 
+def _fatal_payload(msg):
+    """Full-shape error payload so the page renders 'feed DOWN' + the error
+    instead of freezing on a stale file that still claims api_ok=True."""
+    return {
+        'updated': int(time.time()), 'api_ok': False, 'errors': [msg],
+        'wallets_n': 0, 'tier_n': 0, 'tier_pct': TOPDOG_TIER_PCT,
+        'leaderboard_updated': None,
+        'clusters': [], 'coins': {}, 'tiers': [], 'events': [],
+        'new_events': 0,
+    }
+
+
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        # copy_trader zero-byte lesson: NEVER exit without touching OUT —
+        # a stale topdogs.json keeps showing old numbers as if current
+        msg = f'topdog_api crash: {type(e).__name__}: {e}'
+        traceback.print_exc()
+        print(f'[topdog_api] !! {msg}', file=sys.stderr)
+        try:
+            _atomic_write(OUT, _fatal_payload(msg))
+        except Exception as we:
+            print(f'[topdog_api] !! fallback write failed: {we}',
+                  file=sys.stderr)
+        sys.exit(1)
