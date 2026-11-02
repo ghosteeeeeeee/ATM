@@ -128,3 +128,31 @@ Stops + HML = **22 of 28 losses, −95.8 of −111.3** — both land ≈ −0.8�
 4. **Loss-side 0% WR is not a finding** — HML/atr_sl are loss-only by construction; the levers are size-per-loss (already at $11.1 floor) and *when* we cut = (a)/(c)/(d).
 
 **Bottom line: ratify Q1 as shipped; execute (a) with the four guardrails; (b) no action; defer (c) behind (a); fix (d) jup-scoped shadow-first.**
+
+---
+
+## 8. Execution record (2026-11-02, T: "proceed on CEO-approved fixes")
+
+**(a) JUP HML shadow eval — EXECUTED, verdict REJECT×4 → NO enforcement (pre-registration honored).**
+`analysis/jup_hml_shadow_eval.py` (four guardrails implemented: replay fills via audited `replay_layers` distinct-id / winner-preemption vs loser-savings legs in USD / sign-stability bootstrap + flip count / fees noted delta-neutral):
+
+| stack | -0.65 floor Δ | -0.50 floor Δ | verdict |
+|---|---|---|---|
+| pm + mfe (shipped), n=84 | **−$0.30** (save +$0.48 / preempt −$0.78) | **−$0.42** (+$0.97 / −$1.39) | REJECT / REJECT |
+| pm-only, n=84 | **−$0.27** (+$0.48 / −$0.75) | **−$0.38** (+$0.97 / −$1.35) | REJECT / REJECT |
+
+Winner preemption (5 and 10 winners → non-wins) beats loser savings on both thresholds, both stacks — same failure mode as the 2026-10-31 trades-level check, now confirmed by candle replay. `HARD_MAX_LOSS_PCT`/`CUT_LOSER_PNL` untouched (bug_hunter verified: zero lines in the HML region). Shadow keeps collecting as drift monitor; re-run only if the exit stack changes materially.
+
+**(d) ATR-SL corrected-value shadow — SHIPPED (jup-scoped, zero behavior).**
+- `tpsl_utils.compute_atr_{sl,tp}_pct_norm()` added (originals byte-identical, additive-only verified): input normalized percent→fraction before `_atr_tier`. Proof of bug: ATR 0.5/1.0/1.24/3.0 → shipped path **all 2.50%**; corrected path 1.50/1.50/1.50/2.50% (TP: 1.50–2.00%).
+- `position_manager` `[JUP-SHADOW-ATRSL]` block (after trail-shadow, before HML check): logs once per open jup trade per pipeline minute (fresh subprocess — dedup comment corrected by bug_hunter), direction-aware db levels, logged excepts. **152 lines live, 0 errors** (e.g. #16700 BTC LONG: act_sl 2.50% vs fix_sl 1.50%, db_sl 0.77 = ratcheted stop).
+- Eval on DISTINCT `[JUP-SHADOW-ATRSL]` ids → then OOS → widen (CEO order; system-wide `compute_atr_sl_pct` change NOT made).
+
+**Audit:** bug_hunter **SHIP** (`bad2f4a3` — 3 comment/label patches; REJECT×4 re-reproduced independently). Tree note: the change-set rode into `c556a3c2` when a concurrent task committed `git add -A` mid-audit (content verified == audited).
+
+**Open items for CEO (bug_hunter MEDs, need sign-off, not patched):**
+1. Eval's `min_flips_to_erase` sign-fragility gate is degenerate for net>0 — if a future run comes back net-positive, ENFORCE would fire with only the $0.50 marginal gate active (CI/flip gates inert). Metric direction fix = pre-registration change → CEO.
+2. Eval baseline omits `min()` with ATR-SL floor (inert today: all 84 jup trades are 5x; diverges only if non-5x mirror trades appear).
+- Sideways: `position_manager:3866` ATR-floor HML shadow still bare `except: pass` (the exact swallow class we eliminated elsewhere); `tpsl_utils_debug.py` is an unreferenced divergent copy — cleanup candidates.
+
+**(b) TAT: no action** (already shipped by brain_auditor #214, 90m). **(c) CUT_LOSER −3.00: deferred** behind (a) per CEO — (a) now REJECTs, so tightening stays deferred until the exit stack changes materially.
