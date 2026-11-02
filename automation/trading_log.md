@@ -19564,3 +19564,27 @@ Final set: ['BLUR']
 **Open Questions:**
 - 24h net deepened '-0.17' -> '-0.27'; 7d '-1.69' (was '-1.59'). Single drag: hard_max_loss 9T '-1.15' vs profit-monster-trail 15T '+0.89' — profits engine healthy, losers slightly bigger than winners avg
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 08:43] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (hour n/a; 24h 38T 60.5% '-$0.08' flat | 7d 247T 54.3% '-$1.68' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes. Open: 1 (HYPE jup_yolo_mirrored LONG +0.92%)
+- Kill check: no closes last hour -> no kill. 24h n>=3 losers: continuation+ 3T 33.3% '-0.16', bb-squeeze+ 3T 33.3% '-0.09', pump-chain- 7T 42.9% '-0.08' — none at 0%, regime check not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/38 = 5.3% (<40%); dominant close = profit-monster-trail 14T '+$0.84'; drag = hard_max_loss 8T '-$0.98'
+- Boost HOLD: candidate query (n>=5, WR>55%, net>$0.05) returned empty — jup_yolo_mirrored 16T 68.8% net '-0.01' fails net, warrior-sr-confirm+ 3T 100% '+0.33' fails n>=5
+- Neg streak: 04h/05h/06h red but 07h had 0 closes (streak no forward progress); regime = **SHORT_BIAS** (4h scanner 06:00: 45 short/55 neutral/5 long), not NEUTRAL -> no size action. Sizing 1.0x (file absent = truth)
+- Frequency 0/hr — well under 20/hr
+- Entry quality: 24h winners avg MAE 0.261%, 19/23 <0.5%
+- Storm readiness: **window-min -0.31% / at-run +0.39%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flat '-0.08' (WR 60.5%) vs 7d '-1.68' — profit engine (trail 14T +0.84) still offset by hard_max_loss 8T -0.98; watchers from prior runs stand
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+- Sidebar: scripts/hermes_constants.py has uncommitted favorites_updater.py edits (FAVORITES_LONG +ETH, LOSERS +BLUR) — auto-updater output, left untouched
