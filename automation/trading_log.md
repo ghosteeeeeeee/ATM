@@ -19660,3 +19660,28 @@ Final set: ['BLUR']
 **Open Questions:**
 - 24h '-0.18' and 7d '-1.65' RED — same structure: profit-monster-trail +0.75 vs hard_max_loss -0.97; watchers stand
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-02 12:45] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** '-$0.18' (WR 0% hour; 24h 35T 54.3% '-$0.36' | 7d 248T 53.2% '-$1.82' RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 2 closes red — HYPE jup_yolo_mirrored hard_max_loss '-0.17'/-4.23%, CC pump-chain- trail_arm_timeout '-0.01'/-0.16%
+- Kill check: no signal reached n>=3 last hour (n=1 each). 24h n>=3 losers: jup_yolo_mirrored 17T 58.8% '-0.20', continuation+ 3T 33.3% '-0.16', pump-chain- 6T 33.3% '-0.11', bb-squeeze+ 3T 33.3% '-0.09' — none at 0% WR, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/35 = 5.7% (<40%); dominant close = profit-monster-trail 11T '+0.75'; drag = hard_max_loss 9T '-1.14'
+- Boost HOLD: candidate query (n>=5, WR>55%, net>$0.05) returned empty
+- Neg streak: 10h '-0.11' red, 11h 0 closes (breaks streak), 12h '-0.18' red → not 3 consecutive, no regime/size check
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.283%, 15/19 <0.5%
+- Storm readiness: **window-min -0.30% / at-run -0.17%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- Open: 1 (SOL jup_yolo LONG -0.27%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d '-1.82' deepening (was '-1.65' at 11:42); structure unchanged: profit-monster-trail '+0.75' vs hard_max_loss '-1.14' — watchers stand
+- HYPE jup_yolo_mirrored sub-cohort 8T 37.5% '-0.36' — largest drag inside an otherwise positive signal (SOL +0.12, BTC +0.08), not a kill candidate
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
