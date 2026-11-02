@@ -19341,3 +19341,51 @@ Final set: []
 **Open Questions:**
 - 24h gross '-$0.50' (worse than 21:42's '-$0.25'); fee-NET still negative per brain_auditor — log headlines gross
 - 24h n>=3 losers: pump-chain- 13T 30.8% '-$0.34' — regime-block via volatility_gate_v2 is the policy path, needs CEO
+
+## [2026-11-01 23:43] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** '+$0.04' (WR: 100% last hour; 24h 38T 20W '-$0.49' gross) | 7d 242T 130W '-$1.82' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored LONG mfe_exit '+$0.04'/+1.93%
+- Kill check: no signal with 0% WR n>=3 last hour (24h n>=3 losers: pump-chain- 13T 30.8% '-$0.34' — not 0%; EXTREME regime above bar, NORMAL positive → regime-block path needs CEO)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 7/38 = 18.4% (<40%); dominant close = profit-monster-trail 11T '+$0.66'; drag = hard_max_loss 7T '-$0.95'
+- Boost HOLD: warrior-sr-confirm+ 3T 100% '+$0.33' fails n>=5; jup_yolo_mirrored 12T 58.3% net '-$0.19' fails net>'$0.05'; pump-chain- 30.8% fails WR>55%
+- Neg streak: broken — 23h '+0.04' green after 21h '-0.15', 22h '-0.25' (never reached 3)
+- Frequency 1/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.236%, 18/20 <0.5%
+- Storm readiness: **window-min -0.21% / at-run +0.66%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- 2 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h gross '-$0.49'; fee-NET still negative per brain_auditor — log headlines gross
+- 24h n>=3 losers: pump-chain- 13T 30.8% '-$0.34' — regime-block via volatility_gate_v2 is the policy path, needs CEO
+
+## [2026-11-02 00:45] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** '+$0.10' (WR: 100% last hour; 24h 40T 22W '-$0.39' gross) | 7d 242T 130W '-$1.77' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored LONG profit-monster-trail '+$0.07'/+3.20%, ARB pump-chain- LONG trail_arm_timeout '+$0.03'/+1.54%
+- Kill check: no 0% WR n>=3 last hour (24h n>=3 losers: pump-chain- 14T 35.7% '-$0.31' — not 0%, EXTREME regime path still needs CEO)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 7/40 = 17.5% (<40%); dominant close = profit-monster-trail 12T '+$0.73'; drag = hard_max_loss 7T '-$0.95'
+- Boost HOLD: warrior-sr-confirm+ 3T 100% '+$0.33' fails n>=5 (3 tokens, all green — recheck next hour); jup_yolo_mirrored 13T 61.5% fails net>'$0.05' (net '-$0.12', HYPE 6T 33.3% '-$0.35'); pump-chain- 35.7% fails WR>55%
+- Neg streak: broken — 23h '+0.04', 00h '+0.10' green after 21h '-0.15', 22h '-0.25'
+- Frequency 2/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.217%, 20/22 <0.5%
+- Storm readiness: **window-min -0.27% / at-run -0.27%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- 3 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h gross '-$0.39' but WR 55% — losses concentrated in hard_max_loss '-$0.95' (7T); fee-NET still negative per brain_auditor
+- 24h n>=3 losers: pump-chain- 14T 35.7% '-$0.31' — regime-block via volatility_gate_v2 path needs CEO
