@@ -16,15 +16,11 @@
              border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 0.85em; }
     button:hover { background: #00ff8822; }
     button.on { background: #00ff8833; }
-    /* clusters */
-    .cluster-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
-    .cluster-card { background: #1a1a2e; border-radius: 6px; padding: 10px 16px; min-width: 190px;
-                    border: 1px solid #ffaa0066; position: relative; }
-    .cluster-card.hot { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100% { border-color: #ffaa0066; } 50% { border-color: #ffaa00; } }
-    .cluster-card .cc-title { font-size: 1.25em; font-weight: bold; }
-    .cluster-card .cc-sub { color: #888; font-size: 0.78em; margin-top: 3px; }
-    .cluster-card .cc-labels { color: #bbb; font-size: 0.75em; margin-top: 5px; word-break: break-all; }
+    /* clusters folded into coin boxes */
+    .net-pill { font-size: 0.62em; font-weight: normal; padding: 3px 9px; border-radius: 10px; margin-left: auto; }
+    .net-pill.net-long { background: #00ff8822; color: #00ff88; border: 1px solid #00ff8866; }
+    .net-pill.net-short { background: #ff444422; color: #ff4444; border: 1px solid #ff444466; }
+    .net-pill.net-even { background: #333; color: #999; border: 1px solid #555; }
     /* coin grid */
     .coin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
     .coin-card { background: #14141c; border: 1px solid #222; border-radius: 6px; padding: 12px 14px; }
@@ -81,11 +77,8 @@
     <span class="section-note" style="display:inline; margin-left:8px">toasts + sound + desktop notification on new top-dog positions &amp; cluster formations (page polls every 15s; data refreshes every 60s)</span>
   </div>
 
-  <h2>🔥 Clusters now <span class="section-note" style="display:inline">(same coin+side, 2+ traders)</span></h2>
-  <div class="cluster-row" id="clusters">–</div>
-
-  <h2>🪙 Positions by coin</h2>
-  <div class="section-note">big numbers = <span class="tier-star">top-tier</span> traders (top 10% by pnl+winrate+volume); small = all watched traders (tracked = on our leaderboard list)</div>
+  <h2>🪙 Coin boxes — net bias, clusters, holders</h2>
+  <div class="section-note">one box per coin: <b>net bias</b> = all watched longs − shorts; 🔥 = side has a cluster (2+ traders); big numbers = <span class="tier-star">top-tier</span> traders (top 10% by pnl+winrate+volume), small = all watched (· = on our leaderboard list)</div>
   <div class="coin-grid" id="coins">–</div>
 
   <h2>🏆 Top-tier trader stats <span class="section-note" style="display:inline" id="tierNote"></span></h2>
@@ -189,21 +182,8 @@ function render(d) {
     ` · ${d.wallets_n} tracked wallets · top-tier = ${d.tier_n} (top ${(d.tier_pct*100).toFixed(0)}%)` +
     ` · ${d.clusters.length} cluster(s) · errors: ${d.errors.length ? '<span class="bad">' + d.errors.join('; ') + '</span>' : 'none'}`;
 
-  // clusters
-  const cbox = document.getElementById('clusters');
-  if (!d.clusters.length) { cbox.innerHTML = '<span class="section-note">none right now</span>'; }
-  else {
-    cbox.innerHTML = d.clusters.map(c => {
-      const key = c.market + '|' + c.side;
-      const isNew = freshClusterKeys.has(key);
-      const sideCls = c.side === 'long' ? 'c-long' : 'c-short';
-      return `<div class="cluster-card ${isNew ? 'hot' : ''}">
-        <div class="cc-title ${sideCls}">${c.side.toUpperCase()} ${c.market} ×${c.wallets}</div>
-        <div class="cc-sub">${c.tier_wallets} top-tier · ${c.tracked} tracked · $${fmtUsd(c.notional)} notional</div>
-        <div class="cc-labels">${c.labels.join(' ')}</div>
-      </div>`;
-    }).join('');
-  }
+  // clusters are rendered inside the coin boxes (net-bias design, T 2026-11-01);
+  // formation toasts still key off d.clusters in load().
 
   // coins — majors first, then by headcount
   const names = Object.keys(d.coins);
@@ -218,9 +198,13 @@ function render(d) {
   document.getElementById('coins').innerHTML = names.map(n => {
     const c = d.coins[n];
     const clustered = c.cluster_long || c.cluster_short;
+    const net = c.all_long - c.all_short;
+    const netCls = net > 0 ? 'net-long' : (net < 0 ? 'net-short' : 'net-even');
+    const netTxt = net > 0 ? `NET LONG +${net}` : (net < 0 ? `NET SHORT ${Math.abs(net)}` : 'EVEN');
     const members = (c.members || []).slice().sort((a, b) => (b.tier - a.tier) || (b.tracked - a.tracked) || (b.score || 0) - (a.score || 0));
     return `<div class="coin-card ${clustered ? 'clustered' : ''}">
       <div class="coin-name">${n}
+        <span class="net-pill ${netCls}">${netTxt}</span>
         ${c.cluster_long ? `<span class="cluster-badge">🔥 LONG ×${c.all_long}</span>` : ''}
         ${c.cluster_short ? `<span class="cluster-badge">🔥 SHORT ×${c.all_short}</span>` : ''}
       </div>

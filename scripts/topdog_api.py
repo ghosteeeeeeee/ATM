@@ -31,6 +31,7 @@ import math
 import os
 import sys
 import time
+import traceback
 import urllib.request
 from collections import defaultdict
 
@@ -45,6 +46,11 @@ POSITIONS_URL = "https://jup.ag/yolo/api/watch/positions"
 LEADERBOARD_FILE = os.path.join(HERMES_DATA, 'jup_yolo_leaderboard.json')
 STATE_FILE = os.path.join(HERMES_DATA, 'topdog_state.json')
 OUT = os.path.join(WWW_DATA, 'topdogs.json')
+# served page: repo web/ copy -> /var/www/hermes (nothing else re-copies it;
+# a plain `cp` from web/ yields mode 600 because the source is 600 -> 403)
+PAGE_SRC = os.path.join(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))), 'web', 'topdogs.html')
+PAGE_DST = os.path.join(os.path.dirname(WWW_DATA), 'topdogs.html')
 
 
 def _f(v, d=0.0):
@@ -55,9 +61,19 @@ def _f(v, d=0.0):
 
 
 def _usd(raw):
-    """positions feed raw units: 6-decimal fixed point (200000000 -> $200)."""
+    """positions feed raw units: 6-decimal fixed point (200000000 -> $200).
+
+    Accepts str/int/float (the feed has used both str and numeric JSON);
+    bool and anything non-numeric -> None (rendered as '–' downstream).
+    """
     try:
-        return round(int(str(raw).strip()) / 1_000_000.0, 2)
+        if isinstance(raw, bool):
+            return None
+        if isinstance(raw, (int, float)):
+            val = float(raw)
+        else:
+            val = float(str(raw).strip())
+        return round(val / 1_000_000.0, 2)
     except (TypeError, ValueError):
         return None
 
@@ -98,7 +114,8 @@ def compute_tier(wallets):
     best-first over every eligible wallet.
     """
     eligible = [(a, w) for a, w in wallets.items()
-                if int(w.get('trades') or 0) >= TOPDOG_MIN_TRADES
+                if isinstance(w, dict)
+                and int(_f(w.get('trades'))) >= TOPDOG_MIN_TRADES
                 and w.get('pnl') is not None]
     n = len(eligible)
     if n < 2:
@@ -131,7 +148,17 @@ def main():
 
     # ── wallet stats (10-min leaderboard refresh) ──
     lb = _load_json(LEADERBOARD_FILE, {})
+    if not isinstance(lb, dict):          # valid JSON but wrong shape
+        lb = {}
+        out['errors'].append('leaderboard file is not a JSON object')
     wallets = lb.get('wallets') or {}
+    if not isinstance(wallets, dict):
+        wallets = {}
+        out['errors'].append('leaderboard wallets entry is not a JSON object')
+    bad_w = sum(1 for v in wallets.values() if not isinstance(v, dict))
+    if bad_w:
+        out['errors'].append(f'leaderboard: {bad_w} non-object wallet entries dropped')
+        wallets = {k: v for k, v in wallets.items() if isinstance(v, dict)}
     if not wallets:
         out['errors'].append('leaderboard file missing/empty')
     tier_set, ranked = compute_tier(wallets)
@@ -163,13 +190,19 @@ def main():
             if not (isinstance(owner, str) and isinstance(market, str)
                     and side in ('long', 'short') and owner and market):
                 continue
+            executed_at = int(_f(p.get('executedAt')))
+            market_u = market.upper()
+            # id-less row: synthetic key so it still counts for clusters but
+            # can never collide on the shared '' key (would swallow events
+            # for every other id-less position in the feed)
+            pid = _pid(p) or f'noid:{owner}:{market_u}:{side}:{executed_at}'
             rows.append({
-                'owner': owner, 'market': market.upper(), 'side': side,
-                'pid': _pid(p),
+                'owner': owner, 'market': market_u, 'side': side,
+                'pid': pid,
                 'leverage': int(_f(p.get('leverage'))),
                 'margin': _usd(p.get('margin')),
                 'notional': _usd(p.get('notional')),
-                'executed_at': int(_f(p.get('executedAt'))),
+                'executed_at': executed_at,
             })
         except Exception as re_:
             out['errors'].append(f'row parse: {type(re_).__name__}: {re_}')
@@ -235,7 +268,6 @@ def main():
 
     # ── tier table ──
     tiers = []
-    score_by_addr = {addr: round(score, 3) for score, addr, _ in ranked}
     for score, addr, w in ranked:
         if addr not in tier_set:
             continue
@@ -255,11 +287,21 @@ def main():
 
     # ── events: new position ids since last run ──
     state = _load_json(STATE_FILE, None)
+    if state is not None and not isinstance(state, dict):
+        # valid JSON but wrong shape (partial/corrupt state) — reseeds
+        # silently instead of crashing every subsequent run
+        out['errors'].append('state file has unexpected shape — reseeding')
+        state = None
     first_run = state is None
     if first_run:
         state = {'seen': {}, 'events': []}
-    seen = state.get('seen') or {}
-    events = state.get('events') or []
+    seen = state.get('seen')
+    if not isinstance(seen, dict):
+        seen = {}
+    events = state.get('events')
+    if not isinstance(events, list):
+        events = []
+    events = [e for e in events if isinstance(e, dict) and 'eid' in e]
     # prune seen entries whose position vanished long ago (> TTL)
     live_pids = {r['pid'] for r in rows}
     seen = {k: v for k, v in seen.items()

@@ -975,6 +975,33 @@ def compute_atr_tp_pct(atr_pct: float) -> float:
     return max(ATR_TP_MIN, min(ATR_TP_MAX, eff))
 
 
+# ── CORRECTED variants (CEO verdict 2026-11-02, item (d)) ─────────────────────
+# Same math as above but normalizes the PERCENT input (volatility_gate
+# get_atr_pct returns ×100, e.g. 1.24) to the FRACTION the _atr_tier
+# thresholds expect (ATR_PCT_LOW/HIGH_THRESH = 0.01 / 0.015).
+# WHY: the un-normalized path compares 1.24 against 0.015 → always HIGH tier
+# → k*atr >= cap → every realistic ATR clamps to ATR_SL_MAX — the "ATR SL" is
+# a de-facto constant 2.50% (verified by execution 2026-11-01: ATR
+# 0.5/1.0/1.24/3.0 → all 0.025). SHADOW-ONLY until the jup-scoped eval passes:
+# do NOT change compute_atr_sl_pct/compute_atr_tp_pct themselves (system-wide
+# blast radius — every signal's stop moves). Order: jup shadow → OOS → widen.
+
+def compute_atr_sl_pct_norm(atr_pct: float) -> float:
+    """Corrected effective SL % — input is PERCENT (get_atr_pct units)."""
+    a = (atr_pct or 0) / 100.0
+    if a <= 0:
+        return ATR_SL_MIN
+    return max(ATR_SL_MIN, min(ATR_SL_MAX, _atr_tier(a) * a))
+
+
+def compute_atr_tp_pct_norm(atr_pct: float) -> float:
+    """Corrected effective TP % — input is PERCENT (get_atr_pct units)."""
+    a = (atr_pct or 0) / 100.0
+    if a <= 0:
+        return ATR_TP_MIN
+    return max(ATR_TP_MIN, min(ATR_TP_MAX, _atr_tier(a) * a * ATR_TP_K_MULT))
+
+
 def compute_fallback_sl(current_price: float, direction: str) -> float:
     """
     Fallback SL when ATR is unavailable.

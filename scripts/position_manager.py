@@ -125,6 +125,7 @@ from hermes_constants import (
     VB_TRAIL_ARM_TIMEOUT_SHADOW, VB_TRAIL_ARM_TIMEOUT_MIN,
     MFE_CUT_SHADOW_ENABLED, MFE_CUT_SHADOW_MIN, MFE_CUT_SHADOW_MFE_MAX,
     MFE_EXIT_ENABLED, MFE_EXIT_GIVEBACK_PCT, MFE_EXIT_ARM_PCT, MFE_EXIT_SIGNALS,
+    JUP_YOLO_ATRSL_SHADOW_ENABLED,
     PM_TRAIL_ACTIVATE_PCT,
     ARM_BE_SHADOW_ENABLED,
 )
@@ -153,6 +154,7 @@ MAX_POSITIONS = MAX_OPEN_POSITIONS
 _bb_bounce_shadow_logged = set()
 _bb_bounce_tat_enforced = set()
 _jup_tat_shadow_logged = set()   # trade_ids logged for jup/vb- TAT shadow (dedup per process)
+_jup_atrsl_shadow_logged = set() # trade_ids logged for the ATR-SL corrected-value shadow (dedup per process)
 _mfe_cut_shadow_logged = set()
 _hml_shadow_logged = set()     # trade_ids that have logged an HML-SHADOW line
 _arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire (dedup per process; analysis joins by trade_id)
@@ -3946,6 +3948,49 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             # NEVER bare-pass a shadow again — this exact swallow hid the
             # NameError above for a full day-equivalent of passes.
             log(f"  [JUP-SHADOW-TRAIL] error for {token}: {type(_jts_e).__name__}: {_jts_e}")
+
+        # ── ATR-SL CORRECTED-VALUE SHADOW (CEO 2026-11-02, item (d)) ──────────
+        # Log what the ATR SL/TP WOULD be with input normalized to fraction
+        # (tpsl_utils.compute_atr_*_pct_norm) vs the shipped constant path —
+        # jup-scoped, ZERO behavior change. The actual fix ships only after
+        # jup shadow → OOS → widen (CEO: not system-wide this week — every
+        # signal's stop moves). Once per trade: levels are placed at entry,
+        # first poll ≈ placement (pre-ratchet, so db levels = initial ATR SL).
+        if (JUP_YOLO_ATRSL_SHADOW_ENABLED and trade_id not in _jup_atrsl_shadow_logged
+                and 'jup_yolo' in (_pos_signal or '').lower()):
+            try:
+                from volatility_gate_v2 import get_atr_pct as _asl_get
+                from tpsl_utils import (compute_atr_sl_pct as _asl_act_sl,
+                                        compute_atr_tp_pct as _asl_act_tp,
+                                        compute_atr_sl_pct_norm as _asl_fix_sl,
+                                        compute_atr_tp_pct_norm as _asl_fix_tp)
+                _asl_a = _asl_get(token)
+                _asl_en = float(pos.get('entry_price') or 0) or 0
+                _asl_sl = float(pos.get('stop_loss') or 0) or 0
+                _asl_tp = float(pos.get('target') or 0) or 0
+                if _asl_a and _asl_a > 0 and _asl_en > 0:
+                    # stored levels as direction-aware price-% from entry
+                    if direction == 'LONG':
+                        _asl_db_sl = ((_asl_en - _asl_sl) / _asl_en * 100
+                                      if _asl_sl > 0 else None)
+                        _asl_db_tp = ((_asl_tp - _asl_en) / _asl_en * 100
+                                      if _asl_tp > 0 else None)
+                    else:
+                        _asl_db_sl = ((_asl_sl - _asl_en) / _asl_en * 100
+                                      if _asl_sl > 0 else None)
+                        _asl_db_tp = ((_asl_en - _asl_tp) / _asl_en * 100
+                                      if _asl_tp > 0 else None)
+                    _jup_atrsl_shadow_logged.add(trade_id)
+                    log(f"  [JUP-SHADOW-ATRSL] id={trade_id} {token} {direction} "
+                        f"atr={_asl_a:.3f}% act_sl={_asl_act_sl(_asl_a) * 100:.2f}% "
+                        f"fix_sl={_asl_fix_sl(_asl_a) * 100:.2f}% "
+                        f"act_tp={_asl_act_tp(_asl_a) * 100:.2f}% "
+                        f"fix_tp={_asl_fix_tp(_asl_a) * 100:.2f}% "
+                        f"db_sl={None if _asl_db_sl is None else round(_asl_db_sl, 2)} "
+                        f"db_tp={None if _asl_db_tp is None else round(_asl_db_tp, 2)}")
+            except Exception as _asl_e:
+                # logged, never swallowed — same rule as the JUP shadows
+                log(f"  [JUP-SHADOW-ATRSL] error for {token}: {type(_asl_e).__name__}: {_asl_e}")
 
         if live_pnl <= HARD_MAX_LOSS_PCT:
             # P0: canonical label 'hard_max_loss' — pnl detail moved to exit_detail.

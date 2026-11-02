@@ -248,26 +248,31 @@ def get_all_active_traders() -> list:
 
 BULK_SCAN_FILE = os.path.join(HERMES_DATA, 'hl_copy_bulk_scan.json')
 BULK_SCAN_INTERVAL = 300  # 5 minutes
-BULK_SCAN_DELAY = 1.0  # 1s between API calls (reduced from 0.5s to avoid 429s)
 
 
 def bulk_scan_all_traders() -> dict:
-    """Bulk scan ALL traders with rate limiting — runs every 5 minutes.
+    """Bulk-scan a BOUNDED batch of active traders (round-robin cursor).
 
-    Uses 0.5s delay between API calls to stay within HL rate limits.
-    268 traders × 2 calls × 0.5s = ~268s (~4.5 min) — fits in 5 min window.
+    CEO verdict-3 pacing fix (2026-11-02): was ALL traders × 2 /info × the
+    2s GLOBAL info_rate gate ≈ 89min/cycle → capped at
+    HL_COPY_BULK_SCAN_MAX_PER_CYCLE per run (~4min), one userFills call per
+    trader (positions fetch dropped — file has zero consumers), no extra
+    sleep (the gate paces). Full coverage every ceil(N/M) batches.
 
-    Returns: {wallet: {fills: [...], positions: [...], last_scan: timestamp}}
+    Returns merged {wallet: {score, recent_fills, positions}} + _meta
+    {last_scan, errors, cursor, trader_count, batch_size}.
     """
     # Check if we scanned recently
     try:
         if os.path.exists(BULK_SCAN_FILE):
             with open(BULK_SCAN_FILE) as f:
                 cached = json.load(f)
+            if not isinstance(cached, dict):  # bug_hunter LOW: valid-but-not-object JSON
+                raise ValueError('bulk scan file is not an object')
             last_scan = cached.get('_meta', {}).get('last_scan', 0)
             if time.time() - last_scan < BULK_SCAN_INTERVAL:
                 return cached  # skip — scanned recently
-    except (json.JSONDecodeError, OSError):
+    except (json.JSONDecodeError, OSError, ValueError, AttributeError, TypeError):
         cached = {}
 
     all_traders = get_all_active_traders()
@@ -294,15 +299,27 @@ def bulk_scan_all_traders() -> dict:
             cursor = int(_pc.get('_meta', {}).get('cursor', 0) or 0)
     except (json.JSONDecodeError, OSError, TypeError, ValueError):
         prev, cursor = {}, 0
-    if cursor >= len(all_traders):
-        cursor = 0  # wrap → full coverage over ceil(N/_MAX) cycles
-    batch = all_traders[cursor:cursor + _MAX]
-    new_cursor = (cursor + _MAX) % max(len(all_traders), 1)
+    N = len(all_traders)
+    if N == 0:
+        return prev if prev else {'_meta': {'last_scan': time.time(), 'errors': 0,
+                                            'cursor': 0, 'trader_count': 0,
+                                            'batch_size': 0}}
+    cursor = cursor % N
+    # FIX (bug_hunter MEDIUM): CYCLIC window — the old truncated slice
+    # (all_traders[cursor:cursor+_MAX]) ran off the array end, jumped the
+    # cursor BACKWARD, and left [0, tail) wallets to rescan only when
+    # cursor==0 → worst gap N/gcd(N,M) batches (N=1346 → 673 ≈ 2.3 days).
+    # Cyclic indices give max gap = ceil(N/M) exactly (their simulation).
+    batch = [all_traders[(cursor + j) % N] for j in range(min(_MAX, N))]
+    new_cursor = (cursor + _MAX) % N
 
     print(f"[bulk_scan] Scanning batch {len(batch)}/{len(all_traders)} "
-          f"traders (offset {cursor}, gate-paced ~{len(batch)*2*2}s max)...")
+          f"traders (offset {cursor}, gate-paced ~{len(batch)*2}s max)...")
 
-    result = dict(prev)
+    # prune wallets that left the active set (bug_hunter LOW: dict(prev)
+    # accumulation was unbounded); scanned batch re-adds its own
+    _active_set = {t['wallet'] for t in all_traders}
+    result = {k: v for k, v in prev.items() if k in _active_set}
     errors = 0
 
     for i, trader in enumerate(batch):

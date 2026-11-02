@@ -4254,6 +4254,29 @@ JUP_YOLO_HML_SHADOW_THRESHOLDS = (-0.65, -0.50)  # price-% would-fire marks
 JUP_YOLO_TRAIL_SHADOW_ARM_ATR_MULT = 1.0  # counterfactual arm = 1.0×ATR
 JUP_YOLO_TRAIL_SHADOW_DIST_ATR_MULT = 1.0  # counterfactual distance = 1.0×ATR
 JUP_YOLO_SHADOW_EVAL_N = 40                # pre-registered eval window
+# EVAL RESULT (executed 2026-11-02 by analysis/jup_hml_shadow_eval.py, CEO
+# consult item (a), four guardrails: replay fills via audited replay_layers /
+# winner-preemption counted / sign-stability / fees in): BOTH thresholds
+# REJECT — on the current pm+mfe stack AND the pm-only stack. -0.65: loser
+# savings +$0.47 vs winner preemption -$0.78 → net -$0.31 (5 winners →
+# non-wins); -0.50: +$0.94 vs -$1.39 → net -$0.45 (10 preempted). Bootstrap
+# CI straddles 0; erasing the net needs 0 dip-events (need >=3). Same
+# failure mode as the 2026-10-31 trades-level check (+0.69/-0.79) — now
+# confirmed by candle replay on n=83/84. PRE-REGISTRATION HONORED: NO
+# enforcement. Shadow keeps collecting as drift monitor; re-run only if the
+# exit stack changes materially. data/jup_hml_shadow_eval{,_pm_only}.json
+JUP_YOLO_ATRSL_SHADOW_ENABLED = True  # (d) ATR-SL corrected-value shadow. Revert: set False.
+# ── ATR-SL CORRECTED-VALUE SHADOW (CEO verdict 2026-11-02, item (d)) ─────────
+# Root cause (verified by execution 2026-11-01): get_atr_pct returns PERCENT
+# but _atr_tier thresholds are FRACTIONS (ATR_PCT_LOW/HIGH = 0.01/0.015) →
+# every realistic ATR takes the HIGH tier → k*atr ≥ cap → compute_atr_sl_pct
+# returns ATR_SL_MAX (2.50%) for ATR 0.5/1.0/1.24/3.0 alike — the "ATR SL" is
+# a de-facto constant SYSTEM-WIDE. Corrected math lives in
+# tpsl_utils.compute_atr_{sl,tp}_pct_norm (input normalized to fraction).
+# CEO order: one-line fix exists but ship JUP-SCOPED SHADOW FIRST → OOS →
+# widen; do NOT change compute_atr_sl_pct itself yet (every signal's stop
+# moves). Shadow logs once per trade: actual vs corrected SL/TP — eval on
+# DISTINCT id of `[JUP-SHADOW-ATRSL]` lines.
 
 # ── JUP exit simulation (T 2026-10-31: "pm-trail vs rr-exits vs atr-sl") ─────
 # Replay closed mirror trades on 5m OHLC: which exit style suits pro moves?

@@ -82,13 +82,18 @@ class FileLock:
                 # real errors. First wait per lock per process prints; after
                 # that at most once per 60s with a cumulative wait time.
                 _wait_start = time.time()
+                if not hasattr(self, '_lw_started'):
+                    self._lw_started = _wait_start  # first wait of this acquisition
                 time.sleep(self.interval)
                 _lw = getattr(self, '_lw_last', None)
                 _now = time.time()
                 if _lw is None or (_now - _lw) >= 60.0:
                     self._lw_last = _now
-                    _held = getattr(self, '_lw_total', 0.0) + (time.time() - _wait_start)
-                    self._lw_total = _held
+                    # FIX (bug_hunter LOW-MED): old 'cumulative' added only the
+                    # last retry's interval → reported #prints × interval
+                    # (measured 2.0s after 61.5s real; live showed '0.1s total'
+                    # forever). Now: elapsed since FIRST wait of this acquisition.
+                    _held = _now - self._lw_started
                     print(f'  [LOCK-WAIT] {self.lockname}: waited {_held:.1f}s total, retrying (throttled: 1 line/60s)', file=_sys.stderr, flush=True)
 
     def __exit__(self, *args):
