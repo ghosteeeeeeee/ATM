@@ -191,7 +191,9 @@ function render(d) {
     `<span class="${feedCls}">● feed ${feedTxt}</span>` +
     ` · data updated ${age}s ago <span class="${ageCls}">(${ageCls})</span>` +
     ` · ${d.wallets_n} tracked wallets · top-tier = ${d.tier_n} (top ${(d.tier_pct*100).toFixed(0)}%)` +
-    ` · ${d.clusters.length} cluster(s) · errors: ${d.errors.length ? '<span class="bad">' + d.errors.map(esc).join('; ') + '</span>' : 'none'}`;
+    ` · ${d.clusters.length} cluster(s)` +
+    (d.dust_filtered ? ` · dust &lt;$${d.min_margin_usd ?? '?'} filtered: ${d.dust_filtered}` : '') +
+    ` · errors: ${d.errors.length ? '<span class="bad">' + d.errors.map(esc).join('; ') + '</span>' : 'none'}`;
 
   // clusters are rendered inside the coin boxes (net-bias design, T 2026-11-01);
   // formation toasts still key off d.clusters in load().

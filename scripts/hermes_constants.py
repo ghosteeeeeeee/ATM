@@ -4221,6 +4221,14 @@ JUP_YOLO_CLUSTER_MAX_BONUS = 15        # cap (matches HL_COPY cap — prevents o
 # wallets with >= TOPDOG_MIN_TRADES trades.
 TOPDOG_TIER_PCT = 0.10         # focus on the top 10% (T: "top 5-10%")
 TOPDOG_MIN_TRADES = 10         # trades needed to qualify for the tier
+TOPDOG_MIN_MARGIN_USD = 50.0   # live-feed noise floor (T 2026-11-02, custom
+                               # "$50+ margin" after seeing the event feed):
+                               # drops sub-$50-margin dust positions from
+                               # counts/clusters/events/tier-holdings. Feed
+                               # margins run $5-250 — at $50 only the whales
+                               # (~4-8 of ~75) survive; raise/lower freely.
+                               # Unparseable margin keeps (fail-open — never
+                               # hide data we couldn't measure).
 TOPDOG_CLUSTER_MIN = 2         # unique tracked wallets per coin+side = cluster
 TOPDOG_EVENT_RETAIN = 500      # new-position events kept in topdogs.json
                                 # (feed churns 20+/min — 200 rotated in ~7min)

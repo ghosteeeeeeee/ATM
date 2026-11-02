@@ -39,7 +39,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA, WWW_DATA
 from hermes_constants import (
     TOPDOG_TIER_PCT, TOPDOG_MIN_TRADES, TOPDOG_CLUSTER_MIN,
-    TOPDOG_EVENT_RETAIN, TOPDOG_STATE_TTL_SEC,
+    TOPDOG_EVENT_RETAIN, TOPDOG_STATE_TTL_SEC, TOPDOG_MIN_MARGIN_USD,
 )
 
 POSITIONS_URL = "https://jup.ag/yolo/api/watch/positions"
@@ -221,6 +221,7 @@ def main():
 
     # parse feed rows (one bad record must not kill the cycle — monitor rule)
     rows = []
+    dust = 0
     for p in positions:
         try:
             owner = p.get('owner', '')
@@ -235,16 +236,25 @@ def main():
             # can never collide on the shared '' key (would swallow events
             # for every other id-less position in the feed)
             pid = _pid(p) or f'noid:{owner}:{market_u}:{side}:{executed_at}'
+            margin = _usd(p.get('margin'))
+            # $50 noise floor (T 2026-11-02): dust leaves counts/clusters/
+            # events/tier-holdings; unparseable margin keeps (fail-open —
+            # never hide data we couldn't measure)
+            if margin is not None and margin < TOPDOG_MIN_MARGIN_USD:
+                dust += 1
+                continue
             rows.append({
                 'owner': owner, 'market': market_u, 'side': side,
                 'pid': pid,
                 'leverage': int(_f(p.get('leverage'))),
-                'margin': _usd(p.get('margin')),
+                'margin': margin,
                 'notional': _usd(p.get('notional')),
                 'executed_at': executed_at,
             })
         except Exception as re_:
             out['errors'].append(f'row parse: {type(re_).__name__}: {re_}')
+    out['dust_filtered'] = dust
+    out['min_margin_usd'] = TOPDOG_MIN_MARGIN_USD
 
     # unique traders per (market, side) — cluster basis, UNIQUE wallets
     owners_ms = defaultdict(set)
@@ -377,6 +387,11 @@ def main():
     if new_events:
         events = new_events + events
         events = events[:TOPDOG_EVENT_RETAIN]
+    # retro-clean pre-$50 dust from the feed + state history (parse filter
+    # only covers new events; this clears the backlog the moment the floor ships)
+    events = [e for e in events
+              if e.get('margin') is None
+              or float(e.get('margin')) >= TOPDOG_MIN_MARGIN_USD]
     out['events'] = events
     out['new_events'] = len(new_events)
 
