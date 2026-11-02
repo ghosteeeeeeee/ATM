@@ -4265,6 +4265,9 @@ JUP_YOLO_SHADOW_EVAL_N = 40                # pre-registered eval window
 # confirmed by candle replay on n=83/84. PRE-REGISTRATION HONORED: NO
 # enforcement. Shadow keeps collecting as drift monitor; re-run only if the
 # exit stack changes materially. data/jup_hml_shadow_eval{,_pm_only}.json
+# bug_hunter re-run 2026-11-02 (after trade 16703 closed 15:11): verdicts
+# REJECT×4 reproduce; cents drift to -$0.30/-$0.42 (pm+mfe, n=84) and
+# -$0.27/-$0.38 (pm-only) as new trades + 5m bars land — verdict is stable.
 JUP_YOLO_ATRSL_SHADOW_ENABLED = True  # (d) ATR-SL corrected-value shadow. Revert: set False.
 # ── ATR-SL CORRECTED-VALUE SHADOW (CEO verdict 2026-11-02, item (d)) ─────────
 # Root cause (verified by execution 2026-11-01): get_atr_pct returns PERCENT
@@ -4275,8 +4278,11 @@ JUP_YOLO_ATRSL_SHADOW_ENABLED = True  # (d) ATR-SL corrected-value shadow. Rever
 # tpsl_utils.compute_atr_{sl,tp}_pct_norm (input normalized to fraction).
 # CEO order: one-line fix exists but ship JUP-SCOPED SHADOW FIRST → OOS →
 # widen; do NOT change compute_atr_sl_pct itself yet (every signal's stop
-# moves). Shadow logs once per trade: actual vs corrected SL/TP — eval on
-# DISTINCT id of `[JUP-SHADOW-ATRSL]` lines.
+# moves). Shadow logs ONE LINE PER OPEN JUP TRADE PER MINUTE (position_manager
+# is a fresh process each pipeline minute — per-process dedup set resets;
+# bug_hunter comment fix 2026-11-02, was "once per trade"): actual vs
+# corrected SL/TP — eval on DISTINCT id of `[JUP-SHADOW-ATRSL]` lines,
+# FIRST line per id.
 
 # ── JUP exit simulation (T 2026-10-31: "pm-trail vs rr-exits vs atr-sl") ─────
 # Replay closed mirror trades on 5m OHLC: which exit style suits pro moves?

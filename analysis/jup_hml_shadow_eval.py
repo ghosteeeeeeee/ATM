@@ -51,9 +51,9 @@ def main():
     # the pre-registration predates mfe-exit; REJECT on BOTH stacks is the
     # only result that closes the question cleanly.
     pm_only = '--pm-only' in sys.argv
+    stack_label = 'pm-trail only' if pm_only else 'pm-trail + mfe(0.40)'
     trades = jes.load_trades()
-    print(f"closed mirror trades: {len(trades)}  "
-          f"stack: {'pm-trail only' if pm_only else 'pm-trail + mfe(0.40)'}")
+    print(f"closed mirror trades: {len(trades)}  stack: {stack_label}")
 
     sl_pct = compute_atr_sl_pct(1.0)
     tp_pct = compute_atr_tp_pct(1.0)
@@ -138,7 +138,9 @@ def main():
     base_win = sum(1 for r in rows if r['base'] > 0.05)
     base_net = sum(r['base'] for r in rows)
     base_usd = sum(r['base_usd'] for r in rows)
-    print(f"\nbaseline (CUT_LOSER {CUT_LOSER_PNL}/lev, stack pm+mfe): "
+    # bug_hunter 2026-11-02: label was hardcoded 'pm+mfe' — mislabeled the
+    # baseline stack in --pm-only output. Reuse the same label as the header.
+    print(f"\nbaseline (CUT_LOSER {CUT_LOSER_PNL}/lev, stack {stack_label}): "
           f"net={base_net:+.2f} lev% = ${base_usd:+.2f}  wins={base_win}/{n}")
 
     verdicts = {}

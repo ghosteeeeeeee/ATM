@@ -3952,10 +3952,16 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # ── ATR-SL CORRECTED-VALUE SHADOW (CEO 2026-11-02, item (d)) ──────────
         # Log what the ATR SL/TP WOULD be with input normalized to fraction
         # (tpsl_utils.compute_atr_*_pct_norm) vs the shipped constant path —
-        # jup-scoped, ZERO behavior change. The actual fix ships only after
-        # jup shadow → OOS → widen (CEO: not system-wide this week — every
-        # signal's stop moves). Once per trade: levels are placed at entry,
-        # first poll ≈ placement (pre-ratchet, so db levels = initial ATR SL).
+        # jup-scoped, ZERO behavior change (read + log only; no close, no DB
+        # write, no continue — the HARD_MAX_LOSS_PCT check below always runs).
+        # The actual fix ships only after jup shadow → OOS → widen (CEO: not
+        # system-wide this week — every signal's stop moves).
+        # DEDUP IS PER-PROCESS ONLY (bug_hunter 2026-11-02 comment fix — the
+        # old "once per trade" wording was wrong): position_manager is a fresh
+        # subprocess every pipeline minute, so _jup_atrsl_shadow_logged resets
+        # and this logs ONE LINE PER OPEN JUP TRADE PER MINUTE — same basis as
+        # [JUP-SHADOW-HML]. Eval must DISTINCT on trade_id; take the FIRST line
+        # per id (≈ placement: pre-ratchet, db levels = initial ATR SL).
         if (JUP_YOLO_ATRSL_SHADOW_ENABLED and trade_id not in _jup_atrsl_shadow_logged
                 and 'jup_yolo' in (_pos_signal or '').lower()):
             try:
