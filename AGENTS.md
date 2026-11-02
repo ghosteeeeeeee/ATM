@@ -264,6 +264,7 @@ All dashboards served by nginx on port 54321.
 | Top Dogs | `/topdogs.html` | `topdogs.json` (topdog_api.py) | 60s (page polls 15s) |
 | Coin Tracker | `/coin_tracker.html` | `coin_tracker_data.json` | 5min |
 | Pump Flow | `/pump_flow.html` | `pump_flow_data.json` | 2min |
+| Control Tower | `/control_tower.html` | `control_tower.json` (control_tower_api.py) | 60s API (page polls 30s) |
 
 **File locations:**
 - HTML: `/root/.hermes/web/*.html` → copied to `/var/www/hermes/*.html`
