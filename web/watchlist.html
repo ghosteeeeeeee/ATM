@@ -140,6 +140,7 @@ let lastPayloadTs = 0;
 let fastUntil = 0;   // ms epoch — after add/remove, poll every 2s
                      // (server refreshes the payload inline; this is
                      //  the backstop if that refresh failed)
+let pollTimer = null; // single self-scheduling chain (see load()'s finally)
 
 function fmtUsd(v, dp=0) {
   if (v === null || v === undefined) return '–';
@@ -172,7 +173,7 @@ async function loadChips() {
     document.getElementById('chips').innerHTML = entries.map(([addr, v]) =>
       `<span class="wl-chip">${v.label ? `<b>${esc(v.label)}</b>` : ''}
         <span class="addr">${esc(addr.slice(0, 6))}…${esc(addr.slice(-4))}</span>
-        <span class="x" title="remove" onclick="removeWallet('${esc(addr)}')">✕</span></span>`
+        <span class="x" title="remove" data-a="${esc(addr)}" onclick="removeWallet(this.dataset.a)">✕</span></span>`
     ).join('') || '<span class="section-note">none yet</span>';
   } catch (e) {
     document.getElementById('chips').innerHTML =
@@ -321,7 +322,7 @@ function render(d) {
 
   // trader table
   document.getElementById('tierNote').textContent =
-    `— ${d.scored_n ?? 0} of ${d.watchlist_n} have leaderboard stats (top ${(d.tier_pct*100).toFixed(0)}% of scored ⭐)`;
+    `— ${d.scored_n ?? 0} of ${d.watchlist_n} have leaderboard stats · ⭐ = top ${(d.tier_pct*100).toFixed(0)}% composite of those with ≥${d.min_trades ?? '?'} trades (needs ≥2 wallets to score)`;
   const tb = document.querySelector('#tierTable tbody');
   tb.innerHTML = (d.tiers || []).map((t, i) => {
     const pos = (t.positions || []).map(p =>
@@ -340,7 +341,7 @@ function render(d) {
       <td class="${pnlCls(t.pnl_7d)}">${t.pnl_7d != null ? fmtPnl(t.pnl_7d) : '–'}</td>
       <td class="${pnlCls(t.pnl_24h)}">${t.pnl_24h != null ? fmtPnl(t.pnl_24h) : '–'}</td>
       <td>${t.wr != null ? ((t.wr || 0) * 100).toFixed(1) + '%' : '–'}</td>
-      <td>${t.trades ?? '–'}</td>
+      <td>${esc(t.trades ?? '–')}</td>
       <td>${t.volume != null ? fmtUsd(t.volume) : '–'}</td>
       <td>${last}</td>
       <td>${pos}</td>
@@ -420,8 +421,12 @@ async function load() {
     document.getElementById('status').innerHTML = '<span class="bad">fetch failed: ' + esc(e) + '</span>';
   } finally {
     // every path (fresh, unchanged, out-of-order, error) reschedules:
-    // 2s while a mutation is catching up, 15s otherwise
-    setTimeout(load, Date.now() < fastUntil ? 2000 : 15000);
+    // 2s while a mutation is catching up, 15s otherwise. ONE chain only —
+    // addWallet/removeWallet also call load() directly, and without
+    // clearTimeout each of those calls would spawn a PERMANENT extra poll
+    // chain (N adds = N parallel loops hammering the API forever).
+    clearTimeout(pollTimer);
+    pollTimer = setTimeout(load, Date.now() < fastUntil ? 2000 : 15000);
   }
 }
 

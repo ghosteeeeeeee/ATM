@@ -16,24 +16,27 @@ DATA COVERAGE (honest limits — jup exposes no per-wallet endpoint):
              file, refreshed 10min). Otherwise the table shows – and the
              coverage badge says so.
   live     — only when the address is in jup's watch feed (positions feed).
-  activity — global trades feed (2 pages x100) gives last-seen trading per
-             watched owner even when it has no live position.
+  activity — ONE wide page of the global trades feed (WATCHLIST_TRADES_LIMIT)
+             gives last-seen trading per watched owner even when it has no
+             live position (cursor only accepts `after` — probed 2026-11-02).
 
 State: data/watchlist_state.json (first-run bootstrap = no alert storm;
 absence-TTL semantics: live ids refresh their seen-ts every cycle).
 """
+import fcntl
 import json
 import os
 import sys
 import time
+import traceback
 import urllib.request
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA, WWW_DATA
 from hermes_constants import (
-    TOPDOG_TIER_PCT, TOPDOG_CLUSTER_MIN, TOPDOG_EVENT_RETAIN,
-    TOPDOG_STATE_TTL_SEC, TOPDOG_MIN_MARGIN_USD,
+    TOPDOG_TIER_PCT, TOPDOG_MIN_TRADES, TOPDOG_CLUSTER_MIN,
+    TOPDOG_EVENT_RETAIN, TOPDOG_STATE_TTL_SEC, TOPDOG_MIN_MARGIN_USD,
     WATCHLIST_MAX_WALLETS, WATCHLIST_TRADES_LIMIT,
 )
 # helpers + tier engine shared with the topdog tracker (import-safe: module
@@ -46,6 +49,8 @@ from topdog_api import (
 TRADES_URL = "https://yolo-api.jup.ag/trades"
 WATCHLIST_FILE = os.path.join(HERMES_DATA, 'watchlist.json')
 STATE_FILE = os.path.join(HERMES_DATA, 'watchlist_state.json')
+LB_FILE = os.path.join(HERMES_DATA, 'jup_yolo_leaderboard.json')
+LOCK_FILE = os.path.join(HERMES_DATA, 'watchlist_api.lock')
 OUT = os.path.join(WWW_DATA, 'watchlist.json')
 PAGE_SRC = os.path.join(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__))), 'web', 'watchlist.html')
@@ -62,13 +67,14 @@ def _fetch_positions():
     return _get(POSITIONS_URL).get('positions') or []
 
 
-def _fetch_recent_trades(limit):
+def _fetch_recent_trades(limit, errors=None):
     """One wide page of global recent trades (limit≈30min of activity).
 
     Cursor paging was probed 2026-11-02: the feed only accepts `after`
     (forward tail, n=0 when asked for older) — backward paging 400s — so a
-    single wide page is the only depth available. Returns [] on any failure:
-    activity is a bonus column, never a hard dependency.
+    single wide page is the only depth available. A failure is reported into
+    `errors` (the payload must never claim a clean cycle while the activity
+    column is silently empty) and returns [].
     """
     try:
         d = _get(f"{TRADES_URL}?limit={int(limit)}", timeout=15)
@@ -76,23 +82,37 @@ def _fetch_recent_trades(limit):
     except Exception as e:
         print(f"[watchlist_api] trades fetch failed: "
               f"{type(e).__name__}: {e}", file=sys.stderr)
+        if errors is not None:
+            errors.append(f'trades fetch: {type(e).__name__}: {e}')
         return []
 
 
 def load_watchlist():
     """{addr: {label, added}} with shape guards (bug_hunter rule: a corrupt
-    file degrades to an empty list + logged error, never a crash)."""
+    file degrades to an empty list + logged error, never a crash). Every
+    wrong shape must surface in errors[] — a silently-empty list that looks
+    like "user cleared their watchlist" hides corruption."""
+    exists = os.path.exists(WATCHLIST_FILE)
     raw = _load_json(WATCHLIST_FILE, None)
     errors = []
+    wallets = None
     if raw is None:
-        if os.path.exists(WATCHLIST_FILE):
-            errors.append('watchlist file unreadable — treating as empty')
-        raw = {}
-    wallets = raw.get('wallets') if isinstance(raw, dict) else None
-    if not isinstance(wallets, dict):
-        if wallets is not None:
-            errors.append('watchlist.wallets not a dict — treating as empty')
+        # missing file = fresh install (no error); an existing-but-unreadable
+        # or JSON-null file IS corruption and must say so
+        if exists:
+            errors.append('watchlist file unreadable or JSON null — treating as empty')
+    elif not isinstance(raw, dict):
+        errors.append('watchlist file not a JSON object — treating as empty')
+    else:
+        wallets = raw.get('wallets')
+        if not isinstance(wallets, dict):
+            errors.append('watchlist.wallets missing or not a dict — treating as empty')
+            wallets = None
+    if wallets is None:
         wallets = {}
+    bad = sum(1 for v in wallets.values() if not isinstance(v, dict))
+    if bad:
+        errors.append(f'watchlist: {bad} non-object wallet entries dropped')
     clean = {}
     for a, v in wallets.items():
         if not isinstance(a, str) or not a:
@@ -109,17 +129,36 @@ def load_watchlist():
 
 
 def _label_for(addr, wl_entry, lb_entry, fallback_prefix=4):
-    return (wl_entry.get('label')
-            or (lb_entry or {}).get('label')
-            or addr[:fallback_prefix])
+    # shape-guarded: a non-dict entry (corrupt leaderboard/state) must degrade
+    # to the address prefix, never AttributeError-crash the whole cycle
+    wl = wl_entry if isinstance(wl_entry, dict) else {}
+    lb = lb_entry if isinstance(lb_entry, dict) else {}
+    return (wl.get('label') or lb.get('label') or addr[:fallback_prefix])
 
 
 def main():
+    """One serialized run (bug_hunter f82944f8/95e39a32).
+
+    The 60s timer and the write server's inline refresh (95e39a32) can run
+    watchlist_api.py CONCURRENTLY: both use the same fixed .tmp paths in
+    _atomic_write/_sync_page (interleaved bytes -> corrupt JSON/HTML gets
+    published) and do last-writer-wins on the state file (a lost 'seen' entry
+    re-alerts that position on the next cycle). Blocking flock: the second
+    run simply waits for the first, then sees its writes.
+    """
+    with open(LOCK_FILE, 'w') as lock_f:
+        fcntl.flock(lock_f, fcntl.LOCK_EX)
+        _run_locked()
+
+
+def _run_locked():
     now = int(time.time())
     out = {'updated': now, 'api_ok': False, 'errors': [],
            'watchlist_n': 0, 'tiers': [], 'coins': {}, 'clusters': [],
-           'events': [], 'dust_filtered': 0,
+           'events': [], 'dust_filtered': 0, 'new_events': 0,
+           'scored_n': 0, 'live_n': 0,
            'min_margin_usd': TOPDOG_MIN_MARGIN_USD,
+           'min_trades': TOPDOG_MIN_TRADES,
            'tier_pct': TOPDOG_TIER_PCT}
 
     wallets, wl_errors = load_watchlist()
@@ -132,19 +171,42 @@ def main():
         _atomic_write(OUT, out)
         _sync_page(PAGE_SRC, PAGE_DST, 'watchlist_api')
         print("[watchlist_api] empty watchlist -> "
-              f"{OUT}")
+              f"{OUT} errors={len(out['errors'])}")
+        for e in out['errors']:
+            print(f"[watchlist_api] ! {e}", file=sys.stderr)
         return
 
-    lb = _load_json(os.path.join(HERMES_DATA, 'jup_yolo_leaderboard.json'), {})
-    lb_wallets = lb.get('wallets') if isinstance(lb, dict) else None
-    if not isinstance(lb_wallets, dict):
-        lb_wallets = {}
+    lb = _load_json(LB_FILE, None)
+    lb_wallets = None
+    if lb is None:
         out['errors'].append('leaderboard file missing/empty')
+    elif not isinstance(lb, dict):
+        out['errors'].append('leaderboard file not a JSON object — no stats this cycle')
+    else:
+        lb_wallets = lb.get('wallets')
+    if not isinstance(lb_wallets, dict):
+        if lb is not None and isinstance(lb, dict):
+            out['errors'].append('leaderboard.wallets not a dict — no stats this cycle')
+        lb_wallets = {}
+    else:
+        # topdog parity: a non-dict entry used to crash _label_for for
+        # label-less watched wallets — drop them with an honest count
+        bad_w = sum(1 for v in lb_wallets.values() if not isinstance(v, dict))
+        if bad_w:
+            out['errors'].append(f'leaderboard: {bad_w} non-object wallet entries dropped')
+            lb_wallets = {k: v for k, v in lb_wallets.items()
+                          if isinstance(v, dict)}
+        if not lb_wallets:
+            out['errors'].append('leaderboard file missing/empty')
 
     # ── stats + tier among watchlist members that have leaderboard data ──
     stats_subset = {a: lb_wallets[a] for a in wallets if a in lb_wallets}
     tier_set, ranked = compute_tier(stats_subset) if stats_subset else (set(), [])
     score_by = {addr: round(score, 3) for score, addr, _ in ranked}
+    # "has leaderboard stats" (display truth) is NOT "eligible for the
+    # composite" — a solo watchlist (n<2) can't be percentile-ranked, but its
+    # pnl/wr/volume must still render instead of a row of dashes
+    stats_addrs = set(stats_subset)
 
     # ── live positions (jup watch feed), $50 floor, watchlist scope ──
     positions, rows = [], []
@@ -179,7 +241,7 @@ def main():
     # ── last-activity fallback from the global trades feed ──
     last_trade = {}
     try:
-        for t in _fetch_recent_trades(WATCHLIST_TRADES_LIMIT):
+        for t in _fetch_recent_trades(WATCHLIST_TRADES_LIMIT, out['errors']):
             o = t.get('owner')
             if o in wallets:
                 ts = int(_f(t.get('executedAt')))
@@ -268,21 +330,32 @@ def main():
             'coverage': cov,
         })
     scored = {t['wallet'] for t in traders}
-    for addr in wallets:                      # no-stats members, listed last
+    for addr in wallets:          # members the composite couldn't rank, last
         if addr in scored:
             continue
-        cov = []
+        lw = lb_wallets.get(addr)
+        has_stats = isinstance(lw, dict)
+        cov = ['stats'] if has_stats else []
         if positions_by_owner.get(addr):
             cov.append('live')
         if addr in last_trade:
             cov.append('activity')
         traders.append({
             'wallet': addr,
-            'label': _label_for(addr, wallets.get(addr, {}),
-                                lb_wallets.get(addr)),
-            'rank': None, 'score': None, 'tier': False,
-            'pnl': None, 'pnl_7d': None, 'pnl_24h': None,
-            'wr': None, 'wr_7d': None, 'trades': None, 'volume': None,
+            'label': _label_for(addr, wallets.get(addr, {}), lw),
+            'rank': lw.get('rank') if has_stats else None,
+            'score': None, 'tier': False,
+            # raw leaderboard stats still render when the composite can't run
+            # (n<2 eligible members, or trades < TOPDOG_MIN_TRADES): hiding
+            # them made a solo watchlist show a full row of dashes + "0 have
+            # leaderboard stats" while the file held the numbers
+            'pnl': lw.get('pnl') if has_stats else None,
+            'pnl_7d': lw.get('pnl_7d') if has_stats else None,
+            'pnl_24h': lw.get('pnl_24h') if has_stats else None,
+            'wr': lw.get('wr') if has_stats else None,
+            'wr_7d': lw.get('wr_7d') if has_stats else None,
+            'trades': lw.get('trades') if has_stats else None,
+            'volume': lw.get('volume') if has_stats else None,
             'last_trade': last_trade.get(addr),
             'positions': [{'market': r['market'], 'side': r['side'],
                            'leverage': r['leverage'], 'margin': r['margin']}
@@ -290,7 +363,7 @@ def main():
             'coverage': cov or ['none'],
         })
     out['tiers'] = traders
-    out['scored_n'] = len(scored)
+    out['scored_n'] = len(stats_addrs)
     out['live_n'] = len(positions_by_owner)
 
     # ── events: new watchlist position ids since the last run (same
@@ -299,18 +372,34 @@ def main():
     # cycle so a feed blip can never cause a false re-alert) ──
     state = _load_json(STATE_FILE, None)
     first_run = state is None
-    if first_run:
-        state = {'seen': {}, 'events': []}
-    seen = state.get('seen') if isinstance(state.get('seen'), dict) else {}
-    events = state.get('events') if isinstance(state.get('events'), list) else []
-    if not isinstance(state.get('seen'), dict) or not isinstance(state.get('events'), list):
+    top_bad = False
+    if state is not None and not isinstance(state, dict):
+        # valid JSON but wrong top-level shape (list/str/number): topdog
+        # guards this — without the guard state.get() AttributeError-crashed
+        # EVERY run, the payload froze and the page went silently stale
+        out['errors'].append('state file not a JSON object — reseeding '
+                             '(history loss only)')
+        state = None
+        first_run = True
+        top_bad = True
+    seen = state.get('seen') if isinstance(state, dict) else None
+    events = state.get('events') if isinstance(state, dict) else None
+    # a missing file is a healthy first run (no error); an EXISTING state
+    # with broken children is corruption and must say so
+    if not (first_run or top_bad) and (not isinstance(seen, dict)
+                                       or not isinstance(events, list)):
         out['errors'].append('state file shape bad — reseeding (history loss only)')
+    # a corrupt/absent `seen` must BOOTSTRAP (seed live ids, emit nothing):
+    # reusing {} as-is re-alerted every open position of every wallet at once
+    seed_only = first_run or not isinstance(seen, dict)
+    seen = seen if isinstance(seen, dict) else {}
+    events = events if isinstance(events, list) else []
     events = [e for e in events if isinstance(e, dict) and 'eid' in e]
     live_pids = {r['pid'] for r in rows}
     seen = {k: v for k, v in seen.items()
             if k in live_pids or (now - int(_f(v, now))) < TOPDOG_STATE_TTL_SEC}
     new_events = []
-    if first_run:
+    if seed_only:
         for r in rows:
             seen[r['pid']] = now
     else:

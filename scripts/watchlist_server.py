@@ -21,18 +21,24 @@ import json
 import os
 import re
 import sys
+import threading
 import time
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA
 from hermes_constants import WATCHLIST_MAX_WALLETS
-from topdog_api import _load_json, _atomic_write
+from topdog_api import _f, _load_json, _atomic_write
 
 WATCHLIST_FILE = os.path.join(HERMES_DATA, 'watchlist.json')
 PORT = int(os.environ.get('WATCHLIST_API_PORT', '3463'))
 BASE58 = re.compile(r'^[1-9A-HJ-NP-Za-km-z]{32,44}$')
+
+# read-modify-write of the wallet file must stay atomic now that requests are
+# handled concurrently — two simultaneous adds would otherwise both read the
+# same snapshot and the second write would silently drop the first add
+_WRITE_LOCK = threading.Lock()
 
 
 def _read_state():
@@ -44,10 +50,20 @@ def _read_state():
         wallets = {}
     clean = {}
     for a, v in wallets.items():
-        if isinstance(a, str) and a:
-            v = v if isinstance(v, dict) else {}
-            clean[a] = {'label': str(v.get('label') or '')[:24],
-                        'added': int(v.get('added') or 0)}
+        # re-validate keys on read: the chips render onclick="removeWallet('…')"
+        # and esc()'s &#39; is decoded by the HTML parser BEFORE the JS runs,
+        # so esc() alone does NOT make that sink safe — only base58 validation
+        # does. The server is the only writer and validates on add; this
+        # closes the remaining path (hand-edited/poisoned file) and logs it.
+        if not (isinstance(a, str) and BASE58.match(a)):
+            print(f"[watchlist_server] WARN dropping non-base58 wallet key "
+                  f"{a!r} from {WATCHLIST_FILE}", file=sys.stderr)
+            continue
+        v = v if isinstance(v, dict) else {}
+        clean[a] = {'label': str(v.get('label') or '')[:24],
+                    # _f: a hand-corrupted 'added' ("abc", null, 1e999) must
+                    # not ValueError-crash do_GET and drop the connection
+                    'added': int(_f(v.get('added')))}
     return clean
 
 
@@ -57,6 +73,10 @@ def _write_state(wallets):
 
 
 class Handler(BaseHTTPRequestHandler):
+    # a client that opens a request and stalls (lying Content-Length, slow
+    # upload) must not pin its handler thread forever
+    timeout = 30
+
     def _send(self, code, obj):
         body = json.dumps(obj).encode()
         self.send_response(code)
@@ -95,7 +115,16 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == '/health':
             return self._send(200, {'ok': True})
-        wallets = _read_state()
+        try:
+            wallets = _read_state()
+        except Exception as e:
+            # never die on a request — a corrupt file must be a 500 carrying
+            # the reason, not a connection dropped with no response at all
+            print(f"[watchlist_server] ERROR GET {type(e).__name__}: {e}",
+                  file=sys.stderr)
+            return self._send(500, {'ok': False, 'wallets': {}, 'n': 0,
+                                    'max': WATCHLIST_MAX_WALLETS,
+                                    'error': f'{type(e).__name__}: {e}'})
         return self._send(200, {'wallets': wallets, 'n': len(wallets),
                                 'max': WATCHLIST_MAX_WALLETS})
 
@@ -122,27 +151,30 @@ class Handler(BaseHTTPRequestHandler):
                 if not BASE58.match(addr):
                     return self._send(400, {'ok': False, 'error':
                         'not a Solana base58 address (32-44 chars, no 0/O/I/l)'})
-                wallets = _read_state()
-                if addr in wallets:
-                    return self._send(200, {'ok': True, 'already': True,
-                                            'n': len(wallets)})
-                if len(wallets) >= WATCHLIST_MAX_WALLETS:
-                    return self._send(409, {'ok': False, 'error':
-                        f'watchlist full ({WATCHLIST_MAX_WALLETS} max) — '
-                        'remove one first'})
-                label = str(body.get('label') or '').strip()[:24]
-                wallets[addr] = {'label': label, 'added': int(time.time())}
-                _write_state(wallets)
+                with _WRITE_LOCK:
+                    wallets = _read_state()
+                    if addr in wallets:
+                        return self._send(200, {'ok': True, 'already': True,
+                                                'n': len(wallets)})
+                    if len(wallets) >= WATCHLIST_MAX_WALLETS:
+                        return self._send(409, {'ok': False, 'error':
+                            f'watchlist full ({WATCHLIST_MAX_WALLETS} max) — '
+                            'remove one first'})
+                    label = str(body.get('label') or '').strip()[:24]
+                    wallets[addr] = {'label': label, 'added': int(time.time())}
+                    _write_state(wallets)
                 print(f"[watchlist_server] ADD {addr[:8]}… "
                       f"label={label!r} n={len(wallets)}")
                 self._refresh_payload()
                 return self._send(200, {'ok': True, 'n': len(wallets)})
             if action == 'remove':
-                wallets = _read_state()
-                if addr not in wallets:
-                    return self._send(404, {'ok': False, 'error': 'not on list'})
-                del wallets[addr]
-                _write_state(wallets)
+                with _WRITE_LOCK:
+                    wallets = _read_state()
+                    if addr not in wallets:
+                        return self._send(404, {'ok': False,
+                                                'error': 'not on list'})
+                    del wallets[addr]
+                    _write_state(wallets)
                 print(f"[watchlist_server] REMOVE {addr[:8]}… "
                       f"n={len(wallets)}")
                 self._refresh_payload()
@@ -156,8 +188,15 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(500, {'ok': False, 'error': f'{type(e).__name__}: {e}'})
 
 
+class WatchlistHTTPServer(ThreadingHTTPServer):
+    # socketserver.TCPServer backlog default is 5 — a page load fires several
+    # proxied requests (chips GET, data GET, POSTs) and bursts can hit it
+    request_queue_size = 32
+    allow_reuse_address = 1   # TIME_WAIT must not block a systemd restart
+
+
 def main():
-    server = HTTPServer(('127.0.0.1', PORT), Handler)
+    server = WatchlistHTTPServer(('127.0.0.1', PORT), Handler)
     print(f"[watchlist_server] listening on 127.0.0.1:{PORT} "
           f"(file: {WATCHLIST_FILE})")
     server.serve_forever()
