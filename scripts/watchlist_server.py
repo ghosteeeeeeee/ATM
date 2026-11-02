@@ -160,6 +160,8 @@ class Handler(BaseHTTPRequestHandler):
                 if not BASE58.match(addr):
                     return self._send(400, {'ok': False, 'error':
                         'not a Solana base58 address (32-44 chars, no 0/O/I/l)'})
+                renamed = False
+                added = False
                 with _WRITE_LOCK:
                     wallets = _read_state()
                     if addr in wallets:
@@ -173,21 +175,26 @@ class Handler(BaseHTTPRequestHandler):
                             _write_state(wallets)
                             print(f"[watchlist_server] RELABEL {addr[:8]}… "
                                   f"-> {new_label!r}")
-                            self._refresh_payload()
-                        return self._send(200, {'ok': True, 'already': True,
-                                                'renamed': renamed,
-                                                'n': len(wallets)})
-                    if len(wallets) >= WATCHLIST_MAX_WALLETS:
+                    elif len(wallets) >= WATCHLIST_MAX_WALLETS:
                         return self._send(409, {'ok': False, 'error':
                             f'watchlist full ({WATCHLIST_MAX_WALLETS} max) — '
                             'remove one first'})
-                    label = str(body.get('label') or '').strip()[:24]
-                    wallets[addr] = {'label': label, 'added': int(time.time())}
-                    _write_state(wallets)
-                print(f"[watchlist_server] ADD {addr[:8]}… "
-                      f"label={label!r} n={len(wallets)}")
-                self._refresh_payload()
-                return self._send(200, {'ok': True, 'n': len(wallets)})
+                    else:
+                        label = str(body.get('label') or '').strip()[:24]
+                        wallets[addr] = {'label': label, 'added': int(time.time())}
+                        _write_state(wallets)
+                        added = True
+                        print(f"[watchlist_server] ADD {addr[:8]}… "
+                              f"label={label!r} n={len(wallets)}")
+                # refresh OUTSIDE the lock: it can take up to 25s of network
+                # I/O and must not stall concurrent mutations — only file I/O
+                # belongs under the lock (the relabel path held it through the
+                # whole refresh; add/remove never did)
+                if renamed or added:
+                    self._refresh_payload()
+                return self._send(200, {'ok': True, 'already': not added,
+                                        'renamed': renamed,
+                                        'n': len(wallets)})
             if action == 'remove':
                 with _WRITE_LOCK:
                     wallets = _read_state()
