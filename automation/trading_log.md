@@ -19505,3 +19505,38 @@ Final set: []
 **Open Questions:**
 - 24h back to '~flat' '-$0.04' at 59.1% WR — profit engine (profit-monster-trail '+0.89') offset by hard_max_loss '-0.88'; fee-NET still negative per brain_auditor
 - 2 red hours in a row (04h, 05h) — watch for 3rd before size action
+
+## FAVORITES Update — 2026-11-02 06:00 UTC
+- Regime: SHORT_BIAS
+- PROMOTE ETH (WR=70.0%, AvgPnL=0.33%, Trades=10)
+
+Final set: ['CAKE', 'ETH']
+
+## LOSERS Update — 2026-11-02 06:05 UTC
+- ADD BLUR (WR=40.0%, PnL=$-0.30, low_wr (40.0%))
+
+Final set: ['BLUR']
+
+## [2026-11-02 06:43] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** '-$0.17' (WR 0% hour; 24h 43T 58.1% '-$0.17' ~flat) | 7d 247T 54.3% '-$1.59' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 1 close red — HYPE jup_yolo_mirrored LONG hard_max_loss '-0.17'/-4.17%
+- Kill check: NO signal reached n>=3 last hour (n=1) — kill policy does not fire. 24h n>=3 losers: pump-chain- 10T 40.0% '-0.15' (14d NORMAL-only live regime WR>0, keeps alive), continuation+ 3T 33.3% '-0.16', bb-squeeze+ 3T 33.3% '-0.09' — none at 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/43 = 9.3% (<40%); dominant close = profit-monster-trail 15T '+$0.89'; drag = hard_max_loss 8T '-$1.05'
+- Boost HOLD: 0 candidates pass the gate (query n>=5 & net>$0.05 returned empty) — jup_yolo_mirrored 17T 64.7% net '-0.08' fails net; HYPE 8T 37.5% '-0.45' worst sub-cohort; warrior-sr-confirm+ 3T 100% '+0.33' fails n>=5
+- Neg streak = 3 (04h '-0.03', 05h '-0.09', 06h '-0.17') → rule fired, checked regime: **SHORT_BIAS** (FAVORITES 06:00), not NEUTRAL → no size-reduce action. Sizing stays 1.0x (file absent = truth)
+- Frequency 1/hr — under 20/hr
+- Entry quality: 24h winners avg MAE 0.246%, 21/25 <0.5%
+- Storm readiness: **window-min -0.32% / at-run -0.32%** — both within gate, no storm (rolling-60m, 7 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 3 red hours in a row but each tiny ('-0.03'/'-0.09'/'-0.17'); 24h still ~flat. Watch 07h — 4th red hour would warrant a closer look even in SHORT_BIAS
+- Open flag from 04:45 stands: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed (64.3% -> 40.0% WR over 24h/14d 38.5%) — file outside auto_1hr scope, needs CEO/session action
+- 7d deepening: '-$1.59' (was '-$1.41' at 05:47)
