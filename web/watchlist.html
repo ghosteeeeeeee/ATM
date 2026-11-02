@@ -137,6 +137,10 @@ let alertsOn = false, audioCtx = null;
 let seenEids = null;
 let seenClusters = null;
 let lastPayloadTs = 0;
+let seedMaxTs = 0;   // newest event ts ever rendered — alerts fire ONLY for
+                     // ev.ts > this (M12: a transient empty payload re-seeds
+                     // seenEids but can never lower this, so retained history
+                     // can never re-toast)
 let fastUntil = 0;   // ms epoch — after add/remove, poll every 2s
                      // (server refreshes the payload inline; this is
                      //  the backstop if that refresh failed)
@@ -190,7 +194,9 @@ async function addWallet() {
     const d = await wlPost({ action: 'add', address: addr, label });
     document.getElementById('addrInput').value = '';
     document.getElementById('labelInput').value = '';
-    toast('tier', d.already ? 'Already on the list' : '✅ Wallet added',
+    toast('tier',
+          d.renamed ? '✏️ Label updated'
+                    : (d.already ? 'Already on the list' : '✅ Wallet added'),
           addr.slice(0, 8) + '…');
     await loadChips();
     fastUntil = Date.now() + 45000;   // panel must catch up within seconds
@@ -257,11 +263,15 @@ function toast(cls, title, sub) {
 }
 
 function alertEvent(ev) {
-  if (ev.tier) {
-    const side = ev.side.toUpperCase();
-    toast('tier', `⭐ WATCH ${ev.label} ${side} ${ev.market}`,
-          `${ev.leverage}× · $${fmtUsd(ev.margin)} · cluster ×${ev.cluster}`);
-  }
+  // M11 (bug_hunter report, resolved toward original intent): this is YOUR
+  // hand-picked list — every new position matters, and ev.tier is almost
+  // never true for custom addresses (they must be in the yolo top-100 AND
+  // top-10% of the scored subset). ⭐ still decorates tier members; revert
+  // to `if (ev.tier)` to go back to tier-only alerts.
+  const side = ev.side.toUpperCase();
+  toast(ev.tier ? 'tier' : '',
+        `${ev.tier ? '⭐ ' : '📍 '}${ev.label} ${side} ${ev.market}`,
+        `${ev.leverage}× · $${fmtUsd(ev.margin)} · cluster ×${ev.cluster}`);
 }
 
 function render(d) {
@@ -379,17 +389,17 @@ async function load() {
     freshClusterKeys = new Set();
     if (first) {
       seenEids = new Set((d.events || []).map(e => e.eid));
+      seedMaxTs = Math.max(0, ...(d.events || []).map(e => e.ts || 0));
       seenClusters = new Map((d.clusters || []).map(c => {
         const k = c.market + '|' + c.side;
         return [k, { lastLive: Date.now(), goneSince: null }];
       }));
     } else {
       (d.events || []).forEach(ev => {
-        if (!seenEids.has(ev.eid)) {
-          seenEids.add(ev.eid); freshEids.add(ev.eid);
-          alertEvent(ev);
-        }
+        if (!seenEids.has(ev.eid)) { seenEids.add(ev.eid); freshEids.add(ev.eid); }
+        if ((ev.ts || 0) > seedMaxTs) alertEvent(ev);
       });
+      seedMaxTs = Math.max(seedMaxTs, ...(d.events || []).map(e => e.ts || 0));
       const nowMs = Date.now();
       const liveSet = new Set();
       (d.clusters || []).forEach(c => {

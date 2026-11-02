@@ -163,7 +163,19 @@ class Handler(BaseHTTPRequestHandler):
                 with _WRITE_LOCK:
                     wallets = _read_state()
                     if addr in wallets:
+                        # L17: re-add WITH a label renames the wallet (a bare
+                        # re-add keeps the old one) — otherwise "edit label"
+                        # silently did nothing
+                        new_label = str(body.get('label') or '').strip()[:24]
+                        renamed = bool(new_label) and new_label != wallets[addr].get('label')
+                        if renamed:
+                            wallets[addr]['label'] = new_label
+                            _write_state(wallets)
+                            print(f"[watchlist_server] RELABEL {addr[:8]}… "
+                                  f"-> {new_label!r}")
+                            self._refresh_payload()
                         return self._send(200, {'ok': True, 'already': True,
+                                                'renamed': renamed,
                                                 'n': len(wallets)})
                     if len(wallets) >= WATCHLIST_MAX_WALLETS:
                         return self._send(409, {'ok': False, 'error':

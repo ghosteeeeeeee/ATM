@@ -101,9 +101,12 @@
 const API = '/data/topdogs.json';
 const MAJORS = ['BTC', 'ETH', 'SOL', 'HYPE'];
 let alertsOn = false, audioCtx = null;
-let seenEids = null;          // set on first payload — only POST-load events alert
+let seenEids = null;          // set on first payload — fresh-highlight only
 let seenClusters = null;      // cluster keys (market|side) on first payload
 let lastPayloadTs = 0;
+let seedMaxTs = 0;   // newest event ts ever rendered — toasts fire ONLY for
+                     // ev.ts > this (M12: transient empty payloads can never
+                     // re-alert retained history; fixed on BOTH pages together)
 
 function fmtUsd(v, dp=0) {
   if (v === null || v === undefined) return '–';
@@ -291,17 +294,17 @@ async function load() {
     if (first) {
       // first payload: seed state — history never alerts, only POST-load arrivals
       seenEids = new Set((d.events || []).map(e => e.eid));
+      seedMaxTs = Math.max(0, ...(d.events || []).map(e => e.ts || 0));
       seenClusters = new Map((d.clusters || []).map(c => {
         const k = c.market + '|' + c.side;
         return [k, { lastLive: Date.now(), goneSince: null }];
       }));
     } else {
       (d.events || []).forEach(ev => {
-        if (!seenEids.has(ev.eid)) {
-          seenEids.add(ev.eid); freshEids.add(ev.eid);
-          alertEvent(ev);
-        }
+        if (!seenEids.has(ev.eid)) { seenEids.add(ev.eid); freshEids.add(ev.eid); }
+        if ((ev.ts || 0) > seedMaxTs) alertEvent(ev);
       });
+      seedMaxTs = Math.max(seedMaxTs, ...(d.events || []).map(e => e.ts || 0));
       // cluster formation toasts: brand-new key, or reformed after being
       // gone >= 5min (flicker guard — the feed churns fast)
       const nowMs = Date.now();
