@@ -20156,3 +20156,27 @@ Final set: []
 **Open Questions:**
 - 24h '-$1.00' RED (WR 50.0%), 7d '-$1.94' — structure: hard_max_loss 11T '-1.53' vs trail/mfe '+1.19'; hard_max_loss remains dominant drag
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-03 15:44] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $+0.03 (WR: 100% hour; 24h 44T 56.8% -$0.86 | 7d 269T 55.0% -$1.96 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: IOTA pump-chain- LONG trail_arm_timeout +0.02/+0.44%, AVAX pump-chain-,pump-chain-v6- LONG trail_arm_timeout +0.01/+0.57%
+- Kill check: last hour per-signal n=2 pump-chain- 2W0L 100%; 24h n>=3 losers: jup_yolo_mirrored 30T 60.0% '-0.64' (not 0% WR), pump-chain- 3T 66.7% '+0.07', bb-squeeze+ 4T 75.0% '+0.22' — regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 10/44 = 22.7% (<40%) — drag = hard_max_loss 7T '-0.97' vs profit exits '+1.41' — no tpsl_utils alert
+- Boost HOLD: candidate query (n>=5, WR>55%, net>0.05, multi-token) empty
+- Neg streak: 13h red -0.06, 15h green +0.03 (not 3 consecutive); regime 6h EXTREME/FLAT/HIGH/NORMAL (no NEUTRAL) — no size action
+- Frequency 2/hr — under 20
+- Entry quality: 24h winners avg MAE 0.272%, 17/25 <0.5%
+- Storm readiness: **window-min -0.41% / at-run +0.36%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 56.8% but net '-$0.86' RED — winners avg smaller than losers (profit exits +1.41 vs hard_max_loss -0.97 + atr_sl_hit -1.22); structure problem, not hit-rate problem
+- 7d '-$1.96' — hard_max_loss remains dominant drag (7T in 24h alone)
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
