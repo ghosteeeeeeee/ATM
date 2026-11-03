@@ -20098,3 +20098,38 @@ Final set: ['BLUR']
 **Open Questions:**
 - 24h '-$1.47' RED (WR 44.1%), 7d '-$2.14' — structure: hard_max_loss 13T '-1.80' vs trail/mfe '+0.84'; hard_max_loss remains dominant drag
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## FAVORITES Update — 2026-11-03 06:00 UTC
+- Regime: SHORT_BIAS
+- DEMOTE ETH (WR=58.3%, PnL=$-0.50, 1 consecutive bad days, regime=SHORT_BIAS)
+- PROMOTE FIL (WR=71.4%, AvgPnL=0.53%, Trades=7)
+
+Final set: ['CAKE', 'FIL']
+
+## LOSERS Update — 2026-11-03 06:05 UTC
+- REMOVE BLUR (insufficient data)
+
+Final set: []
+
+## [2026-11-03 06:44] Hourly Analysis
+
+**Trades:** 3 closed (1 win, 2 losses)
+**PnL:** $-0.06 (WR: 33.3% hour; 24h 36T 44.4% -$1.36 | 7d 255T 54.1% -$2.20 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE ichimoku-,jup_yolo SHORT atr_sl_hit -0.08/-3.45%, SOL jup_yolo SHORT mfe_exit +0.09/+2.32%, BTC jup_yolo LONG atr_sl_hit -0.07/-3.23%
+- Kill check: last hour per-signal n<=3 with jup_yolo_mirrored 2W1L 66.7% (not 0% WR); 24h n>=3 losers: jup_yolo_mirrored 30T 50.0% '-1.06', pump-chain- 3T 33.3% '+0.04' — neither 0% WR, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/37 = 16.2% (<40%; drag = hard_max_loss 12T '-1.63', trail/mfe exits '+0.93') — no tpsl_utils alert
+- Boost HOLD: candidate query (n>=5, WR>55%, net>0.05, multi-token) empty
+- Neg streak: 02h/03h red, 06h red (04h/05h no trades); regime last 6h HIGH/NORMAL (no NEUTRAL) — no size action
+- Frequency 3/hr — under 20
+- Entry quality: 24h winners avg MAE 0.362%, 9/17 <0.5%
+- Storm readiness: **window-min -0.46% / at-run -0.11%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-$1.36' RED (WR 44.4%), 7d '-$2.20' — structure: hard_max_loss 12T '-1.63' vs trail/mfe '+0.93'; hard_max_loss remains dominant drag
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
