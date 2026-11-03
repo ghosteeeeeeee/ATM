@@ -4249,6 +4249,12 @@ WATCHLIST_TRADES_LIMIT = 1000   # single global-trades page for the last-
                                 # feed's cursor only accepts `after` — it tails
                                 # forward, backward paging 400s — so one big
                                 # page: 1000 trades ≈ last ~30min of activity)
+WATCHLIST_MIN_MARGIN_USD = 30.0 # T 2026-11-02 "$30" — the watchlist's OWN
+                                # floor, split from TOPDOG_MIN_MARGIN_USD(=50,
+                                # leaderboard crowd): at $50 it hid ALL FIVE
+                                # live positions of T's hand-picked wallets
+                                # (5mge $49.93/$49.66 missed by cents), so the
+                                # panel showed an empty book. Topdogs stays $50.
 
 # ── JUP YOLO SHORT Guardrail (CEO Option D, amended 2026-10-30) ───────────────
 # Original guardrail was half-size SHORTs ($11→$5.50) — INVALID: HL minimum

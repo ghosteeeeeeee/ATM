@@ -36,7 +36,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA, WWW_DATA
 from hermes_constants import (
     TOPDOG_TIER_PCT, TOPDOG_MIN_TRADES, TOPDOG_CLUSTER_MIN,
-    TOPDOG_EVENT_RETAIN, TOPDOG_STATE_TTL_SEC, TOPDOG_MIN_MARGIN_USD,
+    TOPDOG_EVENT_RETAIN, TOPDOG_STATE_TTL_SEC,
+    WATCHLIST_MIN_MARGIN_USD,
     WATCHLIST_MAX_WALLETS, WATCHLIST_TRADES_LIMIT,
 )
 # helpers + tier engine shared with the topdog tracker (import-safe: module
@@ -157,7 +158,7 @@ def _run_locked():
            'watchlist_n': 0, 'tiers': [], 'coins': {}, 'clusters': [],
            'events': [], 'dust_filtered': 0, 'new_events': 0,
            'scored_n': 0, 'live_n': 0,
-           'min_margin_usd': TOPDOG_MIN_MARGIN_USD,
+           'min_margin_usd': WATCHLIST_MIN_MARGIN_USD,
            'min_trades': TOPDOG_MIN_TRADES,
            'tier_pct': TOPDOG_TIER_PCT}
 
@@ -228,7 +229,7 @@ def _run_locked():
             market_u = market.upper()
             pid = _pid(p) or f'noid:{owner}:{market_u}:{side}:{executed_at}'
             margin = _usd(p.get('margin'))
-            if margin is not None and margin < TOPDOG_MIN_MARGIN_USD:
+            if margin is not None and margin < WATCHLIST_MIN_MARGIN_USD:
                 out['dust_filtered'] += 1
                 continue
             rows.append({'owner': owner, 'market': market_u, 'side': side,
@@ -428,7 +429,7 @@ def _run_locked():
     # and kill the whole run on one corrupt event)
     events = [e for e in events
               if (mv := _f(e.get('margin'), None)) is None
-              or mv >= TOPDOG_MIN_MARGIN_USD]
+              or mv >= WATCHLIST_MIN_MARGIN_USD]
     # drop events from wallets no longer on the list (T 2026-11-02: removal
     # must also clean the visible feed — stale rows from removed wallets
     # read as bugs). State keeps them (48h prune governs `seen`).
@@ -458,7 +459,7 @@ def _fatal_payload(msg):
         'watchlist_n': 0, 'tiers': [], 'coins': {}, 'clusters': [],
         'events': [], 'new_events': 0, 'dust_filtered': 0,
         'scored_n': 0, 'live_n': 0,
-        'min_margin_usd': TOPDOG_MIN_MARGIN_USD,
+        'min_margin_usd': WATCHLIST_MIN_MARGIN_USD,
         'min_trades': TOPDOG_MIN_TRADES, 'tier_pct': TOPDOG_TIER_PCT,
     }
 
