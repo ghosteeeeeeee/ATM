@@ -3451,5 +3451,16 @@
     "after": "run #217 artifacts",
     "rationale": "Mandate: audit output + >=1 creative idea per run",
     "impact": "reporting only"
+  },
+  {
+    "timestamp": "2026-11-03T21:04:28Z",
+    "agent": "brain_auditor",
+    "change": "Audit #218: actually executed disposition-cadence timer revert (was falsely marked done) — OnCalendar daily -> Mon 08:15 in config + /etc, daemon-reload",
+    "type": "tweak",
+    "file": "config/hermes-shadow-disposition.timer + /etc/systemd/system/hermes-shadow-disposition.timer",
+    "before": "OnCalendar=*-*-* 08:15:00 (daily) in both files despite registry status=done claiming Mon revert",
+    "after": "OnCalendar=Mon *-*-* 08:15:00 in both files; next fire Mon 2026-11-09 08:15Z",
+    "rationale": "Registry entry disposition-cadence-revert claimed REVERT EXECUTED at 04:55Z but files never touched (mtimes Oct 27/29); 11-03 cluster is dispositioned so weekly cadence per signed threshold",
+    "impact": "shadow-disposition packets fire weekly again; no trading behavior change"
   }
 ]

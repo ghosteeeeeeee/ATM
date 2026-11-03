@@ -1,36 +1,39 @@
-# Current State — brain_auditor #217 2026-11-02 04:50 UTC
-**Last Updated: 2026-11-02 04:50 UTC**
-**Updated by: brain_auditor #217. Prior: #216 2026-11-01 20:40 UTC (preserved in git history).**
+# Current State — brain_auditor #218 2026-11-03 21:10 UTC
+**Last Updated: 2026-11-03 21:10 UTC**
+**Updated by: brain_auditor #218. Prior: #217 2026-11-02 04:50 UTC (preserved in git history).**
 
-## HEADLINE — Chop-bleed 13th consecutive >=92% window (95.5%). Formal weekly AMPLIFY MET: pc-fade cell-split proposal registered. Wrong-side refuted 71st run. 0 config changes.
+## HEADLINE — False-done timer revert caught and actually executed. Chop-bleed 14th >=92% window (98.5%). TAT jup shadow verified at 25 fires. 0 trading-constant changes.
 
-### 1. CHOP-BLEED (still the bleed)
-- 7d: 95.5% dollar share (86/93 losers never-armed) = 13th window >=92%.
-- Trail exits 141T 82.3% +6.06 vs other 104T 19.2% -7.21 (7d); families: trail 94T 97.9% +5.90 vs chop 66T 0% -8.53.
-- 0.75x plain-marker stays VETO (#196). Entry-quality stack + TAT shadows own the lever.
+### 1. META FIX (the run's one change)
+- disposition-cadence-revert claimed REVERT EXECUTED 04:55Z but config+/etc stayed daily `*-*-* 08:15:00`.
+- Actually reverted both → `Mon *-*-* 08:15:00` + daemon-reload. Next fire Mon 11-09 08:15Z.
+- Registry note corrected with fix_20261103.
 
-### 2. FEE-NET (fees TEXT-JSON, fee_total)
-24h GROSS +0.19 NET **-0.30** (42T, 0 null fees — stamp holds all exit reasons) | 7d NET -3.04 (93 pre-#211 nulls) | 14d NET -4.79 | 30d gross -5.51 / stamped fee 6.62 (295 pre-fix nulls).
+### 2. CHOP-BLEED (still the bleed)
+- 7d: 98.5% dollar share (99/110 losers chop exits) = 14th window >=92%.
+- trail 143T 89.5% +8.62 vs unarmed/other 130T 15.4% -11.00.
+- 0.75x plain-marker stays VETO (#196). Entry-quality + TAT own the lever.
 
-### 3. AUTOPSY + DEEP-DIVE
-- 48h adverse-first n=32 = 9 never-adverse / 19 recovered / 4 NEVER (HYPE jup ×3 -0.54, BABY -0.05) → **WRONG-SIDE REFUTED 71st consecutive run**.
-- 0 new sub-50% n>=15 targets (pc+ kill-review 11-13, bbbv2 CEO, pc- flip cohort).
+### 3. FEE-NET
+- 24h GROSS -0.40 fees 0.61 NET **-1.01** (43T 60.5%).
+- 7d GROSS -2.28 fees 2.53 NET **-4.81** (272T 54.4%).
+- Fade cohort: n=33 gross -0.02 fees 0.345 NET -0.37 (WR 42.4% vs baseline 27.3%).
 
-### 4. AMPLIFY WEEKLY (Monday bar MET)
-- 30d screen: 6 cells n>=10 net>0 — 4 VALIDATED (pc+ EXTREME / bb-squeeze+ NORMAL / vb- HIGH / r2v2-long3), 2 why-not'd (OOS sign-flips).
-- **NEW: amplify-pc-fade-cell-split** — extend contrarian join to by-token/by-regime flip-WR; ship bar ≥70% n≥30 split-half same-sign (mult-up) / <55% (exclusion); verdict 11-09.
-- Why-nots: 0.0 vol-gate overrides all correct (17 cells audited); solo-bypass hh-hl+/ema300 fail 55% WR bar; mults in flight.
-- Flip-KPI: 0 new; in-flight watch-contrarian (11-03), storm-waiver (11-12).
+### 4. AUTOPSY + DEEP-DIVE
+- 48h adverse-first n=36 = 4 never-adverse / 28 recovered / 4 NEVER (all jup HYPE/ETH) → **WRONG-SIDE REFUTED 72nd run**.
+- 0 new sub-50% n>=15 targets (bbbv2/pc+/pc- owned).
 
 ### 5. SHADOW
-- contrarian join 04:30Z: pc- 64.6% n=350 LIVE / rider 32.3% n=653 do-NOT / overall 43.5% n=1004.
-- TAT jup/vb: 7/15 distinct fires COLLECT. floor_admit 04:33Z: 49.7% vs 44.9% COLLECT 11-15. shadow_trader trail-or-nothing. oscillator/wyckoff/rr dead.
+- contrarian join 20:30Z: pc- 64.6% n=350 LIVE / rider 37.4% n=788 do-NOT / overall 45.8% n=1139; pc- uniform p=0.37.
+- TAT #214: 25 distinct jup fires (vb- 0 = correct-by-traffic) → candle OOS schedulable.
+- floor join 04:41Z COLLECT 11-15; oscillator/wyckoff/rr dead.
 
-### 6. CREATIVE (x2)
-1. pc-fade cell-split → registered as amplify proposal (above).
-2. LONG meta_rsi≥70 by vol REFUTED-WITH-DATA — HIGH -0.49/20T vs base -3.47/141T; no filter.
+### 6. CREATIVE (x3)
+1. jup TAT candle OOS now (25 > 15-fire bar).
+2. fade gross-vs-fee split pre-registered for 11-10 (don't move goalposts).
+3. rider token-cell why-not logged (AVAX 68.8 n=32 fails 70%+n30 bar).
 
-### 7. READINESS (04:50)
-**3 open all LONG bracketed 1.0x HOLD** — JUP bb-squeeze+ -0.35% (rsi 73.7), AVAX bb-squeeze+ -0.06% (rsi 72.0), SOL continuation+ -0.12% (rsi 21.9); cluster steers advisory (correlation, one BTC dump hits all). Regime: 15m LONG_BIAS vs 4h SHORT_BIAS, continuum flipped ABOVE, vol LOW, wyckoff MARKUP, trend UP. No size added while vol LOW; trail-family first; UM_HOLD backstop self-closes (proven 2/2 today).
+### 7. READINESS (21:10)
+**5 open ALL LONG** — FARTCOIN +2.2% (mirror, BE-lock skip by design), XPL +0.3% 13h stale, BTC jup +0.2%, SOL jup -0.1%, ETH jup flat (20:48). Cluster advisory; no new correlated LONGs while 15m SHORT_BIAS vs 4h LONG_BIAS disagree. Regime: continuum ABOVE, vol NORMAL, wyckoff ACCUMULATION. Size 1.0x (file absent).
 
-**Queue:** 11-03 batch (waiver renewal + eval-midband + esc-17 + ugb-pt-045 + watch-contrarian extend) → 11-06 regime coverage (entry_regime_4h still 0/14d) → 11-07 jup regime-split re-measure → 11-09 pc-fade cell-split verdict → 11-10 winner-cell review → 11-13 pc+ kill-review → 11-14 stop-asymmetry/grind-breakout/atrtrail → 11-15 floor_admit bar. CEO: tier-2 ACK + TAT-OOS ratify · HYPE 2.0 fee · NET-KPI switch.
+**Queue:** 11-05 fade-btc-crash → 11-06 regime-coverage batch → 11-07 jup review + trials + stop-tighten label deadline → 11-09 zombie-purge + timer fire → 11-10 fade/winner-cell/watch bars → 11-13 pc+ kill-review → 11-14 stop-asymmetry stack. CEO: stop-tighten-probe label · HYPE 2.0 fee · NET-KPI switch.

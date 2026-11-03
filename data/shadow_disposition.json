@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-03T04:55:46Z",
+  "updated": "2026-11-03T08:30:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -303,7 +303,7 @@
       "id": "disposition-cadence-revert",
       "stream": "hermes-shadow-disposition.timer cadence (daily 10-30 -> revert weekly)",
       "kind": "meta",
-      "disposition": "REVERT EXECUTED — 11-03 cluster dispositioned (ugb KEEP / midband NO-CHANGE / esc-17 stale-close / watch-contrarian EXTEND); timer OnCalendar back to Mon 08:15 (config+etc+daemon-reload)",
+      "disposition": "REVERT EXECUTED (claimed 04:55Z) BUT FILES WERE STILL DAILY — brain_auditor #218 found config+/etc OnCalendar=*-*-* 08:15:00 at 20:57Z, actually reverted both to Mon *-*-* 08:15:00 + daemon-reload. Next fire: Mon 2026-11-09 08:15Z. Status stays done.",
       "status": "done",
       "started": "2026-10-29",
       "deadline": "2026-11-03T00:00:00Z",
@@ -311,13 +311,14 @@
       "threshold": "After the 11-03 cluster is dispositioned: revert timer OnCalendar to 'Mon *-*-* 08:15:00' (config + /etc + daemon-reload). This entry's own packet = the reminder.",
       "default_action": "REVERT timer to weekly + close this entry",
       "owner": "main-session (T sign-off 'All three')",
-      "done_at": "2026-11-03T04:55:46Z"
+      "done_at": "2026-11-03T04:55:46Z",
+      "fix_20261103": "actual revert by brain_auditor #218 at 20:57Z (false-done correction)"
     },
     {
       "id": "fade-ctx-exempt",
       "stream": "CONTRARIAN_CTX_EXEMPT (shadow -> enforce): CTX misaligned + LONG knife exemption for fade entries",
       "kind": "flip",
-      "disposition": "FLIP-PENDING",
+      "disposition": "FLIP-PENDING — bar FAIL on fee-net (n=33 PASS, NET -0.37 < +1.00). Keep shadow-only per default. Re-measure at 11-10 deadline; if still net-negative, report gross-vs-fee split to CEO (WR edge real, fees eat it at current size) rather than auto-flip.",
       "status": "open",
       "started": "2026-10-29",
       "deadline": "2026-11-10T00:00:00Z",
@@ -326,7 +327,14 @@
       "default_action": "KEEP shadow-only (do not enforce)",
       "owner": "CEO label + T sign-off 2026-10-29 ('proceed')",
       "notes": "SEQUENCING: pump-chain- family disposition is in the 11-03 batch — if the bar is not met by then, the family verdict must explicitly carry the fade's shadow-so-far numbers; enforce flip must land before a family kill would take the fade with it. | PRE-FLIP DECISIONS (code review 20261029 LOW-2/LOW-1): (1) pick the bar-measurement convention before the enforce flip — shadow WOULD-FILL logs count at FULL size while the enforce knife leg executes HALF-size (FADE_EXEMPT_KNIFE_SIZE_MULT); CEO to choose convention at flip time. (2) delayed-entry fade marking now mirrors the main loop's _flipped formula (fixed pre-enforce). | AUTOPSY 2026-10-29 (subagent 893bb816): the exec-stage kill-table this entry targets is only the LAST funnel. Funnel: ~503 fade signals -> 47 (9.3%) reach decider -> 35 flipped -> 1 fill. 90% die at APPROVAL, direction-blind (signal_compactor has no inversion logic): vol-gate-override-0.0 ('EXTREME','pump-chain-')=0.0 ~183 signals (WIRING — post-fade is LONG in EXTREME where '+' keeps 1.0 at 45.8%WR +$1.19) + pump-chain-short-high ~156 (outcome-CORRECT — HIGH blocks LONG too 35.7%WR). Exec kills = staleness decay (5-10min approval latency, pumps die before exec) + misaligned/dead-gap CORRECT. similar_setup cross-family bug FIXED in a3835279 (buried in an unrelated commit — flagged). CONF-FILTER-SHADOW [70,95) caps every flip at conf~49.5 — LATENT LANDMINE if ever enforced (100% flips die instantly). | RC1 SHIPPED (CEO-APPROVED-TO-FLIP modified, consult 20261029T1930Z): three-site effective-source rule — (1) approval DRIFT-A vol-gate lookup evaluates the POST-FADE '+'-form (LIVE, money-null until exec flips; 🎭 FADE-EFFECTIVE-SOURCE log), (2) approval SHORT RSI-floors skip fades (they trade LONG post-flip; 8 kills/14d), (3) exec should_trade_v2 vol-gate SKIP wrapped in _fade_exempt_allowed (SHADOW — the CEO's BINDING condition: without it the approval unlock is NULL because the post-fade LONG died at exec mult 0.0; verified in one row: BIGTIME #16457 only filled via the v6 sibling key shadowing the 0.0). Single enforce flip for the whole stack with the same 7d bar; BAR-CONVENTION DECIDED BY CEO: shadow would-fills count at ENFORCE economics (knife legs half-size). CONF_FILTER landmine binding: any future enforce must carry a fade carve-out. | REVIEW LOW-1 CLOSED: effective-source lookup EXTREME-bounded (regime param; NORMAL/HIGH/FLAT keep pre-RC1 behavior — the unmapped NORMAL would have INTRODUCED an unlabeled kill via ('NORMAL','pump-chain+')=0.0). FLIP CHECKLIST for the single enforce flip (review LOW-2 + INFO): (a) half-size knife plumbing ships with the flip (FADE_EXEMPT_KNIFE_SIZE_MULT consumers), (b) exempted fades fall through with volatility_regime=None + sl_multiplier=1.0 — recompute regime on fall-through or accept default SL sizing, (c) confirm whether the enforce wrap should exempt the ENTIRE vol-gate verdict (flat/storm/no_data) or only the override-0.0 case — re-check verdict reason at flip time. NORMAL-regime fade ruling (60.2% n=103 OOS, unlabeled) = optional CEO item.",
-      "revert": "CONTRARIAN_CTX_EXEMPT_ENFORCE stays False; set SHADOW=False to stop logging"
+      "revert": "CONTRARIAN_CTX_EXEMPT_ENFORCE stays False; set SHADOW=False to stop logging",
+      "evidence_20261103": {
+        "fade_long_7d": "n=33 gross=-0.02 fees=0.345 NET=-0.37 wr=42.4% (bar: n>=15 PASS, net>=+$1.00 FAIL)",
+        "fade_long_since_1027": "n=33 same cohort (7d window == full post-flip window for LONG fills)",
+        "baseline": "pre-fade WR 27.3% — directional edge holds (42.4%) but fee-net negative",
+        "conversion": "CONTRARIAN-LIVE 18 fires 11-03; Z-FLIP 0 skip lines (conversion healthy)",
+        "measured_at": "2026-11-03T21:05:00Z"
+      }
     },
     {
       "id": "winner-cell-size-125",
@@ -369,7 +377,8 @@
       "evidence": "CEO 20261029: offense had zero owners (parameter tuner dead since 2026-08-26; auto_1hr boost lane bricked at its 1.0 ceiling 10-28). AMPLIFY mandate added to brain_auditor prompt (rank winner cells, >=1 proposal/week, flip-KPI >=1 shadow->live conversion/week).",
       "threshold": "First weekly run (Mon 11-02) emits >=1 amplify proposal OR a kanban 'why not' note; flip-KPI reported in the next CEO status.",
       "default_action": "FLAG to T: offense loop not running",
-      "owner": "brain_auditor weekly run"
+      "owner": "brain_auditor weekly run",
+      "note_20261103_tuesday": "Light screen (not formal weekly — Mon 11-02 met the bar): 30d n>=10 net>0 cells = 4 VALIDATED (pc+ EXTREME / bb-squeeze NORMAL / vb- HIGH / r2v2 NORMAL already in set) + 3 check-cells all previously why-not'd or in-flight (pc- NORMAL SHORT OOS-unstable, pc-,v6- EXTREME sign-flip, jup HIGH SHORT covered by amplify-jup-short-walk). 0 NEW proposals. stop-tighten-probe-080 (this run's assigned amplify) blocked on CEO label. Flip-KPI: 0 new conversions; in-flight watch-contrarian 11-10, storm-waiver 11-12."
     },
     {
       "id": "fade-volgate-split-analysis",
@@ -425,7 +434,8 @@
       "evidence": "CEO standing mechanism ('T never asks'): auto_1hr_prompt.md section added (T sign-off 'All three'). Packet = per-gate blocked counts + RSI>=35 counterfactual $ + touch rule + waiver state; each packet = one auditable storm-bar entry.",
       "threshold": "First storm after 10-29 emits a [STORM-READINESS] packet with table; >=3 packets accumulate the storm-confl-waiver enforce bar.",
       "default_action": "FLAG to T: mechanism not running",
-      "owner": "auto_1hr hourly run"
+      "owner": "auto_1hr hourly run",
+      "notes": " | CAVEAT (74e824af 2026-11-03, LOW): A4 moved score-kills from compaction_stale_10min into 'blocked@approval: short-regime-gate' — this now counts in the auto_1hr STORM-READINESS census and the _storm_confluence_would_pass sibling block-count, potentially inflating the >=3-storm shadow signal. ENFORCE=False today (log-only); verify census attribution at the 11-12 read."
     },
     {
       "id": "signal-zombie-purge",
@@ -687,7 +697,7 @@
       "id": "watch-contrarian-live",
       "stream": "CONTRARIAN-LIVE pump-chain- fade real-trade watch — PostgreSQL brain trades (pc- LONG opens since started)",
       "kind": "watch",
-      "disposition": "EXTEND 7d — bar MET (29 real pc- LONG fade fills since 10-27, conversion lines firing through 11-03 01:49Z) but fee-net negative: gross +0.03 / fees 0.305 / NET -0.28; WR 41.4% vs pre-fade baseline 27.3% (-0.27) = directional improvement, join flip-WR still 64.6% n=350",
+      "disposition": "EXTEND 7d — bar MET (29 real pc- LONG fade fills since 10-27, conversion lines firing through 11-03 01:49Z) but fee-net negative: gross +0.03 / fees 0.305 / NET -0.28; WR 41.4% vs pre-fade baseline 27.3% (-0.27) = directional improvement, join flip-WR still 64.6% n=350 | 11-03 refresh: NET -0.37 fee-adjusted, EXTEND to 11-10 stands (n>=20 bar for kill/promote).",
       "status": "open",
       "started": "2026-10-27",
       "deadline": "2026-11-10T00:00:00Z",
@@ -723,6 +733,14 @@
         "wr": "41.4% (pre-fade pc- LONG 22T 27.3% -0.27)",
         "join": "pc- flip-WR 64.6% n=350 refreshed 04:31Z",
         "next": "11-10: require NET >= 0 or fade-size/fee review; 0 new fills -> disable path"
+      },
+      "evidence_20261103": {
+        "pc_long_since_1027": "n=33 gross=-0.02 NET=-0.37 wr=42.4% (baseline 27.3% = +15pp directional)",
+        "today": "4T -0.05",
+        "shadow_join": "pc- flip-WR 64.6% n=226/350 LIVE (join re-ran 20:30Z mandate); rider 37.4% n=788 do-NOT; overall 45.8% n=1139",
+        "conversion": "CONTRARIAN-LIVE 18 fires 11-03; Z-FLIP 0 skips",
+        "cell_split": "pc- token heterogeneity chi2 p=0.37 = UNIFORM — amplify-pc-fade-cell-split NO CHANGE stands",
+        "measured_at": "2026-11-03T21:05:00Z"
       }
     },
     {
@@ -833,7 +851,8 @@
       "measurement": "re-run the read-1 method in stop-tighten-enforce-eval.evidence_20261102_read1 with X=0.80; report per-signal delta, fk, split halves, and the winner-kill id list",
       "default_action": "NO CHANGE — STOP_TIGHTEN_MAX_PRICE_PCT stays 1.00 and ENFORCE stays False if the bar fails; the 1.0% enforce hypothesis is judged separately at the same deadline",
       "risk": "low (shadow-only; revert by setting the constant back to 1.0)",
-      "requires": "CEO label + T sign-off BEFORE the constant changes (it is the pre-registered hypothesis of stop-asymmetry-highwr); if no label by 11-07 the probe stays at 1.0% and read-2 simply reports inert again"
+      "requires": "CEO label + T sign-off BEFORE the constant changes (it is the pre-registered hypothesis of stop-asymmetry-highwr); if no label by 11-07 the probe stays at 1.0% and read-2 simply reports inert again",
+      "note_20261103": "Run #218 label check: NO CEO label / T sign-off found in kanban or registry. Per requires-field: probe stays STOP_TIGHTEN_MAX_PRICE_PCT=1.00, ENFORCE=False. Label deadline 11-07 else read-2 reports inert again at 11-14. Companion stop-tighten-enforce-eval unchanged."
     },
     {
       "id": "jup-hml-shadow-065-050",
@@ -997,6 +1016,20 @@
       "default_action": "no change until shadow delivers bars",
       "owner": "CEO",
       "notes": "Not implemented in fix-round 2 — registered so the LONG-heavy bypass cohort is not silently forgotten while SHORT-side work ships."
+    },
+    {
+      "id": "short-shadow-join-builder",
+      "stream": "log tags [SHORT-REGIME-EXEMPT-SHADOW] [FLIP1-OVERRIDE-SHADOW] [BEAR-SINGLE-SOURCE-SHADOW] [VOLGATE-SHORT-EXEMPT-SHADOW] [MAXXED-SHORT-EXEMPT-SHADOW] in logs/pipeline.log",
+      "kind": "eval",
+      "disposition": "EVAL",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-16T00:00:00Z",
+      "threshold": "join builder shipped: for each of the 5 shadow tags, token+dir -> outcome window join (same fwd machinery as gate_shadow.py, TOKEN-DAY DEDUP per gate-shadow-dedup-convention) producing the counterfactual n/net the 11-10 and 11-17 bars require; smoke-tested on >=1 real tag line",
+      "default_action": "at 11-17 the shadow bars read n=0 and their safe defaults fire (keep kill / stay blocked / no exempt) — decision defaults to NO CHANGE, which is the safe direction but wastes the 14d shadow",
+      "owner": "main-session",
+      "evidence": "74e824af follow-up 2026-11-03: no automated join exists for the 5 new tags; daily shadow_disposition runner fires deadline packets but cannot compute the bars",
+      "notes": "built AFTER this: the A1/A2 bars are due 11-17 (entries short-regime-exempt-shadow, flip1-bear-override-reshadow) and the fix-round-2 bars 11-10/11-17 (bear-single-source, volgate, maxxed)"
     }
   ]
 }

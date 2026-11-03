@@ -10386,5 +10386,32 @@
     "category": "entry sniper",
     "status": "measured-refuted",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-03T21:04:28Z",
+    "idea": "Run jup TAT candle OOS now (25 distinct fires > 15-fire bar)",
+    "rationale": "#214 shadow collected 25 distinct jup would-fires since 11-01; candle harness required (pump-chain TAT lesson: trades-level fk 36.8%)",
+    "expected_impact": "GO/NO-GO on jup TAT 90m enforce; targets ~half of jup never-armed bleed",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-03T21:04:28Z",
+    "idea": "fade-ctx-exempt gross-vs-fee decomposition at 11-10 read",
+    "rationale": "WR edge +15pp real but fee-net -0.37 fails pre-reg bar; surface split, don't move goalposts",
+    "expected_impact": "informed CEO flip/kill decision",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-03T21:04:28Z",
+    "idea": "rider token-cell why-not logged (AVAX 68.8 n=32 etc. fail ship bar 70%+n30)",
+    "rationale": "heterogeneity p=5.9e-26 invites re-mining; pre-empt with data",
+    "expected_impact": "stops duplicate amplify proposals",
+    "category": "amplify",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

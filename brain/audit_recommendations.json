@@ -1,218 +1,145 @@
 {
-  "timestamp": "2026-11-02T17:00:00Z",
+  "timestamp": "2026-11-03T21:04:09Z",
   "run": 218,
-  "session_lock": "absent (checked /tmp/hermes-session-active.lock — not present)",
   "session_brain_stats": {
     "queries": [
-      "jup_yolo_mirrored performance losses",
-      "stop asymmetry jup_yolo entry quality",
-      "signal losing streak wrong side"
+      "signal performance winrate regime",
+      "losing money bleeding hard_max_loss chop",
+      "creative idea improvement strategy not implemented"
     ],
-    "top_hits": [
-      "copy_trader yolo: HYPE jup_yolo_mirrored accumulating hard_max_loss -4.58% clusters (recurring since 10-31)",
-      "ceo: jup_yolo_mirrored = brand-new auto-mirror family (a34a68bf), 17 LONG fills day one",
-      "stop-asymmetry study delivered: inverted R:R is stop-side, SL at 1.0% price passed bar -> SHIP-TO-SHADOW",
-      "wave_catcher: signals firing in wrong market conditions; hard_max_loss = bad entry not broken signal"
-    ],
-    "note": "session_brain dup-heavy 16th consecutive run (ideation only, not used for decisions)"
+    "top_insights": [
+      "Recurring: hard_max_loss/chop entries = structural bleed; trail family = only win path (reconfirmed live)",
+      "Recurring: stop asymmetry jup/vb (avg loss 2x avg win) — owned by stop-asymmetry-highwr 11-14",
+      "No unimplemented high-score idea surfaced that isn't already in shadow_disposition"
+    ]
   },
   "trade_summary_24h": {
-    "closed": 37,
-    "wr": 48.6,
-    "pnl_usdt": -0.99,
-    "last20_wr": 30.0,
-    "last20_note": "matches watchdog steer-001 (6W/14L)",
-    "by_signal_top_losers": [
-      "jup_yolo_mirrored LONG 20T 55.0% -0.41",
-      "jup_yolo_mirrored SHORT 5T 40.0% -0.33",
-      "bb-squeeze+ LONG 2T 0% -0.13",
-      "pump-chain- LONG 6T 33.3% -0.11"
-    ],
-    "d7": {
-      "n": 248,
-      "wr": 53.6,
-      "pnl_usdt": -2.01
+    "n": 43,
+    "wr_pct": 60.5,
+    "gross_pnl": -0.4,
+    "fees": 0.61,
+    "net_pnl": -1.01,
+    "7d": {
+      "n": 272,
+      "wr_pct": 54.4,
+      "gross": -2.28,
+      "fees": 2.53,
+      "net": -4.81
     },
-    "d14": {
-      "n": 384,
-      "wr": 50.5,
-      "pnl_usdt": -2.63
-    },
-    "d7_exits": {
-      "profit-monster-trail": "91T 97.8% +5.06",
-      "ugb_pt": "22T 68.2% +1.38",
-      "atr_sl_hit": "34T 0.0% -3.85",
-      "hard_max_loss": "18T 0.0% -2.62",
-      "cut-loser-CL-T1": "13T 0.0% -1.92"
-    },
-    "d7_armed_vs_unarmed": {
-      "armed_trail_family": "131T 88.5% +7.81",
-      "unarmed": "117T 14.5% -9.82"
-    }
-  },
-  "watchdog_triage": {
-    "steer-001": "ANSWERED WITH ZERO CONFIG — 14/20 = last-20 window is 6W/14L; 12 of the 18 24h losers are jup_yolo_mirrored (or continuum+,jup_yolo_mirrored) exiting hard_max_loss/atr_sl_hit at -0.79..-0.92% price (-4.0..-4.7% acct). Root cause = chop entries that never arm (see chop-bleed), not a broken exit. Every jup regime/direction/confidence cell I tested failed significance or fk (see rejected_patterns).",
-    "steer-002": "jup_yolo_mirrored 3-loss streak CONFIRMED but signal-level kill NOT MET: 7d 87T 54.0% -1.13 = 35% of flow, 56% of the 7d loss, born 10-30 (4 days old). Owner = jup-yolo-regime-review (deadline 11-07). Fresh tests this run: regime gate REJECTED (HIGH block kills 20/49 winners, fk 41%), hot-wallet (jup_pnl_7d>=1000) filter REJECTED (p=0.141, fk 55.2%, threshold sweep unstable), rank<=15 filter n=12 <20. NO CHANGE.",
-    "portfolio_health": "critical — 0 open trades, correct (flat) under STRONG_DOWN / SHORT_BIAS / DISTRIBUTION / vol LOW"
-  },
-  "chop_bleed": {
-    "d7_dollar_share_pct": 98.6,
-    "d7_chop_losers": 92,
-    "d7_total_losers": 100,
-    "streak": "14th consecutive window >=92%",
-    "mandate": "trail family 131T 88.5% +7.81 vs unarmed 117T 14.5% -9.82 (7d). Every dollar of the 7d loss is a never-armed entry."
-  },
-  "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py adverse-first (--selfcheck ASSERT PASS; open-anchored test re-confirmed VACUOUS 163/171=95.3%)",
-    "h48": {
-      "n": 37,
-      "never_adverse": 8,
-      "recovered": 25,
-      "never_traded_back": 4,
-      "NEVER": [
-        "ETH SHORT jup_yolo_mirrored -0.19",
-        "HYPE LONG jup_yolo_mirrored -0.17",
-        "HYPE SHORT jup_yolo_mirrored -0.16",
-        "BABY LONG pump-chain- -0.05"
-      ]
-    },
-    "d14": {
-      "n": 171,
-      "never_adverse": 42,
-      "recovered": 105,
-      "never_traded_back": 24,
-      "structural_pct": 14.0
-    },
-    "verdict": "WRONG-SIDE REFUTED 72nd consecutive run (on corrected + independent evidence: #61 opposite-side p=0.116, #84 forward-return t=-0.04). 3 of 4 48h NEVER are jup hard_max_loss — the unarmed-chop class, owned by the queued exit/arm stack.",
-    "structural_class": "24/171 = 14.0% never recover; owned by re-enter-on-recovery (queued), not by a direction flip"
+    "chop_bleed_7d": "98.5% dollar share (99/110 losers from chop exits) = 14th consecutive >=92% window",
+    "trail_vs_other_7d": "trail-family 143T 89.5% +8.62 vs unarmed/other 130T 15.4% -11.00",
+    "by_exit_7d": "atr_sl_hit 41T -4.50 0%WR | hard_max_loss 26T -3.51 0%WR | profit-monster-trail 93T +5.38 97.8%WR"
   },
   "shadow_analysis": {
-    "contrarian": "JOIN REFRESHED THIS RUN 16:53Z (mandated, no systemd producer). Overall flip-WR 43.8% n=1011. pump-chain- 64.6% n=350 (LIVE fade), btc-pump-rider+ 32.9% n=662 (do-NOT). By-token/by-BTC-tape sections already shipped (65b23de8 14:55Z). Cell split dispositioned NO CHANGE: GRASS n=37 75.7% clears magnitude bars but Fisher p=0.093/0.119, bootstrap CI [62.2,89.2] includes base, chi2 heterogeneity p=0.375 = uniform.",
-    "oscillator": "FROZEN+ARCHIVED (data/archive/oscillator_shadow.json.fossil-20261027) — no live question answerable, not queried",
-    "wyckoff": "PENDING JOIN, 345 rows, no outcome column — still none",
-    "floor_admit": "join fresh 04:33Z today: floor_only 1198 decided 49.7% vs always_admit 156 decided 44.9%; blocked cohort n=0; COLLECT to 11-15 (directional, p=0.138 at last full read)",
-    "rr_shadow": "rr_shadow_audit_7d.json ORPHANED (no producer, mtime 24d) — not cited",
-    "stop_tighten": "READ-1 DELIVERED THIS RUN — see drift_findings. Collector live since 10-31; 406 log lines, 44 distinct jup ids + 4 vb ids.",
-    "mfe_cut": "5625 [SHADOW] MFE-CUT lines in pipeline.log, firing live (BTC #16700 135m would-fire). KEEP open to 11-10.",
-    "tat_trail_arm": "81 [SHADOW] TRAIL-ARM would-fire lines, last 11-01 01:48. JUP_TRAIL_ARM_TIMEOUT is SHADOW-only (no ENABLED sibling) — variant-C enforcement exists for bb-bounce only.",
-    "shadow_trader_report": "52,765 signals / 51,818 closed. Top source grind-breakout- n=26 WR 92.3% avg +1.56 (live 2T/30d = amplify-grind-breakout-deploy, due 11-14). Gate justification: CONFLUENCE-EXPIRY 14,815 blocked @47%.",
-    "overall": "Useful: contrarian join (refreshed), floor_admit, stop_tighten (now read), shadow_trader, MFE-CUT. Noise/dead: oscillator (archived), wyckoff (no join), rr_shadow (orphaned)."
+    "contrarian": "JOIN RE-RAN 20:30Z (mandate). Overall flip-WR 45.8% n=1139. pc- 64.6% (226/350) LIVE fade stands; btc-pump-rider+ 37.4% (295/788) do-NOT-flip. pc- token heterogeneity p=0.37 = uniform → cell-split NO CHANGE confirmed. by-BTC-tape: pc- BELOW 67.8% n=211 / AT 58.6% n=111 / ABOVE 64.3% n=28.",
+    "tat_shadow_jup_vb": "#214 WORKING: 25 distinct jup trades would-fired (5411 log lines) since 11-01. vb- 0 fires = correct-by-traffic (all post-ship vb- closes <45m). Ready to schedule candle OOS (exceeds 15-fire bar).",
+    "floor_admit": "join fresh 04:41Z today (16h old, producer runs via agent) — COLLECT to 11-15 unchanged",
+    "oscillator": "ARCHIVED fossil — dead",
+    "wyckoff": "PENDING JOIN (345 rows) — owed before 11-15",
+    "rr_shadow": "ORPHANED — do not cite",
+    "shadow_trader": "trail-or-nothing unchanged (pm_trail +8511 vs hard_max -9605); gates justified (CONFLUENCE-EXPIRY 15026 @47%)",
+    "overall": "contrarian + TAT + floor_admit = useful; oscillator/wyckoff/rr dead"
   },
   "drift_findings": [
     {
-      "id": "D1",
-      "severity": "HIGH",
-      "finding": "STOP_TIGHTEN_MAX_PRICE_PCT=1.00 is INERT — 0/35 log-joined trades reach 1.00% adverse (max 0.864%); the exit system stops these trades at ~0.85% (hard_max_loss/atr_sl). The collector produces zero information for the remaining 12 days of its own 14d window.",
-      "action": "partial read recorded in stop-tighten-enforce-eval; amplify-stop-tighten-probe-080 registered (probe -> 0.80, ENFORCE stays False, needs CEO/T label)"
-    },
-    {
-      "id": "D2",
       "severity": "MED",
-      "finding": "amplify-pc-fade-cell-split was registered on a STALE premise — the join already emitted by-token/by-BTC-tape (commit 65b23de8, 14:55Z, ~5h after registration)",
-      "action": "dispositioned NO CHANGE with full stats same run; do not re-register"
+      "finding": "disposition-cadence-revert status=done claimed 'timer OnCalendar back to Mon 08:15 (config+etc+daemon-reload)' at 04:55Z but BOTH config and /etc still had OnCalendar=*-*-* 08:15:00 at 20:57Z (mtimes Oct 27/29 — never touched).",
+      "action": "ACTUALLY executed the revert this run: both files -> Mon *-*-* 08:15:00 + daemon-reload. Next fire Mon 11-09 08:15Z. Registry note corrected."
     },
     {
-      "id": "D3",
-      "severity": "MED",
-      "finding": "JUP_TRAIL_ARM_TIMEOUT (variant-C for the #1 signal by flow) is SHADOW-only — JUP_TRAIL_ARM_TIMEOUT_SHADOW=True with no ENABLED sibling, while BB_BOUNCE_TRAIL_ARM_TIMEOUT_ENABLED=True is enforced. 31% of 7d flow has no arm-timeout backstop.",
-      "action": "report to CEO — enforcement is a CEO label, not an auditor change; evidence: jup 14d atr_sl_hit 15T -1.99 + hard_max_loss 11T -1.68 = -3.67 of the -1.13 net (offset by trail +2.71)"
-    },
-    {
-      "id": "D4",
       "severity": "LOW",
-      "finding": "CONF-FILTER-SHADOW logs conf=257.42 / final_confidence up to 384.7 (31/244 trades >100) — sig.get('confidence') is None on the standalone path so it falls back to the UNCAPPED composite. Outcome unaffected (any >95 blocks either way) but the log line is unreadable.",
-      "action": "cosmetic; no change"
+      "finding": "FARTCOIN BE-lock steer re-fires every 30m and is correctly skipped ('T1 exact mirror — pro exit governs') — hl_copy_trader stops are provider-governed. Steer noise only, auto_executable=true is misleading for mirror trades.",
+      "action": "report-only; optional watchdog tweak to mark mirror-trade steers auto_executable=false"
     },
     {
-      "id": "D5",
-      "severity": "LOW",
-      "finding": "session_brain dup-heavy 16th consecutive run",
-      "action": "ideation only, not used"
-    },
-    {
-      "id": "D6",
       "severity": "INFO",
-      "finding": "entry_regime_4h is NOT a trades.metadata key at all (top keys are btc_regime / coin_regime / btc_trend_quality) — the CURRENT.md queue line 'entry_regime_4h 0/14d' is measuring a non-existent field",
-      "action": "correct the queue line; use _signal_metadata->>'coin_regime' / 'btc_regime'"
+      "finding": "bb-bounce-v2-long+ 14d 19T 36.8% still sub-50 n>=15 — already owned (TAT-C live, CEO packet complete, kill bars fail on winner-kill)",
+      "action": "no new action"
     }
   ],
-  "rejected_patterns": [
-    {
-      "idea": "jup hot-wallet filter (jup_pnl_7d >= 1000)",
-      "data": "34T 47.1% -1.10 vs 18T 72.2% +0.58",
-      "why_not": "Fisher p=0.141; fk = 16/29 = 55.2% (>20% bar); threshold sweep T=500/1500/2000 all p>=0.588 — unstable. REJECTED-WITH-DATA"
-    },
-    {
-      "idea": "jup regime gate (block LONG in HIGH vol)",
-      "data": "HIGH LONG 36T 55.6% -0.43",
-      "why_not": "fk = 20/49 = 41% of jup winners; NORMAL/EXTREME/FLAT all in-line. REJECTED-WITH-DATA"
-    },
-    {
-      "idea": "jup rank<=15 mirror-only filter",
-      "data": "rank<=15 12T 66.7% -0.09 vs rank>15 70T 52.9% -1.02",
-      "why_not": "n=12 < 20 minimum. MONITOR"
-    },
-    {
-      "idea": "stop-tighten enforce at shipped X=1.00%",
-      "data": "log-joined n=35, delta $0.00/14d",
-      "why_not": "bar +$0.15/30d FAILS; probe inert. KEEP SHADOW"
-    },
-    {
-      "idea": "pump-chain- NORMAL 1.2 boost removal (auto_1hr flag)",
-      "data": "30d NORMAL SHORT 11T +0.58 / LONG 23T +0.09 — net POSITIVE both legs; comment's 64.3% WR justification is stale (now 16-39% WR)",
-      "why_not": "cell is net positive, removing a boost reduces flow on a positive cell; WR decay alone is not a kill bar. MONITOR — re-check at 11-13 pc+ / pc- checkpoint"
-    }
+  "recurring_problems": [
+    "Chop-bleed >=92% dollar share: 14th consecutive window (0.75x plain-marker stays VETO #196; entry-quality stack + TAT own the lever)",
+    "Stop asymmetry jup/vb: losers ride 2x farther than winners collect — stop-asymmetry-highwr due 11-14",
+    "Fee-net: 7d gross -2.28 -> net -4.81; every amplify threshold must read net (BUG-073 standard)"
+  ],
+  "missing_implementations": [
+    "jup TAT candle OOS — shadow has 25 distinct fires (>15 bar) but OOS harness not yet run for #214 flags",
+    "wyckoff outcome join — 345 rows still no outcome column (owed 11-15)"
   ],
   "creative_improvements": [
     {
-      "idea": "STOP_TIGHTEN probe retune 1.00 -> 0.80 (shadow-only, zero live effect)",
-      "rationale": "at 1.00 the clamp binds on 0/35 joined trades = an inert collector burning its own eval window; 0.80 is the measured binding region (10/35 join) with 0/49 jup winners at mae>=0.80 vs 23/32 losers at 0.80 exit-move",
-      "expected_impact": "converts 12 dead days of shadow into a decidable read at 11-14",
+      "date": "2026-11-03T21:04:09Z",
+      "idea": "Run jup TAT candle-level OOS now (25 distinct would-fires accumulated since #214 ship)",
+      "rationale": "#214 shipped shadow-only explicitly 'for candle OOS before any enforce'; 25 fires exceeds the 15-fire bar used for TAT-C. Pump-chain TAT lesson: trades-level overstates, fk was 36.8% — must use candle harness (tat_variant_c_candle_oos pattern).",
+      "expected_impact": "GO/NO-GO on jup TAT enforce (90m) — could cut ~50% of never-armed jup bleed (-5.42/14d chop exits) if fk<=20%",
       "category": "exit sniper",
-      "status": "registered as amplify-stop-tighten-probe-080",
+      "status": "suggested",
+      "risk": "low (analysis only, zero live change)"
+    },
+    {
+      "date": "2026-11-03T21:04:09Z",
+      "idea": "fade-ctx-exempt: report gross-vs-fee split at 11-10 — WR edge is real (+15pp) but fee-net fails bar",
+      "rationale": "n=33 PASS, NET -0.37 FAIL. Fees 0.345 on gross -0.02. Pre-registered bar says net — do NOT move goalposts mid-flight; surface the decomposition so CEO can decide size/fee interaction at flip time.",
+      "expected_impact": "prevents either silent goalpost-move or premature kill of a directionally-correct fade",
+      "category": "process",
+      "status": "suggested",
       "risk": "low"
     },
     {
-      "idea": "GRASS pc- fade cell watch (n 37 -> 60)",
-      "rationale": "only cell anywhere clearing both >=70% flip-WR and n>=30 (75.7%); fails significance today (p=0.093) and global heterogeneity says uniform (p=0.375) — but split-half is same-sign 77.8/73.7",
-      "expected_impact": "if it holds to n>=60 with p<0.05, a per-token fade notional mult becomes eligible",
+      "date": "2026-11-03T21:04:09Z",
+      "idea": "rider token-cell amplify why-not WITH DATA (prevents re-derivation)",
+      "rationale": "btc-pump-rider+ heterogeneity p=5.9e-26: AVAX flip 68.8% n=32, DOGE 71.4% n=21, USELESS 72.2% n=18 look flippable — but NONE clear the pre-registered ship bar (>=70% AND n>=30): AVAX 68.8<70, DOGE/USELESS n<30. ACE/SAND/CFX/ALGO/HYPE/ONDO at 0% flip = original always wins.",
+      "expected_impact": "logs the why-not so next run doesn't re-mine the same cells",
       "category": "amplify",
-      "status": "monitor",
+      "status": "suggested",
       "risk": "low"
     }
   ],
-  "config_changes_applied": [],
-  "config_change_note": "0 trading-constant changes. Every candidate failed the significance/fk/OOS bars (see rejected_patterns). hermes_constants.py untouched; CEO_PROTECTED_FLAGS 13/13; git working tree clean at start of run.",
+  "config_changes_applied": [
+    {
+      "change": "hermes-shadow-disposition.timer OnCalendar *-*-* 08:15 -> Mon *-*-* 08:15 (config + /etc + daemon-reload)",
+      "type": "meta/systemd",
+      "rationale": "disposition-cadence-revert falsely claimed done; cluster is dispositioned so weekly cadence per signed threshold",
+      "trading_constants": "NONE — hermes_constants.py EMPTY diff"
+    }
+  ],
   "changes_from_last_run": [
     {
-      "run": 217,
-      "change": "registered amplify-pc-fade-cell-split (pc-fade by-token/by-regime cell split)",
-      "checked": "JOIN EXTENSION ALREADY EXISTED (65b23de8 14:55Z); ran the ship bar anyway -> NO CELL CLEARS (GRASS p=0.093, chi2 p=0.375). Dispositioned done/NO CHANGE. Proposal closed 14h early with data."
+      "change": "#214 TAT jup/vb shadow",
+      "verified": "WORKING — 25 distinct jup fires, vb- 0 correct-by-traffic",
+      "verdict": "keep collecting; schedule candle OOS"
     },
     {
-      "run": 217,
-      "change": "REFUTED-WITH-DATA: LONG meta_rsi>=70 by vol",
-      "checked": "still no filter — not re-proposed"
+      "change": "#217 amplify-pc-fade-cell-split",
+      "verified": "dispositioned done same day NO CHANGE; join re-run confirms uniform (p=0.37)",
+      "verdict": "stands"
     },
     {
-      "run": 216,
-      "change": "closed hype-16662-umhold-1801 checkpoint (UM_HOLD self-close)",
-      "checked": "UM_HOLD backstop still firing (self-closes proven); 6 UNIVERSAL_MAX_HOLD exits in 7d"
+      "change": "#217 watch-contrarian EXTEND rec",
+      "verified": "written to registry; evidence refreshed this run (NET -0.37, EXTEND to 11-10 stands)",
+      "verdict": "working as intended"
     },
     {
-      "run": 214,
-      "change": "JUP/VB_TRAIL_ARM_TIMEOUT_SHADOW shipped",
-      "checked": "JUP shadow live (44 distinct ids in stop-tighten log is separate; TAT would-fire 81 lines, last 11-01). VB_TRAIL_ARM_TIMEOUT shadow source match tightened to 'volume-buildup-' — still only 4 distinct ids logged"
+      "change": "UM_HOLD self-close (prior runs)",
+      "verified": "not re-tested this run (no UM_HOLD candidates open)",
+      "verdict": "n/a"
     }
   ],
   "next_actions": [
-    "11-03 batch: eval-midband-long-4564 (EVAL-OVERDUE default), escalation-17 DISPOSE (auto-close stale if no answer), ugb-pt-045 FLIP/REVERT check, watch-contrarian-live disposition (extend-to-11-10 recommendation stands), waiver renewal",
-    "11-04..11-07: jup-yolo-regime-review verdict (11-07); trial-wider-sl + trial-extended-time defaults fire 11-07 unless CEO overrides",
-    "11-09: weekly AMPLIFY (amplify-pc-fade-cell-split already closed this run — new cell needed)",
-    "11-10: winner-cell-size-125 read (4 cells, pump-chain+ EXTREME drifted), conf-filter-parity-split, mfe-cut-arm-be",
-    "11-13: pump-chain-plus-weight-kill-review 14d checkpoint; pc+ kill-review",
-    "11-14: stop-tighten-enforce-eval full read + amplify-stop-tighten-probe-080 bar; atrtrail-clip-12; amplify-jup-short-walk; amplify-grind-breakout-deploy",
-    "11-15: floor_admit bar",
-    "CEO now: JUP_TRAIL_ARM_TIMEOUT enforce label (D3) — 31% of flow has no arm-timeout backstop while bb-bounce does"
-  ]
+    "Schedule jup TAT candle OOS (tat_variant_c harness pattern, T=90) — 25 fires ready",
+    "11-05: fade-btc-crash-postflip, ichimoku-bypass-lowjoin",
+    "11-06: momentum-cache-regime-coverage, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit",
+    "11-07: jup-yolo-regime-review, trial-wider-sl, trial-extended-time, volmom-volbreak; stop-tighten-probe label deadline",
+    "11-09: signal-zombie-purge; disposition timer next fire Mon 08:15",
+    "11-10: fade-ctx-exempt bar read (gross/fee split), winner-cell-size-125, watch-contrarian kill/promote, rsi-ceiling-75-live",
+    "11-13: pump-chain+ weight kill-review",
+    "11-14: stop-asymmetry, atrtrail-clip-12, winner-cell mult-150, grind-breakout, stop-tighten reads",
+    "CEO: stop-tighten-probe-080 label (by 11-07) · HYPE 2.0 fee · NET-KPI switch · tier-2 ACK"
+  ],
+  "readiness": {
+    "open_trades": 5,
+    "all_long": true,
+    "notes": "FARTCOIN +2.2% (mirror, BE-lock skip by design), XPL +0.3% 13h stale, BTC jup +0.2%, SOL jup -0.1%, ETH jup flat (opened 20:48). Cluster LONG warning. Regime 15m SHORT_BIAS vs 4h LONG_BIAS disagree, continuum ABOVE, vol NORMAL. Size-reduce absent=1.0x. No new correlated LONGs recommended while 15m SHORT_BIAS.",
+    "kill_switch": "LIVE_TRADING_ENABLED=True + hype_live_trading.json (both required)"
+  }
 }

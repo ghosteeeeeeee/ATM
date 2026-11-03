@@ -1,10 +1,9 @@
-# Shadow disposition report — 2026-11-02T08:15:00.139208+00:00
-registry: 55 entries (open=30)
+# Shadow disposition report — 2026-11-03T08:15:00.128775+00:00
+registry: 68 entries (open=36)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
-- OPEN eval-midband-long-4564: deadline=2026-11-03T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for eval-midband-long-4564
+- DONE eval-midband-long-4564: NO CHANGE — fresh scoped eval delivered (remeasure_20261101); below-EMA300 block REFUTED (AT -0.63/ABOVE -0.27/BELOW -0.22 all negative, BELOW not worst); blanket 45-64 = jup 34% CEO-domain, do NOT re-approve dampen variant (#128 sign-flip) (2026-11-03T04:55:46Z)
 - DONE gate-shadow: KEEP — join-switch SHIPPED 2026-10-31 (fwd-return report leading) (2026-10-31)
 - DONE shadow-trader-bypass: KILL — question answered, kills validated (no FLIP) (2026-10-31)
 - DONE expiry-t5-shadow: SPLIT: KEEP expiry (fwd97.1% = threshold met, LONG protective -0.185%/ev) / KILL t5 (collector stopped) (2026-10-31)
@@ -22,12 +21,9 @@ registry: 55 entries (open=30)
 - DONE oscillator-shadow: FLIPPED_DONE (2026-10-27)
 - DONE bb-tat-shadow: FLIPPED_DONE (2026-10-27)
 - DONE db-mirror-0byte: KILL (2026-10-27)
-- OPEN escalation-17: deadline=2026-11-03T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for escalation-17
-- OPEN ugb-pt-045: deadline=2026-11-03T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for ugb-pt-045
-- OPEN disposition-cadence-revert: deadline=2026-11-03T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for disposition-cadence-revert
+- DONE escalation-17: STALE-CLOSED per registry default (deadline passed, CEO never answered across 48 re-issues). Operational answer stands from audits #95-#217: bb-bounce DO NOT DISABLE (armed 20T 89% vs unarmed 0%, owner TAT variant-C); exit-ladder candle OOS route remains CLOSED (MFE-CUT redesign required per constants comment). Re-escalate only with a NEW packet, not this id. (2026-11-03T04:55:46Z)
+- DONE ugb-pt-045: KEEP 0.45 — threshold PASS (7d avg 0.0574 > baseline-0.30 avg 0.0442, n=19>=10; sum +1.09 vs prior +0.53) (2026-11-03T04:55:46Z)
+- DONE disposition-cadence-revert: REVERT EXECUTED — 11-03 cluster dispositioned (ugb KEEP / midband NO-CHANGE / esc-17 stale-close / watch-contrarian EXTEND); timer OnCalendar back to Mon 08:15 (config+etc+daemon-reload) (2026-11-03T04:55:46Z)
 - OPEN fade-ctx-exempt: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - OPEN winner-cell-size-125: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - DONE bb-squeeze-hml-entry-profile: NO-CHANGE (report-only, per threshold) (2026-10-29)
@@ -52,12 +48,24 @@ registry: 55 entries (open=30)
 - DONE stop-asymmetry-highwr: SHIP-TO-SHADOW — SL at 1.0% price passes bar on both signals (WR not down); shadow-first spec delivered, NO live change (2026-10-31)
 - DONE short-relax-shadow-study: AGGREGATE UNATTRIBUTABLE — accept base rates (2026-10-31)
 - OPEN pump-chain-plus-weight-kill-review: deadline=2026-11-13T00:00:00Z | (no parseable source)
-- OPEN trial-wider-sl: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 51198 rows, 0.0d
-- OPEN trial-extended-time: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 51198 rows, 0.0d
-- OPEN watch-contrarian-live: deadline=2026-11-03T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for watch-contrarian-live
-- OPEN gate-shadow-capture-coverage-fix: deadline=2026-11-06T00:00:00Z | brain/gate_shadow.db: 59451 rows, 0.0d
-- OPEN candle-collector-coverage-audit: deadline=2026-11-06T00:00:00Z | data/candles.db: 10505738 rows, 0.0d
+- OPEN trial-wider-sl: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 55535 rows, 0.0d
+- OPEN trial-extended-time: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 55535 rows, 0.0d
+- OPEN watch-contrarian-live: deadline=2026-11-10T00:00:00Z | (no parseable source)
+- OPEN gate-shadow-capture-coverage-fix: deadline=2026-11-06T00:00:00Z | brain/gate_shadow.db: 63126 rows, 0.0d
+- OPEN candle-collector-coverage-audit: deadline=2026-11-06T00:00:00Z | data/candles.db: 10554279 rows, 0.0d
 - OPEN stop-tighten-enforce-eval: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN amplify-grind-breakout-deploy: deadline=2026-11-14T00:00:00Z | (no parseable source)
-- OPEN amplify-pc-fade-cell-split: deadline=2026-11-09T00:00:00Z | (no parseable source)
+- DONE amplify-pc-fade-cell-split: NO CHANGE — no cell clears ship bar (measured 2026-11-02 16:53Z) (2026-11-02T16:55:00Z)
+- OPEN amplify-stop-tighten-probe-080: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- DONE jup-hml-shadow-065-050: REJECT — pre-registered eval ran 2026-11-02 (n=84): hml65 net -$0.30, hml50 net -$0.42 vs baseline +$1.44 → both REJECT, no enforce (verdicts stable across re-runs). Registered retroactively 2026-11-03 (was unregistered — chase-move-shadow governance-gap class). (2026-11-02)
+- OPEN jup-trail-shadow-1xatr: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN jup-atrsl-shadow-parity: deadline=2026-11-10T00:00:00Z | (no parseable source)
+- OPEN short-regime-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN flip1-bear-override-reshadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- DONE ichimoku-short-pause: PAUSED — 0 fills/7d waste; re-enable only on backtest (2026-11-03)
+- OPEN rsi-ceiling-75-live: deadline=2026-11-10T00:00:00Z | (no parseable source)
+- OPEN bear-single-source-shadow: deadline=2026-11-10T00:00:00Z | (no parseable source)
+- OPEN volgate-short-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN maxxed-short-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN gate-shadow-dedup-convention: deadline=2026-11-10T00:00:00Z | (no parseable source)
+- OPEN long-bypass-regime-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)

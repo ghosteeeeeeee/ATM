@@ -2154,3 +2154,15 @@
 [2026-11-03 02:46 UTC]   🟢 OK: jup_yolo_mirrored: 28 trades, 53.6% WR, PnL=-5.94
 [2026-11-03 02:46 UTC] Done. Rapid-disabled 0 signals.
 [2026-11-03 02:46 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-11-03 08:46 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-03 08:46 UTC]   🟢 OK: jup_yolo_mirrored: 30 trades, 53.3% WR, PnL=-6.11
+[2026-11-03 08:46 UTC] Done. Rapid-disabled 0 signals.
+[2026-11-03 08:46 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-11-03 14:46 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-03 14:46 UTC]   🟢 OK: jup_yolo_mirrored: 31 trades, 58.1% WR, PnL=-4.85
+[2026-11-03 14:46 UTC] Done. Rapid-disabled 0 signals.
+[2026-11-03 14:46 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-11-03 20:46 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-03 20:46 UTC]   🟢 OK: jup_yolo_mirrored: 24 trades, 66.7% WR, PnL=-1.89
+[2026-11-03 20:46 UTC] Done. Rapid-disabled 0 signals.
+[2026-11-03 20:46 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

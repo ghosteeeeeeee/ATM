@@ -1,29 +1,23 @@
 {
-  "timestamp": "2026-11-03T07:11:59.957234+00:00",
+  "timestamp": "2026-11-03T20:42:05.771933+00:00",
   "steers": [
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + XPL",
-      "detail": "Both opened within 13 minutes. Correlation risk.",
-      "auto_executable": false,
+      "category": "stale",
+      "title": "FARTCOIN open 11h, barely profitable",
+      "detail": "Trade open 11 hours. Only +2.2%. Opportunity cost \u2014 consider freeing capital.",
+      "trade_id": 16739,
+      "auto_executable": true,
       "id": "steer-001"
     },
     {
       "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + SOL",
-      "detail": "Both opened within 23 minutes. Correlation risk.",
-      "auto_executable": false,
+      "category": "stale",
+      "title": "XPL open 14h, barely profitable",
+      "detail": "Trade open 14 hours. Only +1.2%. Opportunity cost \u2014 consider freeing capital.",
+      "trade_id": 16731,
+      "auto_executable": true,
       "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: XPL + SOL",
-      "detail": "Both opened within 10 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -31,23 +25,38 @@
       "title": "Portfolio heavily long (4 trades)",
       "detail": "4 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "info",
+      "category": "profit_lock",
+      "title": "Move FARTCOIN stop to breakeven \u2014 up 2.2%",
+      "detail": "Trade is +2.2%. Lock breakeven at 0.1160.",
+      "trade_id": 16739,
+      "action": {
+        "type": "move_stop",
+        "symbol": "FARTCOIN",
+        "direction": "long",
+        "new_stop": 0.11599
+      },
+      "auto_executable": true,
       "id": "steer-004"
     }
   ],
   "portfolio_health": "warning",
   "regime": {
     "btc_15m": "SHORT_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
-    "volatility": "LOW",
-    "zscore_tier": "NEG",
+    "btc_4h": "LONG_BIAS",
+    "continuum": "ABOVE",
+    "volatility": "NORMAL",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "MARKUP",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 5
 }
