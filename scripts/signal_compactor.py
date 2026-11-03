@@ -2053,9 +2053,16 @@ def _score_signal(token, direction, conf, source, signal_type,
         # short-regime-exempt-shadow (deadline 2026-11-17).
         _srge_exempt = False
         if not _short_quality_ok:
-            from hermes_constants import (SHORT_REGIME_EXEMPT_SHADOW,
-                                          SHORT_REGIME_EXEMPT_ENFORCE,
-                                          SHORT_REGIME_EXEMPT_MIN_CONF)
+            try:
+                from hermes_constants import (SHORT_REGIME_EXEMPT_SHADOW,
+                                              SHORT_REGIME_EXEMPT_ENFORCE,
+                                              SHORT_REGIME_EXEMPT_MIN_CONF)
+            except Exception:
+                # bug_hunter hardening: default = kill proceeds, shadow off
+                # (ENFORCE must default False — a True here would skip the kill).
+                SHORT_REGIME_EXEMPT_SHADOW = False
+                SHORT_REGIME_EXEMPT_ENFORCE = False
+                SHORT_REGIME_EXEMPT_MIN_CONF = 60
             if ((SHORT_REGIME_EXEMPT_SHADOW or SHORT_REGIME_EXEMPT_ENFORCE)
                     and conf >= SHORT_REGIME_EXEMPT_MIN_CONF):
                 _srge_r4h, _ = get_regime_4h(token)
@@ -4464,8 +4471,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 # Pre-registered bar (RECORDED, not enforced here): 14d shadow
                                 # n>=20, net >= +$1.00, leave-one-out positive — registry
                                 # flip1-bear-override-reshadow (deadline 2026-11-17).
-                                from hermes_constants import (FLIP1_BEAR_OVERRIDE_SHADOW,
-                                                              FLIP1_BEAR_OVERRIDE_ENFORCE)
+                                try:
+                                    from hermes_constants import (FLIP1_BEAR_OVERRIDE_SHADOW,
+                                                                  FLIP1_BEAR_OVERRIDE_ENFORCE)
+                                except Exception:
+                                    # bug_hunter MED hardening: this import sits inside the
+                                    # outer non-fatal try — a missing constant must NEVER skip
+                                    # the fail-closed check below. Defaulting both False
+                                    # reproduces the pre-shadow behavior exactly (block stays).
+                                    FLIP1_BEAR_OVERRIDE_SHADOW = False
+                                    FLIP1_BEAR_OVERRIDE_ENFORCE = False
                                 _rsh_flip1_on = None
                                 if _rsh_bear_override and not FLIP1_BEAR_OVERRIDE_ENFORCE:
                                     try:
