@@ -1,13 +1,37 @@
 {
-  "timestamp": "2026-11-03T00:41:57.125014+00:00",
+  "timestamp": "2026-11-03T05:11:58.974682+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: ETH + BTC",
-      "detail": "Both opened within 3 minutes. Correlation risk.",
+      "title": "Trade cluster: BTC + SOL",
+      "detail": "Both opened within 22 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: BTC + WLFI",
+      "detail": "Both opened within 25 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: SOL + WLFI",
+      "detail": "Both opened within 3 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: HYPE + ETH",
+      "detail": "Both opened within 27 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-004"
     },
     {
       "severity": "warning",
@@ -15,27 +39,23 @@
       "title": "Portfolio heavily long (3 trades)",
       "detail": "3 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-005"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "warning",
   "regime": {
     "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "ABOVE",
+    "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 4,
-  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 5 (4 long, 1 short)  [MAX_POSITIONS=6 \u2192 1 slot]\nUnrealized PnL: ~\u00b10 (FIL +1.22% best; SOL/HYPE ~-0.3%)\nRegime: SHORT_BIAS (15m+4h+aggregate) | Volatility: LOW | Flip-rate 24h: agg 23 / BTC 25 (normal band)\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning] SOL LONG #16719 entered at rsi 66.67 \u2014 TOP of the long band, HIGH vol, against SHORT_BIAS aggregate. Cut if price stays below entry 92.275 with MFE<0.40 at next cycle \u2014 do not ride it to hard_max_loss (the 24h failure mode, 11x).\n\ud83d\udfe1 [warning] HYPE LONG #16720 \u2014 weakest thesis: HYPE 15m NEUTRAL/ranging, 7d HYPE LONG cell 42T net -0.50. Exit if HYPE stays NEUTRAL and BTC fails to reclaim EMA300 by next cycle; SL 83.38 is the floor either way.\n\ud83d\udfe1 [warning] 4 longs vs SHORT_BIAS aggregate \u2014 one BTC leg lower hits all four; ETH+BTC are a 3-min correlation cluster. BTC short only partly offsets.\n\ud83d\udfe2 [info] BTC SHORT #16709 \u2014 only trend-aligned position. HOLD while aggregate stays SHORT_BIAS.\n\ud83d\udfe2 [info] FIL LONG #16716 \u2014 stop 0.86559 already ABOVE entry 0.8612 (locks +0.51%); FIL is the only LONG_BIAS coin in the book (conf 84.5). No action.\n\ud83d\udfe2 [info] Shadow auto-trader armed BTC LONG 77726.74 (+1.1% above spot) against SHORT_BIAS \u2014 shadow-only, fills only on a reclaim.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nLast 24h: 19 losers / 20 winners \u2014 15 of 19 losers NEVER armed (MFE 0.05-0.23 vs +0.40 gate), 11x hard_max_loss, holds 0.3-2.3h. Every big winner reached MFE 0.43-1.46 and got trailed out. We lose entering where momentum stalled (SOL at rsi 66.7) and shorting where bounce starts (prior HYPE SHORT rsi 37.8). ATRs 0.10-0.25%/1h \u2014 LOW vol, tight stops chewed before moves develop. Pending queue is short-heavy (SOL/CHIP/AVNT shorts) while our book is 4-long \u2014 flow agrees with regime, book doesn't.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Enforce MFE discipline: if an open long shows MFE<0.40 after 2h flat, cut it \u2014 that cell is 96.5% of 7d gross loss.\n2. Treat HYPE as no-trade while 15m stays NEUTRAL (re-test each cycle).\n3. Chop-bleed 7d = 96.5% dollar share (>=92% breach; 0 NULL mfe, same-day arm 46.2%, 7d LONG arm 49.5% <50 tripwire) \u2192 entry-quality, route to brain-auditor entry gates \u2014 NOT exit/trail tweaks.\n4. AI Trader: no pick this cycle \u2014 state written 23:19 (<45min) and AI_TRADER_ENABLED=False (watchlist-only anyway).\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json`. No 8h+ stale trades, no position up 2%+ needing a BE nudge (FIL already BE), no 5%+ traders.\n",
-  "agent_timestamp": "2026-11-02T23:49:19.297743+00:00",
-  "regime_context": "btc_15m=SHORT_BIAS, btc_4h=SHORT_BIAS, aggregate 15m=SHORT_BIAS (35/8/86), continuum=AT (-0.13% vs EMA300, 876 bars below ~14.6h), linreg=LEAN_BEAR, trend_quality=UP (recovered from STRONG_DOWN), market_phase=CALM (was DECLINING at 23:41), volatility=LOW, volume=LOW, velocity=SLOW. Flip-rate 24h: aggregate 23, BTC 15m 25 \u2014 normal band (p50=20, p95=26), standing state, not a finding; <6 would signal a real trend tape and has not occurred since Oct 2. Sources: watchdog btc_15m=SHORT_BIAS, regimes.BTC=NEUTRAL, continuum=AT \u2014 quoted as-is per source. Meaning for positions: trend-aligned side = SHORT rallies / the BTC short is correctly placed; longs must prove themselves fast (MFE>0.40 within ~2h) or be cut. The measured-refuted midband steer (block LONGs in meta_rsi 45-64 below EMA300) stays WITHDRAWN \u2014 that cell was measured profitable; portfolio-level 4-long-vs-SHORT_BIAS exposure is a different question from band-blocking entries and is not a re-issue of it.",
-  "pattern_alerts": "VERIFIED from PostgreSQL this cycle:\n\n1) CHOP-BLEED KPI (dollar share measure): 7d = 96.5% (-$10.01 of -$10.37 gross loss from 95 of 100 losers never armed), 14d = 92.9%, 30d = 88.6%. 7d BREACHES the >=92% line. Companions: NULL-mfe_pct losers = 0 (backfill not a factor); same-day arm rate 18/39 = 46.2%; 7d LONG arm rate 49.5% (97/196) \u2014 below the <50 tripwire. Verdict: ENTRY-QUALITY problem, not exits \u2014 route to brain-auditor entry gates, not UGB-PT/trail distance.\n\n2) jup_yolo_mirrored 7d: 92T, 53W (57.6%), net -1.18 \u2014 dominant family, net-negative. LONG leg 81T net -1.18; SHORT leg 16T net -0.07. Worst single cell: HYPE LONG 42T 24W net -0.50 (HYPE 15m NEUTRAL/ranging \u2014 a chop coin whipsawed both ways). Dead-signal check: live traffic 92T/7d, flagging normally, NOT a stale window. Winning side on HYPE: none \u2014 the right trade is no HYPE trade while its 15m regime stays NEUTRAL (re-test each cycle).\n\n3) 24h loser anatomy (n=19): 15/19 never armed (MFE<0.40), avg holds 0.3-2.3h, exits 11 hard_max_loss / 4 atr_sl_hit / 4 trail_arm_timeout. Winning side (n=20): trail-armed momentum \u2014 profit-monster-trail winners carried MFE 0.43-1.46 (HYPE SHORT rsi 43.2 +5.62%, BTC SHORT rsi 70.1 +1.76%, SOL LONG rsi 35-47 +2.7-4.5%). We were on the wrong side by entering longs at band edges into the stall and shorting into the bounce.\n\n4) volume-buildup- 7d: 33T 19W (57.6% WR) but net -1.08 \u2014 short DIRECTION is right in this tape, geometry returns less than entries cost. Live traffic 33T/7d, flagging normally; parameter changes are brain-auditor territory, not a kill (not dead).\n\nDead-signal check run: jup_yolo_mirrored, volume-buildup-, pump-chain- all have live 7d traffic \u2014 none are stale-window re-reports."
+  "open_count": 5
 }

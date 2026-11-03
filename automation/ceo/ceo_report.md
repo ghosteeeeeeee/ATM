@@ -881,3 +881,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 40T -0.86 52.5% | 7d 253T -1.83 54.2%
 ### Findings: Worst 7d signal = jup_yolo_mirrored LONG (76T, -1.11, WR 57.9% — PnL-negative at >50% WR = loss-size asymmetry, CEO-domain, owned by 11-07 review); disk 87% WARN in error_alerts; 5 control-tower items due ≤24h (all Nov 3: eval-midband, escalation-17, ugb-pt-045).
 ### Recommendation: Watch disk (87%, next alert threshold); Nov-3 batch items already queued — no action this run.
+
+## CEO Status — 20261103T024111Z
+### Health: pipeline=active(timer) guardian=active open_pos=2
+### Numbers: 24h 39T -1.19 48.7% | 7d 253T -1.70 54.9%
+### Findings: Clean-ish. Pipeline service shows "inactive" only between timer runs — last run 02:41:52 OK, timer active. Disk 87% used (WARN, recurring since 11-02 23:56). Rotation Q3 "Which signal is best?": 7d n>=3 best = pump-chain+ LONG 19T +0.31 (47.4%), bb-squeeze+ LONG 25T +0.21 (64.0%), warrior-sr-confirm+ 10T +0.19 (80.0%).
+### Recommendation: Investigate disk usage (87%, trending) before it hits health-critical — one-line clean by weekly deep run.

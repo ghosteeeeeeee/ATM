@@ -39,6 +39,13 @@ SHORT_BLACKLIST = {
     # TRUMP added 2026-08-08 — political meme coin, high volatility
     # Historical 0% SHORT win rate (2026-04-01 analysis):
     'SOL','MEW',        # avg SHORT pnl: deeply negative, bull market leader
+    # HYPE re-added 2026-11-03 — T directive: 'add HYPE to the blacklists,
+    # it's losing much more than it's winning'. Batch-5 trial (removed
+    # 2026-08-03) is over: mirror HYPE SHORT 6T -$0.02, system HYPE SHORT
+    # 24T 48%WR -$0.47 (verified 2026-11-03). NOTE: jup_yolo_mirrored stays
+    # exempt on SHORT via directional_block (Option D) — mirror HYPE SHORT
+    # still trades until that exemption is revoked.
+    'HYPE',
     # HYPE, YGG removed for Batch 5 trial 2026-08-03
     # 0% SHORT win rate — add fresh
     # SYRUP removed for Batch 5 trial 2026-08-03
@@ -171,6 +178,12 @@ SHORT_BLACKLIST = {
     'W',  # brain_auditor 2026-10-10 — chop token: 4 hmacd_mtf-- SHORT trades 24h, 1W/3L net -$0.21. Oscillating both directions, signal re-fires into same chop. 30d: 9T 44.4% -$0.12. Watchdog verified. Remove when W trends.
 }
 LONG_BLACKLIST = {
+    # HYPE added 2026-11-03 — T directive. Evidence: jup_yolo mirror HYPE LONG
+    # 48T 59%WR net -$0.82 (the book's biggest bleed — losses ride 2x wins);
+    # system-wide HYPE LONG 89T net -$0.05 (flat, no edge). Side effect: also
+    # stops non-mirror HYPE LONG (41T +$0.77) — reversible here if T wants the
+    # mirror-scoped alternative (drop HYPE from jup TRADEABLE_MARKETS instead).
+    'HYPE',
     # 2026-04-22: BIO — block both directions
     'GRIFFAIN','BRETT','XLM','SNX','NIL','IP','TRB','ETHFI','EIGEN','S','VVV','SUI','LAYER','BERA','DYM','MAVIA','MEME','INIT','ZEC','GAS','BLAST','MELANIA','YZY','ZETA','BIO','MEW','PROVE',
     # TST, KAS removed 2026-08-07 — no specific block reason
