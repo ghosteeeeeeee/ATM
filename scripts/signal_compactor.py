@@ -3726,6 +3726,29 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # CRITICAL DEBUG: log EVERY combo before gate decision — no exceptions
             log(f"  🔎 [CONFLUENCE-DEBUG] {token} {direction}: source='{source}' parts={source_parts} count={source_count} unique_types={unique_signal_types} -> {'PASS' if pass_gate else 'BLOCK'}")
 
+            # ── item 2: BEAR-SINGLE-SOURCE-SHADOW (CEO consult 20261103T064755Z) ──
+            # Single-type SHORT dying at the need-2+ confluence gate while structure
+            # is bear → log the counterfactual ONLY; pass_gate stays False.
+            # polarity: ENFORCE=False => log-only shadow (zero behavior change);
+            # True => pass_gate=True for this cohort (NOT shipped — bar first:
+            # registry bear-single-source-shadow, flip at 2026-11-10 if simulated
+            # fills n>=20, WR>=55%, net >= +$1.00). CONFLUENCE_REQUIRED untouched.
+            # Bear read = _regime_4h (get_regime_4h → PG momentum_cache, the same
+            # established read as A1/SHORT-NEUTRAL gates, fresh at :2953 this loop);
+            # ('BEAR' is a continuum-linreg token, never a momentum_cache value).
+            if not pass_gate and direction.upper() == 'SHORT' and unique_signal_types == 1:
+                try:
+                    from hermes_constants import (BEAR_SINGLE_SOURCE_SHORT_SHADOW,
+                                                  BEAR_SINGLE_SOURCE_SHORT_ENFORCE)
+                    if _regime_4h in ('SHORT_BIAS', 'BEAR'):
+                        if BEAR_SINGLE_SOURCE_SHORT_ENFORCE:
+                            pass_gate = True  # not shipped (ENFORCE=False today)
+                            gate_msg = f'bear single-source SHORT bypass ({_regime_4h})'
+                        elif BEAR_SINGLE_SOURCE_SHORT_SHADOW:
+                            log(f"  👁️ [BEAR-SINGLE-SOURCE-SHADOW] {token} {direction} WOULD-PASS — source={source} conf={conf} regime_4h={_regime_4h} single-type need-2+ (pass_gate stays False, ENFORCE=False)")
+                except Exception:
+                    pass  # shadow must never alter the gate
+
             if not pass_gate:
                 # 2026-10-09 D4 (CEO GO): literal BLOCKED + token + dir on every
                 # block line — gate census must never depend on substring-grep
@@ -3752,7 +3775,32 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     # (fade-LONG EXTREME 67.3% n=226) along with the bleeding SHORT.
                     _bypass_eff_src = _fade_effective_source(source, regime=_vol_regime)  # EXTREME-bounded (review LOW-1)
                     _bypass_sig_mult = _get_signal_type_mult(_bypass_eff_src, _vol_regime, source=_bypass_eff_src or '')
-                    if _bypass_sig_mult == 0.0:
+                    # ── item 3: VOLGATE-SHORT-EXEMPT-SHADOW (CEO consult 20261103T064755Z) ──
+                    # SHORT blocked by a vol-gate 0.0 override (operative key
+                    # ('EXTREME','pump-chain-') in volatility_gate_v2 SIGNAL_TYPE_OVERRIDES)
+                    # while structure is bear → log the counterfactual ONLY; no
+                    # multiplier change.
+                    # polarity: ENFORCE=False => log-only shadow (zero behavior change);
+                    # True => skip the 0.0 block for this cohort (NOT shipped — bar first:
+                    # registry volgate-short-exempt-shadow, 14d n>=100 token-day fwd
+                    # >= +0.15 & 2/3 positive days, deadline 2026-11-17). Evidence
+                    # CONFLICT: fwd +0.265 n=129 dedup vs realized prior 141T 43.3%
+                    # -$0.42 — hence shadow only. Bear read = _regime_4h (get_regime_4h,
+                    # same established read as item 2/A1, fresh at :2953 this loop).
+                    _vgex_exempt = False
+                    if _bypass_sig_mult == 0.0 and direction.upper() == 'SHORT':
+                        try:
+                            from hermes_constants import (VOL_GATE_SHORT_EXEMPT_SHADOW,
+                                                          VOL_GATE_SHORT_EXEMPT_ENFORCE)
+                            if _regime_4h in ('SHORT_BIAS', 'BEAR'):
+                                if VOL_GATE_SHORT_EXEMPT_ENFORCE:
+                                    _vgex_exempt = True  # not shipped (ENFORCE=False today)
+                                    log(f"  ✅ [VOLGATE-SHORT-EXEMPT] {token} {direction}: vol-gate 0.0 exempt — {_regime_4h} bear structure ('{source}' in {_vol_regime})")
+                                elif VOL_GATE_SHORT_EXEMPT_SHADOW:
+                                    log(f"  👁️ [VOLGATE-SHORT-EXEMPT-SHADOW] {token} {direction} WOULD-PASS — vol-gate 0.0 for '{source}' in {_vol_regime}, regime_4h={_regime_4h} (block stays, ENFORCE=False)")
+                        except Exception:
+                            pass  # shadow must never alter the gate
+                    if _bypass_sig_mult == 0.0 and not _vgex_exempt:
                         log(f"  🚫 [VOL-GATE-BYPASS] {token} {direction} BLOCKED — bypass denied, vol gate override=0.0 for '{source}' in {_vol_regime}"
                             + (f" (post-fade '{_bypass_eff_src}' also 0.0)" if _bypass_eff_src != source else ""))
                         _tombstone_pending(token, direction, 'vol-gate-override-0.0', dry,
@@ -4387,7 +4435,32 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if is_maxxed(_mx_atr):
                         if MAXXED_REGIME_LOG:
                             log(f"  🔥 [MAXXED] {tkn} {direction}: ATR%={_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (maxxed-out tier)")
-                        if MAXXED_BLOCK_ENABLED:
+                        # ── item 4: MAXXED-SHORT-EXEMPT-SHADOW (CEO consult 20261103T064755Z) ──
+                        # SHORT + bear structure at the maxxed tier → log the
+                        # counterfactual ONLY; block stays.
+                        # polarity: ENFORCE=False => log-only shadow (zero behavior change);
+                        # True => skip the block for this cohort (NOT shipped — bar first:
+                        # registry maxxed-short-exempt-shadow, n>=20 token-days,
+                        # deadline 2026-11-17 — data-starved today: 12 tok-days).
+                        # Bear read = get_regime_4h(tkn) FRESH (this is the approval
+                        # loop — _regime_4h here would be the stale pre-filter value);
+                        # bounded to maxxed SHORTs only. Same read as item 2/A1.
+                        _mxs_exempt = False
+                        if direction.upper() == 'SHORT':
+                            try:
+                                from hermes_constants import (MAXXED_SHORT_EXEMPT_SHADOW,
+                                                              MAXXED_SHORT_EXEMPT_ENFORCE)
+                                if MAXXED_SHORT_EXEMPT_SHADOW or MAXXED_SHORT_EXEMPT_ENFORCE:
+                                    _mxs_r4h, _ = get_regime_4h(tkn)
+                                    if _mxs_r4h in ('SHORT_BIAS', 'BEAR'):
+                                        if MAXXED_SHORT_EXEMPT_ENFORCE:
+                                            _mxs_exempt = True  # not shipped (ENFORCE=False today)
+                                            log(f"  ✅ [MAXXED-SHORT-EXEMPT] {tkn} {direction}: maxxed exempt — {_mxs_r4h} bear structure (ATR%={_mx_atr:.2f})")
+                                        elif MAXXED_SHORT_EXEMPT_SHADOW:
+                                            log(f"  👁️ [MAXXED-SHORT-EXEMPT-SHADOW] {tkn} {direction} WOULD-PASS — ATR%={_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} maxxed tier, regime_4h={_mxs_r4h} (block stays, ENFORCE=False)")
+                            except Exception:
+                                pass  # shadow must never alter the block
+                        if MAXXED_BLOCK_ENABLED and not _mxs_exempt:
                             log(f"  🚫 [MAXXED-BLOCK] {tkn} {direction} blocked at approval — ATR% {_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (explosive vol, bad both directions)")
                             _tombstone_pending(tkn, direction, 'maxxed-vol', dry)
                             continue

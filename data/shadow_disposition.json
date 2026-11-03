@@ -919,6 +919,84 @@
       "default_action": "stay paused — re-enable only after an independent backtest justifies it (ICHIMOKU_SHORT_PAUSE_ENABLED = False)",
       "owner": "main-session",
       "notes": "ADD-ONLY: ICHIMOKU_MINUS_ENABLED left untouched (hermes_constants ADD-ONLY rule); new ICHIMOKU_SHORT_PAUSE_ENABLED=True rides the same two per-direction check sites the existing lever uses. LONG untouched (ICHIMOKU_PLUS_ENABLED=True): probe of the shipped scan loop with forced detection — LONG 172 emitted pause-ON == 172 pause-OFF, SHORT 0 pause-ON vs 166 pause-OFF. Related: ichimoku-short-solo-counterfactual (done 10-30, DEAD/no-bypass) and ichimoku-dampen-flooradmit."
+    },
+    {
+      "id": "rsi-ceiling-75-live",
+      "stream": "SHORT_RSI_CEILING live value 65→75 (hermes_constants.py:1205) — soft ceiling now matches SHORT_RSI_HARD_CEILING=75",
+      "kind": "eval",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-10T00:00:00Z",
+      "evidence": "CEO consult 20261103T064755Z (T 'FIX IT' escalation, standing delegation): soft ceiling 65 blocked the 65-75 band the HARD ceiling already permits and whose own comment says bear-structure should trade it. Token-day-dedup fwd +0.376% n=88, event +0.221%, leaked 65-75 cohort realized 17T 70% WR +$0.29/30d.",
+      "threshold": "REVERT RULE: back to 65 if 14d 65-75 realized n>=15 with WR<50% or net<0",
+      "default_action": "revert to 65 if bar fails",
+      "owner": "CEO",
+      "notes": "Shipped 2026-11-03 as the ONE value change of fix-round 2 (all other constants ADD-ONLY). Consumers read it dynamically (decider_run exec-time :2659 + detect-time :1468, ai_trader_precheck getattr) — no code edits needed. HARD_CEILING 75 / FLOOR 45 / knife 35 untouched."
+    },
+    {
+      "id": "bear-single-source-shadow",
+      "stream": "[BEAR-SINGLE-SOURCE-SHADOW] single-type SHORT dying at the confluence need-2+ gate while regime_4h in SHORT_BIAS/BEAR (signal_compactor pre-filter, item 2)",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-10T00:00:00Z",
+      "evidence": "CEO consult 20261103T064755Z fix table item 2. Log-only shadow (BEAR_SINGLE_SOURCE_SHORT_SHADOW=True / _ENFORCE=False); pass_gate stays False, CONFLUENCE_REQUIRED untouched. Bear read = get_regime_4h (PG momentum_cache, same as A1).",
+      "threshold": "enforce flip at 2026-11-10 if simulated fills n>=20, WR>=55%, net >= +$1.00",
+      "default_action": "no single-source shorts in bear (stay blocked)",
+      "owner": "CEO",
+      "notes": "ENFORCE flip would set pass_gate=True for this cohort only (shipped code has the branch, flag False). Join: shadow line token+source+conf → simulated fill outcome at the bar window."
+    },
+    {
+      "id": "volgate-short-exempt-shadow",
+      "stream": "[VOLGATE-SHORT-EXEMPT-SHADOW] SHORT blocked by vol-gate override=0.0 (e.g. operative key ('EXTREME','pump-chain-') in volatility_gate_v2 SIGNAL_TYPE_OVERRIDES) while regime_4h in SHORT_BIAS/BEAR (item 3)",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-17T00:00:00Z",
+      "evidence": "CEO consult 20261103T064755Z fix table item 3. Evidence CONFLICT is the reason it is shadow-only: fwd +0.265 n=129 token-day dedup vs realized prior 141T 43.3% -$0.42. VOL_GATE_SHORT_EXEMPT_SHADOW=True / _ENFORCE=False; no multiplier change.",
+      "threshold": "14d n>=100 token-day fwd >= +0.15 & 2/3 positive days",
+      "default_action": "keep vol-gate 0.0 for SHORT",
+      "owner": "CEO",
+      "notes": "No multiplier change while ENFORCE=False (block + tombstone 'vol-gate-override-0.0' unchanged). Bear read = _regime_4h (get_regime_4h, same as item 2)."
+    },
+    {
+      "id": "maxxed-short-exempt-shadow",
+      "stream": "[MAXXED-SHORT-EXEMPT-SHADOW] SHORT at the ATR%>=4.0 maxxed tier while regime_4h in SHORT_BIAS/BEAR — BOTH sites: signal_compactor approval + decider_run exec backstop (item 4)",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-17T00:00:00Z",
+      "evidence": "CEO consult 20261103T064755Z fix table item 4. Data-starved today: 12 tok-days. MAXXED_SHORT_EXEMPT_SHADOW=True / _ENFORCE=False; blocks stay at both sites (compactor tombstone + exec return False). Bear read = get_regime_4h (fresh per token; decider imports it lazily, precedent decider_run.py:502).",
+      "threshold": "n>=20 token-days",
+      "default_action": "keep MAXXED block for SHORT",
+      "owner": "CEO",
+      "notes": "Inner try/except at both sites guarantees a missing constant or import failure can NEVER skip the block (bug_hunter MED class from A1/A2 hardening). LONG path untouched at both sites."
+    },
+    {
+      "id": "gate-shadow-dedup-convention",
+      "stream": "DOC: gate-shadow forward-mean citation convention — token-day dedup BEFORE quoting any fwd mean",
+      "kind": "eval",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-10T00:00:00Z",
+      "evidence": "CEO consult 20261103T064755Z fix-table context: event n is 7-10x pseudo-replicated (confluence 5,766 events = 576 tok-days; pc-high inflated 7x, confluence diluted 3.6x under dedup).",
+      "threshold": "every quoted fwd mean must be token-day deduped first — event n is 7-10x pseudo-replicated (confluence 5,766 events = 576 tok-days); pc-high inflated 7x, confluence diluted 3.6x",
+      "default_action": "consumers quoted event-level are wrong — fix reports before citing",
+      "owner": "main-session",
+      "notes": "Documentation-of-record for how this round's evidence numbers were framed; applies to future gate-shadow citations in consults and reports."
+    },
+    {
+      "id": "long-bypass-regime-shadow",
+      "stream": "Regime-scoped shadow on the long-heavy STANDALONE_BYPASS_SIGNALS list (hermes_constants ~:3382) for LONG fills landing in SHORT_BIAS",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-17T00:00:00Z",
+      "evidence": "CEO consult 20261103T064755Z: worst cell 94T -$0.65/14d, untouched by this fix round (round 2 only touched SHORT-side gates + the ceiling).",
+      "threshold": "regime-scoped shadow on the long-heavy STANDALONE_BYPASS_SIGNALS list (constants:3382) for LONG fills in SHORT_BIAS — worst cell 94T -$0.65/14d",
+      "default_action": "no change until shadow delivers bars",
+      "owner": "CEO",
+      "notes": "Not implemented in fix-round 2 — registered so the LONG-heavy bypass cohort is not silently forgotten while SHORT-side work ships."
     }
   ]
 }

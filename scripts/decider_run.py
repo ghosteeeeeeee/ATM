@@ -2520,7 +2520,35 @@ def execute_trade(token, direction, price, confidence, source,
             if _mx_is_maxxed(_mx_atr):
                 if MAXXED_REGIME_LOG:
                     log(f'  🔥 [EXEC-MAXXED] {token} {direction}: ATR%={_mx_atr:.2f} >= maxxed tier')
-                if MAXXED_BLOCK_ENABLED:
+                # ── item 4: MAXXED-SHORT-EXEMPT-SHADOW (CEO consult 20261103T064755Z) ──
+                # Exec-time mirror of the approval-layer hook (signal_compactor
+                # MAXXED site): SHORT + bear structure → log the counterfactual
+                # ONLY; block/return stays.
+                # polarity: ENFORCE=False => log-only shadow (zero behavior change);
+                # True => skip the block for this cohort (NOT shipped — bar first:
+                # registry maxxed-short-exempt-shadow, n>=20 token-days, deadline
+                # 2026-11-17). Bear read = signal_compactor.get_regime_4h (PG
+                # momentum_cache — same established read as item 2/A1; lazy import
+                # precedent decider_run.py:502). Inner try/except: a missing
+                # constant or import failure must NEVER skip this block (bug_hunter
+                # MED class) — _mxs_exempt stays False = block proceeds.
+                _mxs_exempt = False
+                if direction.upper() == 'SHORT':
+                    try:
+                        from hermes_constants import (MAXXED_SHORT_EXEMPT_SHADOW,
+                                                      MAXXED_SHORT_EXEMPT_ENFORCE)
+                        if MAXXED_SHORT_EXEMPT_SHADOW or MAXXED_SHORT_EXEMPT_ENFORCE:
+                            from signal_compactor import get_regime_4h as _mxs_g4
+                            _mxs_r4h, _ = _mxs_g4(token)
+                            if _mxs_r4h in ('SHORT_BIAS', 'BEAR'):
+                                if MAXXED_SHORT_EXEMPT_ENFORCE:
+                                    _mxs_exempt = True  # not shipped (ENFORCE=False today)
+                                    log(f'  ✅ [MAXXED-SHORT-EXEMPT] {token} {direction}: exec maxxed exempt — {_mxs_r4h} bear structure (ATR%={_mx_atr:.2f})')
+                                elif MAXXED_SHORT_EXEMPT_SHADOW:
+                                    log(f'  👁️ [MAXXED-SHORT-EXEMPT-SHADOW] {token} {direction} WOULD-PASS — ATR%={_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} maxxed tier, regime_4h={_mxs_r4h} (block stays, ENFORCE=False)')
+                    except Exception:
+                        pass  # shadow must never alter the block
+                if MAXXED_BLOCK_ENABLED and not _mxs_exempt:
                     log(f'  🚫 [EXEC-MAXXED-BLOCK] {token} {direction} BLOCKED — ATR% {_mx_atr:.2f} >= {MAXXED_ATR_PCT_THRESH} (maxxed-out vol, bad both directions)')
                     return False, f'MAXXED vol: ATR% {_mx_atr:.2f} >= maxxed threshold (exec backstop)'
     except Exception:

@@ -1202,7 +1202,7 @@ SHORT_RSI_FLOOR = 45           # REVERTED 35→45 2026-10-18 brain_auditor: pre-
 # own-conclusions 2026-10-12: pump-chain SHORT 40-45 band = 19T 63.2%WR +$0.48 (30d: 18T 61.1%WR +$0.44).
 # REVERTED 2026-10-21 brain_auditor: pre-registered revert trigger HIT (7d n=5 WR 20% < 45% bar; 14d n=17 WR 23.5% net +$0.04; 30d decayed to 41.2% WR +$0.29). Band edge gone — carve-out lifted, pump-chain aligned to standard floor 45.
 SHORT_RSI_FLOOR_PUMP_CHAIN = 45  # REVERTED 40→45 2026-10-21 (trigger hit; was auditor-approved 2026-10-12)
-SHORT_RSI_CEILING = 65         # LOWERED 70→65 (CEO 2026-09-29). 14d: RSI 65+ SHORT = 9T 33.3%WR -$0.66 (block). RSI 55-65 SHORT = 14T 42.9%WR -$0.25 (marginal). Ceiling at 65 blocks overbought SHORT entries.
+SHORT_RSI_CEILING = 75         # RAISED 65→75 (CEO 2026-11-03, consult 20261103T064755Z, T "FIX IT" escalation under standing delegation). The soft ceiling had blocked the 65-75 band that SHORT_RSI_HARD_CEILING (:1206) already permits and whose own comment says bear-structure should trade it. Evidence: token-day-dedup fwd +0.376% n=88, event +0.221%, leaked 65-75 cohort realized 17T 70% WR +$0.29/30d. REVERT RULE: back to 65 if 14d 65-75 realized n>=15 with WR<50% or net<0 (registry rsi-ceiling-75-live, deadline 2026-11-10). Prior: 65 (CEO 2026-09-29, 14d 65+ SHORT 9T 33.3%WR -$0.66), 70 before that.
 SHORT_RSI_HARD_CEILING = 75    # CEO Fix5 2026-10-02: RSI>75 SHORT always blocked — NO bear exemption. RSI 65-75 SHORT: bear-structure-gated exemption only (overbought+pump in bear = short per philosophy). DYDX RSI=75.3 blocked by this.
 # Loss-prevention guardrail (NOT a tunable signal-quality filter). Completes OVERSOLD_SHORT_RSI_MAX hole:
 # STANDALONE_BYPASS skips signal_compactor (where OVERSOLD_SHORT_RSI_MAX lives), and both compactor
@@ -5621,3 +5621,29 @@ FLIP1_BEAR_OVERRIDE_ENFORCE = False   # A2: False => fail-closed block stays, ze
 # Pre-registered bar (RECORDED, not enforced by code): 14d shadow n>=20,
 # net >= +$1.00, leave-one-out positive — registry flip1-bear-override-reshadow,
 # deadline 2026-11-17.
+
+# ── Fix-round 2 (CEO consult 20261103T064755Z — T "FIX IT" escalation) ─────────
+# ADD-ONLY: no existing value touched here (the ONE value change of this round is
+# SHORT_RSI_CEILING 65→75 above, CEO-signed). Shared bear-structure read for all
+# three shadows below = get_regime_4h() (PG momentum_cache.regime_4h — the same
+# read A1 uses); condition written as in ('SHORT_BIAS','BEAR') for spec
+# literalness, but that read only ever returns LONG_BIAS/SHORT_BIAS/NEUTRAL.
+# polarity: ENFORCE=False => log-only shadow; True => pass_gate for
+# single-type SHORT in bear structure (bar-gated; CONFLUENCE_REQUIRED untouched)
+BEAR_SINGLE_SOURCE_SHORT_SHADOW = True   # item 2: log [BEAR-SINGLE-SOURCE-SHADOW] WOULD-PASS at the confluence need-2+ block
+BEAR_SINGLE_SOURCE_SHORT_ENFORCE = False # item 2: False => single-type SHORT stays blocked (zero behavior change); True => bypass (NOT shipped — bar first)
+# Bar (registry bear-single-source-shadow): enforce flip at 2026-11-10 if
+# simulated fills n>=20, WR>=55%, net >= +$1.00.
+# polarity: ENFORCE=False => log-only shadow; True => exempt SHORT from the
+# vol-gate 0.0 override in bear structure (bar-gated)
+VOL_GATE_SHORT_EXEMPT_SHADOW = True      # item 3: log [VOLGATE-SHORT-EXEMPT-SHADOW] WOULD-PASS where vol-gate override=0.0 blocks a SHORT source
+VOL_GATE_SHORT_EXEMPT_ENFORCE = False    # item 3: False => vol-gate 0.0 block stays (zero behavior change); True => exempt (NOT shipped — bar first)
+# Bar (registry volgate-short-exempt-shadow): 14d n>=100 token-day fwd >= +0.15
+# & 2/3 positive days, deadline 2026-11-17. Evidence CONFLICT: fwd +0.265 n=129
+# dedup vs realized prior 141T 43.3% -$0.42 — hence shadow only.
+# polarity: ENFORCE=False => log-only shadow; True => exempt SHORT from the
+# MAXXED (ATR%>=4.0) block in bear structure (bar-gated)
+MAXXED_SHORT_EXEMPT_SHADOW = True        # item 4: log [MAXXED-SHORT-EXEMPT-SHADOW] WOULD-PASS at BOTH MAXXED sites (compactor approval + decider exec)
+MAXXED_SHORT_EXEMPT_ENFORCE = False      # item 4: False => MAXXED block stays for both directions (zero behavior change); True => SHORT exempt (NOT shipped — bar first)
+# Bar (registry maxxed-short-exempt-shadow): n>=20 token-days, deadline
+# 2026-11-17 (data-starved today: 12 tok-days).
