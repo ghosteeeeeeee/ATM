@@ -109,10 +109,13 @@ def main():
     avg_w = gross_w / len(W) if W else 0
     avg_l = gross_l / len(L) if L else 0   # gross_l already positive magnitude
     exp_usd = net_usd / len(closed) if closed else 0
+    payoff = (avg_w / avg_l) if avg_l > 0 else float('nan')
+    be_wr = (avg_l / (avg_w + avg_l) * 100
+             if (avg_w + avg_l) > 0 else float('nan'))
     print(f"  WR {wr:.1f}% (95% CI {lo:.1f}-{hi:.1f})  W/L/B {len(W)}/{len(L)}/{len(B)}")
     print(f"  net ${net_usd:+.3f}  expectancy ${exp_usd:+.4f}/trade  PF {pf:.2f}")
-    print(f"  avg win ${avg_w:+.3f} vs avg loss ${avg_l:.3f} (payoff {avg_w/avg_l:.2f}"
-          f" → breakeven WR {avg_l/(avg_w+avg_l)*100:.0f}%)")
+    print(f"  avg win ${avg_w:+.3f} vs avg loss ${avg_l:.3f} (payoff {payoff:.2f}"
+          f" → breakeven WR {be_wr:.0f}%)")
 
     # baseline: all system trades in the same window
     if closed:
@@ -244,15 +247,11 @@ def main():
     print(f"\n  selection effect — cluster vs becoming a trade:")
     import sqlite3
     from paths import RUNTIME_DB
+    _since = str(q("SELECT MIN(open_time) t FROM trades WHERE signal LIKE '%%jup_yolo%%'")[0]['t'])
     _sc = sqlite3.connect(RUNTIME_DB)
-    sigs = [{'signal_metadata': r[0]} for r in _sc.execute("""
-        SELECT signal_metadata FROM signals
-        WHERE source LIKE '%jup_yolo%'
-          AND created_at >= (SELECT MIN(open_time) FROM trades
-                             WHERE signal LIKE '%jup_yolo%')
-    """).fetchall()] if False else [{'signal_metadata': r[0]} for r in _sc.execute(
+    sigs = [{'signal_metadata': r[0]} for r in _sc.execute(
         "SELECT signal_metadata FROM signals WHERE source LIKE ? AND created_at >= ?",
-        ('%jup_yolo%', str(q("SELECT MIN(open_time) t FROM trades WHERE signal LIKE '%%jup_yolo%%'")[0]['t']))).fetchall()]
+        ('%jup_yolo%', _since)).fetchall()]
     _sc.close()
     sc = Counter()
     for s in sigs:

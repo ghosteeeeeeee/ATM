@@ -4308,6 +4308,10 @@ JUP_YOLO_ATRSL_SHADOW_ENABLED = True  # (d) ATR-SL corrected-value shadow. Rever
 # tpsl_utils.compute_atr_{sl,tp}_pct_norm (input normalized to fraction).
 # CEO order: one-line fix exists but ship JUP-SCOPED SHADOW FIRST → OOS →
 # widen; do NOT change compute_atr_sl_pct itself yet (every signal's stop
+# MOVES). SUPERSEDED 2026-11-03 (T: 'fix the problems'): compute_atr_sl/tp_pct
+# now delegate to norm — OOS counterfactual n=97 mirror trades: norm -98.9 vs
+# broken -155.6 net leveraged %. ATRSL shadow post-fix = db-vs-fix parity
+# monitor (act==fix tautological). PRIOR ORDER TEXT FOLLOWS FOR HISTORY:
 # moves). Shadow logs ONE LINE PER OPEN JUP TRADE PER MINUTE (position_manager
 # is a fresh process each pipeline minute — per-process dedup set resets;
 # bug_hunter comment fix 2026-11-02, was "once per trade"): actual vs

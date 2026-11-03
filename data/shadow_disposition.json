@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": 1793665858,
+ "updated": "2026-11-03T01:11:34Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -856,12 +856,12 @@
    "status": "open",
    "started": "2026-11-02",
    "deadline": "2026-11-10T00:00:00Z",
-   "threshold": "First 5 post-fix [JUP-SHADOW-ATRSL] lines: actual==norm on every id (parity proof). Then KILL stream (question answered) unless drift appears (actual != norm = the fix regressed).",
+   "threshold": "First 5 post-fix [JUP-SHADOW-ATRSL] lines: db-stored levels vs norm-computed (the log's db_sl/db_tp vs fix columns \u2014 act==fix is TAUTOLOGICAL post-fix by construction, so the regression detector is db-vs-fix, not act-vs-fix). Then KILL stream (question answered) unless db drifts from norm (fix regressed or trailing re-loosened).",
    "default_action": "KEEP SHADOW (parity monitor) \u2192 auto-KILL on 14d zero-diff",
    "join_rate": "[JUP-SHADOW-ATRSL] FIRST line per DISTINCT trade_id (placement, pre-ratchet)",
    "owner": "T fix + CEO shadow-first order honored (11-02 order: shadow \u2192 OOS \u2192 widen)",
    "evidence": "pre-fix OOS window 2026-11-02..11-03 + replay n=97; constants doc hermes_constants.py ~4305",
-   "notes": "registered retroactively 2026-11-03 \u2014 stream shipped 11-02 WITHOUT a registry entry (governance gap)."
+   "notes": "registered retroactively 2026-11-03 \u2014 stream shipped 11-02 WITHOUT a registry entry (governance gap). FIXED 11-03: stream strings carry no parseable data path, so zero-event auto-KILL cannot fire for these entries \u2014 deadline-driven only."
   }
  ]
 }

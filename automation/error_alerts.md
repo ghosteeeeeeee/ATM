@@ -2778,3 +2778,9 @@
 
 ## Error Alerts — 2026-11-02 23:56 UTC
 - **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-03 00:41 UTC
+- **NEW** (1x): `Nov N N:N:N systemd[N]: hermes-pipeline.service: Failed to kill control group /system.slice/hermes-pipeline.service, ignoring: Invalid argument`
+
+## Error Alerts — 2026-11-03 00:56 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)

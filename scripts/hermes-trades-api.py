@@ -574,7 +574,9 @@ def _build_hotset_from_db():
             # will actually take. Display-only file (see dump target).
             direction = r['direction'].upper()
             from directional_block import is_directional_blocked
-            if is_directional_blocked(tok, direction, r.get('sources')):
+            # FIX (bug_hunter): sqlite3.Row has no .get() — AttributeError
+            # was swallowed by the bare except → fallback hotset always [].
+            if is_directional_blocked(tok, direction, r['sources']):
                 continue
             if is_solana_only(tok):
                 continue

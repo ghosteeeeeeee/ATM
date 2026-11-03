@@ -53,6 +53,8 @@ from hermes_constants import (
 )
 from tpsl_utils import (compute_atr_sl_pct, compute_atr_tp_pct,
                         compute_atr_sl_pct_norm, compute_atr_tp_pct_norm)
+from hermes_constants import (ATR_SL_MIN, ATR_SL_MAX, ATR_TP_MIN, ATR_TP_MAX,
+                             ATR_K_HIGH_VOL, ATR_TP_K_MULT)
 
 if JUP_EXIT_SIM_TIMEFRAME != '5m':
     raise SystemExit('replay logic assumes 5m candles')
@@ -278,9 +280,14 @@ def main():
             s['pnl'].append(actual_pnl)
             s['hold'].append(actual_hold)
 
-        # ── entry-time levels (system formulas; see docstring v3) ──
-        _sl_cfg_pct = compute_atr_sl_pct(1.0)   # invariant for any ATR>0.015%
-        _tp_cfg_pct = compute_atr_tp_pct(1.0)
+        # ── entry-time levels (see docstring v3) ──
+        # PRE-FIX formula pinned INLINE (bug_hunter): compute_atr_sl/tp_pct
+        # now delegate to norm (unit fix a032b01c), so calling them here would
+        # make atr_cfg ≡ atr_norm and destroy the broken-arm baseline the
+        # counterfactual needs. Broken math: percent input vs fraction
+        # thresholds/clamps → every ATR clamps to MAX (2.50/2.00).
+        _sl_cfg_pct = max(ATR_SL_MIN, min(ATR_SL_MAX, ATR_K_HIGH_VOL * 1.0))
+        _tp_cfg_pct = max(ATR_TP_MIN, min(ATR_TP_MAX, ATR_K_HIGH_VOL * 1.0 * ATR_TP_K_MULT))
         sl_cfg = entry * (1 - _sl_cfg_pct) if long_p(t['dir']) else entry * (1 + _sl_cfg_pct)
         tp_cfg = entry * (1 + _tp_cfg_pct) if long_p(t['dir']) else entry * (1 - _tp_cfg_pct)
         risk_cfg = entry * _sl_cfg_pct          # price units (dollars)
