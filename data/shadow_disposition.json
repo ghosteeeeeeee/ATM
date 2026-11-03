@@ -880,6 +880,45 @@
       "owner": "T fix + CEO shadow-first order honored (11-02 order: shadow → OOS → widen)",
       "evidence": "pre-fix OOS window 2026-11-02..11-03 + replay n=97; constants doc hermes_constants.py ~4305",
       "notes": "registered retroactively 2026-11-03 — stream shipped 11-02 WITHOUT a registry entry (governance gap). FIXED 11-03: stream strings carry no parseable data path, so zero-event auto-KILL cannot fire for these entries — deadline-driven only."
+    },
+    {
+      "id": "short-regime-exempt-shadow",
+      "stream": "A1 SHORT-REGIME-GATE shadow exemption (signal_compactor.py SHORT-REGIME-GATE kill site; [SHORT-REGIME-EXEMPT-SHADOW] log lines)",
+      "kind": "eval",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-17T00:00:00Z",
+      "evidence": "CEO consult 2026-11-03 brief-long-bias-short-market-2026-11-03.md (verdict delivered, standing delegation = CEO label = go). Context: gate-shadow 10-31 SHORT blocks costly aggregate (+$290-eq); SHORT-REGIME-GATE n_ded=100 mean +0.1139% t=+0.61 (failed the old RELAX bars — those govern relaxing the kill; this entry governs the EXEMPT counterfactual on its own pre-registered bar).",
+      "threshold": "14d shadow-joined n>=15, net >= +$0.50, >=2/3 positive days",
+      "default_action": "keep kill (no exempt) if bar fails",
+      "owner": "CEO",
+      "notes": "Shipped SHADOW=True / ENFORCE=False — behavior-inert: kill stays active (mult 0.0, row never ranks), only the WOULD-PASS line logs; polarity comment in hermes_constants.py. A4 rides the same site: tombstone 'short-regime-gate' now stamps the kill so ~190 score-kills/day stop hiding in the compaction_stale_10min bucket (consumer-path proof done — 10-min sweep is text-append only, storm sibling counter is allow-direction with STORM_CONFLUENCE_WAIVER_ENFORCE=False, jup_yolo classifies APPROVAL_DEAD either way, hl_copy._pure_staleness_death predicate provably unsatisfiable: the exact 'compaction_stale_10min' string is only ever written by the >=10min sweep while the reader requires age<10min and signals.created_at is never updated, approval clears decision_reason at signal_compactor:5896). Join for the bar: shadow line token+direction joined to the outcome window (same fwd-join machinery as gate-shadow)."
+    },
+    {
+      "id": "flip1-bear-override-reshadow",
+      "stream": "A2 SHORT-RSI-HARD-FLOOR bear-structure override re-shadow (signal_compactor.py approval layer; [FLIP1-OVERRIDE-SHADOW] log lines)",
+      "kind": "eval",
+      "status": "open",
+      "started": "2026-11-03",
+      "deadline": "2026-11-17T00:00:00Z",
+      "evidence": "CEO consult 2026-11-03 brief-long-bias-short-market-2026-11-03.md. flip#1 waiver expired 10-24 (waiver_expiry.flip1_active()=False, fail-closed by design); the bear-structure override conditions themselves (RSI in [OVERSOLD_SHORT_RSI_MAX, floor), BTC continuum LEAN_BEAR/BEAR age<600s) still hold — shadow logs WOULD-ALLOW with token/rsi/linreg/age then continues to the existing blocked path.",
+      "threshold": "14d shadow n>=20, net >= +$1.00, leave-one-out positive",
+      "default_action": "stay blocked; waiver stays expired if bar fails",
+      "owner": "CEO",
+      "notes": "Shipped FLIP1_BEAR_OVERRIDE_SHADOW=True / FLIP1_BEAR_OVERRIDE_ENFORCE=False — behavior-stays-blocked (fail-closed check untouched; ENFORCE=False means zero behavior change, BUG-068 polarity). Re-arm after the bar = NEW expiry via the existing waiver mechanism (data/vacation_mode.json rules.unclog_waiver.expires) — that flip is a later CEO act, not part of this change."
+    },
+    {
+      "id": "ichimoku-short-pause",
+      "stream": "A3 ichimoku SHORT detection pause (signals/ichimoku_cloud.py Layer-1 per-direction gate + signal_schema.py add_signal Layer-2, ICHIMOKU_SHORT_PAUSE_ENABLED)",
+      "kind": "eval",
+      "status": "done",
+      "started": "2026-11-03",
+      "done_at": "2026-11-03",
+      "disposition": "PAUSED — 0 fills/7d waste; re-enable only on backtest",
+      "evidence": "CEO consult 2026-11-03: ichimoku- produced 1,541 births / 0 fills in 7d (all-time 36 fills, -$0.35); 138 SHORT births on 11-03 until pause deploy 06:35:40Z, 0 after.",
+      "default_action": "stay paused — re-enable only after an independent backtest justifies it (ICHIMOKU_SHORT_PAUSE_ENABLED = False)",
+      "owner": "main-session",
+      "notes": "ADD-ONLY: ICHIMOKU_MINUS_ENABLED left untouched (hermes_constants ADD-ONLY rule); new ICHIMOKU_SHORT_PAUSE_ENABLED=True rides the same two per-direction check sites the existing lever uses. LONG untouched (ICHIMOKU_PLUS_ENABLED=True): probe of the shipped scan loop with forced detection — LONG 172 emitted pause-ON == 172 pause-OFF, SHORT 0 pause-ON vs 166 pause-OFF. Related: ichimoku-short-solo-counterfactual (done 10-30, DEAD/no-bypass) and ichimoku-dampen-flooradmit."
     }
   ]
 }

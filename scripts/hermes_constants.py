@@ -292,7 +292,7 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # AUTO-UPDATED daily by favorites_updater.py.
 FAVORITES_LONG = {
     'CAKE',
-    'ETH'
+    'FIL'
 }
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
@@ -322,9 +322,8 @@ LOSERS_SHORT = {
 }
 # Legacy combined set — DIRECTION-BLIND in decider (HARD-BLOCK + conf penalty).
 # BTC removed 2026-10-24 → LOSERS_LONG (see above). ME/PUMP left per CEO scope.
-LOSERS = {
-    'BLUR'
-}
+LOSERS = set()
+
 
 
 
@@ -4891,6 +4890,14 @@ RR_STRUCTURAL_V2_MOM_FALLING_BB_MIN = 0.0    # block LONG when momentum=falling 
 ICHIMOKU_ENABLED = True                # RE-ENABLED 2026-09-09 — NORMAL 60% WR. HIGH blocked via volatility_gate_v2.
 ICHIMOKU_PLUS_ENABLED = True           # LONG direction
 ICHIMOKU_MINUS_ENABLED = True          # SHORT direction
+# A3 SHORT PAUSE (CEO consult 2026-11-03, brief-long-bias-short-market-2026-11-03):
+# ichimoku- produced 1,541 births / 0 fills / 7d (all-time 36 fills, -$0.35) —
+# fill-neutral waste removal. ADD-ONLY: ICHIMOKU_MINUS_ENABLED above was NOT
+# touched; this flag rides the same two per-direction check sites (detection in
+# signals/ichimoku_cloud.py + add_signal Layer 2 in signal_schema.py).
+# polarity: True => ichimoku SHORT detection PAUSED (LONG untouched);
+# False => re-enable. Re-enable only after an independent backtest justifies it.
+ICHIMOKU_SHORT_PAUSE_ENABLED = True
 ICHIMOKU_COOLDOWN_HOURS = 1            # per token+direction cooldown
 
 # Ichimoku periods (standard 9/26/52)
@@ -5592,3 +5599,25 @@ REGIME_SCANNER_NEUTRAL_THRESHOLD = 0.02  # slope_pct below this = NEUTRAL
 REGIME_SCANNER_R2_TREND = 0.5            # min r2 for confident trend
 REGIME_SCANNER_R2_WEAK = 0.4             # min r2 for weak trend signal
 MOMENTUM_STATE_TREND_THRESHOLD = 0.05    # abs(slope) above this = 'trending' (aligned with regime scale)
+
+# ── SHORT-REGIME-GATE shadow exemption + FLIP1 bear-override re-shadow ──────────
+# CEO consult 2026-11-03 — brief-long-bias-short-market-2026-11-03.md, verdict
+# delivered, standing delegation (CEO label = go). ADD-ONLY block: no existing
+# value in this file was touched. Sites: scripts/signal_compactor.py (A1 at the
+# SHORT-REGIME-GATE kill, A2 at the SHORT-RSI-HARD-FLOOR bear override).
+# polarity: ENFORCE=False => log-only shadow; True => restore mult for
+# SHORT_BIAS+conf>=60 (bar-gated)
+SHORT_REGIME_EXEMPT_SHADOW = True     # A1: log [SHORT-REGIME-EXEMPT-SHADOW] WOULD-PASS when the SHORT-REGIME-GATE kill would be exempt (4h SHORT_BIAS, conf>=min)
+SHORT_REGIME_EXEMPT_ENFORCE = False   # A1: False => kill stays active, zero behavior change (BUG-068 polarity); True => skip the kill for those signals
+SHORT_REGIME_EXEMPT_MIN_CONF = 60     # A1: shadow/exempt only evaluated at conf >= 60 (gate itself unchanged: conf<75 still required for the kill to apply)
+# Pre-registered bar (RECORDED, not enforced by code): 14d shadow-joined n>=15,
+# net >= +$0.50, >=2/3 positive days — registry short-regime-exempt-shadow,
+# deadline 2026-11-17. Same site carries the A4 tombstone 'short-regime-gate'.
+# polarity: ENFORCE=False => log-only shadow; True => honor the BTC-bear flip#1
+# override regardless of waiver expiry (bar-gated re-arm; that re-arm needs a NEW
+# expiry via the existing waiver mechanism — a later CEO act, not this change)
+FLIP1_BEAR_OVERRIDE_SHADOW = True     # A2: log [FLIP1-OVERRIDE-SHADOW] WOULD-ALLOW when bear-structure override conditions hold but flip1_active() is False
+FLIP1_BEAR_OVERRIDE_ENFORCE = False   # A2: False => fail-closed block stays, zero behavior change (BUG-068 polarity); True => bear override honored past waiver expiry
+# Pre-registered bar (RECORDED, not enforced by code): 14d shadow n>=20,
+# net >= +$1.00, leave-one-out positive — registry flip1-bear-override-reshadow,
+# deadline 2026-11-17.

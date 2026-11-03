@@ -1995,9 +1995,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                     pass
             if _comp == 'ichimoku-':
                 try:
-                    from hermes_constants import ICHIMOKU_MINUS_ENABLED
-                    if not ICHIMOKU_MINUS_ENABLED:
-                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ICHIMOKU_MINUS_ENABLED=False', flush=True)
+                    # A3 SHORT PAUSE (CEO consult 2026-11-03): mirrors the detection
+                    # pause in signals/ichimoku_cloud.py — no ichimoku- row may enter
+                    # the DB from any path while ICHIMOKU_SHORT_PAUSE_ENABLED=True.
+                    # LONG (ichimoku+) untouched. Re-enable only after an independent
+                    # backtest justifies it. Fail-open on ImportError = same as before.
+                    from hermes_constants import ICHIMOKU_MINUS_ENABLED, ICHIMOKU_SHORT_PAUSE_ENABLED
+                    if not ICHIMOKU_MINUS_ENABLED or ICHIMOKU_SHORT_PAUSE_ENABLED:
+                        _ich_pause_why = ('ICHIMOKU_MINUS_ENABLED=False' if not ICHIMOKU_MINUS_ENABLED
+                                          else 'ICHIMOKU_SHORT_PAUSE_ENABLED=True')
+                        print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" {_ich_pause_why}', flush=True)
                         return None
                 except ImportError:
                     pass

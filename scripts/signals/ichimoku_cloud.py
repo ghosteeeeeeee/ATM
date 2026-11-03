@@ -33,6 +33,7 @@ from paths import HERMES_DATA
 
 from hermes_constants import (
     ICHIMOKU_ENABLED, ICHIMOKU_PLUS_ENABLED, ICHIMOKU_MINUS_ENABLED,
+    ICHIMOKU_SHORT_PAUSE_ENABLED,
     LONG_BLACKLIST, SHORT_BLACKLIST,
     ICHIMOKU_TENKAN_PERIOD,
     ICHIMOKU_KIJUN_PERIOD,
@@ -349,6 +350,16 @@ def scan_ichimoku_signals() -> int:
         if direction == 'LONG' and not ICHIMOKU_PLUS_ENABLED:
             continue
         if direction == 'SHORT' and not ICHIMOKU_MINUS_ENABLED:
+            continue
+
+        # A3 SHORT PAUSE (CEO consult 2026-11-03, brief-long-bias-short-market-2026-11-03):
+        # ichimoku- = 1,541 births / 0 fills / 7d (all-time 36 fills, -$0.35) —
+        # fill-neutral waste removal, SHORT variant ONLY; LONG untouched. Rides the
+        # existing per-direction lever (ICHIMOKU_MINUS_ENABLED itself was NOT flipped
+        # — hermes_constants is ADD-ONLY; see ICHIMOKU_SHORT_PAUSE_ENABLED there).
+        # Re-enable only after an independent backtest justifies it
+        # (ICHIMOKU_SHORT_PAUSE_ENABLED = False).
+        if direction == 'SHORT' and ICHIMOKU_SHORT_PAUSE_ENABLED:
             continue
 
         # Layer 1: per-direction blacklist

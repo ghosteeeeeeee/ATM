@@ -1181,7 +1181,7 @@ def _can_override_cooldown(token, direction):
 # ── Scoring ───────────────────────────────────────────────────────────────────
 def _score_signal(token, direction, conf, source, signal_type,
                   age_m, compact_rounds, regime, regime_conf, speed_data,
-                  _btc_ctx_cached=None, _vol_regime=None):
+                  _btc_ctx_cached=None, _vol_regime=None, dry=False):
     """
     Deterministic score formula:
 
@@ -2038,9 +2038,49 @@ def _score_signal(token, direction, conf, source, signal_type,
         _proven_short = ('mover-',)
         if any(p in (source or '') for p in _proven_short):
             _short_quality_ok = True
+        # ── A1: SHORT-REGIME-GATE shadow exemption (CEO consult 2026-11-03) ──────
+        # brief-long-bias-short-market-2026-11-03.md, standing delegation
+        # (CEO label = go). polarity: ENFORCE=False => log-only shadow; True =>
+        # restore mult for SHORT_BIAS+conf>=60 (bar-gated). Shipped state is
+        # SHADOW=True / ENFORCE=False, so the kill below stays byte-identical
+        # (zero behavior change, BUG-068 class). 4h read path = get_regime_4h
+        # (PG momentum_cache — the same read the confluence gates use at
+        # run_compaction ~:2906; no new data path invented). Evaluated ONLY when
+        # the kill is about to apply AND conf >= MIN_CONF → bounded: at most one
+        # short PG query, only for NORMAL/HIGH SHORTs with conf 60-74.
+        # Pre-registered bar (RECORDED, not enforced here): 14d shadow-joined
+        # n>=15, net >= +$0.50, >=2/3 positive days — registry
+        # short-regime-exempt-shadow (deadline 2026-11-17).
+        _srge_exempt = False
         if not _short_quality_ok:
+            from hermes_constants import (SHORT_REGIME_EXEMPT_SHADOW,
+                                          SHORT_REGIME_EXEMPT_ENFORCE,
+                                          SHORT_REGIME_EXEMPT_MIN_CONF)
+            if ((SHORT_REGIME_EXEMPT_SHADOW or SHORT_REGIME_EXEMPT_ENFORCE)
+                    and conf >= SHORT_REGIME_EXEMPT_MIN_CONF):
+                _srge_r4h, _ = get_regime_4h(token)
+                if _srge_r4h == 'SHORT_BIAS':
+                    if SHORT_REGIME_EXEMPT_ENFORCE:
+                        _srge_exempt = True  # kill skipped — mult keeps pre-kill value
+                        log(f"  ✅ [SHORT-REGIME-EXEMPT] {token} {direction} {signal_type}: conf={conf:.0f} {_vol_regime} vol regime + 4h SHORT_BIAS — kill exempt, mult {short_normal_mult:.2f} kept")
+                    else:
+                        log(f"  👁️ [SHORT-REGIME-EXEMPT-SHADOW] {token} {direction} {signal_type}: WOULD-PASS — conf={conf:.0f} vol_regime={_vol_regime} regime_4h=SHORT_BIAS (min_conf={SHORT_REGIME_EXEMPT_MIN_CONF}) → mult {short_normal_mult:.2f} WOULD be restored on enforce; kill stays (ENFORCE=False)")
+        if not _short_quality_ok and not _srge_exempt:
             log(f"  🚫 [SHORT-REGIME-GATE] {token} SHORT blocked — {_vol_regime} vol regime, no quality gate (conf={conf:.0f}, need>=75 or proven family)")
             short_normal_mult = 0.0  # Kill score
+            # A4 tombstone (CEO consult 2026-11-03): stop ~190 score-kills/day
+            # hiding in the 'compaction_stale_10min' bucket. Behavior-neutral
+            # (consumer proof in the A4 report): the row is score-killed to 0.0
+            # and never ranks; decision_reason readers are the 10-min sweep
+            # (text-append only), the storm sibling counter (allow-direction,
+            # STORM_CONFLUENCE_WAIVER_ENFORCE=False), jup_yolo (same
+            # APPROVAL_DEAD class either way), shadow/expiry analytics, and
+            # hl_copy._pure_staleness_death whose predicate is provably
+            # unsatisfiable (exact 'compaction_stale_10min' string is only ever
+            # written by the >=10min sweep; the reader requires age<10min;
+            # signals.created_at is never updated). dry threaded from
+            # run_compaction (this site is in _score_signal, no local dry).
+            _tombstone_pending(token, direction, 'short-regime-gate', dry)
 
     # ── Continuum Oscillator Multiplier (SHADOW MODE) ──────────────────────
     oscillator_mult = 1.0
@@ -3879,6 +3919,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 speed_data=speed_data,
                 _btc_ctx_cached=_btc_ctx_cached,
                 _vol_regime=_vol_regime_score,  # FIX: per-token, not stale from pre-filter
+                dry=dry,  # A4: tombstone writes must respect the dry run (threaded from run_compaction)
             )
 
             # Opposing signal penalty: check if opposing direction is firing for this token
@@ -4388,6 +4429,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 # every override below it dead code. (OVERSOLD_SHORT_RSI_MAX
                                 # is imported above, outside the non-fatal try.)
                                 _rsh_bear_override = False
+                                _rsh_linreg = None
+                                _rsh_age_s = None
                                 if _rsh_rsi >= OVERSOLD_SHORT_RSI_MAX:
                                     try:
                                         import os as _rsh_os
@@ -4403,18 +4446,37 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         if (_rsh_row and _rsh_row[1] and (_rsh_time.time() - _rsh_row[1]) < 600
                                                 and _rsh_row[0] in ('LEAN_BEAR', 'BEAR')):
                                             _rsh_bear_override = True
+                                            _rsh_linreg = _rsh_row[0]       # A2 shadow context (log only)
+                                            _rsh_age_s = _rsh_time.time() - _rsh_row[1]
                                     except Exception:
                                         pass
                                 # EXPIRY (brain_auditor #102): flip#1 waiver has a recorded
                                 # expiry nobody read. Fail-closed → reverts to the pre-waiver
                                 # block message below.
-                                if _rsh_bear_override:
+                                # A2 SHADOW (CEO consult 2026-11-03, brief-long-bias-short-market):
+                                # bear-structure override conditions hold but flip1_active() is
+                                # False (waiver expired 10-24) → log the counterfactual and
+                                # continue into the existing blocked path — behavior STAYS
+                                # blocked. polarity: ENFORCE=False => log-only shadow; True =>
+                                # honor the bear override regardless of waiver expiry (bar-gated
+                                # re-arm; the re-arm needs a NEW expiry via the existing waiver
+                                # mechanism — a later CEO act, not this change).
+                                # Pre-registered bar (RECORDED, not enforced here): 14d shadow
+                                # n>=20, net >= +$1.00, leave-one-out positive — registry
+                                # flip1-bear-override-reshadow (deadline 2026-11-17).
+                                from hermes_constants import (FLIP1_BEAR_OVERRIDE_SHADOW,
+                                                              FLIP1_BEAR_OVERRIDE_ENFORCE)
+                                _rsh_flip1_on = None
+                                if _rsh_bear_override and not FLIP1_BEAR_OVERRIDE_ENFORCE:
                                     try:
                                         from waiver_expiry import flip1_active
-                                        if not flip1_active():
+                                        _rsh_flip1_on = flip1_active()
+                                        if not _rsh_flip1_on:
                                             _rsh_bear_override = False
                                     except Exception:
                                         _rsh_bear_override = False
+                                    if FLIP1_BEAR_OVERRIDE_SHADOW and _rsh_flip1_on is False:
+                                        log(f"  👁️ [FLIP1-OVERRIDE-SHADOW] {tkn} {direction} WOULD-ALLOW — rsi={_rsh_rsi:.2f} < {_rsh_floor} but BTC-bear structure (linreg={_rsh_linreg}, age={_rsh_age_s:.0f}s<600) and flip1_active()=False (waiver expired); shadow only, stays blocked")
                                 if _rsh_bear_override:
                                     log(f"  ✅ [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT allowed at approval — RSI {_rsh_rsi:.2f} < {_rsh_floor} but BTC bearish (oversold = continuation)")
                                 else:
