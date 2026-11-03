@@ -20052,3 +20052,26 @@ Final set: ['BLUR']
 **Open Questions:**
 - 24h '-$1.43' RED (WR 47.6%), 7d '-$2.11' — structure: hard_max_loss 14T '-1.89' vs trail/mfe exits +1.10; hard_max_loss remains dominant drag
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-03 04:45] Hourly Analysis
+
+**Trades:** 0 closed (quiet hour)
+**PnL:** $0.00 (WR n/a hour; 24h 37T 40.5% -$1.69 | 7d 252T 54.4% -$2.14 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 trades closed (5 open: BTC LONG, SOL SHORT, WLFI LONG, HYPE SHORT, ETH LONG)
+- Kill check: last hour n=0, no 0% WR/3+ signal; 24h n>=3: jup_yolo_mirrored 28T 46.4% '-1.28', pump-chain- 3T 33.3% '+0.04' — neither 0% WR, regime-kill policy not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/37 = 10.8% (<40%; drag = hard_max_loss 14T '-1.89', trail+mfe '+0.91') — no tpsl_utils alert
+- Boost HOLD: candidate query (n>=5, WR>55%, net>0.05) empty
+- Neg streak: 00h/01h green, 02h/03h red — 2 consecutive, not 3; no size action
+- Frequency 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.366%, 8/15 <0.5%
+- Storm readiness: **window-min +0.00% / at-run +0.31%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h '-$1.69' RED (WR 40.5% — worst of the day), 7d '-$2.14' — structure: hard_max_loss 14T '-1.89' vs trail/mfe exits '+0.91'; hard_max_loss remains dominant drag
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
