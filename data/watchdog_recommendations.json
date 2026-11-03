@@ -1,60 +1,52 @@
 {
-  "timestamp": "2026-11-03T05:11:58.974682+00:00",
+  "timestamp": "2026-11-03T07:11:59.957234+00:00",
   "steers": [
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: BTC + SOL",
-      "detail": "Both opened within 22 minutes. Correlation risk.",
+      "title": "Trade cluster: BTC + XPL",
+      "detail": "Both opened within 13 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: BTC + WLFI",
-      "detail": "Both opened within 25 minutes. Correlation risk.",
+      "title": "Trade cluster: BTC + SOL",
+      "detail": "Both opened within 23 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
     },
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: SOL + WLFI",
-      "detail": "Both opened within 3 minutes. Correlation risk.",
+      "title": "Trade cluster: XPL + SOL",
+      "detail": "Both opened within 10 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-003"
     },
     {
       "severity": "warning",
       "category": "cluster",
-      "title": "Trade cluster: HYPE + ETH",
-      "detail": "Both opened within 27 minutes. Correlation risk.",
+      "title": "Portfolio heavily long (4 trades)",
+      "detail": "4 long positions. One BTC dump hits all of them.",
       "auto_executable": false,
       "id": "steer-004"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Portfolio heavily long (3 trades)",
-      "detail": "3 long positions. One BTC dump hits all of them.",
-      "auto_executable": false,
-      "id": "steer-005"
     }
   ],
   "portfolio_health": "warning",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "NEG",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
+    "linreg_alignment": 0.75,
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
   "open_count": 5
