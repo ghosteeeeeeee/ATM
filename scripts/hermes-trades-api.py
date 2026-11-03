@@ -568,11 +568,13 @@ def _build_hotset_from_db():
             if speed == 0.0:
                 continue
 
-            # Blacklist filters
+            # Blacklist filters — CEO Option D: source-aware via central
+            # helper (N3 fix): jup_yolo_mirrored is exempt from the SHORT
+            # blacklist, so the display must not hide trades the system
+            # will actually take. Display-only file (see dump target).
             direction = r['direction'].upper()
-            if direction == 'SHORT' and tok in SHORT_BLACKLIST:
-                continue
-            if direction == 'LONG' and tok in LONG_BLACKLIST:
+            from directional_block import is_directional_blocked
+            if is_directional_blocked(tok, direction, r.get('sources')):
                 continue
             if is_solana_only(tok):
                 continue

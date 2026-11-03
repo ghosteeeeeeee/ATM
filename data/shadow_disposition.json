@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-02T16:00:00Z",
+ "updated": 1793665858,
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -816,6 +816,52 @@
    "default_action": "NO CHANGE \u2014 STOP_TIGHTEN_MAX_PRICE_PCT stays 1.00 and ENFORCE stays False if the bar fails; the 1.0% enforce hypothesis is judged separately at the same deadline",
    "risk": "low (shadow-only; revert by setting the constant back to 1.0)",
    "requires": "CEO label + T sign-off BEFORE the constant changes (it is the pre-registered hypothesis of stop-asymmetry-highwr); if no label by 11-07 the probe stays at 1.0% and read-2 simply reports inert again"
+  },
+  {
+   "id": "jup-hml-shadow-065-050",
+   "stream": "[JUP-SHADOW-HML] would-fire at -0.65/-0.50 price% on open jup_yolo trades (position_manager HML block, before close-check)",
+   "kind": "shadow",
+   "disposition": "REJECT \u2014 pre-registered eval ran 2026-11-02 (n=84): hml65 net -$0.30, hml50 net -$0.42 vs baseline +$1.44 \u2192 both REJECT, no enforce (verdicts stable across re-runs). Registered retroactively 2026-11-03 (was unregistered \u2014 chase-move-shadow governance-gap class).",
+   "status": "done",
+   "done_at": "2026-11-02",
+   "started": "2026-10-31",
+   "deadline": "2026-11-21T00:00:00Z",
+   "threshold": "40 closed jup_yolo trades (JUP_YOLO_SHADOW_EVAL_N); ENFORCE only if counterfactual net-positive vs CUT_LOSER -4.00 baseline AND gross WR not down",
+   "default_action": "KEEP SHADOW (no enforce) \u2014 CEO 2026-10-31 verdict rejected ship-now at n=42 (net ~-$0.10)",
+   "join_rate": "[JUP-SHADOW-HML] log lines \u2192 DISTINCT trade_id, first line per id",
+   "owner": "CEO label + T sign-off",
+   "evidence": "data/jup_hml_shadow_eval.json + data/jup_hml_shadow_eval_pm_only.json (n=84, verdicts REJECT\u00d74)",
+   "notes": "logging left ON for drift monitoring; re-open only if the exit stack changes materially (CUT_LOSER, HML_VOL_ATR_MULT, trail tiers)."
+  },
+  {
+   "id": "jup-trail-shadow-1xatr",
+   "stream": "[JUP-SHADOW-TRAIL] trail arm/distance counterfactual at 1xATR vs fixed 0.40%/0.20% (PM_TRAIL_* are CEO_PROTECTED \u2014 shadow carve-out only)",
+   "kind": "shadow",
+   "disposition": "EVAL",
+   "status": "open",
+   "started": "2026-10-31",
+   "deadline": "2026-11-17T00:00:00Z",
+   "threshold": "40 closed jup_yolo trades (JUP_YOLO_SHADOW_EVAL_N) \u2014 already met (97 closed 2026-11-03); evaluate: replay would-armed trades (armed_scd=Y, first line per id, max fav) vs actual exits; ENFORCE only if net delta >= +$0.50/40 trades AND gross WR not down; compare against the shipped MFE_EXIT walker rows in data/jup_exit_sim.json (mfe30/pmwalk) to pick ONE exit improvement, not two",
+   "default_action": "KEEP SHADOW \u2014 no PM_TRAIL_* change (protected flags)",
+   "join_rate": "[JUP-SHADOW-TRAIL] log lines \u2192 DISTINCT trade_id (fresh process per minute \u2192 eval DISTINCTs; first line per id)",
+   "owner": "CEO label + T sign-off",
+   "evidence": "CEO 2026-10-31 exit-asymmetry verdict (item #2 APPROVED via automatic-implementation); sim rows pm_mfe30a +42.14 / pmwalk +34.64 vs pm_actual -31.27 (n=97, scripts/jup_exit_sim.py)",
+   "notes": "unit-fixed levels note: compute_atr_sl/tp_pct now delegate to norm (2026-11-03) \u2014 trail eval must use the SAME exit stack as baseline."
+  },
+  {
+   "id": "jup-atrsl-shadow-parity",
+   "stream": "[JUP-SHADOW-ATRSL] actual vs corrected ATR SL/TP on open jup trades (JUP_YOLO_ATRSL_SHADOW_ENABLED)",
+   "kind": "shadow",
+   "disposition": "FIX SHIPPED 2026-11-03 (T: 'fix the problems') \u2014 compute_atr_sl/tp_pct now delegate to compute_atr_{sl,tp}_pct_norm; OOS counterfactual n=97 closed mirror trades: norm -98.9 vs broken -155.6 net leveraged % (avg loss -1.02 vs -1.60). Post-fix lines log actual==norm PARITY.",
+   "status": "open",
+   "started": "2026-11-02",
+   "deadline": "2026-11-10T00:00:00Z",
+   "threshold": "First 5 post-fix [JUP-SHADOW-ATRSL] lines: actual==norm on every id (parity proof). Then KILL stream (question answered) unless drift appears (actual != norm = the fix regressed).",
+   "default_action": "KEEP SHADOW (parity monitor) \u2192 auto-KILL on 14d zero-diff",
+   "join_rate": "[JUP-SHADOW-ATRSL] FIRST line per DISTINCT trade_id (placement, pre-ratchet)",
+   "owner": "T fix + CEO shadow-first order honored (11-02 order: shadow \u2192 OOS \u2192 widen)",
+   "evidence": "pre-fix OOS window 2026-11-02..11-03 + replay n=97; constants doc hermes_constants.py ~4305",
+   "notes": "registered retroactively 2026-11-03 \u2014 stream shipped 11-02 WITHOUT a registry entry (governance gap)."
   }
  ]
 }

@@ -957,22 +957,33 @@ def compute_atr_sl_tp(
 
 def compute_atr_sl_pct(atr_pct: float) -> float:
     """
-    Effective SL % for a given raw ATR%.
+    Effective SL % for a given raw ATR% (input in PERCENT units).
     Use when you have ATR% and just want the SL %.
+
+    FIX (2026-11-03, T: "fix the problems"; diagnosed 2026-11-02, CEO
+    shadow-first order honored): was `k * atr_pct` with PERCENT input against
+    FRACTION-unit tier thresholds (0.01/0.015) and clamps (0.015/0.025) →
+    every realistic ATR took HIGH tier AND clamped to ATR_SL_MAX (2.50%) —
+    the "ATR SL" was a de-facto constant system-wide. Corrected math lives
+    in compute_atr_sl_pct_norm (normalizes input to fraction) — delegate.
+    OOS counterfactual (scripts/jup_exit_sim.py, n=97 closed mirror trades,
+    history predates the fix): norm -98.9 vs broken -155.6 net leveraged %,
+    avg loss -1.02% vs -1.60% (−3pp WR is the cost of cutting smaller).
+    Volume-breakout exec-init was the live consumer (main trailing path
+    compute_atr_sl_tp was already fraction-correct).
     """
-    k = _atr_tier(atr_pct)
-    eff = k * atr_pct
-    return max(ATR_SL_MIN, min(ATR_SL_MAX, eff))
+    return compute_atr_sl_pct_norm(atr_pct)
 
 
 def compute_atr_tp_pct(atr_pct: float) -> float:
     """
-    Effective TP % for a given raw ATR%.
+    Effective TP % for a given raw ATR% (input in PERCENT units).
+
+    FIX (2026-11-03, T: "fix the problems"): same unit defect as
+    compute_atr_sl_pct — PERCENT input vs FRACTION thresholds/clamps made
+    this a de-facto constant (2.00%). Delegates to the corrected norm math.
     """
-    k = _atr_tier(atr_pct)
-    k_tp = k * ATR_TP_K_MULT
-    eff = k_tp * atr_pct
-    return max(ATR_TP_MIN, min(ATR_TP_MAX, eff))
+    return compute_atr_tp_pct_norm(atr_pct)
 
 
 # ── CORRECTED variants (CEO verdict 2026-11-02, item (d)) ─────────────────────

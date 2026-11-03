@@ -51,7 +51,8 @@ from hermes_constants import (
     MFE_EXIT_GIVEBACK_PCT, MFE_EXIT_ARM_PCT,
     PM_TRAIL_ACTIVATE_PCT, PM_TRAIL_DISTANCE_PCT,
 )
-from tpsl_utils import compute_atr_sl_pct, compute_atr_tp_pct
+from tpsl_utils import (compute_atr_sl_pct, compute_atr_tp_pct,
+                        compute_atr_sl_pct_norm, compute_atr_tp_pct_norm)
 
 if JUP_EXIT_SIM_TIMEFRAME != '5m':
     raise SystemExit('replay logic assumes 5m candles')
@@ -236,7 +237,7 @@ def main():
     skipped = {'atr': [], 'rr': [], 'candles': []}
     # per-strategy accumulator
     stats = {k: {'n': 0, 'w': 0, 'l': 0, 'pnl': [], 'hold': [], 'timeout': 0}
-             for k in ('pm_actual', 'pm_trail', 'atr_cfg',
+             for k in ('pm_actual', 'pm_trail', 'atr_cfg', 'atr_norm',
                        'rr2_cfg', 'rr3_cfg', 'rr2_hml', 'rr3_hml', 'ride',
                        'bg', 'mfe30', 'mfe30a040', 'pmwalk',
                        'pm_mfe30', 'pm_mfe30a')}
@@ -310,6 +311,14 @@ def main():
         # ── system ATR config (static from entry)
         _run('atr_cfg', sl_cfg, tp_cfg)
 
+        # ── CORRECTED ATR config (norm math: input normalized to fraction) —
+        # the unit-fix counterfactual (OOS: history predates any fix)
+        _sl_n_pct = compute_atr_sl_pct_norm(1.24)
+        _tp_n_pct = compute_atr_tp_pct_norm(1.24)
+        sl_n = entry * (1 - _sl_n_pct) if long_p(t['dir']) else entry * (1 + _sl_n_pct)
+        tp_n = entry * (1 + _tp_n_pct) if long_p(t['dir']) else entry * (1 - _tp_n_pct)
+        _run('atr_norm', sl_n, tp_n)
+
         # ── R:R on both risk bases
         for R in JUP_EXIT_SIM_RR:
             _r = int(R) if R == int(R) else R
@@ -377,7 +386,7 @@ def main():
           f"{'net%':>8} {'avg%':>7} {'med%':>7} {'avgHold':>8} {'timeout':>7}")
     print('-' * 82)
     report = {}
-    for key in ('pm_actual', 'pm_trail', 'atr_cfg',
+    for key in ('pm_actual', 'pm_trail', 'atr_cfg', 'atr_norm',
                 'rr2_cfg', 'rr3_cfg', 'rr2_hml', 'rr3_hml', 'ride',
                 'bg', 'mfe30', 'mfe30a040', 'pmwalk', 'pm_mfe30', 'pm_mfe30a'):
         s = stats[key]
