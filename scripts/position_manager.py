@@ -2282,19 +2282,26 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         if needs_sl or needs_tp or sl_stale or tp_stale or is_init_to_accel or is_force:
             # ── STOP-TIGHTEN (exec-time node, Lane-2 rule) ─────────────────────
             # Clamp check AT the exact ATR SL placement/replacement point (this
-            # update dict is what _persist_atr_levels + the HL push will write —
-            # initial placement, ratchet re-placement and TP-only re-persists all
-            # flow through here), so the logged counterfactual is the SL we would
-            # actually clamp. NOT signal-time. Guarded: a hook/logging failure
-            # never breaks the ATR update.
+            # update dict is what _persist_atr_levels writes — initial placement,
+            # ratchet re-placement and TP-only re-persists all flow through here),
+            # so the logged counterfactual is the SL we would actually clamp.
+            # NOT signal-time. Guarded: a hook/logging failure never breaks the
+            # ATR update.
             # ENFORCE PHASE (since 2026-11-04, CEO T-override consult 20261104):
             # STOP_TIGHTEN_ENFORCE=True means the helper returns the CLAMPED SL
             # and _st_sl != _st_base_sl whenever it engaged. ENFORCE=False returns
             # the proposed SL unchanged (identity, zero live effect).
-            # ENFORCE-PHASE CHECKLIST (executed with the flip): hl_needs_sl above
-            # is computed from the PRE-clamp new_sl — recompute the HL delta gate
-            # against the clamped value below, before the HL push, or Hyperliquid
-            # keeps the wider pre-clamp stop while the DB holds the clamp.
+            # ENFORCE-PHASE CHECKLIST (executed with the flip, 2026-11-04):
+            # hl_needs_sl above is computed from the PRE-clamp new_sl, so it is
+            # re-derived from the CLAMPED value below. HONEST SCOPE (audit
+            # 2026-11-04): the update dict's `needs_sl` currently has NO consumer
+            # — _persist_atr_levels writes the DB unconditionally and the bulk HL
+            # push (_execute_atr_bulk_updates) does not exist with
+            # ATR_HL_ORDERS_ENABLED=False. HL-side stops for a new position come
+            # from brain.py at open (decider_open, which IS clamped) plus the
+            # watchdog/guardian. The recompute is therefore inert today but is the
+            # documented checklist item and becomes load-bearing the moment that
+            # push path is re-enabled — it must compare the CLAMPED value then.
             _st_base_sl = result['_atr_computed_new_sl'] if is_init_to_accel else new_sl
             _st_sl = _st_base_sl
             try:
@@ -2307,7 +2314,7 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
                 _st_sl = _st_base_sl
                 log(f"  [STOP-TIGHTEN-SHADOW] hook error id={trade_id} {token}: "
                     f"{type(_st_e).__name__}: {_st_e}")
-            # Re-derive the HL delta gate from the CLAMPED value when the clamp
+            # Re-derive the delta gate from the CLAMPED value when the clamp
             # actually engaged (no-op identity when ENFORCE=False or no clamp:
             # _st_sl == _st_base_sl there, so behavior is unchanged).
             if _st_sl != _st_base_sl and current_sl and float(current_sl) > 0:

@@ -2493,13 +2493,19 @@ def _is_bypass_admitted_single_type(source):
     through STANDALONE_BYPASS membership (the bypass path), i.e. NOT through
     multi-source confluence.
 
-    Mirrors signal_compactor's own rule (confluence gate, ~:3666):
-      unique_signal_types == 1 AND (bare_source or _src_stripped or any part)
-      is in STANDALONE_BYPASS_SIGNALS.
-    Normalization is the compactor's: strip trailing +/-, strip a '-broken'
-    suffix, strip ALL trailing digits (bars_since / level markers), then test
-    membership. Returns False on any problem (fail-open: a broken source string
-    must never be able to block a fill by accident).
+    Two DIFFERENT normalizations, each copied from signal_compactor so this
+    agrees with the approval layer exactly (audit MINOR 2026-11-04):
+      * the UNIQUENESS COUNT uses signal_compactor._signal_type_key semantics
+        (signal_compactor.py:2915-2943): keep the +/- suffix, strip '-broken',
+        collapse rs-[sr] -> rs, then strip ALL trailing digits. Getting this
+        wrong would make 'volume-buildup+,volume-buildup' (2 types to the
+        compactor = confluence, never blockable) read as a single-type bypass
+        here and wrongly block a confluence LONG.
+      * the MEMBERSHIP test uses the compactor's bypass test (confluence gate
+        signal_compactor.py:3675/3680): part.rstrip('+-') or the digit-stripped
+        bare form is in STANDALONE_BYPASS_SIGNALS (whole-source variants too).
+    Returns False on any problem (fail-open: a broken source string must never
+    be able to block a fill by accident).
     """
     try:
         import re as _re
@@ -2507,18 +2513,25 @@ def _is_bypass_admitted_single_type(source):
         parts = [p.strip() for p in (source or '').split(',') if p.strip()]
         if not parts:
             return False
-        keys = set()
-        for _p in parts:
-            _b = _re.sub(r'-broken$', '', _p.rstrip('+-'))
-            keys.add(_re.sub(r'\d+$', '', _b))
-        if len(keys) != 1:
+
+        def _type_key(part):
+            # verbatim mirror of signal_compactor._signal_type_key
+            p = _re.sub(r'-broken$', '', part)
+            p = _re.sub(r'^rs-[sr]', 'rs', p)
+            return _re.sub(r'\d+$', '', p) or p
+
+        if len({_type_key(p) for p in parts}) != 1:
             return False          # 2+ unique types = confluence path, never blocked
         _bypass = set(STANDALONE_BYPASS_SIGNALS)
+        # whole-source forms (compactor conditions 1/3) — identical to the
+        # part-level test for a single-part source, needed only for multi-part
+        # same-type sources
+        _whole_stripped = (source or '').rstrip('+-')
+        if _whole_stripped in _bypass or _re.sub(r'\d+$', '', _whole_stripped) in _bypass:
+            return True
         for _p in parts:
-            _bare = _re.sub(r'\d+$', '', _re.sub(r'-broken$', '', _p.rstrip('+-')))
             _stripped = _p.rstrip('+-')
-            if (_stripped in _bypass or _bare in _bypass
-                    or _re.sub(r'-broken$', '', _stripped) in _bypass):
+            if _stripped in _bypass or _re.sub(r'\d+$', '', _stripped) in _bypass:
                 return True
         return False
     except Exception:
@@ -2544,7 +2557,7 @@ def _long_bypass_short_bias_block(token, direction, source):
     trade through, never falsely block it.
     """
     try:
-        if (direction or '').upper() != 'LONG':
+        if (direction or '').strip().upper() != 'LONG':
             return False
         from hermes_constants import LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED
         if not LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED:
@@ -2649,10 +2662,12 @@ def execute_trade(token, direction, price, confidence, source,
         pass  # non-fatal — fail-open on MAXXED check
 
     # ── LONG-BYPASS-SHORT-BIAS-BLOCK (CEO SHIP-LIVE 2026-11-04, consult 20261104) ──
-    # Exec-time admission point — execute_trade is the SINGLE choke point every
-    # fill routes through (one call site, decider_run run() loop), so the block
-    # is reachable for the actual fills. It blocks ONLY a LONG that was admitted
-    # by the STANDALONE_BYPASS single-source path while the coin's 4h regime is
+    # Exec-time admission point — execute_trade is the single choke point for
+    # DECIDER fills (one call site, run() loop), so the block is reachable for
+    # the actual fills; the one other opening path (process_delayed_entries,
+    # which shells out to brain.py directly) carries its own copy of this block
+    # at decider_run.py:927. It blocks ONLY a LONG that was admitted by the
+    # STANDALONE_BYPASS single-source path while the coin's 4h regime is
     # SHORT_BIAS (worst cell 94T -$0.65/14d). Multi-source confluence LONGs in
     # SHORT_BIAS and every SHORT are untouched by design.
     # POLARITY: LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED True = block (live
@@ -4985,15 +5000,27 @@ def run(dry_run=False):
                 JUP_YOLO_FILL_CAP_ENABLED, JUP_YOLO_FILL_WINDOW_HOURS,
                 JUP_YOLO_MAX_FILLS_PER_WINDOW)
             if JUP_YOLO_FILL_CAP_ENABLED and 'jup_yolo' in (source or ''):
-                _jfc_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
-                _jfc_cur = _jfc_conn.cursor()
-                _jfc_cur.execute("""
-                    SELECT COUNT(*) FROM trades
-                    WHERE paper = false AND signal LIKE %s
-                      AND open_time > NOW() - make_interval(hours => %s)
-                """, ('%jup_yolo%', int(JUP_YOLO_FILL_WINDOW_HOURS)))
-                _jfc_n = _jfc_cur.fetchone()[0]
-                _jfc_conn.close()
+                _jfc_conn = None
+                _jfc_cur = None
+                try:
+                    # try/finally close (audit MINOR 2026-11-04): Cap B above
+                    # leaks the connection if execute/fetchone raises; this is
+                    # the commit's new connection site, so close both reliably.
+                    _jfc_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+                    _jfc_cur = _jfc_conn.cursor()
+                    _jfc_cur.execute("""
+                        SELECT COUNT(*) FROM trades
+                        WHERE paper = false AND signal LIKE %s
+                          AND open_time > NOW() - make_interval(hours => %s)
+                    """, ('%jup_yolo%', int(JUP_YOLO_FILL_WINDOW_HOURS)))
+                    _jfc_n = _jfc_cur.fetchone()[0]
+                finally:
+                    try:
+                        if _jfc_cur is not None:
+                            _jfc_cur.close()
+                    finally:
+                        if _jfc_conn is not None:
+                            _jfc_conn.close()
                 if _jfc_n >= JUP_YOLO_MAX_FILLS_PER_WINDOW:
                     log(f'SKIP: Cap C — jup_yolo {_jfc_n} fills in last '
                         f'{JUP_YOLO_FILL_WINDOW_HOURS}h (max '
