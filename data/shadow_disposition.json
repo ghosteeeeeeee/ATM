@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-04T16:28:45Z",
+ "updated": "2026-11-04T16:55:00Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -807,15 +807,16 @@
    "id": "amplify-grind-breakout-deploy",
    "stream": "grind-breakout- under-deployment clone-hunt",
    "kind": "amplify",
-   "disposition": "PROPOSE: diagnose gate friction on grind-breakout- (shadow top source)",
-   "status": "open",
+   "disposition": "NO CHANGE \u2014 bar FAILS clause 3 (no non-colliding widen path); why-not logged 2026-11-04 (audit #220)",
+   "status": "done",
    "deadline": "2026-11-14T00:00:00Z",
    "threshold": "shadow_trader 11-01: grind-breakout- n=26 WR 92.3% avg +1.56 = #1 source by avg_pnl; GRIND_BREAKOUT_MINUS_ENABLED=True but live 30d only 2T (+0.63). Ship bar: join shows >50% of would-win shadow events blocked by a named gate AND blocked-set net would_pnl > +$1.00/14d AND that gate has a non-colliding widen path.",
    "default_action": "NO CHANGE \u2014 log why-not in kanban (do not force-deploy a thin live cohort)",
    "owner": "brain_auditor",
    "created_at": "2026-11-01T00:45:00Z",
-   "evidence": "shadow_trader --report 2026-11-01T00:33Z: grind-breakout- n=26 WR 92.3% avg_pnl +1.56 (top of SIGNAL QUALITY BY SOURCE). Live PG 30d: 2T +0.63. Enabled flags True. Most likely friction = CONFLUENCE-EXPIRY (14,410 blocked @47% lower-bound) \u2014 verify in join. | FRICTION 14d refresh 2026-11-02: signals_hermes_runtime grind_breakout_* = 190 rows, 118 compaction_stale_10min + 28 blocked@approval (short-rsi-hard-floor 10, long-rsi-ceiling 6, long-midband 3, rr-engine-hard-block 3, long-high-70 2, spike-filter-long 2, maxxed-vol 1, oversold-knife 1) + 6 fell-out-of-hotset; named approval gates enumerated (bar still needs blocked-set would_pnl > +$1.00/14d \u2014 shadow join required).",
-   "note_20261101": "interim: shadow still TOP SOURCE 92.3% n=26; live 2T/30d; due 11-14 not duplicated"
+   "evidence": "shadow_trader --report 2026-11-01T00:33Z: grind-breakout- n=26 WR 92.3% avg_pnl +1.56 (top of SIGNAL QUALITY BY SOURCE). Live PG 30d: 2T +0.63. Enabled flags True. Most likely friction = CONFLUENCE-EXPIRY (14,410 blocked @47% lower-bound) \u2014 verify in join. | FRICTION 14d refresh 2026-11-02: signals_hermes_runtime grind_breakout_* = 190 rows, 118 compaction_stale_10min + 28 blocked@approval (short-rsi-hard-floor 10, long-rsi-ceiling 6, long-midband 3, rr-engine-hard-block 3, long-high-70 2, spike-filter-long 2, maxxed-vol 1, oversold-knife 1) + 6 fell-out-of-hotset; named approval gates enumerated (bar still needs blocked-set would_pnl > +$1.00/14d \u2014 shadow join required). | DEDUPE CORRECTION 2026-11-04 (brain/analysis/shadow_source_dedupe_2026-11-04.py, --selfcheck PASS): the n=26/92.3% headline dedupes to n=8 INDEPENDENT token-events (75.0% +1.27, sum +10.20) \u2014 repeated fires of one token-event were counted as independent rows (CRV pair identical ts +9.27 twice; PUMP 6 rows all +1.254). grind_breakout_short blocked cohort 34 raw (28W, binom p=0.00010) -> 18 deduped (12W, p=0.1189) = NOT significant.",
+   "note_20261101": "interim: shadow still TOP SOURCE 92.3% n=26; live 2T/30d; due 11-14 not duplicated",
+   "note_20261104": "BAR EVALUATED = FAIL. (1) named-gate clause: gate_shadow 14d grind-breakout- = 10 events, all would-win, +7.50 pct, 8/10 via CONFLUENCE-GATE-BLOCK -> widen path collides with CEO-protected CONFLUENCE_REQUIRED = no non-colliding path. (2) dominant real friction is compaction_stale_10min (145/225 grind rows 14d), whose shadow counterfactual CONFLUENCE-EXPIRY is NEGATIVE (-2.37/14d, 9W/27) = widening expiry LOSES. (3) RSI knife/hard-floor exempt cohort dedupes to p=0.119 and collides with the in-flight fade knife-exemption design (FADE_EXEMPT_KNIFE_SIZE_MULT, knife<35 stays GLOBAL). Re-open only on >=20 INDEPENDENT deduped events with a non-colliding widen path."
   },
   {
    "id": "amplify-pc-fade-cell-split",
@@ -969,7 +970,7 @@
    "threshold": "enforce flip at 2026-11-10 if simulated fills n>=20, WR>=55%, net >= +$1.00",
    "default_action": "no single-source shorts in bear (stay blocked)",
    "owner": "CEO",
-   "notes": "ENFORCE flip would set pass_gate=True for this cohort only (shipped code has the branch, flag False). Join: shadow line token+source+conf \u2192 simulated fill outcome at the bar window."
+   "notes": "ENFORCE flip would set pass_gate=True for this cohort only (shipped code has the branch, flag False). Join: shadow line token+source+conf \u2192 simulated fill outcome at the bar window. | PACE READ 2026-11-04 (audit #220): 22 WOULD-PASS log lines = ONLY 2 unique tokens (LIT 16, BABY 6) since 11-03 \u2014 the n>=20 bar must be counted on DISTINCT token-events, not lines. On this pace the bar will NOT be met by 11-10; do not read line-count as fills."
   },
   {
    "id": "volgate-short-exempt-shadow",
@@ -1041,15 +1042,17 @@
    "id": "timer-cadence-recheck",
    "stream": "hermes-shadow-disposition.timer OnCalendar cadence vs registry deadline density",
    "kind": "eval",
-   "disposition": "EVAL",
-   "status": "open",
+   "disposition": "RE-DAILY EXECUTED \u2014 option (a) taken as registered default: OnCalendar back to *-*-* 08:15 (repo + /etc, daemon-reload + timer restart verified). Rationale: weekly (Mon-only, from disposition-cadence-revert) could not honor 11-05/11-06/11-07 reads incl. the 11-07 fold-line packet; calendar now has 6+ deadlines 11-07..11-17. Re-evaluate cadence when calendar is sparse (new entry needed then).",
+   "status": "done",
    "started": "2026-11-04",
    "deadline": "2026-11-06T00:00:00Z",
    "threshold": "CEO rules ONE of: (a) daily-while-any-deadline-within-14d exists (conditional cadence), (b) accept weekly with defaults firing up to 6d late (11-09->11-16 gap), (c) keep weekly but add a mid-week run before dense clusters",
    "default_action": "re-daily the timer (reverse disposition-cadence-revert) with a comment citing the deadline density \u2014 the safe direction given 6 deadlines between 11-07 and 11-17",
    "owner": "CEO",
    "evidence": "goal round 10 sweep 2026-11-04: timer reverted to Mon-only per T's 'All three' sign-off on the sparse 11-03 cluster, but the 11-04 harvest ship added deadlines 11-07 (harvest-ship), 11-10 (rsi-ceiling-75, bear-single-source), 11-14 (stop-tighten-enforce), 11-16 (join-builder), 11-17 (volgate/maxxed/long-bypass) \u2014 weekly runs fire those defaults up to 6 days late (the #190 failure mode that forced daily cadence)",
-   "notes": "registered from goal-704ed65e round 12 while ship agent a98de02d held the registry \u2014 re-read preserved its entries"
+   "notes": "registered from goal-704ed65e round 12 while ship agent a98de02d held the registry \u2014 re-read preserved its entries",
+   "done_at": "2026-11-04",
+   "action_taken": "config/hermes-shadow-disposition.timer + /etc/systemd/system copy: OnCalendar=Mon -> daily, daemon-reload, timer restarted 2026-11-04"
   },
   {
    "id": "harvest-ship-2026-11-04",

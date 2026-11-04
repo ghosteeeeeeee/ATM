@@ -10,7 +10,10 @@ Description=Hermes Shadow Disposition Timer — weekly Mon 08:15 UTC (after 07:1
 # REVERT 2026-11-03 brain_auditor #218: 11-03 cluster dispositioned
 # (ugb KEEP / midband NO-CHANGE / esc-17 stale-close / watch-contrarian EXTEND /
 # cadence entry falsely claimed EXECUTED while files stayed daily — fixed now).
-OnCalendar=Mon *-*-* 08:15:00
+OnCalendar=*-*-* 08:15:00
+# 2026-11-04 re-daily (CEO hail-mary verdict 20261104T161050Z + registered default of
+# timer-cadence-recheck): weekly could not honor the 11-05/06/07 reads incl. the 11-07
+# fold-line; reverse of disposition-cadence-revert, re-evaluate when calendar is sparse
 Persistent=true
 
 [Install]
