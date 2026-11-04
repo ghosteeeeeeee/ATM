@@ -4124,6 +4124,134 @@ def _warmup_volume_cache():
     # Don't join — let it run in background while pipeline proceeds
 
 
+# ─── BTC-CRASH continuum override (SHARED) + fade post-flip shadow ───────────
+# Extracted 2026-11-04 (CEO hail-mary item 7, registry fade-btc-crash-postflip)
+# so the LOG-ONLY post-flip shadow below evaluates the SAME continuum rules the
+# live gate uses — one source of truth instead of a duplicated decision block.
+
+def _continuum_allows_crash_bypass(row, direction):
+    """PURE predicate: does BTC continuum structure let `direction` bypass the
+    BTC-CRASH filter? row = (market_phase, linreg_direction, ema300_position)
+    or None.
+
+    Rules are exactly the brain_auditor 2026-10-06 fixes that used to live
+    inline in the exec-loop crash gate (F2 'AT' transitional + bare-phase
+    tightening): LONG = (RECOVERY/NEUTRAL and not LEAN_BEAR/BEAR) OR
+    (CALM and LEAN_BULL/BULL and ABOVE/AT) OR (LEAN_BULL/BULL and ABOVE/AT);
+    SHORT = DECLINING OR (CALM/RECOVERY and LEAN_BEAR/BEAR and BELOW).
+    No DB access, no logging, no side effects — fails safe to False.
+    Equivalence to the pre-extraction inline block probed 2026-11-04 over the
+    full phase x linreg x ema x direction matrix (all equal)."""
+    try:
+        d = (direction or '').upper()
+        if not row or d not in ('LONG', 'SHORT'):
+            return False
+        _p, _l, _e = row[0], row[1], row[2]
+        if d == 'LONG':
+            return bool(
+                (_p in ('RECOVERY', 'NEUTRAL') and _l not in ('LEAN_BEAR', 'BEAR')) or
+                (_p == 'CALM' and _l in ('LEAN_BULL', 'BULL') and _e in ('ABOVE', 'AT')) or
+                (_l in ('LEAN_BULL', 'BULL') and _e in ('ABOVE', 'AT')))
+        return bool(
+            _p == 'DECLINING' or
+            (_p in ('CALM', 'RECOVERY') and _l in ('LEAN_BEAR', 'BEAR') and _e == 'BELOW'))
+    except Exception:
+        return False
+
+
+def _fetch_btc_continuum_row():
+    """Latest BTC continuum row (market_phase, linreg_direction, ema300_position)
+    — shared by the live crash gate and the fade post-flip shadow. Returns None
+    on ANY error (fail-open = no override); connection closed in finally (house
+    convention: no SQLite leaks)."""
+    _conn = None
+    try:
+        _db = os.path.join(os.environ.get('HERMES_DATA', '/root/.hermes/data'), 'continuum.db')
+        _conn = sqlite3.connect(_db, timeout=3)
+        return _conn.execute(
+            "SELECT market_phase, linreg_direction, ema300_position "
+            "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
+        ).fetchone()
+    except Exception:
+        return None
+    finally:
+        if _conn:
+            try:
+                _conn.close()
+            except Exception:
+                pass
+
+
+def _fade_crash_postflip_shadow(token, source, pre_direction, live_verdict, crash):
+    """[FADE-CRASH-POSTFLIP-SHADOW] — LOG-ONLY post-flip crash verdict.
+
+    Registry: fade-btc-crash-postflip (kind=wiring, disposition FIX-SHADOW);
+    wired 2026-11-04 as CEO hail-mary item 7; deadline moved 11-05 -> 11-06 so
+    the registered 24h read can actually happen.
+
+    WHY: the exec-loop BTC-CRASH gate (the ACTUAL enforcement point —
+    _run_hot_set()'s identical gate is cosmetic and cannot kill a trade)
+    evaluates the signal's ORIGINAL direction, while the fade flip
+    (_apply_inversion / CONTRARIAN-LIVE) happens LATER in the SAME iteration.
+    Autopsy RC2: 7 wrong-side SHORT kills of would-be faded LONGs + 9 mirror
+    evasions of the LONG-side block. This line records BOTH verdicts for faded
+    candidates so the 24h read can judge direction-coherence.
+
+    CONTRACT (read before touching): LOG-ONLY — it blocks nothing, allows
+    nothing, never touches skipped/failures/mark_signal_executed, writes no
+    files, and raises nothing (any exception => no log, no behavior change).
+    The pre-flip verdict stays authoritative: registry default_action = KEEP
+    pre-flip behavior until the CEO flips it on evidence. Scope = fade candidates
+    only (_contrarian_live_hit) — this entry is registered about faded entries;
+    static/dynamic inversion types are deliberately out of scope."""
+    try:
+        if not _contrarian_live_hit(source):
+            return
+        # The candidate must be one that could actually reach _apply_inversion:
+        # validate_source() rewrites blacklisted sources to 'unknown' (those get
+        # skipped at the source-validation gate and can never become a faded
+        # entry), so they must not count toward the registry's would-kill tally.
+        # Fail-safe: if the check itself errors, keep logging — this is a
+        # log-only collector, never a gate.
+        try:
+            from signal_schema import validate_source
+            if validate_source(source) == 'unknown':
+                return
+        except Exception:
+            pass
+        pre = (pre_direction or '').upper()
+        if pre not in ('LONG', 'SHORT'):
+            return
+        post = 'SHORT' if pre == 'LONG' else 'LONG'
+        if crash is None:
+            log(f'  👻 [FADE-CRASH-POSTFLIP-SHADOW] {token} {source}: fade {pre}->{post} | '
+                 'live pre-flip verdict=' + str(live_verdict) +
+                ' (authoritative) | shadow post-flip verdict=UNKNOWN (crash filter errored '
+                'this cycle) | log-only, no behavior change')
+            return
+        blocked = bool(getattr(crash, 'blocked', False))
+        block_dir = (getattr(crash, 'blocked_direction', '') or '')
+        post_dir_match = (not block_dir) or (post == block_dir.upper())
+        post_override = False
+        if blocked and post_dir_match:
+            # evaluate the continuum bypass for the FLIPPED direction with the
+            # exact rules the live gate applies to the pre-flip direction
+            post_override = _continuum_allows_crash_bypass(_fetch_btc_continuum_row(), post)
+        post_kill = bool(blocked and post_dir_match and not post_override)
+        sev = str(getattr(crash, 'severity', '') or 'clear')
+        layer = str(getattr(crash, 'layer', '') or '')
+        post_txt = 'WOULD-KILL' if post_kill else 'WOULD-ALLOW'
+        crash_txt = (f'{sev}/{layer}' if layer else sev) if blocked else 'clear'
+        coherent_txt = 'YES' if ((live_verdict == 'KILL') == post_kill) else 'NO'
+        log(f'  👻 [FADE-CRASH-POSTFLIP-SHADOW] {token} {source}: fade {pre}->{post} | '
+            f'live pre-flip verdict={live_verdict} (authoritative — pre-flip default keeps operating) | '
+            f'shadow post-flip verdict={post_txt} | crash={crash_txt} '
+            f'block_dir={block_dir.upper() or "ALL"} post_override={"yes" if post_override else "no"} | '
+            f'coherent={coherent_txt} — log-only, no behavior change')
+    except Exception:
+        pass
+
+
 # ─── Main Run ────────────────────────────────────────────────────
 
 def run(dry_run=False):
@@ -4468,48 +4596,40 @@ def run(dry_run=False):
                 _block_dir = getattr(_crash, 'blocked_direction', None) or ''
                 if not _block_dir or direction.upper() == _block_dir.upper():
                     # CONTINUUM OVERRIDE: allow signal if BTC structure is bullish
+                    # LOGIC EXTRACTED 2026-11-04 (CEO hail-mary item 7, registry
+                    # fade-btc-crash-postflip) into _fetch_btc_continuum_row() +
+                    # _continuum_allows_crash_bypass() so the LOG-ONLY
+                    # [FADE-CRASH-POSTFLIP-SHADOW] shadow judges the FLIPPED
+                    # direction by the identical rules. Behavior unchanged: same
+                    # row, same predicate, same [BTC-CRASH-OVERRIDE] log line.
                     _continuum_override = False
                     try:
-                        import os as _cont_os
-                        _cont_db = _cont_os.path.join(os.environ.get('HERMES_DATA', '/root/.hermes/data'), 'continuum.db')
-                        _cont_conn = None
-                        try:
-                            _cont_conn = sqlite3.connect(_cont_db, timeout=3)
-                            _cont_row = _cont_conn.execute(
-                                "SELECT market_phase, linreg_direction, ema300_position "
-                                "FROM continuum_states WHERE token='BTC' ORDER BY ts DESC LIMIT 1"
-                            ).fetchone()
-                        finally:
-                            if _cont_conn:
-                                try: _cont_conn.close()
-                                except: pass
-                        if _cont_row and direction.upper() == 'LONG':
-                            _p, _l, _e = _cont_row[0], _cont_row[1], _cont_row[2]
-                            # Valid phases: CALM, STORMY, RECOVERY, DECLINING, NEUTRAL
-                            # FIX brain_auditor 2026-10-06: bare RECOVERY/NEUTRAL allowed LONG crash-filter
-                            # override even in full bear structure (SUPER RECOVERY+LEAN_BEAR+BELOW).
-                            # Require non-bear linreg for bare phase; structural bull allows any phase.
-                            if ((_p in ('RECOVERY', 'NEUTRAL') and _l not in ('LEAN_BEAR', 'BEAR')) or
-                                (_p == 'CALM' and _l in ('LEAN_BULL', 'BULL') and _e in ('ABOVE', 'AT')) or  # AT = transitional (bug_hunter F2 2026-10-05)
-                                (_l in ('LEAN_BULL', 'BULL') and _e in ('ABOVE', 'AT'))):  # structural bull any phase
-                                _continuum_override = True
-                                log(f'  ✅ [BTC-CRASH-OVERRIDE] {token} LONG — continuum says {_p}+{_l}+{_e}, allowing despite crash filter')
-                        elif _cont_row and direction.upper() == 'SHORT':
-                            _p, _l, _e = _cont_row[0], _cont_row[1], _cont_row[2]
-                            if (_p == 'DECLINING' or
-                                (_p in ('CALM', 'RECOVERY') and _l in ('LEAN_BEAR', 'BEAR') and _e == 'BELOW')):
-                                _continuum_override = True
-                                log(f'  ✅ [BTC-CRASH-OVERRIDE] {token} SHORT — continuum says {_p}+{_l}+{_e}, allowing despite crash filter')
+                        _cont_row = _fetch_btc_continuum_row()
+                        if _continuum_allows_crash_bypass(_cont_row, direction):
+                            _continuum_override = True
+                            log(f'  ✅ [BTC-CRASH-OVERRIDE] {token} {str(direction).upper()} — continuum says {_cont_row[0]}+{_cont_row[1]}+{_cont_row[2]}, allowing despite crash filter')
                     except Exception:
                         pass
                     if not _continuum_override:
                         log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash.severity}: {_crash.reason}')
+                        # ── FADE POST-FLIP CRASH SHADOW (LOG-ONLY, hail-mary item 7) ──
+                        # live verdict here is an observed KILL on the PRE-flip
+                        # direction; the shadow line records what the same verdict
+                        # would be for the FADED (post-flip) direction. Nothing
+                        # below this line changes.
+                        _fade_crash_postflip_shadow(token, source, direction, 'KILL', _crash)
                         if sig_id:
                             mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                         skipped += 1
                         continue
         except Exception as _e:
             log(f'  ⚠️ [BTC-CRASH] filter error in exec loop: {_e} (fail-open)')
+
+        # NOTE (hail-mary item 7): the "crash verdict = ALLOW" side of the fade
+        # post-flip shadow is logged LATER, right after _apply_inversion — only
+        # there do we know the candidate really flipped (and with the validated
+        # source). The KILL side is logged above, inside the gate, because those
+        # candidates never reach inversion.
 
         # ── Layer 3: Kill-Switch Execution Gate ────────────────────────────────
         # This is the FINAL gate before execution — even if a signal survived
@@ -5107,11 +5227,20 @@ def run(dry_run=False):
             f'[spd={sp_now:.0f}%]')
 
         # ── Signal Inversion (static + dynamic, BEFORE context gate) ─────
+        _pre_inv_direction = direction  # for the fade post-flip crash shadow
         direction, _flipped = _apply_inversion(direction, source, token)
         flipped_direction = direction if _flipped else None
         # OFFENSE (CEO 20261029): mark this candidate as a contrarian fade entry
         # (re-set every iteration — _FADE_CTX can never leak across candidates)
         _FADE_CTX['on'] = bool(_flipped and _contrarian_live_hit(source))
+        # ── FADE POST-FLIP CRASH SHADOW (LOG-ONLY, CEO hail-mary item 7) ───────
+        # This candidate survived the BTC-CRASH gate on its PRE-flip direction
+        # (live verdict = ALLOW, authoritative). Record what the same verdict
+        # would be for the FLIPPED direction — an evasion the autopsy counted
+        # (9 mirror evasions of the LONG-side block) only becomes visible here.
+        # LOG-ONLY: no gate, counter, file, or return value is touched.
+        if _flipped:
+            _fade_crash_postflip_shadow(token, source, _pre_inv_direction, 'ALLOW', _crash_signal)
 
         # ── Z-Score Freshness Check (CRITICAL: prevent stale signal execution) ──
         # If z-score direction has flipped since signal generation, skip the trade.

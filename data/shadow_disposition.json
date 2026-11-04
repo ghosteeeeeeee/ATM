@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-04T16:55:00Z",
+ "updated": "2026-11-04T16:58:39Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -402,11 +402,12 @@
    "disposition": "FIX-SHADOW",
    "status": "open",
    "started": "2026-10-29",
-   "deadline": "2026-11-05T00:00:00Z",
+   "deadline": "2026-11-06T00:00:00Z",
    "evidence": "Autopsy RC2: crash filter (decider_run.py:4130-4183) evaluates the ORIGINAL direction (flip at :4734) -> 7 wrong-side SHORT kills of would-be faded LONGs (HYPER/HBAR/BLUR, LONG side verified clear) + 9 mirror evasions of the LONG-side block. Proposed (autopsy 6a2): hoist inversion above the crash block + shadow-log flipped-direction crash verdicts 24h per automatic-implementation SOP.",
    "threshold": "24h shadow log of post-flip crash verdicts: count would-kills on faded entries; flip to enforced hoist if log shows the verdicts are direction-coherent.",
    "default_action": "KEEP pre-flip behavior",
-   "owner": "main-session after CEO label"
+   "owner": "main-session after CEO label",
+   "notes": "collector wired 2026-11-04 (CEO hail-mary item 7); keep pre-flip default until 24h of post-flip data | WIRING: tag [FADE-CRASH-POSTFLIP-SHADOW] in scripts/decider_run.py \u2014 KILL-side hook inside the exec-loop BTC-CRASH gate (pre-flip kills of faded candidates) + ALLOW-side hook right after _apply_inversion (mirror evasions); LOG-ONLY, no behavior change, pre-flip default keeps operating; continuum-override logic shared with live via _continuum_allows_crash_bypass (equivalence probed 3360-case matrix, 0 mismatches). DEADLINE CHANGED 2026-11-05T00:00:00Z -> 2026-11-06T00:00:00Z (changed 2026-11-04, CEO hail-mary item 7) so the registered 24h read gets a full day of post-flip data."
   },
   {
    "id": "storm-confl-waiver",
