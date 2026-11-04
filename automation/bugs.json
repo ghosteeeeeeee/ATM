@@ -1445,6 +1445,33 @@
       "root_cause": "upstream Hyperliquid /info 500s (or a bad request pattern from our client); no retry/backoff or consecutive-error watchdog exists, so failures repeat every cycle silently.",
       "found_by": "a98de02d harvest-ship agent 2026-11-04 (sideways)",
       "fix": "add retry with backoff on /info calls + consecutive-500 watchdog alert (error_alerts); first verify whether a specific sub-endpoint/payload triggers it (upstream status page vs our request shape)."
+    },
+    {
+      "id": "BUG-078",
+      "title": "Z-FLIP conversion check near-vacuous for pc- fades (sig_z sign mismatch)",
+      "severity": "MED",
+      "status": "OPEN",
+      "files": [
+        "scripts/decider_run.py"
+      ],
+      "symptom": "[Z-FLIP] LONG branch (~:5130) requires sig_z > 0, but 1,899/1,965 (96.6%) pc- SHORT signals carry z<0 (mean -1.52) -> the guard can essentially never skip a fade; '0 Z-FLIP skips' will read as healthy forever regardless of real behavior.",
+      "root_cause": "guard evaluates the PRE-inversion signal's z-sign against the POST-inversion (LONG) direction's expected sign \u2014 wrong side of the flip.",
+      "found_by": "b53b6ccc watch-contrarian eval 2026-11-04 (side-find)",
+      "fix": "evaluate against the post-inversion expected sign (or compare |z| against a threshold), then re-run the conversion check so the 11-11 extend read means something."
+    },
+    {
+      "id": "BUG-079",
+      "title": "DailyFillCap fails OPEN on corrupt fees row while release gate fails CLOSED (asymmetric, under-detected)",
+      "severity": "MED",
+      "status": "OPEN",
+      "files": [
+        "scripts/decider_run.py",
+        "scripts/vacation_guardrail.py"
+      ],
+      "symptom": "A single corrupt fees JSON in the 24h window makes Cap D's fee-net SQL raise -> WARN + proceed WITHOUT cap (brake silently off); meanwhile the guardrail release gate on the same computation fails CLOSED (never clears). The WARN is not routed to error_alerts.md, so a dead brake is invisible.",
+      "root_cause": "spec-accepted asymmetry at ship (consult 20261104T172347Z): fail-open for trading continuity vs fail-closed for release safety \u2014 but no alerting on the open-failure.",
+      "found_by": "21a8f696 ship report 2026-11-04 (deviation list a)",
+      "fix": "route the Cap D WARN through health_monitor/error_alerts (6h dedup) OR count+report corrupt-fees rows; consider COALESCE/guard in the SQL so one bad row cannot disable the brake."
     }
   ],
   "schema": {
