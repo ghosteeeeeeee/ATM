@@ -20666,3 +20666,26 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-1.90 RED — hard_max_loss (12T -1.36) + atr_sl_hit (5T -0.58) remain dominant drag; structural, outside auto_1hr 1-change/hour scope
 - 24h HIGH regime 7T 14.3% -$0.50 worst segment — watch, but regime-based kill needs n>=20 all-regimes check before any action
+
+## [2026-11-04 13:50] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.11 (WR: 0.0% hour; 24h 40T 52.5% $-0.40 | 7d 285T 54.7% $-2.01 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: APE warrior-sr-confirm+ hard_max_loss -0.09/-4.21%, GMX warrior-sr-confirm+ trail_sl -0.02/-0.17% (both LONG, no inversion)
+- Kill check: no 24h n>=3 losers at 0% WR (r2v2-long3 2T n<3; warrior-sr-confirm+ 4T 25% -0.09 wins NORMAL 87.5%/EXTREME 57.1% 14d -> keep; bb-squeeze+ 3T 33.3% -0.19 wins NORMAL 65.8% 14d -> keep)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/40 = 10.0% (<40%) — drag = hard_max_loss 13T -1.45 vs profit exits profit-monster-trail 10T +0.83 + mfe 6T +0.34 — no tpsl_utils alert
+- Boost HOLD: jup_yolo_mirrored 17T 70.6% net +0.21 4 tokens but HYPE -0.17/ETH -0.11 fail token-consistency + fights JUP_YOLO_FILL_CAP; no other candidates
+- Neg streak: 12h -0.13, 13h -0.11 — only 2 consecutive negatives (11h was 0.00, not negative); regime NORMAL 19T 73.7% +0.23 not NEUTRAL -> no size cut
+- Frequency: 2/hr — under 20
+- Entry quality: 24h winners avg MAE 0.195%, 19/21 <0.5%
+- Storm readiness: **window-min -0.57% / at-run +0.20%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-2.01 RED — hard_max_loss (13T -1.45) remains dominant drag; structural, outside auto_1hr 1-change/hour scope
+- 24h HIGH regime 8T 12.5% -$0.59 worst segment — watch, but regime-based kill needs n>=20 all-regimes check before any action
