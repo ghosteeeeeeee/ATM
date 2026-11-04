@@ -20620,3 +20620,26 @@ Final set: ['BLUR']
 **Open Questions:**
 - 24h net $-0.50 at 57.1% WR — hard_max_loss (-1.28) + atr_sl_hit (-0.80) still dominant drag
 - 7d $-1.80 RED — structural, needs CEO/session attention (outside auto_1hr 1-change/hour scope)
+
+## [2026-11-04 10:45] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $+0.08 (WR: 100.0% hour; 24h 43T 58.1% $-0.42 | 7d 282T 55.7% $-1.72 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored LONG profit-monster-trail +0.08/+2.06% (MAE 0.113% — clean entry)
+- Kill check: no 24h n>=3 losers at 0% WR (r2v2-long3 2T n<3; hl_copy 6T 33.3% -0.12 — wins in some regimes 14d → keep)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 7/43 = 16.3% (<40%) — drag = hard_max_loss 11T -1.28 vs profit exits mfe 8T +0.41 + profit-monster 12T +0.89 — no tpsl_utils alert
+- Boost HOLD: candidate query empty (jup_yolo_mirrored 21T 66.7% net 0.00 fails net>0.05; bb-squeeze+ 4T fails n>=5)
+- Neg streak: 02h+03h red then 04h-08h green, 09h red, 10h green — never 3 consecutive; regime NORMAL (24T +0.15) not NEUTRAL → no size cut
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.202%, 22/25 <0.5%
+- Storm readiness: **window-min -0.05% / at-run +0.13%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.72 RED — hard_max_loss + atr_sl_hit remain dominant drag; structural, outside auto_1hr 1-change/hour scope
+- 24h net $-0.42 at 58.1% WR — hard_max_loss (-1.28) still largest single drag
