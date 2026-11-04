@@ -20711,3 +20711,27 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-2.08 RED — hard_max_loss (13T -1.45) remains dominant drag; structural, outside auto_1hr 1-change/hour scope
 - 24h HIGH regime 8T 12.5% -$0.59 worst segment — watch, but regime-based kill needs n>=20 all-regimes check before any action
+
+## [2026-11-04 15:55] Hourly Analysis
+
+**Trades:** 3 closed (3 wins, 0 losses)
+**PnL:** $+0.13 (WR: 100% hour; 24h 41T 53.7% $-0.30 | 7d 285T 55.1% $-1.72 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: COMP bb-squeeze+ profit-monster-trail +0.03/+1.26%, ICP bb-squeeze+ profit-monster-trail +0.03/+1.46%, HBAR bb-squeeze+ profit-monster-trail +0.07/+3.37% (all LONG, no inversion)
+- Kill check: no 24h n>=3 losers at 0% WR (worst: warrior-sr-confirm+ 4T 25% -0.09 wins NORMAL 87.5%/EXTREME 57.1% 14d -> keep; bb-squeeze+ 6T 66.7% -0.06 net-loss despite high WR, small avg loss -> watch; hl_copy 5T 40% +0.05)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/41 = 9.8% (<40%) — drag = hard_max_loss 13T -1.45 vs profit exits profit-monster-trail 13T +0.96 + mfe 6T +0.34 — no tpsl_utils alert
+- Boost HOLD: jup_yolo_mirrored 17T 70.6% net +0.21 passes WR/n/net but HYPE 3T -0.17 / ETH 1T -0.11 fail token-consistency + fights JUP_YOLO_FILL_CAP (SOL 10T +0.29 / BTC 3T +0.20 are the earners)
+- Neg streak: 12h -0.13, 13h -0.11 then 14h +0.10 / 15h +0.03 — not 3 consecutive; regime NORMAL 17T 70.6% +0.20 not NEUTRAL -> no size cut
+- Frequency: 3/hr — under 20
+- Entry quality: 24h winners avg MAE 0.200%, 20/22 <0.5%
+- Storm readiness: **window-min +1.01% / at-run +1.01%** — both within gate, no storm (rolling-60m, 13 samples, BTC; note window-max +3.17% = live pump in progress, at-run under 1.5)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.72 RED — hard_max_loss (13T -1.45) remains dominant drag; structural, outside auto_1hr 1-change/hour scope
+- 24h HIGH regime 11T 36.4% -$0.46 worst segment — watch, but regime-based kill needs n>=20 all-regimes check before any action
+- bb-squeeze+ 6T 66.7% WR but net -0.06 — winners small, losers bigger; watch next hour
