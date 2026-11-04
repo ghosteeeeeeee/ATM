@@ -3527,7 +3527,13 @@ LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED = True
 # Pre-registered kill criteria: if loosened LONG cohort 24h WR < 40%, auto-revert
 # (vacation_guardrail.py flips this flag to False — the compactor reads it).
 # Shadow logging: every gate that WOULD have blocked a loosened trade logs it.
-ICHIMOKU_LONG_BYPASS_ENABLED = True       # ichimoku LONG standalone bypass — compactor reads this flag
+# CEO KILL 2026-11-04 (hail-mary consult 20261104T161050Z, ticket
+# ichimoku-bypass-lowjoin-ticket, due 11-05): bypass shadow join ~0.15% — below
+# the registry's own "join_rate below floor -> auto-KILL ticket" rule → ticket
+# EXECUTED: True -> False. RE-ENABLE ONLY ON A BACKTEST that justifies the lane
+# (same rule as registry entry ichimoku-short-pause). Scope: this value only —
+# ICHIMOKU_SHORT_PAUSE_* and ICHIMOKU_LONG_BYPASS_SHADOW are untouched.
+ICHIMOKU_LONG_BYPASS_ENABLED = False      # ichimoku LONG standalone bypass — compactor reads this flag; DISABLED 2026-11-04 (CEO hail-mary, ticket ichimoku-bypass-lowjoin-ticket, join 0.15% below floor)
 ICHIMOKU_LONG_BYPASS_MIN_WR = 40.0         # auto-revert if loosened cohort WR < this
 ICHIMOKU_LONG_BYPASS_MIN_TRADES = 5        # need 5+ trades before evaluating WR
 ICHIMOKU_LONG_BYPASS_SHADOW = True         # shadow-log what WOULD have blocked loosened trades

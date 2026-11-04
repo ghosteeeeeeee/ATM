@@ -71,7 +71,12 @@ MAX_LEVERAGE = 5               # fallback cap
 # CEO: "Shadow rollout of CUT_LOSER -6.00 + ATR_SL_MAX 4.0, LONG only;
 #       SHORT untouched; size unchanged; 7d/200T review."
 # Evidence threshold: shadow LONGs must hit >=55% WR over >=200 trades.
-SHADOW_TRIAL_ENABLED = True           # Master switch (see supersession note above)
+# KILLED 2026-11-04 (CEO hail-mary 20261104T161050Z, registry trial-wider-sl):
+# bar dead both axes — wider arm 37.7% WR vs 55.0% bar AND vs 43.7% current arm
+# (-6.0pp), PnL -506.6% vs -257.1% (deadline was 11-07). False stops writing
+# exit_wider_sl_json only; stored columns kept for forensics (no backfill delete),
+# --report-wider still reads them. Re-arm = set True.
+SHADOW_TRIAL_ENABLED = False          # Master switch (see supersession note above)
 SHADOW_TRIAL_CUT_LOSER = -6.00        # Wider CUT_LOSER (was -4.00)
 SHADOW_TRIAL_ATR_SL_MAX = 4.0         # Wider ATR_SL_MAX (was 2.5)
 SHADOW_TRIAL_DIRECTION = 'LONG'       # arm is LONG-scoped; SHORT rides the LIVE value (-4.00 since the 2026-10-31 trial revert)
@@ -83,7 +88,13 @@ SHADOW_TRIAL_REVIEW_DAYS = 7          # Days before review
 # CEO Q3: "Extend time-based exits as shadow experiment."
 # Peak p50 219m vs soft-trail 2h implies exits ~100min before median peak.
 # Test: extend trail_arm_timeout and universal_hold to let winners run longer.
-SHADOW_TIME_TRIAL_ENABLED = True      # Master switch for extended time exit trial
+# KILLED 2026-11-04 (CEO hail-mary 20261104T161050Z, registry trial-extended-time):
+# bar dead — extended arm 40.9% WR vs current 56.6% = -15.7pp against the
+# pre-registered >= +5.0pp bar (n=16872; deadline was 11-07). PnL-axis divergence
+# (+1422.5pp extended) noted in the registry; CEO ruled KILL. False stops writing
+# exit_extended_time_json only; stored columns kept for forensics (no backfill
+# delete), --report-time still reads them. Re-arm = set True.
+SHADOW_TIME_TRIAL_ENABLED = False     # Master switch for extended time exit trial
 SHADOW_TIME_TRIAL_ARM_TIMEOUT_MULT = 2.0   # 2x current timeout (60min→120min, 45min→90min)
 SHADOW_TIME_TRIAL_UNIVERSAL_HOLD_EXTRA_MIN = 240  # +4h extra hold (480min→720min)
 SHADOW_TIME_TRIAL_MIN_TRADES = 100    # Min trades for review

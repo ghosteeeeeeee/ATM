@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-04T04:15:00Z",
+ "updated": "2026-11-04T16:28:45Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -611,14 +611,16 @@
    "id": "ichimoku-bypass-lowjoin-ticket",
    "stream": "ICHIMOKU_LONG_BYPASS_SHADOW join-rate ticket \u2014 bypass shadow joins trades at ~0.15% (3 ichimoku trades/21d, +$0.11)",
    "kind": "shadow",
-   "disposition": "AUTO-KILL-TICKET",
-   "status": "open",
+   "disposition": "KILL executed \u2014 ICHIMOKU_LONG_BYPASS_ENABLED=False (join 0.15% below floor)",
+   "status": "done",
    "started": "2026-10-31",
    "deadline": "2026-11-05T00:00:00Z",
    "evidence": "Audit 9e6368df: 1,978 shadow lines, join ~0.15% \u2014 meets the registry's own 'join_rate below floor -> auto-KILL ticket' rule. But ichimoku LONG singles DID pass confluence via this lane in live logs (FARTCOIN-class flows) \u2014 the low join is pipeline-latency + rarity, not a broken lane.",
    "threshold": "Either fix the join measurement (log-to-trade attribution) and re-measure at n>=15, or execute the ticket (ICHIMOKU_LONG_BYPASS_ENABLED=False).",
    "default_action": "EXECUTE TICKET if join still <floor after measurement fix",
-   "owner": "main-session -> CEO"
+   "owner": "main-session -> CEO",
+   "done_at": "2026-11-04",
+   "action_taken": "ICHIMOKU_LONG_BYPASS_ENABLED=False (scripts/hermes_constants.py:3536) \u2014 ticket executed 2026-11-04, CEO hail-mary 20261104T161050Z; re-enable only on backtest. ICHIMOKU_SHORT_PAUSE and BYPASS_SHADOW untouched."
   },
   {
    "id": "stop-asymmetry-highwr",
@@ -667,8 +669,8 @@
    "id": "trial-wider-sl",
    "stream": "wider-SL counterfactual (wider arm of CUT_LOSER) brain/shadow_trades.db",
    "kind": "trial",
-   "disposition": "TRIAL",
-   "status": "open",
+   "disposition": "KILL \u2014 bar dead both axes (CEO hail-mary 20261104T161050Z): wider arm 37.7% WR vs 55.0% bar AND vs 43.7% current arm (-6.0pp); PnL -506.6% vs -257.1% (wider worse both)",
+   "status": "done",
    "started": "2026-10-21",
    "deadline": "2026-11-07T00:00:00Z",
    "threshold": "bar: wider-arm WR >= 55.0% with >= 200 trades (SHADOW_TRIAL_MIN_WR)",
@@ -676,14 +678,16 @@
    "default_action": "KILL trial \u2014 pre-registered WR bar missed (fresh 10-31: wider arm 37.7% vs 55.0%); archive exit_wider_sl_json counterfactual, zero live change (shadow-only)",
    "owner": "CEO",
    "evidence": "hand dashboard 10-27: WR 40.1%->32.7% (-7.4pp); fresh report-wider 10-31: current WR 43.7% vs wider 37.7% (-6.0pp), PnL -257.1% vs -506.6% (wider worse both axes), 6376 rows",
-   "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31 per CEO control-tower build). ATR_SL_MAX=4.0 is inert (trail band supersedes) so this effectively tests CUT_LOSER -6.00 only. Shadow-only; zero live flags."
+   "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31 per CEO control-tower build). ATR_SL_MAX=4.0 is inert (trail band supersedes) so this effectively tests CUT_LOSER -6.00 only. Shadow-only; zero live flags.",
+   "done_at": "2026-11-04",
+   "action_taken": "collector stopped \u2014 SHADOW_TRIAL_ENABLED=False (scripts/shadow_trader.py:79; flag gates the exit_wider_sl_json write at shadow_trader.py:1320). Stored json column kept for forensics, no backfill deletes. --report-wider still reads archived rows."
   },
   {
    "id": "trial-extended-time",
    "stream": "extended-time exits counterfactual (2x arm timeout + 4h hold) brain/shadow_trades.db",
    "kind": "trial",
-   "disposition": "TRIAL",
-   "status": "open",
+   "disposition": "KILL \u2014 bar dead both axes (CEO hail-mary 20261104T161050Z): extended arm -15.7pp WR-improvement vs +5.0pp bar (40.9% vs 56.6% current, n=16872); PnL axis divergence (+1422.5pp extended) documented, CEO ruled KILL over the divergence",
+   "status": "done",
    "started": "2026-10-26",
    "deadline": "2026-11-07T00:00:00Z",
    "threshold": "bar: extended-arm WR improvement >= 5.0pp with >= 100 trades",
@@ -691,7 +695,9 @@
    "default_action": "KILL trial per pre-registered WR bar (fresh 10-31: -15.7pp vs >=+5.0pp); archive exit_extended_time_json, zero live change. PnL divergence noted below is CEO's to override with evidence within 24h",
    "owner": "CEO",
    "evidence": "fresh report-time 10-31: WR 56.6% current vs 40.9% extended (-15.7pp, n=16872) BUT Total PnL +83.4% vs +1505.9% (extended +1422.5pp) \u2014 axes diverge; dashboard 10-26 caveat: comparison apples-to-oranges (full stack vs time-only sim)",
-   "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Shadow-only. The WR/PnL divergence makes this a real CEO decision at deadline, not an auto-kill \u2014 default fires only if silent."
+   "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Shadow-only. The WR/PnL divergence makes this a real CEO decision at deadline, not an auto-kill \u2014 default fires only if silent.",
+   "done_at": "2026-11-04",
+   "action_taken": "collector stopped \u2014 SHADOW_TIME_TRIAL_ENABLED=False (scripts/shadow_trader.py:97; flag gates the exit_extended_time_json write at shadow_trader.py:1325). Stored json column kept for forensics, no backfill deletes. --report-time still reads archived rows."
   },
   {
    "id": "watch-contrarian-live",
@@ -1057,7 +1063,7 @@
    "owner": "CEO",
    "evidence": "2026-11-03/04 harvest: jup_yolo_mirrored 107/200 (53.5%) \u2212$0.95, 33/50 last-50 and 58/83 last-48h fills; HML 7d 33 hits \u2212$4.29 with jup 20 = \u2212$2.95 and stop-tighten scope 24/33 = \u2212$3.46; LONG in SHORT_BIAS worst cell 94T \u2212$0.65/14d; bb-squeeze+ 37T 62.2% +$0.47, warrior-sr-confirm\u00b1 17T +$0.47.",
    "measurement": "rolling-50 jup share (PG signal LIKE '%jup_yolo%'), HML 7d count, daily net from PG trades, LONG fills whose regime_4h=SHORT_BIAS; next-100 fill share for bb-squeeze+/warrior",
-   "notes": "Item 1: hermes_constants STOP_TIGHTEN_MAX_PRICE_PCT 1.0\u21920.75 and STOP_TIGHTEN_ENFORCE False\u2192True (sources tuple UNCHANGED); position_manager post-clamp hl_needs_sl recompute executed from the ENFORCE-flip checklist; log tag [STOP-TIGHTEN-SHADOW] unchanged, now carries enforce=True (same tag = the proof clamp writes appear post-ENFORCE). REVERT: cap 2.5 and/or ENFORCE=False. GUARDIAN RESTART NEEDED (import-time binding in hermes-hl-sync-guardian.service). | Item 2: ADD-only JUP_YOLO_FILL_CAP_ENABLED/JUP_YOLO_FILL_WINDOW_HOURS=6/JUP_YOLO_MAX_FILLS_PER_WINDOW=1 enforced at decider exec loop (Cap C, mirrors Cap B SAME_DIR_30MIN_MAX); concurrent-open cap and size multipliers were measured and rejected (mean hold 1.64h \u2192 MAX_OPEN=1 still ~49% share; sizing cannot move a fill-COUNT metric). REVERT: flag False or MAX=999. | Item 3: LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED=True, exec-time at decider_run.execute_trade (single choke point) + the delayed-entry path, regime read signal_compactor.get_regime_4h() == SHORT_BIAS, tag [LONG-BYPASS-SHORT-BIAS-BLOCK]; bypass path only \u2014 multi-source confluence LONGs and all SHORTs unaffected; classified as exec-policy refusal so it never feeds the 2-fails/1h cooldown. REVERT: flag False. | Item 4: SIGNAL_SOURCE_WEIGHTS bb-squeeze+ 1.0\u21921.3, warrior-sr-confirm\u00b1 1.2\u21921.6 (signal_compactor) mirrored into data/combo_weights.json (auto-tuned weights take priority over static) + bb-squeeze added to the vol-gate HIGH allowlist (volatility_gate_v2 REGIME_SIGNALS) \u2014 the same remediation as commit 5298702e used for NORMAL. DELIBERATELY NOT DONE: the (\u2018EXTREME\u2019, \u2018bb-squeeze\u2019) 0.0 override and BB_SQUEEZE_LONG_EXTREME_BLOCK stay in force \u2014 family ban with negative data (12T \u2212$0.15), protected standing constraint; one-line change if the CEO wants EXTREME opened."
+   "notes": "Item 1: hermes_constants STOP_TIGHTEN_MAX_PRICE_PCT 1.0\u21920.75 and STOP_TIGHTEN_ENFORCE False\u2192True (sources tuple UNCHANGED); position_manager post-clamp hl_needs_sl recompute executed from the ENFORCE-flip checklist; log tag [STOP-TIGHTEN-SHADOW] unchanged, now carries enforce=True (same tag = the proof clamp writes appear post-ENFORCE). REVERT: cap 2.5 and/or ENFORCE=False. GUARDIAN RESTART NEEDED (import-time binding in hermes-hl-sync-guardian.service). | Item 2: ADD-only JUP_YOLO_FILL_CAP_ENABLED/JUP_YOLO_FILL_WINDOW_HOURS=6/JUP_YOLO_MAX_FILLS_PER_WINDOW=1 enforced at decider exec loop (Cap C, mirrors Cap B SAME_DIR_30MIN_MAX); concurrent-open cap and size multipliers were measured and rejected (mean hold 1.64h \u2192 MAX_OPEN=1 still ~49% share; sizing cannot move a fill-COUNT metric). REVERT: flag False or MAX=999. | Item 3: LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED=True, exec-time at decider_run.execute_trade (single choke point) + the delayed-entry path, regime read signal_compactor.get_regime_4h() == SHORT_BIAS, tag [LONG-BYPASS-SHORT-BIAS-BLOCK]; bypass path only \u2014 multi-source confluence LONGs and all SHORTs unaffected; classified as exec-policy refusal so it never feeds the 2-fails/1h cooldown. REVERT: flag False. | Item 4: SIGNAL_SOURCE_WEIGHTS bb-squeeze+ 1.0\u21921.3, warrior-sr-confirm\u00b1 1.2\u21921.6 (signal_compactor) mirrored into data/combo_weights.json (auto-tuned weights take priority over static) + bb-squeeze added to the vol-gate HIGH allowlist (volatility_gate_v2 REGIME_SIGNALS) \u2014 the same remediation as commit 5298702e used for NORMAL. DELIBERATELY NOT DONE: the (\u2018EXTREME\u2019, \u2018bb-squeeze\u2019) 0.0 override and BB_SQUEEZE_LONG_EXTREME_BLOCK stay in force \u2014 family ban with negative data (12T \u2212$0.15), protected standing constraint; one-line change if the CEO wants EXTREME opened. | CEO hail-mary 20261104T161050Z: fold-line 11-07 (cum fee-net < -$1.50 AND verifier <=1/7 => recommend shadow-only); size-reduce 0.5x brake active until first green 24h"
   },
   {
    "id": "amplify-xmirror-giveback",
