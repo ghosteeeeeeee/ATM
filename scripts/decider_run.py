@@ -4182,7 +4182,11 @@ def _fetch_btc_continuum_row():
                 pass
 
 
-def _fade_crash_postflip_shadow(token, source, pre_direction, live_verdict, crash):
+_CONT_ROW_UNSET = object()  # sentinel: "caller did not pass a pre-fetched continuum row"
+
+
+def _fade_crash_postflip_shadow(token, source, pre_direction, live_verdict, crash,
+                                stage='inversion', cont_row=_CONT_ROW_UNSET):
     """[FADE-CRASH-POSTFLIP-SHADOW] — LOG-ONLY post-flip crash verdict.
 
     Registry: fade-btc-crash-postflip (kind=wiring, disposition FIX-SHADOW);
@@ -4197,13 +4201,32 @@ def _fade_crash_postflip_shadow(token, source, pre_direction, live_verdict, cras
     evasions of the LONG-side block. This line records BOTH verdicts for faded
     candidates so the 24h read can judge direction-coherence.
 
+    ARGs:
+      stage      'crash-gate' = emitted inside the gate on an observed KILL
+                              (candidate stops right there);
+                 'inversion' = emitted after _apply_inversion on an observed
+                              ALLOW — BEFORE ~30 downstream gates, so a line
+                              here is NOT proof the entry executed. The 11-06
+                              read must join signals.executed for fill counts
+                              (bug_hunter 2026-11-04 MED-2).
+      cont_row   optional pre-fetched continuum row (KILL side passes the row
+                 the LIVE gate just used -> no second DB read, no TOCTOU).
+                 Default = fetch it here (ALLOW side has none in scope).
+
     CONTRACT (read before touching): LOG-ONLY — it blocks nothing, allows
-    nothing, never touches skipped/failures/mark_signal_executed, writes no
-    files, and raises nothing (any exception => no log, no behavior change).
+    nothing, never touches skipped/failures/mark_signal_executed/decision
+    state, and raises nothing (any exception => no log, no behavior change).
+    Its only side effects are the log line itself (appends logs/pipeline.log
+    via hermes_log.log, which also sets hermes_log._LAST_LOG_MSG — the reason
+    this call is placed AFTER mark_signal_executed on the KILL side) and at
+    most one read-only continuum.db query (sqlite3.connect creates an empty
+    db file if it is missing — same as the pre-existing live code).
     The pre-flip verdict stays authoritative: registry default_action = KEEP
     pre-flip behavior until the CEO flips it on evidence. Scope = fade candidates
     only (_contrarian_live_hit) — this entry is registered about faded entries;
-    static/dynamic inversion types are deliberately out of scope."""
+    static/dynamic/legacy inversion types are deliberately out of scope, so a
+    hoist-wide fix would cover MORE than this collector measures (documented in
+    the registry notes for the 11-06 read)."""
     try:
         if not _contrarian_live_hit(source):
             return
@@ -4225,29 +4248,32 @@ def _fade_crash_postflip_shadow(token, source, pre_direction, live_verdict, cras
         post = 'SHORT' if pre == 'LONG' else 'LONG'
         if crash is None:
             log(f'  👻 [FADE-CRASH-POSTFLIP-SHADOW] {token} {source}: fade {pre}->{post} | '
-                 'live pre-flip verdict=' + str(live_verdict) +
-                ' (authoritative) | shadow post-flip verdict=UNKNOWN (crash filter errored '
-                'this cycle) | log-only, no behavior change')
+                f'live pre-flip verdict={live_verdict} (authoritative) | shadow post-flip verdict=UNKNOWN '
+                f'(crash filter errored this cycle) | stage={stage} | log-only, no behavior change')
             return
         blocked = bool(getattr(crash, 'blocked', False))
         block_dir = (getattr(crash, 'blocked_direction', '') or '')
         post_dir_match = (not block_dir) or (post == block_dir.upper())
         post_override = False
         if blocked and post_dir_match:
-            # evaluate the continuum bypass for the FLIPPED direction with the
-            # exact rules the live gate applies to the pre-flip direction
-            post_override = _continuum_allows_crash_bypass(_fetch_btc_continuum_row(), post)
+            # continuum bypass for the FLIPPED direction, judged by the SAME rules
+            # (and, on the KILL side, the SAME row) the live gate just used
+            _row = cont_row if cont_row is not _CONT_ROW_UNSET else _fetch_btc_continuum_row()
+            post_override = _continuum_allows_crash_bypass(_row, post)
         post_kill = bool(blocked and post_dir_match and not post_override)
         sev = str(getattr(crash, 'severity', '') or 'clear')
         layer = str(getattr(crash, 'layer', '') or '')
         post_txt = 'WOULD-KILL' if post_kill else 'WOULD-ALLOW'
-        crash_txt = (f'{sev}/{layer}' if layer else sev) if blocked else 'clear'
+        # crash=BLOCKED(...)/crash=clear is the machine-readable field the 11-06
+        # read filters on (bug_hunter MED-3: crash=clear lines are proof-of-life
+        # and would otherwise inflate any coherence ratio toward 100%).
+        crash_txt = (f'BLOCKED:{sev}/{layer}' if layer else f'BLOCKED:{sev}') if blocked else 'clear'
         coherent_txt = 'YES' if ((live_verdict == 'KILL') == post_kill) else 'NO'
         log(f'  👻 [FADE-CRASH-POSTFLIP-SHADOW] {token} {source}: fade {pre}->{post} | '
             f'live pre-flip verdict={live_verdict} (authoritative — pre-flip default keeps operating) | '
             f'shadow post-flip verdict={post_txt} | crash={crash_txt} '
             f'block_dir={block_dir.upper() or "ALL"} post_override={"yes" if post_override else "no"} | '
-            f'coherent={coherent_txt} — log-only, no behavior change')
+            f'stage={stage} coherent={coherent_txt} — log-only, no behavior change')
     except Exception:
         pass
 
@@ -4612,15 +4638,23 @@ def run(dry_run=False):
                         pass
                     if not _continuum_override:
                         log(f'  🚨 [BTC-CRASH] {token} {direction} BLOCKED — {_crash.severity}: {_crash.reason}')
-                        # ── FADE POST-FLIP CRASH SHADOW (LOG-ONLY, hail-mary item 7) ──
-                        # live verdict here is an observed KILL on the PRE-flip
-                        # direction; the shadow line records what the same verdict
-                        # would be for the FADED (post-flip) direction. Nothing
-                        # below this line changes.
-                        _fade_crash_postflip_shadow(token, source, direction, 'KILL', _crash)
                         if sig_id:
                             mark_signal_executed(token, direction, 'SKIPPED', signal_id=sig_id)
                         skipped += 1
+                        # ── FADE POST-FLIP CRASH SHADOW (LOG-ONLY, hail-mary item 7) ──
+                        # PLACED AFTER mark_signal_executed on purpose (bug_hunter
+                        # 2026-11-04 MED-1): log() sets hermes_log._LAST_LOG_MSG, and
+                        # mark_signal_executed(reason=None) persists that as
+                        # signals.decision_reason — logging the shadow line FIRST would
+                        # overwrite the real crash reason for this signal. Live verdict
+                        # here is an observed KILL on the PRE-flip direction; the shadow
+                        # line records what the same verdict would be for the FADED
+                        # (post-flip) direction, judged with the SAME continuum row the
+                        # live gate just read. Nothing after this call changes.
+                        _fade_crash_postflip_shadow(
+                            token, source, direction, 'KILL', _crash,
+                            stage='crash-gate',
+                            cont_row=locals().get('_cont_row', _CONT_ROW_UNSET))
                         continue
         except Exception as _e:
             log(f'  ⚠️ [BTC-CRASH] filter error in exec loop: {_e} (fail-open)')
@@ -5238,9 +5272,13 @@ def run(dry_run=False):
         # (live verdict = ALLOW, authoritative). Record what the same verdict
         # would be for the FLIPPED direction — an evasion the autopsy counted
         # (9 mirror evasions of the LONG-side block) only becomes visible here.
+        # stage=inversion: this fires BEFORE ~30 downstream gates, so the line is
+        # NOT proof the entry executed — the 11-06 read joins signals.executed
+        # for fill-level counts (bug_hunter MED-2).
         # LOG-ONLY: no gate, counter, file, or return value is touched.
         if _flipped:
-            _fade_crash_postflip_shadow(token, source, _pre_inv_direction, 'ALLOW', _crash_signal)
+            _fade_crash_postflip_shadow(token, source, _pre_inv_direction, 'ALLOW',
+                                        _crash_signal, stage='inversion')
 
         # ── Z-Score Freshness Check (CRITICAL: prevent stale signal execution) ──
         # If z-score direction has flipped since signal generation, skip the trade.
