@@ -95,6 +95,39 @@ def check_guardrails():
         conn.close()
 
 
+def fee_net_24h():
+    """24h fee-net of closed fills — SAME metric as DAILY_FILL_CAP (Cap D in
+    decider_run): SUM(pnl_usdt) − SUM(fee_total) over status='closed' fills
+    closed in the last 24h whose fees column is JSON (fees LIKE '{%').
+
+    Returns float, or None when it cannot be computed (PG down / bad row).
+    Callers gating a release on it must treat None as NOT green.
+    """
+    conn = None
+    cur = None
+    try:
+        conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT COALESCE(SUM(pnl_usdt), 0)
+                 - COALESCE(SUM(COALESCE((fees::json->>'fee_total')::numeric, 0)), 0)
+            FROM trades
+            WHERE status = 'closed'
+              AND close_time > NOW() - INTERVAL '24 hours'
+              AND fees LIKE '{%'
+        """)
+        return float(cur.fetchone()[0] or 0)
+    except Exception:
+        return None
+    finally:
+        try:
+            if cur is not None:
+                cur.close()
+        finally:
+            if conn is not None:
+                conn.close()
+
+
 def pause_trading(reason):
     """Disable live trading: close positions + stop pipeline timers.
 
@@ -356,12 +389,31 @@ def main():
         f"48h: {data['n_48h']}T {data['wr_48h']}% ${data['pnl_48h']:+.2f} | "
         f"7d: {data['n_7d']}T {data['wr_7d']}% ${data['pnl_7d']:+.2f}")
 
+    # ── CEO ruling 20261104T172347Z (verdict item e): explicit release key ──
+    # The old BH-SR-1 clear below auto-CLEARED the 16:34 size-reduce marker at
+    # 16:42: its rule (WR>=37 AND pnl_7d>=-2) OR pnl_7d>=0 was satisfied
+    # (WR 55.1%, 7d -$1.72) while the 24h fee-net was still -$0.27 — a brake
+    # documented as "until first green 24h" lived 8 minutes and cut 0 fills.
+    # A marker carrying release == 'first_green_24h' now BYPASSES the WR-based
+    # clear: it clears ONLY when the 24h fee-net >= 0 (same metric as
+    # DAILY_FILL_CAP); if that fee-net cannot be computed, it does NOT clear.
+    _sr_wr_clear_ok = True
+    _sr_net24 = None
+    if os.path.exists(SIZE_REDUCE_MARKER):
+        try:
+            with open(SIZE_REDUCE_MARKER) as _sr_f:
+                if json.load(_sr_f).get('release') == 'first_green_24h':
+                    _sr_net24 = fee_net_24h()
+                    _sr_wr_clear_ok = _sr_net24 is not None and _sr_net24 >= 0
+        except Exception:
+            pass  # unreadable marker -> no explicit release honored (old rule stands)
+
     if should_resume:
         reason = (f"auto-resume: 7d WR {data['wr_7d']}% / pnl_7d ${data['pnl_7d']:+.2f} recovered "
                   f"(hysteresis WR>={WR_7D_RESUME}% or pnl>=0)")
         resume_trading(reason)
         write_alert('INFO', f'TRADING RESUMED: {reason}', data)
-    elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and
+    elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and _sr_wr_clear_ok and
           ((data['wr_7d'] >= WR_7D_RESUME and data['pnl_7d'] >= WR_7D_PNL_CONFIRM) or data['pnl_7d'] >= 0)):
         # BH-SR-1 fix: auto-clear size-reduce when metrics recover.
         # Without this, the flag persists indefinitely after WR recovers.
@@ -375,10 +427,15 @@ def main():
         # actual recovery (Oct 13 cohort 56T -$1.53 ages out Oct 20: WR
         # 33.8->37.2% while pnl still -$2.60 — old OR would full-size a
         # still-bleeding book). Clear paths: (WR>=37 AND pnl>=-2) OR pnl>=0.
+        # CEO 20261104T172347Z (item e): `_sr_wr_clear_ok` above gates this
+        # whole clear when the marker declares release='first_green_24h'.
         try:
             os.remove(SIZE_REDUCE_MARKER)
-            log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered")
-            write_alert('INFO', f'Size-reduce cleared: WR {data["wr_7d"]}%', data)
+            log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered"
+                + (f" (release=first_green_24h: 24h fee-net {_sr_net24:+.2f} >= 0)"
+                   if _sr_net24 is not None else ""))
+            write_alert('INFO', f'Size-reduce cleared: WR {data["wr_7d"]}%'
+                        + (f', 24h fee-net {_sr_net24:+.2f} (release key)' if _sr_net24 is not None else ''), data)
         except Exception:
             pass
     elif should_pause:

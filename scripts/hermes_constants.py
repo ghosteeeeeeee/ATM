@@ -5729,3 +5729,28 @@ MAXXED_SHORT_EXEMPT_SHADOW = True        # item 4: log [MAXXED-SHORT-EXEMPT-SHAD
 MAXXED_SHORT_EXEMPT_ENFORCE = False      # item 4: False => MAXXED block stays for both directions (zero behavior change); True => SHORT exempt (NOT shipped — bar first)
 # Bar (registry maxxed-short-exempt-shadow): n>=20 token-days, deadline
 # 2026-11-17 (data-starved today: 12 tok-days).
+
+# ── DAILY FILL CAP (CEO SHIP 2026-11-04, consult 20261104T172347Z, revert=False) ──
+# ADD-ONLY block — no existing value changed; CEO_PROTECTED untouched.
+# RULING: "SHIP (a)+(e). REJECT (b),(c),(d)" — (a) global frequency cap is the
+#   working capital brake, (e) guardrail explicit-release key ships with it.
+#   Standing delegation = CEO label = go (brief-working-brake-2026-11-04.md).
+# MECHANISM: decider exec loop (DailyFillCap/Cap D block, immediately after Cap
+#   C) runs ONE PG read — live (paper=false) opens in the last 24h and the
+#   fee-net of closed fills in the last 24h — and blocks NEW fills only while
+#   BOTH n >= DAILY_FILL_CAP_MAX AND 24h fee-net < 0. Fail-open on PG error
+#   (WARN + fill proceeds; never raises out of the loop). Stateless skip path:
+#   no marker, no state write, no mark_signal_executed (Cap C convention).
+# RELEASE IS EMBEDDED: the first fee-net-green 24h makes the AND false, so the
+#   cap lifts AUTOMATICALLY — no marker file, therefore no BH-SR-1 conflict
+#   (the guardrail rule that auto-cleared the 16:34 size-reduce brake at 16:42
+#   cannot touch this; vacation_guardrail.py also now honors an explicit
+#   release='first_green_24h' key — verdict item (e)).
+# METRIC: fills <= 15/day while the 24h fee-net is red; expected ≈ +$0.40/day
+#   (fees $0.19 + avoided gross $0.24 per CEO math, consult 20261104T172347Z).
+# SCOPE: automated decider fills only — manual/CEO trades run through the
+#   manual-trade-override path and never enter this loop, so they bypass the
+#   cap by design (not a hole: the metric is the automated fee bleed).
+# REVERT: DAILY_FILL_CAP_ENABLED = False (cap inert, no other behavior).
+DAILY_FILL_CAP_ENABLED = True   # master switch — REVERT: False (cap off)
+DAILY_FILL_CAP_MAX = 15         # max live opens per rolling 24h while 24h fee-net < 0
