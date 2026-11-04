@@ -1431,6 +1431,20 @@
       "root_cause": "HL API FileLock contention pattern already documented at hyperliquid_exchange.py:57-58; unknown why burst today. Not related to stop-tighten gate (guardian hook uses PG, not info_rate lock).",
       "found_by": "bug_hunter stop-tighten gate 2026-10-31 (L4 sideways)",
       "fix": "inspect lock-wait burst cause if it recurs; consider rate-limited logging there"
+    },
+    {
+      "id": "BUG-077",
+      "title": "Hyperliquid /info endpoint returning HTTP 500 for days (~1,200 errors)",
+      "severity": "MED",
+      "status": "OPEN",
+      "files": [
+        "scripts/hyperliquid_exchange.py",
+        "logs/pipeline.log"
+      ],
+      "symptom": "[hl_info] Error: HTTP Error 500 appears ~1,200 times in logs/pipeline.log since 2026-10-30 20:48 \u2014 the HL /info API has been failing continuously for days (copy-trader/position data freshness at risk).",
+      "root_cause": "upstream Hyperliquid /info 500s (or a bad request pattern from our client); no retry/backoff or consecutive-error watchdog exists, so failures repeat every cycle silently.",
+      "found_by": "a98de02d harvest-ship agent 2026-11-04 (sideways)",
+      "fix": "add retry with backoff on /info calls + consecutive-500 watchdog alert (error_alerts); first verify whether a specific sub-endpoint/payload triggers it (upstream status page vs our request shape)."
     }
   ],
   "schema": {

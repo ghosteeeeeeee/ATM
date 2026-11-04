@@ -1,15 +1,17 @@
 # Signal Performance Report
-**Generated:** 2026-11-03 20:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-04 02:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,646 | **WR:** 51.3% | **PnL:** -107.10%
-- **Date range:** 2026-07-29 → 2026-11-03
+- **Total trades (all time):** 3,654 | **WR:** 51.3% | **PnL:** -108.26%
+- **Date range:** 2026-07-29 → 2026-11-04
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-None found.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| jup_yolo_mirrored | LONG | 3 | 66.7% | -0.18 | 15 | 73.3% | +0.60 | ❓ |
 
 ---
 
@@ -23,8 +25,8 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| jup_yolo_mirrored | SHORT | 6 | 50.0% | -1.81 | ❓ | Borderline |
-| pump-chain- | LONG | 4 | 50.0% | +0.16 | ❓ | Needs more data |
+| hl_copy_trader | LONG | 5 | 40.0% | -0.63 | ❓ | Borderline |
+| pump-chain- | LONG | 3 | 33.3% | -0.51 | ❓ | Needs more data |
 
 ---
 
@@ -42,8 +44,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] jup_yolo_mirrored SHORT** — WR=50.0%, PnL=-1.81% over 6 trades. Monitor next cycle.
-2. **[WATCH] pump-chain- LONG** — WR=50.0%, PnL=+0.16% over 4 trades. Monitor next cycle.
+1. **[WATCH] hl_copy_trader LONG** — WR=40.0%, PnL=-0.63% over 5 trades. Monitor next cycle.
+2. **[WATCH] pump-chain- LONG** — WR=33.3%, PnL=-0.51% over 3 trades. Monitor next cycle.
+3. **[KEEP] 1 winning combos** — jup_yolo_mirrored. LONG side dominant.
 
 ---
 
