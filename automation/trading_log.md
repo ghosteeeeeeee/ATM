@@ -20446,3 +20446,78 @@ Final set: []
 **Open Questions:**
 - 7d '$-2.12' RED — hard_max_loss + atr_sl_hit remain dominant drag; structural, outside auto_1hr 1-change/hour scope
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope
+
+- [2026-11-04 03:45 UTC] auto_1hr: 🌩️ [STORM-READINESS] window-min -1.60% / at-run -0.49% | blocked 142 (combo_key-stale 58, compaction_stale_10min 24, short-rsi-hard-floor 15, pump-chain-short-high 11, confluence single-type 8, pump-chain-long-high 7, rr-engine-hard-block 4, long-neutral-chop 4, other 11) | true-starvation 34 RSI>=35 | counterfactual $-2.96 (touch 16/34) | waiver: SHADOW=True ENFORCE=False — storm packet #2, counterfactual NEGATIVE → streak reset to 0/3 (bar needs >=3 consecutive positive, deadline 2026-11-12)
+
+## [2026-11-04 03:46] Hourly Analysis
+
+**Trades:** 6 closed (1 wins, 5 losses)
+**PnL:** $-0.54 (WR: 16.7% hour; 24h 44T 54.5% $-0.51 | 7d 284T 53.9% $-2.66 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 1W5L $-0.54 — HYPE jup_yolo hard_max_loss -0.09, HYPE jup_yolo profit-monster +0.01, FARTCOIN hl_copy hard_max_loss -0.08, ETH jup_yolo atr_sl_hit -0.11, SOL jup_yolo hard_max_loss -0.18, BTC continuum+ hard_max_loss -0.09
+- Kill check: 24h n>=3 losers none at 0% WR (jup_yolo_mirrored 24T 66.7% -0.14; hl_copy_trader 6T 33.3% -0.12 — not kill candidates; last-hour jup_yolo 5T 40% is hourly noise, not 24h signal-level)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 8/44 = 18.2% (<40%) — drag = hard_max_loss 10T '-1.10' vs profit exits mfe 12T '+0.66' + profit-monster 7T '+0.51' — no tpsl_utils alert
+- Boost HOLD: candidate query empty (bb-squeeze+ 4T 75% +0.22 fails n>=5; jup_yolo_mirrored net -0.14 fails net>0.05)
+- Neg streak: 2h red, 1h green, 2h+3h red — not 3 consecutive; no NEUTRAL size action
+- Frequency: 6/hr — well under 20
+- Entry quality: 24h winners avg MAE 0.223%, 21/25 <0.5%
+- Storm readiness: **window-min -1.60% / at-run -0.49%** — STORM GATE FIRED (window-min <= -1.5); packet emitted (counterfactual $-2.96 negative, streak 0/3)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h net $-0.51 at 54.5% WR — hard_max_loss (-1.10) + atr_sl_hit (-0.83) still dominant drag
+- 7d $-2.66 RED — structural, needs CEO/session attention (outside auto_1hr 1-change/hour scope)
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope
+- Storm: counterfactual negative means blocked RSI>=35 signals would have LOST $2.96 — gates are protective this storm, no starvation case for waiver
+
+## [2026-11-04 04:45] Hourly Analysis
+
+**Trades:** 4 closed (3 wins, 1 loss)
+**PnL:** $+0.26 (WR: 75.0% hour; 24h 48T 56.2% $-0.25 | 7d 284T 54.2% $-2.22 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 3W1L +$0.26 — SOL jup_yolo profit-monster +0.22, BTC jup_yolo profit-monster +0.08, SOL jup_yolo mfe_exit +0.08, RUNE r2v2-long3 atr_sl_hit -0.12
+- Kill check: 24h n>=3 losers none at 0% WR (r2v2-long3 2T -0.25 n<3; hl_copy_trader 6T 33.3% -0.12; pump-chain- 3T 33.3% -0.06 — none 0%)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 9/48 = 18.8% (<40%) — drag = hard_max_loss 10T '-1.10' vs profit exits mfe 13T '+0.74' + profit-monster 9T '+0.81' — no tpsl_utils alert
+- Boost HOLD: jup_yolo_mirrored 27T 70.4% +0.24 passes WR/n/net but NOT consistent (SOL +0.37, BTC +0.15, ETH -0.03, HYPE -0.35; SOL = 16/27 fills) AND JUP_YOLO_FILL_CAP_ENABLED=True (max 1 fill/6h, share target <35%) — boosting weight fights active fill cap; bb-squeeze+ 4T 75% +0.22 fails n>=5
+- Neg streak: 23h+0h red then 1h green; 2h+3h red then 4h green — never 3 consecutive; no NEUTRAL size action
+- Frequency: 4/hr — under 20
+- Entry quality: 24h winners avg MAE 0.218%, 23/27 <0.5%
+- Storm readiness: **window-min -0.44% / at-run +0.77%** — both within gate (needs <=-1.5 or |at-run|>=1.5), no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d '$-2.22' RED — hard_max_loss + atr_sl_hit remain dominant drag; structural, outside auto_1hr 1-change/hour scope
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope
+- HYPE jup_yolo_mirrored 5T 20% '-0.35' over 24h — worst token cell; watch for regime-kill policy if it persists to n>=20
+
+## [2026-11-04 05:44] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a hour; 24h 48T 56.3% $-0.25 | 7d 284T 54.2% $-2.22 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closed (1 open: BLUR r2v2-long9 LONG)
+- Kill check: 24h n>=3 losers none at 0% WR (hl_copy_trader 6T 33.3% -0.12; pump-chain- 3T 33.3% -0.06; bb-squeeze+ 4T 75% +0.22; jup_yolo_mirrored 27T 70.4% +0.24)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 9/48 = 18.8% (<40%) — drag = hard_max_loss 10T -1.10 vs profit exits mfe 13T +0.74 + profit-monster 9T +0.81 — no tpsl_utils alert
+- Boost HOLD: jup_yolo_mirrored 27T 70.4% +0.24 passes WR/n/net but NOT token-consistent (SOL +0.37 16/27 fills, BTC +0.17, ETH -0.03, HYPE -0.27) and fights active JUP_YOLO_FILL_CAP; bb-squeeze+ fails n>=5
+- Neg streak: latest hour green (+0.30), current hour 0 trades — not 3 consecutive red; no NEUTRAL size action
+- Frequency: 0/hr — well under 20
+- Entry quality: 24h winners avg MAE 0.218%, 23/27 <0.5%
+- Storm readiness: **window-min +0.44% / at-run +1.09%** — both within gate (needs <=-1.5 or |at-run|>=1.5), no storm
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h net $-0.25 at 56.3% WR — hard_max_loss (-1.10) + atr_sl_hit (-0.95) still dominant drag
+- 7d $-2.22 RED — structural, needs CEO/session attention (outside auto_1hr 1-change/hour scope)
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope
