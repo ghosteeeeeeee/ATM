@@ -1,5 +1,5 @@
 [Unit]
-Description=Hermes Shadow Disposition Timer — weekly Mon 08:15 UTC (after 07:15 daily commit)
+Description=Hermes Shadow Disposition Timer — daily Mon 08:15 UTC (after 07:15 daily commit)
 
 [Timer]
 # brain_auditor 2026-10-27 run #190: was Mon-only. The registry's own contract is

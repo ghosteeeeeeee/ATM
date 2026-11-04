@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-04T16:58:39Z",
+ "updated": "2026-11-04T17:30:00Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -704,15 +704,15 @@
    "id": "watch-contrarian-live",
    "stream": "CONTRARIAN-LIVE pump-chain- fade real-trade watch \u2014 PostgreSQL brain trades (pc- LONG opens since started)",
    "kind": "watch",
-   "disposition": "EXTEND 7d \u2014 bar MET (29 real pc- LONG fade fills since 10-27, conversion lines firing through 11-03 01:49Z) but fee-net negative: gross +0.03 / fees 0.305 / NET -0.28; WR 41.4% vs pre-fade baseline 27.3% (-0.27) = directional improvement, join flip-WR still 64.6% n=350 | 11-03 refresh: NET -0.37 fee-adjusted, EXTEND to 11-10 stands (n>=20 bar for kill/promote).",
+   "disposition": "EXTEND 7d to 2026-11-11 \u2014 early Z-FLIP conversion check run 2026-11-04 (hail-mary item 4)",
    "status": "open",
    "started": "2026-10-27",
-   "deadline": "2026-11-10T00:00:00Z",
+   "deadline": "2026-11-11T00:00:00Z",
    "threshold": "bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo",
    "progress_eval": "contrarian_live",
    "default_action": "report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREFIXES (CEO) \u2014 do NOT leave it drifting unwatched",
    "owner": "main-session",
-   "evidence": "pc- LONG live since 2026-10-27 flip: 7T +0.43 WR 57.1% (pump-chain-) + 4T +0.02 combo = 11T +0.45 WR 54.5%. Trades ARE flowing (was 0T concern). Shadow join 11-01 00:31Z: pc- flip-WR 64.6% n=350 unchanged. Default (extend if 0T) NOT triggered \u2014 watch is working. Recommendation: extend to 11-10 for n>=20 bar before any monitor/promote decision.",
+   "evidence": "fresh 2026-11-04 (registry progress_eval SQL): n=32 real pc- LONG fills, gross +$0.130, fees $0.335, NET -$0.205, WR 45.2% (14W/17L/1fl) vs pre-fade baseline 13T 38.5% (+6.7pp directional). Conversion: 178 CONTRARIAN-LIVE approvals (33 tokens) -> 22/33 tokens filled = 66.7%; 0 Z-FLIP skips BUT that check is near-vacuous (96.6% of pc- signals carry z<0, LONG branch needs z>0 \u2014 see BUG-078). Promote gate (NET>=0) unmet: avg gross +$0.0041/trade < fee $0.0108/trade = structurally fee-negative at current size -> fade-size/fee review at 11-10/11-11. Kill gate (0 fills) not triggered. NOTE: prior evidence_20261103 (n=33/NET-0.37/baseline 27.3% n=22) did NOT reproduce \u2014 superseded by these numbers.",
    "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed). | 16:30Z refresh: fade cooled to +0.07 (22T) \u2014 still positive; 11-03 disposition judges (extend-to-11-10 rec stands).",
    "evidence_20261101": {
     "pc_long_since_1027": "9T +0.31 WR 44.4% (cooled from 11T +0.45)",
@@ -890,8 +890,8 @@
    "default_action": "KEEP SHADOW \u2014 no PM_TRAIL_* change (protected flags)",
    "join_rate": "[JUP-SHADOW-TRAIL] log lines \u2192 DISTINCT trade_id (fresh process per minute \u2192 eval DISTINCTs; first line per id)",
    "owner": "CEO label + T sign-off",
-   "evidence": "CEO 2026-10-31 exit-asymmetry verdict (item #2 APPROVED via automatic-implementation); sim rows pm_mfe30a +42.14 / pmwalk +34.64 vs pm_actual -31.27 (n=97, scripts/jup_exit_sim.py)",
-   "notes": "unit-fixed levels note: compute_atr_sl/tp_pct now delegate to norm (2026-11-03) \u2014 trail eval must use the SAME exit stack as baseline."
+   "evidence": "FAIL pre-read 2026-11-04 (hail-mary item 3): 15,343 [JUP-SHADOW-TRAIL] lines -> 94 ids/93 closed, 0 join gaps. Would-armed (max_fav>=arm_scd) n=18/93 replays -$0.508/40 vs actual; param-isolated (same walker, shipped 0.40/0.20 vs shadow 1xATR, MFE stack held) = -$0.056/40 all-93 / -$0.121/40 armed; binding-only +$0.016/40; pre-MFE stack -$1.094/40 with WR 71.0->47.3. The single passing reading (shadow-walk vs DB +$0.526/40) is 100% walker-vs-DB gap (shipped-stack walk alone +$0.582/40) \u2014 trail own contribution <=0. ONE exit improvement = armed MFE-giveback (SHIPPED 10-31; jup_exit_sim pm_mfe30a +43.25 best > pmwalk +35.67 vs pm_actual -30.52, n=98).",
+   "notes": "unit-fixed levels note: compute_atr_sl/tp_pct now delegate to norm (2026-11-03) \u2014 trail eval must use the SAME exit stack as baseline. | CONFLICT (eval 2026-11-04): trail shadow dist p50 0.82%/max 1.79% would LOOSEN giveback while STOP_TIGHTEN_ENFORCE=0.75% live \u2014 opposite levers; if ever revisited, resolve against stop-tighten first. FAIL pre-read => keep shadow to 11-17 deadline, no PM_TRAIL_* change, no T escalation."
   },
   {
    "id": "jup-atrsl-shadow-parity",
@@ -966,12 +966,13 @@
    "kind": "shadow",
    "status": "open",
    "started": "2026-11-03",
-   "deadline": "2026-11-10T00:00:00Z",
-   "evidence": "CEO consult 20261103T064755Z fix table item 2. Log-only shadow (BEAR_SINGLE_SOURCE_SHORT_SHADOW=True / _ENFORCE=False); pass_gate stays False, CONFLUENCE_REQUIRED untouched. Bear read = get_regime_4h (PG momentum_cache, same as A1).",
+   "deadline": "2026-11-17T00:00:00Z",
+   "evidence": "pre-read 2026-11-04: 22 [BEAR-SINGLE-SOURCE-SHADOW] lines = 7.3x pseudo-replicated -> token-day dedup n=3 (LIT 11-03 rs-r45, BABY 11-03 volume-climax-, LIT 11-04 rs-r30); joinable n=1 (LIT has 0 candles_5m rows \u2014 owned by candle-collector-coverage-audit). Bar limbs: WR 1/1=100% MET; net +$0.022 fee-net (+$0.034 gross) at $13.44 << +$1.00 MISSED; n=3 << 20 MISSED. Actual-fill arm EMPTY (rs-r45/rs-r30/volume-climax- = 0 PG trades all-time). Off-engine LIT sensitivity -6.09% on 11-03 -> permissive n=3 nets ~-$0.66.",
    "threshold": "enforce flip at 2026-11-10 if simulated fills n>=20, WR>=55%, net >= +$1.00",
    "default_action": "no single-source shorts in bear (stay blocked)",
    "owner": "CEO",
-   "notes": "ENFORCE flip would set pass_gate=True for this cohort only (shipped code has the branch, flag False). Join: shadow line token+source+conf \u2192 simulated fill outcome at the bar window. | PACE READ 2026-11-04 (audit #220): 22 WOULD-PASS log lines = ONLY 2 unique tokens (LIT 16, BABY 6) since 11-03 \u2014 the n>=20 bar must be counted on DISTINCT token-events, not lines. On this pace the bar will NOT be met by 11-10; do not read line-count as fills."
+   "notes": "ENFORCE flip would set pass_gate=True for this cohort only (shipped code has the branch, flag False). Join: shadow line token+source+conf \u2192 simulated fill outcome at the bar window. | PACE READ 2026-11-04 (audit #220): 22 WOULD-PASS log lines = ONLY 2 unique tokens (LIT 16, BABY 6) since 11-03 \u2014 the n>=20 bar must be counted on DISTINCT token-events, not lines. On this pace the bar will NOT be met by 11-10; do not read line-count as fills.",
+   "disposition": "NOT-YET pre-read 2026-11-04 (hail-mary item 5) \u2014 enforce flip DENIED, stay blocked (default); deadline moved 11-10 -> 11-17 so n can mature (rate 1.5 tok-days/day -> n=20 ~11-16)"
   },
   {
    "id": "volgate-short-exempt-shadow",
@@ -1067,7 +1068,7 @@
    "owner": "CEO",
    "evidence": "2026-11-03/04 harvest: jup_yolo_mirrored 107/200 (53.5%) \u2212$0.95, 33/50 last-50 and 58/83 last-48h fills; HML 7d 33 hits \u2212$4.29 with jup 20 = \u2212$2.95 and stop-tighten scope 24/33 = \u2212$3.46; LONG in SHORT_BIAS worst cell 94T \u2212$0.65/14d; bb-squeeze+ 37T 62.2% +$0.47, warrior-sr-confirm\u00b1 17T +$0.47.",
    "measurement": "rolling-50 jup share (PG signal LIKE '%jup_yolo%'), HML 7d count, daily net from PG trades, LONG fills whose regime_4h=SHORT_BIAS; next-100 fill share for bb-squeeze+/warrior",
-   "notes": "Item 1: hermes_constants STOP_TIGHTEN_MAX_PRICE_PCT 1.0\u21920.75 and STOP_TIGHTEN_ENFORCE False\u2192True (sources tuple UNCHANGED); position_manager post-clamp hl_needs_sl recompute executed from the ENFORCE-flip checklist; log tag [STOP-TIGHTEN-SHADOW] unchanged, now carries enforce=True (same tag = the proof clamp writes appear post-ENFORCE). REVERT: cap 2.5 and/or ENFORCE=False. GUARDIAN RESTART NEEDED (import-time binding in hermes-hl-sync-guardian.service). | Item 2: ADD-only JUP_YOLO_FILL_CAP_ENABLED/JUP_YOLO_FILL_WINDOW_HOURS=6/JUP_YOLO_MAX_FILLS_PER_WINDOW=1 enforced at decider exec loop (Cap C, mirrors Cap B SAME_DIR_30MIN_MAX); concurrent-open cap and size multipliers were measured and rejected (mean hold 1.64h \u2192 MAX_OPEN=1 still ~49% share; sizing cannot move a fill-COUNT metric). REVERT: flag False or MAX=999. | Item 3: LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED=True, exec-time at decider_run.execute_trade (single choke point) + the delayed-entry path, regime read signal_compactor.get_regime_4h() == SHORT_BIAS, tag [LONG-BYPASS-SHORT-BIAS-BLOCK]; bypass path only \u2014 multi-source confluence LONGs and all SHORTs unaffected; classified as exec-policy refusal so it never feeds the 2-fails/1h cooldown. REVERT: flag False. | Item 4: SIGNAL_SOURCE_WEIGHTS bb-squeeze+ 1.0\u21921.3, warrior-sr-confirm\u00b1 1.2\u21921.6 (signal_compactor) mirrored into data/combo_weights.json (auto-tuned weights take priority over static) + bb-squeeze added to the vol-gate HIGH allowlist (volatility_gate_v2 REGIME_SIGNALS) \u2014 the same remediation as commit 5298702e used for NORMAL. DELIBERATELY NOT DONE: the (\u2018EXTREME\u2019, \u2018bb-squeeze\u2019) 0.0 override and BB_SQUEEZE_LONG_EXTREME_BLOCK stay in force \u2014 family ban with negative data (12T \u2212$0.15), protected standing constraint; one-line change if the CEO wants EXTREME opened. | CEO hail-mary 20261104T161050Z: fold-line 11-07 (cum fee-net < -$1.50 AND verifier <=1/7 => recommend shadow-only); size-reduce 0.5x brake active until first green 24h"
+   "notes": "Item 1: hermes_constants STOP_TIGHTEN_MAX_PRICE_PCT 1.0\u21920.75 and STOP_TIGHTEN_ENFORCE False\u2192True (sources tuple UNCHANGED); position_manager post-clamp hl_needs_sl recompute executed from the ENFORCE-flip checklist; log tag [STOP-TIGHTEN-SHADOW] unchanged, now carries enforce=True (same tag = the proof clamp writes appear post-ENFORCE). REVERT: cap 2.5 and/or ENFORCE=False. GUARDIAN RESTART NEEDED (import-time binding in hermes-hl-sync-guardian.service). | Item 2: ADD-only JUP_YOLO_FILL_CAP_ENABLED/JUP_YOLO_FILL_WINDOW_HOURS=6/JUP_YOLO_MAX_FILLS_PER_WINDOW=1 enforced at decider exec loop (Cap C, mirrors Cap B SAME_DIR_30MIN_MAX); concurrent-open cap and size multipliers were measured and rejected (mean hold 1.64h \u2192 MAX_OPEN=1 still ~49% share; sizing cannot move a fill-COUNT metric). REVERT: flag False or MAX=999. | Item 3: LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED=True, exec-time at decider_run.execute_trade (single choke point) + the delayed-entry path, regime read signal_compactor.get_regime_4h() == SHORT_BIAS, tag [LONG-BYPASS-SHORT-BIAS-BLOCK]; bypass path only \u2014 multi-source confluence LONGs and all SHORTs unaffected; classified as exec-policy refusal so it never feeds the 2-fails/1h cooldown. REVERT: flag False. | Item 4: SIGNAL_SOURCE_WEIGHTS bb-squeeze+ 1.0\u21921.3, warrior-sr-confirm\u00b1 1.2\u21921.6 (signal_compactor) mirrored into data/combo_weights.json (auto-tuned weights take priority over static) + bb-squeeze added to the vol-gate HIGH allowlist (volatility_gate_v2 REGIME_SIGNALS) \u2014 the same remediation as commit 5298702e used for NORMAL. DELIBERATELY NOT DONE: the (\u2018EXTREME\u2019, \u2018bb-squeeze\u2019) 0.0 override and BB_SQUEEZE_LONG_EXTREME_BLOCK stay in force \u2014 family ban with negative data (12T \u2212$0.15), protected standing constraint; one-line change if the CEO wants EXTREME opened. | CEO hail-mary 20261104T161050Z: fold-line 11-07 (cum fee-net < -$1.50 AND verifier <=1/7 => recommend shadow-only); size-reduce 0.5x brake CORRECTED (bug_hunter 2026-11-04 HIGH-1): file auto-cleared by guardrail BH-SR-1 at 16:42 (7d WR 55.1/pnl -1.72 met ITS rule) before any fill, AND at current balance base=$11=HL_MIN_NOTIONAL floor so x0.5 would floor back to $11 anyway (NO-OP on live decider path; brain mirror path does cut 100->50). 'Brake active until first green 24h' was FALSE as written \u2014 actual state: no live risk cut in effect. Working-brake ruling requested from CEO (frequency vs sub-floor vs accept-floor)."
   },
   {
    "id": "amplify-xmirror-giveback",
