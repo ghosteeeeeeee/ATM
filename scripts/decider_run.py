@@ -827,6 +827,74 @@ def get_ab_params_for_trade(direction: str) -> dict:
     }
 
 
+def _daily_fill_cap_block():
+    """DailyFillCap / Cap D (CEO SHIP 2026-11-04, consult 20261104T172347Z
+    "SHIP (a)+(e). REJECT (b),(c),(d)" — the working capital brake).
+
+    Returns True when a NEW fill must be blocked: live (paper=false) opens in
+    the last 24h >= DAILY_FILL_CAP_MAX (15) AND the 24h fee-net of closed
+    JSON-fee fills is < 0. ONE PG read supplies both numbers.
+
+    RELEASE IS EMBEDDED in that AND: the first fee-net-green 24h makes the
+    second limb false, so the cap lifts itself — no marker file, hence no
+    BH-SR-1 auto-clear conflict (the rule that killed the 16:34 size-reduce
+    brake at 16:42 cannot touch this).
+
+    Contract: STATELESS (log + return only — no mark_signal_executed, no state
+    write) and FAIL-OPEN (any exception -> WARN + False, never raises; callers
+    therefore never see a PG outage as "block").
+
+    SCOPE: shared by BOTH automated fill paths in this file (main exec loop and
+    process_delayed_entries — mirrored the same way _long_bypass_short_bias_block
+    is, because delayed entries open via brain.py directly). Manual/CEO trades
+    (manual-trade-override / ai_trader_precheck) never reach either path and
+    bypass the cap by design. REVERT: DAILY_FILL_CAP_ENABLED=False (constants
+    block DAILY FILL CAP, hermes_constants.py).
+    """
+    try:
+        from hermes_constants import DAILY_FILL_CAP_ENABLED, DAILY_FILL_CAP_MAX
+        if not DAILY_FILL_CAP_ENABLED:
+            return False
+        _conn = None
+        _cur = None
+        try:
+            _conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            _cur = _conn.cursor()
+            # ONE SQL: live opens (paper=false) + fee-net of JSON-fee closed
+            # fills, both over the rolling 24h. fees LIKE '{%' keeps the ::json
+            # cast off non-JSON rows (fees is text); FILTER is applied before
+            # the aggregate argument is evaluated, so excluded rows never cast.
+            _cur.execute("""
+                SELECT COUNT(*) FILTER (WHERE paper = false
+                                        AND open_time > NOW() - INTERVAL '24 hours'),
+                       COALESCE(SUM(pnl_usdt) FILTER (WHERE status = 'closed'
+                                AND close_time > NOW() - INTERVAL '24 hours'
+                                AND fees LIKE '{%'), 0)
+                     - COALESCE(SUM(COALESCE((fees::json->>'fee_total')::numeric, 0))
+                           FILTER (WHERE status = 'closed'
+                                AND close_time > NOW() - INTERVAL '24 hours'
+                                AND fees LIKE '{%'), 0)
+                FROM trades
+            """)
+            _row = _cur.fetchone()
+        finally:
+            try:
+                if _cur is not None:
+                    _cur.close()
+            finally:
+                if _conn is not None:
+                    _conn.close()
+        _n = int(_row[0] or 0)
+        _net = float(_row[1] or 0)
+        if _n >= DAILY_FILL_CAP_MAX and _net < 0:
+            log(f'SKIP: DailyFillCap — {_n} opens in last 24h (max {DAILY_FILL_CAP_MAX}) while fee-net {_net:+.2f} < 0 — brake until first green 24h')
+            return True
+        return False
+    except Exception as _dfc_err:
+        log(f'WARN: DailyFillCap check failed ({_dfc_err}) — proceeding without fill cap (fail-open)')
+        return False
+
+
 def process_delayed_entries(paper=False):
     """
     Check pending delayed-entry signals.
@@ -922,6 +990,18 @@ def process_delayed_entries(paper=False):
         if get_position_count() >= MAX_POS:
             log(f'⏰ DELAYED BLOCKED: {token} {direction} — max positions reached ({get_position_count()}/{MAX_POS})')
             still_pending.append(entry)  # retry later
+            continue
+
+        # ── DailyFillCap / Cap D (second fill path) ──────────────────────────
+        # Same convention as the LONG-BYPASS mirror below: this path opens via
+        # brain.py directly, so without the gate the daily cap would not be a
+        # cap on delayed fills (they would eat past 15/day while red). Shared
+        # helper = single SQL source with the main exec loop. RETRIED (not
+        # dropped) while engaged — the cap self-releases on the first green
+        # 24h, and max_wait expiry above still applies on the retry.
+        if _daily_fill_cap_block():
+            log(f'  ⏳ DELAYED-ENTRY-HELD: {token} {direction} — DailyFillCap (retry until first green 24h)')
+            still_pending.append(entry)
             continue
 
         # ── LONG-BYPASS-SHORT-BIAS-BLOCK (second fill path) ─────────────────────
@@ -5206,62 +5286,31 @@ def run(dry_run=False):
 
         # ── DailyFillCap / Cap D (CEO SHIP 2026-11-04, consult 20261104T172347Z
         # "SHIP (a)+(e). REJECT (b),(c),(d)" — standing delegation = go) ──
-        # The working capital brake: a global FILL-frequency cap. One PG read
-        # gives (n) live opens in the last 24h and the 24h fee-net of closed
-        # fills; block NEW fills only while BOTH n >= DAILY_FILL_CAP_MAX AND
-        # fee-net < 0. Release is EMBEDDED in that AND: the first fee-net-green
-        # 24h makes the second limb false, so the cap lifts itself — no marker
-        # file, hence no BH-SR-1 auto-clear conflict (the rule that killed the
-        # 16:34 size-reduce brake at 16:42 cannot touch this one).
+        # The working capital brake: a global FILL-frequency cap, implemented
+        # as the shared helper _daily_fill_cap_block() (module level) so BOTH
+        # automated fill paths run it — this exec loop and
+        # process_delayed_entries (mirrored the way _long_bypass_short_bias_block
+        # is, because delayed entries open via brain.py directly: a loop-only
+        # gate would not be a cap on that path).
+        # ONE PG read gives (n) live opens in the last 24h and the 24h fee-net
+        # of closed fills; block NEW fills only while BOTH n >= DAILY_FILL_CAP_MAX
+        # AND fee-net < 0. Release is EMBEDDED in that AND: the first
+        # fee-net-green 24h makes the second limb false, so the cap lifts itself
+        # — no marker file, hence no BH-SR-1 auto-clear conflict (the rule that
+        # killed the 16:34 size-reduce brake at 16:42 cannot touch this one).
         # METRIC: fills <=15/day while the 24h fee-net is red; expected
         #   ≈ +$0.40/day (fees $0.19 + avoided gross $0.24 — CEO math,
         #   consult 20261104T172347Z). REVERT: DAILY_FILL_CAP_ENABLED=False
         #   (constants block DAILY FILL CAP in hermes_constants.py, add-only).
-        # STATELESS on the skip path: locals only, NO mark_signal_executed and
-        #   no state write (same convention as Cap C) — nothing to corrupt.
-        # SCOPE: this exec loop only. Manual/CEO trades (manual-trade-override /
-        #   ai_trader_precheck) never run here, so they bypass the cap by design.
-        # ROBUSTNESS: PG failure -> WARN + fail-open (the fill proceeds); the
-        #   block never raises out of the loop (same try/except shape as Cap C).
-        try:
-            from hermes_constants import DAILY_FILL_CAP_ENABLED, DAILY_FILL_CAP_MAX
-            if DAILY_FILL_CAP_ENABLED:
-                _dfc_conn = None
-                _dfc_cur = None
-                try:
-                    _dfc_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
-                    _dfc_cur = _dfc_conn.cursor()
-                    # ONE SQL: live opens (paper=false) + fee-net of JSON-fee
-                    # closed fills, both over rolling 24h. fees LIKE '{%' keeps
-                    # the ::json cast off non-JSON rows (fees is text).
-                    _dfc_cur.execute("""
-                        SELECT COUNT(*) FILTER (WHERE paper = false
-                                                AND open_time > NOW() - INTERVAL '24 hours'),
-                               COALESCE(SUM(pnl_usdt) FILTER (WHERE status = 'closed'
-                                        AND close_time > NOW() - INTERVAL '24 hours'
-                                        AND fees LIKE '{%'), 0)
-                             - COALESCE(SUM(COALESCE((fees::json->>'fee_total')::numeric, 0))
-                                   FILTER (WHERE status = 'closed'
-                                        AND close_time > NOW() - INTERVAL '24 hours'
-                                        AND fees LIKE '{%'), 0)
-                        FROM trades
-                    """)
-                    _dfc_row = _dfc_cur.fetchone()
-                finally:
-                    try:
-                        if _dfc_cur is not None:
-                            _dfc_cur.close()
-                    finally:
-                        if _dfc_conn is not None:
-                            _dfc_conn.close()
-                _dfc_n = int(_dfc_row[0] or 0)
-                _dfc_net = float(_dfc_row[1] or 0)
-                if _dfc_n >= DAILY_FILL_CAP_MAX and _dfc_net < 0:
-                    log(f'SKIP: DailyFillCap — {_dfc_n} opens in last 24h (max {DAILY_FILL_CAP_MAX}) while fee-net {_dfc_net:+.2f} < 0 — brake until first green 24h')
-                    skipped += 1
-                    continue
-        except Exception as _dfc_err:
-            log(f'WARN: DailyFillCap check failed ({_dfc_err}) — proceeding without fill cap (fail-open)')
+        # STATELESS on the skip path: the helper only logs and returns — NO
+        #   mark_signal_executed and no state write (Cap C convention).
+        # SCOPE: automated fills only. Manual/CEO trades (manual-trade-override /
+        #   ai_trader_precheck) never reach either path, so they bypass by design.
+        # ROBUSTNESS: PG failure -> WARN + fail-open INSIDE the helper; it never
+        #   raises, so neither fill path can die on a PG outage.
+        if _daily_fill_cap_block():
+            skipped += 1
+            continue
 
         if is_pump_chain:
             # Pump-chain: allow if pump_chain_count < PUMP_FLOW_MAX_POSITIONS

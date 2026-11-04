@@ -101,7 +101,10 @@ def fee_net_24h():
     closed in the last 24h whose fees column is JSON (fees LIKE '{%').
 
     Returns float, or None when it cannot be computed (PG down / bad row).
-    Callers gating a release on it must treat None as NOT green.
+    Callers gating a release on it must treat None as NOT green. This function
+    must NEVER raise: a close() error in finally would otherwise override the
+    `return None` above and let a caller read an exception as "green"
+    (code review 2026-11-04, MEDIUM-2 — fail-closed is the contract).
     """
     conn = None
     cur = None
@@ -120,12 +123,12 @@ def fee_net_24h():
     except Exception:
         return None
     finally:
-        try:
-            if cur is not None:
-                cur.close()
-        finally:
-            if conn is not None:
-                conn.close()
+        for _closer in (cur, conn):        # each close independently swallowed
+            try:
+                if _closer is not None:
+                    _closer.close()
+            except Exception:
+                pass
 
 
 def pause_trading(reason):
@@ -226,11 +229,36 @@ def resume_trading(reason):
         if os.path.exists(PAUSE_MARKER):
             os.remove(PAUSE_MARKER)
             log(f"▶️ [VACATION-GUARDRAIL] Removed pause marker: {reason}")
-        # Also clear size-reduce flag on resume
+        # Also clear size-reduce flag on resume — UNLESS it declares an
+        # explicit release. CEO 20261104T172347Z (item e): a
+        # release='first_green_24h' marker must survive EVERY clear path while
+        # the 24h fee-net is red or uncomputable, not just the BH-SR-1 branch
+        # (code review 2026-11-04 HIGH-1: resume used to be the back door that
+        # cleared it with a red fee-net — same 16:42 failure class).
         try:
             if os.path.exists(SIZE_REDUCE_MARKER):
-                os.remove(SIZE_REDUCE_MARKER)
-                log(f"▶️ [VACATION-GUARDRAIL] Removed size-reduce marker")
+                _rel = None
+                try:
+                    with open(SIZE_REDUCE_MARKER) as _f:
+                        _rel = json.load(_f).get('release')
+                except Exception:
+                    _rel = None        # unreadable -> no explicit release (old rule)
+                if _rel == 'first_green_24h':
+                    try:
+                        _net = fee_net_24h()
+                    except Exception:
+                        _net = None    # a raise must not read as green
+                    if _net is not None and _net >= 0:
+                        os.remove(SIZE_REDUCE_MARKER)
+                        log(f"▶️ [VACATION-GUARDRAIL] Removed size-reduce marker "
+                            f"(release=first_green_24h: 24h fee-net {_net:+.2f} >= 0)")
+                    else:
+                        log(f"⏸️ [VACATION-GUARDRAIL] KEPT release-gated size-reduce marker on resume "
+                            f"(24h fee-net {'uncomputable' if _net is None else f'{_net:+.2f} < 0'} — "
+                            f"brake stays until first green 24h)")
+                else:
+                    os.remove(SIZE_REDUCE_MARKER)
+                    log(f"▶️ [VACATION-GUARDRAIL] Removed size-reduce marker")
         except Exception:
             pass
         # Restore kill JSON to true (cosmetic for is_live_trading_enabled, but
@@ -281,14 +309,35 @@ def write_size_reduce(reason):
     T directive 2026-10-17: instead of pausing (which prevents WR recovery),
     reduce position sizes to minimum. New trades still come in, losses are
     minimized, WR can improve.
+    ACTUAL MULTIPLIER: 0.5 (50% of base) — not 30%. The stale "30%" text lived
+    in decider_run._get_dynamic_position_size's docstring (side-finding 2,
+    fixed 2026-11-04); the 0.3 fallbacks there only apply to a marker written
+    without the size_multiplier key. NOTE: at the current balance this path is
+    INERT — base $11.00 = HL_MIN_NOTIONAL floor, so x0.5 floors back to $11.00;
+    the live capital brake is DAILY_FILL_CAP (Cap D in decider_run).
+    An explicit release='first_green_24h' key on an existing marker is carried
+    forward on re-write (CEO consult 20261104T172347Z, item e).
     """
     try:
         config = {
             'size_reduce': True,
             'reason': reason,
             'written_at': datetime.now(timezone.utc).isoformat(),
-            'size_multiplier': 0.5,
+            'size_multiplier': 0.5,   # 50% — see docstring (stale "30%" text
+                                      # lived in decider_run, fixed 2026-11-04)
         }
+        # CEO 20261104T172347Z (item e): carry an explicit release contract
+        # forward. A later WR-triggered re-write must NOT silently destroy a
+        # release='first_green_24h' key — that would re-arm the BH-SR-1
+        # auto-clear which killed the 16:34 brake at 16:42 (code review MEDIUM-4).
+        try:
+            if os.path.exists(SIZE_REDUCE_MARKER):
+                with open(SIZE_REDUCE_MARKER) as _pf:
+                    _prev = json.load(_pf)
+                if isinstance(_prev, dict) and _prev.get('release'):
+                    config['release'] = _prev['release']
+        except Exception:
+            pass
         with open(SIZE_REDUCE_MARKER, 'w') as f:
             json.dump(config, f, indent=2)
         log(f"📉 [VACATION-GUARDRAIL] SIZE REDUCED to 50% (not paused): {reason}")
@@ -394,27 +443,37 @@ def main():
     # 16:42: its rule (WR>=37 AND pnl_7d>=-2) OR pnl_7d>=0 was satisfied
     # (WR 55.1%, 7d -$1.72) while the 24h fee-net was still -$0.27 — a brake
     # documented as "until first green 24h" lived 8 minutes and cut 0 fills.
-    # A marker carrying release == 'first_green_24h' now BYPASSES the WR-based
-    # clear: it clears ONLY when the 24h fee-net >= 0 (same metric as
-    # DAILY_FILL_CAP); if that fee-net cannot be computed, it does NOT clear.
-    _sr_wr_clear_ok = True
+    # A marker carrying release == 'first_green_24h' REPLACES that WR rule:
+    # clear ONLY when the 24h fee-net >= 0 (same metric as DAILY_FILL_CAP) and
+    # NEVER when it cannot be computed — fail CLOSED, so a helper exception can
+    # never read as green (code review 2026-11-04 MEDIUM-2). Markers without
+    # the key keep the standing BH-SR-1 rule byte-for-byte. Evaluated only when
+    # this branch can be reached (no wasted PG read on the resume path,
+    # code review NIT-9).
+    _sr_release = None
     _sr_net24 = None
-    if os.path.exists(SIZE_REDUCE_MARKER):
+    _sr_release_ok = None       # None = no explicit release -> use BH-SR-1 rule
+    if not should_resume and os.path.exists(SIZE_REDUCE_MARKER):
         try:
             with open(SIZE_REDUCE_MARKER) as _sr_f:
-                if json.load(_sr_f).get('release') == 'first_green_24h':
-                    _sr_net24 = fee_net_24h()
-                    _sr_wr_clear_ok = _sr_net24 is not None and _sr_net24 >= 0
+                _sr_release = json.load(_sr_f).get('release')
         except Exception:
-            pass  # unreadable marker -> no explicit release honored (old rule stands)
+            _sr_release = None  # unreadable marker -> no explicit release (old rule)
+        if _sr_release == 'first_green_24h':
+            try:
+                _sr_net24 = fee_net_24h()   # None = not computable
+            except Exception:
+                _sr_net24 = None            # a raise must not read as green
+            _sr_release_ok = _sr_net24 is not None and _sr_net24 >= 0
 
     if should_resume:
         reason = (f"auto-resume: 7d WR {data['wr_7d']}% / pnl_7d ${data['pnl_7d']:+.2f} recovered "
                   f"(hysteresis WR>={WR_7D_RESUME}% or pnl>=0)")
         resume_trading(reason)
         write_alert('INFO', f'TRADING RESUMED: {reason}', data)
-    elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and _sr_wr_clear_ok and
-          ((data['wr_7d'] >= WR_7D_RESUME and data['pnl_7d'] >= WR_7D_PNL_CONFIRM) or data['pnl_7d'] >= 0)):
+    elif (not should_pause and os.path.exists(SIZE_REDUCE_MARKER) and
+          (_sr_release_ok if _sr_release_ok is not None else
+           ((data['wr_7d'] >= WR_7D_RESUME and data['pnl_7d'] >= WR_7D_PNL_CONFIRM) or data['pnl_7d'] >= 0))):
         # BH-SR-1 fix: auto-clear size-reduce when metrics recover.
         # Without this, the flag persists indefinitely after WR recovers.
         # brain_auditor 2026-10-19: parenthesized the OR — without parens,
@@ -427,15 +486,20 @@ def main():
         # actual recovery (Oct 13 cohort 56T -$1.53 ages out Oct 20: WR
         # 33.8->37.2% while pnl still -$2.60 — old OR would full-size a
         # still-bleeding book). Clear paths: (WR>=37 AND pnl>=-2) OR pnl>=0.
-        # CEO 20261104T172347Z (item e): `_sr_wr_clear_ok` above gates this
-        # whole clear when the marker declares release='first_green_24h'.
+        # CEO 20261104T172347Z (item e): when the marker declares
+        # release='first_green_24h', `_sr_release_ok` REPLACES the WR rule
+        # above (clear iff 24h fee-net >= 0); without that key this branch is
+        # the untouched BH-SR-1 rule.
         try:
             os.remove(SIZE_REDUCE_MARKER)
-            log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered"
-                + (f" (release=first_green_24h: 24h fee-net {_sr_net24:+.2f} >= 0)"
-                   if _sr_net24 is not None else ""))
-            write_alert('INFO', f'Size-reduce cleared: WR {data["wr_7d"]}%'
-                        + (f', 24h fee-net {_sr_net24:+.2f} (release key)' if _sr_net24 is not None else ''), data)
+            if _sr_release_ok is not None:
+                log(f"▶️ [VACATION-GUARDRAIL] Size-reduce cleared on release=first_green_24h: "
+                    f"24h fee-net {_sr_net24:+.2f} >= 0 (BH-SR-1 WR rule bypassed, CEO 20261104T172347Z)")
+                write_alert('INFO', f'Size-reduce cleared: release=first_green_24h, '
+                                    f'24h fee-net {_sr_net24:+.2f}', data)
+            else:
+                log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered")
+                write_alert('INFO', f'Size-reduce cleared: WR {data["wr_7d"]}%', data)
         except Exception:
             pass
     elif should_pause:
