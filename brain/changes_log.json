@@ -3495,5 +3495,27 @@
     "after": "run #219 artifacts",
     "rationale": "Mandate: audit output + >=1 creative idea per run",
     "impact": "reporting only"
+  },
+  {
+    "timestamp": "2026-11-04T16:45:10Z",
+    "agent": "brain_auditor",
+    "change": "Audit #220: shipped brain/analysis/shadow_source_dedupe_2026-11-04.py (--selfcheck PASS) — dedupe-aware shadow source ranking; corrected amplify-grind-breakout-deploy evidence (26 rows -> 8 independent events, post-dedupe p=0.119) and dispositioned the deploy bar as NO CHANGE (named-gate widen path collides with CEO-protected CONFLUENCE_REQUIRED; compaction_stale widen counterfactual is negative -2.37/14d).",
+    "type": "creative",
+    "file": "brain/analysis/shadow_source_dedupe_2026-11-04.py",
+    "before": "source ranking + grind deploy evidence counted duplicate token-events as independent",
+    "after": "raw vs deduped columns published; disposition evidence corrected, bar evaluated = NO CHANGE",
+    "rationale": "measurement integrity — prevents a bad 11-14 ship; no trading behavior touched",
+    "impact": "0 trading-constant change; protects the amplify pipeline from duplicate-inflated evidence"
+  },
+  {
+    "timestamp": "2026-11-04T21:04:25Z",
+    "agent": "brain_auditor",
+    "change": "Audit #221: 0 trading-constant changes. Disposed checkpoint guardian-selfclose-line-2000 (done, substitute proof); updated amplify-winner-cell-mult-150 (threshold MET, awaiting CEO+T sign-off); appended 2 creative entries (TAT peak-guard OOS, stop-tighten compound scope measured-no-change); wrote audit_recommendations.json",
+    "type": "ops",
+    "file": "data/checkpoint_registry.json + data/shadow_disposition.json + brain/audit_recommendations.json + brain/creative_improvements.json",
+    "before": "checkpoint surfaced; mult-150 unread",
+    "after": "checkpoint done with substitute proof; mult-150 threshold_met_at 2026-11-04T21:00Z",
+    "rationale": "mandatory dispositions + AMPLIFY servicing; nothing passed significance bars for a trading-constant change",
+    "impact": "zero trading behavior change; CEO sign-off queue updated"
   }
 ]

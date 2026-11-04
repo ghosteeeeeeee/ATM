@@ -10431,5 +10431,43 @@
     "category": "meta/infra",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-04T16:45:10Z",
+    "idea": "Dedupe-aware shadow source ranking (SHIPPED) — count token-events, not signal fires",
+    "rationale": "SIGNAL QUALITY BY SOURCE counts every fire of one token-event as an independent row. grind-breakout- 'n=26 92.3%' dedupes to n=8; grind blocked cohort 34->18 flips binom p 0.00010->0.1189. This is the same failure mode as the 2026-10-08 unreproducible-n pattern, inside our own top-source table.",
+    "expected_impact": "prevents shipping an amplify deploy on 8 independent events; makes source ranking trustworthy",
+    "category": "measurement integrity",
+    "status": "shipped",
+    "risk": "low",
+    "file": "brain/analysis/shadow_source_dedupe_2026-11-04.py"
+  },
+  {
+    "date": "2026-11-04T16:45:10Z",
+    "idea": "BEAR-SINGLE-SOURCE bar re-based on distinct token-events (pre-registered)",
+    "rationale": "22 WOULD-PASS lines = 2 unique tokens (LIT 16, BABY 6) in 2 days. Bar n>=20 fills measured on log lines would read 'near met' while only 2 real setups exist.",
+    "expected_impact": "honest 11-10 enforce decision; avoids flipping the biggest admission unlock on 2 setups",
+    "category": "offense measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-04T21:05:00Z",
+    "idea": "TAT peak-guard: trail_arm_timeout fires on instantaneous live_pnl < arm, not 'never armed' — pre-register candle OOS for a highest_price >= entry*(1+0.004) skip guard",
+    "rationale": "14d TAT n=49: 11 trades peaked MFE>=0.40% (9 were winners at exit, +0.14 net) yet still exited trail_arm_timeout because at the 45/60m poll live_pnl had retrace below 0.40%. ARB peaked +1.37% exited +0.31%. Verdict intent (plans/2026-10-12) was 'never reach PM_TRAIL_ACTIVATE' — code only checks age + instantaneous live_pnl (position_manager.py:4057), no peak/armed check. The never-armed cohort (mfe<0.40, 38T, -0.79) is the intended target and must keep firing.",
+    "expected_impact": "Protect armed-and-retracing trades from premature TAT cut; 11T/14d sample is below the 20T ship bar so this is shadow/OOS only, not a config change",
+    "category": "exit sniper",
+    "status": "pre-registered",
+    "risk": "low",
+    "measurement": "Shadow: at TAT fire, log [TAT-PEAK-CHECK] mfe_pct + would-skip; candle OOS replay of the 11T cohort with skip-guard using 1m candles; ship only if fk<20% AND net>0 on OOS AND n>=20 new fires"
+  },
+  {
+    "date": "2026-11-04T21:05:00Z",
+    "idea": "Stop-tighten compound-signal scope gap quantified — NO change (registry exact-match stands), logged as measurement",
+    "rationale": "STOP_TIGHTEN_SOURCES is exact-match only; compound signals like 'continuum-trend+,jup_yolo_mirrored' escape the clamp. 14d compound jup = 8T -0.17 with SL dists 0.49-1.06% (5 of 8 >0.75% cap would have clamped if in scope). Bleed is tiny vs exact-match cohort (127T -1.18) and widening scope contradicts the registry spec tuple. Open BTC #16787 is compound but SL dist 0.60% < cap anyway.",
+    "expected_impact": "$0.17/14d escaped — not worth a spec change; revisit only if compound share of jup fills exceeds 25% (currently 8/135 = 6%)",
+    "category": "entry sniper",
+    "status": "measured-no-change",
+    "risk": "low"
   }
 ]

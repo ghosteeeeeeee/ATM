@@ -1,43 +1,34 @@
-# Current State — brain_auditor #219 2026-11-04 04:55 UTC
-**Last Updated: 2026-11-04 04:55 UTC**
-**Updated by: brain_auditor #219. Prior: #218 2026-11-03 21:10 UTC (preserved in git history).**
+# Current State — brain_auditor #221 2026-11-04 21:10 UTC
+**Last Updated: 2026-11-04 21:10 UTC**
+**Updated by: brain_auditor #221. Prior: #220 2026-11-04 16:47 UTC (preserved in git history).**
 
-## HEADLINE — Guardian was running PRE-SHIP stop-tighten constants after the CEO 11-04 ship. Restarted 04:43Z. 0 trading-constant changes.
+## HEADLINE — Guardian checkpoint disposed (event-blocked, substitute proof). Winner-cell-mult-150 threshold MET, awaiting CEO+T sign-off. 0 trading-constant changes.
 
-### 1. THE FIX (this run's one change)
-- CEO harvest-ship set STOP_TIGHTEN_MAX_PRICE_PCT=0.75 + ENFORCE=True and noted "GUARDIAN RESTART NEEDED (import-time binding)".
-- Guardian ActiveEnterTimestamp was 2026-11-03 05:16 → logged **34 lines cap=1.0% enforce=False** (site=guardian_selfclose) 00:00-04:06 while pm/decider logged cap=0.75 enforce=True.
-- **Restarted 04:43:44Z** — PID start 04:43:43 > constants mtime 03:50:54. Checkpoint `guardian-stop-tighten-0530` registered (due 05:30Z): first post-restart guardian line must show cap=0.75 enforce=True.
-- Session brain flagged this class twice before = recurring stale-binding bug class → creative #2 (constants-freshness probe).
-
-### 2. HARVEST-SHIP 4-ITEM VERIFY (CEO 2026-11-04)
-| Item | Status |
+### 1. DISPOSITIONS THIS RUN
+| Item | Result |
 |---|---|
-| 1 stop-tighten 0.75+ENFORCE | pm/decider ✅, guardian ❌→**fixed by restart**; early signal SOL #16771 opened 03:50 under enforce → +0.22 PM-trail |
-| 2 jup fill cap | ✅ FIRING — "9 fills in last 6h (max 1)", 0 jup fills since 04:30; rolling-50 share 64% → target <35% by 11-06 |
-| 3 LONG-BYPASS SHORT_BIAS block | ✅ wired (TST pass), 0 real fires yet (jup cap eats traffic first); metric -50% LONG fills in SHORT_BIAS/48h |
-| 4 bb-squeeze 1.3 / warrior 1.6 | ✅ signal_compactor:627/:711 + combo_weights; vol-gate HIGH allowlist NOT re-verified — queued |
+| guardian-selfclose-line-2000 (20:00Z) | **DONE via substitute proof** — 0 lines since 04:43 = event-blocked (no SL>0.75% at guardian site: BTC dist 0.60%, SOL 0.55%); binding verified commit 04:24 < PID 04:43 + pipeline cap=0.75 enforce=True (probe 06:09, SOL 09:51 ENFORCE clamp) |
+| amplify-winner-cell-mult-150 | **THRESHOLD MET** at 21:00Z read (net30 all >0; 3/4 net14>0, pc+ exactly 0.00; net7 +0.25) — AWAITING CEO label + T sign-off (money-sizing #208) |
+| AMPLIFY weekly screen | 7 cells n>=10 net>0, identical to #220 4h ago; pc- NORMAL SHORT 10T +0.52 = 100% fade-marked (fade streams own it); **0 new proposals** (why-not in kanban) |
+| harvest-ship 4 metrics | all early/on-track: jup 24h 41.4% (bar <35) · HML 7d 37 (bar <15) · daily 11-04 -0.19 (bar >=0 72h) · LONG-BIAS block LIVE 3 tokens blocked, 0 bad fills · DailyFillCap ENGAGED (0 opens since 17:44) — first real read 11-06/07 |
 
-### 3. NUMBERS (fresh PG)
-- 24h 48T 56.3% gross -0.25 fees 0.65 **NET -0.90** | 7d 284T 54.2% gross -2.22 fees 2.78 **NET -5.00**
-- 7d trail 148T 89.9% **+9.18** vs chop/stop 88T 0% **-10.41** | armed 137T 85.4% +6.61 vs unarmed 147T 25.2% -8.83
-- 14d armed 211T 82.5% +9.91 vs unarmed 209T 24.9% -12.60
-- Chop-bleed 7d: **100/116 losers never-armed (86.2%), -$11.32 of -$11.98 = 94.5% dollar share** (4th run ≥92%) — entry quality; all 3 entry levers now live
-- jup HML 22T **-3.20** (family born 10-30 → all HML <7d); owns 21/31 of 7d HML hits
-- Open: **0** — SOL +0.22 / BTC +0.08 both closed PM-trail (cluster steer resolved as 2 wins)
+### 2. NUMBERS (fresh PG)
+- 24h 33T 51.5% gross '-0.42' | 7d 278T 54.3% gross '-1.96'
+- 7d armed 136T 84.6% '+6.58' vs unarmed 142T 25.4% '-8.54'
+- 14d trail/profit 269T 80.7% '+12.68' vs chop/stop 119T 0% '-14.77' | 7d chop exits '-11.23'
+- Contrarian join 20:30Z: overall 44.1% n=1325 | pc- 64.6% LIVE | rider 36.8% do-NOT
 
-### 4. AUTOPSY + SHADOW
-- 48h adverse-first n=43 = 8 never-adverse / 33 recovered / **2 NEVER** (ETH+HYPE jup SHORTs) → **WRONG-SIDE REFUTED 73rd**
-- contrarian join re-ran 04:30Z: overall flip 45.8% n=1139; **pc- 64.6% LIVE stands**, rider 37.5% do-NOT; pc- chi2 p=0.375 = uniform → cell-split NOT warranted (closes pc-fade-cell-split)
-- shadow_trader 59,320: gates justified, pm_trail +8702 vs hard_max -9929
-- oscillator/wyckoff/rr dead; floor on its own timer (11-15)
+### 3. AUTOPSY + CREATIVE
+- 48h adverse-first n=33 = 7 never-adverse / 26 recovered / **0 NEVER** -> **WRONG-SIDE REFUTED 75th**
+- **TAT PEAK-GUARD pre-registered**: PM:4057 checks instantaneous live_pnl only; 11/49 14d TAT exits had MFE>=0.40 (9 winners +0.14) — shadow + 1m candle OOS before any ship (n=11<20)
+- stop-tighten compound scope: 8/135 jup 14d escape (-0.17) -> measured, NO change (exact-match spec stands)
 
-### 5. CREATIVE + AMPLIFY
-1. **amplify-xmirror-giveback** (NEW, deadline 11-18): T1 exact-mirror giveback ceiling — FARTCOIN +3.64% MFE → -3.71% floor, XPL +3.68% → -2.90%; SL NULL is BY DESIGN (PM clears it for is_exact_mirror_trade). Shadow bar n>=15 ∧ +$0.50/14d ∧ T sign-off.
-2. **daemon constants-freshness probe**: service ActiveEnterTimestamp vs hermes_constants.py mtime — zero-code guard for the stale-binding class.
-- AMPLIFY screen: 7 cells n>=10 net>0, all validated/why-not'd/in-flight → no duplicate winner-cell proposals; 1 new proposal emitted (above). Flip-KPI 0 new; in-flight watch-contrarian/fade-ctx/winner-cell-125 (11-10) + harvest-ship (11-07).
+### 4. LAST-RUN VERIFY
+#220 dedupe selfcheck PASS | #219 guardian restart holding (PID 3978501) | #218 timer intact | constants EMPTY diff | session lock absent | size-reduce absent=1.0x | 0 Tracebacks
 
-### 6. READINESS (04:55)
-**0 open — flat.** Regime: BTC 15m SHORT_BIAS vs 4h LONG_BIAS (disagree), continuum AT, vol LOW, wyckoff ACCUMULATION, trend_quality STRONG_UP. Long-bypass block live for single-source LONGs in coin-level SHORT_BIAS; jup cap limits family to 1 fill/6h. Size 1.0x (file absent).
+### 5. READINESS (21:10)
+**1 open — BTC LONG #16787 continuum-trend+ @80351 (-0.29%, 5.3h, MFE 0.385% just under arm 0.40, SL 0.60%, meta_rsi 31.8)**, EMA300 4h +0.16% / 15m AT — HOLD per EMA300 rules.
+Regime: btc_15m SHORT_BIAS vs btc_4h LONG_BIAS disagree, vol LOW, auto_trader CHOP MANAGE_ONLY, 0 steers, portfolio good. Size 1.0x.
 
-**Queue:** 05:30Z guardian line verify → 11-05 fade-btc-crash → 11-06 jup-share + LONG-bias reads → 11-07 jup review/trials/harvest first read → 11-09 zombie-purge + disposition timer → 11-10 fade/winner-cell/watch bars → 11-13 pc+ kill-review → 11-14 stop-tighten LIVE read → 11-18 xmirror giveback. Carry: jup TAT candle OOS harness. CEO: stop-tighten-probe-080 label (11-07) · HYPE 2.0 fee · NET-KPI switch.
+**Queue:** 11-05 fade-btc-crash → 11-06 coverage batch + harvest first read → 11-07 harvest full + jup review → 11-09 zombie-purge → 11-10 fade-ctx/winner-cell-125/mult-150-signoff/bear-single-source bars → 11-13 pc+ kill-review → 11-14 stop-tighten eval + grind re-bar.
+**CEO:** winner-cell-mult-150 sign-off (MET now) · stop-tighten-probe-080 label · hail-mary brief answers · NET-KPI switch.
