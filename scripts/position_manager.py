@@ -2280,18 +2280,21 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         # Also force-write if TPSL flagged the current_sl as wrong-sided
         is_force = result.get('_force_write', False)
         if needs_sl or needs_tp or sl_stale or tp_stale or is_init_to_accel or is_force:
-            # ── STOP-TIGHTEN SHADOW (exec-time node, Lane-2 rule) ──────────────
+            # ── STOP-TIGHTEN (exec-time node, Lane-2 rule) ─────────────────────
             # Clamp check AT the exact ATR SL placement/replacement point (this
             # update dict is what _persist_atr_levels + the HL push will write —
             # initial placement, ratchet re-placement and TP-only re-persists all
             # flow through here), so the logged counterfactual is the SL we would
-            # actually clamp. NOT signal-time. ENFORCE=False => log-only, the
-            # helper returns the proposed SL unchanged (identity).
-            # Guarded: a hook/logging failure never breaks the ATR update.
-            # ENFORCE-PHASE CHECKLIST (zero impact today — identity return):
-            # hl_needs_sl above is computed from the PRE-clamp new_sl; when
-            # STOP_TIGHTEN_ENFORCE ever flips True, recompute the HL delta gate
-            # against the clamped value before pushing orders.
+            # actually clamp. NOT signal-time. Guarded: a hook/logging failure
+            # never breaks the ATR update.
+            # ENFORCE PHASE (since 2026-11-04, CEO T-override consult 20261104):
+            # STOP_TIGHTEN_ENFORCE=True means the helper returns the CLAMPED SL
+            # and _st_sl != _st_base_sl whenever it engaged. ENFORCE=False returns
+            # the proposed SL unchanged (identity, zero live effect).
+            # ENFORCE-PHASE CHECKLIST (executed with the flip): hl_needs_sl above
+            # is computed from the PRE-clamp new_sl — recompute the HL delta gate
+            # against the clamped value below, before the HL push, or Hyperliquid
+            # keeps the wider pre-clamp stop while the DB holds the clamp.
             _st_base_sl = result['_atr_computed_new_sl'] if is_init_to_accel else new_sl
             _st_sl = _st_base_sl
             try:
@@ -2304,6 +2307,16 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
                 _st_sl = _st_base_sl
                 log(f"  [STOP-TIGHTEN-SHADOW] hook error id={trade_id} {token}: "
                     f"{type(_st_e).__name__}: {_st_e}")
+            # Re-derive the HL delta gate from the CLAMPED value when the clamp
+            # actually engaged (no-op identity when ENFORCE=False or no clamp:
+            # _st_sl == _st_base_sl there, so behavior is unchanged).
+            if _st_sl != _st_base_sl and current_sl and float(current_sl) > 0:
+                _st_delta = abs(_st_sl - float(current_sl)) / float(current_sl)
+                hl_needs_sl = _st_delta > ATR_UPDATE_THRESHOLD_PCT or sl_stale
+                log(f"  [STOP-TIGHTEN-ENFORCE] id={trade_id} {token} {direction}: "
+                    f"clamp engaged {_st_base_sl:.6f} -> {_st_sl:.6f} "
+                    f"(delta { _st_delta*100:.3f}% vs threshold "
+                    f"{ATR_UPDATE_THRESHOLD_PCT*100:.3f}%, hl_needs_sl={hl_needs_sl})")
             updates.append({
                 'trade_id': trade_id,
                 'token': token,

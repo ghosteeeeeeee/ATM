@@ -730,21 +730,35 @@ ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 # placement/replacement, recovers +$2.74/30d (jup) and +$0.84/30d (vb-) with
 # gross WR exactly unchanged (zero winners touch 1.0%; at X=1.0% every
 # would-stopped trade was a loser).
-# THIS PHASE IS SHADOW-ONLY — ZERO live behavior change. Log-only detection at
-# the EXEC-TIME node (helper: tpsl_utils.stop_tighten_sl, called at each ATR
-# SL placement/replacement site — Lane-2 node rule, NOT signal-time).
+# ── LIVE FLIP 2026-11-04 (CEO consult 20261104, SHIP-LIVE; T speed override
+# "running out of time", standing delegation = CEO label = go) ───────────────
+# Two values moved together: MAX_PRICE_PCT 1.0 -> 0.75 AND ENFORCE False -> True.
+# RATIONALE: HML (CUT_LOSER) fires at -4% ACCOUNT @ lev 5.0 = -0.80% PRICE, so
+# the old 1.0% cap never bound — measured 0/35 log-joined trades reached it,
+# delta $0.00 (read-1 of stop-tighten-enforce-eval, 2026-11-02). 0.75% beats
+# the HML price equivalent by 0.25% account. Evidence: 0/49 jup winners touch
+# 0.80% adverse, 23/32 losers would stop at 0.75 (probe 11-02); HML 7d 33 hits
+# = -$4.29 (46% of the 30d losses class); the stop-tighten scope covers 24/33
+# of 7d HML = -$3.46.
+# THIS PHASE IS LIVE — the clamp is WRITTEN at every ATR SL placement and
+# replacement (helper: tpsl_utils.stop_tighten_sl, called at each site —
+# Lane-2 node rule, EXEC-TIME, NOT signal-time).
 # POLARITY: ENFORCE=False => log-only shadow (inert); True => clamp live
 #   (bar-gated, CEO label required). SHADOW=True => shadow collector running.
 #   NEVER make SHADOW=False the shadow state.
-# BAR (pre-registered, recorded NOT enforced now): 14d shadow-joined n>=20 per
-#   signal AND net delta >= +$0.15/30d @$13.40 AND gross WR not down vs live.
-# REVERT: STOP_TIGHTEN_MAX_PRICE_PCT = 2.5 (== ATR_SL_MAX) restores status-quo
-#   behavior for the two sources — the cap becomes a no-op.
-STOP_TIGHTEN_MAX_PRICE_PCT = 1.0   # % price distance from entry — backstop cap; enforce phase clamps abs(SL-entry)/entry*100 <= this
-STOP_TIGHTEN_SOURCES = ('jup_yolo_mirrored', 'volume-buildup-')  # scope: exact source match ONLY (registry spec tuple)
+# BAR (pre-registered — this bar now governs KEEP-vs-REVERT of the ENFORCE=True
+#   state at the 2026-11-14 read of registry stop-tighten-enforce-eval): 14d
+#   shadow-joined n>=20 per signal AND net delta >= +$0.15/30d @$13.40 AND
+#   gross WR not down vs live.
+# REVERT (either leg, independent): STOP_TIGHTEN_MAX_PRICE_PCT = 2.5
+#   (== ATR_SL_MAX) restores status-quo behavior for the two sources — the cap
+#   becomes a no-op; and/or STOP_TIGHTEN_ENFORCE = False returns the helper to
+#   log-only shadow (zero live effect).
+STOP_TIGHTEN_MAX_PRICE_PCT = 0.75  # % price distance from entry — backstop cap (was 1.0; CEO 2026-11-04: 1.0 never bound against the -0.80% price HML, 0/35 binds); enforce phase clamps abs(SL-entry)/entry*100 <= this
+STOP_TIGHTEN_SOURCES = ('jup_yolo_mirrored', 'volume-buildup-')  # scope: exact source match ONLY (registry spec tuple) — UNCHANGED by the 2026-11-04 flip
 STOP_TIGHTEN_SHADOW = True         # shadow collector on (log lines only)
 # polarity: ENFORCE=False => log-only shadow; True => clamp live (bar-gated, CEO label required)
-STOP_TIGHTEN_ENFORCE = False       # THIS PHASE: False = shadow-only/inert (no live effect)
+STOP_TIGHTEN_ENFORCE = True        # LIVE since 2026-11-04 (CEO T-override): clamp writes reach the SL. Revert = False (shadow-only/inert, no live effect)
 
 # ── Price sanity (brain_auditor 2026-10-21) ─────────────────────────────────
 # A single bad HL mid poll used to become a PERMANENT peak: it feeds
@@ -3479,6 +3493,31 @@ STANDALONE_BYPASS_SIGNALS = (
     # that consults ICHIMOKU_LONG_BYPASS_ENABLED (so auto-revert actually works).
 )
 
+# ── LONG-BYPASS SHORT_BIAS BLOCK (CEO SHIP-LIVE 2026-11-04, consult 20261104) ─
+# ADD-ONLY flag — no existing value changed.
+# The long-heavy STANDALONE_BYPASS_SIGNALS list above must NOT admit a LONG fill
+# when the coin's 4h regime is SHORT_BIAS. Worst cell in the 2026-11-03 harvest
+# (brief-long-bias-short-market-2026-11-03): 94T -$0.65/14d for LONG in
+# SHORT_BIAS — untouched by fix round 2, which only moved SHORT-side gates and
+# the SHORT ceiling. T authorized the LIVE flip ("running out of time").
+# POLARITY: True  = BLOCK bypass-admitted LONGs when get_regime_4h() ==
+#                   'SHORT_BIAS' (live since 2026-11-04, CEO T-override)
+#           False = block off — bypass admits LONGs in SHORT_BIAS again (REVERT)
+# SCOPE: the BYPASS PATH ONLY. A multi-source confluence LONG (2+ unique signal
+#   types) in SHORT_BIAS is NOT touched, and no SHORT is touched — this flag
+#   gates only single-type admissions that rely on STANDALONE_BYPASS membership.
+#   (Normal multi-source confluence LONGs in SHORT_BIAS are unaffected.)
+# Exec-time hook: decider_run.execute_trade — the single choke point every fill
+#   routes through (plus the delayed-entry path) — log tag
+#   [LONG-BYPASS-SHORT-BIAS-BLOCK]. Regime read = the established fresh
+#   signal_compactor.get_regime_4h() (PG momentum_cache), same read fix-round-2
+#   used. Registry: long-bypass-regime-shadow (superseded shadow -> LIVE here).
+# METRIC: LONG fills in SHORT_BIAS -50% within 48h.
+# BAR / auto-revert: if the 14d net of the blocked cohort > 0, convert back to
+#   shadow (set this flag False). Revert = set this flag False.
+LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED = True
+
+
 # ── ichimoku LONG bypass (CEO 2026-10-20) ─────────────────────────────────────
 # Regime-conditional loosening: ichimoku LONG gets standalone bypass ONLY while
 # ICHIMOKU_LONG_BYPASS_ENABLED is True. ichimoku SHORT is NEVER bypassed.
@@ -4277,6 +4316,40 @@ WATCHLIST_MIN_MARGIN_USD = 30.0 # T 2026-11-02 "$30" — the watchlist's OWN
 # performance is re-evaluated vs the LONG baseline.
 JUP_YOLO_MAX_OPEN_SHORTS = 2      # concurrent open jup_yolo SHORT trades allowed
 JUP_YOLO_SHORT_LIFT_CLOSED = 20   # lift the cap after this many SHORTs closed
+
+# ── JUP YOLO FILL-RATE CAP (CEO SHIP-LIVE 2026-11-04, harvest-fix-it verdict) ──
+# ADD-ONLY block — no existing value changed.
+# PROBLEM: jup_yolo_mirrored is ~64% of the rolling-50 live fill book (107/200
+# at the 2026-11-03 consult; re-measured 2026-11-04: 33/50 = 66% of the last-50
+# and 58/83 = 70% of the last-48h fills) while carrying -$0.95/200 and 20 of
+# the 33 7d HML hits. TARGET: rolling-50 jup share <35% within 48h (registry
+# harvest-ship-2026-11-04).
+# LEVER CHOICE (the right lever was hunted first, per the verdict):
+#   * per-signal concurrent-open cap (the JUP_YOLO_MAX_OPEN_SHORTS /
+#     MTF_REGIME_TREND_MAX_POSITIONS / PUMP_FLOW_MAX_POSITIONS pattern) —
+#     REJECTED as insufficient: jup mean hold is 1.64h (p50 0.97h, n=131/14d),
+#     so even MAX_OPEN=1 still yields ~29 jup fills/48h against ~25 non-jup
+#     fills/48h ≈ 49% share, far above the <35% bar. Measured, not assumed.
+#   * per-signal size multiplier (incl. the global data/vacation_size_reduce.json
+#     0.5x fallback) — REJECTED: the metric is fill COUNT share, sizing cannot
+#     move it, and the vacation file sizes ALL trades (not jup-specific).
+#   * CHOSEN: rolling-window FILL cap — the only jup-specific lever that can
+#     reach the target. Mirrors Cap B (SAME_DIR_30MIN_MAX) at the decider exec
+#     loop: count jup_yolo fills (paper=false, open OR closed) inside the
+#     rolling window at exec time; skip the next jup fill while at the cap.
+#     6h/1 => ~8 jup fills/48h ≈ 24% projected rolling-50 share vs others
+#     25/48h (comfortable margin under the <35% bar).
+# SCOPE: any fill whose source contains 'jup_yolo' (jup_yolo_mirrored is the
+#   only emitter today; merged/confluence sources carrying jup count too, so the
+#   measurement matches the PG `signal LIKE '%jup_yolo%'` basis).
+# METRIC: rolling-50 share of fills whose signal contains 'jup_yolo' <35% within
+#   48h of ship (registry harvest-ship-2026-11-04).
+# REVERT: set JUP_YOLO_MAX_FILLS_PER_WINDOW high (e.g. 999) or flip
+#   JUP_YOLO_FILL_CAP_ENABLED = False (cap inert, no other behavior).
+JUP_YOLO_FILL_CAP_ENABLED = True   # master switch — REVERT: False (cap off)
+JUP_YOLO_FILL_WINDOW_HOURS = 6     # rolling window the fill count is taken over
+JUP_YOLO_MAX_FILLS_PER_WINDOW = 1  # max jup_yolo fills allowed inside that window
+
 
 # ── JUP YOLO exit shadows (CEO verdict 2026-10-31, mirror-exit-asymmetry) ───
 # Verdict: #1 ship-now REJECTED (counterfactual: -0.50% HML saves ~+$0.69 but

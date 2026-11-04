@@ -3935,7 +3935,7 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             else:
                 fresh_sl = curr * (1 + sl_pct)
                 fresh_tp = curr * (1 - tp_pct)
-            # ── STOP-TIGHTEN SHADOW (exec-time node, Lane-2 rule) ──────────────
+            # ── STOP-TIGHTEN (exec-time node, Lane-2 rule) ──────────────────────
             # Self-close ATR SL RE-PLACEMENT for unprotectable coins — guardian
             # is the LIVE successor of the deprecated self_close_watcher (merged
             # 2026-04-23), i.e. the real scw_open node. Clamp check runs at the
@@ -3943,8 +3943,16 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
             # price from ENTRY). Source is unknown at this layer (HL-keyed by
             # coin), so it is resolved from the open trade ONLY when the clamp
             # could apply (distance > cap AND loss side) — no query otherwise.
-            # ENFORCE=False => log-only; the helper returns fresh_sl unchanged
-            # => _upsert_self_close stores exactly what it stored before (inert).
+            # ENFORCE=True since 2026-11-04 (CEO T-override, consult 20261104):
+            # the helper returns the CLAMPED fresh_sl when the cap binds and
+            # _upsert_self_close stores it; ENFORCE=False => log-only, stores
+            # exactly what it stored before (inert).
+            # ⚠ GUARDIAN RESTART REQUIRED on every constants change: the daemon
+            # binds STOP_TIGHTEN_* at IMPORT TIME (sys.modules cached for the life
+            # of the process), so without a service restart this node silently
+            # stays on the old cap/flag while decider/position_manager (fresh
+            # subprocess each pipeline minute) already enforce. Reported to the
+            # parent on 2026-11-04 for exactly that reason.
             # Guarded: lookup/hook failure never blocks placement or breach check.
             try:
                 from hermes_constants import STOP_TIGHTEN_MAX_PRICE_PCT as _st_cap

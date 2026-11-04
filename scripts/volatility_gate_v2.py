@@ -167,6 +167,18 @@ REGIME_SIGNALS = {
         'macd-div', 'macd-div+', 'macd-div-',
         'range-reversion-long+', 'range-reversion-long',  # mean reversion LONG — buy at range bottom
         'squeeze-reversal+', 'squeeze-reversal-',  # BB squeeze → mean-reversion breakout
+        # bb-squeeze ADDED to HIGH 2026-11-04 (CEO SHIP-LIVE, consult 20261104, T
+        # speed override) — same remediation as commit 5298702e added it to NORMAL
+        # ("signals passing confluence gate but blocked at execution"): bb-squeeze+
+        # was allowlisted in NORMAL only, so should_trade_v2 SKIP'd every singleton
+        # HIGH fill (log '[VOL-GATE-v2] <tok>: SKIP — bb-squeeze+ not suited for
+        # HIGH' — seen for MERL/GMX/BIGTIME/STX/RESOLV) while the EXTREME
+        # override's own comment asserts "HIGH 63.6%WR +$0.14 kept". The EXTREME
+        # 0.0 ban is UNTOUCHED (family ban with negative data — 12T -$0.15,
+        # protected standing constraint). 30d realized HIGH n=7 -$0.27 (not
+        # significant). REVERT: delete these 4 entries. METRIC: bb-squeeze+ share
+        # of the next-100 fills (registry harvest-ship-2026-11-04).
+        'bb-squeeze+', 'bb_squeeze+', 'bb-squeeze', 'bb_squeeze',
         'grind-breakout+', 'grind-breakout-',  # steady grind + late breakout
         # grind-breakout-v2 REMOVED from HIGH — compression precondition rarely passes in HIGH vol (BB already wide)
         'hh-hl', 'hh-hl+', 'hh-hl-',  # Structure Sniper — trend-following breakout, works in HIGH

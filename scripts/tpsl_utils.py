@@ -1034,7 +1034,8 @@ def compute_fallback_tp(current_price: float, direction: str) -> float:
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# STOP-TIGHTEN SHADOW GATE — registry entry stop-asymmetry-highwr
+# STOP-TIGHTEN GATE (log tag [STOP-TIGHTEN-SHADOW] is the join key — keep it)
+# — registry entry stop-asymmetry-highwr / stop-tighten-enforce-eval
 # (data/shadow_disposition.json). One shared clamp-check helper; every ATR SL
 # placement/replacement site calls THIS — no copy-pasted clamp logic anywhere.
 #
@@ -1044,14 +1045,20 @@ def compute_fallback_tp(current_price: float, direction: str) -> float:
 # NOT at signal detection — so the logged counterfactual reflects the SL we
 # would actually clamp.
 #
+# PHASE AS OF 2026-11-04 (CEO consult 20261104, SHIP-LIVE, T speed override):
+#   STOP_TIGHTEN_MAX_PRICE_PCT = 0.75 (was 1.0) and STOP_TIGHTEN_ENFORCE =
+#   True — the clamp is WRITTEN live at every site above. The log line keeps
+#   firing with enforce=True so the bar audit stays fed.
 # POLARITY: STOP_TIGHTEN_ENFORCE=False => log-only shadow, ZERO live effect
 #   (identity return: sl_to_use == proposed_sl by construction).
-#   True => clamp live — only after the pre-registered bar (14d shadow-joined
-#   n>=20/signal AND net delta >= +$0.15/30d @$13.40 AND gross WR not down)
-#   AND a CEO label. STOP_TIGHTEN_SHADOW=True means the collector is running.
+#   True => clamp live. STOP_TIGHTEN_SHADOW=True means the collector is running.
 #   NEVER make SHADOW=False the shadow state.
-# REVERT: STOP_TIGHTEN_MAX_PRICE_PCT = 2.5 (== ATR_SL_MAX) restores status-quo
-#   behavior for the two scoped sources (cap becomes a no-op).
+# BAR: the pre-registered bar (14d shadow-joined n>=20/signal AND net delta >=
+#   +$0.15/30d @$13.40 AND gross WR not down) now governs KEEP-vs-REVERT of the
+#   ENFORCE=True state at the 2026-11-14 read of stop-tighten-enforce-eval.
+# REVERT (either leg): STOP_TIGHTEN_MAX_PRICE_PCT = 2.5 (== ATR_SL_MAX)
+#   restores status-quo behavior for the two scoped sources (cap becomes a
+#   no-op); and/or STOP_TIGHTEN_ENFORCE = False returns to log-only shadow.
 # ════════════════════════════════════════════════════════════════════════════
 
 from hermes_constants import (
@@ -1088,9 +1095,11 @@ def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
          proposed_sl, would_be_sl, dist_before_pct, dist_after_pct,
          dist_current_pct, would_later_stop}.
 
-    Side effects when ENFORCE is False: at most one [STOP-TIGHTEN-SHADOW] log
-    line when STOP_TIGHTEN_SHADOW is True (guarded twice — a logging failure
-    can never break trade execution). No DB writes, no file writes, no state
+    Side effects: at most one [STOP-TIGHTEN-SHADOW] log line per dedup key when
+    STOP_TIGHTEN_SHADOW is True (guarded twice — a logging failure can never
+    break trade execution). ENFORCE=False adds NO other side effect; ENFORCE=True
+    (live since 2026-11-04) additionally returns the clamped value so the caller
+    writes it. This helper itself does no DB writes, no file writes, no state
     mutation apart from the in-process dedup set.
     """
     try:
@@ -1157,11 +1166,13 @@ def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
             'would_later_stop': 'next-run',
         }
 
-        # Shadow log line — one per clamped-would-be event (deduped per
+        # Clamp log line — one per clamped-would-be event (deduped per
         # process), guarded so logging can never break trade execution.
-        # Gated on SHADOW only: SHADOW=True = collector running (log-only while
-        # ENFORCE=False); if ENFORCE ever flips True the line keeps firing and
-        # carries enforce=True so the bar audit stays fed.
+        # Gated on SHADOW only: SHADOW=True = collector running. The TAG IS
+        # UNCHANGED across the phase flip ([STOP-TIGHTEN-SHADOW] is the join key
+        # every eval joins on) — the phase is carried by the `enforce=` field,
+        # which reads enforce=True from 2026-11-04 on, so the bar audit keeps
+        # getting fed after the flip.
         if STOP_TIGHTEN_SHADOW:
             key = (trade_id if trade_id is not None else f"{token}|{dirn}",
                    site, int(_st_time.time() // 3600))
@@ -1179,8 +1190,10 @@ def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
                     f"would_later_stop=next-run-data")
 
         if STOP_TIGHTEN_ENFORCE:
-            # Future enforce phase only (bar + CEO label). Already-tighter SLs
-            # never reach this branch: they pass the dist_prop <= cap exit above.
+            # ENFORCE phase (LIVE since 2026-11-04, CEO T-override consult
+            # 20261104): return the clamped SL so the caller writes it.
+            # Already-tighter SLs never reach this branch: they pass the
+            # dist_prop <= cap exit above. Revert: ENFORCE=False (log-only).
             return would_be, payload
         return proposed_sl, payload
     except Exception as _st_err:

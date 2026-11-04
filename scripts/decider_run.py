@@ -918,6 +918,16 @@ def process_delayed_entries(paper=False):
             still_pending.append(entry)  # retry later
             continue
 
+        # ── LONG-BYPASS-SHORT-BIAS-BLOCK (second fill path) ─────────────────────
+        # process_delayed_entries opens trades via brain.py directly (it does NOT
+        # route through execute_trade), so the exec-time block is mirrored here or
+        # the bypass hole stays open on this path. Same scope: bypass-admitted
+        # LONG only, SHORT_BIAS only; multi-source confluence LONGs and every
+        # SHORT untouched. Entry dropped (not retried) while the block applies.
+        if _long_bypass_short_bias_block(token, direction, source):
+            log(f'  ⏭️ DELAYED-ENTRY-DROPPED: {token} {direction} — {source} (LONG bypass blocked in SHORT_BIAS)')
+            continue
+
         # Pullback reached → execute trade
         log(f'🎯 DELAYED ENTRY: {token} {direction} @ ${cur_price:.6f} '
             f'(sig=${sig_price:.4f}, pullback={pullback*100:.1f}%)')
@@ -2478,6 +2488,90 @@ def context_gate(token, direction, source, sig):
 
 # ─── Trade Execution ──────────────────────────────────────────────
 
+def _is_bypass_admitted_single_type(source):
+    """True when `source` is a SINGLE signal type that reached admission ONLY
+    through STANDALONE_BYPASS membership (the bypass path), i.e. NOT through
+    multi-source confluence.
+
+    Mirrors signal_compactor's own rule (confluence gate, ~:3666):
+      unique_signal_types == 1 AND (bare_source or _src_stripped or any part)
+      is in STANDALONE_BYPASS_SIGNALS.
+    Normalization is the compactor's: strip trailing +/-, strip a '-broken'
+    suffix, strip ALL trailing digits (bars_since / level markers), then test
+    membership. Returns False on any problem (fail-open: a broken source string
+    must never be able to block a fill by accident).
+    """
+    try:
+        import re as _re
+        from hermes_constants import STANDALONE_BYPASS_SIGNALS
+        parts = [p.strip() for p in (source or '').split(',') if p.strip()]
+        if not parts:
+            return False
+        keys = set()
+        for _p in parts:
+            _b = _re.sub(r'-broken$', '', _p.rstrip('+-'))
+            keys.add(_re.sub(r'\d+$', '', _b))
+        if len(keys) != 1:
+            return False          # 2+ unique types = confluence path, never blocked
+        _bypass = set(STANDALONE_BYPASS_SIGNALS)
+        for _p in parts:
+            _bare = _re.sub(r'\d+$', '', _re.sub(r'-broken$', '', _p.rstrip('+-')))
+            _stripped = _p.rstrip('+-')
+            if (_stripped in _bypass or _bare in _bypass
+                    or _re.sub(r'-broken$', '', _stripped) in _bypass):
+                return True
+        return False
+    except Exception:
+        return False
+
+
+def _long_bypass_short_bias_block(token, direction, source):
+    """LONG-BYPASS-SHORT-BIAS-BLOCK (CEO SHIP-LIVE 2026-11-04, consult 20261104,
+    T speed override; registry long-bypass-regime-shadow superseded to LIVE).
+
+    Returns True when this fill must be BLOCKED: a LONG admitted through the
+    STANDALONE_BYPASS single-source path landing on a coin whose 4h regime is
+    SHORT_BIAS (worst cell 94T -$0.65/14d).
+
+    SCOPE (deliberate): the BYPASS PATH ONLY. Multi-source confluence LONGs in
+    SHORT_BIAS are NOT affected (unique_signal_types >= 2 never matches), and
+    no SHORT is ever affected. Flag polarity: True = block live; False = revert
+    to no block (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED).
+
+    Regime read = the established fresh signal_compactor.get_regime_4h()
+    (PG momentum_cache.regime_4h) — the same read fix-round-2 used; it never
+    raises (falls back to NEUTRAL), so a missing row can only ever let the
+    trade through, never falsely block it.
+    """
+    try:
+        if (direction or '').upper() != 'LONG':
+            return False
+        from hermes_constants import LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED
+        if not LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED:
+            return False
+        if not _is_bypass_admitted_single_type(source):
+            return False          # confluence LONG (or SHORT) — untouched by design
+        from signal_compactor import get_regime_4h as _lb_g4
+        _lb_regime, _lb_conf = _lb_g4(token)
+        if _lb_regime != 'SHORT_BIAS':
+            return False
+        log(f'  🚫 [LONG-BYPASS-SHORT-BIAS-BLOCK] {token} {direction} BLOCKED — '
+            f'bypass-admitted single source (src={source}) in SHORT_BIAS '
+            f'regime_4h={_lb_regime} conf={_lb_conf} '
+            f'(LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED=True; multi-source '
+            f'confluence LONGs and all SHORTs unaffected)')
+        return True
+    except Exception as _lb_e:
+        # Fail-open on infrastructure error (same convention as the EXEC-MAXXED
+        # backstop): a missing constant/import must never take trading down.
+        try:
+            log(f'  [LONG-BYPASS-SHORT-BIAS-BLOCK] check error {token}: '
+                f'{type(_lb_e).__name__}: {_lb_e}')
+        except Exception:
+            pass
+        return False
+
+
 def execute_trade(token, direction, price, confidence, source,
                   signal_type=None,  # actual signal_type from DB (not merged source tags)
                   leverage=10, paper=False, sl_pct=0.02,
@@ -2553,6 +2647,20 @@ def execute_trade(token, direction, price, confidence, source,
                     return False, f'MAXXED vol: ATR% {_mx_atr:.2f} >= maxxed threshold (exec backstop)'
     except Exception:
         pass  # non-fatal — fail-open on MAXXED check
+
+    # ── LONG-BYPASS-SHORT-BIAS-BLOCK (CEO SHIP-LIVE 2026-11-04, consult 20261104) ──
+    # Exec-time admission point — execute_trade is the SINGLE choke point every
+    # fill routes through (one call site, decider_run run() loop), so the block
+    # is reachable for the actual fills. It blocks ONLY a LONG that was admitted
+    # by the STANDALONE_BYPASS single-source path while the coin's 4h regime is
+    # SHORT_BIAS (worst cell 94T -$0.65/14d). Multi-source confluence LONGs in
+    # SHORT_BIAS and every SHORT are untouched by design.
+    # POLARITY: LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED True = block (live
+    #   2026-11-04, CEO T-override) / False = REVERT (no block).
+    # Log tag: [LONG-BYPASS-SHORT-BIAS-BLOCK] (token + regime). Fail-open on
+    #   infrastructure error — same convention as the MAXXED backstop above.
+    if _long_bypass_short_bias_block(token, direction, source):
+        return False, 'LONG bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)'
 
     # ── RSI Floor/Ceiling at Execution Time ────────────────────────────────────
     # FIX: RSI floor only checked at compaction time (hours earlier). By execution
@@ -2854,10 +2962,12 @@ def execute_trade(token, direction, price, confidence, source,
         sl = price * 1.01
         log(f'  [WARN] SL sanity check triggered for SHORT {token}, reset to 1%')
 
-    # ── STOP-TIGHTEN SHADOW (exec-time node, Lane-2 rule) ─────────────────────
+    # ── STOP-TIGHTEN (exec-time node, Lane-2 rule) ────────────────────────────
     # Initial ATR SL placement at trade OPEN — clamp check runs here, at the
     # placement point, NOT at signal detection (price = live entry above).
-    # ENFORCE=False => log-only; stop_tighten_sl returns `sl` unchanged.
+    # ENFORCE=True since 2026-11-04 (CEO T-override, consult 20261104): the
+    # helper returns the CLAMPED sl when the cap binds, and `sl` below is what
+    # brain.py writes. ENFORCE=False => log-only, returns `sl` unchanged.
     # Fully guarded: a hook/logging failure can never break trade execution.
     if sl and sl > 0:
         try:
@@ -3850,6 +3960,10 @@ _POLICY_REFUSAL_MARKERS = (
     'RSI knife floor', 'RSI hard floor', 'RSI floor', 'SHORT mid-band',
     'RSI ceiling', 'RSI hard ceiling', 'MAXXED vol', 'stale candles',
     'RSI check exception', 'BANANA lesson', 'extreme oversold',
+    # LONG-BYPASS-SHORT-BIAS-BLOCK (2026-11-04): regime-conditional refusal —
+    # clears when the coin's 4h regime leaves SHORT_BIAS, so it must not feed
+    # the 2-fails->1h cooldown (same class as the RSI floors above).
+    'LONG bypass blocked in SHORT_BIAS',
 )
 
 
@@ -4853,6 +4967,41 @@ def run(dry_run=False):
                 continue
         except Exception as _cap_err:
             log(f'WARN: Cap B check failed ({_cap_err}) — proceeding without cap')
+
+        # ── Cap C (CEO SHIP 2026-11-04, harvest-fix-it verdict): jup_yolo
+        # rolling-window FILL cap. jup_yolo_mirrored is ~64-70% of the fill book
+        # (33/50 last-50, 58/83 last-48h measured 2026-11-04) while carrying
+        # -$0.95/200 and 20 of 33 7d HML hits. A concurrent-open cap cannot reach
+        # the <35% target (jup mean hold 1.64h -> even MAX_OPEN=1 leaves ~49%
+        # share), so the lever is a rolling-window fill count — same shape as Cap
+        # B above, scoped to this one signal family.
+        # METRIC: rolling-50 jup share <35% within 48h (registry
+        #   harvest-ship-2026-11-04). REVERT: JUP_YOLO_FILL_CAP_ENABLED=False or
+        #   JUP_YOLO_MAX_FILLS_PER_WINDOW=999 (constants block JUP YOLO FILL-RATE
+        #   CAP in hermes_constants.py). paper=false — live capital only, same
+        #   convention as Cap B.
+        try:
+            from hermes_constants import (
+                JUP_YOLO_FILL_CAP_ENABLED, JUP_YOLO_FILL_WINDOW_HOURS,
+                JUP_YOLO_MAX_FILLS_PER_WINDOW)
+            if JUP_YOLO_FILL_CAP_ENABLED and 'jup_yolo' in (source or ''):
+                _jfc_conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+                _jfc_cur = _jfc_conn.cursor()
+                _jfc_cur.execute("""
+                    SELECT COUNT(*) FROM trades
+                    WHERE paper = false AND signal LIKE %s
+                      AND open_time > NOW() - make_interval(hours => %s)
+                """, ('%jup_yolo%', int(JUP_YOLO_FILL_WINDOW_HOURS)))
+                _jfc_n = _jfc_cur.fetchone()[0]
+                _jfc_conn.close()
+                if _jfc_n >= JUP_YOLO_MAX_FILLS_PER_WINDOW:
+                    log(f'SKIP: Cap C — jup_yolo {_jfc_n} fills in last '
+                        f'{JUP_YOLO_FILL_WINDOW_HOURS}h (max '
+                        f'{JUP_YOLO_MAX_FILLS_PER_WINDOW}) — rolling-50 jup share target <35%')
+                    skipped += 1
+                    continue
+        except Exception as _jfc_err:
+            log(f'WARN: Cap C check failed ({_jfc_err}) — proceeding without jup cap')
 
         if is_pump_chain:
             # Pump-chain: allow if pump_chain_count < PUMP_FLOW_MAX_POSITIONS
@@ -5996,9 +6145,11 @@ def run(dry_run=False):
                             # FIX (2026-10-16): changed >= to > — breakeven (SL==entry) is LEGAL
                             # and should not be reset (bug_hunter BUG-3)
                             _new_sl = round(_actual * (1 - ATR_SL_MIN_INIT), 8)
-                            # STOP-TIGHTEN SHADOW (exec-time re-placement, Lane-2):
-                            # clamp check at the replacement point. ENFORCE=False =>
-                            # log-only; returns _new_sl unchanged. Guarded.
+                            # STOP-TIGHTEN (exec-time re-placement, Lane-2):
+                            # clamp check at the replacement point. ENFORCE=True
+                            # since 2026-11-04 => returns the clamped _new_sl
+                            # when the cap binds; ENFORCE=False => log-only,
+                            # returns _new_sl unchanged. Guarded.
                             try:
                                 from tpsl_utils import stop_tighten_sl as _st_hook
                                 _new_sl, _st_payload = _st_hook(
@@ -6014,9 +6165,11 @@ def run(dry_run=False):
                             # SL below entry for SHORT — wrong side, fix it
                             # FIX (2026-10-16): changed <= to < — breakeven (SL==entry) is LEGAL
                             _new_sl = round(_actual * (1 + ATR_SL_MIN_INIT), 8)
-                            # STOP-TIGHTEN SHADOW (exec-time re-placement, Lane-2):
-                            # clamp check at the replacement point. ENFORCE=False =>
-                            # log-only; returns _new_sl unchanged. Guarded.
+                            # STOP-TIGHTEN (exec-time re-placement, Lane-2):
+                            # clamp check at the replacement point. ENFORCE=True
+                            # since 2026-11-04 => returns the clamped _new_sl
+                            # when the cap binds; ENFORCE=False => log-only,
+                            # returns _new_sl unchanged. Guarded.
                             try:
                                 from tpsl_utils import stop_tighten_sl as _st_hook
                                 _new_sl, _st_payload = _st_hook(

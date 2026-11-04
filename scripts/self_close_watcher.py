@@ -252,13 +252,16 @@ def check_and_close():
             # ATR_PCT_FALLBACK, and all MIN/MAX clamping internally.
             sl_price = compute_atr_sl_price(coin, direction, entry_px, current_px)
             tp_price = compute_atr_tp_price(coin, direction, entry_px, current_px)
-            # ── STOP-TIGHTEN SHADOW (exec-time node, Lane-2 rule) ──────────────
+            # ── STOP-TIGHTEN (exec-time node, Lane-2 rule) ──────────────────────
             # First self-close ATR SL placement. Source is unknown at this layer
             # (HL-keyed by coin), so it is resolved from the open trade ONLY when
             # the clamp would actually apply (distance > cap) — keeps the check
-            # cheap. ENFORCE=False => log-only; helper returns sl_price unchanged
-            # => upsert below stores exactly what it stored before (inert).
+            # cheap. ENFORCE=True since 2026-11-04 (CEO T-override) => the helper
+            # returns the clamped sl_price when the cap binds and the upsert below
+            # stores it; ENFORCE=False => log-only, stores what it stored before.
             # Fully guarded: lookup/hook failure never blocks self-close setup.
+            # NOTE: this module is DEPRECATED (timer disabled 2026-04-23 — the
+            # guardian is its successor) so this site is currently UNREACHABLE.
             # NOTE: this module logs via `logging` (self_close_watcher.log), but
             # the [STOP-TIGHTEN-SHADOW] line goes to pipeline.log via the same
             # hermes_log mechanism the other SL sites use (tag is the join key);

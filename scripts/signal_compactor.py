@@ -624,7 +624,7 @@ SIGNAL_SOURCE_WEIGHTS = {
     # bb_bounce_v2_long — BB bounce LONG calibrated from SHORT winners
     ('bb_bounce_v2_long', 'bb-bounce-v2-long+'): 1.4,  # RE-APPLIED 2026-10-06 00:38Z brain_auditor post-freeze (queue #6). Was 1.3 (reverted freeze b960ffe8). Fresh evidence: 7d 18T 77.8%WR +$0.77 (NORMAL 9T 66.7% +$0.50, HIGH 5T 80% +$0.10, FLAT 4T 100% +$0.17). Boosts winner, blocks nothing.
     ('bb_bounce_v3_long', 'bb-bounce-v3-long+'): 0.5,  # DISABLED 2026-10-10 signal_reporter — 14d 19T -$0.33 52.6%WR. Weight lowered pending re-enable.
-    ('bollinger_squeeze_long', 'bb-squeeze+'): 1.0,  # BOOSTED 0.9→1.0 2026-10-28 auto_1hr — 24h 7T 71.4% +$0.29 multi-token (STABLE+ICP+PENGU+MINA), 7d 15T 66.7% +$0.45. Held >65% post-0.9 boost as pre-registered (09:35 run); full 1.0 reversal now supported.
+    ('bollinger_squeeze_long', 'bb-squeeze+'): 1.3,  # BOOSTED 1.0→1.3 2026-11-04 (CEO SHIP-LIVE, consult 20261104, T speed override) — amplification of a 14d winner: 37T 62.2%WR +$0.47 book-wide / NORMAL 30d 44T 63.6% +$0.59 (the bb-squeeze+ NORMAL winner cell). Weight drives compaction score → hotset rank → final confidence at exec, which is the admission-share lever (registry harvest-ship-2026-11-04, target: bb-squeeze+/warrior share of the next-100 fills 10%→25%). History: 0.9→1.0 on 2026-10-28 (24h 7T 71.4% +$0.29; held >65% post-boost). REVERT: 1.0. Does not touch any gate — it only scores.
     ('pump-chain', 'pump-chain+'): 1.4,  # BOOSTED 1.2→1.4 2026-10-10 — 14d 25T 56%WR +$2.27 +2.91%avg. BEST signal by total PnL. Was 1.2 (boosted 10-03).
     ('pump-chain-v6', 'pump-chain-v6+'): 1.0,  # V6 LONG — validated gate (spec rev1, double-audited). Self-learner tunes after 5+ trades.
     ('pump-chain-v6', 'pump-chain-v6-'): 1.0,  # V6 SHORT — monitoring bet; same base weight
@@ -699,8 +699,17 @@ SIGNAL_SOURCE_WEIGHTS = {
     ('continuum_trend_long', 'continuum-trend+'): 1.6,     # BOOSTED 2026-09-21 — trendline LONG (BULL alignment)
     ('continuum_trend_short', 'continuum-trend-'): 1.6,    # BOOSTED 2026-09-21 — trendline SHORT (BEAR alignment)
     # Warrior Trading signals (book strategy conversion 2026-09-12)
-    ('warrior_sr_confirm_long',  'warrior-sr-confirm+'): 1.2,   # S/R + candlestick + volume
-    ('warrior_sr_confirm_short', 'warrior-sr-confirm-'): 1.2,   # S/R + candlestick + volume
+    # BOOSTED 1.2→1.6 2026-11-04 (CEO SHIP-LIVE, consult 20261104, T speed override)
+    # — amplification target with the bb-squeeze+ boost above: 14d warrior-sr-
+    # confirm- 5T 100%WR +$0.27 and warrior-sr-confirm+ 12T 75%WR +$0.20, both
+    # already admitted (confluence PASS → HOTSET-FINAL-ADD → exec fills) but
+    # emission-thin, so the only lever that raises their fill share is score: a
+    # higher source_mult lifts final confidence at exec (observed exec conf 46.5
+    # for CRV warrior-sr-confirm-, close to the 40 floor) and hotset rank.
+    # METRIC (registry harvest-ship-2026-11-04): warrior+bb-squeeze share of the
+    # next-100 fills 10%→25%. REVERT: 1.2. Score-only — touches no gate.
+    ('warrior_sr_confirm_long',  'warrior-sr-confirm+'): 1.6,   # S/R + candlestick + volume
+    ('warrior_sr_confirm_short', 'warrior-sr-confirm-'): 1.6,   # S/R + candlestick + volume
     ('breakout_pullback_long',   'breakout-pullback+'):  1.3,   # breakout → pullback (high R:R)
     ('breakout_pullback_short',  'breakout-pullback-'):  1.3,   # breakout → pullback (high R:R)
     ('volume_climax_long',       'volume-climax+'):      1.25,  # volume rejection reversal
