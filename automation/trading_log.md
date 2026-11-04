@@ -20374,3 +20374,28 @@ Final set: []
 - 24h net '$-0.04' at 63.4% WR — winners slightly smaller than losers (hard_max_loss -0.123 avg + atr_sl_hit -0.103 avg); structure problem persists
 - 7d '$-2.26' — hard_max_loss + atr_sl_hit remain dominant drag
 - Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
+
+## [2026-11-04 00:50] Hourly Analysis
+
+**Trades:** 4 closed (1 wins, 3 losses)
+**PnL:** $-0.27 (WR: 25.0% hour; 24h 44T 59.1% $-0.34 | 7d 279T 54.1% $-2.53 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BTC jup_yolo mfe_exit +0.07, ETH hl_copy_trader hard_max_loss -0.09, SOL jup_yolo hard_max_loss -0.19, XPL hl_copy_trader hard_max_loss -0.06
+- Kill check: 24h n>=3 losers none at 0% WR (hl_copy_trader 5T 40% -0.04; jup_yolo_mirrored 25T 68% -0.21 — not kill candidates)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 7/44 = 15.9% (<40%) — drag = hard_max_loss 9T '-1.08' + atr_sl_hit '-0.72' vs profit exits mfe 12T '+0.66' + profit-monster 7T '+0.47' — no tpsl_utils alert
+- Boost HOLD: bb-squeeze+ 4T 75% +0.22 fails n>=5; jup_yolo n=25 but net -0.21 fails net>0.05
+- Neg streak: 19h+20h red then 21h green, 23h+0h red — only 2 consecutive, not 3; no NEUTRAL check triggered
+- Frequency: 4/hr — under 20
+- Entry quality: 24h winners avg MAE 0.275%, 20/26 <0.5%
+- Storm readiness: **window-min -1.15% / at-run -1.15%** — close to but inside gate (needs <=-1.5 or |at-run|>=1.5), no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Window-min/at-run both -1.15% — near threshold; watch next hour for storm packet
+- Hour 00:00 2 trades -$0.02 after 23:00 -$0.25 — mild red cluster, not 3 consecutive
+- 7d '$-2.53' — hard_max_loss + atr_sl_hit remain dominant drag
+- Standing flag: volatility_gate_v2 NORMAL pump-chain- 1.2 boost evidence decayed — outside auto_1hr scope, needs CEO/session action
