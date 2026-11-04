@@ -322,7 +322,10 @@ LOSERS_SHORT = {
 }
 # Legacy combined set — DIRECTION-BLIND in decider (HARD-BLOCK + conf penalty).
 # BTC removed 2026-10-24 → LOSERS_LONG (see above). ME/PUMP left per CEO scope.
-LOSERS = set()
+LOSERS = {
+    'BLUR'
+}
+
 
 
 
@@ -5715,7 +5718,7 @@ VOL_GATE_SHORT_EXEMPT_ENFORCE = False    # item 3: False => vol-gate 0.0 block s
 # & 2/3 positive days, deadline 2026-11-17. Evidence CONFLICT: fwd +0.265 n=129
 # dedup vs realized prior 141T 43.3% -$0.42 — hence shadow only.
 # polarity: ENFORCE=False => log-only shadow; True => exempt SHORT from the
-# MAXXED (ATR%>=4.0) block in bear structure (bar-gated)
+# MAXXED (ATR%>=MAXXED_ATR_PCT_THRESH=6.0) block in bear structure (bar-gated) [bug_hunter LOW-1 text fix 2026-11-04]
 MAXXED_SHORT_EXEMPT_SHADOW = True        # item 4: log [MAXXED-SHORT-EXEMPT-SHADOW] WOULD-PASS at BOTH MAXXED sites (compactor approval + decider exec)
 MAXXED_SHORT_EXEMPT_ENFORCE = False      # item 4: False => MAXXED block stays for both directions (zero behavior change); True => SHORT exempt (NOT shipped — bar first)
 # Bar (registry maxxed-short-exempt-shadow): n>=20 token-days, deadline
