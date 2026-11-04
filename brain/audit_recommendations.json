@@ -1,145 +1,151 @@
 {
-  "timestamp": "2026-11-03T21:04:09Z",
-  "run": 218,
+  "timestamp": "2026-11-04T04:55:00Z",
+  "run": 219,
   "session_brain_stats": {
     "queries": [
-      "signal performance winrate regime",
-      "losing money bleeding hard_max_loss chop",
-      "creative idea improvement strategy not implemented"
+      "exact mirror giveback exit",
+      "stop tighten enforce guardian",
+      "jup yolo hard max loss entry"
     ],
-    "top_insights": [
-      "Recurring: hard_max_loss/chop entries = structural bleed; trail family = only win path (reconfirmed live)",
-      "Recurring: stop asymmetry jup/vb (avg loss 2x avg win) — owned by stop-asymmetry-highwr 11-14",
-      "No unimplemented high-score idea surfaced that isn't already in shadow_disposition"
-    ]
+    "top_insight": "Session brain independently flagged the same guardian-restart gap ('guardian restart note (item1)'; 'Guardian is running from Aug22 — hasn't been restarted since the fix') — confirms stale import-time binding is a RECURRING daemon class, not a one-off."
   },
   "trade_summary_24h": {
-    "n": 43,
-    "wr_pct": 60.5,
-    "gross_pnl": -0.4,
-    "fees": 0.61,
-    "net_pnl": -1.01,
-    "7d": {
-      "n": 272,
-      "wr_pct": 54.4,
-      "gross": -2.28,
-      "fees": 2.53,
-      "net": -4.81
-    },
-    "chop_bleed_7d": "98.5% dollar share (99/110 losers from chop exits) = 14th consecutive >=92% window",
-    "trail_vs_other_7d": "trail-family 143T 89.5% +8.62 vs unarmed/other 130T 15.4% -11.00",
-    "by_exit_7d": "atr_sl_hit 41T -4.50 0%WR | hard_max_loss 26T -3.51 0%WR | profit-monster-trail 93T +5.38 97.8%WR"
+    "n": 48,
+    "wr": 56.3,
+    "gross_usdt": -0.25,
+    "fees_usdt": 0.65,
+    "net_usdt": -0.9,
+    "n_7d": 284,
+    "wr_7d": 54.2,
+    "gross_7d": -2.22,
+    "fees_7d": 2.78,
+    "net_7d": -5.0,
+    "armed_7d": "137T 85.4% +6.61",
+    "unarmed_7d": "147T 25.2% -8.83",
+    "trail_family_7d": "148T 89.9% +9.18",
+    "chop_stop_7d": "88T 0% -10.41",
+    "chop_bleed_7d": "100/116 losers never-armed (86.2%), -$11.32 of -$11.98 = 94.5% dollar share",
+    "arm_rate_7d": "LONG 49.3% (n=219) / SHORT 44.6% (n=65)",
+    "armed_14d": "211T 82.5% +9.91",
+    "unarmed_14d": "209T 24.9% -12.60",
+    "open_after_run": 0,
+    "last_closes": "SOL #16771 +0.22 PM-trail (stop-tighten 0.75 enforce applied at open), BTC #16769 +0.08 PM-trail — cluster steer resolved as 2 wins"
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 20:30Z (mandate). Overall flip-WR 45.8% n=1139. pc- 64.6% (226/350) LIVE fade stands; btc-pump-rider+ 37.4% (295/788) do-NOT-flip. pc- token heterogeneity p=0.37 = uniform → cell-split NO CHANGE confirmed. by-BTC-tape: pc- BELOW 67.8% n=211 / AT 58.6% n=111 / ABOVE 64.3% n=28.",
-    "tat_shadow_jup_vb": "#214 WORKING: 25 distinct jup trades would-fired (5411 log lines) since 11-01. vb- 0 fires = correct-by-traffic (all post-ship vb- closes <45m). Ready to schedule candle OOS (exceeds 15-fire bar).",
-    "floor_admit": "join fresh 04:41Z today (16h old, producer runs via agent) — COLLECT to 11-15 unchanged",
-    "oscillator": "ARCHIVED fossil — dead",
-    "wyckoff": "PENDING JOIN (345 rows) — owed before 11-15",
-    "rr_shadow": "ORPHANED — do not cite",
-    "shadow_trader": "trail-or-nothing unchanged (pm_trail +8511 vs hard_max -9605); gates justified (CONFLUENCE-EXPIRY 15026 @47%)",
-    "overall": "contrarian + TAT + floor_admit = useful; oscillator/wyckoff/rr dead"
+    "contrarian": "JOIN REFRESHED 04:30Z (ran unconditionally): overall flip-WR 45.8% n=1139; pump-chain- 226W/124L = 64.6% (LIVE fade stands); btc-pump-rider+ 37.5% do-NOT. pc- token heterogeneity chi2 p=0.375 = uniform, cell-split NOT warranted (closes amplify-pc-fade-cell-split why-not).",
+    "oscillator": "FROZEN+ARCHIVED — skip (OSCILLATOR_MULT_ENABLED=True, no writer).",
+    "wyckoff": "PENDING JOIN (345 rows) — unanswerable.",
+    "floor_admit": "join 11-03 04:41Z COLLECT to 11-15 — not re-run this run (daily runner owns it).",
+    "rr_shadow": "ORPHANED (no producer) — skip.",
+    "shadow_trader": "59,320 signals / 58,354 closed. Gates justified: CONFLUENCE-EXPIRY 15,093 @47% would-win. Exit A/B: pm_trail +8702 dominant; hard_max -9929 / rr_engine -3719 = the bleed. Top source grind-breakout- 26T 92.3% avg +1.56 (in-flight amplify-grind-breakout-deploy).",
+    "overall": "2/6 useful (contrarian + shadow_trader). Contrarian re-ran fresh; oscillator/wyckoff/rr dead; floor on its own timer."
   },
   "drift_findings": [
     {
-      "severity": "MED",
-      "finding": "disposition-cadence-revert status=done claimed 'timer OnCalendar back to Mon 08:15 (config+etc+daemon-reload)' at 04:55Z but BOTH config and /etc still had OnCalendar=*-*-* 08:15:00 at 20:57Z (mtimes Oct 27/29 — never touched).",
-      "action": "ACTUALLY executed the revert this run: both files -> Mon *-*-* 08:15:00 + daemon-reload. Next fire Mon 11-09 08:15Z. Registry note corrected."
+      "severity": "HIGH",
+      "finding": "Guardian ran PRE-SHIP stop-tighten constants after CEO 2026-11-04 ship — 34 [STOP-TIGHTEN-SHADOW] lines 00:00-04:06 with cap=1.0% enforce=False from site=guardian_selfclose while pm/decider logged cap=0.75% enforce=True. Ship note explicitly said 'GUARDIAN RESTART NEEDED (import-time binding)'. ActiveEnterTimestamp was 2026-11-03 05:16 — never restarted.",
+      "action": "FIXED: restarted hermes-hl-sync-guardian 04:43:44Z; PID start 04:43:43 > constants mtime 03:50:54, so all 5 hook sites now share shipped constants. Verify first post-restart guardian_selfclose line shows cap=0.75 enforce=True (hourly dedup — expect by hour 05Z)."
     },
     {
       "severity": "LOW",
-      "finding": "FARTCOIN BE-lock steer re-fires every 30m and is correctly skipped ('T1 exact mirror — pro exit governs') — hl_copy_trader stops are provider-governed. Steer noise only, auto_executable=true is misleading for mirror trades.",
-      "action": "report-only; optional watchdog tweak to mark mirror-trade steers auto_executable=false"
+      "finding": "Registry stop-tighten-enforce-eval default_action still said 'ENFORCE stays False' after CEO flipped it True — stale disposition would misdirect the 11-14 read.",
+      "action": "FIXED: disposition + notes updated in data/shadow_disposition.json."
     },
     {
       "severity": "INFO",
-      "finding": "bb-bounce-v2-long+ 14d 19T 36.8% still sub-50 n>=15 — already owned (TAT-C live, CEO packet complete, kill bars fail on winner-kill)",
-      "action": "no new action"
+      "finding": "Watchdog steer-002 (hl_copy_trader 3-loss streak) — 14d n=11 (27.3% WR) is below the n>=20 bar; the 3 NULL-SL losers are T1 exact-mirror trades whose engine SL/TP is cleared BY DESIGN (position_manager.py:3047), not a missing-stop bug.",
+      "action": "MONITOR only. The real T1 question is giveback (see creative/amplify)."
     }
   ],
   "recurring_problems": [
-    "Chop-bleed >=92% dollar share: 14th consecutive window (0.75x plain-marker stays VETO #196; entry-quality stack + TAT own the lever)",
-    "Stop asymmetry jup/vb: losers ride 2x farther than winners collect — stop-asymmetry-highwr due 11-14",
-    "Fee-net: 7d gross -2.28 -> net -4.81; every amplify threshold must read net (BUG-073 standard)"
+    "Stale import-time binding in long-lived daemons (guardian now; same class flagged in session brain for Aug22-era runs) — constants file edits do not reach running processes.",
+    "Chop-bleed: 94.5% dollar share of 7d loser PnL is never-armed trades — entry quality, not exits. 4th consecutive run above the 92% line.",
+    "jup_yolo_mirrored owns the HML tail: 21/31 7d HML hits and -$3.04 of ~-$4.3 — the family was born 10-30, so all its HML is <7d old."
   ],
   "missing_implementations": [
-    "jup TAT candle OOS — shadow has 25 distinct fires (>15 bar) but OOS harness not yet run for #214 flags",
-    "wyckoff outcome join — 345 rows still no outcome column (owed 11-15)"
+    "Daemon constants-freshness probe (no check that service start > hermes_constants.py mtime) — proposed as creative #2 this run.",
+    "T1 exact-mirror giveback ceiling (only the -0.80% floor protects a +3.6% MFE round-trip) — proposed as amplify-xmirror-giveback this run."
   ],
   "creative_improvements": [
     {
-      "date": "2026-11-03T21:04:09Z",
-      "idea": "Run jup TAT candle-level OOS now (25 distinct would-fires accumulated since #214 ship)",
-      "rationale": "#214 shipped shadow-only explicitly 'for candle OOS before any enforce'; 25 fires exceeds the 15-fire bar used for TAT-C. Pump-chain TAT lesson: trades-level overstates, fk was 36.8% — must use candle harness (tat_variant_c_candle_oos pattern).",
-      "expected_impact": "GO/NO-GO on jup TAT enforce (90m) — could cut ~50% of never-armed jup bleed (-5.42/14d chop exits) if fk<=20%",
-      "category": "exit sniper",
-      "status": "suggested",
-      "risk": "low (analysis only, zero live change)"
+      "date": "2026-11-04T04:55:00Z",
+      "idea": "T1 exact-mirror giveback ceiling (shadow): exit when peak MFE >= +1.50% price gives back to <= +0.50% while is_exact_mirror_trade — currently only the -0.80% catastrophic floor applies",
+      "rationale": "3/11 hl_copy 14d trades are T1 exact-mirror (SL/TP cleared by design). FARTCOIN rode mfe_pct +3.64% to hard_max_loss -3.71% pnl, XPL +3.68% to -2.90%. Every other signal 14d: 0/417 NULL SL. The round-trip is structural, not directional.",
+      "expected_impact": "Recover ~1.0-2.5% price per rescued trade; bar n>=15 shadow events AND net +$0.50/14d AND T sign-off (overrides 'their exits are our exits' for the ceiling leg only)",
+      "category": "exit",
+      "status": "registered",
+      "risk": "medium (needs T/CEO — touches a standing T directive)"
     },
     {
-      "date": "2026-11-03T21:04:09Z",
-      "idea": "fade-ctx-exempt: report gross-vs-fee split at 11-10 — WR edge is real (+15pp) but fee-net fails bar",
-      "rationale": "n=33 PASS, NET -0.37 FAIL. Fees 0.345 on gross -0.02. Pre-registered bar says net — do NOT move goalposts mid-flight; surface the decomposition so CEO can decide size/fee interaction at flip time.",
-      "expected_impact": "prevents either silent goalpost-move or premature kill of a directionally-correct fade",
-      "category": "process",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-11-03T21:04:09Z",
-      "idea": "rider token-cell amplify why-not WITH DATA (prevents re-derivation)",
-      "rationale": "btc-pump-rider+ heterogeneity p=5.9e-26: AVAX flip 68.8% n=32, DOGE 71.4% n=21, USELESS 72.2% n=18 look flippable — but NONE clear the pre-registered ship bar (>=70% AND n>=30): AVAX 68.8<70, DOGE/USELESS n<30. ACE/SAND/CFX/ALGO/HYPE/ONDO at 0% flip = original always wins.",
-      "expected_impact": "logs the why-not so next run doesn't re-mine the same cells",
-      "category": "amplify",
+      "date": "2026-11-04T04:55:00Z",
+      "idea": "Daemon constants-freshness probe: systemd timer checks every long-running service's ActiveEnterTimestamp vs hermes_constants.py mtime; alert on any service older than the file",
+      "rationale": "Guardian shipped-constant drift found today was the 2nd occurrence of the same class (session brain: 'Guardian is running from Aug22 — hasn't been restarted since the fix'). import-time binding means every constants edit silently misses daemons until someone remembers to restart.",
+      "expected_impact": "Zero-code; prevents the whole stale-binding bug class (stop-tighten was the 2nd victim)",
+      "category": "meta/infra",
       "status": "suggested",
       "risk": "low"
     }
   ],
   "config_changes_applied": [
     {
-      "change": "hermes-shadow-disposition.timer OnCalendar *-*-* 08:15 -> Mon *-*-* 08:15 (config + /etc + daemon-reload)",
-      "type": "meta/systemd",
-      "rationale": "disposition-cadence-revert falsely claimed done; cluster is dispositioned so weekly cadence per signed threshold",
-      "trading_constants": "NONE — hermes_constants.py EMPTY diff"
+      "change": "systemctl restart hermes-hl-sync-guardian.service (04:43:44Z)",
+      "type": "ops/restart",
+      "rationale": "CEO ship note required guardian restart for import-time STOP_TIGHTEN binding; process was still on cap=1.0/enforce=False",
+      "trading_constants": "NONE — hermes_constants.py not touched by this run (mtime 03:50:54 = CEO ship)"
+    },
+    {
+      "change": "data/shadow_disposition.json: stop-tighten-enforce-eval disposition refreshed + amplify-xmirror-giveback added (72 entries)",
+      "type": "registry",
+      "rationale": "stale disposition after CEO ENFORCE flip; AMPLIFY >=1 proposal/run mandate",
+      "trading_constants": "NONE"
     }
   ],
   "changes_from_last_run": [
     {
-      "change": "#214 TAT jup/vb shadow",
-      "verified": "WORKING — 25 distinct jup fires, vb- 0 correct-by-traffic",
-      "verdict": "keep collecting; schedule candle OOS"
+      "change": "#218 disposition-cadence timer revert (OnCalendar daily -> Mon 08:15)",
+      "verified": "PASS — systemctl cat shows Mon *-*-* 08:15:00, next fire Mon 2026-11-09 08:15Z, last fired Tue 11-03 08:15Z"
     },
     {
-      "change": "#217 amplify-pc-fade-cell-split",
-      "verified": "dispositioned done same day NO CHANGE; join re-run confirms uniform (p=0.37)",
-      "verdict": "stands"
+      "change": "#218 creative: jup TAT candle OOS (25 fires ready)",
+      "verified": "QUEUED, not yet run — harness analysis/tat_variant_c_candle_oos_2026-10-24.py needs a jup-scoped variant; carried to next_actions"
     },
     {
-      "change": "#217 watch-contrarian EXTEND rec",
-      "verified": "written to registry; evidence refreshed this run (NET -0.37, EXTEND to 11-10 stands)",
-      "verdict": "working as intended"
-    },
-    {
-      "change": "UM_HOLD self-close (prior runs)",
-      "verified": "not re-tested this run (no UM_HOLD candidates open)",
-      "verdict": "n/a"
+      "change": "#217 AMPLIFY pc-fade cell-split",
+      "verified": "DONE-CLOSED this run: join now emits by-token/by-BTC-tape; pc- chi2 p=0.375 = uniform → no cell split warranted (threshold's <55% exclusion leg also empty)"
     }
   ],
+  "harvest_ship_verification": {
+    "item1_stop_tighten": "0.75/True in constants ✅; pm+decider firing cap=0.75 enforce=True ✅ (9 lines); guardian WAS stale ❌ → FIXED by restart 04:43Z; early signal: SOL #16771 opened 03:50 under enforce, closed +0.22 PM-trail",
+    "item2_jup_fill_cap": "LIVE ✅ — 'Cap C — jup_yolo 9 fills in last 6h (max 1)' firing continuously since 04:33; 0 jup fills since 04:30. rolling-50 share 64% now, target <35% by 11-06 (depends on non-jup fill rate ~2-4/h during daytime)",
+    "item3_long_bypass_block": "WIRING ✅ (TST tests pass incl. fail-open stub); 0 real fires yet — jup cap is absorbing the bypass traffic first. Metric: LONG fills in SHORT_BIAS -50% within 48h",
+    "item4_weights": "bb-squeeze+ 1.3 ✅ signal_compactor.py:627 + combo_weights.json; warrior-sr-confirm± 1.6 ✅ :711-712; vol-gate HIGH allowlist: not re-verified this run — next_actions"
+  },
+  "amplify_weekly": {
+    "screen": "30d winner cells n>=10 net>0: 7 cells — 4 already VALIDATED (pc+ EXTREME / bb-squeeze NORMAL / vb- HIGH / r2v2 NORMAL), 3 check-cells previously why-not'd or in-flight (pc- NORMAL SHORT OOS-unstable h1 +0.45/h2 +0.13 n=11; pc-,v6- EXTREME sign-flip; jup HIGH SHORT = amplify-jup-short-walk). Early n=5-9 cells: r2v2 NORMAL +0.78, warrior+ NORMAL +0.29 (CEO-boosted today), jup FLAT LONG +0.25 100% (n=7).",
+    "proposal_emitted": "amplify-xmirror-giveback (kind=amplify, type (a) counterfactual, deadline 11-18, n>=15 bar, T sign-off required)",
+    "why_not_winner_cell_change": "Every n>=10 positive cell is already validated, previously why-not'd, or covered by an in-flight entry (winner-cell-size-125 11-10, amplify-jup-short-walk 11-14, harvest item-4 bb/warrior boost shipped today). Re-proposing would duplicate.",
+    "flip_kpi": "0 NEW shadow->live conversions this run. In-flight conversions to service: watch-contrarian-live (11-10), fade-ctx-exempt (11-10), winner-cell-size-125 (11-10), stop-tighten ENFORCE (CEO-shipped today), harvest-ship (11-07 read)."
+  },
+  "autopsy_48h": {
+    "method": "brain/analysis/recovery_replay.py adverse-first (selfcheck PASS)",
+    "n": 43,
+    "never_adverse": 8,
+    "recovered_after_adverse": 33,
+    "never_traded_back": 2,
+    "never_ids": "ETH SHORT jup -0.19 (#16699), HYPE SHORT jup -0.09 (#16712)",
+    "verdict": "wrong-side REFUTED 73rd consecutive run (structural NEVER 2/43 = 4.7% vs ~17.5% baseline; #61 p=0.116, #84 t=-0.04 stand)"
+  },
   "next_actions": [
-    "Schedule jup TAT candle OOS (tat_variant_c harness pattern, T=90) — 25 fires ready",
+    "Verify first post-restart guardian_selfclose line shows cap=0.75% enforce=True (hour 05Z dedup)",
     "11-05: fade-btc-crash-postflip, ichimoku-bypass-lowjoin",
-    "11-06: momentum-cache-regime-coverage, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit",
-    "11-07: jup-yolo-regime-review, trial-wider-sl, trial-extended-time, volmom-volbreak; stop-tighten-probe label deadline",
-    "11-09: signal-zombie-purge; disposition timer next fire Mon 08:15",
-    "11-10: fade-ctx-exempt bar read (gross/fee split), winner-cell-size-125, watch-contrarian kill/promote, rsi-ceiling-75-live",
+    "11-06: jup fill-cap rolling-50 share read (target <35%), momentum-cache-regime-coverage, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, LONG-in-SHORT_BIAS -50% read",
+    "11-07: jup-yolo-regime-review, trial-wider-sl, trial-extended-time, harvest-ship first read, stop-tighten-probe label deadline",
+    "11-09: signal-zombie-purge; disposition timer fires Mon 08:15",
+    "11-10: fade-ctx-exempt bar (gross/fee split), winner-cell-size-125, watch-contrarian kill/promote, rsi-ceiling-75-live",
     "11-13: pump-chain+ weight kill-review",
-    "11-14: stop-asymmetry, atrtrail-clip-12, winner-cell mult-150, grind-breakout, stop-tighten reads",
-    "CEO: stop-tighten-probe-080 label (by 11-07) · HYPE 2.0 fee · NET-KPI switch · tier-2 ACK"
-  ],
-  "readiness": {
-    "open_trades": 5,
-    "all_long": true,
-    "notes": "FARTCOIN +2.2% (mirror, BE-lock skip by design), XPL +0.3% 13h stale, BTC jup +0.2%, SOL jup -0.1%, ETH jup flat (opened 20:48). Cluster LONG warning. Regime 15m SHORT_BIAS vs 4h LONG_BIAS disagree, continuum ABOVE, vol NORMAL. Size-reduce absent=1.0x. No new correlated LONGs recommended while 15m SHORT_BIAS.",
-    "kill_switch": "LIVE_TRADING_ENABLED=True + hype_live_trading.json (both required)"
-  }
+    "11-14: stop-tighten-enforce-eval read (now measures LIVE clamp), stop-asymmetry, atrtrail-clip-12, winner-cell mult-150",
+    "11-18: amplify-xmirror-giveback shadow read",
+    "Carry: jup TAT candle OOS harness run (25 fires > 15 bar)",
+    "CEO stack unchanged: stop-tighten-probe-080 label (by 11-07) · HYPE 2.0 fee · NET-KPI switch · harvest-ship 4-item eval (11-07)"
+  ]
 }

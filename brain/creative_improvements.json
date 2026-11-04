@@ -10413,5 +10413,23 @@
     "category": "amplify",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-04T04:55:00Z",
+    "idea": "T1 exact-mirror giveback ceiling (shadow): exit when peak MFE >= +1.50% price gives back to <= +0.50% while is_exact_mirror_trade — currently only the -0.80% catastrophic floor applies",
+    "rationale": "3/11 hl_copy 14d trades are T1 exact-mirror (SL/TP cleared by design). FARTCOIN rode mfe_pct +3.64% to hard_max_loss -3.71% pnl, XPL +3.68% to -2.90%. Every other signal 14d: 0/417 NULL SL. The round-trip is structural, not directional.",
+    "expected_impact": "Recover ~1.0-2.5% price per rescued trade; bar n>=15 shadow events AND net +$0.50/14d AND T sign-off (overrides 'their exits are our exits' for the ceiling leg only)",
+    "category": "exit",
+    "status": "registered",
+    "risk": "medium (needs T/CEO — touches a standing T directive)"
+  },
+  {
+    "date": "2026-11-04T04:55:00Z",
+    "idea": "Daemon constants-freshness probe: systemd timer checks every long-running service's ActiveEnterTimestamp vs hermes_constants.py mtime; alert on any service older than the file",
+    "rationale": "Guardian shipped-constant drift found today was the 2nd occurrence of the same class (session brain: 'Guardian is running from Aug22 — hasn't been restarted since the fix'). import-time binding means every constants edit silently misses daemons until someone remembers to restart.",
+    "expected_impact": "Zero-code; prevents the whole stale-binding bug class (stop-tighten was the 2nd victim)",
+    "category": "meta/infra",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

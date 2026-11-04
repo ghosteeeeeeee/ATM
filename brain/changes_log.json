@@ -3462,5 +3462,38 @@
     "after": "OnCalendar=Mon *-*-* 08:15:00 in both files; next fire Mon 2026-11-09 08:15Z",
     "rationale": "Registry entry disposition-cadence-revert claimed REVERT EXECUTED at 04:55Z but files never touched (mtimes Oct 27/29); 11-03 cluster is dispositioned so weekly cadence per signed threshold",
     "impact": "shadow-disposition packets fire weekly again; no trading behavior change"
+  },
+  {
+    "timestamp": "2026-11-04T04:43:44Z",
+    "agent": "brain_auditor",
+    "change": "Audit #219: restarted hermes-hl-sync-guardian.service so the shipped STOP_TIGHTEN constants (0.75/ENFORCE=True) bind — process had been running since 11-03 05:16 and logged cap=1.0% enforce=False on 34 lines 00:00-04:06",
+    "type": "ops",
+    "file": "hermes-hl-sync-guardian.service",
+    "before": "ActiveEnterTimestamp 2026-11-03 05:16:53Z (pre-ship import-time binding, cap=1.0 enforce=False)",
+    "after": "ActiveEnterTimestamp 2026-11-04 04:43:44Z (PID start 04:43:43 > constants mtime 03:50:54 — cap=0.75 enforce=True)",
+    "rationale": "CEO harvest-ship note required the restart; without it the guardian_selfclose hook node was inert/stale while pm+decider enforced",
+    "impact": "All 5 stop-tighten hook sites now share shipped constants; first post-restart guardian line expected hour 05Z (hourly dedup). No trading-constant change."
+  },
+  {
+    "timestamp": "2026-11-04T04:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #219: registry updates — stop-tighten-enforce-eval disposition refreshed (ENFORCE now True per CEO ship), new amplify-xmirror-giveback entry (T1 exact-mirror giveback ceiling, n>=15 bar, deadline 11-18)",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "71 entries, stop-tighten disposition still said ENFORCE stays False",
+    "after": "72 entries, disposition corrected, amplify-xmirror-giveback added",
+    "rationale": "stale disposition would misdirect the 11-14 read; AMPLIFY weekly >=1 proposal mandate",
+    "impact": "reporting/registry only — zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-04T04:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #219: wrote brain/audit_recommendations.json + appended 2 creative entries (xmirror giveback ceiling; daemon constants-freshness probe)",
+    "type": "creative",
+    "file": "brain/audit_recommendations.json",
+    "before": "run #218 artifacts",
+    "after": "run #219 artifacts",
+    "rationale": "Mandate: audit output + >=1 creative idea per run",
+    "impact": "reporting only"
   }
 ]
