@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-03T08:15:00.128775+00:00
-registry: 68 entries (open=36)
+# Shadow disposition report — 2026-11-04T16:46:45.786265+00:00
+registry: 72 entries (open=35)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -23,13 +23,14 @@ registry: 68 entries (open=36)
 - DONE db-mirror-0byte: KILL (2026-10-27)
 - DONE escalation-17: STALE-CLOSED per registry default (deadline passed, CEO never answered across 48 re-issues). Operational answer stands from audits #95-#217: bb-bounce DO NOT DISABLE (armed 20T 89% vs unarmed 0%, owner TAT variant-C); exit-ladder candle OOS route remains CLOSED (MFE-CUT redesign required per constants comment). Re-escalate only with a NEW packet, not this id. (2026-11-03T04:55:46Z)
 - DONE ugb-pt-045: KEEP 0.45 — threshold PASS (7d avg 0.0574 > baseline-0.30 avg 0.0442, n=19>=10; sum +1.09 vs prior +0.53) (2026-11-03T04:55:46Z)
-- DONE disposition-cadence-revert: REVERT EXECUTED — 11-03 cluster dispositioned (ugb KEEP / midband NO-CHANGE / esc-17 stale-close / watch-contrarian EXTEND); timer OnCalendar back to Mon 08:15 (config+etc+daemon-reload) (2026-11-03T04:55:46Z)
+- DONE disposition-cadence-revert: REVERT EXECUTED (claimed 04:55Z) BUT FILES WERE STILL DAILY — brain_auditor #218 found config+/etc OnCalendar=*-*-* 08:15:00 at 20:57Z, actually reverted both to Mon *-*-* 08:15:00 + daemon-reload. Next fire: Mon 2026-11-09 08:15Z. Status stays done. (2026-11-03T04:55:46Z)
 - OPEN fade-ctx-exempt: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - OPEN winner-cell-size-125: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - DONE bb-squeeze-hml-entry-profile: NO-CHANGE (report-only, per threshold) (2026-10-29)
 - DONE amplify-weekly-mandate: MET 2026-11-02 (Monday weekly run): 30d winner-cell screen re-run (6 cells n>=10 net>0 — 4 VALIDATED, 2 OOS why-not'd), new proposal amplify-pc-fade-cell-split emitted, why-nots documented in kanban. Flip-KPI: 0 new conversions this run; in-flight watch-contrarian-live (11-03), storm-waiver (11-12). (?)
 - DONE fade-volgate-split-analysis: VALID — exemption candidate cleared (CEO rule met) (2026-10-29)
 - OPEN fade-btc-crash-postflip: deadline=2026-11-05T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for fade-btc-crash-postflip
 - OPEN storm-confl-waiver: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN storm-readiness-packet: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN signal-zombie-purge: deadline=2026-11-09T00:00:00Z | (no parseable source)
@@ -44,17 +45,17 @@ registry: 68 entries (open=36)
 - OPEN reentry-study: deadline=2026-11-21T00:00:00Z | (no parseable source)
 - DONE chase-move-shadow: KILL (2026-10-31)
 - OPEN conf-filter-parity-split: deadline=2026-11-10T00:00:00Z | (no parseable source)
-- OPEN ichimoku-bypass-lowjoin-ticket: deadline=2026-11-05T00:00:00Z | (no parseable source)
+- DONE ichimoku-bypass-lowjoin-ticket: KILL executed — ICHIMOKU_LONG_BYPASS_ENABLED=False (join 0.15% below floor) (2026-11-04)
 - DONE stop-asymmetry-highwr: SHIP-TO-SHADOW — SL at 1.0% price passes bar on both signals (WR not down); shadow-first spec delivered, NO live change (2026-10-31)
 - DONE short-relax-shadow-study: AGGREGATE UNATTRIBUTABLE — accept base rates (2026-10-31)
 - OPEN pump-chain-plus-weight-kill-review: deadline=2026-11-13T00:00:00Z | (no parseable source)
-- OPEN trial-wider-sl: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 55535 rows, 0.0d
-- OPEN trial-extended-time: deadline=2026-11-07T00:00:00Z | brain/shadow_trades.db: 55535 rows, 0.0d
+- DONE trial-wider-sl: KILL — bar dead both axes (CEO hail-mary 20261104T161050Z): wider arm 37.7% WR vs 55.0% bar AND vs 43.7% current arm (-6.0pp); PnL -506.6% vs -257.1% (wider worse both) (2026-11-04)
+- DONE trial-extended-time: KILL — bar dead both axes (CEO hail-mary 20261104T161050Z): extended arm -15.7pp WR-improvement vs +5.0pp bar (40.9% vs 56.6% current, n=16872); PnL axis divergence (+1422.5pp extended) documented, CEO ruled KILL over the divergence (2026-11-04)
 - OPEN watch-contrarian-live: deadline=2026-11-10T00:00:00Z | (no parseable source)
-- OPEN gate-shadow-capture-coverage-fix: deadline=2026-11-06T00:00:00Z | brain/gate_shadow.db: 63126 rows, 0.0d
-- OPEN candle-collector-coverage-audit: deadline=2026-11-06T00:00:00Z | data/candles.db: 10554279 rows, 0.0d
+- OPEN gate-shadow-capture-coverage-fix: deadline=2026-11-06T00:00:00Z | brain/gate_shadow.db: 66747 rows, 0.0d
+- OPEN candle-collector-coverage-audit: deadline=2026-11-06T00:00:00Z | data/candles.db: 10642403 rows, 0.0d
 - OPEN stop-tighten-enforce-eval: deadline=2026-11-14T00:00:00Z | (no parseable source)
-- OPEN amplify-grind-breakout-deploy: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- DONE amplify-grind-breakout-deploy: NO CHANGE — bar FAILS clause 3 (no non-colliding widen path); why-not logged 2026-11-04 (audit #220) (?)
 - DONE amplify-pc-fade-cell-split: NO CHANGE — no cell clears ship bar (measured 2026-11-02 16:53Z) (2026-11-02T16:55:00Z)
 - OPEN amplify-stop-tighten-probe-080: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - DONE jup-hml-shadow-065-050: REJECT — pre-registered eval ran 2026-11-02 (n=84): hml65 net -$0.30, hml50 net -$0.42 vs baseline +$1.44 → both REJECT, no enforce (verdicts stable across re-runs). Registered retroactively 2026-11-03 (was unregistered — chase-move-shadow governance-gap class). (2026-11-02)
@@ -69,3 +70,7 @@ registry: 68 entries (open=36)
 - OPEN maxxed-short-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN gate-shadow-dedup-convention: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - OPEN long-bypass-regime-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN short-shadow-join-builder: deadline=2026-11-16T00:00:00Z | (no parseable source)
+- DONE timer-cadence-recheck: RE-DAILY EXECUTED — option (a) taken as registered default: OnCalendar back to *-*-* 08:15 (repo + /etc, daemon-reload + timer restart verified). Rationale: weekly (Mon-only, from disposition-cadence-revert) could not honor 11-05/11-06/11-07 reads incl. the 11-07 fold-line packet; calendar now has 6+ deadlines 11-07..11-17. Re-evaluate cadence when calendar is sparse (new entry needed then). (2026-11-04)
+- OPEN harvest-ship-2026-11-04: deadline=2026-11-07T00:00:00Z | (no parseable source)
+- OPEN amplify-xmirror-giveback: deadline=2026-11-18T00:00:00Z | (no parseable source)

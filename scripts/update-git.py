@@ -113,6 +113,7 @@ def main():
 
     if dry:
         print(f"[dry-run] Would create release {tag_name}")
+        os.unlink(full_zip)  # dry path leaked the archive — 171 zips/2.8GB in /tmp before this fix
         return
     # 6. Push to GitHub (both remotes)
     if not no_push:

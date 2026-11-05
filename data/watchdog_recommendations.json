@@ -1,29 +1,20 @@
 {
-  "timestamp": "2026-11-04T07:12:10.357450+00:00",
-  "steers": [
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'hl_copy_trader' losing streak: 3 consecutive losses",
-      "detail": "Net -0.23 USDT over last 20 trades (window losses: -0.23). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-001"
-    }
-  ],
+  "timestamp": "2026-11-05T02:42:18.814172+00:00",
+  "steers": [],
   "portfolio_health": "good",
   "regime": {
     "btc_15m": "LONG_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "ABOVE",
-    "volatility": "NORMAL",
+    "btc_4h": "LONG_BIAS",
+    "continuum": "AT",
+    "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.75,
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 1
+  "open_count": 0
 }

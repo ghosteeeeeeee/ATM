@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-04 02:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-05 02:46 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,654 | **WR:** 51.3% | **PnL:** -108.26%
+- **Total trades (all time):** 3,680 | **WR:** 51.3% | **PnL:** -109.85%
 - **Date range:** 2026-07-29 → 2026-11-04
 
 ---
@@ -11,7 +11,8 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| jup_yolo_mirrored | LONG | 3 | 66.7% | -0.18 | 15 | 73.3% | +0.60 | ❓ |
+| jup_yolo_mirrored | LONG | — | —% | — | 5 | 60.0% | +0.50 | ❓ |
+| bb-squeeze+ | LONG | — | —% | — | 6 | 66.7% | +0.22 | ENABLED |
 
 ---
 
@@ -25,8 +26,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| hl_copy_trader | LONG | 5 | 40.0% | -0.63 | ❓ | Borderline |
-| pump-chain- | LONG | 3 | 33.3% | -0.51 | ❓ | Needs more data |
+| warrior-sr-confirm+ | LONG | 3 | 33.3% | -0.01 | ENABLED | Needs more data |
 
 ---
 
@@ -44,9 +44,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] hl_copy_trader LONG** — WR=40.0%, PnL=-0.63% over 5 trades. Monitor next cycle.
-2. **[WATCH] pump-chain- LONG** — WR=33.3%, PnL=-0.51% over 3 trades. Monitor next cycle.
-3. **[KEEP] 1 winning combos** — jup_yolo_mirrored. LONG side dominant.
+1. **[WATCH] warrior-sr-confirm+ LONG** — WR=33.3%, PnL=-0.01% over 3 trades. Monitor next cycle.
+2. **[KEEP] 2 winning combos** — jup_yolo_mirrored, bb-squeeze+. LONG side dominant.
 
 ---
 
@@ -58,15 +57,15 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-04 | e41faad | scripts: CEO capital brake 20261104T172347Z — DAILY_FILL_CAP... |
+| 2026-11-04 | e06fc55 | scripts: hail-mary 20261104T161050Z — kill trial-wider-sl + ... |
+| 2026-11-04 | 11fa30c | scripts: bug_hunter LOW-1 text fix — MAXXED comment/stream s... |
+| 2026-11-04 | 6d5f138 | scripts: harvest ship 2026-11-04 — stop-tighten 0.75+ENFORCE... |
 | 2026-11-03 | 4af44b7 | scripts: CEO fix-round 2 (consult 20261103T064755Z) — SHORT_... |
 | 2026-11-03 | 6bc7eeb | scripts: A1/A2 short shadow exemptions + A4 tombstone + A3 i... |
 | 2026-11-03 | 7f246c6 | blacklist: HYPE both directions (T directive 2026-11-03) |
 | 2026-11-03 | 3ebd4e5 | fix: bug_hunter audit round — N3 crash, sim baseline, regist... |
 | 2026-11-03 | 0592424 | watchlist: own $30 margin floor, split from topdogs' $50 (T:... |
 | 2026-11-02 | f82944f | dashboards: watchlist — custom addresses to follow, add/remo... |
-| 2026-11-02 | 0f81419 | topdogs: $50 margin noise floor (T custom) + retro-clean eve... |
-| 2026-11-02 | bad2f4a | scripts: bug_hunter audit fixes on HML/ATRSL shadow change-s... |
-| 2026-11-02 | c556a3c | fix: bug_hunter pacing audit — cyclic cursor (MEDIUM), truth... |
-| 2026-11-02 | cf81f67 | dashboards: topdog tracker — top-tier YOLO traders, per-coin... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

@@ -917,3 +917,33 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 46T -0.05 58.7% | 7d 282T -1.81 55.0%
 ### Findings: checkpoint `guardian-stop-tighten-0530` past due (05:30Z) — first post-restart guardian line still unverified (cap=0.75 enforce=True); disk 87-88% WARN; proactive Q (coin_tracker signals/week): **0** (threshold <5).
 ### Recommendation: verify the guardian stop-tighten checkpoint line now; delegate a coin_tracker signal build to signal_analyst (0 signals this week).
+
+## CEO Status — 20261104T104115Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 43T -0.42 58.1% | 7d 282T -1.72 55.7%
+### Findings: Proactive Q (day 4 mod 14 = "Are SHORTs bleeding?") — 7d SHORT 63T -0.41 60.3% WR vs LONG 219T -1.31 54.3%: SHORTs not the bleed, LONGs are (larger loss at lower WR). 24h SHORT 9T -0.27 44.4% = small n, watch only. Also: disk 88% (WARN, repeated), overdue checkpoint guardian-stop-tighten-0530 (verify post-restart cap=0.75 enforce=True line).
+### Recommendation: Weekly deep run: check guardian stop-tighten checkpoint disposition and disk usage trend; SHORTs need no action.
+
+## CEO Status — 20261104T144115Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 40T -0.40 52.5% | 7d 283T -2.08 54.4%
+### Findings: Proactive Q (row 5/14, "Is the pipeline healthy?") — both units active; disk at 88% (WARN x3 today, >=85% threshold); recent errors are hebbian-insufficient-data noise + momentum BLOCK/OVERRIDE lines, no Tracebacks.
+### Recommendation: Schedule disk cleanup (88% → under 85%) before it trips health_monitor escalation; numbers slightly red but within recent band — no action.
+
+## CEO Status — 20261104T184115Z
+### Health: pipeline=ok (timer-fired, exit 0 @18:41:42Z) guardian=active open_pos=1
+### Numbers: 24h 35T -0.31 51.4% | 7d 282T -1.75 55.0%
+### Findings: Proactive Q (row 4/14, "Are SHORTs bleeding?") — no: 7d SHORT 60T -0.28 WR 60.0% vs LONG 222T -1.47 WR 53.6%; SHORTs are the healthier side. Side: control tower STALE (>26h, timer missed a render) + disk 85-88% WARN.
+### Recommendation: Re-run shadow_disposition.py to refresh control tower; disk cleanup before health_monitor escalates past 88%.
+
+## CEO Status — 20261104T224116Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 30T -0.44 50.0% | 7d 276T -1.87 54.3%
+### Findings: clean — services up, no new errors; disk at 85% (WARN x2), control_tower.md render stale >26h, guardian-selfclose checkpoint due 20:00Z
+### Recommendation: none (proactive Q = "Is the pipeline healthy?" → yes; disk/monitor at 90% before it becomes a problem)
+
+## CEO Status — 20261105T024118Z
+### Health: pipeline=ok (timer-fires-per-min, last run rc=0 @02:41:39Z) guardian=active open_pos=0
+### Numbers: 24h 26T -0.21 53.8% | 7d 275T -1.70 54.5%
+### Findings: PnL slightly negative — 7d bleed sits in loss-only exits (hard_max_loss 37T -4.73, atr_sl_hit 38T -4.15, 0% WR by construction = stops doing their job, not an entry defect); winners elsewhere net +9.3. Side-finds: disk 85% WARN repeating, control_tower.md 26h stale (daily 08:15 timer missed a cycle).
+### Recommendation: reclaim disk space (85%) and re-run shadow_disposition.py to un-stale control_tower.md — no trade/param action warranted.
