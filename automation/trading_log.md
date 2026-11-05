@@ -21241,3 +21241,54 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-1.52 RED — structural, outside auto_1hr 1-change/hour scope
 - 24h volume thin (8T) — quiet market, not overtrading
+
+## [2026-11-05 14:25] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 8T 75.0% $+0.35 | 7d 274T 54.0% $-1.56 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closed, 0 open — no trades to diagnose
+- Kill check: no signal with 0% WR n>=3 in 24h (best: jup_yolo_mirrored 2T 100% +0.37, bb-squeeze+ 3T 100% +0.13) → keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/8 = 25% (<40%) — drag = atr_sl_hit -$0.20 vs profit-monster-trail 4T +$0.26 → no tpsl_utils alert
+- Boost HOLD: no signal n>=5 (bb-squeeze+ 3T, jup_yolo 2T — both 100% WR but under threshold)
+- Neg streak: only 2 hours with closes in last 6h (-0.07, +0.24) → not 3 consecutive; regime mixed (HIGH 4/4 +0.26, NORMAL 2/2 +0.29, EXTREME 0/1 -0.13, FLAT 0/1 -0.07) not NEUTRAL → no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.277%, 5/6 <0.5%
+- Storm readiness: **window-min -0.37% / at-run -0.17%** — both within gate, no storm (rolling-60m, BTC)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.56 RED — structural, outside auto_1hr 1-change/hour scope
+- EXTREME 1T 0% -$0.13 24h — n<20, no kill evidence
+
+## [2026-11-05 15:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 5T 60.0% $+0.22 | 7d 271T 53.9% $-1.49 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. None (no constants change) — but **STORM GATE FIRED**: window-min -3.00% / at-run -2.40% → full storm-readiness packet run
+
+**Storm-Readiness Packet:**
+- 🌩️ [STORM-READINESS] window-min -3.00% / at-run -2.40% | blocked 161 (combo_key-stale 48, short-rsi-hard-floor 28, expired-hotset 26, pump-chain-short-high 23, compaction_stale_10min 21, confluence single-type 7, oversold-knife 2, other 6) | true-starvation 62 RSI>=35 | counterfactual $+0.99 (touch 21/22) | waiver: SHADOW=True ENFORCE=False
+- Split: blocked SHORTs +$4.21 (gates suppressed dump winners), blocked LONGs -$3.23 (gates correctly kept losers out)
+- Bar tracking: counterfactual POSITIVE → **streak 1/3** toward enforce flip (needs ≥3 consecutive positive, deadline 2026-11-12)
+
+**No Change Needed:**
+- Last hour: 0 closed, 0 open — no trades to diagnose
+- Kill check: no signal with 0% WR n>=3 in 24h → keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/5 = 40% of 24h closes (not >40%) — drag -$0.20 vs mfe_exit +$0.29 + profit-monster +$0.13 → no tpsl_utils alert
+- Boost HOLD: no signal n>=5 in 24h (jup_yolo_mirrored 2T 100% +0.37 best, n<5)
+- Neg streak: only 2 hours with closes in last 6h (-0.07, +0.24) → not 3 consecutive; regime mixed not NEUTRAL → no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.417%, 2/3 <0.5%
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.49 RED — structural, outside auto_1hr 1-change/hour scope
+- Storm dump underway — watch next hour for trade closes; blocked SHORT starvation (+$4.21 counterfactual) suggests short gates (short-rsi-hard-floor 28, pump-chain-short-high 23) may be over-blocking in dumps — candidate for future analysis, not a 1-change/hour action
