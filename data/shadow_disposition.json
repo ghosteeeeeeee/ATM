@@ -663,7 +663,7 @@
       "status": "open",
       "started": "2026-10-31",
       "deadline": "2026-11-13T00:00:00Z",
-      "evidence": "Capstone verdict Q3-5: not a CEO_PROTECTED flag — standard kill bar applies (the 1.4 ceiling held via auto_1hr for weeks without passing its own checkpoint).",
+      "evidence": "Capstone verdict Q3-5: not a CEO_PROTECTED flag — standard kill bar applies (the 1.4 ceiling held via auto_1hr for weeks without passing its own checkpoint). | 2026-11-05 #224 premise correction: 14d pump-chain+ LONG = EXTREME ONLY n=31 '-0.13' (no second regime has trades; n<40). 30d EXTREME cell n=75 '+1.32' POSITIVE, HIGH 11T '-0.59', NORMAL 3T '-0.10'. Kill condition (BOTH-regimes-negative AND n>=40) NOT satisfiable as written — at 11-13 checkpoint: n<40 = INSUFFICIENT -> monitor, do NOT default-KILL on sample-size rule (n<40); evaluate cell-scoped (EXTREME vs rest) instead.",
       "threshold": "At the next 14d checkpoint: if still net-negative both regimes with n>=40 -> kill/decay the 1.4 boost under standard bars; if flipped positive -> KEEP with documented rationale.",
       "default_action": "KILL the 1.4 weight if bar fails at checkpoint",
       "owner": "auto_1hr weekly / AMPLIFY cadence"

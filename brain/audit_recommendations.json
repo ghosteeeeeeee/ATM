@@ -1,128 +1,94 @@
 {
-  "timestamp": "2026-11-05T04:45:00Z",
-  "run": 223,
+  "timestamp": "2026-11-05T08:45:00Z",
+  "run": 224,
   "session_brain_stats": {
-    "queries_run": 3,
-    "top_hits": [
-      "mfe exit / jup_yolo_mirrored losses",
-      "chop filter at execution vs compaction",
-      "volume-buildup short / volume spike winners"
-    ],
-    "note": "session_brain used for context only; no new decisions extracted this run (jup review owned by 11-07 disposition)"
+    "queries": ["signal performance winrate regime", "new signal idea improvement strategy", "loss money bleeding losing"],
+    "top_insights": [
+      "exit asymmetry deep-dive still the dominant recurring theme (exit-asymmetry-2026-10-31)",
+      "trend-following signal idea + R:R 0.95 relaxation remain discussed-but-unshipped (pre-existing, owned by signal-lab)",
+      "no new forgotten implementation discovered this run"
+    ]
   },
   "trade_summary_24h": {
-    "trades": 17,
-    "wr": 70.6,
-    "gross_pnl": "+0.07~",
-    "status": "GREEN",
-    "losers": 6,
-    "loser_pattern": "all LONG, all mfe<0.40 (0.00-0.40), chop entries — APE/GMX warrior+, SAND/DOT bb-squeeze+, ZRO r2v2-long18, ACE hh-hl+",
-    "arm_rate_24h": "12/17 = 70.6%"
-  },
-  "trade_summary_7d": {
-    "trades": 275,
-    "wr": 54.5,
-    "gross_pnl": "-1.70",
-    "status": "RED",
-    "armed": "144T 91.0% +8.78",
-    "unarmed": "132T 15.2% -10.35",
-    "chop_bleed_dollar_share": "95.0% (10.94/11.52, 103/112 losers, 0 NULL mfe)",
-    "never_armed_by_dir": "LONG 81T -8.17 / SHORT 22T -2.77",
-    "family_14d": "trail_family 218T 90.4% +13.43 vs chop_stop 168T 11.9% -15.42"
-  },
-  "trade_summary_30d": {
-    "trades": 781,
-    "wr": 45.7,
-    "gross_pnl": "-5.52"
+    "24h": "16T 56.3% '-0.11'",
+    "7d": "276T 54.7% '-1.56' RED",
+    "30d": "781T 45.7% '-5.52'",
+    "7d_armed_mfe040": "144T 91.0% '+8.78'",
+    "7d_never_armed": "132T 15.2% '-10.34' = 95.0% of gross loss ($10.93/$11.51)",
+    "14d_armed": "219T 90.4% '+12.94'",
+    "14d_never_armed": "188T 13.8% '-14.97'",
+    "14d_trail_family": "269T 81.0% '+12.81' vs chop/stop 124T 0% '-15.07'",
+    "open_trades": 0,
+    "24h_losers": "7 all LONG, 6/7 never-armed class '-0.65' of '-0.67' total, all entered HIGH/EXTREME regime; no signal n>=3 at 0% WR -> no kill"
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 04:30Z (mandate): overall flip 43.8% n=1362 | pc- 226W/124L 64.6% LIVE stands | rider 640L/369W 36.8% do-NOT | chi2 p=0.3747 uniform",
-    "floor_admit": "JOIN REFRESHED 04:41Z (was 48h stale): floor_only 1327 decided 49.1% vs always_admit 203 43.3%, fisher p=0.1315 — direction holds, not significant; n>=200 bar PASS, 30d same-sign not reachable until ~11-15",
-    "oscillator": "FROZEN + archived (OSCILLATOR_MULT_ENABLED=True since Oct 1) — pre-live evidence only",
-    "wyckoff": "RETIRED 2026-10-31 (file moved to data/archive/*.retired-2026-10-31; PLUS/MINUS killed so shadow branch never runs) — prompt's 'PENDING JOIN 345 rows' table row is STALE",
-    "rr_shadow": "ORPHANED (no producer, 24d+ stale) — do not cite",
-    "shadow_trader_report": "CONFLUENCE-EXPIRY 15292 blocked @47% avg -0.13 (justified) | exit A/B pm_trail +9615 vs hard_max -10925 vs cut_loser -2168 vs rr_engine -4130 = trail-or-nothing | worst live-looking: ema300-breakthrough+ n=12 16.7% and r2-trend-long5 n=18 5.6% are ENABLED with 0 live trades 14d — zombie-purge 11-09 candidates",
-    "overall": "3/6 usable (contrarian, floor, shadow_trader); oscillator frozen, wyckoff retired, rr orphaned"
+    "contrarian_join": "REFRESHED 08:30Z (mandate): overall flip-WR 43.8% n=1362; pump-chain- 64.6% (226W/124L) LIVE keep; btc-pump-rider+ 36.8% do-NOT flip (token heterogeneity chi2 p=4.2e-24 — per-token only); pc- uniform p=0.37",
+    "floor_admit": "join 04:41Z fresh: floor 49.1% (n=1327) vs always_admit 43.3% (n=203), fisher p=0.1315 COLLECT -> 11-15 bar; blocked cohort n=0",
+    "oscillator": "FROZEN+ARCHIVED (fossil 20261027) — no live answerable question",
+    "wyckoff": "RETIRED 10-31 (flags False) — prompt table row stale",
+    "rr_shadow": "ORPHANED 24d stale — do not cite",
+    "shadow_trader_report": "64274 signals. Gates: CONFLUENCE-EXPIRY 15318 blocked @47% '-0.13' correct; CTX-GATE 2230 @52% '-0.09' correct EV; SKIP(RSI hard-block family) 28 @79% '+0.11' = tiny +EV cohort, n too small + BANANA/CEO-protected knife blocks -> MONITOR only, do not weaken. Exit A/B: pm_trail n=25680 dominates. Dead shadows confirm zombie list: open-skies+ 19.1% (disabled live), r2-trend-long5 10.5%, ema300-breakthrough+ 16.7% (both purge 11-09)",
+    "sl_sweep": "all SL levels negative in raw pool (wider 'better' = same direction as CEO-KILLed wider-SL trial 11-04) -> no ship, consistent",
+    "overall": "contrarian + floor joins are the useful live collectors; oscillator/wyckoff/rr dead; shadow_trader gate report healthy"
   },
   "drift_findings": [
     {
-      "item": "Prompt Step-2b shadow table still lists wyckoff_shadow.jsonl 345 rows PENDING",
-      "severity": "LOW",
-      "action": "file retired 10-31 by kill of PLUS/MINUS; table row stale — noted, no code change"
-    },
-    {
-      "item": "hermes_constants.py:3763 comment says 'Fires log to data/wyckoff_shadow.jsonl' but PLUS/MINUS=False kill at wyckoff.py:514 before shadow branch",
-      "severity": "LOW",
-      "action": "dead comment, harmless — clean on next constants pass (not this run: EMPTY diff discipline)"
+      "item": "pump-chain-plus-weight-kill-review premise STALE",
+      "detail": "Entry claims '14d red in BOTH regimes with 40T+ n'. Fresh PG: 14d pump-chain+ LONG = EXTREME ONLY n=31 '-0.13' (zero trades in other regimes); 30d EXTREME cell n=75 '+1.32' POSITIVE. Kill condition (both-regimes AND n>=40) unsatisfiable as written; default-KILL at 11-13 would fire on a broken premise.",
+      "action": "CORRECTED evidence field in data/shadow_disposition.json this run (n<40 = INSUFFICIENT -> monitor; cell-scoped eval). Disposition stays open.",
+      "severity": "HIGH"
     }
   ],
   "recurring_problems": [
-    {
-      "problem": "chop-bleed dollar share >=92% (now 95.0% 7d) — entry quality, never-armed",
-      "status": "12th+ consecutive window; entry route closed on 3 axes (#96/#190/#192); active levers = TAT candle-OOS + CONF_FLOOR + jup 11-07 review + stop-tighten 11-14",
-      "not_reissued": "mid-band+BELOW-EAM300 compound block stays WITHDRAWN (#139); LONG mid-band dampen REJECTED (#128 30d sign-flip)"
-    },
-    {
-      "problem": "jup_yolo_mirrored = #1 never-armed bleeder (7d LONG 34T -4.66)",
-      "status": "owned by jup-yolo-regime-review 11-07; this run pre-registered rsi 35-45 cell with confounder proof"
-    },
-    {
-      "problem": "R:R structure (breakeven WR 67.7% jup / 70% vb- vs actual 60.9/60.3)",
-      "status": "owned — jup review 11-07, stop-tighten 11-14"
-    }
+    "never-armed chop bleed: 95.0% of 7d gross loss (13th consecutive >=92% window) — owned by TAT OOS + CONF_FLOOR + jup 11-07 + stop-tighten 11-14; no new lever this run",
+    "jup_yolo_mirrored LONG = top signal bleed 14d 100T '-1.08' (all regimes negative except FLAT n=7) — 11-07 regime review owns it",
+    "stop asymmetry: jup LONG losers avg pnl_pct -4.35 vs PM-trail winners +2.33 — STOP_TIGHTEN enforce live 11-04, only 1 post-ship close, too early to read (eval 11-14)"
   ],
-  "missing_implementations": [],
+  "missing_implementations": [
+    "arm-rate (mfe_pct>=0.40) is not yet a standing metric in auto_1hr kill/boost logic — computed manually each audit (see creative_improvements)"
+  ],
   "creative_improvements": [
-    "jup LONG rsi_exec 35-45 cell pre-registered for 11-07 (n=22, saves +0.96/14d, kills 11.5% of jup winners, excl-jup band flat = confounder proof; n<50 guardrail → not shipped)",
-    "amplify-vb-high-short-clonehunt registered (clone-hunt on validated 78.9% WR cell, deadline 11-13, default NO SHIP)"
+    {
+      "date": "2026-11-05T08:45:00Z",
+      "idea": "Arm-rate standing trigger: at each 14d checkpoint any signal with n>=20 AND arm-rate<30% AND net<0 gets auto_1hr weight dampen 0.5x proposal (one variable, reversible)",
+      "rationale": "Never-armed trades are 95.0% of 7d gross loss ($10.93/$11.51) and 14d '-14.97' at 13.8% WR vs armed 90.4% '+12.94'. Arm-rate (mfe_pct>=0.40) is the cleanest entry-quality vital sign and is already stored on every closed trade. Today ZERO signals qualify (pump-chain- LONG 22.2% arm-rate but net '+0.10' -> excluded by net<0 guard), so this ships as a monitoring rule with zero live impact.",
+      "expected_impact": "Catches chop-signal decay one checkpoint earlier than WR-based kill bars; prevents the 'positive WR, negative PnL' blind spot",
+      "category": "entry sniper",
+      "status": "pre-registered",
+      "risk": "low"
+    }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": {
-    "222_ARM_GAP_log_fix": "PASS — pg_pnl_pct present at position_manager.py:1404, py_compile OK",
-    "222_amplify-ugb-bypass-hole": "PASS — entry open in shadow_disposition, deadline 12-15",
-    "222_dedupe_script": "PASS — tracked and committed",
-    "222_constants": "PASS — EMPTY diff vs HEAD, CEO_PROTECTED 13/13"
+    "223_contrarian_join": "PASS — re-ran 08:30Z fresh, flip-WR reproduced 43.8%",
+    "223_vb-high-short-clonehunt": "PASS — entry present in shadow_disposition, deadline 11-13",
+    "223_constants": "PASS — EMPTY diff vs HEAD, session lock absent",
+    "222_arm-gap": "PASS — pg_pnl_pct fix present at position_manager.py:1404"
   },
-  "amplify_weekly": {
-    "screen": "30d n>=10 net>0 = 7 cells (identical set to #220/#221/#222): pc+ EXTREME 74T +1.45, bb-sq+ NORMAL 43T +0.73, pc- NORMAL SHORT 10T +0.52, vb- HIGH 19T +0.42, pc-,v6- EXTREME 10T +0.30, jup HIGH SHORT 12T +0.28, pc- NORMAL LONG 27T +0.10",
-    "new_proposals": [
-      "amplify-vb-high-short-clonehunt"
-    ],
-    "why_not_more": "all other cells VALIDATED / why-not'd / in-flight (mult-150, winner-cell-125, fade-ctx, bb-squeeze-hml done, jup-short-walk)",
-    "flip_kpi": "0 new conversions this week; in-flight: harvest 11-07, fade-ctx + winner-cell-125 11-10, watch-contrarian 11-11, xmirror 11-18"
+  "last_run_verify_224": {
+    "contrarian_join_fresh": "PASS 08:30Z",
+    "floor_join_fresh": "PASS 04:41Z",
+    "recovery_replay_selfcheck": "PASS",
+    "autopsy_48h": "n=26: 7 never-adverse / 18 recovered / 0 NEVER -> wrong-side REFUTED 78th consecutive (#61 p=0.116, #84 t=-0.04)",
+    "constants_diff": "EMPTY",
+    "session_lock": "absent",
+    "tracebacks_pipeline_log": 0,
+    "checkpoint_registry": "0 pending intraday",
+    "vacation_mode": "active — no_signal_enable_disable + constants review queue honored (0 constant changes)"
   },
-  "autopsy": {
-    "method": "brain/analysis/recovery_replay.py adverse-first (selfcheck PASS)",
-    "48h": "n=27 = 7 never-adverse / 20 recovered / 0 NEVER → WRONG-SIDE REFUTED 77th consecutive run",
-    "calibration_refs": [
-      "#61 opposite-side p=0.116",
-      "#84 forward-return t=-0.04"
-    ]
-  },
-  "signal_quality_deep_dive": {
-    "sub50_n15_14d": "pump-chain- 30T 40.0% net +0.32 (positive, fade-owned) only → 0 new targets",
-    "checks_run": [
-      "LONG rsi_exec 35-45 OOS 7/14/30d",
-      "excl-jup confounder",
-      "jup/vb- armed split",
-      "breakeven WR",
-      "winner-cell screen",
-      "impact-on-winners"
-    ]
-  },
-  "watchdog_triage": {
-    "sol_short_16788": "in profit +0.77%, premise = overbought short under continuum BELOW EMA300; monitor only — re-test condition in watchdog stands, no action",
-    "chop_bleed_steer": "routed to entry-quality queue (TAT/CONF_FLOOR/jup review/stop-tighten) — NOT trail parameters, per steer",
-    "steers": 0
-  },
-  "last_run_verify_222": "ALL PASS",
   "next_actions": [
-    "11-06: fade-btc-crash full read + gate-shadow coverage fix + candle-collector coverage + harvest first read + momentum-cache",
-    "11-07: jup-yolo-regime-review (feed: rsi 35-45 cell numbers above) + harvest full + volmom-volbreak + daily-fill-cap-brake",
-    "11-09: signal-zombie-purge (include ema300-breakthrough+ / r2-trend-long5: enabled, 0 live 14d, shadow WR 16.7%/5.6%)",
+    "11-06: fade-btc-crash full read + gate-shadow coverage fix + candle-collector audit + momentum-cache audit + harvest first read",
+    "11-07: jup-yolo-regime-review (feed: HIGH 41T 56.1% '-0.75' worst cell; all non-FLAT regimes negative; rsi 35-45 jup-confounder packet from #223) + volmom-volbreak + daily-fill-cap-brake",
+    "11-09: signal-zombie-purge (+ema300-breakthrough+/r2-trend-long5 — shadow 16.7%/5.5% WR confirmed this run)",
     "11-10: fade-ctx-exempt + winner-cell-size-125 + rsi-ceiling-75 + conf-filter-parity + jup-atrsl-parity",
-    "11-13: amplify-vb-high-short-clonehunt readout",
-    "11-14: stop-tighten enforce eval + amplify-winner-cell-mult-150 (STILL MET, awaiting CEO label)",
-    "CEO: winner-cell-mult-150 sign-off (met 3 consecutive reads) · stop-tighten-probe-080 label · NET-KPI switch"
-  ]
+    "11-13: amplify-vb-high-short-clonehunt readout + pump-chain+ KILL-REVIEW (NOW CELL-SCOPED per correction — n<40 = insufficient, do not default-kill)",
+    "11-14: stop-tighten enforce eval + amplify-winner-cell-mult-150 (CEO label still pending)",
+    "11-15: floor_admit join bar (p=0.1315 COLLECT)",
+    "CEO: winner-cell-mult-150 sign-off (MET 3x) · stop-tighten-probe-080 label · NET-KPI switch"
+  ],
+  "amplify_status": {
+    "cadence": "Thursday non-weekly run — weekly AMPLIFY last MET 11-02 + #223 emitted amplify-vb-high-short-clonehunt same day; not re-issued",
+    "flip_kpi": "0 conversions this week; in-flight: harvest 11-07, fade-ctx + winner-cell-125 11-10, watch-contrarian 11-11, xmirror 11-18",
+    "inflight_amplifies": ["fade-ctx-exempt 11-10", "winner-cell-size-125 11-10", "bb-squeeze-hml-entry-profile done NO-CHANGE", "amplify-winner-cell-mult-150 11-14 CEO", "amplify-vb-high-short-clonehunt 11-13", "amplify-ugb-bypass-hole", "amplify-stop-tighten-probe-080", "amplify-xmirror-giveback"]
+  }
 }

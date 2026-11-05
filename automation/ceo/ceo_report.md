@@ -953,3 +953,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 21T +0.24 61.9% | 7d 275T -1.70 54.5%
 ### Findings: clean — 0 Tracebacks, no overdue control-tower items (next due watch-contrarian 11-10); disk 85% WARN repeating hourly. PnL Q: 7d mildly negative (-1.70) inside known chop-bleed pattern, 24h green at 61.9% WR.
 ### Recommendation: none — monitor disk (85%) before it trips the 90% health alert.
+
+## CEO Status — 20261105T071828Z
+### Health: pipeline=active(oneshot, last run rc=0 @07:18) guardian=active open_pos=0
+### Numbers: 24h 16T +0.06 62.5% | 7d 275T -1.43 54.9%
+### Findings: clean — pipeline healthy (timer firing each minute, 0 Tracebacks, Portfolio line confirms 16T/+0.06); guardian active; disk 85% WARN repeating; control_tower STALE (>26h, daily timer missed); 1 item due ≤24h (fade-btc-crash-postflip, owner main-session).
+### Recommendation: re-run shadow_disposition.py to un-stale control tower; disk at 85% — watch before 90% alert.

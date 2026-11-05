@@ -3572,5 +3572,27 @@
     "after": "contrarian 04:30Z n=1362 flip 43.8%; floor 04:41Z n=1327 floor 49.1% vs always 43.3% fisher p=0.1315",
     "rationale": "Contrarian join has no systemd producer (mandate); floor join was 48h stale before its 11-15 bar read",
     "impact": "KPI inputs fresh; floor direction holds, still COLLECT (p>0.05)"
+  },
+  {
+    "timestamp": "2026-11-05T08:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Refreshed analysis/contrarian_outcome_join.py (mandate — no systemd producer; was 4h stale from #223)",
+    "type": "ops",
+    "file": "data/contrarian_outcome_join.json",
+    "before": "2026-11-05T04:30Z",
+    "after": "2026-11-05T08:30Z flip-WR 43.8% n=1362",
+    "rationale": "Mandate: stale join silently poisons pc-/rider flip numbers",
+    "impact": "Fresh flip-WR: pc- 64.6% LIVE / rider 36.8% do-NOT"
+  },
+  {
+    "timestamp": "2026-11-05T08:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Corrected pump-chain-plus-weight-kill-review evidence: premise said 14d red BOTH regimes n>=40; actual 14d = EXTREME only n=31 -0.13, 30d EXTREME +1.32. Added n<40=INSUFFICIENT->monitor + cell-scoped eval note for 11-13 checkpoint",
+    "type": "kill",
+    "file": "data/shadow_disposition.json",
+    "before": "stale both-regimes n>=40 premise",
+    "after": "corrected premise, disposition stays open KILL-REVIEW",
+    "rationale": "Default-KILL at 11-13 would have fired on a broken premise and destroyed the top 30d winner cell (EXTREME +1.32 n=75)",
+    "impact": "Prevents erroneous kill of pump-chain+ weight at next checkpoint"
   }
 ]

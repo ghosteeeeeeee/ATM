@@ -10508,5 +10508,14 @@
     "category": "clone-hunt",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-05T08:45:00Z",
+    "idea": "Arm-rate standing trigger: at each 14d checkpoint any signal with n>=20 AND arm-rate(mfe_pct>=0.40)<30% AND net<0 -> auto_1hr weight dampen 0.5x proposal",
+    "rationale": "Never-armed = 95.0% of 7d gross loss ($10.93/$11.51), 14d '-14.97' at 13.8% WR vs armed 90.4% '+12.94'. Arm-rate is the cleanest entry-quality vital sign, already stored on every closed trade. Zero signals qualify today (pump-chain- LONG 22.2% arm but net '+0.10' excluded by net<0 guard) -> ships as monitoring rule, zero live impact.",
+    "expected_impact": "Catches chop-signal decay earlier than WR-based kill bars; closes the positive-WR/negative-PnL blind spot",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
