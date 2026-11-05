@@ -385,11 +385,24 @@ Blocks signals when a token's 5m price volatility < `VOL_FLOOR_THRESHOLD` (0.15%
 
 **What you need to do:** Nothing. The compactor checks the token's candle data, not your signal's data source. New tokens with < 20 candles fail open.
 
-### Layer B: Volatility Gate / Regime Filter (`volatility_gate.py`) ⚠️ CRITICAL
+### Layer B: Volatility Gate / Regime Filter — **TWO FILES, BOTH MANDATORY** ⚠️ CRITICAL
 
-**File**: `/root/.hermes/scripts/volatility_gate.py` — `REGIME_SIGNALS`
+There are **two copies of `REGIME_SIGNALS`** and both must contain your source:
 
-This is the **severe/normal/flat/extreme** regime filter. `decider_run.py` calls `should_trade(token, signal=source)` and **SKIPS** your signal if it's not in the regime list.
+| File | Who reads it | If you only patch the other |
+|------|--------------|------------------------------|
+| `scripts/volatility_gate_v2.py` → `should_trade_v2()` | **THE LIVE GATE**: `decider_run.context_gate` calls it for every candidate at exec | patching only v1 = **dead code**: compactor approves, then exec hard-SKIPs `SKIP: <token> <src> not suited for <REGIME>` and the fire is consumed — first fire on a non-merged token = dead on arrival |
+| `scripts/volatility_gate.py` → `should_trade()` | v1/legacy callers (`position_manager` no-signal path, analysis scripts) | patching only v2 = v1 callers silently skip |
+
+**Both files must get your entries in all 4 regimes (or the regimes you chose).**
+
+This is the **severe/normal/flat/extreme** regime filter. After your first
+live fires, grep the pipeline log for `not suited` to confirm no gate killed it.
+
+> Learned the hard way (2026-11-05, `jup_liq_cascade`): Step 5b originally
+> named `volatility_gate.py` only, and its "who calls it" line was wrong —
+> the signal shipped, approved, and was one non-merged token away from being
+> killed at the LIVE gate on every fire.
 
 **4 Regimes (ATR% based):**
 | Regime | ATR% | Best for |
@@ -429,16 +442,15 @@ REGIME_SIGNALS = {
 - **Breakout signals** → HIGH + EXTREME
 - **Counter-trend signals** → FLAT only (dangerous in trending markets)
 
-**Verification:**
+**Verification (BOTH gates):**
 ```python
-from volatility_gate import should_trade, REGIME_SIGNALS
-# Check your signal is in all target regimes
-for regime, sigs in REGIME_SIGNALS.items():
-    assert any('your-signal' in s for s in sigs), f'MISSING from {regime}'
-
-# Simulate should_trade
-result = should_trade('BTC', signal='your-signal+')
-assert result[0] == 'TRADE', f'BLOCKED: {result}'
+from volatility_gate import REGIME_SIGNALS as R1, should_trade
+from volatility_gate_v2 import REGIME_SIGNALS as R2, should_trade_v2
+for regime in ('FLAT', 'NORMAL', 'HIGH', 'EXTREME'):
+    assert 'your-signal+' in R1[regime], f'v1 MISSING from {regime}'
+    assert 'your-signal+' in R2[regime], f'v2 MISSING from {regime} (LIVE gate!)'
+r = should_trade_v2('BTC', signal='your-signal+')
+assert r[0] == 'TRADE', f'LIVE GATE BLOCKED: {r}'
 ```
 
 ---
@@ -521,7 +533,7 @@ tail -100 /root/.hermes/logs/pipeline.log | grep your_signal
 | **Source format consistent** | Uses `+`/`-` suffix consistently, not mixed bare+directional | Layer 2 checks may be dead code |
 | **Source not blacklisted** | `python3 -c "from signal_schema import validate_source; print(validate_source('your-signal+'))"` | Signal enters DB but gets blocked in hotset |
 | **Vol floor understood** | Signal will be blocked by Layer 3 if token vol < 0.15% — this is correct behavior | Low-vol tokens don't move enough to profit |
-| **In REGIME_SIGNALS** ⚠️ | `grep -n 'your-signal' volatility_gate.py` — MUST appear in correct regimes | `should_trade()` silently SKIPS your signal at Layer 3 |
+| **In REGIME_SIGNALS — BOTH FILES** ⚠️ | `grep -n 'your-signal' volatility_gate.py volatility_gate_v2.py` — both required (v2 is the LIVE exec gate) | exec hard-SKIPs `not suited for <REGIME>` — fire consumed, never traded |
 | **In `is_component_disabled()`** ⚠️ | `grep -n 'your-signal' signal_schema.py` — constant must be imported in that function | NameError crash kills ALL compaction |
 | **In STANDALONE_BYPASS** (if solo) | `grep -n 'your-signal' hermes_constants.py` — check STANDALONE_BYPASS_SIGNALS | Single-source signals blocked by confluence gate |
 | **In PROFIT_MONSTER_BYPASS** (if ATR-managed) | `grep -n 'your-signal' hermes_constants.py` — check PROFIT_MONSTER_BYPASS_SIGNALS | PM Trail cuts winners early |
@@ -657,6 +669,12 @@ This prevents `signal_rotator.py` from auto-re-enabling it.
 13. **Staleness thresholds must match candle timeframe** — 1h candles update hourly, so a 15-minute staleness check kills all tokens. Use: 1m→120s, 5m→600s, 15m→1800s, 1h→5400s, 4h→21600s.
 
 14. **Don't let short-TF noise dilute strong moves** — if your signal is a "leaderboard" or "mover" signal, weight the primary timeframe heavily (0.7+) in move_score. A 5%1h move with -0.5%5m shouldn't score below threshold because of 5m noise.
+
+14b. **Patching only ONE volatility gate** — `volatility_gate.py` (v1) and
+    `volatility_gate_v2.py` (**LIVE**: decider `context_gate` → `should_trade_v2`)
+    each carry their own `REGIME_SIGNALS` copy. Entry in v1 only = compactor
+    approves, exec SKIPS `not suited for <REGIME>` on the first non-merged
+    fire. Patch BOTH, verify BOTH (Step 5b).
 
 15. **Combo weights** — after your signal has 5+ trades, self_learner.py auto-tunes its weight in `data/combo_weights.json`. signal_compactor.py loads these on startup. You don't need to manually set `SIGNAL_SOURCE_WEIGHTS` for combos — the system does it automatically.
 

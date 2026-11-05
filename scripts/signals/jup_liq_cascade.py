@@ -46,7 +46,10 @@ SIGNAL_TYPE_SHORT = 'jup_liq_cascade_short'  # longs liquidated → SHORT
 SOURCE_LONG = 'jup-liq+'
 SOURCE_SHORT = 'jup-liq-'
 
-_TRADES_URL = 'https://yolo-api.jup.ag/trades'
+# limit=500 (bug_hunter): default page =100 events ≈130s — during a heavy
+# cascade unseen events roll off the page and are skipped forever by last_ts.
+# 500 ≈ 10min of feed covers the burst window we target.
+_TRADES_URL = 'https://yolo-api.jup.ag/trades?limit=500'
 _STATE_FILE = os.path.join(HERMES_DATA, 'jup_liq_cascade_state.json')
 _USDC_SCALE = 1_000_000  # notional/margin are USDC 6-decimals
 
@@ -143,7 +146,11 @@ def scan_signals() -> int:
             ts = int(t['executedAt'])
         except (TypeError, ValueError):
             continue
-        if ts <= last_ts:
+        if ts < last_ts:
+            # STRICT < (bug_hunter): same-second events arriving on the next
+            # page must reach the `seen` dedupe below — `<=` dropped the
+            # boundary second before it could be evaluated. seen[id] dedupes
+            # re-ingestion (kind is static per event id, verified live).
             continue
         eid = str(t.get('id') or '')
         if not eid or eid in seen:
@@ -164,8 +171,15 @@ def scan_signals() -> int:
         w = _weight(t.get('leverage'))
         window.setdefault(cell, []).append([ts, w])
         new_liqs += 1
-    state['last_ts'] = max(last_ts, max((int(t.get('executedAt') or 0) for t in trades),
-                                        default=last_ts))
+    _feed_max = last_ts
+    for t in trades:
+        try:
+            _e = int(t.get('executedAt') or 0)
+            if _e > _feed_max:
+                _feed_max = _e
+        except (TypeError, ValueError):
+            continue  # malformed ts on ANY event must not kill the cycle
+    state['last_ts'] = _feed_max
 
     # ── prune: window entries + seen ids older than window + slack ──
     cutoff = now - JUP_LIQ_WINDOW_SEC - 60

@@ -44,6 +44,9 @@ except ImportError:
 
 REGIME_SIGNALS = {
     'FLAT': {
+        # jup-liq: liquidation-cascade follow — structural, all regimes (T 2026-11-05).
+        # LIVE gate (decider context_gate → should_trade_v2) — v1 alone is dead code (bug_hunter #12).
+        'jup-liq', 'jup-liq+', 'jup-liq-',
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+',
         'trend_momentum_near_sma',
@@ -76,6 +79,9 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d FLAT 0T (never admitted).
     },
     'NORMAL': {
+        # jup-liq: liquidation-cascade follow — structural, all regimes (T 2026-11-05).
+        # LIVE gate (decider context_gate → should_trade_v2) — v1 alone is dead code (bug_hunter #12).
+        'jup-liq', 'jup-liq+', 'jup-liq-',
         # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
@@ -131,6 +137,9 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"). v2 omission was an oversight: ATOM SHORT reached exec 10x on 2026-10-12 and vol gate was sole blocker. 90d NORMAL 1T +$0.01.
     },
     'HIGH': {
+        # jup-liq: liquidation-cascade follow — structural, all regimes (T 2026-11-05).
+        # LIVE gate (decider context_gate → should_trade_v2) — v1 alone is dead code (bug_hunter #12).
+        'jup-liq', 'jup-liq+', 'jup-liq-',
         # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum (hyphen variant)
         'pump_chain', 'pump_chain+', 'pump_chain-',  # chain correlation momentum (underscore variant — actual DB values)
@@ -195,6 +204,9 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d HIGH 0T (never admitted).
     },
     'EXTREME': {
+        # jup-liq: liquidation-cascade follow — structural, all regimes (T 2026-11-05).
+        # LIVE gate (decider context_gate → should_trade_v2) — v1 alone is dead code (bug_hunter #12).
+        'jup-liq', 'jup-liq+', 'jup-liq-',
         'continuation+,hzscore+', 'hzscore+,mover+',
         'mover+', 'mover-',
         'bb_bounce',
