@@ -1472,6 +1472,42 @@
       "root_cause": "spec-accepted asymmetry at ship (consult 20261104T172347Z): fail-open for trading continuity vs fail-closed for release safety \u2014 but no alerting on the open-failure.",
       "found_by": "21a8f696 ship report 2026-11-04 (deviation list a)",
       "fix": "route the Cap D WARN through health_monitor/error_alerts (6h dedup) OR count+report corrupt-fees rows; consider COALESCE/guard in the SQL so one bad row cannot disable the brake."
+    },
+    {
+      "id": "BUG-080",
+      "title": "jup_liq_cascade stores corrupt fixed-point price (amount=0 in feed)",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/jup_liq_cascade.py"
+      ],
+      "symptom": "First live fire stored price=7.658e16; exec guard SKIPPED at 16:34 (ratio ~1e12)",
+      "root_cause": "yolo feed amount always \"0\" so notional/amount never ran; raw price field is 1e12 fixed-point",
+      "fix": "get_hl_price first, else raw/1e12; selfcheck PASS",
+      "verified_by": "bug_hunter selfcheck + compile + get_tokens dry-run #225",
+      "date_found": "2026-11-05",
+      "date_fixed": "2026-11-05",
+      "found_by": "brain_auditor",
+      "git_commit": "29fd3075",
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-081",
+      "title": "4h_regime_scanner token universe blind to signal tokens",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/4h_regime_scanner.py"
+      ],
+      "symptom": "regime_4h coverage 81.5% (53/65) < 90% bar; CASHCAT/CC/FARTCOIN/ZORA NULL regime_4h",
+      "root_cause": "Dead paths (/var/www/html missing, data/signals.json 0 bytes) + list-only parse of dict file",
+      "fix": "WWW_DATA path + dict parse + recent-7d traded pull; universe covers bad tokens",
+      "verified_by": "bug_hunter selfcheck + compile + get_tokens dry-run #225",
+      "date_found": "2026-11-05",
+      "date_fixed": "2026-11-05",
+      "found_by": "brain_auditor",
+      "git_commit": "29fd3075",
+      "related_bugs": []
     }
   ],
   "schema": {
