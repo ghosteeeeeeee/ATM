@@ -1,5 +1,5 @@
 # Signal Performance Report
-**Generated:** 2026-11-05 02:46 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-05 03:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
 - **Total trades (all time):** 3,680 | **WR:** 51.3% | **PnL:** -109.85%
@@ -11,7 +11,6 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| jup_yolo_mirrored | LONG | — | —% | — | 5 | 60.0% | +0.50 | ❓ |
 | bb-squeeze+ | LONG | — | —% | — | 6 | 66.7% | +0.22 | ENABLED |
 
 ---
@@ -26,6 +25,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
+| jup_yolo_mirrored | SHORT | 2 | 50.0% | -0.38 | ❓ | Needs more data |
 | warrior-sr-confirm+ | LONG | 3 | 33.3% | -0.01 | ENABLED | Needs more data |
 
 ---
@@ -44,8 +44,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] warrior-sr-confirm+ LONG** — WR=33.3%, PnL=-0.01% over 3 trades. Monitor next cycle.
-2. **[KEEP] 2 winning combos** — jup_yolo_mirrored, bb-squeeze+. LONG side dominant.
+1. **[WATCH] jup_yolo_mirrored SHORT** — WR=50.0%, PnL=-0.38% over 2 trades. Monitor next cycle.
+2. **[WATCH] warrior-sr-confirm+ LONG** — WR=33.3%, PnL=-0.01% over 3 trades. Monitor next cycle.
+3. **[KEEP] 1 winning combos** — bb-squeeze+. LONG side dominant.
 
 ---
 

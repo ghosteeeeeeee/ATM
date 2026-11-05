@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-04 22:51:04",
+  "timestamp": "2026-11-05 03:28:29",
   "total_checks": 20,
   "passed": 12,
   "critical_count": 7,
@@ -51,7 +51,7 @@
   "warnings": [
     {
       "name": "trade_frequency",
-      "msg": "0 trades in 6h (0.0/hr)",
+      "msg": "1 trades in 6h (0.2/hr)",
       "file": "",
       "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
     }
