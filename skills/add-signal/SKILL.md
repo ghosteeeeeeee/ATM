@@ -412,7 +412,9 @@ live fires, grep the pipeline log for `not suited` to confirm no gate killed it.
 | HIGH | 1.0-1.5% | Breakout |
 | EXTREME | > 1.5% | Continuation (or skip) |
 
-**What you MUST do:** Add your source strings to `REGIME_SIGNALS` in `volatility_gate.py`:
+**What you MUST do:** Add your source strings to `REGIME_SIGNALS` in **BOTH**
+`volatility_gate.py` **and** `volatility_gate_v2.py` (v2 = the live exec gate —
+see the two-files table above):
 
 ```python
 REGIME_SIGNALS = {
@@ -490,6 +492,7 @@ files = [
     'signal_schema.py',
     'signal_compactor.py',
     'volatility_gate.py',
+    'volatility_gate_v2.py',
 ]
 for f in files:
     py_compile.compile(f, doraise=True)
@@ -507,11 +510,14 @@ assert len(your) > 0, 'NOT in registry'
 assert your[0]['run'] is not None, 'run function is None'
 print(f'Registry: OK (enabled={your[0][\"enabled\"]})')
 
-from volatility_gate import REGIME_SIGNALS
-for regime in ['NORMAL', 'HIGH']:
-    found = any('your-signal' in s for s in REGIME_SIGNALS.get(regime, set()))
-    assert found, f'MISSING from {regime}'
-print('Volatility gate: OK')
+from volatility_gate import REGIME_SIGNALS as R1
+from volatility_gate_v2 import REGIME_SIGNALS as R2, should_trade_v2
+for regime in ['FLAT', 'NORMAL', 'HIGH', 'EXTREME']:
+    assert any('your-signal' in s for s in R1.get(regime, set())), f'v1 MISSING from {regime}'
+    assert any('your-signal' in s for s in R2.get(regime, set())), f'v2 (LIVE gate) MISSING from {regime}'
+_r = should_trade_v2('BTC', signal='your-signal+')
+assert _r[0] == 'TRADE', f'LIVE GATE BLOCKED: {_r}'
+print('Volatility gates (v1 + v2 LIVE): OK')
 "
 
 # 3. Dry run
@@ -554,6 +560,7 @@ You are the bug_hunter. Audit these files for bugs:
 - scripts/signals/__init__.py (registry entry)
 - scripts/signal_compactor.py (new source weights)
 - scripts/volatility_gate.py (new REGIME_SIGNALS entries)
+- scripts/volatility_gate_v2.py (same entries — LIVE exec gate)
 
 Check: SQL injection, connection leaks, import safety (especially
 is_component_disabled() import block), source string consistency between
@@ -582,7 +589,7 @@ Bug_hunter checks:
 
 ```bash
 cd /root/.hermes
-git add scripts/signals/your_signal.py scripts/hermes_constants.py scripts/signals/__init__.py scripts/signal_schema.py scripts/signal_compactor.py scripts/volatility_gate.py
+git add scripts/signals/your_signal.py scripts/hermes_constants.py scripts/signals/__init__.py scripts/signal_schema.py scripts/signal_compactor.py scripts/volatility_gate.py scripts/volatility_gate_v2.py
 git commit -m "signals: add your_signal — <brief description>
 
 - New signal script: signals/your_signal.py

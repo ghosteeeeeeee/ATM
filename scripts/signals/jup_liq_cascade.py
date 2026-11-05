@@ -55,7 +55,7 @@ _USDC_SCALE = 1_000_000  # notional/margin are USDC 6-decimals
 
 
 def _fetch_trades():
-    """Latest100 trade events. None = unusable (fail-safe: never treat a
+    """Latest page of trade events (limit=500). None = unusable (fail-safe: never treat a
     fetch error as liquidations)."""
     try:
         req = urllib.request.Request(
@@ -144,7 +144,9 @@ def scan_signals() -> int:
             continue
         try:
             ts = int(t['executedAt'])
-        except (TypeError, ValueError):
+        except (KeyError, TypeError, ValueError):
+            # KeyError included (delta audit): a liquidate row MISSING the key
+            # killed the cycle — malformed rows must skip, never crash.
             continue
         if ts < last_ts:
             # STRICT < (bug_hunter): same-second events arriving on the next
@@ -287,12 +289,19 @@ def _last_price_for(trades, market, died_side):
     except Exception:
         pass
     best = None
+    best_ts = -1
     for t in trades:
         if (t.get('kind') == 'liquidate'
                 and str(t.get('market', '')).upper() == market
                 and str(t.get('side', '')).lower() == died_side):
-            if best is None or int(t.get('executedAt') or 0) > int(best.get('executedAt') or 0):
-                best = t
+            # guarded (delta audit): an unparseable executedAt here raised at
+            # FIRE TIME — signal died right before add_signal (worst moment).
+            try:
+                _ts = int(t.get('executedAt') or 0)
+            except (TypeError, ValueError):
+                _ts = -1
+            if best is None or _ts > best_ts:
+                best, best_ts = t, _ts
     if not best:
         return None
     try:
