@@ -2151,6 +2151,15 @@ def _collect_atr_updates(open_positions: List[Dict]) -> List[Dict]:
         import manual_exit_manager as _mxm_atr
         if _mxm_atr.is_managed_signal(_sig_chk):
             continue
+        # linreg-fade OWNS its exits (wide 6% SL/TP, no trailing, ride the
+        # 8h universal close) — ATR level updates would rebuild the V6 exit
+        # structure (2%/ATR + trailing ratchet) that backtest-proven destroys
+        # this signal's edge (V6/V7 lose, V8 wins — brain/linreg-fade-research.md).
+        # Dual-form match (bug_hunter #9): trades.signal is the source today
+        # ('linreg-fade-') but would become signal_type ('linreg_fade_short')
+        # if get_approved_signals ever gains a signal_type key.
+        if 'linreg-fade' in _sig_chk or 'linreg_fade' in _sig_chk:
+            continue
         entry_price = float(pos.get('entry_price') or 0)
         current_price = float(pos.get('current_price') or 0)
         trade_id = pos.get('id')
@@ -2891,6 +2900,13 @@ def _apply_weather_vane_shield(positions: List[Dict]) -> int:
                     continue
             except Exception:
                 pass  # fail-safe: old behavior
+            # linreg-fade exempt (bug_hunter #7): 30min force-close of a
+            # losing position is an early loss-lock — not in the V8 structure
+            # (wide 6% SL + 8h close). Portfolio-wide suppression still blocks
+            # NEW linreg-fade entries via the regime/vol gates.
+            _wv_sig = str(pos.get('signal', '') or '')
+            if 'linreg-fade' in _wv_sig or 'linreg_fade' in _wv_sig:
+                continue
             if WEATHER_VANE_SHIELD_LOSING_ONLY:
                 pnl = float(pos.get('pnl_pct') or 0)
                 if pnl >= 0:
@@ -3035,6 +3051,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # read this one flag.
         import manual_exit_manager as _mxm
         is_ceo_trade = _mxm.is_managed_signal(pos.get('signal', ''))
+        # linreg-fade ownership flag — hoisted to loop top so EVERY exit actor
+        # below (zone 0b, wave_turn, stale, soft-trail, MFE, engines, UGB-PT
+        # via bypass list) sees the same definition. Dual-form match (bug_hunter
+        # #9): source form 'linreg-fade' / signal_type form 'linreg_fade'.
+        _sig_for_fade = str(pos.get('signal', '') or '')
+        is_linreg_fade_pos = ('linreg-fade' in _sig_for_fade
+                              or 'linreg_fade' in _sig_for_fade)
 
         # ── Compute live pnl first (before any exit decisions) ──
         entry = float(pos.get("entry_price") or 0)
@@ -3126,7 +3149,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             _exit_check = zone_aware_exit_check(token, direction, cur, _atr_slz)
             # CEO trades: zone tightening is a THIRD SL actor — forbidden;
             # manual_exit_manager owns their SL exclusively (2026-10-22).
-            if _exit_check['action'] == 'tighten_trail' and _exit_check.get('new_trail_pct') and not is_ceo_trade:
+            if _exit_check['action'] == 'tighten_trail' and _exit_check.get('new_trail_pct') and not is_ceo_trade and not is_linreg_fade_pos:
                 _new_trail_pct = _exit_check['new_trail_pct']
                 if direction == 'LONG':
                     _zone_sl = round(cur * (1 - _new_trail_pct), 8)
@@ -3154,6 +3177,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         from hermes_constants import SIGNAL_EXIT_CONFIG, RR_EXIT_ENABLED
         signal_parts = [s.strip() for s in signal.split(',')]
         # _match_exit_config is now module-level — reuse the single matcher
+        # linreg-fade OWNS its exits end-to-end (V8: wide SL/TP, no engine
+        # early exits, always the 8h universal close). Confluence partners'
+        # exit engines (pump_exit/ride_it/rr_engine) must not run on a trade
+        # that contains linreg-fade — they rebuild the exit structures that
+        # backtest-proven destroy this signal's edge (V2/V6/V7/V9 all lose).
+        # is_linreg_fade_pos is hoisted to loop top (see above).
 
         # ── 0a. Pump-Exit (ATR trailing + momentum + time) ──────────────────
         # Check if this trade's signal uses pump-exit
@@ -3165,7 +3194,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     break
         # CEO trades never enter pump/ride exit paths — matcher resolution
         # alone is not enough (comma-combo signals could leak; bug_hunter #8).
-        if use_pump_exit and not is_ceo_trade:
+        if use_pump_exit and not is_ceo_trade and not is_linreg_fade_pos:
             try:
                 import sqlite3 as _sqlite3
                 from hermes_constants import (
@@ -3343,7 +3372,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 if _match_exit_config(part) == 'ride_it':
                     use_ride_it = True
                     break
-        if use_ride_it and not is_ceo_trade:
+        if use_ride_it and not is_ceo_trade and not is_linreg_fade_pos:
             try:
                 from ride_it_exit import manage_ride_it_exit
                 ride_result = manage_ride_it_exit(token, direction, cur, pos, trade_id)
@@ -3373,7 +3402,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # FIX: prefix matching — 'rs-s34' should match 'rs' key in config
         # (is_ceo_trade + _mxm hoisted to loop top)
         use_rr_engine = False
-        if RR_EXIT_ENABLED and not is_ceo_trade:
+        if RR_EXIT_ENABLED and not is_ceo_trade and not is_linreg_fade_pos:
             for part in signal_parts:
                 if _match_exit_config(part) == 'rr_engine':
                     use_rr_engine = True
@@ -3507,9 +3536,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     wave_turn = True
                     reason = f"wave_turn_bottom_z{z_score:+.2f}_acc{accel:+.4f}"
 
-                if wave_turn:
+                if wave_turn and not is_linreg_fade_pos:
                     # Bug-B fix: removed trailing_active check (always False, trailing is via ATR SL)
                     # P0: canonical label 'wave_turn'; z/accel detail kept in exit_detail
+                    # linreg-fade exempt: early counter-trend cut not in V8 structure.
                     close_paper_position(trade_id, "wave_turn", exit_detail=reason)
                     closed_count += 1
                     wave_turn_fired = True
@@ -3757,7 +3787,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # Fires alongside trailing SL — doesn't replace it. Compliments cascade_flip.
         # Bug-B fix: removed trailing_active check (always False, trailing is via ATR SL)
         stale_close, stale_reason = check_stale_position(token, live_pnl, direction)
-        if stale_close:
+        # linreg-fade exempt (bug_hunter #5): stale-loser cuts at -1.0% after
+        # 8min — the same early loss-lock V9 measured as fatal (WR 53.6->38.3).
+        if stale_close and not is_linreg_fade_pos:
             # P0: canonical label; stalled_* detail moved to exit_detail.
             # (Old f"stale_exit_{stale_reason}" produced 55-char close_reasons that
             # overflowed varchar(50) — likely why no stale_exit rows ever landed.)
@@ -3777,7 +3809,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             'ride_it', 'trend-ride', 'trend_ride',
             'volume-breakout', 'volume_breakout',
             'mover-',  # mover- maps to ride_it; mover+ was removed (own-conclusions 2026-10-06)
-        ))
+        )) and 'linreg-fade' not in _pos_signal and 'linreg_fade' not in _pos_signal  # linreg-fade always gets the 8h close (V8)
         if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time and not _is_ride_it:
             try:
                 if isinstance(open_time, str):
@@ -3810,7 +3842,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         _ot = pos.get('open_time')
         # CEO trades: soft trigger rewrites the predefined SL on old losers —
         # third actor, forbidden; CEO levels + safety nets only (2026-10-22).
-        if _ot and live_pnl <= 0 and not is_ceo_trade:
+        # linreg-fade: same exclusion — the 2h soft-trail locks losses BEFORE
+        # the 8h mean-reversion recovery (backtest V9 vs V8: 1m SHORT WR
+        # 38.3% vs 53.6%, avg +0.074% vs +0.132%). Its protection is the wide
+        # 6% SL + the 8h UNIVERSAL_MAX_HOLD close (V8 = validated structure,
+        # brain/linreg-fade-research.md).
+        if _ot and live_pnl <= 0 and not is_ceo_trade and not is_linreg_fade_pos:
             try:
                 if isinstance(_ot, str):
                     _ot_dt = datetime.fromisoformat(_ot.replace('Z', '+00:00'))
@@ -4266,7 +4303,6 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 if _ugb_fav is not None and _ugb_fav >= _ugb_arm_pct:
                     if trade_id not in _ugb_pt_logged and live_pnl <= _ugb_fav - UGB_PT_DISTANCE_PCT:
                         _ugb_pt_logged.add(trade_id)
-                        log(f"  [SHADOW] UGB-PT would-fire {token} {direction} live={live_pnl:+.2f}% fav={_ugb_fav:+.2f}% [peak-trail -{UGB_PT_DISTANCE_PCT:.2f}%] trade={trade_id} sig={_pos_signal}")
                         # UGB-PT ENFORCE (CEO GO, run #130). Unarmed half only —
                         # armed half measured harm. Trail state from profit_monster
                         # (live arming signal); trades.trailing_activated is
@@ -4276,17 +4312,22 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         # giveback signal. UGB-PT was firing on pump-chain+/- (pump-exit
                         # correctly trailing) because profit_monster trail state is
                         # always empty for PROFIT_MONSTER_BYPASS_SIGNALS.
-                        if UGB_PT_ENFORCE:
-                            from profit_monster import _load_trail_state
-                            from hermes_constants import PROFIT_MONSTER_BYPASS_SIGNALS, PM_TRAIL_BYPASS_SIGNALS
-                            # NULL signal: PM's SQL NOT LIKE excludes NULLs → trail
-                            # never arms → same bug class. Treat empty as bypassed.
-                            # PM_TRAIL_BYPASS signals: run_trail actively deletes them
-                            # from trail state → always empty → same bug class.
-                            _is_bypassed = (not _pos_signal) or \
-                                any(_s in _pos_signal for _s in PROFIT_MONSTER_BYPASS_SIGNALS) or \
-                                any(_s in _pos_signal for _s in PM_TRAIL_BYPASS_SIGNALS)
-                            if not _is_bypassed and str(trade_id) not in _load_trail_state():
+                        # FIX (bug_hunter LOW-1, 2026-11-05): bypass check hoisted
+                        # ABOVE the shadow log — a bypassed trade (e.g. linreg-fade,
+                        # which never arms a trail by design) must not log
+                        # "[SHADOW] UGB-PT would-fire" every minute it is in profit.
+                        from profit_monster import _load_trail_state
+                        from hermes_constants import PROFIT_MONSTER_BYPASS_SIGNALS, PM_TRAIL_BYPASS_SIGNALS
+                        # NULL signal: PM's SQL NOT LIKE excludes NULLs → trail
+                        # never arms → same bug class. Treat empty as bypassed.
+                        # PM_TRAIL_BYPASS signals: run_trail actively deletes them
+                        # from trail state → always empty → same bug class.
+                        _is_bypassed = (not _pos_signal) or \
+                            any(_s in _pos_signal for _s in PROFIT_MONSTER_BYPASS_SIGNALS) or \
+                            any(_s in _pos_signal for _s in PM_TRAIL_BYPASS_SIGNALS)
+                        if not _is_bypassed:
+                            log(f"  [SHADOW] UGB-PT would-fire {token} {direction} live={live_pnl:+.2f}% fav={_ugb_fav:+.2f}% [peak-trail -{UGB_PT_DISTANCE_PCT:.2f}%] trade={trade_id} sig={_pos_signal}")
+                            if UGB_PT_ENFORCE and str(trade_id) not in _load_trail_state():
                                 close_paper_position(trade_id, "ugb_pt",
                                     exit_detail=f"ugb_pt fav={_ugb_fav:+.2f}%,pnl={live_pnl:+.2f}%,trail=FALSE,peak={UGB_PT_DISTANCE_PCT:.2f}%")
                                 closed_count += 1
@@ -4319,7 +4360,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # unproven, direction positive. Re-measure protocol in the verdict.
         # Scope = MFE_EXIT_SIGNALS (mirror book). Revert = MFE_EXIT_ENABLED
         # False (hermes_constants).
-        if MFE_EXIT_ENABLED and not is_ceo_trade:
+        if MFE_EXIT_ENABLED and not is_ceo_trade and not is_linreg_fade_pos:
             try:
                 _mfe_sig_l = (_pos_signal or '').lower()
                 if any(_s in _mfe_sig_l for _s in MFE_EXIT_SIGNALS):

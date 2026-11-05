@@ -2137,6 +2137,12 @@ PM_DEFAULT_NOTIONAL  = 11.0  # default margin per trade (USDT) — used when DB 
 # UPDATED 2026-08-26: Removed ct-hot+/ct-hot- (losing signals, PM Trail should help).
 # Added bb_bounce+/confluence (proven signals, shouldn't have PM Trail interference).
 PROFIT_MONSTER_BYPASS_SIGNALS = (
+    # linreg-fade: V8 exit structure = wide 6% SL/TP, NO trailing, ride to the
+    # 8h universal close (brain/linreg-fade-research.md). PM trail arms at
+    # +0.40% and cut_loser cuts at -1.0% — both measured to destroy this edge
+    # (V6/V7/V9: WR 37-44% vs V8 53.9%). This list also excludes the trade
+    # from cut_loser.py and the UGB-PT bypass test. bug_hunter 2026-11-05.
+    'linreg-fade',
     'atr-spike',           # proven momentum breakout
     'r2-trend-long',       # proven (51-100% WR across variants) — ATR SL, not PM Trail
     # 'bb_bounce+' REMOVED 2026-09-25 — 65% WR LONG in NEUTRAL, pm_trail should book profits
@@ -3413,6 +3419,13 @@ STANDALONE_BYPASS_SIGNALS = (
     # another signal would just delay entering the forced flow (T 2026-11-05).
     # bare form rstrips +/- at both compactor match sites.
     'jup-liq', 'jup_liq_cascade_long', 'jup_liq_cascade_short',
+    # linreg-fade: validated univariate-regression fade (brain/linreg-fade-
+    # research.md). Solo entry is the INTENDED observation mode — all other
+    # safety filters (blacklists, regime gates, vol gate, speed, winrate)
+    # still apply; only the 2-type confluence requirement is waived, same as
+    # jup-liq. Without this the signal never approved (0/57, bug_hunter
+    # 2026-11-05 CRITICAL) and could never collect the 2-week sample.
+    'linreg-fade',
     'mtf-regime-trend',  # multi-timeframe regime trend — works solo (2026-10-01)
     'tl-bounce',  # trendline bounce — works solo (2026-10-06)
     'hmacd-mtf', 'hmacd_mtf',  # multi-timeframe MACD — works solo (2026-10-09). Added underscore variant — signal source uses underscores.
@@ -4412,6 +4425,55 @@ JUP_LIQ_COOLDOWN_HOURS = 1             # per token+direction re-fire guard
 JUP_LIQ_CONF_BASE = 65                 # confidence at threshold
 JUP_LIQ_CONF_PER_RATIO = 8.0           # +per unit of (ratio - SPIKE_MULT), capped
 JUP_LIQ_CONF_CAP = 88                  # system ceiling (add_signal also caps)
+
+# ── Linreg Fade (RenTech-style univariate regression fade, 1m candles) ──────
+# linreg_fade.py — ONE predictor (1m OLS slope % over last LINREG_FADE_SLOPE_
+# WINDOW bars) vs the token's OWN trailing P10/P90 of the previous
+# LINREG_FADE_TRAIL_WIN slopes; fade the extreme; target = 8h forward return.
+# Research: scripts/analysis/linreg_forecast_research.py + linreg_fade_backtest.py
+# Full findings: brain/linreg-fade-research.md
+# EXIT STRUCTURE IS PART OF THE EDGE (V8 backtest): wide SL/TP, NO trailing,
+# ride to the 8h UNIVERSAL_MAX_HOLD close. Tight ATR stops (V2), 2%+trailing
+# production defaults (V6), and wide-SL-with-trailing (V7) ALL LOSE (WR 37-44%
+# < breakeven). decider_run.py has a matching 'linreg-fade' branch and
+# position_manager.py skips ATR level updates for this source.
+LINREG_FADE_ENABLED = True             # master kill-switch
+LINREG_FADE_PLUS_ENABLED = False       # LONG — OFF: loses in the current
+                                       # down regime (1m Oct-Nov: 44.7% WR,
+                                       # -0.318%/trade). Research showed the
+                                       # LONG side wins in up-regimes (15m
+                                       # Aug-Sep: 53.1% WR, +0.196%/trade).
+                                       # Re-enable when regime turns up.
+LINREG_FADE_MINUS_ENABLED = True       # SHORT — validated: 1m Oct-Nov 53.9%
+                                       # WR, +0.154%/trade, n=6142, positive
+                                       # in IS, OOS, and both months (V8);
+                                       # 15m Oct-Nov OOS 54.4% WR, +0.232%.
+LINREG_FADE_COOLDOWN_HOURS = 9.0       # per token+direction; > 8h hold
+LINREG_FADE_SLOPE_WINDOW = 20          # 1m bars for the OLS slope
+LINREG_FADE_TRAIL_WIN = 4320           # 1m bars (3 days) for trailing P10/P90
+LINREG_FADE_PCT_LOW = 10               # LONG trigger at/below trailing P10
+LINREG_FADE_PCT_HIGH = 90              # SHORT trigger at/above trailing P90
+LINREG_FADE_MIN_BARS = 4400            # trail window + slope window + buffer
+LINREG_FADE_MAX_AGE_MIN = 2            # 1m staleness rule (add-signal #13)
+LINREG_FADE_MIN_LIVE_BARS = 10         # >=10 of last 20 bars must trade (dead-token guard)
+LINREG_FADE_MIN_HIST_RATIO = 0.9        # trailing window must be >=90% finite (data quality)
+LINREG_FADE_CONF_BASE = 65             # confidence at threshold
+LINREG_FADE_CONF_FLOOR = 50            # system floor
+LINREG_FADE_CONF_CAP = 88              # system ceiling (add_signal also caps)
+LINREG_FADE_CONF_EXTREME_BONUS_MAX = 15  # bonus for slope deep beyond the decile
+# Exit structure (V8 — the only configuration that preserves the edge):
+LINREG_FADE_SL_PCT = 0.06              # wide 6% SL (V8: only ~6% of exits hit it)
+LINREG_FADE_TP_PCT = 0.06              # wide 6% TP (rare upside capture)
+LINREG_FADE_TRAILING_ACTIVATION = 9.99  # 999% — never arms; trailing destroys
+                                       # the edge (V6/V7: WR 37-44% losers)
+# LEVERAGE IS PART OF THE VALIDATED STRUCTURE (bug_hunter Issue 4, V10/V11):
+# the hard_max_loss floor is -4% ACCOUNT / leverage in price terms. At lev5
+# that floor sits at -0.8% price and cuts 63-74% of fade trades before the
+# 8h recovery (V10: WR 25-32% — edge DEAD). At lev1 the floor is -4% price
+# and the edge survives (V11: SHORT WR 52.8%, +0.103%/trade, HML ~13% of
+# exits). decider_run.py pins linreg-fade trades to this leverage.
+LINREG_FADE_LEVERAGE = 1                # keep HML floor at -4% price (V11)
+
 # EVAL RESULT (executed 2026-11-02 by analysis/jup_hml_shadow_eval.py, CEO
 # consult item (a), four guardrails: replay fills via audited replay_layers /
 # winner-preemption counted / sign-stability / fees in): BOTH thresholds

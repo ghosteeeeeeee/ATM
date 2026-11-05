@@ -786,6 +786,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     try:
         from hermes_constants import (
             JUP_LIQ_ENABLED, JUP_LIQ_PLUS_ENABLED, JUP_LIQ_MINUS_ENABLED,
+            LINREG_FADE_ENABLED, LINREG_FADE_PLUS_ENABLED, LINREG_FADE_MINUS_ENABLED,
             PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
             VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
             HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
@@ -877,6 +878,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 return None
             if _comp == 'jup-liq' and not JUP_LIQ_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" JUP_LIQ_ENABLED=False', flush=True)
+                return None
+            # linreg-fade (RenTech-style regression fade — 2026-11-05)
+            if _comp == 'linreg-fade+' and not LINREG_FADE_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" LINREG_FADE_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'linreg-fade-' and not LINREG_FADE_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" LINREG_FADE_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'linreg-fade' and not LINREG_FADE_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" LINREG_FADE_ENABLED=False', flush=True)
                 return None
             # pct-hermes
             if _comp == 'pct-hermes+' and not PCT_HERMES_PLUS_ENABLED:
@@ -2819,6 +2830,7 @@ def is_component_disabled(component: str) -> bool:
     try:
         from hermes_constants import (
             JUP_LIQ_ENABLED, JUP_LIQ_PLUS_ENABLED, JUP_LIQ_MINUS_ENABLED,
+            LINREG_FADE_ENABLED, LINREG_FADE_PLUS_ENABLED, LINREG_FADE_MINUS_ENABLED,
             PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
             VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
             HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
@@ -2928,6 +2940,10 @@ def is_component_disabled(component: str) -> bool:
     if c in ('jup-liq+', 'jup_liq_cascade_long'): return not JUP_LIQ_PLUS_ENABLED
     if c in ('jup-liq-', 'jup_liq_cascade_short'): return not JUP_LIQ_MINUS_ENABLED
     if c == 'jup-liq': return not JUP_LIQ_ENABLED
+    # linreg-fade (RenTech-style regression fade — 2026-11-05)
+    if c in ('linreg-fade+', 'linreg_fade_long'): return not LINREG_FADE_PLUS_ENABLED
+    if c in ('linreg-fade-', 'linreg_fade_short'): return not LINREG_FADE_MINUS_ENABLED
+    if c == 'linreg-fade': return not LINREG_FADE_ENABLED
     # pct-hermes
     if c == 'pct-hermes+': return not PCT_HERMES_PLUS_ENABLED
     if c == 'pct-hermes-': return not PCT_HERMES_MINUS_ENABLED

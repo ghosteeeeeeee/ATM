@@ -97,6 +97,11 @@ except Exception:
     _r2_trend_v2_long_run = None
 
 try:
+    from signals.linreg_fade import run as _linreg_fade_run
+except Exception:
+    _linreg_fade_run = None
+
+try:
     from signals.trendline_bounce_long import run as _trendline_bounce_long_run
 except Exception:
     _trendline_bounce_long_run = None
@@ -517,6 +522,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'r2_trend_short',           'enabled': 'R2_TREND_SHORT_ENABLED',       'run': _r2_trend_short_run},
     {'name': 'r2_trend_long',            'enabled': 'R2_TREND_LONG_ENABLED',        'run': _r2_trend_long_run},
     {'name': 'r2_trend_v2_long',         'enabled': 'R2_TREND_V2_LONG_ENABLED',     'run': _r2_trend_v2_long_run},
+    {'name': 'linreg_fade',              'enabled': 'LINREG_FADE_ENABLED',          'run': _linreg_fade_run},
     {'name': 'trendline_bounce_long',    'enabled': 'TRENDLINE_BOUNCE_LONG_ENABLED', 'run': _trendline_bounce_long_run},
     {'name': 'ema300_dip_long',          'enabled': 'EMA300_DIP_LONG_ENABLED',      'run': _ema300_dip_long_run},
     {'name': 'ema300_dip_short',         'enabled': 'EMA300_DIP_SHORT_ENABLED',     'run': _ema300_dip_short_run},
@@ -634,7 +640,7 @@ _warn_broken_registry_entries()
 
 # Slow signals — scan 191 tokens and take >60s. Run on a 5-min cadence.
 # pump_flow_signal removed — runs every minute to match state file update cadence
-_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'rr_structural', 'rr_structural_v2_long'}
+_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'rr_structural', 'rr_structural_v2_long', 'linreg_fade'}
 
 
 def _resolve_enabled(entry):

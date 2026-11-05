@@ -2964,6 +2964,16 @@ def execute_trade(token, direction, price, confidence, source,
     # ── Pump Mode ─────────────────────────────────────────────
     # Spike/pump trades: tight SL/TP, NO trailing. Enter fast, exit fast.
     is_pump = 'pump-' in (source or '')
+    # ── Linreg Fade exit structure (V8 backtest — 2026-11-05) ──────────────
+    # 'linreg-fade' mean-reversion entries must RIDE to the 8h universal
+    # close: wide 6% SL/TP, trailing NEVER arms. Tight ATR stops (V2), the
+    # production 2%+trailing defaults (V6), and wide-SL-with-trailing (V7)
+    # all destroy the edge (WR 37-44% < breakeven); wide-SL/no-trail (V8)
+    # preserves it (1m SHORT 53.9% WR +0.154%/trade). See
+    # brain/linreg-fade-research.md. position_manager skips ATR updates
+    # for this source so these levels stick.
+    # dual-form match (bug_hunter #9): source 'linreg-fade' or signal_type 'linreg_fade'
+    is_linreg_fade = ('linreg-fade' in (source or '') or 'linreg_fade' in (source or ''))
 
     # Default values for non-pump trades (avoid UnboundLocalError)
     sl = 0.0
@@ -2971,7 +2981,15 @@ def execute_trade(token, direction, price, confidence, source,
     sl_pct_val = 0.0
     tp_pct_val = 0.0
 
-    if is_pump:
+    if is_linreg_fade:
+        from hermes_constants import (LINREG_FADE_SL_PCT, LINREG_FADE_TP_PCT,
+                                      LINREG_FADE_TRAILING_ACTIVATION)
+        sl_pct_val = LINREG_FADE_SL_PCT      # wide 6% — rarely hit within 8h
+        tp_pct_val = LINREG_FADE_TP_PCT      # wide 6% — rare upside capture
+        trailing_activation = LINREG_FADE_TRAILING_ACTIVATION  # 999% — never arms
+        trailing_distance   = TRAILING_DISTANCE_PCT
+        log(f'  [LINREG-FADE] {token} {direction} — wide SL={sl_pct_val*100:.1f}% TP={tp_pct_val*100:.1f}% trailing=NEVER (V8 exit structure → ride to 8h universal close)')
+    elif is_pump:
         sl_pct_val = PUMP_SL_PCT    # 1.5% SL
         tp_pct_val = PUMP_TP_PCT    # 2.5% TP
         # FIX (2026-09-30): pump mode previously set trailing_activation=0 /
@@ -2992,7 +3010,21 @@ def execute_trade(token, direction, price, confidence, source,
     # ── ATR SL/TP ─────────────────────────────────────────────
     # ATR-based SL/TP is handled by position_manager every 1 min.
     # Decider_run passes sl=0, tp=0 to defer to position_manager._collect_atr_updates().
-    if is_pump:
+    if is_linreg_fade:
+        # V8 levels written at open; position_manager skips ATR updates for
+        # 'linreg-fade' sources so these persist until TP/SL/8h close.
+        # Precedence over pump: a fade-containing trade gets fade exits.
+        from hermes_constants import (LINREG_FADE_SL_PCT, LINREG_FADE_TP_PCT)
+        _live_price = get_current_price(token) or price
+        price = _live_price
+        if direction == 'LONG':
+            sl = round(_live_price * (1 - LINREG_FADE_SL_PCT), 8)
+            tp = round(_live_price * (1 + LINREG_FADE_TP_PCT), 8)
+        else:
+            sl = round(_live_price * (1 + LINREG_FADE_SL_PCT), 8)
+            tp = round(_live_price * (1 - LINREG_FADE_TP_PCT), 8)
+        log(f'  [LINREG-FADE] {token} {direction} — levels SL={sl:.6f} TP={tp:.6f} @live {_live_price:.6f} (6%/6%, no ATR, no trailing)')
+    elif is_pump:
         # Pump mode: tight fixed SL/TP, NO trailing. Enter fast, exit fast.
         if direction == 'LONG':
             sl = round(price * (1 - PUMP_SL_PCT), 8)
@@ -5905,6 +5937,21 @@ def run(dry_run=False):
         # Get per-token leverage from Hyperliquid
         lev = get_max_leverage(token)
         lev = min(lev, 5)   # hard cap at 5x (safer for all directions)
+        # linreg-fade: pin to LINREG_FADE_LEVERAGE — the validated V8 exit
+        # structure only survives the hard_max_loss floor at lev1 (V11 vs V10:
+        # WR 52.8% vs 25-32% — brain/linreg-fade-research.md). Guardrail stays
+        # fully intact; leverage adapts to it instead of exempting it.
+        if 'linreg-fade' in (source or '') or 'linreg_fade' in (source or ''):
+            try:
+                from hermes_constants import LINREG_FADE_LEVERAGE
+                lev = LINREG_FADE_LEVERAGE
+                log(f'  [LINREG-FADE] {token} {direction} — leverage pinned to {lev}x (HML floor -4% price, V11)')
+            except ImportError:
+                # FAIL LOUDLY (bug_hunter LOW-2): degrading to lev5 puts the
+                # hard_max_loss floor at -0.8% price = the V10 regime where the
+                # edge is dead (WR 25-32%). Pin lev1 as the safe fallback.
+                lev = 1
+                log(f'  [LINREG-FADE][ERROR] {token} {direction} — LINREG_FADE_LEVERAGE missing from hermes_constants; FALLBACK lev=1 (was lev5 = V10 dead-edge regime)', 'ERROR')
 
         # BUG-26 fix: claim signal atomically BEFORE brain.py call.
         # This prevents double-execution when multiple scripts run same minute.
