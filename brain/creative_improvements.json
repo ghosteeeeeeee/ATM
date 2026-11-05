@@ -10490,5 +10490,23 @@
     "category": "exit quality / giveback",
     "risk": "medium",
     "registered_as": "amplify-ugb-bypass-hole in data/shadow_disposition.json (deadline 2026-12-15, default NO SHIP)"
+  },
+  {
+    "date": "2026-11-05T04:45:00Z",
+    "idea": "jup LONG rsi_exec 35-45 cell pre-registered for 11-07 jup-yolo-regime-review (NOT shipped)",
+    "rationale": "14d jup LONG rsi_exec 35-45: n=22, 40.9% WR, -0.96 (9W +0.65 / 13L -1.61). Confounder proof: the SAME band excluding jup is flat (14d/30d 25T -0.11) — the 7d LONG band loss is jup-driven, not a band edge. Impact-on-winners: blocking kills 9 of jup's 78 14d winners = 11.5% (<20% bar) and $0.65 of $4.99. n=22 < the pre-registered n>=50 RSI-bucket guardrail → route to the scheduled 11-07 review with numbers, do not ship standalone.",
+    "expected_impact": "If review approves: +0.96/14d saved on the cell, entry-quality fix on the #1 never-armed bleeder (jup LONG 34T -4.66 7d)",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-05T04:45:00Z",
+    "idea": "Amplify vb- HIGH SHORT clone-hunt (amplify-vb-high-short-clonehunt registered in shadow_disposition)",
+    "rationale": "Weekly AMPLIFY bar: all 7 live 30d winner cells are already VALIDATED/why-not'd/in-flight, so the new proposal targets the validated cell with zero offense coverage — mine blocked setups matching volume-buildup- HIGH SHORT (78.9% WR, +0.42/30d) and counterfactual-walk them. Gate-shadow coverage fix lands 11-06 first.",
+    "expected_impact": "If bar met: new trade flow on the family's only validated bright spot; default NO SHIP keeps risk at zero",
+    "category": "clone-hunt",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

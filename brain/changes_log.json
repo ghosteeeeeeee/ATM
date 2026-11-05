@@ -3550,5 +3550,27 @@
     "after": "tracked in git",
     "rationale": "shipped artifacts must be in the repo or a reset loses the dedupe tool",
     "impact": "zero behavior"
+  },
+  {
+    "timestamp": "2026-11-05T04:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Registered amplify-vb-high-short-clonehunt in data/shadow_disposition.json (weekly AMPLIFY proposal #223)",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "11 amplify entries",
+    "after": "12 amplify entries",
+    "rationale": "Weekly offense mandate: all 30d winner cells already in-flight; new clone-hunt covers validated vb- HIGH SHORT cell with no offense entry",
+    "impact": "Measurement-only, default NO SHIP"
+  },
+  {
+    "timestamp": "2026-11-05T04:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Refreshed contrarian_outcome_join.py + floor_admit_outcome_join.py (mandate / staleness)",
+    "type": "ops",
+    "file": "data/contrarian_outcome_join.json + data/floor_admit_outcome_join.json",
+    "before": "contrarian 04:30Z fresh; floor join 2026-11-03 04:41Z (48h stale)",
+    "after": "contrarian 04:30Z n=1362 flip 43.8%; floor 04:41Z n=1327 floor 49.1% vs always 43.3% fisher p=0.1315",
+    "rationale": "Contrarian join has no systemd producer (mandate); floor join was 48h stale before its 11-15 bar read",
+    "impact": "KPI inputs fresh; floor direction holds, still COLLECT (p>0.05)"
   }
 ]

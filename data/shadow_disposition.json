@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-04T19:20:00Z",
+  "updated": "2026-11-05T04:45:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -1112,6 +1112,20 @@
       "threshold": "SHIP only if DISTINCT trade ids >=20 in the widened cohort AND cf net delta >= +$0.15/30d AND killed-winners = 0 AND 7d/14d/30d same sign. Units guard mandatory (pnl_usdt vs pnl_usdt; raw price-move vs stored pnl_pct = #193 landmine).",
       "default_action": "NO SHIP — keep the 2026-10-31 bypass skip; monitor only",
       "notes": "POPULATION CAP: all PROFIT_MONSTER_BYPASS families combined = 26 closed trades/30d, of which 15 reached arm and 8 stopped out. n=20 may be unreachable by 2026-12-15 unless r2-trend-long*/hzscore/confluence volume rises. If deadline hits with n<20, disposition = NO SHIP with the population cap recorded (do NOT lower the bar). Fix spec if it ever ships: split the skip into an 'alternate trail exists' sub-list (pump-catcher*, pump-chain via pump_exit, hzscore ATR) vs 'no trail exists' (hl_copy_trader) — do not re-enable UGB-PT wholesale for bypassed signals, that re-opens the c384a2d5 bug it fixed."
+    },
+    {
+      "id": "amplify-vb-high-short-clonehunt",
+      "stream": "volume-buildup- HIGH SHORT winner-cell (WINNER_CELLS_VALIDATED) — clone-hunt blocked setups matching the profile",
+      "kind": "amplify",
+      "status": "open",
+      "created": "2026-11-05T04:45:00Z",
+      "deadline": "2026-11-13T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run #223",
+      "proposal_type": "(c) clone-hunt: mine signals/gate_shadow for BLOCKED volume-buildup- HIGH SHORT setups + counterfactual-walk candles",
+      "evidence": "Audit #223 weekly screen. WINNER_CELLS_VALIDATED member ('volume-buildup-','HIGH'): live 30d 19T 78.9% WR net +0.42 (PG fresh). Family overall is a net bleeder 14d 58T 60.3% -0.89 (R:R class, unarmed half owns it) — the HIGH SHORT cell is the validated bright spot and has NO amplify proposal yet (stop-tighten 11-14 is exit-side; conf-filter-parity is not cell-scoped). Clone-hunt = find MORE of what that cell does well: setups blocked by CONFLUENCE-EXPIRY / CTX-GATE / regime that match the HIGH SHORT entry profile (vb- source, SHORT, volatility_regime=HIGH), then counterfactual-walk 1m candles. Depends on gate-shadow coverage fix (gate-shadow-capture-coverage-fix due 11-06).",
+      "threshold": "SHIP only if blocked-matchable n>=15 AND would-win >=70% (live cell 78.9%) AND counterfactual candle-walk net >= +$0.50/30d (pnl_usdt basis, units guard) AND 30d same-sign on live cell. Default NO SHIP.",
+      "measurement": "gate_shadow + signals runtime join filtered to vb- HIGH SHORT profile; candle replay via existing counterfactual walkers; report at deadline.",
+      "default_action": "NO SHIP"
     }
   ]
 }
