@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-05T16:55:00Z",
+  "updated": "2026-11-05T20:50:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -1141,6 +1141,21 @@
       "threshold": "n>=15 AND net>0 AND harvest rolling-50 jup share <35% AND 30d same-sign. Then add ('jup_yolo_mirrored','HIGH') to WINNER_CELLS_VALIDATED with units guard (notional AFTER dynamic sizing BEFORE HL_MIN).",
       "default_action": "NO CHANGE until all four bars — log why-not if harvest fails (jup-share conflict)",
       "disposition": "WATCH — n=12 early, conflicts with jup-share harvest bar"
+    },
+    {
+      "id": "amplify-ema300-underdeploy",
+      "stream": "ema300-breakthrough± under-deployment clone-hunt (enabled flags True, live 0T/30d, positive deduped shadow)",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt: mine BLOCKED/dying setups against shadow winner profile + counterfactual-walk candles",
+      "status": "open",
+      "created": "2026-11-05T20:50:00Z",
+      "deadline": "2026-11-19T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run #226",
+      "evidence": "shadow_source_dedupe 2026-11-05 (30d): ema300-breakthrough- n=13 independent events 46.2% WR +0.24 avg, sum +3.18 (dedupe-clean, no token-event inflation). Live PG 30d: 0T for both ±. Flags all True (hermes_constants:2819-2821). Runtime DB: 15 rows/30d, ALL EXPIRED — friction named: compaction_stale_10min 10/15, short-rsi-hard-floor 3/15 (POL/ICP/PONS), long-midband 2/15. Zero approved, zero fills. Contrast grind-breakout-deploy (done NO-CHANGE): same shape, that one had a named approval-gate blocked-set; this one dies primarily on detection->approval LATENCY (stale>10min), so the walk must start at detection ts.",
+      "threshold": "SHIP only if ALL: (i) counterfactual walk of the compaction_stale_10min cohort from DETECTION time with live exit engine gives n>=10 decided AND net>0 (pnl_usdt, units guard — never raw price-move vs pnl_pct); (ii) 7d/14d/30d same-sign on the walked book; (iii) fk <20% of LONG winners in same windows; (iv) if (i)-(iii) pass, ALSO show a non-colliding latency fix (compaction approval SLA) OR an explicit gate-exempt path — no bypass of short-rsi-hard-floor / long-midband (those knife guards stay global).",
+      "default_action": "NO CHANGE — walk stays analysis-only; log why-not in kanban at deadline (status quo is the default).",
+      "measurement": "shadow_trades.db rows for source LIKE 'ema300-breakthrough%' joined to candles; report decided n, net pnl_usdt, WR per window; runtime-DB decision_reason distribution re-counted at deadline.",
+      "notes": "AMPLIFY weekly mandate #226: all 6 n>=10 30d winner cells are already in-flight (pump-chain+ EXTREME / bb-squeeze+ NORMAL / volume-buildup- HIGH / jup SHORT HIGH / pc-v6 EXTREME SHORT dormant 0T14d / pc- NORMAL LONG = contrarian flip watch) — this under-deployment hunt is the run's new proposal. Dedupe lesson from amplify-grind-breakout-deploy applied UP FRONT (deduped before proposing)."
     }
   ]
 }

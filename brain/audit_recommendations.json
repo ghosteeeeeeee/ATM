@@ -1,149 +1,145 @@
 {
-  "timestamp": "2026-11-05T16:55:00Z",
-  "run": 225,
+  "timestamp": "2026-11-05T21:03:24Z",
+  "run": "brain_auditor #226",
   "session_brain_stats": {
     "queries": [
-      "storm waiver starvation counterfactual",
-      "signal performance winrate chop arm",
-      "new signal idea improvement"
+      "chop entries momentum filter losing",
+      "wrong side short long regime trend",
+      "amplify winner cell idea"
     ],
-    "top_insights": [
-      "storm waiver ENFORCE=False pending >=3-storm bar deadline 11-12 (streak 2/3 per auto_1hr)",
-      "chop filter / momentum blocks recurring theme in sessions",
-      "trend-following signal idea still open in brain (add-signal skill)"
-    ]
+    "top_insight": "Recurring sessions: chop-filter coverage per signal type (CHOP filter not applied to all momentum signals); LONG entries against BTC EMA300/slope direction = recurring root-cause; cell-based winner amplifier discussed as possibly dead in money path (WINNER-CELL-SIZE log line verified firing live 2026-11-05 FOGO x1.25 — NOT dead)."
   },
   "trade_summary_24h": {
-    "n": 6,
+    "trades": 6,
     "wr": 66.7,
-    "pnl": 0.28
-  },
-  "trade_summary_7d": {
-    "n": 267,
-    "wr": 53.9,
-    "pnl": -1.36
-  },
-  "trade_summary_14d": {
-    "n": 409,
-    "wr": 55.0,
-    "pnl": -1.91
-  },
-  "chop_vs_trend": {
-    "7d_armed": {
-      "armed": {
-        "n": 138,
-        "pnl": 8.69
-      },
-      "never": {
-        "n": 129,
-        "pnl": -10.05
-      }
+    "net": 0.28,
+    "open": 0,
+    "t_7d": 264,
+    "wr_7d": 54.2,
+    "net_7d": -1.37,
+    "chop_family_7d": {
+      "trades": 86,
+      "net": -10.4
     },
-    "7d_chop_bleed_dollar_share_pct": 94.8,
-    "14d_trail_family": "268T 81.3% +13.02",
-    "14d_chop_stop": "121T 0% -14.97",
-    "verdict": "mandate intact — never-armed entries own 94.8% of 7d dollar losses"
+    "armed_7d": {
+      "trades": 141,
+      "wr": 90.1,
+      "net": 9.18
+    },
+    "other_7d": {
+      "trades": 123,
+      "wr": 13.0,
+      "net": -10.55
+    },
+    "regime_7d_by_vol": {
+      "HIGH": "77T -1.12",
+      "NORMAL": "111T -0.32",
+      "EXTREME": "61T +0.04",
+      "FLAT": "16T +0.18"
+    }
   },
   "shadow_analysis": {
-    "contrarian": "join re-ran 16:30Z: overall flip-WR 43.8% n=1362; pump-chain- ~64-68% LIVE (fade stands); btc-pump-rider+ do-NOT",
-    "floor_admit": "join re-ran 16:30Z: floor 49.1% vs always 43.3% fisher p=0.1315 COLLECT (11-15 bar)",
-    "oscillator": "frozen/archived — not cited",
-    "wyckoff": "retired — not cited",
-    "rr_shadow": "orphaned — not cited",
-    "gate_shadow": "capture 15-30% all major gates vs log reparse (BTC-CRASH 0% in db) — 11-06 fix still open",
-    "overall": "contrarian + floor joins useful; gate_shadow recorder broken; oscillator/wyckoff/rr dead"
+    "contrarian": "join refreshed 20:30Z (mandate, own run): overall flip-WR 43.8% n=1360 decided. pc-: 226W/124L (64.6%) LIVE keep; rider btc-pump-rider+: 369W/640L (36.7%) do-NOT-flip confirmed. per-BTC-tape: pc- flip best BELOW EMA300 67.8% n=211. token chi2 rider p=4e-24 heterogeneous — per-token never blanket.",
+    "floor_admit": "join refreshed 20:35Z: floor_only 1324 decided 49.1% vs always_admit 205 decided 43.9%, blocked n=0; 30d same-sign bar not reachable until 2026-10-16+30d -> COLLECT (directionally still favors floor admit).",
+    "oscillator": "ARCHIVED 2026-10-27 (fossil) — no live reads; OSCILLATOR_MULT_ENABLED=True since Oct 1.",
+    "wyckoff": "KILL executed 2026-10-31 (flags False, polarity corrected) — stream dead; dedupe ranking still shows 17 independent events 88.2% but no re-enable without co-source (Oct-15 ruling).",
+    "rr_shadow": "rr-engine-shadow KILL'd as stale collector (registry done) — do not cite.",
+    "shadow_trader": "66538 signals / 65534 closed. Gates: CONFLUENCE-EXPIRY 15395 blocked @47% would-win (protective floor), CTX-GATE 2249 @52%, BTC-CRASH 432 @41%. Exit A/B: pm_trail 26405 WR100 +38avg dominant; cut_loser/hard_max 0% WR families as expected. Dedupe ranking (30d): grind-breakout- 10ded 80% +1.13, ai-trader+ 9ded 100% +0.56, wyckoff- 17ded 88.2%, ema300-breakthrough- 13ded 46.2% +3.18 sum, continuum- flips raw -0.26 -> dedup +0.20. Live cross-check: ai-trader+ live 29T -0.80 (shadow/live DIVERGE — do not promote on shadow alone), volume-breakout-short- collector DEAD since 10-20 (28 rows only on kill day).",
+    "overall": "Contrarian + floor joins are the only live outcome joins with decision value; shadow_trader dedupe view is required before any 'top source' claim (grind lesson). rs-*/open-skies/ema300 shadow sources have ZERO live fills — under-deployment, not quality, is their binding constraint."
   },
   "drift_findings": [
-    "4h_regime_scanner signals.json paths were dead (list-only parse of a dict file at wrong path) — regime_4h coverage 81.5% < 90% bar. FIXED this run.",
-    "jup_liq_cascade shipped by T 2026-11-05 with price bug (amount=0 in feed → fixed-point stored). FIXED this run.",
-    "FADE-CRASH-POSTFLIP shadow: 17/23 coherent=NO — KEEP pre-flip per bar (not direction-coherent)."
+    {
+      "item": "4h regime_4h coverage bar (>=90%)",
+      "was": "81.5% pre-#225, 86.2% after #225 universe fix",
+      "now": "100% (65/65 recent-7d traded tokens)",
+      "why": "#225 fixed the universe but STALE_THRESHOLD_SECS=600 (10 min) on a 4h candle table rejected ALL mid-period local reads -> Binance fallback -> HL-only tokens dropped. Root cause completed this run.",
+      "impact": "regime_4h gates now see every recently-traded token; 9 HL-only tokens (incl. FARTCOIN/GOAT/CASHCAT) regain 4h regime data."
+    },
+    {
+      "item": "winner-cell amplifier 'dead in money path' session claim",
+      "was": "session brain hit suggested brain.py discards the arg",
+      "now": "NOT dead — decider_run._get_winner_cell_size_mult substring+regime match verified; [WINNER-CELL-SIZE] tag fired live 2026-11-05 (FOGO x1.25)",
+      "why": "session noise vs code",
+      "impact": "no action; recorded to kill the rumor."
+    }
   ],
   "recurring_problems": [
-    "chop-bleed: never-armed entries 14d -15.04 of -16.60 losses (13th consecutive >=92% window)",
-    "jup_yolo_mirrored LONG 14d 100T -1.08 worst cell — regime review due 11-07",
-    "HML 7d 37T -4.73, jup owns 22 (-3.20) — harvest bar HML<15 FAIL"
+    "Chop/stop family owns the bleed: 7d exit-family = 86T -$10.40 vs system -$1.37; armed/profit-exit cohort 141T 90.1% +$9.18 vs other-cohort 123T 13.0% -$10.55. 14d: trail 146T 97.3% +8.77 vs chop/stop 97T 0% -11.53. Same shape as #225 (94.8% dollar).",
+    "jup share rolling-50 = 44% (harvest bar <35%) — harvest-ship 3/4 bars still FAIL at #226; fill-cap C needs more time (deadline 11-07).",
+    "compaction_stale_10min is the top EXPIRED reason for enabled signals that never fill (ema300 10/15 rows) — detection->approval latency, recurring across under-deployed signals."
   ],
   "missing_implementations": [
-    "gate_shadow recorder offset (capture 15-30%) — deadline 11-06, main-session owns",
-    "wyckoff outcome join — still pending"
+    {
+      "item": "wyckoff outcome join",
+      "status": "moot — stream KILL'd 10-31, join no longer valuable"
+    },
+    {
+      "item": "ema300-breakthrough latency/staleness counterfactual",
+      "status": "registered this run as amplify-ema300-underdeploy (clone-hunt, deadline 11-19)"
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-11-05T16:55:00Z",
-      "idea": "add_signal price-sanity: reject signals whose price deviates >100x from live cached price at SOURCE (not just exec guard)",
-      "rationale": "jup-liq first fire stored 7.658e16; exec guard caught it at 16:34 but only after the signal polluted the queue and burned a claim cycle. Fail-fast at add_signal saves decider work and makes corrupt-price bugs visible in signal_runner logs immediately.",
-      "expected_impact": "corrupt-price signals surface within 1 cycle instead of at exec; zero impact on valid signals",
-      "category": "data quality",
+      "date": "2026-11-05T21:03:24Z",
+      "idea": "Anti-vacuous prompt: 'arm-rate' is measured where trail never had a chance — build a momentum-at-entry (MFE-first-5m) gate so never-armed trades only fire when the first 5 candles already show >0.15% adverse-free drift toward TP side",
+      "rationale": "7d other-cohort 123T 13% WR -10.55 all failed to arm; 48h autopsy: 0/18 NEVER-recover (all traded back) = entries are timed wrong, not direction-wrong. If entry waited for drift confirmation, chop entries self-select out while trend entries (already drifting) still fire.",
+      "expected_impact": "cut never-armed cohort by 30-50% (per grind of 52/56 hard_max_loss never reaching +0.40%)",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "low"
+      "risk": "medium — needs 7d backtest on winners for fk check before any ship"
     },
     {
-      "date": "2026-11-05T16:55:00Z",
-      "idea": "STORM waiver streak tracker: surface 'streak N/3' in watchdog when shadow would-pass count is rising — pre-position ENFORCE decision before 11-12 deadline",
-      "rationale": "auto_1hr already computes storm packets (counterfactual +$3.93 touch 30/30 at 16:21) but the >=3-storm bar for ENFORCE lives only in disposition prose. A visible streak counter means the CEO walks into 11-12 with the number in front of them.",
-      "expected_impact": "faster ENFORCE/NO-GO decision at deadline; no behavior change until bar met",
-      "category": "governance",
+      "date": "2026-11-05T21:03:24Z",
+      "idea": "4h regime age-vs-coverage monitor (one-liner in watchdog): alert when recent-7d coverage <90%",
+      "rationale": "81.5%->86.2% drift went unnoticed across runs until audit mandate flagged it; the bar exists but nothing measured it continuously",
+      "expected_impact": "makes the coverage bar self-enforcing",
+      "category": "instrumentation",
       "status": "suggested",
       "risk": "low"
     }
   ],
   "config_changes_applied": [
     {
-      "file": "scripts/signals/jup_liq_cascade.py",
-      "change": "_last_price_for: get_hl_price first, else raw/1e12 (amount always 0 in feed)",
-      "rationale": "first live fire SUSPICIOUS PRICE ratio ~1e12 — signal unexecutable without fix",
-      "verified": "selfcheck PASS: BTC 76544, HYPE 79.51, fallback 1234.5"
-    },
-    {
       "file": "scripts/4h_regime_scanner.py",
-      "change": "get_tokens_to_scan: WWW_DATA signals.json path + dict parse + recent-7d traded pull",
-      "rationale": "regime_4h coverage 81.5% < 90% bar; dead paths meant signal tokens never scanned",
-      "verified": "token universe now includes CASHCAT/FARTCOIN/ZORA etc; compile OK"
+      "before": "STALE_THRESHOLD_SECS = 600",
+      "after": "STALE_THRESHOLD_SECS = 32400 (9h)",
+      "rationale": "ts=candle OPEN time -> honest latest-row age 0-8h; 600s rejected all mid-period local reads -> Binance fallback -> 9 HL-only tokens dropped (coverage 86.2%<90%). bug-hunter F1 caught first cut 21600 leaving (6h,8h) gap -> 32400.",
+      "verification": "two manual scanner runs: 65/65 = 100.0% coverage, zero false-stale fallbacks; bug-hunter subagent PASS"
     }
   ],
   "changes_from_last_run": [
-    "#224 pump-chain+ kill premise correction: HOLDING — cell-scoped eval still 11-13, no premature kill",
-    "#224 arm-rate trigger pre-reg (n>=20 arm<30% net<0): 0 signals qualify — correct, zero live impact",
-    "#223 contrarian join refresh: re-ran this run 16:30Z, pc- still ~64% LIVE",
-    "#224 WINNER-CELL-SIZE 1.25x: still firing (FOGO pump-chain+ EXTREME 07:57 today x1.25)"
-  ],
-  "harvest_ship_early_warning": {
-    "deadline": "2026-11-07",
-    "metrics": {
-      "rolling50_jup_share": "44.0-45.2% (bar <35%) FAIL",
-      "hml_7d": "37 (bar <15) FAIL — jup owns 22",
-      "daily_net_72h": "day-1 -0.14, day-2 -0.29 (bar sustained $0) FAIL",
-      "long_48h": "-0.43"
+    {
+      "run": "#225",
+      "change": "jup_liq_cascade first-fire corrupt price (7.658e16) — get_hl_price-first fix",
+      "status": "PENDING LIVE FIRE — 0 jup_liq trades since 16:00; selfcheck PASS, exec SUSPICIOUS-PRICE guard was the last line of defense and held",
+      "verdict": "monitor"
     },
-    "verdict": "3 of 4 bars FAIL with 2 days left — CEO pre-position revert"
-  },
-  "autopsy_48h": {
-    "n": 20,
-    "never_adverse": 7,
-    "recovered": 13,
-    "never": 0,
-    "wrong_side": "REFUTED 79th consecutive run",
-    "method": "recovery_replay.py adverse-first, selfcheck PASS"
-  },
-  "amplify": {
-    "new_proposal": "amplify-jup-short-high-cell (WATCH — n=12 early, conflicts with jup-share harvest bar)",
-    "in_flight_serviced": [
-      "fade-ctx-exempt 11-10",
-      "winner-cell-size-125 11-10",
-      "bb-squeeze-hml 11-17 done",
-      "eval-midband 11-03 done",
-      "vb-high-short-clonehunt 11-13",
-      "ugb-bypass-hole 12-15"
-    ],
-    "flip_kpi": "0 conversions this week — in-flight: harvest 11-07, fade-ctx 11-10, watch-contrarian 11-11"
-  },
+    {
+      "run": "#225",
+      "change": "4h regime scanner token universe (dead paths + list-only parse)",
+      "status": "PARTIAL then COMPLETED — universe fix alone moved 81.5%->86.2%; residual stale-threshold root cause fixed this run -> 100%",
+      "verdict": "FIXED"
+    },
+    {
+      "run": "#223",
+      "change": "amplify-vb-high-short-clonehunt registered",
+      "status": "OPEN, deadline 11-13 — volume-buildup- HIGH SHORT 7d 5T 100% +0.21 / 14d 18T 77.8% +0.34 still same-sign (healthy)",
+      "verdict": "on track"
+    },
+    {
+      "run": "#225",
+      "change": "harvest early-fail pre-position (3/4 bars FAIL)",
+      "status": "STILL FAIL at #226: rolling-50 jup 44% (>35), bb+warrior share 20% (target 25% by next-100)",
+      "verdict": "watch deadline 11-07"
+    }
+  ],
   "next_actions": [
-    "11-06: fade-btc-crash disposition (incoherent → likely close KEEP), momentum-cache re-measure after fix, gate-shadow re-audit (log-reparse frame), candle-collector audit",
-    "11-07: harvest-ship revert decision (3/4 bars FAIL), jup regime review (HIGH cell packet), volmom, fill-cap",
-    "11-09: zombie-purge",
-    "11-10: four bars (fade-ctx, winner-cell-125, rsi-ceiling, gate-dedup)",
-    "11-12: storm ENFORCE bar (streak 2/3 now)",
-    "11-13: pc+ kill-review CELL-SCOPED + vb-clonehunt",
-    "CEO: winner-cell-mult-150 sign-off (MET 3x) · stop-tighten label · NET-KPI switch · harvest early-fail pre-position"
+    "11-06: fade-btc-crash coherence re-read + momentum re-measure + gate-shadow log-reparse + candle-collector audit (registry open entries)",
+    "11-07: harvest-ship read — revert whichever of 4 ships fails metric (jup share still 44%)",
+    "11-10: fade-ctx-exempt + winner-cell-size-125 bars; mfe-cut-arm-be / conf-filter-parity dispositions",
+    "11-11: watch-contrarian-live Z-FLIP conversion read",
+    "11-12: storm ENFORCE bar (streak was 2/3 at #225)",
+    "11-19: amplify-ema300-underdeploy walk deadline",
+    "AT NEXT TIMER RUN (23:18Z): confirm regime_4h coverage stays >=90% with the 9h threshold"
   ]
 }

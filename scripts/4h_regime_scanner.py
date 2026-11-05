@@ -23,7 +23,15 @@ LOG_FILE = "/root/.hermes/logs/4h_regime.log"
 BRAIN_DB = BRAIN_DB_DICT
 CANDLE_TF = "4h"
 CANDLE_TABLE = "candles_4h"
-STALE_THRESHOLD_SECS = 600  # 10 min — if latest closed candle is older, use Binance
+# 9h = honest max row age (ts = candle OPEN time: latest is_closed row is 0-8h old
+# depending on whether the current-window row is written yet) + 1h writer-lag slack.
+# brain_auditor #226: 600s was WRONG for a 4h table — mid-period every local read was
+# rejected as "stale" and forced to Binance; HL-only tokens (CASHCAT/CC/FARTCOIN/GOAT/
+# KAS/MON/PONS/USELESS/ZORA) aren't on Binance -> dropped from regime_4h -> coverage
+# 86.2% < 90% bar (residual after #225's universe fix — universe had them, data path
+# rejected them). First cut 21600 (6h) rejected age in (6h,8h) for tokens whose
+# current-window row lags (bug-hunter F1/F2) -> 32400 covers the full open-time range.
+STALE_THRESHOLD_SECS = 32400
 
 def fetch_candles_from_db(token, limit=6):
     """Read closed 4h candles from candles.db. Returns list of dicts or None if stale/missing."""

@@ -3616,5 +3616,16 @@
     "after": "WWW_DATA signals.json + dict/list + DISTINCT token from trades 7d",
     "rationale": "recent-traded regime_4h coverage was 81.5% (53/65) < 90% bar; CASHCAT/CC/FARTCOIN/ZORA etc had NULL regime_4h falling back to NEUTRAL on every gate",
     "impact": "token universe 133→137+ with bad tokens now covered; next 4h scan (19:18Z) writes regime_4h for them"
+  },
+  {
+    "timestamp": "2026-11-05T21:03:33Z",
+    "agent": "brain_auditor",
+    "change": "4h_regime_scanner STALE_THRESHOLD_SECS 600 -> 32400 (9h) — 600s rejected all mid-period local 4h reads (ts=open time, honest age 0-8h) forcing Binance fallback; 9 HL-only tokens dropped, coverage 86.2%<90% bar",
+    "type": "config",
+    "file": "scripts/4h_regime_scanner.py",
+    "before": "STALE_THRESHOLD_SECS = 600",
+    "after": "STALE_THRESHOLD_SECS = 32400",
+    "rationale": "Root cause of residual regime_4h coverage gap after #225 universe fix; verified 65/65=100% on two manual runs; bug-hunter subagent PASS (F1 open-time semantics caught before final value)",
+    "impact": "regime_4h gates see 100% of recent-7d traded tokens (was 86.2%); no Binance dependency for HL-only tokens"
   }
 ]
