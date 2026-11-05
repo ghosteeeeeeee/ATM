@@ -183,18 +183,42 @@ def get_tokens_to_scan():
         log(f"DB error: {e}")
 
     # Get from signal files
-    for fname in ["/var/www/html/signals.json", "/root/.hermes/data/signals.json"]:
+    # brain_auditor #225: old paths were dead (/var/www/html missing,
+    # /root/.hermes/data/signals.json is 0 bytes) and the live file is a
+    # DICT under WWW_DATA, not a list — signal tokens never entered this
+    # universe, leaving recent-traded regime_4h coverage at 81.5% (<90% bar).
+    for fname in ["/var/www/hermes/data/signals.json",
+                  "/var/www/html/signals.json",
+                  "/root/.hermes/data/signals.json"]:
         try:
             with open(fname) as f:
                 data = json.load(f)
-                if isinstance(data, list):
-                    for sig in data:
-                        if 'token' in sig:
-                            tokens.add(sig['token'])
-                        elif 'symbol' in sig:
-                            tokens.add(sig['symbol'].replace('USDT', ''))
-        except:
+            rows = data if isinstance(data, list) else (
+                data.get('signals') if isinstance(data, dict) else None)
+            if not isinstance(rows, list):
+                continue
+            for sig in rows:
+                if not isinstance(sig, dict):
+                    continue
+                if 'token' in sig:
+                    tokens.add(sig['token'])
+                elif 'symbol' in sig:
+                    tokens.add(sig['symbol'].replace('USDT', ''))
+        except Exception:
             pass
+
+    # Recent-traded (7d) — the tokens regime_4h gates actually see
+    try:
+        conn = psycopg2.connect(**BRAIN_DB_DICT)
+        cur = conn.cursor()
+        cur.execute("""SELECT DISTINCT token FROM trades
+                       WHERE status='closed' AND close_time > NOW() - INTERVAL '7 days'""")
+        for row in cur.fetchall():
+            if row[0]:
+                tokens.add(row[0])
+        conn.close()
+    except Exception as e:
+        log(f"recent-traded token pull error: {e}")
 
     # Focus tokens
     focus_tokens = [

@@ -785,6 +785,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
     # This layer allows per-direction control (e.g. pct-hermes+ ON, pct-hermes- OFF).
     try:
         from hermes_constants import (
+            JUP_LIQ_ENABLED, JUP_LIQ_PLUS_ENABLED, JUP_LIQ_MINUS_ENABLED,
             PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
             VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
             HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
@@ -867,6 +868,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         source = _src_clean if _src_clean else _src  # use cleaned source for DB write
         _components = _src.split(',')  # keep original for signal type checks
         for _comp in _components:
+            # jup-liq (liquidation cascade — T 2026-11-05)
+            if _comp == 'jup-liq+' and not JUP_LIQ_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" JUP_LIQ_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'jup-liq-' and not JUP_LIQ_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" JUP_LIQ_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'jup-liq' and not JUP_LIQ_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" JUP_LIQ_ENABLED=False', flush=True)
+                return None
             # pct-hermes
             if _comp == 'pct-hermes+' and not PCT_HERMES_PLUS_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" PCT_HERMES_PLUS_ENABLED=False', flush=True)
@@ -2807,6 +2818,7 @@ def is_component_disabled(component: str) -> bool:
     Returns True if the component should be blocked, False if allowed."""
     try:
         from hermes_constants import (
+            JUP_LIQ_ENABLED, JUP_LIQ_PLUS_ENABLED, JUP_LIQ_MINUS_ENABLED,
             PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
             VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
             HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
@@ -2912,6 +2924,10 @@ def is_component_disabled(component: str) -> bool:
     except ImportError:
         return False  # can't check — allow
     c = component.strip()
+    # jup-liq (liquidation cascade — T 2026-11-05)
+    if c in ('jup-liq+', 'jup_liq_cascade_long'): return not JUP_LIQ_PLUS_ENABLED
+    if c in ('jup-liq-', 'jup_liq_cascade_short'): return not JUP_LIQ_MINUS_ENABLED
+    if c == 'jup-liq': return not JUP_LIQ_ENABLED
     # pct-hermes
     if c == 'pct-hermes+': return not PCT_HERMES_PLUS_ENABLED
     if c == 'pct-hermes-': return not PCT_HERMES_MINUS_ENABLED

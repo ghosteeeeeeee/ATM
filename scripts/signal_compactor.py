@@ -448,6 +448,8 @@ def get_regime_4h(coin):
 # First match wins (longer prefixes must come before shorter ones).
 SIGNAL_SOURCE_WEIGHTS = {
     # (signal_type, source_prefix) -> weight
+    ('jup_liq_cascade_long',  'jup-liq+'):  1.0,   # liquidation-cascade follow (T 2026-11-05)
+    ('jup_liq_cascade_short', 'jup-liq-'):  1.0,
     ('mtf_macd',  'hmacd-'):       1.5,   # MACD crossovers — strongest trend signal
     ('macd_short_1m', 'macd-accel-'): 2.00, # per-token tuned 1m MACD SHORT, ~65% WR avg
     ('macd_long_1m',  'macd-accel-'): 1.50, # per-token tuned 1m MACD LONG, ~52% WR avg

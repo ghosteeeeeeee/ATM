@@ -3594,5 +3594,27 @@
     "after": "corrected premise, disposition stays open KILL-REVIEW",
     "rationale": "Default-KILL at 11-13 would have fired on a broken premise and destroyed the top 30d winner cell (EXTREME +1.32 n=75)",
     "impact": "Prevents erroneous kill of pump-chain+ weight at next checkpoint"
+  },
+  {
+    "timestamp": "2026-11-05T16:55:00Z",
+    "agent": "brain_auditor",
+    "change": "jup_liq_cascade _last_price_for: amount always 0 in yolo feed so notional/amount never ran; raw fixed-point (1e12) stored as-is. First fire hit SUSPICIOUS PRICE guard ratio ~1e12. Fixed: get_hl_price first (mirror source), else raw/1e12.",
+    "type": "config",
+    "file": "scripts/signals/jup_liq_cascade.py",
+    "before": "return notional/amount if amount>0 else raw fixed-point float",
+    "after": "get_hl_price(market) first; fallback raw/1e12",
+    "rationale": "Live bug: signals.json price=7.658e16 vs cached 76763; signal could never execute until guard skipped it",
+    "impact": "jup-liq signals get sane entry prices; without fix every fire is SKIPPED by exec guard"
+  },
+  {
+    "timestamp": "2026-11-05T16:55:00Z",
+    "agent": "brain_auditor",
+    "change": "4h_regime_scanner get_tokens_to_scan: dead paths (/var/www/html missing, data/signals.json 0 bytes) + live file is dict not list → signal tokens never scanned. Added WWW_DATA path, dict handling, recent-7d traded pull.",
+    "type": "config",
+    "file": "scripts/4h_regime_scanner.py",
+    "before": "2 dead signal paths, list-only, no recent-traded",
+    "after": "WWW_DATA signals.json + dict/list + DISTINCT token from trades 7d",
+    "rationale": "recent-traded regime_4h coverage was 81.5% (53/65) < 90% bar; CASHCAT/CC/FARTCOIN/ZORA etc had NULL regime_4h falling back to NEUTRAL on every gate",
+    "impact": "token universe 133→137+ with bad tokens now covered; next 4h scan (19:18Z) writes regime_4h for them"
   }
 ]

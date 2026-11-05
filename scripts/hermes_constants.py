@@ -3409,6 +3409,10 @@ STANDALONE_BYPASS_SIGNALS = (
     # confluence path + ('HIGH','bb-bounce-v3-long')=1.0 override. Zero trades opened after Oct 5
     # so near-term impact ~0; closes the hole for future NORMAL slips.
     'bb-squeeze',  # bollinger squeeze breakout — works solo (2026-10-01)
+    # jup-liq: liquidation cascade is a self-contained event — confluence with
+    # another signal would just delay entering the forced flow (T 2026-11-05).
+    # bare form rstrips +/- at both compactor match sites.
+    'jup-liq', 'jup_liq_cascade_long', 'jup_liq_cascade_short',
     'mtf-regime-trend',  # multi-timeframe regime trend — works solo (2026-10-01)
     'tl-bounce',  # trendline bounce — works solo (2026-10-06)
     'hmacd-mtf', 'hmacd_mtf',  # multi-timeframe MACD — works solo (2026-10-09). Added underscore variant — signal source uses underscores.
@@ -4378,6 +4382,36 @@ JUP_YOLO_HML_SHADOW_THRESHOLDS = (-0.65, -0.50)  # price-% would-fire marks
 JUP_YOLO_TRAIL_SHADOW_ARM_ATR_MULT = 1.0  # counterfactual arm = 1.0×ATR
 JUP_YOLO_TRAIL_SHADOW_DIST_ATR_MULT = 1.0  # counterfactual distance = 1.0×ATR
 JUP_YOLO_SHADOW_EVAL_N = 40                # pre-registered eval window
+
+# ── JUP LIQ CASCADE (T 2026-11-05: 'related jup yolo signal — monitor
+# liquidations, the faster they stack up we enter IN the liquidation direction')
+# Source of truth: yolo-api.jup.ag/trades — kind='liquidate' is a FIRST-CLASS
+# event (no inference), carries market/side/leverage/notional/heldFor.
+# Opposite thesis of jup_yolo_mirrored (follows live positions): this
+# FOLLOWS forced flow — longs liquidated → SHORT, shorts liquidated → LONG.
+# Leverage weighting (T): 1000x = little wiggle room, instantly wrong (strongest
+# cascade evidence); 500x = more wiggle, still wrong; lower leverage least.
+# Measured baseline 2026-11-05: ~87 liqs/5min feed-wide, per-(market,side)
+# up to 26.7/5min, median heldFor 14s → trigger is SPIKE-vs-EWMA-baseline,
+# never an absolute count.
+JUP_LIQ_ENABLED = True                 # master kill-switch
+JUP_LIQ_PLUS_ENABLED = True            # LONG (shorts liquidated)
+JUP_LIQ_MINUS_ENABLED = True           # SHORT (longs liquidated)
+JUP_LIQ_WINDOW_SEC = 300               # rolling cascade window (5 min)
+JUP_LIQ_MIN_WEIGHT = 8.0               # absolute floor: weighted units in window
+JUP_LIQ_SPIKE_MULT = 2.5               # window score >= 2.5x cell EWMA baseline
+JUP_LIQ_BASELINE_ALPHA = 0.10          # EWMA per-window learning rate (lags = fires on spike)
+JUP_LIQ_WEIGHT_1000X = 1.0             # T: instantly wrong — strongest
+JUP_LIQ_WEIGHT_500X = 0.6              # T: more wiggle room, still wrong
+JUP_LIQ_WEIGHT_LOW = 0.3               # <500x
+JUP_LIQ_WEIGHT_1000X_MIN = 1000        # leverage >= this → 1.0
+JUP_LIQ_WEIGHT_500X_MIN = 500          # leverage >= this → 0.6
+JUP_LIQ_MIN_NOTIONAL_USDC = 10         # dust filter (notional is USDC 6-dec)
+JUP_LIQ_MIN_FEED_TRADES = 20           # feed sanity: fewer = bad response, skip cycle
+JUP_LIQ_COOLDOWN_HOURS = 1             # per token+direction re-fire guard
+JUP_LIQ_CONF_BASE = 65                 # confidence at threshold
+JUP_LIQ_CONF_PER_RATIO = 8.0           # +per unit of (ratio - SPIKE_MULT), capped
+JUP_LIQ_CONF_CAP = 88                  # system ceiling (add_signal also caps)
 # EVAL RESULT (executed 2026-11-02 by analysis/jup_hml_shadow_eval.py, CEO
 # consult item (a), four guardrails: replay fills via audited replay_layers /
 # winner-preemption counted / sign-stability / fees in): BOTH thresholds

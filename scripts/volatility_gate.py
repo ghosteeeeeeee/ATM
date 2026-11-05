@@ -30,6 +30,8 @@ import sqlite3
 # Updated: 2026-08-11 from 30d backtest
 REGIME_SIGNALS = {
     'FLAT': {
+        # jup-liq: liquidation-cascade follow — structural, works in all regimes (T 2026-11-05)
+        'jup-liq', 'jup-liq+', 'jup-liq-',
         # Mean reversion works in range-bound markets
         'bb_bounce', 'bb_bounce+',
         'bb_bounce+,range_finder+',  # 60.4% WR all-time, star signal
@@ -66,6 +68,8 @@ REGIME_SIGNALS = {
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'NORMAL': {
+        # jup-liq: liquidation-cascade follow — structural, works in all regimes (T 2026-11-05)
+        'jup-liq', 'jup-liq+', 'jup-liq-',
         # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+', 'pump-chain-',  # chain correlation momentum
         'pump-chain-v5',  # V5 with velocity + continuum oscillator filters
@@ -136,6 +140,8 @@ REGIME_SIGNALS = {
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'HIGH': {
+        # jup-liq: liquidation-cascade follow — structural, works in all regimes (T 2026-11-05)
+        'jup-liq', 'jup-liq+', 'jup-liq-',
         # Breakout works in big moves
         # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
         'pump-chain', 'pump-chain+',  # chain correlation LONG — HIGH edge for +
@@ -209,6 +215,8 @@ REGIME_SIGNALS = {
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'EXTREME': {
+        # jup-liq: liquidation-cascade follow — structural, works in all regimes (T 2026-11-05)
+        'jup-liq', 'jup-liq+', 'jup-liq-',
         # Continuation works in storms
         'continuation+,hzscore+', 'hzscore+,mover+',
         'mover+', 'mover-',  # momentum spike detector

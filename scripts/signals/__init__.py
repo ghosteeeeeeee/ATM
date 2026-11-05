@@ -160,6 +160,10 @@ try:
     from signals.liquidation_hunt import run as _liquidation_hunt_run
 except Exception:
     _liquidation_hunt_run = None
+try:
+    from signals.jup_liq_cascade import run as _jup_liq_cascade_run
+except Exception:
+    _jup_liq_cascade_run = None
 
 try:
     from signals.macd_divergence import run as _macd_divergence_run
@@ -526,6 +530,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'continuation',             'enabled': 'CONTINUATION_ENABLED',         'run': _continuation_run},
     {'name': 'spike_exhaustion_short',   'enabled': 'SPIKE_EXHAUSTION_SHORT_ENABLED', 'run': _spike_exhaustion_short_run},
     {'name': 'liquidation_hunt',         'enabled': 'LIQUIDATION_HUNT_ENABLED',     'run': _liquidation_hunt_run},
+    {'name': 'jup_liq_cascade',          'enabled': 'JUP_LIQ_ENABLED',             'run': _jup_liq_cascade_run},
     {'name': 'macd_divergence',          'enabled': 'MACD_DIVERGENCE_ENABLED',      'run': _macd_divergence_run},
     {'name': 'chain_fire',               'enabled': 'CHAIN_FIRE_ENABLED',           'run': _chain_fire_run},
     {'name': 'slow_grind_short',         'enabled': 'SLOW_GRIND_SHORT_ENABLED',     'run': _slow_grind_short_run},

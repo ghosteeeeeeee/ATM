@@ -10517,5 +10517,23 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-05T16:55:00Z",
+    "idea": "add_signal price-sanity: reject signals whose price deviates >100x from live cached price at SOURCE (not just exec guard)",
+    "rationale": "jup-liq first fire stored 7.658e16; exec guard caught it at 16:34 but only after the signal polluted the queue and burned a claim cycle. Fail-fast at add_signal saves decider work and makes corrupt-price bugs visible in signal_runner logs immediately.",
+    "expected_impact": "corrupt-price signals surface within 1 cycle instead of at exec; zero impact on valid signals",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-05T16:55:00Z",
+    "idea": "STORM waiver streak tracker: surface 'streak N/3' in watchdog when shadow would-pass count is rising — pre-position ENFORCE decision before 11-12 deadline",
+    "rationale": "auto_1hr already computes storm packets (counterfactual +$3.93 touch 30/30 at 16:21) but the >=3-storm bar for ENFORCE lives only in disposition prose. A visible streak counter means the CEO walks into 11-12 with the number in front of them.",
+    "expected_impact": "faster ENFORCE/NO-GO decision at deadline; no behavior change until bar met",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
