@@ -21410,3 +21410,26 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-1.22 RED — structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-05 21:19] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 6T 66.7% $+0.28 | 7d 264T 54.2% $-1.37 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closed, 0 open — no trades to diagnose
+- Kill check: no signal with 0% WR n>=3 in 24h (worst: pump-chain+ 1T -0.13, continuum+ 1T -0.07) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/6 = 33.3% of 24h closes (under 40%) — drag -0.20 vs mfe_exit +0.29 + profit-monster +0.19 -> no tpsl_utils alert
+- Boost HOLD: max signal n=3 (jup_yolo_mirrored 3T 100% +0.43) but n<5 -> hold
+- Neg streak: hourly closes last 12h = -0.07, +0.24, +0.06 -> not 3 consecutive negative; regime mixed (HIGH/NORMAL green, EXTREME/FLAT red) not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.349%, 3/4 <0.5% — acceptable
+- No storm (window-min -0.47% / at-run +0.00%)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.37 RED — structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
