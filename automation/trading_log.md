@@ -21218,3 +21218,26 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-1.59 RED — hard_max_loss + thin 24h volume (8T); structural, outside auto_1hr 1-change/hour scope
 - EXTREME 2T 0% -$0.15 24h — n<20, no kill evidence
+
+## [2026-11-05 13:25] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $+0.17 (WR: 50.0% hour; 24h 8T 75.0% $+0.35 | 7d 275T 54.2% $-1.52 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored SHORT mfe_exit +$0.24, BTC continuum+ LONG atr_sl_hit -$0.07 — net green hour
+- Kill check: no signal with 0% WR n>=3 in 24h -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/8 = 25% (<40%) — no tpsl_utils alert
+- Boost HOLD: no signal n>=5 trades 24h (bb-squeeze+ 3T 100% +0.13, jup_yolo_mirrored 2T +0.37 best but n<5)
+- Neg streak: 6h shows 3 hours w/ closes (-0.13, -0.07, +0.24) not 3 consecutive negatives; regime mixed (HIGH 4/4, NORMAL 2/2, EXTREME 0/1, FLAT 0/1) not NEUTRAL -> no size cut
+- Frequency: 2/hr — under 20
+- Entry quality: 24h winners avg MAE 0.277%, 5/6 <0.5%
+- Storm readiness: **window-min -0.98% / at-run -0.66%** — both within gate, no storm (rolling-60m, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.52 RED — structural, outside auto_1hr 1-change/hour scope
+- 24h volume thin (8T) — quiet market, not overtrading
