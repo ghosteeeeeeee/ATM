@@ -21292,3 +21292,30 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-1.49 RED — structural, outside auto_1hr 1-change/hour scope
 - Storm dump underway — watch next hour for trade closes; blocked SHORT starvation (+$4.21 counterfactual) suggests short gates (short-rsi-hard-floor 28, pump-chain-short-high 23) may be over-blocking in dumps — candidate for future analysis, not a 1-change/hour action
+
+## [2026-11-05 16:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 5T 60.0% $+0.22 | 7d 267T 53.6% $-1.43 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none (no constants change) — but **STORM GATE FIRED**: window-min -2.05% / at-run -1.02% → full storm-readiness packet run
+
+**Storm-Readiness Packet:**
+- 🌩️ [STORM-READINESS] window-min -2.05% / at-run -1.02% | blocked 215 (combo_key-stale 90, short-rsi-hard-floor 50, pump-chain-* 27, compaction_stale_10min 24, confluence single-type 8, other 16) | true-starvation 30 RSI>=35 | counterfactual $+3.93 (touch 30/30) | waiver: SHADOW=True ENFORCE=False
+- Split: blocked SHORTs +$6.54 (gates suppressing dump winners again), blocked LONGs -$2.60 (gates correctly kept losers out) — second consecutive storm with SHORT-starvation positive
+- Bar tracking: counterfactual POSITIVE → **streak 2/3** toward enforce flip (needs ≥3 consecutive positive, deadline 2026-11-12)
+
+**No Change Needed:**
+- Last hour: 0 closed, 0 open — no trades to diagnose
+- Kill check: no signal with n>=3 in 24h at all (best: jup_yolo_mirrored 2T 100% +0.37) → keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/5 = 40% of 24h closes (not >40%) — drag -$0.20 vs mfe_exit +$0.29 + profit-monster +$0.13 → no tpsl_utils alert
+- Boost HOLD: no signal n>=5 in 24h (max n=2) → no boost
+- Neg streak: only 2 hours with closes in last 6h (-0.07, +0.24) → not 3 consecutive; regime mixed (NORMAL 2/2 +0.29, HIGH 1/1 +0.13, EXTREME, FLAT red) not NEUTRAL → no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.417%, 2/3 <0.5%
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.43 RED — structural, outside auto_1hr 1-change/hour scope
+- SHORT-starvation repeated across storms (15:21 +$4.21, now +$6.54) — short-rsi-hard-floor (50) + pump-chain-short-high (27) may be over-blocking in dumps; candidate for focused analysis, not a 1-change/hour action
