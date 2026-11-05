@@ -3517,5 +3517,38 @@
     "after": "checkpoint done with substitute proof; mult-150 threshold_met_at 2026-11-04T21:00Z",
     "rationale": "mandatory dispositions + AMPLIFY servicing; nothing passed significance bars for a trading-constant change",
     "impact": "zero trading behavior change; CEO sign-off queue updated"
+  },
+  {
+    "timestamp": "2026-11-05T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "ARM-GAP log units/temporal label fix: SELECT adds trades.pnl_pct, log line appends pg_pnl_pct= close-time baseline (None->NA), units+backfill comment added (log-only, zero behavior)",
+    "type": "ops",
+    "file": "scripts/position_manager.py",
+    "before": "[ARM-GAP] ... pnl={close-time pnl_pct} peakTrail@0.45%={price-move%} — mixed unit systems (leveraged vs unleveraged); close-time pnl later rewritten ~30s by hl_sync_guardian._backfill_hl_pnl_recent_closes with HL-fill truth (XPL #16731 -4.15 -> PG -2.90, FARTCOIN #16739 -5.30 -> -3.71, ~43%)",
+    "after": "[ARM-GAP] ... pnl={close-time} pg_pnl_pct={close-time PG baseline} peakTrail@0.45%={price-move%} + units/backfill comment",
+    "rationale": "Third sighting of the #193 units landmine inside our own instrumentation; the pg_pnl_pct baseline makes the post-close HL backfill delta measurable from the log alone",
+    "impact": "no PnL impact (log only); py_compile PASS; self-check reproduces XPL pg -2.90 / peakTrail +3.21 / None->NA; bug_hunter audited (0 CRITICAL/HIGH, MEDIUM+LOW both fixed); no parser consumed the old format"
+  },
+  {
+    "timestamp": "2026-11-05T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Registered amplify-ugb-bypass-hole in data/shadow_disposition.json (UGB-PT enforce skips PROFIT_MONSTER_BYPASS families -> hl_copy armed trades ride +3.6% peaks into hard_max_loss)",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "no entry",
+    "after": "id=amplify-ugb-bypass-hole, kind=amplify, proposal_type=(a) param-widen counterfactual, deadline 2026-12-15, default NO SHIP, n>=20 bar with units guard",
+    "rationale": "Measured 30d cohort n=8 actual -0.43 vs peak-0.45 counterfactual +1.10 = +1.53 gross; mechanism proven (XPL #16731 MFE 3.68% -> -2.90, FARTCOIN #16739 MFE 3.64% -> -3.71, UGB-PT shadow fires but enforce skipped by c384a2d5). n<20 so monitor, not ship.",
+    "impact": "expected +~$1.5/30d gross IF cohort reaches n=20 (population-capped: all bypassed families = 26T/30d)"
+  },
+  {
+    "timestamp": "2026-11-05T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Committed brain/analysis/shadow_source_dedupe_2026-11-04.py (shipped by #220 but left untracked)",
+    "type": "ops",
+    "file": "brain/analysis/shadow_source_dedupe_2026-11-04.py",
+    "before": "untracked since 2026-11-04",
+    "after": "tracked in git",
+    "rationale": "shipped artifacts must be in the repo or a reset loses the dedupe tool",
+    "impact": "zero behavior"
   }
 ]

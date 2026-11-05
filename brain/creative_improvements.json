@@ -10469,5 +10469,26 @@
     "category": "entry sniper",
     "status": "measured-no-change",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-05T00:45:00Z",
+    "status": "shipped",
+    "idea": "ARM-GAP units/temporal label fix (zero behavior): log trades.pnl_pct as a close-time baseline alongside the local pnl snapshot",
+    "rationale": "The [ARM-GAP] line pairs UNLEVERAGED peakTrail@ (price-move %) with leveraged pnl=. That pnl= is the close-time commit, which hl_sync_guardian._backfill_hl_pnl_recent_closes rewrites >=30s later with HL-fill ground truth: XPL #16731 close-time -4.15 -> PG -2.90, FARTCOIN #16739 -5.30 -> -3.71 (~43%). Third sighting of the #193 units landmine, now inside our own instrumentation. bug_hunter caught that my first version misattributed the cause to 'local vs committed' and that the new field would be a tautology at log time — reframed as a close-time baseline so the backfill delta is measurable from the log alone.",
+    "expected_impact": "no PnL impact; prevents a wrong money conclusion from ARM-GAP lines",
+    "category": "instrumentation hygiene",
+    "risk": "low",
+    "file": "scripts/position_manager.py",
+    "detail": "SELECT now includes pnl_pct; line appends pg_pnl_pct= (None -> NA); comment names the backfill writer. Self-check: XPL #16731 pg_pnl_pct=-2.90, peakTrail +3.21, py_compile PASS. No parser consumed the old format (only position_manager writes it; arm_gap_baseline/giveback_rules_headtohead read PG, not the log)."
+  },
+  {
+    "date": "2026-11-05T00:45:00Z",
+    "status": "pre-registered",
+    "idea": "UGB-PT bypass-skip hole: PM_TRAIL_BYPASS conflates 'alternate trail exists' (pump-chain->pump_exit) with 'no trail exists' (hl_copy_trader) — armed bypassed trades ride +3.6% peaks into hard_max_loss",
+    "rationale": "Root cause of the biggest givebacks in the 48h autopsy: XPL #16731 MFE 3.68% -> -2.90 pg, FARTCOIN #16739 MFE 3.64% -> -3.71 pg, both 17h holds, trail=FALSE. UGB-PT [SHADOW] would-fire logs them (PONS #16754) but the 2026-10-31 fix (c384a2d5) skips enforce for anything in PROFIT_MONSTER_BYPASS_SIGNALS. 30d cohort n=8 actual -0.43 vs peak-0.45 counterfactual +1.10 = +1.53 gross. 10-25's 'escalation #17 closed-superseded: UGB-PT IS the universal post-arm floor' claim is FALSE for bypassed families.",
+    "expected_impact": "+~$1.5/30d gross if the cohort reaches n=20 (population-capped: all bypassed families = 26T/30d)",
+    "category": "exit quality / giveback",
+    "risk": "medium",
+    "registered_as": "amplify-ugb-bypass-hole in data/shadow_disposition.json (deadline 2026-12-15, default NO SHIP)"
   }
 ]

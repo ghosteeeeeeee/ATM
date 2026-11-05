@@ -1365,9 +1365,23 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
         # EXT #44: + peak-trail counterfactual estimate (D=0.3% from mfe_price) —
         # 7d trades-level: 24T saved +85.6pts vs 15T FK -70.9pts = NET +14.7pts
         # (fragile, IMX outlier carries it; needs candle OOS before any flip).
+        # UNITS + TEMPORAL (brain_auditor #222, bug_hunter-audited):
+        #   peakTrail@ = UNLEVERAGED price-move % —
+        #       (mfe_price*(1-UGB_PT_DISTANCE_PCT/100)/entry-1)*100, no leverage.
+        #   pnl=       = local pnl_pct at close-time commit (raw_move x leverage).
+        #   pg_pnl_pct = trades.pnl_pct read back IMMEDIATELY after that commit —
+        #       at this instant it EQUALS pnl= (same write). It is logged as a
+        #       BASELINE so a later PG query can measure the post-close rewrite:
+        #       hl_sync_guardian._backfill_hl_pnl_recent_closes() overwrites
+        #       pnl_pct with HL-fill ground truth >=30s after close
+        #       (measured XPL #16731 close-time -4.15 -> PG -2.90;
+        #        FARTCOIN #16739 -5.30 -> -3.71; ~43%).
+        #   NEVER pair peakTrail@ (price %) with pnl=/pg_pnl_pct (leveraged %) in
+        #   money math — #193 units landmine, third sighting. Money truth =
+        #   a POST-backfill PG query, not this line.
         try:
             if mfe_pct_val is not None and float(mfe_pct_val) >= 0.40 and float(pnl_pct) < 0:
-                cur.execute("SELECT trailing_activated, mfe_price, entry_price FROM trades WHERE id=%s", (trade_id,))
+                cur.execute("SELECT trailing_activated, mfe_price, entry_price, pnl_pct FROM trades WHERE id=%s", (trade_id,))
                 _ag_row = cur.fetchone()
                 # FIX (brain_auditor 2026-10-21): cur is RealDictCursor — row is
                 # dict-like; integer index [0]/[1]/[2] raised KeyError, swallowed
@@ -1385,7 +1399,12 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
                             _ag_pt = f" peakTrail@{UGB_PT_DISTANCE_PCT:.2f}%={_ag_cf:+.2f}%"
                     except Exception:
                         pass
-                    log(f"  [ARM-GAP] {token} {direction} MFE={float(mfe_pct_val):.2f}% trail=FALSE exit={reason} pnl={float(pnl_pct):+.2f}%{_ag_pt} trade={trade_id}")
+                    try:
+                        _ag_raw = _ag_row['pnl_pct']
+                        _ag_pgs = " pg_pnl_pct=NA" if _ag_raw is None else f" pg_pnl_pct={float(_ag_raw):+.2f}%"
+                    except Exception:
+                        _ag_pgs = " pg_pnl_pct=NA"
+                    log(f"  [ARM-GAP] {token} {direction} MFE={float(mfe_pct_val):.2f}% trail=FALSE exit={reason} pnl={float(pnl_pct):+.2f}%{_ag_pgs}{_ag_pt} trade={trade_id}")
         except Exception as _ag_e:
             log(f"  [ARM-GAP-ERROR] trade={trade_id}: {_ag_e}")
 
