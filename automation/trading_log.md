@@ -21319,3 +21319,26 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-1.43 RED — structural, outside auto_1hr 1-change/hour scope
 - SHORT-starvation repeated across storms (15:21 +$4.21, now +$6.54) — short-rsi-hard-floor (50) + pump-chain-short-high (27) may be over-blocking in dumps; candidate for focused analysis, not a 1-change/hour action
+
+## [2026-11-05 17:22] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses), 0 open
+**PnL:** $0.06 (WR: 100% hour; 24h 6T 66.7% $+0.28 | 7d 265T 54.3% $-1.22 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: HYPE jup_yolo_mirrored SHORT profit-monster-trail +0.06 — clean win
+- Kill check: no signal with 0% WR n>=3 in 24h (jup_yolo_mirrored 3T 100% +0.43 is best) → keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/6 = 33.3% of 24h closes (under 40%) — drag -$0.20 vs mfe_exit +$0.29 + profit-monster +$0.19 → no tpsl_utils alert
+- Boost HOLD: jup_yolo_mirrored 3T 100% +$0.43 but n<5 → hold (closest candidate)
+- Neg streak: 6h hours with closes = -0.07, +0.24, +0.06 → not 3 consecutive negative; regime mixed (NORMAL/HIGH green) not NEUTRAL → no size cut
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.349%, 3/4 <0.5% — acceptable
+- No storm (window-min -0.96% / at-run -0.62%)
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.22 RED — structural, outside auto_1hr 1-change/hour scope
+- SHORT-starvation in prior storms (streak 2/3 positive counterfactual) — still pending 3rd storm for enforce-flip bar; no action until next storm packet
