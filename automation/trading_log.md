@@ -21010,3 +21010,26 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-1.70 RED — hard_max_loss (4T -0.44 24h) remains dominant drag; structural, outside auto_1hr 1-change/hour scope
 - 24h flipped GREEN (+0.24) but EXTREME 5T 20% -0.17 / HIGH 8T 50% -0.19 still red — watch, regime kills need n>=20 all-regimes evidence
+
+## [2026-11-05 04:47] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a hour; 24h 16T 62.5% $+0.07 GREEN | 7d 275T 54.5% $-1.70 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closed, 1 open — no trades to diagnose
+- Kill check: no 0% WR n>=3 signals in 24h (bb-squeeze+ 6T 66.7% net -0.06, warrior-sr-confirm+ 3T 33.3% net +0.01; hh-hl+ / r2v2-long18 0% but n=1 each) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.25% (<40%) — drag = hard_max_loss 3T -0.35 vs profit-monster-trail 9T +0.56 — no tpsl_utils alert
+- Boost HOLD: no signal with 5+ trades 24h (bb-squeeze+ 6T but net -0.06 fails PnL>0.05; jup_yolo_mirrored down to 1T 24h, n<5)
+- Neg streak: only 1 hour with closes in last 8h (green +0.05) -> not 3 consecutive; regime NORMAL 5T 100% +0.22 not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.149%, 9/10 <0.5%
+- Storm readiness: **window-min -0.48% / at-run -0.48%** — both within gate, no storm (rolling-60m, 13 samples, BTC)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.70 RED — hard_max_loss (3T -0.35 24h) remains dominant drag; structural, outside auto_1hr 1-change/hour scope
+- 24h HIGH regime 8T 50% -0.19 red but EXTREME 3T 33.3% +0.04 green — regime kills need n>=20 all-regimes evidence
