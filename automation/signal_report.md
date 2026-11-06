@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-05 21:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-06 03:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,685 | **WR:** 51.3% | **PnL:** -109.06%
+- **Total trades (all time):** 3,686 | **WR:** 51.4% | **PnL:** -108.85%
 - **Date range:** 2026-07-29 → 2026-11-05
 
 ---
@@ -50,6 +50,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-06 | 03bde6d | signals: linreg_fade round 2 — cross-sectional trigger + mak... |
 | 2026-11-05 | f47df12 | signals: add linreg_fade — RenTech-style univariate regressi... |
 | 2026-11-05 | 29fd307 | scripts: brain_auditor #225 — fix jup_liq corrupt price + 4h... |
 | 2026-11-04 | e41faad | scripts: CEO capital brake 20261104T172347Z — DAILY_FILL_CAP... |
@@ -59,6 +60,5 @@ None found. Top performers are already enabled.
 | 2026-11-03 | 4af44b7 | scripts: CEO fix-round 2 (consult 20261103T064755Z) — SHORT_... |
 | 2026-11-03 | 6bc7eeb | scripts: A1/A2 short shadow exemptions + A4 tombstone + A3 i... |
 | 2026-11-03 | 7f246c6 | blacklist: HYPE both directions (T directive 2026-11-03) |
-| 2026-11-03 | 3ebd4e5 | fix: bug_hunter audit round — N3 crash, sim baseline, regist... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

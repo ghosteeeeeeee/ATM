@@ -1,0 +1,117 @@
+==========================================================================================
+INDEPENDENT AUDIT — snapshot: 1793941450.7372415
+==========================================================================================
+
+[CLAIM 1] BTC bars n=42807  2026-10-07 05:04 -> 2026-11-06 05:03 UTC
+  gap count(!=60s)=1 sizes=[23640] pos=['2026-10-15T04:11:00+00:00']
+  claim window 2026-10-07 04:35 -> 2026-11-06 04:34: NO MATCH (rolling window drift)
+
+[CLAIM 8 parity] ATR: first_valid mine=14 talib=14 max|diff|=0.000e+00
+  RSI: first_valid mine=14 talib=14 max|diff|=2.842e-14
+  MACD hist: first_valid mine=33 talib=33 max|diff| all=1.418e+00 after bar100=4.520e-05
+
+[CLAIM 2] raw crossings (prev<60<=cur) = 201   (claim 201)
+  declustered hyst=0.9 (re-arm <54) = 109   (claim 109)
+  alternative declustering: hyst0.95(<57)=137, hyst0.833(<50)=93, cooldown60bar=105, cooldown180bar=73
+[CLAIM 8 SMA-ATR] raw crossings=277 (claim 277); overlap |A∩B|=57  jaccard=0.135  vs_wilder=0.284  vs_sma=0.206  (claim '28%')
+
+[CLAIM 3] declustered=109  dropped(last 15 bars)=0  tradeable=95  skipped=14  LONG=48 SHORT=47   (claim 95/14/48/47; skipped components: disagree=14 flat=0)
+
+[CLAIM 4] mean |forward return| event vs baseline (every-60th-bar, direction-filtered)
+  baseline bars (every 60th, agree-filtered) n=556   (claim 510; raw every-60th=714)
+  [baseline phase sensitivity] baseline = indices %60==k, for each k=0..59
+    hz=   60m baseline mean across 60 grid phases: min=0.2353 p25=0.2415 mean=0.2443 p75=0.2468 max=0.2531
+    hz=  240m baseline mean across 60 grid phases: min=0.4932 p25=0.5028 mean=0.5071 p75=0.5123 max=0.5161
+    hz= 1440m baseline mean across 60 grid phases: min=1.2139 p25=1.2232 mean=1.2286 p75=1.2343 max=1.2427
+     60m: ev=0.4127% (n=95)  base=0.2360% (n=554)  diff=+0.1767  boot95=[+0.0889,+0.2767]  dayblock95=[+0.1042,+0.2568]  perm_p=0.0000  circshift_p=0.0007
+    240m: ev=0.7890% (n=93)  base=0.5098% (n=549)  diff=+0.2792  boot95=[+0.1182,+0.4576]  dayblock95=[+0.0965,+0.4797]  perm_p=0.0001  circshift_p=0.0040
+   1440m: ev=1.2965% (n=87)  base=1.2562% (n=534)  diff=+0.0403  boot95=[-0.2279,+0.3331]  dayblock95=[-0.2395,+0.3467]  perm_p=0.7833  circshift_p=0.8620
+  robustness — all declustered events (no MACD/RSI filter):
+       60m: ev=0.3918% (n=109) base=0.2360% diff=+0.1558 boot95=[+0.0760,+0.2447]
+      240m: ev=0.7693% (n=107) base=0.5098% diff=+0.2595 boot95=[+0.1071,+0.4263]
+     1440m: ev=1.3064% (n=100) base=1.2562% diff=+0.0503 boot95=[-0.2008,+0.3081]
+  robustness — ATR-matched baseline (every 60th bar where ATR>=60 at that bar):
+    n=106 (vs events n=95)
+       60m: ev=0.4127%  atr>=60 base=0.4612%  diff=-0.0485 boot95=[-0.1818,+0.0869]
+      240m: ev=0.7890%  atr>=60 base=0.8245%  diff=-0.0354 boot95=[-0.2543,+0.1892]
+     1440m: ev=1.2965%  atr>=60 base=1.5622%  diff=-0.2658 boot95=[-0.6569,+0.1249]
+  robustness — baseline with NO direction filter:
+       60m: ev=0.4127%  base=0.2407% (n=712)  diff=+0.1720 boot95=[+0.0852,+0.2725]
+      240m: ev=0.7890%  base=0.5136% (n=706)  diff=+0.2754 boot95=[+0.1162,+0.4539]
+     1440m: ev=1.2965%  base=1.2373% (n=684)  diff=+0.0591 boot95=[-0.2084,+0.3410]
+  robustness — baseline = EVERY bar (n=42792, no grid):
+       60m: ev=0.4127%  all-bars base=0.2443% (n=42689)  diff=+0.1684 boot95=[+0.0812,+0.2670]
+      240m: ev=0.7890%  all-bars base=0.5071% (n=42329)  diff=+0.2819 boot95=[+0.1292,+0.4519]
+     1440m: ev=1.2965%  all-bars base=1.2286% (n=40977)  diff=+0.0679 boot95=[-0.1822,+0.3360]
+  robustness — alternative declustering (60m |move| ev vs every-60th base):
+    hyst0.95(<57): n=118 | 60m ev=0.413 base=0.236 d=+0.177[+0.087,+0.282] | 240m ev=0.765 base=0.510 d=+0.255[+0.106,+0.417]
+    hyst0.833(<50): n=82 | 60m ev=0.428 base=0.236 d=+0.192[+0.096,+0.303] | 240m ev=0.828 base=0.510 d=+0.318[+0.147,+0.509]
+    cooldown60bar: n=88 | 60m ev=0.450 base=0.236 d=+0.214[+0.115,+0.327] | 240m ev=0.733 base=0.510 d=+0.223[+0.061,+0.404]
+    cooldown180bar: n=62 | 60m ev=0.370 base=0.236 d=+0.134[+0.048,+0.237] | 240m ev=0.631 base=0.510 d=+0.121[-0.038,+0.306]
+    hyst0.9(theirs): n=95 | 60m ev=0.413 base=0.236 d=+0.177[+0.088,+0.278] | 240m ev=0.789 base=0.510 d=+0.279[+0.120,+0.455]
+
+[CLAIM 5] direction-aligned forward return for the tradeable events
+  first raw crossing bar index=304 last=42659 (n=42807); MACD hist first valid=33 -> all events past indicator warmup
+  event clustering: 28 distinct days, max events/day=6, mean=3.4
+     15m: n=95 mean=-0.0477% WR=32.6% (31/95) binom two-sided p=0.0009246  boot95=[-0.0983,+0.0060]
+     30m: n=95 mean=-0.0360% WR=37.9% (36/95) binom two-sided p=0.02349  boot95=[-0.1016,+0.0342]
+     60m: n=95 mean=+0.0317% WR=48.4% (46/95) binom two-sided p=0.8376  boot95=[-0.0861,+0.1598]
+    120m: n=95 mean=+0.0756% WR=48.4% (46/95) binom two-sided p=0.8376  boot95=[-0.0843,+0.2449]
+    240m: n=93 mean=+0.1688% WR=53.8% (50/93) binom two-sided p=0.5341  boot95=[-0.0526,+0.4017]
+    480m: n=90 mean=+0.2262% WR=53.3% (48/90) binom two-sided p=0.5984  boot95=[-0.0561,+0.5245]
+    720m: n=91 mean=+0.1311% WR=48.4% (44/91) binom two-sided p=0.8341  boot95=[-0.1611,+0.4276]
+   1440m: n=87 mean=+0.0588% WR=46.0% (40/87) binom two-sided p=0.5203  boot95=[-0.3181,+0.4426]
+  robustness — enter at next bar close (signal bar close = fill at same close in original):
+       15m: n=95 mean=-0.0219% WR=38.9% boot95=[-0.0751,+0.0329]
+       60m: n=95 mean=+0.0468% WR=47.4% boot95=[-0.0682,+0.1746]
+      240m: n=92 mean=+0.1756% WR=51.1% boot95=[-0.0492,+0.4142]
+     1440m: n=87 mean=+0.0670% WR=44.8% boot95=[-0.3076,+0.4463]
+
+[CLAIM 6] first touch of +/-3% within 24h (direction-aligned, close-based)
+  events: 18/95 (18.9%)  (claim 18/95=18.9%)
+  baseline: 99/556 (17.8%)  (claim 80/510=15.7%)
+  event big-moves in direction: 14/18 one-sided binom p=0.0154  (claim 14/18 p=0.0154)
+  baseline big-moves in direction: 52/99 (52.5%)  (claim 41/80=51.2%)
+  Fisher exact (event vs baseline in-direction): one-sided p=0.0394  (proper comparison test)
+  Fisher exact (big-move RATE ev vs base): two-sided p=0.7735
+  wick-based: events 17/95 (17.9%) in-dir 13/17 | baseline 99/556 (17.8%) in-dir 51/99
+
+[CLAIM 7] cross-coin with ATR% threshold (claim says 0.076%, script default 0.077%)
+  --- threshold 0.076% ---
+      SOL: ev= 206 3%dir/wrong=49/47 OK | 24h dir mean=+0.159% n=202 CI95=[-0.176,+0.492] >>CI includes 0 | flat_bars=0 (0%)
+      SUI: ev= 124 3%dir/wrong=40/46 OK | 24h dir mean=-0.367% n=122 CI95=[-0.832,+0.091] >>CI includes 0 | flat_bars=41 (0%)
+      TAO: ev= 165 3%dir/wrong=54/46 OK | 24h dir mean=-0.192% n=164 CI95=[-0.621,+0.237] >>CI includes 0 | flat_bars=2476 (6%)
+     PUMP: ev=   7 3%dir/wrong=2/5 OK | 24h dir mean=-1.986% n=7 CI95=[-4.242,+0.625] >>CI includes 0 | flat_bars=135 (0%)
+     GALA: ev= 320 3%dir/wrong=128/121 OK | 24h dir mean=+0.086% n=310 CI95=[-0.330,+0.495] >>CI includes 0 | flat_bars=16478 (38%)
+      GMX: ev= 461 3%dir/wrong=206/186 OK | 24h dir mean=-0.290% n=445 CI95=[-0.672,+0.096] >>CI includes 0 | flat_bars=26205 (61%)
+      IMX: ev= 374 3%dir/wrong=145/134 claim=(145, 133) | 24h dir mean=-0.234% n=359 CI95=[-0.725,+0.251] >>CI includes 0 | flat_bars=24358 (57%)
+     SAND: ev= 137 3%dir/wrong=48/42 OK | 24h dir mean=+0.068% n=137 CI95=[-0.526,+0.659] >>CI includes 0 | flat_bars=4600 (11%)
+    POOLED: 672/1299 = 51.7% in-dir (claim 672/1298 = 51.8%)
+    pooled one-sided binom p=0.1111
+  --- threshold 0.077% ---
+      SOL: ev= 210 3%dir/wrong=52/49 claim=(49, 47) | 24h dir mean=+0.206% n=202 CI95=[-0.126,+0.539] >>CI includes 0 | flat_bars=0 (0%)
+      SUI: ev= 132 3%dir/wrong=41/53 claim=(40, 46) | 24h dir mean=-0.293% n=130 CI95=[-0.754,+0.168] >>CI includes 0 | flat_bars=41 (0%)
+      TAO: ev= 180 3%dir/wrong=64/49 claim=(54, 46) | 24h dir mean=-0.080% n=179 CI95=[-0.494,+0.330] >>CI includes 0 | flat_bars=2476 (6%)
+     PUMP: ev=   7 3%dir/wrong=2/5 OK | 24h dir mean=-1.986% n=7 CI95=[-4.242,+0.625] >>CI includes 0 | flat_bars=135 (0%)
+     GALA: ev= 332 3%dir/wrong=135/124 claim=(128, 121) | 24h dir mean=+0.215% n=322 CI95=[-0.181,+0.629] >>CI includes 0 | flat_bars=16478 (38%)
+      GMX: ev= 459 3%dir/wrong=199/196 claim=(206, 186) | 24h dir mean=-0.377% n=443 CI95=[-0.758,+0.000] >>CI includes 0 | flat_bars=26205 (61%)
+      IMX: ev= 378 3%dir/wrong=150/136 claim=(145, 133) | 24h dir mean=-0.142% n=361 CI95=[-0.644,+0.385] >>CI includes 0 | flat_bars=24358 (57%)
+     SAND: ev= 138 3%dir/wrong=49/40 claim=(48, 42) | 24h dir mean=+0.212% n=138 CI95=[-0.380,+0.818] >>CI includes 0 | flat_bars=4600 (11%)
+    POOLED: 692/1344 = 51.5% in-dir (claim 672/1298 = 51.8%)
+    pooled one-sided binom p=0.1437
+
+[SURVIVORSHIP / GAP AUDIT]
+  events in last 15 bars (silently dropped by original): 0 of 109
+  hz=   15m: events resolvable exact=95/95 with-fallback=95 | baseline exact=555/556
+  hz=   60m: events resolvable exact=95/95 with-fallback=95 | baseline exact=554/556
+  hz=  240m: events resolvable exact=92/95 with-fallback=93 | baseline exact=549/556
+  hz= 1440m: events resolvable exact=87/95 with-fallback=87 | baseline exact=534/556
+  gap at index 11467; tradeable events within +/-1500 bars of gap: [10266, 10303, 10526, 11276, 11568, 11859, 12938]
+  horizon 60m falling in gap with fallback landing back on event bar (0% return): []
+  horizon 1440m falling in gap with fallback landing back on event bar (0% return): []
+  bars that are BOTH event and baseline: 1 -> [30360]
+  baseline bars within 1440 bars of some event (overlapping outcome windows): 551/556
+
+[MULTIPLE COMPARISONS] original script tests: 6 thresholds x 12 direction variants x 5 HTF rules x 6 entry schemes x 3 quiet settings x 8 horizons x 3 touch targets x 9 coins
+  Bonferroni on claim-6 p=0.0154 with just 4 sibling tests: 0.0616; with 8: 0.1232; with 50: 0.770
+  claim-5 15m p=4.25e-04 -> Bonferroni x8 horizons = 3.40e-03 (still significant, NEGATIVE edge)
