@@ -21839,3 +21839,28 @@ Final set: []
 - 24h net flipped RED ($-0.34) after two consecutive SL exits — watch; structural 7d -$1.83 still outside auto_1hr scope
 - mae_price NULL on 5/6 24h winners — MAE coverage gap, schema/collector look needed
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 15:22] Hourly Analysis
+
+**Trades:** 3 closed (1 wins, 2 losses), 2 open (CRV pump-chain- LONG +2.21%, GRASS volume-buildup- SHORT -0.13%)
+**PnL:** $-0.23 (WR: 33.3% hour; 24h 13T 53.8% $-0.57 RED | 7d 236T 53.4% $-2.31 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: MON bb-squeeze+ +0.03 (profit-monster-trail), GRASS pump-chain+ -0.15 (atr_sl_hit), XPL bb-squeeze+ -0.11 (hard_max_loss)
+- Kill check: no signal with 0% WR n>=3 (worst: pump-chain+ 1T, continuum-osc- 1T, r2v2-long3 1T) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/13 = 38.5% of 24h closes (under 40% strict) -> no tpsl_utils alert; down from 40.0% last hour
+- Boost: NONE eligible — bb-squeeze+ 5T 60% but net $-0.14 (fails Net PnL>$0.05); jup_yolo_mirrored 4T 75% net $-0.04 (fails PnL bar + n<5)
+- Neg streak: hours 12 (-0.14), 14 (-0.31), 15 (-0.15) = 3 consecutive negative non-empty hours -> checked regime: recent closes EXTREME/HIGH/NORMAL, NOT NEUTRAL -> no size cut (rule is NEUTRAL-only)
+- Frequency: 3/hr — under 20
+- Entry quality: 24h winners MAE 0.083% (1/7 known, <0.5%) -> OK; mae coverage gap persists (6/7 NULL)
+- No storm (window-min -0.81% / at-run +0.03%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 3 consecutive negative hours (total -0.60) but regime is EXTREME/HIGH not NEUTRAL — if next hour is negative and regime flips NEUTRAL, size cut triggers
+- 7d $-2.31 RED — structural, outside auto_1hr 1-change/hour scope
+- mae_price NULL on 6/7 24h winners — MAE coverage gap, schema/collector look needed
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
