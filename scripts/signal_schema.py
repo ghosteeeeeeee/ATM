@@ -787,6 +787,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
         from hermes_constants import (
             JUP_LIQ_ENABLED, JUP_LIQ_PLUS_ENABLED, JUP_LIQ_MINUS_ENABLED,
             LINREG_FADE_ENABLED, LINREG_FADE_PLUS_ENABLED, LINREG_FADE_MINUS_ENABLED,
+            ATR_TREND_ACCEL_ENABLED, ATR_TREND_ACCEL_PLUS_ENABLED, ATR_TREND_ACCEL_MINUS_ENABLED,
             PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
             VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
             HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
@@ -888,6 +889,16 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                 return None
             if _comp == 'linreg-fade' and not LINREG_FADE_ENABLED:
                 print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" LINREG_FADE_ENABLED=False', flush=True)
+                return None
+            # atr-trend (ATR expansion → established-trend acceleration — 2026-11-06)
+            if _comp == 'atr-trend+' and not ATR_TREND_ACCEL_PLUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_TREND_ACCEL_PLUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'atr-trend-' and not ATR_TREND_ACCEL_MINUS_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_TREND_ACCEL_MINUS_ENABLED=False', flush=True)
+                return None
+            if _comp == 'atr-trend' and not ATR_TREND_ACCEL_ENABLED:
+                print(f'  DEBUG add_signal BLOCKED: {token} {direction} source="{source}" ATR_TREND_ACCEL_ENABLED=False', flush=True)
                 return None
             # pct-hermes
             if _comp == 'pct-hermes+' and not PCT_HERMES_PLUS_ENABLED:
@@ -2831,6 +2842,7 @@ def is_component_disabled(component: str) -> bool:
         from hermes_constants import (
             JUP_LIQ_ENABLED, JUP_LIQ_PLUS_ENABLED, JUP_LIQ_MINUS_ENABLED,
             LINREG_FADE_ENABLED, LINREG_FADE_PLUS_ENABLED, LINREG_FADE_MINUS_ENABLED,
+            ATR_TREND_ACCEL_ENABLED, ATR_TREND_ACCEL_PLUS_ENABLED, ATR_TREND_ACCEL_MINUS_ENABLED,
             PCT_HERMES_ENABLED, PCT_HERMES_PLUS_ENABLED, PCT_HERMES_MINUS_ENABLED,
             VEL_HERMES_ENABLED, VEL_HERMES_PLUS_ENABLED, VEL_HERMES_MINUS_ENABLED,
             HZSCORE_ENABLED, HZSCORE_PLUS_ENABLED, HZSCORE_MINUS_ENABLED,
@@ -2943,6 +2955,10 @@ def is_component_disabled(component: str) -> bool:
     # linreg-fade (RenTech-style regression fade — 2026-11-05)
     if c in ('linreg-fade+', 'linreg_fade_long'): return not LINREG_FADE_PLUS_ENABLED
     if c in ('linreg-fade-', 'linreg_fade_short'): return not LINREG_FADE_MINUS_ENABLED
+    # atr-trend (ATR expansion → established-trend acceleration — 2026-11-06)
+    if c in ('atr-trend+', 'atr_trend_accel_long'): return not ATR_TREND_ACCEL_PLUS_ENABLED
+    if c in ('atr-trend-', 'atr_trend_accel_short'): return not ATR_TREND_ACCEL_MINUS_ENABLED
+    if c == 'atr-trend': return not ATR_TREND_ACCEL_ENABLED
     if c == 'linreg-fade': return not LINREG_FADE_ENABLED
     # pct-hermes
     if c == 'pct-hermes+': return not PCT_HERMES_PLUS_ENABLED

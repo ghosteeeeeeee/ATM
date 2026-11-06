@@ -8,8 +8,8 @@
       "files": [
         "coin_tracker_score.py"
       ],
-      "symptom": "All macd_hist values in coin_tracker.db are wrong \u2014 equal to macd_line, not the actual histogram",
-      "root_cause": "macd() at line 64 returns (macd_line, None, macd_line) \u2014 third element should be macd_line - signal_line, but signal_line is never computed",
+      "symptom": "All macd_hist values in coin_tracker.db are wrong — equal to macd_line, not the actual histogram",
+      "root_cause": "macd() at line 64 returns (macd_line, None, macd_line) — third element should be macd_line - signal_line, but signal_line is never computed",
       "fix": "macd() in coin_tracker_score.py now computes signal_line as EMA of macd_series and returns (macd_line, signal_line, macd_line-signal_line). Test: hist == line - sig confirmed.",
       "verified_by": "daily-orchestrator runtime test",
       "date_found": "2026-08-12",
@@ -21,7 +21,7 @@
     },
     {
       "id": "BUG-002",
-      "title": "Connection leaks in coin_tracker_backfill.py \u2014 no try/finally",
+      "title": "Connection leaks in coin_tracker_backfill.py — no try/finally",
       "severity": "CRITICAL",
       "status": "OBSOLETE",
       "files": [
@@ -48,7 +48,7 @@
         "coin_tracker.py"
       ],
       "symptom": "Connection to signals_hermes.db leaked on query failure",
-      "root_cause": "_read_regime() opens conn at line 96 but close() at line 100 is only reached on success \u2014 exception skips close",
+      "root_cause": "_read_regime() opens conn at line 96 but close() at line 100 is only reached on success — exception skips close",
       "fix": "Wrap in try/finally: conn = sqlite3.connect(...); try: ... finally: conn.close()",
       "verified_by": "code review | AUDIT 2026-10-11: try/finally present at coin_tracker.py:132-147 (verified by audit)",
       "date_found": "2026-08-12",
@@ -67,7 +67,7 @@
       "files": [
         "coin_tracker_backfill.py"
       ],
-      "symptom": "Spread_bps values in backfilled events are incorrect \u2014 computed from candle i+1 range, not candle i",
+      "symptom": "Spread_bps values in backfilled events are incorrect — computed from candle i+1 range, not candle i",
       "root_cause": "At iteration i, h_highs[-1] and h_lows[-1] are from candle i+1 (sliced array), but price is from candle i",
       "fix": "Use highs[i] and lows[i] instead of h_highs[-1] and h_lows[-1]",
       "verified_by": "code review | AUDIT 2026-10-11: file deleted in a6e75fb8 (verified by audit)",
@@ -85,7 +85,7 @@
       "files": [
         "coin_tracker.py"
       ],
-      "symptom": "Schema changes, DB corruption, or permission errors silently swallowed \u2014 no log output",
+      "symptom": "Schema changes, DB corruption, or permission errors silently swallowed — no log output",
       "root_cause": "_read_candles_batch (line 72) and _read_signals_batch (line 89) catch Exception and pass without logging",
       "fix": "Add logging: except Exception as e: print(f'[coin_tracker] WARN batch read: {e}')",
       "verified_by": "code review | AUDIT 2026-10-11: batch readers log errors; residual silent excepts + speed_conn leak fixed 2026-10-11 (BUG-060)",
@@ -104,7 +104,7 @@
         "coin_tracker_score.py"
       ],
       "symptom": "ATR values are based on only the first 14 candles of data, not the full available range",
-      "root_cause": "atr() line 71 loops range(min(period, len(closes)-1)) \u2014 caps at period candles",
+      "root_cause": "atr() line 71 loops range(min(period, len(closes)-1)) — caps at period candles",
       "fix": "Loop over all candles: for i in range(1, len(closes)), compute TR for each, then average",
       "verified_by": "code review | AUDIT 2026-10-11: full-range Wilder smoothing verified at coin_tracker_score.py:112-127",
       "date_found": "2026-08-12",
@@ -215,7 +215,7 @@
         "scripts/coin_tracker_schema.py"
       ],
       "symptom": "Table creation SQL is duplicated between conn-provided (lines 126-156) and standalone (lines 166-196) paths",
-      "root_cause": "Two identical CREATE TABLE blocks exist \u2014 one for when conn is provided, one for standalone mode. If schema changes, both must be updated.",
+      "root_cause": "Two identical CREATE TABLE blocks exist — one for when conn is provided, one for standalone mode. If schema changes, both must be updated.",
       "fix": "Extract table creation SQL into a shared constant or helper function",
       "verified_by": "code review | AUDIT 2026-10-11: DRY: single _COIN_TABLE_DDL + _create_coin_table helper; both paths collapsed (verified 543->457 lines)",
       "date_found": "2026-08-12",
@@ -234,9 +234,9 @@
         "scripts/signal_compactor.py"
       ],
       "symptom": "signal_compactor.py imports CONFLUENCE_REQUIRED and ACCEL_300_STANDALONE_BYPASS_ENABLED from hermes_constants (line 26), but these are not visible in the first 732 lines of hermes_constants.py",
-      "root_cause": "False alarm \u2014 CONFLUENCE_REQUIRED (line 1258) and ACCEL_300_STANDALONE_BYPASS_ENABLED (line 1264) exist in hermes_constants.py beyond the truncation point",
-      "fix": "No fix needed \u2014 file was truncated at line 732 during audit",
-      "verified_by": "code review (partial \u2014 file truncated)",
+      "root_cause": "False alarm — CONFLUENCE_REQUIRED (line 1258) and ACCEL_300_STANDALONE_BYPASS_ENABLED (line 1264) exist in hermes_constants.py beyond the truncation point",
+      "fix": "No fix needed — file was truncated at line 732 during audit",
+      "verified_by": "code review (partial — file truncated)",
       "date_found": "2026-08-12",
       "date_fixed": "2026-08-12",
       "found_by": "agent",
@@ -264,14 +264,14 @@
     },
     {
       "id": "BUG-015",
-      "title": "profit_monster trailing activation units mismatch \u2014 false activation at 0.01%",
+      "title": "profit_monster trailing activation units mismatch — false activation at 0.01%",
       "severity": "CRITICAL",
       "status": "FIXED",
       "files": [
         "scripts/profit_monster.py"
       ],
       "symptom": "BSV and GRASS trades closed immediately by trailing stop at near-zero profit. BSV activated at pnl=0.01% instead of required 0.60%.",
-      "root_cause": "PM_TRAIL_ACTIVATE_PCT=0.006 (decimal) compared against live_pnl_pct in percent (0.01). 0.01 >= 0.006 = True \u2192 false activation.",
+      "root_cause": "PM_TRAIL_ACTIVATE_PCT=0.006 (decimal) compared against live_pnl_pct in percent (0.01). 0.01 >= 0.006 = True → false activation.",
       "fix": "Multiply PM_TRAIL_ACTIVATE_PCT and PM_TRAIL_DISTANCE_PCT by 100 at import to convert from decimal to percent.",
       "verified_by": "Bug hunter audit: all 4 usage sites verified correct with percent units.",
       "date_found": "2026-08-15",
@@ -282,7 +282,7 @@
     },
     {
       "id": "BUG-016",
-      "title": "Preserved SHORT entries bypass spike filter \u2014 oversold RSI trades",
+      "title": "Preserved SHORT entries bypass spike filter — oversold RSI trades",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -308,7 +308,7 @@
       "files": [
         "scripts/decider_run.py"
       ],
-      "symptom": "NOT LONG orphan trade \u2014 HL order sent, DB write killed by 30s timeout. Same pattern as W LONG incident.",
+      "symptom": "NOT LONG orphan trade — HL order sent, DB write killed by 30s timeout. Same pattern as W LONG incident.",
       "root_cause": "Two subprocess.run calls in decider_run.py: line 574 (delayed entries) and line 1491 (main trade path). Only line 574 was fixed initially. Line 1491 still had timeout=30.",
       "fix": "Changed both subprocess.run calls to timeout=60.",
       "verified_by": "Bug hunter audit: confirmed both timeouts fixed, no other subprocess timeout=30 in trade execution paths.",
@@ -322,7 +322,7 @@
     },
     {
       "id": "BUG-018",
-      "title": "HL API rate limiting \u2014 redundant /info calls from hl-sync-guardian",
+      "title": "HL API rate limiting — redundant /info calls from hl-sync-guardian",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -342,7 +342,7 @@
     },
     {
       "id": "BUG-019",
-      "title": "r2_trend_short RSI filter comparison inverted \u2014 blocked low RSI instead of overbought",
+      "title": "r2_trend_short RSI filter comparison inverted — blocked low RSI instead of overbought",
       "severity": "CRITICAL",
       "status": "FIXED",
       "files": [
@@ -362,7 +362,7 @@
     },
     {
       "id": "BUG-020",
-      "title": "PRESERVE-APPROVED-UPSERT creates zombie loop \u2014 stale signals survive indefinitely via created_at=CURRENT_TIMESTAMP",
+      "title": "PRESERVE-APPROVED-UPSERT creates zombie loop — stale signals survive indefinitely via created_at=CURRENT_TIMESTAMP",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -370,8 +370,8 @@
         "scripts/decider_run.py",
         "scripts/signal_schema.py"
       ],
-      "symptom": "Preserved hotset entries get APPROVED rows with created_at=CURRENT_TIMESTAMP, refreshing their age. The compactor's 10-minute query picks them up again, creating an infinite cycle: DB\u2192hotset\u2192preserve\u2192UPSERT\u2192DB. Signals like ema300-dip can maintain perpetual hotset slots, accumulating survival_rounds (observed up to 108) while the two staleness checks in decider_run.py are dead code because get_approved_signals() does not return created_at or entry_origin_ts.",
-      "root_cause": "Three interacting bugs: (1) PRESERVE-APPROVED-UPSERT (signal_compactor.py:2267-2285) writes APPROVED rows with CURRENT_TIMESTAMP, refreshing the signal's age to 'just now'. (2) get_approved_signals() (signal_schema.py:2645-2683) SQL SELECT does not include created_at or entry_origin_ts, so decider_run.py:2728 (V2 staleness check) and decider_run.py:3045 (accel staleness check) are dead code \u2014 sig.get('created_at') always returns None. (3) entry_origin_ts resets to time.time() (signal_compactor.py:1813) when a preserved entry drops and a new PENDING signal fires, restarting the staleness clock.",
+      "symptom": "Preserved hotset entries get APPROVED rows with created_at=CURRENT_TIMESTAMP, refreshing their age. The compactor's 10-minute query picks them up again, creating an infinite cycle: DB→hotset→preserve→UPSERT→DB. Signals like ema300-dip can maintain perpetual hotset slots, accumulating survival_rounds (observed up to 108) while the two staleness checks in decider_run.py are dead code because get_approved_signals() does not return created_at or entry_origin_ts.",
+      "root_cause": "Three interacting bugs: (1) PRESERVE-APPROVED-UPSERT (signal_compactor.py:2267-2285) writes APPROVED rows with CURRENT_TIMESTAMP, refreshing the signal's age to 'just now'. (2) get_approved_signals() (signal_schema.py:2645-2683) SQL SELECT does not include created_at or entry_origin_ts, so decider_run.py:2728 (V2 staleness check) and decider_run.py:3045 (accel staleness check) are dead code — sig.get('created_at') always returns None. (3) entry_origin_ts resets to time.time() (signal_compactor.py:1813) when a preserved entry drops and a new PENDING signal fires, restarting the staleness clock.",
       "fix": "PRESERVE-APPROVED-UPSERT has 30-min age guard ([PRESERVE-APPROVED-AGE-BLOCK]) and INSERT uses original entry_origin_ts as created_at instead of CURRENT_TIMESTAMP. get_approved_signals() SELECT includes created_at (FIX 2026-09-04).",
       "verified_by": "daily-orchestrator code inspection + get_approved_signals SQL",
       "date_found": "2026-09-04",
@@ -385,7 +385,7 @@
     },
     {
       "id": "BUG-021",
-      "title": "Chain-data parsing in _classify_signal doesn't normalize hyphens to underscores \u2014 11 MEAN_REVERSION signals misclassified as MOMENTUM",
+      "title": "Chain-data parsing in _classify_signal doesn't normalize hyphens to underscores — 11 MEAN_REVERSION signals misclassified as MOMENTUM",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -406,14 +406,14 @@
     },
     {
       "id": "BUG-022",
-      "title": "Missing ema300_dip_long in SIGNAL_OVERRIDES \u2014 defaults correctly by accident",
+      "title": "Missing ema300_dip_long in SIGNAL_OVERRIDES — defaults correctly by accident",
       "severity": "LOW",
       "status": "FIXED",
       "files": [
         "scripts/chop_detector.py"
       ],
       "symptom": "ema300_dip and ema300_dip_short are in SIGNAL_OVERRIDES but ema300_dip_long is not. Classification defaults to MOMENTUM (correct) via the catch-all default, but this is accidental and inconsistent.",
-      "root_cause": "Omission during SIGNAL_OVERRIDES authoring \u2014 ema300_dip_long was never added despite ema300_dip_short being present.",
+      "root_cause": "Omission during SIGNAL_OVERRIDES authoring — ema300_dip_long was never added despite ema300_dip_short being present.",
       "fix": "Add 'ema300_dip_long': 'MOMENTUM' to SIGNAL_OVERRIDES.",
       "verified_by": "Bug hunter: confirmed ema300_dip_long not in dict, defaults correctly only because of line 160 default.",
       "date_found": "2026-09-13",
@@ -423,20 +423,20 @@
       "related_bugs": [
         "BUG-021"
       ],
-      "note": "Already fixed \u2014 ema300_dip_long present in SIGNAL_OVERRIDES (chop_detector.py:58). Closed 2026-10-09."
+      "note": "Already fixed — ema300_dip_long present in SIGNAL_OVERRIDES (chop_detector.py:58). Closed 2026-10-09."
     },
     {
       "id": "BUG-023",
-      "title": "brain.py trade add dies (argparse RC=2) on negative scientific-notation signal values \u2014 trades silently fail",
+      "title": "brain.py trade add dies (argparse RC=2) on negative scientific-notation signal values — trades silently fail",
       "severity": "CRITICAL",
       "status": "FIXED",
       "files": [
         "scripts/decider_run.py"
       ],
       "symptom": "64 RC=2 \"usage:\" trade failures in 4 days (2026-10-03..08); BLUR LONG retried & failed every minute 14:25-14:31 UTC on 2026-10-08. Log showed only the argparse usage block, never the error line.",
-      "root_cause": "decider_run.py built brain.py argv as [\"--signal-macd-hist\", str(v)]. Python renders tiny negative floats in scientific notation (e.g. -4.29e-06). argparse's negative-number matcher (r'^-\\d+$|^\u2212?\\d*\\.\\d+$') does not match \"-4.29e-06\", so argparse treated it as an OPTION \u2192 \"error: argument --signal-macd-hist: expected one argument\" \u2192 RC=2 \u2192 trade never opened. Any token whose signal had a negative MACD hist/value in sci-notation (common for low-price coins) was un-tradeable.",
+      "root_cause": "decider_run.py built brain.py argv as [\"--signal-macd-hist\", str(v)]. Python renders tiny negative floats in scientific notation (e.g. -4.29e-06). argparse's negative-number matcher (r'^-\\d+$|^−?\\d*\\.\\d+$') does not match \"-4.29e-06\", so argparse treated it as an OPTION → \"error: argument --signal-macd-hist: expected one argument\" → RC=2 → trade never opened. Any token whose signal had a negative MACD hist/value in sci-notation (common for low-price coins) was un-tradeable.",
       "fix": "All brain.py argv options in decider_run.py now use the \"--opt=value\" equals form (helper _barg) which argparse accepts for any value incl. negative scientific notation.",
-      "verified_by": "Reproduced parse failure with extracted parser (space rc=2 / equals OK); LIVE CONFIRMED 2026-10-08 14:43:42 UTC \u2014 BLUR LONG trade #15989 opened after failing every minute 14:25-14:31 pre-fix.",
+      "verified_by": "Reproduced parse failure with extracted parser (space rc=2 / equals OK); LIVE CONFIRMED 2026-10-08 14:43:42 UTC — BLUR LONG trade #15989 opened after failing every minute 14:25-14:31 pre-fix.",
       "date_found": "2026-10-08",
       "date_fixed": "2026-10-08",
       "found_by": "bug-hunter session 2026-10-08",
@@ -445,7 +445,7 @@
     },
     {
       "id": "BUG-024",
-      "title": "Delayed-entry path passes side as buy/sell \u2014 brain.py requires long/short; feature 100% dead",
+      "title": "Delayed-entry path passes side as buy/sell — brain.py requires long/short; feature 100% dead",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -454,7 +454,7 @@
       "symptom": "Every DELAYED ENTRY trade would die in argparse with \"invalid choice: buy (choose from long, short)\". Silent feature death.",
       "root_cause": "decider_run.py delayed-entry block set cmd_side = \"buy\"/\"sell\" (line ~728) but brain.py trade add declares side positional with choices=[\"long\",\"short\"].",
       "fix": "cmd_side = 'long' if direction.upper() == 'LONG' else 'short'",
-      "verified_by": "Extracted-parser test: buy \u2192 rc=2 invalid choice; long \u2192 parse OK. py_compile OK.",
+      "verified_by": "Extracted-parser test: buy → rc=2 invalid choice; long → parse OK. py_compile OK.",
       "date_found": "2026-10-08",
       "date_fixed": "2026-10-08",
       "found_by": "bug-hunter session 2026-10-08",
@@ -465,14 +465,14 @@
     },
     {
       "id": "BUG-025",
-      "title": "brain.py failure logging truncates stderr from the front \u2014 real argparse error line never visible",
+      "title": "brain.py failure logging truncates stderr from the front — real argparse error line never visible",
       "severity": "MEDIUM",
       "status": "FIXED",
       "files": [
         "scripts/decider_run.py"
       ],
       "symptom": "Logs showed only \"usage: brain.py trade add [-h] ...\" with no error reason; BUG-023 stayed invisible for days.",
-      "root_cause": "decider_run.py logged result.stderr[:800] \u2014 argparse prints the ~900-char usage block first and the 'error:' line last, so head-truncation always cut the actual cause.",
+      "root_cause": "decider_run.py logged result.stderr[:800] — argparse prints the ~900-char usage block first and the 'error:' line last, so head-truncation always cut the actual cause.",
       "fix": "Log last 4 stderr lines (tail) + returncode instead of first 800 chars.",
       "verified_by": "py_compile OK; log format change reviewed.",
       "date_found": "2026-10-08",
@@ -485,15 +485,15 @@
     },
     {
       "id": "BUG-026",
-      "title": "brain.py INSERT retry calls time.sleep \u2014 module imports time as _time: NameError kills retry and rolls back HL position",
+      "title": "brain.py INSERT retry calls time.sleep — module imports time as _time: NameError kills retry and rolls back HL position",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
         "scripts/brain.py"
       ],
-      "symptom": "Transient Postgres INSERT errors (lock/serialization/timeout) never retried. Instead NameError propagates to the outer handler which rolls back the HL position \u2014 trade aborted although a retry would very likely have succeeded. Retry loop was dead since import refactor.",
-      "root_cause": "brain.py line 15: `import time as _time`; INSERT retry at line ~738 called bare `time.sleep(1)` \u2192 NameError inside the retry branch.",
-      "fix": "time.sleep(1) \u2192 _time.sleep(1)",
+      "symptom": "Transient Postgres INSERT errors (lock/serialization/timeout) never retried. Instead NameError propagates to the outer handler which rolls back the HL position — trade aborted although a retry would very likely have succeeded. Retry loop was dead since import refactor.",
+      "root_cause": "brain.py line 15: `import time as _time`; INSERT retry at line ~738 called bare `time.sleep(1)` → NameError inside the retry branch.",
+      "fix": "time.sleep(1) → _time.sleep(1)",
       "verified_by": "grep confirmed no other bare `time.` usage; py_compile OK",
       "date_found": "2026-10-08",
       "date_fixed": "2026-10-08",
@@ -503,16 +503,16 @@
     },
     {
       "id": "BUG-027",
-      "title": "Double-close race: close_trade ignores UPDATE rowcount \u2014 loss cooldown + Hebbian + correlation learn the same outcome twice",
+      "title": "Double-close race: close_trade ignores UPDATE rowcount — loss cooldown + Hebbian + correlation learn the same outcome twice",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
         "scripts/brain.py"
       ],
-      "symptom": "profit-monster.service runs as its own systemd unit alongside position_manager (which calls cut_loser\u2192sniper_exit). Two exit engines closing the same trade both succeed: second UPDATE matches 0 rows (status already closed) but code fell through to record loss cooldown again and feed Hebbian/correlation a duplicate outcome, skewing learning stats. CLI also printed \"\u2713 Closed\" regardless.",
+      "symptom": "profit-monster.service runs as its own systemd unit alongside position_manager (which calls cut_loser→sniper_exit). Two exit engines closing the same trade both succeed: second UPDATE matches 0 rows (status already closed) but code fell through to record loss cooldown again and feed Hebbian/correlation a duplicate outcome, skewing learning stats. CLI also printed \"✓ Closed\" regardless.",
       "root_cause": "_close_trade_impl UPDATE has WHERE status=open but never checked cur.rowcount before running close side-effects; CLI ignored close_trade() return value.",
-      "fix": "Check cur.rowcount==0 after UPDATE \u2192 return False before commit/cooldown/Hebbian/correlation. CLI now prints failure and exits 1 when close_trade returns False.",
-      "verified_by": "Tested live: bogus id 999999 \u2192 rc=1 clean; already-closed trade #15985 \u2192 refused, DB row byte-identical (status/exit_price/close_time/pnl/close_reason unchanged). py_compile OK.",
+      "fix": "Check cur.rowcount==0 after UPDATE → return False before commit/cooldown/Hebbian/correlation. CLI now prints failure and exits 1 when close_trade returns False.",
+      "verified_by": "Tested live: bogus id 999999 → rc=1 clean; already-closed trade #15985 → refused, DB row byte-identical (status/exit_price/close_time/pnl/close_reason unchanged). py_compile OK.",
       "date_found": "2026-10-08",
       "date_fixed": "2026-10-08",
       "found_by": "bug-hunter session 1 (2026-10-08)",
@@ -527,7 +527,7 @@
       "files": [
         "scripts/brain.py"
       ],
-      "symptom": "CLI documents --pnl as \"Manual PnL override\" but _close_trade_impl never reads the pnl_usdt param \u2014 PnL always recomputed from HL fill or signal prices.",
+      "symptom": "CLI documents --pnl as \"Manual PnL override\" but _close_trade_impl never reads the pnl_usdt param — PnL always recomputed from HL fill or signal prices.",
       "root_cause": "pnl_usdt parameter accepted by close_trade/_close_trade_impl but unused in the function body.",
       "fix": "Honor pnl_usdt when provided (skip compute_close_pnl + HL realized lookup, or override after). No current callers pass --pnl, so dormant.",
       "verified_by": "grep: zero callers pass --pnl today; behavior unchanged for all live paths",
@@ -536,7 +536,7 @@
       "found_by": "bug-hunter session 1 (2026-10-08)",
       "git_commit": "pending",
       "related_bugs": [],
-      "note": "Fixed 2026-10-09: _close_trade_impl now honors manual pnl_usdt override \u2014 skips HL lookup + signal calc, writes explicit value."
+      "note": "Fixed 2026-10-09: _close_trade_impl now honors manual pnl_usdt override — skips HL lookup + signal calc, writes explicit value."
     },
     {
       "id": "BUG-029",
@@ -546,7 +546,7 @@
       "files": [
         "scripts/brain.py"
       ],
-      "symptom": "Dead code artifact of a botched edit \u2014 second except clause unreachable.",
+      "symptom": "Dead code artifact of a botched edit — second except clause unreachable.",
       "root_cause": "Two consecutive `except Exception:` clauses on the guardian_recently_opened.json marker try block.",
       "fix": "Removed the dead duplicate clause.",
       "verified_by": "py_compile OK",
@@ -558,7 +558,7 @@
     },
     {
       "id": "BUG-030",
-      "title": "LONG trailing stop pinned at entry-1.3% \u2014 min/max inversion kills trailing",
+      "title": "LONG trailing stop pinned at entry-1.3% — min/max inversion kills trailing",
       "severity": "CRITICAL",
       "status": "FIXED",
       "files": [
@@ -576,7 +576,7 @@
     },
     {
       "id": "BUG-031",
-      "title": "eff_sl_pct identically 1.3% \u2014 floor (1.3%) > cap (1.2%) flattens adaptive SL",
+      "title": "eff_sl_pct identically 1.3% — floor (1.3%) > cap (1.2%) flattens adaptive SL",
       "severity": "CRITICAL",
       "status": "FIXED",
       "files": [
@@ -612,7 +612,7 @@
     },
     {
       "id": "BUG-033",
-      "title": "position_manager check_stale_position time NameError \u2014 stale winner/loser exit never fires",
+      "title": "position_manager check_stale_position time NameError — stale winner/loser exit never fires",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -630,7 +630,7 @@
     },
     {
       "id": "BUG-034",
-      "title": "hl_sync_guardian orphan recovery NameError \u2014 amount_usdt undefined on every real orphan",
+      "title": "hl_sync_guardian orphan recovery NameError — amount_usdt undefined on every real orphan",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -648,7 +648,7 @@
     },
     {
       "id": "BUG-035",
-      "title": "hl_sync_guardian _failure_count not module-level \u2014 first-cycle error crashes main()",
+      "title": "hl_sync_guardian _failure_count not module-level — first-cycle error crashes main()",
       "severity": "MEDIUM",
       "status": "FIXED",
       "files": [
@@ -674,7 +674,7 @@
       ],
       "symptom": "21 occurrences of SIGNING_KEY/GITHUB_TOKEN/BRAIN_DB_PASSWORD in plaintext (from a prior session cat-ing .secrets.local). logs/ gitignored but key signs every live HL order.",
       "root_cause": "A prior agent session printed .secrets.local contents into a log that persists.",
-      "fix": "REOPENED-AND-CLOSED 2026-10-19 (upgrade_implementer): Oct 8 scrub was incomplete \u2014 secrets RE-ACCUMULATED (BRAIN_DB_PASSWORD=Brain123 x3, ghp_ token x1) because trade-watchdog runs an opencode agent every 30min whose session transcript (incl. .secrets.local greps) lands on stderr -> trade-watchdog.log. FIX: (1) full log scrub \u2014 112 PASSWORD=REDACTED, 0 real secrets remain; (2) root cause \u2014 run_watchdog.sh now runs sed scrub on LOG_FILE + AGENT_OUTPUT via EXIT trap every run; (3) defense \u2014 trade_watchdog_prompt.md gained hard SECURITY RULES (never read .secrets.local / never echo credentials). STANDING (T action, not code): rotate the leaked GitHub token ghp_pQJy... and DB password Brain123 \u2014 both sat in plaintext for ~11 days.",
+      "fix": "REOPENED-AND-CLOSED 2026-10-19 (upgrade_implementer): Oct 8 scrub was incomplete — secrets RE-ACCUMULATED (BRAIN_DB_PASSWORD=Brain123 x3, ghp_ token x1) because trade-watchdog runs an opencode agent every 30min whose session transcript (incl. .secrets.local greps) lands on stderr -> trade-watchdog.log. FIX: (1) full log scrub — 112 PASSWORD=REDACTED, 0 real secrets remain; (2) root cause — run_watchdog.sh now runs sed scrub on LOG_FILE + AGENT_OUTPUT via EXIT trap every run; (3) defense — trade_watchdog_prompt.md gained hard SECURITY RULES (never read .secrets.local / never echo credentials). STANDING (T action, not code): rotate the leaked GitHub token ghp_pQJy... and DB password Brain123 — both sat in plaintext for ~11 days.",
       "verified_by": "grep -cE \"Brain123|ghp_[A-Za-z0-9]{10}\" trade-watchdog.log = 0; 112 PASSWORD=REDACTED markers; bash -n run_watchdog.sh OK; sed fixture test: PASSWORD/TOKEN/SIGNING_KEY/ghp_ all redacted, ok-line untouched.",
       "date_found": "2026-10-08",
       "date_fixed": "2026-10-19",
@@ -684,7 +684,7 @@
     },
     {
       "id": "BUG-037",
-      "title": "Runtime kill switch hype_live_trading.json not consulted by order path \u2014 documented AND-gate does not exist",
+      "title": "Runtime kill switch hype_live_trading.json not consulted by order path — documented AND-gate does not exist",
       "severity": "HIGH",
       "status": "OPEN",
       "files": [
@@ -721,22 +721,22 @@
     },
     {
       "id": "BUG-039",
-      "title": "pump-exit momentum exit reads the WRONG end of the candle window \u2014 counts oldest candles, not newest",
+      "title": "pump-exit momentum exit reads the WRONG end of the candle window — counts oldest candles, not newest",
       "severity": "CRITICAL",
       "status": "FIXED",
       "files": [
         "scripts/position_manager.py"
       ],
-      "symptom": "Momentum exit (pump_exit_momentum) fires on stale momentum and misses current dumps. With newest-2 candles dumping hard the old code returned False (LONG held a falling knife); with newest-2 recovering it returned True (cut a winner). Affects every pump_chain+ trade \u2014 all 3 currently-open trades (GRASS/FOGO/BLUR) map to pump_exit and RR_EXIT_ENABLED=True.",
-      "root_cause": "_vel_closes fetched ORDER BY ts DESC (index 0=newest) but the loop ran range(1,len) \u2014 newest interval first, oldest last. The consecutive counter RESETS on a non-qualifying candle, so the final surviving run reflects the OLDEST intervals, not the newest. Direction semantics (LONG exits on vel < -0.5, SHORT on vel > +0.5) were correct; only the window end was inverted.",
-      "fix": "Iterate the range in reverse (oldest interval \u2192 newest) so the newest interval is evaluated last and the surviving counter run is the most recent candles. Both LONG and SHORT branches.",
-      "verified_by": "Reproduced the exact loop logic standalone: newest-2-dumping \u2192 old=False/fixed=True (want True); newest-2-recovering \u2192 old=True/fixed=False (want False); SHORT mirrors both pass. py_compile OK. Path confirmed live via SIGNAL_EXIT_CONFIG (pump_chain+ \u2192 pump_exit) + 3 open pump-chain trades. | V1 VERIFIED-FIXED 2026-10-11: 4/4 momentum scenarios correct on live source.",
+      "symptom": "Momentum exit (pump_exit_momentum) fires on stale momentum and misses current dumps. With newest-2 candles dumping hard the old code returned False (LONG held a falling knife); with newest-2 recovering it returned True (cut a winner). Affects every pump_chain+ trade — all 3 currently-open trades (GRASS/FOGO/BLUR) map to pump_exit and RR_EXIT_ENABLED=True.",
+      "root_cause": "_vel_closes fetched ORDER BY ts DESC (index 0=newest) but the loop ran range(1,len) — newest interval first, oldest last. The consecutive counter RESETS on a non-qualifying candle, so the final surviving run reflects the OLDEST intervals, not the newest. Direction semantics (LONG exits on vel < -0.5, SHORT on vel > +0.5) were correct; only the window end was inverted.",
+      "fix": "Iterate the range in reverse (oldest interval → newest) so the newest interval is evaluated last and the surviving counter run is the most recent candles. Both LONG and SHORT branches.",
+      "verified_by": "Reproduced the exact loop logic standalone: newest-2-dumping → old=False/fixed=True (want True); newest-2-recovering → old=True/fixed=False (want False); SHORT mirrors both pass. py_compile OK. Path confirmed live via SIGNAL_EXIT_CONFIG (pump_chain+ → pump_exit) + 3 open pump-chain trades. | V1 VERIFIED-FIXED 2026-10-11: 4/4 momentum scenarios correct on live source.",
       "date_found": "2026-10-08",
       "date_fixed": "2026-10-08",
       "found_by": "bug-hunter session 1 (2026-10-08)",
       "git_commit": null,
       "related_bugs": [
-        "NOTE: ID collision \u2014 parallel bug-hunter round-2 held BUG-030 (tpsl_utils trailing inversion); this momentum bug renumbered to BUG-039"
+        "NOTE: ID collision — parallel bug-hunter round-2 held BUG-030 (tpsl_utils trailing inversion); this momentum bug renumbered to BUG-039"
       ]
     },
     {
@@ -766,10 +766,10 @@
         "scripts/hyperliquid_exchange.py",
         "scripts/trade_watchdog.py"
       ],
-      "symptom": "Watchdog autopilot 0/2 HL success rate (CRV 2026-10-08 00:49 & 01:19): \"float() argument must be a string or a real number, not NoneType\". DB was already written and never rolled back \u2192 DB/HL stop divergence.",
-      "root_cause": "replace_sl(coin,direction,new_price) default size=None; when _find_open_trigger_order found no SL (oid=None, existing_sz=None), place_sl received sz=None \u2192 float(None) TypeError.",
+      "symptom": "Watchdog autopilot 0/2 HL success rate (CRV 2026-10-08 00:49 & 01:19): \"float() argument must be a string or a real number, not NoneType\". DB was already written and never rolled back → DB/HL stop divergence.",
+      "root_cause": "replace_sl(coin,direction,new_price) default size=None; when _find_open_trigger_order found no SL (oid=None, existing_sz=None), place_sl received sz=None → float(None) TypeError.",
       "fix": "replace_sl now fetches live position size (get_open_hype_positions) as ground truth when both size and existing_sz are None; returns clean {success:False,error:...} if truly flat.",
-      "verified_by": "Behavioral test with mocks: flat account \u2192 clean error dict (no crash); live position \u2192 sz=7.5 picked up, place_sl called with size. | V1 VERIFIED-FIXED 2026-10-11: 0 \"float() argument\" since fix; live-position fallback works.",
+      "verified_by": "Behavioral test with mocks: flat account → clean error dict (no crash); live position → sz=7.5 picked up, place_sl called with size. | V1 VERIFIED-FIXED 2026-10-11: 0 \"float() argument\" since fix; live-position fallback works.",
       "date_found": "2026-10-08",
       "date_fixed": "2026-10-08",
       "found_by": "bug-hunter session 2026-10-08 round 3",
@@ -778,7 +778,7 @@
     },
     {
       "id": "BUG-042",
-      "title": "watchdog autopilot wrote brain DB BEFORE HL attempt with no rollback \u2014 stop divergence",
+      "title": "watchdog autopilot wrote brain DB BEFORE HL attempt with no rollback — stop divergence",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -796,14 +796,14 @@
     },
     {
       "id": "BUG-043",
-      "title": "watchdog \u22655% profit-lock branch can propose LOOSENING the stop (no tighten-check)",
+      "title": "watchdog ≥5% profit-lock branch can propose LOOSENING the stop (no tighten-check)",
       "severity": "MEDIUM",
       "status": "FIXED",
       "files": [
         "scripts/trade_watchdog.py"
       ],
       "symptom": "Trail steer could widen an already-tighter stop (e.g. tpsl trailed tighter), giving back profit.",
-      "root_cause": "new_stop = current*(1\u00b13%) computed without comparing against current_sl.",
+      "root_cause": "new_stop = current*(1±3%) computed without comparing against current_sl.",
       "fix": "Tighten-check added: skip steer when new_stop is not tighter than current_sl (LONG: must be above; SHORT: below).",
       "verified_by": "py_compile OK. | V1 VERIFIED-FIXED 2026-10-11: 4-trade mock matrix, loosening steers correctly skipped.",
       "date_found": "2026-10-08",
@@ -814,17 +814,17 @@
     },
     {
       "id": "BUG-044",
-      "title": "sniper-exit.timer disabled \u2014 entire regime-shift exit layer never runs (T decision)",
+      "title": "sniper-exit.timer disabled — entire regime-shift exit layer never runs (T decision)",
       "severity": "HIGH",
       "status": "OPEN",
       "files": [
         "sniper-exit.timer",
         "scripts/sniper_exit.py"
       ],
-      "symptom": "0 journal entries in 48h; profit_monster/cut_loser still consult sniper closing markers \u2014 dead coordination. BTC-shift mass-exit protection silently OFF.",
+      "symptom": "0 journal entries in 48h; profit_monster/cut_loser still consult sniper closing markers — dead coordination. BTC-shift mass-exit protection silently OFF.",
       "root_cause": "Timer disabled at some point; no rationale found in trading_log.md, bugs.json, or git history.",
-      "fix": "NOT enabled \u2014 audit found sniper closes positions on DATA FAILURE (fail-close on missing token_speeds row, sniper_exit.py:862/866) and leaves phantom-open trades on brain.py failure. Enabling as-is is dangerous. T decision needed AFTER fail-open fix. || UPDATE 2026-10-12 (upgrade_implementer): prerequisite FAIL-OPEN fix already shipped \u2014 BUG-062 commit d5fab3cf (2026-10-11) makes missing token_speeds rows fail-open (sniper_exit.py ~862). Remaining work is T decision only: enable sniper-exit.timer now that fail-open is in, or leave disabled.",
-      "verified_by": "systemctl is-enabled \u2192 disabled; journalctl 48h \u2192 no entries.",
+      "fix": "NOT enabled — audit found sniper closes positions on DATA FAILURE (fail-close on missing token_speeds row, sniper_exit.py:862/866) and leaves phantom-open trades on brain.py failure. Enabling as-is is dangerous. T decision needed AFTER fail-open fix. || UPDATE 2026-10-12 (upgrade_implementer): prerequisite FAIL-OPEN fix already shipped — BUG-062 commit d5fab3cf (2026-10-11) makes missing token_speeds rows fail-open (sniper_exit.py ~862). Remaining work is T decision only: enable sniper-exit.timer now that fail-open is in, or leave disabled.",
+      "verified_by": "systemctl is-enabled → disabled; journalctl 48h → no entries.",
       "date_found": "2026-10-08",
       "date_fixed": null,
       "found_by": "bug-hunter session 2026-10-08 round 3",
@@ -833,14 +833,14 @@
     },
     {
       "id": "BUG-045",
-      "title": "signal purge (--purge-executed) never wired into systemd ExecStart \u2014 but archive timer covers retention",
+      "title": "signal purge (--purge-executed) never wired into systemd ExecStart — but archive timer covers retention",
       "severity": "LOW",
       "status": "CLOSED",
       "files": [
         "signal_compactor.py",
         "/etc/systemd/system/hermes-signal-compactor.service"
       ],
-      "symptom": "Audit claimed 25,578 EXPIRED rows = leak. VERIFIED NOT A LEAK: hermes-archive-signals.timer runs daily 04:00 with --apply, 14-day retention by design; dry-run shows 828 rows queued exactly at the 14d boundary. EXECUTED rows total only 20. The --purge-executed flag (1h cleanup + PG cross-check phantom restore) is simply never invoked \u2014 dead feature, not a leak.",
+      "symptom": "Audit claimed 25,578 EXPIRED rows = leak. VERIFIED NOT A LEAK: hermes-archive-signals.timer runs daily 04:00 with --apply, 14-day retention by design; dry-run shows 828 rows queued exactly at the 14d boundary. EXECUTED rows total only 20. The --purge-executed flag (1h cleanup + PG cross-check phantom restore) is simply never invoked — dead feature, not a leak.",
       "root_cause": "ExecStart=/usr/bin/python3 signal_compactor.py passes no --purge-executed; _purge_executed_signals unreachable in production.",
       "fix": "Left as-is (archive timer handles cleanup; purge adds little with 20 executed rows). Flagged so the checklist warning \"[FAIL] signals_db: 28223 signals\" is understood as retention-by-design, not failure.",
       "verified_by": "Dry-run archive-signals.py: 828 rows at 14d boundary. DB distribution: EXPIRED 25578 / SKIPPED 2652 / EXECUTED 20 / PENDING 9.",
@@ -853,14 +853,14 @@
     },
     {
       "id": "BUG-046",
-      "title": "decider_run sl-zone sizing ATR inverts TR pairing \u2014 DESC list not reversed (unfixed twin of position_manager fix)",
+      "title": "decider_run sl-zone sizing ATR inverts TR pairing — DESC list not reversed (unfixed twin of position_manager fix)",
       "severity": "LOW",
       "status": "FIXED",
       "files": [
         "scripts/decider_run.py"
       ],
-      "symptom": "SL-zone size adjustment used a slightly-wrong ATR: query ORDER BY ts DESC LIMIT 20 but the TR loop did not reverse, so rows[i] (OLDER candle H/L) was paired with rows[i-1][3] (NEWER close) \u2014 inverting the previous-close pairing. Impact minor (ATR still captures range magnitude) but inconsistent with the identical calc in position_manager.py ~2714 which DOES .reverse() first.",
-      "root_cause": "Missing _atr_rows_zone.reverse() before the TR loop over a DESC-fetched candle list. Found by BUG-039 pattern sweep (subagent) as a sideways finding \u2014 it is NOT the BUG-039 consecutive-count pattern (no reset counter), just an inverted TR pairing.",
+      "symptom": "SL-zone size adjustment used a slightly-wrong ATR: query ORDER BY ts DESC LIMIT 20 but the TR loop did not reverse, so rows[i] (OLDER candle H/L) was paired with rows[i-1][3] (NEWER close) — inverting the previous-close pairing. Impact minor (ATR still captures range magnitude) but inconsistent with the identical calc in position_manager.py ~2714 which DOES .reverse() first.",
+      "root_cause": "Missing _atr_rows_zone.reverse() before the TR loop over a DESC-fetched candle list. Found by BUG-039 pattern sweep (subagent) as a sideways finding — it is NOT the BUG-039 consecutive-count pattern (no reset counter), just an inverted TR pairing.",
       "fix": "Added _atr_rows_zone.reverse() before the TR loop, matching position_manager.py.",
       "verified_by": "py_compile OK; cross-checked against position_manager.py ~2714 twin which reverses first. BUG-039 sweep subagent confirmed this was the only unfixed DESC/ASC inconsistency of its kind in scripts/.",
       "date_found": "2026-10-08",
@@ -873,7 +873,7 @@
     },
     {
       "id": "BUG-047",
-      "title": "decider_run logs brain.py stdout HEAD \u2014 INSERT-failure traceback (on stdout) invisible; 2 trade-add failures had zero diagnostics",
+      "title": "decider_run logs brain.py stdout HEAD — INSERT-failure traceback (on stdout) invisible; 2 trade-add failures had zero diagnostics",
       "severity": "MEDIUM",
       "status": "FIXED",
       "files": [
@@ -893,7 +893,7 @@
     },
     {
       "id": "BUG-048",
-      "title": "1m candle pipeline degraded \u2014 aggregator dead (MIN_BARS=3 vs exactly 1 tick/window by design) + seed rotation too slow for 178 tokens",
+      "title": "1m candle pipeline degraded — aggregator dead (MIN_BARS=3 vs exactly 1 tick/window by design) + seed rotation too slow for 178 tokens",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -902,9 +902,9 @@
         "scripts/signal_schema.py"
       ],
       "symptom": "hermes-1m-candle.service prints [1m] filled=0 closed windows, dev=0 tokens on every run (0 writes since 2026-10-05 21:34). candles_1m: only ~30/178 tokens fresh <5min; the rest rotation-stale 5-31min (median ~11min at 21:47 UTC; user measured median ~22min/max 31min during a slow-cadence period). All alt-token 1m RSI/BB/EMA consumers read up to 31min-stale closes.",
-      "root_cause": "(1) Commit e9a299ca (2026-10-05 21:32) raised MIN_BARS_FOR_CLOSED 1->3 and MIN_BARS_FOR_DEVELOPING 1->2 in _aggregate_1m.py:29-30, premised on 'price_history ticks are ~155s apart'. Actual: ticks are written EXACTLY ONCE per 60s window BY DESIGN (signal_schema.py:4487 minute_ts=(now//60)*60 + INSERT OR IGNORE at :4489). Verified over all 13.3M rows back to 2026-08-25: 100% of 1m windows have exactly 1 tick; ZERO windows ever have >=2. So bar_count>=3 (_aggregate_1m.py:127) and bar_count>=2 (:192) can never pass \u2014 aggregator is 100% dead code. This shutdown was noticed but accepted in brain/verdicts/bug-hunter-candle-pipeline-fix.md (2026-10-05 22:20), trading the aggregator for INSERT-OR-IGNORE safety with '~36min staleness worst case' explicitly accepted. (2) With the aggregator dead, candles_1m freshness for all 178 universe tokens depends solely on price_collector._seed_universe_candles rotation: 178 tokens / TOKENS_PER_RUN=10 = 17.8 runs x measured effective run cadence 36-142s (timer says 30s but Type=oneshot cadence collapses to run duration; avg 67s over 32min, ~92s in recent half) = 18-42min full rotation. The skip-if-fresh logic (price_collector.py:237-241) NEVER fires (every run logs 'Seeded 10/10') because rotation period >> 300s threshold. BTC exempt (always fetched, :264-269). (3) Latent landmines that make a naive MIN_BARS revert dangerous: (a) last_closed_dict walk-back (_aggregate_1m.py:82-89) uses the OLDEST stuck is_closed=0 dev row as fill boundary when dev_ts < lc \u2014 94/185 tokens currently get a boundary 24h-45d old (most at 08-26 02:22) -> a MIN_BARS=1 revert attempts ~5.5M IGNORE no-op fills/run (verified by read-only simulation; matches the 4.9M fill-storms recorded in the 10-05 verdict) instead of the ~800 real live-edge windows; (b) closed path INSERT OR IGNORE can never upgrade an existing is_closed=0 dev row (K-tokens: 230,827 stuck rows, is_closed=1 count=0 all-time) \u2014 a dev-close UPDATE is required; (c) tokens with no is_closed=1 row ever are skipped entirely by lines 105-106 (chicken-and-egg).",
-      "fix": "PROPOSED (not yet implemented \u2014 CEO decision pending): PRIMARY: split the seeder into a fast 1m-only refresh loop (1 API call/token, e.g. 60-90 tokens/run => all 178 fresh <2min with REAL OHLC+volume) and the existing slow multi-TF backfill loop (15m/1h/4h every ~18min, 5m ~8min). Restores sub-5min 1m freshness for ALL 178 tokens with real volume, keeps flat candles out entirely, removes dependence on the aggregator. INTERIM MINIMAL (if aggregator must be reactivated): _aggregate_1m.py: MIN_BARS_FOR_CLOSED 3->1, MIN_BARS_FOR_DEVELOPING 2->1, KEEP INSERT OR IGNORE, PLUS (i) fix boundary: use lc when dev_ts <= lc (last_closed_dict[token] = max(walkback, lc)) to prevent 5.5M-fill storms; (ii) close dev rows via UPDATE ... SET is_closed=1, open=?,high=?,low=?,close=? WHERE token=? AND ts=? AND is_closed=0 before INSERT OR IGNORE; (iii) accept that live-edge fills are flat (O=H=L=C) volume=0 for 0-18min until the next seed REPLACEs them with real OHLC \u2014 close-based RSI/BB stays accurate, but volume gates read 0 at the edge (documented tradeoff). REJECTED: revert-to-1 alone without (i)/(ii) = fill-storm + DB lock contention; 'reject high==low or volume==0' quality gate = aggregator writes NOTHING again (verified: 100% of would-be fills are high==low by construction, 1 tick/window); MIN_BARS=2 = still dead (0 windows with >=2 ticks since 2026-09-01); raising price_history tick density = breaks the 1-bar=60s signal contract.\n\n--- IMPLEMENTED 2026-10-09 (CEO Option A ratified; bug_hunter) \u2014 scripts/price_collector.py ONLY ---\n(1) _seed_fast_1m(): NEW fast 1m-only refresh loop. FAST_1M_TOKENS_PER_RUN=60 (CEO-set), own cursor in data/candle_fast_1m_progress.json (SEPARATE FILE so the slow path's tokens/cursor keys are never touched \u2014 _save_candle_progress rewrites its whole file and would wipe a sibling key). Skip-if-fresh: re-fetch only if newest 1m >300s old OR newest volume=0 (vol=0 'fresh' = fake tick-agg data, always re-fetch). Binance-first/HL-fallback via shared _fetch_real_candles(). 25s wall-clock budget (FAST_1M_TIME_BUDGET_S) \u2014 on expiry breaks BEFORE fetching and parks the cursor ON the unprocessed token (resumes exactly there). Runs inside main()'s existing candles lock \u2014 never re-acquires (no deadlock). Full 178-token rotation = 3 runs.\n(2) _seed_universe_candles() (slow path) keeps 5m/15m/1h/4h backfill but '1m' REMOVED from its fetch list (SLOW_SEED_TFS constant) \u2014 the fast loop owns 1m now; BTC 1m always-fetch kept (continuum engine needs it every cycle; fast loop only reaches BTC once per rotation).\n(3) _aggregate_tf closed-fill: INSERT OR REPLACE -> volume-guarded upsert (INSERT ... ON CONFLICT(token,ts) DO UPDATE SET ... is_closed=1 WHERE {table}.volume = 0). Tick-agg vol=0 candles can no longer overwrite real API OHLC for 5m/15m/1h/4h (measured damage: 27.8% vol=0 on 4h, 11.4% on 1h/24h). Deliberately NOT plain INSERT OR IGNORE: plain OR IGNORE can never upgrade an existing is_closed=0 dev row (root cause (b) above \u2014 the 230,827 stuck-row failure already seen in candles_1m), which would strand every developing window at is_closed=0 forever and hide recent candles from the 168 is_closed=1 consumer queries. The WHERE volume=0 guard subsumes OR IGNORE for real candles (never touched) AND still lets the aggregator close its own dev windows.\n(4) _store_candles: INSERT OR REPLACE -> guarded upsert (update unless it would downgrade vol>0 -> vol=0; existing vol=0 rows always overwritten = fake candles get healed; is_closed=1 preserved to match old column-DEFAULT semantics). Plain INSERT OR IGNORE rejected for _store_candles: it would freeze the currently-open candle at its first partial mid-minute snapshot forever \u2014 re-introducing BUG-048's stale-candle class.\n(5) _aggregate_1m.py + its systemd service/timer UNTOUCHED \u2014 48h soak continues; deletion is a later step. hermes_constants.py untouched.\nFull rotation in 3 runs (178/60); with ~67s effective cadence that is ~2-3 min per full pass, vs the old 18-42 min at 10 tokens/run. || RATIFIED 2026-10-09 by CEO-agent: both guarded-upsert deviations APPROVED (superior to plain INSERT OR IGNORE). _aggregate_tf: WHERE volume=0 can still upgrade is_closed=0 dev rows to closed (plain OR IGNORE could not \u2014 would strand dev windows from ~168 is_closed=1 consumer queries) while never touching real vol>0 candles. _store_candles: WHERE volume=0 OR excluded.volume>0 prevents vol=0 downgrading real candles AND avoids freezing the open candle at its first partial snapshot (plain OR IGNORE regression). Independent verification: 173/176 tokens fresh <5min, median 160s, p90 220s. || CLOSED 2026-10-12 (upgrade_implementer): 48h soak expired Oct 7; aggregator confirmed filled=0/dev=0 every run for ~7 days (journalctl), 28.5s CPU/min wasted. hermes-1m-candle.timer disabled+stopped (systemctl disable --now). price_collector covers candles.db wal_checkpoint (line 845) so no checkpoint duty lost. 176/178 tokens verified <9min fresh via fast seeder. Interim MIN_BARS path abandoned (primary shipped). _aggregate_1m.py kept on disk, inert.",
-      "verified_by": "bug_hunter 2026-10-09 (KEEP-OPEN: 48h soak not done). (a) ast.parse OK. (b) import check OK: 'import price_collector' has no fetching/lock side effects (0 open sockets after import; only pre-existing init_db CREATE-IF-NOT-EXISTS). (c) /tmp dry-run suite (monkeypatched fetchers, temp CANDLES_DB \u2014 no network, no live DB): ALL 35 ASSERTIONS PASSED \u2014 exactly 60 slots/run; fetched exactly tokens[0:60], [60:120], [120:178)+wrap; full 178-token rotation in 3 runs (178 fetches, 0 dups); fresh token skipped; vol=0 token forced re-fetch and healed (33.0); zero time-budget parks cursor ON stale token (248->TOK070) and next run resumes with that exact token; universe change resets cursor; slow progress file untouched by fast loop; _store_candles no-downgrade guard (real kept, vol=0 rejected, real refreshes real, dev row healed+closed); _aggregate_tf upsert (vol>0 untouched / dev row closed is_closed=1 / gap filled). Throwaway deleted.(d) LIVE evidence (unplanned smoke test \u2014 hermes-price-collector.service is Type=oneshot, so the timer picked up new code at 22:50 UTC with NO restart; I did not run the collector manually): journal shows 'Refreshed 49/60, 58/60, 58/60, 35/60, 13/60' with cursor 60->120->2(wrap)->62->122, i.e. full 178-token rotation in 103s (22:50:07->22:51:50), 0 traceback/non-fatal/error lines since edit. Live candles_1m read-only check: 158/178 tokens fresh <5min (BUG-048 symptom was ~30/178), 176/178 <11min, median staleness 184s. (e) Rate limits: worst case 202 HTTP calls/cycle (fast 60 Binance + <=60 HL fallback; slow 40+<=40; BTC 1-2); Binance klines weight 2 (limit<=500) => ~202 weight/min vs 6000/min cap (3.4%); 25s budget hard-caps the fast loop inside the 36-142s cadence. MANDATORY SELF-REVIEW (independent subagent audit of commit fc55eff0, bug-hunter protocol): verdict SAFE TO SHIP \u2014 no CRITICAL/HIGH introduced; lock discipline, fast/slow cursor isolation, SQLite upsert semantics (empirically tested), write-path inventory into all 5 candle tables, and rate limits (worst ~206 HTTP calls/cycle, ~37x headroom) all verified clean. Findings acted on immediately: MEDIUM-1 (one poisoned token, e.g. NaN OHLC -> IntegrityError, could wedge the entire 1m rotation forever behind a single 'non-fatal' log line) FIXED \u2014 per-token try/except in _seed_fast_1m advances past bad tokens (verified: poison-token test, cursor 60->120 across runs, 177/178 stored); LOW-1 (conn/pragma outside try) FIXED; MEDIUM-3 (comment overstated per-token freshness as 2-7min; measured effective ~6-13min due to the <300s skip) comment corrected. Reported, NOT fixed (out of scope / pre-existing): MEDIUM-2 (no freshness watchdog on candles_1m \u2014 recommended before soak end), MEDIUM-4 (slow seeder has no wall-clock budget, pre-existing), LOW-2 (non-atomic progress JSON writes), LOW-4 (constants in price_collector.py vs hermes_constants.py per CEO instruction; dead CANDLE_PROGRESS_FILE; slow path hardcodes 300s), HIGH pre-existing in _aggregate_1m.py (imports candles lock but never acquires it; dev-write TOCTOU \u2014 must be resolved at the revival/deletion step, file deliberately untouched), MEDIUM pre-existing dormant in backfill_candles_5m.py (unguarded REPLACE from degraded 1m rows \u2014 port the guarded upsert before anyone runs it).",
+      "root_cause": "(1) Commit e9a299ca (2026-10-05 21:32) raised MIN_BARS_FOR_CLOSED 1->3 and MIN_BARS_FOR_DEVELOPING 1->2 in _aggregate_1m.py:29-30, premised on 'price_history ticks are ~155s apart'. Actual: ticks are written EXACTLY ONCE per 60s window BY DESIGN (signal_schema.py:4487 minute_ts=(now//60)*60 + INSERT OR IGNORE at :4489). Verified over all 13.3M rows back to 2026-08-25: 100% of 1m windows have exactly 1 tick; ZERO windows ever have >=2. So bar_count>=3 (_aggregate_1m.py:127) and bar_count>=2 (:192) can never pass — aggregator is 100% dead code. This shutdown was noticed but accepted in brain/verdicts/bug-hunter-candle-pipeline-fix.md (2026-10-05 22:20), trading the aggregator for INSERT-OR-IGNORE safety with '~36min staleness worst case' explicitly accepted. (2) With the aggregator dead, candles_1m freshness for all 178 universe tokens depends solely on price_collector._seed_universe_candles rotation: 178 tokens / TOKENS_PER_RUN=10 = 17.8 runs x measured effective run cadence 36-142s (timer says 30s but Type=oneshot cadence collapses to run duration; avg 67s over 32min, ~92s in recent half) = 18-42min full rotation. The skip-if-fresh logic (price_collector.py:237-241) NEVER fires (every run logs 'Seeded 10/10') because rotation period >> 300s threshold. BTC exempt (always fetched, :264-269). (3) Latent landmines that make a naive MIN_BARS revert dangerous: (a) last_closed_dict walk-back (_aggregate_1m.py:82-89) uses the OLDEST stuck is_closed=0 dev row as fill boundary when dev_ts < lc — 94/185 tokens currently get a boundary 24h-45d old (most at 08-26 02:22) -> a MIN_BARS=1 revert attempts ~5.5M IGNORE no-op fills/run (verified by read-only simulation; matches the 4.9M fill-storms recorded in the 10-05 verdict) instead of the ~800 real live-edge windows; (b) closed path INSERT OR IGNORE can never upgrade an existing is_closed=0 dev row (K-tokens: 230,827 stuck rows, is_closed=1 count=0 all-time) — a dev-close UPDATE is required; (c) tokens with no is_closed=1 row ever are skipped entirely by lines 105-106 (chicken-and-egg).",
+      "fix": "PROPOSED (not yet implemented — CEO decision pending): PRIMARY: split the seeder into a fast 1m-only refresh loop (1 API call/token, e.g. 60-90 tokens/run => all 178 fresh <2min with REAL OHLC+volume) and the existing slow multi-TF backfill loop (15m/1h/4h every ~18min, 5m ~8min). Restores sub-5min 1m freshness for ALL 178 tokens with real volume, keeps flat candles out entirely, removes dependence on the aggregator. INTERIM MINIMAL (if aggregator must be reactivated): _aggregate_1m.py: MIN_BARS_FOR_CLOSED 3->1, MIN_BARS_FOR_DEVELOPING 2->1, KEEP INSERT OR IGNORE, PLUS (i) fix boundary: use lc when dev_ts <= lc (last_closed_dict[token] = max(walkback, lc)) to prevent 5.5M-fill storms; (ii) close dev rows via UPDATE ... SET is_closed=1, open=?,high=?,low=?,close=? WHERE token=? AND ts=? AND is_closed=0 before INSERT OR IGNORE; (iii) accept that live-edge fills are flat (O=H=L=C) volume=0 for 0-18min until the next seed REPLACEs them with real OHLC — close-based RSI/BB stays accurate, but volume gates read 0 at the edge (documented tradeoff). REJECTED: revert-to-1 alone without (i)/(ii) = fill-storm + DB lock contention; 'reject high==low or volume==0' quality gate = aggregator writes NOTHING again (verified: 100% of would-be fills are high==low by construction, 1 tick/window); MIN_BARS=2 = still dead (0 windows with >=2 ticks since 2026-09-01); raising price_history tick density = breaks the 1-bar=60s signal contract.\n\n--- IMPLEMENTED 2026-10-09 (CEO Option A ratified; bug_hunter) — scripts/price_collector.py ONLY ---\n(1) _seed_fast_1m(): NEW fast 1m-only refresh loop. FAST_1M_TOKENS_PER_RUN=60 (CEO-set), own cursor in data/candle_fast_1m_progress.json (SEPARATE FILE so the slow path's tokens/cursor keys are never touched — _save_candle_progress rewrites its whole file and would wipe a sibling key). Skip-if-fresh: re-fetch only if newest 1m >300s old OR newest volume=0 (vol=0 'fresh' = fake tick-agg data, always re-fetch). Binance-first/HL-fallback via shared _fetch_real_candles(). 25s wall-clock budget (FAST_1M_TIME_BUDGET_S) — on expiry breaks BEFORE fetching and parks the cursor ON the unprocessed token (resumes exactly there). Runs inside main()'s existing candles lock — never re-acquires (no deadlock). Full 178-token rotation = 3 runs.\n(2) _seed_universe_candles() (slow path) keeps 5m/15m/1h/4h backfill but '1m' REMOVED from its fetch list (SLOW_SEED_TFS constant) — the fast loop owns 1m now; BTC 1m always-fetch kept (continuum engine needs it every cycle; fast loop only reaches BTC once per rotation).\n(3) _aggregate_tf closed-fill: INSERT OR REPLACE -> volume-guarded upsert (INSERT ... ON CONFLICT(token,ts) DO UPDATE SET ... is_closed=1 WHERE {table}.volume = 0). Tick-agg vol=0 candles can no longer overwrite real API OHLC for 5m/15m/1h/4h (measured damage: 27.8% vol=0 on 4h, 11.4% on 1h/24h). Deliberately NOT plain INSERT OR IGNORE: plain OR IGNORE can never upgrade an existing is_closed=0 dev row (root cause (b) above — the 230,827 stuck-row failure already seen in candles_1m), which would strand every developing window at is_closed=0 forever and hide recent candles from the 168 is_closed=1 consumer queries. The WHERE volume=0 guard subsumes OR IGNORE for real candles (never touched) AND still lets the aggregator close its own dev windows.\n(4) _store_candles: INSERT OR REPLACE -> guarded upsert (update unless it would downgrade vol>0 -> vol=0; existing vol=0 rows always overwritten = fake candles get healed; is_closed=1 preserved to match old column-DEFAULT semantics). Plain INSERT OR IGNORE rejected for _store_candles: it would freeze the currently-open candle at its first partial mid-minute snapshot forever — re-introducing BUG-048's stale-candle class.\n(5) _aggregate_1m.py + its systemd service/timer UNTOUCHED — 48h soak continues; deletion is a later step. hermes_constants.py untouched.\nFull rotation in 3 runs (178/60); with ~67s effective cadence that is ~2-3 min per full pass, vs the old 18-42 min at 10 tokens/run. || RATIFIED 2026-10-09 by CEO-agent: both guarded-upsert deviations APPROVED (superior to plain INSERT OR IGNORE). _aggregate_tf: WHERE volume=0 can still upgrade is_closed=0 dev rows to closed (plain OR IGNORE could not — would strand dev windows from ~168 is_closed=1 consumer queries) while never touching real vol>0 candles. _store_candles: WHERE volume=0 OR excluded.volume>0 prevents vol=0 downgrading real candles AND avoids freezing the open candle at its first partial snapshot (plain OR IGNORE regression). Independent verification: 173/176 tokens fresh <5min, median 160s, p90 220s. || CLOSED 2026-10-12 (upgrade_implementer): 48h soak expired Oct 7; aggregator confirmed filled=0/dev=0 every run for ~7 days (journalctl), 28.5s CPU/min wasted. hermes-1m-candle.timer disabled+stopped (systemctl disable --now). price_collector covers candles.db wal_checkpoint (line 845) so no checkpoint duty lost. 176/178 tokens verified <9min fresh via fast seeder. Interim MIN_BARS path abandoned (primary shipped). _aggregate_1m.py kept on disk, inert.",
+      "verified_by": "bug_hunter 2026-10-09 (KEEP-OPEN: 48h soak not done). (a) ast.parse OK. (b) import check OK: 'import price_collector' has no fetching/lock side effects (0 open sockets after import; only pre-existing init_db CREATE-IF-NOT-EXISTS). (c) /tmp dry-run suite (monkeypatched fetchers, temp CANDLES_DB — no network, no live DB): ALL 35 ASSERTIONS PASSED — exactly 60 slots/run; fetched exactly tokens[0:60], [60:120], [120:178)+wrap; full 178-token rotation in 3 runs (178 fetches, 0 dups); fresh token skipped; vol=0 token forced re-fetch and healed (33.0); zero time-budget parks cursor ON stale token (248->TOK070) and next run resumes with that exact token; universe change resets cursor; slow progress file untouched by fast loop; _store_candles no-downgrade guard (real kept, vol=0 rejected, real refreshes real, dev row healed+closed); _aggregate_tf upsert (vol>0 untouched / dev row closed is_closed=1 / gap filled). Throwaway deleted.(d) LIVE evidence (unplanned smoke test — hermes-price-collector.service is Type=oneshot, so the timer picked up new code at 22:50 UTC with NO restart; I did not run the collector manually): journal shows 'Refreshed 49/60, 58/60, 58/60, 35/60, 13/60' with cursor 60->120->2(wrap)->62->122, i.e. full 178-token rotation in 103s (22:50:07->22:51:50), 0 traceback/non-fatal/error lines since edit. Live candles_1m read-only check: 158/178 tokens fresh <5min (BUG-048 symptom was ~30/178), 176/178 <11min, median staleness 184s. (e) Rate limits: worst case 202 HTTP calls/cycle (fast 60 Binance + <=60 HL fallback; slow 40+<=40; BTC 1-2); Binance klines weight 2 (limit<=500) => ~202 weight/min vs 6000/min cap (3.4%); 25s budget hard-caps the fast loop inside the 36-142s cadence. MANDATORY SELF-REVIEW (independent subagent audit of commit fc55eff0, bug-hunter protocol): verdict SAFE TO SHIP — no CRITICAL/HIGH introduced; lock discipline, fast/slow cursor isolation, SQLite upsert semantics (empirically tested), write-path inventory into all 5 candle tables, and rate limits (worst ~206 HTTP calls/cycle, ~37x headroom) all verified clean. Findings acted on immediately: MEDIUM-1 (one poisoned token, e.g. NaN OHLC -> IntegrityError, could wedge the entire 1m rotation forever behind a single 'non-fatal' log line) FIXED — per-token try/except in _seed_fast_1m advances past bad tokens (verified: poison-token test, cursor 60->120 across runs, 177/178 stored); LOW-1 (conn/pragma outside try) FIXED; MEDIUM-3 (comment overstated per-token freshness as 2-7min; measured effective ~6-13min due to the <300s skip) comment corrected. Reported, NOT fixed (out of scope / pre-existing): MEDIUM-2 (no freshness watchdog on candles_1m — recommended before soak end), MEDIUM-4 (slow seeder has no wall-clock budget, pre-existing), LOW-2 (non-atomic progress JSON writes), LOW-4 (constants in price_collector.py vs hermes_constants.py per CEO instruction; dead CANDLE_PROGRESS_FILE; slow path hardcodes 300s), HIGH pre-existing in _aggregate_1m.py (imports candles lock but never acquires it; dev-write TOCTOU — must be resolved at the revival/deletion step, file deliberately untouched), MEDIUM pre-existing dormant in backfill_candles_5m.py (unguarded REPLACE from degraded 1m rows — port the guarded upsert before anyone runs it).",
       "date_found": "2026-10-09",
       "date_fixed": "2026-10-12",
       "found_by": "bug_hunter (independent investigation 2026-10-09)",
@@ -1061,7 +1061,7 @@
     },
     {
       "id": "BUG-059",
-      "title": "coin_tracker indicators read the WRONG END of oldest-first arrays \u2014 RSI/regime/momentum inverted in production",
+      "title": "coin_tracker indicators read the WRONG END of oldest-first arrays — RSI/regime/momentum inverted in production",
       "severity": "CRITICAL",
       "status": "FIXED",
       "files": [
@@ -1071,7 +1071,7 @@
       "symptom": "candles reversed to oldest-first at coin_tracker.py:287, but rsi() diff, score_momentum closes[0], compute_coin_regime price/momentum/ema_prev all assumed newest-first. Uptrend candles produced RSI=0.0/BEAR, downtrends RSI=100.0/BULL. Stored rsi_14, agg_scores momentum and regime were sign-flipped; feeds live coin_tracker_hot signals + volatility/market_phase gates. Same family: caller read \"recent\" vol/spread from index 0 (vol_1h ~8 days stale, vol_recent ~16h stale, spread from oldest candle, volume_trend fed oldest 60 of 200).",
       "root_cause": "Split conventions: ema/macd/atr are oldest-first-correct; rsi/score_momentum/compute_coin_regime were newest-first. Independently reproduced: rsi(uptrend)=0.0 pre-fix.",
       "fix": "Fixed all to oldest-first (rsi diff new-prev; momentum closes[-1] vs closes[-1-lookback]; regime price=closes[-1], momentum from end, ema_9_prev=closes[-11:-1]); caller vol/spread/trend reads from array END.",
-      "verified_by": "Behavioral: UPTREND rsi=100/BULL/mom=90, DOWNTREND rsi=0/BEAR/mom=10, FLAT rsi=51.9. NOTE: stored historical values are inverted \u2014 dashboards show a one-time step; thresholds tuned on inverted values need re-review (T).",
+      "verified_by": "Behavioral: UPTREND rsi=100/BULL/mom=90, DOWNTREND rsi=0/BEAR/mom=10, FLAT rsi=51.9. NOTE: stored historical values are inverted — dashboards show a one-time step; thresholds tuned on inverted values need re-review (T).",
       "date_found": "2026-10-12",
       "date_fixed": "2026-10-12",
       "found_by": "bug-hunter session 2026-10-11 (verification round)",
@@ -1086,7 +1086,7 @@
       "files": [
         "scripts/decider_run.py"
       ],
-      "symptom": "RSI-DRIFT (4660), PUMP-CHAIN-STALE (4683), CHASE-BLOCK (4789, fired 37x/day), PUMP-CHAIN-GAP-BLOCK (4821) called mark_signal_executed(SKIPPED) after the claim set executed=1 \u2014 no-op (WHERE executed=0) \u2014 row stays EXECUTED with no trade, polluting executed-vs-traded winrate analytics. Live proof: ICP 1671250 claimed then CHASE-BLOCKed same second.",
+      "symptom": "RSI-DRIFT (4660), PUMP-CHAIN-STALE (4683), CHASE-BLOCK (4789, fired 37x/day), PUMP-CHAIN-GAP-BLOCK (4821) called mark_signal_executed(SKIPPED) after the claim set executed=1 — no-op (WHERE executed=0) — row stays EXECUTED with no trade, polluting executed-vs-traded winrate analytics. Live proof: ICP 1671250 claimed then CHASE-BLOCKed same second.",
       "root_cause": "Same no-op trap as BUG-051: mark_signal_executed cannot touch an already-claimed row; release_signal_claim is the correct primitive.",
       "fix": "All 4 sites converted to release_signal_claim(sig_id, SKIPPED, reason=...). Now 7/7 post-claim paths use the release primitive.",
       "verified_by": "py_compile OK; grep confirms 7 release_signal_claim call sites, zero leaking mark_signal_executed post-claim.",
@@ -1098,7 +1098,7 @@
     },
     {
       "id": "BUG-057",
-      "title": "run_pipeline step-failure stderr truncated to FIRST 2 lines \u2014 real exception invisible",
+      "title": "run_pipeline step-failure stderr truncated to FIRST 2 lines — real exception invisible",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
@@ -1116,13 +1116,13 @@
     },
     {
       "id": "BUG-058",
-      "title": "decider_run delayed-entry failure logged stderr tail only \u2014 brain.py INSERT tracebacks (on stdout) invisible",
+      "title": "decider_run delayed-entry failure logged stderr tail only — brain.py INSERT tracebacks (on stdout) invisible",
       "severity": "MEDIUM",
       "status": "FIXED",
       "files": [
         "scripts/decider_run.py"
       ],
-      "symptom": "Delayed-entry failures showed stderr=(empty) while the real INSERT traceback went to stdout \u2014 the exact gap BUG-047 closed on the main path.",
+      "symptom": "Delayed-entry failures showed stderr=(empty) while the real INSERT traceback went to stdout — the exact gap BUG-047 closed on the main path.",
       "root_cause": "Log line only rendered result.stderr.",
       "fix": "Now logs stdout_tail (last 3 lines) + stderr_tail (last 2 lines) like the main site.",
       "verified_by": "py_compile OK.",
@@ -1158,7 +1158,7 @@
       "files": [
         "scripts/sniper_exit.py"
       ],
-      "symptom": "Divergence check treated missing token_speeds row (:864) or ANY divergence-loop exception (:868 -> staying=wrong_side) as \"close all wrong-side positions\" \u2014 a DB hiccup market-closes healthy positions. Separately, when HL close succeeds but brain.py DB close fails, the trade stays status=open and hl_sync_guardian re-mirrors it onto HL (undoing the exit + double fees).",
+      "symptom": "Divergence check treated missing token_speeds row (:864) or ANY divergence-loop exception (:868 -> staying=wrong_side) as \"close all wrong-side positions\" — a DB hiccup market-closes healthy positions. Separately, when HL close succeeds but brain.py DB close fails, the trade stays status=open and hl_sync_guardian re-mirrors it onto HL (undoing the exit + double fees).",
       "root_cause": "Both paths coded as \"safe default = close\". Closing realizes PnL and must require positive evidence, not absence of data.",
       "fix": "FAIL-OPEN applied: no-data -> keep (diverging.append), exception -> staying=[] (close nothing). Phantom-open: retry brain.py once after 5s, then log.critical PHANTOM-OPEN.",
       "verified_by": "py_compile OK; no stray _time refs; sniper-exit.timer is disabled so zero live risk until re-enabled (re-enable is a T decision).",
@@ -1176,7 +1176,7 @@
       "files": [
         "scripts/tpsl_utils.py"
       ],
-      "symptom": "In-profit trades whose current_sl is tighter than the 1.2% trail and above entry (LONG) / below entry (SHORT) skipped the one-way clamp, then needs_sl=True pushed a recomputed looser stop to DB+HL \u2014 undoing the gate block every cycle (SHORT also set _force_write=True). Trigger: another writer (pump-exit 3xATR trail on low-ATR tokens, cascade-flip, manual edit) sets a tighter stop.",
+      "symptom": "In-profit trades whose current_sl is tighter than the 1.2% trail and above entry (LONG) / below entry (SHORT) skipped the one-way clamp, then needs_sl=True pushed a recomputed looser stop to DB+HL — undoing the gate block every cycle (SHORT also set _force_write=True). Trigger: another writer (pump-exit 3xATR trail on low-ATR tokens, cascade-flip, manual edit) sets a tighter stop.",
       "root_cause": "Post-gate skipped the max/min one-way clamp when current_sl was \"wrong-sided\"; since BUG-030 removed the entry cap, an above-entry stop is a legitimate profit lock, so the skip became a looseness hole.",
       "fix": "One-way ratchet applied unconditionally in both in-profit branches: LONG new_sl=max(new_sl,current_sl); SHORT new_sl=min(new_sl,current_sl).",
       "verified_by": "V1's exact synthetic scenarios: LONG entry=99/cur=99.6/high=100/cur_sl=99.4 -> stays 99.4 needs_sl=False; SHORT cur_sl=95.5 -> stays 95.5 needs_sl=False. Old code produced 98.8/96.14 with needs_sl=True.",
@@ -1197,7 +1197,7 @@
       ],
       "symptom": "All 4 currently-open trades (#16068/16069/16070/16072, BTC LONG, entry 83514-83851) are continuum_engine trades with stop_loss=NULL AND target=NULL. Grep of both continuum files finds zero place_sl/stop_loss/hard-stop references. continuum-trader.service runs --live (real HL orders via place_order). Exits rely solely on a 30s polling loop -> a flash crash between ticks is unprotected. Also gated by the same is_live_trading_enabled() that A2 showed has NO working runtime kill switch.",
       "root_cause": "continuum engine was written without a stop-loss layer; only its own polling-loop exit conditions exist (MIN_TIME_BETWEEN_EXITS, COOLDOWN_AFTER_LOSS).",
-      "fix": "NOT auto-fixed \u2014 needs T decision on SL policy (exchange-side SL orders vs tighter polling vs accept risk). Logged as CRITICAL-priority open item.",
+      "fix": "NOT auto-fixed — needs T decision on SL policy (exchange-side SL orders vs tighter polling vs accept risk). Logged as CRITICAL-priority open item.",
       "verified_by": "V1 uncertainty check + direct DB query: 4/4 open trades SL-less; grep continuum_trader.py/continuum_engine.py for place_sl/stop_loss = 0 hits.",
       "date_found": "2026-10-12",
       "date_fixed": null,
@@ -1207,15 +1207,15 @@
     },
     {
       "id": "BUG-065",
-      "title": "HML_VOL_ATR_MULT vol-floor is dead code \u2014 EXTREME-regime HML widening can never fire, while constants comment still promises it",
+      "title": "HML_VOL_ATR_MULT vol-floor is dead code — EXTREME-regime HML widening can never fire, while constants comment still promises it",
       "severity": "MEDIUM",
       "status": "OPEN",
       "files": [
         "scripts/position_manager.py",
         "scripts/hermes_constants.py"
       ],
-      "symptom": "position_manager.py:3747-3759: _hml_vol_floor = -HML_VOL_ATR_MULT*ATR is first clamped to the account cap (CUT_LOSER_PNL_HERMES/lev) whenever it is wider, then tested `if _hml_vol_floor < HARD_MAX_LOSS_PCT` \u2014 HARD_MAX_LOSS_PCT is initialized to that same account cap, so after clamping the condition is equality and never true; the non-widening path also never assigns. The block is unreachable in every branch. hermes_constants.py:736 comment still claims 'EXTREME ATR 1.5% -> thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%' \u2014 that widening has been impossible since the 2026-10-10 account-limit cap. Related: HML remains the #1 bleed class (11/96 exits in last-100 audit, all losses).",
-      "root_cause": "2026-10-10 deliberate account-limit cap made the vol-floor assignment structurally unreachable; the dead branch and the stale constants comment were left in place (stale-comment class, same as 2026-10-22 findings). Note position_manager:3735 comment even calls it 'same bug class as the vol floor (capped Oct 10)' \u2014 known-cap, unaware-dead-code.",
+      "symptom": "position_manager.py:3747-3759: _hml_vol_floor = -HML_VOL_ATR_MULT*ATR is first clamped to the account cap (CUT_LOSER_PNL_HERMES/lev) whenever it is wider, then tested `if _hml_vol_floor < HARD_MAX_LOSS_PCT` — HARD_MAX_LOSS_PCT is initialized to that same account cap, so after clamping the condition is equality and never true; the non-widening path also never assigns. The block is unreachable in every branch. hermes_constants.py:736 comment still claims 'EXTREME ATR 1.5% -> thresh -0.75% price (-3.75% acct @lev5) vs old -0.30%' — that widening has been impossible since the 2026-10-10 account-limit cap. Related: HML remains the #1 bleed class (11/96 exits in last-100 audit, all losses).",
+      "root_cause": "2026-10-10 deliberate account-limit cap made the vol-floor assignment structurally unreachable; the dead branch and the stale constants comment were left in place (stale-comment class, same as 2026-10-22 findings). Note position_manager:3735 comment even calls it 'same bug class as the vol floor (capped Oct 10)' — known-cap, unaware-dead-code.",
       "fix": "Decide policy: (A) accept 'account limit governs everywhere' -> delete the unreachable block and correct HML_VOL_ATR_MULT comment to say inert; or (B) if EXTREME widening is still wanted, it is a CUT_LOSER-coupled risk-budget change -> CEO shadow trial (ties into the deferred CUT_LOSER+ATR_SL coupled trial). Do NOT silently re-widen past CUT_LOSER.",
       "verified_by": "own-conclusions audit ce5a78d3 (2026-10-26) + manual code read of position_manager.py:3747-3759 by main session; arithmetic: clamp-then-compare-to-same-value",
       "date_found": "2026-10-26",
@@ -1232,7 +1232,7 @@
       "files": [
         "scripts/position_manager.py"
       ],
-      "symptom": "_compute_dynamic_sl (~line 1956) reads an undefined `atr_distance` (and `trade` inside a swallowed try) \u2014 any future caller raises NameError. Currently unreachable (grep: only the def). Found by code review of SHADOW-RECKONING commit.",
+      "symptom": "_compute_dynamic_sl (~line 1956) reads an undefined `atr_distance` (and `trade` inside a swallowed try) — any future caller raises NameError. Currently unreachable (grep: only the def). Found by code review of SHADOW-RECKONING commit.",
       "root_cause": "function left half-migrated during an earlier SL refactor",
       "fix": "delete the dead function or complete it with real ATR inputs + a test; either way make it reachable or remove",
       "verified_by": "code review 329547e5 (2026-10-27), grep evidence",
@@ -1265,14 +1265,14 @@
     },
     {
       "id": "BUG-068",
-      "title": "brain_auditor #188 inverted CHASE_RATIO_SHADOW (True->False) \u2014 claimed 'zero behavior change' but False = live block; killed FOGO LONG x10 (conf 133), 0 fills system-wide 19:50-21:55",
+      "title": "brain_auditor #188 inverted CHASE_RATIO_SHADOW (True->False) — claimed 'zero behavior change' but False = live block; killed FOGO LONG x10 (conf 133), 0 fills system-wide 19:50-21:55",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
         "scripts/hermes_constants.py",
         "scripts/decider_run.py"
       ],
-      "symptom": "Commit 56bd9e8d (2026-10-27 19:50) set CHASE_RATIO_SHADOW=False with comment 'Zero behavior change: the gate was log-only the whole time'. Semantics at decider_run.py:5320 are `tag = 'BLOCK' if not CHASE_RATIO_SHADOW else 'SHADOW'` \u2014 False turns the gate LIVE. 10 consecutive [CHASE-RATIO-BLOCK] kills of FOGO LONG (conf 133, setup n=170 WR=44%, last gate before brain) and 0 fills system-wide between 19:50 and the fix at 21:55. #188's own analysis says enforcing would COST $0.29 (criteria failed: 9 trail-winner blocks, negative counterfactual) \u2014 i.e. intended end-state was log-only=True.",
+      "symptom": "Commit 56bd9e8d (2026-10-27 19:50) set CHASE_RATIO_SHADOW=False with comment 'Zero behavior change: the gate was log-only the whole time'. Semantics at decider_run.py:5320 are `tag = 'BLOCK' if not CHASE_RATIO_SHADOW else 'SHADOW'` — False turns the gate LIVE. 10 consecutive [CHASE-RATIO-BLOCK] kills of FOGO LONG (conf 133, setup n=170 WR=44%, last gate before brain) and 0 fills system-wide between 19:50 and the fix at 21:55. #188's own analysis says enforcing would COST $0.29 (criteria failed: 9 trail-winner blocks, negative counterfactual) — i.e. intended end-state was log-only=True.",
       "root_cause": "flag semantics inverted in the auditor's head: it 'reverted' an enforcement it believed existed, but the pre-state was already shadow(True); setting False ENABLED the gate while the comment claimed no behavior change",
       "fix": "CHASE_RATIO_SHADOW restored to True with dated correction comment (BUG-068 block in hermes_constants.py); semantics documented inline: True=SHADOW(log), False=BLOCK. Suggest: any future flag flip must quote the consumer line proving the direction.",
       "verified_by": "main session: git log -S showed True->False at 56bd9e8d; decider_run:5320 semantics; 10 block lines 19:50-21:55; 0 fills since 19:50; fresh import prints True",
@@ -1284,16 +1284,16 @@
     },
     {
       "id": "BUG-069",
-      "title": "contrarian shadow writer stores entry_price=0 silently (decider_run.py:4016 'price or get_current_price() or 0') \u2014 208/558 (37.3%) of pump-chain- evidence rows dropped by every downstream outcome join",
+      "title": "contrarian shadow writer stores entry_price=0 silently (decider_run.py:4016 'price or get_current_price() or 0') — 208/558 (37.3%) of pump-chain- evidence rows dropped by every downstream outcome join",
       "severity": "MEDIUM",
       "status": "OPEN",
       "files": [
         "scripts/decider_run.py"
       ],
-      "symptom": "37.3% of the fade OOS evidence base is silently lost (all 10-13->10-17 rows); outcome joins skip entry_price=0 rows. Proxy-entry backfill is BIASED (proven: proxy drops EXTREME WR 67.3%->53.1%, 28.3% of outcomes flip \u2014 late entry after the bounce systematically hurts a LONG fade). Any future shadow join inherits the hole.",
+      "symptom": "37.3% of the fade OOS evidence base is silently lost (all 10-13->10-17 rows); outcome joins skip entry_price=0 rows. Proxy-entry backfill is BIASED (proven: proxy drops EXTREME WR 67.3%->53.1%, 28.3% of outcomes flip — late entry after the bounce systematically hurts a LONG fade). Any future shadow join inherits the hole.",
       "root_cause": "fallback chain ends in 'or 0' instead of skipping the write when no price is available",
       "fix": "skip the shadow write when price is falsy (or retry get_current_price once and log a WARN); backfill policy for historical rows = leave missing (proxy is biased), note in join scripts",
-      "verified_by": "fade regime-split analysis 5434f9ac (2026-10-29) \u2014 coverage analysis + bias proof",
+      "verified_by": "fade regime-split analysis 5434f9ac (2026-10-29) — coverage analysis + bias proof",
       "date_found": "2026-10-29",
       "date_fixed": null,
       "found_by": "analysis-subagent",
@@ -1302,16 +1302,16 @@
     },
     {
       "id": "BUG-070",
-      "title": "brain.py discarded the caller's amount_usdt \u2014 rebuilt base\u00d7(cluster\u00d7favorite), silently killing ALL decider-side size multipliers (winner-cell 1.25x logged 'x1.25' while HL got $11.11; amplitude same)",
+      "title": "brain.py discarded the caller's amount_usdt — rebuilt base×(cluster×favorite), silently killing ALL decider-side size multipliers (winner-cell 1.25x logged 'x1.25' while HL got $11.11; amplitude same)",
       "severity": "HIGH",
       "status": "FIXED",
       "files": [
         "scripts/brain.py"
       ],
-      "symptom": "Decider computes _trade_size = base \u00d7 size-reduce \u00d7 favorite \u00d7 amplitude \u00d7 winner-cell(CEO-labeled 1.25x) \u00d7 zone-adjust, floored at HL_MIN, passes it as `trade add ... AMOUNT` \u2014 brain used the arg only for a precheck + fallback, then `_precomputed_size = _base_size * _size_mult` rebuilt from fresh HL base \u00d7 (cluster \u00d7 favorite). Evidence: CAKE #16535 decider arg 12.375 \u2192 brain mirror_open size_usdt 11.1097 \u2192 DB amount_usdt 11.10 while log said 'x1.25' (2026-10-30 03:48); manual BTC #16538 got 11.79 instead of the skill-specified 11.10. Same class as BUG-068: log claims success, behavior differs.",
+      "symptom": "Decider computes _trade_size = base × size-reduce × favorite × amplitude × winner-cell(CEO-labeled 1.25x) × zone-adjust, floored at HL_MIN, passes it as `trade add ... AMOUNT` — brain used the arg only for a precheck + fallback, then `_precomputed_size = _base_size * _size_mult` rebuilt from fresh HL base × (cluster × favorite). Evidence: CAKE #16535 decider arg 12.375 → brain mirror_open size_usdt 11.1097 → DB amount_usdt 11.10 while log said 'x1.25' (2026-10-30 03:48); manual BTC #16538 got 11.79 instead of the skill-specified 11.10. Same class as BUG-068: log claims success, behavior differs.",
       "root_cause": "brain reclaims sizing authority near HL (historical: size-reduce fix 10-21, RISK-1 cap 10-12) but the amount arg was never wired into _precomputed_size",
-      "fix": "Honor the arg when >= HL_MIN: _precomputed_size = amount_usdt \u00d7 cluster_only (_cluster_mult kept separate from favorite \u2014 favorite/amplitude/winner-cell already in the caller's number; manual skill contract says AMOUNT IS the size). Legacy fallback (no/short arg) unchanged. HL_MIN floor after both paths.",
-      "verified_by": "py_compile + structure read; live verification = next pipeline fill must print '\u2696\ufe0f size honored from arg' and DB amount == decider arg \u00d7 cluster; review+bug_hunter launched",
+      "fix": "Honor the arg when >= HL_MIN: _precomputed_size = amount_usdt × cluster_only (_cluster_mult kept separate from favorite — favorite/amplitude/winner-cell already in the caller's number; manual skill contract says AMOUNT IS the size). Legacy fallback (no/short arg) unchanged. HL_MIN floor after both paths.",
+      "verified_by": "py_compile + structure read; live verification = next pipeline fill must print '⚖️ size honored from arg' and DB amount == decider arg × cluster; review+bug_hunter launched",
       "date_found": "2026-10-30",
       "date_fixed": "2026-10-30",
       "found_by": "main-session (tracing T's 'take some longs' manual open)",
@@ -1323,14 +1323,14 @@
     },
     {
       "id": "BUG-071",
-      "title": "losers_tracker adds direction-SCATTERED losers to the direction-BLIND legacy LOSERS set \u2014 GRASS added 2026-10-30 (30d LONG 14T 50% WR +$0.24, 30d SHORT 3T; added on a 7d LONG dip 5T -$0.26) \u2014 blocks BOTH directions (HARD-BLOCK + conf penalty) = the one-sided-bleed BTC-class incident repeating via the daily timer",
+      "title": "losers_tracker adds direction-SCATTERED losers to the direction-BLIND legacy LOSERS set — GRASS added 2026-10-30 (30d LONG 14T 50% WR +$0.24, 30d SHORT 3T; added on a 7d LONG dip 5T -$0.26) — blocks BOTH directions (HARD-BLOCK + conf penalty) = the one-sided-bleed BTC-class incident repeating via the daily timer",
       "severity": "MEDIUM",
       "status": "OPEN",
       "files": [
         "scripts/losers_tracker.py",
         "scripts/hermes_constants.py"
       ],
-      "symptom": "Uncommitted working-tree write: LOSERS set() -> {'GRASS'} (tracker runs on timer, daily-commit picks it up). GRASS profile: 30d LONG 50% WR +$0.24 (not a long-loser), 30d SHORT n=3 -$0.01, 7d LONG 5 -$0.26 -> aggregate thresholds fire while per-direction evidence does not. Direction-blind legacy entry zeroes GRASS conf BOTH sides at HARD-BLOCK. The UNCLOG-2 #1 guard (:251) only skips tokens ALREADY in LOSERS_LONG/SHORT \u2014 the tracker has NO path to add directionally (those sets are hand-managed), so every qualifying token lands blind.",
+      "symptom": "Uncommitted working-tree write: LOSERS set() -> {'GRASS'} (tracker runs on timer, daily-commit picks it up). GRASS profile: 30d LONG 50% WR +$0.24 (not a long-loser), 30d SHORT n=3 -$0.01, 7d LONG 5 -$0.26 -> aggregate thresholds fire while per-direction evidence does not. Direction-blind legacy entry zeroes GRASS conf BOTH sides at HARD-BLOCK. The UNCLOG-2 #1 guard (:251) only skips tokens ALREADY in LOSERS_LONG/SHORT — the tracker has NO path to add directionally (those sets are hand-managed), so every qualifying token lands blind.",
       "root_cause": "add-loop writes only the legacy set; no direction-aware destination",
       "fix": "Label needed (CEO): (a) add-loop computes per-direction stats and writes LOSERS_LONG/LOSERS_SHORT (blind legacy only when BOTH sides qualify), or (b) require both-directions evidence before legacy add. Until labeled: daily review of tracker diffs before commit.",
       "verified_by": "main-session: git diff (uncommitted), GRASS directional SQL, add-loop source :236-283",
@@ -1344,13 +1344,13 @@
     },
     {
       "id": "BUG-072",
-      "title": "ichimoku_cloud signals write a >=26h-STALE price into signals.price (search_end = n-26 on 1h bars, ichimoku_cloud.py:180) \u2014 median +1.94% off market, p90 +6.39%; any price-anchored counterfactual on this family fakes 89.1% WR (caught by the ichimoku study 2026-10-30)",
+      "title": "ichimoku_cloud signals write a >=26h-STALE price into signals.price (search_end = n-26 on 1h bars, ichimoku_cloud.py:180) — median +1.94% off market, p90 +6.39%; any price-anchored counterfactual on this family fakes 89.1% WR (caught by the ichimoku study 2026-10-30)",
       "severity": "HIGH",
       "status": "OPEN",
       "files": [
         "scripts/signals/ichimoku_cloud.py"
       ],
-      "symptom": "2,425 solo ichimoku-short rows carry a price that was already a day old at fire time; 89% of rows above market at signal ts. Poisoned one of my own replay families' methodology \u2014 study re-anchored at market close. Other families checked fresh-ish: pump-chain 0.18% median dev, r2v2 0.18%, bb-squeeze 0.21%, continuum 0.05% (mild, below touch-scale materiality).",
+      "symptom": "2,425 solo ichimoku-short rows carry a price that was already a day old at fire time; 89% of rows above market at signal ts. Poisoned one of my own replay families' methodology — study re-anchored at market close. Other families checked fresh-ish: pump-chain 0.18% median dev, r2v2 0.18%, bb-squeeze 0.21%, continuum 0.05% (mild, below touch-scale materiality).",
       "root_cause": "price taken from the lookback close array indexed at n-26 (chikou confirmation design) instead of the live close at fire time",
       "fix": "store live close at fire time (last closed candle) for the price field; keep the chikou index for logic only. Until fixed: NEVER anchor counterfactuals on ichimoku-family signals.price.",
       "verified_by": "signal_analyst study (86f6bf13) + main-session freshness table across families (2026-10-30)",
@@ -1362,7 +1362,7 @@
     },
     {
       "id": "BUG-073",
-      "title": "Analysis layer quotes pnl_usdt as GROSS of fees \u2014 true 30d is -$9.21 not -$3.16 (recorded fees $6.05/437 of 771 closed); every WR/payoff/counterfactual number quoted upstream to T/CEO omits fee drag",
+      "title": "Analysis layer quotes pnl_usdt as GROSS of fees — true 30d is -$9.21 not -$3.16 (recorded fees $6.05/437 of 771 closed); every WR/payoff/counterfactual number quoted upstream to T/CEO omits fee drag",
       "severity": "MEDIUM",
       "status": "OPEN",
       "files": [
@@ -1382,13 +1382,13 @@
     },
     {
       "id": "BUG-074",
-      "title": "CTX-RULES-SHADOW stream broken: 'str' object has no attribute 'get' on every evaluation (28 lines, all errors) \u2014 the shadow never collects data",
+      "title": "CTX-RULES-SHADOW stream broken: 'str' object has no attribute 'get' on every evaluation (28 lines, all errors) — the shadow never collects data",
       "severity": "LOW",
       "status": "OPEN",
       "files": [
         "scripts/decider_run.py"
       ],
-      "symptom": "[CTX-RULES-SHADOW] rules error: 'str' object has no attribute 'get' (BTC/ZEN) \u2014 sig passed as str where dict expected; CONTEXT_GATE_RULES_SHADOW never exercises.",
+      "symptom": "[CTX-RULES-SHADOW] rules error: 'str' object has no attribute 'get' (BTC/ZEN) — sig passed as str where dict expected; CONTEXT_GATE_RULES_SHADOW never exercises.",
       "root_cause": "shadow path passes the rule-set or sig as str instead of dict",
       "fix": "fix the type mismatch or KILL the stream (zero value while broken)",
       "verified_by": "log-flags audit 9e6368df",
@@ -1400,7 +1400,7 @@
     },
     {
       "id": "BUG-075",
-      "title": "trades.fees never written by brain.py close path \u2014 fee column exit-path-biased",
+      "title": "trades.fees never written by brain.py close path — fee column exit-path-biased",
       "severity": "MED",
       "status": "FIXED",
       "files": [
@@ -1441,7 +1441,7 @@
         "scripts/hyperliquid_exchange.py",
         "logs/pipeline.log"
       ],
-      "symptom": "[hl_info] Error: HTTP Error 500 appears ~1,200 times in logs/pipeline.log since 2026-10-30 20:48 \u2014 the HL /info API has been failing continuously for days (copy-trader/position data freshness at risk).",
+      "symptom": "[hl_info] Error: HTTP Error 500 appears ~1,200 times in logs/pipeline.log since 2026-10-30 20:48 — the HL /info API has been failing continuously for days (copy-trader/position data freshness at risk).",
       "root_cause": "upstream Hyperliquid /info 500s (or a bad request pattern from our client); no retry/backoff or consecutive-error watchdog exists, so failures repeat every cycle silently.",
       "found_by": "a98de02d harvest-ship agent 2026-11-04 (sideways)",
       "fix": "add retry with backoff on /info calls + consecutive-500 watchdog alert (error_alerts); first verify whether a specific sub-endpoint/payload triggers it (upstream status page vs our request shape)."
@@ -1455,7 +1455,7 @@
         "scripts/decider_run.py"
       ],
       "symptom": "[Z-FLIP] LONG branch (~:5130) requires sig_z > 0, but 1,899/1,965 (96.6%) pc- SHORT signals carry z<0 (mean -1.52) -> the guard can essentially never skip a fade; '0 Z-FLIP skips' will read as healthy forever regardless of real behavior.",
-      "root_cause": "guard evaluates the PRE-inversion signal's z-sign against the POST-inversion (LONG) direction's expected sign \u2014 wrong side of the flip.",
+      "root_cause": "guard evaluates the PRE-inversion signal's z-sign against the POST-inversion (LONG) direction's expected sign — wrong side of the flip.",
       "found_by": "b53b6ccc watch-contrarian eval 2026-11-04 (side-find)",
       "fix": "evaluate against the post-inversion expected sign (or compare |z| against a threshold), then re-run the conversion check so the 11-11 extend read means something."
     },
@@ -1469,7 +1469,7 @@
         "scripts/vacation_guardrail.py"
       ],
       "symptom": "A single corrupt fees JSON in the 24h window makes Cap D's fee-net SQL raise -> WARN + proceed WITHOUT cap (brake silently off); meanwhile the guardrail release gate on the same computation fails CLOSED (never clears). The WARN is not routed to error_alerts.md, so a dead brake is invisible.",
-      "root_cause": "spec-accepted asymmetry at ship (consult 20261104T172347Z): fail-open for trading continuity vs fail-closed for release safety \u2014 but no alerting on the open-failure.",
+      "root_cause": "spec-accepted asymmetry at ship (consult 20261104T172347Z): fail-open for trading continuity vs fail-closed for release safety — but no alerting on the open-failure.",
       "found_by": "21a8f696 ship report 2026-11-04 (deviation list a)",
       "fix": "route the Cap D WARN through health_monitor/error_alerts (6h dedup) OR count+report corrupt-fees rows; consider COALESCE/guard in the SQL so one bad row cannot disable the brake."
     },
@@ -1662,7 +1662,7 @@
       "files": [
         "automation/bug_hunter_prompt.md"
       ],
-      "symptom": "The documented 'Find next ID' snippet in the bug-registration workflow raises TypeError: '>' not supported between instances of 'int' and 'list' \u2014 max(nums, 0) passes the LIST as the first argument, so Python compares 0 against the list instead of computing an element-wise max. Hit live while registering BUG-082..089 (2026-11-06).",
+      "symptom": "The documented 'Find next ID' snippet in the bug-registration workflow raises TypeError: '>' not supported between instances of 'int' and 'list' — max(nums, 0) passes the LIST as the first argument, so Python compares 0 against the list instead of computing an element-wise max. Hit live while registering BUG-082..089 (2026-11-06).",
       "root_cause": "max(nums, 0) is a two-argument max over (list, int), not max-with-default; it TypeErrors for ANY non-empty nums, so the template can never work as written.",
       "fix": "next_num = (max(nums) + 1) if nums else 1",
       "verified_by": "bug_hunter: registration of BUG-082..089 re-run with the corrected expression; all 8 entries created (89 total bugs).",
@@ -1670,6 +1670,138 @@
       "date_fixed": "2026-11-06",
       "found_by": "bug_hunter",
       "git_commit": "c57eae1d",
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-091",
+      "title": "atr_trend_accel only evaluates the newest completed 1m bar -> 60s detection window vs 5-min scan cadence, ~80% of audited events silently missed",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/atr_trend_accel.py",
+        "scripts/hermes_constants.py"
+      ],
+      "symptom": "dry run / scan_signals found 0 candidates while backtest find_events() recorded 25 declustered BTC crosses in the same 7d window. detect() set i = len(rows)-1 (forming step-back -> the immediately preceding minute) and tested a0<thr<=a1 on THAT bar only, so a cross at minute T is observable only during [T+60, T+120). signals_runner --slow runs on run_pipeline STEPS_EVERY_5M (minute % 5 == 0, 300s), i.e. one scan per five 60s windows: measured capture 12-32% across five scan phases over 7d of BTC crosses (expected 20%). The >=30-day shadow sample would have been ~5x smaller, widening the day-block CI ~2.2x and likely preventing the 'CI excluding 0 before any size' rule from ever being satisfiable.",
+      "root_cause": "Off-by-one-of-cadence, not off-by-one-of-index: the cross itself is a single-bar event and nothing in detect() looked further back than the newest completed bar, even though ATR_TREND_ACCEL_SCAN_BARS=1440 ('1m history for ATR + armed-state walk') and ATR_TREND_ACCEL_BAR_MAX_AGE_MIN ('1m cross-bar max age = 5') both document an intent to evaluate a cross bar that is minutes old. The constant was applied to the newest ROW as a feed-staleness guard instead.",
+      "fix": "detect() now walks back from the newest completed bar over the fetched window and returns the MOST RECENT armed cross (same event set find_events() records), bounded by NEW constant ATR_TREND_ACCEL_CROSS_LOOKBACK_MIN=10 (>=2x the 300s cadence, so every cross is seen by >=1 scan; set to 2 to restore old behaviour). Trend direction + price + confidence are computed once after the cross is found instead of inside the loop. No existing constant value changed.",
+      "verified_by": "bug_hunter: 7d BTC replay with scans every 300s at 5 phases - capture 25/25 = 100% at EVERY phase (was 12-32%), zero spurious detections, fired-cross set identical to backtest find_events(); ATR parity vs backtest _calc_atr exact (maxdiff 0.0, 20146 bars); dry run 0 -> 2 candidates (BCH SHORT, JUP SHORT) with cross ts 4-9 min old that the old code could never have seen.",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": [
+        "BUG-094"
+      ]
+    },
+    {
+      "id": "BUG-092",
+      "title": "scan_signals() exception safety only wrapped detect() - add_signal/get_cooldown/set_cooldown failures abort the whole token scan",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/atr_trend_accel.py"
+      ],
+      "symptom": "One token whose add_signal() (SQLite) or get_cooldown()/set_cooldown() (PostgreSQL) call raised would propagate out of the for-token loop, out of run(), and kill the scan for every remaining token that cycle - the same 'one bad token kills the scan' class the checklist asked about.",
+      "root_cause": "try/except covered only `sig = detect(token)`; everything after it (kill-switch, blacklists, get_cooldown, add_signal, set_cooldown) ran unprotected.",
+      "fix": "Entire per-token body moved inside one try/except that logs 'processing failed for <token>' and continues. `continue` inside try is valid Python 3; no finally involved.",
+      "verified_by": "bug_hunter: forced add_signal to raise for BTC and detect() to raise for JUP over 176 tokens - scan completed normally (101 added, 'processing failed for BTC' logged), no exception escaped.",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-093",
+      "title": "_fetch_1m binds token.upper() but candles_1m stores 6 Hyperliquid k-tokens lowercase - those tokens can never signal",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/atr_trend_accel.py"
+      ],
+      "symptom": "SELECT DISTINCT token FROM candles_1m returns kBONK, kFLOKI, kLUNC, kNEIRO, kPEPE, kSHIB (lowercase 'k'); _fetch_1m bound token.upper() -> 'KBONK' has 0 rows in candles_1m (kBONK: 42804 rows) -> rows=[] -> detect() returns None with no log. 6/177 active tokens silently excluded, and they are exactly the high-beta meme coins this expansion strategy targets. Post-fix the dry run reaches the trend check for kFLOKI, proving the rows now resolve.",
+      "root_cause": "The 1m writer keeps the Hyperliquid 'k' prefix in its native case while signals/latest_prices/candles_15m (recently) normalise to upper case. token.upper() is correct for the other 176 tokens but wrong for these 6. SYSTEMIC: the same blind spot exists in every signal that binds token.upper() against candles_1m (atr_spike.py:62, sma20_dip.py:78, accel_300.py:92, ...).",
+      "fix": "_fetch_1m now binds the token EXACTLY as stored first (tokens come straight from SELECT DISTINCT token ON candles_1m, so this is always an exact match) and falls back to token.upper() for callers that pass the normalised form. Upper-case fallback only - no IN (?,?) - because candles_15m DOES contain the same ts under both cases (3162 overlapping kBONK/KBONK rows), which would double-count bars. HTF lookups keep token.upper() (the fresh 15m rows are the upper-case ones). SYSTEMIC half NOT fixed here - see fix note.",
+      "verified_by": "bug_hunter: dry run now logs kFLOKI reaching the trend check; candles_1m distinct-case audit across all 5 candle tables; no duplicate-ts risk for the 1m table (KBONK rows = 0).",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-094",
+      "title": "Hardcoded 1.5 confidence-bonus multiplier in atr_trend_accel (AGENTS.md: no hardcoded tunables in signal files)",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/atr_trend_accel.py",
+        "scripts/hermes_constants.py"
+      ],
+      "symptom": "detect() used `if a1 >= thr * 1.5` - a tunable that moves the confidence score (70 -> 75) lives as a bare literal in the signal script while every other confidence knob (CONF_BASE/BONUS/CAP/FLOOR) is a constant.",
+      "root_cause": "CONF_BONUS had a constant but the trigger multiple did not.",
+      "fix": "NEW constant ATR_TREND_ACCEL_CONF_BONUS_MULT = 1.5 added to the ATR_TREND_ACCEL block (new line only - zero existing values touched, git diff = 49 insertions / 0 deletions) and imported by the signal. Bonus behaviour byte-identical (0.076 * 1.5 = 0.114 both before and after).",
+      "verified_by": "bug_hunter: py_compile; git diff --stat hermes_constants.py shows 49 insertions 0 deletions; confidence still 70/75 with the same 0.114 trigger.",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-095",
+      "title": "atr_trend_accel __main__ dry-run has finally without except - broken candles.db traceback + NameError on `toks`",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/signals/atr_trend_accel.py"
+      ],
+      "symptom": "If the token query raised (missing/locked candles.db, 'no such table'), the finally closed the conn and re-raised, so the script died with a traceback and then NameError on `toks` in the loop - the dry run could not complete.",
+      "root_cause": "try/finally with no except around the query, and `toks` only assigned inside the try.",
+      "fix": "Added `except Exception as e` that prints 'dry run: token scan failed: <e>' and sets toks = []. Also dropped the dead `import sys as _sys` (sys is already a module-level import).",
+      "verified_by": "bug_hunter: py_compile + normal dry run still completes ('dry run: N candidate(s) ... (no signals written)').",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-096",
+      "title": "38/176 active tokens have 15m candles older than ATR_TREND_ACCEL_TF1_MAX_AGE_MIN=30 - atr_trend_accel silently skips ~22% of the universe",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "scripts/signals/atr_trend_accel.py",
+        "scripts/hermes_constants.py"
+      ],
+      "symptom": "Age of the newest candles_15m row for the 176 tokens active in the last 600s: 109 <=15min, 29 16-30, 7 31-45, 9 46-60, 5 61-90, 17 >90 (max 98min). The 38 tokens above 30min fail _trend_direction()'s freshness check -> return 0 -> detect() returns None, silently, every cycle. 4h is clean (all tokens well inside TF2_MAX_AGE_MIN=480). Not an atr_trend_accel code bug - the guard is correct - but it silently caps coverage at ~78% of the universe.",
+      "root_cause": "Upstream: the 15m candle writer has a long tail / incomplete coverage (a contiguous group of tokens is 38-98min behind while 138 are fresh), so TF1_MAX_AGE_MIN=30 rejects them. Either the 15m writer's sweep latency is broken for that cohort, or 30min is tighter than the pipeline's real 15m cadence.",
+      "fix": "NOT FIXED (deliberately): relaxing TF1_MAX_AGE_MIN would change audited signal behaviour and the 15m writer is outside this build's file set - flag value changes are reported, not made. PARTIAL MITIGATION shipped with BUG-091: detect() now logs one line per actual armed cross that is skipped for trend/stale reasons, so this cohort is at least visible in logs instead of fully silent.",
+      "verified_by": "bug_hunter: per-token MAX(ts) query on candles_15m for all 176 active tokens (histogram above); global newest 15m row is only 8.8min old, so the tail is per-token, not a stopped writer.",
+      "date_found": "2026-11-06",
+      "date_fixed": null,
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "id": "BUG-097",
+      "title": "atr_trend_accel has no shadow_disposition.json entry - SHADOW-RECKONING rule (threshold + deadline + default_action) unmet",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "data/shadow_disposition.json",
+        "plans/atr60-momentum-spec-2026-11-06.md"
+      ],
+      "symptom": "data/shadow_disposition.json (86 entries, updated 2026-11-06T20:53:36Z) contains atrtrail-clip-12 / jup-trail-shadow-1xatr / jup-atrsl-shadow-parity but nothing for atr_trend_accel or atr-trend. The spec ships it LIVE = shadow collection with a hard '>=30 forward days with day-block CI excluding 0 before any size' rule but no registered disposition, threshold, deadline or default_action - so nothing will ever force the shadow→enforce/kill decision. Also flagged as open question (1) in automation/ceo/ceo_kanban.md #230.",
+      "root_cause": "add-signal checklist shipped the code + registry + gates but skipped the SHADOW-RECKONING registry entry.",
+      "fix": "NOT FIXED (deliberately): an entry needs a CEO-chosen threshold, deadline and default_action (kill vs enforce) - inventing them would fabricate a mandate. Reported for CEO action.",
+      "verified_by": "bug_hunter: parsed data/shadow_disposition.json - 86 entries, key scan for 'atr'/'trend' returns only unrelated atr-trail entries.",
+      "date_found": "2026-11-06",
+      "date_fixed": null,
+      "found_by": "bug_hunter",
+      "git_commit": null,
       "related_bugs": []
     }
   ],

@@ -30,6 +30,11 @@ import sqlite3
 # Updated: 2026-08-11 from 30d backtest
 REGIME_SIGNALS = {
     'FLAT': {
+        # atr-trend: ATR expansion → established-trend acceleration (2026-11-06).
+        # ALL 4 regimes: a fresh ATR cross fires from ANY prior regime
+        # (quiet→expansion is the common case) — regime-split untested;
+        # shadow collection must not be exec-gated (jup_liq lesson).
+        'atr-trend', 'atr-trend+', 'atr-trend-',
         # jup-liq: liquidation-cascade follow — structural, works in all regimes (T 2026-11-05)
         'jup-liq', 'jup-liq+', 'jup-liq-',
         # Mean reversion works in range-bound markets
@@ -68,6 +73,11 @@ REGIME_SIGNALS = {
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'NORMAL': {
+        # atr-trend: ATR expansion → established-trend acceleration (2026-11-06).
+        # ALL 4 regimes: a fresh ATR cross fires from ANY prior regime
+        # (quiet→expansion is the common case) — regime-split untested;
+        # shadow collection must not be exec-gated (jup_liq lesson).
+        'atr-trend', 'atr-trend+', 'atr-trend-',
         # jup-liq: liquidation-cascade follow — structural, works in all regimes (T 2026-11-05)
         'jup-liq', 'jup-liq+', 'jup-liq-',
         # pump-catcher REMOVED 2026-10-21 — ENABLED=False since 2026-08-27 CEO kill (NEVER_REENABLE). Dead allowlist entry.
@@ -140,6 +150,11 @@ REGIME_SIGNALS = {
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'HIGH': {
+        # atr-trend: ATR expansion → established-trend acceleration (2026-11-06).
+        # ALL 4 regimes: a fresh ATR cross fires from ANY prior regime
+        # (quiet→expansion is the common case) — regime-split untested;
+        # shadow collection must not be exec-gated (jup_liq lesson).
+        'atr-trend', 'atr-trend+', 'atr-trend-',
         # jup-liq: liquidation-cascade follow — structural, works in all regimes (T 2026-11-05)
         'jup-liq', 'jup-liq+', 'jup-liq-',
         # Breakout works in big moves
@@ -215,6 +230,11 @@ REGIME_SIGNALS = {
         'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal — context-aware, works in all regimes
     },
     'EXTREME': {
+        # atr-trend: ATR expansion → established-trend acceleration (2026-11-06).
+        # ALL 4 regimes: a fresh ATR cross fires from ANY prior regime
+        # (quiet→expansion is the common case) — regime-split untested;
+        # shadow collection must not be exec-gated (jup_liq lesson).
+        'atr-trend', 'atr-trend+', 'atr-trend-',
         # jup-liq: liquidation-cascade follow — structural, works in all regimes (T 2026-11-05)
         'jup-liq', 'jup-liq+', 'jup-liq-',
         # Continuation works in storms

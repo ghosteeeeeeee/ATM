@@ -66,6 +66,7 @@ from hermes_constants import (
     TREND_IGNITION_ENABLED, TREND_IGNITION_PLUS_ENABLED, TREND_IGNITION_MINUS_ENABLED,
     HMACD_MTF_PLUS_ENABLED, HMACD_MTF_MINUS_ENABLED,
     VOLMOM_ENABLED, VOLBREAK_CONT_ENABLED,
+    ATR_TREND_ACCEL_ENABLED, ATR_TREND_ACCEL_PLUS_ENABLED, ATR_TREND_ACCEL_MINUS_ENABLED,
 )
 
 
@@ -100,6 +101,11 @@ try:
     from signals.linreg_fade import run as _linreg_fade_run
 except Exception:
     _linreg_fade_run = None
+
+try:
+    from signals.atr_trend_accel import run as _atr_trend_accel_run
+except Exception:
+    _atr_trend_accel_run = None
 
 try:
     from signals.trendline_bounce_long import run as _trendline_bounce_long_run
@@ -523,6 +529,7 @@ SIGNAL_REGISTRY: list[dict] = [
     {'name': 'r2_trend_long',            'enabled': 'R2_TREND_LONG_ENABLED',        'run': _r2_trend_long_run},
     {'name': 'r2_trend_v2_long',         'enabled': 'R2_TREND_V2_LONG_ENABLED',     'run': _r2_trend_v2_long_run},
     {'name': 'linreg_fade',              'enabled': 'LINREG_FADE_ENABLED',          'run': _linreg_fade_run},
+    {'name': 'atr_trend_accel',          'enabled': 'ATR_TREND_ACCEL_ENABLED',      'run': _atr_trend_accel_run},
     {'name': 'trendline_bounce_long',    'enabled': 'TRENDLINE_BOUNCE_LONG_ENABLED', 'run': _trendline_bounce_long_run},
     {'name': 'ema300_dip_long',          'enabled': 'EMA300_DIP_LONG_ENABLED',      'run': _ema300_dip_long_run},
     {'name': 'ema300_dip_short',         'enabled': 'EMA300_DIP_SHORT_ENABLED',     'run': _ema300_dip_short_run},
@@ -640,7 +647,7 @@ _warn_broken_registry_entries()
 
 # Slow signals — scan 191 tokens and take >60s. Run on a 5-min cadence.
 # pump_flow_signal removed — runs every minute to match state file update cadence
-_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'rr_structural', 'rr_structural_v2_long', 'linreg_fade'}
+_SLOW_SIGNALS = {'macd_divergence', 'signal_confluence', 'ichimoku_cloud', 'rr_structural', 'rr_structural_v2_long', 'linreg_fade', 'atr_trend_accel'}
 
 
 def _resolve_enabled(entry):

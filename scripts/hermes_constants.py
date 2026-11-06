@@ -3426,6 +3426,12 @@ STANDALONE_BYPASS_SIGNALS = (
     # jup-liq. Without this the signal never approved (0/57, bug_hunter
     # 2026-11-05 CRITICAL) and could never collect the 2-week sample.
     'linreg-fade',
+    # atr-trend: single self-contained trigger (ATR cross + 15m/4h trend
+    # agreement) — solo entry is the INTENDED shadow-collection mode; confluence
+    # would just delay the audited observation. Bare + whole-source forms for
+    # the rstrip membership tests at both compactor sites + decider mirror.
+    'atr-trend', 'atr-trend+', 'atr-trend-',
+    'atr_trend_accel_long', 'atr_trend_accel_short',
     'mtf-regime-trend',  # multi-timeframe regime trend — works solo (2026-10-01)
     'tl-bounce',  # trendline bounce — works solo (2026-10-06)
     'hmacd-mtf', 'hmacd_mtf',  # multi-timeframe MACD — works solo (2026-10-09). Added underscore variant — signal source uses underscores.
@@ -4510,6 +4516,49 @@ LINREG_FADE_LEVERAGE = 1                # keep HML floor at -4% price (V11)
 # REJECT×4 reproduce; cents drift to -$0.30/-$0.42 (pm+mfe, n=84) and
 # -$0.27/-$0.38 (pm-only) as new trades + 5m bars land — verdict is stable.
 JUP_YOLO_ATRSL_SHADOW_ENABLED = True  # (d) ATR-SL corrected-value shadow. Revert: set False.
+
+# ── atr_trend_accel (ATR expansion → established-trend acceleration) ────────
+# signals/atr_trend_accel.py — CEO thesis 2026-11-06. Backtested 30d x 12
+# coins: pooled 24h direction-aligned ev vs ATR-state +0.77 (day-block
+# p=0.007-0.015), WR 58.8%; verified by audit #2 + own-conclusions (no
+# lookahead proven). 1m MACD/RSI direction at the cross was REFUTED — the
+# direction comes from the established 15m+4h EMA trend only.
+# LIVE = shadow data collection; do NOT size from the backtest — requires
+# >=30 forward days with day-blocked CI excluding 0 before any sizing.
+ATR_TREND_ACCEL_ENABLED = True            # master kill-switch (LIVE)
+ATR_TREND_ACCEL_PLUS_ENABLED = True       # LONG direction
+ATR_TREND_ACCEL_MINUS_ENABLED = True      # SHORT direction
+ATR_TREND_ACCEL_ATR_PERIOD = 14           # ATR length — chart indicator input (Wilder/RMA)
+ATR_TREND_ACCEL_ATR_PCT_THRESHOLD = 0.076  # ATR% of price cross-up (BTC $60 @ ~79k equiv)
+ATR_TREND_ACCEL_HYSTERESIS = 0.9          # re-arm only below thr*0.9 — audited decluster
+ATR_TREND_ACCEL_TREND_TF_1 = '15m'        # established-trend TF 1 (completed bars)
+ATR_TREND_ACCEL_TREND_TF_2 = '4h'         # established-trend TF 2 — BOTH must agree
+ATR_TREND_ACCEL_EMA_FAST = 20             # trend EMA fast
+ATR_TREND_ACCEL_EMA_SLOW = 50             # trend EMA slow
+ATR_TREND_ACCEL_TREND_BARS = 300          # HTF bars fetched — EMA seed transient converged
+ATR_TREND_ACCEL_MIN_BARS = 50             # min completed HTF bars or skip token
+ATR_TREND_ACCEL_TF1_MAX_AGE_MIN = 30      # newest completed 15m bar max age
+ATR_TREND_ACCEL_TF2_MAX_AGE_MIN = 480     # newest completed 4h bar max age
+ATR_TREND_ACCEL_BAR_MAX_AGE_MIN = 5       # 1m cross-bar max age (stale-feed guard)
+ATR_TREND_ACCEL_FORMING_WINDOW_S = 60     # bar younger than this = current forming minute
+ATR_TREND_ACCEL_SCAN_BARS = 1440          # 1m history for ATR + armed-state walk (24h)
+ATR_TREND_ACCEL_COOLDOWN_HOURS = 4        # per token+direction (hysteresis is primary)
+ATR_TREND_ACCEL_CONF_BASE = 70            # base confidence
+ATR_TREND_ACCEL_CONF_BONUS = 5            # bonus when ATR% >= 1.5x threshold at cross
+ATR_TREND_ACCEL_CONF_CAP = 88             # system ceiling
+ATR_TREND_ACCEL_CONF_FLOOR = 50           # floor
+# bug_hunter 2026-11-06 (BUG-091/094) — NEW constants only, no existing value changed:
+# CROSS_LOOKBACK_MIN = how far back detect() scans the 1m window for the cross.
+# A cross is a single-bar event and the slow-signal runner scans every 300s, so
+# newest-completed-bar-only evaluation exposed each cross for just one 60s window
+# in five and silently dropped ~4 of every 5 audited events (measured 12-32%
+# capture over 7d of BTC crosses at every scan phase). 10 min >= 2x the cadence,
+# so every cross is observed by at least one scan. Set to 2 for the old behaviour.
+# CONF_BONUS_MULT = ATR% threshold multiple that earns CONF_BONUS (was a bare 1.5
+# literal in the signal script — AGENTS.md: no hardcoded tunables in signal files).
+ATR_TREND_ACCEL_CROSS_LOOKBACK_MIN = 10   # minutes of 1m history scanned for the cross
+ATR_TREND_ACCEL_CONF_BONUS_MULT = 1.5     # ATR% >= thr*1.5 at the cross earns CONF_BONUS
+
 # ── ATR-SL CORRECTED-VALUE SHADOW (CEO verdict 2026-11-02, item (d)) ─────────
 # Root cause (verified by execution 2026-11-01): get_atr_pct returns PERCENT
 # but _atr_tier thresholds are FRACTIONS (ATR_PCT_LOW/HIGH = 0.01/0.015) →

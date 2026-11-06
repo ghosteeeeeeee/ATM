@@ -44,6 +44,11 @@ except ImportError:
 
 REGIME_SIGNALS = {
     'FLAT': {
+        # atr-trend: ATR expansion → established-trend acceleration (2026-11-06).
+        # ALL 4 regimes: a fresh ATR cross fires from ANY prior regime
+        # (quiet→expansion is the common case) — regime-split untested;
+        # shadow collection must not be exec-gated (jup_liq lesson).
+        'atr-trend', 'atr-trend+', 'atr-trend-',
         # jup-liq: liquidation-cascade follow — structural, all regimes (T 2026-11-05).
         # LIVE gate (decider context_gate → should_trade_v2) — v1 alone is dead code (bug_hunter #12).
         'jup-liq', 'jup-liq+', 'jup-liq-',
@@ -79,6 +84,11 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d FLAT 0T (never admitted).
     },
     'NORMAL': {
+        # atr-trend: ATR expansion → established-trend acceleration (2026-11-06).
+        # ALL 4 regimes: a fresh ATR cross fires from ANY prior regime
+        # (quiet→expansion is the common case) — regime-split untested;
+        # shadow collection must not be exec-gated (jup_liq lesson).
+        'atr-trend', 'atr-trend+', 'atr-trend-',
         # jup-liq: liquidation-cascade follow — structural, all regimes (T 2026-11-05).
         # LIVE gate (decider context_gate → should_trade_v2) — v1 alone is dead code (bug_hunter #12).
         'jup-liq', 'jup-liq+', 'jup-liq-',
@@ -137,6 +147,11 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"). v2 omission was an oversight: ATOM SHORT reached exec 10x on 2026-10-12 and vol gate was sole blocker. 90d NORMAL 1T +$0.01.
     },
     'HIGH': {
+        # atr-trend: ATR expansion → established-trend acceleration (2026-11-06).
+        # ALL 4 regimes: a fresh ATR cross fires from ANY prior regime
+        # (quiet→expansion is the common case) — regime-split untested;
+        # shadow collection must not be exec-gated (jup_liq lesson).
+        'atr-trend', 'atr-trend+', 'atr-trend-',
         # jup-liq: liquidation-cascade follow — structural, all regimes (T 2026-11-05).
         # LIVE gate (decider context_gate → should_trade_v2) — v1 alone is dead code (bug_hunter #12).
         'jup-liq', 'jup-liq+', 'jup-liq-',
@@ -204,6 +219,11 @@ REGIME_SIGNALS = {
         'warrior-sr-confirm+', 'warrior-sr-confirm-',  # Warrior S/R — added 2026-10-12 CEO sync from v1 (all-4 "structural"); 90d HIGH 0T (never admitted).
     },
     'EXTREME': {
+        # atr-trend: ATR expansion → established-trend acceleration (2026-11-06).
+        # ALL 4 regimes: a fresh ATR cross fires from ANY prior regime
+        # (quiet→expansion is the common case) — regime-split untested;
+        # shadow collection must not be exec-gated (jup_liq lesson).
+        'atr-trend', 'atr-trend+', 'atr-trend-',
         # jup-liq: liquidation-cascade follow — structural, all regimes (T 2026-11-05).
         # LIVE gate (decider context_gate → should_trade_v2) — v1 alone is dead code (bug_hunter #12).
         'jup-liq', 'jup-liq+', 'jup-liq-',

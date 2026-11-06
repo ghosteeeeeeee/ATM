@@ -443,7 +443,24 @@ it fails the signal-lab quality bar (WR>52%, avg PnL>0.05%).
 Round 2 gives one buildable candidate. **Independent audit #2 returned
 CONFIRMED** (see 5c), with its build recommendation adopted:
 
-### Candidate: `atr_trend_accel` (shadow first, per add-signal checklist)
+### ✅ STATUS: BUILT & LIVE (2026-11-06, add-signal checklist complete)
+
+- `signals/atr_trend_accel.py` — ATR(14,1m) Wilder cross-up 0.076% + hysteresis
+  0.9 decluster + direction = completed 15m AND 4h EMA20/50 agreement.
+  Source `atr-trend+`/`atr-trend-`, type `atr_trend_accel_long/short`,
+  flags ALL True (LIVE — shadow collection until real trades fire).
+- Wired: registry (+ `_SLOW_SIGNALS`), Layer 2 in `add_signal()` AND
+  `is_component_disabled()`, compactor weights, **STANDALONE_BYPASS**
+  (confluence waived — solo observation mode), **volatility gates v1+v2,
+  all 4 regimes** (fresh expansion crosses fire from any prior regime).
+- Verification: event-set replay vs audited backtest = **99% overlap
+  (109/110)**; unit tests pass (cross/direction/decluster/re-arm/no-spam);
+  `should_trade_v2(BTC, atr-trend+)=TRADE`; dry run clean (177 tokens, 0.9s).
+- Exits: profit_monster manages (NOT bypassed) — first-hour whipsaw means
+  expect early adverse excursion; sizing rule from audit #2 still applies:
+  **≥30 forward days with day-block CI excluding 0 before any size.**
+
+### Candidate details: `atr_trend_accel` (shadow first, per add-signal checklist)
 
 - **Event:** ATR(14,1m) crosses up through per-coin threshold (0.076% BTC-eq
   or own-p85), declustered (hysteresis 0.9).
