@@ -21815,3 +21815,27 @@ Final set: []
 - 7d $-2.29 RED — structural, outside auto_1hr 1-change/hour scope
 - mae_price is NULL on 5/6 24h winners (and is an absolute price level, not %) — MAE coverage gap, worth a schema/collector look
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 14:30] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses), 1 open (CRV pump-chain- LONG, opened 14:18)
+**PnL:** $-0.23 (WR: 0.0% hour; 24h 10T 60.0% $-0.34 now RED | 7d 237T 54.0% $-1.83 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: RUNE r2v2-long3 LONG atr_sl_hit -0.12 (-5.41% pnl_pct), ALGO bb-squeeze+ LONG atr_sl_hit -0.11 (-5.05%) — 1% price move x 5x leverage, expected magnitude
+- Kill check: no signal with 0% WR n>=3 (worst continuum-osc- 1T, r2v2-long3 1T) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/10 = 40.0% of 24h closes — NOT >40% (threshold strict), borderline; at the line, alert CEO if next hour pushes over
+- Boost: NONE eligible — jup_yolo_mirrored 4T 75% net $-0.04 (fails PnL bar + n<5); bb-squeeze+ 3T n<5
+- Neg streak: hourly tail -0.14, -0.23 = 2 consecutive negative hours -> no size cut (needs 3); regimes mixed, not NEUTRAL
+- Frequency: 2/hr — under 20
+- Entry quality: 24h winners avg MAE 0.083% (1/6 known, <0.5%) — OK, mae coverage gap persists
+- No storm (window-min -0.55% / at-run -0.52%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h net flipped RED ($-0.34) after two consecutive SL exits — watch; structural 7d -$1.83 still outside auto_1hr scope
+- mae_price NULL on 5/6 24h winners — MAE coverage gap, schema/collector look needed
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar

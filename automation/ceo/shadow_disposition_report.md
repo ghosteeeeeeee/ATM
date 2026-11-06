@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-05T08:15:00.094469+00:00
-registry: 75 entries (open=38)
+# Shadow disposition report — 2026-11-06T08:15:00.129083+00:00
+registry: 84 entries (open=42)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -13,6 +13,7 @@ registry: 75 entries (open=38)
 - DONE chase-ratio: KILL — executed at consumption (gate inert) (2026-10-31)
 - OPEN ichimoku-dampen-flooradmit: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - OPEN volmom-volbreak: deadline=2026-11-07T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for volmom-volbreak
 - DONE tc-temporal-confluence: KILL (2026-10-27)
 - DONE mom-filter-shadow: KILL (2026-10-27)
 - DONE acceleration-threshold: KILL (2026-10-27)
@@ -29,17 +30,15 @@ registry: 75 entries (open=38)
 - DONE bb-squeeze-hml-entry-profile: NO-CHANGE (report-only, per threshold) (2026-10-29)
 - DONE amplify-weekly-mandate: MET 2026-11-02 (Monday weekly run): 30d winner-cell screen re-run (6 cells n>=10 net>0 — 4 VALIDATED, 2 OOS why-not'd), new proposal amplify-pc-fade-cell-split emitted, why-nots documented in kanban. Flip-KPI: 0 new conversions this run; in-flight watch-contrarian-live (11-03), storm-waiver (11-12). (?)
 - DONE fade-volgate-split-analysis: VALID — exemption candidate cleared (CEO rule met) (2026-10-29)
-- OPEN fade-btc-crash-postflip: deadline=2026-11-06T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for fade-btc-crash-postflip
+- DONE fade-btc-crash-postflip: KEEP PERMANENT — full 24h read 2026-11-06T00:45Z: 9 unique crash=BLOCKED pump-chain- fade lines, coherence NO=5 YES=4 (56% NO) = STILL INCOHERENT; stage=crash-gate n=1 (ANIME WOULD-ALLOW vs live KILL), stage=inversion n=8 split 4/4. Per protocol (count only crash=BLOCKED, pump-chain- fade scope): NOT direction-coherent -> close KEEP pre-flip permanent per pre-registered default. Hoist NOT shipped. (2026-11-06T00:47:12.481255+00:00)
 - OPEN storm-confl-waiver: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN storm-readiness-packet: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN signal-zombie-purge: deadline=2026-11-09T00:00:00Z | (no parseable source)
-- OPEN momentum-cache-regime-coverage: deadline=2026-11-06T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for momentum-cache-regime-coverage
+- DONE momentum-cache-regime-coverage: DONE — re-measured 2026-11-06T00:45Z after #225 universe fix + #226 STALE_THRESHOLD 32400: recent-traded universe n=65, fresh<4h=65 (100%), fresh<9h=65 (100%), 0 missing, 0 stale. Bar >=90% PASS. SQLite momentum_cache.db remains 0-byte orphan (PG source of truth, by design). (2026-11-06T00:47:12.481255+00:00)
 - DONE pump-detect-ceiling-mismatch: NO-CHANGE — replay NEGATIVE, both options dead, caps stand (2026-10-30)
 - DONE override-vs-ceiling-contradiction: RESOLVED by replay: ceiling owns 75+ (band dead 3T 0% −$0.47); override claim-text fixed, behavior unchanged (2026-10-30)
 - DONE ichimoku-short-solo-counterfactual: DEAD — spam correctly neutered; no bypass (2026-10-30)
-- OPEN jup-yolo-regime-review: deadline=2026-11-07T00:00:00Z | (no parseable source)
+- DONE jup-yolo-regime-review: CLOSED — NO CHANGE (default). Regime gate REJECTED with data. (?)
 - OPEN amplify-winner-cell-mult-150: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN amplify-jup-short-walk: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN atrtrail-clip-12: deadline=2026-11-14T00:00:00Z | (no parseable source)
@@ -53,10 +52,8 @@ registry: 75 entries (open=38)
 - DONE trial-wider-sl: KILL — bar dead both axes (CEO hail-mary 20261104T161050Z): wider arm 37.7% WR vs 55.0% bar AND vs 43.7% current arm (-6.0pp); PnL -506.6% vs -257.1% (wider worse both) (2026-11-04)
 - DONE trial-extended-time: KILL — bar dead both axes (CEO hail-mary 20261104T161050Z): extended arm -15.7pp WR-improvement vs +5.0pp bar (40.9% vs 56.6% current, n=16872); PnL axis divergence (+1422.5pp extended) documented, CEO ruled KILL over the divergence (2026-11-04)
 - OPEN watch-contrarian-live: deadline=2026-11-11T00:00:00Z | (no parseable source)
-- OPEN gate-shadow-capture-coverage-fix: deadline=2026-11-06T00:00:00Z | brain/gate_shadow.db: 68262 rows, 0.0d
-  -> DECISION DUE within 24h for gate-shadow-capture-coverage-fix
-- OPEN candle-collector-coverage-audit: deadline=2026-11-06T00:00:00Z | data/candles.db: 10646943 rows, 0.0d
-  -> DECISION DUE within 24h for candle-collector-coverage-audit
+- DONE gate-shadow-capture-coverage-fix: CLOSED — threshold MET. ROOT CAUSE WAS THE MEASUREMENT FRAME, NOT THE RECORDER. (?)
+- DONE candle-collector-coverage-audit: FIXED — root cause: XMR (blacklisted both sides 2026-08-06) and LIT (LONG-streak blacklist) were never in candles_1m universe so fetch_binance/backfill never seeded them; both are HL-active. One-shot HL candleSnapshot backfill 35d -> candles_1m+candles_5m: XMR +5130/+5026 rows, LIT +5132/+5026, both now 17.4d span. Post-fix: 110/110 tokens blocked>=5x in 14d gate_shadow have >=1d 5m candles, missing=[]. Gate: PASS. (2026-11-06T00:47:12.481255+00:00)
 - OPEN stop-tighten-enforce-eval: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - DONE amplify-grind-breakout-deploy: NO CHANGE — bar FAILS clause 3 (no non-colliding widen path); why-not logged 2026-11-04 (audit #220) (?)
 - DONE amplify-pc-fade-cell-split: NO CHANGE — no cell clears ship bar (measured 2026-11-02 16:53Z) (2026-11-02T16:55:00Z)
@@ -76,7 +73,18 @@ registry: 75 entries (open=38)
 - OPEN short-shadow-join-builder: deadline=2026-11-16T00:00:00Z | (no parseable source)
 - DONE timer-cadence-recheck: RE-DAILY EXECUTED — option (a) taken as registered default: OnCalendar back to *-*-* 08:15 (repo + /etc, daemon-reload + timer restart verified). Rationale: weekly (Mon-only, from disposition-cadence-revert) could not honor 11-05/11-06/11-07 reads incl. the 11-07 fold-line packet; calendar now has 6+ deadlines 11-07..11-17. Re-evaluate cadence when calendar is sparse (new entry needed then). (2026-11-04)
 - OPEN harvest-ship-2026-11-04: deadline=2026-11-07T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for harvest-ship-2026-11-04
 - OPEN amplify-xmirror-giveback: deadline=2026-11-18T00:00:00Z | (no parseable source)
 - OPEN daily-fill-cap-brake: deadline=2026-11-07T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for daily-fill-cap-brake
 - OPEN amplify-ugb-bypass-hole: deadline=2026-12-15T00:00:00Z | (no parseable source)
 - OPEN amplify-vb-high-short-clonehunt: deadline=2026-11-13T00:00:00Z | (no parseable source)
+- OPEN amplify-jup-short-high-cell: deadline=2026-11-19T00:00:00Z | (no parseable source)
+- OPEN amplify-ema300-underdeploy: deadline=2026-11-19T00:00:00Z | (no parseable source)
+- OPEN amplify-bbsqueeze-chop-exempt: deadline=2026-11-13T00:00:00Z | (no parseable source)
+- OPEN jup-cluster-gate: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN jup-anti-chase: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN jup-pro-selection: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN btc-standalone-deny-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN setup-recall-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
+- OPEN linreg-fade-fill-funnel: deadline=2026-11-13T00:00:00Z | (no parseable source)

@@ -989,3 +989,15 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 6T +0.26 66.7% | 7d 260T -2.19 53.8%
 ### Findings: clean — rotating Q#6 (new errors): error_alerts shows only repeated continuum-override/level-block lines, no new error classes, 0 tracebacks; 7d slightly red but 24h green
 ### Recommendation: none — 4 control-tower items due today (fade-btc-crash, regime-coverage, gate-shadow, candle-collector) are for the weekly deep run
+
+## CEO Status — 20261106T071831Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 6T +0.16 66.7% | 7d 253T -2.01 54.5%
+### Findings: Rotating Q "new errors?" — error_alerts.md shows only routine gate traffic (momentum/BTC-level blocks + continuum overrides, TOK-sanitized), 0 new Tracebacks; control tower has 4 T-1 items due today (fade-btc-crash, regime-coverage, gate-shadow, candle-collector) all with safe if-silent defaults.
+### Recommendation: none — harvest-ship-2026-11-04 (CEO, due 11-07, 3/4 bars failing per #228) is the one item to act on at its deadline, not here.
+
+## CEO Status — 20261106T111831Z
+### Health: pipeline=active (timer oneshot, exit 0 @11:18:30Z) guardian=active open_pos=1
+### Numbers: 24h 8T +0.20 75.0% | 7d 242T -2.14 54.1%
+### Findings: Rotating Q (day 6/14 = confluence blocks): 339 CONFLUENCE-GATE-BLOCK today, 329 LONG single-type not in standalone bypass vs 10 SHORT — passes still flowing (jup_yolo_mirrored etc). error_alerts = routine gate block/override noise, 0 new Tracebacks.
+### Recommendation: none — blocked LONGs are the gate working under SHORT_BIAS/SHORT_BIAS regime; revisit only if passes dry up post-regime-flip.
