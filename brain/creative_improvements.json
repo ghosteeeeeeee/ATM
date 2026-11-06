@@ -10598,5 +10598,28 @@
     "category": "observability",
     "status": "shipped",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-06T13:01:25Z",
+    "idea": "Static-weight floor for CEO-shipped boosts (pin mechanism) — auto-tuned combo weights may never LOWER a pinned static boost; learner still owns all non-pinned keys",
+    "rationale": "Found while auditing harvest-ship item4: since e55b6c49 (Aug-7) auto combo_weights take priority over static SIGNAL_SOURCE_WEIGHTS, so every CEO SHIP-LIVE weight boost after Aug-7 that was only written to static was inert whenever self_learner held a key (measured 36/64 keys diverge; stop_hunt 0.0 DEAD suppression overridden to 1.0). Item4 was shipping 1.1/1.04 instead of 1.3/1.6.",
+    "expected_impact": "bb+warrior next-100 fill share 17% -> >=25% (harvest item4 target); class of silent CEO-ship reverts eliminated for pinned keys",
+    "category": "signal weighting",
+    "status": "shipped",
+    "risk": "low",
+    "files": [
+      "scripts/self_learner.py",
+      "data/combo_weights.json"
+    ],
+    "note": "34 remaining auto/static divergences (incl. stop_hunt 0.0->1.0, pump-chain+ 1.4->0.6, volume-buildup- 1.2->1.05) left for a dedicated precedence review — do not flip globally without per-key impact check"
+  },
+  {
+    "date": "2026-11-06T13:01:25Z",
+    "idea": "HML success metric must measure POST-SHIP opens only (window-lag guard) — pre-registered bars on rolling 7d counts are doomed when the fix lands mid-window",
+    "rationale": "harvest-ship bar HML 7d <15 failed at 37 with 34/37 opened BEFORE the 11-04 stop-tighten ship; post-ship opens show 3 HML total, 0 in-scope. The bar would have auto-reverted a WORKING ship.",
+    "expected_impact": "Prevents future false-negative dispositions on rolling-window count metrics; add \"opens >= ship_time\" clause to any bar measuring a count the ship is supposed to reduce",
+    "category": "measurement hygiene",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

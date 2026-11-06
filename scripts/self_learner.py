@@ -1047,6 +1047,19 @@ def _is_signal_disabled(signal_type):
     return False
 
 
+# CEO-shipped boosts that recalc must NEVER lower (registry harvest-ship-2026-11-04).
+# signal_compactor._get_source_weight gives auto combo_weights priority over static
+# SIGNAL_SOURCE_WEIGHTS, so a learner recalc silently reverts SHIP-LIVE static boosts
+# (measured 2026-11-06: bb-squeeze+ effective 1.1 vs 1.3, warrior-sr-confirm+ 1.04 vs
+# 1.6 — ship metric bb+warrior next-100 share stuck at 17% vs 25% target).
+# REVERT: delete entries here AND restore combo_weights.json values.
+PINNED_COMBO_WEIGHTS = {
+    'bb-squeeze+': 1.3,
+    'warrior-sr-confirm+': 1.6,
+    'warrior-sr-confirm-': 1.6,
+}
+
+
 def analyze_combo_weights():
     """Analyze combo performance and update weights JSON."""
     _log("--- Combo weight analysis ---")
@@ -1083,6 +1096,16 @@ def analyze_combo_weights():
     for st, w in old_weights.items():
         if st not in new_weights:
             new_weights[st] = w
+    
+    # Re-assert CEO pins (recalc above may have written a lower learner value)
+    for st, w in PINNED_COMBO_WEIGHTS.items():
+        if new_weights.get(st) != w:
+            if st in new_weights:
+                _log(f"  {st}: PINNED {new_weights[st]} -> {w} (CEO harvest-ship boost)")
+            else:
+                _log(f"  {st}: PINNED add {w} (CEO harvest-ship boost)")
+            new_weights[st] = w
+            changes += 1
     
     if changes > 0:
         _save_combo_weights(new_weights)

@@ -3671,5 +3671,27 @@
     "after": "gate-shadow done, jup review done, linreg-fade-fill-funnel open (bar: >=5 live fills by 11-13 AND armed-rate >=50%), harvest notes carry fresh metrics",
     "rationale": "Deadlines met with data; linreg-fade is the only shadow->live candidate in the Flip-KPI window and its funnel was unmeasured",
     "impact": "3 dispositions moved; 0 trading constants touched; hermes_constants.py diff EMPTY this run (CEO_PROTECTED untouched)"
+  },
+  {
+    "timestamp": "2026-11-06T13:01:25Z",
+    "agent": "brain_auditor",
+    "change": "Un-inert CEO harvest-ship item4: synced data/combo_weights.json bb-squeeze+ 1.1->1.3, warrior-sr-confirm+ 1.04->1.6 (static SIGNAL_SOURCE_WEIGHTS boosts were silently overridden by self_learner auto weights via _get_source_weight auto-first priority) + added PINNED_COMBO_WEIGHTS to self_learner.analyze_combo_weights so the daily 06:00 recalc cannot re-lower them",
+    "type": "config",
+    "file": "scripts/self_learner.py + data/combo_weights.json",
+    "before": "combo_weights.json: bb-squeeze+=1.1, warrior-sr-confirm+=1.04 (auto priority made static 1.3/1.6 inert since 2026-11-04 ship; share stuck 17% vs 25% target)",
+    "after": "combo_weights.json: 1.3/1.6/1.6 + PINNED_COMBO_WEIGHTS={bb-squeeze+:1.3, warrior-sr-confirm+:1.6, warrior-sr-confirm-:1.6} re-asserted before every save; compactor reloads file each 1-min timer tick",
+    "rationale": "Root cause of harvest-ship item4 under-delivery: 36/64 auto keys diverge from static; CEO SHIP-LIVE boost never reached the scorer. Scoped pin (2 keys) not a global precedence flip to avoid changing the other 34 divergences without review.",
+    "impact": "bb-squeeze+/warrior effective confidence x1.18/x1.54 higher at compaction -> hotset rank + share of next-100 fills; measured via amplify-bbsqueeze-warrior-uninert (bar 25% by 11-10)"
+  },
+  {
+    "timestamp": "2026-11-06T13:01:25Z",
+    "agent": "brain_auditor",
+    "change": "harvest-ship-2026-11-04 dispositioned KEEP ALL 4 (default revert OVERRIDDEN with evidence); HML metric re-based to post-ship opens; volmom-volbreak KILL executed; daily-fill-cap-brake KEEP executed",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "3 entries open, defaults = revert failing ships / KILL / KEEP",
+    "after": "all 3 status=done with verdicts + evidence; new amplify-bbsqueeze-warrior-uninert registered (deadline 11-10)",
+    "rationale": "48h read: HML 7d=37 is window lag (34/37 opened pre-ship; post-ship in-scope HML=0), jup share improving 64->46 with Cap C working, LONG-in-SHORT_BIAS -96% PASS, daily net package-level. Reverting item1/2 would restore proven bleed.",
+    "impact": "Prevents a harmful mechanical revert at the 11-07 deadline; keeps stop-tighten 0.75+ENFORCE and jup fill cap live"
   }
 ]
