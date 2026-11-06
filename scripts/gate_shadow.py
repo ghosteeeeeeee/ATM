@@ -45,9 +45,11 @@ any significance claim off this DB; naive per-row averages are point estimates
 only.
 
 Usage: python3 scripts/gate_shadow.py [--record] [--close] [--fwd] [--report] [--since-hours 6]
-       [--backfill-rr HOURS]
+       python3 scripts/gate_shadow.py --backfill-rr 24        # option TAKES a value
        --since-hours limits --record only; --report/--fwd are all-time by design.
-       --backfill-rr is a one-shot RR-ENGINE recovery (see backfill_rr docstring).
+       --backfill-rr HOURS = one-shot, idempotent RR-ENGINE recovery for lines the
+       forward offset already consumed before RR_BLOCK_RE existed (see backfill_rr).
+       Alone it runs ONLY the backfill; combined with the other flags it runs them too.
 """
 import sys
 import os
