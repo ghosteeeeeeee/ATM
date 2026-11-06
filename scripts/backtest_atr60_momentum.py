@@ -1189,11 +1189,14 @@ def _continuum_rules(token):
         return None, None
 
 
-def continuum_study(token='BTC', threshold=60.0):
-    """CEO add-on: continuum score as direction (<50 short, >50 long) for the
-    ATR↑60 event study. Full horizons, event vs random vs ATR-state baselines."""
+def continuum_study(token='BTC', threshold=60.0, flip=False, half=None):
+    """CEO add-on: continuum score as direction for the ATR↑60 event study.
+    flip=True inverts it (CEO 2026-11-06: 'previous move was OVER when the new
+    ATR spike occurred' → mean-revert against the score). Full horizons,
+    event vs random vs ATR-state baselines, optional OOS half."""
     print('\n' + '=' * 78)
-    print(f'CONTINUUM DIRECTION STUDY ({token}, T={threshold})')
+    print(f'CONTINUUM DIRECTION STUDY ({token}, T={threshold}, '
+          f'flip={flip}, half={half})')
     rows = load_candles(token)
     ts = [r[0] for r in rows]
     hh = [r[2] for r in rows]
@@ -1207,7 +1210,6 @@ def continuum_study(token='BTC', threshold=60.0):
     if not cont_rules:
         print('  no continuum history for token — skip')
         return
-    cont50 = dict(cont_rules)['cont_50']
 
     # 1h EMA trend for combos
     hrows, iv = _load_htf(token, 'candles_1h', 3600)
@@ -1224,22 +1226,39 @@ def continuum_study(token='BTC', threshold=60.0):
 
     evs = [i for i in find_events(atr, ts, threshold, hysteresis=0.9)
            if i < len(ts) - 15]
-    ev_set = set(evs)
     base_idx = [i for i in range(0, len(ts), 60) if i < len(ts) - 15]
+    mid_t = (ts[0] + ts[-1]) / 2.0
+    if half in ('first', 'second'):
+        evs = [i for i in evs
+               if (ts[i] < mid_t) == (half == 'first')]
+        base_idx = [i for i in base_idx
+                    if (ts[i] < mid_t) == (half == 'first')]
+    ev_set = set(evs)
     state_idx = []
     last_s = -10**18
     for i in range(len(ts) - 15):
+        if half in ('first', 'second'):
+            if not ((ts[i] < mid_t) == (half == 'first')):
+                continue
         if (atr[i] is not None and atr[i] >= threshold
                 and i not in ev_set and ts[i] - last_s >= 3600):
             state_idx.append(i)
+            last_s = ts[i]  # audit B1 fix: hourly spacing must actually advance
 
+    _d50 = dict(cont_rules)['cont_50']
+    _d55 = dict(cont_rules)['cont_55']
+    _sfx = '_flip' if flip else ''
+    if flip:
+        f50 = lambda t: -_d50(t)
+        f55 = lambda t: -_d55(t)
+    else:
+        f50, f55 = _d50, _d55
     rules = [
-        ('cont_50', cont50),
-        ('cont_55', dict(cont_rules)['cont_55']),
-        ('cont55+1m agree', dict(cont_rules)['cont_55']),  # +1m macd/rsi agree
-        ('cont55+1h agree',
-         lambda t: (lambda a, b: a if a == b else 0)(
-             dict(cont_rules)['cont_55'](t), ema1h(t))),
+        ('cont_50' + _sfx, f50),
+        ('cont_55' + _sfx, f55),
+        ('cont55' + _sfx + '+1m agree', f55),  # +1m macd/rsi agree
+        ('cont55' + _sfx + '+1h agree',
+         lambda t: (lambda a, b: a if a == b else 0)(f55(t), ema1h(t))),
     ]
     HZ = [15, 30, 60, 120, 240, 480, 1440]
 
@@ -1472,6 +1491,8 @@ def main():
                     help='OOS time split for --pooled (each coin midpoint)')
     ap.add_argument('--cont', action='store_true',
                     help='continuum-score direction study (<50 short >50 long)')
+    ap.add_argument('--cont-flip', action='store_true',
+                    help='FLIPPED continuum direction (mean-revert vs score)')
     ap.add_argument('--atr-sm', action='store_true',
                     help='use SMA-of-TR ATR instead of Wilder/RMA (definition sensitivity)')
     ap.add_argument('--coins', default='', help='comma list for cross-coin ATR%% study')
@@ -1509,7 +1530,9 @@ def main():
         for tf in ('5m', '15m', '1h'):
             pooled_ceo(tf, args.pct, coin_list, half=args.half)
     if args.cont:
-        continuum_study(args.coin, args.threshold)
+        continuum_study(args.coin, args.threshold, flip=False, half=args.half)
+    if args.cont_flip:
+        continuum_study(args.coin, args.threshold, flip=True, half=args.half)
     if args.coins:
         for c in args.coins.split(','):
             cross_coin(c.strip(), args.pct)
