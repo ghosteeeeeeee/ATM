@@ -21946,3 +21946,53 @@ Final set: []
 - **Files:** `scripts/backtest_atr60_momentum.py`, `scripts/continuum_replay.py`, `plans/atr60-momentum-spec-2026-11-06.md`, `automation/bugs.json`
 - **Verification:** `--cont-flip --cont-db recorded` reproduces R2c EXACTLY (67.3%/+0.378 n=98, 70.8%/+0.719 n=24, 48.8%/-0.423 n=41); R2b within +-1 event (32.7% vs 34.0%); main table p-values bit-identical post-fix; replay validate re-run rho=0.963; `--ceo 30m`/`--tfs 30m` now clean errors; py_compile OK.
 - **Tracker:** BUG-082, BUG-083, BUG-084, BUG-085, BUG-086, BUG-087, BUG-088, BUG-089
+
+## [2026-11-06 19:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 15T 53.3% $-0.47 RED | 7d 226T 54.0% $-1.95 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — quiet window (last close 16:xx)
+- Kill check: no signal with 0% WR n>=3 last hour (no trades) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/15 = 40.0% of 24h closes — at threshold, NOT >40% -> no tpsl_utils alert (unchanged 3 runs)
+- Boost: NONE eligible — bb-squeeze+ 5T 60% net $-0.14 (fails Net PnL>$0.05); jup_yolo_mirrored 3T 66.7% net $-0.10 (fails PnL bar + n<5); pump-chain- 2T 50% n<5
+- Neg streak: 15:00 +0.08, 16:00 -0.07, then empty — no 3 consecutive negative hours; regimes EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners known MAE avg 0.107% (0.083% / 0.131%, 2/8 known, 6 NULL — mae coverage gap persists) -> OK
+- No storm (window-min -0.27% / at-run -0.10%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- atr_sl_hit holding exactly 40.0% (3 runs in a row) — crosses threshold if any new SL hit next hour
+- 24h net RED ($-0.47) and 7d $-1.95 structural, outside auto_1hr 1-change/hour scope
+- mae_price NULL on 6/8 24h winners — MAE coverage gap, schema/collector look needed
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 20:19] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 15T 53.3% $-0.47 RED | 7d 222T 54.1% $-1.91 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — quiet window (last close 16:xx)
+- Kill check: no signal with 0% WR n>=3 last hour (no trades) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/15 = 40.0% of 24h closes — at threshold, NOT >40% -> no tpsl_utils alert (4 runs holding at exactly 40.0%)
+- Boost: NONE eligible — bb-squeeze+ 5T 60% net $-0.14 (fails Net PnL>$0.05); jup_yolo_mirrored 3T 66.7% net $-0.10 (fails PnL bar + n<5)
+- Neg streak: 16:00 -0.07 then 3 empty hours — no 3 consecutive negative hours; regime not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners MAE avg 0.183% 8/8 known <0.5% (mae_price coverage gap NOW RESOLVED — was 6/8 NULL) -> OK
+- No storm (window-min -0.35% / at-run +0.15%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- atr_sl_hit exactly 40.0% for 4 runs straight — crosses threshold if any new SL hit next hour
+- 24h net RED ($-0.47) and 7d $-1.91 structural, outside auto_1hr 1-change/hour scope
+- Trade flow stopped ~16:00 — 4 quiet hours, 0 open; over-filtered or dead market worth watching next run
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
