@@ -138,6 +138,41 @@ So `LINREG_FADE_LEVERAGE = 1` is pinned in decider_run.py: the account
 guardrail is never exempted; the trade's leverage is set so the guardrail sits
 at the level the structure was validated with (V11).
 
+## Post-ship evaluation (2026-11-06 01:30 — real signals + CEO proposal tests)
+
+**1. The first 78 real signals (all SHORT, as shipped):**
+- `analysis/linreg_real_signal_replay.py` — replay through V8 structure:
+  **WR 69.2%, avg +0.771%/trade, sum +60.17%, 0 SL hits (wide stop never
+  touched), 3 TP, 75 time-exits** — BUT 75/78 signals are younger than 8h
+  (median hold 319min, windows truncated) and Nov 5 was a dump day. Nov 6's
+  8 signals already average −0.31%. Smoke test, not proof.
+- shadow_trades (90 rows, per-engine counterfactuals): recorded old-engine
+  outcome n=58 WR 74.1% avg +0.797%; **profit_monster trail + cut_loser
+  BYPASSED 58/58** (fixes live in shadow); HML fired 8× — all 8 losers
+  (avg −0.99%, confirms it only catches the fade's losers); ATR-engine
+  counterfactual +1.92% avg — but that's 1 dump day vs the 3-month backtest
+  where ATR exits LOSE (V2 −0.09%/trade); trust the longer sample.
+
+**2. CEO proposal — "both sides, follow the trend via the system's own
+regime gates" (`analysis/linreg_both_sides_regime_test.py`, gates
+reconstructed from continuum.db BTC history, Aug 12 → now):**
+
+| Cohort (event-level, V8 exits) | 1m (trading TF) | 15m full-sample | 15m OOS |
+|---|---|---|---|
+| A. current ship: SHORT only, ungated | **+0.248%/WR 54.9%** | −0.052% | **+0.305%** |
+| B. both sides, ungated | −0.073%/WR 49.1% | +0.037% | +0.044% |
+| C. both sides + system trend gates | −0.032%/WR 49.5% | +0.035% | +0.017% |
+
+**Proposal rejected — it loses OOS on both timeframes.** LONG leg bleeds on
+1m (Oct −0.29%, Nov −0.73%) and the system's gates don't rescue it (C still
+negative on 1m; worse than A on 15m OOS). Why the gates don't line up with
+the fade: measured BTC state by month — Aug score>60 only **2.0%** of the
+time (SHORT gate inactive exactly when shorts lost −0.73%/trade), while the
+Oct LONG block (bearish structure 43%) kept the *losing* LONGs (allowed
+Oct LONGs avg −0.57%). Trend-followING itself was already tested in the
+research: slope IC is negative (fade beats follow), momentum flips sign
+IS/OOS → rubbish. LONG flag stays OFF until an up-regime validates it.
+
 ## Honest caveats
 
 - 1m data spans only Oct 6 – Nov 5 2026 (a down regime); 15m spans Aug 7 –
