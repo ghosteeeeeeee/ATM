@@ -21698,3 +21698,50 @@ Final set: []
 **Open Questions:**
 - 7d $-1.84 RED — structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 09:20] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses), 0 open
+**PnL:** $-0.15 (WR: 0.0% hour; 24h 7T 71.4% $+0.17 | 7d 248T 54.4% $-1.96 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BTC continuum-osc- SHORT -0.15 (atr_sl_hit, -3.37% pnl_pct) — single SL, expected range
+- Kill check: no signal with 0% WR n>=3 (continuum-osc- 1T -0.15, continuum+ 1T -0.07) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/7 = 28.6% of 24h closes (under 40%) -> no tpsl_utils alert
+- Boost HOLD: jup_yolo_mirrored 4T 100% +0.36 across 3 tokens but n<5 -> hold
+- Neg streak: hourly closes last 12h = +0.03, +0.03, +0.03, -0.15 — only 1 consecutive negative -> no size cut
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.193%, 5/5 <0.5% — good
+- No storm (window-min -0.08% / at-run +0.63%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-1.96 RED — structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 10:20] Hourly Analysis
+
+**Trades:** 0 closed, 1 open (WCT bb-squeeze+ LONG, opened 10:15)
+**PnL:** $0.00 hour; 24h 7T 71.4% $+0.17 | 7d 247T 54.3% $-2.00 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes — quiet
+- Open: WCT bb-squeeze+ LONG (opened 10:15, pnl 0.00 at check)
+- Kill check: no signal with 0% WR n>=3 in 24h -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/7 = 28.6% of 24h closes (under 40%) -> no tpsl_utils alert
+- Boost: no candidates (best jup_yolo_mirrored 4T 100% +0.36 but n<5) -> hold
+- Neg streak: hourly closes last 12h = +0.03, +0.03, +0.03, -0.15 — only 1 consecutive negative -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.193%, 5/5 <0.5% — good
+- No storm (window-min +0.03% / at-run +0.03%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-2.00 RED — structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
