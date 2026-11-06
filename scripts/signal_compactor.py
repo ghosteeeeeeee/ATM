@@ -3190,6 +3190,21 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                 else:
                     if not _btc_mom_ok_for_bypass:
                         log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h NEUTRAL, BTC flat, standalone bypass denied")
+                        # ── [BTC-CHOP-STANDALONE-SHADOW] CEO consult 20261106T035547Z
+                        # (FLOW RECOVERY PLAN, standing delegation = CEO label = go):
+                        # LOG-ONLY counterfactual for the flat-deny immediately above —
+                        # records what this single-source candidate WOULD do if the deny
+                        # were relaxed (registry: data/shadow_disposition.json entry
+                        # btc-standalone-deny-shadow, deadline 2026-11-17).
+                        # ZERO behavior change: the deny line above, the `continue`
+                        # below, and every counter/state/DB untouched. Inner try/except
+                        # so a missing constant or import failure can never alter flow.
+                        try:
+                            from hermes_constants import BTC_CHOP_STANDALONE_SHADOW as _bcss
+                            if _bcss:
+                                log(f"  📊 [BTC-CHOP-STANDALONE-SHADOW] {token} {direction} {source}: WOULD-PASS single-source while BTC flat (conf={conf}, regime={_regime_4h}) — counterfactual only, deny stays")
+                        except Exception:
+                            pass
                     else:
                         log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
                     continue
@@ -3306,6 +3321,16 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  ✅ [LONG-NEUTRAL-CONTINUUM] {token} LONG — BTC score 60-80 + mean-reversion signal, allowed")
                     elif not _btc_mom_ok_for_bypass:
                         log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h NEUTRAL, BTC flat, standalone bypass denied")
+                        # ── [BTC-CHOP-STANDALONE-SHADOW] LONG leg of the same flat-deny
+                        # (CEO consult 20261106T035547Z): LOG-ONLY counterfactual, same
+                        # contract as the SHORT leg above — deny line byte-unchanged,
+                        # no counter/state/DB touched, guarded so it can never alter flow.
+                        try:
+                            from hermes_constants import BTC_CHOP_STANDALONE_SHADOW as _bcss_l
+                            if _bcss_l:
+                                log(f"  📊 [BTC-CHOP-STANDALONE-SHADOW] {token} {direction} {source}: WOULD-PASS single-source while BTC flat (conf={conf}, regime={_regime_4h}) — counterfactual only, deny stays")
+                        except Exception:
+                            pass
                     else:
                         log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h regime NEUTRAL, no LONG edge")
                     continue

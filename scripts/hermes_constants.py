@@ -5871,3 +5871,30 @@ MAXXED_SHORT_EXEMPT_ENFORCE = False      # item 4: False => MAXXED block stays f
 # REVERT: DAILY_FILL_CAP_ENABLED = False (cap inert, no other behavior).
 DAILY_FILL_CAP_ENABLED = True   # master switch — REVERT: False (cap off)
 DAILY_FILL_CAP_MAX = 15         # max live opens per rolling 24h while 24h fee-net < 0
+
+# ── FLOW RECOVERY shadows (CEO consult 20261106T035547Z, "FLOW RECOVERY PLAN —
+# Today 11-06 / This week"; standing delegation = CEO label = go) ─────────────
+# ADD-ONLY block appended at EOF — no existing value in this file was touched and
+# CEO_PROTECTED is untouched. Two LOG-ONLY counterfactual shadows: they record what
+# WOULD happen if a currently-deny gate were relaxed, so the pre-registered bar can
+# be read at the deadline (registry: data/shadow_disposition.json, both deadline
+# 2026-11-17). Neither flag can change a decision — the deny/SKIP outcomes and their
+# own log lines are byte-identical whether the flag is True or False.
+#
+# polarity: True = log-only counterfactual ([BTC-CHOP-STANDALONE-SHADOW] lines at
+#   signal_compactor.py — BOTH legs of the "standalone bypass denied" flat-deny in
+#   run_compaction (SHORT-NEUTRAL + LONG-NEUTRAL); line numbers drift, grep the tag);
+#   the DENY
+#   itself is unchanged — this measures the flat-tape pincer where altcoins move
+#   independently of BTC while single-source (standalone) candidates are denied
+#   (~1,684 deny lines/2d with no counterfactual before this).
+#   False = stop logging; the flat-deny still applies either way.
+BTC_CHOP_STANDALONE_SHADOW = True
+#
+# polarity: True = log-only counterfactual ([SETUP-RECALL-SHADOW] lines at
+#   decider_run.py context_gate's similar_setup_lookup hard block — grep the tag);
+#   the SKIP return itself
+#   is unchanged — this measures the rule-based setup-WR floor (block fires mostly
+#   at n=5-8; MIN_N=5 vs the house bar n>=15 is the question).
+#   False = stop logging; the hard block still fires either way.
+SETUP_RECALL_SHADOW = True

@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-06T02:26:36Z",
+ "updated": "2026-11-06T04:47:26Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -1129,7 +1129,7 @@
    "default_action": "KEEP cap (stateless, self-releasing \u2014 no harm while red; evaluate frequency trade-off at fold-line)",
    "owner": "CEO",
    "evidence": "ship-time pre-check 2026-11-04 17:38Z: n_opens_24h=32, 24h fee-net=-$0.98 (cap engaged on deploy); 8 red fee-net days, avg -$0.58/day; 24h fee-net metric verified live = -0.982241 (psql == vacation_guardrail.fee_net_24h()).",
-   "notes": "MECHANISM: ADD-only constants DAILY_FILL_CAP_ENABLED=True / DAILY_FILL_CAP_MAX=15 (block DAILY FILL CAP, hermes_constants.py), enforced as Cap D in the decider exec loop immediately after Cap C \u2014 one PG read returns live (paper=false) opens in the last 24h and the fee-net of JSON-fee closed fills in the last 24h; new fills are skipped only while n>=15 AND 24h fee-net<0 (log \"SKIP: DailyFillCap \u2014 \u2026 brake until first green 24h\"). Stateless skip path: locals only, no marker file, no mark_signal_executed (Cap C convention) \u2014 nothing to corrupt. Fail-open: PG error -> WARN, fill proceeds, never raises out of the loop. RELEASE IS EMBEDDED: the first fee-net-green 24h makes the AND false and the cap lifts itself (no BH-SR-1 conflict); vacation_guardrail now honors an explicit marker release=\"first_green_24h\" \u2014 clears ONLY on 24h fee-net>=0, never on the WR rule, and never when the fee-net cannot be computed (verdict item e; the old rule auto-cleared the 16:34 brake at 16:42 while 24h was -$0.27). SCOPE: automated decider fills only \u2014 manual/CEO trades never run this loop, so they bypass by design. REVERT: DAILY_FILL_CAP_ENABLED=False (cap inert, no other behavior). CEO consult 20261104T172347Z \"SHIP (a)+(e). REJECT (b),(c),(d)\". REVIEW 2026-11-04 (code review + hardening, commit 2): Cap D extracted into the shared helper _daily_fill_cap_block() and MIRRORED into process_delayed_entries (second fill path opens via brain.py directly \u2014 review MEDIUM-6; held/retried, not dropped, while engaged); guardrail release contract hardened to fail CLOSED (fee_net_24h can never raise -> None), resume_trading no longer clears a release-gated marker with a red fee-net (review HIGH-1), write_size_reduce carries an explicit release key forward on re-write (review MEDIUM-4), and release replaces the BH-SR-1 WR rule outright (clear iff 24h fee-net >= 0, per spec literal). | CAVEATS for the 11-07 read (ship report 2026-11-04): (1) fee-net limb excludes fees-IS-NULL rows (~24% of 7d closes, currently a +$1.95 PROFITABLE cohort) -> 'first green' is systematically harder (conservative direction for a brake, but state it when quoting improvement); count limb filters paper=false, fee limb does not (spec-literal). (2) Cap D fails OPEN on a corrupt fees row (WARN only, not routed to error_alerts) while the release gate fails CLOSED \u2014 asymmetric by design, tracked as BUG-079. (3) nothing writes release='first_green_24h' yet \u2014 item (e) ships as capability; any future size-reduce marker MUST carry the key. (4) first live line 17:51:31 (32 opens, fee-net -0.98); pipeline double-logs each SKIP (12 events=24 lines)."
+   "notes": "MECHANISM: ADD-only constants DAILY_FILL_CAP_ENABLED=True / DAILY_FILL_CAP_MAX=15 (block DAILY FILL CAP, hermes_constants.py), enforced as Cap D in the decider exec loop immediately after Cap C \u2014 one PG read returns live (paper=false) opens in the last 24h and the fee-net of JSON-fee closed fills in the last 24h; new fills are skipped only while n>=15 AND 24h fee-net<0 (log \"SKIP: DailyFillCap \u2014 \u2026 brake until first green 24h\"). Stateless skip path: locals only, no marker file, no mark_signal_executed (Cap C convention) \u2014 nothing to corrupt. Fail-open: PG error -> WARN, fill proceeds, never raises out of the loop. RELEASE IS EMBEDDED: the first fee-net-green 24h makes the AND false and the cap lifts itself (no BH-SR-1 conflict); vacation_guardrail now honors an explicit marker release=\"first_green_24h\" \u2014 clears ONLY on 24h fee-net>=0, never on the WR rule, and never when the fee-net cannot be computed (verdict item e; the old rule auto-cleared the 16:34 brake at 16:42 while 24h was -$0.27). SCOPE: automated decider fills only \u2014 manual/CEO trades never run this loop, so they bypass by design. REVERT: DAILY_FILL_CAP_ENABLED=False (cap inert, no other behavior). CEO consult 20261104T172347Z \"SHIP (a)+(e). REJECT (b),(c),(d)\". REVIEW 2026-11-04 (code review + hardening, commit 2): Cap D extracted into the shared helper _daily_fill_cap_block() and MIRRORED into process_delayed_entries (second fill path opens via brain.py directly \u2014 review MEDIUM-6; held/retried, not dropped, while engaged); guardrail release contract hardened to fail CLOSED (fee_net_24h can never raise -> None), resume_trading no longer clears a release-gated marker with a red fee-net (review HIGH-1), write_size_reduce carries an explicit release key forward on re-write (review MEDIUM-4), and release replaces the BH-SR-1 WR rule outright (clear iff 24h fee-net >= 0, per spec literal). | CAVEATS for the 11-07 read (ship report 2026-11-04): (1) fee-net limb excludes fees-IS-NULL rows (~24% of 7d closes, currently a +$1.95 PROFITABLE cohort) -> 'first green' is systematically harder (conservative direction for a brake, but state it when quoting improvement); count limb filters paper=false, fee limb does not (spec-literal). (2) Cap D fails OPEN on a corrupt fees row (WARN only, not routed to error_alerts) while the release gate fails CLOSED \u2014 asymmetric by design, tracked as BUG-079. (3) nothing writes release='first_green_24h' yet \u2014 item (e) ships as capability; any future size-reduce marker MUST carry the key. (4) first live line 17:51:31 (32 opens, fee-net -0.98); pipeline double-logs each SKIP (12 events=24 lines). | CEO 20261106T035547Z: brake NOT re-scoping \u2014 verified not binding during idle window (0 skips 11-06, fee-net +$0.16); 'continuous' = EV-positive continuous; fold criteria unchanged (profitability only) + idle-with-candidates diagnostic added."
   },
   {
    "id": "amplify-ugb-bypass-hole",
@@ -1242,6 +1242,32 @@
    "join_rate": "trades metadata jup_win_rate (94/140), jup_trades, jup_margin_usd",
    "owner": "T question, CEO bar",
    "evidence": "jwr <0.30: 30T 59% -$0.33 | 0.30-0.45: 44T 72% +$0.50 (sweet spot) | 0.45-0.60: 12T 67% -$0.20 | >=0.60: 8T 25% -$0.84; jwr>=0.45 net -$1.04 vs <0.45 +$0.17 (p=0.172 n.s.) \u2014 ALIGNS with T's own thesis: high-WR pros = small-move scalpers (500-1000x precision entries), their exits don't fit our 5x big-move need. Experience: <100 trades 20T -$0.91; 100-500 best +$0.28. Margin: <$100 = 109T flat-neg, $100-1k = 28T 68%WR flat-pos, >=$1k = ZERO trades (selection gap \u2014 we copy nobody with real size)"
+  },
+  {
+   "id": "btc-standalone-deny-shadow",
+   "stream": "[BTC-CHOP-STANDALONE-SHADOW] WOULD-PASS single-source lines at the BTC-chop flat-deny of standalone candidates (signal_compactor.py \u2014 both legs of the `standalone bypass denied` deny in run_compaction, SHORT-NEUTRAL + LONG-NEUTRAL; grep the tag) \u2192 fwd4h outcome join, logs/signal-compactor.log",
+   "kind": "shadow",
+   "status": "open",
+   "started": "2026-11-06",
+   "deadline": "2026-11-17T00:00:00Z",
+   "threshold": "token-day dedup join (gate-shadow-dedup-convention) of [BTC-CHOP-STANDALONE-SHADOW] WOULD-PASS lines \u2192 fwd4h outcome at $13.44 notional: enforce-flip candidate only if n>=30 token-days AND net >= +$1.50 AND 2/3 positive days (flat-tape subset)",
+   "default_action": "keep the flat-deny (standalone single-source stays blocked while BTC flat)",
+   "evidence": "CEO 20261106T035547Z flow-recovery: 1,684 deny lines/2d with NO counterfactual existed; this is the flat-tape pincer layer (altcoins move while BTC flat, system denies single-source)",
+   "owner": "CEO",
+   "notes": "log-only; deny outcome byte-unchanged"
+  },
+  {
+   "id": "setup-recall-shadow",
+   "stream": "[SETUP-RECALL-SHADOW] WOULD-ALLOW lines at the similar_setup_lookup hard block (decider_run.py context_gate \u2014 grep the tag) \u2192 outcome join, pipeline/decider log",
+   "kind": "shadow",
+   "status": "open",
+   "started": "2026-11-06",
+   "deadline": "2026-11-17T00:00:00Z",
+   "threshold": "token-day dedup join of [SETUP-RECALL-SHADOW] WOULD-ALLOW \u2192 outcome: re-consider MIN_N/SIMILAR_SETUP_HARD_BLOCK_WR only if n>=30 token-days AND net >= +$1.50 AND 2/3 positive days; fires mostly n=5-8 so MIN_N=5 vs house bar n>=15 is the question",
+   "default_action": "keep the hard block (setup WR floor stays)",
+   "evidence": "CEO 20261106T035547Z: 61 hard blocks/2d, no counterfactual existed; block is rule-based (decider :2382) not LLM",
+   "owner": "CEO",
+   "notes": "log-only; SKIP return value unchanged"
   }
  ]
 }

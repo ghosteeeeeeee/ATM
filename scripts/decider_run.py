@@ -2379,6 +2379,19 @@ def context_gate(token, direction, source, sig):
         wr_pct = setup.win_rate * 100
         log(f'  [SETUP-RECALL] {token} {source} {direction}: n={setup.n} WR={wr_pct:.0f}%')
         if setup.n >= SIMILAR_SETUP_HARD_BLOCK_MIN_N and wr_pct < SIMILAR_SETUP_HARD_BLOCK_WR:
+            # ── [SETUP-RECALL-SHADOW] CEO consult 20261106T035547Z (FLOW RECOVERY
+            # PLAN, standing delegation = CEO label = go): LOG-ONLY counterfactual —
+            # records what this rule-based hard block WOULD allow (registry:
+            # data/shadow_disposition.json entry setup-recall-shadow, deadline
+            # 2026-11-17). ZERO behavior change: the SKIP return below is
+            # byte-identical with the flag on or off, no counter/state touched.
+            # Inner try/except so a missing constant can never alter the block.
+            try:
+                from hermes_constants import SETUP_RECALL_SHADOW as _srs
+                if _srs:
+                    log(f'  [SETUP-RECALL-SHADOW] {token} {source} {direction}: WOULD-ALLOW n={setup.n} WR={wr_pct:.0f}% (hard block fires at n<{SIMILAR_SETUP_HARD_BLOCK_MIN_N} / WR<{SIMILAR_SETUP_HARD_BLOCK_WR}%) — counterfactual only')
+            except Exception:
+                pass
             return ('SKIP', f'similar setup: n={setup.n} WR={wr_pct:.0f}% < {SIMILAR_SETUP_HARD_BLOCK_WR}% (hard block)', 0)
         if wr_pct < 50 and setup.n >= SIMILAR_SETUP_MIN_SAMPLE:
             penalty = SIMILAR_SETUP_PENALTY_30 if wr_pct < 40 else SIMILAR_SETUP_PENALTY_40
