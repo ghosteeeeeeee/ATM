@@ -1669,7 +1669,7 @@
       "date_found": "2026-11-06",
       "date_fixed": "2026-11-06",
       "found_by": "bug_hunter",
-      "git_commit": null,
+      "git_commit": "c57eae1d",
       "related_bugs": []
     }
   ],
