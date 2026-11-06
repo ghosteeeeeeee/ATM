@@ -10621,5 +10621,24 @@
     "category": "measurement hygiene",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-06T20:56:51Z",
+    "idea": "jup/vb TAT candle OOS on the bb-bounce variant-C playbook (two arms: age>=MIN & pnl<0 vs age>=MIN & pnl<arm)",
+    "rationale": "jup+vb own 49% of the 14d never-armed bleed (98T of 201 unarmed, -$6.76). TAT shadows collecting since #214 (11-01; 6,437 lines / 29 unique trades) but no OOS exists. bb-bounce variant-C is the only trail-timeout that ever passed bars (fk 8.8% vs base 41.9%).",
+    "expected_impact": "If variant-C passes fk<20% + net>0 at n>=20: closes the largest single entry-quality hole with a proven mechanism.",
+    "category": "exit/entry quality",
+    "status": "suggested",
+    "risk": "medium",
+    "constraint": "MUST dedup by trade_id — measured 222x pseudo-replication this run"
+  },
+  {
+    "date": "2026-11-06T20:56:51Z",
+    "idea": "gate_shadow FAMILY-UNION citation convention (sibling-gate union before quoting blocked populations)",
+    "rationale": "13/39 bb-squeeze+ neutral token-days appear under BOTH LONG-NEUTRAL and LONG-NEUTRAL-CHOP — per-gate would-win is first-touch-conditional, so quoting one gate mis-states the blocked population. Extends gate-shadow-dedup-convention (due 11-10) which only covers token-day dedup.",
+    "expected_impact": "Prevents event-count errors at the gate-attribution layer; zero code, doc-level.",
+    "category": "measurement hygiene",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

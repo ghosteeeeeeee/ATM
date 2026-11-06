@@ -1,40 +1,42 @@
-# Current State — brain_auditor #229 2026-11-06 13:04 UTC
-**Last Updated: 2026-11-06 13:04 UTC**
-**Updated by: brain_auditor #229. Prior: #228 2026-11-06 05:00 UTC (preserved in git history).**
+# Current State — brain_auditor #230 2026-11-06 20:55 UTC
+**Last Updated: 2026-11-06 20:55 UTC**
+**Updated by: brain_auditor #230. Prior: #229 2026-11-06 13:04 UTC (preserved in git history).**
 
-## HEADLINE — harvest-ship item4 was INERT: auto combo_weights (self_learner) override static SIGNAL_SOURCE_WEIGHTS, so CEO boosts 1.3/1.6 were scoring as 1.1/1.04. Fixed via combo_weights sync + PINNED_COMBO_WEIGHTS. Harvest 48h read = KEEP ALL 4 (default revert would have restored proven bleed; HML bar failed by window lag — 34/37 HML opened pre-ship, post-ship in-scope = 0).
+## HEADLINE — shadow-log pseudo-replication is systemic in position_manager (8 per-process dedup sets): jup/vb TAT 6,437 lines = 29 trades (222x), MFE-CUT 8,548 = 65 (131x), HML 29,987, ATRSL 9,244. Warnings added to the 2 undocumented blocks (comment-only, 13 insertions, zero behavior). Structural fix queued. AMPLIFY emit: amplify-bbsqueeze-neutral-exempt (sibling-gate clone-hunt, due 11-14).
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| **combo-weight-precedence (FIXED, scoped)** | `signal_compactor._get_source_weight` auto-first (e55b6c49, Aug-7) → 36/64 auto keys diverge from static; item4 inert. Fixed: combo_weights 1.1→1.3 / 1.04→1.6 + PINNED_COMBO_WEIGHTS in self_learner (2 keys only). **34 other divergences queued for precedence review — do NOT flip globally without per-key check** (incl. stop_hunt static 0.0 DEAD → auto 1.0 latent, pump-chain+ 1.4→0.6, volume-buildup- 1.2→1.05) |
-| **harvest-ship-2026-11-04 (CLOSED — KEEP ALL 4)** | 48h read: jup rolling-50 46% FAIL-improving (daily 69→58→35→67→33) · HML 7d 37 FAIL **window lag (34/37 pre-ship; post-ship 3 total, 0 in-scope, 0 on 11-06)** · daily net 72h -0.85 FAIL package-level (11-05 first green +0.26/+0.16 since 10-31) · LONG-in-SHORT_BIAS 25→1 **PASS**. Default revert OVERRIDDEN with evidence; HML re-based to post-ship opens; re-read 11-11 |
-| **volmom-volbreak (CLOSED — KILL)** | n=0 vs n>=20 bar: flags False since build, no data files, 0 log lines — shadow never collected. Default KILL executed (registry closed; re-open needs CEO shadow-first ruling) |
-| **daily-fill-cap-brake (CLOSED — KEEP)** | 24h fills 9≤15 · fee-net -0.12<0 engaged · 11-05 green day had 0 SKIPs after (release key verified) · daily fee-net trend -1.42→-0.96→-0.51→+0.16→-0.41 improving |
-| **amplify-bbsqueeze-warrior-uninert (NEW, due 11-10)** | bar: next-100 bb+warrior share ≥25% (baseline 17% last-100 / 38.9% last-48h) ∧ bb NORMAL 7d net ≥0 ∧ pin still 1.3/1.6 at read. Default: revert pin |
-| **LOSERS/BLUR side-find (MEDIUM, not mine)** | Uncommitted hermes_constants: LOSERS {'BLUR'}→set(), BLUR now in NO blocklist. FAVORITES_LONG +BTC = daily auto-updater (expected). Owner confirm-or-revert |
-| **Autopsy 48h (MANDATE)** | n=6 = 2 never-adverse / 4 recovered / **0 NEVER** → WRONG-SIDE REFUTED **85th** (#61 p=0.116, #84 t=-0.04) |
-| **AMPLIFY weekly** | 1 NEW: amplify-bbsqueeze-warrior-uninert. Flip-KPI 0 this week — all 4 n≥8 winner cells already in-flight (pc+ EXTREME, bb NORMAL, vb- HIGH, jup SHORT HIGH); n≥5 early cells too small/sign-flip |
-| **#228 verify** | gate_shadow_health --selfcheck **PASS** (36 gates, covers=True) · jup-regime NO CHANGE held · linreg-fade bypass clean (0 confluence blocks 11-06) |
+| **shadow-log dedup (MEDIUM side-find)** | 8 module-level sets reset every STEPS_EVERY_MIN subprocess. Measured: HML-SHADOW 29,987 lines · ATRSL 9,244 · MFE-CUT 8,548 lines/65 trades (131x) · jup-vb TAT 6,437/29 (222x). Same class as gate-shadow event inflation. **WARNINGS ADDED** to jup/vb TAT + MFE-CUT blocks (position_manager.py, comment-only, py_compile PASS). Structural fix = persist sets like profit_monster._load_trail_state — queued, needs subagent+bug_hunter. |
+| **AMPLIFY #230 (NEW)** | `amplify-bbsqueeze-neutral-exempt` due 11-14. bb-squeeze+ LONG × LONG-NEUTRAL (sibling of in-flight CHOP-only exempt). 14d tok-day dedup 41ev/17td/68.3%/+1.49 (10-26..11-04); 30d 29td/78.9%/+2.35; family-union 30d 39td/80.9%/+4.18, 14d 27td/73.3%/+2.42. **13/39 neutral token-days sit under BOTH gates** → CHOP-only exempt leaves them shut. CONFLUENCE candidate REJECTED (52/90 events cluster Oct-4/5, 14d collapses to 63.2%). |
+| **winner-cell screen** | 4 of 6 n>=10 cells already in-flight. pc- NORMAL LONG REJECTED (born 10-31, daily sign-flip, +0.24 thin). pc-,pc-v6- EXTREME SHORT n=10 WR 30% = noise. |
+| **Flip-KPI 0 this week** | mult-150 MET but awaiting CEO label+T sign-off (money-sizing) · fade-ctx fee-net FAIL (-0.37) · storm needs 3 packets (0) · jup/vb TAT no OOS yet. |
+| **#229 verify** | combo pin HELD (1.3/1.6 + PINNED_COMBO_WEIGHTS); post-pin bb+ 2T / warrior 0T = INSUFFICIENT, bar 11-10 · gate_shadow_health selfcheck PASS (34 gates) · harvest KEEP-ALL-4 no action · linreg-fade 0 fills (11-13). |
+| **jup ATRSL fix side-info** | pre-fix (open<11-03) 96T 59.4% -1.08 vs post-fix 37T 67.6% +0.23. 3d window, regime confound — pre-register 7d re-read, no claim. |
+| **Autopsy 48h (MANDATE)** | n=9 = 3 never-adverse / 6 recovered / **0 NEVER** → WRONG-SIDE REFUTED **86th** (#61 p=0.116, #84 t=-0.04) |
 
 ### 2. NUMBERS (fresh PG)
-- 24h **9T 77.8% gross '+0.13' fees 0.25 net '-0.12'** | 7d **241T 53.9% gross '-2.29' net '-5.36'** | 14d 403T 55.3% '-2.11' | 30d 777T 46.1% gross '-6.28' fees 7.49 **net '-13.77'** | **1 open (ADA bb-squeeze+ LONG +0.23%)**
-- 7d by regime: EXTREME 36T 38.9% '-1.03' · HIGH 77T 58.4% '-0.80' · NORMAL 112T 53.6% '-0.64' · FLAT 16T 68.8% '+0.18'
-- 7d family: **trail 127T 91.3% '+7.90' vs chop 82T 0% '-10.01'** | 14d armed 219T 90.4% '+13.40' vs unarmed 184T 13.6% '-15.51'
-- Contrarian join 12:40Z: flip **43.1% n=1442** | pc- 64.6% LIVE | rider 36.2% do-NOT
-- Floor join 12:55Z: floor_only 49.3% vs always 43.7% **p=0.135** → COLLECT to 11-15
-- goal_metrics verifier: 5/7 FAIL (jup 46%, HML 37, HML net -5.22, net72h -0.85, fleet WR 52.5%) — HML/jup move as pre-ship rows age out
+- 24h **15T 53.3% '-0.47' RED** | 7d **222T 53.6% '-1.91' RED** | 14d 403T 55.3% '-2.07' | 30d 777T 46.1% gross '-6.28'
+- 7d by regime: EXTREME 27T 37.0% '-0.90' · HIGH 69T 56.5% '-0.75' · NORMAL 110T 53.6% '-0.44' · FLAT 16T 68.8% '+0.18'
+- 7d exits: **TRAIL 100T 85.0% '+4.89'** + mfe 35T 82.9% '+1.63' || **HML 37T 0% '-4.68' + ATR-SL 38T 0% '-4.10'**
+- 14d exits: TRAIL 202T 83.7% '+9.71' || ATR-SL 57T 0% '-6.31' + HML 43T 0% '-5.63' + cut-loser 13T '-1.92'
+- 14d armed 202T 83.7% '+9.71' vs unarmed 201T 26.9% '-11.78'
+- Never-armed concentration: jup 80T '-4.57' + vb- 18T '-2.19' = 98T of 201 (49%)
+- 30d winner cells n>=10: pc+ EXTREME L 73T +1.44 · bb+ NORMAL L 44T +0.76 · vb- HIGH S 19T +0.42 · jup HIGH S 15T +0.40 · pc-,pc-v6- EXTREME S 10T +0.30 · pc- NORMAL L 29T +0.24
 
-### 3. SHADOW (3/6 usable)
-- contrarian + floor joins re-ran unconditionally (mandate) · gate_shadow_health selfcheck PASS · shadow_trader 69,256 (pm_trail +10,443 vs hard_max -11,865)
-- oscillator FROZEN/archived · wyckoff RETIRED (file gone) · rr ORPHANED
+### 3. SHADOW (2/6 raw answerable + gate_shadow)
+- contrarian join RE-RAN 20:30Z (mandate): overall flip 43.1% (W620/L820) | **pc- 64.6% n=350 LIVE keep** | rider do-NOT (chi2 p=8.9e-25 heterogeneous)
+- floor join RE-RAN 20:50Z: floor_only 1385 49.2% vs always_admit 208 43.3% **p=0.118 COLLECT → 11-15**
+- shadow_trader exit A/B: pm_trail +10,652 vs hard_max -12,140 (trail-or-nothing) · gate_shadow_health selfcheck PASS
+- oscillator FROZEN/archived · wyckoff file GONE (retired) · rr ORPHANED
 
-### 4. SIGNAL QUALITY — 0 new targets
-- 0 signals at n≥20 + WR<50 + net<0 (14d). #228 entry-filter negative result stands — do not re-propose RSI/gap/BB filters for jup/vb-/pc+.
-- Kill candidates: none. Arm-rate watch: pc- LONG 7.4% (arms almost never, still green).
+### 4. SIGNAL QUALITY — 0 kill candidates
+- 14d n>=15 sub-50% WR + net<0 = **ZERO rows**. Closest: pc- LONG 29T 41.4% but net +0.24.
+- jup LONG 100T 61.0% -1.08 and vb- SHORT 51T 62.7% -0.59 = WR-positive/negative-net = R:R class, no entry filter available (#228 pre-registered negative result stands).
+- 24h losers n=7: all pass standing filters; RUNE LONG RSI 75.0 exactly on the 75 boundary (chasing) — n=7 < 20, RSI-bucket steering already rejected #128. No filter proposed.
 
-### 5. READINESS (13:00)
-**1 open (ADA bb-squeeze+ LONG, +0.23%, 0.5h).** Regime: 15m LONG_BIAS / 4h LONG_BIAS / continuum ABOVE / vol LOW / velocity SLOW / trend UP / wyckoff DISTRIBUTION / 0 steers / portfolio good. Size 1.0x (size-reduce file absent). Session lock ABSENT; CEO_PROTECTED untouched; combo pin + 2 dispositions are this run's only writes to trading paths.
+### 5. READINESS (20:55)
+**0 open — flat, 0 steers, portfolio good.** Regime: 15m SHORT_BIAS / 4h LONG_BIAS (disagreement = the chop) / continuum AT / vol LOW / velocity SLOW / accel NEGATIVE / wyckoff ACCUMULATION / market_phase RECOVERY. → No fresh counter-trend entries, trail-family first, size 1.0x (size-reduce file absent). Session lock ABSENT; CEO_PROTECTED 13/13; hermes_constants EMPTY git diff; checkpoint_registry 0 pending (9/9 done); 0 Tracebacks in pipeline.log.
 
-**Queue:** 11-07 verifier re-run → 11-09 zombie-purge → 11-10 five bars + uninert read → 11-11 HML post-ship re-read → 11-13 linreg-fade fill bar + chop-exempt + clonehunt + pc+ kill → 11-14 stop-tighten eval + atrtrail + jup-short-walk → 11-15 floor/wyckoff → 11-19 ema300/jup-short-high.
-**CEO:** harvest KEEP (veto window open) · 34 combo-weight divergences need precedence review · LOSERS/BLUR uncommitted diff · NET-KPI.
+**Queue:** 11-09 zombie-purge → 11-10 five bars + uninert next-100 read + fade-ctx fee-net re-measure → 11-11 HML post-ship re-read + watch-contrarian → 11-13 linreg-fade / chop-exempt / vb- clonehunt / pc+ kill-review → 11-14 neutral-exempt read + mult-150 CEO label chase + atrtrail + stop-tighten → 11-15 floor/wyckoff → 11-17 jup eval batch.
+**CEO:** mult-150 label pending since 11-04 · 34 combo-weight divergences need precedence review · LOSERS/BLUR uncommitted diff (not mine) · NET-KPI.

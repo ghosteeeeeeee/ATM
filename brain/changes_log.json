@@ -3693,5 +3693,27 @@
     "after": "all 3 status=done with verdicts + evidence; new amplify-bbsqueeze-warrior-uninert registered (deadline 11-10)",
     "rationale": "48h read: HML 7d=37 is window lag (34/37 opened pre-ship; post-ship in-scope HML=0), jup share improving 64->46 with Cap C working, LONG-in-SHORT_BIAS -96% PASS, daily net package-level. Reverting item1/2 would restore proven bleed.",
     "impact": "Prevents a harmful mechanical revert at the 11-07 deadline; keeps stop-tighten 0.75+ENFORCE and jup fill cap live"
+  },
+  {
+    "timestamp": "2026-11-06T20:56:51Z",
+    "agent": "brain_auditor",
+    "change": "Audit #230: added PER-PROCESS DEDUP warnings (measured counts) to jup/vb TAT shadow block and MFE-CUT shadow block in position_manager.py — comment-only, zero behavior",
+    "type": "ops",
+    "file": "scripts/position_manager.py",
+    "before": "no warning on 2 of 8 shadow dedup sets; 6,437 TAT / 8,548 MFE-CUT duplicate lines could be quoted as n",
+    "after": "warnings state 6,437 lines = 29 trades (222x) and 8,548 = 65 trades (131x); dedup by trade_id mandatory; structural fix queued",
+    "rationale": "Same pseudo-replication class as the gate-shadow event-count error; protects the pending jup/vb TAT candle OOS",
+    "impact": "ZERO trading behavior — git diff = 13 insertions(+) 0 deletions, all lines are comments, py_compile PASS"
+  },
+  {
+    "timestamp": "2026-11-06T20:56:51Z",
+    "agent": "brain_auditor",
+    "change": "Audit #230 AMPLIFY: registered amplify-bbsqueeze-neutral-exempt in data/shadow_disposition.json (bb-squeeze+ LONG x LONG-NEUTRAL sibling-gate clone-hunt, due 2026-11-14)",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "85 entries",
+    "after": "86 entries",
+    "rationale": "Weekly AMPLIFY mandate — 14d token-day-dedup screen: 41 ev / 17 tok-days / 68.3% would-win / +1.49 (10-26..11-04 span); 13 token-days blocked under both neutral gates so the in-flight CHOP-only exempt leaves them shut",
+    "impact": "No behavior — open disposition entry with pre-registered ship bars and NO-SHIP default"
   }
 ]

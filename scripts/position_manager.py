@@ -4166,6 +4166,15 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # brain_auditor #214 2026-11-01: coverage gap — these families own ~50% of
         # the 7d never-armed bleed (jup 24T -$2.23 / vb- 17T -$2.05) with 0 TAT coverage.
         # Shadow only — logs would-fires for candle OOS before any enforce.
+        # ⚠️ PER-PROCESS DEDUP (brain_auditor #230, 2026-11-06): _jup_tat_shadow_logged
+        # resets every pipeline pass (position_manager = fresh subprocess per
+        # STEPS_EVERY_MIN) -> measured 6,437 [SHADOW] TAT would-fire lines = 29 unique
+        # trade_ids (222x pseudo-replication) in pipeline.log. ANY count/mean built on
+        # these lines MUST dedup by trade_id first (same class as the gate-shadow
+        # event-level inflation that spawned gate-shadow-dedup-convention). First line
+        # per trade = first eligibility; later lines repeat the same trade at older ages.
+        # Structural fix (queued, not shipped): persist the set to a JSON file the way
+        # profit_monster._load_trail_state does. Fail-open to today's behavior.
         if JUP_TRAIL_ARM_TIMEOUT_SHADOW or VB_TRAIL_ARM_TIMEOUT_SHADOW:
             _jvb_sig_l = (_pos_signal or '').lower()
             _jvb_min = None
@@ -4206,6 +4215,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # and brain/verdicts via analysis/trail_arm_candle_oos_2026-10-17.
         # DO NOT flip live on the old trades-level numbers. Redesign required:
         # signal-family-scoped timeouts, not a universal cut.
+        # ⚠️ PER-PROCESS DEDUP (brain_auditor #230, 2026-11-06): _mfe_cut_shadow_logged
+        # resets every pipeline pass -> measured 8,548 [SHADOW] MFE-CUT would-fire lines
+        # = 65 unique trade_ids (131x). Dedup by trade_id before any count (same class
+        # as the jup/vb TAT block above and gate-shadow-dedup-convention).
         if MFE_CUT_SHADOW_ENABLED and trade_id not in _mfe_cut_shadow_logged:
             try:
                 _mcs_ot = pos.get('open_time') or open_time

@@ -1,174 +1,187 @@
 {
-  "timestamp": "2026-11-06T13:02:38Z",
-  "run": 229,
-  "session_lock": "absent — config changes allowed",
-  "headline": "harvest-ship item4 was INERT (auto combo_weights overrode CEO static boosts 1.3/1.6 -> 1.1/1.04); fixed with synced file + PINNED_COMBO_WEIGHTS. Harvest 48h read: KEEP all 4 (default revert would have restored proven bleed — HML bar failed by window lag, 34/37 opened pre-ship).",
+  "timestamp": "2026-11-06T21:06:12Z",
+  "run": 230,
   "session_brain_stats": {
     "queries": [
-      "harvest ship revert jup fill cap",
-      "volmom volbreak signal",
-      "fill cap brake brake"
+      "signal performance winrate regime",
+      "combo weight precedence source weight",
+      "loss money bleeding losing"
     ],
-    "notes": "Session brain confirms CEO brake design: stateless rolling-24h fill cap N=15 while fee-net<0, self-releasing on first green 24h; jup cap Cap C mirrors Cap B; vol/volbreak signals known as flag-gated with zero collection"
+    "top_insights": [
+      "exit asymmetry + trend-following: sessions repeatedly name the exit system as the #1 profit leak (reports/exit-asymmetry-deep-dive-2026-10-31)",
+      "signal decay / guitar-tuning framing: signals need continuous revalidation, not set-and-forget",
+      "combo-weight precedence (hall of shame sessions): auto-tuned weights override static CEO boosts — root-caused and pinned #229"
+    ]
   },
   "trade_summary_24h": {
-    "trades": 9,
-    "wr": 77.8,
-    "gross": 0.13,
-    "fees": 0.25,
-    "net": -0.12,
-    "by_signal": {
-      "jup_yolo SHORT 5T 80% +0.20": 1,
-      "bb-squeeze+ LONG 2T 100% +0.05": 1,
-      "continuum-osc- SHORT 1T 0% -0.15": 1,
-      "rider/ema-reclaim 1T 100% +0.03": 1
-    },
-    "7d": {
-      "trades": 241,
-      "wr": 53.9,
-      "gross": -2.29,
-      "net": -5.36
-    },
-    "14d": {
-      "trades": 403,
-      "wr": 55.3,
-      "gross": -2.11
-    },
-    "30d": {
-      "trades": 777,
-      "wr": 46.1,
-      "gross": -6.28,
-      "fees": 7.49,
-      "net": -13.77
-    },
-    "open": 1,
-    "regime_7d": {
-      "EXTREME": "36T 38.9% -1.03",
-      "HIGH": "77T 58.4% -0.80",
-      "NORMAL": "112T 53.6% -0.64",
+    "trades": 15,
+    "wr": 53.3,
+    "pnl": -0.47,
+    "open": 0,
+    "by_regime_7d": {
+      "EXTREME": "27T 37.0% -0.90",
+      "HIGH": "69T 56.5% -0.75",
+      "NORMAL": "110T 53.6% -0.44",
       "FLAT": "16T 68.8% +0.18"
     },
-    "family_7d": {
-      "trail_family": "127T 91.3% +7.90",
-      "chop_family": "82T 0% -10.01",
-      "other": "32T 43.8% -0.18"
+    "exit_family_7d": {
+      "TRAIL": "100T 85.0% +4.89",
+      "mfe_exit": "35T 82.9% +1.63",
+      "CHOP-HML": "37T 0% -4.68",
+      "ATR-SL": "38T 0% -4.10"
+    },
+    "exit_family_14d": {
+      "TRAIL": "202T 83.7% +9.71",
+      "ATR-SL": "57T 0% -6.31",
+      "CHOP-HML": "43T 0% -5.63",
+      "cut-loser": "13T 0% -1.92"
     },
     "armed_14d": {
-      "armed": "219T 90.4% +13.40",
-      "unarmed": "184T 13.6% -15.51"
+      "true": "202T 83.7% +9.71",
+      "false": "201T 26.9% -11.78"
+    },
+    "totals": {
+      "7d": "222T 53.6% -1.91",
+      "14d": "403T 55.3% -2.07"
     }
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 12:40Z unconditionally (mandate). Overall flip 43.1% n=1442 | pump-chain- 64.6% (226W/124L) LIVE keep | btc-pump-rider+ 36.2% do-NOT. chi2 per token uniform for pc-.",
-    "floor_admit": "JOIN RE-RAN 12:55Z. floor_only 49.3% (n=1349 decided) vs always_admit 43.7% (n=206), fisher p=0.135 — directional, COLLECT to 11-15 (30d same-sign bar not reachable until 2026-11-15). blocked cohort n=0.",
-    "oscillator": "FROZEN + archived (fossil 2026-10-27) — no answerable questions, pre-live evidence only.",
-    "wyckoff": "RETIRED — data/wyckoff_shadow.jsonl no longer present (Oct-15 ruling: pairing premise failed).",
-    "rr_shadow": "ORPHANED (mtime 24d, no producer) — do not cite.",
-    "gate_shadow": "gate_shadow_health.py --selfcheck PASS (36 gates, 9 flagged, covers=True) — #228 ship still healthy.",
-    "shadow_trader": "69,256 signals | gates justified (CONFLUENCE-EXPIRY 15,470 blocked 47% would-win) | Exit A/B: pm_trail +10,443 vs hard_max -11,865 / cut_loser -2,176 / rr_engine -4,569 = trail-or-nothing confirmed",
-    "overall": "3/6 usable (contrarian, floor, gate_capture) + shadow_trader live. oscillator/wyckoff/rr dead. Contrarian + floor joins refreshed this run."
-  },
-  "losing_trade_autopsy_48h": {
-    "method": "brain/analysis/recovery_replay.py (adverse-first, selfcheck PASS)",
-    "n": 6,
-    "never_adverse": 2,
-    "recovered_after_adverse": 4,
-    "never_traded_back": 0,
-    "verdict": "WRONG-SIDE REFUTED 85th consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "losers": "SOL jup SHORT -0.16 atr_sl_hit (NORMAL) | BTC continuum-osc- SHORT -0.15 atr_sl_hit (NORMAL) + 4 older"
+    "contrarian": "JOIN RE-RUN 2026-11-06T20:30Z (mandate). Overall flip 43.1% (WINNER 620 / LOSER 820 / SHALLOW 2). pump-chain- 64.6% n=350 LIVE (OOS-consistent, Oct-27 PROMOTE stands). btc-pump-rider+ do-NOT-flip (36.2% overall, chi2 p=8.9e-25 = token-heterogeneous, per-token never blanket).",
+    "floor_admit": "JOIN RE-RUN 2026-11-06T20:50Z. floor_only 1385 49.2% vs always_admit 208 43.3%, fisher p=0.118 -> COLLECT (n>=200 PASS, 30d same-sign not reachable until 2026-11-15).",
+    "oscillator": "FROZEN + ARCHIVED (oscillator_shadow.json.fossil-20261027). actual_outcome null on all 24,598. JSONL not JSON. None — pre-live evidence only.",
+    "wyckoff": "RETIRED — data/wyckoff_shadow.jsonl no longer exists (gone from disk).",
+    "rr_shadow": "ORPHANED — data/rr_shadow_audit_7d.json mtime Oct 4, no producer script in repo. Do not cite.",
+    "gate_shadow": "72,218 events. gate_shadow_health --selfcheck PASS (34 gates, covers=True). Clone-hunt screen run this pass (see creative_improvements).",
+    "shadow_trader": "exit A/B: pm_trail n=28,279 WR 100% +10,652 vs hard_max n=12,437 WR 0% -12,140 vs cut_loser -2,180 — trail-or-nothing reproduced independently.",
+    "overall": "2 of 6 raw sources answerable (contrarian + floor joins, both re-run this pass). oscillator frozen, wyckoff retired, rr orphaned. gate_shadow is the highest-value collector this run (drove the AMPLIFY emit)."
   },
   "drift_findings": [
-    {
-      "id": "combo-weight-precedence-drift",
-      "severity": "HIGH",
-      "finding": "Since e55b6c49 (2026-08-07) auto combo_weights override static SIGNAL_SOURCE_WEIGHTS. 36/64 auto keys diverge from static. CEO SHIP-LIVE boosts written only to static were inert: bb-squeeze+ 1.1 vs 1.3, warrior-sr-confirm+ 1.04 vs 1.6. Also stop_hunt DEAD suppression static 0.0 overridden to auto 1.0 (flag-off, latent).",
-      "action": "FIXED this run for the 2 CEO-ship keys (pin). 34 other divergences queued for precedence review — not flipped globally without per-key check."
-    },
-    {
-      "id": "harvest-hml-window-lag",
-      "severity": "HIGH",
-      "finding": "harvest-ship HML 7d<15 bar measured 37 with 34/37 opened BEFORE the 11-04 ship — the bar would have auto-reverted a working stop-tighten (post-ship in-scope HML=0).",
-      "action": "Dispositioned KEEP with post-ship re-base; re-read 11-11. Measurement-hygiene idea logged."
-    },
-    {
-      "id": "losers-blur-removed-uncommitted",
-      "severity": "MEDIUM",
-      "finding": "Working-tree hermes_constants.py: LOSERS {'BLUR'} -> set() (uncommitted, not mine, not favorites_updater which only writes FAVORITES_LONG). BLUR is now in NO blocklist (not LOSERS_LONG/SHORT either). FAVORITES_LONG +BTC is the daily auto-updater (expected).",
-      "action": "FLAGGED — owner must confirm intent or revert before next commit; I did not touch it."
-    }
+    "JUP/VB + MFE-CUT shadow log dedup is per-process while position_manager restarts every STEPS_EVERY_MIN pass -> measured 6,437 TAT lines = 29 unique trades (222x) and 8,548 MFE-CUT lines = 65 unique (131x). HML (29,987) and ATRSL (9,244) same class. Sibling blocks HML/ATRSL already carry the warning; jup/vb TAT and MFE-CUT did NOT — WARNINGS ADDED (comment-only, position_manager.py:4169/4210). Structural fix (persistent set à la profit_monster._load_trail_state) queued, not shipped.",
+    "gate_shadow per-gate would-win is FIRST-TOUCH CONDITIONAL: 13 of 39 bb-squeeze+ neutral token-days appear under BOTH LONG-NEUTRAL and LONG-NEUTRAL-CHOP. Exempt decisions must use the family union — see creative_improvements.",
+    "No trading-constant drift found: hermes_constants.py EMPTY git diff, CEO_PROTECTED_FLAGS 13/13 intact, session lock absent."
   ],
   "recurring_problems": [
-    "Chop vs trend: 7d chop_family 82T 0% WR -$10.01 vs trail_family 127T 91.3% +$7.90 — 4th+ run confirming; entry-quality levers (stop-tighten, jup cap, LONG-bypass) all now live, unarmed 14d -$15.51",
-    "Rolling-window count metrics vs point-in-time ships keep producing false-negative dispositions (HML case; same class as prior window-anchor bugs)"
+    "Chop exits own the bleed: 14d ATR-SL 57T 0% -6.31 + HML 43T 0% -5.63 + cut-loser 13T -1.92 = -13.86 while TRAIL 202T +9.71. Unarmed half = -11.78 vs armed +9.71. Same story as every prior run — entry quality, not exits.",
+    "Never-armed concentration: jup_yolo 80T -4.57 + volume-buildup- 18T -2.19 = 98T of the 201 unarmed 14d trades (49%). Both have TAT shadows running since #214 (11-01) — OOS not yet run."
   ],
   "missing_implementations": [
-    "Precedence review for the 34 remaining auto/static combo-weight divergences (incl. latent stop_hunt 0.0->1.0)",
-    "wyckoff outcome join (retired — N/A)",
-    "jup_liq amount!=0 live fire still PENDING (from #228, unchanged)"
+    "jup/vb TAT candle OOS (bb-bounce playbook: variant-C pnl<0 vs base pnl<arm, dedup by trade_id) — shadow has been collecting 6 days, no OOS script exists.",
+    "gate-shadow family-union citation convention — extends gate-shadow-dedup-convention (due 11-10) which only covers token-day dedup, not sibling-gate union."
   ],
   "creative_improvements": [
     {
-      "idea": "PINNED_COMBO_WEIGHTS floor for CEO-shipped boosts (SHIPPED this run)",
-      "status": "shipped"
+      "date": "2026-11-06T20:56:26Z",
+      "idea": "jup/vb TAT candle OOS on the bb-bounce variant-C playbook (two arms: age>=MIN & pnl<0 vs age>=MIN & pnl<arm)",
+      "rationale": "jup+vb own 49% of the 14d never-armed bleed (98T / -6.76). Shadows have collected since 11-01 (TAT 6,437 lines / 29 trades) but no OOS exists. bb-bounce variant-C is the ONLY trail-timeout that ever passed bars (fk 8.8% vs base 41.9%).",
+      "expected_impact": "If variant-C passes fk<20% + net>0 at n>=20: closes the largest single entry-quality hole with a proven mechanism.",
+      "category": "exit/entry quality",
+      "status": "suggested",
+      "risk": "medium — must dedup by trade_id (222x pseudo-replication measured this run) or the OOS inherits the gate-shadow event-count error"
     },
     {
-      "idea": "Post-ship-opens clause on rolling-window count bars (SUGGESTED)",
-      "status": "suggested"
+      "date": "2026-11-06T20:56:26Z",
+      "idea": "gate_shadow FAMILY-UNION citation convention: per-gate would-win is first-touch-conditional; exempt/kill decisions must quote the union of sibling gates",
+      "rationale": "13/39 bb-squeeze+ neutral token-days sit under BOTH LONG-NEUTRAL and LONG-NEUTRAL-CHOP. Quoting either gate alone mis-states the blocked population; the in-flight chop-exempt entry covers only one of the two.",
+      "expected_impact": "Prevents a repeat of the event-level pseudo-replication error (7-10x) at the gate-attribution layer; zero code, doc-level addition to gate-shadow-dedup-convention (due 11-10).",
+      "category": "measurement hygiene",
+      "status": "suggested",
+      "risk": "low"
     }
   ],
   "config_changes_applied": [
     {
-      "file": "data/combo_weights.json",
-      "change": "bb-squeeze+ 1.1->1.3, warrior-sr-confirm+ 1.04->1.6",
-      "type": "config"
-    },
-    {
-      "file": "scripts/self_learner.py",
-      "change": "added PINNED_COMBO_WEIGHTS + re-assert before save in analyze_combo_weights()",
-      "type": "config"
-    },
-    {
-      "file": "data/shadow_disposition.json",
-      "change": "harvest-ship KEEP ALL 4 / volmom-volbreak KILL / daily-fill-cap-brake KEEP + new amplify-bbsqueeze-warrior-uninert",
-      "type": "disposition"
+      "file": "scripts/position_manager.py",
+      "type": "comment-only",
+      "change": "Added PER-PROCESS DEDUP warnings with measured counts to the jup/vb TAT shadow block (line ~4169) and MFE-CUT shadow block (line ~4210)",
+      "before": "no warning — 6,437 TAT / 8,548 MFE-CUT duplicate lines could be quoted as n",
+      "after": "warning states 6,437 lines = 29 trades (222x) and 8,548 = 65 trades (131x); dedup by trade_id mandatory; structural fix queued",
+      "behavior": "ZERO — 13 inserted comment lines, 0 code lines changed, py_compile PASS, git diff stat = 13 insertions(+)"
     }
   ],
   "changes_from_last_run": [
     {
-      "run": 228,
-      "change": "gate_shadow_health.py --per-gate/--selfcheck",
-      "verify": "PASS this run (36 gates, covers=True) — ship healthy"
+      "run": 229,
+      "change": "combo_weights sync bb-squeeze+ 1.1->1.3 / warrior-sr-confirm+ 1.04->1.6 + PINNED_COMBO_WEIGHTS in self_learner",
+      "verify": "HELD — combo_weights.json reads 1.3/1.6, PINNED_COMBO_WEIGHTS present in self_learner.py. Post-pin closed fills: bb-squeeze+ 2T -0.08, warrior 0T (n=2, INSUFFICIENT — bar due 11-10, next-100 share >=25%)."
+    },
+    {
+      "run": 229,
+      "change": "harvest-ship-2026-11-04 dispositioned KEEP ALL 4",
+      "verify": "No action needed; HML/jup goal-metrics rows still pre-ship-lagged, re-read 11-11."
+    },
+    {
+      "run": 229,
+      "change": "gate_shadow_health per_gate() + --per-gate + --selfcheck",
+      "verify": "PASS — 'selfcheck PASS — 34 gates, 8 flagged, covers=True' 2026-11-06 20:45Z."
     },
     {
       "run": 228,
-      "change": "jup-yolo-regime-review CLOSED NO CHANGE",
-      "verify": "held — no regime gate added, jup SHORT HIGH cell still +0.40/15T in flight"
-    },
-    {
-      "run": 228,
-      "change": "linreg-fade fill funnel bar registered (11-13)",
-      "verify": "in queue; 27 confluence blocks predate bypass, 0 on 11-06 — bypass still working"
+      "change": "linreg-fade STANDALONE_BYPASS live",
+      "verify": "Funnel still dry: linreg-fade-fill-funnel due 11-13, 0 PG fills as of #228 read. No new data this run."
     },
     {
       "run": 227,
-      "change": "amplify-bbsqueeze-chop-exempt caveat removed",
-      "verify": "still open, deadline 11-13"
+      "change": "jup ATRSL parity fix (compute_atr_sl/tp delegate to norm)",
+      "verify": "APPEARS TO BE WORKING — jup_yolo pre-fix (open<11-03) 96T 59.4% -1.08 vs post-fix 37T 67.6% +0.23. 3d window, regime confound possible; not a claim of causation."
     }
   ],
-  "amplify_weekly": {
-    "new_proposal": "amplify-bbsqueeze-warrior-uninert (kind=amplify, deadline 11-10, bar: next-100 share >=25% + bb NORMAL 7d net >=0 + pin held)",
-    "flip_kpi": "0 shadow->live conversions this week; in-flight candidates: watch-contrarian (11-10), fade-ctx-exempt (11-10), winner-cell-125 (11-10), linreg-fade fill bar (11-13), bear-single-source (11-10)",
-    "why_not_more": "all 4 n>=8 net>0.30 30d cells (pc+ EXTREME, bb-squeeze NORMAL, vb- HIGH, jup SHORT HIGH) already in-flight/validated — no duplicate proposals; n>=5 early cells n too small or sign-flipping (r2v2-long3 NORMAL 6T, 7d EXTREME leg negative)"
+  "signal_quality_deep_dive": {
+    "kill_candidates": "NONE. 14d n>=15 sub-50% WR with net<0: zero rows. Closest: pump-chain- LONG 29T 41.4% but net +0.24 (positive); jup LONG 100T 61.0% -1.08 and volume-buildup- SHORT 51T 62.7% -0.59 both have WR>50 (asymmetric-exit class, not kill class).",
+    "losers_24h": "7 losers, all LONG except SOL/BTC shorts. Entry-condition check: RUNE r2v2-long3 LONG at RSI=75.0 exactly at SIGNAL_FILTER_RSI_MAX boundary (blocks only >75) in EXTREME — chasing; BANANA pump-chain- LONG at RSI=12 (bottom-catch doctrine, lost -0.07 tiny). n=7 = below the n>=20 bar; NO filter proposed (RSI-bucket steering already rejected #128 as sign-flipping).",
+    "chop_vs_trend": "52/56 class pattern still holds: 7d HML 37T 0% + ATR-SL 38T 0% = 75 chop exits -8.78; TRAIL+mfe+ugb 138T 85% +7.08. Arm-rate is the discriminator, not signal identity."
   },
-  "signal_quality_targets": "0 signals meet n>=20 + WR<50 + net<0 at 14d this run — no new kill/filter targets. Entry-filter negative result from #228 stands (pre-registered, do not re-propose).",
+  "amplify_weekly": {
+    "emitted": "amplify-bbsqueeze-neutral-exempt (kind=amplify, due 2026-11-14) — see shadow_disposition.json",
+    "winner_cells_30d_n>=10": [
+      "pump-chain+ EXTREME LONG 73T +1.44",
+      "bb-squeeze+ NORMAL LONG 44T +0.76",
+      "volume-buildup- HIGH SHORT 19T +0.42",
+      "jup_yolo_mirrored HIGH SHORT 15T +0.40",
+      "pump-chain-,pump-chain-v6- EXTREME SHORT 10T +0.30 (EARLY, WR 30%)",
+      "pump-chain- NORMAL LONG 29T +0.24 (born 2026-10-31, daily sign-flip +0.43/-0.31/+0.04/-0.06/+0.14 — REJECTED as amplify target)"
+    ],
+    "why_not_more": "4 of 6 n>=10 cells already have in-flight proposals (pc+ weight review, bb-squeeze chop-exempt+uninert, vb- clone-hunt, jup SHORT HIGH cell). pc- NORMAL LONG rejected: 6-day cell, daily sign flips, thin +0.24. pc-,pc-v6- EXTREME SHORT n=10 WR 30% = fat-tail noise.",
+    "flip_kpi": "0 shadow->live conversions this week. Reasons: (1) amplify-winner-cell-mult-150 threshold MET 11-04 but AWAITING CEO label + T sign-off (money-sizing, #208 precedent — auditor cannot apply alone); (2) fade-ctx-exempt bar FAIL on fee-net (n=33 PASS, NET -0.37 < +1.00); (3) storm-confl-waiver needs 3 consecutive storm packets, 0 emitted; (4) jup/vb TAT shadow still collecting (no OOS yet)."
+  },
+  "losing_trade_autopsy_48h": {
+    "method": "brain/analysis/recovery_replay.py adverse-first anchor, --selfcheck PASS ('open-anchored recovery is vacuous; use adverse-first anchor')",
+    "n": 9,
+    "never_adverse": 3,
+    "recovered_after_adverse": 6,
+    "never_traded_back": 0,
+    "verdict": "WRONG-SIDE REFUTED 86th consecutive run. Valid refs: #61 opposite-side-signal test (losers 15.4% vs winners 6.9%, p=0.116) and #84 forward-return census (fwd_4h mean -0.012%, t=-0.04).",
+    "winning_side_note": "0/9 never-recovered this window (vs 17.5% structural never-recover on the 14d calibration) — n=9 too small to update the structural estimate."
+  },
+  "config_check": {
+    "hermes_constants_git_diff": "EMPTY at 20:45Z when checked; a PARALLEL SESSION shipped atr_trend_accel at 21:00-21:01Z during this run — see side_finds[1]. NOT mine, not touched.",
+    "ceo_protected_flags": "13/13 intact",
+    "size_reduce_file": "ABSENT = 1.0x",
+    "session_lock": "ABSENT",
+    "pipeline_tracebacks": "0 in logs/pipeline.log",
+    "config_changes_this_run": 0,
+    "comment_only_changes": 1
+  },
   "next_actions": [
-    "11-07 00:00Z: three dispositions now CLOSED early by this run (harvest KEEP / volmom KILL / fill-cap KEEP) — no silent-default risk",
-    "11-07: harvest full goal_metrics re-run (verifier still 5/7 FAIL — jup share + HML window will move as pre-ship rows age out)",
-    "11-09: signal-zombie-purge decision",
-    "11-10: four bars (rsi-ceiling-75, bear-single-source, watch-contrarian, fade-ctx, winner-cell-125) + amplify-bbsqueeze-warrior-uninert read",
-    "11-11: HML post-ship re-read (pre-ship rows age out of 7d window)",
-    "11-13: linreg-fade fill bar + bbsqueeze-chop-exempt + vb- clonehunt + pc+ kill-review",
-    "11-14: stop-tighten enforce eval + atrtrail-clip + jup-short-walk",
-    "NEXT RUN: verify combo pin held after self_learner 06:00 run (combo_weights.json still 1.3/1.6); check bb+warrior share moving; LOSERS/BLUR uncommitted diff owner"
+    "11-09 signal-zombie-purge DECIDE (default NO CHANGE)",
+    "11-10 five bars + gate-shadow-dedup-convention + amplify-bbsqueeze-warrior-uninert next-100 share read + fade-ctx-exempt fee-net re-measure",
+    "11-11 watch-contrarian-live deadline + HML post-ship re-read (goal_metrics)",
+    "11-13 linreg-fade fill bar + amplify-bbsqueeze-chop-exempt + vb-high-short-clonehunt + pc+ weight-kill-review",
+    "11-14 amplify-bbsqueeze-neutral-exempt read (NEW) + mult-150 CEO label chase + atrtrail-clip-12 + stop-tighten",
+    "11-15 floor_admit 30d same-sign bar",
+    "CEO: mult-150 label still pending since 11-04; 34 combo-weight divergences need precedence review; LOSERS/BLUR uncommitted diff (not mine)"
+  ],
+  "side_finds": [
+    {
+      "severity": "MEDIUM",
+      "find": "Shadow-log pseudo-replication is systemic in position_manager: 8 in-memory dedup sets reset every subprocess. Measured: HML-SHADOW 29,987 lines, ATRSL 9,244, MFE-CUT 8,548/65 trades (131x), TAT 6,437/29 trades (222x).",
+      "fix": "Warnings added to the 2 undocumented blocks (comment-only). Structural fix = persist sets to one JSON file like profit_monster._load_trail_state; queued, not shipped (live file, zero trading impact, needs subagent+bug_hunter).",
+      "impact_if_ignored": "Any OOS that counts lines instead of trade_ids will inherit the same 7-10x..222x inflation that gate-shadow-dedup-convention was written to prevent."
+    },
+    {
+      "severity": "INFO (parallel-session ship observed mid-run, not mine)",
+      "find": "Between 21:00-21:01Z a parallel session shipped a brand-new signal atr_trend_accel: scripts/signals/atr_trend_accel.py (untracked) + hermes_constants.py (ATR_TREND_ACCEL_* block, ATR_TREND_ACCEL_ENABLED=True, PLUS/MINUS True, 4 new STANDALONE_BYPASS entries 'atr-trend'/'atr-trend+'/'atr-trend-'/'atr_trend_accel_long'/'atr_trend_accel_short') + signals/__init__.py registry row + signal_compactor.py + signal_schema.py + volatility_gate.py + volatility_gate_v2.py. Comment says 'LIVE = shadow data collection; do NOT size from the backtest — requires >=30 forward days with day-blocked CI excluding 0 before any sizing'. Verified by this run: py_compile PASS on all touched files, CEO_PROTECTED_FLAGS 13/13, LIVE_TRADING_ENABLED True (untouched), registry row present.",
+      "fix": "None by me. Flagged so the auditor trail carries a live signal enable made outside this run (same class as #192's auto_1hr weight-change note). Owner: the shipping session / CEO. Standing question for the next run: does atr_trend_accel have a shadow_disposition entry with threshold+deadline+default_action (the SHADOW-RECKONING rule), and is it in the zombie-purge/registry sweep?",
+      "impact_if_ignored": "A live signal with no registered disposition bar can drift unmeasured; also 4 new STANDALONE_BYPASS members bypass the compactor (known-unsafe class historically — bb-bounce-v3/vb- were removed for exactly this)."
+    }
   ]
 }
