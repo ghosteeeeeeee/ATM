@@ -202,8 +202,12 @@ def outcomes(i, direction, closes, ts, idx_map, horizon_max=1440):
     for h in HORIZONS:
         target = t0 + h * 60
         j = idx_map.get(target)
-        if j is None:  # gap: nearest within 90s
-            j = idx_map.get(target + 60) or idx_map.get(target - 60)
+        if j is None:  # gap: nearest bar within ±60s, must be AFTER entry bar
+            for off in (60, -60):
+                jj = idx_map.get(target + off)
+                if jj is not None and jj > i:
+                    j = jj
+                    break
         if j is None:
             continue
         pct = (closes[j] / p0 - 1.0) * 100.0
@@ -357,7 +361,7 @@ def print_report(res, threshold):
     print(f"  event ATR range: {min(e['atr'] for e in ev):.1f} - {max(e['atr'] for e in ev):.1f} USD")
     print(f"  LONG events: {sum(1 for e in ev if e['dir']==1)}   SHORT events: {sum(1 for e in ev if e['dir']==-1)}")
 
-    hdr = f"{'horizon':>8} | {'EV dir% mean':>13} {'med':>7} {'CI95':>16} {'WR>0%':>7} {'p2s':>8} | {'BASE dir% mean':>14} {'WR>0%':>7} | {'EV |move|%':>11} {'BASE |move|%':>13}"
+    hdr = f"{'horizon(n)':>12} | {'EV dir% mean':>13} {'med':>7} {'CI95':>16} {'WR>0%':>7} {'p2s':>8} | {'BASE dir% mean':>14} {'WR>0%':>7} | {'EV |move|%':>11} {'BASE |move|%':>13}"
     print(hdr)
     print('-' * len(hdr))
     for hz in HORIZONS:
@@ -370,12 +374,12 @@ def print_report(res, threshold):
         k = sum(1 for x in e if x > 0)
         n_e = len(e)
         p_up = binom_p_ge(k, n_e)            # P(X >= k)
-        p_dn = binom_p_ge(n_e - k + 1, n_e)  # P(X <= k)
+        p_dn = binom_p_ge(n_e - k, n_e)      # P(X <= k), by symmetry of p=0.5
         p_two = min(1.0, 2 * min(p_up, p_dn))  # two-sided vs 50/50
         ci = bootstrap_ci(e)
         wr = pct(k / n_e)
         wr_b = pct(sum(1 for x in b if x > 0) / len(b)) if b else float('nan')
-        print(f"{hz:>6}m | {mean(e):>13.3f} {median(e):>7.3f} [{ci[0]:>6.3f},{ci[1]:>6.3f}] "
+        print(f"{hz:>5}m n={n_e:<4} | {mean(e):>13.3f} {median(e):>7.3f} [{ci[0]:>6.3f},{ci[1]:>6.3f}] "
               f"{wr:>6.1f} {p_two:>8.2e} | {mean(b):>14.3f} {wr_b:>6.1f} | "
               f"{mean(ea):>11.3f} {mean(ba):>13.3f}")
 
@@ -881,6 +885,543 @@ def fresh_expansion(token, threshold):
               f'CI95=[{ci[0]:+.3f},{ci[1]:+.3f}] | 3% dir/wrong={t3h}/{t3w}')
 
 
+def _load_htf(token, table, interval_s):
+    """Completed higher-timeframe bars (ts, open, high, low, close)."""
+    conn = None
+    try:
+        conn = sqlite3.connect(DB, timeout=10)
+        rows = conn.execute(
+            f"SELECT ts, open, high, low, close FROM {table} "
+            f"WHERE token = ? ORDER BY ts ASC", (token.upper(),)
+        ).fetchall()
+        return rows, interval_s
+    finally:
+        if conn:
+            conn.close()
+
+
+def _last_completed_idx(hts, interval_s, t):
+    """Index of last bar fully completed before time t (bar_ts + interval <= t)."""
+    import bisect
+    # bars with ts <= t - interval are completed
+    k = bisect.bisect_right(hts, t - interval_s) - 1
+    return k
+
+
+def htf_trend_study(token, threshold, interval='1h', threshold_pct=None):
+    """CEO hypothesis (2026-11-06): direction comes from the ESTABLISHED
+    higher-timeframe trend; the ATR spike only ACCELERATES that move.
+
+    Direction rules from completed 1h/4h bars only (no lookahead), compared
+    against the 1m-oscillator direction that already failed."""
+    print('\n' + '=' * 78)
+    print(f'HTF-ESTABLISHED-TREND STUDY ({token}, T={threshold}, trend TF={interval})')
+
+    rows = load_candles(token)
+    ts = [r[0] for r in rows]
+    hh = [r[2] for r in rows]
+    ll = [r[3] for r in rows]
+    cc = [r[4] for r in rows]
+    idx_map = build_ts_index(ts)
+    atr = _calc_atr(hh, ll, cc, 14)
+    m1 = tv_macd_hist(cc)
+    r1 = tv_rsi(cc)
+    thr_used = threshold
+    if threshold_pct is not None:
+        atr = [(a / cc[i] * 100.0) if a is not None else None
+               for i, a in enumerate(atr)]
+        thr_used = threshold_pct
+
+    hrows, iv = _load_htf(token, f'candles_{interval}',
+                          {'5m': 300, '15m': 900, '1h': 3600, '4h': 14400}[interval])
+    hts = [r[0] for r in hrows]
+    hc = [r[4] for r in hrows]
+    if len(hc) < 60:
+        print(f'  only {len(hc)} {interval} bars — skip')
+        return
+    # precompute indicators over full HTF series (each index uses only past bars)
+    e20 = ema(hc, 20)
+    e50 = ema(hc, 50)
+    mh = tv_macd_hist(hc)
+
+    def htf_dir(t):
+        """Established trend direction at time t: +1/-1/0 from completed bars."""
+        k = _last_completed_idx(hts, iv, t)
+        if k < 50:
+            return 0
+        if e20[k] is None or e50[k] is None:
+            return 0
+        return 1 if e20[k] > e50[k] else -1
+
+    def htf_dir_macd(t):
+        k = _last_completed_idx(hts, iv, t)
+        if k < 30 or mh[k] is None:
+            return 0
+        return 1 if mh[k] > 0 else (-1 if mh[k] < 0 else 0)
+
+    slope_n = max(6, int(3600 / iv))  # ~1 hour of trend slope
+
+    def htf_dir_slope(t):
+        k = _last_completed_idx(hts, iv, t)
+        if k < slope_n:
+            return 0
+        r = (hc[k] / hc[k - slope_n] - 1.0) * 100.0
+        return 1 if r > 0 else (-1 if r < 0 else 0)
+
+    # 4h trend rule (always from candles_4h)
+    h4, _ = _load_htf(token, 'candles_4h', 14400)
+    h4ts = [r[0] for r in h4]
+    h4c = [r[4] for r in h4]
+    e20_4 = ema(h4c, 20)
+    e50_4 = ema(h4c, 50)
+
+    def htf4_dir(t):
+        k = _last_completed_idx(h4ts, 14400, t)
+        if k < 50 or e20_4[k] is None or e50_4[k] is None:
+            return 0
+        return 1 if e20_4[k] > e50_4[k] else -1
+
+    evs = [i for i in find_events(atr, ts, thr_used, hysteresis=0.9)
+           if i < len(ts) - 15]
+    base = [i for i in range(0, len(ts), 60) if i < len(ts) - 15]
+
+    rules = [
+        (f'ema_{interval}', htf_dir),
+        (f'macd_{interval}', htf_dir_macd),
+        (f'slope{slope_n}_{interval}', htf_dir_slope),
+    ]
+    if interval != '4h':
+        rules.append(('ema_4h', htf4_dir))
+        rules.append((f'{interval}+4h agree',
+                      lambda t: (lambda a, b: a if a == b else 0)(htf_dir(t), htf4_dir(t))))
+
+    HZ = [15, 30, 60, 120, 240, 480, 1440]
+    print(f"{'rule':>26} {'n':>4} | {'15m WR':>7} {'1h dir%':>8} {'1h WR':>7} | "
+          f"{'4h dir%':>8} {'4h WR':>7} {'4h CI95':>18} | {'24h WR':>7} | "
+          f"{'with-trend 1h':>13} {'counter 1h':>11}")
+
+    for rname, fn in rules:
+        ev_vals = {h: [] for h in HZ}
+        base_vals = {h: [] for h in HZ}
+        with_t, counter_t = [], []
+        n_ev = n_base = 0
+        for i in evs:
+            d = fn(ts[i])
+            if d == 0:
+                continue
+            fwd, _, _, _, _ = outcomes(i, d, cc, ts, idx_map)
+            n_ev += 1
+            for h in HZ:
+                if h in fwd:
+                    ev_vals[h].append(fwd[h])
+            # with-trend vs counter-trend split by 1m momentum at spike
+            m, r = direction_at(i, m1, r1)
+            if m == d:
+                if 60 in fwd:
+                    with_t.append(fwd[60])
+            elif m == -d:
+                if 60 in fwd:
+                    counter_t.append(fwd[60])
+        for i in base:
+            d = fn(ts[i])
+            if d == 0:
+                continue
+            fwd, _, _, _, _ = outcomes(i, d, cc, ts, idx_map)
+            n_base += 1
+            for h in HZ:
+                if h in fwd:
+                    base_vals[h].append(fwd[h])
+        if n_ev < 5:
+            print(f'{rname:>26} {n_ev:>4}  too few')
+            continue
+        def wr(v):
+            return pct(sum(1 for x in v if x > 0) / len(v)) if v else float('nan')
+        def mn(v):
+            return mean(v) if v else 0.0
+        ci240 = bootstrap_ci(ev_vals[240], rounds=2000) if ev_vals[240] else (0, 0)
+        wt = mean(with_t) if with_t else 0.0
+        ct = mean(counter_t) if counter_t else 0.0
+        print(f'{rname:>26} {n_ev:>4} | {wr(ev_vals[15]):>7.1f} {mn(ev_vals[60]):>8.3f} '
+              f'{wr(ev_vals[60]):>7.1f} | {mn(ev_vals[240]):>8.3f} {wr(ev_vals[240]):>7.1f} '
+              f'[{ci240[0]:>7.3f},{ci240[1]:>7.3f}] | {wr(ev_vals[1440]):>7.1f} | '
+              f'{wt:>13.3f} {ct:>11.3f}  (n {len(with_t)}/{len(counter_t)})')
+
+    # Strict CEO rule: established 1h trend AND 1m spike momentum AGREE
+    print(f'\n  STRICT (CEO) rule: {interval} established trend AND 1m MACD/RSI at spike agree:')
+    for hz in HZ:
+        ev_v, base_v = [], []
+        n = 0
+        for i in evs:
+            d = htf_dir(ts[i])
+            m, r = direction_at(i, m1, r1)
+            if d == 0 or m == 0 or m != d or r != d:
+                continue
+            fwd, _, _, _, _ = outcomes(i, d, cc, ts, idx_map)
+            n += 1
+            if hz in fwd:
+                ev_v.append(fwd[hz])
+        for i in base:
+            d = htf_dir(ts[i])
+            m, r = direction_at(i, m1, r1)
+            if d == 0 or m == 0 or m != d or r != d:
+                continue
+            fwd, _, _, _, _ = outcomes(i, d, cc, ts, idx_map)
+            if hz in fwd:
+                base_v.append(fwd[hz])
+        if not ev_v:
+            continue
+        k = sum(1 for x in ev_v if x > 0)
+        ci = bootstrap_ci(ev_v, rounds=2000)
+        bwr = pct(sum(1 for x in base_v if x > 0) / len(base_v)) if base_v else float('nan')
+        print(f'    {hz:>5}m n={len(ev_v):>3} dir% mean={mean(ev_v):+7.3f} WR={pct(k/len(ev_v)):5.1f}% '
+              f'CI=[{ci[0]:+6.3f},{ci[1]:+6.3f}] | base n={len(base_v):>4} WR={bwr:5.1f}%')
+
+
+def _trend_rule_builders(token, interval):
+    """Direction rule callables from COMPLETED bars of `interval` candles.
+    Returns (rules, htf_dir) where rules = [(name, fn(t)->+1/-1/0), ...]."""
+    iv = {'5m': 300, '15m': 900, '1h': 3600, '4h': 14400}[interval]
+    hrows, _ = _load_htf(token, f'candles_{interval}', iv)
+    hts = [r[0] for r in hrows]
+    hc = [r[4] for r in hrows]
+    if len(hc) < 60:
+        return None, None
+    e20 = ema(hc, 20)
+    e50 = ema(hc, 50)
+    mh = tv_macd_hist(hc)
+    slope_n = max(6, int(3600 / iv))
+
+    def htf_dir(t):
+        k = _last_completed_idx(hts, iv, t)
+        if k < 50 or e20[k] is None or e50[k] is None:
+            return 0
+        return 1 if e20[k] > e50[k] else -1
+
+    def macd_dir(t):
+        k = _last_completed_idx(hts, iv, t)
+        if k < 30 or mh[k] is None:
+            return 0
+        return 1 if mh[k] > 0 else (-1 if mh[k] < 0 else 0)
+
+    def slope_dir(t):
+        k = _last_completed_idx(hts, iv, t)
+        if k < slope_n:
+            return 0
+        r = (hc[k] / hc[k - slope_n] - 1.0) * 100.0
+        return 1 if r > 0 else (-1 if r < 0 else 0)
+
+    # 4h context rule
+    h4, _ = _load_htf(token, 'candles_4h', 14400)
+    h4ts = [r[0] for r in h4]
+    h4c = [r[4] for r in h4]
+    e20_4 = ema(h4c, 20)
+    e50_4 = ema(h4c, 50)
+
+    def dir4(t):
+        k = _last_completed_idx(h4ts, 14400, t)
+        if k < 50 or e20_4[k] is None or e50_4[k] is None:
+            return 0
+        return 1 if e20_4[k] > e50_4[k] else -1
+
+    rules = [
+        (f'ema_{interval}', htf_dir),
+        (f'macd_{interval}', macd_dir),
+        (f'slope{slope_n}_{interval}', slope_dir),
+    ]
+    if interval != '4h':
+        rules.append(('ema_4h', dir4))
+        rules.append((f'{interval}+4h agree',
+                      lambda t: (lambda a, b: a if a == b else 0)(htf_dir(t), dir4(t))))
+    return rules, htf_dir
+
+
+CONTINUUM_DB = None  # set lazily from paths
+
+
+def _continuum_rules(token):
+    """Continuum-score direction rules (CEO 2026-11-06: <50 short, >50 long).
+    Returns ([(name, fn), ...] or None, score_fn). History from continuum.db."""
+    global CONTINUUM_DB
+    try:
+        from paths import HERMES_DATA as _HD
+        if CONTINUUM_DB is None:
+            CONTINUUM_DB = os.path.join(_HD, 'continuum.db')
+        if not os.path.exists(CONTINUUM_DB):
+            return None, None
+        conn = None
+        try:
+            conn = sqlite3.connect(CONTINUUM_DB, timeout=10)
+            rows = conn.execute(
+                "SELECT ts, state_score FROM continuum_states "
+                "WHERE token = ? AND state_score IS NOT NULL ORDER BY ts ASC",
+                (token.upper(),)).fetchall()
+        finally:
+            if conn:
+                conn.close()
+        if len(rows) < 1000:
+            return None, None
+        import bisect
+        cts = [r[0] for r in rows]
+        cs = [r[1] for r in rows]
+
+        def score_at(t):
+            k = bisect.bisect_right(cts, t) - 1
+            return cs[k] if k >= 0 else None
+
+        def cont50(t):
+            s = score_at(t)
+            if s is None:
+                return 0
+            return 1 if s >= 50 else -1
+
+        def cont55(t):
+            s = score_at(t)
+            if s is None:
+                return 0
+            if s >= 55:
+                return 1
+            if s <= 45:
+                return -1
+            return 0
+
+        return [('cont_50', cont50), ('cont_55', cont55)], score_at
+    except Exception:
+        return None, None
+
+
+def continuum_study(token='BTC', threshold=60.0):
+    """CEO add-on: continuum score as direction (<50 short, >50 long) for the
+    ATR↑60 event study. Full horizons, event vs random vs ATR-state baselines."""
+    print('\n' + '=' * 78)
+    print(f'CONTINUUM DIRECTION STUDY ({token}, T={threshold})')
+    rows = load_candles(token)
+    ts = [r[0] for r in rows]
+    hh = [r[2] for r in rows]
+    ll = [r[3] for r in rows]
+    cc = [r[4] for r in rows]
+    idx_map = build_ts_index(ts)
+    atr = _calc_atr(hh, ll, cc, 14)
+    m1 = tv_macd_hist(cc)
+    r1 = tv_rsi(cc)
+    cont_rules, score_at = _continuum_rules(token)
+    if not cont_rules:
+        print('  no continuum history for token — skip')
+        return
+    cont50 = dict(cont_rules)['cont_50']
+
+    # 1h EMA trend for combos
+    hrows, iv = _load_htf(token, 'candles_1h', 3600)
+    hts = [r[0] for r in hrows]
+    hc = [r[4] for r in hrows]
+    e20 = ema(hc, 20)
+    e50 = ema(hc, 50)
+
+    def ema1h(t):
+        k = _last_completed_idx(hts, iv, t)
+        if k < 50 or e20[k] is None or e50[k] is None:
+            return 0
+        return 1 if e20[k] > e50[k] else -1
+
+    evs = [i for i in find_events(atr, ts, threshold, hysteresis=0.9)
+           if i < len(ts) - 15]
+    ev_set = set(evs)
+    base_idx = [i for i in range(0, len(ts), 60) if i < len(ts) - 15]
+    state_idx = []
+    last_s = -10**18
+    for i in range(len(ts) - 15):
+        if (atr[i] is not None and atr[i] >= threshold
+                and i not in ev_set and ts[i] - last_s >= 3600):
+            state_idx.append(i)
+
+    rules = [
+        ('cont_50', cont50),
+        ('cont_55', dict(cont_rules)['cont_55']),
+        ('cont55+1m agree', dict(cont_rules)['cont_55']),  # +1m macd/rsi agree
+        ('cont55+1h agree',
+         lambda t: (lambda a, b: a if a == b else 0)(
+             dict(cont_rules)['cont_55'](t), ema1h(t))),
+    ]
+    HZ = [15, 30, 60, 120, 240, 480, 1440]
+
+    def collect(idx_list, rule_fn, need_1m=False):
+        out = {h: [] for h in HZ}
+        for i in idx_list:
+            d = rule_fn(ts[i])
+            if need_1m:
+                m, r = direction_at(i, m1, r1)
+                if d == 0 or m == 0 or m != d or r != d:
+                    continue
+            if d == 0:
+                continue
+            fwd, _, _, _, _ = outcomes(i, d, cc, ts, idx_map)
+            for h in HZ:
+                if h in fwd:
+                    out[h].append(fwd[h])
+        return out
+
+    rng = random.Random(77)
+
+    def diff_ci(a, b, seed):
+        r = random.Random(seed)
+        rounds = 2000
+        ds = []
+        for _ in range(rounds):
+            sa = sum(a[r.randrange(len(a))] for _ in range(len(a))) / len(a) if a else 0
+            sb = sum(b[r.randrange(len(b))] for _ in range(len(b))) / len(b) if b else 0
+            ds.append(sa - sb)
+        ds.sort()
+        return ds[int(rounds * 0.025)], ds[int(rounds * 0.975)]
+
+    print(f"{'rule':>16} {'hz':>5} {'n':>4} {'ev mean':>8} {'ev WR':>7} | "
+          f"{'state mean':>10} {'rand mean':>9} | {'ev-state':>9} {'CI95':>18}")
+    for rname, rfn in rules:
+        need_1m = rname.endswith('1m agree')
+        for h in HZ:
+            e = collect(evs, rfn, need_1m).get(h, [])
+            if len(e) < 20:
+                continue
+            s = collect(state_idx, rfn, need_1m).get(h, [])
+            b = collect(base_idx, rfn, need_1m).get(h, [])
+            k = sum(1 for x in e if x > 0)
+            lo, hi = diff_ci(e, s, 77) if s else (0, 0)
+            d = (mean(e) - mean(s)) if s else 0.0
+            print(f'{rname:>16} {h:>5} {len(e):>4} {mean(e):>+8.3f} '
+                  f'{pct(k / len(e)):>6.1f}% | {mean(s) if s else 0:>+10.3f} '
+                  f'{mean(b) if b else 0:>+9.3f} | {d:>+9.3f} '
+                  f'[{lo:>+7.3f},{hi:>+7.3f}]')
+
+
+def pooled_ceo(interval, threshold_pct, coins, half=None):
+    """CEO hypothesis pooled across coins: established `interval` trend direction
+    after an ATR-expansion spike. Pooled event bootstrap + per-coin sign test.
+    half: None | 'first' | 'second' (OOS time split, each coin's own midpoint)."""
+    print('\n' + '=' * 78)
+    print(f'POOLED CEO STUDY (trend TF={interval}, ATR% cross {threshold_pct}%, '
+          f'{len(coins)} coins, half={half})')
+    HZ = [60, 240, 1440]
+    store = {}   # (rule, hz) -> values ; (rule, coin, hz) -> values
+    coin_means = {}  # (rule, coin, hz) -> mean
+    for ck in coins:
+        rows = load_candles(ck)
+        if len(rows) < 1000:
+            continue
+        ts = [r[0] for r in rows]
+        hh = [r[2] for r in rows]
+        ll = [r[3] for r in rows]
+        cc = [r[4] for r in rows]
+        idx_map = build_ts_index(ts)
+        atr = _calc_atr(hh, ll, cc, 14)
+        ap = [(a / cc[i] * 100.0) if a is not None else None for i, a in enumerate(atr)]
+        m1 = tv_macd_hist(cc)
+        r1 = tv_rsi(cc)
+        built, htf_dir = _trend_rule_builders(ck, interval)
+        if built is None:
+            continue
+        evs = [i for i in find_events(ap, ts, threshold_pct, hysteresis=0.9)
+               if i < len(ts) - 15]
+        base_idx = [i for i in range(0, len(ts), 60) if i < len(ts) - 15]
+        if half in ('first', 'second'):
+            mid_t = (ts[0] + ts[-1]) / 2.0
+            def _in_half(i, _m=mid_t):
+                return (ts[i] < _m) if half == 'first' else (ts[i] >= _m)
+            evs = [i for i in evs if _in_half(i)]
+            base_idx = [i for i in base_idx if _in_half(i)]
+        # continuum-score direction rules (BTC history in continuum.db)
+        cont_rules, _ = _continuum_rules(ck)
+        if cont_rules:
+            built = list(built) + cont_rules
+
+        def _collect(idx_list, tag_suffix=''):
+            for rname, fn in built:
+                for i in idx_list:
+                    d = fn(ts[i])
+                    if d == 0:
+                        continue
+                    fwd, _, _, _, _ = outcomes(i, d, cc, ts, idx_map)
+                    for hz in HZ:
+                        if hz in fwd:
+                            store.setdefault((rname + tag_suffix, hz), []).append(fwd[hz])
+                            coin_means.setdefault((rname + tag_suffix, ck, hz), []).append(fwd[hz])
+            # STRICT: established trend AND 1m MACD/RSI at spike agree
+            for i in idx_list:
+                d = htf_dir(ts[i])
+                m, r = direction_at(i, m1, r1)
+                if d == 0 or m == 0 or m != d or r != d:
+                    continue
+                fwd, _, _, _, _ = outcomes(i, d, cc, ts, idx_map)
+                for hz in HZ:
+                    if hz in fwd:
+                        store.setdefault(('STRICT' + tag_suffix, hz), []).append(fwd[hz])
+                        coin_means.setdefault(('STRICT' + tag_suffix, ck, hz), []).append(fwd[hz])
+
+        _collect(evs, '')       # events
+        _collect(base_idx, '|base')  # baseline: same rule, random hourly times
+        # ATR-STATE baseline: high-ATR minutes that are NOT crossing (audit control)
+        ev_set = set(evs)
+        mid_t = (ts[0] + ts[-1]) / 2.0
+        state_idx = []
+        last_s = -10**18
+        for i in range(len(ts) - 15):
+            if half in ('first', 'second'):
+                if not ((ts[i] < mid_t) if half == 'first' else (ts[i] >= mid_t)):
+                    continue
+            if (ap[i] is not None and ap[i] >= threshold_pct
+                    and i not in ev_set and ts[i] - last_s >= 3600):
+                state_idx.append(i)
+                last_s = ts[i]
+        _collect(state_idx, '|state')
+
+    from math import comb
+    event_rules = sorted({k[0] for k in store if not k[0].endswith('|base')
+                          and not k[0].endswith('|state')})
+    print(f"{'rule':>18} {'hz':>5} {'n':>5} {'ev mean':>8} {'ev WR':>7} | "
+          f"{'state mean':>10} {'st WR':>7} | {'ev-state diff':>14} {'CI95':>18} | "
+          f"{'ev-rand diff':>13} | {'coins+/−':>9} {'sign-p':>7}")
+    rng2 = random.Random(31)
+    for rname in event_rules:
+        def _diff_ci(a, bb, seed):
+            r = random.Random(seed)
+            rounds = 2000
+            ds = []
+            for _ in range(rounds):
+                sa = sum(a[r.randrange(len(a))] for _ in range(len(a))) / len(a)
+                sb = sum(bb[r.randrange(len(bb))] for _ in range(len(bb))) / len(bb)
+                ds.append(sa - sb)
+            ds.sort()
+            return (mean(a) - mean(bb),
+                    ds[int(rounds * 0.025)], ds[int(rounds * 0.975)])
+
+        for hz in HZ:
+            v = store.get((rname, hz))
+            b = store.get((rname + '|base', hz))
+            s = store.get((rname + '|state', hz))
+            if not v or len(v) < 50 or not b or not s or len(s) < 30:
+                continue
+            d_s, lo_s, hi_s = _diff_ci(v, s, 31)
+            d_r, lo_r, hi_r = _diff_ci(v, b, 32)
+            # per-coin event vs state
+            pos = neg = 0
+            for ck in coins:
+                cm = coin_means.get((rname, ck, hz))
+                cs = coin_means.get((rname + '|state', ck, hz))
+                if not cm or not cs:
+                    continue
+                if mean(cm) > mean(cs):
+                    pos += 1
+                elif mean(cm) < mean(cs):
+                    neg += 1
+            n_c = pos + neg
+            sp = (sum(comb(n_c, i) for i in range(pos, n_c + 1)) / 2**n_c
+                  if n_c else 1.0)
+            k = sum(1 for x in v if x > 0)
+            ks = sum(1 for x in s if x > 0)
+            print(f'{rname:>18} {hz:>5} {len(v):>5} {mean(v):>+8.3f} '
+                  f'{pct(k / len(v)):>6.1f}% | {mean(s):>+10.3f} '
+                  f'{pct(ks / len(s)):>6.1f}% | {d_s:>+14.3f} '
+                  f'[{lo_s:>+7.3f},{hi_s:>+7.3f}] | {d_r:>+13.3f} '
+                  f'[{lo_r:>+6.3f},{hi_r:>+6.3f}] | {pos:>4} / {neg:<4} {sp:>7.3f}')
+
+
 def recent_case_study(token, threshold, days=3):
     """Show every event in the last `days` days: direction + what happened next."""
     print('\n' + '=' * 78)
@@ -921,10 +1462,20 @@ def main():
     ap.add_argument('--movesize', action='store_true')
     ap.add_argument('--entry', action='store_true')
     ap.add_argument('--fresh', action='store_true')
+    ap.add_argument('--ceo', nargs='?', const='1h', default=None,
+                    help='CEO hypothesis study; optional trend TF (5m/15m/1h/4h), default 1h')
+    ap.add_argument('--use-pct', action='store_true',
+                    help='treat threshold as ATR% of price (with --pct) instead of USD')
+    ap.add_argument('--pooled', action='store_true',
+                    help='pooled cross-coin CEO study across trend TFs 5m/15m/1h')
+    ap.add_argument('--half', choices=['first', 'second'], default=None,
+                    help='OOS time split for --pooled (each coin midpoint)')
+    ap.add_argument('--cont', action='store_true',
+                    help='continuum-score direction study (<50 short >50 long)')
     ap.add_argument('--atr-sm', action='store_true',
                     help='use SMA-of-TR ATR instead of Wilder/RMA (definition sensitivity)')
     ap.add_argument('--coins', default='', help='comma list for cross-coin ATR%% study')
-    ap.add_argument('--pct', type=float, default=0.077, help='ATR%% threshold for cross-coin')
+    ap.add_argument('--pct', type=float, default=0.076, help='ATR%% threshold for cross-coin')
     args = ap.parse_args()
     global _ATR_MODE
     if args.atr_sm:
@@ -947,6 +1498,18 @@ def main():
         entry_timing(args.coin, args.threshold)
     if args.fresh:
         fresh_expansion(args.coin, args.threshold)
+    if args.ceo:
+        htf_trend_study(args.coin, args.threshold, interval=args.ceo,
+                        threshold_pct=(args.pct if args.use_pct else None))
+    if args.pooled:
+        default_coins = ['BTC', 'SOL', 'SUI', 'TAO', 'PUMP', 'GALA', 'GMX',
+                         'IMX', 'SAND', 'FOGO', 'COMP', 'DYM']
+        coin_list = ([c.strip() for c in args.coins.split(',') if c.strip()]
+                     if args.coins else default_coins)
+        for tf in ('5m', '15m', '1h'):
+            pooled_ceo(tf, args.pct, coin_list, half=args.half)
+    if args.cont:
+        continuum_study(args.coin, args.threshold)
     if args.coins:
         for c in args.coins.split(','):
             cross_coin(c.strip(), args.pct)
