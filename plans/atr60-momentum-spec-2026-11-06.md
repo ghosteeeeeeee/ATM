@@ -120,14 +120,21 @@ true but trivial: *of course* minutes after a volatility burst have bigger
 ranges. Not a tradable edge by itself.
 
 **Cross-coin replication of C1** (per-coin p85 ATR% threshold, non-overlapping
-1h windows, 12 coins): **all 12 diffs positive** (+0.14% … +0.46% mean |1h
-move| above baseline), **8/12 individually significant**, sign-test
-p(12/12 positive) = 0.0002:
+1h windows, 12 coins): **all 12 diffs positive** (+0.16% … +0.57% mean |1h
+move| above baseline), **12/12 individually significant** on the fresh
+producer run (earlier ad-hoc run: 8/12), sign-test p(12/12) = 0.0002.
+Producer: `python3 scripts/backtest_atr60_momentum.py --c1coins` (added after
+own-conclusions N5 — the original table had no producer script):
 
 | | BTC | SOL | SUI | TAO | PUMP | GALA | GMX | IMX | SAND | FOGO | COMP | DYM |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| diff% | +0.20 | +0.16 | +0.14 | +0.21 | +0.20 | +0.21 | +0.16 | +0.22 | +0.46 | +0.25 | +0.21 | +0.21 |
-| sig | ✅ | ✅ | – | ✅ | – | ✅ | ✅ | ✅ | ✅ | – | – | ✅ |
+| diff% | +0.16 | +0.17 | +0.22 | +0.28 | +0.25 | +0.18 | +0.16 | +0.29 | +0.57 | +0.38 | +0.24 | +0.28 |
+| sig | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+⚠️ **own-conclusions N4:** the headline event sample is conditioned on
+MACD/RSI agreement (agree-events 0.406% vs skipped-crosses 0.248% @1h) — on
+ALL crosses the 1h diff is still +0.143 [CI excludes 0], so the fact stands,
+but part of the headline magnitude is selection.
 
 → The **volatility half of the thesis replicates on other coins** (as you
 guessed for the "trend"); the direction half does not.
@@ -253,7 +260,16 @@ ATR-state-matched control (high-ATR minutes that aren't crossing).
   (+0.455/+0.976 audited, +0.493/+0.961 claimed).
 - Interpretation: the ATR spike is the moment when a *lagging* trend signal is
   freshest — mechanism is coherent, but effective n is ~30 days of correlated
-  crypto; coin-level sign test (p=0.019) is the honest significance.
+  crypto.
+- ⚠️ **own-conclusions N1/N3/N6 (2026-11-06 evening):** the headline coin-sign
+  test **no longer reproduces — fresh runs give 9/3 (p=0.073), not 10/2
+  (p=0.019)** (BTC ev−state = −0.005 tie; rolling-window re-phasing, no code
+  change). Effective independent coins ≈ **3.0** (pairwise corr 0.268 → design
+  effect), so any coin-sign p is nominal. Day sign test 19/30 = p 0.10; the
+  day-block CI only excludes 0 when **paired** ([+0.172,+1.385]; unpaired
+  cluster bootstrap [−0.41,+1.98] ∋ 0). Net: **plausibly real conditional
+  statistic, not a sized edge — shadow-only, ≥30 forward days, day-blocked CI
+  before any size** (auditor #2's recommendation, now better justified).
 
 ### Hypothesis R2b: continuum score (<50 short, >50 long) — ❌ REFUTED on BTC
 
@@ -369,9 +385,9 @@ measure; `atr_trend_accel` remains the strongest candidate.**
 | …volatility replicates on other coins | ✅ confirmed | 12/12 coins positive diff, 8/12 sig, p=0.0002 |
 | …big (≥3%) moves lean momentum direction (BTC, 30d) | ⚠️ 14/18, p=0.015 | **fails cross-coin + multiplicity** |
 | momentum direction (1m MACD/RSI) predicts avg24h direction | ❌ refuted | WR 34–56% everywhere, all CIs include 0 |
-| enter at cross close | ❌ refuted | WR 33% at 15m, p=9.2e-4 (whipsaw against) |
+| enter at cross close | ❌ refuted | WR 33% at 15m, p≈0.001 (fresh 1.05e-3; whipsaw against) |
 | transfers to other coins (1m direction) | ❌ refuted | pooled 51.8% dir on 8 coins |
-| **R2a: established-TF trend direction @24h (after spike)** | ✅ **OOS-confirmed** | ev−state +0.49/+0.96 (15m+4h agree), both halves sig, 10-11/12 coins |
+| **R2a: established-TF trend direction @24h (after spike)** | ✅ **OOS-confirmed (magnitude)** / ⚠️ sign-test unstable | ev−state +0.49/+0.96 both halves sig; coin signs **10/2 p=0.019 → 9/3 p=0.073 fresh** (N1), effective coins ≈3 (N3) |
 | **R2b: continuum score <50/>50 direction** | ❌ refuted (BTC) | BTC 24h WR 34-36%, ev−state null |
 | **R2c: FLIPPED continuum (BTC)** | ⚠️ works, not event-specific | BTC 67.3% WR (72/62.5 OOS) but ev−state −0.16 n.s. — state-level effect |
 | **R2d: per-coin continuum direction** | ❌ does not transfer | alts unflip +0.29 sig 9/3, BTC wants flip 62% — sign inconsistency; measure itself built+validated (ρ=0.96) |
@@ -384,9 +400,10 @@ in the first 15–30 min.
 **Bottom line (round 2):** direction must come from the **established
 higher-TF trend**, and the payoff horizon is **24h, not 1-4h**. The ATR spike
 appears to mark trend *acceleration onset* — same trend rule that LOSES at
-random high-ATR minutes wins at crossing minutes (ev−state > 0, both halves,
-10-11/12 coins). First-hour whipsaw still applies — any implementation must
-survive it.
+random high-ATR minutes wins at crossing minutes (ev−state > 0, both halves;
+magnitude verified three ways, though the coin-sign test is unstable per
+own-conclusions N1/N3). First-hour whipsaw still applies — any implementation
+must survive it.
 
 ## 5c. Independent audit #2 (round 2) — R2a & R2b CONFIRMED, with qualifications
 
@@ -474,6 +491,15 @@ CONFIRMED** (see 5c), with its build recommendation adopted:
 - Audit #2 (round 2): `/root/.hermes/audit/R2_FINAL_REPORT.md` (commit
   45fd5fb4), `audit/r2_verify.py`, `audit/r2_addendum.py` — R2a/R2b
   CONFIRMED ±0.01, no lookahead, day-block qualifications adopted.
+- bug-hunter pass: BUG-082…090 (9 bugs, 8 fixed; `--cont-db recorded|replay`
+  restores exact R2b/R2c reproduction; see §7b).
+- own-conclusions verdict: `/root/.hermes/brain/verdicts/20261106-2030-verdict.md`
+  (commit d3a7a6ff, scripts in `audit/own/`) — spec honest, **no lookahead
+  proven mechanically** (prefix recompute, 12 coins, 0 mismatches); adopted
+  downgrades: N1 coin-signs 10/2→9/3, N2 **replay scores run +6.55 pts hot vs
+  recorded** (27.7% >10 pts off — log this before any replay-based signal goes
+  live), N3 effective coins ≈3, N4 conditioning, N6 day-block pairing, N5
+  `--c1coins` producer added.
 
 ### 7b. bug_hunter re-run spot-check (2026-11-06, BUG-082…089)
 

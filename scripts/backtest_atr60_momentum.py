@@ -1181,6 +1181,9 @@ def _continuum_rules(token, source='replay'):
                     if conn:
                         conn.close()
         if not rows or len(rows) < 1000:
+            if source == 'replay':
+                print(f'  [continuum] note: no replay rows for {token} — '
+                      f'falling back to recorded continuum.db')
             if CONTINUUM_DB is None:
                 CONTINUUM_DB = os.path.join(_HD, 'continuum.db')
             if not os.path.exists(CONTINUUM_DB):
@@ -1190,7 +1193,8 @@ def _continuum_rules(token, source='replay'):
                 conn = sqlite3.connect(CONTINUUM_DB, timeout=10)
                 rows = conn.execute(
                     "SELECT ts, state_score FROM continuum_states "
-                    "WHERE token = ? AND state_score IS NOT NULL ORDER BY ts ASC",
+                    "WHERE token = ? AND timeframe = '1m' "
+                    "AND state_score IS NOT NULL ORDER BY ts ASC",
                     (token.upper(),)).fetchall()
             finally:
                 if conn:
@@ -1226,6 +1230,93 @@ def _continuum_rules(token, source='replay'):
                 ('cont_55_flip', lambda t: -cont55(t))], score_at
     except Exception:
         return None, None
+
+
+def c1_cross_coin(threshold_pct=0.076, coins=None):
+    """Producer for spec §4 cross-coin C1 table (own-conclusions N5).
+    Per-coin p85 ATR% threshold, non-overlapping 1h windows, |1h move|
+    events vs random-hourly baseline, diff + bootstrap CI + sign test."""
+    if coins is None:
+        coins = ['BTC', 'SOL', 'SUI', 'TAO', 'PUMP', 'GALA', 'GMX',
+                 'IMX', 'SAND', 'FOGO', 'COMP', 'DYM']
+    print('\n' + '=' * 78)
+    print(f'C1 CROSS-COIN (|1h move| ev vs baseline, per-coin p85 ATR% '
+          f'or {threshold_pct}% floor, non-overlapping)')
+    rng = random.Random(5)
+
+    def diff_ci(a, b, rounds=3000):
+        ds = []
+        for _ in range(rounds):
+            se = sum(a[rng.randrange(len(a))] for _ in range(len(a))) / len(a)
+            sb = sum(b[rng.randrange(len(b))] for _ in range(len(b))) / len(b)
+            ds.append(se - sb)
+        ds.sort()
+        return (mean(a) - mean(b),
+                ds[int(rounds * 0.025)], ds[int(rounds * 0.975)])
+
+    def thin(items, tss, gap=3600):
+        out, last = [], -10**18
+        for i in items:
+            if tss[i] - last >= gap:
+                out.append(i)
+                last = tss[i]
+        return out
+
+    print(f"{'coin':>6} {'thr%':>7} {'ev_n':>5} {'ev%':>6} {'base_n':>7} "
+          f"{'base%':>6} | {'diff':>7} {'CI95':>18} {'sig':>4}")
+    diffs, sig_n = [], 0
+    for ck in coins:
+        rows = load_candles(ck)
+        if len(rows) < 1000:
+            continue
+        ts = [r[0] for r in rows]
+        hh = [r[2] for r in rows]
+        ll = [r[3] for r in rows]
+        cc = [r[4] for r in rows]
+        idx_map = build_ts_index(ts)
+        atr = _calc_atr(hh, ll, cc, 14)
+        ap = [(a / cc[i] * 100.0) if a is not None else None
+              for i, a in enumerate(atr)]
+        valid = sorted(x for x in ap if x is not None)
+        thr = max(threshold_pct, valid[int(len(valid) * 0.85)])
+        mh = tv_macd_hist(cc)
+        r1 = tv_rsi(cc)
+        evs = thin([i for i in find_events(ap, ts, thr, 0.9)
+                    if i < len(ts) - 15], ts)
+        base = thin([i for i in range(0, len(ts), 60) if i < len(ts) - 15], ts)
+        ev_v, base_v = [], []
+        for i in evs:
+            m, r = direction_at(i, mh, r1)
+            if m == 0 or r == 0 or m != r:
+                continue
+            _, absfwd, _, _, _ = outcomes(i, m, cc, ts, idx_map)
+            if 60 in absfwd:
+                ev_v.append(absfwd[60])
+        for i in base:
+            m, r = direction_at(i, mh, r1)
+            if m == 0 or r == 0 or m != r:
+                continue
+            _, absfwd, _, _, _ = outcomes(i, m, cc, ts, idx_map)
+            if 60 in absfwd:
+                base_v.append(absfwd[60])
+        if len(ev_v) < 10 or len(base_v) < 10:
+            print(f'{ck:>6} {thr:>7.4f}  too few (ev {len(ev_v)}/base {len(base_v)})')
+            continue
+        d, lo, hi = diff_ci(ev_v, base_v)
+        diffs.append(d)
+        s = 'YES' if lo > 0 else 'no'
+        if lo > 0:
+            sig_n += 1
+        print(f'{ck:>6} {thr:>7.4f} {len(ev_v):>5} {mean(ev_v):>6.3f} '
+              f'{len(base_v):>7} {mean(base_v):>6.3f} | {d:>+7.3f} '
+              f'[{lo:>+7.3f},{hi:>+7.3f}] {s:>4}')
+    from math import comb
+    pos = sum(1 for d in diffs if d > 0)
+    n_c = len(diffs)
+    sp = (sum(comb(n_c, i) for i in range(pos, n_c + 1)) / 2**n_c
+          if n_c else 1.0)
+    print(f'significant at 1h: {sig_n}/{n_c} coins; positive diffs '
+          f'{pos}/{n_c} (sign-p={sp:.4f})')
 
 
 def continuum_study(token='BTC', threshold=60.0, flip=False, half=None,
@@ -1546,6 +1637,8 @@ def main():
                     help='FLIPPED continuum direction (mean-revert vs score)')
     ap.add_argument('--tfs', default='5m,15m,1h',
                     help='comma list of trend TFs for --pooled (e.g. 15m only)')
+    ap.add_argument('--c1coins', action='store_true',
+                    help='producer for spec §4 cross-coin C1 |move| table')
     ap.add_argument('--cont-db', choices=['replay', 'recorded'], default='replay',
                     help="continuum score source: replay=continuum_replay.db (default, "
                          "R2d tables) | recorded=production continuum.db (R2b/R2c tables)")
@@ -1599,6 +1692,8 @@ def main():
     if args.cont_flip:
         continuum_study(args.coin, args.threshold, flip=True, half=args.half,
                         cont_db=args.cont_db)
+    if args.c1coins:
+        c1_cross_coin(args.pct)
     if args.coins:
         for c in args.coins.split(','):
             cross_coin(c.strip(), args.pct)
