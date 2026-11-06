@@ -122,10 +122,22 @@ def log(msg):
 
 
 def parse_line(line, tag):
-    """-> dict event or None.  Tolerant of every real format variant."""
+    """-> dict event or None.  Tolerant of every real format variant.
+
+    TS_RE only checks digit SHAPE, so a corrupted line ('2026-13-45 99:99:99')
+    would otherwise sail through and detonate datetime.strptime later in
+    join_events — bug_hunter F1.  Reject it here, where the bad line is seen,
+    and count it as unparsed instead of letting one line kill the whole run
+    before the JSON artifact is written.
+    """
     m_ts = TS_RE.match(line)
     if not m_ts:
         return None
+    try:
+        datetime.strptime(m_ts.group(1), '%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        return {'ts': m_ts.group(1), 'tag': tag, 'token': None, 'direction': None,
+                'parsed': False}
     marker = f'[{tag}]'
     idx = line.find(marker)
     if idx < 0:
@@ -230,18 +242,28 @@ def entry_ts_of(ts):
 
 
 def join_events(events, candle_loader=load_candles):
-    """Attach fwd_4h (or a skip reason) to every event, in place."""
+    """Attach fwd_4h (or a skip reason) to every event, in place.
+
+    Fail-silent PER EVENT (bug_hunter F1): a timestamp the shape-regex accepted
+    but strptime rejects, or a candle read that blows up, degrades to a skip
+    reason — one bad line must never abort the run before the JSON artifact is
+    written, or the 11-10 bar read would fall back to n=0 on a corrupt log line.
+    """
     for ev in events:
         ev['fwd_4h'] = None
         ev['join_reason'] = None
         if not ev['parsed']:
             ev['join_reason'] = 'unparsed'
             continue
-        rows = candle_loader(ev['token'])
-        if not rows:
-            ev['join_reason'] = 'no_candles'
+        try:
+            rows = candle_loader(ev['token'])
+            if not rows:
+                ev['join_reason'] = 'no_candles'
+                continue
+            f = fwd_4h(rows, entry_ts_of(ev['ts']), ev['direction'])
+        except Exception:
+            ev['join_reason'] = 'bad_event'
             continue
-        f = fwd_4h(rows, entry_ts_of(ev['ts']), ev['direction'])
         if f is None:
             ev['join_reason'] = 'horizon_immature'
             continue
@@ -448,6 +470,13 @@ def selfcheck():
     # a line WITHOUT the tag must not parse
     chk(parse_line('2026-11-06 05:41:00   👁️ [SOME-OTHER-TAG] XX SHORT', 'BEAR-SINGLE-SOURCE-SHADOW')
         is None, 'foreign tag line rejected')
+    # bug_hunter F1: digit-SHAPE-valid but not a real date must be rejected at
+    # parse time, not detonate strptime later in join_events.
+    bad_ts = ('2026-13-45 99:99:99   \U0001f441️ [BEAR-SINGLE-SOURCE-SHADOW] CAKE SHORT '
+              'WOULD-PASS — source=rs-r41 conf=88.0 regime_4h=SHORT_BIAS')
+    ev_bad = parse_line(bad_ts, 'BEAR-SINGLE-SOURCE-SHADOW')
+    chk(ev_bad is not None and ev_bad['parsed'] is False,
+        'shape-valid but impossible timestamp -> parsed=False (no crash)')
 
     # 2) TOKEN-DAY DEDUP: same tag|token|direction|day x3 -> 1, earliest kept;
     #    a second UTC day, a second direction and a second tag all survive.
@@ -473,6 +502,16 @@ def selfcheck():
 
     # 3) fwd engine correctness + NO LOOKAHEAD
     base, rows = _synth_rows()
+    # bug_hunter F1, second layer: even a timestamp that slipped past parse_line
+    # must degrade to a skip reason inside join_events, never raise.
+    try:
+        join_events([{'ts': '2026-13-45 99:99:99', 'tag': 'X', 'token': 'CAKE',
+                      'direction': 'SHORT', 'parsed': True, 'day': 'x'}],
+                    candle_loader=lambda t: rows)
+        degraded = True
+    except Exception:
+        degraded = False
+    chk(degraded, 'join_events is fail-silent per event (never raises)')
     i = 10
     f_long = fwd_4h(rows, base + i * 300, 'LONG')
     chk(f_long is not None and abs(f_long + 5.0) < 1e-9,

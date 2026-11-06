@@ -76,6 +76,10 @@ NOTIONAL_WINDOW_DAYS = 30  # trailing window for the live avg-notional $-eq basi
 # report()'s non-overlapping-window dedupe.
 FWD_HORIZON_CANDLES = 48
 FWD_HORIZON_SECS = FWD_HORIZON_CANDLES * 300  # 300s = 5m candle interval
+# Generous upper bound on pipeline.log growth per hour, used ONLY to bound
+# backfill_rr's scan window (bug_hunter F3). The real rate is tens of MB/day,
+# so this never under-scans a requested `hours` window.
+BACKFILL_BYTES_PER_HOUR = 70_000_000
 
 # Block-line patterns seen in pipeline.log (2026-10-04 verified):
 #   🚫 [GATE-NAME] TOKEN DIRECTION blocked — reason
@@ -301,7 +305,19 @@ def backfill_rr(hours=24):
         cur = conn.cursor()
         cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
         n_new = n_dup = 0
+        # Bound the scan (bug_hunter F3): same technique as record()'s first-run
+        # cap — skip the oldest bytes instead of reading the whole file as the
+        # log grows.  70MB/hour is a deliberately generous upper bound (the log
+        # runs tens of MB/day), so a `hours` window is never under-scanned, and
+        # the discarded head is dropped at a line boundary so no line is
+        # half-read.  `continue` (not `break`) on pre-cutoff lines mirrors
+        # record(): cheap, and does not assume the file is perfectly sorted.
+        size = os.path.getsize(PIPELINE_LOG)
+        start = max(0, size - hours * BACKFILL_BYTES_PER_HOUR)
         with open(PIPELINE_LOG, 'r', errors='replace') as f:
+            if start:
+                f.seek(start)
+                f.readline()  # discard the partial line under `start`
             for line in f:
                 if 'RR HARD BLOCKED' not in line:
                     continue
