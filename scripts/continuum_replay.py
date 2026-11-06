@@ -131,12 +131,16 @@ def validate(token='BTC'):
     series = replay(token)
     if not series:
         return
-    conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'))
-    rec = conn.execute(
-        "SELECT ts, state_score FROM continuum_states "
-        "WHERE token=? AND state_score IS NOT NULL", (token.upper(),)
-    ).fetchall()
-    conn.close()
+    conn = None
+    try:
+        conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'))
+        rec = conn.execute(
+            "SELECT ts, state_score FROM continuum_states "
+            "WHERE token=? AND state_score IS NOT NULL", (token.upper(),)
+        ).fetchall()
+    finally:
+        if conn:
+            conn.close()
     if not rec:
         print('no recorded scores to validate against')
         return

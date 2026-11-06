@@ -1,24 +1,20 @@
 {
-  "timestamp": "2026-11-06T16:18:51.279080+00:00",
+  "timestamp": "2026-11-06T18:48:52.184587+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
+    "continuum": "AT",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.0,
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 0,
-  "deep_analysis": "Portfolio is 2/6 (1L1S), net-flat, nothing stale \u2014 but the system is in a measured entry-quality breach and both open trades sit in chop.\n\nCRV LONG (+2.19%, 1h, pump-chain-): thesis intact \u2014 CRV 15m regime LONG_BIAS conf 88.4, +1.95%/16c, price 0.2661. SL 0.26502 is already ABOVE entry 0.26005 = profit locked at +1.91%; TP 0.2703 (+3.94%). Risk: SL sits only ~0.41% under price vs CRV 1h ATR ~1% \u2014 a normal wiggle stops it before TP. Action: HOLD while CRV 1m/5m holds above 0.2650; if 1m closes below 0.2650, accept the ~+1.9% exit \u2014 do not round-trip a winner to breakeven. Trail rule not yet applicable (<5%).\n\nGRASS SHORT (0.1h, volume-buildup-, EXTREME vol at entry): entered 0.48761 at meta_rsi 56.8 (inside 45-65 short band) \u2014 and it IS the right side: the prior GRASS LONG (pump-chain+) lost -3.71% on the dump, so shorting aligns with what actually happened. Aligned with BTC 1m BELOW continuum EMA300 (75670 vs 75878, LEAN_BEAR, below since ~14:34). Caveats: GRASS itself is NEUTRAL conf 40.4 (flat, not trending down) and volume-buildup- is a bleeding family (7d 10T -$0.50). Exit condition: CLOSE the short if BTC 1m closes hold ABOVE EMA300 75878 for 15-30m (structure flips bullish); SL 0.4998 (-2.5%) is the hard invalidation either way.\n\nEnforced checks: no trade open 8h+ (max 1h); no 2%+ winner without BE (CRV has it); no 5%+ trade needing trail; directional exposure assessed (1L1S, balanced).",
-  "agent_timestamp": "2026-11-06T15:26:44.905032+00:00",
-  "regime_context": "Sources DISAGREE \u2014 state them separately, never blend:\n- regime_5m aggregate: LONG_BIAS (43 long / 1 short / 85 neutral of 129 tokens)\n- continuum BTC 1m: BELOW EMA300 (75670 vs 75878), LEAN_BEAR, below for ~48m straight (last cross 14:34), wyckoff ACCUMULATION/MARKDOWN, market_phase DECLINING, velocity now SLOW with a bounce off 75312\u219275680\n- 15m BTC regime: NEUTRAL; auto_trader: CHOP (score long -5 / short 25, BRACKET)\n- Flip rate 24h: aggregate 18 (normal, p50~19); BTC 27 >= p95 26 = UNUSUALLY UNSTABLE BTC 15m direction (96 dumps). A direction state survives ~1h on average.\n\nRead: bear structure under a positive bounce = chop with bear lean. LONGs hit the BTC bear gate (BELOW + LEAN_BEAR); SHORTs with the micro-trend but against the aggregate long bias. This is exactly the chop regime where entries never arm \u2014 see pattern_alerts. All direction steers this cycle are condition-keyed; re-test next cycle.",
-  "pattern_alerts": "VERIFIED (PostgreSQL, run this cycle):\n\n1) CHOP-BLEED DOLLAR SHARE BREACH \u2014 7d 94.2% (100 losers, 94 never-armed mfe<0.40, $0 NULL-mfe losers), 14d 94.4% (162L/148na), 30d 88.5% (388L/320na) vs baseline 84.1/85.6/80.6. Measure = dollar share sum_loss(mfe<0.40)/sum_all_loss. 7d AND 14d >= 92% => ENTRY QUALITY DETERIORATING \u2014 this is entry-gate territory, not exit tweaks. Companions: NULL-mfe losers 0 (no backfill artifact); today arm rate 54.5% (6/11) same-state companion only; 7d LONG arm rate 47.3% (188T) = TRIPPED the <50 tripwire.\n\n2) 24h LOSERS (6, -$0.80 gross) \u2014 winning side analysis: GRASS LONG @meta_rsi 69.4 and RUNE LONG @meta_rsi 75.0 both chased high-RSI pumps into dumps (right side = SHORT/flat); ALGO LONG @60.0 and XPL LONG @55.1 (hard_max_loss) never armed (right side = flat, chop); SOL SHORT @meta_rsi 40.4 shorted oversold and got the bounce (right side = LONG); BTC SHORT continuum-osc- @57.7 was the ONLY armed loser \u2014 reached MFE +0.57% then atr_sl gave it back (exit-ownership, 1 case). 5/6 losers never reached +0.40% \u2014 we are entering chop and never arming, exactly what the 94.2% dollar share measures.\n\n3) LIVE bleeding families (dead-signal check done \u2014 all have 7d traffic, flags True): volume-buildup- 10T -$0.50, pump-chain+ 8T -$0.48, jup_yolo_mirrored 126T -$0.41, bb-squeeze+ 22T -$0.21. NOT flagged: volume-buildup+ (killed 2026-10-14, 0 traffic), bb-bounce-v2-long+ (1T/7d, kill-bars FAIL per #138 \u2014 already adjudicated), hh-hl+ (enabled, only 2T/7d \u2014 n too small to flag).\n\n4) Measured-refuted steer midband (brain_auditor #139): do NOT re-issue any 'keep LONGs out of meta_rsi 45-64 below EMA300' block \u2014 the blocked cell was the profitable one. Advisory-only until re-measure 2026-10-27."
+  "open_count": 0
 }

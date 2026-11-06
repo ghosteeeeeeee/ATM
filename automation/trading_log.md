@@ -21938,3 +21938,11 @@ Final set: []
 - 24h net RED ($-0.47) and 7d $-2.11 structural, outside auto_1hr 1-change/hour scope
 - mae_price NULL on 6/8 24h winners — MAE coverage gap, schema/collector look needed
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+### [2026-11-06] — Bug Fix: ATR60 momentum research-code audit (8 bugs)
+- **Symptom:** Spec reproduce commands for R2b/R2c (`--cont`/`--cont-flip`) no longer produced the spec's tables (37.8%/62.2% vs claimed 34.0%/67.3%); spec §1 eyeball row 1 didn't match the DB; `binom_p_ge` OverflowError latent at n>=~1075; replay validate() leaked its sqlite handle on error; a whole rule row vanished silently (n<20 suppression); `--ceo/--tfs` fed unvalidated strings toward f-string SQL (KeyError-guarded only by luck); spec had an orphan table header + stale "OOS pending" note + wrong 96h label.
+- **Root cause:** `_continuum_rules` silently switched BTC's score source to `continuum_replay.db` when R2d was added (R2b/R2c were computed on production `continuum.db`); eyeball row 1 has unknown provenance (its values exist nowhere in the 30d window); baseline sampling is index-phased on a front-pruning rolling window (BUG-089, documented not changed).
+- **Fix:** `--cont-db {replay,recorded}` flag (default replay = unchanged behavior) + spec reproduce notes; exact-integer `binom_p_ge`; try/finally in `validate()`; suppression note + collect() hoisted 7x; argparse `choices` on `--ceo` + early `--tfs` validation; spec doc corrected (orphan table, pending note, 72h, eyeball annotation, 7b re-run table). 8 entries BUG-082...089 in `automation/bugs.json`.
+- **Files:** `scripts/backtest_atr60_momentum.py`, `scripts/continuum_replay.py`, `plans/atr60-momentum-spec-2026-11-06.md`, `automation/bugs.json`
+- **Verification:** `--cont-flip --cont-db recorded` reproduces R2c EXACTLY (67.3%/+0.378 n=98, 70.8%/+0.719 n=24, 48.8%/-0.423 n=41); R2b within +-1 event (32.7% vs 34.0%); main table p-values bit-identical post-fix; replay validate re-run rho=0.963; `--ceo 30m`/`--tfs 30m` now clean errors; py_compile OK.
+- **Tracker:** BUG-082, BUG-083, BUG-084, BUG-085, BUG-086, BUG-087, BUG-088, BUG-089

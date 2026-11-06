@@ -1508,6 +1508,151 @@
       "found_by": "brain_auditor",
       "git_commit": "29fd3075",
       "related_bugs": []
+    },
+    {
+      "title": "backtest binom_p_ge overflows (OverflowError) for n>=~1075; docstring claimed log-space",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/backtest_atr60_momentum.py"
+      ],
+      "symptom": "binom_p_ge(600,1200) raised OverflowError: int too large to convert to float. Docstring said 'exact via log-space combinatorics' but code was a naive comb(n,i)*p**i*(1-p)**(n-i) float product; comb(n,n/2) exceeds float range for n>~1070 and terms underflow above i~1022.",
+      "root_cause": "Left-to-right eval converts the (possibly huge) Python int from math.comb to float before multiplying by the p**i float.",
+      "fix": "Exact integer path for p=0.5 (sum(comb)/2**n - all call sites use p=0.5); Fraction fallback for other p; clamp k<=0 / k>n; docstring corrected.",
+      "verified_by": "bug_hunter: binom_p_ge(600,1200)=0.511514... no longer raises; p_two for k=32/n=97 bit-identical to pre-fix (0.0010496073324912283) and matches exact rational computation; 14/18 -> 0.015442 matches spec p=0.015; full main-table re-run prints identical p-values.",
+      "id": "BUG-082",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "title": "continuum_replay.validate() sqlite connection not closed in finally",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/continuum_replay.py"
+      ],
+      "symptom": "validate() opened a connection to the PRODUCTION continuum.db and called conn.close() only on the success path; any exception in execute/fetchall leaks the handle (every other connect in both audited files had try/finally).",
+      "root_cause": "Missing try/finally wrapper around the SELECT.",
+      "fix": "Wrapped connect+execute in try/finally with guarded close.",
+      "verified_by": "bug_hunter: py_compile OK; validate re-run post-fix completes normally (n=42097 pairs, Pearson 0.9631).",
+      "id": "BUG-083",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "title": "Spec R2b/R2c tables irreproducible - --cont silently switched score source to continuum_replay.db",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "scripts/backtest_atr60_momentum.py",
+        "plans/atr60-momentum-spec-2026-11-06.md"
+      ],
+      "symptom": "Documented reproduce commands `--cont` / `--cont-flip` now output replay-based numbers (cont_50 24h 37.8%, flip 62.2%) while spec section 5b claims 34.0% / 67.3% from recorded continuum.db scores. Entire spec rows vanished (cont55_flip+1m n=24) and sub-claims (15m/30m ev-state significantly negative; cont55+1m@480 +0.41 sig) stopped reproducing.",
+      "root_cause": "_continuum_rules() gained a continuum_replay.db preference when R2d was added, with no CLI switch and no spec note - R2b/R2c were computed against production continuum.db before the replay DB existed, so the same command now yields two different spec tables.",
+      "fix": "Added --cont-db {replay,recorded} (default 'replay' = existing behavior), threaded through continuum_study() and pooled_ceo(); spec 5b/7 carry explicit reproduce notes (R2b/R2c = recorded, R2d = replay).",
+      "verified_by": "bug_hunter: `--cont-flip --cont-db recorded` reproduces R2c EXACTLY (cont_50_flip 67.3%/+0.378 n=98; cont55_flip+1m 70.8%/+0.719 n=24; cont55_flip+1h 48.8%/-0.423 n=41); `--cont --cont-db recorded` gives 32.7% vs spec 34.0% (+-1 event of same-day window drift); default replay path unchanged (37.8%/62.2% before and after fix).",
+      "id": "BUG-084",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "title": "continuum_study silently drops a rule's whole table when every horizon has n<20",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/backtest_atr60_momentum.py"
+      ],
+      "symptom": "With the replay score source, `cont55_flip+1m agree` printed ZERO rows (largest-horizon n=18 < 20) - indistinguishable from the rule not existing; the spec R2c row (n=24) only printed because the recorded source cleared the threshold. Also collect() was recomputed identically inside the per-horizon loop (7x redundant work per rule).",
+      "root_cause": "`if len(e) < 20: continue` per horizon with no feedback when all 7 horizons are skipped; collect() called inside the horizon loop instead of hoisted.",
+      "fix": "collect() hoisted to once per rule (event/state/random all hoisted); explicit suppression line printed when no horizon qualifies: '(suppressed: all horizons have event n<20, largest n=18)'.",
+      "verified_by": "bug_hunter: default flip run now prints the suppression note (largest n=18); recorded run prints the full row (n=24); --cont runtime dropped (~7.5s vs ~18s) from the hoist; all printed numeric rows identical to pre-fix output.",
+      "id": "BUG-085",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "title": "User-controlled TF strings interpolate into SQL table name, guarded only by incidental KeyError",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "scripts/backtest_atr60_momentum.py"
+      ],
+      "symptom": "--ceo <any string> / --tfs <any string> crashed with an opaque KeyError traceback. `FROM {table}` in _load_htf receives f'candles_{interval}' built from CLI input; SQL never executed only because a fixed-mapping dict lookup `{...}[interval]` happened to raise before sqlite3.connect - safety was accidental, not enforced at the boundary.",
+      "root_cause": "No validation of argparse TF inputs; the f-string table name relied on evaluation order of a sibling argument to prevent injection.",
+      "fix": "choices=['5m','15m','1h','4h'] on --ceo; explicit early validation of --tfs with ap.error() listing allowed TFs (defense-in-depth; table names remain fixed-mapping).",
+      "verified_by": "bug_hunter: `--ceo 30m` -> clean 'invalid choice' error; `--pooled --tfs 15m,30m` -> clean 'invalid timeframe(s)' error; valid commands (main table, --cont, --cont-db recorded) all still run.",
+      "id": "BUG-086",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "title": "Spec section 1 ATR eyeball row 1 contradicts fresh run - values exist nowhere in the data",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "plans/atr60-momentum-spec-2026-11-06.md"
+      ],
+      "symptom": "Eyeball-verification row '2026-11-06 04:55 | close 75802.0 | ATR 40.78 | SMA 39.92 | RSI 56.6 | MACD -0.61' does not match candles_1m BTC: fresh run at that timestamp gives 75744.01 / 44.08 / 43.22 / 48.1 / -4.31. Close 75802.0 appears NOWHERE in the 30-day window (0 hits at +-0.05), no bar has ATR~40.78 near 04:55, and no repo artifact contains 75802/40.78. Rows 2 and 3 of the same table reproduce EXACTLY (79.61 and 245.02).",
+      "root_cause": "Unknown provenance for row 1 - it is not derived from candles_1m BTC (possibly hand-transcribed from a different source or a typo); the row anchors the spec's 'we are talking about the same ATR' claim to the CEO.",
+      "fix": "Spec annotated in place: fresh-run values for 04:55 shown with an explicit warning that row 1 is unverifiable and rows 2-3 are the valid anchor; original values retained for record.",
+      "verified_by": "bug_hunter: full-window scans (close search, ATR search +-0.03, raw OHLC of the 04:55 bar = 75783.00/75809.14/75744.00/75744.01), grep of audit/plans/brain for 75802|40.78 -> only the spec itself.",
+      "id": "BUG-087",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "title": "Spec doc structure/staleness: orphan table header, stale OOS 'pending' note, wrong 96h window label",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "plans/atr60-momentum-spec-2026-11-06.md"
+      ],
+      "symptom": "Lines 263-264 contained a bare `| Claim | Status | Evidence |` + separator with zero rows immediately before the R2c heading (orphan table, breaks markdown rendering); line 239 said 'OOS time split: pending' although section 5c/verdict later report OOS done; case-study heading said 'last 96h' but --recent is a fixed 3-day (72h) window.",
+      "root_cause": "Leftover from editing the verdict table into section 5b; stale note never updated when OOS halves were added; heading mislabeled.",
+      "fix": "Removed orphan table lines; replaced pending note with actual OOS outcome (first half day-block p=0.068, second p=0.026); heading corrected to 'last 72h'.",
+      "verified_by": "bug_hunter: re-read rendered structure - headings/tables intact; --recent re-run shows all spec case-study events inside a 72h window.",
+      "id": "BUG-088",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
+    },
+    {
+      "title": "Index-phased baseline (every 60th bar) on a front-pruning rolling window - baseline digits not reproducible",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "scripts/backtest_atr60_momentum.py"
+      ],
+      "symptom": "Baseline n swung 552 -> 545 -> 487 across three runs on the same day while event counts stayed 207/110/97; baseline means swing +-0.015 and the R2c state/rand means drift +-0.03 vs the spec. price_collector prunes 1 bar/min from the front, so index->time phase of range(0, len(ts), 60) re-shifts every minute (a full new sample every ~60 min).",
+      "root_cause": "base_idx (run_coin/continuum_study/pooled_ceo) and the state-baseline anchor sample by ROW INDEX, not by timestamp, on a window whose front edge moves continuously.",
+      "fix": "Not changed (deliberately): timestamp-based sampling (e.g. ts % 3600 == 0) would be phase-stable but would change every baseline digit quoted in the spec, which was produced with index sampling. Baselines remain statistically valid (converged +-0.015 same-day; conclusions/CI unaffected). Documented in spec section 2 as BUG-089 addendum.",
+      "verified_by": "bug_hunter: min(ts) moved 18:37 -> 18:53 between runs while count stayed 42807 (continuous prune confirmed); three same-day baseline runs compared.",
+      "id": "BUG-089",
+      "date_found": "2026-11-06",
+      "date_fixed": null,
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {

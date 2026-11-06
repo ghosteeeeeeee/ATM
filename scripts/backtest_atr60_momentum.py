@@ -277,11 +277,25 @@ def bootstrap_ci(v, rounds=4000, alpha=0.05, seed=7):
 
 
 def binom_p_ge(k, n, p=0.5):
-    """P(X >= k) for Binomial(n, p) — exact via log-space combinatorics."""
+    """P(X >= k) for Binomial(n, p).
+
+    Exact for p=0.5 via integer arithmetic (all call sites use p=0.5).
+    The naive comb*p**i*(1-p)**(n-i) form overflows to OverflowError for
+    n>~1070 (comb(n,n/2) exceeds float range) — fixed 2026-11-06 (BUG-082).
+    """
     if n == 0:
         return 1.0
+    if k <= 0:
+        return 1.0
+    if k > n:
+        return 0.0
     from math import comb
-    return sum(comb(n, i) * p**i * (1 - p)**(n - i) for i in range(k, n + 1))
+    if p == 0.5:
+        return sum(comb(n, i) for i in range(k, n + 1)) / 2 ** n
+    from fractions import Fraction
+    fp, f1 = Fraction(p), Fraction(1) - Fraction(p)
+    return float(sum(Fraction(comb(n, i)) * fp ** i * f1 ** (n - i)
+                     for i in range(k, n + 1)))
 
 
 def pct(v):
@@ -1138,27 +1152,34 @@ def _trend_rule_builders(token, interval):
 CONTINUUM_DB = None  # set lazily from paths
 
 
-def _continuum_rules(token):
+def _continuum_rules(token, source='replay'):
     """Continuum-score direction rules (CEO 2026-11-06: <50 short, >50 long;
-    R2c: flipped = fade the score). Prefers continuum_replay.db (reconstructed
-    for ANY token by continuum_replay.py, validated vs BTC ρ=0.96), falls back
-    to the production BTC-only continuum.db."""
+    R2c: flipped = fade the score).
+
+    source='replay'   (default): prefer continuum_replay.db — reconstructed for
+        ANY token by continuum_replay.py (validated vs BTC ρ=0.96). This is the
+        source behind the R2d tables.
+    source='recorded': production continuum.db only (BTC). This is the source
+        behind the R2b/R2c tables — use `--cont-db recorded` to reproduce them
+        (BUG-084: the silent replay-preference made those tables irreproducible).
+    Falls back to the recorded DB whenever the requested source lacks rows."""
     global CONTINUUM_DB
     try:
         from paths import HERMES_DATA as _HD
         rows = None
-        rp = os.path.join(_HD, 'continuum_replay.db')
-        if os.path.exists(rp):
-            conn = None
-            try:
-                conn = sqlite3.connect(rp, timeout=10)
-                rows = conn.execute(
-                    "SELECT ts, score FROM continuum_replay "
-                    "WHERE token = ? AND score IS NOT NULL ORDER BY ts ASC",
-                    (token.upper(),)).fetchall()
-            finally:
-                if conn:
-                    conn.close()
+        if source == 'replay':
+            rp = os.path.join(_HD, 'continuum_replay.db')
+            if os.path.exists(rp):
+                conn = None
+                try:
+                    conn = sqlite3.connect(rp, timeout=10)
+                    rows = conn.execute(
+                        "SELECT ts, score FROM continuum_replay "
+                        "WHERE token = ? AND score IS NOT NULL ORDER BY ts ASC",
+                        (token.upper(),)).fetchall()
+                finally:
+                    if conn:
+                        conn.close()
         if not rows or len(rows) < 1000:
             if CONTINUUM_DB is None:
                 CONTINUUM_DB = os.path.join(_HD, 'continuum.db')
@@ -1207,7 +1228,8 @@ def _continuum_rules(token):
         return None, None
 
 
-def continuum_study(token='BTC', threshold=60.0, flip=False, half=None):
+def continuum_study(token='BTC', threshold=60.0, flip=False, half=None,
+                    cont_db='replay'):
     """CEO add-on: continuum score as direction for the ATR↑60 event study.
     flip=True inverts it (CEO 2026-11-06: 'previous move was OVER when the new
     ATR spike occurred' → mean-revert against the score). Full horizons,
@@ -1224,7 +1246,7 @@ def continuum_study(token='BTC', threshold=60.0, flip=False, half=None):
     atr = _calc_atr(hh, ll, cc, 14)
     m1 = tv_macd_hist(cc)
     r1 = tv_rsi(cc)
-    cont_rules, score_at = _continuum_rules(token)
+    cont_rules, score_at = _continuum_rules(token, cont_db)
     if not cont_rules:
         print('  no continuum history for token — skip')
         return
@@ -1313,12 +1335,18 @@ def continuum_study(token='BTC', threshold=60.0, flip=False, half=None):
           f"{'state mean':>10} {'rand mean':>9} | {'ev-state':>9} {'CI95':>18}")
     for rname, rfn in rules:
         need_1m = rname.endswith('1m agree')
+        # collect ONCE per rule (was recomputed for every horizon — 7x waste)
+        e_all = collect(evs, rfn, need_1m)
+        s_all = collect(state_idx, rfn, need_1m)
+        b_all = collect(base_idx, rfn, need_1m)
+        n_printed = 0
         for h in HZ:
-            e = collect(evs, rfn, need_1m).get(h, [])
+            e = e_all.get(h, [])
             if len(e) < 20:
                 continue
-            s = collect(state_idx, rfn, need_1m).get(h, [])
-            b = collect(base_idx, rfn, need_1m).get(h, [])
+            s = s_all.get(h, [])
+            b = b_all.get(h, [])
+            n_printed += 1
             k = sum(1 for x in e if x > 0)
             lo, hi = diff_ci(e, s, 77) if s else (0, 0)
             d = (mean(e) - mean(s)) if s else 0.0
@@ -1326,9 +1354,15 @@ def continuum_study(token='BTC', threshold=60.0, flip=False, half=None):
                   f'{pct(k / len(e)):>6.1f}% | {mean(s) if s else 0:>+10.3f} '
                   f'{mean(b) if b else 0:>+9.3f} | {d:>+9.3f} '
                   f'[{lo:>+7.3f},{hi:>+7.3f}]')
+        if n_printed == 0:
+            # Make suppression visible: an absent rule must not be
+            # indistinguishable from a rule that doesn't exist (BUG-085).
+            biggest = max((len(v) for v in e_all.values()), default=0)
+            print(f'{rname:>16}  (suppressed: all horizons have event n<20, '
+                  f'largest n={biggest})')
 
 
-def pooled_ceo(interval, threshold_pct, coins, half=None):
+def pooled_ceo(interval, threshold_pct, coins, half=None, cont_db='replay'):
     """CEO hypothesis pooled across coins: established `interval` trend direction
     after an ATR-expansion spike. Pooled event bootstrap + per-coin sign test.
     half: None | 'first' | 'second' (OOS time split, each coin's own midpoint)."""
@@ -1364,7 +1398,7 @@ def pooled_ceo(interval, threshold_pct, coins, half=None):
             evs = [i for i in evs if _in_half(i)]
             base_idx = [i for i in base_idx if _in_half(i)]
         # continuum-score direction rules (BTC history in continuum.db)
-        cont_rules, _ = _continuum_rules(ck)
+        cont_rules, _ = _continuum_rules(ck, cont_db)
         if cont_rules:
             built = list(built) + cont_rules
 
@@ -1500,6 +1534,7 @@ def main():
     ap.add_argument('--entry', action='store_true')
     ap.add_argument('--fresh', action='store_true')
     ap.add_argument('--ceo', nargs='?', const='1h', default=None,
+                    choices=['5m', '15m', '1h', '4h'],
                     help='CEO hypothesis study; optional trend TF (5m/15m/1h/4h), default 1h')
     ap.add_argument('--use-pct', action='store_true',
                     help='treat threshold as ATR% of price (with --pct) instead of USD')
@@ -1513,11 +1548,22 @@ def main():
                     help='FLIPPED continuum direction (mean-revert vs score)')
     ap.add_argument('--tfs', default='5m,15m,1h',
                     help='comma list of trend TFs for --pooled (e.g. 15m only)')
+    ap.add_argument('--cont-db', choices=['replay', 'recorded'], default='replay',
+                    help="continuum score source: replay=continuum_replay.db (default, "
+                         "R2d tables) | recorded=production continuum.db (R2b/R2c tables)")
     ap.add_argument('--atr-sm', action='store_true',
                     help='use SMA-of-TR ATR instead of Wilder/RMA (definition sensitivity)')
     ap.add_argument('--coins', default='', help='comma list for cross-coin ATR%% study')
     ap.add_argument('--pct', type=float, default=0.076, help='ATR%% threshold for cross-coin')
     args = ap.parse_args()
+    # Validate TF lists up front — these strings are interpolated into the
+    # table name `candles_{tf}`; a fixed-mapping KeyError used to be the only
+    # guard (it fired before the SQL, but only with an opaque traceback).
+    _TF_OK = ('5m', '15m', '1h', '4h')
+    if args.pooled:
+        bad = [t for t in args.tfs.split(',') if t.strip() and t.strip() not in _TF_OK]
+        if bad:
+            ap.error(f'--tfs invalid timeframe(s) {bad}; allowed: {",".join(_TF_OK)}')
     global _ATR_MODE
     if args.atr_sm:
         _ATR_MODE = 'sma'
@@ -1548,11 +1594,13 @@ def main():
         coin_list = ([c.strip() for c in args.coins.split(',') if c.strip()]
                      if args.coins else default_coins)
         for tf in [x for x in args.tfs.split(',') if x]:
-            pooled_ceo(tf, args.pct, coin_list, half=args.half)
+            pooled_ceo(tf, args.pct, coin_list, half=args.half, cont_db=args.cont_db)
     if args.cont:
-        continuum_study(args.coin, args.threshold, flip=False, half=args.half)
+        continuum_study(args.coin, args.threshold, flip=False, half=args.half,
+                        cont_db=args.cont_db)
     if args.cont_flip:
-        continuum_study(args.coin, args.threshold, flip=True, half=args.half)
+        continuum_study(args.coin, args.threshold, flip=True, half=args.half,
+                        cont_db=args.cont_db)
     if args.coins:
         for c in args.coins.split(','):
             cross_coin(c.strip(), args.pct)
