@@ -5666,3 +5666,5 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-11-06 03:20 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour, 0 open | 24h 6T 66.7% '+$0.26' GREEN | 7d 260T 53.8% '-$2.19' RED — size-reduce 1.0x (file absent = truth) | kill: none (no 0% WR n>=3) | atr_sl_hit 2/6=33.3% under 40% | inversion 0 mismatches | boost HOLD (jup_yolo_mirrored 4T 100% +0.46, n<5) | neg streak not 3 consecutive -> no size cut | frequency 0/hr | winners MAE 0.251% 4/4 <0.5% | 0 open | no storm (window-min -0.27% / at-run -0.15%) | No constants change -> no signal_versions entry
 BY: auto_1hr
+- [2026-11-06 04:19 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour, 0 open | 24h 6T 66.7% "+$0.26" GREEN | 7d 258T 54.3% "-$1.99" RED — size-reduce 1.0x (file absent = truth) | kill: none (no 0% WR n>=3) | atr_sl_hit 2/6=33.3% under 40% | inversion 0 mismatches | boost HOLD (jup_yolo_mirrored 4T 100% +0.46, n<5) | neg streak not 3 consecutive -> no size cut | frequency 0/hr | winners MAE 0.251% 4/4 <0.5% | 0 open | no storm (window-min -0.70% / at-run -0.44%) | No constants change -> no signal_versions entry
+BY: auto_1hr
