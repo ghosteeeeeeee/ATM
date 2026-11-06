@@ -1139,26 +1139,42 @@ CONTINUUM_DB = None  # set lazily from paths
 
 
 def _continuum_rules(token):
-    """Continuum-score direction rules (CEO 2026-11-06: <50 short, >50 long).
-    Returns ([(name, fn), ...] or None, score_fn). History from continuum.db."""
+    """Continuum-score direction rules (CEO 2026-11-06: <50 short, >50 long;
+    R2c: flipped = fade the score). Prefers continuum_replay.db (reconstructed
+    for ANY token by continuum_replay.py, validated vs BTC ρ=0.96), falls back
+    to the production BTC-only continuum.db."""
     global CONTINUUM_DB
     try:
         from paths import HERMES_DATA as _HD
-        if CONTINUUM_DB is None:
-            CONTINUUM_DB = os.path.join(_HD, 'continuum.db')
-        if not os.path.exists(CONTINUUM_DB):
-            return None, None
-        conn = None
-        try:
-            conn = sqlite3.connect(CONTINUUM_DB, timeout=10)
-            rows = conn.execute(
-                "SELECT ts, state_score FROM continuum_states "
-                "WHERE token = ? AND state_score IS NOT NULL ORDER BY ts ASC",
-                (token.upper(),)).fetchall()
-        finally:
-            if conn:
-                conn.close()
-        if len(rows) < 1000:
+        rows = None
+        rp = os.path.join(_HD, 'continuum_replay.db')
+        if os.path.exists(rp):
+            conn = None
+            try:
+                conn = sqlite3.connect(rp, timeout=10)
+                rows = conn.execute(
+                    "SELECT ts, score FROM continuum_replay "
+                    "WHERE token = ? AND score IS NOT NULL ORDER BY ts ASC",
+                    (token.upper(),)).fetchall()
+            finally:
+                if conn:
+                    conn.close()
+        if not rows or len(rows) < 1000:
+            if CONTINUUM_DB is None:
+                CONTINUUM_DB = os.path.join(_HD, 'continuum.db')
+            if not os.path.exists(CONTINUUM_DB):
+                return None, None
+            conn = None
+            try:
+                conn = sqlite3.connect(CONTINUUM_DB, timeout=10)
+                rows = conn.execute(
+                    "SELECT ts, state_score FROM continuum_states "
+                    "WHERE token = ? AND state_score IS NOT NULL ORDER BY ts ASC",
+                    (token.upper(),)).fetchall()
+            finally:
+                if conn:
+                    conn.close()
+        if not rows or len(rows) < 1000:
             return None, None
         import bisect
         cts = [r[0] for r in rows]
@@ -1184,7 +1200,9 @@ def _continuum_rules(token):
                 return -1
             return 0
 
-        return [('cont_50', cont50), ('cont_55', cont55)], score_at
+        return [('cont_50', cont50), ('cont_55', cont55),
+                ('cont_50_flip', lambda t: -cont50(t)),
+                ('cont_55_flip', lambda t: -cont55(t))], score_at
     except Exception:
         return None, None
 
@@ -1493,6 +1511,8 @@ def main():
                     help='continuum-score direction study (<50 short >50 long)')
     ap.add_argument('--cont-flip', action='store_true',
                     help='FLIPPED continuum direction (mean-revert vs score)')
+    ap.add_argument('--tfs', default='5m,15m,1h',
+                    help='comma list of trend TFs for --pooled (e.g. 15m only)')
     ap.add_argument('--atr-sm', action='store_true',
                     help='use SMA-of-TR ATR instead of Wilder/RMA (definition sensitivity)')
     ap.add_argument('--coins', default='', help='comma list for cross-coin ATR%% study')
@@ -1527,7 +1547,7 @@ def main():
                          'IMX', 'SAND', 'FOGO', 'COMP', 'DYM']
         coin_list = ([c.strip() for c in args.coins.split(',') if c.strip()]
                      if args.coins else default_coins)
-        for tf in ('5m', '15m', '1h'):
+        for tf in [x for x in args.tfs.split(',') if x]:
             pooled_ceo(tf, args.pct, coin_list, half=args.half)
     if args.cont:
         continuum_study(args.coin, args.threshold, flip=False, half=args.half)

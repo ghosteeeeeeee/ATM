@@ -3206,3 +3206,13 @@
 
 ## Error Alerts — 2026-11-06 13:18 UTC
 - **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-06 15:18 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK hard floor (detect): N.N < N`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor (detect): N.N < N`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,TOK,BTC_LEVEL | vol=N.8x eth_div=-N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+
+## Error Alerts — 2026-11-06 16:18 UTC
+- **REPEATED** (12x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+AT, allowing despite TOK filter`

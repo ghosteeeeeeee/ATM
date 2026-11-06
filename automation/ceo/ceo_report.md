@@ -1001,3 +1001,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 8T +0.20 75.0% | 7d 242T -2.14 54.1%
 ### Findings: Rotating Q (day 6/14 = confluence blocks): 339 CONFLUENCE-GATE-BLOCK today, 329 LONG single-type not in standalone bypass vs 10 SHORT — passes still flowing (jup_yolo_mirrored etc). error_alerts = routine gate block/override noise, 0 new Tracebacks.
 ### Recommendation: none — blocked LONGs are the gate working under SHORT_BIAS/SHORT_BIAS regime; revisit only if passes dry up post-regime-flip.
+
+## CEO Status — 20261106T151832Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 13T -0.57 53.8% | 7d 236T -2.31 53.4%
+### Findings: Rotating Q6 (new errors) — no tracebacks; alerts are routine token-filter BLOCK/OVERRIDE traffic, but 3 NEW lines at 15:18Z: hotset hard-floor exec-policy refusal + multi-layer BTC_LEVEL blocks.
+### Recommendation: none (hotset hard-floor refusal is informational — watch if it repeats hourly)

@@ -21864,3 +21864,27 @@ Final set: []
 - 7d $-2.31 RED — structural, outside auto_1hr 1-change/hour scope
 - mae_price NULL on 6/7 24h winners — MAE coverage gap, schema/collector look needed
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 16:20] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses), 0 open
+**PnL:** $0.23 (WR: 100.0% hour; 24h 15T 60.0% $-0.34 RED | 7d 234T 53.4% $-2.18 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: CRV pump-chain- LONG rr_engine_trail_hit +0.21 (+9.33% pnl_pct), GRASS volume-buildup- SHORT profit-monster-trail +0.02 (+0.55%) — both winners, no losses
+- Kill check: no signal with 0% WR n>=3 last hour (only 2 trades, both wins) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/15 = 33.3% of 24h closes — under 40% threshold, down from 38.5% -> no tpsl_utils alert
+- Boost: NONE eligible — bb-squeeze+ 5T 60% net $-0.14 (fails Net PnL>$0.05); jup_yolo_mirrored 4T 75% net $-0.04 (fails PnL bar + n<5)
+- Neg streak: BROKEN — this hour +$0.23 positive after 3 consecutive negative hours -> no size cut
+- Frequency: 2/hr — under 20
+- Entry quality: 24h winners adverse excursion 0.083% (BTC) / 0.131% (CRV), both <0.5% (2/9 known, 7 NULL — mae coverage gap persists)
+- No storm (window-min -0.42% / at-run -0.29%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h net still RED ($-0.34) despite a perfect hour — 7d $-2.18 structural, outside auto_1hr scope
+- mae_price NULL on 7/9 24h winners — MAE coverage gap, schema/collector look needed
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
