@@ -21791,3 +21791,27 @@ Final set: []
 **Open Questions:**
 - 7d $-2.31 RED — structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 13:30] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses), 2 open (RUNE r2v2-long3, ALGO bb-squeeze+ LONG)
+**PnL:** $+0.02 (WR: 100.0% hour; 24h 8T 75.0% $-0.11 | 7d 241T 54.0% $-2.29 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: ADA bb-squeeze+ LONG +0.02 (profit-monster-trail, +0.88% pnl_pct)
+- Kill check: no signal with 0% WR n>=3 (continuum-osc- 1T -0.15 worst) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/8 = 25.0% of 24h closes (under 40%) -> no tpsl_utils alert
+- Boost: NONE eligible — jup_yolo_mirrored 4T 75% but net $-0.04 (fails Net PnL>$0.05); bb-squeeze+ 2T 100% +0.05 but n<5
+- Neg streak: hourly tail = +0.03, -0.15, +0.03, -0.14, +0.02 — 1 consecutive negative -> no size cut
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners with known MAE: 0.083% adverse (1/6 populated, <0.5%) -> OK
+- No storm (window-min -0.32% / at-run -0.31%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-2.29 RED — structural, outside auto_1hr 1-change/hour scope
+- mae_price is NULL on 5/6 24h winners (and is an absolute price level, not %) — MAE coverage gap, worth a schema/collector look
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
