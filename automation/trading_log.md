@@ -21594,3 +21594,60 @@ Final set: ['BLUR']
 **Open Questions:**
 - 7d $-1.99 RED (improved from -$2.19) — structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 05:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 1 open (BTC jup_yolo_mirrored SHORT -0.02)
+**PnL:** $0.00 (WR: n/a hour; 24h 5T 60.0% $+0.13 | 7d 257T 54.1% $-2.02 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closed — no trades to diagnose
+- Kill check: no signal with 0% WR n>=3 in 24h (worst: pump-chain+ 1T -0.13, continuum+ 1T -0.07) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/5 = 40.0% of 24h closes — at threshold, not >40% -> no tpsl_utils alert; drag -0.20 vs profit-monster-trail +0.09 + mfe_exit +0.24
+- Boost HOLD: jup_yolo_mirrored 3T 100% +0.33 across BTC/HYPE/SOL but n<5 -> hold
+- Neg streak: only 1 close in last 12h (23:00 +0.03) — not 3 consecutive -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.224%, 3/3 <0.5% — good
+- No storm (window-min -0.22% / at-run +0.00%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-2.02 RED (slightly worse than -$1.99) — structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## FAVORITES Update — 2026-11-06 06:00 UTC
+- Regime: SHORT_BIAS
+- PROMOTE BTC (WR=61.5%, AvgPnL=0.17%, Trades=26)
+
+Final set: ['BTC', 'CAKE', 'FIL']
+
+## LOSERS Update — 2026-11-06 06:05 UTC
+- REMOVE BLUR (insufficient data)
+
+Final set: []
+
+## [2026-11-06 06:20] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses), 0 open
+**PnL:** $0.03 (WR: 100% hour; 24h 6T 66.7% $+0.16 | 7d 255T 54.5% $-2.02 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BTC jup_yolo_mirrored SHORT +0.03 (mfe_exit) — no losers to diagnose
+- Kill check: no signal with 0% WR n>=3 in 24h (worst: pump-chain+ 1T -0.13, continuum+ 1T -0.07) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/6 = 33.3% of 24h closes (under 40%) — drag -0.20 vs mfe_exit +0.27 + profit-monster-trail +0.09 -> no tpsl_utils alert
+- Boost HOLD: jup_yolo_mirrored 4T 100% +0.36 across 3 tokens but n<5 -> hold
+- Neg streak: hourly closes in last 12h = +0.03 (23:00), +0.03 (05:00) — both positive, not 3 consecutive -> no size cut
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.189%, 4/4 <0.5% — good
+- No storm (window-min -0.29% / at-run -0.16%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-2.02 RED — structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
