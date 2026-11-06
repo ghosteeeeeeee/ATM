@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-06T22:56:17Z",
+ "updated": "2026-11-06T23:30:00Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -1007,12 +1007,12 @@
    "status": "open",
    "started": "2026-11-03",
    "deadline": "2026-11-17T00:00:00Z",
-   "evidence": "pre-read 2026-11-04: 22 [BEAR-SINGLE-SOURCE-SHADOW] lines = 7.3x pseudo-replicated -> token-day dedup n=3 (LIT 11-03 rs-r45, BABY 11-03 volume-climax-, LIT 11-04 rs-r30); joinable n=1 (LIT has 0 candles_5m rows \u2014 owned by candle-collector-coverage-audit). Bar limbs: WR 1/1=100% MET; net +$0.022 fee-net (+$0.034 gross) at $13.44 << +$1.00 MISSED; n=3 << 20 MISSED. Actual-fill arm EMPTY (rs-r45/rs-r30/volume-climax- = 0 PG trades all-time). Off-engine LIT sensitivity -6.09% on 11-03 -> permissive n=3 nets ~-$0.66. | BAR MET per join run 2026-11-06T22:45:05Z \u2014 recommend ENFORCE flip. Token-day dedup join (scripts/shadow_tag_join.py, gate-shadow-dedup-convention): n=34 joinable token-days from 349 raw lines (earlier 22-line/7.3x pre-read is superseded), WR 79.4% (27/34), avg fwd +1.661%, gross +$7.59, RT fee -$0.41, NET +$7.18 at $13.44 notional \u2014 limbs: n>=20 PASS, WR>=55% PASS, net>=$1.00 PASS (leave-one-out min +$6.37, not a limb here). All 34 joinable (the old LIT no-candles hole is closed \u2014 candles backfilled). CAVEAT for the 11-10 read: 29 of 34 tokdays and +$7.90 of the +$7.18 net land on 2026-11-05 alone (other days -0.66/+0.07/-0.13); 30 distinct tokens, fwd range -5.15..+6.11, median +1.93. No member filter applied (counterfactual IS single-type passes). status left OPEN for CEO.",
-   "threshold": "enforce flip at 2026-11-10 if simulated fills n>=20, WR>=55%, net >= +$1.00",
+   "evidence": "VERDICT 20261106T2315Z (independently re-derived): limbs met early (n=34, WR 79.4%, net +$7.18) BUT effective n~=1 episode \u2014 23/34 token-days first logged in hour 19:00 UTC 11-05, all measuring the SAME 4h crash-continuation window (BTC 80.5k->76.1k, post-5% leg); ex-11-05: n=5, WR 40%, net -$0.72; day-LOO(11-05) = -$0.72. Token-LOO +$6.37 MISLEADING (cannot break the shared window). Flip-now exposure ~=0 anyway: DailyFillCap brake active (15/15, fee-net -0.77) so no automated fills pass until first green. Flip-with-tripwire REJECTED: realized n over 4 days ~=0-5 (actual-fill arm empty) -> tripwire fires on noise or never; AND ENFORCE=True freezes the counterfactual (signal_compactor.py:3784 only logs in the elif-SHADOW branch) -> flipping now DESTROYS the instrument that resolves the concentration. Follow-up if flipped at 11-10: log ENFORCED with the same tag so the join keeps measuring. Re-run of shadow_tag_join at 11-10 read: python3 scripts/shadow_tag_join.py (selfcheck 29/29).",
+   "threshold": "enforce flip at 2026-11-10 if simulated fills n>=20, WR>=55%, net >= +$1.00 | AMENDMENT pre-registered 2026-11-06 (4 days ahead of read = legitimate): flip at 11-10 ONLY IF original 3 limbs hold AND ex-best-UTC-day net >= +$1.00 on the doubled sample (currently -$0.72 -> forces real diversification)",
    "default_action": "no single-source shorts in bear (stay blocked)",
    "owner": "CEO",
    "notes": "ENFORCE flip would set pass_gate=True for this cohort only (shipped code has the branch, flag False). Join: shadow line token+source+conf \u2192 simulated fill outcome at the bar window. | PACE READ 2026-11-04 (audit #220): 22 WOULD-PASS log lines = ONLY 2 unique tokens (LIT 16, BABY 6) since 11-03 \u2014 the n>=20 bar must be counted on DISTINCT token-events, not lines. On this pace the bar will NOT be met by 11-10; do not read line-count as fills.",
-   "disposition": "NOT-YET pre-read 2026-11-04 (hail-mary item 5) \u2014 enforce flip DENIED, stay blocked (default); deadline moved 11-10 -> 11-17 so n can mature (rate 1.5 tok-days/day -> n=20 ~11-16)"
+   "disposition": "WAIT to 11-10 (CEO consult 20261106T2315Z) \u2014 flip DENIED today despite literal bar met; pre-registration date is part of the threshold"
   },
   {
    "id": "volgate-short-exempt-shadow",
