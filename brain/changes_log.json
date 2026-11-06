@@ -3649,5 +3649,27 @@
     "after": "3 closed, 1 recheck logged, 1 new amplify proposal",
     "rationale": "mandated 11-06 disposition deadlines + AMPLIFY weekly proposal bar",
     "impact": "queue cleared; weekly offense bar met with default NO SHIP proposal"
+  },
+  {
+    "timestamp": "2026-11-06T04:56:00Z",
+    "agent": "brain_auditor",
+    "change": "gate_shadow_health.py: added per_gate() + --per-gate + --selfcheck (dedup-frame per-gate capture table + covers/db<=dedup invariants)",
+    "type": "ops",
+    "file": "scripts/gate_shadow_health.py",
+    "before": "overall 24h ratio only — per-gate bar was unprintable, forcing hand-rolled db/raw ratios",
+    "after": "--per-gate prints per-gate ratio in the recorder's dedup frame; --selfcheck PASS (37 gates); default --dry path byte-equivalent (OK 1.00)",
+    "rationale": "ROOT CAUSE of gate-shadow-capture-coverage-fix: #225/#227 divided dedup'd db rows by RAW log lines (raw 13043 vs dedup 2469/24h) and reported the designed dedup as a 15-30% capture gap. Correct frame = CEO D4b tool; after one --record flush every gate n>=10 = 1.00.",
+    "impact": "Disposition CLOSED threshold MET; capture caveats removed from amplify-bbsqueeze-chop-exempt + amplify-vb-high-short-clonehunt; zero trading behavior change"
+  },
+  {
+    "timestamp": "2026-11-06T04:56:00Z",
+    "agent": "brain_auditor",
+    "change": "shadow_disposition.json: closed gate-shadow-capture-coverage-fix (MET) + jup-yolo-regime-review (NO CHANGE, regime gate rejected t=-0.57); added linreg-fade-fill-funnel eval (due 11-13); harvest pre-read 3/4 FAIL appended",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "gate-shadow OPEN (deadline 11-06), jup-yolo-regime-review OPEN (deadline 11-07), no linreg funnel entry",
+    "after": "gate-shadow done, jup review done, linreg-fade-fill-funnel open (bar: >=5 live fills by 11-13 AND armed-rate >=50%), harvest notes carry fresh metrics",
+    "rationale": "Deadlines met with data; linreg-fade is the only shadow->live candidate in the Flip-KPI window and its funnel was unmeasured",
+    "impact": "3 dispositions moved; 0 trading constants touched; hermes_constants.py diff EMPTY this run (CEO_PROTECTED untouched)"
   }
 ]

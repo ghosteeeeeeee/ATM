@@ -17,6 +17,8 @@ WARN conditions:
 
 Read-only w.r.t. both DBs (SELECT only). Standalone:
   python3 scripts/gate_shadow_health.py [--dry]
+  python3 scripts/gate_shadow_health.py --per-gate   # per-gate bar read
+  python3 scripts/gate_shadow_health.py --selfcheck  # dedup-frame invariants
 Prints ratio + OK/WARN; exits 1 on WARN. Also invoked from
 pipeline_watchdog.py (2-min timer) via check(), which appends to
 automation/error_alerts.md (6h-deduped) on WARN.
@@ -174,6 +176,40 @@ def check():
                        f'log-dedup={len(keys24)}, raw={raw24})'}
 
 
+def per_gate(window_hours=24, min_n=10):
+    """Per-gate capture ratio in the recorder's OWN dedup frame.
+
+    ponytail: the disposition bar is "per-gate >=90%", but only the overall
+    ratio was ever printed — so auditors hand-rolled db/raw-line ratios and
+    reported the designed 10-min dedup (raw 13k -> dedup 2.4k) as a 15-30%
+    "capture gap" for 3 runs (#225/#227). Raw lines are NOT the denominator:
+    the recorder INSERTs with a UNIQUE gate|token|direction|bucket key, so
+    db/raw can never exceed ~0.3 by construction. This prints the number the
+    bar actually asks for. Rows with dedup < min_n are marked (small-n) and
+    do not fail the bar.
+    Returns (rows, covers); each row is (gate, log_dedup, db, ratio, flagged).
+    """
+    _raw, keys, covers = count_log_gate_lines(window_hours)
+    from collections import Counter
+    log_by_gate = Counter(k.split('|')[0] for k in keys)
+    cutoff_s = (datetime.now(timezone.utc) - timedelta(hours=window_hours)
+                ).strftime('%Y-%m-%d %H:%M:%S') + '+00:00'
+    conn = sqlite3.connect(SHADOW_DB, timeout=10)
+    try:
+        db_by_gate = dict(conn.execute(
+            'SELECT gate, COUNT(*) FROM events WHERE blocked_at >= ? GROUP BY gate',
+            (cutoff_s,)).fetchall())
+    finally:
+        conn.close()
+    out = []
+    for g in sorted(set(log_by_gate) | set(db_by_gate),
+                    key=lambda x: -log_by_gate.get(x, 0)):
+        lg, db = log_by_gate.get(g, 0), db_by_gate.get(g, 0)
+        ratio = min(1.0, db / lg) if lg else (1.0 if db else 0.0)
+        out.append((g, lg, db, ratio, lg < min_n or ratio < CAPTURE_RATIO_MIN))
+    return out, covers
+
+
 def _append_alert(msg):
     """Anomaly-only append to automation/error_alerts.md (same pattern as
     health_monitor.append_alerts), 6h-deduped via ALERT_TS_FILE so the 2-min
@@ -203,7 +239,29 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--dry', action='store_true',
                     help='report only — do not write error_alerts.md')
+    ap.add_argument('--per-gate', action='store_true',
+                    help='print per-gate capture in the recorder dedup frame '
+                         '(the denominator the per-gate >=90% bar asks for)')
+    ap.add_argument('--selfcheck', action='store_true',
+                    help='assert dedup-frame invariants; exit 1 on violation')
     args = ap.parse_args()
+    if args.selfcheck:
+        rows, covers = per_gate(24)
+        assert covers, 'log tail does not cover 24h — ratios not conclusive'
+        # recorder dedup contract: db can never exceed distinct log keys
+        over = [(g, lg, db) for g, lg, db, _r, _f in rows if db > lg]
+        assert not over, f'db > log-dedup (frame broken): {over[:5]}'
+        log(f'selfcheck PASS — {len(rows)} gates, '
+            f'{len([1 for *_x, f in rows if f])} flagged, covers={covers}')
+        return 0
+    if args.per_gate:
+        rows, covers = per_gate(24)
+        log(f'per-gate capture (dedup frame, covers={covers}) — '
+            f'bar >= {CAPTURE_RATIO_MIN:.2f} for every gate with n>=10')
+        for g, lg, db, r, f in rows:
+            mark = '  <-- FLAG' if (f and lg >= 10) else ('  (small-n)' if lg < 10 else '')
+            log(f'  {g:34} dedup={lg:5} db={db:5} ratio={r:.2f}{mark}')
+        return 1 if any(f and lg >= 10 for _g, lg, _db, _r, f in rows) else 0
     # --dry: neuter the alert writer by pretending an alert just fired
     if args.dry:
         globals()['_append_alert'] = lambda msg: (log(f'[DRY] would alert: {msg}'), False)[1]

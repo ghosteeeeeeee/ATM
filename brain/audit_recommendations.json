@@ -1,158 +1,204 @@
 {
-  "timestamp": "2026-11-06T00:53:52Z",
-  "run": 227,
+  "timestamp": "2026-11-06T04:58:49Z",
+  "run": 228,
   "session_brain_stats": {
     "queries": 3,
     "top_hits": [
-      "exit asymmetry / trend following",
-      "pump-chain-short filters",
-      "R:R threshold"
+      "signal to trades / R:R threshold",
+      "consolidation signal momentum block",
+      "trend following signal spec"
     ],
-    "note": "session_brain loads; no new drift vs code found this run"
+    "note": "session_brain loaded fresh (all-MiniLM); no new decision drift found vs code"
   },
   "trade_summary_24h": {
-    "n": 6,
-    "wr": 66.7,
-    "pnl": 0.26,
+    "24h": "5T 60.0% '+0.13' GREEN (jup_yolo SHORT 4T +0.46 carrier; pump-chain+ LONG -0.13, continuum+ LONG -0.07)",
+    "7d": "257T 54.1% '-2.02' RED",
+    "14d": "404T 54.7% '-2.23'",
+    "30d": "777T 45.6% '-6.45'",
     "open": 0,
-    "7d": {
-      "n": 264,
-      "wr": 54.5,
-      "pnl": -1.34
-    },
-    "14d": {
-      "n": 407,
-      "wr": 54.8,
-      "pnl": -2.11
-    },
-    "30d": {
-      "n": 779,
-      "wr": 45.7,
-      "pnl": -5.31
-    },
-    "watchdog": "0 steers, portfolio good, 0 open; btc_15m LONG_BIAS vs btc_4h SHORT_BIAS, vol LOW"
+    "7d_by_regime": "HIGH 76T 55.3% -0.91 | EXTREME 57T 49.1% -0.90 | NORMAL 109T 54.1% -0.36 | FLAT 16T 68.8% +0.18",
+    "regime_now": "btc_15m SHORT_BIAS / btc_4h SHORT_BIAS / continuum BELOW / vol LOW / zscore STRONG_NEG / trend_quality STRONG_DOWN / 0 steers / portfolio good"
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 00:30Z (mandate): overall flip 43.8% n=1360 | pc- 226W/124L 64.6% LIVE keep | rider 640L/369W 36.7% do-NOT | pc- chi2 p=0.375 uniform",
-    "floor_admit": "JOIN RE-RAN 00:30Z: floor_only 1333 decided 49.3% vs always_admit 205 43.9%, fisher p=0.155 — direction holds, COLLECT to 11-15",
+    "contrarian": "JOIN RE-RAN 04:30Z (mandate): overall flip 43.8% n=1362 (W595/L765/S2) | pump-chain- 226W/124L = 64.6% LIVE keep | btc-pump-rider+ 369W/640L = 36.7% do-NOT | pc- token heterogeneity chi2 p=0.375 uniform",
+    "floor_admit": "JOIN RE-RAN 04:32Z: floor_only 1333 decided 49.3% vs always_admit 205 43.9%, fisher p=0.155 -> COLLECT to 11-15 (n bar 1361 PASS, 30d same-sign not reachable until 11-16)",
     "oscillator": "FROZEN/ARCHIVED — no live read",
     "wyckoff": "RETIRED 10-31 — no live read",
     "rr_shadow": "ORPHANED — no producer",
-    "shadow_trader": "67,297 signals; CONFLUENCE-EXPIRY 15415 @47% justified; exit A/B pm_trail +10136 vs hard_max -11449 = trail-or-nothing; cut_loser -2175",
-    "overall": "3/6 usable (contrarian, floor, shadow_trader) — same as #226"
+    "shadow_trader": "67,850 signals (67,105 closed). Gate justification: CONFLUENCE-EXPIRY 15437 @47% avg -0.12, CTX-GATE 2293 @52% -0.09, BTC-CRASH 502 @44% -0.16, EXEC-BLOCK 1126 @48% -0.15. Exit A/B: pm_trail +10265 vs hard_max -11564 / cut_loser -2175 / rr_engine -4481 = trail-or-nothing confirmed. Top source linreg_fade_short n=91 avg +0.626 (see linreg funnel).",
+    "gate_capture": "CORRECTED THIS RUN — see headline. 24h overall 1.00 (db 2471 / log-dedup 2478 / raw 13097); per-gate 1.00 for every gate n>=10 after one --record flush.",
+    "overall": "3/6 usable (contrarian, floor, shadow_trader) + gate_capture now ANSWERABLE"
   },
+  "headline": "gate-shadow 'capture gap' was a MEASUREMENT-FRAME BUG, not a recorder bug — disposition CLOSED with threshold MET (per-gate 0.98-1.00, overall 1.00).",
   "dispositions_due_20261106": [
     {
-      "id": "fade-btc-crash-postflip",
-      "result": "CLOSED KEEP PERMANENT",
-      "detail": "9 BLOCKED lines, coherence NO=5 YES=4 (56% NO) incoherent per pre-registered protocol; hoist NOT shipped"
-    },
-    {
-      "id": "momentum-cache-regime-coverage",
-      "result": "CLOSED PASS",
-      "detail": "re-measure 65/65 fresh<4h = 100% after #225+#226 fixes; bar >=90%"
-    },
-    {
-      "id": "candle-collector-coverage-audit",
-      "result": "CLOSED FIXED",
-      "detail": "root cause: XMR/LIT never in candles_1m universe (blacklisted, fetch only iterates existing tokens); HL candleSnapshot backfill 35d: XMR +5026 5m rows, LIT +5026; 110/110 blocked>=5x tokens now have >=1d 5m candles, missing=[]"
-    },
-    {
       "id": "gate-shadow-capture-coverage-fix",
-      "result": "RE-AUDIT DONE, STILL OPEN",
-      "detail": "log-reparse frame used per default_action: capture still 15-30% (CONTINUUM 15%, RSI-FLOOR 18%, CONFLUENCE 20%, BTC-CRASH/VOL-FLOOR/RR 0% in db); recorder fix not shipped, remains main-session; all downstream n must carry capture caveat"
+      "result": "CLOSED — THRESHOLD MET",
+      "detail": "#225/#227 divided gate_shadow.db rows (10-min dedup, UNIQUE gate|token|direction|bucket) by RAW log lines: raw 13,043 vs dedup 2,469/24h => db/raw = 0.14-0.28 for EVERY gate by construction, and reproduced #227's numbers exactly (CONTINUUM 0.14 / RSI-FLOOR 0.17 / CONFLUENCE 0.20 vs reported 15%/18%/20%). Correct frame = the CEO D4b tool gate_shadow_health.py (same regex + same dedup): 24h overall 1.00, every gate n>=10 at 1.00 after one --record pass; pre-flush residual (LONG-MIDBAND 0.86) = hourly-recorder lag, 0.86->0.98->1.00 across flush. BTC-CRASH/VOL-FLOOR/RR '0% in db' = gates that never fired (0 log lines), not misses. Capture caveats on amplify-bbsqueeze-chop-exempt + amplify-vb-high-short-clonehunt REMOVED."
+    },
+    {
+      "id": "jup-yolo-regime-review",
+      "result": "CLOSED — NO CHANGE (default), regime gate REJECTED",
+      "detail": "14d=30d (all 100T inside 14d), net -1.08. HIGH 41T -0.75 / NORMAL 37T -0.39 / EXTREME 15T -0.19 / FLAT 7T +0.25 — no positive cell n>=15. HIGH-vs-rest t=-0.57 (not significant). Gating to EXTREME/NORMAL keeps -0.58 of -1.08. Leak is R:R: armed 64T +3.76 vs unarmed 36T -4.84; entry features do NOT separate (gap t=-0.63, RSI t=-1.62, volume t=-0.07, momentum t=0.26, BB t=-1.49, staleness t=-0.20 — all |t|<1.7). Owned by stop-tighten 11-14 + xmirror-giveback 11-18."
+    },
+    {
+      "id": "harvest-ship-2026-11-04",
+      "result": "PRE-READ 3/4 FAIL (deadline 11-07, 19h out)",
+      "detail": "rolling-50 jup 44% (bar <35) FAIL | HML 7d 37T -4.73 (bar <15) FAIL | daily net: 11-02 -1.44 / 11-03 -0.29 / 11-04 -0.14 / 11-05 +0.26 = 72h-green FAIL | LONG-in-SHORT_BIAS 48h = 0/18 PASS. Package: bb+warrior last-100 share 15% (target 25%) FAIL. Default = revert failing ship(s); CEO decision at deadline."
+    },
+    {
+      "id": "linreg-fade-fill-funnel",
+      "result": "NEW EVAL REGISTERED (due 11-13)",
+      "detail": "78 signals / first 9h, ALL EXPIRED, 0 APPROVED, 0 PG trades all-time. 27 confluence blocks all predate the 11-05 bypass (0 on 11-06 = bypass works). Path proven end-to-end once: CONFLUENCE-GATE-PASS -> HOTSET-FINAL-BYPASS -> PENDING-APPROVE-BYPASS -> DECIDER-LOOP AVAX SHORT -> EXEC -> killed by VOL-GATE-v2 storm (ATR 1.6874% > 1.5%). Death modes: 43 compaction_stale_10min (never entered top-10 hotset) + 4 short-rsi-hard-floor + 3 rr-engine + 1 oversold-knife. Bar: >=5 live fills by 11-13 AND armed-rate >=50%; else escalate ONE lever, default NO CHANGE."
     }
   ],
-  "drift_findings": [],
+  "drift_findings": [
+    {
+      "item": "gate_shadow capture frame",
+      "severity": "HIGH (analysis, not trading)",
+      "status": "FIXED THIS RUN",
+      "detail": "3 runs (#225/#227 + Oct-31 side-find baselines) reported designed 10-min dedup as a 15-30% capture gap. No recorder code was ever broken. Root cause = wrong denominator. Shipped gate_shadow_health.py --per-gate / --selfcheck so the bar is one command."
+    },
+    {
+      "item": "linreg-fade bypass comment vs reality",
+      "severity": "MEDIUM",
+      "status": "CONFIRMED WORKING",
+      "detail": "hermes_constants STANDALONE_BYPASS comment claims the bypass unlocks the 2-week sample; confluence layer is indeed now passing, but top-10 hotset + VOL-GATE storm still keep fills at 0. Comment is ahead of the data — tracked by linreg-fade-fill-funnel instead of edited."
+    },
+    {
+      "item": "FLOW RECOVERY log-only shadows (BTC_CHOP_STANDALONE_SHADOW / SETUP_RECALL_SHADOW)",
+      "severity": "INFO",
+      "status": "VERIFIED BY PARALLEL SESSION, NOT MINE",
+      "detail": "Committed 8a229b1c by parallel session 03:55Z CEO consult. py_compile OK on decider_run/signal_compactor/hermes_constants. [BTC-CHOP-STANDALONE-SHADOW] = 7 log lines already; [SETUP-RECALL-SHADOW] = 0 (block not yet hit). Deny/SKIP paths unchanged by polarity — read-only verification, no edits by this run."
+    }
+  ],
   "recurring_problems": [
-    "chop-bleed share 7d 94.8% ($10.46 of $11.03 gross loss from never-armed) — entry quality, same shape 12+ runs",
-    "gate_shadow.db capture 15-30% vs log — blocks per-gate n studies until recorder fixed",
-    "harvest early FAIL: rolling-50 jup 44% (bar<35), HML 7d 37 (bar<15), bb+warrior share 15% (target 25%); daily net only 11-05 green; deadline 11-07"
+    "Unarmed-half bleed owns 100% of the loss in every negative n>=15 signal (14d): jup LONG armed +3.76 / unarmed -4.84; vb- SHORT armed +1.69 / unarmed -2.66; pc+ LONG armed +0.82 / unarmed -0.95. Combined unarmed -8.45 vs armed +6.27.",
+    "Entry features do NOT predict arming: 6 features x 3 signals, every |t| < 1.7 (best RSI t=-1.62, BB t=-1.63). No entry filter can be justified from this cohort — pre-registered negative result so future runs stop re-deriving it.",
+    "Chop-exit family still owns 7d gross loss: hard_max_loss + atr_sl_hit + cut-loser + stale = 85T '-10.22' vs armed 136T 91.2% '+8.38' (unarmed 121T 12.4% '-10.40')."
   ],
   "missing_implementations": [
-    "gate_shadow recorder offset (capture 15-30%) — main-session, open",
-    "jup_liq amount=0 fix still PENDING live fire (0 non-zero fires since #225 ship; selfcheck PASS)"
+    "arm-rate (share reaching trail-family exits) is not surfaced in watchdog signal_performance — computed by hand every run; distinguishes chop signals (low arm) from R:R signals (high arm, negative net). Cheap add, not shipped this run (observability only).",
+    "linreg_fade_short has no forward join (fwd_4h NULL on all 91 shadow rows) — shadow ranks it #1 but the number is exit-replay only."
   ],
   "creative_improvements": [
     {
-      "idea": "HL candleSnapshot one-shot backfill for blacklisted-but-active tokens (XMR/LIT)",
-      "status": "SHIPPED",
-      "impact": "candle coverage 108/110 -> 110/110; fwd-outcome joins unblocked"
+      "date": "2026-11-06T04:56:00Z",
+      "idea": "Armed/unarmed split as the standing signal-health KPI (two-axis: arm-rate x net)",
+      "rationale": "14d data: every negative n>=15 signal bleeds ONLY in the unarmed half; arm-rate separates the fix class — low arm (<40%) = entry/chop problem, high arm (>60%) + negative net = exit/R:R problem. jup (arm 64%) and vb- (arm 67%) are R:R problems, NOT chop problems; pc- LONG (arm 7.4%, net +0.10) is the opposite. Without this axis the two get the same wrong fix.",
+      "expected_impact": "Stops mis-directed filter proposals; would have flagged volume-breakout-long+ (arm 6.3%) before its 12T 0% cohort",
+      "category": "signal quality",
+      "status": "suggested",
+      "risk": "low"
     },
     {
-      "idea": "amplify-bbsqueeze-chop-exempt — exempt validated bb-squeeze+ NORMAL LONG cell from LONG-NEUTRAL-CHOP gate (log-reparse bar, units guard, default NO SHIP)",
-      "status": "registered in shadow_disposition",
-      "impact": "potential +1 winner-cell throughput if bar passes"
+      "date": "2026-11-06T04:56:00Z",
+      "idea": "Pre-registered NEGATIVE RESULT: no entry-time filter predicts unarmed outcomes",
+      "rationale": "Measured 14d on all 3 negative n>=15 signals: gap_at_entry t=-0.63/-0.50/+0.70, rsi_exec t=-1.62/+0.78/+0.09, volume_spike t=-0.07/-1.45/-1.07, momentum t=0.26/-0.49/-0.00, bb_position t=-1.49/+0.74/-1.63, staleness t=-0.20/-1.02/+0.26. Nothing clears p<0.05. Logging this prevents the next run from re-proposing RSI/gap/BB filters for these families.",
+      "expected_impact": "Zero code; removes a recurring dead-end from the queue",
+      "category": "analysis hygiene",
+      "status": "pre-registered",
+      "risk": "none"
     },
     {
-      "idea": "R:R breakeven-WR gap screen: jup LONG be_wr 66.7% vs actual 61.0% (5.7pp gap), vb- SHORT be_wr 69.4% vs 59.6% (9.8pp) — both routed to 11-07 jup review / clonehunt, not new ships",
-      "status": "monitor",
-      "impact": "identifies exits-vs-entries ownership"
+      "date": "2026-11-06T04:56:00Z",
+      "idea": "gate_shadow_health --per-gate / --selfcheck (SHIPPED)",
+      "rationale": "The per-gate >=90% bar existed but only the overall ratio was printable, so every auditor hand-rolled db/raw and burned 3 runs on a designed-dedup artifact. --selfcheck asserts the dedup-frame invariants (covers + db<=dedup).",
+      "expected_impact": "Closes gate-shadow-capture-coverage-fix; unblocks 2 amplify proposals' capture caveats",
+      "category": "observability",
+      "status": "shipped",
+      "risk": "none"
     }
   ],
   "config_changes_applied": [
     {
-      "file": "data/candles.db",
-      "change": "XMR+LIT 1m/5m backfilled from Hyperliquid candleSnapshot (35d)",
-      "type": "data",
-      "behavior": "zero trading behavior"
+      "file": "scripts/gate_shadow_health.py",
+      "change": "added per_gate() + --per-gate + --selfcheck CLI flags",
+      "type": "observability (zero trading behavior)",
+      "before": "overall ratio only",
+      "after": "per-gate dedup-frame table + invariant selfcheck (PASS, 37 gates)",
+      "rationale": "prevents recurrence of the raw-vs-dedup frame bug that cost runs #225/#227",
+      "verification": "--selfcheck PASS; --per-gate exit 0 post-flush (all gates 1.00); default --dry path unchanged (OK 1.00)"
     },
     {
       "file": "data/shadow_disposition.json",
-      "change": "4 dispositions closed/updated + amplify-bbsqueeze-chop-exempt registered",
-      "type": "ops",
-      "behavior": "zero trading behavior"
+      "change": "closed gate-shadow-capture-coverage-fix + jup-yolo-regime-review; added linreg-fade-fill-funnel eval; harvest pre-read appended",
+      "type": "disposition",
+      "rationale": "thresholds met / early close with data / new funnel tracked",
+      "verification": "84 entries, json valid"
     }
   ],
   "changes_from_last_run": [
     {
+      "run": 227,
+      "change": "fade-btc-crash-postflip CLOSED KEEP permanent",
+      "verified": "PASS — no hoist shipped; 9 crash=BLOCKED lines unchanged this run"
+    },
+    {
+      "run": 227,
+      "change": "momentum-cache-regime-coverage 100% (4h STALE_THRESHOLD 600->32400)",
+      "verified": "PASS — disposition still closed, no regression"
+    },
+    {
+      "run": 227,
+      "change": "candle-collector coverage XMR/LIT HL backfill",
+      "verified": "PASS — XMR 5m 5026 rows / LIT 5m 5026 rows present in data/candles.db"
+    },
+    {
       "run": 226,
-      "change": "4h_regime_scanner STALE_THRESHOLD_SECS 600->32400",
-      "verified": "PASS — momentum_cache coverage 65/65=100% fresh<4h, disposition closed"
+      "change": "4h scanner token-universe fix",
+      "verified": "PASS (folded into #227 coverage read)"
     },
     {
       "run": 225,
       "change": "jup_liq_cascade amount=0 price-feed fix",
-      "verified": "STILL PENDING LIVE FIRE — signal returns 0 every cycle, selfcheck PASS, no non-zero fire yet; keep watching"
+      "verified": "STILL PENDING LIVE FIRE — py_compile OK; 1,475 'jup_liq' log lines present but no confirmed non-zero notional fire yet; keep watching"
     },
     {
       "run": 225,
-      "change": "4h token-universe fix (WWW_DATA+dict+recent-traded)",
-      "verified": "PASS — folded into 100% coverage read"
+      "change": "gate-shadow capture 15-30% premise",
+      "verified": "REFUTED THIS RUN — frame bug, not a code defect (see headline)"
     }
   ],
   "amplify_weekly": {
-    "screen": "30d n>=10 net>0 = 6 cells, ALL already in-flight (identical set to #220-#226)",
-    "new_proposals": [
-      "amplify-bbsqueeze-chop-exempt (type a, deadline 11-13, default NO SHIP)"
-    ],
-    "flip_kpi": "0 conversions Mon 11-02 -> Fri 11-06; every candidate has open in-flight entry (harvest 11-07, fade-ctx+winner-cell-125 11-10, watch-contrarian 11-11, xmirror 11-18) — why-not logged"
+    "week_of": "2026-11-06",
+    "proposals_this_week": 1,
+    "proposal": "amplify-bbsqueeze-chop-exempt (registered #227 00:55Z, type a, due 11-13) — its capture caveat is now REMOVED by this run's frame fix",
+    "why_not_more": "Screen re-run at #228: 30d n>=10 net>0 = the same 6 cells, ALL already in-flight (pc+ EXTREME / bb-squeeze+ NORMAL / vb- HIGH / jup SHORT HIGH / pc- EXTREME SHORT / pc- NORMAL LONG). n>=5 early cells: r2v2-long3 NORMAL 6T +0.78 sign-FLIPS at 14d (-0.08) -> reject; warrior/doji/ai-trader/continuum-trend all n=5-8 (below signal-level bar); volume-breakout-long+ (arm 6.3%, 30d -0.76) already KILLED 2026-10-13 -> shipped work, do not re-propose. Flip-KPI this week: 0 conversions — why-not: only shadow->live candidate in flight is linreg-fade (0 fills so far, bar registered this run)."
   },
   "losing_autopsy_48h": {
-    "n": 14,
-    "never_adverse": 5,
-    "recovered": 9,
-    "never": 0,
-    "verdict": "WRONG-SIDE REFUTED 83rd consecutive run (#61 p=0.116, #84 t=-0.04)"
+    "method": "brain/analysis/recovery_replay.py (adverse-first anchor), selfcheck PASS",
+    "n": 8,
+    "never_adverse": 3,
+    "recovered_after_adverse": 5,
+    "never_traded_back": 0,
+    "verdict": "WRONG-SIDE REFUTED 84th consecutive run (#61 p=0.116, #84 t=-0.04 stand); winning side = flat",
+    "losers": "BTC continuum+ LONG -0.07 (atr_sl, FLAT, rsi_exec 27.0) | FOGO pump-chain+ LONG -0.13 (atr_sl, EXTREME, rsi_detect 60.0 -> exec 37.5 drift 22.5) | APE warrior+ LONG -0.09 (hard_max, HIGH) | GMX warrior+ LONG -0.02 (trail_sl, EXTREME) | SAND bb-squeeze+ LONG -0.05 (trail_arm_timeout, HIGH) | ZRO r2v2-long18 LONG -0.08 (hard_max, EXTREME) | ACE hh-hl+ LONG -0.12 (atr_sl, HIGH, drift 9.2) | DOT bb-squeeze+ LONG -0.18 (hard_max, HIGH, rsi_exec 68.0)"
   },
   "chop_mandate": {
-    "7d_armed": "137T 92.0% +8.57",
-    "7d_unarmed": "127T 14.2% -9.91",
-    "7d_trail_family": "126T 85.7% +6.66",
-    "7d_chop_exit": "76T 0.0% -8.83",
-    "chop_bleed_share_7d": "94.8%",
-    "signal": "entry quality owns the bleed; trails own the wins"
+    "7d": "armed 136T 91.2% '+8.38' vs unarmed 121T 12.4% '-10.40' | chop-exit family 85T '-10.22' (99.8% of gross loss) | trail family carries all profit",
+    "14d_arm_rate_n15": "jup LONG 64.0% | vb- SHORT 66.7% | pc+ LONG 54.8% | bb-squeeze+ 47.5% | pc- LONG 7.4% (net +0.10 — arms almost never but still green)",
+    "read": "Bleed is no longer 'signals that never arm' — it is 'unarmed trades that lose 2.2x what armed trades win', and no entry feature predicts which is which."
   },
-  "signal_deep_dive": "14d n>=15 sub-50% with negative net: jup LONG 100T 61% -1.08 (R:R be_wr 66.7%, 11-07 owned), vb- SHORT 57T 59.6% -0.97 (be_wr 69.4%, clonehunt owned), pc+ LONG 31T 51.6% -0.13 (NO-KILL stands), pc- LONG 40.7% +0.10 (positive, fade-owned) → 0 NEW targets",
+  "signal_deep_dive": {
+    "sub50_n15_14d": [
+      "bb-bounce-v2-long+ 11T 18.2% -0.36 (n<20, TAT-C already live)",
+      "hl_copy_trader 10T 30.0% -0.12 (n<20)",
+      "pump-chain- LONG 27T 40.7% +0.10 (POSITIVE — not a target)",
+      "pump-chain+ LONG 31T 51.6% -0.13 (kill review 11-13, 30d cell EXTREME +1.32)"
+    ],
+    "new_targets": 0,
+    "note": "No signal passes the n>=20 + WR<50 + net<0 bar this run. Volume-buildup- SHORT (57T 59.6% -0.97) and jup LONG (100T 61.0% -1.08) are WR-positive/negative-net = R:R class, not entry-quality class — no entry filter available (see negative result above)."
+  },
   "next_actions": [
-    "11-06: gate-shadow recorder root-cause (main-session) — capture still 15-30%",
-    "11-07: harvest-ship full 4-metric read (currently 3/4 FAIL early) + jup-yolo regime review + daily-fill-cap brake eval",
+    "11-07: harvest-ship full 4-metric read (3/4 FAIL pre-read) + daily-fill-cap brake eval + volmom-volbreak (default KILL build, flags already False)",
     "11-09: zombie-purge (ema300-breakthrough+, r2-trend-long5)",
-    "11-10: four bars (mfe-cut/ichimoku-dampen/fade-ctx/winner-cell-125/conf-parity)",
-    "11-11: watch-contrarian-live conversion",
-    "11-13: amplify-bbsqueeze-chop-exempt bar read + vb- clonehunt + pc+ kill-review",
-    "11-15: floor/wyckoff joins disposition",
+    "11-10: four bars (mfe-cut/ichimoku-dampen/fade-ctx/winner-cell-125/conf-parity) + bear-single-source enforce bar",
+    "11-11: watch-contrarian-live conversion (pc- 64.6% flip stands)",
+    "11-13: linreg-fade fill bar (>=5 fills) + amplify-bbsqueeze-chop-exempt read + vb- clonehunt (capture caveat now REMOVED) + pc+ kill-review",
+    "11-14: stop-tighten eval + four more amplify deadlines",
+    "11-15: floor/wyckoff join dispositions",
     "11-19: amplify-ema300-underdeploy + amplify-jup-short-high-cell",
-    "CEO: winner-cell-mult-150 sign-off (MET 4x) · stop-tighten-probe-080 label · harvest early-fail decision path · NET-KPI"
+    "CEO: harvest early-fail decision path (deadline 11-07, 3/4 failing) · winner-cell-mult-150 sign-off · stop-tighten-probe-080 label · NET-KPI"
   ]
 }

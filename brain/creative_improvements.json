@@ -10571,5 +10571,32 @@
     "category": "amplify",
     "status": "suggested",
     "risk": "medium"
+  },
+  {
+    "date": "2026-11-06T04:56:00Z",
+    "idea": "Armed/unarmed split as standing signal-health KPI (arm-rate x net two-axis)",
+    "rationale": "14d: every negative n>=15 signal bleeds ONLY in the unarmed half (jup +3.76/-4.84, vb- +1.69/-2.66, pc+ +0.82/-0.95). arm-rate separates fix class: <40% arm = chop/entry problem, >60% arm + negative net = exit/R:R problem. pc- LONG (arm 7.4%, net +0.10) is the counter-example that both axes are needed.",
+    "expected_impact": "Stops mis-directed filter proposals; would have flagged volume-breakout-long+ (arm 6.3%) pre-kill",
+    "category": "signal quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-06T04:56:00Z",
+    "idea": "PRE-REGISTERED NEGATIVE RESULT: no entry-time feature predicts unarmed outcomes",
+    "rationale": "Measured 14d across 3 negative n>=15 signals x 6 features (gap_at_entry, rsi_exec, volume_spike, momentum_score, bb_position, staleness_minutes): every |t| < 1.7 (max RSI -1.62, BB -1.63). Logging prevents the next run re-proposing RSI/gap/BB entry filters for jup/vb-/pc+.",
+    "expected_impact": "Zero code; removes a recurring dead-end from the audit queue",
+    "category": "analysis hygiene",
+    "status": "pre-registered",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-06T04:56:00Z",
+    "idea": "gate_shadow_health --per-gate / --selfcheck (SHIPPED)",
+    "rationale": "Per-gate >=90% bar existed but only overall ratio was printable, so auditors hand-rolled db/raw and reported designed 10-min dedup as a 15-30% capture gap for 3 runs (#225/#227). --selfcheck asserts covers + db<=dedup invariants.",
+    "expected_impact": "Closes gate-shadow-capture-coverage-fix; removes capture caveat on 2 amplify proposals",
+    "category": "observability",
+    "status": "shipped",
+    "risk": "none"
   }
 ]
