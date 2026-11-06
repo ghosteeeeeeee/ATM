@@ -1,0 +1,3 @@
+VALIDATION BTC: n=42097 pairs
+  Pearson=0.9629  Spearman=0.9652  MAE=7.75 pts  sign(50) agreement=90.1%
+  replay range [0.0,100.0] vs recorded [0.0,100.0]
