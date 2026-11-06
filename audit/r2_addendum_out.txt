@@ -1,0 +1,106 @@
+====================================================================================================
+1. ev-state by half, all horizons (claim check: 240m first-half pos, second n.s.; 60m ~0)
+====================================================================================================
+  --- first half, hz=60 ---
+       15m+4h agree n=  989 ev= +0.011 st= -0.014 diff= +0.024 iid[-0.052,+0.102]
+            ema_15m n= 1893 ev= -0.008 st= +0.005 diff= -0.014 iid[-0.067,+0.041]
+             ema_1h n= 1893 ev= -0.009 st= +0.004 diff= -0.014 iid[-0.069,+0.041]
+            macd_1h n= 1893 ev= -0.008 st= -0.021 diff= +0.013 iid[-0.039,+0.067]
+          slope6_1h n= 1840 ev= +0.012 st= +0.001 diff= +0.011 iid[-0.042,+0.068]
+            macd_5m n= 1878 ev= +0.012 st= -0.032 diff= +0.044 iid[-0.011,+0.100]
+  --- first half, hz=240 ---
+       15m+4h agree n=  986 ev= +0.080 st= -0.163 diff= +0.243 iid[+0.095,+0.399]
+            ema_15m n= 1884 ev= +0.014 st= -0.090 diff= +0.104 iid[-0.005,+0.223]
+             ema_1h n= 1884 ev= -0.038 st= -0.056 diff= +0.018 iid[-0.097,+0.133]
+            macd_1h n= 1884 ev= +0.030 st= -0.157 diff= +0.187 iid[+0.068,+0.306]
+          slope6_1h n= 1831 ev= +0.113 st= -0.001 diff= +0.114 iid[-0.004,+0.231]
+            macd_5m n= 1869 ev= -0.019 st= -0.030 diff= +0.011 iid[-0.110,+0.124]
+  --- first half, hz=1440 ---
+       15m+4h agree n=  964 ev= +0.076 st= -0.382 diff= +0.458 iid[+0.115,+0.817]
+            ema_15m n= 1848 ev= +0.116 st= -0.178 diff= +0.294 iid[+0.029,+0.545]
+             ema_1h n= 1848 ev= -0.278 st= -0.366 diff= +0.088 iid[-0.167,+0.331]
+            macd_1h n= 1848 ev= +0.349 st= -0.276 diff= +0.625 iid[+0.374,+0.867]
+          slope6_1h n= 1800 ev= +0.162 st= -0.163 diff= +0.325 iid[+0.077,+0.571]
+            macd_5m n= 1833 ev= -0.180 st= -0.066 diff= -0.113 iid[-0.374,+0.155]
+  --- second half, hz=60 ---
+       15m+4h agree n= 1279 ev= +0.008 st= +0.006 diff= +0.002 iid[-0.062,+0.068]
+            ema_15m n= 2193 ev= -0.017 st= -0.026 diff= +0.009 iid[-0.042,+0.061]
+             ema_1h n= 2193 ev= -0.008 st= -0.031 diff= +0.024 iid[-0.026,+0.071]
+            macd_1h n= 2193 ev= +0.009 st= -0.001 diff= +0.010 iid[-0.038,+0.058]
+          slope6_1h n= 2137 ev= -0.007 st= +0.005 diff= -0.012 iid[-0.060,+0.036]
+            macd_5m n= 2193 ev= -0.003 st= +0.019 diff= -0.022 iid[-0.072,+0.026]
+  --- second half, hz=240 ---
+       15m+4h agree n= 1268 ev= -0.016 st= -0.057 diff= +0.040 iid[-0.082,+0.171]
+            ema_15m n= 2176 ev= -0.086 st= -0.177 diff= +0.091 iid[-0.013,+0.191]
+             ema_1h n= 2176 ev= +0.028 st= -0.126 diff= +0.154 iid[+0.049,+0.261]
+            macd_1h n= 2176 ev= +0.023 st= -0.066 diff= +0.090 iid[-0.013,+0.195]
+          slope6_1h n= 2120 ev= -0.034 st= -0.108 diff= +0.075 iid[-0.026,+0.175]
+            macd_5m n= 2176 ev= +0.055 st= +0.051 diff= +0.005 iid[-0.100,+0.119]
+  --- second half, hz=1440 ---
+       15m+4h agree n= 1226 ev= +1.219 st= +0.255 diff= +0.964 iid[+0.657,+1.277]
+            ema_15m n= 2105 ev= +0.231 st= -0.415 diff= +0.646 iid[+0.413,+0.888]
+             ema_1h n= 2105 ev= +0.644 st= -0.289 diff= +0.933 iid[+0.695,+1.184]
+            macd_1h n= 2105 ev= +0.229 st= -0.296 diff= +0.526 iid[+0.277,+0.766]
+          slope6_1h n= 2049 ev= +0.025 st= -0.419 diff= +0.444 iid[+0.190,+0.682]
+            macd_5m n= 2105 ev= -0.082 st= +0.165 diff= -0.248 iid[-0.485,-0.000]
+
+====================================================================================================
+2. STATE-BASELINE ROBUSTNESS @1440 (grid-phase fragility check)
+====================================================================================================
+      15m+4h agree ev n= 2190  +0.716 | ph0=+0.775 ph900=+0.771 ph1800=+0.764 ph2700=+0.766 | uns state n=172111  -0.216 diff= +0.931 day[+0.202,+1.595] 
+           ema_15m ev n= 3953  +0.177 | ph0=+0.474 ph900=+0.469 ph1800=+0.462 ph2700=+0.464 | uns state n=311906  -0.406 diff= +0.583 day[+0.105,+1.061] 
+            ema_1h ev n= 3953  +0.213 | ph0=+0.543 ph900=+0.547 ph1800=+0.542 ph2700=+0.544 | uns state n=311906  -0.425 diff= +0.638 day[+0.046,+1.205] 
+           macd_1h ev n= 3953  +0.285 | ph0=+0.571 ph900=+0.575 ph1800=+0.575 ph2700=+0.572 | uns state n=311906  -0.397 diff= +0.682 day[+0.295,+1.089] 
+         slope6_1h ev n= 3849  +0.089 | ph0=+0.378 ph900=+0.383 ph1800=+0.383 ph2700=+0.378 | uns state n=308826  -0.384 diff= +0.474 day[+0.095,+0.846] 
+           macd_5m ev n= 3938  -0.128 | ph0=-0.160 ph900=-0.181 ph1800=-0.173 ph2700=-0.167 | uns state n=310645  +0.068 diff= -0.196 day[-0.429,+0.018] 
+
+====================================================================================================
+3/4. coin-composition robustness @1440, rule 15m+4h agree
+====================================================================================================
+                      all 12: ev n= 2190  +0.716 | st n= 3530  -0.059 | pooled diff  +0.775
+      excl GMX/IMX/GALA/SAND: ev n= 1336  +1.001 | st n= 2283  +0.022 | pooled diff  +0.979
+                   excl PUMP: ev n= 2187  +0.718 | st n= 3180  -0.049 | pooled diff  +0.767
+           excl flagged+PUMP: ev n= 1333  +1.005 | st n= 1933  +0.054 | pooled diff  +0.951
+        BTC/SOL/SUI/TAO only: ev n=  380  +0.330 | st n= 1076  -0.123 | pooled diff  +0.453
+
+  equal-weighted mean of per-coin diffs (vs pooled) @1440:
+        15m+4h agree: equal-wt  +0.535 over 12 coins | pooled  +0.775
+             ema_15m: equal-wt  +0.220 over 12 coins | pooled  +0.474
+              ema_1h: equal-wt  +0.386 over 12 coins | pooled  +0.543
+             macd_1h: equal-wt  +0.285 over 12 coins | pooled  +0.571
+           slope6_1h: equal-wt  +0.171 over 12 coins | pooled  +0.378
+             macd_5m: equal-wt  -0.104 over 12 coins | pooled  -0.160
+
+====================================================================================================
+5. event clustering (independence assumption check)
+====================================================================================================
+  BTC   ev days= 28 max/day=  7 mean/day= 3.79
+  SOL   ev days= 30 max/day= 13 mean/day= 7.97
+  SUI   ev days= 27 max/day= 16 mean/day= 5.15
+  TAO   ev days= 29 max/day= 24 mean/day= 6.79
+  PUMP  ev days=  6 max/day=  3 mean/day= 1.33
+  GALA  ev days= 31 max/day= 25 mean/day=12.48
+  GMX   ev days= 31 max/day= 35 mean/day=19.58
+  IMX   ev days= 29 max/day= 29 mean/day=16.24
+  SAND  ev days= 22 max/day= 21 mean/day= 7.82
+  FOGO  ev days= 30 max/day= 46 mean/day=27.13
+  COMP  ev days= 30 max/day= 30 mean/day=14.73
+  DYM   ev days= 30 max/day= 33 mean/day=17.10
+  POOLED per-day event counts: min=32 median=137 max=205 days=31
+  inter-event gap hours: p10=0.15 median=0.72 p90=3.82
+
+====================================================================================================
+7. ev-base @1440 across all 60 index-grid phases (round-1 issue 2.5)
+====================================================================================================
+      15m+4h agree: ev-base diff across 60 phases: min=+0.629 median=+0.652 max=+0.684 (phase0=+0.636)
+           ema_15m: ev-base diff across 60 phases: min=+0.341 median=+0.361 max=+0.388 (phase0=+0.341)
+           macd_1h: ev-base diff across 60 phases: min=+0.479 median=+0.505 max=+0.526 (phase0=+0.485)
+
+====================================================================================================
+6. CONTINUUM addenda (BTC $60 events)
+====================================================================================================
+  staleness: n=110 >60s=1 >300s=1 >1800s=1
+  cont_50             all events: n=100 WR=34.0% mean=-0.421 | INVERTED WR=66.0% mean=+0.421
+  cont_50   staleness<=300s only: n=99 WR=34.3% mean=-0.409 | INVERTED WR=65.7% mean=+0.409
+  direction-neutral 24h BTC fwd at $60 events: n=100 mean=-0.177% WR(>0)=50.0%
+  score>=50 (LONG) events=34 score<50 (SHORT) events=76
