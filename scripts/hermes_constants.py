@@ -4457,6 +4457,27 @@ LINREG_FADE_MIN_BARS = 4400            # trail window + slope window + buffer
 LINREG_FADE_MAX_AGE_MIN = 2            # 1m staleness rule (add-signal #13)
 LINREG_FADE_MIN_LIVE_BARS = 10         # >=10 of last 20 bars must trade (dead-token guard)
 LINREG_FADE_MIN_HIST_RATIO = 0.9        # trailing window must be >=90% finite (data quality)
+# Data cleaning (Patterson: 'should you clean your data?'): pegs carry no
+# crypto beta — slope extremes on them are micro-noise (PAXG avg 1m range
+# 0.017%). Fired once among the first 78 signals; excluded since 2026-11-06.
+LINREG_FADE_EXCLUDE_TOKENS = frozenset({'PAXG', 'STABLE'})
+# Dead-token floor: avg (high-low)/close over the last 60 bars below this
+# cannot clear the 0.09% round-trip fee — do not trade it.
+LINREG_FADE_MIN_AVG_RANGE_PCT = 0.03
+# Round-2 combined trigger: fire only when the token is ALSO in the
+# cross-sectional decile of the same variable (ranked across ALL scanned
+# tokens at the same bar). Research: cross-sectional ICs are regime-free
+# (stable sign all 4 months, t=14-100); combined trigger improved SHORT on
+# both timeframes (1m +0.270 -> +0.306%/trade WR 57.1; 15m -0.049 -> +0.022).
+# Below this many valid slopes there is no reliable cross-section — do not fire.
+LINREG_FADE_XSEC_MIN_TOKENS = 40
+# Maker entry for linreg-fade (HL fees: maker 0.015%/side vs taker 0.045%):
+# ALO post-only limit placed this offset from the live price — better price
+# AND 3x lower fee when it fills; unfilled orders are cancelled (bounded
+# retry while the signal is <10min old). +0.06%/trade on our +0.03..0.31
+# edge is a 20-90% improvement.
+LINREG_FADE_MAKER_OFFSET_PCT = 0.001   # 0.1% from live price
+LINREG_FADE_MAKER_WINDOW_S = 20        # seconds to wait for the ALO fill
 LINREG_FADE_CONF_BASE = 65             # confidence at threshold
 LINREG_FADE_CONF_FLOOR = 50            # system floor
 LINREG_FADE_CONF_CAP = 88              # system ceiling (add_signal also caps)

@@ -701,6 +701,11 @@ def place_order(name, side, sz, price=None, order_type="Limit", tif="Gtc",
         # Guard: if result is a string (raw error from SDK), handle gracefully
         if not isinstance(result, dict):
             return {"success": False, "error": f"Non-dict response from exchange: {result}"}
+        # FIX (audit2 Issue 8): the REST-fallback branch inside _do returns an
+        # already-shaped {"success": False, "error": ...} on failure — without
+        # this check the outer wrapper re-wrapped it as success=True.
+        if result.get("success") is False:
+            return result
         # Guard: top-level error status from HL (e.g. rate limit exceeded)
         if result.get("status") == "err":
             err_msg = result.get("response", "Unknown HL error")
@@ -1023,13 +1028,76 @@ def mirror_get_exit_fill(token: str, start_time_ms: int, window_ms: int = 300000
     }
 
 
+def _extract_limit_oid(place_result) -> int:
+    """Pull the resting order's oid out of place_order's nested response.
+
+    FIX (audit2 Issue 7): official HL docs return {"resting": {"oid": ...}}
+    for a placed resting order — the old code only read s['order'] (a shape
+    no code path in this repo produces), so the targeted cancel never fired
+    and cancel_all_open_orders ran every time. Reads 'resting' first, then
+    'order' for safety, and unwraps the REST-fallback double-wrap
+    (audit2 Issue 8): {success, result: {success, result: {response...}}}.
+    """
+    try:
+        pr = place_result
+        for _ in range(3):
+            if isinstance(pr, dict) and "response" not in pr and \
+                    isinstance(pr.get("result"), dict):
+                pr = pr["result"]
+            else:
+                break
+        sts = pr.get("response", {}).get("data", {}).get("statuses", [])
+        for s in sts:
+            oid = (s.get("resting") or s.get("order") or {}).get("oid")
+            if oid is not None:
+                return int(oid)
+    except Exception:
+        pass
+    return None
+
+
+def _cancel_unfilled_limit(token: str, place_result) -> bool:
+    """Cancel an ALO order that did not fill within the maker window.
+
+    Returns True when a cancel was CONFIRMED. FIX (audit2 Issue 6.2): failures
+    were swallowed while the caller reported 'order cancelled' — now a failed
+    targeted cancel falls back to cancel_all_open_orders (in the HL-first flow
+    no position exists yet for this token, so the only resting orders are
+    leftovers — letting one fill without a DB row is worse than cancelling),
+    and a total failure returns False so the caller can report
+    maker_cancel_failed instead of falsely claiming no position exists.
+    """
+    oid = _extract_limit_oid(place_result)
+    try:
+        if oid is not None:
+            r = cancel_bulk_orders([{"coin": token.upper(), "oid": oid}])
+            ok = bool(r.get("success"))
+            print(f"[maker] cancelled unfilled ALO {token} oid={oid} success={ok}")
+            if ok:
+                return True
+            r2 = cancel_all_open_orders(token.upper())
+            ok2 = bool(r2.get("success"))
+            print(f"[maker] targeted cancel failed — cancel_all_open_orders "
+                  f"fallback for {token}: success={ok2}")
+            return ok2
+        r = cancel_all_open_orders(token.upper())
+        ok = bool(r.get("success"))
+        print(f"[maker] WARNING oid parse failed for {token} — "
+              f"cancel_all_open_orders fallback: success={ok}")
+        return ok
+    except Exception as e:
+        print(f"[maker] ERROR cancelling unfilled ALO {token}: {e}")
+        return False
+
+
 # ─── Mirror Functions ─────────────────────────────────────────────────────────
 # These are the ones called by brain.py and position_manager.py.
 # They check the kill switch before doing anything.
 
 def mirror_open(token: str, direction: str, entry_price: float, leverage: int = None,
                 size_mult: float = 1.0, size_usdt_override: float = None,
-                is_manual: bool = False) -> dict:
+                is_manual: bool = False, order_type: str = 'Market',
+                limit_px: float = None, maker_window_s: int = None) -> dict:
     """
     Open a real Hyperliquid position mirroring a paper trade.
     BLOCKED if live trading is disabled (kill switch).
@@ -1042,10 +1110,27 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
         size_mult:   Position size multiplier (e.g. 1.5 for cluster confluence)
         size_usdt_override: Optional pre-computed size (skips _get_trade_size_usdt())
         is_manual:   True for direct CEO commands — bypasses vacation pause marker
+        order_type:  'Market' (default, taker) or 'Limit' (maker — ALO post-only
+                     at limit_px; waits up to maker_window_s for the fill and
+                     CANCELLS + returns maker_not_filled if unfilled). HL-first:
+                     a maker miss writes NO DB row, so the signal can retry.
+                     Fees: maker 0.015%/side vs taker 0.045%/side — on the
+                     linreg-fade edge (+0.03..0.31%/trade) this is +0.06%/trade.
+        limit_px:    required when order_type='Limit'
+        maker_window_s: how long to wait for the ALO fill before cancelling
 
     Returns:
         dict with 'success', 'message', 'size', 'entry_price'
+        (message 'maker_not_filled: ...' when an ALO order did not fill)
     """
+    # FIX (audit2 Issue 9): consume LINREG_FADE_MAKER_WINDOW_S (was a dead
+    # constant — the literal default in the signature was the only value used)
+    if maker_window_s is None:
+        try:
+            from hermes_constants import LINREG_FADE_MAKER_WINDOW_S
+            maker_window_s = LINREG_FADE_MAKER_WINDOW_S
+        except ImportError:
+            maker_window_s = 20
     if not is_live_trading_enabled(is_manual=is_manual):
         return {"success": False, "message": "Live trading disabled (kill switch)"}
 
@@ -1104,6 +1189,28 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
 
     is_buy = direction.upper() == "LONG"
 
+    # FIX (audit2 Issue 5): HL rejects off-tick limit prices ('invalid price')
+    # and the SDK does not round. Round to the tick in the maker-favorable
+    # direction — LONG DOWN / SHORT UP — so the 0.1% offset can never become
+    # market-crossing (post-only rejection).
+    if order_type == "Limit" and limit_px:
+        try:
+            import decimal as _dec_mod
+            _pdec = _hl_price_decimals(token)
+            _q = Decimal(1).scaleb(-_pdec)          # one tick
+            _d = Decimal(str(limit_px))
+            if is_buy:
+                _d = (_d / _q).to_integral_value(rounding=_dec_mod.ROUND_DOWN) * _q
+            else:
+                _d = (_d / _q).to_integral_value(rounding=_dec_mod.ROUND_UP) * _q
+            _rounded_px = float(_d)
+            if _rounded_px != float(limit_px):
+                print(f"[maker] tick-rounded {token} limit {limit_px} -> "
+                      f"{_rounded_px} ({'LONG floor' if is_buy else 'SHORT ceil'})")
+            limit_px = _rounded_px
+        except Exception as _tr_e:
+            print(f"[maker] tick-round failed for {token}: {_tr_e} — using raw limit price")
+
     # Set leverage BEFORE placing the order
     # Use passed leverage, or paper trade's notional ratio, capped at coin max and 10x
     if leverage is None:
@@ -1119,21 +1226,102 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
             name=token,
             side="BUY" if is_buy else "SELL",
             sz=sz,
-            order_type="Market",
+            price=(float(limit_px) if order_type == 'Limit' and limit_px else None),
+            order_type=order_type,
+            tif=('Alo' if order_type == 'Limit' else 'Gtc'),
         )
 
     try:
         result = _exchange_retry(_do)
         if result.get("success"):
-            # ── Ground truth: poll HL fill history for actual entry price ──
-            order_time_ms = int(time.time() * 1000)
-            entry_info = mirror_get_entry_fill(token, order_time_ms - 2000, window_ms=10000)
-            if entry_info.get("success"):
-                fill_price = entry_info["entry_price"]
-                print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ signal=${live_price:.6f} "
-                      f"→ HL_fill=${fill_price:.6f} ({entry_info.get('fill_count',1)} fills)")
+            entry_info = None
+            if order_type == "Limit":
+                # ── MAKER PATH: fill-or-cancel ─────────────────────────────
+                # No DB row exists yet (HL-first) — an unfilled order MUST be
+                # cancelled or it could fill later as a ghost position.
+                order_time_ms = int(time.time() * 1000)
+                waited = 0
+                _cancel_ok = False
+                # SIGTERM guard: run_pipeline's decider step kills the group
+                # with SIGTERM before SIGKILL — cancel the resting order first.
+                # (subprocess timeout itself SIGKILLs — decider raises the
+                # brain timeout for maker trades to stay clear of that path.)
+                import signal as _sig
+                def _maker_sigterm(signum, frame):
+                    try:
+                        _cancel_unfilled_limit(token, result)
+                        print(f"[maker] SIGTERM during maker wait — ALO {token} cancelled")
+                    finally:
+                        raise SystemExit(143)
+                _prev_handler = _sig.signal(_sig.SIGTERM, _maker_sigterm)
+                try:
+                    try:
+                        while waited < max(4, maker_window_s):
+                            time.sleep(min(4, max(1, maker_window_s - waited)))
+                            waited += 4
+                            fi = mirror_get_entry_fill(
+                                token, order_time_ms - 2000,
+                                window_ms=(waited + 5) * 1000)
+                            if fi.get("success"):
+                                entry_info = fi
+                                break
+                    finally:
+                        # FIX (audit2 Issue 6.1/6.2): ALWAYS attempt cancel
+                        # while unfilled — including exception paths — and
+                        # keep the result so a failed cancel is reported
+                        # instead of swallowed.
+                        if entry_info is None:
+                            _cancel_ok = _cancel_unfilled_limit(token, result)
+                finally:
+                    _sig.signal(_sig.SIGTERM, _prev_handler)
+                if entry_info is None:
+                    # FIX (audit2 Issue 6.3): fill/cancel race — a fill may
+                    # land at the cancel moment; re-check before claiming
+                    # "no position opened".
+                    fi2 = mirror_get_entry_fill(
+                        token, order_time_ms - 2000,
+                        window_ms=(waited + 15) * 1000)
+                    if fi2.get("success"):
+                        entry_info = fi2
+                    elif not _cancel_ok:
+                        return {"success": False,
+                                "message": "maker_cancel_failed: ALO unfilled and "
+                                           "cancel failed — order may still rest "
+                                           "(NO DB row written)"}
+                    else:
+                        return {"success": False,
+                                "message": f"maker_not_filled: no ALO fill in {waited}s "
+                                           f"(order cancelled, no position opened)"}
+                print(f"[maker] ALO FILLED {token} after ~{waited}s @ "
+                      f"${entry_info.get('entry_price', 0)}")
+                # FIX (audit2 Issue 6.4): partial fill — cancel the remainder
+                try:
+                    _tsz = float(entry_info.get("total_sz") or 0)
+                    if 0 < _tsz < float(sz) * 0.99:
+                        if _cancel_unfilled_limit(token, result):
+                            print(f"[maker] partial fill {_tsz}/{sz} — remainder cancelled")
+                        else:
+                            print(f"[maker] WARNING partial fill {_tsz}/{sz} — "
+                                  f"remainder cancel FAILED for {token}")
+                except Exception as _pf_e:
+                    print(f"[maker] partial-fill handling error {token}: {_pf_e}")
             else:
-                # Fall back to slippage estimate
+                # ── Ground truth: poll HL fill history for actual entry price ──
+                order_time_ms = int(time.time() * 1000)
+                entry_info = mirror_get_entry_fill(token, order_time_ms - 2000, window_ms=10000)
+
+            # ── shared success return for Market AND Limit-filled ──────────
+            # FIX (audit2 Issue 1, CRITICAL): the filled-Limit path used to
+            # fall off the end of the function -> returned None -> brain
+            # crashed on result.get with a REAL position open and no DB row.
+            if entry_info is not None and entry_info.get("success"):
+                fill_price = entry_info["entry_price"]
+                if order_type != "Limit":
+                    print(f"[HYPE Mirror] OPEN {direction} {sz} {token} @ signal=${live_price:.6f} "
+                          f"→ HL_fill=${fill_price:.6f} ({entry_info.get('fill_count',1)} fills)")
+            else:
+                # Market only (a filled Limit always has entry_info above):
+                # fall back to slippage estimate
                 slippage = 0.005
                 fill_price = live_price * (1 + slippage) if is_buy else live_price * (1 - slippage)
                 decimals = _sz_decimals(token)
@@ -1156,6 +1344,13 @@ def mirror_open(token: str, direction: str, entry_price: float, leverage: int = 
             # Handle case where result is a string (raw API error) instead of a dict
             err_msg = result.get('error') if isinstance(result, dict) else str(result)
             print(f"[HYPE Mirror] FAILED open {direction} {token}: {err_msg}")
+            if order_type == "Limit":
+                # every Limit-attempt failure is a benign maker miss (ALO
+                # would-cross rejection, rate limit, ...) — prefix so the
+                # decider can release the claim for a bounded retry instead
+                # of marking the signal terminally FAILED
+                return {"success": False,
+                        "message": f"maker_rejected: {err_msg or 'limit order failed'}"}
             return {"success": False, "message": err_msg or "Unknown error"}
     except Exception as e:
         print(f"[HYPE Mirror] FAILED open {direction} {token}: {e}")

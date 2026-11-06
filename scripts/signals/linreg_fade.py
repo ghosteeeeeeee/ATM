@@ -15,8 +15,15 @@ brain/linreg-fade-research.md):
 
   TARGET    : 8h forward return (the horizon where the IC is stable).
   PREDICTOR : ONE variable — the 1m OLS slope (% of price per bar) over the
-              last 20 bars, compared against the token's OWN trailing P10/P90
-              of the previous 4320 slopes (3 days, no lookahead).
+              last 20 bars — required to be extreme on BOTH scales:
+                (1) the token's OWN trailing P10/P90 of the previous 4320
+                    slopes (3 days, no lookahead), AND
+                (2) the CROSS-SECTIONAL decile at the same bar (ranked
+                    across all scanned tokens). Round-2 finding: cross-
+                    sectional ICs are regime-free (sign stable all 4 months,
+                    t=14-100); the combined trigger improved the working
+                    SHORT side on both timeframes (1m: +0.270 -> +0.306%/t,
+                    WR 55.3 -> 57.1; 15m: -0.049 -> +0.022).
   TRANSFORM : nonlinear — we trade the DECILE EXTREMES, not the linear fit
               (decile shape showed the edge lives only in the tails).
   CLEANING  : closed candles only, positive prices, finite volume, minimum
@@ -66,6 +73,9 @@ from hermes_constants import (
     LINREG_FADE_MAX_AGE_MIN,
     LINREG_FADE_MIN_LIVE_BARS,
     LINREG_FADE_MIN_HIST_RATIO,
+    LINREG_FADE_EXCLUDE_TOKENS,
+    LINREG_FADE_MIN_AVG_RANGE_PCT,
+    LINREG_FADE_XSEC_MIN_TOKENS,
     LINREG_FADE_CONF_BASE,
     LINREG_FADE_CONF_FLOOR,
     LINREG_FADE_CONF_CAP,
@@ -83,35 +93,41 @@ _CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
 
 
 def _get_closes_volume(token, limit):
-    """Last `limit` closed 1m candles. Returns (closes, volumes) oldest-first.
+    """Last `limit` closed 1m candles. Returns (closes, vols, ranges_pct)
+    oldest-first — ranges_pct = (high-low)/close*100 per bar (dead-token guard).
 
     DB hygiene: single connection, closed in finally, empty on any error.
     """
     conn = None
     try:
+        if token.upper() in LINREG_FADE_EXCLUDE_TOKENS:
+            return [], [], []          # pegs: no crypto beta, no signal
         conn = sqlite3.connect(_CANDLES_DB, timeout=10)
         cur = conn.cursor()
         cur.execute(
-            "SELECT close, volume FROM candles_1m "
-            "WHERE token = ? AND is_closed = 1 AND close > 0 "
+            "SELECT close, volume, high, low FROM candles_1m "
+            "WHERE token = ? COLLATE NOCASE AND is_closed = 1 AND close > 0 "
             "ORDER BY ts DESC LIMIT ?",
             (token.upper(), limit))
         rows = cur.fetchall()
         if not rows:
-            return [], []
+            return [], [], []
         rows.reverse()
         closes = np.array([r[0] for r in rows], dtype=np.float64)
         vols = np.array([r[1] if r[1] is not None else 0.0 for r in rows],
                         dtype=np.float64)
+        rng = np.array([((r[2] - r[3]) / r[0] * 100.0) if r[0] > 0 else 0.0
+                        for r in rows], dtype=np.float64)
         # cleaning: finite only
-        bad = ~np.isfinite(closes) | ~np.isfinite(vols)
+        bad = ~np.isfinite(closes) | ~np.isfinite(vols) | ~np.isfinite(rng)
         if bad.any():
             closes = closes[~bad]
             vols = vols[~bad]
-        return closes, vols
+            rng = rng[~bad]
+        return closes, vols, rng
     except Exception as e:
         print(f'  [linreg_fade] WARN: candles read failed for {token}: {e}')
-        return [], []
+        return [], [], []
     finally:
         try:
             if 'cur' in dir() and cur is not None:
@@ -144,23 +160,28 @@ def _rolling_slope_pct(closes, w):
     return pct
 
 
-def detect(token, price):
-    """Return {direction, confidence, slope_pct, p10, p90, price} or None.
+def compute_ctx(token, price):
+    """Data guards + slope + OWN-HISTORY extreme side (round-1 trigger).
 
-    ONE predictor: slope_pct vs the token's own trailing P10/P90.
-    No R² / RSI / BB stacking (research: those add nothing or flip sign).
+    Returns dict even when the token is NOT an own-history extreme — the
+    cross-sectional decile (round 2) needs every valid slope to rank against.
+    Returns None only when data guards fail (not enough data / dead / peg).
     """
     w = LINREG_FADE_SLOPE_WINDOW
     # fetch enough for BOTH the trailing window and the MIN_BARS gate
     # (bug: fetching TRAIL+w+5=4345 while MIN_BARS=4400 self-filtered everything)
     need = max(LINREG_FADE_MIN_BARS, LINREG_FADE_TRAIL_WIN + w + 5)
-    closes, vols = _get_closes_volume(token, need)
+    closes, vols, rng = _get_closes_volume(token, need)
     if len(closes) < LINREG_FADE_MIN_BARS:
         return None
 
     # dead-token guard: most recent bars must actually trade (cleaning)
     recent_vol = vols[-w:]
     if int((recent_vol > 0).sum()) < LINREG_FADE_MIN_LIVE_BARS:
+        return None
+
+    # dead-token guard: avg range too small to ever clear the round-trip fee
+    if float(rng[-60:].mean()) < LINREG_FADE_MIN_AVG_RANGE_PCT:
         return None
 
     slopes = _rolling_slope_pct(closes, w)
@@ -178,25 +199,25 @@ def detect(token, price):
     p10 = float(np.percentile(hist, LINREG_FADE_PCT_LOW))
     p90 = float(np.percentile(hist, LINREG_FADE_PCT_HIGH))
 
+    own_side = None
+    frac = 0.0
     if cur <= p10:
-        direction = 'LONG'
+        own_side = 'LONG'
         # extremeness: rank within [0, PCT_LOW] mapped to [0, 1]
         rank = float(np.searchsorted(np.sort(hist), cur)) / len(hist)
         frac = (LINREG_FADE_PCT_LOW / 100.0 - rank) / (LINREG_FADE_PCT_LOW / 100.0)
     elif cur >= p90:
-        direction = 'SHORT'
+        own_side = 'SHORT'
         rank = float(np.searchsorted(np.sort(hist), cur)) / len(hist)
         frac = (rank - LINREG_FADE_PCT_HIGH / 100.0) / (
             1.0 - LINREG_FADE_PCT_HIGH / 100.0)
-    else:
-        return None
 
     bonus = max(0.0, min(1.0, frac)) * LINREG_FADE_CONF_EXTREME_BONUS_MAX
     confidence = min(LINREG_FADE_CONF_CAP,
                      max(LINREG_FADE_CONF_FLOOR, LINREG_FADE_CONF_BASE + bonus))
 
     return {
-        'direction': direction,
+        'own_side': own_side,             # None = not an own-history extreme
         'confidence': round(float(confidence)),
         'slope_pct': float(cur),
         'p10': p10,
@@ -211,22 +232,46 @@ def scan_signals() -> int:
 
     from signal_schema import get_all_latest_prices
     prices = get_all_latest_prices()
-    added = 0
 
+    # ── Pass 1: data guards + slope for EVERY token ──────────────────────
+    # Round-2 trigger (brain/linreg-fade-research.md): the fade must be an
+    # extreme RELATIVE TO THE CROSS-SECTION as well as to the token's own
+    # history — cross-sectional ICs are regime-free (stable sign all 4
+    # months, t=14-100) and the combined trigger improved the working SHORT
+    # side on both timeframes (1m: +0.270 -> +0.306%/trade, WR 55.3 -> 57.1).
+    ctxs = {}
+    slopes = []
     for token, data in prices.items():
         price = data.get('price')
         if not price or price <= 0:
             continue
-
         # Layer 1: staleness — 1m candles, per add-signal staleness rule
         if price_age_minutes(token) > LINREG_FADE_MAX_AGE_MIN:
             continue
-
-        sig = detect(token, price)
-        if sig is None:
+        ctx = compute_ctx(token, price)
+        if ctx is None:
             continue
+        ctxs[token] = ctx
+        slopes.append(ctx['slope_pct'])
 
-        direction = sig['direction']
+    if len(slopes) < LINREG_FADE_XSEC_MIN_TOKENS:
+        # no reliable cross-section this cycle — do not fire on own-history alone
+        return 0
+    xsec_p10, xsec_p90 = np.percentile(
+        np.asarray(slopes, dtype=np.float64),
+        [LINREG_FADE_PCT_LOW, LINREG_FADE_PCT_HIGH])
+
+    # ── Pass 2: own-history extreme AND cross-sectional decile ───────────
+    added = 0
+    for token, sig in ctxs.items():
+        direction = sig['own_side']
+        if direction is None:
+            continue
+        # cross-sectional decile: same variable, ranked across all tokens
+        if direction == 'LONG' and not (sig['slope_pct'] <= xsec_p10):
+            continue
+        if direction == 'SHORT' and not (sig['slope_pct'] >= xsec_p90):
+            continue
 
         # Layer 1: per-direction kill-switch
         if direction == 'LONG' and not LINREG_FADE_PLUS_ENABLED:
@@ -263,10 +308,9 @@ def scan_signals() -> int:
         if sid:
             added += 1
             set_cooldown(token, direction, hours=LINREG_FADE_COOLDOWN_HOURS)
-            edge = sig['p10'] if direction == 'LONG' else sig['p90']
             print(f'  {direction:6s} {token.upper():8s} conf={sig["confidence"]}% '
-                  f'slope={sig["slope_pct"]:+.5f}% thr={edge:+.5f}% '
-                  f'price={sig["price"]:.6g} [{source}]')
+                  f'slope={sig["slope_pct"]:+.5f}% xsec=[{xsec_p10:+.5f},'
+                  f'{xsec_p90:+.5f}%] price={sig["price"]:.6g} [{source}]')
 
     return added
 

@@ -3204,6 +3204,18 @@ def execute_trade(token, direction, price, confidence, source,
            _barg('--trailing-distance', str(trailing_distance))]
     if trailing_phase2_dist is not None:
         cmd += [_barg('--trailing-phase2', str(trailing_phase2_dist))]
+    # linreg-fade maker entry: ALO post-only a fixed offset from the live
+    # price (better-than-market price + maker fee 0.015% vs taker 0.045%).
+    # Unfilled -> brain returns maker_not_filled, NO DB row, claim released
+    # below for a bounded retry while the signal is still valid (<10min).
+    if is_linreg_fade:
+        from hermes_constants import LINREG_FADE_MAKER_OFFSET_PCT
+        if direction == 'LONG':
+            _lim_px = price * (1 - LINREG_FADE_MAKER_OFFSET_PCT)
+        else:
+            _lim_px = price * (1 + LINREG_FADE_MAKER_OFFSET_PCT)
+        cmd += [_barg('--order-type', 'Limit'),
+                _barg('--limit-px', str(round(_lim_px, 8)))]
     if exp_json:
         cmd += [_barg('--experiment', exp_json)]
     if flipped:
@@ -3315,7 +3327,15 @@ def execute_trade(token, direction, price, confidence, source,
 
     try:
         log(f'  [brain.py] EXEC: {" ".join(cmd[:8])}... [{paper_flag}]')
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        # FIX (audit2 Issue 4): maker entries wait up to
+        # LINREG_FADE_MAKER_WINDOW_S (20s) for an ALO fill plus place/cancel
+        # round-trips and rate-limit gaps — 60s was at the edge (and
+        # subprocess.run timeout SIGKILLs, which the in-brain SIGTERM guard
+        # cannot catch). 120s keeps the kill path clear; run_pipeline's
+        # decider-step timeout (360s) still bounds the overall step.
+        _brain_timeout = 120 if is_linreg_fade else 60
+        result = subprocess.run(cmd, capture_output=True, text=True,
+                                timeout=_brain_timeout)
         # FIX (2026-10-08, BUG-047): log the TAIL of stdout, not the head. brain.py's
         # INSERT-failure path prints its full traceback to STDOUT then sys.exit(1)
         # (stderr only carries earlier [LOCK-WAIT] info). The old stdout[:200] cut off
@@ -6566,6 +6586,27 @@ def run(dry_run=False):
             except Exception:
                 pass
         else:
+            # maker-miss is NOT a brain failure: the ALO order was placed and
+            # cancelled with no DB row written (HL-first). Release the claim so
+            # the still-valid signal can retry next cycle — bounded by the
+            # 10-min signal expiry, so this cannot become the unbounded
+            # phantom-trade loop the 2026-09-08 ruling protects against.
+            # FIX (audit2 Issue 2): msg is the TAIL of brain's stdout
+            # ("...mirror_open FAILED for X: maker_not_filled: ...") — a
+            # startswith test was dead code. Match anywhere in msg.
+            if sig_id and 'maker_' in str(msg or ''):
+                try:
+                    # FIX (audit2 Issue 3): 'RETRY' is a dead status — every
+                    # hotset/approval query selects decision IN
+                    # ('PENDING','APPROVED') AND executed=0, and the stale
+                    # sweeper only purges EXPIRED/SKIPPED, so a RETRY row
+                    # stranded invisible forever. PENDING re-enters the normal
+                    # approval path (combo_key includes the source and the
+                    # 9h emission cooldown prevents a sibling PENDING).
+                    release_signal_claim(sig_id, 'PENDING', reason=str(msg))
+                    log(f'  ⏳ MAKER-MISS: {token} {direction} — {msg}; claim released for retry')
+                except Exception as _mm_e:
+                    log(f'  ⚠️ maker-miss release failed for {sig_id}: {_mm_e}', 'WARN')
             # BUG-26 fix: rollback the atomic claim since trade failed.
             # Revert executed=0 so the signal can be picked up on next run.
             # BUG-FIX (2026-09-08): Do NOT rollback when brain.py fails — this creates
@@ -6573,7 +6614,11 @@ def run(dry_run=False):
             # sys.exit(1). Signal rollback lets it retry next cycle → same result → loop.
             # Keep signal as "executed" so it doesn't retry. Fresh signals from next
             # pipeline cycle will re-approve if conditions still warrant.
-            if sig_id:
+            # FIX (audit2 Issue 3): elif — a maker miss must skip the ENTIRE
+            # failure tail (mark_signal_failed would no-op after the PENDING
+            # release, but _record_hotset_failure would still credit the
+            # 2-fails->1h cooldown for a benign no-fill).
+            elif sig_id:
                 log(f'  ⚠️ TRADE FAILED: {token} {direction} — signal NOT rolled back (prevents retry loop)')
                 # FIX (BUG-052, 2026-10-11 CEO): transition claim → FAILED terminal state.
                 # executed=1 stays set (never re-claimed — preserves the 2026-09-08

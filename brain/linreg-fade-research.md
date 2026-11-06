@@ -184,6 +184,56 @@ IS/OOS → rubbish. LONG flag stays OFF until an up-regime validates it.
 - Skill bar: SHORT side passes on 1m full-sample (WR 54.7% V1 / 53.9% V8,
   avg > 0.05%, n ≫ 20) and on 15m OOS; 15m full-sample SHORT fails (up-regime
   drag) — that's the regime story, not noise (p < 1e-10 throughout).
-- Confluence gate applies (signal NOT added to STANDALONE_BYPASS) → trades
-  only fire with a second source, which is the intended 2-week observation
-  period before this signal carries weight on its own.
+- Confluence waived via STANDALONE_BYPASS (audit fix) — all other gates
+  still apply; the 2-week observation period starts at the first live trade.
+
+## Round 2 — cross-sectional regression (2026-11-06, "the hedge fund didn't trade only one side")
+
+The CEO was right that a one-sided book is not the hedge-fund model. Round 2
+asked the *cross-sectional* question — not "does this token rise" (beta) but
+"which token outperforms the others right now" (market-neutral, both sides):
+
+- `analysis/linreg_crosssection_research.py` — per-bar cross-sectional
+  Spearman ICs (target = raw and cross-sectional-excess forward return;
+  excess is rank-identical to raw within a bar — cross-sectional rank IS the
+  beta removal). **Result: fade ICs are regime-free** — sign stable all 4
+  months on both timeframes, |t| = 14–100 OOS (15m slope H16 IC −0.046,
+  every month −0.03…−0.06; 1m rng_pos H120 IC −0.055 t=−70). vol_z stays
+  rubbish ✓ (round-1 verdict holds).
+- `analysis/linreg_xsec_legs_followup.py` — per-month legs + the
+  **combined trigger** (own-history extreme AND cross-sectional decile).
+  The market-neutral **spread is positive every month** (15m slope H16
+  decile: +0.44/+0.07/+0.07/+0.20% per 4h pair) — the real hedge-fund
+  product. But legs stay regime-tilted, and the followup's headline
+  "both legs net positive" was inflated by overlapping-bar counting.
+- `analysis/linreg_combined_backtest.py` — event-level (next-open entry, no
+  lookahead, V8 exits, fees): the honest test.
+
+| Event-level, net of fees | 15m ALL | 1m ALL (Oct–Nov) |
+|---|---|---|
+| round-1 trigger LONG | +0.12% (OOS −0.24) | **−0.36% (both months negative)** |
+| round-1 trigger SHORT | −0.05 (OOS +0.31) | **+0.27% (both months, IS+OOS)** |
+| combined trigger LONG | +0.11 (OOS −0.33) | **−0.45%** |
+| combined trigger SHORT | +0.02 (OOS +0.32) | **+0.31% (Oct +0.30, Nov +0.36)** |
+
+**Conclusions shipped:**
+1. The signal now fires ONLY on the combined trigger (own-history P10/P90
+   AND cross-sectional decile, same variable) — improves the working SHORT
+   side on both timeframes and cuts signal volume ~60% (quality over
+   quantity for the top-10 ranking race).
+2. LONG stays flag-OFF: it loses on the trading TF under every trigger
+   (−0.36…−0.45%/trade, both months). What "both sides" needs is the
+   *spread* (paired market-neutral positions) or maker fees — not a
+   directional LONG in a down regime. LONG flips on when up-regime data
+   validates it (15m Aug–Sep LONG paid: +0.98/+0.19–0.28%/trade).
+3. **Fee lever shipped**: entries were hardcoded Market (taker 0.045%/side).
+   linreg-fade now enters with an ALO post-only Limit at live price ±0.1%
+   (maker 0.015%/side): +0.06%/trade saved = +20–90% on this edge. Unfilled
+   → cancelled within 20s → NO DB row (HL-first) → claim released for a
+   bounded retry; SIGTERM guard cancels a resting order if the decider's
+   60s subprocess timeout kills brain mid-wait.
+4. Data cleaning added: PAXG (gold) + STABLE (stablecoin) excluded; dead-
+   token avg-range floor (0.03%/min); k-token case bug fixed
+   (`COLLATE NOCASE` — `latest_prices` stores KLUNC, candles store kLUNC,
+   every `token.upper()` query silently missed all 8 k-tokens; flagged for
+   other signals too).

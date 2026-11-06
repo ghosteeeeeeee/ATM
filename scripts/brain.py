@@ -343,6 +343,8 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                # ── Signal indicator fields (captured at entry from hotset) ──
                signal_z_score: float = None,
                signal_rsi_14: float = None,
+               order_type: str = "Market",
+               limit_px: float = None,
                signal_macd_hist: float = None,
                signal_macd_value: float = None,
                signal_macd_signal: float = None,
@@ -697,7 +699,8 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # skips its own sizing entirely when size_usdt_override is passed.
     _precomputed_size = max(_precomputed_size, HL_MIN_NOTIONAL_USDT)
     print(f"[brain.py] → mirror_open({hype_token}, {direction}, entry_price={entry_price}, leverage={leverage}, size_mult={_size_mult}, size_usdt=${_precomputed_size:.2f}, is_manual={is_manual})")
-    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult, size_usdt_override=_precomputed_size, is_manual=is_manual)
+    result = mirror_open(hype_token, direction, float(entry_price), leverage=leverage, size_mult=_size_mult, size_usdt_override=_precomputed_size, is_manual=is_manual,
+                         order_type=order_type, limit_px=limit_px)
     print(f"[brain.py] ← mirror_open returned: success={result.get('success')}, "
           f"size={result.get('size')}, total_sz={result.get('total_sz')}, "
           f"notional_usdt={result.get('notional_usdt')}, entry_price={result.get('entry_price')}")
@@ -1484,6 +1487,13 @@ if __name__ == "__main__":
         add_parser.add_argument("--real", action="store_true", help="Real trade (not paper)")
         add_parser.add_argument("--sl", type=float, help="Stop loss price")
         add_parser.add_argument("--target", type=float, help="Target price")
+        # maker entry: Limit = ALO post-only at --limit-px (fill-or-cancel;
+        # maker_not_filled writes no DB row so the signal retries)
+        add_parser.add_argument("--order-type", default="Market",
+                                choices=["Market", "Limit"],
+                                help="Entry order type (default Market=taker)")
+        add_parser.add_argument("--limit-px", type=float, default=None,
+                                help="Limit price for --order-type Limit")
         # FIX (2026-10-16, bug_hunter): default was "Tokyo" — trades added without
         # --server landed on server='Tokyo', which NO exit manager sees:
         # position_manager.get_open_positions(), profit_monster.py:93 and
@@ -1567,6 +1577,8 @@ if __name__ == "__main__":
                 paper=not args.real,
                 stop_loss=args.sl,
                 target=args.target,
+                order_type=args.order_type,
+                limit_px=args.limit_px,
                 server=args.server,
                 signal=args.signal,
                 address=args.address,
