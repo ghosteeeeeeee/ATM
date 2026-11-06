@@ -21768,3 +21768,26 @@ Final set: []
 **Open Questions:**
 - 7d $-2.14 RED — structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 12:22] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses), 1 open (ADA bb-squeeze+ LONG, opened 11:47)
+**PnL:** $-0.16 (WR: 0.0% hour; 24h 9T 66.7% $+0.04 | 7d 240T 53.8% $-2.31 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored SHORT atr_sl_hit -0.16 (-3.88% pnl_pct — 1% price move x leverage, expected)
+- Kill check: no signal with 0% WR n>=3 (1h or 24h) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/9 = 33.3% of 24h closes (under 40%) -> no tpsl_utils alert
+- Boost: jup_yolo_mirrored NOW MEETS the numeric bar (5T 80%WR +$0.20 across BTC/SOL/HYPE) but HOLD — JUP_YOLO_FILL_CAP (1 fill/6h, CEO 2026-11-04 target jup share <35%, currently 64-70% of fills) makes a weight boost inert-to-harmful: rank cannot beat the cap, and raising jup priority contradicts the share-reduction directive
+- Neg streak: hourly closes tail = +0.03, -0.15, +0.03, -0.16 — 1 consecutive negative -> no size cut; regimes mixed (FLAT/HIGH/NORMAL), not NEUTRAL
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.168%, 6/6 <0.5% — good
+- No storm (window-min -0.21% / at-run +0.18%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-2.31 RED — structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
