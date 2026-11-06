@@ -21996,3 +21996,28 @@ Final set: []
 - 24h net RED ($-0.47) and 7d $-1.91 structural, outside auto_1hr 1-change/hour scope
 - Trade flow stopped ~16:00 — 4 quiet hours, 0 open; over-filtered or dead market worth watching next run
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 21:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 15T 53.3% $-0.47 RED | 7d 222T 53.6% $-1.91 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — ROOT CAUSE of quiet window found: `DailyFillCap` brake active ("15 opens in last 24h (max 15) while fee-net -0.77 < 0 — brake until first green 24h"). Designed safety brake, working as intended — not an execution bug (pipeline active, 231 signals/6h, 8 APPROVED)
+- Kill check: no signal with 0% WR n>=3 last hour (no trades) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/15 = 40.0% of 24h closes — at threshold, NOT >40% -> no tpsl_utils alert (5 runs holding at exactly 40.0%)
+- Boost: NONE eligible — bb-squeeze+ 5T 60% net $-0.14 (fails Net PnL>$0.05); jup_yolo_mirrored 3T 66.7% net $-0.10 (fails PnL bar + n<5)
+- Neg streak: 15:00 +0.23, 16:00 -0.07, then empty — no 3 consecutive negative hours; regimes EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.183% 8/8 known <0.5% -> OK (mae_pct column, not mae_price)
+- No storm (window-min +0.00% / at-run +0.19%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- DailyFillCap brake releases when 24h fee-net turns green OR fills roll off (15/15 used) — expect 0 opens until then; watch next run
+- 24h net RED ($-0.47) and 7d $-1.91 structural, outside auto_1hr 1-change/hour scope
+- atr_sl_hit exactly 40.0% for 5 runs straight — crosses threshold if any new SL hit next hour
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
