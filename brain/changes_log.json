@@ -3627,5 +3627,27 @@
     "after": "STALE_THRESHOLD_SECS = 32400",
     "rationale": "Root cause of residual regime_4h coverage gap after #225 universe fix; verified 65/65=100% on two manual runs; bug-hunter subagent PASS (F1 open-time semantics caught before final value)",
     "impact": "regime_4h gates see 100% of recent-7d traded tokens (was 86.2%); no Binance dependency for HL-only tokens"
+  },
+  {
+    "timestamp": "2026-11-06T00:53:52Z",
+    "agent": "brain_auditor",
+    "change": "data/candles.db: XMR+LIT backfilled from HL candleSnapshot (35d, 1m+5m) — candle-collector-coverage-audit CLOSED, 110/110 blocked tokens covered",
+    "type": "ops",
+    "file": "data/candles.db",
+    "before": "XMR/LIT 0 five-matter rows (never in candles_1m universe)",
+    "after": "XMR 5026 + LIT 5026 5m rows, 17.4d span each",
+    "rationale": "fetch_binance/backfill only iterate existing candles_1m tokens; blacklisted-but-active tokens never seed; gate_shadow blocks were unjoinable",
+    "impact": "fwd-outcome joins unblocked for 2 tokens; zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-06T00:53:52Z",
+    "agent": "brain_auditor",
+    "change": "data/shadow_disposition.json: closed fade-btc-crash-postflip (KEEP permanent, incoherent 5NO/4YES), momentum-cache (PASS 100%), candle-audit (FIXED); gate-shadow re-audit logged (open, capture 15-30%); registered amplify-bbsqueeze-chop-exempt",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "4 items open due 11-06",
+    "after": "3 closed, 1 recheck logged, 1 new amplify proposal",
+    "rationale": "mandated 11-06 disposition deadlines + AMPLIFY weekly proposal bar",
+    "impact": "queue cleared; weekly offense bar met with default NO SHIP proposal"
   }
 ]

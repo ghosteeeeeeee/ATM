@@ -2196,3 +2196,9 @@
 [2026-11-05 03:23 UTC]   🟢 OK: jup_yolo_mirrored: 5 trades, 80.0% WR, PnL=1.93
 [2026-11-05 03:23 UTC] Done. Rapid-disabled 0 signals.
 [2026-11-05 03:23 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-11-05 09:23 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-05 09:23 UTC] No signals with sufficient trades in 24h window
+[2026-11-05 15:23 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-05 15:23 UTC] No signals with sufficient trades in 24h window
+[2026-11-05 21:23 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-05 21:23 UTC] No signals with sufficient trades in 24h window

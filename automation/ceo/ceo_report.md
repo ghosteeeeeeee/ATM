@@ -959,3 +959,27 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 16T +0.06 62.5% | 7d 275T -1.43 54.9%
 ### Findings: clean — pipeline healthy (timer firing each minute, 0 Tracebacks, Portfolio line confirms 16T/+0.06); guardian active; disk 85% WARN repeating; control_tower STALE (>26h, daily timer missed); 1 item due ≤24h (fade-btc-crash-postflip, owner main-session).
 ### Recommendation: re-run shadow_disposition.py to un-stale control tower; disk at 85% — watch before 90% alert.
+
+## CEO Status — 20261105T111828Z
+### Health: pipeline=active (timer firing 11:19Z) guardian=active open_pos=2
+### Numbers: 24h 12T -0.06 50.0% | 7d 276T -1.56 54.7%
+### Findings: clean — 4 decision items due 2026-11-06 (fade-btc-crash label, regime-coverage audit, gate-shadow capture fix, candle-collector audit); error_alerts only routine BTC-level/momentum blocks + continuum overrides, no tracebacks.
+### Recommendation: none — hand the 4 Nov-6 due items to the weekly deep run.
+
+## CEO Status — 20261105T151829Z
+### Health: pipeline=active (timer firing 15:19Z) guardian=active open_pos=0
+### Numbers: 24h 5T +0.22 60.0% | 7d 271T -1.49 53.9%
+### Findings: clean — 4 decision items due ≤24h (all 11-06: fade-btc-crash, regime-coverage, gate-shadow, momentum-cache); error_alerts only show expected BTC_LEVEL/MOMENTUM block+override churn, no tracebacks. Proactive Q (PnL): 7d -1.49 on 271T = -0.005%/trade, noise-level, no action.
+### Recommendation: none
+
+## CEO Status — 20261105T191829Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 6T +0.28 66.7% | 7d 265T -1.22 54.3%
+### Findings: New-errors Q: alerts are gate/refusal noise (momentum blocks, hotset floor, 5x signal-rollback lines 19:18) — no Tracebacks, no action. 4 decision items due 11-06 (fade-crash, regime coverage, gate-shadow capture, candle audit).
+### Recommendation: Pre-position harvest-ship 2026-11-04 revert — 3/4 bars already FAIL (jup share 44%>35, HML 7d 37>15, daily net unsustained), due 11-07.
+
+## CEO Status — 20261105T231829Z
+### Health: pipeline=active (timer oneshot, fired 23:19Z, COOL_OFF 95% coins hot) guardian=active open_pos=0
+### Numbers: 24h 6T +0.26 66.7% | 7d 264T -1.34 54.5%
+### Findings: clean — alerts are gate BLOCK/OVERRIDE warnings only, no errors; proactive Q (PnL): 7d marginally red (-1.34) but 24h green; 4 decision items due 11-06 (fade-btc-crash, regime-coverage, gate-shadow, candle-collector)
+### Recommendation: none

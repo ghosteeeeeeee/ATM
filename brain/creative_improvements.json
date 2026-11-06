@@ -10553,5 +10553,23 @@
     "category": "instrumentation",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-06T00:53:52Z",
+    "idea": "HL candleSnapshot backfill for tokens absent from candles_1m (XMR/LIT class) — one-shot script pattern; root cause is fetch_binance/backfill iterate only existing candles_1m tokens so blacklisted/HL-only actives never seed",
+    "rationale": "candle-collector-coverage-audit: 2/110 blocked tokens had zero candles = permanent fwd-outcome blindness",
+    "expected_impact": "110/110 coverage; prevents silent join gaps",
+    "category": "data-quality",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-06T00:53:52Z",
+    "idea": "amplify-bbsqueeze-chop-exempt: exempt validated bb-squeeze+ NORMAL LONG from LONG-NEUTRAL-CHOP after log-reparse deduped would-win>=70% + candle-walk net>=$0.50 units-guarded",
+    "rationale": "gate_shadow shows 82.8% would-win on 58 blocked bb-squeeze+ LONG events; validated cell has zero offense coverage",
+    "expected_impact": "+ throughput on validated cell if bar passes; default NO SHIP",
+    "category": "amplify",
+    "status": "suggested",
+    "risk": "medium"
   }
 ]

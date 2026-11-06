@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-05T20:50:00Z",
+  "updated": "2026-11-06T00:52:13Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -378,7 +378,8 @@
       "threshold": "First weekly run (Mon 11-02) emits >=1 amplify proposal OR a kanban 'why not' note; flip-KPI reported in the next CEO status.",
       "default_action": "FLAG to T: offense loop not running",
       "owner": "brain_auditor weekly run",
-      "note_20261103_tuesday": "Light screen (not formal weekly — Mon 11-02 met the bar): 30d n>=10 net>0 cells = 4 VALIDATED (pc+ EXTREME / bb-squeeze NORMAL / vb- HIGH / r2v2 NORMAL already in set) + 3 check-cells all previously why-not'd or in-flight (pc- NORMAL SHORT OOS-unstable, pc-,v6- EXTREME sign-flip, jup HIGH SHORT covered by amplify-jup-short-walk). 0 NEW proposals. stop-tighten-probe-080 (this run's assigned amplify) blocked on CEO label. Flip-KPI: 0 new conversions; in-flight watch-contrarian 11-10, storm-waiver 11-12."
+      "note_20261103_tuesday": "Light screen (not formal weekly — Mon 11-02 met the bar): 30d n>=10 net>0 cells = 4 VALIDATED (pc+ EXTREME / bb-squeeze NORMAL / vb- HIGH / r2v2 NORMAL already in set) + 3 check-cells all previously why-not'd or in-flight (pc- NORMAL SHORT OOS-unstable, pc-,v6- EXTREME sign-flip, jup HIGH SHORT covered by amplify-jup-short-walk). 0 NEW proposals. stop-tighten-probe-080 (this run's assigned amplify) blocked on CEO label. Flip-KPI: 0 new conversions; in-flight watch-contrarian 11-10, storm-waiver 11-12.",
+      "note_20261106_friday": "Light screen #227 (Fri): 30d n>=10 net>0 = identical 6 cells, ALL in-flight (mult-150/hml-profile/clonehunt/jup-walk/pc-dormant/pc-contrarian) → 0 NEW cell proposals; 1 NEW proposal amplify-bbsqueeze-chop-exempt (type a, validated cell × chop-gate, log-reparse bar). Flip-KPI 0 conversions this week (Mon 11-02→Fri 11-06): every shadow->live candidate has an open in-flight entry (harvest 11-07, fade-ctx+winner-cell-125 11-10, watch-contrarian 11-11, xmirror 11-18) — why-not logged."
     },
     {
       "id": "fade-volgate-split-analysis",
@@ -399,15 +400,24 @@
       "id": "fade-btc-crash-postflip",
       "stream": "BTC-CRASH filter hoist above _apply_inversion (shadow-log first)",
       "kind": "wiring",
-      "disposition": "KEEP pre-flip — 24h shadow tally 17 coherent=NO vs 6 YES (15 WOULD-KILL vs 8 WOULD-ALLOW); bar requires direction-coherent verdicts. Re-check at 11-06 deadline with full window; if still incoherent, close as KEEP permanent.",
-      "status": "open",
+      "disposition": "KEEP PERMANENT — full 24h read 2026-11-06T00:45Z: 9 unique crash=BLOCKED pump-chain- fade lines, coherence NO=5 YES=4 (56% NO) = STILL INCOHERENT; stage=crash-gate n=1 (ANIME WOULD-ALLOW vs live KILL), stage=inversion n=8 split 4/4. Per protocol (count only crash=BLOCKED, pump-chain- fade scope): NOT direction-coherent -> close KEEP pre-flip permanent per pre-registered default. Hoist NOT shipped.",
+      "status": "done",
       "started": "2026-10-29",
       "deadline": "2026-11-06T00:00:00Z",
       "evidence": "Autopsy RC2: crash filter (decider_run.py:4130-4183) evaluates the ORIGINAL direction (flip at :4734) -> 7 wrong-side SHORT kills of would-be faded LONGs (HYPER/HBAR/BLUR, LONG side verified clear) + 9 mirror evasions of the LONG-side block. Proposed (autopsy 6a2): hoist inversion above the crash block + shadow-log flipped-direction crash verdicts 24h per automatic-implementation SOP.",
       "threshold": "24h shadow log of post-flip crash verdicts: count would-kills on faded entries; flip to enforced hoist if log shows the verdicts are direction-coherent.",
       "default_action": "KEEP pre-flip behavior",
       "owner": "main-session after CEO label",
-      "notes": "collector wired 2026-11-04 (CEO hail-mary item 7); keep pre-flip default until 24h of post-flip data | WIRING: tag [FADE-CRASH-POSTFLIP-SHADOW] in scripts/decider_run.py — KILL-side hook inside the exec-loop BTC-CRASH gate (pre-flip kills of faded candidates) + ALLOW-side hook right after _apply_inversion (mirror evasions); LOG-ONLY, no behavior change, pre-flip default keeps operating; continuum-override logic shared with live via _continuum_allows_crash_bypass (equivalence probed 3360-case matrix, 0 mismatches). DEADLINE CHANGED 2026-11-05T00:00:00Z -> 2026-11-06T00:00:00Z (changed 2026-11-04, CEO hail-mary item 7) so the registered 24h read gets a full day of post-flip data. | SCOPE/STATUS 2026-11-04T17:23Z: collector wired and probe-verified, but 0 live lines in the first 25min — no pump-chain- fade candidate was in the hotset in that window (last fade flip 03:04:29Z; fade flips are episodic ~4-6/day), so the first real line lands with the NEXT pc- fade signal. SCOPE = main exec-loop path only: process_delayed_entries opens trades via brain.py directly and has NO BTC-CRASH gate (pre-existing, unchanged), so delayed-path fades are structurally outside this collector. | READ-PROTOCOL for 2026-11-06 (bug_hunter review 2026-11-04): (1) lines carry stage= — 'stage=crash-gate' = candidate stopped there; 'stage=inversion' = emitted BEFORE ~30 downstream gates, so it is NOT proof of an executed fill: join signals.executed for fill-level counts; (2) count coherence ONLY on lines with crash=BLOCKED:... — crash=clear lines are proof-of-life and would inflate any coherence ratio toward 100%; (3) scope = pump-chain- fade flips only — static/dynamic/legacy inversion types are excluded, so this understates a hoist-wide fix; (4) decision_reason hygiene: on the KILL side the shadow call is placed AFTER mark_signal_executed so hermes_log._LAST_LOG_MSG (persisted as signals.decision_reason) keeps the real crash reason. | 2026-11-05 #225 pre-read: NOT coherent (74% NO)"
+      "notes": "collector wired 2026-11-04 (CEO hail-mary item 7); keep pre-flip default until 24h of post-flip data | WIRING: tag [FADE-CRASH-POSTFLIP-SHADOW] in scripts/decider_run.py — KILL-side hook inside the exec-loop BTC-CRASH gate (pre-flip kills of faded candidates) + ALLOW-side hook right after _apply_inversion (mirror evasions); LOG-ONLY, no behavior change, pre-flip default keeps operating; continuum-override logic shared with live via _continuum_allows_crash_bypass (equivalence probed 3360-case matrix, 0 mismatches). DEADLINE CHANGED 2026-11-05T00:00:00Z -> 2026-11-06T00:00:00Z (changed 2026-11-04, CEO hail-mary item 7) so the registered 24h read gets a full day of post-flip data. | SCOPE/STATUS 2026-11-04T17:23Z: collector wired and probe-verified, but 0 live lines in the first 25min — no pump-chain- fade candidate was in the hotset in that window (last fade flip 03:04:29Z; fade flips are episodic ~4-6/day), so the first real line lands with the NEXT pc- fade signal. SCOPE = main exec-loop path only: process_delayed_entries opens trades via brain.py directly and has NO BTC-CRASH gate (pre-existing, unchanged), so delayed-path fades are structurally outside this collector. | READ-PROTOCOL for 2026-11-06 (bug_hunter review 2026-11-04): (1) lines carry stage= — 'stage=crash-gate' = candidate stopped there; 'stage=inversion' = emitted BEFORE ~30 downstream gates, so it is NOT proof of an executed fill: join signals.executed for fill-level counts; (2) count coherence ONLY on lines with crash=BLOCKED:... — crash=clear lines are proof-of-life and would inflate any coherence ratio toward 100%; (3) scope = pump-chain- fade flips only — static/dynamic/legacy inversion types are excluded, so this understates a hoist-wide fix; (4) decision_reason hygiene: on the KILL side the shadow call is placed AFTER mark_signal_executed so hermes_log._LAST_LOG_MSG (persisted as signals.decision_reason) keeps the real crash reason. | 2026-11-05 #225 pre-read: NOT coherent (74% NO)",
+      "done_at": "2026-11-06T00:47:12.481255+00:00",
+      "read_20261106": {
+        "blocked_lines": 9,
+        "coherent_NO": 5,
+        "coherent_YES": 4,
+        "stage_crash_gate": 1,
+        "stage_inversion": 8,
+        "verdict": "KEEP permanent — incoherent"
+      }
     },
     {
       "id": "storm-confl-waiver",
@@ -456,15 +466,22 @@
       "id": "momentum-cache-regime-coverage",
       "stream": "momentum_cache regime_4h coverage gap — NULL/stale rows fall back to NEUTRAL on every regime_4h gate",
       "kind": "data-quality",
-      "disposition": "AUDIT DONE + ROOT-CAUSE FIXED — coverage 81.5% (53/65 recent-7d) <90% bar. Root cause: 4h get_tokens_to_scan had dead signal paths + list-only parse; signal tokens never entered universe. Fix shipped this run (WWW_DATA path + dict + recent-traded pull). Re-measure at next 4h scan (~19:18Z); expect >=90% when CASHCAT/CC/FARTCOIN/ZORA/etc get regime_4h written. SQLite momentum_cache.db is 0-byte orphan (PG is source of truth).",
-      "status": "open",
+      "disposition": "DONE — re-measured 2026-11-06T00:45Z after #225 universe fix + #226 STALE_THRESHOLD 32400: recent-traded universe n=65, fresh<4h=65 (100%), fresh<9h=65 (100%), 0 missing, 0 stale. Bar >=90% PASS. SQLite momentum_cache.db remains 0-byte orphan (PG source of truth, by design).",
+      "status": "done",
       "started": "2026-10-30",
       "deadline": "2026-11-06T00:00:00Z",
       "evidence": "CEO find (consult 20261030T0030Z): MNT/MERL regime_4h = NULL, HBAR/BLUR = NEUTRAL, WLD stale since 10-25 — get_regime_4h falls back to NEUTRAL on missing rows, so SHORT/LONG-NEUTRAL blocks + _neutral_relax branch inherit a fabricated regime. Severity MED.",
       "threshold": "Coverage audit: % of hotset/recent-traded tokens with fresh (<4h) regime_4h rows; stale/NULL list; whether NEUTRAL-fallback decisions flipped any gate verdicts (counterfactual).",
       "default_action": "REPORT + fix coverage (writer) if <90% fresh",
       "owner": "next brain_auditor weekly AMPLIFY/kill run",
-      "notes": " | PAIRED: BUG-074 (CTX-RULES shadow str/dict broken) rides the same data-quality pile (capstone ruling) — broken shadow = no counterfactual = governance blindness. | 2026-11-05 #225: root cause fixed in 4h_regime_scanner.py"
+      "notes": " | PAIRED: BUG-074 (CTX-RULES shadow str/dict broken) rides the same data-quality pile (capstone ruling) — broken shadow = no counterfactual = governance blindness. | 2026-11-05 #225: root cause fixed in 4h_regime_scanner.py",
+      "done_at": "2026-11-06T00:47:12.481255+00:00",
+      "remeasure_20261106": {
+        "universe": 65,
+        "fresh_4h": 65,
+        "pct": 100.0,
+        "bar": "PASS"
+      }
     },
     {
       "id": "pump-detect-ceiling-mismatch",
@@ -764,21 +781,35 @@
       "default_action": "Nov 6 re-audit uses a log-reparse frame instead of gate_shadow.db for per-gate n and carries the capture-limitation caveat",
       "owner": "main-session",
       "evidence": "short-relax-shadow-study side-find (2026-10-31): per-gate n from gate_shadow.db is a NON-RANDOM subset for 5 gates (recorder offset gaps) — fix recorder before the Nov 6 re-audit",
-      "notes": "root-cause the recorder offset gaps (v2 deepdive capture audit referenced); verify with a 7d window reparse diff >= 90% per gate | 2026-11-05 #225: numbers measured, fix not shipped (complex, main-session owns)"
+      "notes": "root-cause the recorder offset gaps (v2 deepdive capture audit referenced); verify with a 7d window reparse diff >= 90% per gate | 2026-11-05 #225: numbers measured, fix not shipped (complex, main-session owns) | 2026-11-06 #227 re-audit RUN with log-reparse frame per default_action (tail 80MB pipeline.log Nov5-6 vs gate_shadow.db): capture still 15-30% on major gates (CONTINUUM-BLOCK 15%, SHORT-RSI-HARD-FLOOR 18%, CONFLUENCE 20%, BTC-CRASH/VOL-FLOOR/RR-ENGINE 0% in db). Recorder fix NOT shipped — remains main-session. Per-gate n for any downstream study MUST use log-reparse + carry capture-limitation caveat.",
+      "recheck_20261106": {
+        "method": "log-reparse frame",
+        "capture_range": "15-30%",
+        "bar_90pct": "FAIL",
+        "recorder_fix": "not shipped"
+      }
     },
     {
       "id": "candle-collector-coverage-audit",
       "stream": "candle collector coverage data/candles.db",
       "kind": "eval",
-      "disposition": "EVAL",
-      "status": "open",
+      "disposition": "FIXED — root cause: XMR (blacklisted both sides 2026-08-06) and LIT (LONG-streak blacklist) were never in candles_1m universe so fetch_binance/backfill never seeded them; both are HL-active. One-shot HL candleSnapshot backfill 35d -> candles_1m+candles_5m: XMR +5130/+5026 rows, LIT +5132/+5026, both now 17.4d span. Post-fix: 110/110 tokens blocked>=5x in 14d gate_shadow have >=1d 5m candles, missing=[]. Gate: PASS.",
+      "status": "done",
       "started": "2026-10-31",
       "deadline": "2026-11-06T00:00:00Z",
       "threshold": "every token blocked >=5x in gate_shadow has >=1d of 5m candles in data/candles.db; full LIT/TESTTOKEN/ZZZ* list resolved (present-and-test-tokens excluded with reason)",
       "default_action": "report the gap list with root cause (collector pair coverage) and either fix the collector pair or register the tokens as permanently-unjoinable (fwd outcome impossible)",
       "owner": "main-session",
       "evidence": "gate-shadow fix 2026-10-31 side-find: LIT blocked 22x over 5d but has ZERO candles in data/candles.db — those events can never get a fwd outcome; pairs with gate-shadow-capture-coverage-fix (recorder) — this one owns the CANDLE side",
-      "notes": "found by fix subagent 18452e27; audit before the Nov 6 re-audit so join coverage claims are honest"
+      "notes": "found by fix subagent 18452e27; audit before the Nov 6 re-audit so join coverage claims are honest",
+      "done_at": "2026-11-06T00:47:12.481255+00:00",
+      "fix_20261106": {
+        "xmr_5m": 5026,
+        "lit_5m": 5026,
+        "blocked_ge5": 110,
+        "missing": 0,
+        "bar": "PASS"
+      }
     },
     {
       "id": "stop-tighten-enforce-eval",
@@ -1156,6 +1187,19 @@
       "default_action": "NO CHANGE — walk stays analysis-only; log why-not in kanban at deadline (status quo is the default).",
       "measurement": "shadow_trades.db rows for source LIKE 'ema300-breakthrough%' joined to candles; report decided n, net pnl_usdt, WR per window; runtime-DB decision_reason distribution re-counted at deadline.",
       "notes": "AMPLIFY weekly mandate #226: all 6 n>=10 30d winner cells are already in-flight (pump-chain+ EXTREME / bb-squeeze+ NORMAL / volume-buildup- HIGH / jup SHORT HIGH / pc-v6 EXTREME SHORT dormant 0T14d / pc- NORMAL LONG = contrarian flip watch) — this under-deployment hunt is the run's new proposal. Dedupe lesson from amplify-grind-breakout-deploy applied UP FRONT (deduped before proposing)."
+    },
+    {
+      "id": "amplify-bbsqueeze-chop-exempt",
+      "stream": "bb-squeeze+ LONG × LONG-NEUTRAL-CHOP gate exempt (validated cell bb-squeeze+ NORMAL LONG 30d 43T 65.1% +0.73)",
+      "kind": "amplify",
+      "status": "open",
+      "started": "2026-11-06",
+      "deadline": "2026-11-13T00:00:00Z",
+      "threshold": "log-reparse (NOT gate_shadow.db — capture 15-30%) deduped token-events n>=15 ∧ would-win>=70% ∧ 30d 1m-candle walk on exempted events net>=$0.50 pnl_usdt-units (UNITS GUARD: derive from entry/exit × amount_usdt, never mix with pnl_pct) ∧ fk of would-be-loser share among exempted <20%; default NO SHIP",
+      "default_action": "NO SHIP — gate stays global; chop-bleed KPI owns the entry-quality story",
+      "owner": "brain_auditor next weekly / signal-lab",
+      "evidence": "gate_shadow 30d: bb-squeeze+ LONG blocked by LONG-NEUTRAL-CHOP n=58 would-win 48/58=82.8% avg +0.031; LONG-NEUTRAL n=51 70.6% +0.040. Validated cell already in WINNER_CELLS_VALIDATED. Capture caveat mandatory (gate-shadow-capture-coverage-fix still open 15-30%).",
+      "notes": "AMPLIFY #227 type (a). Chop-bleed 7d 94.8% says most bleed is never-armed — exempting a chop gate for ONE validated trend signal must prove the exempted cohort actually arms/trails, else it re-opens chop. Pair with arm-rate measurement on exempted events."
     }
   ]
 }
