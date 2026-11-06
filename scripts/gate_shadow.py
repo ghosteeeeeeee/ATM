@@ -45,7 +45,9 @@ any significance claim off this DB; naive per-row averages are point estimates
 only.
 
 Usage: python3 scripts/gate_shadow.py [--record] [--close] [--fwd] [--report] [--since-hours 6]
+       [--backfill-rr HOURS]
        --since-hours limits --record only; --report/--fwd are all-time by design.
+       --backfill-rr is a one-shot RR-ENGINE recovery (see backfill_rr docstring).
 """
 import sys
 import os
@@ -92,6 +94,19 @@ BLOCK_RE = re.compile(
 # this alternative the shadow analysis was blind to the majority of all blocks.
 CONF_RE = re.compile(
     r'🔒\s+\[CONFLUENCE-GATE-BLOCK\]\s+([A-Za-z0-9]+)\s+(LONG|SHORT)\b',
+    re.IGNORECASE,
+)
+# SCOPE+ (registry gate-shadow-capture-coverage-fix, CEO mover-census verdict
+# 20261106T215910Z): rr-engine hard blocks fire as `🎯 [RR-ENGINE] TOKEN DIR:
+# RR HARD BLOCKED: ...` and were captured at 0% because BLOCK_RE only accepts
+# the 🚫/🔒/🚧/🌊 block emojis — the 🎯 target emoji was never in its class.
+# HARD BLOCKED only: the sibling `RR PENALTY ... mult=0.70` lines are a
+# multiplier, not a kill, and must stay out of the counterfactual.
+# TELEMETRY ONLY — nothing in the trading path changed; this is the same
+# log-parse capture every other gate in this DB uses.
+RR_BLOCK_RE = re.compile(
+    r'🎯\s+\[RR-ENGINE\]\s+([A-Za-z0-9]+):?\s+(LONG|SHORT)\b'
+    r'.*?RR HARD BLOCKED',
     re.IGNORECASE,
 )
 
@@ -216,12 +231,21 @@ def record(since_hours):
                 if m:
                     gate, token, direction = m.group(1), m.group(2).upper(), m.group(3).upper()
                 else:
-                    # FIX 2026-10-04 (bug-hunter F1): confluence lines lack the
-                    # 'blocked' word — try the dedicated alternative.
-                    mc = CONF_RE.search(line)
-                    if not mc:
-                        continue
-                    gate, token, direction = 'CONFLUENCE-GATE-BLOCK', mc.group(1).upper(), mc.group(2).upper()
+                    # SCOPE+ (registry gate-shadow-capture-coverage-fix): rr-engine
+                    # hard blocks — same match order, same 10-min dedup bucket, same
+                    # INSERT as every other gate here.  Fail-silent by construction:
+                    # an unparsable line just `continue`s, so a block can never be
+                    # affected by this telemetry.
+                    mr = RR_BLOCK_RE.search(line)
+                    if mr:
+                        gate, token, direction = 'RR-ENGINE', mr.group(1).upper(), mr.group(2).upper()
+                    else:
+                        # FIX 2026-10-04 (bug-hunter F1): confluence lines lack the
+                        # 'blocked' word — try the dedicated alternative.
+                        mc = CONF_RE.search(line)
+                        if not mc:
+                            continue
+                        gate, token, direction = 'CONFLUENCE-GATE-BLOCK', mc.group(1).upper(), mc.group(2).upper()
                 # timestamp: leading 'YYYY-MM-DD HH:MM:SS'
                 ts_m = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
                 if not ts_m:
@@ -248,6 +272,65 @@ def record(since_hours):
         _write_offset(new_offset)
         total = cur.execute('SELECT COUNT(*) FROM events').fetchone()[0]
         log(f'record: +{n_new} events (dedup applied), total={total}, offset={new_offset}')
+        return n_new
+    finally:
+        conn.close()
+
+
+def backfill_rr(hours=24):
+    """One-shot RR-ENGINE recovery (registry gate-shadow-capture-coverage-fix
+    SCOPE+, CEO mover-census 20261106T215910Z).
+
+    record() only ever scans FORWARD from the offset, so every
+    `🎯 [RR-ENGINE] ... RR HARD BLOCKED` line written before RR_BLOCK_RE
+    existed was consumed and dropped — those rows are unrecoverable through the
+    normal path and would leave RR-ENGINE pinned at ~0% capture in
+    gate_shadow_health --per-gate for a full window.  This re-reads the log for
+    the trailing `hours` and inserts with the IDENTICAL gate|token|direction|
+    10-min dedup key, so it is idempotent (UNIQUE dedup_key) and can never
+    double-count a row record() already wrote.  RR-ENGINE only — other gates
+    are untouched, and this is telemetry: nothing in the trading path runs it.
+    """
+    if not os.path.exists(PIPELINE_LOG):
+        log(f'pipeline.log missing: {PIPELINE_LOG}')
+        return 0
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+        n_new = n_dup = 0
+        with open(PIPELINE_LOG, 'r', errors='replace') as f:
+            for line in f:
+                if 'RR HARD BLOCKED' not in line:
+                    continue
+                mr = RR_BLOCK_RE.search(line)
+                if not mr:
+                    continue
+                ts_m = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
+                if not ts_m:
+                    continue
+                blocked_at = ts_m.group(1) + '+00:00'
+                try:
+                    b_dt = datetime.fromisoformat(blocked_at)
+                except ValueError:
+                    continue
+                if b_dt < cutoff:
+                    continue
+                token, direction = mr.group(1).upper(), mr.group(2).upper()
+                bucket = b_dt.strftime('%Y%m%d%H%M')[:-1]  # 10-min bucket
+                dedup = f'RR-ENGINE|{token}|{direction}|{bucket}'
+                try:
+                    cur.execute(
+                        "INSERT INTO events (gate, token, direction, blocked_at, dedup_key) "
+                        "VALUES (?,?,?,?,?)", ('RR-ENGINE', token, direction, blocked_at, dedup))
+                    n_new += 1
+                except sqlite3.IntegrityError:
+                    n_dup += 1  # already recorded by record() — idempotent
+        conn.commit()
+        total = cur.execute(
+            "SELECT COUNT(*) FROM events WHERE gate='RR-ENGINE'").fetchone()[0]
+        log(f'backfill-rr: +{n_new} new RR-ENGINE rows over {hours}h'
+            f' ({n_dup} already present), RR-ENGINE total={total}')
         return n_new
     finally:
         conn.close()
@@ -716,8 +799,15 @@ def main():
     ap.add_argument('--fwd', action='store_true')
     ap.add_argument('--report', action='store_true')
     ap.add_argument('--since-hours', type=int, default=6)
+    ap.add_argument('--backfill-rr', type=int, default=0, metavar='HOURS',
+                    help='one-shot: recover RR-ENGINE hard-block lines the forward '
+                         'offset already consumed before RR_BLOCK_RE existed '
+                         '(0 = off, idempotent)')
     args = ap.parse_args()
-    run_all = not (args.record or args.close or args.fwd or args.report)
+    run_all = not (args.record or args.close or args.fwd or args.report
+                   or args.backfill_rr)
+    if args.backfill_rr:
+        backfill_rr(args.backfill_rr)
     if run_all or args.record:
         record(args.since_hours)
     if run_all or args.close:

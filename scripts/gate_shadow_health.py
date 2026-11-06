@@ -33,9 +33,9 @@ from datetime import datetime, timezone, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA, HERMES_LOG_DIR
-# Reuse gate_shadow's exact block-line patterns (BLOCK_RE + CONF_RE) so this
-# check can never drift from what the recorder actually captures.
-from gate_shadow import BLOCK_RE, CONF_RE
+# Reuse gate_shadow's exact block-line patterns (BLOCK_RE + CONF_RE + RR_BLOCK_RE)
+# so this check can never drift from what the recorder actually captures.
+from gate_shadow import BLOCK_RE, CONF_RE, RR_BLOCK_RE
 
 SHADOW_DB = os.path.join(os.path.dirname(HERMES_DATA), 'brain', 'gate_shadow.db')
 PIPELINE_LOG = os.path.join(HERMES_LOG_DIR, 'pipeline.log')
@@ -63,10 +63,16 @@ def _parse_gate_line(line):
     if m:
         gate, token, direction = m.group(1), m.group(2).upper(), m.group(3).upper()
     else:
-        mc = CONF_RE.search(line)
-        if not mc:
-            return None
-        gate, token, direction = 'CONFLUENCE-GATE-BLOCK', mc.group(1).upper(), mc.group(2).upper()
+        # must mirror gate_shadow.record()'s order exactly, or the db<=dedup
+        # selfcheck below would frame RR-ENGINE rows as unexplained extras.
+        mr = RR_BLOCK_RE.search(line)
+        if mr:
+            gate, token, direction = 'RR-ENGINE', mr.group(1).upper(), mr.group(2).upper()
+        else:
+            mc = CONF_RE.search(line)
+            if not mc:
+                return None
+            gate, token, direction = 'CONFLUENCE-GATE-BLOCK', mc.group(1).upper(), mc.group(2).upper()
     ts_m = TS_RE.match(line)
     if not ts_m:
         return None
