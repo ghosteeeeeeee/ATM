@@ -21888,3 +21888,53 @@ Final set: []
 - 24h net still RED ($-0.34) despite a perfect hour — 7d $-2.18 structural, outside auto_1hr scope
 - mae_price NULL on 7/9 24h winners — MAE coverage gap, schema/collector look needed
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 17:20] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss), 0 open
+**PnL:** $-0.07 (WR: 0.0% hour; 24h 15T 53.3% $-0.47 RED | 7d 231T 53.2% $-2.18 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BANANA pump-chain- LONG atr_sl_hit -0.07 (-1.86% pnl_pct)
+- Kill check: no signal with 0% WR n>=3 last hour (only 1 trade) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/15 = 40.0% of 24h closes — at threshold, NOT >40% -> no tpsl_utils alert (watch next hour; was 33.3% last run)
+- Boost: NONE eligible — bb-squeeze+ 5T 60% net $-0.14 (fails Net PnL>$0.05); jup_yolo_mirrored 3T 66.7% net $-0.10 (fails PnL bar + n<5); pump-chain- 2T 50% n<5
+- Neg streak: hour 15 +0.08 positive, hour 16 -0.07 = 1 consecutive negative -> no size cut (also regime EXTREME/HIGH/NORMAL, not NEUTRAL)
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners known MAE avg 0.107% (max 0.131%, 2/8 known, 6 NULL — mae coverage gap persists) -> OK
+- No storm (window-min +0.00% / at-run +0.64%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- atr_sl_hit back to exactly 40.0% (up from 33.3%) — alert fires only if >40% next hour
+- 24h net RED ($-0.47) and 7d $-2.18 structural, outside auto_1hr 1-change/hour scope
+- mae_price NULL on 6/8 24h winners — MAE coverage gap, schema/collector look needed
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 18:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 15T 53.3% $-0.47 RED | 7d 230T 53.5% $-2.11 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — quiet window (last close BANANA 16:xx -0.07)
+- Kill check: no signal with 0% WR n>=3 last hour (no trades) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/15 = 40.0% of 24h closes — at threshold, NOT >40% -> no tpsl_utils alert (unchanged from last run; alert if >40% next hour)
+- Boost: NONE eligible — bb-squeeze+ 5T 60% net $-0.14 (fails Net PnL>$0.05); jup_yolo_mirrored 3T 66.7% net $-0.10 (n<5 + fails PnL bar)
+- Neg streak: hour 16 -0.07 then two empty hours — no 3 consecutive negative hours; regime EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners known MAE avg 0.107% (0.083% / 0.131%, 2/8 known, 6 NULL — mae coverage gap persists) -> OK
+- No storm (window-min -0.54% / at-run -0.29%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- atr_sl_hit holding exactly 40.0% (2 runs in a row) — crosses threshold if any new SL hit next hour
+- 24h net RED ($-0.47) and 7d $-2.11 structural, outside auto_1hr 1-change/hour scope
+- mae_price NULL on 6/8 24h winners — MAE coverage gap, schema/collector look needed
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
