@@ -105,7 +105,7 @@ with open('automation/bugs.json') as f:
 # Find next ID
 existing = [b['id'] for b in data['bugs']]
 nums = [int(b.split('-')[1]) for b in existing if b.startswith('BUG-')]
-next_num = max(nums, 0) + 1 if nums else 1
+next_num = (max(nums) + 1) if nums else 1  # was max(nums, 0) — TypeError: compares the list against 0 (BUG-090)
 
 bug = {
     'id': f'BUG-{next_num:03d}',

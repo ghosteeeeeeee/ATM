@@ -1653,6 +1653,24 @@
       "found_by": "bug_hunter",
       "git_commit": "2d6e1b34",
       "related_bugs": []
+    },
+    {
+      "id": "BUG-090",
+      "title": "bug_hunter_prompt.md registration snippet crashes: max(nums, 0) compares list vs int",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "automation/bug_hunter_prompt.md"
+      ],
+      "symptom": "The documented 'Find next ID' snippet in the bug-registration workflow raises TypeError: '>' not supported between instances of 'int' and 'list' \u2014 max(nums, 0) passes the LIST as the first argument, so Python compares 0 against the list instead of computing an element-wise max. Hit live while registering BUG-082..089 (2026-11-06).",
+      "root_cause": "max(nums, 0) is a two-argument max over (list, int), not max-with-default; it TypeErrors for ANY non-empty nums, so the template can never work as written.",
+      "fix": "next_num = (max(nums) + 1) if nums else 1",
+      "verified_by": "bug_hunter: registration of BUG-082..089 re-run with the corrected expression; all 8 entries created (89 total bugs).",
+      "date_found": "2026-11-06",
+      "date_fixed": "2026-11-06",
+      "found_by": "bug_hunter",
+      "git_commit": null,
+      "related_bugs": []
     }
   ],
   "schema": {
