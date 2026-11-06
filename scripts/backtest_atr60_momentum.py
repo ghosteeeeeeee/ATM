@@ -1318,8 +1318,6 @@ def continuum_study(token='BTC', threshold=60.0, flip=False, half=None,
                     out[h].append(fwd[h])
         return out
 
-    rng = random.Random(77)
-
     def diff_ci(a, b, seed):
         r = random.Random(seed)
         rounds = 2000
@@ -1593,7 +1591,7 @@ def main():
                          'IMX', 'SAND', 'FOGO', 'COMP', 'DYM']
         coin_list = ([c.strip() for c in args.coins.split(',') if c.strip()]
                      if args.coins else default_coins)
-        for tf in [x for x in args.tfs.split(',') if x]:
+        for tf in [x.strip() for x in args.tfs.split(',') if x.strip()]:
             pooled_ceo(tf, args.pct, coin_list, half=args.half, cont_db=args.cont_db)
     if args.cont:
         continuum_study(args.coin, args.threshold, flip=False, half=args.half,
