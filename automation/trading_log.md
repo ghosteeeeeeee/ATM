@@ -21651,3 +21651,26 @@ Final set: []
 **Open Questions:**
 - 7d $-2.02 RED — structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-06 07:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 1 open
+**PnL:** $0.00 (WR: n/a hour; 24h 6T 66.7% $+0.16 | 7d 253T 54.5% $-2.01 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closed — open: BTC continuum-osc- SHORT (+0.36% unrealized, opened 06:54)
+- Kill check: no signal with 0% WR n>=3 in 24h (worst: pump-chain+ 1T -0.13, continuum+ 1T -0.07) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/6 = 33.3% of 24h closes (under 40%) — drag -0.20 vs mfe_exit +0.27 + profit-monster-trail +0.09 -> no tpsl_utils alert
+- Boost HOLD: jup_yolo_mirrored 4T 100% +0.36 across BTC(2)/HYPE(1)/SOL(1) but n<5 -> hold
+- Neg streak: hourly closes last 12h = +0.03 (23:00), +0.03 (05:00) — both positive, not 3 consecutive -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.189%, 4/4 <0.5% — good
+- No storm (window-min -0.21% / at-run -0.15%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $-2.01 RED — structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
