@@ -10640,5 +10640,16 @@
     "category": "measurement hygiene",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-07T04:52:27Z",
+    "idea": "PRE-ARM BREAKEVEN LOCK — extend ARM-BE-STOP from the 0.40% arm down to a 0.25% peak lock for not-yet-armed trades",
+    "rationale": "Units-correct giveback ledger (pnl_usdt = amount_usdt x move%/100, unleveraged, no fees, ceiling): 14d 399T peaked +$27.85 finished -$2.62 = $30.47 unharvested; 30d 777T peaked +$64.24 finished -$7.21 = $71.45. Never-armed class = 183T/14d; MFE<0.30 owns 132T '-13.42' (3.8% WR, 86% of never-armed bleed); MFE>=0.30 = 51T whose 32 losers sum '-2.69' and would convert to ~0 at a breakeven lock (ceiling +$2.69/14d), MFE>=0.25 cohort 64T ceiling +$3.91/14d. Losers end below entry so they must cross the lock level -> ceiling is tight for the loser subset; only fk is unknown. Current ARM-BE (post-arm only) already PASSed 30d candle OOS at fk 9.7% net +$3.46.",
+    "expected_impact": "ceiling +$2.69/14d (lock 0.30) .. +$3.91/14d (lock 0.25); realistic value unknown until fk measured",
+    "category": "exit / offense — harvest the peak instead of riding it back",
+    "status": "suggested",
+    "risk": "medium",
+    "bar": "candle-OOS 30d: net delta >= +$1.00/14d in pnl_usdt UNITS (never mix with pnl_pct) AND fk <20% AND 30d same-sign. Default NO SHIP.",
+    "not_a_duplicate_of": "ARM-BE-STOP (post-0.40 only) / jup-trail-shadow-1xatr (jup-only) / mfe-cut-arm-be (stall cut, OOS failed) / TAT (time-based)"
   }
 ]

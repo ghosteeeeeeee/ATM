@@ -827,7 +827,7 @@ def get_ab_params_for_trade(direction: str) -> dict:
     }
 
 
-def _daily_fill_cap_block():
+def _daily_fill_cap_block(token=None, direction=None, source=None):
     """DailyFillCap / Cap D (CEO SHIP 2026-11-04, consult 20261104T172347Z
     "SHIP (a)+(e). REJECT (b),(c),(d)" — the working capital brake).
 
@@ -843,6 +843,11 @@ def _daily_fill_cap_block():
     Contract: STATELESS (log + return only — no mark_signal_executed, no state
     write) and FAIL-OPEN (any exception -> WARN + False, never raises; callers
     therefore never see a PG outage as "block").
+
+    token/direction/source are OPTIONAL LOG CONTEXT ONLY (brain_auditor #231
+    2026-11-07): the SKIP line used to carry no candidate identity, so the
+    opportunity cost of the brake was unmeasurable (we could not join a braked
+    candidate to a later outcome). Decision logic does not read them.
 
     SCOPE: shared by BOTH automated fill paths in this file (main exec loop and
     process_delayed_entries — mirrored the same way _long_bypass_short_bias_block
@@ -887,7 +892,9 @@ def _daily_fill_cap_block():
         _n = int(_row[0] or 0)
         _net = float(_row[1] or 0)
         if _n >= DAILY_FILL_CAP_MAX and _net < 0:
-            log(f'SKIP: DailyFillCap — {_n} opens in last 24h (max {DAILY_FILL_CAP_MAX}) while fee-net {_net:+.2f} < 0 — brake until first green 24h')
+            _ctx = ' '.join(str(x) for x in (token, direction, source) if x)
+            log(f'SKIP: DailyFillCap — {_n} opens in last 24h (max {DAILY_FILL_CAP_MAX}) while fee-net {_net:+.2f} < 0 — brake until first green 24h'
+                + (f' [blocked {_ctx}]' if _ctx else ''))
             return True
         return False
     except Exception as _dfc_err:
@@ -999,7 +1006,7 @@ def process_delayed_entries(paper=False):
         # helper = single SQL source with the main exec loop. RETRIED (not
         # dropped) while engaged — the cap self-releases on the first green
         # 24h, and max_wait expiry above still applies on the retry.
-        if _daily_fill_cap_block():
+        if _daily_fill_cap_block(token, direction, source):
             log(f'  ⏳ DELAYED-ENTRY-HELD: {token} {direction} — DailyFillCap (retry until first green 24h)')
             still_pending.append(entry)
             continue
@@ -5373,7 +5380,7 @@ def run(dry_run=False):
         #   ai_trader_precheck) never reach either path, so they bypass by design.
         # ROBUSTNESS: PG failure -> WARN + fail-open INSIDE the helper; it never
         #   raises, so neither fill path can die on a PG outage.
-        if _daily_fill_cap_block():
+        if _daily_fill_cap_block(token, direction, source):
             skipped += 1
             continue
 

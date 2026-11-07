@@ -3715,5 +3715,16 @@
     "after": "86 entries",
     "rationale": "Weekly AMPLIFY mandate — 14d token-day-dedup screen: 41 ev / 17 tok-days / 68.3% would-win / +1.49 (10-26..11-04 span); 13 token-days blocked under both neutral gates so the in-flight CHOP-only exempt leaves them shut",
     "impact": "No behavior — open disposition entry with pre-registered ship bars and NO-SHIP default"
+  },
+  {
+    "timestamp": "2026-11-07T04:52:27Z",
+    "agent": "brain_auditor",
+    "change": "Audit #231: DailyFillCap SKIP log line now carries candidate identity — _daily_fill_cap_block(token=None, direction=None, source=None); both fill paths pass context; suffix ' [blocked TOKEN DIR source]'.",
+    "type": "ops",
+    "file": "scripts/decider_run.py",
+    "before": "SKIP: DailyFillCap - N opens in last 24h (max 15) while fee-net -0.76 < 0 - brake until first green 24h",
+    "after": "same + ' [blocked ENS LONG grind-accum+]'; return-value logic byte-identical",
+    "rationale": "Brake opportunity cost was unmeasurable (no candidate identity on the SKIP line); first braked candidate today only recoverable by fragile line-pairing.",
+    "impact": "ZERO trading behavior. py_compile PASS, 2 callers updated, no repo parser matches the line exactly. Enables 11-08 re-read of what the brake is costing."
   }
 ]
