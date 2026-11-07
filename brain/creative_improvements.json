@@ -10651,5 +10651,26 @@
     "risk": "medium",
     "bar": "candle-OOS 30d: net delta >= +$1.00/14d in pnl_usdt UNITS (never mix with pnl_pct) AND fk <20% AND 30d same-sign. Default NO SHIP.",
     "not_a_duplicate_of": "ARM-BE-STOP (post-0.40 only) / jup-trail-shadow-1xatr (jup-only) / mfe-cut-arm-be (stall cut, OOS failed) / TAT (time-based)"
+  },
+  {
+    "date": "2026-11-07T08:50:00Z",
+    "idea": "PRE-ARM LOCK: measured threshold curve + peak-proportional arm B (extends #231 flat-0.25 idea into a tracked, two-arm counterfactual)",
+    "rationale": "Fresh 30d/14d sweep of unarmed closed trades by peak (mfe_pct): ceiling (losers -> ~0, pnl_usdt units) = thr 0.10 +19.73/30d, 0.15 +16.92, 0.20 +13.75, 0.25 +10.14, 0.30 +8.17, 0.40 +3.85. Lower thresholds dominate on loser coverage while cohort-winner pnl stays ~+6.8-7.0 flat — so ceiling is NOT the binding constraint, fk (winners falling through entry after peak) is, and only a 1m candle walk can price it. Arm A = flat BE lock at thr; Arm B = peak-proportional floor (exit at entry + 40%xpeak once peak>=0.10) which sets a higher floor for deeper peaks and should cut fk. 14d never-armed MFE<0.30 = 114T '-12.64' sits BELOW all thr = this lock cannot touch the biggest bleed class; that stays owned by TAT/stop-tighten.",
+    "expected_impact": "ceiling +10.14 (thr 0.25) .. +19.73 (thr 0.10) per 30d before fk/fees; realistic net unknown until candle walk",
+    "category": "exit / offense — harvest the peak instead of riding it back",
+    "status": "pre-registered",
+    "risk": "medium",
+    "bar": "registered as amplify-prearm-breakeven-lock in data/shadow_disposition.json (due 11-14): net >= +$2.00/30d pnl_usdt-units AND fk<20% AND 14d same-sign AND armed untouched; one arm only; default NO SHIP",
+    "not_a_duplicate_of": "#231 PRE-ARM BREAKEVEN LOCK (this run adds the curve + arm B + tracked bars); ARM-BE post-arm only; mfe-cut time-stall failed; reentry-study is post-stop"
+  },
+  {
+    "date": "2026-11-07T08:50:00Z",
+    "idea": "NAMED-GATE EV LEAGUE — weekly watchlist of gates with would_win >=55% AND n >=300 (only possible after this run's gate-label fix)",
+    "rationale": "The 9,055-row UNKNOWN bucket hid per-gate would-win for 8,716 rows (fix shipped this run). First corrected read: approval-CONFLUENCE 873 blocked @57% would-win avg -0.08 and SHORT-RSI-HARD-FLOOR 391 @56% avg -0.04 are the highest-would-win large blocks and were invisible before; every named gate still has avg_pnl < 0 so the 'gates earn their keep' conclusion HOLDS — the league is a tripwire, not a proposal. If a gate holds >=55% at n>=300 for 2 consecutive weekly reads AND its avg_pnl turns >=0, escalate to a scope/exempt review (check storm-confl-waiver + STANDALONE_BYPASS collisions first).",
+    "expected_impact": "detection only: catches the first gate whose blocked cohort turns positive-EV while it is still cheap to review",
+    "category": "measurement / drift tripwire",
+    "status": "suggested",
+    "risk": "low",
+    "bar": "0 code — read the corrected GATE JUSTIFICATION table in shadow_trader --report weekly; escalate only on the 2-week + n>=300 + avg>=0 condition"
   }
 ]

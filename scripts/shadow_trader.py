@@ -373,6 +373,43 @@ def _get_leverage(token, signals_leverage):
     return MAX_LEVERAGE
 
 
+def gate_name_from_reason(reason):
+    """Map a decision_reason to a gate label (single source of truth — the
+    ingest path and the backfill must agree or labels drift).
+
+    brain_auditor #232 (follow-up logged by main-session 2026-10-29, shipped
+    2026-11-07): 'blocked@approval: <gate>' reasons carry no [BRACKET] tag, so
+    9,055 blocked rows landed gate_name='UNKNOWN' and every gate's would-win
+    table in --report / shadow_mode_analysis undercounted its blocks.
+    ponytail: residual long-tail reasons ('expired: token on blacklist') stay
+    UNKNOWN on purpose — ~101 rows, honest unclassified bucket.
+    """
+    if not reason:
+        return None
+    if 'compaction_stale' in reason:
+        return 'CONFLUENCE-EXPIRY'
+    if reason.startswith('blocked@approval:'):
+        # 'blocked@approval: short-rsi-hard-floor | expired>10min ...'
+        # 'blocked@approval: confluence: single-type not in standalone bypass (...) | ...'
+        body = reason.split(':', 1)[1].split('|')[0].strip()
+        head = body.split(':')[0].strip()
+        return head.upper() if head else 'UNKNOWN'
+    if 'combo_key stale' in reason:
+        return 'COMBO-STALE'
+    if reason.startswith('expired: APPROVED combo'):
+        return 'HOTSET-EXIT'
+    if reason.startswith('trade failed at execution:'):
+        return 'EXEC-FAIL'
+    if reason.startswith('post-claim block:'):
+        head = reason.split(':', 1)[1].strip().split()
+        return head[0].upper() if head else 'UNKNOWN'
+    import re
+    match = re.search(r'\[([A-Z-]+)\]', reason)
+    if match:
+        return match.group(1)
+    return 'UNKNOWN'
+
+
 def record():
     """Snapshot ALL signals not yet recorded."""
     conn = get_db()
@@ -509,16 +546,7 @@ def record():
                 gate_blocked = 0
                 if dec in ('EXPIRED', 'SKIPPED', 'FAILED'):
                     gate_blocked = 1
-                    if 'compaction_stale' in reason:
-                        gate_name = 'CONFLUENCE-EXPIRY'
-                    elif reason:
-                        # Try to parse from reason
-                        import re
-                        match = re.search(r'\[([A-Z-]+)\]', reason)
-                        if match:
-                            gate_name = match.group(1)
-                        else:
-                            gate_name = 'UNKNOWN'
+                    gate_name = gate_name_from_reason(reason)
                 
                 cur.execute("""
                     INSERT OR IGNORE INTO shadow_trades 

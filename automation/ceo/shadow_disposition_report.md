@@ -1,4 +1,4 @@
-# Shadow disposition report — 2026-11-06T23:42:55.375110+00:00
+# Shadow disposition report — 2026-11-07T08:15:00.145161+00:00
 registry: 87 entries (open=41)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
@@ -85,6 +85,6 @@ registry: 87 entries (open=41)
 - OPEN btc-standalone-deny-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN setup-recall-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN linreg-fade-fill-funnel: deadline=2026-11-13T00:00:00Z | (no parseable source)
-- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-10T00:00:00Z | data/combo_weights.json: 65 rows, 0.4d
+- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-10T00:00:00Z | data/combo_weights.json: 65 rows, 0.1d
 - OPEN amplify-bbsqueeze-neutral-exempt: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN atr-trend-accel-shadow: deadline=2026-12-06T00:00:00Z | (no parseable source)

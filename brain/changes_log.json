@@ -3726,5 +3726,27 @@
     "after": "same + ' [blocked ENS LONG grind-accum+]'; return-value logic byte-identical",
     "rationale": "Brake opportunity cost was unmeasurable (no candidate identity on the SKIP line); first braked candidate today only recoverable by fragile line-pairing.",
     "impact": "ZERO trading behavior. py_compile PASS, 2 callers updated, no repo parser matches the line exactly. Enables 11-08 re-read of what the brake is costing."
+  },
+  {
+    "timestamp": "2026-11-07T08:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #232: shadow_trader gate-label parser — shared gate_name_from_reason() now parses blocked@approval:/combo_key stale/HOTSET-EXIT/trade-failed/post-claim reasons; one-time backfill re-labeled 8,716 of 9,055 UNKNOWN rows in brain/shadow_trades.db (residual 339 = no-reason/long-tail, honest)",
+    "type": "ops",
+    "file": "scripts/shadow_trader.py + brain/shadow_trades.db",
+    "before": "gate_name='UNKNOWN' for every reason without a [BRACKET] tag (9,055 rows; every gate's would-win table undercounted its blocks)",
+    "after": "35 named gates; top-10 table now includes COMBO-STALE 3,296 @44%, HOTSET-EXIT 920 @49%, CONFLUENCE 873 @57%, EXEC-FAIL 486 @46%, SHORT-RSI-HARD-FLOOR 391 @56%",
+    "rationale": "Follow-up logged by main-session 2026-10-29 (LOW) and never picked up; shadow_mode_analysis.py consumes the same column so both reports were blind to 8.7k blocked rows",
+    "impact": "ZERO trading behavior — analysis-only script + analysis-only sqlite; py_compile PASS; 10-case truth table PASS; --report re-run reproduces corrected table; all gate avg_pnl still negative so no gate verdict flips"
+  },
+  {
+    "timestamp": "2026-11-07T08:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #232 AMPLIFY: registered amplify-prearm-breakeven-lock in data/shadow_disposition.json (kind=amplify, due 2026-11-14, NO-SHIP default)",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "87 entries",
+    "after": "88 entries — PRE-ARM LOCK two-arm counterfactual with measured thr curve (0.10 ceiling +19.73/30d .. 0.40 +3.85/30d)",
+    "rationale": "Weekly offense mandate; advances #231 creative into a bar-equipped tracked entry (net >= +$2.00/30d units-guarded, fk<20%, 14d same-sign, armed untouched)",
+    "impact": "No behavior — pre-registered measurement only"
   }
 ]

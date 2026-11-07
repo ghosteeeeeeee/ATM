@@ -1336,6 +1336,21 @@
    "join_rate": "PostgreSQL brain trades WHERE signal LIKE 'atr-trend%' (open_time >= started); n and WR limbs both from closed rows",
    "owner": "CEO",
    "notes": "Backtest 30d x 12 coins: 24h direction-aligned WR 58.8% mean +0.72%, ev-state +0.77 (day-block p=0.007-0.015), verified by audit #2 + own-conclusions; audit #2 sizing rule: >=30 forward days day-blocked CI before ANY size \u2014 this reckoning gates KEEP vs KILL, not sizing. OPEN bug BUG-096: 38/176 tokens have 15m data >30min stale -> trend check skips, coverage ~78% (upstream 15m writer). Entry latency up to 10min post-cross (CROSS_LOOKBACK_MIN, 100% event capture). Spec: plans/atr60-momentum-spec-2026-11-06.md"
+  },
+  {
+   "id": "amplify-prearm-breakeven-lock",
+   "stream": "PRE-ARM BREAKEVEN LOCK \u2014 extend ARM-BE-STOP below the 0.40% arm: lock stop at entry once an UNARMED trade peaks >= threshold (arms: flat-BE at thr vs peak-proportional floor = entry + 40% x peak)",
+   "kind": "amplify",
+   "proposal_type": "(a) param-widen counterfactual on a measured cohort (unarmed trades with mfe_pct >= thr)",
+   "status": "open",
+   "created_at": "2026-11-07T08:50:00Z",
+   "owner": "brain_auditor weekly AMPLIFY run #232 (extends #231 creative, now with measured threshold curve + tracked bars)",
+   "deadline": "2026-11-14T00:00:00Z",
+   "evidence": "FRESH 30d/14d PG sweep (units=pnl_usdt, trailing_activated=false, ceiling = cohort losers converted to ~0; fees excluded, winner-pass-through UNMEASURED so this is a CEILING not a claim): thr 0.10 -> +19.73/30d (n=303, 212 losers) / +9.24/14d | 0.15 -> +16.92 / +7.71 | 0.20 -> +13.75 / +5.85 | 0.25 -> +10.14 / +3.62 | 0.30 -> +8.17 / +2.59 | 0.40 -> +3.85 / +0.79. Independent reproduction of #231's 0.25 ceiling (+3.62 vs its +2.69..3.91/14d band). Cohort winners' pnl (pass-through exposure proxy) is flat ~+6.8-7.0/30d across thr 0.10-0.25 -> ceiling is dominated by loser coverage, and the ONLY unknown is fk (winners that fall back through entry after peak before their real win) which only the candle walk can answer. Context: 7d chop-family 71T 0% '-8.14' vs trail-family 100T 93% '+6.67'; 14d never-armed MFE<0.30 = 114T '-12.64' (below every thr = NOT coverable by this lock, needs the TAT/stop-tighten family instead).",
+   "threshold": "30d 1m-candle walk per arm, adverse/peak-first anchor: net delta >= +$2.00/30d in pnl_usdt UNITS (never pnl_pct) AND fk (eventual winners whose path crosses the lock after peak) <20% AND 14d same-sign AND armed trades untouched (lock must not fire once trailing_activated=true). Units guard mandatory (#193 landmine). Default NO SHIP; pick ONE arm only (one variable).",
+   "default_action": "NO SHIP \u2014 stays shadow/counterfactual; ARM-BE-STOP (post-arm only) already live, mfe-cut-arm-be (stall cut) already BAR-FAILED",
+   "not_a_duplicate_of": "ARM-BE-STOP (fires only after 0.40 arm) / mfe-cut-arm-be (time-stall cut, OOS failed #134) / reentry-study (POST-stop re-entry, due 11-21) / stop-tighten 0.80 (adverse-side clamp on jup/vb, due 11-14) / TAT variant-C (time-based)",
+   "risk": "medium \u2014 every loser passes through entry on the way to its stop, so the loser-side ceiling is tight; the risk is winner pass-through (fk), which is why candle-walk fk<20% is a hard bar"
   }
  ]
 }
