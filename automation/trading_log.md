@@ -22439,3 +22439,76 @@ Final set: []
 - 24h nearly flat ($-0.03) but 7d $-1.53 structural, outside auto_1hr 1-change/hour scope
 - DailyFillCap: confirm brake release condition when pipeline next evaluates
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-07 15:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 opens, 1 open (HYPE SHORT jup_yolo_mirrored +0.09%)
+**PnL:** $0.00 (WR: n/a hour; 24h 4T 75.0% +$0.20 GREEN | 7d 192T 53.1% $-2.07 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens — DailyFillCap brake still the quiet cause
+- Kill check: no signal with 0% WR n>=3 last hour (no closes) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/4 = 25.0% of 24h closes (<40%) — tpsl_utils.py DEPLOYED -> no action
+- Boost: NONE eligible — no signal with n>=5 in 24h (max pump-chain- 2T)
+- Neg streak: 0 closes in past 12h — no 3 consecutive negative hours -> no size cut
+- Frequency: 0 opens/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.183% max 0.336%, 3/3 known, all <0.5% -> OK
+- No storm (window-min -0.11% / at-run -0.11%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h turned GREEN (+$0.20, 75% WR) — first green 24h window in days; DailyFillCap release condition (fee-net green) may now be met — confirm when pipeline next evaluates
+- 7d still $-2.07 structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-07 16:20] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses), 0 opens
+**PnL:** $+0.09 (WR: 100% hour; 24h 4T 75.0% +$0.06 GREEN | 7d 190T 53.7% $-2.07 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BCH atr-trend- SHORT +$0.04 (1.61%), HYPE jup_yolo_mirrored SHORT +$0.05 (2.12%) — both profit-monster-trail exits
+- Kill check: no signal with 0% WR n>=3 last hour (both closes wins) -> keep all; pump-chain- 14d 31T 38.7% WR but regime split EXTREME 50.0% (34T) / NORMAL 39.4% (33T +$0.07) — wins in BOTH regimes -> keep alive, watch only
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/4 = 25.0% of 24h closes (<40%) — tpsl_utils.py DEPLOYED -> no action
+- Boost: NONE eligible — no signal with n>=5 in 24h (max jup_yolo_mirrored 2T)
+- Neg streak: only 1 hour with closes in past 12h (15:00, +$0.09) — no 3 consecutive negative hours -> no size cut
+- Frequency: 1 open/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.105% max 0.219%, 3/3 known, all <0.5% -> OK
+- DailyFillCap: BRAKE RELEASED — opens 4 < 15 AND fee-net +0.02 >= 0 (both conditions false) -> fills no longer capped
+- No storm (window-min -0.37% / at-run -0.13%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN +$0.06 with fee-net now positive — watch whether flow resumes with brake off
+- 7d still $-2.07 structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-07 17:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 opens, 0 open
+**PnL:** $0.00 (WR: n/a hour; 24h 3T 100% +$0.13 GREEN | 7d 186T 53.5% $-1.93 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens — quiet hour after 16:20 pair of wins
+- Kill check: no signal with 0% WR n>=3 last hour (no closes) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 0/3 = 0.0% of 24h closes (<40%) — tpsl_utils.py DEPLOYED -> no action
+- Boost: NONE eligible — no signal with n>=5 in 24h (max jup_yolo_mirrored 2T)
+- Neg streak: only 1 hour with closes in past 12h (15:00, +$0.09) — no 3 consecutive negative hours -> no size cut
+- Frequency: 0 opens/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.105% max 0.219%, 3/3 known, all <0.5% -> OK
+- No storm (window-min -0.12% / at-run +0.03%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN +$0.13 at 100% WR (3T) — small n, watch whether DailyFillCap-release flow sustains
+- 7d still $-1.93 structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
