@@ -3734,7 +3734,7 @@
     "type": "ops",
     "file": "scripts/shadow_trader.py + brain/shadow_trades.db",
     "before": "gate_name='UNKNOWN' for every reason without a [BRACKET] tag (9,055 rows; every gate's would-win table undercounted its blocks)",
-    "after": "35 named gates; top-10 table now includes COMBO-STALE 3,296 @44%, HOTSET-EXIT 920 @49%, CONFLUENCE 873 @57%, EXEC-FAIL 486 @46%, SHORT-RSI-HARD-FLOOR 391 @56%",
+    "after": "35+ named gates; top-10 includes COMBO-STALE 3,296 @44%, HOTSET-EXIT 920 @49%, CONFLUENCE 873 @57%, EXEC-FAIL 486 @46%, SHORT-RSI-HARD-FLOOR 391 @56%; cooldown skips -> COOLDOWN-SKIP 330. TOTAL relabeled 9,046 of 9,055 UNKNOWN; residual 9 (blacklist expiries, documented ponytail ceiling). bug_hunter verdict SAFE TO DEPART 6/6 (caught stale ~101-row docstring count -> corrected, SKIP branch added on follow-up).",
     "rationale": "Follow-up logged by main-session 2026-10-29 (LOW) and never picked up; shadow_mode_analysis.py consumes the same column so both reports were blind to 8.7k blocked rows",
     "impact": "ZERO trading behavior — analysis-only script + analysis-only sqlite; py_compile PASS; 10-case truth table PASS; --report re-run reproduces corrected table; all gate avg_pnl still negative so no gate verdict flips"
   },

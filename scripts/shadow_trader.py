@@ -381,8 +381,8 @@ def gate_name_from_reason(reason):
     2026-11-07): 'blocked@approval: <gate>' reasons carry no [BRACKET] tag, so
     9,055 blocked rows landed gate_name='UNKNOWN' and every gate's would-win
     table in --report / shadow_mode_analysis undercounted its blocks.
-    ponytail: residual long-tail reasons ('expired: token on blacklist') stay
-    UNKNOWN on purpose — ~101 rows, honest unclassified bucket.
+    ponytail: residual long-tail reasons stay UNKNOWN on purpose — 9 rows
+    ('expired: token on LONG/SHORT blacklist'), honest unclassified bucket.
     """
     if not reason:
         return None
@@ -400,6 +400,13 @@ def gate_name_from_reason(reason):
         return 'HOTSET-EXIT'
     if reason.startswith('trade failed at execution:'):
         return 'EXEC-FAIL'
+    if reason.startswith('SKIP:'):
+        # 330 hotset-failure-cooldown skips sat as UNKNOWN (bug_hunter #232).
+        # Cooldown gets its own bucket (the Oct-29 cooldown work tracks it);
+        # other SKIP: shapes join the generic SKIP bucket.
+        if 'cooldown' in reason:
+            return 'COOLDOWN-SKIP'
+        return 'SKIP'
     if reason.startswith('post-claim block:'):
         head = reason.split(':', 1)[1].strip().split()
         return head[0].upper() if head else 'UNKNOWN'

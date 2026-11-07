@@ -47,7 +47,7 @@
   ],
   "config_changes_applied": [],
   "ops_changes_applied": [
-    "scripts/shadow_trader.py: gate_name_from_reason() shared parser (ingest + backfill) + one-time backfill of brain/shadow_trades.db (8,716 rows relabeled, 339 honest residual). py_compile PASS, 10-case truth table PASS, --report re-run shows corrected table. ZERO trading behavior."
+    "scripts/shadow_trader.py: shared gate_name_from_reason() (ingest + backfill single source of truth) + two-pass backfill of brain/shadow_trades.db: 9,046 of 9,055 UNKNOWN relabeled (8,716 approval/combo/hotset/post-claim + 330 cooldown skips -> COOLDOWN-SKIP); residual 9 = 'expired: token on blacklist' (documented honest bucket). py_compile PASS, 13-case truth table PASS, --report re-run. bug_hunter subagent verdict SAFE TO DEPART (6/6), caught stale docstring count -> fixed + SKIP branch added same run. ZERO trading behavior."
   ],
   "changes_from_last_run": {
     "#231 DailyFillCap SKIP identity (ops)": "PASS — pipeline.log 04:58:23 line carries [blocked ETH LONG jup_yolo_mirrored]; cap then self-released as #231 predicted (now 12 opens <15 while fee-net still '-0.67' = leaky-limiter behavior confirmed, no SKIPs since 04:58)",
