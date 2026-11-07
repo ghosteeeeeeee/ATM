@@ -3228,3 +3228,14 @@
 
 ## Error Alerts — 2026-11-06 19:18 UTC
 - **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-11-06 22:18 UTC
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: [signals/__init__] WARNING: 'atr_trend_accel' is ENABLED (ATR_TREND_ACCEL_ENABLED) but its module failed to import — it will TOK fire. Check for defunct imports (signal_gen /`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-06 22:48 UTC
+- **[WARN]** (gate_shadow_health): 24h capture ratio=0.87 (db=2329, log-dedup=2680); capture ratio 0.87 < 0.9 (db=2329 vs log-dedup=2680 over 24h)
+
+## Error Alerts — 2026-11-07 02:18 UTC
+- **REPEATED** (13x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] GRIFFAIN TOK BLOCKED — WARNING — MOMENTUM`

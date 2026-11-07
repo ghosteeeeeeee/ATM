@@ -1,22 +1,8 @@
 # CONTROL TOWER — shadows, trials, decision calendar
-generated 2026-11-06T08:15:00.129083+00:00 by scripts/shadow_disposition.py (daily 08:15) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
-42 open / 42 done / 84 registry entries
+generated 2026-11-06T23:42:55.375110+00:00 by scripts/shadow_disposition.py (daily 08:15) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
+41 open / 46 done / 87 registry entries
 
-## 🟠 DUE ≤24h (3)
-- 2026-11-07 [T-1] `volmom-volbreak` (owner: CEO)
-  - bar: pre-registered n>=20 bar
-  - progress: —
-  - if silent: KILL build (flags already False)
-- 2026-11-07 [T-1] `harvest-ship-2026-11-04` (owner: CEO)
-  - bar: jup share rolling-50 <35% within 48h AND HML 7d <15 AND daily net >= $0 sustained 72h AND LONG fills in SHORT_BIAS -5...
-  - progress: —
-  - if silent: revert whichever of the 4 ships fails its metric (constants back / flags off), report to kanban
-- 2026-11-07 [T-1] `daily-fill-cap-brake` (owner: CEO)
-  - bar: fills/day <=15 while 24h fee-net < 0 (cap engaged) AND daily fee-net improves vs the 8-day red baseline (avg -$0.58/d...
-  - progress: —
-  - if silent: KEEP cap (stateless, self-releasing — no harm while red; evaluate frequency trade-off at fold-line)
-
-## 🟡 DUE ≤7d (16)
+## 🟡 DUE ≤7d (17)
 - 2026-11-09 [T-3] `signal-zombie-purge` (owner: main-session -> next consult if T cares)
   - bar: DECISION NEEDED: extending the purge deletes forensic history (we actively use expired-row tombstone reasons for diag...
   - progress: —
@@ -53,9 +39,13 @@ generated 2026-11-06T08:15:00.129083+00:00 by scripts/shadow_disposition.py (dai
   - bar: every quoted fwd mean must be token-day deduped first — event n is 7-10x pseudo-replicated (confluence 5,766 events =...
   - progress: —
   - if silent: consumers quoted event-level are wrong — fix reports before citing
+- 2026-11-10 [T-4] `amplify-bbsqueeze-warrior-uninert` (owner: brain_auditor)
+  - bar: bb-squeeze+ + warrior-sr-confirm± share of next-100 closed fills >= 25% (baseline last-100 17%, last-48h-100 38.9%) A...
+  - progress: —
+  - if silent: —
 - 2026-11-11 [T-5] `watch-contrarian-live` (owner: main-session)
   - bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo
-  - progress: 32 vs >=1 real fade trades (pc- LONG opens since started) — OK
+  - progress: 34 vs >=1 real fade trades (pc- LONG opens since started) — OK
   - if silent: report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREF...
 - 2026-11-12 [T-6] `storm-confl-waiver` (owner: CEO label + T sign-off 2026-10-29 ('All three'))
   - bar: >=3 CONSECUTIVE storms (auto_1hr [STORM-READINESS] packets with |BTC 1h|>=1.5%) each showing positive counterfactual;...
@@ -103,10 +93,10 @@ generated 2026-11-06T08:15:00.129083+00:00 by scripts/shadow_disposition.py (dai
   - bar: At the 2026-11-14 read, on NEW data collected after the retune (never re-use the 1.0% window): log-joined DISTINCT tr...
   - progress: —
   - if silent: NO CHANGE — STOP_TIGHTEN_MAX_PRICE_PCT stays 1.00 and ENFORCE stays False if the bar fails; the 1.0% enforce hypothes...
-- 2026-11-16 [T-10] `short-shadow-join-builder` (owner: main-session)
-  - bar: join builder shipped: for each of the 5 shadow tags, token+dir -> outcome window join (same fwd machinery as gate_sha...
+- 2026-11-14 [T-8] `amplify-bbsqueeze-neutral-exempt` (owner: brain_auditor weekly AMPLIFY run #230)
+  - bar: SHIP only if ALL: (i) gate_shadow token-day dedup (token|YYYYMMDD, per gate-shadow-dedup-convention) blocked n>=15; (...
   - progress: —
-  - if silent: at 11-17 the shadow bars read n=0 and their safe defaults fire (keep kill / stay blocked / no exempt) — decision defa...
+  - if silent: NO SHIP — LONG-NEUTRAL gate stays global; sibling amplify-bbsqueeze-chop-exempt (11-13) owns the CHOP leg independently
 - 2026-11-17 [T-11] `jup-trail-shadow-1xatr` (owner: CEO label + T sign-off)
   - bar: 40 closed jup_yolo trades (JUP_YOLO_SHADOW_EVAL_N) — already met (97 closed 2026-11-03); evaluate: replay would-armed...
   - progress: —
@@ -120,7 +110,7 @@ generated 2026-11-06T08:15:00.129083+00:00 by scripts/shadow_disposition.py (dai
   - progress: —
   - if silent: stay blocked; waiver stays expired if bar fails
 - 2026-11-17 [T-11] `bear-single-source-shadow` (owner: CEO)
-  - bar: enforce flip at 2026-11-10 if simulated fills n>=20, WR>=55%, net >= +$1.00
+  - bar: enforce flip at 2026-11-10 if simulated fills n>=20, WR>=55%, net >= +$1.00 | AMENDMENT pre-registered 2026-11-06 (4 ...
   - progress: —
   - if silent: no single-source shorts in bear (stay blocked)
 - 2026-11-17 [T-11] `volgate-short-exempt-shadow` (owner: CEO)
@@ -168,11 +158,15 @@ generated 2026-11-06T08:15:00.129083+00:00 by scripts/shadow_disposition.py (dai
   - progress: —
   - if silent: NO CHANGE — walk stays analysis-only; log why-not in kanban at deadline (status quo is the default).
 
-## LATER (>14d) (2)
+## LATER (>14d) (3)
 - 2026-11-21 [T-15] `reentry-study` (owner: AMPLIFY weekly run / signal-lab)
   - bar: Design + backtest a re-entry rule (re-enter at reclaim-of-BE or +0.25pp structure confirmation within the 8h horizon)...
   - progress: —
   - if silent: NO CHANGE until design delivered
+- 2026-12-06 [T-30] `atr-trend-accel-shadow` (owner: CEO)
+  - bar: >= 30 CLOSED atr-trend trades AND WR >= 52% -> KEEP; either limb unmet at deadline -> disable (CEO WR-based rule 2026...
+  - progress: —
+  - if silent: KILL: set ATR_TREND_ACCEL_ENABLED=False (PLUS/MINUS too) — WR-based bar unmet; 24h CEO clock on the kanban packet
 - 2026-12-15 [T-39] `amplify-ugb-bypass-hole` (owner: brain_auditor weekly AMPLIFY run #222)
   - bar: SHIP only if DISTINCT trade ids >=20 in the widened cohort AND cf net delta >= +$0.15/30d AND killed-winners = 0 AND ...
   - progress: —
@@ -181,25 +175,24 @@ generated 2026-11-06T08:15:00.129083+00:00 by scripts/shadow_disposition.py (dai
 ## ⚗️ RUNNING TRIALS (1)
 - `watch-contrarian-live` — due 2026-11-11 | owner: main-session
   - bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo
-  - progress: 32 vs >=1 real fade trades (pc- LONG opens since started) — OK
+  - progress: 34 vs >=1 real fade trades (pc- LONG opens since started) — OK
 
 ## 📅 CALENDAR — every dated open item, date-ordered
-- 2026-11-07 [T-1]: volmom-volbreak, harvest-ship-2026-11-04, daily-fill-cap-brake
 - 2026-11-09 [T-3]: signal-zombie-purge
-- 2026-11-10 [T-4]: mfe-cut-arm-be, ichimoku-dampen-flooradmit, fade-ctx-exempt, winner-cell-size-125, conf-filter-parity-split, jup-atrsl-shadow-parity, rsi-ceiling-75-live, gate-shadow-dedup-convention
+- 2026-11-10 [T-4]: mfe-cut-arm-be, ichimoku-dampen-flooradmit, fade-ctx-exempt, winner-cell-size-125, conf-filter-parity-split, jup-atrsl-shadow-parity, rsi-ceiling-75-live, gate-shadow-dedup-convention, amplify-bbsqueeze-warrior-uninert
 - 2026-11-11 [T-5]: watch-contrarian-live
 - 2026-11-12 [T-6]: storm-confl-waiver, storm-readiness-packet
 - 2026-11-13 [T-7]: pump-chain-plus-weight-kill-review, amplify-vb-high-short-clonehunt, amplify-bbsqueeze-chop-exempt, linreg-fade-fill-funnel
-- 2026-11-14 [T-8]: amplify-winner-cell-mult-150, amplify-jup-short-walk, atrtrail-clip-12, stop-tighten-enforce-eval, amplify-stop-tighten-probe-080
-- 2026-11-16 [T-10]: short-shadow-join-builder
+- 2026-11-14 [T-8]: amplify-winner-cell-mult-150, amplify-jup-short-walk, atrtrail-clip-12, stop-tighten-enforce-eval, amplify-stop-tighten-probe-080, amplify-bbsqueeze-neutral-exempt
 - 2026-11-17 [T-11]: jup-trail-shadow-1xatr, short-regime-exempt-shadow, flip1-bear-override-reshadow, bear-single-source-shadow, volgate-short-exempt-shadow, maxxed-short-exempt-shadow, long-bypass-regime-shadow, jup-cluster-gate, jup-anti-chase, jup-pro-selection, btc-standalone-deny-shadow, setup-recall-shadow
 - 2026-11-18 [T-12]: amplify-xmirror-giveback
 - 2026-11-19 [T-13]: amplify-jup-short-high-cell, amplify-ema300-underdeploy
 - 2026-11-21 [T-15]: reentry-study
+- 2026-12-06 [T-30]: atr-trend-accel-shadow
 - 2026-12-15 [T-39]: amplify-ugb-bypass-hole
 
-## ✅ DONE / REVERTED (42)
-flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, relative-regime, rr-engine-shadow, chase-ratio, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, chase-move-shadow, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, jup-hml-shadow-065-050, ichimoku-short-pause, timer-cadence-recheck
+## ✅ DONE / REVERTED (46)
+flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, relative-regime, rr-engine-shadow, chase-ratio, volmom-volbreak, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, chase-move-shadow, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, jup-hml-shadow-065-050, ichimoku-short-pause, short-shadow-join-builder, timer-cadence-recheck, harvest-ship-2026-11-04, daily-fill-cap-brake
 
 ---
-freshness: FRESH | registry mtime: 2026-11-06T05:24:30+00:00 | prev tower render: 2026-11-05T08:15:01+00:00 | last run: 3 packet(s), 0 entry error(s)
+freshness: FRESH | registry mtime: 2026-11-06T23:42:47+00:00 | prev tower render: 2026-11-06T08:15:00+00:00 | last run: 0 packet(s), 0 entry error(s)

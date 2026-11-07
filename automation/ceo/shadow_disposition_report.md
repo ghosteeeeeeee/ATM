@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-06T08:15:00.129083+00:00
-registry: 84 entries (open=42)
+# Shadow disposition report — 2026-11-06T23:42:55.375110+00:00
+registry: 87 entries (open=41)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -12,8 +12,7 @@ registry: 84 entries (open=42)
 - DONE rr-engine-shadow: KILL — stale collector, stop citing as evidence (2026-10-31)
 - DONE chase-ratio: KILL — executed at consumption (gate inert) (2026-10-31)
 - OPEN ichimoku-dampen-flooradmit: deadline=2026-11-10T00:00:00Z | (no parseable source)
-- OPEN volmom-volbreak: deadline=2026-11-07T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for volmom-volbreak
+- DONE volmom-volbreak: KEEP (?)
 - DONE tc-temporal-confluence: KILL (2026-10-27)
 - DONE mom-filter-shadow: KILL (2026-10-27)
 - DONE acceleration-threshold: KILL (2026-10-27)
@@ -70,13 +69,11 @@ registry: 84 entries (open=42)
 - OPEN maxxed-short-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN gate-shadow-dedup-convention: deadline=2026-11-10T00:00:00Z | (no parseable source)
 - OPEN long-bypass-regime-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-- OPEN short-shadow-join-builder: deadline=2026-11-16T00:00:00Z | (no parseable source)
+- DONE short-shadow-join-builder: EVAL (2026-11-06)
 - DONE timer-cadence-recheck: RE-DAILY EXECUTED — option (a) taken as registered default: OnCalendar back to *-*-* 08:15 (repo + /etc, daemon-reload + timer restart verified). Rationale: weekly (Mon-only, from disposition-cadence-revert) could not honor 11-05/11-06/11-07 reads incl. the 11-07 fold-line packet; calendar now has 6+ deadlines 11-07..11-17. Re-evaluate cadence when calendar is sparse (new entry needed then). (2026-11-04)
-- OPEN harvest-ship-2026-11-04: deadline=2026-11-07T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for harvest-ship-2026-11-04
+- DONE harvest-ship-2026-11-04: EARLY FAIL WARNING — rolling-50 jup share 44.0-45.2% (bar <35% FAIL) | HML 7d 37 (bar <15 FAIL, jup owns 22/37=-3.20) | daily net day-1 -0.14 day-2 -0.29 (bar sustained $0 72h FAIL) | LONG 48h -0.43. 3 of 4 metrics failing with 2 days left before 11-07. CEO should pre-position revert decision. (?)
 - OPEN amplify-xmirror-giveback: deadline=2026-11-18T00:00:00Z | (no parseable source)
-- OPEN daily-fill-cap-brake: deadline=2026-11-07T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for daily-fill-cap-brake
+- DONE daily-fill-cap-brake: ? (?)
 - OPEN amplify-ugb-bypass-hole: deadline=2026-12-15T00:00:00Z | (no parseable source)
 - OPEN amplify-vb-high-short-clonehunt: deadline=2026-11-13T00:00:00Z | (no parseable source)
 - OPEN amplify-jup-short-high-cell: deadline=2026-11-19T00:00:00Z | (no parseable source)
@@ -88,3 +85,6 @@ registry: 84 entries (open=42)
 - OPEN btc-standalone-deny-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN setup-recall-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN linreg-fade-fill-funnel: deadline=2026-11-13T00:00:00Z | (no parseable source)
+- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-10T00:00:00Z | data/combo_weights.json: 65 rows, 0.4d
+- OPEN amplify-bbsqueeze-neutral-exempt: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN atr-trend-accel-shadow: deadline=2026-12-06T00:00:00Z | (no parseable source)

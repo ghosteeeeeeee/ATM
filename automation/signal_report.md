@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-11-06 21:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-07 03:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,700 | **WR:** 51.4% | **PnL:** -112.27%
-- **Date range:** 2026-07-29 → 2026-11-06
+- **Total trades (all time):** 3,701 | **WR:** 51.4% | **PnL:** -111.89%
+- **Date range:** 2026-07-29 → 2026-11-07
 
 ---
 
@@ -23,6 +23,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
+| jup_yolo_mirrored | SHORT | 2 | 50.0% | -0.63 | ❓ | Needs more data |
 | pump-chain- | LONG | 2 | 50.0% | +1.24 | ❓ | Needs more data |
 
 ---
@@ -41,7 +42,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] pump-chain- LONG** — WR=50.0%, PnL=+1.24% over 2 trades. Monitor next cycle.
+1. **[WATCH] jup_yolo_mirrored SHORT** — WR=50.0%, PnL=-0.63% over 2 trades. Monitor next cycle.
+2. **[WATCH] pump-chain- LONG** — WR=50.0%, PnL=+1.24% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -53,6 +55,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-06 | 673b669 | bug-hunter: atr_trend_accel build fixes |
 | 2026-11-06 | e62ff98 | automation: hourly analysis 2026-11-06 14:30 — no config cha... |
 | 2026-11-06 | 8a229b1 | scripts: 2 LOG-ONLY counterfactual shadows — BTC-chop standa... |
 | 2026-11-06 | 03bde6d | signals: linreg_fade round 2 — cross-sectional trigger + mak... |
@@ -62,6 +65,5 @@ None found. Top performers are already enabled.
 | 2026-11-04 | e06fc55 | scripts: hail-mary 20261104T161050Z — kill trial-wider-sl + ... |
 | 2026-11-04 | 11fa30c | scripts: bug_hunter LOW-1 text fix — MAXXED comment/stream s... |
 | 2026-11-04 | 6d5f138 | scripts: harvest ship 2026-11-04 — stop-tighten 0.75+ENFORCE... |
-| 2026-11-03 | 4af44b7 | scripts: CEO fix-round 2 (consult 20261103T064755Z) — SHORT_... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
