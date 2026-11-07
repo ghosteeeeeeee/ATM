@@ -22391,3 +22391,27 @@ Final set: []
 - DailyFillCap: opens rolled to 9/15 but brake text says "until first green 24h" — confirm whether count<15 alone releases it when pipeline next evaluates
 - 24h net RED ($-0.24) and 7d $-1.85 structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-07 13:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 opens, 0 open positions
+**PnL:** $0.00 (WR: n/a hour; 24h 9T 4W $-0.26 RED | 7d 193T 53.4% $-1.53 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens, 0 open — DailyFillCap brake still the quiet cause
+- Kill check: no signal with 0% WR n>=3 last hour (no trades) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/9 = 44.4% of 24h closes (>40%) — tpsl_utils.py DEPLOYED (Nov 4) -> monitor only
+- Boost: NONE eligible — no signal with n>=5 in 24h (max bb-squeeze+ 3T)
+- Neg streak: only 1 close in past 12h (+0.04 at 02:00) — no 3 consecutive negative hours -> no size cut
+- Frequency: 0 opens/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.187% max 0.336%, 4/4 known all <0.5% -> OK
+- No storm (window-min -0.21% / at-run -0.18%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h net RED ($-0.26) and 7d $-1.53 structural, outside 1-change/hour scope
+- DailyFillCap releases when 24h fee-net turns green OR fills roll off
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
