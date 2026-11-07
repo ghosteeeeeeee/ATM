@@ -22341,3 +22341,29 @@ Final set: []
 - DailyFillCap releases when 24h fee-net turns green OR fills roll off
 - 24h net RED ($-0.37) and 7d $-1.57 structural, outside auto_1hr 1-change/hour scope
 - atr_sl_hit 41.7% (>40%) — tpsl deployed so non-issue; re-check if tpsl fix shows regression
+
+## [2026-11-07 11:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 0 opens, 0 open positions
+**PnL:** $0.00 (WR: n/a hour; 24h 11T 5W $-0.40 RED | 7d 198T $-1.73 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens, 0 open — DailyFillCap brake STILL ACTIVE, designed behavior
+- Kill check: no signal with 0% WR n>=3 last hour (no trades) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/11 = 45.5% of 24h closes (>40%) — tpsl_utils.py DEPLOYED (Nov 4) -> monitor only
+- Boost: NONE eligible — no signal with n>=5 in 24h (max is bb-squeeze+ 4T)
+- Neg streak: only 1 close in past 12h (+0.04 at 02:00) — no 3 consecutive negative hours -> no size cut
+- Frequency: 0 opens/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.171% max 0.336%, 5/5 known all <0.5% -> OK
+- No storm (window-min -0.15% / at-run -0.15%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- hh-hl+ 3T 0% WR (-$0.41) all in HIGH regime 14d — n=3 far below n>=20 kill bar; watch, not actionable
+- ai-trader-manual 3T 0% WR 14d (manual CEO trades, -$0.04) — out of auto_1hr scope
+- DailyFillCap releases when 24h fee-net turns green OR fills roll off
+- 24h net RED ($-0.40) and 7d $-1.73 structural, outside 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
