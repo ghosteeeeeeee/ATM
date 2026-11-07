@@ -22512,3 +22512,27 @@ Final set: []
 - 24h GREEN +$0.13 at 100% WR (3T) — small n, watch whether DailyFillCap-release flow sustains
 - 7d still $-1.93 structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-07 18:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 1 open (HYPER atr-trend- SHORT opened 17:47)
+**PnL:** $0.00 (WR: n/a hour; 24h 3T 100% +$0.13 GREEN | 7d 182T 53.5% $-2.03 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (HYPER atr-trend- SHORT +0.13% unrealized)
+- Kill check: no signal with 0% WR n>=3 last hour (no closes) -> keep all; hh-hl+ 14d 3T 0% still n<20 watch only
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 0/3 = 0.0% of 24h closes (<40%) — tpsl_utils.py DEPLOYED -> no action
+- Boost: NONE eligible — no signal with n>=5 in 24h (max jup_yolo_mirrored 2T)
+- Neg streak: 24h 3/3 wins, no consecutive negative hours -> no size cut
+- Frequency: 1 open/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.105% max 0.219%, 3/3 known, all <0.5% -> OK
+- No storm (window-min +0.03% / at-run +0.13%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN +$0.13 at 100% WR (3T) — small n, watch whether flow sustains
+- 7d still $-2.03 structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
