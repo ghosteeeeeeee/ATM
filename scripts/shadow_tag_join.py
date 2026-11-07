@@ -44,6 +44,14 @@ Usage:
   python3 scripts/shadow_tag_join.py                 # full run + JSON artifact
   python3 scripts/shadow_tag_join.py --selfcheck     # fixtures, PASS/FAIL exit
   python3 scripts/shadow_tag_join.py --tag BEAR-SINGLE-SOURCE-SHADOW
+  python3 scripts/shadow_tag_join.py --window-days 7 # narrower than the bar window
+
+LOG ROTATION (code-review H1 — this is why the script reads archives): the daily
+rotation at ~00:10 renames pipeline.log into logs/archive/pipeline.log.<ts>.gz.
+Reading only the live file made the first post-rotation run report n=0 for the
+bear tag and overwrite the artifact the 11-10 bar read depends on. Every run now
+walks gate_shadow.log_sources() (archives covering the window, then the live
+log), so history survives rotation.
 """
 import argparse
 import calendar
@@ -52,10 +60,14 @@ import os
 import re
 import sqlite3
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA, HERMES_LOG_DIR
+# Single source of truth for rotation-aware log discovery — gate_shadow_health
+# imports the same helpers for the same reason (do not duplicate the archive
+# filename contract).
+from gate_shadow import log_sources, open_log_text
 
 LOG_PATH = os.path.join(HERMES_LOG_DIR, 'pipeline.log')
 CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
@@ -70,8 +82,20 @@ TAGS = (
     'MAXXED-SHORT-EXEMPT-SHADOW',
 )
 
-# $-basis: live 30d avg PG notional at read time was $13.44 (the same basis the
-# bear-single-source pre-read used).  RT fee = 0.09% round-trip per simulated fill.
+# Registry bars are worded "14d shadow-joined n>=..." — so the join defaults to
+# the same 14d window (code-review M1). The shadows only started 2026-11-03, so
+# for every read through 11-17 the 14d window contains all of their history; it
+# matters once the log holds MORE than 14d, where an unwindowed n would overstate
+# the bar. 0/None = no window (scan everything available).
+DEFAULT_WINDOW_DAYS = 14
+
+# $-basis: FIXED at the CEO-specified figures for this item (live 30d avg PG
+# notional at read time was $13.44 — the same basis the bear-single-source
+# pre-read used; RT fee 0.09% per simulated fill). Deliberately NOT read from
+# hermes_constants (that file is frozen pending CEO instruction) and NOT the
+# live PG notional gate_shadow._avg_notional() computes at runtime — this is a
+# pre-registered bar basis, so it must not drift between the 11-10 and 11-17
+# reads. Recorded in the JSON artifact as notional_usd / rt_fee.
 NOTIONAL = 13.44
 RT_FEE = 0.0009
 FWD_HORIZON = 48  # 48 x 5m = 4h — mirror of gate_shadow.FWD_HORIZON_CANDLES
@@ -164,10 +188,17 @@ def parse_line(line, tag):
     }
 
 
-def collect_events(lines, tags=TAGS):
+def collect_events(lines, tags=TAGS, since=None):
     """Parse + TOKEN-DAY DEDUP (tag|token|direction|UTC-day, keep earliest).
 
-    Returns (events, stats) where stats[tag] = {'raw_lines', 'unparsed'}.
+    `since` ('YYYY-MM-DD HH:MM:SS', UTC) drops lines older than the window
+    BEFORE the dedup step, so a token-day whose earliest sighting predates the
+    window cannot evict its in-window sighting (code-review M1: the registry
+    bars are worded "14d shadow-joined", so the window has to be applied here
+    and not after aggregation).
+
+    Returns (events, stats) where stats[tag] = {'raw_lines', 'unparsed'} — both
+    counted over the window only (out-of-window lines are not counted at all).
     """
     stats = {t: {'raw_lines': 0, 'unparsed': 0} for t in tags}
     picked = {}  # key -> event (earliest wins)
@@ -175,10 +206,16 @@ def collect_events(lines, tags=TAGS):
         for tag in tags:
             if f'[{tag}]' not in line:
                 continue
-            stats[tag]['raw_lines'] += 1
             ev = parse_line(line, tag)
             if ev is None:
+                # tag present but no leading timestamp: cannot be windowed or
+                # deduped — count it as a malformed raw line, never drop it silent
+                stats[tag]['raw_lines'] += 1
+                stats[tag]['unparsed'] += 1
                 continue
+            if since is not None and ev['ts'] < since:
+                continue  # outside the window: excluded entirely (not counted)
+            stats[tag]['raw_lines'] += 1
             if not ev['parsed']:
                 stats[tag]['unparsed'] += 1
                 continue
@@ -189,6 +226,18 @@ def collect_events(lines, tags=TAGS):
             break  # a line belongs to at most one tag
     events = sorted(picked.values(), key=lambda e: (e['ts'], e['token']))
     return events, stats
+
+
+def _iter_lines(sources):
+    """Yield lines from every log source (archives oldest-first, live last),
+    skipping an unreadable source instead of aborting the whole run."""
+    for path in sources:
+        try:
+            with open_log_text(path) as f:
+                for line in f:
+                    yield line
+        except (OSError, EOFError) as e:
+            log(f'skipping unreadable log source {path}: {e}')
 
 
 # ── forward-return engine (verbatim mirror of gate_shadow._fwd_4h) ───────────
@@ -214,15 +263,23 @@ def fwd_4h(rows, entry_ts, direction):
 
 
 _CANDLE_CACHE = {}
+_CANDLES_UNAVAILABLE = False  # set once the DB itself is unreadable (see load_candles)
 
 
 def load_candles(token, db_path=CANDLES_DB):
+    global _CANDLES_UNAVAILABLE
     token = (token or '').upper()
+    if _CANDLES_UNAVAILABLE:
+        return []
     if token in _CANDLE_CACHE:
         return _CANDLE_CACHE[token]
-    rows = []
+    rows = None
     try:
-        conn = sqlite3.connect(db_path, timeout=10)
+        # L4: read-only URI. Plain sqlite3.connect CREATES an empty database
+        # when the path is missing — unacceptable side effect for an analysis
+        # script that is supposed to only read. mode=ro turns that into an
+        # error instead.
+        conn = sqlite3.connect(f'file:{db_path}?mode=ro', uri=True, timeout=10)
         try:
             rows = conn.execute(
                 "SELECT ts, open, close FROM candles_5m"
@@ -230,7 +287,12 @@ def load_candles(token, db_path=CANDLES_DB):
         finally:
             conn.close()
     except sqlite3.Error as e:
-        log(f'candles read failed for {token}: {e}')
+        # Failure is NOT cached per token: a transient read error must not pin
+        # every remaining event to no_candles for the rest of the process. The
+        # DB-level failure is latched once so we do not re-log for every event.
+        _CANDLES_UNAVAILABLE = True
+        log(f'candles DB unreadable ({e}) — every event will read no_candles this run')
+        return []
     _CANDLE_CACHE[token] = rows
     return rows
 
@@ -287,7 +349,12 @@ def aggregate(events, tag):
     fee = n * NOTIONAL * RT_FEE
     net = gross - fee
 
-    # per-UTC-day net (positive-day limb of the short-regime / volgate bars)
+    # per-UTC-day net (positive-day limb of the short-regime / volgate bars).
+    # N3 — denominator note: days_total counts days with >=1 JOINABLE event; a
+    # day whose events are all unjoinable (no candles / horizon not yet matured)
+    # contributes no outcome and so cannot be judged positive or negative. The
+    # 2/3 limbs are read off this ratio, so the base is stated rather than
+    # implicit.
     day_net = {}
     day_n = {}
     for e in joined:
@@ -385,6 +452,10 @@ def eval_bar(tag, m):
             m['pos_day_ratio'] is not None and m['pos_day_ratio'] >= 2.0 / 3.0)
     elif tag == 'MAXXED-SHORT-EXEMPT-SHADOW':
         add('n_joinable >= 20', 20, n, n >= 20)
+    else:
+        # M3: all([]) is True, so an unhandled tag would otherwise print
+        # "BAR MET" with zero limbs. Fail closed instead.
+        add('no bar defined for this tag', 'a registered bar', tag, False)
     return all(l['pass'] for l in limbs), limbs
 
 
@@ -592,21 +663,97 @@ def selfcheck():
     chk(all(l['limb'] != '' for l in limbs) and len(limbs) == 3,
         'bear bar exposes exactly 3 limbs (n / WR / net)')
 
+    # 6) H1 — rotation survival. The daily ~00:10 rename moves history into
+    #    logs/archive/*.gz; reading only the live file made the first
+    #    post-rotation run report n=0 for bear and overwrite the artifact the
+    #    11-10 bar read depends on. Prove discovery, window bounding, .gz reads.
+    import gzip as _gzip
+    import shutil as _shutil
+    import tempfile as _tempfile
+    tmpdir = _tempfile.mkdtemp(prefix='stj_arch_')
+    cwd = os.getcwd()
+    try:
+        live = os.path.join(tmpdir, 'pipeline.log')
+        with open(live, 'w') as fh:
+            fh.write('2026-11-07 00:10:11 live line\n')
+        adir = os.path.join(tmpdir, 'archive')
+        os.makedirs(adir)
+        for name in ('pipeline.log.20260101000000.gz',
+                     'pipeline.log.20261030203931.gz',
+                     'pipeline.log.20261107001010.gz',
+                     'not-a-log.gz'):
+            with open(os.path.join(adir, name), 'w') as fh:
+                fh.write('x')
+        with _gzip.open(os.path.join(adir, 'pipeline.log.20261107001010.gz'),
+                        'wt') as fh:
+            fh.write('2026-11-06 12:00:00 archived line\n')
+
+        got = [os.path.basename(p) for p in log_sources(live)]
+        chk(got == ['pipeline.log.20260101000000.gz',
+                    'pipeline.log.20261030203931.gz',
+                    'pipeline.log.20261107001010.gz', 'pipeline.log'],
+            f'archive discovery (no window) -> {got}')
+        got = [os.path.basename(p) for p in
+               log_sources(live, since=datetime(2026, 11, 5, tzinfo=timezone.utc))]
+        chk(got == ['pipeline.log.20261107001010.gz', 'pipeline.log'],
+            f'window-bounded discovery keeps only the covering archive -> {got}')
+        got_lines = list(_iter_lines(log_sources(
+            live, since=datetime(2026, 11, 5, tzinfo=timezone.utc))))
+        chk(any('archived line' in x for x in got_lines)
+            and any('live line' in x for x in got_lines),
+            'both the .gz archive and the live log are actually read')
+        try:
+            log_sources(live, since=datetime(2026, 11, 5))  # naive must not raise
+            naive_ok = True
+        except TypeError:
+            naive_ok = False
+        chk(naive_ok, 'naive since= does not raise a tz TypeError')
+
+        # M3 — an unknown tag must fail closed, not print BAR MET on all([])
+        met_u, limbs_u = eval_bar('NO-SUCH-TAG', m)
+        chk(not met_u and len(limbs_u) == 1,
+            'unknown tag fails closed instead of BAR MET on all([])')
+
+        # L6/N2 — a bare --json-out (no directory component) must still write
+        os.chdir(tmpdir)
+        try:
+            _write_artifact({'x': 'em—dash'}, 'bare.json')
+            wrote_bare = os.path.exists('bare.json')
+        except Exception:
+            wrote_bare = False
+        finally:
+            os.chdir(cwd)
+        chk(wrote_bare, 'bare --json-out writes without FileNotFoundError')
+    finally:
+        _shutil.rmtree(tmpdir, ignore_errors=True)
+
     print('SELFCHECK ' + ('PASS' if ok else 'FAIL'), flush=True)
     return 0 if ok else 1
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
-def run(log_path=LOG_PATH, out_json=OUT_JSON, tags=TAGS):
+def run(log_path=LOG_PATH, out_json=OUT_JSON, tags=TAGS,
+        window_days=DEFAULT_WINDOW_DAYS):
     global RAW_STATS
-    if not os.path.exists(log_path):
-        log(f'log missing: {log_path}')
+    window_end = datetime.now(timezone.utc)
+    window_start = (window_end - timedelta(days=window_days)
+                    if window_days else None)
+    since = (window_start.strftime('%Y-%m-%d %H:%M:%S')
+             if window_start is not None else None)
+    # H1: walk every source holding the window — rotated archives first, live
+    # log last — so a run after the ~00:10 rotation still sees the history the
+    # bar read depends on (reading only the live file returned n=0 for bear).
+    sources = log_sources(log_path, since=window_start)
+    if not sources:
+        log(f'no log sources found at/near {log_path}')
         return 1
-    log(f'reading {log_path} ...')
-    with open(log_path, 'r', errors='replace') as f:
-        events, stats = collect_events(f, tags=tags)
+    log(f'reading {len(sources)} log source(s)'
+        + (f' for window {since} .. {window_end.strftime("%Y-%m-%d %H:%M:%S")}'
+           if since else ' (all available history)')
+        + f' -> {", ".join(os.path.basename(p) for p in sources)}')
+    events, stats = collect_events(_iter_lines(sources), tags=tags, since=since)
     RAW_STATS = stats
-    log(f'{sum(s["raw_lines"] for s in stats.values())} raw tag lines -> '
+    log(f'{sum(s["raw_lines"] for s in stats.values())} raw tag lines in window -> '
         f'{len(events)} token-days after dedup; joining to {CANDLES_DB} ...')
     join_events(events)
     metrics = {t: aggregate(events, t) for t in tags}
@@ -616,6 +763,10 @@ def run(log_path=LOG_PATH, out_json=OUT_JSON, tags=TAGS):
         'generated_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
         'registry_id': 'short-shadow-join-builder',
         'log_path': log_path,
+        'log_sources': sources,
+        'window_days': window_days,
+        'window_start': since,
+        'window_end': window_end.isoformat(timespec='seconds'),
         'candles_db': CANDLES_DB,
         'notional_usd': NOTIONAL,
         'rt_fee': RT_FEE,
@@ -643,13 +794,25 @@ def run(log_path=LOG_PATH, out_json=OUT_JSON, tags=TAGS):
             'days_positive': m['days_positive'], 'days_total': m['days_total'],
             'loo_min_net_usd': m['loo_min_net_usd'], 'bar_met': met,
         })
-    os.makedirs(os.path.dirname(out_json), exist_ok=True)
-    tmp = out_json + '.tmp'
-    with open(tmp, 'w') as f:
-        json.dump(payload, f, indent=1, ensure_ascii=False)
-    os.replace(tmp, out_json)
+    # L6: dirname('out.json') == '' and os.makedirs('') raises FileNotFoundError
+    # AFTER the whole computation — guard it so a bare --json-out works.
+    # N2: explicit UTF-8 — the payload carries '—' and a non-UTF8 locale would
+    # otherwise raise UnicodeEncodeError at the last step.
+    _write_artifact(payload, out_json)
     log(f'wrote {out_json}')
     return 0
+
+
+def _write_artifact(payload, out_json):
+    """Atomic JSON write (tmp + os.replace) with the L6 dirname guard and the
+    N2 explicit UTF-8 encoding."""
+    out_dir = os.path.dirname(out_json)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    tmp = out_json + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
+        json.dump(payload, f, indent=1, ensure_ascii=False)
+    os.replace(tmp, out_json)
 
 
 def main():
@@ -659,11 +822,17 @@ def main():
                     help='limit to one tag (repeatable)')
     ap.add_argument('--log', default=LOG_PATH)
     ap.add_argument('--json-out', default=OUT_JSON)
+    ap.add_argument('--window-days', type=int, default=DEFAULT_WINDOW_DAYS,
+                    metavar='N',
+                    help='only count lines from the last N days (default 14, '
+                         'matching the registry "14d shadow-joined" bars; '
+                         '0 = all available history)')
     args = ap.parse_args()
     if args.selfcheck:
         return selfcheck()
     return run(log_path=args.log, out_json=args.json_out,
-               tags=tuple(args.tag) if args.tag else TAGS)
+               tags=tuple(args.tag) if args.tag else TAGS,
+               window_days=args.window_days)
 
 
 if __name__ == '__main__':

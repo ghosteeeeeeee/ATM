@@ -34,8 +34,11 @@ from datetime import datetime, timezone, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA, HERMES_LOG_DIR
 # Reuse gate_shadow's exact block-line patterns (BLOCK_RE + CONF_RE + RR_BLOCK_RE)
-# so this check can never drift from what the recorder actually captures.
-from gate_shadow import BLOCK_RE, CONF_RE, RR_BLOCK_RE
+# and its rotated-log discovery (archive_paths + open_log_text) so this check can
+# never drift from what the recorder actually captures, nor from the rotation
+# that moves history into logs/archive/*.gz.
+from gate_shadow import (BLOCK_RE, CONF_RE, RR_BLOCK_RE,
+                         archive_paths, open_log_text)
 
 SHADOW_DB = os.path.join(os.path.dirname(HERMES_DATA), 'brain', 'gate_shadow.db')
 PIPELINE_LOG = os.path.join(HERMES_LOG_DIR, 'pipeline.log')
@@ -85,33 +88,43 @@ def _parse_gate_line(line):
 
 
 def count_log_gate_lines(window_hours):
-    """Scan pipeline.log tail for gate-block lines in the window.
+    """Scan pipeline.log (and its rotated archives) for gate-block lines in the window.
 
-    Returns (raw_line_count, dedup_key_set, tail_covers_window) —
-    tail_covers_window is False when TAIL_BYTES didn't reach back to the
-    cutoff (then log counts are underestimates; ratio would be inflated, so
-    the caller must not WARN on ratio alone).
+    Returns (raw_line_count, dedup_key_set, window_covers) — window_covers is
+    False when no source reaches back to the cutoff (then log counts are
+    underestimates; ratio would be inflated, so the caller must not WARN on
+    ratio alone).
+
+    ROTATION-AWARE (code-review M2 + H1): log_rotate_pipeline renames the live
+    log daily (~00:10) into logs/archive/pipeline.log.<ts>.gz, so right after
+    the rename the live file holds only a couple of hours. Reading it alone
+    collapsed log-dedup while gate_shadow.db still held 24h of rows ->
+    `db > log-dedup` and --selfcheck ASSERTED (observed 2026-11-07 02:17).
+    The live tail is still read first and still TAIL_BYTES-limited so the
+    2-minute watchdog stays cheap; archives are only opened when the live tail
+    does NOT reach back to the cutoff — i.e. only in the post-rotation window,
+    when they are the sole source of the older lines.
     """
     cutoff = datetime.now(timezone.utc) - timedelta(hours=window_hours)
     raw = 0
     keys = set()
-    covers = False
-    if not os.path.exists(PIPELINE_LOG):
-        return 0, keys, True
-    with open(PIPELINE_LOG, 'rb') as f:
-        f.seek(0, 2)
-        size = f.tell()
-        f.seek(max(0, size - TAIL_BYTES))
-        first_ts = None
-        for bline in f:
-            line = bline.decode('utf-8', errors='replace')
-            if first_ts is None:
+    # True once ANY scanned line is at/before the cutoff — under the log's
+    # chronological ordering that proves the scanned region reaches the window
+    # start, which is exactly what the old `first_ts <= cutoff` test asserted.
+    reached = False
+
+    def _consume(lines):
+        nonlocal raw, reached
+        for line in lines:
+            if not reached:
                 tm = TS_RE.match(line)
                 if tm:
                     try:
-                        first_ts = datetime.fromisoformat(tm.group(1) + '+00:00')
+                        ts = datetime.fromisoformat(tm.group(1) + '+00:00')
                     except ValueError:
-                        first_ts = False
+                        ts = None
+                    if ts is not None and ts <= cutoff:
+                        reached = True
             parsed = _parse_gate_line(line)
             if not parsed:
                 continue
@@ -120,9 +133,28 @@ def count_log_gate_lines(window_hours):
                 continue
             raw += 1
             keys.add(key)
-        covers = (first_ts is not False and first_ts is not None
-                  and first_ts <= cutoff) or size < TAIL_BYTES
-    return raw, keys, covers
+
+    # 1) live log, tail-limited (unchanged cost profile)
+    if os.path.exists(PIPELINE_LOG):
+        with open(PIPELINE_LOG, 'rb') as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - TAIL_BYTES))
+            _consume(b.decode('utf-8', errors='replace') for b in f)
+
+    # 2) rotated archives only when the live tail cannot prove coverage
+    if not reached:
+        for path in archive_paths(PIPELINE_LOG, since=cutoff):
+            try:
+                with open_log_text(path) as f:
+                    _consume(f)
+            except (OSError, EOFError) as e:
+                log(f'skipping unreadable {path}: {e}')
+                continue
+
+    if not os.path.exists(PIPELINE_LOG) and not archive_paths(PIPELINE_LOG):
+        return 0, keys, True
+    return raw, keys, reached
 
 
 def count_db_events(window_hours):

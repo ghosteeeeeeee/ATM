@@ -55,6 +55,7 @@ import sys
 import os
 import re
 import json
+import gzip
 import calendar
 import sqlite3
 import argparse
@@ -80,6 +81,60 @@ FWD_HORIZON_SECS = FWD_HORIZON_CANDLES * 300  # 300s = 5m candle interval
 # backfill_rr's scan window (bug_hunter F3). The real rate is tens of MB/day,
 # so this never under-scans a requested `hours` window.
 BACKFILL_BYTES_PER_HOUR = 70_000_000
+
+# ── rotated-log discovery ─────────────────────────────────────────────────────
+# log_rotate_pipeline renames pipeline.log daily (~00:10) into
+# logs/archive/pipeline.log.<YYYYMMDDhhmmss>.gz. Reading ONLY the live file
+# silently drops every older line — code-review H1: the mandated 11-10 join
+# re-run read n=0 for all 5 shadow tags, and gate_shadow_health's log-dedup
+# denominator collapsed until the live log regrew (its --selfcheck then
+# asserted `db > log-dedup`). Every consumer of pipeline.log must go through
+# archive_paths()/open_log_text() to stay correct across the rotation.
+ARCHIVE_NAME_RE = re.compile(r'^pipeline\.log\.(\d{14})\.gz$')
+
+
+def archive_paths(log_path=PIPELINE_LOG, since=None):
+    """Rotated .gz logs, oldest-first. `since` (datetime) drops archives stamped
+    at or before it: an archive stamped T holds data ENDING at T, so T <= since
+    means every line it carries is older than the window."""
+    out = []
+    adir = os.path.join(os.path.dirname(log_path), 'archive')
+    if not os.path.isdir(adir):
+        return out
+    # Archive stamps are UTC wall-clock; normalise BOTH sides so a naive caller
+    # and an aware `datetime.now(timezone.utc)` cutoff compare cleanly
+    # (TypeError: can't compare offset-naive and offset-aware datetimes).
+    if since is not None and since.tzinfo is None:
+        since = since.replace(tzinfo=timezone.utc)
+    for name in sorted(os.listdir(adir)):
+        m = ARCHIVE_NAME_RE.match(name)
+        if not m:
+            continue
+        if since is not None:
+            try:
+                rot = datetime.strptime(m.group(1), '%Y%m%d%H%M%S'
+                                        ).replace(tzinfo=timezone.utc)
+            except ValueError:
+                continue
+            if rot <= since:
+                continue
+        out.append(os.path.join(adir, name))
+    return out
+
+
+def open_log_text(path):
+    """Text handle for a live or rotated log (caller closes it)."""
+    if path.endswith('.gz'):
+        return gzip.open(path, 'rt', errors='replace')
+    return open(path, 'r', errors='replace')
+
+
+def log_sources(log_path=PIPELINE_LOG, since=None):
+    """Every file that can hold lines in the window: rotated archives first,
+    live log last (its content is the newest)."""
+    return archive_paths(log_path, since=since) + (
+        [log_path] if os.path.exists(log_path) else [])
+
 
 # Block-line patterns seen in pipeline.log (2026-10-04 verified):
 #   🚫 [GATE-NAME] TOKEN DIRECTION blocked — reason
@@ -304,46 +359,64 @@ def backfill_rr(hours=24):
     try:
         cur = conn.cursor()
         cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
-        n_new = n_dup = 0
-        # Bound the scan (bug_hunter F3): same technique as record()'s first-run
-        # cap — skip the oldest bytes instead of reading the whole file as the
-        # log grows.  70MB/hour is a deliberately generous upper bound (the log
-        # runs tens of MB/day), so a `hours` window is never under-scanned, and
-        # the discarded head is dropped at a line boundary so no line is
+        n_new = n_dup = n_since_commit = 0
+        # Scan every source that can hold lines in the window: rotated archives
+        # (bounded by `since`) plus the live log.  The live log is tail-seeked
+        # (bug_hunter F3) so a 210MB file is never read from byte 0; 70MB/hour
+        # is a deliberately generous upper bound (the log runs tens of MB/day)
+        # and the discarded head is dropped at a line boundary so no line is
         # half-read.  `continue` (not `break`) on pre-cutoff lines mirrors
         # record(): cheap, and does not assume the file is perfectly sorted.
-        size = os.path.getsize(PIPELINE_LOG)
-        start = max(0, size - hours * BACKFILL_BYTES_PER_HOUR)
-        with open(PIPELINE_LOG, 'r', errors='replace') as f:
-            if start:
-                f.seek(start)
-                f.readline()  # discard the partial line under `start`
-            for line in f:
-                if 'RR HARD BLOCKED' not in line:
-                    continue
-                mr = RR_BLOCK_RE.search(line)
-                if not mr:
-                    continue
-                ts_m = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
-                if not ts_m:
-                    continue
-                blocked_at = ts_m.group(1) + '+00:00'
-                try:
-                    b_dt = datetime.fromisoformat(blocked_at)
-                except ValueError:
-                    continue
-                if b_dt < cutoff:
-                    continue
-                token, direction = mr.group(1).upper(), mr.group(2).upper()
-                bucket = b_dt.strftime('%Y%m%d%H%M')[:-1]  # 10-min bucket
-                dedup = f'RR-ENGINE|{token}|{direction}|{bucket}'
-                try:
-                    cur.execute(
-                        "INSERT INTO events (gate, token, direction, blocked_at, dedup_key) "
-                        "VALUES (?,?,?,?,?)", ('RR-ENGINE', token, direction, blocked_at, dedup))
-                    n_new += 1
-                except sqlite3.IntegrityError:
-                    n_dup += 1  # already recorded by record() — idempotent
+        live_start = 0
+        if os.path.exists(PIPELINE_LOG):
+            live_start = max(0, os.path.getsize(PIPELINE_LOG)
+                             - hours * BACKFILL_BYTES_PER_HOUR)
+        for path in log_sources(PIPELINE_LOG, since=cutoff):
+            try:
+                with open_log_text(path) as f:
+                    if path == PIPELINE_LOG and live_start:
+                        f.seek(live_start)
+                        f.readline()  # discard the partial line under `start`
+                    for line in f:
+                        # L3: RR_BLOCK_RE is IGNORECASE, so the prefilter must
+                        # be too — a case-variant line would otherwise be
+                        # reachable by record() but skipped here.
+                        if 'rr hard blocked' not in line.lower():
+                            continue
+                        mr = RR_BLOCK_RE.search(line)
+                        if not mr:
+                            continue
+                        ts_m = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
+                        if not ts_m:
+                            continue
+                        blocked_at = ts_m.group(1) + '+00:00'
+                        try:
+                            b_dt = datetime.fromisoformat(blocked_at)
+                        except ValueError:
+                            continue
+                        if b_dt < cutoff:
+                            continue
+                        token, direction = mr.group(1).upper(), mr.group(2).upper()
+                        bucket = b_dt.strftime('%Y%m%d%H%M')[:-1]  # 10-min bucket
+                        dedup = f'RR-ENGINE|{token}|{direction}|{bucket}'
+                        try:
+                            cur.execute(
+                                "INSERT INTO events (gate, token, direction, blocked_at, dedup_key) "
+                                "VALUES (?,?,?,?,?)",
+                                ('RR-ENGINE', token, direction, blocked_at, dedup))
+                            n_new += 1
+                        except sqlite3.IntegrityError:
+                            n_dup += 1  # already recorded by record() — idempotent
+                        n_since_commit += 1
+                        # L2: do not hold one write transaction open across the
+                        # whole scan — the hourly record()/watchdog read must
+                        # never see "database is locked" for seconds.
+                        if n_since_commit >= 500:
+                            conn.commit()
+                            n_since_commit = 0
+            except (OSError, EOFError, gzip.BadGzipFile, UnicodeDecodeError) as e:
+                log(f'backfill-rr: skipping unreadable {path}: {e}')
+                continue
         conn.commit()
         total = cur.execute(
             "SELECT COUNT(*) FROM events WHERE gate='RR-ENGINE'").fetchone()[0]
@@ -816,18 +889,26 @@ def main():
     ap.add_argument('--close', action='store_true')
     ap.add_argument('--fwd', action='store_true')
     ap.add_argument('--report', action='store_true')
-    ap.add_argument('--since-hours', type=int, default=6)
+    ap.add_argument('--since-hours', type=int, default=None,
+                    help='hours for --record (default 6); supplying it alone keeps the '
+                         'historic behaviour of running all four modes')
     ap.add_argument('--backfill-rr', type=int, default=0, metavar='HOURS',
                     help='one-shot: recover RR-ENGINE hard-block lines the forward '
                          'offset already consumed before RR_BLOCK_RE existed '
                          '(0 = off, idempotent)')
     args = ap.parse_args()
+    since_given = args.since_hours is not None
+    since_hours = 6 if args.since_hours is None else args.since_hours
+    # L1: `--backfill-rr H` ALONE runs only the backfill, but with any mode flag
+    # or an explicit --since-hours it is additive — `--backfill-rr 24
+    # --since-hours 6` must still run record+close+fwd+report instead of
+    # silently dropping them (the docstring promised "combined ... it runs them").
     run_all = not (args.record or args.close or args.fwd or args.report
-                   or args.backfill_rr)
+                   or (args.backfill_rr and not since_given))
     if args.backfill_rr:
         backfill_rr(args.backfill_rr)
     if run_all or args.record:
-        record(args.since_hours)
+        record(since_hours)
     if run_all or args.close:
         close_events()
     if run_all or args.fwd:
