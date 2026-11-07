@@ -3770,5 +3770,38 @@
     "after": "both pre-adjudicated with 11-07 fresh reads + reproduce command; new entry id=amplify-cell-conf-tilt-floorproof deadline 2026-11-21 SHADOW ONLY",
     "rationale": "A stale affirmative packet sitting in the CEO queue invites a size increase on expired data",
     "impact": "prevents CEO applying 1.25->1.50 on a read that no longer clears its own 3 legs; 0 trading constants touched"
+  },
+  {
+    "timestamp": "2026-11-07T20:51:32Z",
+    "agent": "brain_auditor",
+    "change": "Audit #235: new gate-EV token-day-dedup screen analysis/gate_ev_dedup.py (--selfcheck PASS) — codifies #233's dedup convention so gate-loosening EV rankings can't be inflated by join duplication (SLOPE-FILTER raw +1.99 -> dedup +0.33, SOL 16788 counted 9x)",
+    "type": "ops",
+    "file": "analysis/gate_ev_dedup.py",
+    "before": "n/a (new read-only analysis script)",
+    "after": "n/a",
+    "rationale": "AMPLIFY mandate: reproducible candidate screen; first run produced a clean why-not (4 both-halves-positive candidates all fail fk<20%)",
+    "impact": "zero trading behavior; prevents future join-inflated gate-loosen proposals"
+  },
+  {
+    "timestamp": "2026-11-07T20:51:32Z",
+    "agent": "brain_auditor",
+    "change": "Audit #235 disposition: amplify-cell-conf-tilt-floorproof gains a cell-membership re-validation precondition (only 1 of 4 target cells positive on all windows; pump-chain+|EXTREME now negative 7d/14d/30d)",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "bar measured at 11-21 evaluation only",
+    "after": "re-run winner_cell_set_kpi.py at shadow-ship; drop any cell with net14<0 from the tilt set",
+    "rationale": "cell decay found this run — don't amplify a dead cell",
+    "impact": "zero trading behavior; guards an in-flight amplify proposal"
+  },
+  {
+    "timestamp": "2026-11-07T20:51:32Z",
+    "agent": "brain_auditor",
+    "change": "Audit #235 disposition: fade-ctx-exempt PRE-ADJUDICATED FAIL 3 days early (7d fade 24T net -0.23 vs bar >= +$1.00; full-window 36T +0.07 gross / -0.37 fee-net at 11-03 read) + new dailyfillcap-identity-verify entry due 11-08 06:00Z",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "fade bar unmeasured since 11-03; DailyFillCap identity verify only in prose queue",
+    "after": "pre-read written; identity verify tracked with threshold + deadline",
+    "rationale": "give CEO the 11-10 read 3 days early (same pattern as #234's size-125 pre-adjudication); prevent prose-queue items from being lost",
+    "impact": "zero trading behavior"
   }
 ]

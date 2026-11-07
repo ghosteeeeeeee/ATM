@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-07T17:05:57Z",
+  "updated": "2026-11-07T20:48:03Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -338,7 +338,9 @@
         "baseline": "pre-fade WR 27.3% — directional edge holds (42.4%) but fee-net negative",
         "conversion": "CONTRARIAN-LIVE 18 fires 11-03; Z-FLIP 0 skip lines (conversion healthy)",
         "measured_at": "2026-11-03T21:05:00Z"
-      }
+      },
+      "pre_adjudication_20261107": "PRE-ADJUDICATED FAIL 2026-11-07 21:05Z (audit #235, 3 days early) — bar = 7d fade fills >=15 AND fade net >= +$1.00. Fresh read: 7d (source LIKE '%pump-chain-%' AND direction='LONG', close_time 7d) = n=24 PASS on count, net pnl_usdt -0.23 FAIL on net (needs +1.23 in 3 days). Full post-flip window since 10-27 = n=36 net +0.07 gross; prior fee-inclusive read (11-03) was n=33 gross -0.02 fees 0.345 NET -0.37. 14d same 36T +0.07. WR 41.7% (full window) vs 27.3% pre-fade baseline = DIRECTIONAL EDGE STILL REAL, fee-net still negative at current size. ACTION AT 11-10: if net still < +1.00, report gross-vs-fee split to CEO (do NOT auto-flip) per the entry's own disposition text — this pre-read confirms that path. Also note contrarian join 2026-11-07T20:30Z: pc- flip-WR 64.6% n=350 STAYS LIVE, uniform across BTC tape (ABOVE 64.3% / AT 58.6% / BELOW 67.8%, chi2 p=0.374 = not tape-driven), so the shadow premise is intact — it is execution economics (fees at $11 notional), not direction, that fails the bar.",
+      "adjudicated_by": "brain_auditor #235 2026-11-07T21:05Z"
     },
     {
       "id": "winner-cell-size-125",
@@ -1365,7 +1367,22 @@
       "default_action": "NO CHANGE — notional axis already fails its own bar (winner-cell-size-125 pre-adjudicated FAIL 2026-11-07); this proposal is the replacement lever, not an addition to it.",
       "owner": "CEO+T (confidence path touches live scoring -> needs sign-off before enforce)",
       "evidence": "FLOOR CENSUS is the whole rationale: 276/397 = 69.5% of 14d closes sit at amount_usdt <= 11.5 (HL_MIN_NOTIONAL floor), so a notional multiplier is floored away on ~7 in 10 trades — measured proof this run: 46 WINNER-CELL-SIZE tag events (all x1.25) -> 30 matched trades -> 14d pnl -0.07 -> uplift over 1.0x = -0.01 vs a +$1.00 bar. Size is structurally the wrong axis at this account balance; confidence/weight tilts change WHETHER a cell clears the confidence gate (fill-mix) rather than HOW BIG it is, and are floor-proof. Precedent mechanism: REGIME_CONF_MULTIPLIER_ENABLED already does regime->confidence multipliers.",
-      "notes": "WHY-NOT (mandate: a proposal must state what it is NOT): this is deliberately NOT a new size value, NOT a signal enable/disable, NOT time-based (banned), NOT a blanket +X to all cells. In-flight offense items NOT duplicated: winner-cell-size-125 (11-10), amplify-bbsqueeze-warrior-uninert (11-10), amplify-vb-high-short-clonehunt (11-13), amplify-bbsqueeze-chop-exempt (11-13), amplify-bbsqueeze-neutral-exempt (11-14), amplify-prearm-breakeven-lock (11-14), amplify-jup-short-high-cell (11-19). Measurement vehicle = analysis/winner_cell_set_kpi.py + the existing cell-set SQL."
+      "notes": "WHY-NOT (mandate: a proposal must state what it is NOT): this is deliberately NOT a new size value, NOT a signal enable/disable, NOT time-based (banned), NOT a blanket +X to all cells. In-flight offense items NOT duplicated: winner-cell-size-125 (11-10), amplify-bbsqueeze-warrior-uninert (11-10), amplify-vb-high-short-clonehunt (11-13), amplify-bbsqueeze-chop-exempt (11-13), amplify-bbsqueeze-neutral-exempt (11-14), amplify-prearm-breakeven-lock (11-14), amplify-jup-short-high-cell (11-19). Measurement vehicle = analysis/winner_cell_set_kpi.py + the existing cell-set SQL.",
+      "cell_health_20261107": "CELL-MEMBERSHIP RE-VALIDATION REQUIRED BEFORE SHADOW-SHIP (audit #235): of the 4 cells the tilt would amplify, only bb-squeeze+|NORMAL is positive on all windows (7d +0.19 / 14d +0.52 / 30d +0.76). pump-chain+|EXTREME has DECAYED OUT: 7d -0.42 (n=3) / 14d -0.22 (n=30) / 30d -0.14 (n=68) — it was +0.61 at the #234 read 3.5h earlier and crossed negative purely by window roll-off (Oct-8 IMX +0.48 / GRASS +0.17 / BABY +0.10 aged out of the 30d window between 17:05Z and 20:40Z). volume-buildup-|HIGH 14d -0.07 (30d +0.42). r2v2-long3|NORMAL n=4 in 14d (thin). Bar (ii) 'no cell net14 < 0' would already FAIL today on 2 of 4 cells. Precondition: re-run analysis/winner_cell_set_kpi.py at shadow-ship and drop any cell with net14<0 from the tilt set rather than shipping a tilt that amplifies a dead cell. Reproduce: python3 analysis/winner_cell_set_kpi.py",
+      "adjudicated_by": " | cell-health check brain_auditor #235 2026-11-07T21:05Z"
+    },
+    {
+      "id": "dailyfillcap-identity-verify",
+      "stream": "DailyFillCap SKIP line carries candidate identity (audit #231 fix) — verify on live traffic",
+      "kind": "eval",
+      "status": "open",
+      "started": "2026-11-07",
+      "deadline": "2026-11-08T06:00:00Z",
+      "threshold": "First DAILY FILL CAP SKIP line after 2026-11-08 05:03Z must carry token+direction+source (the #231 empty-context second-call gap). PASS = identity present on BOTH same-second calls. FAIL = reopen #231.",
+      "default_action": "NO CHANGE (fix is already shipped; this is verify-on-traffic)",
+      "owner": "brain_auditor next run",
+      "evidence": "#231 shipped _daily_fill_cap_block(token=None, direction=None, source=None) identity on the SKIP log line 2026-11-07T04:52Z; queued by #234 for the next post-context re-read because no SKIP fired between 04:58Z brake-release and 21:05Z (brake re-released 16:20Z, opens<15 since).",
+      "created_by": "brain_auditor #235"
     }
   ]
 }

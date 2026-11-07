@@ -557,3 +557,6 @@ BY: auto_1hr
 BY: auto_1hr
 - [2026-11-06 22:19 UTC] auto_1hr: NO CONFIG CHANGE — 0T last hour, 0 open | 24h 15T 53.3% '-$0.47' RED | 7d 219T 53.4% '-$1.80' RED — size-reduce 1.0x (file absent = truth) | kill none (no trades) | atr_sl_hit 6/15=40.0% at threshold not >40% (6 runs) | inversion 0 | boost none eligible (bb-squeeze+ 5T net '-$0.14' fails PnL bar) | neg streak no 3 consecutive + regime not NEUTRAL -> no size cut | frequency 0/hr | winners mae_pct 0.183% 8/8 <0.5% | QUIET: DailyFillCap brake still active (15/15, fee-net -0.77, log 22:14) | no storm (window-min -0.19% / at-run +0.20%)
 BY: auto_1hr
+
+## TEAM UPDATES
+- [2026-11-07 21:20] auto_1hr: no config change — 0T last hour, 24h 5T 80% +$0.10 GREEN, no storm (window-min -0.23% / at-run -0.19%), no kill/boost candidates

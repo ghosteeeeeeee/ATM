@@ -10722,5 +10722,35 @@
     "status": "suggested",
     "risk": "low",
     "registry": "data/shadow_disposition.json -> amplify-cell-conf-tilt-floorproof, deadline 2026-11-21, SHADOW ONLY"
+  },
+  {
+    "date": "2026-11-07T20:51:32Z",
+    "run": "brain_auditor #235",
+    "idea": "W/L PAYOFF-RATIO (asymmetry) as a standing companion to the kill screen",
+    "rationale": "The kill screen keys on WR<50 and is BLIND to high-WR negative cells. Fresh 30d screen n>=20 AND WR>=50 AND net<0 finds 4 cells, ALL with win/loss payoff ratio 0.42-0.50 (losers ~2x winners) while the system average is 0.84: jup_yolo_mirrored HIGH LONG 41T 56.1% -0.75 W/L 0.46 | jup NORMAL LONG 38T 60.5% -0.35 W/L 0.50 | volume-buildup- EXTREME SHORT 27T 59.3% -0.49 W/L 0.42 | volume-buildup- NORMAL SHORT 22T 54.5% -0.45 W/L 0.47. Signal level: jup 135T 62.2% -0.76 W/L 0.48, vb- 68T 63.2% -0.52 W/L 0.46. Both signal-level hits are ALREADY the exact scope of STOP_TIGHTEN_SOURCES = ('jup_yolo_mirrored','volume-buildup-') shipped 11-04 — the screen independently re-derives the same targeting, which is evidence it finds real structure.",
+    "expected_impact": "Catches exit-asymmetry bleed the WR-based kill screen misses (4 cells / 128 trades / -2.04 over 30d). Routes them to EXIT TUNING (stop-tighten scope), never to kill — WR>=50 means the entry side works.",
+    "category": "exit sniper / KPI",
+    "status": "suggested (pre-register: flag cell if n>=20 AND net<0 AND WR>=50 AND W/L<0.7 -> exit-tuning queue, NOT kill queue)",
+    "risk": "low (observational metric, zero behavior)"
+  },
+  {
+    "date": "2026-11-07T20:51:32Z",
+    "run": "brain_auditor #235",
+    "idea": "Token-day dedup gate-EV screen as the standing gate-loosening clone-hunt (analysis/gate_ev_dedup.py)",
+    "rationale": "gate_shadow SUM(would_pnl) is join-duplicated (SLOPE-FILTER's SOL 16788 counted 9x: raw +1.99 -> dedup +0.33). #233 hand-rolled token-day dedup for one clone-hunt; this run codifies it with --selfcheck so every future gate-EV ranking is reproducible. First full run: 4 candidates clear both-halves-positive + positive 30d sum, ALL fail fk<20% (fk 29-44%) -> clean why-not, no gate loosened.",
+    "expected_impact": "Prevents shipping a gate-loosen on join-inflated EV (the exact class of error that has bitten before). Reproducible bar for future amplify runs.",
+    "category": "defense / measurement",
+    "status": "shipped (analysis/gate_ev_dedup.py, --selfcheck PASS)",
+    "risk": "zero (read-only analysis)"
+  },
+  {
+    "date": "2026-11-07T20:51:32Z",
+    "run": "brain_auditor #235",
+    "idea": "WINNER-CELL HEALTH GATE before any amplify ships against the validated set",
+    "rationale": "pump-chain+|EXTREME (a WINNER_CELLS_VALIDATED member) crossed from +0.61 to -0.14 within 3.5h purely by 30d-window roll-off, and is now negative on 7d/14d/30d simultaneously. amplify-cell-conf-tilt-floorproof (registered #234) would amplify exactly these cells. Bar (ii) 'no cell net14<0' would already fail on 2 of 4 cells today.",
+    "expected_impact": "Stops a shadow-ship that would amplify a dead cell; forces re-read of analysis/winner_cell_set_kpi.py at ship time.",
+    "category": "amplify guard",
+    "status": "applied (disposition precondition written this run)",
+    "risk": "zero (disposition note only)"
   }
 ]

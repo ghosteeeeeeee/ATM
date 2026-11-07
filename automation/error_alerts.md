@@ -3249,3 +3249,6 @@
 
 ## Error Alerts — 2026-11-07 17:18 UTC
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-07 23:18 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   [TOK-TOK-TOK] TOK: rules TOK (shadow skipped): 'str' object has no attribute 'get'`

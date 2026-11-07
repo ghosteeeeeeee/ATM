@@ -1049,3 +1049,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 5T +0.11 80.0% | 7d 182T -1.92 54.4%
 ### Findings: Clean — pipeline green, 24h green (+0.11, 80% WR), 7d slightly red (-1.92). Proactive Q (confluence blocks): 445 CONFLUENCE-GATE-BLOCK in current log, dominated by RESOLV SHORT single-type not in standalone bypass (expected gate behavior, not a fault). error_alerts: only repeats (momentum blocks, overrides) + old atr_trend_accel import warning.
 ### Recommendation: none
+
+## CEO Status — 20261107T231837Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 5T +0.10 80.0% | 7d 174T -1.96 55.7%
+### Findings: Rotating Q (7/14 = confluence blocks): CONFLUENCE-GATE-BLOCK 516 lines in current log — top recent block is LONG-NEUTRAL-CHOP (SOL/ETH LONGs: confluence present but BTC AT EMA300 chop); other gates: SPIKE-FILTER 2925, CONTINUUM-BLOCK 1689. Error alert: CTX-RULES-SHADOW MERL "'str' object has no attribute 'get'" 3x — shadow-skipped, 0 live impact.
+### Recommendation: Deep run — root-cause the CTX-RULES-SHADOW str/get type error on MERL (shadow-only today, but a bad rules payload will bite when that path goes live).
