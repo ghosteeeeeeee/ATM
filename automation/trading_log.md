@@ -22415,3 +22415,27 @@ Final set: []
 - 24h net RED ($-0.26) and 7d $-1.53 structural, outside 1-change/hour scope
 - DailyFillCap releases when 24h fee-net turns green OR fills roll off
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-07 14:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 1 open (HYPE SHORT jup_yolo_mirrored +0.01%)
+**PnL:** $0.00 (WR: n/a hour; 24h 7T 4W $-0.03 RED | 7d 193T 53.4% $-1.53 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (HYPE jup_yolo_mirrored SHORT opened 14:12) — DailyFillCap brake still the quiet cause
+- Kill check: no signal with 0% WR n>=3 last hour (no closes) -> keep all; hh-hl+ 14d 4T 0% all-RED (n<20, watch only)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/7 = 28.6% of 24h closes (<40%) — tpsl_utils.py DEPLOYED -> no action
+- Boost: NONE eligible — no signal with n>=5 in 24h (max bb-squeeze+ 2T)
+- Neg streak: only 1 close in past 12h (+0.04 at 02:00) — no 3 consecutive negative hours -> no size cut
+- Frequency: 1 open/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.187% max 0.336%, 4/4 known, all <0.5% -> OK
+- No storm (window-min -0.18% / at-run +0.10%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h nearly flat ($-0.03) but 7d $-1.53 structural, outside auto_1hr 1-change/hour scope
+- DailyFillCap: confirm brake release condition when pipeline next evaluates
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
