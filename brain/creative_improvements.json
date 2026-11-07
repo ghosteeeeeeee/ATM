@@ -10702,5 +10702,25 @@
     "category": "amplify",
     "status": "measured-no-ship",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-07T17:08:23Z",
+    "idea": "ARM-RATE CIRCUIT BREAKER (rolling 24h trailing_activated% as portfolio confidence brake)",
+    "rationale": "arm% is the strongest split in the book (7d armed 80T 86.3% +3.92 vs never-armed 109T 30.3% -5.85); DIRECTIONAL_OUTCOME proves the aggregate-brake shape is acceptable here.",
+    "expected_impact": "none — REJECTED-WITH-DATA",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "high",
+    "evidence": "70d daily test: arm%<40 next-day avg -0.242 (n=25) vs arm%>=40 -0.266 (n=28) = no separation; thr45 sign-flips (-0.21 vs -0.318). Logged so never re-proposed as a gate."
+  },
+  {
+    "date": "2026-11-07T17:08:23Z",
+    "idea": "WINNER-CELL CONFIDENCE TILT (floor-proof offense) — validated-cell preference via confidence path, shadow first",
+    "rationale": "276/397 = 69.5% of 14d closes at amount_usdt <= 11.5 (HL floor) so WINNER_CELL_SIZE_MULT is floored away on ~7/10 trades; measured 14d uplift -$0.01 vs a +$1.00 bar. Confidence tilt changes fill-mix, which survives the floor; REGIME_CONF_MULTIPLIER_ENABLED is the precedent mechanism.",
+    "expected_impact": "bar pre-registered: cell-set 14d net > baseline + $0.40, no cell net14 < 0, fill count >= baseline",
+    "category": "offense / fill-mix",
+    "status": "suggested",
+    "risk": "low",
+    "registry": "data/shadow_disposition.json -> amplify-cell-conf-tilt-floorproof, deadline 2026-11-21, SHADOW ONLY"
   }
 ]

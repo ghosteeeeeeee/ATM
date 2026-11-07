@@ -3748,5 +3748,27 @@
     "after": "88 entries — PRE-ARM LOCK two-arm counterfactual with measured thr curve (0.10 ceiling +19.73/30d .. 0.40 +3.85/30d)",
     "rationale": "Weekly offense mandate; advances #231 creative into a bar-equipped tracked entry (net >= +$2.00/30d units-guarded, fk<20%, 14d same-sign, armed untouched)",
     "impact": "No behavior — pre-registered measurement only"
+  },
+  {
+    "timestamp": "2026-11-07T17:08:23Z",
+    "agent": "brain_auditor",
+    "change": "Audit #234: new reproducible KPI analysis/winner_cell_set_kpi.py (size-amplify evals: per-cell + set net 7/14/30d, winner-cell-size-125 3-reading bar, amplify-winner-cell-mult-150 threshold) — spans rotated pipeline.log archives so tag joins can never see 0 tags again (#233 landmine)",
+    "type": "ops",
+    "file": "analysis/winner_cell_set_kpi.py",
+    "before": "(none — evals grepped pipeline.log only)",
+    "after": "--selfcheck PASS (regex, uplift math, archive-presence assert); bug_hunter SAFE TO DEPART; independent SQL re-derivation matched 30/30 numbers",
+    "rationale": "Pre-adjudicate both size-amplify items before their deadlines; make the numbers reproducible",
+    "impact": "zero trading behavior — read-only SELECTs, never imported by pipeline"
+  },
+  {
+    "timestamp": "2026-11-07T17:08:23Z",
+    "agent": "brain_auditor",
+    "change": "Audit #234 disposition updates: winner-cell-size-125 pre-adjudicated FAIL on all 3 readings; amplify-winner-cell-mult-150 THRESHOLD MET -> NO LONGER MET (stale 11-04 read withdrawn); NEW amplify proposal amplify-cell-conf-tilt-floorproof registered",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "winner-cell-size-125 pending to 11-10; mult-150 \"THRESHOLD MET 2026-11-04 AWAITING CEO label\"; no conf-tilt entry",
+    "after": "both pre-adjudicated with 11-07 fresh reads + reproduce command; new entry id=amplify-cell-conf-tilt-floorproof deadline 2026-11-21 SHADOW ONLY",
+    "rationale": "A stale affirmative packet sitting in the CEO queue invites a size increase on expired data",
+    "impact": "prevents CEO applying 1.25->1.50 on a read that no longer clears its own 3 legs; 0 trading constants touched"
   }
 ]
