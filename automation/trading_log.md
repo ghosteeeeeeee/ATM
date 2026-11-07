@@ -22071,3 +22071,28 @@ Final set: []
 - atr_sl_hit crossed to 42.9% (6/14) — tpsl deployed so non-issue, but re-check next hour; if it holds >40% with n>=20, review SL width
 - 24h net RED ($-0.50) and 7d $-1.81 structural, outside auto_1hr 1-change/hour scope
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
+
+## [2026-11-07 00:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 1 open (ETH jup_yolo_mirrored LONG)
+**PnL:** $0.00 (WR: n/a hour; 24h 14T 50.0% $-0.50 RED | 7d 216T 52.8% $-1.98 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens — DailyFillCap brake STILL ACTIVE (log 00:14: "15 opens in last 24h (max 15) while fee-net -0.79 < 0"), designed behavior, pipeline healthy
+- Kill check: no signal with 0% WR n>=3 last hour (no trades) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/14 = 42.9% of 24h closes (>40%) — tpsl_utils.py DEPLOYED (position_manager import, Nov 4) -> monitor only, no CEO alert
+- Boost: NONE eligible — bb-squeeze+ 5T 60% net $-0.14 (fails Net PnL>$0.05); rest n<3
+- Neg streak: no closes in 6h+ -> no 3 consecutive negative hours; regime not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.186% max 0.336%, 7/7 known 0 NULL <0.5% -> OK
+- No storm (window-min -0.16% / at-run +0.09%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- DailyFillCap releases when 24h fee-net turns green OR fills roll off (15/15 used) — expect 0 opens until then
+- 24h net RED ($-0.50) and 7d $-1.98 structural, outside auto_1hr 1-change/hour scope
+- atr_sl_hit holding 42.9% (6/14) — tpsl deployed so non-issue; re-check if n>=20
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet for enforce-flip bar
