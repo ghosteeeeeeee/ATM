@@ -10672,5 +10672,35 @@
     "status": "suggested",
     "risk": "low",
     "bar": "0 code — read the corrected GATE JUSTIFICATION table in shadow_trader --report weekly; escalate only on the 2-week + n>=300 + avg>=0 condition"
+  },
+  {
+    "date": "2026-11-07T12:45:00Z",
+    "run": 233,
+    "idea": "Add post-exit recovery (false-kill) rate as SECONDARY observational metric to stop-tighten-enforce-eval (due 11-14) — no change to pre-registered ship bar",
+    "rationale": "Stop-family exit share 28.7% pre-11-04 -> 40.0% post (atr_sl 14.2%->22.0%) while WR 55.6->56.0 and net/trade flat; separately 48h autopsy: 5/8 losers recovered past exit within 60m, 0 NEVER. Eval must distinguish 'smaller losses' from 'premature exits on trades that come back'.",
+    "expected_impact": "Prevents false KEEP/REVERT verdict on STOP_TIGHTEN_ENFORCE at the 11-14 eval",
+    "category": "exit quality / measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-07T12:45:00Z",
+    "run": 233,
+    "idea": "Winner-cell tag-join must span rotated pipeline logs (logs/archive/pipeline.log.*.gz + current) before the 11-10 WINNER_CELL_SIZE_MULT deadline",
+    "rationale": "43 [WINNER-CELL-SIZE] tags exist since 10-30 across two archived gz files; current pipeline.log (12h span) has 0 — a naive grep reports 'never applied' and would wrongly kill the 1.25x",
+    "expected_impact": "Protects winner-cell-size-125 eval from a false zero",
+    "category": "measurement infra",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-07T12:45:00Z",
+    "run": 233,
+    "idea": "AMPLIFY why-not: clone-hunt screen of gate_shadow (token-day dedup, 14d) produced NO cell clearing bars — bb+ x CONTINUUM-BLOCK fk 27.6%>20% and net +0.44<+0.50; bb+ x CONFLUENCE-GATE-BLOCK OOS 67.4%<70% (decaying from 94.3%); SPIKE-FILTER/LONG-MIDBAND/OVERSOLD-SHORT <70% would-win",
+    "rationale": "Mandate requires >=1 amplify proposal or an explicit why-not with data — this is the why-not, measured this run",
+    "expected_impact": "Documents offense screen so next weekly run starts from measured baseline, not re-derivation",
+    "category": "amplify",
+    "status": "measured-no-ship",
+    "risk": "none"
   }
 ]
