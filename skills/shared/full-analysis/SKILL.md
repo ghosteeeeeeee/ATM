@@ -20,6 +20,8 @@ This skill combines:
 - **Bollinger Bands** — BB position (0=lower band, 1=upper band)
 - **EMA200** — Long-term dynamic support/resistance
 - **Volume ratio** — Per-timeframe volume confirmation
+- **ADX/ATR lifecycle** (computed) — `scripts/adx_atr_analysis.py`:
+  trend-strength/range peaks, exhaustion & climax detection (rules below)
 
 **Data source rule (2026-10-22):** ALL price/candle/indicator reads come from
 the LOCAL stores — `data/candles.db` (refreshed every minute by the
@@ -343,6 +345,45 @@ python3 /root/.hermes/scripts/structure_analysis.py COIN
 **Evidence of the engine matching the tape:** 2026-10-20 23:00 — engine
 reported 1h UPTREND [HH HL] SH=83,189 SL=82,394; those are precisely the
 22:00 high and 19:00 low the CEO read by eye. Same levels, no eyeballing.
+
+### ADX/ATR — Trend Lifecycle (COMPUTED — CEO rules, added 2026-10-27)
+
+ADX measures trend STRENGTH, ATR measures range EXPANSION. Together they
+DATE the move: when the strength/volatility behind a trend peaks, the
+trend is in its last act. Run it on every analysis:
+
+```bash
+python3 /root/.hermes/scripts/adx_atr_analysis.py COIN   # local DB, closed bars only
+```
+
+**The three lifecycle rules (CEO's, tape-derived):**
+
+1. **ADX back to ~0 → new trend starting.** ADX below `ADX_NEAR_ZERO`
+   (5.0) means the previous trend has ENDED — flat, and a NEW trend is
+   beginning from neutral. This is a beginning signal, not an absence of
+   one: the next directional ADX rise marks the new trend's birth.
+2. **ADX peak + a NEW major extreme after the peak → the move is over.**
+   ADX peaks when trend momentum is strongest; if price then prints a
+   new major low (downtrend) / high (uptrend) AFTER that peak, the
+   extreme is exhaustion — the 5th-wave final push. Price has usually
+   then continued the OTHER way from the exhausted extreme.
+   (Divergence shape: new price extreme, lower ADX peak.)
+3. **ADX + ATR peaking together → climaxed move is over.** When strength
+   AND range expansion peak within `ADX_DUAL_PEAK_TOL` (4) bars of each
+   other, both engines are spent. Confirmation arrives like rule 2: a new
+   extreme printed after the dual-peak that fails to extend momentum.
+
+**How to read it in the verdict:** per-TF state (TRENDLESS / TREND
+RUNNING / ADX PEAKED / DUAL-PEAK CLIMAX / EXHAUSTION + flags), then one
+multi-TF sentence — lower TFs lead the lifecycle (1m/5m turn first),
+higher TFs confirm the regime. Lifecycle flags do NOT set direction by
+themselves; they DATE the move: an EXHAUSTION flag on the executing TF +
+a §3 divergence + structure breaking = the reversal confluence; a RUNNING
+higher-TF trend = don't fade it. Rule 1 zones (trendless) are exactly
+where §11 sweeps and §12 brackets live.
+
+Closed bars only (the script filters `is_closed=1`); if you eyeball ADX
+mid-bar, the §4 forming-candle labeling rules apply.
 
 ### Trendlines
 
@@ -725,6 +766,15 @@ BANANA), vol floor, LOSERS list, RR gate.
   [Multi-TF read as a sentence: direction bias (higher TF) + entry context
    (executing TF) — flag any BROKEN tags]
 
+📡 1c. ADX/ATR LIFECYCLE (python3 scripts/adx_atr_analysis.py COIN)
+  1m: ADX [value] (peak Xb ago) | ATR [value] (x.x%) (peak Xb ago) | [state]
+  5m: ...
+  15m: ...
+  1h: ...
+  4h: ...
+  [lifecycle sentence: where each TF sits in the cycle — rule 1/2/3 flags,
+   which TFs are RUNNING vs EXHAUSTED, and what that dates about the move]
+
 📈 2. CONTINUUM
   [continuum data]
 
@@ -761,3 +811,7 @@ read exactly (SH=83189 SL=82394 = the 22:00 high / 19:00 low).
 finds no clear direction, the default action is arming the conditional
 bracket at chart support/resistance — the stop-limit process is the
 backup strategy; market entries in no-edge states are the sweep-tax pattern.
+ADX/ATR lifecycle added 2026-10-27 (CEO rules + scripts/adx_atr_analysis.py):
+rule 1 ADX→0 = new trend starting; rule 2 ADX peak + post-peak new major
+extreme = 5th-wave exhaustion, move over; rule 3 ADX+ATR dual-peak =
+climaxed move over (post-peak extreme confirms). Section 1c in output.

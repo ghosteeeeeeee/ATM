@@ -1175,12 +1175,25 @@ FADE_EXEMPT_KNIFE_SIZE_MULT = 0.5    # enforce-phase half-size for RSI<35 fades
 # a size can never be pushed below minimum.
 WINNER_CELL_SIZE_MULT = 1.25
 WINNER_CELL_SIZE_MULT_CAP = 1.5
+# (signal, volatility_regime, direction) — DIRECTION-AWARE since brain_auditor
+# run #241 (2026-11-08). The old 2-tuple key matched only signal+regime while
+# decider_run._get_winner_cell_size_mult already received `direction` and never
+# used it, so a cell would size up BOTH legs. Harmless while every cell was
+# direction-pure (bb-squeeze+ NORMAL / r2v2-long3 NORMAL / pump-chain+ EXTREME
+# are LONG-only, volume-buildup- HIGH is SHORT-only in the 30d validation
+# window) — but the pending amplify-jup-short-high-cell proposal to add
+# ('jup_yolo_mirrored','HIGH') would have 1.25x'd jup HIGH LONG 34T/41T
+# '-0.75' alongside the winning SHORT leg 15T 73.3% '+0.40'.
+# Cells were VALIDATED on one direction's trades, so sizing must match it.
+# Structural guard: a 2-tuple slipping back in raises at import.
 WINNER_CELLS_VALIDATED = {
-    ('bb-squeeze+', 'NORMAL'),
-    ('volume-buildup-', 'HIGH'),   # bug_hunter 2026-10-29: was 'volume-buildout-' (transcription typo — 0 rows ever; real signal + exact cell stats 14T/71.4%/+$0.21 confirmed on 'volume-buildup-')
-    ('r2v2-long3', 'NORMAL'),
-    ('pump-chain+', 'EXTREME'),
+    ('bb-squeeze+', 'NORMAL', 'LONG'),
+    ('volume-buildup-', 'HIGH', 'SHORT'),   # bug_hunter 2026-10-29: was 'volume-buildout-' (transcription typo — 0 rows ever; real signal + exact cell stats 14T/71.4%/+$0.21 confirmed on 'volume-buildup-')
+    ('r2v2-long3', 'NORMAL', 'LONG'),
+    ('pump-chain+', 'EXTREME', 'LONG'),
 }
+assert all(len(c) == 3 and c[2] in ('LONG', 'SHORT') for c in WINNER_CELLS_VALIDATED), \
+    'WINNER_CELLS_VALIDATED must be (signal, regime, direction) 3-tuples'
 
 # ── STORM CONFLUENCE WAIVER (CEO consult 20261029T2130Z "storm-starvation", T
 # proceed 2026-10-29) — SHADOW FIRST ─────────────────────────────────────────
@@ -2149,6 +2162,20 @@ MANUAL_TRAIL_TIERS = [
     (0.030, 0.010),  # >=3.0%: 1.00%
     (0.050, 0.014),  # >=5.0%: 1.40% (parabolic)
 ]
+
+# full-analysis ADX/ATR trend-lifecycle (CEO rules, 2026-10-27):
+#   1. ADX back to ~0 → previous trend ENDED, a new trend is starting
+#   2. ADX peaks, then price prints a NEW major extreme after the peak →
+#      that extreme is exhaustion (5th-wave) → the move is usually over
+#   3. ADX peak + ATR peak together → climaxed move is over; a new
+#      extreme after the dual-peak confirms it
+ADX_PERIOD = 14               # Wilder smoothing (same as backtest ref impl)
+ADX_NEAR_ZERO = 5.0           # below this = trendless — new trend starting
+ADX_PEAK_LOOKBACK = 40        # closed bars to hunt for a local ADX/ATR peak
+ADX_PEAK_MIN_FALL = 1.0       # ADX must be this far below its peak to call it peaked
+ADX_DUAL_PEAK_TOL = 4         # bars — ADX & ATR peaks within this = dual climax
+ADX_EXTREME_WINDOW = 20       # bars defining the "major" pre-peak price extreme
+
 PM_TRAIL_MIN_HOLD    = 2      # minimum minutes before trailing activates
 PM_TRAIL_FIRE_WINDOWS = {"A": (0.25, 0.5), "B": (0.5, 1)}  # check every 15-30s group A, 30-60s group B
 
