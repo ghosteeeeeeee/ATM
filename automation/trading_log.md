@@ -22725,3 +22725,26 @@ Final set: []
 **Open Questions:**
 - 7d -$2.10 structural RED; worst 14d: volume-buildup- 46T 60.9% (-$1.10 fee drag), jup_yolo_mirrored 135T 62.2% (-$0.76) — WR fine, pnl drag; n>=20 kill-eligible only if regime-losing, not triggered
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-08 03:20] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses), 0 opens, 0 open
+**PnL:** $0.17 (WR: 100% hour; 24h 6T 83% +$0.23 GREEN | 7d 173T 55.5% -$1.93 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: ARB atr-trend+ LONG +0.13 profit-monster-trail, SOL jup_yolo_mirrored SHORT +0.04 profit-monster-trail — both trail exits, no SL hits
+- Kill check: 0 closes at 0%WR; hh-hl+ 3T 0% 14d n<20 not kill-eligible -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/6 = 16.7% of 24h closes (<40%) — tpsl_utils.py DEPLOYED -> no action
+- Boost: NONE eligible — max n=2 per signal in 24h (needs n>=5)
+- Neg streak: only 1 hour with closes (+0.17) -> not 3 consecutive negative -> no size cut
+- Frequency: 0 opens/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.294% max 0.682% (5/5 known), avg <0.5% -> OK
+- No storm (window-min +0.16% / at-run +0.23%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still -$1.93 structural RED; volume-buildup- 46T 60.9% (-$1.10 fee drag) and jup_yolo_mirrored 136T 62.2% (-$0.72) — WR fine, pnl drag, not regime-losing -> keep
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
