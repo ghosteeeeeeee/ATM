@@ -3273,3 +3273,17 @@
 
 ## Error Alerts — 2026-11-08 02:47 UTC
 - **[WARN]** (freq_deviation_shadow): `warrior-sr-confirm+`: FREQ DEVIATION UNDER source=warrior-sr-confirm+ baseline=0.042/h current=0.000/h ratio=0.00 n_base=14 n_cur=0
+
+## Error Alerts — 2026-11-08 03:19 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-08 04:19 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-08 06:14 UTC
+- **[WARN]** (checkpoint_watch): **DUE** `dailyfillcap-identity-0600` (due 2026-11-08T06:00:00+00:00): DailyFillCap identity verify: first SKIP line after 2026-11-08 05:03Z must carry token+direction+source (disposition dailyfillcap-identity-verify). If brake stays released with ZERO skip lines, disposition as NO-TRAFFIC (cannot verify) — partial PASS already on 11-07 04:58 [blocked ETH LONG jup_yolo_mirrored].
+
+## Error Alerts — 2026-11-08 06:19 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`

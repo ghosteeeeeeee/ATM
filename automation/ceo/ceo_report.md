@@ -1100,3 +1100,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 - **A adoption:** any constants change committed after 2026-11-08 must cite train/OOS windows + OOS verdict (grep commit messages / recent_changes.log); `locked_test_state.json` consumed-look count = number of tunes adjudicated.
 - **System baseline:** 7d PnL/WR vs today's -1.93 / 55.5% (context only — system is fee-floor-limited at $11 notional).
 - **Queued next:** B (neighbor sweep on the 3 constants → hill-vs-spike verdict = input to next tune), I, J, D, E, F, G. C/K remain deferred.
+
+## CEO Status — 20261108T031837Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 6T +0.23 83.3% | 7d 173T -1.93 55.5%
+### Findings: Regime Q8 — both scanners now SHORT_BIAS (15m 14S/9L, 4h 72S; was 15m-vs-4h disagree/chop at 00:47Z), aligned = short entries unblocked; error_alerts only freq-deviation WARNs + MOMENTUM-OVERRIDE repeats (no tracebacks).
+### Recommendation: none

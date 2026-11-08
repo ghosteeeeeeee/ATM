@@ -10788,5 +10788,23 @@
     "category": "amplify param-widen",
     "status": "pre-registered",
     "risk": "low (admit-only)"
+  },
+  {
+    "date": "2026-11-08T04:48:29Z",
+    "idea": "Stop-tighten SCOPE widen: extend STOP_TIGHTEN_SOURCES beyond jup/vb- to the out-of-scope stop-family bleed",
+    "rationale": "14d out-of-scope HML+atr_sl = 54T -$5.59 (53% of class sits outside the tuple); 29/54 moved beyond the 0.75% cap; ceiling +$1.12 gross - $0.25 fk = +$0.87/14d net; fk 3.9% (4/103 winners, max mae 0.893%); 30d weekly same-sign 5/5; zero-code (tuple change at 6 existing call sites).",
+    "expected_impact": "+$1.86/30d ceiling on stop-family bleed; converts ~28% of 30d net bleed at ceiling",
+    "category": "exit side / stop-widen",
+    "status": "suggested",
+    "risk": "low — measurement-first, all 4 numeric bars PASS, candle-walk + placement coverage still required, money-adjacent so review-queue + CEO"
+  },
+  {
+    "date": "2026-11-08T04:48:29Z",
+    "idea": "Fade horizon-giveback census: join classifies WINNER at 2.5h but live trails give back beyond the window (HYPER #16616 +0.511% fav → atr_sl loser)",
+    "rationale": "Live fade WR 41.7% vs join-race-on-live-fills 55.9% vs join prediction 64.6% — the gap decomposes into (a) post-gate adverse selection and (b) horizon truncation. Quantifying (b) tells us whether the fade needs a post-arm lock (prearm-breakeven-lock territory) or the watch should just run to 11-11.",
+    "expected_impact": "diagnostic only — informs fade-size/fee review at 11-10/11-11",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "none (analysis only)"
   }
 ]

@@ -3825,5 +3825,27 @@
     "after": "checkpoint_registry entry pending",
     "rationale": "intraday same-day verify must surface via checkpoint_watch; partial PASS already on 11-07 04:58 line",
     "impact": "formal #231 verify will not sit unread"
+  },
+  {
+    "timestamp": "2026-11-08T04:47:11Z",
+    "agent": "brain_auditor",
+    "change": "Audit #237: new zero-behavior analysis brain/analysis/stop_tighten_scope_cf_2026-11-08.py (--selfcheck PASS) + AMPLIFY registration amplify-stoptighten-scope-widen in data/shadow_disposition.json",
+    "type": "ops",
+    "file": "brain/analysis/stop_tighten_scope_cf_2026-11-08.py",
+    "before": "n/a (new script)",
+    "after": "n/a (new script)",
+    "rationale": "Mandated AMPLIFY step: out-of-scope stop-family bleed -5.59/14d measured, ceiling +0.87/14d net after fk, all 4 pre-reg bars PASS",
+    "impact": "measurement-only, zero trading behavior; ship gated on candle-walk + placement coverage + CEO review-queue"
+  },
+  {
+    "timestamp": "2026-11-08T04:47:11Z",
+    "agent": "brain_auditor",
+    "change": "Audit #237: refreshed contrarian_outcome_join (mandate, 04:30Z) + floor_admit_outcome_join (04:33Z); full live fade cohort candle-walk n=36",
+    "type": "ops",
+    "file": "data/contrarian_outcome_join.json",
+    "before": "prior join (stale by ~4h)",
+    "after": "fresh: overall 43.1%, pc- 64.6% n=350, rider 36.2%; floor p=0.1411 COLLECT",
+    "rationale": "join has no systemd producer — manual refresh is the mandate",
+    "impact": "fade watch numbers current; atr_sl_hit fade subset walk = 15.4% join-WR (adverse-selected, SL correctly identifies losers — SL-too-tight hypothesis REFUTED)"
   }
 ]

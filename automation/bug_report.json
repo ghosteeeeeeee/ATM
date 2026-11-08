@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-11-07 19:28:34",
+  "timestamp": "2026-11-08 03:28:33",
   "total_checks": 20,
-  "passed": 13,
+  "passed": 12,
   "critical_count": 7,
-  "warning_count": 0,
+  "warning_count": 1,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -37,7 +37,7 @@
     },
     {
       "name": "non_atomic_json",
-      "msg": "98 files write JSON without atomic pattern: continuum_api.py, cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, limit_order.py",
+      "msg": "100 files write JSON without atomic pattern: continuum_api.py, cascade_flip.py, hl_wallet_discovery.py, ceo_dashboard_api.py, limit_order.py",
       "file": "",
       "fix": "Use 'from hermes_file_lock import atomic_write_json' instead of open/json.dump"
     },
@@ -48,5 +48,12 @@
       "fix": "Use 'from _secrets import BRAIN_DB_DICT' instead of inline passwords"
     }
   ],
-  "warnings": []
+  "warnings": [
+    {
+      "name": "trade_frequency",
+      "msg": "2 trades in 6h (0.3/hr)",
+      "file": "",
+      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
+    }
+  ]
 }

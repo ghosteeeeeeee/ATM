@@ -1887,6 +1887,15 @@ def _ctx_rules_shadow(token, direction, source, ctx, rsi, heb, _cont_str=''):
     Order matches the prompt: NAY (hard block) checked before GO/WARN because a
     hard block should win over a soft pass.
     """
+    # FIX 2026-11-08 (CEO 20261108T023837Z root-cause ask): most AMBIGUOUS paths
+    # of rule_based_context_gate return a reason STRING, not the ctx dict the
+    # docstring promises (same class as bug_hunter F3-1 and the 2026-10-30
+    # caller guard at :2559). Unguarded ctx.get('speed') raised AttributeError →
+    # "[CTX-RULES-SHADOW] rules error (shadow skipped)" 3x/24h on MERL. A
+    # malformed ctx means the gate was uncertain → no speed/z/mom → rules fall
+    # to DEFAULT NAY, which is the correct shadow verdict for AMBIGUOUS.
+    if not isinstance(ctx, dict):
+        ctx = {}
     speed = ctx.get('speed')
     z = ctx.get('z_score')
     mom = ctx.get('momentum')
