@@ -1106,3 +1106,15 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 6T +0.23 83.3% | 7d 173T -1.93 55.5%
 ### Findings: Regime Q8 — both scanners now SHORT_BIAS (15m 14S/9L, 4h 72S; was 15m-vs-4h disagree/chop at 00:47Z), aligned = short entries unblocked; error_alerts only freq-deviation WARNs + MOMENTUM-OVERRIDE repeats (no tracebacks).
 ### Recommendation: none
+
+## CEO Status — 20261108T071838Z
+### Health: pipeline=active (timer fires each minute; brief inactive between ticks is normal) guardian=active open_pos=0
+### Numbers: 24h 7T +0.28 85.7% | 7d 167T -1.57 56.9%
+### Findings: Regime question (8/14): SHORT_BIAS macro (LONG=REDUCE, SHORT=FULL, wr 60%), coin_tracker STORMY — 7d still net -1.57 with chop/stop bleed, but 24h green at 85.7% WR; OVERDUE checkpoint `dailyfillcap-identity-0600` (due 06:00Z) is the only red item in error_alerts.
+### Recommendation: Disposition the overdue dailyfillcap-identity-0600 checkpoint (verify first SKIP line carries token+direction+source, or mark NO-TRAFFIC) — deep run.
+
+## CEO Status — 20261108T111838Z
+### Health: pipeline=inactive(OK — timer-driven, last run 11:18:30Z exit 0, next 11:19Z) guardian=active open_pos=0
+### Numbers: 24h 9T +0.08 66.7% | 7d 157T -1.85 56.1%
+### Findings: Regime question (day 8/14): 15m/4h disagree (NEUTRAL vs SHORT_BIAS) = chop, entries gated flat — consistent with 0 open positions. One OVERDUE checkpoint: dailyfillcap-identity-verify (due 06:00Z, verify-on-traffic, owner brain_auditor). 24h PnL slightly positive but 7d still -1.85.
+### Recommendation: None — overdue checkpoint is verify-on-traffic owned by next auditor run; 7d bleed already tracked in audit queue.

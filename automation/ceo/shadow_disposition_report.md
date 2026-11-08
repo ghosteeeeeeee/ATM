@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-07T08:15:00.145161+00:00
-registry: 87 entries (open=41)
+# Shadow disposition report — 2026-11-08T08:15:00.071466+00:00
+registry: 92 entries (open=46)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -33,6 +33,7 @@ registry: 87 entries (open=41)
 - OPEN storm-confl-waiver: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN storm-readiness-packet: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN signal-zombie-purge: deadline=2026-11-09T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for signal-zombie-purge
 - DONE momentum-cache-regime-coverage: DONE — re-measured 2026-11-06T00:45Z after #225 universe fix + #226 STALE_THRESHOLD 32400: recent-traded universe n=65, fresh<4h=65 (100%), fresh<9h=65 (100%), 0 missing, 0 stale. Bar >=90% PASS. SQLite momentum_cache.db remains 0-byte orphan (PG source of truth, by design). (2026-11-06T00:47:12.481255+00:00)
 - DONE pump-detect-ceiling-mismatch: NO-CHANGE — replay NEGATIVE, both options dead, caps stand (2026-10-30)
 - DONE override-vs-ceiling-contradiction: RESOLVED by replay: ceiling owns 75+ (band dead 3T 0% −$0.47); override claim-text fixed, behavior unchanged (2026-10-30)
@@ -88,3 +89,9 @@ registry: 87 entries (open=41)
 - OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-10T00:00:00Z | data/combo_weights.json: 65 rows, 0.1d
 - OPEN amplify-bbsqueeze-neutral-exempt: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN atr-trend-accel-shadow: deadline=2026-12-06T00:00:00Z | (no parseable source)
+- OPEN amplify-prearm-breakeven-lock: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN amplify-cell-conf-tilt-floorproof: deadline=2026-11-21T00:00:00Z | (no parseable source)
+- OPEN dailyfillcap-identity-verify: deadline=2026-11-08T06:00:00Z | (no parseable source)
+  -> DEADLINE PASSED for dailyfillcap-identity-verify (default packet queued)
+- OPEN amplify-bbsqueeze-module-rsi-reband: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN amplify-stoptighten-scope-widen: deadline=2026-11-21T00:00:00Z | (no parseable source)
