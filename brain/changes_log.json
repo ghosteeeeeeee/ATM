@@ -3891,5 +3891,16 @@
     "after": "raw/dedup table + selfcheck; dedup convention note in shadow_disposition",
     "rationale": "grind-breakout- AMPLIFY candidate inflated 32->11 on dedup; would have shipped a false conversion",
     "impact": "zero trading behavior; prevents false amplify/flip proposals"
+  },
+  {
+    "timestamp": "2026-11-08T16:50:00Z",
+    "agent": "brain_auditor",
+    "change": "stop-tighten-enforce-eval disposition evidence: rotation drift RESOLVED (86 distinct SHADOW trade-ids >=20 bar already MET; archives retained 30d; ENFORCE-only read was the wrong tag)",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "evidence ended with #239 caveat: logs retain only 4 ids since 11-07 rotation, must pull rotated logs or under-count",
+    "after": "+ #240 rotation-resolution: bar counts SHADOW joins, combined archive+current = 86 ids 16632-16818 (10-31..11-08), reproduce command embedded, ENFORCE=5 ids explicitly excluded",
+    "rationale": "#239 flagged MED under-count risk for the 11-14 eval; measured and closed with data — no code, zero trading behavior",
+    "impact": "11-14 eval reads correct id bar (MET) instead of under-counting on rotation"
   }
 ]

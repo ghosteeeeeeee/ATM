@@ -10852,5 +10852,23 @@
     "category": "framing / system",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-08T16:50:00Z",
+    "idea": "Opportunity-cost decomposition KPI (detections + gate-block share + DailyFillCap brake state alongside trade count)",
+    "rationale": "43T/day -> 5T/day collapse split three ways: detections -54% (LOW-vol regime), brake ON through 11-07 16:20, gate block share stable 51-74% no Nov-4/5 spike — prevents false frequency-collapse escalations.",
+    "expected_impact": "no PnL; telemetry",
+    "category": "telemetry",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-08T16:50:00Z",
+    "idea": "Losers-only SL-placement census as standing companion to stop-tighten scope-widen (11-21)",
+    "rationale": "14d losers: SL>0.75% = 114T -13.64 (avg -0.120) vs <=0.75% = 48T -2.82 (avg -0.059); directionally supports scope-widen ceiling but confounded by signal-mix (vb- avg 2.197%) and exit-family — candle-walk remains decision evidence. Also: stop_loss column is mutated by PM trail for winners (min 0.003%) — SL studies must use losers-only or open-time snapshot.",
+    "expected_impact": "corroborating only",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]

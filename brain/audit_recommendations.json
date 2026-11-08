@@ -1,171 +1,127 @@
 {
-  "timestamp": "2026-11-08T12:50:00Z",
-  "run": 239,
-  "session_lock": "ABSENT (config changes permitted; 0 trading-constant changes made)",
-  "headline": "AMPLIFY CANDIDATE REFUTED-WITH-DATA + GUARD SHIPPED — grind-breakout- SHORT looked like a shadow->live conversion (raw n=32, 93.8% WR, fwd4h +3.155% t=5.40) but shadow_trades.db pseudo-replication (same-second re-emission under distinct signal_ids) collapses it to n=11 / +2.208% t=1.42 n.s. / second half negative; knife-floor-blocked subset n=5. Detector shipped.",
+  "timestamp": "2026-11-08T16:50:00Z",
+  "run": 240,
+  "session_lock": "ABSENT (/tmp/hermes-session-active.lock does not exist) — modifications allowed",
+  "headline": "STOP-TIGHTEN ROTATION DRIFT RESOLVED WITH DATA: the 11-14 eval's >=20 distinct-id bar counts [STOP-TIGHTEN-SHADOW] joins, and archive+current logs already hold 86 real ids (16632-16818, 10-31..11-08) = bar MET 4.3x pre-deadline. #239's MED 'under-count' risk closed: ENFORCE-only reads (5 ids) were the wrong tag; pipeline-log-rotate.service retains 30d gz. Also decomposed the trade-frequency collapse (43T/day -> 5-7T/day): detections -54% (LOW-vol regime) + DailyFillCap brake ON through 11-07 16:20 + stable ~60% gate block share (no Nov-4/5 spike) = correct-by-design in chop, NOT a bug. 0 config changes (vacation review-queue bars, nothing passed).",
   "session_brain_stats": {
-    "method": "SessionBrain.query (embedding all-MiniLM-L6-v2)",
-    "queries": [
-      "jup yolo mirrored long losing",
-      "stop tighten scope widen",
-      "winner cell amplify size boost"
-    ],
-    "note": "high scores are lexical/semantic neighbours, not decisions; no new drift found — jup LONG bleed + borrowed-conviction framing already documented in prior sessions"
+    "queries": 3,
+    "top_hits": "pump-chain-short filter/backtest; spike_exhaustion re-enable+48h monitor; trend-following signal request; zombie signals (hzscore/bb_bounce/vortex_break pass registry but dead inside)"
   },
   "trade_summary": {
-    "24h": {
-      "n": 9,
-      "wr": 66.7,
-      "pnl_usdt": 0.08,
-      "status": "GREEN"
-    },
-    "7d": {
-      "n": 156,
-      "wr": 56.4,
-      "pnl_usdt": -1.75,
-      "long": {
-        "n": 116,
-        "wr": 53.4,
-        "pnl": -1.74
-      },
-      "short": {
-        "n": 40,
-        "wr": 65.0,
-        "pnl": -0.01
-      }
-    },
-    "14d": {
-      "n": 392,
-      "wr": 54.6,
-      "pnl_usdt": -3.35
-    },
-    "30d": {
-      "n": 774,
-      "wr": 46.6,
-      "pnl_usdt": -6.76
-    },
-    "rr_asymmetry_7d": {
-      "avg_win_pnl_usdt": 0.063,
-      "avg_loss_pnl_usdt": -0.109,
-      "breakeven_wr": 63.4,
-      "actual_wr": 56.4,
-      "verdict": "WR improving (46.6->56.4 over 30d->7d) but losses 1.73x wins keeps the book negative"
-    },
-    "exit_family_7d": {
-      "TRAIL/TP": "93T 91.4% +5.11",
-      "CHOP/STOP": "59T 0.0% -6.93",
-      "UNIVERSAL_MAX_HOLD": "4T 75.0% +0.07"
-    },
-    "regime_7d": {
-      "HIGH": "41T 51.2% -0.97",
-      "EXTREME": "18T 33.3% -0.73",
-      "FLAT": "12T 66.7% -0.03",
-      "NORMAL": "85T 62.4% -0.02"
-    },
-    "chop_bleed_7d": "CHOP/STOP = 39% of trades, 100% of the trail-minus-stop gap; 7d hard_max_loss 34T 0% -4.17 + atr_sl_hit 25T 0% -2.76"
+    "24h": "9T 55.6% $0.00 FLAT",
+    "7d": "152T 55.9% -1.79 (armed 81T 93.8% +4.57 vs unarmed 71T 12.7% -6.36)",
+    "14d": "393T 54.5% -3.36 (armed 208T 90.4% +11.51 vs unarmed 185T 14.1% -14.87)",
+    "30d": "768T 46.9% -6.45",
+    "rr_asymmetry_7d": "avg win +0.062 vs avg loss -0.107 -> breakeven WR 63.3% vs actual 55.9% (loss SIZE is the lever)",
+    "exit_families_7d": "TRAIL/TP: profit-monster-trail 47T +2.95 97.9% + mfe_exit 28T +1.64 100%; CHOP/STOP: hard_max_loss 32T -3.98 0% + atr_sl_hit 25T -2.76 0%",
+    "chop_bleed_share": "7d 94.6% / 14d 94.7% (BOTH >=92% breach) / 30d 88.8% — chronic; 0.75x remedy VETOED as structurally inert (#196/#201), owned by TAT/prearm-breakeven stack; no blind re-escalation",
+    "regime_7d": "NORMAL 82T -0.05 | HIGH 42T -0.95 | EXTREME 16T -0.76 | FLAT 12T -0.03 (sign-flip vs 30d EXTREME-best -> no regime gate)",
+    "daily_frequency": "Oct30 62T / Nov3 43T -> Nov5 6T / Nov6 14T / Nov7 5T / Nov8 7T so far — decomposed, see headline"
   },
   "shadow_analysis": {
-    "contrarian": "join RE-RAN 12:30Z (mandate): overall flip 43.1% n=1442; pump-chain- 64.6% (226 WIN / 124 LOS) LIVE uniform chi2 p=0.3747; btc-pump-rider+ 36.2% do-NOT-flip. Per-signal only, never blanket.",
-    "floor_admit": "join fresh 08:30Z: floor_only 49.2% (n=1382 decided) vs always_admit 43.7%, fisher p=0.1411 -> COLLECT, bar 11-15.",
-    "shadow_trader": "75,685 signals / 75,036 closed. Gates justified: CONFLUENCE-EXPIRY 15,841 @43% avg -0.13; CONFLUENCE is the only gate >50% (56%) but still avg -0.09. Exit A/B: pm_trail +11,328 vs hard_max -13,275 = trail-or-nothing. NEW: per-source n in this report is PSEUDO-REPLICATED (see dedup_guard).",
-    "dedup_guard": {
-      "shipped": "brain/analysis/shadow_dup_check_2026-11-08.py --selfcheck PASS",
-      "finding": "75,694 rows unique by signal_id but 72,712 distinct (source,token,created_at); grind-breakout- 32->11 (2.9x), btc-pump-rider+ 904->486, ichimoku+ 1249->798; gate counts CTX-GATE 2453->929 (2.6x), COOLDOWN-SKIP 317->146, EXEC-FAIL 495->302",
-      "consequence": "grind-breakout- AMPLIFY REFUTED: fwd4h +3.155% t=5.40 -> +2.208% t=1.42 n.s., second half -0.095; knife-floor subset 14 raw -> 5 deduped"
-    },
-    "oscillator": "FROZEN + archived 2026-10-27 (fossil) — pre-live evidence only, not cited",
-    "wyckoff": "RETIRED (PLUS/MINUS flags False, polarity corrected)",
-    "rr_shadow": "ORPHANED — no producer, mtime stale; stop citing",
-    "overall": "2/6 usable (contrarian + floor), both re-run this run; shadow_trader usable for gate justification but NOT for per-source n without dedup"
+    "contrarian": "join RE-RAN 16:30Z (mandate): overall flip 43.1% n=1442 (flipping loses overall); pump-chain- 64.6% (226W/124L) LIVE uniform chi2 p=0.375 = Oct-27 PROMOTE stands; btc-pump-rider+ 36.2% do-NOT (token heterogeneity chi2 p=8.9e-25)",
+    "floor_admit": "join 08:30Z same-day fresh: floor_only 49.2% vs always_admit 43.7%, fisher p=0.1411 COLLECT (bar 11-15)",
+    "oscillator": "FROZEN (OSCILLATOR_MULT_ENABLED since Oct 1, archived fossil) — none",
+    "wyckoff": "RETIRED — none",
+    "rr_shadow": "ORPHANED (no producer, 24d stale) — none",
+    "shadow_trader": "76,185 signals 16:33Z: exit A/B pm_trail +11,411 (100% WR) vs hard_max -13,378 (0%) vs rr_engine -5,077 vs cut_loser -2,186 = TRAIL-OR-NOTHING; gates justified (CONFLUENCE-EXPIRY avg -0.13, CTX-GATE 2453 @52% -0.08); grind-breakout- top source n=32 but #239 dedup refutes as pseudo-replication",
+    "dedup_guard": "shadow_dup_check_2026-11-08.py --selfcheck PASS (76,185 rows, 14 inflated sources >=1.5x informational)",
+    "overall": "3/6 usable (contrarian fresh, floor same-day, shadow_trader fresh); 3 dead (oscillator/wyckoff/rr)"
   },
   "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py adverse-first (selfcheck PASS)",
-    "window": "48h",
-    "n": 8,
-    "never_adverse": 3,
-    "recovered_after_adverse": 5,
-    "never_traded_back": 0,
-    "verdict": "WRONG-SIDE REFUTED 66th consecutive run (#61 opposite-signal p=0.116, #84 forward-return t=-0.04)",
-    "note": "0 NEVER cohort this run — no structural never-recover trade in the window"
+    "method": "recovery_replay.py adverse-first, --selfcheck PASS",
+    "48h": "n=5 = 2 never-adverse / 3 recovered / 0 NEVER -> WRONG-SIDE REFUTED 67th consecutive run (#61 p=0.116, #84 t=-0.04)",
+    "new_patterns": 0
   },
   "signal_deep_dive": {
-    "new_sub50_n_ge_15_14d": [],
-    "detail": "only two sub-50% 14d signals with n>=15: pump-chain+ 29T 48.3% -0.27 (standing NO-KILL + CONF_FLOOR owner) and pump-chain- 32T 37.5% +0.07 (net POSITIVE, owned by live contrarian PROMOTE). Both already owned — 0 new targets.",
-    "watch": "7d hard_max_loss 34T 0% + atr_sl_hit 25T 0% = every stop exit loses (tautological) but the 39% share of trades in that family is the real number"
+    "new_targets": 0,
+    "sub50_14d": "pump-chain+ 29T 48.3% -0.27 (NO-KILL + CONF_FLOOR, review 11-13); pump-chain- 32T 37.5% net +0.07 (contrarian PROMOTE live, watch 11-11)",
+    "note": "every bleed cohort is killed/disabled/in-flight/CEO-domain — no fresh kill candidate"
   },
   "drift_findings": [
-    {
-      "item": "stop-tighten-enforce-eval evidence says ENFORCE stays False",
-      "reality": "STOP_TIGHTEN_ENFORCE=True live since 2026-11-04 (hermes_constants:764), 13 enforce log lines, clamp engaged on 4 trade ids",
-      "severity": "LOW (stale disposition text only)",
-      "action": "evidence appended this run"
-    },
-    {
-      "item": "eval at 11-14 needs >=20 distinct STOP-TIGHTEN trade ids",
-      "reality": "logs/pipeline.log retains STOP-TIGHTEN lines only from 2026-11-07 14:12 (rotation) = 4 ids",
-      "severity": "MED",
-      "action": "flagged in disposition evidence — read must pull rotated logs or it under-counts"
-    },
-    {
-      "item": "per-source shadow n quoted raw in shadow_trader --report",
-      "reality": "pseudo-replicated up to 2.9x",
-      "severity": "HIGH if used for proposals",
-      "action": "detector shipped; convention extended on gate-shadow-dedup-convention"
-    }
+    "#239 MED '11-14 stop-tighten eval under-counts on rotation' — RESOLVED: bar is SHADOW-tag joins (86 ids, MET), not ENFORCE (5 ids); archives retained 30d. Evidence appended to disposition stop-tighten-enforce-eval.",
+    "SIDE-FIND (method landmine): trades.stop_loss is MUTATED upward by profit-monster trail for winners (min dist 0.003-0.068% on trail exits) — any 'initial SL placement' study must use losers-only or open-time snapshot; my first over/in-cap census was contaminated and is NOT cited as evidence.",
+    "SIDE-FIND (benign): scripts/signals/_candidates/bollinger_squeeze_{long,short}_candidate.py auto-regenerated 15:58Z by the candidate generator (backtest stats refresh only, CANDIDATE status, not enabled) — dirty worktree, not a code change."
   ],
   "recurring_problems": [
-    "Entry-quality filters keep failing significance/p-value bars (5+ rejected runs) while exit-side levers (STOP_TIGHTEN, CUT_LOSER tighter) actually ship — the remaining edge is in average-loss-size, not entry count.",
-    "Winner-cell decay inside the rolling window (pc+ EXTREME last run; vb- HIGH weekly +0.59 -> -0.17 this run) — every VALIDATED cell needs a weekly sign read, not just a one-time validation."
+    "chop-bleed >=92% now on both 7d (94.6%) and 14d (94.7%) — chronic since late Oct; remedy vetoed as inert; owned by queued TAT/prearm-breakeven/CONF_FLOOR stack (due 11-14)",
+    "RR asymmetry: breakeven WR 63.3% vs actual 55.9% — entry count is not the lever, loss SIZE is (stop-tighten in-scope working, scope-widen walk due 11-21)",
+    "session_brain duplicate-text records — flagged 18 runs, rebuild still owed (hygiene, not blocking)"
   ],
   "missing_implementations": [
-    "No dedup step inside shadow_trader.py --report (left as-is deliberately: changing a shared report tool mid-flight is higher risk than shipping a standalone detector; fold dedup in when gate-shadow-dedup-convention closes 11-10)."
+    "zombie-purge DECIDE due 11-09: default NO CHANGE (leave zombies, ~950/day storage-only, forensic tombstone value) — pre-adjudicated as default, formal disposition at deadline",
+    "No systemd producer for contrarian_outcome_join.py — still manual every run (mandate)"
   ],
   "creative_improvements": [
-    "REFUTED-WITH-DATA grind-breakout- AMPLIFY + shipped shadow_dup_check detector",
-    "STOP_TIGHTEN mid-eval read (20 distinct post-ship trades, +0.710 vs -2.31, p=0.094 not significant)",
-    "RR-asymmetry framing: breakeven WR 63.4% vs actual 56.4% — the lever is loss SIZE"
+    {
+      "date": "2026-11-08T16:50:00Z",
+      "idea": "Opportunity-cost decomposition KPI: daily detections + gate-block share + DailyFillCap brake state, reported together with trade count",
+      "rationale": "This run's 43T/day -> 5T/day collapse looked like a bug until split three ways: detections -54% (LOW-vol regime), brake ON through 11-07 16:20 (fee-net negative), gate block share stable 51-74% with NO Nov-4/5 spike. Without the split, a healthy chop-response reads as a failure.",
+      "expected_impact": "no PnL; prevents future false 'frequency collapse' escalations",
+      "category": "telemetry",
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "date": "2026-11-08T16:50:00Z",
+      "idea": "Losers-only SL-placement census as standing companion to stop-tighten scope-widen (11-21)",
+      "rationale": "14d losers: initial SL >0.75% = 114T -13.64 (avg -0.120/trade) vs <=0.75% = 48T -2.82 (avg -0.059). Directionally supports the registered scope-widen ceiling (+$0.87/14d) but is confounded by signal-mix (vb- avg SL 2.197%) and exit-family — MUST NOT be cited alone; the candle-walk remains the decision evidence.",
+      "expected_impact": "corroborating only; feeds 11-21 walk",
+      "category": "entry sniper",
+      "status": "pre-registered",
+      "risk": "low"
+    }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "run": 238,
-      "change": "amplify-winner-cell-drop-pcplus registered (drop pc+ EXTREME from WINNER_CELLS_VALIDATED, bar 30d net<=0 at 11-14)",
-      "status": "OPEN — cell still -0.04/30d, bar unchanged, nothing to do until 11-14"
+      "run": 239,
+      "change": "shadow_dup_check_2026-11-08.py shipped",
+      "status": "VERIFIED — --selfcheck PASS this run (76,185 rows, 14 inflated sources informational)"
     },
     {
-      "run": 238,
-      "change": "dailyfillcap-identity-0600 checkpoint -> NO-TRAFFIC",
-      "status": "VERIFIED — 0 DailyFillCap SKIP lines after 05:03Z this run, disposition stands"
+      "run": 239,
+      "change": "gate-shadow-dedup-convention disposition extended to shadow_trades.db",
+      "status": "OPEN — due 11-10, entry present"
     },
     {
-      "run": 237,
-      "change": "stop-tighten ENFORCE live 0.750%",
-      "status": "WORKING — 13 enforce lines, clamps engaging on 16809/16813/16815/16818; post-ship cohort 20T 80% +0.710"
+      "run": 239,
+      "change": "stop-tighten ENFORCE 0.75 live (post-ship jup+vb 20T 80% +0.710)",
+      "status": "WORKING — 30 ENFORCE lines in current log, clamps on 16809/16813/16815/16818; post-ship jup 19T 78.9% +0.69 fresh (fisher p=0.094 n.s., volume confound)"
     },
     {
-      "run": 237,
+      "run": 239,
+      "change": "amplify-winner-cell-drop-pcplus registered",
+      "status": "OPEN — pc+ EXTREME 30d now 65T $0.00 38.5% (was -0.04), bar unchanged, deadline 11-14"
+    },
+    {
+      "run": 239,
       "change": "contrarian/floor joins refreshed",
-      "status": "RE-RUN this run (12:30Z / 08:30Z) — numbers unchanged in direction"
+      "status": "RE-RUN this run 16:30Z / same-day 08:30Z — direction unchanged"
     }
   ],
   "amplify_step": {
-    "screen": "30d winner cells n>=10 net>0 = 5: bb-squeeze+ NORMAL 44T +0.76 (VALIDATED, in-flight x4), volume-buildup- HIGH 19T +0.42 (VALIDATED, in-flight clone-hunt 11-13), jup SHORT HIGH 15T +0.40 (already amplify-jup-short-walk 11-14 + amplify-jup-short-high-cell 11-19), pc- EXTREME SHORT 10T +0.30, pc- NORMAL LONG 30T +0.19 (too small: 1.25x adds ~+0.05/30d)",
-    "new_proposals": [],
-    "why_not": "NO NEW CELL CLEARED THE BAR THIS RUN. Every cell >=n10 net>0 already carries an in-flight amplify proposal (see queue); the one fresh candidate found by clone-hunt (grind-breakout- SHORT) was REFUTED on dedup (n=32->11, t=1.42 n.s.); pc- NORMAL LONG amplitude +0.19/30d is below materiality; jup SHORT HIGH is 8 days old with no OOS and already registered.",
-    "flip_kpi": "MET this week — stop-tighten ENFORCE (11-04), SHORT_RSI_CEILING 65->75 (11-03), harvest ship (11-04) are the in-flight conversions; 0 NEW conversions this run, documented here per rule 3."
+    "ranked_cells_30d_n10_net_pos": [
+      "bb-squeeze+ NORMAL LONG 44T +0.76 65.9% -> in-flight: chop-exempt 11-13, neutral-exempt 11-14, module-rsi-reband 11-14, warrior-uninert 11-10",
+      "volume-buildup- HIGH SHORT 19T +0.42 78.9% -> in-flight: vb-high-clonehunt 11-13",
+      "jup_yolo_mirrored HIGH SHORT 15T +0.40 73.3% -> in-flight: jup-short-walk 11-14, jup-short-high-cell 11-19 (cell 2wk old, HOLD)",
+      "pump-chain-,pump-chain-v6- EXTREME SHORT 10T +0.30 30.0% -> amplitude 1.25x adds ~+0.075/30d = below materiality; pc- covered by contrarian PROMOTE",
+      "pump-chain- NORMAL LONG 30T +0.19 40.0% -> below materiality (1.25x ~ +0.05/30d)"
+    ],
+    "early_cells_n5": "r2v2-long3 NORMAL 6T +0.78 83.3% (n<10, label only); warrior-sr-confirm+ NORMAL 6T +0.28; jup FLAT LONG 7T +0.25 100% — all below n>=10 bar",
+    "proposal_emitted": false,
+    "why_not": "No fresh cell cleared the bar beyond in-flight proposals (rule-3): the 4 material cells already carry size-125/clone-hunt/walk/kill-review entries, the 2 remaining are below materiality, early cells n<10. Duplicate proposals banned.",
+    "flip_kpi": "MET this week per #239 (stop-tighten ENFORCE 11-04, SHORT_RSI_CEILING 65->75 11-03, harvest 11-04); 0 NEW conversions this run, stated per rule 3"
   },
   "next_actions": [
-    "11-09: signal-zombie-purge DECIDE (default NO CHANGE — leave zombies)",
-    "11-10: gate-shadow-dedup-convention fold (dedup convention now also covers shadow_trades.db) + winner-cell-size-125 + fade-ctx-exempt + rsi-ceiling-75 + conf-filter-parity-split + jup-atrsl-shadow-parity + mfe-cut-arm-be + ichimoku-dampen-flooradmit",
-    "11-13: amplify-vb-high-short-clonehunt + pump-chain-plus-weight-kill-review + linreg-fade-fill-funnel",
-    "11-14: stop-tighten-enforce-eval (source rotated logs!) + amplify-winner-cell-drop-pcplus + atrtrail-clip-12 + probe-080 + bbsqueeze reband/neutral-exempt + prearm-breakeven + TAT-age-sweep",
-    "11-15: floor_admit same-sign | 11-19: jup HIGH cell OOS | 11-21: conf-tilt + stop-tighten scope-widen walk",
-    "CEO: mult-150 sign-off (evidence decayed: judge ex-pc+ or drop first) — jup fill cap holding (last50 share 30.0% < 35% bar)"
+    "11-09: signal-zombie-purge DECIDE (default NO CHANGE — pre-adjudicated this run)",
+    "11-10: gate-shadow-dedup-convention fold (covers shadow_trades.db) + winner-cell-size-125 + fade-ctx-exempt + rsi-ceiling-75 + conf-filter-parity + jup-atrsl-parity + mfe-cut-arm-be + ichimoku-dampen",
+    "11-11: contrarian watch (pc- 64.6% LIVE)",
+    "11-12: storm-waiver enforce bar",
+    "11-13: pc+ kill-review + vb- clone-hunt + linreg-fade funnel",
+    "11-14: stop-tighten-enforce-eval (id bar MET=86 — source archive+current, SHADOW tag) + drop-pcplus + probe-080 + bbsqueeze reband/neutral-exempt + mult-150 adjudication + atrtrail-clip + prearm-breakeven + TAT-age-sweep",
+    "11-15: floor_admit 30d | 11-19: jup HIGH OOS | 11-21: conf-tilt + stop-tighten scope-widen walk (losers-only census appended as corroboration)",
+    "CEO: mult-150 sign-off (evidence decayed — judge ex-pc+ or drop first) · jup HIGH cell HOLD · unclog-waiver EXPIRY re-measure [35,45) before renewal (expired 11-03)"
   ],
-  "readiness": {
-    "open_trades": 0,
-    "steers": [],
-    "regime": "btc_15m LONG_BIAS vs btc_4h SHORT_BIAS = disagree = chop; continuum AT; vol LOW; velocity SLOW; volume LOW; trend_quality STRONG_DOWN",
-    "verdict": "0 open = CORRECT. No counter-trend fresh entries while 15m and 4h disagree, trail-family first, size 1.0x (size-reduce file absent = 1.0x truth)."
-  }
+  "readiness": "3 open LONGS (SOL jup_yolo_mirrored 4.2h -0.12% SL0.60%; IMX continuation+ 0.4h +0.67% SL0.48%; ARB atr-trend+ 0.4h +0.14% SL1.01% — out-of-stop-tighten-scope by design, source not in tuple) — all bracketed, HOLD. Watchdog steers: IMX+ARB cluster + portfolio 3-long (warnings, non-auto). Regime: btc_15m LONG_BIAS vs btc_4h SHORT_BIAS = DISAGREE = chop, continuum AT, vol LOW, velocity SLOW, volume LOW, trend_quality STRONG_DOWN -> NO fresh counter-trend entries; trail-family first; LONGs only on sustained EMA300 reclaim WITH volume; size 1.0x (vacation_size_reduce.json absent = 1.0x). 0 pending checkpoints."
 }
