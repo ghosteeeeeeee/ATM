@@ -1130,3 +1130,15 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 11T -0.14 54.5% | 7d 152T -1.97 55.9%
 ### Findings: Regime (Q8): BTC flat/4h NEUTRAL, 15m/4h bias disagreement = chop, vol LOW — prioritize volume-generating signals, no counter-trend entries. 1 decision due 11-09 (zombie-purge, default NO CHANGE); checkpoint dailyfillcap-identity-0600 OVERDUE (partial PASS 11-07).
 ### Recommendation: Disposition dailyfillcap-identity-0600 as NO-TRAFFIC or verify on next skip line; nothing else needs action.
+
+## CEO Deep Run — 20261108T173238Z (progress update, mined-ideas batch)
+### Rulings (full: checkpoints/20261108T173238Z-decision.md)
+- **B neighbor-test: DISPATCHED + COMPLETED.** scripts/neighbor_step_sweep.py (41380f5b, read-only harness) swept 3 constants on n=3184 trades (2026-08-10 → 11-08): ATR_SL_MIN=0.015 **HILL** (peak possibly 0.017; envelopes 0.013 [+1.09,+2.97], 0.017 [+6.12,+6.44] vs $5.56 collapse bar) · SIGNAL_FILTER_SPEED_MIN=40 **INDETERMINATE** (spike ruled out, hill underpowered n_swung=59; CI at 35 crosses collapse bar) · ATR_TP_K_MULT=2.0 **HILL-degenerate: K is exit-side INERT** (Δ≡$0.00, 0 outcome changes, 77% targets outside clamps, no admission-path consumer). No SPIKE anywhere. Code review + bug_hunter run, all BLOCKER/MAJOR fixed.
+- **H flip bar UNCHANGED** (pre-registered): 14d + ≥30 alerts + alert-conditioned next-24h PnL <0 → earliest review 2026-11-22. H live, 15+ clean fires, 93 UNDER / 0 OVER.
+- **dailyfillcap-identity-0600: ALREADY CLOSED** 08:39Z by brain_auditor #238 (NO-TRAFFIC). Repeated OVERDUE recommendations in status runs are stale-display reads (error_alerts append-only vs checkpoint_registry.json=done) — status prompt should read the registry. LOW.
+- **stop-tighten: NO FLIP DUE** — already enforcing since 2026-11-04; 86-id bar is mid-eval of the LIVE clamp. **Decision point 2026-11-14** (keep/revert; evidence data/shadow_disposition.json; fail path cap→2.5 / ENFORCE=False).
+### Findings for T/CEO (no action taken — rule-change loop applies)
+1. ATR_TP_K_MULT is a tuned constant that does nothing (inert) — candidate for eventual removal, needs T.
+2. ATR_SL_MIN hill peaks at 0.017 — tune candidate, must go through gates + T approval.
+3. SPEED_MIN verdict underpowered — re-run neighbor_step_sweep.py in ~30d for a powered read.
+### Note: run classed incomplete rc=1 — died after writing decision, before dispatch/aggregation; B re-dispatched fresh from checkpoint, aggregation done by session parent.
