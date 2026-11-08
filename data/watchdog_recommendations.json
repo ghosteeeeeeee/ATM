@@ -1,20 +1,44 @@
 {
-  "timestamp": "2026-11-08T15:19:11.193776+00:00",
+  "timestamp": "2026-11-08T17:19:11.917492+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
+    "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.75,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 1
+  "open_count": 1,
+  "deep_analysis": "1 open trade: ARB LONG atr-trend+ (opened 16:12Z, entry 0.16895, meta_rsi 31.25, now ~0.1684, -0.5%). It is a counter-trend long: BTC has held below continuum EMA300 for 58+ consecutive minutes, linreg LEAN_BEAR, trend_quality STRONG_DOWN, aggregate regime SHORT_BIAS 100/122 tokens, and ARB has ground 0.1693\u21920.1684 since entry with no bounce. Fresh-open test: I would not open this trade now \u2014 the paying side in this tape is SHORT (7d SHORT 39T 66.7% WR +$0.09 vs LONG 115T 52.2% WR -$1.98). Entry thesis was an oversold bounce (meta_rsi 31.25); 65 minutes in the bounce has not materialized. SL 0.16725 (-1.0%) and TP 0.1715 (+1.5%) are placed reasonably for current ATR; the risk is thesis decay, not level placement.\n\nPortfolio: 1 long, 0 short, 5 slots free \u2014 exposure is small and capped, but the single position sits on the wrong side of a stable downtrend tape (BTC 15m flips: 1 per 24h \u2014 well under p50=19-20, a genuine trend state, not churn). All three direction sources agree SHORT_BIAS (aggregate, regimes.BTC, continuum BELOW) \u2014 no source disagreement to flag this cycle.\n\nChop-bleed KPI (dollar share, 7d): 94.8% \u2014 $6.86 of $7.24 gross loss came from trades that never reached +0.40% trail arm (62 of 67 losing trades; count share 92.5%). 14d 94.8%, 30d 88.8%. NULL mfe_pct losers: 0 (clean). Same-day arm rate: 6 of 11 closes = 54.5% (companion reading only \u2014 not a tripwire per #196). 7d is at/above the 92% threshold: this is an ENTRY-quality problem, not an exit problem. Exit ownership is fine \u2014 profit-monster-trail +$3.00 and mfe_exit +$1.64 are carrying the system while hard_max_loss 32T -$3.98 and atr_sl_hit 26T -$2.91 give it back.\n\nAI trader pick: KAS SHORT written to ai_trader_state.json \u2014 WATCHLIST ONLY (AI_TRADER_ENABLED=False since 2026-10-19, will NOT execute). Precheck PASS: RSI 57.2 (center of 45-60 short band, outside 45-55 death zone), conf 93, R:R 1.04 grade C with 0.70 multiplier, ATR 0.93%, price fresh 0.5min. Replaces stale ACE SHORT pick from 2026-11-07 15:25.",
+  "regime_context": "Sources (all agree this cycle): aggregate 15m = SHORT_BIAS (100 short / 1 long / 21 neutral, 17:15Z), regimes.BTC = SHORT_BIAS, continuum = BELOW EMA300 (58 consecutive minutes, price 75706 vs EMA300 75966). BTC 15m flip rate: 1/24h (aggregate 15/24h, normal band p50~19-20). BTC flips <6 = real trend tape, not chop \u2014 snapshot directional prose is cheap right now and the stable state is down. 4h regime SHORT_BIAS, volatility LOW, wyckoff ACCUMULATION / market_phase RECOVERY / acceleration POSITIVE \u2014 bottoming flavor underneath a still-bearish tape, which is why the ARB long was attempted; until BTC reclaims EMA300 the trend side remains short. Measured-refuted steer #139 still in force: do NOT re-issue the mid-band (meta_rsi 45-64) LONG block keyed on BTC below EMA300.",
+  "pattern_alerts": "VERIFIED from PostgreSQL this cycle:\n\n1) CHOP-BLEED 94.8% (7d dollar share; 62/67 losing trades, count share 92.5%; $6.86 of $7.24). 14d 94.8%, 30d 88.8%. NULL mfe losers: 0. Same-day arm 6/11=54.5% (companion only). >=92% => entry quality deteriorating: nearly every loss dollar is a trade that never armed. Route: brain-auditor entry-quality work, NOT exit tweaks. WINNING side: armed trail trades (profit-monster-trail 48T +$3.00, mfe_exit 28T +$1.64). Why we weren't on it: entries fire into chop before momentum exists to reach +0.40%.\n\n2) DIRECTION SKEW 7d: LONG 115T 52.2% -$1.98 vs SHORT 39T 66.7% +$0.09. In a stable SHORT_BIAS tape the winning side is short; we are 3x heavier long. jup_yolo_mirrored split: LONG 51T -$0.69 vs SHORT 34T +$0.14 (27 of its losers are all-losses -$3.75, mostly HYPE/SOL/ETH longs at meta_rsi 40-60 never armed). Caveat: measured-refuted steer #139 forbids re-proposing a mid-band-long block below EMA300 \u2014 this is reported as data, not as a block proposal.\n\n3) EXIT REASON LEDGER 7d: hard_max_loss 32T -$3.98 + atr_sl_hit 26T -$2.91 = -$6.89 versus trail/mfe wins +$4.91 combined. Losers cluster at meta_rsi 40-60 (mid band, not extremes) with mfe_pct <0.40 \u2014 entries in drift, not bad RSI extremes and not bad exits. Per-loss winning-side answer: the short side of the same move, entered when BTC was already below EMA300 \u2014 we took the counter-trend fill instead.\n\n4) No signal family proposed for kill: all flagged families (jup_yolo_mirrored, bb-squeeze+, pump-chain+) have live 7d traffic and enabled flags \u2014 not dead-signal stale windows.",
+  "steer_recommendations": [
+    {
+      "severity": "urgent",
+      "category": "regime",
+      "text": "ARB LONG (#16822) is counter-trend in a STRONG_DOWN/SHORT_BIAS tape with an unfired oversold-bounce thesis. Exit if 5m closes below 0.1678 (session-low zone) OR if BTC 1m remains below continuum EMA300 at the next cycle while ARB is still under 0.1690 \u2014 bounce thesis invalidated, short is the paying side. Hold only if ARB reclaims 0.1690 and BTC reclaims EMA300; SL 0.16725 remains the backstop either way.",
+      "condition": "5m close < 0.1678, or (BTC below continuum EMA300 AND ARB < 0.1690) next cycle; inverse: reclaim 0.1690 + BTC EMA300 = hold"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "text": "Chop-bleed 7d dollar share 94.8% (>=92% threshold): route entry-quality filter work to brain_auditor (entry gates, not exits). 0 NULL mfe, same-day arm 6/11 \u2014 data clean, breach real.",
+      "condition": "re-measure next cycle; if <=70% ownership flips to round-trip cohort, re-route to UGB-PT/trail instead"
+    },
+    {
+      "severity": "info",
+      "category": "opportunity",
+      "text": "PICK KAS SHORT (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute): precheck PASS, RSI 57.2, conf 93, R:R 1.04 grade C, ATR 0.93%, regime SHORT_BIAS conf 93.2. 5 slots free. Replaces stale ACE pick (2026-11-07).",
+      "condition": "expires if aggregate flips LONG_BIAS or KAS RSI leaves 45-60 before any manual execution"
+    }
+  ],
+  "agent_timestamp": "2026-11-08T17:26:10.079810+00:00"
 }
