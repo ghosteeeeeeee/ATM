@@ -196,7 +196,9 @@ def _get_winner_cell_size_mult(token, source, direction, regime=None):
     """Winner-cell notional multiplier (CEO consult 20261029T173906Z, T 'proceed').
 
     1.25x (WINNER_CELL_SIZE_MULT, cap WINNER_CELL_SIZE_MULT_CAP) when the signal
-    substring + volatility regime match a validated WINNER_CELLS_VALIDATED cell.
+    substring + volatility regime + DIRECTION match a validated
+    WINNER_CELLS_VALIDATED cell (direction added brain_auditor #241 — cells are
+    validated on one leg's trades and must not size up the other).
 
     Regime source (brain_auditor #205 fix 2026-10-30): prefer the SIGNAL-TIME
     regime (vol-gate classify at approval) when the caller passes `regime=`.
@@ -220,8 +222,9 @@ def _get_winner_cell_size_mult(token, source, direction, regime=None):
             except Exception:
                 return 1.0
         _wc_src = str(source or '')
-        for _sig, _reg in WINNER_CELLS_VALIDATED:
-            if _sig in _wc_src and _wc_regime == _reg:
+        _wc_dir = (direction or '').strip().upper()
+        for _sig, _reg, _cell_dir in WINNER_CELLS_VALIDATED:
+            if _sig in _wc_src and _wc_regime == _reg and _wc_dir == _cell_dir:
                 _wc_mult = min(WINNER_CELL_SIZE_MULT, WINNER_CELL_SIZE_MULT_CAP)
                 log(f'  🎯 [WINNER-CELL-SIZE] {token} {direction}: {_sig} in {_reg} cell '
                     f'-> x{_wc_mult:.2f} (cap {WINNER_CELL_SIZE_MULT_CAP:.2f}, regime_src={"sig" if regime else "live"})')

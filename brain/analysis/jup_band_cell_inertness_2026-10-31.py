@@ -44,7 +44,7 @@ WHERE status='closed' AND close_time > NOW() - INTERVAL '7 days'
 def cell_inert_table():
     from hermes_constants import TOKEN_AMP_CLASS, AMPLITUDE_SIZE_MULT, WINNER_CELLS_VALIDATED, WINNER_CELL_SIZE_MULT
     rows = []
-    for sig, reg in sorted(WINNER_CELLS_VALIDATED):
+    for sig, reg, _cell_dir in sorted(WINNER_CELLS_VALIDATED):
         for tok in ('INJ', 'DYDX', 'MON', 'SOL', 'HYPE', 'BTC', 'ALT', 'ZORA'):
             amp = AMPLITUDE_SIZE_MULT.get(TOKEN_AMP_CLASS.get(tok, 'MED_AMP'), 1.0)
             net = amp * WINNER_CELL_SIZE_MULT
