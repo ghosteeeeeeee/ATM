@@ -23007,3 +23007,28 @@ BY: auto_1hr
 - Quiet market: 0 closes in last hour, 1 open position
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
 BY: auto_1hr
+
+## [2026-11-08 15:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: -% hour; 24h 9T 66.7% +$0.08 GREEN | 7d 152T 55.9% -$1.76 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens, 1 open (SOL jup_yolo_mirrored LONG +0.01, opened 12:22)
+- Kill check: 0%WR 24h = bb-squeeze+ 1T, warrior-sr-confirm+ 1T, pump-chain- 1T — all n<3 -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/9 = 11.1% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — max n=3 (jup_yolo_mirrored 3T 100% +$0.14 across SOL+HYPE), needs n>=5
+- Neg streak: hourly closes 12h = +0.05 (05h), -0.10 (09h), -0.10 (10h) — 2 consecutive negative, not 3 -> no size cut
+- Frequency: 0 closes/hr, 0 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.254% max 0.682% (6/6), avg <0.5% -> OK
+- No storm (window-min -0.29% / at-run +0.12%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still -$1.76 structural RED; 24h GREEN at 66.7% WR
+- Quiet market: 0 closes in last 5 hours, 1 open position
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
+BY: auto_1hr
