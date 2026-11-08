@@ -22771,3 +22771,26 @@ Final set: []
 **Open Questions:**
 - 7d -$1.65 structural RED; worst 14d: volume-buildup- and jup_yolo_mirrored (WR fine, fee drag) — not regime-losing -> keep
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-08 05:20] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses), 0 opens, 0 open
+**PnL:** $0.05 (WR: 100% hour; 24h 7T 85.7% +$0.28 GREEN | 7d 170T 56.5% -$1.61 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: SOL jup_yolo_mirrored SHORT +0.05 mfe_exit — no SL hits
+- Kill check: 0 signals with 0%WR n>=3 (24h max n=3 at 100% WR) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/7 = 14.3% of 24h closes (<40%) — tpsl_utils.py DEPLOYED -> no action
+- Boost: NONE eligible — max n=3 (jup_yolo_mirrored 3T 100% +$0.14), needs n>=5
+- Neg streak: only 2 hours with closes in 10h, both positive (+0.17, +0.05) -> not 3 consecutive negative -> no size cut
+- Frequency: 1 close/hr, 0 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.254% max 0.682% (6/6 known), avg <0.5% -> OK
+- No storm (window-min -0.12% / at-run -0.04%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still -$1.61 structural RED; volume-buildup- and jup_yolo_mirrored WR fine, fee drag, not regime-losing -> keep
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
