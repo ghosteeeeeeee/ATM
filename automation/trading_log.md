@@ -23107,3 +23107,27 @@ BY: auto_1hr
 - jup_yolo_mirrored 3T -$0.06 24h at 66.7% WR — watch, n=3
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
 BY: auto_1hr
+
+## [2026-11-08 19:21] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.07 (WR: 50.0% hour; 24h 11T 54.5% -$0.14 RED | 7d 152T 55.9% -$1.97 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: RENDER bb-squeeze+ LONG +$0.02 profit-monster-trail, ARB atr-trend+ LONG -$0.09 hard_max_loss (-4.20% acct); 3 open (ETC atr-trend- -0.04, BABY atr-trend- +0.36, SOL jup_yolo_mirrored -0.15)
+- Kill check: 0%WR 24h = warrior-sr-confirm+ 2T — n<3 -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/11 = 9.1% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — max n=3 (bb-squeeze+ 3T 66.7% -$0.06, jup_yolo_mirrored 3T 66.7% -$0.06), both net negative anyway
+- Neg streak: hrs w/ closes 12h = -0.10 (09h), -0.10 (10h), -0.01 (15h), -0.08 (16h), -0.07 (19h) — longest run 2 consecutive, not 3 -> no size cut
+- Frequency: 2 closes/hr, 0 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.243% max 0.682% (6/6) -> OK
+- No storm (window-min -0.11% / at-run -0.07%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d worsened to -$1.97 (152T, 55.9% WR) — structural RED, hard_max_loss 33T -$4.07 is the biggest 7d drag
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
+BY: auto_1hr
