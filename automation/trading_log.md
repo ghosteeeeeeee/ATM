@@ -23205,3 +23205,28 @@ BY: auto_1hr
 - 7d -$1.57 structural RED; hard_max_loss 3T -$0.29 + atr_sl_hit 2T -$0.31 are the 24h drags
 - Storm streak 3/3 POSITIVE — enforce bar MET, awaiting CEO/T sign-off to flip STORM_CONFLUENCE_WAIVER_ENFORCE (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-08 23:20] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.01 (WR: 0.0% hour; 24h 15T 53.3% -$0.07 RED | 7d 152T 56.6% -$1.50 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BTC ai-trader-pending SHORT -$0.01 manual_trail_hit; 0 opens, 0 open
+- Kill check: 0%WR 24h = warrior-sr-confirm+ 2T — n<3 -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — max n=4 (jup_yolo_mirrored 4T 50% -$0.22, net negative), needs n>=5
+- Neg streak: hrs w/ closes 12h = -0.01 (15h), -0.08 (16h), -0.05 (19h), +0.06 (21h), -0.01 (23h) — longest run 2 consecutive, not 3 -> no size cut
+- Frequency: 1 close/hr, 1 open/2h — under 20
+- Entry quality: 24h winners mae_pct avg 0.268% max 0.682% (7/8 <0.5%) -> OK
+- No storm (window-min -0.46% / at-run +1.29%) — gate not fired (needs window-min <= -1.5 OR |at-run| >= 1.5), steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- at-run +1.29% is a fresh pump approaching the 1.5% gate — next hour may fire
+- 7d -$1.50 structural RED; hard_max_loss 3T -$0.29 + atr_sl_hit 2T -$0.31 are the 24h drags
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
