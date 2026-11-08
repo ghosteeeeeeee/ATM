@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
 """Stop-tighten SCOPE-widen counterfactual (audit #237, 2026-11-08).
 
-STOP_TIGHTEN_SOURCES covers only ('jup_yolo_mirrored','volume-buildup-') but the
+STATUS 2026-11-08 later same day (CEO consult 20261108T180116Z): SCOPE WIDENED
+AND SHIPPED — STOP_TIGHTEN_SOURCES is now 8 names matched by SUBSTRING (see
+scripts/hermes_constants.py:761). SCOPE_IN/SCOPE_OUT below stay FROZEN at the
+pre-widen split so re-running this script reproduces the CEO's numbers; they are
+NOT the live scope anymore. Two caveats recorded in registry
+amplify-stoptighten-scope-widen: (a) this is ceiling math, not the 1m/5m
+candle-walk that threshold limb (i) names; (b) restricted to the population the
+change actually covers (the new 6 + jup combos) the net limb runs $0.88/30d
+pace vs the $1.00/30d bar, while the full out-of-scope population this script
+measures runs $1.88/30d pace.
+
+At authoring time STOP_TIGHTEN_SOURCES covered only
+('jup_yolo_mirrored','volume-buildup-') but the
 stop-family bleed (hard_max_loss + atr_sl_hit) sits on BOTH sides of that scope
 line. This script measures the out-of-scope half:
 

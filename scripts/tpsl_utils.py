@@ -1049,6 +1049,26 @@ def compute_fallback_tp(current_price: float, direction: str) -> float:
 #   STOP_TIGHTEN_MAX_PRICE_PCT = 0.75 (was 1.0) and STOP_TIGHTEN_ENFORCE =
 #   True — the clamp is WRITTEN live at every site above. The log line keeps
 #   firing with enforce=True so the bar audit stays fed.
+# SCOPE AS OF 2026-11-08 (CEO consult 20261108T180116Z, SCOPE-WIDEN): the tuple
+#   is now 8 sources (was 2) and is matched by SUBSTRING — combo sources such as
+#   'continuum+,jup_yolo_mirrored' no longer escape the clamp. Walk-SCRIPT bars
+#   PASS on re-run 2026-11-08 (brain/analysis/stop_tighten_scope_cf_2026-11-08.py:
+#   n=55, ceiling +$1.13/14d, net +$0.88/14d, fk 3.9%, 5/5 weeks same-sign —
+#   ceiling math over ALL out-of-scope stop-family trades; the 1m/5m candle-walk
+#   was NOT re-run this session and the covered-population split is $0.88/30d
+#   pace vs the $1.00/30d limb — caveats recorded in registry
+#   amplify-stoptighten-scope-widen, due 2026-11-21).
+#   REVERT = remove the 6 appended names from STOP_TIGHTEN_SOURCES.
+# CAP-0.50 SHADOW (same consult, payoff-fix item 4): additional LOG-ONLY
+#   [STOP-TIGHTEN-CAP050-SHADOW] lines when ENFORCE=True and 0.50 < dist <=
+#   live cap — counterfactual for the 0.75 -> 0.50 flip, NEVER changes the
+#   returned SL. The actual flip happens only at the bar, with a CEO label.
+#   SITE COVERAGE (honest): the window is reachable mainly from pm_collect_atr —
+#   guardian_selfclose/scw_open pre-gate on dist>cap BEFORE calling this helper
+#   and decider_open/slfix always propose >=1.00%, so those sites never invoke
+#   it in-window (bar feed proxy: 93 distinct in-scope trades/14d with a stored
+#   stop_loss in (0.50,0.75) >> n>=30). The guardian also needs a service
+#   restart to see any STOP_TIGHTEN_* constant change (import-time binding).
 # POLARITY: STOP_TIGHTEN_ENFORCE=False => log-only shadow, ZERO live effect
 #   (identity return: sl_to_use == proposed_sl by construction).
 #   True => clamp live. STOP_TIGHTEN_SHADOW=True means the collector is running.
@@ -1057,14 +1077,21 @@ def compute_fallback_tp(current_price: float, direction: str) -> float:
 #   +$0.15/30d @$13.40 AND gross WR not down) now governs KEEP-vs-REVERT of the
 #   ENFORCE=True state at the 2026-11-14 read of stop-tighten-enforce-eval.
 # REVERT (either leg): STOP_TIGHTEN_MAX_PRICE_PCT = 2.5 (== ATR_SL_MAX)
-#   restores status-quo behavior for the two scoped sources (cap becomes a
+#   restores status-quo behavior for the scoped sources (cap becomes a
 #   no-op); and/or STOP_TIGHTEN_ENFORCE = False returns to log-only shadow.
 # ════════════════════════════════════════════════════════════════════════════
 
 from hermes_constants import (
     STOP_TIGHTEN_MAX_PRICE_PCT, STOP_TIGHTEN_SOURCES,
     STOP_TIGHTEN_SHADOW, STOP_TIGHTEN_ENFORCE,
+    STOP_TIGHTEN_CAP050_SHADOW,
 )
+
+# CAP-0.50 shadow threshold (CEO consult 20261108T180116Z, payoff-fix item 4).
+# Lives HERE, not in hermes_constants: the constants diff for that consult is
+# ADD-only (tuple append + comment + STOP_TIGHTEN_CAP050_SHADOW flag) — the
+# 0.50 counterfactual window is an analysis parameter of this helper.
+_CAP050_SHADOW_PCT = 0.50
 
 # Dedup: one [STOP-TIGHTEN-SHADOW] line per (trade/token, site, UTC hour) WITHIN
 # a process. The hour bucket bounds the LONG-RUNNING guardian (without it an
@@ -1077,6 +1104,10 @@ from hermes_constants import (
 # (see registry stop-tighten-enforce-eval).
 import time as _st_time
 _STOP_TIGHTEN_LOGGED = set()
+# CAP-0.50 shadow dedup: same (trade/token, site, UTC hour) pattern as the
+# main shadow set — bounds the long-running guardian without under-counting
+# DISTINCT trade ids (analysis joins DISTINCT trade, never line count).
+_STOP_TIGHTEN_CAP050_LOGGED = set()
 
 
 def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
@@ -1097,14 +1128,24 @@ def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
 
     Side effects: at most one [STOP-TIGHTEN-SHADOW] log line per dedup key when
     STOP_TIGHTEN_SHADOW is True (guarded twice — a logging failure can never
-    break trade execution). ENFORCE=False adds NO other side effect; ENFORCE=True
+    break trade execution), plus at most one [STOP-TIGHTEN-CAP050-SHADOW] line
+    per (trade, site, hour) when STOP_TIGHTEN_CAP050_SHADOW and
+    STOP_TIGHTEN_ENFORCE are both True and the stop sits in the
+    0.50 < dist <= cap window (log-only, also double-guarded). ENFORCE=False
+    adds NO other side effect; ENFORCE=True
     (live since 2026-11-04) additionally returns the clamped value so the caller
     writes it. This helper itself does no DB writes, no file writes, no state
-    mutation apart from the in-process dedup set.
+    mutation apart from the in-process dedup sets.
     """
     try:
-        # Scope: ONLY the two registry sources (exact match — the spec tuple).
-        if source not in STOP_TIGHTEN_SOURCES:
+        # Scope: SUBSTRING membership (was exact match until CEO consult
+        # 20261108T180116Z) — any scope name contained in the source string.
+        # Per N2 precedent this catches combo sources the exact match missed
+        # ('continuum+,jup_yolo_mirrored' escaped the clamp at 9T/30d -$0.22).
+        # Disambiguation: 'pump-chain-' is NOT a substring of 'pump-chain+'
+        # (different last char) and vice versa, so the two pump-chain scopes do
+        # not cross-match; 'volume-buildout' does not contain 'volume-buildup-'.
+        if not any(name and name in (source or '') for name in STOP_TIGHTEN_SOURCES):
             return proposed_sl, None
 
         entry = float(entry_price or 0)
@@ -1114,6 +1155,44 @@ def stop_tighten_sl(source, entry_price, proposed_sl, current_sl=0.0, *,
 
         cap = float(STOP_TIGHTEN_MAX_PRICE_PCT)
         dist_prop = abs(prop - entry) / entry * 100.0
+
+        # ── CAP-0.50 SHADOW (CEO consult 20261108T180116Z, payoff-fix item 4) ──
+        # Log-only counterfactual for the proposed 0.75 -> 0.50 cap flip. Fires
+        # whenever this helper is invoked in-window under the live clamp regime
+        # (STOP_TIGHTEN_ENFORCE=True) with a loss-side stop and
+        # 0.50 < dist_prop <= live cap — the region the shipped 0.75 cap leaves
+        # alone today. HONEST SITE COVERAGE: at guardian_selfclose and scw_open
+        # the CALLER pre-gates on dist>cap before invoking the helper, so those
+        # two sites never reach this block in-window (under a real 0.50 flip the
+        # same pre-gate would pass) — pm_collect_atr is the primary feeder;
+        # decider_open/slfix always propose >=1.00%. NEVER changes the returned
+        # SL; the log
+        # call is double-guarded (own try/except inside the function-wide one)
+        # so it can never break trade execution; own dedup set, same
+        # (trade/token, site, UTC hour) pattern as the main shadow log.
+        # Revert: STOP_TIGHTEN_CAP050_SHADOW = False (kills lines only; the
+        # guardian daemon needs a restart to pick the flag change up).
+        if (STOP_TIGHTEN_CAP050_SHADOW and STOP_TIGHTEN_ENFORCE
+                and dist_prop > _CAP050_SHADOW_PCT + 1e-9
+                and dist_prop <= cap + 1e-9):
+            _d050 = (direction or '').upper()
+            # Loss-side only, same rule as the live clamp (a profit-lock SL on
+            # the far side of entry is never clamped back toward the loss, and
+            # an unknown direction can't be evaluated) — otherwise the bar
+            # would count would-clamp events that could never happen.
+            if ((_d050 == 'LONG' and prop < entry) or
+                    (_d050 == 'SHORT' and prop > entry)):
+                _key050 = (trade_id if trade_id is not None else f"{token}|{_d050}",
+                           site, int(_st_time.time() // 3600))
+                if _key050 not in _STOP_TIGHTEN_CAP050_LOGGED:
+                    _STOP_TIGHTEN_CAP050_LOGGED.add(_key050)
+                    try:
+                        log(f"  [STOP-TIGHTEN-CAP050-SHADOW] {token} {trade_id} {site}: "
+                            f"dist={dist_prop:.3f}% >0.50 would-clamp-to-0.50 "
+                            f"(live cap {cap:g}) — counterfactual only")
+                    except Exception:
+                        pass
+
         if dist_prop <= cap + 1e-9:
             # Already within the backstop (already-tighter SLs untouched) —
             # also catches breakeven/profit-lock values at 0 distance. The

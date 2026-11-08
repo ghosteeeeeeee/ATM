@@ -754,14 +754,37 @@ ATR_UPDATE_THRESHOLD   = 0.0015  # 0.15% — delta gate for HL order updates
 #   shadow-joined n>=20 per signal AND net delta >= +$0.15/30d @$13.40 AND
 #   gross WR not down vs live.
 # REVERT (either leg, independent): STOP_TIGHTEN_MAX_PRICE_PCT = 2.5
-#   (== ATR_SL_MAX) restores status-quo behavior for the two sources — the cap
+#   (== ATR_SL_MAX) restores status-quo behavior for the scoped sources — the cap
 #   becomes a no-op; and/or STOP_TIGHTEN_ENFORCE = False returns the helper to
 #   log-only shadow (zero live effect).
 STOP_TIGHTEN_MAX_PRICE_PCT = 0.75  # % price distance from entry — backstop cap (was 1.0; CEO 2026-11-04: 1.0 never bound against the -0.80% price HML, 0/35 binds); enforce phase clamps abs(SL-entry)/entry*100 <= this
-STOP_TIGHTEN_SOURCES = ('jup_yolo_mirrored', 'volume-buildup-')  # scope: exact source match ONLY (registry spec tuple) — UNCHANGED by the 2026-11-04 flip
+STOP_TIGHTEN_SOURCES = ('jup_yolo_mirrored', 'volume-buildup-', 'pump-chain+', 'pump-chain-', 'bb-squeeze+', 'volume-breakout-long+', 'bb-bounce-v2-long+', 'r2v2-long3')  # scope: SUBSTRING membership — any name contained in the source string (N2 precedent, CEO consult 20261108T180116Z; catches combo sources the old exact match missed, e.g. 'continuum+,jup_yolo_mirrored'). First two entries UNCHANGED by the 2026-11-04 flip. SCOPE-WIDEN 2026-11-08 (CEO consult 20261108T180116Z): top-6 out-of-scope sources appended in the verdict's order, each verified against PG SELECT DISTINCT signal — walk-SCRIPT bars PASS on brain/analysis/stop_tighten_scope_cf_2026-11-08.py re-run 2026-11-08 (n=55, ceiling +$1.13/14d, net +$0.88/14d, fk 3.9%, 5/5 weeks same-sign — ceiling math over ALL out-of-scope stop-family trades, the population the CEO verdict adjudicated; the 1m/5m candle-walk was NOT re-run this session and the covered-population split is $0.88/30d pace vs the $1.00/30d limb — both caveats recorded in registry amplify-stoptighten-scope-widen, due 2026-11-21). REVERT = remove the appended entries.
 STOP_TIGHTEN_SHADOW = True         # shadow collector on (log lines only)
 # polarity: ENFORCE=False => log-only shadow; True => clamp live (bar-gated, CEO label required)
 STOP_TIGHTEN_ENFORCE = True        # LIVE since 2026-11-04 (CEO T-override): clamp writes reach the SL. Revert = False (shadow-only/inert, no live effect)
+# ── CAP-0.50 counterfactual SHADOW (CEO consult 20261108T180116Z, payoff-fix item 4) ──
+# POLARITY: True => log-only [STOP-TIGHTEN-CAP050-SHADOW] lines when ENFORCE=True
+#   (the live clamp regime) sees 0.50 < dist_prop <= live cap — counterfactual only;
+#   this flag NEVER changes the SL the helper returns. False => no CAP050 lines
+#   (collector off). This is NOT the flip: the ACTUAL 0.75 -> 0.50 cap change
+#   happens only at the bar, with a CEO label.
+# BAR (pre-registered — this text is recorded in the NOTES of registry
+#   stop-tighten-enforce-eval, which the 2026-11-14 read uses; that entry's own
+#   `threshold` field is the SEPARATE enforce bar for the 0.75 cap, do not
+#   conflate the two): n>=30 log-joined DISTINCT trades AND fk<=20% AND 30d
+#   ceiling >= +$1.00/30d AND 30d weekly same-sign. SITE COVERAGE: reachable
+#   mainly from pm_collect_atr — guardian_selfclose/scw_open pre-gate on
+#   dist>cap before calling the helper and decider_open/slfix place at >=1.00%,
+#   so they never invoke the helper inside the 0.50..0.75 window (bar feed
+#   proxy: 93 distinct in-scope trades/14d had a stored stop_loss in
+#   (0.50,0.75) >> n>=30 — do not read zero lines at other sites as no events).
+# REVERT = this stays shadow either way; the only revert of this flag (False)
+#   just stops the counterfactual lines (zero live effect in any state) — BUT
+#   the guardian daemon binds this flag at IMPORT time, so a flag change (or
+#   this ship) only reaches site=guardian_selfclose after
+#   `systemctl restart hermes-hl-sync-guardian` (same failure class as the
+#   2026-11-04 audit #219 incident).
+STOP_TIGHTEN_CAP050_SHADOW = True
 
 # ── Price sanity (brain_auditor 2026-10-21) ─────────────────────────────────
 # A single bad HL mid poll used to become a PERMANENT peak: it feeds
