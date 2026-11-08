@@ -1,0 +1,11 @@
+[Unit]
+Description=Hermes Trade-Frequency Deviation Shadow Monitor — log-only
+# CEO deep run 20261108T023937Z item H (automatic-implementation Phase 1).
+# SHADOW: computes trades/hour per signal source vs baseline, logs alerts.
+# Read-only on brain, writes only JSONL state + stdout. Zero trading-path touch.
+# Never blocks/signals the pipeline. Flip bar pre-registered in script docstring.
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/freq_deviation_shadow.py
+TimeoutStartSec=120

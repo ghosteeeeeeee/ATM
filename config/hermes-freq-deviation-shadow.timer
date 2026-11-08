@@ -1,0 +1,10 @@
+[Unit]
+Description=Hermes Trade-Frequency Deviation Shadow Timer — hourly
+# CEO deep run 20261108T023937Z item H. Hourly shadow evaluation.
+# Enable pending deploy: systemctl daemon-reload && systemctl enable --now hermes-freq-deviation-shadow.timer
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

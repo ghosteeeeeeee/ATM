@@ -3252,3 +3252,24 @@
 
 ## Error Alerts — 2026-11-07 23:18 UTC
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   [TOK-TOK-TOK] TOK: rules TOK (shadow skipped): 'str' object has no attribute 'get'`
+
+## Error Alerts — 2026-11-08 02:47 UTC
+- **[WARN]** (freq_deviation_shadow): `bb-squeeze+`: FREQ DEVIATION UNDER source=bb-squeeze+ baseline=0.128/h current=0.000/h ratio=0.00 n_base=43 n_cur=0
+
+## Error Alerts — 2026-11-08 02:47 UTC
+- **[WARN]** (freq_deviation_shadow): `jup_yolo_mirrored`: FREQ DEVIATION UNDER source=jup_yolo_mirrored baseline=0.405/h current=0.083/h ratio=0.21 n_base=136 n_cur=2
+
+## Error Alerts — 2026-11-08 02:47 UTC
+- **[WARN]** (freq_deviation_shadow): `pump-chain+`: FREQ DEVIATION UNDER source=pump-chain+ baseline=0.086/h current=0.000/h ratio=0.00 n_base=29 n_cur=0
+
+## Error Alerts — 2026-11-08 02:47 UTC
+- **[WARN]** (freq_deviation_shadow): `pump-chain-`: FREQ DEVIATION UNDER source=pump-chain- baseline=0.095/h current=0.042/h ratio=0.44 n_base=32 n_cur=1
+
+## Error Alerts — 2026-11-08 02:47 UTC
+- **[WARN]** (freq_deviation_shadow): `r2v2-long3`: FREQ DEVIATION UNDER source=r2v2-long3 baseline=0.036/h current=0.000/h ratio=0.00 n_base=12 n_cur=0
+
+## Error Alerts — 2026-11-08 02:47 UTC
+- **[WARN]** (freq_deviation_shadow): `volume-buildup-`: FREQ DEVIATION UNDER source=volume-buildup- baseline=0.137/h current=0.000/h ratio=0.00 n_base=46 n_cur=0
+
+## Error Alerts — 2026-11-08 02:47 UTC
+- **[WARN]** (freq_deviation_shadow): `warrior-sr-confirm+`: FREQ DEVIATION UNDER source=warrior-sr-confirm+ baseline=0.042/h current=0.000/h ratio=0.00 n_base=14 n_cur=0
