@@ -22679,3 +22679,26 @@ Final set: []
 **Open Questions:**
 - 7d watch: pump-chain+ 3T 0% -$0.42 and r2v2-long3 3T 0% -$0.37 — n<20, not kill-eligible, monitor
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
+
+## [2026-11-08 01:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses), 1 open, 2 opens now
+**PnL:** $0.00 (WR: n/a hour; 24h 5T 80% +$0.10 GREEN | 7d 174T 55.7% -$1.96 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (ARB atr-trend+ LONG +0.06, SOL jup_yolo_mirrored SHORT -0.21)
+- Kill check: 0 closes last hour; 14d worst n>=3 are volume-buildup- 46T 60.9% WR (WR fine, pnl -$1.10 fee drag) and hh-hl+ 3T 0% (n<20, not kill-eligible) -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/5 = 20.0% of 24h closes (<40%) — tpsl_utils.py DEPLOYED -> no action
+- Boost: NONE eligible — max n=2 per signal in 24h (needs n>=5)
+- Neg streak: hourly +0.02 (18:00) / -0.05 (19:00), no closes since — not 3 consecutive negative -> no size cut
+- Frequency: 1 open/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.134% max 0.220%, 4/4 known, all <0.5% -> OK
+- No storm (window-min -0.16% / at-run -0.02%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still $-1.96 structural, outside auto_1hr 1-change/hour scope
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
