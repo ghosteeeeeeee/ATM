@@ -34,10 +34,15 @@ import argparse
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 
-sys.path.insert(0, 'scripts')
-import psycopg2
-from _secrets import BRAIN_DB_DICT
-from paths import HERMES_DATA
+try:
+    sys.path.insert(0, 'scripts')
+    import psycopg2
+    from _secrets import BRAIN_DB_DICT
+    from paths import HERMES_DATA
+except Exception as e:
+    # fail-open covers import-time too — a missing dep must not fail the timer
+    print(f'[FREQ-SHADOW] ERROR import failed: {type(e).__name__}: {e}', flush=True)
+    sys.exit(0)
 
 PREFIX = '[FREQ-SHADOW]'
 

@@ -61,7 +61,7 @@ def query_counts(train_end_str, oos_end_str):
 def main():
     p = argparse.ArgumentParser(description='Locked train/OOS split (SOPs.md Locked Test Protocol)')
     g = p.add_mutually_exclusive_group()
-    g.add_argument('--train-end', metavar='YYYY-MM-DD', help='OOS starts the day after this date')
+    g.add_argument('--train-end', metavar='YYYY-MM-DD', help='train ends 00:00:00 of this date (exclusive); OOS starts ON this date')
     g.add_argument('--oos-days', type=int, default=14, help='OOS = last N days (default 14)')
     p.add_argument('--reset', action='store_true', help='clear consumed OOS state (explicit required)')
     args = p.parse_args()
@@ -86,12 +86,11 @@ def main():
     if args.train_end:
         # train = open_time < train_end 00:00 (ends end of previous day); OOS = [train_end, now]
         train_end = datetime.strptime(args.train_end, '%Y-%m-%d')
-        oos_start_str = args.train_end
     else:
         train_end = now - timedelta(days=args.oos_days)
-        oos_start_str = train_end.strftime('%Y-%m-%d')
     oos_end_str = now.strftime('%Y-%m-%d') + ' 23:59:59'
     train_end_str = train_end.strftime('%Y-%m-%d %H:%M:%S')
+    oos_start_str = train_end_str  # true OOS boundary = exclusive train end (bug_hunter 20261108)
 
     n_train, train_min, train_max, n_oos, oos_min, oos_max = query_counts(train_end_str, oos_end_str)
 
