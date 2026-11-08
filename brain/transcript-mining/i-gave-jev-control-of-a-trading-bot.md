@@ -1,7 +1,7 @@
 # Transcript Mining Report
 
 **Source**: I Gave JEV Control of a Trading Bot.md  
-**Date**: 2026-08-24  
+**Date**: 2026-11-08  
 **Author**: Unknown (YouTube)
 
 ## TL;DR

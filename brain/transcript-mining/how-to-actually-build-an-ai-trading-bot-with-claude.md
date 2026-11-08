@@ -1,7 +1,7 @@
 # Transcript Mining Report
 
 **Source**: How To Actually Build an AI Trading Bot With Claude 3 Hour Course.md  
-**Date**: 2026-08-24  
+**Date**: 2026-11-08  
 **Author**: Brendan (ex-investment banking, UCLA math/econ, builds Claude trading systems for clients)
 
 ## TL;DR

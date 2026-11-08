@@ -1,7 +1,7 @@
 # Transcript Mining Report
 
 **Source**: This Algo Strategy Has Only 3 Rules and 62% Win Rate.md  
-**Date**: 2026-08-24  
+**Date**: 2026-11-08  
 **Author**: David from CriticalTrading.com  
 **Book Reference**: *Short-Term Strategies That Work* by Larry Connors
 
