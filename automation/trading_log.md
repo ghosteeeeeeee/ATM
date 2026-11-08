@@ -23057,3 +23057,28 @@ BY: auto_1hr
 - 3 open positions stacked (SOL jup_yolo opened 12:22, IMX, ARB both 16:12)
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
 BY: auto_1hr
+
+## [2026-11-08 17:20] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.10 (WR: 50.0% hour; 24h 11T 54.5% -$0.10 RED | 7d 154T 55.8% -$1.89 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: IMX continuation+ LONG +$0.05 profit-monster-trail, SOL jup_yolo_mirrored LONG -$0.15 atr_sl_hit (-3.64% acct); 1 open (ARB atr-trend+ LONG -0.33 opened 16:12)
+- Kill check: 0%WR 24h = warrior-sr-confirm+ 2T, pump-chain- 1T — all n<3 -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/11 = 18.2% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — max n=3 (jup_yolo_mirrored 3T 66.7% -$0.06), no signal reaches n>=5
+- Neg streak: hours w/ closes 12h = -0.10 (09h), -0.10 (10h), -0.01 (15h), -0.08 (16h) — longest run 2 consecutive, not 3 -> no size cut
+- Frequency: 2 closes/hr, 0 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.278% max 0.682% (6/6), avg <0.5% -> OK
+- No storm (window-min -0.48% / at-run -0.34%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flipped GREEN -> RED (-$0.10); 7d -$1.89 structural RED
+- jup_yolo_mirrored 3T -$0.06 24h — watch, but 66.7% WR and only n=3
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
+BY: auto_1hr
