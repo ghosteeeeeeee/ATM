@@ -1055,3 +1055,48 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 5T +0.10 80.0% | 7d 174T -1.96 55.7%
 ### Findings: Rotating Q (7/14 = confluence blocks): CONFLUENCE-GATE-BLOCK 516 lines in current log — top recent block is LONG-NEUTRAL-CHOP (SOL/ETH LONGs: confluence present but BTC AT EMA300 chop); other gates: SPIKE-FILTER 2925, CONTINUUM-BLOCK 1689. Error alert: CTX-RULES-SHADOW MERL "'str' object has no attribute 'get'" 3x — shadow-skipped, 0 live impact.
 ### Recommendation: Deep run — root-cause the CTX-RULES-SHADOW str/get type error on MERL (shadow-only today, but a bad rules payload will bite when that path goes live).
+
+## CEO Deep Run — 20261108T023937Z
+
+**Brief:** Transcript-mined ideas (4 videos) — binding OAK/KILL/DEFER rulings A–M + ASAP shadow-mode batch.
+
+### Decision (full table in checkpoint `20261108T023937Z-decision.md`)
+| Item | Ruling | Flip bar (shadow) | Order |
+|------|--------|-------------------|-------|
+| A Locked test protocol (SOP + split script) | **OAK** | — | 1st built |
+| B Neighbor test (±step sweep on ATR_SL_MIN / SIGNAL_FILTER_SPEED_MIN / ATR_TP_K_MULT) | **OAK** | — | 3rd (queued) |
+| C Backtester self-test (planted edge) | **DEFER** | — | no canonical engine yet (14 one-off backtests) |
+| D Exposure tracking | **OAK** | — | parallel (queued) |
+| E Detection-vs-execution reconciliation vs `_signal_metadata` | **OAK** | — | after A (queued) — distinct from `hl_reconciliation.py` (fills-vs-DB PnL) |
+| F 2×ATR(20) stop benchmark | **OAK, analysis only** | — | parallel (queued); any ATR_SL change still needs T |
+| G Session/hour-of-day analysis | **OAK** (one-shot) | — | cheap, queued |
+| H Trade-frequency deviation | **OAK — SHADOW, shipped this week** | 14d + ≥30 alerts + alert-conditioned next-24h source PnL mean <0 (n≥30) + CEO approval | **2nd built, LIVE as log-only** |
+| I Kill lines (2× worst tested DD per source) | **OAK — SHADOW, authorized this week** | alert at 80% of line; enforce = line CROSS + negative next-10-trade PnL + explicit CEO approval; never unattended | after H |
+| J Exposure budget (score adj by open load) | **OAK — SHADOW, authorized this week** | n≥100 decisions AND counterfactual EV beats actual ≥$0.50 net with ≤20% trade-count reduction + CEO approval | after D |
+| K Decision-stream dashboard | **DEFER** | — | post shadow batch (viz only) |
+| L HL API key permission audit | **OAK — done today** | — | dispatched + completed |
+| M Rule-change loop in SOPs | **OAK** | — | built with A |
+
+**KILL: none.** DEFER: C, K only. **Explicit ruling:** new zero-behavior shadow flags in `hermes_constants.py` are authorized without T (existing `*_SHADOW` pattern); any change to an EXISTING value still requires T. H/I shipped as standalone scripts + systemd timers — no constants edit at all.
+
+### Evidence (verified this run, psql direct)
+- 7d: **173 closed, -$1.93, 55.5% WR** | 24h: 6T +$0.23 83.3% | 48h exits: atr_sl_hit 7 @ 0% -$0.81 = main bleed; profit-monster-trail 10 @ 100% +$0.41; hard_max_loss 1 -$0.11 (loss-only exit, definitional 0% — not a finding).
+- Tune-history wound confirmed: ATR_SL_MIN 1.3→1.5 (Oct 16), ATR_TP_K_MULT 1.5→2.0 (Sep 29), SPEED_MIN 30→40 (Aug 16) — all tuned on judging data, no OOS/±step check existed.
+- Codebase checks: no locked-test/rule-change rule in SOPs (A/M new); no exposure tracker, no kill-line registry, no frequency monitor existed; `hl_reconciliation.py` ≠ item E.
+
+### Work items dispatched (fresh single-goal subagents; parent edited nothing live-trading)
+1. **L** → result-1: HL audit. **PASS-with-caveats** — no `HL_API_KEY` exists; credentials are an agent wallet signing key (0xc3e4…, approval expires **2027-03-12**), zero withdraw/deposit/transfer/approveAgent calls anywhere in repo, all signed endpoints are order/cancel/leverage only; scope not cryptographically enumerable locally (agent-not-master + SDK issue #159 evidence). Legacy unused key files in `~/.secrets/` flagged for cleanup (not deleted).
+2. **A+M** → result-2: `brain/SOPs.md` +2 sections (Locked Test Protocol: one-look OOS, time-based windows, no outcome selection; Rule-Change Loop: idea→gates→paper→swap-on) + `scripts/locked_test_split.py` (train/OOS split, exactly-once OOS consumption enforced via state file, `--reset` explicit). Verified live: train 6008 trades / OOS 394, second look refused exit 1. Commit `2938e1f1`.
+3. **H** → result-3: `scripts/freq_deviation_shadow.py` (log-only, read-only SELECTs, `[FREQ-SHADOW]` prefix + JSONL state + error_alerts.md w/ 24h dedup, fail-open exit 0) + `config/hermes-freq-deviation-shadow.{service,timer}` hourly. First run: 7 sources checked, 7 UNDER alerts (quiet market, consistent with DailyFillCap brake). Commit `deb50f6d`.
+4. **bug_hunter** → result-4: `2938e1f1` PASS (8 minor/nits); `deb50f6d` **FAIL** — import-time errors bypassed fail-open. Fixed in `ae3133ab` (imports wrapped, exit 0) + locked_test oos_start recorded as true boundary + `--train-end` help-text corrected. Re-verified: py_compile OK, real run exit 0, `systemd-analyze verify` OK.
+
+**Deployed:** timer installed to /etc/systemd/system (repo `config/` is source of truth), `systemctl enable --now hermes-freq-deviation-shadow.timer` — active, first fire 04:00 UTC; manual service run exit 0/SUCCESS.
+
+### Result files
+`automation/ceo/checkpoints/20261108T023937Z-{decision,result-1,result-2,result-3,result-4}.md`
+
+### Metric checkpoint (measure in 7d, by 2026-11-15)
+- **H shadow health:** timer fired hourly with 0 ERROR lines; alert events in `data/freq_deviation_shadow.jsonl` (target ≥30 by 11-22 for first flip-bar read); no trading-path diff from the two commits (`git diff` on decider/signals/PM stays empty).
+- **A adoption:** any constants change committed after 2026-11-08 must cite train/OOS windows + OOS verdict (grep commit messages / recent_changes.log); `locked_test_state.json` consumed-look count = number of tunes adjudicated.
+- **System baseline:** 7d PnL/WR vs today's -1.93 / 55.5% (context only — system is fee-floor-limited at $11 notional).
+- **Queued next:** B (neighbor sweep on the 3 constants → hill-vs-spike verdict = input to next tune), I, J, D, E, F, G. C/K remain deferred.
