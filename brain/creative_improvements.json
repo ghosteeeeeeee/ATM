@@ -10825,5 +10825,32 @@
     "category": "exit sniper",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-08T12:50:00Z",
+    "idea": "REFUTED-WITH-DATA + SHIPPED GUARD: grind-breakout- SHORT AMPLIFY candidate (shadow n=32 93.8% WR fwd4h +3.155% t=5.40) collapses to n=11 / +2.208% t=1.42 n.s. / second half NEGATIVE once same-second re-emissions are deduped; knife-floor-blocked subset is n=5 (far below the 20 bar). Detector brain/analysis/shadow_dup_check_2026-11-08.py shipped --selfcheck PASS.",
+    "rationale": "shadow_trades rows are unique by signal_id but the same detection is re-emitted under multiple signal_ids in the same second, inflating every per-source n (grind-breakout- 2.9x, btc-pump-rider+ 1.9x, CTX-GATE counts 2.6x). Without dedup this would have shipped as a false shadow->live conversion.",
+    "expected_impact": "Prevents false amplify/flip proposals; makes all shadow per-source n citable.",
+    "category": "data quality / anti-false-positive",
+    "status": "refuted-and-shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-08T12:50:00Z",
+    "idea": "STOP_TIGHTEN mid-eval read: 20 distinct post-ship jup/vb closed trades (n bar of the 11-14 eval MET), 80% WR net +0.710 pnl_usdt vs 181T 60.2% -2.31 pre-ship, both jup directions improved. Not significant (fisher p=0.094) and confounded by a system-wide volume collapse (43->5 trades/day).",
+    "rationale": "Mandate rule 7 — track whether last run's/CEO's changes worked. Direction favorable, magnitude material relative to a -1.75/7d book, but n and confound bar shipping any follow-on.",
+    "expected_impact": "Evidence input for stop-tighten-enforce-eval at 11-14; no change now.",
+    "category": "change-impact tracking",
+    "status": "measured-monitored",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-08T12:50:00Z",
+    "idea": "STRUCTURAL: 7d breakeven WR is 63.4% but actual is 56.4% — avg win +0.063 vs avg loss -0.109 pnl_usdt (1.73x). WR has improved 46.6% (30d) -> 56.4% (7d) yet PnL stays negative because losses are ~1.7x wins. The lever that matters is average-LOSS SIZE, not loss count.",
+    "rationale": "7d exit families: TRAIL/TP 93T 91.4% +5.11 vs CHOP/STOP 59T 0% -6.93. Every stop exit costs ~2.1 trail wins. Entry-quality filters keep failing significance (5+ rejected runs); exit-side sizing (STOP_TIGHTEN, CUT_LOSER) is the lever that has actually shipped.",
+    "expected_impact": "Frames the 11-14 stop-tighten/probe-080/scope-widen queue as the primary offense axis.",
+    "category": "framing / system",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

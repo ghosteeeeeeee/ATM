@@ -3880,5 +3880,16 @@
     "after": "08:30Z",
     "rationale": "mandate — join has no systemd producer",
     "impact": "flip numbers current: overall 43.1%, pc- 64.6% LIVE, floor p=0.1411 COLLECT"
+  },
+  {
+    "timestamp": "2026-11-08T12:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Shipped brain/analysis/shadow_dup_check_2026-11-08.py (--selfcheck PASS) — pseudo-replication detector for shadow_trades.db; extended gate-shadow-dedup-convention disposition with the shadow_trades instance; appended stop-tighten mid-eval read",
+    "type": "ops",
+    "file": "brain/analysis/shadow_dup_check_2026-11-08.py",
+    "before": "no dedup guard; per-source shadow n quoted raw",
+    "after": "raw/dedup table + selfcheck; dedup convention note in shadow_disposition",
+    "rationale": "grind-breakout- AMPLIFY candidate inflated 32->11 on dedup; would have shipped a false conversion",
+    "impact": "zero trading behavior; prevents false amplify/flip proposals"
   }
 ]
