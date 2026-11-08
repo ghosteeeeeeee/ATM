@@ -205,7 +205,12 @@ for enf in (True, False):
             T.STOP_TIGHTEN_CAP050_SHADOW = True
 
 print("\n=== C. constants diff = tuple + comment + 1 new flag ONLY ===")
-head = subprocess.run(['git', '-C', REPO, 'show', 'HEAD:scripts/hermes_constants.py'],
+# Baseline must be the commit BEFORE this ship: once the change is committed,
+# HEAD equals the worktree and C1/C3 would compare the file with itself
+# (vacuous pass-turned-fail). 6740b6fb = the code commit; '^' = its parent.
+import os as _os
+BASE = _os.environ.get('PAYOFF_FIX_BASE', '6740b6fb^')
+head = subprocess.run(['git', '-C', REPO, 'show', f'{BASE}:scripts/hermes_constants.py'],
                       capture_output=True, text=True, check=True).stdout
 cur = open(f'{REPO}/scripts/hermes_constants.py', encoding='utf-8').read()
 
