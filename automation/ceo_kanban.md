@@ -560,3 +560,4 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-11-07 21:20] auto_1hr: no config change — 0T last hour, 24h 5T 80% +$0.10 GREEN, no storm (window-min -0.23% / at-run -0.19%), no kill/boost candidates
+- [2026-11-08 13:20] auto_1hr: no config change — 0T last hour, 1 open (SOL jup_yolo_mirrored LONG), 24h 9T 66.7% +$0.08 GREEN, 7d 154T 56.5% -$1.70 RED, no storm (window-min -0.03% / at-run +0.29%), no kill/boost candidates
