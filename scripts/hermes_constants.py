@@ -4543,7 +4543,11 @@ ATR_TREND_ACCEL_BAR_MAX_AGE_MIN = 5       # 1m cross-bar max age (stale-feed gua
 ATR_TREND_ACCEL_FORMING_WINDOW_S = 60     # bar younger than this = current forming minute
 ATR_TREND_ACCEL_SCAN_BARS = 1440          # 1m history for ATR + armed-state walk (24h)
 ATR_TREND_ACCEL_COOLDOWN_HOURS = 4        # per token+direction (hysteresis is primary)
-ATR_TREND_ACCEL_CONF_BASE = 70            # base confidence
+ATR_TREND_ACCEL_CONF_BASE = 78            # base confidence — raised 70->78 (CEO
+# 2026-11-08: make competitive). score = confidence in compactor _score_signal;
+# 70 sat exactly on CONF_FILTER_MIN floor while hotset peers ran 78-88 (jup_yolo
+# 88, continuum 88, r2v2 82). Evidence: audited 24h WR 58.8% + live 3/3 closed
+# winners at launch. Still well under CONF_FILTER_MAX=95; +CONF_BONUS -> 83.
 ATR_TREND_ACCEL_CONF_BONUS = 5            # bonus when ATR% >= 1.5x threshold at cross
 ATR_TREND_ACCEL_CONF_CAP = 88             # system ceiling
 ATR_TREND_ACCEL_CONF_FLOOR = 50           # floor
