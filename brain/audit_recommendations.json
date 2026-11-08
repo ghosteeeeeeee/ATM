@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-07T20:50:50Z",
-  "run": "brain_auditor #235",
+  "timestamp": "2026-11-08T00:47:00Z",
+  "run": "brain_auditor #236",
   "session_lock": "ABSENT (full run, config eligible)",
   "session_brain_stats": {
     "queries": [
@@ -8,140 +8,246 @@
       "new signal idea improvement strategy",
       "loss money bleeding losing"
     ],
-    "top_hits": [
-      "[0.991] trend following signal — exit system is the #1 profit leak (30d)",
-      "[1.023] exit asymmetry — reports/exit-asymmetry-deep-dive-2026-10-31.md",
-      "[0.852] pump-chain-short — dig deeper, add filters, look at what made winners"
-    ],
-    "note": "session_brain duplicate/garbled records persist — rebuild owed (8th+ run flagged)"
+    "top_insights": [
+      "exit system #1 profit leak theme recurs (exit-asymmetry deep-dive 10-31)",
+      "trend-following / signal quality requests recurring",
+      "R:R threshold lowering discussed but not shipped"
+    ]
   },
-  "trade_summary": {
-    "24h": {
-      "n": 5,
-      "wr": 80.0,
-      "pnl": 0.1,
-      "verdict": "GREEN"
-    },
+  "trade_summary_24h": {
+    "trades": 5,
+    "wr": 80.0,
+    "pnl_usdt": 0.1,
     "48h": {
-      "n": 20,
-      "wr": 60.0,
-      "pnl": -0.37
+      "trades": 19,
+      "wr": 57.9,
+      "pnl": -0.4
     },
     "7d": {
-      "n": 177,
-      "wr": 55.4,
-      "pnl": -1.94
+      "trades": 174,
+      "wr": 55.7,
+      "pnl": -1.96
     },
     "14d": {
-      "n": 397,
+      "trades": 395,
       "wr": 54.9,
-      "pnl": -3.03
+      "pnl": -3.07
     },
     "30d": {
-      "n": 776,
+      "trades": 773,
       "wr": 46.4,
-      "pnl": -7.19
+      "pnl": -6.93
     },
-    "loser_24h": "IMX pump-chain- LONG atr_sl_hit -0.05 (NORMAL) — single loser, trail family correct",
-    "families": {
-      "7d": "trail 87T 97.7% +5.36 | chop 83T 9.6% -7.65 | other 7T +0.35",
-      "14d": "trail 181T 95.0% +10.04 | chop 160T 11.3% -14.55",
-      "30d": "trail 281T 92.9% +16.41 | chop 356T 6.7% -30.51"
+    "open": [
+      {
+        "id": 16813,
+        "token": "SOL",
+        "dir": "SHORT",
+        "signal": "jup_yolo_mirrored",
+        "pnl_pct": -0.24,
+        "hours": 2.7,
+        "note": "stop-tighten ENFORCE live: SL clamped dist 1.5%->0.75%; mirror wallet +54.86/24h; not trailed; 15m LONG vs 4h SHORT = chop"
+      },
+      {
+        "id": 16814,
+        "token": "ARB",
+        "dir": "LONG",
+        "signal": "atr-trend+",
+        "pnl_pct": 0.13,
+        "hours": 0.2,
+        "note": "conf 27.5, coin_regime SHORT_BIAS, gap +0.07 — low-conf counter-regime entry, monitor"
+      }
+    ],
+    "families_7d": {
+      "trail": "104T 90.4% +5.39",
+      "chop": "65T 0% -7.42"
     },
-    "arm_split_7d": "ARMED 78T 85.9% +3.79 vs UNARMED 100T 31.0% -5.73",
-    "chop_bleed_share": "7d 85.7% (66/77 losers never-armed) | 14d 84.0% | 30d 86.4% — INSIDE 70-92 band, tripwire (>=92) NOT re-broken on this basis",
-    "by_regime_7d": "HIGH 45T 51.1% -1.02 | EXTREME 18T 33.3% -0.73 | NORMAL 100T 58.0% -0.37 | FLAT 15T 73.3% +0.18",
-    "by_dir_7d": "LONG 135T 52.6% -1.95 | SHORT 43T 62.8% +0.01"
+    "families_14d": {
+      "trail": "230T 83.9% +10.43",
+      "chop_exits": "-11.99"
+    },
+    "armed_7d": {
+      "true": "76T 86.8% +3.76",
+      "false": "98T 31.6% -5.72"
+    },
+    "armed_14d": {
+      "true": "194T +8.76",
+      "false": "395T -11.83"
+    }
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 2026-11-07T20:30:26Z (mandate). n=1440 decided: overall flip 43.1% (flipping the book LOSES). pc- 226W/124L = 64.6% n=350 STAYS LIVE; uniform across BTC tape (ABOVE 64.3% / AT 58.6% / BELOW 67.8%, chi2 p=0.374 = not tape-driven, 15 tokens chi2 p=0.375 uniform). btc-pump-rider+ 394W/695L = 36.1% do-NOT-flip, token-heterogeneous chi2 p=8.9e-25 -> per-signal only.",
-    "floor_admit": "join file fresh from #234 16:46Z (bar due 11-15, not re-run — 4h old): floor_only 1391 49.3% vs always_admit 210 43.8% Fisher p=0.159 -> COLLECT",
-    "oscillator": "FROZEN + archived 2026-10-27 (fossil) — no live answer",
-    "wyckoff": "RETIRED — no answer",
-    "rr_shadow": "ORPHANED (no producer, mtime 24d+) — do not cite",
-    "shadow_trader": "--report run 20:30Z: exit A/B pm_trail +11,097 vs hard_max -12,841 / rr_engine -4,905 / cut_loser -2,184 / trail_arm_timeout -141 = TRAIL-OR-NOTHING confirmed again. Every gate avg-negative-EV on the raw report (best SHORT-RSI-HARD-FLOOR 56% would-win avg -0.04) = admission quality, not blocking, is where money is.",
-    "overall": "2/6 answerable (contrarian + shadow_trader). Both joins mandate-covered where due; floor/wyckoff/oscillator/rr not answerable."
+    "contrarian": {
+      "join_reran": "2026-11-08T00:47:00Z",
+      "overall_flip_wr": 43.1,
+      "total": "W620/L820/S2",
+      "pump_chain_minus": "n=350 flip 64.6% LIVE uniform (chi2 p=0.37) — Oct-27 PROMOTE stands",
+      "btc_pump_rider_plus": "n=1091 ~36% do-NOT-flip (heterogeneous p=8.9e-25)",
+      "verdict": "per-signal only; blanket flip loses"
+    },
+    "oscillator": "FROZEN+archived — no live answer",
+    "wyckoff": "RETIRED",
+    "floor_admit": "join from #234: 1391 49.3% vs 210 43.8% Fisher p=0.159 COLLECT (bar 11-15)",
+    "rr_shadow": "ORPHANED",
+    "shadow_trader_report": "exit A/B pm_trail +11,164 vs hard_max -12,993 / rr_engine -4,939 / cut_loser -2,184 = trail-or-nothing",
+    "overall": "2/6 useful (contrarian + shadow_trader exit A/B); join re-ran unconditionally per mandate"
   },
   "drift_findings": [
     {
-      "severity": "LOW",
-      "finding": "gate_shadow SUM(would_pnl) is JOIN-DUPLICATED without token-day dedup — SLOPE-FILTER SOL 16788 counted 9x, raw sum +1.99 collapses to +0.33. #233 already knew (used token-day dedup); now codified in analysis/gate_ev_dedup.py with --selfcheck.",
-      "action": "shipped analysis script"
+      "severity": "HIGH",
+      "finding": "bb-squeeze+ RSI SOURCE SPLIT: entry_rsi_14/signal_rsi_14 = enrichment RSI (observed 58-100), NOT module filter RSI (compute_rsi 5m, observed 60.0-65.0 on 422/422 signals.value). Module BB_SQUEEZE_LONG_RSI_MIN/MAX filter WORKS. Any analysis calibrating BB_SQUEEZE_LONG_RSI_* on entry_rsi_14 is INVALID — '24 trades RSI>=65 since ship' are NOT filter leaks.",
+      "evidence": "signals.value rsi= vs signals.rsi_14 side-by-side; 422/422 module rsi in [60,65]",
+      "action": "Do not reband RSI_MAX on entry_rsi_14. Amplify requires module-RSI join first."
     },
     {
       "severity": "LOW",
-      "finding": "Winner-cell 30d nets are rolling-window unstable: pump-chain+|EXTREME read +0.61 at #234 17:05Z, -0.14 at 20:40Z — Oct-8 IMX +0.48 / GRASS +0.17 / BABY +0.10 aged out. NOT an error in #234; the cell itself is decaying (7d -0.42 / 14d -0.22 / 30d -0.14).",
-      "action": "cell-health precondition added to amplify-cell-conf-tilt-floorproof"
+      "finding": "[bb-squeeze] LONG BLOCKED prints never appear in pipeline.log/signals.log — blocked-event reparse impossible until instrumented",
+      "action": "prerequisite for module-RSI counterfactual"
     },
     {
       "severity": "INFO",
-      "finding": "Throughput collapse (62 closes 10-30 -> 5 on 11-07) is NOT a gate throttle: gate_shadow blocks/day flat 2600-3800 across the whole window. DailyFillCap released 16:20Z; 24h 5T 80% +0.10 GREEN = correct flat posture in CALM/LOW-vol.",
-      "action": "no change"
-    },
-    {
-      "severity": "CARRIED",
-      "finding": "session_brain duplicate/garbled records — rebuild owed (8th run flagged)",
-      "action": "flagged"
+      "finding": "DailyFillCap SKIP 2026-11-07 04:58:23 carries identity '[blocked ETH LONG jup_yolo_mirrored]' — #231 fix visible; formal bar first SKIP after 2026-11-08 05:03Z (brake RELEASED may = no traffic)",
+      "action": "checkpoint registered"
     }
   ],
-  "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py adverse-first (selfcheck PASS) — NOT the vacuous open-anchored replay",
-    "48h": "n=8 = 3 never-adverse / 5 recovered-after-adverse / 0 NEVER -> WRONG-SIDE REFUTED 62nd consecutive run (#61 opposite-signal p=0.116, #84 fwd-return t=-0.04)",
-    "pattern": "5 of 5 measurable losers traded back through entry = premature stop-outs on no-momentum entries (same class as #234's 5/7). n too small for a filter; feeds the false-kill secondary metric already pre-registered for the 11-14 stop-tighten eval.",
-    "winners": "all exited via profit-monster-trail / mfe_exit / rr = trail family working exactly as mandated"
-  },
-  "signal_quality_deep_dive": {
-    "kill_screen_14d": "ZERO candidates (n>=15 AND WR<50 AND net<0). Known trio/evals unchanged.",
-    "watch": "hl_copy_trader 10T 30% -0.12 (n=10 <15 monitor) | pump-chain- 32T 37.5% +0.07 NET POSITIVE -> no kill | pump-chain+ 30T 50% -0.22 (kill-review queued 11-13)",
-    "arm_rate_14d_n15": "jup_yolo_mirrored 135T 40.0% arm -0.76 | pump-chain+ 30T 26.7% arm -0.22 (both already owned by in-flight evals)",
-    "high_long_root_cause": "HIGH x LONG 30d 122T 45.9% -3.59, both halves negative (-2.04/-1.55) BUT WR equals base LONG WR (45.9% vs 45.8%, binom p=0.55) -> NOT a frequency problem, a PAYOFF problem (avgL -0.09 vs avgW). Three gates already target HIGH LONG (LONG_HIGH_OVERBOUGHT_BLOCK RSI>70, PUMP_CHAIN_LONG_HIGH_BLOCK, VOLUME_BREAKOUT_LONG_HIGH_BLOCK). jup HIGH LONG's 41 trades are ALL pre-11-04, 0 losers since. -> NO NEW GATE (same confound class as #234's EXTREME refutation)."
-  },
-  "amplify_why_not": {
-    "screen": "gate-loosening clone-hunt, brain/gate_shadow.db token-day dedup (house convention #233), 30d + 14d, n>=15",
-    "candidates_passing_halves": [
-      "LONG-RSI-BLOCK n=78 sum +1.33 halves +0.91/+0.42 fk 43.6%",
-      "EXEC-BLOCK n=60 sum +1.59 halves +0.41/+1.18 fk 36.7%",
-      "LONG-MIDBAND n=49 sum +0.76 halves +0.26/+0.50 fk 34.7%",
-      "OVERSOLD-SHORT 30d +0.70 but 14d halves -0.15/+0.57 sign-flip"
-    ],
-    "verdict": "ALL FAIL the fk<20% house bar (fk 29-44% = 29-44% of the added trades are losers). EXEC-BLOCK additionally is a catch-all bucket (single-source / speed=0 stale / hot-set miss / oc_pending) — not a single loosenable rule. NO PROPOSAL REGISTERED. Why-not logged here per mandate.",
-    "script": "analysis/gate_ev_dedup.py (--selfcheck PASS)"
-  },
-  "changes_from_last_run": [
-    "#234 analysis/winner_cell_set_kpi.py: selfcheck PASS, reproduces set 7d -0.18 / mult-150 THRESHOLD NOT MET — SHIP WORKING",
-    "#234 disposition writes: winner-cell-size-125 + amplify-winner-cell-mult-150 both carry adjudicated_by #234; amplify-cell-conf-tilt-floorproof present — ALL PRESENT",
-    "#232 gate_name_from_reason: shadow_trader.py:376 present — SHIP WORKING",
-    "#231 DailyFillCap identity: decider_run.py:830 _daily_fill_cap_block(token,direction,source) present — SHIP WORKING, verify-on-traffic registered (dailyfillcap-identity-verify due 11-08 06:00Z)",
-    "#230/#229 combo pin 1.3/1.6: held (auto_1hr 20:20 no drift)",
-    "stop-tighten (shipped 11-04, not mine): EARLY POSITIVE — jup_yolo_mirrored PRE 10-25..11-03 117T 59.8% -1.43 W/L 0.45 -> POST 11-04 18T 77.8% +0.67 W/L 0.64. n=18, regime confound possible -> MONITOR, not declare."
+  "recurring_problems": [
+    "chop-bleed / unarmed entry quality — #1 dollar leak (7d unarmed -5.72 vs armed +3.76); owned by entry-quality stack not exits",
+    "session_brain duplicate records — rebuild owed (9th)",
+    "throughput collapse 62 closes (10-30) -> 5 (11-07) = CALM/LOW-vol correct flat + DailyFillCap designed brake, NOT a bug"
+  ],
+  "missing_implementations": [
+    "module-RSI join signals.value -> trades for bb-squeeze param work",
+    "[bb-squeeze] BLOCKED log instrumentation"
+  ],
+  "creative_improvements": [
+    {
+      "date": "2026-11-08T00:47:00Z",
+      "idea": "RSI source decoupling map — tag trade RSI columns with provenance (module/filter vs enrichment)",
+      "rationale": "#236 proved entry_rsi_14 != module RSI on bb-squeeze (divergence up to 35 pts). Same class as DRIFT-E.",
+      "expected_impact": "prevents future invalid RSI-band ships",
+      "category": "data integrity",
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "date": "2026-11-08T00:47:00Z",
+      "idea": "Stop-tighten third-source shortlist pre-registered: pump-chain+ avg SL dist 0.709% / bb-squeeze+ 0.845% (14d) if 11-14 bars PASS",
+      "rationale": "SOL #16813 live clamp verified 1.5%->0.75%; jup POST 18T 77.8% +0.67 near n=20",
+      "expected_impact": "extend proven clamp to wide-SL bleed sources",
+      "category": "exit infrastructure",
+      "status": "pre-registered",
+      "risk": "medium"
+    },
+    {
+      "date": "2026-11-08T00:47:00Z",
+      "idea": "Instrument [bb-squeeze] BLOCKED prints to pipeline.log — enables blocked-event reparse for RSI_MAX counterfactual",
+      "rationale": "prints vanish today; zero BLOCKED lines in any log",
+      "expected_impact": "measurement infra for amplify-bbsqueeze-module-rsi-reband",
+      "category": "observability",
+      "status": "suggested",
+      "risk": "zero-behavior"
+    },
+    {
+      "date": "2026-11-08T00:47:00Z",
+      "idea": "AMPLIFY: bb-squeeze RSI_MAX 65->70 param-widen PRE-REG with mandatory module-RSI source (signals.value)",
+      "rationale": "enrichment RSI analyses invalid; module filter verified tight [60,65]; 65-70 band unmeasured on correct source",
+      "expected_impact": "if blocked 65-70 net>0 admit more of winner cell; else report-only",
+      "category": "amplify param-widen",
+      "status": "pre-registered",
+      "risk": "low (admit-only)"
+    }
   ],
   "config_changes_applied": [],
-  "config_change_rationale": "0 trading-constant changes. hermes_constants.py EMPTY git diff, CEO_PROTECTED untouched, session lock absent, size-reduce ABSENT = 1.0x. Nothing passed significance/OOS/fk bars.",
-  "integrity": {
-    "hermes_constants_git_diff": "EMPTY",
-    "ceo_protected": "untouched (13 flags)",
-    "session_lock": "ABSENT",
-    "size_reduce_file": "ABSENT = 1.0x",
-    "tracebacks_today": 0,
-    "checkpoint_registry": "9 entries, 0 pending (no intraday checkpoint due today)"
+  "changes_from_last_run": [
+    {
+      "change": "#235 gate_ev_dedup.py",
+      "verify": "selfcheck PASS (SLOPE-FILTER raw=546 dedup=285)",
+      "status": "PASS"
+    },
+    {
+      "change": "#235 fade-ctx-exempt pre-adjudicated FAIL",
+      "verify": "7d pc- LONG n=24 net -0.23 FAIL confirmed fresh",
+      "status": "PASS (FAIL stands)"
+    },
+    {
+      "change": "#234 winner_cell_set_kpi",
+      "verify": "size-125 all 3 bars FAIL; mult-150 THRESHOLD NOT MET (2/4 cells, set7d -0.16)",
+      "status": "PASS"
+    },
+    {
+      "change": "#235 conf-tilt cell-membership precondition",
+      "verify": "pump-chain+|EXTREME 30d -0.04 still negative — precondition correct",
+      "status": "PASS"
+    },
+    {
+      "change": "#231 DailyFillCap identity",
+      "verify": "04:58:23 SKIP carries [blocked ETH LONG jup_yolo_mirrored]",
+      "status": "PARTIAL PASS — formal bar after 05:03Z"
+    }
+  ],
+  "losing_trade_autopsy_48h": {
+    "method": "recovery_replay.py adverse-first, selfcheck PASS",
+    "n": 8,
+    "never_adverse": 3,
+    "recovered_after_adverse": 5,
+    "never_traded_back": 0,
+    "wrong_side_verdict": "REFUTED 63rd consecutive run (#61 p=0.116, #84 t=-0.04 stand)",
+    "note": "0 NEVER this window; all measurable losers traded back = premature stop-outs, n small"
   },
-  "readiness": {
-    "open_trades": 0,
-    "steers": [],
-    "portfolio_health": "good",
-    "regime": "btc_15m SHORT_BIAS / btc_4h SHORT_BIAS (AGREED) / continuum AT / vol LOW / velocity SLOW / accel FLAT / market_phase CALM / trend_quality STRONG_UP (disagrees with SHORT_BIAS — regime sources split, = chop)",
-    "verdict": "0 open = CORRECT posture. No counter-trend entries, trail-family first, dump-side preferred while both BTC timeframes agree SHORT_BIAS, mid-band = no trade, size 1.0x."
+  "signal_quality_deep_dive": {
+    "sub50_n15_14d": [
+      {
+        "signal": "pump-chain+",
+        "n": 29,
+        "wr": 48.3,
+        "pnl": -0.27,
+        "status": "NO-KILL stands (30d positive), CEO queue"
+      },
+      {
+        "signal": "pump-chain-",
+        "n": 32,
+        "wr": 37.5,
+        "pnl": 0.07,
+        "status": "net positive; flip-WR 64.6% live for contrarian PROMOTE"
+      }
+    ],
+    "watch": "hl_copy 14d 10T 30% -0.12 n<15; hh-hl+ n<20",
+    "new_targets": 0
   },
+  "amplify_step": {
+    "ranked_30d_winner_cells_n10": [
+      "bb-squeeze+|NORMAL|LONG 44T +0.76 65.9% (both halves positive — healthiest)",
+      "volume-buildup-|HIGH|SHORT 19T +0.42 78.9% BUT 14d -0.07 = DECAYING",
+      "jup_yolo|HIGH|SHORT 15T +0.40 73.3% (NEW-half only)",
+      "pc- combo EXTREME SHORT 10T +0.30 30% WR",
+      "pc-|NORMAL|LONG 30T +0.19 40%"
+    ],
+    "early_cells_n5_9": "r2v2-long3|NORMAL 6T +0.78; warrior+|NORMAL 5T +0.29; jup|FLAT|LONG 7T +0.25 100%",
+    "proposal_emitted": "amplify-bbsqueeze-module-rsi-reband (kind=amplify, deadline 11-14)",
+    "why_not_other_cells": "size-125 FAIL + mult-150 NOT MET (in-flight, no dup); vb- HIGH decaying 14d; gate-loosening clone-hunt failed fk #235; fade-ctx FAIL early",
+    "flip_kpi": "no new shadow->live conversion this run; in-flight stop-tighten ENFORCE collecting (11-14)"
+  },
+  "open_dispositions_serviced": [
+    "dailyfillcap-identity-verify — partial PASS, formal bar 05:03Z+ (checkpoint)",
+    "stop-tighten-enforce-eval — LIVE clamps on #16809 HYPE + #16813 SOL (1.5%->0.75%); jup POST 18T/20",
+    "winner-cell-size-125 — FAIL confirmed, due 11-10 REVERT 1.25->1.0",
+    "fade-ctx-exempt — FAIL confirmed, due 11-10",
+    "amplify-winner-cell-mult-150 — THRESHOLD NOT MET, stays 1.25"
+  ],
   "next_actions": [
-    "11-08 06:00Z: dailyfillcap-identity-verify (first SKIP line must carry token+direction+source)",
-    "11-09: signal-zombie-purge DECIDE",
-    "11-10: winner-cell-size-125 default REVERT 1.25->1.0 fires (pre-adjudicated FAIL) + fade-ctx-exempt deadline (pre-adjudicated FAIL on net, report gross-vs-fee to CEO) + warrior-uninert share + fade-ctx-exempt",
-    "11-11: watch-contrarian-live deadline (pc- fade: 7d 24T -0.23, fee-net still negative)",
-    "11-13: pc+ kill-review / vb- clonehunt / linreg-fade",
-    "11-14: prearm candle-walk + stop-tighten eval (+false-kill secondary metric, bar untouched) + neutral-exempt + mult-150 CEO chase",
-    "11-15: floor_admit same-sign",
-    "11-17: jup eval batch (jup-cluster-gate / anti-chase / pro-selection / trail-shadow / atrsl-parity)",
-    "11-21: amplify-cell-conf-tilt-floorproof — NOW WITH cell-membership re-validation precondition",
-    "CEO: mult-150 withdrawal confirm (threshold no longer met) + winner-cell-size-125 REVERT-by-default 11-10"
-  ]
+    "11-08 05:03Z+: DailyFillCap SKIP identity verify (checkpoint)",
+    "11-09 zombie-purge",
+    "11-10 winner-cell-size-125 REVERT + fade-ctx FAIL + warrior-uninert share",
+    "11-11 contrarian live watch (pc- 64.6% promote)",
+    "11-14 stop-tighten n>=20 final + amplify-bbsqueeze-module-rsi-reband + mult-150 + atrtrail-clip",
+    "11-15 floor_admit Fisher re-read",
+    "CEO stack unchanged: pc+ NO-KILL · mult-150 stays 1.25 · no new HIGH-long gate"
+  ],
+  "readiness": {
+    "posture": "2 open (SOL SHORT mirror + ARB LONG low-conf) — 15m LONG vs 4h SHORT disagree = chop; no fresh mid-band; trail-family first; size 1.0x",
+    "size_reduce_file": "absent = 1.0x",
+    "constants_git_diff": "EMPTY",
+    "session_lock": "ABSENT",
+    "tracebacks_today": 0,
+    "steers": []
+  }
 }

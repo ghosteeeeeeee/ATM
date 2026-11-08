@@ -3803,5 +3803,27 @@
     "after": "pre-read written; identity verify tracked with threshold + deadline",
     "rationale": "give CEO the 11-10 read 3 days early (same pattern as #234's size-125 pre-adjudication); prevent prose-queue items from being lost",
     "impact": "zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-08T00:47:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #236 disposition: amplify-bbsqueeze-module-rsi-reband registered (kind=amplify, deadline 11-14) with module-RSI source correction prerequisite",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "no module-RSI amplify entry",
+    "after": "amplify-bbsqueeze-module-rsi-reband open",
+    "rationale": "entry_rsi_14 is enrichment RSI not module filter RSI — prior reband analyses invalid; need signals.value join before any RSI_MAX change",
+    "impact": "blocks invalid param ships; enables valid counterfactual after BLOCKED log instrumentation"
+  },
+  {
+    "timestamp": "2026-11-08T00:47:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #236: registered intraday checkpoint dailyfillcap-identity-0600 due 2026-11-08T06:00Z",
+    "type": "ops",
+    "file": "data/checkpoint_registry.json",
+    "before": "only in shadow_disposition",
+    "after": "checkpoint_registry entry pending",
+    "rationale": "intraday same-day verify must surface via checkpoint_watch; partial PASS already on 11-07 04:58 line",
+    "impact": "formal #231 verify will not sit unread"
   }
 ]

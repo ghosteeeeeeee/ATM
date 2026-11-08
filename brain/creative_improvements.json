@@ -10752,5 +10752,41 @@
     "category": "amplify guard",
     "status": "applied (disposition precondition written this run)",
     "risk": "zero (disposition note only)"
+  },
+  {
+    "date": "2026-11-08T00:47:00Z",
+    "idea": "RSI source decoupling map — tag trade RSI columns with provenance (module/filter vs enrichment)",
+    "rationale": "#236 proved entry_rsi_14 != module RSI on bb-squeeze (divergence up to 35 pts). Same class as DRIFT-E.",
+    "expected_impact": "prevents future invalid RSI-band ships",
+    "category": "data integrity",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-08T00:47:00Z",
+    "idea": "Stop-tighten third-source shortlist pre-registered: pump-chain+ avg SL dist 0.709% / bb-squeeze+ 0.845% (14d) if 11-14 bars PASS",
+    "rationale": "SOL #16813 live clamp verified 1.5%->0.75%; jup POST 18T 77.8% +0.67 near n=20",
+    "expected_impact": "extend proven clamp to wide-SL bleed sources",
+    "category": "exit infrastructure",
+    "status": "pre-registered",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-11-08T00:47:00Z",
+    "idea": "Instrument [bb-squeeze] BLOCKED prints to pipeline.log — enables blocked-event reparse for RSI_MAX counterfactual",
+    "rationale": "prints vanish today; zero BLOCKED lines in any log",
+    "expected_impact": "measurement infra for amplify-bbsqueeze-module-rsi-reband",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "zero-behavior"
+  },
+  {
+    "date": "2026-11-08T00:47:00Z",
+    "idea": "AMPLIFY: bb-squeeze RSI_MAX 65->70 param-widen PRE-REG with mandatory module-RSI source (signals.value)",
+    "rationale": "enrichment RSI analyses invalid; module filter verified tight [60,65]; 65-70 band unmeasured on correct source",
+    "expected_impact": "if blocked 65-70 net>0 admit more of winner cell; else report-only",
+    "category": "amplify param-widen",
+    "status": "pre-registered",
+    "risk": "low (admit-only)"
   }
 ]

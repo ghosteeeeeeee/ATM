@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-07T20:48:03Z",
+  "updated": "2026-11-08T00:47:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -1383,6 +1383,18 @@
       "owner": "brain_auditor next run",
       "evidence": "#231 shipped _daily_fill_cap_block(token=None, direction=None, source=None) identity on the SKIP log line 2026-11-07T04:52Z; queued by #234 for the next post-context re-read because no SKIP fired between 04:58Z brake-release and 21:05Z (brake re-released 16:20Z, opens<15 since).",
       "created_by": "brain_auditor #235"
+    },
+    {
+      "id": "amplify-bbsqueeze-module-rsi-reband",
+      "kind": "amplify",
+      "status": "open",
+      "started": "2026-11-08",
+      "deadline": "2026-11-14T00:00:00Z",
+      "threshold": "PARAM-WIDEN counterfactual BB_SQUEEZE_LONG_RSI_MAX 65->70 on validated cell bb-squeeze+|NORMAL|LONG. MANDATORY: use MODULE RSI from signals.value regex rsi= — NEVER entry_rsi_14/enrichment (proven divergent #236: enrichment 58-100 vs module 60-65 on 422/422). Steps: (i) instrument [bb-squeeze] BLOCKED prints to pipeline.log (zero-behavior); (ii) accumulate >=10 blocked events with module RSI 65-70; (iii) 1m-candle walk live exit engine; SHIP only if net pnl_usdt>0 AND 14d/30d same sign AND fk of current 60-65 winners=0 (admit-only) AND n>=10. Units guard pnl_usdt never pnl_pct. If 0 BLOCKED events in 7d after instrumentation, report-only.",
+      "default_action": "NO CHANGE (BB_SQUEEZE_LONG_RSI_MAX stays 65)",
+      "owner": "brain_auditor",
+      "disposition": "OPEN #236 — enrichment/module RSI split discovered; entry_rsi_14-based reband INVALID",
+      "evidence": "signals.value rsi in [60,65] on 422/422 bb-squeeze+ LONG since 10-24; entry_rsi_14 ranges 58-100 same rows"
     }
   ]
 }
