@@ -23131,3 +23131,26 @@ BY: auto_1hr
 - 7d worsened to -$1.97 (152T, 55.9% WR) — structural RED, hard_max_loss 33T -$4.07 is the biggest 7d drag
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
 BY: auto_1hr
+## [2026-11-08 20:20] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** +$0.02 (WR: 100.0% hour; 24h 12T 58.3% -$0.12 RED | 7d 153T 55.6% -$1.95 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: BABY atr-trend- SHORT +$0.02 profit-monster-trail; 0 opens; 2 open (SOL jup_yolo_mirrored -0.22, ETC atr-trend- +0.23)
+- Kill check: 0%WR 24h = warrior-sr-confirm+ only (n=2 <3) -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/12 = 8.3% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — max n=3 (bb-squeeze+, jup_yolo_mirrored), both net -$0.06 anyway
+- Neg streak: hrs w/ closes 12h = -0.10 (09h), -0.10 (10h), -0.01 (15h), -0.08 (16h), -0.05 (19h) — longest run 2 consecutive, not 3 -> no size cut
+- Frequency: 1 close/hr, 0 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.252% max 0.682% (6/7 <0.5%) -> OK
+- No storm (window-min -0.08% / at-run +0.00%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d -$1.95 structural RED; hard_max_loss 3T -$0.29 still the top 24h drag
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
+BY: auto_1hr
