@@ -174,3 +174,34 @@ Cautionary tale: plans/2026-10-12_gate-conundrum-deadlock-plan.md — a &lt;24h-
 - **ai_decider.py is DEFUNCT** — replaced by `signal_compactor.py`
 - **LIVE_TRADING_ENABLED** is in `hermes_constants.py` — both that and the runtime kill switch must be True for real money
 - **IMX is in the MACD cascade flip list** — special handling applies
+
+---
+
+## Locked Test Protocol
+
+When: before tuning ANY constant (ATR_SL_MIN, ATR_TP_K_MULT, SIGNAL_FILTER_SPEED_MIN, k-multipliers, etc.).
+
+1. **Split first.** Before changing the value, split available trade history into a train window + a locked out-of-sample (OOS) window. The OOS window must be **time-based** (e.g. last N days held out, or a pre-declared date boundary) — NEVER outcome-selected. "Pick the window where it looks fair" is banned.
+2. **Look at OOS EXACTLY ONCE**, after the tune is frozen (train-window backtest + neighbor ±step test complete).
+3. **Accept or revert — never retune against that window.** After seeing OOS results you may accept the tune or revert to the old value, but you may NEVER retune against that same window. A new tune requires a NEW OOS window or a new pre-declared date boundary.
+4. **Record every tune:** constant name, old→new value, train-window dates, OOS-window dates, OOS verdict (accept/revert) — in the commit message AND in `automation/recent_changes.log`-compatible form.
+5. **Tooling:** `python3 scripts/locked_test_split.py --oos-days 14` (or `--train-end YYYY-MM-DD`) prints train/OOS ranges + trade counts and marks the OOS window consumed in `HERMES_DATA/locked_test_state.json`, so a second look is detectable. `--reset` clears it (explicit flag required).
+
+Why: the 2026 constant history (ATR_SL_MIN 1.3→1.5, ATR_TP_K_MULT 1.5→2.0, SIGNAL_FILTER_SPEED_MIN 30→40) was tuned and judged on the same data — no OOS, no ±step robustness. A prior CEO run had 4 failed analyses from survivorship bias / time-anchor bugs / unreproducible numbers. (transcript-mining ideas 1, 2)
+
+---
+
+## Rule-Change Loop
+
+When: ANY threshold/constant change to a live rule — no exceptions.
+
+**Banned pattern:** no threshold changes driven by a recent losing stretch. "ATR_SL widened again after a red 48h" is forbidden — a red 48h is an observation, not a change request. Every reactive widening/loosening after a losing stretch is a process violation regardless of outcome.
+
+Every rule change must go through the full loop:
+
+1. **Idea** — written down: hypothesis, constant name, current→proposed value.
+2. **Full gates** — backtest on the train window (per Locked Test Protocol above) + neighbor ±step test (±1–2 steps around the proposed value must also work — an edge is a hill, not a spike) + OOS looked at exactly once.
+3. **Paper/shadow** — ship in shadow mode via the `automatic-implementation` skill (staggered shadow→enforce rollout); collect counterfactual data for the pre-declared period.
+4. **Swap-on with recorded pre-registered bar** — flip ON only after the shadow period passes the bar declared BEFORE it started; record the bar and the result alongside the tune record.
+
+The old rule keeps trading until the new one earns the swap. Mirrors the `automatic-implementation` skill; this section is the gates document that skill was missing.
