@@ -23032,3 +23032,28 @@ BY: auto_1hr
 - Quiet market: 0 closes in last 5 hours, 1 open position
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
 BY: auto_1hr
+
+## [2026-11-08 16:20] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $0.01 (WR: 50.0% hour; 24h 9T 55.6% $0.00 FLAT | 7d 153T 55.6% -$1.88 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: IMX bb-squeeze+ LONG +$0.02 profit-monster-trail, SPX warrior-sr-confirm+ LONG -$0.01 profit-monster-trail; 2 opens (IMX continuation+ 16:12, ARB atr-trend+ 16:12), 3 open total
+- Kill check: 0%WR 24h max n=2 (warrior-sr-confirm+ 2T -$0.11, pump-chain- 1T) — n<3 -> keep; 14d 0%WR n>=3 = hh-hl+ 3T -$0.41 (n<20 regime threshold), ai-trader-manual 3T (CEO manual, not killable)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/9 = 11.1% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — max n=2, needs n>=5 + multi-token + net>$0.05
+- Neg streak: hourly 12h = +0.05, -0.10, -0.10, -0.01 (15h), +0.02 (16h) — streak broken by 16h positive -> no size cut
+- Frequency: 2 closes/hr, 2 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.307% max 0.682% (5/5), avg <0.5% -> OK
+- No storm (window-min -0.02% / at-run +0.01%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h PnL went +$0.08 -> $0.00 (flat); 7d -$1.88 structural RED
+- 3 open positions stacked (SOL jup_yolo opened 12:22, IMX, ARB both 16:12)
+- Storm streak 2/3 positive counterfactual — awaiting next storm packet
+BY: auto_1hr
