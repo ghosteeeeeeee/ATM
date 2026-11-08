@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-08T08:15:00.071466+00:00
-registry: 92 entries (open=46)
+# Shadow disposition report — 2026-11-08T19:18:59.245547+00:00
+registry: 96 entries (open=48)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -33,7 +33,6 @@ registry: 92 entries (open=46)
 - OPEN storm-confl-waiver: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN storm-readiness-packet: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN signal-zombie-purge: deadline=2026-11-09T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for signal-zombie-purge
 - DONE momentum-cache-regime-coverage: DONE — re-measured 2026-11-06T00:45Z after #225 universe fix + #226 STALE_THRESHOLD 32400: recent-traded universe n=65, fresh<4h=65 (100%), fresh<9h=65 (100%), 0 missing, 0 stale. Bar >=90% PASS. SQLite momentum_cache.db remains 0-byte orphan (PG source of truth, by design). (2026-11-06T00:47:12.481255+00:00)
 - DONE pump-detect-ceiling-mismatch: NO-CHANGE — replay NEGATIVE, both options dead, caps stand (2026-10-30)
 - DONE override-vs-ceiling-contradiction: RESOLVED by replay: ceiling owns 75+ (band dead 3T 0% −$0.47); override claim-text fixed, behavior unchanged (2026-10-30)
@@ -86,12 +85,15 @@ registry: 92 entries (open=46)
 - OPEN btc-standalone-deny-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN setup-recall-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN linreg-fade-fill-funnel: deadline=2026-11-13T00:00:00Z | (no parseable source)
-- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-10T00:00:00Z | data/combo_weights.json: 65 rows, 0.1d
+- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-10T00:00:00Z | data/combo_weights.json: 65 rows, 0.6d
 - OPEN amplify-bbsqueeze-neutral-exempt: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN atr-trend-accel-shadow: deadline=2026-12-06T00:00:00Z | (no parseable source)
 - OPEN amplify-prearm-breakeven-lock: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN amplify-cell-conf-tilt-floorproof: deadline=2026-11-21T00:00:00Z | (no parseable source)
-- OPEN dailyfillcap-identity-verify: deadline=2026-11-08T06:00:00Z | (no parseable source)
-  -> DEADLINE PASSED for dailyfillcap-identity-verify (default packet queued)
+- DONE dailyfillcap-identity-verify: NO-TRAFFIC 2026-11-08 08:40Z (audit #238): 0 DailyFillCap lines after 05:03Z (brake released). Code identity verified decider_run.py:895-897; partial live PASS 11-07 04:58Z. FAIL branch (reopen #231) NOT triggered — no evidence of regression, only absence of traffic. (?)
 - OPEN amplify-bbsqueeze-module-rsi-reband: deadline=2026-11-14T00:00:00Z | (no parseable source)
-- OPEN amplify-stoptighten-scope-widen: deadline=2026-11-21T00:00:00Z | (no parseable source)
+- DONE amplify-stoptighten-scope-widen: SCOPE WIDEN ENFORCED — top-6 sources appended to STOP_TIGHTEN_SOURCES (walk bars PASS: n=55, +$0.88/14d, fk3.9%, 5/5wk); combo-substring bug fixed (tpsl_utils:1107) — CAVEATS (adversarial review 2026-11-08): those bars are the walk-script CEILING MATH over ALL out-of-scope stop-family trades (the population the CEO verdict adjudicated), not the 1m/5m candle-walk threshold limb (i) names; and restricted to the population this change actually covers (new 6 + jup combos: n=31, ceiling $0.62, fk 3.0%, net $0.41/14d = $0.88/30d pace) the net limb sits BELOW the +$1.00/30d bar. Candle-walk owed before this entry’s 2026-11-21 deadline — if it fails there, REVERT = drop the 6 appended tuple entries. (2026-11-08)
+- OPEN amplify-winner-cell-drop-pcplus: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN stop-tighten-slippage-column: deadline=2026-11-14T00:00:00Z | (no parseable source)
+- OPEN win-side-capture-shadow: deadline=2026-11-15T00:00:00Z | (no parseable source)
+- OPEN hml-vol-atr-mult-shadow: deadline=2026-11-18T00:00:00Z | (no parseable source)
