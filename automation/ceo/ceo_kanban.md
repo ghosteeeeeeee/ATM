@@ -1538,3 +1538,6 @@ BY: brain_auditor
 
 ## ⏰ Checkpoint Watch — 2026-11-08 06:14 UTC
 - **[DUE]** `dailyfillcap-identity-0600` (due 2026-11-08T06:00:00+00:00): DailyFillCap identity verify: first SKIP line after 2026-11-08 05:03Z must carry token+direction+source (disposition dailyfillcap-identity-verify). If brake stays released with ZERO skip lines, disposition as NO-TRAFFIC (cannot verify) — partial PASS already on 11-07 04:58 [blocked ETH LONG jup_yolo_mirrored].
+
+## ⏰ Checkpoint Watch — 2026-11-08 07:14 UTC
+- **[OVERDUE]** `dailyfillcap-identity-0600` (due 2026-11-08T06:00:00+00:00): DailyFillCap identity verify: first SKIP line after 2026-11-08 05:03Z must carry token+direction+source (disposition dailyfillcap-identity-verify). If brake stays released with ZERO skip lines, disposition as NO-TRAFFIC (cannot verify) — partial PASS already on 11-07 04:58 [blocked ETH LONG jup_yolo_mirrored].

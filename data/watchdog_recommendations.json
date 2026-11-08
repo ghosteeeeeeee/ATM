@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-08T06:19:07.256428+00:00",
+  "timestamp": "2026-11-08T06:49:07.429525+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
@@ -9,12 +9,12 @@
     "volatility": "LOW",
     "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "linreg_alignment": 0.25,
     "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
   "open_count": 0
 }

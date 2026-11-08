@@ -3287,3 +3287,6 @@
 ## Error Alerts — 2026-11-08 06:19 UTC
 - **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
 - **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+
+## Error Alerts — 2026-11-08 07:14 UTC
+- **[WARN]** (checkpoint_watch): **OVERDUE** `dailyfillcap-identity-0600` (due 2026-11-08T06:00:00+00:00): DailyFillCap identity verify: first SKIP line after 2026-11-08 05:03Z must carry token+direction+source (disposition dailyfillcap-identity-verify). If brake stays released with ZERO skip lines, disposition as NO-TRAFFIC (cannot verify) — partial PASS already on 11-07 04:58 [blocked ETH LONG jup_yolo_mirrored].
