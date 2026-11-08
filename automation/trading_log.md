@@ -23178,3 +23178,30 @@ BY: auto_1hr
 - 7d -$1.96 structural RED; hard_max_loss 3T -$0.29 still the top 24h drag
 - Storm streak 2/3 positive counterfactual — awaiting next storm packet
 BY: auto_1hr
+
+## [2026-11-08 22:22] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** +$0.06 (WR: 50.0% hour; 24h 14T 57.1% -$0.06 RED | 7d 152T 56.6% -$1.57 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config change; storm packet emitted to kanban below)
+
+**Storm Packet (GATE FIRED):**
+🌩️ [STORM-READINESS] window-min -2.12% / at-run -1.56% | blocked 123 (combo_key-stale 52, short-rsi-hard-floor 34, compaction_stale_10min 21, confluence single-type 2, pump-chain-* 2, oversold-knife 2, other 10) | true-starvation 26 RSI>=35 | counterfactual $+0.57 (touch 25/26) | waiver: SHADOW=True ENFORCE=False — storm packet, counterfactual POSITIVE -> **streak 3/3 BAR MET** (deadline 2026-11-12); split: blocked SHORTs +$3.23 (gates suppressed dump winners), blocked LONGs -$2.61 (gates correctly kept losers out). Enforce flip needs CEO label + T sign-off per shadow_disposition.json — NOT auto-flipped.
+
+**No Change Needed:**
+- Last hour: ETC atr-trend- SHORT +$0.22 hard_tp; SOL jup_yolo_mirrored LONG -$0.16 atr_sl_hit; 1 open (BTC ai-trader-pending SHORT +0.09)
+- Kill check: 0%WR 24h = warrior-sr-confirm+ only (n=2 <3) -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/14 = 14.3% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — max n=4 (jup_yolo_mirrored 4T 50% -$0.22, net negative anyway)
+- Neg streak: hrs w/ closes 12h = -0.10 (10h), -0.01 (15h), -0.08 (16h), -0.05 (19h), +0.06 (21h) — longest run 2 consecutive, not 3 -> no size cut
+- Frequency: 2 closes/hr, 1 open — under 20
+- Entry quality: 24h winners mae_pct avg 0.268% max 0.682% -> OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d -$1.57 structural RED; hard_max_loss 3T -$0.29 + atr_sl_hit 2T -$0.31 are the 24h drags
+- Storm streak 3/3 POSITIVE — enforce bar MET, awaiting CEO/T sign-off to flip STORM_CONFLUENCE_WAIVER_ENFORCE (deadline 11-12)
+BY: auto_1hr
