@@ -3847,5 +3847,38 @@
     "after": "fresh: overall 43.1%, pc- 64.6% n=350, rider 36.2%; floor p=0.1411 COLLECT",
     "rationale": "join has no systemd producer — manual refresh is the mandate",
     "impact": "fade watch numbers current; atr_sl_hit fade subset walk = 15.4% join-WR (adverse-selected, SL correctly identifies losers — SL-too-tight hypothesis REFUTED)"
+  },
+  {
+    "timestamp": "2026-11-08T08:41:38Z",
+    "agent": "brain_auditor",
+    "change": "Audit #238 disposition: dailyfillcap-identity-0600 checkpoint + shadow_disposition eval entry -> NO-TRAFFIC (0 DailyFillCap lines after 05:03Z; code identity verified decider_run.py:895-897; partial live PASS 11-07 04:58Z)",
+    "type": "disposition",
+    "file": "data/checkpoint_registry.json + data/shadow_disposition.json",
+    "before": "status open/surfaced (OVERDUE since 07:14Z)",
+    "after": "status done with NO-TRAFFIC disposition",
+    "rationale": "brake released since 11-07 16:20Z so no SKIP traffic exists to verify against; code path carries identity; FAIL branch not triggered",
+    "impact": "closes overdue checkpoint; watcher stops reporting it; zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-08T08:41:38Z",
+    "agent": "brain_auditor",
+    "change": "Audit #238 AMPLIFY: registered amplify-winner-cell-drop-pcplus (drop pump-chain+ EXTREME from WINNER_CELLS_VALIDATED, bar = 30d net<=0 at 11-14) + amended amplify-winner-cell-mult-150 evidence with decay (set 156T +4.83 -> 137T +2.49; pc+ EXTREME +2.73 -> -0.04)",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "mult-150 evidence stale; no drop proposal",
+    "after": "evidence current; drop proposal open deadline 11-14",
+    "rationale": "size boost must not fund a decayed cell; pre-registered bar prevents outcome-selected removal",
+    "impact": "zero trading behavior now; at adjudication stops 1.25x sizing on a 37.9% WR cell"
+  },
+  {
+    "timestamp": "2026-11-08T08:41:38Z",
+    "agent": "brain_auditor",
+    "change": "Audit #238: refreshed contrarian_outcome_join (08:30Z mandate) + floor_admit_outcome_join (08:30Z); shadow_trader --report run (75,148 signals)",
+    "type": "ops",
+    "file": "data/contrarian_outcome_join.json + data/floor_admit_outcome_join.json",
+    "before": "04:30Z / 04:33Z (#237)",
+    "after": "08:30Z",
+    "rationale": "mandate — join has no systemd producer",
+    "impact": "flip numbers current: overall 43.1%, pc- 64.6% LIVE, floor p=0.1411 COLLECT"
   }
 ]

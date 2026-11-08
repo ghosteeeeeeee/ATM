@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-08T04:46:58Z",
+  "updated": "2026-11-08T08:39:50Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -559,7 +559,7 @@
       "deadline": "2026-11-14T00:00:00Z",
       "owner": "CEO label + T sign-off (money-sizing, per #208 precedent)",
       "proposal_type": "(b) winner-cell notional mult change",
-      "evidence": "Winner cells 30d (pnl_usdt, units guard): pump-chain+ EXTREME 82T +2.73 / bb-squeeze+ NORMAL 50T +0.95 / volume-buildup- HIGH 18T +0.37 / r2v2-long3 NORMAL 6T +0.78 = 156T +4.83. All-window positive except pump-chain+ 14d -0.13. bb-squeeze+ NORMAL 7d +0.46 / 14d +0.76 / 30d +0.95 (WR 68-70%, arm 56%). WINNER_CELL_SIZE_MULT=1.25, WINNER_CELL_SIZE_MULT_CAP already 1.5 (hermes_constants:1094-1095) so 1.50 is an in-cap constant change, no code. Amounts verified live: IOTA #16614 12.48 = 11.10x0.9x1.25, DYDX/MON vb- HIGH 12.48.",
+      "evidence": "Winner cells 30d (pnl_usdt, units guard): pump-chain+ EXTREME 82T +2.73 / bb-squeeze+ NORMAL 50T +0.95 / volume-buildup- HIGH 18T +0.37 / r2v2-long3 NORMAL 6T +0.78 = 156T +4.83. All-window positive except pump-chain+ 14d -0.13. bb-squeeze+ NORMAL 7d +0.46 / 14d +0.76 / 30d +0.95 (WR 68-70%, arm 56%). WINNER_CELL_SIZE_MULT=1.25, WINNER_CELL_SIZE_MULT_CAP already 1.5 (hermes_constants:1094-1095) so 1.50 is an in-cap constant change, no code. Amounts verified live: IOTA #16614 12.48 = 11.10x0.9x1.25, DYDX/MON vb- HIGH 12.48. || AUDIT #238 EVIDENCE DECAY (2026-11-08 08:40Z): set-net cited at creation 156T +4.83 now reads 137T +2.49/30d (ex-pc+ 69T +1.96). pump-chain+ EXTREME — largest cited component (+2.73/82T) — is now 66T -0.04 WR 37.9%, weekly Oct-19 -0.33 / Oct-26 +0.15 / Nov-2 -0.42 (2 of 3 weeks negative, latest worst). Tagged under 1.25x since 10-15: 15T -0.12 (1.0x counterfactual -0.096 -> mult amplified the loss -0.024). mult-150 bar must be judged on ex-pc+ set or the cell dropped first — see amplify-winner-cell-drop-pcplus. UNITS: pnl_usdt only.",
       "threshold": "APPLY only if at read time: each cell net30>0 AND >=3 of 4 cells net14>0 AND net7(winner-cell-set)>0. REVERT to 1.25 if winner-cell-set 7d net < $0.00 on any weekly read, or any single cell 7d net < -$0.50 twice consecutively.",
       "default_action": "NO CHANGE — WINNER_CELL_SIZE_MULT stays 1.25; amplify NOT applied without CEO label + T sign-off (status quo is the default).",
       "measurement": "weekly: SELECT signal,volatility_regime,direction window net FROM trades (pnl_usdt only; never pnl_pct — leverage landmine). Expected EV: +20% notional on +4.83/30d cell net ~ +0.97/30d (label: estimate, not measured).",
@@ -1375,14 +1375,16 @@
       "id": "dailyfillcap-identity-verify",
       "stream": "DailyFillCap SKIP line carries candidate identity (audit #231 fix) — verify on live traffic",
       "kind": "eval",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-07",
       "deadline": "2026-11-08T06:00:00Z",
       "threshold": "First DAILY FILL CAP SKIP line after 2026-11-08 05:03Z must carry token+direction+source (the #231 empty-context second-call gap). PASS = identity present on BOTH same-second calls. FAIL = reopen #231.",
       "default_action": "NO CHANGE (fix is already shipped; this is verify-on-traffic)",
       "owner": "brain_auditor next run",
       "evidence": "#231 shipped _daily_fill_cap_block(token=None, direction=None, source=None) identity on the SKIP log line 2026-11-07T04:52Z; queued by #234 for the next post-context re-read because no SKIP fired between 04:58Z brake-release and 21:05Z (brake re-released 16:20Z, opens<15 since).",
-      "created_by": "brain_auditor #235"
+      "created_by": "brain_auditor #235",
+      "disposition": "NO-TRAFFIC 2026-11-08 08:40Z (audit #238): 0 DailyFillCap lines after 05:03Z (brake released). Code identity verified decider_run.py:895-897; partial live PASS 11-07 04:58Z. FAIL branch (reopen #231) NOT triggered — no evidence of regression, only absence of traffic.",
+      "disposed_at": "2026-11-08T08:39:50Z"
     },
     {
       "id": "amplify-bbsqueeze-module-rsi-reband",
@@ -1410,6 +1412,22 @@
       "default_action": "NO CHANGE — STOP_TIGHTEN_SOURCES stays ('jup_yolo_mirrored','volume-buildup-'); tuple edit needs review-queue + CEO per money-adjacent precedent",
       "disposition": "OPEN #237 — all 4 numeric bars PASS on ceiling math; candle-walk + placement coverage still required before any tuple change",
       "created_at": "2026-11-08T04:46:58Z"
+    },
+    {
+      "id": "amplify-winner-cell-drop-pcplus",
+      "stream": "WINNER_CELLS_VALIDATED rotation — drop pump-chain+ EXTREME (decayed out of winner status)",
+      "kind": "amplify",
+      "proposal_type": "(b) winner-cell set change (money-sizing membership)",
+      "status": "open",
+      "started": "2026-11-08",
+      "deadline": "2026-11-14T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run #238",
+      "evidence": "Fresh PG 30d (2026-11-08 08:40Z): pump-chain+ EXTREME cell = 66T net -0.04 WR 37.9%. At mult-150 creation (10-31, f1fa4ee6) the same cell read 82T +2.73 — it has decayed THROUGH zero inside the rolling window. Weekly sign: Oct-19 -0.33 / Oct-26 +0.15 / Nov-2 -0.42 = 2 of 3 weeks negative, latest week worst. Tagged (size_mult in metadata) since 10-15: 15T -0.12 vs 1.0x counterfactual -0.096 -> the 1.25x boost AMPLIFIED a losing cell by -0.024 (units: pnl_usdt; counterfactual = actual/1.25, no pnl_pct mixing). VALIDATED set total decayed 156T +4.83 (creation) -> 137T +2.49 (now); ex-pc+ subset 69T +1.96 stays healthy (bb-squeeze+ NORMAL 44T +0.76 65.9% | volume-buildup- HIGH 19T +0.42 78.9% | r2v2-long3 NORMAL 6T +0.78 83.3%). Dropping the cell = stop sizing UP a 37.9% WR cell; the 3 healthy cells keep their boost.",
+      "threshold": "DROP if at the 11-14 mult-150 adjudication the cell's rolling-30d pnl_usdt <= 0 (currently -0.04) — pre-registered now so the removal is not outcome-selected. RE-ADD bar (pre-registered): 30d net >= +0.50 AND 2 consecutive positive weeks AND n>=40. One variable at a time: this changes MEMBERSHIP only, WINNER_CELL_SIZE_MULT stays 1.25 (the 11-10 revert and 11-14 mult-150 questions are separate).",
+      "units_guard": "pnl_usdt only; never mix with leveraged pnl_pct (#193 landmine)",
+      "impact_on_winners": "Removes a size BOOST from a net-negative cell — cannot block a single trade, only reverts its notional to base. Counterfactual: tagged pc+ EXTREME since 10-15 loses -0.024 LESS at 1.0x. No entry/exit behavior changes.",
+      "created_by": "brain_auditor #238",
+      "created_at": "2026-11-08T08:39:50Z"
     }
   ]
 }

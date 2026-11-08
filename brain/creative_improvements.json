@@ -10806,5 +10806,24 @@
     "category": "measurement",
     "status": "suggested",
     "risk": "none (analysis only)"
+  },
+  {
+    "date": "2026-11-08T08:41:38Z",
+    "idea": "AMPLIFY: drop pump-chain+ EXTREME from WINNER_CELLS_VALIDATED — cell decayed +2.73 -> -0.04/30d inside the rolling window; 1.25x boost amplified tagged losses by -0.024 since 10-15",
+    "rationale": "winner-cell set must track live cell health; a size boost on a 37.9% WR cell funds losers",
+    "expected_impact": "stop amplifying negative cell; ex-pc+ set stays +1.96/30d; zero trade-blocking",
+    "category": "amplify",
+    "status": "registered",
+    "risk": "low",
+    "ref": "amplify-winner-cell-drop-pcplus"
+  },
+  {
+    "date": "2026-11-08T08:41:38Z",
+    "idea": "TAT age sweep for bb-squeeze+ (40/55/70m) — bb-squeeze+ owns 17/44 trail_arm_timeout exits (14d 35.3% WR -0.41) while its NORMAL cell prints +0.76",
+    "rationale": "timeout exits are the leak inside the best validated cell; one signal's hold profile may need its own age",
+    "expected_impact": "measurement only; ship iff 1m walk net >= +$0.50/14d AND fk<20% AND 30d same-sign",
+    "category": "exit sniper",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
