@@ -465,6 +465,25 @@ def run_cycle():
                                              f"({'stale %.0fh' % age_h if stale else 'ATR shift'})")
                     else:
                         keep = True  # levels fresh — this leg stays as-is
+                        if cfg.get('mode') == 'live':
+                            # Back-fill gap fix (2026-11-09 02:28): a leg
+                            # armed while mode was still 'shadow' has NO real
+                            # pending order — keep means the levels stand, so
+                            # the REAL order must exist too. Dedupe inside
+                            # makes repeat calls 'covered' (idempotent).
+                            res = _arm_real_leg(
+                                h['order_id'], leg,
+                                {'trigger': h['trigger'], 'sl': h['sl'],
+                                 'tp': h['tp'],
+                                 'trigger_dir': (h['trigger_dir']
+                                                 if 'trigger_dir' in h.keys()
+                                                 else None)},
+                                size, cfg, h1_atr)
+                            summary['live_armed'].append(f'{leg}-kept:{res}')
+                            if res == 'armed':
+                                DB.log_event('INFO',
+                                             f"cycle {cycle_id}: live "
+                                             f"back-fill {h['order_id']} → armed")
                 if keep:
                     continue  # fresh armed leg exists for this direction
                 # E2 checklist: never arm an already-crossed (ITM) level.
