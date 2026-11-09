@@ -23305,3 +23305,28 @@ BY: auto_1hr
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 - Zero activity hour — market quiet, no signal pressure either way
 BY: auto_1hr
+
+## [2026-11-09 03:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a hour; 24h 15T 46.7% -$0.29 RED | 7d 148T 54.7% -$1.87 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens, 0 open — quiet hour
+- Kill check: 0%WR 24h with n>=3 = none -> keep all
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/15 = 20.0% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — no signal has n>=5 in 24h (max jup_yolo_mirrored 4T 25% -$0.34 net negative)
+- Neg streak: hrs w/ closes 19h +0.02, 21h +0.06, 23h -0.01, 00h +0.03, 01h -0.08 — longest run 1 consecutive, not 3 -> no size cut
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.191% max 0.379% (7/7 <0.5%) -> OK
+- No storm (window-min -0.38% / at-run -0.38%) — gate not fired (needs window-min <= -1.5 OR |at-run| >= 1.5), steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h dipped to 46.7% WR -$0.29 (was 52.9% -$0.12 at 02:20) — window rolled out 2 wins; jup_yolo_mirrored 4T 25% -$0.34 remains top drag but n<5, wins in all 14d regimes -> keep alive
+- 7d -$1.87 structural RED unchanged; hard_max_loss 3T -$0.29 + atr_sl_hit 3T -$0.39 = 24h drags
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
