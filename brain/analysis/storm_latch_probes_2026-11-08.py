@@ -144,18 +144,42 @@ chk(len(entries) == 97, f'registry: 97 entries after insert (got {len(entries)})
 # mislabeled for these files — the proper `scripts: ` package commits follow.
 BASE = 'e9035a27^'
 
-# git diff of the registry must touch ONLY this run's fields
+# Registry check vs the pinned base — ENTRY-LEVEL, not raw line counts: other
+# actors' edits can ride the same commits (the hourly sweep carried this
+# package; a parallel session's signal-zombie-purge disposition at 00:45Z rode
+# this package's registry commit via git add -u). This package may change ONLY
+# its own fields/entries; foreign changes are reported as INFO, not failed.
 diff = git('diff', BASE, '--', 'data/shadow_disposition.json')
 chk(diff.strip(),
     'registry: package diff vs pinned baseline is non-empty (wrong-base guard)')
-removed = [l for l in diff.splitlines()
-           if l.startswith('-') and not l.startswith('---')]
-bad_rem = [l for l in removed
-           if not any(k in l for k in ('"updated"', '"disposition"',
-                                       '"evidence"', '"threshold"', '"notes"'))]
-chk(not bad_rem, 'registry: git diff removes ONLY this run\'s fields',
-    f'unexpected removals={bad_rem[:2]}')
-chk(len(removed) == 5, f'registry: exactly 5 field lines replaced (got {len(removed)})')
+base_reg = json.loads(git('show', f'{BASE}:data/shadow_disposition.json'))
+
+
+def _emap(d):
+    return {e['id']: e for e in d.get('entries', []) if isinstance(e, dict)}
+
+
+bm, wm = _emap(base_reg), _emap(reg)
+added_ids = set(wm) - set(bm)
+removed_ids = set(bm) - set(wm)
+chk(added_ids == {'linreg-fade-storm-admission-shadow'},
+    f'registry: exactly one entry added (added={sorted(added_ids)})')
+chk(not removed_ids, f'registry: no entries removed (removed={sorted(removed_ids)})')
+changed_ids = {k for k in (set(bm) & set(wm)) if bm[k] != wm[k]}
+chk('storm-confl-waiver' in changed_ids,
+    'registry: storm-confl-waiver changed by this run')
+wfields = {k for k in bm['storm-confl-waiver']
+           if bm['storm-confl-waiver'].get(k) != wm['storm-confl-waiver'].get(k)}
+chk(wfields <= {'disposition', 'evidence', 'threshold', 'notes'},
+    'registry: waiver changed ONLY this run\'s fields '
+    f'(changed={sorted(wfields)})')
+foreign = changed_ids - {'storm-confl-waiver'}
+if foreign:
+    print(f'  INFO foreign registry edits riding the same commits (not this '
+          f'package): {sorted(foreign)}')
+chk({k for k in base_reg if k != 'entries'
+     and base_reg.get(k) != reg.get(k)} <= {'updated'},
+    'registry: only top-level "updated" changed outside entries')
 
 # ═════════════════════════════════════════════════════════════════════════════
 # Item 2 — Q4 stale log text (source-level; the line is emitted live at runtime)
