@@ -3902,5 +3902,27 @@
     "after": "+ #240 rotation-resolution: bar counts SHADOW joins, combined archive+current = 86 ids 16632-16818 (10-31..11-08), reproduce command embedded, ENFORCE=5 ids explicitly excluded",
     "rationale": "#239 flagged MED under-count risk for the 11-14 eval; measured and closed with data — no code, zero trading behavior",
     "impact": "11-14 eval reads correct id bar (MET) instead of under-counting on rotation"
+  },
+  {
+    "timestamp": "2026-11-09T00:43:25Z",
+    "agent": "brain_auditor",
+    "change": "Audit #241: signal-zombie-purge DECIDE resolved NO CHANGE — root cause = archive-signals.py tier-2 archiver already implements retention>=14d (CUTOFF_HOURS_OTHERS=336h) + archive-preserve (decision_reason in gzipped JSONL); compactor purgers are tier-1 fast-path only",
+    "type": "kill",
+    "file": "data/shadow_disposition.json",
+    "before": "status=open, DECIDE pending (3 options, default NO CHANGE)",
+    "after": "status=done, disposition=NO CHANGE with full evidence",
+    "rationale": "Runtime DB min(created_at)=2026-10-25 proves 14d retention is live; archive/signals/2026-08..11.jsonl.gz present = forensic history preserved. Both proposed options (a) and (b) already exist. No purge code change needed.",
+    "impact": "Closes an 11-day-old hygiene DECIDE that two prior investigations re-derived"
+  },
+  {
+    "timestamp": "2026-11-09T00:43:25Z",
+    "agent": "brain_auditor",
+    "change": "Audit #241: TWO-TIER PURGE ownership comment at signal_compactor.py purge call site (8 lines, zero behavior)",
+    "type": "tweak",
+    "file": "scripts/signal_compactor.py",
+    "before": "comment: \"Purge executed signals older than 1 hour (keeps DB lean)\"",
+    "after": "documents tier-1 (1h/2h purgers) vs tier-2 (archive-signals.py 336h archiver), names sweep-expired \"zombie\" rows as tier-2-covered, forbids extending tier-1 WHERE",
+    "rationale": "Prevents a third re-derivation of the zombie-purge defect framing",
+    "impact": "None on trading; py_compile PASS; git diff = 8 insertions only"
   }
 ]

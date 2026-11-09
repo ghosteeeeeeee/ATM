@@ -1,127 +1,82 @@
 {
-  "timestamp": "2026-11-08T16:50:00Z",
-  "run": 240,
-  "session_lock": "ABSENT (/tmp/hermes-session-active.lock does not exist) — modifications allowed",
-  "headline": "STOP-TIGHTEN ROTATION DRIFT RESOLVED WITH DATA: the 11-14 eval's >=20 distinct-id bar counts [STOP-TIGHTEN-SHADOW] joins, and archive+current logs already hold 86 real ids (16632-16818, 10-31..11-08) = bar MET 4.3x pre-deadline. #239's MED 'under-count' risk closed: ENFORCE-only reads (5 ids) were the wrong tag; pipeline-log-rotate.service retains 30d gz. Also decomposed the trade-frequency collapse (43T/day -> 5-7T/day): detections -54% (LOW-vol regime) + DailyFillCap brake ON through 11-07 16:20 + stable ~60% gate block share (no Nov-4/5 spike) = correct-by-design in chop, NOT a bug. 0 config changes (vacation review-queue bars, nothing passed).",
+  "timestamp": "2026-11-09T00:42:51Z",
+  "run": 241,
   "session_brain_stats": {
     "queries": 3,
-    "top_hits": "pump-chain-short filter/backtest; spike_exhaustion re-enable+48h monitor; trend-following signal request; zombie signals (hzscore/bb_bounce/vortex_break pass registry but dead inside)"
+    "top_hits": [
+      "signal to trades R:R threshold 0.95",
+      "pump-chain-short filters",
+      "trend following signal",
+      "signal lifecycle EXPIRED/staleness"
+    ]
   },
-  "trade_summary": {
-    "24h": "9T 55.6% $0.00 FLAT",
-    "7d": "152T 55.9% -1.79 (armed 81T 93.8% +4.57 vs unarmed 71T 12.7% -6.36)",
-    "14d": "393T 54.5% -3.36 (armed 208T 90.4% +11.51 vs unarmed 185T 14.1% -14.87)",
-    "30d": "768T 46.9% -6.45",
-    "rr_asymmetry_7d": "avg win +0.062 vs avg loss -0.107 -> breakeven WR 63.3% vs actual 55.9% (loss SIZE is the lever)",
-    "exit_families_7d": "TRAIL/TP: profit-monster-trail 47T +2.95 97.9% + mfe_exit 28T +1.64 100%; CHOP/STOP: hard_max_loss 32T -3.98 0% + atr_sl_hit 25T -2.76 0%",
-    "chop_bleed_share": "7d 94.6% / 14d 94.7% (BOTH >=92% breach) / 30d 88.8% — chronic; 0.75x remedy VETOED as structurally inert (#196/#201), owned by TAT/prearm-breakeven stack; no blind re-escalation",
-    "regime_7d": "NORMAL 82T -0.05 | HIGH 42T -0.95 | EXTREME 16T -0.76 | FLAT 12T -0.03 (sign-flip vs 30d EXTREME-best -> no regime gate)",
-    "daily_frequency": "Oct30 62T / Nov3 43T -> Nov5 6T / Nov6 14T / Nov7 5T / Nov8 7T so far — decomposed, see headline"
+  "trade_summary_24h": {
+    "n": 16,
+    "wr": 56.3,
+    "pnl": -0.04,
+    "note": "FLAT"
+  },
+  "trade_summary_windows": {
+    "7d": {
+      "n": 150,
+      "wr": 56.0,
+      "pnl": -1.61,
+      "armed": "81T 92.6% +4.68",
+      "unarmed": "69T 13.0% -6.29"
+    },
+    "14d": {
+      "n": 392,
+      "wr": 54.6,
+      "pnl": -3.38
+    },
+    "30d": {
+      "n": 768,
+      "wr": 47.0,
+      "pnl": -6.6
+    }
   },
   "shadow_analysis": {
-    "contrarian": "join RE-RAN 16:30Z (mandate): overall flip 43.1% n=1442 (flipping loses overall); pump-chain- 64.6% (226W/124L) LIVE uniform chi2 p=0.375 = Oct-27 PROMOTE stands; btc-pump-rider+ 36.2% do-NOT (token heterogeneity chi2 p=8.9e-25)",
-    "floor_admit": "join 08:30Z same-day fresh: floor_only 49.2% vs always_admit 43.7%, fisher p=0.1411 COLLECT (bar 11-15)",
-    "oscillator": "FROZEN (OSCILLATOR_MULT_ENABLED since Oct 1, archived fossil) — none",
-    "wyckoff": "RETIRED — none",
-    "rr_shadow": "ORPHANED (no producer, 24d stale) — none",
-    "shadow_trader": "76,185 signals 16:33Z: exit A/B pm_trail +11,411 (100% WR) vs hard_max -13,378 (0%) vs rr_engine -5,077 vs cut_loser -2,186 = TRAIL-OR-NOTHING; gates justified (CONFLUENCE-EXPIRY avg -0.13, CTX-GATE 2453 @52% -0.08); grind-breakout- top source n=32 but #239 dedup refutes as pseudo-replication",
-    "dedup_guard": "shadow_dup_check_2026-11-08.py --selfcheck PASS (76,185 rows, 14 inflated sources >=1.5x informational)",
-    "overall": "3/6 usable (contrarian fresh, floor same-day, shadow_trader fresh); 3 dead (oscillator/wyckoff/rr)"
-  },
-  "losing_trade_autopsy": {
-    "method": "recovery_replay.py adverse-first, --selfcheck PASS",
-    "48h": "n=5 = 2 never-adverse / 3 recovered / 0 NEVER -> WRONG-SIDE REFUTED 67th consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "new_patterns": 0
-  },
-  "signal_deep_dive": {
-    "new_targets": 0,
-    "sub50_14d": "pump-chain+ 29T 48.3% -0.27 (NO-KILL + CONF_FLOOR, review 11-13); pump-chain- 32T 37.5% net +0.07 (contrarian PROMOTE live, watch 11-11)",
-    "note": "every bleed cohort is killed/disabled/in-flight/CEO-domain — no fresh kill candidate"
+    "contrarian": "JOIN RE-RAN 00:30Z (mandate). overall flip 43.4% n=1448. pump-chain- 64.6% (226W/124L) LIVE uniform chi2 p=0.3747 = Oct-27 PROMOTE STANDS. btc-pump-rider+ 36.2% do-NOT.",
+    "floor_admit": "join 2026-11-08 08:30Z: floor_only 49.2% (n=1382 decided) vs always_admit 43.7% (n=213) — COLLECT to 11-15.",
+    "oscillator": "FROZEN by design (OSCILLATOR_MULT_ENABLED), archived fossil — no live question.",
+    "wyckoff": "RETIRED.",
+    "rr_shadow": "ORPHANED (no producer) — do not cite.",
+    "shadow_trader": "76k+ signals. exit A/B: pm_trail n=30987 WR100% +11582 vs hard_max n=14029 WR0% -13641 = trail-or-nothing reconfirmed. cut_loser -2187, rr_engine -5136.",
+    "overall": "3/6 answerable (contrarian fresh, floor fresh, shadow_trader fresh). oscillator/wyckoff/rr dead by design."
   },
   "drift_findings": [
-    "#239 MED '11-14 stop-tighten eval under-counts on rotation' — RESOLVED: bar is SHADOW-tag joins (86 ids, MET), not ENFORCE (5 ids); archives retained 30d. Evidence appended to disposition stop-tighten-enforce-eval.",
-    "SIDE-FIND (method landmine): trades.stop_loss is MUTATED upward by profit-monster trail for winners (min dist 0.003-0.068% on trail exits) — any 'initial SL placement' study must use losers-only or open-time snapshot; my first over/in-cap census was contaminated and is NOT cited as evidence.",
-    "SIDE-FIND (benign): scripts/signals/_candidates/bollinger_squeeze_{long,short}_candidate.py auto-regenerated 15:58Z by the candidate generator (backtest stats refresh only, CANDIDATE status, not enabled) — dirty worktree, not a code change."
+    "signal-zombie-purge DECIDE (due 2026-11-09) RESOLVED — NO CHANGE with better root cause: archive-signals.py tier-2 archiver already implements retention>=14d (CUTOFF_HOURS_OTHERS=336) AND archive-preserve (decision_reason in gzipped JSONL), so both proposed options (a) and (b) already exist. Compactor purgers are tier-1 fast-path only. Evidence: runtime DB min(created_at)=2026-10-25, archive/signals/2026-08..11.jsonl.gz present. Disposition set done; ownership comment shipped to signal_compactor.py.",
+    "No session-brain decision found that is missing from code this run (all flagged items already in-flight or adjudicated)."
   ],
   "recurring_problems": [
-    "chop-bleed >=92% now on both 7d (94.6%) and 14d (94.7%) — chronic since late Oct; remedy vetoed as inert; owned by queued TAT/prearm-breakeven/CONF_FLOOR stack (due 11-14)",
-    "RR asymmetry: breakeven WR 63.3% vs actual 55.9% — entry count is not the lever, loss SIZE is (stop-tighten in-scope working, scope-widen walk due 11-21)",
-    "session_brain duplicate-text records — flagged 18 runs, rebuild still owed (hygiene, not blocking)"
+    "CHOP-bleed chronic: loser-side share from never-armed trades (mfe<0.40) = 94.5% (7d) / 94.8% (14d) / 89.0% (30d) — both ≥92% pre-registered push bar. Remedy already VETOED as inert; ownership sits with the 11-14 stack.",
+    "RR asymmetry: 7d avg win +0.0648 vs avg loss -0.1068 (1.65x) -> breakeven WR 62.2% vs actual 56.0%. LOSS SIZE is the lever, not entry count.",
+    "Exit families 14d: atr_sl_hit 58T 0% -6.50 + hard_max_loss 45T 0% -5.82 = 103/162 losers (63.6%) exit through the two pure-loss engines; profit-monster-trail 138T 97.8% +7.76 carries all profit."
   ],
-  "missing_implementations": [
-    "zombie-purge DECIDE due 11-09: default NO CHANGE (leave zombies, ~950/day storage-only, forensic tombstone value) — pre-adjudicated as default, formal disposition at deadline",
-    "No systemd producer for contrarian_outcome_join.py — still manual every run (mandate)"
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
-    {
-      "date": "2026-11-08T16:50:00Z",
-      "idea": "Opportunity-cost decomposition KPI: daily detections + gate-block share + DailyFillCap brake state, reported together with trade count",
-      "rationale": "This run's 43T/day -> 5T/day collapse looked like a bug until split three ways: detections -54% (LOW-vol regime), brake ON through 11-07 16:20 (fee-net negative), gate block share stable 51-74% with NO Nov-4/5 spike. Without the split, a healthy chop-response reads as a failure.",
-      "expected_impact": "no PnL; prevents future false 'frequency collapse' escalations",
-      "category": "telemetry",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-11-08T16:50:00Z",
-      "idea": "Losers-only SL-placement census as standing companion to stop-tighten scope-widen (11-21)",
-      "rationale": "14d losers: initial SL >0.75% = 114T -13.64 (avg -0.120/trade) vs <=0.75% = 48T -2.82 (avg -0.059). Directionally supports the registered scope-widen ceiling (+$0.87/14d) but is confounded by signal-mix (vb- avg SL 2.197%) and exit-family — MUST NOT be cited alone; the candle-walk remains the decision evidence.",
-      "expected_impact": "corroborating only; feeds 11-21 walk",
-      "category": "entry sniper",
-      "status": "pre-registered",
-      "risk": "low"
-    }
+    "SHIPPED: two-tier purge ownership comment in signal_compactor.py (see drift_findings[0]) — closes an 11-day-old hygiene DECIDE that two investigations re-derived.",
+    "WATCH (no proposal, concentration): jup_yolo_mirrored = 37% of last-100 closed fills and 139T/30d (18% of volume) yet 30d net -0.98 at 61.9% WR; only its HIGH-SHORT cell is positive (+0.40). Already covered by 4 registered items (conf-filter jup conf-99 dampen 11-10, jup-atrsl-parity 11-10, jup walk 11-14, jup HIGH OOS 11-19) — reported as concentration watch, NOT re-proposed."
   ],
-  "config_changes_applied": [],
+  "config_changes_applied": [
+    "scripts/signal_compactor.py: +8 comment lines at purge call site (TWO-TIER PURGE ownership). py_compile PASS. ZERO trading behavior.",
+    "data/shadow_disposition.json: signal-zombie-purge status open -> done with full evidence."
+  ],
   "changes_from_last_run": [
-    {
-      "run": 239,
-      "change": "shadow_dup_check_2026-11-08.py shipped",
-      "status": "VERIFIED — --selfcheck PASS this run (76,185 rows, 14 inflated sources informational)"
-    },
-    {
-      "run": 239,
-      "change": "gate-shadow-dedup-convention disposition extended to shadow_trades.db",
-      "status": "OPEN — due 11-10, entry present"
-    },
-    {
-      "run": 239,
-      "change": "stop-tighten ENFORCE 0.75 live (post-ship jup+vb 20T 80% +0.710)",
-      "status": "WORKING — 30 ENFORCE lines in current log, clamps on 16809/16813/16815/16818; post-ship jup 19T 78.9% +0.69 fresh (fisher p=0.094 n.s., volume confound)"
-    },
-    {
-      "run": 239,
-      "change": "amplify-winner-cell-drop-pcplus registered",
-      "status": "OPEN — pc+ EXTREME 30d now 65T $0.00 38.5% (was -0.04), bar unchanged, deadline 11-14"
-    },
-    {
-      "run": 239,
-      "change": "contrarian/floor joins refreshed",
-      "status": "RE-RUN this run 16:30Z / same-day 08:30Z — direction unchanged"
-    }
+    "#240 stop-tighten id-bar RESOLUTION verified: shadow_dup_check_2026-11-08.py --selfcheck PASS (rows=77491).",
+    "#240 stop-tighten-enforce track (11-04 flip): post-11-04 70T WR 57.1% net -0.32 vs pre-11-04 437T WR 51.7% net -3.14 — directionally better, n=70 small, avg loss unchanged (-0.094 -> -0.101) => NOT claimed as a win; 11-14 eval remains the registered decision point (id bar already MET at 86 SHADOW ids).",
+    "#240 constants EMPTY diff, registry 0 pending, size-reduce absent=1.0x, 0 Tracebacks today — ALL PASS."
   ],
-  "amplify_step": {
-    "ranked_cells_30d_n10_net_pos": [
-      "bb-squeeze+ NORMAL LONG 44T +0.76 65.9% -> in-flight: chop-exempt 11-13, neutral-exempt 11-14, module-rsi-reband 11-14, warrior-uninert 11-10",
-      "volume-buildup- HIGH SHORT 19T +0.42 78.9% -> in-flight: vb-high-clonehunt 11-13",
-      "jup_yolo_mirrored HIGH SHORT 15T +0.40 73.3% -> in-flight: jup-short-walk 11-14, jup-short-high-cell 11-19 (cell 2wk old, HOLD)",
-      "pump-chain-,pump-chain-v6- EXTREME SHORT 10T +0.30 30.0% -> amplitude 1.25x adds ~+0.075/30d = below materiality; pc- covered by contrarian PROMOTE",
-      "pump-chain- NORMAL LONG 30T +0.19 40.0% -> below materiality (1.25x ~ +0.05/30d)"
-    ],
-    "early_cells_n5": "r2v2-long3 NORMAL 6T +0.78 83.3% (n<10, label only); warrior-sr-confirm+ NORMAL 6T +0.28; jup FLAT LONG 7T +0.25 100% — all below n>=10 bar",
-    "proposal_emitted": false,
-    "why_not": "No fresh cell cleared the bar beyond in-flight proposals (rule-3): the 4 material cells already carry size-125/clone-hunt/walk/kill-review entries, the 2 remaining are below materiality, early cells n<10. Duplicate proposals banned.",
-    "flip_kpi": "MET this week per #239 (stop-tighten ENFORCE 11-04, SHORT_RSI_CEILING 65->75 11-03, harvest 11-04); 0 NEW conversions this run, stated per rule 3"
+  "amplify": {
+    "new_proposals": 0,
+    "why_not": "All 4 thirty-day winner cells with n>=10 and net>0 are already in-flight or below materiality: bb-squeeze+ NORMAL LONG 44T +0.76 (combo-boost amplify due 11-10; reband due 11-14), volume-buildup- HIGH SHORT 19T +0.42 (clone-hunt due 11-13), jup_yolo_mirrored HIGH SHORT 15T +0.40 (walk 11-14 / HIGH OOS 11-19), pump-chain- NORMAL LONG 30T +0.19 (contrarian watch 11-11). No cell clears the +1.00 net bar. Flip-KPI MET this week (#239).",
+    "in_flight_reading": "amplify-bbsqueeze-warrior-uninert: bb-squeeze+ 17 + warrior-sr-confirm+ 6 = 23% of last-100 fills vs the >=25% bar (baseline 17%) — borderline, deadline 11-10."
   },
   "next_actions": [
-    "11-09: signal-zombie-purge DECIDE (default NO CHANGE — pre-adjudicated this run)",
-    "11-10: gate-shadow-dedup-convention fold (covers shadow_trades.db) + winner-cell-size-125 + fade-ctx-exempt + rsi-ceiling-75 + conf-filter-parity + jup-atrsl-parity + mfe-cut-arm-be + ichimoku-dampen",
-    "11-11: contrarian watch (pc- 64.6% LIVE)",
-    "11-12: storm-waiver enforce bar",
-    "11-13: pc+ kill-review + vb- clone-hunt + linreg-fade funnel",
-    "11-14: stop-tighten-enforce-eval (id bar MET=86 — source archive+current, SHADOW tag) + drop-pcplus + probe-080 + bbsqueeze reband/neutral-exempt + mult-150 adjudication + atrtrail-clip + prearm-breakeven + TAT-age-sweep",
-    "11-15: floor_admit 30d | 11-19: jup HIGH OOS | 11-21: conf-tilt + stop-tighten scope-widen walk (losers-only census appended as corroboration)",
-    "CEO: mult-150 sign-off (evidence decayed — judge ex-pc+ or drop first) · jup HIGH cell HOLD · unclog-waiver EXPIRY re-measure [35,45) before renewal (expired 11-03)"
+    "11-09 zombie-purge: DONE this run (NO CHANGE + ownership comment).",
+    "11-10 (8 items): gate-shadow-dedup fold, size-125 auto-revert (WINNER_CELL_SIZE_MULT 1.25->1.0 per pre-adjudicated FAIL), fade-ctx-exempt re-measure, rsi-ceiling-75 revert-rule, conf-filter-parity (source-scoped jup conf-99), jup-atrsl-parity, mfe-cut-arm-be, ichimoku-dampen.",
+    "11-11 contrarian watch close · 11-13 pc+ kill-review + vb- clone-hunt + linreg-fade · 11-14 stop-tighten eval (SHADOW ids only, source archive+current) + drop-pcplus + bbsqueeze reband + mult-150 + TAT-age-sweep · 11-15 floor · 11-19 jup HIGH OOS · 11-21 conf-tilt + scope-widen walk.",
+    "CEO: mult-150 sign-off (evidence decayed) · unclog-waiver EXPIRY re-measure [35,45) (expired 11-03, still owed)."
   ],
-  "readiness": "3 open LONGS (SOL jup_yolo_mirrored 4.2h -0.12% SL0.60%; IMX continuation+ 0.4h +0.67% SL0.48%; ARB atr-trend+ 0.4h +0.14% SL1.01% — out-of-stop-tighten-scope by design, source not in tuple) — all bracketed, HOLD. Watchdog steers: IMX+ARB cluster + portfolio 3-long (warnings, non-auto). Regime: btc_15m LONG_BIAS vs btc_4h SHORT_BIAS = DISAGREE = chop, continuum AT, vol LOW, velocity SLOW, volume LOW, trend_quality STRONG_DOWN -> NO fresh counter-trend entries; trail-family first; LONGs only on sustained EMA300 reclaim WITH volume; size 1.0x (vacation_size_reduce.json absent = 1.0x). 0 pending checkpoints."
+  "readiness": "1 open: MON volume-buildup- SHORT #16828 +0.18% (0.1h), bracketed SL 0.016161 / TP 0.015516. 0 steers, portfolio good. Regime 15m NEUTRAL vs 4h SHORT_BIAS, continuum BELOW, vol NORMAL, wyckoff ACCUMULATION, market CALM, trend_quality UP. HOLD; trail-family first; no fresh counter-trend entries; size 1.0x."
 }

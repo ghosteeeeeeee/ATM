@@ -6478,6 +6478,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
         log(f"Compaction done in {elapsed:.2f}s — {len(hotset_output)} tokens in hotset")
 
         # Purge executed signals older than 1 hour (keeps DB lean)
+        # TWO-TIER PURGE (do not re-open as a defect — audit #241, 2026-11-09):
+        #   tier 1 (here): fast-path 1h EXECUTED/FAILED + 2h EXPIRED/SKIPPED where executed=0.
+        #   tier 2: scripts/archive-signals.py (hermes-archive-signals.timer 04:00Z) archives
+        #     decision IN (SKIPPED,EXPIRED,EXECUTED,COMPACTED,WAIT,FAILED) older than 336h (14d)
+        #     to archive/signals/signals_YYYY-MM.jsonl.gz (decision_reason preserved) then DELETE+VACUUM.
+        #   sweep-expired rows (decision='EXPIRED' AND executed=1) match NEITHER tier-1 purge and are
+        #   therefore called "zombies" — tier 2 already covers them at 14d. That is the retention
+        #   window, not a leak: runtime DB min(created_at) stays ~15d old. Do NOT extend tier-1 WHERE.
         if purge_executed:
             _purge_executed_signals(hours=1, dry=dry)
             _purge_stale_unexecuted(hours=2, dry=dry)

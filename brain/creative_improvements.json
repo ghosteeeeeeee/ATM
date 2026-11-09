@@ -10870,5 +10870,14 @@
     "category": "entry sniper",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-09T00:50:00Z",
+    "idea": "Two-tier purge ownership documented in signal_compactor.py (zombie-purge DECIDE resolved NO CHANGE with root cause)",
+    "rationale": "The signal-zombie-purge DECIDE sat open 11 days (10-29 -> 11-09) chasing a defect that archive-signals.py already handles: tier-2 archiver covers decision=EXPIRED/executed=1 rows at 336h (14d) with decision_reason preserved in gzipped JSONL, then DELETE+VACUUM. Runtime DB min(created_at)=2026-10-25 proves the 14d retention is live. Two prior investigations (facbf027 + audit #241) re-derived the same gap because the two purge tiers do not reference each other.",
+    "expected_impact": "Prevents re-opening an already-adjudicated hygiene DECIDE; zero trading behavior",
+    "category": "hygiene / root-cause",
+    "status": "shipped",
+    "risk": "none (comment only)"
   }
 ]
