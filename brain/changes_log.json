@@ -3946,5 +3946,38 @@
     "after": "WR leg unchanged + RR-BLINDSPOT shadow print (promotion criteria pre-registered in-file)",
     "rationale": "HYPE: WR-leg passed at 54.9% while netting -0.54/7d; flags it exactly on 11-03 (T manual blacklists same day). 21d snapshot validation = 2 BTC flags fwd-flat -> enforcement too noisy, shadow first",
     "impact": "zero trading behavior; hourly journal gains an audit line; promote to auto-blacklist only per in-file criteria + CEO sign-off"
+  },
+  {
+    "timestamp": "2026-11-09T21:01:45Z",
+    "agent": "brain_auditor",
+    "change": "11-10 disposition batch adjudicated early (8 entries): gate-dedup DONE, rsi-ceiling-75 KEEP, fade-ctx FAIL-CLOSED shadow-only, conf-99 KEEP-SHADOW, jup-atrsl KEEP+db-drift FLAG, ichimoku/dampen KILL+floor COLLECT, mfe-cut EXTEND→11-14, uninert EXTEND→11-14",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "9 entries open due 11-10",
+    "after": "4 done, 2 extended to 11-14, 3 closed with disposition text",
+    "rationale": "Deadlines land 00:00Z 11-10; adjudicate with fresh PG data before runner fires defaults blindly",
+    "impact": "Prevents wrong default (KILL mfe-cut would destroy 11-14 prearm feeder; uninert fail on n=39 would be noise)"
+  },
+  {
+    "timestamp": "2026-11-09T21:01:45Z",
+    "agent": "brain_auditor",
+    "change": "Exited wrong-side BTC SHORT #16838 via close_position.py (manual_close) — structure flipped LONG_BIAS against entry, never armed (mfe 0.00), MFE-CUT/TAT both would-fired",
+    "type": "trade",
+    "file": "trades",
+    "before": "open SHORT entry 74622, ~-0.29% unrealized, 2.3h hold",
+    "after": "closed exit 74888 pnl_usdt -0.06",
+    "rationale": "Watchdog exit-while-above-EMA300 steer + fundamental truth: wrong side of chop; exit early in chop",
+    "impact": "Realized -$0.06; avoided SL at 75181 (-0.75% price); loss cooldown 0.3h armed"
+  },
+  {
+    "timestamp": "2026-11-09T21:01:45Z",
+    "agent": "brain_auditor",
+    "change": "AMPLIFY: registered amplify-structure-flip-early-exit (kind=amplify, due 11-21, NO-SHIP default)",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "no structure-flip exit shadow",
+    "after": "log-only shadow proposal with units-guarded bar",
+    "rationale": "Weekly AMPLIFY mandate; exit-side axis untested while entry-side filters all fail fk",
+    "impact": "Shadow only until bar met; zero trading behavior"
   }
 ]

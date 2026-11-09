@@ -10930,5 +10930,23 @@
     "category": "regime",
     "status": "rejected-with-data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-11-09T21:01:45Z",
+    "idea": "Structure-flip early-exit for never-armed trades (AMPLIFY amplify-structure-flip-early-exit registered)",
+    "rationale": "Chop-bleed 93.4% dollar share = never-armed entries. Entry-side filters all fail fk bar (#228 negative result reproduced: RSI/gap/conf/z all kill 30-50% of armed). Untested axis = structure changing MID-HOLD: #16838 short entered aligned (below EMA300), structure flipped LONG_BIAS, MFE-CUT would-fire at -0.22% vs realized -0.36%. 14d never-armed losers avg -0.179, exit reasons atr_sl 16 + hard_max 16 = wait-for-SL is the default bleed path.",
+    "expected_impact": "+$2.00/30d if bar met (pre-registered); at minimum converts stall-bleed into structure-aware cut",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low (shadow-first, log-only until bar met)"
+  },
+  {
+    "date": "2026-11-09T21:01:45Z",
+    "idea": "REJECTED-WITH-DATA: counter-trend_quality entry filter (contra-at-entry blocks)",
+    "rationale": "14d: aligned 265T 141W net -1.58 vs contra 113T 63W net -1.54 — zero separation. Winners counter-trend at entry = 63T +3.58. Structure-at-entry does not predict outcome; do not re-propose LONG-block-on-STRONG_DOWN (blanket version also failed earlier: would block 77/156 winners).",
+    "expected_impact": "n/a — prevented a bad filter",
+    "category": "negative result",
+    "status": "rejected-with-data",
+    "risk": "n/a"
   }
 ]
