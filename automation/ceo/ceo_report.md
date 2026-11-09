@@ -1154,3 +1154,15 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 15T -0.29 46.7% | 7d 148T -1.87 54.7%
 ### Findings: disk 85% (recurring WARN); regime-specialist scan (30d, n>=8): EXTREME cells dominate the bleed — ai-trader+ 15T 20% -0.90, pump-chain- 30T 23.3% -0.50, volume-breakout-long+ 9T 0% -0.63; jup_yolo_mirrored NORMAL/HIGH ~59% WR but still -0.62/-0.43 (payout, not entry). Control tower: 1 item due <=24h (signal-zombie-purge, silent default = leave).
 ### Recommendation: clean up disk (log rotation on hl-copy/signal-compactor err logs) before it trips 90%; no trade/param action.
+
+## CEO Status — 20261109T071840Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 16T -0.36 37.5% | 7d 140T -1.66 54.3%
+### Findings: disk 85% WARN (3x since 04:34Z); control_tower DUE≤24h `signal-zombie-purge` already resolved NO CHANGE per audit #241; rotating Q (regime-specialists, 9%14=9): 14d n>=8 cells show no actionable specialist — jup_yolo_mirrored FLAT 12T 83.3% +0.26 (n<20 COLLECT), bb-squeeze+ NORMAL 65.6% vs HIGH 58.3% (both positive, no action); 24h WR 37.5% is small-n chop, not a metric anomaly.
+### Recommendation: rotate/compress logs (hl-copy.err.log known 28MB unrotated) before disk crosses 90%.
+
+## CEO Status — 20261109T111840Z
+### Health: pipeline=active (timer race: 11:19 run active) guardian=active open_pos=0
+### Numbers: 24h 15T -0.14 46.7% | 7d 138T -1.71 55.1%
+### Findings: clean — disk 86% WARN (repeated); 7 regime-specialist Q: NORMAL 66T 63.6% +0.44 is the only positive regime; EXTREME 17T 35.3% -0.73 worst; chop-bleed still ≥92% (owned, queued 11-10+)
+### Recommendation: clean disk (logs/err.log rotation) — nothing else actionable in a read-only run

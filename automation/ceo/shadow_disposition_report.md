@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-08T19:18:59.245547+00:00
-registry: 96 entries (open=48)
+# Shadow disposition report — 2026-11-09T08:15:00.132011+00:00
+registry: 97 entries (open=48)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -8,10 +8,12 @@ registry: 96 entries (open=48)
 - DONE shadow-trader-bypass: KILL — question answered, kills validated (no FLIP) (2026-10-31)
 - DONE expiry-t5-shadow: SPLIT: KEEP expiry (fwd97.1% = threshold met, LONG protective -0.185%/ev) / KILL t5 (collector stopped) (2026-10-31)
 - OPEN mfe-cut-arm-be: deadline=2026-11-10T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for mfe-cut-arm-be
 - DONE relative-regime: KILL — dead collector (counterfactual never existed) (2026-10-31)
 - DONE rr-engine-shadow: KILL — stale collector, stop citing as evidence (2026-10-31)
 - DONE chase-ratio: KILL — executed at consumption (gate inert) (2026-10-31)
 - OPEN ichimoku-dampen-flooradmit: deadline=2026-11-10T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for ichimoku-dampen-flooradmit
 - DONE volmom-volbreak: KEEP (?)
 - DONE tc-temporal-confluence: KILL (2026-10-27)
 - DONE mom-filter-shadow: KILL (2026-10-27)
@@ -25,14 +27,17 @@ registry: 96 entries (open=48)
 - DONE ugb-pt-045: KEEP 0.45 — threshold PASS (7d avg 0.0574 > baseline-0.30 avg 0.0442, n=19>=10; sum +1.09 vs prior +0.53) (2026-11-03T04:55:46Z)
 - DONE disposition-cadence-revert: REVERT EXECUTED (claimed 04:55Z) BUT FILES WERE STILL DAILY — brain_auditor #218 found config+/etc OnCalendar=*-*-* 08:15:00 at 20:57Z, actually reverted both to Mon *-*-* 08:15:00 + daemon-reload. Next fire: Mon 2026-11-09 08:15Z. Status stays done. (2026-11-03T04:55:46Z)
 - OPEN fade-ctx-exempt: deadline=2026-11-10T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for fade-ctx-exempt
 - OPEN winner-cell-size-125: deadline=2026-11-10T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for winner-cell-size-125
 - DONE bb-squeeze-hml-entry-profile: NO-CHANGE (report-only, per threshold) (2026-10-29)
 - DONE amplify-weekly-mandate: MET 2026-11-02 (Monday weekly run): 30d winner-cell screen re-run (6 cells n>=10 net>0 — 4 VALIDATED, 2 OOS why-not'd), new proposal amplify-pc-fade-cell-split emitted, why-nots documented in kanban. Flip-KPI: 0 new conversions this run; in-flight watch-contrarian-live (11-03), storm-waiver (11-12). (?)
 - DONE fade-volgate-split-analysis: VALID — exemption candidate cleared (CEO rule met) (2026-10-29)
 - DONE fade-btc-crash-postflip: KEEP PERMANENT — full 24h read 2026-11-06T00:45Z: 9 unique crash=BLOCKED pump-chain- fade lines, coherence NO=5 YES=4 (56% NO) = STILL INCOHERENT; stage=crash-gate n=1 (ANIME WOULD-ALLOW vs live KILL), stage=inversion n=8 split 4/4. Per protocol (count only crash=BLOCKED, pump-chain- fade scope): NOT direction-coherent -> close KEEP pre-flip permanent per pre-registered default. Hoist NOT shipped. (2026-11-06T00:47:12.481255+00:00)
 - OPEN storm-confl-waiver: deadline=2026-11-12T00:00:00Z | (no parseable source)
+- OPEN linreg-fade-storm-admission-shadow: deadline=2026-11-12T00:00:00Z | (no parseable source)
 - OPEN storm-readiness-packet: deadline=2026-11-12T00:00:00Z | (no parseable source)
-- OPEN signal-zombie-purge: deadline=2026-11-09T00:00:00Z | (no parseable source)
+- DONE signal-zombie-purge: NO CHANGE (default action confirmed) — root cause materially better than the framing: the 'zombies' (decision='EXPIRED' AND executed=1) are already covered by the SECOND tier of a two-tier purge. scripts/archive-signals.py (daily hermes-archive-signals.timer 04:00Z) archives decision IN ('SKIPPED','EXPIRED','EXECUTED','COMPACTED','WAIT','FAILED') older than CUTOFF_HOURS_OTHERS=336h (14d) to /root/.hermes/archive/signals/signals_YYYY-MM.jsonl.gz — decision_reason FULLY PRESERVED — then DELETE+VACUUM. So option (a) retention>=14d AND option (b) archive-preserve are BOTH ALREADY IMPLEMENTED; the compactor's _purge_executed_signals (1h, EXECUTED/FAILED only) and _purge_stale_unexecuted (2h, executed=0 only) are just the fast-path. EVIDENCE: runtime DB min(created_at)=2026-10-25 (16,161 rows, nothing older than ~15d despite ~1000 zombies/day) and archive/signals/{2026-08,2026-09,2026-10,2026-11}.jsonl.gz all present. The ~15.9k 'zombies' are simply the in-retention-window forensic cohort = by design. Forensic history NOT at risk. No purge code change. 3-line ownership comment added to signal_compactor.py so this DECIDE is not re-opened. (2026-11-09T00:45:00Z)
 - DONE momentum-cache-regime-coverage: DONE — re-measured 2026-11-06T00:45Z after #225 universe fix + #226 STALE_THRESHOLD 32400: recent-traded universe n=65, fresh<4h=65 (100%), fresh<9h=65 (100%), 0 missing, 0 stale. Bar >=90% PASS. SQLite momentum_cache.db remains 0-byte orphan (PG source of truth, by design). (2026-11-06T00:47:12.481255+00:00)
 - DONE pump-detect-ceiling-mismatch: NO-CHANGE — replay NEGATIVE, both options dead, caps stand (2026-10-30)
 - DONE override-vs-ceiling-contradiction: RESOLVED by replay: ceiling owns 75+ (band dead 3T 0% −$0.47); override claim-text fixed, behavior unchanged (2026-10-30)
@@ -44,6 +49,7 @@ registry: 96 entries (open=48)
 - OPEN reentry-study: deadline=2026-11-21T00:00:00Z | (no parseable source)
 - DONE chase-move-shadow: KILL (2026-10-31)
 - OPEN conf-filter-parity-split: deadline=2026-11-10T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for conf-filter-parity-split
 - DONE ichimoku-bypass-lowjoin-ticket: KILL executed — ICHIMOKU_LONG_BYPASS_ENABLED=False (join 0.15% below floor) (2026-11-04)
 - DONE stop-asymmetry-highwr: SHIP-TO-SHADOW — SL at 1.0% price passes bar on both signals (WR not down); shadow-first spec delivered, NO live change (2026-10-31)
 - DONE short-relax-shadow-study: AGGREGATE UNATTRIBUTABLE — accept base rates (2026-10-31)
@@ -60,14 +66,17 @@ registry: 96 entries (open=48)
 - DONE jup-hml-shadow-065-050: REJECT — pre-registered eval ran 2026-11-02 (n=84): hml65 net -$0.30, hml50 net -$0.42 vs baseline +$1.44 → both REJECT, no enforce (verdicts stable across re-runs). Registered retroactively 2026-11-03 (was unregistered — chase-move-shadow governance-gap class). (2026-11-02)
 - OPEN jup-trail-shadow-1xatr: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN jup-atrsl-shadow-parity: deadline=2026-11-10T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for jup-atrsl-shadow-parity
 - OPEN short-regime-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN flip1-bear-override-reshadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - DONE ichimoku-short-pause: PAUSED — 0 fills/7d waste; re-enable only on backtest (2026-11-03)
 - OPEN rsi-ceiling-75-live: deadline=2026-11-10T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for rsi-ceiling-75-live
 - OPEN bear-single-source-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN volgate-short-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN maxxed-short-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN gate-shadow-dedup-convention: deadline=2026-11-10T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for gate-shadow-dedup-convention
 - OPEN long-bypass-regime-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - DONE short-shadow-join-builder: EVAL (2026-11-06)
 - DONE timer-cadence-recheck: RE-DAILY EXECUTED — option (a) taken as registered default: OnCalendar back to *-*-* 08:15 (repo + /etc, daemon-reload + timer restart verified). Rationale: weekly (Mon-only, from disposition-cadence-revert) could not honor 11-05/11-06/11-07 reads incl. the 11-07 fold-line packet; calendar now has 6+ deadlines 11-07..11-17. Re-evaluate cadence when calendar is sparse (new entry needed then). (2026-11-04)
@@ -85,7 +94,8 @@ registry: 96 entries (open=48)
 - OPEN btc-standalone-deny-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN setup-recall-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN linreg-fade-fill-funnel: deadline=2026-11-13T00:00:00Z | (no parseable source)
-- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-10T00:00:00Z | data/combo_weights.json: 65 rows, 0.6d
+- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-10T00:00:00Z | data/combo_weights.json: 65 rows, 0.1d
+  -> DECISION DUE within 24h for amplify-bbsqueeze-warrior-uninert
 - OPEN amplify-bbsqueeze-neutral-exempt: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN atr-trend-accel-shadow: deadline=2026-12-06T00:00:00Z | (no parseable source)
 - OPEN amplify-prearm-breakeven-lock: deadline=2026-11-14T00:00:00Z | (no parseable source)
