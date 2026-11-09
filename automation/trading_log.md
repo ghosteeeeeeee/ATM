@@ -23382,3 +23382,40 @@ BY: auto_1hr
 - 7d -.91 structural RED unchanged
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## FAVORITES Update — 2026-11-09 06:00 UTC
+- Regime: SHORT_BIAS
+- DEMOTE CAKE (inactive 7d, no trades)
+
+Final set: ['BTC', 'FIL']
+
+## LOSERS Update — 2026-11-09 06:05 UTC
+- ADD ETH (WR=45.5%, PnL=$-0.58, negative_pnl ($-0.58))
+
+Final set: ['ETH']
+
+## [2026-11-09 06:21] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.02 (WR: 0.0% hour; 24h 16T 37.5% -$0.36 RED | 7d 141T 53.9% -$1.76 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 2 closes (both BTC ai-trader-pending SHORT manual_sl_hit -$0.01 each), 0 opens, 1 open (WLFI atr-trend- SHORT)
+- Kill check: 0%WR 24h n>=3 = jup_yolo_mirrored 3T 0W -$0.39 -> regime check: WINS in all 4 14d regimes (56.7-78.6%) -> keep alive per policy. ai-trader-pending 3T 0W but n=4 in 14d (n<20, manual CEO signal) -> keep. warrior-sr-confirm+ 2T n<3
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/16 = 18.75% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (max n=3; atr-trend- 2T 2W +$0.24 but n<5)
+- Neg streak: hrs w/ closes 21h +0.06, 23h -0.01, 00h +0.03, 01h -0.08, 06h -0.02 — longest run 2 consecutive entries, not 3 -> no size cut
+- Frequency: 2 closes/hr, 0 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.215% max 0.379% (6/6 <0.5%) -> OK
+- No storm (window-min -0.31% / at-run -0.29%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR slipped to 37.5% -$0.36 (was 42.9% -$0.34 at 05:21) — 2 more jup_yolo/ai-trader losses; jup_yolo still wins all regimes, no kill
+- 7d -$1.76 structural RED (improving from -$1.91)
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr

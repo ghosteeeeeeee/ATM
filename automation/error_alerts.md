@@ -3356,3 +3356,13 @@
 
 ## Error Alerts — 2026-11-09 04:34 UTC
 - **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-09 05:19 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+
+## Error Alerts — 2026-11-09 05:34 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-09 06:34 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
