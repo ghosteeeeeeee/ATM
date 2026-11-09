@@ -178,6 +178,13 @@ def update_trail(pos: dict, direction: str, current_price: float,
 
     state = _load_state()
     st = state.get(str(trade_id)) or {}
+    # Structure-fixed stop (CEO 2026-11-09): the order was armed with
+    # "dynamic_sl": false — the watchdog's full-analysis tweak owns this
+    # SL (stop stays above break-of-structure to survive the retest);
+    # BE-lock and trail must not touch it. Flag written at fire time by
+    # trade_watchdog._execute_pending_order.
+    if st.get('dynamic_sl') is False:
+        return False
     peak_frac = st.get('peak_frac')
 
     decided = decide_sl(direction, current_price, entry_price, old_sl,

@@ -210,10 +210,15 @@ arming rule 9) — report it, it feeds the slip-buffer sizing.
 
 ## Conditional (Pending) Orders — arming rules
 
-Config: `/root/.hermes/data/pending_orders.json`. Engine: trade_watchdog
-cycle (~30min) monitors price, fires via `brain.py trade add` with
-`ai-trader-pending` (NO `--manual` → vacation pause still gates). One-shot:
-fires once, never re-arms; orphaned `triggered` state surfaces as an urgent
+Config: `/root/.hermes/data/pending_orders.json`. **Execution cadence:
+the pipeline runs `pending_order_monitor` FIRST every ~1 minute** (CEO
+directive 2026-11-08: fills within the minute, not on the watchdog
+clock) — it shares trade_watchdog's monitor/execute path and autopilot
+gate; the 30-min watchdog cycle monitors too (one-shot state makes the
+double caller safe). Fires via `brain.py trade add` with
+`ai-trader-pending` (NO `--manual` → vacation pause still gates) plus
+`--force` for CEO tranches. One-shot: fires once, never re-arms;
+orphaned `triggered` state surfaces as an urgent
 steer after 15min (re-arm = delete the state entry). Verify any armed order
 with the engine on a temp state path — never the live state file.
 
@@ -286,6 +291,19 @@ with the engine on a temp state path — never the live state file.
     structure — was the stopper. When late: wait for the RETEST of the
     broken level with a reclaim/fail confirmation, never arm the flush
     itself.
+12. **Break-continuation entries: `"dynamic_sl": false` + the structure
+    stop** (CEO 2026-11-09, #16827). The BE/trail stack tightens INTO
+    the retest zone — it stopped #16827 at breakeven-ish 45 minutes
+    before the move resolved. Order field `dynamic_sl: false` hands SL
+    authority to the watchdog's full-analysis tweak (every 30-min cycle):
+    the stop sits just BEYOND the 15m swing (retest ceiling/floor),
+    capped at ±0.5% from entry, and rule-10 snaps any void-TP into the
+    first opposing structure. Guardian/max-hold still apply. Use this
+    for floor/breakdown and breakout-continuation arms — BE/trail stays
+    the default for everything else. (Counterfactual noted honestly:
+    on #16827 itself the trail's exit beat the structure stop by
+    ~1.7pts-of-margin — the fake-out resolved UP; the rule is for when
+    the retest precedes the REAL leg.)
 
 **Tranche adds to an existing position:** brain.py's duplicate guard blocks
 a second same-coin open — for a CEO-directed add pass `--force`

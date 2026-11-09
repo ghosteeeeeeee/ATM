@@ -33,7 +33,9 @@ LOCK    = '/tmp/hermes-pipeline.lock'
 # All master *_ENABLED flags in hermes_constants.py are False; signal_gen was doing
 # expensive computation (get_all_latest_prices, compute_regime, get_momentum_stats)
 # for zero signal output. signals_runner is now the canonical path.
-STEPS_EVERY_MIN  = ['signal_analyst', 'breakout_engine', 'signals_runner', 'decider_run', 'position_manager', 'hermes-trades-api']
+# pending_order_monitor FIRST (CEO directive 2026-11-08): armed conditional
+# orders must fill on THIS cycle (~1 min), not wait for the 30-min watchdog.
+STEPS_EVERY_MIN  = ['pending_order_monitor', 'signal_analyst', 'breakout_engine', 'signals_runner', 'decider_run', 'position_manager', 'hermes-trades-api']
 # price_collector: removed 2026-04-25
 #   - Was firing BOTH via run_pipeline.py AND via hermes-price-collector.timer
 #   - Lock caused ~0.3% skip rate from collision
@@ -51,6 +53,7 @@ STEP_TIMEOUTS = {
     'decider_run': 360,
     'signal_analyst': 30,     # score hotset signals, must be fast
     'position_manager': 120,
+    'pending_order_monitor': 60,  # conditional-order fills must stay fast
     'strategy_optimizer': 300,
     'ab_optimizer': 300,
     'shadow_signals_runner': 180,  # shadow-mode signal detection (T directive 2026-10-22)

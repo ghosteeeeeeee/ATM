@@ -1429,6 +1429,24 @@ def _execute_pending_order(order):
             "trade": trade_ref,
             "output_tail": out[-400:],
         }
+        # Structure-fixed stop (CEO directive 2026-11-09, #16827 lesson):
+        # orders armed with "dynamic_sl": false hand SL authority to the
+        # watchdog full-analysis tweak (stop stays above break-of-structure
+        # so retests don't kick the trade out before the real leg) — the
+        # BE/trail stack skips these trades entirely. Flag must live in
+        # manual_exit_manager's state too (keyed by TRADE id, not order id).
+        if order.get("dynamic_sl") is False:
+            state[oid]["dynamic_sl"] = False
+            if trade_ref and trade_ref.lstrip('#').isdigit():
+                try:
+                    import manual_exit_manager as _mxm_flag
+                    _mstate = _mxm_flag._load_state()
+                    _mstate[trade_ref.lstrip('#')] = {
+                        'dynamic_sl': False, 'ts': time.time()}
+                    _mxm_flag._save_state(_mstate)
+                except Exception as _e:
+                    log(f"AUTO-EXEC {oid}: dynamic_sl flag bridge failed: {_e}",
+                        "WARN")
         atomic_write_json(PENDING_ORDERS_STATE, state)
         if success:
             log(f"AUTO-EXEC pending order {oid} ✅ opened {trade_ref}", "INFO")

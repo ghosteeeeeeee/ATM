@@ -212,6 +212,175 @@ def pause_checks(cfg, summary):
         summary.setdefault('pause_flag', 'daily_cap')
 
 
+def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
+    """mode=live (spec v2 §2): write a GATED bracket leg into the real
+    pending-orders config — the 1-minute pipeline monitor
+    (pending_order_monitor) executes it. Gates already ran upstream
+    (shape checklist, ITM skip, real R:R >= 1.0). Dedupe: skip when an
+    unfired same-direction order sits within 0.3x 1h-ATR of this trigger
+    (stacking twins from both callers). Returns 'armed'|'covered'|'error'.
+    """
+    path = os.path.join(HERMES_DATA, 'pending_orders.json')
+    try:
+        with open(path) as f:
+            pcfg = json.load(f)
+    except Exception:
+        pcfg = {}
+    orders = pcfg.get('orders') if isinstance(pcfg, dict) else None
+    if not isinstance(orders, list):
+        orders = []
+    dedupe = 0.3 * (atr_1h or 400)
+    for ex in orders:
+        if ex.get('direction') != leg:
+            continue
+        if abs(float(ex.get('trigger_price') or 0) - o['trigger']) < dedupe:
+            return 'covered'
+    tdir = o.get('trigger_dir') or ('above' if leg == 'long' else 'below')
+    new = {
+        'id': order_id,
+        'coin': 'BTC',
+        'direction': leg,
+        'trigger': tdir,
+        'trigger_price': float(o['trigger']),
+        'amount_usdt': round(float(size), 2),
+        'leverage': int(cfg.get('leverage_max', 5)),
+        'sl': float(o['sl']),
+        'target': float(o['tp']),
+        'confidence': 60,
+        'dynamic_sl': False,
+        'note': (f'auto_trader LIVE arm (spec v2 §2, mode=live phase 1, '
+                 f'cycle {order_id}). Gates: shape checklist OK, not ITM, '
+                 f'real R:R >= 1.0 with 0.12%/150pt slip. Mapping: lower '
+                 f'break = SHORT / upper = LONG via trigger_dir={tdir}. '
+                 f'dynamic_sl=false — structure-fixed stop: the watchdog '
+                 f'full-analysis tweak owns the SL (stop beyond retest per '
+                 f'CEO 2026-11-09 #16827 lesson); BE/trail stands down. '
+                 f'Shadow evidence: 18d / 54 resolved hypotheticals.'),
+    }
+    orders.append(new)
+    try:
+        tmp = path + '.tmp'
+        with open(tmp, 'w') as f:
+            json.dump({'orders': orders}, f, indent=1)
+        os.replace(tmp, path)
+        return 'armed'
+    except Exception as e:
+        return f'error:{e}'
+
+
+def tweak_structure_fixed(decision, open_positions):
+    """CEO directive 2026-11-09: when a position is open, each watchdog
+    full-analysis cycle TUNES it — but only structure-fixed trades
+    (dynamic_sl=false: BE/trail stands down, this IS their SL authority).
+
+    Bounded rules, CAS-protected, every write logged:
+      R1 retest survival — a stop sitting INSIDE the retest zone moves
+         just beyond the 15m swing (short: above SH + 0.10 ATR; long:
+         below SL − 0.10 ATR), capped at ±0.5% from entry, and never
+         onto the live price side (no instant self-close).
+      R2 rule-10 TP — a TP overshooting the FIRST opposing structure by
+         more than 1 ATR snaps into it (short: 15m SL + 0.05 ATR;
+         long: 15m SH − 0.05 ATR).
+    Returns tweak dicts for the cycle summary.
+    """
+    tweaks = []
+    sd = (decision.get('structure_detail') or {}).get('15m') or {}
+    sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')
+    if not (sh and sl and atr):
+        return tweaks
+    try:
+        import manual_exit_manager as MXM
+        mstate = MXM._load_state()
+    except Exception:
+        mstate = {}
+    try:
+        import psycopg2
+        from _secrets import BRAIN_PASSWORD, BRAIN_HOST
+        conn = psycopg2.connect(host=BRAIN_HOST, dbname='brain',
+                                user='postgres', password=BRAIN_PASSWORD,
+                                connect_timeout=5)
+    except Exception:
+        return tweaks
+    try:
+        cur = conn.cursor()
+        for pos in open_positions or []:
+            if mstate.get(str(pos.get('id')), {}).get('dynamic_sl') is not False:
+                continue                  # dynamic-trail trade — not ours
+            sig = str(pos.get('signal') or '')
+            if not any(t in sig for t in ('ai-trader-manual', 'ai-trader-pending',
+                                          'ai-trader-auto')):
+                continue
+            entry = float(pos.get('entry_price') or 0)
+            stop = float(pos.get('stop_loss') or 0)
+            target = float(pos.get('target') or 0)
+            price = float(pos.get('current_price') or 0)
+            if not (entry and stop and target and price):
+                continue
+            d = str(pos.get('direction') or '').upper()
+            if d == 'SHORT':
+                # structure + ±0.5% risk cap, then keep the stop ABOVE the
+                # live price (below price = instant self-close for a short)
+                want = min(sh + 0.10 * atr, entry * 1.005)
+                want = max(want, price * 1.001)
+                if want > entry * 1.005:
+                    continue              # price past the cap — no safe write
+                if stop < want:
+                    cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s "
+                                "AND status='open' AND stop_loss=%s",
+                                (round(want, 8), pos['id'], stop))
+                    if cur.rowcount:
+                        conn.commit()
+                        t = {'trade': pos['id'], 'field': 'stop_loss',
+                             'old': stop, 'new': round(want, 8), 'rule': 'R1'}
+                        tweaks.append(t)
+                        DB.log_event('INFO', f"tweak {t}")
+                    stop = want if cur.rowcount else stop
+                if target < (sl - atr):    # deeper than structure by >1 ATR
+                    new_tp = round(sl + 0.05 * atr, 8)
+                    cur.execute("UPDATE trades SET target=%s WHERE id=%s "
+                                "AND status='open' AND target=%s",
+                                (new_tp, pos['id'], target))
+                    if cur.rowcount:
+                        conn.commit()
+                        t = {'trade': pos['id'], 'field': 'target',
+                             'old': target, 'new': new_tp, 'rule': 'R2'}
+                        tweaks.append(t)
+                        DB.log_event('INFO', f"tweak {t}")
+            elif d == 'LONG':
+                # mirror: structure − 0.1 ATR with ±0.5% cap, stop kept
+                # BELOW the live price (at/above price = instant self-close)
+                want = max(sl - 0.10 * atr, entry * 0.995)
+                want = min(want, price * 0.999)
+                if want < entry * 0.995:
+                    continue              # price past the cap — no safe write
+                if stop > want:
+                    cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s "
+                                "AND status='open' AND stop_loss=%s",
+                                (round(want, 8), pos['id'], stop))
+                    if cur.rowcount:
+                        conn.commit()
+                        t = {'trade': pos['id'], 'field': 'stop_loss',
+                             'old': stop, 'new': round(want, 8), 'rule': 'R1'}
+                        tweaks.append(t)
+                        DB.log_event('INFO', f"tweak {t}")
+                    stop = want if cur.rowcount else stop
+                if target > (sh + atr):
+                    new_tp = round(sh - 0.05 * atr, 8)
+                    cur.execute("UPDATE trades SET target=%s WHERE id=%s "
+                                "AND status='open' AND target=%s",
+                                (new_tp, pos['id'], target))
+                    if cur.rowcount:
+                        conn.commit()
+                        t = {'trade': pos['id'], 'field': 'target',
+                             'old': target, 'new': new_tp, 'rule': 'R2'}
+                        tweaks.append(t)
+                        DB.log_event('INFO', f"tweak {t}")
+        cur.close()
+    finally:
+        conn.close()
+    return tweaks
+
+
 def run_cycle():
     """Main entry. Returns a summary dict for the watchdog output/dashboard."""
     cfg = load_config()
@@ -224,7 +393,7 @@ def run_cycle():
     import uuid
     cycle_id = f"{int(time.time())}-{uuid.uuid4().hex[:6]}"
     summary = {'enabled': True, 'mode': cfg.get('mode', 'shadow'),
-               'shadow_armed': []}
+               'shadow_armed': [], 'live_armed': [], 'tweaks': []}
 
     open_positions = get_open_btc()
     if open_positions is None:
@@ -253,6 +422,14 @@ def run_cycle():
     summary['hypo_events'] = events
     for e in events:
         DB.log_event('INFO', f"hypothetical: {e}")
+
+    # 3b LIVE TUNE (CEO 2026-11-09): with a position open, tune its TP/SL
+    # per full-analysis structure — structure-fixed trades only.
+    if cfg.get('mode') == 'live' and open_positions:
+        try:
+            summary['tweaks'] = tweak_structure_fixed(decision, open_positions)
+        except Exception as e:
+            DB.log_event('WARN', f'tweak_structure_fixed failed: {e}')
 
     # 4 JOURNAL + SHADOW-ARM hypotheticals
     if decision.get('decision') == 'BRACKET' and decision.get('bracket'):
@@ -317,14 +494,22 @@ def run_cycle():
                                          f"{_real:.2f} < 1.0 — leg not armed")
                     continue
                 order_id = f"btc-auto-{cycle_id}-{leg}"
+                _live = cfg.get('mode') == 'live'
                 DB.record_order(did, leg, {**o, 'order_id': order_id},
-                                'shadow_armed', size, cfg.get('leverage_max', 5))
+                                'armed' if _live else 'shadow_armed',
+                                size, cfg.get('leverage_max', 5))
                 DB.upsert_hypothetical(
                     {'order_id': order_id, 'direction': leg,
                      'trigger': o['trigger'], 'sl': o['sl'], 'tp': o['tp'],
                      'trigger_dir': o.get('trigger_dir') or
                      ('above' if leg == 'long' else 'below')},
                     decision['regime_state'], size)
+                if _live:
+                    res = _arm_real_leg(order_id, leg, o, size, cfg, h1_atr)
+                    summary['live_armed'].append(f'{leg}:{res}')
+                    DB.log_event('INFO', f"cycle {cycle_id}: live arm "
+                                         f"{order_id} {leg} @ {o['trigger']} "
+                                         f"→ {res}")
             # Truthful report: whatever is armed in DB AFTER this cycle
             summary['shadow_armed'] = [h['order_id'] for h in
                                        DB.get_hypotheticals('armed')]
