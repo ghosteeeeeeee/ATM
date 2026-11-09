@@ -414,6 +414,17 @@ def run_cycle():
     _mt = DB._exec("SELECT new_value FROM self_tuning WHERE parameter='size_mult' "
                    "ORDER BY ts DESC LIMIT 1", fetch='one')
     size = cfg.get('size_usdt', 11.10) * (_mt['new_value'] if _mt else 1.0)
+    # HL MINIMUM NOTIONAL FLOOR (CEO 2026-11-09: "$11 incl. leverage or HL
+    # will not place the order"): brain.py trade-add REJECTS amounts below
+    # HL_MIN_NOTIONAL_USDT (brain.py:550 — a sub-$11 order burns the
+    # one-shot state as an error at fire, never trading). Self-tuning's 0.66
+    # multiplier had armed two $7.33 orders that would have died exactly
+    # that way. Floor wins over the tuned multiplier; mult may still raise.
+    from hermes_constants import HL_MIN_NOTIONAL_USDT
+    if size < HL_MIN_NOTIONAL_USDT:
+        DB.log_event('WARN', f'size {size:.2f} < HL min {HL_MIN_NOTIONAL_USDT} '
+                             f'— floored (tuned mult overridden)')
+        size = HL_MIN_NOTIONAL_USDT
 
     # 3 TRACK existing hypotheticals FIRST (E4 fix: resolve hits before any
     # supersede logic can touch them — a leg crossed this cycle but
