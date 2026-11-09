@@ -23523,3 +23523,29 @@ BY: auto_1hr
 - 7d -$1.73 structural RED
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-09 11:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a hour; 24h 15T 46.7% -$0.14 RED | 7d 138T 55.1% -$1.71 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens, 0 open positions
+- Kill check: jup_yolo_mirrored 3T 0W -$0.39 (regime re-run: wins all 4 14d regimes 56.7-78.6% n=149 -> keep) + ai-trader-pending 3T 0W manual n=4 14d <20 -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/15 = 20.0% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (no signal with n>=5 and net PnL > $0.05)
+- Neg streak: hrs w/ closes 00h +0.03, 01h -0.08, 06h -0.02, 08h +0.02 — longest run 1, not 3 -> no size cut
+- Frequency: 0 closes/hr, 0 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.207% max 0.379% (7/7 <0.5%) -> OK
+- No storm (window-min -0.07% / at-run +0.74%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.14 RED, WR 46.7% — quiet hour, no new data
+- 7d -$1.71 structural RED
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
