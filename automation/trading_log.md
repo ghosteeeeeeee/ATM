@@ -23601,3 +23601,29 @@ BY: auto_1hr
 - 7d -$1.60 structural RED
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-09 14:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a hour; 24h 15T 46.7% -$0.14 RED | 7d 133T 55.6% -$1.45 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 opens, 2 open (SOL jup_yolo_mirrored SHORT, BTC ai-trader-pending LONG)
+- Kill check: jup_yolo_mirrored 3T 0W -$0.39 (14d regimes re-verified: wins ALL 4 — FLAT 83.3% n=12, EXTREME 58.8% n=17, NORMAL 59.3% n=54, HIGH 59.6% n=57 -> keep) + ai-trader-pending 3T 0W -$0.03 (manual CEO, 14d n=4 <20 -> keep)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/15 = 20.0% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (no signal with n>=5 and net PnL > $0.05; max n=3 atr-trend- 3T 3W +$0.26)
+- Neg streak: only 1 of last 8h had closes (08h +0.02) — longest run 1, not 3 -> no size cut
+- Frequency: 0 closes/hr, 0 opens — under 20
+- Entry quality: 24h winners mae_pct avg 0.207% max 0.379% (7/7 <0.5%) -> OK
+- No storm (window-min -0.42% / at-run +0.02%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h -$0.14 RED, WR 46.7% — quiet hour, no new data
+- 7d -$1.45 structural RED
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
