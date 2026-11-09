@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-08T16:44:41Z",
+  "updated": "2026-11-08T23:58:27Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -430,16 +430,30 @@
       "id": "storm-confl-waiver",
       "stream": "STORM_CONFLUENCE_WAIVER (shadow -> enforce): single-type SHORT + storm conditions",
       "kind": "flip",
-      "disposition": "FLIP-PENDING",
+      "disposition": "NO-CONVERT 2026-11-08 (CEO 20261108T230547Z) — keep shadow; the storm bottleneck is the FLOOR, not single-type confluence",
       "status": "open",
       "started": "2026-10-29",
       "deadline": "2026-11-12T00:00:00Z",
-      "evidence": "CEO consult 20261029T2130Z: gate-interaction starvation on the 10-29 dump. Honest replay (RSI>=35 cohort only, first-fire, walk-to-21:06 @$11): 13 blocked shorts = +$8.31 (12W1L), 13/13 touch +0.40% (CONFL 7/+$5.72, HIGH 5/+$2.59) vs 24h PnL -$0.31. 25 RSI<35 siblings correctly knife-killed at exec, NOT counted. HIGH-block carve-out REJECTED (14d 20%WR beats one dump).",
-      "threshold": ">=3 CONSECUTIVE storms (auto_1hr [STORM-READINESS] packets with |BTC 1h|>=1.5%) each showing positive counterfactual; shadow logs [STORM-CONFL-WAIVER-SHADOW] would-pass. Conditions all-of: BTC 1h<=-1.5%, RSI>=35, sibling approval-blocked<=30min.",
+      "evidence": "CEO consult 20261029T2130Z: gate-interaction starvation on the 10-29 dump. Honest replay (RSI>=35 cohort only, first-fire, walk-to-21:06 @$11): 13 blocked shorts = +$8.31 (12W1L), 13/13 touch +0.40% (CONFL 7/+$5.72, HIGH 5/+$2.59) vs 24h PnL -$0.31. 25 RSI<35 siblings correctly knife-killed at exec, NOT counted. HIGH-block carve-out REJECTED (14d 20%WR beats one dump). | VERIFIED (CEO 20261108T230547Z): 0 true fillable storm shorts; WOULD-PASS lines = confluence-stage only, same signal died at short-rsi-hard-floor within 1s (SYRUP RSI26.7, SAGA RSI33.3 <45); storm-short census = 100% floor-blocked (28/28 tokens, 435/435 block lines); the 16.6:1 (92.5 vs 5.6 short-rescue) and +$3.23 came from floor-PASSING shorts — rescued by the ALREADY-LIVE ceiling65-75 relief (33 hits), not the waiver; flip would have produced zero fills (log-noise) plus default-fire breach risk if11-05 cf(0.99) is read as same storm family as11-08(2.92):0/3 positive → default 'keep shadow, NO CONVERSION'.",
+      "threshold": ">=3 CONSECUTIVE storms (auto_1hr [STORM-READINESS] packets with |BTC 1h|>=1.5%) each showing positive counterfactual; shadow logs [STORM-CONFL-WAIVER-SHADOW] would-pass. Conditions all-of: BTC 1h<=-1.5%, RSI>=45 (corrected 2026-11-08 per CEO 20261108T230547Z — was >=35; floor stays 45 so the 35-45 leg was dead text), sibling approval-blocked<=30min.",
       "default_action": "KEEP shadow (do not enforce)",
       "owner": "CEO label + T sign-off 2026-10-29 ('All three')",
-      "notes": "BAR STATUS: packet #1/3 = 10-30 00:44 (STORM-READINESS, cf +$19.58/2h census); packet #2/3 = RETRO for 10-29 armed window 20:41-21:14 (min rolling -2.95%, strict-window replay +$1.18, positive — CEO retro-count ruling 20261030T0030Z; logged in ceo_kanban). ONE MORE positive storm flips the enforce bar (~11-01); deadline 11-12 unchanged. ENFORCE-NOW REJECTED by CEO (tonight's strict armed cf +$0.03 n=2 = thin; pre-arm blocks correctly excluded; BUG-068-class shortcut warning). FIXES SHIPPED 10-30: (a) FAIL(i/ii/iii) debug at every helper exit under shadow; (b) window-peak packet rule (min rolling over prior 60min — instant-sample missed 10-29's window); (c) REACHABILITY HOIST above neutral-relax split (the autopsy find: NEUTRAL/NULL regime_4h fallback tokens never reached the waiver). | BUG-HUNTER FINAL: SAFE TO DEPART (83a7407a, 19/19 + AST 7/7-branch enforce proof + live reachability 51 singles). Pre-flight LOW FIXED same session: gate_msg overwrite guards at neutral-else/final-else (PASS line would print the block reason at enforce). FLIP CHECKLIST ADDITIONS: (4) SHORT_NEUTRAL hard-block continue fires BEFORE the hoisted waiver and writes no tombstone — outside waiver reach by design (condition iii needs rows it can't create); next storm autopsy must check whether armed-window SHORT_NEUTRAL hard blocks exist (0 in the 10-29 window); scope = CEO. (5) ALL-3 PASS log line not SHADOW-gated (pre-existing, decide at flip). | BAR CORRECTION (CEO 20261030T0640Z): bar counts **1/3 not 2/3** — only packet #1 (10-30 00:44, cf +$19.58, touch 25/28) is an emitted packet; the RETRO entry needs re-derivation to CEO's packet format before counting. Enforce HOLD on cadence (act-early pattern explicitly rejected). All later auto_1hr runs = 'no storm'.",
+      "notes": "BAR STATUS: packet #1/3 = 10-30 00:44 (STORM-READINESS, cf +$19.58/2h census); packet #2/3 = RETRO for 10-29 armed window 20:41-21:14 (min rolling -2.95%, strict-window replay +$1.18, positive — CEO retro-count ruling 20261030T0030Z; logged in ceo_kanban). ONE MORE positive storm flips the enforce bar (~11-01); deadline 11-12 unchanged. ENFORCE-NOW REJECTED by CEO (tonight's strict armed cf +$0.03 n=2 = thin; pre-arm blocks correctly excluded; BUG-068-class shortcut warning). FIXES SHIPPED 10-30: (a) FAIL(i/ii/iii) debug at every helper exit under shadow; (b) window-peak packet rule (min rolling over prior 60min — instant-sample missed 10-29's window); (c) REACHABILITY HOIST above neutral-relax split (the autopsy find: NEUTRAL/NULL regime_4h fallback tokens never reached the waiver). | BUG-HUNTER FINAL: SAFE TO DEPART (83a7407a, 19/19 + AST 7/7-branch enforce proof + live reachability 51 singles). Pre-flight LOW FIXED same session: gate_msg overwrite guards at neutral-else/final-else (PASS line would print the block reason at enforce). FLIP CHECKLIST ADDITIONS: (4) SHORT_NEUTRAL hard-block continue fires BEFORE the hoisted waiver and writes no tombstone — outside waiver reach by design (condition iii needs rows it can't create); next storm autopsy must check whether armed-window SHORT_NEUTRAL hard blocks exist (0 in the 10-29 window); scope = CEO. (5) ALL-3 PASS log line not SHADOW-gated (pre-existing, decide at flip). | BAR CORRECTION (CEO 20261030T0640Z): bar counts **1/3 not 2/3** — only packet #1 (10-30 00:44, cf +$19.58, touch 25/28) is an emitted packet; the RETRO entry needs re-derivation to CEO's packet format before counting. Enforce HOLD on cadence (act-early pattern explicitly rejected). All later auto_1hr runs = 'no storm'. | stale-text fixed 2026-11-08: line now distinguishes pending vs bar-met-awaiting-signoff | RSI-clause correction (CEO 20261108T230547Z): registered condition corrected >=35 -> >=45 (floor stays 45; the 35-45 leg was dead text — those signals died at short-rsi-hard-floor <1s later). Code limb (ii) still reads STORM_MIN_RSI=35 (constants stay ADD-only this run; ENFORCE=NO-CONVERT so limb (ii) can never admit) — one-line STORM_MIN_RSI=45 edit available if CEO wants code parity.",
       "revert": "hermes_constants STORM_CONFLUENCE_WAIVER_ENFORCE stays False / SHADOW=False to stop logging"
+    },
+    {
+      "id": "linreg-fade-storm-admission-shadow",
+      "stream": "linreg-fade- SHORT storm-admission counterfactual — [LINREG-FADE-STORM-SHADOW] lines at the short-rsi-hard-floor approval site (scripts/signal_compactor.py, logs/pipeline.log)",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-08",
+      "deadline": "2026-11-12T00:00:00Z",
+      "owner": "CEO",
+      "threshold": "pre-registered band for linreg-fade- (a SHORT family whose RSI runs 25-50 in dumps — floor kills it at <45): shadow would-admit when storm conditions hold (BTC 1h<=-1.5 per STORM_BTC_1H_MOVE_PCT) AND linreg-fade- RSI in [30,45); enforce flip at 11-12 ONLY IF auto-flip policy applies (gate admission with registered default) AND token-day dedup n>=20 AND net >= +$1.00 AND 2/3 positive days; default_action = 'stay blocked (floor holds)'",
+      "default_action": "stay blocked (floor holds)",
+      "evidence": "CEO 20261108T230547Z Q3: the waiver is single-type confluence scope and CANNOT rescue linreg-fade- (it died at a DIFFERENT blocker = the floor); 16.6:1 floor-pass-vs-rescue math; BANANA floor logic holds; this is the real storm-short spring for the 489-block class",
+      "notes": "log-only shadow; floor stays 45 for everyone else; waiver's RSI>=35 clause being corrected to >=45 to remove the dead-text contradiction",
+      "revert": "LINREG_FADE_STORM_SHADOW = False (kills lines only; floor unchanged)"
     },
     {
       "id": "storm-readiness-packet",

@@ -1219,6 +1219,29 @@ STORM_CONFLUENCE_WAIVER_ENFORCE = False
 STORM_BTC_1H_MOVE_PCT = -1.5
 STORM_MIN_RSI = 35
 STORM_SIBLING_WINDOW_MIN = 30
+# RULING (CEO 20261108T230547Z, storm-latch package): floor stays 45 and the
+# waiver's registered RSI>=35 clause was corrected to >=45 in
+# data/shadow_disposition.json (storm-confl-waiver threshold) — 35-45 died at
+# short-rsi-hard-floor <1s later, so that leg was dead text. STORM_MIN_RSI
+# value UNCHANGED this run (constants stay ADD-only); ENFORCE=NO-CONVERT so
+# limb (ii) can never admit regardless. One-line STORM_MIN_RSI=45 edit is
+# available if CEO wants code parity with the registered clause.
+
+# ── linreg-fade storm-admission SHADOW (CEO 20261108T230547Z) ───────────────
+# Log-only counterfactual at the SHORT-RSI-HARD-FLOOR approval site
+# (signal_compactor._linreg_fade_storm_shadow): a linreg-fade- SHORT sitting
+# in the storm band while the BTC storm limb holds would be the real
+# storm-short spring for the 489-block class — the floor STILL blocks it
+# (identity outcome preserved; this flag never admits anything).
+# polarity: True => emit [LINREG-FADE-STORM-SHADOW] lines (zero behavior
+# change, ENFORCE=False — NO enforce flag exists; enforcement would be a
+# future registered flip, not this one); False => no lines.
+# Bar: enforce flip at 11-12 ONLY IF auto-flip policy applies (gate admission
+# with registered default) AND token-day dedup n>=20 AND net >= +$1.00 AND
+# 2/3 positive days; deadline 2026-11-12; registry ref:
+# data/shadow_disposition.json id linreg-fade-storm-admission-shadow.
+# revert: LINREG_FADE_STORM_SHADOW = False (logging off, zero behavior).
+LINREG_FADE_STORM_SHADOW = True
 
 # ── Chase-Move Shadow Gate (brain_auditor 2026-10-27, run #188) ─────────────
 # The CHASE gap/z gate is LONG-only and gap-anchored (2.0%); CHASE_RATIO above

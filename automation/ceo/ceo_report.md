@@ -1142,3 +1142,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 2. ATR_SL_MIN hill peaks at 0.017 — tune candidate, must go through gates + T approval.
 3. SPEED_MIN verdict underpowered — re-run neighbor_step_sweep.py in ~30d for a powered read.
 ### Note: run classed incomplete rc=1 — died after writing decision, before dispatch/aggregation; B re-dispatched fresh from checkpoint, aggregation done by session parent.
+
+## CEO Status — 20261108T231839Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 15T -0.07 53.3% | 7d 152T -1.50 56.6%
+### Findings: clean — error_alerts only shows momentum/contagion entry BLOCKs (gates working) + 5x CASHCAT signal rollbacks (retry-loop guard, no trade); 56.6% WR on negative 7d PnL = small winners/large losers, not a query artifact. Control tower: 1 item due ≤24h — `signal-zombie-purge` (11-09, T-owned; silent = leave zombies).
+### Recommendation: none — regime check (rotating Q: 8 mod 14 = "What regime are we in?") reads 15m LONG_BIAS vs 4h SHORT_BIAS = disagree/chop, vol LOW → current no-fresh-entries stance is correct.

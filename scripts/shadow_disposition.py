@@ -42,6 +42,27 @@ default_action}. This runner:
                              item due <=7d with owner + tower freshness — the
                              calendar-drives-action layer that warns BEFORE the
                              daily 24h packet and the deadline default.
+  8. auto-flip packet      -> AUTO-FLIP POLICY (CEO 20261108T230547Z): gate
+                             admissions with registered defaults auto-flip via
+                             this packet (flag flip = one-line constants edit
+                             on receipt, no waiting for a human to read at
+                             2am); money-sizing/mults/protected flags NEVER
+                             auto-flip. Opt-in: an entry carries
+                             auto_flip_flag = '<HERMES_CONSTANTS_FLAG>' plus a
+                             bar evaluator (auto_flip_check preferred, else
+                             threshold_eval — for an opt-in entry the
+                             evaluator's True means bar MET). When the bar is
+                             MET the runner emits ONE loud [AUTO-FLIP-READY]
+                             kanban packet (state-deduped, fires once) and
+                             NEVER touches hermes_constants.py itself — that
+                             file is human/CEO-owned and imported at process
+                             start, so the actual flip stays a reviewed
+                             one-line constants edit executed by the
+                             parent/CEO on receipt of the packet. No registry
+                             entry carries auto_flip_flag today
+                             (storm-confl-waiver ruled NO-CONVERT
+                             20261108T230547Z; mechanism ships ready, entries
+                             opt in later).
 
 Robustness contract (code review 2026-10-27 MED-4/5/6/7, LOW-1/5):
   - dedupe keys are applied ONLY after a successful kanban append (a failed
@@ -413,6 +434,57 @@ PROGRESS_EVALS = {
 }
 
 
+def auto_flip_bar(entry):
+    """(breached, detail) for an auto-flip entry's bar, or (None, why).
+
+    Evaluator resolution: the entry's own `auto_flip_check`
+    (THRESHOLD_EVALS style, preferred — write it with POSITIVE semantics:
+    True = bar MET), else its `threshold_eval` (existing mechanism; an
+    auto-flip opt-in must only reuse it when True there also means bar MET).
+    No evaluator / unknown name / evaluator error -> (None, why): the packet
+    is skipped and reported — a wiring gap can never fire a false flip
+    packet (the #102 class). Never raises.
+    """
+    name = entry.get('auto_flip_check') or entry.get('threshold_eval')
+    if not name:
+        return None, 'no evaluator (threshold_eval/auto_flip_check) — bar unknowable'
+    fn = THRESHOLD_EVALS.get(name)
+    if fn is None:
+        return None, f'unknown evaluator {name!r}'
+    try:
+        breached, detail = fn(entry)
+    except Exception as ex:
+        return None, f'evaluator {name} error: {type(ex).__name__}: {ex}'
+    return bool(breached), str(detail)
+
+
+def auto_flip_packet(entry, st, now_iso, breached, detail):
+    """(kanban_line, state_value) for a bar-met auto-flip entry, else
+    (None, None). Pure — selfcheck calls it with fixtures.
+
+    Fires ONCE per entry (state key auto_flip_fired); the caller queues the
+    state write only after a successful kanban append (the MED-4
+    append-success-only contract). The line is deliberately loud and
+    actionable — it names the exact one-line constants edit; the runner
+    itself never edits hermes_constants.py.
+    """
+    flag = entry.get('auto_flip_flag')
+    if not flag or entry.get('status') != 'open' or st.get('auto_flip_fired'):
+        return None, None
+    if not breached:
+        return None, None
+    line = (
+        f'- [{now_iso}] shadow-disposition: 🔄 [AUTO-FLIP-READY] '
+        f'{entry.get("id", "?")} bar met — flip {flag} now (one-line command: '
+        f'set {flag} = True in scripts/hermes_constants.py) | {detail} | '
+        f'AUTO-FLIP POLICY (CEO 20261108T230547Z): gate admissions with '
+        f'registered defaults auto-flip via this packet (flag flip = one-line '
+        f'constants edit on receipt, no waiting for a human to read at 2am); '
+        f'money-sizing/mults/protected flags NEVER auto-flip. Registry: '
+        f'data/shadow_disposition.json')
+    return line, now_iso
+
+
 def main():
     reg = _load(REGISTRY, None)
     if not reg or 'entries' not in reg:
@@ -524,6 +596,30 @@ def main():
                                 f'{detail}. Default action: '
                                 f'{e.get("default_action", "(registry missing default_action)")}. '
                                 f'24h CEO clock to revert or override with evidence.')
+
+            # ── auto-flip packet (AUTO-FLIP POLICY, CEO 20261108T230547Z) ──
+            # Gate admissions with a registered default: bar MET -> ONE loud
+            # kanban packet (fires once, state-deduped) instead of waiting for
+            # a human to read at 2am. The runner NEVER edits
+            # hermes_constants.py (human/CEO-owned, imported at process start)
+            # — the actual flip stays a one-line constants edit executed by the
+            # parent/CEO on receipt. Opt-in field auto_flip_flag; no entry
+            # carries it today (storm-confl-waiver is NO-CONVERT — mechanism
+            # ships ready, entries opt in later).
+            if e.get('auto_flip_flag') and status == 'open':
+                af_breached, af_detail = auto_flip_bar(e)
+                if af_breached is None:
+                    report.append(f'  -> auto-flip skipped for {eid}: {af_detail}')
+                else:
+                    af_line, af_val = auto_flip_packet(e, st, now_iso,
+                                                       af_breached, af_detail)
+                    if af_line:
+                        # append-success-only recording (review MED-4 contract)
+                        pending_state.append((eid, 'auto_flip_fired', af_val))
+                        problems += 1
+                        kanban_lines.append(af_line)
+                        report.append(f'  -> AUTO-FLIP-READY packet queued for {eid} '
+                                      f'(flip {e.get("auto_flip_flag")})')
 
             # ── deadline handling ──────────────────────────────────────────
             dl = e.get('deadline')
@@ -919,6 +1015,49 @@ def selfcheck():
         chk('⚠️ **STALE**' in txt_stale, 'stale prev-mtime -> STALE banner in header')
     except Exception as ex:
         chk(False, f'tower builder raised: {type(ex).__name__}: {ex}')
+
+    # auto-flip packet (CEO 20261108T230547Z AUTO-FLIP POLICY) — pure-function
+    # fixtures first: met bar -> packet text naming the flag + one-line command;
+    # every no-packet path (dedupe/non-open/bar-not-met/no-flag) and both
+    # evaluator resolutions (auto_flip_check preferred, threshold_eval reuse).
+    fx = {'id': 'fixture-autoflip', 'status': 'open',
+          'auto_flip_flag': 'FIXTURE_ADMISSION_FLAG'}
+    ln, sv = auto_flip_packet(fx, {}, NOW.isoformat(), True, 'fixture bar 3/3')
+    chk(ln is not None and '[AUTO-FLIP-READY]' in ln
+        and 'fixture-autoflip bar met' in ln
+        and 'FIXTURE_ADMISSION_FLAG' in ln and 'one-line command' in ln,
+        'auto-flip: met bar -> [AUTO-FLIP-READY] packet names flag + command')
+    chk(sv == NOW.isoformat(), 'auto-flip: state value returned for dedupe')
+    chk(auto_flip_packet(fx, {'auto_flip_fired': 'x'}, NOW.isoformat(),
+                         True, 'd')[0] is None,
+        'auto-flip: already fired -> no second packet (state dedupe)')
+    chk(auto_flip_packet(dict(fx, status='done'), {}, NOW.isoformat(),
+                         True, 'd')[0] is None,
+        'auto-flip: non-open entry -> no packet')
+    chk(auto_flip_packet(fx, {}, NOW.isoformat(), False, 'd')[0] is None,
+        'auto-flip: bar not met -> no packet')
+    chk(auto_flip_packet({'id': 'no-flag', 'status': 'open'}, {},
+                         NOW.isoformat(), True, 'd')[0] is None,
+        'auto-flip: no auto_flip_flag -> no packet (opt-in only)')
+    b, d = auto_flip_bar({'id': 'no-eval'})
+    chk(b is None and 'no evaluator' in d,
+        'auto-flip: entry without evaluator -> bar unknowable, no packet')
+    chk(auto_flip_bar({'id': 'bad-eval',
+                       'auto_flip_check': 'no_such_eval'})[0] is None,
+        'auto-flip: unknown evaluator -> bar unknowable, no packet')
+    THRESHOLD_EVALS['_fixture_bar_met'] = lambda e: (True, 'fixture bar met')
+    b, d = auto_flip_bar({'id': 'fx2', 'threshold_eval': '_fixture_bar_met'})
+    chk(b is True and 'met' in d,
+        'auto-flip: threshold_eval reuse resolves -> bar MET')
+    b, d = auto_flip_bar({'id': 'fx3', 'auto_flip_check': '_fixture_bar_met',
+                          'threshold_eval': 'no_such_eval'})
+    chk(b is True,
+        'auto-flip: auto_flip_check preferred over a threshold_eval name')
+    THRESHOLD_EVALS.pop('_fixture_bar_met', None)
+    reg_af = [x.get('id') for x in reg.get('entries', [])
+              if isinstance(x, dict) and x.get('auto_flip_flag')]
+    chk(not reg_af,
+        f'no registry entry carries auto_flip_flag yet (opt-in; found={reg_af})')
 
     print('SELFCHECK ' + ('PASS' if ok else 'FAIL'), flush=True)
     return 0 if ok else 1

@@ -3293,3 +3293,33 @@
 
 ## Error Alerts — 2026-11-08 18:19 UTC
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-08 22:19 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CASHCAT TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): CASHCAT TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,CONTAGION,TOK,MULTI_ALT,MOMENTUM,BTC_LEVEL | vol=N.9x eth_div=+N.N% | MULTI_ALT: N weak alts`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CASHCAT TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,CONTAGION,TOK,MULTI_ALT,MOMENTUM,BTC_LEVEL | vol=N.9x eth_div=+N.N% | MULTI_ALT: N weak `
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — TOK+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK TOK: -N.N% in 5m (threshold -N.N%) | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CASHCAT TOK BLOCKED — WARNING: TOK TOK: -N.N% in 5m (threshold -N.N%) | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [WARNING] TOK TOK: -N.N% in 5m (threshold -N.N%) | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CASHCAT TOK BLOCKED — WARNING — TOK+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL — TOK+TOK+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] CASHCAT TOK BLOCKED — CRITICAL: TOK CRITICAL: -N.N% in 5m (threshold -N.N%) | layers: TOK,TOK,MOMENTUM,BTC_LEVEL | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL: TOK CRITICAL: -N.N% in 5m (threshold -N.N%) | layers: TOK,TOK,MOMENTUM,BTC_LEVEL | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] FARTCOIN TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] FARTCOIN TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-08 23:19 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS [Position Manager] TOK mirror_close TOK (DB committed, HL still open): mirror_close(TOK): HL TOK failed — Unknown TOK`
+
+## Error Alerts — 2026-11-08 23:34 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+- **[WARN]** (health_monitor): `logs`: compressed 7 old logs, freed 0.0MB (disk 85%)
+
+## Error Alerts — 2026-11-09 00:19 UTC
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
