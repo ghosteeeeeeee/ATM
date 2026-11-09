@@ -212,6 +212,21 @@ def pause_checks(cfg, summary):
         summary.setdefault('pause_flag', 'daily_cap')
 
 
+def _structure_sl(decision, leg):
+    """Structure-break stop at BIRTH (CEO 2026-11-09: "we need it to break
+    structure to exit"): just beyond the 15m swing — the trade exits when
+    structure ACTUALLY breaks, not on entry-relative noise. Replaces the
+    engine's trigger−ATR geometry SL (#16834: died 130pts above structure
+    while the move ran +691). Returns None when the snapshot is missing."""
+    sd = (decision.get('structure_detail') or {}).get('15m') or {}
+    sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')
+    if not (sh and sl and atr):
+        return None
+    if leg == 'long':
+        return round(float(sl) - 0.10 * float(atr), 8)
+    return round(float(sh) + 0.10 * float(atr), 8)
+
+
 def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
     """mode=live (spec v2 §2): write a GATED bracket leg into the real
     pending-orders config — the 1-minute pipeline monitor
@@ -254,6 +269,20 @@ def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
         if _st.get('status') in ('fired', 'error'):
             continue                      # consumed — covers nothing
         if abs(float(ex.get('trigger_price') or 0) - o['trigger']) < dedupe:
+            # covered = idempotent skip, but an AUTO-owned order's SL syncs
+            # to the structure stop (never CEO-owned orders — those levels
+            # are the CEO's). Keeps real order == hypothetical after the
+            # structure-at-birth change.
+            if (str(ex.get('id', '')).startswith('btc-auto-')
+                    and abs(float(ex.get('sl') or 0) - float(o['sl'])) > 1):
+                ex['sl'] = float(o['sl'])
+                try:
+                    tmp = path + '.tmp'
+                    with open(tmp, 'w') as f:
+                        json.dump({'orders': orders}, f, indent=1)
+                    os.replace(tmp, path)
+                except Exception:
+                    pass
             return 'covered'
     tdir = o.get('trigger_dir') or ('above' if leg == 'long' else 'below')
     new = {
@@ -293,14 +322,17 @@ def tweak_structure_fixed(decision, open_positions):
     full-analysis cycle TUNES it — but only structure-fixed trades
     (dynamic_sl=false: BE/trail stands down, this IS their SL authority).
 
-    Bounded rules, CAS-protected, every write logged:
-      R1 retest survival — a stop sitting INSIDE the retest zone moves
+    Structure-bound rules, CAS-protected, every write logged:
+      R1 structure-break exit (CEO 2026-11-09 17:00: "we need it to
+         break structure to exit" — the ±0.5% entry cap was REMOVED:
+         it forced #16834's stop into the noise 130pts above structure
+         while the move ran +691) — a stop INSIDE the retest zone moves
          just beyond the 15m swing (short: above SH + 0.10 ATR; long:
-         below SL − 0.10 ATR), capped at ±0.5% from entry, and never
-         onto the live price side (no instant self-close).
+         below SL − 0.10 ATR), never onto the live price side (no
+         instant self-close). Structure IS the risk bound.
       R2 rule-10 TP — a TP overshooting the FIRST opposing structure by
          more than 1 ATR snaps into it (short: 15m SL + 0.05 ATR;
-         long: 15m SH − 0.05 ATR).
+         long: 15m SH − 0.05 ATR), price-side guarded (F3).
     Returns tweak dicts for the cycle summary.
     """
     tweaks = []
@@ -338,12 +370,15 @@ def tweak_structure_fixed(decision, open_positions):
                 continue
             d = str(pos.get('direction') or '').upper()
             if d == 'SHORT':
-                # structure + ±0.5% risk cap, then keep the stop ABOVE the
-                # live price (below price = instant self-close for a short)
-                want = min(sh + 0.10 * atr, entry * 1.005)
+                # STRUCTURE-BREAK EXIT (CEO 2026-11-09: "we need it to break
+                # structure to exit"): stop sits just beyond the 15m retest
+                # ceiling — the trade exits when structure ACTUALLY breaks.
+                # The old ±0.5% entry cap forced stops into the noise
+                # (#16834 stopped 130pts above structure, move then ran +691)
+                # and is REMOVED by directive — structure is the risk bound.
+                # Keep: never at/below live price (instant self-close).
+                want = sh + 0.10 * atr
                 want = max(want, price * 1.001)
-                if want > entry * 1.005:
-                    continue              # price past the cap — no safe write
                 if stop < want:
                     cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s "
                                 "AND status='open' AND stop_loss=%s",
@@ -369,12 +404,11 @@ def tweak_structure_fixed(decision, open_positions):
                         tweaks.append(t)
                         DB.log_event('INFO', f"tweak {t}")
             elif d == 'LONG':
-                # mirror: structure − 0.1 ATR with ±0.5% cap, stop kept
-                # BELOW the live price (at/above price = instant self-close)
-                want = max(sl - 0.10 * atr, entry * 0.995)
+                # structure-break mirror: stop just BELOW the 15m swing low
+                # (±0.5% entry cap REMOVED by CEO directive 2026-11-09);
+                # never at/above live price (instant self-close for a long)
+                want = sl - 0.10 * atr
                 want = min(want, price * 0.999)
-                if want < entry * 0.995:
-                    continue              # price past the cap — no safe write
                 if stop > want:
                     cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s "
                                 "AND status='open' AND stop_loss=%s",
@@ -486,6 +520,11 @@ def run_cycle():
             h1_atr = (decision.get('structure_detail', {}).get('1h') or {}).get('atr', 400) or 400
             armed_now = DB.get_hypotheticals('armed')
             for leg, o in decision['bracket'].items():
+                # structure-break stop from birth (CEO 2026-11-09) — applied
+                # BEFORE the gates so the real-R:R check prices the real risk
+                _ssl = _structure_sl(decision, leg)
+                if _ssl:
+                    o = {**o, 'sl': _ssl}
                 existing = [h for h in armed_now if h['direction'] == leg]
                 keep = False
                 for h in existing:
@@ -505,19 +544,32 @@ def run_cycle():
                             # pending order — keep means the levels stand, so
                             # the REAL order must exist too. Dedupe inside
                             # makes repeat calls 'covered' (idempotent).
+                            # Structure-break SL at birth (2026-11-09 17:00):
+                            # kept legs also get the 15m-swing stop, with the
+                            # shadow hypothetical synced so scoring matches
+                            # what the real order carries.
+                            _bo = {'trigger': h['trigger'], 'sl': h['sl'],
+                                   'tp': h['tp'],
+                                   'trigger_dir': (h['trigger_dir']
+                                                   if 'trigger_dir' in h.keys()
+                                                   else None)}
+                            _bssl = _structure_sl(decision, leg)
+                            if _bssl and abs(_bssl - float(h['sl'])) > 1:
+                                _bo['sl'] = _bssl
+                                try:
+                                    DB.update_hypothetical(h['order_id'],
+                                                           sl=_bssl)
+                                except Exception:
+                                    pass
                             res = _arm_real_leg(
-                                h['order_id'], leg,
-                                {'trigger': h['trigger'], 'sl': h['sl'],
-                                 'tp': h['tp'],
-                                 'trigger_dir': (h['trigger_dir']
-                                                 if 'trigger_dir' in h.keys()
-                                                 else None)},
+                                h['order_id'], leg, _bo,
                                 size, cfg, h1_atr)
                             summary['live_armed'].append(f'{leg}-kept:{res}')
                             if res == 'armed':
                                 DB.log_event('INFO',
                                              f"cycle {cycle_id}: live "
-                                             f"back-fill {h['order_id']} → armed")
+                                             f"back-fill {h['order_id']} → armed "
+                                             f"SL={_bo['sl']} (structure)")
                 if keep:
                     continue  # fresh armed leg exists for this direction
                 # E2 checklist: never arm an already-crossed (ITM) level.

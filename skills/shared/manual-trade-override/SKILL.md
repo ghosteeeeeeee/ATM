@@ -296,15 +296,20 @@ duplicate real trade #16832).
     broken level with a reclaim/fail confirmation, never arm the flush
     itself.
 12. **Break-continuation entries: `"dynamic_sl": false` + the structure
-    stop** (CEO 2026-11-09, #16827). The BE/trail stack tightens INTO
-    the retest zone — it stopped #16827 at breakeven-ish 45 minutes
+    stop** (CEO 2026-11-09, #16827 + #16834). The BE/trail stack tightens
+    INTO the retest zone — it stopped #16827 at breakeven-ish 45 minutes
     before the move resolved. Order field `dynamic_sl: false` hands SL
     authority to the watchdog's full-analysis tweak (every 30-min cycle):
-    the stop sits just BEYOND the 15m swing (retest ceiling/floor),
-    capped at ±0.5% from entry, and rule-10 snaps any void-TP into the
-    first opposing structure. Guardian/max-hold still apply. Use this
-    for floor/breakdown and breakout-continuation arms — BE/trail stays
-    the default for everything else. (Counterfactual noted honestly:
+    the stop sits just BEYOND the 15m swing (retest ceiling/floor) and
+    **exits only when structure ACTUALLY breaks** — no entry-relative
+    cap (the ±0.5% cap was REMOVED by CEO 2026-11-09 17:00: it forced
+    #16834's stop into the noise, 130pts above structure, and the move
+    then ran +691 without us; structure IS the risk bound). Auto arms
+    now carry the structure SL FROM BIRTH (15m swing ±0.10 ATR —
+    `_structure_sl`), and rule-10 snaps any void-TP into the first
+    opposing structure. Guardian/max-hold still apply. Use this for
+    floor/breakdown and breakout-continuation arms — BE/trail stays the
+    default for everything else. (Counterfactual noted honestly:
     on #16827 itself the trail's exit beat the structure stop by
     ~1.7pts-of-margin — the fake-out resolved UP; the rule is for when
     the retest precedes the REAL leg.)
