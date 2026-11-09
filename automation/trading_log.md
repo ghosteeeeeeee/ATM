@@ -23840,3 +23840,28 @@ BY: auto_1hr
 - 24h closed entirely at loss streak hours; watch MET/GRASS opens
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-09 23:20] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.05 (WR: 100% hour; 24h 13T 23.1% -$0.57 RED | 7d 125T 54.4% -$1.21 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (GRASS r2v2-long3 LONG profit-monster-trail +$0.05 / +1.48%), 3 open (AVAX r2v2-long3, CC bb-squeeze+, MET atr-trend+)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; jup_yolo_mirrored 14d regimes re-verified wins ALL 4 (FLAT 78.6% n=14, EXTREME 61.1% n=18, NORMAL 58.6% n=58, HIGH 55.7% n=61) -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/13 = 23.1% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (only n>=5 gone now: ai-trader-pending 4T 0W -$0.08; all others n<5)
+- Neg streak: BROKEN — 21h 0 closes, 22h +0.05 positive -> no size cut; vacation_size_reduce file absent -> 1.0x
+- Frequency: 1 close/hr, 3 open — under 20
+- Entry quality: 24h winners mae_pct avg 0.284% max 0.484% (3/3 <0.5%) -> OK
+- No storm (window-min +0.09% / at-run +0.28%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 23.1% (3/13) -$0.57 RED, 7d -$1.21 structural RED (7d WR 54.4% but negative PnL = R:R drag)
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
