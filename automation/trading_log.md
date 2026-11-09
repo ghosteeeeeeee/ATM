@@ -23814,3 +23814,29 @@ BY: auto_1hr
 - jup_yolo_mirrored 24h 0/4 — watch; kill policy requires regime check, prior 14d shows wins in all 4 regimes
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-09 22:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a hour; 24h 13T 15.4% -$0.63 RED | 7d 125T 53.6% -$1.42 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 2 open (MET atr-trend+ LONG $11.10, GRASS r2v2-long3 LONG $11.10)
+- Kill check: 0 closes last hour -> no 3+ trigger; jup_yolo_mirrored 14d regimes re-verified wins ALL 4 (FLAT 78.6% n=14, EXTREME 61.1% n=18, NORMAL 58.6% n=58, HIGH 55.7% n=61) -> keep; ai-trader-pending 24h 5T 0W -$0.09 manual n<20 -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/13 = 23.1% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (only n>=5 in 24h is ai-trader-pending 5T 0W -$0.09)
+- Neg streak: BROKEN — 21h and 22h had 0 closes (last close 20h -0.06); rule requires 3 consecutive negative hours -> no size cut
+- Frequency: 0 closes/hr, 2 open — under 20
+- Entry quality: 24h winners mae_pct avg 0.184% max 0.209% (2/2 <0.5%) -> OK
+- No storm (window-min -0.02% / at-run +0.22%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 15.4% (2/13) -$0.63 RED, 7d -$1.42 structural RED
+- 24h closed entirely at loss streak hours; watch MET/GRASS opens
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
