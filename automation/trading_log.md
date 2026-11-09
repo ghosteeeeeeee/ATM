@@ -23756,3 +23756,35 @@ BY: auto_1hr
 - atr-trend- 7d 5/5 +0.32 across 5 tokens — revisit if 24h n reaches 5
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-09 20:22] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.10 (WR: 0.0% hour; 24h 14T 21.4% -$0.51 RED | 7d 128T 53.9% -$1.54 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none — size-reduce lever evaluated and found INERT (see below), no misleading marker written
+
+**No Change Needed:**
+- Last hour: 1 close (GMX bb-squeeze+ LONG atr_sl_hit -$0.10 / -2.70%, mae 0.784%), 1 open, 1 open (BTC jup_yolo_mirrored SHORT 18:39 $16.60)
+- Kill check: no signal with 3+ closes last hour; jup_yolo_mirrored 14d regimes re-verified wins ALL 4 (FLAT 78.6% n=14, EXTREME 61.1% n=18, NORMAL 59.6% n=57, HIGH 55.7% n=61 -> keep); ai-trader-pending 24h 5T 0W -$0.09 but manual 14d n<20 -> keep
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/14 = 28.6% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (only n>=5 in 24h is ai-trader-pending 5T 0W -$0.09; atr-trend- 24h 2T 2W +0.24 n<5, 7d 5/5 +0.32 across 5 tokens — 24h rule not met)
+- Frequency: 1 close/hr, 1 open — under 20
+- Entry quality: 24h winners mae_pct avg 0.249% max 0.379% (3/3 <0.5%) -> OK
+- No storm (window-min +0.24% / at-run +0.24%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**NEG-STREAK RULE FIRED (3 consecutive negative hours: 17h -0.10, 18h -0.08, 19h -0.10 = -$0.28 total) + market regime NEUTRAL (8/14 of 24h closes carry regime='NEUTRAL') -> considered size cut, NOT applied:**
+- Mechanism `data/vacation_size_reduce.json` (0.5x) is provably INERT at current balance — `_get_trade_size_usdt()` live-checked = $11.00 = HL_MIN_NOTIONAL floor; $11.00 x 0.5 = $5.50 floors straight back to $11.00 (decider_run.py docstring confirms, working-brake 2026-11-04).
+- Writing the marker would change REPORTED multiplier to 0.5x with zero actual risk reduction = misleading audit trail. Declined.
+- Real capital brake already ON: DAILY_FILL_CAP_ENABLED=True, MAX=15 fills/24h while fee-net <0.
+- Actual exposure this streak: 1 trade/hour, -$0.28 over 3h — not a blowup pattern.
+
+**Open Questions:**
+- 24h WR 21.4% (3/14) -$0.51 RED, 7d -$1.54 structural RED
+- SIZE-REDUCE LEVER IS A NO-OP at $11 base — if CEO wants a real sub-floor brake, the lever needs a different mechanism (DAILY_FILL_CAP or a max-notional override). Flagged, not changed.
+- atr-trend- 7d 5/5 +0.32 across 5 tokens — revisit boost if 24h n reaches 5
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
