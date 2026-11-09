@@ -3935,5 +3935,16 @@
     "after": "source-scoped floors via is_giant_source since OPTION_D_FROM 2026-10-30 23:13:19; waiver expires normalized to \"YYYY-MM-DD HH:MM:SS\"; 14d LEAK 5->0, 30d 0, selfcheck PASS, bug_hunter SHIP-WITH-FIXES (fixes applied)",
     "rationale": "Live gates (signal_compactor:4632, decider_run:1472) apply the jup carve-out since CEO Option D; the census never did, so it cried wolf on 5 legal trades and mislabeled 11 more as waiver-covered. Audit script only — zero trading behavior.",
     "impact": "trustworthy gate-integrity KPI; no trading change"
+  },
+  {
+    "timestamp": "2026-11-09T16:42:07Z",
+    "agent": "brain_auditor",
+    "change": "Audit #243: token_performance_monitor + R:R-blindspot report-only leg (RR_MIN_TRADES=5, RR_MAX_NET=-0.50); legacy WR<35 blacklist path untouched",
+    "type": "tweak",
+    "file": "scripts/token_performance_monitor.py",
+    "before": "WR<35 leg only (structurally blind to R:R bleeds like HYPE 59%WR -$0.82)",
+    "after": "WR leg unchanged + RR-BLINDSPOT shadow print (promotion criteria pre-registered in-file)",
+    "rationale": "HYPE: WR-leg passed at 54.9% while netting -0.54/7d; flags it exactly on 11-03 (T manual blacklists same day). 21d snapshot validation = 2 BTC flags fwd-flat -> enforcement too noisy, shadow first",
+    "impact": "zero trading behavior; hourly journal gains an audit line; promote to auto-blacklist only per in-file criteria + CEO sign-off"
   }
 ]

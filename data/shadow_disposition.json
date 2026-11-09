@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-09T00:45:00Z",
+  "updated": "2026-11-09T16:42:07Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -1483,6 +1483,21 @@
       "default_action": "keep 0.5",
       "owner": "CEO",
       "evidence": "CEO 20261108T180116Z: +$0.05/day estimate"
+    },
+    {
+      "id": "amplify-atr-trend-short-cell-watch",
+      "kind": "amplify",
+      "proposal_type": "winner-cell watch (early, n<10 labeled)",
+      "created_by": "brain_auditor #243",
+      "created_at": "2026-11-09T16:42:07Z",
+      "deadline": "2026-11-16T00:00:00Z",
+      "status": "open",
+      "owner": "brain_auditor",
+      "threshold": "atr-trend- NORMAL SHORT cell reaches n>=10 closed AND net>0 over trailing 30d -> promote to winner-cell notional-mult evaluation (WINNER_CELLS path); if net<=0 or n<10 at deadline -> close as no-cell",
+      "measurement": "PG: signal='atr-trend-' AND volatility_regime='NORMAL' AND direction='SHORT', 30d window, n/WR/net + arm% (mfe>=0.40); units guard: pnl_usdt vs pnl_usdt",
+      "evidence": "5T 100% WR +0.32, 100% arm, last close 2026-11-09 (fresh); signal live since 2026-11-06 (n<10 = early, labeled per AMPLIFY rule)",
+      "not_a_duplicate_of": "atr-trend-accel-shadow (that is the shadow collector due 12-06; this is the winner-cell promote watch)",
+      "risk": "low"
     }
   ]
 }

@@ -20,6 +20,20 @@ MIN_TRADES = 5
 MAX_WR = 35.0
 WINDOW = "7 days"
 
+# R:R-blind-spot shadow leg (brain_auditor #243, 2026-11-09) — REPORT-ONLY.
+# The WR leg (<35%) structurally cannot see R:R bleeds: HYPE was the book's
+# biggest single-token bleed (jup mirror LONG 48T 59%WR net -$0.82, losses
+# riding 2x wins) yet passed every WR check until T blacklisted manually
+# 2026-11-03. Trailing-7d net-leg would have flagged it the same day
+# (n=51, WR 54.9%, net -$0.54). Validation: 21 daily snapshots -> 2 flags
+# (BTC both, forward-7d ~flat) = too noisy for auto-blacklist as-is.
+# PROMOTION CRITERIA (CEO sign-off required; auto-blacklist = trading behavior):
+#   during a >=7d collect window, a non-major flagged token (a) n>=10 at flag,
+#   (b) forward-7d net <= -$0.75, (c) not already blacklisted at flag time,
+#   (d) majors (BTC/ETH/SOL) excluded -> then wire into add_to_blacklist path.
+RR_MIN_TRADES = 5
+RR_MAX_NET = -0.50
+
 def get_token_performance():
     conn = None
     try:
@@ -87,9 +101,49 @@ def add_to_blacklist(token):
     print(f"  AUTO-BLACKLISTED {token}")
     return True
 
+def report_rr_blindspot():
+    """Shadow-only: tokens passing the WR leg but bleeding on net PnL.
+    Never blacklists — prints for audit collection (see promotion criteria
+    in the RR_MAX_NET comment block above)."""
+    conn = None
+    try:
+        conn = psycopg2.connect("dbname=brain user=postgres")
+        cur = conn.cursor()
+        cur.execute(f"""
+            SELECT token,
+                   COUNT(*) as trades,
+                   ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
+                   ROUND(SUM(pnl_usdt),2) as pnl
+            FROM trades
+            WHERE status = 'closed'
+              AND close_time > NOW() - INTERVAL '{WINDOW}'
+            GROUP BY token
+            HAVING COUNT(*) >= {RR_MIN_TRADES}
+               AND ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) >= {MAX_WR}
+               AND SUM(pnl_usdt) <= {RR_MAX_NET}
+            ORDER BY SUM(pnl_usdt) ASC
+        """)
+        flags = cur.fetchall()
+    except Exception as e:
+        print(f"Error querying DB (rr-blindspot): {e}")
+        return
+    finally:
+        if conn:
+            conn.close()
+
+    if flags:
+        print(f"  RR-BLINDSPOT (shadow, NO action): {len(flags)} token(s) pass WR leg but net <= {RR_MAX_NET}")
+        for token, trades, wr, pnl in flags:
+            print(f"    {token}: {trades}T, {wr}% WR, ${pnl} net (R:R bleed — monitor)")
+    else:
+        print("  RR-BLINDSPOT (shadow): none")
+
+
 def main():
     print("Token Performance Monitor — checking 7d performance...")
     results = get_token_performance()
+
+    report_rr_blindspot()
 
     if not results:
         print("  No tokens with 5+ trades in 7d window")

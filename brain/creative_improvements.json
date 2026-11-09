@@ -10909,5 +10909,26 @@
     "category": "tracking",
     "status": "measured",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-09T16:42:07Z",
+    "run": 243,
+    "idea": "token_performance_monitor R:R-blind-spot shadow leg (WR>=35 & n>=5 & net<=-0.50, print-only) — SHIPPED",
+    "rationale": "Auto-blacklist keys WR<35 only; HYPE was biggest single-token bleed (jup mirror LONG 48T 59%WR -$0.82, losses 2x wins) yet invisible to the WR leg — T caught it manually 11-03. Net-leg would have flagged the same day (n=51 WR54.9% -0.54)",
+    "expected_impact": "detects coin-level R:R bleeds earlier; zero trading behavior until promotion (criteria in-file, CEO sign-off)",
+    "category": "detection",
+    "status": "shipped-shadow",
+    "risk": "low",
+    "validation": "21 daily snapshots -> 2 flags (BTC, fwd-7d ~flat) = noisy for enforcement; subagent review SHIP-WITH-FIXES, MED rounding fix applied; py_compile + live run PASS"
+  },
+  {
+    "date": "2026-11-09T16:42:07Z",
+    "run": 243,
+    "idea": "jup HIGH/NORMAL regime block — REJECTED-WITH-DATA",
+    "rationale": "118T -1.42 looks blockable but Fisher vs FLAT p=0.158 and HYPE = -1.06 of -1.42 (confound = already-blacklisted token); post-11-03 halves HIGH 6T 0.00 / NORMAL 7T +0.11 = bleed stopped with no regime block",
+    "expected_impact": "none (not shipped)",
+    "category": "regime",
+    "status": "rejected-with-data",
+    "risk": "n/a"
   }
 ]
