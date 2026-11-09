@@ -3924,5 +3924,16 @@
     "after": "documents tier-1 (1h/2h purgers) vs tier-2 (archive-signals.py 336h archiver), names sweep-expired \"zombie\" rows as tier-2-covered, forbids extending tier-1 WHERE",
     "rationale": "Prevents a third re-derivation of the zombie-purge defect framing",
     "impact": "None on trading; py_compile PASS; git diff = 8 insertions only"
+  },
+  {
+    "timestamp": "2026-11-09T04:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #242: gate_leak_census source-scoped floor fix (_effective_floor mirrors Option D giants=35 / pump-chain=45) + _waiver_active ISO timestamp normalization + 9 selfcheck asserts",
+    "type": "tweak",
+    "file": "brain/analysis/gate_leak_census.py",
+    "before": "global floor 45 applied to all sources; 5 phantom jup LEAKs + 11 phantom WAIVERs; waiver expires compared with raw ISO T/Z string",
+    "after": "source-scoped floors via is_giant_source since OPTION_D_FROM 2026-10-30 23:13:19; waiver expires normalized to \"YYYY-MM-DD HH:MM:SS\"; 14d LEAK 5->0, 30d 0, selfcheck PASS, bug_hunter SHIP-WITH-FIXES (fixes applied)",
+    "rationale": "Live gates (signal_compactor:4632, decider_run:1472) apply the jup carve-out since CEO Option D; the census never did, so it cried wolf on 5 legal trades and mislabeled 11 more as waiver-covered. Audit script only — zero trading behavior.",
+    "impact": "trustworthy gate-integrity KPI; no trading change"
   }
 ]

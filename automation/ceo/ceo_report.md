@@ -1148,3 +1148,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 15T -0.07 53.3% | 7d 152T -1.50 56.6%
 ### Findings: clean — error_alerts only shows momentum/contagion entry BLOCKs (gates working) + 5x CASHCAT signal rollbacks (retry-loop guard, no trade); 56.6% WR on negative 7d PnL = small winners/large losers, not a query artifact. Control tower: 1 item due ≤24h — `signal-zombie-purge` (11-09, T-owned; silent = leave zombies).
 ### Recommendation: none — regime check (rotating Q: 8 mod 14 = "What regime are we in?") reads 15m LONG_BIAS vs 4h SHORT_BIAS = disagree/chop, vol LOW → current no-fresh-entries stance is correct.
+
+## CEO Status — 20261109T031840Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 15T -0.29 46.7% | 7d 148T -1.87 54.7%
+### Findings: disk 85% (recurring WARN); regime-specialist scan (30d, n>=8): EXTREME cells dominate the bleed — ai-trader+ 15T 20% -0.90, pump-chain- 30T 23.3% -0.50, volume-breakout-long+ 9T 0% -0.63; jup_yolo_mirrored NORMAL/HIGH ~59% WR but still -0.62/-0.43 (payout, not entry). Control tower: 1 item due <=24h (signal-zombie-purge, silent default = leave).
+### Recommendation: clean up disk (log rotation on hl-copy/signal-compactor err logs) before it trips 90%; no trade/param action.

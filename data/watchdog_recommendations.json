@@ -1,20 +1,29 @@
 {
-  "timestamp": "2026-11-09T00:19:14.967211+00:00",
-  "steers": [],
+  "timestamp": "2026-11-09T04:49:16.772112+00:00",
+  "steers": [
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'jup_yolo_mirrored' losing streak: 3 consecutive losses",
+      "detail": "Net -0.30 USDT over last 20 trades (window losses: -0.39). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-001"
+    }
+  ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "NEUTRAL",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
-    "volatility": "NORMAL",
+    "continuum": "AT",
+    "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
   "open_count": 1
 }

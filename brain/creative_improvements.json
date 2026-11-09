@@ -10879,5 +10879,35 @@
     "category": "hygiene / root-cause",
     "status": "shipped",
     "risk": "none (comment only)"
+  },
+  {
+    "date": "2026-11-09T04:45:00Z",
+    "run": 242,
+    "idea": "gate_leak_census source-scoped floor fix — adjudicate giants (jup_yolo/hl_copy) against SHORT_RSI_HARD_FLOOR_JUP_YOLO=35 since Option D (2026-10-30 23:13Z), pump-chain against its own constant, mirroring signal_compactor:4632 / decider_run:1472; also fix _waiver_active ISO 'T'/'Z' string-compare that kept the whole expiry day in-waiver",
+    "rationale": "5 phantom LEAKs (jup rsi 38.8-43.2, 11-05..11-08) + 11 phantom WAIVERs were false positives against the global floor 45 — live gates were holding. Root-cause fix in the shared _band/_effective_floor, not per-caller patches.",
+    "expected_impact": "census 14d LEAK 5->0, 30d 0; trustworthy gate-integrity KPI (exit 1 on real leak)",
+    "category": "instrumentation",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-09T04:45:00Z",
+    "run": 242,
+    "idea": "hl_copy_trader confidence-floor watch (#145) CLOSED-WITH-DATA — 21/21 30d trades already at confidence >=70 (19/21 >=80); floor 70 blocks 0 trades, floor 80 blocks 2 losers / 0 winners / -0.11",
+    "rationale": "The confidence axis is structurally inert for this signal. Bleed is exit-side: hl_copy is bypassed from BOTH PM trail and UGB-PT (zero giveback protection), exits = atr_sl_hit 9T -0.59 + hard_max 4T -0.34. Owned by amplify-ugb-bypass-hole due 2026-12-15.",
+    "expected_impact": "0 (rejected-with-data) — stops a standing watch from being re-litigated every run",
+    "category": "entry sniper",
+    "status": "rejected-with-data",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-09T04:45:00Z",
+    "run": 242,
+    "idea": "jup ATRSL-parity 7d re-read (#230 pre-registered) — pre-fix opens 96T 59.4% -1.08 vs post-11-03 opens 44T 65.9% +0.02 (sign flip), post-fix exits: mfe_exit 16T +1.05 / pm-trail 12T +0.89 / atr_sl_hit 8T -1.00 / hard_max 7T -0.97",
+    "rationale": "The 11-03 compute_atr_sl/tp parity fix was pre-registered for a 7d performance re-read. Direction favorable, n=44, regime confound possible = report into the 11-10 jup-atrsl-parity disposition packet, not a causation claim.",
+    "expected_impact": "evidence for KEEP/KILL of the parity shadow stream at its 11-10 deadline",
+    "category": "tracking",
+    "status": "measured",
+    "risk": "none"
   }
 ]

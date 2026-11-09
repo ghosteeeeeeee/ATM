@@ -25,8 +25,10 @@ from paths import *  # noqa
 import psycopg2
 from hermes_constants import (  # noqa
     SHORT_RSI_HARD_FLOOR, OVERSOLD_SHORT_RSI_MAX,
+    SHORT_RSI_HARD_FLOOR_JUP_YOLO, SHORT_RSI_HARD_FLOOR_PUMP_CHAIN,
     SHORT_MIDBAND_RSI_MIN, SHORT_MIDBAND_RSI_MAX,
 )
+from directional_block import is_giant_source
 
 MIDBAND_LIVE = '2026-10-16 00:00:00'          # SHORT_MIDBAND block shipped
 # SHORT_RSI_HARD_FLOOR history (git -S on hermes_constants.py):
@@ -36,6 +38,16 @@ FLOOR_45_FROM_EARLY = '2026-10-07 04:38:49'   # 25 -> 45, "NO bearish override"
 FLOOR_35_FROM = '2026-10-13 04:19:37'
 FLOOR_45_FROM = '2026-10-18 14:40:11'          # commit f635705c
 WAIVER_LIVE = '2026-10-22 00:00:00'            # first unclog grant
+# Source-scoped floors (must mirror signal_compactor/decider source-floor select):
+#   Option D giants (jup_yolo/hl_copy) 35 — commit 0c2f7a46 2026-10-30 23:13Z
+#   pump-chain floor was 40 from 10-13 to 10-21 (now 45 = global, no delta).
+#   NOT modelled (all verified zero-impact by bug_hunter #242):
+#     - 10-18..10-21 pump floor 40 while global 45 (only reachable --days>=30)
+#     - 'hl_copy' joined GIANT_NS at 112f5915 2026-10-31 01:49 (~2h26m after
+#       OPTION_D_FROM) — all 134 hl_copy trades are LONG, zero SHORT exposure
+#     - RC1 fade sources ('+' form) skip SHORT floors entirely at
+#       signal_compactor:4621 — zero '+' SHORT trades in 14d
+OPTION_D_FROM = '2026-10-30 23:13:19'
 PATH_EXEMPT = ('ai-trader',)                   # CEO conditional-order path
 
 
@@ -51,7 +63,10 @@ def _waiver_active(open_time):
     try:
         with open(os.path.join(HERMES_DATA, 'vacation_mode.json')) as f:
             w = json.load(f).get('rules', {}).get('unclog_waiver')
-        return bool(w) and w.get('expires', '0000') > ts
+        # normalize ISO 'T'/'Z' before string-compare: '2026-11-03T...' > '2026-11-03 ...'
+        # would keep the whole expiry DAY in-waiver regardless of hour (bug_hunter #242 M1)
+        exp = str(w.get('expires', '0000')).replace('T', ' ')[:19] if w else '0000'
+        return bool(w) and exp > ts
     except Exception:
         return False
 
@@ -66,6 +81,24 @@ def _floor_at(ts):
     return SHORT_RSI_HARD_FLOOR
 
 
+def _effective_floor(ts, source):
+    """Global floor history + source-scoped carve-outs.
+
+    Mirrors the live source-floor select (signal_compactor._rsh_floor /
+    decider_run _hard_floor): giants get SHORT_RSI_HARD_FLOOR_JUP_YOLO=35
+    once Option D is live; pump-chain gets its own constant (45 today, so
+    zero delta vs global). Knife (< OVERSOLD_SHORT_RSI_MAX) stays global.
+    """
+    floor = _floor_at(ts)
+    if ts >= OPTION_D_FROM:
+        src = source or ''
+        if 'pump-chain' in src:
+            floor = SHORT_RSI_HARD_FLOOR_PUMP_CHAIN
+        elif is_giant_source(src):
+            floor = SHORT_RSI_HARD_FLOOR_JUP_YOLO
+    return floor
+
+
 def _band(rsi, source, waived, open_time='2099-01-01 00:00:00'):
     """(verdict, reason) for a SHORT. verdict in ALLOW / WAIVER / LEAK."""
     ts = str(open_time)[:19]
@@ -77,7 +110,7 @@ def _band(rsi, source, waived, open_time='2099-01-01 00:00:00'):
     src = source or ''
     if rsi < OVERSOLD_SHORT_RSI_MAX:
         return 'LEAK', f'knife {rsi:.1f} < {OVERSOLD_SHORT_RSI_MAX} (never waivable)'
-    floor = _floor_at(ts)
+    floor = _effective_floor(ts, src)
     if rsi < floor:
         if waived:
             return 'WAIVER', f'{rsi:.1f} < {floor} — unclog bear-band active'
@@ -152,6 +185,29 @@ def main():
         assert _band(50.0, 'pump-chain-', True)[0] == 'WAIVER', 'pump-chain midband exempt'
         assert _band(50.0, 'volume-buildup-', True)[0] == 'LEAK', 'non-pump midband holds'
         assert _band(56.0, 'x', True)[0] == 'ALLOW', 'above floor, outside midband'
+        # Option D source-scoped floors (fix 2026-11-09 run #242 — the 5 'LEAK'
+        # jup rows rsi 38.8-43.2 were false positives against the global 45)
+        assert _band(40.0, 'jup_yolo_mirrored', False, '2026-11-05 00:00:00')[0] == 'ALLOW', \
+            'giant floor 35 post-Option-D'
+        assert _band(40.0, 'hl_copy_trader', False, '2026-11-05 00:00:00')[0] == 'ALLOW', \
+            'hl_copy is a giant namespace'
+        assert _band(40.0, 'jup_yolo_mirrored', False, '2026-10-20 00:00:00')[0] == 'LEAK', \
+            'pre-Option-D giants used the global floor'
+        assert _band(34.0, 'jup_yolo_mirrored', False, '2026-11-05 00:00:00')[0] == 'LEAK', \
+            'knife <35 stays global for giants'
+        assert _band(40.0, 'volume-buildup-', False, '2026-11-05 00:00:00')[0] == 'LEAK', \
+            'non-giant still 45 post-waiver-expiry'
+        # direct floor pins (values <=35 are unobservable through _band — knife fires first)
+        assert SHORT_RSI_HARD_FLOOR_JUP_YOLO == 35, 'jup floor moved — update expectations'
+        assert SHORT_RSI_HARD_FLOOR_PUMP_CHAIN == 45, 'pump floor moved'
+        assert _effective_floor('2026-11-05 00:00:00', 'jup_yolo_mirrored') == 35, 'giant floor'
+        assert _effective_floor('2026-11-05 00:00:00', 'volume-buildup-') == 45, 'global floor'
+        assert _effective_floor('2026-10-30 23:13:18', 'jup_yolo_mirrored') == 45, \
+            'pre-Option-D boundary (1s before commit)'
+        assert _effective_floor('2026-10-30 23:13:19', 'jup_yolo_mirrored') == 35, \
+            'Option-D boundary (commit instant)'
+        assert _effective_floor('2026-11-05 00:00:00', 'pump-chain-,jup_yolo_mirrored') == 45, \
+            'combo source: pump-chain branch first (mirrors decider_run)'
         print('SELFCHECK PASS')
         return 0
 

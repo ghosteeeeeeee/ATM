@@ -1,42 +1,44 @@
-# Current State — brain_auditor #241 2026-11-09 00:50 UTC
-**Last Updated: 2026-11-09 00:50 UTC**
-**Updated by: brain_auditor #241. Prior: #240 2026-11-08 16:50 UTC (preserved in git history).**
+# Current State — brain_auditor #242 2026-11-09 04:45 UTC
+**Last Updated: 2026-11-09 04:45 UTC**
+**Updated by: brain_auditor #242. Prior: #241 2026-11-09 00:50 UTC (preserved in git history).**
 
-## HEADLINE — SIGNAL-ZOMBIE-PURGE DECIDE (DUE 11-09) RESOLVED: THE PURGE IS ALREADY TWO-TIER
+## HEADLINE — GATE-LEAK CENSUS WAS CRYING WOLF: 5 PHANTOM LEAKS, GATES WERE HOLDING
 
-1. **NO CHANGE (default action confirmed) — but both proposed options are ALREADY IMPLEMENTED.** Tier 1 = compactor purgers: `_purge_executed_signals` (1h, decision IN EXECUTED/FAILED) + `_purge_stale_unexecuted` (2h, EXPIRED/SKIPPED **and executed=0**). Tier 2 = `scripts/archive-signals.py` on `hermes-archive-signals.timer` (daily 04:00Z): archives decision IN (SKIPPED,EXPIRED,EXECUTED,COMPACTED,WAIT,FAILED) older than **CUTOFF_HOURS_OTHERS=336h = 14d** → `archive/signals/signals_YYYY-MM.jsonl.gz` **with decision_reason fully preserved** → DELETE+VACUUM. So option (a) retention≥14d and option (b) archive-preserve both exist already; the "sweep-expired zombies" (decision=EXPIRED AND executed=1) are the in-retention-window forensic cohort, by design.
-2. **Evidence:** runtime DB `min(created_at)=2026-10-25` (16,161 rows, nothing older than ~15d despite ~1,000 zombies/day) + archive files 2026-08/09/10/11 all present. Forensic history not at risk. **SHIP: +8-line TWO-TIER PURGE ownership comment at the signal_compactor.py call site** (py_compile PASS, zero behavior) so this DECIDE is not re-derived a third time.
-3. **0 config changes** — session lock absent, constants EMPTY diff, nothing passed vacation review-queue bars.
+1. **SHIPPED (audit script only, zero trading behavior): `brain/analysis/gate_leak_census.py` source-scoped floor fix.** The census adjudicated every executed SHORT against the global `SHORT_RSI_HARD_FLOOR=45`, but live code has applied `SHORT_RSI_HARD_FLOOR_JUP_YOLO=35` to giants (`jup_yolo`/`hl_copy`, via `directional_block.is_giant_source`) since CEO Option D commit `0c2f7a46` (2026-10-30 23:13:19) — signal_compactor.py:4632 and decider_run.py:1472 both do the source-floor select. Result: **5 phantom LEAKs** (jup rsi 38.8-43.2, opened 11-05..11-08, all post-waiver-expiry so they fell out of the WAIVER bucket) + **11 phantom WAIVERs** (post-Option-D jup rows that are legal ALLOW, not waiver-covered). Live gates were holding the entire time.
+2. **Root-cause fix, not per-caller patches:** new `_effective_floor(ts, source)` mirrors the live select order exactly (pump-chain branch first, then `is_giant_source`, else global history) — bug_hunter confirmed order matches decider_run.py:1469-1474. Also fixed a second latent bug it found: `_waiver_active` compared raw ISO (`2026-11-03T00:00:00Z`) against space-separated (`2026-11-03 ...`) — `'T' > ' '` kept the **entire expiry day** in-waiver regardless of hour (zero affected rows today, normalized anyway).
+3. **Verified:** `--selfcheck` PASS (+9 new asserts: boundary ±1s at the Option D commit instant, combo-source pump-first order, direct `_effective_floor` pins, constant pins) · 14d **LEAK 5→0** (ALLOW 40→56, WAIVER 43→32) · 30d LEAK 0 · `py_compile` OK · **bug_hunter SHIP-WITH-FIXES, both fixes applied**. Known-gaps comment documents the 3 modelled-but-zero-impact windows (pre-10-21 pump floor 40, hl_copy 2h26m GIANT_NS lag, RC1 fade '+' sources).
+4. **0 trading-constant changes** — `hermes_constants.py` EMPTY git diff, session lock ABSENT, CEO_PROTECTED 13/13, size-reduce file absent = 1.0x, checkpoint_registry 0 pending.
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| **zombie-purge DECIDE (headline)** | RESOLVED → done. Two-tier purge already covers options (a)+(b); comment shipped |
-| **chop-bleed** | 7d **94.5%** / 14d **94.8%** (both ≥92%) / 30d 89.0% — chronic, remedy VETOED as inert, owned by 11-14 stack |
-| **RR asymmetry** | 7d avg win +0.0648 vs avg loss -0.1068 (1.65x) → breakeven WR **62.2%** vs actual 56.0% = loss SIZE is the lever |
-| **exit families 14d** | profit-monster-trail 138T 97.8% **+7.76** carries all profit; atr_sl_hit 58T 0% -6.50 + hard_max_loss 45T 0% -5.82 = 103/162 losers (63.6%) through the two pure-loss engines |
-| **jup concentration (side-find)** | jup_yolo_mirrored = 37% of last-100 fills, 139T/30d (18%) yet 30d net **-0.98** at 61.9% WR; only HIGH-SHORT cell positive — 4 registered items already cover it, reported NOT re-proposed |
-| **#240 verify** | shadow_dup_check selfcheck PASS (77,491 rows) · clamps live · joins re-ran · constants EMPTY · 0 Tracebacks · registry 0 pending — **ALL PASS** |
+| **gate-leak census false positives (headline)** | SHIPPED — source-scoped floors + waiver ISO fix; 5 phantom LEAKs explained, gates holding |
+| **watchdog steer-001 (jup losing streak)** | TRIAGED, NO ACTION — window artifact (rolling last-20-ALL-signals, not jup's own last-20 = +0.39/70%); 8 registered jup items cover it; HIGH-SHORT cell positive → NOT disabling (CEO domain) |
+| **chop-bleed** | 7d **94.5%** / 14d **95.1%** (both ≥92%) / 30d 89.5% — chronic; remedy set already queued 11-10..11-14; 0.75x size stays vetoed (#196) |
+| **hl_copy confidence-floor watch (#145)** | CLOSED-WITH-DATA — 21/21 trades already conf≥70 (19/21 ≥80): floor is structurally inert. Bleed is exit-side (bypassed from PM trail AND UGB-PT), owned by amplify-ugb-bypass-hole (12-15) |
+| **jup ATRSL-parity re-read (#230 pre-reg)** | DIRECTIONALLY CONFIRMED — pre-fix 96T 59.4% **-1.08** vs post-11-03 44T 65.9% **+0.02** (sign flip, n=44, regime confound possible) → feeds the 11-10 jup-atrsl-parity packet, not a causation claim |
+| **#241 verify** | TWO-TIER PURGE comment at signal_compactor.py:6481 PRESENT · shadow_dup_check selfcheck PASS (78,273 rows) · both joins re-ran · constants EMPTY · 0 pending — ALL PASS |
 
-### 2. NUMBERS (fresh PG 00:30Z)
-- 24h **16T 56.3% -0.04 FLAT** | 7d **150T 56.0% -1.61** (armed 81T 92.6% +4.68 vs unarmed 69T 13.0% -6.29) | 14d 392T 54.6% -3.38 | 30d 768T 47.0% -6.60
-- 7d exit families: trail 50T 98.0% +3.00 vs chop exits 56T 0% -6.69
-- 14d sub-50% n≥15: pc+ 29T 48.3% -0.27 (NO-KILL/11-13) · pc- 32T 37.5% +0.07 (contrarian-owned) — **0 new targets**
+### 2. NUMBERS (fresh PG 04:30Z)
+- 24h **15T 46.7% -0.29** | 48h 21T 57.1% -0.06 | 7d **143T 53.1% -2.13** (armed 73T 91.8% +4.24 vs unarmed 70T 12.9% -6.37) | 14d 388T 54.6% -3.28 | 30d 761T 46.8% -7.24 (**armed 393T 81.2% +22.12 vs unarmed 368T 10.1% -29.36**)
+- 14d exit families: pm-trail 137T 97.8% **+7.73** carries all profit; atr_sl_hit 58T 0% -6.53 + hard_max_loss 44T 0% -5.73 = **102/162 losers through the two pure-loss engines**
+- 7d by direction×arm: LONG armed 47T 91.5% +2.67 / LONG unarmed 54T 9.3% **-5.19** · SHORT armed 26T 92.3% +1.57 / SHORT unarmed 16T 25% -1.18
+- 14d sub-50% n≥15: pc+ 29T 48.3% -0.27 (NO-KILL/11-13) · pc- 31T 38.7% +0.12 (contrarian-owned) — **0 new kill targets**
 
-### 3. SHADOW (3/6 usable)
-- **contrarian join 00:30Z (re-ran, mandate):** overall flip 43.4% n=1448 · **pc- 64.6% (226W/124L) LIVE uniform chi2 p=0.3747 = Oct-27 PROMOTE stands** · rider 36.2% do-NOT
-- floor join 11-08 08:30Z: 49.2% vs 43.7% **p=0.1411 COLLECT (11-15)**
-- shadow_trader: exit A/B **pm_trail +11,582 vs hard_max -13,641** = trail-or-nothing
-- oscillator FROZEN · wyckoff RETIRED · rr ORPHANED
+### 3. SHADOW (2/6 usable)
+- **contrarian join 04:30Z (re-ran, mandate):** overall flip **43.4%** n=1448 (W628/L820) = flipping the book loses · **pc- 64.6% (226W/124L) LIVE, uniform chi2 p=0.3747 across tape+tokens = Oct-27 PROMOTE stands** · rider 36.2% do-NOT
+- floor join 04:31Z: n bar PASS (1451); 30d same-sign not reachable until **2026-11-16** → COLLECT (11-15)
+- shadow_trader: exit A/B **pm_trail +11,687 vs hard_max -13,770** = trail-or-nothing; every gate still avg-negative-EV
+- oscillator FROZEN (archived) · wyckoff RETIRED · rr ORPHANED
 
 ### 4. AUTOPSY + AMPLIFY
-- **48h recovery_replay (adverse-first, selfcheck PASS): n=8 = 5 never-adverse / 3 recovered / 0 NEVER → WRONG-SIDE REFUTED 68th consecutive** (#61 p=0.116, #84 t=-0.04).
-- **AMPLIFY: 0 new proposals (rule-3 why-not recorded).** Top cells all in-flight (bb-squeeze combo-boost 11-10 · vb- clone-hunt 11-13 · jup walk 11-14 / HIGH OOS 11-19 · pc- contrarian 11-11) or below the +1.00 materiality bar. **Flip-KPI MET this week** (#239). In-flight reading: bb-squeeze+ 17 + warrior-sr-confirm+ 6 = **23% of last-100 vs ≥25% bar** (baseline 17%), deadline 11-10.
-- Creative x2: two-tier purge ownership comment (SHIPPED) · jup concentration watch.
-- constants EMPTY · session lock ABSENT · size-reduce absent = 1.0x · 0 pending checkpoints · watchdog steers = 0.
+- **48h recovery_replay (adverse-first, selfcheck PASS): n=9 = 5 never-adverse / 4 recovered / 0 NEVER → WRONG-SIDE REFUTED 70th consecutive** (#61 p=0.116, #84 t=-0.04). 8/9 24h losers = unarmed chop entries (MFE 0.007-0.369) exiting atr_sl/hard_max; SOL jup #16818 hit MFE 0.369 = 92% of arm threshold and still lost → feeds prearm-breakeven sweep (11-14).
+- **AMPLIFY: 0 new proposals (rule-3 why-not recorded in kanban + audit_recommendations).** All 4 n≥10 30d winner cells in-flight: bb-squeeze+ NORMAL 44T +0.76 (x4 items) · vb- HIGH 19T +0.42 (11-13) · jup HIGH 16T +0.32 (11-19) · pc- NORMAL 30T +0.19 (11-11); n≥5 net>0.5 = r2v2-long3 6T +0.78 inside size-125 (default revert 11-10). No new clone-hunt target (#235 gate-EV screen: all fk 29-44% FAIL; pc- cells rejected by #230). **Flip-KPI MET this week (#239).**
+- Creative x3: census source-scoped fix (SHIPPED) · jup ATRSL-parity re-read (measured) · hl_copy confidence watch closed-with-data.
+- constants EMPTY · session lock ABSENT · size-reduce absent = 1.0x · 0 pending checkpoints · watchdog steers = 1 (triaged, no action).
 
-### 5. READINESS (2026-11-09 00:30 UTC)
-**1 open — HOLD:** MON volume-buildup- SHORT #16828 +0.18% (0.1h), bracketed SL 0.016161 / TP 0.015516. 0 steers, portfolio good. Regime: **15m NEUTRAL vs 4h SHORT_BIAS**, continuum BELOW, vol NORMAL, wyckoff ACCUMULATION, market CALM, trend_quality UP → **HOLD; trail-family first; no fresh counter-trend entries; size 1.0x.**
+### 5. READINESS (2026-11-09 04:30 UTC)
+**0 open — FLAT = CORRECT.** 0 steers actionable, portfolio good. Regime: **15m AND 4h both SHORT_BIAS (agreed)**, continuum AT, vol LOW, velocity SLOW, accel NEGATIVE, wyckoff MARKDOWN, market CALM, trend_quality UP (disagrees with bias pair = chop) → **no counter-trend entries, dump-side preferred while both timeframes agree, mid-band = no trade, trail-family first, size 1.0x.**
 
-**Queue:** ~~11-09 zombie-purge DECIDE~~ **DONE this run** → **11-10 eight items: gate-shadow-dedup fold + size-125 auto-revert (1.25→1.0, pre-adjudicated FAIL) + fade-ctx + rsi-ceiling-75 revert-rule + conf-filter-parity (jup conf-99) + jup-atrsl-parity + mfe-cut-arm-be + ichimoku-dampen** → 11-11 contrarian watch → 11-12 storm-waiver → 11-13 pc+ kill-review + vb- clone-hunt + linreg-fade → 11-14 stop-tighten eval (id bar MET=86, SHADOW tag, source archive+current) + drop-pcplus + probe-080 + bbsqueeze reband/neutral-exempt + mult-150 + atrtrail-clip + prearm-breakeven + TAT-age-sweep → 11-15 floor → 11-19 jup HIGH OOS → 11-21 conf-tilt + scope-widen walk.
-**CEO:** mult-150 sign-off (evidence decayed — judge ex-pc+ or drop first) · jup HIGH cell HOLD · unclog-waiver EXPIRY re-measure [35,45) before renewal (expired 11-03, still owed).
+**Queue:** ~~11-09 zombie-purge~~ DONE #241 → **11-10 (9 items 00:00Z): gate-shadow-dedup fold · size-125 auto-revert 1.25→1.0 (pre-adjudicated FAIL; money-sizing=CEO) · fade-ctx-exempt (pre-adjudicated fee-net FAIL, bring gross-vs-fee split to CEO) · rsi-ceiling-75 revert-rule · conf-filter-parity source-scoped jup conf-99 · jup-atrsl-parity (ADD this run's post-fix re-read 44T +0.02) · mfe-cut-arm-be · ichimoku-dampen · warrior-uninert next-100 share read (bar ≥25%, baseline 17%)** → 11-11 contrarian → 11-12 storm x3 → 11-13 pc+ kill-review + vb- clone-hunt + linreg-fade → 11-14 stop-tighten eval + drop-pcplus + probe-080 + bbsqueeze reband/neutral-exempt + mult-150 + atrtrail-clip + prearm-breakeven + TAT-age-sweep → 11-15 floor → 11-19 jup HIGH OOS → 11-21 conf-tilt + scope-widen walk → 12-15 ugb-bypass-hole.
+**CEO:** mult-150 sign-off (evidence decayed) · unclog-waiver EXPIRY re-measure [35,45) before renewal (expired 11-03, still owed) · watchdog's "consider disabling jup" = **NOT recommended** (8 registered items; HIGH-SHORT cell +0.32 validated).

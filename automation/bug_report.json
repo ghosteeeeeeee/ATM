@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-08 19:28:35",
+  "timestamp": "2026-11-09 03:28:35",
   "total_checks": 20,
   "passed": 13,
   "critical_count": 7,
@@ -13,13 +13,13 @@
     },
     {
       "name": "sql_injection",
-      "msg": "39 files with f-string SQL",
+      "msg": "40 files with f-string SQL",
       "file": "session_brain.py:498",
       "fix": "Use parameterized queries: cursor.execute('SELECT ... WHERE col = ?', (value,))"
     },
     {
       "name": "cursor_leaks",
-      "msg": "53 files: ceo_dashboard_api.py, study_winning_combos.py, family_map_dashboard.py, apply_fixes.py, wave_backtest.py",
+      "msg": "52 files: ceo_dashboard_api.py, study_winning_combos.py, family_map_dashboard.py, apply_fixes.py, wave_backtest.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
