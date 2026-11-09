@@ -232,18 +232,25 @@ def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
     # F4 (bug_hunter MED): a CONSUMED order (fired/error in the one-shot
     # state) must not 'cover' a new arm — covering a filled order would
     # leave shadow/live divergence (hypothetical armed, no real order).
+    # LOW-3: unreadable state fails CLOSED (refuse to arm — the fire path
+    # refuses to trade under the same condition; failing open here would
+    # recreate the divergence exactly under corruption).
     try:
         with open(os.path.join(HERMES_DATA, 'pending_orders_state.json')) as f:
             pstate = json.load(f)
         if not isinstance(pstate, dict):
-            pstate = {}
-    except Exception:
-        pstate = {}
+            raise ValueError('state not a dict')
+    except Exception as e:
+        DB.log_event('WARN', f'arm skipped FAIL-CLOSED — one-shot state '
+                             f'unreadable: {e}')
+        return 'error:state-unreadable'
     dedupe = 0.3 * (atr_1h or 400)
     for ex in orders:
         if ex.get('direction') != leg:
             continue
-        _st = (pstate.get(ex.get('id')) or {})
+        _st = pstate.get(ex.get('id'))
+        if not isinstance(_st, dict):       # LOW-2: truthy non-dict guard
+            _st = {}
         if _st.get('status') in ('fired', 'error'):
             continue                      # consumed — covers nothing
         if abs(float(ex.get('trigger_price') or 0) - o['trigger']) < dedupe:

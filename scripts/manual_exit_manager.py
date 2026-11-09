@@ -105,15 +105,21 @@ def _save_state(state: dict) -> None:
 
 
 def decide_sl(direction: str, current_price: float, entry_price: float,
-              old_sl: float, peak_frac: float = None):
+              old_sl: float, peak_frac: float = None, skip_be: bool = False,
+              giveback_frac: float = None, min_lock_frac: float = 0.0):
     """Pure phase decision: what should the SL become? Returns
     (new_sl, profit_frac, phase, peak_frac) or None to leave the SL put.
 
     Phases:
       — profit <  PM_BREAKEVEN_LOCK_PCT:      untouched
       — BE lock ≤ profit <  PM_TRAIL_ACTIVATE_PCT: SL := entry (breakeven)
+        (skipped entirely when skip_be=True — CEO 2026-11-09: retest-
+        surviving trades park nothing at entry; the ARMED deep stop stands)
       — profit ≥ PM_TRAIL_ACTIVATE_PCT:       SL := entry ∓ floor, where
-        floor = peak profit − tier_dist(peak)  (profit-monster tiers)
+        floor = peak profit − dist. dist = MANUAL tiers by default,
+        giveback_frac overrides (per-order trail profile). Writes only
+        when floor ≥ min_lock_frac (default 0.0 = legacy behavior) —
+        keeps the armed stop until the lock is worth taking.
     """
     if direction not in ('LONG', 'SHORT'):
         return None                        # validate — never fall through
@@ -133,6 +139,8 @@ def decide_sl(direction: str, current_price: float, entry_price: float,
         return None                        # SL untouched
 
     if profit_frac < PM_TRAIL_ACTIVATE_PCT:
+        if skip_be:
+            return None                    # armed deep stop stands
         new_sl = round(entry_price, 8)             # breakeven lock
         better = (new_sl > old_sl) if direction == 'LONG' else (new_sl < old_sl)
         if not better:
@@ -143,8 +151,11 @@ def decide_sl(direction: str, current_price: float, entry_price: float,
     # profit-monster, +0.30 giveback cushion per level so slightly bigger
     # pullbacks don't clip the trade) ──
     peak_frac = max(peak_frac or 0.0, profit_frac)   # peak tracks the best
-    dist_frac = _manual_dist_pct(peak_frac * 100) / 100.0
+    dist_frac = (giveback_frac if giveback_frac is not None
+                 else _manual_dist_pct(peak_frac * 100) / 100.0)
     floor_frac = max(0.0, peak_frac - dist_frac)
+    if floor_frac < min_lock_frac:
+        return None                    # lock not worth taking — armed stop stays
     # Exit at the floor-profit PRICE: SHORT locks entry*(1−floor),
     # LONG locks entry*(1+floor) — calibrated against #16381's real
     # trail fill (short 79,721: code floor → 79,402.12 vs actual
@@ -186,9 +197,21 @@ def update_trail(pos: dict, direction: str, current_price: float,
     if st.get('dynamic_sl') is False:
         return False
     peak_frac = st.get('peak_frac')
+    # Per-order trail profile (bridged at fire time, CEO 2026-11-09):
+    # skip_be_lock / giveback_pct / min_lock_pct — coerced defensively.
+    try:
+        _gb = st.get('giveback_pct')
+        _gb = float(_gb) if _gb is not None else None
+    except (TypeError, ValueError):
+        _gb = None
+    try:
+        _ml = float(st.get('min_lock_pct') or 0.0)
+    except (TypeError, ValueError):
+        _ml = 0.0
 
     decided = decide_sl(direction, current_price, entry_price, old_sl,
-                        peak_frac)
+                        peak_frac, skip_be=st.get('skip_be_lock') is True,
+                        giveback_frac=_gb, min_lock_frac=_ml)
     if decided is None:
         _save_state(state)                # persist peak progress (prune too)
         return False                      # SL untouched

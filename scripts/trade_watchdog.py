@@ -1263,11 +1263,22 @@ def monitor_pending_orders(btc_price):
     """Cross-process-locked wrapper (bug_hunter F1): the pipeline's 1-min
     caller and the watchdog's 30-min caller share this state file — the
     entire read→claim→write section runs under one exclusive flock."""
-    lf = _acquire_pending_lock()
+    try:
+        lf = _acquire_pending_lock()
+    except OSError as e:
+        # LOW-1 (bug_hunter): unusable lock path must degrade like the
+        # corrupt-state path (fail-closed, cycle continues) — not raise
+        # into the pipeline step / whole watchdog cycle.
+        log(f"pending state lock unusable — cycle skipped FAIL-CLOSED: {e}",
+            "ERROR")
+        return []
     try:
         return _monitor_pending_orders_impl(btc_price)
     finally:
-        _release_pending_lock(lf)
+        try:
+            _release_pending_lock(lf)
+        except OSError:
+            pass
 
 
 def _monitor_pending_orders_impl(btc_price):
@@ -1407,6 +1418,11 @@ def _monitor_pending_orders_impl(btc_price):
                         # never ran (live #16831 got the premature BE-LOCK).
                         # None when absent (is False check stays correct).
                         "dynamic_sl": order.get("dynamic_sl"),
+                        # Per-order trail profile (CEO 2026-11-09) — same
+                        # bridging rule: payload carries them or they're lost.
+                        "skip_be_lock": order.get("skip_be_lock"),
+                        "giveback_pct": order.get("giveback_pct"),
+                        "min_lock_pct": order.get("min_lock_pct"),
                     }}
                 })
                 if PENDING_ORDERS_CAN_PERSIST:
@@ -1437,11 +1453,23 @@ def _execute_pending_order(order):
     """Cross-process-locked wrapper (bug_hunter F1): claim→fire state
     transitions from both the pipeline and watchdog callers serialize on
     the same flock as the monitor."""
-    lf = _acquire_pending_lock()
+    oid = order.get("id", "?") if isinstance(order, dict) else "?"
+    try:
+        lf = _acquire_pending_lock()
+    except OSError as e:
+        # LOW-1: degrade fail-closed, never raise into the cycle
+        log(f"AUTO-EXEC {oid}: lock unusable — refusing to trade FAIL-CLOSED: {e}",
+            "ERROR")
+        return {"type": "pending_order", "order_id": oid,
+                "auto_executed": False,
+                "hl_result": f"error: lock unusable ({e})"}
     try:
         return _execute_pending_order_impl(order)
     finally:
-        _release_pending_lock(lf)
+        try:
+            _release_pending_lock(lf)
+        except OSError:
+            pass
 
 
 def _execute_pending_order_impl(order):
@@ -1519,18 +1547,29 @@ def _execute_pending_order_impl(order):
         # so retests don't kick the trade out before the real leg) — the
         # BE/trail stack skips these trades entirely. Flag must live in
         # manual_exit_manager's state too (keyed by TRADE id, not order id).
-        if order.get("dynamic_sl") is False:
-            state[oid]["dynamic_sl"] = False
-            if trade_ref and trade_ref.lstrip('#').isdigit():
-                try:
-                    import manual_exit_manager as _mxm_flag
-                    _mstate = _mxm_flag._load_state()
-                    _mstate[trade_ref.lstrip('#')] = {
-                        'dynamic_sl': False, 'ts': time.time()}
-                    _mxm_flag._save_state(_mstate)
-                except Exception as _e:
-                    log(f"AUTO-EXEC {oid}: dynamic_sl flag bridge failed: {_e}",
-                        "WARN")
+        # Trail-profile bridge (CEO 2026-11-09): order-config keys cross into
+        # manual_exit_manager's state (keyed by TRADE id — its file is keyed
+        # differently than this order-id state). dynamic_sl:false = structure-
+        # fixed (watchdog tweak owns the SL); skip_be_lock/giveback_pct/
+        # min_lock_pct = custom trail profile (retest-surviving riders).
+        _profile = {k: order.get(k) for k in
+                    ("dynamic_sl", "skip_be_lock", "giveback_pct", "min_lock_pct")
+                    if order.get(k) is not None}
+        if "dynamic_sl" in _profile:
+            state[oid]["dynamic_sl"] = order.get("dynamic_sl")
+        if _profile and trade_ref and trade_ref.lstrip('#').isdigit():
+            try:
+                import manual_exit_manager as _mxm_flag
+                _mstate = _mxm_flag._load_state()
+                _entry = _mstate.get(trade_ref.lstrip('#')) or {}
+                _entry.update(_profile)
+                _entry['ts'] = time.time()
+                _mstate[trade_ref.lstrip('#')] = _entry
+                _mxm_flag._save_state(_mstate)
+                log(f"AUTO-EXEC {oid}: trail profile bridged {list(_profile)}")
+            except Exception as _e:
+                log(f"AUTO-EXEC {oid}: trail-profile bridge failed: {_e}",
+                    "WARN")
         atomic_write_json(PENDING_ORDERS_STATE, state)
         if success:
             log(f"AUTO-EXEC pending order {oid} ✅ opened {trade_ref}", "INFO")
