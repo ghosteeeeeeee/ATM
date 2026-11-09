@@ -217,10 +217,14 @@ clock) — it shares trade_watchdog's monitor/execute path and autopilot
 gate; the 30-min watchdog cycle monitors too (one-shot state makes the
 double caller safe). Fires via `brain.py trade add` with
 `ai-trader-pending` (NO `--manual` → vacation pause still gates) plus
-`--force` for CEO tranches. One-shot: fires once, never re-arms;
-orphaned `triggered` state surfaces as an urgent
-steer after 15min (re-arm = delete the state entry). Verify any armed order
-with the engine on a temp state path — never the live state file.
+`--force` for CEO tranches. One-shot: fires once, never re-arms — state
+is cross-process LOCKED (flock; pipeline 1-min + watchdog 30-min share
+it, fail-closed on corrupt); orphaned `triggered` state surfaces as an
+urgent steer after 15min (re-arm = delete the state entry). **Verify any
+armed order with the engine on a temp state AND temp config path — never
+the live ones** (bug_hunter incident 2026-11-09: a probe patched only
+the state path, clobbered the live config, and the pipeline filled it →
+duplicate real trade #16832).
 
 **The arming lessons (all paid for in real money, 2026-10-19/20):**
 

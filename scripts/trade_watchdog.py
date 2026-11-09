@@ -1215,19 +1215,62 @@ def analyze_price_alerts(btc_price):
 
 
 def _load_orders_state():
+    """Load the one-shot state. FAIL-CLOSED (bug_hunter F1): corrupt or
+    non-dict state returns None — never {} — because an empty one-shot
+    memory would re-fire EVERY already-crossed order (proven double-fire).
+    Callers must abort pending processing on None."""
     state = {}
     if os.path.exists(PENDING_ORDERS_STATE):
         try:
             with open(PENDING_ORDERS_STATE) as f:
                 state = json.load(f)
             if not isinstance(state, dict):
-                state = {}
+                return None
         except Exception:
-            state = {}
+            return None
     return state
 
 
+# ── Cross-process one-shot lock (bug_hunter F1 CRITICAL) ───────────────────
+# The state file is read-modify-written by TWO processes (pipeline
+# pending_order_monitor every ~1min + trade_watchdog every ~30min).
+# Unlocked, a 5ms stall double-fired 6/6 in tests, and concurrent fixed-tmp
+# writes corrupted the file (→ {} → one-shot wipe → re-fire). Every
+# state read→write section holds this exclusive lock; the fixed .tmp in
+# atomic_write_json is then safe (serialized writers).
+import fcntl
+_PENDING_STATE_LOCK = PENDING_ORDERS_STATE + ".lock"
+
+
+def _acquire_pending_lock():
+    fd = open(_PENDING_STATE_LOCK, "w")
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+    except Exception:
+        fd.close()
+        raise
+    return fd
+
+
+def _release_pending_lock(fd):
+    try:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+    finally:
+        fd.close()
+
+
 def monitor_pending_orders(btc_price):
+    """Cross-process-locked wrapper (bug_hunter F1): the pipeline's 1-min
+    caller and the watchdog's 30-min caller share this state file — the
+    entire read→claim→write section runs under one exclusive flock."""
+    lf = _acquire_pending_lock()
+    try:
+        return _monitor_pending_orders_impl(btc_price)
+    finally:
+        _release_pending_lock(lf)
+
+
+def _monitor_pending_orders_impl(btc_price):
     """Internal stop-limit orders: monitor trigger prices, alert + execute.
 
     Flow: order armed in pending_orders.json → watchdog cycle detects price
@@ -1255,6 +1298,12 @@ def monitor_pending_orders(btc_price):
         log('pending orders config malformed: expected {"orders": [...]} — skipping', "WARN")
         return steers
     state = _load_orders_state()
+    if state is None:
+        # F1 fail-closed: one-shot memory unreadable — firing now risks
+        # re-firing every crossed order. Abort; next healthy cycle recovers.
+        log("pending orders state UNREADABLE (corrupt) — skipping cycle "
+            "FAIL-CLOSED until a writer repairs it", "ERROR")
+        return steers
     changed = False
     seen_ids = set()
     for order in cfg["orders"]:
@@ -1353,6 +1402,11 @@ def monitor_pending_orders(btc_price):
                         "leverage": leverage, "sl": sl, "target": target,
                         "confidence": confidence,
                         "note": note,
+                        # F2 (bug_hunter HIGH): the rebuilt payload DROPPED
+                        # this key — the dynamic_sl bridge at the fire path
+                        # never ran (live #16831 got the premature BE-LOCK).
+                        # None when absent (is False check stays correct).
+                        "dynamic_sl": order.get("dynamic_sl"),
                     }}
                 })
                 if PENDING_ORDERS_CAN_PERSIST:
@@ -1380,6 +1434,17 @@ def monitor_pending_orders(btc_price):
 
 
 def _execute_pending_order(order):
+    """Cross-process-locked wrapper (bug_hunter F1): claim→fire state
+    transitions from both the pipeline and watchdog callers serialize on
+    the same flock as the monitor."""
+    lf = _acquire_pending_lock()
+    try:
+        return _execute_pending_order_impl(order)
+    finally:
+        _release_pending_lock(lf)
+
+
+def _execute_pending_order_impl(order):
     """Place a triggered pending order via brain.py trade add — the regular
     execution path WITHOUT --manual, so vacation pause / kill switch still gate.
 
@@ -1388,6 +1453,24 @@ def _execute_pending_order(order):
     import subprocess
     import re as _re
     oid = order.get("id", "?")
+    # F1 claim recheck (runs under the wrapper's flock): refuse to trade if
+    # the one-shot memory is unreadable (fail-closed) or already consumed —
+    # this is the belt to the monitor's suspenders against double-fire.
+    _pre_state = _load_orders_state()
+    if _pre_state is None:
+        log(f"AUTO-EXEC {oid}: state unreadable (corrupt) — refusing to "
+            f"trade FAIL-CLOSED", "ERROR")
+        return {"type": "pending_order", "order_id": oid,
+                "auto_executed": False,
+                "hl_result": "error: one-shot state corrupt"}
+    _prev = _pre_state.get(oid)
+    if isinstance(_prev, dict) and _prev.get("status") in ("fired", "error"):
+        log(f"AUTO-EXEC {oid}: already {_prev.get('status')} — one-shot "
+            f"re-entry refused", "WARN")
+        return {"type": "pending_order", "order_id": oid,
+                "auto_executed": False,
+                "hl_result": f"skipped: already {_prev.get('status')}"}
+    state = _pre_state                    # same lock hold → use for the write
     try:
         # Cmd build INSIDE try — a KeyError on a bad payload must mark the
         # order error, not escape to the caller (bug_hunter LOW).
@@ -1420,8 +1503,9 @@ def _execute_pending_order(order):
         m = _re.search(r"trade #(\d+)", out)
         if m:
             trade_ref = f"#{m.group(1)}"
-        # Update state: fired or error — never re-fire either way (one-shot)
-        state = _load_orders_state()
+        # Update state: fired or error — never re-fire either way (one-shot).
+        # Reuses `state` loaded at claim time — same lock hold, no reload
+        # (F1: interleaved reloads were the race window).
         state[oid] = {
             "status": "fired" if success else "error",
             "price": order.get("trigger_price"),
@@ -1468,9 +1552,9 @@ def _execute_pending_order(order):
     except Exception as e:
         log(f"AUTO-EXEC pending order {oid} exception: {e}", "ERROR")
         try:
-            state = _load_orders_state()
-            state[oid] = {"status": "error", "ts": time.time(), "error": str(e)}
-            atomic_write_json(PENDING_ORDERS_STATE, state)
+            if state is not None:          # claim-time load, same lock hold
+                state[oid] = {"status": "error", "ts": time.time(), "error": str(e)}
+                atomic_write_json(PENDING_ORDERS_STATE, state)
         except Exception:
             pass
         return {

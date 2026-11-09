@@ -53,7 +53,7 @@ STEP_TIMEOUTS = {
     'decider_run': 360,
     'signal_analyst': 30,     # score hotset signals, must be fast
     'position_manager': 120,
-    'pending_order_monitor': 60,  # conditional-order fills must stay fast
+    'pending_order_monitor': 180,  # must exceed brain.py's inner 120s budget (F7)
     'strategy_optimizer': 300,
     'ab_optimizer': 300,
     'shadow_signals_runner': 180,  # shadow-mode signal detection (T directive 2026-10-22)

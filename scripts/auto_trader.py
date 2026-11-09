@@ -229,10 +229,23 @@ def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
     orders = pcfg.get('orders') if isinstance(pcfg, dict) else None
     if not isinstance(orders, list):
         orders = []
+    # F4 (bug_hunter MED): a CONSUMED order (fired/error in the one-shot
+    # state) must not 'cover' a new arm — covering a filled order would
+    # leave shadow/live divergence (hypothetical armed, no real order).
+    try:
+        with open(os.path.join(HERMES_DATA, 'pending_orders_state.json')) as f:
+            pstate = json.load(f)
+        if not isinstance(pstate, dict):
+            pstate = {}
+    except Exception:
+        pstate = {}
     dedupe = 0.3 * (atr_1h or 400)
     for ex in orders:
         if ex.get('direction') != leg:
             continue
+        _st = (pstate.get(ex.get('id')) or {})
+        if _st.get('status') in ('fired', 'error'):
+            continue                      # consumed — covers nothing
         if abs(float(ex.get('trigger_price') or 0) - o['trigger']) < dedupe:
             return 'covered'
     tdir = o.get('trigger_dir') or ('above' if leg == 'long' else 'below')
@@ -335,7 +348,9 @@ def tweak_structure_fixed(decision, open_positions):
                         tweaks.append(t)
                         DB.log_event('INFO', f"tweak {t}")
                     stop = want if cur.rowcount else stop
-                if target < (sl - atr):    # deeper than structure by >1 ATR
+                # F3 (bug_hunter MED): TP must stay BELOW live price for a
+                # short — a structure snap already crossed = instant exit.
+                if target < (sl - atr) and (sl + 0.05 * atr) < price * 0.999:
                     new_tp = round(sl + 0.05 * atr, 8)
                     cur.execute("UPDATE trades SET target=%s WHERE id=%s "
                                 "AND status='open' AND target=%s",
@@ -364,7 +379,8 @@ def tweak_structure_fixed(decision, open_positions):
                         tweaks.append(t)
                         DB.log_event('INFO', f"tweak {t}")
                     stop = want if cur.rowcount else stop
-                if target > (sh + atr):
+                # F3 mirror: TP must stay ABOVE live price for a long
+                if target > (sh + atr) and (sh - 0.05 * atr) > price * 1.001:
                     new_tp = round(sh - 0.05 * atr, 8)
                     cur.execute("UPDATE trades SET target=%s WHERE id=%s "
                                 "AND status='open' AND target=%s",
