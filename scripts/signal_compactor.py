@@ -2549,7 +2549,7 @@ def _storm_btc_limb():
 _LINREG_FADE_STORM_LOGGED = set()
 
 
-def _linreg_fade_storm_shadow(tkn, direction, source, rsi, floor):
+def _linreg_fade_storm_shadow(tkn, direction, source, rsi, floor, dry=False):
     """[LINREG-FADE-STORM-SHADOW] log-only counterfactual (CEO 20261108T230547Z).
 
     Fires only when ALL hold: LINREG_FADE_STORM_SHADOW is True (polarity:
@@ -2557,14 +2557,26 @@ def _linreg_fade_storm_shadow(tkn, direction, source, rsi, floor):
     floor stays 45 for everyone else), direction is SHORT, the family is
     linreg-fade- (dual-form match, decider_run bug_hunter #9 precedent), the
     BTC storm limb holds (_storm_btc_limb — BTC condition ONLY, no
-    confluence/sibling limbs), and rsi is in [30,45).
+    confluence/sibling limbs), and rsi is in [30,45) (the pre-registered
+    band, registry linreg-fade-storm-admission-shadow threshold).
+
+    Label hygiene (adversarial review MED-1, 2026-11-09): the band keeps its
+    registered [30,45), but WOULD-ADMIT is provably false below 35 — knife<35
+    is global (BANANA, dead on every path) — so rsi<35 rows get an explicit
+    "can NEVER admit, exclude from bar counts" suffix; [35,45) rows are
+    hard-floor-STAGE admissions only (soft-floor/1m knife downstream are not
+    evaluated here). dry-run lines are tagged so they can never pad the
+    n>=20 bar.
 
     Called from the short-rsi-hard-floor BLOCK branch, so it can only ever
     describe a real block. It never touches control flow (returns True iff a
     line was emitted — probe hook) and is double-guarded (own try/except
     inside the caller's) so a logging failure can never alter the floor
-    outcome. Dedup: one line per (token|direction, site, UTC hour).
-    revert: LINREG_FADE_STORM_SHADOW = False (logging off).
+    outcome. Dedup: one line per (token|direction, site, UTC hour, dry) —
+    membership is checked BEFORE the storm-limb DB open, and the key is added
+    only AFTER log() returns (a failed write must never burn the hour's
+    line; review LOW-4). revert: LINREG_FADE_STORM_SHADOW = False (logging
+    off).
     """
     try:
         from hermes_constants import LINREG_FADE_STORM_SHADOW
@@ -2577,17 +2589,23 @@ def _linreg_fade_storm_shadow(tkn, direction, source, rsi, floor):
             return False
         if rsi is None or not (30 <= rsi < 45):
             return False
+        _key = (f'{tkn}|{direction}', 'short-rsi-hard-floor',
+                int(time.time() // 3600), bool(dry))
+        if _key in _LINREG_FADE_STORM_LOGGED:
+            return False
         _ok, _btc_1h = _storm_btc_limb()
         if not _ok:
             return False
-        _key = (f'{tkn}|{direction}', 'short-rsi-hard-floor',
-                int(time.time() // 3600))
-        if _key in _LINREG_FADE_STORM_LOGGED:
-            return False
+        _msg = (f"  👁️ [LINREG-FADE-STORM-SHADOW] {tkn} SHORT WOULD-ADMIT — "
+                f"rsi={rsi:.2f} in storm band [30,45), floor {floor} holds for "
+                f"everyone else — counterfactual only (ENFORCE=False)")
+        if rsi < 35:
+            _msg += (" [rsi<35: knife<35 stays GLOBAL (BANANA) — can NEVER "
+                     "admit, exclude from bar counts]")
+        if dry:
+            _msg += " [dry-run — exclude from bar counts]"
+        log(_msg)
         _LINREG_FADE_STORM_LOGGED.add(_key)
-        log(f"  👁️ [LINREG-FADE-STORM-SHADOW] {tkn} SHORT WOULD-ADMIT — "
-            f"rsi={rsi:.2f} in storm band [30,45), floor {floor} holds for "
-            f"everyone else — counterfactual only (ENFORCE=False)")
         return True
     except Exception:
         return False  # shadow must never alter the floor block
@@ -3734,7 +3752,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                             log(f"  🌩️ [STORM-CONFL-WAIVER-SHADOW] {token} {direction}: WOULD-PASS "
                                 f"single-type confluence (storm conditions met) — shadow only "
                                 f"(ENFORCE=False); conversion ruling: NO-CONVERT 20261108T230547Z, "
-                                f"floor is the bottleneck [3/3 bar MET 2026-11-08 22:22Z, no longer pending]")
+                                f"floor is the bottleneck [3/3 bar MET 2026-11-08 22:22Z, no longer pending]"
+                                f" [limb-ii RSI clause: STORM_MIN_RSI=35 vs registered >=45 — see registry]")
                 except ImportError:
                     pass
             if not CONFLUENCE_REQUIRED:
@@ -4708,7 +4727,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                     # own try/except) so it can never alter the floor.
                                     try:
                                         _linreg_fade_storm_shadow(
-                                            tkn, direction, source, _rsh_rsi, _rsh_floor)
+                                            tkn, direction, source, _rsh_rsi,
+                                            _rsh_floor, dry)
                                     except Exception:
                                         pass  # shadow must never alter the block
                                     log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.2f} < {_rsh_floor} (exec-time floor would reject anyway)")

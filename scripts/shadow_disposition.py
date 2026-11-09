@@ -63,6 +63,18 @@ default_action}. This runner:
                              (storm-confl-waiver ruled NO-CONVERT
                              20261108T230547Z; mechanism ships ready, entries
                              opt in later).
+                             Guards (reviews 2026-11-09): a threshold_eval
+                             fallback is BREACH-style in this runner, so the
+                             entry must ALSO declare auto_flip_polarity=
+                             "true=met" (or register a positive-semantics
+                             auto_flip_check) or the bar is reported
+                             unknowable; protected/money/mult flags are
+                             refused by auto_flip_flag_blocked()
+                             (CEO_PROTECTED_FLAGS + denylist patterns) —
+                             enforced in code, never prose alone; and
+                             auto_flip_fired RE-ARMS when the bar clears
+                             (mirror of threshold_fired) so a revert-then-
+                             re-met bar can packet again.
 
 Robustness contract (code review 2026-10-27 MED-4/5/6/7, LOW-1/5):
   - dedupe keys are applied ONLY after a successful kanban append (a failed
@@ -434,16 +446,62 @@ PROGRESS_EVALS = {
 }
 
 
-def auto_flip_bar(entry):
+# Protected-flag denylist (AUTO-FLIP POLICY, CEO 20261108T230547Z):
+# "money-sizing/mults/protected flags NEVER auto-flip" — enforced in CODE
+# (bug_hunter LOW-3 2026-11-09: prose is not a guard). Patterns are
+# intentionally broad: a false REFUSE is harmless (a human can still flip the
+# flag by hand), a false ALLOW hands a money flag an auto packet.
+_AUTO_FLIP_BLOCKED_PATTERNS = (
+    (re.compile(r'PM_TRAIL_'), 'PM-trail tier (CEO-protected)'),
+    (re.compile(r'WINNER_CELL'), 'winner-cell sizing (money-sizing)'),
+    (re.compile(r'_MULT$|_MULT_'), 'mult change (money-sizing)'),
+    (re.compile(r'DAMPEN'), 'dampen flag (money-sizing)'),
+    (re.compile(r'^(CUT_LOSER_PNL|ATR_SL_MAX|ATR_SL_MAX_INIT|HL_MIN_NOTIONAL)$'),
+     'money/risk-sizing constant'),
+    (re.compile(r'^LIVE_TRADING_ENABLED$'), 'master live-trading switch'),
+)
+
+
+def auto_flip_flag_blocked(flag):
+    """reason `flag` may NEVER auto-flip, else None. Never raises.
+
+    Checks (1) name shape — must look like a constants flag; (2) the house's
+    own CEO_PROTECTED_FLAGS registry (imported read-only); (3) the money/mult
+    denylist patterns above. Used BOTH in main() (loud report line) and
+    inside auto_flip_packet() (defense in depth)."""
+    f = str(flag or '').strip()
+    if not f:
+        return 'empty auto_flip_flag'
+    if not re.fullmatch(r'[A-Z][A-Z0-9_]*', f):
+        return f'not a constants flag name: {f!r}'
+    try:
+        from hermes_constants import CEO_PROTECTED_FLAGS
+        if f in CEO_PROTECTED_FLAGS:
+            return f'CEO_PROTECTED_FLAGS member ({f})'
+    except Exception:
+        pass
+    for pat, why in _AUTO_FLIP_BLOCKED_PATTERNS:
+        if pat.search(f):
+            return f'protected ({why})'
+    return None
+
+
+def auto_flip_bar(entry, preset=None):
     """(breached, detail) for an auto-flip entry's bar, or (None, why).
 
     Evaluator resolution: the entry's own `auto_flip_check`
-    (THRESHOLD_EVALS style, preferred — write it with POSITIVE semantics:
-    True = bar MET), else its `threshold_eval` (existing mechanism; an
-    auto-flip opt-in must only reuse it when True there also means bar MET).
-    No evaluator / unknown name / evaluator error -> (None, why): the packet
-    is skipped and reported — a wiring gap can never fire a false flip
-    packet (the #102 class). Never raises.
+    (THRESHOLD_EVALS style, preferred — its contract is POSITIVE:
+    True = bar MET), else its `threshold_eval` — which is BREACH-style
+    (True = bad news) in this runner — and that fallback is trusted only
+    when the entry ALSO declares `auto_flip_polarity: "true=met"`
+    (adversarial review MED-2: without the declaration an opt-in would emit
+    "flip <flag> ON" for a losing trial plus two contradictory packets).
+    `preset` is the already-computed (name, breached, detail) from the main
+    threshold section — passed through so an opted-in evaluator never runs
+    twice per run (duplicate Postgres reads, review MED-2 secondary).
+    No evaluator / unknown name / error / missing polarity declaration ->
+    (None, why): the packet is skipped and reported — a wiring gap can never
+    fire a false flip packet (the #102 class). Never raises.
     """
     name = entry.get('auto_flip_check') or entry.get('threshold_eval')
     if not name:
@@ -451,10 +509,19 @@ def auto_flip_bar(entry):
     fn = THRESHOLD_EVALS.get(name)
     if fn is None:
         return None, f'unknown evaluator {name!r}'
-    try:
-        breached, detail = fn(entry)
-    except Exception as ex:
-        return None, f'evaluator {name} error: {type(ex).__name__}: {ex}'
+    if preset is not None and preset[0] == name:
+        breached, detail = preset[1], preset[2]
+    else:
+        try:
+            breached, detail = fn(entry)
+        except Exception as ex:
+            return None, f'evaluator {name} error: {type(ex).__name__}: {ex}'
+    if name == entry.get('threshold_eval') and not entry.get('auto_flip_check'):
+        if str(entry.get('auto_flip_polarity', '')).strip().lower() != 'true=met':
+            return None, (f'threshold_eval {name!r} is breach-style (True = bad news) — '
+                          f'declare auto_flip_polarity="true=met" or register '
+                          f'auto_flip_check (positive semantics)')
+        detail = f'[polarity declared true=met] {detail}'
     return bool(breached), str(detail)
 
 
@@ -464,12 +531,16 @@ def auto_flip_packet(entry, st, now_iso, breached, detail):
 
     Fires ONCE per entry (state key auto_flip_fired); the caller queues the
     state write only after a successful kanban append (the MED-4
-    append-success-only contract). The line is deliberately loud and
-    actionable — it names the exact one-line constants edit; the runner
-    itself never edits hermes_constants.py.
+    append-success-only contract), and clears the key again if the bar later
+    clears (re-arm, mirror of threshold_fired). Protected flags are refused
+    here too (defense in depth behind main()'s report line). The line is
+    deliberately loud and actionable — it names the exact one-line constants
+    edit; the runner itself never edits hermes_constants.py.
     """
     flag = entry.get('auto_flip_flag')
     if not flag or entry.get('status') != 'open' or st.get('auto_flip_fired'):
+        return None, None
+    if auto_flip_flag_blocked(flag):
         return None, None
     if not breached:
         return None, None
@@ -568,6 +639,7 @@ def main():
                 report.append(f'  -> ZERO-EVENT RULE HIT for {eid} (auto-KILL ticket issued once)')
 
             # ── pre-registered threshold trip (before deadline) ──────────────
+            _thr_resolved = None   # (name, breached, detail) for auto-flip reuse
             ev_name = e.get('threshold_eval')
             if ev_name:
                 ev = THRESHOLD_EVALS.get(ev_name)
@@ -585,6 +657,7 @@ def main():
                     else:
                         report.append(f'  -> threshold: '
                                       f'{"BREACHED" if breached else "not breached"} | {detail}')
+                        _thr_resolved = (ev_name, breached, detail)
                         if not breached:
                             st.pop('threshold_fired', None)   # re-arm for a later breach
                         elif not st.get('threshold_fired'):
@@ -605,21 +678,37 @@ def main():
             # — the actual flip stays a one-line constants edit executed by the
             # parent/CEO on receipt. Opt-in field auto_flip_flag; no entry
             # carries it today (storm-confl-waiver is NO-CONVERT — mechanism
-            # ships ready, entries opt in later).
+            # ships ready, entries opt in later). Guards (reviews 2026-11-09):
+            # protected flags refused in code (denylist, never prose);
+            # threshold_eval fallback needs auto_flip_polarity="true=met"
+            # (breach-style evals); bar-not-met RE-ARMS auto_flip_fired so a
+            # revert-then-re-met bar can packet again.
             if e.get('auto_flip_flag') and status == 'open':
-                af_breached, af_detail = auto_flip_bar(e)
-                if af_breached is None:
-                    report.append(f'  -> auto-flip skipped for {eid}: {af_detail}')
+                af_block = auto_flip_flag_blocked(e.get('auto_flip_flag'))
+                if af_block:
+                    report.append(f'  -> auto-flip REFUSED for {eid}: {af_block} '
+                                  f'(protected flags NEVER auto-flip)')
                 else:
-                    af_line, af_val = auto_flip_packet(e, st, now_iso,
-                                                       af_breached, af_detail)
-                    if af_line:
-                        # append-success-only recording (review MED-4 contract)
-                        pending_state.append((eid, 'auto_flip_fired', af_val))
-                        problems += 1
-                        kanban_lines.append(af_line)
-                        report.append(f'  -> AUTO-FLIP-READY packet queued for {eid} '
-                                      f'(flip {e.get("auto_flip_flag")})')
+                    af_breached, af_detail = auto_flip_bar(
+                        e, preset=_thr_resolved)
+                    if af_breached is None:
+                        report.append(f'  -> auto-flip skipped for {eid}: {af_detail}')
+                    elif not af_breached:
+                        # re-arm mirror of threshold_fired (review LOW-7): a
+                        # cleared bar must allow a later re-met to packet again
+                        if st.pop('auto_flip_fired', None):
+                            report.append(f'  -> auto-flip re-armed for {eid} '
+                                          f'(bar no longer met)')
+                    else:
+                        af_line, af_val = auto_flip_packet(e, st, now_iso,
+                                                           af_breached, af_detail)
+                        if af_line:
+                            # append-success-only recording (review MED-4 contract)
+                            pending_state.append((eid, 'auto_flip_fired', af_val))
+                            problems += 1
+                            kanban_lines.append(af_line)
+                            report.append(f'  -> AUTO-FLIP-READY packet queued for {eid} '
+                                          f'(flip {e.get("auto_flip_flag")})')
 
             # ── deadline handling ──────────────────────────────────────────
             dl = e.get('deadline')
@@ -1046,14 +1135,48 @@ def selfcheck():
                        'auto_flip_check': 'no_such_eval'})[0] is None,
         'auto-flip: unknown evaluator -> bar unknowable, no packet')
     THRESHOLD_EVALS['_fixture_bar_met'] = lambda e: (True, 'fixture bar met')
-    b, d = auto_flip_bar({'id': 'fx2', 'threshold_eval': '_fixture_bar_met'})
-    chk(b is True and 'met' in d,
-        'auto-flip: threshold_eval reuse resolves -> bar MET')
+    b, d = auto_flip_bar({'id': 'fx2', 'threshold_eval': '_fixture_bar_met',
+                          'auto_flip_polarity': 'true=met'})
+    chk(b is True and 'true=met' in d,
+        'auto-flip: threshold_eval reuse + declared polarity -> bar MET')
+    b, d = auto_flip_bar({'id': 'fx2b', 'threshold_eval': '_fixture_bar_met'})
+    chk(b is None and 'polarity' in d,
+        'auto-flip: BREACH-style threshold_eval WITHOUT polarity declaration '
+        '-> bar unknowable (no inverted packet)')
     b, d = auto_flip_bar({'id': 'fx3', 'auto_flip_check': '_fixture_bar_met',
                           'threshold_eval': 'no_such_eval'})
     chk(b is True,
         'auto-flip: auto_flip_check preferred over a threshold_eval name')
+
+    # preset pass-through: a raising evaluator must NOT run when the main
+    # threshold section already resolved it (no duplicate Postgres reads)
+    def _fixture_boom(e):
+        raise RuntimeError('must not run — preset should short-circuit')
+
+    THRESHOLD_EVALS['_fixture_boom'] = _fixture_boom
+    b, d = auto_flip_bar({'id': 'fx4', 'threshold_eval': '_fixture_boom',
+                          'auto_flip_polarity': 'true=met'},
+                         preset=('_fixture_boom', True, 'preset bar met'))
+    chk(b is True and 'preset bar met' in d and 'must not run' not in d,
+        'auto-flip: preset short-circuits the evaluator (no double run)')
+    THRESHOLD_EVALS.pop('_fixture_boom', None)
     THRESHOLD_EVALS.pop('_fixture_bar_met', None)
+
+    # protected-flag denylist (code, not prose)
+    chk(auto_flip_flag_blocked('WINNER_CELL_SIZE_MULT') is not None,
+        'auto-flip: WINNER_CELL_SIZE_MULT refused (money-sizing)')
+    chk(auto_flip_flag_blocked('PM_TRAIL_ACTIVATE_PCT') is not None,
+        'auto-flip: PM_TRAIL_* refused (CEO-protected)')
+    chk(auto_flip_flag_blocked('FOO_MULT_ENABLED') is not None,
+        'auto-flip: *_MULT flag refused (mult change)')
+    chk(auto_flip_flag_blocked('some lowercase') is not None,
+        'auto-flip: non-flag-name string refused')
+    chk(auto_flip_flag_blocked('LINREG_FADE_STORM_SHADOW') is None,
+        'auto-flip: ordinary gate flag NOT blocked (opt-in stays possible)')
+    chk(auto_flip_packet(dict(fx, auto_flip_flag='WINNER_CELL_SIZE_MULT'),
+                         {}, NOW.isoformat(), True, 'd')[0] is None,
+        'auto-flip: protected flag cannot reach a packet (defense in depth)')
+
     reg_af = [x.get('id') for x in reg.get('entries', [])
               if isinstance(x, dict) and x.get('auto_flip_flag')]
     chk(not reg_af,

@@ -135,8 +135,19 @@ if n:
         'registry: new entry stream has no parseable path (no false auto-KILL)')
 chk(len(entries) == 97, f'registry: 97 entries after insert (got {len(entries)})')
 
+# Pin the diff baseline to the PRE-SHIP commit: the hourly auto-commit
+# e9035a27 ("logs: hourly analysis ... no config change") swept this package
+# in mid-review, so an unpinned working-tree diff goes empty the moment the
+# tree is committed — its gates would then pass vacuously (adversarial review
+# MED-3, verified). Pattern from the payoff-fix probes (d5f306a1). An empty
+# diff now FAILS instead of passing. Note: the sweep's commit message is
+# mislabeled for these files — the proper `scripts: ` package commits follow.
+BASE = 'e9035a27^'
+
 # git diff of the registry must touch ONLY this run's fields
-diff = git('diff', '--', 'data/shadow_disposition.json')
+diff = git('diff', BASE, '--', 'data/shadow_disposition.json')
+chk(diff.strip(),
+    'registry: package diff vs pinned baseline is non-empty (wrong-base guard)')
 removed = [l for l in diff.splitlines()
            if l.startswith('-') and not l.startswith('---')]
 bad_rem = [l for l in removed
@@ -158,6 +169,7 @@ q4_pieces = [
     'single-type confluence (storm conditions met) — shadow only ',
     '(ENFORCE=False); conversion ruling: NO-CONVERT 20261108T230547Z, ',
     'floor is the bottleneck [3/3 bar MET 2026-11-08 22:22Z, no longer pending]',
+    ' [limb-ii RSI clause: STORM_MIN_RSI=35 vs registered >=45 — see registry]',
 ]
 chk(all(p in src for p in q4_pieces),
     'Q4: all log-line f-string pieces present in source')
@@ -172,7 +184,9 @@ chk('[STORM-CONFL-WAIVER-SHADOW]' in src, 'Q4: tag unchanged')
 # ═════════════════════════════════════════════════════════════════════════════
 # Constants — ADD-only + polarity
 # ═════════════════════════════════════════════════════════════════════════════
-cst_diff = git('diff', '--', 'scripts/hermes_constants.py')
+cst_diff = git('diff', BASE, '--', 'scripts/hermes_constants.py')
+chk(cst_diff.strip(),
+    'constants: package diff vs pinned baseline is non-empty (wrong-base guard)')
 cst_rem = [l for l in cst_diff.splitlines()
            if l.startswith('-') and not l.startswith('---')]
 chk(not cst_rem, 'constants: git diff is ADD-only (zero removed lines)',
@@ -324,6 +338,29 @@ try:
                                  source='linreg-fade', rsi=35.0, floor=45)
     chk(emitted and lines, 'shadow: flag restored True -> line again')
 
+    # rsi<35 label hygiene (adversarial review MED-1): band stays [30,45) as
+    # pre-registered, but the line must admit it can never actually admit
+    emitted, lines = shadow_case(tkn='PROBE11', direction='SHORT',
+                                 source='linreg-fade', rsi=32.0, floor=45)
+    chk(emitted and lines and 'can NEVER admit' in lines[0]
+        and 'WOULD-ADMIT' in lines[0] and 'ENFORCE=False' in lines[0],
+        'shadow: rsi<35 line carries the knife-dead (BANANA) caveat',
+        lines[0] if lines else '')
+
+    # dry-run tagging (review LOW-4): dry lines distinguishable + independent key
+    emitted, lines = shadow_case(tkn='PROBE12', direction='SHORT',
+                                 source='linreg-fade', rsi=35.0, floor=45,
+                                 dry=True)
+    chk(emitted and lines and 'dry-run' in lines[0]
+        and 'exclude from bar counts' in lines[0],
+        'shadow: dry-run lines tagged (excluded from bar counts)',
+        lines[0] if lines else '')
+    emitted, lines = shadow_case(tkn='PROBE12', direction='SHORT',
+                                 source='linreg-fade', rsi=35.0, floor=45,
+                                 dry=False)
+    chk(emitted and lines,
+        'shadow: dry/live dedup keys independent (no cross-mode suppression)')
+
     # exception safety: the helper must swallow a raising storm limb
     orig_limb = sc._storm_btc_limb
 
@@ -413,6 +450,45 @@ chk(sd.auto_flip_packet(fx, {'auto_flip_fired': 'x'}, sd.NOW.isoformat(),
     'auto-flip: state dedupe -> packet fires once')
 chk(sd.auto_flip_packet(fx, {}, sd.NOW.isoformat(), False, 'd')[0] is None,
     'auto-flip: bar not met -> no packet')
+# protected-flag denylist (bug_hunter LOW-3: enforced in code, not prose)
+chk(sd.auto_flip_flag_blocked('WINNER_CELL_SIZE_MULT') is not None,
+    'auto-flip: WINNER_CELL_SIZE_MULT refused (money-sizing denylist)')
+chk(sd.auto_flip_flag_blocked('PM_TRAIL_ACTIVATE_PCT') is not None,
+    'auto-flip: PM_TRAIL_* refused (CEO-protected denylist)')
+chk(sd.auto_flip_flag_blocked('some lowercase') is not None,
+    'auto-flip: non-flag-name string refused')
+chk(sd.auto_flip_flag_blocked('LINREG_FADE_STORM_SHADOW') is None,
+    'auto-flip: ordinary gate flag not blocked (opt-in stays possible)')
+chk(sd.auto_flip_packet(dict(fx, auto_flip_flag='WINNER_CELL_SIZE_MULT'),
+                        {}, sd.NOW.isoformat(), True, 'd')[0] is None,
+    'auto-flip: protected flag cannot reach a packet (defense in depth)')
+# polarity guard (adversarial MED-2): breach-style threshold_eval needs an
+# explicit auto_flip_polarity="true=met" declaration or the bar is unknowable
+sd.THRESHOLD_EVALS['_probe_breach'] = lambda e: (True, '-> BREACH: trial PnL -2.60 < -2.5')
+b, d = sd.auto_flip_bar({'id': 'probe-p1', 'threshold_eval': '_probe_breach'})
+chk(b is None and 'polarity' in d,
+    'auto-flip: breach-style eval WITHOUT declaration -> NO packet (no inversion)',
+    d)
+b, d = sd.auto_flip_bar({'id': 'probe-p2', 'threshold_eval': '_probe_breach',
+                         'auto_flip_polarity': 'true=met'})
+chk(b is True and 'true=met' in d,
+    'auto-flip: declared true=met resolves the bar with the caveat in detail')
+sd.THRESHOLD_EVALS.pop('_probe_breach', None)
+
+
+def _probe_boom(e):
+    raise RuntimeError('must not run — preset should short-circuit')
+
+
+sd.THRESHOLD_EVALS['_probe_boom'] = _probe_boom
+b, d = sd.auto_flip_bar({'id': 'probe-p3', 'threshold_eval': '_probe_boom',
+                         'auto_flip_polarity': 'true=met'},
+                        preset=('_probe_boom', True, 'preset bar met'))
+chk(b is True and 'preset bar met' in d and 'must not run' not in d,
+    'auto-flip: preset short-circuits the evaluator (no double run)', d)
+sd.THRESHOLD_EVALS.pop('_probe_boom', None)
+chk("st.pop('auto_flip_fired', None)" in sd_src,
+    'runner: auto_flip_fired re-arms when the bar clears (review LOW-7)')
 b, d = sd.auto_flip_bar({'id': 'probe-no-eval'})
 chk(b is None, 'auto-flip: no evaluator -> bar unknowable (no false packet)', d)
 reg_af = [e.get('id') for e in entries if e.get('auto_flip_flag')]
