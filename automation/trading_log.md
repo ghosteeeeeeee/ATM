@@ -23255,3 +23255,28 @@ BY: auto_1hr
 - 7d -$1.64 structural RED; hard_max_loss 3T -$0.29 + atr_sl_hit 2T -$0.31 remain the 24h drags
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-09 01:20] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** -$0.05 (WR: 50.0% hour; 24h 17T 52.9% -$0.12 RED | 7d 151T 55.6% -$1.69 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:** none
+
+**No Change Needed:**
+- Last hour: 1W MON volume-buildup- SHORT +$0.03 profit-monster-trail / 1L ETH jup_yolo_mirrored SHORT -$0.08 atr_sl_hit -3.59% acct; 1 open, 0 now open
+- Kill check: 0%WR 24h with n>=3 = none (worst: warrior-sr-confirm+ 2T 0W n<3; jup_yolo_mirrored 5T 2W 40% not 0%) — regime query 14d jup_yolo wins in ALL regimes (EXTREME 61%, FLAT 79%, HIGH 57%, NORMAL 60%) -> keep alive
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/17 = 17.6% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible — needs n>=5 + WR>55% + net>$0.05; jup_yolo n=5 but 40% WR -$0.30, others n<=2
+- Neg streak: hrs w/ closes 19h -0.05, 21h +0.06, 23h -0.01, 00h +0.03, 01h -0.08 — longest run 1 consecutive, not 3 -> no size cut
+- Frequency: 2 closes/hr, 1 open/hr — under 20
+- Entry quality: 24h winners mae_pct avg 0.262% max 0.682% (8/9 <0.5%) -> OK
+- No storm (window-min -1.13% / at-run +0.42%) — gate not fired (needs window-min <= -1.5 OR |at-run| >= 1.5), steps 1-4 skipped; window-min -1.13% is the closest approach since 23:20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- jup_yolo_mirrored 24h -$0.30 (5T, 40% WR) is the top drag but wins in every regime — losses > wins, not a kill candidate; watch for n growth
+- 7d -$1.69 structural RED; hard_max_loss 3T -$0.29 + atr_sl_hit 3T -$0.39 = 24h drags
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
