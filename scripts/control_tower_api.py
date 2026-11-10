@@ -258,7 +258,29 @@ def _fill_cap():
 
 
 def main():
+    # F1 fix (bug_hunter 20261110, MEDIUM): the RELEASED transition is invisible
+    # to decider_run — it respawns every pipeline minute with an empty state set,
+    # so a cross-process release is never logged there (the real release at
+    # 19:42Z left no trace anywhere durable). The tower feed runs every 60s and
+    # owns the previous payload, so the engaged flip is durable HERE:
+    # prev engaged=true -> current false = release. Stateless (reads the file it
+    # is about to overwrite); Cap D's stateless contract untouched.
+    _prev_engaged = None
+    try:
+        with open(OUTPUT) as f:
+            _prev_engaged = (json.load(f).get('fill_cap') or {}).get('engaged')
+    except Exception:
+        _prev_engaged = None
     fill_cap = _fill_cap()
+    try:
+        if _prev_engaged is True and fill_cap.get('engaged') is False:
+            _now = datetime.now(timezone.utc)
+            log(f'DailyFillCap RELEASED {_now.strftime("%H:%M")}Z (tower) — '
+                f'opens {fill_cap.get("opens_24h")} < {fill_cap.get("max")} (roll-off) '
+                f'or fee-net {float(fill_cap.get("fee_net_24h") or 0):+.2f} >= 0 — '
+                f'{fill_cap.get("blocked_candidates_today")} candidates held today')
+    except Exception:
+        pass  # visibility only — a log failure must never break the feed
     reg = _load(REGISTRY, None)
     if not reg or not isinstance(reg.get('entries'), list):
         log('ERROR: registry missing/empty — writing error feed')
