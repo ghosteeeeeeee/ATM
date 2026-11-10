@@ -1817,6 +1817,21 @@
       "root_cause": "a writer (not yet located) emits 'TOKEN(x.y N),' fragments into the signal column.",
       "found_by": "6b94396d payoff-fix package 2026-11-08 (sideways)",
       "fix": "locate the writer (grep the '('+confidence pattern in signal assembly), sanitize at write; comma-token-boundary scope alternative spelled out in amplify-stoptighten-scope-widen notes."
+    },
+    {
+      "id": "BUG-099",
+      "title": "fees JSON ~10x inflated for pre-2026-08-22 closes (leverage-SELECT fix)",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "files": [
+        "scripts/position_manager.py",
+        "scripts/decider_run.py",
+        "scripts/vacation_guardrail.py"
+      ],
+      "symptom": "Recorded fee = amount*10*0.0009 for closes before the 2026-08-22 leverage-SELECT fix regardless of actual leverage (3/5), while hl_notional_usdt ~ amount and the correct model is amount*0.0009. Any lifetime net summed from fees::json->>'fee_total' (decider_run.py:881, vacation_guardrail.py:116) overstates pre-8/24 cost ~10x. Side note: under the correct house fee model NO week in the 26-week history is net-positive (closest 6/22 -$0.06).",
+      "root_cause": "pre-8/22 fee formula multiplied by a fixed 10x (leverage placeholder) before the SELECT was fixed at position_manager.py:1184-1189.",
+      "found_by": "CEO consult 20261109T2330Z (sideways, severity high, accounting)",
+      "fix": "one HL balance reconciliation to confirm; if confirmed null/correct pre-8/24 fee rows; audit every consumer of fee_total before quoting lifetime nets."
     }
   ],
   "schema": {
