@@ -1308,6 +1308,13 @@ def _monitor_pending_orders_impl(btc_price):
     if not isinstance(cfg, dict) or not isinstance(cfg.get("orders"), list):
         log('pending orders config malformed: expected {"orders": [...]} — skipping', "WARN")
         return steers
+    # Local price map for multi-coin orders (spin-off 2026-11-10) —
+    # each order compares against its OWN coin's price.
+    try:
+        with open(os.path.join(HERMES_DATA, 'prices.json')) as f:
+            _prices = json.load(f).get('prices', {}) or {}
+    except Exception:
+        _prices = {}
     state = _load_orders_state()
     if state is None:
         # F1 fail-closed: one-shot memory unreadable — firing now risks
@@ -1317,6 +1324,7 @@ def _monitor_pending_orders_impl(btc_price):
         return steers
     changed = False
     seen_ids = set()
+    serial_claimed = False   # one serial-ladder rung fires per cycle
     for order in cfg["orders"]:
         # Per-order isolation: a malformed entry skips itself, never the cycle
         try:
@@ -1352,9 +1360,32 @@ def _monitor_pending_orders_impl(btc_price):
                         })
                 continue
             coin = order.get("coin", "BTC")
-            if coin != "BTC":
-                log(f"pending order {oid}: coin {coin} not supported yet (BTC only) — skipped", "WARN")
-                continue
+            # Multi-coin support (spin-off 2026-11-10): every order is
+            # monitored against ITS OWN coin's local price — never BTC's.
+            px = float(_prices.get(coin) or 0)
+            if px <= 0:
+                # prices.json covers the dashboard universe only (HYPE — the
+                # jup mirror's biggest coin — is absent): fall back to the
+                # coin's latest CLOSED 1m candle (local DB, data-source rule)
+                try:
+                    import sqlite3 as _sq
+                    _c = _sq.connect(f"file:{HERMES_DATA}/candles.db?mode=ro",
+                                      uri=True)
+                    _cur = _c.cursor()
+                    _cur.execute("SELECT close FROM candles_1m WHERE token=? "
+                                 "AND is_closed=1 ORDER BY ts DESC LIMIT 1",
+                                 (coin,))
+                    _r = _cur.fetchone()
+                    _c.close()
+                    px = float(_r[0]) if _r else 0.0
+                except Exception:
+                    px = 0.0
+            if px <= 0:
+                if coin == "BTC":
+                    px = btc_price          # last-resort fallback
+                else:
+                    log(f"pending order {oid}: no local price for {coin} — skipped", "WARN")
+                    continue
             direction = order.get("direction")
             if direction not in ("long", "short"):
                 log(f"pending order {oid}: direction {direction!r} not 'long'/'short' — skipped", "WARN")
@@ -1393,8 +1424,8 @@ def _monitor_pending_orders_impl(btc_price):
             # ID claimed only after FULL validation — a malformed first copy
             # must not poison a valid duplicate (bug_hunter sideways find)
             seen_ids.add(oid)
-            crossed = (btc_price >= trigger_price) if trigger == "above" \
-                else (btc_price <= trigger_price)
+            crossed = (px >= trigger_price) if trigger == "above" \
+                else (px <= trigger_price)
             if crossed and (str(oid).startswith("btc-auto-")
                             or order.get("serial") is True):
                 # Same-coin stacking guard (CEO lesson 2026-11-10: two AUTO
@@ -1427,13 +1458,24 @@ def _monitor_pending_orders_impl(btc_price):
                         "INFO")
                     continue
             if crossed:
+                if order.get("serial") is True:
+                    # ONE serial rung per cycle (ladder integrity: with all
+                    # rungs crossed while flat, emission must still be
+                    # sequential — else 3 rungs merge into 3x via --force).
+                    # The flat-gate above sequences the REMAINING rungs
+                    # across cycles (rung-after-rung as each closes).
+                    if serial_claimed:
+                        log(f"pending order {oid}: serial rung deferred — "
+                            f"one rung per cycle", "INFO")
+                        continue
+                    serial_claimed = True
                 note = str(order.get("note", ""))
                 steers.append({
                     "severity": "urgent",
                     "category": "pending_order",
                     # :g not :.4g — 4 sig-figs rendered 81025 as '8.102e+04'
                     "title": f"PENDING ORDER {oid}: {coin} {direction.upper()} @ {trigger_price:g}",
-                    "detail": (f"Trigger hit: BTC {btc_price:.0f} crossed {trigger} "
+                    "detail": (f"Trigger hit: {coin} {px:.4g} crossed {trigger} "
                                f"{trigger_price:g}. Executing {direction} {amount:.2f} USDT "
                                f"{leverage}x, SL {sl:g}, TP {target:g}. {note}"),
                     "trade_id": None,
@@ -1457,7 +1499,7 @@ def _monitor_pending_orders_impl(btc_price):
                     }}
                 })
                 if PENDING_ORDERS_CAN_PERSIST:
-                    state[oid] = {"status": "triggered", "price": btc_price, "ts": time.time()}
+                    state[oid] = {"status": "triggered", "price": px, "ts": time.time()}
                     changed = True
                 else:
                     # recommend/--dry-run: steer shown but order NOT burned —
