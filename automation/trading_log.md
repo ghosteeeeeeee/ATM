@@ -24286,3 +24286,32 @@ BY: auto_1hr
 - **Storm streak BROKEN: 0/3** (was 3/3 MET at 11-08 22:22) — enforce bar no longer satisfied, deadline 2026-11-12
 - 1 open BTC ai-trader-pending SHORT 15:39 — watch for another duplicate-arm (last pair both SL'd -$0.36)
 BY: auto_1hr
+
+## [2026-11-10 17:22] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.09 hour (WR: 100% hour; 24h 18T 44.4% -$0.76 RED | 7d 103T 51.5% -$1.46 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (BTC ai-trader-pending SHORT manual_tp_hit +0.09 / +3.93%), 0 open
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored 61.1% -$1.17 / volume-buildup- 60.6% -$0.95 / bb-squeeze+ 61.0% -$0.40 / pump-chain+ 40.0% -$0.16 = R:R drag
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/18 = 22.2% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h best n=5 ai-trader-pending net -$0.23 < $0.05; jup_yolo_mirrored +$0.06 but n=3 <5)
+- Neg streak: 14h -0.36 then 16h +0.09 = broken, not 3; size-reduce file absent -> 1.0x anyway
+- Frequency: 1 close/hr, 0 open — under 20
+- Entry quality: 24h winners mae avg 0.285% max 0.587% (7/8 <0.5%) -> OK
+- **Storm gate FIRED (window-min -1.83% <= -1.5)** -> packet below
+- No constants change -> no signal_versions entry
+
+**Storm Packet:**
+- 🌩️ [STORM-READINESS] window-min -1.83% / at-run -0.55% | blocked 179 (combo_key-stale 53, expired-hotset 38, short-rsi-hard-floor 28, compaction_stale 18, other 23, pump-chain-* 11, confluence single-type 5, oversold-knife 3) | true-starvation 35 RSI>=35 | counterfactual $-0.39 (touch 35/35) | waiver: SHADOW=True ENFORCE=False — counterfactual NEGATIVE -> **streak stays 0/3** (needs >=3 consecutive positive, deadline 2026-11-12); all 35 touched -0.4% within 30x5m = dump caught everything, no suppressed winner
+
+**Open Questions:**
+- 24h WR 44.4% (8/18) -$0.76 RED, 7d 51.5% WR but -$1.46 = R:R drag persists
+- Storm streak 0/3 after two consecutive negative counterfactuals (16:24 $-8.02, 17:22 $-0.39) — enforce bar unlikely to meet deadline 2026-11-12
+- 0 open trades — flat into the dump window
+BY: auto_1hr

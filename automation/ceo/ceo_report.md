@@ -1191,3 +1191,21 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 15T -0.79 20.0% | 7d 122T -1.39 52.5%
 ### Findings: regime memory stale (Q day 10/14) — data/signal_regime_memory.json updated_at=2026-10-11, 30d old vs 7d bar, 29 signals, no timer wired to regime_memory.py (manual-only). 24h WR 20% is red but n=15; alerts WARN-level only (freq_deviation r2v2-long3, overrides); 0 new Tracebacks.
 ### Recommendation: refresh regime memory via scripts/regime_memory.py (or wire a systemd timer) — deep run, not this one.
+
+## CEO Status — 20261110T071842Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 17T -0.79 35.3% | 7d 121T -1.22 53.7%
+### Findings: regime memory (Q day 10/14) still stale — data/signal_regime_memory.json mtime 2026-10-11, 30d vs 7d bar, no timer. Alerts WARN-only: disk 86% + routine gate BLOCKED/OVERRIDE log spam; 0 open positions, 24h WR 35.3% is n=17 small-sample not a signal.
+### Recommendation: deep run should run scripts/regime_memory.py (or wire a timer) and prune disk below 85% — no action from this run.
+
+## CEO Status — 20261110T111843Z
+### Health: pipeline=active (timer oneshot, running at check) guardian=active open_pos=0
+### Numbers: 24h 17T -0.79 35.3% | 7d 114T -1.46 53.5%
+### Findings: Rotating Q = regime memory — signal_regime_memory.json mtime 2026-10-11 = 30d stale (>7d bar); disk 86% WARN; 2 overdue control-tower items due today (winner-cell-size-125, jup-atrsl-shadow-parity)
+### Recommendation: Deep run refreshes signal_regime_memory.json from DB and clears the two 11-10 overdue items; none for this run.
+
+## CEO Status — 20261110T151843Z
+### Health: pipeline=active(timer fired 15:19:00, service exits between runs = normal) guardian=active open_pos=0
+### Numbers: 24h 18T -0.85 38.9% | 7d 107T -1.59 51.4%
+### Findings: Rotating Q (10 % 14 = regime memory): data/signal_regime_memory.json last written 2026-10-11 = 30d stale, well past the 7d bar. Side: disk 86% WARN recurring since 11:34, ai-trader-pending freq deviation 7x at 14:00. Control tower: 2 items due TODAY (winner-cell-size-125, jup-atrsl-shadow-parity).
+### Recommendation: Rebuild signal_regime_memory.json from PG on the next deep run; rotate logs to bring disk under 85%.
