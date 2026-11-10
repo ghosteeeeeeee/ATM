@@ -213,12 +213,16 @@ def pause_checks(cfg, summary):
 
 
 def _structure_sl(decision, leg):
-    """Structure-break stop at BIRTH (CEO 2026-11-09: "we need it to break
-    structure to exit"): just beyond the 15m swing — the trade exits when
-    structure ACTUALLY breaks, not on entry-relative noise. Replaces the
-    engine's trigger−ATR geometry SL (#16834: died 130pts above structure
-    while the move ran +691). Returns None when the snapshot is missing."""
-    sd = (decision.get('structure_detail') or {}).get('15m') or {}
+    """Structure-break stop at BIRTH: just beyond the MAJOR (1h) swing —
+    the trade exits when MAJOR structure actually breaks. (CEO 2026-11-10:
+    the 15m reference got stop-hunted by the flag's own interior whipsaw —
+    #16851/52's 15m stop 74114 was hunted at 74285, then the real drop
+    came; #16846's trailed stop 74727 died on the 74,5xx retest. Flags
+    hunt their interior — the stop references the PATTERN BOUNDARY.
+    15m fallback if the 1h snapshot is missing.)"""
+    sd = (decision.get('structure_detail') or {}).get('1h') or {}
+    if not (sd.get('sh') and sd.get('sl') and sd.get('atr')):
+        sd = (decision.get('structure_detail') or {}).get('15m') or {}
     sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')
     if not (sh and sl and atr):
         return None
@@ -342,8 +346,13 @@ def tweak_structure_fixed(decision, open_positions):
     Returns tweak dicts for the cycle summary.
     """
     tweaks = []
+    # R1 stops follow MAJOR (1h) structure — CEO 2026-11-10 (15m interior
+    # swings get hunted by flag whipsaws: #16851/52 stop 74114 hunted at
+    # 74285, real drop followed; the stop references the pattern boundary).
     sd = (decision.get('structure_detail') or {}).get('15m') or {}
-    sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')
+    sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')   # R2 TP side (15m first-opposing)
+    sd_h = (decision.get('structure_detail') or {}).get('1h') or {}
+    sh_h, sl_h, atr_h = sd_h.get('sh'), sd_h.get('sl'), sd_h.get('atr')
     if not (sh and sl and atr):
         return tweaks
     try:
@@ -389,18 +398,20 @@ def tweak_structure_fixed(decision, open_positions):
             d = str(pos.get('direction') or '').upper()
             if d == 'SHORT':
                 # FLUID STRUCTURE-FOLLOW (CEO 2026-11-10 synthesis):
-                # risk-side (stop ≥ entry) → ALIGN to structure either
-                # direction — survival IS structure (#16834 fix; ±0.5%
-                # entry cap removed 2026-11-09). Profit-side (stop <
-                # entry) → only DEEPEN the lock, never relax — the
-                # watchdog must not undo what the trail booked.
-                want = sh + 0.10 * atr
-                want = max(want, price * 1.001)   # never at/below price
-                if stop >= entry:
-                    if abs(stop - want) > 1:
+                # risk-side (stop ≥ entry) → ALIGN to MAJOR (1h) structure
+                # either direction — survival IS the pattern boundary
+                # (#16834 fix; ±0.5% cap removed; 15m→1h 2026-11-10 because
+                # flag interior swings get stop-hunted: #16851/52's 74114
+                # died at 74285, real drop followed). Profit-side (stop <
+                # entry) → only DEEPEN the lock, never relax.
+                if sh_h and atr_h:
+                    want = sh_h + 0.10 * atr_h
+                    want = max(want, price * 1.001)   # never at/below price
+                    if stop >= entry:
+                        if abs(stop - want) > 1:
+                            _apply_stop(want, stop, pos['id'])
+                    elif stop > want:
                         _apply_stop(want, stop, pos['id'])
-                elif stop > want:
-                    _apply_stop(want, stop, pos['id'])
                 # F3 (bug_hunter MED): TP must stay BELOW live price for a
                 # short — a structure snap already crossed = instant exit.
                 if target < (sl - atr) and (sl + 0.05 * atr) < price * 0.999:
@@ -415,20 +426,21 @@ def tweak_structure_fixed(decision, open_positions):
                         tweaks.append(t)
                         DB.log_event('INFO', f"tweak {t}")
             elif d == 'LONG':
-                # FLUID STRUCTURE-FOLLOW mirror: risk-side (stop ≤ entry)
-                # → align to structure either direction (survival);
-                # profit-side → only deepen the lock, never relax.
+                # FLUID STRUCTURE-FOLLOW mirror (1h MAJOR structure, CEO
+                # 2026-11-10): risk-side (stop ≤ entry) → align to pattern
+                # boundary; profit-side → only deepen, never relax.
                 # Clamp ONLY when structure sits at/above the live price
                 # (instant self-close) — never over-tighten valid structure
                 # (test-caught: min() dragged a valid stop150pts closer).
-                want = sl - 0.10 * atr
-                if want >= price:
-                    want = price * 0.999
-                if stop <= entry:
-                    if abs(stop - want) > 1:
+                if sl_h and atr_h:
+                    want = sl_h - 0.10 * atr_h
+                    if want >= price:
+                        want = price * 0.999
+                    if stop <= entry:
+                        if abs(stop - want) > 1:
+                            _apply_stop(want, stop, pos['id'])
+                    elif stop < want:
                         _apply_stop(want, stop, pos['id'])
-                elif stop < want:
-                    _apply_stop(want, stop, pos['id'])
                 # F3 mirror: TP must stay ABOVE live price for a long
                 if target > (sh + atr) and (sh - 0.05 * atr) > price * 1.001:
                     new_tp = round(sh - 0.05 * atr, 8)

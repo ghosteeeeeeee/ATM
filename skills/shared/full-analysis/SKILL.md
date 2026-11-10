@@ -372,6 +372,16 @@ python3 /root/.hermes/scripts/adx_atr_analysis.py COIN   # local DB, closed bars
    AND range expansion peak within `ADX_DUAL_PEAK_TOL` (4) bars of each
    other, both engines are spent. Confirmation arrives like rule 2: a new
    extreme printed after the dual-peak that fails to extend momentum.
+4. **ADX divergence at a price extreme → the trend may be changing**
+   (CEO 2026-11-10, 15m read): price prints a NEW low (or high) while
+   ADX's latest peak is SIMILAR-TO-LOWER than its previous peak — the
+   indicator is not confirming the extreme → momentum is unconfirmed,
+   the trend is exhausting, a reversal (e.g. the downtrend ending, an
+   uptrend beginning) is brewing. Companion reads from the same snapshot:
+   **ATR back at its previous peak** = volatility climax (both engines
+   spent — same family as rule 3); **MACD and RSI both low** = oversold
+   but NOT a floor — "could drop further", never a buy signal on its
+   own: it needs rule-4 divergence + structure confirmation first.
 
 **How to read it in the verdict:** per-TF state (TRENDLESS / TREND
 RUNNING / ADX PEAKED / DUAL-PEAK CLIMAX / EXHAUSTION + flags), then one
@@ -636,6 +646,37 @@ and resistance.** The stop-limit process IS the backup strategy.
   short leg to the NEXT major shelf (§11 lesson: major structure only,
   cushioned), not back to the old number.
 
+### 13. Major-structure stop discipline — hold through the whipsaw (CEO 2026-11-10)
+
+A stop that follows the PATTERN'S INTERIOR swings gets hunted by the
+pattern's own whipsaw. The flag/consolidation trades of 2026-11-10 are
+the proof: #16851/52's stop tracked the 15m swing to 74,114 and was
+hunted at 74,285 — **100 minutes before the real drop to 72,817**;
+#16846's trailed stop (74,727) died on the 74,5xx retest of the same
+flag. One held position would have ridden entry→72,8xx whole; instead
+two early exits plus a double-stopped pair summed **−1.94%**. The CEO's
+model:
+
+- **The stop references MAJOR structure — the pattern boundary, 1h
+  swings, and round lines (the 74,000-class) — not the 15m interior.**
+  The watchdog's structure-follow (auto_trader tweak R1) and
+  `_structure_sl` both use the **1h snapshot** for exactly this reason.
+- **Ratchet only after the expansion leg establishes.** Inside the
+  flag/compression the stop stays at the pattern's outer bound (the
+  resistance-side stop that defined the entry); it moves down/trails
+  only once price has broken and traveled (the drop past 74,000) —
+  "anything crossing that (74,000) would break structure" is the
+  trailing condition, not the 15m wiggle.
+- Exit still means structure broken — measured against the TRADE'S
+  timeframe: an 8h hold is invalidated by an 1h/round-level break, not
+  by a 15m retest. Minor-structure stops = §11 sweep bait.
+- Pair with ADX rule 4: interior whipsaws at fading ADX peaks are the
+  exhaustion signature that PRECEDES the real leg — surviving them is
+  the whole trade. Stacking lesson (same day): two AUTO shorts fired
+  1min apart in one dump → 2× exposure stopped −3.80%×2 on one spike —
+  auto orders now wait until flat (monitor stacking guard + scoped
+  `--force`), CEO tranches keep the merge path.
+
 ## Analysis Script
 
 **Fast path (2026-10-22):** `python3 scripts/auto_analysis.py` runs the
@@ -815,3 +856,10 @@ ADX/ATR lifecycle added 2026-10-27 (CEO rules + scripts/adx_atr_analysis.py):
 rule 1 ADX→0 = new trend starting; rule 2 ADX peak + post-peak new major
 extreme = 5th-wave exhaustion, move over; rule 3 ADX+ATR dual-peak =
 climaxed move over (post-peak extreme confirms). Section 1c in output.
+Rule 4 added 2026-11-10 (CEO): ADX divergence at a price extreme (new low
+with a similar/lower ADX peak) = momentum unconfirmed → trend change
+brewing; ATR at previous peak = climax; MACD+RSI low = could drop further,
+never a floor alone. §13 added 2026-11-10: major-structure stop discipline
+(hold through the flag's interior whipsaw — stops reference 1h/round
+structure, not 15m interior swings; #16851/52 + #16846 + stacked-double
+lessons).

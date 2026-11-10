@@ -1395,6 +1395,35 @@ def _monitor_pending_orders_impl(btc_price):
             seen_ids.add(oid)
             crossed = (btc_price >= trigger_price) if trigger == "above" \
                 else (btc_price <= trigger_price)
+            if crossed and str(oid).startswith("btc-auto-"):
+                # Same-coin stacking guard (CEO lesson 2026-11-10): two AUTO
+                # shorts fired 1min apart in one dump → 2× exposure, both
+                # stopped −3.80% on a single spike. Auto orders WAIT until
+                # flat (stay armed, no state burn); CEO (btc-ceo-*) orders
+                # keep the merge path = intentional tranches. brain's dup
+                # guard blocks ANY same-coin open (no direction filter) —
+                # we mirror that here.
+                try:
+                    import psycopg2
+                    from _secrets import BRAIN_PASSWORD, BRAIN_HOST
+                    _c = psycopg2.connect(host=BRAIN_HOST, dbname="brain",
+                                          user="postgres",
+                                          password=BRAIN_PASSWORD,
+                                          connect_timeout=5)
+                    _cur = _c.cursor()
+                    _cur.execute(
+                        "SELECT id FROM trades WHERE token=%s AND "
+                        "status='open' LIMIT 1", (coin,))
+                    _open = _cur.fetchone()
+                    _cur.close()
+                    _c.close()
+                except Exception:
+                    _open = None
+                if _open:
+                    log(f"pending order {oid}: {coin} #{_open[0]} already "
+                        f"open — auto order stays armed (stacking guard)",
+                        "INFO")
+                    continue
             if crossed:
                 note = str(order.get("note", ""))
                 steers.append({
@@ -1502,12 +1531,16 @@ def _execute_pending_order_impl(order):
     try:
         # Cmd build INSIDE try — a KeyError on a bad payload must mark the
         # order error, not escape to the caller (bug_hunter LOW).
-        # --force (2026-10-24): pending orders ARE CEO-configured directives,
-        # and CEO tranches are legitimate same-coin adds (manual-trade-override
-        # skill: "for a CEO-directed add pass --force — manual-only; the
-        # pipeline never passes it"). One-shot state + orphaned-trigger
-        # steer-only recovery prevent double-fires; the vacation/kill-switch
-        # gate is unaffected (--manual is still NOT passed).
+        # --force (2026-10-24, scope-narrowed 2026-11-10): ONLY btc-ceo-*
+        # orders get it — CEO-authored tranches are intentional same-coin
+        # adds (skill: "for a CEO-directed add pass --force"). AUTO orders
+        # must NOT: two auto shorts fired 1min apart in one dump → 2×
+        # exposure stopped −3.80%×2 on one spike (stacking lesson). The
+        # monitor's stacking guard (stay-until-flat) is the first layer;
+        # this is the belt — an auto order reaching brain with a position
+        # open hits the dup-guard and fails SAFE (no stack). One-shot
+        # state + orphan steer-only recovery prevent double-fires; the
+        # vacation/kill-switch gate is unaffected (--manual still NOT passed).
         cmd = [
             sys.executable, os.path.join(SCRIPTS_DIR, "brain.py"),
             "trade", "add",
@@ -1520,8 +1553,9 @@ def _execute_pending_order_impl(order):
             "--leverage", str(int(order["leverage"])),
             "--sl", f'{float(order["sl"]):.8g}',
             "--target", f'{float(order["target"]):.8g}',
-            "--force",
         ]
+        if str(order.get("id", "")).startswith("btc-ceo-"):
+            cmd.append("--force")
         log(f"AUTO-EXEC pending order {oid}: {' '.join(cmd[4:])}")
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
                            cwd=SCRIPTS_DIR)
