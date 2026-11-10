@@ -24155,3 +24155,134 @@ BY: auto_1hr
 - 24h WR 35.3% (6/17) -$0.79 RED, 7d ~52% WR but ~-$1.55 = R:R drag persists
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-10 12:25] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 hour (WR: n/a hour; 24h 17T 35.3% -$0.79 RED | 7d 113T 54.0% -$1.36 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — quiet hour
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored 60.8% -$1.24 / volume-buildup- 60.6% -$0.95 / pump-chain+ 40.0% -$0.16 / bb-squeeze+ 62.8% -$0.02 = R:R drag
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/17 = 29.4% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h max n=4 ai-trader-pending 2W -$0.02, below n>=5; r2v2-long3 n=2 +$0.06)
+- Neg streak: last close 10h +0.02, prior -0.13 at 06h -> broken, not 3 consecutive -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners mae avg 0.300% max 0.587% (5/6 <0.5%) -> OK
+- No storm (window-min -0.20% / at-run +0.16%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 35.3% (6/17) -$0.79 RED, 7d 54.0% WR but -$1.36 = R:R drag persists
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
+
+## [2026-11-10 13:25] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 hour (WR: n/a hour; 24h 17T 35.3% -$0.79 RED | 7d 109T 53.2% -$1.38 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (HYPE jup_yolo_mirrored SHORT 12:34, -0.10%) — quiet hour
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored 60.8% -$1.24 / volume-buildup- 60.6% -$0.95 / pump-chain+ 40.0% -$0.16 / bb-squeeze+ 62.8% -$0.02 = R:R drag
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/17 = 29.4% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h no signal with n>=5 AND net>$0.05 — best n=4 ai-trader-pending -$0.02)
+- Neg streak: 06h -0.13, then 07-09h 0 closes, 10h +0.02 -> broken, not 3 -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr, 1 open — under 20
+- Entry quality: 24h winners mae avg 0.300% max 0.587% (5/6 <0.5%) -> OK
+- No storm (window-min -0.20% / at-run -0.08%) — gate not fired (needs window-min <= -1.5 OR |at-run| >= 1.5), steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 35.3% (6/17) -$0.79 RED, 7d 53.2% WR but -$1.38 = R:R drag persists
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
+
+## [2026-11-10 14:21] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.07 hour (WR: 100.0% hour; 24h 18T 38.9% -$0.72 RED | 7d 107T 53.3% -$1.20 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (HYPE jup_yolo_mirrored SHORT 12:34 mfe_exit +0.07 +3.18% mae 0.046%), 2 open (BTC ai-trader-pending SHORT x2, -0.14% each)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored 61.1% -$1.17 / volume-buildup- 60.6% -$0.95 / pump-chain+ 40.0% -$0.16 / bb-squeeze+ 62.8% -$0.02 = R:R drag
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/18 = 27.8% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h no signal with n>=5 AND net>$0.05)
+- Neg streak: 10h +0.02, 13h +0.07 — no negative streak -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners mae avg 0.303% max 0.587% (6/7 <0.5%) -> OK
+- No storm (window-min -0.84% / at-run -0.62%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 38.9% (7/18) -$0.72 RED, 7d 53.3% WR but -$1.20 = R:R drag persists
+- 2 open BTC ai-trader-pending SHORT rows — duplicate pending or 2 positions? worth a look
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
+
+## [2026-11-10 15:25] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.36 hour (WR: 0.0% hour; 24h 18T 38.9% -$0.85 RED | 7d 107T 51.4% -$1.59 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 2 closes (BTC ai-trader-pending SHORT x2 manual_sl_hit -0.18 each, open 13:32/13:33 closed 14:37 — the duplicate-pending pair from 14:21 both closed at SL), 0 open
+- Kill check: ai-trader-pending only 2 closes/hr (<3) -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored 61.1% -$1.17 / volume-buildup- 60.6% -$0.95 / pump-chain+ 40.0% -$0.16 / bb-squeeze+ 62.8% -$0.02 = R:R drag
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/18 = 22.2% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h best n=5 ai-trader-pending net -$0.32 < $0.05)
+- Neg streak: 13h +0.07, 14h -0.36 = 1 consecutive negative hour -> not 3, no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 2 closes/hr, 0 open — under 20
+- Entry quality: 24h winners mae avg 0.303% max 0.587% (6/7 <0.5%) -> OK
+- No storm (window-min -0.67% / at-run +0.96%) — gate not fired (needs window-min <= -1.5 OR |at-run| >= 1.5), steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 38.9% (7/18) -$0.85 RED, 7d 51.4% WR but -$1.59 = R:R drag persists
+- BTC ai-trader-pending duplicate pair both SL'd (-0.36 combined) — worth confirming whether both positions were intentional or a double-arm
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
+
+## [2026-11-10 16:24] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 hour (WR: n/a hour; 24h 18T 38.9% -$0.85 RED | 7d 105T 50.5% -$1.69 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (BTC ai-trader-pending SHORT 15:39 -0.16%)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored 60.1% -$1.29 / volume-buildup- 60.6% -$0.95 / bb-squeeze+ 61.9% -$0.39 / pump-chain+ 38.1% -$0.31 = R:R drag (all win >55% except pump-chain+, net negative = R:R not WR problem)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/18 = 22.2% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h only ai-trader-pending n=5 but net -$0.32; all others n<5)
+- Neg streak: 14h -0.36 then 15h/16h 0 closes -> broken, not 3; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners mae avg 0.303% max 0.587% (6/7 <0.5%) -> OK
+- **Storm gate FIRED (window-min -1.87% <= -1.5)** -> packet below
+- No constants change -> no signal_versions entry
+
+**Storm Packet:**
+- 🌩️ [STORM-READINESS] window-min -1.87% / at-run -1.34% | blocked 195 (expired-hotset 56, combo_key-stale 41, other 29, short-rsi-hard-floor 22, compaction_stale_19, pump-chain-* 14, confluence single-type 11, oversold-knife 3) | true-starvation 54 RSI>=35 | counterfactual $-8.02 (touch 41/54) | waiver: SHADOW=True ENFORCE=False — storm packet, counterfactual NEGATIVE -> **streak RESET 0/3** (was 3/3 MET 11-08; bar needs >=3 consecutive positive, deadline 2026-11-12); split: blocked SHORTs $-0.97 (15), blocked LONGs $-7.05 (39) = gates correctly kept LONG dump losers out, no suppressed dump winners
+
+**Open Questions:**
+- 24h WR 38.9% (7/18) -$0.85 RED, 7d 50.5% WR but -$1.69 = R:R drag persists
+- **Storm streak BROKEN: 0/3** (was 3/3 MET at 11-08 22:22) — enforce bar no longer satisfied, deadline 2026-11-12
+- 1 open BTC ai-trader-pending SHORT 15:39 — watch for another duplicate-arm (last pair both SL'd -$0.36)
+BY: auto_1hr
