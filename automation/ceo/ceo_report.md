@@ -1185,3 +1185,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Findings: 24h WR 23.1% is red (n=13); alerts only WARN-level — disk 86% + freq deviation on warrior-sr-confirm+/r2v2-long3; regime-specialist Q (day 9/14): bb-squeeze+ is NORMAL-regime (32T 65.6% +0.50) vs HIGH (13T 53.8% -0.43), jup_yolo_mirrored loses in NORMAL/HIGH/EXTREME (130T ~-1.55) and only wins FLAT (12T 83.3% +0.26)
 ### Findings (calendar): 9 decision items due ≤24h (Nov 10), all owner=CEO/main-session — mfe-cut-arm-be, ichimoku-dampen-flooradmit, fade-ctx-exempt, winner-cell-size-125, conf-filter-parity-split, jup-atrsl-shadow-parity, rsi-ceiling-75-live, gate-shadow-dedup, amplify-bbsqueeze. None overdue.
 ### Recommendation: disk at 86% needs log rotation/prune before it trips the 90% health gate; no trade/param action from this run.
+
+## CEO Status — 20261110T031842Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 15T -0.79 20.0% | 7d 122T -1.39 52.5%
+### Findings: regime memory stale (Q day 10/14) — data/signal_regime_memory.json updated_at=2026-10-11, 30d old vs 7d bar, 29 signals, no timer wired to regime_memory.py (manual-only). 24h WR 20% is red but n=15; alerts WARN-level only (freq_deviation r2v2-long3, overrides); 0 new Tracebacks.
+### Recommendation: refresh regime memory via scripts/regime_memory.py (or wire a systemd timer) — deep run, not this one.
