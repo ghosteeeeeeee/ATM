@@ -656,6 +656,14 @@ and resistance.** The stop-limit process IS the backup strategy.
 - Every full-analysis that ends in "no trade" must END with the bracket
   proposal: the two levels, the four numbers per leg (trigger/SL/TP/size),
   armed and verified — not an empty verdict.
+- **The bracket is a LADDER, probability-weighted (CEO 2026-11-10:
+  "there is always a short we want to be ready for... it is about
+  probabilities, anything can happen").** Arm every rung the chart gives
+  — trendline-touch breaks, local-low breaks, major-low breaks (each
+  own TP/SL, `serial: true` so they fire rung-after-rung), mirrored on
+  the long side — instead of picking one level. The analysis's job is
+  weighting (which rung is most likely to be reached first / to pay),
+  never deciding "no short exists". See manual-trade-override rule 13.
 - **⚠️ DIRECTION MAPPING IS FIXED — never silently all-longs.** Two levels
   given as a pair = the CEO's bracket by default:
   **break DOWN through the lower level → SHORT, break UP through the
