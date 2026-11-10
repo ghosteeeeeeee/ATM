@@ -3979,5 +3979,38 @@
     "after": "log-only shadow proposal with units-guarded bar",
     "rationale": "Weekly AMPLIFY mandate; exit-side axis untested while entry-side filters all fail fk",
     "impact": "Shadow only until bar met; zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-10T20:57:00Z",
+    "agent": "brain_auditor",
+    "change": "Adjudicated overdue winner-cell-size-125: bar FAIL confirmed fresh (A -0.014/B -1.13/C +0.04), default REVERT is CEO-owned (auto-flip denylist money-sizing) — surfaced to CEO, constant untouched",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "deadline passed, disposition stale",
+    "after": "disposition updated with fresh KPI + CEO action required",
+    "rationale": "pre-registered default cannot auto-fire; code enforces money-sizing=CEO",
+    "impact": "CEO decides revert; no behavior change this run"
+  },
+  {
+    "timestamp": "2026-11-10T20:57:00Z",
+    "agent": "brain_auditor",
+    "change": "jup-atrsl-shadow-parity EXTENDED to 11-17 (drift confirmed live id=16854 db_sl=0.75 vs fix 1.50)",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "deadline 2026-11-10",
+    "after": "deadline 2026-11-17 with 5-trade kill criteria",
+    "rationale": "threshold drift!=zero => KEEP",
+    "impact": "stream stays as regression monitor"
+  },
+  {
+    "timestamp": "2026-11-10T20:57:00Z",
+    "agent": "brain_auditor",
+    "change": "AMPLIFY: registered amplify-tat-neverarmed-age-widen (type a, due 11-14, NO-SHIP default, pooled n=51, units guard, MFE-CUT collision note)",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "TAT-age-sweep only in #238 prose, never in registry",
+    "after": "registry entry 100 total",
+    "rationale": "closes governance gap + satisfies weekly AMPLIFY proposal bar with powered cohort",
+    "impact": "measurement-only until 11-14 bar"
   }
 ]

@@ -1,47 +1,47 @@
-# Current State — brain_auditor #244 2026-11-09 21:05 UTC
-**Last Updated: 2026-11-09 21:05 UTC**
-**Updated by: brain_auditor #244. Prior: #243 2026-11-09 16:55 UTC (preserved in git history).**
+# Current State — brain_auditor #245 2026-11-10 21:00 UTC
+**Last Updated: 2026-11-10 21:00 UTC**
+**Updated by: brain_auditor #245. Prior: #244 2026-11-09 21:05 UTC (preserved in git history).**
 
-## HEADLINE — WRONG-SIDE SHORT EXITED; 11-10 DISPOSITIONS ADJUDICATED EARLY; STRUCTURE-FLIP EXIT SHADOW REGISTERED
+## HEADLINE — WINNER-CELL REVERT OVERDUE (CEO); DUP-BTC-SHORTS ALREADY FIXED; TAT-AGE AMPLIFY REGISTERED
 
-1. **TRADE ACTION: BTC SHORT #16838 manual_close 20:56Z exit=74888 pnl_usdt=-0.06.** Entered aligned (below EMA300), structure flipped LONG_BIAS against it, never armed (mfe 0.00), MFE-CUT + TAT both would-fired at 130m. Watchdog exit steer executed. 0 open after. Loss cooldown 0.3h armed for BTC SHORT.
-2. **11-10 disposition batch (9 items due 00:00Z) adjudicated early with fresh PG data — 8 written:** gate-shadow-dedup DONE (convention adopted #234/#235) · rsi-ceiling-75 KEEP (n=9<15, WR 77.8%, +0.27) · fade-ctx FAIL-CLOSED shadow-only (7d n=8 net +0.11, both limbs fail) · conf-99 KEEP-SHADOW (fk 46% ≫ 20%) · jup-atrsl **KEEP + db-drift FLAG** (db_sl=0.75 vs fix_sl=1.50 on #16838) · ichimoku/dampen KILL streams + floor COLLECT · **mfe-cut EXTEND→11-14** (feeder for prearm-breakeven; would-fire live on #16838) · **uninert EXTEND→11-14** (post-pin n=39/100 share 23.1% incomplete; interim share>baseline 17%, NORMAL 7d +0.29, pin held).
-3. **AMPLIFY: `amplify-structure-flip-early-exit` registered (due 11-21, NO-SHIP default, units guard).** Never-armed open + BTC ema300_position flips against direction mid-hold → would-exit vs hold-to-SL. Proof: #16838. NOT prearm (time-based), NOT mfe-cut (stall-cut). Entry-side contra-trend filter REJECTED-WITH-DATA (aligned 265T -1.58 vs contra 113T -1.54 = zero separation).
-4. **winner-cell-size-125 default REVERT 1.25→1.0 fires 00:00Z 11-10** — bar pre-adjudicated FAIL #234; did NOT jump deadline (money-sizing=CEO #208). Economic gap ~$0.01/14d.
-5. **0 trading-constant changes** — hermes_constants.py EMPTY git diff, session lock ABSENT, CEO_PROTECTED untouched, size-reduce file absent = 1.0x, 0 Tracebacks.
+1. **CEO ACTION REQUIRED: `WINNER_CELL_SIZE_MULT` revert is 20h overdue.** Deadline was 00:00Z 11-10; fresh `winner_cell_set_kpi.py` FAILs all three readings (A -0.014 / B -1.13 / C +0.04 vs bar >= +1.00). The registered default (REVERT 1.25→1.0) **cannot self-fire**: `shadow_disposition.py:456` auto-flip denylist blocks `WINNER_CELL_*` as money-sizing (selfcheck asserts it; #208 money-sizing=CEO). Constant still 1.25 at `hermes_constants.py:1174`. **CEO: one-line revert or explicit extension.** Revert makes `drop-pcplus` + `mult-150` (both 11-14) moot — fold into one post-revert narrow-set question if any boost is ever wanted.
+2. **Duplicate BTC SHORT fills root-caused and ALREADY FIXED by CEO today.** #16851/#16852 (13:32/13:33, -0.18×2) + #16831/#16832 double-filled because pre-18:43 code passed `--force` to ALL pending orders, bypassing brain.py's dup guard (`if dup_row and not force`). CEO commit `48681501` 18:43 scoped `--force` to `btc-ceo-*` + monitor stacking guard (`trade_watchdog.py:1398`). Verified in HEAD — confirming, not re-fixing.
+3. **AMPLIFY: `amplify-tat-neverarmed-age-widen` registered (due 11-14, NO-SHIP default).** TAT 30d: NEVER-ARMED 51T `-1.42` WR 23.5% avg_mfe 0.173 avg_hold 52min vs ARMED 14T `+0.19` WR 78.6%. Pooled n=51 clears power bar (per-signal bb-squeeze+ n=19 does not). Walk = +38min capped 90min (< MFE-CUT 130m); adjudicate jointly with prearm-breakeven, ship at most ONE.
+4. **jup HIGH SHORT decay alarm:** 30d net +0.40 (#239) → +0.32 (#242) → **+0.15 (today)** as n 15→16→17; current week 2T `-0.25` 0% WR. 11-19 read must judge **net>0, not n>=10**.
+5. **jup-atrsl parity EXTENDED → 11-17** (drift live: id=16854 db_sl=0.75 vs fix 1.50). Kill criterion: 5+ distinct trade_ids with db==fix.
+6. **0 trading-constant changes** — hermes_constants.py EMPTY git diff, session lock ABSENT, CEO_PROTECTED 13/13, size-reduce absent = 1.0x, 0 Tracebacks today.
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| watchdog steer exit #16838 | EXECUTED manual_close -0.06 |
-| chop-bleed 3rd cycle ≥92% | VERIFIED 93.3% (52/58, -$5.42/-$5.81); no new gate; remedy stack queued; 0.75x stays VETO |
-| steer-001 12/20 lost | TRIAGED — rolling window + unarmed chop |
-| steer-002 jup disable | NO-DISABLE — family healthy, monitor |
-| 11-10 batch (9 items) | 8 adjudicated early, 1 (winner-cell-125) left to registered default at 00:00Z |
-| jup-atrsl db drift | NEW FLAG — DB stores original 0.75% SL, PM runs norm 1.50% |
-| contra-trend entry filter | REJECTED-WITH-DATA (zero separation 14d) |
-| #243 RR-blindspot | SHIPPED report-only, intact |
+| winner-cell-size-125 overdue | Bar FAIL fresh → surfaced to CEO (auto-flip refuses money-sizing) |
+| dup BTC shorts | Root cause = old `--force` on all pending; CEO fixed 18:43 — verified |
+| jup-atrsl drift | Still live (16854) → EXTEND 11-17 |
+| TAT age pre-reg gap | #238 prose never landed in registry → closed via new pooled proposal |
+| jup HIGH cell decay | +0.40→+0.15 across 3 runs → 11-19 bar tightened to net>0 |
+| deep-dive kill targets | 0 new (all owned) |
 
-### 2. NUMBERS (fresh PG 21:00Z)
-- 24h **15T 20.0% -0.57** | 48h 27T 37.0% -0.69 | 7d **127T 53.5% -1.50** (armed 67T 89.6% **+3.63** vs unarmed 60T 13.3% **-5.13**) | 14d 378T 54.0% -3.12 | 30d 752T 46.5% -6.93
-- 7d exits: profit-monster-trail 41T 97.6% **+2.25** + mfe_exit 19T 100% **+1.18** carry all profit; atr_sl_hit 24T 0% **-2.74** + hard_max_loss 24T 0% **-2.73** = pure-loss engines (48/127 = 38% of exits)
-- chop-bleed 7d: **93.3% dollar share** (52/58 never-armed) = 3rd cycle at tripwire
-- 14d sub-50% n>=15: pc+ LONG 22T 45.5% +0.09 (net positive) · pc- LONG 30T 40.0% +0.19 (net positive, contrarian-owned) — **0 kill targets**
+### 2. NUMBERS (fresh PG 20:56Z)
+- 24h **15T 53.3% -0.48** | 7d **100T 51.0% -1.62** (armed 41T 90.2% **+2.02** vs unarmed 59T 23.7% **-3.64**) | 14d 372T 53.5% -3.90
+- 14d exits: pm-trail 130T 97.7% **+7.27** + mfe_exit **+1.79** + ugb_pt **+1.04** carry all profit; atr_sl_hit 61T 0% **-6.84** + hard_max 43T 0% **-5.31** + cut-loser **-1.69** = pure-loss engines
+- chop-bleed: 14d losers **146/158 (92%) never armed = -16.25**; 7d 42/48
+- RR asymmetry 7d: avg win +0.0627 vs avg loss -0.1004 → breakeven WR **61.6%** vs actual **51.0%**
+- 14d direction: LONG 277T -3.22 vs SHORT 95T -0.68 (contra-trend entry filter stays REJECTED #244)
 
-### 3. SHADOW (4/6 usable)
-- **contrarian join 20:30Z (re-ran, mandate):** overall flip **42.7%** n=1587 = flipping loses · **pc- 64.6% (226W/124L) LIVE, chi2 p=0.3747 uniform** · rider do-NOT (p=4e-29)
-- **floor join 20:59Z (re-ran):** floor_only 1499 WR 49.6% vs always_admit 245 WR 44.6%; n>=200 PASS; 30d same-sign → COLLECT 11-15
-- shadow_trader: exit A/B **pm_trail +12,323 vs hard_max -14,194** = trail-or-nothing; every gate still avg-negative-EV
-- mfe-cut ACTIVE (11 unique would-fires) · jup-atrsl ACTIVE + drift FLAG · oscillator FROZEN · wyckoff RETIRED · rr ORPHANED
+### 3. SHADOW (3/6 usable)
+- **contrarian join 20:31Z (re-ran, mandate):** overall flip **43.6%** n=1604 = flipping loses · **pc- 64.6% (226W/124L) LIVE, chi2 p=0.3747 uniform** · rider 36.2% do-NOT
+- **floor join 20:45Z:** n=1559 PASS, 30d same-sign → **11-15 COLLECT**
+- shadow_trader: exit A/B **pm_trail +12,828 vs hard_max -15,084** = trail-or-nothing; SHORT-RSI-HARD-FLOOR would_win 56% avg -0.04 = gate saves money
+- oscillator FROZEN · wyckoff RETIRED · rr ORPHANED
 
 ### 4. AUTOPSY + AMPLIFY
-- **48h recovery_replay (adverse-first, selfcheck PASS): n=15 = 7 never-adverse / 7 recovered / 1 NEVER (GMX #16839 bb-squeeze+) → WRONG-SIDE REFUTED 72nd consecutive** (#61 p=0.116, #84 t=-0.04). Never-armed losers 14d sample n=40: exit reasons atr_sl 16 + hard_max 16 = wait-for-SL is the bleed path; avg -0.179.
-- **AMPLIFY: 1 NEW** — `amplify-structure-flip-early-exit` (type a exit-side, due 11-21). Why-not cells: all 4 n>=10 in-flight; n>=5 early thin. Flip-KPI MET this week.
-- Creative x2: structure-flip shadow registered · contra-trend filter rejected-with-data.
-- constants EMPTY · session lock ABSENT · size-reduce absent = 1.0x · 0 pending checkpoints (0 registered this run — no intraday boxes needed).
+- **48h recovery_replay (adverse-first, selfcheck PASS): n=17 = 7 never-adverse / 9 recovered / 1 NEVER (GMX #16839) → WRONG-SIDE REFUTED 73rd consecutive** (#61 p=0.116, #84 t=-0.04). 16/17 losers = never-armed stop-family exits.
+- **AMPLIFY: 1 NEW** — `amplify-tat-neverarmed-age-widen` (type a, due 11-14). Why-not cells: all 4 n>=10 in-flight; 0 signal×dir n>=8 net>0.50/30d = thin book. Flip-KPI: 0 new conversions this run (day 1 of week); prior week's cited.
+- Creative x3: pooled TAT walk · revert fold-in question · jup-decay bar tightening.
 
-### 5. READINESS (2026-11-09 21:05 UTC)
-**0 open — flat after manual exit.** Regime: watchdog 15m LONG_BIAS / 4h LONG_BIAS / continuum AT + LEAN_BEAR oscillation (sources disagree AT the line = chop), vol LOW, zscore STRONG_POS, wyckoff MARKUP, market CALM, trend_quality STRONG_UP. Continuum logs still [CONTINUUM-BLOCK] BTC LONG (bearish structure) while [LONG-NEUTRAL-CHOP-BYPASS] lets SOL LONG with own momentum = conflicting micro-reads. → **no new entries until 1m sustains one side WITH volume; trail-family first; size 1.0x.**
+### 5. READINESS (2026-11-10 21:00 UTC)
+**1 open — HOLD: HYPE #16854 jup_yolo_mirrored SHORT** entry 71.91 / SL(db) 72.449 (PM act 73.0 — the flagged drift) / TP 70.256 / 5x / `-0.47%` 68min. Aligned: btc_15m AND btc_4h both **SHORT_BIAS (agreed)** → bracketed, hold. 0 steers, portfolio good.
+Regime: both TFs SHORT_BIAS agreed · continuum AT · vol NORMAL · velocity SLOW · accel FLAT · market DECLINING · trend_quality STRONG_UP (disagrees with bias pair = chop undertone) → **SHORTs only on alignment (as now); no fresh counter-trend LONGs until 1m sustains reclaim WITH volume; trail-family first; size 1.0x.**
 
-**Queue:** **11-10 00:00Z:** winner-cell-size-125 default REVERT (fires; do not jump) · jup-atrsl db-drift root-cause (main-session/T) → 11-11 contrarian watch → 11-12 storm x3 → 11-13 linreg-fade/vb-clonehunt/pc+/bbsq-chop-exempt → **11-14 mfe-cut fold + prearm-breakeven walk + uninert full-100 read** + stop-tighten + neutral-exempt + mult-150 → 11-15 floor same-sign → 11-16 atr-trend cell promote-read → 11-17 jup batch → 11-19 jup HIGH OOS → **11-21 structure-flip-early-exit bar + conf-tilt** → 12-15 ugb-bypass-hole.
-**CEO:** mult-150 sign-off still owed (evidence decayed #234) · unclog-waiver re-measure [35,45) still owed · fade-ctx fee-net report (this run: edge real, fees eat it at $11) · jup Option-D monitor.
+**Queue:** **CEO: winner-cell revert decision (OVERDUE)** → 11-11 contrarian watch (pc- PROMOTE GO/NO-GO) → 11-12 storm x3 → 11-13 pc+ kill-review + vb- clone-hunt + linreg-fade + chop-exempt → **11-14 EXIT-STACK DAY** (stop-tighten eval · prearm-breakeven · MFE-CUT fold · **NEW pooled TAT age-walk** · uninert · drop-pcplus+mult-150 fold-if-revert · jup-walk · neutral-exempt · reband · probe-080 · atrtrail · slippage) → 11-15 floor same-sign → 11-16 atr-trend cell → 11-17 jup batch + atrsl re-check → 11-19 jup HIGH OOS (**net>0 bar**) → 11-21 structure-flip + conf-tilt → 12-15 ugb-bypass-hole.
+**CEO owed:** winner-cell revert · mult-150 sign-off (folds into revert) · unclog-waiver [35,45) re-measure · fade-ctx fee-net · jup Option-D monitor.

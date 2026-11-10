@@ -330,6 +330,23 @@ duplicate real trade #16832).
     on #16827 itself the trail's exit beat the structure stop by
     ~1.7pts-of-margin — the fake-out resolved UP; the rule is for when
     the retest precedes the REAL leg.)
+13. **ALWAYS arm the short ladder — readiness is the default**
+    (CEO 2026-11-10: "there is always a short we want to be ready for...
+    it is about probabilities, anything can happen"). Never report "no
+    short armed" or ask the CEO for short levels — derive the ladder
+    from the chart yourself and arm it: **rung 1** = local-low break
+    (quick-move, own tight TP/SL, local structure OK per §13 quick-leg),
+    **rung 2** = trendline break (the CEO's trendline touches — fit the
+    line from the touch points, trigger cushioned under it, SL above the
+    touch zone, TP into the void with disclosure), **rung 3** = major-low
+    break (SL = reclaim of the low band, TP = measured move into the
+    void, disclosed). Each rung gets its OWN TP/SL. Legs carry
+    `serial: true` — the monitor's stacking guard fires them rung-after-
+    rung (only when flat: no merge, no state burn, no double-size).
+    Longs mirror the same way. The real-R:R gate still REPORTS (run like
+    the 73,350 leg run at real 0.55 — disclosed in the note as a CEO
+    ladder override); probability weighting decides which rung matters,
+    not whether to arm.
 
 **Tranche adds to an existing position:** brain.py's duplicate guard blocks
 a second same-coin open — for a CEO-directed add pass `--force`

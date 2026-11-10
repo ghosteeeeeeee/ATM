@@ -1209,3 +1209,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 18T -0.85 38.9% | 7d 107T -1.59 51.4%
 ### Findings: Rotating Q (10 % 14 = regime memory): data/signal_regime_memory.json last written 2026-10-11 = 30d stale, well past the 7d bar. Side: disk 86% WARN recurring since 11:34, ai-trader-pending freq deviation 7x at 14:00. Control tower: 2 items due TODAY (winner-cell-size-125, jup-atrsl-shadow-parity).
 ### Recommendation: Rebuild signal_regime_memory.json from PG on the next deep run; rotate logs to bring disk under 85%.
+
+## CEO Status — 20261110T191843Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 16T -0.58 50.0% | 7d 101T -1.72 50.5%
+### Findings: clean — flat book, both services active, no new Tracebacks; disk 87% WARN repeated 16:34-18:34; 2 overdue decision items (winner-cell-size-125, jup-atrsl-shadow-parity). Rotating Q (regime memory): signal_regime_memory.json last written Oct 11 = 30d stale (>7d bar).
+### Recommendation: refresh signal_regime_memory.json from DB (stale 30d) and clear the 2 overdue control-tower items; disk at 87% needs log/dB cleanup soon.

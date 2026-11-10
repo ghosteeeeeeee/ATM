@@ -24367,3 +24367,29 @@ BY: auto_1hr
 - Storm streak 0/3 (prior negative counterfactuals) — deadline 2026-11-12, unlikely to meet
 - 0 open trades — flat
 BY: auto_1hr
+
+## [2026-11-10 20:21] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 hour (24h 15T 53.3% -$0.48 RED | 7d 100T 51.0% -$1.62 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (HYPE jup_yolo_mirrored SHORT 19:48, -0.50%)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored / volume-buildup- / bb-squeeze+ / pump-chain+ = R:R drag
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/15 = 20.0% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h best n=5 ai-trader-pending net -$0.23; jup_yolo_mirrored net +$0.06 but n=3 <5)
+- Neg streak: 14h -0.36 then 16h +0.09, then 0 closes -> broken, not 3; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners mae avg 0.285% max 0.587% -> OK
+- No storm (window-min -0.34% / at-run +0.23%) -> gate not fired, no packet
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 53.3% (8/15) but net -$0.48 RED, 7d 51.0% WR -$1.62 = R:R drag persists
+- Storm streak 0/3 — deadline 2026-11-12, unlikely to meet
+- 1 open trade (HYPE SHORT)
+BY: auto_1hr

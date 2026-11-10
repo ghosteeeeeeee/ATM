@@ -10948,5 +10948,32 @@
     "category": "negative result",
     "status": "rejected-with-data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-11-10T20:57:00Z",
+    "idea": "Pooled never-armed TAT age-widen counterfactual (n=51/30d, +38min, cap 90min < MFE-CUT 130m)",
+    "rationale": "TAT splits: armed 14T +0.19 WR 78.6% vs never-armed 51T -1.42 WR 23.5% avg_mfe 0.173 avg_hold 52min. Pooled clears n>=20 power bar; per-signal bb-squeeze+ n=19 does not.",
+    "expected_impact": "walk measures whether stalls arm with 38 more minutes; NO-SHIP default",
+    "category": "exit sniper",
+    "status": "registered (amplify-tat-neverarmed-age-widen due 11-14)",
+    "risk": "medium (opposite direction to MFE-CUT — adjudicate jointly, ship one)"
+  },
+  {
+    "date": "2026-11-10T20:57:00Z",
+    "idea": "Winner-cell revert overdue -> CEO decision + fold drop-pcplus/mult-150 into single post-revert question",
+    "rationale": "Bar FAIL all three readings; auto-flip denylist blocks auditor execution (money-sizing=CEO). Two 11-14 proposals become moot on revert.",
+    "expected_impact": "removes boost drag; prevents re-litigating dead proposals",
+    "category": "governance",
+    "status": "surfaced",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-10T20:57:00Z",
+    "idea": "jup HIGH SHORT cell decay alarm pre-registered: judge 11-19 on net>0 not n>=10",
+    "rationale": "+0.40 -> +0.32 -> +0.15 across 3 runs as n 15->16->17; current week 2T -0.25",
+    "expected_impact": "prevents promoting a decaying cell on sample-size alone",
+    "category": "amplify guard",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

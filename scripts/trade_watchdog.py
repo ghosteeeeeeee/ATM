@@ -1395,14 +1395,16 @@ def _monitor_pending_orders_impl(btc_price):
             seen_ids.add(oid)
             crossed = (btc_price >= trigger_price) if trigger == "above" \
                 else (btc_price <= trigger_price)
-            if crossed and str(oid).startswith("btc-auto-"):
-                # Same-coin stacking guard (CEO lesson 2026-11-10): two AUTO
+            if crossed and (str(oid).startswith("btc-auto-")
+                            or order.get("serial") is True):
+                # Same-coin stacking guard (CEO lesson 2026-11-10: two AUTO
                 # shorts fired 1min apart in one dump → 2× exposure, both
-                # stopped −3.80% on a single spike. Auto orders WAIT until
-                # flat (stay armed, no state burn); CEO (btc-ceo-*) orders
-                # keep the merge path = intentional tranches. brain's dup
-                # guard blocks ANY same-coin open (no direction filter) —
-                # we mirror that here.
+                # stopped −3.80% on a single spike). Auto AND serial-ladder
+                # orders WAIT until flat (stay armed, no state burn) — the
+                # ladder fires rung-after-rung, never merged. CEO tranches
+                # (btc-ceo-* without serial) keep the merge path.
+                # brain's dup guard blocks ANY same-coin open (no direction
+                # filter) — we mirror that here.
                 try:
                     import psycopg2
                     from _secrets import BRAIN_PASSWORD, BRAIN_HOST
