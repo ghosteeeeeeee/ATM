@@ -133,6 +133,19 @@ trades** (CEO directive 2026-10-22). The rules:
      giant-candle backstop. Tier boundaries intentionally LOOSEN the
      floor on our own stops (PM semantics); a stop you tightened by hand
      is only ever improved, never relaxed.
+   - **WATCHDOG STRUCTURE-FOLLOW (30-min) — coexists with the trail**
+     (CEO synthesis 2026-11-10: "trailing so we book profits... fluid
+     enough to survive chop unless structure is broken... the watchdog
+     adjusting stops as the trade progresses"): every watchdog cycle
+     the full-analysis tweak adjusts the stop fluidly — risk-side stops
+     (wrong side of entry) ALIGN to the 15m swing ±0.10 ATR (survival
+     IS structure, either direction), profit-side stops only DEEPEN
+     (never relax — cannot undo what the trail booked). Trail books on
+     2-min pipeline cycles, watchdog follows structure on 30-min;
+     CAS + improve-only on both sides means they never fight.
+     Conditional orders carry the fluid trail profile by default
+     (skip_be/giveback/min_lock) unless `dynamic_sl: false`
+     (structure-only — tweak governs alone).
 3. **Safety nets remain**: guardian hard caps, max-hold, staleness checks
    still apply — safety, not exit management. Guardian hard-stop closes
    relabel to `manual_*` too (bug_hunter F-1 fix 2026-10-24 — the label
@@ -307,9 +320,13 @@ duplicate real trade #16832).
     then ran +691 without us; structure IS the risk bound). Auto arms
     now carry the structure SL FROM BIRTH (15m swing ±0.10 ATR —
     `_structure_sl`), and rule-10 snaps any void-TP into the first
-    opposing structure. Guardian/max-hold still apply. Use this for
-    floor/breakdown and breakout-continuation arms — BE/trail stays the
-    default for everything else. (Counterfactual noted honestly:
+    opposing structure. Guardian/max-hold still apply. Since 2026-11-10
+    the fluid TRAIL and the watchdog structure-follow run TOGETHER on
+    every managed trade (contract item 2): the trail books profits on
+    2-min cycles with chop-surviving giveback, the watchdog aligns risk-
+    side stops to structure / deepens profit-side stops on 30-min — so
+    a winning trade books en route AND exits only when structure
+    actually breaks. (Counterfactual noted honestly:
     on #16827 itself the trail's exit beat the structure stop by
     ~1.7pts-of-margin — the fake-out resolved UP; the rule is for when
     the retest precedes the REAL leg.)

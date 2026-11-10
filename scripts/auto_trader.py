@@ -259,7 +259,9 @@ def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
         DB.log_event('WARN', f'arm skipped FAIL-CLOSED — one-shot state '
                              f'unreadable: {e}')
         return 'error:state-unreadable'
-    dedupe = 0.3 * (atr_1h or 400)
+    # 0.5x ATR (was 0.3): the engine kept re-arming a same-direction twin
+    # ~230pts from the CEO's level — overlapping triggers broke the
+    dedupe = 0.5 * (atr_1h or 400)
     for ex in orders:
         if ex.get('direction') != leg:
             continue
@@ -318,18 +320,22 @@ def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
 
 
 def tweak_structure_fixed(decision, open_positions):
-    """CEO directive 2026-11-09: when a position is open, each watchdog
-    full-analysis cycle TUNES it — but only structure-fixed trades
-    (dynamic_sl=false: BE/trail stands down, this IS their SL authority).
+    """Fluid structure-follow stop tuning (CEO 2026-11-10: "the stop is
+    trailing so we book profits... fluid enough to allow the chop and
+    survive unless structure is broken... the watchdog is adjusting the
+    stops as the trade progresses").
 
-    Structure-bound rules, CAS-protected, every write logged:
-      R1 structure-break exit (CEO 2026-11-09 17:00: "we need it to
-         break structure to exit" — the ±0.5% entry cap was REMOVED:
-         it forced #16834's stop into the noise 130pts above structure
-         while the move ran +691) — a stop INSIDE the retest zone moves
-         just beyond the 15m swing (short: above SH + 0.10 ATR; long:
-         below SL − 0.10 ATR), never onto the live price side (no
-         instant self-close). Structure IS the risk bound.
+    Runs on EVERY managed open trade (ai-trader-*) — the mxm trail books
+    profits on 2-min pipeline cycles with the fluid profile (skip-BE /
+    wide giveback / min-lock), THIS tweak follows structure every 30-min
+    watchdog cycle. The two coexist without fighting:
+      R1 structure-follow — risk-side stop (short: stop ≥ entry, long:
+         stop ≤ entry) ALIGNS to structure either direction (survival IS
+         structure — the #16834 fix: stop pinned 130pts above structure
+         in the noise, move ran +691; ±0.5% entry cap removed 2026-11-09).
+         Profit-side stop: only DEEPENS (never relaxes a lock) — so the
+         watchdog can't undo what the trail booked, and the trail's
+         ratchet can't undo an alignment. Never onto the live price side.
       R2 rule-10 TP — a TP overshooting the FIRST opposing structure by
          more than 1 ATR snaps into it (short: 15m SL + 0.05 ATR;
          long: 15m SH − 0.05 ATR), price-side guarded (F3).
@@ -341,11 +347,6 @@ def tweak_structure_fixed(decision, open_positions):
     if not (sh and sl and atr):
         return tweaks
     try:
-        import manual_exit_manager as MXM
-        mstate = MXM._load_state()
-    except Exception:
-        mstate = {}
-    try:
         import psycopg2
         from _secrets import BRAIN_PASSWORD, BRAIN_HOST
         conn = psycopg2.connect(host=BRAIN_HOST, dbname='brain',
@@ -355,9 +356,26 @@ def tweak_structure_fixed(decision, open_positions):
         return tweaks
     try:
         cur = conn.cursor()
+
+        def _apply_stop(new_val, old, pid):
+            """CAS stop write + log. Returns True on rowcount."""
+            new_val = round(new_val, 8)
+            cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s "
+                        "AND status='open' AND stop_loss=%s",
+                        (new_val, pid, old))
+            if cur.rowcount:
+                conn.commit()
+                t = {'trade': pid, 'field': 'stop_loss',
+                     'old': old, 'new': new_val, 'rule': 'R1'}
+                tweaks.append(t)
+                DB.log_event('INFO', f"tweak {t}")
+                return True
+            return False
+
         for pos in open_positions or []:
-            if mstate.get(str(pos.get('id')), {}).get('dynamic_sl') is not False:
-                continue                  # dynamic-trail trade — not ours
+            # Gate CHANGED 2026-11-10: no longer dynamic_sl-false only —
+            # trail (2-min mxm, fluid profile) and this structure-follow
+            # (30-min) now coexist on the same trade per CEO synthesis.
             sig = str(pos.get('signal') or '')
             if not any(t in sig for t in ('ai-trader-manual', 'ai-trader-pending',
                                           'ai-trader-auto')):
@@ -370,26 +388,19 @@ def tweak_structure_fixed(decision, open_positions):
                 continue
             d = str(pos.get('direction') or '').upper()
             if d == 'SHORT':
-                # STRUCTURE-BREAK EXIT (CEO 2026-11-09: "we need it to break
-                # structure to exit"): stop sits just beyond the 15m retest
-                # ceiling — the trade exits when structure ACTUALLY breaks.
-                # The old ±0.5% entry cap forced stops into the noise
-                # (#16834 stopped 130pts above structure, move then ran +691)
-                # and is REMOVED by directive — structure is the risk bound.
-                # Keep: never at/below live price (instant self-close).
+                # FLUID STRUCTURE-FOLLOW (CEO 2026-11-10 synthesis):
+                # risk-side (stop ≥ entry) → ALIGN to structure either
+                # direction — survival IS structure (#16834 fix; ±0.5%
+                # entry cap removed 2026-11-09). Profit-side (stop <
+                # entry) → only DEEPEN the lock, never relax — the
+                # watchdog must not undo what the trail booked.
                 want = sh + 0.10 * atr
-                want = max(want, price * 1.001)
-                if stop < want:
-                    cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s "
-                                "AND status='open' AND stop_loss=%s",
-                                (round(want, 8), pos['id'], stop))
-                    if cur.rowcount:
-                        conn.commit()
-                        t = {'trade': pos['id'], 'field': 'stop_loss',
-                             'old': stop, 'new': round(want, 8), 'rule': 'R1'}
-                        tweaks.append(t)
-                        DB.log_event('INFO', f"tweak {t}")
-                    stop = want if cur.rowcount else stop
+                want = max(want, price * 1.001)   # never at/below price
+                if stop >= entry:
+                    if abs(stop - want) > 1:
+                        _apply_stop(want, stop, pos['id'])
+                elif stop > want:
+                    _apply_stop(want, stop, pos['id'])
                 # F3 (bug_hunter MED): TP must stay BELOW live price for a
                 # short — a structure snap already crossed = instant exit.
                 if target < (sl - atr) and (sl + 0.05 * atr) < price * 0.999:
@@ -404,22 +415,20 @@ def tweak_structure_fixed(decision, open_positions):
                         tweaks.append(t)
                         DB.log_event('INFO', f"tweak {t}")
             elif d == 'LONG':
-                # structure-break mirror: stop just BELOW the 15m swing low
-                # (±0.5% entry cap REMOVED by CEO directive 2026-11-09);
-                # never at/above live price (instant self-close for a long)
+                # FLUID STRUCTURE-FOLLOW mirror: risk-side (stop ≤ entry)
+                # → align to structure either direction (survival);
+                # profit-side → only deepen the lock, never relax.
+                # Clamp ONLY when structure sits at/above the live price
+                # (instant self-close) — never over-tighten valid structure
+                # (test-caught: min() dragged a valid stop150pts closer).
                 want = sl - 0.10 * atr
-                want = min(want, price * 0.999)
-                if stop > want:
-                    cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s "
-                                "AND status='open' AND stop_loss=%s",
-                                (round(want, 8), pos['id'], stop))
-                    if cur.rowcount:
-                        conn.commit()
-                        t = {'trade': pos['id'], 'field': 'stop_loss',
-                             'old': stop, 'new': round(want, 8), 'rule': 'R1'}
-                        tweaks.append(t)
-                        DB.log_event('INFO', f"tweak {t}")
-                    stop = want if cur.rowcount else stop
+                if want >= price:
+                    want = price * 0.999
+                if stop <= entry:
+                    if abs(stop - want) > 1:
+                        _apply_stop(want, stop, pos['id'])
+                elif stop < want:
+                    _apply_stop(want, stop, pos['id'])
                 # F3 mirror: TP must stay ABOVE live price for a long
                 if target > (sh + atr) and (sh - 0.05 * atr) > price * 1.001:
                     new_tp = round(sh - 0.05 * atr, 8)
