@@ -23992,3 +23992,41 @@ BY: auto_1hr
 - 24h WR 20.0% (3/15) -$0.79 RED, 7d -$1.23 structural RED (7d WR 52.9% but negative PnL = R:R drag)
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## FAVORITES Update — 2026-11-10 06:00 UTC
+- Regime: LONG_BIAS
+- DEMOTE FIL (inactive 7d, no trades)
+- DEMOTE BTC (WR=50.0%, PnL=$-0.23, 1 consecutive bad days, regime=LONG_BIAS)
+
+Final set: []
+
+## LOSERS Update — 2026-11-10 06:05 UTC
+- REMOVE ETH (WR=57.1%, PnL=$-0.10, recovered)
+
+Final set: []
+
+## [2026-11-10 06:21] Hourly Analysis
+
+**Trades:** 2 closed (1 win, 1 loss)
+**PnL:** $-0.08 hour (WR: 50% hour; 24h 17T 35.3% -$0.79 RED | 7d 124T 54.0% -$1.18 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1W SOL jup_yolo_mirrored profit-monster-trail +0.05 (mae 0.046%), 1L SUPER hh-hl+ atr_sl_hit -0.13; 0 open
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg: jup_yolo_mirrored 60.8% WR -$1.24, volume-buildup- 60.6% -$0.95, bb-squeeze+ 62.2% -$0.03, pump-chain+ 40.0% -$0.16 (all 20 pump-chain+ trades in EXTREME only) — R:R drag, no last-hour trigger, no kill criterion met
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/17 = 29.4% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h max n=3 ai-trader-pending/jup_yolo_mirrored, both net negative; no n>=5 net positive)
+- Neg streak: 04h +0.06, 05h +0.05, 06h -0.13 — not 3 consecutive -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 2 closes/hr, 0 open — under 20
+- Entry quality: last-hour winner mae 0.046% <0.5%; 24h winners mae avg 0.283% max 0.587% (5/6 <0.5%) -> OK
+- No storm (window-min -0.38% / at-run -0.38%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 35.3% (6/17) -$0.79 RED, 7d 54.0% WR but -$1.18 = R:R drag persists
+- pump-chain+ 14d exactly n=20, 40% WR, all EXTREME — borderline kill candidate; monitor, needs regime-gate path if it worsens
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
