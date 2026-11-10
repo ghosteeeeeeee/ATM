@@ -23,7 +23,7 @@ import sys
 from datetime import datetime, timezone, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from paths import HERMES_DATA, WWW_DATA  # noqa: E402
+from paths import HERMES_DATA, WWW_DATA, HERMES_LOG_DIR  # noqa: E402
 
 REGISTRY = os.path.join(HERMES_DATA, 'shadow_disposition.json')
 TOWER = '/root/.hermes/automation/ceo/control_tower.md'
@@ -119,13 +119,152 @@ def _recent_packets(limit=8):
     return hits[-limit:][::-1]
 
 
+# ── fill_cap (DailyFillCap / Cap D visibility, CEO consult 20261110T184624Z) ──
+# Bounded backward scan of pipeline.log for DailyFillCap SKIP events dated
+# today (UTC). ONLY single-timestamp lines count as events: pipeline
+# double-logs every log() line as a stdout echo ('TS   TS SKIP: ...'), so
+# counting both would double the event count (registry evidence: 12 events =
+# 24 lines). The Cap D skip path is stateless by design (no PG/SQLite record),
+# so the log is the only source for last_skip_ts / blocked_candidates_today.
+_FC_SCAN_CHUNK = 4 * 1024 * 1024    # per-iteration backward read
+_FC_SCAN_MAX = 64 * 1024 * 1024     # hard cap (~2.4 days at the current ~27MB/day)
+_FC_TS_RE = re.compile(r'^\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
+_FC_SKIP_RE = re.compile(r'^\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) SKIP: DailyFillCap')
+
+
+def _skip_events_today(path, day_prefix):
+    """(events_today_utc, last_event_ts_iso_or_None) from pipeline.log.
+
+    Scans backward from EOF (bounded to _FC_SCAN_MAX bytes) and stops at the
+    first line dated before day_prefix (the log is chronological). Never
+    raises: any read failure returns what was counted so far.
+    """
+    count = 0
+    last = None
+    try:
+        size = os.path.getsize(path)
+    except OSError:
+        return 0, None
+    pos = size
+    scanned = 0
+    carry = b''
+    try:
+        with open(path, 'rb') as f:
+            while pos > 0 and scanned < _FC_SCAN_MAX:
+                n = min(_FC_SCAN_CHUNK, pos)
+                pos -= n
+                scanned += n
+                f.seek(pos)
+                buf = f.read(n) + carry
+                parts = buf.split(b'\n')
+                if pos > 0:
+                    carry = parts.pop(0)   # this line's start lives in older bytes
+                else:
+                    carry = b''
+                # decode only lines whose first non-space bytes are a date
+                txts = []
+                for raw in parts:
+                    s = raw.lstrip()
+                    txts.append(s.decode('utf-8', 'replace') if s[:4].isdigit() else None)
+                j = -1                      # last index of a pre-today line
+                for i, txt in enumerate(txts):
+                    if txt is None:
+                        continue
+                    m = _FC_TS_RE.match(txt)
+                    if m and m.group(1) < day_prefix:
+                        j = i
+                chunk_last = None
+                for txt in txts[j + 1:]:    # today's region of this chunk
+                    if txt is None:
+                        continue
+                    m = _FC_SKIP_RE.match(txt)
+                    if m:
+                        count += 1
+                        chunk_last = m.group(1)
+                if last is None and chunk_last is not None:
+                    last = chunk_last       # chunks arrive newest-first
+                if j >= 0:
+                    break                   # boundary hit: older bytes are pre-today
+    except Exception:
+        pass
+    return count, (last.replace(' ', 'T') + 'Z' if last else None)
+
+
+def _fill_cap():
+    """DailyFillCap (Cap D) state for the tower feed — never raises.
+
+    engaged/opens_24h/fee_net_24h come from ONE cheap PG read (same SQL as
+    decider_run._daily_fill_cap_block); max from DAILY_FILL_CAP_MAX.
+    last_skip_ts / blocked_candidates_today come from a bounded scan of
+    pipeline.log (see _skip_events_today). Any failure degrades that field
+    to null — a broken feed must never break the tower.
+    """
+    out = {'engaged': None, 'opens_24h': None, 'max': None,
+           'fee_net_24h': None, 'last_skip_ts': None,
+           'blocked_candidates_today': None}
+    cap_max = None
+    try:
+        from hermes_constants import DAILY_FILL_CAP_MAX
+        cap_max = int(DAILY_FILL_CAP_MAX)
+        out['max'] = cap_max
+    except Exception as e:
+        log(f'WARN: fill_cap DAILY_FILL_CAP_MAX unreadable: {e}')
+    try:
+        import psycopg2
+        conn = None
+        cur = None
+        try:
+            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            cur = conn.cursor()
+            # SAME SQL as decider_run._daily_fill_cap_block: live opens (paper=false)
+            # + fee-net of JSON-fee closed fills over the rolling 24h (ONE read).
+            cur.execute("""
+                SELECT COUNT(*) FILTER (WHERE paper = false
+                                        AND open_time > NOW() - INTERVAL '24 hours'),
+                       COALESCE(SUM(pnl_usdt) FILTER (WHERE status = 'closed'
+                                AND close_time > NOW() - INTERVAL '24 hours'
+                                AND fees LIKE '{%'), 0)
+                     - COALESCE(SUM(COALESCE((fees::json->>'fee_total')::numeric, 0))
+                           FILTER (WHERE status = 'closed'
+                                AND close_time > NOW() - INTERVAL '24 hours'
+                                AND fees LIKE '{%'), 0)
+                FROM trades
+            """)
+            row = cur.fetchone()
+        finally:
+            try:
+                if cur is not None:
+                    cur.close()
+            finally:
+                if conn is not None:
+                    conn.close()
+        n = int(row[0] or 0)
+        net = float(row[1] or 0)
+        out['opens_24h'] = n
+        out['fee_net_24h'] = net
+        if cap_max is not None:
+            # mirror the helper's AND exactly (raw net, pre-rounding)
+            out['engaged'] = bool(n >= cap_max and net < 0)
+    except Exception as e:
+        log(f'WARN: fill_cap PG read failed: {e}')
+    try:
+        cnt, last = _skip_events_today(os.path.join(HERMES_LOG_DIR, 'pipeline.log'),
+                                       datetime.now(timezone.utc).strftime('%Y-%m-%d '))
+        out['blocked_candidates_today'] = cnt
+        out['last_skip_ts'] = last
+    except Exception as e:
+        log(f'WARN: fill_cap log scan failed: {e}')
+    return out
+
+
 def main():
+    fill_cap = _fill_cap()
     reg = _load(REGISTRY, None)
     if not reg or not isinstance(reg.get('entries'), list):
         log('ERROR: registry missing/empty — writing error feed')
         payload = {'generated_at': NOW.isoformat(), 'error': 'registry unreadable',
                    'counts': {}, 'sections': {}, 'trials': [], 'calendar': [],
-                   'done': [], 'packets': []}
+                   'done': [], 'packets': [], 'fill_cap': fill_cap}
     else:
         entries = [e for e in reg['entries'] if isinstance(e, dict)]
         opens = [e for e in entries if e.get('status') == 'open']
@@ -197,6 +336,7 @@ def main():
             'calendar': calendar,
             'done': [e.get('id', '?') for e in dones],
             'packets': _recent_packets(),
+            'fill_cap': fill_cap,
         }
 
     tmp = f'{OUTPUT}.{os.getpid()}.tmp'

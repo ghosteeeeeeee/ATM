@@ -830,6 +830,68 @@ def get_ab_params_for_trade(direction: str) -> dict:
     }
 
 
+# ── DailyFillCap state-change visibility (CEO consult 20261110T184624Z,
+# verdict "LEAVE as designed; add a visibility surfacing") — LOG-ONLY. ──
+# One ENGAGED/RELEASED summary line per (state, UTC hour) WITHIN a process —
+# same dedup pattern as the stop-tighten sets (tpsl_utils._STOP_TIGHTEN_LOGGED):
+# a module-level set keyed by (state, UTC-hour). pm/decider respawn every
+# pipeline minute, so the set resets each run there — at those sites the bound
+# is execution cadence, not 24/day (stop-tighten M2 note applies verbatim).
+# _DFC_K counts blocked candidates since the last flip: it increments ONLY
+# inside the block branch and resets only on a release flip. Engagement state
+# is tracked via the module set (any 'ENGAGED' key = engaged); release discards
+# those keys so a same-hour re-engagement logs again. Every log() call sits in
+# its own try/except and the whole helper is guarded: a logging failure must
+# never change _daily_fill_cap_block's decision — its SQL, return values, and
+# per-candidate SKIP bytes are untouched (pure logging addition).
+_DFC_STATE_LOGGED = set()   # {('ENGAGED'|'RELEASED', 'YYYY-MM-DDTHH')}
+_DFC_K = 0                  # blocked candidates since last state flip
+
+
+def _daily_fill_cap_state_line(blocked, n, net, cap_max):
+    """Log-only ENGAGED/RELEASED state line for DailyFillCap (Cap D).
+
+    Never raises (state mutation and every log() call are individually
+    guarded), so it can never alter _daily_fill_cap_block's return value.
+    No return value (None); at most one line per (state, UTC hour) per process.
+    """
+    global _DFC_K
+    try:
+        _hhmm = time.strftime('%H:%M', time.gmtime())
+        _hour_key = time.strftime('%Y-%m-%dT%H', time.gmtime())
+        if blocked:
+            _DFC_K += 1
+            _key = ('ENGAGED', _hour_key)
+            if _key not in _DFC_STATE_LOGGED:
+                _DFC_STATE_LOGGED.add(_key)
+                try:
+                    log(f'DailyFillCap ENGAGED {_hhmm}Z — {n}/{cap_max} opens, fee-net {net:+.2f}'
+                        f' — releases on count roll-off below {cap_max} OR first green 24h'
+                        f' (sawtooth, ~1h typical); candidates blocked since last flip: {_DFC_K}')
+                except Exception:
+                    pass
+        else:
+            if any(_s == 'ENGAGED' for _s, _h in _DFC_STATE_LOGGED):
+                # list() first: difference_update over a generator that walks
+                # THIS set raises "Set changed size during iteration"
+                _DFC_STATE_LOGGED.difference_update(
+                    [_k for _k in _DFC_STATE_LOGGED if _k[0] == 'ENGAGED'])
+                _key = ('RELEASED', _hour_key)
+                _first = _key not in _DFC_STATE_LOGGED
+                if _first:
+                    _DFC_STATE_LOGGED.add(_key)
+                _k_held = _DFC_K
+                _DFC_K = 0
+                if _first:
+                    try:
+                        log(f'DailyFillCap RELEASED {_hhmm}Z — opens {n} < {cap_max} (roll-off)'
+                            f' or fee-net {net:+.2f} >= 0 — {_k_held} candidates were held during engagement')
+                    except Exception:
+                        pass
+    except Exception:
+        return
+
+
 def _daily_fill_cap_block(token=None, direction=None, source=None):
     """DailyFillCap / Cap D (CEO SHIP 2026-11-04, consult 20261104T172347Z
     "SHIP (a)+(e). REJECT (b),(c),(d)" — the working capital brake).
@@ -858,6 +920,7 @@ def _daily_fill_cap_block(token=None, direction=None, source=None):
     (manual-trade-override / ai_trader_precheck) never reach either path and
     bypass the cap by design. REVERT: DAILY_FILL_CAP_ENABLED=False (constants
     block DAILY FILL CAP, hermes_constants.py).
+    PENDING-BYPASS NUANCE (CEO consult 20261110T184624Z, documented observation, not a code change): 5 of the 15 slots can be ai-trader-pending fills which bypass this gate but consume its budget → effective automated budget while red ≈ 10/day.
     """
     try:
         from hermes_constants import DAILY_FILL_CAP_ENABLED, DAILY_FILL_CAP_MAX
@@ -895,10 +958,21 @@ def _daily_fill_cap_block(token=None, direction=None, source=None):
         _n = int(_row[0] or 0)
         _net = float(_row[1] or 0)
         if _n >= DAILY_FILL_CAP_MAX and _net < 0:
+            # State-change visibility (CEO 20261110T184624Z): log-only, fires
+            # on the engagement flip (per-hour dedup) — guarded so a log
+            # failure can never change this block decision.
+            try:
+                _daily_fill_cap_state_line(True, _n, _net, DAILY_FILL_CAP_MAX)
+            except Exception:
+                pass
             _ctx = ' '.join(str(x) for x in (token, direction, source) if x)
             log(f'SKIP: DailyFillCap — {_n} opens in last 24h (max {DAILY_FILL_CAP_MAX}) while fee-net {_net:+.2f} < 0 — brake until first green 24h'
                 + (f' [blocked {_ctx}]' if _ctx else ''))
             return True
+        try:
+            _daily_fill_cap_state_line(False, _n, _net, DAILY_FILL_CAP_MAX)
+        except Exception:
+            pass
         return False
     except Exception as _dfc_err:
         log(f'WARN: DailyFillCap check failed ({_dfc_err}) — proceeding without fill cap (fail-open)')
