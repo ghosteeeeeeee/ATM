@@ -24105,3 +24105,53 @@ BY: auto_1hr
 - 24h WR 31.2% (5/16) -$0.81 RED, 7d 52.2% WR but -$1.57 = R:R drag persists
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-10 10:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 hour (WR: n/a hour; 24h 16T 31.2% -$0.81 RED | 7d 114T 52.6% -$1.55 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (BTC ai-trader-pending SHORT 09:02, +0.10%) — quiet hour
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored/volume-buildup-/bb-squeeze+/pump-chain+ = R:R drag
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/16 = 31.2% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h max n=3: jup_yolo_mirrored -$0.18, ai-trader-pending -$0.04, r2v2-long3 +$0.06 — all below n>=5)
+- Neg streak: last close 06h -0.13, 07-10h 0 closes -> broken, not 3 -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners mae avg 0.308% max 0.587% (4/5 <0.5%) -> OK
+- No storm (window-min -0.59% / at-run -0.08%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 31.2% (5/16) -$0.81 RED, 7d 52.6% WR but -$1.55 = R:R drag persists
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
+
+## [2026-11-10 11:25] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.02 (WR: 100% hour; 24h 17T 35.3% -$0.79 RED | 7d ~114T ~52% ~-$1.55 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close — BTC ai-trader-pending SHORT manual_tp_hit +$0.02 (+0.92%), 0 open
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still jup_yolo_mirrored/volume-buildup-/bb-squeeze+/pump-chain+ = R:R drag, no last-hour trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/17 = 29.4% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h max n=3 jup_yolo_mirrored -$0.18 / ai-trader-pending -$0.02 / r2v2-long3 +$0.06 — all below n>=5)
+- Neg streak: 06h -0.13, then 07-09h 0 closes, 10h +0.02 -> broken, not 3 -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 1 close/hr, 0 open — under 20
+- Entry quality: 24h winners mae avg 0.300% max 0.587% (5/6 <0.5%) -> OK
+- No storm (window-min -0.13% / at-run -0.06%) — gate not fired (needs window-min <= -1.5 OR |at-run| >= 1.5), steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 35.3% (6/17) -$0.79 RED, 7d ~52% WR but ~-$1.55 = R:R drag persists
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
