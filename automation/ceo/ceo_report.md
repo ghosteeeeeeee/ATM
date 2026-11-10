@@ -1172,3 +1172,16 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 17T -0.37 41.2% | 7d 133T -1.60 54.9%
 ### Findings: clean — disk 86% WARN recurring (11:34/12:34/13:34/14:34Z); rotating Q (9%14=9, regime-specialists 14d n>=8): no actionable specialist — bb-squeeze+ NORMAL 32T 65.6% +0.50 vs HIGH 12T 58.3% -0.33 (both near bar, COLLECT), jup_yolo_mirrored FLAT 12T 83.3% +0.26 (n<20), volume-buildup- EXTREME/HIGH 63-75% WR but negative pnl = payout structure not entry; control_tower has 9 items due<=24h all dated 11-10, none overdue today.
 ### Recommendation: rotate/compress hl-copy + signal-compactor err logs before disk crosses 90%; no trade/param action.
+
+## CEO Status — 20261109T191841Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 14T -0.39 28.6% | 7d 129T -1.49 54.3%
+### Findings: 24h WR 28.6% is n=14 small-sample, not a signal; disk 86% used (WARN, ≥85%) + repeated TOK-override/BLOCK log spam; 14d regime split all four regimes net-negative (NORMAL -0.39 / HIGH -2.10 / EXTREME -0.15 / FLAT -0.29).
+### Recommendation: rotate/compress logs to drop disk below 85% before it trips a write failure; regime-specialist read = bb-squeeze+ is NORMAL-specialist (32T 65.6% +0.50 vs HIGH 12T 58.3% -0.33, already weight-boosted, keep) and volume-buildup- EXTREME 19T 63.2% WR but -0.42 net = R:R, not entry, owned by queued stack. none else.
+
+## CEO Status — 20261109T231842Z
+### Health: pipeline=inactive(OK — timer job exited 0 at 23:18:34, next 23:19) guardian=active open_pos=3
+### Numbers: 24h 13T -0.57 23.1% | 7d 125T -1.21 54.4%
+### Findings: 24h WR 23.1% is red (n=13); alerts only WARN-level — disk 86% + freq deviation on warrior-sr-confirm+/r2v2-long3; regime-specialist Q (day 9/14): bb-squeeze+ is NORMAL-regime (32T 65.6% +0.50) vs HIGH (13T 53.8% -0.43), jup_yolo_mirrored loses in NORMAL/HIGH/EXTREME (130T ~-1.55) and only wins FLAT (12T 83.3% +0.26)
+### Findings (calendar): 9 decision items due ≤24h (Nov 10), all owner=CEO/main-session — mfe-cut-arm-be, ichimoku-dampen-flooradmit, fade-ctx-exempt, winner-cell-size-125, conf-filter-parity-split, jup-atrsl-shadow-parity, rsi-ceiling-75-live, gate-shadow-dedup, amplify-bbsqueeze. None overdue.
+### Recommendation: disk at 86% needs log rotation/prune before it trips the 90% health gate; no trade/param action from this run.

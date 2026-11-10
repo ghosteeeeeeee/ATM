@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-11-09T18:19:22.577982+00:00",
+  "timestamp": "2026-11-10T01:19:25.456397+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.57 USDT. Something is wrong.",
+      "title": "Losing streak: 13/20 recent trades lost",
+      "detail": "Win rate 30% over last 20 trades. Total PnL: -0.68 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
@@ -13,7 +13,7 @@
       "severity": "warning",
       "category": "health",
       "title": "Signal 'jup_yolo_mirrored' losing streak: 4 consecutive losses",
-      "detail": "Net -0.56 USDT over last 20 trades (window losses: -0.56). Consider disabling or tuning this signal.",
+      "detail": "Net -0.47 USDT over last 20 trades (window losses: -0.47). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-002"
     }
@@ -21,17 +21,17 @@
   "portfolio_health": "critical",
   "regime": {
     "btc_15m": "SHORT_BIAS",
-    "btc_4h": "NEUTRAL",
-    "continuum": "BELOW",
+    "btc_4h": "LONG_BIAS",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "CALM",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 1
 }

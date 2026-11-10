@@ -23892,3 +23892,28 @@ BY: auto_1hr
 - 0 open trades — quiet book entering new hour
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-10 01:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 hour (WR: 0% hour; 24h 14T 21.4% -$0.70 RED | 7d 127T 53.5% -$1.42 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (FARTCOIN warrior-sr-confirm+ LONG 00:40)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still all win >60% WR (jup_yolo_mirrored 60.6% n=142 -$1.29, volume-buildup- 61.8% n=34 -$0.92, bb-squeeze+ 62.2% n=45 -$0.03) = R:R drag not WR collapse, no kill criterion met
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/14 = 21.4% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h no signal with n>=5 + net >$0.05)
+- Neg streak: 23h -0.09, 00h -0.09 = 2 consecutive, not 3 -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr, 1 open — under 20
+- Entry quality: 24h winners mae_pct avg 0.326% max 0.484% (3/3 <0.5%) -> OK
+- No storm (window-min -0.42% / at-run -0.01%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 21.4% (3/14) -$0.70 RED, 7d -$1.42 structural RED (7d WR 53.5% but negative PnL = R:R drag)
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
