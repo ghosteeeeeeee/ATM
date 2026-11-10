@@ -214,12 +214,20 @@ def score_direction(ind, continuum, direction='long', struct=None):
     return s, trend, reasons
 
 
-def build_decision(cycle_id, open_positions, cfg):
-    """The full cycle: analyze → score → decide → bracket levels."""
-    token = 'BTC'
+def build_decision(cycle_id, open_positions, cfg, token='BTC'):
+    """The full cycle: analyze → score → decide → bracket levels.
+    token= parameter = the multi-coin spin-off (coin_analysis.py); default
+    BTC keeps auto_trader's behavior byte-identical."""
+    # Market regime fallback (coin spin-off): alts have no continuum of
+    # their own — BTC's chop count IS their regime context (chop halving,
+    # score_adj) — labeled in output as regime_source.
+    flips, continuum = chop_flips_24h(token)
+    regime_source = token
+    if flips is None and token != 'BTC':
+        flips, continuum = chop_flips_24h('BTC')
+        regime_source = 'BTC'
     price_rows = tf_indicators(token, '1m')
     price = price_rows['price'] if price_rows else None
-    flips, continuum = chop_flips_24h(token)
     chop = flips is not None and flips >= 2
     regime = 'CHOP' if chop else ('TREND' if flips is not None else 'UNKNOWN')
 
@@ -285,7 +293,13 @@ def build_decision(cycle_id, open_positions, cfg):
             sh, sl = h1.get('sh'), h1.get('sl')
             if sh and sl and sh > sl:
                 atr1 = h1.get('atr', 400) or 400
-                cushion = max(30.0, 0.10 * atr1)
+                # Cushion must SCALE with the coin (spin-off fix 2026-11-10):
+                # the old absolute max(30.0, ...) was a BTC-points floor — on
+                # SOL (ATR $1.15) it made a 36%-of-price cushion ("short
+                # below 51.77" at price 83; shape-gates caught it, but the
+                # screening output was garbage). Floor = 0.05% of price
+                # (BTC-compressed ≈ old 36pts); ATR term dominates on majors.
+                cushion = max(0.10 * atr1, 0.0005 * (price or sh))
                 risk = 0.5 * atr1
                 rng = sh - sl  # range for measured-move targets
                 # §12 FIXED DIRECTION MAPPING (skill: break down = SHORT,
@@ -334,6 +348,7 @@ def build_decision(cycle_id, open_positions, cfg):
 
     return {
         'ts': time.time(), 'cycle_id': cycle_id, 'price': price,
+        'token': token, 'regime_source': regime_source,
         'regime_state': regime, 'flips_24h': flips,
         'structure': {tf: s['state'] for tf, s in struct.items()},
         'structure_detail': struct,
@@ -341,7 +356,8 @@ def build_decision(cycle_id, open_positions, cfg):
         'score_adj_best': 'CHOP' if chop else 'TREND',
         'decision': decision, 'bracket': bracket,
         'reasons': reasons + [f"long: {'; '.join(reasons_long[:4])}",
-                              f"short: {'; '.join(reasons_short[:4])}"],
+                              f"short: {'; '.join(reasons_short[:4])}",
+                              f"regime source: {regime_source}"],
         'atr_pct': a_pct, 'mode': cfg.get('mode', 'shadow'),
     }
 

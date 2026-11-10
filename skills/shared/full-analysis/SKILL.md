@@ -31,6 +31,32 @@ shared rate-limit budget (429 risk) that order placement depends on, and the
 local data is never staler than ~60s. API is only for what the local DB does
 not have (live mid on a delisted/edge case, exchange positions state).
 
+### Multi-coin spin-off (CEO directive 2026-11-10)
+
+```bash
+python3 scripts/coin_analysis.py               # jup_yolo list: HYPE SOL BTC ETH
+python3 scripts/coin_analysis.py HYPE SOL ...  # explicit coins
+```
+
+Same engines, parameterized: `auto_analysis.build_decision(token=...)`
+(scores/bracket/structure per coin), structure engine, ADX/ATR lifecycle,
+precheck at execution. Two spin-off-specific pieces:
+
+- **BTC-coupling label** (CEO worry: "trends would be very similar to
+  btc... others might go up/down independently"): Pearson correlation of
+  15m log-returns vs BTC (~18h) + beta + 24h relative strength →
+  **OWN-TREND** (|corr| < 0.6 — trades its own story, BTC read = context
+  only) vs **BTC-DRIVEN** (≥ 0.6 — a leveraged BTC echo: lead with the
+  BTC full-analysis there). Empirically the majors ARE echoes (HYPE +0.84,
+  SOL +0.90, ETH +0.95) — independent movers must be found OUTSIDE the
+  jup list (run the spin-off on HL-universe candidates to screen them).
+- **Regime is the market's**: alts have no continuum of their own — the
+  BTC chop count is their regime context (output labels
+  `regime_source: BTC`); structure/ADX/RSI/ATR are the coin's own.
+
+Screening output only — any actual trade still goes through
+manual-trade-override (precheck, explicit levels, verify).
+
 ## Step 0: Current Position Check (MANDATORY)
 
 **Always check current positions before any analysis.** This tells you:
