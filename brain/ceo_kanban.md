@@ -34,4 +34,4 @@ BY: auto_1hr
 - [2026-10-30 17:43 UTC] auto_1hr: NO CONFIG CHANGE — 2T 0W2L '-$0.13' | 24h 49T 59.2% '+$0.49' GREEN | 7d 174T '+$0.16' GREEN | kill none | inversion 0 | boost none | no storm (window-min -0.51% / at-run -0.15%)
 
 ## TEAM UPDATES
-- [2026-11-10 06:21 UTC] auto_1hr: NO CONFIG CHANGE — 2T 1W1L '-$0.08' (SOL jup_yolo_mirrored trail +$0.05, SUPER hh-hl+ atr_sl_hit -$0.13), 0 open | 24h 17T 35.3
+- [2026-11-10 06:21 UTC] auto_1hr: NO CONFIG CHANGE — 2T 1W1L '-$0.08' (SOL jup_yolo_mirrored trail +$0.05, SUPER hh-hl+ atr_sl_hit -$0.13), 0 open | 24h 17T 35.3% '-$0.79' RED | kill none | inversion 0 | boost none | pump-chain+ 14d n=20 40% WR all-EXTREME borderline noted | no storm (window-min -0.38% / at-run -0.38%)
