@@ -23967,3 +23967,28 @@ BY: auto_1hr
 - 24h WR 20.0% (3/15) -$0.79 RED, 7d -$1.39 structural RED (7d WR 52.5% but negative PnL = R:R drag)
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-10 04:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 hour (WR: 0% hour; 24h 15T 20.0% -$0.79 RED | 7d 121T 52.9% -$1.23 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 2 open (FARTCOIN warrior-sr-confirm+ LONG 00:40, BTC ai-trader-pending SHORT 02:24)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg still all >60% WR (R:R drag) -> no kill criterion met
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/15 = 26.7% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h max n=4 ai-trader-pending 0W -$0.08; no n>=5 net positive)
+- Neg streak: 00h -0.09, 01h no closes gap, 02h -0.09 — not 3 consecutive -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr, 2 open — under 20
+- Entry quality: 24h winners mae_pct avg 0.326% max 0.484% (3/3 <0.5%) -> OK
+- No storm (window-min -0.57% / at-run -0.25%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 20.0% (3/15) -$0.79 RED, 7d -$1.23 structural RED (7d WR 52.9% but negative PnL = R:R drag)
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
