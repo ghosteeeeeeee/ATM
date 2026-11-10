@@ -24030,3 +24030,28 @@ Final set: []
 - pump-chain+ 14d exactly n=20, 40% WR, all EXTREME — borderline kill candidate; monitor, needs regime-gate path if it worsens
 - Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
 BY: auto_1hr
+
+## [2026-11-10 07:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 hour (WR: n/a hour; 24h 17T 35.3% -$0.79 RED | 7d 121T 52.9% -$1.22 RED) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — quiet hour
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg: jup_yolo_mirrored 60.8% WR -$1.24, volume-buildup- 60.6% -$0.95, bb-squeeze+ 62.2% -$0.03, pump-chain+ 40.0% -$0.16 (EXTREME 40% -$0.32 / NORMAL 40.6% +$0.14 — wins in NORMAL, would need regime-gate path not kill) — R:R drag, no last-hour trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/17 = 29.4% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (no signal with n>=5 in 24h; max n=3 jup_yolo_mirrored/ai-trader-pending, both net negative)
+- Neg streak: 04h +0.06, 05h +0.05, 06h -0.13 — 1 consecutive neg, not 3 -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr, 0 open — under 20
+- Entry quality: 24h winners mae avg 0.283% max 0.587% (5/6 <0.5%) -> OK
+- No storm (window-min -0.40% / at-run +0.19%) — gate not fired, steps 1-4 skipped
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 35.3% (6/17) -$0.79 RED, 7d 52.9% WR but -$1.22 = R:R drag persists
+- Storm streak 3/3 positive counterfactual — enforce bar MET, awaiting CEO/T sign-off (deadline 11-12)
+BY: auto_1hr
