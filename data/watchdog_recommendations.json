@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-11T17:19:44.220177+00:00",
+  "timestamp": "2026-11-11T18:19:44.812844+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -12,8 +12,8 @@
     {
       "severity": "info",
       "category": "profit_lock",
-      "title": "Move ETH stop to breakeven \u2014 up 2.3%",
-      "detail": "Trade is +2.3%. Lock breakeven at 2047.6000.",
+      "title": "Move ETH stop to breakeven \u2014 up 2.2%",
+      "detail": "Trade is +2.2%. Lock breakeven at 2047.6000.",
       "trade_id": 16867,
       "action": {
         "type": "move_stop",
@@ -27,12 +27,12 @@
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "NEUTRAL",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
-    "velocity_state": "RISING",
+    "zscore_tier": "NEUTRAL",
+    "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
@@ -40,5 +40,9 @@
     "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 1
+  "open_count": 1,
+  "deep_analysis": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 CRITICAL\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (1 long, 0 short)\nUnrealized PnL: +0.24 USDT\nRegime: conflict \u2014 continuum ABOVE/LEAN_BULL vs 5m aggregate SHORT_BIAS | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 [urgent/health] 12/20 recent closes lost (35% WR, -1.07); 48h guardrail tripped at 37.5% WR / 32 trades. Chop-bleed 7d **96.0%** dollar-share (-4.11/-4.28, 42 losers, 0 NULL mfe; same-day arm 18.2% 2/11) \u2014 above 92% = entry quality, not exits.\n\ud83d\udd34 [urgent/health] ETH #16867 has **stop_loss=NULL and target=NULL** \u2014 the automated \"move stop to BE 2047.60\" steer has no stop to move. Place a real stop at 2047.60 now (or tighter structure stop). Condition: keep LONG only while 1m holds above continuum EMA300 (currently above, 332 min; BTC 29 flips/24h \u2265 p95 \u2014 re-test next cycle).\n\ud83d\udfe1 [warning/regime] Regime sources disagree (continuum ABOVE vs 5m SHORT_BIAS 43:9, wyckoff DISTRIBUTION, phase DECLINING). Flip rate agg 25 / BTC 29 per 24h. No standing direction claim \u2014 all steers condition-keyed.\n\ud83d\udfe2 [info/profit_lock] ETH +2.15%, 3.9h \u2014 breakeven stop valid (condition re-verified: pnl \u2265 +2% still holds). Trail recommendation only at +5%.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nWe are on the wrong side of the chop: 96% of 7d gross loss came from entries that never armed (+0.40% MFE). Recent losers AR LONG (meta_rsi 22.7) and ACE LONG (20.0) were falling knives \u2014 the winning side was short-the-continuation or no trade; FOGO/WCT/ZORA shorts that never armed bled on counter-pops. Winners are only the armed trail family (DOT/ENS/BABY profit-monster-trail, SOL mfe_exit). Open ETH long is currently the right side of the 1m continuum but entered at meta_rsi 30.1 (below the 45-60 band) with no stop on file \u2014 protect it first.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Set ETH #16867 stop to 2047.60 (BE) immediately \u2014 no stop exists in DB.\n2. No fresh entries until chop-bleed share drops below 92% \u2014 route entry-quality filters to brain_auditor (watchdog banned from parameter changes).\n3. No AI trader pick this cycle (watchlist-only anyway, AI_TRADER_ENABLED=False): slot open 1/6 but nothing passes the \"worth it in 96% chop-bleed\" bar. Prior SAND LONG pick stands.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nAnalysis merged into `watchdog_recommendations.json` (`steers` untouched). Skipped: AI pick \u2014 add when regime stops conflicting or bleed share <92%.\n",
+  "regime_context": "Sources disagree and that is the story: continuum says ABOVE EMA300 (BTC 74522 vs 74150, 332 min above, LEAN_BULL, trend_quality STRONG_UP) while the 15m scanner aggregate flipped to SHORT_BIAS at 18:15 (43 short-bias tokens vs 9 long) and btc_15m sits NEUTRAL/SHORT_BIAS. Flip rate 24h: aggregate 25 / BTC 29 (baseline p50 ~19-20, p95 26) \u2014 BTC churn is unusually high, average direction state survives well under an hour. Wyckoff DISTRIBUTION + market_phase DECLINING + volume LOW + velocity SLOW = chop tape, not trend tape. Implication: LONGs only hold while BTC 1m stays above continuum EMA300 (currently true, age 332 min); SHORT entries on alts are fighting the continuum but matching the 5m aggregate \u2014 mixed regime means size down, no fresh mid-band structure entries, every steer condition-keyed to EMA300/flip state.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, run this cycle):\n1) Chop-bleed dollar-share: 7d 96.0% (-4.11/-4.28, 42 losers, 0 NULL mfe), 14d 95.3% (-15.28/-16.03), 30d 91.4%. Threshold >=92% = entry quality deteriorating. Same-day arm rate 18.2% (2/11). Count-share note: 7d never-armed losers 39/42 \u2014 dollar and count measures both extreme. WINNING SIDE: armed trail trades (mfe>=0.40) \u2014 7d armed cohort is where the survivors live. WHY NOT US: we keep opening where RSI/volume/structure say chop, and 52/56-class hard_max_loss entries never arm.\n2) Falling-knife LONGs at meta_rsi<25: AR (22.7) -5.15%, ACE (20.0) -1.02% both atr/pump SL hits within 30-60 min. WINNING SIDE: short the continuation or wait for reclaim \u2014 do not buy the knife. n=2 in 24h, but same family as the standing oversold-long bleed.\n3) jup_yolo_mirrored: 147 trades, WR 60.5%, total -1.39 (avg -0.01/trade) \u2014 high WR, negative expectancy = payoff skew, winners smaller than losers. Not a kill candidate on WR alone; brain-auditor should look at MFE giveback on this family.\n4) hl_copy_trader (signal of the open trade): 14d 8 trades, 2W, -0.22. Family is a net loser; current ETH trade is the best of it so far \u2014 protect with a real stop.\n5) ai-trader-pending BTC shorts: 6 of last 20 closes, mixed manual_tp/manual_sl \u2014 chop whipsaw, not a signal defect.\nDEAD-SIGNAL CHECK: no flagged family has 0 trades in 7d \u2014 atr-trend-/pump-chain-/r2v2 all live. HL_COPY_TRADING_ENABLED=False is disabled-by-design (sibling HL_COPY_SIGNAL_* are the live path) \u2014 NO action, do not re-flag.",
+  "agent_timestamp": "2026-11-11T18:26:20.607880+00:00"
 }

@@ -80,79 +80,42 @@ Turn every finding from this run's SQL into a question:
 
 ### Query with recency and type filters (REQUIRED):
 
-`SessionBrain.query()` accepts only `(query_text, top_k, min_score)` — there is **NO** `since_days`,
-`chunk_types`, or `topic` kwarg (verified against `scripts/session_brain.py`). Use this helper: it
-over-fetches, then post-filters via a read-only SQL join on `sessions.last_modified`,
-`chunks.chunk_type`, `chunks.topic`. Verified working against the live brain.
+`SessionBrain.query()` accepts `(query_text, top_k, min_score, since_days, chunk_types, topic)` — all native kwargs. Use them directly (NOT a post-filter helper — post-filtering starves results when the filtered pool is rare).
 
 ```python
-import sys, time, sqlite3
+import sys
 sys.path.insert(0, '/root/.hermes/scripts')
-from session_brain import SessionBrain, BRAIN_DB
+from session_brain import SessionBrain
 
 brain = SessionBrain()
 
-def brain_query(q, top_k=5, since_days=30, chunk_types=None, topic=None, overfetch=40):
-    """Run-derived session-brain search with recency + type filters.
-    - since_days: 30 default; 7 for recent topics (last-run changes / in-flight work)
-    - chunk_types: ['user','assistant'] excludes tool/reasoning noise
-    - topic: 'signal', 'trade', 'regime', 'debug', 'config', ... ('general' = no match)
-    Returns [{title, date, chunk_type, topic, score, excerpt}].
-    score is L2 distance — LOWER is better.
-    """
-    hits = brain.query(q, top_k=overfetch)
-    cutoff = time.time() - since_days * 86400
-    out, seen = [], set()
-    db = sqlite3.connect(f"file:{BRAIN_DB}?mode=ro", uri=True)
-    try:
-        for h in hits:
-            key = h['text'][:80]
-            if key in seen:
-                continue
-            row = db.execute(
-                "SELECT c.chunk_type, c.topic, s.last_modified "
-                "FROM chunks c JOIN sessions s ON c.session_id = s.id "
-                "WHERE c.session_id = ? AND c.chunk_index = ?",
-                (h['session_id'], h['chunk_index'])
-            ).fetchone()
-            if not row:
-                continue
-            ctype, topic_val, last_mod = row
-            ts = last_mod or 0
-            if ts < cutoff:                      # recency constraint
-                continue
-            if chunk_types and ctype not in chunk_types:  # noise filter
-                continue
-            if topic and (topic_val or '') != topic:
-                continue
-            seen.add(key)
-            out.append({
-                "title": h['title'],
-                "date": time.strftime('%Y-%m-%d', time.gmtime(ts)),
-                "chunk_type": ctype,
-                "topic": topic_val,
-                "score": h['score'],
-                "excerpt": h['text'][:300],
-            })
-            if len(out) >= top_k:
-                break
-    finally:
-        db.close()
-    return out
+# Direct native calls — filters are pushed INTO the sqlite-vec KNN
+# since_days: 30 default; 7 for recent topics (last-run changes / in-flight work)
+# chunk_types: ['user','assistant'] excludes tool/reasoning noise
+# topic: 'signal', 'trade', 'regime', 'debug', 'config', ...
+# NOTE: since_days filters on sessions.created_at (session creation time)
+hits = brain.query("what did we say about bb-squeeze+ exits",
+                   top_k=5, since_days=30, chunk_types=['user','assistant'])
+hits = brain.query("have we tried RSI filter before",
+                   top_k=5, since_days=60)
+hits = brain.query("bb_bounce losses pattern",
+                   top_k=5, since_days=14, topic='signal')
 ```
+
+**Returns** `[{title, date, chunk_type, topic, score, excerpt}]` — score is L2 distance (LOWER is better).
 
 ### Example queries (adapt the text to YOUR findings — never reuse these verbatim):
 
 ```python
 # From Step 3: bb-squeeze+ has 50% HML rate — what did we say about its exits?
-brain_query("what did we say about bb-squeeze+ exits",
+brain.query("what did we say about bb-squeeze+ exits",
             top_k=5, since_days=30, chunk_types=['user','assistant'])
 
 # From Step 5: you're about to propose an RSI filter — has this been tried?
-brain_query("have we tried RSI filter before", top_k=5, since_days=60)
+brain.query("have we tried RSI filter before", top_k=5, since_days=60)
 
 # From Step 3: bb_bounce losing cluster — what pattern did we discuss?
-brain_query("bb_bounce losses pattern", top_k=5, since_days=14, topic='signal')
+brain.query("bb_bounce losses pattern", top_k=5, since_days=14, topic='signal')
 ```
 
 **Recency defaults:** `since_days=30` for general topics, `since_days=7` for recent topics
@@ -168,7 +131,7 @@ Before recommending ANY change, query: **"have we tried [change] before — what
 ### Citation requirement:
 
 Every recommendation must cite ≥1 session-brain hit in `[title, date, excerpt]` form
-(from `brain_query()` output). A recommendation with zero citations is incomplete — either query
+(from `brain.query()` output). A recommendation with zero citations is incomplete — either query
 again or downgrade it to "monitor".
 
 ## Step 2b: Analyze Shadow Mode Data (MANDATE — every run)
