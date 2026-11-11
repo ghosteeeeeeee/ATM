@@ -24939,3 +24939,29 @@ BY: auto_1hr
 - Storm streak 0/3 — deadline 2026-11-12, will not meet
 - ETH long open +2.17% — watching for trail exit
 BY: auto_1hr
+
+## [2026-11-11 19:25] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: 0.0%) | 24h 15T 26.7% -$0.89 RED | 7d 82T 46.3% -$2.09 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes; 1 open (ETH hl_copy_trader LONG 14:22, +1.24% unrealized)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg bb-squeeze+ (37T -$0.36 WR59.5%) / jup_yolo_mirrored (147T -$1.39 WR60.5%) / volume-buildup- (26T -$0.37 WR65.4%) = R:R drag, all WR>55% keep alive per policy; regime splits show wins in NORMAL (bb-squeeze+ 61.9%, jup 59.0%) -> no regime gate
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/15 = 33.3% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h n>=5: only atr-trend- n=6 WR50% net -$0.21 — fails WR>55 and net>$0.05)
+- Neg streak: closes stop at 15h; 16h/17h/18h 0 trades = gap breaks chain -> streak 0; 24h regime NORMAL (not NEUTRAL) -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr — under 20 (under-traded, not over)
+- Entry quality: prior 24h winners mae avg 0.246% max 0.576% -> low adverse excursion; losers mae avg 0.753% — exits, not entries, drive losses
+- No storm (window-min -0.39% / at-run -0.39%) -> gate not fired, no packet
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 26.7% net -$0.89, 7d 46.3% net -$2.09 — R:R drag persists (winners ~+0.05 to +0.16, losers -0.04 to -0.37); entry quality fine, exit asymmetry is the issue
+- Storm streak 0/3 — deadline 2026-11-12, will not meet
+- Trade flow very quiet (0-2 closes/hr all day) — under-trading, not overtrading
+BY: auto_1hr
