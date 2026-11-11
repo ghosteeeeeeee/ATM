@@ -3654,3 +3654,10 @@
 
 ## Error Alerts — 2026-11-11 08:34 UTC
 - **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-11 09:19 UTC
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (12x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-11 09:34 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
