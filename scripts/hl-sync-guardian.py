@@ -864,11 +864,11 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
 
         cur.execute("""
             INSERT INTO trades (token, direction, amount_usdt, entry_price, hl_entry_price,
-                exchange, paper, stop_loss, target, server, status, open_time,
+                exchange, paper, stop_loss, target, server, signal, status, open_time,
                 pnl_usdt, pnl_pct, leverage, sl_distance, trailing_activation, trailing_distance,
                 guardian_closed, is_guardian_close,
                 signal_z_score, volatility_regime, _signal_metadata)
-            SELECT %s, %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'open', NOW(),
+            SELECT %s, %s, %s, %s, %s, 'Hyperliquid', true, %s, %s, 'Hermes', 'guardian_orphan', 'open', NOW(),
                    0, 0, %s, 0.03, 0.01, 0.01, TRUE, TRUE,
                    %s, %s, %s::jsonb
             WHERE NOT EXISTS (

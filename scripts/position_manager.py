@@ -3769,9 +3769,26 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # Race prevention: check guardian markers before closing.
         if should_cut_loser(live_pnl, pos):
             # P0: canonical label; pnl detail moved to exit_detail (exit_conditions)
-            close_paper_position(trade_id, "cut_loser", exit_detail=f"cut_loser_pct={live_pnl:+.2f}%")
+            # LABEL FIX (CEO 2026-11-11: "last trade was killed by cut_loser" —
+            # it was #16861's plain SL breach, the label made it look like an
+            # exotic actor). CEO-trade stops are the ownership receipt:
+            # manual_sl_hit (stop side) / manual_trail_hit (profit side).
+            _reason = "cut_loser"
+            try:
+                import manual_exit_manager as _mxm_lc
+                if _mxm_lc.is_managed_signal(pos.get('signal')):
+                    _ep = float(pos.get('entry_price') or 0)
+                    _slv = float(pos.get('stop_loss') or 0)
+                    _dir = str(pos.get('direction') or direction or '').upper()
+                    _on_profit = bool(_ep and _slv) and (
+                        (_dir == 'SHORT' and _slv < _ep) or
+                        (_dir == 'LONG' and _slv > _ep))
+                    _reason = "manual_trail_hit" if _on_profit else "manual_sl_hit"
+            except Exception:
+                pass
+            close_paper_position(trade_id, _reason, exit_detail=f"cut_loser_pct={live_pnl:+.2f}%")
             closed_count += 1
-            log(f"  CUT_LOSER {token} {direction} {live_pnl:+.2f}%")
+            log(f"  {'CUT_LOSER' if _reason == 'cut_loser' else _reason.upper() + ' (stop breach)'} {token} {direction} {live_pnl:+.2f}%")
             # bug_hunter 2026-10-31: every other close site in this loop
             # continues. Falling through let stale/time/peak/UGB-PT/MFE-EXIT
             # re-close the SAME trade in this iteration: the row update dedups,
