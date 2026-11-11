@@ -1223,3 +1223,9 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Recommendation: Refresh signal_regime_memory.json from DB (stale >7d bar) and investigate `_prices` NameError on the pending-order path; disk cleanup next deep run.
 
 Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered or loss-only metrics flagged.
+
+## CEO Status — 20261111T031845Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 17T -0.54 52.9% | 7d 95T -1.35 51.6%
+### Findings: 2 OVERDUE control-tower decisions (winner-cell-size-125 revert 20h late — CEO line owed; jup-atrsl-parity 11-10); disk 88% WARN; atr-trend- freq deviation 7x baseline. Proactive Q (day 11 % 14 rows = row 11): new signals developed this week = 0 (kanban 11-08..11-10: audits/AMPLIFY only, no signal_analyst build).
+### Recommendation: CEO fire the one-line winner-cell-size-125 revert/extend decision today; disk at 88% needs cleanup before it trips a hard failure.
