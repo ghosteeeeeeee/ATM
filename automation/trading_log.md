@@ -24861,3 +24861,29 @@ BY: auto_1hr
 - ai-trader-pending 24h WR 25% (n=4) — watch for kill-criteria trigger if 3+ closes/hr at 0%
 - Storm streak 0/3 — deadline 2026-11-12
 BY: auto_1hr
+
+## [2026-11-11 15:21] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $0.00 (WR: 0.0%) | 24h 15T 33.3% -$0.65 RED | 7d 81T 46.9% -$1.94 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: BTC ai-trader-pending SHORT HL_CLOSED 0.00 (-0.11%); 2 open (BTC SHORT 14:35, ETH hl_copy_trader LONG 14:22)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg jup_yolo_mirrored/volume-buildup-/bb-squeeze+ = R:R drag, all WR>55% keep alive per policy
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/15 = 26.7% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h: atr-trend- n=6 net -0.21; jup_yolo_mirrored n=3 -0.22; ai-trader-pending n=3 +0.03 fails n>=5; no signal n>=5 net>$0.05 WR>55%)
+- Neg streak: 13h -0.18, 14h -0.04 = 2 consecutive with gaps elsewhere breaking chain -> under 3; size-reduce file absent -> 1.0x anyway
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners SL dist avg 0.775% max 1.702% (5 trades) — no anomaly
+- No storm (window-min -0.49% / at-run -0.13%) -> gate not fired, no packet
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 33.3% net -$0.65, 7d 46.9% net -$1.94 — R:R drag persists
+- Storm streak 0/3 — deadline 2026-11-12, will not meet
+- ai-trader-pending 24h n=3 WR 33% +0.03 — small sample, watch
+BY: auto_1hr
