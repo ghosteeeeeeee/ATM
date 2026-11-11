@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ponytail always-on">
+  <rect width="64" height="64" rx="14" fill="#1f2430"/>
+  <path d="M24 13c0 12 3 19 8 24" fill="none" stroke="#7ee0c0" stroke-width="5" stroke-linecap="round"/>
+  <path d="M40 13c0 12-3 19-8 24" fill="none" stroke="#7ee0c0" stroke-width="5" stroke-linecap="round"/>
+  <rect x="25" y="34" width="14" height="7" rx="3.5" fill="#f0c674"/>
+  <path d="M32 43c1 7-2 12-8 16" fill="none" stroke="#7ee0c0" stroke-width="5" stroke-linecap="round"/>
+</svg>

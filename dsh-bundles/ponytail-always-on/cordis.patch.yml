@@ -1,0 +1,15 @@
+# Always-on ponytail.
+#
+# The `dsh-best-ponytail` bundle inserts its own row with `config: {}`, which
+# leaves `mode` at the package default of `off`: skills and `/ponytail` work,
+# but nothing is injected, so ponytail still has to be invoked. This layer is
+# composed after that bundle (new bundles append to the profile bundle list),
+# so this override wins and the ruleset is injected every turn.
+#
+# The row itself belongs to `dsh-best-ponytail`; this bundle only restates its
+# config. Removing `dsh-best-ponytail` makes this an unmatched target, which the
+# Loader warns about and skips rather than failing the boot.
+- id: dsh-best-ponytail
+  name: dsh-best-ponytail
+  config:
+    mode: full

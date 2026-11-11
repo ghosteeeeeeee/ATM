@@ -9,12 +9,14 @@ All skills are maintained in one place: `/root/.config/opencode/skills/`
 
 ```
 /root/.config/opencode/skills/     ← SOURCE (OpenCode)
-/root/.cache/opencode/packages/    ← SOURCE (Ponytail plugin)
         ↓ symlinks
 /root/.hermes/skills/shared/       ← DSH references
 ```
 
-## Available Skills (43 total)
+> Ponytail is no longer a shared skill here. It runs as a DSH plugin
+> (`dsh-best-ponytail`, always-on `mode: full`) — see `dsh-bundles/ponytail-always-on/`.
+
+## Available Skills (51 total)
 
 ### Trading & Analysis
 | Skill | Purpose |
@@ -50,16 +52,6 @@ All skills are maintained in one place: `/root/.config/opencode/skills/`
 | `transcript-miner` | Transcript mining |
 | `youtube-watch` | YouTube analysis |
 | `download-pdfs` | PDF download |
-
-### Code Quality (Ponytail)
-| Skill | Purpose |
-|-------|---------|
-| `ponytail` | Enforce minimal, lazy-first code (lite/full/ultra modes) |
-| `ponytail-audit` | Audit code for over-engineering |
-| `ponytail-debt` | Track technical debt |
-| `ponytail-gain` | Track code quality gains |
-| `ponytail-help` | Ponytail help |
-| `ponytail-review` | Review code with ponytail lens |
 
 ### Books (16)
 Wyckoff, Price Action, Trading Psychology, and more.

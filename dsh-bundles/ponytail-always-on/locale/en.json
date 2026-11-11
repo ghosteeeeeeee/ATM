@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Ponytail always-on",
+    "description": "Keeps the installed ponytail plugin at full strength so its lazy-first ruleset is injected every turn instead of only when a skill is invoked."
+  }
+}
