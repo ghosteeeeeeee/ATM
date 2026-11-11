@@ -4034,5 +4034,16 @@
     "after": "re-surfaced #246, constant verified still 1.25 at hermes_constants.py:1174",
     "rationale": "auto-flip denylist blocks self-fire; bar FAILs A -0.014/B -1.13/C +0.04; needs one-line CEO act",
     "impact": "stops amplifying a 37.9% WR cell"
+  },
+  {
+    "timestamp": "2026-11-11T04:50:31Z",
+    "agent": "brain_auditor",
+    "change": "Registered amplify-ugb-bypass-armgap (type a, due 2026-11-18, NO-SHIP default): candle-walk UGB-PT giveback on PROFIT_MONSTER_BYPASS arm-gap atr_sl cohort (30d 34T -2.17)",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "UGB-PT skips bypass signals by 2026-10-31 design; arm-gap giveback unowned",
+    "after": "Pre-registered measurement: SHIP iff n>=20 AND net>=+$1.00/30d pnl_usdt AND fk<20% AND 14d same-sign",
+    "rationale": "atr_sl_hit is #1 bleed exit (14d 59T 0%WR -6.49); bypass signals reach +0.40% then surrender to ATR SL",
+    "impact": "Collection only; no live behavior change until candle-walk bar met at 11-18"
   }
 ]

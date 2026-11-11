@@ -1574,6 +1574,19 @@
       "measurement": "python3 - sqlite brain/gate_shadow.db events WHERE outcome_signal='atr-trend-' AND direction='SHORT' AND blocked_at>=30d AND would_win IS NOT NULL; dedup GROUP BY token, date(blocked_at,'unixepoch'); then 1m walk via existing clone-hunt pattern (see amplify-vb-high-short-clonehunt)",
       "not_a_duplicate_of": "amplify-atr-trend-short-cell-watch (#243, due 11-16) = winner-cell promotion on LIVE fills; this = blocked-setups clone-hunt on gate_shadow. Different data source, different lever.",
       "risk": "low (collection-only, zero behavior)"
+    },
+    {
+      "id": "amplify-ugb-bypass-armgap",
+      "kind": "amplify",
+      "status": "open",
+      "deadline": "2026-11-18T00:00:00Z",
+      "created_by": "brain_auditor #247",
+      "created_at": "2026-11-11T04:48:43.024055+00:00",
+      "stream": "ARM-GAP ATR-SL giveback on PROFIT_MONSTER_BYPASS signals — MFE>=0.40 never trails, dies atr_sl_hit; UGB-PT skips bypass by 2026-10-31 design so giveback is unowned",
+      "threshold": "SHIP only if ALL: (i) candle-walk UGB-PT (peak-UGB_PT_DISTANCE_PCT) on bypass-signal arm-gap atr_sl cohort n>=20 (30d raw n=34, ~32 bypass, -$2.17); (ii) net delta >= +$1.00/30d on pnl_usdt basis (UNITS GUARD: derive price-move from entry/exit x amount_usdt, never mix with leveraged pnl_pct); (iii) fk of would-be-blocked winners (trades that atr_sl'd but UGB-PT would have exited < entry) among cohort winners <20%; (iv) 14d same-sign. Default NO SHIP — pump-exit/timeout paths may already own part of this cohort; measure first.",
+      "measurement": "PG: status=closed AND exit_reason='atr_sl_hit' AND COALESCE(mfe_pct,0)>=0.40 AND signal ~ any(PROFIT_MONSTER_BYPASS_SIGNALS) over 30d; 1m candle walk from mfe_price applying UGB-PT exit rule (exit when price gives back UGB_PT_DISTANCE_PCT from running peak, unarmed half only); compare realized atr_sl pnl_usdt vs walk pnl_usdt.",
+      "default_action": "NO SHIP — collection + candle-walk only; report at 11-18",
+      "rationale": "30d: 34 arm-gap atr_sl (MFE>=0.40, trailing_activated=False) net -$2.17; 14d atr_sl_hit overall 59T 0%WR -$6.49 is #1 bleed exit. Bypass signals (pump-chain±, ai-trader±, r2-trend, continuum-osc, hl_copy) never arm PM trail so UGB-PT excludes them by design — but they still hit +0.40% and give it all back to ATR SL. UGB-PT's +85pp/30d candle result was measured on the NON-bypass unarmed half; bypass half unmeasured."
     }
   ]
 }

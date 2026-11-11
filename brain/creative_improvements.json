@@ -10993,5 +10993,15 @@
     "category": "clone-hunt",
     "status": "suggested (registered in shadow_disposition)",
     "risk": "low (zero behavior)"
+  },
+  {
+    "date": "2026-11-11T04:48:43Z",
+    "idea": "UGB-PT giveback extension to PROFIT_MONSTER_BYPASS signals (pre-registered amplify-ugb-bypass-armgap)",
+    "rationale": "30d arm-gap atr_sl cohort (MFE>=0.40, trail never armed, exit atr_sl_hit) = 34T -$2.17; ~32/34 are bypass signals (pump-chain±, ai-trader±, r2-trend, continuum-osc, hl_copy) that UGB-PT skips by 2026-10-31 design. They reach trail activation then surrender the full move to ATR SL — the same giveback UGB-PT solved for non-bypass (+85pp/30d candle). 14d atr_sl_hit is #1 bleed exit: 59T 0%WR -$6.49.",
+    "expected_impact": "Recover a portion of -$2.17/30d arm-gap giveback; if candle-walk confirms +$1.00/30d net with fk<20%, live UGB-PT for bypass signals",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low",
+    "registration": "data/shadow_disposition.json#amplify-ugb-bypass-armgap due 2026-11-18"
   }
 ]

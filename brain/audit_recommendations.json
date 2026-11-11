@@ -1,145 +1,138 @@
 {
-  "timestamp": "2026-11-11T00:50:00Z",
-  "run": 246,
-  "session_lock": "absent",
-  "config_changes_applied": [],
+  "timestamp": "2026-11-11T04:50:21Z",
+  "run": 247,
   "session_brain_stats": {
     "queries": [
-      "signal performance winrate regime",
+      "signal performance winrate losing chop",
       "new signal idea improvement strategy",
-      "loss money bleeding losing"
+      "winner cell size multiplier revert"
     ],
-    "top_insights": [
-      "exit asymmetry deep-dive (2026-10-31) still the dominant recurring theme — R:R drag on jup/bb-squeeze/volume-buildup",
-      "T asked for R:R threshold 0.95 lower + trend-following signal — both already have in-flight evals",
-      "session_brain duplicate-text issue persists (7th run flagged, rebuild still owed)"
-    ]
+    "notes": "Session brain loaded OK (embedding model all-MiniLM-L6-v2). Top hits: chop-detector/trend-following signal ideas (already owned by signal-lab queue); winner-cell revert discussions confirm CEO-domain money sizing."
   },
   "trade_summary_24h": {
-    "closed": "14T 57.1% -0.40 RED",
-    "winners": "8T +0.40",
-    "losers": "6T -0.80 (incl dup BTC pair -0.18x2, CEO-fixed --force bug)",
-    "7d": "97T 51.5% -1.48",
-    "14d": "376T 53.5% -4.01",
-    "open": "1 — WCT atr-trend- SHORT #16857 entry 0.029636, SL 0.03008, TP 0.02904, -0.63% price, 0.9h, HOLD (bracketed; btc_15m LONG_BIAS vs btc_4h SHORT_BIAS disagree, trend_quality STRONG_DOWN agrees with short)",
-    "armed_split_14d": "armed 176T 86.4% +8.34 vs unarmed 200T 24.5% -12.35",
-    "exit_family_14d": "trail_family 193T 91.2% +11.50 vs chop_exits 132T 0.8% -15.50 vs other 51T -0.01",
-    "chop_bleed_share": "7d 98.0% / 14d 95.4% / 30d 94.2% — ALL >=92% push threshold (entry-quality zone)",
-    "arm_rate": "7d 44.3% / 14d 46.8% / 30d 44.8%",
-    "rr_asymmetry_7d": "avg win +0.0627 vs avg loss -0.1004 -> breakeven WR 61.6% vs actual 51.5%"
+    "24h": "17T 52.9% -0.54",
+    "48h": "32T 37.5% -1.33 (VACATION-GUARDRAIL ESCALATE active: WR<40 n>=30 — alert only, pause thresholds NOT met: pnl_24h -0.54 > -3.00, 7d WR 51.1% > 35)",
+    "7d": "90T 51.1% -1.52",
+    "14d": "374T 53.5% -3.74",
+    "30d": "749T 46.6% -9.27",
+    "armed_14d": "192T 90.6% +10.99",
+    "unarmed_14d": "182T 14.3% -14.73",
+    "armed_7d": "48T 89.6% +2.36",
+    "unarmed_7d": "42T 7.1% -3.88",
+    "exit_14d_top": "profit-monster-trail 133T 97.7% +7.43 | mfe_exit 38T 84.2% +1.79 | atr_sl_hit 59T 0% -6.49 (#1 bleed) | hard_max_loss 44T 0% -5.41",
+    "chop_bleed_share_7d": "91.9% (just under 92% push threshold)",
+    "open_trades": 0
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 2026-11-11T00:30Z (mandate): overall flip 43.8% n=1609 = blanket flip loses; pc- 64.6% (226W/124L n=350) STANDS LIVE, token chi2 p=0.3747 uniform (no cell split); rider 38.0% do-NOT-flip. Real fade watch DUE today adjudicated: EXTEND to 11-18 (kill gate unmet, promote gate fee-negative NET -0.245/-0.127, shadow edge intact).",
-    "floor_admit": "join fresh 2026-11-10T20:36Z, raw jsonl 4674 rows growing (mtime 00:30Z today) — 11-15 same-sign read on track",
-    "oscillator": "FROZEN+ARCHIVED (fossil 20261027) — no answerable question, correct",
-    "wyckoff": "RETIRED — data/wyckoff_shadow.jsonl now MISSING (moved to data/archive/wyckoff_shadow.jsonl.retired-2026-10-31). Registry entry already done. Not an anomaly.",
-    "rr_shadow": "ORPHANED (rr_shadow_audit_7d.json, no producer) — do not cite",
-    "shadow_trader": "report fresh 00:33Z: gates justified — COMBO-STALE blocked 4412 @48% avg -0.15, EXEC-BLOCK 1633 @48% -0.15, CONFLUENCE 1037 @56% -0.10; EXIT A/B pm_trail +12,942 vs hard_max -15,260 vs rr_engine -5,981 = trail-or-nothing reconfirmed; top source grind-breakout- n=32 93.8% +1.41 (shadow)",
-    "overall": "3/5 collectors usable (contrarian join live, floor join live, shadow_trader live). oscillator frozen / wyckoff retired / rr orphaned = by design or known."
+    "contrarian": "join RE-RAN 04:30Z (mandate): overall flip 44.8% n=1648; pc- 64.6% (226W/124L n=350) STABLE = Oct-27 PROMOTE stands; btc-pump-rider+ 39.5% do-NOT-flip; pc- uniform chi2 p=0.375",
+    "oscillator": "FROZEN + archived (data/archive/oscillator_shadow.json.fossil-20261027) — not usable",
+    "wyckoff": "RETIRED (file moved to archive)",
+    "floor_admit": "join fresh 11-10 20:36Z; jsonl growing (4674+ rows); 11-15 same-sign read on track",
+    "rr_shadow": "ORPHANED (mtime Oct 4, no producer) — do not cite",
+    "shadow_trader": "86,543 signals 04:32Z — gates justified (CONFLUENCE-EXPIRY 16,384 @47% avg -0.13; COMBO-STALE 4,463 @45% -0.15); exit A/B pm_trail +13,034 vs hard_max -15,350 = trail-or-nothing",
+    "overall": "3/5 answerable (contrarian fresh, floor fresh, shadow_trader fresh); oscillator/wyckoff/rr dead by design"
   },
-  "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py 48h adverse-first (selfcheck PASS)",
-    "n": 17,
-    "never_adverse": 6,
-    "recovered_after_adverse": 9,
-    "never_traded_back": "2 — FOGO #16858 SHORT atr-trend- cut-loser -0.13, GMX #16839 LONG bb-squeeze+ atr_sl -0.10 (both immaterial)",
-    "verdict": "WRONG-SIDE REFUTED 74th consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "pattern": "16/17 48h losers = never-armed stop-family exits; 24h n=6 all trailing_activated=false, avg MFE 0.132 (none reached 0.40 arm). Winning side = flat/trail-family.",
-    "clusters": "BTC ai-trader-pending SHORT x2 = duplicate-fill bug (CEO fixed 48681501, --force scoped to btc-ceo-*); no new signal-level cluster"
-  },
-  "drift_findings": [
-    {
-      "item": "WINNER_CELL_SIZE_MULT still 1.25",
-      "status": "OVERDUE CEO action (deadline was 00:00Z 11-10, now 25h late); auto-flip denylist blocks self-fire; bar FAILs reconfirmed #245",
-      "impact": "amplifies a 37.9% WR cell at floor-suppressed size (uplift measured -0.01)"
-    },
-    {
-      "item": "session_brain duplicate-text records",
-      "status": "7th run flagged, rebuild still not done",
-      "impact": "query quality degraded, low severity"
-    },
-    {
-      "item": "ai-trader-pending/manual trades carry NULL momentum_state/z_score_tier",
-      "status": "NEW side-find this run — 23T/14d -0.68 (63% of NULL cohort is ai-trader-*), 30d 63T 36.5% WR",
-      "impact": "instrumentation gap, NOT a tradeable feature (fragile to block on missing metadata); flag to main-session to stamp metadata on ai-trader path"
-    }
-  ],
+  "drift_findings": [],
   "recurring_problems": [
-    "chop-bleed >=92% for 3+ runs (now 94-98%) — entry quality owns the bleed; no entry filter passed bars this run either (fisher scan: momentum/z-tier predict ARM rate, NOT net — rising momentum 14d net -2.26 despite 56% WR = #139 lesson repeats)",
-    "R:R drag (avg loss 1.6x avg win) on jup/bb-squeeze/vb- — all covered by in-flight exit evals (stop-tighten, win-side-capture, HML, TAT age-widen)",
-    "winner-cell book thin: only 4 cells n>=10 net>0, 2 already decay-flagged"
+    "atr_sl_hit = #1 bleed exit 14d (59T 0%WR -6.49); 50.8% never reached MFE 0.20; arm-gap subset (MFE>=0.40, trail never armed) 30d 34T -2.17 mostly PROFIT_MONSTER_BYPASS signals that UGB-PT skips by design → NEW amplify registered",
+    "VACATION-GUARDRAIL ESCALATE repeating every 30min since 00:49Z (48h WR 36.7-37.5% < 40, n=29-32) — alert-only, composition scattered (ai-trader-pending SHORT -0.44 biggest cluster, CEO domain); no pause trigger"
   ],
-  "missing_implementations": [],
+  "missing_implementations": [
+    "UGB-PT giveback protection for PROFIT_MONSTER_BYPASS signals — shipped non-bypass only (2026-10-31 fix); bypass arm-gap cohort unmeasured until amplify-ugb-bypass-armgap candle-walk"
+  ],
   "creative_improvements": [
     {
-      "date": "2026-11-11T00:50:00Z",
-      "idea": "Contrarian fade fee-hurdle: skip pc- LONG fade when expected move < 2x round-trip fee (or bump fade notional above fee-crossing size)",
-      "rationale": "Fade is directionally correct (shadow flip 64.6% n=350, real WR 40% vs baseline 27-38%) but structurally fee-negative: gross/trade +0.0036..0.0063 vs fee/trade ~0.0104 at $11.69 avg notional. Weekly gross stalled at +0.130 since 11-04. Kill would destroy a working instrument over a sizing problem.",
-      "expected_impact": "NET>=0 promote gate reachable without killing the 64.6% shadow edge",
-      "category": "fee/size engineering",
+      "date": "2026-11-11T04:50:21Z",
+      "idea": "UGB-PT giveback extension to PROFIT_MONSTER_BYPASS signals (pre-registered amplify-ugb-bypass-armgap, due 11-18)",
+      "rationale": "30d arm-gap atr_sl 34T -2.17 ~32 bypass; they hit +0.40% then surrender to ATR SL; UGB-PT +85pp/30d was measured non-bypass only",
+      "expected_impact": "Recover portion of -2.17/30d; SHIP bar: candle-walk net >= +$1.00/30d, fk<20%, n>=20, 14d same-sign",
+      "category": "exit sniper",
       "status": "suggested",
-      "risk": "low (needs shadow first, pairs with 11-18 watch read)"
-    },
-    {
-      "date": "2026-11-11T00:50:00Z",
-      "idea": "atr-trend- SHORT blocked-setups clone-hunt (registered amplify-atr-trend-short-clonehunt)",
-      "rationale": "42/42 raw blocked would-win looks like free money but token-day dedup = n=5 (ETC/BABY/HYPER/BCH/WLFI multi-gate same-day stacking). Below bar. Collection-only proposal so the question resolves with data instead of intuition.",
-      "expected_impact": "if n>=15 deduped holds >=70% WW: +$0.50/30d exempt candidate; if collapses: gates confirmed correct",
-      "category": "clone-hunt",
-      "status": "suggested (registered in shadow_disposition)",
-      "risk": "low (zero behavior)"
+      "risk": "low"
     }
   ],
-  "signal_quality_deep_dive": {
-    "sub50_n15_14d": "pump-chain+ 19T 36.8% -0.19 (OWNED: kill-review 11-13), pump-chain- 30T 40.0% +0.19 (fade, net-positive), warrior-sr-confirm+ 15T 53.3% -0.03 (net ~0, owned by boost pin eval). 0 NEW targets.",
-    "rr_drag_n10_30d": "jup 145T 60.7% -1.26 (aw +0.064/al -0.133), bb-bounce-v2-long+ 40T 37.5% -1.12 (disabled/owned), doji 16T 31.3% (killed), volume-buildup- 69T 63.8% -0.49 — all owned by in-flight evals",
-    "entry_filter_scan": "Fisher scan of momentum_state/z_tier/vol_spike vs never-armed-losers: extreme_high z (p=0.0051) and rising momentum (p=0.0324) predict ARM but NOT net (extreme_high 14d net -0.36, rising 14d net -2.26) — REJECTED, arm!=net (#139 pattern). NULL-metadata p=0.0059 = instrumentation gap not feature. No filter ships."
-  },
-  "clone_hunt_screen": {
-    "atr-trend-_SHORT": "42 raw 100% WW -> 5 token-days dedup = BELOW BAR -> registered amplify collection",
-    "grind-breakout-_SHORT": "CONFLUENCE 10 raw -> 2 token-days = too thin",
-    "hh-hl+_LONG": "21 blocked 0% WW = gates correct, do not exempt",
-    "continuum-trend+_LONG": "268 blocked sum -10.51 = gates correct, do not exempt"
-  },
+  "config_changes_applied": [],
   "changes_from_last_run": [
     {
+      "change": "contrarian join re-run mandate (#246)",
+      "verified": "fresh 2026-11-11T04:30:41Z, pc- 64.6% n=350 STABLE",
+      "result": "WORKING"
+    },
+    {
+      "change": "watch-contrarian-live EXTEND to 11-18 (#246)",
+      "verified": "entry present, deadline 2026-11-18, status open",
+      "result": "ON TRACK"
+    },
+    {
+      "change": "amplify-atr-trend-short-clonehunt registered (#246)",
+      "verified": "entry present, due 11-18, default NO-SHIP",
+      "result": "ON TRACK"
+    },
+    {
+      "change": "WINNER_CELL_SIZE_MULT 1.25 revert surfaced (#245/#246)",
+      "verified": "constant STILL 1.25 at hermes_constants.py:1174; deadline was 00:00Z 11-10 = ~28h overdue",
+      "result": "STILL OVERDUE — resurface to CEO"
+    },
+    {
       "change": "gate_leak_census source-scoped floor fix (#245)",
-      "verified": "SELFCHECK PASS rc=0 2026-11-11",
+      "verified": "--selfcheck PASS rc=0",
       "result": "WORKING"
     },
     {
       "change": "token_performance_monitor R:R-blindspot leg (#243)",
-      "verified": "script exists, hermes-token-perf-monitor.timer fired 00:15Z today",
+      "verified": "timer fired 00:15Z today (prior run)",
       "result": "WORKING"
-    },
-    {
-      "change": "amplify-tat-neverarmed-age-widen registered (#245)",
-      "verified": "entry present, due 11-14, pending exit-stack day",
-      "result": "ON TRACK"
-    },
-    {
-      "change": "winner-cell revert surfaced to CEO (#245)",
-      "verified": "constant STILL 1.25, no CEO action yet",
-      "result": "STILL OVERDUE — resurface"
     }
   ],
-  "dispositions_adjudicated": [
-    "watch-contrarian-live (DUE 11-11): EXTEND to 11-18 with evidence (kill gate unmet, promote fee-negative, shadow 64.6% intact, v6-combo sub-cohort flagged)",
-    "amplify-atr-trend-short-clonehunt: NEW registered (type c, due 11-18, NO-SHIP default)"
-  ],
+  "deep_dive": {
+    "sub50_n_ge_15_14d": [
+      "pump-chain+ LONG 18T 33.3% -0.23 — owned by CONF_FLOOR (CEO fk ruling pending)",
+      "pump-chain- LONG 30T 40.0% +0.19 — net POSITIVE, owned by contrarian fade PROMOTE"
+    ],
+    "new_targets": 0,
+    "verdict": "0 new sub-50% n>=15 targets — all bleed cohorts owned/killed/CEO-domain"
+  },
+  "losing_trade_autopsy": {
+    "method": "recovery_replay adverse-first (selfcheck PASS)",
+    "window_48h": "n=19 = 6 never-adverse / 10 recovered / 3 NEVER (FOGO atr-trend- -0.13, DYDX r2v2-long5 -0.10, GMX bb-squeeze+ -0.10 — all immaterial)",
+    "wrong_side_verdict": "REFUTED 75th consecutive run (#61 p=0.116, #84 t=-0.04)",
+    "patterns": "16/19 never reached trail arm = chop entries; 48h loser clusters: ai-trader-pending SHORT -0.44 (CEO), jup SHORT -0.32, atr-trend- -0.25"
+  },
+  "amplify": {
+    "ranked_30d_winner_cells_n_ge_10": [
+      "bb-squeeze+ NORMAL LONG 44T 65.9% +0.76",
+      "volume-buildup- HIGH SHORT 19T 78.9% +0.42",
+      "pump-chain- NORMAL LONG 30T 40.0% +0.19",
+      "jup_yolo_mirrored HIGH SHORT 18T 61.1% +0.06"
+    ],
+    "new_proposal": "amplify-ugb-bypass-armgap (type a, due 11-18, NO-SHIP default)",
+    "flip_kpi": "0 new shadow->live conversions this run (week day 2; prior week's cited)",
+    "inflight_serviced": "winner-cell-size-125 (CEO, overdue), watch-contrarian-live (11-18), amplify-atr-trend-short-clonehunt (11-18), fade-ctx-exempt DONE fail-closed, eval-midband DONE no-change"
+  },
+  "guardrail": {
+    "escalate_active": true,
+    "escalate_detail": "48h WR 37.5% < 40.0 with 32 trades — alert-only since 00:49Z",
+    "pause_not_triggered": "pnl_24h -0.54 > -3.00; 7d WR 51.1% > 35; size-reduce absent = 1.0x",
+    "action": "No config change. Escalate is working as designed. Biggest 48h loser cluster is ai-trader-pending (CEO/autopilot domain)."
+  },
+  "readiness": {
+    "open_trades": 0,
+    "regime": "btc_15m LONG_BIAS vs btc_4h SHORT_BIAS disagree; continuum BELOW; trend_quality STRONG_DOWN; vol NORMAL; auto_trader CHOP scores long -5 / short -35 → BRACKET",
+    "posture": "0 open flat is CORRECT — mixed regime, no confirmed trend, no steers. No size added. Trail-family first. size 1.0x."
+  },
   "next_actions": [
-    "CEO: WINNER_CELL_SIZE_MULT 1.25->1.0 revert (OVERDUE 25h) or explicit extension",
+    "CEO: WINNER_CELL_SIZE_MULT 1.25->1.0 revert (~28h OVERDUE) or explicit extension",
     "CEO: contrarian fade fee/size review input for 11-18 read (fee-hurdle idea)",
     "11-12: storm x3 dispositions (storm-confl-waiver, linreg-fade-storm-admission-shadow, storm-readiness-packet)",
     "11-13: pc+ kill-review, vb- clone-hunt, linreg-fade fill bar, chop-exempt, bbsqueeze-chop-exempt",
     "11-14: EXIT-STACK DAY (13 entries incl prearm-breakeven, TAT age-widen, MFE-CUT fold, drop-pcplus/mult-150 fold-if-revert)",
     "11-16: atr-trend cell watch",
     "11-17: jup batch + atrsl re-check + 7 shadow bars",
-    "11-18: contrarian fade deadline read + atr-trend clone-hunt n read",
-    "11-19: jup HIGH OOS (net>0 bar, n=18 now, 7d -0.09 sign-flip caution)"
+    "11-18: contrarian fade deadline read + atr-trend clone-hunt n + UGB-bypass-armgap candle-walk",
+    "11-19: jup HIGH OOS (net>0 bar)",
+    "Watch: VACATION-GUARDRAIL ESCALATE (48h WR) — recheck next run; if pause thresholds trip, size-reduce/pause is automatic"
   ],
-  "readiness": {
-    "open": "WCT atr-trend- SHORT #16857 HOLD — bracketed SL 0.03008/TP 0.02904, -0.63% price against, 0.9h open. btc_15m LONG_BIAS vs btc_4h SHORT_BIAS disagree; trend_quality STRONG_DOWN + continuum AT + vol LOW. No steers. No size added while volume LOW. Trail-family first.",
-    "regime": "btc_15m LONG_BIAS | btc_4h SHORT_BIAS | continuum AT | vol LOW | velocity SLOW | accel POSITIVE | wyckoff ACCUMULATION | market RECOVERY | trend_quality STRONG_DOWN"
-  }
+  "session_lock": "ABSENT",
+  "hermes_constants_diff": "EMPTY (only auto-generated _candidates backtest metadata modified by candidate pipeline, not by auditor)",
+  "tracebacks_today": 0
 }
