@@ -24757,3 +24757,29 @@ BY: auto_1hr
 - Storm streak 0/3 — deadline 2026-11-12, unlikely to meet
 - 1 open trade (ZORA SHORT)
 BY: auto_1hr
+
+## [2026-11-11 11:21] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.12 (WR: 0%) | 24h 15T 40.0% -$0.72 RED | 7d 87T 48.3% -$1.83 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close — ZORA atr-trend- SHORT cut-loser-CL-T1 -0.12 (-3.18%); 0 open
+- Kill check: atr-trend- 1 close/hr (<3); ai-trader-pending 24h n=4 net -0.33 WR 25% but no 3+ closes in one hour -> no trigger; 14d n>=20 net-neg jup_yolo_mirrored / volume-buildup- / bb-squeeze+ = R:R drag (WR>60% keep alive per policy)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h: jup_yolo_mirrored n=3 +0.03 fails n>=5; atr-trend- n=6 net -0.21; ai-trader-pending n=4 net -0.33; no signal n>=5 net>$0.05 WR>55%)
+- Neg streak: hourly 23h -0.13, 0h -0.02... 0h -0.12, 2h -0.11, 6h -0.06, 10h -0.12 — gaps at 1h/3-5h/7-9h break chain, max 2 consecutive -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners mae avg 0.245% max 0.576% (6 trades) -> OK
+- No storm (window-min +0.19% / at-run +0.33%) -> gate not fired, no packet
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 40.0% net -$0.72 (worse than 10:21 run's 46.7% -$0.58), 7d 48.3% -$1.83 = R:R drag persists
+- Storm streak 0/3 — deadline 2026-11-12, unlikely to meet
+- ai-trader-pending 24h WR 25% (n=4) — watch for kill-criteria trigger if it hits 3+ closes in one hour at 0%
+BY: auto_1hr
