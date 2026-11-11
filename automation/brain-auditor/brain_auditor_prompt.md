@@ -64,38 +64,112 @@ cat CURRENT.md
 
 **Use these steers as INPUT for your audit.** If the watchdog keeps flagging the same signal as losing, investigate why. If it sees a wrong-side pattern, verify it. If it recommends an RSI filter, evaluate whether to implement it. The watchdog is your eyes on the ground — you decide what systemic changes are needed.
 
-## Step 2: Query the Session Brain
+## Step 2: Query the Session Brain (RUN-DERIVED QUESTIONS)
 
-The session brain contains all DSH conversations — every decision, every debugging session, every signal analysis. Search it for insights:
+**DO NOT use hardcoded queries.** The old generic queries ("signal performance winrate regime",
+"new signal idea improvement strategy", "loss money bleeding losing") return months-old content and
+don't help you think like T. Generate questions from THIS run's analysis instead.
+
+### After Step 3 (trade data), ask questions like:
+
+Turn every finding from this run's SQL into a question:
+- "What did we say about [signal] losses?" (e.g. "what did we say about bb-squeeze+ exits")
+- "Have we tried [proposed fix] before? What happened?" (e.g. "have we tried adding RSI filter to bb-squeeze before")
+- "What patterns did we discuss in sessions about [topic]?"
+- "When we dealt with [similar problem] before, what was the outcome?"
+
+### Query with recency and type filters (REQUIRED):
+
+`SessionBrain.query()` accepts only `(query_text, top_k, min_score)` — there is **NO** `since_days`,
+`chunk_types`, or `topic` kwarg (verified against `scripts/session_brain.py`). Use this helper: it
+over-fetches, then post-filters via a read-only SQL join on `sessions.last_modified`,
+`chunks.chunk_type`, `chunks.topic`. Verified working against the live brain.
 
 ```python
-import sys
+import sys, time, sqlite3
 sys.path.insert(0, '/root/.hermes/scripts')
-from session_brain import SessionBrain
+from session_brain import SessionBrain, BRAIN_DB
 
 brain = SessionBrain()
 
-# Search for recent decisions about signals
-results = brain.query("signal performance winrate regime", top_k=10)
-for r in results:
-    print(f"[{r['score']:.3f}] {r['title'][:60]}")
-    print(f"  {r['text'][:200]}")
-    print()
-
-# Search for creative ideas we discussed but didn't implement
-results = brain.query("new signal idea improvement strategy", top_k=10)
-for r in results:
-    print(f"[{r['score']:.3f}] {r['title'][:60]}")
-    print(f"  {r['text'][:200]}")
-    print()
-
-# Search for specific problems
-results = brain.query("loss money bleeding losing", top_k=10)
-for r in results:
-    print(f"[{r['score']:.3f}] {r['title'][:60]}")
-    print(f"  {r['text'][:200]}")
-    print()
+def brain_query(q, top_k=5, since_days=30, chunk_types=None, topic=None, overfetch=40):
+    """Run-derived session-brain search with recency + type filters.
+    - since_days: 30 default; 7 for recent topics (last-run changes / in-flight work)
+    - chunk_types: ['user','assistant'] excludes tool/reasoning noise
+    - topic: 'signal', 'trade', 'regime', 'debug', 'config', ... ('general' = no match)
+    Returns [{title, date, chunk_type, topic, score, excerpt}].
+    score is L2 distance — LOWER is better.
+    """
+    hits = brain.query(q, top_k=overfetch)
+    cutoff = time.time() - since_days * 86400
+    out, seen = [], set()
+    db = sqlite3.connect(f"file:{BRAIN_DB}?mode=ro", uri=True)
+    try:
+        for h in hits:
+            key = h['text'][:80]
+            if key in seen:
+                continue
+            row = db.execute(
+                "SELECT c.chunk_type, c.topic, s.last_modified "
+                "FROM chunks c JOIN sessions s ON c.session_id = s.id "
+                "WHERE c.session_id = ? AND c.chunk_index = ?",
+                (h['session_id'], h['chunk_index'])
+            ).fetchone()
+            if not row:
+                continue
+            ctype, topic_val, last_mod = row
+            ts = last_mod or 0
+            if ts < cutoff:                      # recency constraint
+                continue
+            if chunk_types and ctype not in chunk_types:  # noise filter
+                continue
+            if topic and (topic_val or '') != topic:
+                continue
+            seen.add(key)
+            out.append({
+                "title": h['title'],
+                "date": time.strftime('%Y-%m-%d', time.gmtime(ts)),
+                "chunk_type": ctype,
+                "topic": topic_val,
+                "score": h['score'],
+                "excerpt": h['text'][:300],
+            })
+            if len(out) >= top_k:
+                break
+    finally:
+        db.close()
+    return out
 ```
+
+### Example queries (adapt the text to YOUR findings — never reuse these verbatim):
+
+```python
+# From Step 3: bb-squeeze+ has 50% HML rate — what did we say about its exits?
+brain_query("what did we say about bb-squeeze+ exits",
+            top_k=5, since_days=30, chunk_types=['user','assistant'])
+
+# From Step 5: you're about to propose an RSI filter — has this been tried?
+brain_query("have we tried RSI filter before", top_k=5, since_days=60)
+
+# From Step 3: bb_bounce losing cluster — what pattern did we discuss?
+brain_query("bb_bounce losses pattern", top_k=5, since_days=14, topic='signal')
+```
+
+**Recency defaults:** `since_days=30` for general topics, `since_days=7` for recent topics
+(last-run changes, in-flight work). Never cite a hit older than 60 days without labeling it as old.
+
+### MANDATORY prior-art query (for EVERY proposed change):
+
+Before recommending ANY change, query: **"have we tried [change] before — what happened?"**
+- **If results found:** read what happened — was it tried, measured, rejected? Do NOT re-propose
+  shipped or rejected work (this is the same "check existing implementations" rule as Step 5c).
+- **If NO results:** say **"no prior art found"** — do NOT assume the idea is new.
+
+### Citation requirement:
+
+Every recommendation must cite ≥1 session-brain hit in `[title, date, excerpt]` form
+(from `brain_query()` output). A recommendation with zero citations is incomplete — either query
+again or downgrade it to "monitor".
 
 ## Step 2b: Analyze Shadow Mode Data (MANDATE — every run)
 
@@ -505,6 +579,9 @@ cat > brain/audit_recommendations.json << 'EOF'
 {
     "timestamp": "ISO timestamp",
     "session_brain_stats": {...},
+    "questions_asked": [   // every run-derived question from Step 2 (proactivity check for next run)
+        {"question": "what did we say about bb-squeeze+ exits", "results_found": 4, "cited": true}
+    ],
     "trade_summary_24h": {...},
     "shadow_analysis": {
         "oscillator": "Are multipliers helping? Hit rate?",

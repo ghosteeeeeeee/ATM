@@ -9,6 +9,7 @@ Usage:
   python3 scripts/session_brain.py --ingest     # Full ingest of all sessions
   python3 scripts/session_brain.py --update     # Incremental (new/changed only)
   python3 scripts/session_brain.py --query "bb_bounce in EXTREME regime"
+  python3 scripts/session_brain.py --query "signal" --since-days 7 --chunk-types user,assistant --topic signal
   python3 scripts/session_brain.py --stats      # Show brain stats
 """
 
@@ -21,8 +22,8 @@ import sqlite3
 import argparse
 import hashlib
 from pathlib import Path
-from datetime import datetime, timezone
-from typing import List, Dict, Optional, Tuple
+from datetime import datetime, timezone, timedelta
+from typing import List, Dict, Optional, Tuple, Sequence
 
 sys.path.insert(0, os.path.dirname(__file__))
 from paths import *  # noqa: F401,F403
@@ -533,14 +534,24 @@ class VectorStore:
             )
         # BUG 1 fix: Don't commit here — let caller manage transactions
     
-    def search(self, query: List[float], top_k: int = 10) -> List[Tuple[int, float]]:
-        """Search for similar vectors. Returns [(chunk_id, distance), ...]"""
+    def search(self, query: List[float], top_k: int = 10,
+               filter_sql: str = "",
+               filter_params: Optional[Sequence] = None) -> List[Tuple[int, float]]:
+        """Search for similar vectors. Returns [(chunk_id, distance), ...]
+
+        filter_sql: optional extra WHERE predicates appended after
+        `embedding MATCH ?` (placeholders bound via filter_params).
+        sqlite-vec evaluates these DURING KNN selection, so top_k results
+        are the best matches *within* the filtered set (verified against a
+        brute-force scan — see --selfcheck). Empty string = the exact
+        legacy unfiltered query.
+        """
         import struct
         q_bytes = struct.pack(f'{len(query)}f', *query)
-        results = self.db.execute(
-            "SELECT id, distance FROM vec_chunks WHERE embedding MATCH ? ORDER BY distance LIMIT ?",
-            (q_bytes, top_k)
-        ).fetchall()
+        sql = ("SELECT id, distance FROM vec_chunks WHERE embedding MATCH ?"
+               f"{filter_sql} ORDER BY distance LIMIT ?")
+        params = [q_bytes, *(filter_params or []), top_k]
+        results = self.db.execute(sql, params).fetchall()
         return [(r[0], r[1]) for r in results]
     
     def save(self):
@@ -735,11 +746,64 @@ class SessionBrain:
         print(f"  Duration: {duration:.1f}s")
         print(f"{'='*60}\n")
     
-    def query(self, query_text: str, top_k: int = 10, 
-              min_score: float = 0.0) -> List[Dict]:
+    @staticmethod
+    def _build_filter_clause(since_days=None, chunk_types=None,
+                             topic=None) -> Tuple[str, List]:
+        """Build extra KNN WHERE predicates for query() filters.
+
+        Returns ("", []) when no filter is active — the caller then runs
+        the exact legacy query, so default behavior is byte-for-byte
+        unchanged (CEO requirement, verified by --selfcheck).
+
+        Filters are pushed INTO the sqlite-vec KNN query (id IN subquery),
+        not applied after it: a post-filter over the unfiltered top_k*4
+        window starves when the filtered pool is rare (e.g. --since-days 7
+        = 0.7% of chunks), returning far fewer than top_k results.
+        """
+        clauses: List[str] = []
+        params: List = []
+        if since_days is not None:
+            # sessions.created_at is ISO-8601 UTC (datetime.isoformat()),
+            # so lexicographic >= against an identically-formatted cutoff
+            # is a correct time comparison.
+            cutoff = (datetime.now(timezone.utc) - timedelta(days=since_days)).isoformat()
+            clauses.append("s.created_at >= ?")
+            params.append(cutoff)
+        if chunk_types:
+            if isinstance(chunk_types, str):
+                chunk_types = [t.strip() for t in chunk_types.split(",") if t.strip()]
+            if chunk_types:
+                clauses.append(
+                    "c.chunk_type IN (" + ",".join("?" * len(chunk_types)) + ")"
+                )
+                params.extend(chunk_types)
+        if topic:
+            clauses.append("c.topic = ?")
+            params.append(topic)
+        if not clauses:
+            return "", []
+        where = " AND ".join(clauses)
+        sql = (" AND id IN (SELECT c.id FROM chunks c "
+               f"JOIN sessions s ON c.session_id = s.id WHERE {where})")
+        return sql, params
+
+    def query(self, query_text: str, top_k: int = 10,
+              min_score: float = 0.0,
+              since_days: Optional[int] = None,
+              chunk_types: Optional[List[str]] = None,
+              topic: Optional[str] = None) -> List[Dict]:
         """
         Semantic search across all sessions.
-        
+
+        Optional filters (all default None = no filtering, identical to
+        pre-filter behavior):
+          since_days  — only sessions created within the last N days
+                        (sessions.created_at)
+          chunk_types — only these chunk types, e.g. ['user', 'assistant']
+                        to exclude tool/reasoning noise (chunks.chunk_type)
+          topic       — only chunks classified with this topic
+                        (chunks.topic, e.g. 'signal')
+
         Returns list of {text, session_id, score, type, chunk_index}
         """
         self._ensure_embedder()
@@ -752,12 +816,19 @@ class SessionBrain:
         # Embed query
         query_vec = self.embedder.embed_one(query_text)
         
+        # Filter predicates for the KNN query ("" = legacy unfiltered path)
+        filter_sql, filter_params = self._build_filter_clause(
+            since_days=since_days, chunk_types=chunk_types, topic=topic
+        )
+
         # Search — candidate window is top_k*4. CEILING (measured #147): the
         # largest duplicate group in the book is 423 copies of one text, so no
         # fixed multiplier guarantees top_k unique results. Under-filling with
         # UNIQUE results is the intended trade — callers get distinct records,
         # never padded with repeats.
-        results = self.vector_store.search(query_vec, top_k=top_k * 4)
+        results = self.vector_store.search(query_vec, top_k=top_k * 4,
+                                           filter_sql=filter_sql,
+                                           filter_params=filter_params)
 
         # Enrich with metadata
         # BUG 3 fix: vec0 returns L2 distance (lower = better)
@@ -916,30 +987,69 @@ def main():
                         help="Only ingest main (human) sessions, skip subagents")
     parser.add_argument("--top-k", type=int, default=10, help="Number of results for query")
     parser.add_argument("--min-score", type=float, default=0.0, help="Minimum similarity score")
+    parser.add_argument("--since-days", type=int, default=None,
+                        help="Only return chunks from sessions created within N days")
+    parser.add_argument("--chunk-types", type=str, default=None,
+                        help="Comma-separated chunk types to include (e.g. user,assistant)")
+    parser.add_argument("--topic", type=str, default=None,
+                        help="Only return chunks with this topic (e.g. signal)")
     
     args = parser.parse_args()
     brain = SessionBrain()
     
     if args.selfcheck:
         # Runs the real query path; fails if any two results share a text.
+        # Also verifies DEFAULTS ARE UNCHANGED (CEO requirement): explicit
+        # None filters and an over-broad filter that matches every session
+        # must return exactly what the bare default call returns — proving
+        # the filter code path never alters unfiltered behavior.
         probes = ["signal performance winrate regime",
                   "loss money bleeding losing",
                   "new signal idea improvement strategy",
                   "trailing stop loss",
                   "win rate backtest results"]
         ok = True
-        for q in probes:
+        for i, q in enumerate(probes):
+            t0 = time.time()
             res = brain.query(q, top_k=6)
+            elapsed = time.time() - t0
             texts = [r["text"] for r in res]
             uniq = len(set(texts))
             filled = len(res)
-            print(f"[selfcheck] q={q!r} results={filled} unique={uniq}/{len(texts)}")
+            print(f"[selfcheck] q={q!r} results={filled} unique={uniq}/{len(texts)} ({elapsed:.1f}s)")
             if uniq != len(texts):
                 ok = False
             if filled < 6:
-                print(f"  WARN: only {filled}/6 after dedup (candidate window exhausted)")
-        print("SELF-CHECK PASS: query() returns unique texts" if ok
-              else "SELF-CHECK FAIL: duplicate texts returned")
+                print("  WARN: only {}/6 after dedup (candidate window exhausted)".format(filled))
+
+            # Defaults unchanged: explicit None == bare call
+            res_none = brain.query(q, top_k=6, since_days=None,
+                                   chunk_types=None, topic=None)
+            if res_none != res:
+                ok = False
+                print("  FAIL: explicit-None call differs from default call")
+
+            # Defaults unchanged: a filter matching EVERY session (data
+            # spans < 3650 days) must reproduce the default results exactly
+            if i < 2:
+                res_broad = brain.query(q, top_k=6, since_days=3650)
+                if res_broad != res:
+                    ok = False
+                    print("  FAIL: over-broad --since-days filter changed default results")
+
+        # Functional check: chunk_types filter must actually filter
+        res_user = brain.query(probes[0], top_k=6, chunk_types=["user"])
+        if res_user:
+            leaked = [r["type"] for r in res_user if r["type"] != "user"]
+            if leaked:
+                ok = False
+                print(f"  FAIL: chunk_types=['user'] leaked types: {set(leaked)}")
+            else:
+                print(f"[selfcheck] chunk_types=['user'] filter: {len(res_user)} results, all user ✓")
+        else:
+            print("  WARN: chunk_types=['user'] returned 0 results (no user chunks near probe)")
+        print("SELF-CHECK PASS: query() returns unique texts; defaults unchanged" if ok
+              else "SELF-CHECK FAIL: duplicate texts returned or defaults changed")
         sys.exit(0 if ok else 1)
     if args.ingest:
         brain.ingest(incremental=False, main_only=args.main_only)
@@ -948,12 +1058,27 @@ def main():
     elif args.rebuild_index:
         brain.rebuild_index()
     elif args.query:
-        results = brain.query(args.query, top_k=args.top_k, min_score=args.min_score)
+        chunk_types = ([t.strip() for t in args.chunk_types.split(",") if t.strip()]
+                       if args.chunk_types else None)
+        filters = []
+        if args.since_days is not None:
+            filters.append(f"since_days={args.since_days}")
+        if chunk_types:
+            filters.append(f"chunk_types={chunk_types}")
+        if args.topic:
+            filters.append(f"topic={args.topic}")
+        results = brain.query(args.query, top_k=args.top_k, min_score=args.min_score,
+                              since_days=args.since_days, chunk_types=chunk_types,
+                              topic=args.topic)
         if not results:
             print("No results found.")
+            if filters:
+                print(f"  (filters active: {', '.join(filters)} — try a wider window)")
             return
         print(f"\n{'='*60}")
         print(f"QUERY: {args.query}")
+        if filters:
+            print(f"FILTERS: {', '.join(filters)}")
         print(f"RESULTS: {len(results)}")
         print(f"{'='*60}\n")
         for i, r in enumerate(results, 1):

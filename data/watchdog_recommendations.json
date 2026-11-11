@@ -1,18 +1,42 @@
 {
-  "timestamp": "2026-11-11T10:19:41.181906+00:00",
-  "steers": [],
-  "portfolio_health": "good",
+  "timestamp": "2026-11-11T17:19:44.220177+00:00",
+  "steers": [
+    {
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: -1.07 USDT. Something is wrong.",
+      "auto_executable": false,
+      "id": "steer-001"
+    },
+    {
+      "severity": "info",
+      "category": "profit_lock",
+      "title": "Move ETH stop to breakeven \u2014 up 2.3%",
+      "detail": "Trade is +2.3%. Lock breakeven at 2047.6000.",
+      "trade_id": 16867,
+      "action": {
+        "type": "move_stop",
+        "symbol": "ETH",
+        "direction": "long",
+        "new_stop": 2047.6
+      },
+      "auto_executable": true,
+      "id": "steer-002"
+    }
+  ],
+  "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "LONG_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
+    "btc_15m": "NEUTRAL",
+    "btc_4h": "LONG_BIAS",
+    "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
-    "velocity_state": "SLOW",
+    "zscore_tier": "STRONG_POS",
+    "velocity_state": "RISING",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.25,
-    "wyckoff_phase": "UNKNOWN",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "DISTRIBUTION",
     "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },

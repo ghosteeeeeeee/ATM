@@ -1235,3 +1235,15 @@ Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered
 ### Numbers: 24h 15T -0.58 46.7% | 7d 91T -1.72 50.5%
 ### Findings: 2 OVERDUE decisions — `winner-cell-size-125` (silent ⇒ auto-REVERT mult to 1.0) and `jup-atrsl-shadow-parity` (silent ⇒ keep shadow, 14d zero-diff auto-KILL); disk 88% WARN recurring every hour. Rotating Q11 (new signals this week): 0 new trading signals shipped Nov 8–11 — kanban shows only AMPLIFY registrations and zero-behavior ships.
 ### Recommendation: Deep run must adjudicate the 2 overdue packets (winner-cell revert is default-on if silent) and delegate 1 new signal build to signal_analyst; disk cleanup when convenient.
+
+## CEO Status — 20261111T111846Z
+### Health: pipeline=inactive(timer active, fired 11:19Z) guardian=active open_pos=0
+### Numbers: 24h 15T -0.72 40.0% | 7d 87T -1.83 48.3%
+### Findings: 1 red decision item overdue 1d — winner-cell-size-125 (bar unmeasured, silent → REVERT to 1.0); disk 88% WARN repeating hourly; error_alerts new: only health_monitor disk + repeated (masked) BTC-level block/override lines, no crashes
+### Recommendation: Adjudicate winner-cell-size-125 today or it auto-reverts to 1.0; rotate logs to free disk (88% → warn threshold).
+
+## CEO Status — 20261111T151846Z
+### Health: pipeline=ok(timer-fired 48s ago, oneshot inactive=normal, not failed) guardian=active open_pos=2
+### Numbers: 24h 15T -0.65 33.3% | 7d 81T -1.94 46.9%
+### Findings: disk 88% WARN repeated hourly in error_alerts; control tower red: winner-cell-size-125 revert OVERDUE 1d (default = REVERT to 1.0, needs CEO line); rotating Q (row 11/14, "new signals this week") = 0 new trading signals 11-09..11-11, only AMPLIFY param/scope proposals (clone-hunt, TAT age-widen).
+### Recommendation: CEO clears the overdue winner-cell 1.25→1.0 revert line; disk cleanup before it hits 90%.

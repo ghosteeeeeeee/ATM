@@ -1475,7 +1475,7 @@ def _monitor_pending_orders_impl(btc_price):
                     "category": "pending_order",
                     # :g not :.4g — 4 sig-figs rendered 81025 as '8.102e+04'
                     "title": f"PENDING ORDER {oid}: {coin} {direction.upper()} @ {trigger_price:g}",
-                    "detail": (f"Trigger hit: {coin} {px:.4g} crossed {trigger} "
+                    "detail": (f"Trigger hit: {coin} {px:g} crossed {trigger} "
                                f"{trigger_price:g}. Executing {direction} {amount:.2f} USDT "
                                f"{leverage}x, SL {sl:g}, TP {target:g}. {note}"),
                     "trade_id": None,
