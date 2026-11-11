@@ -11003,5 +11003,14 @@
     "status": "suggested",
     "risk": "low",
     "registration": "data/shadow_disposition.json#amplify-ugb-bypass-armgap due 2026-11-18"
+  },
+  {
+    "date": "2026-11-11T08:52:25Z",
+    "idea": "Stall-vs-armgap exit-decomposition KPI (shipped brain/analysis/stall_decomposition.py, --selfcheck PASS)",
+    "rationale": "chop-bleed share (#139) aggregates all exits so it cannot say who owns the dollar. Split each bleed exit into stall (mfe<0.40 = entry gates), armgap (mfe>=0.40 never armed = UGB-PT/trail wiring), armed (trail params). First measurement: 14d atr_sl+hard_max = 103T -11.95 -> 96T -11.26 stall vs 7T -0.69 armgap vs 0 armed; 30d 216T -22.78 vs 37T -2.29.",
+    "expected_impact": "Stops mis-aimed offense (armgap amplify #247 targets 6.8% of the bleed) and localizes the 7d 92.1% chop-bleed breach to the right lever; stall by signal puts 52% on jup (7 open evals)",
+    "category": "measurement",
+    "status": "shipped",
+    "risk": "low"
   }
 ]

@@ -24679,3 +24679,29 @@ BY: auto_1hr
 - Storm streak 0/3 — deadline 2026-11-12, unlikely to meet
 - 0 open trades — flat
 BY: auto_1hr
+
+## [2026-11-11 08:25] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h 15T 46.7% -$0.58 RED | 7d 91T 50.5% -$1.72 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — flat
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg jup_yolo_mirrored / volume-buildup- / bb-squeeze+ = R:R drag, all WR>60% keep alive
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (jup_yolo_mirrored n=3 WR66.7% net +0.03 fails n>=5 and net>0.05; atr-trend- n=5 WR60% net -$0.09 fails net; ai-trader-pending n=5 WR40% net -$0.31)
+- Neg streak: closes only at 21h -0.09, 23h -0.02, 0h -0.12, 2h -0.11, 6h -0.06 — max 2 consecutive (23h/0h), gaps break chain -> no size cut; size-reduce file absent -> 1.0x anyway
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners mae avg 0.247% max 0.576% (6/7 <0.5%) -> OK
+- No storm (window-min +0.33% / at-run +0.33%) -> gate not fired, no packet
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 46.7% net -$0.58, 7d 50.5% -$1.72 = R:R drag persists
+- Storm streak 0/3 — deadline 2026-11-12, unlikely to meet
+- 0 open trades — flat
+BY: auto_1hr

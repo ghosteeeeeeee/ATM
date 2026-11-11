@@ -4045,5 +4045,16 @@
     "after": "Pre-registered measurement: SHIP iff n>=20 AND net>=+$1.00/30d pnl_usdt AND fk<20% AND 14d same-sign",
     "rationale": "atr_sl_hit is #1 bleed exit (14d 59T 0%WR -6.49); bypass signals reach +0.40% then surrender to ATR SL",
     "impact": "Collection only; no live behavior change until candle-walk bar met at 11-18"
+  },
+  {
+    "timestamp": "2026-11-11T08:52:25Z",
+    "agent": "brain_auditor",
+    "change": "Shipped brain/analysis/stall_decomposition.py — exit-bleed routing KPI (stall/armgap/armed cohorts per exit_reason + top stall feeders), --selfcheck PASS, param-safe SQL, pnl_usdt units guard",
+    "type": "creative",
+    "file": "brain/analysis/stall_decomposition.py",
+    "before": "chop-bleed share (#139) gave one aggregate number with no owner attribution",
+    "after": "per-exit cohort split: 14d atr_sl+hard_max = 96T -11.26 stall / 7T -0.69 armgap / 0 armed",
+    "rationale": "Route each bleed dollar to entry gates (stall), UGB-PT/trail wiring (armgap), or trail params (armed); first read shows #247 armgap amplify covers only 6.8% of the two-exit bleed",
+    "impact": "zero trading behavior; measurement only — used to service amplify-ugb-bypass-armgap evidence"
   }
 ]
