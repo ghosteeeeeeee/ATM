@@ -11012,5 +11012,32 @@
     "category": "measurement",
     "status": "shipped",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-11T20:46:57Z",
+    "idea": "STOP-TIGHTEN wide-SL residual monitor (zero new code)",
+    "rationale": "Pre-enforce wide cohort was jup bleed; stop-tighten already clamps — re-proposing duplicates",
+    "expected_impact": "Avoids redundant filter",
+    "category": "verify-dont-duplicate",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-11T20:46:57Z",
+    "idea": "AMPLIFY x2: jup LONG FLAT early cell + grind-breakout- underdeploy",
+    "rationale": "Weekly offense — uncovered early/underdeployed candidates",
+    "expected_impact": "Conversion evidence if bars pass",
+    "category": "amplify",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-11T20:46:57Z",
+    "idea": "ETH hl_copy #16867 null-SL cut-first operational flag",
+    "rationale": "Exact-mirror class gave back MFE 3.6% historically",
+    "expected_impact": "Prevents giveback; feeds xmirror sample",
+    "category": "risk",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

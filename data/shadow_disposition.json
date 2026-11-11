@@ -1588,6 +1588,28 @@
       "default_action": "NO SHIP — collection + candle-walk only; report at 11-18",
       "rationale": "30d: 34 arm-gap atr_sl (MFE>=0.40, trailing_activated=False) net -$2.17; 14d atr_sl_hit overall 59T 0%WR -$6.49 is #1 bleed exit. Bypass signals (pump-chain±, ai-trader±, r2-trend, continuum-osc, hl_copy) never arm PM trail so UGB-PT excludes them by design — but they still hit +0.40% and give it all back to ATR SL. UGB-PT's +85pp/30d candle result was measured on the NON-bypass unarmed half; bypass half unmeasured.",
       "notes": " | POOL-SIZE (brain_auditor #248, 2026-11-11T08:52Z, brain/analysis/stall_decomposition.py --selfcheck PASS): the armgap pool is the SMALL side of the two-exit bleed — 14d atr_sl_hit+hard_max_loss 103T -11.95 = stall(mfe<0.40) 96T -11.26 vs armgap(mfe>=0.40 never armed) 7T -0.69 vs armed 0T; 30d 216T -22.78 vs 37T -2.29. So this amplify can address at most ~6.8% (14d) / 16.6% (30d) of the bleed — the stall side is owned by mfe-cut/prearm-breakeven/stop-tighten/tat-neverarmed (all due 11-14) + structure-flip (11-21), and 52% of 14d stall is jup_yolo_mirrored 43T -5.91 (7 open jup evals 11-14..11-19). Adjudicate the candle-walk with this ceiling in mind: a PASS here is a narrow win, not a bleed fix."
+    },
+    {
+      "id": "amplify-jup-long-flat-cell",
+      "kind": "amplify",
+      "status": "open",
+      "due_at": "2026-11-18T00:00:00Z",
+      "desc": "Early cell watch: jup_yolo_mirrored LONG FLAT 30d 8T 87.5% net +0.10 arm 2/8 — n<10 EARLY label per AMPLIFY rule",
+      "evidence": "PG 2026-11-11: signal=jup_yolo_mirrored direction=LONG volatility_regime=FLAT close_time>now-30d => n=8 net=+0.10 WR=87.5% trailing_activated=2. Sibling cells bleed (HIGH 42T -0.70, NORMAL 41T -0.41) so cell must stay regime-scoped. Prior art: jup evals due 11-17 cover cluster/anti-chase/pro-selection — this is the FLAT positive cell only, not a duplicate entry filter.",
+      "threshold": "Promote to WINNER_CELLS_VALIDATED candidate only if n>=15 AND net>0 AND 30d same-sign AND arm% >= 50. If net<=0 or n<10 at deadline, close as noise. Units guard: pnl_usdt only.",
+      "measurement": "PG: signal='jup_yolo_mirrored' AND direction='LONG' AND volatility_regime='FLAT' trailing 30d — n/WR/net/arm%",
+      "notes": "brain_auditor #249 AMPLIFY weekly type early-cell. Due 11-18 to allow sample growth from current n=8."
+    },
+    {
+      "id": "amplify-grind-breakout-underdeploy",
+      "kind": "amplify",
+      "status": "open",
+      "due_at": "2026-11-20T00:00:00Z",
+      "desc": "Clone-hunt/type-c: grind-breakout- shadow n=32 WR 93.8% avg +1.41 vs live all-time only 7T — underdeployment audit",
+      "evidence": "shadow_trader --report 2026-11-11 20:35Z: grind-breakout- n=32 WR=93.8% avg_pnl=+1.41 (top source). Live PG all-time: 7 closed net +0.86 WR 71.4% (30d: 3T). signals_runner includes grind_breakout/grind_breakout_v2. Pattern matches solo-bypass conversion watch (#142) and amplify-ema300-underdeploy (open).",
+      "threshold": "SHIP only if: (i) gate_shadow/log blocked-matchable n>=15 token-day deduped; (ii) would-win >=70%; (iii) 30d 1m-candle walk net >= +$0.50 pnl_usdt units guard; (iv) live fills after any exempt reach n>=10 with net>0. Else CLOSE as shadow-noise.",
+      "measurement": "gate_shadow.db WHERE outcome_signal LIKE 'grind-breakout%' AND blocked_at>=30d; join signals runtime; live PG count for signal LIKE 'grind-breakout%'",
+      "notes": "brain_auditor #249 AMPLIFY weekly type (c) clone-hunt/underdeploy. Not a duplicate of ema300-underdeploy (different signal)."
     }
   ]
 }

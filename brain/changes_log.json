@@ -4056,5 +4056,27 @@
     "after": "per-exit cohort split: 14d atr_sl+hard_max = 96T -11.26 stall / 7T -0.69 armgap / 0 armed",
     "rationale": "Route each bleed dollar to entry gates (stall), UGB-PT/trail wiring (armgap), or trail params (armed); first read shows #247 armgap amplify covers only 6.8% of the two-exit bleed",
     "impact": "zero trading behavior; measurement only — used to service amplify-ugb-bypass-armgap evidence"
+  },
+  {
+    "timestamp": "2026-11-11T20:45:42Z",
+    "agent": "brain_auditor",
+    "change": "AMPLIFY weekly: registered amplify-jup-long-flat-cell + amplify-grind-breakout-underdeploy (shadow_disposition.json); contrarian_outcome_join re-ran; 0 trading-constant changes",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "2 amplify proposals not present",
+    "after": "2 new amplify entries open with pre-registered bars",
+    "rationale": "Weekly offense mandate — uncovered early/underdeployed cells; all n>=10 winner cells already in-flight",
+    "impact": "Collects conversion evidence; no live behavior change"
+  },
+  {
+    "timestamp": "2026-11-11T20:45:42Z",
+    "agent": "brain_auditor",
+    "change": "Resurfaced WINNER_CELL_SIZE_MULT 1.25->1.0 CEO revert (still overdue ~44h); no self-change to constants",
+    "type": "ops",
+    "file": "hermes_constants.py",
+    "before": "1.25",
+    "after": "1.25 (unchanged — CEO domain)",
+    "rationale": "Deadline was 2026-11-10T00:00Z; auditor must not touch sizing constant unilaterally",
+    "impact": "CEO action required"
   }
 ]

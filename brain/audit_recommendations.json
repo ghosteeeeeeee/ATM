@@ -1,122 +1,294 @@
 {
-  "timestamp": "2026-11-11T08:51:52Z",
-  "run": 248,
-  "session_lock": "ABSENT",
-  "config_changes_applied": [],
+  "timestamp": "2026-11-11T20:46:57Z",
+  "run": 249,
   "session_brain_stats": {
-    "queries": [
-      "signal performance winrate regime",
-      "new signal idea improvement strategy",
-      "loss money bleeding losing"
+    "queries": 12,
+    "note": "hits returned but excerpts/dates often empty (session_brain dup-text issue continues)"
+  },
+  "questions_asked": [
+    {
+      "question": "what did we say about jup_yolo_mirrored losses and stall",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "have we tried atr_sl_hit stop widen before",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "chop bleed entry quality never armed",
+      "results_found": 3,
+      "cited": true
+    },
+    {
+      "question": "what did we say about hl_copy_trader performance",
+      "results_found": 3,
+      "cited": true
+    },
+    {
+      "question": "have we tried adding momentum filter to block chop entries",
+      "results_found": 3,
+      "cited": true
+    },
+    {
+      "question": "winner cell size mult 1.25 revert",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "jup stop loss distance wide filter block",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "grind-breakout underdeployed shadow",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "have we tried SL distance filter jup",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "jup FLAT regime long cell amplify",
+      "results_found": 4,
+      "cited": true
+    },
+    {
+      "question": "jup R:R asymmetric winners small losers",
+      "results_found": 4,
+      "cited": true
+    },
+    {
+      "question": "hl_copy null stop loss giveback",
+      "results_found": 4,
+      "cited": true
+    }
+  ],
+  "trade_summary_24h": {
+    "closed": 16,
+    "pnl": -0.84,
+    "wr": 31.3,
+    "by_signal": [
+      [
+        "jup_yolo_mirrored SHORT",
+        2,
+        -0.27,
+        0.0
+      ],
+      [
+        "atr-trend- SHORT",
+        6,
+        -0.21,
+        50.0
+      ],
+      [
+        "None SHORT",
+        1,
+        -0.15,
+        0.0
+      ],
+      [
+        "atr-trend+ LONG",
+        1,
+        -0.11,
+        0.0
+      ],
+      [
+        "r2v2-long5 LONG",
+        1,
+        -0.1,
+        0.0
+      ],
+      [
+        "ai-trader-pending SHORT",
+        2,
+        -0.06,
+        0.0
+      ],
+      [
+        "pump-chain- LONG",
+        1,
+        -0.04,
+        0.0
+      ],
+      [
+        "jup_yolo_mirrored LONG",
+        2,
+        0.1,
+        100.0
+      ]
     ],
-    "top_insights": [
-      "risk-budget decision: exit system is the #1 profit leak (recurring, matches live exit table)",
-      "exit-asymmetry deep-dive 2026-10-31 still the standing reference for trail vs stop asymmetry",
-      "R:R threshold 0.95 idea and 'trend following' new-signal request remain unimplemented session ideas"
-    ],
-    "recurring_topics": [
-      "exit asymmetry / trail-vs-stop",
-      "pump-chain short filters",
-      "MFE trailing frequency"
+    "7d": {
+      "closed": 83,
+      "pnl": -2.04,
+      "wr": 47.0
+    },
+    "chop_bleed_share": {
+      "7d": 92.9,
+      "14d": 92.3,
+      "30d": 84.9
+    },
+    "armed_vs_unarmed_14d_jup_LONG": {
+      "armed": "57T 98.2% +3.91",
+      "unarmed": "91T 37.4% -5.25"
+    },
+    "stall_feeders_14d": [
+      [
+        "jup_yolo_mirrored",
+        44,
+        -6.09
+      ],
+      [
+        "pump-chain-",
+        13,
+        -0.77
+      ],
+      [
+        "bb-squeeze+",
+        6,
+        -0.7
+      ],
+      [
+        "volume-buildup-",
+        4,
+        -0.45
+      ]
     ]
   },
-  "trade_summary": {
-    "24h": "14T, mixed small red (ai-trader-pending SHORT -0.31 biggest)",
-    "7d": "90T 50.0% -1.76",
-    "14d": "373T 53.9% -3.53",
-    "30d": "745T 46.6% -9.18",
-    "armed_14d": "177T 86.4% +8.39",
-    "unarmed_14d": "196T 24.5% -11.92",
-    "armed_7d": "38T 89.5% +1.60",
-    "unarmed_7d": "52T 21.2% -3.36",
-    "exits_14d_top_bleed": "atr_sl_hit 59T 0% -6.54 | hard_max_loss 44T 0% -5.41 | cut-loser-CL-T1 11T 0% -1.63",
-    "exits_14d_winners": "profit-monster-trail 133T 97.7% +7.43 | mfe_exit 39T 84.6% +1.84 | ugb_pt 15T 53.3% +0.99",
-    "chop_bleed_share": {
-      "7d": 92.1,
-      "14d": 90.8,
-      "30d": 88.1,
-      "note": "7d >=92% push threshold (2nd breach; response stack mfe-cut/prearm-breakeven/stop-tighten all due 11-14, jup entry evals due 11-17; 0.75x size remains VETOED #196)"
-    }
-  },
-  "headline_finding": {
-    "what": "EXIT-BLEED ROUTING: 14d atr_sl_hit+hard_max_loss = 103T -11.95 splits 96T -11.26 STALL (mfe<0.40, never armed) vs 7T -0.69 ARMGAP (mfe>=0.40, never armed) vs 0T armed. 30d: 216T -22.78 stall vs 37T -2.29 armgap.",
-    "implication": "(1) 100% of the #1/#2 bleed exits are PRE-ARM = entry-quality problem, full stop (mandate intact). (2) amplify-ugb-bypass-armgap (#247) targets the SMALL pool: 7T of 103T (6.8%) of the two-exit bleed. (3) stall by signal: jup_yolo_mirrored 43T -5.91 = 52% of stall — covered by 7 open jup evals due 11-14..11-19.",
-    "shipped": "brain/analysis/stall_decomposition.py (--selfcheck PASS, units guard on pnl_usdt, param-safe SQL)"
-  },
-  "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py adverse-first, selfcheck PASS",
-    "window_48h": "n=18 = 4 never-adverse / 10 recovered / 4 NEVER (FOGO -0.13, AR -0.11, DYDX -0.10, GMX -0.10 — all immaterial)",
-    "verdict": "WRONG-SIDE REFUTED 76th consecutive run (#61 p=0.116, #84 t=-0.04)",
-    "vacuous_replay_guard": "not used; open-anchored recovery is vacuous (198/206 pass on candle 1)"
-  },
-  "signal_quality_deep_dive": {
-    "new_sub50_n15_targets": 0,
-    "detail": "14d n>=15 sub-50% WR: pump-chain+ 33.3% n=18 -0.23 (CONF_FLOOR in-flight, CEO domain); pump-chain- 40% n=30 +0.19 net-positive (Oct-27 PROMOTE stands). High-WR net-negative R:R class: jup_yolo_mirrored 146T 61% -1.21 (avg_win 0.064 / avg_loss -0.133), volume-buildup- 30T 63.3% -0.63, bb-squeeze+ 40T 62.5% -0.28 — all covered by stop-tighten/prearm-breakeven stack due 11-14 + jup entry evals due 11-17.",
-    "dead_signal_check": "CLEAN — doji-bottom-long 0 opens since 10-16 kill (16T all pre-kill); ai-trader+ 0 opens since 10-19; bb-bounce-v2-long+ 1 open/14d."
+  "watchdog_steer_triage": {
+    "steer-001_losing_streak_12of20": "VERIFIED: 24h 16T -0.84 WR 31.3%. Root cause = chop entries never arming (stall feeders jup 52% of 14d bleed). Not wrong-side structural — 48h autopsy 4 NEVER all immaterial. Exit conditions govern; response stack already registered due 11-14.",
+    "portfolio_health_critical": "1 open ETH hl_copy LONG +0.17 with stop_loss=NULL target=NULL (exact-mirror). Cut-first if fades; amplify-xmirror-giveback due 11-18. No size added while regime sources disagree and volume LOW."
   },
   "shadow_analysis": {
-    "contrarian": "join RE-RAN 08:30Z (mandate): overall flip 44.6% n=1653; pump-chain- 64.6% (226W/124L n=350) STABLE = Oct-27 PROMOTE stands; btc-pump-rider+ 39.5% do-NOT (chi2 p=7e-30 heterogeneous); pc- token chi2 p=0.375 uniform so no cell split.",
-    "oscillator": "FROZEN + archived (data/archive/oscillator_shadow.json.fossil-20261027) — 0 outcomes, JSONL not array.",
-    "wyckoff": "RETIRED (345 rows, no outcome join).",
-    "floor_admit": "join fresh 11-10 20:36Z (n=1841 episodes) — 11-15 same-sign read on track.",
-    "rr_shadow": "ORPHANED (no producer script, 24d+ stale) — do not cite.",
-    "shadow_trader": "87,038 signals: gates justified (CONFLUENCE-EXPIRY 16,411 @47% avg -0.13, EXEC-FAIL 532 @45% -0.19); exit A/B pm_trail +13,122 vs hard_max -15,515 = trail-or-nothing.",
-    "overall": "3/5 usable (contrarian, floor, shadow_trader). Gate_shadow usable but MUST token-day dedup (event n pseudo-replicated 7-10x)."
+    "contrarian": "join RE-RAN 20:31Z: overall flip 44.6%. pump-chain- 64.6% n=350 STABLE. btc-pump-rider+ 39.7% do-NOT-flip.",
+    "floor_admit": "join 11-10 fresh: floor_only 49.1% vs always_admit 42.4% directional; 30d same-sign due 11-15.",
+    "oscillator": "FROZEN+ARCHIVED — skip.",
+    "wyckoff": "RETIRED — skip.",
+    "rr_shadow": "ORPHANED — skip.",
+    "shadow_trader": "89,009 signals. CONFLUENCE-EXPIRY 16,522 @47% gates justified. Exit A/B pm_trail +13,350 vs hard_max -15,818.",
+    "overall": "3/5 usable. contrarian pc- stable. shadow_trader confirms chop/entry-quality bleed."
   },
-  "drift_findings": [],
-  "recurring_problems": [
-    "chop-bleed >=92% breach (7d 92.1%) — 2nd time; remedy stack registered, not yet due",
-    "R:R drag trio (jup/vb-/bb-squeeze+) high WR, net negative — avg_win ~2x smaller than avg_loss",
-    "WINNER_CELL_SIZE_MULT 1.25 revert OVERDUE ~32h (CEO, money-sizing denylist blocks auditor)"
+  "drift_findings": [
+    {
+      "item": "WINNER_CELL_SIZE_MULT",
+      "status": "STILL 1.25 at hermes_constants.py:1174",
+      "impact": "CEO revert deadline 2026-11-10 ~44h overdue — resurface"
+    },
+    {
+      "item": "chop-bleed KPI",
+      "status": "7d 92.9% = 3rd breach of 92%",
+      "impact": "Stack registered due 11-14 — do not invent new gates"
+    },
+    {
+      "item": "jup wide-SL",
+      "status": "14d >0.8% SL 4W/39L -5.17 but post stop-tighten-enforce only 3 wide trades remain",
+      "impact": "Root cause ALREADY SHIPPED — do not re-propose SL-distance filter"
+    }
   ],
-  "missing_implementations": [],
+  "recurring_problems": [
+    "chop-bleed never-armed >=92% 3rd run — stack owns fix due 11-14",
+    "jup_yolo_mirrored #1 stall feeder 44T -6.09/14d — 7 open jup evals due 11-17 + stop-tighten",
+    "hl_copy exact-mirror null SL — live ETH #16867 null SL again; xmirror shadow due 11-18",
+    "session_brain empty excerpts — rebuild still owed (MED)"
+  ],
+  "missing_implementations": [
+    {
+      "idea": "hl_copy null-SL open-time guard",
+      "prior_art": "xmirror giveback shadow covers post-entry only",
+      "status": "monitor"
+    },
+    {
+      "idea": "grind-breakout- underdeploy",
+      "prior_art": "no open entry with this id",
+      "status": "REGISTERED amplify-grind-breakout-underdeploy"
+    }
+  ],
   "creative_improvements": [
     {
-      "date": "2026-11-11T08:51:52Z",
-      "idea": "Stall-vs-armgap exit-decomposition KPI (shipped brain/analysis/stall_decomposition.py)",
-      "rationale": "chop-bleed share (#139) aggregates all exits into one number and cannot say WHO owns the dollar. Decomposition routes: stall->entry gates, armgap->UGB-PT/trail wiring, armed->trail params. First measurement: 14d bleed exits are 96T -11.26 stall vs 7T -0.69 armgap vs 0 armed.",
-      "expected_impact": "Stops mis-aimed offense proposals (armgap amplify covers 6.8% of the bleed) and localizes the 92% chop-bleed push to the right lever.",
-      "category": "measurement",
-      "status": "shipped",
+      "date": "2026-11-11T20:46:57Z",
+      "idea": "STOP-TIGHTEN wide-SL residual monitor (zero new code)",
+      "rationale": "Pre-enforce wide cohort was jup bleed; stop-tighten already clamps — re-proposing duplicates",
+      "expected_impact": "Avoids redundant filter",
+      "category": "verify-dont-duplicate",
+      "status": "monitor",
+      "risk": "low"
+    },
+    {
+      "date": "2026-11-11T20:46:57Z",
+      "idea": "AMPLIFY x2: jup LONG FLAT early cell + grind-breakout- underdeploy",
+      "rationale": "Weekly offense — uncovered early/underdeployed candidates",
+      "expected_impact": "Conversion evidence if bars pass",
+      "category": "amplify",
+      "status": "suggested",
+      "risk": "low"
+    },
+    {
+      "date": "2026-11-11T20:46:57Z",
+      "idea": "ETH hl_copy #16867 null-SL cut-first operational flag",
+      "rationale": "Exact-mirror class gave back MFE 3.6% historically",
+      "expected_impact": "Prevents giveback; feeds xmirror sample",
+      "category": "risk",
+      "status": "suggested",
       "risk": "low"
     }
   ],
-  "changes_from_last_run": {
-    "#247 amplify-ugb-bypass-armgap": "REGISTERED and present; evidence EXTENDED this run with stall/armgap ratio (14d 7T armgap vs 96T stall) so 11-18 adjudication sees pool size",
-    "#247 guardrail-escalate": "still alert-only; pause thresholds still not met (pnl_24h > -3.00, 7d WR > 35)",
-    "#246 watch-contrarian-live EXTEND 11-18": "PRESENT in registry; pc- LONG fills continue (JUP 11-10 -0.09 etc.), promote gate still fee-negative",
-    "#244/#246 gate_leak_census": "selfcheck PASS this run",
-    "recovery_replay": "selfcheck PASS this run",
-    "winner-cell revert": "STILL 1.25 at hermes_constants.py:1174 — CEO action, ~32h overdue"
-  },
-  "amplify_step": {
-    "cells_ranked_30d_n10_net_pos": [
-      "bb-squeeze+ NORMAL LONG 43T 65.1% +0.75",
-      "volume-buildup- HIGH SHORT 19T 78.9% +0.42",
-      "pump-chain- NORMAL LONG 30T 40.0% +0.19",
-      "pump-chain+ EXTREME LONG 60T 38.3% +0.14",
-      "jup_yolo_mirrored HIGH SHORT 18T 61.1% +0.06"
-    ],
-    "early_cells_n5_9": "atr-trend- NORMAL SHORT 5T 100% +0.32 | warrior-sr-confirm+ NORMAL LONG 6T | r2v2-long3 NORMAL LONG 5T | continuum-trend+ NORMAL/FLAT 6T+6T | jup FLAT LONG 8T — all labeled, none validated",
-    "proposal_emitted": false,
-    "why_not": "Every n>=10 winner cell and every n>=5 early cell is already covered by an OPEN amplify/eval entry: bb-squeeze+ (chop-exempt 11-13, neutral-exempt 11-14, rsi-reband 11-14, warrior-uninert 11-14), vb- HIGH SHORT (clonehunt 11-13), pc- (watch-contrarian-live 11-18 + fade cell-split), pc+ (weight-kill-review 11-13, drop-pcplus 11-14), jup HIGH SHORT (high-cell 11-19), atr-trend- (cell-watch 11-16, clonehunt 11-18). Weekly offense for this week was already emitted by run #247 4h ago (amplify-ugb-bypass-armgap, due 11-18). The one new measurable pool I found (stall 96T) is covered by mfe-cut 11-14 / prearm-breakeven 11-14 / stop-tighten 11-14 / tat-neverarmed 11-14 / structure-flip 11-21, and 52% of it by the 7 open jup evals — a new proposal would duplicate. Flip-KPI: 0 conversions this week; all ready-looking shadows carry explicit 'not runnable before ~11-13' OOS guards (amplify-jup-short-walk), so no early convert is legitimate today.",
-    "service_done": "amplify-ugb-bypass-armgap evidence updated with stall/armgap pool sizes"
-  },
-  "readiness": "0 open — CORRECT. btc_15m LONG_BIAS vs btc_4h SHORT_BIAS disagree; continuum ABOVE (watchdog) with trend_quality STRONG_UP; volatility LOW; velocity SLOW; no steers; portfolio_health good. Flat until a side sustains 15-30m with volume; trail-family first; size 1.0x (size-reduce file absent).",
-  "queue": [
-    "CEO: WINNER_CELL_SIZE_MULT 1.25->1.0 revert OVERDUE ~32h (one line, hermes_constants.py:1174) or explicit extension; fade fee/size input",
-    "11-12: storm-confl-waiver + linreg-fade-storm-admission + storm-readiness-packet (3 items)",
-    "11-13: vb- clonehunt + linreg-fade-fill-funnel + pc+ weight-kill-review + bbsqueeze-chop-exempt",
-    "11-14: EXIT-STACK DAY (mfe-cut, prearm-breakeven, stop-tighten x3, jup-short-walk, tat-neverarmed, rsi-ceiling recheck)",
-    "11-15: floor_admit same-sign",
-    "11-17: jup batch (cluster-gate, anti-chase, pro-selection, trail-1xatr, atrsl-parity) + bear-single-source + setup-recall",
-    "11-18: watch-contrarian-live read + atr-trend clone-hunt + ugb-bypass-armgap candle-walk",
-    "11-19: jup HIGH OOS + ema300-underdeploy",
-    "12-15: ugb-bypass-hole"
+  "config_changes_applied": [],
+  "changes_from_last_run": [
+    {
+      "run": 248,
+      "change": "stall_decomposition.py",
+      "verified": "selfcheck PASS: stall=98T armgap=7T; jup still #1"
+    },
+    {
+      "run": 248,
+      "change": "chop-bleed 92.1%",
+      "verified": "now 92.9% 3rd breach — stack not yet due"
+    },
+    {
+      "run": 248,
+      "change": "winner-cell revert CEO",
+      "verified": "STILL 1.25 overdue — resurface"
+    },
+    {
+      "run": 248,
+      "change": "contrarian join mandate",
+      "verified": "re-ran 20:31Z; pc- 64.6% n=350 stable"
+    }
   ],
   "next_actions": [
-    "Re-measure stall_decomposition at 11-14 exit-stack day — stall share should drop if mfe-cut/prearm land",
-    "chop-bleed 7d >=92% re-check next run (stack not yet due; 0.75x size stays vetoed)",
-    "session_brain duplicate rebuild — 7th run flagged"
-  ]
+    "CEO: WINNER_CELL_SIZE_MULT 1.25->1.0 revert ~44h OVERDUE",
+    "Service due 11-12: storm-confl-waiver, linreg-fade-storm, storm-readiness-packet",
+    "11-13: pump-chain-plus-weight-kill-review, vb-high-short-clonehunt, linreg-fade-fill",
+    "11-14 EXIT-STACK DAY + winner-cell mult-150 adjudication",
+    "11-15 floor same-sign; 11-17 jup batch; 11-18 contrarian watch + new amplies",
+    "Watch ETH #16867 null-SL cut-first; no new LONGs while regime disagrees",
+    "MED: session_brain rebuild"
+  ],
+  "amplify_weekly": {
+    "proposals_emitted": [
+      "amplify-jup-long-flat-cell",
+      "amplify-grind-breakout-underdeploy"
+    ],
+    "why_not_more": "All 5 n>=10 winner cells already OPEN; stall pool covered by 11-14 stack; flip-KPI 0 conversions this week"
+  },
+  "readiness": {
+    "open": 1,
+    "trades": [
+      {
+        "id": 16867,
+        "coin": "ETH",
+        "signal": "hl_copy_trader",
+        "dir": "LONG",
+        "pnl_usdt": 0.17,
+        "sl": null,
+        "tp": null,
+        "note": "null-SL — cut-first if fades"
+      }
+    ],
+    "regime": "btc_15m SHORT_BIAS vs btc_4h LONG_BIAS disagree; continuum ABOVE; vol LOW; velocity SLOW; market CALM; trend_quality STRONG_UP",
+    "verdict": "Mixed tape = chop. No new LONG entries until side sustains 15-30m with volume. Trail-family first. Size 1.0x."
+  }
 }
